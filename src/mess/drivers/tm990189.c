@@ -194,12 +194,12 @@ static MACHINE_RESET( tm990_189 )
 
 	hold_load(machine);
 
-	tms9901_init(0, &usr9901reset_param);
-	tms9901_init(1, &sys9901reset_param);
+	tms9901_init(machine, 0, &usr9901reset_param);
+	tms9901_init(machine, 1, &sys9901reset_param);
 	tms9901_reset(0);
 	tms9901_reset(1);
 
-	tms9902_init(0, &tms9902_params);
+	tms9902_init(machine, 0, &tms9902_params);
 }
 
 static const TMS9928a_interface tms9918_interface =
@@ -226,12 +226,12 @@ static MACHINE_RESET( tm990_189_v )
 
 	hold_load(machine);
 
-	tms9901_init(0, &usr9901reset_param);
-	tms9901_init(1, &sys9901reset_param);
+	tms9901_init(machine, 0, &usr9901reset_param);
+	tms9901_init(machine, 1, &sys9901reset_param);
 	tms9901_reset(0);
 	tms9901_reset(1);
 
-	tms9902_init(0, &tms9902_params);
+	tms9902_init(machine, 0, &tms9902_params);
 
 	TMS9928A_reset();
 }
@@ -494,7 +494,7 @@ static DEVICE_IMAGE_LOAD( tm990_189_rs232 )
 	rs232_fp = image;
 
 	tms9902_set_dsr(id, 1);
-	rs232_input_timer = timer_alloc(machine, rs232_input_callback, NULL);
+	rs232_input_timer = timer_alloc(image->machine, rs232_input_callback, NULL);
 	timer_adjust_periodic(rs232_input_timer, attotime_zero, 0, ATTOTIME_IN_MSEC(10));
 
 	return INIT_PASS;

@@ -39,7 +39,7 @@ struct _mc6854_interface
   void ( * out_tx  ) ( int state ); /* transmit bit */
 
   /* high-level, frame-based interface */
-  void ( * out_frame ) ( UINT8* data, int length );
+  void ( * out_frame ) ( running_machine *machine, UINT8* data, int length );
 
   /* control lines */
   void ( * out_rts ) ( int state ); /* 1 = transmitting, 0 = idle */
@@ -49,7 +49,7 @@ struct _mc6854_interface
 
 /* ---------- functions ------------ */
 
-extern void mc6854_config ( const mc6854_interface* func );
+extern void mc6854_config ( running_machine *machine, const mc6854_interface* func );
 
 /* reset by external signal */
 extern void mc6854_reset ( void );
@@ -59,10 +59,10 @@ extern READ8_HANDLER  ( mc6854_r );
 extern WRITE8_HANDLER ( mc6854_w );
 
 /* low-level, bit-based interface */
-extern void mc6854_set_rx ( int state );
+extern void mc6854_set_rx ( running_machine *machine, int state );
 
 /* high-level, frame-based interface */
-extern int mc6854_send_frame( UINT8* data, int length ); /* ret -1 if busy */
+extern int mc6854_send_frame( running_machine *machine, UINT8* data, int length ); /* ret -1 if busy */
 
 /* control lines */
 extern void mc6854_set_cts ( int state ); /* 1 = clear-to-send, 0 = busy */

@@ -215,7 +215,7 @@ static void thom_floppy_seek ( const device_config *image, int physical_track )
 		physical_track = 0;
 	if ( physical_track >= 80 )
 		physical_track = 79;
-	LOG(( "%f thom_floppy_seek: dev=%d track=%i\n", attotime_to_double(timer_get_time(machine)), (int)(FPTR)(d - thom_floppy_drives), physical_track ));
+	//LOG(( "%f thom_floppy_seek: dev=%d track=%i\n", attotime_to_double(timer_get_time(machine)), (int)(FPTR)(d - thom_floppy_drives), physical_track ));
 	d->cur_track = physical_track;
 }
 

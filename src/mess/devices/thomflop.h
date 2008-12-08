@@ -39,7 +39,7 @@ extern READ8_HANDLER  ( to9_floppy_r );
 extern WRITE8_HANDLER ( to9_floppy_w );
 
 /* TO8 internal (THMFC1) controller */
-extern void thmfc_floppy_init  ( void );
+extern void thmfc_floppy_init  ( running_machine *machine );
 extern void thmfc_floppy_reset ( running_machine *machine );
 extern READ8_HANDLER  ( thmfc_floppy_r );
 extern WRITE8_HANDLER ( thmfc_floppy_w );

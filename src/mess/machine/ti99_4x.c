@@ -751,10 +751,10 @@ MACHINE_START( ti99_4ev_60hz)
 void ti99_common_init(running_machine *machine, const TMS9928a_interface *gfxparm) 
 {
     if (ti99_model==model_99_8) {
-        tms9901_init(0, &tms9901reset_param_ti99_8);
+        tms9901_init(machine, 0, &tms9901reset_param_ti99_8);
     }
     else {
-	tms9901_init(0,  &tms9901reset_param_ti99_4x);
+		tms9901_init(machine, 0,  &tms9901reset_param_ti99_4x);
     }
 	if (gfxparm!=0) TMS9928A_configure(gfxparm);
 
@@ -1283,12 +1283,12 @@ static WRITE16_HANDLER ( ti99_wspeech_w )
 	if (! tms5220_ready_r())
 	{
 		attotime time_to_ready = double_to_attotime(tms5220_time_to_ready());
-		int cycles_to_ready = ceil(cpu_attotime_to_clocks(machine->cpu[0], time_to_ready));
+		int cycles_to_ready = ceil(cpu_attotime_to_clocks(space->machine->cpu[0], time_to_ready));
 
 		logerror("time to ready: %f -> %d\n", attotime_to_double(time_to_ready), (int) cycles_to_ready);
 
 		cpu_adjust_icount(space->machine->cpu[0],-cycles_to_ready);
-		timer_set(machine, attotime_zero, NULL, 0, /*speech_kludge_callback*/NULL);
+		timer_set(space->machine, attotime_zero, NULL, 0, /*speech_kludge_callback*/NULL);
 	}
 #endif
 
@@ -1644,14 +1644,14 @@ WRITE8_HANDLER ( ti99_8_w )
 					if (! tms5220_ready_r())
 					{
 						attotime time_to_ready = double_to_attotime(tms5220_time_to_ready());
-						double d = ceil(cpu_attotime_to_clocks(machine->cpu[0], time_to_ready));
+						double d = ceil(cpu_attotime_to_clocks(space->machine->cpu[0], time_to_ready));
 						int cycles_to_ready = ((int) (d + 3)) & ~3;
 
 						logerror("time to ready: %f -> %d\n", attotime_to_double(time_to_ready)
 							, (int) cycles_to_ready);
 
 						cpu_adjust_icount(space->machine->cpu[0],-cycles_to_ready);
-						timer_set(machine, attotime_zero, NULL, 0, /*speech_kludge_callback*/NULL);
+						timer_set(space->machine, attotime_zero, NULL, 0, /*speech_kludge_callback*/NULL);
 					}
 
 					tms5220_data_w(space, offset, data);
@@ -1819,7 +1819,7 @@ static void ti99_handset_set_ack(int offset, int data)
 		handset_ack = data;
 		if (data == handset_clock)
 			/* I don't know what the real delay is, but 30us apears to be enough */
-			timer_set(machine, ATTOTIME_IN_USEC(30), NULL, 0, ti99_handset_ack_callback);
+			timer_set(Machine, ATTOTIME_IN_USEC(30), NULL, 0, ti99_handset_ack_callback);
 	}
 }
 

@@ -164,8 +164,8 @@ DEVICE_IMAGE_UNLOAD( ti99_4_rs232 )
 void ti99_rs232_init(running_machine *machine)
 {
 	rs232_DSR = memory_region(machine, region_dsr) + offset_rs232_dsr;
-	tms9902_init(0, &tms9902_params);
-	tms9902_init(1, &tms9902_params);
+	tms9902_init(machine, 0, &tms9902_params);
+	tms9902_init(machine, 1, &tms9902_params);
 	
 	add_exit_callback(machine, ti99_rs232_cleanup);
 }

@@ -566,19 +566,19 @@ WRITE8_HANDLER ( mea8000_w )
 		{
 			/* got pitch byte before first frame */
 			mea8000.pitch = 2 * data;
-			LOG(( "$%04x %f: mea8000_w pitch %i\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)), mea8000.pitch ));
+			LOG(( "$%04x %f: mea8000_w pitch %i\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(space->machine)), mea8000.pitch ));
 			mea8000.state = MEA8000_WAIT_FIRST;
 			mea8000.bufpos = 0;
 		}
 		else if (mea8000.bufpos == 4)
 		{
 			/* overflow */
-			LOG(( "$%04x %f: mea8000_w data overflow %02X\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)), data ));
+			LOG(( "$%04x %f: mea8000_w data overflow %02X\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(space->machine)), data ));
 		}
 		else
 		{
 			/* enqueue frame byte */
-			LOG(( "$%04x %f: mea8000_w data %02X in frame pos %i\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)),
+			LOG(( "$%04x %f: mea8000_w data %02X in frame pos %i\n", cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(space->machine)),
 			      data, mea8000.bufpos ));
 			mea8000.buf[mea8000.bufpos] = data;
 			mea8000.bufpos++;
@@ -612,7 +612,7 @@ WRITE8_HANDLER ( mea8000_w )
 			mea8000_stop_frame();
 
 		LOG(( "$%04x %f: mea8000_w command %02X stop=%i cont=%i roe=%i\n",
-		      cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(machine)), data,
+		      cpu_get_previouspc(space->cpu), attotime_to_double(timer_get_time(space->machine)), data,
 		      stop, mea8000.cont, mea8000.roe ));
 
 		mea8000_update_req(space->machine);
@@ -663,7 +663,7 @@ void mea8000_config ( running_machine *machine, int channel, write8_space_func r
 	mea8000.timer = timer_alloc(machine,  mea8000_timer_expire , NULL);
 
 	state_save_register_item(machine, "mea8000", NULL, 0, mea8000.state );
-	state_save_register_item_array( "mea8000", NULL, 0, mea8000.buf );
+	state_save_register_item_array(machine, "mea8000", NULL, 0, mea8000.buf );
 	state_save_register_item(machine, "mea8000", NULL, 0, mea8000.bufpos );
 	state_save_register_item(machine, "mea8000", NULL, 0, mea8000.cont );
 	state_save_register_item(machine, "mea8000", NULL, 0, mea8000.roe );

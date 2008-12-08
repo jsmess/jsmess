@@ -201,11 +201,11 @@ static emu_timer *thom_lightpen_timer;
 
 
 /* lightpen callback function to call from timer */
-static void (*thom_lightpen_cb) ( int );
+static void (*thom_lightpen_cb) ( running_machine *machine, int );
 
 
 
-void thom_set_lightpen_callback ( int nb, void (*cb) ( int step ) )
+void thom_set_lightpen_callback ( running_machine *machine, int nb, void (*cb) ( running_machine *machine, int step ) )
 {
 	LOG (( "%f thom_set_lightpen_callback called\n", attotime_to_double(timer_get_time(machine)) ));
 	thom_lightpen_nb = nb;
@@ -217,7 +217,7 @@ static TIMER_CALLBACK( thom_lightpen_step )
 	int step = param;
 
 	if ( thom_lightpen_cb )
-		thom_lightpen_cb( step );
+		thom_lightpen_cb( machine, step );
 
 	if ( step < thom_lightpen_nb )
 		timer_adjust_oneshot(thom_lightpen_timer, ATTOTIME_IN_USEC( 64 ), step + 1);
@@ -911,7 +911,7 @@ VIDEO_UPDATE ( thom )
 	rectangle lrect = { 0, xbleft - 1, 0, 0 };
 	rectangle rrect = { xbright, xright - 1, 0, 0 };
 
-	LOG (( "%f thom: video update called\n", attotime_to_double(timer_get_time(machine)) ));
+	//LOG (( "%f thom: video update called\n", attotime_to_double(timer_get_time(machine)) ));
 
 	/* upper border */
 	for ( y = 0; y < THOM_BORDER_HEIGHT - thom_bheight; y++ )
@@ -1009,11 +1009,11 @@ VIDEO_UPDATE ( thom )
 
 static emu_timer *thom_init_timer;
 
-static void (*thom_init_cb) ( int );
+static void (*thom_init_cb) ( running_machine *machine, int );
 
 
 
-void thom_set_init_callback ( void (*cb) ( int init ) )
+void thom_set_init_callback ( void (*cb) ( running_machine *machine, int init ) )
 {
 	thom_init_cb = cb;
 }
@@ -1026,7 +1026,7 @@ static TIMER_CALLBACK( thom_set_init )
 	LOG (( "%f thom_set_init: %i, at line %i col %i\n", attotime_to_double(timer_get_time(machine)), init, thom_video_elapsed() / 64, thom_video_elapsed() % 64 ));
 
 	if ( thom_init_cb )
-		thom_init_cb( init );
+		thom_init_cb( machine, init );
 	if ( ! init )
 		timer_adjust_oneshot(thom_init_timer, ATTOTIME_IN_USEC( 64 * THOM_ACTIVE_HEIGHT - 24 ), 1-init);
 }

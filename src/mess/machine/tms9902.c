@@ -126,7 +126,7 @@ static void initiate_transmit(int which);
 /*
 	initialize the tms9902 core
 */
-void tms9902_init(int which, const tms9902reset_param *param)
+void tms9902_init(running_machine *machine,int which, const tms9902reset_param *param)
 {
 	tms9902[which].clock_rate = param->clock_rate;
 

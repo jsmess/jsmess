@@ -76,6 +76,7 @@
 #include "includes/thomson.h"
 #include "machine/6821pia.h"
 #include "machine/mc6846.h"
+#include "machine/6850acia.h"
 #include "machine/6551.h"
 #include "audio/mea8000.h"
 #include "devices/cartslot.h"
@@ -712,6 +713,7 @@ static SYSTEM_CONFIG_START ( t9000 )
      CONFIG_IMPORT_FROM ( to7 )
 SYSTEM_CONFIG_END
 
+extern const acia6850_interface to7_acia_modem;
 
 /* ------------ driver ------------ */
 
@@ -760,6 +762,8 @@ static MACHINE_DRIVER_START ( to7 )
 
 	/* acia */
 	MDRV_DEVICE_ADD("acia", ACIA6551)
+	MDRV_DEVICE_ADD("acia_1", ACIA6850)
+	MDRV_DEVICE_CONFIG(to7_acia_modem)	
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START ( t9000 )

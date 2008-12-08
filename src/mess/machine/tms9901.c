@@ -193,7 +193,7 @@ static int find_first_bit(int value)
 /*
 	initialize the tms9901 core
 */
-void tms9901_init(int which, const tms9901reset_param *param)
+void tms9901_init(running_machine *machine,int which, const tms9901reset_param *param)
 {
 	int i;
 

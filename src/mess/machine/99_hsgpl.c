@@ -260,13 +260,13 @@ void ti99_hsgpl_init(running_machine *machine)
 	hsgpl.RAM6_ptr = rgn + offset_hsgpl_ram6;
 
 	at29c040a_init_data_ptr(feeprom_grom0, rgn + offset_hsgpl_grom);
-	at29c040a_init(feeprom_grom0);
+	at29c040a_init(machine,feeprom_grom0);
 	at29c040a_init_data_ptr(feeprom_grom1, rgn + offset_hsgpl_grom + 0x80000);
-	at29c040a_init(feeprom_grom1);
+	at29c040a_init(machine,feeprom_grom1);
 	at29c040a_init_data_ptr(feeprom_rom6, rgn + offset_hsgpl_rom6);
-	at29c040a_init(feeprom_rom6);
+	at29c040a_init(machine,feeprom_rom6);
 	at29c040a_init_data_ptr(feeprom_dsr, rgn + offset_hsgpl_dsr);
-	at29c040a_init(feeprom_dsr);
+	at29c040a_init(machine,feeprom_dsr);
 }
 
 /*

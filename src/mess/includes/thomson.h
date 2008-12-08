@@ -72,7 +72,6 @@ extern WRITE8_HANDLER ( to770_gatearray_w );
 extern MACHINE_START ( to770 );
 extern MACHINE_RESET ( to770 );
 
-
 /***************************** MO5 ******************************/
 
 /* gate-array */
@@ -254,7 +253,7 @@ extern struct thom_vsignal thom_get_lightpen_vsignal ( running_machine *machine,
 						       int xdec2 );
 
 /* specify a lightpencall-back function, called nb times per frame */
-extern void thom_set_lightpen_callback ( int nb, void (*cb) ( int step ) );
+extern void thom_set_lightpen_callback ( running_machine *machine, int nb, void (*cb) ( running_machine *machine, int step ) );
 
 
 /***************************** commons *****************************/
@@ -265,7 +264,7 @@ extern PALETTE_INIT ( thom );
 extern VIDEO_EOF    ( thom );
 
 /* pass video init signal */
-extern void thom_set_init_callback ( void (*cb) ( int init ) );
+extern void thom_set_init_callback ( void (*cb) ( running_machine *machine, int init ) );
 
 /* TO7 TO7/70 MO5 video bank switch */
 extern void thom_set_mode_point ( running_machine *machine, int point );

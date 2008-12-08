@@ -129,7 +129,7 @@ void at29c040a_init_data_ptr(int id, UINT8 *data_ptr)
 /*
 	Initialize one FEEPROM chip: must be called at machine init time
 */
-void at29c040a_init(int id)
+void at29c040a_init(running_machine *machine,int id)
 {
 	at29c040a[id].programming_timer = timer_alloc(machine, at29c040a_programming_timer_callback, NULL);
 }

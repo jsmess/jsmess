@@ -207,7 +207,7 @@ DRIVER_INIT( genmod )
 
 MACHINE_START( geneve )
 {
-	tms9901_init(0, & tms9901reset_param_ti99);
+	tms9901_init(machine, 0, & tms9901reset_param_ti99);
 
 	/* Initialize all. Actually, at this point, we don't know
 	   how the switches are set. Later we use the configuration switches to
@@ -413,12 +413,12 @@ static WRITE8_HANDLER ( geneve_speech_w )
 	if (! tms5220_ready_r())
 	{
 		attotime time_to_ready = double_to_attotime(tms5220_time_to_ready());
-		int cycles_to_ready = ceil(cpu_attotime_to_clocks(machine->cpu[0], time_to_ready));
+		int cycles_to_ready = ceil(cpu_attotime_to_clocks(space->machine->cpu[0], time_to_ready));
 
 		logerror("time to ready: %f -> %d\n", attotime_to_double(time_to_ready), (int) cycles_to_ready);
 
 		cpu_adjust_icount(space->machine->cpu[0],-cycles_to_ready);
-		timer_set(machine, attotime_zero, NULL, 0, /*speech_kludge_callback*/NULL);
+		timer_set(space->machine, attotime_zero, NULL, 0, /*speech_kludge_callback*/NULL);
 	}
 #endif
 

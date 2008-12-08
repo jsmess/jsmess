@@ -33,7 +33,7 @@ typedef struct tms9901reset_param
 } tms9901reset_param;
 
 
-void tms9901_init(int which, const tms9901reset_param *param);
+void tms9901_init(running_machine *machine,int which, const tms9901reset_param *param);
 void tms9901_cleanup(int which);
 
 void tms9901_reset(int which);

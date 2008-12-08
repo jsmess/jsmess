@@ -237,7 +237,7 @@ static TIMER_CALLBACK(setup_beep)
 /*
 	Initialize one 911 vdt controller/terminal
 */
-void vdt911_init_term(int unit, const vdt911_init_params_t *params)
+void vdt911_init_term(running_machine *machine,int unit, const vdt911_init_params_t *params)
 {
 	vdt[unit].screen_size = params->screen_size;
 	vdt[unit].model = params->model;
