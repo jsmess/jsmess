@@ -109,7 +109,7 @@ static TIMER_CALLBACK(pc_rtc_timer)
 	}
 }
 
-void pc_rtc_init(void)
+void pc_rtc_init(running_machine *machine)
 {
 	memset(&pc_rtc,0,sizeof(pc_rtc));
 	pc_rtc.timer = timer_alloc(machine, pc_rtc_timer, NULL);
@@ -160,6 +160,8 @@ static struct {
 
 WRITE8_HANDLER ( pc_EXP_w )
 {
+	running_machine *machine = space->machine;
+
 	DBG_LOG(1,"EXP_unit_w",("%.2x $%02x\n", offset, data));
 	switch (offset) {
 	case 4:
@@ -174,6 +176,7 @@ READ8_HANDLER ( pc_EXP_r )
 {
     int data;
 	UINT16 a;
+	running_machine *machine = space->machine;
 
 	switch (offset) {
 	case 6:

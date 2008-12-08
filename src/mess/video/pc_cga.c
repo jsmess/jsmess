@@ -546,6 +546,7 @@ static MC6845_UPDATE_ROW( cga_text_inten_update_row )
 {
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	int i;
+	running_machine *machine = device->machine;
 
 	if ( y == 0 ) CGA_LOG(1,"cga_text_inten_update_row",("\n"));
 	for ( i = 0; i < x_count; i++ )
@@ -583,6 +584,7 @@ static MC6845_UPDATE_ROW( cga_text_inten_comp_grey_update_row )
 {
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	int i;
+	running_machine *machine = device->machine;
 
 	if ( y == 0 ) CGA_LOG(1,"cga_text_inten_update_row",("\n"));
 	for ( i = 0; i < x_count; i++ )
@@ -619,6 +621,7 @@ static MC6845_UPDATE_ROW( cga_text_inten_alt_update_row )
 {
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	int i;
+	running_machine *machine = device->machine;
 
 	if ( y == 0 ) CGA_LOG(1,"cga_text_inten_alt_update_row",("\n"));
 	for ( i = 0; i < x_count; i++ )
@@ -655,6 +658,7 @@ static MC6845_UPDATE_ROW( cga_text_blink_update_row )
 {
 	UINT16	*p = BITMAP_ADDR16(bitmap, y, 0);
 	int i;
+	running_machine *machine = device->machine;
 
 	if ( y == 0 ) CGA_LOG(1,"cga_text_blink_update_row",("\n"));
 	for ( i = 0; i < x_count; i++ )
@@ -702,6 +706,7 @@ static MC6845_UPDATE_ROW( cga_text_blink_alt_update_row )
 {
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	int i;
+	running_machine *machine = device->machine;
 
 	if ( y == 0 ) CGA_LOG(1,"cga_text_blink_alt_update_row",("\n"));
 	for ( i = 0; i < x_count; i++ )
@@ -747,6 +752,7 @@ static MC6845_UPDATE_ROW( cga_gfx_4bppl_update_row )
 {
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	int i;
+	running_machine *machine = device->machine;
 
 	if ( y == 0 ) CGA_LOG(1,"cga_gfx_4bppl_update_row",("\n"));
 	for ( i = 0; i < x_count; i++ )
@@ -805,6 +811,7 @@ static MC6845_UPDATE_ROW( cga_gfx_4bpph_update_row )
 	int		samp_index = 0;
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	int i;
+	running_machine *machine = device->machine;
 
 	if ( y == 0 ) CGA_LOG(1,"cga_gfx_4bpph_update_row",("\n"));
 if ( NTSC_FILTER )
@@ -907,6 +914,7 @@ static MC6845_UPDATE_ROW( cga_gfx_2bpp_update_row )
 {
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	int i;
+	running_machine *machine = device->machine;
 
 	if ( y == 0 ) CGA_LOG(1,"cga_gfx_2bpp_update_row",("\n"));
 	for ( i = 0; i < x_count; i++ )
@@ -941,6 +949,7 @@ static MC6845_UPDATE_ROW( cga_gfx_1bpp_update_row )
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	UINT8	fg = cga.color_select & 0x0F;
 	int i;
+	running_machine *machine = device->machine;
 
 	if ( y == 0 ) CGA_LOG(1,"cga_gfx_1bpp_update_row",("\n"));
 	for ( i = 0; i < x_count; i++ )
@@ -1156,7 +1165,7 @@ static void pc_cga_mode_control_w(running_machine *machine, int data)
 /*
  *	?W	reserved for color select register on color adapter
  */
-static void pc_cga_color_select_w(int data)
+static void pc_cga_color_select_w(running_machine *machine, int data)
 {
 	CGA_LOG(1,"CGA_color_select_w",("$%02x\n", data));
 	cga.color_select = data;
@@ -1169,7 +1178,7 @@ static void pc_cga_color_select_w(int data)
 /*
  * Select Plantronics modes
  */
-static void pc_cga_plantronics_w(int data)
+static void pc_cga_plantronics_w(running_machine *machine, int data)
 {
 	CGA_LOG(1,"CGA_plantronics_w",("$%02x\n", data));
 
@@ -1227,10 +1236,10 @@ static WRITE8_HANDLER( pc_cga8_w )
 		pc_cga_mode_control_w(space->machine, data);
 		break;
 	case 9:
-		pc_cga_color_select_w(data);
+		pc_cga_color_select_w(space->machine, data);
 		break;
 	case 0x0d:
-		pc_cga_plantronics_w(data);
+		pc_cga_plantronics_w(space->machine, data);
 		break;
 	}
 }
@@ -1457,6 +1466,7 @@ static MC6845_UPDATE_ROW( pc1512_gfx_4bpp_update_row )
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	UINT16	offset_base = ra << 13;
 	int i;
+	running_machine *machine = device->machine;
 
 	if ( y == 0 ) CGA_LOG(1,"pc1512_gfx_4bpp_update_row",("\n"));
 	for ( i = 0; i < x_count; i++ )

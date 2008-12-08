@@ -38,7 +38,7 @@ static TIMER_CALLBACK(pc_turbo_callback)
 
 
 
-int pc_turbo_setup(int cpunum, const char *port, int mask, double off_speed, double on_speed)
+int pc_turbo_setup(running_machine *machine, int cpunum, const char *port, int mask, double off_speed, double on_speed)
 {
 	struct pc_turbo_info *ti;
 

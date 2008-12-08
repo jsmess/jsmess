@@ -147,6 +147,7 @@ static MC6845_UPDATE_ROW( mda_text_inten_update_row )
 	UINT16	*p = BITMAP_ADDR16( bitmap, y, 0 );
 	UINT16	chr_base = ( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
 	int i;
+	running_machine *machine = device->machine;
 
 	if ( y == 0 ) MDA_LOG(1,"mda_text_inten_update_row",("\n"));
 	for ( i = 0; i < x_count; i++ )
@@ -219,6 +220,7 @@ static MC6845_UPDATE_ROW( mda_text_blink_update_row )
 	UINT16	*p = BITMAP_ADDR16( bitmap, y, 0 );
 	UINT16	chr_base = ( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
 	int i;
+	running_machine *machine = device->machine;
 
 	if ( y == 0 ) MDA_LOG(1,"mda_text_blink_update_row",("\n"));
 	for ( i = 0; i < x_count; i++ )
@@ -317,7 +319,7 @@ static MC6845_ON_VSYNC_CHANGED( mda_vsync_changed )
 /*
  *	rW	MDA mode control register (see #P138)
  */
-static void mda_mode_control_w(int data)
+static void mda_mode_control_w(running_machine *machine, int data)
 {
 	MDA_LOG(1,"MDA_mode_control_w",("$%02x: colums %d, gfx %d, enable %d, blink %d\n",
 		data, (data&1)?80:40, (data>>1)&1, (data>>3)&1, (data>>5)&1));
@@ -373,7 +375,7 @@ WRITE8_HANDLER ( pc_MDA_w )
 			mc6845_register_w( devconf, offset, data );
 			break;
 		case 8:
-			mda_mode_control_w(data);
+			mda_mode_control_w(space->machine, data);
 			break;
 	}
 }
@@ -490,6 +492,7 @@ static MC6845_UPDATE_ROW( hercules_gfx_update_row )
 	UINT16	*p = BITMAP_ADDR16( bitmap, y, 0 );
 	UINT16	gfx_base = ( ( mda.mode_control & 0x80 ) ? 0x8000 : 0x0000 ) | ( ( ra & 0x03 ) << 13 );
 	int i;
+	running_machine *machine = device->machine;
 
 	if ( y == 0 ) MDA_LOG(1,"hercules_gfx_update_row",("\n"));
 	for ( i = 0; i < x_count; i++ )
@@ -556,7 +559,7 @@ static void hercules_mode_control_w(running_machine *machine, int data)
 }
 
 
-static void hercules_config_w(int data)
+static void hercules_config_w(running_machine *machine, int data)
 {
 	MDA_LOG(1,"HGC_config_w",("$%02x\n", data));
 	mda.configuration_switch = data;
@@ -579,7 +582,7 @@ static WRITE8_HANDLER ( pc_hercules_w )
 		hercules_mode_control_w(space->machine, data);
 		break;
 	case 15:
-		hercules_config_w(data);
+		hercules_config_w(space->machine, data);
 		break;
 	}
 }

@@ -18,7 +18,7 @@ READ8_HANDLER ( pc_JOY_r )
 {
 	UINT8 data = 0;
 	int delta;
-	attotime new_time = timer_get_time(machine);
+	attotime new_time = timer_get_time(space->machine);
 	const input_port_config *joystick_port = input_port_by_tag(space->machine->portconfig, "pc_joy");
 
 	if (joystick_port != NULL)
@@ -46,7 +46,7 @@ READ8_HANDLER ( pc_JOY_r )
 
 WRITE8_HANDLER ( pc_JOY_w )
 {
-	JOY_time = timer_get_time(machine);
+	JOY_time = timer_get_time(space->machine);
 }
 
 

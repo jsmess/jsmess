@@ -229,7 +229,7 @@ static PIC8259_SET_INT_LINE( pcjr_pic8259_master_set_int_line )
 {
 	if ( cpu_get_reg( device->machine->cpu[0], REG_PC ) == 0xF0454 )
 	{
-		timer_adjust_oneshot( pc_int_delay_timer, cpu_clocks_to_attotime(machine->cpu[0], 1), interrupt );
+		timer_adjust_oneshot( pc_int_delay_timer, cpu_clocks_to_attotime(device->machine->cpu[0], 1), interrupt );
 	}
 	else
 	{
@@ -574,7 +574,7 @@ static void pcjr_set_keyb_int(int state)
 }
 
 
-static void pcjr_keyb_init(void)
+static void pcjr_keyb_init(running_machine *machine)
 {
 	pcjr_keyb.transferring = 0;
 	pcjr_keyb.latch = 0;
@@ -660,6 +660,7 @@ static struct {
 static READ8_DEVICE_HANDLER (ibm5150_ppi_porta_r)
 {
 	int data = 0xFF;
+	running_machine *machine = device->machine;
 
 	/* KB port A */
 	if (pc_ppi.keyboard_clear)
@@ -702,6 +703,7 @@ static READ8_DEVICE_HANDLER (ibm5150_ppi_porta_r)
 static READ8_DEVICE_HANDLER (ibm5150_ppi_portb_r )
 {
 	int data;
+	running_machine *machine = device->machine;
 
 	data = 0xff;
 	PIO_LOG(1,"PIO_B_r",("$%02x\n", data));
@@ -713,6 +715,7 @@ static READ8_DEVICE_HANDLER ( ibm5150_ppi_portc_r )
 {
 	int timer2_output = pit8253_get_output( pc_devices.pit8253, 2 );
 	int data=0xff;
+	running_machine *machine = device->machine;
 
 	data&=~0x80; // no parity error
 	data&=~0x40; // no error on expansion board
@@ -780,6 +783,8 @@ static READ8_DEVICE_HANDLER ( ibm5150_ppi_portc_r )
 
 static WRITE8_DEVICE_HANDLER ( ibm5150_ppi_porta_w )
 {
+	running_machine *machine = device->machine;
+
 	/* KB controller port A */
 	PIO_LOG(1,"PIO_A_w",("$%02x\n", data));
 }
@@ -790,7 +795,7 @@ static WRITE8_DEVICE_HANDLER ( ibm5150_ppi_portb_w )
 	/* KB controller port B */
 	pc_ppi.portb = data;
 	pc_ppi.portc_switch_high = data & 0x08;
-	pc_ppi.keyboard_clear = data & 0x80;
+		pc_ppi.keyboard_clear = data & 0x80;
 	pc_ppi.keyb_clock = data & 0x40;
 	pit8253_gate_w( pc_devices.pit8253, 2, data & 1);
 	pc_speaker_set_spkrdata( data & 0x02 );
@@ -813,6 +818,8 @@ static WRITE8_DEVICE_HANDLER ( ibm5150_ppi_portb_w )
 
 static WRITE8_DEVICE_HANDLER ( ibm5150_ppi_portc_w )
 {
+	running_machine *machine = device->machine;
+
 	/* KB controller port C */
 	PIO_LOG(1,"PIO_C_w",("$%02x\n", data));
 }
@@ -880,6 +887,7 @@ const ppi8255_interface ibm5150_ppi8255_interface =
 static READ8_DEVICE_HANDLER (ibm5160_ppi_porta_r)
 {
 	int data = 0xFF;
+	running_machine *machine = device->machine;
 
 	/* KB port A */
 	if (pc_ppi.keyboard_clear)
@@ -911,6 +919,7 @@ static READ8_DEVICE_HANDLER ( ibm5160_ppi_portc_r )
 {
 	int timer2_output = pit8253_get_output( pc_devices.pit8253, 2 );
 	int data=0xff;
+	running_machine *machine = device->machine;
 
 	data&=~0x80; // no parity error
 	data&=~0x40; // no error on expansion board
@@ -983,6 +992,7 @@ static WRITE8_DEVICE_HANDLER ( pcjr_ppi_portb_w )
 static READ8_DEVICE_HANDLER (pcjr_ppi_porta_r )
 {
 	int data;
+	running_machine *machine = device->machine;
 
 	data = 0xff;
 	PIO_LOG(1,"PIO_A_r",("$%02x\n", data));
@@ -1120,7 +1130,7 @@ void mess_init_pc_common(running_machine *machine, UINT32 flags, void (*set_keyb
 DRIVER_INIT( ibm5150 )
 {
 	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
-	pc_rtc_init();
+	pc_rtc_init(machine);
 
 	/* Attach keyboard to the keyboard controller */
 	ibm5150_set_keyboard_interface( machine, kb_keytronic_set_clock_signal, kb_keytronic_set_data_signal );
@@ -1131,7 +1141,7 @@ DRIVER_INIT( ibm5150 )
 DRIVER_INIT( pccga )
 {
 	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
-	pc_rtc_init();
+	pc_rtc_init(machine);
 }
 
 
@@ -1169,7 +1179,7 @@ DRIVER_INIT( europc )
 
 	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
 
-	europc_rtc_init();
+	europc_rtc_init(machine);
 //	europc_rtc_set_time(machine);
 }
 
@@ -1333,7 +1343,7 @@ MACHINE_RESET( pc )
 MACHINE_RESET( pcjr )
 {
 	MACHINE_RESET_CALL( pc );
-	pcjr_keyb_init();
+	pcjr_keyb_init(machine);
 	pc_int_delay_timer = timer_alloc(machine,  pcjr_delayed_pic8259_irq, NULL );
 }
 

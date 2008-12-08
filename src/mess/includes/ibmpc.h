@@ -16,7 +16,7 @@ WRITE8_HANDLER( pc_rtc_w );
 READ16_HANDLER( pc16le_rtc_r );
 WRITE16_HANDLER( pc16le_rtc_w );
 
-void pc_rtc_init(void);
+void pc_rtc_init(running_machine *machine);
 
 READ8_HANDLER ( pc_EXP_r );
 WRITE8_HANDLER ( pc_EXP_w );

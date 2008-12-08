@@ -421,6 +421,8 @@ DRVLIBS = \
 	$(MESSOBJ)/mikro80.a \
 	$(MESSOBJ)/ondra.a \
 	$(MESSOBJ)/orion.a \
+	$(MESSOBJ)/pc.a \
+	$(MESSOBJ)/pcshare.a \
 	$(MESSOBJ)/pel.a \
 	$(MESSOBJ)/pk8020.a \
 	$(MESSOBJ)/pmd85.a \
@@ -429,6 +431,7 @@ DRVLIBS = \
 	$(MESSOBJ)/radio.a \
 	$(MESSOBJ)/rt1715.a \
 	$(MESSOBJ)/sapi1.a \
+	$(MESSOBJ)/sgi.a \
 	$(MESSOBJ)/sharp.a \
 	$(MESSOBJ)/special.a \
 	$(MESSOBJ)/sony.a \
@@ -475,14 +478,11 @@ DRVLIBS = \
 #	$(MESSOBJ)/osborne.a \
 #	$(MESSOBJ)/p2000.a \
 #	$(MESSOBJ)/pasogo.a \
-#	$(MESSOBJ)/pc.a \
-#	$(MESSOBJ)/pcshare.a \
 #	$(MESSOBJ)/pdp1.a \
 #	$(MESSOBJ)/rca.a \
 #	$(MESSOBJ)/rockwell.a \
 #	$(MESSOBJ)/samcoupe.a \
 #	$(MESSOBJ)/sega.a \
-#	$(MESSOBJ)/sgi.a \
 #	$(MESSOBJ)/sinclair.a \
 #	$(MESSOBJ)/thomson.a \
 #	$(MESSOBJ)/ti99.a \

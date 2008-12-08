@@ -146,7 +146,7 @@ extern WRITE8_HANDLER( europc_rtc_w );
 extern NVRAM_HANDLER( europc_rtc );
 
 void europc_rtc_set_time(running_machine *machine);
-void europc_rtc_init(void);
+void europc_rtc_init(running_machine *machine);
 
 
 #endif /* EUROPC_H_ */

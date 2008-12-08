@@ -273,7 +273,7 @@ static TIMER_CALLBACK(europc_rtc_timer)
 	}
 }
 
-void europc_rtc_init(void)
+void europc_rtc_init(running_machine *machine)
 {
 	memset(&europc_rtc,0,sizeof(europc_rtc));
 	europc_rtc.data[0xf]=1;
