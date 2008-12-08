@@ -131,10 +131,10 @@ static DEVICE_START( dl1416 )
 	dl1416->intf = device->static_config;
 
 	/* register for state saving */
-	state_save_register_item(device->machine, "dl1416", NULL, 0, dl1416->chip_enable);
-	state_save_register_item(device->machine, "dl1416", NULL, 0, dl1416->cursor_enable);
-	state_save_register_item(device->machine, "dl1416", NULL, 0, dl1416->write_enable);
-	state_save_register_item_array(device->machine, "dl1416", NULL, 0, dl1416->cursor_ram);
+	state_save_register_item(device->machine, "dl1416", device->tag, 0, dl1416->chip_enable);
+	state_save_register_item(device->machine, "dl1416", device->tag, 0, dl1416->cursor_enable);
+	state_save_register_item(device->machine, "dl1416", device->tag, 0, dl1416->write_enable);
+	state_save_register_item_array(device->machine, "dl1416", device->tag, 0, dl1416->cursor_ram);
 	return DEVICE_START_OK;
 }
 
