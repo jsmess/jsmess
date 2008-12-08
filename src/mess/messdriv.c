@@ -552,8 +552,8 @@ XL/XE 16kB OS roms
 //	DRIVER( ti84pse )	/* 2004 TI-84 Plus Silver Edition					*/
 
 	/* NEC */
-//0128u5	DRIVER( pc88srl )	/* PC-8801mkIISR(Low res display, VSYNC 15KHz)		*/
-//0128u5	DRIVER( pc88srh )	/* PC-8801mkIISR(High res display, VSYNC 24KHz)		*/
+	DRIVER( pc88srl )	/* PC-8801mkIISR(Low res display, VSYNC 15KHz)		*/
+	DRIVER( pc88srh )	/* PC-8801mkIISR(High res display, VSYNC 24KHz)		*/
 
 	/* CANTAB */
 //0128u5	DRIVER( jupiter )	/* Jupiter Ace										*/
