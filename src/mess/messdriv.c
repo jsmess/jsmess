@@ -212,24 +212,24 @@ const game_driver * const drivers[] =
 	DRIVER( z88 )		/*													*/
 
 	/* AMSTRAD */
-//0128u5	DRIVER( cpc464 )	/* Amstrad (Schneider in Germany) 1984				*/
-//0128u5	DRIVER( cpc664 )	/* Amstrad (Schneider in Germany) 1985				*/
-//0128u5	DRIVER( cpc6128 )	/* Amstrad (Schneider in Germany) 1985				*/
-//0128u5	DRIVER( cpc6128s )	/* Amstrad (Schneider in Germany) 1985				*/
-//0128u5	DRIVER( cpc6128f )	/* Amstrad (Schneider in Germany) 1985 (AZERTY)		*/
-//0128u5	DRIVER( cpc464p )	/* Amstrad CPC464  Plus - 1990						*/
-//0128u5	DRIVER( cpc6128p )	/* Amstrad CPC6128 Plus - 1990						*/
-//0128u5	DRIVER( gx4000 )	/* Amstrad GX4000 - 1990							*/
-//0128u5	DRIVER( kccomp )	/* VEB KC compact									*/
-//0128u5	DRIVER( al520ex )	/* Patisonic Aleste 520EX (1993)					*/
-//0128u5	DRIVER( pcw8256 )	/* 198? PCW8256										*/
-//0128u5	DRIVER( pcw8512 )	/* 198? PCW8512										*/
-//0128u5	DRIVER( pcw9256 )	/* 198? PCW9256										*/
-//0128u5	DRIVER( pcw9512 )	/* 198? PCW9512 (+)									*/
-//0128u5	DRIVER( pcw10 ) 	/* 198? PCW10										*/
-//0128u5	DRIVER( pcw16 )		/* 1995 PCW16										*/
-//0128u5	DRIVER( nc100 )		/* 19?? NC100										*/
-//0128u5	DRIVER( nc200 )		/* 19?? NC200										*/
+	DRIVER( cpc464 )	/* Amstrad (Schneider in Germany) 1984				*/
+	DRIVER( cpc664 )	/* Amstrad (Schneider in Germany) 1985				*/
+	DRIVER( cpc6128 )	/* Amstrad (Schneider in Germany) 1985				*/
+	DRIVER( cpc6128s )	/* Amstrad (Schneider in Germany) 1985				*/
+	DRIVER( cpc6128f )	/* Amstrad (Schneider in Germany) 1985 (AZERTY)		*/
+	DRIVER( cpc464p )	/* Amstrad CPC464  Plus - 1990						*/
+	DRIVER( cpc6128p )	/* Amstrad CPC6128 Plus - 1990						*/
+	DRIVER( gx4000 )	/* Amstrad GX4000 - 1990							*/
+	DRIVER( kccomp )	/* VEB KC compact									*/
+	DRIVER( al520ex )	/* Patisonic Aleste 520EX (1993)					*/
+	DRIVER( pcw8256 )	/* 198? PCW8256										*/
+	DRIVER( pcw8512 )	/* 198? PCW8512										*/
+	DRIVER( pcw9256 )	/* 198? PCW9256										*/
+	DRIVER( pcw9512 )	/* 198? PCW9512 (+)									*/
+	DRIVER( pcw10 ) 	/* 198? PCW10										*/
+	DRIVER( pcw16 )		/* 1995 PCW16										*/
+	DRIVER( nc100 )		/* 19?? NC100										*/
+	DRIVER( nc200 )		/* 19?? NC200										*/
 
 	/* APPLE */
 	DRIVER( apple1 )	/* Jul 1976 Apple 1									*/
