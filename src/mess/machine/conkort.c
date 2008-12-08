@@ -101,27 +101,25 @@ Notes:
 typedef struct _slow_t slow_t;
 struct _slow_t
 {
-	const device_config *cpu;	/* CPU of the Z80 */
-
 	UINT8 status;			/* ABC BUS status */
 	UINT8 data;				/* ABC BUS data */
 	int pio_ardy;			/* PIO port A ready */
 	int fdc_irq;			/* FDC interrupt */
 
 	/* devices */
+	const device_config *cpu;
 	const device_config *z80pio;
 };
 
 typedef struct _fast_t fast_t;
 struct _fast_t
 {
-	const device_config *cpu;	/* CPU of the Z80 */
-
 	UINT8 status;			/* ABC BUS status */
 	UINT8 data;				/* ABC BUS data */
 	int fdc_irq;			/* FDC interrupt */
 
 	/* devices */
+	const device_config *cpu;
 	const device_config *z80dma;
 };
 
@@ -219,12 +217,14 @@ static ABCBUS_CARD_SELECT( luxor_55_10828 )
 
 	if (data == 0x2d) // TODO: bit 0 of this is configurable with S1
 	{
-		memory_install_readwrite8_handler(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_IO), ABCBUS_INP, ABCBUS_OUT, 0x18, 0, slow_bus_data_r, slow_bus_data_w);
-		memory_install_read8_handler(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_IO), ABCBUS_STAT, ABCBUS_STAT, 0x18, 0, slow_bus_stat_r);
-		memory_install_write8_handler(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_IO), ABCBUS_C1, ABCBUS_C1, 0x18, 0, slow_bus_c1_w);
-		memory_install_write8_handler(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_IO), ABCBUS_C2, ABCBUS_C2, 0x18, 0, SMH_NOP);
-		memory_install_write8_handler(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_IO), ABCBUS_C3, ABCBUS_C3, 0x18, 0, slow_bus_c3_w);
-		memory_install_write8_handler(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_IO), ABCBUS_C4, ABCBUS_C4, 0x18, 0, SMH_NOP);
+		const address_space *io = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_IO);
+			
+		memory_install_readwrite8_handler(io, ABCBUS_INP, ABCBUS_OUT, 0x18, 0, slow_bus_data_r, slow_bus_data_w);
+		memory_install_read8_handler(io, ABCBUS_STAT, ABCBUS_STAT, 0x18, 0, slow_bus_stat_r);
+		memory_install_write8_handler(io, ABCBUS_C1, ABCBUS_C1, 0x18, 0, slow_bus_c1_w);
+		memory_install_write8_handler(io, ABCBUS_C2, ABCBUS_C2, 0x18, 0, SMH_NOP);
+		memory_install_write8_handler(io, ABCBUS_C3, ABCBUS_C3, 0x18, 0, slow_bus_c3_w);
+		memory_install_write8_handler(io, ABCBUS_C4, ABCBUS_C4, 0x18, 0, SMH_NOP);
 	}
 
 	cpu_set_input_line(conkort->cpu, INPUT_LINE_RESET, PULSE_LINE);
@@ -346,12 +346,14 @@ static ABCBUS_CARD_SELECT( luxor_55_21046 )
 
 	if (data == input_port_read(device->machine, "SW3"))
 	{
-		memory_install_readwrite8_handler(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_IO), ABCBUS_INP, ABCBUS_OUT, 0x18, 0, fast_bus_data_r, fast_bus_data_w);
-		memory_install_read8_handler(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_IO), ABCBUS_STAT, ABCBUS_STAT, 0x18, 0, fast_bus_stat_r);
-		memory_install_write8_handler(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_IO), ABCBUS_C1, ABCBUS_C1, 0x18, 0, fast_bus_c1_w);
-		memory_install_write8_handler(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_IO), ABCBUS_C2, ABCBUS_C2, 0x18, 0, SMH_NOP);
-		memory_install_write8_handler(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_IO), ABCBUS_C3, ABCBUS_C3, 0x18, 0, fast_bus_c3_w);
-		memory_install_write8_handler(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_IO), ABCBUS_C4, ABCBUS_C4, 0x18, 0, SMH_NOP);
+		const address_space *io = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_IO);
+
+		memory_install_readwrite8_handler(io, ABCBUS_INP, ABCBUS_OUT, 0x18, 0, fast_bus_data_r, fast_bus_data_w);
+		memory_install_read8_handler(io, ABCBUS_STAT, ABCBUS_STAT, 0x18, 0, fast_bus_stat_r);
+		memory_install_write8_handler(io, ABCBUS_C1, ABCBUS_C1, 0x18, 0, fast_bus_c1_w);
+		memory_install_write8_handler(io, ABCBUS_C2, ABCBUS_C2, 0x18, 0, SMH_NOP);
+		memory_install_write8_handler(io, ABCBUS_C3, ABCBUS_C3, 0x18, 0, fast_bus_c3_w);
+		memory_install_write8_handler(io, ABCBUS_C4, ABCBUS_C4, 0x18, 0, SMH_NOP);
 	}
 
 	cpu_set_input_line(conkort->cpu, INPUT_LINE_RESET, PULSE_LINE);
@@ -774,9 +776,9 @@ ROM_END
 
 ROM_START( luxor_55_21046 )
 	ROM_REGION( 0x10000, "conkort", ROMREGION_LOADBYNAME )
+	ROM_LOAD( "fast108.bin",	0x0000, 0x2000, CRC(229764cb) SHA1(a2e2f6f49c31b827efc62f894de9a770b65d109d) ) // Luxor v1.08
+	ROM_LOAD( "fast207.bin",	0x0000, 0x2000, CRC(86622f52) SHA1(61ad271de53152c1640c0b364fce46d1b0b4c7e2) ) // DIAB v2.07
 	ROM_LOAD( "6490318-07.bin", 0x0000, 0x2000, CRC(06ae1fe8) SHA1(ad1d9d0c192539af70cb95223263915a09693ef8) ) // PROM v1.07, Art N/O 6490318-07. Luxor Styrkort Art. N/O 55 21046-41. Date 1985-07-03
-//	ROM_LOAD( "fast108.bin",	0x2000, 0x2000, CRC(229764cb) SHA1(a2e2f6f49c31b827efc62f894de9a770b65d109d) ) // Luxor v1.08
-//	ROM_LOAD( "fast207.bin",	0x4000, 0x2000, CRC(86622f52) SHA1(61ad271de53152c1640c0b364fce46d1b0b4c7e2) ) // DIAB v2.07
 ROM_END
 
 ROM_START( myab_turbo_kontroller )
@@ -786,7 +788,7 @@ ROM_START( myab_turbo_kontroller )
 	ROM_LOAD( "unidisk8.bin", 0x2000, 0x1000, CRC(d04e6a43) SHA1(8db504d46ff0355c72bd58fd536abeb17425c532) ) // 8"
 ROM_END
 
-ROM_START( hdd_controller ) // TODO: remove this!
+ROM_START( hdd_controller )
 	ROM_REGION( 0x1000, "abc850", ROMREGION_LOADBYNAME )
 	ROM_LOAD( "rodi202.bin",  0x0000, 0x0800, CRC(337b4dcf) SHA1(791ebeb4521ddc11fb9742114018e161e1849bdf) ) // Rodime RO202 (http://artofhacking.com/th99/h/txt/3699.txt)
 	ROM_LOAD( "basf6185.bin", 0x0800, 0x0800, CRC(06f8fe2e) SHA1(e81f2a47c854e0dbb096bee3428d79e63591059d) ) // BASF 6185 (http://bk0010.narod.ru/hardware_specs/h/txt/178.txt)
@@ -817,15 +819,21 @@ static DEVICE_START( luxor_55_10828 )
 	/* find our CPU */
 	astring_printf(tempstring, "%s:%s", device->tag, CONKORT_Z80_TAG);
 	conkort->cpu = cputag_get_cpu(device->machine, astring_c(tempstring));
-	astring_free(tempstring);
 
 	/* find devices */
-	conkort->z80pio = devtag_get_device(device->machine, Z80PIO, "conkort:3a"); // TODO hardcoded
+	astring_printf(tempstring, "%s:%s", device->tag, CONKORT_Z80PIO_TAG);
+	conkort->z80pio = devtag_get_device(device->machine, Z80PIO, astring_c(tempstring));
 
 	/* initialize FDC */
 	wd17xx_init(device->machine, WD_TYPE_179X, slow_wd1791_callback, NULL); // FD1791-01
 
 	/* register for state saving */
+	state_save_register_device_item(device, 0, conkort->status);
+	state_save_register_device_item(device, 0, conkort->data);
+	state_save_register_device_item(device, 0, conkort->pio_ardy);
+	state_save_register_device_item(device, 0, conkort->fdc_irq);
+
+	astring_free(tempstring);
 
 	return DEVICE_START_OK;
 }
@@ -885,15 +893,20 @@ static DEVICE_START( luxor_55_21046 )
 	/* find our CPU */
 	astring_printf(tempstring, "%s:%s", device->tag, CONKORT_Z80_TAG);
 	conkort->cpu = cputag_get_cpu(device->machine, astring_c(tempstring));
-	astring_free(tempstring);
 
 	/* find devices */
-	conkort->z80dma = devtag_get_device(device->machine, Z80DMA, "conkort:z80dma"); // TODO hardcoded
+	astring_printf(tempstring, "%s:%s", device->tag, CONKORT_Z80DMA_TAG);
+	conkort->z80dma = devtag_get_device(device->machine, Z80DMA, astring_c(tempstring));
 
 	/* initialize FDC */
 	wd17xx_init(device->machine, WD_TYPE_1793, fast_wd1793_callback, NULL); // FD1793-01
 
 	/* register for state saving */
+	state_save_register_device_item(device, 0, conkort->status);
+	state_save_register_device_item(device, 0, conkort->data);
+	state_save_register_device_item(device, 0, conkort->fdc_irq);
+
+	astring_free(tempstring);
 
 	return DEVICE_START_OK;
 }
