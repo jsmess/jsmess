@@ -733,7 +733,7 @@ static MACHINE_RESET( tmc1800 )
 
 	/* reset CDP1864 */
 
-	state->cdp1861->reset(state->cdp1861);
+	device_reset(state->cdp1861);
 }
 
 // OSCOM 1000B
@@ -792,10 +792,11 @@ static MACHINE_START( tmc2000 )
 
 static MACHINE_RESET( tmc2000 )
 {
+	tmc2000_state *state = machine->driver_data;
+
 	/* reset CDP1864 */
 
-	const device_config *cdp1864 = devtag_get_device(machine, CDP1864, CDP1864_TAG);
-	cdp1864->reset(cdp1864);
+	device_reset(state->cdp1864);
 
 	/* enable monitor mirror at 0x0000 */
 
@@ -846,7 +847,7 @@ static MACHINE_RESET( oscnano )
 
 	/* reset CDP1864 */
 
-	state->cdp1864->reset(state->cdp1864);
+	device_reset(state->cdp1864);
 
 	/* enable ROM */
 
