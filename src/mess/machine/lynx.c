@@ -9,8 +9,6 @@
 #include "devices/cartslot.h"
 #include "hash.h"
 
-#include "deprecat.h"
-
 static UINT16 lynx_granularity = 1;
 static int lynx_line;
 static int lynx_line_y;	
@@ -787,7 +785,7 @@ static void lynx_blitter(running_machine *machine)
 	int i; int o;int colors;
 
 	blitter.memory_accesses = 0;
-	blitter.mem = memory_get_read_ptr(cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000);
+	blitter.mem = memory_get_read_ptr(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000);
 
 	blitter.xoff   = GET_WORD(suzy.data, 0x04);
 	blitter.yoff   = GET_WORD(suzy.data, 0x06);

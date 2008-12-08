@@ -10,7 +10,6 @@
 #include "sound/speaker.h"
 #include "machine/centroni.h"
 #include "devices/printer.h"
-#include "deprecat.h"
 
 static UINT8 super80_mhz=2;	/* state of bit 2 of port F0 */
 static UINT16 vidpg=0xfe00;	/* Home position of video page being displayed */
@@ -240,7 +239,7 @@ static VIDEO_UPDATE( super80 )
 		for (x=0; x<32; x++)
 		{
 			if (screen_on)
-				code = memory_read_byte(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), vidpg + x + (y<<5));
+				code = memory_read_byte(cputag_get_address_space(screen->machine,"main",ADDRESS_SPACE_PROGRAM), vidpg + x + (y<<5));
 
 			drawgfx(bitmap, screen->machine->gfx[0], code & mask, 0, 0, 0, x*8, y*10,
 				cliprect, TRANSPARENCY_NONE, 0);
@@ -275,9 +274,9 @@ static VIDEO_UPDATE( super80m )
 		{
 			if (screen_on)
 			{
-				code = memory_read_byte(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), vidpg + x + (y<<5));		/* get character to display */
+				code = memory_read_byte(cputag_get_address_space(screen->machine,"main",ADDRESS_SPACE_PROGRAM), vidpg + x + (y<<5));		/* get character to display */
 
-				if (!(options & 0x40)) col = memory_read_byte(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0xfe00 + x + (y<<5));	/* byte of colour to display */
+				if (!(options & 0x40)) col = memory_read_byte(cputag_get_address_space(screen->machine,"main",ADDRESS_SPACE_PROGRAM), 0xfe00 + x + (y<<5));	/* byte of colour to display */
 			}
 
 			drawgfx(bitmap, screen->machine->gfx[cgen], code, col, 0, 0, x*8, y*10,

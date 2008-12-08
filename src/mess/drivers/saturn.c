@@ -532,20 +532,20 @@ static UINT8 stv_SMPC_r8(const address_space *space, int offset)
 			{
 				case 0:
 					return_data = 0x90;
-//					return_data = 0xf0 | ((input_port_read(Machine, "JOY1")>>4) & 0xf);
+//					return_data = 0xf0 | ((input_port_read(space->machine, "JOY1")>>4) & 0xf);
 					break;
 
 				case 1:
-//					return_data = 0xf0 | ((input_port_read(Machine, "JOY1")>>12) & 0xf); 
+//					return_data = 0xf0 | ((input_port_read(space->machine, "JOY1")>>12) & 0xf); 
 					break;
 
 				case 2:
-//					return_data = 0xf0 | ((input_port_read(Machine, "JOY1")>>8) & 0xf);
+//					return_data = 0xf0 | ((input_port_read(space->machine, "JOY1")>>8) & 0xf);
 					break;
 
 				case 3:
 					return_data = 0x94;
-//					return_data = 0xf0 | (input_port_read(Machine, "JOY1")&0x8) | 0x4;
+//					return_data = 0xf0 | (input_port_read(space->machine, "JOY1")&0x8) | 0x4;
 					break;
 			}
 		}

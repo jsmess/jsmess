@@ -68,7 +68,7 @@ void matsucd_init( const device_config *cdrom_device )
 
 	cd.cdrom = mess_cd_get_cdrom_file( cdrom_device );
 
-	cd.frame_timer = timer_alloc(Machine, matsu_subcode_proc, NULL);
+	cd.frame_timer = timer_alloc(cdrom_device->machine, matsu_subcode_proc, NULL);
 
 	cd.stch_signal = 1;
 }

@@ -586,7 +586,7 @@ static int generic_pak_load(const device_config *image, int rambase_index, int r
 	memcpy(pakbase, rambase + 0xC000, 0x3F00);
 
 	if (trailer_load)
-		pak_load_trailer(Machine, &trailer);
+		pak_load_trailer(image->machine, &trailer);
 	return INIT_PASS;
 }
 

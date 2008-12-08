@@ -1619,7 +1619,7 @@ static void set_field_sync(void)
 static TIMER_CALLBACK(hs_fall)
 {
 	if (LOG_HS)
-		logerror("hs_fall(): time=%s\n", attotime_string(timer_get_time(Machine), ATTOTIME_STRING_PRECISION));
+		logerror("hs_fall(): time=%s\n", attotime_string(timer_get_time(machine), ATTOTIME_STRING_PRECISION));
 
 	set_horizontal_sync();
 }
@@ -1627,7 +1627,7 @@ static TIMER_CALLBACK(hs_fall)
 static TIMER_CALLBACK(hs_rise)
 {
 	if (LOG_HS)
-		logerror("hs_rise(): time=%s\n", attotime_string(timer_get_time(Machine), ATTOTIME_STRING_PRECISION));
+		logerror("hs_rise(): time=%s\n", attotime_string(timer_get_time(machine), ATTOTIME_STRING_PRECISION));
 
 	timer_adjust_oneshot(m6847->hs_rise_timer,
 		attotime_make(0, m6847->scanline_period), 0);
@@ -1641,7 +1641,7 @@ static TIMER_CALLBACK(hs_rise)
 static TIMER_CALLBACK(fs_fall)
 {
 	if (LOG_FS)
-		logerror("fs_fall(): time=%s scanline=%d\n", attotime_string(timer_get_time(Machine), ATTOTIME_STRING_PRECISION), get_scanline());
+		logerror("fs_fall(): time=%s scanline=%d\n", attotime_string(timer_get_time(machine), ATTOTIME_STRING_PRECISION), get_scanline());
 
 	set_field_sync();
 }
@@ -1649,7 +1649,7 @@ static TIMER_CALLBACK(fs_fall)
 static TIMER_CALLBACK(fs_rise)
 {
 	if (LOG_FS)
-		logerror("fs_rise(): time=%s scanline=%d\n", attotime_string(timer_get_time(Machine), ATTOTIME_STRING_PRECISION), get_scanline());
+		logerror("fs_rise(): time=%s scanline=%d\n", attotime_string(timer_get_time(machine), ATTOTIME_STRING_PRECISION), get_scanline());
 
 	/* adjust field sync falling edge timer */
 	timer_adjust_oneshot(m6847->fs_fall_timer,

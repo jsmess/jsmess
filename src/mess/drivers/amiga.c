@@ -399,7 +399,7 @@ static void amiga_cia_0_portA_w(const device_config *device, UINT8 data)
 		/* overlay disabled, map RAM on 0x000000 */
 		memory_install_write16_handler(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x000000, amiga_chip_ram_size - 1, 0, mirror_mask, SMH_BANK1);
 
-		amiga_cart_check_overlay(Machine);
+		amiga_cart_check_overlay(device->machine);
 	}
 	else
 		/* overlay enabled, map Amiga system ROM on 0x000000 */

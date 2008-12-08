@@ -316,14 +316,14 @@ QUICKLOAD_LOAD(atom)
 	/* copy data into memory */
 	for (i=size-1; i>=0; i--)
 	{
-		memory_write_byte( cpu_get_address_space( Machine->cpu[0], ADDRESS_SPACE_PROGRAM ), addr, data[0]);
+		memory_write_byte( cpu_get_address_space( image->machine->cpu[0], ADDRESS_SPACE_PROGRAM ), addr, data[0]);
 		addr++;
 		data++;
 	}
 
 
 	/* set new pc address */
-	cpu_set_reg( Machine->cpu[0], REG_PC, exec);
+	cpu_set_reg( image->machine->cpu[0], REG_PC, exec);
 
 	/* free the data */
 	free(quickload_data);

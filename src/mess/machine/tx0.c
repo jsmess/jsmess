@@ -336,20 +336,20 @@ static TIMER_CALLBACK(reader_callback)
 			if (data & 0100)
 			{
 				/* read current AC */
-				ac = cpu_get_reg(Machine->cpu[0], TX0_AC);
+				ac = cpu_get_reg(machine->cpu[0], TX0_AC);
 				/* cycle right */
 				ac = (ac >> 1) | ((ac & 1) << 17);
 				/* shuffle and insert data into AC */
 				ac = (ac /*& 0333333*/) | ((data & 001) << 17) | ((data & 002) << 13) | ((data & 004) << 9) | ((data & 010) << 5) | ((data & 020) << 1) | ((data & 040) >> 3);
 				/* write modified AC */
-				cpu_set_reg(Machine->cpu[0], TX0_AC, ac);
+				cpu_set_reg(machine->cpu[0], TX0_AC, ac);
 
 				tape_reader.rc = (tape_reader.rc+1) & 3;
 
 				if (tape_reader.rc == 0)
 				{	/* IO complete */
 					tape_reader.rcl = 0;
-					cpu_set_reg(Machine->cpu[0], TX0_IO_COMPLETE, 0);
+					cpu_set_reg(machine->cpu[0], TX0_IO_COMPLETE, 0);
 				}
 			}
 		}
@@ -367,7 +367,7 @@ static TIMER_CALLBACK(reader_callback)
 */
 static TIMER_CALLBACK(puncher_callback)
 {
-	cpu_set_reg(Machine->cpu[0], TX0_IO_COMPLETE, 0);
+	cpu_set_reg(machine->cpu[0], TX0_IO_COMPLETE, 0);
 }
 
 /*
@@ -455,7 +455,7 @@ static void typewriter_out(running_machine *machine, UINT8 data)
 */
 static TIMER_CALLBACK(prt_callback)
 {
-	cpu_set_reg(Machine->cpu[0], TX0_IO_COMPLETE, 0);
+	cpu_set_reg(machine->cpu[0], TX0_IO_COMPLETE, 0);
 }
 
 /*
@@ -481,7 +481,7 @@ void tx0_io_prt(void)
 */
 static TIMER_CALLBACK(dis_callback)
 {
-	cpu_set_reg(Machine->cpu[0], TX0_IO_COMPLETE, 0);
+	cpu_set_reg(machine->cpu[0], TX0_IO_COMPLETE, 0);
 }
 
 /*
@@ -596,7 +596,7 @@ DEVICE_IMAGE_UNLOAD( tx0_magtape )
 		if ((magtape.state == MTS_SELECTED) || ((magtape.state == MTS_SELECTING) && (magtape.command == 2)))
 		{	/* unit has become unavailable */
 			magtape.state = MTS_UNSELECTING;
-			cpu_set_reg(Machine->cpu[0], TX0_PF, cpu_get_reg(Machine->cpu[0], TX0_PF) | PF_RWC);
+			cpu_set_reg(image->machine->cpu[0], TX0_PF, cpu_get_reg(image->machine->cpu[0], TX0_PF) | PF_RWC);
 			schedule_unselect();
 		}
 	}

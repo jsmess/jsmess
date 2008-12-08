@@ -271,7 +271,7 @@ static UINT8 c64_cia0_port_a_r (const device_config *device)
 		value &= t;
 	}
 
-	if ( input_port_read(Machine, "CTRLSEL") & 0x80 )
+	if ( input_port_read(device->machine, "CTRLSEL") & 0x80 )
 		value &= c64_keyline[8];
 	else
 		value &= c64_keyline[9];
@@ -293,12 +293,12 @@ static UINT8 c64_cia0_port_b_r (const device_config *device)
     if (!(cia0porta & 0x02)) value &= c64_keyline[1];
     if (!(cia0porta & 0x01)) value &= c64_keyline[0];
 
-	if ( input_port_read(Machine, "CTRLSEL") & 0x80 )
+	if ( input_port_read(device->machine, "CTRLSEL") & 0x80 )
 		value &= c64_keyline[9];
     else 
 		value &= c64_keyline[8];
 
-    if (is_c128(Machine))
+    if (is_c128(device->machine))
     {
 		if (!vic2e_k0_r ())
 			value &= c128_keyline[0];
@@ -307,7 +307,7 @@ static UINT8 c64_cia0_port_b_r (const device_config *device)
 		if (!vic2e_k2_r ())
 			value &= c128_keyline[2];
     }
-    if (is_c65(Machine))
+    if (is_c65(device->machine))
 	{
 		if (!(c65_6511_port & 0x02))
 			value &= c65_keyline;
@@ -407,7 +407,7 @@ static void c64_cia1_port_a_w (const device_config *device, UINT8 data)
 	cbm_serial_data_write (serial_data = !(data & 0x20));
 	cbm_serial_atn_write (serial_atn = !(data & 0x08));
 	c64_vicaddr = c64_memory + helper[data & 0x03];
-	if (is_c128(Machine))
+	if (is_c128(device->machine))
 	{
 		c128_vicaddr = c64_memory + helper[data & 0x03] + c128_va1617;
 	}

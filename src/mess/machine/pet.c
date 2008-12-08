@@ -20,8 +20,6 @@
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
 
-#include "deprecat.h"
-
 #define VERBOSE_LEVEL 0
 #define DBG_LOG(N,M,A) \
 	do { \
@@ -555,7 +553,7 @@ static TIMER_CALLBACK(pet_interrupt)
 {
 	static int level = 0;
 
-	pia_0_cb1_w(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0, level);
+	pia_0_cb1_w(cputag_get_address_space(machine,"main",ADDRESS_SPACE_PROGRAM), 0, level);
 	level = !level;
 }
 
@@ -565,7 +563,7 @@ static TIMER_CALLBACK( pet_tape1_timer )
 {
 //	cassette 1
 	UINT8 data = (cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette1" )) > +0.0) ? 1 : 0;
-	pia_0_ca1_w(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0, data);
+	pia_0_ca1_w(cputag_get_address_space(machine,"main",ADDRESS_SPACE_PROGRAM), 0, data);
 }
 
 /* NOT WORKING - Just placeholder */
@@ -573,7 +571,7 @@ static TIMER_CALLBACK( pet_tape2_timer )
 {
 //	cassette 2
 	UINT8 data = (cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette2" )) > +0.0) ? 1 : 0;
-	via_0_cb1_w(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), 0, data);
+	via_0_cb1_w(cputag_get_address_space(machine,"main",ADDRESS_SPACE_PROGRAM), 0, data);
 }
 
 

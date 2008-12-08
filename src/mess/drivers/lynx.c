@@ -12,8 +12,6 @@
 
 #include "devices/snapquik.h"
 
-#include "deprecat.h"
-
 static QUICKLOAD_LOAD( lynx );
 
 static ADDRESS_MAP_START( lynx_mem , ADDRESS_SPACE_PROGRAM, 8)
@@ -174,7 +172,7 @@ static QUICKLOAD_LOAD( lynx )
 		return INIT_FAIL;
 
 	for (i = 0; i < length; i++)
-		memory_write_byte(cputag_get_address_space(Machine,"main",ADDRESS_SPACE_PROGRAM), start + i, data[i]);
+		memory_write_byte(cputag_get_address_space(image->machine,"main",ADDRESS_SPACE_PROGRAM), start + i, data[i]);
 
 	rom[0x1fc] = start & 0xff;
 	rom[0x1fd] = start >> 8;
