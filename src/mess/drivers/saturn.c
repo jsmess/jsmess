@@ -1550,7 +1550,7 @@ static void dma_direct_lv0(const address_space *space)
 	if(LOG_SCU) logerror("DMA transfer END\n");
 
 	/*TODO: timing of this*/
-	timer_set(machine, ATTOTIME_IN_USEC(300), NULL, 0, dma_lv0_ended);
+	timer_set(space->machine, ATTOTIME_IN_USEC(300), NULL, 0, dma_lv0_ended);
 
 	if(scu_add_tmp & 0x80000000)
 	{
@@ -1651,7 +1651,7 @@ static void dma_direct_lv1(const address_space *space)
 
 	if(LOG_SCU) logerror("DMA transfer END\n");
 
-	timer_set(machine, ATTOTIME_IN_USEC(300), NULL, 0, dma_lv1_ended);
+	timer_set(space->machine, ATTOTIME_IN_USEC(300), NULL, 0, dma_lv1_ended);
 
 	if(scu_add_tmp & 0x80000000)
 	{
@@ -1752,7 +1752,7 @@ static void dma_direct_lv2(const address_space *space)
 
 	if(LOG_SCU) logerror("DMA transfer END\n");
 
-	timer_set(machine, ATTOTIME_IN_USEC(300), NULL, 0, dma_lv2_ended);
+	timer_set(space->machine, ATTOTIME_IN_USEC(300), NULL, 0, dma_lv2_ended);
 
 	if(scu_add_tmp & 0x80000000)
 	{
@@ -1827,7 +1827,7 @@ static void dma_indirect_lv0(const address_space *space)
 
 	}while(job_done == 0);
 
-	timer_set(machine, ATTOTIME_IN_USEC(300), NULL, 0, dma_lv0_ended);
+	timer_set(space->machine, ATTOTIME_IN_USEC(300), NULL, 0, dma_lv0_ended);
 }
 
 static void dma_indirect_lv1(const address_space *space)
@@ -1896,7 +1896,7 @@ static void dma_indirect_lv1(const address_space *space)
 
 	}while(job_done == 0);
 
-	timer_set(machine, ATTOTIME_IN_USEC(300), NULL, 0, dma_lv1_ended);
+	timer_set(space->machine, ATTOTIME_IN_USEC(300), NULL, 0, dma_lv1_ended);
 }
 
 static void dma_indirect_lv2(const address_space *space)
@@ -1964,7 +1964,7 @@ static void dma_indirect_lv2(const address_space *space)
 
 	}while(job_done == 0);
 
-	timer_set(machine, ATTOTIME_IN_USEC(300), NULL, 0, dma_lv2_ended);
+	timer_set(space->machine, ATTOTIME_IN_USEC(300), NULL, 0, dma_lv2_ended);
 }
 
 

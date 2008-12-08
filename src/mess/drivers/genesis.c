@@ -51,7 +51,6 @@ MESS adaptation by R. Belmont
 #include "driver.h"
 #include "sound/2612intf.h"
 #include "../../mame/drivers/megadriv.h"
-#include "deprecat.h"
 
 /* cart device, custom mappers & sram init */
 #include "includes/genesis.h"
@@ -76,7 +75,7 @@ static TIMER_CALLBACK( mess_io_timeout_timer_callback )
 	mess_io_stage[(int)(FPTR)ptr] = -1;
 }
 
-static void mess_init_6buttons_pad(void)
+static void mess_init_6buttons_pad(running_machine *machine)
 {
 	int i;
 
@@ -89,7 +88,7 @@ static void mess_init_6buttons_pad(void)
 
 /* These overwrite the MAME ones in DRIVER_INIT */
 /* They're needed to give the users the choice between different controllers */
-static UINT8 mess_md_io_read_data_port(int portnum)
+static UINT8 mess_md_io_read_data_port(running_machine *machine, int portnum)
 {
 	static const char *const pad6names[2][4] = {{ "PAD1_6B", "PAD2_6B", "UNUSED", "UNUSED" }, 
 												{ "EXTRA1", "EXTRA2", "UNUSED", "UNUSED" }};
@@ -103,11 +102,11 @@ static UINT8 mess_md_io_read_data_port(int portnum)
 	switch (portnum)
 	{
 		case 0:
-			controller = (input_port_read(Machine, "CTRLSEL") & 0x0f);
+			controller = (input_port_read(machine, "CTRLSEL") & 0x0f);
 			break;
 
 		case 1:
-			controller = (input_port_read(Machine, "CTRLSEL") & 0xf0);
+			controller = (input_port_read(machine, "CTRLSEL") & 0xf0);
 			break;
 
 		default:
@@ -124,14 +123,14 @@ static UINT8 mess_md_io_read_data_port(int portnum)
 			{
 				/* here we read B, C & the additional buttons */
 				retdata = (megadrive_io_data_regs[portnum] & helper_6b) | 
-							(((input_port_read_safe(Machine, pad6names[0][portnum], 0) & 0x30) | 
-								(input_port_read_safe(Machine, pad6names[1][portnum], 0) & 0x0f)) & ~helper_6b);
+							(((input_port_read_safe(machine, pad6names[0][portnum], 0) & 0x30) | 
+								(input_port_read_safe(machine, pad6names[1][portnum], 0) & 0x0f)) & ~helper_6b);
 			}
 			else
 			{
 				/* here we read B, C & the directional buttons */
 				retdata = (megadrive_io_data_regs[portnum] & helper_6b) | 
-							((input_port_read_safe(Machine, pad6names[0][portnum], 0) & 0x3f) & ~helper_6b);
+							((input_port_read_safe(machine, pad6names[0][portnum], 0) & 0x3f) & ~helper_6b);
 			}
 		}
 		else
@@ -140,20 +139,20 @@ static UINT8 mess_md_io_read_data_port(int portnum)
 			{
 				/* here we read ((Start & A) >> 2) | 0x00 */
 				retdata = (megadrive_io_data_regs[portnum] & helper_6b) | 
-							(((input_port_read_safe(Machine, pad6names[0][portnum], 0) & 0xc0) >> 2) & ~helper_6b);
+							(((input_port_read_safe(machine, pad6names[0][portnum], 0) & 0xc0) >> 2) & ~helper_6b);
 			}
 			else if (mess_io_stage[portnum]==2)
 			{
 				/* here we read ((Start & A) >> 2) | 0x0f */
 				retdata = (megadrive_io_data_regs[portnum] & helper_6b) | 
-							((((input_port_read_safe(Machine, pad6names[0][portnum], 0) & 0xc0) >> 2) | 0x0f) & ~helper_6b);
+							((((input_port_read_safe(machine, pad6names[0][portnum], 0) & 0xc0) >> 2) | 0x0f) & ~helper_6b);
 			}
 			else
 			{
 				/* here we read ((Start & A) >> 2) | Up and Down */
 				retdata = (megadrive_io_data_regs[portnum] & helper_6b) | 
-							((((input_port_read_safe(Machine, pad6names[0][portnum], 0) & 0xc0) >> 2) | 
-								(input_port_read_safe(Machine, pad6names[0][portnum], 0) & 0x03)) & ~helper_6b);
+							((((input_port_read_safe(machine, pad6names[0][portnum], 0) & 0xc0) >> 2) | 
+								(input_port_read_safe(machine, pad6names[0][portnum], 0) & 0x03)) & ~helper_6b);
 			}
 		}
 
@@ -168,14 +167,14 @@ static UINT8 mess_md_io_read_data_port(int portnum)
 		{
 			/* here we read B, C & the directional buttons */
 			retdata = (megadrive_io_data_regs[portnum] & helper_3b) | 
-						(((input_port_read_safe(Machine, pad3names[portnum], 0) & 0x3f) | 0x40) & ~helper_3b);
+						(((input_port_read_safe(machine, pad3names[portnum], 0) & 0x3f) | 0x40) & ~helper_3b);
 		}
 		else
 		{
 			/* here we read ((Start & A) >> 2) | Up and Down */
 			retdata = (megadrive_io_data_regs[portnum] & helper_3b) | 
-						((((input_port_read_safe(Machine, pad3names[portnum], 0) & 0xc0) >> 2) | 
-							(input_port_read_safe(Machine, pad3names[portnum], 0) & 0x03) | 0x40) & ~helper_3b);
+						((((input_port_read_safe(machine, pad3names[portnum], 0) & 0xc0) >> 2) | 
+							(input_port_read_safe(machine, pad3names[portnum], 0) & 0x03) | 0x40) & ~helper_3b);
 		}
 	}
 
@@ -183,18 +182,18 @@ static UINT8 mess_md_io_read_data_port(int portnum)
 }
 
 
-static void mess_md_io_write_data_port(int portnum, UINT16 data)
+static void mess_md_io_write_data_port(running_machine *machine, int portnum, UINT16 data)
 {
 	int controller;
 
 	switch (portnum)
 	{
 		case 0:
-			controller = (input_port_read(Machine, "CTRLSEL") & 0x0f);
+			controller = (input_port_read(machine, "CTRLSEL") & 0x0f);
 			break;
 
 		case 1:
-			controller = (input_port_read(Machine, "CTRLSEL") & 0xf0);
+			controller = (input_port_read(machine, "CTRLSEL") & 0xf0);
 			break;
 
 		default:
@@ -317,7 +316,7 @@ INPUT_PORTS_END
 
 /*************************************
  *
- *  Machine driver
+ *  machine driver
  *
  *************************************/
 
@@ -326,7 +325,7 @@ static MACHINE_RESET( ms_megadriv )
 	MACHINE_RESET_CALL( megadriv );
 	MACHINE_RESET_CALL( md_mappers );
 	
-	mess_init_6buttons_pad();
+	mess_init_6buttons_pad(machine);
 }
 
 static MACHINE_DRIVER_START( ms_megadriv )
@@ -482,20 +481,20 @@ SYSTEM_CONFIG_END
 #define PICO_PENX	1
 #define PICO_PENY	2
 
-static UINT16 pico_read_penpos(int pen)
+static UINT16 pico_read_penpos(running_machine *machine, int pen)
 {
   UINT16 penpos = 0;
 
   switch (pen)
     {
     case PICO_PENX:
-      penpos = input_port_read_safe(Machine, "PENX", 0);
+      penpos = input_port_read_safe(machine, "PENX", 0);
       penpos |= 0x6;
       penpos = penpos * 320 / 255;
       penpos += 0x3d;
       break;
     case PICO_PENY:
-      penpos = input_port_read_safe(Machine, "PENY", 0);
+      penpos = input_port_read_safe(machine, "PENY", 0);
       penpos |= 0x6;
       penpos = penpos * 251 / 255;
       penpos += 0x1fc;
@@ -518,7 +517,7 @@ static READ16_HANDLER( pico_68k_io_read )
 		retdata = (megadrive_region_export << 6) | (megadrive_region_pal << 5);
 	    break;
 	  case 1:
-	    retdata = input_port_read_safe(Machine, "PAD", 0);
+	    retdata = input_port_read_safe(space->machine, "PAD", 0);
 	    break;
 
 	    /*
@@ -533,16 +532,16 @@ static READ16_HANDLER( pico_68k_io_read )
 	          0x2f8 - 0x3f3 (storyware)
 	     */
 	  case 2:
-	    retdata = pico_read_penpos(PICO_PENX) >> 8;
+	    retdata = pico_read_penpos(space->machine, PICO_PENX) >> 8;
 	    break;
 	  case 3:
-	    retdata = pico_read_penpos(PICO_PENX) & 0x00ff;
+	    retdata = pico_read_penpos(space->machine, PICO_PENX) & 0x00ff;
 	    break;
 	  case 4:
-	    retdata = pico_read_penpos(PICO_PENY) >> 8;
+	    retdata = pico_read_penpos(space->machine, PICO_PENY) >> 8;
 	    break;
 	  case 5:
-	    retdata = pico_read_penpos(PICO_PENY) & 0x00ff;
+	    retdata = pico_read_penpos(space->machine, PICO_PENY) & 0x00ff;
 	    break;
 	  case 6:
 	    /* Page register :
@@ -553,7 +552,7 @@ static READ16_HANDLER( pico_68k_io_read )
 	    {
 	      UINT8 tmp;
 
-	      tmp = input_port_read_safe(Machine, "PAGE", 0);
+	      tmp = input_port_read_safe(space->machine, "PAGE", 0);
 	      if (tmp == 2 && page_register != 0x3f)
 		{
 		  page_register <<= 1;

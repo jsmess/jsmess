@@ -79,43 +79,43 @@ const game_driver * const drivers[] =
 //0128u5	DRIVER( megaduck )	/* Megaduck											*/
 
 	/* SEGA */
-//0128u5	DRIVER( sg1000 )	/* Sega SG-1000 (Japan)								*/
-//0128u5	DRIVER( sg1000m2 )	/* Sega SG-1000 Mark II (Japan)						*/
-//0128u5	DRIVER( sc3000 )	/* Sega SC-3000 (Japan)								*/
-//0128u5	DRIVER( sc3000h )	/* Sega SC-3000H (Japan)							*/
-//0128u5	DRIVER( sf7000 )	/* Sega SC-3000 w/ SF-7000 (Japan)					*/
+	DRIVER( sg1000 )	/* Sega SG-1000 (Japan)								*/
+	DRIVER( sg1000m2 )	/* Sega SG-1000 Mark II (Japan)						*/
+	DRIVER( sc3000 )	/* Sega SC-3000 (Japan)								*/
+	DRIVER( sc3000h )	/* Sega SC-3000H (Japan)							*/
+	DRIVER( sf7000 )	/* Sega SC-3000 w/ SF-7000 (Japan)					*/
 //	DRIVER( omv1000 )	/* Tsukuda Original Othello Multivision	FG-1000		*/
 //	DRIVER( omv2000 )	/* Tsukuda Original Othello Multivision	FG-2000		*/
 
-//0128u5	DRIVER( gamegear )	/* Sega GameGear									*/
-//0128u5	DRIVER( gamegeaj )	/* Sega GameGear (Japan)							*/
-//0128u5	DRIVER( sms )		/* Sega Master System II (NTSC)						*/
-//0128u5	DRIVER( sms1 )		/* Sega Master System I (NTSC)						*/
-//0128u5	DRIVER( sms1pal )	/* Sega Master System I (PAL)						*/
-//0128u5	DRIVER( smspal )	/* Sega Master System II (PAL)						*/
-//0128u5	DRIVER( smsj )		/* Sega Master System (Japan) with FM Chip			*/
-//0128u5	DRIVER( sg1000m3 )	/* Sega SG-1000 Mark III (Japan)					*/
-//0128u5	DRIVER( sms2kr )	/* Samsung Gam*Boy II (Korea)						*/
-//0128u5	DRIVER( smssdisp )	/* Sega Master System Store Display Unit			*/
+	DRIVER( gamegear )	/* Sega GameGear									*/
+	DRIVER( gamegeaj )	/* Sega GameGear (Japan)							*/
+	DRIVER( sms )		/* Sega Master System II (NTSC)						*/
+	DRIVER( sms1 )		/* Sega Master System I (NTSC)						*/
+	DRIVER( sms1pal )	/* Sega Master System I (PAL)						*/
+	DRIVER( smspal )	/* Sega Master System II (PAL)						*/
+	DRIVER( smsj )		/* Sega Master System (Japan) with FM Chip			*/
+	DRIVER( sg1000m3 )	/* Sega SG-1000 Mark III (Japan)					*/
+	DRIVER( sms2kr )	/* Samsung Gam*Boy II (Korea)						*/
+	DRIVER( smssdisp )	/* Sega Master System Store Display Unit			*/
 
-//0128u5	DRIVER( megadrij )	/* 1988 Sega Mega Drive (Japan)						*/
-//0128u5	DRIVER( genesis )	/* 1989 Sega Genesis (USA)							*/
-//0128u5	DRIVER( gensvp )	/* 1993 Sega Genesis (USA w/SVP chip)				*/
-//0128u5	DRIVER( megadriv )	/* 1990 Sega Mega Drive (Europe)					*/
-//0128u5	DRIVER( pico )		/* 1994 Sega Pico (Europe)							*/
-//0128u5	DRIVER( picou )		/* 1994 Sega Pico (USA)								*/
-//0128u5	DRIVER( picoj )		/* 1993 Sega Pico (Japan)							*/
+	DRIVER( megadrij )	/* 1988 Sega Mega Drive (Japan)						*/
+	DRIVER( genesis )	/* 1989 Sega Genesis (USA)							*/
+	DRIVER( gensvp )	/* 1993 Sega Genesis (USA w/SVP chip)				*/
+	DRIVER( megadriv )	/* 1990 Sega Mega Drive (Europe)					*/
+	DRIVER( pico )		/* 1994 Sega Pico (Europe)							*/
+	DRIVER( picou )		/* 1994 Sega Pico (USA)								*/
+	DRIVER( picoj )		/* 1993 Sega Pico (Japan)							*/
 
-//0128u5	DRIVER( saturnjp )	/* 1994 Sega Saturn (Japan)							*/
-//0128u5	DRIVER( saturn )	/* 1995 Sega Saturn (USA)							*/
-//0128u5	DRIVER( saturneu )	/* 1995 Sega Saturn (Europe)						*/
-//0128u5	DRIVER( vsaturn )	/* JVC V-Saturn										*/
-//0128u5	DRIVER( hisaturn )	/* Hitachi HiSaturn									*/
+	DRIVER( saturnjp )	/* 1994 Sega Saturn (Japan)							*/
+	DRIVER( saturn )	/* 1995 Sega Saturn (USA)							*/
+	DRIVER( saturneu )	/* 1995 Sega Saturn (Europe)						*/
+	DRIVER( vsaturn )	/* JVC V-Saturn										*/
+	DRIVER( hisaturn )	/* Hitachi HiSaturn									*/
 
-//0128u5	DRIVER( dcjp )		/* 1998 Sega Dreamcast (Japan) */
-//0128u5	DRIVER( dc )		/* 1999 Sega Dreamcast (USA) */
-//0128u5	DRIVER( dceu )		/* 1999 Sega Dreamcast (Europe) */
-//0128u5	DRIVER( dcdev )		/* 1998 Sega HKT-0120 Sega Dreamcast Development Box */
+	DRIVER( dcjp )		/* 1998 Sega Dreamcast (Japan) */
+	DRIVER( dc )		/* 1999 Sega Dreamcast (USA) */
+	DRIVER( dceu )		/* 1999 Sega Dreamcast (Europe) */
+	DRIVER( dcdev )		/* 1998 Sega HKT-0120 Sega Dreamcast Development Box */
 
 	/* BALLY */
 	DRIVER( astrocde )	/* Bally Astrocade									*/
