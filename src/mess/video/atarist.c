@@ -15,54 +15,36 @@
 #include "video/atarist.h"
 #include "includes/atarist.h"
 
-static struct SHIFTER
-{
-	UINT32 base;
-	UINT32 ofs;
-	UINT8 sync;
-	UINT8 mode;
-	UINT16 palette[16];
-	UINT8 lineofs;  // STe
-	UINT8 pixelofs; // STe
-	UINT16 rr[4];
-	UINT16 ir[4];
-	int bitplane;
-	int shift;
-	int h, v;
-	int de;
-	int x_start, x_end, y_start, y_end, hblank_start, vblank_start;
-} shifter;
-
-static emu_timer *atarist_glue_timer;
-static emu_timer *atarist_shifter_timer;
-static const device_config *mfp;
-
 INLINE pen_t atarist_shift_mode_0(running_machine *machine)
 {
-	int color = (BIT(shifter.rr[3], 15) << 3) | (BIT(shifter.rr[2], 15) << 2) | (BIT(shifter.rr[1], 15) << 1) | BIT(shifter.rr[0], 15);
+	atarist_state *state = machine->driver_data;
 
-	shifter.rr[0] <<= 1;
-	shifter.rr[1] <<= 1;
-	shifter.rr[2] <<= 1;
-	shifter.rr[3] <<= 1;
+	int color = (BIT(state->shifter_rr[3], 15) << 3) | (BIT(state->shifter_rr[2], 15) << 2) | (BIT(state->shifter_rr[1], 15) << 1) | BIT(state->shifter_rr[0], 15);
+
+	state->shifter_rr[0] <<= 1;
+	state->shifter_rr[1] <<= 1;
+	state->shifter_rr[2] <<= 1;
+	state->shifter_rr[3] <<= 1;
 
 	return machine->pens[color];
 }
 
 INLINE pen_t atarist_shift_mode_1(running_machine *machine)
 {
-	int color = (BIT(shifter.rr[1], 15) << 1) | BIT(shifter.rr[0], 15);
+	atarist_state *state = machine->driver_data;
 
-	shifter.rr[0] <<= 1;
-	shifter.rr[1] <<= 1;
-	shifter.shift++;
+	int color = (BIT(state->shifter_rr[1], 15) << 1) | BIT(state->shifter_rr[0], 15);
 
-	if (shifter.shift == 16)
+	state->shifter_rr[0] <<= 1;
+	state->shifter_rr[1] <<= 1;
+	state->shifter_shift++;
+
+	if (state->shifter_shift == 16)
 	{
-		shifter.rr[0] = shifter.rr[2];
-		shifter.rr[1] = shifter.rr[3];
-		shifter.rr[2] = shifter.rr[3] = 0;
-		shifter.shift = 0;
+		state->shifter_rr[0] = state->shifter_rr[2];
+		state->shifter_rr[1] = state->shifter_rr[3];
+		state->shifter_rr[2] = state->shifter_rr[3] = 0;
+		state->shifter_shift = 0;
 	}
 
 	return machine->pens[color];
@@ -70,44 +52,48 @@ INLINE pen_t atarist_shift_mode_1(running_machine *machine)
 
 INLINE pen_t atarist_shift_mode_2(running_machine *machine)
 {
-	int color = BIT(shifter.rr[0], 15);
+	atarist_state *state = machine->driver_data;
 
-	shifter.rr[0] <<= 1;
-	shifter.shift++;
+	int color = BIT(state->shifter_rr[0], 15);
 
-	switch (shifter.shift)
+	state->shifter_rr[0] <<= 1;
+	state->shifter_shift++;
+
+	switch (state->shifter_shift)
 	{
 	case 16:
-		shifter.rr[0] = shifter.rr[1];
-		shifter.rr[1] = shifter.rr[2];
-		shifter.rr[2] = shifter.rr[3];
-		shifter.rr[3] = 0;
+		state->shifter_rr[0] = state->shifter_rr[1];
+		state->shifter_rr[1] = state->shifter_rr[2];
+		state->shifter_rr[2] = state->shifter_rr[3];
+		state->shifter_rr[3] = 0;
 		break;
 
 	case 32:
-		shifter.rr[0] = shifter.rr[1];
-		shifter.rr[1] = shifter.rr[2];
-		shifter.rr[2] = 0;
+		state->shifter_rr[0] = state->shifter_rr[1];
+		state->shifter_rr[1] = state->shifter_rr[2];
+		state->shifter_rr[2] = 0;
 		break;
 
 	case 48:
-		shifter.rr[0] = shifter.rr[1];
-		shifter.rr[1] = 0;
-		shifter.shift = 0;
+		state->shifter_rr[0] = state->shifter_rr[1];
+		state->shifter_rr[1] = 0;
+		state->shifter_shift = 0;
 		break;
 	}
 
 	return machine->pens[color];
 }
 
-static TIMER_CALLBACK(atarist_shifter_tick)
+static TIMER_CALLBACK( atarist_shifter_tick )
 {
+	atarist_state *state = machine->driver_data;
+
 	int y = video_screen_get_vpos(machine->primary_screen);
 	int x = video_screen_get_hpos(machine->primary_screen);
 
 	pen_t pen;
 
-	switch (shifter.mode)
+	switch (state->shifter_mode)
 	{
 	case 0:
 		pen = atarist_shift_mode_0(machine);
@@ -131,37 +117,42 @@ static TIMER_CALLBACK(atarist_shifter_tick)
 
 INLINE void atarist_shifter_load(running_machine *machine)
 {
-	UINT8 *RAM = memory_region(machine, "main") + shifter.ofs;
+	atarist_state *state = machine->driver_data;
 
-	shifter.ir[shifter.bitplane] = (RAM[1] << 8) | RAM[0];
-	shifter.bitplane++;
-	shifter.ofs += 2;
+	const address_space *program = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	UINT16 data = memory_read_word_16be(program, state->shifter_ofs);
 
-	if (shifter.bitplane == 4)
+	state->shifter_ir[state->shifter_bitplane] = data;
+	state->shifter_bitplane++;
+	state->shifter_ofs += 2;
+
+	if (state->shifter_bitplane == 4)
 	{
-		shifter.bitplane = 0;
+		state->shifter_bitplane = 0;
 
-		shifter.rr[0] = shifter.ir[0];
-		shifter.rr[1] = shifter.ir[1];
-		shifter.rr[2] = shifter.ir[2];
-		shifter.rr[3] = shifter.ir[3];
+		state->shifter_rr[0] = state->shifter_ir[0];
+		state->shifter_rr[1] = state->shifter_ir[1];
+		state->shifter_rr[2] = state->shifter_ir[2];
+		state->shifter_rr[3] = state->shifter_ir[3];
 	}
 }
 
-static TIMER_CALLBACK(atarist_glue_tick)
+static TIMER_CALLBACK( atarist_glue_tick )
 {
+	atarist_state *state = machine->driver_data;
+
 	int y = video_screen_get_vpos(machine->primary_screen);
 	int x = video_screen_get_hpos(machine->primary_screen);
 
-	int v = (y >= shifter.y_start) && (y < shifter.y_end);
-	int h = (x >= shifter.x_start) && (x < shifter.x_end);
+	int v = (y >= state->shifter_y_start) && (y < state->shifter_y_end);
+	int h = (x >= state->shifter_x_start) && (x < state->shifter_x_end);
 
 	int de = h && v;
 
-	if (de != shifter.de)
+	if (de != state->shifter_de)
 	{
-		mc68901_tbi_w(mfp, de);
-		shifter.de = de;
+		mc68901_tbi_w(state->mc68901, de);
+		state->shifter_de = de;
 	}
 
 	if (de)
@@ -169,38 +160,40 @@ static TIMER_CALLBACK(atarist_glue_tick)
 		atarist_shifter_load(machine);
 	}
 
-	if ((y == shifter.vblank_start) && (x == 0))
+	if ((y == state->shifter_vblank_start) && (x == 0))
 	{
 		cpu_set_input_line(machine->cpu[0], M68K_IRQ_4, HOLD_LINE);
-		shifter.ofs = shifter.base;
+		state->shifter_ofs = state->shifter_base;
 	}
 
-	if (x == shifter.hblank_start)
+	if (x == state->shifter_hblank_start)
 	{
 		cpu_set_input_line(machine->cpu[0], M68K_IRQ_2, HOLD_LINE);
-		shifter.ofs += (shifter.lineofs * 2); // STe
+		state->shifter_ofs += (state->shifter_lineofs * 2); // STe
 	}
 }
 
-static void atarist_set_screen_parameters(void)
+static void atarist_set_screen_parameters(running_machine *machine)
 {
-	if (shifter.sync & 0x02)
+	atarist_state *state = machine->driver_data;
+
+	if (state->shifter_sync & 0x02)
 	{
-		shifter.x_start = ATARIST_HBDEND_PAL;
-		shifter.x_end = ATARIST_HBDSTART_PAL;
-		shifter.y_start = ATARIST_VBDEND_PAL;
-		shifter.y_end = ATARIST_VBDSTART_PAL;
-		shifter.hblank_start = ATARIST_HBSTART_PAL;
-		shifter.vblank_start = ATARIST_VBSTART_PAL;
+		state->shifter_x_start = ATARIST_HBDEND_PAL;
+		state->shifter_x_end = ATARIST_HBDSTART_PAL;
+		state->shifter_y_start = ATARIST_VBDEND_PAL;
+		state->shifter_y_end = ATARIST_VBDSTART_PAL;
+		state->shifter_hblank_start = ATARIST_HBSTART_PAL;
+		state->shifter_vblank_start = ATARIST_VBSTART_PAL;
 	}
 	else
 	{
-		shifter.x_start = ATARIST_HBDEND_NTSC;
-		shifter.x_end = ATARIST_HBDSTART_NTSC;
-		shifter.y_start = ATARIST_VBDEND_NTSC;
-		shifter.y_end = ATARIST_VBDSTART_NTSC;
-		shifter.hblank_start = ATARIST_HBSTART_NTSC;
-		shifter.vblank_start = ATARIST_VBSTART_NTSC;
+		state->shifter_x_start = ATARIST_HBDEND_NTSC;
+		state->shifter_x_end = ATARIST_HBDSTART_NTSC;
+		state->shifter_y_start = ATARIST_VBDEND_NTSC;
+		state->shifter_y_end = ATARIST_VBDSTART_NTSC;
+		state->shifter_hblank_start = ATARIST_HBSTART_NTSC;
+		state->shifter_vblank_start = ATARIST_VBSTART_NTSC;
 	}
 }
 
@@ -208,12 +201,14 @@ static void atarist_set_screen_parameters(void)
 
 READ16_HANDLER( atarist_shifter_base_r )
 {
+	atarist_state *state = space->machine->driver_data;
+
 	switch (offset)
 	{
 	case 0x00:
-		return (shifter.base >> 16) & 0x3f;
+		return (state->shifter_base >> 16) & 0x3f;
 	case 0x01:
-		return (shifter.base >> 8) & 0xff;
+		return (state->shifter_base >> 8) & 0xff;
 	}
 
 	return 0;
@@ -221,29 +216,33 @@ READ16_HANDLER( atarist_shifter_base_r )
 
 WRITE16_HANDLER( atarist_shifter_base_w )
 {
+	atarist_state *state = space->machine->driver_data;
+
 	switch (offset)
 	{
 	case 0x00:
-		shifter.base = (shifter.base & 0x00ff00) | (data & 0x3f) << 16;
-		logerror("SHIFTER Video Base Address %06x\n", shifter.base);
+		state->shifter_base = (state->shifter_base & 0x00ff00) | (data & 0x3f) << 16;
+		logerror("SHIFTER Video Base Address %06x\n", state->shifter_base);
 		break;
 	case 0x01:
-		shifter.base = (shifter.base & 0x3f0000) | (data & 0xff) << 8;
-		logerror("SHIFTER Video Base Address %06x\n", shifter.base);
+		state->shifter_base = (state->shifter_base & 0x3f0000) | (data & 0xff) << 8;
+		logerror("SHIFTER Video Base Address %06x\n", state->shifter_base);
 		break;
 	}
 }
 
 READ16_HANDLER( atarist_shifter_counter_r )
 {
+	atarist_state *state = space->machine->driver_data;
+
 	switch (offset)
 	{
 	case 0x00:
-		return (shifter.ofs >> 16) & 0x3f;
+		return (state->shifter_ofs >> 16) & 0x3f;
 	case 0x01:
-		return (shifter.ofs >> 8) & 0xff;
+		return (state->shifter_ofs >> 8) & 0xff;
 	case 0x02:
-		return shifter.ofs & 0xff;
+		return state->shifter_ofs & 0xff;
 	}
 
 	return 0;
@@ -251,35 +250,47 @@ READ16_HANDLER( atarist_shifter_counter_r )
 
 READ8_HANDLER( atarist_shifter_sync_r )
 {
-	return shifter.sync;
+	atarist_state *state = space->machine->driver_data;
+
+	return state->shifter_sync;
 }
 
 WRITE8_HANDLER( atarist_shifter_sync_w )
 {
-	shifter.sync = data;
-	logerror("SHIFTER Sync %x\n", shifter.sync);
-	atarist_set_screen_parameters();
+	atarist_state *state = space->machine->driver_data;
+
+	state->shifter_sync = data;
+	logerror("SHIFTER Sync %x\n", state->shifter_sync);
+	atarist_set_screen_parameters(space->machine);
 }
 
 READ8_HANDLER( atarist_shifter_mode_r )
 {
-	return shifter.mode;
+	atarist_state *state = space->machine->driver_data;
+
+	return state->shifter_mode;
 }
 
 WRITE8_HANDLER( atarist_shifter_mode_w )
 {
-	shifter.mode = data;
-	logerror("SHIFTER Mode %x\n", shifter.mode);
+	atarist_state *state = space->machine->driver_data;
+
+	state->shifter_mode = data;
+	logerror("SHIFTER Mode %x\n", state->shifter_mode);
 }
 
 READ16_HANDLER( atarist_shifter_palette_r )
 {
-	return shifter.palette[offset];
+	atarist_state *state = space->machine->driver_data;
+
+	return state->shifter_palette[offset];
 }
 
 WRITE16_HANDLER( atarist_shifter_palette_w )
 {
-	shifter.palette[offset] = data;
+	atarist_state *state = space->machine->driver_data;
+
+	state->shifter_palette[offset] = data;
 	logerror("SHIFTER Palette[%x] = %x\n", offset, data);
 
 	palette_set_color_rgb(space->machine, offset, pal3bit(data >> 8), pal3bit(data >> 4), pal3bit(data));
@@ -289,25 +300,31 @@ WRITE16_HANDLER( atarist_shifter_palette_w )
 
 READ16_HANDLER( atariste_shifter_base_low_r )
 {
-	return shifter.base & 0xfe;
+	atarist_state *state = space->machine->driver_data;
+
+	return state->shifter_base & 0xfe;
 }
 
 WRITE16_HANDLER( atariste_shifter_base_low_w )
 {
-	shifter.base = (shifter.base & 0x3fff00) | (data & 0xfe);
-	logerror("SHIFTER Video Base Address %06x\n", shifter.base);
+	atarist_state *state = space->machine->driver_data;
+
+	state->shifter_base = (state->shifter_base & 0x3fff00) | (data & 0xfe);
+	logerror("SHIFTER Video Base Address %06x\n", state->shifter_base);
 }
 
 READ16_HANDLER( atariste_shifter_counter_r )
 {
+	atarist_state *state = space->machine->driver_data;
+
 	switch (offset)
 	{
 	case 0x00:
-		return (shifter.ofs >> 16) & 0x3f;
+		return (state->shifter_ofs >> 16) & 0x3f;
 	case 0x01:
-		return (shifter.ofs >> 8) & 0xff;
+		return (state->shifter_ofs >> 8) & 0xff;
 	case 0x02:
-		return shifter.ofs & 0xfe;
+		return state->shifter_ofs & 0xfe;
 	}
 
 	return 0;
@@ -315,30 +332,34 @@ READ16_HANDLER( atariste_shifter_counter_r )
 
 WRITE16_HANDLER( atariste_shifter_counter_w )
 {
+	atarist_state *state = space->machine->driver_data;
+
 	switch (offset)
 	{
 	case 0x00:
-		shifter.ofs = (shifter.ofs & 0x00fffe) | (data & 0x3f) << 16;
-		logerror("SHIFTER Video Address Counter %06x\n", shifter.ofs);
+		state->shifter_ofs = (state->shifter_ofs & 0x00fffe) | (data & 0x3f) << 16;
+		logerror("SHIFTER Video Address Counter %06x\n", state->shifter_ofs);
 		break;
 	case 0x01:
-		shifter.ofs = (shifter.ofs & 0x3f00fe) | (data & 0xff) << 8;
-		logerror("SHIFTER Video Address Counter %06x\n", shifter.ofs);
+		state->shifter_ofs = (state->shifter_ofs & 0x3f00fe) | (data & 0xff) << 8;
+		logerror("SHIFTER Video Address Counter %06x\n", state->shifter_ofs);
 		break;
 	case 0x02:
-		shifter.ofs = (shifter.ofs & 0x3fff00) | (data & 0xfe);
-		logerror("SHIFTER Video Address Counter %06x\n", shifter.ofs);
+		state->shifter_ofs = (state->shifter_ofs & 0x3fff00) | (data & 0xfe);
+		logerror("SHIFTER Video Address Counter %06x\n", state->shifter_ofs);
 		break;
 	}
 }
 
 WRITE16_HANDLER( atariste_shifter_palette_w )
 {
+	atarist_state *state = space->machine->driver_data;
+
 	int r = ((data >> 7) & 0x0e) | BIT(data, 11);
 	int g = ((data >> 3) & 0x0e) | BIT(data, 7);
 	int b = ((data << 1) & 0x0e) | BIT(data, 3);
 
-	shifter.palette[offset] = data;
+	state->shifter_palette[offset] = data;
 	logerror("SHIFTER palette %x = %x\n", offset, data);
 
 	palette_set_color_rgb(space->machine, offset, r, g, b);
@@ -346,24 +367,32 @@ WRITE16_HANDLER( atariste_shifter_palette_w )
 
 READ16_HANDLER( atariste_shifter_lineofs_r )
 {
-	return shifter.lineofs;
+	atarist_state *state = space->machine->driver_data;
+
+	return state->shifter_lineofs;
 }
 
 WRITE16_HANDLER( atariste_shifter_lineofs_w )
 {
-	shifter.lineofs = data & 0xff;
-	logerror("SHIFTER Line Offset %x\n", shifter.lineofs);
+	atarist_state *state = space->machine->driver_data;
+
+	state->shifter_lineofs = data & 0xff;
+	logerror("SHIFTER Line Offset %x\n", state->shifter_lineofs);
 }
 
 READ16_HANDLER( atariste_shifter_pixelofs_r )
 {
-	return shifter.pixelofs;
+	atarist_state *state = space->machine->driver_data;
+
+	return state->shifter_pixelofs;
 }
 
 WRITE16_HANDLER( atariste_shifter_pixelofs_w )
 {
-	shifter.pixelofs = data & 0x0f;
-	logerror("SHIFTER Pixel Offset %x\n", shifter.pixelofs);
+	atarist_state *state = space->machine->driver_data;
+
+	state->shifter_pixelofs = data & 0x0f;
+	logerror("SHIFTER Pixel Offset %x\n", state->shifter_pixelofs);
 }
 
 /* Atari ST Blitter */
@@ -388,42 +417,36 @@ static const int BLITTER_NOPS[16][4] =
 	{ 1, 1, 1, 1 }
 };
 
-static struct BLITTER
-{
-	UINT16 halftone[16];
-	INT16 src_inc_x, src_inc_y, dst_inc_x, dst_inc_y;
-	UINT32 src, dst;
-	UINT16 endmask1, endmask2, endmask3;
-	UINT16 xcount, ycount, xcountl;
-	UINT8 hop, op, ctrl, skew;
-	UINT32 srcbuf;
-} blitter;
-
 static void atarist_blitter_source(running_machine *machine)
 {
-	UINT8 *RAM = memory_region(machine, "main") + blitter.src;
+	atarist_state *state = machine->driver_data;
 
-	if (blitter.src_inc_x < 0)
+	const address_space *program = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	UINT16 data = memory_read_word_16be(program, state->blitter_src);
+
+	if (state->blitter_src_inc_x < 0)
 	{
-		blitter.srcbuf = (RAM[1] << 24) | (RAM[0] << 16) | (blitter.srcbuf >> 16);
+		state->blitter_srcbuf = (data << 16) | (state->blitter_srcbuf >> 16);
 	}
 	else
 	{
-		blitter.srcbuf = (blitter.srcbuf << 16) | (RAM[1] << 8) | RAM[0];
+		state->blitter_srcbuf = (state->blitter_srcbuf << 16) | data;
 	}
 }
 
-static UINT16 atarist_blitter_hop(void)
+static UINT16 atarist_blitter_hop(running_machine *machine)
 {
-	UINT16 source = blitter.srcbuf >> (blitter.skew & 0x0f);
-	UINT16 halftone = blitter.halftone[blitter.ctrl & 0x0f];
+	atarist_state *state = machine->driver_data;
 
-	if (blitter.ctrl & ATARIST_BLITTER_CTRL_SMUDGE)
+	UINT16 source = state->blitter_srcbuf >> (state->blitter_skew & 0x0f);
+	UINT16 halftone = state->blitter_halftone[state->blitter_ctrl & 0x0f];
+
+	if (state->blitter_ctrl & ATARIST_BLITTER_CTRL_SMUDGE)
 	{
-		halftone = blitter.halftone[source & 0x0f];
+		halftone = state->blitter_halftone[source & 0x0f];
 	}
 
-	switch (blitter.hop)
+	switch (state->blitter_hop)
 	{
 	case 0:
 		return 0xffff;
@@ -440,99 +463,110 @@ static UINT16 atarist_blitter_hop(void)
 
 static void atarist_blitter_op(running_machine *machine, UINT16 s, UINT32 dstaddr, UINT16 mask)
 {
-	UINT8 *dst = memory_region(machine, "main") + dstaddr;
-	UINT16 d = (dst[1] << 8) + dst[0];
+	atarist_state *state = machine->driver_data;
+	const address_space *program = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
+	UINT16 d = memory_read_word_16be(program, dstaddr);
 	UINT16 result = 0;
 
-	if (blitter.op & 0x08) result = (~s & ~d);
-	if (blitter.op & 0x04) result |= (~s & d);
-	if (blitter.op & 0x02) result |= (s & ~d);
-	if (blitter.op & 0x01) result |= (s & d);
+	if (state->blitter_op & 0x08) result = (~s & ~d);
+	if (state->blitter_op & 0x04) result |= (~s & d);
+	if (state->blitter_op & 0x02) result |= (s & ~d);
+	if (state->blitter_op & 0x01) result |= (s & d);
 
-	dst[0] = result & 0xff;
-	dst[1] = (result >> 8) & 0xff;
+	memory_write_word_16be(program, dstaddr, result);
 }
 
 static TIMER_CALLBACK( atarist_blitter_tick )
 {
+	atarist_state *state = machine->driver_data;
+
 	do
 	{
-		if (blitter.skew & ATARIST_BLITTER_SKEW_FXSR)
+		if (state->blitter_skew & ATARIST_BLITTER_SKEW_FXSR)
 		{
 			atarist_blitter_source(machine);
-			blitter.src += blitter.src_inc_x;
+			state->blitter_src += state->blitter_src_inc_x;
 		}
 
 		atarist_blitter_source(machine);
-		atarist_blitter_op(machine, atarist_blitter_hop(), blitter.dst, blitter.endmask1);
-		blitter.xcount--;
+		atarist_blitter_op(machine, atarist_blitter_hop(machine), state->blitter_dst, state->blitter_endmask1);
+		state->blitter_xcount--;
 
-		while (blitter.xcount > 0)
+		while (state->blitter_xcount > 0)
 		{
-			blitter.src += blitter.src_inc_x;
-			blitter.dst += blitter.dst_inc_x;
+			state->blitter_src += state->blitter_src_inc_x;
+			state->blitter_dst += state->blitter_dst_inc_x;
 
-			if (blitter.xcount == 1)
+			if (state->blitter_xcount == 1)
 			{
-				if (!(blitter.skew & ATARIST_BLITTER_SKEW_NFSR))
+				if (!(state->blitter_skew & ATARIST_BLITTER_SKEW_NFSR))
 				{
 					atarist_blitter_source(machine);
 				}
 
-				atarist_blitter_op(machine, atarist_blitter_hop(), blitter.dst, blitter.endmask3);
+				atarist_blitter_op(machine, atarist_blitter_hop(machine), state->blitter_dst, state->blitter_endmask3);
 			}
 			else
 			{
 				atarist_blitter_source(machine);
-				atarist_blitter_op(machine, atarist_blitter_hop(), blitter.dst, blitter.endmask2);
+				atarist_blitter_op(machine, atarist_blitter_hop(machine), state->blitter_dst, state->blitter_endmask2);
 			}
 
-			blitter.xcount--;
+			state->blitter_xcount--;
 		}
 
-		blitter.src += blitter.src_inc_y;
-		blitter.dst += blitter.dst_inc_y;
+		state->blitter_src += state->blitter_src_inc_y;
+		state->blitter_dst += state->blitter_dst_inc_y;
 
-		if (blitter.dst_inc_y < 0)
+		if (state->blitter_dst_inc_y < 0)
 		{
-			blitter.ctrl = (blitter.ctrl & 0xf0) | (((blitter.ctrl & 0x0f) - 1) & 0x0f);
+			state->blitter_ctrl = (state->blitter_ctrl & 0xf0) | (((state->blitter_ctrl & 0x0f) - 1) & 0x0f);
 		}
 		else
 		{
-			blitter.ctrl = (blitter.ctrl & 0xf0) | (((blitter.ctrl & 0x0f) + 1) & 0x0f);
+			state->blitter_ctrl = (state->blitter_ctrl & 0xf0) | (((state->blitter_ctrl & 0x0f) + 1) & 0x0f);
 		}
 
-		blitter.xcount = blitter.xcountl;
-		blitter.ycount--;
+		state->blitter_xcount = state->blitter_xcountl;
+		state->blitter_ycount--;
 	}
-	while (blitter.ycount > 0);
+	while (state->blitter_ycount > 0);
 
-	blitter.ctrl &= 0x7f;
+	state->blitter_ctrl &= 0x7f;
 }
 
 READ16_HANDLER( atarist_blitter_halftone_r )
 {
-	return blitter.halftone[offset];
+	atarist_state *state = space->machine->driver_data;
+
+	return state->blitter_halftone[offset];
 }
 
 READ16_HANDLER( atarist_blitter_src_inc_x_r )
 {
-	return blitter.src_inc_x;
+	atarist_state *state = space->machine->driver_data;
+
+	return state->blitter_src_inc_x;
 }
 
 READ16_HANDLER( atarist_blitter_src_inc_y_r )
 {
-	return blitter.src_inc_y;
+	atarist_state *state = space->machine->driver_data;
+
+	return state->blitter_src_inc_y;
 }
 
 READ16_HANDLER( atarist_blitter_src_r )
 {
+	atarist_state *state = space->machine->driver_data;
+
 	switch (offset)
 	{
 	case 0:
-		return (blitter.src >> 16) & 0xff;
+		return (state->blitter_src >> 16) & 0xff;
 	case 1:
-		return blitter.src & 0xfffe;
+		return state->blitter_src & 0xfffe;
 	}
 
 	return 0;
@@ -540,14 +574,16 @@ READ16_HANDLER( atarist_blitter_src_r )
 
 READ16_HANDLER( atarist_blitter_end_mask_r )
 {
+	atarist_state *state = space->machine->driver_data;
+
 	switch (offset)
 	{
 	case 0:
-		return blitter.endmask1;
+		return state->blitter_endmask1;
 	case 1:
-		return blitter.endmask2;
+		return state->blitter_endmask2;
 	case 2:
-		return blitter.endmask3;
+		return state->blitter_endmask3;
 	}
 
 	return 0;
@@ -555,22 +591,28 @@ READ16_HANDLER( atarist_blitter_end_mask_r )
 
 READ16_HANDLER( atarist_blitter_dst_inc_x_r )
 {
-	return blitter.dst_inc_x;
+	atarist_state *state = space->machine->driver_data;
+
+	return state->blitter_dst_inc_x;
 }
 
 READ16_HANDLER( atarist_blitter_dst_inc_y_r )
 {
-	return blitter.dst_inc_y;
+	atarist_state *state = space->machine->driver_data;
+
+	return state->blitter_dst_inc_y;
 }
 
 READ16_HANDLER( atarist_blitter_dst_r )
 {
+	atarist_state *state = space->machine->driver_data;
+
 	switch (offset)
 	{
 	case 0:
-		return (blitter.dst >> 16) & 0xff;
+		return (state->blitter_dst >> 16) & 0xff;
 	case 1:
-		return blitter.dst & 0xfffe;
+		return state->blitter_dst & 0xfffe;
 	}
 
 	return 0;
@@ -578,138 +620,170 @@ READ16_HANDLER( atarist_blitter_dst_r )
 
 READ16_HANDLER( atarist_blitter_count_x_r )
 {
-	return blitter.xcount;
+	atarist_state *state = space->machine->driver_data;
+
+	return state->blitter_xcount;
 }
 
 READ16_HANDLER( atarist_blitter_count_y_r )
 {
-	return blitter.ycount;
+	atarist_state *state = space->machine->driver_data;
+
+	return state->blitter_ycount;
 }
 
 READ16_HANDLER( atarist_blitter_op_r )
 {
+	atarist_state *state = space->machine->driver_data;
+
 	if (ACCESSING_BITS_0_7)
 	{
-		return blitter.hop;
+		return state->blitter_hop;
 	}
 	else
 	{
-		return blitter.op;
+		return state->blitter_op;
 	}
 }
 
 READ16_HANDLER( atarist_blitter_ctrl_r )
 {
+	atarist_state *state = space->machine->driver_data;
+
 	if (ACCESSING_BITS_0_7)
 	{
-		return blitter.ctrl;
+		return state->blitter_ctrl;
 	}
 	else
 	{
-		return blitter.skew;
+		return state->blitter_skew;
 	}
 }
 
 WRITE16_HANDLER( atarist_blitter_halftone_w )
 {
-	blitter.halftone[offset] = data;
+	atarist_state *state = space->machine->driver_data;
+
+	state->blitter_halftone[offset] = data;
 }
 
 WRITE16_HANDLER( atarist_blitter_src_inc_x_w )
 {
-	blitter.src_inc_x = data & 0xfffe;
+	atarist_state *state = space->machine->driver_data;
+
+	state->blitter_src_inc_x = data & 0xfffe;
 }
 
 WRITE16_HANDLER( atarist_blitter_src_inc_y_w )
 {
-	blitter.src_inc_y = data & 0xfffe;
+	atarist_state *state = space->machine->driver_data;
+
+	state->blitter_src_inc_y = data & 0xfffe;
 }
 
 WRITE16_HANDLER( atarist_blitter_src_w )
 {
+	atarist_state *state = space->machine->driver_data;
+
 	switch (offset)
 	{
 	case 0:
-		blitter.src = (data & 0xff) | (blitter.src & 0xfffe);
+		state->blitter_src = (data & 0xff) | (state->blitter_src & 0xfffe);
 	case 1:
-		blitter.src = (blitter.src & 0xff0000) | (data & 0xfffe);
+		state->blitter_src = (state->blitter_src & 0xff0000) | (data & 0xfffe);
 	}
 }
 
 WRITE16_HANDLER( atarist_blitter_end_mask_w )
 {
+	atarist_state *state = space->machine->driver_data;
+
 	switch (offset)
 	{
 	case 0:
-		blitter.endmask1 = data;
+		state->blitter_endmask1 = data;
 	case 1:
-		blitter.endmask2 = data;
+		state->blitter_endmask2 = data;
 	case 2:
-		blitter.endmask3 = data;
+		state->blitter_endmask3 = data;
 	}
 }
 
 WRITE16_HANDLER( atarist_blitter_dst_inc_x_w )
 {
-	blitter.dst_inc_x = data & 0xfffe;
+	atarist_state *state = space->machine->driver_data;
+
+	state->blitter_dst_inc_x = data & 0xfffe;
 }
 
 WRITE16_HANDLER( atarist_blitter_dst_inc_y_w )
 {
-	blitter.dst_inc_y = data & 0xfffe;
+	atarist_state *state = space->machine->driver_data;
+
+	state->blitter_dst_inc_y = data & 0xfffe;
 }
 
 WRITE16_HANDLER( atarist_blitter_dst_w )
 {
+	atarist_state *state = space->machine->driver_data;
+
 	switch (offset)
 	{
 	case 0:
-		blitter.dst = (data & 0xff) | (blitter.dst & 0xfffe);
+		state->blitter_dst = (data & 0xff) | (state->blitter_dst & 0xfffe);
 	case 1:
-		blitter.dst = (blitter.dst & 0xff0000) | (data & 0xfffe);
+		state->blitter_dst = (state->blitter_dst & 0xff0000) | (data & 0xfffe);
 	}
 }
 
 WRITE16_HANDLER( atarist_blitter_count_x_w )
 {
-	blitter.xcount = data;
+	atarist_state *state = space->machine->driver_data;
+
+	state->blitter_xcount = data;
 }
 
 WRITE16_HANDLER( atarist_blitter_count_y_w )
 {
-	blitter.ycount = data;
+	atarist_state *state = space->machine->driver_data;
+
+	state->blitter_ycount = data;
 }
 
 WRITE16_HANDLER( atarist_blitter_op_w )
 {
+	atarist_state *state = space->machine->driver_data;
+
 	if (ACCESSING_BITS_0_7)
 	{
-		blitter.hop = (data >> 8) & 0x03;
+		state->blitter_hop = (data >> 8) & 0x03;
 	}
 	else
 	{
-		blitter.op = data & 0x0f;
+		state->blitter_op = data & 0x0f;
 	}
 }
 
 WRITE16_HANDLER( atarist_blitter_ctrl_w )
 {
+	atarist_state *state = space->machine->driver_data;
+
 	if (ACCESSING_BITS_0_7)
 	{
-		blitter.ctrl = (data >> 8) & 0xef;
+		state->blitter_ctrl = (data >> 8) & 0xef;
 
-		if (!(blitter.ctrl & ATARIST_BLITTER_CTRL_BUSY))
+		if (!(state->blitter_ctrl & ATARIST_BLITTER_CTRL_BUSY))
 		{
 			if ((data >> 8) & ATARIST_BLITTER_CTRL_BUSY)
 			{
-				int nops = BLITTER_NOPS[blitter.op][blitter.hop]; // each NOP takes 4 cycles
+				int nops = BLITTER_NOPS[state->blitter_op][state->blitter_hop]; // each NOP takes 4 cycles
 				timer_set(space->machine, ATTOTIME_IN_HZ((Y2/4)/(4*nops)), NULL, 0, atarist_blitter_tick);
 			}
 		}
 	}
 	else
 	{
-		blitter.skew = data & 0xcf;
+		state->blitter_skew = data & 0xcf;
 	}
 }
 
@@ -717,50 +791,49 @@ WRITE16_HANDLER( atarist_blitter_ctrl_w )
 
 VIDEO_START( atarist )
 {
-	mfp = device_list_find_by_tag(machine->config->devicelist, MC68901, MC68901_TAG);
+	atarist_state *state = machine->driver_data;
 
-	atarist_shifter_timer = timer_alloc(machine, atarist_shifter_tick, NULL);
-	atarist_glue_timer = timer_alloc(machine, atarist_glue_tick, NULL);
+	state->shifter_timer = timer_alloc(machine, atarist_shifter_tick, NULL);
+	state->glue_timer = timer_alloc(machine, atarist_glue_tick, NULL);
 
-	timer_adjust_periodic(atarist_shifter_timer, video_screen_get_time_until_pos(machine->primary_screen,0,0), 0, ATTOTIME_IN_HZ(Y2/4)); // 125 ns
-	timer_adjust_periodic(atarist_glue_timer, video_screen_get_time_until_pos(machine->primary_screen,0,0), 0, ATTOTIME_IN_HZ(Y2/16)); // 500 ns
+	timer_adjust_periodic(state->shifter_timer, video_screen_get_time_until_pos(machine->primary_screen,0,0), 0, ATTOTIME_IN_HZ(Y2/4)); // 125 ns
+	timer_adjust_periodic(state->glue_timer, video_screen_get_time_until_pos(machine->primary_screen,0,0), 0, ATTOTIME_IN_HZ(Y2/16)); // 500 ns
 
-	memset(&shifter, 0, sizeof(shifter));
+	/* register for state saving */
+	state_save_register_global(machine, state->shifter_base);
+	state_save_register_global(machine, state->shifter_ofs);
+	state_save_register_global(machine, state->shifter_sync);
+	state_save_register_global(machine, state->shifter_mode);
+	state_save_register_global_array(machine, state->shifter_palette);
+	state_save_register_global(machine, state->shifter_lineofs);
+	state_save_register_global(machine, state->shifter_pixelofs);
+	state_save_register_global_array(machine, state->shifter_rr);
+	state_save_register_global_array(machine, state->shifter_ir);
+	state_save_register_global(machine, state->shifter_bitplane);
+	state_save_register_global(machine, state->shifter_shift);
+	state_save_register_global(machine, state->shifter_h);
+	state_save_register_global(machine, state->shifter_v);
+	state_save_register_global(machine, state->shifter_de);
 
-	state_save_register_global(machine, shifter.base);
-	state_save_register_global(machine, shifter.ofs);
-	state_save_register_global(machine, shifter.sync);
-	state_save_register_global(machine, shifter.mode);
-	state_save_register_global_array(machine, shifter.palette);
-	state_save_register_global(machine, shifter.lineofs);
-	state_save_register_global(machine, shifter.pixelofs);
-	state_save_register_global_array(machine, shifter.rr);
-	state_save_register_global_array(machine, shifter.ir);
-	state_save_register_global(machine, shifter.bitplane);
-	state_save_register_global(machine, shifter.shift);
-	state_save_register_global(machine, shifter.h);
-	state_save_register_global(machine, shifter.v);
-	state_save_register_global(machine, shifter.de);
+	state_save_register_global_array(machine, state->blitter_halftone);
+	state_save_register_global(machine, state->blitter_src_inc_x);
+	state_save_register_global(machine, state->blitter_src_inc_y);
+	state_save_register_global(machine, state->blitter_dst_inc_x);
+	state_save_register_global(machine, state->blitter_dst_inc_y);
+	state_save_register_global(machine, state->blitter_src);
+	state_save_register_global(machine, state->blitter_dst);
+	state_save_register_global(machine, state->blitter_endmask1);
+	state_save_register_global(machine, state->blitter_endmask2);
+	state_save_register_global(machine, state->blitter_endmask3);
+	state_save_register_global(machine, state->blitter_xcount);
+	state_save_register_global(machine, state->blitter_ycount);
+	state_save_register_global(machine, state->blitter_xcountl);
+	state_save_register_global(machine, state->blitter_hop);
+	state_save_register_global(machine, state->blitter_op);
+	state_save_register_global(machine, state->blitter_ctrl);
+	state_save_register_global(machine, state->blitter_skew);
 
-	state_save_register_global_array(machine, blitter.halftone);
-	state_save_register_global(machine, blitter.src_inc_x);
-	state_save_register_global(machine, blitter.src_inc_y);
-	state_save_register_global(machine, blitter.dst_inc_x);
-	state_save_register_global(machine, blitter.dst_inc_y);
-	state_save_register_global(machine, blitter.src);
-	state_save_register_global(machine, blitter.dst);
-	state_save_register_global(machine, blitter.endmask1);
-	state_save_register_global(machine, blitter.endmask2);
-	state_save_register_global(machine, blitter.endmask3);
-	state_save_register_global(machine, blitter.xcount);
-	state_save_register_global(machine, blitter.ycount);
-	state_save_register_global(machine, blitter.xcountl);
-	state_save_register_global(machine, blitter.hop);
-	state_save_register_global(machine, blitter.op);
-	state_save_register_global(machine, blitter.ctrl);
-	state_save_register_global(machine, blitter.skew);
-
-	atarist_set_screen_parameters();
+	atarist_set_screen_parameters(machine);
 
 	VIDEO_START_CALL(generic_bitmapped);
 }
