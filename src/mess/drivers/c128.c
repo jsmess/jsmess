@@ -20,7 +20,7 @@
 
 * Commodore 128 (1985)
 
-CPU: CSG 8502 (1 or 2 Mhz), Z80 (~3 Mhz)
+CPU: CSG 8502 (1 or 2 MHz), Z80 (~3 MHz)
 RAM: 128 kilobytes
 ROM: 72 kilobytes expandable
 Video: MOS 8564 "VIC-IIE", MOS 8563 "VDC" CTRC (40/80 columns text; Palette of 16 
@@ -57,7 +57,7 @@ arrays, 8580R5 sid, and 8502R0 processor.
 case, with built-in 1571 disk drive (upgraded with a special software to
 discourage pirating software). Some NTSC prototypes exist.
 
-CPU: CSG 8502 (1 or 2 Mhz), Z80 (~3 Mhz), 6502 (co-processor for disk
+CPU: CSG 8502 (1 or 2 MHz), Z80 (~3 MHz), 6502 (co-processor for disk
 	drive)
 RAM: 128 kilobytes
 ROM: 72 kilobytes expandable

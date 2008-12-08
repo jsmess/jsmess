@@ -52,10 +52,10 @@
     From here CP/M is booted, and the appropiate programs can be run.
 
     The hardware:
-       - Z80 CPU running at 3.4Mhz
+       - Z80 CPU running at 3.4 MHz
        - NEC765 FDC
        - mono display
-       - beep (a fixed hz tone which can be turned on/off)
+       - beep (a fixed Hz tone which can be turned on/off)
        - 720x256 (PAL) bitmapped display, 720x200 (NTSC) bitmapped display
        - Amstrad CPC6128 style keyboard
 
@@ -943,7 +943,7 @@ static INPUT_PORTS_START(pcw)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_VBLANK)
 	/* frame rate option */
 	PORT_DIPNAME( 0x10, 0x010, "50/60Hz Frame Rate Option")
-	PORT_DIPSETTING(	0x00, "60hz")
+	PORT_DIPSETTING(	0x00, "60Hz")
 	PORT_DIPSETTING(	0x10, "50Hz" )
 	/* spectravideo joystick enabled */
 	PORT_DIPNAME( 0x20, 0x020, "Spectravideo Joystick Enabled")
@@ -980,7 +980,7 @@ INPUT_PORTS_END
 /* PCW8256, PCW8512, PCW9256 */
 static MACHINE_DRIVER_START( pcw )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 4000000)       /* clock supplied to chip, but in reality it is 3.4Mhz */
+	MDRV_CPU_ADD("main", Z80, 4000000)       /* clock supplied to chip, but in reality it is 3.4 MHz */
 	MDRV_CPU_PROGRAM_MAP(pcw_map, 0)
 	MDRV_CPU_IO_MAP(pcw_io, 0)
 	MDRV_INTERLEAVE(1)

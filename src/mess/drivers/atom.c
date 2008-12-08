@@ -34,7 +34,7 @@ Floppy:     FDC8271
 Hardware:   PPIA 8255
 
     output  b000    0 - 3 keyboard row, 4 - 7 graphics mode
-            b002    0 cas output, 1 enable 2.4Khz, 2 buzzer, 3 colour set
+            b002    0 cas output, 1 enable 2.4kHz, 2 buzzer, 3 colour set
 
     input   b001    0 - 5 keyboard column, 6 CTRL key, 7 SHIFT key
             b002    4 2.4kHz input, 5 cas input, 6 REPT key, 7 60 Hz input
@@ -251,7 +251,7 @@ INPUT_PORTS_END
 /* machine definition */
 static MACHINE_DRIVER_START( atom )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M65C02, 1000000)        /* 0,894886 Mhz */
+	MDRV_CPU_ADD("main", M65C02, 1000000)        /* 0,894886 MHz */
 	MDRV_CPU_PROGRAM_MAP(atom_mem, 0)
 
 	MDRV_MACHINE_RESET( atom )

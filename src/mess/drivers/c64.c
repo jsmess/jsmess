@@ -28,7 +28,7 @@ latter with support for LOAD/SAVE commands as well). The character rom
 is not present either and its content was, again, in the cart. Max Machine
 carts can be run by both C64 and C128.
 
-CPU: MOS Technology 6510 (1Mhz)
+CPU: MOS Technology 6510 (1 MHz)
 RAM: 4 kilobytes (2 kilobytes?)
 ROM: none
 Video: MOS 6566 "VIC-II" (320 x 200 Hi-Resolution, 40 columns text, 16 
@@ -51,7 +51,7 @@ time for business product (letter + memory size: P128 & B256).
 It was also advertised as VC 64 in Germany, and as VIC 64S in Sweden
 (the latter came with a modified character set)
 
-CPU: CSG 6510 (1Mhz)
+CPU: CSG 6510 (1 MHz)
 RAM: 64 kilobytes
 ROM: 20 kilobytes
 Video: MOS 6569 "VIC-II" (320 x 200 Hi-Resolution, 40 columns text, 16 
@@ -140,7 +140,7 @@ built-in speaker. The only differences between the C64 and the SX-64 are in
 the start up colors and in the SX-64 better support for the internal floppy
 drive. The tape drive support was removed in the portable system.
 
-CPU: MOS 6510 (1Mhz)
+CPU: MOS 6510 (1 MHz)
 RAM: 64 kilobytes (68 with the 1541)
 ROM: 20 kilobytes (36 with the 1541)
 Video: MOS 6569 "VIC-II" (320 x 200 Hi-Resolution, 40 columns text, 16 
@@ -177,7 +177,7 @@ larger case (closer to the original C64) is known as Commodore 64G, because
 mainly sold in Germany. Other repackaged versions followed, built around the 
 same kernel and chips.
 
-CPU: CSG 8500 (1 Mhz; 6510 compatible)
+CPU: CSG 8500 (1 MHz; 6510 compatible)
 RAM: 64 kilobytes
 ROM: 20 kilobytes
 Video: MOS 8565 "VIC-II" (320 x 200 Hi-Resolution, 40 columns text, 16 
@@ -200,7 +200,7 @@ BIOS:
   Repackaged C64 with neither keyboard, nor ports. Basically, the
 system came far too late to enter the console market of the 90s.
 
-CPU: CSG 6510 (1 Mhz)
+CPU: CSG 6510 (1 MHz)
 RAM: 64 kilobytes
 ROM: 16 kilobytes
 Video: MOS 8565 "VIC-II" (320 x 200 Hi-Resolution, 40 columns text, 16 

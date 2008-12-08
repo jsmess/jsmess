@@ -70,23 +70,23 @@ A= BBC Model A
 
 
 
-&00-&07 6845 CRTC       Video controller                8  ( 2 bytes x  4 ) 1Mhz
-&08-&0F 6850 ACIA       Serial controller               8  ( 2 bytes x  4 ) 1Mhz
-&10-&17 Serial ULA      Serial system chip              8  ( 1 byte  x  8 ) 1Mhz
-&18-&1f INTOFF/STATID   ECONET Interrupt Off / ID No.   8  ( 1 byte  x  8 ) 1Mhz
+&00-&07 6845 CRTC       Video controller                8  ( 2 bytes x  4 ) 1MHz
+&08-&0F 6850 ACIA       Serial controller               8  ( 2 bytes x  4 ) 1MHz
+&10-&17 Serial ULA      Serial system chip              8  ( 1 byte  x  8 ) 1MHz
+&18-&1f INTOFF/STATID   ECONET Interrupt Off / ID No.   8  ( 1 byte  x  8 ) 1MHz
 write:
-&20-&2F Video ULA       Video system chip               16 ( 2 bytes x  8 ) 2Mhz
-&30-&3F 74LS161         Paged ROM selector              16 ( 1 byte  x 16 ) 2Mhz
+&20-&2F Video ULA       Video system chip               16 ( 2 bytes x  8 ) 2MHz
+&30-&3F 74LS161         Paged ROM selector              16 ( 1 byte  x 16 ) 2MHz
 read:
-&20-&2F INTON           ECONET Interrupt On             16 ( 1 bytes x 16 ) 2Mhz
-&30-&3F Not Connected   Not Connected                                       2Mhz
+&20-&2F INTON           ECONET Interrupt On             16 ( 1 bytes x 16 ) 2MHz
+&30-&3F Not Connected   Not Connected                                       2MHz
 
-&40-&5F 6522 VIA        SYSTEM VIA                      32 (16 bytes x  2 ) 1Mhz
-&60-&7F 6522 VIA        USER VIA                        32 (16 bytes x  2 ) 1Mhz
-&80-&9F 8271 FDC        FDC Floppy disc controller      32 ( 8 bytes x  4 ) 2Mhz
-&A0-&BF 68B54 ADLC      ECONET controller               32 ( 4 bytes x  8 ) 2Mhz
-&C0-&DF uPD7002         Analogue to digital converter   32 ( 4 bytes x  8 ) 1Mhz
-&E0-&FF Tube ULA        Tube system interface           32 (32 bytes x  1 ) 2Mhz
+&40-&5F 6522 VIA        SYSTEM VIA                      32 (16 bytes x  2 ) 1MHz
+&60-&7F 6522 VIA        USER VIA                        32 (16 bytes x  2 ) 1MHz
+&80-&9F 8271 FDC        FDC Floppy disc controller      32 ( 8 bytes x  4 ) 2MHz
+&A0-&BF 68B54 ADLC      ECONET controller               32 ( 4 bytes x  8 ) 2MHz
+&C0-&DF uPD7002         Analogue to digital converter   32 ( 4 bytes x  8 ) 1MHz
+&E0-&FF Tube ULA        Tube system interface           32 (32 bytes x  1 ) 2MHz
 ******************************************************************************/
 
 static ADDRESS_MAP_START(bbca_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -240,12 +240,12 @@ ADDRESS_MAP_END
 &30-&33 ROMSEL          -                       ROM Select               4 ( 1 byte  x  4 )
 &34-&37 ACCCON          ACCCON select reg.      ACCCON select reg        4 ( 1 byte  x  4 )
 &38-&3F NC              -                       -
-&40-&5F 6522 VIA        SYSTEM VIA              SYSTEM VIA              32 (16 bytes x  2 ) 1Mhz
-&60-&7F 6522 VIA        USER VIA                USER VIA                32 (16 bytes x  2 ) 1Mhz
+&40-&5F 6522 VIA        SYSTEM VIA              SYSTEM VIA              32 (16 bytes x  2 ) 1MHz
+&60-&7F 6522 VIA        USER VIA                USER VIA                32 (16 bytes x  2 ) 1MHz
 &80-&9F Int. Modem      Int. Modem              Int Modem
-&A0-&BF 68B54 ADLC      ECONET controller       ECONET controller       32 ( 4 bytes x  8 ) 2Mhz
+&A0-&BF 68B54 ADLC      ECONET controller       ECONET controller       32 ( 4 bytes x  8 ) 2MHz
 &C0-&DF NC              -                       -
-&E0-&FF Tube ULA        Tube system interface   Tube system interface   32 (32 bytes x  1 ) 2Mhz
+&E0-&FF Tube ULA        Tube system interface   Tube system interface   32 (32 bytes x  1 ) 2MHz
 ******************************************************************************/
 
 
@@ -720,7 +720,7 @@ static const cassette_config bbc_cassette_config =
 
 static MACHINE_DRIVER_START( bbca )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, 2000000)        /* 2.00Mhz */
+	MDRV_CPU_ADD("main", M6502, 2000000)        /* 2.00 MHz */
 	MDRV_CPU_PROGRAM_MAP( bbca_mem, 0 )
 	MDRV_CPU_VBLANK_INT("main", bbcb_vsync)				/* screen refresh interrupts */
 	MDRV_CPU_PERIODIC_INT(bbcb_keyscan, 1000)		/* scan keyboard */
@@ -785,7 +785,7 @@ MACHINE_DRIVER_END
 /****BBC MASTER */
 static MACHINE_DRIVER_START( bbcm )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M65SC02, 2000000)        /* 2.00Mhz */
+	MDRV_CPU_ADD("main", M65SC02, 2000000)        /* 2.00 MHz */
 	MDRV_CPU_PROGRAM_MAP( bbcm_mem, 0 )
 	MDRV_CPU_VBLANK_INT("main", bbcb_vsync)				/* screen refresh interrupts */
 	MDRV_CPU_PERIODIC_INT(bbcm_keyscan, 1000)		/* scan keyboard */

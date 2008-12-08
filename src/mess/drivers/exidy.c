@@ -60,8 +60,8 @@
 
     2. on cassette a 1 data bit is stored as a high frequency
     and a 0 data bit as a low frequency
-    - At 1200 baud, a logic 1 is 1 cycle of 1200hz and a logic 0 is 1/2 cycle of 600hz.
-    - At 300 baud, a logic 1 is 8 cycles of 2400hz and a logic 0 is 4 cycles of 1200hz.
+    - At 1200 baud, a logic 1 is 1 cycle of 1200 Hz and a logic 0 is 1/2 cycle of 600 Hz.
+    - At 300 baud, a logic 1 is 8 cycles of 2400 Hz and a logic 0 is 4 cycles of 1200 Hz.
 
     Attenuation is applied to the signal and the square wave edges are rounded.
 
@@ -93,7 +93,7 @@
 
  ******************************************************************************
 
-    The CPU clock speed is 2.106mhz, which was increased to 4.0mhz on the last production runs.
+    The CPU clock speed is 2.106 MHz, which was increased to 4.0 MHz on the last production runs.
 
     The Sorcerer has a bus connection for S100 equipment. This allows the connection
     of disk drives, provided that suitable driver/boot software is loaded.

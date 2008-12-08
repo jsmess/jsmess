@@ -55,7 +55,7 @@ static PALETTE_INIT( concept )
 /* concept machine */
 static MACHINE_DRIVER_START( concept )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 8182000)        /* 16.364 Mhz / 2 */
+	MDRV_CPU_ADD("main", M68000, 8182000)        /* 16.364 MHz / 2 */
 	MDRV_CPU_PROGRAM_MAP(concept_memmap, 0)
 	MDRV_CPU_VBLANK_INT("main", concept_interrupt)
 

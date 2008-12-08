@@ -24,7 +24,7 @@ Also known as C64 DX at early stages of the project. It was cancelled
 around 1990-1991. Only few units survive (they were sold after Commodore 
 liquidation in 1994).
 
-CPU: CSG 4510 (3.54 Mhz)
+CPU: CSG 4510 (3.54 MHz)
 RAM: 128 kilobytes, expandable to 8 megabytes
 ROM: 128 kilobytes
 Video: CSG 4569 "VIC-III" (6 Video modes; Resolutions from 320x200 to 

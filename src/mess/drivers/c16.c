@@ -24,7 +24,7 @@
 in Europe. It was impressive for the small size of its case, but it didn't
 meet commercial success
 
-CPU: MOS Technology 7501 (variable clock rate, with max 1.76 Mhz)
+CPU: MOS Technology 7501 (variable clock rate, with max 1.76 MHz)
 RAM: 16 kilobytes (expandable to 64k internally)
 ROM: 32 kilobytes
 Video: MOS Technology 7360 "TED" (5 Video modes; Max. Resolution 320x200;
@@ -42,7 +42,7 @@ Keyboard: QWERTY 62 key "membrane" (8 programmable function keys; 4 direction
   Redesigned version of the C116, with a different case and a different 
 keyboard.
 
-CPU: MOS Technology 7501 (variable clock rate, with max 1.76 Mhz)
+CPU: MOS Technology 7501 (variable clock rate, with max 1.76 MHz)
 RAM: 16 kilobytes (expandable to 64k internally)
 ROM: 32 kilobytes
 Video: MOS Technology 7360 "TED" (5 Video modes; Max. Resolution 320x200;
@@ -62,7 +62,7 @@ the original Commodore 264. The Plus/4 is basically the same as the C264,
 but the name refers to the four built-in programs which came with the 
 machine: Word Processing, Spreadsheet, Database software, Graphing package.
 
-CPU: MOS Technology 7501 (variable clock rate, with max 1.76 Mhz)
+CPU: MOS Technology 7501 (variable clock rate, with max 1.76 MHz)
 RAM: 64 kilobytes (expandable to 64k internally)
 ROM: 64 kilobytes
 Video: MOS Technology 7360 "TED" (5 Video modes; Max. Resolution 320x200;
@@ -364,7 +364,7 @@ static PALETTE_INIT( c16 )
 
 static MACHINE_DRIVER_START( c16 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M7501, 1400000)        /* 7.8336 Mhz */
+	MDRV_CPU_ADD("main", M7501, 1400000)        /* 7.8336 MHz */
 	MDRV_CPU_PROGRAM_MAP(c16_map, 0)
 	MDRV_CPU_VBLANK_INT("main", c16_frame_interrupt)
 	MDRV_CPU_PERIODIC_INT(ted7360_raster_interrupt, TED7360_HRETRACERATE)

@@ -44,7 +44,7 @@ BX256-80HP (***)	CBM 730		256k
 	HP machines had a detachable keyboard
 (***) Additional 8088 CPU present
 
-CPU: MOS 6509 (2 mhz)
+CPU: MOS 6509 (2 MHz)
 RAM: 128 Kilobytes (Expandable to 256k internal, 704k external)
 ROM: 24 Kilobytes
 Video: MOS 6545 CTRC (Text: 80 columns, 25 rows)
@@ -62,7 +62,7 @@ Keyboard: Full-sized 102 key QWERTY (19 key numeric keypad!; 4 direction
 market. In this machine, the Datasette port can be used (the BASIC ROMs 
 contain the necessary routines). It is also probably know as C128-40.
   
-CPU: CSG 6509 (1 Mhz)
+CPU: CSG 6509 (1 MHz)
 RAM: 128 kilobytes, expandable to 720k
 ROM: 24 kilobytes
 Video: CSG 6569 "VIC-II" (320 x 200 Hi-Resolution; 40 columns text; Palette 
@@ -357,7 +357,7 @@ static const mc6845_interface cbm700_crtc = {
 
 static MACHINE_DRIVER_START( cbm600 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6509, 7833600)        /* 7.8336 Mhz */
+	MDRV_CPU_ADD("main", M6509, 7833600)        /* 7.8336 MHz */
 	MDRV_CPU_PROGRAM_MAP(cbmb_readmem, cbmb_writemem)
 	MDRV_INTERLEAVE(0)
 
@@ -431,7 +431,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( p500 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6509, VIC6567_CLOCK)        /* 7.8336 Mhz */
+	MDRV_CPU_ADD("main", M6509, VIC6567_CLOCK)        /* 7.8336 MHz */
 	MDRV_CPU_PROGRAM_MAP(p500_readmem, p500_writemem)
 	MDRV_CPU_PERIODIC_INT(vic2_raster_irq, VIC6567_HRETRACERATE)
 	MDRV_INTERLEAVE(0)
