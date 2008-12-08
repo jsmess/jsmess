@@ -162,7 +162,7 @@ static MACHINE_DRIVER_START( mz80k )
 	/* basic machine hardware */
 
 	/* main CPU */
-	MDRV_CPU_ADD("main", Z80, 2000000)        /* 2 Mhz */
+	MDRV_CPU_ADD("main", Z80, 2000000)        /* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(mz80k_mem, 0)
 	MDRV_CPU_IO_MAP(mz80k_io, 0)
 

@@ -7,20 +7,20 @@
     TMS9129 VDP Graphics
         16k ram
 
-    Z80 CPU (4Mhz)
+    Z80 CPU (4 MHz)
 
-    Z80 CTC (4Mhz)
+    Z80 CTC (4 MHz)
         channel 0 is serial transmit clock
         channel 1 is serial receive clock
-        trigger for channel 0,1 and 2 is a 2mhz clock
+        trigger for channel 0,1 and 2 is a 2 MHz clock
         trigger for channel 3 is the terminal count of channel 2
 
-    Intel 8251 Serial (2Mhz clock?)
+    Intel 8251 Serial (2 MHz clock?)
 
     WD1770 Floppy Disc controller
         density is fixed, 4 drives and double sided supported
 
-    AY-3-8910 PSG (2Mhz)
+    AY-3-8910 PSG (2 MHz)
         port A and port B are connected to the keyboard. Port A is keyboard
         line select, Port B is data.
 
@@ -132,7 +132,7 @@ static void einstein_dump_ram(void)
     0x049 = crtc data register (w)
 
     0x04c
-        bit 2 = 50/60hz mode?
+        bit 2 = 50/60Hz mode?
         bit 1 = 1
         bit 0 = vsync state?
 
@@ -330,7 +330,7 @@ static TIMER_CALLBACK(einstein_ctc_trigger_callback)
 
 	einstein_ctc_trigger^=1;
 
-	/* channel 0 and 1 have a 2Mhz input clock for triggering */
+	/* channel 0 and 1 have a 2 MHz input clock for triggering */
 	z80ctc_trg0_w(device, 0, einstein_ctc_trigger);
 	z80ctc_trg1_w(device, 0, einstein_ctc_trigger);
 }
@@ -1451,11 +1451,11 @@ static MACHINE_RESET( einstein )
 	cpu_set_irq_callback(machine->cpu[0], einstein_cpu_acknowledge_int);
 
 	/* the einstein keyboard can generate a interrupt */
-	/* the int is actually clocked at the system clock 4Mhz, but this would be too fast for our
+	/* the int is actually clocked at the system clock 4 MHz, but this would be too fast for our
     driver. So we update at 50Hz and hope this is good enough. */
 	timer_pulse(machine, ATTOTIME_IN_HZ(50), NULL, 0, einstein_keyboard_timer_callback);
 
-	/* the input to channel 0 and 1 of the ctc is a 2mhz clock */
+	/* the input to channel 0 and 1 of the ctc is a 2 MHz clock */
 	einstein_ctc_trigger = 0;
 	timer_pulse(machine, ATTOTIME_IN_HZ(2000000), (void *)device_list_find_by_tag(machine->config->devicelist, Z80CTC, "z80ctc"), 0, einstein_ctc_trigger_callback);
 

@@ -19,7 +19,7 @@
     Hardware:
         - 2mb dram max,
         - 2mb flash-file memory max (in 2 1mb chips),
-        - 16Mhz Z80 (core combined in Anne ASIC),
+        - 16MHz Z80 (core combined in Anne ASIC),
         - Anne ASIC (keyboard interface, video (colours), dram/flash/rom paging,
         real time clock, "glue" logic for Super I/O)
         - Winbond Super I/O chip (PC type hardware - FDC, Serial, LPT, Hard-drive)
@@ -31,7 +31,7 @@
     Primary Purpose:
         - built as a successor to the PCW8526/PCW9512 series
         - wordprocessor system (also contains spreadsheet and other office applications)
-        - 16Mhz processor used so proportional fonts and enhanced wordprocessing features
+        - 16MHz processor used so proportional fonts and enhanced wordprocessing features
           are possible, true WYSIWYG wordprocessing.
         - flash-file can store documents.
 

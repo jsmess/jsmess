@@ -13,7 +13,7 @@
 
 static UINT8 super80_mhz=2;	/* state of bit 2 of port F0 */
 static UINT16 vidpg=0xfe00;	/* Home position of video page being displayed */
-static UINT8 int_sw;		/* internal 1 mhz flipflop */
+static UINT8 int_sw;		/* internal 1 MHz flipflop */
 
 static UINT8 current_palette;	/* for super80m and super80v */
 static UINT8 current_charset;	/* for super80m */
@@ -416,7 +416,7 @@ static void cassette_motor( running_machine *machine, UINT8 data )
 
 static UINT8 cass_data[]={ 0, 0, 0, 0 };
 
-/*	This timer runs at 200khz and emulates the 2 chips in the cassette input circuit
+/*	This timer runs at 200kHz and emulates the 2 chips in the cassette input circuit
 	They are U79 CD4046BCN PLL chip and U1 LM311P op-amp. U79 converts a frequency to a voltage,
 	and U1 amplifies that voltage to digital levels. U1 has a trimpot connected, to set the midpoint.
 
@@ -749,7 +749,7 @@ static INPUT_PORTS_START( super80 )
 	PORT_CONFNAME( 0x01, 0x01, "Autorun on Quickload")
 	PORT_CONFSETTING(    0x00, DEF_STR(No))
 	PORT_CONFSETTING(    0x01, DEF_STR(Yes))
-	PORT_CONFNAME( 0x02, 0x02, "2 Mhz always")
+	PORT_CONFNAME( 0x02, 0x02, "2 MHz always")
 	PORT_CONFSETTING(    0x02, DEF_STR(No))
 	PORT_CONFSETTING(    0x00, DEF_STR(Yes))
 	PORT_CONFNAME( 0x04, 0x04, "Screen on always")
@@ -854,7 +854,7 @@ static INPUT_PORTS_START( super80d )
 	PORT_CONFNAME( 0x01, 0x01, "Autorun on Quickload")
 	PORT_CONFSETTING(    0x00, DEF_STR(No))
 	PORT_CONFSETTING(    0x01, DEF_STR(Yes))
-	PORT_CONFNAME( 0x02, 0x02, "2 Mhz always")
+	PORT_CONFNAME( 0x02, 0x02, "2 MHz always")
 	PORT_CONFSETTING(    0x02, DEF_STR(No))
 	PORT_CONFSETTING(    0x00, DEF_STR(Yes))
 	PORT_CONFNAME( 0x04, 0x04, "Screen on always")
@@ -967,7 +967,7 @@ static TIMER_CALLBACK( super80_halfspeed )
 	if ((super80_mhz == 2) || (!(input_port_read(machine, "CONFIG") & 2)))	/* bit 2 of port F0 is low, OR user turned on config switch */
 		go_fast++;
 
-	/* code to slow down computer to 1mhz by halting cpu on every second frame */
+	/* code to slow down computer to 1 MHz by halting cpu on every second frame */
 	if (!go_fast)
 	{
 		if (!int_sw)
@@ -982,7 +982,7 @@ static TIMER_CALLBACK( super80_halfspeed )
 	}
 	else
 	{
-		if (int_sw < 8)								// @2mhz, reset just once
+		if (int_sw < 8)								// @2MHz, reset just once
 		{
 			cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, CLEAR_LINE);
 			int_sw = 8;							// ...not every time
@@ -1016,7 +1016,7 @@ static const cassette_config super80_cassette_config =
 
 static MACHINE_DRIVER_START( super80 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK/6)		/* 2 Mhz */
+	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK/6)		/* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(super80_map, 0)
 	MDRV_CPU_IO_MAP(super80_io, 0)
 	MDRV_CPU_CONFIG(super80_daisy_chain)
@@ -1070,7 +1070,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( super80v )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK/6)		/* 2 Mhz */
+	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK/6)		/* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(super80v_map, 0)
 	MDRV_CPU_IO_MAP(super80v_io, 0)
 	MDRV_CPU_CONFIG(super80_daisy_chain)
@@ -1122,7 +1122,7 @@ static void driver_init_common( running_machine *machine )
 
 static DRIVER_INIT( super80 )
 {
-	timer_pulse(machine, ATTOTIME_IN_HZ(100),NULL,0,super80_halfspeed);	/* timer for 1mhz slowdown */
+	timer_pulse(machine, ATTOTIME_IN_HZ(100),NULL,0,super80_halfspeed);	/* timer for 1MHz slowdown */
 	driver_init_common(machine);
 }
 

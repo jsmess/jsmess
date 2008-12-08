@@ -25,7 +25,7 @@
   The first model released was the Japanese one. It featured support for the
 Japanese katakana character.
 
-CPU: MOS Technology 6502 (1.01 Mhz)
+CPU: MOS Technology 6502 (1.01 MHz)
 RAM: 5 kilobytes (Expanded to 21k though an external 16k unit)
 ROM: 20 kilobytes
 Video: MOS Technology 6560 "VIC"(Text: 22 columns, 23 rows; Hires: 176x184 
@@ -44,7 +44,7 @@ Keyboard: Full-sized QWERTY 66 key (8 programmable function keys; 2 sets of
 worldwide. It was sold both in Europe and in the US. In Germany the 
 computer was renamed as VC 20 (apparently, it stands for 'VolksComputer'
 
-CPU: MOS Technology 6502A (1.01 Mhz)
+CPU: MOS Technology 6502A (1.01 MHz)
 RAM: 5 kilobytes (Expanded to 32k)
 ROM: 20 kilobytes
 Video: MOS Technology 6560 "VIC"(Text: 22 columns, 23 rows; Hires: 176x184 
@@ -252,7 +252,7 @@ static PALETTE_INIT( vc20 )
 
 static MACHINE_DRIVER_START( vic20 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, VIC6560_CLOCK)        /* 7.8336 Mhz */
+	MDRV_CPU_ADD("main", M6502, VIC6560_CLOCK)        /* 7.8336 MHz */
 	MDRV_CPU_PROGRAM_MAP(vc20_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", vic20_frame_interrupt)
 	MDRV_CPU_PERIODIC_INT(vic656x_raster_interrupt, VIC656X_HRETRACERATE)

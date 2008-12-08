@@ -182,7 +182,7 @@ static MACHINE_START(ex800)
 {
 	/* Setup beep */
 	beep_set_state(0, 0);
-	beep_set_frequency(0, 4000); /* measured at 4000 hz */
+	beep_set_frequency(0, 4000); /* measured at 4000 Hz */
 }
 
 
@@ -418,7 +418,7 @@ static const UPD7810_CONFIG ex800_cpu_config =
 
 static MACHINE_DRIVER_START(ex800)
     /* basic machine hardware */
-    MDRV_CPU_ADD("main", UPD7810, 12000000)  /* 12 Mhz? */
+    MDRV_CPU_ADD("main", UPD7810, 12000000)  /* 12 MHz? */
     MDRV_CPU_CONFIG(ex800_cpu_config)
     MDRV_CPU_PROGRAM_MAP(ex800_mem, 0)
 	MDRV_CPU_IO_MAP(ex800_io, 0)

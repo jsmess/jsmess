@@ -269,7 +269,7 @@ static const cassette_config svi318_cassette_config =
 
 static MACHINE_DRIVER_START( svi318 )
 	/* Basic machine hardware */
-	MDRV_CPU_ADD( "main", Z80, 3579545 )	/* 3.579545 Mhz */
+	MDRV_CPU_ADD( "main", Z80, 3579545 )	/* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP( svi318_mem, 0 )
 	MDRV_CPU_IO_MAP( svi318_io, 0 )
 	MDRV_CPU_VBLANK_INT("main", svi318_interrupt)
@@ -331,7 +331,7 @@ static const mc6845_interface svi806_crtc6845_interface =
 
 static MACHINE_DRIVER_START( svi328_806 )
 	/* Basic machine hardware */
-	MDRV_CPU_ADD( "main", Z80, 3579545 )	/* 3.579545 Mhz */
+	MDRV_CPU_ADD( "main", Z80, 3579545 )	/* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP( svi328_806_mem, 0 )
 	MDRV_CPU_IO_MAP( svi328_806_io, 0 )
 	MDRV_CPU_VBLANK_INT("main", svi318_interrupt)

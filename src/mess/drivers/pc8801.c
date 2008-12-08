@@ -518,13 +518,13 @@ static MACHINE_DRIVER_START( pc88srl )
 	/* basic machine hardware */
 
 	/* main CPU */
-	MDRV_CPU_ADD("main", Z80, 4000000)        /* 4 Mhz */
+	MDRV_CPU_ADD("main", Z80, 4000000)        /* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(pc8801_mem, 0)
 	MDRV_CPU_IO_MAP(pc88sr_io, 0)
 	MDRV_CPU_VBLANK_INT("main", pc8801_interrupt)
 
 	/* sub CPU(5 inch floppy drive) */
-	MDRV_CPU_ADD("sub", Z80, 4000000)		/* 4 Mhz */
+	MDRV_CPU_ADD("sub", Z80, 4000000)		/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(pc8801fd_mem, 0)
 	MDRV_CPU_IO_MAP(pc8801fd_io, 0)
 	MDRV_CPU_VBLANK_INT("main", pc8801fd_interrupt)

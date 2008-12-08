@@ -32,7 +32,7 @@ also containing graphics on the keys). Plenty of models were released in
 this series, depending on the RAM size, the keyboard type and the screen
 dimension (see below).
 
-CPU: MOS 6502 (1 Mhz)
+CPU: MOS 6502 (1 MHz)
 RAM: 4K and 8K early models (Expandable to 32k addressable, more banked);
 	8K, 16K, 32K later models (Expandable again to larger RAM config)
 ROM: 18 kilobytes early models; 20 kilobytes later ones
@@ -78,7 +78,7 @@ XX is equal to the RAM size. These were basically PET models with 9" Screen
 and upgraded ROMs. There also existed a German CBM 3001, which was a PET 
 2001, B or N. Notice that these systems used to boot 
 
-CPU: MOS 6502 (1Mhz)
+CPU: MOS 6502 (1MHz)
 RAM: 8K, 16k, and 32k models (Expandable to even more banked memory)
 ROM: 20 Kilobytes
 Video: MOS Technology 6545 CRTC (9" Monochrome display; 40 columns x 25 rows)
@@ -96,7 +96,7 @@ quite similar to the previous ones (except for the new BASIC version), the
 machines with design 3 were quite different: there was CRTC support, it was
 possible to upgrade to 80 cols and a piezo beeper.
 
-CPU: MOS 6502 (1 Mhz)
+CPU: MOS 6502 (1 MHz)
 RAM: 8K, 16k, and 32k models (Expandable to even more banked memory)
 ROM: 20 Kilobytes
 Video: MOS Technology 6545 CRTC (9" and 12" Monochrome displays; 40 
@@ -112,7 +112,7 @@ Keyboard: Full 69 key QWERTY (16 key numeric keypad!; 4 direction 2-key cursor-p
   Again, 80 columns screen and piezo beeper; BASIC 4 has a 80 columns editor 
 ROM. It was possible to expand it to a 8096.
 
-CPU: MOS 6502 (1 mhz)
+CPU: MOS 6502 (1 MHz)
 RAM: 32k standard (Expandable to even more banked memory)
 ROM: 20 Kilobytes
 Video: MOS Technology 6545 CRTC (12" Monochrome displays; 80 columns x 25 rows)
@@ -128,7 +128,7 @@ Keyboard: Full 73 key QWERTY (11 key numeric keypad!; 4 direction 2-key cursor-p
 with design 3 didn't fit very well the new case and required extra cables.
 It was possible to expand it to a 8096-SK.
 
-CPU: MOS 6502 (1 Mhz)
+CPU: MOS 6502 (1 MHz)
 RAM: 32k standard (8096 expanded to 96k, 64k is banked memory)
 ROM: 20 Kilobytes
 Video: MOS Technology 6545 CRTC (12" Monochrome display; 80 columns x 25 rows)
@@ -149,7 +149,7 @@ CBM 220 was a CBM 8096-SK.
   Based on PET 8032. Sold in Germany as MMF (MicroMainFrame) 9000. Machines 
 sold in Italy had 134kB of RAM.
 
-CPU: MOS Technology 6502 & 6809 (1 Mhz clock speeds)
+CPU: MOS Technology 6502 & 6809 (1 MHz clock speeds)
 RAM: 96 kilobytes (64K was contained on an expansion board above the motherboard;
 	Early SP9000 models had two boards above the motherboard; Some models also 
 	had 3 or more switches)
@@ -180,7 +180,7 @@ the RAM "under the ROM", so that the complete 128k RAM are accessible. The "user
 jumpers" could be set to connect to the userport, so this could even be done 
 under program control.
 
-CPU: MOS 6502 (1 Mhz)
+CPU: MOS 6502 (1 MHz)
 RAM: 160K (32k standard)
 ROM: 24 Kilobytes
 Video: MOS Technology 6545 CRTC (12" Monochrome displays; 80 columns x 25 rows)
@@ -650,7 +650,7 @@ static VIDEO_UPDATE( pet_crtc )
 
 static MACHINE_DRIVER_START( pet_general )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, 7833600)        /* 7.8336 Mhz */
+	MDRV_CPU_ADD("main", M6502, 7833600)        /* 7.8336 MHz */
 	MDRV_CPU_PROGRAM_MAP(pet_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", pet_frame_interrupt)
 	MDRV_INTERLEAVE(0)

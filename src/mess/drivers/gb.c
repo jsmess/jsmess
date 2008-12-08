@@ -553,7 +553,7 @@ static const custom_sound_interface gameboy_sound_interface =
 
 static MACHINE_DRIVER_START( gameboy )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", LR35902, 4194304)			/* 4.194304 Mhz */
+	MDRV_CPU_ADD("main", LR35902, 4194304)			/* 4.194304 MHz */
 	MDRV_CPU_PROGRAM_MAP(gb_map, 0)
 	MDRV_CPU_CONFIG(dmg_cpu_reset)
 	MDRV_CPU_VBLANK_INT("main", gb_scanline_interrupt)	/* 1 dummy int each frame */
@@ -588,7 +588,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( supergb )
 	MDRV_IMPORT_FROM(gameboy)
-	MDRV_CPU_REPLACE("main", LR35902, 4295454)	/* 4.295454 Mhz */
+	MDRV_CPU_REPLACE("main", LR35902, 4295454)	/* 4.295454 MHz */
 	MDRV_CPU_PROGRAM_MAP(sgb_map, 0)
 
 	MDRV_CPU_MODIFY("main")
@@ -671,7 +671,7 @@ SYSTEM_CONFIG_END
 
 static MACHINE_DRIVER_START( megaduck )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", LR35902, 4194304)			/* 4.194304 Mhz */
+	MDRV_CPU_ADD("main", LR35902, 4194304)			/* 4.194304 MHz */
 	MDRV_CPU_PROGRAM_MAP( megaduck_map, 0 )
 	MDRV_CPU_VBLANK_INT("main", gb_scanline_interrupt)	/* 1 int each scanline ! */
 	MDRV_CPU_CONFIG(megaduck_cpu_reset)

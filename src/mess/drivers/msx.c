@@ -1028,7 +1028,7 @@ static const cassette_config msx_cassette_config =
 
 static MACHINE_DRIVER_START( msx )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 3579545)		  /* 3.579545 Mhz */
+	MDRV_CPU_ADD("main", Z80, 3579545)		  /* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
 	MDRV_CPU_VBLANK_INT("main", msx_interrupt)
@@ -1084,7 +1084,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( msx2 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 3579545)		  /* 3.579545 Mhz */
+	MDRV_CPU_ADD("main", Z80, 3579545)		  /* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem, writemem)
 	MDRV_CPU_IO_MAP(readport2,writeport2)
 	MDRV_CPU_VBLANK_INT_HACK(msx2_interrupt, 262)

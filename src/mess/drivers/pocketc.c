@@ -59,7 +59,7 @@
    c1 counter reset
    c2 cpu halt
    c3 computer off
-   c4 beeper frequency (1 4khz, 0 2khz), or (c5=0) membran pos1/pos2
+   c4 beeper frequency (1 4kHz, 0 2kHz), or (c5=0) membran pos1/pos2
    c5 beeper on
    c6 beeper steuerung
 
@@ -721,7 +721,7 @@ static const sc61860_cpu_core config =
 
 static MACHINE_DRIVER_START( pc1401 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", SC61860, 192000)        /* 7.8336 Mhz */
+	MDRV_CPU_ADD("main", SC61860, 192000)        /* 7.8336 MHz */
 	MDRV_CPU_PROGRAM_MAP(pc1401_mem, 0)
 	MDRV_CPU_CONFIG(config)
 

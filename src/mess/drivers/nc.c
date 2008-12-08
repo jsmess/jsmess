@@ -23,7 +23,7 @@
         NC100:
 
         Hardware:
-            - Z80 CPU, 6mhz
+            - Z80 CPU, 6 MHz
             - memory powered by lithium batterys!
             - 2 channel tone (programmable frequency beep's)
             - LCD screen

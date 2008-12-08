@@ -601,7 +601,7 @@ static MACHINE_RESET( tc2048 )
 
 static MACHINE_DRIVER_START( ts2068 )
 	MDRV_IMPORT_FROM( spectrum_128 )
-	MDRV_CPU_REPLACE("main", Z80, 3580000)        /* 3.58 Mhz */
+	MDRV_CPU_REPLACE("main", Z80, 3580000)        /* 3.58 MHz */
 	MDRV_CPU_PROGRAM_MAP(ts2068_mem, 0)
 	MDRV_CPU_IO_MAP(ts2068_io, 0)
 

@@ -23,7 +23,7 @@ static struct {
 	UINT8 data[0x100];
 	struct {
 		UINT16 data;
-	} bios_timer; // 1.19mhz tclk signal
+	} bios_timer; // 1.19 MHz tclk signal
 	struct {
 		int seconds, minutes, hours, days;
 		int alarm_seconds, alarm_minutes, alarm_hours, alarm_days;

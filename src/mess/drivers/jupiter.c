@@ -303,7 +303,7 @@ static const cassette_config jupiter_cassette_config =
 /* machine definition */
 static MACHINE_DRIVER_START( jupiter )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, XTAL_6_5MHz/2)        /* 3.25 Mhz */
+	MDRV_CPU_ADD("main", Z80, XTAL_6_5MHz/2)        /* 3.25 MHz */
 	MDRV_CPU_PROGRAM_MAP(jupiter_mem, 0)
 	MDRV_CPU_IO_MAP(jupiter_io, 0)
 	MDRV_INTERLEAVE(1)

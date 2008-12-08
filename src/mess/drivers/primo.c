@@ -27,7 +27,7 @@ Primo variants:
     B-64 - 48kB RAM + 16KB ROM
 
 CPU:
-    U880D (DDR clone of Z80), 2.5Mhz
+    U880D (DDR clone of Z80), 2.5 MHz
 
 Memory map:
     A-32

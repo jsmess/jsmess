@@ -270,7 +270,7 @@ static MACHINE_RESET( spectrum_128 )
 MACHINE_DRIVER_START( spectrum_128 )
 	MDRV_IMPORT_FROM( spectrum )
 
-	MDRV_CPU_REPLACE("main", Z80, 3500000)        /* 3.5 Mhz */
+	MDRV_CPU_REPLACE("main", Z80, 3500000)        /* 3.5 MHz */
 	MDRV_CPU_PROGRAM_MAP(spectrum_128_mem, 0)
 	MDRV_CPU_IO_MAP(spectrum_128_io, 0)
 

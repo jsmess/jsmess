@@ -69,7 +69,7 @@ Not dumped:
 Not emulated:
  TRS80 Japanese kana/ascii switch and alternate keyboard
  TRS80 Model III and 4 hardware above what is in a Model I.
- LNW80 1.77 / 4.0 mhz switch
+ LNW80 1.77 / 4.0 MHz switch
  LNW80 Colour board
  LNW80 Hires graphics
  LNW80 24x80 screen
@@ -379,7 +379,7 @@ static const cassette_config trs80l2_cassette_config =
 
 static MACHINE_DRIVER_START( level1 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 1796000)        /* 1.796 Mhz */
+	MDRV_CPU_ADD("main", Z80, 1796000)        /* 1.796 MHz */
 	MDRV_CPU_PROGRAM_MAP(mem_level1, 0)
 	MDRV_CPU_IO_MAP(io_level1, 0)
 	MDRV_CPU_VBLANK_INT("main", trs80_frame_interrupt)

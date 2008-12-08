@@ -531,7 +531,7 @@ static const custom_sound_interface dave_custom_sound =
 	Dave_sh_start
 };
 
-/* 4Mhz clock, although it can be changed to 8 Mhz! */
+/* 4 MHz clock, although it can be changed to 8 Mhz! */
 
 static MACHINE_DRIVER_START( ep128 )
 	/* basic machine hardware */

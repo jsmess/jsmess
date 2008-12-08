@@ -643,7 +643,7 @@ static const cassette_config coco_cassette_config =
 
 static MACHINE_DRIVER_START( dragon32 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 Mhz */
+	MDRV_CPU_ADD("main", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 MHz */
 	MDRV_CPU_PROGRAM_MAP(coco_map, 0)
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(M6847_PAL_FRAMES_PER_SECOND)
@@ -671,7 +671,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dragon64 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 Mhz */
+	MDRV_CPU_ADD("main", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 MHz */
 	MDRV_CPU_PROGRAM_MAP(d64_map, 0)
 
 	MDRV_MACHINE_START( dragon64 )
@@ -703,7 +703,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( d64plus )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 Mhz */
+	MDRV_CPU_ADD("main", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 MHz */
 	MDRV_CPU_PROGRAM_MAP(d64_plus_map, 0)
 
 	MDRV_MACHINE_START( dragon64 )
@@ -735,7 +735,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dgnalpha )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 Mhz */
+	MDRV_CPU_ADD("main", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 MHz */
 	MDRV_CPU_PROGRAM_MAP(dgnalpha_map, 0)
 
 	MDRV_MACHINE_START( dgnalpha )
@@ -770,7 +770,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( tanodr64 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 Mhz */
+	MDRV_CPU_ADD("main", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 MHz */
 	MDRV_CPU_PROGRAM_MAP(d64_map, 0)
 
 	MDRV_MACHINE_START( tanodr64 )
@@ -802,7 +802,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 Mhz */
+	MDRV_CPU_ADD("main", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 MHz */
 	MDRV_CPU_PROGRAM_MAP(coco_map, 0)
 
 	MDRV_MACHINE_START( coco )
@@ -835,7 +835,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco2 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 Mhz */
+	MDRV_CPU_ADD("main", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 MHz */
 	MDRV_CPU_PROGRAM_MAP(coco_map, 0)
 
 	MDRV_MACHINE_START( coco2 )
@@ -868,7 +868,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco2b )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 Mhz */
+	MDRV_CPU_ADD("main", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 MHz */
 	MDRV_CPU_PROGRAM_MAP(coco_map, 0)
 
 	MDRV_MACHINE_START( coco2 )
@@ -901,7 +901,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco3 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 Mhz */
+	MDRV_CPU_ADD("main", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 MHz */
 	MDRV_CPU_PROGRAM_MAP(coco3_map, 0)
 
 	MDRV_MACHINE_START( coco3 )
