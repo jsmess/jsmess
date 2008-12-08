@@ -234,9 +234,9 @@ static VIDEO_START( abc802 )
 
 	state_save_register_global_pointer(machine, state->charram, ABC802_CHAR_RAM_SIZE);
 
-	state_save_register_global(state->flshclk_ctr);
-	state_save_register_global(state->flshclk);
-	state_save_register_global(state->mux80_40);
+	state_save_register_global(machine, state->flshclk_ctr);
+	state_save_register_global(machine, state->flshclk);
+	state_save_register_global(machine, state->mux80_40);
 }
 
 /* Video Update */

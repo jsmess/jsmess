@@ -920,8 +920,8 @@ static ADDRESS_MAP_START( newbrain_m_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x14, 0x14) AM_MIRROR(0xffc0) AM_READ(ust_r)
 	AM_RANGE(0x15, 0x15) AM_MIRROR(0xffc2) AM_READ(user_r)
 	AM_RANGE(0x16, 0x16) AM_MIRROR(0xffc0) AM_READ(ust2_r)
-	AM_RANGE(0x18, 0x18) AM_MIRROR(0xffc0) AM_DEVREADWRITE(ACIA6850, "acia_0", acia6850_0_stat_r, acia6850_0_ctrl_w)
-	AM_RANGE(0x19, 0x19) AM_MIRROR(0xffc0) AM_READWRITE(acia6850_0_data_r, acia6850_0_data_w)
+	AM_RANGE(0x18, 0x18) AM_MIRROR(0xffc0) AM_DEVREADWRITE(ACIA6850, "acia_0", acia6850_stat_r, acia6850_ctrl_w)
+	AM_RANGE(0x19, 0x19) AM_MIRROR(0xffc0) AM_DEVREADWRITE(ACIA6850, "acia_0", acia6850_data_r, acia6850_data_w)
 	AM_RANGE(0x1c, 0x1c) AM_MIRROR(0xffc0) AM_DEVREADWRITE(Z80CTC, "z80ctc", z80ctc_r, z80ctc_w)
 ADDRESS_MAP_END
 
@@ -949,8 +949,8 @@ static ADDRESS_MAP_START( newbrain_v_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0xffc3) AM_WRITE(tvctl_w)
 	AM_RANGE(0x14, 0x14) AM_MIRROR(0xffc0) AM_READ(ust_r)
 	AM_RANGE(0x15, 0x15) AM_MIRROR(0xffc2) AM_READ(user_r)
-	AM_RANGE(0x18, 0x18) AM_MIRROR(0xffc0) AM_DEVREADWRITE(ACIA6850, "acia_0", acia6850_0_stat_r, acia6850_0_ctrl_w)
-	AM_RANGE(0x19, 0x19) AM_MIRROR(0xffc0) AM_READWRITE(acia6850_0_data_r, acia6850_0_data_w)
+	AM_RANGE(0x18, 0x18) AM_MIRROR(0xffc0) AM_DEVREADWRITE(ACIA6850, "acia_0", acia6850_stat_r, acia6850_ctrl_w)
+	AM_RANGE(0x19, 0x19) AM_MIRROR(0xffc0) AM_DEVREADWRITE(ACIA6850, "acia_0", acia6850_data_r, acia6850_data_w)
 	AM_RANGE(0x1c, 0x1c) AM_MIRROR(0xffc0) AM_DEVREADWRITE(Z80CTC, "z80ctc", z80ctc_r, z80ctc_w)
 ADDRESS_MAP_END
 
@@ -1080,9 +1080,9 @@ INPUT_PORTS_END
 
 /* Machine Initialization */
 
-static void acia_interrupt(int state)
+static void acia_interrupt(const device_config *device, int state)
 {
-	newbrain_state *driver_state = Machine->driver_data;
+	newbrain_state *driver_state = device->machine->driver_data;
 
 	driver_state->aciaint = state;
 }
@@ -1169,7 +1169,6 @@ static MACHINE_START( newbrain )
 	/* initialize devices */
 
 	nec765_init(machine, &newbrain_nec765_interface, NEC765A, NEC765_RDY_PIN_NOT_CONNECTED);
-	acia6850_config(0, &newbrain_acia_intf);
 
 	/* allocate reset timer */
 	
@@ -1268,6 +1267,10 @@ static MACHINE_DRIVER_START( newbrain )
 
 	MDRV_CASSETTE_ADD( "cassette1", newbrain_cassette_config )
 	MDRV_CASSETTE_ADD( "cassette2", newbrain_cassette_config )
+	
+	/* acia */
+	MDRV_DEVICE_ADD("acia_0", ACIA6850)
+	MDRV_DEVICE_CONFIG(newbrain_acia_intf)	
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( newbraim )
@@ -1295,6 +1298,10 @@ static MACHINE_DRIVER_START( newbraim )
 
 	MDRV_CASSETTE_ADD( "cassette1", newbrain_cassette_config )
 	MDRV_CASSETTE_ADD( "cassette2", newbrain_cassette_config )
+
+	/* acia */
+	MDRV_DEVICE_ADD("acia_0", ACIA6850)
+	MDRV_DEVICE_CONFIG(newbrain_acia_intf)	
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( newbraia )
@@ -1320,6 +1327,10 @@ static MACHINE_DRIVER_START( newbraia )
 
 	MDRV_CASSETTE_ADD( "cassette1", newbrain_cassette_config )
 	MDRV_CASSETTE_ADD( "cassette2", newbrain_cassette_config )
+
+	/* acia */
+	MDRV_DEVICE_ADD("acia_0", ACIA6850)
+	MDRV_DEVICE_CONFIG(newbrain_acia_intf)	
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( newbraiv )
@@ -1347,6 +1358,10 @@ static MACHINE_DRIVER_START( newbraiv )
 
 	MDRV_CASSETTE_ADD( "cassette1", newbrain_cassette_config )
 	MDRV_CASSETTE_ADD( "cassette2", newbrain_cassette_config )
+
+	/* acia */
+	MDRV_DEVICE_ADD("acia_0", ACIA6850)
+	MDRV_DEVICE_CONFIG(newbrain_acia_intf)	
 MACHINE_DRIVER_END
 
 /* ROMs */

@@ -386,7 +386,7 @@ WRITE8_HANDLER ( nes_IN0_w )
 	in_1.shift = 0;
 
 	/* Check if lightgun has been chosen as input: if so, enable crosshair */
-	timer_set(machine, attotime_zero, NULL, 0, lightgun_tick);
+	timer_set(space->machine, attotime_zero, NULL, 0, lightgun_tick);
 
 	/* Check the configuration to see what's connected */
 	cfg = input_port_read(space->machine, "CTRLSEL");

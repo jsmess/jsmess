@@ -63,20 +63,20 @@ const game_driver * const drivers[] =
 //	DRIVER( falcon40 )	/* Atari Falcon040 (prototype)						*/
 
 	/* NINTENDO */
-//0128u5	DRIVER( nes )		/* Nintendo Entertainment System					*/
-//0128u5	DRIVER( nespal )	/* Nintendo Entertainment System					*/
-//0128u5	DRIVER( famicom )
-//0128u5	DRIVER( famitwin )	/* Sharp Famicom Twin System						*/
-//0128u5	DRIVER( gameboy )	/* Nintendo Game Boy Handheld						*/
-//0128u5	DRIVER( supergb )	/* Nintendo Super Game Boy SNES Cartridge			*/
-//0128u5	DRIVER( gbpocket )	/* Nintendo Game Boy Pocket Handheld				*/
-//0128u5	DRIVER( gbcolor )	/* Nintendo Game Boy Color Handheld					*/
-//0128u5	DRIVER( snes )		/* Nintendo Super Nintendo NTSC						*/
-//0128u5	DRIVER( snespal )	/* Nintendo Super Nintendo PAL						*/
-//0128u5	DRIVER( n64 )		/* Nintendo N64										*/
-//0128u5	DRIVER( pokemini )	/* Nintendo Pokemon Mini							*/
+	DRIVER( nes )		/* Nintendo Entertainment System					*/
+	DRIVER( nespal )	/* Nintendo Entertainment System					*/
+	DRIVER( famicom )
+	DRIVER( famitwin )	/* Sharp Famicom Twin System						*/
+	DRIVER( gameboy )	/* Nintendo Game Boy Handheld						*/
+	DRIVER( supergb )	/* Nintendo Super Game Boy SNES Cartridge			*/
+	DRIVER( gbpocket )	/* Nintendo Game Boy Pocket Handheld				*/
+	DRIVER( gbcolor )	/* Nintendo Game Boy Color Handheld					*/
+	DRIVER( snes )		/* Nintendo Super Nintendo NTSC						*/
+	DRIVER( snespal )	/* Nintendo Super Nintendo PAL						*/
+	DRIVER( n64 )		/* Nintendo N64										*/
+	DRIVER( pokemini )	/* Nintendo Pokemon Mini							*/
 
-//0128u5	DRIVER( megaduck )	/* Megaduck											*/
+	DRIVER( megaduck )	/* Megaduck											*/
 
 	/* SEGA */
 	DRIVER( sg1000 )	/* Sega SG-1000 (Japan)								*/
@@ -162,36 +162,36 @@ const game_driver * const drivers[] =
 	DRIVER( intvsrs )	/* Intellivision (Sears License) - 19??				*/
 
 	/* ENTEX */
-//0128u5	DRIVER( advision )	/* Adventurevision									*/
+	DRIVER( advision )	/* Adventurevision									*/
 
 	/* CAPCOM */
-//0128u5	DRIVER( sfzch )		/* CPS Changer (Street Fighter ZERO)				*/
+	DRIVER( sfzch )		/* CPS Changer (Street Fighter ZERO)				*/
 
 	/* MAGNAVOX */
 	DRIVER( odyssey2 )	/* Magnavox Odyssey 2 - 1978-1983					*/
 
 	/* Hartung, Watara, ...*/
-//0128u5	DRIVER( gmaster )	/* Hartung Gamemaster 								*/
+	DRIVER( gmaster )	/* Hartung Gamemaster 								*/
 
 	/* WATARA */
-//0128u5	DRIVER( svision )	/* Supervision Handheld								*/
-//0128u5	DRIVER( svisions )
-//0128u5	DRIVER( svisionp )
-//0128u5	DRIVER( svisionn )
-//0128u5	DRIVER( tvlinkp )
+	DRIVER( svision )	/* Supervision Handheld								*/
+	DRIVER( svisions )
+	DRIVER( svisionp )
+	DRIVER( svisionn )
+	DRIVER( tvlinkp )
 
 	/* INTERTON */
 	DRIVER( vc4000 )	/* Interton vc4000									*/
 
 	/* BANDAI */
-//0128u5	DRIVER( wswan )		/* Bandai WonderSwan Handheld						*/
-//0128u5	DRIVER( wscolor )	/* Bandai WonderSwan Color Handheld					*/
+	DRIVER( wswan )		/* Bandai WonderSwan Handheld						*/
+	DRIVER( wscolor )	/* Bandai WonderSwan Color Handheld					*/
 
 	/* EPOCH */
 	DRIVER( gamepock )	/* Epoch Game Pocket Computer						*/
 
 	/* KOEI */
-//0128u5	DRIVER( pasogo )	/* KOEI PasoGo										*/
+	DRIVER( pasogo )	/* KOEI PasoGo										*/
 
 
 /****************COMPUTERS***************************************************/
@@ -303,8 +303,8 @@ XL/XE 16kB OS roms
 
 	/* COMMODORE */
 	DRIVER( kim1 )		/* Commodore (MOS) KIM-1 1975						*/
-//0128u5	DRIVER( sym1 )		/* Synertek SYM-1									*/
-//0128u5	DRIVER( aim65 )		/* Rockwell AIM65									*/
+	DRIVER( sym1 )		/* Synertek SYM-1									*/
+	DRIVER( aim65 )		/* Rockwell AIM65									*/
 
 	DRIVER( pet2001 )	/* PET 2001											*/
 	DRIVER( pet2001n )	/* PET 2001-N										*/
@@ -411,45 +411,45 @@ XL/XE 16kB OS roms
 	DRIVER( c64dx )		/* 1991 C65 / C64DX (Prototype, German PAL)			*/
 
 	/* IBM PC & Clones */
-//0128u5	DRIVER( ibm5150 )	/* 1981	IBM 5150									*/
-//0128u5	DRIVER( dgone )		/* 1984 Data General/One */
-//0128u5	DRIVER( pcmda )		/* 1987 PC with MDA									*/
-//0128u5	DRIVER( pcherc )	/* 1987 PC with Hercules (for testing hercules)		*/
-//0128u5	DRIVER( pc )		/* 1987 PC with CGA									*/
-//0128u5	DRIVER( bondwell )	/* 1985	Bondwell (CGA)								*/
-//0128u5	DRIVER( europc )	/* 1988	Schneider Euro PC (CGA or Hercules)			*/
+	DRIVER( ibm5150 )	/* 1981	IBM 5150									*/
+	DRIVER( dgone )		/* 1984 Data General/One */
+	DRIVER( pcmda )		/* 1987 PC with MDA									*/
+	DRIVER( pcherc )	/* 1987 PC with Hercules (for testing hercules)		*/
+	DRIVER( pc )		/* 1987 PC with CGA									*/
+	DRIVER( bondwell )	/* 1985	Bondwell (CGA)								*/
+	DRIVER( europc )	/* 1988	Schneider Euro PC (CGA or Hercules)			*/
 
 	/* pc junior */
-//0128u5	DRIVER( ibmpcjr )	/* 1984 IBM PC Jr									*/
-//0128u5	DRIVER( t1000hx )	/* 1987 Tandy 1000HX (similiar to PCJr)				*/
-//0128u5	DRIVER( t1000sx )	/* 1987 Tandy 1000SX (similiar to PCJr)				*/
+	DRIVER( ibmpcjr )	/* 1984 IBM PC Jr									*/
+	DRIVER( t1000hx )	/* 1987 Tandy 1000HX (similiar to PCJr)				*/
+	DRIVER( t1000sx )	/* 1987 Tandy 1000SX (similiar to PCJr)				*/
 
 	/* xt */
-//0128u5	DRIVER( ibm5160 )	/* 1982	IBM XT 5160									*/
-//0128u5	DRIVER( ibm5162 )	/* 1986 IBM XT 5162 (XT w/80286)					*/
-//0128u5	DRIVER( pc200 )		/* 1988 Sinclair PC200								*/
-//0128u5	DRIVER( pc20 )		/* 1988 Amstrad PC20								*/
-//0128u5	DRIVER( ppc512 )	/* 1987 Amstrad PPC512								*/
-//0128u5	DRIVER( ppc640 )	/* 1987 Amstrad PPC640								*/
-//0128u5	DRIVER( pc1512 )	/* 1986 Amstrad PC1512 v1 (CGA compatible)			*/
-//0128u5	DRIVER( pc1512v2 )	/* 1986 Amstrad PC1512 v2 (CGA compatible)			*/
-//0128u5	DRIVER( pc1640 )	/* 1987 Amstrad PC1640 (EGA compatible)				*/
+	DRIVER( ibm5160 )	/* 1982	IBM XT 5160									*/
+	DRIVER( ibm5162 )	/* 1986 IBM XT 5162 (XT w/80286)					*/
+	DRIVER( pc200 )		/* 1988 Sinclair PC200								*/
+	DRIVER( pc20 )		/* 1988 Amstrad PC20								*/
+	DRIVER( ppc512 )	/* 1987 Amstrad PPC512								*/
+	DRIVER( ppc640 )	/* 1987 Amstrad PPC640								*/
+	DRIVER( pc1512 )	/* 1986 Amstrad PC1512 v1 (CGA compatible)			*/
+	DRIVER( pc1512v2 )	/* 1986 Amstrad PC1512 v2 (CGA compatible)			*/
+	DRIVER( pc1640 )	/* 1987 Amstrad PC1640 (EGA compatible)				*/
 
-//0128u5	DRIVER( xtvga )		/* 198? PC-XT (VGA, MF2 Keyboard)					*/
+	DRIVER( xtvga )		/* 198? PC-XT (VGA, MF2 Keyboard)					*/
 
 	/* at */
-//0128u5	DRIVER( ibm5170 )	/* 1984 IBM PC/AT 5170, original 6 MHz model		*/
-//0128u5	DRIVER( ibm5170a )	/* 1985	IBM PC/AT 5170, enhanced 8 MHz model		*/
-//0128u5	DRIVER( i8530286 )	/* 1988 IBM PS2 Model 30 286 (VGA)					*/
-//0128u5	DRIVER( at )		/* 1987 AMI Bios and Diagnostics					*/
-//0128u5	DRIVER( atvga )		/* 19?? AT VGA										*/
-//0128u5	DRIVER( neat )		/* 1989	New Enhanced AT chipset, AMI BIOS			*/
-//0128u5	DRIVER( at386 )		/* 19?? IBM AT 386									*/
-//0128u5	DRIVER( at486 )		/* 19?? IBM AT 486									*/
-//0128u5	DRIVER( at586 )		/* 19?? AT 586										*/
+	DRIVER( ibm5170 )	/* 1984 IBM PC/AT 5170, original 6 MHz model		*/
+	DRIVER( ibm5170a )	/* 1985	IBM PC/AT 5170, enhanced 8 MHz model		*/
+	DRIVER( i8530286 )	/* 1988 IBM PS2 Model 30 286 (VGA)					*/
+	DRIVER( at )		/* 1987 AMI Bios and Diagnostics					*/
+	DRIVER( atvga )		/* 19?? AT VGA										*/
+	DRIVER( neat )		/* 1989	New Enhanced AT chipset, AMI BIOS			*/
+	DRIVER( at386 )		/* 19?? IBM AT 386									*/
+	DRIVER( at486 )		/* 19?? IBM AT 486									*/
+	DRIVER( at586 )		/* 19?? AT 586										*/
 
 	/* OSBORNE */
-//0128u5	DRIVER( osborne1 )	/* 1981 Osborne-1									*/
+	DRIVER( osborne1 )	/* 1981 Osborne-1									*/
 
 	/* SINCLAIR RESEARCH */
 	DRIVER( zx80 )		/* 1980 Sinclair ZX-80								*/
@@ -567,8 +567,8 @@ XL/XE 16kB OS roms
 	DRIVER( apfimag )
 
 	/* Tatung */
-//0128u5	DRIVER( einstein )
-//0128u5	DRIVER( einstei2 )
+	DRIVER( einstein )
+	DRIVER( einstei2 )
 
 	/* INTELLIGENT SOFTWARE */
 	DRIVER( ep128 )		/* Enterprise 128 k									*/
@@ -640,148 +640,148 @@ XL/XE 16kB OS roms
 	DRIVER( laser700 )	/* 1984? Laser 700									*/
 
 	/* TANGERINE */
-//0128u5	DRIVER( microtan )	/* 1979 Microtan 65									*/
+	DRIVER( microtan )	/* 1979 Microtan 65									*/
 
-//0128u5	DRIVER( oric1 )		/* 1983 Oric 1										*/
-//0128u5	DRIVER( orica )		/* 1984 Oric Atmos									*/
-//0128u5	DRIVER( prav8d )	/* 1985 Pravetz 8D									*/
-//0128u5	DRIVER( prav8dd )	/* 1989 Pravetz 8D (Disk ROM)						*/
-//0128u5	DRIVER( telstrat )	/* ??? Oric Telestrat/Stratos						*/
+	DRIVER( oric1 )		/* 1983 Oric 1										*/
+	DRIVER( orica )		/* 1984 Oric Atmos									*/
+	DRIVER( prav8d )	/* 1985 Pravetz 8D									*/
+	DRIVER( prav8dd )	/* 1989 Pravetz 8D (Disk ROM)						*/
+	DRIVER( telstrat )	/* ??? Oric Telestrat/Stratos						*/
 
 	/* PHILIPS */
-//0128u5	DRIVER( p2000t )	/* 1980 P2000T										*/
-//0128u5	DRIVER( p2000m )	/* 1980 P2000M										*/
-//0128u5	DRIVER( videopac )	/* 1979 Videopac G7000/C52							*/
-//0128u5	DRIVER( g7400 )		/* 1983 Videopac Plus G7400							*/
+	DRIVER( p2000t )	/* 1980 P2000T										*/
+	DRIVER( p2000m )	/* 1980 P2000M										*/
+	DRIVER( videopac )	/* 1979 Videopac G7000/C52							*/
+	DRIVER( g7400 )		/* 1983 Videopac Plus G7400							*/
 
 	/* COMPUKIT */
-//0128u5	DRIVER( uk101 )		/* 1979 UK101										*/
+	DRIVER( uk101 )		/* 1979 UK101										*/
 
 	/* OHIO SCIENTIFIC */
-//0128u5	DRIVER( sb2m600b )	/* 1979 Superboard II								*/
+	DRIVER( sb2m600b )	/* 1979 Superboard II								*/
 
 	/* ASCII & MICROSOFT */
-//0128u5	DRIVER( msx )		/* 1983 MSX 										*/
-//0128u5	DRIVER( ax170 )
-//0128u5	DRIVER( canonv10 )
-//0128u5	DRIVER( canonv20 )
-//0128u5	DRIVER( dpc100 )	/* 1984 MSX Korea									*/
-//0128u5	DRIVER( dpc180 )	/* 1984 MSX Korea									*/
-//0128u5	DRIVER( dpc200 )	/* 1984 MSX Korea									*/
-//0128u5	DRIVER( gsfc200 )
-//0128u5	DRIVER( expert10 )	/* 1983 MSX Brazil									*/
-//0128u5	DRIVER( expert11 )	/* 1984 MSX Brazil									*/
-//0128u5	DRIVER( expert13 )	/* 1984 MSX Brazil									*/
-//0128u5	DRIVER( expertdp )	/* 1985 MSX Brazil									*/
-//0128u5	DRIVER( expertpl )	/* 1984 MSX Brazil									*/
-//0128u5	DRIVER( jvchc7gb )
-//0128u5	DRIVER( mlf80 )
-//0128u5	DRIVER( mlfx1 )
-//0128u5	DRIVER( cf1200 )	/* 1984 MSX Japan									*/
-//0128u5	DRIVER( cf2000 )	/* 1983 MSX Japan									*/
-//0128u5	DRIVER( cf2700 )	/* 1984 MSX Japan									*/
-//0128u5	DRIVER( cf3000 )	/* 1984 MSX Japan									*/
-//0128u5	DRIVER( cf3300 )	/* 1985 MSX Japan									*/
-//0128u5	DRIVER( fs1300 )	/* 1985 MSX Japan									*/
-//0128u5	DRIVER( fs4000 )	/* 1985 MSX Japan									*/
-//0128u5	DRIVER( nms801 )
-//0128u5	DRIVER( vg802000 )
-//0128u5	DRIVER( vg802020 )	/* 1985 MSX											*/
-//0128u5	DRIVER( piopx7 )	
-//0128u5	DRIVER( mpc100 )
-//0128u5	DRIVER( hotbit11 )	/* 1985 MSX Brazil									*/
-//0128u5	DRIVER( hotbit12 )	/* 1985 MSX	Brazil									*/
-//0128u5	DRIVER( hotbi13b )	/* 1985 MSX	Brazil									*/
-//0128u5	DRIVER( hotbi13p )	/* 1985 MSX	Brazil									*/
-//0128u5	DRIVER( hotbit20 )	/* 1986 MSX2 Brazil									*/
-//0128u5	DRIVER( hb201 )		/* 1985 MSX Japan									*/
-//0128u5	DRIVER( hb201p )	/* 1985 MSX											*/
-//0128u5	DRIVER( hb501p )	/* 1984 MSX											*/
-//0128u5	DRIVER( hb55d )		/* 1983 MSX Germany									*/
-//0128u5	DRIVER( hb55p )		/* 1983 MSX											*/
-//0128u5	DRIVER( hb75d )		/* 1983 MSX Germany									*/
-//0128u5	DRIVER( hb75p )		/* 1983 MSX											*/
-//0128u5	DRIVER( svi728 )	/* 1985 MSX											*/
-//0128u5	DRIVER( svi738 )	/* 1985 MSX											*/
-//0128u5	DRIVER( svi738sw )	/* 1985 MSX											*/
-//0128u5	DRIVER( tadpc200 )
-//0128u5	DRIVER( tadpc20a )
-//0128u5	DRIVER( hx10 )		/* 1984 MSX											*/
-//0128u5	DRIVER( hx10s )		/* 1984 MSX											*/
-//0128u5	DRIVER( hx20 )		/* 1984 MSX											*/
-//0128u5	DRIVER( cx5m )
-//0128u5	DRIVER( cx5m128 )
-//0128u5	DRIVER( cx5m2 )	
-//0128u5	DRIVER( yis303 )
-//0128u5	DRIVER( yis503 )
-//0128u5	DRIVER( yis503ii )
-//0128u5	DRIVER( yis503m )
-//0128u5	DRIVER( yc64 )
-	
-	
-//0128u5	DRIVER( msx2 )		/* 1985 MSX2										*/
-//0128u5	DRIVER( ax350 )
-//0128u5	DRIVER( ax370 )
-//0128u5	DRIVER( hbf9p )		/* 1985 MSX2										*/
-//0128u5	DRIVER( hbf9s )		/* 1985 MSX2										*/
-//0128u5	DRIVER( hbf500p )	/* 1985 MSX2										*/
-//0128u5	DRIVER( hbf700d )	/* 1985 MSX2 Germany								*/
-//0128u5	DRIVER( hbf700f )	/* 1985 MSX2 						*/
-//0128u5	DRIVER( hbf700p )	/* 1985 MSX2										*/
-//0128u5	DRIVER( hbf700s )	/* 1985 MSX2 Spain									*/
-//0128u5	DRIVER( hbg900ap )	/* 1986 MSX2										*/
-//0128u5	DRIVER( hbg900p )	/* 1986 MSX2										*/
-//0128u5	DRIVER( nms8220 )	/* 1986 MSX2										*/
-//0128u5	DRIVER( nms8220a )	/* 1986 MSX2										*/
-//0128u5	DRIVER( vg8230 )	/* 1986 MSX2										*/
-//0128u5	DRIVER( vg8235 )	/* 1986 MSX2										*/
-//0128u5	DRIVER( vg8235f)	/* 1986 MSX2										*/
-//0128u5	DRIVER( vg8240)	/* 1986 MSX2										*/
-//0128u5	DRIVER( nms8245 )	/* 1986 MSX2										*/
-//0128u5	DRIVER( nms8245f)	/* 1986 MSX2										*/
-//0128u5	DRIVER( nms8250 )	/* 1986 MSX2										*/
-//0128u5	DRIVER( nms8255 )	/* 1986 MSX2										*/
-//0128u5	DRIVER( nms8280 )	/* 1986 MSX2										*/
-//0128u5	DRIVER( nms8280g)	/* 1986 MSX2										*/
-//0128u5	DRIVER( tpc310)	  /* 1986 MSX2										*/
-//0128u5	DRIVER( hx23)	    /* 1986 MSX2										*/
-//0128u5	DRIVER( hx23f)	  /* 1986 MSX2										*/
-//0128u5	DRIVER( cx7m)	    /* 1986 MSX2										*/
-//0128u5	DRIVER( cx7m128)	/* 1986 MSX2										*/
-//0128u5	DRIVER( fs5500 )	/* 1985 MSX2 Japan									*/
-//0128u5	DRIVER( fs4500 )	/* 1986 MSX2 Japan									*/
-//0128u5	DRIVER( fs4700 )	/* 1986 MSX2 Japan									*/
-//0128u5	DRIVER( fs5000 )	/* 1986 MSX2 Japan									*/
-//0128u5	DRIVER( fs4600 )	/* 1986 MSX2 Japan									*/
-//0128u5	DRIVER( fsa1 )		/* 1986 MSX2 Japan									*/
-//0128u5	DRIVER( fsa1a )		/* 1986 MSX2 Japan									*/
-//0128u5	DRIVER( fsa1mk2 )	/* 1987 MSX2 Japan									*/
-//0128u5	DRIVER( fsa1f )		/* 1987 MSX2 Japan									*/
-//0128u5	DRIVER( fsa1fm )	/* 1988 MSX2 Japan									*/
-//0128u5	DRIVER( hbf500 )	/* 1986 MSX2 Japan									*/
-//0128u5	DRIVER( hbf900 )	/* 1986 MSX2 Japan									*/
-//0128u5	DRIVER( hbf900a )	/* 1986 MSX2 Japan									*/
-//0128u5	DRIVER( hbf1 )		/* 1986 MSX2 Japan									*/
-//0128u5	DRIVER( hbf12 )		/* 1987 MSX2 Japan									*/
-//0128u5	DRIVER( hbf1xd )	/* 1987 MSX2 Japan									*/
-//0128u5	DRIVER( hbf1xdm2 )	/* 1988 MSX2 Japan									*/
-//0128u5	DRIVER( phc23 )		/* 1986 MSX2 Japan									*/
-//0128u5	DRIVER( cpc300 )	/* 1986 MSX2 Korea									*/
-//0128u5	DRIVER( cpc300e )	/* 1986 MSX2 Korea									*/
-//0128u5	DRIVER( cpc400 )	/* 1986 MSX2 Korea									*/
-//0128u5	DRIVER( cpc400s )	/* 1986 MSX2 Korea									*/
-//0128u5	DRIVER( expert20 )/* 1986 MSX2 Korea									*/
+	DRIVER( msx )		/* 1983 MSX 										*/
+	DRIVER( ax170 )
+	DRIVER( canonv10 )
+	DRIVER( canonv20 )
+	DRIVER( dpc100 )	/* 1984 MSX Korea									*/
+	DRIVER( dpc180 )	/* 1984 MSX Korea									*/
+	DRIVER( dpc200 )	/* 1984 MSX Korea									*/
+	DRIVER( gsfc200 )
+	DRIVER( expert10 )	/* 1983 MSX Brazil									*/
+	DRIVER( expert11 )	/* 1984 MSX Brazil									*/
+	DRIVER( expert13 )	/* 1984 MSX Brazil									*/
+	DRIVER( expertdp )	/* 1985 MSX Brazil									*/
+	DRIVER( expertpl )	/* 1984 MSX Brazil									*/
+	DRIVER( jvchc7gb )
+	DRIVER( mlf80 )
+	DRIVER( mlfx1 )
+	DRIVER( cf1200 )	/* 1984 MSX Japan									*/
+	DRIVER( cf2000 )	/* 1983 MSX Japan									*/
+	DRIVER( cf2700 )	/* 1984 MSX Japan									*/
+	DRIVER( cf3000 )	/* 1984 MSX Japan									*/
+	DRIVER( cf3300 )	/* 1985 MSX Japan									*/
+	DRIVER( fs1300 )	/* 1985 MSX Japan									*/
+	DRIVER( fs4000 )	/* 1985 MSX Japan									*/
+	DRIVER( nms801 )
+	DRIVER( vg802000 )
+	DRIVER( vg802020 )	/* 1985 MSX											*/
+	DRIVER( piopx7 )	
+	DRIVER( mpc100 )
+	DRIVER( hotbit11 )	/* 1985 MSX Brazil									*/
+	DRIVER( hotbit12 )	/* 1985 MSX	Brazil									*/
+	DRIVER( hotbi13b )	/* 1985 MSX	Brazil									*/
+	DRIVER( hotbi13p )	/* 1985 MSX	Brazil									*/
+	DRIVER( hotbit20 )	/* 1986 MSX2 Brazil									*/
+	DRIVER( hb201 )		/* 1985 MSX Japan									*/
+	DRIVER( hb201p )	/* 1985 MSX											*/
+	DRIVER( hb501p )	/* 1984 MSX											*/
+	DRIVER( hb55d )		/* 1983 MSX Germany									*/
+	DRIVER( hb55p )		/* 1983 MSX											*/
+	DRIVER( hb75d )		/* 1983 MSX Germany									*/
+	DRIVER( hb75p )		/* 1983 MSX											*/
+	DRIVER( svi728 )	/* 1985 MSX											*/
+	DRIVER( svi738 )	/* 1985 MSX											*/
+	DRIVER( svi738sw )	/* 1985 MSX											*/
+	DRIVER( tadpc200 )
+	DRIVER( tadpc20a )
+	DRIVER( hx10 )		/* 1984 MSX											*/
+	DRIVER( hx10s )		/* 1984 MSX											*/
+	DRIVER( hx20 )		/* 1984 MSX											*/
+	DRIVER( cx5m )
+	DRIVER( cx5m128 )
+	DRIVER( cx5m2 )	
+	DRIVER( yis303 )
+	DRIVER( yis503 )
+	DRIVER( yis503ii )
+	DRIVER( yis503m )
+	DRIVER( yc64 )
 
-//0128u5	DRIVER( msx2p )		/* 1988 MSX2+ Japan									*/
-//0128u5	DRIVER( fsa1fx )	/* 1988 MSX2+ Japan									*/
-//0128u5	DRIVER( fsa1wx )	/* 1988 MSX2+ Japan									*/
-//0128u5	DRIVER( fsa1wxa )	/* 1988 MSX2+ Japan									*/
-//0128u5	DRIVER( fsa1wsx )	/* 1989 MSX2+ Japan									*/
-//0128u5	DRIVER( hbf1xdj )	/* 1988 MSX2+ Japan									*/
-//0128u5	DRIVER( hbf1xv )	/* 1989 MSX2+ Japan									*/
-//0128u5	DRIVER( phc70fd )	/* 1988 MSX2+ Japan									*/
-//0128u5	DRIVER( phc70fd2 )	/* 1988 MSX2+ Japan									*/
-//0128u5	DRIVER( phc35j )	/* 1989 MSX2+ Japan									*/
+
+	DRIVER( msx2 )		/* 1985 MSX2										*/
+	DRIVER( ax350 )
+	DRIVER( ax370 )
+	DRIVER( hbf9p )		/* 1985 MSX2										*/
+	DRIVER( hbf9s )		/* 1985 MSX2										*/
+	DRIVER( hbf500p )	/* 1985 MSX2										*/
+	DRIVER( hbf700d )	/* 1985 MSX2 Germany								*/
+	DRIVER( hbf700f )	/* 1985 MSX2 						*/
+	DRIVER( hbf700p )	/* 1985 MSX2										*/
+	DRIVER( hbf700s )	/* 1985 MSX2 Spain									*/
+	DRIVER( hbg900ap )	/* 1986 MSX2										*/
+	DRIVER( hbg900p )	/* 1986 MSX2										*/
+	DRIVER( nms8220 )	/* 1986 MSX2										*/
+	DRIVER( nms8220a )	/* 1986 MSX2										*/
+	DRIVER( vg8230 )	/* 1986 MSX2										*/
+	DRIVER( vg8235 )	/* 1986 MSX2										*/
+	DRIVER( vg8235f)	/* 1986 MSX2										*/
+	DRIVER( vg8240)	/* 1986 MSX2										*/
+	DRIVER( nms8245 )	/* 1986 MSX2										*/
+	DRIVER( nms8245f)	/* 1986 MSX2										*/
+	DRIVER( nms8250 )	/* 1986 MSX2										*/
+	DRIVER( nms8255 )	/* 1986 MSX2										*/
+	DRIVER( nms8280 )	/* 1986 MSX2										*/
+	DRIVER( nms8280g)	/* 1986 MSX2										*/
+	DRIVER( tpc310)	  /* 1986 MSX2										*/
+	DRIVER( hx23)	    /* 1986 MSX2										*/
+	DRIVER( hx23f)	  /* 1986 MSX2										*/
+	DRIVER( cx7m)	    /* 1986 MSX2										*/
+	DRIVER( cx7m128)	/* 1986 MSX2										*/
+	DRIVER( fs5500 )	/* 1985 MSX2 Japan									*/
+	DRIVER( fs4500 )	/* 1986 MSX2 Japan									*/
+	DRIVER( fs4700 )	/* 1986 MSX2 Japan									*/
+	DRIVER( fs5000 )	/* 1986 MSX2 Japan									*/
+	DRIVER( fs4600 )	/* 1986 MSX2 Japan									*/
+	DRIVER( fsa1 )		/* 1986 MSX2 Japan									*/
+	DRIVER( fsa1a )		/* 1986 MSX2 Japan									*/
+	DRIVER( fsa1mk2 )	/* 1987 MSX2 Japan									*/
+	DRIVER( fsa1f )		/* 1987 MSX2 Japan									*/
+	DRIVER( fsa1fm )	/* 1988 MSX2 Japan									*/
+	DRIVER( hbf500 )	/* 1986 MSX2 Japan									*/
+	DRIVER( hbf900 )	/* 1986 MSX2 Japan									*/
+	DRIVER( hbf900a )	/* 1986 MSX2 Japan									*/
+	DRIVER( hbf1 )		/* 1986 MSX2 Japan									*/
+	DRIVER( hbf12 )		/* 1987 MSX2 Japan									*/
+	DRIVER( hbf1xd )	/* 1987 MSX2 Japan									*/
+	DRIVER( hbf1xdm2 )	/* 1988 MSX2 Japan									*/
+	DRIVER( phc23 )		/* 1986 MSX2 Japan									*/
+	DRIVER( cpc300 )	/* 1986 MSX2 Korea									*/
+	DRIVER( cpc300e )	/* 1986 MSX2 Korea									*/
+	DRIVER( cpc400 )	/* 1986 MSX2 Korea									*/
+	DRIVER( cpc400s )	/* 1986 MSX2 Korea									*/
+	DRIVER( expert20 )/* 1986 MSX2 Korea									*/
+
+	DRIVER( msx2p )		/* 1988 MSX2+ Japan									*/
+	DRIVER( fsa1fx )	/* 1988 MSX2+ Japan									*/
+	DRIVER( fsa1wx )	/* 1988 MSX2+ Japan									*/
+	DRIVER( fsa1wxa )	/* 1988 MSX2+ Japan									*/
+	DRIVER( fsa1wsx )	/* 1989 MSX2+ Japan									*/
+	DRIVER( hbf1xdj )	/* 1988 MSX2+ Japan									*/
+	DRIVER( hbf1xv )	/* 1989 MSX2+ Japan									*/
+	DRIVER( phc70fd )	/* 1988 MSX2+ Japan									*/
+	DRIVER( phc70fd2 )	/* 1988 MSX2+ Japan									*/
+	DRIVER( phc35j )	/* 1989 MSX2+ Japan									*/
 
 
 	/* NASCOM MICROCOMPUTERS */
@@ -846,7 +846,7 @@ XL/XE 16kB OS roms
 
 	/* Team Concepts */
 	/* CPU not known, else should be easy, look into drivers/comquest.c */
-//0128u5	DRIVER( comquest )	/* Comquest Plus German								*/
+	DRIVER( comquest )	/* Comquest Plus German								*/
 
 	/* Hewlett Packard */
 	DRIVER( hp48s )		/* HP48 S */
@@ -855,22 +855,22 @@ XL/XE 16kB OS roms
 	DRIVER( hp48gx )	/* HP48 GX */
 
 	/* SpectraVideo */
-//0128u5	DRIVER( svi318 )	/* SVI-318 (PAL)									*/
-//0128u5	DRIVER( svi318n )	/* SVI-318 (NTSC)									*/
-//0128u5	DRIVER( svi328 )	/* SVI-328 (PAL)									*/
-//0128u5	DRIVER( svi328n )	/* SVI-328 (NTSC)									*/
-//0128u5	DRIVER( sv328p80 )	/* SVI-328 (PAL) + SVI-806 80 column card			*/
-//0128u5	DRIVER( sv328n80 )	/* SVI-328 (NTSC) + SVI-806 80 column card			*/
+	DRIVER( svi318 )	/* SVI-318 (PAL)									*/
+	DRIVER( svi318n )	/* SVI-318 (NTSC)									*/
+	DRIVER( svi328 )	/* SVI-328 (PAL)									*/
+	DRIVER( svi328n )	/* SVI-328 (NTSC)									*/
+	DRIVER( sv328p80 )	/* SVI-328 (PAL) + SVI-806 80 column card			*/
+	DRIVER( sv328n80 )	/* SVI-328 (NTSC) + SVI-806 80 column card			*/
 
 	/* Andrew Donald Booth (this is the name of the designer, not a company) */
 //	DRIVER( apexc53 )	/* 1951(?) APEXC: All-Purpose Electronic X-ray Computer */
-//0128u5	DRIVER( apexc )		/* 1955(?) APEXC: All-Purpose Electronic X-ray Computer */
+	DRIVER( apexc )		/* 1955(?) APEXC: All-Purpose Electronic X-ray Computer */
 
 	/* Sony */
-//0128u5	DRIVER( psj )		/* 1994 Sony PlayStation (Japan)					*/
-//0128u5	DRIVER( psu )		/* 1995 Sony PlayStation (USA)						*/
-//0128u5	DRIVER( pse )		/* 1995 Sony PlayStation (Europe)					*/
-//0128u5	DRIVER( psa )		/* 1995 Sony PlayStation (Asia-Pacific)				*/
+	DRIVER( psj )		/* 1994 Sony PlayStation (Japan)					*/
+	DRIVER( psu )		/* 1995 Sony PlayStation (USA)						*/
+	DRIVER( pse )		/* 1995 Sony PlayStation (Europe)					*/
+	DRIVER( psa )		/* 1995 Sony PlayStation (Asia-Pacific)				*/
 
 	/* Corvus */
 	DRIVER(concept)		/* 1982 Corvus Concept								*/
@@ -882,37 +882,37 @@ XL/XE 16kB OS roms
 	DRIVER(compis)		/* 1985 Telenova Compis								*/
 
 	/* Multitech */
-//0128u5	DRIVER(mpf1)		/* 1979 Multitech Micro Professor 1					*/
-//0128u5	DRIVER(mpf1b)		/* 1979 Multitech Micro Professor 1B				*/
+	DRIVER(mpf1)		/* 1979 Multitech Micro Professor 1					*/
+	DRIVER(mpf1b)		/* 1979 Multitech Micro Professor 1B				*/
 
 	/* Telercas Oy */
 //	DRIVER(tmc1800)
-//0128u5	DRIVER(tmc2000)
-//0128u5	DRIVER(tmc2000e)
+	DRIVER(tmc2000)
+	DRIVER(tmc2000e)
 //	DRIVER(tmc600s1)
-//0128u5	DRIVER(tmc600s2)
+	DRIVER(tmc600s2)
 
 	/* OSCOM Oy */
 //	DRIVER(osc1000b)
-//0128u5	DRIVER(oscnano)
+	DRIVER(oscnano)
 
 	/* MIT */
-//0128u5	DRIVER( tx0_64kw )	/* April 1956 MIT TX-0 (64kw RAM)					*/
-//0128u5	DRIVER( tx0_8kw )	/* 1962 MIT TX-0 (8kw RAM)							*/
+	DRIVER( tx0_64kw )	/* April 1956 MIT TX-0 (64kw RAM)					*/
+	DRIVER( tx0_8kw )	/* 1962 MIT TX-0 (8kw RAM)							*/
 
 	/* Luxor Datorer AB */
-//0128u5	DRIVER( abc80 )
-//0128u5	DRIVER( abc802 )
-//0128u5	DRIVER( abc800m )
-//0128u5	DRIVER( abc800c )
-//0128u5	DRIVER( abc806 )
+	DRIVER( abc80 )
+	DRIVER( abc802 )
+	DRIVER( abc800m )
+	DRIVER( abc800c )
+	DRIVER( abc806 )
 
 	/* Be Incorporated */
-//0128u5	DRIVER( bebox )		/* BeBox Dual603-66									*/
-//0128u5	DRIVER( bebox2 )	/* BeBox Dual603-133								*/
+	DRIVER( bebox )		/* BeBox Dual603-66									*/
+	DRIVER( bebox2 )	/* BeBox Dual603-133								*/
 
 	/* Tiger Electronics */
-//0128u5	DRIVER( gamecom )	/* Tiger Game.com									*/
+	DRIVER( gamecom )	/* Tiger Game.com									*/
 
 	/* Thomson */
 //0128u5	DRIVER( t9000 )		/* 1980 Thomson T9000 (TO7 prototype)				*/
@@ -935,12 +935,12 @@ XL/XE 16kB OS roms
 	DRIVER( cybikoxt )	/* Cybiko Wireless Intertainment System - Xtreme     */
 
 	/* Dick Smith */
-//0128u5	DRIVER( super80 )
-//0128u5	DRIVER( super80d )
-//0128u5	DRIVER( super80e )
-//0128u5	DRIVER( super80m )
-//0128u5	DRIVER( super80r )
-//0128u5	DRIVER( super80v )
+	DRIVER( super80 )
+	DRIVER( super80d )
+	DRIVER( super80e )
+	DRIVER( super80m )
+	DRIVER( super80r )
+	DRIVER( super80v )
 
 	/* Galeb */
 	DRIVER( galeb )
@@ -1026,33 +1026,33 @@ XL/XE 16kB OS roms
   /* Spectrum clones */
   	
   /* ICE-Felix */
-//0128u5	DRIVER( hc85 )    /* 1985 HC-85										  */
-//0128u5	DRIVER( hc90 )    /* 1990 HC-90										  */
-//0128u5	DRIVER( hc91 )    /* 1991 HC-91										  */
-//0128u5	DRIVER( hc128 )   /* 1991 HC-128									  */
-//0128u5	DRIVER( hc2000 )  /* 1992 HC-2000									  */
+	DRIVER( hc85 )    /* 1985 HC-85										  */
+	DRIVER( hc90 )    /* 1990 HC-90										  */
+	DRIVER( hc91 )    /* 1991 HC-91										  */
+	DRIVER( hc128 )   /* 1991 HC-128									  */
+	DRIVER( hc2000 )  /* 1992 HC-2000									  */
 
-//0128u5	DRIVER( cip03 )   /* 1988 CIP-03										  */
-//0128u5	DRIVER( jet )     /* 1990 JET										  */
+	DRIVER( cip03 )   /* 1988 CIP-03										  */
+	DRIVER( jet )     /* 1990 JET										  */
   
   /* Didaktik Skalica */
-//0128u5	DRIVER( dgama87)  /* 1987 Didaktik Gama 87          */
-//0128u5	DRIVER( dgama88)  /* 1988 Didaktik Gama 88          */
-//0128u5	DRIVER( dgama89)  /* 1989 Didaktik Gama 89          */
-//0128u5	DRIVER( didakt90) /* 1990 Didaktik Skalica 90       */
-//0128u5	DRIVER( didakm91) /* 1991 Didaktik M 91             */
-//0128u5	DRIVER( didaktk)  /* 1992 Didaktik Kompakt          */
-//0128u5	DRIVER( didakm93) /* 1993 Didaktik M 93             */
+	DRIVER( dgama87)  /* 1987 Didaktik Gama 87          */
+	DRIVER( dgama88)  /* 1988 Didaktik Gama 88          */
+	DRIVER( dgama89)  /* 1989 Didaktik Gama 89          */
+	DRIVER( didakt90) /* 1990 Didaktik Skalica 90       */
+	DRIVER( didakm91) /* 1991 Didaktik M 91             */
+	DRIVER( didaktk)  /* 1992 Didaktik Kompakt          */
+	DRIVER( didakm93) /* 1993 Didaktik M 93             */
 	
-//0128u5	DRIVER( mistrum ) /* 1988 Mistrum										*/
+	DRIVER( mistrum ) /* 1988 Mistrum										*/
 	
 	/* Russian clones */
-//0128u5	DRIVER( blitz )     /* 1990 Blic                     */
-//0128u5	DRIVER( byte )      /* 1990 Byte                     */
-//0128u5	DRIVER( orizon )    /* 199? Orizon-Micro             */
-//0128u5	DRIVER( quorum48 )  /* 1993 Kvorum 48K               */
-//0128u5	DRIVER( magic6 )    /* 1993 Magic 6                  */
-//0128u5	DRIVER( compani1 )  /* 1990 Kompanion 1              */
+	DRIVER( blitz )     /* 1990 Blic                     */
+	DRIVER( byte )      /* 1990 Byte                     */
+	DRIVER( orizon )    /* 199? Orizon-Micro             */
+	DRIVER( quorum48 )  /* 1993 Kvorum 48K               */
+	DRIVER( magic6 )    /* 1993 Magic 6                  */
+	DRIVER( compani1 )  /* 1990 Kompanion 1              */
 
 	/* Kramer */
 	DRIVER(kramermc) /* 1987 Kramer MC				*/
@@ -1061,7 +1061,7 @@ XL/XE 16kB OS roms
 	DRIVER(pecom64)
 		
 	/* Bondwell */
-//0128u5	DRIVER( bw2 )
+	DRIVER( bw2 )
 
 	/* Exeltel */
 	DRIVER( exl100 )
@@ -1073,10 +1073,10 @@ XL/XE 16kB OS roms
 //	DRIVER( comxpl80 )
 
 	/* Grundy Business Systems Ltd */
-//0128u5	DRIVER( newbrain )
-//0128u5	DRIVER( newbraim )
-//0128u5	DRIVER( newbraia )
-//0128u5	DRIVER( newbraiv )
+	DRIVER( newbrain )
+	DRIVER( newbraim )
+	DRIVER( newbraia )
+	DRIVER( newbraiv )
 
 	/* Votrax */
 //	DRIVER( votrtnt ) /* Votrax Type-N-Talk */
@@ -1089,24 +1089,24 @@ XL/XE 16kB OS roms
 	DRIVER( mk2 )		/* Chess Champion MK II								*/
 
 	/* Novag */
-//0128u5	DRIVER( ssystem3 )	/* Chess Champion Super System III / MK III			*/
+	DRIVER( ssystem3 )	/* Chess Champion Super System III / MK III			*/
 
 	/* Hegener & Glaser Munich */
 //	DRIVER( mephisto )	/* Mephisto											*/
-//0128u5	DRIVER( mm4 )		/* Mephisto 4										*/
-//0128u5	DRIVER( mm5 )		/* Mephisto 5.1 ROM									*/
-//0128u5	DRIVER( mm50 )		/* Mephisto 5.0 ROM									*/
-//0128u5	DRIVER( rebel5 )		/* Mephisto 5									*/
-//0128u5	DRIVER( glasgow )		/* Glasgow										*/
-//0128u5	DRIVER( amsterd )		/* Amsterdam									*/
-//0128u5	DRIVER( dallas )		/* Dallas										*/
-//0128u5	DRIVER( dallas16 )		/* Dallas										*/
-//0128u5	DRIVER( dallas32 )		/* Dallas										*/
-//0128u5	DRIVER( roma )			/* Roma											*/
-//0128u5	DRIVER( roma32 )		/* Roma											*/
+	DRIVER( mm4 )		/* Mephisto 4										*/
+	DRIVER( mm5 )		/* Mephisto 5.1 ROM									*/
+	DRIVER( mm50 )		/* Mephisto 5.0 ROM									*/
+	DRIVER( rebel5 )		/* Mephisto 5									*/
+	DRIVER( glasgow )		/* Glasgow										*/
+	DRIVER( amsterd )		/* Amsterdam									*/
+	DRIVER( dallas )		/* Dallas										*/
+	DRIVER( dallas16 )		/* Dallas										*/
+	DRIVER( dallas32 )		/* Dallas										*/
+	DRIVER( roma )			/* Roma											*/
+	DRIVER( roma32 )		/* Roma											*/
 
 /*********** Misc ***********************************************************/
-//0128u5	DRIVER( ex800 )
+	DRIVER( ex800 )
 
 
 #endif /* DRIVER_RECURSIVE */

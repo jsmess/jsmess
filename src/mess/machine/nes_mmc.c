@@ -2873,7 +2873,7 @@ static WRITE8_HANDLER( mapper42_w )
 			/* Check if IRQ is being enabled */
 			if ( ! IRQ_enable && ( data & 0x02 ) ) {
 				IRQ_enable = 1;
-				timer_adjust_oneshot(nes_irq_timer, cpu_clocks_to_attotime(machine->cpu[0], 24576), 0);
+				timer_adjust_oneshot(nes_irq_timer, cpu_clocks_to_attotime(space->machine->cpu[0], 24576), 0);
 			}
 			if ( ! ( data & 0x02 ) ) {
 				IRQ_enable = 0;
@@ -4861,7 +4861,7 @@ int mapper_reset (int mapperNum)
 	ppu2c0x_set_hblank_callback (0, mapper ? mapper->mmc_hblank :  NULL);
 
 	if (!nes_irq_timer)
-		nes_irq_timer = timer_alloc(machine, nes_irq_callback, NULL);
+		nes_irq_timer = timer_alloc(Machine, nes_irq_callback, NULL);
 
 	mapper_warning = 0;
 	/* 8k mask */

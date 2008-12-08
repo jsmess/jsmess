@@ -338,14 +338,14 @@ static DEVICE_START( abc77 )
 
 	/* allocate reset timer */
 
-	abc77->reset_timer = timer_alloc(machine, reset_tick, (FPTR *) device);
+	abc77->reset_timer = timer_alloc(device->machine, reset_tick, (FPTR *) device);
 
 	/* register for state saving */
 
-	state_save_register_item(machine, "abc77", device->tag, 0, abc77->keylatch);
-	state_save_register_item(machine, "abc77", device->tag, 0, abc77->clock);
-	state_save_register_item(machine, "abc77", device->tag, 0, abc77->hys);
-	state_save_register_item(machine, "abc77", device->tag, 0, abc77->reset);
+	state_save_register_item(device->machine, "abc77", device->tag, 0, abc77->keylatch);
+	state_save_register_item(device->machine, "abc77", device->tag, 0, abc77->clock);
+	state_save_register_item(device->machine, "abc77", device->tag, 0, abc77->hys);
+	state_save_register_item(device->machine, "abc77", device->tag, 0, abc77->reset);
 
 	return DEVICE_START_OK;
 }

@@ -775,7 +775,7 @@ WRITE8_HANDLER ( gb_io_w )
 		case 0x81:				/* enabled & internal clock */
 			SIODATA = 0xFF;
 			SIOCount = 8;
-			timer_adjust_periodic(gb_serial_timer, cpu_clocks_to_attotime(machine->cpu[0], 512), 0, cpu_clocks_to_attotime(machine->cpu[0], 512));
+			timer_adjust_periodic(gb_serial_timer, cpu_clocks_to_attotime(space->machine->cpu[0], 512), 0, cpu_clocks_to_attotime(space->machine->cpu[0], 512));
 			timer_enable( gb_serial_timer, 1 );
 			break;
 		}

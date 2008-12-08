@@ -336,7 +336,7 @@ static void gb_update_scanline( running_machine *machine ) {
 	/* Make sure we're in mode 3 */
 	if ( ( LCDSTAT & 0x03 ) == 0x03 ) {
 		/* Calculate number of pixels to render based on time still left on the timer */
-		UINT32 cycles_to_go = ATTOTIME_TO_CYCLES( 0, timer_timeleft( gb_lcd.lcd_timer ) );
+		UINT32 cycles_to_go = cpu_attotime_to_clocks(machine->cpu[0], timer_timeleft( gb_lcd.lcd_timer ) );
 		int l = 0;
 
 		if ( gb_lcd.start_x < 0 ) {
@@ -625,7 +625,7 @@ static void sgb_update_scanline( running_machine *machine ) {
 
 	if ( ( LCDSTAT & 0x03 ) == 0x03 ) {
 		/* Calcuate number of pixels to render based on time still left on the timer */
-		UINT32 cycles_to_go = ATTOTIME_TO_CYCLES( 0, timer_timeleft( gb_lcd.lcd_timer ) );
+		UINT32 cycles_to_go = cpu_attotime_to_clocks(machine->cpu[0], timer_timeleft( gb_lcd.lcd_timer ) );
 		int l = 0;
 
 		if ( gb_lcd.start_x < 0 ) {
@@ -896,7 +896,7 @@ static void cgb_update_scanline ( running_machine *machine ) {
 
 	if ( ( LCDSTAT & 0x03 ) == 0x03 ) {
 		/* Calcuate number of pixels to render based on time still left on the timer */
-		UINT32 cycles_to_go = ATTOTIME_TO_CYCLES( 0, timer_timeleft( gb_lcd.lcd_timer ) );
+		UINT32 cycles_to_go = cpu_attotime_to_clocks(machine->cpu[0], timer_timeleft( gb_lcd.lcd_timer ) );
 		int l = 0;
 
 		if ( gb_lcd.start_x < 0 ) {
@@ -1386,7 +1386,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			     ( ( ! gb_lcd.line_irq && gb_lcd.delayed_line_irq ) || ! ( LCDSTAT & 0x40 ) ) ) {
 				cpu_set_input_line( machine->cpu[0], LCD_INT, HOLD_LINE );
 			}
-			timer_adjust_oneshot(gb_lcd.lcd_timer, cpu_clocks_to_attotime(machine->cpu[0], 196 - gb_lcd.scrollx_adjust - gb_lcd.sprite_cycles,0), GB_LCD_STATE_LYXX_M0_PRE_INC);
+			timer_adjust_oneshot(gb_lcd.lcd_timer, cpu_clocks_to_attotime(machine->cpu[0], 196 - gb_lcd.scrollx_adjust - gb_lcd.sprite_cycles), GB_LCD_STATE_LYXX_M0_PRE_INC);
 			break;
 		case GB_LCD_STATE_LYXX_M0_PRE_INC:	/* Just before incrementing the line counter go to mode 2 internally */
 			if ( CURLINE < 143 ) {
