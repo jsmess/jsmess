@@ -452,43 +452,43 @@ XL/XE 16kB OS roms
 //0128u5	DRIVER( osborne1 )	/* 1981 Osborne-1									*/
 
 	/* SINCLAIR RESEARCH */
-//0128u5	DRIVER( zx80 )		/* 1980 Sinclair ZX-80								*/
-//0128u5	DRIVER( zx81 )		/* 1981 Sinclair ZX-81								*/
-//0128u5	DRIVER( ts1000 )	/* 1982 Timex Sinclair 1000							*/
-//0128u5	DRIVER( pc8300 )	/* Your Computer - PC8300							*/
-//0128u5	DRIVER( pow3000 )	/* Creon Enterprises - Power 3000					*/
-//0128u5	DRIVER( lambda )	/* Lambda 8300										*/
+	DRIVER( zx80 )		/* 1980 Sinclair ZX-80								*/
+	DRIVER( zx81 )		/* 1981 Sinclair ZX-81								*/
+	DRIVER( ts1000 )	/* 1982 Timex Sinclair 1000							*/
+	DRIVER( pc8300 )	/* Your Computer - PC8300							*/
+	DRIVER( pow3000 )	/* Creon Enterprises - Power 3000					*/
+	DRIVER( lambda )	/* Lambda 8300										*/
 
-//0128u5	DRIVER( spectrum )/* 1982 ZX Spectrum									*/
-//0128u5	DRIVER( spec80k ) /* 1987 ZX Spectrum 80k							*/
-//0128u5	DRIVER( specide ) /* 1995 ZX Spectrum IDE							*/
-//0128u5	DRIVER( inves )		/* 1986 Inves Spectrum 48K+							*/
-//0128u5	DRIVER( tk90x )		/* 1985 TK90x Color Computer						*/
-//0128u5	DRIVER( tk95 )		/* 1986 TK95 Color Computer							*/
-//0128u5	DRIVER( tc2048 )	/* 198? TC2048										*/
-//0128u5	DRIVER( ts2068 )	/* 1983 TS2068										*/
-//0128u5	DRIVER( uk2086 )	/* 1986 UK2086										*/  
+	DRIVER( spectrum )/* 1982 ZX Spectrum									*/
+	DRIVER( spec80k ) /* 1987 ZX Spectrum 80k							*/
+	DRIVER( specide ) /* 1995 ZX Spectrum IDE							*/
+	DRIVER( inves )		/* 1986 Inves Spectrum 48K+							*/
+	DRIVER( tk90x )		/* 1985 TK90x Color Computer						*/
+	DRIVER( tk95 )		/* 1986 TK95 Color Computer							*/
+	DRIVER( tc2048 )	/* 198? TC2048										*/
+	DRIVER( ts2068 )	/* 1983 TS2068										*/
+	DRIVER( uk2086 )	/* 1986 UK2086										*/  
 	
-//0128u5	DRIVER( spec128 )	  /* 1986 ZX Spectrum 128								*/
-//0128u5	DRIVER( specpls2 )	/* 1986 ZX Spectrum +2								*/
-//0128u5	DRIVER( specpl2a )	/* 1987 ZX Spectrum +2a								*/	
-//0128u5	DRIVER( specpls3 )	/* 1987 ZX Spectrum +3								*/
-//0128u5	DRIVER( specpl3e )	/* 2000 ZX Spectrum +3e								*/
-//0128u5	DRIVER( sp3e8bit )	/* 2002 ZX Spectrum +3e	8bit IDE			*/
-//0128u5	DRIVER( sp3ezcf )  	/* 2002 ZX Spectrum +3e	ZXCF   				*/
-//0128u5	DRIVER( sp3eata )  	/* 2002 ZX Spectrum +3e	ZXATASP  			*/	
-//0128u5	DRIVER( scorpion )
-//0128u5	DRIVER( pentagon )
+	DRIVER( spec128 )	  /* 1986 ZX Spectrum 128								*/
+	DRIVER( specpls2 )	/* 1986 ZX Spectrum +2								*/
+	DRIVER( specpl2a )	/* 1987 ZX Spectrum +2a								*/	
+	DRIVER( specpls3 )	/* 1987 ZX Spectrum +3								*/
+	DRIVER( specpl3e )	/* 2000 ZX Spectrum +3e								*/
+	DRIVER( sp3e8bit )	/* 2002 ZX Spectrum +3e	8bit IDE			*/
+	DRIVER( sp3ezcf )  	/* 2002 ZX Spectrum +3e	ZXCF   				*/
+	DRIVER( sp3eata )  	/* 2002 ZX Spectrum +3e	ZXATASP  			*/	
+	DRIVER( scorpion )
+	DRIVER( pentagon )
 
-//0128u5	DRIVER( ql )		/* 1984 Sinclair QL	(UK)							*/
-//0128u5	DRIVER( ql_us )		/* 1984 Sinclair QL	(USA)							*/
-//0128u5	DRIVER( ql_es )		/* 1984 Sinclair QL	(Spain)							*/
-//0128u5	DRIVER( ql_fr )		/* 1984 Sinclair QL	(France)						*/
-//0128u5	DRIVER( ql_de )		/* 1984 Sinclair QL	(Germany)						*/
-//0128u5	DRIVER( ql_it )		/* 1984 Sinclair QL	(Italy)							*/
-//0128u5	DRIVER( ql_se )		/* 1984 Sinclair QL	(Sweden)						*/
-//0128u5	DRIVER( ql_dk )		/* 1984 Sinclair QL	(Denmark)						*/
-//0128u5	DRIVER( ql_gr )		/* 1984 Sinclair QL	(Greece)						*/
+	DRIVER( ql )		/* 1984 Sinclair QL	(UK)							*/
+	DRIVER( ql_us )		/* 1984 Sinclair QL	(USA)							*/
+	DRIVER( ql_es )		/* 1984 Sinclair QL	(Spain)							*/
+	DRIVER( ql_fr )		/* 1984 Sinclair QL	(France)						*/
+	DRIVER( ql_de )		/* 1984 Sinclair QL	(Germany)						*/
+	DRIVER( ql_it )		/* 1984 Sinclair QL	(Italy)							*/
+	DRIVER( ql_se )		/* 1984 Sinclair QL	(Sweden)						*/
+	DRIVER( ql_dk )		/* 1984 Sinclair QL	(Denmark)						*/
+	DRIVER( ql_gr )		/* 1984 Sinclair QL	(Greece)						*/
 //	DRIVER( tonto )
 //	DRIVER( megaopd )
 

@@ -253,19 +253,19 @@ static DEVICE_START( zx8301 )
 	assert(zx8301->screen != NULL);
 
 	/* create the timers */
-	zx8301->vsync_timer = timer_alloc(machine, zx8301_vsync_tick, (void *)device);
+	zx8301->vsync_timer = timer_alloc(device->machine, zx8301_vsync_tick, (void *)device);
 	timer_adjust_periodic(zx8301->vsync_timer, attotime_zero, 0, ATTOTIME_IN_HZ(50)); // HACK
 
-	zx8301->flash_timer = timer_alloc(machine, zx8301_flash_tick, (void *)device);
+	zx8301->flash_timer = timer_alloc(device->machine, zx8301_flash_tick, (void *)device);
 	timer_adjust_periodic(zx8301->flash_timer, ATTOTIME_IN_HZ(2), 0, ATTOTIME_IN_HZ(2));
 
 	/* register for state saving */
-	state_save_register_item(machine, "zx8301", device->tag, 0, zx8301->dispoff);
-	state_save_register_item(machine, "zx8301", device->tag, 0, zx8301->mode8);
-	state_save_register_item(machine, "zx8301", device->tag, 0, zx8301->base);
-	state_save_register_item(machine, "zx8301", device->tag, 0, zx8301->flash);
-	state_save_register_item(machine, "zx8301", device->tag, 0, zx8301->vsync);
-	state_save_register_item(machine, "zx8301", device->tag, 0, zx8301->vda);
+	state_save_register_item(device->machine, "zx8301", device->tag, 0, zx8301->dispoff);
+	state_save_register_item(device->machine, "zx8301", device->tag, 0, zx8301->mode8);
+	state_save_register_item(device->machine, "zx8301", device->tag, 0, zx8301->base);
+	state_save_register_item(device->machine, "zx8301", device->tag, 0, zx8301->flash);
+	state_save_register_item(device->machine, "zx8301", device->tag, 0, zx8301->vsync);
+	state_save_register_item(device->machine, "zx8301", device->tag, 0, zx8301->vda);
 
 	return DEVICE_START_OK;
 }

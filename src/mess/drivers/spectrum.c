@@ -177,7 +177,7 @@ WRITE8_HANDLER(spectrum_port_fe_w)
 	if ((Changed & 0x07)!=0)
 	{
 		/* yes - send event */
-		EventList_AddItemOffset(space->machine, 0x0fe, data & 0x07, cpu_attotime_to_clocks(machine->cpu[0],attotime_mul(video_screen_get_scan_period(space->machine->primary_screen), video_screen_get_vpos(space->machine->primary_screen))));
+		EventList_AddItemOffset(space->machine, 0x0fe, data & 0x07, cpu_attotime_to_clocks(space->machine->cpu[0],attotime_mul(video_screen_get_scan_period(space->machine->primary_screen), video_screen_get_vpos(space->machine->primary_screen))));
 	}
 
 	if ((Changed & (1<<4))!=0)
