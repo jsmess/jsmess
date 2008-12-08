@@ -706,6 +706,7 @@ MACHINE_RESET( pet )
 
 	cbm_drive_0_config (input_port_read(machine, "CFG") & 2 ? IEEE : 0, 8);
 	cbm_drive_1_config (input_port_read(machine, "CFG") & 1 ? IEEE : 0, 9);
+	cpu_reset(cputag_get_cpu(machine, "main"));
 }
 
 
