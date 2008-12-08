@@ -278,7 +278,7 @@ static READ8_HANDLER( ikbd_port2_r )
 
     */
 
-	atarist_state *state = space->machine->driver_data;
+//	atarist_state *state = space->machine->driver_data;
 
 	return (ikbd_tx << 3) | (input_port_read_safe(space->machine, "IKBD_JOY1", 0xff) & 0x06);
 }
@@ -297,7 +297,7 @@ static WRITE8_HANDLER( ikbd_port2_w )
 
     */
 
-	atarist_state *state = space->machine->driver_data;
+//	atarist_state *state = space->machine->driver_data;
 
 	ikbd_rx = (data & 0x10) >> 4;
 }
@@ -1379,7 +1379,7 @@ static MC68901_GPIO_READ( mfp_gpio_r )
 
 static IRQ_CALLBACK( atarist_int_ack )
 {
-	atarist_state *state = device->machine->driver_data;
+//	atarist_state *state = device->machine->driver_data;
 
 	const device_config *mc68901 = device_list_find_by_tag(device->machine->config->devicelist, MC68901, MC68901_TAG);
 

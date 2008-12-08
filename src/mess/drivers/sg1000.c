@@ -78,16 +78,16 @@ Notes:
 #include "video/tms9928a.h"
 
 #define IS_CARTRIDGE_TV_DRAW(ptr) \
-	(!strncmp("annakmn", (const char *)&##ptr[0x13b3], 7))
+	(!strncmp("annakmn", (const char *)&ptr[0x13b3], 7))
 
 #define IS_CARTRIDGE_THE_CASTLE(ptr) \
-	(!strncmp("ASCII 1986", (const char *)&##ptr[0x1cc3], 10))
+	(!strncmp("ASCII 1986", (const char *)&ptr[0x1cc3], 10))
 
 #define IS_CARTRIDGE_BASIC_LEVEL_III(ptr) \
-	(!strncmp("SC-3000 BASIC Level 3 ver 1.0", (const char *)&##ptr[0x6a20], 29))
+	(!strncmp("SC-3000 BASIC Level 3 ver 1.0", (const char *)&ptr[0x6a20], 29))
 
 #define IS_CARTRIDGE_MUSIC_EDITOR(ptr) \
-	(!strncmp("PIANO", (const char *)&##ptr[0x0841], 5))
+	(!strncmp("PIANO", (const char *)&ptr[0x0841], 5))
 
 static const device_config *cassette_device_image(running_machine *machine)
 {
@@ -984,7 +984,7 @@ static void sc3000_map_cartridge_memory(running_machine *machine, UINT8 *ptr, in
 
 static DEVICE_IMAGE_LOAD( sc3000_cart )
 {
-	const address_space *program = cputag_get_address_space(image->machine, "main", ADDRESS_SPACE_PROGRAM);
+//	const address_space *program = cputag_get_address_space(image->machine, "main", ADDRESS_SPACE_PROGRAM);
 	int size = image_length(image);
 	UINT8 *ptr = memory_region(image->machine, "main");
 
