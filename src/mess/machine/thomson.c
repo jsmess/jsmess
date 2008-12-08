@@ -1475,7 +1475,7 @@ MACHINE_RESET ( to7 )
 	/* video */
 	thom_set_video_mode( THOM_VMODE_TO770 );
 	thom_set_init_callback( to7_set_init );
-	thom_set_lightpen_callback( 3, to7_lightpen_cb );
+	thom_set_lightpen_callback(machine, 3, to7_lightpen_cb );
 	thom_set_mode_point( machine, 0 );
 	thom_set_border_color( 0 );
 	pia_set_input_cb1( THOM_PIA_SYS, 0 );
@@ -1724,7 +1724,7 @@ MACHINE_RESET( to770 )
 	/* video */
 	thom_set_video_mode( THOM_VMODE_TO770 );
 	thom_set_init_callback( to7_set_init );
-	thom_set_lightpen_callback( 3, to7_lightpen_cb );
+	thom_set_lightpen_callback(machine, 3, to7_lightpen_cb );
 	thom_set_mode_point( machine, 0 );
 	thom_set_border_color( 8 );
 	pia_set_input_cb1( THOM_PIA_SYS, 0 );
@@ -2084,7 +2084,7 @@ MACHINE_RESET( mo5 )
 
 	/* video */
 	thom_set_video_mode( THOM_VMODE_MO5 );
-	thom_set_lightpen_callback( 3, mo5_lightpen_cb );
+	thom_set_lightpen_callback(machine, 3, mo5_lightpen_cb );
 	thom_set_mode_point( machine, 0 );
 	thom_set_border_color( 0 );
 	pia_set_input_ca1( THOM_PIA_SYS, 0 );
@@ -3049,7 +3049,7 @@ MACHINE_RESET ( to9 )
 
 	/* video */
 	thom_set_video_mode( THOM_VMODE_TO9 );
-	thom_set_lightpen_callback( 3, to7_lightpen_cb );
+	thom_set_lightpen_callback(machine, 3, to7_lightpen_cb );
 	thom_set_border_color( 8 );
 	thom_set_mode_point( machine, 0 );
 	pia_set_input_cb1( THOM_PIA_SYS, 0 );
@@ -4017,7 +4017,7 @@ MACHINE_RESET ( to8 )
 
 	/* video */
 	thom_set_video_mode( THOM_VMODE_TO770 );
-	thom_set_lightpen_callback( 4, to8_lightpen_cb );
+	thom_set_lightpen_callback(machine, 4, to8_lightpen_cb );
 	thom_set_border_color( 0 );
 	thom_set_mode_point( machine, 0 );
 	pia_set_input_cb1( THOM_PIA_SYS, 0 );
@@ -4183,7 +4183,7 @@ MACHINE_RESET ( to9p )
 
 	/* video */
 	thom_set_video_mode( THOM_VMODE_TO770 );
-	thom_set_lightpen_callback( 4, to8_lightpen_cb );
+	thom_set_lightpen_callback(machine, 4, to8_lightpen_cb );
 	thom_set_border_color( 0 );
 	thom_set_mode_point( machine, 0 );
 	pia_set_input_cb1( THOM_PIA_SYS, 0 );
@@ -4774,7 +4774,7 @@ MACHINE_RESET ( mo6 )
 
 	/* video */
 	thom_set_video_mode( THOM_VMODE_MO5 );
-	thom_set_lightpen_callback( 3, to8_lightpen_cb );
+	thom_set_lightpen_callback(machine, 3, to8_lightpen_cb );
 	thom_set_border_color( 0 );
 	thom_set_mode_point( machine, 0 );
 	pia_set_input_ca1( THOM_PIA_SYS, 0 );
@@ -5047,7 +5047,7 @@ MACHINE_RESET ( mo5nr )
 
 	/* video */
 	thom_set_video_mode( THOM_VMODE_MO5 );
-	thom_set_lightpen_callback( 3, to8_lightpen_cb );
+	thom_set_lightpen_callback(machine, 3, to8_lightpen_cb );
 	thom_set_border_color( 0 );
 	thom_set_mode_point( machine, 0 );
 	pia_set_input_ca1( THOM_PIA_SYS, 0 );

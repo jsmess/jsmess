@@ -415,7 +415,7 @@ static TIMER_CALLBACK(mc6854_tfifo_cb)
 
 		mc6854->flen = 0;
 		if ( mc6854->iface->out_frame )
-			mc6854->iface->out_frame( mc6854->frame, len );
+			mc6854->iface->out_frame( machine, mc6854->frame, len );
 	}
 }
 
