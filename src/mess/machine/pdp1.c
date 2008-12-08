@@ -1148,7 +1148,7 @@ void iot_dcc(int op2, int nac, int mb, int *io, int ac)
 		if (parallel_drum.wc)
 			delay = attotime_add(delay, PARALLEL_DRUM_WORD_TIME);
 	} while (parallel_drum.wc);
-	cpu_adjust_icount(Machine->cpu[0],-cpu_attotime_to_clocks(machine->cpu[0], delay));
+	cpu_adjust_icount(Machine->cpu[0],-cpu_attotime_to_clocks(Machine->cpu[0], delay));
 	/* if no error, skip */
 	cpu_set_reg(Machine->cpu[0], PDP1_PC, cpu_get_reg(Machine->cpu[0], PDP1_PC)+1);
 }

@@ -209,14 +209,14 @@ static DEVICE_START( cdp1861 )
 	cdp1861->bitmap = auto_bitmap_alloc(video_screen_get_width(cdp1861->screen), video_screen_get_height(cdp1861->screen), video_screen_get_format(cdp1861->screen));
 
 	/* create the timers */
-	cdp1861->int_timer = timer_alloc(machine, cdp1861_int_tick, (void *)device);
-	cdp1861->efx_timer = timer_alloc(machine, cdp1861_efx_tick, (void *)device);
-	cdp1861->dma_timer = timer_alloc(machine, cdp1861_dma_tick, (void *)device);
+	cdp1861->int_timer = timer_alloc(device->machine, cdp1861_int_tick, (void *)device);
+	cdp1861->efx_timer = timer_alloc(device->machine, cdp1861_efx_tick, (void *)device);
+	cdp1861->dma_timer = timer_alloc(device->machine, cdp1861_dma_tick, (void *)device);
 
 	/* register for state saving */
-	state_save_register_item(machine, "cdp1861", device->tag, 0, cdp1861->disp);
-	state_save_register_item(machine, "cdp1861", device->tag, 0, cdp1861->dmaout);
-	state_save_register_bitmap("cdp1861", device->tag, 0, "cdp1861->bitmap", cdp1861->bitmap);
+	state_save_register_device_item(device, 0, cdp1861->disp);
+	state_save_register_device_item(device, 0, cdp1861->dmaout);
+	state_save_register_device_item_bitmap(device, 0, cdp1861->bitmap);
 
 	return DEVICE_START_OK;
 }
@@ -227,7 +227,7 @@ static DEVICE_RESET( cdp1861 )
 
 	timer_adjust_oneshot(cdp1861->int_timer, video_screen_get_time_until_pos(cdp1861->screen, CDP1861_SCANLINE_INT_START, 0), 0);
 	timer_adjust_oneshot(cdp1861->efx_timer, video_screen_get_time_until_pos(cdp1861->screen, CDP1861_SCANLINE_EFX_TOP_START, 0), 0);
-	timer_adjust_oneshot(cdp1861->dma_timer, cpu_clocks_to_attotime(machine->cpu[0], CDP1861_CYCLES_DMA_START), 0);
+	timer_adjust_oneshot(cdp1861->dma_timer, cpu_clocks_to_attotime(device->machine->cpu[0], CDP1861_CYCLES_DMA_START), 0);
 	
 	cdp1861->disp = 0;
 	cdp1861->dmaout = 0;

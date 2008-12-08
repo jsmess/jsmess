@@ -122,9 +122,9 @@ const game_driver * const drivers[] =
 	DRIVER( astrocdw )	/* Bally Astrocade (white case)						*/
 
 	/* RCA */
-//0128u5	DRIVER( vip )		/* 1977 Cosmac VIP VP-711							*/
-//0128u5	DRIVER( vp111 )		/* 1977 Cosmac VIP VP-111							*/
-//0128u5	DRIVER( studio2 )	/* 1977 Studio II									*/
+	DRIVER( vip )		/* 1977 Cosmac VIP VP-711							*/
+	DRIVER( vp111 )		/* 1977 Cosmac VIP VP-111							*/
+	DRIVER( studio2 )	/* 1977 Studio II									*/
 //	DRIVER( visicom )
 //	DRIVER( mpt02s )
 //	DRIVER( mpt02h )
@@ -556,11 +556,11 @@ XL/XE 16kB OS roms
 	DRIVER( pc88srh )	/* PC-8801mkIISR(High res display, VSYNC 24KHz)		*/
 
 	/* CANTAB */
-//0128u5	DRIVER( jupiter )	/* Jupiter Ace										*/
+	DRIVER( jupiter )	/* Jupiter Ace										*/
 
 	/* SORD */
-//0128u5	DRIVER( sordm5 )
-//0128u5	DRIVER( srdm5fd5 )
+	DRIVER( sordm5 )
+	DRIVER( srdm5fd5 )
 
 	/* APF Electronics Inc. */
 	DRIVER( apfm1000 )
@@ -785,22 +785,22 @@ XL/XE 16kB OS roms
 
 
 	/* NASCOM MICROCOMPUTERS */
-//0128u5	DRIVER( nascom1 )	/* 1978 Nascom 1									*/
-//0128u5	DRIVER( nascom2 )	/* 1979 Nascom 2									*/
+	DRIVER( nascom1 )	/* 1978 Nascom 1									*/
+	DRIVER( nascom2 )	/* 1979 Nascom 2									*/
 
 	/* MILES GORDON TECHNOLOGY */
 	DRIVER( samcoupe )	/* 1989 Sam Coupe									*/
 
 	/* MOTOROLA */
-//0128u5	DRIVER( mekd2 )		/* 1977 Motorola Evaluation Kit						*/
+	DRIVER( mekd2 )		/* 1977 Motorola Evaluation Kit						*/
 
 	/* DEC */
-//0128u5	DRIVER( pdp1 )		/* 1961 DEC PDP1									*/
+	DRIVER( pdp1 )		/* 1961 DEC PDP1									*/
 
 	/* MEMOTECH */
-//0128u5	DRIVER( mtx512 )	/* 1983 Memotech MTX 512							*/
-//0128u5	DRIVER( mtx500 )	/* 1983 Memotech MTX 500							*/
-//0128u5	DRIVER( rs128 )		/* 1984 Memotech RS 128								*/
+	DRIVER( mtx512 )	/* 1983 Memotech MTX 512							*/
+	DRIVER( mtx500 )	/* 1983 Memotech MTX 500							*/
+	DRIVER( rs128 )		/* 1984 Memotech RS 128								*/
 
 	/* MATTEL */
 	DRIVER( intvkbd )	/* 1981 - Mattel Intellivision Keyboard Component	*/
@@ -1084,9 +1084,9 @@ XL/XE 16kB OS roms
 
 /****************Games*******************************************************/
 	/* Computer Electronic */
-//0128u5	DRIVER( mk1 )		/* Chess Champion MK I								*/
+	DRIVER( mk1 )		/* Chess Champion MK I								*/
 	/* Quelle International */
-//0128u5	DRIVER( mk2 )		/* Chess Champion MK II								*/
+	DRIVER( mk2 )		/* Chess Champion MK II								*/
 
 	/* Novag */
 //0128u5	DRIVER( ssystem3 )	/* Chess Champion Super System III / MK III			*/

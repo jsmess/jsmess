@@ -193,7 +193,7 @@ static const f3853_config mk1_config = {
 };
 
 static DRIVER_INIT( mk1 ) {
-    f3853_init( &mk1_config );
+    f3853_init( machine, &mk1_config );
 }
 
 /***************************************************************************
