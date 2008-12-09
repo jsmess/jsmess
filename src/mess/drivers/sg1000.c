@@ -53,7 +53,6 @@ Notes:
 
     TODO:
 
-	- move variables to driver state
 	- OMV keyboard
 	- SC-3000 return instruction referenced by R when reading ports 60-7f,e0-ff
 	- connect the PSG /READY signal 
@@ -65,6 +64,8 @@ Notes:
 */
 
 #include "driver.h"
+#include "includes/sg1000.h"
+#include "deprecat.h"
 #include "devices/basicdsk.h"
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
@@ -76,18 +77,6 @@ Notes:
 #include "machine/nec765.h"
 #include "sound/sn76496.h"
 #include "video/tms9928a.h"
-
-#define IS_CARTRIDGE_TV_DRAW(ptr) \
-	(!strncmp("annakmn", (const char *)&ptr[0x13b3], 7))
-
-#define IS_CARTRIDGE_THE_CASTLE(ptr) \
-	(!strncmp("ASCII 1986", (const char *)&ptr[0x1cc3], 10))
-
-#define IS_CARTRIDGE_BASIC_LEVEL_III(ptr) \
-	(!strncmp("SC-3000 BASIC Level 3 ver 1.0", (const char *)&ptr[0x6a20], 29))
-
-#define IS_CARTRIDGE_MUSIC_EDITOR(ptr) \
-	(!strncmp("PIANO", (const char *)&ptr[0x0841], 5))
 
 static const device_config *cassette_device_image(running_machine *machine)
 {
@@ -111,20 +100,20 @@ static const device_config *cassette_device_image(running_machine *machine)
 
 */
 
-static UINT8 tvdraw_data;
-
 static WRITE8_HANDLER( tvdraw_axis_w )
 {
+	sg1000_state *state = space->machine->driver_data;
+
 	if (data & 0x01)
 	{
-		tvdraw_data = input_port_read(space->machine, "TVDRAW_X");
+		state->tvdraw_data = input_port_read(space->machine, "TVDRAW_X");
 
-		if (tvdraw_data < 4) tvdraw_data = 4;
-		if (tvdraw_data > 251) tvdraw_data = 251;
+		if (state->tvdraw_data < 4) state->tvdraw_data = 4;
+		if (state->tvdraw_data > 251) state->tvdraw_data = 251;
 	}
 	else
 	{
-		tvdraw_data = input_port_read(space->machine, "TVDRAW_Y") + 32;
+		state->tvdraw_data = input_port_read(space->machine, "TVDRAW_Y") + 32;
 	}
 }
 
@@ -135,7 +124,9 @@ static READ8_HANDLER( tvdraw_status_r )
 
 static READ8_HANDLER( tvdraw_data_r )
 {
-	return tvdraw_data;
+	sg1000_state *state = space->machine->driver_data;
+
+	return state->tvdraw_data;
 }
 
 static READ8_HANDLER( sg1000_joysel_r )
@@ -215,7 +206,7 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( trigger_nmi )
 {
-	cpu_set_input_line(field->port->machine->cpu[0], INPUT_LINE_NMI, (input_port_read(field->port->machine, "NMI") ? CLEAR_LINE : ASSERT_LINE));
+	cputag_set_input_line(field->port->machine, "main", INPUT_LINE_NMI, (input_port_read(field->port->machine, "NMI") ? CLEAR_LINE : ASSERT_LINE));
 }
 
 static INPUT_PORTS_START( tvdraw )
@@ -451,7 +442,7 @@ static INTERRUPT_GEN( sg1000_int )
 
 static void sg1000_vdp_interrupt(running_machine *machine, int state)
 {
-	cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ0, state);
+	cputag_set_input_line(machine, "main", INPUT_LINE_IRQ0, state);
 }
 
 static const TMS9928a_interface tms9928a_interface =
@@ -480,6 +471,8 @@ static TIMER_CALLBACK( lightgun_tick )
 
 static MACHINE_START( sg1000 )
 {
+	sg1000_state *state = machine->driver_data;
+
 	/* configure VDP */
 	TMS9928A_configure(&tms9928a_interface);
 
@@ -487,17 +480,13 @@ static MACHINE_START( sg1000 )
 	timer_set(machine, attotime_zero, NULL, 0, lightgun_tick);
 
 	/* register for state saving */
-	state_save_register_global(machine, tvdraw_data);
+	state_save_register_global(machine, state->tvdraw_data);
 }
 
 // SC-3000
 
-static int keylatch;
-
 static READ8_DEVICE_HANDLER( sc3000_ppi8255_a_r )
 {
-	static const char *const keynames[] = { "PA0", "PA1", "PA2", "PA3", "PA4", "PA5", "PA6", "PA7" };
-
 	/*
         Signal  Description
 
@@ -511,13 +500,15 @@ static READ8_DEVICE_HANDLER( sc3000_ppi8255_a_r )
         PA7     Keyboard input
     */
 
-	return input_port_read(device->machine, keynames[keylatch]);
+	sg1000_state *state = device->machine->driver_data;
+
+	static const char *const keynames[] = { "PA0", "PA1", "PA2", "PA3", "PA4", "PA5", "PA6", "PA7" };
+
+	return input_port_read(device->machine, keynames[state->keylatch]);
 }
 
 static READ8_DEVICE_HANDLER( sc3000_ppi8255_b_r )
 {
-	static const char *const keynames[] = { "PB0", "PB1", "PB2", "PB3", "PB4", "PB5", "PB6", "PB7" };
-
 	/*
         Signal  Description
 
@@ -531,8 +522,12 @@ static READ8_DEVICE_HANDLER( sc3000_ppi8255_b_r )
         PB7     Cassette tape input
     */
 
+	sg1000_state *state = device->machine->driver_data;
+
+	static const char *const keynames[] = { "PB0", "PB1", "PB2", "PB3", "PB4", "PB5", "PB6", "PB7" };
+
 	/* keyboard */
-	UINT8 data = input_port_read(device->machine, keynames[keylatch]);
+	UINT8 data = input_port_read(device->machine, keynames[state->keylatch]);
 
 	/* cartridge contact */
 	data |= 0x10;
@@ -561,8 +556,10 @@ static WRITE8_DEVICE_HANDLER( sc3000_ppi8255_c_w )
         PC7     /FEED to printer
     */
 
+	sg1000_state *state = device->machine->driver_data;
+
 	/* keyboard */
-	keylatch = data & 0x07;
+	state->keylatch = data & 0x07;
 
 	/* cassette */
 	cassette_output(cassette_device_image(device->machine), BIT(data, 4) ? +1.0 : -1.0);
@@ -582,6 +579,8 @@ static const ppi8255_interface sc3000_ppi8255_intf =
 
 static MACHINE_START( sc3000 )
 {
+	sg1000_state *state = machine->driver_data;
+
 	/* configure VDP */
 	TMS9928A_configure(&tms9928a_interface);
 
@@ -589,14 +588,11 @@ static MACHINE_START( sc3000 )
 	timer_set(machine, attotime_zero, NULL, 0, lightgun_tick);
 
 	/* register for state saving */
-	state_save_register_global(machine, tvdraw_data);
-	state_save_register_global(machine, keylatch);
+	state_save_register_global(machine, state->tvdraw_data);
+	state_save_register_global(machine, state->keylatch);
 }
 
 // SF-7000
-
-static int sf7000_fdc_int;
-static int sf7000_fdc_index;
 
 static READ8_DEVICE_HANDLER( sf7000_ppi8255_a_r )
 {
@@ -613,6 +609,8 @@ static READ8_DEVICE_HANDLER( sf7000_ppi8255_a_r )
         PA7
     */
 
+	sg1000_state *state = device->machine->driver_data;
+
 	int centronics_handshake = centronics_read_handshake(1);
 	int busy = 0;
 
@@ -621,7 +619,7 @@ static READ8_DEVICE_HANDLER( sf7000_ppi8255_a_r )
 		busy = 0x02;
 	}
 
-	return (sf7000_fdc_index << 2) | busy | sf7000_fdc_int;
+	return (state->fdc_index << 2) | busy | state->fdc_irq;
 }
 
 static WRITE8_DEVICE_HANDLER( sf7000_ppi8255_b_w )
@@ -700,12 +698,16 @@ static const ppi8255_interface sf7000_ppi8255_intf[2] =
 /* callback for /INT output from FDC */
 static void sf7000_fdc_interrupt(int state)
 {
-	sf7000_fdc_int = state;
+	sg1000_state *driver_state = Machine->driver_data; // TODO
+
+	driver_state->fdc_irq = state;
 }
 
 static void sf7000_fdc_index_callback(const device_config *img, int state)
 {
-	sf7000_fdc_index = state;
+	sg1000_state *driver_state = img->machine->driver_data;
+
+	driver_state->fdc_index = state;
 }
 
 static const struct nec765_interface sf7000_nec765_interface =
@@ -723,6 +725,8 @@ static const CENTRONICS_CONFIG sf7000_centronics_config[1] = {
 
 static MACHINE_START( sf7000 )
 {
+	sg1000_state *state = machine->driver_data;
+
 	/* configure VDP */
 	TMS9928A_configure(&tms9928a_interface);
 
@@ -739,9 +743,9 @@ static MACHINE_START( sf7000 )
 	memory_configure_bank(machine, 2, 0, 1, mess_ram, 0);
 
 	/* register for state saving */
-	state_save_register_global(machine, keylatch);
-	state_save_register_global(machine, sf7000_fdc_int);
-	state_save_register_global(machine, sf7000_fdc_index);
+	state_save_register_global(machine, state->keylatch);
+	state_save_register_global(machine, state->fdc_irq);
+	state_save_register_global(machine, state->fdc_index);
 }
 
 static MACHINE_RESET( sf7000 )
@@ -753,6 +757,8 @@ static MACHINE_RESET( sf7000 )
 /* Machine Drivers */
 
 static MACHINE_DRIVER_START( sg1000 )
+	MDRV_DRIVER_DATA(sg1000_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, XTAL_10_738635MHz/3)
 	MDRV_CPU_PROGRAM_MAP(sg1000_map, 0)
@@ -785,6 +791,8 @@ static const cassette_config sc3000_cassette_config =
 };
 
 static MACHINE_DRIVER_START( sc3000 )
+	MDRV_DRIVER_DATA(sg1000_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, XTAL_10_738635MHz/3) // LH0080A
 	MDRV_CPU_PROGRAM_MAP(sc3000_map, 0)
@@ -815,6 +823,8 @@ static MACHINE_DRIVER_START( sc3000 )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( sf7000 )
+	MDRV_DRIVER_DATA(sg1000_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, XTAL_10_738635MHz/3)
 	MDRV_CPU_PROGRAM_MAP(sf7000_map, 0)
