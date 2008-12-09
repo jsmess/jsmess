@@ -1379,13 +1379,11 @@ static MC68901_GPIO_READ( mfp_gpio_r )
 
 static IRQ_CALLBACK( atarist_int_ack )
 {
-//	atarist_state *state = device->machine->driver_data;
-
-	const device_config *mc68901 = device_list_find_by_tag(device->machine->config->devicelist, MC68901, MC68901_TAG);
+	atarist_state *state = device->machine->driver_data;
 
 	if (irqline == M68K_IRQ_6)
 	{
-		return mc68901_get_vector(mc68901);
+		return mc68901_get_vector(state->mc68901);
 	}
 
 	return M68K_INT_ACK_AUTOVECTOR;
