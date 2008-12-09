@@ -130,8 +130,7 @@ static MACHINE_DRIVER_START( mac512ke )
 	/* devices */
 	MDRV_DEVICE_ADD("fdc", IWM)
 	MDRV_DEVICE_CONFIG(mac_iwm_interface)
-	MDRV_DEVICE_ADD("scc", SCC8530)
-	MDRV_DEVICE_CONFIG(mac_scc8530_interface)
+	MDRV_SCC8530_ADD("scc", mac_scc8530_interface)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( macplus )

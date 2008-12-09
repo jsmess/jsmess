@@ -609,6 +609,11 @@ static const mips3_config config =
 	32768	/* data cache size */
 };
 
+static const scc8530_interface ip20_scc8530_interface =
+{
+	NULL
+};
+
 static MACHINE_DRIVER_START( ip204415 )
 	MDRV_CPU_ADD( "main", R4600BE, 50000000*3 )
 	MDRV_CPU_CONFIG( config )
@@ -635,7 +640,7 @@ static MACHINE_DRIVER_START( ip204415 )
 	MDRV_SOUND_ADD( "cdda", CDDA, 0 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_DEVICE_ADD("scc", SCC8530)
+	MDRV_SCC8530_ADD("scc", ip20_scc8530_interface)
 
 	MDRV_DEVICE_ADD( "cdrom", CDROM )
 MACHINE_DRIVER_END
