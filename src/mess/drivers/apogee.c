@@ -132,8 +132,7 @@ static MACHINE_DRIVER_START( apogee )
 
 	//MDRV_PPI8255_ADD( "ppi8255_2", apogee_ppi8255_interface_2 )
 
-	MDRV_DEVICE_ADD( "i8275", I8275 )
-	MDRV_DEVICE_CONFIG(apogee_i8275_interface)
+	MDRV_I8275_ADD	( "i8275", apogee_i8275_interface)
     /* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)

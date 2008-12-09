@@ -176,19 +176,18 @@ static const struct pit8253_config mikrosha_pit8253_intf =
 };
 
 static MACHINE_DRIVER_START( mikrosha )
-  /* basic machine hardware */
-  MDRV_CPU_ADD("main", 8080, XTAL_16MHz / 9)
-  MDRV_CPU_PROGRAM_MAP(mikrosha_mem, 0)
-  MDRV_CPU_IO_MAP(mikrosha_io, 0)
-  MDRV_MACHINE_START( mikrosha )
-  MDRV_MACHINE_RESET( radio86 )
+	/* basic machine hardware */
+	MDRV_CPU_ADD("main", 8080, XTAL_16MHz / 9)
+	MDRV_CPU_PROGRAM_MAP(mikrosha_mem, 0)
+	MDRV_CPU_IO_MAP(mikrosha_io, 0)
+	MDRV_MACHINE_START( mikrosha )
+	MDRV_MACHINE_RESET( radio86 )
 
 	MDRV_PPI8255_ADD( "ppi8255_1", mikrosha_ppi8255_interface_1 )
 
 	MDRV_PPI8255_ADD( "ppi8255_2", mikrosha_ppi8255_interface_2 )
 
-	MDRV_DEVICE_ADD( "i8275", I8275 )
-	MDRV_DEVICE_CONFIG(mikrosha_i8275_interface)
+	MDRV_I8275_ADD  ( "i8275", mikrosha_i8275_interface)
 
 	MDRV_PIT8253_ADD( "pit8253", mikrosha_pit8253_intf )
 

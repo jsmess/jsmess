@@ -280,16 +280,15 @@ static const cassette_config radio86_cassette_config =
 
 /* Machine driver */
 static MACHINE_DRIVER_START( radio86 )
-  /* basic machine hardware */
-  MDRV_CPU_ADD("main",8080, XTAL_16MHz / 9)
-  MDRV_CPU_PROGRAM_MAP(radio86_mem, 0)
-  MDRV_CPU_IO_MAP(radio86_io, 0)
-  MDRV_MACHINE_RESET( radio86 )
+	/* basic machine hardware */
+	MDRV_CPU_ADD("main",8080, XTAL_16MHz / 9)
+	MDRV_CPU_PROGRAM_MAP(radio86_mem, 0)
+	MDRV_CPU_IO_MAP(radio86_io, 0)
+	MDRV_MACHINE_RESET( radio86 )
 
 	MDRV_PPI8255_ADD( "ppi8255_1", radio86_ppi8255_interface_1 )
 
-	MDRV_DEVICE_ADD( "i8275", I8275 )
-	MDRV_DEVICE_CONFIG(radio86_i8275_interface)
+	MDRV_I8275_ADD	( "i8275", radio86_i8275_interface)
     /* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)

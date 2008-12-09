@@ -12,7 +12,15 @@
 #ifndef __I8275_VIDEO__
 #define __I8275_VIDEO__
 
+/***************************************************************************
+    MACROS
+***************************************************************************/
+
 #define I8275		DEVICE_GET_INFO_NAME(i8275)
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
 
 typedef void (*i8275_dma_request_func)(const device_config *device, int state);
 #define I8275_DMA_REQUEST(name)	void name(const device_config *device, int state )
@@ -37,6 +45,10 @@ struct _i8275_interface
 	i8275_display_pixels_func display_pixels;
 };
 
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
+
 /* device interface */
 DEVICE_GET_INFO( i8275 );
 
@@ -48,5 +60,13 @@ WRITE8_DEVICE_HANDLER ( i8275_w );
 void i8275_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect);
 
 void i8275_dack_set_data(const device_config *device, UINT8 data);
+
+/***************************************************************************
+    DEVICE CONFIGURATION MACROS
+***************************************************************************/
+
+#define MDRV_I8275_ADD(_tag, _intrf) \
+	MDRV_DEVICE_ADD(_tag, I8275) \
+	MDRV_DEVICE_CONFIG(_intrf)
 
 #endif
