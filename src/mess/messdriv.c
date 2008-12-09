@@ -655,10 +655,12 @@ XL/XE 16kB OS roms
 	DRIVER( g7400 )		/* 1983 Videopac Plus G7400							*/
 
 	/* COMPUKIT */
-	DRIVER( uk101 )		/* 1979 UK101										*/
+	DRIVER( uk101 )
 
 	/* OHIO SCIENTIFIC */
-	DRIVER( sb2m600b )	/* 1979 Superboard II								*/
+	DRIVER( sb2m600b )
+	DRIVER( c1p )
+	DRIVER( c1pmf )
 
 	/* ASCII & MICROSOFT */
 	DRIVER( msx )		/* 1983 MSX 										*/

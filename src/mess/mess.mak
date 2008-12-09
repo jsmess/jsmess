@@ -439,6 +439,7 @@ DRVLIBS = \
 	$(MESSOBJ)/ondra.a \
 	$(MESSOBJ)/orion.a \
 	$(MESSOBJ)/osborne.a \
+	$(MESSOBJ)/osi.a \
 	$(MESSOBJ)/sgi.a \
 	$(MESSOBJ)/p2000.a \
 	$(MESSOBJ)/pasogo.a \
@@ -876,7 +877,10 @@ $(MESSOBJ)/p2000.a:    \
 	$(MESS_VIDEO)/p2000m.o	 \
 	$(MESS_DRIVERS)/p2000t.o	 \
 	$(MESS_MACHINE)/p2000t.o	 \
+	
+$(MESSOBJ)/osi.a:    \
 	$(MESS_DRIVERS)/osi.o	\
+	$(MESS_VIDEO)/osi.o	\
 
 $(MESSOBJ)/amstrad.a:  \
 	$(MESS_DRIVERS)/amstrad.o  \
