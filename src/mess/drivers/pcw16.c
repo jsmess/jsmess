@@ -1400,11 +1400,9 @@ static MACHINE_DRIVER_START( pcw16 )
 	MDRV_MACHINE_RESET( pcw16 )
 	MDRV_NVRAM_HANDLER( pcw16 )
 
-	MDRV_DEVICE_ADD( "ns16550_1", NS16550 )				/* TODO: Verify uart model */
-	MDRV_DEVICE_CONFIG( pcw16_com_interface[0] )
+	MDRV_NS16550_ADD( "ns16550_1", pcw16_com_interface[0] )				/* TODO: Verify uart model */
 
-	MDRV_DEVICE_ADD( "ns16550_2", NS16550 )				/* TODO: Verify uart model */
-	MDRV_DEVICE_CONFIG( pcw16_com_interface[1] )
+	MDRV_NS16550_ADD( "ns16550_2", pcw16_com_interface[1] )				/* TODO: Verify uart model */
 
     /* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

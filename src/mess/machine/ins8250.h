@@ -70,6 +70,14 @@ typedef struct
 	MDRV_DEVICE_REMOVE(_tag, NS16450)
 
 
+#define MDRV_NS16550_ADD(_tag, _intrf) \
+	MDRV_DEVICE_ADD(_tag, NS16550) \
+	MDRV_DEVICE_CONFIG(_intrf)
+
+#define MDRV_NS16550_REMOVE(_tag) \
+	MDRV_DEVICE_REMOVE(_tag, NS16550)
+
+
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
