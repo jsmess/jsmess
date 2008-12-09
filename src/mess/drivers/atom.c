@@ -256,8 +256,7 @@ static MACHINE_DRIVER_START( atom )
 
 	MDRV_MACHINE_RESET( atom )
 
-	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( atom_8255_int )
+	MDRV_PPI8255_ADD( "ppi8255", atom_8255_int )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

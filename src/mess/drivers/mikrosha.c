@@ -183,17 +183,14 @@ static MACHINE_DRIVER_START( mikrosha )
   MDRV_MACHINE_START( mikrosha )
   MDRV_MACHINE_RESET( radio86 )
 
-	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
-	MDRV_DEVICE_CONFIG( mikrosha_ppi8255_interface_1 )
+	MDRV_PPI8255_ADD( "ppi8255_1", mikrosha_ppi8255_interface_1 )
 
-	MDRV_DEVICE_ADD( "ppi8255_2", PPI8255 )
-	MDRV_DEVICE_CONFIG( mikrosha_ppi8255_interface_2 )
+	MDRV_PPI8255_ADD( "ppi8255_2", mikrosha_ppi8255_interface_2 )
 
 	MDRV_DEVICE_ADD( "i8275", I8275 )
 	MDRV_DEVICE_CONFIG(mikrosha_i8275_interface)
 
-	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
-	MDRV_DEVICE_CONFIG( mikrosha_pit8253_intf )
+	MDRV_PIT8253_ADD( "pit8253", mikrosha_pit8253_intf )
 
   /* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

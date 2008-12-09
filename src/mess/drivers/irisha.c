@@ -135,14 +135,11 @@ static MACHINE_DRIVER_START( irisha )
 
    	MDRV_MACHINE_RESET( irisha )
 
-    MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-		MDRV_DEVICE_CONFIG( irisha_ppi8255_interface )
+    MDRV_PPI8255_ADD( "ppi8255", irisha_ppi8255_interface )
 
- 		MDRV_DEVICE_ADD( "pit8253", PIT8253 )
-		MDRV_DEVICE_CONFIG( irisha_pit8253_intf )
+	MDRV_PIT8253_ADD( "pit8253", irisha_pit8253_intf )
 
-		MDRV_DEVICE_ADD( "pic8259", PIC8259 )
-		MDRV_DEVICE_CONFIG( irisha_pic8259_config )
+	MDRV_PIC8259_ADD( "pic8259", irisha_pic8259_config )
 
     /* video hardware */
 		MDRV_SCREEN_ADD("main", RASTER)

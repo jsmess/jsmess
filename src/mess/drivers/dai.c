@@ -190,11 +190,9 @@ static MACHINE_DRIVER_START( dai )
 
 	MDRV_MACHINE_START( dai )
 
-	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
-	MDRV_DEVICE_CONFIG( dai_pit8253_intf )
+	MDRV_PIT8253_ADD( "pit8253", dai_pit8253_intf )
 
-	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( dai_ppi82555_intf )
+	MDRV_PPI8255_ADD( "ppi8255", dai_ppi82555_intf )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

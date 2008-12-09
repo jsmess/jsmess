@@ -2952,8 +2952,7 @@ static MACHINE_DRIVER_START( amstrad )
 
 	MDRV_MACHINE_RESET( amstrad )
 
-	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( amstrad_ppi8255_interface )
+	MDRV_PPI8255_ADD( "ppi8255", amstrad_ppi8255_interface )
 
     /* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

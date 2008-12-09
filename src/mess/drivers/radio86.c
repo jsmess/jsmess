@@ -286,8 +286,7 @@ static MACHINE_DRIVER_START( radio86 )
   MDRV_CPU_IO_MAP(radio86_io, 0)
   MDRV_MACHINE_RESET( radio86 )
 
-	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
-	MDRV_DEVICE_CONFIG( radio86_ppi8255_interface_1 )
+	MDRV_PPI8255_ADD( "ppi8255_1", radio86_ppi8255_interface_1 )
 
 	MDRV_DEVICE_ADD( "i8275", I8275 )
 	MDRV_DEVICE_CONFIG(radio86_i8275_interface)
@@ -349,8 +348,7 @@ static MACHINE_DRIVER_START( radiorom )
   MDRV_CPU_MODIFY("main")
   MDRV_CPU_PROGRAM_MAP(radio86rom_mem, 0)
     
-	MDRV_DEVICE_ADD( "ppi8255_2", PPI8255 )
-	MDRV_DEVICE_CONFIG( radio86_ppi8255_interface_2 )
+	MDRV_PPI8255_ADD( "ppi8255_2", radio86_ppi8255_interface_2 )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( radioram )
@@ -359,8 +357,7 @@ static MACHINE_DRIVER_START( radioram )
   MDRV_CPU_MODIFY("main")
   MDRV_CPU_PROGRAM_MAP(radio86ram_mem, 0)
 
-	MDRV_DEVICE_ADD( "ppi8255_2", PPI8255 )
-	MDRV_DEVICE_CONFIG( radio86_ppi8255_interface_2 )
+	MDRV_PPI8255_ADD( "ppi8255_2", radio86_ppi8255_interface_2 )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( rk7007 )
@@ -369,8 +366,7 @@ static MACHINE_DRIVER_START( rk7007 )
   MDRV_CPU_MODIFY("main")
   MDRV_CPU_IO_MAP(rk7007_io, 0)
 
-	MDRV_DEVICE_ADD( "ms7007", PPI8255 )
-	MDRV_DEVICE_CONFIG( rk7007_ppi8255_interface )
+	MDRV_PPI8255_ADD( "ms7007", rk7007_ppi8255_interface )
 MACHINE_DRIVER_END
   
 static MACHINE_DRIVER_START( rk700716 )
@@ -379,8 +375,7 @@ static MACHINE_DRIVER_START( rk700716 )
   MDRV_CPU_MODIFY("main")
   MDRV_CPU_IO_MAP(rk7007_io, 0)
     
-	MDRV_DEVICE_ADD( "ms7007", PPI8255 )
-	MDRV_DEVICE_CONFIG( rk7007_ppi8255_interface )    
+	MDRV_PPI8255_ADD( "ms7007", rk7007_ppi8255_interface )    
 MACHINE_DRIVER_END
 
 

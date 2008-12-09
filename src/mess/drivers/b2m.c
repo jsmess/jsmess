@@ -184,20 +184,15 @@ static MACHINE_DRIVER_START( b2m )
 	MDRV_PALETTE_LENGTH(4)
 	MDRV_PALETTE_INIT(b2m)	
 	
-	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
-	MDRV_DEVICE_CONFIG( b2m_pit8253_intf )
+	MDRV_PIT8253_ADD( "pit8253", b2m_pit8253_intf )
 
-	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
-	MDRV_DEVICE_CONFIG( b2m_ppi8255_interface_1 )
+	MDRV_PPI8255_ADD( "ppi8255_1", b2m_ppi8255_interface_1 )
 
-	MDRV_DEVICE_ADD( "ppi8255_2", PPI8255 )
-	MDRV_DEVICE_CONFIG( b2m_ppi8255_interface_2 )
+	MDRV_PPI8255_ADD( "ppi8255_2", b2m_ppi8255_interface_2 )
 		    
-	MDRV_DEVICE_ADD( "ppi8255_3", PPI8255 )
-	MDRV_DEVICE_CONFIG( b2m_ppi8255_interface_3 )
+	MDRV_PPI8255_ADD( "ppi8255_3", b2m_ppi8255_interface_3 )
 
-	MDRV_DEVICE_ADD( "pic8259", PIC8259 )
-	MDRV_DEVICE_CONFIG( b2m_pic8259_config )
+	MDRV_PIC8259_ADD( "pic8259", b2m_pic8259_config )
 		
 	MDRV_VIDEO_START(b2m)
     MDRV_VIDEO_UPDATE(b2m)    	

@@ -320,11 +320,9 @@ static MACHINE_DRIVER_START( special )
     MDRV_CPU_PROGRAM_MAP(specialist_mem, 0)
     MDRV_MACHINE_RESET( special )
 
-	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
-	MDRV_DEVICE_CONFIG( specimx_pit8253_intf )
+	MDRV_PIT8253_ADD( "pit8253", specimx_pit8253_intf )
 
-	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( specialist_ppi8255_interface )
+	MDRV_PPI8255_ADD( "ppi8255", specialist_ppi8255_interface )
 
     /* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -393,8 +391,7 @@ static MACHINE_DRIVER_START( erik )
     MDRV_MACHINE_RESET( erik )
     MDRV_MACHINE_START( erik )
 
-	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( specialist_ppi8255_interface )
+	MDRV_PPI8255_ADD( "ppi8255", specialist_ppi8255_interface )
 
     /* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

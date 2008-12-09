@@ -1325,20 +1325,15 @@ static MACHINE_DRIVER_START( pcmda )
 	MDRV_MACHINE_START(pc)
 	MDRV_MACHINE_RESET(pc)
 
-	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
-	MDRV_DEVICE_CONFIG( ibm5150_pit8253_config )
+	MDRV_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
 
-	MDRV_DEVICE_ADD( "dma8237", DMA8237 )
-	MDRV_DEVICE_CONFIG( ibm5150_dma8237_config )
+	MDRV_DMA8237_ADD( "dma8237", ibm5150_dma8237_config )
 
-	MDRV_DEVICE_ADD( "pic8259_master", PIC8259 )
-	MDRV_DEVICE_CONFIG( ibm5150_pic8259_master_config )
+	MDRV_PIC8259_ADD( "pic8259_master", ibm5150_pic8259_master_config )
 
-	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
-	MDRV_DEVICE_CONFIG( ibm5150_pic8259_slave_config )
+	MDRV_PIC8259_ADD( "pic8259_slave", ibm5150_pic8259_slave_config )
 
-	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( ibm5160_ppi8255_interface )
+	MDRV_PPI8255_ADD( "ppi8255", ibm5160_ppi8255_interface )
 
 	MDRV_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
 	MDRV_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
@@ -1384,20 +1379,15 @@ static MACHINE_DRIVER_START( pcherc )
 	MDRV_MACHINE_START(pc)
 	MDRV_MACHINE_RESET(pc)
 
-	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
-	MDRV_DEVICE_CONFIG( ibm5150_pit8253_config )
+	MDRV_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
 
-	MDRV_DEVICE_ADD( "dma8237", DMA8237 )
-	MDRV_DEVICE_CONFIG( ibm5150_dma8237_config )
+	MDRV_DMA8237_ADD( "dma8237", ibm5150_dma8237_config )
 
-	MDRV_DEVICE_ADD( "pic8259_master", PIC8259 )
-	MDRV_DEVICE_CONFIG( ibm5150_pic8259_master_config )
+	MDRV_PIC8259_ADD( "pic8259_master", ibm5150_pic8259_master_config )
 
-	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
-	MDRV_DEVICE_CONFIG( ibm5150_pic8259_slave_config )
+	MDRV_PIC8259_ADD( "pic8259_slave", ibm5150_pic8259_slave_config )
 
-	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( ibm5160_ppi8255_interface )
+	MDRV_PPI8255_ADD( "ppi8255", ibm5160_ppi8255_interface )
 
 	MDRV_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
 	MDRV_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
@@ -1451,20 +1441,15 @@ static MACHINE_DRIVER_START( ibm5150 )
 	MDRV_MACHINE_START(pc)
 	MDRV_MACHINE_RESET(pc)
 
-	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
-	MDRV_DEVICE_CONFIG( ibm5150_pit8253_config )
+	MDRV_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
 
-	MDRV_DEVICE_ADD( "dma8237", DMA8237 )
-	MDRV_DEVICE_CONFIG( ibm5150_dma8237_config )
+	MDRV_DMA8237_ADD( "dma8237", ibm5150_dma8237_config )
 
-	MDRV_DEVICE_ADD( "pic8259_master", PIC8259 )
-	MDRV_DEVICE_CONFIG( ibm5150_pic8259_master_config )
+	MDRV_PIC8259_ADD( "pic8259_master", ibm5150_pic8259_master_config )
 
-	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
-	MDRV_DEVICE_CONFIG( ibm5150_pic8259_slave_config )
+	MDRV_PIC8259_ADD( "pic8259_slave", ibm5150_pic8259_slave_config )
 
-	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( ibm5150_ppi8255_interface )
+	MDRV_PPI8255_ADD( "ppi8255", ibm5150_ppi8255_interface )
 
 	MDRV_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
 	MDRV_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
@@ -1512,20 +1497,15 @@ static MACHINE_DRIVER_START( pccga )
 	MDRV_MACHINE_START(pc)
 	MDRV_MACHINE_RESET(pc)
 
-	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
-	MDRV_DEVICE_CONFIG( ibm5150_pit8253_config )
+	MDRV_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
 
-	MDRV_DEVICE_ADD( "dma8237", DMA8237 )
-	MDRV_DEVICE_CONFIG( ibm5150_dma8237_config )
+	MDRV_DMA8237_ADD( "dma8237", ibm5150_dma8237_config )
 
-	MDRV_DEVICE_ADD( "pic8259_master", PIC8259 )
-	MDRV_DEVICE_CONFIG( ibm5150_pic8259_master_config )
+	MDRV_PIC8259_ADD( "pic8259_master", ibm5150_pic8259_master_config )
 
-	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
-	MDRV_DEVICE_CONFIG( ibm5150_pic8259_slave_config )
+	MDRV_PIC8259_ADD( "pic8259_slave", ibm5150_pic8259_slave_config )
 
-	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( ibm5160_ppi8255_interface )
+	MDRV_PPI8255_ADD( "ppi8255", ibm5160_ppi8255_interface )
 
 	MDRV_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
 	MDRV_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
@@ -1570,20 +1550,15 @@ static MACHINE_DRIVER_START( europc )
 	MDRV_MACHINE_START(pc)
 	MDRV_MACHINE_RESET(pc)
 
-	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
-	MDRV_DEVICE_CONFIG( ibm5150_pit8253_config )
+	MDRV_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
 
-	MDRV_DEVICE_ADD( "dma8237", DMA8237 )
-	MDRV_DEVICE_CONFIG( ibm5150_dma8237_config )
+	MDRV_DMA8237_ADD( "dma8237", ibm5150_dma8237_config )
 
-	MDRV_DEVICE_ADD( "pic8259_master", PIC8259 )
-	MDRV_DEVICE_CONFIG( ibm5150_pic8259_master_config )
+	MDRV_PIC8259_ADD( "pic8259_master", ibm5150_pic8259_master_config )
 
-	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
-	MDRV_DEVICE_CONFIG( ibm5150_pic8259_slave_config )
+	MDRV_PIC8259_ADD( "pic8259_slave", ibm5150_pic8259_slave_config )
 
-	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( ibm5150_ppi8255_interface )
+	MDRV_PPI8255_ADD( "ppi8255", ibm5150_ppi8255_interface )
 
 	MDRV_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
 	MDRV_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
@@ -1622,20 +1597,15 @@ static MACHINE_DRIVER_START( ibm5160 )
 	MDRV_MACHINE_START(pc)
 	MDRV_MACHINE_RESET(pc)
 
-	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
-	MDRV_DEVICE_CONFIG( ibm5150_pit8253_config )
+	MDRV_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
 
-	MDRV_DEVICE_ADD( "dma8237", DMA8237 )
-	MDRV_DEVICE_CONFIG( ibm5150_dma8237_config )
+	MDRV_DMA8237_ADD( "dma8237", ibm5150_dma8237_config )
 
-	MDRV_DEVICE_ADD( "pic8259_master", PIC8259 )
-	MDRV_DEVICE_CONFIG( ibm5150_pic8259_master_config )
+	MDRV_PIC8259_ADD( "pic8259_master", ibm5150_pic8259_master_config )
 
-	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
-	MDRV_DEVICE_CONFIG( ibm5150_pic8259_slave_config )
+	MDRV_PIC8259_ADD( "pic8259_slave", ibm5150_pic8259_slave_config )
 
-	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( ibm5160_ppi8255_interface )
+	MDRV_PPI8255_ADD( "ppi8255", ibm5160_ppi8255_interface )
 
 	MDRV_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
 	MDRV_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
@@ -1680,20 +1650,15 @@ static MACHINE_DRIVER_START( pc200 )
 	MDRV_MACHINE_START(pc)
 	MDRV_MACHINE_RESET(pc)
 
-	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
-	MDRV_DEVICE_CONFIG( ibm5150_pit8253_config )
+	MDRV_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
 
-	MDRV_DEVICE_ADD( "dma8237", DMA8237 )
-	MDRV_DEVICE_CONFIG( ibm5150_dma8237_config )
+	MDRV_DMA8237_ADD( "dma8237", ibm5150_dma8237_config )
 
-	MDRV_DEVICE_ADD( "pic8259_master", PIC8259 )
-	MDRV_DEVICE_CONFIG( ibm5150_pic8259_master_config )
+	MDRV_PIC8259_ADD( "pic8259_master", ibm5150_pic8259_master_config )
 
-	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
-	MDRV_DEVICE_CONFIG( ibm5150_pic8259_slave_config )
+	MDRV_PIC8259_ADD( "pic8259_slave", ibm5150_pic8259_slave_config )
 
-	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( ibm5150_ppi8255_interface )
+	MDRV_PPI8255_ADD( "ppi8255", ibm5150_ppi8255_interface )
 
 	MDRV_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
 	MDRV_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
@@ -1725,20 +1690,15 @@ static MACHINE_DRIVER_START( pc1512 )
 	MDRV_MACHINE_START(pc)
 	MDRV_MACHINE_RESET(pc)
 
-	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
-	MDRV_DEVICE_CONFIG( ibm5150_pit8253_config )
+	MDRV_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
 
-	MDRV_DEVICE_ADD( "dma8237", DMA8237 )
-	MDRV_DEVICE_CONFIG( ibm5150_dma8237_config )
+	MDRV_DMA8237_ADD( "dma8237", ibm5150_dma8237_config )
 
-	MDRV_DEVICE_ADD( "pic8259_master", PIC8259 )
-	MDRV_DEVICE_CONFIG( ibm5150_pic8259_master_config )
+	MDRV_PIC8259_ADD( "pic8259_master", ibm5150_pic8259_master_config )
 
-	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
-	MDRV_DEVICE_CONFIG( ibm5150_pic8259_slave_config )
+	MDRV_PIC8259_ADD( "pic8259_slave", ibm5150_pic8259_slave_config )
 
-	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( ibm5150_ppi8255_interface )
+	MDRV_PPI8255_ADD( "ppi8255", ibm5150_ppi8255_interface )
 
 	MDRV_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
 	MDRV_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
@@ -1772,20 +1732,15 @@ static MACHINE_DRIVER_START( pc1640 )
 	MDRV_MACHINE_START(pc)
 	MDRV_MACHINE_RESET(pc)
 
-	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
-	MDRV_DEVICE_CONFIG( ibm5150_pit8253_config )
+	MDRV_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
 
-	MDRV_DEVICE_ADD( "dma8237", DMA8237 )
-	MDRV_DEVICE_CONFIG( ibm5150_dma8237_config )
+	MDRV_DMA8237_ADD( "dma8237", ibm5150_dma8237_config )
 
-	MDRV_DEVICE_ADD( "pic8259_master", PIC8259 )
-	MDRV_DEVICE_CONFIG( ibm5150_pic8259_master_config )
+	MDRV_PIC8259_ADD( "pic8259_master", ibm5150_pic8259_master_config )
 
-	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
-	MDRV_DEVICE_CONFIG( ibm5150_pic8259_slave_config )
+	MDRV_PIC8259_ADD( "pic8259_slave", ibm5150_pic8259_slave_config )
 
-	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( ibm5150_ppi8255_interface )
+	MDRV_PPI8255_ADD( "ppi8255", ibm5150_ppi8255_interface )
 
 	MDRV_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
 	MDRV_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
@@ -1822,20 +1777,15 @@ static MACHINE_DRIVER_START( xtvga )
 	MDRV_MACHINE_START(pc)
 	MDRV_MACHINE_RESET(pc)
 
-	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
-	MDRV_DEVICE_CONFIG( ibm5150_pit8253_config )
+	MDRV_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
 
-	MDRV_DEVICE_ADD( "dma8237", DMA8237 )
-	MDRV_DEVICE_CONFIG( ibm5150_dma8237_config )
+	MDRV_DMA8237_ADD( "dma8237", ibm5150_dma8237_config )
 
-	MDRV_DEVICE_ADD( "pic8259_master", PIC8259 )
-	MDRV_DEVICE_CONFIG( ibm5150_pic8259_master_config )
+	MDRV_PIC8259_ADD( "pic8259_master", ibm5150_pic8259_master_config )
 
-	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
-	MDRV_DEVICE_CONFIG( ibm5150_pic8259_slave_config )
+	MDRV_PIC8259_ADD( "pic8259_slave", ibm5150_pic8259_slave_config )
 
-	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( ibm5150_ppi8255_interface )
+	MDRV_PPI8255_ADD( "ppi8255", ibm5150_ppi8255_interface )
 
 	MDRV_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
 	MDRV_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
@@ -1876,20 +1826,15 @@ static MACHINE_DRIVER_START( t1000hx )
 	MDRV_MACHINE_START(pc)
 	MDRV_MACHINE_RESET(pc)
 
-	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
-	MDRV_DEVICE_CONFIG( ibm5150_pit8253_config )
+	MDRV_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
 
-	MDRV_DEVICE_ADD( "dma8237", DMA8237 )
-	MDRV_DEVICE_CONFIG( ibm5150_dma8237_config )
+	MDRV_DMA8237_ADD( "dma8237", ibm5150_dma8237_config )
 
-	MDRV_DEVICE_ADD( "pic8259_master", PIC8259 )
-	MDRV_DEVICE_CONFIG( ibm5150_pic8259_master_config )
+	MDRV_PIC8259_ADD( "pic8259_master", ibm5150_pic8259_master_config )
 
-	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
-	MDRV_DEVICE_CONFIG( ibm5150_pic8259_slave_config )
+	MDRV_PIC8259_ADD( "pic8259_slave", ibm5150_pic8259_slave_config )
 
-	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( ibm5150_ppi8255_interface )
+	MDRV_PPI8255_ADD( "ppi8255", ibm5150_ppi8255_interface )
 
 	MDRV_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
 	MDRV_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
@@ -1923,20 +1868,15 @@ static MACHINE_DRIVER_START( ibmpcjr )
 	MDRV_MACHINE_START(pc)
 	MDRV_MACHINE_RESET(pcjr)
 
-	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
-	MDRV_DEVICE_CONFIG( pcjr_pit8253_config )
+	MDRV_PIT8253_ADD( "pit8253", pcjr_pit8253_config )
 
-	MDRV_DEVICE_ADD( "dma8237", DMA8237 )
-	MDRV_DEVICE_CONFIG( ibm5150_dma8237_config )
+	MDRV_DMA8237_ADD( "dma8237", ibm5150_dma8237_config )
 
-	MDRV_DEVICE_ADD( "pic8259_master", PIC8259 )
-	MDRV_DEVICE_CONFIG( pcjr_pic8259_master_config )
+	MDRV_PIC8259_ADD( "pic8259_master", pcjr_pic8259_master_config )
 
-	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
-	MDRV_DEVICE_CONFIG( ibm5150_pic8259_slave_config )
+	MDRV_PIC8259_ADD( "pic8259_slave", ibm5150_pic8259_slave_config )
 
-	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( pcjr_ppi8255_interface )
+	MDRV_PPI8255_ADD( "ppi8255", pcjr_ppi8255_interface )
 
 	MDRV_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
 	MDRV_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */

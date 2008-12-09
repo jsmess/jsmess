@@ -533,11 +533,9 @@ static MACHINE_DRIVER_START( pc88srl )
 
 	MDRV_MACHINE_RESET( pc88srl )
 
-	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
-	MDRV_DEVICE_CONFIG( pc8801_8255_config_0 )
+	MDRV_PPI8255_ADD( "ppi8255_0", pc8801_8255_config_0 )
 
-	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
-	MDRV_DEVICE_CONFIG( pc8801_8255_config_1 )
+	MDRV_PPI8255_ADD( "ppi8255_1", pc8801_8255_config_1 )
 
     /* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

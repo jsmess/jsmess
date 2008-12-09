@@ -549,8 +549,7 @@ static MACHINE_DRIVER_START( pmd85 )
 
 	MDRV_MACHINE_RESET( pmd85 )
 
-	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
-	MDRV_DEVICE_CONFIG( pmd85_pit8253_interface )
+	MDRV_PIT8253_ADD( "pit8253", pmd85_pit8253_interface )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -580,17 +579,13 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( pmd851 )
 	MDRV_IMPORT_FROM( pmd85 )
 
-	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
-	MDRV_DEVICE_CONFIG( pmd85_ppi8255_interface[0] )
+	MDRV_PPI8255_ADD( "ppi8255_0", pmd85_ppi8255_interface[0] )
 
-	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
-	MDRV_DEVICE_CONFIG( pmd85_ppi8255_interface[1] )
+	MDRV_PPI8255_ADD( "ppi8255_1", pmd85_ppi8255_interface[1] )
 
-	MDRV_DEVICE_ADD( "ppi8255_2", PPI8255 )
-	MDRV_DEVICE_CONFIG( pmd85_ppi8255_interface[2] )
+	MDRV_PPI8255_ADD( "ppi8255_2", pmd85_ppi8255_interface[2] )
 
-	MDRV_DEVICE_ADD( "ppi8255_3", PPI8255 )
-	MDRV_DEVICE_CONFIG( pmd85_ppi8255_interface[3] )
+	MDRV_PPI8255_ADD( "ppi8255_3", pmd85_ppi8255_interface[3] )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pmd852a )
@@ -610,14 +605,11 @@ static MACHINE_DRIVER_START( alfa )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(alfa_mem, 0)
 
-	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
-	MDRV_DEVICE_CONFIG( alfa_ppi8255_interface[0] )
+	MDRV_PPI8255_ADD( "ppi8255_0", alfa_ppi8255_interface[0] )
 
-	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
-	MDRV_DEVICE_CONFIG( alfa_ppi8255_interface[1] )
+	MDRV_PPI8255_ADD( "ppi8255_1", alfa_ppi8255_interface[1] )
 
-	MDRV_DEVICE_ADD( "ppi8255_2", PPI8255 )
-	MDRV_DEVICE_CONFIG( alfa_ppi8255_interface[1] )
+	MDRV_PPI8255_ADD( "ppi8255_2", alfa_ppi8255_interface[1] )
 
 MACHINE_DRIVER_END
 
@@ -627,8 +619,7 @@ static MACHINE_DRIVER_START( mato )
 	MDRV_CPU_PROGRAM_MAP(mato_mem, 0)
 	MDRV_CPU_IO_MAP(mato_io_map, 0)
 
-	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
-	MDRV_DEVICE_CONFIG( mato_ppi8255_interface )
+	MDRV_PPI8255_ADD( "ppi8255_0", mato_ppi8255_interface )
 
 	/* no uart */
 	MDRV_DEVICE_REMOVE( "uart", MSM8251 )

@@ -430,11 +430,9 @@ static MACHINE_DRIVER_START( lviv )
 
 	MDRV_MACHINE_RESET( lviv )
 
-	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
-	MDRV_DEVICE_CONFIG( lviv_ppi8255_interface_0 )
+	MDRV_PPI8255_ADD( "ppi8255_0", lviv_ppi8255_interface_0 )
 
-	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
-	MDRV_DEVICE_CONFIG( lviv_ppi8255_interface_1 )
+	MDRV_PPI8255_ADD( "ppi8255_1", lviv_ppi8255_interface_1 )
 
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)

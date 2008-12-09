@@ -168,11 +168,9 @@ static MACHINE_DRIVER_START( mz80k )
 
 	MDRV_MACHINE_RESET( mz80k )
 
-	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( mz80k_8255_int )
+	MDRV_PPI8255_ADD( "ppi8255", mz80k_8255_int )
 
-	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
-	MDRV_DEVICE_CONFIG( mz80k_pit8253_config )
+	MDRV_PIT8253_ADD( "pit8253", mz80k_pit8253_config )
 
     /* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

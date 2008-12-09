@@ -142,8 +142,7 @@ static MACHINE_DRIVER_START( partner )
     MDRV_MACHINE_START( partner )
     MDRV_MACHINE_RESET( partner )
 
-	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
-	MDRV_DEVICE_CONFIG( radio86_ppi8255_interface_1 )
+	MDRV_PPI8255_ADD( "ppi8255_1", radio86_ppi8255_interface_1 )
 
 	MDRV_DEVICE_ADD( "i8275", I8275 )
 	MDRV_DEVICE_CONFIG(partner_i8275_interface)

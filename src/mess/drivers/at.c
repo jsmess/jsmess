@@ -421,20 +421,15 @@ static MACHINE_DRIVER_START( ibm5170 )
 
 	MDRV_INTERLEAVE(1)
 
-	MDRV_DEVICE_ADD( "pit8254", PIT8254 )
-	MDRV_DEVICE_CONFIG( at_pit8254_config )
+	MDRV_PIT8254_ADD( "pit8254", at_pit8254_config )
 
-	MDRV_DEVICE_ADD( "dma8237_1", DMA8237 )
-	MDRV_DEVICE_CONFIG( at_dma8237_1_config )
+	MDRV_DMA8237_ADD( "dma8237_1", at_dma8237_1_config )
 
-	MDRV_DEVICE_ADD( "dma8237_2", DMA8237 )
-	MDRV_DEVICE_CONFIG( at_dma8237_2_config )
+	MDRV_DMA8237_ADD( "dma8237_2", at_dma8237_2_config )
 
-	MDRV_DEVICE_ADD( "pic8259_master", PIC8259 )
-	MDRV_DEVICE_CONFIG( at_pic8259_master_config )
+	MDRV_PIC8259_ADD( "pic8259_master", at_pic8259_master_config )
 
-	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
-	MDRV_DEVICE_CONFIG( at_pic8259_slave_config )
+	MDRV_PIC8259_ADD( "pic8259_slave", at_pic8259_slave_config )
 
 	MDRV_NS16450_ADD( "ns16450_0", ibm5170_com_interface[0] )			/* TODO: verify model */
 	MDRV_NS16450_ADD( "ns16450_1", ibm5170_com_interface[1] )			/* TODO: verify model */
@@ -489,20 +484,15 @@ static MACHINE_DRIVER_START( ibm5162 )
 
 	MDRV_INTERLEAVE(1)
 
-	MDRV_DEVICE_ADD( "pit8254", PIT8254 )
-	MDRV_DEVICE_CONFIG( at_pit8254_config )
+	MDRV_PIT8254_ADD( "pit8254", at_pit8254_config )
 
-	MDRV_DEVICE_ADD( "dma8237_1", DMA8237 )
-	MDRV_DEVICE_CONFIG( at_dma8237_1_config )
+	MDRV_DMA8237_ADD( "dma8237_1", at_dma8237_1_config )
 
-	MDRV_DEVICE_ADD( "dma8237_2", DMA8237 )
-	MDRV_DEVICE_CONFIG( at_dma8237_2_config )
+	MDRV_DMA8237_ADD( "dma8237_2", at_dma8237_2_config )
 
-	MDRV_DEVICE_ADD( "pic8259_master", PIC8259 )
-	MDRV_DEVICE_CONFIG( at_pic8259_master_config )
+	MDRV_PIC8259_ADD( "pic8259_master", at_pic8259_master_config )
 
-	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
-	MDRV_DEVICE_CONFIG( at_pic8259_slave_config )
+	MDRV_PIC8259_ADD( "pic8259_slave", at_pic8259_slave_config )
 
 	MDRV_NS16450_ADD( "ns16450_0", ibm5170_com_interface[0] )			/* TODO: verify model */
 	MDRV_NS16450_ADD( "ns16450_1", ibm5170_com_interface[1] )			/* TODO: verify model */
@@ -539,20 +529,15 @@ static MACHINE_DRIVER_START( ps2m30286 )
 	/* basic machine hardware */
 	MDRV_CPU_ATPC(at16, at16, I80286, 12000000)
 
-	MDRV_DEVICE_ADD( "pit8254", PIT8254 )
-	MDRV_DEVICE_CONFIG( at_pit8254_config )
+	MDRV_PIT8254_ADD( "pit8254", at_pit8254_config )
 
-	MDRV_DEVICE_ADD( "dma8237_1", DMA8237 )
-	MDRV_DEVICE_CONFIG( at_dma8237_1_config )
+	MDRV_DMA8237_ADD( "dma8237_1", at_dma8237_1_config )
 
-	MDRV_DEVICE_ADD( "dma8237_2", DMA8237 )
-	MDRV_DEVICE_CONFIG( at_dma8237_2_config )
+	MDRV_DMA8237_ADD( "dma8237_2", at_dma8237_2_config )
 
-	MDRV_DEVICE_ADD( "pic8259_master", PIC8259 )
-	MDRV_DEVICE_CONFIG( at_pic8259_master_config )
+	MDRV_PIC8259_ADD( "pic8259_master", at_pic8259_master_config )
 
-	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
-	MDRV_DEVICE_CONFIG( at_pic8259_slave_config )
+	MDRV_PIC8259_ADD( "pic8259_slave", at_pic8259_slave_config )
 
 	MDRV_NS16450_ADD( "ns16450_0", ibm5170_com_interface[0] )			/* TODO: verify model */
 	MDRV_NS16450_ADD( "ns16450_1", ibm5170_com_interface[1] )			/* TODO: verify model */
@@ -604,20 +589,15 @@ static MACHINE_DRIVER_START( atvga )
 	/* basic machine hardware */
 	MDRV_CPU_ATPC(at16, at16, I80286, 12000000)
 
-	MDRV_DEVICE_ADD( "pit8254", PIT8254 )
-	MDRV_DEVICE_CONFIG( at_pit8254_config )
+	MDRV_PIT8254_ADD( "pit8254", at_pit8254_config )
 
-	MDRV_DEVICE_ADD( "dma8237_1", DMA8237 )
-	MDRV_DEVICE_CONFIG( at_dma8237_1_config )
+	MDRV_DMA8237_ADD( "dma8237_1", at_dma8237_1_config )
 
-	MDRV_DEVICE_ADD( "dma8237_2", DMA8237 )
-	MDRV_DEVICE_CONFIG( at_dma8237_2_config )
+	MDRV_DMA8237_ADD( "dma8237_2", at_dma8237_2_config )
 
-	MDRV_DEVICE_ADD( "pic8259_master", PIC8259 )
-	MDRV_DEVICE_CONFIG( at_pic8259_master_config )
+	MDRV_PIC8259_ADD( "pic8259_master", at_pic8259_master_config )
 
-	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
-	MDRV_DEVICE_CONFIG( at_pic8259_slave_config )
+	MDRV_PIC8259_ADD( "pic8259_slave", at_pic8259_slave_config )
 
 	MDRV_NS16450_ADD( "ns16450_0", ibm5170_com_interface[0] )			/* TODO: verify model */
 	MDRV_NS16450_ADD( "ns16450_1", ibm5170_com_interface[1] )			/* TODO: verify model */
@@ -675,20 +655,15 @@ static MACHINE_DRIVER_START( at386 )
 	MDRV_MACHINE_START( at )
 	MDRV_MACHINE_RESET( at )
 
-	MDRV_DEVICE_ADD( "pit8254", PIT8254 )
-	MDRV_DEVICE_CONFIG( at_pit8254_config )
+	MDRV_PIT8254_ADD( "pit8254", at_pit8254_config )
 
-	MDRV_DEVICE_ADD( "dma8237_1", DMA8237 )
-	MDRV_DEVICE_CONFIG( at_dma8237_1_config )
+	MDRV_DMA8237_ADD( "dma8237_1", at_dma8237_1_config )
 
-	MDRV_DEVICE_ADD( "dma8237_2", DMA8237 )
-	MDRV_DEVICE_CONFIG( at_dma8237_2_config )
+	MDRV_DMA8237_ADD( "dma8237_2", at_dma8237_2_config )
 
-	MDRV_DEVICE_ADD( "pic8259_master", PIC8259 )
-	MDRV_DEVICE_CONFIG( at_pic8259_master_config )
+	MDRV_PIC8259_ADD( "pic8259_master", at_pic8259_master_config )
 
-	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
-	MDRV_DEVICE_CONFIG( at_pic8259_slave_config )
+	MDRV_PIC8259_ADD( "pic8259_slave", at_pic8259_slave_config )
 
 	MDRV_NS16450_ADD( "ns16450_0", ibm5170_com_interface[0] )			/* TODO: verify model */
 	MDRV_NS16450_ADD( "ns16450_1", ibm5170_com_interface[1] )			/* TODO: verify model */

@@ -128,11 +128,9 @@ static MACHINE_DRIVER_START( apogee )
     MDRV_CPU_PROGRAM_MAP(apogee_mem, 0)
     MDRV_MACHINE_RESET( radio86 )
 
-	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
-	MDRV_DEVICE_CONFIG( radio86_ppi8255_interface_1 )
+	MDRV_PPI8255_ADD( "ppi8255_1", radio86_ppi8255_interface_1 )
 
-	//MDRV_DEVICE_ADD( "ppi8255_2", PPI8255 )
-	//MDRV_DEVICE_CONFIG( apogee_ppi8255_interface_2 )
+	//MDRV_PPI8255_ADD( "ppi8255_2", apogee_ppi8255_interface_2 )
 
 	MDRV_DEVICE_ADD( "i8275", I8275 )
 	MDRV_DEVICE_CONFIG(apogee_i8275_interface)

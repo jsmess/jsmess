@@ -235,20 +235,15 @@ static MACHINE_DRIVER_START( compis )
 
 	MDRV_MACHINE_RESET(compis)
 
-	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
-	MDRV_DEVICE_CONFIG( compis_pit8253_config )
+	MDRV_PIT8253_ADD( "pit8253", compis_pit8253_config )
 
-	MDRV_DEVICE_ADD( "pit8254", PIT8254 )
-	MDRV_DEVICE_CONFIG( compis_pit8254_config )
+	MDRV_PIT8254_ADD( "pit8254", compis_pit8254_config )
 
-	MDRV_DEVICE_ADD( "pic8259_master", PIC8259 )
-	MDRV_DEVICE_CONFIG( compis_pic8259_master_config )
+	MDRV_PIC8259_ADD( "pic8259_master", compis_pic8259_master_config )
 
-	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
-	MDRV_DEVICE_CONFIG( compis_pic8259_slave_config )
+	MDRV_PIC8259_ADD( "pic8259_slave", compis_pic8259_slave_config )
 
-	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG ( compis_ppi_interface )
+	MDRV_PPI8255_ADD( "ppi8255", compis_ppi_interface )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

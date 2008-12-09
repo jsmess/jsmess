@@ -278,8 +278,7 @@ static MACHINE_DRIVER_START( svi318 )
 	MDRV_MACHINE_START( svi318_pal )
 	MDRV_MACHINE_RESET( svi318 )
 
-	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( svi318_ppi8255_interface )
+	MDRV_PPI8255_ADD( "ppi8255", svi318_ppi8255_interface )
 
 	MDRV_INS8250_ADD( "ins8250_0", svi318_ins8250_interface[0] )
 	MDRV_INS8250_ADD( "ins8250_1", svi318_ins8250_interface[1] )
@@ -340,8 +339,7 @@ static MACHINE_DRIVER_START( svi328_806 )
 	MDRV_MACHINE_START( svi318_pal )
 	MDRV_MACHINE_RESET( svi328_806 )
 
-	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( svi318_ppi8255_interface )
+	MDRV_PPI8255_ADD( "ppi8255", svi318_ppi8255_interface )
 
 	MDRV_INS8250_ADD( "ins8250_0", svi318_ins8250_interface[0] )
 	MDRV_INS8250_ADD( "ins8250_1", svi318_ins8250_interface[1] )

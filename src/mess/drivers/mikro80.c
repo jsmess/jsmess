@@ -142,8 +142,7 @@ static MACHINE_DRIVER_START( mikro80 )
     MDRV_CPU_IO_MAP(mikro80_io, 0)
     MDRV_MACHINE_RESET( mikro80 )
 
-	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( mikro80_ppi8255_interface )
+	MDRV_PPI8255_ADD( "ppi8255", mikro80_ppi8255_interface )
 
     /* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

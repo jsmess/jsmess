@@ -634,8 +634,7 @@ static MACHINE_DRIVER_START( sord_m5 )
 	MDRV_MACHINE_START( sord_m5 )
 	MDRV_MACHINE_RESET( sord_m5 )
 
-	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( sord_ppi8255_interface )
+	MDRV_PPI8255_ADD( "ppi8255", sord_ppi8255_interface )
 
 	MDRV_Z80CTC_ADD( "z80ctc", sord_m5_ctc_intf )
 

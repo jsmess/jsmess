@@ -163,11 +163,9 @@ static MACHINE_DRIVER_START( vector06 )
 	MDRV_MACHINE_START( vector06 )
   	MDRV_MACHINE_RESET( vector06 )
 
-	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( vector06_ppi8255_interface )
+	MDRV_PPI8255_ADD( "ppi8255", vector06_ppi8255_interface )
 
-	MDRV_DEVICE_ADD( "ppi8255_2", PPI8255 )
-	MDRV_DEVICE_CONFIG( vector06_ppi8255_2_interface )
+	MDRV_PPI8255_ADD( "ppi8255_2", vector06_ppi8255_2_interface )
 
     /* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

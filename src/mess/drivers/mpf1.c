@@ -457,8 +457,7 @@ static MACHINE_DRIVER_START( mpf1 )
 
 	MDRV_Z80PIO_ADD( "z80pio", pio_intf )
 
-	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( ppi8255_intf )
+	MDRV_PPI8255_ADD( "ppi8255", ppi8255_intf )
 
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")

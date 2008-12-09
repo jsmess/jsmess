@@ -90,20 +90,15 @@ static MACHINE_DRIVER_START( bebox )
 
 	MDRV_INTERLEAVE(1)
 
-	MDRV_DEVICE_ADD( "pit8254", PIT8254 )
-	MDRV_DEVICE_CONFIG( bebox_pit8254_config )
+	MDRV_PIT8254_ADD( "pit8254", bebox_pit8254_config )
 
-	MDRV_DEVICE_ADD( "dma8237_1", DMA8237 )
-	MDRV_DEVICE_CONFIG( bebox_dma8237_1_config )
+	MDRV_DMA8237_ADD( "dma8237_1", bebox_dma8237_1_config )
 
-	MDRV_DEVICE_ADD( "dma8237_2", DMA8237 )
-	MDRV_DEVICE_CONFIG( bebox_dma8237_2_config )
+	MDRV_DMA8237_ADD( "dma8237_2", bebox_dma8237_2_config )
 
-	MDRV_DEVICE_ADD( "pic8259_master", PIC8259 )
-	MDRV_DEVICE_CONFIG( bebox_pic8259_master_config )
+	MDRV_PIC8259_ADD( "pic8259_master", bebox_pic8259_master_config )
 
-	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
-	MDRV_DEVICE_CONFIG( bebox_pic8259_slave_config )
+	MDRV_PIC8259_ADD( "pic8259_slave", bebox_pic8259_slave_config )
 
 	MDRV_DEVICE_ADD( "ns16550_0", NS16550 )			/* TODO: Verify model */
 	MDRV_DEVICE_CONFIG( bebox_uart_inteface[0] )

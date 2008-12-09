@@ -1037,8 +1037,7 @@ static MACHINE_DRIVER_START( msx )
 	MDRV_MACHINE_START( msx )
 	MDRV_MACHINE_RESET( msx )
 
-	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( msx_ppi8255_interface )
+	MDRV_PPI8255_ADD( "ppi8255", msx_ppi8255_interface )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(tms9928a)
@@ -1093,8 +1092,7 @@ static MACHINE_DRIVER_START( msx2 )
 	MDRV_MACHINE_START( msx2 )
 	MDRV_MACHINE_RESET( msx2 )
 
-	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( msx_ppi8255_interface )
+	MDRV_PPI8255_ADD( "ppi8255", msx_ppi8255_interface )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
