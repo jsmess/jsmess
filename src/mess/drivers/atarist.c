@@ -1779,7 +1779,7 @@ static MACHINE_DRIVER_START( atarist )
 	// device hardware
 	MDRV_DEVICE_ADD(MC68901_TAG, MC68901)
 	MDRV_DEVICE_CONFIG(mfp_intf)
-	MDRV_DEVICE_ADD("scc", SCC8530)
+	MDRV_SCC8530_ADD("scc", atarist_scc8530_interface)
 
 	// video hardware
 	MDRV_SCREEN_ADD("main", RASTER)
