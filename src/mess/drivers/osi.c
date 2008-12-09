@@ -1,9 +1,11 @@
 /*
 
-Ohio Scientific Model 600 Rev C/D
+Ohio Scientific Superboard II Model 600
 
 PCB Layout
 ----------
+
+OHIO SCIENTIFIC MODEL 600 REV D
 
 |-------------------------------------------------------------------------------------------|
 |					2114	2114															|
@@ -112,9 +114,56 @@ Notes:
 
 /*
 
+Ohio Scientific Single Sided Floppy Interface
+
+PCB Layout
+----------
+
+OSI 470 REV B
+
+|-------------------------------------------------------------------|
+|																	|
+|												8T26	8T26		|
+|																	|
+|		7417														|
+|																	|
+|						6820				6850		7400  U2C	|
+|		7417														|
+|																	|
+|																	|
+|		7417												7404	|
+|																	|
+|																	|
+|		7417														|
+|																	|
+|					7400	7404	74123	74123	7410			|
+|	4MHz															|
+|																	|
+|																	|
+|	7400	7493	74390	74390	74390	7404	7430	7404	|
+|																	|
+|																	|
+|					U6A												|
+|																	|
+|-------------------------------------------------------------------|
+
+Notes:
+    All IC's shown.
+
+	6850	- Asynchronous Communications Interface Adapter
+	6820	- Peripheral Interface Adapter
+	8T26	- 4-Bit Bidirectional Bus Transceiver
+	U2C		- PROTO?
+	U6A		- PROTO?
+
+*/
+
+/*
+
 	TODO:
 
 	- fix uk101 video to 64x16
+	- floppy PIA is actually a 6820
 	- break key
 	- power on reset
 	- Superboard II revisions A/C/D
@@ -306,8 +355,16 @@ static WRITE8_HANDLER( osi630_sound_w )
 	C011 ACIAIO			DISK CONTROLLER ACIA I/O PORT
 */
 
+static void osi470_index_callback(const device_config *img, int state)
+{
+	osi_state *driver_state = img->machine->driver_data;
+
+	driver_state->fdc_index = state;
+}
+
 static READ8_HANDLER( osi470_pia_a_r )
 {
+
 	/*
 
 		bit		description
@@ -323,7 +380,9 @@ static READ8_HANDLER( osi470_pia_a_r )
 
 	*/
 
-	return 0x00;
+	osi_state *state = space->machine->driver_data;
+
+	return (state->fdc_index << 7);
 }
 
 static WRITE8_HANDLER( osi470_pia_a_w )
@@ -362,6 +421,10 @@ static WRITE8_HANDLER( osi470_pia_b_w )
 	*/
 }
 
+static WRITE8_HANDLER( osi470_pia_cb2_w )
+{
+}
+
 static const pia6821_interface osi470_pia_intf =
 {
 	osi470_pia_a_r,
@@ -373,7 +436,7 @@ static const pia6821_interface osi470_pia_intf =
 	osi470_pia_a_w,
 	osi470_pia_b_w,
 	NULL, // write8_machine_func out_ca2_func,
-	NULL, // write8_machine_func out_cb2_func,
+	osi470_pia_cb2_w,
 	NULL, // void (*irq_a_func)(int state),
 	NULL, // void (*irq_b_func)(int state),
 };
@@ -418,7 +481,7 @@ static ADDRESS_MAP_START( c1p_mem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( c1pmf_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x4fff) AM_RAM
+	AM_RANGE(0x0000, 0x4fff) AM_RAMBANK(1)
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc003) AM_READWRITE(pia_0_r, pia_0_w) // FDC
 	AM_RANGE(0xc010, 0xc010) AM_DEVREADWRITE(ACIA6850, "acia_1", acia6850_stat_r, acia6850_ctrl_w)
@@ -561,8 +624,8 @@ static const acia6850_interface uk101_acia_intf =
 
 static const acia6850_interface osi470_acia_intf =
 {
-	500000, //
-	500000, //
+	0,				// clocked in from the floppy drive
+	XTAL_4MHz/8,	// 250 kHz
 	&fdc_rx,
 	&fdc_tx,
 	NULL,
@@ -640,7 +703,11 @@ static MACHINE_START( c1pmf )
 {
 	MACHINE_START_CALL(c1p);
 
+	/* configure floppy PIA */
 	pia_config(0, &osi470_pia_intf);
+
+	/* set floppy index hole callback */
+	floppy_drive_set_index_pulse_callback(image_from_devtype_and_index(IO_FLOPPY, 0), osi470_index_callback);
 }
 
 /* Machine Drivers */
@@ -698,7 +765,7 @@ static MACHINE_DRIVER_START( c1p )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M6502, X1/4) // .98304 MHz
-	MDRV_CPU_PROGRAM_MAP(osi600_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(c1p_mem, 0)
 
 	MDRV_MACHINE_START(c1p)
 
@@ -724,6 +791,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( c1pmf )
 	MDRV_IMPORT_FROM(c1p)
+
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_PROGRAM_MAP(c1pmf_mem, 0)
 
 	MDRV_MACHINE_START(c1pmf)
 
