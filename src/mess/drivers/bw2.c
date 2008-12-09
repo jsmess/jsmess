@@ -28,6 +28,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "includes/bw2.h"
 #include "cpu/z80/z80.h"
 #include "includes/serial.h"
 #include "machine/8255ppi.h"
@@ -39,30 +40,6 @@
 #include "devices/printer.h"
 #include "video/msm6255.h"
 #include "bw2.lh"
-
-#define SCREEN_TAG	"main"
-#define Z80_TAG		"ic1"
-#define PPI8255_TAG	"ic4"
-#define WD2797_TAG	"ic5"
-#define PIT8253_TAG	"ic6"
-#define MSM8251_TAG	"ic7"
-#define MSM6255_TAG	"ic49"
-
-enum {
-	BANK_RAM1 = 0,
-	BANK_VRAM,
-	BANK_RAM2, BANK_RAMCARD_ROM = BANK_RAM2,
-	BANK_RAM3,
-	BANK_RAM4,
-	BANK_RAM5, BANK_RAMCARD_RAM = BANK_RAM5,
-	BANK_RAM6,
-	BANK_ROM
-};
-
-static UINT8 *ramcard_ram;
-static UINT8 keyboard_row;
-static UINT8 bank;
-static int selected_drive;
 
 static const device_config *get_floppy_image(int drive)
 {
@@ -91,9 +68,11 @@ static void bw2_set_banks(running_machine *machine, UINT8 data)
 
 	*/
 
+	bw2_state *state = machine->driver_data;
+
 	int max_ram_bank = 0;
 
-	bank = data & 0x07;
+	state->bank = data & 0x07;
 
 	switch (mess_ram_size)
 	{
@@ -122,7 +101,7 @@ static void bw2_set_banks(running_machine *machine, UINT8 data)
 		break;
 	}
 
-	switch(bank)
+	switch (state->bank)
 	{
 	case BANK_RAM1:
 		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x7fff, 0, 0, SMH_BANK1, SMH_BANK1);
@@ -137,7 +116,7 @@ static void bw2_set_banks(running_machine *machine, UINT8 data)
 	case BANK_RAM4:
 	case BANK_RAM5:
 	case BANK_RAM6:
-		if (bank > max_ram_bank)
+		if (state->bank > max_ram_bank)
 		{
 			memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x7fff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		}
@@ -152,7 +131,7 @@ static void bw2_set_banks(running_machine *machine, UINT8 data)
 		break;
 	}
 
-	memory_set_bank(machine, 1, bank);
+	memory_set_bank(machine, 1, state->bank);
 }
 
 static void ramcard_set_banks(running_machine *machine, UINT8 data)
@@ -170,9 +149,11 @@ static void ramcard_set_banks(running_machine *machine, UINT8 data)
 
 	*/
 
+	bw2_state *state = machine->driver_data;
+
 	int max_ram_bank = BANK_RAM1;
 
-	bank = data & 0x07;
+	state->bank = data & 0x07;
 
 	switch (mess_ram_size)
 	{
@@ -195,7 +176,7 @@ static void ramcard_set_banks(running_machine *machine, UINT8 data)
 		break;
 	}
 
-	switch (bank)
+	switch (state->bank)
 	{
 	case BANK_RAM1:
 	case BANK_RAMCARD_RAM:
@@ -209,7 +190,7 @@ static void ramcard_set_banks(running_machine *machine, UINT8 data)
 	case BANK_RAM3:
 	case BANK_RAM4:
 	case BANK_RAM6:
-		if (bank > max_ram_bank)
+		if (state->bank > max_ram_bank)
 		{
 			memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x7fff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		}
@@ -228,11 +209,13 @@ static void ramcard_set_banks(running_machine *machine, UINT8 data)
 		break;
 	}
 
-	memory_set_bank(machine, 1, bank);
+	memory_set_bank(machine, 1, state->bank);
 }
 
 static WRITE8_HANDLER( ramcard_bank_w )
 {
+	bw2_state *state = space->machine->driver_data;
+
 	UINT8 ramcard_bank = data & 0x0f;
 	UINT32 bank_offset = ramcard_bank * 0x8000;
 
@@ -245,15 +228,15 @@ static WRITE8_HANDLER( ramcard_bank_w )
 		memory_install_readwrite8_handler(cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x7fff, 0, 0, SMH_BANK1, SMH_BANK1);
 	}
 
-	memory_configure_bank(space->machine, 1, BANK_RAMCARD_RAM, 1, ramcard_ram + bank_offset, 0);
-	memory_set_bank(space->machine, 1, bank);
+	memory_configure_bank(space->machine, 1, BANK_RAMCARD_RAM, 1, state->ramcard_ram + bank_offset, 0);
+	memory_set_bank(space->machine, 1, state->bank);
 }
 
 /* Serial */
 
 static DEVICE_IMAGE_LOAD( bw2_serial )
 {
-	const device_config *uart = device_list_find_by_tag(image->machine->config->devicelist, MSM8251, "uart");
+	bw2_state *state = image->machine->driver_data;
 
 	/* filename specified */
 	if (device_load_serial_device(image) == INIT_PASS)
@@ -262,7 +245,7 @@ static DEVICE_IMAGE_LOAD( bw2_serial )
 		serial_device_setup(image, 9600 >> input_port_read(image->machine, "BAUD"), 8, 1, SERIAL_PARITY_NONE);
 
 		/* connect serial chip to serial device */
-		msm8251_connect_to_serial_device(uart, image);
+		msm8251_connect_to_serial_device(state->msm8251, image);
 
 		serial_device_set_protocol(image, SERIAL_PROTOCOL_NONE);
 
@@ -277,8 +260,6 @@ static DEVICE_IMAGE_LOAD( bw2_serial )
 
 
 /* Floppy */
-
-static int bw2_mtron, bw2_mfdbk;
 
 static DEVICE_IMAGE_LOAD( bw2_floppy )
 {
@@ -308,21 +289,21 @@ static void bw2_wd17xx_callback(running_machine *machine, wd17xx_state_t state, 
 	switch(state)
 	{
 		case WD17XX_IRQ_CLR:
-			cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ0, CLEAR_LINE);
+			cputag_set_input_line(machine, Z80_TAG, INPUT_LINE_IRQ0, CLEAR_LINE);
 			break;
 
 		case WD17XX_IRQ_SET:
-			cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ0, HOLD_LINE);
+			cputag_set_input_line(machine, Z80_TAG, INPUT_LINE_IRQ0, HOLD_LINE);
 			break;
 
 		case WD17XX_DRQ_CLR:
-			cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
+			cputag_set_input_line(machine, Z80_TAG, INPUT_LINE_NMI, CLEAR_LINE);
 			break;
 
 		case WD17XX_DRQ_SET:
 			if (cpu_get_reg(machine->cpu[0], Z80_HALT))
 			{
-				cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, HOLD_LINE);
+				cputag_set_input_line(machine, Z80_TAG, INPUT_LINE_NMI, HOLD_LINE);
 			}
 			break;
 	}
@@ -403,18 +384,20 @@ static WRITE8_DEVICE_HANDLER( bw2_ppi8255_a_w )
 
 	*/
 
-	keyboard_row = data & 0x0f;
+	bw2_state *state = device->machine->driver_data;
+
+	state->keyboard_row = data & 0x0f;
 
 	if (BIT(data, 4))
 	{
-		selected_drive = 0;
-		wd17xx_set_drive(selected_drive);
+		state->selected_drive = 0;
+		wd17xx_set_drive(state->selected_drive);
 	}
 
 	if (BIT(data, 5))
 	{
-		selected_drive = 1;
-		wd17xx_set_drive(selected_drive);
+		state->selected_drive = 1;
+		wd17xx_set_drive(state->selected_drive);
 	}
 
 	/* assumption: select is tied low */
@@ -437,10 +420,12 @@ static READ8_DEVICE_HANDLER( bw2_ppi8255_b_r )
 
 	*/
 
+	bw2_state *state = device->machine->driver_data;
+
 	UINT8 row;
 	static const char *const rownames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8", "ROW9" };
 
-	row = keyboard_row;
+	row = state->keyboard_row;
 
 	if (row <= 9)
 		return input_port_read(device->machine, rownames[row]);
@@ -480,15 +465,17 @@ static READ8_DEVICE_HANDLER( bw2_ppi8255_c_r )
 
 	*/
 
+	bw2_state *state = device->machine->driver_data;
+
 	UINT8 data = 0;
 
 	/* assumption: select is tied low */
 	centronics_write_handshake(0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT | CENTRONICS_NO_RESET);
 	data = ((centronics_read_handshake(0) & CENTRONICS_NOT_BUSY) == 0) ? 0x10 : 0;
 
-	data |= bw2_mfdbk << 5;
+	data |= state->mfdbk << 5;
 	
-	data |= floppy_drive_get_flag_state(get_floppy_image(selected_drive), FLOPPY_DRIVE_DISK_WRITE_PROTECTED) ? 0x00 : 0x80;
+	data |= floppy_drive_get_flag_state(get_floppy_image(state->selected_drive), FLOPPY_DRIVE_DISK_WRITE_PROTECTED) ? 0x00 : 0x80;
 
 	return data;
 }
@@ -503,28 +490,30 @@ static const ppi8255_interface bw2_ppi8255_interface =
 	bw2_ppi8255_c_w,
 };
 
-
 /* PIT */
+
 static PIT8253_OUTPUT_CHANGED( bw2_timer0_w )
 {
-	const device_config *uart = device_list_find_by_tag(device->machine->config->devicelist, MSM8251, "uart");
+	bw2_state *driver_state = device->machine->driver_data;
 
-	msm8251_transmit_clock(uart);
-	msm8251_receive_clock(uart);
+	msm8251_transmit_clock(driver_state->msm8251);
+	msm8251_receive_clock(driver_state->msm8251);
 }
 
 static PIT8253_OUTPUT_CHANGED( bw2_timer1_w )
 {
-	pit8253_set_clock_signal( device, 2, state );
+	pit8253_set_clock_signal(device, 2, state);
 }
 
 static PIT8253_OUTPUT_CHANGED( bw2_timer2_w )
 {
-	bw2_mtron = state;
-	bw2_mfdbk = !state;
+	bw2_state *driver_state = device->machine->driver_data;
+
+	driver_state->mtron = state;
+	driver_state->mfdbk = !state;
 			
-	floppy_drive_set_motor_state(get_floppy_image(0), !bw2_mtron);
-	floppy_drive_set_motor_state(get_floppy_image(1), !bw2_mtron);
+	floppy_drive_set_motor_state(get_floppy_image(0), !driver_state->mtron);
+	floppy_drive_set_motor_state(get_floppy_image(1), !driver_state->mtron);
 	
 	floppy_drive_set_ready_state(get_floppy_image(0), 1, 1);
 	floppy_drive_set_ready_state(get_floppy_image(1), 1, 1);
@@ -548,7 +537,6 @@ static const struct pit8253_config bw2_pit8253_interface =
 	}
 };
 
-
 /* Printer */
 
 static const CENTRONICS_CONFIG bw2_centronics_config[1] =
@@ -564,7 +552,6 @@ static WRITE8_HANDLER( bw2_centronics_data_w )
 	centronics_write_data(0, data);
 }
 
-
 /* Video */
 
 static PALETTE_INIT( bw2 )
@@ -579,9 +566,9 @@ static VIDEO_START( bw2 )
 
 static VIDEO_UPDATE( bw2 )
 {
-	const device_config *msm6255 = device_list_find_by_tag(screen->machine->config->devicelist, MSM6255, MSM6255_TAG);
+	bw2_state *state = screen->machine->driver_data;
 
-	msm6255_update(msm6255, bitmap, cliprect);
+	msm6255_update(state->msm6255, bitmap, cliprect);
 
 	return 0;
 }
@@ -590,24 +577,56 @@ static VIDEO_UPDATE( bw2 )
 
 static DRIVER_INIT( bw2 )
 {
-	videoram_size = 0x4000;
-	videoram = auto_malloc(videoram_size);
+	bw2_state *state = machine->driver_data;
 
-	ramcard_ram = auto_malloc(512*1024);
+	/* allocate work memory */
+	state->work_ram = auto_malloc(mess_ram_size);
+
+	/* allocate video memory */
+	state->video_ram = auto_malloc(BW2_VIDEORAM_SIZE);
+
+	/* allocate RAMcard memory */
+	state->ramcard_ram = auto_malloc(BW2_RAMCARD_SIZE);
+}
+
+static MACHINE_START( bw2 )
+{
+	bw2_state *state = machine->driver_data;
+
+	centronics_config(0, bw2_centronics_config);
+
+	wd17xx_init(machine, WD_TYPE_179X, bw2_wd17xx_callback, NULL); // really WD2797
+	wd17xx_set_density(DEN_MFM_LO);
+
+	/* find devices */
+	state->msm8251 = devtag_get_device(machine, MSM8251, MSM8251_TAG);
+	state->msm6255 = devtag_get_device(machine, MSM6255, MSM6255_TAG);
+	
+	/* register for state saving */
+	state_save_register_global(machine, state->keyboard_row);
+	state_save_register_global_pointer(machine, state->work_ram, mess_ram_size);
+	state_save_register_global_pointer(machine, state->ramcard_ram, BW2_RAMCARD_SIZE);
+	state_save_register_global(machine, state->bank);
+	state_save_register_global(machine, state->selected_drive);
+	state_save_register_global(machine, state->mtron);
+	state_save_register_global(machine, state->mfdbk);
+	state_save_register_global_pointer(machine, state->video_ram, BW2_VIDEORAM_SIZE);
 }
 
 static MACHINE_RESET( bw2 )
 {
+	bw2_state *state = machine->driver_data;
+
 	if (get_ramdisk_size(machine) > 0)
 	{
 		// RAMCARD installed
 		
-		memory_configure_bank(machine, 1, BANK_RAM1, 1, mess_ram, 0);
-		memory_configure_bank(machine, 1, BANK_VRAM, 1, videoram, 0);
+		memory_configure_bank(machine, 1, BANK_RAM1, 1, state->work_ram, 0);
+		memory_configure_bank(machine, 1, BANK_VRAM, 1, state->video_ram, 0);
 		memory_configure_bank(machine, 1, BANK_RAMCARD_ROM, 1, memory_region(machine, "ramcard"), 0);
-		memory_configure_bank(machine, 1, BANK_RAM3, 2, mess_ram + 0x8000, 0x8000);
-		memory_configure_bank(machine, 1, BANK_RAMCARD_RAM, 1, ramcard_ram, 0);
-		memory_configure_bank(machine, 1, BANK_RAM6, 1, mess_ram + 0x18000, 0);
+		memory_configure_bank(machine, 1, BANK_RAM3, 2, state->work_ram + 0x8000, 0x8000);
+		memory_configure_bank(machine, 1, BANK_RAMCARD_RAM, 1, state->ramcard_ram, 0);
+		memory_configure_bank(machine, 1, BANK_RAM6, 1, state->work_ram + 0x18000, 0);
 		memory_configure_bank(machine, 1, BANK_ROM, 1, memory_region(machine, "ic1"), 0);
 
 		memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x30, 0x30, 0, 0x0f, &ramcard_bank_w);
@@ -616,23 +635,15 @@ static MACHINE_RESET( bw2 )
 	{
 		// no RAMCARD
 
-		memory_configure_bank(machine, 1, BANK_RAM1, 1, mess_ram, 0);
-		memory_configure_bank(machine, 1, BANK_VRAM, 1, videoram, 0);
-		memory_configure_bank(machine, 1, BANK_RAM2, 5, mess_ram + 0x8000, 0x8000);
+		memory_configure_bank(machine, 1, BANK_RAM1, 1, state->work_ram, 0);
+		memory_configure_bank(machine, 1, BANK_VRAM, 1, state->video_ram, 0);
+		memory_configure_bank(machine, 1, BANK_RAM2, 5, state->work_ram + 0x8000, 0x8000);
 		memory_configure_bank(machine, 1, BANK_ROM, 1, memory_region(machine, "ic1"), 0);
 
 		memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x30, 0x30, 0, 0x0f, SMH_UNMAP);
 	}
 
 	memory_set_bank(machine, 1, BANK_ROM);
-}
-
-static MACHINE_START( bw2 )
-{
-	centronics_config(0, bw2_centronics_config);
-
-	wd17xx_init(machine, WD_TYPE_179X, bw2_wd17xx_callback, NULL); // really WD2797
-	wd17xx_set_density(DEN_MFM_LO);
 }
 
 static ADDRESS_MAP_START( bw2_mem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -648,8 +659,8 @@ static ADDRESS_MAP_START( bw2_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x10, 0x13 ) AM_DEVREADWRITE( PIT8253, PIT8253_TAG, pit8253_r, pit8253_w )
 	AM_RANGE( 0x20, 0x21 ) AM_DEVREADWRITE( MSM6255, MSM6255_TAG, msm6255_register_r, msm6255_register_w )
 //	AM_RANGE( 0x30, 0x3f ) SLOT
-	AM_RANGE( 0x40, 0x40 ) AM_DEVREADWRITE( MSM8251, "uart", msm8251_data_r, msm8251_data_w )
-	AM_RANGE( 0x41, 0x41 ) AM_DEVREADWRITE( MSM8251, "uart", msm8251_status_r, msm8251_control_w )
+	AM_RANGE( 0x40, 0x40 ) AM_DEVREADWRITE( MSM8251, MSM8251_TAG, msm8251_data_r, msm8251_data_w )
+	AM_RANGE( 0x41, 0x41 ) AM_DEVREADWRITE( MSM8251, MSM8251_TAG, msm8251_status_r, msm8251_control_w )
 	AM_RANGE( 0x50, 0x50 ) AM_WRITE( bw2_centronics_data_w )
 	AM_RANGE( 0x60, 0x63 ) AM_READWRITE( bw2_wd2797_r, bw2_wd2797_w )
 //	AM_RANGE( 0x70, 0x7f ) MODEMSEL
@@ -800,7 +811,9 @@ INPUT_PORTS_END
 
 static MSM6255_CHAR_RAM_READ( bw2_charram_r )
 {
-	return videoram[ma & 0x3fff];
+	bw2_state *state = device->machine->driver_data;
+
+	return state->video_ram[ma & 0x3fff];
 }
 
 static const msm6255_interface bw2_msm6255_intf =
@@ -812,6 +825,8 @@ static const msm6255_interface bw2_msm6255_intf =
 };
 
 static MACHINE_DRIVER_START( bw2 )
+	MDRV_DRIVER_DATA(bw2_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD( Z80_TAG, Z80, XTAL_16MHz/4 )
 	MDRV_CPU_PROGRAM_MAP( bw2_mem, 0 )
@@ -846,7 +861,7 @@ static MACHINE_DRIVER_START( bw2 )
 	MDRV_DEVICE_ADD("printer", PRINTER)
 
 	/* uart */
-	MDRV_DEVICE_ADD("uart", MSM8251)
+	MDRV_DEVICE_ADD(MSM8251_TAG, MSM8251)
 MACHINE_DRIVER_END
 
 /***************************************************************************
