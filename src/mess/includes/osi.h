@@ -20,7 +20,6 @@ struct _osi_state
 	int coloren;
 	UINT8 *video_ram;
 	UINT8 *color_ram;
-	tilemap *bg_tilemap;
 
 	/* floppy state */
 	int fdc_index;
