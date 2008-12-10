@@ -39,6 +39,7 @@
 #include "devices/printer.h"
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
+#include "machine/mm58274c.h"
 #include "formats/cpis_dsk.h"
 
 
@@ -223,6 +224,12 @@ INPUT_PORTS_END
 
 static const unsigned i86_address_mask = 0x000fffff;
 
+static const mm58274c_interface compis_mm58274c_interface =
+{
+	0,	/* 	mode 24*/
+	1   /*  first day of week */
+};
+
 static MACHINE_DRIVER_START( compis )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", I80186, 8000000)	/* 8 MHz */
@@ -265,6 +272,9 @@ static MACHINE_DRIVER_START( compis )
 	/* uart */
 	MDRV_DEVICE_ADD("uart", MSM8251)
 	MDRV_DEVICE_CONFIG(compis_usart_interface)
+	
+	/* rtc */
+	MDRV_MM58274C_ADD("mm58274c", compis_mm58274c_interface)	
 MACHINE_DRIVER_END
 
 /***************************************************************************

@@ -21,14 +21,12 @@
 #include "driver.h"
 #include "mm58274c.h"
 
+typedef struct _mm58274c_t mm58274c_t;
 
-static TIMER_CALLBACK(rtc_interrupt_callback);
-static TIMER_CALLBACK(increment_rtc);
-
-#define MAX_58274 2
-
-static struct
+struct _mm58274c_t
 {
+	const mm58274c_interface *intf;
+
 	int status;		/* status register (*read* from address 0 = control register) */
 	int control;	/* control register (*write* to address 0) */
 
@@ -51,8 +49,9 @@ static struct
 	int seconds2;
 	int tenths;		/* tenths of second (BCD : 0-9) */
 
-	void *interrupt_timer;
-} rtc[MAX_58274];
+	emu_timer *increment_rtc;
+	emu_timer *interrupt_timer;
+};
 
 enum
 {
@@ -73,6 +72,15 @@ enum
 	int_ctl_dly = 0x7		/* 0 no interrupt, 1 = .1 second, 2=.5, 3=1, 4=5, 5=10, 6=30, 7=60 */
 };
 
+
+INLINE mm58274c_t *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+
+	return (mm58274c_t *)device->token;
+}
+
 static attotime interrupt_period_table(int val)
 {
 	switch(val)
@@ -89,140 +97,88 @@ static attotime interrupt_period_table(int val)
 	}
 };
 
-/* 
-	Initializes the clock chip. 
-	day1 must be set to a value from 0 (sunday), 1 (monday) ... 
-	to 6 (saturday)	and is needed to correctly retrieve the day-of-week 
-	from the host system clock.
-*/
-void mm58274c_init(running_machine *machine, int which, int mode24, int day1)
+READ8_DEVICE_HANDLER( mm58274c_r )
 {
-	memset(&rtc[which], 0, sizeof(rtc[which]));
-	timer_pulse(machine, ATTOTIME_IN_MSEC(100), NULL, which, increment_rtc);
-	rtc[which].interrupt_timer = timer_alloc(machine, rtc_interrupt_callback, NULL);
-
-	{
-		mame_system_time systime;
-
-		/* get the current date/time from the core */
-		mame_get_current_datetime(machine, &systime);
-
-		rtc[which].clk_set = systime.local_time.year & 3 << 2;
-		if (mode24)
-			rtc[which].clk_set |= clk_set_24;
-                    
-		/* The clock count starts on 1st January 1900 */
-		rtc[which].wday = 1 + ((systime.local_time.weekday - day1)%7);
-		rtc[which].years1 = (systime.local_time.year / 10) % 10;
-		rtc[which].years2 = systime.local_time.year % 10;
-		rtc[which].months1 = (systime.local_time.month + 1) / 10;
-		rtc[which].months2 = (systime.local_time.month + 1) % 10;
-		rtc[which].days1 = systime.local_time.mday / 10;
-		rtc[which].days2 = systime.local_time.mday % 10;
-		if (! mode24)
-		{
-			/* 12-hour mode */
-			if (systime.local_time.hour > 12)
-			{
-				systime.local_time.hour -= 12;
-				rtc[which].clk_set |= clk_set_pm;
-			}
-			if (systime.local_time.hour == 0)
-				systime.local_time.hour = 12;
-		}
-		rtc[which].hours1 = systime.local_time.hour / 10;
-		rtc[which].hours2 = systime.local_time.hour % 10;
-		rtc[which].minutes1 = systime.local_time.minute / 10;
-		rtc[which].minutes2 = systime.local_time.minute % 10;
-		rtc[which].seconds1 = systime.local_time.second / 10;
-		rtc[which].seconds2 = systime.local_time.second % 10;
-		rtc[which].tenths = 0;
-	}
-}
-
-
-int mm58274c_r(int which, int offset)
-{
+	mm58274c_t *mm58274c = get_safe_token(device);
 	int reply;
-
 
 	offset &= 0xf;
 
 	switch (offset)
 	{
 	case 0x0:	/* Control Register */
-		reply = rtc[which].status;
-		rtc[which].status = 0;
+		reply = mm58274c->status;
+		mm58274c->status = 0;
 		break;
 
 	case 0x1:	/* Tenths of Seconds */
-		reply = rtc[which].tenths;
+		reply = mm58274c->tenths;
 		break;
 
 	case 0x2:	/* Units Seconds */
-		reply = rtc[which].seconds2;
+		reply = mm58274c->seconds2;
 		break;
 
 	case 0x3:	/* Tens Seconds */
-		reply = rtc[which].seconds1;
+		reply = mm58274c->seconds1;
 		break;
 
 	case 0x04:	/* Units Minutes */
-		reply = rtc[which].minutes2;
+		reply = mm58274c->minutes2;
 		break;
 
 	case 0x5:	/* Tens Minutes */
-		reply = rtc[which].minutes1;
+		reply = mm58274c->minutes1;
 		break;
 
 	case 0x6:	/* Units Hours */
-		reply = rtc[which].hours2;
+		reply = mm58274c->hours2;
 		break;
 
 	case 0x7:	/* Tens Hours */
-		reply = rtc[which].hours1;
+		reply = mm58274c->hours1;
 		break;
 
 	case 0x8:	/* Units Days */
-		reply = rtc[which].days2;
+		reply = mm58274c->days2;
 		break;
 
 	case 0x9:	/* Tens Days */
-		reply = rtc[which].days1;
+		reply = mm58274c->days1;
 		break;
 
 	case 0xA:	/* Units Months */
-		reply = rtc[which].months2;
+		reply = mm58274c->months2;
 		break;
 
 	case 0xB:	/* Tens Months */
-		reply = rtc[which].months1;
+		reply = mm58274c->months1;
 		break;
 
 	case 0xC:	/* Units Years */
-		reply = rtc[which].years2;
+		reply = mm58274c->years2;
 		break;
 
 	case 0xD:	/* Tens Years */
-		reply = rtc[which].years1;
+		reply = mm58274c->years1;
 		break;
 
 	case 0xE:	/* Day of Week */
-		reply = rtc[which].wday;
+		reply = mm58274c->wday;
 		break;
 
 	case 0xF:	/* Clock Setting & Interrupt Registers */
-		if (rtc[which].control & ctl_intsel)
+		if (mm58274c->control & ctl_intsel)
 			/* interrupt register */
-			reply = rtc[which].int_ctl;
+			reply = mm58274c->int_ctl;
 		else
 		{	/* clock setting register */
-			if (rtc[which].clk_set & clk_set_24)
+			if (mm58274c->clk_set & clk_set_24)
 				/* 24-hour mode */
-				reply = rtc[which].clk_set & ~clk_set_pm;
+				reply = mm58274c->clk_set & ~clk_set_pm;
 			else
 				/* 12-hour mode */
-				reply = rtc[which].clk_set;
+				reply = mm58274c->clk_set;
 		}
 		break;
 
@@ -235,106 +191,108 @@ int mm58274c_r(int which, int offset)
 }
 
 
-void mm58274c_w(int which, int offset, int data)
+WRITE8_DEVICE_HANDLER (mm58274c_w)
 {
+	mm58274c_t *mm58274c = get_safe_token(device);
+	
 	offset &= 0xf;
 	data &= 0xf;
 
 	switch (offset)
 	{
 	case 0x0:	/* Control Register (test mode and interrupt not emulated) */
-		if ((! (rtc[which].control & ctl_intstop)) && (data & ctl_intstop))
+		if ((! (mm58274c->control & ctl_intstop)) && (data & ctl_intstop))
 			/* interrupt stop */
-			timer_enable(rtc[which].interrupt_timer, 0);
-		else if ((rtc[which].control & ctl_intstop) && (! (data & ctl_intstop)))
+			timer_enable(mm58274c->interrupt_timer, 0);
+		else if ((mm58274c->control & ctl_intstop) && (! (data & ctl_intstop)))
 		{
 			/* interrupt run */
-			attotime period = interrupt_period_table(rtc[which].int_ctl & int_ctl_dly);
+			attotime period = interrupt_period_table(mm58274c->int_ctl & int_ctl_dly);
 
-			timer_adjust_periodic(rtc[which].interrupt_timer, period, which, rtc[which].int_ctl & int_ctl_rpt ? period : attotime_zero);
+			timer_adjust_periodic(mm58274c->interrupt_timer, period, 0, mm58274c->int_ctl & int_ctl_rpt ? period : attotime_zero);
 		}
 		if (data & ctl_clkstop)
 			/* stopping the clock clears the tenth counter */
-			rtc[which].tenths = 0;
-		rtc[which].control = data;
+			mm58274c->tenths = 0;
+		mm58274c->control = data;
 		break;
 
 	case 0x1:	/* Tenths of Seconds: cannot be written */
 		break;
 
 	case 0x2:	/* Units Seconds */
-		rtc[which].seconds2 = data;
+		mm58274c->seconds2 = data;
 		break;
 
 	case 0x3:	/* Tens Seconds */
-		rtc[which].seconds1 = data;
+		mm58274c->seconds1 = data;
 		break;
 
 	case 0x4:	/* Units Minutes */
-		rtc[which].minutes2 = data;
+		mm58274c->minutes2 = data;
 		break;
 
 	case 0x5:	/* Tens Minutes */
-		rtc[which].minutes1 = data;
+		mm58274c->minutes1 = data;
 		break;
 
 	case 0x6:	/* Units Hours */
-		rtc[which].hours2 = data;
+		mm58274c->hours2 = data;
 		break;
 
 	case 0x7:	/* Tens Hours */
-		rtc[which].hours1 = data;
+		mm58274c->hours1 = data;
 		break;
 
 	case 0x8:	/* Units Days */
-		rtc[which].days2 = data;
+		mm58274c->days2 = data;
 		break;
 
 	case 0x9:	/* Tens Days */
-		rtc[which].days1 = data;
+		mm58274c->days1 = data;
 		break;
 
 	case 0xA:	/* Units Months */
-		rtc[which].months2 = data;
+		mm58274c->months2 = data;
 		break;
 
 	case 0xB:	/* Tens Months */
-		rtc[which].months1 = data;
+		mm58274c->months1 = data;
 		break;
 
 	case 0xC:	/* Units Years */
-		rtc[which].years2 = data;
+		mm58274c->years2 = data;
 		break;
 
 	case 0xD:	/* Tens Years */
-		rtc[which].years1 = data;
+		mm58274c->years1 = data;
 		break;
 
 	case 0xE:	/* Day of Week */
-		rtc[which].wday = data;
+		mm58274c->wday = data;
 		break;
 
 	case 0xF:	/* Clock Setting & Interrupt Registers */
-		if (rtc[which].control & ctl_intsel)
+		if (mm58274c->control & ctl_intsel)
 		{
 			/* interrupt register (not emulated) */
-			rtc[which].int_ctl = data;
-			if (! (rtc[which].control & ctl_intstop))
+			mm58274c->int_ctl = data;
+			if (! (mm58274c->control & ctl_intstop))
 			{
 				/* interrupt run */
-				attotime period = interrupt_period_table(rtc[which].int_ctl & int_ctl_dly);
+				attotime period = interrupt_period_table(mm58274c->int_ctl & int_ctl_dly);
 
-				timer_adjust_periodic(rtc[which].interrupt_timer, period, which, rtc[which].int_ctl & int_ctl_rpt ? period : attotime_zero);
+				timer_adjust_periodic(mm58274c->interrupt_timer, period, 0, mm58274c->int_ctl & int_ctl_rpt ? period : attotime_zero);
 			}
 		}
 		else
 		{
 			/* clock setting register */
-			rtc[which].clk_set = data;
+			mm58274c->clk_set = data;
 			#if 0
-				if (rtc[which].clk_set & clk_set_24)
+				if (mm58274c->clk_set & clk_set_24)
 					/* 24-hour mode */
-					rtc[which].clk_set &= ~clk_set_pm;
+					mm58274c->clk_set &= ~clk_set_pm;
 			#endif
 		}
 		break;
@@ -347,84 +305,87 @@ void mm58274c_w(int which, int offset, int data)
 */
 static TIMER_CALLBACK(rtc_interrupt_callback)
 {
-	int which = param;
-	rtc[which].status |= st_if;
+	const device_config *device = ptr;
+	mm58274c_t *mm58274c = get_safe_token(device);
+	mm58274c->status |= st_if;
 }
 
 
 /*
 	Increment RTC clock (timed interrupt every 1/10s)
 */
+
 static TIMER_CALLBACK(increment_rtc)
 {
-	int which = param;
-	if (! (rtc[which].control & ctl_clkstop))
+	const device_config *device = ptr;
+	mm58274c_t *mm58274c = get_safe_token(device);
+	if (! (mm58274c->control & ctl_clkstop))
 	{
-		rtc[which].status |= st_dcf;
+		mm58274c->status |= st_dcf;
 
-		if ((++rtc[which].tenths) == 10)
+		if ((++mm58274c->tenths) == 10)
 		{
-			rtc[which].tenths = 0;
+			mm58274c->tenths = 0;
 
-			if ((++rtc[which].seconds2) == 10)
+			if ((++mm58274c->seconds2) == 10)
 			{
-				rtc[which].seconds2 = 0;
+				mm58274c->seconds2 = 0;
 
-				if ((++rtc[which].seconds1) == 6)
+				if ((++mm58274c->seconds1) == 6)
 				{
-					rtc[which].seconds1 = 0;
+					mm58274c->seconds1 = 0;
 
-					if ((++rtc[which].minutes2) == 10)
+					if ((++mm58274c->minutes2) == 10)
 					{
-						rtc[which].minutes2 = 0;
+						mm58274c->minutes2 = 0;
 
-						if ((++rtc[which].minutes1) == 6)
+						if ((++mm58274c->minutes1) == 6)
 						{
-							rtc[which].minutes1 = 0;
+							mm58274c->minutes1 = 0;
 
-							if ((++rtc[which].hours2) == 10)
+							if ((++mm58274c->hours2) == 10)
 							{
-								rtc[which].hours2 = 0;
+								mm58274c->hours2 = 0;
 
-								rtc[which].hours1++;
+								mm58274c->hours1++;
 							}
 
 							/* handle wrap-around */
-							if ((! (rtc[which].clk_set & clk_set_24))
-									&& ((rtc[which].hours1*10 + rtc[which].hours2) == 12))
+							if ((! (mm58274c->clk_set & clk_set_24))
+									&& ((mm58274c->hours1*10 + mm58274c->hours2) == 12))
 							{
-								rtc[which].clk_set ^= clk_set_pm;
+								mm58274c->clk_set ^= clk_set_pm;
 							}
-							if ((! (rtc[which].clk_set & clk_set_24))
-									&& ((rtc[which].hours1*10 + rtc[which].hours2) == 13))
+							if ((! (mm58274c->clk_set & clk_set_24))
+									&& ((mm58274c->hours1*10 + mm58274c->hours2) == 13))
 							{
-								rtc[which].hours1 = 0;
-								rtc[which].hours2 = 1;
+								mm58274c->hours1 = 0;
+								mm58274c->hours2 = 1;
 							}
 
-							if ((rtc[which].clk_set & clk_set_24)
-								&& ((rtc[which].hours1*10 + rtc[which].hours2) == 24))
+							if ((mm58274c->clk_set & clk_set_24)
+								&& ((mm58274c->hours1*10 + mm58274c->hours2) == 24))
 							{
-								rtc[which].hours1 = rtc[which].hours2 = 0;
+								mm58274c->hours1 = mm58274c->hours2 = 0;
 							}
 
 							/* increment day if needed */
-							if ((rtc[which].clk_set & clk_set_24)
-								? ((rtc[which].hours1*10 + rtc[which].hours2) == 0)
-								: (((rtc[which].hours1*10 + rtc[which].hours2) == 12)
-									&& (! (rtc[which].clk_set & clk_set_pm))))
+							if ((mm58274c->clk_set & clk_set_24)
+								? ((mm58274c->hours1*10 + mm58274c->hours2) == 0)
+								: (((mm58274c->hours1*10 + mm58274c->hours2) == 12)
+									&& (! (mm58274c->clk_set & clk_set_pm))))
 							{
 								int days_in_month;
 
-								if ((++rtc[which].days2) == 10)
+								if ((++mm58274c->days2) == 10)
 								{
-									rtc[which].days2 = 0;
+									mm58274c->days2 = 0;
 
-									rtc[which].days1++;
+									mm58274c->days1++;
 								}
 
-								if ((++rtc[which].wday) == 8)
-									rtc[which].wday = 1;
+								if ((++mm58274c->wday) == 8)
+									mm58274c->wday = 1;
 
 								{
 									static const int days_in_month_array[] =
@@ -433,39 +394,39 @@ static TIMER_CALLBACK(increment_rtc)
 										31,31,30, 31,30,31
 									};
 
-									if (((rtc[which].months1*10 + rtc[which].months2) != 2) || (rtc[which].clk_set & clk_set_leap))
-										days_in_month = days_in_month_array[rtc[which].months1*10 + rtc[which].months2 - 1];
+									if (((mm58274c->months1*10 + mm58274c->months2) != 2) || (mm58274c->clk_set & clk_set_leap))
+										days_in_month = days_in_month_array[mm58274c->months1*10 + mm58274c->months2 - 1];
 									else
 										days_in_month = 29;
 								}
 
 
-								if ((rtc[which].days1*10 + rtc[which].days2) == days_in_month+1)
+								if ((mm58274c->days1*10 + mm58274c->days2) == days_in_month+1)
 								{
-									rtc[which].days1 = 0;
-									rtc[which].days2 = 1;
+									mm58274c->days1 = 0;
+									mm58274c->days2 = 1;
 
-									if ((++rtc[which].months2) == 10)
+									if ((++mm58274c->months2) == 10)
 									{
-										rtc[which].months2 = 0;
+										mm58274c->months2 = 0;
 
-										rtc[which].months1++;
+										mm58274c->months1++;
 									}
 
-									if ((rtc[which].months1*10 + rtc[which].months2) == 13)
+									if ((mm58274c->months1*10 + mm58274c->months2) == 13)
 									{
-										rtc[which].months1 = 0;
-										rtc[which].months2 = 1;
+										mm58274c->months1 = 0;
+										mm58274c->months2 = 1;
 
-										rtc[which].clk_set = (rtc[which].clk_set & ~clk_set_leap)
-															| ((rtc[which].clk_set + clk_set_leap_inc) & clk_set_leap);
+										mm58274c->clk_set = (mm58274c->clk_set & ~clk_set_leap)
+															| ((mm58274c->clk_set + clk_set_leap_inc) & clk_set_leap);
 
-										if ((++rtc[which].years2) == 10)
+										if ((++mm58274c->years2) == 10)
 										{
-											rtc[which].years2 = 0;
+											mm58274c->years2 = 0;
 
-											if ((++rtc[which].years1) == 10)
-												rtc[which].years1 = 0;
+											if ((++mm58274c->years1) == 10)
+												mm58274c->years1 = 0;
 										}
 									}
 								}
@@ -475,5 +436,118 @@ static TIMER_CALLBACK(increment_rtc)
 				}
 			}
 		}
+	}
+}
+
+/* Device Interface */
+
+static DEVICE_START( mm58274c )
+{
+	mm58274c_t *mm58274c = get_safe_token(device);
+	
+	// validate arguments
+	assert(device != NULL);
+	assert(device->tag != NULL);
+	assert(strlen(device->tag) < 20);
+	assert(device->static_config != NULL);
+
+	mm58274c->intf = device->static_config;
+	// register for state saving
+	state_save_register_item(device->machine, "mm58274c", device->tag, 0, mm58274c->status);
+	state_save_register_item(device->machine, "mm58274c", device->tag, 0, mm58274c->control);
+	state_save_register_item(device->machine, "mm58274c", device->tag, 0, mm58274c->clk_set);
+	state_save_register_item(device->machine, "mm58274c", device->tag, 0, mm58274c->int_ctl);
+	state_save_register_item(device->machine, "mm58274c", device->tag, 0, mm58274c->wday);
+	state_save_register_item(device->machine, "mm58274c", device->tag, 0, mm58274c->years1);
+	state_save_register_item(device->machine, "mm58274c", device->tag, 0, mm58274c->years2);
+	state_save_register_item(device->machine, "mm58274c", device->tag, 0, mm58274c->months1);
+	state_save_register_item(device->machine, "mm58274c", device->tag, 0, mm58274c->months2);
+	state_save_register_item(device->machine, "mm58274c", device->tag, 0, mm58274c->days1);
+	state_save_register_item(device->machine, "mm58274c", device->tag, 0, mm58274c->days2);
+	state_save_register_item(device->machine, "mm58274c", device->tag, 0, mm58274c->hours1);
+	state_save_register_item(device->machine, "mm58274c", device->tag, 0, mm58274c->hours2);
+	state_save_register_item(device->machine, "mm58274c", device->tag, 0, mm58274c->minutes1);
+	state_save_register_item(device->machine, "mm58274c", device->tag, 0, mm58274c->minutes2);
+	state_save_register_item(device->machine, "mm58274c", device->tag, 0, mm58274c->seconds1);
+	state_save_register_item(device->machine, "mm58274c", device->tag, 0, mm58274c->seconds2);
+	state_save_register_item(device->machine, "mm58274c", device->tag, 0, mm58274c->tenths);		
+
+	mm58274c->increment_rtc = timer_alloc(device->machine, increment_rtc, ((void*)device));
+	timer_adjust_periodic(mm58274c->increment_rtc, attotime_zero, 0, ATTOTIME_IN_MSEC(100));
+	mm58274c->interrupt_timer = timer_alloc(device->machine, rtc_interrupt_callback, ((void*)device));
+
+	return DEVICE_START_OK;
+}
+
+
+static DEVICE_RESET( mm58274c )
+{
+	mm58274c_t *mm58274c = get_safe_token(device);
+	mame_system_time systime;
+
+	/* get the current date/time from the core */
+	mame_get_current_datetime(device->machine, &systime);
+
+	mm58274c->clk_set = systime.local_time.year & 3 << 2;
+	if (mm58274c->intf->mode24)
+		mm58274c->clk_set |= clk_set_24;
+                
+	/* The clock count starts on 1st January 1900 */
+	mm58274c->wday = 1 + ((systime.local_time.weekday - mm58274c->intf->day1)%7);
+	mm58274c->years1 = (systime.local_time.year / 10) % 10;
+	mm58274c->years2 = systime.local_time.year % 10;
+	mm58274c->months1 = (systime.local_time.month + 1) / 10;
+	mm58274c->months2 = (systime.local_time.month + 1) % 10;
+	mm58274c->days1 = systime.local_time.mday / 10;
+	mm58274c->days2 = systime.local_time.mday % 10;
+	if (!mm58274c->intf->mode24)
+	{
+		/* 12-hour mode */
+		if (systime.local_time.hour > 12)
+		{
+			systime.local_time.hour -= 12;
+			mm58274c->clk_set |= clk_set_pm;
+		}
+		if (systime.local_time.hour == 0)
+			systime.local_time.hour = 12;
+	}
+	mm58274c->hours1 = systime.local_time.hour / 10;
+	mm58274c->hours2 = systime.local_time.hour % 10;
+	mm58274c->minutes1 = systime.local_time.minute / 10;
+	mm58274c->minutes2 = systime.local_time.minute % 10;
+	mm58274c->seconds1 = systime.local_time.second / 10;
+	mm58274c->seconds2 = systime.local_time.second % 10;
+	mm58274c->tenths = 0;
+}
+
+static DEVICE_SET_INFO( mm58274c )
+{
+	switch (state)
+	{
+		/* no parameters to set */
+	}
+}
+
+DEVICE_GET_INFO( mm58274c )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(mm58274c_t);				break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
+		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(mm58274c); break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(mm58274c);	break;
+		case DEVINFO_FCT_STOP:							/* Nothing */								break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(mm58274c);	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							info->s = "National Semiconductor MM58274C";break;
+		case DEVINFO_STR_FAMILY:						info->s = "National Semiconductor MM58274C";break;
+		case DEVINFO_STR_VERSION:						info->s = "1.0";							break;
+		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;							break;
+		case DEVINFO_STR_CREDITS:						info->s = "Copyright MESS Team";			break;
 	}
 }

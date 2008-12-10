@@ -33,6 +33,7 @@
 #include "devices/mflopimg.h"
 #include "formats/basicdsk.h"
 #include "devices/harddriv.h"
+#include "machine/mm58274c.h"
 
 static ADDRESS_MAP_START(concept_memmap, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x000000, 0x000007) AM_ROM AM_REGION("main", 0x010000) 	/* boot ROM mirror */
@@ -51,6 +52,12 @@ static PALETTE_INIT( concept )
 	palette_set_color_rgb(machine, 0, 0xff, 0xff, 0xff);
 	palette_set_color_rgb(machine, 1, 0x00, 0x00, 0x00);
 }
+
+static const mm58274c_interface concept_mm58274c_interface =
+{
+	0,	/* 	mode 24*/
+	1   /*  first day of week */
+};
 
 /* concept machine */
 static MACHINE_DRIVER_START( concept )
@@ -79,6 +86,9 @@ static MACHINE_DRIVER_START( concept )
 	/* no sound? */
 
 	MDRV_DEVICE_ADD( "harddisk1", HARDDISK )
+	
+	/* rtc */
+	MDRV_MM58274C_ADD("mm58274c", concept_mm58274c_interface)
 MACHINE_DRIVER_END
 
 

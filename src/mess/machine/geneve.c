@@ -217,7 +217,6 @@ MACHINE_START( geneve )
 	ti99_ide_init(machine);
 	ti99_rs232_init(machine);
 	ti99_usbsm_init(machine);
-	mm58274c_init(machine, 0, 1, 0);
 	add_exit_callback(machine, machine_stop_geneve);
 
 	/* set up RAM pointers */
@@ -479,7 +478,7 @@ READ8_HANDLER ( geneve_r )
 			case 0xf13d:
 			case 0xf13e:
 			case 0xf13f:
-				return mm58274c_r(0, offset-0xf130);
+				return mm58274c_r((device_config*)device_list_find_by_tag( space->machine->config->devicelist, MM58274C, "mm58274c"), offset-0xf130);
 
 			default:
 				logerror("unmapped read offs=%d\n", (int) offset);
@@ -525,7 +524,7 @@ READ8_HANDLER ( geneve_r )
 			case 0x801d:
 			case 0x801e:
 			case 0x801f:
-				return mm58274c_r(0, offset-0xf130);
+				return mm58274c_r((device_config*)device_list_find_by_tag( space->machine->config->devicelist, MM58274C, "mm58274c"), offset-0xf130);
 
 			default:
 				logerror("unmapped read offs=%d\n", (int) offset);
@@ -742,7 +741,7 @@ WRITE8_HANDLER ( geneve_w )
 			case 0xf13d:
 			case 0xf13e:
 			case 0xf13f:
-				mm58274c_w(0, offset-0xf130, data);
+				mm58274c_w((device_config*)device_list_find_by_tag( space->machine->config->devicelist, MM58274C, "mm58274c"), offset-0xf130, data);
 				return;
 
 			default:
@@ -791,7 +790,7 @@ WRITE8_HANDLER ( geneve_w )
 			case 0x801d:
 			case 0x801e:
 			case 0x801f:
-				mm58274c_w(0, offset-0xf130, data);
+				mm58274c_w((device_config*)device_list_find_by_tag( space->machine->config->devicelist, MM58274C, "mm58274c"), offset-0xf130, data);
 				return;
 
 			default:

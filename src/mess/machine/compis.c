@@ -526,12 +526,12 @@ WRITE16_DEVICE_HANDLER ( compis_osp_pit_w )
 
 READ16_HANDLER ( compis_rtc_r )
 {
-	return mm58274c_r(0, offset);
+	return mm58274c_r((device_config*)device_list_find_by_tag( space->machine->config->devicelist, MM58274C, "mm58274c"), offset);
 }
 
 WRITE16_HANDLER ( compis_rtc_w )
 {
-	mm58274c_w(0, offset, data);
+	mm58274c_w((device_config*)device_list_find_by_tag( space->machine->config->devicelist, MM58274C, "mm58274c"), offset, data);
 }
 
 /*-------------------------------------------------------------------------*/
@@ -1547,9 +1547,6 @@ MACHINE_RESET( compis )
 	/* FDC */
 	nec765_init(machine, &compis_fdc_interface, NEC765A, NEC765_RDY_PIN_CONNECTED);
 	compis_fdc_reset(machine);
-
-	/* RTC */
-	mm58274c_init(machine, 0, 0, 1);
 
 	/* Keyboard */
 	compis_keyb_init();

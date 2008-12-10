@@ -36,6 +36,7 @@ Historical notes: TI made several last minute design changes.
 #include "sound/5220intf.h"
 #include "machine/idectrl.h"
 #include "machine/smc92x4.h"
+#include "machine/mm58274c.h"
 
 /*
     memory map
@@ -498,6 +499,11 @@ static const tms5220_interface ti99_4x_tms5220interface =
 	spchroms_read_and_branch	/* speech ROM read and branch handler */
 };
 
+static const mm58274c_interface floppy_mm58274c_interface =
+{
+	1,	/* 	mode 24*/
+	0   /*  first day of week */
+};
 
 static MACHINE_DRIVER_START(ti99_4_60hz)
 	/* basic machine hardware */
@@ -537,6 +543,9 @@ static MACHINE_DRIVER_START(ti99_4_60hz)
 
 	MDRV_CASSETTE_ADD( "cassette1", default_cassette_config )
 	MDRV_CASSETTE_ADD( "cassette2", default_cassette_config )
+	
+	/* rtc */
+	MDRV_MM58274C_ADD("mm58274c_floppy", floppy_mm58274c_interface)	
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START(ti99_4_50hz)
@@ -575,6 +584,9 @@ static MACHINE_DRIVER_START(ti99_4_50hz)
 
 	MDRV_CASSETTE_ADD( "cassette1", default_cassette_config )
 	MDRV_CASSETTE_ADD( "cassette2", default_cassette_config )
+
+	/* rtc */
+	MDRV_MM58274C_ADD("mm58274c_floppy", floppy_mm58274c_interface)	
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START(ti99_4a_60hz)
@@ -613,6 +625,9 @@ static MACHINE_DRIVER_START(ti99_4a_60hz)
 
 	MDRV_CASSETTE_ADD( "cassette1", default_cassette_config )
 	MDRV_CASSETTE_ADD( "cassette2", default_cassette_config )
+
+	/* rtc */
+	MDRV_MM58274C_ADD("mm58274c_floppy", floppy_mm58274c_interface)	
 MACHINE_DRIVER_END
 
 
@@ -652,6 +667,9 @@ static MACHINE_DRIVER_START(ti99_4a_50hz)
 
 	MDRV_CASSETTE_ADD( "cassette1", default_cassette_config )
 	MDRV_CASSETTE_ADD( "cassette2", default_cassette_config )
+
+	/* rtc */
+	MDRV_MM58274C_ADD("mm58274c_floppy", floppy_mm58274c_interface)	
 MACHINE_DRIVER_END
 
 
@@ -699,6 +717,9 @@ static MACHINE_DRIVER_START(ti99_4ev_60hz)
 
 	MDRV_CASSETTE_ADD( "cassette1", default_cassette_config )
 	MDRV_CASSETTE_ADD( "cassette2", default_cassette_config )
+
+	/* rtc */
+	MDRV_MM58274C_ADD("mm58274c_floppy", floppy_mm58274c_interface)	
 MACHINE_DRIVER_END
 
 

@@ -406,9 +406,6 @@ void ti99_floppy_controllers_init_all(running_machine *machine)
 	ti99_install_tracktranslate_procs();
 
 	motor_on_timer = timer_alloc(machine, motor_on_timer_callback, NULL);
-	
-	/* initialize the RTC for BwG and HFDC */
-	mm58274c_init(machine, 1, 1, 0);
 }
 
 /*===========================================================================*/
@@ -1037,7 +1034,7 @@ static  READ8_HANDLER(bwg_mem_r)
 	else if (bwg_rtc_enable)
 	{
 		if (! (offset & 1))
-			reply = mm58274c_r(1, (offset - 0x1FE0) >> 1);
+			reply = mm58274c_r((device_config*)device_list_find_by_tag( space->machine->config->devicelist, MM58274C, "mm58274c_floppy"), (offset - 0x1FE0) >> 1);
 	}
 	else
 	{
@@ -1078,7 +1075,7 @@ static WRITE8_HANDLER(bwg_mem_w)
 	else if (bwg_rtc_enable)
 	{
 		if (! (offset & 1))
-			mm58274c_w(1, (offset - 0x1FE0) >> 1, data);
+			mm58274c_w((device_config*)device_list_find_by_tag( space->machine->config->devicelist, MM58274C, "mm58274c_floppy"), (offset - 0x1FE0) >> 1, data);
 	}
 	else
 	{
@@ -1404,7 +1401,7 @@ static  READ8_HANDLER(hfdc_mem_r)
 	{
 		/* rtc */
 		if (! (offset & 1))
-			reply = mm58274c_r(1, (offset - 0x1FE0) >> 1);
+			reply = mm58274c_r((device_config*)device_list_find_by_tag( space->machine->config->devicelist, MM58274C, "mm58274c_floppy"), (offset - 0x1FE0) >> 1);
 	}
 	else if (offset < 0x1400)
 	{
@@ -1454,7 +1451,7 @@ static WRITE8_HANDLER(hfdc_mem_w)
 	{
 		/* rtc */
 		if (! (offset & 1))
-			mm58274c_w(1, (offset - 0x1FE0) >> 1, data);
+			mm58274c_w((device_config*)device_list_find_by_tag( space->machine->config->devicelist, MM58274C, "mm58274c_floppy"), (offset - 0x1FE0) >> 1, data);
 	}
 	else if (offset < 0x1400)
 	{

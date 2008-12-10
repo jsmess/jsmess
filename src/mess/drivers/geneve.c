@@ -214,6 +214,8 @@
 #include "devices/harddriv.h"
 #include "machine/idectrl.h"
 #include "machine/smc92x4.h" 
+#include "machine/mm58274c.h"
+
 
 /*
     memory map
@@ -449,6 +451,18 @@ static const tms5220_interface geneve_tms5220interface =
 #endif
 };
 
+static const mm58274c_interface geneve_mm58274c_interface =
+{
+	1,	/* 	mode 24*/
+	0   /*  first day of week */
+};
+
+
+static const mm58274c_interface floppy_mm58274c_interface =
+{
+	1,	/* 	mode 24*/
+	0   /*  first day of week */
+};
 
 static MACHINE_DRIVER_START(geneve_60hz)
 	/* basic machine hardware */
@@ -489,6 +503,10 @@ static MACHINE_DRIVER_START(geneve_60hz)
 	MDRV_IMPORT_FROM( smc92x4_hd )
 
 	MDRV_DEVICE_ADD( "ide_harddisk", IDE_HARDDISK )
+	
+	/* rtc */
+	MDRV_MM58274C_ADD("mm58274c", geneve_mm58274c_interface)
+	MDRV_MM58274C_ADD("mm58274c_floppy", floppy_mm58274c_interface)
 MACHINE_DRIVER_END
 
 
