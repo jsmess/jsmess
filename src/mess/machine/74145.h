@@ -7,29 +7,56 @@
 #ifndef TTL74145_H_
 #define TTL74145_H_
 
+/***************************************************************************
+    MACROS
+***************************************************************************/
+
+#define TTL74145		DEVICE_GET_INFO_NAME(ttl74145)
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef void (*ttl74145_output_line_func)(const device_config *device, int state);
+#define TTL74145_OUTPUT_LINE(name)	void name(const device_config *device, int state )
+
+
 /* Interface */
 typedef struct _ttl74145_interface ttl74145_interface;
 struct _ttl74145_interface
 {
 	/* Outputs */
-	void (*output_line_0)(int state);
-	void (*output_line_1)(int state);
-	void (*output_line_2)(int state);
-	void (*output_line_3)(int state);
-	void (*output_line_4)(int state);
-	void (*output_line_5)(int state);
-	void (*output_line_6)(int state);
-	void (*output_line_7)(int state);
-	void (*output_line_8)(int state);
-	void (*output_line_9)(int state);
+	ttl74145_output_line_func output_line_0;
+	ttl74145_output_line_func output_line_1;
+	ttl74145_output_line_func output_line_2;
+	ttl74145_output_line_func output_line_3;
+	ttl74145_output_line_func output_line_4;
+	ttl74145_output_line_func output_line_5;
+	ttl74145_output_line_func output_line_6;
+	ttl74145_output_line_func output_line_7;
+	ttl74145_output_line_func output_line_8;
+	ttl74145_output_line_func output_line_9;
 };
 
-/* Configuration */
-void ttl74145_config(running_machine *machine, int which, const ttl74145_interface *intf);
-void ttl74145_reset(int which);
+
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
+
+/* device interface */
+DEVICE_GET_INFO( ttl74145 );
 
 /* Standard handlers */
-WRITE8_HANDLER( ttl74145_0_w );
-READ16_HANDLER( ttl74145_0_r );
+WRITE8_DEVICE_HANDLER( ttl74145_w );
+READ16_DEVICE_HANDLER( ttl74145_r );
+
+/***************************************************************************
+    DEVICE CONFIGURATION MACROS
+***************************************************************************/
+
+#define MDRV_TTL74145_ADD(_tag, _intrf) \
+	MDRV_DEVICE_ADD(_tag, TTL74145) \
+	MDRV_DEVICE_CONFIG(_intrf)
+
 
 #endif /*TTL74145_H_*/

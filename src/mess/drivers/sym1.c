@@ -13,6 +13,7 @@
 /* Peripheral chips */
 #include "machine/6532riot.h"
 #include "machine/6522via.h"
+#include "machine/74145.h"
 
 /* Layout */
 #include "sym1.lh"
@@ -132,6 +133,7 @@ static MACHINE_DRIVER_START( sym1 )
 
 	/* devices */
 	MDRV_RIOT6532_ADD("riot", SYM1_CLOCK, sym1_r6532_interface)
+	MDRV_TTL74145_ADD("ttl74145", sym1_ttl74145_intf)
 MACHINE_DRIVER_END
 
 

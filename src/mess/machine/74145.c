@@ -46,23 +46,13 @@
 #include "74145.h"
 
 
-
-/*****************************************************************************
- Macros
-*****************************************************************************/
-
-
-#define MAX_74145   (1)
-
-
-
 /*****************************************************************************
  Type definitions
 *****************************************************************************/
 
 
-typedef struct _ttl74145_state ttl74145_state;
-struct _ttl74145_state
+typedef struct _ttl74145_t ttl74145_t;
+struct _ttl74145_t
 {
 	/* Pointer to our interface */
 	const ttl74145_interface *intf;
@@ -71,72 +61,104 @@ struct _ttl74145_state
 	UINT16 number;
 };
 
-
-
-/*****************************************************************************
- Global variables
-*****************************************************************************/
-
-
-static ttl74145_state ttl74145[MAX_74145];
-
-
-
 /*****************************************************************************
  Implementation
 *****************************************************************************/
 
-
-/* Config */
-void ttl74145_config(running_machine *machine, int which, const ttl74145_interface *intf)
+INLINE ttl74145_t *get_safe_token(const device_config *device)
 {
-	assert_always(mame_get_phase(machine) == MAME_PHASE_INIT,
-		"Can only call ttl74145_config at init time!");
-	assert_always(which < MAX_74145,
-		"'which' exceeds maximum number of configured 74145s!");
+	assert(device != NULL);
+	assert(device->token != NULL);
 
-	/* Assign interface */
-	ttl74145[which].intf = intf;
-
-	/* Initialize */
-	ttl74145_reset(which);
+	return (ttl74145_t *)device->token;
 }
 
-
-/* Reset */
-void ttl74145_reset(int which)
-{
-	ttl74145[which].number = 0;
-}
-
-
-/* Data Write */
-static void ttl74145_write(int which, offs_t offset, UINT8 data)
-{
+WRITE8_DEVICE_HANDLER( ttl74145_w ) { 
 	/* Decode number */
+	ttl74145_t *ttl74145 = get_safe_token(device);
 	UINT16 new_number = bcd_2_dec(data & 0x0f);
-
+	
 	/* Call output callbacks if the number changed */
-	if (new_number != ttl74145[which].number)
+	if (new_number != ttl74145->number)
 	{
-		const ttl74145_interface *i = ttl74145[which].intf;
-
-		if (i->output_line_0) i->output_line_0(new_number == 0);
-		if (i->output_line_1) i->output_line_1(new_number == 1);
-		if (i->output_line_2) i->output_line_2(new_number == 2);
-		if (i->output_line_3) i->output_line_3(new_number == 3);
-		if (i->output_line_4) i->output_line_4(new_number == 4);
-		if (i->output_line_5) i->output_line_5(new_number == 5);
-		if (i->output_line_6) i->output_line_6(new_number == 6);
-		if (i->output_line_7) i->output_line_7(new_number == 7);
-		if (i->output_line_8) i->output_line_8(new_number == 8);
-		if (i->output_line_9) i->output_line_9(new_number == 9);
+		const ttl74145_interface *i = ttl74145->intf;
+	
+		if (i->output_line_0) i->output_line_0(device, new_number == 0);
+		if (i->output_line_1) i->output_line_1(device, new_number == 1);
+		if (i->output_line_2) i->output_line_2(device, new_number == 2);
+		if (i->output_line_3) i->output_line_3(device, new_number == 3);
+		if (i->output_line_4) i->output_line_4(device, new_number == 4);
+		if (i->output_line_5) i->output_line_5(device, new_number == 5);
+		if (i->output_line_6) i->output_line_6(device, new_number == 6);
+		if (i->output_line_7) i->output_line_7(device, new_number == 7);
+		if (i->output_line_8) i->output_line_8(device, new_number == 8);
+		if (i->output_line_9) i->output_line_9(device, new_number == 9);
 	}
-
+	
 	/* Update state */
-	ttl74145[which].number = new_number;
+	ttl74145->number = new_number;		
 }
 
+READ16_DEVICE_HANDLER( ttl74145_r ) { 
+	ttl74145_t *ttl74145 = get_safe_token(device);
+	
+	return ttl74145->number; 
+}
 
-WRITE8_HANDLER( ttl74145_0_w ) { ttl74145_write(0, offset, data); }
-READ16_HANDLER( ttl74145_0_r ) { return ttl74145[0].number; }
+/* Device Interface */
+
+static DEVICE_START( ttl74145 )
+{
+	ttl74145_t *ttl74145 = get_safe_token(device);
+	// validate arguments
+
+	assert(device != NULL);
+	assert(device->tag != NULL);
+	assert(strlen(device->tag) < 20);
+	assert(device->static_config != NULL);
+
+	ttl74145->intf = device->static_config;
+	ttl74145->number = 0;
+	
+	// register for state saving
+	state_save_register_item(device->machine, "ttl74145", device->tag, 0, ttl74145->number);
+	return DEVICE_START_OK;
+}
+
+static DEVICE_RESET( ttl74145 )
+{
+	ttl74145_t *ttl74145 = get_safe_token(device);
+	ttl74145->number = 0;
+}
+
+static DEVICE_SET_INFO( ttl74145 )
+{
+	switch (state)
+	{
+		/* no parameters to set */
+	}
+}
+
+DEVICE_GET_INFO( ttl74145 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(ttl74145_t);					break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
+		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(ttl74145); break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(ttl74145);		break;
+		case DEVINFO_FCT_STOP:							/* Nothing */								break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(ttl74145);		break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							info->s = "TTL74145";						break;
+		case DEVINFO_STR_FAMILY:						info->s = "TTL74145";						break;
+		case DEVINFO_STR_VERSION:						info->s = "1.0";							break;
+		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;							break;
+		case DEVINFO_STR_CREDITS:						info->s = "Copyright MESS Team";			break;
+	}
+}

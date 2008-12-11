@@ -33,37 +33,37 @@ static emu_timer *led_update;
 ******************************************************************************/
 
 
-static void sym1_74145_output_0_w(int state)
+TTL74145_OUTPUT_LINE(sym1_74145_output_0_w)
 {
 	if (state) timer_adjust_oneshot(led_update, LED_REFRESH_DELAY, 0);
 }
 
 
-static void sym1_74145_output_1_w(int state)
+TTL74145_OUTPUT_LINE(sym1_74145_output_1_w)
 {
 	if (state) timer_adjust_oneshot(led_update, LED_REFRESH_DELAY, 1);
 }
 
 
-static void sym1_74145_output_2_w(int state)
+TTL74145_OUTPUT_LINE(sym1_74145_output_2_w)
 {
 	if (state) timer_adjust_oneshot(led_update, LED_REFRESH_DELAY, 2);
 }
 
 
-static void sym1_74145_output_3_w(int state)
+TTL74145_OUTPUT_LINE(sym1_74145_output_3_w)
 {
 	if (state) timer_adjust_oneshot(led_update, LED_REFRESH_DELAY, 3);
 }
 
 
-static void sym1_74145_output_4_w(int state)
+TTL74145_OUTPUT_LINE(sym1_74145_output_4_w)
 {
 	if (state) timer_adjust_oneshot(led_update, LED_REFRESH_DELAY, 4);
 }
 
 
-static void sym1_74145_output_5_w(int state)
+TTL74145_OUTPUT_LINE(sym1_74145_output_5_w)
 {
 	if (state) timer_adjust_oneshot(led_update, LED_REFRESH_DELAY, 5);
 }
@@ -76,7 +76,7 @@ static TIMER_CALLBACK( led_refresh )
 
 
 /* The speaker is connected to output 6 of the 74145 */
-static void sym1_74145_output_6_w(int state)
+TTL74145_OUTPUT_LINE(sym1_74145_output_6_w)
 {
 	speaker_level_w(0, state);
 }
@@ -137,7 +137,7 @@ static void sym1_riot_b_w(const device_config *device, UINT8 newdata, UINT8 data
 	riot_port_b = data;
 
 	/* first 4 pins are connected to the 74145 */
-	ttl74145_0_w( cpu_get_address_space( device->machine->cpu[0], ADDRESS_SPACE_PROGRAM ), 0, data & 0x0f);
+	ttl74145_w( (device_config*)device_list_find_by_tag( device->machine->config->devicelist, TTL74145, "ttl74145" ), 0, data & 0x0f);
 }
 
 
@@ -150,7 +150,7 @@ const riot6532_interface sym1_r6532_interface =
 };
 
 
-static const ttl74145_interface ttl74145_intf =
+const ttl74145_interface sym1_ttl74145_intf =
 {
 	sym1_74145_output_0_w,  /* connected to DS0 */
 	sym1_74145_output_1_w,  /* connected to DS1 */
@@ -287,9 +287,6 @@ DRIVER_INIT( sym1 )
 	via_config(1, &via1);
 	via_config(2, &via2);
 
-	/* configure 74145 */
-	ttl74145_config(machine, 0, &ttl74145_intf);
-
 	/* allocate a timer to refresh the led display */
 	led_update = timer_alloc(machine, led_refresh, NULL);
 }
@@ -298,7 +295,6 @@ DRIVER_INIT( sym1 )
 MACHINE_RESET( sym1 )
 {
 	via_reset();
-	ttl74145_reset(0);
 
 	/* make 0xf800 to 0xffff point to the last half of the monitor ROM
 	   so that the CPU can find its reset vectors */

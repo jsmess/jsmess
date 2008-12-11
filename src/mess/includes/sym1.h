@@ -13,6 +13,7 @@
 #define SYM1_H_
 
 #include "machine/6532riot.h"
+#include "machine/74145.h"
 
 /* SYM-1 main (and only) oscillator Y1 */
 #define SYM1_CLOCK  XTAL_1MHz
@@ -27,7 +28,7 @@ extern UINT8 *sym1_monitor;
 /*----------- defined in machine/sym1.c -----------*/
 
 extern const riot6532_interface sym1_r6532_interface;
-
+extern const ttl74145_interface sym1_ttl74145_intf;
 DRIVER_INIT( sym1 );
 MACHINE_RESET( sym1 );
 

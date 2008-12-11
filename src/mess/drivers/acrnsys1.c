@@ -35,7 +35,7 @@ static READ8_DEVICE_HANDLER( ins8154_b1_port_a_r )
 
 static WRITE8_DEVICE_HANDLER( ins8154_b1_port_a_w )
 {
-	ttl74145_0_w(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0, data & 0x07);
+	ttl74145_w((device_config*)device_list_find_by_tag( device->machine->config->devicelist, TTL74145, "ttl74145" ), 0, data & 0x07);
 }
 
 static WRITE8_DEVICE_HANDLER( acrnsys1_led_segment_w )
@@ -54,14 +54,14 @@ static const ins8154_interface ins8154_b1 =
 	NULL
 };
 
-static void acrnsys1_7445_output_0_w(int state) { if (state) key_digit = 0; }
-static void acrnsys1_7445_output_1_w(int state) { if (state) key_digit = 1; }
-static void acrnsys1_7445_output_2_w(int state) { if (state) key_digit = 2; }
-static void acrnsys1_7445_output_3_w(int state) { if (state) key_digit = 3; }
-static void acrnsys1_7445_output_4_w(int state) { if (state) key_digit = 4; }
-static void acrnsys1_7445_output_5_w(int state) { if (state) key_digit = 5; }
-static void acrnsys1_7445_output_6_w(int state) { if (state) key_digit = 6; }
-static void acrnsys1_7445_output_7_w(int state) { if (state) key_digit = 7; }
+TTL74145_OUTPUT_LINE ( acrnsys1_7445_output_0_w ) { if (state) key_digit = 0; }
+TTL74145_OUTPUT_LINE ( acrnsys1_7445_output_1_w ) { if (state) key_digit = 1; }
+TTL74145_OUTPUT_LINE ( acrnsys1_7445_output_2_w ) { if (state) key_digit = 2; }
+TTL74145_OUTPUT_LINE ( acrnsys1_7445_output_3_w ) { if (state) key_digit = 3; }
+TTL74145_OUTPUT_LINE ( acrnsys1_7445_output_4_w ) { if (state) key_digit = 4; }
+TTL74145_OUTPUT_LINE ( acrnsys1_7445_output_5_w ) { if (state) key_digit = 5; }
+TTL74145_OUTPUT_LINE ( acrnsys1_7445_output_6_w ) { if (state) key_digit = 6; }
+TTL74145_OUTPUT_LINE ( acrnsys1_7445_output_7_w ) { if (state) key_digit = 7; }
 
 static const ttl74145_interface ic8_7445 =
 {
@@ -79,12 +79,10 @@ static const ttl74145_interface ic8_7445 =
 
 static DRIVER_INIT( acrnsys1 )
 {
-	ttl74145_config(machine, 0, &ic8_7445);
 }
 
 static MACHINE_RESET( acrnsys1 )
 {
-	ttl74145_reset(0);
 }
 
 
@@ -97,7 +95,7 @@ static ADDRESS_MAP_START( acrnsys1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0e00, 0x0e7f) AM_MIRROR(0x100) AM_DEVREADWRITE(INS8154, "b1", ins8154_r, ins8154_w)
 	AM_RANGE(0x0e80, 0x0eff) AM_MIRROR(0x100) AM_RAM
-	AM_RANGE(0xfe00, 0xffff) AM_MIRROR(0x600) AM_ROM
+	AM_RANGE(0xfe00, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -189,6 +187,8 @@ static MACHINE_DRIVER_START( acrnsys1 )
 	MDRV_DEVICE_CONFIG(ins8154_b1)
 	
 	MDRV_DEFAULT_LAYOUT(layout_acrnsys1)
+	
+	MDRV_TTL74145_ADD("ttl74145", ic8_7445)
 MACHINE_DRIVER_END
 
 
