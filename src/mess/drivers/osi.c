@@ -19,7 +19,7 @@ OHIO SCIENTIFIC MODEL 600 REV D
 | -					2114	2114					8T28	8T28							|
 | |																							|
 |C|					2114	2114															|
-|N|		CN4																					|
+|N|																							|
 |3|					2114	2114						6502								|
 | |																							|
 | -					2114	2114															|
@@ -37,7 +37,7 @@ OHIO SCIENTIFIC MODEL 600 REV D
 |C|																							|
 |N|			7476	7400	LS157	LS93	LS04		6850								|
 |2|																							|
-| -	7403	74123	3.7MHz	LS86	LS163	LS20											|
+| -	7403	74123	3.7MHz	LS86	LS163	LS20									CN4		|
 |-------------------------------------------------------------------------------------------|
 
 Notes:
@@ -48,10 +48,10 @@ Notes:
 	6850	- Asynchronous Communications Interface Adapter
 	8T28	- 4-Bit Bidirectional Bus Transceiver
 	CA3130	- Operational Amplifier
-	CN1		- OSI-48 Bus Connector
+	CN1		- OSI-48 bus connector
 	CN2		- 
 	CN3		- 
-	CN4		- UHF Modulator Output
+	CN4		- sound connector
 	SW1		- 
 
 */
