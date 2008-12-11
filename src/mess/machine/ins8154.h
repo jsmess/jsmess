@@ -40,5 +40,12 @@ WRITE8_DEVICE_HANDLER( ins8154_w );
 WRITE8_DEVICE_HANDLER( ins8154_porta_w );
 WRITE8_DEVICE_HANDLER( ins8154_portb_w );
 
+/***************************************************************************
+    DEVICE CONFIGURATION MACROS
+***************************************************************************/
+
+#define MDRV_INS8154_ADD(_tag, _intrf) \
+	MDRV_DEVICE_ADD(_tag, INS8154) \
+	MDRV_DEVICE_CONFIG(_intrf)
 
 #endif /* INS8154_H_ */
