@@ -1605,12 +1605,12 @@ READ16_HANDLER ( lisa_r )
 					if ((time_in_frame >= 364) && (time_in_frame <= 375))
 					{
 						answer = videoROM_ptr[videoROM_address|0x80] << 8;
-  				logerror("reading1 %06X=%04x PC=%06x time=%d\n", address, answer,safe_cpu_get_pc(space->machine->cpu[0]),time_in_frame);
+  				logerror("reading1 %06X=%04x PC=%06x time=%d\n", address, answer, cpu_get_pc(space->machine->cpu[0]), time_in_frame);
 					}
 					else
 					{
 						answer = videoROM_ptr[videoROM_address] << 8;
-  				logerror("reading2 %06X=%04x PC=%06x time=%d\n", address, answer,safe_cpu_get_pc(space->machine->cpu[0]),time_in_frame);
+  				logerror("reading2 %06X=%04x PC=%06x time=%d\n", address, answer, cpu_get_pc(space->machine->cpu[0]), time_in_frame);
 					}
 				}
 
@@ -1871,19 +1871,19 @@ INLINE void cpu_board_control_access(running_machine *machine, offs_t offset)
 		seg &= ~2;
 		break;
 	case 0x0010:	/* SETUP register SET */
-    	logerror("setup SET PC=%x\n", safe_cpu_get_pc(machine->cpu[0]));
+    	logerror("setup SET PC=%x\n", cpu_get_pc(machine->cpu[0]));
 		setup = 1;
 		break;
 	case 0x0012:	/* SETUP register RESET */
-    	logerror("setup UNSET PC=%x\n", safe_cpu_get_pc(machine->cpu[0]));
+    	logerror("setup UNSET PC=%x\n", cpu_get_pc(machine->cpu[0]));
 		setup = 0;
 		break;
 	case 0x001A:	/* Enable Vertical Retrace Interrupt */
-    	logerror("enable retrace PC=%x\n", safe_cpu_get_pc(machine->cpu[0]));
+    	logerror("enable retrace PC=%x\n", cpu_get_pc(machine->cpu[0]));
 		VTMSK = 1;
 		break;
 	case 0x0018:	/* Disable Vertical Retrace Interrupt */
-    	logerror("disable retrace PC=%x\n", safe_cpu_get_pc(machine->cpu[0]));
+    	logerror("disable retrace PC=%x\n", cpu_get_pc(machine->cpu[0]));
 		VTMSK = 0;
 		set_VTIR(machine, 2);
 		break;
@@ -2017,7 +2017,7 @@ static READ16_HANDLER ( lisa_IO_r )
 			else
 						answer |= 0x04;
 			/* huh... we need to emulate some other bits */
-			 logerror("read status PC=%x val=%x\n", safe_cpu_get_pc(space->machine->cpu[0]),answer);
+			 logerror("read status PC=%x val=%x\n", cpu_get_pc(space->machine->cpu[0]),answer);
 
 			break;
 		}

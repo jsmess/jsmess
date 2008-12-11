@@ -88,7 +88,7 @@ READ8_DEVICE_HANDLER( ins8154_r )
 	if (offset > 0x24)
 	{
 		logerror("INS8154 (%08x): Read from unknown offset %02x!\n",
-			safe_cpu_get_pc( device->machine->cpu[0] ), offset);
+			cpu_get_pc( device->machine->cpu[0] ), offset);
 		return 0xff;
 	}
 	
@@ -138,7 +138,7 @@ WRITE8_DEVICE_HANDLER( ins8154_porta_w )
 			i->intf->out_a_func(device, 0, (data & i->odra) | (i->odra ^ 0xff));
 		else
 			logerror("INS8154 (%08x): Write to port A but no write handler defined!\n",
-				safe_cpu_get_pc( device->machine->cpu[0] ) );
+				cpu_get_pc( device->machine->cpu[0] ) );
 	}
 }
 
@@ -156,7 +156,7 @@ WRITE8_DEVICE_HANDLER( ins8154_portb_w )
 			i->intf->out_b_func(device, 0, (data & i->odrb) | (i->odrb ^ 0xff));
 		else
 			logerror("INS8154 (%08x): Write to port B but no write handler defined!\n",
-				safe_cpu_get_pc( device->machine->cpu[0] ) );
+				cpu_get_pc( device->machine->cpu[0] ) );
 	}
 }
 
@@ -168,7 +168,7 @@ WRITE8_DEVICE_HANDLER( ins8154_w )
 	if (offset > 0x24)
 	{
 		logerror("INS8154 (%04x): Write %02x to invalid offset %02x!\n",
-			safe_cpu_get_pc( device->machine->cpu[0] ), data, offset);
+			cpu_get_pc( device->machine->cpu[0] ), data, offset);
 		return;
 	}
 	
@@ -184,19 +184,19 @@ WRITE8_DEVICE_HANDLER( ins8154_w )
 		
 	case 0x22:
 		LOG(("INS8154 (%04x): ODR for port A set to %02x\n",
-			safe_cpu_get_pc( device->machine->cpu[0] ), data));
+			cpu_get_pc( device->machine->cpu[0] ), data));
 		i->odra = data;
 		break;
 		
 	case 0x23:
 		LOG(("INS8154 (%04x): ODR for port B set to %02x\n",
-			safe_cpu_get_pc( device->machine->cpu[0] ), data));
+			cpu_get_pc( device->machine->cpu[0] ), data));
 		i->odrb = data;
 		break;
 		
 	case 0x24:
 		LOG(("INS8154 (%04x): MDR set to %02x\n",
-			safe_cpu_get_pc( device->machine->cpu[0] ), data));
+			cpu_get_pc( device->machine->cpu[0] ), data));
 		i->mdr = data;
 		break;
 		
