@@ -529,12 +529,6 @@ static void at_kbdc8042_set_keyboard_interface( running_machine *machine, write8
 }
 
 
-static ADDRESS_MAP_START( kbdc8042_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE( 0x0000, 0x07FF )  AM_ROM
-	AM_RANGE( 0x0800, 0x08FF )  AM_RAM
-ADDRESS_MAP_END
-
-
 static ADDRESS_MAP_START( kbdc8042_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( I8X41_t0, I8X41_t0 )	AM_READ( at_kbdc8042_t0_r )
 	AM_RANGE( I8X41_t1, I8X41_t1 )	AM_READ( at_kbdc8042_t1_r )
@@ -545,7 +539,6 @@ ADDRESS_MAP_END
 
 MACHINE_DRIVER_START( at_kbdc8042 )
 	MDRV_CPU_ADD("kbdc8042", I8042, 4772720 )   /* Frequency is a wild guess */
-	MDRV_CPU_PROGRAM_MAP( kbdc8042_mem, 0 )
 	MDRV_CPU_IO_MAP( kbdc8042_io, 0 )
 MACHINE_DRIVER_END
 
