@@ -137,9 +137,7 @@ static I8275_DMA_REQUEST(radio86_video_dma_request) {
 READ8_DEVICE_HANDLER(radio86_dma_read_byte)
 {
 	UINT8 result;
-	cpu_push_context(device->machine->cpu[0]);
 	result = memory_read_byte(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM),offset);
-	cpu_pop_context();
 	return result;
 }
 

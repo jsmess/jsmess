@@ -371,9 +371,7 @@ WRITE8_HANDLER (partner_mem_page_w )
 
 static WRITE8_DEVICE_HANDLER(partner_dma_write_byte)
 {
-	cpu_push_context(device->machine->cpu[0]);
 	memory_write_byte(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM),offset,data);
-	cpu_pop_context();
 }
 
 static READ8_DEVICE_HANDLER ( partner_wd17xx_data_r )
