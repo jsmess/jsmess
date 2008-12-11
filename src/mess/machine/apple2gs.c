@@ -794,9 +794,6 @@ static TIMER_CALLBACK(apple2gs_scanline_tick)
 {
 	int scanline;
 
-	// make sure we're in the 65816's context
-	cpu_push_context(machine->cpu[0]);
-
 	scanline = video_screen_get_vpos(machine->primary_screen);
 	video_screen_update_partial(machine->primary_screen, scanline);
 
@@ -835,8 +832,6 @@ static TIMER_CALLBACK(apple2gs_scanline_tick)
 	}
 
 	timer_adjust_oneshot(apple2gs_scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, (scanline+1)%262, 0), 0);
-
-	cpu_pop_context();
 }
 
 
