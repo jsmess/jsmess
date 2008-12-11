@@ -626,11 +626,7 @@ static READ8_DEVICE_HANDLER( dma_port_a_r )
 
 	UINT8 data = 0xff;
 
-	cpu_push_context(conkort->cpu);
-
 	data = memory_read_byte_8le(program, offset);
-	
-	cpu_pop_context();
 
 	return data;
 }
@@ -640,11 +636,7 @@ static WRITE8_DEVICE_HANDLER( dma_port_a_w )
 	fast_t *conkort = get_safe_token_machine_fast(device->machine);
 	const address_space *program = cpu_get_address_space(conkort->cpu, ADDRESS_SPACE_PROGRAM);
 
-	cpu_push_context(conkort->cpu);
-	
 	memory_write_byte_8le(program, offset, data);
-	
-	cpu_pop_context();
 }
 
 static READ8_DEVICE_HANDLER( dma_port_b_r )
@@ -654,11 +646,7 @@ static READ8_DEVICE_HANDLER( dma_port_b_r )
 
 	UINT8 data = 0xff;
 
-	cpu_push_context(conkort->cpu);
-
 	data = memory_read_byte_8le(io, offset);
-
-	cpu_pop_context();
 
 	return data;
 }
@@ -668,11 +656,7 @@ static WRITE8_DEVICE_HANDLER( dma_port_b_w )
 	fast_t *conkort = get_safe_token_machine_fast(device->machine);
 	const address_space *io = cpu_get_address_space(conkort->cpu, ADDRESS_SPACE_IO);
 
-	cpu_push_context(conkort->cpu);
-
 	memory_write_byte_8le(io, offset, data);
-
-	cpu_pop_context();
 }
 
 static const z80dma_interface dma_intf =
