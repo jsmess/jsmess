@@ -81,6 +81,7 @@ static CDP1869_ON_PRD_CHANGED( pecom_prd_w )
 static CDP1869_INTERFACE( pecom_cdp1869_intf )
 {
 	SCREEN_TAG,
+	"main",
 	CDP1869_DOT_CLK_PAL,
 	CDP1869_COLOR_CLK_PAL,
 	CDP1869_PAL,
