@@ -471,39 +471,6 @@ MC6845_UPDATE_ROW( svi806_crtc6845_update_row )
 	}
 }
 
-static void svi806_set_crtc_register(UINT8 reg, UINT8 data) {	
-	/* 
-		NPW 9-Mar-2008 - This is bad; commenting out
-
-		mc6845_address_w(mc6845, 0, reg);
-		mc6845_register_w(mc6845, 0, data);
-	*/
-}
-
-static TIMER_CALLBACK(svi318_80col_init_registers)
-{
-	cpu_push_context(machine->cpu[0]);
-
-	/* set some default values for the 6845 controller */
-	svi806_set_crtc_register(  0, 109 );
-	svi806_set_crtc_register(  1,  80 );
-	svi806_set_crtc_register(  2,  89 );
-	svi806_set_crtc_register(  3,  12 );
-	svi806_set_crtc_register(  4,  31 );
-	svi806_set_crtc_register(  5,   2 );
-	svi806_set_crtc_register(  6,  24 );
-	svi806_set_crtc_register(  7,  26 );
-	svi806_set_crtc_register(  8,   0 );
-	svi806_set_crtc_register(  9,   7 );
-	svi806_set_crtc_register( 10,  96 );
-	svi806_set_crtc_register( 11,   7 );
-	svi806_set_crtc_register( 12,   0 );
-	svi806_set_crtc_register( 13,   0 );
-	svi806_set_crtc_register( 14,   0 );
-	svi806_set_crtc_register( 15,   0 );
-
-	cpu_pop_context();
-}
 
 /* 80 column card init */
 static void svi318_80col_init(running_machine *machine)
@@ -514,9 +481,8 @@ static void svi318_80col_init(running_machine *machine)
 	memset( svi.svi806_ram, 0x00, 0x800 );
 	memset( svi.svi806_ram + 0x800, 0xFF, 0x800 );
 	svi.svi806_gfx = memory_region(machine, "gfx1");
-
-	timer_set( machine, attotime_zero, NULL, 0, svi318_80col_init_registers );
 }
+
 
 static WRITE8_HANDLER( svi806_ram_enable_w )
 {
