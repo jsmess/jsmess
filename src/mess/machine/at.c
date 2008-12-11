@@ -249,10 +249,7 @@ static DMA8237_MEM_READ( pc_dma_read_byte )
 	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
 		& 0xFF0000;
 
-	cpu_push_context(device->machine->cpu[0]);
 	result = memory_read_byte(cpu_get_address_space(device->machine->cpu[0],ADDRESS_SPACE_PROGRAM), page_offset + offset);
-	cpu_pop_context();
-
 	return result;
 }
 
@@ -262,9 +259,7 @@ static DMA8237_MEM_WRITE( pc_dma_write_byte )
 	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
 		& 0xFF0000;
 
-	cpu_push_context(device->machine->cpu[0]);
 	memory_write_byte(cpu_get_address_space(device->machine->cpu[0],ADDRESS_SPACE_PROGRAM), page_offset + offset, data);
-	cpu_pop_context();
 }
 
 
