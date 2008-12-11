@@ -1950,8 +1950,6 @@ static TIMER_CALLBACK(mac_scanline_tick)
 {
 	int scanline;
 
-	cpu_push_context(machine->cpu[0]);
-
 	mac_sh_updatebuffer();
 
 	scanline = video_screen_get_vpos(machine->primary_screen);
@@ -1963,8 +1961,6 @@ static TIMER_CALLBACK(mac_scanline_tick)
 		mouse_callback(machine);
 
 	timer_adjust_oneshot(mac_scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, (scanline+1) % MAC_V_TOTAL, 0), 0);
-
-	cpu_pop_context();
 }
 
 
@@ -2808,7 +2804,7 @@ static offs_t mac_dasm_override(const device_config *device, char *buffer, offs_
 		if (trap)
 		{
 			strcpy(buffer, trap);
-			result = 1;
+			result = 2;
 		}
 	}
 	return result;
