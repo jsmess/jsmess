@@ -856,8 +856,6 @@ static void pmd85_common_driver_init (running_machine *machine)
 
 	serial_connection_init(&pmd85_cassette_serial_connection);
 	serial_connection_set_in_callback(&pmd85_cassette_serial_connection, pmd85_cassette_write);
-
-	msm8251_connect(device_list_find_by_tag( machine->config->devicelist, MSM8251, "uart" ), &pmd85_cassette_serial_connection);
 }
 
 DRIVER_INIT ( pmd851 )
@@ -901,12 +899,14 @@ DRIVER_INIT ( c2717 )
 	pmd85_common_driver_init(machine);
 }
 
-static TIMER_CALLBACK( setup_pit8253_gates ) {
+static TIMER_CALLBACK( setup_machine_state ) {
 	device_config *pit8253 = (device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8253, "pit8253" );
 
 	pit8253_gate_w(pit8253, 0, 1);
 	pit8253_gate_w(pit8253, 1, 1);
 	pit8253_gate_w(pit8253, 2, 1);
+
+	msm8251_connect(device_list_find_by_tag( machine->config->devicelist, MSM8251, "uart" ), &pmd85_cassette_serial_connection);
 }
 
 
@@ -931,7 +931,7 @@ MACHINE_RESET( pmd85 )
 	pmd85_startup_mem_map = 1;
 	pmd85_update_memory(machine);
 
-	timer_set(machine,  attotime_zero, NULL, 0, setup_pit8253_gates );
+	timer_set(machine,  attotime_zero, NULL, 0, setup_machine_state );
 
 	memory_set_direct_update_handler(cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM), pmd85_opbaseoverride);	
 }
