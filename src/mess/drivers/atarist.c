@@ -1600,6 +1600,7 @@ static MACHINE_START( atariste )
 	state->microwire_timer = timer_alloc(machine, atariste_microwire_tick, NULL);
 
 	/* find devices */
+	state->mc68901 = devtag_get_device(machine, MC68901, MC68901_TAG);
 	state->lmc1992 = devtag_get_device(machine, LMC1992, LMC1992_TAG);
 
 	/* register for state saving */
