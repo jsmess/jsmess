@@ -9,12 +9,21 @@
 #ifndef INS8154_H_
 #define INS8154_H_
 
+/***************************************************************************
+    MACROS
+***************************************************************************/
+
 #define INS8154  DEVICE_GET_INFO_NAME(ins8154)
 
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef void (*ins8154_irq_func)(const device_config *device, int state);
+#define INS8154_IRQ(name)	void name(const device_config *device, int state )
 
 /******************* Interface **********************************************/
 
-typedef struct _ins8154_t ins8154_t;
 typedef struct _ins8154_interface ins8154_interface;
 
 struct _ins8154_interface
@@ -23,7 +32,7 @@ struct _ins8154_interface
 	read8_device_func in_b_func;
 	write8_device_func out_a_func;
 	write8_device_func out_b_func;
-	void (*irq_func)(int state);	
+	ins8154_irq_func irq_func;	
 };
 
 DEVICE_GET_INFO( ins8154 );

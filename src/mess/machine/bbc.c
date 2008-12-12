@@ -594,7 +594,7 @@ long myo;
 		if ((myo>=0x00) && (myo<=0x07)) return BBC_6845_r(space, myo-0x00);		/* Video Controller */
 		if ((myo>=0x08) && (myo<=0x0f)) return BBC_6850_r(space, myo-0x08);		/* Serial Controller */
 		if ((myo>=0x10) && (myo<=0x17)) return 0xfe;						/* Serial System Chip */
-		if ((myo>=0x18) && (myo<=0x1f)) return uPD7002_r(space, myo-0x18);			/* A to D converter */
+		if ((myo>=0x18) && (myo<=0x1f)) return uPD7002_r((device_config*)device_list_find_by_tag( space->machine->config->devicelist, UPD7002, "upd7002" ), myo-0x18);			/* A to D converter */
 		if ((myo>=0x20) && (myo<=0x23)) return 0xfe;						/* VideoULA */
 		if ((myo>=0x24) && (myo<=0x27)) return bbcm_wd1770l_read(space, myo-0x24); /* 1770 */
 		if ((myo>=0x28) && (myo<=0x2f)) return bbcm_wd1770_read(space, myo-0x28);  /* disc control latch */
@@ -622,7 +622,7 @@ long myo;
 		if ((myo>=0x00) && (myo<=0x07)) BBC_6845_w(space, myo-0x00,data);			/* Video Controller */
 		if ((myo>=0x08) && (myo<=0x0f)) BBC_6850_w(space, myo-0x08,data);			/* Serial Controller */
 		if ((myo>=0x10) && (myo<=0x17)) BBC_SerialULA_w(space, myo-0x10,data);		/* Serial System Chip */
-		if ((myo>=0x18) && (myo<=0x1f)) uPD7002_w(space, myo-0x18,data);			/* A to D converter */
+		if ((myo>=0x18) && (myo<=0x1f)) uPD7002_w((device_config*)device_list_find_by_tag( space->machine->config->devicelist, UPD7002, "upd7002" ),myo-0x18,data);			/* A to D converter */
 		if ((myo>=0x20) && (myo<=0x23)) videoULA_w(space, myo-0x20,data);			/* VideoULA */
 		if ((myo>=0x24) && (myo<=0x27)) bbcm_wd1770l_write(space, myo-0x24,data); 	/* 1770 */
 		if ((myo>=0x28) && (myo<=0x2f)) bbcm_wd1770_write(space, myo-0x28,data);  	/* disc control latch */
@@ -1159,7 +1159,7 @@ static  READ8_HANDLER( bbcb_via_system_read_ca1 )
 /* joystick EOC */
 static  READ8_HANDLER( bbcb_via_system_read_cb1 )
 {
-  return uPD7002_EOC_r(space, 0);
+  return uPD7002_EOC_r((device_config*)device_list_find_by_tag( space->machine->config->devicelist, UPD7002, "upd7002" ),0);
 }
 
 
@@ -1312,39 +1312,37 @@ static const struct via6522_interface bbcb_user_via =
 BBC Joystick Support
 **************************************/
 
-static int BBC_get_analogue_input(int channel_number)
+UPD7002_GET_ANALOGUE(BBC_get_analogue_input)
 {
 	switch(channel_number)
 	{
 		case 0:
-			return ((0xff-input_port_read(Machine, "JOY0"))<<8);
+			return ((0xff-input_port_read(device->machine, "JOY0"))<<8);
 			break;
 		case 1:
-			return ((0xff-input_port_read(Machine, "JOY1"))<<8);
+			return ((0xff-input_port_read(device->machine, "JOY1"))<<8);
 			break;
 		case 2:
-			return ((0xff-input_port_read(Machine, "JOY2"))<<8);
+			return ((0xff-input_port_read(device->machine, "JOY2"))<<8);
 			break;
 		case 3:
-			return ((0xff-input_port_read(Machine, "JOY3"))<<8);
+			return ((0xff-input_port_read(device->machine, "JOY3"))<<8);
 			break;
 	}
 
 	return 0;
 }
 
-static void BBC_uPD7002_EOC(int data)
+UPD7002_EOC(BBC_uPD7002_EOC)
 {
 	via_0_cb1_w(cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0,data);
 }
 
-static const struct uPD7002_interface BBC_uPD7002 =
+const uPD7002_interface BBC_uPD7002 =
 {
 	BBC_get_analogue_input,
 	BBC_uPD7002_EOC
 };
-
-
 
 
 /***************************************
@@ -2205,7 +2203,6 @@ MACHINE_RESET( bbcb )
 
 	bbcb_IC32_initialise();
 
-	uPD7002_config(&BBC_uPD7002);
 	MC6850_config(&BBC_MC6850_calls);
 
 	opusbank=0;
@@ -2249,7 +2246,6 @@ MACHINE_RESET( bbcbp )
 
 	bbcb_IC32_initialise();
 
-	uPD7002_config(&BBC_uPD7002);
 	MC6850_config(&BBC_MC6850_calls);
 
 	previous_wd177x_int_state=1;
@@ -2290,7 +2286,6 @@ MACHINE_RESET( bbcm )
 
 	bbcb_IC32_initialise();
 
-	uPD7002_config(&BBC_uPD7002);
 	MC6850_config(&BBC_MC6850_calls);
 
 	previous_wd177x_int_state=1;

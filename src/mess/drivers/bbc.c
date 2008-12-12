@@ -147,7 +147,7 @@ static ADDRESS_MAP_START(bbcb_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xfe60, 0xfe7f) AM_READWRITE(via_1_r       	, via_1_w        	)	/*    fe60-fe7f  6522 VIA       USER VIA                        */
 	AM_RANGE(0xfe80, 0xfe9f) AM_READWRITE(bbc_disc_r		, bbc_disc_w		)	/*    fe80-fe9f  8271 FDC       Floppy disc controller          */
 	AM_RANGE(0xfea0, 0xfebf) AM_READ	 (return8_FE    	                 	)	/*    fea0-febf  68B54 ADLC     ECONET controller               */
-	AM_RANGE(0xfec0, 0xfedf) AM_READWRITE(uPD7002_r			, uPD7002_w		 	)	/*    fec0-fedf  uPD7002        Analogue to digital converter   */
+	AM_RANGE(0xfec0, 0xfedf) AM_DEVREADWRITE(UPD7002, "upd7002",uPD7002_r,uPD7002_w	)	/*    fec0-fedf  uPD7002        Analogue to digital converter   */
 	AM_RANGE(0xfee0, 0xfeff) AM_READ	 (return8_FE						 	)	/*    fee0-feff  Tube ULA       Tube system interface           */
 
 	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("user1", 0x43f00)				/*    ff00-ffff                 OS Rom (continued)              */
@@ -181,7 +181,7 @@ static ADDRESS_MAP_START(bbcbp_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xfe60, 0xfe7f) AM_READWRITE(via_1_r			, via_1_w			)	/*    fe60-fe7f  6522 VIA       USER VIA                        */
 	AM_RANGE(0xfe80, 0xfe9f) AM_READWRITE(bbc_wd1770_read	, bbc_wd1770_write	)	/*    fe80-fe9f  1770 FDC       Floppy disc controller          */
 	AM_RANGE(0xfea0, 0xfebf) AM_READ     (return8_FE							)	/*    fea0-febf  68B54 ADLC     ECONET controller               */
-	AM_RANGE(0xfec0, 0xfedf) AM_READWRITE(uPD7002_r			, uPD7002_w			)	/*    fec0-fedf  uPD7002        Analogue to digital converter   */
+	AM_RANGE(0xfec0, 0xfedf) AM_DEVREADWRITE(UPD7002, "upd7002", uPD7002_r, uPD7002_w)	/*    fec0-fedf  uPD7002        Analogue to digital converter   */
 	AM_RANGE(0xfee0, 0xfeff) AM_READ	 (return8_FE							)	/*    fee0-feff  Tube ULA       Tube system interface           */
 
 	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("user1", 0x43f00)				/*    ff00-ffff                 OS Rom (continued)              */
@@ -217,7 +217,7 @@ static ADDRESS_MAP_START(bbcbp128_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xfe60, 0xfe7f) AM_READWRITE(via_1_r			, via_1_w			)	/*    fe60-fe7f  6522 VIA       USER VIA                        */
 	AM_RANGE(0xfe80, 0xfe9f) AM_READWRITE(bbc_wd1770_read	, bbc_wd1770_write	)	/*    fe80-fe9f  1770 FDC       Floppy disc controller          */
 	AM_RANGE(0xfea0, 0xfebf) AM_READ     (return8_FE							)	/*    fea0-febf  68B54 ADLC     ECONET controller               */
-	AM_RANGE(0xfec0, 0xfedf) AM_READWRITE(uPD7002_r			, uPD7002_w			)	/*    fec0-fedf  uPD7002        Analogue to digital converter   */
+	AM_RANGE(0xfec0, 0xfedf) AM_DEVREADWRITE(UPD7002, "upd7002",uPD7002_r, uPD7002_w	)	/*    fec0-fedf  uPD7002        Analogue to digital converter   */
 	AM_RANGE(0xfee0, 0xfeff) AM_READ	 (return8_FE							)	/*    fee0-feff  Tube ULA       Tube system interface           */
 
 	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("user1", 0x43f00)				/*    ff00-ffff                 OS Rom (continued)              */
@@ -271,7 +271,7 @@ static ADDRESS_MAP_START(bbcm_mem, ADDRESS_SPACE_PROGRAM, 8)
     AM_RANGE(0xfe00, 0xfe07) AM_READWRITE(BBC_6845_r        , BBC_6845_w        )         fe00-fe07  6845 CRTC      Video controller
     AM_RANGE(0xfe08, 0xfe0f) AM_READWRITE(BBC_6850_r        , BBC_6850_w        )         fe08-fe0f  6850 ACIA      Serial Controller
     AM_RANGE(0xfe10, 0xfe17) AM_NOP                                                       fe10-fe17  Serial ULA     Serial system chip
-    AM_RANGE(0xfe18, 0xfe1f) AM_READWRITE(uPD7002_r         , uPD7002_w         )         fec0-fedf  uPD7002        Analogue to digital converter
+    AM_RANGE(0xfe18, 0xfe1f) M_DEVREADWRITE(UPD7002, "uPD7002",uPD7002_r, uPD7002_w )         fec0-fedf  uPD7002        Analogue to digital converter
     AM_RANGE(0xfe20, 0xfe23) AM_READWRITE(return8_FE        , videoULA_w        )         fe20-fe23  Video ULA      Video system chip
     AM_RANGE(0xfe24, 0xfe27) AM_READWRITE(bbcm_wd1770l_read , bbcm_wd1770l_write)         fe24-fe27  1770 Latch     1770 Control Latch
     AM_RANGE(0xfe28, 0xfe2f) AM_READWRITE(bbcm_wd1770_read  , bbcm_wd1770_write )         fe28-fe2f  1770 FDC       Floppy disc controller
@@ -749,6 +749,9 @@ static MACHINE_DRIVER_START( bbca )
 //  MDRV_SOUND_ADD("tms5220", TMS5220, tms5220_interface)
 
 	MDRV_CASSETTE_ADD( "cassette", bbc_cassette_config )
+	
+	/* devices */
+	MDRV_UPD7002_ADD("upd7002",BBC_uPD7002)
 MACHINE_DRIVER_END
 
 
@@ -818,6 +821,9 @@ static MACHINE_DRIVER_START( bbcm )
 	MDRV_DEVICE_ADD("printer", PRINTER)
 
 	MDRV_CASSETTE_ADD( "cassette", bbc_cassette_config )
+	
+	/* devices */
+	MDRV_UPD7002_ADD("upd7002",BBC_uPD7002)
 MACHINE_DRIVER_END
 
 static void bbc_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)

@@ -11,22 +11,51 @@
 #ifndef UPD7002_H_
 #define UPD7002_H_
 
+/***************************************************************************
+    MACROS
+***************************************************************************/
 
-struct uPD7002_interface
+#define UPD7002		DEVICE_GET_INFO_NAME(uPD7002)
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef int (*uPD7002_get_analogue_func)(const device_config *device, int channel_number);
+#define UPD7002_GET_ANALOGUE(name)	int name(const device_config *device, int channel_number )
+
+typedef void (*uPD7002_eoc_func)(const device_config *device, int data);
+#define UPD7002_EOC(name)	void name(const device_config *device, int data )
+
+
+typedef struct _uPD7002_interface uPD7002_interface;
+struct _uPD7002_interface
 {
-	int  (*get_analogue_func)(int channel_number);
-	void (*EOC_func)(int data);
+	uPD7002_get_analogue_func get_analogue_func;
+	uPD7002_eoc_func 		  EOC_func;
 };
 
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
 
-/*----------- defined in machine/upd7002.c -----------*/
+/* device interface */
+DEVICE_GET_INFO( uPD7002 );
 
-void uPD7002_config(const struct uPD7002_interface *intf);
+/* Standard handlers */
 
- READ8_HANDLER ( uPD7002_EOC_r );
+READ8_DEVICE_HANDLER ( uPD7002_EOC_r );
+READ8_DEVICE_HANDLER ( uPD7002_r );
+WRITE8_DEVICE_HANDLER ( uPD7002_w );
 
- READ8_HANDLER ( uPD7002_r );
-WRITE8_HANDLER ( uPD7002_w );
+
+/***************************************************************************
+    DEVICE CONFIGURATION MACROS
+***************************************************************************/
+
+#define MDRV_UPD7002_ADD(_tag, _intrf) \
+	MDRV_DEVICE_ADD(_tag, UPD7002) \
+	MDRV_DEVICE_CONFIG(_intrf)
 
 
 #endif /* UPD7002_H_ */

@@ -27,7 +27,7 @@ enum
 	MDR_STROBED_OUTPUT_3STATE = 0xe0
 };
 
-
+typedef struct _ins8154_t ins8154_t;
 struct _ins8154_t
 {
 	const ins8154_interface *intf; /* Pointer to our interface */
