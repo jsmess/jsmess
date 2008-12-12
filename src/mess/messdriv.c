@@ -932,9 +932,9 @@ XL/XE 16kB OS roms
 	DRIVER( pro128 )	/* 1986 Olivetti Prodest PC 128						*/
 
 	/* Cybiko, Inc. */
-	DRIVER( cybikov1 )	/* Cybiko Wireless Intertainment System - Classic V1 */
-	DRIVER( cybikov2 )	/* Cybiko Wireless Intertainment System - Classic V2 */
-	DRIVER( cybikoxt )	/* Cybiko Wireless Intertainment System - Xtreme     */
+//	DRIVER( cybikov1 )	/* Cybiko Wireless Intertainment System - Classic V1 */
+//	DRIVER( cybikov2 )	/* Cybiko Wireless Intertainment System - Classic V2 */
+//	DRIVER( cybikoxt )	/* Cybiko Wireless Intertainment System - Xtreme     */
 
 	/* Dick Smith */
 	DRIVER( super80 )
