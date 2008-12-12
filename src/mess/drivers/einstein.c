@@ -301,6 +301,8 @@ static  READ8_HANDLER(einstein_80col_r)
 
 static WRITE8_HANDLER(einstein_80col_w)
 {
+	const device_config *mc6845 = devtag_get_device(space->machine, MC6845, "crtc");
+
 	switch (offset & 0x0f)
 	{
 		case 0:
@@ -314,10 +316,10 @@ static WRITE8_HANDLER(einstein_80col_w)
 			einstein_80col_ram_w(space, offset,data);
 			break;
 		case 8:
-			mc6845_address_w( devtag_get_token(space->machine, MC6845, "crtc"), offset, data );
+			mc6845_address_w( mc6845, offset, data );
 			break;
 		case 9:
-			mc6845_register_w( devtag_get_token(space->machine, MC6845, "crtc"), offset, data );
+			mc6845_register_w( mc6845, offset, data );
 			break;
 		default:
 			break;
@@ -1703,7 +1705,7 @@ static const ay8910_interface einstein_ay_interface =
 
 static VIDEO_UPDATE( einstein2 )
 {
-	const device_config *mc6845 = device_list_find_by_tag(screen->machine->config->devicelist, MC6845, "crtc");
+	const device_config *mc6845 = devtag_get_device(screen->machine, MC6845, "crtc");
 
 	VIDEO_UPDATE_CALL(tms9928a);
 	mc6845_update(mc6845, bitmap, cliprect);
