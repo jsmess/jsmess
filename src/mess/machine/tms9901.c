@@ -308,6 +308,7 @@ READ8_DEVICE_HANDLER ( tms9901_cru_r )
 {
 	int answer;
 	tms9901_t *tms = get_token(device);
+	const address_space* space = cpu_get_address_space(device->machine->cpu[0],ADDRESS_SPACE_PROGRAM);
 
 	offset &= 0x003;
 
@@ -323,7 +324,7 @@ READ8_DEVICE_HANDLER ( tms9901_cru_r )
 			answer = ((~ tms->int_state) & tms->supported_int_mask) & 0xFF;
 
 			if (tms->intf->read_handlers[0])
-				answer |= (* tms->intf->read_handlers[0])(0);
+				answer |= (* tms->intf->read_handlers[0])(space, 0);
 
 			answer &= ~ tms->pio_direction_mirror;
 			answer |= (tms->pio_output_mirror & tms->pio_direction_mirror) & 0xFF;
@@ -341,7 +342,7 @@ READ8_DEVICE_HANDLER ( tms9901_cru_r )
 			answer = ((~ tms->int_state) & tms->supported_int_mask) >> 8;
 
 			if (tms->intf->read_handlers[1])
-				answer |= (* tms->intf->read_handlers[1])(1);
+				answer |= (* tms->intf->read_handlers[1])(space, 1);
 
 			answer &= ~ (tms->pio_direction_mirror >> 8);
 			answer |= (tms->pio_output_mirror & tms->pio_direction_mirror) >> 8;
@@ -351,7 +352,7 @@ READ8_DEVICE_HANDLER ( tms9901_cru_r )
 		/* exit timer mode */
 		tms->mode9901 = 0;
 
-		answer = (tms->intf->read_handlers[2]) ? (* tms->intf->read_handlers[2])(2) : 0;
+		answer = (tms->intf->read_handlers[2]) ? (* tms->intf->read_handlers[2])(space, 2) : 0;
 
 		answer &= ~ tms->pio_direction;
 		answer |= (tms->pio_output & tms->pio_direction) & 0xFF;
@@ -361,7 +362,7 @@ READ8_DEVICE_HANDLER ( tms9901_cru_r )
 		/* exit timer mode */
 		tms->mode9901 = 0;
 
-		answer = (tms->intf->read_handlers[3]) ? (* tms->intf->read_handlers[3])(3) : 0;
+		answer = (tms->intf->read_handlers[3]) ? (* tms->intf->read_handlers[3])(space, 3) : 0;
 
 		answer &= ~ (tms->pio_direction >> 8);
 		answer |= (tms->pio_output & tms->pio_direction) >> 8;
@@ -388,6 +389,7 @@ READ8_DEVICE_HANDLER ( tms9901_cru_r )
 WRITE8_DEVICE_HANDLER ( tms9901_cru_w )
 {
 	tms9901_t *tms = get_token(device);
+	const address_space* space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
 	data &= 1;	/* clear extra bits */
 	offset &= 0x01F;
@@ -528,7 +530,7 @@ WRITE8_DEVICE_HANDLER ( tms9901_cru_w )
 			}
 
 			if (tms->intf->write_handlers[pin] != NULL)
-				(* tms->intf->write_handlers[pin])(pin, data);
+				(* tms->intf->write_handlers[pin])(space, pin, data);
 		}
 
 		break;

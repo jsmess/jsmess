@@ -77,27 +77,9 @@ static READ16_HANDLER ( ti99_rspeech_r );
 static WRITE16_HANDLER ( ti99_wspeech_w );
 
 static void tms9901_set_int1(running_machine *machine, int state);
-static void tms9901_interrupt_callback(const device_config *device, int intreq, int ic);
-static int ti99_R9901_0(int offset);
-static int ti99_R9901_1(int offset);
-static int ti99_R9901_2(int offset);
-static int ti99_R9901_3(int offset);
 
-static void ti99_handset_set_ack(int offset, int data);
 static void ti99_handset_task(running_machine *machine);
 static void mecmouse_poll(running_machine *machine);
-static void ti99_KeyC(int offset, int data);
-static void ti99_AlphaW(int offset, int data);
-
-static int ti99_8_R9901_0(int offset);
-static int ti99_8_R9901_1(int offset);
-static void ti99_8_KeyC(int offset, int data);
-static void ti99_8_WCRUS(int offset, int data);
-static void ti99_8_PTGEN(int offset, int data);
-
-static void ti99_CS_motor(int offset, int data);
-static void ti99_audio_gate(int offset, int data);
-static void ti99_CS_output(int offset, int data);
 
 static void ti99_8_internal_dsr_reset(running_machine *machine);
 
@@ -144,82 +126,6 @@ static char has_hsgpl;
 static char has_mecmouse;
 /* TRUE if usb-sm card present */
 static char has_usb_sm;
-
-
-/* tms9901 setup */
-const tms9901_interface tms9901reset_param_ti99_4x =
-{
-	TMS9901_INT1 | TMS9901_INT2 | TMS9901_INTC,	/* only input pins whose state is always known */
-
-	{	/* read handlers */
-		ti99_R9901_0,
-		ti99_R9901_1,
-		ti99_R9901_2,
-		ti99_R9901_3
-	},
-
-	{	/* write handlers */
-		ti99_handset_set_ack,
-		NULL,
-		ti99_KeyC,
-		ti99_KeyC,
-		ti99_KeyC,
-		ti99_AlphaW,
-		ti99_CS_motor,
-		ti99_CS_motor,
-		ti99_audio_gate,
-		ti99_CS_output,
-		NULL,
-		NULL,
-		NULL,
-		NULL,
-		NULL,
-		NULL
-	},
-
-	/* interrupt handler */
-	tms9901_interrupt_callback,
-
-	/* clock rate = 3MHz */
-	3000000.
-};
-
-const tms9901_interface tms9901reset_param_ti99_8 =
-{
-	TMS9901_INT1 | TMS9901_INT2 | TMS9901_INTC,	/* only input pins whose state is always known */
-
-	{	/* read handlers */
-		ti99_8_R9901_0,
-		ti99_8_R9901_1,
-		ti99_R9901_2,
-		ti99_R9901_3
-	},
-
-	{	/* write handlers */
-		ti99_8_KeyC,
-		ti99_8_KeyC,
-		ti99_8_KeyC,
-		ti99_8_KeyC,
-		ti99_8_WCRUS,
-		ti99_8_PTGEN,
-		ti99_CS_motor,
-		NULL,
-		ti99_audio_gate,
-		ti99_CS_output,
-		NULL,
-		NULL,
-		NULL,
-		NULL,
-		NULL,
-		NULL
-	},
-
-	/* interrupt handler */
-	tms9901_interrupt_callback,
-
-	/* clock rate = 3.58MHz??? 2.68MHz??? */
-	/*3579545.*/2684658.75
-};
 
 /* handset interface */
 static int handset_buf;
@@ -1803,14 +1709,14 @@ static TIMER_CALLBACK(ti99_handset_ack_callback)
 
 	Handler for tms9901 P0 pin (handset data acknowledge)
 */
-static void ti99_handset_set_ack(int offset, int data)
+WRITE8_HANDLER( ti99_handset_set_ack )
 {
 	if (has_handset && handset_buflen && (data != handset_ack))
 	{
 		handset_ack = data;
 		if (data == handset_clock)
 			/* I don't know what the real delay is, but 30us apears to be enough */
-			timer_set(Machine, ATTOTIME_IN_USEC(30), NULL, 0, ti99_handset_ack_callback);
+			timer_set(space->machine, ATTOTIME_IN_USEC(30), NULL, 0, ti99_handset_ack_callback);
 	}
 }
 
@@ -2226,7 +2132,7 @@ void tms9901_set_int2(running_machine *machine, int state)
 /*
 	Called by the 9901 core whenever the state of INTREQ and IC0-3 changes
 */
-static void tms9901_interrupt_callback(const device_config *device, int intreq, int ic)
+static TMS9910_INT_CALLBACK( tms9901_interrupt_callback )
 {
 	if (intreq)
 	{
@@ -2248,9 +2154,8 @@ static void tms9901_interrupt_callback(const device_config *device, int intreq, 
 	 (bit 2: INT2 status)
 	 bit 3-7: keyboard status bits 0 to 4
 */
-static int ti99_R9901_0(int offset)
+static READ8_HANDLER( ti99_R9901_0 )
 {
-	running_machine *machine = Machine;
 	int answer;
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3" };
 
@@ -2258,7 +2163,7 @@ static int ti99_R9901_0(int offset)
 		answer = (ti99_handset_poll_bus() << 3) | 0x80;
 	else if (has_mecmouse && (KeyCol == ((ti99_model == model_99_4) ? 6 : 7)))
 	{
-		int buttons = input_port_read(machine, "MOUSE0") & 3;
+		int buttons = input_port_read(space->machine, "MOUSE0") & 3;
 
 		answer = (mecmouse_read_y ? mecmouse_y_buf : mecmouse_x_buf) << 4;
 
@@ -2271,13 +2176,13 @@ static int ti99_R9901_0(int offset)
 	}
 	else
 	{
-		answer = ((input_port_read(machine, keynames[KeyCol >> 1]) >> ((KeyCol & 1) * 8)) << 3) & 0xF8;
+		answer = ((input_port_read(space->machine, keynames[KeyCol >> 1]) >> ((KeyCol & 1) * 8)) << 3) & 0xF8;
 	}
 	
 	if ((ti99_model == model_99_4a) || (ti99_model == model_99_4p))
 	{
 		if (! AlphaLockLine)
-			answer &= ~ (input_port_read(machine, "ALPHA") << 3);
+			answer &= ~ (input_port_read(space->machine, "ALPHA") << 3);
 	}
 
 	return answer;
@@ -2292,9 +2197,8 @@ static int ti99_R9901_0(int offset)
 	 (bit 4: IR remote handset interrupt)
 	 bit 5-7: weird, not emulated
 */
-static int ti99_R9901_1(int offset)
+static READ8_HANDLER( ti99_R9901_1 )
 {
-	running_machine *machine = Machine;
 	int answer;
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3" };
 
@@ -2302,7 +2206,7 @@ static int ti99_R9901_1(int offset)
 		answer = 0x07;
 	else
 	{
-		answer = ((input_port_read(machine, keynames[KeyCol >> 1]) >> ((KeyCol & 1) * 8)) >> 5) & 0x07;
+		answer = ((input_port_read(space->machine, keynames[KeyCol >> 1]) >> ((KeyCol & 1) * 8)) >> 5) & 0x07;
 	}
 	
 	/* we don't take CS2 into account, as CS2 is a write-only unit */
@@ -2317,7 +2221,7 @@ static int ti99_R9901_1(int offset)
 
 	 bit 1: handset data clock pin
 */
-static int ti99_R9901_2(int offset)
+static READ8_HANDLER( ti99_R9901_2 )
 {
 	return (has_handset && handset_clock) ? 2 : 0;
 }
@@ -2328,9 +2232,8 @@ static int ti99_R9901_2(int offset)
 	 bit 26: IR handset interrupt
 	 bit 27: tape input
 */
-static int ti99_R9901_3(int offset)
+static READ8_HANDLER( ti99_R9901_3 )
 {
-	running_machine *machine = Machine;
 	int answer;
 
 	if (has_handset && (handset_buflen == 3))
@@ -2341,12 +2244,12 @@ static int ti99_R9901_3(int offset)
 	/* we don't take CS2 into account, as CS2 is a write-only unit */
 	if ( ti99_model != model_99_8 )
 	{
-		if (cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette1" )) > 0)
+		if (cassette_input(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette1" )) > 0)
 			answer |= 8;
 	}
 	else
 	{
-		if (cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" )) > 0)
+		if (cassette_input(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" )) > 0)
 			answer |= 8;
 	}
 
@@ -2357,7 +2260,7 @@ static int ti99_R9901_3(int offset)
 /*
 	WRITE key column select (P2-P4)
 */
-static void ti99_KeyC(int offset, int data)
+static WRITE8_HANDLER( ti99_KeyC )
 {
 	if (data)
 		KeyCol |= 1 << (offset-2);
@@ -2372,7 +2275,7 @@ static void ti99_KeyC(int offset, int data)
 /*
 	WRITE alpha lock line - TI99/4a only (P5)
 */
-static void ti99_AlphaW(int offset, int data)
+static WRITE8_HANDLER( ti99_AlphaW )
 {
 	if ((ti99_model == model_99_4a) || (ti99_model == model_99_4p))
 		AlphaLockLine = data;
@@ -2388,16 +2291,15 @@ static void ti99_AlphaW(int offset, int data)
 	 bit 5: ???
 	 bit 6-7: keyboard status bits 0 through 1
 */
-static int ti99_8_R9901_0(int offset)
+static READ8_HANDLER( ti99_8_R9901_0 )
 {
-	running_machine *machine = Machine;
 	int answer;
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7",
 										"KEY8", "KEY9", "KEY10", "KEY11", "KEY12", "KEY13", "KEY14", "KEY15" };
 
 	if (has_mecmouse && (KeyCol == 15))
 	{
-		int buttons = input_port_read(machine, "MOUSE0") & 3;
+		int buttons = input_port_read(space->machine, "MOUSE0") & 3;
 
 		answer = ((mecmouse_read_y ? mecmouse_y_buf : mecmouse_x_buf) << 7) & 0x80;
 
@@ -2407,7 +2309,7 @@ static int ti99_8_R9901_0(int offset)
 	}
 	else
 	{
-		answer = (input_port_read(machine, keynames[KeyCol]) << 6) & 0xC0;
+		answer = (input_port_read(space->machine, keynames[KeyCol]) << 6) & 0xC0;
 	}
 	
 	return answer;
@@ -2422,16 +2324,15 @@ static int ti99_8_R9901_0(int offset)
 	 (bit 4: IR remote handset interrupt)
 	 bit 5-7: weird, not emulated
 */
-static int ti99_8_R9901_1(int offset)
+static READ8_HANDLER( ti99_8_R9901_1 )
 {
-	running_machine *machine = Machine;
 	int answer;
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7",
 										"KEY8", "KEY9", "KEY10", "KEY11", "KEY12", "KEY13", "KEY14", "KEY15" };
 
 	if (has_mecmouse && (KeyCol == 15))
 	{
-		int buttons = input_port_read(machine, "MOUSE0") & 3;
+		int buttons = input_port_read(space->machine, "MOUSE0") & 3;
 
 		answer = ((mecmouse_read_y ? mecmouse_y_buf : mecmouse_x_buf) << 1) & 0x03;
 
@@ -2441,7 +2342,7 @@ static int ti99_8_R9901_1(int offset)
 	}
 	else
 	{
-		answer = (input_port_read(machine, keynames[KeyCol]) >> 2) & 0x07;
+		answer = (input_port_read(space->machine, keynames[KeyCol]) >> 2) & 0x07;
 	}
 	
 	/* we don't take CS2 into account, as CS2 is a write-only unit */
@@ -2454,7 +2355,7 @@ static int ti99_8_R9901_1(int offset)
 /*
 	WRITE key column select (P0-P3)
 */
-static void ti99_8_KeyC(int offset, int data)
+static WRITE8_HANDLER( ti99_8_KeyC )
 {
 	if (data)
 		KeyCol |= 1 << offset;
@@ -2465,12 +2366,12 @@ static void ti99_8_KeyC(int offset, int data)
 		mecmouse_select(KeyCol, 14, 15);
 }
 
-static void ti99_8_WCRUS(int offset, int data)
+static WRITE8_HANDLER( ti99_8_WCRUS )
 {
 	ti99_8_CRUS = data;
 }
 
-static void ti99_8_PTGEN(int offset, int data)
+static WRITE8_HANDLER( ti99_8_PTGEN )
 {
 	/* ... */
 }
@@ -2478,18 +2379,17 @@ static void ti99_8_PTGEN(int offset, int data)
 /*
 	command CS1/CS2 tape unit motor (P6-P7)
 */
-static void ti99_CS_motor(int offset, int data)
+static WRITE8_HANDLER( ti99_CS_motor )
 {
-	running_machine *machine = Machine;
 	const device_config *img;
 
 	if ( ti99_model != model_99_8 )
 	{
-		img = device_list_find_by_tag( machine->config->devicelist, CASSETTE, ( offset-6 ) ? "cassette2" :  "cassette1" );
+		img = device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, ( offset-6 ) ? "cassette2" :  "cassette1" );
 	}
 	else
 	{
-		img = device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" );
+		img = device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" );
 	}
 	cassette_change_state(img, data ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
@@ -2503,7 +2403,7 @@ static void ti99_CS_motor(int offset, int data)
 	We do not really need to emulate this as the tape recorder generates sound
 	on its own.
 */
-static void ti99_audio_gate(int offset, int data)
+static WRITE8_HANDLER( ti99_audio_gate )
 {
 }
 
@@ -2511,18 +2411,16 @@ static void ti99_audio_gate(int offset, int data)
 	tape output (P9)
 	I think polarity is correct, but don't take my word for it.
 */
-static void ti99_CS_output(int offset, int data)
+static WRITE8_HANDLER( ti99_CS_output )
 {
-	running_machine *machine = Machine;
-
 	if (ti99_model != model_99_8)	/* 99/8 only has one tape port!!! */
 	{
-		cassette_output(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette1" ), data ? +1 : -1);
-		cassette_output(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette2" ), data ? +1 : -1);
+		cassette_output(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette1" ), data ? +1 : -1);
+		cassette_output(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette2" ), data ? +1 : -1);
 	}
 	else
 	{
-		cassette_output(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ), data ? +1 : -1);
+		cassette_output(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" ), data ? +1 : -1);
 	}
 }
 
@@ -3375,3 +3273,78 @@ static WRITE8_HANDLER(evpc_mem_w)
 		}
 	}
 }
+
+/* tms9901 setup */
+const tms9901_interface tms9901reset_param_ti99_4x =
+{
+	TMS9901_INT1 | TMS9901_INT2 | TMS9901_INTC,	/* only input pins whose state is always known */
+
+	{	/* read handlers */
+		ti99_R9901_0,
+		ti99_R9901_1,
+		ti99_R9901_2,
+		ti99_R9901_3
+	},
+
+	{	/* write handlers */
+		ti99_handset_set_ack,
+		NULL,
+		ti99_KeyC,
+		ti99_KeyC,
+		ti99_KeyC,
+		ti99_AlphaW,
+		ti99_CS_motor,
+		ti99_CS_motor,
+		ti99_audio_gate,
+		ti99_CS_output,
+		NULL,
+		NULL,
+		NULL,
+		NULL,
+		NULL,
+		NULL
+	},
+
+	/* interrupt handler */
+	tms9901_interrupt_callback,
+
+	/* clock rate = 3MHz */
+	3000000.
+};
+
+const tms9901_interface tms9901reset_param_ti99_8 =
+{
+	TMS9901_INT1 | TMS9901_INT2 | TMS9901_INTC,	/* only input pins whose state is always known */
+
+	{	/* read handlers */
+		ti99_8_R9901_0,
+		ti99_8_R9901_1,
+		ti99_R9901_2,
+		ti99_R9901_3
+	},
+
+	{	/* write handlers */
+		ti99_8_KeyC,
+		ti99_8_KeyC,
+		ti99_8_KeyC,
+		ti99_8_KeyC,
+		ti99_8_WCRUS,
+		ti99_8_PTGEN,
+		ti99_CS_motor,
+		NULL,
+		ti99_audio_gate,
+		ti99_CS_output,
+		NULL,
+		NULL,
+		NULL,
+		NULL,
+		NULL,
+		NULL
+	},
+
+	/* interrupt handler */
+	tms9901_interrupt_callback,
+
+	/* clock rate = 3.58MHz??? 2.68MHz??? */
+	/*3579545.*/2684658.75
+};

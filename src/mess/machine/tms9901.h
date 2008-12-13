@@ -34,14 +34,17 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
+typedef void (*tms9910_int_callback_func)(const device_config *device, int intreq, int ic);
+#define TMS9910_INT_CALLBACK(name)	void name(const device_config *device, int intreq, int ic )
+
 /* TMS5501 timer and interrupt controler */
 typedef struct _tms9901_interface tms9901_interface;
 struct _tms9901_interface
 {
 	int supported_int_mask;	/* a bit for each input pin whose state is always notified to the TMS9901 core */
-	int (*read_handlers[4])(int offset);	/* 4*8 bits */
-	void (*write_handlers[16])(int offset, int data);	/* 16 Pn outputs */
-	void (*interrupt_callback)(const device_config *device, int intreq, int ic);		/* called when interrupt bus state changes */
+	read8_space_func  read_handlers[4];	  /* 4*8 bits */
+	write8_space_func write_handlers[16]; /* 16 Pn outputs */
+	tms9910_int_callback_func interrupt_callback; /* called when interrupt bus state changes */
 	double clock_rate;
 };
 

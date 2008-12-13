@@ -5,7 +5,6 @@
 
 #include <math.h>
 #include "driver.h"
-#include "deprecat.h"
 #include "tms9901.h"
 #include "mm58274c.h"
 #include "video/v9938.h"
@@ -30,19 +29,6 @@ static void intb_callback(running_machine *machine, int state);
 static void read_key_if_possible(running_machine *machine);
 static void poll_keyboard(running_machine *machine);
 static void poll_mouse(running_machine *machine);
-
-static void tms9901_interrupt_callback(const device_config *device,int intreq, int ic);
-static int R9901_0(int offset);
-static int R9901_1(int offset);
-static int R9901_2(int offset);
-static int R9901_3(int offset);
-
-static void W9901_PE_bus_reset(int offset, int data);
-static void W9901_VDP_reset(int offset, int data);
-static void W9901_JoySel(int offset, int data);
-static void W9901_KeyboardReset(int offset, int data);
-static void W9901_ext_mem_wait_states(int offset, int data);
-static void W9901_VDP_wait_states(int offset, int data);
 
 /*
 	pointers to memory areas
@@ -74,44 +60,6 @@ static char has_usb_sm;
 
 /* TRUE if we are using the alternative boot ROM */
 static char has_alt_boot;
-
-/* tms9901 setup */
-const tms9901_interface tms9901reset_param_ti99 =
-{
-	TMS9901_INT1 | TMS9901_INT2 | TMS9901_INT8 | TMS9901_INTB | TMS9901_INTC,	/* only input pins whose state is always known */
-
-	{	/* read handlers */
-		R9901_0,
-		R9901_1,
-		R9901_2,
-		R9901_3
-	},
-
-	{	/* write handlers */
-		W9901_PE_bus_reset,
-		W9901_VDP_reset,
-		W9901_JoySel,
-		NULL,
-		NULL,
-		NULL,
-		W9901_KeyboardReset,
-		W9901_ext_mem_wait_states,
-		NULL,
-		W9901_VDP_wait_states,
-		NULL,
-		NULL,
-		NULL,
-		NULL,
-		NULL,
-		NULL
-	},
-
-	/* interrupt handler */
-	tms9901_interrupt_callback,
-
-	/* clock rate = 3MHz */
-	3000000.
-};
 
 /* keyboard interface */
 static int JoySel;
@@ -1339,7 +1287,7 @@ static void poll_mouse(running_machine *machine)
 /*
 	Called by the 9901 core whenever the state of INTREQ and IC0-3 changes
 */
-static void tms9901_interrupt_callback(const device_config *device, int intreq, int ic)
+static TMS9910_INT_CALLBACK( tms9901_interrupt_callback )
 {
 	/* INTREQ is connected to INT1 (IC0-3 are not connected) */
 	cpu_set_input_line(device->machine->cpu[0], 0, intreq ? ASSERT_LINE : CLEAR_LINE);
@@ -1353,11 +1301,11 @@ static void tms9901_interrupt_callback(const device_config *device, int intreq, 
 	 (bit 2: INT2 status)
 	 bit 3-7: joystick status
 */
-static int R9901_0(int offset)
+static READ8_HANDLER( R9901_0 )
 {
 	int answer;
 
-	answer = input_port_read(Machine, "JOY") >> (JoySel * 8);
+	answer = input_port_read(space->machine, "JOY") >> (JoySel * 8);
 
 	return (answer);
 }
@@ -1374,11 +1322,11 @@ static int R9901_0(int offset)
 	 bit 5 & 7: used as output
 	 bit 6: unused
 */
-static int R9901_1(int offset)
+static READ8_HANDLER( R9901_1 )
 {
 	int answer;
 
-	answer = (input_port_read(Machine, "MOUSE0") & 4) ^ 4;
+	answer = (input_port_read(space->machine, "MOUSE0") & 4) ^ 4;
 
 	return answer;
 }
@@ -1386,7 +1334,7 @@ static int R9901_1(int offset)
 /*
 	Read pins P0-P7 of Geneve 9901.
 */
-static int R9901_2(int offset)
+static READ8_HANDLER( R9901_2 )
 {
 	return 0;
 }
@@ -1395,11 +1343,11 @@ static int R9901_2(int offset)
 	Read pins P8-P15 of Geneve 9901.
 	bit 4: mouse right button
 */
-static int R9901_3(int offset)
+static READ8_HANDLER( R9901_3 )
 {
 	int answer = 0;
 
-	if (! (input_port_read(Machine, "MOUSE0") & 4))
+	if (! (input_port_read(space->machine, "MOUSE0") & 4))
 		answer |= 0x10;
 
 	return answer;
@@ -1409,26 +1357,26 @@ static int R9901_3(int offset)
 /*
 	Write PE bus reset line
 */
-static void W9901_PE_bus_reset(int offset, int data)
+static WRITE8_HANDLER( W9901_PE_bus_reset )
 {
 }
 
 /*
 	Write VDP reset line
 */
-static void W9901_VDP_reset(int offset, int data)
+static WRITE8_HANDLER( W9901_VDP_reset )
 {
 }
 
 /*
 	Write joystick select line
 */
-static void W9901_JoySel(int offset, int data)
+static WRITE8_HANDLER( W9901_JoySel )
 {
 	JoySel = data;
 }
 
-static void W9901_KeyboardReset(int offset, int data)
+static WRITE8_HANDLER( W9901_KeyboardReset )
 {
 	KeyReset = ! data;
 	if (KeyReset)
@@ -1445,22 +1393,59 @@ static void W9901_KeyboardReset(int offset, int data)
 		KeyAutoRepeatKey = 0;
 	}
 	/*else
-		poll_keyboard(Machine);*/
+		poll_keyboard(space->machine);*/
 }
 
 /*
 	Write external mem cycles (0=long, 1=short)
 */
-static void W9901_ext_mem_wait_states(int offset, int data)
+static WRITE8_HANDLER( W9901_ext_mem_wait_states )
 {
 }
 
 /*
 	Write vdp wait cycles (1=add 15 cycles, 0=add none)
 */
-static void W9901_VDP_wait_states(int offset, int data)
+static WRITE8_HANDLER( W9901_VDP_wait_states )
 {
 }
 
+/* tms9901 setup */
+const tms9901_interface tms9901reset_param_ti99 =
+{
+	TMS9901_INT1 | TMS9901_INT2 | TMS9901_INT8 | TMS9901_INTB | TMS9901_INTC,	/* only input pins whose state is always known */
+
+	{	/* read handlers */
+		R9901_0,
+		R9901_1,
+		R9901_2,
+		R9901_3
+	},
+
+	{	/* write handlers */
+		W9901_PE_bus_reset,
+		W9901_VDP_reset,
+		W9901_JoySel,
+		NULL,
+		NULL,
+		NULL,
+		W9901_KeyboardReset,
+		W9901_ext_mem_wait_states,
+		NULL,
+		W9901_VDP_wait_states,
+		NULL,
+		NULL,
+		NULL,
+		NULL,
+		NULL,
+		NULL
+	},
+
+	/* interrupt handler */
+	tms9901_interrupt_callback,
+
+	/* clock rate = 3MHz */
+	3000000.
+};
 
 
