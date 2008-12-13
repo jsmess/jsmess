@@ -3,6 +3,14 @@
 
 	Raphael Nabet
 */
+#ifndef __TMS9901_H__
+#define __TMS9901_H__
+
+/***************************************************************************
+    MACROS
+***************************************************************************/
+
+#define TMS9901			DEVICE_GET_INFO_NAME(tms9901)
 
 
 /* Masks for the interrupts levels available on TMS9901 */
@@ -22,30 +30,37 @@
 #define TMS9901_INTE 0x4000
 #define TMS9901_INTF 0x8000
 
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
 
-typedef struct tms9901reset_param
+/* TMS5501 timer and interrupt controler */
+typedef struct _tms9901_interface tms9901_interface;
+struct _tms9901_interface
 {
 	int supported_int_mask;	/* a bit for each input pin whose state is always notified to the TMS9901 core */
 	int (*read_handlers[4])(int offset);	/* 4*8 bits */
 	void (*write_handlers[16])(int offset, int data);	/* 16 Pn outputs */
-	void (*interrupt_callback)(int intreq, int ic);		/* called when interrupt bus state changes */
+	void (*interrupt_callback)(const device_config *device, int intreq, int ic);		/* called when interrupt bus state changes */
 	double clock_rate;
-} tms9901reset_param;
+};
 
+void tms9901_set_single_int(const device_config *device, int pin_number, int state);
 
-void tms9901_init(running_machine *machine,int which, const tms9901reset_param *param);
-void tms9901_cleanup(int which);
-
-void tms9901_reset(int which);
-
-void tms9901_set_single_int(int which, int pin_number, int state);
-
-int tms9901_cru_r(int which, int offset);
-void tms9901_cru_w(int which, int offset, int data);
+DEVICE_GET_INFO(tms9901);
 
 /*********************** Standard 8-bit CPU interfaces *********************/
 
- READ8_HANDLER ( tms9901_0_cru_r );
-WRITE8_HANDLER ( tms9901_0_cru_w );
- READ8_HANDLER ( tms9901_1_cru_r );
-WRITE8_HANDLER ( tms9901_1_cru_w );
+READ8_DEVICE_HANDLER ( tms9901_cru_r );
+WRITE8_DEVICE_HANDLER( tms9901_cru_w );
+
+
+/***************************************************************************
+    DEVICE CONFIGURATION MACROS
+***************************************************************************/
+
+#define MDRV_TMS9901_ADD(_tag, _intrf) \
+	MDRV_DEVICE_ADD(_tag, TMS9901) \
+	MDRV_DEVICE_CONFIG(_intrf)
+
+#endif /* __TMS9901_H__ */

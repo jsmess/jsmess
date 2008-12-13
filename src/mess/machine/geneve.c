@@ -27,11 +27,11 @@
 static void inta_callback(running_machine *machine, int state);
 static void intb_callback(running_machine *machine, int state);
 
-static void read_key_if_possible(void);
+static void read_key_if_possible(running_machine *machine);
 static void poll_keyboard(running_machine *machine);
 static void poll_mouse(running_machine *machine);
 
-static void tms9901_interrupt_callback(int intreq, int ic);
+static void tms9901_interrupt_callback(const device_config *device,int intreq, int ic);
 static int R9901_0(int offset);
 static int R9901_1(int offset);
 static int R9901_2(int offset);
@@ -76,7 +76,7 @@ static char has_usb_sm;
 static char has_alt_boot;
 
 /* tms9901 setup */
-static const tms9901reset_param tms9901reset_param_ti99 =
+const tms9901_interface tms9901reset_param_ti99 =
 {
 	TMS9901_INT1 | TMS9901_INT2 | TMS9901_INT8 | TMS9901_INTB | TMS9901_INTC,	/* only input pins whose state is always known */
 
@@ -207,8 +207,6 @@ DRIVER_INIT( genmod )
 
 MACHINE_START( geneve )
 {
-	tms9901_init(machine, 0, & tms9901reset_param_ti99);
-
 	/* Initialize all. Actually, at this point, we don't know
 	   how the switches are set. Later we use the configuration switches to
 	   determine which one to use. */
@@ -237,9 +235,6 @@ MACHINE_RESET( geneve )
 
 	/* reset cartridge mapper */
 	cartridge_page = 0;
-
-	/* init tms9901 */
-	tms9901_reset(0);
 
 	v9938_reset(0);
 
@@ -315,8 +310,6 @@ static void machine_stop_geneve(running_machine *machine)
 {
 	if (has_ide)
 		ti99_ide_save_memcard();
-
-	tms9901_cleanup(0);
 }
 
 
@@ -349,7 +342,7 @@ INTERRUPT_GEN( geneve_hblank_interrupt )
 */
 static void inta_callback(running_machine *machine, int state)
 {
-	tms9901_set_single_int(0, 1, state);
+	tms9901_set_single_int(device_list_find_by_tag(machine->config->devicelist, TMS9901, "tms9901"), 1, state);
 	cpu_set_input_line(machine->cpu[0], 1, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -358,7 +351,7 @@ static void inta_callback(running_machine *machine, int state)
 */
 static void intb_callback(running_machine *machine, int state)
 {
-	tms9901_set_single_int(0, 12, state);
+	tms9901_set_single_int(device_list_find_by_tag(machine->config->devicelist, TMS9901, "tms9901"), 12, state);
 }
 
 
@@ -988,7 +981,7 @@ WRITE8_HANDLER ( geneve_peb_mode_cru_w )
 		if ((offset == 0x778) && data && (! (old_flags & mf_keyclock)))
 		{
 			/* set mf_keyclock */
-			read_key_if_possible();
+			read_key_if_possible(space->machine);
 		}
 		if (offset == 0x779)
 		{
@@ -996,7 +989,7 @@ WRITE8_HANDLER ( geneve_peb_mode_cru_w )
 			{
 				/* set mf_keyclear: enable key input */
 				/* shift in new key immediately if possible */
-				read_key_if_possible();
+				read_key_if_possible(space->machine);
 			}
 			else if ((! data) && (old_flags & mf_keyclear))
 			{
@@ -1007,7 +1000,7 @@ WRITE8_HANDLER ( geneve_peb_mode_cru_w )
 					KeyQueueLen--;
 				}
 				/* clear keyboard interrupt */
-				tms9901_set_single_int(0, 8, 0);
+				tms9901_set_single_int(device_list_find_by_tag(space->machine->config->devicelist, TMS9901, "tms9901"), 8, 0);
 				KeyInBuf = 0;
 			}
 		}
@@ -1022,13 +1015,13 @@ WRITE8_HANDLER ( geneve_peb_mode_cru_w )
 #pragma mark KEYBOARD INTERFACE
 #endif
 
-static void read_key_if_possible(void)
+static void read_key_if_possible(running_machine *machine)
 {
 	/* if keyboard reset is not asserted, and key clock is enabled, and key
 	buffer clear is disabled, and key queue is not empty. */
 	if ((! KeyReset) && (mode_flags & mf_keyclock) && (mode_flags & mf_keyclear) && KeyQueueLen)
 	{
-		tms9901_set_single_int(0, 8, 1);
+		tms9901_set_single_int(device_list_find_by_tag(machine->config->devicelist, TMS9901, "tms9901"), 8, 1);
 		KeyInBuf = 1;
 	}
 }
@@ -1240,7 +1233,7 @@ static void poll_keyboard(running_machine *machine)
 							keycode |= 0x80;
 						post_in_KeyQueue(keycode);
 					}
-					read_key_if_possible();
+					read_key_if_possible(machine);
 				}
 			}
 		}
@@ -1270,7 +1263,7 @@ static void poll_keyboard(running_machine *machine)
 		{
 			post_in_KeyQueue(KeyAutoRepeatKey);
 		}
-		read_key_if_possible();
+		read_key_if_possible(machine);
 		KeyAutoRepeatTimer = KeyAutoRepeatRate;
 	}
 }
@@ -1340,16 +1333,16 @@ static void poll_mouse(running_machine *machine)
 */
 /*void tms9901_set_int2(int state)
 {
-	tms9901_set_single_int(0, 2, state);
+	tms9901_set_single_int(device_list_find_by_tag(machine->config->devicelist, TMS9901, "tms9901"), 2, state);
 }*/
 
 /*
 	Called by the 9901 core whenever the state of INTREQ and IC0-3 changes
 */
-static void tms9901_interrupt_callback(int intreq, int ic)
+static void tms9901_interrupt_callback(const device_config *device, int intreq, int ic)
 {
 	/* INTREQ is connected to INT1 (IC0-3 are not connected) */
-	cpu_set_input_line(Machine->cpu[0], 0, intreq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[0], 0, intreq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /*

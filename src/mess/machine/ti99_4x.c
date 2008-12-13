@@ -77,7 +77,7 @@ static READ16_HANDLER ( ti99_rspeech_r );
 static WRITE16_HANDLER ( ti99_wspeech_w );
 
 static void tms9901_set_int1(running_machine *machine, int state);
-static void tms9901_interrupt_callback(int intreq, int ic);
+static void tms9901_interrupt_callback(const device_config *device, int intreq, int ic);
 static int ti99_R9901_0(int offset);
 static int ti99_R9901_1(int offset);
 static int ti99_R9901_2(int offset);
@@ -147,7 +147,7 @@ static char has_usb_sm;
 
 
 /* tms9901 setup */
-static const tms9901reset_param tms9901reset_param_ti99_4x =
+const tms9901_interface tms9901reset_param_ti99_4x =
 {
 	TMS9901_INT1 | TMS9901_INT2 | TMS9901_INTC,	/* only input pins whose state is always known */
 
@@ -184,7 +184,7 @@ static const tms9901reset_param tms9901reset_param_ti99_4x =
 	3000000.
 };
 
-static const tms9901reset_param tms9901reset_param_ti99_8 =
+const tms9901_interface tms9901reset_param_ti99_8 =
 {
 	TMS9901_INT1 | TMS9901_INT2 | TMS9901_INTC,	/* only input pins whose state is always known */
 
@@ -750,12 +750,6 @@ MACHINE_START( ti99_4ev_60hz)
 
 void ti99_common_init(running_machine *machine, const TMS9928a_interface *gfxparm) 
 {
-    if (ti99_model==model_99_8) {
-        tms9901_init(machine, 0, &tms9901reset_param_ti99_8);
-    }
-    else {
-		tms9901_init(machine, 0,  &tms9901reset_param_ti99_4x);
-    }
 	if (gfxparm!=0) TMS9928A_configure(gfxparm);
 
         /* Initialize all. Actually, at this point, we don't know
@@ -807,9 +801,6 @@ MACHINE_RESET( ti99 )
 			current_page_ptr = cartridge_pages[0];
 	}
 
-	/* init tms9901 */
-        tms9901_reset(0);
-
 	if (!has_evpc) TMS9928A_reset();
         else v9938_reset(0);
 
@@ -822,7 +813,7 @@ MACHINE_RESET( ti99 )
 	handset_buflen = 0;
 	handset_clock = 0;
 	handset_ack = 0;
-	tms9901_set_single_int(0, 12, 0);
+	tms9901_set_single_int(device_list_find_by_tag(machine->config->devicelist, TMS9901, "tms9901"), 12, 0);
 
 	/* read config */
 	if (ti99_model == model_99_8)
@@ -1790,7 +1781,7 @@ static TIMER_CALLBACK(ti99_handset_ack_callback)
 	handset_clock = ! handset_clock;
 	handset_buf >>= 4;
 	handset_buflen--;
-	tms9901_set_single_int(0, 12, 0);
+	tms9901_set_single_int(device_list_find_by_tag(machine->config->devicelist, TMS9901, "tms9901"), 12, 0);
 
 	if (handset_buflen == 1)
 	{
@@ -1832,13 +1823,13 @@ static void ti99_handset_set_ack(int offset, int data)
 
 	message: 12-bit message to post (only the 12 LSBits are meaningful)
 */
-static void ti99_handset_post_message(int message)
+static void ti99_handset_post_message(running_machine *machine, int message)
 {
 	/* post message and assert interrupt */
 	handset_clock = 1;
 	handset_buf = ~ message;
 	handset_buflen = 3;
-	tms9901_set_single_int(0, 12, 1);
+	tms9901_set_single_int(device_list_find_by_tag(machine->config->devicelist, TMS9901, "tms9901"), 12, 1);
 }
 
 /*
@@ -1884,7 +1875,7 @@ static int ti99_handset_poll_keyboard(running_machine *machine, int num)
 				previous_key[num] = current_key = previous_key[num] & ~0x20;
 			}
 			/* post message */
-			ti99_handset_post_message((((unsigned) current_key) << 4) | (num << 1));
+			ti99_handset_post_message(machine, (((unsigned) current_key) << 4) | (num << 1));
 
 			return TRUE;
 		}
@@ -1913,7 +1904,7 @@ static int ti99_handset_poll_keyboard(running_machine *machine, int num)
 		previous_key[num] = current_key;
 
 		/* post message */
-		ti99_handset_post_message((((unsigned) current_key) << 4) | (num << 1));
+		ti99_handset_post_message(machine, (((unsigned) current_key) << 4) | (num << 1));
 
 		return TRUE;
 	}
@@ -1990,7 +1981,7 @@ static int ti99_handset_poll_joystick(running_machine *machine, int num)
 		message |= (num << 1) | 0x1;
 
 		/* post message */
-		ti99_handset_post_message(message);
+		ti99_handset_post_message(machine, message);
 
 		return TRUE;
 	}
@@ -2221,7 +2212,7 @@ nota:
 */
 static void tms9901_set_int1(running_machine *machine, int state)
 {
-	tms9901_set_single_int(0, 1, state);
+	tms9901_set_single_int(device_list_find_by_tag(machine->config->devicelist, TMS9901, "tms9901"), 1, state);
 }
 
 /*
@@ -2229,23 +2220,23 @@ static void tms9901_set_int1(running_machine *machine, int state)
 */
 void tms9901_set_int2(running_machine *machine, int state)
 {
-	tms9901_set_single_int(0, 2, state);
+	tms9901_set_single_int(device_list_find_by_tag(machine->config->devicelist, TMS9901, "tms9901"), 2, state);
 }
 
 /*
 	Called by the 9901 core whenever the state of INTREQ and IC0-3 changes
 */
-static void tms9901_interrupt_callback(int intreq, int ic)
+static void tms9901_interrupt_callback(const device_config *device, int intreq, int ic)
 {
 	if (intreq)
 	{
 		/* On TI99, TMS9900 IC0-3 lines are not connected to TMS9901,
 		 * but hard-wired to force level 1 interrupts */
-		cpu_set_input_line_and_vector(Machine->cpu[0], 0, ASSERT_LINE, 1);	/* interrupt it, baby */
+		cpu_set_input_line_and_vector(device->machine->cpu[0], 0, ASSERT_LINE, 1);	/* interrupt it, baby */
 	}
 	else
 	{
-		cpu_set_input_line(Machine->cpu[0], 0, CLEAR_LINE);
+		cpu_set_input_line(device->machine->cpu[0], 0, CLEAR_LINE);
 	}
 }
 

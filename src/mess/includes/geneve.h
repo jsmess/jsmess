@@ -9,6 +9,7 @@
 #ifndef GENEVE_H_
 #define GENEVE_H_
 
+#include "machine/tms9901.h"
 
 /* defines */
 
@@ -41,5 +42,6 @@ WRITE8_HANDLER ( geneve_w );
 
 WRITE8_HANDLER ( geneve_peb_mode_cru_w );
 
+extern const tms9901_interface tms9901reset_param_ti99;
 
 #endif /* GENEVE_H_ */

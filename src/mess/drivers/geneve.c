@@ -234,14 +234,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(writecru, ADDRESS_SPACE_IO, 8)
 
-	AM_RANGE(0x0000, 0x07ff) AM_WRITE(tms9901_0_cru_w)
+	AM_RANGE(0x0000, 0x07ff) AM_DEVWRITE(TMS9901, "tms9901", tms9901_cru_w)
 	AM_RANGE(0x0800, 0x0fff) AM_WRITE(geneve_peb_mode_cru_w)
 
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(readcru, ADDRESS_SPACE_IO, 8)
 
-	AM_RANGE(0x0000, 0x00ff) AM_READ(tms9901_0_cru_r)
+	AM_RANGE(0x0000, 0x00ff) AM_DEVREAD(TMS9901, "tms9901", tms9901_cru_r)
 	AM_RANGE(0x0100, 0x01ff) AM_READ(geneve_peb_cru_r)
 
 ADDRESS_MAP_END
@@ -507,6 +507,9 @@ static MACHINE_DRIVER_START(geneve_60hz)
 	/* rtc */
 	MDRV_MM58274C_ADD("mm58274c", geneve_mm58274c_interface)
 	MDRV_MM58274C_ADD("mm58274c_floppy", floppy_mm58274c_interface)
+	
+	/* tms9901 */
+	MDRV_TMS9901_ADD("tms9901", tms9901reset_param_ti99)	
 MACHINE_DRIVER_END
 
 

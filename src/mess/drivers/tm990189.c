@@ -81,8 +81,8 @@ static int LED_display_window_height;
 
 static void hold_load(running_machine *machine);
 
-static void usr9901_interrupt_callback(int intreq, int ic);
-static void sys9901_interrupt_callback(int intreq, int ic);
+static void usr9901_interrupt_callback(const device_config *device, int intreq, int ic);
+static void sys9901_interrupt_callback(const device_config *device, int intreq, int ic);
 
 static void usr9901_led_w(int offset, int data);
 
@@ -96,7 +96,7 @@ static void sys9901_tapewdata_w(int offset, int data);
 
 
 /* user tms9901 setup */
-static const tms9901reset_param usr9901reset_param =
+static const tms9901_interface usr9901reset_param =
 {
 	TMS9901_INT1 | TMS9901_INT2 | TMS9901_INT3 | TMS9901_INT4 | TMS9901_INT5 | TMS9901_INT6,	/* only input pins whose state is always known */
 
@@ -135,7 +135,7 @@ static const tms9901reset_param usr9901reset_param =
 };
 
 /* system tms9901 setup */
-static const tms9901reset_param sys9901reset_param =
+static const tms9901_interface sys9901reset_param =
 {
 	0,	/* only input pins whose state is always known */
 
@@ -194,11 +194,6 @@ static MACHINE_RESET( tm990_189 )
 
 	hold_load(machine);
 
-	tms9901_init(machine, 0, &usr9901reset_param);
-	tms9901_init(machine, 1, &sys9901reset_param);
-	tms9901_reset(0);
-	tms9901_reset(1);
-
 	tms9902_init(machine, 0, &tms9902_params);
 }
 
@@ -225,11 +220,6 @@ static MACHINE_RESET( tm990_189_v )
 	joy2y_timer = timer_alloc(machine, NULL, NULL);
 
 	hold_load(machine);
-
-	tms9901_init(machine, 0, &usr9901reset_param);
-	tms9901_init(machine, 1, &sys9901reset_param);
-	tms9901_reset(0);
-	tms9901_reset(1);
 
 	tms9902_init(machine, 0, &tms9902_params);
 
@@ -380,7 +370,7 @@ static void hold_load(running_machine *machine)
     tms9901 code
 */
 
-static void usr9901_interrupt_callback(int intreq, int ic)
+static void usr9901_interrupt_callback(const device_config *device, int intreq, int ic)
 {
 	ic_state = ic & 7;
 
@@ -396,11 +386,11 @@ static void usr9901_led_w(int offset, int data)
 		LED_state &= ~(1 << offset);
 }
 
-static void sys9901_interrupt_callback(int intreq, int ic)
+static void sys9901_interrupt_callback(const device_config *device,int intreq, int ic)
 {
 	(void)ic;
 
-	tms9901_set_single_int(0, 5, intreq);
+	tms9901_set_single_int(device_list_find_by_tag(device->machine->config->devicelist, TMS9901, "tms9901_0"), 5, intreq);
 }
 
 static int sys9901_r0(int offset)
@@ -761,20 +751,16 @@ ADDRESS_MAP_END
 */
 
 static ADDRESS_MAP_START(tm990_189_writecru, ADDRESS_SPACE_IO, 8)
-
-
-	AM_RANGE(0x000, 0x1ff) AM_WRITE(tms9901_0_cru_w)	/* user I/O tms9901 */
-	AM_RANGE(0x200, 0x3ff) AM_WRITE(tms9901_1_cru_w)	/* system I/O tms9901 */
+	AM_RANGE(0x000, 0x1ff) AM_DEVWRITE(TMS9901, "tms9901_0", tms9901_cru_w)	/* user I/O tms9901 */
+	AM_RANGE(0x200, 0x3ff) AM_DEVWRITE(TMS9901, "tms9901_1", tms9901_cru_w)	/* system I/O tms9901 */
 	AM_RANGE(0x400, 0x5ff) AM_WRITE(tms9902_0_cru_w)	/* optional tms9902 */
 
 	AM_RANGE(0x0800,0x1fff)AM_WRITE(ext_instr_decode)	/* external instruction decoding (IDLE, RSET, CKON, CKOF, LREX) */
-
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(tm990_189_readcru, ADDRESS_SPACE_IO, 8)
-
-	AM_RANGE(0x00, 0x3f) AM_READ(tms9901_0_cru_r)		/* user I/O tms9901 */
-	AM_RANGE(0x40, 0x6f) AM_READ(tms9901_1_cru_r)		/* system I/O tms9901 */
+	AM_RANGE(0x00, 0x3f) AM_DEVREAD(TMS9901, "tms9901_0", tms9901_cru_r)		/* user I/O tms9901 */
+	AM_RANGE(0x40, 0x6f) AM_DEVREAD(TMS9901, "tms9901_1", tms9901_cru_r)		/* system I/O tms9901 */
 	AM_RANGE(0x80, 0xcf) AM_READ(tms9902_0_cru_r)		/* optional tms9902 */
 
 ADDRESS_MAP_END
@@ -821,6 +807,9 @@ static MACHINE_DRIVER_START(tm990_189)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
+	
+	MDRV_TMS9901_ADD("tms9901_0", usr9901reset_param)
+	MDRV_TMS9901_ADD("tms9901_1", sys9901reset_param)
 MACHINE_DRIVER_END
 
 #define LEFT_BORDER		15
@@ -859,6 +848,9 @@ static MACHINE_DRIVER_START(tm990_189_v)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
+
+	MDRV_TMS9901_ADD("tms9901_0", usr9901reset_param)
+	MDRV_TMS9901_ADD("tms9901_1", sys9901reset_param)	
 MACHINE_DRIVER_END
 
 
