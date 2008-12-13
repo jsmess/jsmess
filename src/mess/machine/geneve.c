@@ -1287,7 +1287,7 @@ static void poll_mouse(running_machine *machine)
 /*
 	Called by the 9901 core whenever the state of INTREQ and IC0-3 changes
 */
-static TMS9910_INT_CALLBACK( tms9901_interrupt_callback )
+static TMS9901_INT_CALLBACK( tms9901_interrupt_callback )
 {
 	/* INTREQ is connected to INT1 (IC0-3 are not connected) */
 	cpu_set_input_line(device->machine->cpu[0], 0, intreq ? ASSERT_LINE : CLEAR_LINE);

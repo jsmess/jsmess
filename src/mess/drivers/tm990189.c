@@ -80,17 +80,6 @@ static int LED_display_window_height;
 
 static void hold_load(running_machine *machine);
 
-static void rts_callback(int which, int RTS);
-static void xmit_callback(int which, int data);
-
-static const tms9902reset_param tms9902_params =
-{
-	2000000.,				/* clock rate (2MHz) */
-	NULL,/*int_callback,*/	/* called when interrupt pin state changes */
-	rts_callback,			/* called when Request To Send pin state changes */
-	NULL,/*brk_callback,*/	/* called when BReaK state changes */
-	xmit_callback			/* called when a character is transmitted */
-};
 
 static const device_config *rs232_fp;
 static UINT8 rs232_rts;
@@ -101,8 +90,6 @@ static MACHINE_RESET( tm990_189 )
 	displayena_timer = timer_alloc(machine, NULL, NULL);
 
 	hold_load(machine);
-
-	tms9902_init(machine, 0, &tms9902_params);
 }
 
 static const TMS9928a_interface tms9918_interface =
@@ -128,9 +115,7 @@ static MACHINE_RESET( tm990_189_v )
 	joy2y_timer = timer_alloc(machine, NULL, NULL);
 
 	hold_load(machine);
-
-	tms9902_init(machine, 0, &tms9902_params);
-
+	
 	TMS9928A_reset();
 }
 
@@ -278,7 +263,7 @@ static void hold_load(running_machine *machine)
     tms9901 code
 */
 
-static TMS9910_INT_CALLBACK ( usr9901_interrupt_callback )
+static TMS9901_INT_CALLBACK ( usr9901_interrupt_callback )
 {
 	ic_state = ic & 7;
 
@@ -294,7 +279,7 @@ static WRITE8_HANDLER( usr9901_led_w )
 		LED_state &= ~(1 << offset);
 }
 
-static TMS9910_INT_CALLBACK( sys9901_interrupt_callback )
+static TMS9901_INT_CALLBACK( sys9901_interrupt_callback )
 {
 	(void)ic;
 
@@ -375,7 +360,7 @@ static TIMER_CALLBACK(rs232_input_callback)
 	if (/*rs232_rts &&*/ /*(mame_ftell(rs232_fp) < mame_fsize(rs232_fp))*/1)
 	{
 		if (image_fread(rs232_fp, &buf, 1) == 1)
-			tms9902_push_data(0, buf);
+			tms9902_push_data(device_list_find_by_tag(machine->config->devicelist, TMS9902, "tms9902"), buf);
 	}
 }
 
@@ -391,7 +376,7 @@ static DEVICE_IMAGE_LOAD( tm990_189_rs232 )
 
 	rs232_fp = image;
 
-	tms9902_set_dsr(id, 1);
+	tms9902_set_dsr(device_list_find_by_tag(image->machine->config->devicelist, TMS9902, "tms9902"), 1);
 	rs232_input_timer = timer_alloc(image->machine, rs232_input_callback, NULL);
 	timer_adjust_periodic(rs232_input_timer, attotime_zero, 0, ATTOTIME_IN_MSEC(10));
 
@@ -410,18 +395,18 @@ static DEVICE_IMAGE_UNLOAD( tm990_189_rs232 )
 
 	rs232_fp = NULL;
 
-	tms9902_set_dsr(id, 0);
+	tms9902_set_dsr(device_list_find_by_tag(image->machine->config->devicelist, TMS9902, "tms9902"), 0);
 
 	timer_reset(rs232_input_timer, attotime_never);	/* FIXME - timers should only be allocated once */
 }
 
-static void rts_callback(int which, int RTS)
+static TMS9902_RST_CALLBACK( rts_callback )
 {
 	rs232_rts = RTS;
-	tms9902_set_cts(which, RTS);
+	tms9902_set_cts(device, RTS);
 }
 
-static void xmit_callback(int which, int data)
+static TMS9902_XMIT_CALLBACK( xmit_callback )
 {
 	UINT8 buf = data;
 
@@ -657,6 +642,15 @@ static const tms9901_interface sys9901reset_param =
     0x3000-0x3fff: 4kb onboard ROM
 */
 
+static const tms9902_interface tms9902_params =
+{
+	2000000.,				/* clock rate (2MHz) */
+	NULL,/*int_callback,*/	/* called when interrupt pin state changes */
+	rts_callback,			/* called when Request To Send pin state changes */
+	NULL,/*brk_callback,*/	/* called when BReaK state changes */
+	xmit_callback			/* called when a character is transmitted */
+};
+
 static ADDRESS_MAP_START(tm990_189_memmap, ADDRESS_SPACE_PROGRAM, 8)
 
 	AM_RANGE(0x0000, 0x07ff) AM_RAM									/* RAM */
@@ -737,7 +731,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(tm990_189_writecru, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x000, 0x1ff) AM_DEVWRITE(TMS9901, "tms9901_0", tms9901_cru_w)	/* user I/O tms9901 */
 	AM_RANGE(0x200, 0x3ff) AM_DEVWRITE(TMS9901, "tms9901_1", tms9901_cru_w)	/* system I/O tms9901 */
-	AM_RANGE(0x400, 0x5ff) AM_WRITE(tms9902_0_cru_w)	/* optional tms9902 */
+	AM_RANGE(0x400, 0x5ff) AM_DEVWRITE(TMS9902, "tms9902", tms9902_cru_w)	/* optional tms9902 */
 
 	AM_RANGE(0x0800,0x1fff)AM_WRITE(ext_instr_decode)	/* external instruction decoding (IDLE, RSET, CKON, CKOF, LREX) */
 ADDRESS_MAP_END
@@ -745,7 +739,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(tm990_189_readcru, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x00, 0x3f) AM_DEVREAD(TMS9901, "tms9901_0", tms9901_cru_r)		/* user I/O tms9901 */
 	AM_RANGE(0x40, 0x6f) AM_DEVREAD(TMS9901, "tms9901_1", tms9901_cru_r)		/* system I/O tms9901 */
-	AM_RANGE(0x80, 0xcf) AM_READ(tms9902_0_cru_r)		/* optional tms9902 */
+	AM_RANGE(0x80, 0xcf) AM_DEVREAD(TMS9902, "tms9902", tms9902_cru_r)		/* optional tms9902 */
 
 ADDRESS_MAP_END
 
@@ -792,8 +786,11 @@ static MACHINE_DRIVER_START(tm990_189)
 
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
 	
+	/* tms9901 */
 	MDRV_TMS9901_ADD("tms9901_0", usr9901reset_param)
 	MDRV_TMS9901_ADD("tms9901_1", sys9901reset_param)
+	/* tms9902 */
+	MDRV_TMS9902_ADD("tms9902", tms9902_params)
 MACHINE_DRIVER_END
 
 #define LEFT_BORDER		15
@@ -833,8 +830,11 @@ static MACHINE_DRIVER_START(tm990_189_v)
 
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
 
+	/* tms9901 */
 	MDRV_TMS9901_ADD("tms9901_0", usr9901reset_param)
-	MDRV_TMS9901_ADD("tms9901_1", sys9901reset_param)	
+	MDRV_TMS9901_ADD("tms9901_1", sys9901reset_param)
+	/* tms9902 */
+	MDRV_TMS9902_ADD("tms9902", tms9902_params)
 MACHINE_DRIVER_END
 
 

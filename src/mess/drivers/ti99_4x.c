@@ -23,6 +23,7 @@ Historical notes: TI made several last minute design changes.
 #include "video/v9938.h"
 #include "machine/ti99_4x.h"
 #include "machine/tms9901.h"
+#include "machine/tms9902.h"
 #include "audio/spchroms.h"
 #include "machine/99_peb.h"
 #include "machine/994x_ser.h"
@@ -545,10 +546,12 @@ static MACHINE_DRIVER_START(ti99_4_60hz)
 	MDRV_CASSETTE_ADD( "cassette2", default_cassette_config )
 	
 	/* rtc */
-	MDRV_MM58274C_ADD("mm58274c_floppy", floppy_mm58274c_interface)	
-	
+	MDRV_MM58274C_ADD("mm58274c_floppy", floppy_mm58274c_interface)		
 	/* tms9901 */
-	MDRV_TMS9901_ADD("tms9901", tms9901reset_param_ti99_4x)
+	MDRV_TMS9901_ADD("tms9901", tms9901reset_param_ti99_4x)	
+	/* tms9902 */
+	MDRV_TMS9902_ADD("tms9902_0", tms9902_params_0)
+	MDRV_TMS9902_ADD("tms9902_1", tms9902_params_1)		
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START(ti99_4_50hz)
@@ -592,6 +595,9 @@ static MACHINE_DRIVER_START(ti99_4_50hz)
 	MDRV_MM58274C_ADD("mm58274c_floppy", floppy_mm58274c_interface)	
 	/* tms9901 */
 	MDRV_TMS9901_ADD("tms9901", tms9901reset_param_ti99_4x)	
+	/* tms9902 */
+	MDRV_TMS9902_ADD("tms9902_0", tms9902_params_0)
+	MDRV_TMS9902_ADD("tms9902_1", tms9902_params_1)		
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START(ti99_4a_60hz)
@@ -636,6 +642,9 @@ static MACHINE_DRIVER_START(ti99_4a_60hz)
 	
 	/* tms9901 */
 	MDRV_TMS9901_ADD("tms9901", tms9901reset_param_ti99_4x)	
+	/* tms9902 */
+	MDRV_TMS9902_ADD("tms9902_0", tms9902_params_0)
+	MDRV_TMS9902_ADD("tms9902_1", tms9902_params_1)		
 MACHINE_DRIVER_END
 
 
@@ -677,10 +686,12 @@ static MACHINE_DRIVER_START(ti99_4a_50hz)
 	MDRV_CASSETTE_ADD( "cassette2", default_cassette_config )
 
 	/* rtc */
-	MDRV_MM58274C_ADD("mm58274c_floppy", floppy_mm58274c_interface)	
-	
+	MDRV_MM58274C_ADD("mm58274c_floppy", floppy_mm58274c_interface)		
 	/* tms9901 */
 	MDRV_TMS9901_ADD("tms9901", tms9901reset_param_ti99_4x)	
+	/* tms9902 */
+	MDRV_TMS9902_ADD("tms9902_0", tms9902_params_0)
+	MDRV_TMS9902_ADD("tms9902_1", tms9902_params_1)	
 MACHINE_DRIVER_END
 
 
@@ -733,6 +744,9 @@ static MACHINE_DRIVER_START(ti99_4ev_60hz)
 	MDRV_MM58274C_ADD("mm58274c_floppy", floppy_mm58274c_interface)	
 	/* tms9901 */
 	MDRV_TMS9901_ADD("tms9901", tms9901reset_param_ti99_4x)
+	/* tms9902 */
+	MDRV_TMS9902_ADD("tms9902_0", tms9902_params_0)
+	MDRV_TMS9902_ADD("tms9902_1", tms9902_params_1)		
 MACHINE_DRIVER_END
 
 

@@ -12,7 +12,6 @@
 
 #define TMS9901			DEVICE_GET_INFO_NAME(tms9901)
 
-
 /* Masks for the interrupts levels available on TMS9901 */
 #define TMS9901_INT1 0x0002
 #define TMS9901_INT2 0x0004
@@ -34,29 +33,30 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef void (*tms9910_int_callback_func)(const device_config *device, int intreq, int ic);
-#define TMS9910_INT_CALLBACK(name)	void name(const device_config *device, int intreq, int ic )
+typedef void (*tms9901_int_callback_func)(const device_config *device, int intreq, int ic);
+#define TMS9901_INT_CALLBACK(name)	void name(const device_config *device, int intreq, int ic )
 
-/* TMS5501 timer and interrupt controler */
 typedef struct _tms9901_interface tms9901_interface;
 struct _tms9901_interface
 {
 	int supported_int_mask;	/* a bit for each input pin whose state is always notified to the TMS9901 core */
 	read8_space_func  read_handlers[4];	  /* 4*8 bits */
 	write8_space_func write_handlers[16]; /* 16 Pn outputs */
-	tms9910_int_callback_func interrupt_callback; /* called when interrupt bus state changes */
+	tms9901_int_callback_func interrupt_callback; /* called when interrupt bus state changes */
 	double clock_rate;
 };
+
+
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
 
 void tms9901_set_single_int(const device_config *device, int pin_number, int state);
 
 DEVICE_GET_INFO(tms9901);
 
-/*********************** Standard 8-bit CPU interfaces *********************/
-
 READ8_DEVICE_HANDLER ( tms9901_cru_r );
 WRITE8_DEVICE_HANDLER( tms9901_cru_w );
-
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS

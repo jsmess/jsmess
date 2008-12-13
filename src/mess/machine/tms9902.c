@@ -9,8 +9,6 @@
 
 #include "tms9902.h"
 
-#define MAX_9902 2
-
 /*
 	TMS9902 emulation.
 
@@ -25,7 +23,13 @@ Pins:
 
 */
 
-typedef struct tms9902_t
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef struct _tms9902_t tms9902_t;
+struct _tms9902_t
 {
 	/* driver-specific configuration */
 	/* tms9902 clock rate (PHI* pin, normally connected to TMS9900 Phi3*) */
@@ -34,14 +38,8 @@ typedef struct tms9902_t
 	(warning: 3MHz on a tms9900 is equivalent to 12MHz on a tms9995 or tms99000) */
 	double clock_rate;
 
-	void (*int_callback)(int which, int INT);	/* called when interrupt pin state changes */
-	void (*rts_callback)(int which, int RTS);	/* called when Request To Send pin state changes */
-	void (*brk_callback)(int which, int BRK);	/* called when BReaK state changes */
-	void (*xmit_callback)(int which, int data);	/* called when a character is transmitted */
-
-
 	/* CRU interface */
-	int register_select;	/* bits which select which register is being written to */
+	int register_select;	/* bits device select device register is being written to */
 
 	/* inputs pins */
 	unsigned int CTS : 1;
@@ -93,7 +91,10 @@ typedef struct tms9902_t
 
 	/* clock registers */
 	void *timer;			/* MESS timer, used to emulate the decrementer register */
-} tms9902_t;
+
+	/* Pointer to interface */
+	const tms9902_interface *intf;	
+};
 
 /* bits in register_select */
 enum
@@ -104,159 +105,103 @@ enum
 	register_select_LDCTRL = 0x8
 };
 
-static tms9902_t tms9902[MAX_9902];
+static void initiate_transmit(const device_config *device);
+static void set_brk(const device_config *device, int state);
+static DEVICE_RESET( tms9902 );
 
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
 
-/*
-	prototypes
-*/
-
-static void field_interrupts(int which);
-static TIMER_CALLBACK(decrementer_callback);
-static void set_rts(int which, int state);
-static void set_brk(int which, int state);
-static void initiate_transmit(int which);
-
-
-/*
-	utilities
-*/
-
-
-/*
-	initialize the tms9902 core
-*/
-void tms9902_init(running_machine *machine,int which, const tms9902reset_param *param)
+INLINE tms9902_t *get_token(const device_config *device)
 {
-	tms9902[which].clock_rate = param->clock_rate;
-
-	tms9902[which].int_callback = param->int_callback;
-	tms9902[which].rts_callback = param->rts_callback;
-	tms9902[which].brk_callback = param->brk_callback;
-	tms9902[which].xmit_callback = param->xmit_callback;
-
-	tms9902[which].timer = timer_alloc(machine, decrementer_callback, NULL);
-
-	tms9902_reset(which);
+	assert(device != NULL);
+	assert(device->type == TMS9902);
+	return (tms9902_t *) device->token;
 }
 
-
-void tms9902_cleanup(int which)
-{
-	if (tms9902[which].timer)
-	{
-		timer_reset(tms9902[which].timer, attotime_never);	/* FIXME - timers should only be allocated once */
-		tms9902[which].timer = NULL;
-	}
-}
-
-void tms9902_reset(int which)
-{
-	/*  disable all interrupts */
-	tms9902[which].DSCENB = 0;
-	tms9902[which].TIMENB = 0;
-	tms9902[which].XBIENB = 0;
-	tms9902[which].RIENB = 0;
-	if (tms9902[which].int_callback)
-		(*tms9902[which].int_callback)(which, 0);
-	/* initialize transmitter */
-	tms9902[which].XBRE = 1;
-	tms9902[which].XSRE = 1;
-	/* initialize receiver */
-	tms9902[which].RBRL = 0;
-	/* we probably need to clear receive error conditions, too... */
-	/* clear RTS */
-	tms9902[which].RTSON = 0;
-	tms9902[which].RTS = 0;
-	if (tms9902[which].rts_callback)
-		(*tms9902[which].rts_callback)(which, 0);
-	/* set all resister load flags to 1 */
-	tms9902[which].register_select = 0xf;
-	/* clear break condition */
-	tms9902[which].BRKON = 0;
-	tms9902[which].BRK = 0;
-	if (tms9902[which].brk_callback)
-		(*tms9902[which].brk_callback)(which, 0);
-	field_interrupts(which);
-}
 
 /*
 	should be called after any change to int_state or enabled_ints.
 */
-static void field_interrupts(int which)
+static void field_interrupts(const device_config *device)
 {
-	int new_int = (tms9902[which].DSCH && tms9902[which].DSCENB)
-							|| (tms9902[which].RBRL && tms9902[which].RIENB)
-							|| (tms9902[which].XBRE && tms9902[which].XBIENB)
-							|| (tms9902[which].TIMELP && tms9902[which].TIMENB);
+	tms9902_t *tms9902 = get_token(device);
+	int new_int = (tms9902->DSCH && tms9902->DSCENB)
+							|| (tms9902->RBRL && tms9902->RIENB)
+							|| (tms9902->XBRE && tms9902->XBIENB)
+							|| (tms9902->TIMELP && tms9902->TIMENB);
 
-	if (new_int != tms9902[which].INT)
+	if (new_int != tms9902->INT)
 	{
-		tms9902[which].INT = new_int;
+		tms9902->INT = new_int;
 
-		if (tms9902[which].int_callback)
-			(*tms9902[which].int_callback)(which, new_int);
+		if (tms9902->intf->int_callback)
+			(*tms9902->intf->int_callback)(device, new_int);
 	}
 }
 
 
 /*
-	function which should be called by the driver when the state of CTS changes
+	function device should be called by the driver when the state of CTS changes
 
 	state == 0: CTS* is inactive (high)
-	state != 0: CTS* is active (low)
+	state != 0: CTS* is active (low) 
 */
-void tms9902_set_cts(int which, int state)
+void tms9902_set_cts(const device_config *device, int state)
 {
+	tms9902_t *tms9902 = get_token(device);
 	state = state != 0;
 
-	if (state != tms9902[which].CTS)
+	if (state != tms9902->CTS)
 	{
-		tms9902[which].CTS = state;
-		tms9902[which].DSCH = 1;
-		field_interrupts(which);
+		tms9902->CTS = state;
+		tms9902->DSCH = 1;
+		field_interrupts(device);
 
-		if (state && tms9902[which].RTS && tms9902[which].XSRE)
+		if (state && tms9902->RTS && tms9902->XSRE)
 		{
-			if ((! tms9902[which].XBRE) && ! tms9902[which].BRK)
-				initiate_transmit(which);
-			else if (tms9902[which].BRKON)
-				set_brk(which, 1);
+			if ((! tms9902->XBRE) && ! tms9902->BRK)
+				initiate_transmit(device);
+			else if (tms9902->BRKON)
+				set_brk(device, 1);
 		}
 	}
 }
 
 
 /*
-	function which should be called by the driver when the state of DSR changes
+	function device should be called by the driver when the state of DSR changes
 
 	state == 0: DSR* is inactive (high)
 	state != 0: DSR* is active (low)
 */
-void tms9902_set_dsr(int which, int state)
+void tms9902_set_dsr(const device_config *device, int state)
 {
+	tms9902_t *tms9902 = get_token(device);
 	state = state != 0;
 
-	if (state != tms9902[which].DSR)
+	if (state != tms9902->DSR)
 	{
-		tms9902[which].DSR = state;
-		tms9902[which].DSCH = 1;
-		field_interrupts(which);
+		tms9902->DSR = state;
+		tms9902->DSCH = 1;
+		field_interrupts(device);
 	}
 }
 
 
-void tms9902_push_data(int which, int data)
+void tms9902_push_data(const device_config *device, int data)
 {
-	tms9902[which].RBR = data;
+	tms9902_t *tms9902 = get_token(device);
+	tms9902->RBR = data;
 
-	if (! tms9902[which].RBRL)
+	if (! tms9902->RBRL)
 	{
-		tms9902[which].RBRL = 1;
-		field_interrupts(which);
+		tms9902->RBRL = 1;
+		field_interrupts(device);
 	}
 	else
-		tms9902[which].ROVER = 1;
+		tms9902->ROVER = 1;
 }
 
 
@@ -266,84 +211,91 @@ void tms9902_push_data(int which, int data)
 */
 static TIMER_CALLBACK(decrementer_callback)
 {
-	int which = param;
-	if (tms9902[which].TIMELP)
-		tms9902[which].TIMERR = 1;
+	const device_config *device = (const device_config *) ptr;
+	tms9902_t *tms9902 = get_token(device);
+	
+	if (tms9902->TIMELP)
+		tms9902->TIMERR = 1;
 	else
-		tms9902[which].TIMELP = 1;
+		tms9902->TIMELP = 1;
 }
 
 /*
 	load the content of clockinvl into the decrementer
 */
-static void reload_interval_timer(int which)
+static void reload_interval_timer(const device_config *device)
 {
-	if (tms9902[which].TMR)
+	tms9902_t *tms9902 = get_token(device);
+	if (tms9902->TMR)
 	{	/* reset clock interval */
-		timer_adjust_periodic(tms9902[which].timer,
-						double_to_attotime((double) tms9902[which].TMR / (tms9902[which].clock_rate / ((tms9902[which].CLK4M) ? 4. : 3.) / 64.)),
-						which,
-						double_to_attotime((double) tms9902[which].TMR / (tms9902[which].clock_rate / ((tms9902[which].CLK4M) ? 4. : 3.) / 64.)));
+		timer_adjust_periodic(tms9902->timer,
+						double_to_attotime((double) tms9902->TMR / (tms9902->clock_rate / ((tms9902->CLK4M) ? 4. : 3.) / 64.)),
+						0,
+						double_to_attotime((double) tms9902->TMR / (tms9902->clock_rate / ((tms9902->CLK4M) ? 4. : 3.) / 64.)));
 	}
 	else
 	{	/* clock interval == 0 -> no timer */
-		timer_enable(tms9902[which].timer, 0);
+		timer_enable(tms9902->timer, 0);
 	}
 }
 
 
-static void set_rts(int which, int state)
+static void set_rts(const device_config *device, int state)
 {
+	tms9902_t *tms9902 = get_token(device);
 	/*state = state != 0;*/
 
-	if (state != tms9902[which].RTS)
+	if (state != tms9902->RTS)
 	{
-		tms9902[which].RTS = state;
+		tms9902->RTS = state;
 
-		if (tms9902[which].rts_callback)
-			(*tms9902[which].rts_callback)(which, state);
+		if (tms9902->intf->rts_callback)
+			(*tms9902->intf->rts_callback)(device, state);
 	}
 }
 
 
-static void set_brk(int which, int state)
+static void set_brk(const device_config *device, int state)
 {
+	tms9902_t *tms9902 = get_token(device);
 	/*state = state != 0;*/
 
-	if (state != tms9902[which].BRK)
+	if (state != tms9902->BRK)
 	{
-		tms9902[which].BRK = state;
+		tms9902->BRK = state;
 
-		if (tms9902[which].brk_callback)
-			(*tms9902[which].brk_callback)(which, state);
+		if (tms9902->intf->brk_callback)
+			(*tms9902->intf->brk_callback)(device, state);
 	}
 }
 
 
-static void initiate_transmit(int which)
+static void initiate_transmit(const device_config *device)
 {
+	tms9902_t *tms9902 = get_token(device);
+	
 	/* Load transmit register */
-	tms9902[which].XSR = tms9902[which].XBR;
-	tms9902[which].XSRE = 0;
-	tms9902[which].XBRE = 1;
-	field_interrupts(which);
+	tms9902->XSR = tms9902->XBR;
+	tms9902->XSRE = 0;
+	tms9902->XBRE = 1;
+	field_interrupts(device);
 
 	/* Do transmit at once (I will add a timer delay some day, maybe) */
 
-	if (tms9902[which].xmit_callback)
-		(*tms9902[which].xmit_callback)(which, tms9902[which].XSR & (0xff >> (3-tms9902[which].RCL)));
+	if (tms9902->intf->xmit_callback)
+		(*tms9902->intf->xmit_callback)(device, tms9902->XSR & (0xff >> (3-tms9902->RCL)));
 
-	tms9902[which].XSRE = 1;
+	tms9902->XSRE = 1;
 
-	if ((! tms9902[which].XBRE) /*&& tms9902[which].RTS*/ && tms9902[which].CTS /*&& ! tms9902[which].BRK*/)
+	if ((! tms9902->XBRE) /*&& tms9902->RTS*/ && tms9902->CTS /*&& ! tms9902->BRK*/)
 		/* load next byte */
-		initiate_transmit(which);
-	else if (tms9902[which].BRKON /*&& tms9902[which].RTS*/ && tms9902[which].CTS)
+		initiate_transmit(device);
+	else if (tms9902->BRKON /*&& tms9902->RTS*/ && tms9902->CTS)
 		/* enter break mode */
-		set_brk(which, 1);
-	else if ((! tms9902[which].RTSON) && ((! tms9902[which].CTS) || (tms9902[which].XBRE && ! tms9902[which].BRK)))
+		set_brk(device, 1);
+	else if ((! tms9902->RTSON) && ((! tms9902->CTS) || (tms9902->XBRE && ! tms9902->BRK)))
 		/* clear RTS output */
-		set_rts(which, 0);
+		set_rts(device, 0);
 }
 
 
@@ -365,42 +317,43 @@ static void initiate_transmit(int which)
 	bit 13-15: not emulated, normally used for diagnostics
 	bit 16: RBINT (RBRL&RIENB)
 */
-int tms9902_cru_r(int which, int offset)
+READ8_DEVICE_HANDLER( tms9902_cru_r )
 {
 	int answer = 0;
+	tms9902_t *tms9902 = get_token(device);
 
 	offset &= 0x003;
 
 	switch (offset)
 	{
 	case 0:
-		answer = tms9902[which].RBR;
+		answer = tms9902->RBR;
 		break;
 
 	case 1:
-		answer = (tms9902[which].ROVER << 3)
-					| (tms9902[which].ROVER << 1);
+		answer = (tms9902->ROVER << 3)
+					| (tms9902->ROVER << 1);
 		break;
 
 	case 2:
-		answer = (tms9902[which].XSRE << 7)
-					| (tms9902[which].XBRE << 6)
-					| (tms9902[which].RBRL << 5)
-					| ((tms9902[which].DSCH & tms9902[which].DSCENB) << 4)
-					| ((tms9902[which].TIMELP & tms9902[which].TIMENB) << 3)
-					| ((tms9902[which].XBRE & tms9902[which].XBIENB) << 1)
-					| (tms9902[which].RBRL & tms9902[which].RIENB);
+		answer = (tms9902->XSRE << 7)
+					| (tms9902->XBRE << 6)
+					| (tms9902->RBRL << 5)
+					| ((tms9902->DSCH & tms9902->DSCENB) << 4)
+					| ((tms9902->TIMELP & tms9902->TIMENB) << 3)
+					| ((tms9902->XBRE & tms9902->XBIENB) << 1)
+					| (tms9902->RBRL & tms9902->RIENB);
 		break;
 
 	case 3:
-		answer = (tms9902[which].INT << 7)
-					| ((tms9902[which].register_select != 0) << 6)
-					| (tms9902[which].DSCH << 5)
-					| (tms9902[which].CTS << 4)
-					| (tms9902[which].DSR << 3)
-					| (tms9902[which].RTS << 2)
-					| (tms9902[which].TIMELP << 1)
-					| (tms9902[which].TIMERR);
+		answer = (tms9902->INT << 7)
+					| ((tms9902->register_select != 0) << 6)
+					| (tms9902->DSCH << 5)
+					| (tms9902->CTS << 4)
+					| (tms9902->DSR << 3)
+					| (tms9902->RTS << 2)
+					| (tms9902->TIMELP << 1)
+					| (tms9902->TIMERR);
 		break;
 	}
 
@@ -413,8 +366,10 @@ int tms9902_cru_r(int which, int offset)
 	signification:
 	...
 */
-void tms9902_cru_w(int which, int offset, int data)
+WRITE8_DEVICE_HANDLER( tms9902_cru_w )
 {
+	tms9902_t *tms9902 = get_token(device);
+	
 	data &= 1;	/* clear extra bits */
 	offset &= 0x01F;
 
@@ -435,7 +390,7 @@ void tms9902_cru_w(int which, int offset, int data)
 		{
 			int mask = 1 << offset;
 
-			if (tms9902[which].register_select & register_select_LDCTRL)
+			if (tms9902->register_select & register_select_LDCTRL)
 			{	/* Control Register */
 				if (offset <= 7)
 				{
@@ -444,68 +399,68 @@ void tms9902_cru_w(int which, int offset, int data)
 					case 0:
 					case 1:
 						if (data)
-							tms9902[which].RCL |= mask;
+							tms9902->RCL |= mask;
 						else
-							tms9902[which].RCL &= ~mask;
+							tms9902->RCL &= ~mask;
 						break;
 
 					case 3:
-						tms9902[which].CLK4M = data;
+						tms9902->CLK4M = data;
 						break;
 
 					/* ... */
 					}
 
 					if (offset == 7)
-						tms9902[which].register_select &= ~register_select_LDCTRL;
+						tms9902->register_select &= ~register_select_LDCTRL;
 				}
 			}
-			else if (tms9902[which].register_select & register_select_LDIR)
+			else if (tms9902->register_select & register_select_LDIR)
 			{	/* Interval Register */
 				if (offset <= 7)
 				{
 					if (data)
-						tms9902[which].TMR |= mask;
+						tms9902->TMR |= mask;
 					else
-						tms9902[which].TMR &= ~mask;
+						tms9902->TMR &= ~mask;
 
 					if (offset == 7)
 					{
-						reload_interval_timer(which);
-						tms9902[which].register_select &= ~register_select_LDIR;
+						reload_interval_timer(device);
+						tms9902->register_select &= ~register_select_LDIR;
 					}
 				}
 			}
-			else if (tms9902[which].register_select & (register_select_LRDR | register_select_LXDR))
+			else if (tms9902->register_select & (register_select_LRDR | register_select_LXDR))
 			{	/* Receive&Transmit Data Rate Register */
 				if (offset < 10)
 				{
-					if (tms9902[which].register_select & register_select_LRDR)
+					if (tms9902->register_select & register_select_LRDR)
 					{
 						if (data)
-							tms9902[which].RDR |= mask;
+							tms9902->RDR |= mask;
 						else
-							tms9902[which].RDR &= ~mask;
+							tms9902->RDR &= ~mask;
 					}
-					if (tms9902[which].register_select & register_select_LXDR)
+					if (tms9902->register_select & register_select_LXDR)
 					{
 						if (data)
-							tms9902[which].XDR |= mask;
+							tms9902->XDR |= mask;
 						else
-							tms9902[which].XDR &= ~mask;
+							tms9902->XDR &= ~mask;
 					}
 				}
 				else if (offset == 10)
 				{
-					if (tms9902[which].register_select & register_select_LRDR)
-						tms9902[which].RDV8 = data;
-					if (tms9902[which].register_select & register_select_LXDR)
-						tms9902[which].XDV8 = data;
+					if (tms9902->register_select & register_select_LRDR)
+						tms9902->RDV8 = data;
+					if (tms9902->register_select & register_select_LXDR)
+						tms9902->XDV8 = data;
 
 					/* set data rate */
 					/* ... */
 
-					tms9902[which].register_select &= ~ (register_select_LRDR | register_select_LXDR);
+					tms9902->register_select &= ~ (register_select_LRDR | register_select_LXDR);
 				}
 			}
 			else
@@ -513,16 +468,16 @@ void tms9902_cru_w(int which, int offset, int data)
 				if (offset <= 7)
 				{
 					if (data)
-						tms9902[which].XBR |= mask;
+						tms9902->XBR |= mask;
 					else
-						tms9902[which].XBR &= ~mask;
+						tms9902->XBR &= ~mask;
 
 					if (offset == 7)
 					{	/* transmit */
-						tms9902[which].XBRE = 0;
-						if (tms9902[which].XSRE && tms9902[which].RTS && tms9902[which].CTS && ! tms9902[which].BRK)
+						tms9902->XBRE = 0;
+						if (tms9902->XSRE && tms9902->RTS && tms9902->CTS && ! tms9902->BRK)
 						{
-							initiate_transmit(which);
+							initiate_transmit(device);
 						}
 					}
 				}
@@ -537,14 +492,14 @@ void tms9902_cru_w(int which, int offset, int data)
 		{
 			int mask = 1 << (offset - 0x0B);
 
-			if ((offset == 0x0D) && (! data) && (tms9902[which].register_select & register_select_LDIR))
+			if ((offset == 0x0D) && (! data) && (tms9902->register_select & register_select_LDIR))
 				/* clearing LDIR reloads the interval timer (right???) */
-				reload_interval_timer(which);
+				reload_interval_timer(device);
 
 			if (data)
-				tms9902[which].register_select |= mask;
+				tms9902->register_select |= mask;
 			else
-				tms9902[which].register_select &= ~mask;
+				tms9902->register_select &= ~mask;
 		}
 		break;
 
@@ -553,75 +508,184 @@ void tms9902_cru_w(int which, int offset, int data)
 		break;
 
 	case 0x10:	/* RTSON */
-		tms9902[which].RTSON = data;
-		if (data || (tms9902[which].XBRE && tms9902[which].XSRE && ! tms9902[which].BRK))
+		tms9902->RTSON = data;
+		if (data || (tms9902->XBRE && tms9902->XSRE && ! tms9902->BRK))
 		{
-			set_rts(which, data);
-			if (data && tms9902[which].CTS)
+			set_rts(device, data);
+			if (data && tms9902->CTS)
 			{
-				if (tms9902[which].XSRE && (! tms9902[which].XBRE) && ! tms9902[which].BRK)
-					initiate_transmit(which);
-				else if (tms9902[which].BRKON)
-					set_brk(which, 1);
+				if (tms9902->XSRE && (! tms9902->XBRE) && ! tms9902->BRK)
+					initiate_transmit(device);
+				else if (tms9902->BRKON)
+					set_brk(device, 1);
 			}
 		}
 		break;
 
 	case 0x11:	/* BRKON */
-		tms9902[which].BRKON = data;
-		if (tms9902[which].BRK && ! data)
+		tms9902->BRKON = data;
+		if (tms9902->BRK && ! data)
 		{
-			tms9902[which].BRK = 0;
-			if ((! tms9902[which].XBRE) && tms9902[which].CTS)
+			tms9902->BRK = 0;
+			if ((! tms9902->XBRE) && tms9902->CTS)
 				/* transmit next byte */
-				initiate_transmit(which);
-			else if (! tms9902[which].RTSON)
+				initiate_transmit(device);
+			else if (! tms9902->RTSON)
 				/* clear RTS */
-				set_rts(which, 0);
+				set_rts(device, 0);
 		}
-		else if (tms9902[which].XBRE && tms9902[which].XSRE && tms9902[which].RTS && tms9902[which].CTS)
+		else if (tms9902->XBRE && tms9902->XSRE && tms9902->RTS && tms9902->CTS)
 		{
-			set_brk(which, data);
+			set_brk(device, data);
 		}
 		break;
 
 	case 0x12:	/* RIENB */
-		tms9902[which].RIENB = data;
-		tms9902[which].RBRL = 0;
-		field_interrupts(which);
+		tms9902->RIENB = data;
+		tms9902->RBRL = 0;
+		field_interrupts(device);
 		break;
 
 	case 0x13:	/* XBIENB */
-		tms9902[which].XBIENB = data;
-		field_interrupts(which);
+		tms9902->XBIENB = data;
+		field_interrupts(device);
 		break;
 
 	case 0x14:	/* TIMENB */
-		tms9902[which].TIMENB = data;
-		tms9902[which].TIMELP = 0;
-		tms9902[which].TIMERR = 0;
-		field_interrupts(which);
+		tms9902->TIMENB = data;
+		tms9902->TIMELP = 0;
+		tms9902->TIMERR = 0;
+		field_interrupts(device);
 		break;
 
 	case 0x15:	/* DSCENB */
-		tms9902[which].DSCENB = data;
-		tms9902[which].DSCH = 0;
-		field_interrupts(which);
+		tms9902->DSCENB = data;
+		tms9902->DSCH = 0;
+		field_interrupts(device);
 		break;
 
 	case 0x1F:	/* RESET */
-		tms9902_reset(which);
+		device_reset_tms9902(device);
 		break;
 	}
 }
 
 
- READ8_HANDLER ( tms9902_0_cru_r )
+/*-------------------------------------------------
+    DEVICE_STOP( tms9902 )
+-------------------------------------------------*/
+
+static DEVICE_STOP( tms9902 )
 {
-	return tms9902_cru_r(0, offset);
+	tms9902_t *tms9902 = get_token(device);
+	
+	if (tms9902->timer)
+	{
+		timer_reset(tms9902->timer, attotime_never);	/* FIXME - timers should only be allocated once */
+		tms9902->timer = NULL;
+	}
 }
 
-WRITE8_HANDLER ( tms9902_0_cru_w )
+/*-------------------------------------------------
+    DEVICE_RESET( tms9902 )
+-------------------------------------------------*/
+
+static DEVICE_RESET( tms9902 )
 {
-	tms9902_cru_w(0, offset, data);
+	tms9902_t *tms9902 = get_token(device);
+
+	/*  disable all interrupts */
+	tms9902->DSCENB = 0;
+	tms9902->TIMENB = 0;
+	tms9902->XBIENB = 0;
+	tms9902->RIENB = 0;
+	if (tms9902->intf->int_callback)
+		(*tms9902->intf->int_callback)(device, 0);
+	/* initialize transmitter */
+	tms9902->XBRE = 1;
+	tms9902->XSRE = 1;
+	/* initialize receiver */
+	tms9902->RBRL = 0;
+	/* we probably need to clear receive error conditions, too... */
+	/* clear RTS */
+	tms9902->RTSON = 0;
+	tms9902->RTS = 0;
+	if (tms9902->intf->rts_callback)
+		(*tms9902->intf->rts_callback)(device, 0);
+	/* set all resister load flags to 1 */
+	tms9902->register_select = 0xf;
+	/* clear break condition */
+	tms9902->BRKON = 0;
+	tms9902->BRK = 0;
+	if (tms9902->intf->brk_callback)
+		(*tms9902->intf->brk_callback)(device, 0);
+	field_interrupts(device);
+
+}
+
+
+/*-------------------------------------------------
+    DEVICE_START( tms9902 )
+-------------------------------------------------*/
+
+static DEVICE_START( tms9902 )
+{
+	tms9902_t *tms9902 = get_token(device);
+
+	assert(device != NULL);
+	assert(device->tag != NULL);
+	assert(strlen(device->tag) < 20);
+	assert(device->static_config != NULL);
+
+	tms9902->intf = device->static_config;
+
+	tms9902->clock_rate = tms9902->intf->clock_rate;
+
+	tms9902->timer = timer_alloc(device->machine, decrementer_callback, (void *) device);
+
+	return DEVICE_START_OK;
+}
+
+
+
+/*-------------------------------------------------
+    DEVICE_SET_INFO( tms9902 )
+-------------------------------------------------*/
+
+static DEVICE_SET_INFO( tms9902 )
+{
+	switch (state)
+	{
+		/* no parameters to set */
+	}
+}
+
+
+
+/*-------------------------------------------------
+    DEVICE_GET_INFO( tms9902 )
+-------------------------------------------------*/
+
+DEVICE_GET_INFO( tms9902 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(tms9902_t);				break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
+		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(tms9902); break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(tms9902);	break;
+		case DEVINFO_FCT_STOP:							info->stop  = DEVICE_STOP_NAME (tms9902);	break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(tms9902);	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							info->s = "TMS9902";					break;
+		case DEVINFO_STR_FAMILY:						info->s = "TMS9902";					break;
+		case DEVINFO_STR_VERSION:						info->s = "1.0";							break;
+		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;							break;
+		case DEVINFO_STR_CREDITS:						/* Nothing */								break;
+	}
 }

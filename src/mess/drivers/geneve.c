@@ -203,6 +203,7 @@
 #include "includes/geneve.h"
 #include "machine/ti99_4x.h"
 #include "machine/tms9901.h"
+#include "machine/tms9902.h"
 #include "audio/spchroms.h"
 #include "machine/99_peb.h"
 #include "machine/994x_ser.h"
@@ -510,6 +511,9 @@ static MACHINE_DRIVER_START(geneve_60hz)
 	
 	/* tms9901 */
 	MDRV_TMS9901_ADD("tms9901", tms9901reset_param_ti99)	
+	/* tms9902 */
+	MDRV_TMS9902_ADD("tms9902_0", tms9902_params_0)
+	MDRV_TMS9902_ADD("tms9902_1", tms9902_params_1)
 MACHINE_DRIVER_END
 
 
@@ -652,3 +656,4 @@ SYSTEM_CONFIG_END
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE      INPUT    INIT      CONFIG  COMPANY     FULLNAME */
 COMP( 1987,geneve,   0,		0,		geneve_60hz,  geneve,  geneve,	geneve,	"Myarc",	"Geneve 9640" , 0)
 COMP( 1990,genmod,   geneve,	0,		geneve_60hz,  geneve,  genmod,	geneve,	"Myarc",	"Geneve 9640 (with Genmod modification)" , 0)
+

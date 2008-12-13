@@ -32,6 +32,7 @@
 
 #include "machine/ti99_4x.h"
 #include "machine/tms9901.h"
+#include "machine/tms9902.h"
 #include "audio/spchroms.h"
 #include "machine/99_peb.h"
 #include "machine/994x_ser.h"
@@ -287,6 +288,9 @@ static MACHINE_DRIVER_START(ti99_4p_60hz)
 	
 	/* tms9901 */
 	MDRV_TMS9901_ADD("tms9901", tms9901reset_param_ti99_4x)	
+	/* tms9902 */
+	MDRV_TMS9902_ADD("tms9902_0", tms9902_params_0)
+	MDRV_TMS9902_ADD("tms9902_1", tms9902_params_1)	
 MACHINE_DRIVER_END
 
 

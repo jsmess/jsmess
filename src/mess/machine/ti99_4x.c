@@ -2132,7 +2132,7 @@ void tms9901_set_int2(running_machine *machine, int state)
 /*
 	Called by the 9901 core whenever the state of INTREQ and IC0-3 changes
 */
-static TMS9910_INT_CALLBACK( tms9901_interrupt_callback )
+static TMS9901_INT_CALLBACK( tms9901_interrupt_callback )
 {
 	if (intreq)
 	{

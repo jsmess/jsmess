@@ -29,13 +29,10 @@
 #define MAX_RS232_CARDS 1/*2*/
 
 /* prototypes */
-static void int_callback(int which, int INT);
-static void xmit_callback(int which, int data);
 static int rs232_cru_r(running_machine *machine, int offset);
 static void rs232_cru_w(running_machine *machine, int offset, int data);
 static READ8_HANDLER(rs232_mem_r);
 static WRITE8_HANDLER(rs232_mem_w);
-static void ti99_rs232_cleanup(running_machine *machine);
 
 /* pointer to the rs232 ROM data */
 static UINT8 *rs232_DSR;
@@ -66,17 +63,6 @@ static const ti99_peb_card_handlers_t rs232_handlers =
 	rs232_mem_r,
 	rs232_mem_w
 };
-
-static const tms9902reset_param tms9902_params =
-{
-	3000000.,				/* clock rate (3MHz) */
-	int_callback,			/* called when interrupt pin state changes */
-	NULL,//rts_callback,			/* called when Request To Send pin state changes */
-	NULL,//brk_callback,			/* called when BReaK state changes */
-	xmit_callback			/* called when a character is transmitted */
-};
-
-
 
 /*
 	Initialize pio unit and open image
@@ -120,24 +106,33 @@ DEVICE_IMAGE_UNLOAD( ti99_4_pio )
 */
 DEVICE_IMAGE_LOAD( ti99_4_rs232 )
 {
+	const device_config *tms9902 = NULL;
+	
 	int id = image_index_in_device(image);
 
 	/*if ((id < 0) || (id >= 2*MAX_RS232_CARDS))
 		return INIT_FAIL;*/
 	if (id != 0)
 		return INIT_FAIL;
-
+	
+	if (id==0) {
+		tms9902 = device_list_find_by_tag(image->machine->config->devicelist, TMS9902, "tms9902_0");
+	}
+	if (id==1) {
+		tms9902 = device_list_find_by_tag(image->machine->config->devicelist, TMS9902, "tms9902_1");
+	}
+	
 	rs232_fp = image;
 
 	if (rs232_fp)
 	{
-		tms9902_set_cts(id, 1);
-		tms9902_set_dsr(id, 1);
+		tms9902_set_cts(tms9902, 1);
+		tms9902_set_dsr(tms9902, 1);
 	}
 	else
 	{
-		tms9902_set_cts(id, 0);
-		tms9902_set_dsr(id, 0);
+		tms9902_set_cts(tms9902, 0);
+		tms9902_set_dsr(tms9902, 0);
 	}
 
 	return INIT_PASS;
@@ -164,10 +159,6 @@ DEVICE_IMAGE_UNLOAD( ti99_4_rs232 )
 void ti99_rs232_init(running_machine *machine)
 {
 	rs232_DSR = memory_region(machine, region_dsr) + offset_rs232_dsr;
-	tms9902_init(machine, 0, &tms9902_params);
-	tms9902_init(machine, 1, &tms9902_params);
-	
-	add_exit_callback(machine, ti99_rs232_cleanup);
 }
 
 /*
@@ -186,51 +177,37 @@ void ti99_rs232_reset(running_machine *machine)
 	cts1 = 0;
 	cts2 = 0;
 	led = 0;
-	tms9902_reset(0);
-	tms9902_reset(1);
-}
-
-/*
-	rs232 card clean-up
-*/
-static void ti99_rs232_cleanup(running_machine *machine)
-{
-	tms9902_cleanup(0);
-	tms9902_cleanup(1);
 }
 
 /*
 	rs232 interrupt handler
 */
-static void int_callback(int which, int INT)
+static TMS9902_INT_CALLBACK( int_callback_0 )
 {
-	switch (which)
-	{
-	case 0:
-		ti99_peb_set_ila_bit(inta_rs232_1_bit, INT);
-		break;
-
-	case 1:
-		ti99_peb_set_ila_bit(inta_rs232_2_bit, INT);
-		break;
-
-	case 2:
-		ti99_peb_set_ila_bit(inta_rs232_3_bit, INT);
-		break;
-
-	case 3:
-		ti99_peb_set_ila_bit(inta_rs232_4_bit, INT);
-		break;
-	}
+	ti99_peb_set_ila_bit(inta_rs232_1_bit, INT);
 }
 
-static void xmit_callback(int which, int data)
+static TMS9902_INT_CALLBACK( int_callback_1 )
+{
+	ti99_peb_set_ila_bit(inta_rs232_2_bit, INT);
+}
+
+static TMS9902_XMIT_CALLBACK( xmit_callback_0 )
 {
 	UINT8 buf = data;
 
 	if (rs232_fp)
 		image_fwrite(rs232_fp, &buf, 1);
 }
+
+static TMS9902_XMIT_CALLBACK( xmit_callback_1 )
+{
+	UINT8 buf = data;
+
+	if (rs232_fp)
+		image_fwrite(rs232_fp, &buf, 1);
+}
+
 
 /*
 	Read rs232 card CRU interface
@@ -274,12 +251,12 @@ static int rs232_cru_r(running_machine *machine, int offset)
 
 	case 1:
 		/* first 9902 */
-		reply = tms9902_cru_r(0, offset);
+		reply = tms9902_cru_r(device_list_find_by_tag(machine->config->devicelist, TMS9902, "tms9902_0"), offset);
 		break;
 
 	case 2:
 		/* second 9902 */
-		reply = tms9902_cru_r(1, offset);
+		reply = tms9902_cru_r(device_list_find_by_tag(machine->config->devicelist, TMS9902, "tms9902_1"), offset);
 		break;
 
 	default:
@@ -375,12 +352,12 @@ static void rs232_cru_w(running_machine *machine, int offset, int data)
 
 	case 1:
 		/* first 9902 */
-		tms9902_cru_w(0, offset, data);
+		tms9902_cru_w(device_list_find_by_tag(machine->config->devicelist, TMS9902, "tms9902_0"), offset, data);
 		break;
 
 	case 2:
 		/* second 9902 */
-		tms9902_cru_w(1, offset, data);
+		tms9902_cru_w(device_list_find_by_tag(machine->config->devicelist, TMS9902, "tms9902_1"), offset, data);
 		break;
 
 	default:
@@ -426,3 +403,21 @@ static WRITE8_HANDLER(rs232_mem_w)
 		/* DSR ROM: do nothing */
 	}
 }
+
+const tms9902_interface tms9902_params_0 =
+{
+	3000000.,				/* clock rate (3MHz) */
+	int_callback_0,			/* called when interrupt pin state changes */
+	NULL,//rts_callback,			/* called when Request To Send pin state changes */
+	NULL,//brk_callback,			/* called when BReaK state changes */
+	xmit_callback_0			/* called when a character is transmitted */
+};
+
+const tms9902_interface tms9902_params_1 =
+{
+	3000000.,				/* clock rate (3MHz) */
+	int_callback_1,			/* called when interrupt pin state changes */
+	NULL,//rts_callback,			/* called when Request To Send pin state changes */
+	NULL,//brk_callback,			/* called when BReaK state changes */
+	xmit_callback_1			/* called when a character is transmitted */
+};
