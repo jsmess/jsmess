@@ -257,13 +257,12 @@ static void dma_indirect_lv2(const address_space *space); /*DMA level 2 indirect
 int minit_boost,sinit_boost;
 attotime minit_boost_timeslice, sinit_boost_timeslice;
 
-static int scanline;
+//static int scanline;
 
-#if 0
 /*A-Bus IRQ checks,where they could be located these?*/
-#define ABUSIRQ(_irq_,_vector_,_mask_) \
-	if(!(stv_scu[40] & _mask_)) { cpu_set_input_line_and_vector(Machine->cpu[0], _irq_, HOLD_LINE , _vector_); }
-
+#define ABUSIRQ(_irq_,_vector_) \
+	{ cpu_set_input_line_and_vector(device->machine->cpu[0], _irq_, HOLD_LINE , _vector_); }
+#if 0
 if(stv_scu[42] & 1)//IRQ ACK
 {
 	ABUSIRQ(7,0x50,0x00010000);
@@ -629,7 +628,7 @@ static void stv_SMPC_w8(const address_space *space, int offset, UINT8 data)
 		if(EXLE1 || EXLE2)
 			if(!(stv_scu[40] & 0x0100)) /*Pad irq*/
 			{
-				if(LOG_SMPC) logerror ("Interrupt: PAD irq at scanline %04x, Vector 0x48 Level 0x08\n",scanline);
+				if(LOG_SMPC) logerror ("Interrupt: PAD irq, Vector 0x48 Level 0x08\n");
 				cpu_set_input_line_and_vector(machine->cpu[0], 8, HOLD_LINE , 0x48);
 			}
 	}
@@ -836,150 +835,6 @@ static WRITE32_HANDLER ( stv_SMPC_w32 )
 
 
 /*
-(Preliminary) explaination about this:
-VBLANK-OUT is used at the start of the vblank period.It also sets the timer zero
-variable to 0.
-If the Timer Compare register is zero too,the Timer 0 irq is triggered.
-
-HBLANK-IN is used at the end of each scanline except when in VBLANK-IN/OUT periods.
-
-The timer 0 is also incremented by one at each HBLANK and checked with the value
-of the Timer Compare register;if equal,the timer 0 irq is triggered here too.
-Notice that the timer 0 compare register can be more than the VBLANK maximum range,in
-this case the timer 0 irq is simply never triggered.This is a known Sega Saturn/ST-V "bug".
-
-VBLANK-IN is used at the end of the vblank period.
-
-SCU register[36] is the timer zero compare register.
-SCU register[40] is for IRQ masking.
-*/
-
-/* to do, update bios idle skips so they work better with this arrangement.. */
-
-static emu_timer *vblank_in_timer,*scan_timer,*t1_timer;
-static int h_sync,v_sync;
-static int cur_scan;
-
-#define VBLANK_OUT_IRQ	\
-timer_0 = 0; \
-{ \
-	/*if(LOG_IRQ) logerror ("Interrupt: VBlank-OUT Vector 0x41 Level 0x0e\n");*/ \
-	cpu_set_input_line_and_vector(device->machine->cpu[0], 0xe, (stv_irq.vblank_out) ? HOLD_LINE : CLEAR_LINE , 0x41); \
-} \
-
-#define VBLANK_IN_IRQ \
-{ \
-	/*if(LOG_IRQ) logerror ("Interrupt: VBlank IN Vector 0x40 Level 0x0f\n");*/ \
-	cpu_set_input_line_and_vector(machine->cpu[0], 0xf, (stv_irq.vblank_in) ? HOLD_LINE : CLEAR_LINE , 0x40); \
-} \
-
-#define HBLANK_IN_IRQ \
-timer_1 = stv_scu[37] & 0x1ff; \
-{ \
-	/*if(LOG_IRQ) logerror ("Interrupt: HBlank-In at scanline %04x, Vector 0x42 Level 0x0d\n",scanline);*/ \
-	cpu_set_input_line_and_vector(machine->cpu[0], 0xd, (stv_irq.hblank_in) ? HOLD_LINE : CLEAR_LINE, 0x42); \
-} \
-
-#define TIMER_0_IRQ \
-if(timer_0 == (stv_scu[36] & 0x3ff)) \
-{ \
-	/*if(LOG_IRQ) logerror ("Interrupt: Timer 0 at scanline %04x, Vector 0x43 Level 0x0c\n",scanline);*/ \
-	cpu_set_input_line_and_vector(machine->cpu[0], 0xc, (stv_irq.timer_0) ? HOLD_LINE : CLEAR_LINE, 0x43 ); \
-} \
-
-#define TIMER_1_IRQ	\
-if((stv_scu[38] & 1)) \
-{ \
-	if(!(stv_scu[38] & 0x80)) \
-	{ \
-		/*if(LOG_IRQ) logerror ("Interrupt: Timer 1 at point %04x, Vector 0x44 Level 0x0b\n",point);*/ \
-		cpu_set_input_line_and_vector(machine->cpu[0], 0xb, (stv_irq.timer_1) ? HOLD_LINE : CLEAR_LINE, 0x44 ); \
-	} \
-	else \
-	{ \
-		if((timer_0) == (stv_scu[36] & 0x3ff)) \
-		{ \
-			/*if(LOG_IRQ) logerror ("Interrupt: Timer 1 at point %04x, Vector 0x44 Level 0x0b\n",point);*/ \
-			cpu_set_input_line_and_vector(machine->cpu[0], 0xb, (stv_irq.timer_1) ? HOLD_LINE : CLEAR_LINE, 0x44 ); \
-		} \
-	} \
-} \
-
-#define VDP1_IRQ \
-{ \
-	cpu_set_input_line_and_vector(machine->cpu[0], 2, (stv_irq.vdp1_end) ? HOLD_LINE : CLEAR_LINE, 0x4d); \
-} \
-
-static TIMER_CALLBACK( hblank_in_irq )
-{
-	int scanline = param;
-
-//  h = video_screen_get_height(machine->primary_screen);
-//  w = video_screen_get_width(machine->primary_screen);
-
-	TIMER_0_IRQ;
-	HBLANK_IN_IRQ;
-
-	if((scanline+1) < v_sync)
-	{
-		timer_adjust_oneshot(scan_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline+1, h_sync), scanline+1);
-		/*set the first Timer-1 event*/
-		cur_scan = scanline+1;
-		timer_adjust_oneshot(t1_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline+1, 0), 0);
-	}
-
-	timer_0++;
-}
-
-static TIMER_CALLBACK( timer1_irq )
-{
-	int cur_point = param;
-
-	TIMER_1_IRQ;
-
-	if((cur_point+1) < h_sync)
-	{
-		timer_adjust_oneshot(t1_timer, video_screen_get_time_until_pos(machine->primary_screen, cur_scan, cur_point+1), cur_point+1);
-	}
-
-	if(timer_1 > 0) timer_1--;
-}
-
-static TIMER_CALLBACK( vdp1_irq )
-{
-	VDP1_IRQ;
-}
-
-static TIMER_CALLBACK( vblank_in_irq )
-{
-	VBLANK_IN_IRQ;
-}
-
-/*V-Blank-OUT event*/
-static INTERRUPT_GEN( stv_interrupt )
-{
-//  scanline = 0;
-	h_sync = video_screen_get_height(device->machine->primary_screen)/2;//horz
-	v_sync = video_screen_get_width(device->machine->primary_screen)-2;//vert
-
-	VBLANK_OUT_IRQ;
-
-	/*Next V-Blank-IN event*/
-	timer_adjust_oneshot(vblank_in_timer,video_screen_get_time_until_pos(device->machine->primary_screen, 0, 0), 0);
-	/*Set the first Hblank-IN event*/
-	timer_adjust_oneshot(scan_timer, video_screen_get_time_until_pos(device->machine->primary_screen, 0, h_sync), 0);
-
-	/*TODO: timing of this one (related to the VDP1 speed)*/
-	/*      (NOTE: value shouldn't be at h_sync/v_sync position (will break shienryu))*/
-	timer_set(device->machine, video_screen_get_time_until_pos(device->machine->primary_screen,0,0), NULL, 0, vdp1_irq);
-}
-
-static UINT8 port_sel,mux_data;
-
-#define HI_WORD_ACCESS (~mem_mask & 0x00ff0000) == 0
-#define LO_WORD_ACCESS (~mem_mask & 0x000000ff) == 0
-
-/*
 
 SCU Handling
 
@@ -1112,6 +967,11 @@ static READ32_HANDLER( stv_scu_r32 )
 	{
 		if(LOG_SCU) logerror("(PC=%08x) DMA status reg read\n",cpu_get_pc(space->cpu));
 		return stv_scu[offset];
+	}
+	// Saturn BIOS needs this (need to investigate further)
+	else if (offset == 32)
+	{
+		return 0x00100000;
 	}
 	else if ( offset == 35 )
 	{
@@ -1366,9 +1226,9 @@ static WRITE32_HANDLER( stv_scu_w32 )
 		stv_irq.sound_req =  (((stv_scu[40] & 0x0040)>>6) ^ 1);
 		stv_irq.smpc =       (((stv_scu[40] & 0x0080)>>7)); //NOTE: SCU bug
 		stv_irq.pad =        (((stv_scu[40] & 0x0100)>>8) ^ 1);
-		stv_irq.dma_end[0] = (((stv_scu[40] & 0x0200)>>9) ^ 1);
+		stv_irq.dma_end[2] = (((stv_scu[40] & 0x0200)>>9) ^ 1);
 		stv_irq.dma_end[1] = (((stv_scu[40] & 0x0400)>>10) ^ 1);
-		stv_irq.dma_end[2] = (((stv_scu[40] & 0x0800)>>11) ^ 1);
+		stv_irq.dma_end[0] = (((stv_scu[40] & 0x0800)>>11) ^ 1);
 		stv_irq.dma_ill =    (((stv_scu[40] & 0x1000)>>12) ^ 1);
 		stv_irq.vdp1_end =   (((stv_scu[40] & 0x2000)>>13) ^ 1);
 		stv_irq.abus =       (((stv_scu[40] & 0x8000)>>15) ^ 1);
@@ -1413,9 +1273,9 @@ static WRITE32_HANDLER( stv_scu_w32 )
 		stv_irq.sound_req =  ((stv_scu[41] & 0x0040)>>6);
 		stv_irq.smpc =       ((stv_scu[41] & 0x0080)>>7);
 		stv_irq.pad =        ((stv_scu[41] & 0x0100)>>8);
-		stv_irq.dma_end[0] = ((stv_scu[41] & 0x0200)>>9);
+		stv_irq.dma_end[2] = ((stv_scu[41] & 0x0200)>>9);
 		stv_irq.dma_end[1] = ((stv_scu[41] & 0x0400)>>10);
-		stv_irq.dma_end[2] = ((stv_scu[41] & 0x0800)>>11);
+		stv_irq.dma_end[0] = ((stv_scu[41] & 0x0800)>>11);
 		stv_irq.dma_ill =    ((stv_scu[41] & 0x1000)>>12);
 		stv_irq.vdp1_end =   ((stv_scu[41] & 0x2000)>>13);
 		stv_irq.abus =       ((stv_scu[41] & 0x8000)>>15);
@@ -2174,6 +2034,151 @@ static INPUT_PORTS_START( saturn )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("P2 R") PORT_PLAYER(2)	// R
 INPUT_PORTS_END
 
+/*
+(Preliminary) explaination about this:
+VBLANK-OUT is used at the start of the vblank period.It also sets the timer zero
+variable to 0.
+If the Timer Compare register is zero too,the Timer 0 irq is triggered.
+
+HBLANK-IN is used at the end of each scanline except when in VBLANK-IN/OUT periods.
+
+The timer 0 is also incremented by one at each HBLANK and checked with the value
+of the Timer Compare register;if equal,the timer 0 irq is triggered here too.
+Notice that the timer 0 compare register can be more than the VBLANK maximum range,in
+this case the timer 0 irq is simply never triggered.This is a known Sega Saturn/ST-V "bug".
+
+VBLANK-IN is used at the end of the vblank period.
+
+SCU register[36] is the timer zero compare register.
+SCU register[40] is for IRQ masking.
+*/
+
+/* to do, update bios idle skips so they work better with this arrangement.. */
+
+static emu_timer *vblank_out_timer,*scan_timer,*t1_timer;
+static int h_sync,v_sync;
+static int cur_scan;
+
+#define VBLANK_OUT_IRQ	\
+timer_0 = 0; \
+{ \
+	/*if(LOG_IRQ) logerror ("Interrupt: VBlank-OUT Vector 0x41 Level 0x0e\n");*/ \
+	cpu_set_input_line_and_vector(machine->cpu[0], 0xe, (stv_irq.vblank_out) ? HOLD_LINE : CLEAR_LINE , 0x41); \
+} \
+
+#define VBLANK_IN_IRQ \
+{ \
+	/*if(LOG_IRQ) logerror ("Interrupt: VBlank IN Vector 0x40 Level 0x0f\n");*/ \
+	cpu_set_input_line_and_vector(device->machine->cpu[0], 0xf, (stv_irq.vblank_in) ? HOLD_LINE : CLEAR_LINE , 0x40); \
+} \
+
+#define HBLANK_IN_IRQ \
+timer_1 = stv_scu[37] & 0x1ff; \
+{ \
+	/*if(LOG_IRQ) logerror ("Interrupt: HBlank-In at scanline %04x, Vector 0x42 Level 0x0d\n",scanline);*/ \
+	cpu_set_input_line_and_vector(machine->cpu[0], 0xd, (stv_irq.hblank_in) ? HOLD_LINE : CLEAR_LINE, 0x42); \
+} \
+
+#define TIMER_0_IRQ \
+if(timer_0 == (stv_scu[36] & 0x3ff)) \
+{ \
+	/*if(LOG_IRQ) logerror ("Interrupt: Timer 0 at scanline %04x, Vector 0x43 Level 0x0c\n",scanline);*/ \
+	cpu_set_input_line_and_vector(machine->cpu[0], 0xc, (stv_irq.timer_0) ? HOLD_LINE : CLEAR_LINE, 0x43 ); \
+} \
+
+#define TIMER_1_IRQ	\
+if((stv_scu[38] & 1)) \
+{ \
+	if(!(stv_scu[38] & 0x80)) \
+	{ \
+		/*if(LOG_IRQ) logerror ("Interrupt: Timer 1 at point %04x, Vector 0x44 Level 0x0b\n",point);*/ \
+		cpu_set_input_line_and_vector(machine->cpu[0], 0xb, (stv_irq.timer_1) ? HOLD_LINE : CLEAR_LINE, 0x44 ); \
+	} \
+	else \
+	{ \
+		if((timer_0) == (stv_scu[36] & 0x3ff)) \
+		{ \
+			/*if(LOG_IRQ) logerror ("Interrupt: Timer 1 at point %04x, Vector 0x44 Level 0x0b\n",point);*/ \
+			cpu_set_input_line_and_vector(machine->cpu[0], 0xb, (stv_irq.timer_1) ? HOLD_LINE : CLEAR_LINE, 0x44 ); \
+		} \
+	} \
+} \
+
+#define VDP1_IRQ \
+{ \
+	cpu_set_input_line_and_vector(machine->cpu[0], 2, (stv_irq.vdp1_end) ? HOLD_LINE : CLEAR_LINE, 0x4d); \
+} \
+
+static TIMER_CALLBACK( hblank_in_irq )
+{
+	int scanline = param;
+
+//  h = video_screen_get_height(machine->primary_screen);
+//  w = video_screen_get_width(machine->primary_screen);
+
+	HBLANK_IN_IRQ;
+	TIMER_0_IRQ;
+
+	if(scanline+1 < v_sync)
+	{
+		if(stv_irq.hblank_in || stv_irq.timer_0)
+			timer_adjust_oneshot(scan_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline+1, h_sync), scanline+1);
+		/*set the first Timer-1 event*/
+		cur_scan = scanline+1;
+		if(stv_irq.timer_1)
+			timer_adjust_oneshot(t1_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline+1, 0), 0);
+	}
+
+	timer_0++;
+}
+
+static TIMER_CALLBACK( timer1_irq )
+{
+	int cur_point = param;
+
+	TIMER_1_IRQ;
+
+	if((cur_point+1) < h_sync && stv_irq.timer_1)
+	{
+		timer_adjust_oneshot(t1_timer, video_screen_get_time_until_pos(machine->primary_screen, cur_scan, cur_point+1), cur_point+1);
+	}
+
+	if(timer_1 > 0) timer_1--;
+}
+
+static TIMER_CALLBACK( vdp1_irq )
+{
+	VDP1_IRQ;
+}
+
+static TIMER_CALLBACK( vblank_out_irq )
+{
+	VBLANK_OUT_IRQ;
+}
+
+/*V-Blank-IN event*/
+static INTERRUPT_GEN( stv_interrupt )
+{
+//  scanline = 0;
+	rectangle visarea = *video_screen_get_visible_area(device->machine->primary_screen);
+
+	h_sync = visarea.max_x+1;//horz
+	v_sync = visarea.max_y+1;//vert
+
+	VBLANK_IN_IRQ;
+
+	/*Next V-Blank-OUT event*/
+	if(stv_irq.vblank_out)
+		timer_adjust_oneshot(vblank_out_timer,video_screen_get_time_until_pos(device->machine->primary_screen, 0, 0), 0);
+	/*Set the first Hblank-IN event*/
+	if(stv_irq.hblank_in || stv_irq.timer_0 || stv_irq.timer_1)
+		timer_adjust_oneshot(scan_timer, video_screen_get_time_until_pos(device->machine->primary_screen, 0, h_sync), 0);
+
+	/*TODO: timing of this one (related to the VDP1 speed)*/
+	/*      (NOTE: value shouldn't be at h_sync/v_sync position (will break shienryu))*/
+	timer_set(device->machine, video_screen_get_time_until_pos(device->machine->primary_screen,0,0), NULL, 0, vdp1_irq);
+}
+
 static void saturn_init_driver(running_machine *machine, int rgn)
 {
 	mame_system_time systime;
@@ -2242,15 +2247,14 @@ static MACHINE_START( saturn )
 	state_save_register_global(machine, en_68k);
 	state_save_register_global(machine, timer_0);
 	state_save_register_global(machine, timer_1);
-	state_save_register_global(machine, scanline);
 	state_save_register_global(machine, IOSEL1);
 	state_save_register_global(machine, IOSEL2);
 	state_save_register_global(machine, EXLE1);
 	state_save_register_global(machine, EXLE2);
 	state_save_register_global(machine, PDR1);
 	state_save_register_global(machine, PDR2);
-	state_save_register_global(machine, port_sel);
-	state_save_register_global(machine, mux_data);
+//	state_save_register_global(machine, port_sel);
+//	state_save_register_global(machine, mux_data);
 	state_save_register_global(machine, scsp_last_line);
 	state_save_register_global(machine, intback_stage);
 	state_save_register_global(machine, pmode);
@@ -2289,8 +2293,8 @@ static MACHINE_RESET( saturn )
 	/* set the first scanline 0 timer to go off */
 	scan_timer = timer_alloc(machine, hblank_in_irq, NULL);
 	t1_timer = timer_alloc(machine, timer1_irq,NULL);
-	vblank_in_timer = timer_alloc(machine, vblank_in_irq,NULL);
-	timer_adjust_oneshot(vblank_in_timer,video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
+	vblank_out_timer = timer_alloc(machine, vblank_out_irq,NULL);
+	timer_adjust_oneshot(vblank_out_timer,video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 	timer_adjust_oneshot(scan_timer, video_screen_get_time_until_pos(machine->primary_screen, 224, 352), 0);
 }
 
@@ -2402,7 +2406,7 @@ static MACHINE_DRIVER_START( saturn )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
 	MDRV_CPU_PROGRAM_MAP(saturn_mem, 0)
-	MDRV_CPU_VBLANK_INT_HACK(stv_interrupt, 264)/*264 lines,224 display lines*/
+	MDRV_CPU_VBLANK_INT("main",stv_interrupt)
 	MDRV_CPU_CONFIG(sh2_conf_master)
 
 	MDRV_CPU_ADD("slave", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
@@ -2423,8 +2427,8 @@ static MACHINE_DRIVER_START( saturn )
 
 	/* video hardware */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
-	MDRV_SCREEN_SIZE(1024, 1024)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 703, 0*8, 512) // we need to use a resolution as high as the max size it can change to
+	MDRV_SCREEN_SIZE(704*2, 512*2)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 703, 0*8, 511) // we need to use a resolution as high as the max size it can change to
 	MDRV_PALETTE_LENGTH(2048+(2048*2))//standard palette + extra memory for rgb brightness.
 	MDRV_GFXDECODE(saturn)
 
