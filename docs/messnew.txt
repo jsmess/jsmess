@@ -49,6 +49,8 @@ System Driver Changes:
 
 - [ONDRA] Both computers now work, cassette supported  [Miodrag Milanovic]
 
+- [X68000] Set speaker output to stereo.  [Peter Conway]
+
 
 
 User Interface Changes:
