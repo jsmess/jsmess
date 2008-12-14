@@ -938,7 +938,6 @@ static void image_clear(image_slot_data *image)
 
 	astring_cpyc(image->name, "");
 
-	pool_clear(image->mempool);
 	image->writeable = 0;
 	image->created = 0;
 	image->dir = NULL;
