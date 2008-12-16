@@ -9,8 +9,6 @@ New System Drivers Supported (in no particular order):
 - Ivel Ultra [Miodrag Milanovic]
 - Pecom 64 [Miodrag Milanovic]
 - Sharp MZ80K [Miodrag Milanovic]
-- Ohio Scientific Challenger 1P Series 2 (not working) [Curt Coder]
-- Ohio Scientific Challenger 1P MF Series 2 (not working) [Curt Coder]
 
 
 
@@ -52,8 +50,6 @@ System Driver Changes:
 
 - [ONDRA] Both computers now work, cassette supported  [Miodrag Milanovic]
 
-- [X68000] Set speaker output to stereo.  [Peter Conway]
-
 
 
 User Interface Changes:
@@ -84,6 +80,9 @@ Source Changes:
 - Changed the TMS5501 implementation to be a device.  [Nathan Woods]
 
 - Various code cleanups.  [Atari Ace]
+
+- Fixed regression that could cause hanging when creating an image from the
+  command line or the MESSUI.  (bug #1744) [Nathan Woods]
 
 
 

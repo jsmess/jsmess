@@ -95,7 +95,7 @@ astring *zippath_parent(astring *dst, const char *path)
 	parse_parent_path(path, &pos, NULL);
 
 	/* return the result */
-	return (pos >= 0) ? astring_cpych(dst, path, pos + 1) : NULL;
+	return (pos >= 0) ? astring_cpych(dst, path, pos + 1) : astring_cpyc(dst, "");
 }
 
 
