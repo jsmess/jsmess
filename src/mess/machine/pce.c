@@ -1,6 +1,5 @@
 
 #include "driver.h"
-#include "deprecat.h"
 #include "video/vdc.h"
 #include "cpu/h6280/h6280.h"
 #include "includes/pce.h"
@@ -338,7 +337,7 @@ logerror("Setting CD in reply_status_byte\n");
 }
 
 /* 0x00 - TEST UNIT READY */
-static void pce_cd_test_unit_ready( void ) 
+static void pce_cd_test_unit_ready( running_machine *machine ) 
 {
 	logerror("test unit ready\n");
 	if ( pce_cd.cd ) 
@@ -354,7 +353,7 @@ static void pce_cd_test_unit_ready( void )
 }
 
 /* 0x08 - READ (6) */
-static void pce_cd_read_6( void ) 
+static void pce_cd_read_6( running_machine *machine ) 
 {
 	UINT32 frame = ( ( pce_cd.command_buffer[1] & 0x1F ) << 16 ) | ( pce_cd.command_buffer[2] << 8 ) | pce_cd.command_buffer[3];
 	UINT32 frame_count = pce_cd.command_buffer[4];
@@ -386,7 +385,7 @@ static void pce_cd_read_6( void )
 }
 
 /* 0xD8 - SET AUDIO PLAYBACK START POSITION (NEC) */
-static void pce_cd_nec_set_audio_start_position( void ) 
+static void pce_cd_nec_set_audio_start_position( running_machine *machine ) 
 {
 	UINT32	frame = 0;
 
@@ -428,11 +427,11 @@ static void pce_cd_nec_set_audio_start_position( void )
 	}
 
 	pce_cd_reply_status_byte( SCSI_STATUS_OK );
-	pce_cd_set_irq_line( Machine, PCE_CD_IRQ_TRANSFER_DONE, ASSERT_LINE );
+	pce_cd_set_irq_line( machine, PCE_CD_IRQ_TRANSFER_DONE, ASSERT_LINE );
 }
 
 /* 0xD9 - SET AUDIO PLAYBACK END POSITION (NEC) */
-static void pce_cd_nec_set_audio_stop_position( void ) 
+static void pce_cd_nec_set_audio_stop_position( running_machine *machine ) 
 {
 	UINT32  frame = 0;
 
@@ -482,11 +481,11 @@ static void pce_cd_nec_set_audio_stop_position( void )
 	}
 
 	pce_cd_reply_status_byte( SCSI_STATUS_OK );
-	pce_cd_set_irq_line( Machine, PCE_CD_IRQ_TRANSFER_DONE, ASSERT_LINE );
+	pce_cd_set_irq_line( machine, PCE_CD_IRQ_TRANSFER_DONE, ASSERT_LINE );
 }
 
 /* 0xDA - PAUSE (NEC) */
-static void pce_cd_nec_pause( void ) 
+static void pce_cd_nec_pause( running_machine *machine ) 
 {
 
 	/* If no cd mounted throw an error */
@@ -510,7 +509,7 @@ static void pce_cd_nec_pause( void )
 }
 
 /* 0xDD - READ SUBCHANNEL Q (NEC) */
-static void pce_cd_nec_get_subq( void ) 
+static void pce_cd_nec_get_subq( running_machine *machine ) 
 {
 	/* WP - I do not have access to chds with subchannel information yet, so I'm faking something here */
 	UINT32 msf_abs, msf_rel, track, frame;
@@ -561,7 +560,7 @@ static void pce_cd_nec_get_subq( void )
 }
 
 /* 0xDE - GET DIR INFO (NEC) */
-static void pce_cd_nec_get_dir_info( void ) 
+static void pce_cd_nec_get_dir_info( running_machine *machine ) 
 {
 	UINT32 frame, msf, track = 0;
 	const cdrom_toc	*toc;
@@ -622,12 +621,12 @@ static void pce_cd_nec_get_dir_info( void )
 	pce_cd.scsi_CD = 0;
 }
 
-static void pce_cd_handle_data_output( void ) 
+static void pce_cd_handle_data_output( running_machine *machine ) 
 {
 	static const struct {
 		UINT8	command_byte;
 		UINT8	command_size;
-		void	(*command_handler)(void);
+		void	(*command_handler)(running_machine *machine);
 	} pce_cd_commands[] = {
 		{ 0x00, 6, pce_cd_test_unit_ready },				/* TEST UNIT READY */
 		{ 0x08, 6, pce_cd_read_6 },							/* READ (6) */
@@ -669,7 +668,7 @@ static void pce_cd_handle_data_output( void )
 
 		if ( pce_cd.command_buffer_index == pce_cd_commands[i].command_size ) 
 		{
-			(pce_cd_commands[i].command_handler)();
+			(pce_cd_commands[i].command_handler)( machine );
 			pce_cd.command_buffer_index = 0;
 		} 
 		else 
@@ -679,7 +678,7 @@ static void pce_cd_handle_data_output( void )
 	}
 }
 
-static void pce_cd_handle_data_input( void ) 
+static void pce_cd_handle_data_input( running_machine *machine ) 
 {
 	if ( pce_cd.scsi_CD ) 
 	{
@@ -715,12 +714,12 @@ static void pce_cd_handle_data_input( void )
 		{
 			if ( pce_cd.data_buffer_index == pce_cd.data_buffer_size ) 
 			{
-				pce_cd_set_irq_line( Machine, PCE_CD_IRQ_TRANSFER_READY, CLEAR_LINE );
+				pce_cd_set_irq_line( machine, PCE_CD_IRQ_TRANSFER_READY, CLEAR_LINE );
 				if ( pce_cd.data_transferred ) 
 				{
 					pce_cd.data_transferred = 0;
 					pce_cd_reply_status_byte( SCSI_STATUS_OK );
-					pce_cd_set_irq_line( Machine, PCE_CD_IRQ_TRANSFER_DONE, ASSERT_LINE );
+					pce_cd_set_irq_line( machine, PCE_CD_IRQ_TRANSFER_DONE, ASSERT_LINE );
 				}
 			} 
 			else 
@@ -822,12 +821,12 @@ logerror("Setting CD in device selection\n");
 				if ( pce_cd.scsi_IO ) 
 				{
 					/* Reading data from target */
-					pce_cd_handle_data_input();
+					pce_cd_handle_data_input( machine );
 				} 
 				else 
 				{
 					/* Sending data to target */
-					pce_cd_handle_data_output();
+					pce_cd_handle_data_output( machine );
 				}
 			}
 		}
