@@ -70,7 +70,6 @@ void electron_interrupt_handler(running_machine *machine, int mode, int interrup
 
 VIDEO_START( electron );
 VIDEO_UPDATE( electron );
-INTERRUPT_GEN( electron_scanline_interrupt );
 
 
 #endif /* ELECTRON_H_ */

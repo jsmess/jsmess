@@ -26,7 +26,6 @@ Missing:
 #include "includes/electron.h"
 #include "devices/cassette.h"
 #include "formats/uef_cas.h"
-#include "deprecat.h"
 
 static const rgb_t electron_palette[8]=
 {
@@ -176,7 +175,6 @@ static const cassette_config electron_cassette_config =
 static MACHINE_DRIVER_START( electron )
 	MDRV_CPU_ADD( "main", M6502, 2000000 )
 	MDRV_CPU_PROGRAM_MAP( electron_mem, 0 )
-	MDRV_CPU_VBLANK_INT_HACK(electron_scanline_interrupt, 312) /* scanline interrupt */
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE( 50.08 )
 

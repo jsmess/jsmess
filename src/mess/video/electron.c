@@ -35,8 +35,11 @@ Mode changes are 'immediate', so any change in RAM access timing occurs exactly 
 
 */
 
+static TIMER_CALLBACK( electron_scanline_interrupt );
+
 static int map4[256];
 static int map16[256];
+static emu_timer *scanline_timer;
 
 VIDEO_START( electron )
 {
@@ -45,6 +48,8 @@ VIDEO_START( electron )
 		map4[i] = ( ( i & 0x10 ) >> 3 ) | ( i & 0x01 );
 		map16[i] = ( ( i & 0x40 ) >> 3 ) | ( ( i & 0x10 ) >> 2 ) | ( ( i & 0x04 ) >> 1 ) | ( i & 0x01 );
 	}
+	scanline_timer = timer_alloc( machine, electron_scanline_interrupt, NULL );
+	timer_adjust_periodic( scanline_timer, video_screen_get_time_until_pos( machine->primary_screen, 0, 0 ), 0, video_screen_get_scan_period( machine->primary_screen ) );
 }
 
 INLINE UINT8 read_vram( UINT16 addr ) {
@@ -244,15 +249,15 @@ VIDEO_UPDATE( electron )
 	return 0;
 }
 
-INTERRUPT_GEN( electron_scanline_interrupt )
+static TIMER_CALLBACK( electron_scanline_interrupt )
 {
-	switch (video_screen_get_vpos(device->machine->primary_screen))
+	switch (video_screen_get_vpos(machine->primary_screen))
 	{
 	case 43:
-		electron_interrupt_handler( device->machine, INT_SET, INT_RTC );
+		electron_interrupt_handler( machine, INT_SET, INT_RTC );
 		break;
 	case 199:
-		electron_interrupt_handler( device->machine, INT_SET, INT_DISPLAY_END );
+		electron_interrupt_handler( machine, INT_SET, INT_DISPLAY_END );
 		break;
 	case 255:
 		ula.screen_addr = ula.screen_start - ula.screen_base;
