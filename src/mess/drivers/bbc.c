@@ -20,7 +20,6 @@
 #include "devices/cartslot.h"
 #include "devices/printer.h"
 #include "devices/cassette.h"
-#include "machine/mc6850.h"
 #include "formats/uef_cas.h"
 #include "formats/csw_cas.h"
 
@@ -748,7 +747,12 @@ static MACHINE_DRIVER_START( bbca )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 //  MDRV_SOUND_ADD("tms5220", TMS5220, tms5220_interface)
 
+	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", bbc_cassette_config )
+
+	/* acia */
+	MDRV_DEVICE_ADD("acia6850", ACIA6850)
+	MDRV_DEVICE_CONFIG(bbc_acia6850_interface)
 	
 	/* devices */
 	MDRV_UPD7002_ADD("upd7002",BBC_uPD7002)
@@ -821,7 +825,12 @@ static MACHINE_DRIVER_START( bbcm )
 	/* printer */
 	MDRV_DEVICE_ADD("printer", PRINTER)
 
+	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", bbc_cassette_config )
+
+	/* acia */
+	MDRV_DEVICE_ADD("acia6850", ACIA6850)
+	MDRV_DEVICE_CONFIG(bbc_acia6850_interface)
 	
 	/* devices */
 	MDRV_UPD7002_ADD("upd7002",BBC_uPD7002)

@@ -24,17 +24,20 @@ System Driver Changes:
 
 - [BBC] Changed memory handling for the 0xfc00 to 0xfeff memory region
   on the Master driver, to allow correct debugging of code in this area
-  when ROM is paged in for read [Phill Harvey-Smith]
+  when ROM is paged in for read.  [Phill Harvey-Smith]
 
 - [BBC] Added version 3.20 of the Master MOS, selectable as a bios, as this is the 
-  more common version of the bios [Phill Harvey-Smith]
+  more common version of the bios.  [Phill Harvey-Smith]
 
 - [BBC] Fixed up loading of 8K roms as cartriges so that they mirror correctly
-  and don't cause an error on loading, 16K was already working correctly
+  and don't cause an error on loading, 16K was already working correctly.
   [Phill Harvey-Smith]  
 
+- [BBC] Changed to use MAME's 6850 implemenation.  Deleted MESS's private 6850
+  implementation.  [Nathan Woods]
+
 - [COCO] Fixed Dragon Alpha, via mame update, the NMI enable/disable allowing
-  disks to boot again [Phill Harvey-Smith]
+  disks to boot again.  [Phill Harvey-Smith]
 
 - [COMX35] Added support for the 80 column card. [Curt Coder, Marcel van Tongeren]
 

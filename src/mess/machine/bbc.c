@@ -18,7 +18,6 @@
 #include "machine/upd7002.h"
 #include "machine/i8271.h"
 #include "machine/mc146818.h"
-#include "machine/mc6850.h"
 #include "devices/basicdsk.h"
 #include "devices/cassette.h"
 #include "sound/sn76496.h"
@@ -1351,13 +1350,15 @@ const uPD7002_interface BBC_uPD7002 =
 
 WRITE8_HANDLER ( BBC_6850_w )
 {
+	const device_config *acia = device_list_find_by_tag(space->machine->config->devicelist, ACIA6850, "acia6850");
+
 	switch (offset&1)
 	{
 		case 0:
-			MC6850_control_w(0,data);
+			acia6850_ctrl_w(acia, 0, data);
 			break;
 		case 1:
-			MC6850_data_w(0,data);
+			acia6850_data_w(acia, 0, data);
 			break;
 	}
 
@@ -1367,15 +1368,16 @@ WRITE8_HANDLER ( BBC_6850_w )
 
 READ8_HANDLER (BBC_6850_r)
 {
-	int retval=0;
+	const device_config *acia = device_list_find_by_tag(space->machine->config->devicelist, ACIA6850, "acia6850");
+	UINT8 retval=0;
 
 	switch (offset&1)
 	{
 		case 0:
-			retval=MC6850_status_r(0);
+			retval = acia6850_stat_r(acia, 0);
 			break;
 		case 1:
-			retval=MC6850_data_r(0);
+			retval = acia6850_data_r(acia, 0);
 			break;
 	}
 	//logerror("6850 read from %02x = %02x\n",offset,retval);
@@ -1384,18 +1386,23 @@ READ8_HANDLER (BBC_6850_r)
 
 
 
-static void Serial_interrupt(int level)
+static void Serial_interrupt(const device_config *device, int level)
 {
   MC6850_irq=level;
   bbc_setirq(Machine);
   //logerror("Set SIO irq  %01x\n",level);
 }
 
-static const struct MC6850_interface BBC_MC6850_calls =
+const acia6850_interface bbc_acia6850_interface =
 {
-	0,// Transmit data ouput
-	0,// Request to Send output
-	Serial_interrupt,// Interupt Request output
+	0,						/* tx_clock */
+	0,						/* rx_clock */
+	NULL,					/* rx_pin */
+	NULL,					/* tx_pin */
+	NULL,					/* cts_pin */
+	NULL,					/* rts_pin */
+	NULL,					/* dcd_pin */
+	Serial_interrupt,		/* int_callback */
 };
 
 
@@ -1412,8 +1419,19 @@ static int len0=0;
 static int len1=0;
 static int len2=0;
 static int len3=0;
+static int mc6850_clock = 0;
 
 static emu_timer *bbc_tape_timer;
+
+static void MC6850_Receive_Clock(running_machine *machine, int new_clock)
+{
+	if (!mc6850_clock && new_clock)
+	{
+		const device_config *acia = device_list_find_by_tag(machine->config->devicelist, ACIA6850, "acia6850");
+		acia_tx_clock_in(acia);
+	}
+	mc6850_clock = new_clock;
+}
 
 static TIMER_CALLBACK(bbc_tape_timer_cb)
 {
@@ -1428,7 +1446,6 @@ static TIMER_CALLBACK(bbc_tape_timer_cb)
 		{
 			//this is to long to recive anything so reset the serial IC. This is a hack, this should be done as a timer in the MC6850 code.
 			logerror ("Cassette length %d\n",wav_len);
-			MC6850_Reset(wav_len);
 			len0=0;
 			len1=0;
 			len2=0;
@@ -1449,7 +1466,7 @@ static TIMER_CALLBACK(bbc_tape_timer_cb)
 		{
 			/* Clock a 0 onto the serial line */
 			logerror("Serial value 0\n");
-			MC6850_Receive_Clock(0);
+			MC6850_Receive_Clock(machine, 0);
 			len0=0;
 			len1=0;
 			len2=0;
@@ -1460,7 +1477,7 @@ static TIMER_CALLBACK(bbc_tape_timer_cb)
 		{
 			/* Clock a 1 onto the serial line */
 			logerror("Serial value 1\n");
-			MC6850_Receive_Clock(1);
+			MC6850_Receive_Clock(machine, 1);
 			len0=0;
 			len1=0;
 			len2=0;
@@ -1484,7 +1501,6 @@ static void BBC_Cassette_motor(running_machine *machine, unsigned char status)
 	} else {
 		cassette_change_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ),CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 		timer_reset(bbc_tape_timer, attotime_never);
-		MC6850_Reset(wav_len);
 		len0=0;
 		len1=0;
 		len2=0;
@@ -2132,6 +2148,7 @@ DRIVER_INIT( bbcm )
 
 MACHINE_START( bbca )
 {
+	mc6850_clock = 0;
 	via_config(0, &bbcb_system_via);
 	via_set_clock(0,1000000);
 }
@@ -2148,12 +2165,11 @@ MACHINE_RESET( bbca )
 	via_reset();
 
 	bbcb_IC32_initialise();
-
-	MC6850_config(&BBC_MC6850_calls);
 }
 
 MACHINE_START( bbcb )
 {
+	mc6850_clock = 0;
 	//removed from here because MACHINE_START can no longer read DIP swiches.
 	//put in MACHINE_RESET instead.
 	//bbc_DFSType=  (input_port_read(machine, "BBCCONFIG")>>0)&0x07;
@@ -2204,7 +2220,6 @@ MACHINE_RESET( bbcb )
 
 	bbcb_IC32_initialise();
 
-	MC6850_config(&BBC_MC6850_calls);
 
 	opusbank=0;
 	/*set up the required disc controller*/
@@ -2220,6 +2235,8 @@ MACHINE_RESET( bbcb )
 
 MACHINE_START( bbcbp )
 {
+	mc6850_clock = 0;
+
 	memory_set_direct_update_handler( cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM), bbcbp_direct_handler);
 
 	/* bank 6 is the paged ROMs     from b000 to bfff */
@@ -2246,7 +2263,6 @@ MACHINE_RESET( bbcbp )
 
 	bbcb_IC32_initialise();
 
-	MC6850_config(&BBC_MC6850_calls);
 
 	previous_wd177x_int_state=1;
     wd17xx_reset(machine);
@@ -2256,6 +2272,8 @@ MACHINE_RESET( bbcbp )
 
 MACHINE_START( bbcm )
 {
+	mc6850_clock = 0;
+
 	memory_set_direct_update_handler( cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM ), bbcm_direct_handler);
 
 	/* bank 5 is the paged ROMs     from 9000 to bfff */
@@ -2286,7 +2304,6 @@ MACHINE_RESET( bbcm )
 
 	bbcb_IC32_initialise();
 
-	MC6850_config(&BBC_MC6850_calls);
 
 	previous_wd177x_int_state=1;
     wd17xx_reset(machine);
