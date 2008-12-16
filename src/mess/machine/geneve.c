@@ -1301,11 +1301,11 @@ static TMS9901_INT_CALLBACK( tms9901_interrupt_callback )
 	 (bit 2: INT2 status)
 	 bit 3-7: joystick status
 */
-static READ8_HANDLER( R9901_0 )
+static READ8_DEVICE_HANDLER( R9901_0 )
 {
 	int answer;
 
-	answer = input_port_read(space->machine, "JOY") >> (JoySel * 8);
+	answer = input_port_read(device->machine, "JOY") >> (JoySel * 8);
 
 	return (answer);
 }
@@ -1322,11 +1322,11 @@ static READ8_HANDLER( R9901_0 )
 	 bit 5 & 7: used as output
 	 bit 6: unused
 */
-static READ8_HANDLER( R9901_1 )
+static READ8_DEVICE_HANDLER( R9901_1 )
 {
 	int answer;
 
-	answer = (input_port_read(space->machine, "MOUSE0") & 4) ^ 4;
+	answer = (input_port_read(device->machine, "MOUSE0") & 4) ^ 4;
 
 	return answer;
 }
@@ -1334,7 +1334,7 @@ static READ8_HANDLER( R9901_1 )
 /*
 	Read pins P0-P7 of Geneve 9901.
 */
-static READ8_HANDLER( R9901_2 )
+static READ8_DEVICE_HANDLER( R9901_2 )
 {
 	return 0;
 }
@@ -1343,11 +1343,11 @@ static READ8_HANDLER( R9901_2 )
 	Read pins P8-P15 of Geneve 9901.
 	bit 4: mouse right button
 */
-static READ8_HANDLER( R9901_3 )
+static READ8_DEVICE_HANDLER( R9901_3 )
 {
 	int answer = 0;
 
-	if (! (input_port_read(space->machine, "MOUSE0") & 4))
+	if (! (input_port_read(device->machine, "MOUSE0") & 4))
 		answer |= 0x10;
 
 	return answer;
@@ -1357,26 +1357,26 @@ static READ8_HANDLER( R9901_3 )
 /*
 	Write PE bus reset line
 */
-static WRITE8_HANDLER( W9901_PE_bus_reset )
+static WRITE8_DEVICE_HANDLER( W9901_PE_bus_reset )
 {
 }
 
 /*
 	Write VDP reset line
 */
-static WRITE8_HANDLER( W9901_VDP_reset )
+static WRITE8_DEVICE_HANDLER( W9901_VDP_reset )
 {
 }
 
 /*
 	Write joystick select line
 */
-static WRITE8_HANDLER( W9901_JoySel )
+static WRITE8_DEVICE_HANDLER( W9901_JoySel )
 {
 	JoySel = data;
 }
 
-static WRITE8_HANDLER( W9901_KeyboardReset )
+static WRITE8_DEVICE_HANDLER( W9901_KeyboardReset )
 {
 	KeyReset = ! data;
 	if (KeyReset)
@@ -1399,14 +1399,14 @@ static WRITE8_HANDLER( W9901_KeyboardReset )
 /*
 	Write external mem cycles (0=long, 1=short)
 */
-static WRITE8_HANDLER( W9901_ext_mem_wait_states )
+static WRITE8_DEVICE_HANDLER( W9901_ext_mem_wait_states )
 {
 }
 
 /*
 	Write vdp wait cycles (1=add 15 cycles, 0=add none)
 */
-static WRITE8_HANDLER( W9901_VDP_wait_states )
+static WRITE8_DEVICE_HANDLER( W9901_VDP_wait_states )
 {
 }
 

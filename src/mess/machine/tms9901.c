@@ -324,7 +324,7 @@ READ8_DEVICE_HANDLER ( tms9901_cru_r )
 			answer = ((~ tms->int_state) & tms->supported_int_mask) & 0xFF;
 
 			if (tms->intf->read_handlers[0])
-				answer |= (* tms->intf->read_handlers[0])(space, 0);
+				answer |= (* tms->intf->read_handlers[0])(device, 0);
 
 			answer &= ~ tms->pio_direction_mirror;
 			answer |= (tms->pio_output_mirror & tms->pio_direction_mirror) & 0xFF;
@@ -342,7 +342,7 @@ READ8_DEVICE_HANDLER ( tms9901_cru_r )
 			answer = ((~ tms->int_state) & tms->supported_int_mask) >> 8;
 
 			if (tms->intf->read_handlers[1])
-				answer |= (* tms->intf->read_handlers[1])(space, 1);
+				answer |= (* tms->intf->read_handlers[1])(device, 1);
 
 			answer &= ~ (tms->pio_direction_mirror >> 8);
 			answer |= (tms->pio_output_mirror & tms->pio_direction_mirror) >> 8;
@@ -352,7 +352,7 @@ READ8_DEVICE_HANDLER ( tms9901_cru_r )
 		/* exit timer mode */
 		tms->mode9901 = 0;
 
-		answer = (tms->intf->read_handlers[2]) ? (* tms->intf->read_handlers[2])(space, 2) : 0;
+		answer = (tms->intf->read_handlers[2]) ? (* tms->intf->read_handlers[2])(device, 2) : 0;
 
 		answer &= ~ tms->pio_direction;
 		answer |= (tms->pio_output & tms->pio_direction) & 0xFF;
@@ -362,7 +362,7 @@ READ8_DEVICE_HANDLER ( tms9901_cru_r )
 		/* exit timer mode */
 		tms->mode9901 = 0;
 
-		answer = (tms->intf->read_handlers[3]) ? (* tms->intf->read_handlers[3])(space, 3) : 0;
+		answer = (tms->intf->read_handlers[3]) ? (* tms->intf->read_handlers[3])(device, 3) : 0;
 
 		answer &= ~ (tms->pio_direction >> 8);
 		answer |= (tms->pio_output & tms->pio_direction) >> 8;
@@ -530,7 +530,7 @@ WRITE8_DEVICE_HANDLER ( tms9901_cru_w )
 			}
 
 			if (tms->intf->write_handlers[pin] != NULL)
-				(* tms->intf->write_handlers[pin])(space, pin, data);
+				(* tms->intf->write_handlers[pin])(device, pin, data);
 		}
 
 		break;

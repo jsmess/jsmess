@@ -40,8 +40,8 @@ typedef struct _tms9901_interface tms9901_interface;
 struct _tms9901_interface
 {
 	int supported_int_mask;	/* a bit for each input pin whose state is always notified to the TMS9901 core */
-	read8_space_func  read_handlers[4];	  /* 4*8 bits */
-	write8_space_func write_handlers[16]; /* 16 Pn outputs */
+	read8_device_func  read_handlers[4];	  /* 4*8 bits */
+	write8_device_func write_handlers[16]; /* 16 Pn outputs */
 	tms9901_int_callback_func interrupt_callback; /* called when interrupt bus state changes */
 	double clock_rate;
 };

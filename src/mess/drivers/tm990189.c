@@ -271,7 +271,7 @@ static TMS9901_INT_CALLBACK ( usr9901_interrupt_callback )
 		field_interrupts(device->machine);
 }
 
-static WRITE8_HANDLER( usr9901_led_w )
+static WRITE8_DEVICE_HANDLER( usr9901_led_w )
 {
 	if (data)
 		LED_state |= (1 << offset);
@@ -286,23 +286,23 @@ static TMS9901_INT_CALLBACK( sys9901_interrupt_callback )
 	tms9901_set_single_int(device_list_find_by_tag(device->machine->config->devicelist, TMS9901, "tms9901_0"), 5, intreq);
 }
 
-static READ8_HANDLER( sys9901_r0 )
+static READ8_DEVICE_HANDLER( sys9901_r0 )
 {
 	int reply = 0x00;
 	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8" };
 
 	/* keyboard read */
 	if (digitsel < 9)
-		reply |= input_port_read(space->machine, keynames[digitsel]) << 1;
+		reply |= input_port_read(device->machine, keynames[digitsel]) << 1;
 
 	/* tape input */
-	if (cassette_input(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" )) > 0.0)
+	if (cassette_input(device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" )) > 0.0)
 		reply |= 0x40;
 
 	return reply;
 }
 
-static WRITE8_HANDLER( sys9901_digitsel_w )
+static WRITE8_DEVICE_HANDLER( sys9901_digitsel_w )
 {
 	if (data)
 		digitsel |= 1 << offset;
@@ -310,7 +310,7 @@ static WRITE8_HANDLER( sys9901_digitsel_w )
 		digitsel &= ~ (1 << offset);
 }
 
-static WRITE8_HANDLER( sys9901_segment_w )
+static WRITE8_DEVICE_HANDLER( sys9901_segment_w )
 {
 	if (data)
 		segment |= 1 << (offset-4);
@@ -322,7 +322,7 @@ static WRITE8_HANDLER( sys9901_segment_w )
 	}
 }
 
-static WRITE8_HANDLER( sys9901_dsplytrgr_w )
+static WRITE8_DEVICE_HANDLER( sys9901_dsplytrgr_w )
 {
 	if ((!data) && (digitsel < 10))
 	{
@@ -331,7 +331,7 @@ static WRITE8_HANDLER( sys9901_dsplytrgr_w )
 	}
 }
 
-static WRITE8_HANDLER( sys9901_shiftlight_w )
+static WRITE8_DEVICE_HANDLER( sys9901_shiftlight_w )
 {
 	if (data)
 		LED_state |= 0x10;
@@ -339,14 +339,14 @@ static WRITE8_HANDLER( sys9901_shiftlight_w )
 		LED_state &= ~0x10;
 }
 
-static WRITE8_HANDLER( sys9901_spkrdrive_w )
+static WRITE8_DEVICE_HANDLER( sys9901_spkrdrive_w )
 {
 	speaker_level_w(0, data);
 }
 
-static WRITE8_HANDLER( sys9901_tapewdata_w )
+static WRITE8_DEVICE_HANDLER( sys9901_tapewdata_w )
 {
-	cassette_output(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" ), data ? +1.0 : -1.0);
+	cassette_output(device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" ), data ? +1.0 : -1.0);
 }
 
 /*
