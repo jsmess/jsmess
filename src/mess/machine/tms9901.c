@@ -308,7 +308,6 @@ READ8_DEVICE_HANDLER ( tms9901_cru_r )
 {
 	int answer;
 	tms9901_t *tms = get_token(device);
-	const address_space* space = cpu_get_address_space(device->machine->cpu[0],ADDRESS_SPACE_PROGRAM);
 
 	offset &= 0x003;
 
@@ -389,7 +388,6 @@ READ8_DEVICE_HANDLER ( tms9901_cru_r )
 WRITE8_DEVICE_HANDLER ( tms9901_cru_w )
 {
 	tms9901_t *tms = get_token(device);
-	const address_space* space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
 	data &= 1;	/* clear extra bits */
 	offset &= 0x01F;
