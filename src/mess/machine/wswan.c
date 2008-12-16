@@ -56,6 +56,9 @@ struct SoundDMA {
 	UINT8	enable;		/* Enabled */
 };
 
+static TIMER_CALLBACK(wswan_scanline_interrupt);
+
+
 static UINT8 *ROMMap[256];
 static UINT32 ROMBanks;
 static UINT8 internal_eeprom[INTERNAL_EEPROM_SIZE];
@@ -237,6 +240,8 @@ MACHINE_RESET( wswan )
 	vdp.color_mode = 0;
 	vdp.colors_16 = 0;
 	vdp.tile_packed = 0;
+	vdp.timer = timer_alloc( machine, wswan_scanline_interrupt, &vdp );
+	timer_adjust_periodic( vdp.timer, ticks_to_attotime( 256, 3072000 ), 0, ticks_to_attotime( 256, 3072000 ) );
 
 	/* Initialize sound DMA */
 	memset( &sound_dma, 0, sizeof( sound_dma ) );
@@ -1355,7 +1360,7 @@ DEVICE_IMAGE_LOAD(wswan_cart)
 	return INIT_PASS;
 }
 
-INTERRUPT_GEN(wswan_scanline_interrupt)
+static TIMER_CALLBACK(wswan_scanline_interrupt)
 {
 	if( vdp.current_line < 144 ) {
 		wswan_refresh_scanline();
@@ -1372,13 +1377,13 @@ INTERRUPT_GEN(wswan_scanline_interrupt)
 				vdp.timer_hblank_reload = 0;
 			}
 			logerror( "trigerring hbltmr interrupt\n" );
-			wswan_set_irq_line( device->machine, WSWAN_IFLAG_HBLTMR );
+			wswan_set_irq_line( machine, WSWAN_IFLAG_HBLTMR );
 		}
 	}
 
 	/* Handle Sound DMA */
 	if ( ( sound_dma.enable & 0x88 ) == 0x80 ) {
-		const address_space *space = cpu_get_address_space( device->machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+		const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
 		/* TODO: Output sound DMA byte */
 		wswan_port_w( space, 0x89, memory_read_byte(space,  sound_dma.source ) );
 		sound_dma.size--;
@@ -1391,7 +1396,7 @@ INTERRUPT_GEN(wswan_scanline_interrupt)
 //	vdp.current_line = (vdp.current_line + 1) % 159;
 
 	if( vdp.current_line == 144 ) {
-		wswan_set_irq_line( device->machine, WSWAN_IFLAG_VBL );
+		wswan_set_irq_line( machine, WSWAN_IFLAG_VBL );
 		/* Decrement 75Hz (VBlank) counter */
 		if ( vdp.timer_vblank_enable && vdp.timer_vblank_reload != 0 ) {
 			vdp.timer_vblank_count--;
@@ -1403,7 +1408,7 @@ INTERRUPT_GEN(wswan_scanline_interrupt)
 					vdp.timer_vblank_reload = 0;
 				}
 				logerror( "triggering vbltmr interrupt\n" );
-				wswan_set_irq_line( device->machine, WSWAN_IFLAG_VBLTMR );
+				wswan_set_irq_line( machine, WSWAN_IFLAG_VBLTMR );
 			}
 		}
 	}
@@ -1411,7 +1416,7 @@ INTERRUPT_GEN(wswan_scanline_interrupt)
 //	vdp.current_line = (vdp.current_line + 1) % 159;
 
 	if ( vdp.current_line == vdp.line_compare ) {
-		wswan_set_irq_line( device->machine, WSWAN_IFLAG_LCMP );
+		wswan_set_irq_line( machine, WSWAN_IFLAG_LCMP );
 	}
 
 	vdp.current_line = (vdp.current_line + 1) % 159;
@@ -1420,9 +1425,9 @@ INTERRUPT_GEN(wswan_scanline_interrupt)
 		if ( vdp.display_vertical != vdp.new_display_vertical ) {
 			vdp.display_vertical = vdp.new_display_vertical;
 			if ( vdp.display_vertical ) {
-				video_screen_set_visarea( device->machine->primary_screen, 5*8, 5*8 + WSWAN_Y_PIXELS - 1, 0, WSWAN_X_PIXELS - 1 );
+				video_screen_set_visarea( machine->primary_screen, 5*8, 5*8 + WSWAN_Y_PIXELS - 1, 0, WSWAN_X_PIXELS - 1 );
 			} else {
-				video_screen_set_visarea( device->machine->primary_screen, 0, WSWAN_X_PIXELS - 1, 5*8, 5*8 + WSWAN_Y_PIXELS - 1 );
+				video_screen_set_visarea( machine->primary_screen, 0, WSWAN_X_PIXELS - 1, 5*8, 5*8 + WSWAN_Y_PIXELS - 1 );
 			}
 		}
 	}

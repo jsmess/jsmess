@@ -80,6 +80,7 @@ struct VDP
 	int main_palette[8];
 	UINT8 display_vertical;			/* Should the wonderswan be held vertically? */
 	UINT8 new_display_vertical;		/* New value for the display_vertical bit (to prevent mid frame changes) */
+	emu_timer *timer;
 };
 
 
@@ -98,7 +99,6 @@ extern READ8_HANDLER( wswan_sram_r );
 extern WRITE8_HANDLER( wswan_sram_w );
 extern DEVICE_START(wswan_cart);
 extern DEVICE_IMAGE_LOAD(wswan_cart);
-extern INTERRUPT_GEN(wswan_scanline_interrupt);
 
 
 /*----------- defined in video/wswan.c -----------*/
