@@ -984,10 +984,8 @@ static MACHINE_DRIVER_START ( hp48gx )
 	MDRV_DEVICE_CONFIG  ( hp48gx_port2_config )
 		
 	/* serial I/O */
-	MDRV_DEVICE_ADD( "rs232_x", XMODEM )
-	MDRV_DEVICE_CONFIG( hp48_xmodem_rs232_conf )
-	MDRV_DEVICE_ADD( "rs232_k", KERMIT )
-	MDRV_DEVICE_CONFIG( hp48_kermit_rs232_conf )
+	MDRV_XMODEM_ADD( "rs232_x", hp48_xmodem_rs232_conf )
+	MDRV_KERMIT_ADD( "rs232_k", hp48_kermit_rs232_conf )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START ( hp48g )
@@ -996,10 +994,8 @@ static MACHINE_DRIVER_START ( hp48g )
 	MDRV_DEFAULT_LAYOUT ( layout_hp48g )
 
 	/* serial I/O */
-	MDRV_DEVICE_ADD( "rs232_x", XMODEM )
-	MDRV_DEVICE_CONFIG( hp48_xmodem_rs232_conf )
-	MDRV_DEVICE_ADD( "rs232_k", KERMIT )
-	MDRV_DEVICE_CONFIG( hp48_kermit_rs232_conf )
+	MDRV_XMODEM_ADD( "rs232_x", hp48_xmodem_rs232_conf )
+	MDRV_KERMIT_ADD( "rs232_k", hp48_kermit_rs232_conf )
 MACHINE_DRIVER_END
 
 
@@ -1016,8 +1012,7 @@ static MACHINE_DRIVER_START ( hp48sx )
 	MDRV_DEVICE_CONFIG  ( hp48sx_port2_config )
 
 	/* serial I/O */
-	MDRV_DEVICE_ADD( "rs232_k", KERMIT )
-	MDRV_DEVICE_CONFIG( hp48_kermit_rs232_conf )
+	MDRV_KERMIT_ADD( "rs232_k", hp48_kermit_rs232_conf )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START ( hp48s )
@@ -1027,8 +1022,7 @@ static MACHINE_DRIVER_START ( hp48s )
 	MDRV_DEFAULT_LAYOUT ( layout_hp48s )
 
 	/* serial I/O */
-	MDRV_DEVICE_ADD( "rs232_k", KERMIT )
-	MDRV_DEVICE_CONFIG( hp48_kermit_rs232_conf )
+	MDRV_KERMIT_ADD( "rs232_k", hp48_kermit_rs232_conf )
 MACHINE_DRIVER_END
 
 

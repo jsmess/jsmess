@@ -23,6 +23,13 @@ typedef struct {
 } xmodem_config;
 
 
+#define MDRV_XMODEM_ADD(_tag, _intrf) \
+  MDRV_DEVICE_ADD(_tag, XMODEM)	      \
+  MDRV_DEVICE_CONFIG(_intrf)
+
+#define MDRV_XMODEM_REMOVE(_tag)		\
+  MDRV_DEVICE_REMOVE(_tag, XMODEM)
+
 
 extern DEVICE_GET_INFO( xmodem );
 

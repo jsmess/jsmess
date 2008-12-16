@@ -8,7 +8,7 @@
 
 #include "driver.h"
 #include "timer.h"
-#include "state.h"
+#include "state.h" 
 #include "device.h"
 #include "sound/dac.h"
 #include "cpu/saturn/saturn.h"
@@ -186,8 +186,8 @@ void hp48_rs232_start_recv_byte( running_machine *machine, UINT8 data )
 /* end of send event */
 static TIMER_CALLBACK( hp48_rs232_byte_sent_cb )
 {	
-	const device_config *xmodem = device_list_find_by_tag( machine->config->devicelist, XMODEM, "rs232-x" );
-	const device_config *kermit = device_list_find_by_tag( machine->config->devicelist, KERMIT, "rs232-k" );
+	const device_config *xmodem = device_list_find_by_tag( machine->config->devicelist, XMODEM, "rs232_x" );
+	const device_config *kermit = device_list_find_by_tag( machine->config->devicelist, KERMIT, "rs232_k" );
 
 	LOG_SERIAL(( "%f hp48_rs232_byte_sent_cb: end of send, data=%02x\n", 
 		     attotime_to_double(timer_get_time(machine)), param ));
@@ -211,13 +211,12 @@ static TIMER_CALLBACK( hp48_rs232_byte_sent_cb )
 /* CPU initiates a send event */
 static void hp48_rs232_send_byte( running_machine *machine )
 {
-	const device_config *xmodem = device_list_find_by_tag( machine->config->devicelist, XMODEM, "rs232-x" );
-	const device_config *kermit = device_list_find_by_tag( machine->config->devicelist, KERMIT, "rs232-k" );
-	
+	const device_config *xmodem = device_list_find_by_tag( machine->config->devicelist, XMODEM, "rs232_x" );
+	const device_config *kermit = device_list_find_by_tag( machine->config->devicelist, KERMIT, "rs232_k" );	
 	UINT8 data = HP48_IO_8(0x16); /* byte to send */
 
-//	LOG_SERIAL(( "%05x %f hp48_rs232_send_byte: start sending, data=%02x\n", 
-//		     activecpu_get_previouspc(), attotime_to_double(timer_get_time(machine)), data ));
+	LOG_SERIAL(( "%05x %f hp48_rs232_send_byte: start sending, data=%02x\n", 
+		     cpu_get_previouspc(machine->cpu[0]), attotime_to_double(timer_get_time(machine)), data ));
 
 	hp48_io[0x12] |= 3;           /* set byte sending and send buffer full */
 
@@ -272,7 +271,7 @@ static void hp48_chardev_start_recv_byte( running_machine *machine, chardev_err 
 	}
 
 	/* schedule end of reception */
-	timer_set( RS232_DELAY, NULL, 0, hp48_chardev_byte_recv_cb );
+	timer_set( machine, RS232_DELAY, NULL, 0, hp48_chardev_byte_recv_cb );
 }
 
 static void hp48_chardev_ready_to_send( running_machine *machine )
@@ -298,8 +297,8 @@ static const chardev_interface hp48_chardev_iface =
 /* CPU sets OUT register (keyboard + beeper) */
 void hp48_reg_out( running_machine* machine, int out )
 {
-//	LOG(( "%05x %f hp48_reg_out: %03x\n",
-//	      activecpu_get_previouspc(), attotime_to_double(timer_get_time(machine)), out ));
+	LOG(( "%05x %f hp48_reg_out: %03x\n",
+	      cpu_get_previouspc(machine->cpu[0]), attotime_to_double(timer_get_time(machine)), out ));
 
 	/* bits 0-8: keyboard lines */
 	hp48_out = out & 0x1ff;
@@ -335,8 +334,8 @@ static int hp48_get_in( running_machine *machine )
 int hp48_reg_in( running_machine* machine )
 {
 	int in = hp48_get_in( machine );
-//	LOG(( "%05x %f hp48_reg_in: %04x\n",
-//	      activecpu_get_previouspc(), attotime_to_double(timer_get_time(machine)), in ));
+	LOG(( "%05x %f hp48_reg_in: %04x\n",
+	      cpu_get_previouspc(machine->cpu[0]), attotime_to_double(timer_get_time(machine)), in ));
 	return in;
 }
 
@@ -378,7 +377,7 @@ static TIMER_CALLBACK( hp48_kbd_cb )
 /* RSI opcode */
 void hp48_rsi( running_machine *machine )
 {
-//	LOG(( "%05x %f hp48_rsi\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time(machine)) ));
+	LOG(( "%05x %f hp48_rsi\n", cpu_get_previouspc(machine->cpu[0]), attotime_to_double(timer_get_time(machine)) ));
 
 	/* enables interrupts on key repeat 
 	   (normally, there is only one interrupt, when the key is pressed)
@@ -464,6 +463,7 @@ static WRITE8_HANDLER ( hp48_io_w )
 	/* cards */
 	case 0x0e:
 		LOG(( "%05x: card control write %02x\n", cpu_get_previouspc(space->cpu), data ));
+
 		/* bit 0: software interrupt */
 		if ( data & 1 )
 		{
@@ -596,8 +596,8 @@ static READ8_HANDLER ( hp48_io_r )
 	{
                 /* second nibble of received data */
 
-		const device_config *xmodem = device_list_find_by_tag( space->machine->config->devicelist, XMODEM, "rs232-x" );
-		const device_config *kermit = device_list_find_by_tag( space->machine->config->devicelist, KERMIT, "rs232-k" );
+		const device_config *xmodem = device_list_find_by_tag( space->machine->config->devicelist, XMODEM, "rs232_x" );
+		const device_config *kermit = device_list_find_by_tag( space->machine->config->devicelist, KERMIT, "rs232_k" );	
 
 		hp48_io[0x11] &= ~1;  /* clear byte received */
 		data = hp48_io[offset];
@@ -714,7 +714,7 @@ static TIMER_CALLBACK( hp48_timer2_cb )
 /* --------- memory controller ----------- */
 
 /* 
-   Clark (S series) and York (G series) CPUs have 6 daisy-chainedmodules
+   Clark (S series) and York (G series) CPUs have 6 daisy-chained modules
 
 
    <-- highest --------- priority ------------- lowest -->
@@ -754,6 +754,7 @@ static void hp48_apply_modules( running_machine *machine, void* param )
 {
 	int i;
 	int nce2_enable = 1;
+	const address_space* space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
 	hp48_io_addr = 0x100000;
 
@@ -812,15 +813,15 @@ static void hp48_apply_modules( running_machine *machine, void* param )
 				  select_mask, hp48_module_names[i] );
 			continue;
 		}
-		memory_install_read8_handler( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), base, end, 0, mirror, hp48_modules[i].read );
-		memory_install_write8_handler( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), base, end, 0, mirror, hp48_modules[i].write );
+		memory_install_read8_handler( space, base, end, 0, mirror, hp48_modules[i].read );
+		memory_install_write8_handler( space, base, end, 0, mirror, hp48_modules[i].write );
 
 		LOG(( "hp48_mem_config: module %s configured at %05x-%05x, mirror %05x\n",
 		      hp48_module_names[i], base, end, mirror ));
 
 		if ( hp48_modules[i].data )
 		{
-			memory_set_bankptr( machine, i, hp48_modules[i].data );
+			memory_set_bankptr( space->machine, i, hp48_modules[i].data );
 		}
 
 		if ( i == 0 )
@@ -856,7 +857,7 @@ static void hp48_reset_modules( running_machine *machine )
 /* RESET opcode */
 void hp48_mem_reset( running_machine* machine )
 {
-//	LOG(( "%05x %f hp48_mem_reset\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time(machine)) ));
+	LOG(( "%05x %f hp48_mem_reset\n", cpu_get_previouspc(machine->cpu[0]), attotime_to_double(timer_get_time(machine)) ));
 	hp48_reset_modules( machine );
 }
 
@@ -866,7 +867,7 @@ void hp48_mem_config( running_machine* machine, int v )
 {	
 	int i;
 
-//	LOG(( "%05x %f hp48_mem_config: %05x\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time(machine)), v ));
+	LOG(( "%05x %f hp48_mem_config: %05x\n", cpu_get_previouspc(machine->cpu[0]), attotime_to_double(timer_get_time(machine)), v ));
 
 	/* find the highest priority unconfigured module (except non-configurable NCE1)... */
 	for ( i = 0; i < 5; i++ )
@@ -897,7 +898,7 @@ void hp48_mem_config( running_machine* machine, int v )
 void hp48_mem_unconfig( running_machine* machine, int v )
 {	
 	int i;
-//	LOG(( "%05x %f hp48_mem_unconfig: %05x\n", activecpu_get_previouspc(), attotime_to_double(timer_get_time(machine)), v ));
+	LOG(( "%05x %f hp48_mem_unconfig: %05x\n", cpu_get_previouspc(machine->cpu[0]), attotime_to_double(timer_get_time(machine)), v ));
 
 	/* find the highest priority fully configured module at address v (except NCE1)... */
 	for ( i = 0; i < 5; i++ )
@@ -939,8 +940,8 @@ int  hp48_mem_id( running_machine* machine )
 		}
 	}
 
-//	LOG(( "%05x %f hp48_mem_id = %02x\n", 
-//	      activecpu_get_previouspc(), attotime_to_double(timer_get_time(machine)), data ));
+	LOG(( "%05x %f hp48_mem_id = %02x\n", 
+	      cpu_get_previouspc(machine->cpu[0]), attotime_to_double(timer_get_time(machine)), data ));
 
 	return data; /* everything is configured */
 }
@@ -1151,7 +1152,6 @@ static void hp48_machine_start( running_machine *machine, hp48_models model )
 	generic_nvram_size = 2 * ram_size;
 	generic_nvram = auto_malloc( generic_nvram_size );
 	ram = (UINT8*) generic_nvram;
-	memset( generic_nvram, 0, generic_nvram_size );
 
 	/* ROM load */
 	rom_size = HP48_S_SERIES ? (256 * 1024) : (512 * 1024);
@@ -1186,11 +1186,13 @@ static void hp48_machine_start( running_machine *machine, hp48_models model )
                 /* bank switcher */
 		hp48_modules[2].off_mask = 0x00fff;  /* 2 KB */
 		hp48_modules[2].read     = hp48_bank_r;
+		hp48_modules[2].write    = SMH_NOP;
 	}
 
 	/* ROM */
 	hp48_modules[5].off_mask = 2 * rom_size - 1;
 	hp48_modules[5].read     = SMH_BANK5;
+	hp48_modules[5].write    = SMH_NOP;
 	hp48_modules[5].data     = rom;
 
 	/* timers */
