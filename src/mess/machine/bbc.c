@@ -1335,7 +1335,7 @@ UPD7002_GET_ANALOGUE(BBC_get_analogue_input)
 
 UPD7002_EOC(BBC_uPD7002_EOC)
 {
-	via_0_cb1_w(cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0,data);
+	via_0_cb1_w(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0,data);
 }
 
 const uPD7002_interface BBC_uPD7002 =
@@ -1528,7 +1528,7 @@ DEVICE_IMAGE_LOAD( bbc_floppy )
 
 static int previous_i8271_int_state;
 
-static void	bbc_i8271_interrupt(int state)
+static void	bbc_i8271_interrupt(const device_config *device, int state)
 {
 	/* I'm assuming that the nmi is edge triggered */
 	/* a interrupt from the fdc will cause a change in line state, and
@@ -1542,7 +1542,7 @@ static void	bbc_i8271_interrupt(int state)
 		{
 			/* I'll pulse it because if I used hold-line I'm not sure
 			it would clear - to be checked */
-			cpu_set_input_line(cputag_get_cpu(Machine, "main"), INPUT_LINE_NMI,PULSE_LINE);
+			cpu_set_input_line(cputag_get_cpu(device->machine, "main"), INPUT_LINE_NMI,PULSE_LINE);
 		}
 	}
 
@@ -1550,7 +1550,7 @@ static void	bbc_i8271_interrupt(int state)
 }
 
 
-static const i8271_interface bbc_i8271_interface=
+const i8271_interface bbc_i8271_interface=
 {
 	bbc_i8271_interrupt,
     NULL
@@ -1559,7 +1559,8 @@ static const i8271_interface bbc_i8271_interface=
 
 static READ8_HANDLER( bbc_i8271_read )
 {
-int ret;
+	int ret;
+	device_config *i8271 = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, I8271, "i8271" );
 	ret=0x0ff;
 	logerror("i8271 read %d  ",offset);
 	switch (offset)
@@ -1569,11 +1570,11 @@ int ret;
 		case 2:
 		case 3:
 			/* 8271 registers */
-			ret=i8271_r(space, offset);
+			ret=i8271_r(i8271, offset);
 			logerror("  %d\n",ret);
 			return ret;
 		case 4:
-			ret=i8271_data_r(space, offset);
+			ret=i8271_data_r(i8271, offset);
 			logerror("  %d\n",ret);
 			return ret;
 		default:
@@ -1585,6 +1586,7 @@ int ret;
 
 static WRITE8_HANDLER( bbc_i8271_write )
 {
+	device_config *i8271 = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, I8271, "i8271" );
 	logerror("i8271 write  %d  %d\n",offset,data);
 
 	switch (offset)
@@ -1594,10 +1596,10 @@ static WRITE8_HANDLER( bbc_i8271_write )
 		case 2:
 		case 3:
 			/* 8271 registers */
-			i8271_w(space, offset, data);
+			i8271_w(i8271, offset, data);
 			return;
 		case 4:
-			i8271_data_w(space, offset, data);
+			i8271_data_w(i8271, offset, data);
 			return;
 		default:
 			break;
@@ -2168,7 +2170,6 @@ MACHINE_START( bbcb )
 	//switch (bbc_DFSType) {
 	//case 0:	case 1: case 2: case 3:
 		previous_i8271_int_state=0;
-		i8271_init(&bbc_i8271_interface);
 	//	break;
 	//case 4: case 5: case 6:
 		previous_wd177x_int_state=1;
@@ -2209,7 +2210,6 @@ MACHINE_RESET( bbcb )
 	/*set up the required disc controller*/
 	//switch (bbc_DFSType) {
 	//case 0:	case 1: case 2: case 3:
-		i8271_reset();
 	//	break;
 	//case 4: case 5: case 6:
 	    wd17xx_reset(machine);

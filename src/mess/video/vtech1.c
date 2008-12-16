@@ -28,7 +28,6 @@ Video hardware:
 ******************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/vtech1.h"
 #include "video/m6847.h"
 
@@ -87,12 +86,12 @@ static const UINT8 *vtech1_get_video_ram(int scanline)
  * location 0038 HEX every 20ms.
  *
  */
-static void vtech1_field_sync_callback(int data)
+static void vtech1_field_sync_callback(running_machine *machine, int data)
 {
 	if (data)
-		cpu_set_input_line(Machine->cpu[0], 0, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 	else
-		cpu_set_input_line(Machine->cpu[0], 0, HOLD_LINE);
+		cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
 }
 
 

@@ -93,7 +93,6 @@
   - emulation of other hardware...?
  ******************************************************************************/
 #include "driver.h"
-#include "deprecat.h"
 // nec765 interface
 #include "machine/nec765.h"
 #include "devices/dsk.h"
@@ -105,7 +104,7 @@
 #define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
-static void pcw_fdc_interrupt(int);
+static void pcw_fdc_interrupt(running_machine*,int);
 
 // pointer to pcw ram
 unsigned int roller_ram_addr;
@@ -214,7 +213,7 @@ static void	pcw_trigger_fdc_int(running_machine *machine)
 }
 
 /* fdc interrupt callback. set/clear fdc int */
-static void pcw_fdc_interrupt(int state)
+static void pcw_fdc_interrupt(running_machine *machine,int state)
 {
 	pcw_system_status &= ~(1<<5);
 
@@ -224,7 +223,7 @@ static void pcw_fdc_interrupt(int state)
 		pcw_system_status |= (1<<5);
 	}
 
-	pcw_trigger_fdc_int(Machine);
+	pcw_trigger_fdc_int(machine);
 }
 
 
@@ -283,9 +282,9 @@ static void pcw_update_read_memory_block(running_machine *machine, int block, in
 
 
 
-static void pcw_update_write_memory_block(int block, int bank)
+static void pcw_update_write_memory_block(running_machine *machine, int block, int bank)
 {
-	memory_set_bankptr(Machine, block + 5, mess_ram + ((bank * 0x4000) % mess_ram_size));
+	memory_set_bankptr(machine, block + 5, mess_ram + ((bank * 0x4000) % mess_ram_size));
 }
 
 
@@ -307,7 +306,7 @@ static void pcw_update_mem(running_machine *machine, int block, int data)
 		bank = data & 0x7f;
 
 		pcw_update_read_memory_block(machine, block, bank);
-		pcw_update_write_memory_block(block, bank);
+		pcw_update_write_memory_block(machine, block, bank);
 	}
 	else
 	{
@@ -355,7 +354,7 @@ static void pcw_update_mem(running_machine *machine, int block, int data)
 		pcw_update_read_memory_block(machine, block, read_bank);
 
 		write_bank = data & 0x07;
-		pcw_update_write_memory_block(block, write_bank);
+		pcw_update_write_memory_block(machine, block, write_bank);
 	}
 
 	/* if boot is active, page in fake ROM */

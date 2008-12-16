@@ -17,7 +17,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/6821pia.h"
 #include "machine/6883sam.h"
 #include "video/m6847.h"
@@ -47,18 +46,18 @@ ATTR_CONST UINT8 coco_get_attributes(UINT8 c)
 
 
 
-static void coco_horizontal_sync_callback(int data)
+static void coco_horizontal_sync_callback(running_machine *machine, int data)
 {
-	const address_space *space = cpu_get_address_space( Machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
 
 	pia_0_ca1_w(space, 0, data);
 }
 
 
 
-static void coco_field_sync_callback(int data)
+static void coco_field_sync_callback(running_machine *machine, int data)
 {
-	const address_space *space = cpu_get_address_space( Machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
 
 	pia_0_cb1_w(space, 0, data);
 }

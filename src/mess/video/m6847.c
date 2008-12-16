@@ -64,7 +64,6 @@
 **********************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "m6847.h"
 
 #include "debug/debugcpu.h"
@@ -107,8 +106,8 @@ typedef struct _m6847_vdg m6847_vdg;
 struct _m6847_vdg
 {
 	/* callbacks */
-	void (*horizontal_sync_callback)(int line);
-	void (*field_sync_callback)(int line);
+	void (*horizontal_sync_callback)(running_machine *machine,int line);
+	void (*field_sync_callback)(running_machine *machine,int line);
 	UINT8 (*get_attributes)(UINT8 video_byte);
 	const UINT8 *(*get_video_ram)(int scanline);
 	int (*new_frame_callback)(void);	/* returns whether the M6847 is in charge of this frame */
@@ -1574,38 +1573,38 @@ void m6847_video_changed(void)
  *
  *************************************/
 
-int m6847_get_horizontal_sync(void)
+int m6847_get_horizontal_sync(running_machine *machine)
 {
 	attotime fire_time = timer_firetime(m6847->hs_fall_timer);
-	return attotime_compare(fire_time, timer_get_time(Machine)) > 0;
+	return attotime_compare(fire_time, timer_get_time(machine)) > 0;
 }
 
 
 
-static void set_horizontal_sync(void)
+static void set_horizontal_sync(running_machine *machine)
 {
 	attotime fire_time = timer_firetime(m6847->hs_fall_timer);
-	int horizontal_sync = attotime_compare(fire_time, timer_get_time(Machine)) > 0;
+	int horizontal_sync = attotime_compare(fire_time, timer_get_time(machine)) > 0;
 	if (m6847->horizontal_sync_callback)
-		m6847->horizontal_sync_callback(!horizontal_sync);
+		m6847->horizontal_sync_callback(machine, !horizontal_sync);
 }
 
 
 
-int m6847_get_field_sync(void)
+int m6847_get_field_sync(running_machine *machine)
 {
 	attotime fire_time = timer_firetime(m6847->fs_fall_timer);
-	return attotime_compare(fire_time, timer_get_time(Machine)) > 0;
+	return attotime_compare(fire_time, timer_get_time(machine)) > 0;
 }
 
 
 
-static void set_field_sync(void)
+static void set_field_sync(running_machine *machine)
 {
 	attotime fire_time = timer_firetime(m6847->fs_fall_timer);
-	int field_sync = attotime_compare(fire_time, timer_get_time(Machine)) > 0;
+	int field_sync = attotime_compare(fire_time, timer_get_time(machine)) > 0;
 	if (m6847->field_sync_callback)
-		m6847->field_sync_callback(field_sync);
+		m6847->field_sync_callback(machine,field_sync);
 }
 
 
@@ -1621,7 +1620,7 @@ static TIMER_CALLBACK(hs_fall)
 	if (LOG_HS)
 		logerror("hs_fall(): time=%s\n", attotime_string(timer_get_time(machine), ATTOTIME_STRING_PRECISION));
 
-	set_horizontal_sync();
+	set_horizontal_sync(machine);
 }
 
 static TIMER_CALLBACK(hs_rise)
@@ -1634,7 +1633,7 @@ static TIMER_CALLBACK(hs_rise)
 	timer_adjust_oneshot(m6847->hs_fall_timer,
 		attotime_make(0, m6847->horizontal_sync_period), 0);
 
-	set_horizontal_sync();
+	set_horizontal_sync(machine);
 	prepare_scanline(0);
 }
 
@@ -1643,7 +1642,7 @@ static TIMER_CALLBACK(fs_fall)
 	if (LOG_FS)
 		logerror("fs_fall(): time=%s scanline=%d\n", attotime_string(timer_get_time(machine), ATTOTIME_STRING_PRECISION), get_scanline());
 
-	set_field_sync();
+	set_field_sync(machine);
 }
 
 static TIMER_CALLBACK(fs_rise)
@@ -1662,7 +1661,7 @@ static TIMER_CALLBACK(fs_rise)
 	if (m6847->new_frame_callback)
 		m6847->using_custom = !m6847->new_frame_callback();
 
-	set_field_sync();
+	set_field_sync(machine);
 }
 
 
@@ -1801,8 +1800,8 @@ static void build_fontdata(const m6847_variant *v)
 
 static STATE_POSTLOAD( m6847_postload )
 {
-	set_field_sync();
-	set_horizontal_sync();
+	set_field_sync(machine);
+	set_horizontal_sync(machine);
 	set_dirty();
 }
 
@@ -2002,20 +2001,20 @@ static attotime interval(m6847_timing_type timing)
 
 
 
-UINT64 m6847_time(m6847_timing_type timing)
+UINT64 m6847_time(running_machine *machine, m6847_timing_type timing)
 {
-	attotime current_time = timer_get_time(Machine);
+	attotime current_time = timer_get_time(machine);
 	attotime divisor = interval(timing);
 	return divide_mame_time(current_time, divisor);
 }
 
 
 
-attotime m6847_time_until(m6847_timing_type timing, UINT64 target_time)
+attotime m6847_time_until(running_machine *machine, m6847_timing_type timing, UINT64 target_time)
 {
 	attotime target_mame_time, current_time;
 	target_mame_time = attotime_mul(interval(timing), target_time);
-	current_time = timer_get_time(Machine);
+	current_time = timer_get_time(machine);
 
 	if (attotime_compare(target_mame_time, current_time) < 0)
 		fatalerror("m6847_time_until(): cannot target past times");

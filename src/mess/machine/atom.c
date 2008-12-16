@@ -16,7 +16,6 @@
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/8255ppi.h"
 #include "video/m6847.h"
 #include "machine/i8271.h"
@@ -137,7 +136,7 @@ const ppi8255_interface atom_8255_int =
 
 static int previous_i8271_int_state = 0;
 
-static void atom_8271_interrupt_callback(int state)
+static void atom_8271_interrupt_callback(const device_config *device, int state)
 {
 	/* I'm assuming that the nmi is edge triggered */
 	/* a interrupt from the fdc will cause a change in line state, and
@@ -151,14 +150,14 @@ static void atom_8271_interrupt_callback(int state)
 		{
 			/* I'll pulse it because if I used hold-line I'm not sure
 			it would clear - to be checked */
-			cpu_set_input_line(Machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
+			cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
 		}
 	}
 
 	previous_i8271_int_state = state;
 }
 
-static const struct i8271_interface atom_8271_interface=
+const i8271_interface atom_8271_interface=
 {
 	atom_8271_interrupt_callback,
 	NULL
@@ -243,8 +242,6 @@ MACHINE_RESET( atom )
 	atom_8255_porta = 0xff;
 	atom_8255_portb = 0xff;
 	atom_8255_portc = 0xff;
-
-	i8271_init(&atom_8271_interface);
 
 	via_config(0, &atom_6522_interface);
 	via_set_clock(0,1000000);
@@ -381,7 +378,7 @@ READ8_DEVICE_HANDLER ( atom_8255_portc_r )
 		atom_8255_portc |= (1<<4);
 	}
 
-	atom_8255_portc |= (m6847_get_field_sync() ? 0x00 : 0x80);
+	atom_8255_portc |= (m6847_get_field_sync(device->machine) ? 0x00 : 0x80);
 	atom_8255_portc |= (input_port_read(device->machine, "KEY11") & 0x40);
 	/* logerror("8255: Read port c (%02X)\n",atom_8255.atom_8255_portc); */
 	return (atom_8255_portc);
@@ -421,6 +418,8 @@ WRITE8_DEVICE_HANDLER (atom_8255_portc_w)
 /* KT- I've assumed that the atom 8271 is linked in exactly the same way as on the bbc */
 READ8_HANDLER(atom_8271_r)
 {
+	device_config *i8271 = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, I8271, "i8271" );
+
 	switch (offset)
 	{
 		case 0:
@@ -428,9 +427,9 @@ READ8_HANDLER(atom_8271_r)
 		case 2:
 		case 3:
 			/* 8271 registers */
-			return i8271_r(space, offset);
+			return i8271_r(i8271, offset);
 		case 4:
-			return i8271_data_r(space, offset);
+			return i8271_data_r(i8271, offset);
 		default:
 			break;
 	}
@@ -440,6 +439,8 @@ READ8_HANDLER(atom_8271_r)
 
 WRITE8_HANDLER(atom_8271_w)
 {
+	device_config *i8271 = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, I8271, "i8271" );
+
 	switch (offset)
 	{
 		case 0:
@@ -447,10 +448,10 @@ WRITE8_HANDLER(atom_8271_w)
 		case 2:
 		case 3:
 			/* 8271 registers */
-			i8271_w(space, offset, data);
+			i8271_w(i8271, offset, data);
 			return;
 		case 4:
-			i8271_data_w(space, offset, data);
+			i8271_data_w(i8271, offset, data);
 			return;
 		default:
 			break;

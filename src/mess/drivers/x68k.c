@@ -118,7 +118,6 @@
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/68901mfp.h"
 #include "machine/8255ppi.h"
@@ -832,7 +831,7 @@ static READ16_HANDLER( x68k_fdc_r )
 	}
 }
 
-static void fdc_irq(int state)
+static void fdc_irq(running_machine *machine,int state)
 {
 	if((sys.ioc.irqstatus & 0x04) && state == ASSERT_LINE)
 	{
@@ -840,26 +839,26 @@ static void fdc_irq(int state)
 		sys.ioc.irqstatus |= 0x80;
 		current_irq_line = 1;
 		logerror("FDC: IRQ triggered\n");
-		cpu_set_input_line_and_vector(Machine->cpu[0],1,ASSERT_LINE,current_vector[1]);
+		cpu_set_input_line_and_vector(machine->cpu[0],1,ASSERT_LINE,current_vector[1]);
 	}
 }
 
-static int x68k_fdc_read_byte(int addr)
+static int x68k_fdc_read_byte(running_machine *machine,int addr)
 {
 	int data = -1;
 
 	if(sys.fdc.drq_state != 0)
-		data = nec765_dack_r(cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0);
+		data = nec765_dack_r(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0);
 //  logerror("FDC: DACK reading\n");
 	return data;
 }
 
-static void x68k_fdc_write_byte(int addr, int data)
+static void x68k_fdc_write_byte(running_machine *machine,int addr, int data)
 {
-	nec765_dack_w(cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0, data);
+	nec765_dack_w(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0, data);
 }
 
-static void fdc_drq(int state, int read_write)
+static void fdc_drq(running_machine *machine,int state, int read_write)
 {
 	sys.fdc.drq_state = state;
 }
@@ -1479,22 +1478,22 @@ static void x68k_dma_irq(running_machine *machine, int channel)
 	cpu_set_input_line_and_vector(machine->cpu[0],3,ASSERT_LINE,current_vector[3]);
 }
 
-static void x68k_dma_end(int channel,int irq)
+static void x68k_dma_end(running_machine *machine, int channel,int irq)
 {
 	if(irq != 0)
 	{
-		x68k_dma_irq(Machine, channel);
+		x68k_dma_irq(machine, channel);
 	}
 }
 
-static void x68k_dma_error(int channel, int irq)
+static void x68k_dma_error(running_machine *machine, int channel, int irq)
 {
-	const device_config *device = device_list_find_by_tag(Machine->config->devicelist, HD63450, "hd63450");
+	const device_config *device = device_list_find_by_tag(machine->config->devicelist, HD63450, "hd63450");
 	if(irq != 0)
 	{
 		current_vector[3] = hd63450_get_error_vector(device,channel);
 		current_irq_line = 3;
-		cpu_set_input_line_and_vector(Machine->cpu[0],3,ASSERT_LINE,current_vector[3]);
+		cpu_set_input_line_and_vector(machine->cpu[0],3,ASSERT_LINE,current_vector[3]);
 	}
 }
 

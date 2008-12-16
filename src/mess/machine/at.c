@@ -391,7 +391,7 @@ const ins8250_interface ibm5170_com_interface[4]=
 
 #define FDC_DMA 2
 
-static void at_fdc_interrupt(int state)
+static void at_fdc_interrupt(running_machine *machine, int state)
 {
 	pic8259_set_irq_line(at_devices.pic8259_master, 6, state);
 //if ( mess_ram[0x0490] == 0x74 )
@@ -399,7 +399,7 @@ static void at_fdc_interrupt(int state)
 }
 
 
-static void at_fdc_dma_drq(int state, int read_)
+static void at_fdc_dma_drq(running_machine *machine, int state, int read_)
 {
 	dma8237_drq_write( at_devices.dma8237_1, FDC_DMA, state);
 }
@@ -677,11 +677,11 @@ DRIVER_INIT( at586 )
 
 
 
-static void at_map_vga_memory(offs_t begin, offs_t end, read8_space_func rh, write8_space_func wh)
+static void at_map_vga_memory(running_machine *machine, offs_t begin, offs_t end, read8_space_func rh, write8_space_func wh)
 {
 	int buswidth;
-	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	buswidth = cpu_get_databus_width(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	buswidth = cpu_get_databus_width(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	switch(buswidth)
 	{
 		case 8:

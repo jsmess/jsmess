@@ -89,7 +89,6 @@ TODO:
 
 /* Core includes */
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/pcw16.h"
 
 /* Components */
@@ -1189,7 +1188,7 @@ static  READ8_HANDLER(pcw16_superio_fdc_digital_input_register_r)
 	return pc_fdc_r(space, PC_FDC_DIGITIAL_INPUT_REGISTER);
 }
 
-static void	pcw16_fdc_interrupt(int state)
+static void	pcw16_fdc_interrupt(running_machine *machine, int state)
 {
 	/* IRQ6 */
 	/* bit 6 of PCW16 system status indicates floppy ints */
@@ -1200,7 +1199,7 @@ static void	pcw16_fdc_interrupt(int state)
 		pcw16_system_status |= (1<<6);
 	}
 
-	pcw16_trigger_fdc_int(Machine);
+	pcw16_trigger_fdc_int(machine);
 }
 
 static const struct pc_fdc_interface pcw16_fdc_interface=

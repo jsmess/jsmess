@@ -3,7 +3,6 @@
 ******************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "video/m6847.h"
 #include "includes/apf.h"
 
@@ -31,13 +30,13 @@ static UINT8 apf_get_character(int character, int line)
   return apf_video_ram[(character&0x1f)*0x10+line+0x200];
 }
 
-static void apf_vsync_int(int line)
+static void apf_vsync_int(running_machine *machine, int line)
 {
 	if (line)
 		apf_ints |= 0x10;
 	else
 		apf_ints &= ~0x10;
-	apf_update_ints(Machine);
+	apf_update_ints(machine);
 }
 
 

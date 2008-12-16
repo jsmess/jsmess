@@ -209,7 +209,7 @@ WRITE8_HANDLER(kc85_disc_hw_terminal_count_w)
 
 
 /* callback for /INT output from FDC */
-static void kc85_fdc_interrupt(int state)
+static void kc85_fdc_interrupt(running_machine *machine, int state)
 {
 	kc85_disc_hw_input_gate &=~(1<<6);
 	if (state)
@@ -217,7 +217,7 @@ static void kc85_fdc_interrupt(int state)
 }
 
 /* callback for /DRQ output from FDC */
-static void kc85_fdc_dma_drq(int state, int read_)
+static void kc85_fdc_dma_drq(running_machine *machine, int state, int read_)
 {
 	kc85_disc_hw_input_gate &=~(1<<7);
 	if (state)

@@ -902,19 +902,19 @@ static void coco3_raise_interrupt(running_machine *machine, UINT8 mask, int stat
 
 
 
-void coco3_horizontal_sync_callback(int data)
+void coco3_horizontal_sync_callback(running_machine *machine,int data)
 {
-	const address_space *space = cpu_get_address_space( Machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
 
 	pia_0_ca1_w(space, 0, data);
-	coco3_raise_interrupt(Machine, COCO3_INT_HBORD, data);
+	coco3_raise_interrupt(machine, COCO3_INT_HBORD, data);
 }
 
 
 
-void coco3_field_sync_callback(int data)
+void coco3_field_sync_callback(running_machine *machine,int data)
 {
-	const address_space *space = cpu_get_address_space( Machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
 
 	pia_0_cb1_w(space, 0, data);
 }
@@ -2091,7 +2091,7 @@ static void d_sam_set_memorysize(int val)
 
 static emu_timer *coco3_gime_timer;
 
-static void coco3_timer_reset(void)
+static void coco3_timer_reset(running_machine *machine)
 {
 	/* reset the timer; take the value stored in $FF94-5 and start the timer ticking */
 	UINT64 current_time;
@@ -2114,10 +2114,10 @@ static void coco3_timer_reset(void)
 		timing = (coco3_gimereg[1] & 0x20) ? M6847_CLOCK : M6847_HSYNC;
 
 		/* determine the current time */
-		current_time = m6847_time(timing);
+		current_time = m6847_time(machine, timing);
 
 		/* calculate the time */
-		target_time = m6847_time_until(timing, current_time + timer_value);
+		target_time = m6847_time_until(machine, timing, current_time + timer_value);
 		if (LOG_TIMER)
 			logerror("coco3_reset_timer(): target_time=%g\n", attotime_to_double(target_time));
 
@@ -2137,7 +2137,7 @@ static void coco3_timer_reset(void)
 
 static TIMER_CALLBACK(coco3_timer_proc)
 {
-	coco3_timer_reset();
+	coco3_timer_reset(machine);
 	coco3_vh_blink();
 	coco3_raise_interrupt(machine, COCO3_INT_TMR, 1);
 	coco3_raise_interrupt(machine, COCO3_INT_TMR, 0);
@@ -2426,7 +2426,7 @@ WRITE8_HANDLER(coco3_gime_w)
 			*		  Bit 0 TR Task register select
 			*/
 			coco3_mmu_update(space->machine, 0, 8);
-			coco3_timer_reset();
+			coco3_timer_reset(space->machine);
 			break;
 
 		case 2:
@@ -2482,7 +2482,7 @@ WRITE8_HANDLER(coco3_gime_w)
 			*		  Bits 4-7 Unused
 			*		  Bits 0-3 High order four bits of the timer
 			*/
-			coco3_timer_reset();
+			coco3_timer_reset(space->machine);
 			break;
 
 		case 5:
@@ -2502,7 +2502,7 @@ WRITE8_HANDLER(coco3_gime_w)
   	                        * thanks to John Kowalski for pointing me in the right
   	                        * direction
 				*/
-				coco3_timer_reset();
+				coco3_timer_reset(space->machine);
   	                }
 			break;
 

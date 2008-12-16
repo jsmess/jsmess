@@ -402,16 +402,16 @@ const ins8250_interface bebox_uart_inteface[4] =
 
 #define FDC_DMA 2
 
-static void bebox_fdc_interrupt(int state)
+static void bebox_fdc_interrupt(running_machine *machine, int state)
 {
-	bebox_set_irq_bit(Machine, 13, state);
+	bebox_set_irq_bit(machine, 13, state);
 	if ( bebox_devices.pic8259_master ) {
 		pic8259_set_irq_line(bebox_devices.pic8259_master, 6, state);
 	}
 }
 
 
-static void bebox_fdc_dma_drq(int state, int read_)
+static void bebox_fdc_dma_drq(running_machine *machine, int state, int read_)
 {
 	if ( bebox_devices.dma8237_1 ) {
 		dma8237_drq_write(bebox_devices.dma8237_1, FDC_DMA, state);
@@ -580,9 +580,9 @@ static WRITE64_HANDLER( bebox_vga_memory_w )
 }
 
 
-static void bebox_map_vga_memory(offs_t begin, offs_t end, read8_space_func rh, write8_space_func wh)
+static void bebox_map_vga_memory(running_machine *machine, offs_t begin, offs_t end, read8_space_func rh, write8_space_func wh)
 {
-	const address_space *space = cpu_get_address_space( Machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
 
 	read64_space_func rh64 = (rh == SMH_BANK4) ? SMH_BANK4 : bebox_vga_memory_r;
 	write64_space_func wh64 = (wh == SMH_BANK4) ? SMH_BANK4 : bebox_vga_memory_w;

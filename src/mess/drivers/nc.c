@@ -1322,7 +1322,7 @@ static const msm8251_interface nc200_uart_interface=
 };
 
 
-static void nc200_fdc_interrupt(int state)
+static void nc200_fdc_interrupt(running_machine *machine, int state)
 {
 #if 0
     nc_irq_latch &=~(1<<5);
@@ -1339,7 +1339,7 @@ static void nc200_fdc_interrupt(int state)
             nc_irq_status |=(1<<5);
     }
 
-    nc_update_interrupts(Machine);
+    nc_update_interrupts(machine);
 }
 
 static const struct nec765_interface nc200_nec765_interface=

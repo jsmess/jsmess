@@ -284,7 +284,7 @@ void hd63450_single_transfer(const device_config* device, int x)
 			{
 				if(dmac->intf->dma_read[x])
 				{
-					data = dmac->intf->dma_read[x](dmac->reg[x].mar);
+					data = dmac->intf->dma_read[x](device->machine,dmac->reg[x].mar);
 					if(data == -1)
 						return;  // not ready to recieve data
 					memory_write_byte(space,dmac->reg[x].mar,data);
@@ -325,7 +325,7 @@ void hd63450_single_transfer(const device_config* device, int x)
 				if(dmac->intf->dma_write[x])
 				{
 					data = memory_read_byte(space,dmac->reg[x].mar);
-					dmac->intf->dma_write[x](dmac->reg[x].mar,data);
+					dmac->intf->dma_write[x](device->machine, dmac->reg[x].mar,data);
 					datasize = 1;
 				}
 				else
@@ -396,7 +396,7 @@ void hd63450_single_transfer(const device_config* device, int x)
 					cpu_set_input_line(device->machine->cpu[dmac->intf->cpu],INPUT_LINE_HALT,CLEAR_LINE);
 
 				if(dmac->intf->dma_end)
-					dmac->intf->dma_end(x,dmac->reg[x].ccr & 0x08);
+					dmac->intf->dma_end(device->machine,x,dmac->reg[x].ccr & 0x08);
 			}
 		}
 }

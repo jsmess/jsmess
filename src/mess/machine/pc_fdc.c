@@ -12,7 +12,6 @@
 **********************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/pc_fdc.h"
 #include "machine/nec765.h"
 #include "memconv.h"
@@ -56,9 +55,9 @@ static struct pc_fdc *fdc;
 /* Prototypes */
 
 static TIMER_CALLBACK( watchdog_timeout );
-static void pc_fdc_hw_interrupt(int state);
-static void pc_fdc_hw_dma_drq(int,int);
-static const device_config *pc_fdc_get_image(int floppy_index);
+static void pc_fdc_hw_interrupt(running_machine *machine,int state);
+static void pc_fdc_hw_dma_drq(running_machine *machine,int,int);
+static const device_config *pc_fdc_get_image(running_machine *machine,int floppy_index);
 
 static const nec765_interface pc_fdc_nec765_interface =
 {
@@ -113,13 +112,13 @@ void pc_fdc_init(running_machine *machine, const struct pc_fdc_interface *iface)
 
 
 
-static const device_config *pc_fdc_get_image(int floppy_index)
+static const device_config *pc_fdc_get_image(running_machine *machine, int floppy_index)
 {
 	const device_config *image = NULL;
 
 	if (!fdc->fdc_interface.get_image)
 	{
-		if (floppy_index < device_count(Machine, IO_FLOPPY))
+		if (floppy_index < device_count(machine, IO_FLOPPY))
 			image = image_from_devtype_and_index(IO_FLOPPY, floppy_index);
 	}
 	else
@@ -145,7 +144,7 @@ void pc_fdc_set_tc_state(running_machine *machine, int state)
 
 
 
-void pc_fdc_hw_interrupt(int state)
+void pc_fdc_hw_interrupt(running_machine *machine,int state)
 {
 	fdc->int_state = state;
 
@@ -155,7 +154,7 @@ void pc_fdc_hw_interrupt(int state)
 
 	/* send irq */
 	if (fdc->fdc_interface.pc_fdc_interrupt)
-		fdc->fdc_interface.pc_fdc_interrupt(state);
+		fdc->fdc_interface.pc_fdc_interrupt(machine, state);
 }
 
 
@@ -190,7 +189,7 @@ void pc_fdc_dack_w(running_machine *machine, int data)
 
 
 
-void pc_fdc_hw_dma_drq(int state, int read_)
+void pc_fdc_hw_dma_drq(running_machine *machine, int state, int read_)
 {
 	fdc->dma_state = state;
 	fdc->dma_read = read_;
@@ -200,7 +199,7 @@ void pc_fdc_hw_dma_drq(int state, int read_)
 		return;
 
 	if (fdc->fdc_interface.pc_fdc_dma_drq)
-		fdc->fdc_interface.pc_fdc_dma_drq(state, read_);
+		fdc->fdc_interface.pc_fdc_dma_drq(machine,state, read_);
 }
 
 
@@ -275,12 +274,12 @@ static void pc_fdc_dor_w(running_machine *machine, UINT8 data)
 	/* changing the DMA enable bit, will affect the dma drq state
 	from reaching us - if dma is enabled this will send it through
 	otherwise it will be ignored */
-	pc_fdc_hw_dma_drq(fdc->dma_state, fdc->dma_read);
+	pc_fdc_hw_dma_drq(machine, fdc->dma_state, fdc->dma_read);
 
 	/* changing the DMA enable bit, will affect the irq state
 	from reaching us - if dma is enabled this will send it through
 	otherwise it will be ignored */
-	pc_fdc_hw_interrupt(fdc->int_state);
+	pc_fdc_hw_interrupt(machine, fdc->int_state);
 
 	/* reset? */
 	if ((fdc->digital_output_register & PC_FDC_FLAGS_DOR_FDC_ENABLED)==0)
@@ -337,8 +336,8 @@ static TIMER_CALLBACK( watchdog_timeout )
 	/* Trigger a watchdog timeout signal */
 	if ( fdc->fdc_interface.pc_fdc_interrupt )
 	{
-		fdc->fdc_interface.pc_fdc_interrupt( 1 );
-		fdc->fdc_interface.pc_fdc_interrupt( 0 );
+		fdc->fdc_interface.pc_fdc_interrupt(machine, 1 );
+		fdc->fdc_interface.pc_fdc_interrupt(machine, 0 );
 	}
 }
 

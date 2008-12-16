@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/z80/z80daisy.h"
 #include "cpu/cop400/cop400.h"
 #include "machine/nec765.h"
@@ -1099,9 +1098,9 @@ static const acia6850_interface newbrain_acia_intf =
 	acia_interrupt
 };
 
-static void newbrain_fdc_interrupt(int state)
+static void newbrain_fdc_interrupt(running_machine *machine, int state)
 {
-	newbrain_state *driver_state = Machine->driver_data;
+	newbrain_state *driver_state = machine->driver_data;
 
 	driver_state->fdc_int = state;
 }

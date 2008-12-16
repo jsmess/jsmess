@@ -10,10 +10,10 @@ struct _hd63450_interface
 	int cpu;
 	attotime clock[4];
 	attotime burst_clock[4];
-	void (*dma_end)(int channel,int irq);  // called when the DMA transfer ends
-	void (*dma_error)(int channel, int irq);  // called when a DMA transfer error occurs
-	int (*dma_read[4])(int addr);  // special read / write handlers for each channel
-	void (*dma_write[4])(int addr,int data);
+	void (*dma_end)(running_machine *machine,int channel,int irq);  // called when the DMA transfer ends
+	void (*dma_error)(running_machine *machine,int channel, int irq);  // called when a DMA transfer error occurs
+	int (*dma_read[4])(running_machine *machine,int addr);  // special read / write handlers for each channel
+	void (*dma_write[4])(running_machine *machine,int addr,int data);
 };
 
 typedef struct _hd63450_regs hd63450_regs;

@@ -11,6 +11,7 @@
 #ifndef BBC_H_
 #define BBC_H_
 
+#include "machine/i8271.h"
 #include "machine/upd7002.h"
 
 /*----------- defined in machine/bbc.c -----------*/
@@ -90,6 +91,7 @@ READ8_HANDLER (BBC_6850_r);
 
 WRITE8_HANDLER ( BBC_SerialULA_w );
 
+extern const i8271_interface bbc_i8271_interface;
 extern const uPD7002_interface BBC_uPD7002;
 
 /*----------- defined in video/bbc.c -----------*/

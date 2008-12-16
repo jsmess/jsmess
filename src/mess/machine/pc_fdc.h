@@ -28,8 +28,8 @@ struct pc_fdc_interface
 {
 	NEC765_VERSION nec765_type;
 	NEC765_RDY_PIN nec765_rdy_pin;
-	void (*pc_fdc_interrupt)(int);
-	void (*pc_fdc_dma_drq)(int,int);
+	void (*pc_fdc_interrupt)(running_machine*,int);
+	void (*pc_fdc_dma_drq)(running_machine*,int,int);
 	const device_config *(*get_image)(int floppy_index);
 };
 

@@ -65,7 +65,6 @@ Notes:
 
 #include "driver.h"
 #include "includes/sg1000.h"
-#include "deprecat.h"
 #include "devices/basicdsk.h"
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
@@ -696,9 +695,9 @@ static const ppi8255_interface sf7000_ppi8255_intf[2] =
 };
 
 /* callback for /INT output from FDC */
-static void sf7000_fdc_interrupt(int state)
+static void sf7000_fdc_interrupt(running_machine *machine,int state)
 {
-	sg1000_state *driver_state = Machine->driver_data; // TODO
+	sg1000_state *driver_state = machine->driver_data; // TODO
 
 	driver_state->fdc_irq = state;
 }

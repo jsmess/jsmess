@@ -51,8 +51,8 @@ struct _m6847_config
 	int cpu0_timing_factor;
 
 	/* callbacks */
-	void (*horizontal_sync_callback)(int line);
-	void (*field_sync_callback)(int line);
+	void (*horizontal_sync_callback)(running_machine *machine, int line);
+	void (*field_sync_callback)(running_machine *machine,int line);
 	UINT8 (*get_attributes)(UINT8 video_byte) ATTR_CONST;
 	const UINT8 *(*get_video_ram)(int scanline);
 
@@ -71,12 +71,12 @@ VIDEO_UPDATE(m6847);
 void m6847_video_changed(void);
 
 /* sync */
-int m6847_get_horizontal_sync(void);
-int m6847_get_field_sync(void);
+int m6847_get_horizontal_sync(running_machine *machine);
+int m6847_get_field_sync(running_machine *machine);
 
 /* timing functions */
-UINT64 m6847_time(m6847_timing_type timing);
-attotime m6847_time_until(m6847_timing_type timing, UINT64 target_time);
+UINT64 m6847_time(running_machine *machine,m6847_timing_type timing);
+attotime m6847_time_until(running_machine *machine, m6847_timing_type timing, UINT64 target_time);
 
 /* CoCo 3 hooks */
 attotime m6847_scanline_time(int scanline);

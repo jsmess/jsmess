@@ -584,19 +584,19 @@ static void vga_cpu_interface(running_machine *machine)
 					read_handler = SMH_NOP;
 					write_handler = SMH_NOP;
 				}
-				vga.vga_intf.map_vga_memory(0xA0000, 0xBFFFF, read_handler, write_handler);
+				vga.vga_intf.map_vga_memory(machine, 0xA0000, 0xBFFFF, read_handler, write_handler);
 
 				if (vga.vga_intf.vga_memory_bank != 0)
 					memory_set_bankptr(machine,vga.vga_intf.vga_memory_bank, vga.memory);
 				break;
 			case 0x04:
-				vga.vga_intf.map_vga_memory(0xA0000, 0xAFFFF, read_handler, write_handler);
+				vga.vga_intf.map_vga_memory(machine, 0xA0000, 0xAFFFF, read_handler, write_handler);
 				break;
 			case 0x08:
-				vga.vga_intf.map_vga_memory(0xB0000, 0xB7FFF, read_handler, write_handler);
+				vga.vga_intf.map_vga_memory(machine, 0xB0000, 0xB7FFF, read_handler, write_handler);
 				break;
 			case 0x0C:
-				vga.vga_intf.map_vga_memory(0xB8000, 0xBFFFF, read_handler, write_handler);
+				vga.vga_intf.map_vga_memory(machine, 0xB8000, 0xBFFFF, read_handler, write_handler);
 				break;
 		}
 	}

@@ -34,13 +34,13 @@ typedef enum
 typedef struct nec765_interface
 {
 	/* interrupt issued */
-	void	(*interrupt)(int state);
+	void	(*interrupt)(running_machine *machine,int state);
 
 	/* dma data request */
-	void	(*dma_drq)(int state,int read_write);
+	void	(*dma_drq)(running_machine *machine,int state,int read_write);
 
 	/* image lookup */
-	const device_config *(*get_image)(int floppy_index);
+	const device_config *(*get_image)(running_machine *machine,int floppy_index);
 } nec765_interface;
 
 /* init nec765 interface */

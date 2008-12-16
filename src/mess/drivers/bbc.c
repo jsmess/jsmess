@@ -752,6 +752,7 @@ static MACHINE_DRIVER_START( bbca )
 	
 	/* devices */
 	MDRV_UPD7002_ADD("upd7002",BBC_uPD7002)
+	MDRV_I8271_ADD("i8271", bbc_i8271_interface)
 MACHINE_DRIVER_END
 
 

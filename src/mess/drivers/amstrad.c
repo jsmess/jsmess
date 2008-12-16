@@ -428,7 +428,7 @@ static const ppi8255_interface amstrad_ppi8255_interface =
 	amstrad_ppi_portc_w    /* port C write */
 };
 
-static void aleste_interrupt(int state)
+static void aleste_interrupt(running_machine *machine,int state)
 {
 	if(state == CLEAR_LINE)
 		aleste_fdc_int = 0;

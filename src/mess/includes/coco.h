@@ -71,8 +71,8 @@ READ8_HANDLER ( coco3_cartridge_r);
 WRITE8_HANDLER ( coco3_cartridge_w );
 offs_t coco3_mmu_translate(int bank, int offset);
 WRITE8_HANDLER( coco_pia_1_w );
-void coco3_horizontal_sync_callback(int data);
-void coco3_field_sync_callback(int data);
+void coco3_horizontal_sync_callback(running_machine *machine,int data);
+void coco3_field_sync_callback(running_machine *machine,int data);
 void coco3_gime_field_sync_callback(running_machine *machine);
 
 /* Compusense Dragon Plus board */

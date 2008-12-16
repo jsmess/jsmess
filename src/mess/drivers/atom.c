@@ -280,6 +280,8 @@ static MACHINE_DRIVER_START( atom )
 	MDRV_QUICKLOAD_ADD(atom, "atm", 0)
 
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
+	
+	MDRV_I8271_ADD("i8271", atom_8271_interface)
 MACHINE_DRIVER_END
 
 

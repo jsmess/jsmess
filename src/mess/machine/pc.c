@@ -1060,14 +1060,14 @@ const ppi8255_interface pcjr_ppi8255_interface =
 
 #define FDC_DMA 2
 
-static void pc_fdc_interrupt(int state)
+static void pc_fdc_interrupt(running_machine *machine, int state)
 {
 	if ( pc_devices.pic8259_master ) {
 		pic8259_set_irq_line(pc_devices.pic8259_master, 6, state);
 	}
 }
 
-static void pc_fdc_dma_drq(int state, int read_)
+static void pc_fdc_dma_drq(running_machine *machine, int state, int read_)
 {
 	dma8237_drq_write( pc_devices.dma8237, FDC_DMA, state);
 }
@@ -1236,11 +1236,11 @@ DRIVER_INIT( pcjr )
 
 
 
-static void pc_map_vga_memory(offs_t begin, offs_t end, read8_space_func rh, write8_space_func wh)
+static void pc_map_vga_memory(running_machine *machine, offs_t begin, offs_t end, read8_space_func rh, write8_space_func wh)
 {
-	const address_space *space = cpu_get_address_space( Machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
 	int buswidth;
-	buswidth = cpu_get_databus_width(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	buswidth = cpu_get_databus_width(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	switch(buswidth)
 	{
 		case 8:

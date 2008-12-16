@@ -125,8 +125,8 @@ static TIMER_CALLBACK(nec765_continue_command);
 static int nec765_sector_count_complete(running_machine *machine);
 static void nec765_increment_sector(running_machine *machine);
 static void nec765_update_state(running_machine *machine);
-static void nec765_set_dma_drq(int state);
-static void nec765_set_int(int state);
+static void nec765_set_dma_drq(running_machine *machine,int state);
+static void nec765_set_int(running_machine *machine,int state);
 
 static NEC765 fdc;
 static char nec765_data_buffer[32*1024];
@@ -154,7 +154,7 @@ static const device_config *current_image(running_machine *machine)
 	}
 	else
 	{
-		image = nec765_iface.get_image(fdc.drive);
+		image = nec765_iface.get_image(machine, fdc.drive);
 	}
 	return image;
 }
@@ -305,8 +305,8 @@ static void nec765_seek_complete(running_machine *machine)
 	/* set drive and side */
 	fdc.nec765_status[0] |= fdc.drive | (fdc.side<<2);
 
-	nec765_set_int(0);
-	nec765_set_int(1);
+	nec765_set_int(machine,0);
+	nec765_set_int(machine,1);
 
 	fdc.nec765_flags &= ~NEC765_SEEK_ACTIVE;
 }
@@ -319,7 +319,7 @@ static TIMER_CALLBACK(nec765_seek_timer_callback)
 	timer_reset(fdc.seek_timer, attotime_never);
 }
 
-static void nec765_timer_func(int timer_type)
+static void nec765_timer_func(running_machine *machine, int timer_type)
 {
 	/* type 0 = data transfer mode in execution phase */
 	if (fdc.timer_type == 0)
@@ -336,7 +336,7 @@ static void nec765_timer_func(int timer_type)
 		}
 		else
 		{
-			nec765_timer_func(fdc.timer_type);
+			nec765_timer_func(machine, fdc.timer_type);
 		}
 	}
 	else if (fdc.timer_type==2)
@@ -355,7 +355,7 @@ static void nec765_timer_func(int timer_type)
 		case 17:	/* scan equal */
 		case 19:	/* scan low or equal */
 		case 29:	/* scan high or equal */
-			nec765_set_int(1);
+			nec765_set_int(machine,1);
 			break;
 
 		default:
@@ -372,14 +372,14 @@ static void nec765_timer_func(int timer_type)
 		a int is generated per byte */
 		if (fdc.nec765_flags & NEC765_DMA_MODE)
 		{
-			nec765_set_dma_drq(1);
+			nec765_set_dma_drq(machine,1);
 		}
 		else
 		{
 			if (fdc.FDC_main & (1<<7))
 			{
 				/* set int to indicate data is ready */
-				nec765_set_int(1);
+				nec765_set_int(machine,1);
 			}
 		}
 
@@ -389,7 +389,7 @@ static void nec765_timer_func(int timer_type)
 
 static TIMER_CALLBACK(nec765_timer_callback)
 {
-	nec765_timer_func(param);
+	nec765_timer_func(machine,param);
 }
 
 /* after (32-27) the DRQ is set, then 27 us later, the int is set.
@@ -398,7 +398,7 @@ In this driver, the first NMI calls the handler function, furthur NMI's are
 effectively disabled by reading the data before the NMI int can be set.
 */
 
-static void nec765_setup_timed_generic(int timer_type, attotime duration)
+static void nec765_setup_timed_generic(running_machine *machine, int timer_type, attotime duration)
 {
 	fdc.timer_type = timer_type;
 
@@ -408,22 +408,22 @@ static void nec765_setup_timed_generic(int timer_type, attotime duration)
 	}
 	else
 	{
-		nec765_timer_func(fdc.timer_type);
+		nec765_timer_func(machine,fdc.timer_type);
 		timer_reset(fdc.timer, attotime_never);
 	}
 }
 
 /* setup data request */
-static void nec765_setup_timed_data_request(int bytes)
+static void nec765_setup_timed_data_request(running_machine *machine, int bytes)
 {
 	/* setup timer to trigger in NEC765_DATA_RATE us */
-	nec765_setup_timed_generic(0, ATTOTIME_IN_USEC(32-27)	/*NEC765_DATA_RATE)*bytes*/);
+	nec765_setup_timed_generic(machine, 0, ATTOTIME_IN_USEC(32-27)	/*NEC765_DATA_RATE)*bytes*/);
 }
 
 /* setup result data request */
-static void nec765_setup_timed_result_data_request(void)
+static void nec765_setup_timed_result_data_request(running_machine *machine)
 {
-	nec765_setup_timed_generic(2, ATTOTIME_IN_USEC(NEC765_DATA_RATE*2));
+	nec765_setup_timed_generic(machine, 2, ATTOTIME_IN_USEC(NEC765_DATA_RATE*2));
 }
 
 
@@ -535,7 +535,7 @@ static void nec765_seek_setup(running_machine *machine, int is_recalibrate)
 
 
 
-static void nec765_setup_execution_phase_read(char *ptr, int size)
+static void nec765_setup_execution_phase_read(running_machine *machine, char *ptr, int size)
 {
 	fdc.FDC_main |= 0x040;                     /* FDC->CPU */
 
@@ -544,10 +544,10 @@ static void nec765_setup_execution_phase_read(char *ptr, int size)
 	fdc.execution_phase_data = ptr;
 	fdc.nec765_phase = NEC765_EXECUTION_PHASE_READ;
 
-	nec765_setup_timed_data_request(1);
+	nec765_setup_timed_data_request(machine, 1);
 }
 
-static void nec765_setup_execution_phase_write(char *ptr, int size)
+static void nec765_setup_execution_phase_write(running_machine *machine, char *ptr, int size)
 {
 	fdc.FDC_main &= ~0x040;                     /* FDC->CPU */
 
@@ -557,11 +557,11 @@ static void nec765_setup_execution_phase_write(char *ptr, int size)
 	fdc.nec765_phase = NEC765_EXECUTION_PHASE_WRITE;
 
 	/* setup a data request with first byte */
-	nec765_setup_timed_data_request(1);
+	nec765_setup_timed_data_request(machine,1);
 }
 
 
-static void nec765_setup_result_phase(int byte_count)
+static void nec765_setup_result_phase(running_machine *machine, int byte_count)
 {
 	fdc.FDC_main |= 0x040;                     /* FDC->CPU */
 	fdc.FDC_main &= ~0x020;                    /* not execution phase */
@@ -570,7 +570,7 @@ static void nec765_setup_result_phase(int byte_count)
 	fdc.nec765_transfer_bytes_remaining = byte_count;
 	fdc.nec765_phase = NEC765_RESULT_PHASE;
 
-	nec765_setup_timed_result_data_request();
+	nec765_setup_timed_result_data_request(machine);
 }
 
 void nec765_idle(void)
@@ -586,7 +586,7 @@ void nec765_idle(void)
 
 
 /* change flags */
-static void nec765_change_flags(unsigned int flags, unsigned int mask)
+static void nec765_change_flags(running_machine *machine,unsigned int flags, unsigned int mask)
 {
 	unsigned int new_flags;
 	unsigned int changed_flags;
@@ -601,29 +601,29 @@ static void nec765_change_flags(unsigned int flags, unsigned int mask)
 
 	/* if interrupt changed, call the handler */
 	if ((changed_flags & NEC765_INT) && nec765_iface.interrupt)
-		nec765_iface.interrupt((fdc.nec765_flags & NEC765_INT) ? 1 : 0);
+		nec765_iface.interrupt(machine,(fdc.nec765_flags & NEC765_INT) ? 1 : 0);
 
 	/* if DRQ changed, call the handler */
 	if ((changed_flags & NEC765_DMA_DRQ) && nec765_iface.dma_drq)
-		nec765_iface.dma_drq((fdc.nec765_flags & NEC765_DMA_DRQ) ? 1 : 0, fdc.FDC_main & (1<<6));
+		nec765_iface.dma_drq(machine,(fdc.nec765_flags & NEC765_DMA_DRQ) ? 1 : 0, fdc.FDC_main & (1<<6));
 }
 
 
 
 /* set int output */
-static void nec765_set_int(int state)
+static void nec765_set_int(running_machine *machine, int state)
 {
 	if (LOG_INTERRUPT)
 		logerror("nec765_set_int(): state=%d\n", state);
-	nec765_change_flags(state ? NEC765_INT : 0, NEC765_INT);
+	nec765_change_flags(machine, state ? NEC765_INT : 0, NEC765_INT);
 }
 
 
 
 /* set dma request output */
-static void nec765_set_dma_drq(int state)
+static void nec765_set_dma_drq(running_machine *machine, int state)
 {
-	nec765_change_flags(state ? NEC765_DMA_DRQ : 0, NEC765_DMA_DRQ);
+	nec765_change_flags(machine, state ? NEC765_DMA_DRQ : 0, NEC765_DMA_DRQ);
 }
 
 
@@ -670,7 +670,7 @@ static void nec765_set_ready_change_callback(const device_config *img, int state
 		fdc.nec765_status[0] |= 8;
 
 	/* trigger an int */
-	nec765_set_int(1);
+	nec765_set_int(img->machine, 1);
 }
 
 
@@ -709,7 +709,7 @@ void nec765_set_tc_state(running_machine *machine, int state)
 	old_state = fdc.nec765_flags;
 
 	/* clear drq */
-	nec765_set_dma_drq(0);
+	nec765_set_dma_drq(machine, 0);
 
 	fdc.nec765_flags &= ~NEC765_TC;
 	if (state)
@@ -892,7 +892,7 @@ static int nec765_get_matching_sector(running_machine *machine)
 	return 0;
 }
 
-static void nec765_read_complete(void)
+static void nec765_read_complete(running_machine *machine)
 {
 
 /* causes problems!!! - need to fix */
@@ -926,7 +926,7 @@ static void nec765_read_complete(void)
 	fdc.nec765_result_bytes[5] = fdc.nec765_command_bytes[4]; /* R */
 	fdc.nec765_result_bytes[6] = fdc.nec765_command_bytes[5]; /* N */
 
-	nec765_setup_result_phase(7);
+	nec765_setup_result_phase(machine,7);
 }
 
 static void nec765_read_data(running_machine *machine)
@@ -946,7 +946,7 @@ static void nec765_read_data(running_machine *machine)
 		fdc.nec765_result_bytes[4] = fdc.nec765_command_bytes[3]; /* H */
 		fdc.nec765_result_bytes[5] = fdc.nec765_command_bytes[4]; /* R */
 		fdc.nec765_result_bytes[6] = fdc.nec765_command_bytes[5]; /* N */
-		nec765_setup_result_phase(7);
+		nec765_setup_result_phase(machine,7);
 		return;
 	}
 
@@ -974,7 +974,7 @@ static void nec765_read_data(running_machine *machine)
 					if (nec765_sector_count_complete(machine))
 					{
 						/* read complete */
-						nec765_read_complete();
+						nec765_read_complete(machine);
 						return;
 					}
 
@@ -992,7 +992,7 @@ static void nec765_read_data(running_machine *machine)
 			else
 			{
 				/* error in finding sector */
-				nec765_read_complete();
+				nec765_read_complete(machine);
 				return;
 			}
 		}
@@ -1006,7 +1006,7 @@ static void nec765_read_data(running_machine *machine)
 
 		floppy_drive_read_sector_data(img, fdc.side, fdc.sector_id,nec765_data_buffer,data_size);
 
-        nec765_setup_execution_phase_read(nec765_data_buffer, data_size);
+        nec765_setup_execution_phase_read(machine,nec765_data_buffer, data_size);
 	}
 }
 
@@ -1029,12 +1029,12 @@ static void nec765_format_track(running_machine *machine)
 			fdc.nec765_result_bytes[4] = fdc.format_data[1];
 			fdc.nec765_result_bytes[5] = fdc.format_data[2];
 			fdc.nec765_result_bytes[6] = fdc.format_data[3];
-			nec765_setup_result_phase(7);
+			nec765_setup_result_phase(machine,7);
 
 		return;
 	}
 
-    nec765_setup_execution_phase_write(&fdc.format_data[0], 4);
+    nec765_setup_execution_phase_write(machine, &fdc.format_data[0], 4);
 }
 
 static void nec765_read_a_track(running_machine *machine)
@@ -1071,7 +1071,7 @@ static void nec765_read_a_track(running_machine *machine)
 
 	floppy_drive_read_sector_data(current_image(machine), fdc.side, fdc.sector_id,nec765_data_buffer,data_size);
 
-	nec765_setup_execution_phase_read(nec765_data_buffer, data_size);
+	nec765_setup_execution_phase_read(machine,nec765_data_buffer, data_size);
 }
 
 static int nec765_just_read_last_sector_on_track(running_machine *machine)
@@ -1081,7 +1081,7 @@ static int nec765_just_read_last_sector_on_track(running_machine *machine)
 	return 0;
 }
 
-static void nec765_write_complete(void)
+static void nec765_write_complete(running_machine *machine)
 {
 
 /* causes problems!!! - need to fix */
@@ -1115,7 +1115,7 @@ static void nec765_write_complete(void)
     fdc.nec765_result_bytes[5] = fdc.nec765_command_bytes[4]; /* R */
     fdc.nec765_result_bytes[6] = fdc.nec765_command_bytes[5]; /* N */
 
-    nec765_setup_result_phase(7);
+    nec765_setup_result_phase(machine,7);
 }
 
 
@@ -1134,7 +1134,7 @@ static void nec765_write_data(running_machine *machine)
         fdc.nec765_result_bytes[4] = fdc.nec765_command_bytes[3]; /* H */
         fdc.nec765_result_bytes[5] = fdc.nec765_command_bytes[4]; /* R */
         fdc.nec765_result_bytes[6] = fdc.nec765_command_bytes[5]; /* N */
-		nec765_setup_result_phase(7);
+		nec765_setup_result_phase(machine,7);
 		return;
 	}
 
@@ -1143,7 +1143,7 @@ static void nec765_write_data(running_machine *machine)
 	{
 		fdc.nec765_status[1] |= NEC765_ST1_NOT_WRITEABLE;
 
-		nec765_write_complete();
+		nec765_write_complete(machine);
 		return;
 	}
 
@@ -1153,11 +1153,11 @@ static void nec765_write_data(running_machine *machine)
 
 		data_size = nec765_n_to_bytes(fdc.nec765_command_bytes[5]);
 
-        nec765_setup_execution_phase_write(nec765_data_buffer, data_size);
+        nec765_setup_execution_phase_write(machine,nec765_data_buffer, data_size);
 	}
     else
     {
-        nec765_setup_result_phase(7);
+        nec765_setup_result_phase(machine,7);
     }
 }
 
@@ -1404,7 +1404,7 @@ static TIMER_CALLBACK(nec765_continue_command)
 					fdc.nec765_result_bytes[5] = fdc.nec765_command_bytes[4]; /* R */
 					fdc.nec765_result_bytes[6] = fdc.nec765_command_bytes[5]; /* N */
 
-					nec765_setup_result_phase(7);
+					nec765_setup_result_phase(machine,7);
 				}
 				else
 				{
@@ -1434,7 +1434,7 @@ static TIMER_CALLBACK(nec765_continue_command)
 					fdc.nec765_result_bytes[4] = fdc.format_data[1];
 					fdc.nec765_result_bytes[5] = fdc.format_data[2];
 					fdc.nec765_result_bytes[6] = fdc.format_data[3];
-					nec765_setup_result_phase(7);
+					nec765_setup_result_phase(machine,7);
 				}
 				else
 				{
@@ -1462,7 +1462,7 @@ static TIMER_CALLBACK(nec765_continue_command)
 				if (nec765_sector_count_complete(machine))
 				{
 					nec765_increment_sector(machine);
-					nec765_write_complete();
+					nec765_write_complete(machine);
 				}
 				else
 				{
@@ -1482,7 +1482,7 @@ static TIMER_CALLBACK(nec765_continue_command)
 				/* sector id == EOT */
 				if (nec765_sector_count_complete(machine) || nec765_read_data_stop())
 			    {
-					nec765_read_complete();
+					nec765_read_complete(machine);
 				}
 				else
 				{
@@ -1573,7 +1573,7 @@ void nec765_update_state(running_machine *machine)
 			case 17:	/* scan equal */
 			case 19:	/* scan low or equal */
 			case 29:	/* scan high or equal */
-				nec765_set_int(0);
+				nec765_set_int(machine, 0);
 				break;
 
 			default:
@@ -1613,7 +1613,7 @@ void nec765_update_state(running_machine *machine)
 		else
 		{
 			/* trigger int */
-			nec765_setup_timed_data_request(1);
+			nec765_setup_timed_data_request(machine,1);
 		}
 		break;
 
@@ -1680,7 +1680,7 @@ void nec765_update_state(running_machine *machine)
 		}
 		else
 		{
-			nec765_setup_timed_data_request(1);
+			nec765_setup_timed_data_request(machine,1);
 		}
 		break;
 	}
@@ -1697,7 +1697,7 @@ READ8_HANDLER(nec765_data_r)
 		{
 
 			/* reading the data byte clears the interrupt */
-			nec765_set_int(CLEAR_LINE);
+			nec765_set_int(space->machine,CLEAR_LINE);
 		}
 
 		/* reset data request */
@@ -1729,7 +1729,7 @@ WRITE8_HANDLER(nec765_data_w)
 		{
 
 			/* reading the data byte clears the interrupt */
-			nec765_set_int(CLEAR_LINE);
+			nec765_set_int(space->machine, CLEAR_LINE);
 		}
 
 		/* reset data request */
@@ -1740,11 +1740,11 @@ WRITE8_HANDLER(nec765_data_w)
 	}
 }
 
-static void nec765_setup_invalid(void)
+static void nec765_setup_invalid(running_machine *machine)
 {
 	fdc.command = 0;
 	fdc.nec765_result_bytes[0] = 0x080;
-	nec765_setup_result_phase(1);
+	nec765_setup_result_phase(machine,1);
 }
 
 static void nec765_setup_command(running_machine *machine)
@@ -1832,7 +1832,7 @@ static void nec765_setup_command(running_machine *machine)
 
 			/* two side and fault not set but should be? */
 			fdc.nec765_result_bytes[0] = fdc.nec765_status[3];
-			nec765_setup_result_phase(1);
+			nec765_setup_result_phase(machine,1);
 			break;
 
 		case 0x07:          /* recalibrate */
@@ -1894,7 +1894,7 @@ static void nec765_setup_command(running_machine *machine)
 					fdc.nec765_result_bytes[5] = id.R; /* R */
 					fdc.nec765_result_bytes[6] = id.N; /* N */
 
-					nec765_setup_result_phase(7);
+					nec765_setup_result_phase(machine,7);
 				}
 				else
 				{
@@ -1926,7 +1926,7 @@ static void nec765_setup_command(running_machine *machine)
 			if (fdc.nec765_flags & NEC765_INT)
 			{
 				/* yes. Clear int */
-				nec765_set_int(CLEAR_LINE);
+				nec765_set_int(machine, CLEAR_LINE);
 
 				/* clear drive seek bits */
 				fdc.FDC_main &= ~(1 | 2 | 4 | 8);
@@ -1937,13 +1937,13 @@ static void nec765_setup_command(running_machine *machine)
 				fdc.nec765_result_bytes[1] = fdc.pcn[fdc.drive];
 
 				/* return result */
-				nec765_setup_result_phase(2);
+				nec765_setup_result_phase(machine,2);
 			}
 			else
 			{
 				if(fdc.version == NEC72065 && (fdc.FDC_main & 0x0f) == 0x00)
 				{  // based on XM6
-					nec765_setup_invalid();
+					nec765_setup_invalid(machine);
 				}
 				else
 				{
@@ -1953,7 +1953,7 @@ static void nec765_setup_command(running_machine *machine)
 					fdc.nec765_result_bytes[1] = fdc.pcn[fdc.drive];
 
 					/* return result */
-					nec765_setup_result_phase(2);
+					nec765_setup_result_phase(machine,2);
 				}
 			}
 			break;
@@ -2042,7 +2042,7 @@ static void nec765_setup_command(running_machine *machine)
 			{
 				case NEC765A:
 				case NEC72065:
-					nec765_setup_invalid();
+					nec765_setup_invalid(machine);
 					break;
 
 				case NEC765B:
@@ -2052,7 +2052,7 @@ static void nec765_setup_command(running_machine *machine)
 						/* version */
 						fdc.nec765_status[0] = 0x090;
 						fdc.nec765_result_bytes[0] = fdc.nec765_status[0];
-						nec765_setup_result_phase(1);
+						nec765_setup_result_phase(machine,1);
 					}
 					break;
 
@@ -2063,7 +2063,7 @@ static void nec765_setup_command(running_machine *machine)
 						case 0x10:		/* version */
 							fdc.nec765_status[0] = 0x90;
 							fdc.nec765_result_bytes[0] = fdc.nec765_status[0];
-							nec765_setup_result_phase(1);
+							nec765_setup_result_phase(machine,1);
 							break;
 
 						case 0x13:		/* configure */
@@ -2076,7 +2076,7 @@ static void nec765_setup_command(running_machine *machine)
 							fdc.nec765_result_bytes[2] = fdc.pcn[2];
 							fdc.nec765_result_bytes[3] = fdc.pcn[3];
 
-							nec765_setup_result_phase(10);
+							nec765_setup_result_phase(machine,10);
 							break;
 
 						case 0x12:		/* perpendicular mode */
@@ -2084,7 +2084,7 @@ static void nec765_setup_command(running_machine *machine)
 							break;
 
 						case 0x14:		/* lock */
-							nec765_setup_result_phase(1);
+							nec765_setup_result_phase(machine,1);
 							break;
 					}
 					break;
@@ -2097,7 +2097,7 @@ static void nec765_setup_command(running_machine *machine)
 WRITE8_HANDLER(nec765_dack_w)
 {
 	/* clear request */
-	nec765_set_dma_drq(CLEAR_LINE);
+	nec765_set_dma_drq(space->machine, CLEAR_LINE);
 
 	/* write data */
 	nec765_data_w(space, offset, data);
@@ -2106,7 +2106,7 @@ WRITE8_HANDLER(nec765_dack_w)
 READ8_HANDLER(nec765_dack_r)
 {
 	/* clear data request */
-	nec765_set_dma_drq(CLEAR_LINE);
+	nec765_set_dma_drq(space->machine,CLEAR_LINE);
 
 	/* read data */
 	return nec765_data_r(space, offset);
@@ -2119,9 +2119,9 @@ void nec765_reset(running_machine *machine, int offset)
 	nec765_idle();
 
 	/* set int low */
-	nec765_set_int(0);
+	nec765_set_int(machine, 0);
 	/* set dma drq output */
-	nec765_set_dma_drq(0);
+	nec765_set_dma_drq(machine,0);
 
 	/* tandy 100hx assumes that after NEC is reset, it is in DMA mode */
 	fdc.nec765_flags |= NEC765_DMA_MODE;
@@ -2154,7 +2154,7 @@ void nec765_reset(running_machine *machine, int offset)
 			fdc.nec765_status[0] |= 0x08;
 		}
 
-		nec765_set_int(1);
+		nec765_set_int(machine, 1);
 	}
 }
 
@@ -2174,7 +2174,7 @@ void nec765_set_reset_state(running_machine *machine, int state)
 	{
 		fdc.nec765_flags |= NEC765_RESET;
 
-		nec765_set_int(0);
+		nec765_set_int(machine, 0);
 	}
 
 	/* reset changed state? */

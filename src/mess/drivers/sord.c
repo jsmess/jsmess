@@ -19,7 +19,6 @@
  ******************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "video/tms9928a.h"
 #include "sound/sn76496.h"
 #include "cpu/z80/z80.h"
@@ -152,15 +151,15 @@ static ADDRESS_MAP_START(sord_fd5_io, ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 /* nec765 data request is connected to interrupt of z80 inside fd5 interface */
-static void sord_fd5_fdc_interrupt(int state)
+static void sord_fd5_fdc_interrupt(running_machine *machine, int state)
 {
 	if (state)
 	{
-		cpu_set_input_line(Machine->cpu[1], 0, HOLD_LINE);
+		cpu_set_input_line(machine->cpu[1], 0, HOLD_LINE);
 	}
 	else
 	{
-		cpu_set_input_line(Machine->cpu[1], 0,CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[1], 0,CLEAR_LINE);
 	}
 }
 

@@ -16,7 +16,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/8255ppi.h"
 #include "includes/pc8801.h"
 #include "machine/nec765.h"
@@ -802,13 +801,13 @@ READ8_HANDLER(pc8801fd_nec765_tc)
 }
 
 /* callback for /INT output from FDC */
-static void pc8801_fdc_interrupt(int state)
+static void pc8801_fdc_interrupt(running_machine *machine,int state)
 {
-    cpu_set_input_line(Machine->cpu[1], 0, state ? HOLD_LINE : CLEAR_LINE);
+    cpu_set_input_line(machine->cpu[1], 0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 /* callback for /DRQ output from FDC */
-static void pc8801_fdc_dma_drq(int state, int read_)
+static void pc8801_fdc_dma_drq(running_machine *machine,int state, int read_)
 {
 }
 

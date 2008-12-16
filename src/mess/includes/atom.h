@@ -9,7 +9,7 @@
 
 #include "devices/snapquik.h"
 #include "machine/8255ppi.h"
-
+#include "machine/i8271.h"
 
 /*----------- defined in machine/atom.c -----------*/
 
@@ -17,6 +17,7 @@ extern UINT8 atom_8255_porta;
 extern UINT8 atom_8255_portc;
 
 extern const ppi8255_interface atom_8255_int;
+extern const i8271_interface atom_8271_interface;
 
 MACHINE_RESET( atom );
 QUICKLOAD_LOAD( atom );

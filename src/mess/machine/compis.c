@@ -13,7 +13,6 @@
 /*-------------------------------------------------------------------------*/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/i86/i186intf.h"
 #include "video/i82720.h"
 #include "machine/8255ppi.h"
@@ -305,19 +304,19 @@ static void compis_fdc_tc(running_machine *machine, int state)
 	}
 }
 
-static void compis_fdc_int(int state)
+static void compis_fdc_int(running_machine *machine,int state)
 {
 	/* No interrupt requests if iSBX-218A has DMA enabled */
-  	if (!input_port_read(Machine, "DSW1") && state)
+  	if (!input_port_read(machine, "DSW1") && state)
 	{
 		compis_osp_pic_irq(COMPIS_IRQ_SBX0_INT1);
 	}
 }
 
-static void compis_fdc_dma_drq(int state, int read)
+static void compis_fdc_dma_drq(running_machine *machine,int state, int read)
 {
 	/* DMA requst if iSBX-218A has DMA enabled */
-  	if (input_port_read(Machine, "DSW1") && state)
+  	if (input_port_read(machine, "DSW1") && state)
 	{
 		//compis_dma_drq(state, read);
 	}
@@ -822,7 +821,8 @@ static void internal_timer_sync(int which)
 }
 
 
-static void internal_timer_update(int which,
+static void internal_timer_update(running_machine *machine,
+								  int which,
                                   int new_count,
                                   int new_maxA,
                                   int new_maxB,
@@ -892,7 +892,7 @@ static void internal_timer_update(int which,
 		diff = new_control ^ t->control;
 		if (diff & 0x001c)
 		  logerror("%05X:ERROR! -unsupported timer mode %04X\n",
-			   cpu_get_pc(Machine->cpu[0]),
+			   cpu_get_pc(machine->cpu[0]),
 			   new_control);
 
 		/* if we have real changes, update things */
@@ -980,7 +980,7 @@ static TIMER_CALLBACK(dma_timer_callback)
 }
 
 
-static void update_dma_control(int which, int new_control)
+static void update_dma_control(running_machine *machine, int which, int new_control)
 {
 	struct dma_state *d = &i186.dma[which];
 	int diff;
@@ -994,7 +994,7 @@ static void update_dma_control(int which, int new_control)
 	diff = new_control ^ d->control;
 	if (diff & 0x6811)
 	  logerror("%05X:ERROR! - unsupported DMA mode %04X\n",
-		   cpu_get_pc(Machine->cpu[0]),
+		   cpu_get_pc(machine->cpu[0]),
 		   new_control);
 
 	/* if we're going live, set a timer */
@@ -1322,7 +1322,7 @@ WRITE16_HANDLER( i186_internal_port_w )
 		case 0x30:
 			if (LOG_PORTS) logerror("%05X:80186 Timer %d count = %04X\n", cpu_get_pc(space->cpu), (offset - 0x28) / 4, data16);
 			which = (offset - 0x28) / 4;
-			internal_timer_update(which, data16, -1, -1, -1);
+			internal_timer_update(space->machine,which, data16, -1, -1, -1);
 			break;
 
 		case 0x29:
@@ -1330,14 +1330,14 @@ WRITE16_HANDLER( i186_internal_port_w )
 		case 0x31:
 			if (LOG_PORTS) logerror("%05X:80186 Timer %d max A = %04X\n", cpu_get_pc(space->cpu), (offset - 0x29) / 4, data16);
 			which = (offset - 0x29) / 4;
-			internal_timer_update(which, -1, data16, -1, -1);
+			internal_timer_update(space->machine,which, -1, data16, -1, -1);
 			break;
 
 		case 0x2a:
 		case 0x2e:
 			if (LOG_PORTS) logerror("%05X:80186 Timer %d max B = %04X\n", cpu_get_pc(space->cpu), (offset - 0x2a) / 4, data16);
 			which = (offset - 0x2a) / 4;
-			internal_timer_update(which, -1, -1, data16, -1);
+			internal_timer_update(space->machine,which, -1, -1, data16, -1);
 			break;
 
 		case 0x2b:
@@ -1345,7 +1345,7 @@ WRITE16_HANDLER( i186_internal_port_w )
 		case 0x33:
 			if (LOG_PORTS) logerror("%05X:80186 Timer %d control = %04X\n", cpu_get_pc(space->cpu), (offset - 0x2b) / 4, data16);
 			which = (offset - 0x2b) / 4;
-			internal_timer_update(which, -1, -1, -1, data16);
+			internal_timer_update(space->machine,which, -1, -1, -1, data16);
 			break;
 
 		case 0x50:
@@ -1436,7 +1436,7 @@ WRITE16_HANDLER( i186_internal_port_w )
 			if (LOG_PORTS) logerror("%05X:80186 DMA%d control = %04X\n", cpu_get_pc(space->cpu), (offset - 0x65) / 8, data16);
 			which = (offset - 0x65) / 8;
 //			stream_update(dma_stream, 0);
-			update_dma_control(which, data16);
+			update_dma_control(space->machine, which, data16);
 			break;
 
 		case 0x7f:
