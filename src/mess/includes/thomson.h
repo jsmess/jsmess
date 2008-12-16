@@ -9,6 +9,27 @@
 #ifndef _THOMSON_H_
 #define _THOMSON_H_
 
+#include "driver.h"
+#include "cpu/m6809/m6809.h"
+#include "machine/6821pia.h"
+#include "machine/mc6846.h"
+#include "machine/6850acia.h"
+#include "machine/6551.h"
+#include "sound/dac.h"
+#include "audio/mea8000.h"
+#include "devices/cartslot.h"
+#include "machine/centroni.h"
+#include "devices/printer.h"
+#include "includes/serial.h"
+#include "devices/cassette.h"
+#include "machine/wd17xx.h"
+#include "machine/mc6843.h"
+#include "machine/mc6846.h"
+#include "machine/mc6854.h"
+#include "formats/thom_cas.h"
+#include "devices/thomflop.h"
+#include "formats/thom_dsk.h"
+
 
 /*----------- defined in machine/thomson.c -----------*/
 
@@ -37,12 +58,10 @@
 #define THOM_FLOP_BANK  4 /* external floppy controller ROM */
 #define THOM_BASE_BANK  5 /* system RAM */
 
-
 /* serial */
 extern DEVICE_START( thom_serial );
 extern DEVICE_IMAGE_LOAD( thom_serial );
 extern DEVICE_IMAGE_UNLOAD( thom_serial );
-
 
 /***************************** TO7 / T9000 *************************/
 
@@ -62,6 +81,19 @@ extern WRITE8_HANDLER ( to7_midi_w );
 extern MACHINE_START ( to7 );
 extern MACHINE_RESET ( to7 );
 
+/* timer */
+extern mc6846_interface to7_timer;
+
+/* speech synthesis */
+extern mea8000_interface to7_speech;
+
+/* floppy */
+extern mc6843_interface to7_6843_itf;
+extern mc6854_interface to7_network_iface;
+
+/* modem */
+extern acia6850_interface to7_modem;
+
 
 /***************************** TO7/70 ******************************/
 
@@ -71,6 +103,8 @@ extern WRITE8_HANDLER ( to770_gatearray_w );
 
 extern MACHINE_START ( to770 );
 extern MACHINE_RESET ( to770 );
+
+extern mc6846_interface to770_timer;
 
 /***************************** MO5 ******************************/
 
@@ -113,6 +147,8 @@ extern WRITE8_HANDLER ( to9_kbd_w );
 extern MACHINE_START ( to9 );
 extern MACHINE_RESET ( to9 );
 
+extern mc6846_interface to9_timer;
+
 
 /***************************** TO8 ******************************/
 
@@ -144,11 +180,15 @@ extern WRITE8_HANDLER ( to8_floppy_w );
 extern MACHINE_START ( to8 );
 extern MACHINE_RESET ( to8 );
 
+extern mc6846_interface to8_timer;
+
 
 /***************************** TO9+ ******************************/
 
 extern MACHINE_START ( to9p );
 extern MACHINE_RESET ( to9p );
+
+extern mc6846_interface to9p_timer;
 
 
 /***************************** MO6 ******************************/
@@ -240,7 +280,7 @@ struct thom_vsignal {
 };
 
 /* current video position */
-extern struct thom_vsignal thom_get_vsignal ( void );
+extern struct thom_vsignal thom_get_vsignal ( running_machine *machine );
 
 
 /************************* lightpen ********************************/
@@ -264,16 +304,16 @@ extern PALETTE_INIT ( thom );
 extern VIDEO_EOF    ( thom );
 
 /* pass video init signal */
-extern void thom_set_init_callback ( void (*cb) ( running_machine *machine, int init ) );
+extern void thom_set_init_callback ( running_machine *machine, void (*cb) ( running_machine *machine, int init ) );
 
 /* TO7 TO7/70 MO5 video bank switch */
 extern void thom_set_mode_point ( running_machine *machine, int point );
 
 /* set the palette index for the border color */
-extern void thom_set_border_color ( unsigned color );
+extern void thom_set_border_color ( running_machine *machine, unsigned color );
 
 /* set one of 16 palette indices to one of 4096 colors */
-extern void thom_set_palette ( unsigned index, UINT16 color );
+extern void thom_set_palette ( running_machine *machine, unsigned index, UINT16 color );
 
 
 /* video modes */
@@ -292,13 +332,13 @@ extern void thom_set_palette ( unsigned index, UINT16 color );
 #define THOM_VMODE_NB         12
 
 /* change the current video-mode */
-extern void thom_set_video_mode ( unsigned mode );
+extern void thom_set_video_mode ( running_machine *machine, unsigned mode );
 
 /* select which video page shown among the 4 available */
-extern void thom_set_video_page ( unsigned page );
+extern void thom_set_video_page ( running_machine *machine, unsigned page );
 
 /* to tell there is some floppy activity, stays up for a few frames */
-extern void thom_floppy_active ( int write );
+extern void thom_floppy_active ( running_machine *machine, int write );
 
 
 /***************************** TO7 / T9000 *************************/

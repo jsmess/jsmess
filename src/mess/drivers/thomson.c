@@ -72,20 +72,7 @@
 
 */
 
-#include "driver.h"
 #include "includes/thomson.h"
-#include "machine/6821pia.h"
-#include "machine/mc6846.h"
-#include "machine/6850acia.h"
-#include "machine/6551.h"
-#include "audio/mea8000.h"
-#include "devices/cartslot.h"
-#include "devices/printer.h"
-#include "devices/cassette.h"
-#include "formats/thom_cas.h"
-#include "devices/thomflop.h"
-#include "formats/thom_dsk.h"
-#include "includes/serial.h"
 
 
 /**************************** common *******************************/
@@ -351,7 +338,7 @@ boot floppy.
   - AZERTY keyboard, 58-keys, French with accents
   - cartridge 16 KB (up to 64 KB using bank-switching),
     the MESS cartridge device is named -cart
-  - cassette 900 bauds (frequency signals: 0=4.5kHz, 1=6.3kHz)
+  - cassette 900 bauds (frequency signals: 0=4.5Khz, 1=6.3KHz)
     the MESS cassette device is named -cass
   - 1-bit internal buzzer
   - lightpen, with 8-pixel horizontal resolution, 1-pixel vertical
@@ -421,7 +408,7 @@ static ADDRESS_MAP_START ( to7, ADDRESS_SPACE_PROGRAM, 8 )
      AM_RANGE ( 0x8000, 0xbfff ) AM_NOP       /* 16 KB (for extension) */
      AM_RANGE ( 0xc000, 0xdfff ) AM_NOP       /*  8 KB (for extension) */
      AM_RANGE ( 0xe000, 0xe7bf ) AM_ROMBANK   ( THOM_FLOP_BANK )
-     AM_RANGE ( 0xe7c0, 0xe7c7 ) AM_READWRITE ( mc6846_r, mc6846_w )
+     AM_RANGE ( 0xe7c0, 0xe7c7 ) AM_DEVREADWRITE(MC6846, "mc6846", mc6846_r, mc6846_w)
      AM_RANGE ( 0xe7c8, 0xe7cb ) AM_READWRITE ( pia_0_alt_r,  pia_0_alt_w )
      AM_RANGE ( 0xe7cc, 0xe7cf ) AM_READWRITE ( pia_1_alt_r,  pia_1_alt_w )
      AM_RANGE ( 0xe7d0, 0xe7df ) AM_READWRITE ( to7_floppy_r, to7_floppy_w )
@@ -713,7 +700,6 @@ static SYSTEM_CONFIG_START ( t9000 )
      CONFIG_IMPORT_FROM ( to7 )
 SYSTEM_CONFIG_END
 
-extern const acia6850_interface to7_acia_modem;
 
 /* ------------ driver ------------ */
 
@@ -727,10 +713,6 @@ static MACHINE_DRIVER_START ( to7 )
      MDRV_CPU_PROGRAM_MAP ( to7, 0 )
 
 /* video */
-/* Finally, I figured it out. The video hardware overclocks the SECAM
-   framerate from 50 Hz to 1/0.019968 Hz to get 312 64us lines per frame,
-   i.e., 19.968 ms per frame, not 20 ms
-*/
      MDRV_SCREEN_ADD("main", RASTER)
      MDRV_SCREEN_REFRESH_RATE ( /*50*/ 1./0.019968 )
      MDRV_INTERLEAVE ( 0 )
@@ -754,16 +736,31 @@ static MACHINE_DRIVER_START ( to7 )
      MDRV_SOUND_ADD ( "speech", DAC, 0 )
      MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.) /* speech synthesis */
 
-	/* printer */
-	MDRV_DEVICE_ADD("printer", PRINTER)
+/* printer */
+     MDRV_DEVICE_ADD("printer", PRINTER)
 
-	/* cassette */
-	MDRV_CASSETTE_ADD( "cassette", to7_cassette_config )
+/* cassette */
+     MDRV_CASSETTE_ADD( "cassette", to7_cassette_config )
 
-	/* acia */
-	MDRV_DEVICE_ADD("acia", ACIA6551)
-	MDRV_DEVICE_ADD("acia_1", ACIA6850)
-	MDRV_DEVICE_CONFIG(to7_acia_modem)	
+/* timer */
+     MDRV_MC6846_ADD( "mc6846", to7_timer )
+
+/* speech synthesis */
+     MDRV_MEA8000_ADD( "mea8000", to7_speech )
+
+/* floppy */
+     MDRV_MC6843_ADD( "mc6843", to7_6843_itf )
+
+/* network */
+     MDRV_MC6854_ADD( "mc6854", to7_network_iface )
+
+/* acia */
+     MDRV_DEVICE_ADD( "acia", ACIA6551 )
+
+/* modem */
+     MDRV_DEVICE_ADD( "acia6850", ACIA6850 )
+     MDRV_DEVICE_CONFIG( to7_modem )
+
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START ( t9000 )
@@ -832,7 +829,7 @@ static ADDRESS_MAP_START ( to770, ADDRESS_SPACE_PROGRAM, 8 )
      AM_RANGE ( 0x6000, 0x9fff ) AM_RAMBANK   ( THOM_BASE_BANK ) /* 16 KB */
      AM_RANGE ( 0xa000, 0xdfff ) AM_RAMBANK   ( THOM_RAM_BANK )  /* 6 * 16 KB */
      AM_RANGE ( 0xe000, 0xe7bf ) AM_ROMBANK   ( THOM_FLOP_BANK )
-     AM_RANGE ( 0xe7c0, 0xe7c7 ) AM_READWRITE ( mc6846_r, mc6846_w )
+     AM_RANGE ( 0xe7c0, 0xe7c7 ) AM_DEVREADWRITE(MC6846, "mc6846", mc6846_r, mc6846_w)
      AM_RANGE ( 0xe7c8, 0xe7cb ) AM_READWRITE ( pia_0_alt_r,  pia_0_alt_w )
      AM_RANGE ( 0xe7cc, 0xe7cf ) AM_READWRITE ( pia_1_alt_r,  pia_1_alt_w )
      AM_RANGE ( 0xe7d0, 0xe7df ) AM_READWRITE ( to7_floppy_r, to7_floppy_w )
@@ -950,8 +947,11 @@ static MACHINE_DRIVER_START ( to770 )
      MDRV_IMPORT_FROM ( to7 )
      MDRV_MACHINE_START ( to770 )
      MDRV_MACHINE_RESET ( to770 )
+
      MDRV_CPU_MODIFY( "main" )
      MDRV_CPU_PROGRAM_MAP ( to770, 0 )
+
+     MDRV_MC6846_MODIFY( "mc6846", to770_timer )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START ( to770a )
@@ -1000,7 +1000,7 @@ Unlike the TO7, the BASIC 1.0 is integrated and the MO5 can be used "as-is".
     . the right SHIFT key has been replaced with a BASIC key
     . no caps-lock led
   - the famous lightpen is optional
-  - cassette 1200 bauds (frequency signals: 0=4.5kHz, 1=6.3kHz),
+  - cassette 1200 bauds (frequency signals: 0=4.5Khz, 1=6.3KHz),
     TO7-incompatible
   - optional cartridge, up to 64 KB, incompatible with TO7,
     masks the integrated BASIC ROM
@@ -1036,7 +1036,7 @@ static ADDRESS_MAP_START ( mo5, ADDRESS_SPACE_PROGRAM, 8 )
 						mo5_gatearray_w )
      AM_RANGE ( 0xa7e8, 0xa7eb ) AM_DEVREADWRITE(ACIA6551, "acia",  acia_6551_r, acia_6551_w )
      AM_RANGE ( 0xa7f2, 0xa7f3 ) AM_READWRITE ( to7_midi_r, to7_midi_w )
-     AM_RANGE ( 0xa7fe, 0xa7ff ) AM_READWRITE ( mea8000_r, mea8000_w )
+     AM_RANGE ( 0xa7fe, 0xa7ff ) AM_DEVREADWRITE(MEA8000, "mea8000", mea8000_r, mea8000_w)
      AM_RANGE ( 0xb000, 0xefff ) AM_READWRITE ( SMH_BANK(THOM_CART_BANK), mo5_cartridge_w )
      AM_RANGE ( 0xf000, 0xffff ) AM_ROM       /* system bios */
 
@@ -1145,10 +1145,13 @@ static MACHINE_DRIVER_START ( mo5 )
      MDRV_IMPORT_FROM ( to7 )
      MDRV_MACHINE_START ( mo5 )
      MDRV_MACHINE_RESET ( mo5 )
+
      MDRV_CPU_MODIFY( "main" )
      MDRV_CPU_PROGRAM_MAP ( mo5, 0 )
 
-	MDRV_CASSETTE_MODIFY( "cassette", mo5_cassette_config )
+     MDRV_CASSETTE_MODIFY( "cassette", mo5_cassette_config )
+
+     MDRV_MC6846_REMOVE( "mc6846" )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START ( mo5e )
@@ -1225,8 +1228,8 @@ It was replaced quickly with the improved TO9+.
   - IEEE extension ? (unemulated)
   - floppy:
     . integrated floppy controller, based on WD2793
-    . integrated one-sided double-density 3"1/2
-    . external two-sided double-density 3"1/2, 5"1/4 or QDD (extension)
+    . integrated one-sided double-density 3''1/2
+    . external two-sided double-density 3''1/2, 5''1/4 or QDD (extension)
     . floppies are TO7 and MO5 compatible
   - speech synthesis extension: identical to TO7
   - MIDIPAK MIDI extension: identical to TO7
@@ -1235,12 +1238,12 @@ It was replaced quickly with the improved TO9+.
 
 static ADDRESS_MAP_START ( to9, ADDRESS_SPACE_PROGRAM, 8 )
 
-     AM_RANGE ( 0x0000, 0x3fff ) AM_READWRITE ( SMH_BANK(THOM_CART_BANK), to9_cartridge_w )/* 12 * 16 KB */
+     AM_RANGE ( 0x0000, 0x3fff ) AM_READWRITE ( SMH_BANK(THOM_CART_BANK), to9_cartridge_w )/* 4 * 16 KB */
      AM_RANGE ( 0x4000, 0x5fff ) AM_READWRITE ( SMH_BANK(THOM_VRAM_BANK), to770_vram_w )
      AM_RANGE ( 0x6000, 0x9fff ) AM_RAMBANK   ( THOM_BASE_BANK ) /* 16 KB */
      AM_RANGE ( 0xa000, 0xdfff ) AM_RAMBANK   ( THOM_RAM_BANK )  /* 10 * 16 KB */
      AM_RANGE ( 0xe000, 0xe7bf ) AM_ROMBANK   ( THOM_FLOP_BANK )
-     AM_RANGE ( 0xe7c0, 0xe7c7 ) AM_READWRITE ( mc6846_r, mc6846_w )
+     AM_RANGE ( 0xe7c0, 0xe7c7 ) AM_DEVREADWRITE(MC6846, "mc6846", mc6846_r, mc6846_w)
      AM_RANGE ( 0xe7c8, 0xe7cb ) AM_READWRITE ( pia_0_alt_r,  pia_0_alt_w )
      AM_RANGE ( 0xe7cc, 0xe7cf ) AM_READWRITE ( pia_1_alt_r,  pia_1_alt_w )
      AM_RANGE ( 0xe7d0, 0xe7d9 ) AM_READWRITE ( to9_floppy_r, to9_floppy_w )
@@ -1492,8 +1495,11 @@ static MACHINE_DRIVER_START ( to9 )
      MDRV_IMPORT_FROM ( to7 )
      MDRV_MACHINE_START ( to9 )
      MDRV_MACHINE_RESET ( to9 )
+
      MDRV_CPU_MODIFY( "main" )
      MDRV_CPU_PROGRAM_MAP ( to9, 0 )
+
+     MDRV_MC6846_MODIFY( "mc6846", to9_timer )
 MACHINE_DRIVER_END
 
 
@@ -1565,14 +1571,14 @@ The TO8D is simply a TO8 with an integrated 3"1/2 floppy drive.
 
 static ADDRESS_MAP_START ( to8, ADDRESS_SPACE_PROGRAM, 8 )
 
-     AM_RANGE ( 0x0000, 0x3fff ) AM_READWRITE ( SMH_BANK(THOM_CART_BANK), to8_cartridge_w ) /* 8 * 16 KB */
+     AM_RANGE ( 0x0000, 0x3fff ) AM_READWRITE ( SMH_BANK(THOM_CART_BANK), to8_cartridge_w ) /* 4 * 16 KB */
      AM_RANGE ( 0x4000, 0x5fff ) AM_READWRITE ( SMH_BANK(THOM_VRAM_BANK), to770_vram_w )
      AM_RANGE ( 0x6000, 0x7fff ) AM_READWRITE ( SMH_BANK(TO8_SYS_LO), to8_sys_lo_w )
      AM_RANGE ( 0x8000, 0x9fff ) AM_READWRITE ( SMH_BANK(TO8_SYS_HI), to8_sys_hi_w )
      AM_RANGE ( 0xa000, 0xbfff ) AM_READWRITE ( SMH_BANK(TO8_DATA_LO), to8_data_lo_w )
      AM_RANGE ( 0xc000, 0xdfff ) AM_READWRITE ( SMH_BANK(TO8_DATA_HI), to8_data_hi_w )
      AM_RANGE ( 0xe000, 0xe7bf ) AM_ROMBANK   ( THOM_FLOP_BANK ) /* 2 * 2 KB */
-     AM_RANGE ( 0xe7c0, 0xe7c7 ) AM_READWRITE ( mc6846_r, mc6846_w )
+     AM_RANGE ( 0xe7c0, 0xe7c7 ) AM_DEVREADWRITE(MC6846, "mc6846", mc6846_r, mc6846_w)
      AM_RANGE ( 0xe7c8, 0xe7cb ) AM_READWRITE ( pia_0_alt_r,  pia_0_alt_w )
      AM_RANGE ( 0xe7cc, 0xe7cf ) AM_READWRITE ( pia_1_alt_r,  pia_1_alt_w )
      AM_RANGE ( 0xe7d0, 0xe7d9 ) AM_READWRITE ( to8_floppy_r, to8_floppy_w )
@@ -1723,8 +1729,11 @@ static MACHINE_DRIVER_START ( to8 )
      MDRV_IMPORT_FROM ( to7 )
      MDRV_MACHINE_START ( to8 )
      MDRV_MACHINE_RESET ( to8 )
+
      MDRV_CPU_MODIFY( "main" )
      MDRV_CPU_PROGRAM_MAP ( to8, 0 )
+
+     MDRV_MC6846_MODIFY( "mc6846", to8_timer )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START ( to8d )
@@ -1768,7 +1777,7 @@ The differences with the TO8 are:
   - RF 57-932: RS232 (identical to the TO7) sometimes integrated
   - MD 90-120: MODEM (identical to the TO7?) sometimes integrated
   - IEEE extension ?
-  - floppy: one two-sided double-density 3"1/2 floppy drive is integrated
+  - floppy: one two-sided double-density 3''1/2 floppy drive is integrated
   - RS 52-932 RS232 extension ?
   - digitisation extension
 
@@ -1776,14 +1785,14 @@ The differences with the TO8 are:
 
 static ADDRESS_MAP_START ( to9p, ADDRESS_SPACE_PROGRAM, 8 )
 
-     AM_RANGE ( 0x0000, 0x3fff ) AM_READWRITE ( SMH_BANK(THOM_CART_BANK), to8_cartridge_w ) /* 8 * 16 KB */
+     AM_RANGE ( 0x0000, 0x3fff ) AM_READWRITE ( SMH_BANK(THOM_CART_BANK), to8_cartridge_w ) /* 4 * 16 KB */
      AM_RANGE ( 0x4000, 0x5fff ) AM_READWRITE ( SMH_BANK(THOM_VRAM_BANK), to770_vram_w )
      AM_RANGE ( 0x6000, 0x7fff ) AM_READWRITE ( SMH_BANK(TO8_SYS_LO), to8_sys_lo_w )
      AM_RANGE ( 0x8000, 0x9fff ) AM_READWRITE ( SMH_BANK(TO8_SYS_HI), to8_sys_hi_w )
      AM_RANGE ( 0xa000, 0xbfff ) AM_READWRITE ( SMH_BANK(TO8_DATA_LO), to8_data_lo_w )
      AM_RANGE ( 0xc000, 0xdfff ) AM_READWRITE ( SMH_BANK(TO8_DATA_HI), to8_data_hi_w )
      AM_RANGE ( 0xe000, 0xe7bf ) AM_ROMBANK   ( THOM_FLOP_BANK ) /* 2 * 2 KB */
-     AM_RANGE ( 0xe7c0, 0xe7c7 ) AM_READWRITE ( mc6846_r, mc6846_w )
+     AM_RANGE ( 0xe7c0, 0xe7c7 ) AM_DEVREADWRITE(MC6846, "mc6846", mc6846_r, mc6846_w)
      AM_RANGE ( 0xe7c8, 0xe7cb ) AM_READWRITE ( pia_0_alt_r,  pia_0_alt_w )
      AM_RANGE ( 0xe7cc, 0xe7cf ) AM_READWRITE ( pia_1_alt_r,  pia_1_alt_w )
      AM_RANGE ( 0xe7d0, 0xe7d9 ) AM_READWRITE ( to8_floppy_r, to8_floppy_w )
@@ -1875,8 +1884,11 @@ static MACHINE_DRIVER_START ( to9p )
      MDRV_IMPORT_FROM ( to7 )
      MDRV_MACHINE_START ( to9p )
      MDRV_MACHINE_RESET ( to9p )
+
      MDRV_CPU_MODIFY( "main" )
      MDRV_CPU_PROGRAM_MAP ( to9p, 0 )
+
+     MDRV_MC6846_MODIFY( "mc6846", to9p_timer )
 MACHINE_DRIVER_END
 
 COMP ( 1986, to9p, 0, 0, to9p, to9p, 0, to9p, "Thomson", "TO9+", 0 )
@@ -1959,7 +1971,7 @@ static ADDRESS_MAP_START ( mo6, ADDRESS_SPACE_PROGRAM, 8 )
      AM_RANGE ( 0xa7e8, 0xa7eb ) AM_DEVREADWRITE(ACIA6551, "acia",  acia_6551_r, acia_6551_w )
 /*   AM_RANGE ( 0xa7f0, 0xa7f7 ) AM_READWRITE ( to9_ieee_r, to9_ieee_w )*/
      AM_RANGE ( 0xa7f2, 0xa7f3 ) AM_READWRITE ( to7_midi_r, to7_midi_w )
-     AM_RANGE ( 0xa7fe, 0xa7ff ) AM_READWRITE ( mea8000_r, mea8000_w )
+     AM_RANGE ( 0xa7fe, 0xa7ff ) AM_DEVREADWRITE(MEA8000, "mea8000", mea8000_r, mea8000_w)
      AM_RANGE ( 0xb000, 0xefff ) AM_ROMBANK   ( THOM_CART_BANK )
                                  AM_WRITE     ( mo6_cartridge_w )
      AM_RANGE ( 0xf000, 0xffff ) AM_ROMBANK   ( TO8_BIOS_BANK )
@@ -2218,8 +2230,11 @@ static MACHINE_DRIVER_START ( mo6 )
      MDRV_IMPORT_FROM ( to7 )
      MDRV_MACHINE_START ( mo6 )
      MDRV_MACHINE_RESET ( mo6 )
+
      MDRV_CPU_MODIFY( "main" )
      MDRV_CPU_PROGRAM_MAP ( mo6, 0 )
+
+     MDRV_MC6846_REMOVE( "mc6846" )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START ( pro128 )
@@ -2281,8 +2296,8 @@ static ADDRESS_MAP_START ( mo5nr, ADDRESS_SPACE_PROGRAM, 8 )
 /*   AM_RANGE ( 0xa7f0, 0xa7f7 ) AM_READWRITE ( to9_ieee_r, to9_ieee_w ) */
      AM_RANGE ( 0xa7f2, 0xa7f3 ) AM_READWRITE ( to7_midi_r, to7_midi_w )
      AM_RANGE ( 0xa7f8, 0xa7fb ) AM_READWRITE ( pia_3_alt_r, pia_3_alt_w )
-     AM_RANGE ( 0xa7fe, 0xa7ff ) AM_READWRITE ( mea8000_r, mea8000_w )
-     AM_RANGE ( 0xb000, 0xefff ) AM_READWRITE ( SMH_BANK(THOM_CART_BANK), mo6_cartridge_w ) /* 8 * 16 KB */
+     AM_RANGE ( 0xa7fe, 0xa7ff ) AM_DEVREADWRITE(MEA8000, "mea8000", mea8000_r, mea8000_w)
+     AM_RANGE ( 0xb000, 0xefff ) AM_READWRITE ( SMH_BANK(THOM_CART_BANK), mo6_cartridge_w ) /* 4 * 16 KB */
      AM_RANGE ( 0xf000, 0xffff ) AM_ROMBANK   ( TO8_BIOS_BANK )
 
 /* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
@@ -2441,8 +2456,11 @@ static MACHINE_DRIVER_START ( mo5nr )
      MDRV_IMPORT_FROM ( to7 )
      MDRV_MACHINE_START ( mo5nr )
      MDRV_MACHINE_RESET ( mo5nr )
+
      MDRV_CPU_MODIFY( "main" )
      MDRV_CPU_PROGRAM_MAP ( mo5nr, 0 )
+
+     MDRV_MC6846_REMOVE( "mc6846" )
 MACHINE_DRIVER_END
 
 COMP ( 1986, mo5nr, 0, 0, mo5nr, mo5nr, 0, mo5nr, "Thomson", "MO5 NR", 0 )

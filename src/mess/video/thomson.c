@@ -7,11 +7,7 @@
 **********************************************************************/
 
 #include <math.h>
-#include "driver.h"
 #include "includes/thomson.h"
-#include "cpu/m6809/m6809.h"
-#include "machine/6821pia.h"
-#include "machine/mc6846.h"
 
 
 #define VERBOSE 0
@@ -99,7 +95,7 @@ static emu_timer* thom_video_timer; /* time elapsed from begining of frame */
 
 
 /* elapsed time from begining of frame, in us */
-INLINE unsigned thom_video_elapsed ( void )
+INLINE unsigned thom_video_elapsed ( running_machine *machine )
 {
 	unsigned u;
 	attotime elapsed = timer_timeelapsed( thom_video_timer );
@@ -111,10 +107,10 @@ INLINE unsigned thom_video_elapsed ( void )
 
 
 
-struct thom_vsignal thom_get_vsignal ( void )
+struct thom_vsignal thom_get_vsignal ( running_machine *machine )
 {
 	struct thom_vsignal v;
-	int gpl = thom_video_elapsed() - 64 * THOM_BORDER_HEIGHT - 7;
+	int gpl = thom_video_elapsed( machine ) - 64 * THOM_BORDER_HEIGHT - 7;
 	if ( gpl < 0 )
 		gpl += 19968;
 
@@ -296,9 +292,9 @@ static int thom_mode_is_hires( int mode )
 
 
 /* either the border index or its palette entry has changed */
-static void thom_border_changed( void )
+static void thom_border_changed( running_machine *machine )
 {
-	unsigned l = thom_video_elapsed();
+	unsigned l = thom_video_elapsed( machine );
 	unsigned y = l >> 6;
 	unsigned x = l & 63;
 	unsigned color =  thom_pal[ thom_border_index ];
@@ -335,9 +331,9 @@ static void thom_border_changed( void )
 
 
 /* the video mode or page has changed */
-static void thom_gplinfo_changed( void )
+static void thom_gplinfo_changed( running_machine *machine )
 {
-	unsigned l = thom_video_elapsed() - THOM_BORDER_HEIGHT * 64 - 7;
+	unsigned l = thom_video_elapsed( machine ) - THOM_BORDER_HEIGHT * 64 - 7;
 	unsigned y = l >> 6;
 	unsigned x = l & 63;
 	int modepage = ((int)thom_vmode << 8) | thom_vpage;
@@ -350,20 +346,20 @@ static void thom_gplinfo_changed( void )
 
 
 
-void thom_set_border_color ( unsigned index )
+void thom_set_border_color ( running_machine *machine, unsigned index )
 {
 	assert( index < 16 );
 	if ( index != thom_border_index )
 	{
-		LOG (( "thom_set_border_color: %i at line %i col %i\n", index, thom_video_elapsed() / 64, thom_video_elapsed() % 64  ));
+		LOG (( "thom_set_border_color: %i at line %i col %i\n", index, thom_video_elapsed( machine ) / 64, thom_video_elapsed( machine ) % 64  ));
 		thom_border_index = index;
-		thom_border_changed();
+		thom_border_changed( machine );
 	}
 }
 
 
 
-void thom_set_palette ( unsigned index, UINT16 color )
+void thom_set_palette ( running_machine *machine, unsigned index, UINT16 color )
 {
 	assert( index < 16 );
 
@@ -373,40 +369,40 @@ void thom_set_palette ( unsigned index, UINT16 color )
 	if ( thom_pal[ index ] == color )
 		return;
 
-	LOG (( "thom_set_palette: %i to %03x at line %i col %i\n", index, color, thom_video_elapsed() / 64, thom_video_elapsed() % 64  ));
+	LOG (( "thom_set_palette: %i to %03x at line %i col %i\n", index, color, thom_video_elapsed( machine ) / 64, thom_video_elapsed( machine ) % 64  ));
 
 	thom_pal[ index ] = color;
 	if ( index == thom_border_index )
-		thom_border_changed();
+		thom_border_changed( machine );
 	thom_pal_changed = 1;
 	thom_vstate_dirty = 1;
 }
 
 
 
-void thom_set_video_mode ( unsigned mode )
+void thom_set_video_mode ( running_machine *machine, unsigned mode )
 {
 	assert( mode < THOM_VMODE_NB );
 
 	if ( mode != thom_vmode )
 	{
-		LOG (( "thom_set_video_mode: %i at line %i, col %i\n", mode, thom_video_elapsed() / 64, thom_video_elapsed() % 64 ));
+		LOG (( "thom_set_video_mode: %i at line %i, col %i\n", mode, thom_video_elapsed( machine ) / 64, thom_video_elapsed( machine ) % 64 ));
 		thom_vmode = mode;
-		thom_gplinfo_changed();
+		thom_gplinfo_changed( machine );
 		thom_hires_better |= thom_mode_is_hires( mode );
 	}
 }
 
 
 
-void thom_set_video_page ( unsigned page )
+void thom_set_video_page ( running_machine *machine, unsigned page )
 {
 	assert( page < THOM_NB_PAGES )
 		;
 	if ( page != thom_vpage ) {
-		LOG (( "thom_set_video_page: %i at line %i col %i\n", page, thom_video_elapsed() / 64, thom_video_elapsed() % 64  ));
+		LOG (( "thom_set_video_page: %i at line %i col %i\n", page, thom_video_elapsed( machine ) / 64, thom_video_elapsed( machine ) % 64  ));
 		thom_vpage = page;
-		thom_gplinfo_changed();
+		thom_gplinfo_changed( machine );
 	}
 }
 
@@ -416,13 +412,14 @@ void thom_set_video_page ( unsigned page )
 
 
 
-typedef void ( *thom_scandraw ) ( UINT8* vram, UINT16* dst, UINT16* pal,
+typedef void ( *thom_scandraw ) ( running_machine *machine, UINT8* vram, UINT16* dst, UINT16* pal,
 				  int org, int len );
 
 
 
 #define UPDATE( name, res )						\
-	static void name##_scandraw_##res ( UINT8* vram, UINT16* dst,	UINT16* pal, \
+	static void name##_scandraw_##res ( running_machine *machine,	\
+					    UINT8* vram, UINT16* dst,	UINT16* pal, \
 					    int org, int len )		\
 	{								\
 		unsigned gpl;						\
@@ -810,7 +807,8 @@ static TIMER_CALLBACK( thom_scanline_start )
 				xx++;
 			} while ( xx < 40 && thom_vmodepage[xx] == -1 );
 			thom_scandraw_funcs[ mode ][ thom_hires ]
-				( thom_vram + y * 40 + page * 0x4000,
+				( machine,
+				  thom_vram + y * 40 + page * 0x4000,
 				  thom_vbody + y * 320 * (thom_hires+1),
 				  thom_last_pal, x, xx-x );
 			x = xx;
@@ -873,7 +871,7 @@ void thom_set_mode_point ( running_machine *machine, int point )
 
 
 
-void thom_floppy_active ( int write )
+void thom_floppy_active ( running_machine *machine, int write )
 {
 	int fold = FLOP_STATE, fnew;
 
@@ -1009,11 +1007,11 @@ VIDEO_UPDATE ( thom )
 
 static emu_timer *thom_init_timer;
 
-static void (*thom_init_cb) ( running_machine *machine, int );
+static void (*thom_init_cb) ( running_machine *machine, int init );
 
 
 
-void thom_set_init_callback ( void (*cb) ( running_machine *machine, int init ) )
+void thom_set_init_callback ( running_machine *machine, void (*cb) ( running_machine *machine, int init ) )
 {
 	thom_init_cb = cb;
 }
@@ -1023,7 +1021,7 @@ void thom_set_init_callback ( void (*cb) ( running_machine *machine, int init ) 
 static TIMER_CALLBACK( thom_set_init )
 {
 	int init = param;
-	LOG (( "%f thom_set_init: %i, at line %i col %i\n", attotime_to_double(timer_get_time(machine)), init, thom_video_elapsed() / 64, thom_video_elapsed() % 64 ));
+	LOG (( "%f thom_set_init: %i, at line %i col %i\n", attotime_to_double(timer_get_time(machine)), init, thom_video_elapsed( machine ) / 64, thom_video_elapsed( machine ) % 64 ));
 
 	if ( thom_init_cb )
 		thom_init_cb( machine, init );
@@ -1102,7 +1100,7 @@ static const UINT16 thom_pal_init[16] =
 	0x0777, /* 8: gray */         0x033a, /* 9: pink */
 	0x03a3, /* a: light green */  0x03aa, /* b: light yellow */
 	0x0a33, /* c: light blue */   0x0a3a, /* d: redish pink */
-	0x0ee7, /* e: light cyan */   0x007b, /* f: orange */
+	0x0ee7, /* e: light cyan */   0x003b, /* f: orange */
 };
 
 
