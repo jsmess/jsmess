@@ -6,16 +6,38 @@
 
 **********************************************************************/
 
-#ifndef MEA8000
-#define MEA8000
+#ifndef MEA8000_H
+#define MEA8000_H
 
-extern void mea8000_config ( running_machine *machine, int channel, write8_space_func req_out_func );
+#define MEA8000 DEVICE_GET_INFO_NAME(mea8000)
 
-/* reset by external signal */
-extern void mea8000_reset ( running_machine *machine );
+/* ---------- configuration ------------ */
+
+typedef struct _mea8000_interface mea8000_interface;
+struct _mea8000_interface
+{
+  /* output channel */
+  int                channel;
+
+  /* 1-bit 'ready' output, not negated */
+  write8_device_func req_out_func;
+};
+
+
+#define MDRV_MEA8000_ADD(_tag, _intrf)	      \
+  MDRV_DEVICE_ADD(_tag, MEA8000)	      \
+  MDRV_DEVICE_CONFIG(_intrf)
+
+#define MDRV_MEA8000_REMOVE(_tag)		\
+  MDRV_DEVICE_REMOVE(_tag, MEA8000)
+
+
+/* ---------- functions ------------ */
+
+DEVICE_GET_INFO(mea8000);
 
 /* interface to CPU via address/data bus*/
-extern READ8_HANDLER  ( mea8000_r );
-extern WRITE8_HANDLER ( mea8000_w );
+extern READ8_DEVICE_HANDLER  ( mea8000_r );
+extern WRITE8_DEVICE_HANDLER ( mea8000_w );
 
 #endif
