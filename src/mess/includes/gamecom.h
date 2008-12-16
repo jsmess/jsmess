@@ -167,7 +167,7 @@ extern UINT8 gamecom_vram[];
 
 /*----------- defined in video/gamecom.c -----------*/
 
-extern INTERRUPT_GEN( gamecom_scanline );
+VIDEO_START( gamecom );
 
 
 #endif /* GAMECOM_H_ */

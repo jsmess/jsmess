@@ -5,14 +5,9 @@
 
 static int scanline;
 static unsigned int base_address;
+static emu_timer *scanline_timer;
 
-#ifdef UNUSED_FUNCTION
-void gamecom_video_init( void ) {
-	scanline = 0;
-}
-#endif
-
-INTERRUPT_GEN( gamecom_scanline ) {
+static TIMER_CALLBACK( gamecom_scanline ) {
 	// draw line
 	if ( scanline == 0 ) {
 		base_address = ( internal_registers[SM8521_LCDC] & 0x40 ) ? 0x2000 : 0x0000;
@@ -65,5 +60,13 @@ INTERRUPT_GEN( gamecom_scanline ) {
 	}
 
 	scanline = ( scanline + 1 ) % Y_PIXELS;
+}
+
+VIDEO_START( gamecom )
+{
+	VIDEO_START_CALL( generic_bitmapped );
+	scanline_timer = timer_alloc( machine, gamecom_scanline, NULL );
+	timer_adjust_periodic( scanline_timer, video_screen_get_time_until_pos( machine->primary_screen, 0, 0 ), 0, video_screen_get_scan_period( machine->primary_screen ) );
+
 }
 
