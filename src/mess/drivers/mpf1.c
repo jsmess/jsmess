@@ -32,6 +32,7 @@
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
 #include "sound/dac.h"
+#include "mpf1.lh"
 
 
 #define VERBOSE_LEVEL ( 0 )
@@ -464,6 +465,7 @@ static MACHINE_DRIVER_START( mpf1 )
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
+	MDRV_DEFAULT_LAYOUT( layout_mpf1 )
 MACHINE_DRIVER_END
 
 /* ROMs */
