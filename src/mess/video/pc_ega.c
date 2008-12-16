@@ -55,6 +55,27 @@ TODO - Write documentation
 	                        1 = video is being displayed
 
 
+	Configuration switches
+	SW1 SW2 SW3 SW4
+	OFF OFF OFF ON  - EGA, Color 80x25 (5153)
+	                - EGA (primary) + MDA, Color 80x25 + Monochrome
+	OFF OFF ON  OFF	- EGA, Monochrome (5151)
+	                - EGA (primary) + CGA, Monochrome + Color 80x25
+	OFF OFF ON  ON  - EGA + MDA (primary), 5154 + Enhanced Monochrome
+	OFF ON  OFF ON  - EGA + CGA (primary), Monochrome + Color 80x25
+	OFF ON  ON  OFF - EGA, Enhanced Color - Enhanced Mode (5154)
+	                - EGA (primary) + MDA, 5154 monitor + Enhanced Monochrome
+	OFF ON  ON  ON  - EGA + MDA (primary), Color 80x25 + Monochrome
+	ON  OFF OFF ON  - EGA, Color 40x25 (5153)
+	                - EGA (primary) + MDA, Color 40x25 + Monochrome
+	ON  OFF ON  OFF - EGA (primary) + CGA, Monochrome + Color 40x25
+	ON  OFF ON  ON  - EGA + MDA (primary), 5154 + Normal Monochrome
+	ON  ON  OFF ON  - EGA + CGA (primary), Monochrome + Color 40x25
+	ON  ON  ON  OFF - EGA, Enhanced Color - Enhanced Mode (5154)
+	                - EGA (primary) + MDA, 5154 monitor + Normal Monochrome
+	ON  ON  ON  ON  - EGA + MDA (primary), Color 40x25 + Monochrome
+
+
 	3XA - 7 6 5 4 3 2 1 0 - Feature Control Register - Write Only
 	      | | | | | | | |
 	      | | | | | | | +-- output to FEAT0 of the feature connector
@@ -77,13 +98,16 @@ TODO - Write documentation
 	      | | | | | +------ light pen switch
 	      | | | | |         0 = switch is closed
 	      | | | | |         1 = switch is open
-	      | | | | +-------- vertical retrace
+	      | | | | +-------- vertical blank
 	      | | | |           0 = video information is being displayed
-	      | | | |           1 = CRT is in vertical retrace
+	      | | | |           1 = CRT is in vertical blank
 	      | | | +---------- diagnostic usage
 	      | | +------------ diagnostic usage
 	      | +-------------- reserved/unused
 	      +---------------- reserved/unused
+
+We think bits 4 and 5 of the status register contain some information about the
+current pixel that is being drawn. Those bits do not seem to be documented.
 
 
 The EGA graphics card introduces a lot of new indexed registers to handle the
@@ -461,6 +485,7 @@ static struct
 
 	UINT8	frame_cnt;
 	UINT8	vsync;
+	UINT8	vblank;
 	UINT8	display_enable;
 } ega;
 
@@ -474,6 +499,7 @@ static PALETTE_INIT( pc_ega );
 static CRTC_EGA_UPDATE_ROW( ega_update_row );
 static CRTC_EGA_ON_DE_CHANGED( ega_de_changed );
 static CRTC_EGA_ON_VSYNC_CHANGED( ega_vsync_changed );
+static CRTC_EGA_ON_VBLANK_CHANGED( ega_vblank_changed );
 static READ8_HANDLER( pc_ega8_3b0_r );
 static WRITE8_HANDLER( pc_ega8_3b0_w );
 static READ16_HANDLER( pc_ega16le_3b0_r );
@@ -507,7 +533,8 @@ static const crtc_ega_interface crtc_ega_ega_intf =
 	NULL,				/* end_update */
 	ega_de_changed,		/* on_de_chaged */
 	NULL,				/* on_hsync_changed */
-	ega_vsync_changed	/* on_vsync_changed */
+	ega_vsync_changed,	/* on_vsync_changed */
+	ega_vblank_changed	/* on_vblank_changed */
 };
 
 
@@ -694,10 +721,18 @@ static CRTC_EGA_ON_VSYNC_CHANGED( ega_vsync_changed )
 }
 
 
+static CRTC_EGA_ON_VBLANK_CHANGED( ega_vblank_changed )
+{
+	ega.vblank = vblank ? 8 : 0;
+}
+
+
 static CRTC_EGA_UPDATE_ROW( pc_ega_graphics )
 {
 	UINT16	*p = BITMAP_ADDR16(bitmap, y, 0);
 	int	i;
+
+//	logerror( "pc_ega_graphics: y = %d, x_count = %d, ma = %d, ra = %d\n", y, x_count, ma, ra );
 
 	for ( i = 0; i < x_count; i++ )
 	{
@@ -788,6 +823,9 @@ static void pc_ega_change_mode( const device_config *device )
 	}
 	crtc_ega_set_clock( device, clock / pixels );
 	crtc_ega_set_hpixels_per_column( device, pixels );
+
+if ( ! ega.update_row )
+	logerror("unknown video mode\n");
 }
 
 
@@ -814,7 +852,16 @@ static READ8_HANDLER( pc_ega8_3X0_r )
 
 	/* Input Status Register 1 */
 	case 10:
-		data = ega.vsync | ega.display_enable;
+		data = ega.vblank | ega.display_enable;
+
+		if ( ega.display_enable )
+		{
+			/* For the moment i'm putting in some bogus data */
+			static int pixel_data;
+
+			pixel_data = ( pixel_data + 1 ) & 0x03;
+			data |= ( pixel_data << 4 );
+		}
 
 		/* Reset the attirubte writing flip flop to let the next write go to the index reigster */
 		ega.attribute.index_write = 1;
@@ -892,6 +939,22 @@ static WRITE8_HANDLER( pc_ega8_3d0_w )
 
 static READ8_HANDLER( pc_ega8_3c0_r )
 {
+	UINT8	dips = 0x08;	/* 0x01 - EGA only, 80x25 color(?) */
+/*
+0000 - 40x25
+0001 - no display (text at a0000) and writes to 0c00xx (?), seems to be a graphics mode
+0010 - 40x25
+0011 - no display
+0100 - 40x25
+0101 - no display
+0110 - 40x25
+0111 - no display
+1000 - 40x25
+1001 - no diplsay (text at a0000)
+1010 - 40x25
+1100 - 40x25
+1110 - 40x25
+*/
 	int data = 0xff;
 
 	if ( VERBOSE_EGA )
@@ -907,9 +970,10 @@ static READ8_HANDLER( pc_ega8_3c0_r )
 
 	/* Feature Read */
 	case 2:
-		data = ( data & 0x0F );
+		data = ( data & 0x0f );
 		data |= ( ( ega.feature_control & 0x03 ) << 5 );
 		data |= ( ega.vsync ? 0x00 : 0x80 );
+		data |= ( ( ( dips >> ( ( ( ega.misc_output & 0xc0 ) >> 6 ) ) ) & 0x01 ) << 4 );
 		break;
 
 	/* Sequencer */
