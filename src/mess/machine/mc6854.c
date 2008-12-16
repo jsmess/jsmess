@@ -57,7 +57,7 @@
 /******************* internal chip data structure ******************/
 
 
-static struct
+typedef struct
 {
 
 	/* interface */
@@ -86,7 +86,7 @@ static struct
 	UINT8  frame[MAX_FRAME_LENGTH];
 	UINT32 flen, fpos;
 
-} * mc6854;
+} mc6854_t;
 
 /* meaning of tstate / rtate:
    0 = idle / waiting for frame flag
@@ -216,13 +216,23 @@ static const int word_length[4] = { 5, 6, 7, 8 };
 
 
 
+INLINE mc6854_t* get_safe_token( const device_config *device ) 
+{
+	assert( device != NULL );
+	assert( device->token != NULL );
+	assert( device->type == DEVICE_GET_INFO_NAME( mc6854 ) );
+	return (mc6854_t*) device->token;
+}
+
+
 /*********************** transmit ***********************/
 
 
 
 /* MC6854 fills bit queue */
-static void mc6854_send_bits( UINT32 data, int len, int zi )
+static void mc6854_send_bits( const device_config *device, UINT32 data, int len, int zi )
 {
+	mc6854_t* mc6854 = get_safe_token( device );
 	attotime expire;
 	int i;
 	if ( zi )
@@ -256,7 +266,7 @@ static void mc6854_send_bits( UINT32 data, int len, int zi )
 	if ( mc6854->iface->out_tx )
 	{
 		for ( i = 0; i < len; i++, data >>= 1 )
-			mc6854->iface->out_tx( data & 1 );
+			mc6854->iface->out_tx( device, data & 1 );
 	}
 
 	/* schedule when to ask the MC6854 for more bits */
@@ -269,8 +279,9 @@ static void mc6854_send_bits( UINT32 data, int len, int zi )
 
 
 /* CPU push -> tfifo[0] -> ... -> tfifo[FIFO_SIZE-1] -> pop */
-static void mc6854_tfifo_push( running_machine *machine, UINT8 data )
+static void mc6854_tfifo_push( const device_config *device, UINT8 data )
 {
+	mc6854_t* mc6854 = get_safe_token( device );
 	int i;
 
 	if ( TRESET )
@@ -286,22 +297,24 @@ static void mc6854_tfifo_push( running_machine *machine, UINT8 data )
 	if ( i >= 0 )
 		mc6854->tfifo[ i ] = data | 0x100;
 	else
-		logerror( "%f mc6854_tfifo_push: FIFO overrun\n", attotime_to_double(timer_get_time(machine)) );
+		logerror( "%f mc6854_tfifo_push: FIFO overrun\n", attotime_to_double(timer_get_time(device->machine)) );
 
 	/* start frame, if needed */
 	if ( ! mc6854->tstate )
 	{
-		LOG(( "%f mc6854_tfifo_push: start frame\n", attotime_to_double(timer_get_time(machine)) ));
+		LOG(( "%f mc6854_tfifo_push: start frame\n", attotime_to_double(timer_get_time(device->machine)) ));
 		mc6854->tstate = 2;
-		mc6854_send_bits( FLAG, 8, 0 );
+		mc6854_send_bits( device, FLAG, 8, 0 );
 	}
 }
 
 
 
 /* CPU asks for normal frame termination */
-static void mc6854_tfifo_terminate( void )
+static void mc6854_tfifo_terminate( const device_config *device )
 {
+	mc6854_t* mc6854 = get_safe_token( device );
+
 	/* mark most recently pushed byte as the last one of the frame */
 	int i;
 	for ( i = 0; i < FIFO_SIZE; i++ )
@@ -319,6 +332,8 @@ static void mc6854_tfifo_terminate( void )
 /* call-back to refill the bit-stream from the FIFO */
 static TIMER_CALLBACK(mc6854_tfifo_cb)
 {
+	device_config* device = (device_config*) ptr;
+	mc6854_t* mc6854 = get_safe_token( device );
 	int i, data = mc6854->tfifo[ FIFO_SIZE - 1 ];
 
 	if ( ! mc6854->tstate )
@@ -382,7 +397,7 @@ static TIMER_CALLBACK(mc6854_tfifo_cb)
 		else
 			logerror( "mc6854_tfifo_cb: truncated frame, max=%i\n", MAX_FRAME_LENGTH );
 
-		mc6854_send_bits( data, blen, 1 );
+		mc6854_send_bits( device, data, blen, 1 );
 	}
 	else
 	{
@@ -390,7 +405,7 @@ static TIMER_CALLBACK(mc6854_tfifo_cb)
 		logerror( "%f mc6854_tfifo_cb: FIFO underrun\n", attotime_to_double(timer_get_time(machine)) );
 		mc6854->sr1 |= TU;
 		mc6854->tstate = 0;
-		mc6854_send_bits( 0xffff, ABTEX ? 16 : 8, 0 );
+		mc6854_send_bits( device, 0xffff, ABTEX ? 16 : 8, 0 );
 		mc6854->flen = 0;
 	}
 
@@ -400,29 +415,30 @@ static TIMER_CALLBACK(mc6854_tfifo_cb)
 		int len = mc6854->flen;
 
 		LOG(( "%f mc6854_tfifo_cb: end frame\n", attotime_to_double(timer_get_time(machine)) ));
-		mc6854_send_bits( 0xdeadbeef, 16, 1 );  /* send check-sum: TODO */
-		mc6854_send_bits( FLAG, 8, 0 );         /* send closing flag */
+		mc6854_send_bits( device, 0xdeadbeef, 16, 1 );  /* send check-sum: TODO */
+		mc6854_send_bits( device, FLAG, 8, 0 );         /* send closing flag */
 
 		if ( mc6854->tfifo[ FIFO_SIZE - 1 ] & 0x100 )
 		{
 			/* re-open frame asap */
 			LOG(( "%f mc6854_tfifo_cb: start frame\n", attotime_to_double(timer_get_time(machine)) ));
 			if ( TWOINTER )
-				mc6854_send_bits( FLAG, 8, 0 );
+				mc6854_send_bits( device, FLAG, 8, 0 );
 		}
 		else
 			mc6854->tstate = 0;
 
 		mc6854->flen = 0;
 		if ( mc6854->iface->out_frame )
-			mc6854->iface->out_frame( machine, mc6854->frame, len );
+			mc6854->iface->out_frame( device, mc6854->frame, len );
 	}
 }
 
 
 
-static void mc6854_tfifo_clear( void )
+static void mc6854_tfifo_clear( const device_config *device )
 {
+	mc6854_t* mc6854 = get_safe_token( device );
 	memset( mc6854->tfifo, 0, sizeof( mc6854->tfifo ) );
 	mc6854->tstate = 0;
 	mc6854->flen = 0;
@@ -436,8 +452,9 @@ static void mc6854_tfifo_clear( void )
 
 
 /* MC6854 pushes a field in the FIFO */
-static void mc6854_rfifo_push( running_machine *machine, UINT8 d )
+static void mc6854_rfifo_push( const device_config *device, UINT8 d )
 {
+	mc6854_t* mc6854 = get_safe_token( device );
 	int i, blen = 8;
 	unsigned data = d;
 
@@ -451,7 +468,7 @@ static void mc6854_rfifo_push( running_machine *machine, UINT8 d )
 			mc6854->rstate = 3;
 		else
 			mc6854->rstate = 2;
-		LOG(( "%f mc6854_rfifo_push: address field $%02X\n", attotime_to_double(timer_get_time(machine)), data ));
+		LOG(( "%f mc6854_rfifo_push: address field $%02X\n", attotime_to_double(timer_get_time(device->machine)), data ));
 		data |= 0x400; /* address marker */
 		break;
 
@@ -462,7 +479,7 @@ static void mc6854_rfifo_push( running_machine *machine, UINT8 d )
 			mc6854->rstate = 5;
 		else
 			mc6854->rstate = 6;
-		LOG(( "%f mc6854_rfifo_push: control field $%02X\n", attotime_to_double(timer_get_time(machine)), data ));
+		LOG(( "%f mc6854_rfifo_push: control field $%02X\n", attotime_to_double(timer_get_time(device->machine)), data ));
 		break;
 
 	case 4: /* 8-bit extended control field (optional) */
@@ -470,26 +487,26 @@ static void mc6854_rfifo_push( running_machine *machine, UINT8 d )
 			mc6854->rstate = 5;
 		else
 			mc6854->rstate = 6;
-		LOG(( "%f mc6854_rfifo_push: control field $%02X\n", attotime_to_double(timer_get_time(machine)), data ));
+		LOG(( "%f mc6854_rfifo_push: control field $%02X\n", attotime_to_double(timer_get_time(device->machine)), data ));
 		break;
 
 	case 5: /* 8-bit logical control (optional) */
 		if ( ! ( data & 0x80 ) )
 			mc6854->rstate = 6;
-		LOG(( "%f mc6854_rfifo_push: logical control field $%02X\n", attotime_to_double(timer_get_time(machine)), data ));
+		LOG(( "%f mc6854_rfifo_push: logical control field $%02X\n", attotime_to_double(timer_get_time(device->machine)), data ));
 		break;
 
 	case 6: /* variable-length data */
 		blen = RWL;
 		data >>= 8 - blen;
-		LOG(( "%f mc6854_rfifo_push: data field $%02X, %i bits\n", attotime_to_double(timer_get_time(machine)), data, blen ));
+		LOG(( "%f mc6854_rfifo_push: data field $%02X, %i bits\n", attotime_to_double(timer_get_time(device->machine)), data, blen ));
 		break;
 	}
 
 	/* no further FIFO fill until FV is cleared! */
 	if ( mc6854->sr2 & FV )
 	{
-		LOG(( "%f mc6854_rfifo_push: field not pushed\n", attotime_to_double(timer_get_time(machine)) ));
+		LOG(( "%f mc6854_rfifo_push: field not pushed\n", attotime_to_double(timer_get_time(device->machine)) ));
 		return;
 	}
 
@@ -509,7 +526,7 @@ static void mc6854_rfifo_push( running_machine *machine, UINT8 d )
 		/* FIFO full */
 		mc6854->sr2 |= OVRN;
 		mc6854->rfifo[ 0 ] = data;
-		logerror( "%f mc6854_rfifo_push: FIFO overrun\n", attotime_to_double(timer_get_time(machine)) );
+		logerror( "%f mc6854_rfifo_push: FIFO overrun\n", attotime_to_double(timer_get_time(device->machine)) );
 	}
 
 	mc6854->rsize -= blen;
@@ -517,8 +534,9 @@ static void mc6854_rfifo_push( running_machine *machine, UINT8 d )
 
 
 
-static void mc6854_rfifo_terminate( void )
+static void mc6854_rfifo_terminate( const device_config *device )
 {
+	mc6854_t* mc6854 = get_safe_token( device );
 	/* mark most recently pushed byte as the last one of the frame */
 	int i;
 	for ( i = 0; i < FIFO_SIZE; i++ )
@@ -538,8 +556,9 @@ static void mc6854_rfifo_terminate( void )
 
 
 /* CPU pops the FIFO */
-static UINT8 mc6854_rfifo_pop( running_machine *machine )
+static UINT8 mc6854_rfifo_pop( const device_config *device )
 {
+	mc6854_t* mc6854 = get_safe_token( device );
 	int i, data = mc6854->rfifo[ FIFO_SIZE - 1 ];
 
 	/* shift FIFO to the right */
@@ -556,9 +575,9 @@ static UINT8 mc6854_rfifo_pop( running_machine *machine )
 	/* auto-refill in frame mode */
 	if ( mc6854->flen > 0 )
 	{
-		mc6854_rfifo_push( machine, mc6854->frame[ mc6854->fpos++ ] );
+		mc6854_rfifo_push( device, mc6854->frame[ mc6854->fpos++ ] );
 		if ( mc6854->fpos == mc6854->flen )
-			mc6854_rfifo_terminate();
+			mc6854_rfifo_terminate( device );
 	}
 
 	return data;
@@ -566,8 +585,9 @@ static UINT8 mc6854_rfifo_pop( running_machine *machine )
 
 
 /* MC6854 makes fields from bits */
-void mc6854_set_rx( running_machine *machine, int bit )
+void mc6854_set_rx( const device_config *device, int bit )
 {
+	mc6854_t* mc6854 = get_safe_token( device );
 	int fieldlen = ( mc6854->rstate < 6 ) ? 8 : RWL;
 
 	if ( RRESET || DCD )
@@ -586,14 +606,14 @@ void mc6854_set_rx( running_machine *machine, int bit )
 			{
 				/* only in-frame abort */
 				mc6854->sr2 |= RABT;
-				LOG(( "%f mc6854_receive_bit: abort\n", attotime_to_double(timer_get_time(machine)) ));
+				LOG(( "%f mc6854_receive_bit: abort\n", attotime_to_double(timer_get_time(device->machine)) ));
 			}
 		}
 		else
 		{
 			mc6854->rsize++;
 			if ( mc6854->rstate && mc6854->rsize >= fieldlen + 24 )
-				mc6854_rfifo_push( machine, mc6854->rreg );
+				mc6854_rfifo_push( device, mc6854->rreg );
 		}
 	}
 	else if ( mc6854->rones == 5 )
@@ -614,9 +634,9 @@ void mc6854_set_rx( running_machine *machine, int bit )
 			mc6854->rreg >>= 1;
 			mc6854->rsize++;
 			if ( mc6854->rsize >= fieldlen + 24 ) /* last field */
-				mc6854_rfifo_push( machine, mc6854->rreg );
-			mc6854_rfifo_terminate();
-			LOG(( "%f mc6854_receive_bit: end of frame\n", attotime_to_double(timer_get_time(machine)) ));
+				mc6854_rfifo_push( device, mc6854->rreg );
+			mc6854_rfifo_terminate( device );
+			LOG(( "%f mc6854_receive_bit: end of frame\n", attotime_to_double(timer_get_time(device->machine)) ));
 		}
 		mc6854->rones = 0;
 		mc6854->rstate = 1;
@@ -627,14 +647,15 @@ void mc6854_set_rx( running_machine *machine, int bit )
 		mc6854->rreg >>= 1;
 		mc6854->rsize++;
 		if ( mc6854->rstate && mc6854->rsize >= fieldlen + 24 )
-			mc6854_rfifo_push( machine, mc6854->rreg );
+			mc6854_rfifo_push( device, mc6854->rreg );
 	}
 }
 
 
 
-static void mc6854_rfifo_clear( void )
+static void mc6854_rfifo_clear( const device_config *device )
 {
+	mc6854_t* mc6854 = get_safe_token( device );
 	memset( mc6854->rfifo, 0, sizeof( mc6854->rfifo ) );
 	mc6854->rstate = 0;
 	mc6854->rreg = 0;
@@ -645,8 +666,9 @@ static void mc6854_rfifo_clear( void )
 
 
 
-int mc6854_send_frame( running_machine *machine, UINT8* data, int len )
+int mc6854_send_frame( const device_config *device, UINT8* data, int len )
 {
+	mc6854_t* mc6854 = get_safe_token( device );
 	if ( mc6854->rstate > 1 || mc6854->tstate > 1 || RTS )
 		return -1; /* busy */
 
@@ -665,10 +687,10 @@ int mc6854_send_frame( running_machine *machine, UINT8* data, int len )
 		mc6854->sr1 |= FD;
 	mc6854->flen = len;
 	mc6854->fpos = 0;
-	mc6854_rfifo_push( machine, mc6854->frame[ mc6854->fpos++ ] );
-	mc6854_rfifo_push( machine, mc6854->frame[ mc6854->fpos++ ] );
+	mc6854_rfifo_push( device, mc6854->frame[ mc6854->fpos++ ] );
+	mc6854_rfifo_push( device, mc6854->frame[ mc6854->fpos++ ] );
 	if ( mc6854->fpos == mc6854->flen )
-		mc6854_rfifo_terminate();
+		mc6854_rfifo_terminate( device );
 	return 0;
 }
 
@@ -678,8 +700,9 @@ int mc6854_send_frame( running_machine *machine, UINT8* data, int len )
 
 
 
-void mc6854_set_cts( int data )
+void mc6854_set_cts( const device_config *device, int data )
 {
+	mc6854_t* mc6854 = get_safe_token( device );
 	if ( ! mc6854->cts && data )
 		mc6854->sr1 |= CTS;
 	mc6854->cts = data;
@@ -692,8 +715,9 @@ void mc6854_set_cts( int data )
 
 
 
-void mc6854_set_dcd( int data )
+void mc6854_set_dcd( const device_config *device, int data )
 {
+	mc6854_t* mc6854 = get_safe_token( device );
 	if ( ! mc6854->dcd && data )
 	{
 		mc6854->sr2 |= DCD;
@@ -708,7 +732,7 @@ void mc6854_set_dcd( int data )
 
 
 
-static void mc6854_update_sr2( void )
+static void mc6854_update_sr2( mc6854_t* mc6854 )
 {
 	/* update RDA */
 	mc6854->sr2 |= RDA2;
@@ -726,9 +750,9 @@ static void mc6854_update_sr2( void )
 
 
 
-static void mc6854_update_sr1( void )
+static void mc6854_update_sr1( mc6854_t* mc6854 )
 {
-	mc6854_update_sr2();
+	mc6854_update_sr2( mc6854 );
 
 	/* update S2RQ */
 	if ( mc6854->sr2 & 0x7f )
@@ -769,15 +793,16 @@ static void mc6854_update_sr1( void )
 
 
 
-READ8_HANDLER ( mc6854_r )
+READ8_DEVICE_HANDLER ( mc6854_r )
 {
+	mc6854_t* mc6854 = get_safe_token( device );
 	switch ( offset )
 	{
 
 	case 0: /* status register 1 */
-		mc6854_update_sr1();
+		mc6854_update_sr1( mc6854 );
 		LOG(( "%f $%04x mc6854_r: get SR1=$%02X (rda=%i,s2rq=%i,fd=%i,cts=%i,tu=%i,tdra=%i,irq=%i)\n",
-		      attotime_to_double(timer_get_time(space->machine)), cpu_get_previouspc(space->cpu), mc6854->sr1,
+		      attotime_to_double(timer_get_time(device->machine)), cpu_get_previouspc( device->machine->cpu[0] ), mc6854->sr1,
 		      ( mc6854->sr1 & RDA) ? 1 : 0, ( mc6854->sr1 & S2RQ) ? 1 : 0,
 		      ( mc6854->sr1 & FD ) ? 1 : 0, ( mc6854->sr1 & CTS ) ? 1 : 0,
 		      ( mc6854->sr1 & TU ) ? 1 : 0, ( mc6854->sr1 & TDRA) ? 1 : 0,
@@ -785,9 +810,9 @@ READ8_HANDLER ( mc6854_r )
 		return mc6854->sr1;
 
 	case 1: /* status register 2 */
-		mc6854_update_sr2();
+		mc6854_update_sr2( mc6854 );
 		LOG(( "%f $%04x mc6854_r: get SR2=$%02X (ap=%i,fv=%i,ridle=%i,rabt=%i,err=%i,dcd=%i,ovrn=%i,rda2=%i)\n",
-		      attotime_to_double(timer_get_time(space->machine)), cpu_get_previouspc(space->cpu), mc6854->sr2,
+		      attotime_to_double(timer_get_time(device->machine)), cpu_get_previouspc( device->machine->cpu[0] ), mc6854->sr2,
 		      ( mc6854->sr2 & AP   ) ? 1 : 0, ( mc6854->sr2 & FV  ) ? 1 : 0,
 		      ( mc6854->sr2 & RIDLE) ? 1 : 0, ( mc6854->sr2 & RABT) ? 1 : 0,
 		      ( mc6854->sr2 & ERR  ) ? 1 : 0, ( mc6854->sr2 & DCD ) ? 1 : 0,
@@ -797,29 +822,30 @@ READ8_HANDLER ( mc6854_r )
 	case 2: /* receiver data register */
 	case 3:
 	{
-		UINT8 data = mc6854_rfifo_pop(space->machine);
+		UINT8 data = mc6854_rfifo_pop( device );
 		LOG(( "%f $%04x mc6854_r: get data $%02X\n",
-		      attotime_to_double(timer_get_time(space->machine)), cpu_get_previouspc(space->cpu), data ));
+		      attotime_to_double(timer_get_time(device->machine)), cpu_get_previouspc( device->machine->cpu[0] ), data ));
 		return data;
 	}
 
 	default:
-		logerror( "$%04x mc6854 invalid read offset %i\n", cpu_get_previouspc(space->cpu), offset );
+		logerror( "$%04x mc6854 invalid read offset %i\n", cpu_get_previouspc( device->machine->cpu[0] ), offset );
 	}
 	return 0;
 }
 
 
 
-WRITE8_HANDLER ( mc6854_w )
+WRITE8_DEVICE_HANDLER ( mc6854_w )
 {
+	mc6854_t* mc6854 = get_safe_token( device );
 	switch ( offset )
 	{
 
 	case 0: /* control register 1 */
 		mc6854->cr1 = data;
 		LOG(( "%f $%04x mc6854_w: set CR1=$%02X (ac=%i,irq=%c%c,%sreset=%c%c)\n",
-		      attotime_to_double(timer_get_time(space->machine)), cpu_get_previouspc(space->cpu), mc6854->cr1,
+		      attotime_to_double(timer_get_time(device->machine)), cpu_get_previouspc( device->machine->cpu[0] ), mc6854->cr1,
 		      AC ? 1 : 0,
 		      RIE ? 'r' : '-', TIE ? 't' : '-',
 		      DISCONTINUE ? "discontinue," : "",
@@ -827,7 +853,7 @@ WRITE8_HANDLER ( mc6854_w )
 			    ));
 		if ( mc6854->cr1 & 0xc )
 			logerror( "$%04x mc6854 DMA not handled (CR1=$%02X)\n",
-				  cpu_get_previouspc(space->cpu), mc6854->cr1 );
+				  cpu_get_previouspc( device->machine->cpu[0] ), mc6854->cr1 );
 		if ( DISCONTINUE )
 		{
 			/* abort receive FIFO but keeps shift register & synchro */
@@ -837,14 +863,14 @@ WRITE8_HANDLER ( mc6854_w )
 		if ( RRESET )
 		{
 			/* abort FIFO & synchro */
-			mc6854_rfifo_clear();
+			mc6854_rfifo_clear( device );
 			mc6854->sr1 &= ~FD;
 			mc6854->sr2 &= ~(AP | FV | RIDLE | RABT | ERR | OVRN | DCD);
 			if ( mc6854->dcd ) mc6854->sr2 |= DCD;
 		}
 		if ( TRESET )
 		{
-			mc6854_tfifo_clear();
+			mc6854_tfifo_clear( device );
 			mc6854->sr1 &= ~(TU | TDRA | CTS);
 			if ( mc6854->cts ) mc6854->sr1 |= CTS;
 		}
@@ -856,18 +882,18 @@ WRITE8_HANDLER ( mc6854_w )
 			/* control register 3 */
 			mc6854->cr3 = data;
 			LOG(( "%f $%04x mc6854_w: set CR3=$%02X (lcf=%i,aex=%i,idl=%i,fdse=%i,loop=%i,tst=%i,dtr=%i)\n",
-			      attotime_to_double(timer_get_time(space->machine)), cpu_get_previouspc(space->cpu), mc6854->cr3,
+			      attotime_to_double(timer_get_time(device->machine)), cpu_get_previouspc( device->machine->cpu[0] ), mc6854->cr3,
 			      LCF ? (CEX ? 16 : 8) : 0,  AEX ? 1 : 0,
 			      IDL0 ? 0 : 1, FDSE ? 1 : 0, LOOP ? 1 : 0,
 			      TST ? 1 : 0, DTR ? 1 : 0
 				    ));
 			if ( LOOP )
-				logerror( "$%04x mc6854 loop mode not handled (CR3=$%02X)\n", cpu_get_previouspc(space->cpu), mc6854->cr3 );
+				logerror( "$%04x mc6854 loop mode not handled (CR3=$%02X)\n", cpu_get_previouspc( device->machine->cpu[0] ), mc6854->cr3 );
 			if ( TST )
-				logerror( "$%04x mc6854 test mode not handled (CR3=$%02X)\n", cpu_get_previouspc(space->cpu), mc6854->cr3 );
+				logerror( "$%04x mc6854 test mode not handled (CR3=$%02X)\n", cpu_get_previouspc( device->machine->cpu[0] ), mc6854->cr3 );
 
 			if ( mc6854->iface->out_dtr )
-				mc6854->iface->out_dtr( DTR ? 1 : 0 );
+				mc6854->iface->out_dtr( device, DTR ? 1 : 0 );
 
 		}
 		else
@@ -875,15 +901,15 @@ WRITE8_HANDLER ( mc6854_w )
 			/* control register 2 */
 			mc6854->cr2 = data;
 			LOG(( "%f $%04x mc6854_w: set CR2=$%02X (pse=%i,bytes=%i,fmidle=%i,%s,tlast=%i,clr=%c%c,rts=%i)\n",
-			      attotime_to_double(timer_get_time(space->machine)), cpu_get_previouspc(space->cpu), mc6854->cr2,
+			      attotime_to_double(timer_get_time(device->machine)), cpu_get_previouspc( device->machine->cpu[0] ), mc6854->cr2,
 			      PSE ? 1 : 0,  TWOBYTES ? 2 : 1,  FMIDLE ? 1 : 0,
 			      FCTDRA ? "fc" : "tdra", TLAST ? 1 : 0,
 			      data & 0x20 ? 'r' : '-',  data & 0x40 ? 't' : '-',
 			      RTS ? 1 : 0 ));
 			if ( PSE )
-				logerror( "$%04x mc6854 status prioritization not handled (CR2=$%02X)\n", cpu_get_previouspc(space->cpu), mc6854->cr2 );
+				logerror( "$%04x mc6854 status prioritization not handled (CR2=$%02X)\n", cpu_get_previouspc( device->machine->cpu[0] ), mc6854->cr2 );
 			if ( TLAST )
-				mc6854_tfifo_terminate();
+				mc6854_tfifo_terminate( device );
 			if ( data & 0x20 )
 			{
 				/* clear receiver status */
@@ -901,13 +927,13 @@ WRITE8_HANDLER ( mc6854_w )
 			}
 
 			if ( mc6854->iface->out_rts )
-				mc6854->iface->out_rts( RTS ? 1 : 0 );
+				mc6854->iface->out_rts( device, RTS ? 1 : 0 );
 		}
 		break;
 
 	case 2: /* transmitter data: continue data */
-		LOG(( "%f $%04xmc6854_w: push data=$%02X\n", attotime_to_double(timer_get_time(space->machine)), cpu_get_previouspc(space->cpu), data ));
-		mc6854_tfifo_push( space->machine, data );
+		LOG(( "%f $%04xmc6854_w: push data=$%02X\n", attotime_to_double(timer_get_time(device->machine)), cpu_get_previouspc( device->machine->cpu[0] ), data ));
+		mc6854_tfifo_push( device, data );
 		break;
 
 	case 3:
@@ -915,7 +941,7 @@ WRITE8_HANDLER ( mc6854_w )
 		{
 			/* control register 4 */
 			mc6854->cr4 = data;
-			LOG(( "%f $%04x mc6854_w: set CR4=$%02X (interframe=%i,tlen=%i,rlen=%i,%s%s)\n", attotime_to_double(timer_get_time(space->machine)), cpu_get_previouspc(space->cpu), mc6854->cr4,
+			LOG(( "%f $%04x mc6854_w: set CR4=$%02X (interframe=%i,tlen=%i,rlen=%i,%s%s)\n", attotime_to_double(timer_get_time(device->machine)), cpu_get_previouspc( device->machine->cpu[0] ), mc6854->cr4,
 			      TWOINTER ? 2 : 1,
 			      TWL, RWL,
 			      ABT ? ( ABTEX ? "abort-ext," : "abort,") : "",
@@ -923,21 +949,21 @@ WRITE8_HANDLER ( mc6854_w )
 			if ( ABT )
 			{
 				mc6854->tstate = 0;
-				mc6854_send_bits( 0xffff, ABTEX ? 16 : 8, 0 );
+				mc6854_send_bits( device, 0xffff, ABTEX ? 16 : 8, 0 );
 				mc6854->flen = 0;
 			}
 		}
 		else
 		{
 			/* transmitter data: last data */
-			LOG(( "%f $%04x mc6854_w: push last-data=$%02X\n", attotime_to_double(timer_get_time(space->machine)), cpu_get_previouspc(space->cpu), data ));
-			mc6854_tfifo_push( space->machine, data );
-			mc6854_tfifo_terminate();
+			LOG(( "%f $%04x mc6854_w: push last-data=$%02X\n", attotime_to_double(timer_get_time(device->machine)), cpu_get_previouspc( device->machine->cpu[0] ), data ));
+			mc6854_tfifo_push( device, data );
+			mc6854_tfifo_terminate( device );
 		}
 		break;
 
 	default:
-		logerror( "$%04x mc6854 invalid write offset %i (data=$%02X)\n", cpu_get_previouspc(space->cpu), offset, data );
+		logerror( "$%04x mc6854 invalid write offset %i (data=$%02X)\n", cpu_get_previouspc( device->machine->cpu[0] ), offset, data );
 	}
 }
 
@@ -945,10 +971,9 @@ WRITE8_HANDLER ( mc6854_w )
 
 /************************ reset *****************************/
 
-
-
-void mc6854_reset ( void )
+static DEVICE_RESET( mc6854 )
 {
+	mc6854_t* mc6854 = get_safe_token( device );
 	LOG (( "mc6854 reset\n" ));
 	mc6854->cr1 = 0xc0; /* reset condition */
 	mc6854->cr2 = 0;
@@ -958,8 +983,43 @@ void mc6854_reset ( void )
 	mc6854->sr2 = 0;
 	mc6854->cts = 0;
 	mc6854->dcd = 0;
-	mc6854_tfifo_clear();
-	mc6854_rfifo_clear();
+	mc6854_tfifo_clear( device );
+	mc6854_rfifo_clear( device );
+}
+
+
+
+/************************ start *****************************/
+
+static DEVICE_START( mc6854 )
+{
+	mc6854_t* mc6854 = get_safe_token( device );
+
+	mc6854->iface = device->static_config;
+
+	mc6854->ttimer = timer_alloc( device->machine, mc6854_tfifo_cb , (void*) device );
+
+	state_save_register_item( device->machine, "mc6854", device->tag, 0, mc6854->cr1 );
+	state_save_register_item( device->machine, "mc6854", device->tag, 0, mc6854->cr2 );
+	state_save_register_item( device->machine, "mc6854", device->tag, 0, mc6854->cr3 );
+	state_save_register_item( device->machine, "mc6854", device->tag, 0, mc6854->cr4 );
+	state_save_register_item( device->machine, "mc6854", device->tag, 0, mc6854->sr1 );
+	state_save_register_item( device->machine, "mc6854", device->tag, 0, mc6854->sr2 );
+	state_save_register_item( device->machine, "mc6854", device->tag, 0, mc6854->cts );
+	state_save_register_item( device->machine, "mc6854", device->tag, 0, mc6854->dcd );
+	state_save_register_item( device->machine, "mc6854", device->tag, 0, mc6854->tstate );
+	state_save_register_item_array( device->machine, "mc6854", device->tag, 0, mc6854->tfifo );
+	state_save_register_item( device->machine, "mc6854", device->tag, 0, mc6854->tones );
+	state_save_register_item( device->machine, "mc6854", device->tag, 0, mc6854->rstate );
+	state_save_register_item( device->machine, "mc6854", device->tag, 0, mc6854->rreg );
+	state_save_register_item( device->machine, "mc6854", device->tag, 0, mc6854->rones );
+	state_save_register_item( device->machine, "mc6854", device->tag, 0, mc6854->rsize );
+	state_save_register_item_array( device->machine, "mc6854", device->tag, 0, mc6854->rfifo );
+	state_save_register_item_array( device->machine, "mc6854", device->tag, 0, mc6854->frame );
+	state_save_register_item( device->machine, "mc6854", device->tag, 0, mc6854->flen );
+	state_save_register_item( device->machine, "mc6854", device->tag, 0, mc6854->fpos );
+
+	return DEVICE_START_OK;
 }
 
 
@@ -967,32 +1027,32 @@ void mc6854_reset ( void )
 /************************** configuration ****************************/
 
 
-
-void mc6854_config ( running_machine *machine, const mc6854_interface* iface )
+static DEVICE_SET_INFO( mc6854 )
 {
-	assert( iface );
-	mc6854 = auto_malloc( sizeof( * mc6854 ) );
-	assert( mc6854 );
-	mc6854->iface = iface;
-	mc6854->ttimer = timer_alloc(machine,  mc6854_tfifo_cb , NULL);
-	state_save_register_item(machine, "mc6854", NULL, 0, mc6854->cr1 );
-	state_save_register_item(machine, "mc6854", NULL, 0, mc6854->cr2 );
-	state_save_register_item(machine, "mc6854", NULL, 0, mc6854->cr3 );
-	state_save_register_item(machine, "mc6854", NULL, 0, mc6854->cr4 );
-	state_save_register_item(machine, "mc6854", NULL, 0, mc6854->sr1 );
-	state_save_register_item(machine, "mc6854", NULL, 0, mc6854->sr2 );
-	state_save_register_item(machine, "mc6854", NULL, 0, mc6854->cts );
-	state_save_register_item(machine, "mc6854", NULL, 0, mc6854->dcd );
-	state_save_register_item(machine, "mc6854", NULL, 0, mc6854->tstate );
-	state_save_register_item_array( machine, "mc6854", NULL, 0, mc6854->tfifo );
-	state_save_register_item(machine, "mc6854", NULL, 0, mc6854->tones );
-	state_save_register_item(machine, "mc6854", NULL, 0, mc6854->rstate );
-	state_save_register_item(machine, "mc6854", NULL, 0, mc6854->rreg );
-	state_save_register_item(machine, "mc6854", NULL, 0, mc6854->rones );
-	state_save_register_item(machine, "mc6854", NULL, 0, mc6854->rsize );
-	state_save_register_item_array( machine, "mc6854", NULL, 0, mc6854->rfifo );
-	state_save_register_item_array( machine, "mc6854", NULL, 0, mc6854->frame );
-	state_save_register_item(machine, "mc6854", NULL, 0, mc6854->flen );
-	state_save_register_item(machine, "mc6854", NULL, 0, mc6854->fpos );
-	mc6854_reset();
+	switch ( state ) {
+		/* no parameters to set */
+	}
+}
+
+
+DEVICE_GET_INFO( mc6854 ) {
+	switch ( state ) {
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(mc6854_t);			break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = 0;					break;
+		case DEVINFO_INT_CLASS:				info->i = DEVICE_CLASS_PERIPHERAL;		break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+	        case DEVINFO_FCT_SET_INFO:		     	info->set_info = DEVICE_SET_INFO_NAME(mc6854);  break;
+		case DEVINFO_FCT_START:				info->start = DEVICE_START_NAME(mc6854);	break;
+		case DEVINFO_FCT_STOP:				/* nothing */					break;
+		case DEVINFO_FCT_RESET:				info->reset = DEVICE_RESET_NAME(mc6854);	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:				info->s = "Motorola MC6854 ADLC";		break;
+		case DEVINFO_STR_FAMILY:			info->s = "MC6854";				break;
+		case DEVINFO_STR_VERSION:			info->s = "1.00";				break;
+		case DEVINFO_STR_SOURCE_FILE:			info->s = __FILE__;				break;
+		case DEVINFO_STR_CREDITS:			info->s = "Copyright the MAME and MESS Teams";  break;
+	}
 }
