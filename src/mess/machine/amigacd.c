@@ -319,7 +319,7 @@ static WRITE16_HANDLER( amiga_dmac_w )
 		case 0x50:
 		{
 			LOG(( "DMAC: PC=%08x - CDROM CMD Write - data = %04x\n", cpu_get_pc(space->cpu), data ));
-			matsucd_command_w( data );
+			matsucd_command_w( space->machine, data );
 		}
 		break;
 

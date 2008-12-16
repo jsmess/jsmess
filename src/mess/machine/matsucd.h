@@ -25,5 +25,5 @@ extern void matsucd_read_next_block( void );
 extern int matsucd_get_next_byte( UINT8 *data );
 
 /* main command interface */
-extern void matsucd_command_w( UINT8 data );
+extern void matsucd_command_w( running_machine *machine, UINT8 data );
 extern UINT8 matsucd_response_r( void );
