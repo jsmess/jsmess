@@ -14,12 +14,6 @@
 
 #ifndef SDLMAME_WIN32
 
-#if (defined SDLMAME_MACOSX) || (defined SDLMAME_FREEBSD) || (defined SDLMAME_SOLARIS) || (defined SDLMAME_OS2)
-#define THREAD_COOPERATIVE      (0)
-#else
-#define THREAD_COOPERATIVE		(1)
-#endif
-
 /***************************************************************************
     SYNCHRONIZATION INTERFACES - Events
 ***************************************************************************/
@@ -27,6 +21,7 @@
 /* osd_event is an opaque type which represents a setable/resetable event */
 
 typedef struct _osd_event osd_event;
+
 
 /*-----------------------------------------------------------------------------
     osd_lock_event_alloc: allocate a new event
@@ -43,6 +38,7 @@ typedef struct _osd_event osd_event;
         A pointer to the allocated event.
 -----------------------------------------------------------------------------*/
 osd_event *osd_event_alloc(int manualreset, int initialstate);
+
 
 /*-----------------------------------------------------------------------------
     osd_event_wait: wait for an event to be signalled
@@ -61,6 +57,7 @@ osd_event *osd_event_alloc(int manualreset, int initialstate);
 -----------------------------------------------------------------------------*/
 int osd_event_wait(osd_event *event, osd_ticks_t timeout);
 
+
 /*-----------------------------------------------------------------------------
     osd_event_reset: reset an event to non-signalled state
 
@@ -73,6 +70,7 @@ int osd_event_wait(osd_event *event, osd_ticks_t timeout);
 	    None
 -----------------------------------------------------------------------------*/
 void osd_event_reset(osd_event *event);
+
 
 /*-----------------------------------------------------------------------------
     osd_event_set: set an event to signalled state
@@ -113,6 +111,7 @@ void osd_event_free(osd_event *event);
 /* osd_thread is an opaque type which represents a thread */
 typedef struct _osd_thread osd_thread;
 
+
 /* osd_thread_callback is a callback function that will be called from the thread */
 typedef void *(*osd_thread_callback)(void *param);
 
@@ -146,6 +145,7 @@ osd_thread *osd_thread_create(osd_thread_callback callback, void *cbparam);
 -----------------------------------------------------------------------------*/
 int osd_thread_adjust_priority(osd_thread *thread, int adjust);
 
+
 /*-----------------------------------------------------------------------------
     osd_thread_cpu_affinity: change cpu affinity of a thread
 
@@ -161,6 +161,7 @@ int osd_thread_adjust_priority(osd_thread *thread, int adjust);
         TRUE on success, FALSE on failure
 -----------------------------------------------------------------------------*/
 int osd_thread_cpu_affinity(osd_thread *thread, UINT32 mask);
+
 
 /*-----------------------------------------------------------------------------
     osd_thread_wait_free: wait for thread to finish and free resources

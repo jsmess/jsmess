@@ -202,19 +202,46 @@ static const options_entry mame_sdl_options[] =
 
 	// joystick mapping
 	{ NULL, 		                         NULL,   OPTION_HEADER,     "SDL JOYSTICK MAPPING" },
-	{ SDLOPTION_JOYMAP,                      "0",    OPTION_BOOLEAN,    "enable physical to logical joystick mapping" },
-	{ SDLOPTION_JOYMAP_FILE,                "joymap.dat", 0,            "joymap filename" },
-	{ SDLOPTION_SIXAXIS,			        "0",	 OPTION_BOOLEAN,    "Use special handling for PS3 Sixaxis controllers" },
+	{ SDLOPTION_JOYINDEX "1",                SDLOPTVAL_AUTO, 0,         "name of joystick mapped to joystick #1" },
+	{ SDLOPTION_JOYINDEX "2",                SDLOPTVAL_AUTO, 0,         "name of joystick mapped to joystick #2" },
+	{ SDLOPTION_JOYINDEX "3",                SDLOPTVAL_AUTO, 0,         "name of joystick mapped to joystick #3" },
+	{ SDLOPTION_JOYINDEX "4",                SDLOPTVAL_AUTO, 0,         "name of joystick mapped to joystick #4" },
+	{ SDLOPTION_JOYINDEX "5",                SDLOPTVAL_AUTO, 0,         "name of joystick mapped to joystick #5" },
+	{ SDLOPTION_JOYINDEX "6",                SDLOPTVAL_AUTO, 0,         "name of joystick mapped to joystick #6" },
+	{ SDLOPTION_JOYINDEX "7",                SDLOPTVAL_AUTO, 0,         "name of joystick mapped to joystick #7" },
+	{ SDLOPTION_JOYINDEX "8",                SDLOPTVAL_AUTO, 0,         "name of joystick mapped to joystick #8" },
+	{ SDLOPTION_SIXAXIS,			         "0",	 OPTION_BOOLEAN,    "Use special handling for PS3 Sixaxis controllers" },
 
+#if (SDL_VERSION_ATLEAST(1,3,0))
+	{ NULL, 		                         NULL,   OPTION_HEADER,     "SDL MOUSE MAPPING" },
+	{ SDLOPTION_MOUSEINDEX "1",              SDLOPTVAL_AUTO, 0,         "name of mouse mapped to mouse #1" },
+	{ SDLOPTION_MOUSEINDEX "2",              SDLOPTVAL_AUTO, 0,         "name of mouse mapped to mouse #2" },
+	{ SDLOPTION_MOUSEINDEX "3",              SDLOPTVAL_AUTO, 0,         "name of mouse mapped to mouse #3" },
+	{ SDLOPTION_MOUSEINDEX "4",              SDLOPTVAL_AUTO, 0,         "name of mouse mapped to mouse #4" },
+	{ SDLOPTION_MOUSEINDEX "5",              SDLOPTVAL_AUTO, 0,         "name of mouse mapped to mouse #5" },
+	{ SDLOPTION_MOUSEINDEX "6",              SDLOPTVAL_AUTO, 0,         "name of mouse mapped to mouse #6" },
+	{ SDLOPTION_MOUSEINDEX "7",              SDLOPTVAL_AUTO, 0,         "name of mouse mapped to mouse #7" },
+	{ SDLOPTION_MOUSEINDEX "8",              SDLOPTVAL_AUTO, 0,         "name of mouse mapped to mouse #8" },
+
+	{ NULL, 		                         NULL,   OPTION_HEADER,     "SDL KEYBOARD MAPPING" },
+	{ SDLOPTION_KEYBINDEX "1",               SDLOPTVAL_AUTO, 0,         "name of keyboard mapped to keyboard #1" },
+	{ SDLOPTION_KEYBINDEX "2",               SDLOPTVAL_AUTO, 0,         "name of keyboard mapped to keyboard #2" },
+	{ SDLOPTION_KEYBINDEX "3",               SDLOPTVAL_AUTO, 0,         "name of keyboard mapped to keyboard #3" },
+	{ SDLOPTION_KEYBINDEX "4",               SDLOPTVAL_AUTO, 0,         "name of keyboard mapped to keyboard #4" },
+	{ SDLOPTION_KEYBINDEX "5",               SDLOPTVAL_AUTO, 0,         "name of keyboard mapped to keyboard #5" },
+	{ SDLOPTION_KEYBINDEX "6",               SDLOPTVAL_AUTO, 0,         "name of keyboard mapped to keyboard #6" },
+	{ SDLOPTION_KEYBINDEX "7",               SDLOPTVAL_AUTO, 0,         "name of keyboard mapped to keyboard #7" },
+	{ SDLOPTION_KEYBINDEX "8",               SDLOPTVAL_AUTO, 0,         "name of keyboard mapped to keyboard #8" },
+#endif
 	// SDL low level driver options
 	{ NULL, 		                         NULL,   OPTION_HEADER,     "SDL LOWLEVEL DRIVER OPTIONS" },
-	{ SDLOPTION_VIDEODRIVER ";vd",       SDLOPTVAL_AUTO,   0,           "sdl video driver to use ('x11', 'directfb', ... or 'auto' for SDL default" },
+	{ SDLOPTION_VIDEODRIVER ";vd",           SDLOPTVAL_AUTO,  0,        "sdl video driver to use ('x11', 'directfb', ... or 'auto' for SDL default" },
 #if (SDL_VERSION_ATLEAST(1,3,0))
-	{ SDLOPTION_RENDERDRIVER ";rd",      SDLOPTVAL_AUTO,   0,           "sdl render driver to use ('software', 'opengl', 'directfb' ... or 'auto' for SDL default" },
+	{ SDLOPTION_RENDERDRIVER ";rd",          SDLOPTVAL_AUTO,  0,        "sdl render driver to use ('software', 'opengl', 'directfb' ... or 'auto' for SDL default" },
 #endif
-	{ SDLOPTION_AUDIODRIVER ";ad",       SDLOPTVAL_AUTO,   0,           "sdl audio driver to use ('alsa', 'arts', ... or 'auto' for SDL default" },
+	{ SDLOPTION_AUDIODRIVER ";ad",           SDLOPTVAL_AUTO,  0,        "sdl audio driver to use ('alsa', 'arts', ... or 'auto' for SDL default" },
 #if USE_OPENGL
- 	{ SDLOPTION_GL_LIB,                   SDLOPTVAL_GLLIB, 0,           "alternative libGL.so to use; 'auto' for system default" },
+ 	{ SDLOPTION_GL_LIB,                      SDLOPTVAL_GLLIB, 0,        "alternative libGL.so to use; 'auto' for system default" },
 #endif
 
 	// End of list
@@ -414,6 +441,7 @@ static void defines_verbose(void)
 	mame_printf_verbose("Build version:      %s\n", build_version);
 	mame_printf_verbose("Build architecure:  ");
 	MACRO_VERBOSE(SDLMAME_ARCH);
+	MACRO_VERBOSE(DISTRO);
 	mame_printf_verbose("\n");
 	mame_printf_verbose("Build defines:      ");
 	MACRO_VERBOSE(SDLMAME_UNIX);
@@ -451,7 +479,63 @@ static void defines_verbose(void)
 	MACRO_VERBOSE(__ppc__);
 	MACRO_VERBOSE(__ppc64__);
 	mame_printf_verbose("\n");
+	mame_printf_verbose("Compiler defines C: ");
+	MACRO_VERBOSE(_FORTIFY_SOURCE);
+	MACRO_VERBOSE(__USE_FORTIFY_LEVEL);
+	mame_printf_verbose("\n");
 }
+
+//============================================================
+//	osd_sdl_info
+//============================================================
+
+static void osd_sdl_info(void)
+{
+#if SDL_VERSION_ATLEAST(1,3,0)
+	int i, cur, num = SDL_GetNumVideoDrivers();
+	
+	mame_printf_verbose("Available videodrivers: ");
+	for (i=0;i<num;i++)
+	{
+		const char *name = SDL_GetVideoDriver(i);
+		mame_printf_verbose("%s ", name);
+	}
+	mame_printf_verbose("\n");
+	mame_printf_verbose("Current Videodriver: %s\n", SDL_GetCurrentVideoDriver());
+	num = SDL_GetNumVideoDisplays();
+	cur = SDL_GetCurrentVideoDisplay();
+	for (i=0;i<num;i++)
+	{
+		SDL_DisplayMode mode;
+		int j;
+		
+		SDL_SelectVideoDisplay(i);
+		mame_printf_verbose("\tDisplay #%d\n", i);
+		if (SDL_GetDesktopDisplayMode(&mode));
+			mame_printf_verbose("\t\tDesktop Mode:         %dx%d-%d@%d\n", mode.w, mode.h, SDL_BITSPERPIXEL(mode.format), mode.refresh_rate);
+		if (SDL_GetFullscreenDisplayMode(&mode));
+			mame_printf_verbose("\t\tFullscreen Mode:      %dx%d-%d@%d\n", mode.w, mode.h, SDL_BITSPERPIXEL(mode.format), mode.refresh_rate);
+		if (SDL_GetCurrentDisplayMode(&mode));
+			mame_printf_verbose("\t\tCurrent Display Mode: %dx%d-%d@%d\n", mode.w, mode.h, SDL_BITSPERPIXEL(mode.format), mode.refresh_rate);
+		mame_printf_verbose("\t\tRenderdrivers:\n");
+		for (j=0; j<SDL_GetNumRenderDrivers(); j++)
+		{
+			SDL_RendererInfo info;
+			SDL_GetRenderDriverInfo(j, &info);
+			mame_printf_verbose("\t\t\t%10s (%dx%d)\n", info.name, info.max_texture_width, info.max_texture_height);
+		}
+	}
+	SDL_SelectVideoDisplay(cur);
+
+	mame_printf_verbose("Available audio drivers: \n");
+	num = SDL_GetNumAudioDrivers();
+	for (i=0;i<num;i++)
+	{
+		mame_printf_verbose("\t%-20s\n", SDL_GetAudioDriver(i));
+	}
+#endif
+}
+
 
 //============================================================
 //	osd_init
@@ -505,6 +589,7 @@ void osd_init(running_machine *machine)
 			ShowError("Could not initialize SDL", SDL_GetError());
 			exit(-1);
 		}
+		osd_sdl_info();
 	}
 	// must be before sdlvideo_init!
 	add_exit_callback(machine, osd_exit);

@@ -22,7 +22,6 @@
 #include "render.h"
 #include "options.h"
 #include "driver.h"
-#include "deprecat.h"
 
 // standard SDL headers
 #include <SDL/SDL.h>
@@ -245,48 +244,6 @@ INLINE void set_blendmode(sdl_info *sdl, int blendmode)
 	}
 }
 
-INLINE UINT32 ycc_to_rgb(UINT8 y, UINT8 cb, UINT8 cr)
-{
-	/* original equations:
-
-        C = Y - 16
-        D = Cb - 128
-        E = Cr - 128
-
-        R = clip(( 298 * C           + 409 * E + 128) >> 8)
-        G = clip(( 298 * C - 100 * D - 208 * E + 128) >> 8)
-        B = clip(( 298 * C + 516 * D           + 128) >> 8)
-
-        R = clip(( 298 * (Y - 16)                    + 409 * (Cr - 128) + 128) >> 8)
-        G = clip(( 298 * (Y - 16) - 100 * (Cb - 128) - 208 * (Cr - 128) + 128) >> 8)
-        B = clip(( 298 * (Y - 16) + 516 * (Cb - 128)                    + 128) >> 8)
-
-        R = clip(( 298 * Y - 298 * 16                        + 409 * Cr - 409 * 128 + 128) >> 8)
-        G = clip(( 298 * Y - 298 * 16 - 100 * Cb + 100 * 128 - 208 * Cr + 208 * 128 + 128) >> 8)
-        B = clip(( 298 * Y - 298 * 16 + 516 * Cb - 516 * 128                        + 128) >> 8)
-
-        R = clip(( 298 * Y - 298 * 16                        + 409 * Cr - 409 * 128 + 128) >> 8)
-        G = clip(( 298 * Y - 298 * 16 - 100 * Cb + 100 * 128 - 208 * Cr + 208 * 128 + 128) >> 8)
-        B = clip(( 298 * Y - 298 * 16 + 516 * Cb - 516 * 128                        + 128) >> 8)
-    */
-	//int r, g, b, common;
-	unsigned int r, g, b, common;
-
-	common = 298 * y - 56992;
-	r = (common +            409 * cr);
-	g = (common - 100 * cb - 208 * cr + 91776);
-	b = (common + 516 * cb - 13696);
-
-	if ((int) r < 0) r = 0;
-	if ((int) g < 0) g = 0;
-	if ((int) b < 0) b = 0;
-
-	/* MAME_RGB does upper clamping */
-
-	return MAKE_RGB(r >> 8, g >> 8, b >> 8);
-}
-
-
 //============================================================
 //  PROTOTYPES
 //============================================================
@@ -374,9 +331,9 @@ static void scale2x_rgb15_paletted_argb1555(texture_info *texture, const render_
 //============================================================
 
 static void texture_set_data(texture_info *texture, const render_texinfo *texsource);
-static texture_info *texture_create(sdl_info *sdl, sdl_window_info *window, const render_texinfo *texsource, UINT32 flags);
+static texture_info *texture_create(sdl_window_info *window, const render_texinfo *texsource, UINT32 flags);
 static texture_info *texture_find(sdl_info *sdl, const render_primitive *prim);
-static texture_info * texture_update(sdl_info *sdl, sdl_window_info *window, const render_primitive *prim, int shaderIdx);
+static texture_info * texture_update(sdl_window_info *window, const render_primitive *prim, int shaderIdx);
 static void texture_all_disable(sdl_info *sdl);
 static void texture_disable(sdl_info *sdl, texture_info * texture);
 
@@ -540,6 +497,8 @@ static int drawogl_window_create(sdl_window_info *window, int width, int height)
 	
 	sdl->gl_context_id = SDL_GL_CreateContext(window->window_id);
 
+	SDL_GL_SetSwapInterval(options_get_bool(mame_options(), SDLOPTION_WAITVSYNC) ? 2 : 0);
+	
 #else
 	sdl->extra_flags = (window->fullscreen ?  SDL_FULLSCREEN : SDL_RESIZABLE);
 	sdl->extra_flags |= SDL_OPENGL | SDL_DOUBLEBUF;
@@ -1321,7 +1280,7 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 
 				set_blendmode(sdl, PRIMFLAG_GET_BLENDMODE(prim->flags));
 
-				texture = texture_update(sdl, window, prim, 0);
+				texture = texture_update(window, prim, 0);
 
 				if ( texture && texture->type==TEXTURE_TYPE_SHADER )
 				{
@@ -1352,7 +1311,7 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 
 						if(i>0) // first fetch already done
 						{
-							texture = texture_update(sdl, window, prim, i);
+							texture = texture_update(window, prim, i);
 						}
 						glDrawArrays(GL_QUADS, 0, 4);
 					}
@@ -1897,9 +1856,10 @@ static int texture_fbo_create(UINT32 text_unit, UINT32 text_name, UINT32 fbo_nam
 	return 0;
 }
 
-static int texture_shader_create(sdl_info *sdl, sdl_window_info *window, 
+static int texture_shader_create(sdl_window_info *window, 
                                  const render_texinfo *texsource, texture_info *texture, UINT32 flags)
 {
+	sdl_info *sdl = window->dxdata;
 	int uniform_location;
 	int lut_table_width_pow2=0;
 	int lut_table_height_pow2=0;
@@ -2258,8 +2218,9 @@ static int texture_shader_create(sdl_info *sdl, sdl_window_info *window,
 	return 0;
 }
 
-static texture_info *texture_create(sdl_info *sdl, sdl_window_info *window, const render_texinfo *texsource, UINT32 flags)
+static texture_info *texture_create(sdl_window_info *window, const render_texinfo *texsource, UINT32 flags)
 {
+	sdl_info *sdl = window->dxdata;
 	texture_info *texture;
 	
 	// allocate a new texture
@@ -2344,7 +2305,7 @@ static texture_info *texture_create(sdl_info *sdl, sdl_window_info *window, cons
 
 	if ( texture->type==TEXTURE_TYPE_SHADER )
 	{
-		if ( texture_shader_create(sdl, window, texsource, texture, flags) )
+		if ( texture_shader_create(window, texsource, texture, flags) )
         {
             free(texture);
             return NULL;
@@ -2577,9 +2538,10 @@ static texture_info *texture_find(sdl_info *sdl, const render_primitive *prim)
 //  texture_update
 //============================================================
 
-static void texture_coord_update(sdl_info *sdl, sdl_window_info *window, 
+static void texture_coord_update(sdl_window_info *window, 
                                  texture_info *texture, const render_primitive *prim, int shaderIdx)
 {
+	sdl_info *sdl = window->dxdata;
 	float ustart, ustop;			// beginning/ending U coordinates
 	float vstart, vstop;			// beginning/ending V coordinates
 	float du, dv;
@@ -2729,8 +2691,9 @@ static void texture_mpass_flip(sdl_info *sdl, texture_info *texture, int shaderI
 	}
 }
 
-static void texture_shader_update(sdl_info *sdl, sdl_window_info *window, texture_info *texture, int shaderIdx)
+static void texture_shader_update(sdl_window_info *window, texture_info *texture, int shaderIdx)
 {
+	sdl_info *sdl = window->dxdata;
 	if ( !texture->lut_texture )
 	{
 		int uniform_location, scrnum;
@@ -2742,7 +2705,7 @@ static void texture_shader_update(sdl_info *sdl, sdl_window_info *window, textur
 
 		scrnum = 0;
 		container = (render_container *)NULL;
-		for (screen = video_screen_first(Machine->config); screen != NULL; screen = video_screen_next(screen))
+		for (screen = video_screen_first(window->machine->config); screen != NULL; screen = video_screen_next(screen))
 		{
 			if (scrnum == window->start_viewscreen)
 			{
@@ -2780,15 +2743,16 @@ static void texture_shader_update(sdl_info *sdl, sdl_window_info *window, textur
 	}
 }
 
-static texture_info * texture_update(sdl_info *sdl, sdl_window_info *window, const render_primitive *prim, int shaderIdx)
+static texture_info * texture_update(sdl_window_info *window, const render_primitive *prim, int shaderIdx)
 {
+	sdl_info *sdl = window->dxdata;
 	texture_info *texture = texture_find(sdl, prim);
 	int texBound = 0;
 
 	// if we didn't find one, create a new texture
 	if (texture == NULL && prim->texture.base != NULL)
     {
-            texture = texture_create(sdl, window, &prim->texture, prim->flags); 
+            texture = texture_create(window, &prim->texture, prim->flags); 
 
     } 
 	else if (texture != NULL)
@@ -2813,7 +2777,7 @@ static texture_info * texture_update(sdl_info *sdl, sdl_window_info *window, con
 	{
 		if ( texture->type == TEXTURE_TYPE_SHADER )
 		{
-			texture_shader_update(sdl, window, texture, shaderIdx);
+			texture_shader_update(window, texture, shaderIdx);
 			if ( sdl->glsl_program_num>1 )
 			{
 				texture_mpass_flip(sdl, texture, shaderIdx);
@@ -2835,7 +2799,7 @@ static texture_info * texture_update(sdl_info *sdl, sdl_window_info *window, con
 		if (!texBound) {
 			glBindTexture(texture->texTarget, texture->texture);
 		}
-		texture_coord_update(sdl, window, texture, prim, shaderIdx);
+		texture_coord_update(window, texture, prim, shaderIdx);
 
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 		if(sdl->usevbo)

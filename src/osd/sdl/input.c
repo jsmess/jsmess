@@ -46,22 +46,22 @@ enum
 	POVDIR_DOWN
 };
 
-// introduced in 1.3
-
-#ifndef SDLK_INDEX
-#define SDLK_INDEX(x)		(x)
-#endif
-
 #define MAX_KEYS			256
 #define MAX_AXES			8
 #define MAX_BUTTONS			32
 #define MAX_HATS			8
 #define MAX_POV				4
-#define MAX_JOYSTICKS		16
+#define MAX_DEVMAP_ENTRIES	16
 
 //============================================================
 //  MACROS
 //============================================================
+
+// introduced in 1.3
+
+#ifndef SDLK_INDEX
+#define SDLK_INDEX(x)		(x)
+#endif
 
 
 //============================================================
@@ -118,6 +118,7 @@ struct _device_info
 	};
 };
 
+
 //============================================================
 //  LOCAL VARIABLES
 //============================================================
@@ -151,15 +152,24 @@ static device_info *		lightgun_list;
 static device_info *		joystick_list;
 
 // joystick mapper
-static struct 
-{
-	char	*name;
-	int		physical;
-} joy_map[MAX_JOYSTICKS];
 
-static int joy_logical[MAX_JOYSTICKS];
+typedef struct _device_map_t device_map_t;
+struct _device_map_t 
+{
+	struct {
+		char	*name;
+		int		physical;
+	} map[MAX_DEVMAP_ENTRIES];
+	int 	logical[MAX_DEVMAP_ENTRIES];
+	int     initialized;
+};
+
+static device_map_t joy_map;
+static device_map_t mouse_map;
+static device_map_t keyboard_map;
 
 static int sixaxis_mode;
+
 
 //============================================================
 //  PROTOTYPES
@@ -181,6 +191,7 @@ static INT32 generic_button_get_state(void *device_internal, void *item_internal
 static INT32 generic_axis_get_state(void *device_internal, void *item_internal);
 static device_info *generic_device_find_index(device_info *devlist_head, int index);
 
+
 //============================================================
 //  KEYBOARD/JOYSTICK LIST
 //============================================================
@@ -200,7 +211,12 @@ struct _kt_table {
 
 #define OSD_SDL_INDEX(x) (x)
 #define OSD_SDL_INDEX_KEYSYM(keysym) ((keysym)->scancode)
+
 #define GET_WINDOW(ev) window_from_id((ev)->windowID)
+// FIXME: sdl does not properly report the window for certain ops.
+#define GET_FOCUS_WINDOW(ev) focus_window
+//#define GET_FOCUS_WINDOW(ev) window_from_id((ev)->windowID)
+
 
 #define KTT_ENTRY0(MAME, SDL, VK, AS, UI) { ITEM_ID_ ## MAME, SDL_SCANCODE_ ## SDL, "ITEM_ID_" #MAME, (char *) UI }
 #define KTT_ENTRY1(MAME, SDL) KTT_ENTRY0(MAME, SDL, MAME, MAME, #MAME)
@@ -325,6 +341,7 @@ static kt_table sdl_key_trans_table[] =
 #define OSD_SDL_INDEX(x) (SDLK_INDEX(x)-SDLK_FIRST)
 #define OSD_SDL_INDEX_KEYSYM(keysym) (OSD_SDL_INDEX((keysym)->sym))
 #define GET_WINDOW(ev) sdl_window_list
+#define GET_FOCUS_WINDOW(ev) sdl_window_list
 
 #define KTT_ENTRY0(MAME, SDL, VK, AS, UI) { ITEM_ID_ ## MAME, SDLK_ ## SDL, "ITEM_ID_" #MAME, (char *) UI }
 #define KTT_ENTRY1(MAME, SDL) KTT_ENTRY0(MAME, SDL, MAME, MAME, #MAME)
@@ -446,9 +463,7 @@ static kt_table sdl_key_trans_table[] =
 };
 #endif
 
-
 typedef struct _key_lookup_table key_lookup_table;
-
 struct _key_lookup_table 
 {
 	int code;
@@ -526,16 +541,17 @@ static key_lookup_table sdl_lookup_table[] =
 };
 #endif
 
+
 //============================================================
 //  INLINE FUNCTIONS
 //============================================================
 
-static int joy_map_leastfree(void)
+static int devmap_leastfree(device_map_t *devmap)
 {
 	int i;
-	for (i=0;i<MAX_JOYSTICKS;i++)
+	for (i=0;i<MAX_DEVMAP_ENTRIES;i++)
 	{
-		if (*joy_map[i].name == 0)
+		if (*devmap->map[i].name == 0)
 			return i;
 	}
 	return -1;
@@ -574,68 +590,89 @@ static char *remove_spaces(const char *s)
 	return r;
 }
 
+static void devmap_register(device_map_t *devmap, int physical_idx, char *name)
+{
+	int found = 0;
+	int stick, i;
+
+	for (i=0;i<MAX_DEVMAP_ENTRIES;i++)
+	{
+		if (strcmp(name,devmap->map[i].name) == 0 && devmap->map[i].physical < 0)
+		{
+			devmap->map[i].physical = physical_idx;
+			found = 1;
+			devmap->logical[physical_idx] = i;
+		}
+	}
+	if (found == 0)
+	{
+		stick = devmap_leastfree(devmap);
+		devmap->map[stick].physical = physical_idx;
+		devmap->map[stick].name = name;
+		devmap->logical[physical_idx] = stick;
+	}
+	
+}
+
 //============================================================
 //  init_joymap
 //============================================================
 
-static void init_joymap(void)
+static void devmap_init(device_map_t *devmap, const char *opt, int max_devices, const char *label)
 {
-	int stick;
-
-	for (stick=0; stick < MAX_JOYSTICKS; stick++)
-	{
-		joy_map[stick].name = (char *)"";
-		joy_map[stick].physical = -1;
-		joy_logical[stick] = -1;
-	}
-		
-	if (options_get_bool(mame_options(), SDLOPTION_JOYMAP))
-	{
-		FILE *joymap_file;
-		int line = 1;
-		char *joymap_filename;
+	int dev;
+	char defname[20];
 	
-		joymap_filename = (char *)options_get_string(mame_options(), SDLOPTION_JOYMAP_FILE);
-		mame_printf_verbose("Joymap: Start reading joymap_file %s\n", joymap_filename);
+	assert(max_devices <= MAX_DEVMAP_ENTRIES); 
+	
+	for (dev = 0; dev < MAX_DEVMAP_ENTRIES; dev++)
+	{
+		devmap->map[dev].name = (char *)"";
+		devmap->map[dev].physical = -1;
+		devmap->logical[dev] = -1;
+	}
+	devmap->initialized = 0;
+	
+	for (dev = 0; dev < max_devices; dev++)
+	{
+		const char *dev_name;
+		sprintf(defname, "%s%d", opt, dev + 1);
 
-		joymap_file = fopen(joymap_filename, "r");
-
-		if (joymap_file == NULL)
+		dev_name = options_get_string(mame_options(), defname);
+		if (dev_name && *dev_name && strcmp(dev_name,SDLOPTVAL_AUTO))
 		{
-			mame_printf_warning( "Joymap: Unable to open joymap %s - using default mapping\n", joymap_filename);
-		}
-		else
-		{
-			int i, logical;
-			char buf[256];
-			char name[65];
-			
-			while (!feof(joymap_file) && fgets(buf, 255, joymap_file))
-			{
-				if (*buf && buf[0] && buf[0] != '#')
-				{
-					buf[255]=0;
-					i=strlen(buf);
-					if (i && buf[i-1] == '\n')
-						buf[i-1] = 0;
-					memset(name, 0, 65);
-					logical = -1;
-					sscanf(buf, "%x %64c\n", &logical, name);
-					if ((logical >=0 ) && (logical < MAX_JOYSTICKS))
-					{
-						joy_map[logical].name = remove_spaces(name);
-						mame_printf_verbose("Joymap: Logical id %d: %s\n", logical, joy_map[logical].name);
-					}
-					else
-						mame_printf_warning("Joymap: Error reading map: Line %d: %s\n", line, buf);
-				}
-				line++;
-			}
-			fclose(joymap_file);
-			mame_printf_verbose("Joymap: Processed %d lines\n", line);
+			devmap->map[dev].name = remove_spaces(dev_name);
+			mame_printf_verbose("%s: Logical id %d: %s\n", label, dev + 1, joy_map.map[dev].name);
+			devmap->initialized = 1;
 		}
 	}
 }
+
+static device_info *devmap_class_register(running_machine *machine, device_map_t *devmap, 
+		int index, device_info **devlist, input_device_class devclass)
+{
+	device_info *devinfo = NULL;
+	char tempname[20];
+
+	if (*devmap->map[index].name == 0)
+	{
+		/* only map place holders if there were mappings specified is enabled */
+		if (devmap->initialized)
+		{
+			sprintf(tempname, "NC%d", index);
+			devinfo = generic_device_alloc(devlist, tempname);
+			devinfo->device = input_device_add(machine, devclass, devinfo->name, devinfo);
+		}
+		return NULL;
+	}
+	else
+	{
+		devinfo = generic_device_alloc(devlist, devmap->map[index].name);
+		devinfo->device = input_device_add(machine, devclass, devinfo->name, devinfo);
+	}
+	return devinfo;
+}
+
 
 //============================================================
 //  sdlinput_register_joysticks
@@ -644,62 +681,29 @@ static void init_joymap(void)
 static void sdlinput_register_joysticks(running_machine *machine)
 {
 	device_info *devinfo;
-	int physical_stick, axis, button, hat, stick, i;
+	int physical_stick, axis, button, hat, stick;
 	char tempname[512];
 	SDL_Joystick *joy;
 
-	init_joymap();
+	devmap_init(&joy_map, SDLOPTION_JOYINDEX, 8, "Joystick mapping");
 
 	mame_printf_verbose("Joystick: Start initialization\n");
 	for (physical_stick = 0; physical_stick < SDL_NumJoysticks(); physical_stick++)
 	{
 		char *joy_name = remove_spaces(SDL_JoystickName(physical_stick));
-		int found = 0;
 		
-		for (i=0;i<MAX_JOYSTICKS;i++)
-		{
-			if (strcmp(joy_name,joy_map[i].name) == 0 && joy_map[i].physical < 0)
-			{
-				joy_map[i].physical = physical_stick;
-				found = 1;
-				joy_logical[physical_stick] = i;
-			}
-		}
-		if (found == 0)
-		{
-			stick = joy_map_leastfree();
-			joy_map[stick].physical = physical_stick;
-			joy_map[stick].name = joy_name;
-			joy_logical[physical_stick] = stick;
-		}
+		devmap_register(&joy_map, physical_stick, joy_name);
 	}
 
-	for (stick = 0; stick < MAX_JOYSTICKS; stick++)
+	for (stick = 0; stick < MAX_DEVMAP_ENTRIES; stick++)
 	{
-		if (*joy_map[stick].name == 0)
-		{
-			devinfo = NULL;
-			/* only map place holders if remapjoys is enabled */
-			if (options_get_bool(mame_options(), SDLOPTION_JOYMAP))
-			{
-				sprintf(tempname, "NC%d", stick);
-				devinfo = generic_device_alloc(&joystick_list, tempname);
-				devinfo->device = input_device_add(machine, DEVICE_CLASS_JOYSTICK, devinfo->name, devinfo);
-			}
-		}
-		else
-		{
-			devinfo = generic_device_alloc(&joystick_list, joy_map[stick].name);
-			devinfo->device = input_device_add(machine, DEVICE_CLASS_JOYSTICK, devinfo->name, devinfo);
-		}
-		
+		devinfo = devmap_class_register(machine, &joy_map, stick, &joystick_list, DEVICE_CLASS_JOYSTICK);
 
-		physical_stick = joy_map[stick].physical;
-		
-		if (physical_stick < 0)
+		if (devinfo == NULL)
 			continue;
 		
-		// loop over all axes
+		physical_stick = joy_map.map[stick].physical;
+		
 		joy = SDL_JoystickOpen(physical_stick);
 
 		devinfo->joystick.device = joy;
@@ -765,6 +769,91 @@ static void sdlinput_register_joysticks(running_machine *machine)
 }
 
 //============================================================
+//  sdlinput_register_joysticks
+//============================================================
+
+#if (SDL_VERSION_ATLEAST(1,3,0))
+static void sdlinput_register_mice(running_machine *machine)
+{
+	int index, physical_mouse;
+	
+	mouse_enabled = options_get_bool(mame_options(), OPTION_MOUSE);
+
+	devmap_init(&mouse_map, SDLOPTION_MOUSEINDEX, 8, "Mouse mapping");
+
+	for (physical_mouse = 0; physical_mouse < SDL_GetNumMice(); physical_mouse++)
+	{
+		char *mouse_name = remove_spaces(SDL_GetMouseName(physical_mouse));
+		
+		devmap_register(&mouse_map, physical_mouse, mouse_name);
+	}
+
+	mame_printf_verbose("Mouse: Start initialization\n");
+	for (index = 0; index < MAX_DEVMAP_ENTRIES; index++)
+	{
+		device_info *devinfo;
+		char defname[90];
+		int button;
+
+		devinfo = devmap_class_register(machine, &mouse_map, index, &mouse_list, DEVICE_CLASS_MOUSE);
+
+		if (devinfo == NULL)
+			continue;
+	
+		// add the axes
+		sprintf(defname, "X %s", devinfo->name);
+		input_device_item_add(devinfo->device, defname, &devinfo->mouse.lX, ITEM_ID_XAXIS, generic_axis_get_state);
+		sprintf(defname, "Y %s", devinfo->name);
+		input_device_item_add(devinfo->device, defname, &devinfo->mouse.lY, ITEM_ID_YAXIS, generic_axis_get_state);
+	
+		for (button = 0; button < 4; button++)
+		{
+			sprintf(defname, "B%d", button + 1);
+	
+			input_device_item_add(devinfo->device, defname, &devinfo->mouse.buttons[button], ITEM_ID_BUTTON1+button, generic_button_get_state);
+		}
+	
+		if (0 && mouse_enabled)
+			SDL_SetRelativeMouseMode(index, 1);
+		mame_printf_verbose("Mouse: Registered %s\n", devinfo->name);
+	}
+	mame_printf_verbose("Mouse: End initialization\n");
+}
+#else
+static void sdlinput_register_mice(running_machine *machine)
+{
+	device_info *devinfo;
+	char defname[20];
+	int button;
+	
+	mame_printf_verbose("Mouse: Start initialization\n");
+
+	mouse_map.logical[0] = 0;
+
+	// SDL 1.2 has only 1 mouse - 1.3+ will also change that, so revisit this then
+	devinfo = generic_device_alloc(&mouse_list, "System mouse");
+	devinfo->device = input_device_add(machine, DEVICE_CLASS_MOUSE, devinfo->name, devinfo);
+
+	mouse_enabled = options_get_bool(mame_options(), OPTION_MOUSE);
+	
+	// add the axes
+	input_device_item_add(devinfo->device, "X", &devinfo->mouse.lX, ITEM_ID_XAXIS, generic_axis_get_state);
+	input_device_item_add(devinfo->device, "Y", &devinfo->mouse.lY, ITEM_ID_YAXIS, generic_axis_get_state);
+
+	for (button = 0; button < 4; button++)
+	{
+		sprintf(defname, "B%d", button + 1);
+
+		input_device_item_add(devinfo->device, defname, &devinfo->mouse.buttons[button], ITEM_ID_BUTTON1+button, generic_button_get_state);
+	}
+
+	mame_printf_verbose("Mouse: Registered %s\n", devinfo->name);
+	mame_printf_verbose("Mouse: End initialization\n");
+}
+#endif
+
+
+//============================================================
 //  lookup_sdl_code
 //============================================================
 
@@ -780,6 +869,7 @@ static int lookup_sdl_code(const char *scode)
 	}
 	return -1;
 }
+
 
 //============================================================
 //  lookup_mame_code
@@ -815,12 +905,14 @@ static int lookup_mame_code(const char *scode)
 }
 #endif
 
+
 //============================================================
 //  sdlinput_read_keymap
 //============================================================
 
-static kt_table * sdlinput_read_keymap(char *keymap_filename)
+static kt_table * sdlinput_read_keymap(void)
 {
+	char *keymap_filename;
 	kt_table *key_trans_table;
 	FILE *keymap_file;
 	int line = 1;
@@ -830,6 +922,10 @@ static kt_table * sdlinput_read_keymap(char *keymap_filename)
 	char sks[21];
 	char kns[21];
 
+	if (!options_get_bool(mame_options(), SDLOPTION_KEYMAP))
+		return sdl_key_trans_table;
+
+	keymap_filename = (char *)options_get_string(mame_options(), SDLOPTION_KEYMAP_FILE);
 	mame_printf_verbose("Keymap: Start reading keymap_file %s\n", keymap_filename);
 
 	keymap_file = fopen(keymap_filename, "r");
@@ -881,47 +977,73 @@ static kt_table * sdlinput_read_keymap(char *keymap_filename)
 	return key_trans_table;
 }
 
+
 //============================================================
-//  sdlinput_init
+//  sdlinput_register_keyboards
 //============================================================
 
-void sdlinput_init(running_machine *machine)
+#if (SDL_VERSION_ATLEAST(1,3,0))
+static void sdlinput_register_keyboards(running_machine *machine)
 {
-	device_info *devinfo;
-	int keynum, button;
-	char defname[20];
+	int physical_keyboard;
+	int index;
 	kt_table *key_trans_table;
 
-	keyboard_list = NULL;
-	joystick_list = NULL;
-	mouse_list = NULL;
-	lightgun_list = NULL;
+	key_trans_table = sdlinput_read_keymap();
+
+	devmap_init(&keyboard_map, SDLOPTION_KEYBINDEX, 8, "Keyboard mapping");
+
+	for (physical_keyboard = 0; physical_keyboard < SDL_GetNumKeyboards(); physical_keyboard++)
+	{
+		char defname[90];
+		snprintf(defname, sizeof(defname)-1, "Keyboard #%d", physical_keyboard + 1);
+		
+		devmap_register(&keyboard_map, physical_keyboard, defname);
+	}
+
+	mame_printf_verbose("Keyboard: Start initialization\n");
+	for (index = 0; index < MAX_DEVMAP_ENTRIES; index++)
+	{
+		device_info *devinfo;
+		char defname[90];
+		int keynum;
+
+		devinfo = devmap_class_register(machine, &keyboard_map, index, &keyboard_list, DEVICE_CLASS_KEYBOARD);
+
+		if (devinfo == NULL)
+			continue;
 	
-	app_has_mouse_focus = 1;
+		// populate it
+		for (keynum = 0; sdl_key_trans_table[keynum].mame_key >= 0; keynum++)
+		{
+			input_item_id itemid;
+			
+			itemid = key_trans_table[keynum].mame_key;
 
-	// get Sixaxis special mode info
-	sixaxis_mode = options_get_bool(mame_options(), SDLOPTION_SIXAXIS);
+			// generate the default / modified name
+			snprintf(defname, sizeof(defname)-1, "%s", key_trans_table[keynum].ui_name);
+			
+			// add the item to the device
+			input_device_item_add(devinfo->device, defname, &devinfo->keyboard.state[OSD_SDL_INDEX(key_trans_table[keynum].sdl_key)], itemid, generic_button_get_state);
+		}
 
-	// we need pause and exit callbacks
-	add_pause_callback(machine, sdlinput_pause);
-	add_exit_callback(machine, sdlinput_exit);
-
-	if (options_get_bool(mame_options(), SDLOPTION_KEYMAP))
-	{
-		char *keymap_filename;
-
-		keymap_filename = (char *)options_get_string(mame_options(), SDLOPTION_KEYMAP_FILE);
-
-		key_trans_table = sdlinput_read_keymap(keymap_filename);
+		mame_printf_verbose("Keyboard: Registered %s\n", devinfo->name);
 	}
-	else
-	{
-		key_trans_table = sdl_key_trans_table;
-	}
+	mame_printf_verbose("Keyboard: End initialization\n");
+}
+#else
+static void sdlinput_register_keyboards(running_machine *machine)
+{
+	device_info *devinfo;
+	char defname[20];
+	int keynum;
+	kt_table *key_trans_table;
 
-	// allocate a lock for input synchronizations
-	input_lock = osd_lock_alloc();
-	assert_always(input_lock != NULL, "Failed to allocate input_lock");
+	key_trans_table = sdlinput_read_keymap();
+
+	keyboard_map.logical[0] = 0;
+	
+	mame_printf_verbose("Keyboard: Start initialization\n");
 
 	// SDL 1.2 only has 1 keyboard (1.3+ will have multiple, this must be revisited then)
 	// add it now
@@ -943,12 +1065,38 @@ void sdlinput_init(running_machine *machine)
 		input_device_item_add(devinfo->device, defname, &devinfo->keyboard.state[OSD_SDL_INDEX(key_trans_table[keynum].sdl_key)], itemid, generic_button_get_state);
 	}
 
-	// SDL 1.2 has only 1 mouse - 1.3+ will also change that, so revisit this then
-	devinfo = generic_device_alloc(&mouse_list, "System mouse");
-	devinfo->device = input_device_add(machine, DEVICE_CLASS_MOUSE, devinfo->name, devinfo);
+	mame_printf_verbose("Keyboard: Registered %s\n", devinfo->name);
+	mame_printf_verbose("Keyboard: End initialization\n");
+}
+#endif
 
-	mouse_enabled = options_get_bool(mame_options(), OPTION_MOUSE);
+//============================================================
+//  sdlinput_init
+//============================================================
+
+void sdlinput_init(running_machine *machine)
+{
+	keyboard_list = NULL;
+	joystick_list = NULL;
+	mouse_list = NULL;
+	lightgun_list = NULL;
 	
+	app_has_mouse_focus = 1;
+
+	// we need pause and exit callbacks
+	add_pause_callback(machine, sdlinput_pause);
+	add_exit_callback(machine, sdlinput_exit);
+
+	// allocate a lock for input synchronizations
+	input_lock = osd_lock_alloc();
+	assert_always(input_lock != NULL, "Failed to allocate input_lock");
+
+	// register the keyboards
+	sdlinput_register_keyboards(machine);
+
+	// register the mice
+	sdlinput_register_mice(machine);
+
 #ifdef MAME_DEBUG
 	if (mouse_enabled)
 	{
@@ -956,17 +1104,8 @@ void sdlinput_init(running_machine *machine)
 		mouse_enabled = 0;
 	}
 #endif
-
-	// add the axes
-	input_device_item_add(devinfo->device, "X", &devinfo->mouse.lX, ITEM_ID_XAXIS, generic_axis_get_state);
-	input_device_item_add(devinfo->device, "Y", &devinfo->mouse.lY, ITEM_ID_YAXIS, generic_axis_get_state);
-
-	for (button = 0; button < 4; button++)
-	{
-		sprintf(defname, "B%d", button + 1);
-
-		input_device_item_add(devinfo->device, defname, &devinfo->mouse.buttons[button], ITEM_ID_BUTTON1+button, generic_button_get_state);
-	}
+	// get Sixaxis special mode info
+	sixaxis_mode = options_get_bool(mame_options(), SDLOPTION_SIXAXIS);
 
 	// register the joysticks
 	sdlinput_register_joysticks(machine);
@@ -1018,6 +1157,7 @@ sdl_window_info *sdlinput_get_focus_window(running_machine *machine)
 		return sdl_window_list;
 }
 
+
 //============================================================
 //  sdlinput_poll
 //============================================================
@@ -1029,6 +1169,7 @@ INLINE sdl_window_info * window_from_id(SDL_WindowID windowID)
 	
 	for (w = sdl_window_list; w != NULL; w = w->next)
 	{
+		//printf("w->window_id: %d\n", w->window_id);
 		if (w->window_id == windowID)
 		{
 			return w;
@@ -1059,19 +1200,26 @@ void sdlinput_process_events_buf(running_machine *machine)
 #endif
 }
 
+
 void sdlinput_poll(running_machine *machine)
 {
 	device_info *devinfo;
 	SDL_Event event;
+	int index;
 #if SDLMAME_EVENTS_IN_WORKER_THREAD
 	SDL_Event			loc_event_buf[MAX_BUF_EVENTS];
 	int					loc_event_buf_count;
 	int bufp;
 #endif
 
-	devinfo = mouse_list;
-	devinfo->mouse.lX = 0;
-	devinfo->mouse.lY = 0;
+	for (index=0; ;index++)
+	{
+		devinfo = generic_device_find_index( mouse_list, index);
+		if (devinfo == NULL)
+			break;
+		devinfo->mouse.lX = 0;
+		devinfo->mouse.lY = 0;
+	}
 
 #if SDLMAME_EVENTS_IN_WORKER_THREAD
 	osd_lock_acquire(input_lock);
@@ -1094,18 +1242,19 @@ void sdlinput_poll(running_machine *machine)
 		}
 		switch(event.type) {
 		case SDL_KEYDOWN:
-			devinfo = keyboard_list;
+			devinfo = generic_device_find_index( keyboard_list, keyboard_map.logical[event.key.which]);
+			//printf("Key down %d %d %s\n", event.key.which, event.key.keysym.scancode, devinfo->name);
 			devinfo->keyboard.state[OSD_SDL_INDEX_KEYSYM(&event.key.keysym)] = 0x80;
 #if (!SDL_VERSION_ATLEAST(1,3,0))
 			ui_input_push_char_event(machine, sdl_window_list->target, (unicode_char) event.key.keysym.unicode);
 #endif
 			break;
 		case SDL_KEYUP:
-			devinfo = keyboard_list;
+			devinfo = generic_device_find_index( keyboard_list, keyboard_map.logical[event.key.which]);
 			devinfo->keyboard.state[OSD_SDL_INDEX_KEYSYM(&event.key.keysym)] = 0x00;
 			break;
 		case SDL_JOYAXISMOTION:
-			devinfo = generic_device_find_index(joystick_list, joy_logical[event.jaxis.which]);
+			devinfo = generic_device_find_index(joystick_list, joy_map.logical[event.jaxis.which]);
 			if (devinfo)
 			{
 				if (sixaxis_mode)
@@ -1128,7 +1277,7 @@ void sdlinput_poll(running_machine *machine)
 			}
 			break;
 		case SDL_JOYHATMOTION:
-			devinfo = generic_device_find_index(joystick_list, joy_logical[event.jhat.which]);
+			devinfo = generic_device_find_index(joystick_list, joy_map.logical[event.jhat.which]);
 			if (devinfo)
 			{
 				if (event.jhat.value & SDL_HAT_UP)
@@ -1167,15 +1316,16 @@ void sdlinput_poll(running_machine *machine)
 			break;
 		case SDL_JOYBUTTONDOWN:
 		case SDL_JOYBUTTONUP:
-			devinfo = generic_device_find_index(joystick_list, joy_logical[event.jbutton.which]);
+			devinfo = generic_device_find_index(joystick_list, joy_map.logical[event.jbutton.which]);
 			if (devinfo)
 			{
 				devinfo->joystick.buttons[event.jbutton.button] = (event.jbutton.state == SDL_PRESSED) ? 0x80 : 0; 
 			}
 			break;
 		case SDL_MOUSEBUTTONDOWN:
-			devinfo = mouse_list;
+			devinfo = generic_device_find_index(mouse_list, mouse_map.logical[event.button.which]);
 			devinfo->mouse.buttons[event.button.button-1] = 0x80; 
+			//printf("But down %d %d %d %d %s\n", event.button.which, event.button.button, event.button.x, event.button.y, devinfo->name);
 			if (event.button.button == 1)
 			{
 				// FIXME Move static declaration
@@ -1184,8 +1334,7 @@ void sdlinput_poll(running_machine *machine)
 				static int last_y = 0;
 				int cx, cy;
 				osd_ticks_t click = osd_ticks() * 1000 / osd_ticks_per_second();
-				sdl_window_info *window = GET_WINDOW(&event.button);
-				
+				sdl_window_info *window = GET_FOCUS_WINDOW(&event.button);
 				if (window != NULL && window->xy_to_render_target(window, event.button.x,event.button.y, &cx, &cy) )
 				{
 					ui_input_push_mouse_down_event(machine, window->target, cx, cy); 
@@ -1207,13 +1356,14 @@ void sdlinput_poll(running_machine *machine)
 			}
 			break;
 		case SDL_MOUSEBUTTONUP:
-			devinfo = mouse_list;
+			devinfo = generic_device_find_index(mouse_list, mouse_map.logical[event.button.which]);
 			devinfo->mouse.buttons[event.button.button-1] = 0; 
+			//printf("But up %d %d %d %d\n", event.button.which, event.button.button, event.button.x, event.button.y);
 
 			if (event.button.button == 1)
 			{
 				int cx, cy;
-				sdl_window_info *window = GET_WINDOW(&event.button);
+				sdl_window_info *window = GET_FOCUS_WINDOW(&event.button);
 				
 				if (window != NULL && window->xy_to_render_target(window, event.button.x,event.button.y, &cx, &cy) )
 				{
@@ -1222,9 +1372,10 @@ void sdlinput_poll(running_machine *machine)
 			}
 			break;
 		case SDL_MOUSEMOTION:
-			devinfo = mouse_list;
+			devinfo = generic_device_find_index(mouse_list, mouse_map.logical[event.motion.which]);
 #if (SDL_VERSION_ATLEAST(1,3,0))
 			// FIXME: may apply to 1.2 as well ...
+			//printf("Motion %d %d %d %s\n", event.motion.which, event.motion.x, event.motion.y, devinfo->name);
 			devinfo->mouse.lX += event.motion.xrel * INPUT_RELATIVE_PER_PIXEL; 
 			devinfo->mouse.lY += event.motion.yrel * INPUT_RELATIVE_PER_PIXEL;
 #else
@@ -1233,8 +1384,8 @@ void sdlinput_poll(running_machine *machine)
 #endif
 			{
 				int cx=-1, cy=-1;
-				sdl_window_info *window = GET_WINDOW(&event.motion);
-				
+				sdl_window_info *window = GET_FOCUS_WINDOW(&event.motion);
+
 				if (window != NULL && window->xy_to_render_target(window, event.motion.x, event.motion.y, &cx, &cy) )
 					ui_input_push_mouse_move_event(machine, window->target, cx, cy); 
 			}
@@ -1244,7 +1395,7 @@ void sdlinput_poll(running_machine *machine)
 			app_has_mouse_focus = event.active.gain;
 			if (!event.active.gain)
 			{
-				sdl_window_info *window = GET_WINDOW(&event.motion);
+				sdl_window_info *window = GET_FOCUS_WINDOW(&event.motion);
 				ui_input_push_mouse_leave_event(machine, window->target);
 			}
 			break;
@@ -1258,7 +1409,7 @@ void sdlinput_poll(running_machine *machine)
 		case SDL_TEXTINPUT:
 			if (*event.text.text)
 			{
-				sdl_window_info *window = GET_WINDOW(&event.text);
+				sdl_window_info *window = GET_FOCUS_WINDOW(&event.text);
 				unicode_char result;
 				if (window != NULL )
 				{
@@ -1284,7 +1435,6 @@ void sdlinput_poll(running_machine *machine)
 				ui_input_push_mouse_leave_event(machine, window->target);
 				app_has_mouse_focus = 0;
 				break;
-				
 			}
 			case SDL_WINDOWEVENT_RESIZED:
 				if (event.window.data1 != window->width || event.window.data2 != window->height)
@@ -1308,9 +1458,11 @@ void sdlinput_poll(running_machine *machine)
 	}
 }
 
+	
 //============================================================
 //  sdlinput_release_keys
 //============================================================
+
 
 void  sdlinput_release_keys(running_machine *machine)
 {
@@ -1319,12 +1471,18 @@ void  sdlinput_release_keys(running_machine *machine)
 	// state when a window is destroyed and recreated.
 #if (SDL_VERSION_ATLEAST(1,3,0))
 	device_info *devinfo;
+	int index;
 
-	devinfo = keyboard_list;
-	if (devinfo != NULL)
+	for (index = 0; ;index++)
+	{
+		devinfo = generic_device_find_index( keyboard_list, index);
+		if (devinfo == NULL)
+			break;
 		memset(&devinfo->keyboard.state, 0, sizeof(devinfo->keyboard.state));
+	}
 #endif	
 }
+
 
 //============================================================
 //  sdlinput_should_hide_mouse
@@ -1500,6 +1658,7 @@ void osd_customize_input_type_list(input_type_desc *typelist)
 	}
 }
 
+
 //============================================================
 //  device_list_reset_devices
 //============================================================
@@ -1511,6 +1670,7 @@ static void device_list_reset_devices(device_info *devlist_head)
 	for (curdev = devlist_head; curdev != NULL; curdev = curdev->next)
 		generic_device_reset(curdev);
 }
+
 
 //============================================================
 //  device_list_free_devices
@@ -1528,6 +1688,7 @@ static void device_list_free_devices(device_info **devlist_head)
 	}
 	*devlist_head = NULL;
 }
+
 
 //============================================================
 //  generic_device_alloc
@@ -1602,6 +1763,7 @@ static int generic_device_index(device_info *devlist_head, device_info *devinfo)
 	}
 	return -1;
 }
+
 
 static device_info *generic_device_find_index(device_info *devlist_head, int index)
 {

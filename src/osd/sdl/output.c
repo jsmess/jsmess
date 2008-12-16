@@ -16,7 +16,6 @@
 // MAME headers
 #include "osdepend.h"
 #include "driver.h"
-#include "deprecat.h"
 
 // MAMEOS headers
 #include "output.h"

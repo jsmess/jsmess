@@ -410,8 +410,21 @@ static int drawsdl_window_create(sdl_window_info *window, int width, int height)
 			width, height, sdl->extra_flags);
 	SDL_ShowWindow(window->window_id);
 	
+	SDL_SetWindowFullscreen(window->window_id, window->fullscreen);
+	SDL_GetWindowSize(window->window_id, &window->width, &window->height);		
+	SDL_RaiseWindow(window->window_id);
+	
+	/* FIXME: Bug in SDL 1.3 */
+	if (window->fullscreen)
+		SDL_SetWindowGrab(window->window_id, 1);
+
 	// create a texture
-	SDL_CreateRenderer(window->window_id, -1, SDL_RENDERER_SINGLEBUFFER | SDL_RENDERER_PRESENTDISCARD);
+	
+	if (options_get_bool(mame_options(), SDLOPTION_WAITVSYNC))	
+		SDL_CreateRenderer(window->window_id, -1, SDL_RENDERER_PRESENTFLIP2 | SDL_RENDERER_PRESENTDISCARD | SDL_RENDERER_PRESENTVSYNC);
+	else
+		SDL_CreateRenderer(window->window_id, -1, SDL_RENDERER_PRESENTFLIP2 | SDL_RENDERER_PRESENTDISCARD);
+		
     SDL_SelectRenderer(window->window_id);
     
     {
@@ -440,9 +453,6 @@ static int drawsdl_window_create(sdl_window_info *window, int width, int height)
     	}
     }
 	
-	SDL_SetWindowFullscreen(window->window_id, window->fullscreen);
-	SDL_GetWindowSize(window->window_id, &window->width, &window->height);		
-	SDL_RaiseWindow(window->window_id);
 	setup_texture(window, width, height);
 #else
 	sdl->extra_flags = (window->fullscreen ?  SDL_FULLSCREEN : SDL_RESIZABLE);

@@ -21,6 +21,13 @@
 # for details
 #-------------------------------------------------
 
+
+# uncomment and edit next line to specify a distribution
+# supported debian-stable, ubuntu-intrepid
+
+# DISTRO = debian-stable
+# DISTRO = ubuntu-intrepid
+
 # uncomment next line to build without OpenGL support
 
 # NO_OPENGL = 1
@@ -40,11 +47,12 @@
 USE_DISPATCH_GL = 1
 
 # uncomment and change the next line to compile and link to specific
-# SDL library. This is currently ony supported for unix!
+# SDL library. This is currently only supported for unix!
 # There is no need to play with this option unless you are doing
 # active development on sdlmame or SDL.
 
-# SDL_INSTALL_ROOT = /usr/local/sdl13
+#SDL_INSTALL_ROOT = /usr/local/sdl13
+#SDL_INSTALL_ROOT = /usr/local/test
 
 ###########################################################################
 ##################   END USER-CONFIGURABLE OPTIONS   ######################
@@ -52,6 +60,28 @@ USE_DISPATCH_GL = 1
 
 # bring in external flags for RPM build
 CFLAGS += $(OPT_FLAGS)
+
+#-------------------------------------------------
+# distribution may change things
+#-------------------------------------------------
+	
+ifeq ($(DISTRO),)
+DISTRO = generic
+else 
+ifeq ($(DISTRO),debian-stable)
+DEFS += -DNO_AFFINITY_NP
+else 
+ifeq ($(DISTRO),ubuntu-intrepid)
+# Force gcc-4.2 on ubuntu-intrepid
+CC = @gcc -V 4.2
+LD = @gcc -V 4.2
+else
+$(error DISTRO $(DISTRO) unknown)
+endif
+endif
+endif
+
+DEFS += -DDISTRO=$(DISTRO)
 
 #-------------------------------------------------
 # sanity check the configuration
@@ -66,11 +96,12 @@ endif
 # OS/2 can't have OpenGL (aww)
 ifeq ($(TARGETOS),os2)
 NO_OPENGL = 1
+DEFS += -DNO_THREAD_COOPERATIVE -DNO_DEBUGGER
 endif
 
 # additional definitions when we are on Solaris
 ifeq ($(TARGETOS),solaris)
-DEFS += -DSDLMAME_X11 -DSDLMAME_UNIX -DSDLMAME_SOLARIS
+DEFS += -DNO_AFFINITY_NP -DNO_DEBUGGER -DSDLMAME_X11 -DSDLMAME_UNIX -DSDLMAME_SOLARIS
 endif
 
 #-------------------------------------------------
@@ -95,6 +126,7 @@ endif
 
 ifeq ($(TARGETOS),freebsd)
 TARGETOS = unix
+DEFS += -DNO_THREAD_COOPERATIVE -DNO_DEBUGGER
 endif
 
 ifeq ($(TARGETOS),unix)
@@ -102,12 +134,12 @@ DEFS += -DSDLMAME_UNIX
 ifndef NO_X11
 DEFS += -DSDLMAME_X11
 else
-DEFS += -DSDLMAME_NO_X11
+DEFS += -DSDLMAME_NO_X11 -DNO_DEBUGGER
 endif
 endif
 
 ifeq ($(TARGETOS),macosx)
-DEFS += -DSDLMAME_UNIX -DSDLMAME_MACOSX
+DEFS += -DNO_THREAD_COOPERATIVE -DSDLMAME_UNIX -DSDLMAME_MACOSX
 MAINLDFLAGS = -Xlinker -all_load
 ifdef BIGENDIAN
 PPC=1
@@ -132,7 +164,7 @@ endif
 endif
 
 ifeq ($(TARGETOS),win32)
-DEFS += -DSDLMAME_WIN32
+DEFS += -DSDLMAME_WIN32 -DNO_DEBUGGER
 endif
 
 ifeq ($(TARGETOS),os2)

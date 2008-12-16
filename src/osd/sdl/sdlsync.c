@@ -44,7 +44,7 @@
 #define pthread_self    _gettid
 #endif
 
-#if THREAD_COOPERATIVE
+#ifndef NO_THREAD_COOPERATIVE
 typedef struct _hidden_mutex_t hidden_mutex_t;
 struct _hidden_mutex_t {
 	pthread_mutex_t id;
@@ -87,7 +87,7 @@ struct _osd_thread {
 };
 
 
-#if THREAD_COOPERATIVE
+#ifndef NO_THREAD_COOPERATIVE
 
 //============================================================
 //  osd_lock_alloc
@@ -586,7 +586,7 @@ int osd_thread_adjust_priority(osd_thread *thread, int adjust)
 
 int osd_thread_cpu_affinity(osd_thread *thread, UINT32 mask)
 {
-#if THREAD_COOPERATIVE
+#if !defined(NO_THREAD_COOPERATIVE) && !defined(NO_AFFINITY_NP)
 	cpu_set_t	cmask;
 	pthread_t	lthread;
 	int			bitnum;
@@ -603,7 +603,7 @@ int osd_thread_cpu_affinity(osd_thread *thread, UINT32 mask)
     
 	if (pthread_setaffinity_np(lthread, sizeof(cmask), &cmask) <0)
 	{
-		// Not available during link in all targets
+		/* Not available during link in all targets */
 		fprintf(stderr, "error %d setting cpu affinity to mask %08x", errno, mask);
 		return FALSE;
 	}
@@ -769,7 +769,7 @@ void osd_thread_wait_free(osd_thread *thread)
 }
 
 #endif  /* SDLMAME_OS2 */
-#else	// SDLMAME_WIN32
+#else	/* SDLMAME_WIN32 */
 #include "../windows/winsync.c"
 #endif
 

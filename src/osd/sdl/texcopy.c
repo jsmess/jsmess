@@ -1,6 +1,64 @@
 
 #ifndef SDL_TEXFORMAT
 
+#if 0
+INLINE UINT32 ycc_to_rgb(unsigned y, unsigned cb, unsigned cr)
+{
+	/* original equations:
+
+        C = Y - 16
+        D = Cb - 128
+        E = Cr - 128
+
+        R = clip(( 298 * C           + 409 * E + 128) >> 8)
+        G = clip(( 298 * C - 100 * D - 208 * E + 128) >> 8)
+        B = clip(( 298 * C + 516 * D           + 128) >> 8)
+
+        R = clip(( 298 * (Y - 16)                    + 409 * (Cr - 128) + 128) >> 8)
+        G = clip(( 298 * (Y - 16) - 100 * (Cb - 128) - 208 * (Cr - 128) + 128) >> 8)
+        B = clip(( 298 * (Y - 16) + 516 * (Cb - 128)                    + 128) >> 8)
+
+        R = clip(( 298 * Y - 298 * 16                        + 409 * Cr - 409 * 128 + 128) >> 8)
+        G = clip(( 298 * Y - 298 * 16 - 100 * Cb + 100 * 128 - 208 * Cr + 208 * 128 + 128) >> 8)
+        B = clip(( 298 * Y - 298 * 16 + 516 * Cb - 516 * 128                        + 128) >> 8)
+
+        R = clip(( 298 * Y - 298 * 16                        + 409 * Cr - 409 * 128 + 128) >> 8)
+        G = clip(( 298 * Y - 298 * 16 - 100 * Cb + 100 * 128 - 208 * Cr + 208 * 128 + 128) >> 8)
+        B = clip(( 298 * Y - 298 * 16 + 516 * Cb - 516 * 128                        + 128) >> 8)
+    */
+	//int r, g, b, common;
+	unsigned int r, g, b, common;
+
+	common = 298 * y - 56992;
+	r = (common +            409 * cr);
+	g = (common - 100 * cb - 208 * cr + 91776);
+	b = (common + 516 * cb - 13696);
+
+	if ((int) r < 0) r = 0;
+	if ((int) g < 0) g = 0;
+	if ((int) b < 0) b = 0;
+
+	/* MAME_RGB does upper clamping */
+
+	return MAKE_RGB(r >> 8, g >> 8, b >> 8);
+}
+#else
+#define CLUL(x) ((int) x < 0 ? 0 : (x > 65535 ? 255 : x>>8))
+
+INLINE UINT32 ycc_to_rgb(unsigned y, unsigned cb, unsigned cr)
+{
+	unsigned int r, g, b, common;
+
+	common = 298 * y - 56992;
+	r = (common +            409 * cr);
+	g = (common - 100 * cb - 208 * cr + 91776);
+	b = (common + 516 * cb - 13696);
+
+	return 0xff000000 | (CLUL(r)<<16) | (CLUL(g)<<8) | (CLUL(b));
+}
+
+#endif
+
 #define SDL_TEXFORMAT SDL_TEXFORMAT_ARGB32
 #include "texcopy.c"
 
@@ -83,7 +141,7 @@ static void texcopy_yuv16(texture_info *texture, const render_texinfo *texsource
 	}
 }
 
-#define CLSH(x)		(((int) x < 0) ? 0 : x >> 8)
+#define CLSH(x)		(((int) (x) < 0) ? 0 : ( (x) > 65535 ? 255 : (x) >> 8))
 
 static void texcopy_yuv16_paletted(texture_info *texture, const render_texinfo *texsource)
 {
@@ -109,7 +167,7 @@ static void texcopy_yuv16_paletted(texture_info *texture, const render_texinfo *
 			UINT8 cb = srcpix0 & 0xff;
 			UINT8 cr = srcpix1 & 0xff;
 			
-#if 0	
+#if 0
 			*dst++ = ycc_to_rgb(texsource->palette[0x000 + (srcpix0 >> 8)], cb, cr);
 			*dst++ = ycc_to_rgb(texsource->palette[0x000 + (srcpix1 >> 8)], cb, cr);
 #else
@@ -122,8 +180,8 @@ static void texcopy_yuv16_paletted(texture_info *texture, const render_texinfo *
 			b1 = b2 =  + 516 * cb - 70688;
 			r1 += y1; g1 += y1; b1 += y1;
 			r2 += y2; g2 += y2; b2 += y2;
-			*dst++ = MAKE_RGB(CLSH(r1), CLSH(g1), CLSH(b1));
-			*dst++ = MAKE_RGB(CLSH(r2), CLSH(g2), CLSH(b2));
+			*dst++ = 0xff000000 | (CLSH(r1)<<16) | (CLSH(g1)<<8) | (CLSH(b1));
+			*dst++ = 0xff000000 | (CLSH(r2)<<16) | (CLSH(g2)<<8) | (CLSH(b2));
 #endif
 		}
 		

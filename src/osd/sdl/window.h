@@ -89,6 +89,9 @@ struct _sdl_window_info
 	// Pointer to next window
 	sdl_window_info *	next;
 	
+	// Pointer to machine
+	running_machine *	machine;
+	
 	// Draw Callbacks
 	int (*create)(sdl_window_info *window, int width, int height);
 	void (*resize)(sdl_window_info *window, int width, int height);

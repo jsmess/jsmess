@@ -703,6 +703,7 @@ static void sdlwindow_update_cursor_state(running_machine *machine, sdl_window_i
 	{
 		//FIXME: SDL1.3: really broken: the whole SDL code
 		//       will only work correct with relative mouse movements ...
+		//SDL_SetRelativeMouseMode
 		if (!window->fullscreen && !sdlinput_should_hide_mouse(machine))
 		{
 			SDL_ShowCursor(SDL_ENABLE);
@@ -768,6 +769,7 @@ int sdlwindow_video_window_create(running_machine *machine, int index, sdl_monit
 	window->depth = config->depth;
 	window->refresh = config->refresh;
 	window->monitor = monitor;
+	window->machine = machine;
 	
 	//FIXME: these should be per_window in config-> or even better a bit set
 	window->fullscreen = !video_config.windowed;

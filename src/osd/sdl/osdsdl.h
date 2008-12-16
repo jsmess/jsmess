@@ -9,9 +9,26 @@
 	  * SDL1.3/X11: Some compound keys, e.g. "'" are not supported by SDL driver
 	  * SDL1.3/X11: No -switchres because SDL does not support it right now.
 	  * SDL1.3/directfb: -switchres broken for directfb >= 1.2.0/works with 1.0.
-	  * Need to submit the directfb driver to the SDL team
 	  * SDL1.3: sdlvideofps does not take -numscreens>1 into account.
 
+	- fixed yuv issues (firefox) / this was a bug I introduced
+	- removed deprecat.h from output.c
+	- Separated keyboard and mouse initialization into separate functions
+	- added _FORTIFY_SOURCE to verbose compiler define output.
+	- remove MAX_CPU from debugwin.c
+	- fixed vsync handling in SDL1.3 in soft/opengl drivers
+	- "waitvsync" also supported by "soft" driver in SDL1.3
+	- multiple mice and keyboards supported in SDL1.3
+	- support for DISTRO= make option
+	- got rid of "-joymap" and "-joymap_file"
+	- add -joy_idx[0-7] -keyb_idx[0-7] -mouse_idx[0-7] which
+	  specify, which device is allocated to to e.g. Mouse 1, Mouse 2, ...
+	- moved define of THREAD_COOPERATIVE into sdl.mak and renamed to 
+	  NO_THREAD_COOPERATIVE. Changed references to #ifndef
+	- define NO_DEBUGGER in sdl.mak
+	- Solaris now uses -DNO_AFFINITY_NP
+	- added machine to window_info, removed deprecat.h from drawogl.c
+	
 	- For DEBUG=1 builds, disable input grapping while windowed
 	- Fixed WIN32 compile
 	  Wrote setenv function since mingw does not provide one.
@@ -217,11 +234,13 @@
 #define SDLOPTION_WAITVSYNC				"waitvsync"
 #define SDLOPTION_KEYMAP				"keymap"
 #define SDLOPTION_KEYMAP_FILE			"keymap_file"
-#define SDLOPTION_JOYMAP				"remapjoys"
-#define SDLOPTION_JOYMAP_FILE			"remapjoyfile"
 #define SDLOPTION_UIMODEKEY				"uimodekey"
-#define SDLOPTION_SIXAXIS				"sixaxis"
 #define SDLOPTION_OSLOG					"oslog"
+
+#define SDLOPTION_SIXAXIS				"sixaxis"
+#define SDLOPTION_JOYINDEX				"joy_idx"  
+#define SDLOPTION_KEYBINDEX				"keyb_idx"  
+#define SDLOPTION_MOUSEINDEX			"mouse_index"  
 
 #define SDLOPTION_SHADER_MAME(x)		"glsl_shader_mame" x
 #define SDLOPTION_SHADER_SCREEN(x)		"glsl_shader_screen" x
@@ -245,17 +264,7 @@
 #define SDLOPTVAL_OPENGL16				"opengl16"
 #define SDLOPTVAL_SOFT					"soft"
 
-#if 0
-/* FIXME: Remove me */
-#define SDLOPTVAL_HWBLIT				"hwblit"
-#define SDLOPTVAL_HWBEST				"hwbest"
-#define SDLOPTVAL_YV12					"yv12"
-#define SDLOPTVAL_YV12x2				"yv12x2"
-#define SDLOPTVAL_YUY2					"yuy2"
-#define SDLOPTVAL_YUY2x2				"yuy2x2"
-#endif
-
-#define SDLMAME_LED(x)						"led" #x
+#define SDLMAME_LED(x)					"led" #x
 
 // read by sdlmame
 
@@ -271,7 +280,7 @@
 #define SDLENV_AUDIODRIVER				"SDL_AUDIODRIVER"
 #define SDLENV_RENDERDRIVER				"SDL_VIDEO_RENDERER"
 
-#define SDLMAME_SOUND_LOG					"sound.log"
+#define SDLMAME_SOUND_LOG				"sound.log"
 
 #ifdef SDLMAME_MACOSX
 /* Vas Crabb: Default GL-lib for MACOSX */

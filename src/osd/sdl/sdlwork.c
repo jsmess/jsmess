@@ -40,7 +40,7 @@
 #define SDLENV_CPUMASKS					"OSDCPUMASKS"
 
 #define INFINITE				(osd_ticks_per_second() *  (osd_ticks_t) 10000)
-#if THREAD_COOPERATIVE
+#ifndef NO_THREAD_COOPERATIVE
 //FIXME: depends on <THREADS>/<PHYS PROCESSORS>
 #define SPIN_LOOP_TIME			(osd_ticks_per_second() / 10000)
 //#define SPIN_LOOP_TIME			((osd_ticks_t) 0)
@@ -72,7 +72,7 @@
 typedef struct _scalable_lock scalable_lock;
 struct _scalable_lock
 {
-#if THREAD_COOPERATIVE
+#ifndef NO_THREAD_COOPERATIVE
 	osd_lock			*lock;
 #else
 	struct
@@ -146,7 +146,7 @@ typedef void *PVOID;
 //============================================================
 
 static int effective_num_processors(void);
-#if THREAD_COOPERATIVE
+#ifndef NO_THREAD_COOPERATIVE
 static UINT32 effective_cpu_mask(int index);
 #endif
 static void * worker_thread_entry(void *param);
@@ -186,7 +186,7 @@ INLINE INT32 interlocked_add(INT32 volatile *ptr, INT32 add)
 
 INLINE void scalable_lock_init(scalable_lock *lock)
 {
-#if THREAD_COOPERATIVE
+#ifndef NO_THREAD_COOPERATIVE
 	lock->lock = osd_lock_alloc();
 #else
 	memset(lock, 0, sizeof(*lock));
@@ -197,7 +197,7 @@ INLINE void scalable_lock_init(scalable_lock *lock)
 
 INLINE INT32 scalable_lock_acquire(scalable_lock *lock)
 {
-#if THREAD_COOPERATIVE
+#ifndef NO_THREAD_COOPERATIVE
 	osd_lock_acquire(lock->lock);
 	return 0;
 #else
@@ -259,7 +259,7 @@ INLINE INT32 scalable_lock_acquire(scalable_lock *lock)
 
 INLINE void scalable_lock_release(scalable_lock *lock, INT32 myslot)
 {
-#if THREAD_COOPERATIVE
+#ifndef NO_THREAD_COOPERATIVE
 	osd_lock_release(lock->lock);
 	return;
 #else
@@ -282,7 +282,7 @@ INLINE void scalable_lock_release(scalable_lock *lock, INT32 myslot)
 
 INLINE void scalable_lock_free(scalable_lock *lock)
 {
-#if THREAD_COOPERATIVE
+#ifndef NO_THREAD_COOPERATIVE
 	osd_lock_free(lock->lock);
 #endif
 }
@@ -360,7 +360,7 @@ osd_work_queue *osd_work_queue_alloc(int flags)
 		else
 			osd_thread_adjust_priority(thread->handle, 0);	// TODO: specify appropriate priority
 
-#if THREAD_COOPERATIVE
+#ifndef NO_THREAD_COOPERATIVE
 		// Bind main thread to cpu 0
 		osd_thread_cpu_affinity(NULL, effective_cpu_mask(0));
 		
@@ -724,7 +724,7 @@ static int effective_num_processors(void)
 //  effective_cpu_mask
 //============================================================
 
-#if THREAD_COOPERATIVE
+#ifndef NO_THREAD_COOPERATIVE
 static UINT32 effective_cpu_mask(int index)
 {
 	char 	*s;
