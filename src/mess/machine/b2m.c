@@ -161,7 +161,6 @@ static void b2m_set_bank(running_machine *machine,int bank)
 
 static PIT8253_OUTPUT_CHANGED(bm2_pit_out0)
 {
-	logerror("bm2_pit_out0\n");
 	pic8259_set_irq_line((device_config*)device_list_find_by_tag( device->machine->config->devicelist, PIC8259, "pic8259"),1,state);		
 }
 
@@ -214,35 +213,22 @@ static WRITE8_DEVICE_HANDLER (b2m_8255_portc_w )
 	b2m_video_page = (b2m_8255_portc >> 7) & 1;
 }
 
-static READ8_DEVICE_HANDLER (b2m_8255_porta_r )
-{
-	return 0xff;
-}
 static READ8_DEVICE_HANDLER (b2m_8255_portb_r )
 {
 	return b2m_video_scroll;
 }
-static READ8_DEVICE_HANDLER (b2m_8255_portc_r )
-{
-	return 0xff;
-}
+
 const ppi8255_interface b2m_ppi8255_interface_1 =
 {
-	b2m_8255_porta_r,
+	NULL,
 	b2m_8255_portb_r,
-	b2m_8255_portc_r,
+	NULL,
 	b2m_8255_porta_w,
 	b2m_8255_portb_w,
 	b2m_8255_portc_w
 };
 
 
-static WRITE8_DEVICE_HANDLER (b2m_ext_8255_porta_w )
-{	
-}
-static WRITE8_DEVICE_HANDLER (b2m_ext_8255_portb_w )
-{	
-}
 
 static WRITE8_DEVICE_HANDLER (b2m_ext_8255_portc_w )
 {		
@@ -259,26 +245,13 @@ static WRITE8_DEVICE_HANDLER (b2m_ext_8255_portc_w )
 	}
 }
 
-static READ8_DEVICE_HANDLER (b2m_ext_8255_porta_r )
-{
-	return 0xff;
-}
-static READ8_DEVICE_HANDLER (b2m_ext_8255_portb_r )
-{
-	return 0xff;
-}
-static READ8_DEVICE_HANDLER (b2m_ext_8255_portc_r )
-{
-	return 0xff;
-}
-
 const ppi8255_interface b2m_ppi8255_interface_2 =
 {
-	b2m_ext_8255_porta_r,
-	b2m_ext_8255_portb_r,
-	b2m_ext_8255_portc_r,
-	b2m_ext_8255_porta_w,
-	b2m_ext_8255_portb_w,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
 	b2m_ext_8255_portc_w
 };
 
@@ -418,22 +391,6 @@ DEVICE_IMAGE_LOAD( b2m_floppy )
 	return INIT_PASS;
 }
 
-static void *b2m_sh_start(const device_config *device, int clock, const custom_sound_interface *config);
-static void b2m_sh_update(void *param,stream_sample_t **inputs, stream_sample_t **_buffer,int length);
-
-const custom_sound_interface b2m_sound_interface =
-{
-	b2m_sh_start,
-	NULL,
-	NULL
-};
-
-static void *b2m_sh_start(const device_config *device, int clock, const custom_sound_interface *config)
-{
-	b2m_sound_input = 0;
-	mixer_channel = stream_create(device, 0, 1, device->machine->sample_rate, 0, b2m_sh_update);
-	return (void *) ~0;
-}
 
 static void b2m_sh_update(void *param,stream_sample_t **inputs, stream_sample_t **buffer,int length)
 {
@@ -449,10 +406,16 @@ static void b2m_sh_update(void *param,stream_sample_t **inputs, stream_sample_t 
 		sample_left++;
 	}
 }
-
-void b2m_sh_change_clock(double clock)
+static CUSTOM_START (b2m_sh_start)
 {
-	if (mixer_channel!=NULL) {
-		stream_update(mixer_channel);
-	}
+	b2m_sound_input = 0;
+	mixer_channel = stream_create(device, 0, 1, device->machine->sample_rate, 0, b2m_sh_update);
+	return (void *) ~0;
 }
+
+const custom_sound_interface b2m_sound_interface =
+{
+	b2m_sh_start,
+	NULL,
+	NULL
+};
