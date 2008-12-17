@@ -159,8 +159,9 @@ static void b2m_set_bank(running_machine *machine,int bank)
 	}
 }
 
-static PIT8253_OUTPUT_CHANGED(bm2_pit_out2)
+static PIT8253_OUTPUT_CHANGED(bm2_pit_out0)
 {
+	logerror("bm2_pit_out0\n");
 	pic8259_set_irq_line((device_config*)device_list_find_by_tag( device->machine->config->devicelist, PIC8259, "pic8259"),1,state);		
 }
 
@@ -173,9 +174,9 @@ static PIT8253_OUTPUT_CHANGED(bm2_pit_out1)
 	b2m_sound_input = state;
 }
 
-static PIT8253_OUTPUT_CHANGED(bm2_pit_out0)
+static PIT8253_OUTPUT_CHANGED(bm2_pit_out2)
 {
-	pit8253_set_clock_signal( device, 2, state );
+	pit8253_set_clock_signal( device, 0, state );
 }
 
 
@@ -183,11 +184,11 @@ const struct pit8253_config b2m_pit8253_intf =
 {
 	{
 		{
-			2000000,
+			0,
 			bm2_pit_out0
 		},
 		{
-			0,
+			2000000,
 			bm2_pit_out1
 		},
 		{
@@ -378,8 +379,6 @@ INTERRUPT_GEN (b2m_vblank_interrupt)
 
 MACHINE_RESET(b2m)
 {	
-	device_config *pit8253 = (device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8253, "pit8253" );
-	
 	b2m_sound_input = 0;
 	
 	wd17xx_reset(machine);
@@ -391,10 +390,6 @@ MACHINE_RESET(b2m)
 
 	cpu_set_irq_callback(machine->cpu[0], b2m_irq_callback);
 	b2m_set_bank(machine,7);
-		
-	pit8253_gate_w(pit8253, 0, 0);
-	pit8253_gate_w(pit8253, 1, 0);
-	pit8253_gate_w(pit8253, 2, 0);
 }
 
 DEVICE_IMAGE_LOAD( b2m_floppy )

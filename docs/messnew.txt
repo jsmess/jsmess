@@ -20,6 +20,8 @@ System Driver Changes:
 
 - [ABC806] Added keyboard simulation and HR graphics. [Curt Coder, Erik Isaksson]
 
+- [B2M] bug #1661 fixed [Miodrag Milanovic]
+
 - [BBC] Changed memory handling for the 0xfc00 to 0xfeff memory region
   on the Master driver, to allow correct debugging of code in this area
   when ROM is paged in for read.  [Phill Harvey-Smith]
@@ -78,6 +80,18 @@ Source Changes:
 - Changed the 8593 RTC implementation to be a device.  [Nathan Woods]
 
 - Changed the TMS5501 implementation to be a device.  [Nathan Woods]
+
+- Changed the MM58274C implementation to be a device.  [Miodrag Milanovic]
+
+- Changed the TTL74145 implementation to be a device.  [Miodrag Milanovic]
+
+- Changed the UPD7002 implementation to be a device.  [Miodrag Milanovic]
+
+- Changed the TMS9901 implementation to be a device.  [Miodrag Milanovic]
+
+- Changed the TMS9902 implementation to be a device.  [Miodrag Milanovic]
+
+- Changed the I8271 implementation to be a device.  [Miodrag Milanovic]
 
 - Various code cleanups.  [Atari Ace]
 
