@@ -9,7 +9,6 @@
 #include "ppccom.h"
 #include "cpuexec.h"
 #include "mame.h"
-#include "deprecat.h"
 
 
 /***************************************************************************
@@ -280,7 +279,7 @@ void ppccom_reset(powerpc_state *ppc)
 
 		/* reset the decrementer */
 		ppc->dec_zero_cycles = cpu_get_total_cycles(ppc->device);
-		decrementer_int_callback(Machine, ppc, 0);
+		decrementer_int_callback(ppc->device->machine, ppc, 0);
 	}
 
 	/* initialize the 4XX state */
@@ -546,7 +545,7 @@ void ppccom_execute_tlbl(powerpc_state *ppc)
 	int entrynum;
 
 	/* determine entry number; we use rand() for associativity */
-	entrynum = ((address >> 12) & 0x1f) | (mame_rand(Machine) & 0x20) | (isitlb ? 0x40 : 0);
+	entrynum = ((address >> 12) & 0x1f) | (mame_rand(ppc->device->machine) & 0x20) | (isitlb ? 0x40 : 0);
 
 	/* determine the flags */
 	flags = VTLB_FLAG_VALID | VTLB_READ_ALLOWED | VTLB_FETCH_ALLOWED;
@@ -816,9 +815,9 @@ void ppccom_execute_mtspr(powerpc_state *ppc)
 			case SPR4XX_TCR:
 				ppc->spr[SPR4XX_TCR] = ppc->param1 | (oldval & PPC4XX_TCR_WRC_MASK);
 				if ((oldval ^ ppc->spr[SPR4XX_TCR]) & PPC4XX_TCR_FIE)
-					ppc4xx_fit_callback(Machine, ppc, FALSE);
+					ppc4xx_fit_callback(ppc->device->machine, ppc, FALSE);
 				if ((oldval ^ ppc->spr[SPR4XX_TCR]) & PPC4XX_TCR_PIE)
-					ppc4xx_pit_callback(Machine, ppc, FALSE);
+					ppc4xx_pit_callback(ppc->device->machine, ppc, FALSE);
 				return;
 
 			/* timer status register */
@@ -831,7 +830,7 @@ void ppccom_execute_mtspr(powerpc_state *ppc)
 			case SPR4XX_PIT:
 				ppc->spr[SPR4XX_PIT] = ppc->param1;
 				ppc->pit_reload = ppc->param1;
-				ppc4xx_pit_callback(Machine, ppc, FALSE);
+				ppc4xx_pit_callback(ppc->device->machine, ppc, FALSE);
 				return;
 
 			/* timebase */
@@ -1158,8 +1157,6 @@ void ppccom_get_info(powerpc_state *ppc, UINT32 state, cpuinfo *info)
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						/* provided by core */					break;
-		case CPUINFO_PTR_GET_CONTEXT:					/* provided by core */					break;
-		case CPUINFO_PTR_SET_CONTEXT:					/* provided by core */					break;
 		case CPUINFO_PTR_INIT:							/* provided by core */					break;
 		case CPUINFO_PTR_RESET:							/* provided by core */					break;
 		case CPUINFO_PTR_EXIT:							/* provided by core */					break;
@@ -1376,10 +1373,8 @@ static int ppc4xx_dma_fetch_transmit_byte(powerpc_state *ppc, int dmachan, UINT8
 		return FALSE;
 
 	/* fetch the data */
-	cpu_push_context(ppc->device);
 	*byte = memory_read_byte(ppc->program, dmaregs[DCR4XX_DMADA0]++);
 	ppc4xx_dma_decrement_count(ppc, dmachan);
-	cpu_pop_context();
 	return TRUE;
 }
 
@@ -1402,10 +1397,8 @@ static int ppc4xx_dma_handle_receive_byte(powerpc_state *ppc, int dmachan, UINT8
 		return FALSE;
 
 	/* store the data */
-	cpu_push_context(ppc->device);
 	memory_write_byte(ppc->program, dmaregs[DCR4XX_DMADA0]++, byte);
 	ppc4xx_dma_decrement_count(ppc, dmachan);
-	cpu_pop_context();
 	return TRUE;
 }
 

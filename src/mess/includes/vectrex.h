@@ -7,8 +7,12 @@
 #ifndef VECTREX_H_
 #define VECTREX_H_
 
+#include "machine/6522via.h"
 
 /*----------- defined in machine/vectrex.c -----------*/
+
+extern const via6522_interface vectrex_via6522_interface;
+extern const via6522_interface spectrum1_via6522_interface;
 
 DEVICE_IMAGE_LOAD( vectrex_cart );
 
@@ -22,15 +26,15 @@ extern int vectrex_reset_refresh;
 
 TIMER_CALLBACK(vectrex_imager_eye);
 void vectrex_configuration(running_machine *machine);
-READ8_HANDLER (v_via_pa_r);
-READ8_HANDLER(v_via_pb_r );
-void v_via_irq (running_machine *machine, int level);
+READ8_DEVICE_HANDLER (v_via_pa_r);
+READ8_DEVICE_HANDLER(v_via_pb_r );
+void v_via_irq (const device_config *device, int level);
 WRITE8_HANDLER ( vectrex_psg_port_w );
 
 DRIVER_INIT( vectrex );
 
 /* for spectrum 1+ */
-READ8_HANDLER( s1_via_pb_r );
+READ8_DEVICE_HANDLER( s1_via_pb_r );
 
 
 /*----------- defined in video/vectrex.c -----------*/
@@ -41,6 +45,8 @@ VIDEO_UPDATE( vectrex );
 VIDEO_START( raaspec );
 
 WRITE8_HANDLER  ( raaspec_led_w );
+
+READ8_HANDLER ( vectrex_via_r );
 WRITE8_HANDLER ( vectrex_via_w ); 
 
 void vectrex_add_point_stereo (int x, int y, rgb_t color, int intensity);

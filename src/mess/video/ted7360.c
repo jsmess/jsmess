@@ -962,7 +962,7 @@ VIDEO_START( ted7360 )
 	int width = video_screen_get_width(screen);
 	int height = video_screen_get_height(screen);
 
-	cursorelement = allocgfx(&cursorlayout);
+	cursorelement = allocgfx(machine, &cursorlayout);
 	decodegfx(cursorelement, cursormask, 0, 1);
 	/* 7-Sep-2007 - After 0.118u5, you cannot revector the color table */
 	/* cursorelement->colortable = cursorcolortable; */

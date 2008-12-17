@@ -313,7 +313,7 @@ static UINT32 read_pixel_32(tms34010_state *tms, offs_t offset)
 static UINT32 read_pixel_shiftreg(tms34010_state *tms, offs_t offset)
 {
 	if (tms->config->to_shiftreg)
-		tms->config->to_shiftreg(offset, &tms->shiftreg[0]);
+		tms->config->to_shiftreg(tms->program, offset, &tms->shiftreg[0]);
 	else
 		fatalerror("To ShiftReg function not set. PC = %08X\n", tms->pc);
 	return tms->shiftreg[0];
@@ -457,7 +457,7 @@ static void write_pixel_r_t_32(tms34010_state *tms, offs_t offset, UINT32 data)
 static void write_pixel_shiftreg(tms34010_state *tms, offs_t offset, UINT32 data)
 {
 	if (tms->config->from_shiftreg)
-		tms->config->from_shiftreg(offset, &tms->shiftreg[0]);
+		tms->config->from_shiftreg(tms->program, offset, &tms->shiftreg[0]);
 	else
 		fatalerror("From ShiftReg function not set. PC = %08X\n", tms->pc);
 }
@@ -701,32 +701,6 @@ static CPU_EXIT( tms34010 )
 
 
 /***************************************************************************
-    Get all registers in given buffer
-***************************************************************************/
-
-static CPU_GET_CONTEXT( tms34010 ) { }
-
-
-static CPU_GET_CONTEXT( tms34020 ) { }
-
-
-
-/***************************************************************************
-    Set all registers to given values
-***************************************************************************/
-
-static CPU_SET_CONTEXT( tms34010 )
-{
-}
-
-
-static CPU_SET_CONTEXT( tms34020 )
-{
-}
-
-
-
-/***************************************************************************
     Set IRQ line state
 ***************************************************************************/
 
@@ -924,9 +898,6 @@ static TIMER_CALLBACK( scanline_callback )
 	int enabled;
 	int master;
 
-	/* set the CPU context */
-	cpu_push_context(tms->device);
-
 	/* fetch the core timing parameters */
 	current_visarea = video_screen_get_visible_area(tms->screen);
 	enabled = SMART_IOREG(tms, DPYCTL) & 0x8000;
@@ -1055,9 +1026,6 @@ static TIMER_CALLBACK( scanline_callback )
 	/* note that we add !master (0 or 1) as a attoseconds value; this makes no practical difference */
 	/* but helps ensure that masters are updated first before slaves */
 	timer_adjust_oneshot(tms->scantimer, attotime_add_attoseconds(video_screen_get_time_until_pos(tms->screen, vcount, 0), !master), cpunum | (vcount << 8));
-
-	/* restore the context */
-	cpu_pop_context();
 }
 
 
@@ -1246,12 +1214,12 @@ WRITE16_HANDLER( tms34010_io_register_w )
 			if (!(oldreg & 0x0080) && (newreg & 0x0080))
 			{
 				if (tms->config->output_int)
-					(*tms->config->output_int)(1);
+					(*tms->config->output_int)(space->cpu, 1);
 			}
 			else if ((oldreg & 0x0080) && !(newreg & 0x0080))
 			{
 				if (tms->config->output_int)
-					(*tms->config->output_int)(0);
+					(*tms->config->output_int)(space->cpu, 0);
 			}
 
 			/* input interrupt? (should really be state-based, but the functions don't exist!) */
@@ -1397,12 +1365,12 @@ WRITE16_HANDLER( tms34020_io_register_w )
 			if (!(oldreg & 0x0080) && (newreg & 0x0080))
 			{
 				if (tms->config->output_int)
-					(*tms->config->output_int)(1);
+					(*tms->config->output_int)(space->cpu, 1);
 			}
 			else if ((oldreg & 0x0080) && !(newreg & 0x0080))
 			{
 				if (tms->config->output_int)
-					(*tms->config->output_int)(0);
+					(*tms->config->output_int)(space->cpu, 0);
 			}
 
 			/* input interrupt? (should really be state-based, but the functions don't exist!) */
@@ -1584,9 +1552,6 @@ void tms34010_host_w(const device_config *cpu, int reg, int data)
 	tms34010_state *tms = cpu->token;
 	unsigned int addr;
 
-	/* swap to the target cpu */
-	cpu_push_context(cpu);
-
 	switch (reg)
 	{
 		/* upper 16 bits of the address */
@@ -1629,9 +1594,6 @@ void tms34010_host_w(const device_config *cpu, int reg, int data)
 			logerror("tms34010_host_control_w called on invalid register %d\n", reg);
 			break;
 	}
-
-	/* swap back */
-	cpu_pop_context();
 }
 
 
@@ -1665,9 +1627,7 @@ int tms34010_host_r(const device_config *cpu, int reg)
 
 			/* read from the address */
 			addr = (IOREG(tms, REG_HSTADRH) << 16) | IOREG(tms, REG_HSTADRL);
-			cpu_push_context(cpu);
 			result = TMS34010_RDMEM_WORD(tms, TOBYTE(addr & 0xfffffff0));
-			cpu_pop_context();
 
 			/* optional postincrement (it says preincrement, but data is preloaded, so it
                is effectively a postincrement */
@@ -1824,8 +1784,6 @@ CPU_GET_INFO( tms34010 )
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(tms34010);		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(tms34010); break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(tms34010); break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(tms34010);				break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(tms34010);			break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(tms34010);				break;
@@ -1914,8 +1872,6 @@ CPU_GET_INFO( tms34020 )
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 4;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(tms34020); break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(tms34020); break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(tms34020);			break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(tms34020);		break;
 

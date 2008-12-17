@@ -10,6 +10,7 @@
 #include "machine/ins8250.h"
 #include "machine/mc146818.h"
 #include "machine/pic8259.h"
+#include "machine/i82439tx.h"
 #include "devices/printer.h"
 
 #include "machine/pit8253.h"
@@ -198,7 +199,7 @@ static ADDRESS_MAP_START(at586_io, ADDRESS_SPACE_IO, 32)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE8(pc_fdc_r,				pc_fdc_w, 0xffffffff)
 	AM_RANGE(0x03bc, 0x03bf) AM_READWRITE(pc32le_parallelport0_r,		pc32le_parallelport0_w)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8(NS16450, "ns16450_0", ins8250_r, ins8250_w, 0xffffffff)
-	AM_RANGE(0x0cf8, 0x0cff) AM_READWRITE(pci_32le_r,				pci_32le_w)
+	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE(PCI_BUS, "pcibus", pci_32le_r,				pci_32le_w)
 ADDRESS_MAP_END
 
 
@@ -718,6 +719,9 @@ static MACHINE_DRIVER_START( at586 )
 	MDRV_CPU_REPLACE("main", PENTIUM, 60000000)
 	MDRV_CPU_PROGRAM_MAP(at586_map, 0)
 	MDRV_CPU_IO_MAP(at586_io, 0)
+
+	MDRV_PCI_BUS_ADD("pcibus", 0)
+	MDRV_PCI_BUS_DEVICE(0, NULL, NULL, intel82439tx_pci_read, intel82439tx_pci_write)
 MACHINE_DRIVER_END
 
 

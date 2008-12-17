@@ -196,13 +196,13 @@ VIDEO_START( atarisy1 )
 	decode_gfx(machine, playfield_lookup, motable);
 
 	/* initialize the playfield */
-	atarigen_playfield_tilemap = tilemap_create(get_playfield_tile_info, tilemap_scan_rows,  8,8, 64,64);
+	atarigen_playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_rows,  8,8, 64,64);
 
 	/* initialize the motion objects */
 	atarimo_init(machine, 0, &modesc);
 
 	/* initialize the alphanumerics */
-	atarigen_alpha_tilemap = tilemap_create(get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,32);
+	atarigen_alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,32);
 	tilemap_set_transparent_pen(atarigen_alpha_tilemap, 0);
 
 	/* modify the motion object code lookup */
@@ -671,15 +671,15 @@ static int get_bank(running_machine *machine, UINT8 prom1, UINT8 prom2, int bpp)
 	switch (bpp)
 	{
 	case 4:
-		machine->gfx[gfx_index] = allocgfx(&objlayout_4bpp);
+		machine->gfx[gfx_index] = allocgfx(machine, &objlayout_4bpp);
 		break;
 
 	case 5:
-		machine->gfx[gfx_index] = allocgfx(&objlayout_5bpp);
+		machine->gfx[gfx_index] = allocgfx(machine, &objlayout_5bpp);
 		break;
 
 	case 6:
-		machine->gfx[gfx_index] = allocgfx(&objlayout_6bpp);
+		machine->gfx[gfx_index] = allocgfx(machine, &objlayout_6bpp);
 		break;
 
 	default:

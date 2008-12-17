@@ -135,7 +135,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static VIDEO_START( jokrwild )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 8, 8, 24, 26);
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 24, 26);
 }
 
 
@@ -420,8 +420,8 @@ static DRIVER_INIT( jokrwild )
 	}
 
 	/* Initializing PIAs... */
-//  pia_config(0, &pia0_intf);
-//  pia_config(1, &pia1_intf);
+//  pia_config(machine, 0, &pia0_intf);
+//  pia_config(machine, 1, &pia1_intf);
 }
 
 

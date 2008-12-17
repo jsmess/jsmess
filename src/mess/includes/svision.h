@@ -61,7 +61,7 @@ typedef struct
 
 extern SVISION_CHANNEL svision_channel[2];
 
-void *svision_custom_start(int clock, const custom_sound_interface *config);
+void *svision_custom_start(const device_config *device, int clock, const custom_sound_interface *config);
 
 void svision_soundport_w (running_machine *machine, SVISION_CHANNEL *channel, int offset, int data);
 WRITE8_HANDLER( svision_sounddma_w );

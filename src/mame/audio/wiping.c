@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "streams.h"
 #include "sound/custom.h"
 
@@ -162,12 +161,13 @@ static void wiping_update_mono(void *param, stream_sample_t **inputs, stream_sam
 
 
 
-void *wiping_sh_start(int clock, const custom_sound_interface *config)
+CUSTOM_START( wiping_sh_start )
 {
+	running_machine *machine = device->machine;
 	sound_channel *voice;
 
 	/* get stream channels */
-	stream = stream_create(0, 1, samplerate, NULL, wiping_update_mono);
+	stream = stream_create(device, 0, 1, samplerate, NULL, wiping_update_mono);
 
 	/* allocate a pair of buffers to mix into - 1 second's worth should be more than enough */
 	mixer_buffer = auto_malloc(2 * sizeof(short) * samplerate);
@@ -181,8 +181,8 @@ void *wiping_sh_start(int clock, const custom_sound_interface *config)
 	num_voices = 8;
 	last_channel = channel_list + num_voices;
 
-	sound_rom = memory_region(Machine, "samples");
-	sound_prom = memory_region(Machine, "soundproms");
+	sound_rom = memory_region(machine, "samples");
+	sound_prom = memory_region(machine, "soundproms");
 
 	/* start with sound enabled, many games don't have a sound enable register */
 	sound_enable = 1;

@@ -50,10 +50,10 @@ typedef struct _vectrex_point
 
 *********************************************************************/
 
-static WRITE8_HANDLER (v_via_pa_w);
-static WRITE8_HANDLER(v_via_pb_w);
-static WRITE8_HANDLER (v_via_ca2_w);
-static WRITE8_HANDLER (v_via_cb2_w);
+static WRITE8_DEVICE_HANDLER (v_via_pa_w);
+static WRITE8_DEVICE_HANDLER(v_via_pb_w);
+static WRITE8_DEVICE_HANDLER (v_via_ca2_w);
+static WRITE8_DEVICE_HANDLER (v_via_cb2_w);
 
 
 /*********************************************************************
@@ -62,7 +62,7 @@ static WRITE8_HANDLER (v_via_cb2_w);
 
 *********************************************************************/
 
-static const struct via6522_interface vectrex_via6522_interface =
+const via6522_interface vectrex_via6522_interface =
 {
 	v_via_pa_r, v_via_pb_r,         /* read PA/B */
 	0, 0, 0, 0,                     /* read ca1, cb1, ca2, cb2 */
@@ -98,8 +98,9 @@ static TIMER_CALLBACK(lightpen_trigger)
 {
 	if (vectrex_lightpen_port & 1)
 	{
-		via_set_input_ca1(machine, 0, 1);
-		via_set_input_ca1(machine, 0, 0);
+		const device_config *via_0 = device_list_find_by_tag(machine->config->devicelist, VIA6522, "via6522_0");
+		via_ca1_w(via_0, 0, 1);
+		via_ca1_w(via_0, 0, 0);
 	}
 
 	if (vectrex_lightpen_port & 2)
@@ -128,8 +129,15 @@ static TIMER_CALLBACK(lightpen_trigger)
 
 *********************************************************************/
 
+READ8_HANDLER(vectrex_via_r)
+{
+	const device_config *via = device_list_find_by_tag(space->machine->config->devicelist, VIA6522, "via6522_0");
+	return via_r(via, offset);
+}
+
 WRITE8_HANDLER(vectrex_via_w) 
 { 
+	const device_config *via = device_list_find_by_tag(space->machine->config->devicelist, VIA6522, "via6522_0");
 	attotime period;
 
 	switch (offset)
@@ -152,7 +160,7 @@ WRITE8_HANDLER(vectrex_via_w)
 								  period);
 		break;
 	}
-	via_write(space->machine, 0, offset, data); 
+	via_w(via, offset, data); 
 }
 
 
@@ -293,9 +301,6 @@ VIDEO_START(vectrex)
 	x_max = visarea->max_x << 16;
 	y_max = visarea->max_y << 16;
 
-	via_config(0, &vectrex_via6522_interface);
-	via_reset();
-
 	imager_freq = 1;
 
 	imager_timer = timer_alloc(machine, vectrex_imager_eye, NULL);
@@ -330,7 +335,7 @@ static void vectrex_multiplexer(running_machine *machine, int mux)
 }
 
 
-static WRITE8_HANDLER(v_via_pb_w)
+static WRITE8_DEVICE_HANDLER(v_via_pb_w)
 {
 	if (!(data & 0x80))
 	{
@@ -370,7 +375,7 @@ static WRITE8_HANDLER(v_via_pb_w)
 						+(double)(pen_y - y_int) * (pen_y - y_int);
 					d2 = b2 - ab * ab / a2;
 					if (d2 < 2e10 && analog[A_Z] * blank > 0)
-						timer_adjust_oneshot(lp_t, double_to_attotime(ab / a2 / (cpu_get_clock(space->machine->cpu[0]) * INT_PER_CLOCK)), 0);
+						timer_adjust_oneshot(lp_t, double_to_attotime(ab / a2 / (cpu_get_clock(device->machine->cpu[0]) * INT_PER_CLOCK)), 0);
 				}
 			}
 		}
@@ -378,7 +383,7 @@ static WRITE8_HANDLER(v_via_pb_w)
 		if (!(data & 0x1) && (vectrex_via_out[PORTB] & 0x1))
 		{
 			/* MUX has been enabled */
-			timer_set(space->machine, ATTOTIME_IN_NSEC(ANALOG_DELAY), NULL, 0, update_signal);
+			timer_set(device->machine, ATTOTIME_IN_NSEC(ANALOG_DELAY), NULL, 0, update_signal);
 		}
 	}
 	else
@@ -395,6 +400,8 @@ static WRITE8_HANDLER(v_via_pb_w)
 	/* Sound */
 	if (data & 0x10)
 	{
+		const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 		if (data & 0x08) /* BC1 (do we select a reg or write it ?) */
 			ay8910_control_port_0_w(space, 0, vectrex_via_out[PORTA]);
 		else
@@ -402,32 +409,32 @@ static WRITE8_HANDLER(v_via_pb_w)
 	}
 
 	if (!(data & 0x1) && (vectrex_via_out[PORTB] & 0x1))
-		vectrex_multiplexer (space->machine, (data >> 1) & 0x3);
+		vectrex_multiplexer (device->machine, (data >> 1) & 0x3);
 
 	vectrex_via_out[PORTB] = data;
-	timer_set(space->machine, ATTOTIME_IN_NSEC(ANALOG_DELAY), &ramp, data & 0x80, update_signal);
+	timer_set(device->machine, ATTOTIME_IN_NSEC(ANALOG_DELAY), &ramp, data & 0x80, update_signal);
 }
 
 
-static WRITE8_HANDLER(v_via_pa_w)
+static WRITE8_DEVICE_HANDLER(v_via_pa_w)
 {
 	/* DAC output always goes to Y integrator */
 	vectrex_via_out[PORTA] = data;
-	timer_set(space->machine, ATTOTIME_IN_NSEC(ANALOG_DELAY), &analog[A_Y], data, update_signal);
+	timer_set(device->machine, ATTOTIME_IN_NSEC(ANALOG_DELAY), &analog[A_Y], data, update_signal);
 
 	if (!(vectrex_via_out[PORTB] & 0x1))
-		vectrex_multiplexer (space->machine, (vectrex_via_out[PORTB] >> 1) & 0x3);
+		vectrex_multiplexer (device->machine, (vectrex_via_out[PORTB] >> 1) & 0x3);
 }
 
 
-static WRITE8_HANDLER(v_via_ca2_w)
+static WRITE8_DEVICE_HANDLER(v_via_ca2_w)
 {
 	if (data == 0)
-		timer_set(space->machine, ATTOTIME_IN_NSEC(ANALOG_DELAY), NULL, 0, vectrex_zero_integrators);
+		timer_set(device->machine, ATTOTIME_IN_NSEC(ANALOG_DELAY), NULL, 0, vectrex_zero_integrators);
 }
 
 
-static WRITE8_HANDLER(v_via_cb2_w)
+static WRITE8_DEVICE_HANDLER(v_via_cb2_w)
 {
 	int dx, dy;
 	static UINT8 cb2 = 0;
@@ -438,21 +445,21 @@ static WRITE8_HANDLER(v_via_cb2_w)
 		/* Check lightpen */
 		if (vectrex_lightpen_port != 0)
 		{
-			lightpen_down = input_port_read(space->machine, "LPENCONF") & 0x10;
+			lightpen_down = input_port_read(device->machine, "LPENCONF") & 0x10;
 			
 			if (lightpen_down)
 			{
-				pen_x = input_port_read(space->machine, "LPENX") * (x_max / 0xff);
-				pen_y = input_port_read(space->machine, "LPENY") * (y_max / 0xff);
+				pen_x = input_port_read(device->machine, "LPENX") * (x_max / 0xff);
+				pen_y = input_port_read(device->machine, "LPENY") * (y_max / 0xff);
 				
 				dx = abs(pen_x - x_int);
 				dy = abs(pen_y - y_int);
 				if (dx < 500000 && dy < 500000 && data > 0)
-					timer_set(space->machine, attotime_zero, NULL, 0, lightpen_trigger);
+					timer_set(device->machine, attotime_zero, NULL, 0, lightpen_trigger);
 			}
 		}
 
-		timer_set(space->machine, attotime_zero, &blank, data, update_signal);
+		timer_set(device->machine, attotime_zero, &blank, data, update_signal);
 		cb2 = data;
 	}
 }
@@ -464,7 +471,7 @@ static WRITE8_HANDLER(v_via_cb2_w)
 
 *****************************************************************/
 
-static const struct via6522_interface spectrum1_via6522_interface =
+const via6522_interface spectrum1_via6522_interface =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ v_via_pa_r, s1_via_pb_r, 0, 0, 0, 0,
 	/*outputs: A/B,CA/B1,CA/B2 */ v_via_pa_w, v_via_pb_w, 0, 0, v_via_ca2_w, v_via_cb2_w,
@@ -490,8 +497,6 @@ VIDEO_START(raaspec)
 	x_max = visarea->max_x << 16;
 	y_max = visarea->max_y << 16;
 
-	via_config(0, &spectrum1_via6522_interface);
-	via_reset();
 	refresh = timer_alloc(machine, vectrex_refresh, NULL);
 
 	VIDEO_START_CALL(vector);

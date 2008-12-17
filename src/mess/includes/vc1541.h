@@ -9,7 +9,12 @@
 #ifndef VC1541_H_
 #define VC1541_H_
 
+#include "machine/6522via.h"
+
 /*----------- defined in machine/vc1541.c -----------*/
+
+extern const via6522_interface vc1541_via2;
+extern const via6522_interface vc1541_via3;
 
 /* we currently have preliminary support for 1541 & 1551 only */
 enum { 

@@ -9,11 +9,15 @@
 #ifndef LISA_H_
 #define LISA_H_
 
+#include "machine/6522via.h"
 
 /*----------- defined in machine/lisa.c -----------*/
 
 extern UINT8 *lisa_fdc_rom;
 extern UINT8 *lisa_fdc_ram;
+
+extern const via6522_interface lisa_via6522_0_intf;
+extern const via6522_interface lisa_via6522_1_intf;
 
 VIDEO_START( lisa );
 VIDEO_UPDATE( lisa );

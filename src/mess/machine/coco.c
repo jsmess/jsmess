@@ -2874,7 +2874,7 @@ static void generic_init_machine(running_machine *machine, const machine_init_in
 
 	/* setup PIAs */
 	for (i = 0; i < init->piaintf_count; i++)
-		pia_config(i, &init->piaintf[i]);
+		pia_config(machine, i, &init->piaintf[i]);
 	pia_reset();
 
 	/* cartridge line timers */

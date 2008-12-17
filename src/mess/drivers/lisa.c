@@ -12,6 +12,7 @@
 #include "includes/lisa.h"
 #include "devices/sonydriv.h"
 #include "machine/applefdc.h"
+#include "machine/6522via.h"
 
 
 /***************************************************************************
@@ -121,6 +122,10 @@ static MACHINE_DRIVER_START( lisa )
 	/* devices */
 	MDRV_DEVICE_ADD("fdc", IWM)
 	MDRV_DEVICE_CONFIG(lisa2_fdc_interface)
+
+	/* via */
+	MDRV_VIA6522_ADD("via6522_0", 500000, lisa_via6522_0_intf)
+	MDRV_VIA6522_ADD("via6522_1", 500000, lisa_via6522_1_intf)
 MACHINE_DRIVER_END
 
 
@@ -132,6 +137,12 @@ static MACHINE_DRIVER_START( lisa210 )
 	/* Lisa 2/10 and MacXL had a slightly different FDC interface */	
 	MDRV_DEVICE_MODIFY("fdc", IWM)
 	MDRV_DEVICE_CONFIG(lisa210_fdc_interface)
+
+	/* via */
+	MDRV_VIA6522_REMOVE("via6522_0")
+	MDRV_VIA6522_REMOVE("via6522_1")
+	MDRV_VIA6522_ADD("via6522_0", 1250000, lisa_via6522_0_intf)
+	MDRV_VIA6522_ADD("via6522_1", 1250000, lisa_via6522_1_intf)
 MACHINE_DRIVER_END
 
 

@@ -49,7 +49,7 @@ static WRITE32_HANDLER(bank_e8000_w)	{ COMBINE_DATA(&i82439tx->bios_ram[offset +
 static WRITE32_HANDLER(bank_ec000_w)	{ COMBINE_DATA(&i82439tx->bios_ram[offset + 0x2c000 / 4]); }
 static WRITE32_HANDLER(bank_f0000_w)	{ COMBINE_DATA(&i82439tx->bios_ram[offset + 0x30000 / 4]); }
 
-static UINT32 intel82439tx_pci_read(int function, int offset, UINT32 mem_mask)
+UINT32 intel82439tx_pci_read(const device_config *busdevice, const device_config *device, int function, int offset, UINT32 mem_mask)
 {
 	UINT32 result = 0;
 
@@ -119,7 +119,7 @@ static void intel82439tx_configure_memory(running_machine *machine, UINT8 val, o
 
 
 
-static void intel82439tx_pci_write(int function, int offset, UINT32 data, UINT32 mem_mask)
+void intel82439tx_pci_write(const device_config *busdevice, const device_config *device, int function, int offset, UINT32 data, UINT32 mem_mask)
 {
 	running_machine *machine = Machine;
 
@@ -211,20 +211,9 @@ static void intel82439tx_pci_write(int function, int offset, UINT32 data, UINT32
 
 
 
-static const struct pci_device_info intel82439tx_callbacks =
-{
-	intel82439tx_pci_read,
-	intel82439tx_pci_write
-};
-
-
-
 void intel82439tx_init(running_machine *machine)
 {
 	/* setup PCI */
-	pci_init();
-	pci_add_device(0, 0, &intel82439tx_callbacks);
-
 	i82439tx = auto_malloc(sizeof(*i82439tx));
 	memset(i82439tx, 0, sizeof(*i82439tx));
 	i82439tx->regs[0x00] = 0x14020000;

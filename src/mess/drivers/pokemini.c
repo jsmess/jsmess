@@ -96,7 +96,7 @@ MACHINE_DRIVER_END
 
 static DRIVER_INIT( pokemini )
 {
-	i2cmem_init( 0, I2CMEM_SLAVE_ADDRESS, 0, 0x2000, NULL);
+	i2cmem_init( machine, 0, I2CMEM_SLAVE_ADDRESS, 0, 0x2000, NULL);
 }
 
 

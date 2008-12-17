@@ -49,8 +49,8 @@ void lynx_audio_reset(void);
 void lynx_audio_write(int offset, UINT8 data);
 UINT8 lynx_audio_read(int offset);
 void lynx_audio_count_down(running_machine *machine, int nr);
-void *lynx_custom_start(int clock, const custom_sound_interface *config);
-void *lynx2_custom_start(int clock, const custom_sound_interface *config);
+void *lynx_custom_start(const device_config *device, int clock, const custom_sound_interface *config);
+void *lynx2_custom_start(const device_config *device, int clock, const custom_sound_interface *config);
 
 
 #endif /* LYNX_H_ */

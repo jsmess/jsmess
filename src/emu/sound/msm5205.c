@@ -16,7 +16,6 @@
 
 #include "sndintrf.h"
 #include "streams.h"
-#include "deprecat.h"
 #include "msm5205.h"
 
 /*
@@ -188,8 +187,8 @@ static SND_START( msm5205 )
 	ComputeTables (voice);
 
 	/* stream system initialize */
-	voice->stream = stream_create(0,1,clock,voice,MSM5205_update);
-	voice->timer = timer_alloc(Machine, MSM5205_vclk_callback, voice);
+	voice->stream = stream_create(device,0,1,clock,voice,MSM5205_update);
+	voice->timer = timer_alloc(device->machine, MSM5205_vclk_callback, voice);
 
 	/* initialize */
 	msm5205_reset(voice);
@@ -225,7 +224,7 @@ void msm5205_vclk_w (int num, int vclk)
 		if( voice->vclk != vclk)
 		{
 			voice->vclk = vclk;
-			if( !vclk ) MSM5205_vclk_callback(Machine, voice, 0);
+			if( !vclk ) MSM5205_vclk_callback(voice->device->machine, voice, 0);
 		}
 	}
 }

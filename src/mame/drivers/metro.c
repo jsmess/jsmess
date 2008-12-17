@@ -187,7 +187,7 @@ static void update_irq_state(running_machine *machine)
 /* For games that supply an *IRQ Vector* on the data bus */
 static IRQ_CALLBACK(metro_irq_callback)
 {
-//  logerror("CPU #0 PC %06X: irq callback returns %04X\n",cpu_get_pc(machine->activecpu),metro_irq_vectors[int_level]);
+//  logerror("%s: irq callback returns %04X\n",cpuexec_describe_context(device->machine),metro_irq_vectors[int_level]);
 	return metro_irq_vectors[irqline]&0xff;
 }
 
@@ -692,7 +692,7 @@ INLINE void blt_write(const address_space *space, const int tmap, const offs_t o
 		case 2:	metro_vram_1_w(space,offs,data,mask);	break;
 		case 3:	metro_vram_2_w(space,offs,data,mask);	break;
 	}
-//  logerror("CPU #0 PC %06X : Blitter %X] %04X <- %04X & %04X\n",cpu_get_pc(machine->activecpu),tmap,offs,data,mask);
+//  logerror("%s : Blitter %X] %04X <- %04X & %04X\n",cpuexec_describe_context(space->machine),tmap,offs,data,mask);
 }
 
 
@@ -4222,7 +4222,7 @@ static NVRAM_HANDLER( dokyusp )
 		eeprom_save(file);
 	else
 	{
-		eeprom_init(&eeprom_interface_93C46);
+		eeprom_init(machine, &eeprom_interface_93C46);
 		if (file)	eeprom_load(file);
 		else		eeprom_set_data(def_data,sizeof(def_data)/sizeof(def_data[0]));
 	}

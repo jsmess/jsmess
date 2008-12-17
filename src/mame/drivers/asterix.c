@@ -34,21 +34,13 @@ static const eeprom_interface eeprom_intf =
 	"1100110000000" /* unlock command */
 };
 
-#if 0
-static void eeprom_init(void)
-{
-	eeprom_init(&eeprom_intf);
-	init_eeprom_count = 0;
-}
-#endif
-
 static NVRAM_HANDLER( asterix )
 {
 	if (read_or_write)
 		eeprom_save(file);
 	else
 	{
-		eeprom_init(&eeprom_intf);
+		eeprom_init(machine, &eeprom_intf);
 
 		if (file)
 		{
@@ -354,8 +346,8 @@ ROM_END
 
 static DRIVER_INIT( asterix )
 {
-	konami_rom_deinterleave_2("gfx1");
-	konami_rom_deinterleave_2("gfx2");
+	konami_rom_deinterleave_2(machine, "gfx1");
+	konami_rom_deinterleave_2(machine, "gfx2");
 
 #if 0
 	*(UINT16 *)(memory_region(machine, "main") + 0x07f34) = 0x602a;

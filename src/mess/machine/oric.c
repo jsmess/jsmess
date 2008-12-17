@@ -162,8 +162,10 @@ WRITE8_HANDLER (oric_psg_porta_write)
 static char oric_psg_control;
 
 /* this port is also used to read printer data */
-static  READ8_HANDLER ( oric_via_in_a_func )
+static READ8_DEVICE_HANDLER ( oric_via_in_a_func )
 {
+	const address_space *space = cpu_get_address_space( device->machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+
 	/*logerror("port a read\r\n"); */
 
 	/* access psg? */
@@ -183,11 +185,11 @@ static  READ8_HANDLER ( oric_via_in_a_func )
 	return oric_via_port_a_data;
 }
 
-static READ8_HANDLER ( oric_via_in_b_func )
+static READ8_DEVICE_HANDLER ( oric_via_in_b_func )
 {
 	int data;
 
-	oric_keyboard_sense_refresh(space->machine);
+	oric_keyboard_sense_refresh(device->machine);
 
 	data = oric_key_sense_bit;
 	data |= oric_keyboard_line & 0x07;
@@ -197,7 +199,7 @@ static READ8_HANDLER ( oric_via_in_b_func )
 
 
 /* read/write data depending on state of bdir, bc1 pins and data output to psg */
-static void oric_psg_connection_refresh(const address_space *space)
+static void oric_psg_connection_refresh(running_machine *machine)
 {
 	if (oric_psg_control!=0)
 	{
@@ -215,12 +217,14 @@ static void oric_psg_connection_refresh(const address_space *space)
 			/* write register data */
 			case 2:
 			{
+				const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
 				ay8910_write_port_0_w(space, 0, oric_via_port_a_data);
 			}
 			break;
 			/* write register index */
 			case 3:
 			{
+				const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
 				ay8910_control_port_0_w(space, 0, oric_via_port_a_data);
 			}
 			break;
@@ -233,11 +237,11 @@ static void oric_psg_connection_refresh(const address_space *space)
 	}
 }
 
-static WRITE8_HANDLER ( oric_via_out_a_func )
+static WRITE8_DEVICE_HANDLER ( oric_via_out_a_func )
 {
 	oric_via_port_a_data = data;
 
-	oric_psg_connection_refresh(space);
+	oric_psg_connection_refresh(device->machine);
 
 
 	if (oric_psg_control==0)
@@ -280,6 +284,7 @@ static TIMER_CALLBACK(oric_refresh_tape)
 {
 	int data;
 	int input_port_9;
+	const device_config *via_0 = device_list_find_by_tag(machine->config->devicelist, VIA6522, "via6522_0");
 
 	data = 0;
 
@@ -299,11 +304,11 @@ static TIMER_CALLBACK(oric_refresh_tape)
 		data = input_port_9>>4;
 	}
 
-	via_set_input_cb1(machine, 0, data);
+	via_cb1_w(via_0, 0, data);
 }
 
 static unsigned char previous_portb_data = 0;
-static WRITE8_HANDLER ( oric_via_out_b_func )
+static WRITE8_DEVICE_HANDLER ( oric_via_out_b_func )
 {
 	int printer_handshake;
 
@@ -319,12 +324,12 @@ static WRITE8_HANDLER ( oric_via_out_b_func )
 	}
 
 	cassette_change_state(
-		cassette_device_image(space->machine),
+		cassette_device_image(device->machine),
 		(data & 0x40) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,
 		CASSETTE_MOTOR_DISABLED);
 
 	/* cassette data out */
-	cassette_output(cassette_device_image(space->machine), (data & (1<<7)) ? -1.0 : +1.0);
+	cassette_output(cassette_device_image(device->machine), (data & (1<<7)) ? -1.0 : +1.0);
 
 
 	/* PRINTER STROBE */
@@ -340,7 +345,7 @@ static WRITE8_HANDLER ( oric_via_out_b_func )
 	centronics_write_handshake(0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
 	centronics_write_handshake(0, printer_handshake, CENTRONICS_STROBE);
 
-	oric_psg_connection_refresh(space);
+	oric_psg_connection_refresh(device->machine);
 	previous_portb_data = data;
 
 }
@@ -348,6 +353,7 @@ static WRITE8_HANDLER ( oric_via_out_b_func )
 static void oric_printer_handshake_in(int number, int data, int mask)
 {
 	int acknowledge;
+	const device_config *via_0 = device_list_find_by_tag(Machine->config->devicelist, VIA6522, "via6522_0");
 
 	acknowledge = 1;
 
@@ -359,7 +365,7 @@ static void oric_printer_handshake_in(int number, int data, int mask)
 		}
 	}
 
-    via_set_input_ca1(Machine, 0, acknowledge);
+    via_ca1_w(via_0, 0, acknowledge);
 }
 
 static const CENTRONICS_CONFIG oric_cent_config[1]={
@@ -370,17 +376,17 @@ static const CENTRONICS_CONFIG oric_cent_config[1]={
 };
 
 
-static  READ8_HANDLER ( oric_via_in_ca2_func )
+static READ8_DEVICE_HANDLER ( oric_via_in_ca2_func )
 {
 	return oric_psg_control & 1;
 }
 
-static  READ8_HANDLER ( oric_via_in_cb2_func )
+static READ8_DEVICE_HANDLER ( oric_via_in_cb2_func )
 {
 	return (oric_psg_control>>1) & 1;
 }
 
-static WRITE8_HANDLER ( oric_via_out_ca2_func )
+static WRITE8_DEVICE_HANDLER ( oric_via_out_ca2_func )
 {
 	oric_psg_control &=~1;
 
@@ -389,10 +395,10 @@ static WRITE8_HANDLER ( oric_via_out_ca2_func )
 		oric_psg_control |=1;
 	}
 
-	oric_psg_connection_refresh(space);
+	oric_psg_connection_refresh(device->machine);
 }
 
-static WRITE8_HANDLER ( oric_via_out_cb2_func )
+static WRITE8_DEVICE_HANDLER ( oric_via_out_cb2_func )
 {
 	oric_psg_control &=~2;
 
@@ -401,11 +407,11 @@ static WRITE8_HANDLER ( oric_via_out_cb2_func )
 		oric_psg_control |=2;
 	}
 
-	oric_psg_connection_refresh(space);
+	oric_psg_connection_refresh(device->machine);
 }
 
 
-static void	oric_via_irq_func(running_machine *machine, int state)
+static void	oric_via_irq_func(const device_config *device, int state)
 {
 	oric_irqs &= ~(1<<0);
 
@@ -419,7 +425,7 @@ static void	oric_via_irq_func(running_machine *machine, int state)
 		oric_irqs |=(1<<0);
 	}
 
-	oric_refresh_ints(machine);
+	oric_refresh_ints(device->machine);
 }
 
 
@@ -462,7 +468,7 @@ CB2
 
 */
 
-static const struct via6522_interface oric_6522_interface=
+const via6522_interface oric_6522_interface=
 {
 	oric_via_in_a_func,
 	oric_via_in_b_func,
@@ -725,8 +731,9 @@ static void oric_jasmin_wd179x_callback(running_machine *machine, int State)
 	}
 }
 
-static  READ8_HANDLER (oric_jasmin_r)
+static READ8_HANDLER (oric_jasmin_r)
 {
+	const device_config *via_0 = device_list_find_by_tag(space->machine->config->devicelist, VIA6522, "via6522_0");
 	unsigned char data = 0x0ff;
 
 	switch (offset & 0x0f)
@@ -745,7 +752,7 @@ static  READ8_HANDLER (oric_jasmin_r)
 			data = wd17xx_data_r(space, 0);
 			break;
 		default:
-			data = via_0_r(space, offset & 0x0f);
+			data = via_r(via_0, offset & 0x0f);
 			logerror("unhandled io read: %04x %02x\n", offset, data);
 			break;
 
@@ -756,6 +763,7 @@ static  READ8_HANDLER (oric_jasmin_r)
 
 static WRITE8_HANDLER(oric_jasmin_w)
 {
+	const device_config *via_0 = device_list_find_by_tag(space->machine->config->devicelist, VIA6522, "via6522_0");
 	switch (offset & 0x0f)
 	{
 		/* microdisc floppy disc interface */
@@ -798,7 +806,7 @@ static WRITE8_HANDLER(oric_jasmin_w)
 			break;
 
 		default:
-			via_0_w(space, offset & 0x0f, data);
+			via_w(via_0, offset & 0x0f, data);
 			break;
 	}
 }
@@ -987,7 +995,10 @@ READ8_HANDLER (oric_microdisc_r)
 			break;
 
 		default:
-			data = via_0_r(space, offset & 0x0f);
+			{
+				const device_config *via_0 = device_list_find_by_tag(space->machine->config->devicelist, VIA6522, "via6522_0");
+				data = via_r(via_0, offset & 0x0f);
+			}
 			break;
 
 	}
@@ -1043,7 +1054,10 @@ WRITE8_HANDLER(oric_microdisc_w)
 		break;
 
 		default:
-			via_0_w(space, offset & 0x0f, data);
+			{
+				const device_config *via_0 = device_list_find_by_tag(space->machine->config->devicelist, VIA6522, "via6522_0");
+				via_w(via_0, offset & 0x0f, data);
+			}
 			break;
 	}
 }
@@ -1120,20 +1134,18 @@ DEVICE_IMAGE_LOAD( oric_floppy )
 
 static void oric_common_init_machine(running_machine *machine)
 {
-    /* clear all irqs */
+	const device_config *via_0 = device_list_find_by_tag(machine->config->devicelist, VIA6522, "via6522_0");
+
+	/* clear all irqs */
 	oric_irqs = 0;
 	oric_ram_0x0c000 = NULL;
 
     timer_pulse(machine, ATTOTIME_IN_HZ(4800), NULL, 0, oric_refresh_tape);
 
-	via_reset();
-	via_config(0, &oric_6522_interface);
-	via_set_clock(0,1000000);
-
 	centronics_config(0, oric_cent_config);
 	/* assumption: select is tied low */
 	centronics_write_handshake(0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
-    via_set_input_ca1(machine, 0, 1);
+    via_ca1_w(via_0, 0, 1);
 }
 
 MACHINE_START( oric )
@@ -1211,6 +1223,7 @@ MACHINE_RESET( oric )
 
 READ8_HANDLER ( oric_IO_r )
 {
+	const device_config *via_0 = device_list_find_by_tag(space->machine->config->devicelist, VIA6522, "via6522_0");
 #if 0
 	switch (input_port_read(machine, "FLOPPY") & 0x07)
 	{
@@ -1245,11 +1258,12 @@ READ8_HANDLER ( oric_IO_r )
 		}
 	}
 	/* it is repeated */
-	return via_0_r(space, offset & 0x0f);
+	return via_r(via_0, offset & 0x0f);
 }
 
 WRITE8_HANDLER ( oric_IO_w )
 {
+	const device_config *via_0 = device_list_find_by_tag(space->machine->config->devicelist, VIA6522, "via6522_0");
 #if 0
 	switch (input_port_read(machine, "FLOPPY") & 0x07)
 	{
@@ -1284,7 +1298,7 @@ WRITE8_HANDLER ( oric_IO_w )
 		logerror("via 0 w: %04x %02x %04x\n",offset,data,(unsigned) cpu_get_reg(space->machine->cpu[0], REG_PC));
 	}
 
-	via_0_w(space, offset & 0x0f,data);
+	via_w(via_0, offset & 0x0f,data);
 }
 
 
@@ -1398,14 +1412,14 @@ static void	telestrat_refresh_mem(running_machine *machine)
 	memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, wh);
 }
 
-static  READ8_HANDLER(telestrat_via2_in_a_func)
+static READ8_DEVICE_HANDLER(telestrat_via2_in_a_func)
 {
 	logerror("via 2 - port a %02x\n",telestrat_via2_port_a_data);
 	return telestrat_via2_port_a_data;
 }
 
 
-static WRITE8_HANDLER(telestrat_via2_out_a_func)
+static WRITE8_DEVICE_HANDLER(telestrat_via2_out_a_func)
 {
 	logerror("via 2 - port a w: %02x\n",data);
 
@@ -1415,24 +1429,24 @@ static WRITE8_HANDLER(telestrat_via2_out_a_func)
 	{
 		telestrat_bank_selection = data & 0x07;
 
-		telestrat_refresh_mem(space->machine);
+		telestrat_refresh_mem(device->machine);
 	}
 }
 
-static  READ8_HANDLER(telestrat_via2_in_b_func)
+static READ8_DEVICE_HANDLER(telestrat_via2_in_b_func)
 {
 	unsigned char data = 0x01f;
 
 	/* left joystick selected? */
 	if (telestrat_via2_port_b_data & (1<<6))
 	{
-		data &= input_port_read(space->machine, "JOY0");
+		data &= input_port_read(device->machine, "JOY0");
 	}
 
 	/* right joystick selected? */
 	if (telestrat_via2_port_b_data & (1<<7))
 	{
-		data &= input_port_read(space->machine, "JOY1");
+		data &= input_port_read(device->machine, "JOY1");
 	}
 
 	data |= telestrat_via2_port_b_data & ((1<<7) | (1<<6) | (1<<5));
@@ -1440,13 +1454,13 @@ static  READ8_HANDLER(telestrat_via2_in_b_func)
 	return data;
 }
 
-static WRITE8_HANDLER(telestrat_via2_out_b_func)
+static WRITE8_DEVICE_HANDLER(telestrat_via2_out_b_func)
 {
 	telestrat_via2_port_b_data = data;
 }
 
 
-static void	telestrat_via2_irq_func(running_machine *machine, int state)
+static void	telestrat_via2_irq_func(const device_config *device, int state)
 {
     oric_irqs &=~(1<<2);
 
@@ -1457,9 +1471,9 @@ static void	telestrat_via2_irq_func(running_machine *machine, int state)
         oric_irqs |=(1<<2);
 	}
 
-    oric_refresh_ints(machine);
+    oric_refresh_ints(device->machine);
 }
-static const struct via6522_interface telestrat_via2_interface=
+const via6522_interface telestrat_via2_interface=
 {
 	telestrat_via2_in_a_func,
 	telestrat_via2_in_b_func,
@@ -1531,9 +1545,6 @@ MACHINE_START( telestrat )
 	/* disable os rom, enable microdisc rom */
 	/* 0x0c000-0x0dfff will be ram, 0x0e000-0x0ffff will be microdisc rom */
     port_314_w = 0x0ff^((1<<7) | (1<<1));
-
-	via_config(1, &telestrat_via2_interface);
-	via_set_clock(1,1000000);
 
 	wd17xx_init(machine, WD_TYPE_179X,oric_wd179x_callback, NULL);
 }

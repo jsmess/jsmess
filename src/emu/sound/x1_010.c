@@ -49,7 +49,6 @@ Registers:
 ***************************************************************************/
 
 #include "sndintrf.h"
-#include "deprecat.h"
 #include "cpuintrf.h"
 #include "streams.h"
 #include "x1_010.h"
@@ -214,7 +213,7 @@ static SND_START( x1_010 )
 	LOG_SOUND(("masterclock = %d rate = %d\n", clock, info->rate ));
 
 	/* get stream channels */
-	info->stream = stream_create(0,2,info->rate,info,seta_update);
+	info->stream = stream_create(device,0,2,info->rate,info,seta_update);
 
 	return info;
 }

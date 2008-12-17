@@ -4,7 +4,7 @@
 
 void ti990_reset_int(void);
 void ti990_set_int_line(running_machine *machine, int line, int state);
-void ti990_set_int2(int state);
+void ti990_set_int2(const device_config *device, int state);
 void ti990_set_int3(int state);
 void ti990_set_int6(int state);
 void ti990_set_int7(int state);
@@ -18,6 +18,6 @@ void ti990_hold_load(running_machine *machine);
 WRITE8_HANDLER ( ti990_panel_write );
 
 void ti990_line_interrupt(void);
-void ti990_ckon_ckof_callback(int state);
+void ti990_ckon_ckof_callback(const device_config *device, int state);
 
 void ti990_cpuboard_reset(void);

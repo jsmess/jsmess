@@ -223,7 +223,7 @@
 
 #define VERBOSE_LEVEL ( 0 )
 
-INLINE void ATTR_PRINTF(2,3) verboselog( int n_level, const char *s_fmt, ... )
+INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, const char *s_fmt, ... )
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -232,14 +232,7 @@ INLINE void ATTR_PRINTF(2,3) verboselog( int n_level, const char *s_fmt, ... )
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		if( Machine->activecpu != NULL )
-		{
-			logerror( "%08x: %s", cpu_get_pc(Machine->activecpu), buf );
-		}
-		else
-		{
-			logerror( "(timer) : %s", buf );
-		}
+		logerror( "%s: %s", cpuexec_describe_context(machine), buf );
 	}
 }
 
@@ -284,13 +277,13 @@ static NVRAM_HANDLER( konami573 )
 
 static WRITE32_HANDLER( mb89371_w )
 {
-	verboselog( 2, "mb89371_w %08x %08x %08x\n", offset, mem_mask, data );
+	verboselog( space->machine, 2, "mb89371_w %08x %08x %08x\n", offset, mem_mask, data );
 }
 
 static READ32_HANDLER( mb89371_r )
 {
 	UINT32 data = 0xffffffff;
-	verboselog( 2, "mb89371_r %08x %08x %08x\n", offset, mem_mask, data );
+	verboselog( space->machine, 2, "mb89371_r %08x %08x %08x\n", offset, mem_mask, data );
 	return data;
 }
 
@@ -348,14 +341,14 @@ static READ32_HANDLER( jamma_r )
 		break;
 	}
 
-	verboselog( 2, "jamma_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
+	verboselog( space->machine, 2, "jamma_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
 
 	return data;
 }
 
 static WRITE32_HANDLER( jamma_w )
 {
-	verboselog( 2, "jamma_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
+	verboselog( space->machine, 2, "jamma_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
 
 	switch( offset )
 	{
@@ -367,7 +360,7 @@ static WRITE32_HANDLER( jamma_w )
 		break;
 
 	default:
-		verboselog( 0, "jamma_w: unhandled offset %08x %08x %08x\n", offset, mem_mask, data );
+		verboselog( space->machine, 0, "jamma_w: unhandled offset %08x %08x %08x\n", offset, mem_mask, data );
 		break;
 	}
 }
@@ -376,7 +369,7 @@ static UINT32 control;
 
 static READ32_HANDLER( control_r )
 {
-	verboselog( 2, "control_r( %08x, %08x ) %08x\n", offset, mem_mask, control );
+	verboselog( space->machine, 2, "control_r( %08x, %08x ) %08x\n", offset, mem_mask, control );
 
 	return control;
 }
@@ -386,7 +379,7 @@ static WRITE32_HANDLER( control_w )
 //  int old_bank = flash_bank;
 	COMBINE_DATA(&control);
 
-	verboselog( 2, "control_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
+	verboselog( space->machine, 2, "control_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
 
 	flash_bank = -1;
 
@@ -466,7 +459,7 @@ static TIMER_CALLBACK( atapi_xfer_end )
 
 	timer_adjust_oneshot(atapi_timer, attotime_never, 0);
 
-//  verboselog( 2, "atapi_xfer_end( %d ) atapi_xferlen = %d, atapi_xfermod=%d\n", x, atapi_xfermod, atapi_xferlen );
+//  verboselog( machine, 2, "atapi_xfer_end( %d ) atapi_xferlen = %d, atapi_xfermod=%d\n", x, atapi_xfermod, atapi_xferlen );
 
 //  mame_printf_debug("ATAPI: xfer_end.  xferlen = %d, atapi_xfermod = %d\n", atapi_xferlen, atapi_xfermod);
 
@@ -520,11 +513,12 @@ static TIMER_CALLBACK( atapi_xfer_end )
 
 	psx_irq_set(machine, 0x400);
 
-	verboselog( 2, "atapi_xfer_end: %d %d\n", atapi_xferlen, atapi_xfermod );
+	verboselog( machine, 2, "atapi_xfer_end: %d %d\n", atapi_xferlen, atapi_xfermod );
 }
 
 static READ32_HANDLER( atapi_r )
 {
+	running_machine *machine = space->machine;
 	int reg, data;
 
 	if (mem_mask == 0x0000ffff)	// word-wide command read
@@ -552,7 +546,7 @@ static READ32_HANDLER( atapi_r )
 				atapi_xfermod = 0;
 			}
 
-			verboselog( 2, "atapi_r: atapi_xferlen=%d\n", atapi_xferlen );
+			verboselog( machine, 2, "atapi_r: atapi_xferlen=%d\n", atapi_xferlen );
 			if( atapi_xferlen != 0 )
 			{
 				atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ | ATAPI_STAT_SERVDSC;
@@ -577,7 +571,7 @@ static READ32_HANDLER( atapi_r )
 			data |= ( atapi_data[atapi_data_ptr++] << 8 );
 			if( atapi_data_ptr >= atapi_data_len )
 			{
-//              verboselog( 2, "atapi_r: read all bytes\n" );
+//              verboselog( machine, 2, "atapi_r: read all bytes\n" );
 				atapi_data_ptr = 0;
 				atapi_data_len = 0;
 
@@ -610,28 +604,28 @@ static READ32_HANDLER( atapi_r )
 		switch( reg )
 		{
 		case ATAPI_REG_DATA:
-			verboselog( 1, "atapi_r: data=%02x\n", data );
+			verboselog( machine, 1, "atapi_r: data=%02x\n", data );
 			break;
 		case ATAPI_REG_ERRFEAT:
-			verboselog( 1, "atapi_r: errfeat=%02x\n", data );
+			verboselog( machine, 1, "atapi_r: errfeat=%02x\n", data );
 			break;
 		case ATAPI_REG_INTREASON:
-			verboselog( 1, "atapi_r: intreason=%02x\n", data );
+			verboselog( machine, 1, "atapi_r: intreason=%02x\n", data );
 			break;
 		case ATAPI_REG_SAMTAG:
-			verboselog( 1, "atapi_r: samtag=%02x\n", data );
+			verboselog( machine, 1, "atapi_r: samtag=%02x\n", data );
 			break;
 		case ATAPI_REG_COUNTLOW:
-			verboselog( 1, "atapi_r: countlow=%02x\n", data );
+			verboselog( machine, 1, "atapi_r: countlow=%02x\n", data );
 			break;
 		case ATAPI_REG_COUNTHIGH:
-			verboselog( 1, "atapi_r: counthigh=%02x\n", data );
+			verboselog( machine, 1, "atapi_r: counthigh=%02x\n", data );
 			break;
 		case ATAPI_REG_DRIVESEL:
-			verboselog( 1, "atapi_r: drivesel=%02x\n", data );
+			verboselog( machine, 1, "atapi_r: drivesel=%02x\n", data );
 			break;
 		case ATAPI_REG_CMDSTATUS:
-			verboselog( 1, "atapi_r: cmdstatus=%02x\n", data );
+			verboselog( machine, 1, "atapi_r: cmdstatus=%02x\n", data );
 			break;
 		}
 
@@ -640,19 +634,20 @@ static READ32_HANDLER( atapi_r )
 		data <<= shift;
 	}
 
-	verboselog( 2, "atapi_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
+	verboselog( machine, 2, "atapi_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
 	return data;
 }
 
 static WRITE32_HANDLER( atapi_w )
 {
+	running_machine *machine = space->machine;
 	int reg;
 
-	verboselog( 2, "atapi_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
+	verboselog( machine, 2, "atapi_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
 
 	if (mem_mask == 0x0000ffff)	// word-wide command write
 	{
-		verboselog( 2, "atapi_w: data=%04x\n", data );
+		verboselog( machine, 2, "atapi_w: data=%04x\n", data );
 
 //      mame_printf_debug("ATAPI: packet write %04x\n", data);
 		atapi_data[atapi_data_ptr++] = data & 0xff;
@@ -678,7 +673,7 @@ static WRITE32_HANDLER( atapi_w )
 		{
 			int phase;
 
-			verboselog( 2, "atapi_w: command %02x\n", atapi_data[0]&0xff );
+			verboselog( machine, 2, "atapi_w: command %02x\n", atapi_data[0]&0xff );
 
 			// reset data pointer for reading SCSI results
 			atapi_data_ptr = 0;
@@ -765,28 +760,28 @@ static WRITE32_HANDLER( atapi_w )
 		switch( reg )
 		{
 		case ATAPI_REG_DATA:
-			verboselog( 1, "atapi_w: data=%02x\n", data );
+			verboselog( machine, 1, "atapi_w: data=%02x\n", data );
 			break;
 		case ATAPI_REG_ERRFEAT:
-			verboselog( 1, "atapi_w: errfeat=%02x\n", data );
+			verboselog( machine, 1, "atapi_w: errfeat=%02x\n", data );
 			break;
 		case ATAPI_REG_INTREASON:
-			verboselog( 1, "atapi_w: intreason=%02x\n", data );
+			verboselog( machine, 1, "atapi_w: intreason=%02x\n", data );
 			break;
 		case ATAPI_REG_SAMTAG:
-			verboselog( 1, "atapi_w: samtag=%02x\n", data );
+			verboselog( machine, 1, "atapi_w: samtag=%02x\n", data );
 			break;
 		case ATAPI_REG_COUNTLOW:
-			verboselog( 1, "atapi_w: countlow=%02x\n", data );
+			verboselog( machine, 1, "atapi_w: countlow=%02x\n", data );
 			break;
 		case ATAPI_REG_COUNTHIGH:
-			verboselog( 1, "atapi_w: counthigh=%02x\n", data );
+			verboselog( machine, 1, "atapi_w: counthigh=%02x\n", data );
 			break;
 		case ATAPI_REG_DRIVESEL:
-			verboselog( 1, "atapi_w: drivesel=%02x\n", data );
+			verboselog( machine, 1, "atapi_w: drivesel=%02x\n", data );
 			break;
 		case ATAPI_REG_CMDSTATUS:
-			verboselog( 1, "atapi_w: cmdstatus=%02x\n", data );
+			verboselog( machine, 1, "atapi_w: cmdstatus=%02x\n", data );
 			break;
 		}
 
@@ -936,11 +931,11 @@ static void atapi_init(running_machine *machine)
 
 static WRITE32_HANDLER( atapi_reset_w )
 {
-	verboselog( 2, "atapi_reset_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
+	verboselog( space->machine, 2, "atapi_reset_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
 
 	if (data)
 	{
-		verboselog( 2, "atapi_reset_w: reset\n" );
+		verboselog( space->machine, 2, "atapi_reset_w: reset\n" );
 
 //      mame_printf_debug("ATAPI reset\n");
 
@@ -960,18 +955,20 @@ static WRITE32_HANDLER( atapi_reset_w )
 
 static void cdrom_dma_read( UINT32 n_address, INT32 n_size )
 {
-	verboselog( 2, "cdrom_dma_read( %08x, %08x )\n", n_address, n_size );
+	verboselog( Machine, 2, "cdrom_dma_read( %08x, %08x )\n", n_address, n_size );
 //  mame_printf_debug("DMA read: address %08x size %08x\n", n_address, n_size);
 }
 
 static void cdrom_dma_write( UINT32 n_address, INT32 n_size )
 {
-	verboselog( 2, "cdrom_dma_write( %08x, %08x )\n", n_address, n_size );
+	running_machine *machine = Machine;
+
+	verboselog( machine, 2, "cdrom_dma_write( %08x, %08x )\n", n_address, n_size );
 //  mame_printf_debug("DMA write: address %08x size %08x\n", n_address, n_size);
 
 	atapi_xferbase = n_address;
 
-	verboselog( 2, "atapi_xfer_end: %d %d\n", atapi_xferlen, atapi_xfermod );
+	verboselog( machine, 2, "atapi_xfer_end: %d %d\n", atapi_xferlen, atapi_xfermod );
 
 	// set a transfer complete timer (Note: CYCLES_PER_SECTOR can't be lower than 2000 or the BIOS ends up "out of order")
 	timer_adjust_oneshot(atapi_timer, cpu_clocks_to_attotime(Machine->cpu[0], (ATAPI_CYCLES_PER_SECTOR * (atapi_xferlen/2048))), 0);
@@ -986,7 +983,7 @@ static WRITE32_HANDLER( security_w )
 {
 	COMBINE_DATA( &m_n_security_control );
 
-	verboselog( 2, "security_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
+	verboselog( space->machine, 2, "security_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
 
 	if( ACCESSING_BITS_0_15 )
 	{
@@ -1038,7 +1035,7 @@ static WRITE32_HANDLER( security_w )
 static READ32_HANDLER( security_r )
 {
 	UINT32 data = m_n_security_control;
-	verboselog( 2, "security_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
+	verboselog( space->machine, 2, "security_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
 	return data;
 }
 
@@ -1073,14 +1070,14 @@ static READ32_HANDLER( flash_r )
 		}
 	}
 
-	verboselog( 2, "flash_r( %08x, %08x, %08x)\n", offset, mem_mask, data );
+	verboselog( space->machine, 2, "flash_r( %08x, %08x, %08x)\n", offset, mem_mask, data );
 
 	return data;
 }
 
 static WRITE32_HANDLER( flash_w )
 {
-	verboselog( 2, "flash_w( %08x, %08x, %08x\n", offset, mem_mask, data );
+	verboselog( space->machine, 2, "flash_w( %08x, %08x, %08x\n", offset, mem_mask, data );
 
 	if( flash_bank < 0 )
 	{
@@ -1361,7 +1358,7 @@ static void flash_init( running_machine *machine )
 			*( flash_init[ i ].start ) = flash_chips;
 			for( chip = 0; chip < flash_init[ i ].chips; chip++ )
 			{
-				intelflash_init( flash_chips, flash_init[ i ].type, data + size );
+				intelflash_init( machine, flash_chips, flash_init[ i ].type, data + size );
 				size += flash_init[ i ].size;
 				flash_chips++;
 			}
@@ -1419,7 +1416,7 @@ static void security_cart_init( running_machine *machine, int cart, const char *
 		switch( eeprom_length )
 		{
 		case 0x224:
-			x76f041_init( cart, eeprom_rom );
+			x76f041_init( machine, cart, eeprom_rom );
 			chiptype[ cart ] = 1;
 
 			switch( cart )
@@ -1435,7 +1432,7 @@ static void security_cart_init( running_machine *machine, int cart, const char *
 			break;
 
 		case 0x84:
-			x76f100_init( cart, eeprom_rom );
+			x76f100_init( machine, cart, eeprom_rom );
 			chiptype[ cart ] = 2;
 
 			switch( cart )
@@ -1478,7 +1475,7 @@ static void security_cart_init( running_machine *machine, int cart, const char *
 
 	if( chiptype[ cart ] != 3 && ds2401_rom != NULL )
 	{
-		ds2401_init( cart, ds2401_rom );
+		ds2401_init( machine, cart, ds2401_rom );
 		has_ds2401[ cart ] = 1;
 	}
 	else
@@ -1511,7 +1508,7 @@ static DRIVER_INIT( konami573 )
 	state_save_register_item_array( machine, "KSYS573", NULL, 0, m_p_n_root_target );
 	state_save_register_item_array( machine, "KSYS573", NULL, 0, m_p_n_root_start );
 
-	adc083x_init( 0, ADC0834, analogue_inputs_callback );
+	adc083x_init( machine, 0, ADC0834, analogue_inputs_callback );
 	flash_init(machine);
 }
 
@@ -1625,11 +1622,11 @@ static READ32_HANDLER( ge765pwbba_r )
 		break;
 
 	default:
-		verboselog( 0, "ge765pwbba_r: unhandled offset %08x %08x\n", offset, mem_mask );
+		verboselog( space->machine, 0, "ge765pwbba_r: unhandled offset %08x %08x\n", offset, mem_mask );
 		break;
 	}
 
-	verboselog( 2, "ge765pwbba_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
+	verboselog( space->machine, 2, "ge765pwbba_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
 	return data;
 }
 
@@ -1663,18 +1660,18 @@ static WRITE32_HANDLER( ge765pwbba_w )
 		break;
 
 	default:
-		verboselog( 0, "ge765pwbba_w: unhandled offset %08x %08x %08x\n", offset, mem_mask, data );
+		verboselog( space->machine, 0, "ge765pwbba_w: unhandled offset %08x %08x %08x\n", offset, mem_mask, data );
 		break;
 	}
 
-	verboselog( 2, "ge765pwbba_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
+	verboselog( space->machine, 2, "ge765pwbba_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
 }
 
 static DRIVER_INIT( ge765pwbba )
 {
 	DRIVER_INIT_CALL(konami573);
 
-	uPD4701_init( 0 );
+	uPD4701_init( machine, 0 );
 
 	memory_install_readwrite32_handler( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f640000, 0x1f6400ff, 0, 0, ge765pwbba_r, ge765pwbba_w );
 }
@@ -1716,7 +1713,7 @@ static READ32_HANDLER( gx700pwbf_io_r )
 		break;
 	}
 
-	verboselog( 2, "gx700pwbf_io_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
+	verboselog( space->machine, 2, "gx700pwbf_io_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
 
 	return data;
 }
@@ -1742,7 +1739,7 @@ static void gx700pwbf_output( int offset, UINT8 data )
 
 static WRITE32_HANDLER( gx700pwbf_io_w )
 {
-	verboselog( 2, "gx700pwbf_io_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
+	verboselog( space->machine, 2, "gx700pwbf_io_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
 
 	switch( offset )
 	{
@@ -1873,7 +1870,7 @@ static void gn845pwbb_clk_w( int offset, int data )
 		}
 	}
 
-	verboselog( 2, "stage: %dp data clk=%d state=%d d0=%d shift=%08x bit=%d stage_mask=%08x\n", offset + 1, clk, stage[ offset ].state, stage[ offset ].DO, stage[ offset ].shift, stage[ offset ].bit, stage_mask );
+	verboselog( Machine, 2, "stage: %dp data clk=%d state=%d d0=%d shift=%08x bit=%d stage_mask=%08x\n", offset + 1, clk, stage[ offset ].state, stage[ offset ].DO, stage[ offset ].shift, stage[ offset ].bit, stage_mask );
 }
 
 static CUSTOM_INPUT( gn845pwbb_read )
@@ -1996,17 +1993,17 @@ static READ32_HANDLER( gtrfrks_io_r )
 		break;
 
 	default:
-		verboselog( 0, "gtrfrks_io_r: unhandled offset %08x, %08x\n", offset, mem_mask );
+		verboselog( space->machine, 0, "gtrfrks_io_r: unhandled offset %08x, %08x\n", offset, mem_mask );
 		break;
 	}
 
-	verboselog( 2, "gtrfrks_io_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
+	verboselog( space->machine, 2, "gtrfrks_io_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
 	return data;
 }
 
 static WRITE32_HANDLER( gtrfrks_io_w )
 {
-	verboselog( 2, "gtrfrks_io_w( %08x, %08x ) %08x\n", offset, mem_mask, data );
+	verboselog( space->machine, 2, "gtrfrks_io_w( %08x, %08x ) %08x\n", offset, mem_mask, data );
 
 	switch( offset )
 	{
@@ -2021,7 +2018,7 @@ static WRITE32_HANDLER( gtrfrks_io_w )
 		break;
 
 	default:
-		verboselog( 0, "gtrfrks_io_w: unhandled offset %08x, %08x\n", offset, mem_mask );
+		verboselog( space->machine, 0, "gtrfrks_io_w: unhandled offset %08x, %08x\n", offset, mem_mask );
 		break;
 	}
 }
@@ -2141,7 +2138,7 @@ static READ32_HANDLER( gx894pwbba_r )
 		break;
 	}
 
-	verboselog( 2, "gx894pwbba_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
+	verboselog( space->machine, 2, "gx894pwbba_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
 //  printf( "%08x: gx894pwbba_r( %08x, %08x ) %08x\n", cpu_get_pc(space->cpu), offset, mem_mask, data );
 	return data;
 }
@@ -2193,7 +2190,7 @@ static WRITE32_HANDLER( gx894pwbba_w )
 		return;
 	}
 
-	verboselog( 2, "gx894pwbba_w( %08x, %08x, %08x) %s\n", offset, mem_mask, data, binary( data ) );
+	verboselog( space->machine, 2, "gx894pwbba_w( %08x, %08x, %08x) %s\n", offset, mem_mask, data, binary( data ) );
 
 	switch( offset )
 	{
@@ -2326,7 +2323,7 @@ static void gx894pwbba_init( running_machine *machine, void (*output_callback_fu
 	gx894_ram_read_offset = 0;
 	gx894_ram = auto_malloc( gx894_ram_size );
 
-	ds2401_init( 2, ds2401_xid ); /* todo: load this from roms */
+	ds2401_init( machine, 2, ds2401_xid ); /* todo: load this from roms */
 
 	state_save_register_global_array(machine,  gx894pwbba_output_data );
 	state_save_register_global_pointer(machine,  gx894_ram, gx894_ram_size / 4 );
@@ -2616,7 +2613,7 @@ static void dmx_output_callback( int offset, int data )
 
 static WRITE32_HANDLER( dmx_io_w )
 {
-	verboselog( 2, "dmx_io_w( %08x, %08x ) %08x\n", offset, mem_mask, data );
+	verboselog( space->machine, 2, "dmx_io_w( %08x, %08x ) %08x\n", offset, mem_mask, data );
 
 	switch( offset )
 	{
@@ -2631,7 +2628,7 @@ static WRITE32_HANDLER( dmx_io_w )
 		break;
 
 	default:
-		verboselog( 0, "dmx_io_w: unhandled offset %08x, %08x\n", offset, mem_mask );
+		verboselog( space->machine, 0, "dmx_io_w: unhandled offset %08x, %08x\n", offset, mem_mask );
 		break;
 	}
 }
@@ -2686,7 +2683,7 @@ static void salarymc_lamp_clk_write( int data )
 			{
 				if( ( salarymc_lamp_shift & ~0xe38 ) != 0 )
 				{
-					verboselog( 0, "unknown bits in salarymc_lamp_shift %08x\n", salarymc_lamp_shift & ~0xe38 );
+					verboselog( Machine, 0, "unknown bits in salarymc_lamp_shift %08x\n", salarymc_lamp_shift & ~0xe38 );
 				}
 
 				output_set_value( "player 1 red", ( salarymc_lamp_shift >> 11 ) & 1 );

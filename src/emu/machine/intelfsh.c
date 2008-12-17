@@ -12,7 +12,6 @@
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "intelfsh.h"
 
 enum
@@ -78,7 +77,7 @@ void* intelflash_getmemptr(int chip)
 	return c->flash_memory;
 }
 
-void intelflash_init(int chip, int type, void *data)
+void intelflash_init(running_machine *machine, int chip, int type, void *data)
 {
 	struct flash_chip *c;
 	if( chip >= FLASH_CHIPS_MAX )
@@ -132,13 +131,13 @@ void intelflash_init(int chip, int type, void *data)
 	c->status = 0x80;
 	c->flash_mode = FM_NORMAL;
 	c->flash_master_lock = 0;
-	c->timer = timer_alloc(Machine, erase_finished, c);
+	c->timer = timer_alloc(machine, erase_finished, c);
 	c->flash_memory = data;
 
-	state_save_register_item( Machine, "intelfsh", NULL, chip, c->status );
-	state_save_register_item( Machine, "intelfsh", NULL, chip, c->flash_mode );
-	state_save_register_item( Machine, "intelfsh", NULL, chip, c->flash_master_lock );
-	state_save_register_memory( Machine, "intelfsh", NULL, chip, "flash_memory", c->flash_memory, c->bits/8, c->size / (c->bits/8) );
+	state_save_register_item( machine, "intelfsh", NULL, chip, c->status );
+	state_save_register_item( machine, "intelfsh", NULL, chip, c->flash_mode );
+	state_save_register_item( machine, "intelfsh", NULL, chip, c->flash_master_lock );
+	state_save_register_memory( machine, "intelfsh", NULL, chip, "flash_memory", c->flash_memory, c->bits/8, c->size / (c->bits/8) );
 }
 
 UINT32 intelflash_read(int chip, UINT32 address)
@@ -213,7 +212,7 @@ UINT32 intelflash_read(int chip, UINT32 address)
 		break;
 	}
 
-//  logerror( "%08x: intelflash_read( %d, %08x ) %08x\n", cpu_get_pc(machine->activecpu), chip, address, data );
+//  logerror( "%s: intelflash_read( %d, %08x ) %08x\n", cpuexec_describe_context(machine), chip, address, data );
 
 	return data;
 }
@@ -228,7 +227,7 @@ void intelflash_write(int chip, UINT32 address, UINT32 data)
 	}
 	c = &chips[ chip ];
 
-//  logerror( "%08x: intelflash_write( %d, %08x, %08x )\n", cpu_get_pc(machine->activecpu), chip, address, data );
+//  logerror( "%s: intelflash_write( %d, %08x, %08x )\n", cpuexec_describe_context(machine), chip, address, data );
 
 	switch( c->flash_mode )
 	{

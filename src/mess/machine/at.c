@@ -165,7 +165,7 @@ static void init_at_common(running_machine *machine, const struct kbdc8042_inter
 	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_AT, at_set_keyb_int, at_set_irq_line);
 	mc146818_init(machine, MC146818_STANDARD);
 	soundblaster_config(&soundblaster);
-	kbdc8042_init(at8042);
+	kbdc8042_init(machine, at8042);
 
 	if (mess_ram_size > 0x0a0000)
 	{

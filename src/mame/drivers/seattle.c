@@ -769,7 +769,7 @@ static void vblank_assert(const device_config *device, int state)
  *
  *************************************/
 
-static UINT32 pci_bridge_r(running_machine *machine, UINT8 reg, UINT8 type)
+static UINT32 pci_bridge_r(const address_space *space, UINT8 reg, UINT8 type)
 {
 	UINT32 result = galileo.pci_bridge_regs[reg];
 
@@ -785,16 +785,16 @@ static UINT32 pci_bridge_r(running_machine *machine, UINT8 reg, UINT8 type)
 	}
 
 	if (LOG_PCI)
-		logerror("%08X:PCI bridge read: reg %d type %d = %08X\n", cpu_get_pc(machine->activecpu), reg, type, result);
+		logerror("%08X:PCI bridge read: reg %d type %d = %08X\n", cpu_get_pc(space->cpu), reg, type, result);
 	return result;
 }
 
 
-static void pci_bridge_w(running_machine *machine, UINT8 reg, UINT8 type, UINT32 data)
+static void pci_bridge_w(const address_space *space, UINT8 reg, UINT8 type, UINT32 data)
 {
 	galileo.pci_bridge_regs[reg] = data;
 	if (LOG_PCI)
-		logerror("%08X:PCI bridge write: reg %d type %d = %08X\n", cpu_get_pc(machine->activecpu), reg, type, data);
+		logerror("%08X:PCI bridge write: reg %d type %d = %08X\n", cpu_get_pc(space->cpu), reg, type, data);
 }
 
 
@@ -805,7 +805,7 @@ static void pci_bridge_w(running_machine *machine, UINT8 reg, UINT8 type, UINT32
  *
  *************************************/
 
-static UINT32 pci_3dfx_r(running_machine *machine, UINT8 reg, UINT8 type)
+static UINT32 pci_3dfx_r(const address_space *space, UINT8 reg, UINT8 type)
 {
 	UINT32 result = galileo.pci_3dfx_regs[reg];
 
@@ -821,12 +821,12 @@ static UINT32 pci_3dfx_r(running_machine *machine, UINT8 reg, UINT8 type)
 	}
 
 	if (LOG_PCI)
-		logerror("%08X:PCI 3dfx read: reg %d type %d = %08X\n", cpu_get_pc(machine->activecpu), reg, type, result);
+		logerror("%08X:PCI 3dfx read: reg %d type %d = %08X\n", cpu_get_pc(space->cpu), reg, type, result);
 	return result;
 }
 
 
-static void pci_3dfx_w(running_machine *machine, UINT8 reg, UINT8 type, UINT32 data)
+static void pci_3dfx_w(const address_space *space, UINT8 reg, UINT8 type, UINT32 data)
 {
 	galileo.pci_3dfx_regs[reg] = data;
 
@@ -843,7 +843,7 @@ static void pci_3dfx_w(running_machine *machine, UINT8 reg, UINT8 type, UINT32 d
 			break;
 	}
 	if (LOG_PCI)
-		logerror("%08X:PCI 3dfx write: reg %d type %d = %08X\n", cpu_get_pc(machine->activecpu), reg, type, data);
+		logerror("%08X:PCI 3dfx write: reg %d type %d = %08X\n", cpu_get_pc(space->cpu), reg, type, data);
 }
 
 
@@ -854,7 +854,7 @@ static void pci_3dfx_w(running_machine *machine, UINT8 reg, UINT8 type, UINT32 d
  *
  *************************************/
 
-static UINT32 pci_ide_r(running_machine *machine, UINT8 reg, UINT8 type)
+static UINT32 pci_ide_r(const address_space *space, UINT8 reg, UINT8 type)
 {
 	UINT32 result = galileo.pci_ide_regs[reg];
 
@@ -870,16 +870,16 @@ static UINT32 pci_ide_r(running_machine *machine, UINT8 reg, UINT8 type)
 	}
 
 	if (LOG_PCI)
-		logerror("%08X:PCI IDE read: reg %d type %d = %08X\n", cpu_get_pc(machine->activecpu), reg, type, result);
+		logerror("%08X:PCI IDE read: reg %d type %d = %08X\n", cpu_get_pc(space->cpu), reg, type, result);
 	return result;
 }
 
 
-static void pci_ide_w(running_machine *machine, UINT8 reg, UINT8 type, UINT32 data)
+static void pci_ide_w(const address_space *space, UINT8 reg, UINT8 type, UINT32 data)
 {
 	galileo.pci_ide_regs[reg] = data;
 	if (LOG_PCI)
-		logerror("%08X:PCI bridge write: reg %d type %d = %08X\n", cpu_get_pc(machine->activecpu), reg, type, data);
+		logerror("%08X:PCI bridge write: reg %d type %d = %08X\n", cpu_get_pc(space->cpu), reg, type, data);
 }
 
 
@@ -1126,15 +1126,15 @@ static READ32_HANDLER( galileo_r )
 
 			/* unit 0 is the PCI bridge */
 			if (unit == 0 && func == 0)
-				result = pci_bridge_r(space->machine, reg, type);
+				result = pci_bridge_r(space, reg, type);
 
 			/* unit 8 is the 3dfx card */
 			else if (unit == 8 && func == 0)
-				result = pci_3dfx_r(space->machine, reg, type);
+				result = pci_3dfx_r(space, reg, type);
 
 			/* unit 9 is the IDE controller */
 			else if (unit == 9 && func == 0)
-				result = pci_ide_r(space->machine, reg, type);
+				result = pci_ide_r(space, reg, type);
 
 			/* anything else, just log */
 			else
@@ -1264,15 +1264,15 @@ static WRITE32_HANDLER( galileo_w )
 
 			/* unit 0 is the PCI bridge */
 			if (unit == 0 && func == 0)
-				pci_bridge_w(space->machine, reg, type, data);
+				pci_bridge_w(space, reg, type, data);
 
 			/* unit 8 is the 3dfx card */
 			else if (unit == 8 && func == 0)
-				pci_3dfx_w(space->machine, reg, type, data);
+				pci_3dfx_w(space, reg, type, data);
 
 			/* unit 9 is the IDE controller */
 			else if (unit == 9 && func == 0)
-				pci_ide_w(space->machine, reg, type, data);
+				pci_ide_w(space, reg, type, data);
 
 			/* anything else, just log */
 			else
@@ -1304,12 +1304,12 @@ static WRITE32_HANDLER( galileo_w )
  *
  *************************************/
 
-static WRITE32_DEVICE_HANDLER( seattle_voodoo_w )
+static WRITE32_HANDLER( seattle_voodoo_w )
 {
 	/* if we're not stalled, just write and get out */
 	if (!voodoo_stalled)
 	{
-		voodoo_w(device, offset, data, mem_mask);
+		voodoo_w(voodoo_device, offset, data, mem_mask);
 		return;
 	}
 
@@ -1324,8 +1324,8 @@ static WRITE32_DEVICE_HANDLER( seattle_voodoo_w )
 	cpu_stalled_mem_mask = mem_mask;
 
 	/* spin until we send the magic trigger */
-	cpu_spinuntil_trigger(device->machine->cpu[0], 45678);
-	if (LOG_DMA) logerror("%08X:Stalling CPU on voodoo (already stalled)\n", cpu_get_pc(device->machine->activecpu));
+	cpu_spinuntil_trigger(space->cpu, 45678);
+	if (LOG_DMA) logerror("%08X:Stalling CPU on voodoo (already stalled)\n", cpu_get_pc(space->cpu));
 }
 
 
@@ -1344,7 +1344,7 @@ static void voodoo_stall(const device_config *device, int stall)
 		}
 		else
 		{
-			if (LOG_DMA) logerror("%08X:Stalling CPU on voodoo\n", cpu_get_pc(device->machine->activecpu));
+			if (LOG_DMA) logerror("%08X:Stalling CPU on voodoo\n", cpu_get_pc(device->machine->cpu[0]));
 			cpu_spinuntil_trigger(device->machine->cpu[0], 45678);
 		}
 	}
@@ -1365,9 +1365,7 @@ static void voodoo_stall(const device_config *device, int stall)
 				galileo.dma_stalled_on_voodoo[which] = FALSE;
 
 				/* resume execution */
-				cpu_push_context(space->cpu);
 				galileo_perform_dma(space, which);
-				cpu_pop_context();
 				break;
 			}
 
@@ -1729,11 +1727,19 @@ PCI Mem  = 08000000-09FFFFFF
 
 */
 
+static READ32_DEVICE_HANDLER( seattle_ide_r )
+{
+	/* note that blitz times out if we don't have this cycle stealing */
+	if (offset == 0x3f6/4)
+		cpu_eat_cycles(device->machine->cpu[0], 100);
+	return ide_controller32_r(device, offset, mem_mask);
+}
+
 static ADDRESS_MAP_START( seattle_map, ADDRESS_SPACE_PROGRAM, 32 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_BASE(&rambase)	// wg3dh only has 4MB; sfrush, blitz99 8MB
-	AM_RANGE(0x08000000, 0x08ffffff) AM_DEVREADWRITE(VOODOO_GRAPHICS, "voodoo", voodoo_r, seattle_voodoo_w)
-	AM_RANGE(0x0a000000, 0x0a0003ff) AM_DEVREADWRITE(IDE_CONTROLLER, "ide", ide_controller32_r, ide_controller32_w)
+	AM_RANGE(0x08000000, 0x08ffffff) AM_DEVREAD(VOODOO_GRAPHICS, "voodoo", voodoo_r) AM_WRITE(seattle_voodoo_w)
+	AM_RANGE(0x0a000000, 0x0a0003ff) AM_DEVREADWRITE(IDE_CONTROLLER, "ide", seattle_ide_r, ide_controller32_w)
 	AM_RANGE(0x0a00040c, 0x0a00040f) AM_NOP						// IDE-related, but annoying
 	AM_RANGE(0x0a000f00, 0x0a000f07) AM_DEVREADWRITE(IDE_CONTROLLER, "ide", ide_bus_master32_r, ide_bus_master32_w)
 	AM_RANGE(0x0c000000, 0x0c000fff) AM_READWRITE(galileo_r, galileo_w)
@@ -2476,6 +2482,7 @@ static MACHINE_DRIVER_START( seattle_common )
 	MDRV_IDE_BUS_MASTER_SPACE("main", PROGRAM)
 
 	MDRV_3DFX_VOODOO_1_ADD("voodoo", STD_VOODOO_1_CLOCK, 2, "main")
+	MDRV_3DFX_VOODOO_CPU("main")
 	MDRV_3DFX_VOODOO_TMU_MEMORY(0, 4)
 	MDRV_3DFX_VOODOO_VBLANK(vblank_assert)
 	MDRV_3DFX_VOODOO_STALL(voodoo_stall)
@@ -2732,8 +2739,20 @@ ROM_START( carnevil )
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) /* Boot Rom Version 1.9 */
 	ROM_LOAD( "carnevil1_9.u32", 0x000000, 0x80000, CRC(82c07f2e) SHA1(fa51c58022ce251c53bad12fc6ffadb35adb8162) )
 
-	DISK_REGION( "ide" )	/* Hard Drive v1.0.1  12/11/99 */
-	DISK_IMAGE( "carnevil", 0, BAD_DUMP MD5(6eafae86091c0a915cf8cfdc3d73adc2) SHA1(5e6524d4b97de141c38e301a17e8af15661cb5d6) )
+	DISK_REGION( "ide" )	/* Hard Drive v1.0.3  Diagnostics v3.4 / Feb 1 1999 16:00:07 */
+	DISK_IMAGE( "carnevil", 0, MD5(cba5ecd6c59b6fb56f574558f4f2b509) SHA1(ba32b7ef9721d730ce58bd753d47fb947b6ae9b6) )
+ROM_END
+
+
+ROM_START( carnevi1 )
+	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* ADSP-2115 data Version 1.02 */
+	ROM_LOAD16_BYTE( "sound102.u95", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
+
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) /* Boot Rom Version 1.9 */
+	ROM_LOAD( "carnevil1_9.u32", 0x000000, 0x80000, CRC(82c07f2e) SHA1(fa51c58022ce251c53bad12fc6ffadb35adb8162) )
+
+	DISK_REGION( "ide" )	/* Hard Drive v1.0.1  Diagnostics v3.3 / Oct 20 1998 11:44:41 */
+	DISK_IMAGE( "carnevi1", 0, BAD_DUMP MD5(6eafae86091c0a915cf8cfdc3d73adc2) SHA1(5e6524d4b97de141c38e301a17e8af15661cb5d6) )
 ROM_END
 
 
@@ -2967,5 +2986,6 @@ GAME( 1997, blitz,    0,        seattle150,        blitz,    blitz,    ROT0, "Mi
 GAME( 1997, blitz11,  blitz,    seattle150,        blitz,    blitz,    ROT0, "Midway Games", "NFL Blitz (boot ROM 1.1)", GAME_SUPPORTS_SAVE )
 GAME( 1998, blitz99,  0,        seattle150,        blitz99,  blitz99,  ROT0, "Midway Games", "NFL Blitz '99", GAME_SUPPORTS_SAVE )
 GAME( 1999, blitz2k,  0,        seattle150,        blitz99,  blitz2k,  ROT0, "Midway Games", "NFL Blitz 2000 Gold Edition", GAME_SUPPORTS_SAVE )
-GAME( 1998, carnevil, 0,        seattle150,        carnevil, carnevil, ROT0, "Midway Games", "CarnEvil", GAME_SUPPORTS_SAVE )
+GAME( 1998, carnevil, 0,        seattle150,        carnevil, carnevil, ROT0, "Midway Games", "CarnEvil (v1.0.3)", GAME_SUPPORTS_SAVE )
+GAME( 1998, carnevi1, carnevil, seattle150,        carnevil, carnevil, ROT0, "Midway Games", "CarnEvil (v1.0.1)", GAME_SUPPORTS_SAVE )
 GAME( 1998, hyprdriv, 0,        seattle200_widget, hyprdriv, hyprdriv, ROT0, "Midway Games", "Hyperdrive", GAME_SUPPORTS_SAVE )

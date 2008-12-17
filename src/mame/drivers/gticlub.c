@@ -332,7 +332,7 @@ static void eeprom_handler(running_machine *machine, mame_file *file, int read_o
 	}
 	else
 	{
-		eeprom_init(&eeprom_intf);
+		eeprom_init(machine, &eeprom_intf);
 		if (file)
 		{
 			eeprom_load(file);
@@ -979,11 +979,13 @@ static MACHINE_DRIVER_START( hangplt )
 	MDRV_MACHINE_RESET(hangplt)
 
 	MDRV_3DFX_VOODOO_1_ADD("voodoo0", STD_VOODOO_1_CLOCK, 2, "left")
+	MDRV_3DFX_VOODOO_CPU("dsp1")
 	MDRV_3DFX_VOODOO_TMU_MEMORY(0, 2)
 	MDRV_3DFX_VOODOO_TMU_MEMORY(1, 2)
 	MDRV_3DFX_VOODOO_VBLANK(voodoo_vblank_0)
 
 	MDRV_3DFX_VOODOO_1_ADD("voodoo1", STD_VOODOO_1_CLOCK, 2, "right")
+	MDRV_3DFX_VOODOO_CPU("dsp2")
 	MDRV_3DFX_VOODOO_TMU_MEMORY(0, 2)
 	MDRV_3DFX_VOODOO_TMU_MEMORY(1, 2)
 	MDRV_3DFX_VOODOO_VBLANK(voodoo_vblank_1)
@@ -1188,7 +1190,7 @@ static DRIVER_INIT(hangplt)
 	gticlub_led_reg0 = gticlub_led_reg1 = 0x7f;
 
 	K056800_init(machine, sound_irq_callback);
-	K033906_init();
+	K033906_init(machine);
 
 	adc1038_init(machine);
 }

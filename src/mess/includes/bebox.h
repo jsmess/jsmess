@@ -48,5 +48,7 @@ WRITE64_HANDLER( bebox_flash_w );
 
 void bebox_ide_interrupt(int state);
 
+UINT32 scsi53c810_pci_read(const device_config *busdevice, const device_config *device, int function, int offset, UINT32 mem_mask);
+void scsi53c810_pci_write(const device_config *busdevice, const device_config *device, int function, int offset, UINT32 data, UINT32 mem_mask);
 
 #endif /* BEBOX_H_ */

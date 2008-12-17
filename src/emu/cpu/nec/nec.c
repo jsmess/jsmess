@@ -104,7 +104,6 @@
 ****************************************************************************/
 
 #include "debugger.h"
-#include "deprecat.h"
 
 typedef UINT8 BOOLEAN;
 typedef UINT8 BYTE;
@@ -1049,10 +1048,6 @@ static void i_invalid(nec_state_t *nec_state)
 
 /*****************************************************************************/
 
-static CPU_GET_CONTEXT( nec ) { }
-
-static CPU_SET_CONTEXT( nec ) { }
-
 static void set_irq_line(nec_state_t *nec_state, int irqline, int state)
 {
 	if (irqline == INPUT_LINE_NMI)
@@ -1246,8 +1241,11 @@ static CPU_INIT( v33 )
 
 	nec_init(device, index, clock, irqcallback, 2);
 	nec_state->chip_type=V33;
-	nec_state->prefetch_size = 6;		/* ???? */
-	nec_state->prefetch_cycles = 2;		/* two cycles per byte / four per word */
+	nec_state->prefetch_size = 6;
+	/* FIXME: Need information about prefetch size and cycles for V33.
+     * complete guess below, nbbatman will not work
+     * properly without. */
+	nec_state->prefetch_cycles = 1;		/* two cycles per byte / four per word */
 
 	configure_memory_16bit(nec_state);
 }
@@ -1374,8 +1372,6 @@ static CPU_GET_INFO( nec )
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(nec);			break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(nec);		break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(nec);		break;
 		case CPUINFO_PTR_INIT:							/* set per-CPU */						break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(nec);				break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(nec);					break;

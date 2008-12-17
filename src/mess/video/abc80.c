@@ -204,7 +204,7 @@ static VIDEO_START( abc80 )
 
 	/* create tx_tilemap */
 
-	state->tx_tilemap = tilemap_create(abc80_get_tile_info, abc80_tilemap_scan, 6, 10, 40, 24);
+	state->tx_tilemap = tilemap_create(machine, abc80_get_tile_info, abc80_tilemap_scan, 6, 10, 40, 24);
 
 	tilemap_set_scrolldx(state->tx_tilemap, ABC80_HDSTART, ABC80_HDSTART);
 	tilemap_set_scrolldy(state->tx_tilemap, ABC80_VDSTART, ABC80_VDSTART);

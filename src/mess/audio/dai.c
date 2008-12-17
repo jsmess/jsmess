@@ -16,7 +16,7 @@
 #include "streams.h"
 #include "deprecat.h"
 
-static void *dai_sh_start(int clock, const custom_sound_interface *config);
+static void *dai_sh_start(const device_config *device, int clock, const custom_sound_interface *config);
 static void dai_sh_update(void *param,stream_sample_t **inputs, stream_sample_t **_buffer,int length);
 
 static sound_stream *mixer_channel;
@@ -51,13 +51,13 @@ void dai_set_input(int index, int state)
 }
 
 
-static void *dai_sh_start(int clock, const custom_sound_interface *config)
+static void *dai_sh_start(const device_config *device, int clock, const custom_sound_interface *config)
 {
 	dai_input[0] = dai_input[1] = dai_input[2] = 0;
 
-	mixer_channel = stream_create(0, 2, Machine->sample_rate, 0, dai_sh_update);
+	mixer_channel = stream_create(device, 0, 2, device->machine->sample_rate, 0, dai_sh_update);
 	
-	logerror ("sample rate: %d\n", Machine->sample_rate);
+	logerror ("sample rate: %d\n", device->machine->sample_rate);
 
 	return (void *) ~0;
 }

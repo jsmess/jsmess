@@ -16,9 +16,13 @@
 #define MICROTAN_H_
 
 #include "devices/snapquik.h"
+#include "machine/6522via.h"
 
 
 /*----------- defined in machine/microtan.c -----------*/
+
+extern const via6522_interface microtan_via6522_0;
+extern const via6522_interface microtan_via6522_1;
 
 DRIVER_INIT( microtan );
 MACHINE_RESET( microtan );

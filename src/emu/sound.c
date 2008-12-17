@@ -294,7 +294,7 @@ static void start_sound_chips(running_machine *machine)
 		VPRINTF(("sndnum = %d -- sound_type = %d\n", sndnum, msound->type));
 		num_regs = state_save_get_reg_count(machine);
 		streams_set_tag(machine, info);
-		if (sndintrf_init_sound(sndnum, msound->tag, msound->type, msound->clock, msound->config) != 0)
+		if (sndintrf_init_sound(machine, sndnum, msound->tag, msound->type, msound->clock, msound->config) != 0)
 			fatalerror("Sound chip #%d (%s) failed to initialize!", sndnum, sndnum_get_name(sndnum));
 
 		/* if no state registered for saving, we can't save */
@@ -396,7 +396,7 @@ static void route_sound(running_machine *machine)
 		speaker_info *info = curspeak->token;
 		if (info->inputs != 0)
 		{
-			info->mixer_stream = stream_create(info->inputs, 1, machine->sample_rate, info, mixer_update);
+			info->mixer_stream = stream_create(curspeak, info->inputs, 1, machine->sample_rate, info, mixer_update);
 			state_save_register_postload(machine, mixer_postload, info->mixer_stream);
 			info->input = auto_malloc(info->inputs * sizeof(*info->input));
 			info->inputs = 0;

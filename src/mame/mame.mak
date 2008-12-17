@@ -40,7 +40,7 @@ CPUS += 8085A
 CPUS += M6502
 CPUS += M65C02
 CPUS += M65SC02
-#CPUS += M65CE02
+CPUS += M65CE02
 CPUS += M6509
 CPUS += M6510
 CPUS += M6510T
@@ -116,15 +116,15 @@ CPUS += T11
 CPUS += S2650
 CPUS += TMS340X0
 CPUS += TMS9900
-#CPUS += TMS9940
+CPUS += TMS9940
 CPUS += TMS9980
-#CPUS += TMS9985
-#CPUS += TMS9989
+CPUS += TMS9985
+CPUS += TMS9989
 CPUS += TMS9995
-#CPUS += TMS99105A
-#CPUS += TMS99110A
-#CPUS += TMS99000
-#CPUS += TMS99010
+CPUS += TMS99105A
+CPUS += TMS99110A
+CPUS += TMS99000
+CPUS += TMS99010
 CPUS += Z8000
 CPUS += TMS32010
 CPUS += TMS32025
@@ -144,7 +144,7 @@ CPUS += CXD8661R
 CPUS += ASAP
 CPUS += UPD7810
 CPUS += UPD7807
-#CPUS += UPD7801
+CPUS += UPD7801
 CPUS += ARM
 CPUS += ARM7
 CPUS += JAGUAR
@@ -195,7 +195,7 @@ CPUS += PPC602
 CPUS += PPC603
 CPUS += PPC603E
 CPUS += PPC603R
-#CPUS += PPC604
+CPUS += PPC604
 CPUS += MPC8240
 CPUS += SE3208
 CPUS += MC68HC11
@@ -205,19 +205,19 @@ CPUS += RSP
 CPUS += ALPHA8201
 CPUS += ALPHA8301
 CPUS += CDP1802
-#CPUS += COP401
+CPUS += COP401
 CPUS += COP410
-#CPUS += COP411
+CPUS += COP411
 CPUS += COP402
 CPUS += COP420
 CPUS += COP421
-#CPUS += COP422
-#CPUS += COP404
-#CPUS += COP424
-#CPUS += COP425
-#CPUS += COP426
-#CPUS += COP444
-#CPUS += COP445
+CPUS += COP422
+CPUS += COP404
+CPUS += COP424
+CPUS += COP425
+CPUS += COP426
+CPUS += COP444
+CPUS += COP445
 CPUS += TLCS90
 CPUS += MB8841
 CPUS += MB8842
@@ -237,7 +237,7 @@ CPUS += LR35902
 CPUS += TMS7000
 CPUS += TMS7000_EXL
 CPUS += SM8500
-#CPUS += MINX
+CPUS += MINX
 
 
 
@@ -997,7 +997,9 @@ $(MAMEOBJ)/midway.a: \
 	$(AUDIO)/wow.o \
 
 $(MAMEOBJ)/msx.a: \
+	$(DRIVERS)/forte2.o \
 	$(DRIVERS)/sangho.o \
+	$(DRIVERS)/sfkick.o \
 
 $(MAMEOBJ)/namco.a: \
 	$(DRIVERS)/20pacgal.o $(VIDEO)/20pacgal.o \
@@ -1061,6 +1063,7 @@ $(MAMEOBJ)/nichibut.a: \
 	$(DRIVERS)/galivan.o $(VIDEO)/galivan.o \
 	$(DRIVERS)/gomoku.o $(AUDIO)/gomoku.o $(VIDEO)/gomoku.o \
 	$(DRIVERS)/hyhoo.o $(VIDEO)/hyhoo.o \
+	$(DRIVERS)/jangou.o \
 	$(DRIVERS)/magmax.o $(VIDEO)/magmax.o \
 	$(DRIVERS)/nbmj8688.o $(VIDEO)/nbmj8688.o \
 	$(DRIVERS)/nbmj8891.o $(VIDEO)/nbmj8891.o \
@@ -1535,6 +1538,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/1945kiii.o \
 	$(DRIVERS)/2mindril.o \
 	$(DRIVERS)/4enraya.o $(VIDEO)/4enraya.o \
+	$(DRIVERS)/4roses.o \
 	$(DRIVERS)/acefruit.o \
 	$(DRIVERS)/adp.o \
 	$(DRIVERS)/ambush.o $(VIDEO)/ambush.o \
@@ -1643,18 +1647,19 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/pntnpuzl.o \
 	$(DRIVERS)/policetr.o $(VIDEO)/policetr.o \
 	$(DRIVERS)/polyplay.o $(AUDIO)/polyplay.o $(VIDEO)/polyplay.o \
+	$(DRIVERS)/queen.o \
 	$(DRIVERS)/quizo.o \
 	$(DRIVERS)/quizpun2.o \
 	$(DRIVERS)/rbmk.o \
 	$(DRIVERS)/rcorsair.o \
 	$(DRIVERS)/re900.o \
-	$(DRIVERS)/sfkick.o \
 	$(DRIVERS)/shangkid.o $(VIDEO)/shangkid.o \
 	$(DRIVERS)/skyarmy.o \
 	$(DRIVERS)/skylncr.o \
 	$(DRIVERS)/sliver.o \
 	$(DRIVERS)/smstrv.o \
 	$(DRIVERS)/snookr10.o $(VIDEO)/snookr10.o \
+	$(DRIVERS)/spool99.o \
 	$(DRIVERS)/sprcros2.o $(VIDEO)/sprcros2.o \
 	$(DRIVERS)/ssfindo.o \
 	$(DRIVERS)/ssingles.o \
@@ -1685,7 +1690,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/wldarrow.o \
 	$(DRIVERS)/xyonix.o $(VIDEO)/xyonix.o \
 	$(DRIVERS)/hikaru.o \
-
+	$(DRIVERS)/cb2001.o \
 
 #-------------------------------------------------
 # layout dependencies
@@ -1707,6 +1712,8 @@ $(DRIVERS)/atarifb.o:	$(LAYOUT)/atarifb.lh \
 						$(LAYOUT)/abaseb.lh
 
 $(DRIVERS)/avalnche.o:	$(LAYOUT)/avalnche.lh
+
+$(DRIVERS)/brasil.o:	$(LAYOUT)/fashion.lh
 
 $(DRIVERS)/bzone.o:		$(LAYOUT)/bzone.lh
 
@@ -1767,6 +1774,8 @@ $(DRIVERS)/meadows.o:	$(LAYOUT)/deadeye.lh \
 
 $(DRIVERS)/midzeus.o:	$(LAYOUT)/crusnexo.lh
 
+$(DRIVERS)/mil4000.o:	$(LAYOUT)/mil4000.lh
+
 $(DRIVERS)/nbmj8688.o:	$(LAYOUT)/nbmj8688.lh
 
 $(DRIVERS)/neogeo.o:	$(LAYOUT)/neogeo.lh
@@ -1795,6 +1804,8 @@ $(DRIVERS)/sspeedr.o:	$(LAYOUT)/sspeedr.lh
 $(DRIVERS)/stactics.o:	$(LAYOUT)/stactics.lh
 
 $(DRIVERS)/tceptor.o:	$(LAYOUT)/tceptor2.lh
+
+$(DRIVERS)/tehkanwc.o:	$(LAYOUT)/gridiron.lh
 
 $(DRIVERS)/tetrisp2.o:	$(LAYOUT)/rocknms.lh
 

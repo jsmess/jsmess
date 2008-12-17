@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "mpc105.h"
 #include "machine/pci.h"
 
@@ -84,7 +83,7 @@ static void mpc105_update_memory(running_machine *machine)
 
 
 
-static UINT32 mpc105_pci_read(int function, int offset, UINT32 mem_mask)
+UINT32 mpc105_pci_read(const device_config *busdevice, const device_config *device, int function, int offset, UINT32 mem_mask)
 {
 	UINT32 result;
 
@@ -160,9 +159,10 @@ static UINT32 mpc105_pci_read(int function, int offset, UINT32 mem_mask)
 
 
 
-static void mpc105_pci_write(int function, int offset, UINT32 data, UINT32 mem_mask)
+void mpc105_pci_write(const device_config *busdevice, const device_config *device, int function, int offset, UINT32 data, UINT32 mem_mask)
 {
 	int i;
+	running_machine *machine = busdevice->machine;
 
 	if (function != 0)
 		return;
@@ -181,7 +181,7 @@ static void mpc105_pci_write(int function, int offset, UINT32 data, UINT32 mem_m
 			if (mpc105->bank_registers[i] != data)
 			{
 				mpc105->bank_registers[i] = data;
-				mpc105_update_memory(Machine);
+				mpc105_update_memory(machine);
 			}
 			break;
 
@@ -189,7 +189,7 @@ static void mpc105_pci_write(int function, int offset, UINT32 data, UINT32 mem_m
 			if (mpc105->bank_enable != (UINT8) data)
 			{
 				mpc105->bank_enable = (UINT8) data;
-				mpc105_update_memory(Machine);
+				mpc105_update_memory(machine);
 			}
 			break;
 
@@ -207,20 +207,9 @@ static void mpc105_pci_write(int function, int offset, UINT32 data, UINT32 mem_m
 
 
 
-static const struct pci_device_info mpc105_callbacks =
-{
-	mpc105_pci_read,
-	mpc105_pci_write
-};
-
-
-
 void mpc105_init(int bank_base)
 {
 	/* setup PCI */
-	pci_init();
-	pci_add_device(0, 0, &mpc105_callbacks);
-
 	mpc105 = (struct mpc105_info *) auto_malloc(sizeof(*mpc105));
 	memset(mpc105, '\0', sizeof(*mpc105));
 	mpc105->bank_base = bank_base;

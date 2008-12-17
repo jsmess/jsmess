@@ -100,20 +100,20 @@ static void engine_sound_update(void *param, stream_sample_t **inputs, stream_sa
 /************************************/
 /* Sound handler start              */
 /************************************/
-void *polepos_sh_start(int clock, const custom_sound_interface *config)
+CUSTOM_START( polepos_sh_start )
 {
-	stream = stream_create(0, 1, OUTPUT_RATE, NULL, engine_sound_update);
+	stream = stream_create(device, 0, 1, OUTPUT_RATE, NULL, engine_sound_update);
 	sample_msb = sample_lsb = 0;
 	sample_enable = 0;
 
 	/* setup the filters */
-	filter_opamp_m_bandpass_setup(RES_K(220), RES_K(33), RES_K(390), CAP_U(.01),  CAP_U(.01),
+	filter_opamp_m_bandpass_setup(device, RES_K(220), RES_K(33), RES_K(390), CAP_U(.01),  CAP_U(.01),
 									&filter_engine[0]);
-	filter_opamp_m_bandpass_setup(RES_K(150), RES_K(22), RES_K(330), CAP_U(.0047),  CAP_U(.0047),
+	filter_opamp_m_bandpass_setup(device, RES_K(150), RES_K(22), RES_K(330), CAP_U(.0047),  CAP_U(.0047),
 									&filter_engine[1]);
 	/* Filter 3 is a little different.  Because of the input capacitor, it is
      * a high pass filter. */
-	filter2_setup(FILTER_HIGHPASS, 950, Q_TO_DAMP(.707), 1,
+	filter2_setup(device, FILTER_HIGHPASS, 950, Q_TO_DAMP(.707), 1,
 									&filter_engine[2]);
 
 	return auto_malloc(1);
@@ -122,7 +122,7 @@ void *polepos_sh_start(int clock, const custom_sound_interface *config)
 /************************************/
 /* Sound handler reset              */
 /************************************/
-void polepos_sh_reset(void *token)
+CUSTOM_RESET( polepos_sh_reset )
 {
 	int loop;
 	for (loop = 0; loop < 3; loop++) filter2_reset(&filter_engine[loop]);

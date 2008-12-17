@@ -1429,8 +1429,8 @@ MACHINE_DRIVER_END
 static DRIVER_INIT( pcw16 )
 {
 	/* init flashes */
-	intelflash_init(0, FLASH_INTEL_E28F008SA, NULL);
-	intelflash_init(1, FLASH_INTEL_E28F008SA, NULL);
+	intelflash_init(machine, 0, FLASH_INTEL_E28F008SA, NULL);
+	intelflash_init(machine, 1, FLASH_INTEL_E28F008SA, NULL);
 }
 
 /***************************************************************************

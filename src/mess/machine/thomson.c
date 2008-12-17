@@ -869,7 +869,7 @@ static void to7_io_reset( running_machine *machine )
 static void to7_io_init( running_machine *machine )
 {
 	LOG (( "to7_io_init: CC 90-323 serial / parallel extension\n" ));
-	pia_config( THOM_PIA_IO, &to7_io );
+	pia_config( machine, THOM_PIA_IO, &to7_io );
 	centronics_config( 0, &to7_centronics );
 	serial_connection_init( &to7_io_line );
 	serial_connection_set_in_callback( &to7_io_line, to7_io_in_cb );
@@ -945,7 +945,7 @@ static void to7_modem_reset( running_machine *machine )
 static void to7_modem_init( running_machine *machine )
 {
 	LOG (( "to7_modem_init: MODEM not implemented!\n" ));
-	pia_config( THOM_PIA_MODEM, &to7_pia_modem );
+	pia_config( machine, THOM_PIA_MODEM, &to7_pia_modem );
 	state_save_register_global( machine, to7_modem_rx );
 	state_save_register_global( machine, to7_modem_tx );
 }
@@ -1180,7 +1180,7 @@ static TIMER_CALLBACK(to7_game_update_cb)
 static void to7_game_init ( running_machine *machine )
 {
 	LOG (( "to7_game_init called\n" ));
-	pia_config( THOM_PIA_GAME, &to7_game );
+	pia_config( machine, THOM_PIA_GAME, &to7_game );
 	to7_game_timer = timer_alloc( machine, to7_game_update_cb , NULL);
 	timer_adjust_periodic(to7_game_timer, TO7_GAME_POLL_PERIOD, 0, TO7_GAME_POLL_PERIOD);
 	state_save_register_global( machine, to7_game_sound );
@@ -1495,7 +1495,7 @@ MACHINE_START ( to7 )
 
 	/* subsystems */
 	thom_irq_init(machine);
-	pia_config( THOM_PIA_SYS, &to7_sys );
+	pia_config( machine, THOM_PIA_SYS, &to7_sys );
 	to7_game_init(machine);
 	to7_floppy_init(machine, mem + 0x20000);
 	to7_io_init(machine);
@@ -1740,7 +1740,7 @@ MACHINE_START ( to770 )
 
 	/* subsystems */
 	thom_irq_init(machine);
-	pia_config( THOM_PIA_SYS, &to770_sys );
+	pia_config( machine, THOM_PIA_SYS, &to770_sys );
 	to7_game_init(machine);
 	to7_floppy_init( machine, mem + 0x20000 );
 	to7_io_init(machine);
@@ -2095,7 +2095,7 @@ MACHINE_START ( mo5 )
 
 	/* subsystems */
 	thom_irq_init(machine);
-	pia_config( THOM_PIA_SYS, &mo5_sys );
+	pia_config( machine, THOM_PIA_SYS, &mo5_sys );
 	to7_game_init(machine);
 	to7_floppy_init( machine, mem + 0x20000 );
 	to7_io_init(machine);
@@ -3059,7 +3059,7 @@ MACHINE_START ( to9 )
 
 	/* subsystems */
 	thom_irq_init(machine);
-	pia_config( THOM_PIA_SYS, &to9_sys );
+	pia_config( machine, THOM_PIA_SYS, &to9_sys );
 	centronics_config( 0, &to9_centronics );
 	to7_game_init(machine);
 	to9_floppy_init( machine, mem + 0xe000, mem + 0x40000 );
@@ -4026,7 +4026,7 @@ MACHINE_START ( to8 )
 
 	/* subsystems */
 	thom_irq_init(machine);
-	pia_config( THOM_PIA_SYS, &to8_sys );
+	pia_config( machine, THOM_PIA_SYS, &to8_sys );
 	centronics_config( 0, &to9_centronics );
 	to7_game_init(machine);
 	to8_floppy_init(machine);
@@ -4187,7 +4187,7 @@ MACHINE_START ( to9p )
 
 	/* subsystems */
 	thom_irq_init(machine);
-	pia_config( THOM_PIA_SYS, &to9p_sys );
+	pia_config( machine, THOM_PIA_SYS, &to9p_sys );
 	centronics_config( 0, &to9_centronics );
 	to7_game_init(machine);
 	to8_floppy_init( machine );
@@ -4455,7 +4455,7 @@ static TIMER_CALLBACK(mo6_game_update_cb)
 static void mo6_game_init ( running_machine *machine )
 {
 	LOG (( "mo6_game_init called\n" ));
-	pia_config( THOM_PIA_GAME, &mo6_game );
+	pia_config( machine, THOM_PIA_GAME, &mo6_game );
 	to7_game_timer = timer_alloc( machine, mo6_game_update_cb , NULL);
 	timer_adjust_periodic(to7_game_timer, TO7_GAME_POLL_PERIOD, 0, TO7_GAME_POLL_PERIOD);
 	state_save_register_global( machine, to7_game_sound );
@@ -4771,7 +4771,7 @@ MACHINE_START ( mo6 )
 
 	/* subsystems */
 	thom_irq_init(machine);
-	pia_config( THOM_PIA_SYS, &mo6_sys );
+	pia_config( machine, THOM_PIA_SYS, &mo6_sys );
 	centronics_config( 0, &to9_centronics );
 	mo6_game_init(machine);
 	to7_floppy_init( machine, mem + 0x30000 );
@@ -4965,7 +4965,7 @@ static const pia6821_interface mo5nr_game =
 static void mo5nr_game_init ( running_machine* machine )
 {
 	LOG (( "mo5nr_game_init called\n" ));
-	pia_config( THOM_PIA_GAME, &mo5nr_game );
+	pia_config( machine, THOM_PIA_GAME, &mo5nr_game );
 	to7_game_timer = timer_alloc( machine, mo6_game_update_cb , NULL);
 	timer_adjust_periodic( to7_game_timer, TO7_GAME_POLL_PERIOD, 0, TO7_GAME_POLL_PERIOD );
 	state_save_register_global( machine, to7_game_sound );
@@ -5038,7 +5038,7 @@ MACHINE_START ( mo5nr )
 
 	/* subsystems */
 	thom_irq_init(machine);
-	pia_config( THOM_PIA_SYS, &mo5nr_sys );
+	pia_config( machine, THOM_PIA_SYS, &mo5nr_sys );
 	centronics_config( 0, &to9_centronics );
 	mo5nr_game_init(machine);
 	to7_floppy_init( machine, mem + 0x30000 );

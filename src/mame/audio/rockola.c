@@ -627,7 +627,7 @@ void rockola_set_music_clock(double clock_time)
 	tone_clock = 0;
 }
 
-void *rockola_sh_start(int clock, const custom_sound_interface *config)
+CUSTOM_START( rockola_sh_start )
 {
 	// adjusted
 	rockola_set_music_freq(43000);
@@ -635,7 +635,7 @@ void *rockola_sh_start(int clock, const custom_sound_interface *config)
 	// 38.99 Hz update (according to schematic)
 	rockola_set_music_clock(M_LN2 * (RES_K(18) * 2 + RES_K(1)) * CAP_U(1));
 
-	tone_stream = stream_create(0, 1, SAMPLE_RATE, NULL, rockola_tone_update);
+	tone_stream = stream_create(device, 0, 1, SAMPLE_RATE, NULL, rockola_tone_update);
 
 	return auto_malloc(1);
 }

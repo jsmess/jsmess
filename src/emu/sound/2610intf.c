@@ -12,7 +12,6 @@
 ***************************************************************************/
 
 #include "sndintrf.h"
-#include "deprecat.h"
 #include "streams.h"
 #include "ay8910.h"
 #include "2610intf.h"
@@ -26,6 +25,7 @@ struct ym2610_info
 	void *			chip;
 	void *			psg;
 	const ym2610_interface *intf;
+	const device_config *device;
 };
 
 
@@ -66,7 +66,7 @@ static const ssg_callbacks psgintf =
 static void IRQHandler(void *param,int irq)
 {
 	struct ym2610_info *info = param;
-	if(info->intf->handler) info->intf->handler(Machine, irq);
+	if(info->intf->handler) info->intf->handler(info->device->machine, irq);
 }
 
 /* Timer overflow callback from timer.c */
@@ -142,15 +142,16 @@ static SND_START( ym2610 )
 	memset(info, 0, sizeof(*info));
 
 	info->intf = intf;
+	info->device = device;
 	info->psg = ay8910_start_ym(SOUND_YM2610, device, clock, &generic_ay8910);
 	if (!info->psg) return NULL;
 
 	/* Timer Handler set */
-	info->timer[0] = timer_alloc(Machine, timer_callback_0, info);
-	info->timer[1] = timer_alloc(Machine, timer_callback_1, info);
+	info->timer[0] = timer_alloc(device->machine, timer_callback_0, info);
+	info->timer[1] = timer_alloc(device->machine, timer_callback_1, info);
 
 	/* stream system initialize */
-	info->stream = stream_create(0,2,rate,info,ym2610_stream_update);
+	info->stream = stream_create(device,0,2,rate,info,ym2610_stream_update);
 	/* setup adpcm buffers */
 	pcmbufa  = device->region;
 	pcmsizea = device->regionbytes;
@@ -208,15 +209,16 @@ static SND_START( ym2610b )
 	memset(info, 0, sizeof(*info));
 
 	info->intf = intf;
+	info->device = device;
 	info->psg = ay8910_start_ym(SOUND_YM2610B, device, clock, &generic_ay8910);
 	if (!info->psg) return NULL;
 
 	/* Timer Handler set */
-	info->timer[0] =timer_alloc(Machine, timer_callback_0, info);
-	info->timer[1] =timer_alloc(Machine, timer_callback_1, info);
+	info->timer[0] =timer_alloc(device->machine, timer_callback_0, info);
+	info->timer[1] =timer_alloc(device->machine, timer_callback_1, info);
 
 	/* stream system initialize */
-	info->stream = stream_create(0,2,rate,info,ym2610b_stream_update);
+	info->stream = stream_create(device, 0,2,rate,info,ym2610b_stream_update);
 	/* setup adpcm buffers */
 	pcmbufa  = device->region;
 	pcmsizea = device->regionbytes;

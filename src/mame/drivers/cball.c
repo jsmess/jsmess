@@ -28,7 +28,7 @@ static WRITE8_HANDLER( cball_vram_w )
 
 static VIDEO_START( cball )
 {
-	bg_tilemap = tilemap_create(get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 
@@ -55,7 +55,7 @@ static TIMER_CALLBACK( interrupt_callback )
 {
 	int scanline = param;
 
-	cpu_set_input_line(machine->cpu[0], 0, PULSE_LINE);
+	generic_pulse_irq_line(machine->cpu[0], 0);
 
 	scanline = scanline + 32;
 

@@ -14,7 +14,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "system16.h"
 #include "machine/fd1089.h"
 #include "machine/segaic16.h"
@@ -255,7 +254,7 @@ static MACHINE_RESET( outrun )
 	segaic16_memory_mapper_reset(machine);
 	if (custom_map)
 		segaic16_memory_mapper_config(machine, custom_map);
-	segaic16_tilemap_reset(0);
+	segaic16_tilemap_reset(machine, 0);
 
 	/* hook the RESET line, which resets CPU #1 */
 	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_M68K_RESET_CALLBACK, (genf *)outrun_reset);
@@ -276,7 +275,7 @@ static void log_unknown_ppi_read( running_machine *machine, unsigned port )
 {
 	static const char ports[] = "ABC";
 
-	logerror("%06X:read from 8255 port %c\n", cpu_get_pc(machine->activecpu), ports[port]);
+	logerror("%06X:read from 8255 port %c\n", cpu_get_pc(machine->cpu[0]), ports[port]);
 }
 
 
@@ -284,7 +283,7 @@ static void log_unknown_ppi_write( running_machine *machine, unsigned port, UINT
 {
 	static const char ports[] = "ABC";
 
-	logerror("%06X:write %02X to 8255 port %c\n", cpu_get_pc(machine->activecpu), data, ports[port]);
+	logerror("%06X:write %02X to 8255 port %c\n", cpu_get_pc(machine->cpu[0]), data, ports[port]);
 }
 
 

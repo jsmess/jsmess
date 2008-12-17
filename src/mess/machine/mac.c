@@ -106,17 +106,17 @@ static emu_timer *mac_scanline_timer, *mac_adb_timer;
 static int scan_keyboard(running_machine *machine);
 static TIMER_CALLBACK(inquiry_timeout_func);
 static void keyboard_receive(running_machine *machine, int val);
-static READ8_HANDLER(mac_via_in_a);
-static READ8_HANDLER(mac_via_in_b);
-static READ8_HANDLER(mac_adb_via_in_cb2);
-static WRITE8_HANDLER(mac_via_out_a);
-static WRITE8_HANDLER(mac_via_out_b);
-static WRITE8_HANDLER(mac_adb_via_out_cb2);
-static WRITE8_HANDLER(mac_via_out_cb2);
-static void mac_via_irq(running_machine *machine, int state);
+static READ8_DEVICE_HANDLER(mac_via_in_a);
+static READ8_DEVICE_HANDLER(mac_via_in_b);
+static READ8_DEVICE_HANDLER(mac_adb_via_in_cb2);
+static WRITE8_DEVICE_HANDLER(mac_via_out_a);
+static WRITE8_DEVICE_HANDLER(mac_via_out_b);
+static WRITE8_DEVICE_HANDLER(mac_adb_via_out_cb2);
+static WRITE8_DEVICE_HANDLER(mac_via_out_cb2);
+static void mac_via_irq(const device_config *device, int state);
 static offs_t mac_dasm_override(const device_config *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 
-static const struct via6522_interface mac_via6522_intf =
+const via6522_interface mac_via6522_intf =
 {
 	mac_via_in_a, mac_via_in_b,
 	NULL, NULL,
@@ -127,7 +127,7 @@ static const struct via6522_interface mac_via6522_intf =
 	mac_via_irq
 };
 
-static const struct via6522_interface mac_via6522_adb_intf =
+const via6522_interface mac_via6522_adb_intf =
 {
 	mac_via_in_a, mac_via_in_b,
 	NULL, NULL,
@@ -506,16 +506,18 @@ static void keyboard_init(void)
 static TIMER_CALLBACK(kbd_clock)
 {
 	int i;
+	const device_config *via_0 = device_list_find_by_tag(machine->config->devicelist, VIA6522, "via6522_0");
+
 	if (kbd_comm == TRUE)
 	{
 		for (i=0; i<8; i++)
 		{
 			/* Put data on CB2 if we are sending*/
 			if (kbd_receive == FALSE)
-				via_set_input_cb2(machine, 0, kbd_shift_reg&0x80?1:0);
+				via_cb2_w(via_0, 0, kbd_shift_reg&0x80?1:0);
 			kbd_shift_reg <<= 1;
-			via_set_input_cb1(machine, 0, 0);
-			via_set_input_cb1(machine, 0, 1);
+			via_cb1_w(via_0, 0, 0);
+			via_cb1_w(via_0, 0, 1);
 		}
 		if (kbd_receive == TRUE)
 		{
@@ -540,14 +542,14 @@ static void kbd_shift_out(running_machine *machine, int data)
 	}
 }
 
-static WRITE8_HANDLER(mac_via_out_cb2)
+static WRITE8_DEVICE_HANDLER(mac_via_out_cb2)
 {
 	if (kbd_comm == FALSE && data == 0)
 	{
 		/* Mac pulls CB2 down to initiate communication */
 		kbd_comm = TRUE;
 		kbd_receive = TRUE;
-		timer_set(space->machine, ATTOTIME_IN_USEC(100), NULL, 0, kbd_clock);
+		timer_set(device->machine, ATTOTIME_IN_USEC(100), NULL, 0, kbd_clock);
 	}
 	if (kbd_comm == TRUE && kbd_receive == TRUE)
 	{
@@ -1444,11 +1446,13 @@ static void mac_adb_talk(running_machine *machine)
 
 static TIMER_CALLBACK(mac_adb_tick)
 {
+	const device_config *via_0 = device_list_find_by_tag(machine->config->devicelist, VIA6522, "via6522_0");
+
 	// do one clock transition on CB1 to advance the VIA shifter
 	adb_extclock ^= 1;
-	via_set_input_cb1(machine, 0, adb_extclock);
+	via_cb1_w(via_0, 0, adb_extclock);
 	adb_extclock ^= 1;
-	via_set_input_cb1(machine, 0, adb_extclock);
+	via_cb1_w(via_0, 0, adb_extclock);
 
 	adb_timer_ticks--;
 	if (!adb_timer_ticks)
@@ -1466,7 +1470,7 @@ static TIMER_CALLBACK(mac_adb_tick)
 	}
 }
 
-static READ8_HANDLER(mac_adb_via_in_cb2)
+static READ8_DEVICE_HANDLER(mac_adb_via_in_cb2)
 {
 	UINT8 ret;
 
@@ -1478,7 +1482,7 @@ static READ8_HANDLER(mac_adb_via_in_cb2)
 	return ret;
 }
 
-static WRITE8_HANDLER(mac_adb_via_out_cb2)
+static WRITE8_DEVICE_HANDLER(mac_adb_via_out_cb2)
 {
 //	printf("OUT CB2 = %x\n", data);
 	adb_command <<= 1;
@@ -1608,7 +1612,7 @@ static void adb_reset(void)
  *
  */
 
-static READ8_HANDLER(mac_via_in_a)
+static READ8_DEVICE_HANDLER(mac_via_in_a)
 {
 	if (mac_model == MODEL_MAC_CLASSIC)
 	{
@@ -1618,12 +1622,12 @@ static READ8_HANDLER(mac_via_in_a)
 	return 0x80;
 }
 
-static READ8_HANDLER(mac_via_in_b)
+static READ8_DEVICE_HANDLER(mac_via_in_b)
 {
 	int val = 0;
 
 	/* video beam in display (! VBLANK && ! HBLANK basically) */
-	if (video_screen_get_vpos(space->machine->primary_screen) >= MAC_V_VIS)
+	if (video_screen_get_vpos(device->machine->primary_screen) >= MAC_V_VIS)
 		val |= 0x40;
 
 	if (has_adb())
@@ -1641,7 +1645,7 @@ static READ8_HANDLER(mac_via_in_b)
 			val |= 0x20;
 		if (mouse_bit_x)	/* Mouse X2 */
 			val |= 0x10;
-		if ((input_port_read(space->machine, "MOUSE0") & 0x01) == 0)
+		if ((input_port_read(device->machine, "MOUSE0") & 0x01) == 0)
 			val |= 0x08;
 	}
 	if (rtc_data_out)
@@ -1650,7 +1654,7 @@ static READ8_HANDLER(mac_via_in_b)
 	return val;
 }
 
-static WRITE8_HANDLER(mac_via_out_a)
+static WRITE8_DEVICE_HANDLER(mac_via_out_a)
 {
 	set_scc_waitrequest((data & 0x80) >> 7);
 	mac_set_screen_buffer((data & 0x40) >> 6);
@@ -1670,10 +1674,10 @@ static WRITE8_HANDLER(mac_via_out_a)
 	 * possibly later models), overlay was set on reset, but cleared on the
 	 * first access to the ROM. */
 	if (mac_model < MODEL_MAC_SE)
-		set_memory_overlay(space->machine, (data & 0x10) >> 4);
+		set_memory_overlay(device->machine, (data & 0x10) >> 4);
 }
 
-static WRITE8_HANDLER(mac_via_out_b)
+static WRITE8_DEVICE_HANDLER(mac_via_out_b)
 {
 	int new_rtc_rTCClk;
 
@@ -1697,29 +1701,32 @@ static WRITE8_HANDLER(mac_via_out_b)
 	}
 }
 
-static void mac_via_irq(running_machine *machine, int state)
+static void mac_via_irq(const device_config *device, int state)
 {
 	/* interrupt the 68k (level 1) */
 	//cpu_set_input_line(machine->cpu[0], 1, state);
-	set_via_interrupt(machine, state);
+	set_via_interrupt(device->machine, state);
 }
 
 READ16_HANDLER ( mac_via_r )
 {
-	int data;
+	UINT16 data;
+	const device_config *via_0 = device_list_find_by_tag(space->machine->config->devicelist, VIA6522, "via6522_0");
 
 	offset >>= 8;
 	offset &= 0x0f;
 
 	if (LOG_VIA)
 		logerror("mac_via_r: offset=0x%02x\n", offset);
-	data = via_0_r(space, offset);
+	data = via_r(via_0, offset);
 
 	return (data & 0xff) | (data << 8);
 }
 
 WRITE16_HANDLER ( mac_via_w )
 {
+	const device_config *via_0 = device_list_find_by_tag(space->machine->config->devicelist, VIA6522, "via6522_0");
+
 	offset >>= 8;
 	offset &= 0x0f;
 
@@ -1727,7 +1734,7 @@ WRITE16_HANDLER ( mac_via_w )
 		logerror("mac_via_w: offset=0x%02x data=0x%08x\n", offset, data);
 
 	if (ACCESSING_BITS_8_15)
-		via_0_w(space, offset, (data >> 8) & 0xff);
+		via_w(via_0, offset, (data >> 8) & 0xff);
 }
 
 
@@ -1745,9 +1752,6 @@ MACHINE_RESET(mac)
 
 	/* setup the memory overlay */
 	set_memory_overlay(machine, 1);
-
-	/* reset the via */
-	via_reset();
 
 	/* setup videoram */
 	mac_set_screen_buffer(1);
@@ -1825,17 +1829,6 @@ static void mac_driver_init(running_machine *machine, mac_model_t model)
 		mac_overlay = 1;
 	}
 
-	/* configure via */
-	if (has_adb())
-	{
-		via_config(0, &mac_via6522_adb_intf);
-	}
-	else
-	{
-		via_config(0, &mac_via6522_intf);
-	}
-	via_set_clock(0, 1000000);	/* 6522 = 1 MHz, 6522a = 2 MHz */
-
 	/* setup keyboard */
 	keyboard_init();
 
@@ -1905,6 +1898,7 @@ DRIVER_INIT(macclassic)
 static void mac_vblank_irq(running_machine *machine)
 {
 	static int irq_count = 0, ca1_data = 0, ca2_data = 0;
+	const device_config *via_0 = device_list_find_by_tag(machine->config->devicelist, VIA6522, "via6522_0");
 
 	/* handle ADB keyboard/mouse */
 	if (has_adb())
@@ -1930,7 +1924,7 @@ static void mac_vblank_irq(running_machine *machine)
 
 	/* signal VBlank on CA1 input on the VIA */
 	ca1_data ^= 1;
-	via_set_input_ca1(machine, 0, ca1_data);
+	via_ca1_w(via_0, 0, ca1_data);
 
 	if (++irq_count == 60)
 	{
@@ -1938,7 +1932,7 @@ static void mac_vblank_irq(running_machine *machine)
 
 		ca2_data ^= 1;
 		/* signal 1 Hz irq on CA2 input on the VIA */
-		via_set_input_ca2(machine, 0, ca2_data);
+		via_ca2_w(via_0, 0, ca2_data);
 
 		rtc_incticks();
 	}

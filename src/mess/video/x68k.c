@@ -954,21 +954,21 @@ VIDEO_START( x68000 )
 			break;
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine->gfx[gfx_index] = allocgfx(&x68k_pcg_8);
+	machine->gfx[gfx_index] = allocgfx(machine, &x68k_pcg_8);
 	decodegfx(machine->gfx[gfx_index] , memory_region(machine, "user1"), 0, 256);
 	machine->gfx[gfx_index]->total_colors = 32;
 
 	gfx_index++;
 
-	machine->gfx[gfx_index] = allocgfx(&x68k_pcg_16);
+	machine->gfx[gfx_index] = allocgfx(machine, &x68k_pcg_16);
 	decodegfx(machine->gfx[gfx_index] , memory_region(machine, "user1"), 0, 256);
 	machine->gfx[gfx_index]->total_colors = 32;
 
 	/* Tilemaps */
-	x68k_bg0_8 = tilemap_create(x68k_get_bg0_tile,tilemap_scan_rows,8,8,64,64);
-	x68k_bg1_8 = tilemap_create(x68k_get_bg1_tile,tilemap_scan_rows,8,8,64,64);
-	x68k_bg0_16 = tilemap_create(x68k_get_bg0_tile_16,tilemap_scan_rows,16,16,64,64);
-	x68k_bg1_16 = tilemap_create(x68k_get_bg1_tile_16,tilemap_scan_rows,16,16,64,64);
+	x68k_bg0_8 = tilemap_create(machine, x68k_get_bg0_tile,tilemap_scan_rows,8,8,64,64);
+	x68k_bg1_8 = tilemap_create(machine, x68k_get_bg1_tile,tilemap_scan_rows,8,8,64,64);
+	x68k_bg0_16 = tilemap_create(machine, x68k_get_bg0_tile_16,tilemap_scan_rows,16,16,64,64);
+	x68k_bg1_16 = tilemap_create(machine, x68k_get_bg1_tile_16,tilemap_scan_rows,16,16,64,64);
 
 	tilemap_set_transparent_pen(x68k_bg0_8,0);
 	tilemap_set_transparent_pen(x68k_bg1_8,0);

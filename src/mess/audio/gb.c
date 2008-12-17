@@ -642,7 +642,7 @@ static void gameboy_update(void *param,stream_sample_t **inputs, stream_sample_t
 
 
 
-void *gameboy_sh_start(int clock, const custom_sound_interface *config)
+void *gameboy_sh_start(const device_config *device, int clock, const custom_sound_interface *config)
 {
 	int I, J;
 
@@ -651,8 +651,8 @@ void *gameboy_sh_start(int clock, const custom_sound_interface *config)
 	memset(&snd_3, 0, sizeof(snd_3));
 	memset(&snd_4, 0, sizeof(snd_4));
 
-	channel = stream_create(0, 2, Machine->sample_rate, 0, gameboy_update);
-	rate = Machine->sample_rate;
+	channel = stream_create(device, 0, 2, device->machine->sample_rate, 0, gameboy_update);
+	rate = device->machine->sample_rate;
 
 	/* Calculate the envelope and sweep tables */
 	for( I = 0; I < 8; I++ )

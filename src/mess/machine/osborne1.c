@@ -512,8 +512,8 @@ DRIVER_INIT( osborne1 )
 	memset( osborne1.empty_4K, 0xFF, 0x1000 );
 
 	/* configure the 6821 PIAs */
-	pia_config( 0, &osborne1_ieee_pia_config );
-	pia_config( 1, &osborne1_video_pia_config );
+	pia_config(machine, 0, &osborne1_ieee_pia_config );
+	pia_config(machine, 1, &osborne1_video_pia_config );
 
 	/* Configure the 6850 ACIA */
 //	acia6850_config( 0, &osborne1_6850_config );

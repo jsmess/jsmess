@@ -396,7 +396,12 @@ static MACHINE_DRIVER_START( c16 )
 	/* devices */
 	MDRV_QUICKLOAD_ADD(cbm_c16, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
+	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", cbm_cassette_config )
+
+	/* via */
+	MDRV_VIA6522_ADD("via6522_2", 0, vc1541_via2)
+	MDRV_VIA6522_ADD("via6522_3", 0, vc1541_via3)
 MACHINE_DRIVER_END
 
 

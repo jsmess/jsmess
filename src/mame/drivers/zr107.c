@@ -237,9 +237,7 @@ static VIDEO_UPDATE( jetwave )
 	draw_7segment_led(bitmap, 3, 3, led_reg0);
 	draw_7segment_led(bitmap, 9, 3, led_reg1);
 
-	cpu_push_context(screen->machine->cpu[2]);
-	sharc_set_flag_input(1, ASSERT_LINE);
-	cpu_pop_context();
+	sharc_set_flag_input(screen->machine->cpu[2], 1, ASSERT_LINE);
 	return 0;
 }
 
@@ -293,9 +291,7 @@ static VIDEO_UPDATE( zr107 )
 	draw_7segment_led(bitmap, 3, 3, led_reg0);
 	draw_7segment_led(bitmap, 9, 3, led_reg1);
 
-	cpu_push_context(screen->machine->cpu[2]);
-	sharc_set_flag_input(1, ASSERT_LINE);
-	cpu_pop_context();
+	sharc_set_flag_input(screen->machine->cpu[2], 1, ASSERT_LINE);
 	return 0;
 }
 
@@ -852,7 +848,7 @@ static void init_zr107(running_machine *machine)
 
 	K056800_init(machine, sound_irq_callback);
 
-	adc083x_init(0, ADC0838, adc0838_callback);
+	adc083x_init(machine, 0, ADC0838, adc0838_callback);
 }
 
 static DRIVER_INIT(zr107)

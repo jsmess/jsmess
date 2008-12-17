@@ -1,5 +1,5 @@
 #include "driver.h"
-#include "deprecat.h"
+#include "includes/taito_l.h"
 
 
 extern UINT8 *taitol_rambanks;
@@ -76,9 +76,9 @@ VIDEO_START( taitol )
 {
 	int i;
 
-	bg18_tilemap = tilemap_create(get_bg18_tile_info,tilemap_scan_rows,8,8,64,32);
-	bg19_tilemap = tilemap_create(get_bg19_tile_info,tilemap_scan_rows,     8,8,64,32);
-	ch1a_tilemap = tilemap_create(get_ch1a_tile_info,tilemap_scan_rows,8,8,64,32);
+	bg18_tilemap = tilemap_create(machine, get_bg18_tile_info,tilemap_scan_rows,8,8,64,32);
+	bg19_tilemap = tilemap_create(machine, get_bg19_tile_info,tilemap_scan_rows,     8,8,64,32);
+	ch1a_tilemap = tilemap_create(machine, get_ch1a_tile_info,tilemap_scan_rows,8,8,64,32);
 
 	bankc[0] = bankc[1] = bankc[2] = bankc[3] = 0;
 	horshoes_gfxbank = 0;
@@ -158,70 +158,68 @@ READ8_HANDLER( taitol_control_r )
 	return cur_ctrl;
 }
 
-void taitol_chardef14_m(int offset)
+INLINE void taitol_chardef(running_machine *machine, int num, int offset)
 {
-	decodechar(Machine->gfx[2], offset/32,     taitol_rambanks);
+	decodechar(machine->gfx[2], num, taitol_rambanks + offset);
 	tilemap_mark_all_tiles_dirty(ch1a_tilemap);
 }
 
-void taitol_chardef15_m(int offset)
+void taitol_chardef14_m(running_machine *machine, int offset)
 {
-	decodechar(Machine->gfx[2], offset/32+128, taitol_rambanks);
-	tilemap_mark_all_tiles_dirty(ch1a_tilemap);
+	taitol_chardef(machine, offset/32, 0);
 }
 
-void taitol_chardef16_m(int offset)
+void taitol_chardef15_m(running_machine *machine, int offset)
 {
-	decodechar(Machine->gfx[2], offset/32+256, taitol_rambanks);
-	tilemap_mark_all_tiles_dirty(ch1a_tilemap);
+	taitol_chardef(machine, offset/32 + 128, 0);
 }
 
-void taitol_chardef17_m(int offset)
+void taitol_chardef16_m(running_machine *machine, int offset)
 {
-	decodechar(Machine->gfx[2], offset/32+384, taitol_rambanks);
-	tilemap_mark_all_tiles_dirty(ch1a_tilemap);
+	taitol_chardef(machine, offset/32+256, 0);
 }
 
-void taitol_chardef1c_m(int offset)
+void taitol_chardef17_m(running_machine *machine, int offset)
 {
-	decodechar(Machine->gfx[2], offset/32+512, taitol_rambanks + 0x4000);
-	tilemap_mark_all_tiles_dirty(ch1a_tilemap);
+	taitol_chardef(machine, offset/32+384, 0);
 }
 
-void taitol_chardef1d_m(int offset)
+void taitol_chardef1c_m(running_machine *machine, int offset)
 {
-	decodechar(Machine->gfx[2], offset/32+640, taitol_rambanks + 0x4000);
-	tilemap_mark_all_tiles_dirty(ch1a_tilemap);
+	taitol_chardef(machine, offset/32+512, 0x4000);
 }
 
-void taitol_chardef1e_m(int offset)
+void taitol_chardef1d_m(running_machine *machine, int offset)
 {
-	decodechar(Machine->gfx[2], offset/32+768, taitol_rambanks + 0x4000);
-	tilemap_mark_all_tiles_dirty(ch1a_tilemap);
+	taitol_chardef(machine, offset/32+640, 0x4000);
 }
 
-void taitol_chardef1f_m(int offset)
+void taitol_chardef1e_m(running_machine *machine, int offset)
 {
-	decodechar(Machine->gfx[2], offset/32+896, taitol_rambanks + 0x4000);
-	tilemap_mark_all_tiles_dirty(ch1a_tilemap);
+	taitol_chardef(machine, offset/32+768, 0x4000);
 }
 
-void taitol_bg18_m(int offset)
+void taitol_chardef1f_m(running_machine *machine, int offset)
+{
+	taitol_chardef(machine, offset/32+896, 0x4000);
+}
+
+void taitol_bg18_m(running_machine *machine, int offset)
 {
 	tilemap_mark_tile_dirty(bg18_tilemap,offset/2);
 }
 
-void taitol_bg19_m(int offset)
+void taitol_bg19_m(running_machine *machine, int offset)
 {
 	tilemap_mark_tile_dirty(bg19_tilemap,offset/2);
 }
 
-void taitol_char1a_m(int offset)
+void taitol_char1a_m(running_machine *machine, int offset)
 {
 	tilemap_mark_tile_dirty(ch1a_tilemap,offset/2);
 }
 
-void taitol_obj1b_m(int offset)
+void taitol_obj1b_m(running_machine *machine, int offset)
 {
 #if 0
 	if (offset>=0x3f0 && offset<=0x3ff)

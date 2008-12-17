@@ -704,7 +704,7 @@ static MACHINE_START( c1pmf )
 	MACHINE_START_CALL(c1p);
 
 	/* configure floppy PIA */
-	pia_config(0, &osi470_pia_intf);
+	pia_config(machine, 0, &osi470_pia_intf);
 
 	/* set floppy index hole callback */
 	floppy_drive_set_index_pulse_callback(image_from_devtype_and_index(IO_FLOPPY, 0), osi470_index_callback);

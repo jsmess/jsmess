@@ -39,15 +39,15 @@ static char atom_printer_data = 0x07f;
 /* I am not sure if this is correct, the atom appears to have a 2.4 kHz timer used for reading tapes?? */
 static int	timer_state = 0;
 
-static void atom_via_irq_func(running_machine *machine, int state)
+static void atom_via_irq_func(const device_config *device, int state)
 {
 	if (state)
 	{
-		cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
+		cpu_set_input_line(device->machine->cpu[0], 0, HOLD_LINE);
 	}
 	else
 	{
-		cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+		cpu_set_input_line(device->machine->cpu[0], 0, CLEAR_LINE);
 	}
 }
 
@@ -62,13 +62,13 @@ static const device_config *printer_image(running_machine *machine)
 }
 
 /* printer status */
-static  READ8_HANDLER(atom_via_in_a_func)
+static READ8_DEVICE_HANDLER(atom_via_in_a_func)
 {
 	unsigned char data;
 
 	data = atom_printer_data;
 
-	if (!printer_is_ready(printer_image(space->machine)))
+	if (!printer_is_ready(printer_image(device->machine)))
 	{
 		/* offline */
 		data |=0x080;
@@ -78,7 +78,7 @@ static  READ8_HANDLER(atom_via_in_a_func)
 }
 
 /* printer data */
-static WRITE8_HANDLER(atom_via_out_a_func)
+static WRITE8_DEVICE_HANDLER(atom_via_out_a_func)
 {
 	/* data is written to port, this causes a pulse on ca2 (printer /strobe input),
 	and data is written */
@@ -89,7 +89,7 @@ static WRITE8_HANDLER(atom_via_out_a_func)
 static unsigned char previous_ca2_data = 0;
 
 /* one of these is pulsed! */
-static WRITE8_HANDLER(atom_via_out_ca2_func)
+static WRITE8_DEVICE_HANDLER(atom_via_out_ca2_func)
 {
 	/* change in state of ca2 output? */
 	if (((previous_ca2_data^data)&0x01)!=0)
@@ -98,14 +98,14 @@ static WRITE8_HANDLER(atom_via_out_ca2_func)
 		if (data & 0x01)
 		{
 			/* output data to printer */
-			printer_output(printer_image(space->machine), atom_printer_data);
+			printer_output(printer_image(device->machine), atom_printer_data);
 		}
 	}
 
 	previous_ca2_data = data;
 }
 
-static const struct via6522_interface atom_6522_interface=
+const via6522_interface atom_6522_interface =
 {
 	atom_via_in_a_func,		/* printer status */
 	NULL,
@@ -242,10 +242,6 @@ MACHINE_RESET( atom )
 	atom_8255_porta = 0xff;
 	atom_8255_portb = 0xff;
 	atom_8255_portc = 0xff;
-
-	via_config(0, &atom_6522_interface);
-	via_set_clock(0,1000000);
-	via_reset();
 
 	timer_state = 0;
 	timer_pulse(machine, ATTOTIME_IN_HZ(2400*2), NULL, 0, atom_timer_callback);

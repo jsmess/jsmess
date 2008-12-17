@@ -70,7 +70,7 @@ static NVRAM_HANDLER(93C56)
 	}
 	else
 	{
-		eeprom_init(&eeprom_interface_93C56);
+		eeprom_init(machine, &eeprom_interface_93C56);
 		if (file)
 		{
 			eeprom_load(file);
@@ -584,7 +584,7 @@ static DRIVER_INIT( ip204415 )
 
 static MACHINE_RESET( ip204415 )
 {
-	wd33c93_init(&scsi_intf);
+	wd33c93_init(machine, &scsi_intf);
 
 	mc_init(machine);
 

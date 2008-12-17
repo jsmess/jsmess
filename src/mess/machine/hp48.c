@@ -295,10 +295,10 @@ static const chardev_interface hp48_chardev_iface =
 
 
 /* CPU sets OUT register (keyboard + beeper) */
-void hp48_reg_out( running_machine* machine, int out )
+void hp48_reg_out( const device_config *device, int out )
 {
 	LOG(( "%05x %f hp48_reg_out: %03x\n",
-	      cpu_get_previouspc(machine->cpu[0]), attotime_to_double(timer_get_time(machine)), out ));
+	      cpu_get_previouspc(device->machine->cpu[0]), attotime_to_double(timer_get_time(device->machine)), out ));
 
 	/* bits 0-8: keyboard lines */
 	hp48_out = out & 0x1ff;
@@ -331,11 +331,11 @@ static int hp48_get_in( running_machine *machine )
 }
 
 /* CPU reads IN register (keyboard) */
-int hp48_reg_in( running_machine* machine )
+int hp48_reg_in( const device_config *device )
 {
-	int in = hp48_get_in( machine );
+	int in = hp48_get_in( device->machine );
 	LOG(( "%05x %f hp48_reg_in: %04x\n",
-	      cpu_get_previouspc(machine->cpu[0]), attotime_to_double(timer_get_time(machine)), in ));
+	      cpu_get_previouspc(device->machine->cpu[0]), attotime_to_double(timer_get_time(device->machine)), in ));
 	return in;
 }
 
@@ -375,9 +375,9 @@ static TIMER_CALLBACK( hp48_kbd_cb )
 }
 
 /* RSI opcode */
-void hp48_rsi( running_machine *machine )
+void hp48_rsi( const device_config *device )
 {
-	LOG(( "%05x %f hp48_rsi\n", cpu_get_previouspc(machine->cpu[0]), attotime_to_double(timer_get_time(machine)) ));
+	LOG(( "%05x %f hp48_rsi\n", cpu_get_previouspc(device->machine->cpu[0]), attotime_to_double(timer_get_time(device->machine)) ));
 
 	/* enables interrupts on key repeat 
 	   (normally, there is only one interrupt, when the key is pressed)
@@ -855,19 +855,19 @@ static void hp48_reset_modules( running_machine *machine )
 
 
 /* RESET opcode */
-void hp48_mem_reset( running_machine* machine )
+void hp48_mem_reset( const device_config *device )
 {
-	LOG(( "%05x %f hp48_mem_reset\n", cpu_get_previouspc(machine->cpu[0]), attotime_to_double(timer_get_time(machine)) ));
-	hp48_reset_modules( machine );
+	LOG(( "%05x %f hp48_mem_reset\n", cpu_get_previouspc(device->machine->cpu[0]), attotime_to_double(timer_get_time(device->machine)) ));
+	hp48_reset_modules( device->machine );
 }
 
 
 /* CONFIG opcode */
-void hp48_mem_config( running_machine* machine, int v )
+void hp48_mem_config( const device_config *device, int v )
 {	
 	int i;
 
-	LOG(( "%05x %f hp48_mem_config: %05x\n", cpu_get_previouspc(machine->cpu[0]), attotime_to_double(timer_get_time(machine)), v ));
+	LOG(( "%05x %f hp48_mem_config: %05x\n", cpu_get_previouspc(device->machine->cpu[0]), attotime_to_double(timer_get_time(device->machine)), v ));
 
 	/* find the highest priority unconfigured module (except non-configurable NCE1)... */
 	for ( i = 0; i < 5; i++ )
@@ -887,7 +887,7 @@ void hp48_mem_config( running_machine* machine, int v )
 			hp48_modules[i].state = HP48_MODULE_CONFIGURED;
 			LOG(( "hp48_mem_config: module %s configured base=%05x, mask=%05x\n",
 			      hp48_module_names[i], hp48_modules[i].base, hp48_modules[i].mask ));
-			hp48_apply_modules( machine, NULL );
+			hp48_apply_modules( device->machine, NULL );
 			break;
 		}
 	}
@@ -895,10 +895,10 @@ void hp48_mem_config( running_machine* machine, int v )
 
 
 /* UNCFG opcode */
-void hp48_mem_unconfig( running_machine* machine, int v )
+void hp48_mem_unconfig( const device_config *device, int v )
 {	
 	int i;
-	LOG(( "%05x %f hp48_mem_unconfig: %05x\n", cpu_get_previouspc(machine->cpu[0]), attotime_to_double(timer_get_time(machine)), v ));
+	LOG(( "%05x %f hp48_mem_unconfig: %05x\n", cpu_get_previouspc(device->machine->cpu[0]), attotime_to_double(timer_get_time(device->machine)), v ));
 
 	/* find the highest priority fully configured module at address v (except NCE1)... */
 	for ( i = 0; i < 5; i++ )
@@ -909,7 +909,7 @@ void hp48_mem_unconfig( running_machine* machine, int v )
 		{
 			hp48_modules[i].state = i> 0 ? HP48_MODULE_UNCONFIGURED : HP48_MODULE_MASK_KNOWN;
 			LOG(( "hp48_mem_unconfig: module %s\n", hp48_module_names[i] ));
-			hp48_apply_modules( machine, NULL );
+			hp48_apply_modules( device->machine, NULL );
 			break;
 		}
 	}
@@ -917,7 +917,7 @@ void hp48_mem_unconfig( running_machine* machine, int v )
 
 
 /* C=ID opcode */
-int  hp48_mem_id( running_machine* machine )
+int  hp48_mem_id( const device_config *device )
 {
 	int i;
 	int data = 0; /* 0 = everything is configured */
@@ -941,7 +941,7 @@ int  hp48_mem_id( running_machine* machine )
 	}
 
 	LOG(( "%05x %f hp48_mem_id = %02x\n", 
-	      cpu_get_previouspc(machine->cpu[0]), attotime_to_double(timer_get_time(machine)), data ));
+	      cpu_get_previouspc(device->machine->cpu[0]), attotime_to_double(timer_get_time(device->machine)), data ));
 
 	return data; /* everything is configured */
 }
@@ -951,7 +951,7 @@ int  hp48_mem_id( running_machine* machine )
 /* --------- CRC ---------- */
 
 /* each memory read by the CPU updates the internal CRC state */
-void hp48_mem_crc( running_machine* machine, int addr, int data )
+void hp48_mem_crc( const device_config *device, int addr, int data )
 {
 	/* no CRC for I/O RAM */
 	if ( addr >= hp48_io_addr && addr < hp48_io_addr + 0x40 ) return;

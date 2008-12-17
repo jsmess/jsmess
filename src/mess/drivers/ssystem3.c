@@ -134,49 +134,49 @@ static void ssystem3_playfield_read(running_machine *machine, int *on, int *read
 	*ready=FALSE;
 }
 
-static WRITE8_HANDLER(ssystem3_via_write_a)
+static WRITE8_DEVICE_HANDLER(ssystem3_via_write_a)
 {
   ssystem3.porta=data;
   //  logerror("%.4x via port a write %02x\n",(int)activecpu_get_pc(), data);
 }
 
-static READ8_HANDLER(ssystem3_via_read_a)
+static READ8_DEVICE_HANDLER(ssystem3_via_read_a)
 {
   UINT8 data=0xff;
 #if 1 // time switch
-  if (!(ssystem3.porta&0x10)) data&=input_port_read(space->machine, "matrix1")|0xf1;
-  if (!(ssystem3.porta&0x20)) data&=input_port_read(space->machine, "matrix2")|0xf1;
-  if (!(ssystem3.porta&0x40)) data&=input_port_read(space->machine, "matrix3")|0xf1;
-  if (!(ssystem3.porta&0x80)) data&=input_port_read(space->machine, "matrix4")|0xf1;
+  if (!(ssystem3.porta&0x10)) data&=input_port_read(device->machine, "matrix1")|0xf1;
+  if (!(ssystem3.porta&0x20)) data&=input_port_read(device->machine, "matrix2")|0xf1;
+  if (!(ssystem3.porta&0x40)) data&=input_port_read(device->machine, "matrix3")|0xf1;
+  if (!(ssystem3.porta&0x80)) data&=input_port_read(device->machine, "matrix4")|0xf1;
 #else
-  if (!(ssystem3.porta&0x10)) data&=input_port_read(space->machine, "matrix1")|0xf0;
-  if (!(ssystem3.porta&0x20)) data&=input_port_read(space->machine, "matrix2")|0xf0;
-  if (!(ssystem3.porta&0x40)) data&=input_port_read(space->machine, "matrix3")|0xf0;
-  if (!(ssystem3.porta&0x80)) data&=input_port_read(space->machine, "matrix4")|0xf0;
+  if (!(ssystem3.porta&0x10)) data&=input_port_read(device->machine, "matrix1")|0xf0;
+  if (!(ssystem3.porta&0x20)) data&=input_port_read(device->machine, "matrix2")|0xf0;
+  if (!(ssystem3.porta&0x40)) data&=input_port_read(device->machine, "matrix3")|0xf0;
+  if (!(ssystem3.porta&0x80)) data&=input_port_read(device->machine, "matrix4")|0xf0;
 #endif
   if (!(ssystem3.porta&1)) {
-    if (!(input_port_read(space->machine, "matrix1")&1)) data&=~0x10;
-    if (!(input_port_read(space->machine, "matrix2")&1)) data&=~0x20;
-    if (!(input_port_read(space->machine, "matrix3")&1)) data&=~0x40;
-    if (!(input_port_read(space->machine, "matrix4")&1)) data&=~0x80;
+    if (!(input_port_read(device->machine, "matrix1")&1)) data&=~0x10;
+    if (!(input_port_read(device->machine, "matrix2")&1)) data&=~0x20;
+    if (!(input_port_read(device->machine, "matrix3")&1)) data&=~0x40;
+    if (!(input_port_read(device->machine, "matrix4")&1)) data&=~0x80;
   }
   if (!(ssystem3.porta&2)) {
-    if (!(input_port_read(space->machine, "matrix1")&2)) data&=~0x10;
-    if (!(input_port_read(space->machine, "matrix2")&2)) data&=~0x20;
-    if (!(input_port_read(space->machine, "matrix3")&2)) data&=~0x40;
-    if (!(input_port_read(space->machine, "matrix4")&2)) data&=~0x80;
+    if (!(input_port_read(device->machine, "matrix1")&2)) data&=~0x10;
+    if (!(input_port_read(device->machine, "matrix2")&2)) data&=~0x20;
+    if (!(input_port_read(device->machine, "matrix3")&2)) data&=~0x40;
+    if (!(input_port_read(device->machine, "matrix4")&2)) data&=~0x80;
   }
   if (!(ssystem3.porta&4)) {
-    if (!(input_port_read(space->machine, "matrix1")&4)) data&=~0x10;
-    if (!(input_port_read(space->machine, "matrix2")&4)) data&=~0x20;
-    if (!(input_port_read(space->machine, "matrix3")&4)) data&=~0x40;
-    if (!(input_port_read(space->machine, "matrix4")&4)) data&=~0x80;
+    if (!(input_port_read(device->machine, "matrix1")&4)) data&=~0x10;
+    if (!(input_port_read(device->machine, "matrix2")&4)) data&=~0x20;
+    if (!(input_port_read(device->machine, "matrix3")&4)) data&=~0x40;
+    if (!(input_port_read(device->machine, "matrix4")&4)) data&=~0x80;
   }
   if (!(ssystem3.porta&8)) {
-    if (!(input_port_read(space->machine, "matrix1")&8)) data&=~0x10;
-    if (!(input_port_read(space->machine, "matrix2")&8)) data&=~0x20;
-    if (!(input_port_read(space->machine, "matrix3")&8)) data&=~0x40;
-    if (!(input_port_read(space->machine, "matrix4")&8)) data&=~0x80;
+    if (!(input_port_read(device->machine, "matrix1")&8)) data&=~0x10;
+    if (!(input_port_read(device->machine, "matrix2")&8)) data&=~0x20;
+    if (!(input_port_read(device->machine, "matrix3")&8)) data&=~0x40;
+    if (!(input_port_read(device->machine, "matrix4")&8)) data&=~0x80;
   }
   //  logerror("%.4x via port a read %02x\n",(int)activecpu_get_pc(), data);
   return data;
@@ -204,29 +204,31 @@ static READ8_HANDLER(ssystem3_via_read_a)
    bit 5: input low x/$37 4 (else 1)
 
  */
-static READ8_HANDLER(ssystem3_via_read_b)
+static READ8_DEVICE_HANDLER(ssystem3_via_read_b)
 {
-  UINT8 data=0xff;
-  int on, ready;
-  ssystem3_playfield_read(space->machine, &on, &ready);
-  if (!on) data&=~0x20;
-  if (!ready) data&=~0x10;
-  return data;
+	UINT8 data=0xff;
+	int on, ready;
+	ssystem3_playfield_read(device->machine, &on, &ready);
+	if (!on) data&=~0x20;
+	if (!ready) data&=~0x10;
+	return data;
 }
 
-static WRITE8_HANDLER(ssystem3_via_write_b)
+static WRITE8_DEVICE_HANDLER(ssystem3_via_write_b)
 {
+	const device_config *via_0 = device_list_find_by_tag(device->machine->config->devicelist, VIA6522, "via6522_0");
 	UINT8 d;
-	ssystem3_playfield_write(space->machine, data&1, data&8);
-	ssystem3_lcd_write(space->machine, data&4, data&2);
 
-	d=ssystem3_via_read_b(space, 0)&~0x40;
+	ssystem3_playfield_write(device->machine, data&1, data&8);
+	ssystem3_lcd_write(device->machine, data&4, data&2);
+
+	d=ssystem3_via_read_b(via_0, 0)&~0x40;
 	if (data&0x80) d|=0x40;
 	//  d&=~0x8f;
-	via_set_input_b( 0, d );
+	via_portb_w( via_0, 0, d );
 }
 
-static const struct via6522_interface config=
+static const via6522_interface ssystem3_via_config=
 {
 	ssystem3_via_read_a,//read8_machine_func in_a_func;
 	ssystem3_via_read_b,//read8_machine_func in_b_func;
@@ -243,14 +245,8 @@ static const struct via6522_interface config=
 
 static DRIVER_INIT( ssystem3 )
 {
-	via_config(0,&config);
 	ssystem3_playfield_reset();
 	ssystem3_lcd_reset();
-}
-
-static MACHINE_RESET( ssystem3 )
-{
-  via_reset();
 }
 
 static ADDRESS_MAP_START( ssystem3_map , ADDRESS_SPACE_PROGRAM, 8)
@@ -263,7 +259,7 @@ static ADDRESS_MAP_START( ssystem3_map , ADDRESS_SPACE_PROGRAM, 8)
   probably zusatzgerät memory (battery powered ram 256x4? at 0x4000)
   $40ff low nibble ram if playfield module (else init with normal playfield)
  */
-	AM_RANGE( 0x6000, 0x600f) AM_READWRITE( via_0_r, via_0_w )
+	AM_RANGE( 0x6000, 0x600f) AM_DEVREADWRITE(VIA6522, "via6522_0", via_r, via_w)
 #if 1
 	AM_RANGE( 0xc000, 0xdfff) AM_ROM
 	AM_RANGE( 0xf000, 0xffff) AM_ROM
@@ -326,8 +322,6 @@ static MACHINE_DRIVER_START( ssystem3 )
 	MDRV_CPU_PROGRAM_MAP(ssystem3_map, 0)
 	MDRV_INTERLEAVE(1)
 
-	MDRV_MACHINE_RESET( ssystem3 )
-
     /* video hardware */
 	MDRV_SCREEN_ADD("main", LCD)
 	MDRV_SCREEN_REFRESH_RATE(LCD_FRAMES_PER_SECOND)
@@ -343,9 +337,11 @@ static MACHINE_DRIVER_START( ssystem3 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+
+	/* via */
+	MDRV_VIA6522_ADD("via6522_0", 0, ssystem3_via_config)
 MACHINE_DRIVER_END
 
 

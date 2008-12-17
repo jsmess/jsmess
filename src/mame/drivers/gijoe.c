@@ -63,21 +63,13 @@ static const eeprom_interface eeprom_intf =
 	"0100110000000" /* unlock command */
 };
 
-#if 0
-static void eeprom_init(void)
-{
-	eeprom_init(&eeprom_intf);
-	init_eeprom_count = 0;
-}
-#endif
-
 static NVRAM_HANDLER( gijoe )
 {
 	if (read_or_write)
 		eeprom_save(file);
 	else
 	{
-		eeprom_init(&eeprom_intf);
+		eeprom_init(machine, &eeprom_intf);
 
 		if (file)
 		{
@@ -454,8 +446,8 @@ ROM_END
 
 static DRIVER_INIT( gijoe )
 {
-	konami_rom_deinterleave_2("gfx1");
-	konami_rom_deinterleave_4("gfx2");
+	konami_rom_deinterleave_2(machine, "gfx1");
+	konami_rom_deinterleave_4(machine, "gfx2");
 }
 
 GAME( 1992, gijoe,  0,     gijoe, gijoe, gijoe, ROT0, "Konami", "GI Joe (World)", 0)

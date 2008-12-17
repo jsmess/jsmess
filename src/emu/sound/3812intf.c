@@ -17,7 +17,6 @@
 *
 ******************************************************************************/
 #include "sndintrf.h"
-#include "deprecat.h"
 #include "streams.h"
 #include "cpuintrf.h"
 #include "3812intf.h"
@@ -33,12 +32,13 @@ struct ym3812_info
 	emu_timer *	timer[2];
 	void *			chip;
 	const ym3812_interface *intf;
+	const device_config *device;
 };
 
 static void IRQHandler_3812(void *param,int irq)
 {
 	struct ym3812_info *info = param;
-	if (info->intf->handler) (info->intf->handler)(Machine, irq ? ASSERT_LINE : CLEAR_LINE);
+	if (info->intf->handler) (info->intf->handler)(info->device->machine, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 static TIMER_CALLBACK( timer_callback_3812_0 )
 {
@@ -89,21 +89,22 @@ static SND_START( ym3812 )
 	memset(info, 0, sizeof(*info));
 
 	info->intf = config ? config : &dummy;
+	info->device = device;
 
 	/* stream system initialize */
 	info->chip = ym3812_init(device,clock,rate);
 	if (!info->chip)
 		return NULL;
 
-	info->stream = stream_create(0,1,rate,info,ym3812_stream_update);
+	info->stream = stream_create(device,0,1,rate,info,ym3812_stream_update);
 
 	/* YM3812 setup */
 	ym3812_set_timer_handler (info->chip, TimerHandler_3812, info);
 	ym3812_set_irq_handler   (info->chip, IRQHandler_3812, info);
 	ym3812_set_update_handler(info->chip, _stream_update_3812, info);
 
-	info->timer[0] = timer_alloc(Machine, timer_callback_3812_0, info);
-	info->timer[1] = timer_alloc(Machine, timer_callback_3812_1, info);
+	info->timer[0] = timer_alloc(device->machine, timer_callback_3812_0, info);
+	info->timer[1] = timer_alloc(device->machine, timer_callback_3812_1, info);
 
 	return info;
 }
@@ -200,6 +201,7 @@ struct ym3526_info
 	emu_timer *	timer[2];
 	void *			chip;
 	const ym3526_interface *intf;
+	const device_config *device;
 };
 
 
@@ -207,7 +209,7 @@ struct ym3526_info
 static void IRQHandler_3526(void *param,int irq)
 {
 	struct ym3526_info *info = param;
-	if (info->intf->handler) (info->intf->handler)(Machine, irq ? ASSERT_LINE : CLEAR_LINE);
+	if (info->intf->handler) (info->intf->handler)(info->device->machine, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 /* Timer overflow callback from timer.c */
 static TIMER_CALLBACK( timer_callback_3526_0 )
@@ -258,20 +260,21 @@ static SND_START( ym3526 )
 	memset(info, 0, sizeof(*info));
 
 	info->intf = config ? config : &dummy;
+	info->device = device;
 
 	/* stream system initialize */
 	info->chip = ym3526_init(device,clock,rate);
 	if (!info->chip)
 		return NULL;
 
-	info->stream = stream_create(0,1,rate,info,ym3526_stream_update);
+	info->stream = stream_create(device,0,1,rate,info,ym3526_stream_update);
 	/* YM3526 setup */
 	ym3526_set_timer_handler (info->chip, TimerHandler_3526, info);
 	ym3526_set_irq_handler   (info->chip, IRQHandler_3526, info);
 	ym3526_set_update_handler(info->chip, _stream_update_3526, info);
 
-	info->timer[0] = timer_alloc(Machine, timer_callback_3526_0, info);
-	info->timer[1] = timer_alloc(Machine, timer_callback_3526_1, info);
+	info->timer[0] = timer_alloc(device->machine, timer_callback_3526_0, info);
+	info->timer[1] = timer_alloc(device->machine, timer_callback_3526_1, info);
 
 	return info;
 }
@@ -368,13 +371,14 @@ struct y8950_info
 	emu_timer *	timer[2];
 	void *			chip;
 	const y8950_interface *intf;
+	const device_config *device;
 	int				index;
 };
 
 static void IRQHandler_8950(void *param,int irq)
 {
 	struct y8950_info *info = param;
-	if (info->intf->handler) (info->intf->handler)(Machine, irq ? ASSERT_LINE : CLEAR_LINE);
+	if (info->intf->handler) (info->intf->handler)(info->device->machine, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 static TIMER_CALLBACK( timer_callback_8950_0 )
 {
@@ -402,9 +406,9 @@ static void TimerHandler_8950(void *param,int c,attotime period)
 
 static unsigned char Y8950PortHandler_r(void *param)
 {
-	/* temporary hack until this is converted to a device */
-	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	struct y8950_info *info = param;
+	/* temporary hack until this is converted to a device */
+	const address_space *space = cpu_get_address_space(info->device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	if (info->intf->portread)
 		return info->intf->portread(space,info->index);
 	return 0;
@@ -412,18 +416,18 @@ static unsigned char Y8950PortHandler_r(void *param)
 
 static void Y8950PortHandler_w(void *param,unsigned char data)
 {
-	/* temporary hack until this is converted to a device */
-	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	struct y8950_info *info = param;
+	/* temporary hack until this is converted to a device */
+	const address_space *space = cpu_get_address_space(info->device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	if (info->intf->portwrite)
 		info->intf->portwrite(space,info->index,data);
 }
 
 static unsigned char Y8950KeyboardHandler_r(void *param)
 {
-	/* temporary hack until this is converted to a device */
-	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	struct y8950_info *info = param;
+	/* temporary hack until this is converted to a device */
+	const address_space *space = cpu_get_address_space(info->device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	if (info->intf->keyboardread)
 		return info->intf->keyboardread(space,info->index);
 	return 0;
@@ -431,9 +435,9 @@ static unsigned char Y8950KeyboardHandler_r(void *param)
 
 static void Y8950KeyboardHandler_w(void *param,unsigned char data)
 {
-	/* temporary hack until this is converted to a device */
-	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	struct y8950_info *info = param;
+	/* temporary hack until this is converted to a device */
+	const address_space *space = cpu_get_address_space(info->device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	if (info->intf->keyboardwrite)
 		info->intf->keyboardwrite(space,info->index,data);
 }
@@ -461,6 +465,7 @@ static SND_START( y8950 )
 	memset(info, 0, sizeof(*info));
 
 	info->intf = config ? config : &dummy;
+	info->device = device;
 	info->index = sndindex;
 
 	/* stream system initialize */
@@ -471,7 +476,7 @@ static SND_START( y8950 )
 	/* ADPCM ROM data */
 	y8950_set_delta_t_memory(info->chip, device->region, device->regionbytes);
 
-	info->stream = stream_create(0,1,rate,info,y8950_stream_update);
+	info->stream = stream_create(device,0,1,rate,info,y8950_stream_update);
 
 	/* port and keyboard handler */
 	y8950_set_port_handler(info->chip, Y8950PortHandler_w, Y8950PortHandler_r, info);
@@ -482,8 +487,8 @@ static SND_START( y8950 )
 	y8950_set_irq_handler   (info->chip, IRQHandler_8950, info);
 	y8950_set_update_handler(info->chip, _stream_update_8950, info);
 
-	info->timer[0] = timer_alloc(Machine, timer_callback_8950_0, info);
-	info->timer[1] = timer_alloc(Machine, timer_callback_8950_1, info);
+	info->timer[0] = timer_alloc(device->machine, timer_callback_8950_0, info);
+	info->timer[1] = timer_alloc(device->machine, timer_callback_8950_1, info);
 
 	return info;
 }

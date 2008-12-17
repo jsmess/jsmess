@@ -208,11 +208,11 @@ static void attckufo_update (void *param,stream_sample_t **inputs, stream_sample
 /************************************/
 
 
-void *attckufo_custom_start(int clock, const custom_sound_interface *config)
+CUSTOM_START( attckufo_custom_start )
 {
 	int i;
 
-	channel = stream_create(0, 1, OUTPUT_RATE, 0, attckufo_update);
+	channel = stream_create(device, 0, 1, OUTPUT_RATE, 0, attckufo_update);
 
 
 	/* buffer for fastest played sample for 5 second

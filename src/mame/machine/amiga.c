@@ -282,6 +282,8 @@ static void amiga_m68k_reset(const device_config *device)
 	logerror("Executed RESET at PC=%06x\n", cpu_get_pc(space->cpu));
 
 	/* Initialize the various chips */
+	devtag_reset(device->machine, CIA8520, "cia_0");
+	devtag_reset(device->machine, CIA8520, "cia_1");
 	custom_reset();
 	autoconfig_reset();
 
@@ -299,7 +301,7 @@ static void amiga_m68k_reset(const device_config *device)
 
 MACHINE_RESET( amiga )
 {
-//  const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+//  const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
 	/* set m68k reset  function */
 	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_M68K_RESET_CALLBACK, (genf *)amiga_m68k_reset);
@@ -952,14 +954,14 @@ static TIMER_CALLBACK( amiga_blitter_proc )
  *
  *************************************/
 
-static void blitter_setup(void)
+static void blitter_setup(const address_space *space)
 {
 	int ticks, width, height, blittime;
 
 	/* is there another blitting in progress? */
 	if (CUSTOM_REG(REG_DMACON) & 0x4000)
 	{
-		logerror("PC: %08x - This program is playing tricks with the blitter\n", safe_cpu_get_pc(Machine->activecpu) );
+		logerror("%s - This program is playing tricks with the blitter\n", cpuexec_describe_context(space->machine) );
 		return;
 	}
 
@@ -992,7 +994,7 @@ static void blitter_setup(void)
 	if ( CUSTOM_REG(REG_DMACON) & 0x0400 )
 	{
 		/* simulate the 68k not running while the blit is going */
-		cpu_adjust_icount( Machine->activecpu, -(blittime/2) );
+		cpu_adjust_icount( space->cpu, -(blittime/2) );
 
 		blittime = BLITTER_NASTY_DELAY;
 	}
@@ -1005,7 +1007,7 @@ static void blitter_setup(void)
  	CUSTOM_REG(REG_DMACON) |= 0x4000;
 
 	/* set a timer */
-	timer_adjust_oneshot( amiga_blitter_timer, cpu_clocks_to_attotime( Machine->activecpu, blittime ), 0);
+	timer_adjust_oneshot( amiga_blitter_timer, cpu_clocks_to_attotime( space->cpu, blittime ), 0);
 }
 
 
@@ -1040,7 +1042,7 @@ READ16_HANDLER( amiga_cia_r )
 	data = cia_r(cia, offset >> 7);
 
 	if (LOG_CIA)
-		logerror("%06x:cia_%c_read(%03x) = %04x & %04x\n", safe_cpu_get_pc(space->cpu), 'A' + ((~offset & 0x0800) >> 11), offset * 2, data << shift, mem_mask);
+		logerror("%06x:cia_%c_read(%03x) = %04x & %04x\n", cpu_get_pc(space->cpu), 'A' + ((~offset & 0x0800) >> 11), offset * 2, data << shift, mem_mask);
 
 	return data << shift;
 }
@@ -1058,7 +1060,7 @@ WRITE16_HANDLER( amiga_cia_w )
 	const device_config *cia;
 
 	if (LOG_CIA)
-		logerror("%06x:cia_%c_write(%03x) = %04x & %04x\n", safe_cpu_get_pc(space->cpu), 'A' + ((~offset & 0x0800) >> 11), offset * 2, data, mem_mask);
+		logerror("%06x:cia_%c_write(%03x) = %04x & %04x\n", cpu_get_pc(space->cpu), 'A' + ((~offset & 0x0800) >> 11), offset * 2, data, mem_mask);
 
 	/* offsets 0000-07ff reference CIA B, and are accessed via the MSB */
 	if ((offset & 0x0800) == 0)
@@ -1224,7 +1226,7 @@ READ16_HANDLER( amiga_custom_r )
 	}
 
 	if (LOG_CUSTOM)
-		logerror("%06X:read from custom %s\n", safe_cpu_get_pc(space->cpu), amiga_custom_names[offset & 0xff]);
+		logerror("%06X:read from custom %s\n", cpu_get_pc(space->cpu), amiga_custom_names[offset & 0xff]);
 
 	return 0xffff;
 }
@@ -1255,7 +1257,7 @@ WRITE16_HANDLER( amiga_custom_w )
 	offset &= 0xff;
 
 	if (LOG_CUSTOM)
-		logerror("%06X:write to custom %s = %04X\n", safe_cpu_get_pc(space->cpu), amiga_custom_names[offset & 0xff], data);
+		logerror("%06X:write to custom %s = %04X\n", cpu_get_pc(space->cpu), amiga_custom_names[offset & 0xff], data);
 
 	switch (offset)
 	{
@@ -1289,7 +1291,7 @@ WRITE16_HANDLER( amiga_custom_w )
 			CUSTOM_REG(REG_BLTSIZH) = data & 0x3f;
 			if ( CUSTOM_REG(REG_BLTSIZV) == 0 ) CUSTOM_REG(REG_BLTSIZV) = 0x400;
 			if ( CUSTOM_REG(REG_BLTSIZH) == 0 ) CUSTOM_REG(REG_BLTSIZH) = 0x40;
-			blitter_setup();
+			blitter_setup(space);
 			break;
 
 		case REG_BLTSIZV:	/* ECS-AGA only */
@@ -1305,7 +1307,7 @@ WRITE16_HANDLER( amiga_custom_w )
 			{
 				CUSTOM_REG(REG_BLTSIZH) = data & 0x7ff;
 				if ( CUSTOM_REG(REG_BLTSIZH) == 0 ) CUSTOM_REG(REG_BLTSIZH) = 0x800;
-				blitter_setup();
+				blitter_setup(space);
 			}
 			break;
 
@@ -1374,7 +1376,7 @@ WRITE16_HANDLER( amiga_custom_w )
 
 			/* if 'blitter-nasty' has been turned on and we have a blit pending, reschedule it */
 			if ( ( data & 0x400 ) && ( CUSTOM_REG(REG_DMACON) & 0x4000 ) )
-				timer_adjust_oneshot( amiga_blitter_timer, cpu_clocks_to_attotime( Machine->activecpu, BLITTER_NASTY_DELAY ), 0);
+				timer_adjust_oneshot( amiga_blitter_timer, cpu_clocks_to_attotime( space->cpu, BLITTER_NASTY_DELAY ), 0);
 
 			break;
 
@@ -1385,7 +1387,7 @@ WRITE16_HANDLER( amiga_custom_w )
 			CUSTOM_REG(offset) = data;
 
 			if ( temp & 0x8000  ) /* if we're enabling irq's, delay a bit */
-				timer_adjust_oneshot( amiga_irq_timer, cpu_clocks_to_attotime( Machine->activecpu, AMIGA_IRQ_DELAY_CYCLES ), 0);
+				timer_adjust_oneshot( amiga_irq_timer, cpu_clocks_to_attotime( space->cpu, AMIGA_IRQ_DELAY_CYCLES ), 0);
 			else /* if we're disabling irq's, process right away */
 				update_irqs(space->machine);
 			break;

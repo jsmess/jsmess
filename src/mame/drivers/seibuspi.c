@@ -695,12 +695,12 @@ static int fifoout_read_request = 0;
 
 static UINT8 sb_coin_latch = 0;
 
-static UINT8 z80_fifoout_pop(running_machine *machine)
+static UINT8 z80_fifoout_pop(const address_space *space)
 {
 	UINT8 r;
 	if (fifoout_wpos == fifoout_rpos)
 	{
-		logerror("Sound FIFOOUT underflow at %08X\n", cpu_get_pc(machine->activecpu));
+		logerror("Sound FIFOOUT underflow at %08X\n", cpu_get_pc(space->cpu));
 	}
 	r = fifoout_data[fifoout_rpos++];
 	if(fifoout_rpos == FIFO_SIZE)
@@ -716,7 +716,7 @@ static UINT8 z80_fifoout_pop(running_machine *machine)
 	return r;
 }
 
-static void z80_fifoout_push(running_machine *machine, UINT8 data)
+static void z80_fifoout_push(const address_space *space, UINT8 data)
 {
 	fifoout_data[fifoout_wpos++] = data;
 	if (fifoout_wpos == FIFO_SIZE)
@@ -725,18 +725,18 @@ static void z80_fifoout_push(running_machine *machine, UINT8 data)
 	}
 	if(fifoout_wpos == fifoout_rpos)
 	{
-		fatalerror("Sound FIFOOUT overflow at %08X", cpu_get_pc(machine->activecpu));
+		fatalerror("Sound FIFOOUT overflow at %08X", cpu_get_pc(space->cpu));
 	}
 
 	fifoout_read_request = 1;
 }
 
-static UINT8 z80_fifoin_pop(running_machine *machine)
+static UINT8 z80_fifoin_pop(const address_space *space)
 {
 	UINT8 r;
 	if (fifoin_wpos == fifoin_rpos)
 	{
-		fatalerror("Sound FIFOIN underflow at %08X", cpu_get_pc(machine->activecpu));
+		fatalerror("Sound FIFOIN underflow at %08X", cpu_get_pc(space->cpu));
 	}
 	r = fifoin_data[fifoin_rpos++];
 	if(fifoin_rpos == FIFO_SIZE)
@@ -752,7 +752,7 @@ static UINT8 z80_fifoin_pop(running_machine *machine)
 	return r;
 }
 
-static void z80_fifoin_push(running_machine *machine, UINT8 data)
+static void z80_fifoin_push(const address_space *space, UINT8 data)
 {
 	fifoin_data[fifoin_wpos++] = data;
 	if(fifoin_wpos == FIFO_SIZE)
@@ -761,7 +761,7 @@ static void z80_fifoin_push(running_machine *machine, UINT8 data)
 	}
 	if(fifoin_wpos == fifoin_rpos)
 	{
-		fatalerror("Sound FIFOIN overflow at %08X", cpu_get_pc(machine->activecpu));
+		fatalerror("Sound FIFOIN overflow at %08X", cpu_get_pc(space->cpu));
 	}
 
 	fifoin_read_request = 1;
@@ -785,7 +785,7 @@ static WRITE8_HANDLER( sb_coin_w )
 
 static READ32_HANDLER( sound_fifo_r )
 {
-	UINT8 r = z80_fifoout_pop(space->machine);
+	UINT8 r = z80_fifoout_pop(space);
 
 	return r;
 }
@@ -793,7 +793,7 @@ static READ32_HANDLER( sound_fifo_r )
 static WRITE32_HANDLER( sound_fifo_w )
 {
 	if( ACCESSING_BITS_0_7 ) {
-		z80_fifoin_push(space->machine, data & 0xff);
+		z80_fifoin_push(space, data & 0xff);
 	}
 }
 
@@ -934,14 +934,14 @@ static WRITE32_HANDLER( spi_6295_1_w )
 
 static READ8_HANDLER( z80_soundfifo_r )
 {
-	UINT8 r = z80_fifoin_pop(space->machine);
+	UINT8 r = z80_fifoin_pop(space);
 
 	return r;
 }
 
 static WRITE8_HANDLER( z80_soundfifo_w )
 {
-	z80_fifoout_push(space->machine, data);
+	z80_fifoout_push(space, data);
 }
 
 static READ8_HANDLER( z80_soundfifo_status_r )
@@ -1648,7 +1648,7 @@ static NVRAM_HANDLER( spi )
 	if( read_or_write ) {
 		DS2404_save(file);
 	} else {
-		DS2404_init(1995, 1, 1);
+		DS2404_init(machine, 1995, 1, 1);
 
 		if(file) {
 			DS2404_load(file);
@@ -1678,7 +1678,7 @@ static NVRAM_HANDLER( sxx2f )
 	if( read_or_write ) {
 		eeprom_save(file);
 	} else {
-		eeprom_init(&eeprom_intf);
+		eeprom_init(machine, &eeprom_intf);
 
 		if(file)
 			eeprom_load(file);
@@ -1943,8 +1943,8 @@ static READ32_HANDLER ( rfjet_speedup_r )
 
 static void init_spi(running_machine *machine)
 {
-	intelflash_init( 0, FLASH_INTEL_E28F008SA, NULL );
-	intelflash_init( 1, FLASH_INTEL_E28F008SA, NULL );
+	intelflash_init( machine, 0, FLASH_INTEL_E28F008SA, NULL );
+	intelflash_init( machine, 1, FLASH_INTEL_E28F008SA, NULL );
 
 	seibuspi_text_decrypt(memory_region(machine, "gfx1"));
 	seibuspi_bg_decrypt(memory_region(machine, "gfx2"), memory_region_length(machine, "gfx2"));
@@ -2005,8 +2005,8 @@ static DRIVER_INIT( viprp1o )
 
 static void init_rf2(running_machine *machine)
 {
-	intelflash_init( 0, FLASH_INTEL_E28F008SA, NULL );
-	intelflash_init( 1, FLASH_INTEL_E28F008SA, NULL );
+	intelflash_init( machine, 0, FLASH_INTEL_E28F008SA, NULL );
+	intelflash_init( machine, 1, FLASH_INTEL_E28F008SA, NULL );
 
 	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0282AC, 0x0282AF, 0, 0, rf2_speedup_r );
 	seibuspi_rise10_text_decrypt(memory_region(machine, "gfx1"));
@@ -2029,8 +2029,8 @@ static DRIVER_INIT( rdft2us )
 
 static DRIVER_INIT( rfjet )
 {
-	intelflash_init( 0, FLASH_INTEL_E28F008SA, NULL );
-	intelflash_init( 1, FLASH_INTEL_E28F008SA, NULL );
+	intelflash_init( machine, 0, FLASH_INTEL_E28F008SA, NULL );
+	intelflash_init( machine, 1, FLASH_INTEL_E28F008SA, NULL );
 
 	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x002894c, 0x002894f, 0, 0, rfjet_speedup_r );
 	seibuspi_rise11_text_decrypt(memory_region(machine, "gfx1"));

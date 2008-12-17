@@ -101,9 +101,9 @@ has twice the steps, happening twice as fast.
 ***************************************************************************/
 
 #include "sndintrf.h"
-#include "deprecat.h"
 #include "streams.h"
 #include "cpuintrf.h"
+#include "cpuexec.h"
 #include "ay8910.h"
 
 /*************************************
@@ -387,7 +387,7 @@ INLINE UINT16 mix_3D(ay8910_context *psg)
 static void ay8910_write_reg(ay8910_context *psg, int r, int v)
 {
 	/* temporary hack until this is converted to a device */
-	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cpu_get_address_space(psg->device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
 	//if (r >= 11 && r <= 13 ) printf("%d %x %02x\n", PSG->index, r, v);
 	psg->regs[r] = v;
@@ -706,7 +706,7 @@ void *ay8910_start_ym(sound_type chip_type, const device_config *device, int clo
 
 	/* The envelope is pacing twice as fast for the YM2149 as for the AY-3-8910,    */
 	/* This handled by the step parameter. Consequently we use a divider of 8 here. */
-	info->channel = stream_create(0,info->streams,clock / 8 ,info,ay8910_update);
+	info->channel = stream_create(device, 0, info->streams, clock / 8, info, ay8910_update);
 
 	ay8910_set_clock_ym(info,clock);
 	ay8910_statesave(info, device);
@@ -781,9 +781,9 @@ void ay8910_write_ym(void *chip, int addr, int data)
 
 int ay8910_read_ym(void *chip)
 {
-	/* temporary hack until this is converted to a device */
-	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	ay8910_context *psg = chip;
+	/* temporary hack until this is converted to a device */
+	const address_space *space = cpu_get_address_space(psg->device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	int r = psg->register_latch;
 
 	if (r > 15) return 0;
@@ -800,7 +800,7 @@ int ay8910_read_ym(void *chip)
 		if (psg->intf->portAread)
 			psg->regs[AY_PORTA] = (*psg->intf->portAread)(space, 0);
 		else
-			logerror("PC %04x: warning - read 8910 '%s' Port A\n",cpu_get_pc(Machine->activecpu),psg->device->tag);
+			logerror("%s: warning - read 8910 '%s' Port A\n",cpuexec_describe_context(psg->device->machine),psg->device->tag);
 		break;
 	case AY_PORTB:
 		if ((psg->regs[AY_ENABLE] & 0x80) != 0)
@@ -808,7 +808,7 @@ int ay8910_read_ym(void *chip)
 		if (psg->intf->portBread)
 			psg->regs[AY_PORTB] = (*psg->intf->portBread)(space, 0);
 		else
-			logerror("PC %04x: warning - read 8910 '%s' Port B\n",cpu_get_pc(Machine->activecpu),psg->device->tag);
+			logerror("%s: warning - read 8910 '%s' Port B\n",cpuexec_describe_context(psg->device->machine),psg->device->tag);
 		break;
 	}
 	return psg->regs[r];

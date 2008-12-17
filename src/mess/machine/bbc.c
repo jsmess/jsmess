@@ -10,7 +10,6 @@
 
 #include "ctype.h"
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/6522via.h"
 #include "machine/wd17xx.h"
@@ -589,6 +588,9 @@ long myo;
 
 	if ((offset>=0x200) && (offset<=0x2ff)) /* SHEILA */
 	{
+		const device_config *via_0 = device_list_find_by_tag(space->machine->config->devicelist, VIA6522, "via6522_0");
+		const device_config *via_1 = device_list_find_by_tag(space->machine->config->devicelist, VIA6522, "via6522_1");
+
 		myo=offset-0x200;
 		if ((myo>=0x00) && (myo<=0x07)) return BBC_6845_r(space, myo-0x00);		/* Video Controller */
 		if ((myo>=0x08) && (myo<=0x0f)) return BBC_6850_r(space, myo-0x08);		/* Serial Controller */
@@ -600,8 +602,8 @@ long myo;
 		if ((myo>=0x30) && (myo<=0x33)) return 0xfe;						/* page select */
 		if ((myo>=0x34) && (myo<=0x37)) return bbcm_ACCCON_read(space, myo-0x34);	/* ACCCON */
 		if ((myo>=0x38) && (myo<=0x3f)) return 0xfe;						/* NC ?? */
-		if ((myo>=0x40) && (myo<=0x5f)) return via_0_r(space, myo-0x40);
-		if ((myo>=0x60) && (myo<=0x7f)) return via_1_r(space, myo-0x60);
+		if ((myo>=0x40) && (myo<=0x5f)) return via_r(via_0, myo-0x40);
+		if ((myo>=0x60) && (myo<=0x7f)) return via_r(via_1, myo-0x60);
 		if ((myo>=0x80) && (myo<=0x9f)) return 0xfe;
 		if ((myo>=0xa0) && (myo<=0xbf)) return 0xfe;
 		if ((myo>=0xc0) && (myo<=0xdf)) return 0xfe;
@@ -617,6 +619,9 @@ long myo;
 
 	if ((offset>=0x200) && (offset<=0x2ff)) /* SHEILA */
 	{
+		const device_config *via_0 = device_list_find_by_tag(space->machine->config->devicelist, VIA6522, "via6522_0");
+		const device_config *via_1 = device_list_find_by_tag(space->machine->config->devicelist, VIA6522, "via6522_1");
+
 		myo=offset-0x200;
 		if ((myo>=0x00) && (myo<=0x07)) BBC_6845_w(space, myo-0x00,data);			/* Video Controller */
 		if ((myo>=0x08) && (myo<=0x0f)) BBC_6850_w(space, myo-0x08,data);			/* Serial Controller */
@@ -628,8 +633,8 @@ long myo;
 		if ((myo>=0x30) && (myo<=0x33)) page_selectbm_w(space, myo-0x30,data);		/* page select */
 		if ((myo>=0x34) && (myo<=0x37)) bbcm_ACCCON_write(space, myo-0x34,data);	/* ACCCON */
 		//if ((myo>=0x38) && (myo<=0x3f)) 									/* NC ?? */
-		if ((myo>=0x40) && (myo<=0x5f)) via_0_w(space, myo-0x40,data);
-		if ((myo>=0x60) && (myo<=0x7f)) via_1_w(space, myo-0x60,data);
+		if ((myo>=0x40) && (myo<=0x5f)) via_w(via_0, myo-0x40, data);
+		if ((myo>=0x60) && (myo<=0x7f)) via_w(via_1, myo-0x60, data);
 		//if ((myo>=0x80) && (myo<=0x9f))
 		//if ((myo>=0xa0) && (myo<=0xbf))
 		//if ((myo>=0xc0) && (myo<=0xdf))
@@ -768,6 +773,7 @@ INTERRUPT_GEN( bbcb_keyscan )
 {
 	static const char *const colnames[] = { "COL0", "COL1", "COL2", "COL3", "COL4", 
 										"COL5", "COL6", "COL7", "COL8", "COL9" };
+	const device_config *via_0 = device_list_find_by_tag(device->machine->config->devicelist, VIA6522, "via6522_0");
 	
   	/* only do auto scan if keyboard is not enabled */
 	if (b3_keyboard == 1)
@@ -783,17 +789,17 @@ INTERRUPT_GEN( bbcb_keyscan )
     			 being pressed on the selected column */
 			if ((input_port_read(device->machine, colnames[column]) | 0x01) != 0xff)
 			{
-				via_0_ca2_w(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0, 1);
+				via_ca2_w(via_0, 0, 1);
 			} 
 			else 
 			{
-				via_0_ca2_w(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0, 0);
+				via_ca2_w(via_0, 0, 0);
 			}
 
 		} 
 		else 
 		{
-			via_0_ca2_w(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0, 0);
+			via_ca2_w(via_0, 0, 0);
 		}
 	}
 }
@@ -803,6 +809,7 @@ INTERRUPT_GEN( bbcm_keyscan )
 {
 	static const char *const colnames[] = { "COL0", "COL1", "COL2", "COL3", "COL4", 
 										"COL5", "COL6", "COL7", "COL8", "COL9" };
+	const device_config *via_0 = device_list_find_by_tag(device->machine->config->devicelist, VIA6522, "via6522_0");
 
   	/* only do auto scan if keyboard is not enabled */
 	if (b3_keyboard == 1)
@@ -820,13 +827,13 @@ INTERRUPT_GEN( bbcm_keyscan )
 				 being pressed on the selected column */
 			if ((input_port_read(device->machine, colnames[column]) | 0x01) != 0xff)
 			{
-				via_0_ca2_w(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0, 1);
+				via_ca2_w(via_0, 0, 1);
 			} else {
-				via_0_ca2_w(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0, 0);
+				via_ca2_w(via_0, 0, 0);
 			}
 
 		} else {
-			via_0_ca2_w(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0, 0);
+			via_ca2_w(via_0, 0, 0);
 		}
 	}
 }
@@ -840,6 +847,7 @@ static int bbc_keyboard(const address_space *space, int data)
 	int res;
 	static const char *const colnames[] = { "COL0", "COL1", "COL2", "COL3", "COL4", 
 										"COL5", "COL6", "COL7", "COL8", "COL9" };
+	const device_config *via_0 = device_list_find_by_tag(space->machine->config->devicelist, VIA6522, "via6522_0");
 
 	column = data & 0x0f;
 	row = (data>>4) & 0x07;
@@ -863,11 +871,11 @@ static int bbc_keyboard(const address_space *space, int data)
 
 	if ((res | 1) != 0xff)
 	{
-		via_0_ca2_w(space, 0, 1);
+		via_ca2_w(via_0, 0, 1);
 	} 
 	else 
 	{
-		via_0_ca2_w(space, 0, 0);
+		via_ca2_w(via_0, 0, 0);
 	}
 
 	return (data & 0x7f) | (bit<<7);
@@ -919,9 +927,9 @@ static void MC146818_set(const address_space *space)
 }
 
 
-static WRITE8_HANDLER( bbcb_via_system_write_porta )
+static WRITE8_DEVICE_HANDLER( bbcb_via_system_write_porta )
 {
-
+	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	//logerror("SYSTEM write porta %d\n",data);
 
 	via_system_porta=data;
@@ -939,8 +947,9 @@ static WRITE8_HANDLER( bbcb_via_system_write_porta )
 }
 
 
-static WRITE8_HANDLER( bbcb_via_system_write_portb )
+static WRITE8_DEVICE_HANDLER( bbcb_via_system_write_portb )
 {
+	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	int bit,value;
 	bit=data & 0x07;
 	value=(data>>3) &0x01;
@@ -1113,7 +1122,7 @@ static WRITE8_HANDLER( bbcb_via_system_write_portb )
 }
 
 
-static  READ8_HANDLER( bbcb_via_system_read_porta )
+static READ8_DEVICE_HANDLER( bbcb_via_system_read_porta )
 {
 	//logerror("SYSTEM read porta %d\n",via_system_porta);
 	return via_system_porta;
@@ -1137,83 +1146,83 @@ static int TMSrdy=1;
 
 
 
-static READ8_HANDLER( bbcb_via_system_read_portb )
+static READ8_DEVICE_HANDLER( bbcb_via_system_read_portb )
 {
 //	TMSint=(!tms5220_int_r())&1;
 //	TMSrdy=(!tms5220_ready_r())&1;
 
 	//logerror("SYSTEM read portb %d\n",0xf | input_port(machine, "IN0")|(TMSint<<6)|(TMSrdy<<7));
 
-	return (0xf | input_port_read(space->machine, "IN0")|(TMSint<<6)|(TMSrdy<<7));
+	return (0xf | input_port_read(device->machine, "IN0")|(TMSint<<6)|(TMSrdy<<7));
 }
 
 
 /* vertical sync pulse from video circuit */
-static  READ8_HANDLER( bbcb_via_system_read_ca1 )
+static READ8_DEVICE_HANDLER( bbcb_via_system_read_ca1 )
 {
-  return 0x01;
+	return 0x01;
 }
 
 
 /* joystick EOC */
-static  READ8_HANDLER( bbcb_via_system_read_cb1 )
+static READ8_DEVICE_HANDLER( bbcb_via_system_read_cb1 )
 {
-  return uPD7002_EOC_r((device_config*)device_list_find_by_tag( space->machine->config->devicelist, UPD7002, "upd7002" ),0);
+	return uPD7002_EOC_r((device_config*)device_list_find_by_tag( device->machine->config->devicelist, UPD7002, "upd7002" ),0);
 }
 
 
 /* keyboard pressed detect */
-static  READ8_HANDLER( bbcb_via_system_read_ca2 )
+static READ8_DEVICE_HANDLER( bbcb_via_system_read_ca2 )
 {
-  return 0x01;
+	return 0x01;
 }
 
 
 /* light pen strobe detect (not emulated) */
-static  READ8_HANDLER( bbcb_via_system_read_cb2 )
+static READ8_DEVICE_HANDLER( bbcb_via_system_read_cb2 )
 {
-  return 0x01;
+	return 0x01;
 }
 
 
 /* this is wired as in input port so writing to this port would be bad */
 
-static WRITE8_HANDLER( bbcb_via_system_write_ca2 )
+static WRITE8_DEVICE_HANDLER( bbcb_via_system_write_ca2 )
 {
-  //logerror("via_system_write_ca2: $%02X\n", data);
+	//logerror("via_system_write_ca2: $%02X\n", data);
 }
 
 /* this is wired as in input port so writing to this port would be bad */
 
-static WRITE8_HANDLER( bbcb_via_system_write_cb2 )
+static WRITE8_DEVICE_HANDLER( bbcb_via_system_write_cb2 )
 {
-  //logerror("via_system_write_cb2: $%02X\n", data);
+	//logerror("via_system_write_cb2: $%02X\n", data);
 }
 
 
 
-static void bbc_via_system_irq(running_machine *machine, int level)
+static void bbc_via_system_irq(const device_config *device, int level)
 {
 //  logerror("SYSTEM via irq %d %d %d\n",via_system_irq,via_user_irq,level);
-  via_system_irq=level;
-  bbc_setirq(machine);
+	via_system_irq=level;
+	bbc_setirq(device->machine);
 }
 
 
-static const struct via6522_interface bbcb_system_via =
+const via6522_interface bbcb_system_via =
 {
-  bbcb_via_system_read_porta,
-  bbcb_via_system_read_portb,
-  bbcb_via_system_read_ca1,
-  bbcb_via_system_read_cb1,
-  bbcb_via_system_read_ca2,
-  bbcb_via_system_read_cb2,
-  bbcb_via_system_write_porta,
-  bbcb_via_system_write_portb,
-  NULL, NULL,
-  bbcb_via_system_write_ca2,
-  bbcb_via_system_write_cb2,
-  bbc_via_system_irq
+	bbcb_via_system_read_porta,
+	bbcb_via_system_read_portb,
+	bbcb_via_system_read_ca1,
+	bbcb_via_system_read_cb1,
+	bbcb_via_system_read_ca2,
+	bbcb_via_system_read_cb2,
+	bbcb_via_system_write_porta,
+	bbcb_via_system_write_portb,
+	NULL, NULL,
+	bbcb_via_system_write_ca2,
+	bbcb_via_system_write_cb2,
+	bbc_via_system_irq
 };
 
 
@@ -1236,39 +1245,41 @@ static int bbc_printer_ca2;
 
 /* USER VIA 6522 port A is buffered as an output through IC70 so
 reading from this port will always return 0xff */
-static  READ8_HANDLER( bbcb_via_user_read_porta )
+static READ8_DEVICE_HANDLER( bbcb_via_user_read_porta )
 {
 	return 0xff;
 }
 
 /* USER VIA 6522 port B is connected to the BBC user port */
-static  READ8_HANDLER( bbcb_via_user_read_portb )
+static READ8_DEVICE_HANDLER( bbcb_via_user_read_portb )
 {
 	return 0xff;
 }
 
-static  READ8_HANDLER( bbcb_via_user_read_ca1 )
+static READ8_DEVICE_HANDLER( bbcb_via_user_read_ca1 )
 {
 	return bbc_printer_ca1;
 }
 
-static  READ8_HANDLER( bbcb_via_user_read_ca2 )
+static READ8_DEVICE_HANDLER( bbcb_via_user_read_ca2 )
 {
 	return 1;
 }
 
-static WRITE8_HANDLER( bbcb_via_user_write_porta )
+static WRITE8_DEVICE_HANDLER( bbcb_via_user_write_porta )
 {
 	bbc_printer_porta=data;
 }
 
-static WRITE8_HANDLER( bbcb_via_user_write_portb )
+static WRITE8_DEVICE_HANDLER( bbcb_via_user_write_portb )
 {
 	bbc_userport=data;
 }
 
-static WRITE8_HANDLER( bbcb_via_user_write_ca2 )
+static WRITE8_DEVICE_HANDLER( bbcb_via_user_write_ca2 )
 {
+	const device_config *via_1 = device_list_find_by_tag(device->machine->config->devicelist, VIA6522, "via6522_1");
+
 	/* write value to printer on rising edge of ca2 */
 	if ((bbc_printer_ca2==0) && (data==1))
 	{
@@ -1279,17 +1290,17 @@ static WRITE8_HANDLER( bbcb_via_user_write_ca2 )
 	/* this is a very bad way of returning an acknowledge
 	by just linking the strobe output into the acknowledge input */
 	bbc_printer_ca1=data;
-	via_1_ca1_w(space, 0,data);
+	via_ca1_w(via_1, 0,data);
 }
 
-static void bbc_via_user_irq(running_machine *machine, int level)
+static void bbc_via_user_irq(const device_config *device, int level)
 {
-  via_user_irq=level;
-  bbc_setirq(machine);
+	via_user_irq=level;
+	bbc_setirq(device->machine);
 }
 
 
-static const struct via6522_interface bbcb_user_via =
+const via6522_interface bbcb_user_via =
 {
 	bbcb_via_user_read_porta,//via_user_read_porta,
 	bbcb_via_user_read_portb,//via_user_read_portb,
@@ -1334,7 +1345,8 @@ UPD7002_GET_ANALOGUE(BBC_get_analogue_input)
 
 UPD7002_EOC(BBC_uPD7002_EOC)
 {
-	via_0_cb1_w(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0,data);
+	const device_config *via_0 = device_list_find_by_tag(device->machine->config->devicelist, VIA6522, "via6522_0");
+	via_cb1_w(via_0, 0,data);
 }
 
 const uPD7002_interface BBC_uPD7002 =
@@ -1388,9 +1400,9 @@ READ8_HANDLER (BBC_6850_r)
 
 static void Serial_interrupt(const device_config *device, int level)
 {
-  MC6850_irq=level;
-  bbc_setirq(Machine);
-  //logerror("Set SIO irq  %01x\n",level);
+	MC6850_irq=level;
+	bbc_setirq(device->machine);
+	//logerror("Set SIO irq  %01x\n",level);
 }
 
 const acia6850_interface bbc_acia6850_interface =
@@ -2148,9 +2160,6 @@ DRIVER_INIT( bbcm )
 
 MACHINE_START( bbca )
 {
-	mc6850_clock = 0;
-	via_config(0, &bbcb_system_via);
-	via_set_clock(0,1000000);
 }
 
 MACHINE_RESET( bbca )
@@ -2161,8 +2170,6 @@ MACHINE_RESET( bbca )
 
 	memory_set_bankptr(machine, 4,memory_region(machine, "user1"));          /* bank 4 is the paged ROMs     from 8000 to bfff */
 	memory_set_bankptr(machine, 7,memory_region(machine, "user1")+0x10000);  /* bank 7 points at the OS rom  from c000 to ffff */
-
-	via_reset();
 
 	bbcb_IC32_initialise();
 }
@@ -2175,12 +2182,6 @@ MACHINE_START( bbcb )
 	//bbc_DFSType=  (input_port_read(machine, "BBCCONFIG")>>0)&0x07;
 	//bbc_SWRAMtype=(input_port_read(machine, "BBCCONFIG")>>3)&0x03;
 	//bbc_RAMSize=  (input_port_read(machine, "BBCCONFIG")>>5)&0x01;
-
-	via_config(0, &bbcb_system_via);
-	via_set_clock(0,1000000);
-
-	via_config(1, &bbcb_user_via);
-	via_set_clock(1,1000000);
 
 	/*set up the required disc controller*/
 	//switch (bbc_DFSType) {
@@ -2216,8 +2217,6 @@ MACHINE_RESET( bbcb )
 	memory_set_bankptr(machine, 4,memory_region(machine, "user1"));          /* bank 4 is the paged ROMs     from 8000 to bfff */
 	memory_set_bankptr(machine, 7,memory_region(machine, "user1")+0x40000);  /* bank 7 points at the OS rom  from c000 to ffff */
 
-	via_reset();
-
 	bbcb_IC32_initialise();
 
 
@@ -2242,12 +2241,6 @@ MACHINE_START( bbcbp )
 	/* bank 6 is the paged ROMs     from b000 to bfff */
 	memory_configure_bank(machine, 6, 0, 16, memory_region(machine, "user1") + 0x3000, 1<<14);
 
-	via_config(0, &bbcb_system_via);
-	via_set_clock(0,1000000);
-
-	via_config(1, &bbcb_user_via);
-	via_set_clock(1,1000000);
-
 	wd17xx_init(machine, WD_TYPE_177X,bbc_wd177x_callback, NULL);
 }
 
@@ -2258,8 +2251,6 @@ MACHINE_RESET( bbcbp )
 	memory_set_bankptr(machine, 4,memory_region(machine, "user1"));         /* bank 4 is paged ROM or RAM   from 8000 to afff */
 	memory_set_bank(machine, 6, 0);
 	memory_set_bankptr(machine, 7,memory_region(machine, "user1")+0x40000); /* bank 7 points at the OS rom  from c000 to ffff */
-
-	via_reset();
 
 	bbcb_IC32_initialise();
 
@@ -2283,12 +2274,6 @@ MACHINE_START( bbcm )
 	memory_set_bankptr( machine, 8, memory_region(machine, "user1")+0x43c00); 
 	memory_install_read_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM),0xFC00,0xFEFF,0,0,8);
 
-	via_config(0, &bbcb_system_via);
-	via_set_clock(0,1000000);
-
-	via_config(1, &bbcb_user_via);
-	via_set_clock(1,1000000);
-
 	wd17xx_init(machine, WD_TYPE_177X,bbc_wd177x_callback, NULL);
 }
 
@@ -2299,8 +2284,6 @@ MACHINE_RESET( bbcm )
 	memory_set_bankptr(machine, 4,memory_region(machine, "user1"));         /* bank 4 is paged ROM or RAM   from 8000 to 8fff */
 	memory_set_bank(machine, 5, 0);
 	memory_set_bankptr(machine, 7,memory_region(machine, "user1")+0x40000); /* bank 6 OS rom of RAM			from c000 to dfff */
-
-	via_reset();
 
 	bbcb_IC32_initialise();
 

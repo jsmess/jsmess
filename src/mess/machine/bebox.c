@@ -964,7 +964,7 @@ static void scsi53c810_dma_callback(UINT32 src, UINT32 dst, int length, int byte
 }
 
 
-static UINT32 scsi53c810_pci_read(int function, int offset, UINT32 mem_mask)
+UINT32 scsi53c810_pci_read(const device_config *busdevice, const device_config *device, int function, int offset, UINT32 mem_mask)
 {
 	UINT32 result = 0;
 
@@ -989,7 +989,7 @@ static UINT32 scsi53c810_pci_read(int function, int offset, UINT32 mem_mask)
 }
 
 
-static void scsi53c810_pci_write(int function, int offset, UINT32 data, UINT32 mem_mask)
+void scsi53c810_pci_write(const device_config *busdevice, const device_config *device, int function, int offset, UINT32 data, UINT32 mem_mask)
 {
 	offs_t addr;
 
@@ -1026,12 +1026,6 @@ static void scsi53c810_pci_write(int function, int offset, UINT32 data, UINT32 m
 	}
 }
 
-
-static const struct pci_device_info scsi53c810_callbacks =
-{
-	scsi53c810_pci_read,
-	scsi53c810_pci_write
-};
 
 static const SCSIConfigTable dev_table =
 {
@@ -1104,13 +1098,10 @@ DRIVER_INIT( bebox )
 	offs_t vram_end;
 
 	mpc105_init(0);
-	pci_add_device(0, 1, &cirrus5430_callbacks);
-	if (0)
-		pci_add_device(0, 12, &scsi53c810_callbacks);
 
 	/* set up boot and flash ROM */
 	memory_set_bankptr(machine, 2, memory_region(machine, "user2"));
-	intelflash_init(0, FLASH_FUJITSU_29F016A, memory_region(machine, "user1"));
+	intelflash_init(machine, 0, FLASH_FUJITSU_29F016A, memory_region(machine, "user1"));
 
 	/* install MESS managed RAM */
 	memory_install_read64_handler(space_0, 0, mess_ram_size - 1, 0, 0x02000000, SMH_BANK3);
@@ -1121,7 +1112,7 @@ DRIVER_INIT( bebox )
 
 	mc146818_init(machine, MC146818_STANDARD);
 	pc_vga_init(machine, &bebox_vga_interface, &cirrus_svga_interface);
-	kbdc8042_init(&bebox_8042_interface);
+	kbdc8042_init(machine, &bebox_8042_interface);
 
 	/* install VGA memory */
 	vram_begin = 0xC1000000;

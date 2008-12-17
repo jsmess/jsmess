@@ -873,7 +873,7 @@ static WRITE64_HANDLER( real3d_dma_w )
 
 static void real3d_dma_callback(UINT32 src, UINT32 dst, int length, int byteswap)
 {
-	const address_space *space = cpu_get_address_space(Machine->activecpu, ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	switch(dst >> 24)
 	{
 		case 0x88:		/* Display List End Trigger */
@@ -897,7 +897,7 @@ static void real3d_dma_callback(UINT32 src, UINT32 dst, int length, int byteswap
 		case 0x9c:		/* Unknown */
 			break;
 		default:
-			fatalerror("dma_callback: %08X, %08X, %d at %08X", src, dst, length, cpu_get_pc(Machine->activecpu));
+			fatalerror("dma_callback: %08X, %08X, %d at %08X", src, dst, length, cpu_get_pc(Machine->cpu[0]));
 			break;
 	}
 }
@@ -918,27 +918,28 @@ static const eeprom_interface eeprom_intf =
 	5				/* reset_delay (Lost World needs this, very similar to wbeachvl in playmark.c) */
 };
 
-static void eeprom_handler(mame_file *file,int read_or_write)
+static void eeprom_handler(running_machine *machine, mame_file *file, int read_or_write)
 {
 	if (read_or_write)
 		eeprom_save(file);
 	else
 	{
-		eeprom_init(&eeprom_intf);
+		eeprom_init(machine, &eeprom_intf);
 		if (file)	eeprom_load(file);
 	}
 }
 
 static NVRAM_HANDLER( model3 )
 {
-	if( mame_stricmp(machine->gamedrv->name, "lostwsga") == 0 ||
-		mame_stricmp(machine->gamedrv->name, "dirtdvls") == 0 ||
-		mame_stricmp(machine->gamedrv->name, "dirtdvla") == 0 ||
-		mame_stricmp(machine->gamedrv->name, "lemans24") == 0 ||
-		mame_stricmp(machine->gamedrv->name, "von2") == 0 ||
-		mame_stricmp(machine->gamedrv->name, "von254g") == 0)
+	const char *name = machine->gamedrv->name;
+	if( mame_stricmp(name, "lostwsga") == 0 ||
+		mame_stricmp(name, "dirtdvls") == 0 ||
+		mame_stricmp(name, "dirtdvla") == 0 ||
+		mame_stricmp(name, "lemans24") == 0 ||
+		mame_stricmp(name, "von2") == 0 ||
+		mame_stricmp(name, "von254g") == 0)
 	{
-		eeprom_handler(file, read_or_write);
+		eeprom_handler(machine, file, read_or_write);
 	} else {
 		NVRAM_HANDLER_CALL(93C46);
 	}

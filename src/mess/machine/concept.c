@@ -41,15 +41,15 @@ static char clock_address;
 /*static int ready;*/			/* ready line from monochip, role unknown */
 
 /* Via */
-static  READ8_HANDLER(via_in_a);
-static WRITE8_HANDLER(via_out_a);
-static  READ8_HANDLER(via_in_b);
-static WRITE8_HANDLER(via_out_b);
-static WRITE8_HANDLER(via_out_cb2);
-static void via_irq_func(running_machine *machine, int state);
+static READ8_DEVICE_HANDLER(via_in_a);
+static WRITE8_DEVICE_HANDLER(via_out_a);
+static READ8_DEVICE_HANDLER(via_in_b);
+static WRITE8_DEVICE_HANDLER(via_out_b);
+static WRITE8_DEVICE_HANDLER(via_out_cb2);
+static void via_irq_func(const device_config *device, int state);
 
 
-static const struct via6522_interface concept_via6522_intf =
+const via6522_interface concept_via6522_intf =
 {	/* main via */
 	via_in_a, via_in_b,
 	NULL, NULL,
@@ -88,11 +88,6 @@ MACHINE_START(concept)
 {
 	/* initialize int state */
 	pending_interrupts = 0;
-
-	/* configure via */
-	via_config(0, & concept_via6522_intf);
-	via_set_clock(0, 1022750);		/* 16.364 MHZ / 16 */
-	via_reset();
 
 	/* initialize clock interface */
 	clock_enable = 0/*1*/;
@@ -222,13 +217,13 @@ INTERRUPT_GEN( concept_interrupt )
 	6: DCD1 (I)
 	7: IOX (O)
 */
-static  READ8_HANDLER(via_in_a)
+static  READ8_DEVICE_HANDLER(via_in_a)
 {
 	LOG(("via_in_a: VIA port A (Omninet and COMM port status) read\n"));
 	return 1;		/* omninet ready always 1 */
 }
 
-static WRITE8_HANDLER(via_out_a)
+static WRITE8_DEVICE_HANDLER(via_out_a)
 {
 	LOG(("via_out_a: VIA port A status written: data=0x%2.2x\n", data));
 	/*iox = (data & 0x80) != 0;*/
@@ -246,16 +241,16 @@ static WRITE8_HANDLER(via_out_a)
 	6: boot switch 0 (I)
 	7: boot switch 1 (I)
 */
-static READ8_HANDLER(via_in_b)
+static READ8_DEVICE_HANDLER(via_in_b)
 {
 	UINT8 status;
 
-	status = ((input_port_read(space->machine, "DSW0") & 0x80) >> 1) | ((input_port_read(space->machine, "DSW0") & 0x40) << 1);
+	status = ((input_port_read(device->machine, "DSW0") & 0x80) >> 1) | ((input_port_read(device->machine, "DSW0") & 0x40) << 1);
 	LOG(("via_in_b: VIA port B (DIP switches, Video, Comm Rate) - status: 0x%2.2x\n", status));
 	return status;
 }
 
-static WRITE8_HANDLER(via_out_b)
+static WRITE8_DEVICE_HANDLER(via_out_b)
 {
 	VLOG(("via_out_b: VIA port B (Video Control and COMM rate select) written: data=0x%2.2x\n", data));
 }
@@ -263,7 +258,7 @@ static WRITE8_HANDLER(via_out_b)
 /*
 	VIA CB2: used as sound output
 */
-static WRITE8_HANDLER(via_out_cb2)
+static WRITE8_DEVICE_HANDLER(via_out_cb2)
 {
 	LOG(("via_out_cb2: Sound control written: data=0x%2.2x\n", data));
 }
@@ -271,9 +266,9 @@ static WRITE8_HANDLER(via_out_cb2)
 /*
 	VIA irq -> 68k level 5
 */
-static void via_irq_func(running_machine *machine, int state)
+static void via_irq_func(const device_config *device, int state)
 {
-	concept_set_interrupt(machine, TIMINT_level, state);
+	concept_set_interrupt(device->machine, TIMINT_level, state);
 }
 
 READ16_HANDLER(concept_io_r)
@@ -381,7 +376,10 @@ READ16_HANDLER(concept_io_r)
 		case 3:
 			/* NVIA versatile system interface */
 			LOG(("concept_io_r: VIA read at address 0x03%4.4x\n", offset << 1));
-			return via_read(space->machine, 0, offset & 0xf);
+			{
+				const device_config *via_0 = device_list_find_by_tag(space->machine->config->devicelist, VIA6522, "via6522_0");
+				return via_r(via_0, offset & 0xf);
+			}
 			break;
 
 		case 4:
@@ -491,7 +489,10 @@ WRITE16_HANDLER(concept_io_w)
 
 		case 3:
 			/* NVIA versatile system interface */
-			via_write(space->machine, 0, offset & 0xf, data);
+			{
+				const device_config *via_0 = device_list_find_by_tag(space->machine->config->devicelist, VIA6522, "via6522_0");
+				via_w(via_0, offset & 0xf, data);
+			}
 			break;
 
 		case 4:

@@ -328,12 +328,12 @@ VIDEO_START( namcona1 )
 	int i;
 	gfx_element *gfx0,*gfx1,*gfx2;
 
-	roz_tilemap = tilemap_create( roz_get_info, tilemap_scan_rows, 8,8,64,64 );
+	roz_tilemap = tilemap_create( machine, roz_get_info, tilemap_scan_rows, 8,8,64,64 );
 	roz_palette = -1;
 
 	for( i=0; i<NAMCONA1_NUM_TILEMAPS; i++ )
 	{
-		bg_tilemap[i] = tilemap_create( get_info[i], tilemap_scan_rows, 8,8,64,64 );
+		bg_tilemap[i] = tilemap_create( machine, get_info[i], tilemap_scan_rows, 8,8,64,64 );
 		tilemap_palette_bank[i] = -1;
 	}
 
@@ -341,15 +341,15 @@ VIDEO_START( namcona1 )
 	cgram			     = auto_malloc( 0x1000*0x40 );
 	dirtychar		     = auto_malloc( 0x1000 );
 
-	gfx0 = allocgfx( &cg_layout_8bpp );
+	gfx0 = allocgfx( machine, &cg_layout_8bpp );
 	gfx0->total_colors = machine->config->total_colors/256;
 	machine->gfx[0] = gfx0;
 
-	gfx1 = allocgfx( &cg_layout_4bpp );
+	gfx1 = allocgfx( machine, &cg_layout_4bpp );
 	gfx1->total_colors = machine->config->total_colors/16;
 	machine->gfx[1] = gfx1;
 
-	gfx2 = allocgfx( &shape_layout );
+	gfx2 = allocgfx( machine, &shape_layout );
 	gfx2->total_colors = machine->config->total_colors/2;
 	machine->gfx[2] = gfx2;
 } /* namcona1_vh_start */

@@ -67,10 +67,10 @@ static TILE_GET_INFO( get_tile_info2 )	{	SET_TILE_INFO(0, bishjan_videoram2[ til
 
 static VIDEO_START(bishjan)
 {
-	tmap1 = tilemap_create(	get_tile_info1, tilemap_scan_rows,
+	tmap1 = tilemap_create(	machine, get_tile_info1, tilemap_scan_rows,
 							 8,8, 0x80,0x40	);
 
-	tmap2 = tilemap_create(	get_tile_info2, tilemap_scan_rows,
+	tmap2 = tilemap_create(	machine, get_tile_info2, tilemap_scan_rows,
 							 8,8, 0x80,0x40	);
 
 	tilemap_set_transparent_pen(tmap1, 0);
@@ -432,7 +432,7 @@ static INTERRUPT_GEN( bishjan_interrupt )
 	switch (cpu_getiloops(device))
 	{
 		case 0:
-			cpu_set_input_line(device, 0, PULSE_LINE);
+			generic_pulse_irq_line(device, 0);
 			break;
 		default:
 			cpu_set_input_line(device->machine->cpu[0], H8_METRO_TIMER_HACK, HOLD_LINE);

@@ -7,16 +7,20 @@
  *****************************************************************************/
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "cpuexec.h"
 #include "sh2.h"
 #include "sh2comn.h"
 
-extern SH2 *sh2;
-
 #define VERBOSE 0
 
 #define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
+
+#ifdef USE_SH2DRC
+#define GET_SH2(dev) *(SH2 **)(dev)->token
+#else
+#define GET_SH2(dev) (SH2 *)(dev)->token
+#endif
+
 
 // Atrocious hack that makes the soldivid music correct
 
@@ -57,7 +61,7 @@ INLINE void WL(SH2 *sh2, offs_t A, UINT32 V)
 	memory_write_dword_32be(sh2->program, A & AM,V);
 }
 
-static void sh2_timer_resync(void)
+static void sh2_timer_resync(SH2 *sh2)
 {
 	int divider = div_tab[(sh2->m[5] >> 8) & 3];
 	UINT64 cur_time = cpu_get_total_cycles(sh2->device);
@@ -67,7 +71,7 @@ static void sh2_timer_resync(void)
 	sh2->frc_base = cur_time;
 }
 
-static void sh2_timer_activate(void)
+static void sh2_timer_activate(SH2 *sh2)
 {
 	int max_delta = 0xfffff;
 	UINT16 frc;
@@ -107,12 +111,10 @@ static void sh2_timer_activate(void)
 
 TIMER_CALLBACK( sh2_timer_callback )
 {
+	SH2 *sh2 = ptr;
 	UINT16 frc;
 
-	sh2 = ptr;
-
-	cpu_push_context(sh2->device);
-	sh2_timer_resync();
+	sh2_timer_resync(sh2);
 
 	frc = sh2->frc;
 
@@ -130,27 +132,22 @@ TIMER_CALLBACK( sh2_timer_callback )
 			sh2->frc = 0;
 	}
 
-	sh2_recalc_irq();
-	sh2_timer_activate();
-
-	cpu_pop_context();
+	sh2_recalc_irq(sh2);
+	sh2_timer_activate(sh2);
 }
 
 TIMER_CALLBACK( sh2_dmac_callback )
 {
 	int dma = param & 1;
+	SH2 *sh2 = ptr;
 
-	sh2 = ptr;
-
-	cpu_push_context(sh2->device);
 	LOG(("SH2.%d: DMA %d complete\n", cpu_get_index(sh2->device), dma));
 	sh2->m[0x63+4*dma] |= 2;
 	sh2->dma_timer_active[dma] = 0;
-	sh2_recalc_irq();
-	cpu_pop_context();
+	sh2_recalc_irq(sh2);
 }
 
-static void sh2_dmac_check(int dma)
+static void sh2_dmac_check(SH2 *sh2, int dma)
 {
 	if(sh2->m[0x63+4*dma] & sh2->m[0x6c] & 1)
 	{
@@ -290,6 +287,7 @@ static void sh2_dmac_check(int dma)
 
 WRITE32_HANDLER( sh2_internal_w )
 {
+	SH2 *sh2 = GET_SH2(space->cpu);
 	UINT32 old;
 
 #ifdef USE_SH2DRC
@@ -310,22 +308,22 @@ WRITE32_HANDLER( sh2_internal_w )
 		// Timers
 	case 0x04: // TIER, FTCSR, FRC
 		if((mem_mask & 0x00ffffff) != 0)
-			sh2_timer_resync();
+			sh2_timer_resync(sh2);
 //      printf("SH2.%d: TIER write %04x @ %04x\n", cpu_get_index(sh2->device), data >> 16, mem_mask>>16);
 		sh2->m[4] = (sh2->m[4] & ~(ICF|OCFA|OCFB|OVF)) | (old & sh2->m[4] & (ICF|OCFA|OCFB|OVF));
 		COMBINE_DATA(&sh2->frc);
 		if((mem_mask & 0x00ffffff) != 0)
-			sh2_timer_activate();
-		sh2_recalc_irq();
+			sh2_timer_activate(sh2);
+		sh2_recalc_irq(sh2);
 		break;
 	case 0x05: // OCRx, TCR, TOCR
 //      printf("SH2.%d: TCR write %08x @ %08x\n", cpu_get_index(sh2->device), data, mem_mask);
-		sh2_timer_resync();
+		sh2_timer_resync(sh2);
 		if(sh2->m[5] & 0x10)
 			sh2->ocrb = (sh2->ocrb & (~mem_mask >> 16)) | ((data & mem_mask) >> 16);
 		else
 			sh2->ocra = (sh2->ocra & (~mem_mask >> 16)) | ((data & mem_mask) >> 16);
-		sh2_timer_activate();
+		sh2_timer_activate(sh2);
 		break;
 
 	case 0x06: // ICR
@@ -335,7 +333,7 @@ WRITE32_HANDLER( sh2_internal_w )
 	case 0x18: // IPRB, VCRA
 	case 0x19: // VCRB, VCRC
 	case 0x1a: // VCRD
-		sh2_recalc_irq();
+		sh2_recalc_irq(sh2);
 		break;
 
 		// DMA
@@ -374,16 +372,16 @@ WRITE32_HANDLER( sh2_internal_w )
 				sh2->m[0x42] |= 0x00010000;
 				sh2->m[0x45] = 0x7fffffff;
 				sh2->m[0x44] = 0x7fffffff;
-				sh2_recalc_irq();
+				sh2_recalc_irq(sh2);
 			}
 			break;
 		}
 	case 0x42: // DVCR
 		sh2->m[0x42] = (sh2->m[0x42] & ~0x00001000) | (old & sh2->m[0x42] & 0x00010000);
-		sh2_recalc_irq();
+		sh2_recalc_irq(sh2);
 		break;
 	case 0x43: // VCRDIV
-		sh2_recalc_irq();
+		sh2_recalc_irq(sh2);
 		break;
 	case 0x44: // DVDNTH
 		break;
@@ -400,7 +398,7 @@ WRITE32_HANDLER( sh2_internal_w )
 					sh2->m[0x42] |= 0x00010000;
 					sh2->m[0x45] = 0x7fffffff;
 					sh2->m[0x44] = 0x7fffffff;
-					sh2_recalc_irq();
+					sh2_recalc_irq(sh2);
 				}
 				else
 				{
@@ -413,7 +411,7 @@ WRITE32_HANDLER( sh2_internal_w )
 				sh2->m[0x42] |= 0x00010000;
 				sh2->m[0x45] = 0x7fffffff;
 				sh2->m[0x44] = 0x7fffffff;
-				sh2_recalc_irq();
+				sh2_recalc_irq(sh2);
 			}
 			break;
 		}
@@ -427,7 +425,7 @@ WRITE32_HANDLER( sh2_internal_w )
 		break;
 	case 0x63: // CHCR0
 		sh2->m[0x63] = (sh2->m[0x63] & ~2) | (old & sh2->m[0x63] & 2);
-		sh2_dmac_check(0);
+		sh2_dmac_check(sh2, 0);
 		break;
 	case 0x64: // SAR1
 	case 0x65: // DAR1
@@ -437,16 +435,16 @@ WRITE32_HANDLER( sh2_internal_w )
 		break;
 	case 0x67: // CHCR1
 		sh2->m[0x67] = (sh2->m[0x67] & ~2) | (old & sh2->m[0x67] & 2);
-		sh2_dmac_check(1);
+		sh2_dmac_check(sh2, 1);
 		break;
 	case 0x68: // VCRDMA0
 	case 0x6a: // VCRDMA1
-		sh2_recalc_irq();
+		sh2_recalc_irq(sh2);
 		break;
 	case 0x6c: // DMAOR
 		sh2->m[0x6c] = (sh2->m[0x6c] & ~6) | (old & sh2->m[0x6c] & 6);
-		sh2_dmac_check(0);
-		sh2_dmac_check(1);
+		sh2_dmac_check(sh2, 0);
+		sh2_dmac_check(sh2, 1);
 		break;
 
 		// Bus controller
@@ -467,6 +465,8 @@ WRITE32_HANDLER( sh2_internal_w )
 
 READ32_HANDLER( sh2_internal_r )
 {
+	SH2 *sh2 = GET_SH2(space->cpu);
+
 #ifdef USE_SH2DRC
 	offset &= 0x7f;
 #endif
@@ -477,7 +477,7 @@ READ32_HANDLER( sh2_internal_r )
 		if ( mem_mask == 0x00ff0000 )
 			if ( sh2->ftcsr_read_callback != NULL )
 				sh2->ftcsr_read_callback( (sh2->m[4] & 0xffff0000) | sh2->frc );
-		sh2_timer_resync();
+		sh2_timer_resync(sh2);
 		return (sh2->m[4] & 0xffff0000) | sh2->frc;
 	case 0x05: // OCRx, TCR, TOCR
 		if(sh2->m[5] & 0x10)
@@ -505,6 +505,8 @@ READ32_HANDLER( sh2_internal_r )
 
 void sh2_set_frt_input(const device_config *device, int state)
 {
+	SH2 *sh2 = GET_SH2(device);
+
 	if(state == PULSE_LINE)
 	{
 		sh2_set_frt_input(device, ASSERT_LINE);
@@ -512,10 +514,7 @@ void sh2_set_frt_input(const device_config *device, int state)
 		return;
 	}
 
-	cpu_push_context(device);
-
 	if(sh2->frt_input == state) {
-		cpu_pop_context();
 		return;
 	}
 
@@ -523,25 +522,22 @@ void sh2_set_frt_input(const device_config *device, int state)
 
 	if(sh2->m[5] & 0x8000) {
 		if(state == CLEAR_LINE) {
-			cpu_pop_context();
 			return;
 		}
 	} else {
 		if(state == ASSERT_LINE) {
-			cpu_pop_context();
 			return;
 		}
 	}
 
-	sh2_timer_resync();
+	sh2_timer_resync(sh2);
 	sh2->icr = sh2->frc;
 	sh2->m[4] |= ICF;
 	logerror("SH2.%d: ICF activated (%x)\n", cpu_get_index(sh2->device), sh2->pc & AM);
-	sh2_recalc_irq();
-	cpu_pop_context();
+	sh2_recalc_irq(sh2);
 }
 
-void sh2_set_irq_line(int irqline, int state)
+void sh2_set_irq_line(SH2 *sh2, int irqline, int state)
 {
 	if (irqline == INPUT_LINE_NMI)
 	{
@@ -557,7 +553,7 @@ void sh2_set_irq_line(int irqline, int state)
 		{
 			LOG(("SH-2 '%s' assert nmi\n", sh2->device->tag));
 
-			sh2_exception("Set IRQ line", 16);
+			sh2_exception(sh2, "Set IRQ line", 16);
 
 			#ifdef USE_SH2DRC
 			sh2->pending_nmi = 1;
@@ -591,7 +587,7 @@ void sh2_set_irq_line(int irqline, int state)
 	}
 }
 
-void sh2_recalc_irq(void)
+void sh2_recalc_irq(SH2 *sh2)
 {
 	int irq = 0, vector = -1;
 	int  level;
@@ -635,7 +631,7 @@ void sh2_recalc_irq(void)
 	sh2->test_irq = 1;
 }
 
-void sh2_exception(const char *message, int irqline)
+void sh2_exception(SH2 *sh2, const char *message, int irqline)
 {
 	int vector;
 
@@ -700,15 +696,9 @@ void sh2_exception(const char *message, int irqline)
 	#endif
 }
 
-void sh2_common_init(int alloc, const device_config *device, int index, int clock, cpu_irq_callback irqcallback)
+void sh2_common_init(SH2 *sh2, const device_config *device, int index, int clock, cpu_irq_callback irqcallback)
 {
 	const sh2_cpu_core *conf = device->static_config;
-
-	if (alloc)
-	{
-		sh2 = (SH2 *)auto_malloc(sizeof(SH2));
-		memset(sh2, 0, sizeof(SH2));
-	}
 
 	sh2->timer = timer_alloc(device->machine, sh2_timer_callback, sh2);
 	timer_adjust_oneshot(sh2->timer, attotime_never, 0);

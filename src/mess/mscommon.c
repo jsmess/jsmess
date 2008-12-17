@@ -68,7 +68,7 @@ struct terminal *terminal_create(
 	term = (struct terminal *) auto_malloc(sizeof(struct terminal) - sizeof(term->mem)
 		+ (num_cols * num_rows * sizeof(termchar_t)));
 
-	term->tm = tilemap_create(terminal_gettileinfo, tilemap_scan_rows,
+	term->tm = tilemap_create(machine, terminal_gettileinfo, tilemap_scan_rows,
 		char_width, char_height, num_cols, num_rows);
 
 	term->gfx = gfx;

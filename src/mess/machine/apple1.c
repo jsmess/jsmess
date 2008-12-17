@@ -153,7 +153,7 @@ DRIVER_INIT( apple1 )
 								  0x0000, mess_ram_size - 1, 0, 0, SMH_BANK1);
 	memory_set_bankptr(machine,1, mess_ram);
 
-	pia_config(0, &apple1_pia0);
+	pia_config(machine, 0, &apple1_pia0);
 
 	/* Poll the keyboard input ports periodically.  These include both
 	   ordinary keys and the RESET and CLEAR SCREEN pushbutton

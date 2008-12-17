@@ -5,9 +5,9 @@
 *********************************************************/
 
 #include "sndintrf.h"
-#include "deprecat.h"
 #include "streams.h"
 #include "cpuintrf.h"
+#include "cpuexec.h"
 #include "k053260.h"
 
 /* 2004-02-28: Fixed ppcm decoding. Games sound much better now.*/
@@ -38,6 +38,7 @@ struct k053260_chip_def {
 	unsigned long					*delta_table;
 	struct k053260_channel_def		channels[4];
 	const k053260_interface			*intf;
+	const device_config *device;
 };
 
 
@@ -209,6 +210,7 @@ static SND_START( k053260 )
 	memset(ic, 0, sizeof(*ic));
 
 	/* Initialize our chip structure */
+	ic->device = device;
 	ic->intf = (config != NULL) ? config : &defintrf;
 
 	ic->mode = 0;
@@ -227,13 +229,13 @@ static SND_START( k053260 )
 
 	ic->delta_table = ( unsigned long * )auto_malloc( 0x1000 * sizeof( unsigned long ) );
 
-	ic->channel = stream_create( 0, 2, rate, ic, k053260_update );
+	ic->channel = stream_create( device, 0, 2, rate, ic, k053260_update );
 
 	InitDeltaTable( ic, rate, clock );
 
 	/* setup SH1 timer if necessary */
 	if ( ic->intf->irq )
-		timer_pulse( Machine, attotime_mul(ATTOTIME_IN_HZ(clock), 32), NULL, 0, ic->intf->irq );
+		timer_pulse( device->machine, attotime_mul(ATTOTIME_IN_HZ(clock), 32), NULL, 0, ic->intf->irq );
 
     return ic;
 }
@@ -259,7 +261,7 @@ INLINE void check_bounds( struct k053260_chip_def *ic, int channel ) {
 	if (LOG) logerror("K053260: Sample Start = %06x, Sample End = %06x, Sample rate = %04lx, PPCM = %s\n", channel_start, channel_end, ic->channels[channel].rate, ic->channels[channel].ppcm ? "yes" : "no" );
 }
 
-static void k053260_write( int chip, offs_t offset, UINT8 data )
+static void k053260_write( const address_space *space, offs_t offset, UINT8 data, int chip )
 {
 	int i, t;
 	int r = offset;
@@ -376,7 +378,7 @@ static void k053260_write( int chip, offs_t offset, UINT8 data )
 	}
 }
 
-static UINT8 k053260_read( int chip, offs_t offset )
+static UINT8 k053260_read( const address_space *space,  offs_t offset, int chip )
 {
 	struct k053260_chip_def *ic = sndti_token(SOUND_K053260, chip);
 
@@ -399,7 +401,7 @@ static UINT8 k053260_read( int chip, offs_t offset )
 				ic->channels[0].pos += ( 1 << 16 );
 
 				if ( offs > ic->rom_size ) {
-					logerror("%06x: K53260: Attempting to read past rom size in rom Read Mode (offs = %06x, size = %06x).\n",cpu_get_pc(Machine->activecpu),offs,ic->rom_size );
+					logerror("%s: K53260: Attempting to read past rom size in rom Read Mode (offs = %06x, size = %06x).\n", cpuexec_describe_context(space->machine),offs,ic->rom_size );
 
 					return 0;
 				}
@@ -417,22 +419,22 @@ static UINT8 k053260_read( int chip, offs_t offset )
 
 READ8_HANDLER( k053260_0_r )
 {
-	return k053260_read( 0, offset );
+	return k053260_read( space, offset, 0 );
 }
 
 WRITE8_HANDLER( k053260_0_w )
 {
-	k053260_write( 0, offset, data );
+	k053260_write( space, offset, data, 0 );
 }
 
 READ8_HANDLER( k053260_1_r )
 {
-	return k053260_read( 1, offset );
+	return k053260_read( space, offset, 1 );
 }
 
 WRITE8_HANDLER( k053260_1_w )
 {
-	k053260_write( 1, offset, data );
+	k053260_write( space, offset, data, 1 );
 }
 
 WRITE16_HANDLER( k053260_0_lsb_w )

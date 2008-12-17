@@ -12,10 +12,9 @@
 #include "machine/pit8253.h"
 #include "includes/dai.h"
 #include "streams.h"
-#include "deprecat.h"
 #include "includes/special.h"
 
-static void *specimx_sh_start(int clock, const custom_sound_interface *config);
+static void *specimx_sh_start(const device_config *device, int clock, const custom_sound_interface *config);
 static void specimx_sh_update(void *param,stream_sample_t **inputs, stream_sample_t **_buffer,int length);
 
 static sound_stream *mixer_channel;
@@ -28,10 +27,10 @@ const custom_sound_interface specimx_sound_interface =
 	NULL
 };
 
-static void *specimx_sh_start(int clock, const custom_sound_interface *config)
+static void *specimx_sh_start(const device_config *device, int clock, const custom_sound_interface *config)
 {
 	specimx_input[0] = specimx_input[1] = specimx_input[2] = 0;
-	mixer_channel = stream_create(0, 1, Machine->sample_rate, 0, specimx_sh_update);
+	mixer_channel = stream_create(device, 0, 1, device->machine->sample_rate, 0, specimx_sh_update);
 	return (void *) ~0;
 }
 

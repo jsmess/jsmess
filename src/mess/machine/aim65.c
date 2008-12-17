@@ -35,9 +35,9 @@ static UINT8 riot_port_a;
 ******************************************************************************/
 
 
-static void aim65_via_irq_func(running_machine *machine, int state)
+static void aim65_via_irq_func(const device_config *device, int state)
 {
-	cpu_set_input_line(machine->cpu[0], M6502_IRQ_LINE, state ? HOLD_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[0], M6502_IRQ_LINE, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 /* STEP/RUN
@@ -170,25 +170,25 @@ void aim65_riot_irq(const device_config *device, int state)
 ******************************************************************************/
 
 
-static WRITE8_HANDLER( aim65_via0_a_w )
+static WRITE8_DEVICE_HANDLER( aim65_via0_a_w )
 {
 	 aim65_printer_data_a(data);
 }
 
 
-static WRITE8_HANDLER( aim65_via0_b_w )
+static WRITE8_DEVICE_HANDLER( aim65_via0_b_w )
 {
 	aim65_printer_data_b(data);
 }
 
 
-static READ8_HANDLER( aim65_via0_b_r )
+static READ8_DEVICE_HANDLER( aim65_via0_b_r )
 {
-	return input_port_read(space->machine, "switches");
+	return input_port_read(device->machine, "switches");
 }
 
 
-static const struct via6522_interface via0 =
+const via6522_interface aim65_via0 =
 {
 	0, // read8_machine_func in_a_func;
 	aim65_via0_b_r, // read8_machine_func in_b_func;
@@ -205,7 +205,7 @@ static const struct via6522_interface via0 =
 	aim65_via_irq_func // void (*irq_func)(int state);
 };
 
-static const struct via6522_interface user_via =
+const via6522_interface aim65_user_via =
 {
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 };
@@ -219,9 +219,10 @@ static const struct via6522_interface user_via =
 
 DRIVER_INIT( aim65 )
 {
-	/* Init RAM */
+	const device_config *via_0 = device_list_find_by_tag(machine->config->devicelist, VIA6522, "via6522_0");
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	
+
+	/* Init RAM */
 	memory_install_readwrite8_handler(space,
 		0, mess_ram_size - 1, 0, 0, SMH_BANK1, SMH_BANK1);
 	memory_set_bankptr(machine, 1, mess_ram);
@@ -230,14 +231,10 @@ DRIVER_INIT( aim65 )
 		memory_install_readwrite8_handler(space,
 			mess_ram_size, 0x0fff, 0, 0, SMH_NOP, SMH_NOP);
 
-	pia_config(0, &pia);
+	pia_config(machine, 0, &pia);
 
-	via_config(0, &via0);
-	via_0_cb1_w(space, 1, 1);
-	via_0_ca1_w(space, 1, 0);
-
-	via_config(1, &user_via);
-	via_reset();
+	via_cb1_w(via_0, 1, 1);
+	via_ca1_w(via_0, 1, 0);
 }
 
 

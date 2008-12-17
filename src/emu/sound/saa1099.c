@@ -66,8 +66,8 @@
 #include "sndintrf.h"
 #include "streams.h"
 #include "cpuintrf.h"
+#include "cpuexec.h"
 #include "saa1099.h"
-#include "deprecat.h"
 #include <math.h>
 
 
@@ -102,6 +102,7 @@ struct saa1099_noise
 /* this structure defines a SAA1099 chip */
 struct SAA1099
 {
+	const device_config *device;
 	sound_stream * stream;			/* our stream */
 	int noise_params[2];			/* noise generators parameters */
 	int env_enable[2];				/* envelope generators enable */
@@ -109,7 +110,7 @@ struct SAA1099
 	int env_mode[2];				/* envelope generators mode */
 	int env_bits[2];				/* non zero = 3 bits resolution */
 	int env_clock[2];				/* envelope clock mode (non-zero external) */
-    int env_step[2];                /* current envelope step */
+	int env_step[2];                /* current envelope step */
 	int all_ch_enable;				/* all channels enable */
 	int sync_state;					/* sync all channels */
 	int selected_reg;				/* selected register */
@@ -319,10 +320,11 @@ static SND_START( saa1099 )
 	memset(saa, 0, sizeof(*saa));
 
 	/* copy global parameters */
+	saa->device = device;
 	saa->sample_rate = clock / 256;
 
 	/* for each chip allocate one stream */
-	saa->stream = stream_create(0, 2, saa->sample_rate, saa, saa1099_update);
+	saa->stream = stream_create(device, 0, 2, saa->sample_rate, saa, saa1099_update);
 
 	return saa;
 }
@@ -331,13 +333,13 @@ static void saa1099_control_port_w( int chip, int reg, int data )
 {
 	struct SAA1099 *saa = sndti_token(SOUND_SAA1099, chip);
 
-    if ((data & 0xff) > 0x1c)
+	if ((data & 0xff) > 0x1c)
 	{
 		/* Error! */
-                logerror("%04x: (SAA1099 #%d) Unknown register selected\n",cpu_get_pc(Machine->activecpu), chip);
+                logerror("%s: (SAA1099 #%d) Unknown register selected\n",cpuexec_describe_context(saa->device->machine), chip);
 	}
 
-    saa->selected_reg = data & 0x1f;
+	saa->selected_reg = data & 0x1f;
 	if (saa->selected_reg == 0x18 || saa->selected_reg == 0x19)
 	{
 		/* clock the envelope channels */
@@ -420,7 +422,7 @@ static void saa1099_write_port_w( int chip, int offset, int data )
 			int i;
 
 			/* Synch & Reset generators */
-			logerror("%04x: (SAA1099 #%d) -reg 0x1c- Chip reset\n",cpu_get_pc(Machine->activecpu), chip);
+			logerror("%s: (SAA1099 #%d) -reg 0x1c- Chip reset\n",cpuexec_describe_context(saa->device->machine), chip);
 			for (i = 0; i < 6; i++)
 			{
                 saa->channels[i].level = 0;
@@ -429,7 +431,7 @@ static void saa1099_write_port_w( int chip, int offset, int data )
 		}
 		break;
 	default:	/* Error! */
-		logerror("%04x: (SAA1099 #%d) Unknown operation (reg:%02x, data:%02x)\n",cpu_get_pc(Machine->activecpu), chip, reg, data);
+		logerror("%s: (SAA1099 #%d) Unknown operation (reg:%02x, data:%02x)\n",cpuexec_describe_context(saa->device->machine), chip, reg, data);
 	}
 }
 

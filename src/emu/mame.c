@@ -235,6 +235,26 @@ static void logfile_callback(running_machine *machine, const char *buffer);
 ***************************************************************************/
 
 /*-------------------------------------------------
+    eat_all_cpu_cycles - eat a ton of cycles on
+    all CPUs to force a quick exit
+-------------------------------------------------*/
+
+INLINE void eat_all_cpu_cycles(running_machine *machine)
+{
+	int cpunum;
+
+	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
+		if (machine->cpu[cpunum] != NULL)
+			cpu_eat_cycles(machine->cpu[cpunum], 1000000000);
+}
+
+
+
+/***************************************************************************
+    CORE IMPLEMENTATION
+***************************************************************************/
+
+/*-------------------------------------------------
     mame_execute - run the core emulation
 -------------------------------------------------*/
 
@@ -559,8 +579,7 @@ void mame_schedule_exit(running_machine *machine)
 		mame->exit_pending = TRUE;
 
 	/* if we're executing, abort out immediately */
-	if (machine->activecpu != NULL)
-		cpu_eat_cycles(machine->activecpu, 1000000000);
+	eat_all_cpu_cycles(machine);
 
 	/* if we're autosaving on exit, schedule a save as well */
 	if (options_get_bool(mame_options(), OPTION_AUTOSAVE) && (machine->gamedrv->flags & GAME_SUPPORTS_SAVE))
@@ -579,8 +598,7 @@ void mame_schedule_hard_reset(running_machine *machine)
 	mame->hard_reset_pending = TRUE;
 
 	/* if we're executing, abort out immediately */
-	if (machine->activecpu != NULL)
-		cpu_eat_cycles(machine->activecpu, 1000000000);
+	eat_all_cpu_cycles(machine);
 }
 
 
@@ -599,8 +617,7 @@ void mame_schedule_soft_reset(running_machine *machine)
 	mame_pause(machine, FALSE);
 
 	/* if we're executing, abort out immediately */
-	if (machine->activecpu != NULL)
-		cpu_eat_cycles(machine->activecpu, 1000000000);
+	eat_all_cpu_cycles(machine);
 }
 
 
@@ -616,8 +633,7 @@ void mame_schedule_new_driver(running_machine *machine, const game_driver *drive
 	mame->new_driver_pending = driver;
 
 	/* if we're executing, abort out immediately */
-	if (machine->activecpu != NULL)
-		cpu_eat_cycles(machine->activecpu, 1000000000);
+	eat_all_cpu_cycles(machine);
 }
 
 
@@ -1713,50 +1729,46 @@ static void handle_save(running_machine *machine)
 	filerr = mame_fopen(mame->saveload_searchpath, astring_c(mame->saveload_pending_file), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
 	if (filerr == FILERR_NONE)
 	{
-		int cpunum;
+		astring *fullname = astring_dupc(mame_file_full_name(file));
+		state_save_error staterr;
 
 		/* write the save state */
-		if (state_save_save_begin(machine, file) != 0)
+		staterr = state_save_write_file(machine, file);
+
+		/* handle the result */
+		switch (staterr)
 		{
-			popmessage("Error: Unable to save state due to illegal registrations. See error.log for details.");
-			mame_fclose(file);
-			goto cancel;
+			case STATERR_ILLEGAL_REGISTRATIONS:
+				popmessage("Error: Unable to save state due to illegal registrations. See error.log for details.");
+				break;
+
+			case STATERR_WRITE_ERROR:
+				popmessage("Error: Unable to save state due to a write error. Verify there is enough disk space.");
+				break;
+
+			case STATERR_NONE:
+				if (!(machine->gamedrv->flags & GAME_SUPPORTS_SAVE))
+					popmessage("State successfully saved.\nWarning: Save states are not officially supported for this game.");
+				else
+					popmessage("State successfully saved.");
+				break;
+
+			default:
+				popmessage("Error: Unknwon error during state save.");
+				break;
 		}
 
-		/* write the default tag */
-		state_save_push_tag(0);
-		state_save_save_continue(machine);
-		state_save_pop_tag();
-
-		/* loop over CPUs */
-		for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
-			if (machine->cpu[cpunum] != NULL)
-			{
-				cpu_push_context(machine->cpu[cpunum]);
-
-				/* save the CPU data */
-				state_save_push_tag(cpunum + 1);
-				state_save_save_continue(machine);
-				state_save_pop_tag();
-
-				cpu_pop_context();
-			}
-
-		/* finish and close */
-		state_save_save_finish(machine);
+		/* close and perhaps delete the file */
 		mame_fclose(file);
-
-		/* pop a warning if the game doesn't support saves */
-		if (!(machine->gamedrv->flags & GAME_SUPPORTS_SAVE))
-			popmessage("State successfully saved.\nWarning: Save states are not officially supported for this game.");
-		else
-			popmessage("State successfully saved.");
+		if (staterr != STATERR_NONE)
+			osd_rmfile(astring_c(fullname));
+		astring_free(fullname);
 	}
 	else
-		popmessage("Error: Failed to save state");
+		popmessage("Error: Failed to create save state file.");
 
-cancel:
 	/* unschedule the save */
+cancel:
 	astring_free(mame->saveload_pending_file);
 	mame->saveload_searchpath = NULL;
 	mame->saveload_pending_file = NULL;
@@ -1798,43 +1810,46 @@ static void handle_load(running_machine *machine)
 	filerr = mame_fopen(mame->saveload_searchpath, astring_c(mame->saveload_pending_file), OPEN_FLAG_READ, &file);
 	if (filerr == FILERR_NONE)
 	{
-		/* start loading */
-		if (state_save_load_begin(machine, file) == 0)
+		state_save_error staterr;
+
+		/* write the save state */
+		staterr = state_save_read_file(machine, file);
+
+		/* handle the result */
+		switch (staterr)
 		{
-			int cpunum;
+			case STATERR_ILLEGAL_REGISTRATIONS:
+				popmessage("Error: Unable to load state due to illegal registrations. See error.log for details.");
+				break;
 
-			/* read tag 0 */
-			state_save_push_tag(0);
-			state_save_load_continue(machine);
-			state_save_pop_tag();
+			case STATERR_INVALID_HEADER:
+				popmessage("Error: Unable to load state due to an invalid header. Make sure the save state is correct for this game.");
+				break;
 
-			/* loop over CPUs */
-			for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
-				if (machine->cpu[cpunum] != NULL)
-				{
-					cpu_push_context(machine->cpu[cpunum]);
+			case STATERR_READ_ERROR:
+				popmessage("Error: Unable to load state due to a read error (file is likely corrupt).");
+				break;
 
-					/* load the CPU data */
-					state_save_push_tag(cpunum + 1);
-					state_save_load_continue(machine);
-					state_save_pop_tag();
+			case STATERR_NONE:
+				if (!(machine->gamedrv->flags & GAME_SUPPORTS_SAVE))
+					popmessage("State successfully loaded.\nWarning: Save states are not officially supported for this game.");
+				else
+					popmessage("State successfully loaded.");
+				break;
 
-					cpu_pop_context();
-				}
-
-			/* finish and close */
-			state_save_load_finish(machine);
-			popmessage("State successfully loaded.");
+			default:
+				popmessage("Error: Unknwon error during state load.");
+				break;
 		}
-		else
-			popmessage("Error: Failed to load state");
+
+		/* close the file */
 		mame_fclose(file);
 	}
 	else
-		popmessage("Error: Failed to load state");
+		popmessage("Error: Failed to open save state file.");
 
-cancel:
 	/* unschedule the load */
+cancel:
 	astring_free(mame->saveload_pending_file);
 	mame->saveload_pending_file = NULL;
 	mame->saveload_schedule_callback = NULL;

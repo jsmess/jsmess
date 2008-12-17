@@ -55,9 +55,9 @@ static ADDRESS_MAP_START( microtan_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xbc01, 0xbc01) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)
 	AM_RANGE(0xbc02, 0xbc02) AM_WRITE(ay8910_control_port_1_w)
 	AM_RANGE(0xbc03, 0xbc03) AM_READWRITE(ay8910_read_port_1_r, ay8910_write_port_1_w)
-	AM_RANGE(0xbfc0, 0xbfcf) AM_READWRITE(via_0_r, via_0_w)
+	AM_RANGE(0xbfc0, 0xbfcf) AM_DEVREADWRITE(VIA6522, "via6522_0", via_r, via_w)
 	AM_RANGE(0xbfd0, 0xbfd3) AM_DEVREADWRITE(ACIA6551, "acia", acia_6551_r, acia_6551_w)
-	AM_RANGE(0xbfe0, 0xbfef) AM_READWRITE(via_1_r, via_1_w)
+	AM_RANGE(0xbfe0, 0xbfef) AM_DEVREADWRITE(VIA6522, "via6522_1", via_r, via_w)
 	AM_RANGE(0xbff0, 0xbfff) AM_READWRITE(microtan_bffx_r, microtan_bffx_w)
 	AM_RANGE(0xc000, 0xe7ff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_ROM
@@ -255,6 +255,10 @@ static MACHINE_DRIVER_START( microtan )
 
 	/* acia */
 	MDRV_DEVICE_ADD("acia", ACIA6551)
+
+	/* via */
+	MDRV_VIA6522_ADD("via6522_0", 0, microtan_via6522_0)
+	MDRV_VIA6522_ADD("via6522_1", 0, microtan_via6522_1)
 MACHINE_DRIVER_END
 
 ROM_START( microtan )

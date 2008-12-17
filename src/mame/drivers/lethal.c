@@ -214,7 +214,7 @@ static NVRAM_HANDLER( lethalen )
 		eeprom_save(file);
 	else
 	{
-		eeprom_init(&eeprom_intf);
+		eeprom_init(machine, &eeprom_intf);
 
 		if (file)
 		{
@@ -869,9 +869,9 @@ ROM_END
 
 static DRIVER_INIT( lethalen )
 {
-	konami_rom_deinterleave_2_half("gfx2");
-	konami_rom_deinterleave_2("gfx3");
-	konami_rom_deinterleave_2("gfx4");
+	konami_rom_deinterleave_2_half(machine, "gfx2");
+	konami_rom_deinterleave_2(machine, "gfx3");
+	konami_rom_deinterleave_2(machine, "gfx4");
 }
 
 GAME( 1992, lethalen, 0,        lethalen, lethalen, lethalen, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers (ver UAE, 11/19/92 15:04)", GAME_IMPERFECT_GRAPHICS) // writes UE to eeprom

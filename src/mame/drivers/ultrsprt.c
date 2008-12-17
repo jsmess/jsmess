@@ -97,6 +97,8 @@ static MACHINE_START( ultrsprt )
 	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_READONLY, 0);
 }
 
+
+
 static ADDRESS_MAP_START( ultrsprt_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_BASE(&vram)
 	AM_RANGE(0x70000000, 0x70000003) AM_READWRITE(eeprom_r, eeprom_w)
@@ -205,7 +207,7 @@ static INPUT_PORTS_START( ultrsprt )
 	PORT_BIT( 0xfff, 0x800, IPT_AD_STICK_Y ) PORT_MINMAX(0x000,0xfff) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(2)
 INPUT_PORTS_END
 
-static void eeprom_handler(mame_file *file, int read_or_write)
+static NVRAM_HANDLER(ultrsprt)
 {
 	if (read_or_write)
 	{
@@ -213,17 +215,12 @@ static void eeprom_handler(mame_file *file, int read_or_write)
 	}
 	else
 	{
-		eeprom_init(&eeprom_interface_93C46);
+		eeprom_init(machine, &eeprom_interface_93C46);
 		if (file)
 		{
 			eeprom_load(file);
 		}
 	}
-}
-
-static NVRAM_HANDLER(ultrsprt)
-{
-	eeprom_handler(file, read_or_write);
 }
 
 static INTERRUPT_GEN( ultrsprt_vblank )
@@ -270,15 +267,13 @@ MACHINE_DRIVER_END
 static void sound_irq_callback(running_machine *machine, int irq)
 {
 	if (irq == 0)
-		/*cpu_set_input_line(machine->cpu[1], INPUT_LINE_IRQ5, PULSE_LINE)*/;
+		/*generic_pulse_irq_line(machine->cpu[1], INPUT_LINE_IRQ5)*/;
 	else
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_IRQ6, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_IRQ6, HOLD_LINE);
 }
 
 static DRIVER_INIT( ultrsprt )
 {
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
-
 	K056800_init(machine, sound_irq_callback);
 }
 

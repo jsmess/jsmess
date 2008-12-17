@@ -10,7 +10,6 @@
 *********************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "debugvw.h"
 #include "debugcmd.h"
 #include "debugcmt.h"
@@ -112,6 +111,7 @@ struct _debug_view
 	UINT8				recompute;				/* does this view require a recomputation? */
 	UINT8				update_level;			/* update level; updates when this hits 0 */
 	UINT8				update_pending;			/* true if there is a pending update */
+	UINT8				osd_update_pending;		/* true if there is a pending update */
 	debug_view_char *	viewdata;				/* current array of view data */
 	int					viewdata_size;			/* number of elements of the viewdata array */
 };
@@ -490,8 +490,9 @@ void debug_view_end_update(debug_view *view)
 		{
 			int size;
 
-			/* no longer pending */
+			/* no longer pending, but flag for the OSD */
 			view->update_pending = FALSE;
+			view->osd_update_pending = TRUE;
 
 			/* resize the viewdata if needed */
 			size = view->visible.x * view->visible.y;
@@ -504,15 +505,37 @@ void debug_view_end_update(debug_view *view)
 			/* update the view */
 			if (view->cb.update != NULL)
 				(*view->cb.update)(view);
-
-			/* update the owner */
-			if (view->osdupdate != NULL)
-				(*view->osdupdate)(view, view->osdprivate);
 		}
 	}
 
 	/* decrement the level */
 	view->update_level--;
+}
+
+
+/*-------------------------------------------------
+    debug_view_flush_updates - force all updates
+    to notify the OSD
+-------------------------------------------------*/
+
+void debug_view_flush_updates(running_machine *machine)
+{
+	debugvw_private *global = machine->debugvw_data;
+	debug_view *view;
+
+	/* skip if we're not ready yet */
+	if (global == NULL)
+		return;
+
+	/* loop over each view and force an update */
+	for (view = global->viewlist; view != NULL; view = view->next)
+		if (view->osd_update_pending)
+		{
+			/* update the owner */
+			if (view->osdupdate != NULL)
+				(*view->osdupdate)(view, view->osdprivate);
+			view->osd_update_pending = FALSE;
+		}
 }
 
 
@@ -1853,7 +1876,7 @@ static int disasm_view_recompute(debug_view *view, offs_t pc, int startline, int
 		int numbytes = 0;
 
 		/* convert PC to a byte offset */
-		pcbyte = memory_address_to_byte(space, pc) & space->bytemask;
+		pcbyte = memory_address_to_byte(space, pc);
 
 		/* save a copy of the previous line as a backup if we're only doing one line */
 		if (lines == 1)
@@ -1940,9 +1963,6 @@ static void disasm_view_update(debug_view *view)
 	pc = cpu_get_pc(space->cpu);
 	pcbyte = memory_address_to_byte(space, pc) & space->logbytemask;
 
-	/* switch to the CPU's context */
-	cpu_push_context(space->cpu);
-
 	/* if our expression is dirty, fix it */
 	if (dasmdata->expression.dirty)
 	{
@@ -1972,7 +1992,7 @@ static void disasm_view_update(debug_view *view)
 		exprerr = expression_execute(dasmdata->expression.parsed, &result);
 		if (exprerr == EXPRERR_NONE && result != dasmdata->expression.result)
 		{
-			offs_t resultbyte = memory_address_to_byte(space, result) & space->bytemask;
+			offs_t resultbyte = memory_address_to_byte(space, result);
 
 			/* update the result */
 			dasmdata->expression.result = result;
@@ -2080,7 +2100,7 @@ recompute:
 			{
 				const cpu_debug_data *cpuinfo = cpu_get_debug_data(space->cpu);
 				for (bp = cpuinfo->bplist; bp != NULL; bp = bp->next)
-					if (dasmdata->byteaddress[effrow] == (memory_address_to_byte(space, bp->address) & space->bytemask))
+					if (dasmdata->byteaddress[effrow] == memory_address_to_byte(space, bp->address))
 						attrib = DCA_CHANGED;
 			}
 
@@ -2115,9 +2135,6 @@ recompute:
 			col++;
 		}
 	}
-
-	/* restore the original CPU context */
-	cpu_pop_context();
 }
 
 
@@ -2601,10 +2618,6 @@ static void memory_view_update(debug_view *view)
 	/* get positional data */
 	posdata = &memory_pos_table[memdata->bytes_per_chunk];
 
-	/* switch to the CPU's context */
-	if (space != NULL)
-		cpu_push_context(space->cpu);
-
 	/* loop over visible rows */
 	for (row = 0; row < view->visible.y; row++)
 	{
@@ -2673,10 +2686,6 @@ static void memory_view_update(debug_view *view)
 			}
 		}
 	}
-
-	/* restore the context */
-	if (memdata->desc->base == NULL)
-		cpu_pop_context();
 }
 
 
@@ -2996,7 +3005,6 @@ static UINT64 memory_view_read(debug_view_memory *memdata, UINT8 size, offs_t of
 		const address_space *space = memdata->desc->space;
 		UINT64 result = ~(UINT64)0;
 
-		cpu_push_context(space->cpu);
 		switch (size)
 		{
 			case 1:	result = debug_read_byte(space, offs, !memdata->no_translation); break;
@@ -3004,7 +3012,6 @@ static UINT64 memory_view_read(debug_view_memory *memdata, UINT8 size, offs_t of
 			case 4:	result = debug_read_dword(space, offs, !memdata->no_translation); break;
 			case 8:	result = debug_read_qword(space, offs, !memdata->no_translation); break;
 		}
-		cpu_pop_context();
 		return result;
 	}
 
@@ -3038,7 +3045,6 @@ static void memory_view_write(debug_view_memory *memdata, UINT8 size, offs_t off
 	{
 		const address_space *space = memdata->desc->space;
 
-		cpu_push_context(space->cpu);
 		switch (size)
 		{
 			case 1:	debug_write_byte(space, offs, data, !memdata->no_translation); break;
@@ -3046,7 +3052,6 @@ static void memory_view_write(debug_view_memory *memdata, UINT8 size, offs_t off
 			case 4:	debug_write_dword(space, offs, data, !memdata->no_translation); break;
 			case 8:	debug_write_qword(space, offs, data, !memdata->no_translation); break;
 		}
-		cpu_pop_context();
 		return;
 	}
 

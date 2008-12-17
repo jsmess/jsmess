@@ -85,7 +85,7 @@ static NVRAM_HANDLER(mystwarr)
 		eeprom_save(file);
 	else
 	{
-		eeprom_init(&eeprom_intf);
+		eeprom_init(machine, &eeprom_intf);
 
 		if (file)
 		{
@@ -103,7 +103,7 @@ static NVRAM_HANDLER(gaiapols)
 		eeprom_save(file);
 	else
 	{
-		eeprom_init(&eeprom_intf_gaia);
+		eeprom_init(machine, &eeprom_intf_gaia);
 
 		if (file)
 		{
@@ -2173,7 +2173,7 @@ ROM_END
 
 static DRIVER_INIT(metamrph)
 {
-	K053250_unpack_pixels("gfx3");
+	K053250_unpack_pixels(machine, "gfx3");
 }
 
 

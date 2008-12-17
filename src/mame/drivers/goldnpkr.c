@@ -640,7 +640,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static VIDEO_START( goldnpkr )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 29);
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 29);
 }
 
 static VIDEO_UPDATE( goldnpkr )
@@ -3158,14 +3158,14 @@ ROM_END
 
 static DRIVER_INIT( goldnpkr )
 {
-	pia_config(0, &goldnpkr_pia0_intf);
-	pia_config(1, &goldnpkr_pia1_intf);
+	pia_config(machine, 0, &goldnpkr_pia0_intf);
+	pia_config(machine, 1, &goldnpkr_pia1_intf);
 }
 
 static DRIVER_INIT( pottnpkr )
 {
-	pia_config(0, &pottnpkr_pia0_intf);
-	pia_config(1, &pottnpkr_pia1_intf);
+	pia_config(machine, 0, &pottnpkr_pia0_intf);
+	pia_config(machine, 1, &pottnpkr_pia1_intf);
 }
 
 /*
@@ -3214,8 +3214,8 @@ static DRIVER_INIT( royale )
 //  ROM[0x60bb] = 0xea;
 //  ROM[0x60bc] = 0xea;
 
-	pia_config(0, &pottnpkr_pia0_intf);
-	pia_config(1, &pottnpkr_pia1_intf);
+	pia_config(machine, 0, &pottnpkr_pia0_intf);
+	pia_config(machine, 1, &pottnpkr_pia1_intf);
 }
 
 /*************************
@@ -3262,7 +3262,7 @@ GAMEL( 1991, bsuerten, bsuerte,  witchcrd, bsuerte,  pottnpkr, ROT0,   "Unknown"
 GAMEL( 1991, bsuerteo, bsuerte,  witchcrd, bsuerte,  pottnpkr, ROT0,   "Unknown",                   "Buena Suerte (spanish, set 16)",          0,                layout_goldnpkr )
 GAMEL( 1991, bsuertep, bsuerte,  witchcrd, bsuerte,  pottnpkr, ROT0,   "Unknown",                   "Buena Suerte (spanish, set 17)",          0,                layout_goldnpkr )
 GAMEL( 1991, bsuerteq, bsuerte,  witchcrd, bsuerte,  pottnpkr, ROT0,   "Unknown",                   "Buena Suerte (spanish, set 18)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuerter, bsuerte,  witchcrd, bsuerte,  pottnpkr, ROT0,   "Unknown",                   "Buena Suerte (spanish, bet 19)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuerter, bsuerte,  witchcrd, bsuerte,  pottnpkr, ROT0,   "Unknown",                   "Buena Suerte (spanish, set 19)",          0,                layout_goldnpkr )
 GAMEL( 1991, bsuertes, bsuerte,  witchcrd, bsuerte,  pottnpkr, ROT0,   "Unknown",                   "Buena Suerte (spanish, set 20)",          0,                layout_goldnpkr )
 GAMEL( 1991, bsuertet, bsuerte,  witchcrd, bsuerte,  pottnpkr, ROT0,   "Unknown",                   "Buena Suerte (spanish, set 21)",          0,                layout_goldnpkr )
 GAMEL( 1991, bsuerteu, bsuerte,  witchcrd, bsuerte,  pottnpkr, ROT0,   "Unknown",                   "Buena Suerte (spanish, set 22)",          0,                layout_goldnpkr )

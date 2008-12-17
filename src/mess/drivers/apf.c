@@ -318,23 +318,23 @@ static const pia6821_interface apf_imagination_pia_interface=
 };
 
 
-static void apf_common_init(void)
+static void apf_common_init(running_machine *machine)
 {
 	apf_ints = 0;
-	pia_config(0,&apf_m1000_pia_interface);
+	pia_config(machine, 0,&apf_m1000_pia_interface);
 	pia_reset();
 }
 
 static MACHINE_START( apf_imagination )
 {
-	pia_config(1,&apf_imagination_pia_interface);
-	apf_common_init();
+	pia_config(machine, 1,&apf_imagination_pia_interface);
+	apf_common_init(machine);
 	wd17xx_init(machine, WD_TYPE_179X, NULL, NULL);
 }
 
 static MACHINE_START( apf_m1000 )
 {
-	apf_common_init();
+	apf_common_init(machine);
 }
 
 static WRITE8_HANDLER(apf_dischw_w)

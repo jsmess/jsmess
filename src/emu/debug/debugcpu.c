@@ -277,7 +277,10 @@ void debug_cpu_flush_traces(running_machine *machine)
 		if (machine->cpu[cpunum] != NULL)
 		{
 			cpu_debug_data *info = cpu_get_debug_data(machine->cpu[cpunum]);
-			if (info->trace.file != NULL)
+
+			/* this can be called on exit even when no debugging is enabled, so
+               make sure the info is valid before proceeding */
+			if (info != NULL && info->trace.file != NULL)
 				fflush(info->trace.file);
 		}
 }
@@ -392,6 +395,7 @@ void debug_cpu_start_hook(const device_config *device, attotime endtime)
 		if (device == global->visiblecpu && osd_ticks() > global->last_periodic_update_time + osd_ticks_per_second()/4)
 		{
 			debug_view_update_all(device->machine);
+			debug_view_flush_updates(device->machine);
 			global->last_periodic_update_time = osd_ticks();
 		}
 
@@ -532,6 +536,7 @@ void debug_cpu_instruction_hook(const device_config *device, offs_t curpc)
 			else if ((info->flags & DEBUG_FLAG_STEPPING_OUT) == 0 && (info->stepsleft < 200 || info->stepsleft % 100 == 0))
 			{
 				debug_view_update_all(device->machine);
+				debug_view_flush_updates(device->machine);
 				debugger_refresh_display(device->machine);
 			}
 		}
@@ -579,6 +584,9 @@ void debug_cpu_instruction_hook(const device_config *device, offs_t curpc)
 		sound_mute(TRUE);
 		while (global->execution_state == EXECUTION_STATE_STOPPED)
 		{
+			/* flush any pending updates before waiting again */
+			debug_view_flush_updates(device->machine);
+
 			/* clear the memory modified flag and wait */
 			global->memory_modified = FALSE;
 			osd_wait_for_debugger(device, firststop);
@@ -2345,7 +2353,6 @@ static UINT64 expression_read_address_space(const address_space *space, offs_t a
 		address = memory_address_to_byte(space, address);
 
 		/* switch contexts and do the read */
-		cpu_push_context(space->cpu);
 		switch (size)
 		{
 			case 1:		result = debug_read_byte(space, address, TRUE);		break;
@@ -2353,7 +2360,6 @@ static UINT64 expression_read_address_space(const address_space *space, offs_t a
 			case 4:		result = debug_read_dword(space, address, TRUE);	break;
 			case 8:		result = debug_read_qword(space, address, TRUE);	break;
 		}
-		cpu_pop_context();
 	}
 	return result;
 }
@@ -2553,7 +2559,6 @@ static void expression_write_address_space(const address_space *space, offs_t ad
 		address = memory_address_to_byte(space, address);
 
 		/* switch contexts and do the write */
-		cpu_push_context(space->cpu);
 		switch (size)
 		{
 			case 1:		debug_write_byte(space, address, data, TRUE);	break;
@@ -2561,7 +2566,6 @@ static void expression_write_address_space(const address_space *space, offs_t ad
 			case 4:		debug_write_dword(space, address, data, TRUE);	break;
 			case 8:		debug_write_qword(space, address, data, TRUE);	break;
 		}
-		cpu_pop_context();
 	}
 }
 

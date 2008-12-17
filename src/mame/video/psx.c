@@ -25,7 +25,7 @@
 
 #define VERBOSE_LEVEL ( 0 )
 
-INLINE void ATTR_PRINTF(2,3) verboselog( int n_level, const char *s_fmt, ... )
+INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, const char *s_fmt, ... )
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -34,14 +34,7 @@ INLINE void ATTR_PRINTF(2,3) verboselog( int n_level, const char *s_fmt, ... )
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		if( Machine->activecpu != NULL )
-		{
-			logerror( "%08x: %s", cpu_get_pc(Machine->activecpu), buf );
-		}
-		else
-		{
-			logerror( "(timer) : %s", buf );
-		}
+		logerror( "%s: %s", cpuexec_describe_context(machine), buf );
 	}
 }
 
@@ -272,15 +265,19 @@ PALETTE_INIT( psx )
 #if defined( MAME_DEBUG )
 
 #define DEBUG_COORDS ( 10 )
-static bitmap_t *debugmesh;
-static int m_b_debugclear;
-static int m_b_debugmesh;
-static int m_n_debugskip;
-static int m_b_debugtexture;
-static int m_n_debuginterleave;
-static int m_n_debugcoord;
-static int m_n_debugcoordx[ DEBUG_COORDS ];
-static int m_n_debugcoordy[ DEBUG_COORDS ];
+static struct
+{
+	running_machine *machine;
+	bitmap_t *mesh;
+	int b_clear;
+	int b_mesh;
+	int n_skip;
+	int b_texture;
+	int n_interleave;
+	int n_coord;
+	int n_coordx[ DEBUG_COORDS ];
+	int n_coordy[ DEBUG_COORDS ];
+} m_debug;
 
 #define DEBUG_MAX ( 512 )
 
@@ -289,29 +286,31 @@ static void DebugMeshInit( running_machine *machine )
 	int width = video_screen_get_width(machine->primary_screen);
 	int height = video_screen_get_height(machine->primary_screen);
 
-	m_b_debugmesh = 0;
-	m_b_debugtexture = 0;
-	m_n_debuginterleave = -1;
-	m_b_debugclear = 1;
-	m_n_debugcoord = 0;
-	m_n_debugskip = 0;
-	debugmesh = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16 );
+	m_debug.b_mesh = 0;
+	m_debug.b_texture = 0;
+	m_debug.n_interleave = -1;
+	m_debug.b_clear = 1;
+	m_debug.n_coord = 0;
+	m_debug.n_skip = 0;
+	m_debug.mesh = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16 );
+	m_debug.machine = machine;
 }
 
-static void DebugMesh( running_machine *machine, int n_coordx, int n_coordy )
+static void DebugMesh( int n_coordx, int n_coordy )
 {
+	running_machine *machine = m_debug.machine;
 	int n_coord;
 	int n_colour;
 	int width = video_screen_get_width(machine->primary_screen);
 	int height = video_screen_get_height(machine->primary_screen);
 
-	if( m_b_debugclear )
+	if( m_debug.b_clear )
 	{
-		bitmap_fill( debugmesh, NULL , 0x0000);
-		m_b_debugclear = 0;
+		bitmap_fill( m_debug.mesh, NULL , 0x0000);
+		m_debug.b_clear = 0;
 	}
 
-	if( m_n_debugcoord < DEBUG_COORDS )
+	if( m_debug.n_coord < DEBUG_COORDS )
 	{
 		n_coordx += m_n_displaystartx;
 		n_coordy += m_n_displaystarty;
@@ -323,25 +322,25 @@ static void DebugMesh( running_machine *machine, int n_coordx, int n_coordy )
 		n_coordy /= DEBUG_MAX - 1;
 		n_coordy += 256;
 
-		m_n_debugcoordx[ m_n_debugcoord ] = n_coordx;
-		m_n_debugcoordy[ m_n_debugcoord ] = n_coordy;
-		m_n_debugcoord++;
+		m_debug.n_coordx[ m_debug.n_coord ] = n_coordx;
+		m_debug.n_coordy[ m_debug.n_coord ] = n_coordy;
+		m_debug.n_coord++;
 	}
 
 	n_colour = 0x1f;
-	for( n_coord = 0; n_coord < m_n_debugcoord; n_coord++ )
+	for( n_coord = 0; n_coord < m_debug.n_coord; n_coord++ )
 	{
-		if( n_coordx != m_n_debugcoordx[ n_coord ] ||
-			n_coordy != m_n_debugcoordy[ n_coord ] )
+		if( n_coordx != m_debug.n_coordx[ n_coord ] ||
+			n_coordy != m_debug.n_coordy[ n_coord ] )
 		{
 			break;
 		}
 	}
-	if( n_coord == m_n_debugcoord && m_n_debugcoord > 1 )
+	if( n_coord == m_debug.n_coord && m_debug.n_coord > 1 )
 	{
 		n_colour = 0xffff;
 	}
-	for( n_coord = 0; n_coord < m_n_debugcoord; n_coord++ )
+	for( n_coord = 0; n_coord < m_debug.n_coord; n_coord++ )
 	{
 		PAIR n_x;
 		PAIR n_y;
@@ -355,7 +354,7 @@ static void DebugMesh( running_machine *machine, int n_coordx, int n_coordy )
 		INT32 n_dx;
 		INT32 n_dy;
 
-		n_xstart = m_n_debugcoordx[ n_coord ];
+		n_xstart = m_debug.n_coordx[ n_coord ];
 		n_xend = n_coordx;
 		if( n_xend > n_xstart )
 		{
@@ -366,7 +365,7 @@ static void DebugMesh( running_machine *machine, int n_coordx, int n_coordy )
 			n_xlen = n_xstart - n_xend;
 		}
 
-		n_ystart = m_n_debugcoordy[ n_coord ];
+		n_ystart = m_debug.n_coordy[ n_coord ];
 		n_yend = n_coordy;
 		if( n_yend > n_ystart )
 		{
@@ -403,8 +402,8 @@ static void DebugMesh( running_machine *machine, int n_coordx, int n_coordy )
 				(INT16)n_x.w.h <= width - 1 &&
 				(INT16)n_y.w.h <= height - 1 )
 			{
-				if( *BITMAP_ADDR16(debugmesh, n_y.w.h, n_x.w.h) != 0xffff )
-					*BITMAP_ADDR16(debugmesh, n_y.w.h, n_x.w.h) = n_colour;
+				if( *BITMAP_ADDR16(m_debug.mesh, n_y.w.h, n_x.w.h) != 0xffff )
+					*BITMAP_ADDR16(m_debug.mesh, n_y.w.h, n_x.w.h) = n_colour;
 			}
 			n_x.d += n_dx;
 			n_y.d += n_dy;
@@ -415,18 +414,18 @@ static void DebugMesh( running_machine *machine, int n_coordx, int n_coordy )
 
 static void DebugMeshEnd( void )
 {
-	m_n_debugcoord = 0;
+	m_debug.n_coord = 0;
 }
 
 static void DebugCheckKeys( running_machine *machine )
 {
 	if( input_code_pressed_once( KEYCODE_M ) )
-		m_b_debugmesh = !m_b_debugmesh;
+		m_debug.b_mesh = !m_debug.b_mesh;
 
 	if( input_code_pressed_once( KEYCODE_V ) )
-		m_b_debugtexture = !m_b_debugtexture;
+		m_debug.b_texture = !m_debug.b_texture;
 
-	if( m_b_debugmesh || m_b_debugtexture )
+	if( m_debug.b_mesh || m_debug.b_texture )
 	{
 		int width = video_screen_get_width(machine->primary_screen);
 		int height = video_screen_get_height(machine->primary_screen);
@@ -437,28 +436,28 @@ static void DebugCheckKeys( running_machine *machine )
 
 	if( input_code_pressed_once( KEYCODE_I ) )
 	{
-		if( m_b_debugtexture )
+		if( m_debug.b_texture )
 		{
-			m_n_debuginterleave++;
+			m_debug.n_interleave++;
 
-			if( m_n_debuginterleave == 2 )
-				m_n_debuginterleave = -1;
+			if( m_debug.n_interleave == 2 )
+				m_debug.n_interleave = -1;
 
-			if( m_n_debuginterleave == -1 )
+			if( m_debug.n_interleave == -1 )
 				popmessage( "interleave off" );
-			else if( m_n_debuginterleave == 0 )
+			else if( m_debug.n_interleave == 0 )
 				popmessage( "4 bit interleave" );
-			else if( m_n_debuginterleave == 1 )
+			else if( m_debug.n_interleave == 1 )
 				popmessage( "8 bit interleave" );
 		}
 		else
 		{
-			m_n_debugskip++;
+			m_debug.n_skip++;
 
-			if( m_n_debugskip > 15 )
-				m_n_debugskip = 0;
+			if( m_debug.n_skip > 15 )
+				m_debug.n_skip = 0;
 
-			popmessage( "debug skip %d", m_n_debugskip );
+			popmessage( "debug skip %d", m_debug.n_skip );
 		}
 	}
 
@@ -496,19 +495,19 @@ static void DebugCheckKeys( running_machine *machine )
 
 static int DebugMeshDisplay( bitmap_t *bitmap, const rectangle *cliprect )
 {
-	if( m_b_debugmesh )
+	if( m_debug.mesh )
 	{
-		copybitmap( bitmap, debugmesh, 0, 0, 0, 0, cliprect );
+		copybitmap( bitmap, m_debug.mesh, 0, 0, 0, 0, cliprect );
 	}
-	m_b_debugclear = 1;
-	return m_b_debugmesh;
+	m_debug.b_clear = 1;
+	return m_debug.b_mesh;
 }
 
 static int DebugTextureDisplay( running_machine *machine, bitmap_t *bitmap )
 {
 	UINT32 n_y;
 
-	if( m_b_debugtexture )
+	if( m_debug.b_texture )
 	{
 		int width = video_screen_get_width(machine->primary_screen);
 		int height = video_screen_get_height(machine->primary_screen);
@@ -522,12 +521,12 @@ static int DebugTextureDisplay( running_machine *machine, bitmap_t *bitmap )
 
 			for( n_x = 0; n_x < width; n_x++ )
 			{
-				if( m_n_debuginterleave == 0 )
+				if( m_debug.n_interleave == 0 )
 				{
 					n_xi = ( n_x & ~0x3c ) + ( ( n_y << 2 ) & 0x3c );
 					n_yi = ( n_y & ~0xf ) + ( ( n_x >> 2 ) & 0xf );
 				}
-				else if( m_n_debuginterleave == 1 )
+				else if( m_debug.n_interleave == 1 )
 				{
 					n_xi = ( n_x & ~0x78 ) + ( ( n_x << 3 ) & 0x40 ) + ( ( n_y << 3 ) & 0x38 );
 					n_yi = ( n_y & ~0x7 ) + ( ( n_x >> 4 ) & 0x7 );
@@ -542,7 +541,7 @@ static int DebugTextureDisplay( running_machine *machine, bitmap_t *bitmap )
 			draw_scanline16( bitmap, 0, n_y, width, p_n_interleave, machine->pens, -1 );
 		}
 	}
-	return m_b_debugtexture;
+	return m_debug.b_texture;
 }
 
 #endif
@@ -949,6 +948,8 @@ f  e| d  c| b| a  9| 8  7| 6  5| 4| 3  2  1  0
 
 INLINE void decode_tpage( struct PSXGPU *p_psxgpu, UINT32 tpage )
 {
+	running_machine *machine = Machine;
+
 	if( m_n_gputype == 2 )
 	{
 		m_n_gpustatus = ( m_n_gpustatus & 0xfffff800 ) | ( tpage & 0x7ff );
@@ -962,11 +963,11 @@ INLINE void decode_tpage( struct PSXGPU *p_psxgpu, UINT32 tpage )
 		p_psxgpu->n_ti = 0;
 		if( ( tpage & ~0x39ff ) != 0 )
 		{
-			verboselog( 1, "not handled: draw mode %08x\n", tpage & ~0x39ff );
+			verboselog( machine, 1, "not handled: draw mode %08x\n", tpage & ~0x39ff );
 		}
 		if( p_psxgpu->n_tp == 3 )
 		{
-			verboselog( 0, "not handled: tp == 3\n" );
+			verboselog( machine, 0, "not handled: tp == 3\n" );
 		}
 	}
 	else
@@ -982,15 +983,15 @@ INLINE void decode_tpage( struct PSXGPU *p_psxgpu, UINT32 tpage )
 		p_psxgpu->n_iy = 0;
 		if( ( tpage & ~0x27ef ) != 0 )
 		{
-			verboselog( 1, "not handled: draw mode %08x\n", tpage & ~0x27ef );
+			verboselog( machine, 1, "not handled: draw mode %08x\n", tpage & ~0x27ef );
 		}
 		if( p_psxgpu->n_tp == 3 )
 		{
-			verboselog( 0, "not handled: tp == 3\n" );
+			verboselog( machine, 0, "not handled: tp == 3\n" );
 		}
 		else if( p_psxgpu->n_tp == 2 && p_psxgpu->n_ti != 0 )
 		{
-			verboselog( 0, "not handled: interleaved 15 bit texture\n" );
+			verboselog( machine, 0, "not handled: interleaved 15 bit texture\n" );
 		}
 	}
 }
@@ -1035,7 +1036,7 @@ INLINE void decode_tpage( struct PSXGPU *p_psxgpu, UINT32 tpage )
 			p_n_redtrans = m_p_n_redaddtrans; \
 			p_n_greentrans = m_p_n_greenaddtrans; \
 			p_n_bluetrans = m_p_n_blueaddtrans; \
-			verboselog( 2, "Transparency Mode: 0.5*B + 0.5*F\n" ); \
+			verboselog( machine, 2, "Transparency Mode: 0.5*B + 0.5*F\n" ); \
 			break; \
 		case 0x01: \
 			p_n_f = m_p_n_f1; \
@@ -1045,7 +1046,7 @@ INLINE void decode_tpage( struct PSXGPU *p_psxgpu, UINT32 tpage )
 			p_n_redtrans = m_p_n_redaddtrans; \
 			p_n_greentrans = m_p_n_greenaddtrans; \
 			p_n_bluetrans = m_p_n_blueaddtrans; \
-			verboselog( 2, "Transparency Mode: 1.0*B + 1.0*F\n" ); \
+			verboselog( machine, 2, "Transparency Mode: 1.0*B + 1.0*F\n" ); \
 			break; \
 		case 0x02: \
 			p_n_f = m_p_n_f1; \
@@ -1055,7 +1056,7 @@ INLINE void decode_tpage( struct PSXGPU *p_psxgpu, UINT32 tpage )
 			p_n_redtrans = m_p_n_redsubtrans; \
 			p_n_greentrans = m_p_n_greensubtrans; \
 			p_n_bluetrans = m_p_n_bluesubtrans; \
-			verboselog( 2, "Transparency Mode: 1.0*B - 1.0*F\n" ); \
+			verboselog( machine, 2, "Transparency Mode: 1.0*B - 1.0*F\n" ); \
 			break; \
 		case 0x03: \
 			p_n_f = m_p_n_f025; \
@@ -1065,7 +1066,7 @@ INLINE void decode_tpage( struct PSXGPU *p_psxgpu, UINT32 tpage )
 			p_n_redtrans = m_p_n_redaddtrans; \
 			p_n_greentrans = m_p_n_greenaddtrans; \
 			p_n_bluetrans = m_p_n_blueaddtrans; \
-			verboselog( 2, "Transparency Mode: 1.0*B + 0.25*F\n" ); \
+			verboselog( machine, 2, "Transparency Mode: 1.0*B + 0.25*F\n" ); \
 			break; \
 		} \
 		break; \
@@ -1452,6 +1453,7 @@ INLINE void decode_tpage( struct PSXGPU *p_psxgpu, UINT32 tpage )
 
 static void FlatPolygon( int n_points )
 {
+	running_machine *machine = Machine;
 	INT16 n_y;
 	INT16 n_x;
 
@@ -1484,13 +1486,13 @@ static void FlatPolygon( int n_points )
 	UINT16 *p_vram;
 
 #if defined( MAME_DEBUG )
-	if( m_n_debugskip == 1 )
+	if( m_debug.n_skip == 1 )
 	{
 		return;
 	}
 	for( n_point = 0; n_point < n_points; n_point++ )
 	{
-		DebugMesh( Machine, COORD_X( m_packet.FlatPolygon.vertex[ n_point ].n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatPolygon.vertex[ n_point ].n_coord ) + m_n_drawoffset_y );
+		DebugMesh( COORD_X( m_packet.FlatPolygon.vertex[ n_point ].n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatPolygon.vertex[ n_point ].n_coord ) + m_n_drawoffset_y );
 	}
 	DebugMeshEnd();
 #endif
@@ -1607,6 +1609,7 @@ static void FlatPolygon( int n_points )
 
 static void FlatTexturedPolygon( int n_points )
 {
+	running_machine *machine = Machine;
 	INT16 n_y;
 	INT16 n_x;
 	int n_tx;
@@ -1657,13 +1660,13 @@ static void FlatTexturedPolygon( int n_points )
 	UINT32 n_bgr;
 
 #if defined( MAME_DEBUG )
-	if( m_n_debugskip == 2 )
+	if( m_debug.n_skip == 2 )
 	{
 		return;
 	}
 	for( n_point = 0; n_point < n_points; n_point++ )
 	{
-		DebugMesh( Machine, COORD_X( m_packet.FlatTexturedPolygon.vertex[ n_point ].n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatTexturedPolygon.vertex[ n_point ].n_coord ) + m_n_drawoffset_y );
+		DebugMesh( COORD_X( m_packet.FlatTexturedPolygon.vertex[ n_point ].n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatTexturedPolygon.vertex[ n_point ].n_coord ) + m_n_drawoffset_y );
 	}
 	DebugMeshEnd();
 #endif
@@ -1829,6 +1832,7 @@ static void FlatTexturedPolygon( int n_points )
 
 static void GouraudPolygon( int n_points )
 {
+	running_machine *machine = Machine;
 	INT16 n_y;
 	INT16 n_x;
 
@@ -1876,13 +1880,13 @@ static void GouraudPolygon( int n_points )
 	UINT16 *p_vram;
 
 #if defined( MAME_DEBUG )
-	if( m_n_debugskip == 3 )
+	if( m_debug.n_skip == 3 )
 	{
 		return;
 	}
 	for( n_point = 0; n_point < n_points; n_point++ )
 	{
-		DebugMesh( Machine, COORD_X( m_packet.GouraudPolygon.vertex[ n_point ].n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.GouraudPolygon.vertex[ n_point ].n_coord ) + m_n_drawoffset_y );
+		DebugMesh( COORD_X( m_packet.GouraudPolygon.vertex[ n_point ].n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.GouraudPolygon.vertex[ n_point ].n_coord ) + m_n_drawoffset_y );
 	}
 	DebugMeshEnd();
 #endif
@@ -2042,6 +2046,7 @@ static void GouraudPolygon( int n_points )
 
 static void GouraudTexturedPolygon( int n_points )
 {
+	running_machine *machine = Machine;
 	INT16 n_y;
 	INT16 n_x;
 	int n_tx;
@@ -2107,13 +2112,13 @@ static void GouraudTexturedPolygon( int n_points )
 	UINT32 n_bgr;
 
 #if defined( MAME_DEBUG )
-	if( m_n_debugskip == 4 )
+	if( m_debug.n_skip == 4 )
 	{
 		return;
 	}
 	for( n_point = 0; n_point < n_points; n_point++ )
 	{
-		DebugMesh( Machine, COORD_X( m_packet.GouraudTexturedPolygon.vertex[ n_point ].n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.GouraudTexturedPolygon.vertex[ n_point ].n_coord ) + m_n_drawoffset_y );
+		DebugMesh( COORD_X( m_packet.GouraudTexturedPolygon.vertex[ n_point ].n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.GouraudTexturedPolygon.vertex[ n_point ].n_coord ) + m_n_drawoffset_y );
 	}
 	DebugMeshEnd();
 #endif
@@ -2367,12 +2372,12 @@ static void MonochromeLine( void )
 	UINT16 *p_vram;
 
 #if defined( MAME_DEBUG )
-	if( m_n_debugskip == 5 )
+	if( m_debug.n_skip == 5 )
 	{
 		return;
 	}
-	DebugMesh( Machine, COORD_X( m_packet.MonochromeLine.vertex[ 0 ].n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.MonochromeLine.vertex[ 0 ].n_coord ) + m_n_drawoffset_y );
-	DebugMesh( Machine, COORD_X( m_packet.MonochromeLine.vertex[ 1 ].n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.MonochromeLine.vertex[ 1 ].n_coord ) + m_n_drawoffset_y );
+	DebugMesh( COORD_X( m_packet.MonochromeLine.vertex[ 0 ].n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.MonochromeLine.vertex[ 0 ].n_coord ) + m_n_drawoffset_y );
+	DebugMesh( COORD_X( m_packet.MonochromeLine.vertex[ 1 ].n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.MonochromeLine.vertex[ 1 ].n_coord ) + m_n_drawoffset_y );
 	DebugMeshEnd();
 #endif
 
@@ -2473,12 +2478,12 @@ static void GouraudLine( void )
 	UINT16 *p_vram;
 
 #if defined( MAME_DEBUG )
-	if( m_n_debugskip == 6 )
+	if( m_debug.n_skip == 6 )
 	{
 		return;
 	}
-	DebugMesh( Machine, COORD_X( m_packet.GouraudLine.vertex[ 0 ].n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.GouraudLine.vertex[ 0 ].n_coord ) + m_n_drawoffset_y );
-	DebugMesh( Machine, COORD_X( m_packet.GouraudLine.vertex[ 1 ].n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.GouraudLine.vertex[ 1 ].n_coord ) + m_n_drawoffset_y );
+	DebugMesh( COORD_X( m_packet.GouraudLine.vertex[ 0 ].n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.GouraudLine.vertex[ 0 ].n_coord ) + m_n_drawoffset_y );
+	DebugMesh( COORD_X( m_packet.GouraudLine.vertex[ 1 ].n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.GouraudLine.vertex[ 1 ].n_coord ) + m_n_drawoffset_y );
 	DebugMeshEnd();
 #endif
 
@@ -2572,14 +2577,14 @@ static void FrameBufferRectangleDraw( void )
 	UINT16 *p_vram;
 
 #if defined( MAME_DEBUG )
-	if( m_n_debugskip == 7 )
+	if( m_debug.n_skip == 7 )
 	{
 		return;
 	}
-	DebugMesh( Machine, COORD_X( m_packet.FlatRectangle.n_coord ), COORD_Y( m_packet.FlatRectangle.n_coord ) );
-	DebugMesh( Machine, COORD_X( m_packet.FlatRectangle.n_coord ) + SIZE_W( m_packet.FlatRectangle.n_size ), COORD_Y( m_packet.FlatRectangle.n_coord ) );
-	DebugMesh( Machine, COORD_X( m_packet.FlatRectangle.n_coord ), COORD_Y( m_packet.FlatRectangle.n_coord ) + SIZE_H( m_packet.FlatRectangle.n_size ) );
-	DebugMesh( Machine, COORD_X( m_packet.FlatRectangle.n_coord ) + SIZE_W( m_packet.FlatRectangle.n_size ), COORD_Y( m_packet.FlatRectangle.n_coord ) + SIZE_H( m_packet.FlatRectangle.n_size ) );
+	DebugMesh( COORD_X( m_packet.FlatRectangle.n_coord ), COORD_Y( m_packet.FlatRectangle.n_coord ) );
+	DebugMesh( COORD_X( m_packet.FlatRectangle.n_coord ) + SIZE_W( m_packet.FlatRectangle.n_size ), COORD_Y( m_packet.FlatRectangle.n_coord ) );
+	DebugMesh( COORD_X( m_packet.FlatRectangle.n_coord ), COORD_Y( m_packet.FlatRectangle.n_coord ) + SIZE_H( m_packet.FlatRectangle.n_size ) );
+	DebugMesh( COORD_X( m_packet.FlatRectangle.n_coord ) + SIZE_W( m_packet.FlatRectangle.n_size ), COORD_Y( m_packet.FlatRectangle.n_coord ) + SIZE_H( m_packet.FlatRectangle.n_size ) );
 	DebugMeshEnd();
 #endif
 
@@ -2612,6 +2617,7 @@ static void FrameBufferRectangleDraw( void )
 
 static void FlatRectangle( void )
 {
+	running_machine *machine = Machine;
 	INT16 n_y;
 	INT16 n_x;
 
@@ -2634,14 +2640,14 @@ static void FlatRectangle( void )
 	UINT16 *p_vram;
 
 #if defined( MAME_DEBUG )
-	if( m_n_debugskip == 8 )
+	if( m_debug.n_skip == 8 )
 	{
 		return;
 	}
-	DebugMesh( Machine, COORD_X( m_packet.FlatRectangle.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatRectangle.n_coord ) + m_n_drawoffset_y );
-	DebugMesh( Machine, COORD_X( m_packet.FlatRectangle.n_coord ) + m_n_drawoffset_x + SIZE_W( m_packet.FlatRectangle.n_size ), COORD_Y( m_packet.FlatRectangle.n_coord ) + m_n_drawoffset_y );
-	DebugMesh( Machine, COORD_X( m_packet.FlatRectangle.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatRectangle.n_coord ) + m_n_drawoffset_y + SIZE_H( m_packet.FlatRectangle.n_size ) );
-	DebugMesh( Machine, COORD_X( m_packet.FlatRectangle.n_coord ) + m_n_drawoffset_x + SIZE_W( m_packet.FlatRectangle.n_size ), COORD_Y( m_packet.FlatRectangle.n_coord ) + m_n_drawoffset_y + SIZE_H( m_packet.FlatRectangle.n_size ) );
+	DebugMesh( COORD_X( m_packet.FlatRectangle.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatRectangle.n_coord ) + m_n_drawoffset_y );
+	DebugMesh( COORD_X( m_packet.FlatRectangle.n_coord ) + m_n_drawoffset_x + SIZE_W( m_packet.FlatRectangle.n_size ), COORD_Y( m_packet.FlatRectangle.n_coord ) + m_n_drawoffset_y );
+	DebugMesh( COORD_X( m_packet.FlatRectangle.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatRectangle.n_coord ) + m_n_drawoffset_y + SIZE_H( m_packet.FlatRectangle.n_size ) );
+	DebugMesh( COORD_X( m_packet.FlatRectangle.n_coord ) + m_n_drawoffset_x + SIZE_W( m_packet.FlatRectangle.n_size ), COORD_Y( m_packet.FlatRectangle.n_coord ) + m_n_drawoffset_y + SIZE_H( m_packet.FlatRectangle.n_size ) );
 	DebugMeshEnd();
 #endif
 
@@ -2677,6 +2683,7 @@ static void FlatRectangle( void )
 
 static void FlatRectangle8x8( void )
 {
+	running_machine *machine = Machine;
 	INT16 n_y;
 	INT16 n_x;
 
@@ -2699,14 +2706,14 @@ static void FlatRectangle8x8( void )
 	UINT16 *p_vram;
 
 #if defined( MAME_DEBUG )
-	if( m_n_debugskip == 9 )
+	if( m_debug.n_skip == 9 )
 	{
 		return;
 	}
-	DebugMesh( Machine, COORD_X( m_packet.FlatRectangle8x8.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatRectangle8x8.n_coord ) + m_n_drawoffset_y );
-	DebugMesh( Machine, COORD_X( m_packet.FlatRectangle8x8.n_coord ) + m_n_drawoffset_x + 8, COORD_Y( m_packet.FlatRectangle8x8.n_coord ) + m_n_drawoffset_y );
-	DebugMesh( Machine, COORD_X( m_packet.FlatRectangle8x8.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatRectangle8x8.n_coord ) + m_n_drawoffset_y + 8 );
-	DebugMesh( Machine, COORD_X( m_packet.FlatRectangle8x8.n_coord ) + m_n_drawoffset_x + 8, COORD_Y( m_packet.FlatRectangle8x8.n_coord ) + m_n_drawoffset_y + 8 );
+	DebugMesh( COORD_X( m_packet.FlatRectangle8x8.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatRectangle8x8.n_coord ) + m_n_drawoffset_y );
+	DebugMesh( COORD_X( m_packet.FlatRectangle8x8.n_coord ) + m_n_drawoffset_x + 8, COORD_Y( m_packet.FlatRectangle8x8.n_coord ) + m_n_drawoffset_y );
+	DebugMesh( COORD_X( m_packet.FlatRectangle8x8.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatRectangle8x8.n_coord ) + m_n_drawoffset_y + 8 );
+	DebugMesh( COORD_X( m_packet.FlatRectangle8x8.n_coord ) + m_n_drawoffset_x + 8, COORD_Y( m_packet.FlatRectangle8x8.n_coord ) + m_n_drawoffset_y + 8 );
 	DebugMeshEnd();
 #endif
 
@@ -2742,6 +2749,7 @@ static void FlatRectangle8x8( void )
 
 static void FlatRectangle16x16( void )
 {
+	running_machine *machine = Machine;
 	INT16 n_y;
 	INT16 n_x;
 
@@ -2764,14 +2772,14 @@ static void FlatRectangle16x16( void )
 	UINT16 *p_vram;
 
 #if defined( MAME_DEBUG )
-	if( m_n_debugskip == 10 )
+	if( m_debug.n_skip == 10 )
 	{
 		return;
 	}
-	DebugMesh( Machine, COORD_X( m_packet.FlatRectangle16x16.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatRectangle16x16.n_coord ) + m_n_drawoffset_y );
-	DebugMesh( Machine, COORD_X( m_packet.FlatRectangle16x16.n_coord ) + m_n_drawoffset_x + 16, COORD_Y( m_packet.FlatRectangle16x16.n_coord ) + m_n_drawoffset_y );
-	DebugMesh( Machine, COORD_X( m_packet.FlatRectangle16x16.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatRectangle16x16.n_coord ) + m_n_drawoffset_y + 16 );
-	DebugMesh( Machine, COORD_X( m_packet.FlatRectangle16x16.n_coord ) + m_n_drawoffset_x + 16, COORD_Y( m_packet.FlatRectangle16x16.n_coord ) + m_n_drawoffset_y + 16 );
+	DebugMesh( COORD_X( m_packet.FlatRectangle16x16.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatRectangle16x16.n_coord ) + m_n_drawoffset_y );
+	DebugMesh( COORD_X( m_packet.FlatRectangle16x16.n_coord ) + m_n_drawoffset_x + 16, COORD_Y( m_packet.FlatRectangle16x16.n_coord ) + m_n_drawoffset_y );
+	DebugMesh( COORD_X( m_packet.FlatRectangle16x16.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatRectangle16x16.n_coord ) + m_n_drawoffset_y + 16 );
+	DebugMesh( COORD_X( m_packet.FlatRectangle16x16.n_coord ) + m_n_drawoffset_x + 16, COORD_Y( m_packet.FlatRectangle16x16.n_coord ) + m_n_drawoffset_y + 16 );
 	DebugMeshEnd();
 #endif
 
@@ -2807,6 +2815,7 @@ static void FlatRectangle16x16( void )
 
 static void FlatTexturedRectangle( void )
 {
+	running_machine *machine = Machine;
 	INT16 n_y;
 	INT16 n_x;
 	int n_tx;
@@ -2840,14 +2849,14 @@ static void FlatTexturedRectangle( void )
 	UINT16 n_bgr;
 
 #if defined( MAME_DEBUG )
-	if( m_n_debugskip == 11 )
+	if( m_debug.n_skip == 11 )
 	{
 		return;
 	}
-	DebugMesh( Machine, COORD_X( m_packet.FlatTexturedRectangle.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatTexturedRectangle.n_coord ) + m_n_drawoffset_y );
-	DebugMesh( Machine, COORD_X( m_packet.FlatTexturedRectangle.n_coord ) + m_n_drawoffset_x + SIZE_W( m_packet.FlatTexturedRectangle.n_size ), COORD_Y( m_packet.FlatTexturedRectangle.n_coord ) + m_n_drawoffset_y );
-	DebugMesh( Machine, COORD_X( m_packet.FlatTexturedRectangle.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatTexturedRectangle.n_coord ) + m_n_drawoffset_y + SIZE_H( m_packet.FlatTexturedRectangle.n_size ) );
-	DebugMesh( Machine, COORD_X( m_packet.FlatTexturedRectangle.n_coord ) + m_n_drawoffset_x + SIZE_W( m_packet.FlatTexturedRectangle.n_size ), COORD_Y( m_packet.FlatTexturedRectangle.n_coord ) + m_n_drawoffset_y + SIZE_H( m_packet.FlatTexturedRectangle.n_size ) );
+	DebugMesh( COORD_X( m_packet.FlatTexturedRectangle.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatTexturedRectangle.n_coord ) + m_n_drawoffset_y );
+	DebugMesh( COORD_X( m_packet.FlatTexturedRectangle.n_coord ) + m_n_drawoffset_x + SIZE_W( m_packet.FlatTexturedRectangle.n_size ), COORD_Y( m_packet.FlatTexturedRectangle.n_coord ) + m_n_drawoffset_y );
+	DebugMesh( COORD_X( m_packet.FlatTexturedRectangle.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatTexturedRectangle.n_coord ) + m_n_drawoffset_y + SIZE_H( m_packet.FlatTexturedRectangle.n_size ) );
+	DebugMesh( COORD_X( m_packet.FlatTexturedRectangle.n_coord ) + m_n_drawoffset_x + SIZE_W( m_packet.FlatTexturedRectangle.n_size ), COORD_Y( m_packet.FlatTexturedRectangle.n_coord ) + m_n_drawoffset_y + SIZE_H( m_packet.FlatTexturedRectangle.n_size ) );
 	DebugMeshEnd();
 #endif
 
@@ -2905,6 +2914,7 @@ static void FlatTexturedRectangle( void )
 
 static void Sprite8x8( void )
 {
+	running_machine *machine = Machine;
 	INT16 n_y;
 	INT16 n_x;
 	int n_tx;
@@ -2938,14 +2948,14 @@ static void Sprite8x8( void )
 	UINT16 n_bgr;
 
 #if defined( MAME_DEBUG )
-	if( m_n_debugskip == 12 )
+	if( m_debug.n_skip == 12 )
 	{
 		return;
 	}
-	DebugMesh( Machine, COORD_X( m_packet.Sprite8x8.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.Sprite8x8.n_coord ) + m_n_drawoffset_y );
-	DebugMesh( Machine, COORD_X( m_packet.Sprite8x8.n_coord ) + m_n_drawoffset_x + 7, COORD_Y( m_packet.Sprite8x8.n_coord ) + m_n_drawoffset_y );
-	DebugMesh( Machine, COORD_X( m_packet.Sprite8x8.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.Sprite8x8.n_coord ) + m_n_drawoffset_y + 7 );
-	DebugMesh( Machine, COORD_X( m_packet.Sprite8x8.n_coord ) + m_n_drawoffset_x + 7, COORD_Y( m_packet.Sprite8x8.n_coord ) + m_n_drawoffset_y + 7 );
+	DebugMesh( COORD_X( m_packet.Sprite8x8.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.Sprite8x8.n_coord ) + m_n_drawoffset_y );
+	DebugMesh( COORD_X( m_packet.Sprite8x8.n_coord ) + m_n_drawoffset_x + 7, COORD_Y( m_packet.Sprite8x8.n_coord ) + m_n_drawoffset_y );
+	DebugMesh( COORD_X( m_packet.Sprite8x8.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.Sprite8x8.n_coord ) + m_n_drawoffset_y + 7 );
+	DebugMesh( COORD_X( m_packet.Sprite8x8.n_coord ) + m_n_drawoffset_x + 7, COORD_Y( m_packet.Sprite8x8.n_coord ) + m_n_drawoffset_y + 7 );
 	DebugMeshEnd();
 #endif
 
@@ -3003,6 +3013,7 @@ static void Sprite8x8( void )
 
 static void Sprite16x16( void )
 {
+	running_machine *machine = Machine;
 	INT16 n_y;
 	INT16 n_x;
 	int n_tx;
@@ -3036,14 +3047,14 @@ static void Sprite16x16( void )
 	UINT16 n_bgr;
 
 #if defined( MAME_DEBUG )
-	if( m_n_debugskip == 13 )
+	if( m_debug.n_skip == 13 )
 	{
 		return;
 	}
-	DebugMesh( Machine, COORD_X( m_packet.Sprite16x16.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.Sprite16x16.n_coord ) + m_n_drawoffset_y );
-	DebugMesh( Machine, COORD_X( m_packet.Sprite16x16.n_coord ) + m_n_drawoffset_x + 7, COORD_Y( m_packet.Sprite16x16.n_coord ) + m_n_drawoffset_y );
-	DebugMesh( Machine, COORD_X( m_packet.Sprite16x16.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.Sprite16x16.n_coord ) + m_n_drawoffset_y + 7 );
-	DebugMesh( Machine, COORD_X( m_packet.Sprite16x16.n_coord ) + m_n_drawoffset_x + 7, COORD_Y( m_packet.Sprite16x16.n_coord ) + m_n_drawoffset_y + 7 );
+	DebugMesh( COORD_X( m_packet.Sprite16x16.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.Sprite16x16.n_coord ) + m_n_drawoffset_y );
+	DebugMesh( COORD_X( m_packet.Sprite16x16.n_coord ) + m_n_drawoffset_x + 7, COORD_Y( m_packet.Sprite16x16.n_coord ) + m_n_drawoffset_y );
+	DebugMesh( COORD_X( m_packet.Sprite16x16.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.Sprite16x16.n_coord ) + m_n_drawoffset_y + 7 );
+	DebugMesh( COORD_X( m_packet.Sprite16x16.n_coord ) + m_n_drawoffset_x + 7, COORD_Y( m_packet.Sprite16x16.n_coord ) + m_n_drawoffset_y + 7 );
 	DebugMeshEnd();
 #endif
 
@@ -3109,11 +3120,11 @@ static void Dot( void )
 	UINT16 *p_vram;
 
 #if defined( MAME_DEBUG )
-	if( m_n_debugskip == 14 )
+	if( m_debug.n_skip == 14 )
 	{
 		return;
 	}
-	DebugMesh( Machine, COORD_X( m_packet.Dot.vertex.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.Dot.vertex.n_coord ) + m_n_drawoffset_y );
+	DebugMesh( COORD_X( m_packet.Dot.vertex.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.Dot.vertex.n_coord ) + m_n_drawoffset_y );
 	DebugMeshEnd();
 #endif
 
@@ -3147,14 +3158,14 @@ static void MoveImage( void )
 	UINT16 *p_vram;
 
 #if defined( MAME_DEBUG )
-	if( m_n_debugskip == 15 )
+	if( m_debug.n_skip == 15 )
 	{
 		return;
 	}
-	DebugMesh( Machine, COORD_X( m_packet.MoveImage.vertex[ 1 ].n_coord ), COORD_Y( m_packet.MoveImage.vertex[ 1 ].n_coord ) );
-	DebugMesh( Machine, COORD_X( m_packet.MoveImage.vertex[ 1 ].n_coord ) + SIZE_W( m_packet.MoveImage.n_size ), COORD_Y( m_packet.MoveImage.vertex[ 1 ].n_coord ) );
-	DebugMesh( Machine, COORD_X( m_packet.MoveImage.vertex[ 1 ].n_coord ), COORD_Y( m_packet.MoveImage.vertex[ 1 ].n_coord ) + SIZE_H( m_packet.MoveImage.n_size ) );
-	DebugMesh( Machine, COORD_X( m_packet.MoveImage.vertex[ 1 ].n_coord ) + SIZE_W( m_packet.MoveImage.n_size ), COORD_Y( m_packet.MoveImage.vertex[ 1 ].n_coord ) + SIZE_H( m_packet.MoveImage.n_size ) );
+	DebugMesh( COORD_X( m_packet.MoveImage.vertex[ 1 ].n_coord ), COORD_Y( m_packet.MoveImage.vertex[ 1 ].n_coord ) );
+	DebugMesh( COORD_X( m_packet.MoveImage.vertex[ 1 ].n_coord ) + SIZE_W( m_packet.MoveImage.n_size ), COORD_Y( m_packet.MoveImage.vertex[ 1 ].n_coord ) );
+	DebugMesh( COORD_X( m_packet.MoveImage.vertex[ 1 ].n_coord ), COORD_Y( m_packet.MoveImage.vertex[ 1 ].n_coord ) + SIZE_H( m_packet.MoveImage.n_size ) );
+	DebugMesh( COORD_X( m_packet.MoveImage.vertex[ 1 ].n_coord ) + SIZE_W( m_packet.MoveImage.n_size ), COORD_Y( m_packet.MoveImage.vertex[ 1 ].n_coord ) + SIZE_H( m_packet.MoveImage.n_size ) );
 	DebugMeshEnd();
 #endif
 
@@ -3183,19 +3194,21 @@ static void MoveImage( void )
 
 void psx_gpu_write( UINT32 *p_ram, INT32 n_size )
 {
+	running_machine *machine = Machine;
+
 	while( n_size > 0 )
 	{
 		UINT32 data = *( p_ram );
 
-		verboselog( 2, "PSX Packet #%u %08x\n", m_n_gpu_buffer_offset, data );
+		verboselog( machine, 2, "PSX Packet #%u %08x\n", m_n_gpu_buffer_offset, data );
 		m_packet.n_entry[ m_n_gpu_buffer_offset ] = data;
 		switch( m_packet.n_entry[ 0 ] >> 24 )
 		{
 		case 0x00:
-			verboselog( 1, "not handled: GPU Command 0x00: (%08x)\n", data );
+			verboselog( machine, 1, "not handled: GPU Command 0x00: (%08x)\n", data );
 			break;
 		case 0x01:
-			verboselog( 1, "not handled: clear cache\n" );
+			verboselog( machine, 1, "not handled: clear cache\n" );
 			break;
 		case 0x02:
 			if( m_n_gpu_buffer_offset < 2 )
@@ -3204,7 +3217,7 @@ void psx_gpu_write( UINT32 *p_ram, INT32 n_size )
 			}
 			else
 			{
-				verboselog( 1, "%02x: frame buffer rectangle %u,%u %u,%u\n", m_packet.n_entry[ 0 ] >> 24,
+				verboselog( machine, 1, "%02x: frame buffer rectangle %u,%u %u,%u\n", m_packet.n_entry[ 0 ] >> 24,
 					m_packet.n_entry[ 1 ] & 0xffff, m_packet.n_entry[ 1 ] >> 16, m_packet.n_entry[ 2 ] & 0xffff, m_packet.n_entry[ 2 ] >> 16 );
 				FrameBufferRectangleDraw();
 				m_n_gpu_buffer_offset = 0;
@@ -3220,7 +3233,7 @@ void psx_gpu_write( UINT32 *p_ram, INT32 n_size )
 			}
 			else
 			{
-				verboselog( 1, "%02x: monochrome 3 point polygon\n", m_packet.n_entry[ 0 ] >> 24 );
+				verboselog( machine, 1, "%02x: monochrome 3 point polygon\n", m_packet.n_entry[ 0 ] >> 24 );
 				FlatPolygon( 3 );
 				m_n_gpu_buffer_offset = 0;
 			}
@@ -3235,7 +3248,7 @@ void psx_gpu_write( UINT32 *p_ram, INT32 n_size )
 			}
 			else
 			{
-				verboselog( 1, "%02x: textured 3 point polygon\n", m_packet.n_entry[ 0 ] >> 24 );
+				verboselog( machine, 1, "%02x: textured 3 point polygon\n", m_packet.n_entry[ 0 ] >> 24 );
 				FlatTexturedPolygon( 3 );
 				m_n_gpu_buffer_offset = 0;
 			}
@@ -3250,7 +3263,7 @@ void psx_gpu_write( UINT32 *p_ram, INT32 n_size )
 			}
 			else
 			{
-				verboselog( 1, "%02x: monochrome 4 point polygon\n", m_packet.n_entry[ 0 ] >> 24 );
+				verboselog( machine, 1, "%02x: monochrome 4 point polygon\n", m_packet.n_entry[ 0 ] >> 24 );
 				FlatPolygon( 4 );
 				m_n_gpu_buffer_offset = 0;
 			}
@@ -3265,7 +3278,7 @@ void psx_gpu_write( UINT32 *p_ram, INT32 n_size )
 			}
 			else
 			{
-				verboselog( 1, "%02x: textured 4 point polygon\n", m_packet.n_entry[ 0 ] >> 24 );
+				verboselog( machine, 1, "%02x: textured 4 point polygon\n", m_packet.n_entry[ 0 ] >> 24 );
 				FlatTexturedPolygon( 4 );
 				m_n_gpu_buffer_offset = 0;
 			}
@@ -3280,7 +3293,7 @@ void psx_gpu_write( UINT32 *p_ram, INT32 n_size )
 			}
 			else
 			{
-				verboselog( 1, "%02x: gouraud 3 point polygon\n", m_packet.n_entry[ 0 ] >> 24 );
+				verboselog( machine, 1, "%02x: gouraud 3 point polygon\n", m_packet.n_entry[ 0 ] >> 24 );
 				GouraudPolygon( 3 );
 				m_n_gpu_buffer_offset = 0;
 			}
@@ -3295,7 +3308,7 @@ void psx_gpu_write( UINT32 *p_ram, INT32 n_size )
 			}
 			else
 			{
-				verboselog( 1, "%02x: gouraud textured 3 point polygon\n", m_packet.n_entry[ 0 ] >> 24 );
+				verboselog( machine, 1, "%02x: gouraud textured 3 point polygon\n", m_packet.n_entry[ 0 ] >> 24 );
 				GouraudTexturedPolygon( 3 );
 				m_n_gpu_buffer_offset = 0;
 			}
@@ -3310,7 +3323,7 @@ void psx_gpu_write( UINT32 *p_ram, INT32 n_size )
 			}
 			else
 			{
-				verboselog( 1, "%02x: gouraud 4 point polygon\n", m_packet.n_entry[ 0 ] >> 24 );
+				verboselog( machine, 1, "%02x: gouraud 4 point polygon\n", m_packet.n_entry[ 0 ] >> 24 );
 				GouraudPolygon( 4 );
 				m_n_gpu_buffer_offset = 0;
 			}
@@ -3325,7 +3338,7 @@ void psx_gpu_write( UINT32 *p_ram, INT32 n_size )
 			}
 			else
 			{
-				verboselog( 1, "%02x: gouraud textured 4 point polygon\n", m_packet.n_entry[ 0 ] >> 24 );
+				verboselog( machine, 1, "%02x: gouraud textured 4 point polygon\n", m_packet.n_entry[ 0 ] >> 24 );
 				GouraudTexturedPolygon( 4 );
 				m_n_gpu_buffer_offset = 0;
 			}
@@ -3339,7 +3352,7 @@ void psx_gpu_write( UINT32 *p_ram, INT32 n_size )
 			}
 			else
 			{
-				verboselog( 1, "%02x: monochrome line\n", m_packet.n_entry[ 0 ] >> 24 );
+				verboselog( machine, 1, "%02x: monochrome line\n", m_packet.n_entry[ 0 ] >> 24 );
 				MonochromeLine();
 				m_n_gpu_buffer_offset = 0;
 			}
@@ -3353,7 +3366,7 @@ void psx_gpu_write( UINT32 *p_ram, INT32 n_size )
 			}
 			else
 			{
-				verboselog( 1, "%02x: monochrome polyline\n", m_packet.n_entry[ 0 ] >> 24 );
+				verboselog( machine, 1, "%02x: monochrome polyline\n", m_packet.n_entry[ 0 ] >> 24 );
 				MonochromeLine();
 				if( ( m_packet.n_entry[ 3 ] & 0xf000f000 ) != 0x50005000 )
 				{
@@ -3375,7 +3388,7 @@ void psx_gpu_write( UINT32 *p_ram, INT32 n_size )
 			}
 			else
 			{
-				verboselog( 1, "%02x: gouraud line\n", m_packet.n_entry[ 0 ] >> 24 );
+				verboselog( machine, 1, "%02x: gouraud line\n", m_packet.n_entry[ 0 ] >> 24 );
 				GouraudLine();
 				m_n_gpu_buffer_offset = 0;
 			}
@@ -3390,7 +3403,7 @@ void psx_gpu_write( UINT32 *p_ram, INT32 n_size )
 			}
 			else
 			{
-				verboselog( 1, "%02x: gouraud polyline\n", m_packet.n_entry[ 0 ] >> 24 );
+				verboselog( machine, 1, "%02x: gouraud polyline\n", m_packet.n_entry[ 0 ] >> 24 );
 				GouraudLine();
 				if( ( m_packet.n_entry[ 4 ] & 0xf000f000 ) != 0x50005000 )
 				{
@@ -3416,7 +3429,7 @@ void psx_gpu_write( UINT32 *p_ram, INT32 n_size )
 			}
 			else
 			{
-				verboselog( 1, "%02x: rectangle %d,%d %d,%d\n",
+				verboselog( machine, 1, "%02x: rectangle %d,%d %d,%d\n",
 					m_packet.n_entry[ 0 ] >> 24,
 					(INT16)( m_packet.n_entry[ 1 ] & 0xffff ), (INT16)( m_packet.n_entry[ 1 ] >> 16 ),
 					(INT16)( m_packet.n_entry[ 2 ] & 0xffff ), (INT16)( m_packet.n_entry[ 2 ] >> 16 ) );
@@ -3434,7 +3447,7 @@ void psx_gpu_write( UINT32 *p_ram, INT32 n_size )
 			}
 			else
 			{
-				verboselog( 1, "%02x: sprite %d,%d %u,%u %08x, %08x\n",
+				verboselog( machine, 1, "%02x: sprite %d,%d %u,%u %08x, %08x\n",
 					m_packet.n_entry[ 0 ] >> 24,
 					(INT16)( m_packet.n_entry[ 1 ] & 0xffff ), (INT16)( m_packet.n_entry[ 1 ] >> 16 ),
 					m_packet.n_entry[ 3 ] & 0xffff, m_packet.n_entry[ 3 ] >> 16,
@@ -3451,7 +3464,7 @@ void psx_gpu_write( UINT32 *p_ram, INT32 n_size )
 			}
 			else
 			{
-				verboselog( 1, "%02x: dot %d,%d %08x\n",
+				verboselog( machine, 1, "%02x: dot %d,%d %08x\n",
 					m_packet.n_entry[ 0 ] >> 24,
 					(INT16)( m_packet.n_entry[ 1 ] & 0xffff ), (INT16)( m_packet.n_entry[ 1 ] >> 16 ),
 					m_packet.n_entry[ 0 ] & 0xffffff );
@@ -3468,7 +3481,7 @@ void psx_gpu_write( UINT32 *p_ram, INT32 n_size )
 			}
 			else
 			{
-				verboselog( 1, "%02x: 16x16 rectangle %08x %08x\n", m_packet.n_entry[ 0 ] >> 24,
+				verboselog( machine, 1, "%02x: 16x16 rectangle %08x %08x\n", m_packet.n_entry[ 0 ] >> 24,
 					m_packet.n_entry[ 0 ], m_packet.n_entry[ 1 ] );
 				FlatRectangle8x8();
 				m_n_gpu_buffer_offset = 0;
@@ -3484,7 +3497,7 @@ void psx_gpu_write( UINT32 *p_ram, INT32 n_size )
 			}
 			else
 			{
-				verboselog( 1, "%02x: 8x8 sprite %08x %08x %08x\n", m_packet.n_entry[ 0 ] >> 24,
+				verboselog( machine, 1, "%02x: 8x8 sprite %08x %08x %08x\n", m_packet.n_entry[ 0 ] >> 24,
 					m_packet.n_entry[ 0 ], m_packet.n_entry[ 1 ], m_packet.n_entry[ 2 ] );
 				Sprite8x8();
 				m_n_gpu_buffer_offset = 0;
@@ -3499,7 +3512,7 @@ void psx_gpu_write( UINT32 *p_ram, INT32 n_size )
 			}
 			else
 			{
-				verboselog( 1, "%02x: 16x16 rectangle %08x %08x\n", m_packet.n_entry[ 0 ] >> 24,
+				verboselog( machine, 1, "%02x: 16x16 rectangle %08x %08x\n", m_packet.n_entry[ 0 ] >> 24,
 					m_packet.n_entry[ 0 ], m_packet.n_entry[ 1 ] );
 				FlatRectangle16x16();
 				m_n_gpu_buffer_offset = 0;
@@ -3515,7 +3528,7 @@ void psx_gpu_write( UINT32 *p_ram, INT32 n_size )
 			}
 			else
 			{
-				verboselog( 1, "%02x: 16x16 sprite %08x %08x %08x\n", m_packet.n_entry[ 0 ] >> 24,
+				verboselog( machine, 1, "%02x: 16x16 sprite %08x %08x %08x\n", m_packet.n_entry[ 0 ] >> 24,
 					m_packet.n_entry[ 0 ], m_packet.n_entry[ 1 ], m_packet.n_entry[ 2 ] );
 				Sprite16x16();
 				m_n_gpu_buffer_offset = 0;
@@ -3528,7 +3541,7 @@ void psx_gpu_write( UINT32 *p_ram, INT32 n_size )
 			}
 			else
 			{
-				verboselog( 1, "move image in frame buffer %08x %08x %08x %08x\n", m_packet.n_entry[ 0 ], m_packet.n_entry[ 1 ], m_packet.n_entry[ 2 ], m_packet.n_entry[ 3 ] );
+				verboselog( machine, 1, "move image in frame buffer %08x %08x %08x %08x\n", m_packet.n_entry[ 0 ], m_packet.n_entry[ 1 ], m_packet.n_entry[ 2 ], m_packet.n_entry[ 3 ] );
 				MoveImage();
 				m_n_gpu_buffer_offset = 0;
 			}
@@ -3545,7 +3558,7 @@ void psx_gpu_write( UINT32 *p_ram, INT32 n_size )
 				{
 					UINT16 *p_vram;
 
-					verboselog( 2, "send image to framebuffer ( pixel %u,%u = %u )\n",
+					verboselog( machine, 2, "send image to framebuffer ( pixel %u,%u = %u )\n",
 						( m_n_vramx + m_packet.n_entry[ 1 ] ) & 1023,
 						( m_n_vramy + ( m_packet.n_entry[ 1 ] >> 16 ) ) & 1023,
 						data & 0xffff );
@@ -3559,7 +3572,7 @@ void psx_gpu_write( UINT32 *p_ram, INT32 n_size )
 						m_n_vramy++;
 						if( m_n_vramy >= ( m_packet.n_entry[ 2 ] >> 16 ) )
 						{
-							verboselog( 1, "%02x: send image to framebuffer %u,%u %u,%u\n", m_packet.n_entry[ 0 ] >> 24,
+							verboselog( machine, 1, "%02x: send image to framebuffer %u,%u %u,%u\n", m_packet.n_entry[ 0 ] >> 24,
 								m_packet.n_entry[ 1 ] & 0xffff, ( m_packet.n_entry[ 1 ] >> 16 ),
 								m_packet.n_entry[ 2 ] & 0xffff, ( m_packet.n_entry[ 2 ] >> 16 ) );
 							m_n_gpu_buffer_offset = 0;
@@ -3579,12 +3592,12 @@ void psx_gpu_write( UINT32 *p_ram, INT32 n_size )
 			}
 			else
 			{
-				verboselog( 1, "%02x: copy image from frame buffer\n", m_packet.n_entry[ 0 ] >> 24 );
+				verboselog( machine, 1, "%02x: copy image from frame buffer\n", m_packet.n_entry[ 0 ] >> 24 );
 				m_n_gpustatus |= ( 1L << 0x1b );
 			}
 			break;
 		case 0xe1:
-			verboselog( 1, "%02x: draw mode %06x\n", m_packet.n_entry[ 0 ] >> 24,
+			verboselog( machine, 1, "%02x: draw mode %06x\n", m_packet.n_entry[ 0 ] >> 24,
 				m_packet.n_entry[ 0 ] & 0xffffff );
 			decode_tpage( &psxgpu, m_packet.n_entry[ 0 ] & 0xffffff );
 			break;
@@ -3593,7 +3606,7 @@ void psx_gpu_write( UINT32 *p_ram, INT32 n_size )
 			m_n_twx = ( ( ( m_packet.n_entry[ 0 ] >> 10 ) & 0x1f ) << 3 );
 			m_n_twh = 255 - ( ( ( m_packet.n_entry[ 0 ] >> 5 ) & 0x1f ) << 3 );
 			m_n_tww = 255 - ( ( m_packet.n_entry[ 0 ] & 0x1f ) << 3 );
-			verboselog( 1, "%02x: texture window %u,%u %u,%u\n", m_packet.n_entry[ 0 ] >> 24,
+			verboselog( machine, 1, "%02x: texture window %u,%u %u,%u\n", m_packet.n_entry[ 0 ] >> 24,
 				m_n_twx, m_n_twy, m_n_tww, m_n_twh );
 			break;
 		case 0xe3:
@@ -3606,7 +3619,7 @@ void psx_gpu_write( UINT32 *p_ram, INT32 n_size )
 			{
 				m_n_drawarea_y1 = ( m_packet.n_entry[ 0 ] >> 12 ) & 1023;
 			}
-			verboselog( 1, "%02x: drawing area top left %d,%d\n", m_packet.n_entry[ 0 ] >> 24,
+			verboselog( machine, 1, "%02x: drawing area top left %d,%d\n", m_packet.n_entry[ 0 ] >> 24,
 				m_n_drawarea_x1, m_n_drawarea_y1 );
 			break;
 		case 0xe4:
@@ -3619,7 +3632,7 @@ void psx_gpu_write( UINT32 *p_ram, INT32 n_size )
 			{
 				m_n_drawarea_y2 = ( m_packet.n_entry[ 0 ] >> 12 ) & 1023;
 			}
-			verboselog( 1, "%02x: drawing area bottom right %d,%d\n", m_packet.n_entry[ 0 ] >> 24,
+			verboselog( machine, 1, "%02x: drawing area bottom right %d,%d\n", m_packet.n_entry[ 0 ] >> 24,
 				m_n_drawarea_x2, m_n_drawarea_y2 );
 			break;
 		case 0xe5:
@@ -3632,7 +3645,7 @@ void psx_gpu_write( UINT32 *p_ram, INT32 n_size )
 			{
 				m_n_drawoffset_y = SINT11( ( m_packet.n_entry[ 0 ] >> 12 ) & 2047 );
 			}
-			verboselog( 1, "%02x: drawing offset %d,%d\n", m_packet.n_entry[ 0 ] >> 24,
+			verboselog( machine, 1, "%02x: drawing offset %d,%d\n", m_packet.n_entry[ 0 ] >> 24,
 				m_n_drawoffset_x, m_n_drawoffset_y );
 			break;
 		case 0xe6:
@@ -3640,18 +3653,18 @@ void psx_gpu_write( UINT32 *p_ram, INT32 n_size )
 			m_n_gpustatus |= ( data & 0x03 ) << 0xb;
 			if( ( m_packet.n_entry[ 0 ] & 3 ) != 0 )
 			{
-				verboselog( 1, "not handled: mask setting %d\n", m_packet.n_entry[ 0 ] & 3 );
+				verboselog( machine, 1, "not handled: mask setting %d\n", m_packet.n_entry[ 0 ] & 3 );
 			}
 			else
 			{
-				verboselog( 1, "mask setting %d\n", m_packet.n_entry[ 0 ] & 3 );
+				verboselog( machine, 1, "mask setting %d\n", m_packet.n_entry[ 0 ] & 3 );
 			}
 			break;
 		default:
 #if defined( MAME_DEBUG )
 			popmessage( "unknown GPU packet %08x", m_packet.n_entry[ 0 ] );
 #endif
-			verboselog( 0, "unknown GPU packet %08x (%08x)\n", m_packet.n_entry[ 0 ], data );
+			verboselog( machine, 0, "unknown GPU packet %08x (%08x)\n", m_packet.n_entry[ 0 ], data );
 #if ( STOP_ON_ERROR )
 			m_n_gpu_buffer_offset = 1;
 #endif
@@ -3664,6 +3677,8 @@ void psx_gpu_write( UINT32 *p_ram, INT32 n_size )
 
 WRITE32_HANDLER( psx_gpu_w )
 {
+	running_machine *machine = space->machine;
+
 	switch( offset )
 	{
 	case 0x00:
@@ -3673,7 +3688,7 @@ WRITE32_HANDLER( psx_gpu_w )
 		switch( data >> 24 )
 		{
 		case 0x00:
-			verboselog( 1, "reset gpu\n" );
+			verboselog( machine, 1, "reset gpu\n" );
 			m_n_gpu_buffer_offset = 0;
 			m_n_gpustatus = 0x14802000;
 			m_n_drawarea_x1 = 0;
@@ -3697,18 +3712,18 @@ WRITE32_HANDLER( psx_gpu_w )
 			updatevisiblearea(space->machine, NULL);
 			break;
 		case 0x01:
-			verboselog( 1, "not handled: reset command buffer\n" );
+			verboselog( machine, 1, "not handled: reset command buffer\n" );
 			m_n_gpu_buffer_offset = 0;
 			break;
 		case 0x02:
-			verboselog( 1, "not handled: reset irq\n" );
+			verboselog( machine, 1, "not handled: reset irq\n" );
 			break;
 		case 0x03:
 			m_n_gpustatus &= ~( 1L << 0x17 );
 			m_n_gpustatus |= ( data & 0x01 ) << 0x17;
 			break;
 		case 0x04:
-			verboselog( 1, "dma setup %d\n", data & 3 );
+			verboselog( machine, 1, "dma setup %d\n", data & 3 );
 			m_n_gpustatus &= ~( 3L << 0x1d );
 			m_n_gpustatus |= ( data & 0x03 ) << 0x1d;
 			m_n_gpustatus &= ~( 1L << 0x19 );
@@ -3727,20 +3742,20 @@ WRITE32_HANDLER( psx_gpu_w )
 			{
 				m_n_displaystarty = ( data >> 12 ) & 1023;
 			}
-			verboselog( 1, "start of display area %d %d\n", m_n_displaystartx, m_n_displaystarty );
+			verboselog( machine, 1, "start of display area %d %d\n", m_n_displaystartx, m_n_displaystarty );
 			break;
 		case 0x06:
 			m_n_horiz_disstart = data & 4095;
 			m_n_horiz_disend = ( data >> 12 ) & 4095;
-			verboselog( 1, "horizontal display range %d %d\n", m_n_horiz_disstart, m_n_horiz_disend );
+			verboselog( machine, 1, "horizontal display range %d %d\n", m_n_horiz_disstart, m_n_horiz_disend );
 			break;
 		case 0x07:
 			m_n_vert_disstart = data & 1023;
 			m_n_vert_disend = ( data >> 10 ) & 2047;
-			verboselog( 1, "vertical display range %d %d\n", m_n_vert_disstart, m_n_vert_disend );
+			verboselog( machine, 1, "vertical display range %d %d\n", m_n_vert_disstart, m_n_vert_disend );
 			break;
 		case 0x08:
-			verboselog( 1, "display mode %02x\n", data & 0xff );
+			verboselog( machine, 1, "display mode %02x\n", data & 0xff );
 			m_n_gpustatus &= ~( 127L << 0x10 );
 			m_n_gpustatus |= ( data & 0x3f ) << 0x11; /* width 0 + height + videmode + isrgb24 + isinter */
 			m_n_gpustatus |= ( ( data & 0x40 ) >> 0x06 ) << 0x10; /* width 1 */
@@ -3751,10 +3766,10 @@ WRITE32_HANDLER( psx_gpu_w )
 			updatevisiblearea(space->machine, NULL);
 			break;
 		case 0x09:
-			verboselog( 1, "not handled: GPU Control 0x09: %08x\n", data );
+			verboselog( machine, 1, "not handled: GPU Control 0x09: %08x\n", data );
 			break;
 		case 0x0d:
-			verboselog( 1, "reset lightgun coordinates %08x\n", data );
+			verboselog( machine, 1, "reset lightgun coordinates %08x\n", data );
 			m_n_lightgun_x = 0;
 			m_n_lightgun_y = 0;
 			break;
@@ -3770,7 +3785,7 @@ WRITE32_HANDLER( psx_gpu_w )
 				{
 					m_n_gpuinfo = m_n_drawarea_x1 | ( m_n_drawarea_y1 << 12 );
 				}
-				verboselog( 1, "GPU Info - Draw area top left %08x\n", m_n_gpuinfo );
+				verboselog( machine, 1, "GPU Info - Draw area top left %08x\n", m_n_gpuinfo );
 				break;
 			case 0x04:
 				if( m_n_gputype == 2 )
@@ -3781,7 +3796,7 @@ WRITE32_HANDLER( psx_gpu_w )
 				{
 					m_n_gpuinfo = m_n_drawarea_x2 | ( m_n_drawarea_y2 << 12 );
 				}
-				verboselog( 1, "GPU Info - Draw area bottom right %08x\n", m_n_gpuinfo );
+				verboselog( machine, 1, "GPU Info - Draw area bottom right %08x\n", m_n_gpuinfo );
 				break;
 			case 0x05:
 				if( m_n_gputype == 2 )
@@ -3792,35 +3807,35 @@ WRITE32_HANDLER( psx_gpu_w )
 				{
 					m_n_gpuinfo = ( m_n_drawoffset_x & 2047 ) | ( ( m_n_drawoffset_y & 2047 ) << 12 );
 				}
-				verboselog( 1, "GPU Info - Draw offset %08x\n", m_n_gpuinfo );
+				verboselog( machine, 1, "GPU Info - Draw offset %08x\n", m_n_gpuinfo );
 				break;
 			case 0x07:
 				m_n_gpuinfo = m_n_gputype;
-				verboselog( 1, "GPU Info - GPU Type %08x\n", m_n_gpuinfo );
+				verboselog( machine, 1, "GPU Info - GPU Type %08x\n", m_n_gpuinfo );
 				break;
 			case 0x08:
 				m_n_gpuinfo = m_n_lightgun_x | ( m_n_lightgun_y << 16 );
-				verboselog( 1, "GPU Info - lightgun coordinates %08x\n", m_n_gpuinfo );
+				verboselog( machine, 1, "GPU Info - lightgun coordinates %08x\n", m_n_gpuinfo );
 				break;
 			default:
-				verboselog( 0, "GPU Info - unknown request (%08x)\n", data );
+				verboselog( machine, 0, "GPU Info - unknown request (%08x)\n", data );
 				m_n_gpuinfo = 0;
 				break;
 			}
 			break;
 		case 0x20:
-			verboselog( 1, "not handled: GPU Control 0x20: %08x\n", data );
+			verboselog( machine, 1, "not handled: GPU Control 0x20: %08x\n", data );
 			break;
 		default:
 #if defined( MAME_DEBUG )
 			popmessage( "unknown GPU command %08x", data );
 #endif
-			verboselog( 0, "gpu_w( %08x ) unknown GPU command\n", data );
+			verboselog( machine, 0, "gpu_w( %08x ) unknown GPU command\n", data );
 			break;
 		}
 		break;
 	default:
-		verboselog( 0, "gpu_w( %08x, %08x, %08x ) unknown register\n", offset, data, mem_mask );
+		verboselog( machine, 0, "gpu_w( %08x, %08x, %08x ) unknown register\n", offset, data, mem_mask );
 		break;
 	}
 }
@@ -3828,6 +3843,8 @@ WRITE32_HANDLER( psx_gpu_w )
 
 void psx_gpu_read( UINT32 *p_ram, INT32 n_size )
 {
+	running_machine *machine = Machine;
+
 	while( n_size > 0 )
 	{
 		if( ( m_n_gpustatus & ( 1L << 0x1b ) ) != 0 )
@@ -3835,7 +3852,7 @@ void psx_gpu_read( UINT32 *p_ram, INT32 n_size )
 			UINT32 n_pixel;
 			PAIR data;
 
-			verboselog( 2, "copy image from frame buffer ( %d, %d )\n", m_n_vramx, m_n_vramy );
+			verboselog( machine, 2, "copy image from frame buffer ( %d, %d )\n", m_n_vramx, m_n_vramy );
 			data.d = 0;
 			for( n_pixel = 0; n_pixel < 2; n_pixel++ )
 			{
@@ -3848,7 +3865,7 @@ void psx_gpu_read( UINT32 *p_ram, INT32 n_size )
 					m_n_vramy++;
 					if( m_n_vramy >= ( m_packet.n_entry[ 2 ] >> 16 ) )
 					{
-						verboselog( 1, "copy image from frame buffer end\n" );
+						verboselog( machine, 1, "copy image from frame buffer end\n" );
 						m_n_gpustatus &= ~( 1L << 0x1b );
 						m_n_gpu_buffer_offset = 0;
 						m_n_vramx = 0;
@@ -3866,7 +3883,7 @@ void psx_gpu_read( UINT32 *p_ram, INT32 n_size )
 		}
 		else
 		{
-			verboselog( 2, "read GPU info (%08x)\n", m_n_gpuinfo );
+			verboselog( machine, 2, "read GPU info (%08x)\n", m_n_gpuinfo );
 			*( p_ram ) = m_n_gpuinfo;
 		}
 		p_ram++;
@@ -3884,11 +3901,11 @@ READ32_HANDLER( psx_gpu_r )
 		psx_gpu_read( &data, 1 );
 		break;
 	case 0x01:
-		verboselog( 1, "read GPU status (%08x)\n", m_n_gpustatus );
+		verboselog( space->machine, 1, "read GPU status (%08x)\n", m_n_gpustatus );
 		data = m_n_gpustatus;
 		break;
 	default:
-		verboselog( 0, "gpu_r( %08x, %08x ) unknown register\n", offset, mem_mask );
+		verboselog( space->machine, 0, "gpu_r( %08x, %08x ) unknown register\n", offset, mem_mask );
 		data = 0;
 		break;
 	}

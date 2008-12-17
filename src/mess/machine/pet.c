@@ -270,9 +270,9 @@ static const pia6821_interface pet_pia1 =
     pet_pia1_cb2_write,			/* out_cb2_func */
 };
 
-static WRITE8_HANDLER( pet_address_line_11 )
+static WRITE8_DEVICE_HANDLER( pet_address_line_11 )
 {
-	running_machine *machine = space->machine;
+	running_machine *machine = device->machine;
 	DBG_LOG (1, "address line", ("%d\n", data));
 	if (data) pet_font |= 1;
 	else pet_font &= ~1;
@@ -295,48 +295,48 @@ static WRITE8_HANDLER( pet_address_line_11 )
    cb1 cassettes
    cb2 user port
  */
-static READ8_HANDLER( pet_via_port_b_r )
+static READ8_DEVICE_HANDLER( pet_via_port_b_r )
 {
 	UINT8 data = 0;
 
-	if (cbm_ieee_ndac_r(space->machine)) data |= 0x01;
+	if (cbm_ieee_ndac_r(device->machine)) data |= 0x01;
 
 	//	data & 0x08 -> cassette write (it seems to BOTH cassettes from schematics)
 
 	if (!(data & 0x10))
 	{
-		cassette_change_state(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette2" ),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+		cassette_change_state(device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette2" ),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
 		timer_adjust_periodic(datasette2_timer, attotime_zero, 0, ATTOTIME_IN_HZ(48000));	// I put 48000 because I was given some .wav with this freq
 	}
 	else
 	{
-		cassette_change_state(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette2" ),CASSETTE_MOTOR_DISABLED ,CASSETTE_MASK_MOTOR);
+		cassette_change_state(device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette2" ),CASSETTE_MOTOR_DISABLED ,CASSETTE_MASK_MOTOR);
 		timer_reset(datasette2_timer, attotime_never);
 	}
 
-	if (cbm_ieee_nrfd_r(space->machine)) data |= 0x40;
+	if (cbm_ieee_nrfd_r(device->machine)) data |= 0x40;
 
-	if (cbm_ieee_dav_r(space->machine)) data |= 0x80;
+	if (cbm_ieee_dav_r(device->machine)) data |= 0x80;
 
 	return data;
 }
 
 /* NOT WORKING - Just placeholder */
-static READ8_HANDLER( pet_via_cb1_r )
+static READ8_DEVICE_HANDLER( pet_via_cb1_r )
 {
 	// cassette 2 read
-	return (cassette_input(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette2" )) > +0.0) ? 1 : 0;
+	return (cassette_input(device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette2" )) > +0.0) ? 1 : 0;
 }
 
 
-static WRITE8_HANDLER( pet_via_port_b_w )
+static WRITE8_DEVICE_HANDLER( pet_via_port_b_w )
 {
 	cbm_ieee_nrfd_w(0, data & 2);
 	cbm_ieee_atn_w(0, data & 4);
 }
 
 
-static const struct via6522_interface pet_via =
+const via6522_interface pet_via =
 {
 	NULL,					/* in_a_func */
 	pet_via_port_b_r,		/* in_b_func */
@@ -356,12 +356,14 @@ static struct {
 
 static WRITE8_HANDLER(cbm8096_io_w)
 {
+	const device_config *via_0 = device_list_find_by_tag(space->machine->config->devicelist, VIA6522, "via6522_0");
+
 	if (offset < 0x10) ;
 	else if (offset < 0x14) pia_0_w(space, offset & 3, data);
 	else if (offset < 0x20) ;
 	else if (offset < 0x24) pia_1_w(space, offset & 3, data);
 	else if (offset < 0x40) ;
-	else if (offset < 0x50) via_0_w(space, offset & 0xf, data);
+	else if (offset < 0x50) via_w(via_0, offset & 0xf, data);
 	else if (offset < 0x80) ;
 	else if (offset == 0x80) pet_mc6845_address_w(space, offset, data);
 	else if (offset == 0x81) pet_mc6845_register_w(space, offset, data);
@@ -369,13 +371,15 @@ static WRITE8_HANDLER(cbm8096_io_w)
 
 static READ8_HANDLER(cbm8096_io_r)
 {
+	const device_config *via_0 = device_list_find_by_tag(space->machine->config->devicelist, VIA6522, "via6522_0");
+
 	int data = 0xff;
 	if (offset < 0x10) ;
 	else if (offset < 0x14) data = pia_0_r(space, offset & 3);
 	else if (offset < 0x20) ;
 	else if (offset < 0x24) data = pia_1_r(space, offset & 3);
 	else if (offset < 0x40) ;
-	else if (offset < 0x50) data = via_0_r(space, offset & 0xf);
+	else if (offset < 0x50) data = via_r(via_0, offset & 0xf);
 	else if (offset < 0x80) ;
 	else if (offset == 0x81) data = pet_mc6845_register_r(space, offset);
 	return data;
@@ -569,9 +573,10 @@ static TIMER_CALLBACK( pet_tape1_timer )
 /* NOT WORKING - Just placeholder */
 static TIMER_CALLBACK( pet_tape2_timer )
 {
+	const device_config *via_0 = device_list_find_by_tag(machine->config->devicelist, VIA6522, "via6522_0");
 //	cassette 2
 	UINT8 data = (cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette2" )) > +0.0) ? 1 : 0;
-	via_0_cb1_w(cputag_get_address_space(machine,"main",ADDRESS_SPACE_PROGRAM), 0, data);
+	via_cb1_w(via_0, 0, data);
 }
 
 
@@ -606,9 +611,7 @@ static void pet_common_driver_init(running_machine *machine)
 	datasette1_timer = timer_alloc(machine, pet_tape1_timer, NULL);
 	datasette2_timer = timer_alloc(machine, pet_tape2_timer, NULL);
 
-
-	via_config(0, &pet_via);
-	pia_config(1, &pet_pia1);
+	pia_config(machine, 1, &pet_pia1);
 
 	cbm_ieee_open();
 }
@@ -618,28 +621,28 @@ DRIVER_INIT( pet2001 )
 {
 	pet_basic1 = 1;
 	pet_common_driver_init(machine);
-	pia_config(0, &pet_pia0);
+	pia_config(machine, 0, &pet_pia0);
 	pet_vh_init(machine);
 }
 
 DRIVER_INIT( pet )
 {
 	pet_common_driver_init(machine);
-	pia_config(0, &pet_pia0);
+	pia_config(machine, 0, &pet_pia0);
 	pet_vh_init(machine);
 }
 
 DRIVER_INIT( petb )
 {
 	pet_common_driver_init(machine);
-	pia_config(0, &petb_pia0);
+	pia_config(machine, 0, &petb_pia0);
 	pet_vh_init(machine);
 }
 
 DRIVER_INIT( pet40 )
 {
 	pet_common_driver_init(machine);
-	pia_config(0, &pet_pia0);
+	pia_config(machine, 0, &pet_pia0);
 	pet_vh_init(machine);
 }
 
@@ -649,7 +652,7 @@ DRIVER_INIT( pet80 )
 	pet_memory = memory_region(machine, "main");
 
 	pet_common_driver_init(machine);
-	pia_config(0, &petb_pia0);
+	pia_config(machine, 0, &petb_pia0);
 	videoram = &pet_memory[0x8000];
 	videoram_size = 0x800;
 	pet80_vh_init(machine);
@@ -659,7 +662,7 @@ DRIVER_INIT( superpet )
 {
 	superpet = 1;
 	pet_common_driver_init(machine);
-	pia_config(0, &petb_pia0);
+	pia_config(machine, 0, &petb_pia0);
 
 	superpet_memory = auto_malloc(0x10000);
 
@@ -671,7 +674,6 @@ DRIVER_INIT( superpet )
 
 MACHINE_RESET( pet )
 {
-	via_reset();
 	pia_reset();
 
 	if (superpet)

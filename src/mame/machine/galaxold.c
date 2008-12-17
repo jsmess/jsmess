@@ -70,11 +70,11 @@ static void machine_reset_common(running_machine *machine, int line)
 	irq_line = line;
 
 	/* initalize main CPU interrupt generator flip-flops */
-	TTL7474_config(0, &galaxold_7474_9M_2_intf);
+	TTL7474_config(machine, 0, &galaxold_7474_9M_2_intf);
 	TTL7474_preset_w(0, 1);
 	TTL7474_clear_w (0, 1);
 
-	TTL7474_config(1, &galaxold_7474_9M_1_intf);
+	TTL7474_config(machine, 1, &galaxold_7474_9M_1_intf);
 	TTL7474_clear_w (1, 1);
 	TTL7474_d_w     (1, 0);
 	TTL7474_preset_w(1, 0);
@@ -405,7 +405,7 @@ DRIVER_INIT( 4in1 )
 
 INTERRUPT_GEN( hunchbks_vh_interrupt )
 {
-	cpu_set_input_line_and_vector(device,0,PULSE_LINE,0x03);
+	generic_pulse_irq_line_and_vector(device,0,0x03);
 }
 
 DRIVER_INIT( ladybugg )

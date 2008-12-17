@@ -13,6 +13,7 @@
 #define SYM1_H_
 
 #include "machine/6532riot.h"
+#include "machine/6522via.h"
 #include "machine/74145.h"
 
 /* SYM-1 main (and only) oscillator Y1 */
@@ -29,6 +30,10 @@ extern UINT8 *sym1_monitor;
 
 extern const riot6532_interface sym1_r6532_interface;
 extern const ttl74145_interface sym1_ttl74145_intf;
+extern const via6522_interface sym1_via0;
+extern const via6522_interface sym1_via1;
+extern const via6522_interface sym1_via2;
+
 DRIVER_INIT( sym1 );
 MACHINE_RESET( sym1 );
 

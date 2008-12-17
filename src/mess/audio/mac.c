@@ -70,10 +70,10 @@ static void mac_sound_update(void *param,stream_sample_t **inputs, stream_sample
 /* Sound handler start              */
 /************************************/
 
-void *mac_sh_start(int clock, const custom_sound_interface *config)
+void *mac_sh_start(const device_config *device, int clock, const custom_sound_interface *config)
 {
 	snd_cache = auto_malloc(SND_CACHE_SIZE * sizeof(*snd_cache));
-	mac_stream = stream_create(0, 1, MAC_SAMPLE_RATE, 0, mac_sound_update);
+	mac_stream = stream_create(device, 0, 1, MAC_SAMPLE_RATE, 0, mac_sound_update);
 	snd_cache_head = snd_cache_len = snd_cache_tail = 0;
 	return (void *) ~0;
 }

@@ -30,6 +30,7 @@
 
 // MAME/MAMEUI headers
 #include "unzip.h"
+#include "devintrf.h"
 #include "sound/samples.h"
 #include "winutf8.h"
 #include "strconv.h"

@@ -612,7 +612,7 @@ static WRITE32_HANDLER( parallel_port_w )
 	}
 }
 
-static UINT32 cx5510_pci_r(int function, int reg, UINT32 mem_mask)
+static UINT32 cx5510_pci_r(const device_config *busdevice, const device_config *device, int function, int reg, UINT32 mem_mask)
 {
 //  mame_printf_debug("CX5510: PCI read %d, %02X, %08X\n", function, reg, mem_mask);
 
@@ -624,7 +624,7 @@ static UINT32 cx5510_pci_r(int function, int reg, UINT32 mem_mask)
 	return cx5510_regs[reg/4];
 }
 
-static void cx5510_pci_w(int function, int reg, UINT32 data, UINT32 mem_mask)
+static void cx5510_pci_w(const device_config *busdevice, const device_config *device, int function, int reg, UINT32 data, UINT32 mem_mask)
 {
 //  mame_printf_debug("CX5510: PCI write %d, %02X, %08X, %08X\n", function, reg, data, mem_mask);
 	COMBINE_DATA(cx5510_regs + (reg/4));
@@ -773,15 +773,10 @@ static WRITE8_HANDLER(at_page8_w)
 static DMA8237_MEM_READ( pc_dma_read_byte )
 {
 	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	UINT8 result;
 	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
 		& 0xFF0000;
 
-	cpu_push_context(space->cpu);
-	result = memory_read_byte(space, page_offset + offset);
-	cpu_pop_context();
-
-	return result;
+	return memory_read_byte(space, page_offset + offset);
 }
 
 
@@ -791,9 +786,7 @@ static DMA8237_MEM_WRITE( pc_dma_write_byte )
 	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
 		& 0xFF0000;
 
-	cpu_push_context(space->cpu);
 	memory_write_byte(space, page_offset + offset, data);
-	cpu_pop_context();
 }
 
 
@@ -854,7 +847,7 @@ static ADDRESS_MAP_START(mediagx_io, ADDRESS_SPACE_IO, 32)
 	AM_RANGE(0x0378, 0x037b) AM_READWRITE(parallel_port_r, parallel_port_w)
 	AM_RANGE(0x03f0, 0x03ff) AM_DEVREADWRITE(IDE_CONTROLLER, "ide", fdc_r, fdc_w)
 	AM_RANGE(0x0400, 0x04ff) AM_READWRITE(ad1847_r, ad1847_w)
-	AM_RANGE(0x0cf8, 0x0cff) AM_READWRITE(pci_32le_r,				pci_32le_w)
+	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE(PCI_BUS, "pcibus", pci_32le_r,	pci_32le_w)
 ADDRESS_MAP_END
 
 /*****************************************************************************/
@@ -964,6 +957,7 @@ static MACHINE_RESET(mediagx)
 	cpu_set_irq_callback(machine->cpu[0], irq_callback);
 
 	memcpy(bios_ram, rom, 0x40000);
+	cpu_reset(machine->cpu[0]);
 
 	dacl = auto_malloc(65536 * sizeof(INT16));
 	dacr = auto_malloc(65536 * sizeof(INT16));
@@ -1040,20 +1034,18 @@ static MACHINE_DRIVER_START(mediagx)
 	MDRV_MACHINE_START(mediagx)
 	MDRV_MACHINE_RESET(mediagx)
 
-	MDRV_DEVICE_ADD( "pit8254", PIT8254 )
-	MDRV_DEVICE_CONFIG( mediagx_pit8254_config )
+	MDRV_PCI_BUS_ADD("pcibus", 0)
+	MDRV_PCI_BUS_DEVICE(18, NULL, NULL, cx5510_pci_r, cx5510_pci_w)
 
-	MDRV_DEVICE_ADD( "dma8237_1", DMA8237 )
-	MDRV_DEVICE_CONFIG( dma8237_1_config )
+	MDRV_PIT8254_ADD( "pit8254", mediagx_pit8254_config )
 
-	MDRV_DEVICE_ADD( "dma8237_2", DMA8237 )
-	MDRV_DEVICE_CONFIG( dma8237_2_config )
+	MDRV_DMA8237_ADD( "dma8237_1", dma8237_1_config )
 
-	MDRV_DEVICE_ADD( "pic8259_master", PIC8259 )
-	MDRV_DEVICE_CONFIG( mediagx_pic8259_1_config )
+	MDRV_DMA8237_ADD( "dma8237_2", dma8237_2_config )
 
-	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
-	MDRV_DEVICE_CONFIG( mediagx_pic8259_2_config )
+	MDRV_PIC8259_ADD( "pic8259_master", mediagx_pic8259_1_config )
+
+	MDRV_PIC8259_ADD( "pic8259_slave", mediagx_pic8259_2_config )
 
 	MDRV_IDE_CONTROLLER_ADD("ide", ide_interrupt)
 
@@ -1106,12 +1098,6 @@ static const struct kbdc8042_interface at8042 =
 	KBDC8042_AT386, set_gate_a20, keyboard_interrupt, mediagx_get_out2
 };
 
-static const struct pci_device_info cx5510 =
-{
-	cx5510_pci_r,
-	cx5510_pci_w
-};
-
 static void mediagx_set_keyb_int(int state) {
 	pic8259_set_irq_line(mediagx_devices.pic8259_1, 1, state);
 }
@@ -1123,10 +1109,7 @@ static void init_mediagx(running_machine *machine)
 	init_pc_common(machine, PCCOMMON_KEYBOARD_AT,mediagx_set_keyb_int);
 	mc146818_init(machine, MC146818_STANDARD);
 
-	pci_init();
-	pci_add_device(0, 18, &cx5510);
-
-	kbdc8042_init(&at8042);
+	kbdc8042_init(machine, &at8042);
 }
 
 #if SPEEDUP_HACKS
@@ -1142,28 +1125,28 @@ struct _speedup_entry
 static speedup_entry *speedup_table;
 static int speedup_count;
 
-INLINE UINT32 generic_speedup(running_machine *machine, speedup_entry *entry)
+INLINE UINT32 generic_speedup(const address_space *space, speedup_entry *entry)
 {
-	if (cpu_get_pc(machine->activecpu) == entry->pc)
+	if (cpu_get_pc(space->cpu) == entry->pc)
 	{
 		entry->hits++;
-		cpu_spinuntil_int(machine->activecpu);
+		cpu_spinuntil_int(space->cpu);
 	}
 	return main_ram[entry->offset/4];
 }
 
-static READ32_HANDLER( speedup0_r ) { return generic_speedup(space->machine, &speedup_table[0]); }
-static READ32_HANDLER( speedup1_r ) { return generic_speedup(space->machine, &speedup_table[1]); }
-static READ32_HANDLER( speedup2_r ) { return generic_speedup(space->machine, &speedup_table[2]); }
-static READ32_HANDLER( speedup3_r ) { return generic_speedup(space->machine, &speedup_table[3]); }
-static READ32_HANDLER( speedup4_r ) { return generic_speedup(space->machine, &speedup_table[4]); }
-static READ32_HANDLER( speedup5_r ) { return generic_speedup(space->machine, &speedup_table[5]); }
-static READ32_HANDLER( speedup6_r ) { return generic_speedup(space->machine, &speedup_table[6]); }
-static READ32_HANDLER( speedup7_r ) { return generic_speedup(space->machine, &speedup_table[7]); }
-static READ32_HANDLER( speedup8_r ) { return generic_speedup(space->machine, &speedup_table[8]); }
-static READ32_HANDLER( speedup9_r ) { return generic_speedup(space->machine, &speedup_table[9]); }
-static READ32_HANDLER( speedup10_r ) { return generic_speedup(space->machine, &speedup_table[10]); }
-static READ32_HANDLER( speedup11_r ) { return generic_speedup(space->machine, &speedup_table[11]); }
+static READ32_HANDLER( speedup0_r ) { return generic_speedup(space, &speedup_table[0]); }
+static READ32_HANDLER( speedup1_r ) { return generic_speedup(space, &speedup_table[1]); }
+static READ32_HANDLER( speedup2_r ) { return generic_speedup(space, &speedup_table[2]); }
+static READ32_HANDLER( speedup3_r ) { return generic_speedup(space, &speedup_table[3]); }
+static READ32_HANDLER( speedup4_r ) { return generic_speedup(space, &speedup_table[4]); }
+static READ32_HANDLER( speedup5_r ) { return generic_speedup(space, &speedup_table[5]); }
+static READ32_HANDLER( speedup6_r ) { return generic_speedup(space, &speedup_table[6]); }
+static READ32_HANDLER( speedup7_r ) { return generic_speedup(space, &speedup_table[7]); }
+static READ32_HANDLER( speedup8_r ) { return generic_speedup(space, &speedup_table[8]); }
+static READ32_HANDLER( speedup9_r ) { return generic_speedup(space, &speedup_table[9]); }
+static READ32_HANDLER( speedup10_r ) { return generic_speedup(space, &speedup_table[10]); }
+static READ32_HANDLER( speedup11_r ) { return generic_speedup(space, &speedup_table[11]); }
 
 static const read32_space_func speedup_handlers[] =
 {

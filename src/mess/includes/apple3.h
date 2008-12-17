@@ -10,6 +10,7 @@
 #define APPLE3_H_
 
 #include "machine/applefdc.h"
+#include "machine/6522via.h"
 
 #define VAR_VM0			0x0001
 #define VAR_VM1			0x0002
@@ -25,6 +26,8 @@
 
 extern UINT32 a3;
 extern const applefdc_interface apple3_fdc_interface;
+extern const via6522_interface apple3_via_0_intf;
+extern const via6522_interface apple3_via_1_intf;
 
 MACHINE_RESET( apple3 );
 DRIVER_INIT( apple3 );

@@ -116,7 +116,7 @@ VIDEO_START( avigo )
 
 	/* allocate video memory */
 	avigo_video_memory = auto_malloc(((AVIGO_SCREEN_WIDTH>>3)*AVIGO_SCREEN_HEIGHT));
-	machine->gfx[0] = stylus_pointer = allocgfx(&pointerlayout);
+	machine->gfx[0] = stylus_pointer = allocgfx(machine, &pointerlayout);
 
 	decodegfx(stylus_pointer, pointermask, 0, 1);
 	stylus_pointer->total_colors = 3;

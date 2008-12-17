@@ -97,10 +97,10 @@ static void cps3_stream_update(void *param, stream_sample_t **inputs, stream_sam
 
 }
 
-void *cps3_sh_start(int clock, const custom_sound_interface *config)
+CUSTOM_START( cps3_sh_start )
 {
 	/* Allocate the stream */
-	cps3_stream = stream_create(0, 2, clock / 384, NULL, cps3_stream_update);
+	cps3_stream = stream_create(device, 0, 2, clock / 384, NULL, cps3_stream_update);
 
 	memset(&chip, 0, sizeof(chip));
 

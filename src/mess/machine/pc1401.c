@@ -24,45 +24,44 @@ UINT8 pc1401_portc;
 
 static int power = 1; /* simulates pressed cce when mess is started */
 
-void pc1401_outa(int data)
+void pc1401_outa(const device_config *device, int data)
 {
 	outa=data;
 }
 
-void pc1401_outb(int data)
+void pc1401_outb(const device_config *device, int data)
 {
 	outb=data;
 }
 
-void pc1401_outc(int data)
+void pc1401_outc(const device_config *device, int data)
 {
 	//logerror("%g outc %.2x\n", attotime_to_double(timer_get_time(machine)), data);
 	pc1401_portc=data;
 }
 
-int pc1401_ina(void)
+int pc1401_ina(const device_config *device)
 {
-	running_machine *machine = Machine;
 	int data = outa;
 
 	if (outb & 0x01) 
-		data |= input_port_read(machine, "KEY0");
+		data |= input_port_read(device->machine, "KEY0");
 
 	if (outb & 0x02) 
-		data |= input_port_read(machine, "KEY1");
+		data |= input_port_read(device->machine, "KEY1");
 
 	if (outb & 0x04) 
-		data |= input_port_read(machine, "KEY2");
+		data |= input_port_read(device->machine, "KEY2");
 
 	if (outb & 0x08) 
-		data |= input_port_read(machine, "KEY3");
+		data |= input_port_read(device->machine, "KEY3");
 
 	if (outb & 0x10) 
-		data |= input_port_read(machine, "KEY4");
+		data |= input_port_read(device->machine, "KEY4");
 
 	if (outb & 0x20) 
 	{
-		data |= input_port_read(machine, "KEY5");
+		data |= input_port_read(device->machine, "KEY5");
 	
 		/* At Power Up we fake a 'C-CE' pressure */
 		if (power)
@@ -70,57 +69,55 @@ int pc1401_ina(void)
 	}
 
 	if (outa & 0x01) 
-		data |= input_port_read(machine, "KEY6");
+		data |= input_port_read(device->machine, "KEY6");
 
 	if (outa & 0x02) 
-		data |= input_port_read(machine, "KEY7");
+		data |= input_port_read(device->machine, "KEY7");
 
 	if (outa & 0x04) 
-		data |= input_port_read(machine, "KEY8");
+		data |= input_port_read(device->machine, "KEY8");
 
 	if (outa & 0x08)
-		data |= input_port_read(machine, "KEY9");
+		data |= input_port_read(device->machine, "KEY9");
 
 	if (outa & 0x10)
-		data |= input_port_read(machine, "KEY10");
+		data |= input_port_read(device->machine, "KEY10");
 
 	if (outa & 0x20)
-		data |= input_port_read(machine, "KEY11");
+		data |= input_port_read(device->machine, "KEY11");
 
 	if (outa & 0x40)
-		data |= input_port_read(machine, "KEY12");
+		data |= input_port_read(device->machine, "KEY12");
 
 	return data;
 }
 
-int pc1401_inb(void)
+int pc1401_inb(const device_config *device)
 {
-	running_machine *machine = Machine;
 	int data=outb;
 
-	if (input_port_read(machine, "EXTRA") & 0x04) 
+	if (input_port_read(device->machine, "EXTRA") & 0x04) 
 		data |= 0x01;
 
 	return data;
 }
 
-int pc1401_brk(void)
+int pc1401_brk(const device_config *device)
 {
-	running_machine *machine = Machine;
-	return (input_port_read(machine, "EXTRA") & 0x01);
+	return (input_port_read(device->machine, "EXTRA") & 0x01);
 }
 
-int pc1401_reset(void)
+int pc1401_reset(const device_config *device)
 {
-	running_machine *machine = Machine;
-	return (input_port_read(machine, "EXTRA") & 0x02);
+	return (input_port_read(device->machine, "EXTRA") & 0x02);
 }
 
 /* currently enough to save the external ram */
 NVRAM_HANDLER( pc1401 )
 {
-	UINT8 *ram=memory_region(machine, "main")+0x2000,
-		*cpu=sc61860_internal_ram();
+	const device_config *main_cpu = cputag_get_cpu(machine, "main");
+	UINT8 *ram = memory_region(machine, "main")+0x2000;
+	UINT8 *cpu = sc61860_internal_ram(main_cpu);
 
 	if (read_or_write)
 	{

@@ -9,9 +9,9 @@
 **************************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/wswan.h"
 #include "streams.h"
-#include "deprecat.h"
 
 static sound_stream *channel;
 
@@ -219,9 +219,9 @@ static void wswan_sh_update(void *param,stream_sample_t **inputs, stream_sample_
 	}
 }
 
-void *wswan_sh_start(int clock, const custom_sound_interface *config)
+void *wswan_sh_start(const device_config *device, int clock, const custom_sound_interface *config)
 {
-	channel = stream_create(0, 2, Machine->sample_rate, 0, wswan_sh_update);
+	channel = stream_create(device, 0, 2, device->machine->sample_rate, 0, wswan_sh_update);
 
 	snd.audio1.on = 0;
 	snd.audio1.signal = 16;

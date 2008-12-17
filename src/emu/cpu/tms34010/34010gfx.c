@@ -9,7 +9,6 @@
 
 #ifndef RECURSIVE_INCLUDE
 
-#include "deprecat.h"
 
 #define LOG_GFX_OPS 0
 #define LOGGFX(x) do { if (LOG_GFX_OPS && input_code_pressed(KEYCODE_L)) logerror x; } while (0)
@@ -206,7 +205,7 @@ static void shiftreg_w(const address_space *space, offs_t offset,UINT16 data)
 {
 	tms34010_state *tms = space->cpu->token;
 	if (tms->config->from_shiftreg)
-		(*tms->config->from_shiftreg)((UINT32)(offset << 3) & ~15, &tms->shiftreg[0]);
+		(*tms->config->from_shiftreg)(space, (UINT32)(offset << 3) & ~15, &tms->shiftreg[0]);
 	else
 		logerror("From ShiftReg function not set. PC = %08X\n", tms->pc);
 }
@@ -215,7 +214,7 @@ static UINT16 shiftreg_r(const address_space *space, offs_t offset)
 {
 	tms34010_state *tms = space->cpu->token;
 	if (tms->config->to_shiftreg)
-		(*tms->config->to_shiftreg)((UINT32)(offset << 3) & ~15, &tms->shiftreg[0]);
+		(*tms->config->to_shiftreg)(space, (UINT32)(offset << 3) & ~15, &tms->shiftreg[0]);
 	else
 		logerror("To ShiftReg function not set. PC = %08X\n", tms->pc);
 	return tms->shiftreg[0];

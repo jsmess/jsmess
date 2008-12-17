@@ -131,6 +131,7 @@ static MACHINE_DRIVER_START( mac512ke )
 	MDRV_DEVICE_ADD("fdc", IWM)
 	MDRV_DEVICE_CONFIG(mac_iwm_interface)
 	MDRV_SCC8530_ADD("scc", mac_scc8530_interface)
+	MDRV_VIA6522_ADD("via6522_0", 1000000, mac_via6522_intf)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( macplus )
@@ -145,6 +146,12 @@ static MACHINE_DRIVER_START( macplus )
 MACHINE_DRIVER_END
 
 
+static MACHINE_DRIVER_START( macse )
+	MDRV_IMPORT_FROM( macplus )
+
+	MDRV_VIA6522_REMOVE("via6522_0")
+	MDRV_VIA6522_ADD("via6522_0", 1000000, mac_via6522_adb_intf)
+MACHINE_DRIVER_END
 
 static INPUT_PORTS_START( macplus )
 	PORT_START("MOUSE0") /* Mouse - button */
@@ -372,13 +379,13 @@ SYSTEM_CONFIG_END
 
 
 
-/*    YEAR      NAME      PARENT    COMPAT  MACHINE   INPUT     INIT        CONFIG      COMPANY             FULLNAME */
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT        CONFIG      COMPANY             FULLNAME */
 COMP( 1984,	mac128k,  0, 		0,	mac512ke, macplus,  mac128k512k,	mac128k,	"Apple Computer",	"Macintosh 128k",  GAME_NOT_WORKING )
 COMP( 1984,	mac512k,  mac128k,	0,	mac512ke, macplus,  mac128k512k,	mac512k,	"Apple Computer",	"Macintosh 512k",  GAME_NOT_WORKING )
 COMP( 1986,	mac512ke, macplus,  0,		mac512ke, macplus,  mac512ke,		mac512k,	"Apple Computer",	"Macintosh 512ke", 0 )
 COMP( 1986,	macplus,  0,		0,	macplus,  macplus,  macplus,		macplus,	"Apple Computer",	"Macintosh Plus",  0 )
-COMP( 1987,	macse,    0,		0,	macplus,  macplus,  macse,		    macse,		"Apple Computer",	"Macintosh SE",  0 )
-COMP( 1990,	macclasc, 0,		0,	macplus,  macplus,  macclassic,		    macse,		"Apple Computer",	"Macintosh Classic",  GAME_NOT_WORKING )
+COMP( 1987,	macse,    0,		0,	macse,  macplus,  macse,		    macse,		"Apple Computer",	"Macintosh SE",  0 )
+COMP( 1990,	macclasc, 0,		0,	macse,  macplus,  macclassic,		    macse,		"Apple Computer",	"Macintosh Classic",  GAME_NOT_WORKING )
 
 
 

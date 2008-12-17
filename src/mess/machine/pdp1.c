@@ -12,8 +12,6 @@
 #include <stdio.h>
 
 #include "driver.h"
-#include "deprecat.h"
-
 #include "cpu/pdp1/pdp1.h"
 #include "includes/pdp1.h"
 
@@ -562,7 +560,7 @@ static TIMER_CALLBACK(puncher_callback)
 /*
 	Initiate read of a 18-bit word in binary format from tape (used in read-in mode)
 */
-void pdp1_tape_read_binary(void)
+void pdp1_tape_read_binary(const device_config *device)
 {
 	begin_tape_read(1, 1);
 }
@@ -594,10 +592,10 @@ void pdp1_tape_read_binary(void)
  * IO Bits        10 11 12 13 14 15 16 17
  * TAPE CHANNELS  8  7  6  5  4  3  2  1
  */
-void iot_rpa(int op2, int nac, int mb, int *io, int ac)
+void iot_rpa(const device_config *device, int op2, int nac, int mb, int *io, int ac)
 {
 	if (LOG_IOT_EXTRA)
-		logerror("Warning, RPA instruction not fully emulated: mb=0%06o, pc=0%06o\n", (unsigned) mb, (unsigned) cpu_get_reg(Machine->cpu[0], PDP1_PC));
+		logerror("Warning, RPA instruction not fully emulated: mb=0%06o, (%s)\n", (unsigned) mb, cpuexec_describe_context(device->machine));
 
 	begin_tape_read(0, nac);
 }
@@ -631,10 +629,10 @@ void iot_rpa(int op2, int nac, int mb, int *io, int ac)
  * different (730002 or 724002) the 18-bit word read from tape is automatically
  * transferred to the IO Register via the Reader Buffer.
  */
-void iot_rpb(int op2, int nac, int mb, int *io, int ac)
+void iot_rpb(const device_config *device, int op2, int nac, int mb, int *io, int ac)
 {
 	if (LOG_IOT_EXTRA)
-		logerror("Warning, RPB instruction not fully emulated: mb=0%06o, pc=0%06o\n", (unsigned) mb, (unsigned) cpu_get_reg(Machine->cpu[0], PDP1_PC));
+		logerror("Warning, RPB instruction not fully emulated: mb=0%06o, (%s)\n", (unsigned) mb, cpuexec_describe_context(device->machine));
 
 	begin_tape_read(1, nac);
 }
@@ -642,10 +640,10 @@ void iot_rpb(int op2, int nac, int mb, int *io, int ac)
 /*
 	rrb iot callback
 */
-void iot_rrb(int op2, int nac, int mb, int *io, int ac)
+void iot_rrb(const device_config *device, int op2, int nac, int mb, int *io, int ac)
 {
 	if (LOG_IOT_EXTRA)
-		logerror("RRB instruction: mb=0%06o, pc=0%06o\n", (unsigned) mb, (unsigned) cpu_get_reg(Machine->cpu[0], PDP1_PC));
+		logerror("RRB instruction: mb=0%06o, (%s)\n", (unsigned) mb, cpuexec_describe_context(device->machine));
 
 	*io = tape_reader.rb;
 	io_status &= ~io_st_ptr;
@@ -665,10 +663,10 @@ void iot_rrb(int op2, int nac, int mb, int *io, int ac)
  * For each In-Out Transfer instruction one line of tape is punched. In-Out Register
  * Bit 17 conditions Hole 1. Bit 16 conditions Hole 2, etc. Bit 10 conditions Hole 8
  */
-void iot_ppa(int op2, int nac, int mb, int *io, int ac)
+void iot_ppa(const device_config *device, int op2, int nac, int mb, int *io, int ac)
 {
 	if (LOG_IOT_EXTRA)
-		logerror("PPA instruction: mb=0%06o, pc=0%06o\n", (unsigned) mb, (unsigned) cpu_get_reg(Machine->cpu[0], PDP1_PC));
+		logerror("PPA instruction: mb=0%06o, (%s)\n", (unsigned) mb, cpuexec_describe_context(device->machine));
 
 	tape_write(*io & 0377);
 	io_status &= ~io_st_ptp;
@@ -676,7 +674,7 @@ void iot_ppa(int op2, int nac, int mb, int *io, int ac)
 	if (LOG_IOT_OVERLAP)
 	{
 		if (timer_enable(tape_puncher.timer, 0))
-			logerror("Error: overlapped PPA/PPB instructions: mb=0%06o, pc=0%06o\n", (unsigned) mb, (unsigned) cpu_get_reg(Machine->cpu[0], PDP1_PC));
+			logerror("Error: overlapped PPA/PPB instructions: mb=0%06o, (%s)\n", (unsigned) mb, cpuexec_describe_context(device->machine));
 	}
 
 	timer_adjust_oneshot(tape_puncher.timer, ATTOTIME_IN_USEC(15800), nac);
@@ -693,10 +691,10 @@ void iot_ppa(int op2, int nac, int mb, int *io, int ac)
  * Bit 5 conditions Hole 1. Bit 4 conditions Hole 2, etc. Bit 0 conditions Hole 6.
  * Hole 7 is left blank. Hole 8 is always punched in this mode.
  */
-void iot_ppb(int op2, int nac, int mb, int *io, int ac)
+void iot_ppb(const device_config *device, int op2, int nac, int mb, int *io, int ac)
 {
 	if (LOG_IOT_EXTRA)
-		logerror("PPB instruction: mb=0%06o, pc=0%06o\n", (unsigned) mb, (unsigned) cpu_get_reg(Machine->cpu[0], PDP1_PC));
+		logerror("PPB instruction: mb=0%06o, (%s)\n", (unsigned) mb, cpuexec_describe_context(device->machine));
 
 	tape_write((*io >> 12) | 0200);
 	io_status &= ~io_st_ptp;
@@ -704,7 +702,7 @@ void iot_ppb(int op2, int nac, int mb, int *io, int ac)
 	if (LOG_IOT_OVERLAP)
 	{
 		if (timer_enable(tape_puncher.timer, 0))
-			logerror("Error: overlapped PPA/PPB instructions: mb=0%06o, pc=0%06o\n", (unsigned) mb, (unsigned) cpu_get_reg(Machine->cpu[0], PDP1_PC));
+			logerror("Error: overlapped PPA/PPB instructions: mb=0%06o, (%s)\n", (unsigned) mb, cpuexec_describe_context(device->machine));
 	}
 	timer_adjust_oneshot(tape_puncher.timer, ATTOTIME_IN_USEC(15800), nac);
 }
@@ -859,16 +857,16 @@ static TIMER_CALLBACK(tyo_callback)
 /*
 	tyo iot callback
 */
-void iot_tyo(int op2, int nac, int mb, int *io, int ac)
+void iot_tyo(const device_config *device, int op2, int nac, int mb, int *io, int ac)
 {
 	int ch, delay;
 
 	if (LOG_IOT_EXTRA)
-		logerror("Warning, TYO instruction not fully emulated: mb=0%06o, pc=0%06o\n", (unsigned) mb, (unsigned) cpu_get_reg(Machine->cpu[0], PDP1_PC));
+		logerror("Warning, TYO instruction not fully emulated: mb=0%06o, (%s)\n", (unsigned) mb, cpuexec_describe_context(device->machine));
 
 	ch = (*io) & 077;
 
-	typewriter_out(Machine, ch);
+	typewriter_out(device->machine, ch);
 	io_status &= ~io_st_tyo;
 
 	/* compute completion delay (source: maintainance manual 9-12, 9-13 and 9-14) */
@@ -892,7 +890,7 @@ void iot_tyo(int op2, int nac, int mb, int *io, int ac)
 	if (LOG_IOT_OVERLAP)
 	{
 		if (timer_enable(typewriter.tyo_timer, 0))
-			logerror("Error: overlapped TYO instruction: mb=0%06o, pc=0%06o\n", (unsigned) mb, (unsigned) cpu_get_reg(Machine->cpu[0], PDP1_PC));
+			logerror("Error: overlapped TYO instruction: mb=0%06o, (%s)\n", (unsigned) mb, cpuexec_describe_context(device->machine));
 	}
 
 	timer_adjust_oneshot(typewriter.tyo_timer, ATTOTIME_IN_MSEC(delay), nac);
@@ -912,10 +910,10 @@ void iot_tyo(int op2, int nac, int mb, int *io, int ac)
  * clears the In-Out Register before transferring the information and also clears
  * the type-in status bit.
  */
-void iot_tyi(int op2, int nac, int mb, int *io, int ac)
+void iot_tyi(const device_config *device, int op2, int nac, int mb, int *io, int ac)
 {
 	if (LOG_IOT_EXTRA)
-		logerror("Warning, TYI instruction not fully emulated: mb=0%06o, pc=0%06o\n", (unsigned) mb, (unsigned) cpu_get_reg(Machine->cpu[0], PDP1_PC));
+		logerror("Warning, TYI instruction not fully emulated: mb=0%06o, (%s)\n", (unsigned) mb, cpuexec_describe_context(device->machine));
 
 	*io = typewriter.tb;
 	if (! (io_status & io_st_tyi))
@@ -924,7 +922,7 @@ void iot_tyi(int op2, int nac, int mb, int *io, int ac)
 	{
 		io_status &= ~io_st_tyi;
 		if (USE_SBS)
-			cpu_set_input_line_and_vector(Machine->cpu[0], 0, CLEAR_LINE, 0);	/* interrupt it, baby */
+			cpu_set_input_line_and_vector(device->machine->cpu[0], 0, CLEAR_LINE, 0);	/* interrupt it, baby */
 	}
 }
 
@@ -977,7 +975,7 @@ static TIMER_CALLBACK(dpy_callback)
 
 	Light on one pixel on CRT
 */
-void iot_dpy(int op2, int nac, int mb, int *io, int ac)
+void iot_dpy(const device_config *device, int op2, int nac, int mb, int *io, int ac)
 {
 	int x;
 	int y;
@@ -994,7 +992,7 @@ void iot_dpy(int op2, int nac, int mb, int *io, int ac)
 	{
 		io_status |= io_st_pen;
 
-		cpu_set_reg(Machine->cpu[0], PDP1_PF3, 1);
+		cpu_set_reg(device->machine->cpu[0], PDP1_PF3, 1);
 	}
 
 	if (nac)
@@ -1005,7 +1003,7 @@ void iot_dpy(int op2, int nac, int mb, int *io, int ac)
 			/* note that overlap detection is incomplete: it will only work if both DPY
 			instructions require a completion pulse */
 			if (timer_enable(dpy_timer, 0))
-				logerror("Error: overlapped DPY instruction: mb=0%06o, pc=0%06o\n", (unsigned) mb, (unsigned) cpu_get_reg(Machine->cpu[0], PDP1_PC));
+				logerror("Error: overlapped DPY instruction: mb=0%06o, (%s)\n", (unsigned) mb, cpuexec_describe_context(device->machine));
 		}
 		timer_adjust_oneshot(dpy_timer, ATTOTIME_IN_USEC(50), 0);
 	}
@@ -1065,7 +1063,7 @@ DEVICE_IMAGE_UNLOAD(pdp1_drum)
 	parallel_drum.fd = NULL;
 }
 
-void iot_dia(int op2, int nac, int mb, int *io, int ac)
+void iot_dia(const device_config *device, int op2, int nac, int mb, int *io, int ac)
 {
 	parallel_drum.wfb = ((*io) & 0370000) >> 12;
 	parallel_drum_set_il((*io) & 0007777);
@@ -1073,7 +1071,7 @@ void iot_dia(int op2, int nac, int mb, int *io, int ac)
 	parallel_drum.dba = 0;	/* right? */
 }
 
-void iot_dba(int op2, int nac, int mb, int *io, int ac)
+void iot_dba(const device_config *device, int op2, int nac, int mb, int *io, int ac)
 {
 	parallel_drum.wfb = ((*io) & 0370000) >> 12;
 	parallel_drum_set_il((*io) & 0007777);
@@ -1114,7 +1112,7 @@ static void drum_write(int field, int position, UINT32 data)
 	}
 }
 
-void iot_dcc(int op2, int nac, int mb, int *io, int ac)
+void iot_dcc(const device_config *device, int op2, int nac, int mb, int *io, int ac)
 {
 	attotime delay;
 	int dc;
@@ -1134,12 +1132,12 @@ void iot_dcc(int op2, int nac, int mb, int *io, int ac)
 	{
 		if ((parallel_drum.wfb >= 1) && (parallel_drum.wfb <= 22))
 		{
-			drum_write(parallel_drum.wfb-1, dc, (signed)memory_read_dword_32be(cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM),parallel_drum.wcl<<2));
+			drum_write(parallel_drum.wfb-1, dc, (signed)memory_read_dword_32be(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM),parallel_drum.wcl<<2));
 		}
 
 		if ((parallel_drum.rfb >= 1) && (parallel_drum.rfb <= 22))
 		{
-			memory_write_dword_32be(cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM),parallel_drum.wcl<<2, drum_read(parallel_drum.rfb-1, dc));
+			memory_write_dword_32be(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM),parallel_drum.wcl<<2, drum_read(parallel_drum.rfb-1, dc));
 		}
 
 		parallel_drum.wc = (parallel_drum.wc+1) & 07777;
@@ -1148,12 +1146,12 @@ void iot_dcc(int op2, int nac, int mb, int *io, int ac)
 		if (parallel_drum.wc)
 			delay = attotime_add(delay, PARALLEL_DRUM_WORD_TIME);
 	} while (parallel_drum.wc);
-	cpu_adjust_icount(Machine->cpu[0],-cpu_attotime_to_clocks(Machine->cpu[0], delay));
+	cpu_adjust_icount(device->machine->cpu[0],-cpu_attotime_to_clocks(device->machine->cpu[0], delay));
 	/* if no error, skip */
-	cpu_set_reg(Machine->cpu[0], PDP1_PC, cpu_get_reg(Machine->cpu[0], PDP1_PC)+1);
+	cpu_set_reg(device->machine->cpu[0], PDP1_PC, cpu_get_reg(device->machine->cpu[0], PDP1_PC)+1);
 }
 
-void iot_dra(int op2, int nac, int mb, int *io, int ac)
+void iot_dra(const device_config *device, int op2, int nac, int mb, int *io, int ac)
 {
 	(*io) = attotime_mul(
 		timer_timeelapsed(parallel_drum.rotation_timer),
@@ -1175,9 +1173,9 @@ void iot_dra(int op2, int nac, int mb, int *io, int ac)
 		fire rocket, and fire torpedo. low order 4 bits, same for
 		other ship. routine is entered by jsp cwg.
 */
-void iot_011(int op2, int nac, int mb, int *io, int ac)
+void iot_011(const device_config *device, int op2, int nac, int mb, int *io, int ac)
 {
-	int key_state = input_port_read(Machine, "SPACEWAR");
+	int key_state = input_port_read(device->machine, "SPACEWAR");
 	int reply;
 
 
@@ -1214,10 +1212,10 @@ void iot_011(int op2, int nac, int mb, int *io, int ac)
 
 	check IO status
 */
-void iot_cks(int op2, int nac, int mb, int *io, int ac)
+void iot_cks(const device_config *device, int op2, int nac, int mb, int *io, int ac)
 {
 	if (LOG_IOT_EXTRA)
-		logerror("CKS instruction: mb=0%06o, pc=0%06o\n", (unsigned) mb, (unsigned) cpu_get_reg(Machine->cpu[0], PDP1_PC));
+		logerror("CKS instruction: mb=0%06o, (%s)\n", (unsigned) mb, cpuexec_describe_context(device->machine));
 
 	*io = io_status;
 }
@@ -1228,7 +1226,7 @@ void iot_cks(int op2, int nac, int mb, int *io, int ac)
 
 	IO devices should reset
 */
-void pdp1_io_sc_callback(void)
+void pdp1_io_sc_callback(const device_config *device)
 {
 	tape_reader.rcl = tape_reader.rc = 0;
 	if (tape_reader.timer)

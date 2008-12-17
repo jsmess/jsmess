@@ -220,12 +220,12 @@ static void svision_update (void *param,stream_sample_t **inputs, stream_sample_
 /************************************/
 /* Sound handler start              */
 /************************************/
-void *svision_custom_start(int clock, const custom_sound_interface *config)
+void *svision_custom_start(const device_config *device, int clock, const custom_sound_interface *config)
 {
 	memset(&svision_dma, 0, sizeof(svision_dma));
 	memset(&svision_noise, 0, sizeof(svision_noise));
 	memset(svision_channel, 0, sizeof(svision_channel));
 
-	mixer_channel = stream_create(0, 2, Machine->sample_rate, 0, svision_update);
+	mixer_channel = stream_create(device, 0, 2, Machine->sample_rate, 0, svision_update);
 	return (void *) ~0;
 }

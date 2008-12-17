@@ -281,10 +281,11 @@ static WRITE8_HANDLER( tmnt_sres_w )
 }
 
 
-static void tmnt_decode_sample(void)
+static SAMPLES_START( tmnt_decode_sample )
 {
+	running_machine *machine = device->machine;
 	int i;
-	UINT8 *source = memory_region(Machine, "title");
+	UINT8 *source = memory_region(machine, "title");
 
 	sampledata = auto_malloc(0x40000*sizeof(sampledata[0]));
 
@@ -443,7 +444,7 @@ static NVRAM_HANDLER( eeprom )
 		eeprom_save(file);
 	else
 	{
-		eeprom_init(&eeprom_intf);
+		eeprom_init(machine, &eeprom_intf);
 
 		if (file)
 		{
@@ -543,7 +544,7 @@ static NVRAM_HANDLER( thndrx2 )
 		eeprom_save(file);
 	else
 	{
-		eeprom_init(&thndrx2_eeprom_interface);
+		eeprom_init(machine, &thndrx2_eeprom_interface);
 
 		if (file)
 		{
@@ -3883,8 +3884,8 @@ ROM_END
 
 static DRIVER_INIT( gfx )
 {
-	konami_rom_deinterleave_2("gfx1");
-	konami_rom_deinterleave_2("gfx2");
+	konami_rom_deinterleave_2(machine, "gfx1");
+	konami_rom_deinterleave_2(machine, "gfx2");
 }
 
 static DRIVER_INIT( mia )

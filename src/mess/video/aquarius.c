@@ -88,7 +88,7 @@ static TILE_GET_INFO(aquarius_gettileinfo)
 
 VIDEO_START( aquarius )
 {
-	aquarius_tilemap = tilemap_create(aquarius_gettileinfo, tilemap_scan_rows, 8, 8, 40, 24);
+	aquarius_tilemap = tilemap_create(machine, aquarius_gettileinfo, tilemap_scan_rows, 8, 8, 40, 24);
 }
 
 VIDEO_UPDATE( aquarius )

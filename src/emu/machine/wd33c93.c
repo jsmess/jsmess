@@ -294,7 +294,7 @@ static void wd33c93_complete_cmd( UINT8 status )
 /* command handlers */
 static void wd33c93_invalid_cmd( void )
 {
-	logerror( "Unknown/Unimplemented SCSI controller command: %02x (PC=%x)\n", scsi_data.regs[WD_COMMAND], cpu_get_pc(Machine->activecpu) );
+	logerror( "%s:Unknown/Unimplemented SCSI controller command: %02x\n", cpuexec_describe_context(Machine), scsi_data.regs[WD_COMMAND] );
 
 	/* complete the command */
 	wd33c93_complete_cmd( CSR_INVALID );
@@ -527,7 +527,7 @@ WRITE8_HANDLER(wd33c93_w)
 
 		case 1:
 		{
-			LOG(( "WD33C93: PC=%08x - Write REG=%02x, data = %02x\n", safe_cpu_get_pc(space->cpu), scsi_data.sasr, data ));
+			LOG(( "WD33C93: PC=%08x - Write REG=%02x, data = %02x\n", cpu_get_pc(space->cpu), scsi_data.sasr, data ));
 
 			/* update the register */
 			scsi_data.regs[scsi_data.sasr] = data;
@@ -535,7 +535,7 @@ WRITE8_HANDLER(wd33c93_w)
 			/* if we receive a command, schedule to process it */
 			if ( scsi_data.sasr == WD_COMMAND )
 			{
-				LOG(( "WDC33C93: PC=%08x - Executing command %08x - unit %d\n", safe_cpu_get_pc(space->cpu), data, wd33c93_getunit() ));
+				LOG(( "WDC33C93: PC=%08x - Executing command %08x - unit %d\n", cpu_get_pc(space->cpu), data, wd33c93_getunit() ));
 
 				/* signal we're processing it */
 				scsi_data.regs[WD_AUXILIARY_STATUS] |= ASR_CIP;
@@ -686,7 +686,7 @@ READ8_HANDLER(wd33c93_r)
 					intf->irq_callback(space->machine, 0);
 				}
 
-				LOG(( "WD33C93: PC=%08x - Status read (%02x)\n", safe_cpu_get_pc(space->cpu), scsi_data.regs[WD_SCSI_STATUS] ));
+				LOG(( "WD33C93: PC=%08x - Status read (%02x)\n", cpu_get_pc(space->cpu), scsi_data.regs[WD_SCSI_STATUS] ));
 			}
 			else if ( scsi_data.sasr == WD_DATA )
 			{
@@ -755,7 +755,7 @@ READ8_HANDLER(wd33c93_r)
 				}
 			}
 
-			LOG(( "WD33C93: PC=%08x - Data read (%02x)\n", safe_cpu_get_pc(space->cpu), scsi_data.regs[WD_DATA] ));
+			LOG(( "WD33C93: PC=%08x - Data read (%02x)\n", cpu_get_pc(space->cpu), scsi_data.regs[WD_DATA] ));
 
 			/* get the register value */
 			ret = scsi_data.regs[scsi_data.sasr];
@@ -779,7 +779,7 @@ READ8_HANDLER(wd33c93_r)
 	return 0;
 }
 
-extern void wd33c93_init( const struct WD33C93interface *interface )
+void wd33c93_init( running_machine *machine, const struct WD33C93interface *interface )
 {
 	int i;
 
@@ -796,14 +796,14 @@ extern void wd33c93_init( const struct WD33C93interface *interface )
 	}
 
 	/* allocate a timer for commands */
-	scsi_data.cmd_timer = timer_alloc(Machine, wd33c93_complete_cb, NULL);
+	scsi_data.cmd_timer = timer_alloc(machine, wd33c93_complete_cb, NULL);
 
 	scsi_data.temp_input = auto_malloc( TEMP_INPUT_LEN );
 
-//  state_save_register_item_array(Machine, "wd33c93", NULL, 0, scsi_data);
+//  state_save_register_item_array(machine, "wd33c93", NULL, 0, scsi_data);
 }
 
-extern void wd33c93_exit( const struct WD33C93interface *interface )
+void wd33c93_exit( const struct WD33C93interface *interface )
 {
 	int i;
 

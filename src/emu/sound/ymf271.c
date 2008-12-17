@@ -14,7 +14,6 @@
 
 #include <math.h>
 #include "sndintrf.h"
-#include "deprecat.h"
 #include "streams.h"
 #include "ymf271.h"
 
@@ -114,6 +113,7 @@ typedef struct
 
 	UINT32 clock;
 	sound_stream * stream;
+	const device_config *device;
 } YMF271Chip;
 
 // slot mapping assists
@@ -1375,7 +1375,7 @@ static TIMER_CALLBACK( ymf271_timer_b_tick )
 static UINT8 ymf271_read_ext_memory(YMF271Chip *chip, UINT32 address)
 {
 	/* temporary hack until this is converted to a device */
-	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cpu_get_address_space(chip->device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	if( chip->ext_mem_read ) {
 		return chip->ext_mem_read(space,address);
 	} else {
@@ -1388,7 +1388,7 @@ static UINT8 ymf271_read_ext_memory(YMF271Chip *chip, UINT32 address)
 static void ymf271_write_ext_memory(YMF271Chip *chip, UINT32 address, UINT8 data)
 {
 	/* temporary hack until this is converted to a device */
-	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cpu_get_address_space(chip->device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	if( chip->ext_mem_write ) {
 		chip->ext_mem_write(space, address, data);
 	}
@@ -1399,7 +1399,7 @@ static void ymf271_write_timer(YMF271Chip *chip, int data)
 	int slotnum;
 	YMF271Group *group;
 	attotime period;
-	running_machine *machine = Machine;
+	running_machine *machine = chip->device->machine;
 
 	slotnum = fm_tab[chip->timerreg & 0xf];
 	group = &chip->groups[slotnum];
@@ -1729,8 +1729,8 @@ static void init_state(YMF271Chip *chip, const device_config *device)
 
 static void ymf271_init(const device_config *device, YMF271Chip *chip, UINT8 *rom, void (*cb)(running_machine *,int), read8_space_func ext_read, write8_space_func ext_write)
 {
-	chip->timA = timer_alloc(Machine, ymf271_timer_a_tick, chip);
-	chip->timB = timer_alloc(Machine, ymf271_timer_b_tick, chip);
+	chip->timA = timer_alloc(device->machine, ymf271_timer_a_tick, chip);
+	chip->timB = timer_alloc(device->machine, ymf271_timer_b_tick, chip);
 
 	chip->rom = rom;
 	chip->irq_callback = cb;
@@ -1751,12 +1751,13 @@ static SND_START( ymf271 )
 
 	chip = auto_malloc(sizeof(*chip));
 	memset(chip, 0, sizeof(*chip));
+	chip->device = device;
 	chip->clock = clock;
 
 	intf = (config != NULL) ? config : &defintrf;
 
 	ymf271_init(device, chip, device->region, intf->irq_callback, intf->ext_read, intf->ext_write);
-	chip->stream = stream_create(0, 2, clock/384, chip, ymf271_update);
+	chip->stream = stream_create(device, 0, 2, clock/384, chip, ymf271_update);
 
 	for (i = 0; i < 256; i++)
 	{

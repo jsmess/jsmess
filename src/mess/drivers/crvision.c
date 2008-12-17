@@ -391,7 +391,7 @@ static MACHINE_START( crvision )
 	state_save_register_global(machine, sn76489_ready);
 
 	TMS9928A_configure(&tms9918_intf);
-	pia_config(0, &crvision_pia_intf);
+	pia_config(machine, 0, &crvision_pia_intf);
 }
 
 static MACHINE_START( fnvision )
@@ -400,7 +400,7 @@ static MACHINE_START( fnvision )
 	state_save_register_global(machine, sn76489_ready);
 
 	TMS9928A_configure(&tms9929_intf);
-	pia_config(0, &crvision_pia_intf);
+	pia_config(machine, 0, &crvision_pia_intf);
 }
 
 static MACHINE_RESET( crvision )

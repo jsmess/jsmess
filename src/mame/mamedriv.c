@@ -411,6 +411,8 @@ const game_driver * const drivers[] =
 	DRIVER( hyhoo )		/* (c) 1987 */
 	DRIVER( hyhoo2 )	/* (c) 1987 */
 
+	DRIVER( jangou )    /* (c) 1983 */
+	DRIVER( jngolady )  /* (c) 1984 */
 	DRIVER( pastelg )	/* (c) 1985 */
 
 	DRIVER( crystalg )	/* (c) 1986 */
@@ -2661,6 +2663,7 @@ V-V                           TP-027
 	DRIVER( megaman2 )	/* 08/07/1996 (c) 1996 (US) */
 	DRIVER( megamn2a )	/* 08/07/1996 (c) 1996 (Asia) */
 	DRIVER( rckman2j )	/* 08/07/1996 (c) 1996 (Japan) */
+	DRIVER( gigamn2 )	/* bootleg */
 	DRIVER( sfz2al )	/* 26/08/1996 (c) 1996 (Asia) */
 	DRIVER( sfz2alj )	/* 05/08/1996 (c) 1996 (Japan) */
 	DRIVER( sfz2alh )	/* 13/08/1996 (c) 1996 (Hispanic) */
@@ -2780,9 +2783,9 @@ V-V                           TP-027
 
 	/* Capcom CPS3 games */
 	DRIVER( sfiii )		/* 04/02/1997 (c) 1997 Capcom */
-	DRIVER( sfiiiu )	/* 04/02/1997 (c) 1997 Capcom */
+	DRIVER( sfiiij )	/* 04/02/1997 (c) 1997 Capcom */
 	DRIVER( sfiii2 )	/* 30/09/1997 (c) 1997 Capcom */
-	DRIVER( sfiii2u )	/* 30/09/1997 (c) 1997 Capcom */
+	DRIVER( sfiii2j )	/* 30/09/1997 (c) 1997 Capcom */
 	DRIVER( sfiii3 )	/* 12/05/1999 (c) 1999 Capcom */
 	DRIVER( sfiii3a )	/* 08/06/1999 (c) 1999 Capcom */
 	DRIVER( jojo )		/* 02/12/1998 (c) 1998 Capcom */
@@ -6162,7 +6165,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( hiimpac3 )	/* (c) 1990 Williams */
 	DRIVER( hiimpacp )	/* (c) 1990 Williams */
 	DRIVER( shimpact )	/* (c) 1991 Midway */
-	DRIVER( shimpacp )	/* (c) 1991 Midway */
+	DRIVER( shimpap6 )	/* (c) 1991 Midway */
+	DRIVER( shimpap5 )	/* (c) 1991 Midway */
 	DRIVER( shimpap4 )	/* (c) 1991 Midway */
 	DRIVER( strkforc )	/* (c) 1991 Midway */
 	DRIVER( mk )		/* (c) 1992 Midway */
@@ -6241,7 +6245,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( calspeda )	/* (c) 1996 Atari Games */
 	DRIVER( vaportrx )	/* (c) 1998 Atari Games */
 	DRIVER( vaportrp )	/* (c) 1998 Atari Games */
-	DRIVER( carnevil )	/* (c) 1998 Midway Games */
+	DRIVER( carnevil )	/* (c) 1998 Midway Games (v1.0.3) */
+	DRIVER( carnevi1 )	/* (c) 1998 Midway Games (v1.0.1) */
 	DRIVER( biofreak )	/* (c) 1997 Midway Games (prototype) */
 	DRIVER( blitz )		/* (c) 1997 Midway Games */
 	DRIVER( blitz11 )	/* (c) 1997 Midway Games */
@@ -7392,10 +7397,15 @@ Other Sun games
 	DRIVER( moonlght )	/* bootleg */
 	DRIVER( chry10 )	/* bootleg */
 	DRIVER( chryigld )	/* bootleg */
+	DRIVER( ncb3 )		/* (c) 19?? Dyna/bootleg? */
+	DRIVER( cb3 )		/* (c) 19?? Dyna/bootleg? */
+	DRIVER( cmv801 )	/* (c) 198? Corsica */
+	DRIVER( cmaster )	/* (c) 1991 Dyna */
  	DRIVER( cpoker )	/* (c) 1993? IGS */
  	DRIVER( cpokert )	/* (c) 1993? Tuning */
 	DRIVER( csk227it )	/* (c) 198? IGS */
 	DRIVER( csk234it )	/* (c) 198? IGS */
+	DRIVER( jackie )	/* (c) 199? IGS */
 	DRIVER( stellecu )	/* (c) 1998 */
 	DRIVER( iqblock )	/* (c) 1993 */
 	DRIVER( grndtour )	/* (c) 1993 */
@@ -7895,6 +7905,7 @@ Other Sun games
 	DRIVER( hangman )	/* (c) 1984 Status Games */
 	DRIVER( trivquiz )	/* (c) 1984 Status Games */
 	DRIVER( statriv2 )	/* (c) 1984 Status Games */
+	DRIVER( statrv2v )	/* (c) 1984 Status Games */
 	DRIVER( statriv4 )	/* (c) 1985 Status Games */
 	DRIVER( sextriv )	/* (c) 1985 Status Games */
 	DRIVER( quaquiz2 )	/* (c) 1985 Status Games */
@@ -8124,7 +8135,6 @@ Other Sun games
 
 	DRIVER( vroulet )	/* (c) 1989 World Game */
 	DRIVER( rcasino )	/* (c) 1984 Dyna Electronics */
-	DRIVER( cmv801 )	/* (c) 198? Corsica */
 	DRIVER( cm2v841 )	/* (c) 198? Dyna Electronics */
 	DRIVER( cm2841a )	/* (c) 198? Dyna Electronics */
 	DRIVER( ampoker2 )	/* (c) 1990 Novomatic */
@@ -8357,6 +8367,11 @@ Other Sun games
 	DRIVER( re900 )		/* (c) 1993 Entretenimientos GEMINIS */
 	DRIVER( bs94 )		/* (c) 1994 Entretenimientos GEMINIS */
 	DRIVER( jokrwild )	/* (c) 1988 Sigma */
+	DRIVER( pesadelo )	/* (c) 1989 Forte II Games */
+	DRIVER( spool99 )   /* (c) 1998 Electronic Projects */
+	DRIVER( spool99a )  /* (c) 1998 Electronic Projects */
+	DRIVER( 4roses )	/* 1999 Unknown */
+	DRIVER( 4rosesa )	/* 1999 Unknown */
 
 	/* InterFlip / Recreativos Franco */
 	DRIVER( videopkr )	/* (c) 1984 InterFlip */
@@ -8373,6 +8388,7 @@ Other Sun games
 	DRIVER( capcor )	/* (c) 2001 Nazionale Elettronica */
 	DRIVER( euro2k2 )	/* (c) 2001 Nazionale Elettronica */
 	DRIVER( euro2k2a )	/* (c) 2001 Nazionale Elettronica */
+	DRIVER( euro2k2s )	/* (c) 2002 Nazionale Elettronica */
 	DRIVER( mnumber )	/* (c) 200? M.M. - B.R.L. */
 
 	/* H8/3337 italian gambling games */
@@ -8402,5 +8418,11 @@ Other Sun games
 
 	/* Astro Corp. */
 	DRIVER( showhand )	/* (c) 1999? Astro Corp. */
+
+	/* Dyna */
+	DRIVER ( cb2001 )
+
+	/* STG? */
+	DRIVER ( queen )
 
 #endif	/* DRIVER_RECURSIVE */

@@ -8,6 +8,7 @@
 #define ATOM_H_
 
 #include "devices/snapquik.h"
+#include "machine/6522via.h"
 #include "machine/8255ppi.h"
 #include "machine/i8271.h"
 
@@ -17,6 +18,7 @@ extern UINT8 atom_8255_porta;
 extern UINT8 atom_8255_portc;
 
 extern const ppi8255_interface atom_8255_int;
+extern const via6522_interface atom_6522_interface;
 extern const i8271_interface atom_8271_interface;
 
 MACHINE_RESET( atom );

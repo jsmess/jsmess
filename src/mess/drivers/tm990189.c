@@ -455,7 +455,7 @@ static WRITE8_HANDLER(ext_instr_decode)
 	}
 }
 
-static void idle_callback(int state)
+static void idle_callback(const device_config *device, int state)
 {
 	if (state)
 		LED_state |= 0x40;

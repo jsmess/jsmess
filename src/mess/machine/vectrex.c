@@ -218,18 +218,18 @@ void vectrex_configuration(running_machine *machine)
 
 *********************************************************************/
 
-void v_via_irq(running_machine *machine, int level)
+void v_via_irq(const device_config *device, int level)
 {
-	cpu_set_input_line(machine->cpu[0], M6809_IRQ_LINE, level);
+	cpu_set_input_line(device->machine->cpu[0], M6809_IRQ_LINE, level);
 }
 
 
-READ8_HANDLER(v_via_pb_r)
+READ8_DEVICE_HANDLER(v_via_pb_r)
 {
 	int pot;
 	static const char *const ctrlnames[] = { "CONTR1X", "CONTR1Y", "CONTR2X", "CONTR2Y" };
 
-	pot = input_port_read(space->machine, ctrlnames[(vectrex_via_out[PORTB] & 0x6) >> 1]) - 0x80; 
+	pot = input_port_read(device->machine, ctrlnames[(vectrex_via_out[PORTB] & 0x6) >> 1]) - 0x80; 
 	
 	if (pot > (signed char)vectrex_via_out[PORTA])
 		vectrex_via_out[PORTB] |= 0x20;
@@ -240,11 +240,13 @@ READ8_HANDLER(v_via_pb_r)
 }
 
 
-READ8_HANDLER(v_via_pa_r)
+READ8_DEVICE_HANDLER(v_via_pa_r)
 {
 	if ((!(vectrex_via_out[PORTB] & 0x10)) && (vectrex_via_out[PORTB] & 0x08))
 		/* BDIR inactive, we can read the PSG. BC1 has to be active. */
 	{
+		const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 		vectrex_via_out[PORTA] = ay8910_read_port_0_r(space, 0)
 			& ~(vectrex_imager_pinlevel & 0x80);
 	}
@@ -252,9 +254,9 @@ READ8_HANDLER(v_via_pa_r)
 }
 
 
-READ8_HANDLER(s1_via_pb_r)
+READ8_DEVICE_HANDLER(s1_via_pb_r)
 {
-	return (vectrex_via_out[PORTB] & ~0x40) | (input_port_read(space->machine, "COIN") & 0x40);
+	return (vectrex_via_out[PORTB] & ~0x40) | (input_port_read(device->machine, "COIN") & 0x40);
 }
 
 
@@ -279,6 +281,7 @@ static TIMER_CALLBACK(update_level)
 
 TIMER_CALLBACK(vectrex_imager_eye)
 {
+	const device_config *via_0 = device_list_find_by_tag(machine->config->devicelist, VIA6522, "via6522_0");
 	int coffset;
 	double rtime = (1.0 / imager_freq);
 
@@ -295,8 +298,8 @@ TIMER_CALLBACK(vectrex_imager_eye)
 			timer_set (machine, double_to_attotime(rtime * 0.50), NULL, 1, vectrex_imager_eye);
 
 			/* Index hole sensor is connected to IO7 which triggers also CA1 of VIA */
-			via_set_input_ca1(machine, 0, 1);
-			via_set_input_ca1(machine, 0, 0);
+			via_ca1_w(via_0, 0, 1);
+			via_ca1_w(via_0, 0, 0);
 			vectrex_imager_pinlevel |= 0x80;
 			timer_set (machine, double_to_attotime(rtime / 360.0), &vectrex_imager_pinlevel, 0, update_level);
 		}

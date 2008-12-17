@@ -79,7 +79,7 @@ static void amiga_akiko_exit(running_machine* machine)
 
 void amiga_akiko_init(running_machine* machine)
 {
-	i2cmem_init( 0, I2CMEM_SLAVE_ADDRESS, NVRAM_PAGE_SIZE, NVRAM_SIZE, NULL );
+	i2cmem_init( machine, 0, I2CMEM_SLAVE_ADDRESS, NVRAM_PAGE_SIZE, NVRAM_SIZE, NULL );
 
 	akiko.c2p_input_index = 0;
 	akiko.c2p_output_index = 0;
@@ -642,7 +642,7 @@ static void akiko_update_cdrom(const address_space *space)
 
 				if ( cmdbuf[7] == 0x80 )
 				{
-					if (LOG_AKIKO_CD) logerror( "AKIKO CD: PC:%06x Data read - start lba: %08x - end lba: %08x\n", safe_cpu_get_pc(Machine->activecpu), startpos, endpos );
+					if (LOG_AKIKO_CD) logerror( "%s:AKIKO CD: Data read - start lba: %08x - end lba: %08x\n", cpuexec_describe_context(space->machine), startpos, endpos );
 					akiko.cdrom_speed = (cmdbuf[8] & 0x40) ? 2 : 1;
 					akiko.cdrom_lba_start = startpos;
 					akiko.cdrom_lba_end = endpos;

@@ -341,10 +341,10 @@ static void set_scroll(tilemap *tm, int plane)
 
 static VIDEO_START( raiden2 )
 {
-	text_layer       = tilemap_create(get_text_tile_info, tilemap_scan_rows,  8, 8, 64,32 );
-	background_layer = tilemap_create(get_back_tile_info, tilemap_scan_rows, 16,16, 32,32 );
-	midground_layer  = tilemap_create(get_mid_tile_info,  tilemap_scan_rows, 16,16, 32,32 );
-	foreground_layer = tilemap_create(get_fore_tile_info, tilemap_scan_rows, 16,16, 32,32 );
+	text_layer       = tilemap_create(machine, get_text_tile_info, tilemap_scan_rows,  8, 8, 64,32 );
+	background_layer = tilemap_create(machine, get_back_tile_info, tilemap_scan_rows, 16,16, 32,32 );
+	midground_layer  = tilemap_create(machine, get_mid_tile_info,  tilemap_scan_rows, 16,16, 32,32 );
+	foreground_layer = tilemap_create(machine, get_fore_tile_info, tilemap_scan_rows, 16,16, 32,32 );
 
 	tilemap_set_transparent_pen(midground_layer, 15);
 	tilemap_set_transparent_pen(foreground_layer, 15);
@@ -682,18 +682,18 @@ WRITE16_HANDLER(sprcpt_flags_2_w)
 // XXX
 // write only: 4c0 4c1 500 501 502 503
 
-static UINT16 handle_io_r(running_machine *machine, int offset)
+static UINT16 handle_io_r(const address_space *space, int offset)
 {
-	logerror("io_r %04x, %04x (%x)\n", offset*2, mainram[offset], cpu_get_pc(machine->activecpu));
+	logerror("io_r %04x, %04x (%x)\n", offset*2, mainram[offset], cpu_get_pc(space->cpu));
 	return mainram[offset];
 }
 
-static void handle_io_w(running_machine *machine, int offset, UINT16 data, UINT16 mem_mask)
+static void handle_io_w(const address_space *space, int offset, UINT16 data, UINT16 mem_mask)
 {
 	COMBINE_DATA(&mainram[offset]);
 	switch(offset) {
 	default:
-		logerror("io_w %04x, %04x & %04x (%x)\n", offset*2, data, mem_mask, cpu_get_pc(machine->activecpu));
+		logerror("io_w %04x, %04x & %04x (%x)\n", offset*2, data, mem_mask, cpu_get_pc(space->cpu));
 	}
 }
 
@@ -702,7 +702,7 @@ static READ16_HANDLER(any_r)
 	c_r[offset]++;
 
 	if(offset >= 0x400/2 && offset < 0x800/2)
-		return handle_io_r(space->machine, offset);
+		return handle_io_r(space, offset);
 
 	return mainram[offset];
 }
@@ -711,7 +711,7 @@ static WRITE16_HANDLER(any_w)
 {
 	int show = 0;
 	if(offset >= 0x400/2 && offset < 0x800/2)
-		handle_io_w(space->machine, offset, data, mem_mask);
+		handle_io_w(space, offset, data, mem_mask);
 
 	c_w[offset]++;
 	//  logerror("mainram_w %04x, %02x (%x)\n", offset, data, cpu_get_pc(space->cpu));
@@ -1853,7 +1853,7 @@ static NVRAM_HANDLER( rdx_v33 )
 		eeprom_save(file);
 	else
 	{
-		eeprom_init(&eeprom_interface_93C46);
+		eeprom_init(machine, &eeprom_interface_93C46);
 
 		if (file) eeprom_load(file);
 		else

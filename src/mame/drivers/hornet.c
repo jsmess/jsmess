@@ -435,13 +435,13 @@ static int K037122_vh_start(running_machine *machine, int chip)
 
 	if (chip == 0)
 	{
-		K037122_layer[chip][0] = tilemap_create(K037122_0_tile_info_layer0, tilemap_scan_rows, 8, 8, 256, 64);
-		K037122_layer[chip][1] = tilemap_create(K037122_0_tile_info_layer1, tilemap_scan_rows, 8, 8, 128, 64);
+		K037122_layer[chip][0] = tilemap_create(machine, K037122_0_tile_info_layer0, tilemap_scan_rows, 8, 8, 256, 64);
+		K037122_layer[chip][1] = tilemap_create(machine, K037122_0_tile_info_layer1, tilemap_scan_rows, 8, 8, 128, 64);
 	}
 	else
 	{
-		K037122_layer[chip][0] = tilemap_create(K037122_1_tile_info_layer0, tilemap_scan_rows, 8, 8, 256, 64);
-		K037122_layer[chip][1] = tilemap_create(K037122_1_tile_info_layer1, tilemap_scan_rows, 8, 8, 128, 64);
+		K037122_layer[chip][0] = tilemap_create(machine, K037122_1_tile_info_layer0, tilemap_scan_rows, 8, 8, 256, 64);
+		K037122_layer[chip][1] = tilemap_create(machine, K037122_1_tile_info_layer1, tilemap_scan_rows, 8, 8, 128, 64);
 	}
 
 	tilemap_set_transparent_pen(K037122_layer[chip][0], 0);
@@ -452,7 +452,7 @@ static int K037122_vh_start(running_machine *machine, int chip)
 	memset(K037122_dirty_map[chip], 0, K037122_NUM_TILES);
 	memset(K037122_reg[chip], 0, 0x400);
 
-	machine->gfx[K037122_gfx_index[chip]] = allocgfx(&K037122_char_layout);
+	machine->gfx[K037122_gfx_index[chip]] = allocgfx(machine, &K037122_char_layout);
 	decodegfx(machine->gfx[K037122_gfx_index[chip]], (UINT8*)K037122_char_ram[chip], 0, machine->gfx[K037122_gfx_index[chip]]->total_elements);
 
 	machine->gfx[K037122_gfx_index[chip]]->total_colors = machine->config->total_colors / 16;
@@ -1069,6 +1069,7 @@ static MACHINE_DRIVER_START( hornet )
 	MDRV_NVRAM_HANDLER( hornet )
 
 	MDRV_3DFX_VOODOO_1_ADD("voodoo0", STD_VOODOO_1_CLOCK, 2, "main")
+	MDRV_3DFX_VOODOO_CPU("dsp")
 	MDRV_3DFX_VOODOO_TMU_MEMORY(0, 4)
 	MDRV_3DFX_VOODOO_VBLANK(voodoo_vblank_0)
 
@@ -1126,10 +1127,12 @@ static MACHINE_DRIVER_START( hornet_2board )
 
 	MDRV_3DFX_VOODOO_REMOVE("voodoo0")
 	MDRV_3DFX_VOODOO_1_ADD("voodoo0", STD_VOODOO_1_CLOCK, 2, "left")
+	MDRV_3DFX_VOODOO_CPU("dsp")
 	MDRV_3DFX_VOODOO_TMU_MEMORY(0, 4)
 	MDRV_3DFX_VOODOO_VBLANK(voodoo_vblank_0)
 
 	MDRV_3DFX_VOODOO_1_ADD("voodoo1", STD_VOODOO_1_CLOCK, 2, "right")
+	MDRV_3DFX_VOODOO_CPU("dsp2")
 	MDRV_3DFX_VOODOO_TMU_MEMORY(0, 4)
 	MDRV_3DFX_VOODOO_VBLANK(voodoo_vblank_1)
 
@@ -1156,11 +1159,13 @@ static MACHINE_DRIVER_START( hornet_2board_v2 )
 
 	MDRV_3DFX_VOODOO_REMOVE("voodoo0")
 	MDRV_3DFX_VOODOO_2_ADD("voodoo0", STD_VOODOO_2_CLOCK, 2, "left")
+	MDRV_3DFX_VOODOO_CPU("dsp")
 	MDRV_3DFX_VOODOO_TMU_MEMORY(0, 4)
 	MDRV_3DFX_VOODOO_VBLANK(voodoo_vblank_0)
 
 	MDRV_3DFX_VOODOO_REMOVE("voodoo1")
 	MDRV_3DFX_VOODOO_2_ADD("voodoo1", STD_VOODOO_2_CLOCK, 2, "right")
+	MDRV_3DFX_VOODOO_CPU("dsp2")
 	MDRV_3DFX_VOODOO_TMU_MEMORY(0, 4)
 	MDRV_3DFX_VOODOO_VBLANK(voodoo_vblank_1)
 MACHINE_DRIVER_END
@@ -1183,6 +1188,7 @@ static void jamma_jvs_w(UINT8 data)
 
 static int jvs_encode_data(UINT8 *in, int length)
 {
+	running_machine *machine = Machine;
 	int inptr = 0;
 	int sum = 0;
 
@@ -1192,19 +1198,19 @@ static int jvs_encode_data(UINT8 *in, int length)
 		if (b == 0xe0)
 		{
 			sum += 0xd0 + 0xdf;
-			ppc4xx_spu_receive_byte(Machine->cpu[0], 0xd0);
-			ppc4xx_spu_receive_byte(Machine->cpu[0], 0xdf);
+			ppc4xx_spu_receive_byte(machine->cpu[0], 0xd0);
+			ppc4xx_spu_receive_byte(machine->cpu[0], 0xdf);
 		}
 		else if (b == 0xd0)
 		{
 			sum += 0xd0 + 0xcf;
-			ppc4xx_spu_receive_byte(Machine->cpu[0], 0xd0);
-			ppc4xx_spu_receive_byte(Machine->cpu[0], 0xcf);
+			ppc4xx_spu_receive_byte(machine->cpu[0], 0xd0);
+			ppc4xx_spu_receive_byte(machine->cpu[0], 0xcf);
 		}
 		else
 		{
 			sum += b;
-			ppc4xx_spu_receive_byte(Machine->cpu[0], b);
+			ppc4xx_spu_receive_byte(machine->cpu[0], b);
 		}
 	}
 	return sum;
@@ -1234,6 +1240,7 @@ static int jvs_decode_data(UINT8 *in, UINT8 *out, int length)
 
 static void jamma_jvs_cmd_exec(void)
 {
+	running_machine *machine = Machine;
 	UINT8 sync, node, byte_num;
 	UINT8 data[1024], rdata[1024];
 	int length;
@@ -1293,11 +1300,11 @@ static void jamma_jvs_cmd_exec(void)
 
 	// write jvs return data
 	sum = 0x00 + (rdata_ptr+1);
-	ppc4xx_spu_receive_byte(Machine->cpu[0], 0xe0);			// sync
-	ppc4xx_spu_receive_byte(Machine->cpu[0], 0x00);			// node
-	ppc4xx_spu_receive_byte(Machine->cpu[0], rdata_ptr+1);	// num of bytes
+	ppc4xx_spu_receive_byte(machine->cpu[0], 0xe0);			// sync
+	ppc4xx_spu_receive_byte(machine->cpu[0], 0x00);			// node
+	ppc4xx_spu_receive_byte(machine->cpu[0], rdata_ptr+1);	// num of bytes
 	sum += jvs_encode_data(rdata, rdata_ptr);
-	ppc4xx_spu_receive_byte(Machine->cpu[0], sum - 1);		// checksum
+	ppc4xx_spu_receive_byte(machine->cpu[0], sum - 1);		// checksum
 
 	jvs_sdata_ptr = 0;
 }
@@ -1323,7 +1330,7 @@ static DRIVER_INIT(hornet)
 	set_cgboard_texture_bank(0, 5, memory_region(machine, "user5"));
 
 	K056800_init(machine, sound_irq_callback);
-	K033906_init();
+	K033906_init(machine);
 
 	led_reg0 = led_reg1 = 0x7f;
 
@@ -1337,7 +1344,7 @@ static DRIVER_INIT(hornet_2board)
 	set_cgboard_texture_bank(1, 6, memory_region(machine, "user5"));
 
 	K056800_init(machine, sound_irq_callback);
-	K033906_init();
+	K033906_init(machine);
 
 	led_reg0 = led_reg1 = 0x7f;
 

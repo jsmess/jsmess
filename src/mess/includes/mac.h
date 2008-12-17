@@ -11,6 +11,7 @@
 
 #include "sound/custom.h"
 #include "machine/8530scc.h"
+#include "machine/6522via.h"
 
 
 // video parameters
@@ -23,6 +24,8 @@
 /*----------- defined in machine/mac.c -----------*/
 
 extern const scc8530_interface mac_scc8530_interface;
+extern const via6522_interface mac_via6522_intf;
+extern const via6522_interface mac_via6522_adb_intf;
 
 MACHINE_START( macscsi );
 MACHINE_RESET( mac );
@@ -59,7 +62,7 @@ void mac_set_screen_buffer( int buffer );
 
 /*----------- defined in audio/mac.c -----------*/
 
-void *mac_sh_start(int clock, const custom_sound_interface *config);
+void *mac_sh_start(const device_config *device, int clock, const custom_sound_interface *config);
 
 void mac_enable_sound( int on );
 void mac_set_sound_buffer( int buffer );

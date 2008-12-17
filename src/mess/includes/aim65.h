@@ -9,6 +9,8 @@
 #ifndef AIM65_H_
 #define AIM65_H_
 
+#include "machine/6522via.h"
+
 
 /** R6502 Clock.
  *
@@ -20,6 +22,9 @@
 
 
 /*----------- defined in machine/aim65.c -----------*/
+
+extern const via6522_interface aim65_via0;
+extern const via6522_interface aim65_user_via;
 
 void aim65_update_ds1(int digit, int data);
 void aim65_update_ds2(int digit, int data);
@@ -43,7 +48,7 @@ void aim65_printer_data_a(UINT8 data);
 void aim65_printer_data_b(UINT8 data);
 
 TIMER_CALLBACK(aim65_printer_timer);
-WRITE8_HANDLER( aim65_printer_on );
+WRITE8_DEVICE_HANDLER( aim65_printer_on );
 
 
 #endif /* AIM65_H_ */

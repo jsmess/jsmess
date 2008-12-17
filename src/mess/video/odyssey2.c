@@ -567,9 +567,9 @@ VIDEO_UPDATE( odyssey2 )
 	return 0;
 }
 
-static void *odyssey2_sh_start(int clock, const custom_sound_interface *config)
+static void *odyssey2_sh_start(const device_config *device, int clock, const custom_sound_interface *config)
 {
-	odyssey2_sh_channel = stream_create(0, 1, clock/(I824X_LINE_CLOCKS*4), 0, odyssey2_sh_update );
+	odyssey2_sh_channel = stream_create(device, 0, 1, clock/(I824X_LINE_CLOCKS*4), 0, odyssey2_sh_update );
 	return (void *) ~0;
 }
 

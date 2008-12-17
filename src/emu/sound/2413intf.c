@@ -57,12 +57,12 @@ static SND_START( ym2413 )
 	memset(info, 0, sizeof(*info));
 
 	/* emulator create */
-	info->chip = ym2413_init(clock, rate, device);
+	info->chip = ym2413_init(device, clock, rate);
 	if (!info->chip)
 		return NULL;
 
 	/* stream system initialize */
-	info->stream = stream_create(0,2,rate,info,ym2413_stream_update);
+	info->stream = stream_create(device,0,2,rate,info,ym2413_stream_update);
 
 	ym2413_set_update_handler(info->chip, _stream_update, info);
 
@@ -85,7 +85,7 @@ static SND_START( ym2413 )
 	{
 		ym2413_reset (i);
 
-		ym2413[i].DAC_stream = stream_create(0, 1, clock/72, i, YM2413DAC_update);
+		ym2413[i].DAC_stream = stream_create(device, 0, 1, clock/72, i, YM2413DAC_update);
 
 		if (ym2413[i].DAC_stream == -1)
 			return 1;

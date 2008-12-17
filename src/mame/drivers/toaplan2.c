@@ -243,7 +243,6 @@ To Do / Unknowns:
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/eeprom.h"
@@ -1231,7 +1230,7 @@ static NVRAM_HANDLER( bbakraid )
 		eeprom_save(file);
 	else
 	{
-		eeprom_init(&eeprom_interface_93C66);
+		eeprom_init(machine, &eeprom_interface_93C66);
 
 		if (file) eeprom_load(file);
 		else

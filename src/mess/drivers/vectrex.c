@@ -18,7 +18,7 @@ Bruce Tomlin (hardware info)
 static ADDRESS_MAP_START(vectrex_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc800, 0xcbff) AM_RAM AM_MIRROR(0x0400) AM_BASE(&vectorram) AM_SIZE(&vectorram_size)
-	AM_RANGE(0xd000, 0xd7ff) AM_READWRITE(via_0_r, vectrex_via_w)
+	AM_RANGE(0xd000, 0xd7ff) AM_READWRITE(vectrex_via_r, vectrex_via_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -116,6 +116,9 @@ static MACHINE_DRIVER_START(vectrex)
 	MDRV_SOUND_ADD("ay8912", AY8912, 1500000)
 	MDRV_SOUND_CONFIG(vectrex_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+
+	/* via */
+	MDRV_VIA6522_ADD("via6522_0", 0, vectrex_via6522_interface)
 MACHINE_DRIVER_END
 
 static void vectrex_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
@@ -186,7 +189,7 @@ static ADDRESS_MAP_START(raaspec_map , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(raaspec_led_w)
 	AM_RANGE(0xc800, 0xcbff) AM_RAM AM_MIRROR(0x0400) AM_BASE(&vectorram) AM_SIZE(&vectorram_size)
-	AM_RANGE(0xd000, 0xd7ff) AM_READWRITE (via_0_r, vectrex_via_w)
+	AM_RANGE(0xd000, 0xd7ff) AM_READWRITE (vectrex_via_r, vectrex_via_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -216,6 +219,10 @@ static MACHINE_DRIVER_START(raaspec)
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	MDRV_VIDEO_START(raaspec)
+
+	/* via */
+	MDRV_VIA6522_REMOVE("via6522_0")
+	MDRV_VIA6522_ADD("via6522_0", 0, spectrum1_via6522_interface)
 MACHINE_DRIVER_END
 
 ROM_START(raaspec)

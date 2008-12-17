@@ -138,10 +138,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 static VIDEO_START( darkhors )
 {
-	darkhors_tmap			=	tilemap_create(	get_tile_info_0, tilemap_scan_rows,
+	darkhors_tmap			=	tilemap_create(	machine, get_tile_info_0, tilemap_scan_rows,
 												16,16, 0x40,0x40	);
 
-	darkhors_tmap2			=	tilemap_create(	get_tile_info_1, tilemap_scan_rows,
+	darkhors_tmap2			=	tilemap_create(	machine, get_tile_info_1, tilemap_scan_rows,
 												16,16, 0x40,0x40	);
 
 	tilemap_set_transparent_pen(darkhors_tmap, 0);
@@ -220,7 +220,7 @@ static NVRAM_HANDLER( darkhors )
 		eeprom_save(file);
 	else
 	{
-		eeprom_init(&eeprom_intf);
+		eeprom_init(machine, &eeprom_intf);
 
 		if (file) eeprom_load(file);
 		else

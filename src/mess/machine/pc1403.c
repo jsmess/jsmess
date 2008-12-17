@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/sc61860/sc61860.h"
 
 #include "includes/pocketc.h"
@@ -41,7 +40,7 @@ WRITE8_HANDLER(pc1403_asic_write)
     }
 }
 
- READ8_HANDLER(pc1403_asic_read)
+READ8_HANDLER(pc1403_asic_read)
 {
     UINT8 data=asic[offset>>9];
     switch( (offset>>9) ){
@@ -52,40 +51,39 @@ WRITE8_HANDLER(pc1403_asic_write)
     return data;
 }
 
-void pc1403_outa(int data)
+void pc1403_outa(const device_config *device, int data)
 {
     outa=data;
 }
 
-int pc1403_ina(void)
+int pc1403_ina(const device_config *device)
 {
     UINT8 data=outa;
-	running_machine *machine = Machine;
 
     if (asic[3] & 0x01)
-		data |= input_port_read(machine, "KEY0");
+		data |= input_port_read(device->machine, "KEY0");
 
     if (asic[3] & 0x02)
-		data |= input_port_read(machine, "KEY1");
+		data |= input_port_read(device->machine, "KEY1");
 
     if (asic[3] & 0x04)
-		data |= input_port_read(machine, "KEY2");
+		data |= input_port_read(device->machine, "KEY2");
 
     if (asic[3] & 0x08)
-		data |= input_port_read(machine, "KEY3");
+		data |= input_port_read(device->machine, "KEY3");
 
     if (asic[3] & 0x10)
-		data |= input_port_read(machine, "KEY4");
+		data |= input_port_read(device->machine, "KEY4");
 
     if (asic[3] & 0x20)
-		data |= input_port_read(machine, "KEY5");
+		data |= input_port_read(device->machine, "KEY5");
 
     if (asic[3] & 0x40)
-		data |= input_port_read(machine, "KEY6");
+		data |= input_port_read(device->machine, "KEY6");
 
     if (outa & 0x01)
 	{
-		data |= input_port_read(machine, "KEY7");
+		data |= input_port_read(device->machine, "KEY7");
 		
 		/* At Power Up we fake a 'C-CE' pressure */
 		if (power)
@@ -93,22 +91,22 @@ int pc1403_ina(void)
 	}
 
     if (outa & 0x02)
-		data |= input_port_read(machine, "KEY8");
+		data |= input_port_read(device->machine, "KEY8");
 
     if (outa & 0x04)
-		data |= input_port_read(machine, "KEY9");
+		data |= input_port_read(device->machine, "KEY9");
 
     if (outa & 0x08)
-		data |= input_port_read(machine, "KEY10");
+		data |= input_port_read(device->machine, "KEY10");
 
     if (outa & 0x10)
-		data |= input_port_read(machine, "KEY11");
+		data |= input_port_read(device->machine, "KEY11");
 
     if (outa & 0x20)
-		data |= input_port_read(machine, "KEY12");
+		data |= input_port_read(device->machine, "KEY12");
 
     if (outa & 0x40)
-		data |= input_port_read(machine, "KEY13");
+		data |= input_port_read(device->machine, "KEY13");
 
     return data;
 }
@@ -125,30 +123,29 @@ int pc1403_inb(void)
 }
 #endif
 
-void pc1403_outc(int data)
+void pc1403_outc(const device_config *device, int data)
 {
     pc1403_portc = data;
-//    logerror("%g pc %.4x outc %.2x\n", attotime_to_double(timer_get_time(machine)), cpu_get_pc(Machine->cpu[0]), data);
+//    logerror("%g pc %.4x outc %.2x\n", attotime_to_double(timer_get_time(device->machine)), cpu_get_pc(device->machine->cpu[0]), data);
 }
 
 
-int pc1403_brk(void)
+int pc1403_brk(const device_config *device)
 {
-	running_machine *machine = Machine;
-	return (input_port_read(machine, "EXTRA") & 0x01);
+	return (input_port_read(device->machine, "EXTRA") & 0x01);
 }
 
-int pc1403_reset(void)
+int pc1403_reset(const device_config *device)
 {
-	running_machine *machine = Machine;
-	return (input_port_read(machine, "EXTRA") & 0x02);
+	return (input_port_read(device->machine, "EXTRA") & 0x02);
 }
 
 /* currently enough to save the external ram */
 NVRAM_HANDLER( pc1403 )
 {
-	UINT8 *ram=memory_region(machine, "main")+0x8000,
-		*cpu=sc61860_internal_ram();
+	const device_config *main_cpu = cputag_get_cpu(machine, "main");
+	UINT8 *ram = memory_region(machine, "main") + 0x8000;
+	UINT8 *cpu = sc61860_internal_ram(main_cpu);
 
 	if (read_or_write)
 	{

@@ -113,8 +113,8 @@ static ADDRESS_MAP_START( vc20_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x8000, 0x8fff) AM_ROM
 	AM_RANGE(0x9000, 0x900f) AM_READWRITE( vic6560_port_r, vic6560_port_w )
 	AM_RANGE(0x9010, 0x910f) AM_NOP
-	AM_RANGE(0x9110, 0x911f) AM_READWRITE( via_0_r, via_0_w )
-	AM_RANGE(0x9120, 0x912f) AM_READWRITE( via_1_r, via_1_w )
+	AM_RANGE(0x9110, 0x911f) AM_DEVREADWRITE(VIA6522, "via6522_0", via_r, via_w)
+	AM_RANGE(0x9120, 0x912f) AM_DEVREADWRITE(VIA6522, "via6522_1", via_r, via_w)
 	AM_RANGE(0x9130, 0x93ff) AM_NOP
 	AM_RANGE(0x9400, 0x97ff) AM_READWRITE(SMH_RAM, vc20_write_9400) AM_BASE(&vc20_memory_9400)	/*color ram 4 bit */
 	AM_RANGE(0x9800, 0x9fff) AM_RAM
@@ -132,11 +132,11 @@ static ADDRESS_MAP_START( vc20i_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x8000, 0x8fff) AM_ROM
 	AM_RANGE(0x9000, 0x900f) AM_READWRITE( vic6560_port_r, vic6560_port_w )
 	AM_RANGE(0x9010, 0x910f) AM_NOP
-	AM_RANGE(0x9110, 0x911f) AM_READWRITE( via_0_r, via_0_w )
-	AM_RANGE(0x9120, 0x912f) AM_READWRITE( via_1_r, via_1_w )
+	AM_RANGE(0x9110, 0x911f) AM_DEVREADWRITE(VIA6522, "via6522_0", via_r, via_w)
+	AM_RANGE(0x9120, 0x912f) AM_DEVREADWRITE(VIA6522, "via6522_1", via_r, via_w)
 	AM_RANGE(0x9400, 0x97ff) AM_READWRITE( SMH_RAM, vc20_write_9400) AM_BASE(&vc20_memory_9400)	/* color ram 4 bit */
-	AM_RANGE(0x9800, 0x980f) AM_READWRITE( via_4_r, via_4_w )
-	AM_RANGE(0x9810, 0x981f) AM_READWRITE( via_5_r, via_5_w )
+	AM_RANGE(0x9800, 0x980f) AM_DEVREADWRITE(VIA6522, "via6522_4", via_r, via_w)
+	AM_RANGE(0x9810, 0x981f) AM_DEVREADWRITE(VIA6522, "via6522_5", via_r, via_w)
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK(5)
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -284,7 +284,16 @@ static MACHINE_DRIVER_START( vic20 )
 	/* devices */
 	MDRV_QUICKLOAD_ADD(cbm_vc20, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
+	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", cbm_cassette_config )
+
+	/* via */
+	MDRV_VIA6522_ADD("via6522_0", 0, vc20_via0)
+	MDRV_VIA6522_ADD("via6522_1", 0, vc20_via1)
+	MDRV_VIA6522_ADD("via6522_2", 0, vc1541_via2)
+	MDRV_VIA6522_ADD("via6522_3", 0, vc1541_via3)
+	MDRV_VIA6522_ADD("via6522_4", 0, vc20_via4)
+	MDRV_VIA6522_ADD("via6522_5", 0, vc20_via5)
 MACHINE_DRIVER_END
 
 

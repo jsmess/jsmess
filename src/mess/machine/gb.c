@@ -36,7 +36,6 @@
 #define __MACHINE_GB_C
 
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/gb.h"
 #include "cpu/lr35902/lr35902.h"
 #include "image.h"
@@ -1846,24 +1845,24 @@ static void gb_timer_increment( running_machine *machine ) {
 	}
 }
 
-void gb_timer_callback(int cycles) {
+void gb_timer_callback(const device_config *device, int cycles) {
 	UINT16 old_gb_divcount = gb_timer.divcount;
 	gb_timer.divcount += cycles;
 
-	gb_timer_check_irq(Machine);
+	gb_timer_check_irq(device->machine);
 
 	if ( TIMEFRQ & 0x04 ) {
 		UINT16 old_count = old_gb_divcount >> gb_timer.shift;
 		UINT16 new_count = gb_timer.divcount >> gb_timer.shift;
 		if ( cycles > gb_timer.shift_cycles ) {
-			gb_timer_increment(Machine);
+			gb_timer_increment(device->machine);
 			old_count++;
 		}
 		if ( new_count != old_count ) {
-			gb_timer_increment(Machine);
+			gb_timer_increment(device->machine);
 		}
 		if ( new_count << gb_timer.shift < gb_timer.divcount ) {
-			gb_timer_check_irq(Machine);
+			gb_timer_check_irq(device->machine);
 		}
 	}
 }

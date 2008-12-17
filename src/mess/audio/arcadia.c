@@ -7,7 +7,6 @@
 
 #include "driver.h"
 #include "streams.h"
-#include "deprecat.h"
 #include "includes/arcadia.h"
 
 
@@ -70,9 +69,9 @@ static void arcadia_update(void *param,stream_sample_t **inputs, stream_sample_t
 /* Sound handler start              */
 /************************************/
 
-static void *arcadia_custom_start(int clock, const custom_sound_interface *config)
+static void *arcadia_custom_start(const device_config *device, int clock, const custom_sound_interface *config)
 {
-    arcadia_sound.channel = stream_create(0, 1, Machine->sample_rate, 0, arcadia_update);
+    arcadia_sound.channel = stream_create(device, 0, 1, device->machine->sample_rate, 0, arcadia_update);
     return (void *) ~0;
 }
 

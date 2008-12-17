@@ -102,7 +102,7 @@ static INTERRUPT_GEN( ti990_10_line_interrupt )
 {
 }*/
 
-static void rset_callback(void)
+static void rset_callback(const device_config *device)
 {
 	ti990_cpuboard_reset();
 
@@ -112,10 +112,10 @@ static void rset_callback(void)
 	/* clear controller panel and smi fault LEDs */
 }
 
-static void lrex_callback(void)
+static void lrex_callback(const device_config *device)
 {
 	/* right??? */
-	ti990_hold_load(Machine);
+	ti990_hold_load(device->machine);
 }
 
 /*

@@ -533,7 +533,6 @@ Newer version of the I/O chip ?
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "taitoic.h"
 
 #define TOPSPEED_ROAD_COLORS
@@ -578,11 +577,12 @@ INLINE void taitoic_drawscanline(
 /* Note: various assumptions are made in these routines, typically that
    only CPU#0 is of interest. If in doubt, check the routine. */
 
-static int has_write_handler(int cpunum, write16_space_func handler)
+static int has_write_handler(running_machine *machine, int cpunum, write16_space_func handler)
 {
-	if (Machine->cpu[cpunum] != NULL)
+	const device_config *cpu = machine->cpu[cpunum];
+	if (cpu != NULL)
 	{
-		const address_space *space = cpu_get_address_space(Machine->cpu[cpunum], ADDRESS_SPACE_PROGRAM);
+		const address_space *space = cpu_get_address_space(cpu, ADDRESS_SPACE_PROGRAM);
 		const address_map_entry *entry;
 
 		if (space != NULL && space->map != NULL)
@@ -594,84 +594,62 @@ static int has_write_handler(int cpunum, write16_space_func handler)
 	return 0;
 }
 
-int number_of_TC0100SCN(void)
+int TC0100SCN_count(running_machine *machine)
 {
-	int has_chip[3] = {0,0,0};
-
-	/* scan the memory handlers and see how many TC0100SCN are used */
-	if (has_write_handler(0, TC0100SCN_word_0_w) ||
-		has_write_handler(0, TC0100SCN_dual_screen_w) ||
-		has_write_handler(0, TC0100SCN_triple_screen_w))
-		has_chip[0] = 1;
-
-	if (has_write_handler(0, TC0100SCN_word_1_w))
-		has_chip[1] = 1;
-
-	if (has_write_handler(0, TC0100SCN_word_2_w))
-		has_chip[2] = 1;
+	int mask = (has_write_handler(machine, 0, TC0100SCN_word_0_w) ||
+		has_write_handler(machine, 0, TC0100SCN_dual_screen_w) ||
+		has_write_handler(machine, 0, TC0100SCN_triple_screen_w)) ? 1 : 0;
+	mask |= has_write_handler(machine, 0, TC0100SCN_word_1_w) << 1;
+	mask |= has_write_handler(machine, 0, TC0100SCN_word_2_w) << 2;
 
 	/* Catch illegal configurations */
 	/* TODO: we should give an appropriate warning */
-
-	if (!has_chip[0] && (has_chip[1] || has_chip[2]))
-		return -1;
-
-	if (!has_chip[1] && has_chip[2])
-		return -1;
-
-	return (has_chip[0] + has_chip[1] + has_chip[2]);
+	assert_always(mask == 0 || mask == 1 || mask == 3 || mask == 7, "Invalid TC0110PCR configuration");
+	return BIT(mask,0) + BIT(mask,1) + BIT(mask,2);
 }
 
 
-int has_TC0110PCR(void)
+int TC0110PCR_mask(running_machine *machine)
 {
-	return	has_write_handler(0, TC0110PCR_word_w) ||
-			has_write_handler(0, TC0110PCR_step1_word_w) ||
-			has_write_handler(0, TC0110PCR_step1_rbswap_word_w) ||
-			has_write_handler(0, TC0110PCR_step1_4bpg_word_w);
+	int mask = (has_write_handler(machine, 0, TC0110PCR_word_w) ||
+			has_write_handler(machine, 0, TC0110PCR_step1_word_w) ||
+			has_write_handler(machine, 0, TC0110PCR_step1_rbswap_word_w) ||
+			has_write_handler(machine, 0, TC0110PCR_step1_4bpg_word_w)) ? 1 : 0;
+	mask |= has_write_handler(machine, 0, TC0110PCR_step1_word_1_w) << 1;
+	mask |= has_write_handler(machine, 0, TC0110PCR_step1_word_2_w) << 2;
+	return mask;
 }
 
-int has_second_TC0110PCR(void)
+int has_TC0150ROD(running_machine *machine)
 {
-	return	has_write_handler(0, TC0110PCR_step1_word_1_w);
-}
-
-int has_third_TC0110PCR(void)
-{
-	return	has_write_handler(0, TC0110PCR_step1_word_2_w);
-}
-
-
-int has_TC0150ROD(void)
-{
-	return	has_write_handler(0, TC0150ROD_word_w) ||
-			has_write_handler(1, TC0150ROD_word_w) ||
-			has_write_handler(2, TC0150ROD_word_w);
+	return	has_write_handler(machine, 0, TC0150ROD_word_w) ||
+			has_write_handler(machine, 1, TC0150ROD_word_w) ||
+			has_write_handler(machine, 2, TC0150ROD_word_w);
 }
 
 
-int has_TC0280GRD(void)
+int has_TC0280GRD(running_machine *machine)
 {
-	return	has_write_handler(0, TC0280GRD_word_w);
+	return	has_write_handler(machine, 0, TC0280GRD_word_w);
 }
 
 
-int has_TC0360PRI(void)
+int has_TC0360PRI(running_machine *machine)
 {
-	return	has_write_handler(0, TC0360PRI_halfword_w) ||
-			has_write_handler(0, TC0360PRI_halfword_swap_w);
+	return	has_write_handler(machine, 0, TC0360PRI_halfword_w) ||
+			has_write_handler(machine, 0, TC0360PRI_halfword_swap_w);
 }
 
 
-int has_TC0430GRW(void)
+int has_TC0430GRW(running_machine *machine)
 {
-	return	has_write_handler(0, TC0430GRW_word_w);
+	return	has_write_handler(machine, 0, TC0430GRW_word_w);
 }
 
 
-int has_TC0480SCP(void)
+int has_TC0480SCP(running_machine *machine)
 {
-	return	has_write_handler(0, TC0480SCP_word_w);
+	return	has_write_handler(machine, 0, TC0480SCP_word_w);
 }
 
 
@@ -804,13 +782,13 @@ void PC080SN_vh_start(running_machine *machine,int chips,int gfxnum,int x_offset
 
 		if (!PC080SN_dblwidth)	/* standard tilemaps */
 		{
-			PC080SN_tilemap[i][0] = tilemap_create(PC080SN_get_tile_info[i][0],tilemap_scan_rows,8,8,64,64);
-			PC080SN_tilemap[i][1] = tilemap_create(PC080SN_get_tile_info[i][1],tilemap_scan_rows,8,8,64,64);
+			PC080SN_tilemap[i][0] = tilemap_create(machine, PC080SN_get_tile_info[i][0],tilemap_scan_rows,8,8,64,64);
+			PC080SN_tilemap[i][1] = tilemap_create(machine, PC080SN_get_tile_info[i][1],tilemap_scan_rows,8,8,64,64);
 		}
 		else	/* double width tilemaps */
 		{
-			PC080SN_tilemap[i][0] = tilemap_create(PC080SN_get_tile_info[i][0],tilemap_scan_rows,8,8,128,64);
-			PC080SN_tilemap[i][1] = tilemap_create(PC080SN_get_tile_info[i][1],tilemap_scan_rows,8,8,128,64);
+			PC080SN_tilemap[i][0] = tilemap_create(machine, PC080SN_get_tile_info[i][0],tilemap_scan_rows,8,8,128,64);
+			PC080SN_tilemap[i][1] = tilemap_create(machine, PC080SN_get_tile_info[i][1],tilemap_scan_rows,8,8,128,64);
 		}
 
 		PC080SN_ram[i] = auto_malloc(PC080SN_RAM_SIZE);
@@ -1539,8 +1517,8 @@ void TC0080VCO_vh_start(running_machine *machine, int gfxnum,int has_fg0,int bg_
 	TC0080VCO_bg_flip_yoffs = bg_flip_yoffs;	/* usually -2 */
 	TC0080VCO_has_tx = has_fg0;	/* for debugging only */
 
-	TC0080VCO_tilemap[0] = tilemap_create(TC0080VCO_get_bg0_tile_info_0,tilemap_scan_rows,16,16,64,64);
-	TC0080VCO_tilemap[1] = tilemap_create(TC0080VCO_get_bg1_tile_info_0,tilemap_scan_rows,16,16,64,64);
+	TC0080VCO_tilemap[0] = tilemap_create(machine, TC0080VCO_get_bg0_tile_info_0,tilemap_scan_rows,16,16,64,64);
+	TC0080VCO_tilemap[1] = tilemap_create(machine, TC0080VCO_get_bg1_tile_info_0,tilemap_scan_rows,16,16,64,64);
 	TC0080VCO_ram = auto_malloc(TC0080VCO_RAM_SIZE);
 
 	memset( TC0080VCO_ram,0,TC0080VCO_RAM_SIZE );
@@ -1562,7 +1540,7 @@ void TC0080VCO_vh_start(running_machine *machine, int gfxnum,int has_fg0,int bg_
 
 	/* Perform extra initialisations for text layer */
 	{
-		TC0080VCO_tilemap[2] = tilemap_create(TC0080VCO_get_tx_tile_info,tilemap_scan_rows,8,8,64,64);
+		TC0080VCO_tilemap[2] = tilemap_create(machine, TC0080VCO_get_tx_tile_info,tilemap_scan_rows,8,8,64,64);
 		TC0080VCO_char_dirty = auto_malloc(TC0080VCO_TOTAL_CHARS);
 
 		TC0080VCO_dirty_chars();
@@ -1574,7 +1552,7 @@ void TC0080VCO_vh_start(running_machine *machine, int gfxnum,int has_fg0,int bg_
 		assert(gfx_index != MAX_GFX_ELEMENTS);
 
 		/* create the char set (gfx will then be updated dynamically from RAM) */
-		machine->gfx[gfx_index] = allocgfx(&TC0080VCO_charlayout);
+		machine->gfx[gfx_index] = allocgfx(machine, &TC0080VCO_charlayout);
 
 		/* set the color information */
 		machine->gfx[gfx_index]->total_colors = 64;	// is this correct ?
@@ -2308,14 +2286,14 @@ void TC0100SCN_vh_start(running_machine *machine, int chips,int gfxnum,int x_off
 			screen = machine->primary_screen;
 
 		/* Single width versions */
-		TC0100SCN_tilemap[i][0][0] = tilemap_create(TC0100SCN_get_tile_info[i][0],tilemap_scan_rows,8,8,64,64);
-		TC0100SCN_tilemap[i][1][0] = tilemap_create(TC0100SCN_get_tile_info[i][1],tilemap_scan_rows,8,8,64,64);
-		TC0100SCN_tilemap[i][2][0] = tilemap_create(TC0100SCN_get_tile_info[i][2],tilemap_scan_rows,8,8,64,64);
+		TC0100SCN_tilemap[i][0][0] = tilemap_create(machine, TC0100SCN_get_tile_info[i][0],tilemap_scan_rows,8,8,64,64);
+		TC0100SCN_tilemap[i][1][0] = tilemap_create(machine, TC0100SCN_get_tile_info[i][1],tilemap_scan_rows,8,8,64,64);
+		TC0100SCN_tilemap[i][2][0] = tilemap_create(machine, TC0100SCN_get_tile_info[i][2],tilemap_scan_rows,8,8,64,64);
 
 		/* Double width versions */
-		TC0100SCN_tilemap[i][0][1] = tilemap_create(TC0100SCN_get_tile_info[i][0],tilemap_scan_rows,8,8,128,64);
-		TC0100SCN_tilemap[i][1][1] = tilemap_create(TC0100SCN_get_tile_info[i][1],tilemap_scan_rows,8,8,128,64);
-		TC0100SCN_tilemap[i][2][1] = tilemap_create(TC0100SCN_get_tile_info[i][2],tilemap_scan_rows,8,8,128,32);
+		TC0100SCN_tilemap[i][0][1] = tilemap_create(machine, TC0100SCN_get_tile_info[i][0],tilemap_scan_rows,8,8,128,64);
+		TC0100SCN_tilemap[i][1][1] = tilemap_create(machine, TC0100SCN_get_tile_info[i][1],tilemap_scan_rows,8,8,128,64);
+		TC0100SCN_tilemap[i][2][1] = tilemap_create(machine, TC0100SCN_get_tile_info[i][2],tilemap_scan_rows,8,8,128,32);
 
 		/* Set up clipping for multi-TC0100SCN games. We assume
            this code won't ever affect single screen games:
@@ -2348,7 +2326,7 @@ void TC0100SCN_vh_start(running_machine *machine, int chips,int gfxnum,int x_off
 		assert(gfx_index != MAX_GFX_ELEMENTS);
 
 		/* create the char set (gfx will then be updated dynamically from RAM) */
-		machine->gfx[gfx_index] = allocgfx(&TC0100SCN_charlayout);
+		machine->gfx[gfx_index] = allocgfx(machine, &TC0100SCN_charlayout);
 
 		/* set the color information */
 		machine->gfx[gfx_index]->total_colors = 64;
@@ -2800,7 +2778,7 @@ static TILE_GET_INFO( TC0280GRD_get_tile_info )
 void TC0280GRD_vh_start(running_machine *machine, int gfxnum)
 {
 	TC0280GRD_ram = auto_malloc(TC0280GRD_RAM_SIZE);
-	TC0280GRD_tilemap = tilemap_create(TC0280GRD_get_tile_info,tilemap_scan_rows,8,8,64,64);
+	TC0280GRD_tilemap = tilemap_create(machine, TC0280GRD_get_tile_info,tilemap_scan_rows,8,8,64,64);
 
 	state_save_register_global_pointer(machine, TC0280GRD_ram, TC0280GRD_RAM_SIZE/2);
 	state_save_register_global_array(machine, TC0280GRD_ctrl);
@@ -3185,18 +3163,18 @@ void TC0480SCP_vh_start(running_machine *machine, int gfxnum,int pixels,int x_of
 		TC0480SCP_dblwidth=0;
 
 		/* Single width versions */
-		TC0480SCP_tilemap[0][0] = tilemap_create(tc480_get_tile_info[0],tilemap_scan_rows,16,16,32,32);
-		TC0480SCP_tilemap[1][0] = tilemap_create(tc480_get_tile_info[1],tilemap_scan_rows,16,16,32,32);
-		TC0480SCP_tilemap[2][0] = tilemap_create(tc480_get_tile_info[2],tilemap_scan_rows,16,16,32,32);
-		TC0480SCP_tilemap[3][0] = tilemap_create(tc480_get_tile_info[3],tilemap_scan_rows,16,16,32,32);
-		TC0480SCP_tilemap[4][0] = tilemap_create(tc480_get_tile_info[4],tilemap_scan_rows,8,8,64,64);
+		TC0480SCP_tilemap[0][0] = tilemap_create(machine, tc480_get_tile_info[0],tilemap_scan_rows,16,16,32,32);
+		TC0480SCP_tilemap[1][0] = tilemap_create(machine, tc480_get_tile_info[1],tilemap_scan_rows,16,16,32,32);
+		TC0480SCP_tilemap[2][0] = tilemap_create(machine, tc480_get_tile_info[2],tilemap_scan_rows,16,16,32,32);
+		TC0480SCP_tilemap[3][0] = tilemap_create(machine, tc480_get_tile_info[3],tilemap_scan_rows,16,16,32,32);
+		TC0480SCP_tilemap[4][0] = tilemap_create(machine, tc480_get_tile_info[4],tilemap_scan_rows,8,8,64,64);
 
 		/* Double width versions */
-		TC0480SCP_tilemap[0][1] = tilemap_create(tc480_get_tile_info[0],tilemap_scan_rows,16,16,64,32);
-		TC0480SCP_tilemap[1][1] = tilemap_create(tc480_get_tile_info[1],tilemap_scan_rows,16,16,64,32);
-		TC0480SCP_tilemap[2][1] = tilemap_create(tc480_get_tile_info[2],tilemap_scan_rows,16,16,64,32);
-		TC0480SCP_tilemap[3][1] = tilemap_create(tc480_get_tile_info[3],tilemap_scan_rows,16,16,64,32);
-		TC0480SCP_tilemap[4][1] = tilemap_create(tc480_get_tile_info[4],tilemap_scan_rows,8,8,64,64);
+		TC0480SCP_tilemap[0][1] = tilemap_create(machine, tc480_get_tile_info[0],tilemap_scan_rows,16,16,64,32);
+		TC0480SCP_tilemap[1][1] = tilemap_create(machine, tc480_get_tile_info[1],tilemap_scan_rows,16,16,64,32);
+		TC0480SCP_tilemap[2][1] = tilemap_create(machine, tc480_get_tile_info[2],tilemap_scan_rows,16,16,64,32);
+		TC0480SCP_tilemap[3][1] = tilemap_create(machine, tc480_get_tile_info[3],tilemap_scan_rows,16,16,64,32);
+		TC0480SCP_tilemap[4][1] = tilemap_create(machine, tc480_get_tile_info[4],tilemap_scan_rows,8,8,64,64);
 
 		TC0480SCP_ram = auto_malloc(TC0480SCP_RAM_SIZE);
 		TC0480SCP_char_dirty = auto_malloc(TC0480SCP_TOTAL_CHARS);
@@ -3217,7 +3195,7 @@ void TC0480SCP_vh_start(running_machine *machine, int gfxnum,int pixels,int x_of
 		assert(gfx_index != MAX_GFX_ELEMENTS);
 
 		/* create the char set (gfx will then be updated dynamically from RAM) */
-		machine->gfx[gfx_index] = allocgfx(&TC0480SCP_charlayout);
+		machine->gfx[gfx_index] = allocgfx(machine, &TC0480SCP_charlayout);
 
 		/* set the color information */
 		machine->gfx[gfx_index]->total_colors = 64;

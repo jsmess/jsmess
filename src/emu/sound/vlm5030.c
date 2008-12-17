@@ -75,7 +75,6 @@ chirp 12-..: vokume   0   : silent
 */
 #include "sndintrf.h"
 #include "streams.h"
-#include "deprecat.h"
 #include "vlm5030.h"
 
 /* interpolator per frame   */
@@ -89,6 +88,7 @@ chirp 12-..: vokume   0   : silent
 
 struct vlm5030_info
 {
+	const device_config *device;
 	const vlm5030_interface *intf;
 
 	sound_stream * channel;
@@ -369,7 +369,7 @@ static void vlm5030_update_callback(void *param,stream_sample_t **inputs, stream
 			}
 			else if (chip->old_pitch <= 1)
 			{	/* generate unvoiced samples here */
-				current_val = (mame_rand(Machine)&1) ? chip->current_energy : -chip->current_energy;
+				current_val = (mame_rand(chip->device->machine)&1) ? chip->current_energy : -chip->current_energy;
 			}
 			else
 			{
@@ -646,6 +646,7 @@ static SND_START( vlm5030 )
 	chip = auto_malloc(sizeof(*chip));
 	memset(chip, 0, sizeof(*chip));
 
+	chip->device = device;
 	chip->intf = (config != NULL) ? config : &defintrf;
 
 	emulation_rate = clock / 440;
@@ -664,7 +665,7 @@ static SND_START( vlm5030 )
 	else
 		chip->address_mask = chip->intf->memory_size-1;
 
-	chip->channel = stream_create(0, 1, emulation_rate,chip,vlm5030_update_callback);
+	chip->channel = stream_create(device, 0, 1, emulation_rate,chip,vlm5030_update_callback);
 
 	/* don't restore "UINT8 *chip->rom" when use vlm5030_set_rom() */
 

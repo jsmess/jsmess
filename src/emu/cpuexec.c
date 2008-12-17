@@ -63,7 +63,6 @@ struct _cpu_class_data
 	cpu_class_header header;				/* header containing public data */
 
 	/* cycle counting and executing */
-	UINT8			executing;				/* TRUE if the values below are valid */
 	int *			icount;					/* pointer to the icount */
 	int 			cycles_running;			/* number of cycles we are executing */
 	int				cycles_stolen;			/* number of cycles we artificially stole */
@@ -95,6 +94,15 @@ struct _cpu_class_data
 	INT32 			iloops; 				/* number of interrupts remaining this frame */
 	emu_timer *		partial_frame_timer;	/* the timer that triggers partial frame interrupts */
 	attotime		partial_frame_period;	/* the length of one partial frame for interrupt purposes */
+};
+
+
+/* global data stored in the machine */
+/* In mame.h: typedef struct _cpuexec_private cpuexec_private; */
+struct _cpuexec_private
+{
+	const device_config *executingcpu;		/* pointer to the currently executing CPU */
+	char			statebuf[256];			/* string buffer containing state description */
 };
 
 
@@ -199,6 +207,10 @@ void cpuexec_init(running_machine *machine)
 {
 	int cpunum;
 
+	/* allocate global state */
+	machine->cpuexec_data = auto_malloc(sizeof(*machine->cpuexec_data));
+	memset(machine->cpuexec_data, 0, sizeof(*machine->cpuexec_data));
+
 	/* loop over all our CPUs */
 	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->config->cpu); cpunum++)
 		if (machine->cpu[cpunum] != NULL)
@@ -250,11 +262,9 @@ void cpuexec_init(running_machine *machine)
 				classdata->timedint_timer = timer_alloc(machine, trigger_periodic_interrupt, device);
 
 			/* initialize this CPU */
-			state_save_push_tag(cpunum + 1);
 			num_regs = state_save_get_reg_count(machine);
 			cpu_init(device, cpunum, classdata->clock, standard_irq_callback);
 			num_regs = state_save_get_reg_count(machine) - num_regs;
-			state_save_pop_tag();
 
 			/* fetch post-initialization data */
 			classdata->icount = cpu_get_icount_ptr(device);
@@ -350,6 +360,7 @@ static void cpuexec_exit(running_machine *machine)
 void cpuexec_timeslice(running_machine *machine)
 {
 	int call_debugger = ((machine->debug_flags & DEBUG_FLAG_ENABLED) != 0);
+	cpuexec_private *global = machine->cpuexec_data;
 	attotime target = timer_next_fire_time(machine);
 	attotime base = timer_get_time(machine);
 	int cpunum, ran;
@@ -369,7 +380,8 @@ void cpuexec_timeslice(running_machine *machine)
 	/* loop over non-suspended CPUs */
 	for (cpunum = 0; machine->cpu[cpunum] != NULL; cpunum++)
 	{
-		cpu_class_data *classdata = machine->cpu[cpunum]->classtoken;
+		const device_config *cpu = machine->cpu[cpunum];
+		cpu_class_data *classdata = cpu->classtoken;
 		if (classdata->suspend == 0)
 		{
 			attotime delta = attotime_sub(target, classdata->localtime);
@@ -384,14 +396,14 @@ void cpuexec_timeslice(running_machine *machine)
 				/* note that this global variable cycles_stolen can be modified */
 				/* via the call to the cpunum_execute */
 				classdata->cycles_stolen = 0;
-				classdata->executing = TRUE;
+				global->executingcpu = cpu;
 				if (!call_debugger)
-					ran = cpu_execute(machine->cpu[cpunum], classdata->cycles_running);
+					ran = cpu_execute(cpu, classdata->cycles_running);
 				else
 				{
-					debugger_start_cpu_hook(machine->cpu[cpunum], target);
-					ran = cpu_execute(machine->cpu[cpunum], classdata->cycles_running);
-					debugger_stop_cpu_hook(machine->cpu[cpunum]);
+					debugger_start_cpu_hook(cpu, target);
+					ran = cpu_execute(cpu, classdata->cycles_running);
+					debugger_stop_cpu_hook(cpu);
 				}
 
 #ifdef MAME_DEBUG
@@ -399,7 +411,6 @@ void cpuexec_timeslice(running_machine *machine)
 					fatalerror("Negative CPU cycle count!");
 #endif /* MAME_DEBUG */
 
-				classdata->executing = FALSE;
 				ran -= classdata->cycles_stolen;
 				profiler_mark(PROFILER_END);
 
@@ -417,6 +428,7 @@ void cpuexec_timeslice(running_machine *machine)
 			}
 		}
 	}
+	global->executingcpu = NULL;
 
 	/* update the local times of all CPUs */
 	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu) && machine->cpu[cpunum] != NULL; cpunum++)
@@ -447,19 +459,10 @@ void cpuexec_timeslice(running_machine *machine)
 }
 
 
-/*-------------------------------------------------
-    cpuexec_boost_interleave - temporarily boosts
-    the interleave factor
--------------------------------------------------*/
 
-void cpuexec_boost_interleave(running_machine *machine, attotime timeslice_time, attotime boost_duration)
-{
-	/* ignore timeslices > 1 second */
-	if (timeslice_time.seconds > 0)
-		return;
-	timer_add_scheduling_quantum(machine, timeslice_time.attoseconds, boost_duration);
-}
-
+/***************************************************************************
+    GLOBAL HELPERS
+***************************************************************************/
 
 /*-------------------------------------------------
     cputag_get_cpu - return a pointer to the given
@@ -475,6 +478,41 @@ const device_config *cputag_get_cpu(running_machine *machine, const char *tag)
 			return machine->cpu[cpunum];
 
 	return NULL;
+}
+
+
+/*-------------------------------------------------
+    cpuexec_boost_interleave - temporarily boosts
+    the interleave factor
+-------------------------------------------------*/
+
+void cpuexec_boost_interleave(running_machine *machine, attotime timeslice_time, attotime boost_duration)
+{
+	/* ignore timeslices > 1 second */
+	if (timeslice_time.seconds > 0)
+		return;
+	timer_add_scheduling_quantum(machine, timeslice_time.attoseconds, boost_duration);
+}
+
+
+/*-------------------------------------------------
+    cpuexec_describe_context - return a string
+    describing which CPUs are currently executing
+    and their PC
+-------------------------------------------------*/
+
+const char *cpuexec_describe_context(running_machine *machine)
+{
+	cpuexec_private *global = machine->cpuexec_data;
+	const device_config *executingcpu = global->executingcpu;
+
+	/* if we have an executing CPU, output data */
+	if (executingcpu != NULL)
+		sprintf(global->statebuf, "'%s'(%08X)", executingcpu->tag, cpu_get_pc(executingcpu));
+	else
+		strcpy(global->statebuf, "(no context)");
+
+	return global->statebuf;
 }
 
 
@@ -497,8 +535,7 @@ void cpu_suspend(const device_config *device, int reason, int eatcycles)
 	classdata->nexteatcycles = eatcycles;
 
 	/* if we're active, synchronize */
-	if (classdata->executing)
-		cpu_abort_timeslice(device);
+	cpu_abort_timeslice(device);
 }
 
 
@@ -515,8 +552,7 @@ void cpu_resume(const device_config *device, int reason)
 	classdata->nextsuspend &= ~reason;
 
 	/* if we're active, synchronize */
-	if (classdata->executing)
-		cpu_abort_timeslice(device);
+	cpu_abort_timeslice(device);
 }
 
 
@@ -527,8 +563,7 @@ void cpu_resume(const device_config *device, int reason)
 
 int cpu_is_executing(const device_config *device)
 {
-	cpu_class_data *classdata = get_safe_classtoken(device);
-	return classdata->executing;
+	return (device == device->machine->cpuexec_data->executingcpu);
 }
 
 
@@ -615,13 +650,17 @@ void cpu_set_clockscale(const device_config *device, double clockscale)
     clock ticks to an attotime
 -------------------------------------------------*/
 
-attotime cpu_clocks_to_attotime(const device_config *device, UINT32 clocks)
+attotime cpu_clocks_to_attotime(const device_config *device, UINT64 clocks)
 {
 	cpu_class_data *classdata = get_safe_classtoken(device);
 	if (clocks < classdata->cycles_per_second)
 		return attotime_make(0, clocks * classdata->attoseconds_per_cycle);
 	else
-		return attotime_make(clocks / classdata->cycles_per_second, (clocks % classdata->cycles_per_second) * classdata->attoseconds_per_cycle);
+	{
+		UINT32 remainder;
+		UINT32 quotient = divu_64x32_rem(clocks, classdata->cycles_per_second, &remainder);
+		return attotime_make(quotient, (UINT64)remainder * (UINT64)classdata->attoseconds_per_cycle);
+	}
 }
 
 
@@ -630,10 +669,10 @@ attotime cpu_clocks_to_attotime(const device_config *device, UINT32 clocks)
     as attotime to CPU clock ticks
 -------------------------------------------------*/
 
-UINT32 cpu_attotime_to_clocks(const device_config *device, attotime duration)
+UINT64 cpu_attotime_to_clocks(const device_config *device, attotime duration)
 {
 	cpu_class_data *classdata = get_safe_classtoken(device);
-	return duration.seconds * classdata->cycles_per_second + duration.attoseconds / classdata->attoseconds_per_cycle;
+	return mulu_32x32(duration.seconds, classdata->cycles_per_second) + (UINT64)duration.attoseconds * (UINT64)classdata->attoseconds_per_cycle;
 }
 
 
@@ -654,12 +693,27 @@ attotime cpu_get_local_time(const device_config *device)
 
 	/* if we're active, add in the time from the current slice */
 	result = classdata->localtime;
-	if (classdata->executing)
+	if (device == device->machine->cpuexec_data->executingcpu)
 	{
 		int cycles = classdata->cycles_running - *classdata->icount;
 		result = attotime_add(result, cpu_clocks_to_attotime(device, cycles));
 	}
 	return result;
+}
+
+
+/*-------------------------------------------------
+    cpuexec_override_local_time - overrides the
+    given time with the executing CPU's local
+    time, if present (this function is private
+    to timer.c)
+-------------------------------------------------*/
+
+attotime cpuexec_override_local_time(running_machine *machine, attotime default_time)
+{
+	if (machine->cpuexec_data != NULL && machine->cpuexec_data->executingcpu != NULL)
+		return cpu_get_local_time(machine->cpuexec_data->executingcpu);
+	return default_time;
 }
 
 
@@ -673,7 +727,7 @@ UINT64 cpu_get_total_cycles(const device_config *device)
 {
 	cpu_class_data *classdata = get_safe_classtoken(device);
 
-	if (classdata->executing)
+	if (device == device->machine->cpuexec_data->executingcpu)
 		return classdata->totalcycles + classdata->cycles_running - *classdata->icount;
 	else
 		return classdata->totalcycles;
@@ -690,7 +744,7 @@ void cpu_eat_cycles(const device_config *device, int cycles)
 	cpu_class_data *classdata = get_safe_classtoken(device);
 
 	/* ignore if not the executing CPU */
-	if (!classdata->executing)
+	if (device != device->machine->cpuexec_data->executingcpu)
 		return;
 
 	if (cycles > *classdata->icount)
@@ -709,7 +763,7 @@ void cpu_adjust_icount(const device_config *device, int delta)
 	cpu_class_data *classdata = get_safe_classtoken(device);
 
 	/* ignore if not the executing CPU */
-	if (!classdata->executing)
+	if (device != device->machine->cpuexec_data->executingcpu)
 		return;
 
 	*classdata->icount += delta;
@@ -728,7 +782,7 @@ void cpu_abort_timeslice(const device_config *device)
 	int delta;
 
 	/* ignore if not the executing CPU */
-	if (!classdata->executing)
+	if (device != device->machine->cpuexec_data->executingcpu)
 		return;
 
 	/* swallow the remaining cycles */
@@ -739,6 +793,19 @@ void cpu_abort_timeslice(const device_config *device)
 		classdata->cycles_running -= delta;
 		*classdata->icount -= delta;
 	}
+}
+
+
+/*-------------------------------------------------
+    cpuexec_abort_timeslice - abort execution
+    for the current timeslice
+-------------------------------------------------*/
+
+void cpuexec_abort_timeslice(running_machine *machine)
+{
+	const device_config *executingcpu = machine->cpuexec_data->executingcpu;
+	if (executingcpu != NULL)
+		cpu_abort_timeslice(executingcpu);
 }
 
 
@@ -834,8 +901,7 @@ void cpuexec_trigger(running_machine *machine, int trigger)
 		cpu_class_data *classdata = machine->cpu[cpunum]->classtoken;
 
 		/* if we're executing, for an immediate abort */
-		if (classdata->executing)
-			cpu_abort_timeslice(machine->cpu[cpunum]);
+		cpu_abort_timeslice(machine->cpu[cpunum]);
 
 		/* see if this is a matching trigger */
 		if (classdata->suspend != 0 && classdata->trigger == trigger)
@@ -919,60 +985,9 @@ void cpu_set_input_line_and_vector(const device_config *device, int line, int st
 {
 	cpu_class_data *classdata = get_safe_classtoken(device);
 
-#ifdef MAME_DEBUG
 	/* catch errors where people use PULSE_LINE for CPUs that don't support it */
 	if (state == PULSE_LINE && line != INPUT_LINE_NMI && line != INPUT_LINE_RESET)
-	{
-		switch (classdata->header.cputype)
-		{
-			case CPU_Z80:
-			case CPU_Z180:
-			case CPU_M68000:
-			case CPU_M68008:
-			case CPU_M68010:
-			case CPU_M68EC020:
-			case CPU_M68020:
-			case CPU_M68040:
-			case CPU_R4600BE:
-			case CPU_R4600LE:
-			case CPU_R4650BE:
-			case CPU_R4650LE:
-			case CPU_R4700BE:
-			case CPU_R4700LE:
-			case CPU_R5000BE:
-			case CPU_R5000LE:
-			case CPU_QED5271BE:
-			case CPU_QED5271LE:
-			case CPU_RM7000BE:
-			case CPU_RM7000LE:
-			case CPU_PPC403GA:
-			case CPU_PPC403GCX:
-			case CPU_PPC601:
-			case CPU_PPC602:
-			case CPU_PPC603:
-			case CPU_PPC603E:
-			case CPU_PPC603R:
-			case CPU_PPC604:
-			case CPU_I8035:
-			case CPU_I8041:
-			case CPU_I8048:
-			case CPU_I8648:
-			case CPU_I8748:
-			case CPU_MB8884:
-			case CPU_N7751:
-			case CPU_TMS34010:
-			case CPU_TMS34020:
-			case CPU_TMS32010:
-			case CPU_TMS32025:
-			case CPU_TMS32026:
-				fatalerror("CPU %s: PULSE_LINE used with level-detected IRQ %d\n", device->tag, line);
-				break;
-
-			default:
-				break;
-		}
-	}
-#endif
+		fatalerror("CPU %s: PULSE_LINE can only be used for NMI and RESET lines\n", device->tag);
 
 	if (line >= 0 && line < MAX_INPUT_LINES)
 	{
@@ -1204,11 +1219,7 @@ static void on_vblank(const device_config *device, void *param, int vblank_state
 				if (cpu_interested)
 				{
 					if (!(classdata->suspend & (SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE)))
-					{
-						cpu_push_context(cpudevice);
 						(*config->vblank_interrupt)(cpudevice);
-						cpu_pop_context();
-					}
 
 					/* if we have more than one interrupt per frame, start the timer now to trigger the rest of them */
 					if (config->vblank_interrupts_per_frame > 1 && !(classdata->suspend & SUSPEND_REASON_DISABLE))
@@ -1240,11 +1251,7 @@ static TIMER_CALLBACK( trigger_partial_frame_interrupt )
 
 	/* call the interrupt handler */
 	if (!cpu_is_suspended(device, SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE))
-	{
-		cpu_push_context(device);
 		(*config->vblank_interrupt)(device);
-		cpu_pop_context();
-	}
 
 	/* more? */
 	if (classdata->iloops > 1)
@@ -1264,11 +1271,7 @@ static TIMER_CALLBACK( trigger_periodic_interrupt )
 
 	/* bail if there is no routine */
 	if (config->timed_interrupt != NULL && !cpu_is_suspended(device, SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE))
-	{
-		cpu_push_context(device);
 		(*config->timed_interrupt)(device);
-		cpu_pop_context();
-	}
 }
 
 
@@ -1294,9 +1297,6 @@ static TIMER_CALLBACK( empty_event_queue )
 	cpu_class_data *classdata = device->classtoken;
 	cpu_input_data *inputline = &classdata->input[param];
 	int curevent;
-
-	/* swap to the CPU's context */
-	cpu_push_context(device);
 
 	/* loop over all events */
 	for (curevent = 0; curevent < inputline->qindex; curevent++)
@@ -1371,9 +1371,6 @@ static TIMER_CALLBACK( empty_event_queue )
 				cpu_triggerint(device);
 		}
 	}
-
-	/* swap back */
-	cpu_pop_context();
 
 	/* reset counter */
 	inputline->qindex = 0;

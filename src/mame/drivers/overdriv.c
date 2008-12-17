@@ -114,7 +114,7 @@ static NVRAM_HANDLER( overdriv )
 		eeprom_save(file);
 	else
 	{
-		eeprom_init(&eeprom_intf);
+		eeprom_init(machine, &eeprom_intf);
 
 		if (file)
 			eeprom_load(file);
@@ -490,7 +490,7 @@ ROM_END
 
 static DRIVER_INIT( overdriv )
 {
-	konami_rom_deinterleave_4("gfx1");
+	konami_rom_deinterleave_4(machine, "gfx1");
 }
 
 

@@ -7,6 +7,7 @@
 #ifndef VC20_H_
 #define VC20_H_
 
+#include "machine/6522via.h"
 
 #define VC20ADDR2VIC6560ADDR(a) (((a) > 0x8000) ? ((a) & 0x1fff) : ((a) | 0x2000))
 #define VIC6560ADDR2VC20ADDR(a) (((a) > 0x2000) ? ((a) & 0x1fff) : ((a) | 0x8000))
@@ -15,6 +16,10 @@
 /*----------- defined in machine/vc20.c -----------*/
 
 extern UINT8 *vc20_memory_9400;
+extern const via6522_interface vc20_via0;
+extern const via6522_interface vc20_via1;
+extern const via6522_interface vc20_via4;
+extern const via6522_interface vc20_via5;
 
 WRITE8_HANDLER ( vc20_write_9400 );
 

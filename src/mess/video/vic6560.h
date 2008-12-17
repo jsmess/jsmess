@@ -130,7 +130,7 @@ extern  READ8_HANDLER ( vic6560_port_r );
 /*----------- defined in audio/vic6560.c -----------*/
 
 /* private area */
-void *vic6560_custom_start(int clock, const custom_sound_interface *config);
+void *vic6560_custom_start(const device_config *device, int clock, const custom_sound_interface *config);
 void vic6560_soundport_w (running_machine *machine, int mode, int data);
 
 

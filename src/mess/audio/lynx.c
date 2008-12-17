@@ -3,8 +3,8 @@
 ******************************************************************************/
 
 #include "driver.h"
-#include "streams.h"
 #include "deprecat.h"
+#include "streams.h"
 #include "includes/lynx.h"
 
 
@@ -361,11 +361,11 @@ void lynx_audio_reset(void)
 /* Sound handler start              */
 /************************************/
 
-void *lynx_custom_start(int clock, const custom_sound_interface *config)
+void *lynx_custom_start(const device_config *device, int clock, const custom_sound_interface *config)
 {
-	mixer_channel = stream_create(0, 1, Machine->sample_rate, 0, lynx_update);
+	mixer_channel = stream_create(device, 0, 1, device->machine->sample_rate, 0, lynx_update);
 
-	usec_per_sample = 1000000 / Machine->sample_rate;
+	usec_per_sample = 1000000 / device->machine->sample_rate;
 
 	lynx_audio_init();
 	return (void *) ~0;
@@ -373,11 +373,11 @@ void *lynx_custom_start(int clock, const custom_sound_interface *config)
 
 
 
-void *lynx2_custom_start(int clock, const custom_sound_interface *config)
+void *lynx2_custom_start(const device_config *device, int clock, const custom_sound_interface *config)
 {
-    mixer_channel = stream_create(0, 2, Machine->sample_rate, 0, lynx2_update);
+    mixer_channel = stream_create(device, 0, 2, device->machine->sample_rate, 0, lynx2_update);
 
-    usec_per_sample = 1000000 / Machine->sample_rate;
+    usec_per_sample = 1000000 / device->machine->sample_rate;
 
     lynx_audio_init();
 	return (void *) ~0;

@@ -176,16 +176,16 @@ static WRITE32_DEVICE_HANDLER(at32_dma8237_2_w)
 // Intel 82439TX System Controller (MXTC)
 static UINT8 mxtc_config_reg[256];
 
-static UINT8 mxtc_config_r(int function, int reg)
+static UINT8 mxtc_config_r(const device_config *busdevice, const device_config *device, int function, int reg)
 {
 //  mame_printf_debug("MXTC: read %d, %02X\n", function, reg);
 
 	return mxtc_config_reg[reg];
 }
 
-static void mxtc_config_w(running_machine *machine, int function, int reg, UINT8 data)
+static void mxtc_config_w(const device_config *busdevice, const device_config *device, int function, int reg, UINT8 data)
 {
-//  mame_printf_debug("MXTC: write %d, %02X, %02X at %08X\n", function, reg, data, cpu_get_pc(machine->activecpu));
+//  mame_printf_debug("%s:MXTC: write %d, %02X, %02X\n", cpuexec_describe_context(busdevice->machine), function, reg, data);
 
 	switch(reg)
 	{
@@ -193,11 +193,11 @@ static void mxtc_config_w(running_machine *machine, int function, int reg, UINT8
 		{
 			if (data & 0x10)		// enable RAM access to region 0xf0000 - 0xfffff
 			{
-				memory_set_bankptr(machine, 1, bios_ram);
+				memory_set_bankptr(busdevice->machine, 1, bios_ram);
 			}
 			else					// disable RAM access (reads go to BIOS ROM)
 			{
-				memory_set_bankptr(machine, 1, memory_region(machine, "user1") + 0x30000);
+				memory_set_bankptr(busdevice->machine, 1, memory_region(busdevice->machine, "user1") + 0x30000);
 			}
 			break;
 		}
@@ -216,102 +216,102 @@ static void intel82439tx_init(void)
 	mxtc_config_reg[0x65] = 0x02;
 }
 
-static UINT32 intel82439tx_pci_r(int function, int reg, UINT32 mem_mask)
+static UINT32 intel82439tx_pci_r(const device_config *busdevice, const device_config *device, int function, int reg, UINT32 mem_mask)
 {
 	UINT32 r = 0;
 	if (ACCESSING_BITS_24_31)
 	{
-		r |= mxtc_config_r(function, reg + 3) << 24;
+		r |= mxtc_config_r(busdevice, device, function, reg + 3) << 24;
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		r |= mxtc_config_r(function, reg + 2) << 16;
+		r |= mxtc_config_r(busdevice, device, function, reg + 2) << 16;
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		r |= mxtc_config_r(function, reg + 1) << 8;
+		r |= mxtc_config_r(busdevice, device, function, reg + 1) << 8;
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		r |= mxtc_config_r(function, reg + 0) << 0;
+		r |= mxtc_config_r(busdevice, device, function, reg + 0) << 0;
 	}
 	return r;
 }
 
-static void intel82439tx_pci_w(int function, int reg, UINT32 data, UINT32 mem_mask)
+static void intel82439tx_pci_w(const device_config *busdevice, const device_config *device, int function, int reg, UINT32 data, UINT32 mem_mask)
 {
 	if (ACCESSING_BITS_24_31)
 	{
-		mxtc_config_w(Machine, function, reg + 3, (data >> 24) & 0xff);
+		mxtc_config_w(busdevice, device, function, reg + 3, (data >> 24) & 0xff);
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		mxtc_config_w(Machine, function, reg + 2, (data >> 16) & 0xff);
+		mxtc_config_w(busdevice, device, function, reg + 2, (data >> 16) & 0xff);
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		mxtc_config_w(Machine, function, reg + 1, (data >> 8) & 0xff);
+		mxtc_config_w(busdevice, device, function, reg + 1, (data >> 8) & 0xff);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		mxtc_config_w(Machine, function, reg + 0, (data >> 0) & 0xff);
+		mxtc_config_w(busdevice, device, function, reg + 0, (data >> 0) & 0xff);
 	}
 }
 
 // Intel 82371AB PCI-to-ISA / IDE bridge (PIIX4)
 static UINT8 piix4_config_reg[4][256];
 
-static UINT8 piix4_config_r(int function, int reg)
+static UINT8 piix4_config_r(const device_config *busdevice, const device_config *device, int function, int reg)
 {
 //  mame_printf_debug("PIIX4: read %d, %02X\n", function, reg);
 	return piix4_config_reg[function][reg];
 }
 
-static void piix4_config_w(int function, int reg, UINT8 data)
+static void piix4_config_w(const device_config *busdevice, const device_config *device, int function, int reg, UINT8 data)
 {
-//  mame_printf_debug("PIIX4: write %d, %02X, %02X at %08X\n", function, reg, data, cpu_get_pc(machine->activecpu));
+//  mame_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", cpuexec_describe_context(busdevice->machine), function, reg, data);
 	piix4_config_reg[function][reg] = data;
 }
 
-static UINT32 intel82371ab_pci_r(int function, int reg, UINT32 mem_mask)
+static UINT32 intel82371ab_pci_r(const device_config *busdevice, const device_config *device, int function, int reg, UINT32 mem_mask)
 {
 	UINT32 r = 0;
 	if (ACCESSING_BITS_24_31)
 	{
-		r |= piix4_config_r(function, reg + 3) << 24;
+		r |= piix4_config_r(busdevice, device, function, reg + 3) << 24;
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		r |= piix4_config_r(function, reg + 2) << 16;
+		r |= piix4_config_r(busdevice, device, function, reg + 2) << 16;
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		r |= piix4_config_r(function, reg + 1) << 8;
+		r |= piix4_config_r(busdevice, device, function, reg + 1) << 8;
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		r |= piix4_config_r(function, reg + 0) << 0;
+		r |= piix4_config_r(busdevice, device, function, reg + 0) << 0;
 	}
 	return r;
 }
 
-static void intel82371ab_pci_w(int function, int reg, UINT32 data, UINT32 mem_mask)
+static void intel82371ab_pci_w(const device_config *busdevice, const device_config *device, int function, int reg, UINT32 data, UINT32 mem_mask)
 {
 	if (ACCESSING_BITS_24_31)
 	{
-		piix4_config_w(function, reg + 3, (data >> 24) & 0xff);
+		piix4_config_w(busdevice, device, function, reg + 3, (data >> 24) & 0xff);
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		piix4_config_w(function, reg + 2, (data >> 16) & 0xff);
+		piix4_config_w(busdevice, device, function, reg + 2, (data >> 16) & 0xff);
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		piix4_config_w(function, reg + 1, (data >> 8) & 0xff);
+		piix4_config_w(busdevice, device, function, reg + 1, (data >> 8) & 0xff);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		piix4_config_w(function, reg + 0, (data >> 0) & 0xff);
+		piix4_config_w(busdevice, device, function, reg + 0, (data >> 0) & 0xff);
 	}
 }
 
@@ -422,15 +422,10 @@ static WRITE8_HANDLER(at_page8_w)
 static DMA8237_MEM_READ( pc_dma_read_byte )
 {
 	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	UINT8 result;
 	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
 		& 0xFF0000;
 
-	cpu_push_context(space->cpu);
-	result = memory_read_byte(space, page_offset + offset);
-	cpu_pop_context();
-
-	return result;
+	return memory_read_byte(space, page_offset + offset);
 }
 
 
@@ -440,9 +435,7 @@ static DMA8237_MEM_WRITE( pc_dma_write_byte )
 	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
 		& 0xFF0000;
 
-	cpu_push_context(space->cpu);
 	memory_write_byte(space, page_offset + offset, data);
-	cpu_pop_context();
 }
 
 
@@ -514,7 +507,7 @@ static ADDRESS_MAP_START(gamecstl_io, ADDRESS_SPACE_IO, 32)
 	AM_RANGE(0x0278, 0x027b) AM_WRITE(pnp_config_w)
 	AM_RANGE(0x03f0, 0x03ff) AM_DEVREADWRITE(IDE_CONTROLLER, "ide", fdc_r, fdc_w)
 	AM_RANGE(0x0a78, 0x0a7b) AM_WRITE(pnp_data_w)
-	AM_RANGE(0x0cf8, 0x0cff) AM_READWRITE(pci_32le_r,				pci_32le_w)
+	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE(PCI_BUS, "pcibus", pci_32le_r,	pci_32le_w)
 ADDRESS_MAP_END
 
 /*****************************************************************************/
@@ -662,20 +655,19 @@ static MACHINE_DRIVER_START(gamecstl)
 
 	MDRV_MACHINE_RESET(gamecstl)
 
-	MDRV_DEVICE_ADD( "pit8254", PIT8254 )
-	MDRV_DEVICE_CONFIG( gamecstl_pit8254_config )
+	MDRV_PCI_BUS_ADD("pcibus", 0)
+	MDRV_PCI_BUS_DEVICE(0, NULL, NULL, intel82439tx_pci_r, intel82439tx_pci_w)
+	MDRV_PCI_BUS_DEVICE(7, NULL, NULL, intel82371ab_pci_r, intel82371ab_pci_w)
 
-	MDRV_DEVICE_ADD( "dma8237_1", DMA8237 )
-	MDRV_DEVICE_CONFIG( dma8237_1_config )
+	MDRV_PIT8254_ADD( "pit8254", gamecstl_pit8254_config )
 
-	MDRV_DEVICE_ADD( "dma8237_2", DMA8237 )
-	MDRV_DEVICE_CONFIG( dma8237_2_config )
+	MDRV_DMA8237_ADD( "dma8237_1", dma8237_1_config )
 
-	MDRV_DEVICE_ADD( "pic8259_1", PIC8259 )
-	MDRV_DEVICE_CONFIG( gamecstl_pic8259_1_config )
+	MDRV_DMA8237_ADD( "dma8237_2", dma8237_2_config )
 
-	MDRV_DEVICE_ADD( "pic8259_2", PIC8259 )
-	MDRV_DEVICE_CONFIG( gamecstl_pic8259_2_config )
+	MDRV_PIC8259_ADD( "pic8259_1", gamecstl_pic8259_1_config )
+
+	MDRV_PIC8259_ADD( "pic8259_2", gamecstl_pic8259_2_config )
 
 	MDRV_IDE_CONTROLLER_ADD("ide", ide_interrupt)
 
@@ -696,18 +688,6 @@ static MACHINE_DRIVER_START(gamecstl)
 	MDRV_VIDEO_UPDATE(gamecstl)
 
 MACHINE_DRIVER_END
-
-static const struct pci_device_info intel82439tx =
-{
-	intel82439tx_pci_r,
-	intel82439tx_pci_w
-};
-
-static const struct pci_device_info intel82371ab =
-{
-	intel82371ab_pci_r,
-	intel82371ab_pci_w
-};
 
 static void set_gate_a20(int a20)
 {
@@ -746,11 +726,7 @@ static DRIVER_INIT( gamecstl )
 
 	intel82439tx_init();
 
-	pci_init();
-	pci_add_device(0, 0, &intel82439tx);
-	pci_add_device(0, 7, &intel82371ab);
-
-	kbdc8042_init(&at8042);
+	kbdc8042_init(machine, &at8042);
 }
 
 /*****************************************************************************/

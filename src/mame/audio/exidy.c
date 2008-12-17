@@ -7,7 +7,6 @@
 #include "driver.h"
 #include "machine/rescap.h"
 #include "streams.h"
-#include "deprecat.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/6821pia.h"
 #include "machine/6532riot.h"
@@ -338,21 +337,26 @@ static void exidy_stream_update(void *param, stream_sample_t **inputs, stream_sa
  *
  *************************************/
 
-void *exidy_sh6840_sh_start(int clock, const custom_sound_interface *config)
+static void *common_sh_start(const device_config *device, int clock, const custom_sound_interface *config)
 {
 	int sample_rate = SH8253_CLOCK;
 
 	sh6840_clocks_per_sample = (int)((double)SH6840_CLOCK / (double)sample_rate * (double)(1 << 24));
 
 	/* allocate the stream */
-	exidy_stream = stream_create(0, 1, sample_rate, NULL, exidy_stream_update);
+	exidy_stream = stream_create(device, 0, 1, sample_rate, NULL, exidy_stream_update);
 
+	return auto_malloc(1);
+}
+
+CUSTOM_START( exidy_sh6840_sh_start )
+{
 	/* indicate no additional hardware */
 	has_sh8253  = FALSE;
 	has_tms5220 = FALSE;
 	has_mc3417 = FALSE;
 
-	return auto_malloc(1);
+	return common_sh_start(device, clock, config);
 }
 
 
@@ -363,7 +367,7 @@ void *exidy_sh6840_sh_start(int clock, const custom_sound_interface *config)
  *
  *************************************/
 
-void exidy_sh6840_sh_reset(void *token)
+static void common_sh_reset(void *token)
 {
 	/* 6840 */
 	memset(sh6840_timer, 0, sizeof(sh6840_timer));
@@ -379,6 +383,11 @@ void exidy_sh6840_sh_reset(void *token)
 	sh6840_LFSR_1 = 0xffffffff;
 	sh6840_LFSR_2 = 0xffffffff;
 	sh6840_LFSR_3 = 0xffffffff;
+}
+
+CUSTOM_RESET( exidy_sh6840_sh_reset )
+{
+	common_sh_reset(token);
 }
 
 
@@ -411,11 +420,11 @@ static void r6532_portb_w(const device_config *device, UINT8 newdata, UINT8 oldd
 		if ((olddata & 0x01) && !(newdata & 0x01))
 		{
 			riot6532_porta_in_set(riot, tms5220_status_r(space, 0), 0xff);
-			logerror("(%f)%04X:TMS5220 status read = %02X\n", attotime_to_double(timer_get_time(device->machine)), cpu_get_previouspc(device->machine->activecpu), tms5220_status_r(space, 0));
+			logerror("(%f)%s:TMS5220 status read = %02X\n", attotime_to_double(timer_get_time(device->machine)), cpuexec_describe_context(device->machine), tms5220_status_r(space, 0));
 		}
 		if ((olddata & 0x02) && !(newdata & 0x02))
 		{
-			logerror("(%f)%04X:TMS5220 data write = %02X\n", attotime_to_double(timer_get_time(device->machine)), cpu_get_previouspc(device->machine->activecpu), riot6532_porta_out_get(riot));
+			logerror("(%f)%s:TMS5220 data write = %02X\n", attotime_to_double(timer_get_time(device->machine)), cpuexec_describe_context(device->machine), riot6532_porta_out_get(riot));
 			tms5220_data_w(space, 0, riot6532_porta_out_get(riot));
 		}
 	}
@@ -626,13 +635,14 @@ static const pia6821_interface venture_pia_1_intf =
 };
 
 
-static void *venture_common_sh_start(int clock, const custom_sound_interface *config, int _has_tms5220)
+static void *venture_common_sh_start(const device_config *device, int clock, const custom_sound_interface *config, int _has_tms5220)
 {
+	running_machine *machine = device->machine;
 	int i;
 
-	void *ret = exidy_sh6840_sh_start(clock, config);
+	void *ret = common_sh_start(device, clock, config);
 
-	riot = device_list_find_by_tag(Machine->config->devicelist, RIOT6532, "riot");
+	riot = device_list_find_by_tag(machine->config->devicelist, RIOT6532, "riot");
 
 	has_sh8253  = TRUE;
 	has_tms5220 = _has_tms5220;
@@ -641,7 +651,7 @@ static void *venture_common_sh_start(int clock, const custom_sound_interface *co
 	has_mc3417 = FALSE;
 	for (i = 0; i < MAX_SOUND; i++)
 	{
-		if (Machine->config->sound[i].type == SOUND_MC3417)
+		if (machine->config->sound[i].type == SOUND_MC3417)
 			has_mc3417 = TRUE;
 	}
 
@@ -652,18 +662,19 @@ static void *venture_common_sh_start(int clock, const custom_sound_interface *co
 }
 
 
-static void *venture_sh_start(int clock, const custom_sound_interface *config)
+static CUSTOM_START( venture_sh_start )
 {
-	pia_config(0, &venture_pia_0_intf);
-	pia_config(1, &venture_pia_1_intf);
+	running_machine *machine = device->machine;
+	pia_config(machine, 0, &venture_pia_0_intf);
+	pia_config(machine, 1, &venture_pia_1_intf);
 
-	return venture_common_sh_start(clock, config, FALSE);
+	return venture_common_sh_start(device, clock, config, FALSE);
 }
 
 
-static void venture_sh_reset(void *token)
+static CUSTOM_RESET( venture_sh_reset )
 {
-	exidy_sh6840_sh_reset(token);
+	common_sh_reset(token);
 
 	/* PIA */
 	pia_reset();
@@ -848,19 +859,23 @@ static const pia6821_interface victory_pia_e5_intf =
 };
 
 
-static void *victory_sh_start(int clock, const custom_sound_interface *config)
+static CUSTOM_START( victory_sh_start )
 {
-	pia_config(1, &victory_pia_e5_intf);
+	running_machine *machine = device->machine;
+	pia_config(machine, 1, &victory_pia_e5_intf);
 
-	state_save_register_global(Machine, victory_sound_response_ack_clk);
+	state_save_register_global(machine, victory_sound_response_ack_clk);
 
-	return venture_common_sh_start(clock, config, TRUE);
+	return venture_common_sh_start(device, clock, config, TRUE);
 }
 
 
-static void victory_sh_reset(void *token)
+static CUSTOM_RESET( victory_sh_reset )
 {
-	venture_sh_reset(token);
+	common_sh_reset(token);
+	pia_reset();
+	device_reset(riot);
+	memset(sh8253_timer, 0, sizeof(sh8253_timer));
 
 	/* the flip-flop @ F4 is reset */
 	victory_sound_response_ack_clk = 0;

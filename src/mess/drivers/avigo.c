@@ -407,9 +407,9 @@ static MACHINE_RESET( avigo )
 	memset(avigo_banked_opbase, 0, sizeof(avigo_banked_opbase));
 
 	/* initialise flash memory */
-	intelflash_init(0, FLASH_INTEL_E28F008SA, memory_region(machine, "main")+0x10000);
-	intelflash_init(1, FLASH_INTEL_E28F008SA, memory_region(machine, "main")+0x110000);
-	intelflash_init(2, FLASH_INTEL_E28F008SA, NULL);
+	intelflash_init(machine, 0, FLASH_INTEL_E28F008SA, memory_region(machine, "main")+0x10000);
+	intelflash_init(machine, 1, FLASH_INTEL_E28F008SA, memory_region(machine, "main")+0x110000);
+	intelflash_init(machine, 2, FLASH_INTEL_E28F008SA, NULL);
 
 	stylus_marker_x = AVIGO_SCREEN_WIDTH>>1;
 	stylus_marker_y = AVIGO_SCREEN_HEIGHT>>1;

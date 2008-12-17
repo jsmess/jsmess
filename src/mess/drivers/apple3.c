@@ -57,6 +57,10 @@ static MACHINE_DRIVER_START( apple3 )
 
 	/* acia */
 	MDRV_DEVICE_ADD("acia", ACIA6551)
+
+	/* via */
+	MDRV_VIA6522_ADD("via6522_0", 1000000, apple3_via_0_intf)
+	MDRV_VIA6522_ADD("via6522_1", 2000000, apple3_via_1_intf)
 MACHINE_DRIVER_END
 
 

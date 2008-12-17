@@ -63,8 +63,8 @@ void viper_bankswitch(running_machine *machine);
 void offroad_bankswitch(running_machine *machine);
 void ataxx_bankswitch(running_machine *machine);
 
-void leland_init_eeprom(UINT8 default_val, const UINT16 *data, UINT8 serial_offset, UINT8 serial_type);
-void ataxx_init_eeprom(UINT8 default_val, const UINT16 *data, UINT8 serial_offset);
+void leland_init_eeprom(running_machine *machine, UINT8 default_val, const UINT16 *data, UINT8 serial_offset, UINT8 serial_type);
+void ataxx_init_eeprom(running_machine *machine, UINT8 default_val, const UINT16 *data, UINT8 serial_offset);
 
 READ8_HANDLER( ataxx_eeprom_r );
 WRITE8_HANDLER( ataxx_eeprom_w );
@@ -101,10 +101,10 @@ void leland_rotate_memory(running_machine *machine, const char *cpuname);
 
 /*----------- defined in audio/leland.c -----------*/
 
-void *leland_sh_start(int clock, const custom_sound_interface *config);
+CUSTOM_START( leland_sh_start );
 
-void *leland_80186_sh_start(int clock, const custom_sound_interface *config);
-void *redline_80186_sh_start(int clock, const custom_sound_interface *config);
+CUSTOM_START( leland_80186_sh_start );
+CUSTOM_START( redline_80186_sh_start );
 void leland_dac_update(int dacnum, UINT8 sample);
 
 void leland_80186_sound_init(void);

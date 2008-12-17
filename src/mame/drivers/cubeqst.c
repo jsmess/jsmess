@@ -114,14 +114,12 @@ static VIDEO_UPDATE( cubeqst )
 	/* Bit 3 selects LD/#GRAPHICS */
 	bitmap_fill(bitmap, cliprect, colormap[255]);
 
-	cpu_push_context(screen->machine->cpu[LINE_CPU]);
-
 	/* TODO: Add 1 for linebuffering? */
 	for (y = cliprect->min_y; y <= cliprect->max_y; ++y)
 	{
 		int i;
-		int num_entries = get_ptr_ram_val(y);
-		UINT32 *stk_ram = get_stack_ram();
+		int num_entries = cubeqcpu_get_ptr_ram_val(screen->machine->cpu[LINE_CPU], y);
+		UINT32 *stk_ram = cubeqcpu_get_stack_ram(screen->machine->cpu[LINE_CPU]);
 		UINT32 *dest = BITMAP_ADDR32(bitmap, y, 0);
 		UINT32 pen;
 
@@ -173,7 +171,6 @@ static VIDEO_UPDATE( cubeqst )
 		}
 	}
 
-	cpu_pop_context();
 	return 0;
 }
 
@@ -248,13 +245,10 @@ static WRITE16_HANDLER( control_w )
 
 static TIMER_CALLBACK( delayed_bank_swap )
 {
-	cpu_push_context(machine->cpu[LINE_CPU]);
-	cubeqcpu_swap_line_banks();
+	cubeqcpu_swap_line_banks(machine->cpu[LINE_CPU]);
 
 	/* TODO: This is a little dubious */
-	clear_stack();
-
-	cpu_pop_context();
+	cubeqcpu_clear_stack(machine->cpu[LINE_CPU]);
 }
 
 
@@ -384,6 +378,26 @@ INPUT_PORTS_END
  *
  *************************************/
 
+static READ16_HANDLER( read_rotram )
+{
+	return cubeqcpu_rotram_r(space->machine->cpu[ROTATE_CPU], offset, mem_mask);
+}
+
+static WRITE16_HANDLER( write_rotram )
+{
+	cubeqcpu_rotram_w(space->machine->cpu[ROTATE_CPU], offset, data, mem_mask);
+}
+
+static READ16_HANDLER( read_sndram )
+{
+	return cubeqcpu_sndram_r(space->machine->cpu[SOUND_CPU], offset, mem_mask);
+}
+
+static WRITE16_HANDLER( write_sndram )
+{
+	cubeqcpu_sndram_w(space->machine->cpu[SOUND_CPU], offset, data, mem_mask);
+}
+
 static ADDRESS_MAP_START( m68k_program_map, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_GLOBAL_MASK(0x03ffff)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
@@ -445,7 +459,7 @@ static MACHINE_RESET( cubeqst )
  */
 
 /* Called by the sound CPU emulation */
-static void sound_dac_w(UINT16 data)
+static void sound_dac_w(const device_config *device, UINT16 data)
 {
 	dac_signed_data_16_w(data & 15, (data & 0xfff0) ^ 0x8000);
 }
@@ -454,6 +468,16 @@ static const cubeqst_snd_config snd_config =
 {
 	sound_dac_w,
 	"soundproms"
+};
+
+static const cubeqst_rot_config rot_config =
+{
+	"line_cpu"
+};
+
+static const cubeqst_lin_config lin_config =
+{
+	"rotate_cpu"
 };
 
 
@@ -470,9 +494,11 @@ static MACHINE_DRIVER_START( cubeqst )
 
 	MDRV_CPU_ADD("rotate_cpu", CQUESTROT, XTAL_10MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(rotate_map, 0)
+	MDRV_CPU_CONFIG(rot_config)
 
 	MDRV_CPU_ADD("line_cpu", CQUESTLIN, XTAL_10MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(line_sound_map, 0)
+	MDRV_CPU_CONFIG(lin_config)
 
 	MDRV_CPU_ADD("sound_cpu", CQUESTSND, XTAL_10MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(line_sound_map, 0)

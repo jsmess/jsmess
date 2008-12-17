@@ -601,7 +601,6 @@ INLINE void apu_update(struct nesapu_info *info, stream_sample_t *buffer16, int 
 {
    int accum;
 
-	cpu_push_context( info->APU.dpcm.memory->cpu );
    while (samples--)
    {
       accum = apu_square(info, &info->APU.squ[0]);
@@ -618,7 +617,6 @@ INLINE void apu_update(struct nesapu_info *info, stream_sample_t *buffer16, int 
 
       *(buffer16++)=accum<<8;
    }
-	cpu_pop_context();
 }
 
 /* READ VALUES FROM REGISTERS */
@@ -696,7 +694,7 @@ static SND_START( nesapu )
 	/* Initialize individual chips */
 	(info->APU.dpcm).memory = cputag_get_address_space(device->machine, intf->cpu_tag, ADDRESS_SPACE_PROGRAM);
 
-	info->stream = stream_create(0, 1, rate, info, nes_psg_update_sound);
+	info->stream = stream_create(device, 0, 1, rate, info, nes_psg_update_sound);
 
 	/* register for save */
 	for (i = 0; i < 2; i++)

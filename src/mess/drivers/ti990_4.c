@@ -89,7 +89,8 @@ static WRITE8_HANDLER ( rset_callback )
 
 static WRITE8_HANDLER ( ckon_ckof_callback )
 {
-	ti990_ckon_ckof_callback((offset & 0x1000) ? 1 : 0);
+	const device_config *maincpu = cputag_get_cpu(space->machine, "main");
+	ti990_ckon_ckof_callback(maincpu, (offset & 0x1000) ? 1 : 0);
 }
 
 static WRITE8_HANDLER ( lrex_callback )

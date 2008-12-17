@@ -12,7 +12,6 @@
 ***************************************************************************/
 
 #include "sndintrf.h"
-#include "deprecat.h"
 #include "streams.h"
 #include "sound/fm.h"
 #include "sound/2612intf.h"
@@ -24,6 +23,7 @@ struct ym2612_info
 	emu_timer *	timer[2];
 	void *			chip;
 	const ym2612_interface *intf;
+	const device_config *device;
 };
 
 /*------------------------- TM2612 -------------------------------*/
@@ -31,7 +31,7 @@ struct ym2612_info
 static void IRQHandler(void *param,int irq)
 {
 	struct ym2612_info *info = param;
-	if(info->intf->handler) info->intf->handler(Machine, irq);
+	if(info->intf->handler) info->intf->handler(info->device->machine, irq);
 }
 
 /* Timer overflow callback from timer.c */
@@ -97,14 +97,15 @@ static SND_START( ym2612 )
 	memset(info, 0, sizeof(*info));
 
 	info->intf = config ? config : &dummy;
+	info->device = device;
 
 	/* FM init */
 	/* Timer Handler set */
-	info->timer[0] = timer_alloc(Machine, timer_callback_2612_0, info);
-	info->timer[1] = timer_alloc(Machine, timer_callback_2612_1, info);
+	info->timer[0] = timer_alloc(device->machine, timer_callback_2612_0, info);
+	info->timer[1] = timer_alloc(device->machine, timer_callback_2612_1, info);
 
 	/* stream system initialize */
-	info->stream = stream_create(0,2,rate,info,ym2612_stream_update);
+	info->stream = stream_create(device,0,2,rate,info,ym2612_stream_update);
 
 	/**** initialize YM2612 ****/
 	info->chip = ym2612_init(info,device,clock,rate,timer_handler,IRQHandler);

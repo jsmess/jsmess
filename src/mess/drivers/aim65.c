@@ -38,11 +38,11 @@ ToDo:
 /* Note: RAM is mapped dynamically in machine/aim65.c */
 static ADDRESS_MAP_START( aim65_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x1000, 0x9fff ) AM_NOP /* User available expansions */
-	AM_RANGE( 0xa000, 0xa00f ) AM_MIRROR(0x3f0) AM_READWRITE(via_1_r, via_1_w) /* User VIA */
+	AM_RANGE( 0xa000, 0xa00f ) AM_MIRROR(0x3f0) AM_DEVREADWRITE(VIA6522, "via6522_1", via_r, via_w) /* User VIA */
 	AM_RANGE( 0xa400, 0xa47f ) AM_RAM /* RIOT RAM */
 	AM_RANGE( 0xa480, 0xa497 ) AM_DEVREADWRITE(RIOT6532, "riot", riot6532_r, riot6532_w)
 	AM_RANGE( 0xa498, 0xa7ff ) AM_NOP /* Not available */
-	AM_RANGE( 0xa800, 0xa80f ) AM_MIRROR(0x3f0) AM_READWRITE(via_0_r, via_0_w)
+	AM_RANGE( 0xa800, 0xa80f ) AM_MIRROR(0x3f0) AM_DEVREADWRITE(VIA6522, "via6522_0", via_r, via_w)
 	AM_RANGE( 0xac00, 0xac03 ) AM_READWRITE(pia_0_r, pia_0_w)
 	AM_RANGE( 0xac04, 0xac43 ) AM_RAM /* PIA RAM */
 	AM_RANGE( 0xac44, 0xafff ) AM_NOP /* Not available */
@@ -197,6 +197,8 @@ static MACHINE_DRIVER_START( aim65 )
 
 	/* other devices */
 	MDRV_RIOT6532_ADD("riot", AIM65_CLOCK, aim65_r6532_interface)
+	MDRV_VIA6522_ADD("via6522_0", 0, aim65_via0)
+	MDRV_VIA6522_ADD("via6522_1", 0, aim65_user_via)
 MACHINE_DRIVER_END
 
 

@@ -36,7 +36,6 @@
 #include <math.h>
 #include "sndintrf.h"
 #include "cpuintrf.h"
-#include "deprecat.h"
 #include "es5503.h"
 #include "streams.h"
 #include "state.h"
@@ -78,6 +77,7 @@ typedef struct
 
 	UINT32 clock;
 	UINT32 output_rate;
+	const device_config *device;
 } ES5503Chip;
 
 static const UINT16 wavesizes[8] = { 256, 512, 1024, 2048, 4096, 8192, 16384, 32768 };
@@ -128,7 +128,7 @@ static void es5503_halt_osc(ES5503Chip *chip, int onum, int type, UINT32 *accumu
 
 		if (chip->irq_callback)
 		{
-			chip->irq_callback(Machine, 1);
+			chip->irq_callback(chip->device->machine, 1);
 		}
 	}
 }
@@ -240,6 +240,7 @@ static SND_START( es5503 )
 	chip->adc_read = intf->adc_read;
 	chip->docram = intf->wave_memory;
 	chip->clock = clock;
+	chip->device = device;
 
 	chip->rege0 = 0x80;
 
@@ -260,14 +261,14 @@ static SND_START( es5503 )
 		chip->oscillators[osc].irqpend = 0;
 		chip->oscillators[osc].accumulator = 0;
 
-		chip->oscillators[osc].timer = timer_alloc(Machine, es5503_timer_cb, &chip->oscillators[osc]);
+		chip->oscillators[osc].timer = timer_alloc(device->machine, es5503_timer_cb, &chip->oscillators[osc]);
 		chip->oscillators[osc].chip = (void *)chip;
 	}
 
 	chip->oscsenabled = 1;
 
 	chip->output_rate = (clock/8)/34;	// (input clock / 8) / # of oscs. enabled + 2
-	chip->stream = stream_create(0, 2, chip->output_rate, chip, es5503_pcm_update);
+	chip->stream = stream_create(device, 0, 2, chip->output_rate, chip, es5503_pcm_update);
 
 	return chip;
 }

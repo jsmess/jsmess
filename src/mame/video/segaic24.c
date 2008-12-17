@@ -156,10 +156,10 @@ void sys24_tile_vh_start(running_machine *machine, UINT16 tile_mask)
 
 	sys24_char_dirtymap = auto_malloc(SYS24_TILES);
 
-	sys24_tile_layer[0] = tilemap_create(sys24_tile_info_0s, tilemap_scan_rows,  8, 8, 64, 64);
-	sys24_tile_layer[1] = tilemap_create(sys24_tile_info_0w, tilemap_scan_rows,  8, 8, 64, 64);
-	sys24_tile_layer[2] = tilemap_create(sys24_tile_info_1s, tilemap_scan_rows,  8, 8, 64, 64);
-	sys24_tile_layer[3] = tilemap_create(sys24_tile_info_1w, tilemap_scan_rows,  8, 8, 64, 64);
+	sys24_tile_layer[0] = tilemap_create(machine, sys24_tile_info_0s, tilemap_scan_rows,  8, 8, 64, 64);
+	sys24_tile_layer[1] = tilemap_create(machine, sys24_tile_info_0w, tilemap_scan_rows,  8, 8, 64, 64);
+	sys24_tile_layer[2] = tilemap_create(machine, sys24_tile_info_1s, tilemap_scan_rows,  8, 8, 64, 64);
+	sys24_tile_layer[3] = tilemap_create(machine, sys24_tile_info_1w, tilemap_scan_rows,  8, 8, 64, 64);
 
 	tilemap_set_transparent_pen(sys24_tile_layer[0], 0);
 	tilemap_set_transparent_pen(sys24_tile_layer[1], 0);
@@ -171,7 +171,7 @@ void sys24_tile_vh_start(running_machine *machine, UINT16 tile_mask)
 	memset(sys24_char_dirtymap, 1, SYS24_TILES);
 	sys24_char_dirty = 1;
 
-	machine->gfx[sys24_char_gfx_index] = allocgfx(&sys24_char_layout);
+	machine->gfx[sys24_char_gfx_index] = allocgfx(machine, &sys24_char_layout);
 
 	machine->gfx[sys24_char_gfx_index]->total_colors = machine->config->total_colors / 16;
 

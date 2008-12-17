@@ -1444,7 +1444,7 @@ static int ip22_get_out2(running_machine *machine) {
 static MACHINE_START( ip22 )
 {
 	// SCSI init
-	wd33c93_init(&scsi_intf);
+	wd33c93_init(machine, &scsi_intf);
 	add_exit_callback(machine, ip225015_exit);
 }
 
@@ -1458,7 +1458,7 @@ static DRIVER_INIT( ip225015 )
 	// IP22 uses 2 pieces of PC-compatible hardware: the 8042 PS/2 keyboard/mouse
 	// interface and the 8254 PIT.  Both are licensed cores embedded in the IOC custom chip.
 	init_pc_common(machine, PCCOMMON_KEYBOARD_AT, NULL);
-	kbdc8042_init(&at8042);
+	kbdc8042_init(machine, &at8042);
 
 	nIOC_ParReadCnt = 0;
 }

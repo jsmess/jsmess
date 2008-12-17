@@ -578,9 +578,9 @@ static void gcr_double_2_gcr(UINT8 a, UINT8 b, UINT8 c, UINT8 d, UINT8 *dest)
 
 static ADDRESS_MAP_START( _1541_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1800, 0x180f) AM_READWRITE(via_2_r, via_2_w)	/* 0 and 1 used in vc20 */
+	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE(VIA6522, "via6522_2", via_r, via_w)	/* 0 and 1 used in vc20 */
 	AM_RANGE(0x1810, 0x189f) AM_READ(SMH_NOP)				/* for debugger */
-	AM_RANGE(0x1c00, 0x1c0f) AM_READWRITE(via_3_r, via_3_w)
+	AM_RANGE(0x1c00, 0x1c0f) AM_DEVREADWRITE(VIA6522, "via6522_3", via_r, via_w)
 	AM_RANGE(0x1c10, 0x1c9f) AM_READ(SMH_NOP)				/* for debugger */
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -588,8 +588,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dolphin_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1800, 0x180f) AM_READWRITE(via_2_r, via_2_w)	/* 0 and 1 used in vc20 */
-	AM_RANGE(0x1c00, 0x1c0f) AM_READWRITE(via_3_r, via_3_w)
+	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE(VIA6522, "via6522_2", via_r, via_w)	/* 0 and 1 used in vc20 */
+	AM_RANGE(0x1c00, 0x1c0f) AM_DEVREADWRITE(VIA6522, "via6522_3", via_r, via_w)
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -606,8 +606,10 @@ static TIMER_CALLBACK(drive_timer)
 	
 		if (drive->type == type_1541) 
 		{
+			const device_config *via_3 = device_list_find_by_tag(machine->config->devicelist, VIA6522, "via6522_3");
+
 			cpu_set_input_line(machine->cpu[drive->cpunumber], M6502_SET_OVERFLOW, 1);
-			via_3_ca1_w(cpu_get_address_space(machine->cpu[drive->cpunumber], ADDRESS_SPACE_PROGRAM), 0,1);
+			via_ca1_w(via_3, 0, 1);
 		}
 
 		drive->clock = 1;
@@ -642,8 +644,9 @@ static TIMER_CALLBACK(drive_timer)
 
 	if (drive->type == type_1541) 
 	{
+		const device_config *via_3 = device_list_find_by_tag(machine->config->devicelist, VIA6522, "via6522_3");
 		cpu_set_input_line(machine->cpu[drive->cpunumber], M6502_SET_OVERFLOW, 0);
-		via_3_ca1_w(cpu_get_address_space(machine->cpu[drive->cpunumber], ADDRESS_SPACE_PROGRAM), 0, 0);
+		via_ca1_w(via_3, 0, 0);
 	}
 
 	drive->clock = 0;
@@ -666,15 +669,17 @@ static TIMER_CALLBACK(drive_timer)
  * irq to m6502 irq connected (or with second via irq)
  */
 
-static void vc1541_via0_irq (running_machine *machine, int level)
+static void vc1541_via0_irq (const device_config *device, int level)
 {
+	running_machine *machine = device->machine;
+
 	drive->via0irq = level;
 	DBG_LOG(2, "vc1541 via0 irq",("level %d %d\n",drive->via0irq,drive->via1irq));
 
-	cpu_set_input_line (machine->cpu[drive->cpunumber], M6502_IRQ_LINE, drive->via1irq || drive->via0irq);
+	cpu_set_input_line (device->machine->cpu[drive->cpunumber], M6502_IRQ_LINE, drive->via1irq || drive->via0irq);
 }
 
-static READ8_HANDLER( vc1541_via0_read_portb )
+static READ8_DEVICE_HANDLER( vc1541_via0_read_portb )
 {
 	int value = 0x7a;
 
@@ -704,9 +709,9 @@ static READ8_HANDLER( vc1541_via0_read_portb )
 	return value;
 }
 
-static WRITE8_HANDLER( vc1541_via0_write_portb )
+static WRITE8_DEVICE_HANDLER( vc1541_via0_write_portb )
 {
-	running_machine *machine = space->machine;
+	running_machine *machine = device->machine;
 
 	DBG_LOG(2, "vc1541 serial write",("%s %s %s\n",
 									 data & 0x10 ? "ATN"   : "atn",
@@ -726,7 +731,7 @@ static WRITE8_HANDLER( vc1541_via0_write_portb )
 		vc1541_serial_clock_write (1, drive->drive.serial.serial_clock = !(data & 0x08));
 	}
 
-	vc1541_serial_atn_write (space->machine, 1, drive->drive.serial.serial_atn = 1);
+	vc1541_serial_atn_write (device->machine, 1, drive->drive.serial.serial_atn = 1);
 }
 
 
@@ -758,29 +763,31 @@ static WRITE8_HANDLER( vc1541_via0_write_portb )
  * irq to m6502 irq connected
  */
 
-static void vc1541_via1_irq (running_machine *machine, int level)
+static void vc1541_via1_irq (const device_config *device, int level)
 {
+	running_machine *machine = device->machine;
+
 	drive->via1irq = level;
 	DBG_LOG(2, "vc1541 via1 irq", ("level %d %d\n", drive->via0irq, drive->via1irq));
 
 	cpu_set_input_line (machine->cpu[drive->cpunumber], M6502_IRQ_LINE, drive->via1irq || drive->via0irq);
 }
 
-static READ8_HANDLER( vc1541_via1_read_porta )
+static READ8_DEVICE_HANDLER( vc1541_via1_read_porta )
 {
-	running_machine *machine = space->machine;
+	running_machine *machine = device->machine;
 	int data = drive->gcr.data[drive->pos];
 	DBG_LOG(2, "vc1541 drive", ("port a read %.2x\n", data));
 	return data;
 }
 
-static WRITE8_HANDLER( vc1541_via1_write_porta )
+static WRITE8_DEVICE_HANDLER( vc1541_via1_write_porta )
 {
-	running_machine *machine = space->machine;
+	running_machine *machine = device->machine;
 	DBG_LOG(1, "vc1541 drive", ("port a write %.2x\n", data));
 }
 
-static  READ8_HANDLER( vc1541_via1_read_portb )
+static  READ8_DEVICE_HANDLER( vc1541_via1_read_portb )
 {
 	UINT8 value = 0xff;
 
@@ -799,9 +806,9 @@ static  READ8_HANDLER( vc1541_via1_read_portb )
 
 static int old = 0;
 
-static WRITE8_HANDLER( vc1541_via1_write_portb )
+static WRITE8_DEVICE_HANDLER( vc1541_via1_write_portb )
 {
-	running_machine *machine = space->machine;
+	running_machine *machine = device->machine;
 	if (data != old) 
 	{
 		DBG_LOG(1, "vc1541 drive",("%.2x\n", data));
@@ -876,15 +883,15 @@ static WRITE8_HANDLER( vc1541_via1_write_portb )
 	drive->led = data & 0x08;
 }
 
-static WRITE8_HANDLER( vc1541_via1_write_portca1 )
+static WRITE8_DEVICE_HANDLER( vc1541_via1_write_portca1 )
 {
 }
 
-static WRITE8_HANDLER( vc1541_via1_write_portca2 )
+static WRITE8_DEVICE_HANDLER( vc1541_via1_write_portca2 )
 {
 }
 
-static const struct via6522_interface via2 =
+const via6522_interface vc1541_via2 =
 {
 	0,								   /*vc1541_via0_read_porta, */
 	vc1541_via0_read_portb,
@@ -899,7 +906,7 @@ static const struct via6522_interface via2 =
 	0,								   /*via2_write_ca2, */
 	0,								   /*via2_write_cb2, */
 	vc1541_via0_irq
-}, via3 =
+}, vc1541_via3 =
 {
 	vc1541_via1_read_porta,
 	vc1541_via1_read_portb,
@@ -931,6 +938,7 @@ int vc1541_serial_atn_read (int which)
 
 void vc1541_serial_atn_write (running_machine *machine, int which, int level)
 {
+	const device_config *via_2 = device_list_find_by_tag(machine->config->devicelist, VIA6522, "via6522_2");
 #if 0
 	int value;
 #endif
@@ -951,7 +959,7 @@ void vc1541_serial_atn_write (running_machine *machine, int which, int level)
 									 activecpu_get_pc(),
 									 serial.atn[0]?"ATN":"atn"));
 			#endif
-				via_set_input_ca1 (machine, 2, !level);
+				via_ca1_w (via_2, 0, !level);
 #if 0
 				value=drive->drive.serial.data;
 				if (drive->drive.serial.acka!=!level) value=0;
@@ -1047,9 +1055,9 @@ void vc1541_serial_request_write (int which, int level)
 
 static ADDRESS_MAP_START( _1571_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1800, 0x180f) AM_READWRITE(via_2_r, via_2_w)  /* 0 and 1 used in vc20 */
+	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE(VIA6522, "via6522_2", via_r, via_w)  /* 0 and 1 used in vc20 */
 	AM_RANGE(0x1810, 0x189f) AM_READ(SMH_NOP) /* for debugger */
-	AM_RANGE(0x1c00, 0x1c0f) AM_READWRITE(via_3_r, via_3_w)
+	AM_RANGE(0x1c00, 0x1c0f) AM_DEVREADWRITE(VIA6522, "via6522_3", via_r, via_w)
 	AM_RANGE(0x1c10, 0x1c9f) AM_READ(SMH_NOP) /* for debugger */
 //	AM_RANGE(0x2000, 0x2003) // WD17xx
 //	AM_RANGE(0x4000, 0x400f) // CIA
@@ -1358,12 +1366,6 @@ int drive_config (int type, int id, int mode, int cpunr, int devicenr)
 	drive->drive.serial.deviceid = devicenr;
 	drive->timer = timer_alloc(Machine, drive_timer, NULL);
 
-	if ((drive->type == type_1541) || (drive->type == type_2031)) 
-	{
-		via_config (2, &via2);
-		via_config (3, &via3);
-	}
-
 	if (type == type_1551)
 	{
 		tpi6525[0].c.read = c1551_port_c_r;
@@ -1391,11 +1393,6 @@ void drive_reset (void)
 	}
 
 	drive->track = 1.0;
-
-	if ((drive->type == type_1541) || (drive->type == type_2031)) 
-	{
-		via_reset ();
-	}
 
 	if ((drive->type == type_1551)) 
 	{

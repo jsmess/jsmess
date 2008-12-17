@@ -26,6 +26,7 @@
 #include "machine/8042kbdc.h"
 #include "machine/pit8253.h"
 #include "machine/idectrl.h"
+#include "machine/mpc105.h"
 
 /* Devices */
 #include "devices/mflopimg.h"
@@ -70,7 +71,7 @@ static ADDRESS_MAP_START( bebox_mem, ADDRESS_SPACE_PROGRAM, 64 )
 	AM_RANGE(0x800003F0, 0x800003F7) AM_READWRITE( bebox_800003F0_r, bebox_800003F0_w )
 	AM_RANGE(0x800003F8, 0x800003FF) AM_DEVREADWRITE8( NS16550, "ns16550_0", ins8250_r, ins8250_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0x80000480, 0x8000048F) AM_READWRITE( bebox_80000480_r, bebox_80000480_w )
-	AM_RANGE(0x80000CF8, 0x80000CFF) AM_READWRITE( pci_64be_r, pci_64be_w )
+	AM_RANGE(0x80000CF8, 0x80000CFF) AM_DEVREADWRITE( PCI_BUS, "pcibus", pci_64be_r, pci_64be_w )
 	AM_RANGE(0x800042E8, 0x800042EF) AM_WRITE( cirrus_64be_42E8_w )
 
 	AM_RANGE(0xBFFFFFF0, 0xBFFFFFFF) AM_READ( bebox_interrupt_ack_r )
@@ -130,8 +131,13 @@ static MACHINE_DRIVER_START( bebox )
 	MDRV_NVRAM_HANDLER( bebox )
 
 	MDRV_DEVICE_ADD( "cdrom", CDROM )
-
 	MDRV_DEVICE_ADD( "harddisk1", HARDDISK )
+
+	/* pci */
+	MDRV_PCI_BUS_ADD("pcibus", 0)
+	MDRV_PCI_BUS_DEVICE(1, NULL, NULL, mpc105_pci_read, mpc105_pci_write)
+	MDRV_PCI_BUS_DEVICE(1, NULL, NULL, cirrus5430_pci_read, cirrus5430_pci_write)
+	/*MDRV_PCI_BUS_DEVICE(12, NULL, NULL, scsi53c810_pci_read, scsi53c810_pci_write)*/
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( bebox2 )

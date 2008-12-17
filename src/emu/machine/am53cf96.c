@@ -10,7 +10,6 @@
  */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "am53cf96.h"
 
 static UINT8 scsi_regs[32], fifo[16], fptr = 0, xfer_state, last_id;
@@ -209,7 +208,7 @@ WRITE32_HANDLER( am53cf96_w )
 	}
 }
 
-void am53cf96_init( const struct AM53CF96interface *interface )
+void am53cf96_init( running_machine *machine, const struct AM53CF96interface *interface )
 {
 	int i;
 
@@ -225,11 +224,11 @@ void am53cf96_init( const struct AM53CF96interface *interface )
 		SCSIAllocInstance( interface->scsidevs->devices[i].scsiClass, &devices[interface->scsidevs->devices[i].scsiID], interface->scsidevs->devices[i].diskregion );
 	}
 
-	state_save_register_global_array(Machine, scsi_regs);
-	state_save_register_global_array(Machine, fifo);
-	state_save_register_global(Machine, fptr);
-	state_save_register_global(Machine, xfer_state);
-	state_save_register_global(Machine, last_id);
+	state_save_register_global_array(machine, scsi_regs);
+	state_save_register_global_array(machine, fifo);
+	state_save_register_global(machine, fptr);
+	state_save_register_global(machine, xfer_state);
+	state_save_register_global(machine, last_id);
 }
 
 void am53cf96_exit( const struct AM53CF96interface *interface )

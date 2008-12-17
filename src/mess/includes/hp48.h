@@ -37,20 +37,20 @@ extern UINT8 hp48_io[64];
 /************************ Saturn's I/O *******************************/
 
 /* memory controller */
-void hp48_mem_reset( running_machine* machine );
-void hp48_mem_config( running_machine* machine, int v );
-void hp48_mem_unconfig( running_machine* machine, int v );
-int  hp48_mem_id( running_machine* machine );
+void hp48_mem_reset( const device_config *device );
+void hp48_mem_config( const device_config *device, int v );
+void hp48_mem_unconfig( const device_config *device, int v );
+int  hp48_mem_id( const device_config *device );
 
 /* CRC computation */
-void hp48_mem_crc( running_machine* machine, int addr, int data );
+void hp48_mem_crc( const device_config *device, int addr, int data );
 
 /* IN/OUT registers */
-int  hp48_reg_in( running_machine* machine );
-void hp48_reg_out( running_machine* machine, int v );
+int  hp48_reg_in( const device_config *device );
+void hp48_reg_out( const device_config *device, int v );
 
 /* keybord interrupt system */
-void hp48_rsi( running_machine* machine );
+void hp48_rsi( const device_config *device );
 
 
 /***************************** serial ********************************/

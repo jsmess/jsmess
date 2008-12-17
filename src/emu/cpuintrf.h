@@ -131,8 +131,6 @@ enum
 		CPUINFO_PTR_EXIT = DEVINFO_FCT_STOP,				/* R/O: void (*exit)(const device_config *device) */
 
 		CPUINFO_PTR_SET_INFO = DEVINFO_FCT_CLASS_SPECIFIC,	/* R/O: void (*set_info)(const device_config *device, UINT32 state, INT64 data, void *ptr) */
-		CPUINFO_PTR_GET_CONTEXT,							/* R/O: void (*get_context)(void *buffer) */
-		CPUINFO_PTR_SET_CONTEXT,							/* R/O: void (*set_context)(void *buffer) */
 		CPUINFO_PTR_INIT,									/* R/O: void (*init)(const device_config *device, int index, int clock, int (*irqcallback)(const device_config *device, int)) */
 		CPUINFO_PTR_EXECUTE,								/* R/O: int (*execute)(const device_config *device, int cycles) */
 		CPUINFO_PTR_BURN,									/* R/O: void (*burn)(const device_config *device, int cycles) */
@@ -143,6 +141,8 @@ enum
 		CPUINFO_PTR_READOP,									/* R/O: int (*readop)(const device_config *device, UINT32 offset, int size, UINT64 *value) */
 		CPUINFO_PTR_DEBUG_INIT,								/* R/O: void (*debug_init)(const device_config *device) */
 		CPUINFO_PTR_VALIDITY_CHECK,							/* R/O: int (*validity_check)(const game_driver *driver, const void *config) */
+
+	CPUINFO_FCT_CPU_SPECIFIC = DEVINFO_FCT_DEVICE_SPECIFIC,	/* R/W: CPU-specific values start here */
 
 	/* --- the following bits of info are returned as NULL-terminated strings --- */
 	CPUINFO_STR_FIRST = DEVINFO_STR_FIRST,
@@ -166,16 +166,16 @@ enum
 /* get_reg/set_reg constants */
 enum
 {
-	/* This value is passed to activecpu_get_reg to retrieve the previous
+	/* This value is passed to cpu_get_reg to retrieve the previous
      * program counter value, ie. before a CPU emulation started
      * to fetch opcodes and arguments for the current instrution. */
 	REG_PREVIOUSPC = CPUINFO_INT_PREVIOUSPC - CPUINFO_INT_REGISTER,
 
-	/* This value is passed to activecpu_get_reg to retrieve the current
+	/* This value is passed to cpu_get_reg to retrieve the current
      * program counter value. */
 	REG_PC = CPUINFO_INT_PC - CPUINFO_INT_REGISTER,
 
-	/* This value is passed to activecpu_get_reg to retrieve the current
+	/* This value is passed to cpu_get_reg to retrieve the current
      * stack pointer value. */
 	REG_SP = CPUINFO_INT_SP - CPUINFO_INT_REGISTER
 };
@@ -502,14 +502,6 @@ typedef enum _cpu_type cpu_type;
 #define CPU_VALIDITY_CHECK(name)		int CPU_VALIDITY_CHECK_NAME(name)(const game_driver *driver, const void *config)
 #define CPU_VALIDITY_CHECK_CALL(name)	CPU_VALIDITY_CHECK_NAME(name)(driver, config)
 
-#define CPU_GET_CONTEXT_NAME(name)	cpu_get_context_##name
-#define CPU_GET_CONTEXT(name)		void CPU_GET_CONTEXT_NAME(name)(void *dst)
-#define CPU_GET_CONTEXT_CALL(name)	CPU_GET_CONTEXT_NAME(name)(buffer)
-
-#define CPU_SET_CONTEXT_NAME(name)	cpu_set_context_##name
-#define CPU_SET_CONTEXT(name)		void CPU_SET_CONTEXT_NAME(name)(void *src)
-#define CPU_SET_CONTEXT_CALL(name)	CPU_SET_CONTEXT_NAME(name)(buffer)
-
 
 /* helpers for accessing common CPU state */
 #define cpu_get_context_size(cpu)			cpu_get_info_int(cpu, CPUINFO_INT_CONTEXT_SIZE)
@@ -607,8 +599,6 @@ typedef void (*cpu_debug_init_func)(const device_config *device);
 typedef offs_t (*cpu_disassemble_func)(const device_config *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 
 typedef int (*cpu_validity_check_func)(const game_driver *driver, const void *config);
-typedef void (*cpu_get_context_func)(void *buffer);
-typedef void (*cpu_set_context_func)(void *buffer);
 
 
 /* cpuinfo union used to pass data to/from the get_info/set_info functions */
@@ -620,8 +610,6 @@ union _cpuinfo
 	char *					s;							/* generic strings */
 
 	cpu_set_info_func		setinfo;					/* CPUINFO_PTR_SET_INFO */
-	cpu_get_context_func	getcontext;					/* CPUINFO_PTR_GET_CONTEXT */
-	cpu_set_context_func	setcontext;					/* CPUINFO_PTR_SET_CONTEXT */
 	cpu_init_func			init;						/* CPUINFO_PTR_INIT */
 	cpu_reset_func			reset;						/* CPUINFO_PTR_RESET */
 	cpu_exit_func			exit;						/* CPUINFO_PTR_EXIT */
@@ -654,8 +642,6 @@ struct _cpu_class_header
 	/* table of core functions */
 	cpu_get_info_func		get_info;
 	cpu_set_info_func		set_info;
-	cpu_get_context_func	get_context;
-	cpu_set_context_func	set_context;
 	cpu_init_func			init;
 	cpu_reset_func			reset;
 	cpu_exit_func			exit;
@@ -690,12 +676,6 @@ char *cpuintrf_temp_str(void);
 
 /* ----- live context control ----- */
 
-/* remember the current context and push a new one on the stack */
-void cpu_push_context(const device_config *cpu);
-
-/* restore the previously saved context */
-void cpu_pop_context(void);
-
 /* find a CPU in the machine by searching */
 int cpu_get_index_slow(const device_config *cpu);
 
@@ -719,9 +699,6 @@ const char *cpu_get_info_string(const device_config *cpu, UINT32 state);
 void cpu_set_info_int(const device_config *cpu, UINT32 state, INT64 data);
 void cpu_set_info_ptr(const device_config *cpu, UINT32 state, void *data);
 void cpu_set_info_fct(const device_config *cpu, UINT32 state, genf *data);
-
-/* execute the requested cycles on a given CPU */
-int cpu_execute(const device_config *cpu, int cycles);
 
 /* signal a reset for a given CPU */
 void cpu_reset(const device_config *cpu);
@@ -750,21 +727,9 @@ const char *cputype_get_info_string(cpu_type cputype, UINT32 state);
 
 
 
-
 /***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
-
-/*-------------------------------------------------
-    safe_cpu_get_pc - return the current PC or ~0
-    if the CPU is invalid
--------------------------------------------------*/
-
-INLINE offs_t safe_cpu_get_pc(const device_config *cpu)
-{
-	return (cpu != NULL) ? cpu_get_pc(cpu) : ~0;
-}
-
 
 /*-------------------------------------------------
     cpu_get_index - return the index of the
@@ -799,6 +764,18 @@ INLINE const address_space *cpu_get_address_space(const device_config *cpu, int 
 {
 	cpu_class_header *classheader = cpu->classtoken;
 	return classheader->space[spacenum];
+}
+
+
+/*-------------------------------------------------
+    cpu_execute - execute the requested cycles on
+    a given CPU
+-------------------------------------------------*/
+
+INLINE int cpu_execute(const device_config *device, int cycles)
+{
+	cpu_class_header *classheader = device->classtoken;
+	return (*classheader->execute)(device, cycles);
 }
 
 

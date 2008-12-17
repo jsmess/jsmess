@@ -1150,7 +1150,6 @@ Registers (word-wise):
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "video/konamiic.h"
 
 #define VERBOSE 0
@@ -1185,25 +1184,25 @@ static void shuffle(UINT16 *buf,int len)
 
 
 /* helper function to join two 16-bit ROMs and form a 32-bit data stream */
-void konami_rom_deinterleave_2(const char *mem_region)
+void konami_rom_deinterleave_2(running_machine *machine, const char *mem_region)
 {
-	shuffle((UINT16 *)memory_region(Machine, mem_region),memory_region_length(Machine, mem_region)/2);
+	shuffle((UINT16 *)memory_region(machine, mem_region),memory_region_length(machine, mem_region)/2);
 }
 
 /* hacked version of rom_deinterleave_2_half for Lethal Enforcers */
-void konami_rom_deinterleave_2_half(const char *mem_region)
+void konami_rom_deinterleave_2_half(running_machine *machine, const char *mem_region)
 {
-	UINT8 *rgn = memory_region(Machine, mem_region);
+	UINT8 *rgn = memory_region(machine, mem_region);
 
-	shuffle((UINT16 *)rgn,memory_region_length(Machine, mem_region)/4);
-	shuffle((UINT16 *)(rgn+memory_region_length(Machine, mem_region)/2),memory_region_length(Machine, mem_region)/4);
+	shuffle((UINT16 *)rgn,memory_region_length(machine, mem_region)/4);
+	shuffle((UINT16 *)(rgn+memory_region_length(machine, mem_region)/2),memory_region_length(machine, mem_region)/4);
 }
 
 /* helper function to join four 16-bit ROMs and form a 64-bit data stream */
-void konami_rom_deinterleave_4(const char *mem_region)
+void konami_rom_deinterleave_4(running_machine *machine, const char *mem_region)
 {
-	konami_rom_deinterleave_2(mem_region);
-	konami_rom_deinterleave_2(mem_region);
+	konami_rom_deinterleave_2(machine, mem_region);
+	konami_rom_deinterleave_2(machine, mem_region);
 }
 
 
@@ -1213,7 +1212,7 @@ static void decode_gfx(running_machine *machine, int gfx_index, UINT8 *data, UIN
 
 	memcpy(&gl, layout, sizeof(gl));
 	gl.total = total;
-	machine->gfx[gfx_index] = allocgfx(&gl);
+	machine->gfx[gfx_index] = allocgfx(machine, &gl);
 	decodegfx(machine->gfx[gfx_index], data, 0, machine->gfx[gfx_index]->total_elements);
 
 	/* set the color information */
@@ -1524,8 +1523,8 @@ void K007342_vh_start(running_machine *machine, int gfx_index, void (*callback)(
 	K007342_gfxnum = gfx_index;
 	K007342_callback = callback;
 
-	K007342_tilemap[0] = tilemap_create(K007342_get_tile_info0,K007342_scan,8,8,64,32);
-	K007342_tilemap[1] = tilemap_create(K007342_get_tile_info1,K007342_scan,8,8,64,32);
+	K007342_tilemap[0] = tilemap_create(machine, K007342_get_tile_info0,K007342_scan,8,8,64,32);
+	K007342_tilemap[1] = tilemap_create(machine, K007342_get_tile_info1,K007342_scan,8,8,64,32);
 
 	K007342_ram = auto_malloc(0x2000);
 	K007342_scroll_ram = auto_malloc(0x0200);
@@ -2042,9 +2041,9 @@ void K052109_vh_start(running_machine *machine,const char *gfx_memory_region,int
 
 	has_extra_video_ram = 0;
 
-	K052109_tilemap[0] = tilemap_create(K052109_get_tile_info0,tilemap_scan_rows,8,8,64,32);
-	K052109_tilemap[1] = tilemap_create(K052109_get_tile_info1,tilemap_scan_rows,8,8,64,32);
-	K052109_tilemap[2] = tilemap_create(K052109_get_tile_info2,tilemap_scan_rows,8,8,64,32);
+	K052109_tilemap[0] = tilemap_create(machine, K052109_get_tile_info0,tilemap_scan_rows,8,8,64,32);
+	K052109_tilemap[1] = tilemap_create(machine, K052109_get_tile_info1,tilemap_scan_rows,8,8,64,32);
+	K052109_tilemap[2] = tilemap_create(machine, K052109_get_tile_info2,tilemap_scan_rows,8,8,64,32);
 
 	K052109_ram = auto_malloc(0x6000);
 
@@ -2590,7 +2589,7 @@ static int K051960_fetchromdata(running_machine *machine, int byte)
 	addr = (code << 7) | (off1 << 2) | byte;
 	addr &= memory_region_length(machine, K051960_memory_region)-1;
 
-//  popmessage("%04x: addr %06x",cpu_get_pc(machine->activecpu),addr);
+//  popmessage("%s: addr %06x",cpuexec_describe_context(machine),addr);
 
 	return memory_region(machine, K051960_memory_region)[addr];
 }
@@ -3136,7 +3135,7 @@ static UINT8 K053244_chip_r (running_machine *machine, int chip, int offset)
 			| ((offset & 3) ^ 1);
 		addr &= memory_region_length(machine, K053245_memory_region[chip])-1;
 
-//  popmessage("%04x: offset %02x addr %06x",cpu_get_pc(machine->activecpu),offset&3,addr);
+//  popmessage("%s: offset %02x addr %06x",cpuexec_describe_context(machine),offset&3,addr);
 
 		return memory_region(machine, K053245_memory_region[chip])[addr];
 	}
@@ -3147,7 +3146,7 @@ static UINT8 K053244_chip_r (running_machine *machine, int chip, int offset)
 	}
 	else
 	{
-//logerror("%04x: read from unknown 053244 address %x\n",cpu_get_pc(machine->activecpu),offset);
+//logerror("%s: read from unknown 053244 address %x\n",cpuexec_describe_context(machine),offset);
 		return 0;
 	}
 }
@@ -3167,7 +3166,7 @@ static void K053244_chip_w(int chip, int offset, int data)
 //          popmessage("053244 reg 05 = %02x",data);
 		/* bit 2 = unknown, Parodius uses it */
 		/* bit 5 = unknown, Rollergames uses it */
-//      logerror("%04x: write %02x to 053244 address 5\n",cpu_get_pc(machine->activecpu),data);
+//      logerror("%s: write %02x to 053244 address 5\n",cpuexec_describe_context(machine),data);
 		break;
 	}
 	case 0x06:
@@ -4702,7 +4701,7 @@ static void K051316_vh_start(running_machine *machine,int chip, const char *gfx_
 	K051316_bpp[chip] = bpp;
 	K051316_callback[chip] = callback;
 
-	K051316_tilemap[chip] = tilemap_create(get_tile_info[chip],tilemap_scan_rows,16,16,32,32);
+	K051316_tilemap[chip] = tilemap_create(machine, get_tile_info[chip],tilemap_scan_rows,16,16,32,32);
 
 	K051316_ram[chip] = auto_malloc(0x800);
 
@@ -4799,13 +4798,13 @@ static int K051316_rom_r(running_machine *machine, int chip, int offset)
 		if (K051316_bpp[chip] <= 4) addr /= 2;
 		addr &= memory_region_length(machine, K051316_memory_region[chip])-1;
 
-//  popmessage("%04x: offset %04x addr %04x",cpu_get_pc(machine->activecpu),offset,addr);
+//  popmessage("%s: offset %04x addr %04x",cpuexec_describe_context(machine),offset,addr);
 
 		return memory_region(machine, K051316_memory_region[chip])[addr];
 	}
 	else
 	{
-//logerror("%04x: read 051316 ROM offset %04x but reg 0x0c bit 0 not clear\n",cpu_get_pc(machine->activecpu),offset);
+//logerror("%s: read 051316 ROM offset %04x but reg 0x0c bit 0 not clear\n",cpuexec_describe_context(machine),offset);
 		return 0;
 	}
 }
@@ -4830,7 +4829,7 @@ READ8_HANDLER( K051316_rom_2_r )
 static void K051316_ctrl_w(int chip,int offset,int data)
 {
 	K051316_ctrlram[chip][offset] = data;
-//if (offset >= 0x0c) logerror("%04x: write %02x to 051316 reg %x\n",cpu_get_pc(machine->activecpu),data,offset);
+//if (offset >= 0x0c) logerror("%s: write %02x to 051316 reg %x\n",cpuexec_describe_context(machine),data,offset);
 }
 
 WRITE8_HANDLER( K051316_ctrl_0_w )
@@ -5791,22 +5790,22 @@ void K056832_vh_start(running_machine *machine, const char *gfx_memory_region, i
 
 	K056832_videoram = auto_malloc(0x2000 * (K056832_PAGE_COUNT+1));
 
-	K056832_tilemap[0x0] = tilemap_create(K056832_get_tile_info0, tilemap_scan_rows,  8, 8, 64, 32);
-	K056832_tilemap[0x1] = tilemap_create(K056832_get_tile_info1, tilemap_scan_rows,  8, 8, 64, 32);
-	K056832_tilemap[0x2] = tilemap_create(K056832_get_tile_info2, tilemap_scan_rows,  8, 8, 64, 32);
-	K056832_tilemap[0x3] = tilemap_create(K056832_get_tile_info3, tilemap_scan_rows,  8, 8, 64, 32);
-	K056832_tilemap[0x4] = tilemap_create(K056832_get_tile_info4, tilemap_scan_rows,  8, 8, 64, 32);
-	K056832_tilemap[0x5] = tilemap_create(K056832_get_tile_info5, tilemap_scan_rows,  8, 8, 64, 32);
-	K056832_tilemap[0x6] = tilemap_create(K056832_get_tile_info6, tilemap_scan_rows,  8, 8, 64, 32);
-	K056832_tilemap[0x7] = tilemap_create(K056832_get_tile_info7, tilemap_scan_rows,  8, 8, 64, 32);
-	K056832_tilemap[0x8] = tilemap_create(K056832_get_tile_info8, tilemap_scan_rows,  8, 8, 64, 32);
-	K056832_tilemap[0x9] = tilemap_create(K056832_get_tile_info9, tilemap_scan_rows,  8, 8, 64, 32);
-	K056832_tilemap[0xa] = tilemap_create(K056832_get_tile_infoa, tilemap_scan_rows,  8, 8, 64, 32);
-	K056832_tilemap[0xb] = tilemap_create(K056832_get_tile_infob, tilemap_scan_rows,  8, 8, 64, 32);
-	K056832_tilemap[0xc] = tilemap_create(K056832_get_tile_infoc, tilemap_scan_rows,  8, 8, 64, 32);
-	K056832_tilemap[0xd] = tilemap_create(K056832_get_tile_infod, tilemap_scan_rows,  8, 8, 64, 32);
-	K056832_tilemap[0xe] = tilemap_create(K056832_get_tile_infoe, tilemap_scan_rows,  8, 8, 64, 32);
-	K056832_tilemap[0xf] = tilemap_create(K056832_get_tile_infof, tilemap_scan_rows,  8, 8, 64, 32);
+	K056832_tilemap[0x0] = tilemap_create(machine, K056832_get_tile_info0, tilemap_scan_rows,  8, 8, 64, 32);
+	K056832_tilemap[0x1] = tilemap_create(machine, K056832_get_tile_info1, tilemap_scan_rows,  8, 8, 64, 32);
+	K056832_tilemap[0x2] = tilemap_create(machine, K056832_get_tile_info2, tilemap_scan_rows,  8, 8, 64, 32);
+	K056832_tilemap[0x3] = tilemap_create(machine, K056832_get_tile_info3, tilemap_scan_rows,  8, 8, 64, 32);
+	K056832_tilemap[0x4] = tilemap_create(machine, K056832_get_tile_info4, tilemap_scan_rows,  8, 8, 64, 32);
+	K056832_tilemap[0x5] = tilemap_create(machine, K056832_get_tile_info5, tilemap_scan_rows,  8, 8, 64, 32);
+	K056832_tilemap[0x6] = tilemap_create(machine, K056832_get_tile_info6, tilemap_scan_rows,  8, 8, 64, 32);
+	K056832_tilemap[0x7] = tilemap_create(machine, K056832_get_tile_info7, tilemap_scan_rows,  8, 8, 64, 32);
+	K056832_tilemap[0x8] = tilemap_create(machine, K056832_get_tile_info8, tilemap_scan_rows,  8, 8, 64, 32);
+	K056832_tilemap[0x9] = tilemap_create(machine, K056832_get_tile_info9, tilemap_scan_rows,  8, 8, 64, 32);
+	K056832_tilemap[0xa] = tilemap_create(machine, K056832_get_tile_infoa, tilemap_scan_rows,  8, 8, 64, 32);
+	K056832_tilemap[0xb] = tilemap_create(machine, K056832_get_tile_infob, tilemap_scan_rows,  8, 8, 64, 32);
+	K056832_tilemap[0xc] = tilemap_create(machine, K056832_get_tile_infoc, tilemap_scan_rows,  8, 8, 64, 32);
+	K056832_tilemap[0xd] = tilemap_create(machine, K056832_get_tile_infod, tilemap_scan_rows,  8, 8, 64, 32);
+	K056832_tilemap[0xe] = tilemap_create(machine, K056832_get_tile_infoe, tilemap_scan_rows,  8, 8, 64, 32);
+	K056832_tilemap[0xf] = tilemap_create(machine, K056832_get_tile_infof, tilemap_scan_rows,  8, 8, 64, 32);
 
 	for (i=0; i<K056832_PAGE_COUNT; i++)
 	{
@@ -7509,13 +7508,13 @@ void K053250_dma(running_machine *machine, int chip, int limiter)
 }
 
 // Pixel data of the K053250 is nibble packed. It's preferable to be unpacked into byte format.
-void K053250_unpack_pixels(const char *region)
+void K053250_unpack_pixels(running_machine *machine, const char *region)
 {
 	UINT8 *src_ptr, *dst_ptr;
 	int hi_nibble, lo_nibble, offset;
 
-	dst_ptr = src_ptr = memory_region(Machine, region);
-	offset = memory_region_length(Machine, region) / 2 - 1;
+	dst_ptr = src_ptr = memory_region(machine, region);
+	offset = memory_region_length(machine, region) / 2 - 1;
 
 	do
 	{
@@ -7537,14 +7536,14 @@ void K053250_vh_start(running_machine *machine, int chips, const char **region)
 
 	for(chip=0; chip<chips; chip++)
 	{
-		K053250_info.chip[chip].base = memory_region(Machine, region[chip]);
+		K053250_info.chip[chip].base = memory_region(machine, region[chip]);
 		ram = auto_malloc(0x6000);
 		K053250_info.chip[chip].ram = ram;
 		K053250_info.chip[chip].rammax = ram + 0x800;
 		K053250_info.chip[chip].buffer[0] = ram + 0x2000;
 		K053250_info.chip[chip].buffer[1] = ram + 0x2800;
 		memset(ram+0x2000, 0, 0x2000);
-		K053250_info.chip[chip].rommask = memory_region_length(Machine, region[chip]);
+		K053250_info.chip[chip].rommask = memory_region_length(machine, region[chip]);
 		K053250_info.chip[chip].page[1] = K053250_info.chip[chip].page[0] = 0;
 		K053250_info.chip[chip].offsy = K053250_info.chip[chip].offsx = 0;
 		K053250_info.chip[chip].frame = -1;

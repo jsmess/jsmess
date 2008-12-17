@@ -36,7 +36,6 @@
 #include "sndintrf.h"
 #include "streams.h"
 #include "inptport.h"
-#include "deprecat.h"
 #include "wavwrite.h"
 #include "discrete.h"
 
@@ -68,7 +67,7 @@ discrete_info *discrete_current_context = NULL;
 
 static void init_nodes(discrete_info *info, discrete_sound_block *block_list, const device_config *device);
 static void find_input_nodes(discrete_info *info, discrete_sound_block *block_list);
-static void setup_output_nodes(discrete_info *info);
+static void setup_output_nodes(const device_config *device, discrete_info *info);
 static void setup_disc_logs(discrete_info *info);
 static SND_RESET( discrete );
 
@@ -255,6 +254,7 @@ static SND_START( discrete )
 	info = auto_malloc(sizeof(*info));
 	memset(info, 0, sizeof(*info));
 
+	info->device = device;
 	info->sndindex = sndindex;
 
 	/* If a clock is specified we will use it, otherwise run at the audio sample rate. */
@@ -314,7 +314,7 @@ static SND_START( discrete )
 	find_input_nodes(info, intf);
 
 	/* then set up the output nodes */
-	setup_output_nodes(info);
+	setup_output_nodes(device, info);
 
 	setup_disc_logs(info);
 
@@ -406,11 +406,11 @@ static SND_RESET( discrete )
 
 		/* if the node has a reset function, call it */
 		if (node->module.reset)
-			(*node->module.reset)(node);
+			(*node->module.reset)(device, node);
 
 		/* otherwise, just step it */
 		else if (node->module.step)
-			(*node->module.step)(node);
+			(*node->module.step)(device, node);
 	}
 
 	discrete_current_context = NULL;
@@ -452,7 +452,7 @@ static void discrete_stream_update(void *param, stream_sample_t **inputs, stream
 			node->run_time -= osd_profiling_ticks();
 #endif
 			if (node->module.step)
-				(*node->module.step)(node);
+				(*node->module.step)(info->device, node);
 #if (DISCRETE_PROFILING)
 			node->run_time += osd_profiling_ticks();
 #endif
@@ -693,10 +693,10 @@ static void find_input_nodes(discrete_info *info, discrete_sound_block *block_li
  *
  *************************************/
 
-static void setup_output_nodes(discrete_info *info)
+static void setup_output_nodes(const device_config *device, discrete_info *info)
 {
 	/* initialize the stream(s) */
-	info->discrete_stream = stream_create(info->discrete_input_streams, info->discrete_outputs, info->sample_rate, info, discrete_stream_update);
+	info->discrete_stream = stream_create(device, info->discrete_input_streams, info->discrete_outputs, info->sample_rate, info, discrete_stream_update);
 }
 
 

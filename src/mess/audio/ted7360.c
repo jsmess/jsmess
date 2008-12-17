@@ -153,11 +153,11 @@ static void ted7360_update (void *param,stream_sample_t **inputs, stream_sample_
 /************************************/
 /* Sound handler start              */
 /************************************/
-void *ted7360_custom_start (int clock, const custom_sound_interface *config)
+void *ted7360_custom_start (const device_config *device, int clock, const custom_sound_interface *config)
 {
 	int i;
 
-	channel = stream_create(0, 1, Machine->sample_rate, 0, ted7360_update);
+	channel = stream_create(device, 0, 1, device->machine->sample_rate, 0, ted7360_update);
 
 	/* buffer for fastest played sample for 5 second
 	 * so we have enough data for min 5 second */

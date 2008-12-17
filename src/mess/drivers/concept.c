@@ -89,6 +89,9 @@ static MACHINE_DRIVER_START( concept )
 	
 	/* rtc */
 	MDRV_MM58274C_ADD("mm58274c", concept_mm58274c_interface)
+
+	/* via */
+	MDRV_VIA6522_ADD("via6522_0", 1022750, concept_via6522_intf)
 MACHINE_DRIVER_END
 
 

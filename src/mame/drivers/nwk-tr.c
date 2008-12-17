@@ -431,21 +431,21 @@ int K001604_vh_start(running_machine *machine, int chip)
 	{
 		int roz_tile_size = K001604_roz_size[chip] ? 16 : 8;
 		int roz_width = K001604_layer_size ? 64 : 128;
-		K001604_layer_8x8[chip][0] = tilemap_create(K001604_0_tile_info_layer_8x8, K001604_scan_layer_8x8_0, 8, 8, 64, 64);
-		K001604_layer_8x8[chip][1] = tilemap_create(K001604_0_tile_info_layer_8x8, K001604_scan_layer_8x8_1, 8, 8, 64, 64);
+		K001604_layer_8x8[chip][0] = tilemap_create(machine, K001604_0_tile_info_layer_8x8, K001604_scan_layer_8x8_0, 8, 8, 64, 64);
+		K001604_layer_8x8[chip][1] = tilemap_create(machine, K001604_0_tile_info_layer_8x8, K001604_scan_layer_8x8_1, 8, 8, 64, 64);
 
-		K001604_layer_roz[chip][0] = tilemap_create(K001604_0_tile_info_layer_roz, K001604_scan_layer_roz_0, roz_tile_size, roz_tile_size, roz_width, 64);
-		K001604_layer_roz[chip][1] = tilemap_create(K001604_0_tile_info_layer_roz, K001604_scan_layer_roz_1, roz_tile_size, roz_tile_size, 64, 64);
+		K001604_layer_roz[chip][0] = tilemap_create(machine, K001604_0_tile_info_layer_roz, K001604_scan_layer_roz_0, roz_tile_size, roz_tile_size, roz_width, 64);
+		K001604_layer_roz[chip][1] = tilemap_create(machine, K001604_0_tile_info_layer_roz, K001604_scan_layer_roz_1, roz_tile_size, roz_tile_size, 64, 64);
 	}
 	else
 	{
 		int roz_tile_size = K001604_roz_size[chip] ? 16 : 8;
 		int roz_width = K001604_layer_size ? 64 : 128;
-		K001604_layer_8x8[chip][0] = tilemap_create(K001604_1_tile_info_layer_8x8, K001604_scan_layer_8x8_0, 8, 8, 64, 64);
-		K001604_layer_8x8[chip][1] = tilemap_create(K001604_1_tile_info_layer_8x8, K001604_scan_layer_8x8_1, 8, 8, 64, 64);
+		K001604_layer_8x8[chip][0] = tilemap_create(machine, K001604_1_tile_info_layer_8x8, K001604_scan_layer_8x8_0, 8, 8, 64, 64);
+		K001604_layer_8x8[chip][1] = tilemap_create(machine, K001604_1_tile_info_layer_8x8, K001604_scan_layer_8x8_1, 8, 8, 64, 64);
 
-		K001604_layer_roz[chip][0] = tilemap_create(K001604_1_tile_info_layer_roz, K001604_scan_layer_roz_0, roz_tile_size, roz_tile_size, roz_width, 64);
-		K001604_layer_roz[chip][1] = tilemap_create(K001604_1_tile_info_layer_roz, K001604_scan_layer_roz_1, roz_tile_size, roz_tile_size, 64, 64);
+		K001604_layer_roz[chip][0] = tilemap_create(machine, K001604_1_tile_info_layer_roz, K001604_scan_layer_roz_0, roz_tile_size, roz_tile_size, roz_width, 64);
+		K001604_layer_roz[chip][1] = tilemap_create(machine, K001604_1_tile_info_layer_roz, K001604_scan_layer_roz_1, roz_tile_size, roz_tile_size, 64, 64);
 	}
 
 	tilemap_set_transparent_pen(K001604_layer_8x8[chip][0], 0);
@@ -458,9 +458,9 @@ int K001604_vh_start(running_machine *machine, int chip)
 	memset(K001604_reg[chip], 0, 0x400);
 
 
-	machine->gfx[K001604_gfx_index[chip][0]] = allocgfx(&K001604_char_layout_layer_8x8);
+	machine->gfx[K001604_gfx_index[chip][0]] = allocgfx(machine, &K001604_char_layout_layer_8x8);
 	decodegfx(machine->gfx[K001604_gfx_index[chip][0]], (UINT8*)&K001604_char_ram[chip][0], 0, machine->gfx[K001604_gfx_index[chip][0]]->total_elements);
-	machine->gfx[K001604_gfx_index[chip][1]] = allocgfx(&K001604_char_layout_layer_16x16);
+	machine->gfx[K001604_gfx_index[chip][1]] = allocgfx(machine, &K001604_char_layout_layer_16x16);
 	decodegfx(machine->gfx[K001604_gfx_index[chip][1]], (UINT8*)&K001604_char_ram[chip][0], 0, machine->gfx[K001604_gfx_index[chip][1]]->total_elements);
 
 	machine->gfx[K001604_gfx_index[chip][0]]->total_colors = machine->config->total_colors / 16;
@@ -1114,6 +1114,7 @@ static MACHINE_DRIVER_START( nwktr )
 	MDRV_MACHINE_RESET(nwktr)
 
 	MDRV_3DFX_VOODOO_1_ADD("voodoo", STD_VOODOO_1_CLOCK, 2, "main")
+	MDRV_3DFX_VOODOO_CPU("dsp")
 	MDRV_3DFX_VOODOO_TMU_MEMORY(0, 2)
 	MDRV_3DFX_VOODOO_TMU_MEMORY(1, 2)
 	MDRV_3DFX_VOODOO_VBLANK(voodoo_vblank_0)
@@ -1145,9 +1146,9 @@ MACHINE_DRIVER_END
 static void sound_irq_callback(running_machine *machine, int irq)
 {
 	if (irq == 0)
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_IRQ1, PULSE_LINE);
+		generic_pulse_irq_line(machine->cpu[1], INPUT_LINE_IRQ1);
 	else
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_IRQ2, PULSE_LINE);
+		generic_pulse_irq_line(machine->cpu[1], INPUT_LINE_IRQ2);
 }
 
 static DRIVER_INIT(nwktr)
@@ -1159,7 +1160,7 @@ static DRIVER_INIT(nwktr)
 	led_reg0 = led_reg1 = 0x7f;
 
 	K056800_init(machine, sound_irq_callback);
-	K033906_init();
+	K033906_init(machine);
 
 //  cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_SPU_TX_HANDLER, (genf *)jamma_jvs_w);
 //  cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_SPU_RX_HANDLER, (genf *)jamma_jvs_r);

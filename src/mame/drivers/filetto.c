@@ -322,7 +322,7 @@ static WRITE8_HANDLER( vga_vram_w )
 /*end of Video HW file*/
 
 static struct {
-	const device_config	*pit8254;
+	const device_config	*pit8253;
 	const device_config	*pic8259_1;
 	const device_config	*pic8259_2;
 	const device_config	*dma8237_1;
@@ -552,15 +552,10 @@ static UINT8 at_pages[0x10];
 static DMA8237_MEM_READ( pc_dma_read_byte )
 {
 	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	UINT8 result;
 	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
 		& 0xFF0000;
 
-	cpu_push_context(space->cpu);
-	result = memory_read_byte(space, page_offset + offset);
-	cpu_pop_context();
-
-	return result;
+	return memory_read_byte(space, page_offset + offset);
 }
 
 
@@ -570,9 +565,7 @@ static DMA8237_MEM_WRITE( pc_dma_write_byte )
 	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
 		& 0xFF0000;
 
-	cpu_push_context(space->cpu);
 	memory_write_byte(space, page_offset + offset, data);
-	cpu_pop_context();
 }
 
 static READ8_HANDLER(dma_page_select_r)
@@ -825,7 +818,7 @@ static MACHINE_RESET( filetto )
 	lastvalue = -1;
 	hv_blank = 0;
 	cpu_set_irq_callback(machine->cpu[0], irq_callback);
-	filetto_devices.pit8254 = device_list_find_by_tag( machine->config->devicelist, PIT8254, "pit8254" );
+	filetto_devices.pit8253 = device_list_find_by_tag( machine->config->devicelist, PIT8253, "pit8253" );
 	filetto_devices.pic8259_1 = device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_1" );
 	filetto_devices.pic8259_2 = device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_2" );
 	filetto_devices.dma8237_1 = device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_1" );
@@ -839,20 +832,16 @@ static MACHINE_DRIVER_START( filetto )
 
 	MDRV_MACHINE_RESET( filetto )
 
-	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
-	MDRV_DEVICE_CONFIG( pc_pit8253_config )
+	MDRV_PIT8253_ADD( "pit8253", pc_pit8253_config )
 
 	MDRV_PPI8255_ADD( "ppi8255_0", filetto_ppi8255_intf[0] )
 	MDRV_PPI8255_ADD( "ppi8255_1", filetto_ppi8255_intf[1] )
 
-	MDRV_DEVICE_ADD( "dma8237_1", DMA8237 )
-	MDRV_DEVICE_CONFIG( dma8237_1_config )
+	MDRV_DMA8237_ADD( "dma8237_1", dma8237_1_config )
 
-	MDRV_DEVICE_ADD( "pic8259_1", PIC8259 )
-	MDRV_DEVICE_CONFIG( pic8259_1_config )
+	MDRV_PIC8259_ADD( "pic8259_1", pic8259_1_config )
 
-	MDRV_DEVICE_ADD( "pic8259_2", PIC8259 )
-	MDRV_DEVICE_CONFIG( pic8259_2_config )
+	MDRV_PIC8259_ADD( "pic8259_2", pic8259_2_config )
 
 	MDRV_GFXDECODE(filetto)
 

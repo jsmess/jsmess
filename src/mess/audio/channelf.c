@@ -76,12 +76,12 @@ static void channelf_sh_update(void *param,stream_sample_t **inputs, stream_samp
 
 
 
-void *channelf_sh_custom_start(int clock, const custom_sound_interface *config)
+void *channelf_sh_custom_start(const device_config *device, int clock, const custom_sound_interface *config)
 {
 	int rate;
 
-	channel = stream_create(0, 1, Machine->sample_rate, 0, channelf_sh_update);
-	rate = Machine->sample_rate;
+	channel = stream_create(device, 0, 1, device->machine->sample_rate, 0, channelf_sh_update);
+	rate = device->machine->sample_rate;
 
 	/*
 	 * 2V = 1000Hz ~= 3579535/224/16

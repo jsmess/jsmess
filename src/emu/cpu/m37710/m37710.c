@@ -264,13 +264,11 @@ static TIMER_CALLBACK( m37710_timer_cb )
 	int which = param;
 	int curirq = M37710_LINE_TIMERA0 - which;
 
-	cpu_push_context(cpustate->device);
 	timer_adjust_oneshot(cpustate->timers[which], cpustate->reload[which], param);
 
 	cpustate->m37710_regs[m37710_irq_levels[curirq]] |= 0x04;
 	m37710_set_irq_line(cpustate, curirq, PULSE_LINE);
 	cpu_triggerint(cpustate->device);
-	cpu_pop_context();
 }
 
 static void m37710_external_tick(m37710i_cpu_struct *cpustate, int timer, int state)
@@ -859,12 +857,6 @@ static CPU_EXECUTE( m37710 )
 }
 
 
-/* Get the current CPU context */
-static CPU_GET_CONTEXT( m37710 ) { }
-
-/* Set the current CPU context */
-static CPU_SET_CONTEXT( m37710 ) { }
-
 /* Set the Program Counter */
 static void m37710_set_pc(m37710i_cpu_struct *cpustate, unsigned val)
 {
@@ -1119,8 +1111,6 @@ CPU_GET_INFO( m37710 )
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(m37710);		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(m37710);	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(m37710);	break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m37710);				break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(m37710);				break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(m37710);				break;

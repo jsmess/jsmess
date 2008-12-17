@@ -635,8 +635,6 @@ static TIMER_CALLBACK( e132xs_timer_callback )
 	hyperstone_state *cpustate = device->token;
 	int update = param;
 
-	cpu_push_context(device);
-
 	/* update the values if necessary */
 	if (update)
 		update_timer_prescale(cpustate);
@@ -648,8 +646,6 @@ static TIMER_CALLBACK( e132xs_timer_callback )
 	/* adjust ourselves for the next time */
 	else
 		adjust_timer_interrupt(cpustate);
-
-	cpu_pop_context();
 }
 
 
@@ -1713,10 +1709,6 @@ static CPU_EXIT( hyperstone )
 {
 	// nothing to do
 }
-
-static CPU_GET_CONTEXT( hyperstone ) { }
-
-static CPU_SET_CONTEXT( hyperstone ) { }
 
 static CPU_DISASSEMBLE( hyperstone )
 {
@@ -5022,8 +5014,6 @@ static CPU_GET_INFO( hyperstone )
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(hyperstone);	break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(hyperstone); break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(hyperstone); break;
 		case CPUINFO_PTR_INIT:							info->init = NULL;						break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(hyperstone);			break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(hyperstone);			break;

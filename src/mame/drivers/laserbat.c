@@ -505,7 +505,7 @@ static VIDEO_START( laserbat )
 	int screen_width = video_screen_get_width(machine->primary_screen);
 	int screen_height = video_screen_get_height(machine->primary_screen);
 
-	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,8,8,32,32);
+	bg_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan_rows,8,8,32,32);
 
 	videoram = (UINT8 *)auto_malloc(0x400);
 	colorram = (UINT8 *)auto_malloc(0x400);
@@ -670,7 +670,7 @@ static const ay8910_interface ay8910_config =
 
 static MACHINE_START( catnmous )
 {
-	pia_config(0, &pia_0_intf);
+	pia_config(machine, 0, &pia_0_intf);
 }
 
 static MACHINE_RESET( catnmous )
@@ -681,7 +681,7 @@ static MACHINE_RESET( catnmous )
 
 static INTERRUPT_GEN( laserbat_interrupt )
 {
-	cpu_set_input_line_and_vector(device,0,PULSE_LINE,0x0a);
+	generic_pulse_irq_line_and_vector(device,0,0x0a);
 }
 
 static INTERRUPT_GEN( zaccaria_cb1_toggle )

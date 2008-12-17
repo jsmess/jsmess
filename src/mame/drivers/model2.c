@@ -91,7 +91,7 @@ static int dsp_type;
 static int copro_fifoin_rpos, copro_fifoin_wpos;
 static UINT32 copro_fifoin_data[COPRO_FIFOIN_SIZE];
 static int copro_fifoin_num = 0;
-static int copro_fifoin_pop(UINT32 *result)
+static int copro_fifoin_pop(const device_config *device, UINT32 *result)
 {
 	UINT32 r;
 
@@ -100,7 +100,7 @@ static int copro_fifoin_pop(UINT32 *result)
 		if (dsp_type == DSP_TYPE_TGP)
 			return 0;
 
-		fatalerror("Copro FIFOIN underflow (at %08X)", cpu_get_pc(Machine->activecpu));
+		fatalerror("Copro FIFOIN underflow (at %08X)", cpu_get_pc(device));
 		return 0;
 	}
 
@@ -116,15 +116,11 @@ static int copro_fifoin_pop(UINT32 *result)
 	{
 		if (copro_fifoin_num == 0)
 		{
-			cpu_push_context(Machine->cpu[2]);
-			sharc_set_flag_input(0, ASSERT_LINE);
-			cpu_pop_context();
+			sharc_set_flag_input(device, 0, ASSERT_LINE);
 		}
 		else
 		{
-			cpu_push_context(Machine->cpu[2]);
-			sharc_set_flag_input(0, CLEAR_LINE);
-			cpu_pop_context();
+			sharc_set_flag_input(device, 0, CLEAR_LINE);
 		}
 	}
 
@@ -133,15 +129,15 @@ static int copro_fifoin_pop(UINT32 *result)
 	return 1;
 }
 
-static void copro_fifoin_push(UINT32 data)
+static void copro_fifoin_push(const device_config *device, UINT32 data)
 {
 	if (copro_fifoin_num == COPRO_FIFOIN_SIZE)
 	{
-		fatalerror("Copro FIFOIN overflow (at %08X)", cpu_get_pc(Machine->activecpu));
+		fatalerror("Copro FIFOIN overflow (at %08X)", cpu_get_pc(device));
 		return;
 	}
 
-	//mame_printf_debug("COPRO FIFOIN at %08X, %08X, %f\n", cpu_get_pc(Machine->activecpu), data, *(float*)&data);
+	//mame_printf_debug("COPRO FIFOIN at %08X, %08X, %f\n", cpu_get_pc(device), data, *(float*)&data);
 
 	copro_fifoin_data[copro_fifoin_wpos++] = data;
 	if (copro_fifoin_wpos == COPRO_FIFOIN_SIZE)
@@ -154,9 +150,7 @@ static void copro_fifoin_push(UINT32 data)
 	// clear FIFO empty flag on SHARC
 	if (dsp_type == DSP_TYPE_SHARC)
 	{
-		cpu_push_context(Machine->cpu[2]);
-		sharc_set_flag_input(0, CLEAR_LINE);
-		cpu_pop_context();
+		sharc_set_flag_input(device, 0, CLEAR_LINE);
 	}
 }
 
@@ -165,17 +159,17 @@ static void copro_fifoin_push(UINT32 data)
 static int copro_fifoout_rpos, copro_fifoout_wpos;
 static UINT32 copro_fifoout_data[COPRO_FIFOOUT_SIZE];
 static int copro_fifoout_num = 0;
-static UINT32 copro_fifoout_pop(void)
+static UINT32 copro_fifoout_pop(const address_space *space)
 {
 	UINT32 r;
 
 	if (copro_fifoout_num == 0)
 	{
 		/* Reading from empty FIFO causes the i960 to enter wait state */
-		i960_stall(Machine->activecpu);
+		i960_stall(space->cpu);
 
 		/* spin the main cpu and let the TGP catch up */
-		cpu_spinuntil_time(Machine->activecpu, ATTOTIME_IN_USEC(100));
+		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(100));
 
 		return 0;
 	}
@@ -196,27 +190,23 @@ static UINT32 copro_fifoout_pop(void)
 	{
 		if (copro_fifoout_num == COPRO_FIFOOUT_SIZE)
 		{
-			cpu_push_context(Machine->cpu[2]);
-			sharc_set_flag_input(1, ASSERT_LINE);
-			cpu_pop_context();
+			sharc_set_flag_input(space->machine->cpu[2], 1, ASSERT_LINE);
 		}
 		else
 		{
-			cpu_push_context(Machine->cpu[2]);
-			sharc_set_flag_input(1, CLEAR_LINE);
-			cpu_pop_context();
+			sharc_set_flag_input(space->machine->cpu[2], 1, CLEAR_LINE);
 		}
 	}
 
 	return r;
 }
 
-static void copro_fifoout_push(UINT32 data)
+static void copro_fifoout_push(const device_config *device, UINT32 data)
 {
 	//if (copro_fifoout_wpos == copro_fifoout_rpos)
 	if (copro_fifoout_num == COPRO_FIFOOUT_SIZE)
 	{
-		fatalerror("Copro FIFOOUT overflow (at %08X)", cpu_get_pc(Machine->activecpu));
+		fatalerror("Copro FIFOOUT overflow (at %08X)", cpu_get_pc(device));
 		return;
 	}
 
@@ -235,19 +225,15 @@ static void copro_fifoout_push(UINT32 data)
 	{
 		if (copro_fifoout_num == COPRO_FIFOOUT_SIZE)
 		{
-			cpu_push_context(Machine->cpu[2]);
-			sharc_set_flag_input(1, ASSERT_LINE);
-			cpu_pop_context();
+			sharc_set_flag_input(device, 1, ASSERT_LINE);
 
-			//cpu_set_input_line(Machine->cpu[2], SHARC_INPUT_FLAG1, ASSERT_LINE);
+			//cpu_set_input_line(device, SHARC_INPUT_FLAG1, ASSERT_LINE);
 		}
 		else
 		{
-			cpu_push_context(Machine->cpu[2]);
-			sharc_set_flag_input(1, CLEAR_LINE);
-			cpu_pop_context();
+			sharc_set_flag_input(device, 1, CLEAR_LINE);
 
-			//cpu_set_input_line(Machine->cpu[2], SHARC_INPUT_FLAG1, CLEAR_LINE);
+			//cpu_set_input_line(device, SHARC_INPUT_FLAG1, CLEAR_LINE);
 		}
 	}
 }
@@ -556,13 +542,13 @@ static WRITE32_HANDLER(copro_function_port_w)
 	d |= a << 23;
 
 	//logerror("copro_function_port_w: %08X, %08X, %08X\n", data, offset, mem_mask);
-	copro_fifoin_push(d);
+	copro_fifoin_push(space->machine->cpu[2], d);
 }
 
 static READ32_HANDLER(copro_fifo_r)
 {
 	//logerror("copro_fifo_r: %08X, %08X\n", offset, mem_mask);
-	return copro_fifoout_pop();
+	return copro_fifoout_pop(space);
 }
 
 static WRITE32_HANDLER(copro_fifo_w)
@@ -571,9 +557,7 @@ static WRITE32_HANDLER(copro_fifo_w)
 	{
 		if (dsp_type == DSP_TYPE_SHARC)
 		{
-			cpu_push_context(space->machine->cpu[2]);
-			sharc_external_dma_write(model2_coprocnt, data & 0xffff);
-			cpu_pop_context();
+			sharc_external_dma_write(space->machine->cpu[2], model2_coprocnt, data & 0xffff);
 		}
 		else if (dsp_type == DSP_TYPE_TGP)
 		{
@@ -585,7 +569,7 @@ static WRITE32_HANDLER(copro_fifo_w)
 	else
 	{
 		//mame_printf_debug("copro_fifo_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(space->cpu));
-		copro_fifoin_push(data);
+		copro_fifoin_push(space->machine->cpu[2], data);
 	}
 }
 
@@ -598,9 +582,7 @@ static WRITE32_HANDLER(copro_sharc_iop_w)
 		(strcmp(space->machine->gamedrv->name, "vstriker" ) == 0) ||
 		(strcmp(space->machine->gamedrv->name, "gunblade" ) == 0))
 	{
-		cpu_push_context(space->machine->cpu[2]);
-		sharc_external_iop_write(offset, data);
-		cpu_pop_context();
+		sharc_external_iop_write(space->machine->cpu[2], offset, data);
 	}
 	else
 	{
@@ -611,9 +593,7 @@ static WRITE32_HANDLER(copro_sharc_iop_w)
 		else
 		{
 			iop_data |= (data & 0xffff) << 16;
-			cpu_push_context(space->machine->cpu[2]);
-			sharc_external_iop_write(offset, iop_data);
-			cpu_pop_context();
+			sharc_external_iop_write(space->machine->cpu[2], offset, iop_data);
 		}
 		iop_write_num++;
 	}
@@ -688,9 +668,7 @@ static WRITE32_HANDLER(geo_sharc_fifo_w)
 {
     if (model2_geoctl & 0x80000000)
     {
-        cpu_push_context(space->machine->cpu[3]);
-        sharc_external_dma_write(model2_geocnt, data & 0xffff);
-        cpu_pop_context();
+        sharc_external_dma_write(space->machine->cpu[3], model2_geocnt, data & 0xffff);
 
         model2_geocnt++;
     }
@@ -706,9 +684,7 @@ static WRITE32_HANDLER(geo_sharc_iop_w)
 {
     if ((strcmp(space->machine->gamedrv->name, "schamp" ) == 0))
     {
-        cpu_push_context(space->machine->cpu[3]);
-        sharc_external_iop_write(offset, data);
-        cpu_pop_context();
+        sharc_external_iop_write(space->machine->cpu[3], offset, data);
     }
     else
     {
@@ -719,9 +695,7 @@ static WRITE32_HANDLER(geo_sharc_iop_w)
         else
         {
             geo_iop_data |= (data & 0xffff) << 16;
-            cpu_push_context(space->machine->cpu[3]);
-            sharc_external_iop_write(offset, geo_iop_data);
-            cpu_pop_context();
+            sharc_external_iop_write(space->machine->cpu[3], offset, geo_iop_data);
         }
         geo_iop_write_num++;
     }
@@ -768,7 +742,7 @@ static READ32_HANDLER( geo_r )
 	}
 
 //  fatalerror("geo_r: %08X, %08X\n", address, mem_mask);
-	mame_printf_debug("geo_r: PC:%08x - %08X\n", safe_cpu_get_pc(space->cpu), address);
+	mame_printf_debug("geo_r: PC:%08x - %08X\n", cpu_get_pc(space->cpu), address);
 
 	return 0;
 }
@@ -900,32 +874,32 @@ static WRITE32_HANDLER(model2_irq_w)
 
 static int to_68k;
 
-static int snd_68k_ready_r(void)
+static int snd_68k_ready_r(const address_space *space)
 {
-	int sr = cpu_get_reg(Machine->cpu[1], M68K_SR);
+	int sr = cpu_get_reg(space->machine->cpu[1], M68K_SR);
 
 	if ((sr & 0x0700) > 0x0100)
 	{
-		cpu_spinuntil_time(Machine->activecpu, ATTOTIME_IN_USEC(40));
+		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(40));
 		return 0;	// not ready yet, interrupts disabled
 	}
 
 	return 0xff;
 }
 
-static void snd_latch_to_68k_w(running_machine *machine, int data)
+static void snd_latch_to_68k_w(const address_space *space, int data)
 {
-	while (!snd_68k_ready_r())
+	if (!snd_68k_ready_r(space))
 	{
-		cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(40));
+		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(40));
 	}
 
 	to_68k = data;
 
-	cpu_set_input_line(machine->cpu[1], 2, HOLD_LINE);
+	cpu_set_input_line(space->machine->cpu[1], 2, HOLD_LINE);
 
 	// give the 68k time to notice
-	cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(40));
+	cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(40));
 }
 
 static READ32_HANDLER( model2_serial_r )
@@ -942,7 +916,7 @@ static WRITE32_HANDLER( model2o_serial_w )
 {
 	if (mem_mask == 0x0000ffff)
 	{
-		snd_latch_to_68k_w(space->machine, data&0xff);
+		snd_latch_to_68k_w(space, data&0xff);
 	}
 }
 
@@ -1744,17 +1718,17 @@ static const scsp_interface scsp_config =
 
 static READ32_HANDLER(copro_sharc_input_fifo_r)
 {
-	UINT32 result;
+	UINT32 result = 0;
 	//mame_printf_debug("SHARC FIFOIN pop at %08X\n", cpu_get_pc(space->cpu));
 
-	copro_fifoin_pop(&result);
+	copro_fifoin_pop(space->machine->cpu[2], &result);
 	return result;
 }
 
 static WRITE32_HANDLER(copro_sharc_output_fifo_w)
 {
 	//mame_printf_debug("SHARC FIFOOUT push %08X\n", data);
-	copro_fifoout_push(data);
+	copro_fifoout_push(space->machine->cpu[2], data);
 }
 
 static READ32_HANDLER(copro_sharc_buffer_r)

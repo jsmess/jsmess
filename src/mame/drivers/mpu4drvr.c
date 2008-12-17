@@ -996,10 +996,10 @@ static VIDEO_START( mpu4_vid )
 	assert(mpu4_gfx_index != MAX_GFX_ELEMENTS);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine->gfx[mpu4_gfx_index+0] = allocgfx(&mpu4_vid_char_8x8_layout);
-	machine->gfx[mpu4_gfx_index+1] = allocgfx(&mpu4_vid_char_8x16_layout);
-	machine->gfx[mpu4_gfx_index+2] = allocgfx(&mpu4_vid_char_16x8_layout);
-	machine->gfx[mpu4_gfx_index+3] = allocgfx(&mpu4_vid_char_16x16_layout);
+	machine->gfx[mpu4_gfx_index+0] = allocgfx(machine, &mpu4_vid_char_8x8_layout);
+	machine->gfx[mpu4_gfx_index+1] = allocgfx(machine, &mpu4_vid_char_8x16_layout);
+	machine->gfx[mpu4_gfx_index+2] = allocgfx(machine, &mpu4_vid_char_16x8_layout);
+	machine->gfx[mpu4_gfx_index+3] = allocgfx(machine, &mpu4_vid_char_16x16_layout);
 
 	/* set the color information */
 	machine->gfx[mpu4_gfx_index+0]->total_colors = machine->config->total_colors / 16;
@@ -1364,10 +1364,10 @@ MACHINE_START( mpu4_vid )
 
 	/* setup 4 reels (for hybrid machines) */
 
-	stepper_config(0, &barcrest_reel_interface);
-	stepper_config(1, &barcrest_reel_interface);
-	stepper_config(2, &barcrest_reel_interface);
-	stepper_config(3, &barcrest_reel_interface);
+	stepper_config(machine, 0, &barcrest_reel_interface);
+	stepper_config(machine, 1, &barcrest_reel_interface);
+	stepper_config(machine, 2, &barcrest_reel_interface);
+	stepper_config(machine, 3, &barcrest_reel_interface);
 
 	/* setup the standard oki MSC1937 display */
 

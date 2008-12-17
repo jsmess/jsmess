@@ -271,9 +271,11 @@ static WRITE8_HANDLER( apple3_c0xx_w )
 
 INTERRUPT_GEN( apple3_interrupt )
 {
-	via_set_input_ca2(device->machine, 1, (AY3600_keydata_strobe_r() & 0x80) ? 1 : 0);
-	via_set_input_cb1(device->machine, 1, video_screen_get_vblank(device->machine->primary_screen));
-	via_set_input_cb2(device->machine, 1, video_screen_get_vblank(device->machine->primary_screen));
+	const device_config *via_1 = device_list_find_by_tag(device->machine->config->devicelist, VIA6522, "via6522_1");
+
+	via_ca2_w(via_1, 0, (AY3600_keydata_strobe_r() & 0x80) ? 1 : 0);
+	via_cb1_w(via_1, 0, video_screen_get_vblank(device->machine->primary_screen));
+	via_cb2_w(via_1, 0, video_screen_get_vblank(device->machine->primary_screen));
 }
 
 
@@ -464,10 +466,14 @@ static void apple3_update_memory(running_machine *machine)
 		apple3_setbank(machine,7, ~0, 0x7000);
 
 	/* reinstall VIA handlers */
-	memory_install_read8_handler(space, 0xFFD0, 0xFFDF, 0, 0, via_0_r);
-	memory_install_write8_handler(space, 0xFFD0, 0xFFDF, 0, 0, via_0_w);
-	memory_install_read8_handler(space, 0xFFE0, 0xFFEF, 0, 0, via_1_r);
-	memory_install_write8_handler(space, 0xFFE0, 0xFFEF, 0, 0, via_1_w);
+	{
+		const device_config *via_0 = device_list_find_by_tag(space->machine->config->devicelist, VIA6522, "via6522_0");
+		const device_config *via_1 = device_list_find_by_tag(space->machine->config->devicelist, VIA6522, "via6522_1");
+		memory_install_read8_device_handler(space, via_0, 0xFFD0, 0xFFDF, 0, 0, via_r);
+		memory_install_write8_device_handler(space, via_0, 0xFFD0, 0xFFDF, 0, 0, via_w);
+		memory_install_read8_device_handler(space, via_1, 0xFFE0, 0xFFEF, 0, 0, via_r);
+		memory_install_write8_device_handler(space, via_1, 0xFFE0, 0xFFEF, 0, 0, via_w);
+	}
 }
 
 
@@ -483,22 +489,22 @@ static void apple3_via_out(running_machine *machine, UINT8 *var, UINT8 data)
 
 
 /* these are here to appease the Apple /// confidence tests */
-static READ8_HANDLER(apple3_via_1_in_a) { return ~0; }
-static READ8_HANDLER(apple3_via_1_in_b) { return ~0; }
+static READ8_DEVICE_HANDLER(apple3_via_1_in_a) { return ~0; }
+static READ8_DEVICE_HANDLER(apple3_via_1_in_b) { return ~0; }
 
-static WRITE8_HANDLER(apple3_via_0_out_a) { apple3_via_out(space->machine, &via_0_a, data); }
-static WRITE8_HANDLER(apple3_via_0_out_b) { apple3_via_out(space->machine, &via_0_b, data); }
-static WRITE8_HANDLER(apple3_via_1_out_a) { apple3_via_out(space->machine, &via_1_a, data); }
-static WRITE8_HANDLER(apple3_via_1_out_b) { apple3_via_out(space->machine, &via_1_b, data); }
+static WRITE8_DEVICE_HANDLER(apple3_via_0_out_a) { apple3_via_out(device->machine, &via_0_a, data); }
+static WRITE8_DEVICE_HANDLER(apple3_via_0_out_b) { apple3_via_out(device->machine, &via_0_b, data); }
+static WRITE8_DEVICE_HANDLER(apple3_via_1_out_a) { apple3_via_out(device->machine, &via_1_a, data); }
+static WRITE8_DEVICE_HANDLER(apple3_via_1_out_b) { apple3_via_out(device->machine, &via_1_b, data); }
 
-static void apple2_via_1_irq_func(running_machine *machine, int state)
+static void apple2_via_1_irq_func(const device_config *device, int state)
 {
 	if (!via_1_irq && state)
-		cpu_set_input_line(machine->cpu[0], M6502_IRQ_LINE, PULSE_LINE);
+		cpu_set_input_line(device->machine->cpu[0], M6502_IRQ_LINE, PULSE_LINE);
 	via_1_irq = state;
 }
 
-static const struct via6522_interface via_0_intf =
+const via6522_interface apple3_via_0_intf =
 {
 	NULL,					/* in_a_func */
 	NULL,					/* in_b_func */
@@ -515,7 +521,7 @@ static const struct via6522_interface via_0_intf =
 	NULL					/* irq_func */
 };
 
-static const struct via6522_interface via_1_intf =
+const via6522_interface apple3_via_1_intf =
 {
 	apple3_via_1_in_a,		/* in_a_func */
 	apple3_via_1_in_b,		/* in_b_func */
@@ -536,7 +542,6 @@ static const struct via6522_interface via_1_intf =
 
 MACHINE_RESET( apple3 )
 {
-	via_reset();
 }
 
 
@@ -720,11 +725,6 @@ DRIVER_INIT( apple3 )
 	apple3_update_drives();
 
 	AY3600_init(machine);
-
-	via_config(0, &via_0_intf);
-	via_config(1, &via_1_intf);
-	via_set_clock(0, 1000000);
-	via_set_clock(1, 2000000);
 
 	apple3_profile_init();
 

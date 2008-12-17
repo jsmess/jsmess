@@ -11,12 +11,16 @@
 #ifndef BBC_H_
 #define BBC_H_
 
+#include "machine/6522via.h"
 #include "machine/6850acia.h"
 #include "machine/i8271.h"
 #include "machine/upd7002.h"
 
 
 /*----------- defined in machine/bbc.c -----------*/
+
+extern const via6522_interface bbcb_system_via;
+extern const via6522_interface bbcb_user_via;
 
 DRIVER_INIT( bbc );
 DRIVER_INIT( bbcm );

@@ -973,7 +973,7 @@ static void HD63484_command_w(running_machine *machine, UINT16 cmd)
 	{
 		int i;
 
-		logerror("PC %05x: HD63484 command %s (%04x) ",cpu_get_pc(machine->activecpu),instruction_name[fifo[0]>>10],fifo[0]);
+		logerror("%s: HD63484 command %s (%04x) ",cpuexec_describe_context(machine),instruction_name[fifo[0]>>10],fifo[0]);
 		for (i = 1;i < fifo_counter;i++)
 			logerror("%04x ",fifo[i]);
 		logerror("\n");
@@ -1355,6 +1355,9 @@ WRITE16_HANDLER( HD63484_address_w )
 WRITE16_HANDLER( HD63484_data_w )
 {
 	COMBINE_DATA(&HD63484_reg[regno/2]);
+
+	if ( !strcmp(space->machine->gamedrv->name, "skattva")) HD63484_reg[2/2] = (HD63484_reg[2/2] & 0xf8ff) | 0x0200; // hack to set proper color depth in skattva
+
 	if (regno & 0x80) regno += 2;	/* autoincrement */
 logerror("PC %05x: HD63484 register %02x write %04x\n",cpu_get_pc(space->cpu),regno,HD63484_reg[regno/2]);
 	if (regno == 0)	/* FIFO */

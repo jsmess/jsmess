@@ -125,35 +125,37 @@ static UINT16 *videoram_ptr;		/* screen bitmap base address (derived from video_
 	a hard disk
 */
 
-static  READ8_HANDLER(COPS_via_in_b);
-static WRITE8_HANDLER(COPS_via_out_a);
-static WRITE8_HANDLER(COPS_via_out_b);
-static WRITE8_HANDLER(COPS_via_out_ca2);
-static WRITE8_HANDLER(COPS_via_out_cb2);
-static void COPS_via_irq_func(running_machine *machine, int val);
-static  READ8_HANDLER(parallel_via_in_b);
+static READ8_DEVICE_HANDLER(COPS_via_in_b);
+static WRITE8_DEVICE_HANDLER(COPS_via_out_a);
+static WRITE8_DEVICE_HANDLER(COPS_via_out_b);
+static WRITE8_DEVICE_HANDLER(COPS_via_out_ca2);
+static WRITE8_DEVICE_HANDLER(COPS_via_out_cb2);
+static void COPS_via_irq_func(const device_config *device, int val);
+static READ8_DEVICE_HANDLER(parallel_via_in_b);
 
 static int KBIR;	/* COPS VIA interrupt pending */
 
-static const struct via6522_interface lisa_via6522_intf[2] =
+const via6522_interface lisa_via6522_0_intf =
 {
-	{	/* COPS via */
-		NULL, COPS_via_in_b,
-		NULL, NULL,
-		NULL, NULL,
-		COPS_via_out_a, COPS_via_out_b,
-		COPS_via_out_ca2, COPS_via_out_cb2,
-		NULL, NULL,
-		COPS_via_irq_func,
-	},
-	{	/* parallel interface via - incomplete */
-		NULL, parallel_via_in_b,
-		NULL, NULL,
-		NULL, NULL,
-		NULL, NULL,
-		NULL, NULL,
-		NULL, NULL,
-	}
+	/* COPS via */
+	NULL, COPS_via_in_b,
+	NULL, NULL,
+	NULL, NULL,
+	COPS_via_out_a, COPS_via_out_b,
+	COPS_via_out_ca2, COPS_via_out_cb2,
+	NULL, NULL,
+	COPS_via_irq_func,
+};
+
+const via6522_interface lisa_via6522_1_intf =
+{
+	/* parallel interface via - incomplete */
+	NULL, parallel_via_in_b,
+	NULL, NULL,
+	NULL, NULL,
+	NULL, NULL,
+	NULL, NULL,
+	NULL, NULL,
 };
 
 /*
@@ -335,17 +337,19 @@ static struct
 
 INLINE void COPS_send_data_if_possible(running_machine *machine)
 {
+	const device_config *via_0 = device_list_find_by_tag(machine->config->devicelist, VIA6522, "via6522_0");
+
 	if ((! hold_COPS_data) && fifo_size && (! COPS_Ready))
 	{
 		logerror("Pushing one byte of data to VIA\n");
 
-		via_set_input_a(0, fifo_data[fifo_head]);	/* output data */
+		via_porta_w(via_0, 0, fifo_data[fifo_head]);	/* output data */
 		if (fifo_head == mouse_data_offset)
 			mouse_data_offset = -1;	/* we just phased out the mouse data in buffer */
 		fifo_head = (fifo_head+1) & 0x7;
 		fifo_size--;
-		via_set_input_ca1(machine, 0, 1);		/* pulse ca1 so that VIA reads it */
-		via_set_input_ca1(machine, 0, 0);		/* BTW, I have no idea how a real COPS does it ! */
+		via_ca1_w(via_0, 0, 1);		/* pulse ca1 so that VIA reads it */
+		via_ca1_w(via_0, 0, 0);		/* BTW, I have no idea how a real COPS does it ! */
 	}
 }
 
@@ -519,6 +523,7 @@ static TIMER_CALLBACK(handle_mouse)
 static TIMER_CALLBACK(read_COPS_command)
 {
 	int command;
+	const device_config *via_0 = device_list_find_by_tag(machine->config->devicelist, VIA6522, "via6522_0");
 
 	COPS_Ready = 0;
 
@@ -526,7 +531,7 @@ static TIMER_CALLBACK(read_COPS_command)
 	COPS_send_data_if_possible(machine);
 
 	/* some pull-ups allow the COPS to read 1s when the VIA port is not set as output */
-	command = (COPS_command | (~ via_read(machine, 0, VIA_DDRA))) & 0xff;
+	command = (COPS_command | (~ via_r(via_0, VIA_DDRA))) & 0xff;
 
 	if (command & 0x80)
 		return;	/* NOP */
@@ -769,19 +774,19 @@ static void init_COPS(running_machine *machine)
 	CA1 (I) : COPS sending valid data
 	CA2 (O) : VIA -> COPS handshake
 */
-static WRITE8_HANDLER(COPS_via_out_a)
+static WRITE8_DEVICE_HANDLER(COPS_via_out_a)
 {
 	COPS_command = data;
 }
 
-static WRITE8_HANDLER(COPS_via_out_ca2)
+static WRITE8_DEVICE_HANDLER(COPS_via_out_ca2)
 {
 	hold_COPS_data = data;
 
 	/*logerror("COPS CA2 line state : %d\n", val);*/
 
 	/*logerror("COPS_via_out_ca2 : trying to send data to VIA\n");*/
-	COPS_send_data_if_possible(space->machine);
+	COPS_send_data_if_possible(device->machine);
 }
 
 /*
@@ -798,7 +803,7 @@ static WRITE8_HANDLER(COPS_via_out_ca2)
 	CB1 : not used
 	CB2 (O) : sound output
 */
-static  READ8_HANDLER(COPS_via_in_b)
+static READ8_DEVICE_HANDLER(COPS_via_in_b)
 {
 	int val = 0;
 
@@ -811,17 +816,19 @@ static  READ8_HANDLER(COPS_via_in_b)
 	return val;
 }
 
-static WRITE8_HANDLER(COPS_via_out_b)
+static WRITE8_DEVICE_HANDLER(COPS_via_out_b)
 {
+	const device_config *via_0 = device_list_find_by_tag(device->machine->config->devicelist, VIA6522, "via6522_0");
+
 	/* pull-up */
-	data |= (~ via_read(space->machine, 0, VIA_DDRA)) & 0x01;
+	data |= (~ via_r(via_0, VIA_DDRA)) & 0x01;
 
 	if (data & 0x01)
 	{
 		if (COPS_force_unplug)
 		{
 			COPS_force_unplug = 0;
-			plug_keyboard(space->machine);
+			plug_keyboard(device->machine);
 		}
 	}
 	else
@@ -829,23 +836,23 @@ static WRITE8_HANDLER(COPS_via_out_b)
 		if (! COPS_force_unplug)
 		{
 			COPS_force_unplug = 1;
-			unplug_keyboard(space->machine);
+			unplug_keyboard(device->machine);
 			//reset_COPS();
 		}
 	}
 }
 
-static WRITE8_HANDLER(COPS_via_out_cb2)
+static WRITE8_DEVICE_HANDLER(COPS_via_out_cb2)
 {
 	speaker_level_w(0, data);
 }
 
-static void COPS_via_irq_func(running_machine *machine, int val)
+static void COPS_via_irq_func(const device_config *device, int val)
 {
 	if (KBIR != val)
 	{
 		KBIR = val;
-		lisa_field_interrupts(machine);
+		lisa_field_interrupts(device->machine);
 	}
 }
 
@@ -869,7 +876,7 @@ static void COPS_via_irq_func(running_machine *machine, int val)
 	CB1 : not used
 	CB2 (I) : current parity latch value
 */
-static  READ8_HANDLER(parallel_via_in_b)
+static READ8_DEVICE_HANDLER(parallel_via_in_b)
 {
 	int val = 0;
 
@@ -1162,14 +1169,10 @@ MACHINE_RESET( lisa )
 	/* reset COPS keyboard/mouse controller */
 	init_COPS(machine);
 
-	/* configure vias */
-	via_config(0, & lisa_via6522_intf[0]);
-	via_set_clock(0, lisa_features.has_fast_timers ? 1250000 : 500000);	/* one of these values must be wrong : see note after description of the has_fast_timers field */
-	via_config(1, & lisa_via6522_intf[1]);
-	via_set_clock(1, lisa_features.has_fast_timers ? 1250000 : 500000);	/* one of these values must be wrong : see note after description of the has_fast_timers field */
-
-	via_reset();
-	COPS_via_out_ca2(cpu_get_address_space(machine->cpu[0],ADDRESS_SPACE_PROGRAM), 0, 0);	/* VIA core forgets to do so */
+	{
+		const device_config *via_0 = device_list_find_by_tag(machine->config->devicelist, VIA6522, "via6522_0");
+		COPS_via_out_ca2(via_0, 0, 0);	/* VIA core forgets to do so */
+	}
 
 	/* initialize floppy */
 	{
@@ -1902,6 +1905,8 @@ INLINE void cpu_board_control_access(running_machine *machine, offs_t offset)
 
 static READ16_HANDLER ( lisa_IO_r )
 {
+	const device_config *via_0 = device_list_find_by_tag(space->machine->config->devicelist, VIA6522, "via6522_0");
+	const device_config *via_1 = device_list_find_by_tag(space->machine->config->devicelist, VIA6522, "via6522_1");
 	int answer=0;
 
 	switch ((offset & 0x7000) >> 12)
@@ -1953,13 +1958,13 @@ static READ16_HANDLER ( lisa_IO_r )
 			case 2:	/* parallel port */
 				/* 1 VIA located at 0xD901 */
 				if (ACCESSING_BITS_0_7)
-					return via_read(space->machine, 1, (offset >> 2) & 0xf);
+					return via_r(via_1, (offset >> 2) & 0xf);
 				break;
 
 			case 3:	/* keyboard/mouse cops via */
 				/* 1 VIA located at 0xDD81 */
 				if (ACCESSING_BITS_0_7)
-					return via_read(space->machine, 0, offset & 0xf);
+					return via_r(via_0, offset & 0xf);
 				break;
 			}
 		}
@@ -2029,6 +2034,9 @@ static READ16_HANDLER ( lisa_IO_r )
 
 static WRITE16_HANDLER ( lisa_IO_w )
 {
+	const device_config *via_0 = device_list_find_by_tag(space->machine->config->devicelist, VIA6522, "via6522_0");
+	const device_config *via_1 = device_list_find_by_tag(space->machine->config->devicelist, VIA6522, "via6522_1");
+
 	switch ((offset & 0x7000) >> 12)
 	{
 	case 0x0:
@@ -2075,12 +2083,12 @@ static WRITE16_HANDLER ( lisa_IO_w )
 
 			case 2:	/* paralel port */
 				if (ACCESSING_BITS_0_7)
-					via_write(space->machine, 1, (offset >> 2) & 0xf, data & 0xff);
+					via_w(via_1, (offset >> 2) & 0xf, data & 0xff);
 				break;
 
 			case 3:	/* keyboard/mouse cops via */
 				if (ACCESSING_BITS_0_7)
-					via_write(space->machine, 0, offset & 0xf, data & 0xff);
+					via_w(via_0, offset & 0xf, data & 0xff);
 				break;
 			}
 		}

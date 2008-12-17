@@ -515,21 +515,21 @@ VIDEO_START( ygv608 )
 	namcond1_gfxbank = 0;
 
 	/* create tilemaps of all sizes and combinations */
-	tilemap_A_cache_8[0] = tilemap_create(get_tile_info_A_8, get_tile_offset,  8,8, 32,32);
-	tilemap_A_cache_8[1] = tilemap_create(get_tile_info_A_8, get_tile_offset,  8,8, 64,32);
-	tilemap_A_cache_8[2] = tilemap_create(get_tile_info_A_8, get_tile_offset,  8,8, 32,64);
+	tilemap_A_cache_8[0] = tilemap_create(machine, get_tile_info_A_8, get_tile_offset,  8,8, 32,32);
+	tilemap_A_cache_8[1] = tilemap_create(machine, get_tile_info_A_8, get_tile_offset,  8,8, 64,32);
+	tilemap_A_cache_8[2] = tilemap_create(machine, get_tile_info_A_8, get_tile_offset,  8,8, 32,64);
 
-	tilemap_A_cache_16[0] = tilemap_create(get_tile_info_A_16, get_tile_offset,  16,16, 32,32);
-	tilemap_A_cache_16[1] = tilemap_create(get_tile_info_A_16, get_tile_offset,  16,16, 64,32);
-	tilemap_A_cache_16[2] = tilemap_create(get_tile_info_A_16, get_tile_offset,  16,16, 32,64);
+	tilemap_A_cache_16[0] = tilemap_create(machine, get_tile_info_A_16, get_tile_offset,  16,16, 32,32);
+	tilemap_A_cache_16[1] = tilemap_create(machine, get_tile_info_A_16, get_tile_offset,  16,16, 64,32);
+	tilemap_A_cache_16[2] = tilemap_create(machine, get_tile_info_A_16, get_tile_offset,  16,16, 32,64);
 
-	tilemap_B_cache_8[0] = tilemap_create(get_tile_info_B_8, get_tile_offset,  8,8, 32,32);
-	tilemap_B_cache_8[1] = tilemap_create(get_tile_info_B_8, get_tile_offset,  8,8, 64,32);
-	tilemap_B_cache_8[2] = tilemap_create(get_tile_info_B_8, get_tile_offset,  8,8, 32,64);
+	tilemap_B_cache_8[0] = tilemap_create(machine, get_tile_info_B_8, get_tile_offset,  8,8, 32,32);
+	tilemap_B_cache_8[1] = tilemap_create(machine, get_tile_info_B_8, get_tile_offset,  8,8, 64,32);
+	tilemap_B_cache_8[2] = tilemap_create(machine, get_tile_info_B_8, get_tile_offset,  8,8, 32,64);
 
-	tilemap_B_cache_16[0] = tilemap_create(get_tile_info_B_16, get_tile_offset,  16,16, 32,32);
-	tilemap_B_cache_16[1] = tilemap_create(get_tile_info_B_16, get_tile_offset,  16,16, 64,32);
-	tilemap_B_cache_16[2] = tilemap_create(get_tile_info_B_16, get_tile_offset,  16,16, 32,64);
+	tilemap_B_cache_16[0] = tilemap_create(machine, get_tile_info_B_16, get_tile_offset,  16,16, 32,32);
+	tilemap_B_cache_16[1] = tilemap_create(machine, get_tile_info_B_16, get_tile_offset,  16,16, 64,32);
+	tilemap_B_cache_16[2] = tilemap_create(machine, get_tile_info_B_16, get_tile_offset,  16,16, 32,64);
 
 	tilemap_A = NULL;
 	tilemap_B = NULL;
@@ -1431,8 +1431,8 @@ static void SetPostShortcuts( int reg )
 			UINT8 yTile = ygv608.regs.s.r0 & r0_pny;
 
 			if (yTile >= ygv608.page_y)
-				logerror ("setting pny(%d) >= page_y(%d) @ $%X\n",
-						yTile, ygv608.page_y, cpu_get_pc(Machine->activecpu) );
+				logerror ("%s:setting pny(%d) >= page_y(%d)\n", cpuexec_describe_context(Machine),
+						yTile, ygv608.page_y );
 			yTile &= (ygv608.page_y - 1);
 			ygv608.regs.s.r0 &= ~r0_pny;
 			ygv608.regs.s.r0 |= yTile;
@@ -1444,8 +1444,8 @@ static void SetPostShortcuts( int reg )
 			UINT8 xTile = ygv608.regs.s.r1 & r1_pnx;
 
 			if (xTile >= ygv608.page_x)
-				logerror ("setting pnx(%d) >= page_x(%d) @ $%X\n",
-						xTile, ygv608.page_x, cpu_get_pc(Machine->activecpu) );
+				logerror ("%s:setting pnx(%d) >= page_x(%d)\n", cpuexec_describe_context(Machine),
+						xTile, ygv608.page_x );
 			xTile &= (ygv608.page_x - 1);
 			ygv608.regs.s.r1 &= ~r1_pnx;
 			ygv608.regs.s.r1 |= xTile;

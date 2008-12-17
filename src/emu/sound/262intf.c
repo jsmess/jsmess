@@ -6,7 +6,6 @@
 
 ***************************************************************************/
 #include "sndintrf.h"
-#include "deprecat.h"
 #include "streams.h"
 #include "262intf.h"
 #include "ymf262.h"
@@ -18,6 +17,7 @@ struct ymf262_info
 	emu_timer *	timer[2];
 	void *			chip;
 	const ymf262_interface *intf;
+	const device_config *device;
 };
 
 
@@ -26,7 +26,7 @@ struct ymf262_info
 static void IRQHandler_262(void *param,int irq)
 {
 	struct ymf262_info *info = param;
-	if (info->intf->handler) (info->intf->handler)(Machine, irq);
+	if (info->intf->handler) (info->intf->handler)(info->device->machine, irq);
 }
 
 static TIMER_CALLBACK( timer_callback_262_0 )
@@ -77,21 +77,22 @@ static SND_START( ymf262 )
 	memset(info, 0, sizeof(*info));
 
 	info->intf = config ? config : &dummy;
+	info->device = device;
 
 	/* stream system initialize */
-	info->chip = ymf262_init(clock,rate);
+	info->chip = ymf262_init(device,clock,rate);
 	if (info->chip == NULL)
 		return NULL;
 
-	info->stream = stream_create(0,4,rate,info,ymf262_stream_update);
+	info->stream = stream_create(device,0,4,rate,info,ymf262_stream_update);
 
 	/* YMF262 setup */
 	ymf262_set_timer_handler (info->chip, timer_handler_262, info);
 	ymf262_set_irq_handler   (info->chip, IRQHandler_262, info);
 	ymf262_set_update_handler(info->chip, _stream_update, info);
 
-	info->timer[0] = timer_alloc(Machine, timer_callback_262_0, info);
-	info->timer[1] = timer_alloc(Machine, timer_callback_262_1, info);
+	info->timer[0] = timer_alloc(device->machine, timer_callback_262_0, info);
+	info->timer[1] = timer_alloc(device->machine, timer_callback_262_1, info);
 
 	return info;
 }

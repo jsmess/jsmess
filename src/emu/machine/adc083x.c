@@ -12,7 +12,7 @@
 
 #define VERBOSE_LEVEL ( 0 )
 
-INLINE void ATTR_PRINTF(2,3) verboselog( int n_level, const char *s_fmt, ... )
+INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, const char *s_fmt, ... )
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -21,14 +21,7 @@ INLINE void ATTR_PRINTF(2,3) verboselog( int n_level, const char *s_fmt, ... )
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		if( Machine->activecpu != NULL )
-		{
-			logerror( "%08x: %s", cpu_get_pc(Machine->activecpu), buf );
-		}
-		else
-		{
-			logerror( "(timer) : %s", buf );
-		}
+		logerror( "%s: %s", cpuexec_describe_context(machine), buf );
 	}
 }
 
@@ -63,13 +56,13 @@ struct adc083x_chip
 
 static struct adc083x_chip adc083x[ MAX_ADC083X_CHIPS ];
 
-void adc083x_init( int chip, int type, double (*input_callback)(int input) )
+void adc083x_init( running_machine *machine, int chip, int type, double (*input_callback)(int input) )
 {
 	struct adc083x_chip *c;
 
 	if( chip >= MAX_ADC083X_CHIPS )
 	{
-		verboselog( 0, "adc083x_init( %d ) chip out of range\n", chip );
+		verboselog( machine, 0, "adc083x_init( %d ) chip out of range\n", chip );
 		return;
 	}
 
@@ -114,28 +107,29 @@ void adc083x_init( int chip, int type, double (*input_callback)(int input) )
 		break;
 	}
 
-	state_save_register_item( Machine, "adc083x", NULL, chip, c->CS );
-	state_save_register_item( Machine, "adc083x", NULL, chip, c->CLK );
-	state_save_register_item( Machine, "adc083x", NULL, chip, c->DI );
-	state_save_register_item( Machine, "adc083x", NULL, chip, c->SE );
-	state_save_register_item( Machine, "adc083x", NULL, chip, c->SARS );
-	state_save_register_item( Machine, "adc083x", NULL, chip, c->DO );
-	state_save_register_item( Machine, "adc083x", NULL, chip, c->SGL );
-	state_save_register_item( Machine, "adc083x", NULL, chip, c->ODD );
-	state_save_register_item( Machine, "adc083x", NULL, chip, c->SEL1 );
-	state_save_register_item( Machine, "adc083x", NULL, chip, c->SEL0 );
-	state_save_register_item( Machine, "adc083x", NULL, chip, c->state );
-	state_save_register_item( Machine, "adc083x", NULL, chip, c->bit );
-	state_save_register_item( Machine, "adc083x", NULL, chip, c->output );
+	state_save_register_item( machine, "adc083x", NULL, chip, c->CS );
+	state_save_register_item( machine, "adc083x", NULL, chip, c->CLK );
+	state_save_register_item( machine, "adc083x", NULL, chip, c->DI );
+	state_save_register_item( machine, "adc083x", NULL, chip, c->SE );
+	state_save_register_item( machine, "adc083x", NULL, chip, c->SARS );
+	state_save_register_item( machine, "adc083x", NULL, chip, c->DO );
+	state_save_register_item( machine, "adc083x", NULL, chip, c->SGL );
+	state_save_register_item( machine, "adc083x", NULL, chip, c->ODD );
+	state_save_register_item( machine, "adc083x", NULL, chip, c->SEL1 );
+	state_save_register_item( machine, "adc083x", NULL, chip, c->SEL0 );
+	state_save_register_item( machine, "adc083x", NULL, chip, c->state );
+	state_save_register_item( machine, "adc083x", NULL, chip, c->bit );
+	state_save_register_item( machine, "adc083x", NULL, chip, c->output );
 }
 
 void adc083x_cs_write( int chip, int cs )
 {
+	running_machine *machine = Machine;
 	struct adc083x_chip *c;
 
 	if( chip >= MAX_ADC083X_CHIPS )
 	{
-		verboselog( 0, "adc083x_cs_write( %d ) chip out of range\n", chip );
+		verboselog( machine, 0, "adc083x_cs_write( %d ) chip out of range\n", chip );
 		return;
 	}
 
@@ -143,7 +137,7 @@ void adc083x_cs_write( int chip, int cs )
 
 	if( c->CS != cs )
 	{
-		verboselog( 2, "adc083x_cs_write( %d, %d )\n", chip, cs );
+		verboselog( machine, 2, "adc083x_cs_write( %d, %d )\n", chip, cs );
 	}
 
 	if( c->CS == 0 && cs != 0 )
@@ -251,11 +245,12 @@ static int adc083x_conversion( int chip )
 
 void adc083x_clk_write( int chip, int clk )
 {
+	running_machine *machine = Machine;
 	struct adc083x_chip *c;
 
 	if( chip >= MAX_ADC083X_CHIPS )
 	{
-		verboselog( 0, "adc083x_clk_write( %d ) chip out of range\n", chip );
+		verboselog( machine, 0, "adc083x_clk_write( %d ) chip out of range\n", chip );
 		return;
 	}
 
@@ -263,7 +258,7 @@ void adc083x_clk_write( int chip, int clk )
 
 	if( c->CLK != clk )
 	{
-		verboselog( 2, "adc083x_clk_write( %d, %d )\n", chip, clk );
+		verboselog( machine, 2, "adc083x_clk_write( %d, %d )\n", chip, clk );
 	}
 
 	if( c->CS == 0 )
@@ -275,7 +270,7 @@ void adc083x_clk_write( int chip, int clk )
 			case STATE_WAIT_FOR_START:
 				if( c->DI != 0 )
 				{
-					verboselog( 1, "adc083x %d got start bit\n", chip );
+					verboselog( machine, 1, "adc083x %d got start bit\n", chip );
 					c->state = STATE_SHIFT_MUX;
 					c->SARS = 0;
 					c->SGL = 0;
@@ -286,7 +281,7 @@ void adc083x_clk_write( int chip, int clk )
 				}
 				else
 				{
-					verboselog( 1, "adc083x %d not start bit\n", chip );
+					verboselog( machine, 1, "adc083x %d not start bit\n", chip );
 				}
 				break;
 			case STATE_SHIFT_MUX:
@@ -297,28 +292,28 @@ void adc083x_clk_write( int chip, int clk )
 					{
 						c->SGL = 1;
 					}
-					verboselog( 1, "adc083x %d SGL <- %d\n", chip, c->SGL );
+					verboselog( machine, 1, "adc083x %d SGL <- %d\n", chip, c->SGL );
 					break;
 				case 1:
 					if( c->DI != 0 )
 					{
 						c->ODD = 1;
 					}
-					verboselog( 1, "adc083x %d ODD <- %d\n", chip, c->ODD );
+					verboselog( machine, 1, "adc083x %d ODD <- %d\n", chip, c->ODD );
 					break;
 				case 2:
 					if( c->DI != 0 )
 					{
 						c->SEL1 = 1;
 					}
-					verboselog( 1, "adc083x %d SEL1 <- %d\n", chip, c->SEL1 );
+					verboselog( machine, 1, "adc083x %d SEL1 <- %d\n", chip, c->SEL1 );
 					break;
 				case 3:
 					if( c->DI != 0 )
 					{
 						c->SEL0 = 1;
 					}
-					verboselog( 1, "adc083x %d SEL0 <- %d\n", chip, c->SEL0 );
+					verboselog( machine, 1, "adc083x %d SEL0 <- %d\n", chip, c->SEL0 );
 					break;
 				}
 				c->bit++;
@@ -331,11 +326,11 @@ void adc083x_clk_write( int chip, int clk )
 				c->SARS = 0;
 				if( c->type == ADC0838 && c->SE != 0 )
 				{
-					verboselog( 1, "adc083x %d not SE\n", chip );
+					verboselog( machine, 1, "adc083x %d not SE\n", chip );
 				}
 				else
 				{
-					verboselog( 1, "adc083x %d got SE\n", chip );
+					verboselog( machine, 1, "adc083x %d got SE\n", chip );
 					c->state = STATE_OUTPUT_LSB_FIRST;
 					c->bit = 1;
 				}
@@ -347,7 +342,7 @@ void adc083x_clk_write( int chip, int clk )
 			switch( c->state )
 			{
 			case STATE_MUX_SETTLE:
-				verboselog( 1, "adc083x %d mux settle\n", chip );
+				verboselog( machine, 1, "adc083x %d mux settle\n", chip );
 				c->output = adc083x_conversion( chip );
 				c->state = STATE_OUTPUT_MSB_FIRST;
 				c->bit = 7;
@@ -359,7 +354,7 @@ void adc083x_clk_write( int chip, int clk )
 				break;
 			case STATE_OUTPUT_MSB_FIRST:
 				c->DO = ( c->output >> c->bit ) & 1;
-				verboselog( 1, "adc083x %d msb %d -> %d\n", chip, c->bit, c->DO );
+				verboselog( machine, 1, "adc083x %d msb %d -> %d\n", chip, c->bit, c->DO );
 				c->bit--;
 				if( c->bit < 0 )
 				{
@@ -375,7 +370,7 @@ void adc083x_clk_write( int chip, int clk )
 				break;
 			case STATE_OUTPUT_LSB_FIRST:
 				c->DO = ( c->output >> c->bit ) & 1;
-				verboselog( 1, "adc083x %d lsb %d -> %d\n", chip, c->bit, c->DO );
+				verboselog( machine, 1, "adc083x %d lsb %d -> %d\n", chip, c->bit, c->DO );
 				c->bit++;
 				if( c->bit == 8 )
 				{
@@ -395,11 +390,12 @@ void adc083x_clk_write( int chip, int clk )
 
 void adc083x_di_write( int chip, int di )
 {
+	running_machine *machine = Machine;
 	struct adc083x_chip *c;
 
 	if( chip >= MAX_ADC083X_CHIPS )
 	{
-		verboselog( 0, "adc083x_di_write( %d ) chip out of range\n", chip );
+		verboselog( machine, 0, "adc083x_di_write( %d ) chip out of range\n", chip );
 		return;
 	}
 
@@ -407,7 +403,7 @@ void adc083x_di_write( int chip, int di )
 
 	if( c->DI != di )
 	{
-		verboselog( 2, "adc083x_di_write( %d, %d )\n", chip, di );
+		verboselog( machine, 2, "adc083x_di_write( %d, %d )\n", chip, di );
 	}
 
 	c->DI = di;
@@ -415,11 +411,12 @@ void adc083x_di_write( int chip, int di )
 
 void adc083x_se_write( int chip, int se )
 {
+	running_machine *machine = Machine;
 	struct adc083x_chip *c;
 
 	if( chip >= MAX_ADC083X_CHIPS )
 	{
-		verboselog( 0, "adc083x_se_write( %d ) chip out of range\n", chip );
+		verboselog( machine, 0, "adc083x_se_write( %d ) chip out of range\n", chip );
 		return;
 	}
 
@@ -427,7 +424,7 @@ void adc083x_se_write( int chip, int se )
 
 	if( c->SE != se )
 	{
-		verboselog( 2, "adc083x_se_write( %d, %d )\n", chip, se );
+		verboselog( machine, 2, "adc083x_se_write( %d, %d )\n", chip, se );
 	}
 
 	c->SE = se;
@@ -435,32 +432,34 @@ void adc083x_se_write( int chip, int se )
 
 int adc083x_sars_read( int chip )
 {
+	running_machine *machine = Machine;
 	struct adc083x_chip *c;
 
 	if( chip >= MAX_ADC083X_CHIPS )
 	{
-		verboselog( 0, "adc083x_sars_read( %d ) chip out of range\n", chip );
+		verboselog( machine, 0, "adc083x_sars_read( %d ) chip out of range\n", chip );
 		return 0;
 	}
 
 	c = &adc083x[ chip ];
 
-	verboselog( 1, "adc083x_sars_read( %d ) %d\n", chip, c->SARS );
+	verboselog( machine, 1, "adc083x_sars_read( %d ) %d\n", chip, c->SARS );
 	return c->SARS;
 }
 
 int adc083x_do_read( int chip )
 {
+	running_machine *machine = Machine;
 	struct adc083x_chip *c;
 
 	if( chip >= MAX_ADC083X_CHIPS )
 	{
-		verboselog( 0, "adc083x_do_read( %d ) chip out of range\n", chip );
+		verboselog( machine, 0, "adc083x_do_read( %d ) chip out of range\n", chip );
 		return 0;
 	}
 
 	c = &adc083x[ chip ];
 
-	verboselog( 1, "adc083x_do_read( %d ) %d\n", chip, c->DO );
+	verboselog( machine, 1, "adc083x_do_read( %d ) %d\n", chip, c->DO );
 	return c->DO;
 }

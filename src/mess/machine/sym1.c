@@ -170,21 +170,21 @@ const ttl74145_interface sym1_ttl74145_intf =
 ******************************************************************************/
 
 
-static void sym1_irq(running_machine *machine, int level)
+static void sym1_irq(const device_config *device, int level)
 {
-	cpu_set_input_line(machine->cpu[0], M6502_IRQ_LINE, level);
+	cpu_set_input_line(device->machine->cpu[0], M6502_IRQ_LINE, level);
 }
 
 
-static READ8_HANDLER( sym1_via0_b_r )
+static READ8_DEVICE_HANDLER( sym1_via0_b_r )
 {
 	return 0xff;
 }
 
 
-static WRITE8_HANDLER( sym1_via0_b_w )
+static WRITE8_DEVICE_HANDLER( sym1_via0_b_w )
 {
-	logerror("%x: via0_b_w 0x%02x\n", cpu_get_pc( space->cpu ), data);
+	logerror("%s: via0_b_w 0x%02x\n", cpuexec_describe_context(device->machine), data);
 }
 
 
@@ -193,27 +193,27 @@ static WRITE8_HANDLER( sym1_via0_b_w )
  * PA2: Write protect RAM 0x800-0xbff
  * PA3: Write protect RAM 0xc00-0xfff
  */
-static WRITE8_HANDLER( sym1_via2_a_w )
+static WRITE8_DEVICE_HANDLER( sym1_via2_a_w )
 {
-	const address_space *cpu0space = cpu_get_address_space( space->machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	const address_space *cpu0space = cpu_get_address_space( device->machine->cpu[0], ADDRESS_SPACE_PROGRAM );
 
 	logerror("SYM1 VIA2 W 0x%02x\n", data);
 
 	memory_install_write8_handler(cpu0space, 0xa600, 0xa67f, 0, 0,
-		((input_port_read(space->machine, "WP") & 0x01) && !(data & 0x01)) ? SMH_NOP : SMH_BANK5);
+		((input_port_read(device->machine, "WP") & 0x01) && !(data & 0x01)) ? SMH_NOP : SMH_BANK5);
 
 	memory_install_write8_handler(cpu0space, 0x0400, 0x07ff, 0, 0,
-		((input_port_read(space->machine, "WP") & 0x02) && !(data & 0x02)) ? SMH_NOP : SMH_BANK2);
+		((input_port_read(device->machine, "WP") & 0x02) && !(data & 0x02)) ? SMH_NOP : SMH_BANK2);
 
 	memory_install_write8_handler(cpu0space, 0x0800, 0x0bff, 0, 0,
-		((input_port_read(space->machine, "WP") & 0x04) && !(data & 0x04)) ? SMH_NOP : SMH_BANK3);
+		((input_port_read(device->machine, "WP") & 0x04) && !(data & 0x04)) ? SMH_NOP : SMH_BANK3);
 
 	memory_install_write8_handler(cpu0space, 0x0c00, 0x0fff, 0, 0,
-		((input_port_read(space->machine, "WP") & 0x08) && !(data & 0x08)) ? SMH_NOP : SMH_BANK4);
+		((input_port_read(device->machine, "WP") & 0x08) && !(data & 0x08)) ? SMH_NOP : SMH_BANK4);
 }
 
 
-static const struct via6522_interface via0 =
+const via6522_interface sym1_via0 =
 {
 	NULL,           /* VIA Port A Input */
 	sym1_via0_b_r,  /* VIA Port B Input */
@@ -231,7 +231,7 @@ static const struct via6522_interface via0 =
 };
 
 
-static const struct via6522_interface via1 =
+const via6522_interface sym1_via1 =
 {
 	NULL,           /* VIA Port A Input */
 	NULL,           /* VIA Port B Input */
@@ -249,7 +249,7 @@ static const struct via6522_interface via1 =
 };
 
 
-static const struct via6522_interface via2 =
+const via6522_interface sym1_via2 =
 {
 	NULL,           /* VIA Port A Input */
 	NULL,           /* VIA Port B Input */
@@ -282,11 +282,6 @@ DRIVER_INIT( sym1 )
 			mess_ram_size, 0x0fff, 0, 0, SMH_NOP, SMH_NOP);
 	}
 
-	/* configure vias and riot */
-	via_config(0, &via0);
-	via_config(1, &via1);
-	via_config(2, &via2);
-
 	/* allocate a timer to refresh the led display */
 	led_update = timer_alloc(machine, led_refresh, NULL);
 }
@@ -294,8 +289,6 @@ DRIVER_INIT( sym1 )
 
 MACHINE_RESET( sym1 )
 {
-	via_reset();
-
 	/* make 0xf800 to 0xffff point to the last half of the monitor ROM
 	   so that the CPU can find its reset vectors */
 	memory_install_readwrite8_handler(cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM ),

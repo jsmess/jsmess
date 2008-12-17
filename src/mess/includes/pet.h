@@ -8,6 +8,7 @@
 #define PET_H_
 
 #include "video/mc6845.h"
+#include "machine/6522via.h"
 
 /*----------- defined in video/pet.c -----------*/
 
@@ -24,6 +25,7 @@ MC6845_ON_DE_CHANGED( pet_display_enable_changed );
 /*----------- defined in machine/pet.c -----------*/
 
 extern int pet_font;
+extern const via6522_interface pet_via;
 
 extern UINT8 *pet_memory;
 extern UINT8 *pet_videoram;

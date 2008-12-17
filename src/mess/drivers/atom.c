@@ -90,7 +90,7 @@ static ADDRESS_MAP_START( atom_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x8000, 0x97ff) AM_RAM AM_BASE(&videoram) /* VDG 6847 */
 	AM_RANGE(0x9800, 0x9fff) AM_RAM
 	AM_RANGE(0xb000, 0xb003) AM_DEVREADWRITE( PPI8255, "ppi8255", ppi8255_r, ppi8255_w) /* PPIA 8255 */
-	AM_RANGE(0xb800, 0xbbff) AM_READWRITE(via_0_r, via_0_w)			/* VIA 6522 */
+	AM_RANGE(0xb800, 0xbbff) AM_DEVREADWRITE(VIA6522, "via6522_0", via_r, via_w)			/* VIA 6522 */
 	AM_RANGE(0xc000, 0xcfff) AM_ROM
 	AM_RANGE(0xd000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xefff) AM_ROM
@@ -106,7 +106,7 @@ static ADDRESS_MAP_START( atomeb_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x9800, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xafff) AM_READ(SMH_BANK1)	/* eprom data from eprom box */
 	AM_RANGE(0xb000, 0xb003) AM_DEVREADWRITE( PPI8255, "ppi8255", ppi8255_r, ppi8255_w) /* PPIA 8255 */
-	AM_RANGE(0xb800, 0xbbff) AM_READWRITE(via_0_r, via_0_w)			/* VIA 6522 */
+	AM_RANGE(0xb800, 0xbbff) AM_DEVREADWRITE(VIA6522, "via6522_0", via_r, via_w)			/* VIA 6522 */
 	AM_RANGE(0xbfff, 0xbfff) AM_READWRITE(atom_eprom_box_r, atom_eprom_box_w)
 	AM_RANGE(0xc000, 0xcfff) AM_ROM
 	AM_RANGE(0xd000, 0xdfff) AM_ROM
@@ -279,8 +279,13 @@ static MACHINE_DRIVER_START( atom )
 	/* quickload */
 	MDRV_QUICKLOAD_ADD(atom, "atm", 0)
 
+	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
-	
+
+	/* via */
+	MDRV_VIA6522_ADD("via6522_0", 1000000, atom_6522_interface)
+
+	/* i8271 */
 	MDRV_I8271_ADD("i8271", atom_8271_interface)
 MACHINE_DRIVER_END
 

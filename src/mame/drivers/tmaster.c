@@ -345,7 +345,7 @@ static void tmaster_draw(running_machine *machine)
 	addr <<= 1;
 
 #if 0
-	logerror("%06x: blit w %03x, h %02x, x %03x, y %02x, addr %06x, mode %02x\n", cpu_get_pc(machine->activecpu),
+	logerror("%s: blit w %03x, h %02x, x %03x, y %02x, addr %06x, mode %02x\n", cpuexec_describe_context(machine),
 			sw,sh,sx,sy, addr, mode
 	);
 #endif
@@ -369,7 +369,7 @@ static void tmaster_draw(running_machine *machine)
 		case 0x00:							// blit with transparency
 			if (addr > size - sw*sh)
 			{
-				logerror("%06x: blit error, addr %06x out of bounds\n", cpu_get_pc(machine->activecpu),addr);
+				logerror("%s: blit error, addr %06x out of bounds\n", cpuexec_describe_context(machine),addr);
 				addr = size - sw*sh;
 			}
 
@@ -504,7 +504,7 @@ static NVRAM_HANDLER( galgames )
 		eeprom_save(file);
 	else
 	{
-		eeprom_init(&galgames_eeprom_interface);
+		eeprom_init(machine, &galgames_eeprom_interface);
 		if (file)	eeprom_load(file);
 	}
 }
@@ -744,7 +744,7 @@ INPUT_PORTS_END
 
 static MACHINE_START( tmaster )
 {
-	microtouch_init(microtouch_tx, 0);
+	microtouch_init(machine, microtouch_tx, 0);
 }
 
 static MACHINE_RESET( tmaster )
@@ -831,6 +831,8 @@ static MACHINE_RESET( galgames )
 
 	memory_set_bank(machine, 2, 0);	// ram
 	memory_set_bank(machine, 4, 0);	// ram
+
+	cpu_reset(machine->cpu[0]);
 }
 
 static MACHINE_DRIVER_START( galgames )

@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "deprecat.h"
 #include "eeprom.h"
 
 #define VERBOSE 0
@@ -112,7 +111,7 @@ NVRAM_HANDLER( 93C46 )
 		eeprom_save(file);
 	else
 	{
-		eeprom_init(&eeprom_interface_93C46);
+		eeprom_init(machine, &eeprom_interface_93C46);
 		if (file)	eeprom_load(file);
 	}
 }
@@ -123,12 +122,12 @@ NVRAM_HANDLER( 93C66B )
 		eeprom_save(file);
 	else
 	{
-		eeprom_init(&eeprom_interface_93C66B);
+		eeprom_init(machine, &eeprom_interface_93C66B);
 		if (file)	eeprom_load(file);
 	}
 }
 
-void eeprom_init(const eeprom_interface *interface)
+void eeprom_init(running_machine *machine, const eeprom_interface *interface)
 {
 	intf = interface;
 
@@ -147,17 +146,17 @@ void eeprom_init(const eeprom_interface *interface)
 	if (intf->cmd_unlock) locked = 1;
 	else locked = 0;
 
-	state_save_register_global_array(Machine, eeprom_data);
-	state_save_register_global_array(Machine, serial_buffer);
-	state_save_register_global(Machine, clock_line);
-	state_save_register_global(Machine, reset_line);
-	state_save_register_global(Machine, locked);
-	state_save_register_global(Machine, serial_count);
-	state_save_register_global(Machine, latch);
-	state_save_register_global(Machine, reset_delay);
-	state_save_register_global(Machine, eeprom_clock_count);
-	state_save_register_global(Machine, eeprom_data_bits);
-	state_save_register_global(Machine, eeprom_read_address);
+	state_save_register_global_array(machine, eeprom_data);
+	state_save_register_global_array(machine, serial_buffer);
+	state_save_register_global(machine, clock_line);
+	state_save_register_global(machine, reset_line);
+	state_save_register_global(machine, locked);
+	state_save_register_global(machine, serial_count);
+	state_save_register_global(machine, latch);
+	state_save_register_global(machine, reset_delay);
+	state_save_register_global(machine, eeprom_clock_count);
+	state_save_register_global(machine, eeprom_data_bits);
+	state_save_register_global(machine, eeprom_read_address);
 }
 
 static void eeprom_write(int bit)
