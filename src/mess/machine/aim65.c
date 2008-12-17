@@ -216,20 +216,17 @@ const via6522_interface aim65_user_via =
  Driver init
 ******************************************************************************/
 
-
-DRIVER_INIT( aim65 )
+MACHINE_START( aim65 )
 {
 	const device_config *via_0 = device_list_find_by_tag(machine->config->devicelist, VIA6522, "via6522_0");
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
 	/* Init RAM */
-	memory_install_readwrite8_handler(space,
-		0, mess_ram_size - 1, 0, 0, SMH_BANK1, SMH_BANK1);
+	memory_install_readwrite8_handler(space, 0, mess_ram_size - 1, 0, 0, SMH_BANK1, SMH_BANK1);
 	memory_set_bankptr(machine, 1, mess_ram);
 
 	if (mess_ram_size < 4 * 1024)
-		memory_install_readwrite8_handler(space,
-			mess_ram_size, 0x0fff, 0, 0, SMH_NOP, SMH_NOP);
+		memory_install_readwrite8_handler(space, mess_ram_size, 0x0fff, 0, 0, SMH_NOP, SMH_NOP);
 
 	pia_config(machine, 0, &pia);
 

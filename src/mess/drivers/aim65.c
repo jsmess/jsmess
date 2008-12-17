@@ -179,6 +179,8 @@ static MACHINE_DRIVER_START( aim65 )
 	MDRV_CPU_ADD("main", M6502, AIM65_CLOCK) /* 1 MHz */
 	MDRV_CPU_PROGRAM_MAP(aim65_mem, 0)
 
+	MDRV_MACHINE_START(aim65)
+
 	MDRV_DEFAULT_LAYOUT(layout_aim65)
 
 	/* alpha-numeric display */
@@ -262,5 +264,5 @@ SYSTEM_CONFIG_END
 ******************************************************************************/
 
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY     FULLNAME  FLAGS */
-COMP(1977,	aim65,	0,		0,		aim65,	aim65,	aim65,	aim65,	"Rockwell",	"AIM 65", 0)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   INIT    CONFIG  COMPANY     FULLNAME  FLAGS */
+COMP(1977,  aim65,  0,      0,      aim65,   aim65,  0,      aim65,  "Rockwell", "AIM 65", 0)

@@ -36,7 +36,7 @@ UINT8 aim65_riot_b_r(const device_config *device, UINT8 olddata);
 void aim65_riot_a_w(const device_config *device, UINT8 data, UINT8 olddata);
 void aim65_riot_irq(const device_config *device, int state);
 
-DRIVER_INIT( aim65 );
+MACHINE_START( aim65 );
 
 
 /*----------- defined in video/aim65.c -----------*/
