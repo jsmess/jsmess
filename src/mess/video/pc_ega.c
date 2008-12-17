@@ -101,8 +101,18 @@ TODO - Write documentation
 	      | | | | +-------- vertical blank
 	      | | | |           0 = video information is being displayed
 	      | | | |           1 = CRT is in vertical blank
-	      | | | +---------- diagnostic usage
-	      | | +------------ diagnostic usage
+	      | | | +---------- diagnostic usage, output depends on AR12 video status mux bits
+	      | | |             mux bits - output
+	      | | |             00       - blue
+	      | | |             01       - I blue
+	      | | |             10       - I red
+	      | | |             11       - unknown
+	      | | +------------ diagnostic usage, output depends on AR12 video status mux bits
+	      | |               mux bits - output
+	      | |               00       - red
+	      | |               01       - green
+	      | |               10       - I green
+	      | |               11       - unknown
 	      | +-------------- reserved/unused
 	      +---------------- reserved/unused
 
