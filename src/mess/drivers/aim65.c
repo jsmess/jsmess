@@ -150,15 +150,8 @@ INPUT_PORTS_END
  Device interfaces
 ******************************************************************************/
 
-/* Display driver interfaces */
-static const dl1416_interface dl1416_ds1 = { DL1416T, aim65_update_ds1 };
-static const dl1416_interface dl1416_ds2 = { DL1416T, aim65_update_ds2 };
-static const dl1416_interface dl1416_ds3 = { DL1416T, aim65_update_ds3 };
-static const dl1416_interface dl1416_ds4 = { DL1416T, aim65_update_ds4 };
-static const dl1416_interface dl1416_ds5 = { DL1416T, aim65_update_ds5 };
-
 /* riot interface */
-static const riot6532_interface aim65_r6532_interface =
+static const riot6532_interface aim65_riot_interface =
 {
 	NULL,
 	aim65_riot_b_r,
@@ -167,12 +160,34 @@ static const riot6532_interface aim65_r6532_interface =
 	aim65_riot_irq
 };
 
+/* system via interface */
+static const via6522_interface aim65_system_via =
+{
+	NULL,
+	aim65_via0_b_r,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	aim65_via0_a_w,
+	aim65_via0_b_w,
+	NULL,
+	NULL,
+	NULL,
+	aim65_printer_on,
+	aim65_via_irq_func
+};
+
+/* user via interface */
+static const via6522_interface aim65_user_via =
+{
+	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
+};
 
 
 /******************************************************************************
  Machine Drivers
 ******************************************************************************/
-
 
 static MACHINE_DRIVER_START( aim65 )
 	/* basic machine hardware */
@@ -184,22 +199,17 @@ static MACHINE_DRIVER_START( aim65 )
 	MDRV_DEFAULT_LAYOUT(layout_aim65)
 
 	/* alpha-numeric display */
-	MDRV_DEVICE_ADD("ds1", DL1416)
-	MDRV_DEVICE_CONFIG(dl1416_ds1)
-	MDRV_DEVICE_ADD("ds2", DL1416)
-	MDRV_DEVICE_CONFIG(dl1416_ds2)
-	MDRV_DEVICE_ADD("ds3", DL1416)
-	MDRV_DEVICE_CONFIG(dl1416_ds3)
-	MDRV_DEVICE_ADD("ds4", DL1416)
-	MDRV_DEVICE_CONFIG(dl1416_ds4)
-	MDRV_DEVICE_ADD("ds5", DL1416)
-	MDRV_DEVICE_CONFIG(dl1416_ds5)
+	MDRV_DL1416T_ADD("ds1", aim65_update_ds1)
+	MDRV_DL1416T_ADD("ds2", aim65_update_ds2)
+	MDRV_DL1416T_ADD("ds3", aim65_update_ds3)
+	MDRV_DL1416T_ADD("ds4", aim65_update_ds4)
+	MDRV_DL1416T_ADD("ds5", aim65_update_ds5)
 
 	MDRV_VIDEO_START(aim65)
 
 	/* other devices */
-	MDRV_RIOT6532_ADD("riot", AIM65_CLOCK, aim65_r6532_interface)
-	MDRV_VIA6522_ADD("via6522_0", 0, aim65_via0)
+	MDRV_RIOT6532_ADD("riot", AIM65_CLOCK, aim65_riot_interface)
+	MDRV_VIA6522_ADD("via6522_0", 0, aim65_system_via)
 	MDRV_VIA6522_ADD("via6522_1", 0, aim65_user_via)
 MACHINE_DRIVER_END
 

@@ -21,52 +21,10 @@
  * Changes:
  *   - 2007-07-30: Initial version.  [Dirk Best]
  *   - 2008-02-25: Converted to the new device interface.  [Dirk Best]
+ *   - 2008-12-18: Cleanups.  [Dirk Best]
  *
- ****************************************************************************/
-
-
-/*****************************************************************************
- Includes
-*****************************************************************************/
-
-#include "driver.h"
-#include "dl1416.h"
-
-
-
-/*****************************************************************************
- Constants
-*****************************************************************************/
-
-#define SEG_UNDEF  (-1)
-#define SEG_BLANK  (0)
-#define SEG_CURSOR (0xffff)
-
-
-
-/*****************************************************************************
- Type definitions
-*****************************************************************************/
-
-struct _dl1416_t
-{
-	const dl1416_interface *intf;
-
-	int write_enable;
-	int chip_enable;
-	int cursor_enable;
-
-	UINT16 cursor_ram[4];
-};
-
-
-
-/*****************************************************************************
- Global variables
-*****************************************************************************/
-
-
-/* We use the following order for the segments:
+ * 
+ * We use the following order for the segments:
  *
  *   000 111
  *  7D  A  E2
@@ -77,9 +35,22 @@ struct _dl1416_t
  *  6 C B F 3
  *  6C  B  F3
  *   555 444
- */
+ *
+ ****************************************************************************/
 
-/* Character set DL1416T */
+#include "driver.h"
+#include "dl1416.h"
+
+
+/***************************************************************************
+    CONSTANTS
+***************************************************************************/
+
+#define SEG_UNDEF  (-1)
+#define SEG_BLANK  (0)
+#define SEG_CURSOR (0xffff)
+
+/* character set DL1416T */
 static const int dl1416t_segments[128] = {
 	SEG_UNDEF, SEG_UNDEF, SEG_UNDEF, SEG_UNDEF, /* undefined */
 	SEG_UNDEF, SEG_UNDEF, SEG_UNDEF, SEG_UNDEF, /* undefined */
@@ -116,25 +87,53 @@ static const int dl1416t_segments[128] = {
 };
 
 
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef struct _dl1416_state dl1416_state;
+struct _dl1416_state
+{
+	int write_enable;
+	int chip_enable;
+	int cursor_enable;
+
+	UINT16 cursor_ram[4];
+};
+
 
 /*****************************************************************************
- Device interface
+    INLINE FUNCTIONS
+*****************************************************************************/
+
+INLINE dl1416_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == DL1416);
+
+	return (dl1416_state *)device->token;
+}
+
+
+/*****************************************************************************
+    DEVICE INTERFACE
 *****************************************************************************/
 
 static DEVICE_START( dl1416 )
 {
-	dl1416_t *dl1416 = device->token;
-	/* validate arguments */
-	assert(device->tag != NULL);
-	assert(strlen(device->tag) < 20);
+	const dl1416_interface *intf = device->inline_config;
+	dl1416_state *dl1416 = get_safe_token(device);
 
-	dl1416->intf = device->static_config;
+	/* validate arguments */
+	assert(intf->type == DL1416B || intf->type == DL1416T);
 
 	/* register for state saving */
 	state_save_register_item(device->machine, "dl1416", device->tag, 0, dl1416->chip_enable);
 	state_save_register_item(device->machine, "dl1416", device->tag, 0, dl1416->cursor_enable);
 	state_save_register_item(device->machine, "dl1416", device->tag, 0, dl1416->write_enable);
 	state_save_register_item_array(device->machine, "dl1416", device->tag, 0, dl1416->cursor_ram);
+
 	return DEVICE_START_OK;
 }
 
@@ -142,14 +141,14 @@ static DEVICE_START( dl1416 )
 static DEVICE_RESET( dl1416 )
 {
 	int i;
-	dl1416_t *chip = device->token;
+	dl1416_state *chip = get_safe_token(device);
 
-	/* Disable all lines */
+	/* disable all lines */
 	chip->chip_enable = FALSE;
 	chip->write_enable = FALSE;
 	chip->cursor_enable = FALSE;
 
-	/* Randomize cursor memory */
+	/* randomize cursor memory */
 	for (i = 0; i < 4; i++)
 		chip->cursor_ram[i] = mame_rand(device->machine);
 }
@@ -169,55 +168,59 @@ DEVICE_GET_INFO( dl1416 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;							break;
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(dl1416_t);				break;
+		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(dl1416_state);			break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = sizeof(dl1416_interface);		break;
+		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME( dl1416 );		break;
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( dl1416 );				break;
-		case DEVINFO_FCT_STOP:							/* Nothing */							break;
-		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME( dl1416 );				break;
+		case DEVINFO_FCT_SET_INFO:				info->set_info = DEVICE_SET_INFO_NAME( dl1416 );		break;
+		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME( dl1416 );				break;
+		case DEVINFO_FCT_STOP:					/* Nothing */							break;
+		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME( dl1416 );				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "DL1416";						break;
-		case DEVINFO_STR_FAMILY:						info->s = "DL1416";						break;
-		case DEVINFO_STR_VERSION:						info->s = "1.0";						break;
-		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;						break;
-		case DEVINFO_STR_CREDITS:						info->s = "Copyright MESS Team";		break;
+		case DEVINFO_STR_NAME:					info->s = "DL1416";						break;
+		case DEVINFO_STR_FAMILY:				info->s = "DL1416";						break;
+		case DEVINFO_STR_VERSION:				info->s = "1.1";						break;
+		case DEVINFO_STR_SOURCE_FILE:			info->s = __FILE__;						break;
+		case DEVINFO_STR_CREDITS:				info->s = "Copyright MESS Team";		break;
 	}
 }
 
 
-
 /*****************************************************************************
- Implementation
+    IMPLEMENTATION
 *****************************************************************************/
 
-/* Write enable, active low */
-void dl1416_set_input_w(dl1416_t *chip, int data)
+/* write enable, active low */
+void dl1416_set_input_w(const device_config *device, int data)
 {
+	dl1416_state *chip = get_safe_token(device);
 	chip->write_enable = !data;
 }
 
 
-/* Chip enable, active low */
-void dl1416_set_input_ce(dl1416_t *chip, int data)
+/* chip enable, active low */
+void dl1416_set_input_ce(const device_config *device, int data)
 {
+	dl1416_state *chip = get_safe_token(device);
 	chip->chip_enable = !data;
 }
 
 
-/* Cursor enable, active low */
-void dl1416_set_input_cu(dl1416_t *chip, int data)
+/* cursor enable, active low */
+void dl1416_set_input_cu(const device_config *device, int data)
 {
+	dl1416_state *chip = get_safe_token(device);
 	chip->cursor_enable = !data;
 }
 
 
-/* Data */
-void dl1416_write(dl1416_t *chip, offs_t offset, UINT8 data)
+/* data */
+WRITE8_DEVICE_HANDLER( dl1416_w )
 {
-	int i, digit;
+	dl1416_state *chip = get_safe_token(device);
+	const dl1416_interface *intf = device->inline_config;
 
 	offset &= 0x03; /* A0-A1 */
 	data &= 0x7f;   /* D0-D6 */
@@ -225,11 +228,12 @@ void dl1416_write(dl1416_t *chip, offs_t offset, UINT8 data)
 	/* Only try to update the data if we are enabled and write is enabled */
 	if (chip->chip_enable && chip->write_enable)
 	{
+		int i, digit;
+
 		if (chip->cursor_enable)
 		{
-			switch (chip->intf->type)
+			switch (intf->type)
 			{
-
 			case DL1416B:
 
 				/* The cursor will be set if D0 is high and the original */
@@ -237,7 +241,7 @@ void dl1416_write(dl1416_t *chip, offs_t offset, UINT8 data)
 				digit = data & 1 ? SEG_CURSOR : chip->cursor_ram[offset];
 
 				/* Call update function */
-				chip->intf->digit_changed(offset, digit);
+				intf->update(device, offset, digit);
 
 				break;
 
@@ -253,10 +257,9 @@ void dl1416_write(dl1416_t *chip, offs_t offset, UINT8 data)
 
 					/* Call update function if we changed something */
 					if (previous_digit != digit)
-						chip->intf->digit_changed(i, digit);
+						intf->update(device, i, digit);
 				}
 				break;
-
 			}
 		}
 		else
@@ -264,7 +267,7 @@ void dl1416_write(dl1416_t *chip, offs_t offset, UINT8 data)
 			/* On the DL1416T, a digit can only be changed if there is no */
 			/* previously stored cursor, or overriden by an undefined */
 			/* character (blank) */
-			if ((chip->intf->type != DL1416T) || (
+			if ((intf->type != DL1416T) || (
 				(chip->cursor_ram[offset] != SEG_CURSOR) ||
 				(dl1416t_segments[data] == SEG_UNDEF)))
 			{
@@ -279,7 +282,7 @@ void dl1416_write(dl1416_t *chip, offs_t offset, UINT8 data)
 				chip->cursor_ram[offset] = digit;
 
 				/* Call update function */
-				chip->intf->digit_changed(offset, digit);
+				intf->update(device, offset, digit);
 			}
 		}
 	}

@@ -23,18 +23,20 @@
 
 /*----------- defined in machine/aim65.c -----------*/
 
-extern const via6522_interface aim65_via0;
-extern const via6522_interface aim65_user_via;
-
-void aim65_update_ds1(int digit, int data);
-void aim65_update_ds2(int digit, int data);
-void aim65_update_ds3(int digit, int data);
-void aim65_update_ds4(int digit, int data);
-void aim65_update_ds5(int digit, int data);
+void aim65_update_ds1(const device_config *device, int digit, int data);
+void aim65_update_ds2(const device_config *device, int digit, int data);
+void aim65_update_ds3(const device_config *device, int digit, int data);
+void aim65_update_ds4(const device_config *device, int digit, int data);
+void aim65_update_ds5(const device_config *device, int digit, int data);
 
 UINT8 aim65_riot_b_r(const device_config *device, UINT8 olddata);
 void aim65_riot_a_w(const device_config *device, UINT8 data, UINT8 olddata);
 void aim65_riot_irq(const device_config *device, int state);
+
+void aim65_via_irq_func(const device_config *device, int state);
+WRITE8_DEVICE_HANDLER( aim65_via0_a_w );
+WRITE8_DEVICE_HANDLER( aim65_via0_b_w );
+READ8_DEVICE_HANDLER( aim65_via0_b_r );
 
 MACHINE_START( aim65 );
 

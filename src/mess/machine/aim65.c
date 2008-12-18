@@ -35,7 +35,7 @@ static UINT8 riot_port_a;
 ******************************************************************************/
 
 
-static void aim65_via_irq_func(const device_config *device, int state)
+void aim65_via_irq_func(const device_config *device, int state)
 {
 	cpu_set_input_line(device->machine->cpu[0], M6502_IRQ_LINE, state ? HOLD_LINE : CLEAR_LINE);
 }
@@ -69,21 +69,21 @@ static void aim65_via_irq_func(const device_config *device, int state)
  * PB7: CU (Cursor)
  */
 
-static void dl1416_update(dl1416_t *chip, int index)
+static void dl1416_update(const device_config *device, int index)
 {
-	dl1416_set_input_ce(chip, pia_a & (0x04 << index));
-	dl1416_set_input_w(chip, pia_a & 0x80);
-	dl1416_set_input_cu(chip, pia_b & 0x80);
-	dl1416_write(chip, pia_a & 0x03, pia_b & 0x7f);
+	dl1416_set_input_ce(device, pia_a & (0x04 << index));
+	dl1416_set_input_w(device, pia_a & 0x80);
+	dl1416_set_input_cu(device, pia_b & 0x80);
+	dl1416_w(device, pia_a & 0x03, pia_b & 0x7f);
 }
 
 static void aim65_pia(running_machine *machine)
 {
-	dl1416_update(devtag_get_token(machine, DL1416, "ds1"), 0);
-	dl1416_update(devtag_get_token(machine, DL1416, "ds2"), 1);
-	dl1416_update(devtag_get_token(machine, DL1416, "ds3"), 2);
-	dl1416_update(devtag_get_token(machine, DL1416, "ds4"), 3);
-	dl1416_update(devtag_get_token(machine, DL1416, "ds5"), 4);
+	dl1416_update(devtag_get_device(machine, DL1416, "ds1"), 0);
+	dl1416_update(devtag_get_device(machine, DL1416, "ds2"), 1);
+	dl1416_update(devtag_get_device(machine, DL1416, "ds3"), 2);
+	dl1416_update(devtag_get_device(machine, DL1416, "ds4"), 3);
+	dl1416_update(devtag_get_device(machine, DL1416, "ds5"), 4);
 }
 
 
@@ -118,11 +118,30 @@ static const pia6821_interface pia =
 };
 
 
-void aim65_update_ds1(int digit, int data) { output_set_digit_value( 0 + (digit ^ 3), data); }
-void aim65_update_ds2(int digit, int data) { output_set_digit_value( 4 + (digit ^ 3), data); }
-void aim65_update_ds3(int digit, int data) { output_set_digit_value( 8 + (digit ^ 3), data); }
-void aim65_update_ds4(int digit, int data) { output_set_digit_value(12 + (digit ^ 3), data); }
-void aim65_update_ds5(int digit, int data) { output_set_digit_value(16 + (digit ^ 3), data); }
+void aim65_update_ds1(const device_config *device, int digit, int data)
+{
+	output_set_digit_value(0 + (digit ^ 3), data);
+}
+
+void aim65_update_ds2(const device_config *device, int digit, int data)
+{
+	output_set_digit_value(4 + (digit ^ 3), data);
+}
+
+void aim65_update_ds3(const device_config *device, int digit, int data)
+{
+	output_set_digit_value(8 + (digit ^ 3), data);
+}
+
+void aim65_update_ds4(const device_config *device, int digit, int data)
+{
+	output_set_digit_value(12 + (digit ^ 3), data);
+}
+
+void aim65_update_ds5(const device_config *device, int digit, int data)
+{
+	output_set_digit_value(16 + (digit ^ 3), data);
+}
 
 
 
@@ -170,51 +189,27 @@ void aim65_riot_irq(const device_config *device, int state)
 ******************************************************************************/
 
 
-static WRITE8_DEVICE_HANDLER( aim65_via0_a_w )
+WRITE8_DEVICE_HANDLER( aim65_via0_a_w )
 {
 	 aim65_printer_data_a(data);
 }
 
 
-static WRITE8_DEVICE_HANDLER( aim65_via0_b_w )
+WRITE8_DEVICE_HANDLER( aim65_via0_b_w )
 {
 	aim65_printer_data_b(data);
 }
 
 
-static READ8_DEVICE_HANDLER( aim65_via0_b_r )
+READ8_DEVICE_HANDLER( aim65_via0_b_r )
 {
 	return input_port_read(device->machine, "switches");
 }
 
 
-const via6522_interface aim65_via0 =
-{
-	0, // read8_machine_func in_a_func;
-	aim65_via0_b_r, // read8_machine_func in_b_func;
-	0, // read8_machine_func in_ca1_func;
-	0, // read8_machine_func in_cb1_func;
-	0, // read8_machine_func in_ca2_func;
-	0, // read8_machine_func in_cb2_func;
-	aim65_via0_a_w,	// write8_machine_func out_a_func;
-	aim65_via0_b_w, // write8_machine_func out_b_func;
-	0, // write8_machine_func out_ca1_func;
-	0, // write8_machine_func out_cb1_func;
-	0, // write8_machine_func out_ca2_func;
-	aim65_printer_on, // write8_machine_func out_cb2_func;
-	aim65_via_irq_func // void (*irq_func)(int state);
-};
-
-const via6522_interface aim65_user_via =
-{
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
-};
-
-
-
-/******************************************************************************
- Driver init
-******************************************************************************/
+/***************************************************************************
+    DRIVER INIT
+***************************************************************************/
 
 MACHINE_START( aim65 )
 {
