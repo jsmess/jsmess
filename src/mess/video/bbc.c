@@ -22,12 +22,16 @@ static void (*draw_function)(running_machine* machine);
 static void BBC_draw_RGB_in(running_machine *machine, int offset,int data);
 
 /************************************************************************
+ * video_refresh flag is used in optimising the screen redrawing
+ * it is set whenever a 6845 or VideoULA registers are change.
+ * This will then cause a full screen refresh.
  * The vidmem array is used to optimise the screen redrawing
  * whenever a memory location is written to the same location is set in the vidmem array
  * if none of the video registers have been changed and a full redraw is not needed
  * the video display emulation will only redraw the video memory locations that have been changed.
  ************************************************************************/
 
+static int video_refresh;
 unsigned char vidmem[0x10000];
 
 // this is the real location of the start of the BBC's ram in the emulation
@@ -156,6 +160,9 @@ void setscreenstart(int c0,int c1)
 	if ((c0==1) && (c1==0)) video_ram_lookup=video_ram_lookup1;
 	if ((c0==0) && (c1==1)) video_ram_lookup=video_ram_lookup2;
 	if ((c0==1) && (c1==1)) video_ram_lookup=video_ram_lookup3;
+
+	// emulation refresh optimisation
+	video_refresh=1;
 }
 
 
@@ -268,6 +275,10 @@ WRITE8_HANDLER ( videoULA_w )
 
 	int tpal,tcol,vpos;
 
+
+	// emulation refresh optimisation
+	video_refresh=1;
+
 	// Make sure vpos is never <0 2008-10-11 PHS.
 	vpos=video_screen_get_vpos(space->machine->primary_screen);
 	if(vpos==0)
@@ -324,6 +335,9 @@ WRITE8_HANDLER ( videoULA_w )
 		videoULA_pallet1[tpal]=tcol<8?tcol^7:tcol;
 		break;
 	}
+
+	// emulation refresh optimisation
+	video_refresh=1;
 }
 
 
@@ -341,6 +355,7 @@ static void BBC_Clock_CR(void)
 		VideoULA_CR_counter-=1;
 		if (VideoULA_CR_counter<=0) {
 			VideoULA_CR=0;
+			video_refresh=video_refresh&0xfb;
 			set_cursor();
 		}
 	}
@@ -385,7 +400,7 @@ static void BBC_draw_hi_res(running_machine *machine)
 		// this is actually does by the latch IC's not the Video ULA
 		meml=video_ram_lookup[m6845_memory_address_r(0)]|(BBC_Character_Row&0x7);
 
-		if (vidmem_RAM[meml])
+		if (vidmem_RAM[meml] || video_refresh )
 		{
 			vidmem_RAM[meml]=0;
 			i=BBC_Video_RAM[meml];
@@ -399,8 +414,13 @@ static void BBC_draw_hi_res(running_machine *machine)
 			BBC_display += emulation_pixels_per_byte;
 		}
 	} else {
-		// if the display is not enable, just draw a blank area.
-		BBC_ula_drawpixel(0, emulation_pixels_per_byte);
+		if (video_refresh)
+		{
+			// if the display is not enable, just draw a blank area.
+			BBC_ula_drawpixel(0, emulation_pixels_per_byte);
+		} else {
+			BBC_display += emulation_pixels_per_byte;
+		}
 	}
 }
 
@@ -505,6 +525,8 @@ static void BBC_Set_CRE(int offset, int data)
 	if (data&2) {
 		VideoULA_CR_counter=emulation_cursor_size;
 		VideoULA_CR=1;
+		// turn on the video refresh for the cursor area
+		video_refresh=video_refresh|4;
 		// set the pallet on
 		if (data&1) set_cursor();
 	}
@@ -541,6 +563,9 @@ WRITE8_HANDLER ( BBC_6845_w )
 			m6845_register_w(0,data);
 			break;
 	}
+
+	// emulation refresh optimisation
+	video_refresh=1;
 }
 
  READ8_HANDLER (BBC_6845_r)
@@ -570,16 +595,26 @@ WRITE8_HANDLER ( BBC_6845_w )
 VIDEO_UPDATE( bbc )
 {
 	long c;
+	int full_refresh;
 
 	//logerror ("Box %d by %d \n",cliprect->min_y,cliprect->max_y);
 
 	c = 0; // this is used to time out the screen redraw, in the case that the 6845 is in some way out state.
+	full_refresh = 1;
 
 	BBC_bitmap=bitmap;
 
 	BBC_display_left=BITMAP_ADDR16(BBC_bitmap, 0, 0);
 	BBC_display_right=BBC_display_left;
 	BBC_display=BBC_display_left;
+
+	// video_refresh is set if any of the 6845 or Video ULA registers are changed
+	// this then forces a full screen redraw
+
+	if (full_refresh)
+	{
+		video_refresh=video_refresh|2;
+	}
 
 	// loop until the end of the Vertical Sync pulse
 	// or until a timeout (this catches the 6845 with silly register values that would not give a VSYNC signal)
@@ -604,6 +639,9 @@ VIDEO_UPDATE( bbc )
 		m6845_clock();
 		c++;
 	}
+
+	// redrawn the screen so reset video_refresh
+	video_refresh=0;
 
 	return 0;
 }

@@ -39,15 +39,7 @@ static int bbc_Master=0;
  IRQ inputs
 *****************************/
 
-static int via_system_irq=0;
-static int via_user_irq=0;
-static int MC6850_irq=0;
 static int ACCCON_IRR=0;
-
-static void bbc_setirq(running_machine *machine)
-{
-	cpu_set_input_line(machine->cpu[0], M6502_IRQ_LINE, via_system_irq|via_user_irq|MC6850_irq|ACCCON_IRR);
-}
 
 /************************
 Sideways RAM/ROM code
@@ -396,7 +388,7 @@ WRITE8_HANDLER ( bbcm_ACCCON_write )
 
   	if (tempIRR!=ACCCON_IRR)
   	{
-		bbc_setirq(space->machine);
+		cpu_set_input_line(space->machine->cpu[0], M6502_IRQ_LINE, ACCCON_IRR);
 	}
 
 	if (ACCCON_Y)
@@ -1204,8 +1196,7 @@ static WRITE8_DEVICE_HANDLER( bbcb_via_system_write_cb2 )
 static void bbc_via_system_irq(const device_config *device, int level)
 {
 //  logerror("SYSTEM via irq %d %d %d\n",via_system_irq,via_user_irq,level);
-	via_system_irq=level;
-	bbc_setirq(device->machine);
+	cpu_set_input_line(device->machine->cpu[0], M6502_IRQ_LINE, level);
 }
 
 
@@ -1295,8 +1286,7 @@ static WRITE8_DEVICE_HANDLER( bbcb_via_user_write_ca2 )
 
 static void bbc_via_user_irq(const device_config *device, int level)
 {
-	via_user_irq=level;
-	bbc_setirq(device->machine);
+	cpu_set_input_line(device->machine->cpu[0], M6502_IRQ_LINE, level);
 }
 
 
@@ -1400,9 +1390,7 @@ READ8_HANDLER (BBC_6850_r)
 
 static void Serial_interrupt(const device_config *device, int level)
 {
-	MC6850_irq=level;
-	bbc_setirq(device->machine);
-	//logerror("Set SIO irq  %01x\n",level);
+	cpu_set_input_line(device->machine->cpu[0], M6502_IRQ_LINE, level);
 }
 
 UINT8 bbc_tx_pin;
