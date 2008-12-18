@@ -1405,12 +1405,14 @@ static void Serial_interrupt(const device_config *device, int level)
 	//logerror("Set SIO irq  %01x\n",level);
 }
 
+UINT8 bbc_tx_pin;
+
 const acia6850_interface bbc_acia6850_interface =
 {
 	0,						/* tx_clock */
 	0,						/* rx_clock */
 	NULL,					/* rx_pin */
-	NULL,					/* tx_pin */
+	&bbc_tx_pin,			/* tx_pin */
 	NULL,					/* cts_pin */
 	NULL,					/* rts_pin */
 	NULL,					/* dcd_pin */
