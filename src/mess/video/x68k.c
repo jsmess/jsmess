@@ -557,7 +557,9 @@ static void x68k_render_video_word(int offset)
 
 	for(l=0;l<16;l++)
 	{
-		x68k_plot_pixel(x68k_text_bitmap,x+(15-l),y,0x100+x68k_get_text_pixel(offset,l));
+		// apply text layer access mask
+		if((sys.crtc.reg[23] & (1<<l)) == 0)
+			x68k_plot_pixel(x68k_text_bitmap,x+(15-l),y,0x100+x68k_get_text_pixel(offset,l));
 	}
 }
 
