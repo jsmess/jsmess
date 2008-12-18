@@ -42,7 +42,6 @@
 #include "driver.h"
 #include "includes/gb.h"
 #include "streams.h"
-#include "deprecat.h"
 
 #define NR10 0x00
 #define NR11 0x01
@@ -689,7 +688,7 @@ void *gameboy_sh_start(const device_config *device, int clock, const custom_soun
 		length_mode3_table[I] = ((256 - I) * ((1 << FIXED_POINT)/256) * rate) >> FIXED_POINT;
 	}
 
-	gb_sound_w_internal( Machine, NR52, 0x00 );
+	gb_sound_w_internal( device->machine, NR52, 0x00 );
 	snd_regs[AUD3W0] = 0xac;
 	snd_regs[AUD3W1] = 0xdd;
 	snd_regs[AUD3W2] = 0xda;

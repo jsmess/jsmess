@@ -6,7 +6,6 @@
 #include "osd_cpu.h"
 #include "driver.h"
 #include "streams.h"
-#include "deprecat.h"
 #include "mame.h"
 #include "timer.h"
 //#include "sound/mixer.h"

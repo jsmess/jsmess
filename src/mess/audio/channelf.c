@@ -2,7 +2,6 @@
 
 #include "driver.h"
 #include "streams.h"
-#include "deprecat.h"
 #include "includes/channelf.h"
 
 static sound_stream *channel;

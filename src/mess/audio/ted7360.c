@@ -9,7 +9,6 @@
 
 #include "driver.h"
 #include "streams.h"
-#include "deprecat.h"
 
 #include "video/ted7360.h"
 

@@ -232,7 +232,7 @@ void *vic6560_custom_start(const device_config *device, int clock, const custom_
 {
 	int i;
 
-	channel = stream_create(device, 0, 1, Machine->sample_rate, 0, vic6560_update);
+	channel = stream_create(device, 0, 1, device->machine->sample_rate, 0, vic6560_update);
 
 	/* buffer for fastest played sample for 5 second
 	 * so we have enough data for min 5 second */
@@ -268,7 +268,7 @@ void *vic6560_custom_start(const device_config *device, int clock, const custom_
 				noiseshift <<= 1;
 		}
 	}
-	tonesize = Machine->sample_rate / TONE_FREQUENCY_MIN;
+	tonesize = device->machine->sample_rate / TONE_FREQUENCY_MIN;
 
 	if (tonesize > 0)
 	{
