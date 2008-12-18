@@ -122,11 +122,11 @@ INLINE dl1416_state *get_safe_token(const device_config *device)
 
 static DEVICE_START( dl1416 )
 {
-	const dl1416_interface *intf = device->inline_config;
+	//const dl1416_interface *intf = device->inline_config;
 	dl1416_state *dl1416 = get_safe_token(device);
 
 	/* validate arguments */
-	assert(intf->type == DL1416B || intf->type == DL1416T);
+	//assert(intf->type == DL1416B || intf->type == DL1416T);
 
 	/* register for state saving */
 	state_save_register_item(device->machine, "dl1416", device->tag, 0, dl1416->chip_enable);
