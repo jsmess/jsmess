@@ -174,7 +174,7 @@ const struct dma8237_interface ibm5150_dma8237_config =
 
 static PIC8259_SET_INT_LINE( pc_pic8259_master_set_int_line )
 {
-	cpu_set_input_line(device->machine->cpu[0], 0, interrupt ? HOLD_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[0], 0, interrupt ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -228,7 +228,7 @@ static PIC8259_SET_INT_LINE( pcjr_pic8259_master_set_int_line )
 	}
 	else
 	{
-		cpu_set_input_line(device->machine->cpu[0], 0, interrupt ? HOLD_LINE : CLEAR_LINE);
+		cpu_set_input_line(device->machine->cpu[0], 0, interrupt ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
