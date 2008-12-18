@@ -905,8 +905,9 @@ static TIMER_CALLBACK( setup_machine_state ) {
 	pit8253_gate_w(pit8253, 0, 1);
 	pit8253_gate_w(pit8253, 1, 1);
 	pit8253_gate_w(pit8253, 2, 1);
-
-	msm8251_connect(device_list_find_by_tag( machine->config->devicelist, MSM8251, "uart" ), &pmd85_cassette_serial_connection);
+	if (pmd85_model!=MATO) {
+		msm8251_connect(device_list_find_by_tag( machine->config->devicelist, MSM8251, "uart" ), &pmd85_cassette_serial_connection);
+	}
 }
 
 
