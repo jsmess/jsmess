@@ -16,7 +16,6 @@
 *********************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "harddisk.h"
 #include "harddriv.h"
 

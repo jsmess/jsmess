@@ -68,7 +68,7 @@ TODO :
 */
 
 #include "driver.h"
-#include "deprecat.h"
+
 #include "cpu/tms9900/tms9900.h"
 #include "machine/ti990.h"
 #include "machine/990_hd.h"

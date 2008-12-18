@@ -31,7 +31,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/wswan.h"
 #include "devices/cartslot.h"
 #include "sound/custom.h"
