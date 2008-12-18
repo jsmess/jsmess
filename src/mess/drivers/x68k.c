@@ -427,7 +427,6 @@ static void x68k_keyboard_ctrl_w(int data)
 
 }
 
-#ifdef UNUSED_FUNCTION
 int x68k_keyboard_pop_scancode(void)
 {
 	int ret;
@@ -442,9 +441,8 @@ int x68k_keyboard_pop_scancode(void)
 	logerror("MFP: Keyboard buffer pop 0x%02x\n",ret);
 	return ret;
 }
-#endif
 
-static void x68k_keyboard_push_scancode(unsigned char code)
+static void x68k_keyboard_push_scancode(running_machine* machine,unsigned char code)
 {
 	sys.keyboard.keynum++;
 	if(sys.keyboard.keynum >= 1)
@@ -453,6 +451,8 @@ static void x68k_keyboard_push_scancode(unsigned char code)
 		{
 			sys.mfp.rsr |= 0x80;  // Buffer full
 //          mfp_trigger_irq(MFP_IRQ_RX_FULL);
+			current_vector[6] = 0x4c;
+			cpu_set_input_line_and_vector(machine->cpu[0],6,HOLD_LINE,0x4c);
 			logerror("MFP: Receive buffer full IRQ sent\n");
 		}
 	}
@@ -461,6 +461,8 @@ static void x68k_keyboard_push_scancode(unsigned char code)
 	{
 		sys.keyboard.headpos = 0;
 //      mfp_trigger_irq(MFP_IRQ_RX_ERROR);
+		current_vector[6] = 0x4b;
+//		cpu_set_input_line_and_vector(machine->cpu[0],6,HOLD_LINE,0x4b);
 	}
 }
 
@@ -480,7 +482,7 @@ static TIMER_CALLBACK(x68k_keyboard_poll)
 		{
 			if(sys.keyboard.keyon[x] != 0)
 			{
-				x68k_keyboard_push_scancode(0x80 + x);
+				x68k_keyboard_push_scancode(machine,0x80 + x);
 				sys.keyboard.keytime[x] = 0;
 				sys.keyboard.keyon[x] = 0;
 				sys.keyboard.last_pressed = 0;
@@ -492,7 +494,7 @@ static TIMER_CALLBACK(x68k_keyboard_poll)
 		{
 			if(input_port_read(machine, keynames[sys.keyboard.last_pressed / 32]) & (1 << (sys.keyboard.last_pressed % 32)))
 			{
-				x68k_keyboard_push_scancode(sys.keyboard.last_pressed);
+				x68k_keyboard_push_scancode(machine,sys.keyboard.last_pressed);
 				sys.keyboard.keytime[sys.keyboard.last_pressed] = (sys.keyboard.repeat^2)*5+30;
 				logerror("KB: Holding key 0x%02x\n",sys.keyboard.last_pressed);
 			}
@@ -501,7 +503,7 @@ static TIMER_CALLBACK(x68k_keyboard_poll)
 		{
 			if(sys.keyboard.keyon[x] == 0)
 			{
-				x68k_keyboard_push_scancode(x);
+				x68k_keyboard_push_scancode(machine,x);
 				sys.keyboard.keytime[x] = sys.keyboard.delay * 100 + 200;
 				sys.keyboard.keyon[x] = 1;
 				sys.keyboard.last_pressed = x;
@@ -1020,23 +1022,22 @@ static READ16_HANDLER( x68k_sysport_r )
 	}
 }
 
-static READ16_HANDLER( x68k_mfp_r )
+/*static READ16_HANDLER( x68k_mfp_r )
 {
 	const device_config *x68k_mfp = device_list_find_by_tag(space->machine->config->devicelist, MC68901, MC68901_TAG);
 
 	return mc68901_register_r(x68k_mfp, offset);
-}
+}*/
 
-#ifdef UNUSED_FUNCTION
 READ16_HANDLER( x68k_mfp_r )
 {
-    int ret;
+	const device_config *x68k_mfp = device_list_find_by_tag(space->machine->config->devicelist, MC68901, MC68901_TAG);
     // Initial settings indicate that IRQs are generated for FM (YM2151), Receive buffer error or full,
     // MFP Timer C, and the power switch
 //  logerror("MFP: [%08x] Reading offset %i\n",cpu_get_pc(space->cpu),offset);
     switch(offset)
     {
-    case 0x00:  // GPIP - General purpose I/O register (read-only)
+/*    case 0x00:  // GPIP - General purpose I/O register (read-only)
         ret = 0x23;
         if(video_screen_get_vpos(machine->primary_screen) == sys.crtc.reg[9])
             ret |= 0x40;
@@ -1077,7 +1078,7 @@ READ16_HANDLER( x68k_mfp_r )
     case 17:  // TCDR
         return sys.mfp.timer[2].counter;
     case 18:  // TDDR
-        return sys.mfp.timer[3].counter;
+        return sys.mfp.timer[3].counter;*/
     case 21:  // RSR
         return sys.mfp.rsr;
     case 22:  // TSR
@@ -1085,11 +1086,10 @@ READ16_HANDLER( x68k_mfp_r )
     case 23:
         return x68k_keyboard_pop_scancode();
     default:
-//      logerror("MFP: [%08x] Offset %i read\n",cpu_get_pc(space->cpu),offset);
-        return 0xff;
+		if (ACCESSING_BITS_0_7) return mc68901_register_r(x68k_mfp, offset);
     }
+    return 0xffff;
 }
-#endif
 
 static WRITE16_HANDLER( x68k_mfp_w )
 {
@@ -1192,13 +1192,13 @@ static WRITE16_HANDLER( x68k_mfp_w )
         break;
     case 20:
         sys.mfp.ucr = data;
-        break;
+        break;*/
     case 21:
         if(data & 0x01)
             sys.mfp.usart.recv_enable = 1;
         else
             sys.mfp.usart.recv_enable = 0;
-        break;*/
+        break;
 	case 22:
 		if(data & 0x01)
 			sys.mfp.usart.send_enable = 1;
@@ -1531,6 +1531,7 @@ static MC68901_ON_IRQ_CHANGED( mfp_irq_callback )
 //	if((sys.ioc.irqstatus & 0xc0) != 0)  // if the FDC is busy, then we don't want to miss that IRQ
 //		return;
 	cpu_set_input_line(device->machine->cpu[0], 6, level);
+	current_vector[6] = 0;
 	prev = level;
 }
 
@@ -1557,7 +1558,10 @@ static IRQ_CALLBACK(x68k_int_ack)
 	if(irqline == 6)  // MFP
 	{
 		sys.mfp.current_irq = -1;
-		current_vector[6] = mc68901_get_vector(x68k_mfp);
+		if(current_vector[6] != 0x4b && current_vector[6] != 0x4c)
+			current_vector[6] = mc68901_get_vector(x68k_mfp);
+		else
+			cpu_set_input_line_and_vector(device->machine->cpu[0],irqline,CLEAR_LINE,current_vector[irqline]);
 		logerror("SYS: IRQ acknowledged (vector=0x%02x, line = %i)\n",current_vector[6],irqline);
 		return current_vector[6];
 	}
