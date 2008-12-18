@@ -22,7 +22,8 @@
 enum
 {
 	DL1416B,
-	DL1416T
+	DL1416T,
+	MAX_DL1416_TYPES
 };
 
 

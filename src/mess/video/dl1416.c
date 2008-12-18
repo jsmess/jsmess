@@ -122,11 +122,11 @@ INLINE dl1416_state *get_safe_token(const device_config *device)
 
 static DEVICE_START( dl1416 )
 {
-	//const dl1416_interface *intf = device->inline_config;
 	dl1416_state *dl1416 = get_safe_token(device);
 
 	/* validate arguments */
-	//assert(intf->type == DL1416B || intf->type == DL1416T);
+	assert(((const dl1416_interface *)(device->inline_config))->type >= DL1416B);
+	assert(((const dl1416_interface *)(device->inline_config))->type < MAX_DL1416_TYPES);
 
 	/* register for state saving */
 	state_save_register_item(device->machine, "dl1416", device->tag, 0, dl1416->chip_enable);
@@ -241,7 +241,8 @@ WRITE8_DEVICE_HANDLER( dl1416_w )
 				digit = data & 1 ? SEG_CURSOR : chip->cursor_ram[offset];
 
 				/* Call update function */
-				intf->update(device, offset, digit);
+				if (intf->update)
+					intf->update(device, offset, digit);
 
 				break;
 
@@ -257,7 +258,8 @@ WRITE8_DEVICE_HANDLER( dl1416_w )
 
 					/* Call update function if we changed something */
 					if (previous_digit != digit)
-						intf->update(device, i, digit);
+						if (intf->update)
+							intf->update(device, i, digit);
 				}
 				break;
 			}
@@ -282,7 +284,8 @@ WRITE8_DEVICE_HANDLER( dl1416_w )
 				chip->cursor_ram[offset] = digit;
 
 				/* Call update function */
-				intf->update(device, offset, digit);
+				if (intf->update)
+					intf->update(device, offset, digit);
 			}
 		}
 	}
