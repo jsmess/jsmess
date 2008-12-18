@@ -12,6 +12,7 @@
 #include "cpu/i8085/i8085.h"
 #include "machine/8255ppi.h"
 #include "machine/mc146818.h"
+#include "machine/wd17xx.h"
 #include "devices/basicdsk.h"
 #include "devices/cassette.h"
 #include "devices/cartslot.h"
@@ -116,6 +117,8 @@ static MACHINE_DRIVER_START( orion128 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MDRV_CASSETTE_ADD( "cassette", orion_cassette_config )
+	
+	MDRV_WD1793_ADD("wd1793", default_wd17xx_interface )		
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( orion128ms )
@@ -170,6 +173,8 @@ static MACHINE_DRIVER_START( orionz80 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_CASSETTE_ADD( "cassette", orion_cassette_config )
+	
+	MDRV_WD1793_ADD("wd1793", default_wd17xx_interface )		
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( orionz80ms )
@@ -214,6 +219,8 @@ static MACHINE_DRIVER_START( orionpro )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_CASSETTE_ADD( "cassette", orion_cassette_config )
+	
+	MDRV_WD1793_ADD("wd1793", default_wd17xx_interface )		
 MACHINE_DRIVER_END
 
 

@@ -71,8 +71,9 @@ DRIVER_INIT( orion128 )
 
 MACHINE_START( orion128 )
 {
-	wd17xx_init(machine, WD_TYPE_1793, NULL , NULL);
-	wd17xx_set_density (DEN_FM_HI);	
+	device_config *fdc = (device_config*)device_list_find_by_tag( machine->config->devicelist, WD1793, "wd1793");
+
+	wd17xx_set_density (fdc,DEN_FM_HI);	
 	orion_video_mode_mask = 7;
 }
 
@@ -158,8 +159,6 @@ WRITE8_HANDLER ( orion128_memory_page_w )
 
 MACHINE_RESET ( orion128 ) 
 {		
-	wd17xx_reset(machine);
-	wd17xx_set_density (DEN_FM_HI);	
 	orion128_video_page = 0;
 	orion128_video_mode = 0;
 	orion128_memory_page = -1;
@@ -205,36 +204,42 @@ DEVICE_IMAGE_LOAD( orion_floppy )
 
 static WRITE8_HANDLER ( orion_disk_control_w )
 {
-	wd17xx_set_side(((data & 0x10) >> 4) ^ 1);
- 	wd17xx_set_drive(data & 3);				
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD1793, "wd1793");
+
+	wd17xx_set_side(fdc,((data & 0x10) >> 4) ^ 1);
+ 	wd17xx_set_drive(fdc,data & 3);				
 }
 
 READ8_HANDLER ( orion128_floppy_r )
 {	
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD1793, "wd1793");
+
 	switch(offset) {
 		case 0x0	:
-		case 0x10 : return wd17xx_status_r(space,0);
+		case 0x10 : return wd17xx_status_r(fdc,0);
 		case 0x1 	:
-		case 0x11 : return wd17xx_track_r(space,0);
+		case 0x11 : return wd17xx_track_r(fdc,0);
 		case 0x2  :
-		case 0x12 : return wd17xx_sector_r(space,0);
+		case 0x12 : return wd17xx_sector_r(fdc,0);
 		case 0x3  :
-		case 0x13 : return wd17xx_data_r(space,0);
+		case 0x13 : return wd17xx_data_r(fdc,0);
 	}	
 	return 0xff;
 }
 
 WRITE8_HANDLER ( orion128_floppy_w )
 {		
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD1793, "wd1793");
+	
 	switch(offset) {
 		case 0x0	:
-		case 0x10 : wd17xx_command_w(space,0,data); break;
+		case 0x10 : wd17xx_command_w(fdc,0,data); break;
 		case 0x1 	:
-		case 0x11 : wd17xx_track_w(space,0,data);break;
+		case 0x11 : wd17xx_track_w(fdc,0,data);break;
 		case 0x2  :
-		case 0x12 : wd17xx_sector_w(space,0,data);break;
+		case 0x12 : wd17xx_sector_w(fdc,0,data);break;
 		case 0x3  :
-		case 0x13 : wd17xx_data_w(space,0,data);break;
+		case 0x13 : wd17xx_data_w(fdc,0,data);break;
 		case 0x4  : 
 		case 0x14 : 
 		case 0x20 : orion_disk_control_w(space, offset, data);break;
@@ -267,8 +272,9 @@ DRIVER_INIT( orionz80 )
 
 MACHINE_START( orionz80 )
 {
-	wd17xx_init(machine, WD_TYPE_1793, NULL , NULL);
-	wd17xx_set_density (DEN_FM_HI);
+	device_config *fdc = (device_config*)device_list_find_by_tag( machine->config->devicelist, WD1793, "wd1793");
+
+	wd17xx_set_density (fdc,DEN_FM_HI);
 	mc146818_init(machine, MC146818_IGNORE_CENTURY);
 	orion_video_mode_mask = 7;
 }
@@ -375,7 +381,7 @@ MACHINE_RESET ( orionz80 )
 	memory_set_bankptr(machine, 3, mess_ram + 0xf000);		
 	memory_set_bankptr(machine, 5, memory_region(machine, "main") + 0xf800);		
 	
-	wd17xx_reset(machine);
+
 	orion128_video_page = 0;
 	orion128_video_mode = 0;
 	orionz80_memory_page = 0;
@@ -437,8 +443,8 @@ DRIVER_INIT( orionpro )
 
 MACHINE_START( orionpro )
 {
-	wd17xx_init(machine, WD_TYPE_1793, NULL , NULL);
-	wd17xx_set_density (DEN_FM_HI);
+	device_config *fdc = (device_config*)device_list_find_by_tag( machine->config->devicelist, WD1793, "wd1793");
+	wd17xx_set_density (fdc,DEN_FM_HI);
 }
 
 static WRITE8_HANDLER ( orionpro_memory_page_w );
@@ -533,8 +539,6 @@ static WRITE8_HANDLER ( orionpro_memory_page_w )
 MACHINE_RESET ( orionpro ) 
 {	
 	radio86_init_keyboard();	
-	
-	wd17xx_reset(machine);
 
 	orion128_video_page = 0;
 	orion128_video_mode = 0;
@@ -558,6 +562,8 @@ MACHINE_RESET ( orionpro )
 }
 
 READ8_HANDLER ( orionpro_io_r ) {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD1793, "wd1793");
+		
 	switch (offset & 0xff) {		
 		case 0x00 : return 0x56;
 		case 0x04 : return orionpro_ram0_segment;
@@ -566,10 +572,10 @@ READ8_HANDLER ( orionpro_io_r ) {
 		case 0x08 : return orionpro_page;
 		case 0x09 : return orionpro_rom2_segment;
 		case 0x0a : return orionpro_dispatcher;
-		case 0x10 : return wd17xx_status_r(space,0); 
-		case 0x11 : return wd17xx_track_r(space,0);
-		case 0x12 : return wd17xx_sector_r(space,0);
-		case 0x13 : return wd17xx_data_r(space,0);
+		case 0x10 : return wd17xx_status_r(fdc,0); 
+		case 0x11 : return wd17xx_track_r(fdc,0);
+		case 0x12 : return wd17xx_sector_r(fdc,0);
+		case 0x13 : return wd17xx_data_r(fdc,0);
 		case 0x18 : 
 		case 0x19 : 
 		case 0x1a : 
@@ -587,6 +593,8 @@ READ8_HANDLER ( orionpro_io_r ) {
 }
 
 WRITE8_HANDLER ( orionpro_io_w ) {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD1793, "wd1793");
+		
 	switch (offset & 0xff) {		
 		case 0x04 : orionpro_ram0_segment = data; orionpro_bank_switch(space->machine); break;		
 		case 0x05 : orionpro_ram1_segment = data; orionpro_bank_switch(space->machine); break;
@@ -594,10 +602,10 @@ WRITE8_HANDLER ( orionpro_io_w ) {
 		case 0x08 : orionpro_page = data; 		  orionpro_bank_switch(space->machine); break;
 		case 0x09 : orionpro_rom2_segment = data; orionpro_bank_switch(space->machine); break;
 		case 0x0a : orionpro_dispatcher = data;   orionpro_bank_switch(space->machine); break;
-		case 0x10 : wd17xx_command_w(space,0,data); break;
-		case 0x11 : wd17xx_track_w(space,0,data);break;
-		case 0x12 : wd17xx_sector_w(space,0,data);break;
-		case 0x13 : wd17xx_data_w(space,0,data);break;
+		case 0x10 : wd17xx_command_w(fdc,0,data); break;
+		case 0x11 : wd17xx_track_w(fdc,0,data);break;
+		case 0x12 : wd17xx_sector_w(fdc,0,data);break;
+		case 0x13 : wd17xx_data_w(fdc,0,data);break;
 		case 0x14 : orion_disk_control_w(space, 9, data);break;
 		case 0x18 : 
 		case 0x19 : 

@@ -393,7 +393,7 @@ static const sam6883_interface coco3_sam_intf =
 	coco3_sam_set_maptype
 };
 
-static coco_cartridge *coco_cart;
+coco_cartridge *coco_cart;
 static emu_timer *cart_timer;
 static emu_timer *nmi_timer;
 static emu_timer *halt_timer;
@@ -1231,22 +1231,23 @@ READ8_HANDLER ( dgnalpha_psg_porta_read )
 
 WRITE8_HANDLER ( dgnalpha_psg_porta_write )
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
 	/* Bits 0..3 are the drive select lines for the internal floppy interface */
 	/* Bit 4 is the motor on, in the real hardware these are inverted on their way to the drive */
 	/* Bits 5,6,7 are connected to /DDEN, ENP and 5/8 on the WD2797 */
 	switch (data & 0xF)
 	{
 		case(0x01) :
-			wd17xx_set_drive(0);
+			wd17xx_set_drive(fdc,0);
 			break;
 		case(0x02) :
-			wd17xx_set_drive(1);
+			wd17xx_set_drive(fdc,1);
 			break;
 		case(0x04) :
-			wd17xx_set_drive(2);
+			wd17xx_set_drive(fdc,2);
 			break;
 		case(0x08) :
-			wd17xx_set_drive(3);
+			wd17xx_set_drive(fdc,3);
 			break;
 	}
 }
@@ -1650,18 +1651,18 @@ static void dragon_page_rom(running_machine *machine, int romswitch)
 /* Dragon Alpha onboard FDC */
 /********************************************************************************************/
 
-static void	dgnalpha_fdc_callback(running_machine *machine, wd17xx_state_t event, void *param)
+static WD17XX_CALLBACK( dgnalpha_fdc_callback )
 {
 	/* The NMI line on the alphaAlpha is gated through IC16 (early PLD), and is gated by pia2 CA2  */
 	/* The DRQ line goes through pia2 cb1, in exactly the same way as DRQ from DragonDos does */
 	/* for pia1 cb1 */
 
-	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	const address_space *space = cpu_get_address_space( device->machine->cpu[0], ADDRESS_SPACE_PROGRAM );
 
-	switch(event)
+	switch(state)
 	{
 		case WD17XX_IRQ_CLR:
-			cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
+			cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
 			break;
 		case WD17XX_IRQ_SET:
 			if(dgnalpha_just_reset)
@@ -1671,7 +1672,7 @@ static void	dgnalpha_fdc_callback(running_machine *machine, wd17xx_state_t event
 			else
 			{
 				if (pia_get_output_ca2_z(2))
-					cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, ASSERT_LINE);
+					cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_NMI, ASSERT_LINE);
 			}
 			break;
 		case WD17XX_DRQ_CLR:
@@ -1686,21 +1687,22 @@ static void	dgnalpha_fdc_callback(running_machine *machine, wd17xx_state_t event
 /* The Dragon Alpha hardware reverses the order of the WD2797 registers */
 READ8_HANDLER(wd2797_r)
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
 	int result = 0;
 
 	switch(offset & 0x03)
 	{
 		case 0:
-			result = wd17xx_data_r(space, 0);
+			result = wd17xx_data_r(fdc, 0);
 			break;
 		case 1:
-			result = wd17xx_sector_r(space, 0);
+			result = wd17xx_sector_r(fdc, 0);
 			break;
 		case 2:
-			result = wd17xx_track_r(space, 0);
+			result = wd17xx_track_r(fdc, 0);
 			break;
 		case 3:
-			result = wd17xx_status_r(space, 0);
+			result = wd17xx_status_r(fdc, 0);
 			break;
 		default:
 			break;
@@ -1711,22 +1713,23 @@ READ8_HANDLER(wd2797_r)
 
 WRITE8_HANDLER(wd2797_w)
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
     switch(offset & 0x3)
 	{
 		case 0:
-			wd17xx_data_w(space, 0, data);
+			wd17xx_data_w(fdc, 0, data);
 			break;
 		case 1:
-			wd17xx_sector_w(space, 0, data);
+			wd17xx_sector_w(fdc, 0, data);
 			break;
 		case 2:
-			wd17xx_track_w(space, 0, data);
+			wd17xx_track_w(fdc, 0, data);
 			break;
 		case 3:
-			wd17xx_command_w(space, 0, data);
+			wd17xx_command_w(fdc, 0, data);
 
 			/* disk head is encoded in the command byte */
-			wd17xx_set_side((data & 0x02) ? 1 : 0);
+			wd17xx_set_side(fdc,(data & 0x02) ? 1 : 0);
 			break;
 	};
 }
@@ -2999,10 +3002,12 @@ MACHINE_START( dgnalpha )
 	/* dgnalpha_just_reset, is here to flag that we should ignore the first irq generated */
 	/* by the WD2797, it is reset to 0 after the first inurrupt */
 	dgnalpha_just_reset=1;
-
-	wd17xx_init(machine, WD_TYPE_179X, dgnalpha_fdc_callback, NULL);
 }
 
+const wd17xx_interface dgnalpha_wd17xx_interface = {
+	dgnalpha_fdc_callback,
+	NULL
+};
 /******* Machine Setups CoCos **********/
 
 MACHINE_START( coco )

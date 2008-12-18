@@ -34,7 +34,6 @@ void samcoupe_irq(const device_config *device, UINT8 src);
 void samcoupe_update_memory(const address_space *space);
 
 WRITE8_HANDLER( samcoupe_ext_mem_w );
-MACHINE_START( samcoupe );
 MACHINE_RESET( samcoupe );
 
 

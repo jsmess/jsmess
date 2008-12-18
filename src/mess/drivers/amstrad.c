@@ -428,7 +428,7 @@ static const ppi8255_interface amstrad_ppi8255_interface =
 	amstrad_ppi_portc_w    /* port C write */
 };
 
-static void aleste_interrupt(running_machine *machine,int state)
+static NEC765_INTERRUPT( aleste_interrupt )
 {
 	if(state == CLEAR_LINE)
 		aleste_fdc_int = 0;
@@ -440,14 +440,18 @@ static void aleste_interrupt(running_machine *machine,int state)
 static const nec765_interface amstrad_nec765_interface =
 {
 	NULL,
-	NULL
+	NULL,
+	NULL,
+	NEC765_RDY_PIN_CONNECTED
 };
 
 /* Aleste uses an 8272A, with the interrupt flag visible on PPI port B */
 static const nec765_interface aleste_8272_interface =
 {
 	aleste_interrupt,
-	NULL
+	NULL,
+	NULL,
+	NEC765_RDY_PIN_CONNECTED	
 };
 
 /* pointers to current ram configuration selected for banks */
@@ -1242,6 +1246,7 @@ Expansion Peripherals Read/Write -   -   -   -   -   0   -   -   -   -   -   -  
 
 static READ8_HANDLER ( AmstradCPC_ReadPortHandler )
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, NEC765A, "nec765");
 	unsigned char data = 0xFF;
 	unsigned int r1r0 = (unsigned int)((offset & 0x0300) >> 8);
 	m6845_personality_t crtc_type;
@@ -1324,10 +1329,10 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 				int b8b0 = ((offset & (1<<8)) >> (8 - 1)) | (offset & (0x01));
 				switch (b8b0) {
   				case 0x02: {
-  						data = nec765_status_r(space, 0);
+  						data = nec765_status_r(fdc, 0);
   				} break;
   				case 0x03: {
-  						data = nec765_data_r(space, 0);
+  						data = nec765_data_r(fdc, 0);
   				} break;
   				default: {
   				} break;
@@ -1341,6 +1346,7 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 /* Offset handler for write */
 static WRITE8_HANDLER ( AmstradCPC_WritePortHandler )
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, NEC765A, "nec765");
 	if ((offset & (1<<15)) == 0) 
 	{
 		if(aleste_mode & 0x04) // Aleste mode
@@ -1456,7 +1462,7 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 			  break;
 
 		  case 0x03: /* Write Data register of FDC */
-					nec765_data_w(space, 0,data);
+					nec765_data_w(fdc, 0,data);
 				break;
 				default:
 				break;
@@ -2044,7 +2050,6 @@ static void amstrad_common_init(running_machine *machine)
 
 	if(amstrad_system_type != SYSTEM_GX4000)
 	{
-		nec765_init(machine, &amstrad_nec765_interface,NEC765A/*?*/,NEC765_RDY_PIN_CONNECTED);
 		floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 0),  FLOPPY_DRIVE_SS_40);
 		floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 1),  FLOPPY_DRIVE_SS_40);
 	}
@@ -2242,7 +2247,6 @@ static MACHINE_RESET( aleste )
 	amstrad_common_init(machine);
 	amstrad_reset_machine(machine);
 
-	nec765_init(machine, &aleste_8272_interface,NEC765A,NEC765_RDY_PIN_CONNECTED);
 	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 0),  FLOPPY_DRIVE_DS_80);
 	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 1),  FLOPPY_DRIVE_DS_80);
 }
@@ -2984,6 +2988,8 @@ static MACHINE_DRIVER_START( amstrad )
 	MDRV_SNAPSHOT_ADD(amstrad, "sna", 0)
 
 	MDRV_CASSETTE_ADD( "cassette", amstrad_cassette_config )
+	
+	MDRV_NEC765A_ADD("nec765", amstrad_nec765_interface)
 MACHINE_DRIVER_END
 
 
@@ -3032,6 +3038,7 @@ static MACHINE_DRIVER_START( gx4000 )
 	MDRV_DEVICE_REMOVE("printer", PRINTER)
 
 	MDRV_CASSETTE_REMOVE( "cassette" )
+	MDRV_NEC765A_REMOVE( "nec765" )
 MACHINE_DRIVER_END
 
 
@@ -3045,6 +3052,7 @@ static MACHINE_DRIVER_START( aleste )
 	MDRV_PALETTE_LENGTH(32+64)
 	MDRV_PALETTE_INIT(aleste)
 	MDRV_NVRAM_HANDLER(mc146818)
+	MDRV_NEC765A_MODIFY("nec765", aleste_8272_interface)
 MACHINE_DRIVER_END
 
 

@@ -2,6 +2,7 @@
 #define __COMX35__
 
 #include "devices/snapquik.h"
+#include "machine/wd17xx.h"
 
 #define SCREEN_TAG			"main"
 #define MC6845_SCREEN_TAG	"mc6845"
@@ -68,6 +69,8 @@ struct _comx35_state
 };
 
 /* ---------- defined in machine/comx35.c ---------- */
+
+extern const wd17xx_interface comx35_wd17xx_interface;
 
 WRITE8_HANDLER( comx35_bank_select_w );
 READ8_HANDLER( comx35_io_r );

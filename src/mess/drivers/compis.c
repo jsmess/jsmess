@@ -40,6 +40,7 @@
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
 #include "machine/mm58274c.h"
+#include "machine/nec765.h"
 #include "formats/cpis_dsk.h"
 
 
@@ -275,6 +276,8 @@ static MACHINE_DRIVER_START( compis )
 	
 	/* rtc */
 	MDRV_MM58274C_ADD("mm58274c", compis_mm58274c_interface)	
+	
+	MDRV_NEC765A_ADD("nec765", compis_fdc_interface)
 MACHINE_DRIVER_END
 
 /***************************************************************************

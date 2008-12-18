@@ -177,16 +177,16 @@ static MACHINE_RESET( a310 )
 	a310_memc_reset();
 }
 
-static void a310_wd177x_callback(running_machine *machine, wd17xx_state_t event, void *param)
+static WD17XX_CALLBACK ( a310_wd177x_callback )
 {
-	switch (event)
+	switch (state)
 	{
 		case WD17XX_IRQ_CLR:
 			a310_iocregs[12] &= ~A310_FIQ_FLOPPY;
 			break;
 
 		case WD17XX_IRQ_SET:
-			a310_request_fiq(machine, A310_FIQ_FLOPPY);
+			a310_request_fiq(device->machine, A310_FIQ_FLOPPY);
 			break;
 
 		case WD17XX_DRQ_CLR:
@@ -194,7 +194,7 @@ static void a310_wd177x_callback(running_machine *machine, wd17xx_state_t event,
 			break;
 
 		case WD17XX_DRQ_SET:
-			a310_request_fiq(machine, A310_FIQ_FLOPPY_DRQ);
+			a310_request_fiq(device->machine, A310_FIQ_FLOPPY_DRQ);
 			break;
 	}
 }
@@ -203,7 +203,6 @@ static void a310_wd177x_callback(running_machine *machine, wd17xx_state_t event,
 static MACHINE_START( a310 )
 {
 	a310_pagesize = 0;
-	wd17xx_init(machine, WD_TYPE_1772, a310_wd177x_callback, NULL);
 
 	vbl_timer = timer_alloc(machine, a310_vblank, NULL);
 	timer_adjust_oneshot(vbl_timer, attotime_never, 0);
@@ -367,6 +366,7 @@ static void latch_timer_cnt(int tmr)
 
 static READ32_HANDLER(ioc_r)
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD1772, "wd1772");	
 	if (offset >= 0x80000 && offset < 0xc0000)
 	{
 		switch (offset & 0x1f)
@@ -407,7 +407,7 @@ static READ32_HANDLER(ioc_r)
 	else if (offset >= 0xc4000 && offset <= 0xc4010)
 	{
 		logerror("17XX: R @ addr %x mask %08x\n", offset*4, mem_mask);
-		return wd17xx_data_r(space, offset&0xf);
+		return wd17xx_data_r(fdc, offset&0xf);
 	}
 	else
 	{
@@ -420,6 +420,7 @@ static READ32_HANDLER(ioc_r)
 
 static WRITE32_HANDLER(ioc_w)
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD1772, "wd1772");	
 	if (offset >= 0x80000 && offset < 0xc0000)
 	{
 //      logerror("IOC: W %02x @ reg %s (PC=%x)\n", data&0xff, ioc_regnames[offset&0x1f], cpu_get_pc( space->cpu ));
@@ -504,35 +505,35 @@ static WRITE32_HANDLER(ioc_w)
 	else if (offset >= 0xc4000 && offset <= 0xc4010)
 	{
 		logerror("17XX: %x to addr %x mask %08x\n", data, offset*4, mem_mask);
-		wd17xx_data_w(space, offset&0xf, data&0xff);
+		wd17xx_data_w(fdc, offset&0xf, data&0xff);
 	}
 	else if (offset == 0xd40006)
 	{
 		// latch A
 		if (data & 1)
 		{
-			wd17xx_set_drive(0);
+			wd17xx_set_drive(fdc,0);
 		}
 		if (data & 2)
 		{
-			wd17xx_set_drive(1);
+			wd17xx_set_drive(fdc,1);
 		}
 		if (data & 4)
 		{
-			wd17xx_set_drive(2);
+			wd17xx_set_drive(fdc,2);
 		}
 		if (data & 8)
 		{
-			wd17xx_set_drive(3);
+			wd17xx_set_drive(fdc,3);
 		}
 
-		wd17xx_set_side((data & 0x10)>>4);
+		wd17xx_set_side(fdc,(data & 0x10)>>4);
 
 	}
 	else if (offset == 0xd40010)
 	{
 		// latch B
-		wd17xx_set_density((data & 2) ? DEN_MFM_LO : DEN_MFM_HI);
+		wd17xx_set_density(fdc,(data & 2) ? DEN_MFM_LO : DEN_MFM_HI);
 	}
 	else
 	{
@@ -856,6 +857,10 @@ static INPUT_PORTS_START( a310 )
 	PORT_BIT (0xf8, 0x80, IPT_UNUSED)
 INPUT_PORTS_END
 
+const wd17xx_interface a310_wd17xx_interface = {
+	a310_wd177x_callback,
+	NULL
+};
 
 static MACHINE_DRIVER_START( a310 )
 	/* basic machine hardware */
@@ -880,8 +885,9 @@ static MACHINE_DRIVER_START( a310 )
 	MDRV_SPEAKER_STANDARD_MONO("a310")
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(0, "a310", 1.00)
+	
+	MDRV_WD1772_ADD("wd1772", a310_wd17xx_interface )
 MACHINE_DRIVER_END
-
 
 ROM_START(a310)
 	ROM_REGION(0x800000, "main", 0)
@@ -899,4 +905,5 @@ ROM_END
 
 /*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT     INIT  CONFIG  COMPANY  FULLNAME */
 COMP( 1988, a310, 0,      0,      a310,    a310,  a310, NULL,   "Acorn", "Archimedes 310 (Risc OS 3.11)", GAME_NOT_WORKING)
+
 

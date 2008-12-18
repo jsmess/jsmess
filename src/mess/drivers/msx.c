@@ -278,6 +278,7 @@ PCB Layouts missing
 #include "deprecat.h"
 #include "machine/8255ppi.h"
 #include "machine/tc8521.h"
+#include "machine/wd17xx.h"
 #include "video/tms9928a.h"
 #include "video/v9938.h"
 #include "includes/msx_slot.h"
@@ -1065,6 +1066,8 @@ static MACHINE_DRIVER_START( msx )
 	MDRV_DEVICE_ADD("printer", PRINTER)
 
 	MDRV_CASSETTE_ADD( "cassette", msx_cassette_config )
+	
+	MDRV_WD179X_ADD("wd179x", msx_wd17xx_interface )	
 MACHINE_DRIVER_END
 
 
@@ -1132,6 +1135,8 @@ static MACHINE_DRIVER_START( msx2 )
 
 	/* real time clock */
 	MDRV_DEVICE_ADD("rtc", TC8521)
+	
+	MDRV_WD179X_ADD("wd179x", msx_wd17xx_interface )	
 MACHINE_DRIVER_END
 
 

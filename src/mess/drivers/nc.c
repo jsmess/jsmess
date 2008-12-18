@@ -1322,7 +1322,7 @@ static const msm8251_interface nc200_uart_interface=
 };
 
 
-static void nc200_fdc_interrupt(running_machine *machine, int state)
+static NEC765_INTERRUPT( nc200_fdc_interrupt )
 {
 #if 0
     nc_irq_latch &=~(1<<5);
@@ -1339,13 +1339,15 @@ static void nc200_fdc_interrupt(running_machine *machine, int state)
             nc_irq_status |=(1<<5);
     }
 
-    nc_update_interrupts(machine);
+    nc_update_interrupts(device->machine);
 }
 
-static const struct nec765_interface nc200_nec765_interface=
+static const nec765_interface nc200_nec765_interface=
 {
     nc200_fdc_interrupt,
     NULL,
+    NULL,
+    NEC765_RDY_PIN_CONNECTED
 };
 
 #ifdef UNUSED_FUNCTION
@@ -1369,7 +1371,6 @@ static MACHINE_RESET( nc200 )
 
     nc_common_init_machine(machine);
 
-    nec765_init(machine, &nc200_nec765_interface, NEC765A,NEC765_RDY_PIN_CONNECTED);
     /* double sided, 80 track drive */
 	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 0), FLOPPY_DRIVE_DS_80);
 	//floppy_drive_set_index_pulse_callback(image_from_devtype_and_index(IO_FLOPPY, 0), nc200_floppy_drive_index_callback);
@@ -1519,12 +1520,13 @@ static WRITE8_HANDLER(nc200_uart_control_w)
 
 static WRITE8_HANDLER(nc200_memory_card_wait_state_w)
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, NEC765A, "nec765");
 	LOG_DEBUG(("nc200 memory card wait state: PC: %04x %02x\n",cpu_get_pc(space->machine->cpu[0]),data));
 #if 0
 	floppy_drive_set_motor_state(0,1);
 	floppy_drive_set_ready_state(0,1,1);
 #endif
-	nec765_set_tc_state(space->machine, (data & 0x01));
+	nec765_set_tc_state(fdc, (data & 0x01));
 }
 
 /* bit 2: backlight: 1=off, 0=on */
@@ -1554,8 +1556,8 @@ static ADDRESS_MAP_START(nc200_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE(MSM8251, "uart", msm8251_data_r, msm8251_data_w)
 	AM_RANGE(0xc1, 0xc1) AM_DEVREADWRITE(MSM8251, "uart", msm8251_status_r, msm8251_control_w)
 	AM_RANGE(0xd0, 0xd1) AM_READWRITE(mc146818_port_r, mc146818_port_w)
-	AM_RANGE(0xe0, 0xe0) AM_READ(nec765_status_r)
-	AM_RANGE(0xe1, 0xe1) AM_READWRITE(nec765_data_r, nec765_data_w)
+	AM_RANGE(0xe0, 0xe0) AM_DEVREAD(NEC765A, "nec765", nec765_status_r)
+	AM_RANGE(0xe1, 0xe1) AM_DEVREADWRITE(NEC765A, "nec765",nec765_data_r, nec765_data_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START(nc200)
@@ -1738,6 +1740,8 @@ static MACHINE_DRIVER_START( nc200 )
 
 	/* no rtc */
 	MDRV_DEVICE_REMOVE("rtc", TC8521)
+	
+	MDRV_NEC765A_ADD("nec765", nc200_nec765_interface)
 MACHINE_DRIVER_END
 
 

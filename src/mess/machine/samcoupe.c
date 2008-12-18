@@ -10,7 +10,6 @@
 #include "driver.h"
 #include "includes/samcoupe.h"
 #include "devices/basicdsk.h"
-#include "machine/wd17xx.h"
 #include "machine/msm6242.h"
 
 
@@ -189,8 +188,3 @@ MACHINE_RESET( samcoupe )
 	samcoupe_update_memory(space);
 }
 
-
-MACHINE_START( samcoupe )
-{
-    wd17xx_init(machine, WD_TYPE_1772, NULL, NULL);
-}

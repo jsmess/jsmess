@@ -104,7 +104,7 @@
 #define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
-static void pcw_fdc_interrupt(running_machine*,int);
+static NEC765_INTERRUPT( pcw_fdc_interrupt );
 
 // pointer to pcw ram
 unsigned int roller_ram_addr;
@@ -136,7 +136,9 @@ static void pcw_update_interrupt_counter(void)
 static const nec765_interface pcw_nec765_interface =
 {
 	pcw_fdc_interrupt,
-	NULL
+	NULL,
+	NULL,
+	NEC765_RDY_PIN_CONNECTED
 };
 
 /* determines if int line is held or cleared */
@@ -213,7 +215,7 @@ static void	pcw_trigger_fdc_int(running_machine *machine)
 }
 
 /* fdc interrupt callback. set/clear fdc int */
-static void pcw_fdc_interrupt(running_machine *machine,int state)
+static NEC765_INTERRUPT( pcw_fdc_interrupt )
 {
 	pcw_system_status &= ~(1<<5);
 
@@ -223,7 +225,7 @@ static void pcw_fdc_interrupt(running_machine *machine,int state)
 		pcw_system_status |= (1<<5);
 	}
 
-	pcw_trigger_fdc_int(machine);
+	pcw_trigger_fdc_int(device->machine);
 }
 
 
@@ -431,6 +433,7 @@ static WRITE8_HANDLER(pcw_vdu_video_control_register_w)
 
 static WRITE8_HANDLER(pcw_system_control_w)
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, NEC765A, "nec765");
 	LOG(("SYSTEM CONTROL: %d\n",data));
 
 	switch (data)
@@ -516,14 +519,14 @@ static WRITE8_HANDLER(pcw_system_control_w)
 		/* set fdc terminal count */
 		case 5:
 		{
-			nec765_set_tc_state(space->machine, 1);
+			nec765_set_tc_state(fdc, 1);
 		}
 		break;
 
 		/* clear fdc terminal count */
 		case 6:
 		{
-			nec765_set_tc_state(space->machine, 0);
+			nec765_set_tc_state(fdc, 0);
 		}
 		break;
 
@@ -650,21 +653,23 @@ static WRITE8_HANDLER(pcw_expansion_w)
 
 static READ8_HANDLER(pcw_fdc_r)
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, NEC765A, "nec765");
 	/* from Jacob Nevins docs. FDC I/O is not fully decoded */
 	if (offset & 1)
 	{
-		return nec765_data_r(space, 0);
+		return nec765_data_r(fdc, 0);
 	}
 
-	return nec765_status_r(space, 0);
+	return nec765_status_r(fdc, 0);
 }
 
 static WRITE8_HANDLER(pcw_fdc_w)
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, NEC765A, "nec765");
 	/* from Jacob Nevins docs. FDC I/O is not fully decoded */
 	if (offset & 1)
 	{
-		nec765_data_w(space, 0,data);
+		nec765_data_w(fdc, 0,data);
 	}
 }
 
@@ -744,7 +749,6 @@ static TIMER_CALLBACK(setup_beep)
 
 static MACHINE_START( pcw )
 {
-	nec765_init(machine, &pcw_nec765_interface,NEC765A,NEC765_RDY_PIN_CONNECTED);
 	fdc_interrupt_code = 0;
 	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 0), FLOPPY_DRIVE_DS_80);
 }
@@ -1003,6 +1007,8 @@ static MACHINE_DRIVER_START( pcw )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("beep", BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	
+	MDRV_NEC765A_ADD("nec765", pcw_nec765_interface)
 MACHINE_DRIVER_END
 
 

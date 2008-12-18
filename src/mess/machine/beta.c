@@ -35,7 +35,7 @@ void betadisk_clear_status(void)
 	betadisk_status = 0;
 }
 
-void betadisk_wd179x_callback(running_machine *machine, wd17xx_state_t state, void *param)
+static WD17XX_CALLBACK( betadisk_wd179x_callback )
 {
 	switch (state)
 	{
@@ -65,10 +65,12 @@ void betadisk_wd179x_callback(running_machine *machine, wd17xx_state_t state, vo
 	}
 }
 
+const wd17xx_interface beta_wd17xx_interface = { betadisk_wd179x_callback, NULL };
+
 READ8_HANDLER(betadisk_status_r)
 {
 	if (betadisk_active==1) {
-		return wd17xx_status_r(space, offset); 
+		return wd17xx_status_r((device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x"), offset); 
 	} else {
 		return 0xff;
 	}
@@ -77,7 +79,7 @@ READ8_HANDLER(betadisk_status_r)
 READ8_HANDLER(betadisk_track_r)
 {
 	if (betadisk_active==1) {
-		return wd17xx_track_r(space, offset); 
+		return wd17xx_track_r((device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x"), offset); 
 	} else {
 		return 0xff;
 	}
@@ -86,7 +88,7 @@ READ8_HANDLER(betadisk_track_r)
 READ8_HANDLER(betadisk_sector_r)
 {
 	if (betadisk_active==1) {
-		return wd17xx_sector_r(space, offset); 
+		return wd17xx_sector_r((device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x"), offset); 
 	} else {
 		return 0xff;
 	}
@@ -95,7 +97,7 @@ READ8_HANDLER(betadisk_sector_r)
 READ8_HANDLER(betadisk_data_r)
 {
 	if (betadisk_active==1) {
-		return wd17xx_data_r(space, offset); 
+		return wd17xx_data_r((device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x"), offset); 
 	} else {
 		return 0xff;
 	}
@@ -112,13 +114,14 @@ READ8_HANDLER(betadisk_state_r)
 
 WRITE8_HANDLER(betadisk_param_w)
 { 
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
 	if (betadisk_active==1) {
-  		wd17xx_set_drive ( data & 3);  
-  		wd17xx_set_side ((data & 0x10) ? 0 : 1 );
-  		wd17xx_set_density(data & 0x20 ? DEN_MFM_HI : DEN_FM_LO );
+  		wd17xx_set_drive(fdc, data & 3);  
+  		wd17xx_set_side (fdc,(data & 0x10) ? 0 : 1 );
+  		wd17xx_set_density(fdc, data & 0x20 ? DEN_MFM_HI : DEN_FM_LO );
   		if ((data & 0x04) == 0) // reset
   		{
-  			wd17xx_reset(space->machine);	
+  			wd17xx_reset(fdc);	
   		}    		
   		betadisk_status = (data & 0x3f) | betadisk_status;
   	}
@@ -127,28 +130,28 @@ WRITE8_HANDLER(betadisk_param_w)
 WRITE8_HANDLER(betadisk_command_w)
 {
 	if (betadisk_active==1) {
-		wd17xx_command_w(space, offset, data);
+		wd17xx_command_w((device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x"), offset, data);
 	}	
 }
 
 WRITE8_HANDLER(betadisk_track_w)
 {
 	if (betadisk_active==1) {
-		wd17xx_track_w(space, offset, data);
+		wd17xx_track_w((device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x"), offset, data);
 	}	
 }
 
 WRITE8_HANDLER(betadisk_sector_w)
 {
 	if (betadisk_active==1) {
-		wd17xx_sector_w(space, offset, data);
+		wd17xx_sector_w((device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x"), offset, data);
 	}	
 }
 
 WRITE8_HANDLER(betadisk_data_w)
 {
 	if (betadisk_active==1) {
-		wd17xx_data_w(space, offset, data);
+		wd17xx_data_w((device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x"), offset, data);
 	}	
 }
 

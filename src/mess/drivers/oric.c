@@ -27,7 +27,7 @@
 #include "sound/ay8910.h"
 #include "machine/6522via.h"
 #include "machine/6551.h"
-
+#include "machine/wd17xx.h"
 #include "includes/apple2.h"
 
 /*
@@ -388,6 +388,8 @@ static MACHINE_DRIVER_START( oric )
 
 	/* via */
 	MDRV_VIA6522_ADD( "via6522_0", 1000000, oric_6522_interface )
+	
+	MDRV_WD179X_ADD("wd179x", oric_wd17xx_interface )
 MACHINE_DRIVER_END
 
 

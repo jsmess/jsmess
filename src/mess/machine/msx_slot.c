@@ -1127,16 +1127,18 @@ MSX_SLOT_INIT(diskrom)
 
 MSX_SLOT_RESET(diskrom)
 {
-	wd17xx_reset (machine);
+	device_config *fdc = (device_config*)device_list_find_by_tag( machine->config->devicelist, WD179X, "wd179x");
+	wd17xx_reset(fdc);	
 }
 
 static READ8_HANDLER (msx_diskrom_page1_r)
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
 	switch (offset) {
-	case 0: return wd17xx_status_r (space, 0);
-	case 1: return wd17xx_track_r (space, 0);
-	case 2: return wd17xx_sector_r (space, 0);
-	case 3: return wd17xx_data_r (space, 0);
+	case 0: return wd17xx_status_r (fdc, 0);
+	case 1: return wd17xx_track_r (fdc, 0);
+	case 2: return wd17xx_sector_r (fdc, 0);
+	case 3: return wd17xx_data_r (fdc, 0);
 	case 7: return msx1.dsk_stat;
 	default:
 		return msx1.state[1]->mem[offset + 0x3ff8];
@@ -1145,16 +1147,17 @@ static READ8_HANDLER (msx_diskrom_page1_r)
 
 static READ8_HANDLER (msx_diskrom_page2_r)
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
 	if (offset >= 0x7f8) {
 		switch (offset) {
 		case 0x7f8:
-			return wd17xx_status_r (space, 0);
+			return wd17xx_status_r (fdc, 0);
 		case 0x7f9:
-			return wd17xx_track_r (space, 0);
+			return wd17xx_track_r (fdc, 0);
 		case 0x7fa:
-			return wd17xx_sector_r (space, 0);
+			return wd17xx_sector_r (fdc, 0);
 		case 0x7fb:
-			return wd17xx_data_r (space, 0);
+			return wd17xx_data_r (fdc, 0);
 		case 0x7ff:
 			return msx1.dsk_stat;
 		default:
@@ -1193,29 +1196,29 @@ MSX_SLOT_MAP(diskrom)
 
 MSX_SLOT_WRITE(diskrom)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	device_config *fdc = (device_config*)device_list_find_by_tag( machine->config->devicelist, WD179X, "wd179x");
 	if (addr >= 0xa000 && addr < 0xc000) {
 		addr -= 0x4000;
 	}
 	switch (addr) {
 	case 0x7ff8:
-		wd17xx_command_w (space, 0, val);
+		wd17xx_command_w (fdc, 0, val);
 		break;
 	case 0x7ff9:
-		wd17xx_track_w (space, 0, val);
+		wd17xx_track_w (fdc, 0, val);
 		break;
 	case 0x7ffa:
-		wd17xx_sector_w (space, 0, val);
+		wd17xx_sector_w (fdc, 0, val);
 		break;
 	case 0x7ffb:
-		wd17xx_data_w (space, 0, val);
+		wd17xx_data_w (fdc, 0, val);
 		break;
 	case 0x7ffc:
-		wd17xx_set_side (val & 1);
+		wd17xx_set_side (fdc,val & 1);
 		state->mem[0x3ffc] = val | 0xfe;
 		break;
 	case 0x7ffd:
-		wd17xx_set_drive (val & 1);
+		wd17xx_set_drive (fdc,val & 1);
 		if ((state->mem[0x3ffd] ^ val) & 0x40) {
 			set_led_status (0, !(val & 0x40));
 		}
@@ -1240,16 +1243,18 @@ MSX_SLOT_INIT(diskrom2)
 
 MSX_SLOT_RESET(diskrom2)
 {
-	wd17xx_reset (machine);
+	device_config *fdc = (device_config*)device_list_find_by_tag( machine->config->devicelist, WD179X, "wd179x");
+	wd17xx_reset (fdc);
 }
 
 static READ8_HANDLER (msx_diskrom2_page1_r)
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
 	switch (offset) {
-	case 0: return wd17xx_status_r(space, 0);
-	case 1: return wd17xx_track_r(space, 0);
-	case 2: return wd17xx_sector_r(space, 0);
-	case 3: return wd17xx_data_r(space, 0);
+	case 0: return wd17xx_status_r(fdc, 0);
+	case 1: return wd17xx_track_r(fdc, 0);
+	case 2: return wd17xx_sector_r(fdc, 0);
+	case 3: return wd17xx_data_r(fdc, 0);
 	case 4: return msx1.dsk_stat;
 	default:
 		return msx1.state[1]->mem[offset + 0x3ff8];
@@ -1258,16 +1263,17 @@ static READ8_HANDLER (msx_diskrom2_page1_r)
 
 static  READ8_HANDLER (msx_diskrom2_page2_r)
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
 	if (offset >= 0x7b8) {
 		switch (offset) {
 		case 0x7b8:
-			return wd17xx_status_r (space, 0);
+			return wd17xx_status_r (fdc, 0);
 		case 0x7b9:
-			return wd17xx_track_r (space, 0);
+			return wd17xx_track_r (fdc, 0);
 		case 0x7ba:
-			return wd17xx_sector_r (space, 0);
+			return wd17xx_sector_r (fdc, 0);
 		case 0x7bb:
-			return wd17xx_data_r (space, 0);
+			return wd17xx_data_r (fdc, 0);
 		case 0x7bc:
 			return msx1.dsk_stat;
 		default:
@@ -1305,27 +1311,27 @@ MSX_SLOT_MAP(diskrom2)
 
 MSX_SLOT_WRITE(diskrom2)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	device_config *fdc = (device_config*)device_list_find_by_tag( machine->config->devicelist, WD179X, "wd179x");
 	if (addr >= 0xa000 && addr < 0xc000) {
 		addr -= 0x4000;
 	}
 	switch (addr) {
 	case 0x7fb8:
-		wd17xx_command_w (space, 0, val);
+		wd17xx_command_w (fdc, 0, val);
 		break;
 	case 0x7fb9:
-		wd17xx_track_w (space, 0, val);
+		wd17xx_track_w (fdc, 0, val);
 		break;
 	case 0x7fba:
-		wd17xx_sector_w (space, 0, val);
+		wd17xx_sector_w (fdc, 0, val);
 		break;
 	case 0x7fbb:
-		wd17xx_data_w (space, 0, val);
+		wd17xx_data_w (fdc, 0, val);
 		break;
 	case 0x7fbc:
-		wd17xx_set_side (val & 1);
+		wd17xx_set_side (fdc,val & 1);
 		state->mem[0x3fbc] = val | 0xfe;
-		wd17xx_set_drive (val & 1);
+		wd17xx_set_drive (fdc,val & 1);
 		if ((state->mem[0x3fbc] ^ val) & 0x40) {
 			set_led_status (0, !(val & 0x40));
 		}

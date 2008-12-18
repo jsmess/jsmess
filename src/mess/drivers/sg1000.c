@@ -194,8 +194,8 @@ static ADDRESS_MAP_START( sf7000_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xbe, 0xbe) AM_READWRITE(TMS9928A_vram_r, TMS9928A_vram_w)
 	AM_RANGE(0xbf, 0xbf) AM_READWRITE(TMS9928A_register_r, TMS9928A_register_w)
 	AM_RANGE(0xdc, 0xdf) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xe0, 0xe0) AM_READ(nec765_status_r)
-	AM_RANGE(0xe1, 0xe1) AM_READWRITE(nec765_data_r, nec765_data_w)
+	AM_RANGE(0xe0, 0xe0) AM_DEVREAD(NEC765A, "nec765", nec765_status_r)
+	AM_RANGE(0xe1, 0xe1) AM_DEVREADWRITE(NEC765A, "nec765", nec765_data_r, nec765_data_w)
 	AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xe8, 0xe8) AM_DEVREADWRITE(MSM8251, "uart", msm8251_data_r, msm8251_data_w)
 	AM_RANGE(0xe9, 0xe9) AM_DEVREADWRITE(MSM8251, "uart", msm8251_status_r, msm8251_control_w)
@@ -641,6 +641,7 @@ static WRITE8_DEVICE_HANDLER( sf7000_ppi8255_b_w )
 
 static WRITE8_DEVICE_HANDLER( sf7000_ppi8255_c_w )
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( device->machine->config->devicelist, NEC765A, "nec765");
 	/*
         Signal  Description
 
@@ -659,12 +660,12 @@ static WRITE8_DEVICE_HANDLER( sf7000_ppi8255_c_w )
 	floppy_drive_set_ready_state(image_from_devtype_and_index(IO_FLOPPY, 0), 1, 0);
 
 	/* FDC terminal count */
-	nec765_set_tc_state(device->machine, data & 0x04);
+	nec765_set_tc_state(fdc, data & 0x04);
 
 	/* FDC reset */
 	if (data & 0x08)
 	{
-		nec765_reset(device->machine, 0);
+		nec765_reset(fdc, 0);
 	}
 
 	/* ROM selection */
@@ -695,14 +696,14 @@ static const ppi8255_interface sf7000_ppi8255_intf[2] =
 };
 
 /* callback for /INT output from FDC */
-static void sf7000_fdc_interrupt(running_machine *machine,int state)
+static NEC765_INTERRUPT( sf7000_fdc_interrupt )
 {
-	sg1000_state *driver_state = machine->driver_data; // TODO
+	sg1000_state *driver_state = device->machine->driver_data; // TODO
 
 	driver_state->fdc_irq = state;
 }
 
-static void sf7000_fdc_index_callback(const device_config *img, int state)
+static void sf7000_fdc_index_callback(const device_config *controller, const device_config *img, int state)
 {
 	sg1000_state *driver_state = img->machine->driver_data;
 
@@ -712,7 +713,9 @@ static void sf7000_fdc_index_callback(const device_config *img, int state)
 static const struct nec765_interface sf7000_nec765_interface =
 {
 	sf7000_fdc_interrupt,
-	NULL
+	NULL,
+	NULL,
+	NEC765_RDY_PIN_CONNECTED
 };
 
 static const CENTRONICS_CONFIG sf7000_centronics_config[1] = {
@@ -730,7 +733,6 @@ static MACHINE_START( sf7000 )
 	TMS9928A_configure(&tms9928a_interface);
 
 	/* configure FDC */
-	nec765_init(machine, &sf7000_nec765_interface, NEC765A, NEC765_RDY_PIN_CONNECTED);
 	floppy_drive_set_index_pulse_callback(image_from_devtype_and_index(IO_FLOPPY, 0), sf7000_fdc_index_callback);
 
 	/* configure PPI */
@@ -856,6 +858,8 @@ static MACHINE_DRIVER_START( sf7000 )
 
 	/* uart */
 	MDRV_DEVICE_ADD("uart", MSM8251)
+	
+	MDRV_NEC765A_ADD("nec765", sf7000_nec765_interface)		
 MACHINE_DRIVER_END
 
 /* ROMs */

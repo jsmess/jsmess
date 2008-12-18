@@ -404,12 +404,17 @@ static void at_fdc_dma_drq(running_machine *machine, int state, int read_)
 	dma8237_drq_write( at_devices.dma8237_1, FDC_DMA, state);
 }
 
+static device_config * at_get_device(running_machine *machine )
+{
+	return (device_config*)device_list_find_by_tag( machine->config->devicelist, NEC765A, "nec765");	
+}
+
 static const struct pc_fdc_interface fdc_interface =
 {
-	NEC765A,
-	NEC765_RDY_PIN_NOT_CONNECTED,
 	at_fdc_interrupt,
 	at_fdc_dma_drq,
+	NULL,
+	at_get_device
 };
 
 

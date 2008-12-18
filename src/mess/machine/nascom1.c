@@ -55,9 +55,9 @@ static struct
  *
  *************************************/
 
-static void nascom2_fdc_callback(running_machine *machine, wd17xx_state_t event, void *param)
+static WD17XX_CALLBACK( nascom2_fdc_callback )
 {
-	switch (event)
+	switch (state)
 	{
 	case WD17XX_IRQ_SET: nascom2_fdc.irq = 1; break;
 	case WD17XX_IRQ_CLR: nascom2_fdc.irq = 0; break;
@@ -65,6 +65,9 @@ static void nascom2_fdc_callback(running_machine *machine, wd17xx_state_t event,
 	case WD17XX_DRQ_CLR: nascom2_fdc.drq = 0; break;
 	}
 }
+
+
+const wd17xx_interface nascom2_wd17xx_interface = { nascom2_fdc_callback, NULL };
 
 
 READ8_HANDLER( nascom2_fdc_select_r )
@@ -75,15 +78,16 @@ READ8_HANDLER( nascom2_fdc_select_r )
 
 WRITE8_HANDLER( nascom2_fdc_select_w )
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD1793, "wd1793");
 	nascom2_fdc.select = data;
 
 	logerror("nascom2_fdc_select_w: %02x\n", data);
 
-	if (data & 0x01) wd17xx_set_drive(0);
-	if (data & 0x02) wd17xx_set_drive(1);
-	if (data & 0x04) wd17xx_set_drive(2);
-	if (data & 0x08) wd17xx_set_drive(3);
-	if (data & 0x10) wd17xx_set_side((data & 0x10) >> 4);
+	if (data & 0x01) wd17xx_set_drive(fdc,0);
+	if (data & 0x02) wd17xx_set_drive(fdc,1);
+	if (data & 0x04) wd17xx_set_drive(fdc,2);
+	if (data & 0x08) wd17xx_set_drive(fdc,3);
+	if (data & 0x10) wd17xx_set_side(fdc,(data & 0x10) >> 4);
 }
 
 
@@ -103,7 +107,7 @@ READ8_HANDLER( nascom2_fdc_status_r )
 DEVICE_IMAGE_LOAD( nascom2_floppy )
 {
 	int sides, sectors;
-
+	device_config *fdc = (device_config*)device_list_find_by_tag( image->machine->config->devicelist, WD1793, "wd1793");
 	if (!image_has_been_created(image))
 	{
 		switch (image_length(image))
@@ -111,13 +115,13 @@ DEVICE_IMAGE_LOAD( nascom2_floppy )
 		case 80 * 2 * 2 * 8 * 256:
 			sides = 2;
 			sectors = 2 * 8;
-			wd17xx_set_density(DEN_FM_HI);
+			wd17xx_set_density(fdc,DEN_FM_HI);
 			break;
 
 		case 80 * 1 * 2 * 8 * 256:
 			sides = 1;
 			sectors = 2 * 8;
-			wd17xx_set_density(DEN_FM_HI);
+			wd17xx_set_density(fdc,DEN_FM_HI);
 			break;
 
 		default:
@@ -289,12 +293,6 @@ SNAPSHOT_LOAD( nascom1 )
  *  Initialization
  *
  *************************************/
-
-MACHINE_START( nascom2 )
-{
-	wd17xx_init(machine, WD_TYPE_1793, nascom2_fdc_callback, NULL);
-}
-
 
 MACHINE_RESET( nascom1 )
 {

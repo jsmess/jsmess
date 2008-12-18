@@ -284,26 +284,26 @@ static DEVICE_IMAGE_LOAD( bw2_floppy )
 	return INIT_FAIL;
 }
 
-static void bw2_wd17xx_callback(running_machine *machine, wd17xx_state_t state, void *param)
+static WD17XX_CALLBACK( bw2_wd17xx_callback )
 {
 	switch(state)
 	{
 		case WD17XX_IRQ_CLR:
-			cputag_set_input_line(machine, Z80_TAG, INPUT_LINE_IRQ0, CLEAR_LINE);
+			cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_IRQ0, CLEAR_LINE);
 			break;
 
 		case WD17XX_IRQ_SET:
-			cputag_set_input_line(machine, Z80_TAG, INPUT_LINE_IRQ0, HOLD_LINE);
+			cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_IRQ0, HOLD_LINE);
 			break;
 
 		case WD17XX_DRQ_CLR:
-			cputag_set_input_line(machine, Z80_TAG, INPUT_LINE_NMI, CLEAR_LINE);
+			cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_NMI, CLEAR_LINE);
 			break;
 
 		case WD17XX_DRQ_SET:
-			if (cpu_get_reg(machine->cpu[0], Z80_HALT))
+			if (cpu_get_reg(device->machine->cpu[0], Z80_HALT))
 			{
-				cputag_set_input_line(machine, Z80_TAG, INPUT_LINE_NMI, HOLD_LINE);
+				cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_NMI, HOLD_LINE);
 			}
 			break;
 	}
@@ -312,20 +312,21 @@ static void bw2_wd17xx_callback(running_machine *machine, wd17xx_state_t state, 
 static READ8_HANDLER( bw2_wd2797_r )
 {
 	UINT8 result = 0xff;
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
 
 	switch (offset & 0x03)
 	{
 		case 0:
-			result = wd17xx_status_r(space, 0);
+			result = wd17xx_status_r(fdc, 0);
 			break;
 		case 1:
-			result = wd17xx_track_r(space, 0);
+			result = wd17xx_track_r(fdc, 0);
 			break;
 		case 2:
-			result = wd17xx_sector_r(space, 0);
+			result = wd17xx_sector_r(fdc, 0);
 			break;
 		case 3:
-			result = wd17xx_data_r(space, 0);
+			result = wd17xx_data_r(fdc, 0);
 			break;
 	}
 
@@ -334,6 +335,7 @@ static READ8_HANDLER( bw2_wd2797_r )
 
 static WRITE8_HANDLER( bw2_wd2797_w )
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
 	switch (offset & 0x3)
 	{
 		case 0:
@@ -345,23 +347,23 @@ static WRITE8_HANDLER( bw2_wd2797_w )
 				{
 					int side = BIT(data, 1);
 
-					wd17xx_set_side(side);
+					wd17xx_set_side(fdc,side);
 
 					data &= ~0x02;
 				}
 			}
 
-			wd17xx_command_w(space, 0, data);
+			wd17xx_command_w(fdc, 0, data);
 
 			break;
 		case 1:
-			wd17xx_track_w(space, 0, data);
+			wd17xx_track_w(fdc, 0, data);
 			break;
 		case 2:
-			wd17xx_sector_w(space, 0, data);
+			wd17xx_sector_w(fdc, 0, data);
 			break;
 		case 3:
-			wd17xx_data_w(space, 0, data);
+			wd17xx_data_w(fdc, 0, data);
 			break;
 	};
 }
@@ -371,6 +373,7 @@ static WRITE8_HANDLER( bw2_wd2797_w )
 
 static WRITE8_DEVICE_HANDLER( bw2_ppi8255_a_w )
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( device->machine->config->devicelist, WD179X, "wd179x");
 	/*
 
 		PA0     KB0 Keyboard line select 0
@@ -391,13 +394,13 @@ static WRITE8_DEVICE_HANDLER( bw2_ppi8255_a_w )
 	if (BIT(data, 4))
 	{
 		state->selected_drive = 0;
-		wd17xx_set_drive(state->selected_drive);
+		wd17xx_set_drive(fdc,state->selected_drive);
 	}
 
 	if (BIT(data, 5))
 	{
 		state->selected_drive = 1;
-		wd17xx_set_drive(state->selected_drive);
+		wd17xx_set_drive(fdc,state->selected_drive);
 	}
 
 	/* assumption: select is tied low */
@@ -592,11 +595,12 @@ static DRIVER_INIT( bw2 )
 static MACHINE_START( bw2 )
 {
 	bw2_state *state = machine->driver_data;
+	device_config *fdc = (device_config*)device_list_find_by_tag( machine->config->devicelist, WD179X, "wd179x");
+
 
 	centronics_config(0, bw2_centronics_config);
 
-	wd17xx_init(machine, WD_TYPE_179X, bw2_wd17xx_callback, NULL); // really WD2797
-	wd17xx_set_density(DEN_MFM_LO);
+	wd17xx_set_density(fdc,DEN_MFM_LO);
 
 	/* find devices */
 	state->msm8251 = devtag_get_device(machine, MSM8251, MSM8251_TAG);
@@ -824,6 +828,8 @@ static const msm6255_interface bw2_msm6255_intf =
 	bw2_charram_r,
 };
 
+const wd17xx_interface bw2_wd17xx_interface = { bw2_wd17xx_callback, NULL };
+
 static MACHINE_DRIVER_START( bw2 )
 	MDRV_DRIVER_DATA(bw2_state)
 
@@ -861,6 +867,8 @@ static MACHINE_DRIVER_START( bw2 )
 
 	/* uart */
 	MDRV_DEVICE_ADD(MSM8251_TAG, MSM8251)
+		
+	MDRV_WD179X_ADD("wd179x", default_wd17xx_interface )			
 MACHINE_DRIVER_END
 
 /***************************************************************************

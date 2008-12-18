@@ -14,6 +14,7 @@
 #include "includes/svi318.h"
 #include "video/tms9928a.h"
 #include "machine/8255ppi.h"
+#include "machine/wd17xx.h"
 #include "devices/basicdsk.h"
 #include "devices/printer.h"
 #include "devices/cartslot.h"
@@ -303,6 +304,8 @@ static MACHINE_DRIVER_START( svi318 )
 	MDRV_DEVICE_ADD("printer", PRINTER)
 
 	MDRV_CASSETTE_ADD( "cassette", svi318_cassette_config )
+		
+	MDRV_WD179X_ADD("wd179x", svi_wd17xx_interface )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( svi318n )

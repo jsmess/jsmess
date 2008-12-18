@@ -11,6 +11,7 @@
 #include "cpu/i8085/i8085.h"
 #include "machine/8255ppi.h"
 #include "machine/8257dma.h"
+#include "machine/wd17xx.h"
 #include "video/i8275.h"
 #include "devices/cassette.h"
 #include "devices/basicdsk.h"
@@ -166,6 +167,8 @@ static MACHINE_DRIVER_START( partner )
 	MDRV_DEVICE_CONFIG(partner_dma)
 
 	MDRV_CASSETTE_ADD( "cassette", partner_cassette_config )
+	
+	MDRV_WD1793_ADD("wd1793", partner_wd17xx_interface )
 MACHINE_DRIVER_END
 
 

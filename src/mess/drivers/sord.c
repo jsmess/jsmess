@@ -131,8 +131,9 @@ static WRITE8_HANDLER(fd5_drive_control_w)
 
 static WRITE8_HANDLER(fd5_tc_w)
 {
-	nec765_set_tc_state(space->machine, 1);
-	nec765_set_tc_state(space->machine, 0);
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, NEC765A, "nec765");
+	nec765_set_tc_state(fdc, 1);
+	nec765_set_tc_state(fdc, 0);
 }
 
 /* 0x020 fd5 writes to this port to communicate with m5 */
@@ -141,8 +142,8 @@ static WRITE8_HANDLER(fd5_tc_w)
 /* 0x040 */
 /* 0x050 */
 static ADDRESS_MAP_START(sord_fd5_io, ADDRESS_SPACE_IO, 8)
-	AM_RANGE(0x000, 0x000) AM_READ(nec765_status_r)
-	AM_RANGE(0x001, 0x001) AM_READWRITE(nec765_data_r, nec765_data_w)
+	AM_RANGE(0x000, 0x000) AM_DEVREAD( NEC765A, "nec765", nec765_status_r)
+	AM_RANGE(0x001, 0x001) AM_DEVREADWRITE( NEC765A, "nec765", nec765_data_r, nec765_data_w)
 	AM_RANGE(0x010, 0x010) AM_READWRITE(fd5_data_r, fd5_data_w)
 	AM_RANGE(0x020, 0x020) AM_WRITE(fd5_communication_w)
 	AM_RANGE(0x030, 0x030) AM_READ(fd5_communication_r)
@@ -151,34 +152,30 @@ static ADDRESS_MAP_START(sord_fd5_io, ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 /* nec765 data request is connected to interrupt of z80 inside fd5 interface */
-static void sord_fd5_fdc_interrupt(running_machine *machine, int state)
+static NEC765_INTERRUPT( sord_fd5_fdc_interrupt )
 {
 	if (state)
 	{
-		cpu_set_input_line(machine->cpu[1], 0, HOLD_LINE);
+		cpu_set_input_line(device->machine->cpu[1], 0, HOLD_LINE);
 	}
 	else
 	{
-		cpu_set_input_line(machine->cpu[1], 0,CLEAR_LINE);
+		cpu_set_input_line(device->machine->cpu[1], 0,CLEAR_LINE);
 	}
 }
 
 static const struct nec765_interface sord_fd5_nec765_interface=
 {
 	sord_fd5_fdc_interrupt,
-	NULL
+	NULL,
+	NULL,
+	NEC765_RDY_PIN_CONNECTED
 };
-
-static void sord_fd5_init(running_machine *machine)
-{
-	nec765_init(machine, &sord_fd5_nec765_interface,NEC765A,NEC765_RDY_PIN_CONNECTED);
-}
 
 static MACHINE_RESET( sord_m5_fd5 )
 {
 	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 0), FLOPPY_DRIVE_SS_40);
 	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 1), FLOPPY_DRIVE_SS_40);
-	sord_fd5_init(machine);
 	MACHINE_RESET_CALL(sord_m5);
 	ppi8255_set_port_c((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), 0x50);
 }
@@ -652,6 +649,7 @@ static MACHINE_DRIVER_START( sord_m5 )
 	MDRV_DEVICE_ADD("printer", PRINTER)
 
 	MDRV_CASSETTE_ADD( "cassette", sordm5_cassette_config )
+		
 MACHINE_DRIVER_END
 
 
@@ -667,6 +665,8 @@ static MACHINE_DRIVER_START( sord_m5_fd5 )
 
 	MDRV_INTERLEAVE(20)
 	MDRV_MACHINE_RESET( sord_m5_fd5 )
+	
+	MDRV_NEC765A_ADD("nec765", sord_fd5_nec765_interface)
 MACHINE_DRIVER_END
 
 

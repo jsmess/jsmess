@@ -727,12 +727,13 @@ static WRITE8_DEVICE_HANDLER( ppi_port_c_w )
 // NEC uPD72065 at 0xe94000
 static WRITE16_HANDLER( x68k_fdc_w )
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, NEC72065, "nec72065");
 	unsigned int drive, x;
 	switch(offset)
 	{
 	case 0x00:
 	case 0x01:
-		nec765_data_w(space, 0,data);
+		nec765_data_w(fdc, 0,data);
 		break;
 	case 0x02:  // drive option signal control
 		x = data & 0x0f;
@@ -801,12 +802,14 @@ static READ16_HANDLER( x68k_fdc_r )
 {
 	unsigned int ret;
 	int x;
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, NEC72065, "nec72065");
+	
 	switch(offset)
 	{
 	case 0x00:
-		return nec765_status_r(space, 0);
+		return nec765_status_r(fdc, 0);
 	case 0x01:
-		return nec765_data_r(space, 0);
+		return nec765_data_r(fdc, 0);
 	case 0x02:
 		ret = 0x00;
 		for(x=0;x<4;x++)
@@ -833,7 +836,7 @@ static READ16_HANDLER( x68k_fdc_r )
 	}
 }
 
-static void fdc_irq(running_machine *machine,int state)
+static NEC765_INTERRUPT( fdc_irq )
 {
 	if((sys.ioc.irqstatus & 0x04) && state == ASSERT_LINE)
 	{
@@ -841,26 +844,28 @@ static void fdc_irq(running_machine *machine,int state)
 		sys.ioc.irqstatus |= 0x80;
 		current_irq_line = 1;
 		logerror("FDC: IRQ triggered\n");
-		cpu_set_input_line_and_vector(machine->cpu[0],1,ASSERT_LINE,current_vector[1]);
+		cpu_set_input_line_and_vector(device->machine->cpu[0],1,ASSERT_LINE,current_vector[1]);
 	}
 }
 
 static int x68k_fdc_read_byte(running_machine *machine,int addr)
 {
 	int data = -1;
+	device_config *fdc = (device_config*)device_list_find_by_tag( machine->config->devicelist, NEC72065, "nec72065");
 
 	if(sys.fdc.drq_state != 0)
-		data = nec765_dack_r(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0);
+		data = nec765_dack_r(fdc, 0);
 //  logerror("FDC: DACK reading\n");
 	return data;
 }
 
 static void x68k_fdc_write_byte(running_machine *machine,int addr, int data)
 {
-	nec765_dack_w(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0, data);
+	device_config *fdc = (device_config*)device_list_find_by_tag( machine->config->devicelist, NEC72065, "nec72065");
+	nec765_dack_w(fdc, 0, data);
 }
 
-static void fdc_drq(running_machine *machine,int state, int read_write)
+static NEC765_DMA_REQUEST ( fdc_drq )
 {
 	sys.fdc.drq_state = state;
 }
@@ -890,10 +895,11 @@ static READ16_HANDLER( x68k_fm_r )
 
 static WRITE8_HANDLER( x68k_ct_w )
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, NEC72065, "nec72065");
 	// CT1 and CT2 bits from YM2151 port 0x1b
 	// CT1 - ADPCM clock - 0 = 8MHz, 1 = 4MHz
 	// CT2 - 1 = Set ready state of FDC
-	nec765_set_ready_state(data & 0x01);
+	nec765_set_ready_state(fdc,data & 0x01);
 	sys.adpcm.clock = data & 0x02;
 	x68k_set_adpcm(space->machine);
 	okim6258_set_clock(0, data & 0x02 ? 4000000 : 8000000);
@@ -1654,7 +1660,9 @@ static const hd63450_intf dmac_interface =
 static const nec765_interface fdc_interface =
 {
 	fdc_irq,
-	fdc_drq
+	fdc_drq,
+	NULL,
+	NEC765_RDY_PIN_CONNECTED
 };
 
 static const ym2151_interface x68k_ym2151_interface =
@@ -2008,7 +2016,6 @@ static MACHINE_RESET( x68000 )
 	sys.crtc.reg[7] = 552;  // Vertical end
 	sys.crtc.reg[8] = 27;   // Horizontal adjust
 
-	nec765_reset(machine, 0);
 	mfp_init();
 
 	x68k_scanline = video_screen_get_vpos(machine->primary_screen);// = sys.crtc.reg[6];  // Vertical start
@@ -2069,9 +2076,6 @@ static MACHINE_START( x68000 )
 
 	// start LED timer
 	timer_adjust_periodic(led_timer, attotime_zero, 0, ATTOTIME_IN_MSEC(400));
-
-	nec765_init(machine, &fdc_interface,NEC72065,NEC765_RDY_PIN_CONNECTED);
-	nec765_reset(machine, 0);
 }
 
 static DRIVER_INIT( x68000 )
@@ -2172,8 +2176,9 @@ static MACHINE_DRIVER_START( x68000 )
     MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.00)
 
 	MDRV_NVRAM_HANDLER( generic_0fill )
-MACHINE_DRIVER_END
 
+	MDRV_NEC72065_ADD("nec72065", fdc_interface)	
+MACHINE_DRIVER_END
 
 static SYSTEM_CONFIG_START(x68000)
 	CONFIG_DEVICE(x68k_floppy_getinfo)

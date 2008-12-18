@@ -98,7 +98,7 @@ static ADDRESS_MAP_START( nascom2_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x01, 0x01) AM_READWRITE(nascom1_port_01_r, nascom1_port_01_w)
 	AM_RANGE(0x02, 0x02) AM_READ(nascom1_port_02_r)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE( Z80PIO, "z80pio", z80pio_r, z80pio_w )
-	AM_RANGE(0xe0, 0xe3) AM_READWRITE(wd17xx_r, wd17xx_w)
+	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE(WD1793, "wd1793", wd17xx_r, wd17xx_w)
 	AM_RANGE(0xe4, 0xe4) AM_READWRITE(nascom2_fdc_select_r, nascom2_fdc_select_w)
 	AM_RANGE(0xe5, 0xe5) AM_READ(nascom2_fdc_status_r)
 ADDRESS_MAP_END
@@ -313,14 +313,14 @@ static MACHINE_DRIVER_START( nascom2 )
 	MDRV_CPU_REPLACE("main", Z80, XTAL_16MHz/8)
 	MDRV_CPU_IO_MAP(nascom2_io, 0)
 
-	MDRV_MACHINE_START(nascom2)
-
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_SIZE(48 * 8, 16 * 14)
 	MDRV_SCREEN_VISIBLE_AREA(0, 48 * 8 - 1, 0, 16 * 14 - 1)
 	MDRV_GFXDECODE(nascom2)
 	MDRV_VIDEO_UPDATE(nascom2)
+	
+	MDRV_WD1793_ADD("wd1793", nascom2_wd17xx_interface )
 MACHINE_DRIVER_END
 
 

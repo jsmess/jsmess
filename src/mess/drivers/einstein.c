@@ -598,6 +598,7 @@ static WRITE8_HANDLER(einstein_vdp_w)
 static WRITE8_HANDLER(einstein_fdc_w)
 {
 	int reg = offset & 0x03;
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD177X, "wd177x");
 
 	logerror("fdc w: PC: %04x %04x %02x\n",cpu_get_pc(space->machine->cpu[0]),offset,data);
 
@@ -605,25 +606,25 @@ static WRITE8_HANDLER(einstein_fdc_w)
 	{
 		case 0:
 		{
-			wd17xx_command_w(space, reg, data);
+			wd17xx_command_w(fdc, reg, data);
 		}
 		break;
 
 		case 1:
 		{
-			wd17xx_track_w(space, reg, data);
+			wd17xx_track_w(fdc, reg, data);
 		}
 		break;
 
 		case 2:
 		{
-			wd17xx_sector_w(space, reg, data);
+			wd17xx_sector_w(fdc, reg, data);
 		}
 		break;
 
 		case 3:
 		{
-			wd17xx_data_w(space, reg, data);
+			wd17xx_data_w(fdc, reg, data);
 		}
 		break;
 	}
@@ -633,6 +634,7 @@ static WRITE8_HANDLER(einstein_fdc_w)
 static  READ8_HANDLER(einstein_fdc_r)
 {
 	int reg = offset & 0x03;
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD177X, "wd177x");
 
 	logerror("fdc r: PC: %04x %04x\n",cpu_get_pc(space->machine->cpu[0]),offset);
 
@@ -640,25 +642,25 @@ static  READ8_HANDLER(einstein_fdc_r)
 	{
 		case 0:
 		{
-			return wd17xx_status_r(space, reg);
+			return wd17xx_status_r(fdc, reg);
 		}
 		break;
 
 		case 1:
 		{
-			return wd17xx_track_r(space, reg);
+			return wd17xx_track_r(fdc, reg);
 		}
 		break;
 
 		case 2:
 		{
-			return wd17xx_sector_r(space, reg);
+			return wd17xx_sector_r(fdc, reg);
 		}
 		break;
 
 		case 3:
 		{
-			return wd17xx_data_r(space, reg);
+			return wd17xx_data_r(fdc, reg);
 		}
 		break;
 	}
@@ -823,6 +825,8 @@ static void einstein_page_rom(running_machine *machine)
 
 static WRITE8_HANDLER(einstein_drive_w)
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD177X, "wd177x");
+
 	/* bit 4: side select */
 	/* bit 3: select drive 3 */
 	/* bit 2: select drive 2 */
@@ -831,26 +835,26 @@ static WRITE8_HANDLER(einstein_drive_w)
 
 	logerror("drive w: PC: %04x %04x %02x\n",cpu_get_pc(space->machine->cpu[0]),offset,data);
 
-	wd17xx_set_side((data>>4) & 0x01);
+	wd17xx_set_side(fdc,(data>>4) & 0x01);
 
 	if (data & 0x01)
 	{
-		wd17xx_set_drive(0);
+		wd17xx_set_drive(fdc,0);
 	}
 	else
 	if (data & 0x02)
 	{
-		wd17xx_set_drive(1);
+		wd17xx_set_drive(fdc,1);
 	}
 	else
 	if (data & 0x04)
 	{
-		wd17xx_set_drive(2);
+		wd17xx_set_drive(fdc,2);
 	}
 	else
 	if (data & 0x08)
 	{
-		wd17xx_set_drive(3);
+		wd17xx_set_drive(fdc,3);
 	}
 }
 
@@ -1426,7 +1430,6 @@ static const TMS9928a_interface tms9928a_interface =
 static MACHINE_START( einstein )
 {
 	TMS9928A_configure(&tms9928a_interface);
-	wd17xx_init(machine, WD_TYPE_177X, NULL, NULL);
 
 	einstein_z80pio = device_list_find_by_tag( machine->config->devicelist, Z80PIO, "z80pio" );
 }
@@ -1746,6 +1749,8 @@ static MACHINE_DRIVER_START( einstein )
 
 	/* uart */
 	MDRV_DEVICE_ADD("uart", MSM8251)
+	
+	MDRV_WD177X_ADD("wd177x", default_wd17xx_interface )
 MACHINE_DRIVER_END
 
 

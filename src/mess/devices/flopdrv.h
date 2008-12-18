@@ -95,24 +95,26 @@ struct floppy_drive
 	/* index pulse timer */
 	void	*index_timer;
 	/* index pulse callback */
-	void	(*index_pulse_callback)(const device_config *image, int state);
+	void	(*index_pulse_callback)(const device_config *controller,const device_config *image, int state);
 	/* rotation per minute => gives index pulse frequency */
 	float rpm;
 	/* current index pulse value */
 	int index;
 
-	void	(*ready_state_change_callback)(const device_config *img, int state);
+	void	(*ready_state_change_callback)(const device_config *controller,const device_config *img, int state);
 
 	unsigned char id_buffer[4];
 
 	int id_index;
     chrn_id ids[32];
 
+	const device_config *controller;
+	
 	floppy_interface interface_;
 };
 
 /* a callback which will be executed if the ready state of the drive changes e.g. not ready->ready, ready->not ready */
-void floppy_drive_set_ready_state_change_callback(const device_config *img, void (*callback)(const device_config *img, int state));
+void floppy_drive_set_ready_state_change_callback(const device_config *img, void (*callback)(const device_config *controller,const device_config *img, int state));
 
 /* floppy drive types */
 typedef enum
@@ -121,7 +123,7 @@ typedef enum
 	FLOPPY_DRIVE_DS_80
 } floppy_type;
 
-void floppy_drive_set_index_pulse_callback(const device_config *img, void (*callback)(const device_config *image, int state));
+void floppy_drive_set_index_pulse_callback(const device_config *img, void (*callback)(const device_config *controller,const device_config *image, int state));
 
 /* set flag state */
 int floppy_drive_get_flag_state(const device_config *img, int flag);
@@ -164,5 +166,5 @@ int	floppy_drive_get_datarate_in_us(DENSITY density);
 */
 void floppy_drive_set_rpm(const device_config *image, float rpm);
 
-
+void floppy_drive_set_controller(const device_config *img, const device_config *controller);
 #endif /* FLOPDRV_H */

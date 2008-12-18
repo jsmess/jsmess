@@ -270,8 +270,10 @@ static UINT8 to7_5p14_select;
 
 static READ8_HANDLER ( to7_5p14_r )
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD2793, "wd2793");
+	
 	if ( offset < 4 )
-		return wd17xx_r( space, offset );
+		return wd17xx_r( fdc, offset );
 	else if ( offset == 8 )
 		return to7_5p14_select;
 	else
@@ -283,8 +285,9 @@ static READ8_HANDLER ( to7_5p14_r )
 
 static WRITE8_HANDLER( to7_5p14_w )
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD2793, "wd2793");
 	if ( offset < 4 )
-		wd17xx_w( space, offset, data );
+		wd17xx_w( fdc, offset, data );
 	else if ( offset == 8 )
 	{
 		/* drive select */
@@ -304,15 +307,15 @@ static WRITE8_HANDLER( to7_5p14_w )
 
 		dens = (data & 0x80) ? DEN_FM_LO : DEN_MFM_LO;
 		thom_floppy_set_density( dens );
-		wd17xx_set_density( dens );
+		wd17xx_set_density( fdc, dens );
 
 		to7_5p14_select = data;
 
 		if ( drive != -1 )
 		{
 			thom_floppy_active( space->machine, 0 );
-			wd17xx_set_drive( drive );
-			wd17xx_set_side( side );
+			wd17xx_set_drive( fdc, drive );
+			wd17xx_set_side( fdc, side );
 			LOG(( "%f $%04x to7_5p14_w: $%02X set drive=%i side=%i density=%s\n",
 			      attotime_to_double(timer_get_time(space->machine)), cpu_get_previouspc( space->machine->cpu[0] ),
 			      data, drive, side, (dens == DEN_FM_LO) ? "FM" : "MFM" ));
@@ -328,9 +331,10 @@ static WRITE8_HANDLER( to7_5p14_w )
 static void to7_5p14_reset( running_machine *machine )
 {
 	int i;
+	device_config *fdc = (device_config*)device_list_find_by_tag( machine->config->devicelist, WD2793, "wd2793");	
 	LOG(( "to7_5p14_reset: CD 90-640 controller\n" ));
 	thom_floppy_set_density( DEN_MFM_LO );
-	wd17xx_reset(machine);
+	wd17xx_reset(fdc);
 	for ( i = 0; i < device_count( machine, IO_FLOPPY ); i++ )
 	{
 		const device_config * img = image_from_devtype_and_index( IO_FLOPPY, i );
@@ -345,7 +349,6 @@ static void to7_5p14_reset( running_machine *machine )
 static void to7_5p14_init( running_machine *machine )
 {
 	LOG(( "to7_5p14_init: CD 90-640 controller\n" ));
-	wd17xx_init( machine, WD_TYPE_2793, NULL, NULL );
 	state_save_register_global( machine, to7_5p14_select );
 }
 
@@ -424,9 +427,9 @@ static WRITE8_HANDLER( to7_5p14sd_w )
 			   attotime_to_double(timer_get_time(space->machine)), cpu_get_previouspc( space->machine->cpu[0] ), offset, data );
 }
 
-static void to7_5p14_index_pulse_callback( const device_config *device, int index_pulse )
+static void to7_5p14_index_pulse_callback( const device_config *controller,const device_config *image, int state )
 {
-	mc6843_set_index_pulse( devtag_get_device(device->machine, MC6843, "mc6843"), index_pulse );
+	mc6843_set_index_pulse( devtag_get_device(image->machine, MC6843, "mc6843"), state );
 }
 
 static void to7_5p14sd_reset( running_machine *machine )
@@ -525,7 +528,7 @@ static struct
 
 
 
-static void to7_qdd_index_pulse_cb ( const device_config* img, int state )
+static void to7_qdd_index_pulse_cb ( const device_config *controller,const device_config *image, int state )
 {
 	to7qdd->index_pulse = state;
 
@@ -537,7 +540,7 @@ static void to7_qdd_index_pulse_cb ( const device_config* img, int state )
 		to7qdd->data_size = 0;
 	}
 
-	VLOG(( "%f to7_qdd_pulse_cb: state=%i\n", attotime_to_double(timer_get_time(img->machine)), state ));
+	VLOG(( "%f to7_qdd_pulse_cb: state=%i\n", attotime_to_double(timer_get_time(image->machine)), state ));
 }
 
 
@@ -954,15 +957,15 @@ static int thmfc_floppy_is_qdd ( void )
 
 
 
-static void thmfc_floppy_index_pulse_cb ( const device_config *img, int state )
+static void thmfc_floppy_index_pulse_cb ( const device_config *controller,const device_config *image, int state )
 {
-	if ( img != thmfc_floppy_image() )
+	if ( image != thmfc_floppy_image() )
 		return;
 
 	if ( thmfc_floppy_is_qdd() )
 	{
 		/* pulse each time the whole-disk spiraling track ends */
-		floppy_drive_set_rpm( img, 16.92f /* 423/25 */ );
+		floppy_drive_set_rpm( image, 16.92f /* 423/25 */ );
 		thmfc1->ipl = state;
 		if ( state )
 		{
@@ -973,13 +976,13 @@ static void thmfc_floppy_index_pulse_cb ( const device_config *img, int state )
 	}
 	else
 	{
-		floppy_drive_set_rpm( img, 300. );
+		floppy_drive_set_rpm( image, 300. );
 		thmfc1->ipl = state;
 		if ( state  )
 			thmfc1->data_raw_idx = 0;
 	}
 
-	VLOG(( "%f thmfc_floppy_index_pulse_cb: state=%i\n", attotime_to_double(timer_get_time(img->machine)), state ));
+	VLOG(( "%f thmfc_floppy_index_pulse_cb: state=%i\n", attotime_to_double(timer_get_time(image->machine)), state ));
 }
 
 

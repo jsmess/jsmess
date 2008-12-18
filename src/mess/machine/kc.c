@@ -203,13 +203,14 @@ WRITE8_HANDLER(kc85_disc_interface_latch_w)
 
 WRITE8_HANDLER(kc85_disc_hw_terminal_count_w)
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, NEC765A, "nec765");
 	logerror("kc85 disc hw tc w: %02x\n",data);
-	nec765_set_tc_state(space->machine, data & 0x01);
+	nec765_set_tc_state(fdc, data & 0x01);
 }
 
 
 /* callback for /INT output from FDC */
-static void kc85_fdc_interrupt(running_machine *machine, int state)
+static NEC765_INTERRUPT( kc85_fdc_interrupt )
 {
 	kc85_disc_hw_input_gate &=~(1<<6);
 	if (state)
@@ -217,17 +218,19 @@ static void kc85_fdc_interrupt(running_machine *machine, int state)
 }
 
 /* callback for /DRQ output from FDC */
-static void kc85_fdc_dma_drq(running_machine *machine, int state, int read_)
+static NEC765_DMA_REQUEST( kc85_fdc_dma_drq )
 {
 	kc85_disc_hw_input_gate &=~(1<<7);
 	if (state)
 		kc85_disc_hw_input_gate |=(1<<7);
 }
 
-static const struct nec765_interface kc_fdc_interface=
+const nec765_interface kc_fdc_interface=
 {
 	kc85_fdc_interrupt,
-	kc85_fdc_dma_drq
+	kc85_fdc_dma_drq,
+	NULL,
+	NEC765_RDY_PIN_CONNECTED	
 };
 
 static TIMER_CALLBACK(kc85_disk_reset_timer_callback)
@@ -239,8 +242,6 @@ static TIMER_CALLBACK(kc85_disk_reset_timer_callback)
 static void kc_disc_interface_init(running_machine *machine)
 {
 	timer_set(machine, attotime_zero, NULL, 0, kc85_disk_reset_timer_callback);
-
-	nec765_init(machine, &kc_fdc_interface,NEC765A,NEC765_RDY_PIN_CONNECTED);
 
 	/* hold cpu at reset */
 	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);

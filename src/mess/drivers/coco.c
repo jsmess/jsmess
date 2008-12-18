@@ -17,6 +17,7 @@
 #include "machine/6883sam.h"
 #include "includes/coco.h"
 #include "devices/basicdsk.h"
+#include "machine/wd17xx.h"
 #include "machine/6551.h"
 #include "formats/coco_dsk.h"
 #include "formats/coco_cas.h"
@@ -667,6 +668,8 @@ static MACHINE_DRIVER_START( dragon32 )
 	MDRV_SNAPSHOT_ADD(coco_pak, "pak", 0)
 
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
+	
+	MDRV_WD179X_ADD("wd179x", dragon_wd17xx_interface )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dragon64 )
@@ -699,6 +702,8 @@ static MACHINE_DRIVER_START( dragon64 )
 
 	/* acia */
 	MDRV_DEVICE_ADD("acia", ACIA6551)
+	
+	MDRV_WD179X_ADD("wd179x", dragon_wd17xx_interface )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( d64plus )
@@ -731,6 +736,8 @@ static MACHINE_DRIVER_START( d64plus )
 
 	/* acia */
 	MDRV_DEVICE_ADD("acia", ACIA6551)
+	
+	MDRV_WD179X_ADD("wd179x", dragon_wd17xx_interface )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dgnalpha )
@@ -766,6 +773,8 @@ static MACHINE_DRIVER_START( dgnalpha )
 
 	/* acia */
 	MDRV_DEVICE_ADD("acia", ACIA6551)
+	
+	MDRV_WD179X_ADD("wd179x", dgnalpha_wd17xx_interface )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( tanodr64 )
@@ -798,6 +807,8 @@ static MACHINE_DRIVER_START( tanodr64 )
 
 	/* acia */
 	MDRV_DEVICE_ADD("acia", ACIA6551)
+	
+	MDRV_WD1773_ADD("wd1773", coco_wd17xx_interface )	
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco )
@@ -831,6 +842,8 @@ static MACHINE_DRIVER_START( coco )
 
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
+	
+	MDRV_WD1773_ADD("wd1773", coco_wd17xx_interface )	
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco2 )
@@ -864,6 +877,8 @@ static MACHINE_DRIVER_START( coco2 )
 
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
+	
+	MDRV_WD1773_ADD("wd1773", coco_wd17xx_interface )	
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco2b )
@@ -897,6 +912,8 @@ static MACHINE_DRIVER_START( coco2b )
 
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
+	
+	MDRV_WD1773_ADD("wd1773", coco_wd17xx_interface )	
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco3 )

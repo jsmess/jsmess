@@ -39,7 +39,6 @@ extern WRITE8_HANDLER( specimx_disk_ctrl_w );
 
 extern DRIVER_INIT( erik );
 extern MACHINE_RESET( erik );
-extern MACHINE_START( erik );
 
 extern READ8_HANDLER ( erik_rr_reg_r );
 extern WRITE8_HANDLER( erik_rr_reg_w );

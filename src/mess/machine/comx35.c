@@ -143,39 +143,42 @@ DEVICE_IMAGE_LOAD( comx35_floppy )
 	return INIT_FAIL;
 }
 
-static void comx35_fdc_callback(running_machine *machine, wd17xx_state_t event, void *param)
+static WD17XX_CALLBACK( comx35_fdc_callback )
 {
-	comx35_state *state = machine->driver_data;
+	comx35_state *driver_state = device->machine->driver_data;
 
-	switch (event)
+	switch (state)
 	{
 	case WD17XX_IRQ_SET:
-		state->fdc_irq = 1;
+		driver_state->fdc_irq = 1;
 		break;
 
 	case WD17XX_IRQ_CLR:
-		state->fdc_irq = 0;
+		driver_state->fdc_irq = 0;
 		break;
 
 	case WD17XX_DRQ_SET:
-		if (state->fdc_drq_enable)
+		if (driver_state->fdc_drq_enable)
 		{
-			state->cdp1802_ef4 = 1;
+			driver_state->cdp1802_ef4 = 1;
 		}
 		break;
 
 	case WD17XX_DRQ_CLR:
-		if (state->fdc_drq_enable)
+		if (driver_state->fdc_drq_enable)
 		{
-			state->cdp1802_ef4 = 0;
+			driver_state->cdp1802_ef4 = 0;
 		}
 		break;
 	}
 }
 
+const wd17xx_interface comx35_wd17xx_interface = { comx35_fdc_callback, NULL };
+
 static UINT8 fdc_r(const address_space *space)
 {
 	comx35_state *state = space->machine->driver_data;
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD1770, "wd1770");
 
 	UINT8 data;
 
@@ -185,7 +188,7 @@ static UINT8 fdc_r(const address_space *space)
 	}
 	else
 	{
-		data = wd17xx_r(space, state->fdc_addr);
+		data = wd17xx_r(fdc, state->fdc_addr);
 	}
 
 	return data;
@@ -193,6 +196,7 @@ static UINT8 fdc_r(const address_space *space)
 
 static void fdc_w(const address_space *space, UINT8 data)
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD1770, "wd1770");
 	/*
 
 		bit		description
@@ -216,11 +220,11 @@ static void fdc_w(const address_space *space, UINT8 data)
 
 		if (BIT(data, 2))
 		{
-			wd17xx_set_drive(0);
+			wd17xx_set_drive(fdc,0);
 		}		
 		else if (BIT(data, 3))
 		{
-			wd17xx_set_drive(1);
+			wd17xx_set_drive(fdc,1);
 		}
 
 		state->fdc_drq_enable = BIT(data, 4);
@@ -230,13 +234,13 @@ static void fdc_w(const address_space *space, UINT8 data)
 			state->cdp1802_ef4 = 1;
 		}
 
-		wd17xx_set_side(BIT(data, 5));
+		wd17xx_set_side(fdc,BIT(data, 5));
 	}
 	else
 	{
 		// write data to WD1770
 
-		wd17xx_w(space, state->fdc_addr, data);
+		wd17xx_w(fdc, state->fdc_addr, data);
 	}
 }
 
@@ -609,10 +613,6 @@ MACHINE_START( comx35p )
 	/* screen format */
 
 	state->pal_ntsc = CDP1869_PAL;
-
-	/* initialize floppy disc controller */
-
-	wd17xx_init(machine, WD_TYPE_1770, comx35_fdc_callback, NULL);
 
 	/* register for state saving */
 

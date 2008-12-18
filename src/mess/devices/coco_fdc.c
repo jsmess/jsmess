@@ -109,7 +109,7 @@ static fdc_info *fdc_get_info(coco_cartridge *cartridge)
     fdc_callback - callback from the FDC
 -------------------------------------------------*/
 
-static void fdc_callback(running_machine *machine, wd17xx_state_t state, void *param)
+static WD17XX_CALLBACK( fdc_callback )
 {
 	coco_cartridge *cartridge = (coco_cartridge *) param;
 	fdc_info *info = fdc_get_info(cartridge);
@@ -136,6 +136,21 @@ static void fdc_callback(running_machine *machine, wd17xx_state_t state, void *p
 	(*info->update_lines)(cartridge);
 }
 
+extern coco_cartridge *coco_cart;
+
+static WD17XX_PARAM_CALLBACK( get_coco_cart )
+{
+	return coco_cart;
+}
+
+const wd17xx_interface dragon_wd17xx_interface = {
+	fdc_callback,
+	get_coco_cart
+};
+const wd17xx_interface coco_wd17xx_interface = {
+	fdc_callback,
+	get_coco_cart
+};
 
 
 /*-------------------------------------------------
@@ -144,7 +159,6 @@ static void fdc_callback(running_machine *machine, wd17xx_state_t state, void *p
 
 static void fdc_init(running_machine *machine,
 	coco_cartridge *cartridge,
-	wd17xx_type_t type,
 	void (*update_lines)(coco_cartridge *cartridge),
 	int initial_drq)
 {
@@ -156,7 +170,7 @@ static void fdc_init(running_machine *machine,
 	info->drq = initial_drq ? 1 : 0;
 
 	/* initialize FDC */
-	wd17xx_init(machine, type, fdc_callback, (void *) cartridge);
+//	wd17xx_init(machine, type, fdc_callback, (void *) cartridge);
 }
 
 
@@ -216,7 +230,7 @@ static void fdc_coco_update_lines(coco_cartridge *cartridge)
 
 static void fdc_coco_init(coco_cartridge *cartridge)
 {
-	fdc_init(Machine, cartridge, WD_TYPE_1773, fdc_coco_update_lines, 1);
+	fdc_init(Machine, cartridge, fdc_coco_update_lines, 1);
 }
 
 
@@ -228,6 +242,8 @@ static void fdc_coco_init(coco_cartridge *cartridge)
 
 static void fdc_coco_dskreg_w(coco_cartridge *cartridge, UINT8 data)
 {
+	running_machine *machine = Machine;
+	device_config *fdc = (device_config*)device_list_find_by_tag( machine->config->devicelist, WD1773, "wd1773");
 	fdc_info *info = fdc_get_info(cartridge);
 	UINT8 drive = 0;
 	UINT8 head = 0;
@@ -272,9 +288,9 @@ static void fdc_coco_dskreg_w(coco_cartridge *cartridge, UINT8 data)
 
 	(*info->update_lines)(cartridge);
 
-	wd17xx_set_drive(drive);
-	wd17xx_set_side(head);
-	wd17xx_set_density((info->dskreg & 0x20) ? DEN_MFM_LO : DEN_FM_LO);
+	wd17xx_set_drive(fdc,drive);
+	wd17xx_set_side(fdc,head);
+	wd17xx_set_density(fdc,(info->dskreg & 0x20) ? DEN_MFM_LO : DEN_FM_LO);
 }
 
 
@@ -286,21 +302,21 @@ static void fdc_coco_dskreg_w(coco_cartridge *cartridge, UINT8 data)
 static UINT8 fdc_coco_r(coco_cartridge *cartridge, UINT16 addr)
 {
 	running_machine *machine = Machine;
-	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	device_config *fdc = (device_config*)device_list_find_by_tag( machine->config->devicelist, WD1773, "wd1773");
 	UINT8 result = 0;
 	switch(addr & 0xEF)
 	{
 		case 8:
-			result = wd17xx_status_r(space, 0);
+			result = wd17xx_status_r(fdc, 0);
 			break;
 		case 9:
-			result = wd17xx_track_r(space, 0);
+			result = wd17xx_track_r(fdc, 0);
 			break;
 		case 10:
-			result = wd17xx_sector_r(space, 0);
+			result = wd17xx_sector_r(fdc, 0);
 			break;
 		case 11:
-			result = wd17xx_data_r(space, 0);
+			result = wd17xx_data_r(fdc, 0);
 			break;
 	}
 	return result;
@@ -315,7 +331,7 @@ static UINT8 fdc_coco_r(coco_cartridge *cartridge, UINT16 addr)
 static void fdc_coco_w(coco_cartridge *cartridge, UINT16 addr, UINT8 data)
 {
 	running_machine *machine = Machine;
-	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	device_config *fdc = (device_config*)device_list_find_by_tag( machine->config->devicelist, WD1773, "wd1773");
 	switch(addr & 0xEF)
 	{
 		case 0: case 1: case 2: case 3:
@@ -323,16 +339,16 @@ static void fdc_coco_w(coco_cartridge *cartridge, UINT16 addr, UINT8 data)
 			fdc_coco_dskreg_w(cartridge, data);
 			break;
 		case 8:
-			wd17xx_command_w(space, 0, data);
+			wd17xx_command_w(fdc, 0, data);
 			break;
 		case 9:
-			wd17xx_track_w(space, 0, data);
+			wd17xx_track_w(fdc, 0, data);
 			break;
 		case 10:
-			wd17xx_sector_w(space, 0, data);
+			wd17xx_sector_w(fdc, 0, data);
 			break;
 		case 11:
-			wd17xx_data_w(space, 0, data);
+			wd17xx_data_w(fdc, 0, data);
 			break;
 	};
 }
@@ -540,7 +556,7 @@ static void fdc_dragon_update_lines(coco_cartridge *cartridge)
 
 static void fdc_dragon_init(coco_cartridge *cartridge)
 {
-	fdc_init(Machine, cartridge, WD_TYPE_179X, fdc_dragon_update_lines, 0);
+	fdc_init(Machine, cartridge, fdc_dragon_update_lines, 0);
 }
 
 
@@ -552,6 +568,8 @@ static void fdc_dragon_init(coco_cartridge *cartridge)
 
 static void fdc_dragon_dskreg_w(coco_cartridge *cartridge, UINT8 data)
 {
+	running_machine *machine = Machine;
+	device_config *fdc = (device_config*)device_list_find_by_tag( machine->config->devicelist, WD179X, "wd179x");
 	fdc_info *info = fdc_get_info(cartridge);
 
 	if (LOG_FDC)
@@ -569,9 +587,9 @@ static void fdc_dragon_dskreg_w(coco_cartridge *cartridge, UINT8 data)
 	}
 
 	if (data & 0x04)
-		wd17xx_set_drive(data & 0x03);
+		wd17xx_set_drive(fdc,data & 0x03);
 
-	wd17xx_set_density((data & 0x08) ? DEN_FM_LO: DEN_MFM_LO);
+	wd17xx_set_density(fdc,(data & 0x08) ? DEN_FM_LO: DEN_MFM_LO);
 	info->dskreg = data;
 }
 
@@ -584,21 +602,21 @@ static void fdc_dragon_dskreg_w(coco_cartridge *cartridge, UINT8 data)
 static UINT8 fdc_dragon_r(coco_cartridge *cartridge, UINT16 addr)
 {
 	running_machine *machine = Machine;
-	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	device_config *fdc = (device_config*)device_list_find_by_tag( machine->config->devicelist, WD179X, "wd179x");
 	UINT8 result = 0;
 	switch(addr & 0xEF)
 	{
 		case 0:
-			result = wd17xx_status_r(space, 0);
+			result = wd17xx_status_r(fdc, 0);
 			break;
 		case 1:
-			result = wd17xx_track_r(space, 0);
+			result = wd17xx_track_r(fdc, 0);
 			break;
 		case 2:
-			result = wd17xx_sector_r(space, 0);
+			result = wd17xx_sector_r(fdc, 0);
 			break;
 		case 3:
-			result = wd17xx_data_r(space, 0);
+			result = wd17xx_data_r(fdc, 0);
 			break;
 	}
 	return result;
@@ -613,25 +631,25 @@ static UINT8 fdc_dragon_r(coco_cartridge *cartridge, UINT16 addr)
 static void fdc_dragon_w(coco_cartridge *cartridge, UINT16 addr, UINT8 data)
 {
 	running_machine *machine = Machine;
-	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	device_config *fdc = (device_config*)device_list_find_by_tag( machine->config->devicelist, WD179X, "wd179x");
 	switch(addr & 0xEF)
 	{
 		case 0:
-			wd17xx_command_w(space, 0, data);
+			wd17xx_command_w(fdc, 0, data);
 
 			/* disk head is encoded in the command byte */
 			/* Only for type 3 & 4 commands */
 			if (data & 0x80)
-				wd17xx_set_side((data & 0x02) ? 1 : 0);
+				wd17xx_set_side(fdc,(data & 0x02) ? 1 : 0);
 			break;
 		case 1:
-			wd17xx_track_w(space, 0, data);
+			wd17xx_track_w(fdc, 0, data);
 			break;
 		case 2:
-			wd17xx_sector_w(space, 0, data);
+			wd17xx_sector_w(fdc, 0, data);
 			break;
 		case 3:
-			wd17xx_data_w(space, 0, data);
+			wd17xx_data_w(fdc, 0, data);
 			break;
 		case 8: case 9: case 10: case 11:
 		case 12: case 13: case 14: case 15:

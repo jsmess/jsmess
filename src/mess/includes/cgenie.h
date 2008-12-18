@@ -7,6 +7,7 @@
 #ifndef CGENIE_H_
 #define CGENIE_H_
 
+#include "machine/wd17xx.h"
 
 /*----------- defined in audio/cgenie.c -----------*/
 
@@ -19,6 +20,7 @@ READ8_HANDLER ( cgenie_sh_data_port_r );
 /*----------- defined in machine/cgenie.c -----------*/
 
 extern UINT8 *cgenie_fontram;
+extern const wd17xx_interface cgenie_wd17xx_interface;
 
 DEVICE_IMAGE_LOAD( cgenie_floppy );
 

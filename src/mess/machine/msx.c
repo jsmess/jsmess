@@ -295,7 +295,6 @@ static const TMS9928a_interface tms9928a_interface =
 	msx_vdp_interrupt
 };
 
-static void msx_wd179x_int (running_machine *machine, wd17xx_state_t state, void *param);
 
 MACHINE_START( msx )
 {
@@ -305,8 +304,8 @@ MACHINE_START( msx )
 
 MACHINE_START( msx2 )
 {
-	wd17xx_init (machine, WD_TYPE_179X, msx_wd179x_int, NULL);
-	wd17xx_set_density (DEN_FM_HI);
+	device_config *fdc = (device_config*)device_list_find_by_tag( machine->config->devicelist, WD179X, "wd179x");
+	wd17xx_set_density (fdc,DEN_FM_HI);
 	msx1.dsk_stat = 0x7f;
 }
 
@@ -634,7 +633,7 @@ set on 7FFDH bit 2 always to 0 (some use it as disk change reset)
 
 */
 
-static void msx_wd179x_int (running_machine *machine, wd17xx_state_t state, void *param)
+static WD17XX_CALLBACK( msx_wd179x_int )
 {
 	switch (state)
 	{
@@ -645,6 +644,7 @@ static void msx_wd179x_int (running_machine *machine, wd17xx_state_t state, void
 	}
 }
 
+const wd17xx_interface msx_wd17xx_interface = { msx_wd179x_int, NULL };
 
 DEVICE_IMAGE_LOAD( msx_floppy )
 {

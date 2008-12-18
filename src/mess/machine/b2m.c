@@ -233,14 +233,15 @@ const ppi8255_interface b2m_ppi8255_interface_1 =
 static WRITE8_DEVICE_HANDLER (b2m_ext_8255_portc_w )
 {		
 	UINT8 drive = ((data >> 1) & 1) ^ 1;
-	UINT8 side  = (data  & 1) ^ 1;
+	UINT8 side  = (data  & 1) ^ 1;	
+	device_config *fdc = (device_config*)device_list_find_by_tag( device->machine->config->devicelist, WD1793, "wd1793");
 	
 	if (b2m_drive!=drive) {
-		wd17xx_set_drive(drive);
+		wd17xx_set_drive(fdc,drive);
 		b2m_drive = drive;
 	}
 	if (b2m_side!=side) {
-		wd17xx_set_side(side);
+		wd17xx_set_side(fdc,side);
 		b2m_side = side;
 	}
 }
@@ -329,8 +330,7 @@ READ8_HANDLER ( b2m_localmachine_r )
 
 MACHINE_START(b2m)
 {
-	wd17xx_init(machine, WD_TYPE_1793, NULL , NULL);	
-	wd17xx_set_pause_time(10);
+	wd17xx_set_pause_time((device_config*)device_list_find_by_tag( machine->config->devicelist, WD1793, "wd1793"),10);
 }
 
 static IRQ_CALLBACK(b2m_irq_callback)
@@ -353,13 +353,9 @@ INTERRUPT_GEN (b2m_vblank_interrupt)
 MACHINE_RESET(b2m)
 {	
 	b2m_sound_input = 0;
-	
-	wd17xx_reset(machine);
-	
+		
 	b2m_side = 0;
 	b2m_drive = 0;
-	wd17xx_set_side(0);
-	wd17xx_set_drive(0);
 
 	cpu_set_irq_callback(machine->cpu[0], b2m_irq_callback);
 	b2m_set_bank(machine,7);

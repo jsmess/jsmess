@@ -8,14 +8,16 @@
 #define NASCOM1_H_
 
 #include "devices/snapquik.h"
+#include "machine/wd17xx.h"
 
 
 /*----------- defined in machine/nascom1.c -----------*/
 
+extern const wd17xx_interface nascom2_wd17xx_interface;
+
 DRIVER_INIT( nascom1 );
 DEVICE_IMAGE_LOAD( nascom1_cassette );
 DEVICE_IMAGE_UNLOAD( nascom1_cassette );
-MACHINE_START( nascom2 );
 SNAPSHOT_LOAD( nascom1 );
 
 READ8_HANDLER( nascom2_fdc_select_r );

@@ -552,6 +552,8 @@ static MACHINE_DRIVER_START(ti99_4_60hz)
 	/* tms9902 */
 	MDRV_TMS9902_ADD("tms9902_0", tms9902_params_0)
 	MDRV_TMS9902_ADD("tms9902_1", tms9902_params_1)		
+	
+	MDRV_WD179X_ADD("wd179x", ti99_wd17xx_interface )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START(ti99_4_50hz)
@@ -598,6 +600,8 @@ static MACHINE_DRIVER_START(ti99_4_50hz)
 	/* tms9902 */
 	MDRV_TMS9902_ADD("tms9902_0", tms9902_params_0)
 	MDRV_TMS9902_ADD("tms9902_1", tms9902_params_1)		
+	
+	MDRV_WD179X_ADD("wd179x", ti99_wd17xx_interface )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START(ti99_4a_60hz)
@@ -645,6 +649,8 @@ static MACHINE_DRIVER_START(ti99_4a_60hz)
 	/* tms9902 */
 	MDRV_TMS9902_ADD("tms9902_0", tms9902_params_0)
 	MDRV_TMS9902_ADD("tms9902_1", tms9902_params_1)		
+	
+	MDRV_WD179X_ADD("wd179x", ti99_wd17xx_interface )	
 MACHINE_DRIVER_END
 
 
@@ -692,6 +698,8 @@ static MACHINE_DRIVER_START(ti99_4a_50hz)
 	/* tms9902 */
 	MDRV_TMS9902_ADD("tms9902_0", tms9902_params_0)
 	MDRV_TMS9902_ADD("tms9902_1", tms9902_params_1)	
+	
+	MDRV_WD179X_ADD("wd179x", ti99_wd17xx_interface )
 MACHINE_DRIVER_END
 
 
@@ -746,7 +754,9 @@ static MACHINE_DRIVER_START(ti99_4ev_60hz)
 	MDRV_TMS9901_ADD("tms9901", tms9901reset_param_ti99_4x)
 	/* tms9902 */
 	MDRV_TMS9902_ADD("tms9902_0", tms9902_params_0)
-	MDRV_TMS9902_ADD("tms9902_1", tms9902_params_1)		
+	MDRV_TMS9902_ADD("tms9902_1", tms9902_params_1)
+	
+	MDRV_WD179X_ADD("wd179x", ti99_wd17xx_interface )		
 MACHINE_DRIVER_END
 
 

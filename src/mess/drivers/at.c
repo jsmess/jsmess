@@ -470,6 +470,8 @@ static MACHINE_DRIVER_START( ibm5170 )
 
 	/* harddisk */
 	MDRV_IMPORT_FROM( pc_hdc )
+	
+	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
 MACHINE_DRIVER_END
 
 
@@ -523,6 +525,8 @@ static MACHINE_DRIVER_START( ibm5162 )
 
 	/* harddisk */
 	MDRV_IMPORT_FROM( pc_hdc )
+	
+	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
 MACHINE_DRIVER_END
 
 
@@ -583,6 +587,8 @@ static MACHINE_DRIVER_START( ps2m30286 )
 
 	/* harddisk */
 	MDRV_IMPORT_FROM( pc_hdc )
+	
+	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
 MACHINE_DRIVER_END
 
 
@@ -645,6 +651,8 @@ static MACHINE_DRIVER_START( atvga )
 
 	/* harddisk */
 	MDRV_IMPORT_FROM( pc_hdc )
+	
+	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
 MACHINE_DRIVER_END
 
 
@@ -704,6 +712,8 @@ static MACHINE_DRIVER_START( at386 )
 
 	/* harddisk */
 	MDRV_IMPORT_FROM( pc_hdc )
+	
+	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
 MACHINE_DRIVER_END
 
 

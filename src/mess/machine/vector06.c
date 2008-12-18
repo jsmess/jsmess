@@ -171,8 +171,9 @@ static TIMER_CALLBACK(reset_check_callback)
 
 WRITE8_HANDLER(vector_disc_w)
 {
-	wd17xx_set_side (((data & 4) >> 2) ^ 1);
- 	wd17xx_set_drive(data & 1);					
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD1793, "wd1793");
+	wd17xx_set_side (fdc,((data & 4) >> 2) ^ 1);
+ 	wd17xx_set_drive(fdc,data & 1);					
 }
 
 DEVICE_IMAGE_LOAD( vector_floppy )
@@ -204,8 +205,8 @@ DEVICE_IMAGE_LOAD( vector_floppy )
 
 MACHINE_START( vector06 )
 {
-	wd17xx_init(machine, WD_TYPE_1793, NULL , NULL);
-	wd17xx_set_density (DEN_FM_HI);
+	device_config *fdc = (device_config*)device_list_find_by_tag( machine->config->devicelist, WD1793, "wd1793");
+	wd17xx_set_density (fdc, DEN_FM_HI);
 }
 
 MACHINE_RESET( vector06 )
@@ -227,7 +228,4 @@ MACHINE_RESET( vector06 )
 	vector_color_index = 0;
 	vector_video_mode = 0;
 	timer_pulse(machine, ATTOTIME_IN_HZ(50), NULL, 0, reset_check_callback);
-	
-	wd17xx_reset(machine);
-	wd17xx_set_pause_time(0);
 }

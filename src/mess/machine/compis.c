@@ -289,53 +289,59 @@ static void compis_keyb_init(void)
 /*-------------------------------------------------------------------------*/
 static void compis_fdc_reset(running_machine *machine)
 {
-	nec765_reset(machine, 0);
+	device_config *fdc = (device_config*)device_list_find_by_tag( machine->config->devicelist, NEC765A, "nec765");		
+	
+	nec765_reset(fdc, 0);
 
 	/* set FDC at reset */
-	nec765_set_reset_state(machine, 1);
+	nec765_set_reset_state(fdc, 1);
 }
 
 static void compis_fdc_tc(running_machine *machine, int state)
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( machine->config->devicelist, NEC765A, "nec765");
 	/* Terminal count if iSBX-218A has DMA enabled */
   	if (input_port_read(machine, "DSW1"))
 	{
-		nec765_set_tc_state(machine, state);
+		nec765_set_tc_state(fdc, state);
 	}
 }
 
-static void compis_fdc_int(running_machine *machine,int state)
+static NEC765_INTERRUPT( compis_fdc_int )
 {
 	/* No interrupt requests if iSBX-218A has DMA enabled */
-  	if (!input_port_read(machine, "DSW1") && state)
+  	if (!input_port_read(device->machine, "DSW1") && state)
 	{
 		compis_osp_pic_irq(COMPIS_IRQ_SBX0_INT1);
 	}
 }
 
-static void compis_fdc_dma_drq(running_machine *machine,int state, int read)
+static NEC765_DMA_REQUEST( compis_fdc_dma_drq )
 {
 	/* DMA requst if iSBX-218A has DMA enabled */
-  	if (input_port_read(machine, "DSW1") && state)
+  	if (input_port_read(device->machine, "DSW1") && state)
 	{
 		//compis_dma_drq(state, read);
 	}
 }
 
-static const nec765_interface compis_fdc_interface =
+const nec765_interface compis_fdc_interface =
 {
 	compis_fdc_int,
-	compis_fdc_dma_drq
+	compis_fdc_dma_drq,
+	NULL,
+	NEC765_RDY_PIN_CONNECTED
 };
 
 READ16_HANDLER (compis_fdc_dack_r)
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, NEC765A, "nec765");
 	UINT16 data;
-	data = 0xffff;
+	data = 0xffff;	
 	/* DMA acknowledge if iSBX-218A has DMA enabled */
   	if (input_port_read(space->machine, "DSW1"))
   	{
-		data = nec765_dack_r(space, 0);
+		data = nec765_dack_r(fdc, 0);
 	}
 
 	return data;
@@ -343,10 +349,11 @@ READ16_HANDLER (compis_fdc_dack_r)
 
 WRITE16_HANDLER (compis_fdc_w)
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, NEC765A, "nec765");
 	switch(offset)
 	{
 		case 2:
-			nec765_data_w(space, 0, data);
+			nec765_data_w(fdc, 0, data);
 			break;
 		default:
 			logerror("FDC Unknown Port Write %04X = %04X\n", offset, data);
@@ -356,15 +363,16 @@ WRITE16_HANDLER (compis_fdc_w)
 
 READ16_HANDLER (compis_fdc_r)
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, NEC765A, "nec765");
 	UINT16 data;
 	data = 0xffff;
 	switch(offset)
 	{
 		case 0:
-			data = nec765_status_r(space, 0);
+			data = nec765_status_r(fdc, 0);
 			break;
 		case 1:
-			data = nec765_data_r(space, 0);
+			data = nec765_data_r(fdc, 0);
 			break;
 		default:
 			logerror("FDC Unknown Port Read %04X\n", offset);
@@ -1545,7 +1553,6 @@ MACHINE_RESET( compis )
 	compis_cpu_init(machine);
 
 	/* FDC */
-	nec765_init(machine, &compis_fdc_interface, NEC765A, NEC765_RDY_PIN_CONNECTED);
 	compis_fdc_reset(machine);
 
 	/* Keyboard */

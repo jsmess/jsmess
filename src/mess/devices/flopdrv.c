@@ -57,6 +57,8 @@ void floppy_drive_init(const device_config *img, const floppy_interface *iface)
 	/* default RPM */
 	pDrive->rpm = 300;
 
+	pDrive->controller = NULL;
+	
 	floppy_drive_set_disk_image_interface(img, iface);
 }
 
@@ -81,7 +83,7 @@ static void floppy_drive_index_func(const device_config *img)
 	}
 
 	if (pDrive->index_pulse_callback)
-		pDrive->index_pulse_callback(img, pDrive->index);
+		pDrive->index_pulse_callback(pDrive->controller, img, pDrive->index);
 }
 
 
@@ -95,14 +97,14 @@ static TIMER_CALLBACK(floppy_drive_index_callback)
 
 
 /* set the callback for the index pulse */
-void floppy_drive_set_index_pulse_callback(const device_config *img, void (*callback)(const device_config *image, int state))
+void floppy_drive_set_index_pulse_callback(const device_config *img, void (*callback)(const device_config *controller,const device_config *image, int state))
 {
 	struct floppy_drive *pDrive = get_drive(img);
 	pDrive->index_pulse_callback = callback;
 }
 
 
-void floppy_drive_set_ready_state_change_callback(const device_config *img, void (*callback)(const device_config *img, int state))
+void floppy_drive_set_ready_state_change_callback(const device_config *img, void (*callback)(const device_config *controller,const device_config *img, int state))
 {
 	struct floppy_drive *pDrive = get_drive(img);
 	pDrive->ready_state_change_callback = callback;
@@ -169,7 +171,7 @@ void floppy_drive_set_flag_state(const device_config *img, int flag, int state)
 		{
 			/* trigger state change callback */
 			if (drv->ready_state_change_callback)
-				drv->ready_state_change_callback(img, new_state);
+				drv->ready_state_change_callback(drv->controller, img, new_state);
 		}
 	}
 }
@@ -510,3 +512,10 @@ void floppy_drive_set_rpm(const device_config *img, float rpm)
 	struct floppy_drive *drv = get_drive(img);
 	drv->rpm = rpm;
 }
+
+void floppy_drive_set_controller(const device_config *img, const device_config *controller)
+{
+	struct floppy_drive *drv = get_drive(img);
+	drv->controller = controller;
+}
+

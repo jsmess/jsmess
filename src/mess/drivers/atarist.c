@@ -44,6 +44,7 @@ static UINT8 acia_midi_rx = 1, acia_midi_tx = 1;
 
 static void atarist_fdc_dma_transfer(running_machine *machine)
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( machine->config->devicelist, WD1772, "wd1772");
 	const address_space *program = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
 	atarist_state *state = machine->driver_data;
 
@@ -55,11 +56,11 @@ static void atarist_fdc_dma_transfer(running_machine *machine)
 			{
 				UINT8 data = memory_read_byte_8be(program, state->fdc_dmabase);
 
-				wd17xx_data_w(program, 0, data);
+				wd17xx_data_w(fdc, 0, data);
 			}
 			else
 			{
-				UINT8 data = wd17xx_data_r(program, 0);
+				UINT8 data = wd17xx_data_r(fdc, 0);
 
 				memory_write_byte_8be(program, state->fdc_dmabase, data);
 			}
@@ -84,34 +85,37 @@ static void atarist_fdc_dma_transfer(running_machine *machine)
 	}
 }
 
-static void atarist_fdc_callback(running_machine *machine, wd17xx_state_t event, void *param)
+static WD17XX_CALLBACK( atarist_fdc_callback )
 {
-	atarist_state *state = machine->driver_data;
+	atarist_state *driver_state = device->machine->driver_data;
 
-	switch (event)
+	switch (state)
 	{
 	case WD17XX_IRQ_SET:
-		state->fdc_irq = 1;
+		driver_state->fdc_irq = 1;
 		break;
 
 	case WD17XX_IRQ_CLR:
-		state->fdc_irq = 0;
+		driver_state->fdc_irq = 0;
 		break;
 
 	case WD17XX_DRQ_SET:
-		state->fdc_status |= ATARIST_FLOPPY_STATUS_FDC_DATA_REQUEST;
-		atarist_fdc_dma_transfer(machine);
+		driver_state->fdc_status |= ATARIST_FLOPPY_STATUS_FDC_DATA_REQUEST;
+		atarist_fdc_dma_transfer(device->machine);
 		break;
 
 	case WD17XX_DRQ_CLR:
-		state->fdc_status &= ~ATARIST_FLOPPY_STATUS_FDC_DATA_REQUEST;
+		driver_state->fdc_status &= ~ATARIST_FLOPPY_STATUS_FDC_DATA_REQUEST;
 		break;
 	}
 }
 
+const wd17xx_interface atarist_wd17xx_interface = { atarist_fdc_callback, NULL };
+
 static READ16_HANDLER( atarist_fdc_data_r )
 {
 	atarist_state *state = space->machine->driver_data;
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD1772, "wd1772");
 
 	if (state->fdc_mode & ATARIST_FLOPPY_MODE_SECTOR_COUNT)
 	{
@@ -128,7 +132,7 @@ static READ16_HANDLER( atarist_fdc_data_r )
 		}
 		else
 		{
-			return wd17xx_r(space, (state->fdc_mode & ATARIST_FLOPPY_MODE_ADDRESS_MASK) >> 1);
+			return wd17xx_r(fdc, (state->fdc_mode & ATARIST_FLOPPY_MODE_ADDRESS_MASK) >> 1);
 		}
 	}
 }
@@ -136,7 +140,8 @@ static READ16_HANDLER( atarist_fdc_data_r )
 static WRITE16_HANDLER( atarist_fdc_data_w )
 {
 	atarist_state *state = space->machine->driver_data;
-
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD1772, "wd1772");
+	
 	if (state->fdc_mode & ATARIST_FLOPPY_MODE_SECTOR_COUNT)
 	{
 		if (data == 0)
@@ -159,7 +164,7 @@ static WRITE16_HANDLER( atarist_fdc_data_w )
 		}
 		else
 		{
-			wd17xx_w(space, (state->fdc_mode & ATARIST_FLOPPY_MODE_ADDRESS_MASK) >> 1, data);
+			wd17xx_w(fdc, (state->fdc_mode & ATARIST_FLOPPY_MODE_ADDRESS_MASK) >> 1, data);
 		}
 	}
 }
@@ -1278,16 +1283,17 @@ INPUT_PORTS_END
 
 static WRITE8_HANDLER( ym2149_port_a_w )
 {
-	wd17xx_set_side(BIT(data, 0) ? 0 : 1);
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD1772, "wd1772");
+	wd17xx_set_side(fdc, BIT(data, 0) ? 0 : 1);
 
 	if (!BIT(data, 1))
 	{
-		wd17xx_set_drive(0);
+		wd17xx_set_drive(fdc,0);
 	}
 
 	if (!BIT(data, 2))
 	{
-		wd17xx_set_drive(1);
+		wd17xx_set_drive(fdc,1);
 	}
 
 	// 0x08 = RTS
@@ -1494,7 +1500,6 @@ static MACHINE_START( atarist )
 
 	/* configure devices */
 	centronics_config(0, atarist_centronics_config);
-	wd17xx_init(machine, WD_TYPE_1772, atarist_fdc_callback, NULL);
 
 	/* set CPU interrupt callback */
 	cpu_set_irq_callback(machine->cpu[0], atarist_int_ack);
@@ -1590,8 +1595,7 @@ static MACHINE_START( atariste )
 
 	/* configure devices */
 	centronics_config(0, atarist_centronics_config);
-	wd17xx_init(machine, WD_TYPE_1772, atarist_fdc_callback, NULL);
-
+	
 	/* set CPU interrupt callback */
 	cpu_set_irq_callback(machine->cpu[0], atarist_int_ack);
 
@@ -1649,16 +1653,17 @@ static void stbook_configure_memory(running_machine *machine)
 
 static WRITE8_HANDLER( stbook_ym2149_port_a_w )
 {
-	wd17xx_set_side((data & 0x01) ? 0 : 1);
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD1772, "wd1772");
+	wd17xx_set_side(fdc,(data & 0x01) ? 0 : 1);
 
 	if (!(data & 0x02))
 	{
-		wd17xx_set_drive(0);
+		wd17xx_set_drive(fdc,0);
 	}
 
 	if (!(data & 0x04))
 	{
-		wd17xx_set_drive(1);
+		wd17xx_set_drive(fdc,1);
 	}
 
 	// 0x08 = RTS
@@ -1744,7 +1749,6 @@ static MACHINE_START( stbook )
 
 	/* configure devices */
 	centronics_config(0, atarist_centronics_config);
-	wd17xx_init(machine, WD_TYPE_1772, atarist_fdc_callback, NULL);
 	rp5c15_init(machine, &rtc_intf);
 
 	/* set CPU interrupt callback */
@@ -1805,6 +1809,8 @@ static MACHINE_DRIVER_START( atarist )
 	MDRV_DEVICE_CONFIG(acia_ikbd_intf)
 	MDRV_DEVICE_ADD("acia_1", ACIA6850)
 	MDRV_DEVICE_CONFIG(acia_midi_intf)
+	
+	MDRV_WD1772_ADD("wd1772", atarist_wd17xx_interface )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( megast )
@@ -1866,6 +1872,8 @@ static MACHINE_DRIVER_START( atariste )
 	MDRV_DEVICE_CONFIG(acia_ikbd_intf)
 	MDRV_DEVICE_ADD("acia_1", ACIA6850)
 	MDRV_DEVICE_CONFIG(acia_midi_intf)
+	
+	MDRV_WD1772_ADD("wd1772", atarist_wd17xx_interface )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( megaste )
@@ -1919,6 +1927,8 @@ static MACHINE_DRIVER_START( stbook )
 	MDRV_DEVICE_CONFIG(stbook_acia_ikbd_intf)
 	MDRV_DEVICE_ADD("acia_1", ACIA6850)
 	MDRV_DEVICE_CONFIG(acia_midi_intf)
+	
+	MDRV_WD1772_ADD("wd1772", atarist_wd17xx_interface )
 MACHINE_DRIVER_END
 
 /* ROMs */

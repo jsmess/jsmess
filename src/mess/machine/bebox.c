@@ -426,14 +426,18 @@ static const device_config *bebox_fdc_get_image(int floppy_index)
 	return image_from_devtype_and_index(IO_FLOPPY, 0);
 }
 
+static device_config * bebox_get_device(running_machine *machine )
+{
+	return (device_config*)device_list_find_by_tag( machine->config->devicelist, SMC37C78, "smc37c78");	
+}
+
 
 static const struct pc_fdc_interface bebox_fdc_interface =
 {
-	SMC37C78,
-	NEC765_RDY_PIN_CONNECTED,
 	bebox_fdc_interrupt,
 	bebox_fdc_dma_drq,
-	bebox_fdc_get_image
+	bebox_fdc_get_image,
+	bebox_get_device
 };
 
 

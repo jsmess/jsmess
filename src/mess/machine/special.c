@@ -246,8 +246,8 @@ const struct pit8253_config specimx_pit8253_intf =
 
 MACHINE_START( specimx )
 {
-	wd17xx_init(machine, WD_TYPE_1793, NULL , NULL);
-	wd17xx_set_density (DEN_FM_HI);
+	device_config *fdc = (device_config*)device_list_find_by_tag( machine->config->devicelist, WD1793, "wd1793");
+	wd17xx_set_density (fdc,DEN_FM_HI);
 }
 
 static TIMER_CALLBACK( setup_pit8253_gates ) {
@@ -262,8 +262,6 @@ MACHINE_RESET( specimx )
 {
 	specimx_set_bank(machine, 2,0x00); // Initiali load ROM disk
 	specimx_color = 0x70;	
-	wd17xx_reset(machine);
-	wd17xx_set_side(0);
 	timer_set(machine,  attotime_zero, NULL, 0, setup_pit8253_gates );
 }
 
@@ -274,13 +272,14 @@ READ8_HANDLER ( specimx_disk_ctrl_r )
 
 WRITE8_HANDLER( specimx_disk_ctrl_w )
 {	
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD1793, "wd1793");
 
 	switch(offset) {  				
 		case 2 :						
-		 		wd17xx_set_side(data & 1);							
+		 		wd17xx_set_side(fdc,data & 1);							
 				break;			
 		case 3 :				
-		 		wd17xx_set_drive(data & 1);				
+		 		wd17xx_set_drive(fdc,data & 1);				
 		 		break;
 			
   }  
@@ -403,15 +402,8 @@ DRIVER_INIT(erik)
 	erik_background = 0;
 }
 
-MACHINE_START( erik )
-{
-	wd17xx_init(machine, WD_TYPE_1793, NULL , NULL);
-}
-
 MACHINE_RESET( erik )
 {
-	wd17xx_reset(machine);		
-	
 	RR_register = 0x00;	
 	RC_register = 0x00;
 	erik_set_bank(machine);				
@@ -446,11 +438,13 @@ READ8_HANDLER ( erik_disk_reg_r ) {
 }
 
 WRITE8_HANDLER( erik_disk_reg_w ) {
-	wd17xx_set_side (data & 1);	
-	wd17xx_set_drive((data >> 1) & 1);
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD1793, "wd1793");
+	
+	wd17xx_set_side (fdc,data & 1);	
+	wd17xx_set_drive(fdc,(data >> 1) & 1);
 	if((data >>2) & 1) {
-		wd17xx_set_density (DEN_FM_LO);
+		wd17xx_set_density (fdc,DEN_FM_LO);
 	} else {
-		wd17xx_set_density (DEN_FM_HI);
+		wd17xx_set_density (fdc,DEN_FM_HI);
   }	
 }

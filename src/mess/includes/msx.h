@@ -7,6 +7,7 @@
 #ifndef MSX_H_
 #define MSX_H_
 
+#include "machine/wd17xx.h"
 
 #define MSX_MAX_CARTS	(2)
 
@@ -48,7 +49,7 @@ typedef struct {
 
 extern MSX msx1;
 extern const ppi8255_interface msx_ppi8255_interface;
-
+extern const wd17xx_interface msx_wd17xx_interface;
 /* start/stop functions */
 extern DRIVER_INIT( msx );
 extern MACHINE_START( msx );

@@ -93,6 +93,10 @@ Source Changes:
 
 - Changed the I8271 implementation to be a device.  [Miodrag Milanovic]
 
+- Changed the WD17XX implementation to be a device.  [Miodrag Milanovic]
+
+- Changed the NEC765 implementation to be a device.  [Miodrag Milanovic]
+
 - Various code cleanups.  [Atari Ace]
 
 - Fixed regression that could cause hanging when creating an image from the

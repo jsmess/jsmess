@@ -33,11 +33,21 @@ typedef enum
 	NEC765_EXECUTION_PHASE_WRITE
 } NEC765_PHASE;
 
+/* supported versions */
+typedef enum
+{
+	TYPE_NEC765A = 0,
+	TYPE_NEC765B = 1,
+	TYPE_SMC37C78 = 2,
+	TYPE_NEC72065 = 3
+} NEC765_VERSION;
+
+
 /* uncomment the following line for verbose information */
 #define LOG_VERBOSE		1
-#define LOG_COMMAND		0
-#define LOG_EXTRA		0
-#define LOG_INTERRUPT	0
+#define LOG_COMMAND		1
+#define LOG_EXTRA		1
+#define LOG_INTERRUPT	1
 
 /* uncomment this to not allow end of cylinder "error" */
 #define NO_END_OF_CYLINDER
@@ -63,7 +73,8 @@ typedef enum
 
 #define NEC765_RESET 0x080
 
-typedef struct nec765
+typedef struct _nec765_t nec765_t;
+struct _nec765_t
 {
 	unsigned long	sector_counter;
 	/* version of fdc to emulate */
@@ -117,23 +128,19 @@ typedef struct nec765
 	int timer_type;
 
 	emu_timer *command_timer;
-} NEC765;
+	
+	char *data_buffer;
+	const nec765_interface *intf;
+};
 
 //static void nec765_setup_data_request(unsigned char Data);
-static void nec765_setup_command(running_machine *machine);
+static void nec765_setup_command(const device_config *device);
 static TIMER_CALLBACK(nec765_continue_command);
-static int nec765_sector_count_complete(running_machine *machine);
-static void nec765_increment_sector(running_machine *machine);
-static void nec765_update_state(running_machine *machine);
-static void nec765_set_dma_drq(running_machine *machine,int state);
-static void nec765_set_int(running_machine *machine,int state);
-
-static NEC765 fdc;
-static char nec765_data_buffer[32*1024];
-
-
-static nec765_interface nec765_iface;
-
+static int nec765_sector_count_complete(const device_config *device);
+static void nec765_increment_sector(const device_config *device);
+static void nec765_update_state(const device_config *device);
+static void nec765_set_dma_drq(const device_config *device,int state);
+static void nec765_set_int(const device_config *device,int state);
 
 static const INT8 nec765_cmd_size[32] =
 {
@@ -141,49 +148,58 @@ static const INT8 nec765_cmd_size[32] =
 	1,9,1,1,1,1,9,1,1,9,1,1,1,9,1,1
 };
 
+INLINE nec765_t *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
 
+	return (nec765_t *)device->token;
+}
 
-static const device_config *current_image(running_machine *machine)
+static const device_config *current_image(const device_config *device)
 {
 	const device_config *image = NULL;
+	nec765_t *fdc = get_safe_token(device);
 
-	if (!nec765_iface.get_image)
+	if (!fdc->intf->get_image)
 	{
-		if (fdc.drive < device_count(machine, IO_FLOPPY))
-			image = image_from_devtype_and_index(IO_FLOPPY, fdc.drive);
+		if (fdc->drive < device_count(device->machine, IO_FLOPPY))
+			image = image_from_devtype_and_index(IO_FLOPPY, fdc->drive);
 	}
 	else
 	{
-		image = nec765_iface.get_image(machine, fdc.drive);
+		image = fdc->intf->get_image(device, fdc->drive);
 	}
 	return image;
 }
 
-static void nec765_setup_drive_and_side(void)
+static void nec765_setup_drive_and_side(const device_config *device)
 {
+	nec765_t *fdc = get_safe_token(device);
 	/* drive index nec765 sees */
-	fdc.drive = fdc.nec765_command_bytes[1] & 0x03;
+	fdc->drive = fdc->nec765_command_bytes[1] & 0x03;
 	/* side index nec765 sees */
-	fdc.side = (fdc.nec765_command_bytes[1]>>2) & 0x01;
+	fdc->side = (fdc->nec765_command_bytes[1]>>2) & 0x01;
 }
 
 
 /* setup status register 0 based on data in status register 1 and 2 */
-static void nec765_setup_st0(void)
+static void nec765_setup_st0(const device_config *device)
 {
+	nec765_t *fdc = get_safe_token(device);
 	/* clear completition status bits, drive bits and side bits */
-	fdc.nec765_status[0] &= ~((1<<7) | (1<<6) | (1<<2) | (1<<1) | (1<<0));
+	fdc->nec765_status[0] &= ~((1<<7) | (1<<6) | (1<<2) | (1<<1) | (1<<0));
 	/* fill in drive */
-	fdc.nec765_status[0] |= fdc.drive | (fdc.side<<2);
+	fdc->nec765_status[0] |= fdc->drive | (fdc->side<<2);
 
 	/* fill in completion status bits based on bits in st0, st1, st2 */
 	/* no error bits set */
-	if ((fdc.nec765_status[1] | fdc.nec765_status[2])==0)
+	if ((fdc->nec765_status[1] | fdc->nec765_status[2])==0)
 	{
 		return;
 	}
 
-	fdc.nec765_status[0] |= 0x040;
+	fdc->nec765_status[0] |= 0x040;
 }
 
 
@@ -194,18 +210,20 @@ static int nec765_n_to_bytes(int n)
 	return 1<<(n+7);
 }
 
-static void nec765_set_data_request(void)
+static void nec765_set_data_request(const device_config *device)
 {
-	fdc.FDC_main |= 0x080;
+	nec765_t *fdc = get_safe_token(device);
+	fdc->FDC_main |= 0x080;
 }
 
-static void nec765_clear_data_request(void)
+static void nec765_clear_data_request(const device_config *device)
 {
-	fdc.FDC_main &= ~0x080;
+	nec765_t *fdc = get_safe_token(device);
+	fdc->FDC_main &= ~0x080;
 }
 
-static void nec765_seek_complete(running_machine *machine)
-{
+static void nec765_seek_complete(const device_config *device)
+{	
 	/* tested on Amstrad CPC */
 
 	/* if a seek is done without drive connected: */
@@ -259,12 +277,13 @@ static void nec765_seek_complete(running_machine *machine)
 		This indicates it is always ready!!!!!
 	*/
 
-	const device_config *img = current_image(machine);
-
+	const device_config *img = current_image(device);
+	nec765_t *fdc = get_safe_token(device);
+	
 	if (!img)
 		return;
 
-	fdc.pcn[fdc.drive] = fdc.ncn;
+	fdc->pcn[fdc->drive] = fdc->ncn;
 
 	/* drive ready? */
 	if (floppy_drive_get_flag_state(img, FLOPPY_DRIVE_READY))
@@ -272,7 +291,7 @@ static void nec765_seek_complete(running_machine *machine)
 		/* yes */
 
 		/* recalibrate? */
-		if (fdc.nec765_flags & NEC765_SEEK_OPERATION_IS_RECALIBRATE)
+		if (fdc->nec765_flags & NEC765_SEEK_OPERATION_IS_RECALIBRATE)
 		{
 			/* yes */
 
@@ -280,12 +299,12 @@ static void nec765_seek_complete(running_machine *machine)
 			if (floppy_drive_get_flag_state(img, FLOPPY_DRIVE_HEAD_AT_TRACK_0))
 			{
 				/* yes. Seek complete */
-				fdc.nec765_status[0] = 0x020;
+				fdc->nec765_status[0] = 0x020;
 			}
 			else
 			{
 				/* no, track 0 failed after 77 steps */
-				fdc.nec765_status[0] = 0x040 | 0x020 | 0x010;
+				fdc->nec765_status[0] = 0x040 | 0x020 | 0x010;
 			}
 		}
 		else
@@ -293,58 +312,61 @@ static void nec765_seek_complete(running_machine *machine)
 			/* no, seek */
 
 			/* seek complete */
-			fdc.nec765_status[0] = 0x020;
+			fdc->nec765_status[0] = 0x020;
 		}
 	}
 	else
 	{
 		/* abnormal termination, not ready */
-		fdc.nec765_status[0] = 0x040 | 0x020 | 0x08;
+		fdc->nec765_status[0] = 0x040 | 0x020 | 0x08;
 	}
 
 	/* set drive and side */
-	fdc.nec765_status[0] |= fdc.drive | (fdc.side<<2);
+	fdc->nec765_status[0] |= fdc->drive | (fdc->side<<2);
 
-	nec765_set_int(machine,0);
-	nec765_set_int(machine,1);
+	nec765_set_int(device,0);
+	nec765_set_int(device,1);
 
-	fdc.nec765_flags &= ~NEC765_SEEK_ACTIVE;
+	fdc->nec765_flags &= ~NEC765_SEEK_ACTIVE;
 }
 
 static TIMER_CALLBACK(nec765_seek_timer_callback)
 {
+	const device_config *device = ptr;
+	nec765_t *fdc = get_safe_token(device);
 	/* seek complete */
-	nec765_seek_complete(machine);
+	nec765_seek_complete(device);
 
-	timer_reset(fdc.seek_timer, attotime_never);
+	timer_reset(fdc->seek_timer, attotime_never);
 }
 
-static void nec765_timer_func(running_machine *machine, int timer_type)
+static void nec765_timer_func(const device_config *device, int timer_type)
 {
+	nec765_t *fdc = get_safe_token(device);
 	/* type 0 = data transfer mode in execution phase */
-	if (fdc.timer_type == 0)
+	if (fdc->timer_type == 0)
 	{
 		/* set data request */
-		nec765_set_data_request();
+		nec765_set_data_request(device);
 
-		fdc.timer_type = 4;
+		fdc->timer_type = 4;
 
-		if (!(fdc.nec765_flags & NEC765_DMA_MODE))
+		if (!(fdc->nec765_flags & NEC765_DMA_MODE))
 		{
 			/* for pcw */
-			timer_reset(fdc.timer, ATTOTIME_IN_USEC(27));
+			timer_reset(fdc->timer, ATTOTIME_IN_USEC(27));
 		}
 		else
 		{
-			nec765_timer_func(machine, fdc.timer_type);
+			nec765_timer_func(device, fdc->timer_type);
 		}
 	}
-	else if (fdc.timer_type==2)
+	else if (fdc->timer_type==2)
 	{
 		/* result phase begin */
 
 		/* generate a int for specific commands */
-		switch (fdc.command) {
+		switch (fdc->command) {
 		case 2:		/* read a track */
 		case 5:		/* write data */
 		case 6:		/* read data */
@@ -355,41 +377,42 @@ static void nec765_timer_func(running_machine *machine, int timer_type)
 		case 17:	/* scan equal */
 		case 19:	/* scan low or equal */
 		case 29:	/* scan high or equal */
-			nec765_set_int(machine,1);
+			nec765_set_int(device,1);
 			break;
 
 		default:
 			break;
 		}
 
-		nec765_set_data_request();
+		nec765_set_data_request(device);
 
-		timer_reset(fdc.timer, attotime_never);
+		timer_reset(fdc->timer, attotime_never);
 	}
-	else if (fdc.timer_type == 4)
+	else if (fdc->timer_type == 4)
 	{
 		/* if in dma mode, a int is not generated per byte. If not in  DMA mode
 		a int is generated per byte */
-		if (fdc.nec765_flags & NEC765_DMA_MODE)
+		if (fdc->nec765_flags & NEC765_DMA_MODE)
 		{
-			nec765_set_dma_drq(machine,1);
+			nec765_set_dma_drq(device,1);
 		}
 		else
 		{
-			if (fdc.FDC_main & (1<<7))
+			if (fdc->FDC_main & (1<<7))
 			{
 				/* set int to indicate data is ready */
-				nec765_set_int(machine,1);
+				nec765_set_int(device,1);
 			}
 		}
 
-		timer_reset(fdc.timer, attotime_never);
+		timer_reset(fdc->timer, attotime_never);
 	}
 }
 
 static TIMER_CALLBACK(nec765_timer_callback)
-{
-	nec765_timer_func(machine,param);
+{	
+	const device_config *device = ptr;
+	nec765_timer_func(device,param);
 }
 
 /* after (32-27) the DRQ is set, then 27 us later, the int is set.
@@ -398,67 +421,71 @@ In this driver, the first NMI calls the handler function, furthur NMI's are
 effectively disabled by reading the data before the NMI int can be set.
 */
 
-static void nec765_setup_timed_generic(running_machine *machine, int timer_type, attotime duration)
+static void nec765_setup_timed_generic(const device_config *device, int timer_type, attotime duration)
 {
-	fdc.timer_type = timer_type;
+	nec765_t *fdc = get_safe_token(device);
+	
+	fdc->timer_type = timer_type;
 
-	if (!(fdc.nec765_flags & NEC765_DMA_MODE))
+	if (!(fdc->nec765_flags & NEC765_DMA_MODE))
 	{
-		timer_adjust_oneshot(fdc.timer, duration, 0);
+		timer_adjust_oneshot(fdc->timer, duration, 0);
 	}
 	else
 	{
-		nec765_timer_func(machine,fdc.timer_type);
-		timer_reset(fdc.timer, attotime_never);
+		nec765_timer_func(device,fdc->timer_type);
+		timer_reset(fdc->timer, attotime_never);
 	}
 }
 
 /* setup data request */
-static void nec765_setup_timed_data_request(running_machine *machine, int bytes)
+static void nec765_setup_timed_data_request(const device_config *device, int bytes)
 {
 	/* setup timer to trigger in NEC765_DATA_RATE us */
-	nec765_setup_timed_generic(machine, 0, ATTOTIME_IN_USEC(32-27)	/*NEC765_DATA_RATE)*bytes*/);
+	nec765_setup_timed_generic(device, 0, ATTOTIME_IN_USEC(32-27)	/*NEC765_DATA_RATE)*bytes*/);
 }
 
 /* setup result data request */
-static void nec765_setup_timed_result_data_request(running_machine *machine)
+static void nec765_setup_timed_result_data_request(const device_config *device)
 {
-	nec765_setup_timed_generic(machine, 2, ATTOTIME_IN_USEC(NEC765_DATA_RATE*2));
+	nec765_setup_timed_generic(device, 2, ATTOTIME_IN_USEC(NEC765_DATA_RATE*2));
 }
 
 
 /* sets up a timer to issue a seek complete in signed_tracks time */
-static void nec765_setup_timed_int(int signed_tracks)
+static void nec765_setup_timed_int(const device_config *device,int signed_tracks)
 {
+	nec765_t *fdc = get_safe_token(device);
 	/* setup timer to signal after seek time is complete */
-	timer_adjust_periodic(fdc.seek_timer, attotime_zero, 0, double_to_attotime(fdc.srt_in_ms*abs(signed_tracks)*0.001));
+	timer_adjust_periodic(fdc->seek_timer, attotime_zero, 0, double_to_attotime(fdc->srt_in_ms*abs(signed_tracks)*0.001));
 }
 
-static void nec765_seek_setup(running_machine *machine, int is_recalibrate)
+static void nec765_seek_setup(const device_config *device, int is_recalibrate)
 {
 	const device_config *img;
 	int signed_tracks;
+	nec765_t *fdc = get_safe_token(device);
 
-	fdc.nec765_flags |= NEC765_SEEK_ACTIVE;
+	fdc->nec765_flags |= NEC765_SEEK_ACTIVE;
 
 	if (is_recalibrate)
 	{
 		/* head cannot be specified with recalibrate */
-		fdc.nec765_command_bytes[1] &=~0x04;
+		fdc->nec765_command_bytes[1] &=~0x04;
 	}
 
-	nec765_setup_drive_and_side();
+	nec765_setup_drive_and_side(device);
 
-	img = current_image(machine);
+	img = current_image(device);
 
-	fdc.FDC_main |= (1<<fdc.drive);
+	fdc->FDC_main |= (1<<fdc->drive);
 
 	/* recalibrate command? */
 	if (is_recalibrate)
 	{
-		fdc.nec765_flags |= NEC765_SEEK_OPERATION_IS_RECALIBRATE;
+		fdc->nec765_flags |= NEC765_SEEK_OPERATION_IS_RECALIBRATE;
 
-		fdc.ncn = 0;
+		fdc->ncn = 0;
 
 		/* if drive is already at track 0, or drive is not ready */
 		if (
@@ -467,7 +494,7 @@ static void nec765_seek_setup(running_machine *machine, int is_recalibrate)
 			)
 		{
 			/* seek completed */
-			nec765_seek_complete(machine);
+			nec765_seek_complete(device);
 		}
 		else
 		{
@@ -496,28 +523,28 @@ static void nec765_seek_setup(running_machine *machine, int is_recalibrate)
 				/* perform seek - if drive isn't present it will not do anything */
 				floppy_drive_seek(img, signed_tracks);
 
-				nec765_setup_timed_int(signed_tracks);
+				nec765_setup_timed_int(device,signed_tracks);
 			}
 			else
 			{
-				nec765_seek_complete(machine);
+				nec765_seek_complete(device);
 			}
 		}
 	}
 	else
 	{
 
-		fdc.nec765_flags &= ~NEC765_SEEK_OPERATION_IS_RECALIBRATE;
+		fdc->nec765_flags &= ~NEC765_SEEK_OPERATION_IS_RECALIBRATE;
 
-		fdc.ncn = fdc.nec765_command_bytes[2];
+		fdc->ncn = fdc->nec765_command_bytes[2];
 
 		/* get signed tracks */
-		signed_tracks = fdc.ncn - fdc.pcn[fdc.drive];
+		signed_tracks = fdc->ncn - fdc->pcn[fdc->drive];
 
 		/* if no tracks to seek, or drive is not ready, seek is complete */
 		if ((signed_tracks==0) || (!floppy_drive_get_flag_state(img, FLOPPY_DRIVE_READY)))
 		{
-			nec765_seek_complete(machine);
+			nec765_seek_complete(device);
 		}
 		else
 		{
@@ -525,105 +552,113 @@ static void nec765_seek_setup(running_machine *machine, int is_recalibrate)
 			floppy_drive_seek(img, signed_tracks);
 
 			/* seek complete - issue an interrupt */
-			nec765_setup_timed_int(signed_tracks);
+			nec765_setup_timed_int(device,signed_tracks);
 		}
 	}
 
-    nec765_idle();
+    nec765_idle(device);
 
 }
 
 
 
-static void nec765_setup_execution_phase_read(running_machine *machine, char *ptr, int size)
+static void nec765_setup_execution_phase_read(const device_config *device, char *ptr, int size)
 {
-	fdc.FDC_main |= 0x040;                     /* FDC->CPU */
+	nec765_t *fdc = get_safe_token(device);
+	fdc->FDC_main |= 0x040;                     /* FDC->CPU */
 
-	fdc.nec765_transfer_bytes_count = 0;
-	fdc.nec765_transfer_bytes_remaining = size;
-	fdc.execution_phase_data = ptr;
-	fdc.nec765_phase = NEC765_EXECUTION_PHASE_READ;
+	fdc->nec765_transfer_bytes_count = 0;
+	fdc->nec765_transfer_bytes_remaining = size;
+	fdc->execution_phase_data = ptr;
+	fdc->nec765_phase = NEC765_EXECUTION_PHASE_READ;
 
-	nec765_setup_timed_data_request(machine, 1);
+	nec765_setup_timed_data_request(device, 1);
 }
 
-static void nec765_setup_execution_phase_write(running_machine *machine, char *ptr, int size)
+static void nec765_setup_execution_phase_write(const device_config *device, char *ptr, int size)
 {
-	fdc.FDC_main &= ~0x040;                     /* FDC->CPU */
+	nec765_t *fdc = get_safe_token(device);
+	
+	fdc->FDC_main &= ~0x040;                     /* FDC->CPU */
 
-	fdc.nec765_transfer_bytes_count = 0;
-	fdc.nec765_transfer_bytes_remaining = size;
-	fdc.execution_phase_data = ptr;
-	fdc.nec765_phase = NEC765_EXECUTION_PHASE_WRITE;
+	fdc->nec765_transfer_bytes_count = 0;
+	fdc->nec765_transfer_bytes_remaining = size;
+	fdc->execution_phase_data = ptr;
+	fdc->nec765_phase = NEC765_EXECUTION_PHASE_WRITE;
 
 	/* setup a data request with first byte */
-	nec765_setup_timed_data_request(machine,1);
+	nec765_setup_timed_data_request(device,1);
 }
 
 
-static void nec765_setup_result_phase(running_machine *machine, int byte_count)
+static void nec765_setup_result_phase(const device_config *device, int byte_count)
 {
-	fdc.FDC_main |= 0x040;                     /* FDC->CPU */
-	fdc.FDC_main &= ~0x020;                    /* not execution phase */
+	nec765_t *fdc = get_safe_token(device);
+	
+	fdc->FDC_main |= 0x040;                     /* FDC->CPU */
+	fdc->FDC_main &= ~0x020;                    /* not execution phase */
 
-	fdc.nec765_transfer_bytes_count = 0;
-	fdc.nec765_transfer_bytes_remaining = byte_count;
-	fdc.nec765_phase = NEC765_RESULT_PHASE;
+	fdc->nec765_transfer_bytes_count = 0;
+	fdc->nec765_transfer_bytes_remaining = byte_count;
+	fdc->nec765_phase = NEC765_RESULT_PHASE;
 
-	nec765_setup_timed_result_data_request(machine);
+	nec765_setup_timed_result_data_request(device);
 }
 
-void nec765_idle(void)
+void nec765_idle(const device_config *device)
 {
-	fdc.FDC_main &= ~0x040;                     /* CPU->FDC */
-	fdc.FDC_main &= ~0x020;                    /* not execution phase */
-	fdc.FDC_main &= ~0x010;                     /* not busy */
-	fdc.nec765_phase = NEC765_COMMAND_PHASE_FIRST_BYTE;
+	nec765_t *fdc = get_safe_token(device);
+	
+	fdc->FDC_main &= ~0x040;                     /* CPU->FDC */
+	fdc->FDC_main &= ~0x020;                    /* not execution phase */
+	fdc->FDC_main &= ~0x010;                     /* not busy */
+	fdc->nec765_phase = NEC765_COMMAND_PHASE_FIRST_BYTE;
 
-	nec765_set_data_request();
+	nec765_set_data_request(device);
 }
 
 
 
 /* change flags */
-static void nec765_change_flags(running_machine *machine,unsigned int flags, unsigned int mask)
+static void nec765_change_flags(const device_config *device,unsigned int flags, unsigned int mask)
 {
 	unsigned int new_flags;
 	unsigned int changed_flags;
-
+	nec765_t *fdc = get_safe_token(device);
+	
 	assert((flags & ~mask) == 0);
 
 	/* compute the new flags and which ones have changed */
-	new_flags = fdc.nec765_flags & ~mask;
+	new_flags = fdc->nec765_flags & ~mask;
 	new_flags |= flags;
-	changed_flags = fdc.nec765_flags ^ new_flags;
-	fdc.nec765_flags = new_flags;
+	changed_flags = fdc->nec765_flags ^ new_flags;
+	fdc->nec765_flags = new_flags;
 
 	/* if interrupt changed, call the handler */
-	if ((changed_flags & NEC765_INT) && nec765_iface.interrupt)
-		nec765_iface.interrupt(machine,(fdc.nec765_flags & NEC765_INT) ? 1 : 0);
+	if ((changed_flags & NEC765_INT) && fdc->intf->interrupt)
+		fdc->intf->interrupt(device,(fdc->nec765_flags & NEC765_INT) ? 1 : 0);
 
 	/* if DRQ changed, call the handler */
-	if ((changed_flags & NEC765_DMA_DRQ) && nec765_iface.dma_drq)
-		nec765_iface.dma_drq(machine,(fdc.nec765_flags & NEC765_DMA_DRQ) ? 1 : 0, fdc.FDC_main & (1<<6));
+	if ((changed_flags & NEC765_DMA_DRQ) && fdc->intf->dma_drq)
+		fdc->intf->dma_drq(device,(fdc->nec765_flags & NEC765_DMA_DRQ) ? 1 : 0, fdc->FDC_main & (1<<6));
 }
 
 
 
 /* set int output */
-static void nec765_set_int(running_machine *machine, int state)
+static void nec765_set_int(const device_config *device, int state)
 {
 	if (LOG_INTERRUPT)
 		logerror("nec765_set_int(): state=%d\n", state);
-	nec765_change_flags(machine, state ? NEC765_INT : 0, NEC765_INT);
+	nec765_change_flags(device, state ? NEC765_INT : 0, NEC765_INT);
 }
 
 
 
 /* set dma request output */
-static void nec765_set_dma_drq(running_machine *machine, int state)
+static void nec765_set_dma_drq(const device_config *device, int state)
 {
-	nec765_change_flags(machine, state ? NEC765_DMA_DRQ : 0, NEC765_DMA_DRQ);
+	nec765_change_flags(device, state ? NEC765_DMA_DRQ : 0, NEC765_DMA_DRQ);
 }
 
 
@@ -656,98 +691,74 @@ is not ready.
 /* done when ready state of drive changes */
 /* this ignores if command is active, in which case command should terminate immediatly
 with error */
-static void nec765_set_ready_change_callback(const device_config *img, int state)
+static void nec765_set_ready_change_callback(const device_config *controller, const device_config *img, int state)
 {
+	nec765_t *fdc = get_safe_token(controller);
 	int drive = image_index_in_device(img);
 
 	logerror("nec765: ready state change\n");
 
 	/* drive that changed state */
-	fdc.nec765_status[0] = 0x0c0 | drive;
+	fdc->nec765_status[0] = 0x0c0 | drive;
 
 	/* not ready */
-	if (state==0 && fdc.rdy_pin == NEC765_RDY_PIN_CONNECTED )
-		fdc.nec765_status[0] |= 8;
+	if (state==0 && fdc->intf->rdy_pin == NEC765_RDY_PIN_CONNECTED )
+		fdc->nec765_status[0] |= 8;
 
 	/* trigger an int */
-	nec765_set_int(img->machine, 1);
-}
-
-
-
-
-void nec765_init(running_machine *machine, const nec765_interface *iface, NEC765_VERSION version, NEC765_RDY_PIN rdy_pin)
-{
-	int i;
-
-	fdc.version = version;
-	fdc.rdy_pin = rdy_pin;
-	fdc.timer = timer_alloc(machine, nec765_timer_callback, NULL);
-	fdc.seek_timer = timer_alloc(machine, nec765_seek_timer_callback, NULL);
-	fdc.command_timer = timer_alloc(machine, nec765_continue_command, NULL);
-	memset(&nec765_iface, 0, sizeof(nec765_interface));
-
-	if (iface)
-	{
-		memcpy(&nec765_iface, iface, sizeof(nec765_interface));
-	}
-
-	fdc.nec765_flags &= NEC765_FDD_READY;
-
-	nec765_reset(machine, 0);
-
-	for (i = 0; i < device_count(machine, IO_FLOPPY); i++)
-		floppy_drive_set_ready_state_change_callback(image_from_devtype_and_index(IO_FLOPPY, i), nec765_set_ready_change_callback);
+	nec765_set_int(controller, 1);
 }
 
 
 /* terminal count input */
-void nec765_set_tc_state(running_machine *machine, int state)
+void nec765_set_tc_state(const device_config *device, int state)
 {
 	int old_state;
+	nec765_t *fdc = get_safe_token(device);
 
-	old_state = fdc.nec765_flags;
+	old_state = fdc->nec765_flags;
 
 	/* clear drq */
-	nec765_set_dma_drq(machine, 0);
+	nec765_set_dma_drq(device, 0);
 
-	fdc.nec765_flags &= ~NEC765_TC;
+	fdc->nec765_flags &= ~NEC765_TC;
 	if (state)
 	{
-		fdc.nec765_flags |= NEC765_TC;
+		fdc->nec765_flags |= NEC765_TC;
 	}
 
 	/* changed state? */
-	if (((fdc.nec765_flags^old_state) & NEC765_TC)!=0)
+	if (((fdc->nec765_flags^old_state) & NEC765_TC)!=0)
 	{
 		/* now set? */
-		if ((fdc.nec765_flags & NEC765_TC)!=0)
+		if ((fdc->nec765_flags & NEC765_TC)!=0)
 		{
 			/* yes */
-			if (fdc.timer)
+			if (fdc->timer)
 			{
-				if (fdc.timer_type==0)
+				if (fdc->timer_type==0)
 				{
-					timer_reset(fdc.timer, attotime_never);
+					timer_reset(fdc->timer, attotime_never);
 
 
 				}
 			}
 
 #ifdef NO_END_OF_CYLINDER
-			timer_adjust_oneshot(fdc.command_timer, attotime_zero, 0);
+			timer_adjust_oneshot(fdc->command_timer, attotime_zero, 0);
 #else
-			nec765_update_state(machine);
+			nec765_update_state(device);
 #endif
 		}
 	}
 }
 
-READ8_HANDLER(nec765_status_r)
+READ8_DEVICE_HANDLER(nec765_status_r)
 {
+	nec765_t *fdc = get_safe_token(device);
 	if (LOG_EXTRA)
-		logerror("nec765 status r: %02x\n",fdc.FDC_main);
-	return fdc.FDC_main;
+		logerror("nec765 status r: %02x\n",fdc->FDC_main);
+	return fdc->FDC_main;
 }
 
 
@@ -758,16 +769,17 @@ skip it.
 if SK==1, and we are executing a read deleted data command, and a data mark is found,
 skip it. */
 
-static int nec765_read_skip_sector(void)
+static int nec765_read_skip_sector(const device_config *device)
 {
+	nec765_t *fdc = get_safe_token(device);
 	/* skip set? */
-	if ((fdc.nec765_command_bytes[0] & (1<<5))!=0)
+	if ((fdc->nec765_command_bytes[0] & (1<<5))!=0)
 	{
 		/* read data? */
-		if (fdc.command == 0x06)
+		if (fdc->command == 0x06)
 		{
 			/* did we just find a sector with deleted data mark? */
-			if (fdc.data_type == NEC765_DAM_DELETED_DATA)
+			if (fdc->data_type == NEC765_DAM_DELETED_DATA)
 			{
 				/* skip it */
 				return TRUE;
@@ -775,10 +787,10 @@ static int nec765_read_skip_sector(void)
 		}
 		/* deleted data? */
 		else
-		if (fdc.command == 0x0c)
+		if (fdc->command == 0x0c)
 		{
 			/* did we just find a sector with data mark ? */
-			if (fdc.data_type == NEC765_DAM_DATA)
+			if (fdc->data_type == NEC765_DAM_DATA)
 			{
 				/* skip it */
 				return TRUE;
@@ -801,26 +813,28 @@ static int nec765_read_skip_sector(void)
   - if the index is seen twice while it is searching for a sector, then the sector cannot be found
 */
 
-static void nec765_get_next_id(running_machine *machine, chrn_id *id)
+static void nec765_get_next_id(const device_config *device, chrn_id *id)
 {
-	const device_config *img = current_image(machine);
+	nec765_t *fdc = get_safe_token(device);
+	const device_config *img = current_image(device);
 
 	/* get next id from disc */
-	floppy_drive_get_next_id(img, fdc.side,id);
+	floppy_drive_get_next_id(img, fdc->side,id);
 
-	fdc.sector_id = id->data_id;
+	fdc->sector_id = id->data_id;
 
 	/* set correct data type */
-	fdc.data_type = NEC765_DAM_DATA;
+	fdc->data_type = NEC765_DAM_DATA;
 	if (id->flags & ID_FLAG_DELETED_DATA)
 	{
-		fdc.data_type = NEC765_DAM_DELETED_DATA;
+		fdc->data_type = NEC765_DAM_DELETED_DATA;
 	}
 }
 
-static int nec765_get_matching_sector(running_machine *machine)
+static int nec765_get_matching_sector(const device_config *device)
 {
-	const device_config *img = current_image(machine);
+	nec765_t *fdc = get_safe_token(device);
+	const device_config *img = current_image(device);
 	chrn_id id;
 
 	/* number of times we have seen index hole */
@@ -829,27 +843,27 @@ static int nec765_get_matching_sector(running_machine *machine)
 	/* get sector id's */
 	do
     {
-		nec765_get_next_id(machine, &id);
+		nec765_get_next_id(device, &id);
 
 		/* tested on Amstrad CPC - All bytes must match, otherwise
 		a NO DATA error is reported */
-		if (id.R == fdc.nec765_command_bytes[4])
+		if (id.R == fdc->nec765_command_bytes[4])
 		{
-			if (id.C == fdc.nec765_command_bytes[2])
+			if (id.C == fdc->nec765_command_bytes[2])
 			{
-				if (id.H == fdc.nec765_command_bytes[3])
+				if (id.H == fdc->nec765_command_bytes[3])
 				{
-					if (id.N == fdc.nec765_command_bytes[5])
+					if (id.N == fdc->nec765_command_bytes[5])
 					{
 						/* end of cylinder is set if:
 						1. sector data is read completely (i.e. no other errors occur like
 						no data.
 						2. sector being read is same specified by EOT
 						3. terminal count is not received */
-						if (fdc.nec765_command_bytes[4]==fdc.nec765_command_bytes[6])
+						if (fdc->nec765_command_bytes[4]==fdc->nec765_command_bytes[6])
 						{
 							/* set end of cylinder */
-							fdc.nec765_status[1] |= NEC765_ST1_END_OF_CYLINDER;
+							fdc->nec765_status[1] |= NEC765_ST1_END_OF_CYLINDER;
 						}
 
 						return TRUE;
@@ -862,15 +876,15 @@ static int nec765_get_matching_sector(running_machine *machine)
 				in the read/write command did not match the C value read from the disc */
 
 				/* no data - checked on Amstrad CPC */
-				fdc.nec765_status[1] |= NEC765_ST1_NO_DATA;
+				fdc->nec765_status[1] |= NEC765_ST1_NO_DATA;
 				/* bad C value */
-				fdc.nec765_status[2] |= NEC765_ST2_WRONG_CYLINDER;
+				fdc->nec765_status[2] |= NEC765_ST2_WRONG_CYLINDER;
 
 				if (id.C == 0x0ff)
 				{
 					/* the C value is 0x0ff which indicates a bad track in the IBM soft-sectored
 					format */
-					fdc.nec765_status[2] |= NEC765_ST2_BAD_CYLINDER;
+					fdc->nec765_status[2] |= NEC765_ST2_BAD_CYLINDER;
 				}
 
 				return FALSE;
@@ -887,18 +901,18 @@ static int nec765_get_matching_sector(running_machine *machine)
 	while (index_count!=2);
 
 	/* no data - specified sector ID was not found */
-    fdc.nec765_status[1] |= NEC765_ST1_NO_DATA;
+    fdc->nec765_status[1] |= NEC765_ST1_NO_DATA;
 
 	return 0;
 }
 
-static void nec765_read_complete(running_machine *machine)
+static void nec765_read_complete(const device_config *device)
 {
-
+	nec765_t *fdc = get_safe_token(device);
 /* causes problems!!! - need to fix */
 #ifdef NO_END_OF_CYLINDER
 	/* set end of cylinder */
-	fdc.nec765_status[1] &= ~NEC765_ST1_END_OF_CYLINDER;
+	fdc->nec765_status[1] &= ~NEC765_ST1_END_OF_CYLINDER;
 #else
 	/* completed read command */
 
@@ -909,49 +923,50 @@ static void nec765_read_complete(running_machine *machine)
 		*/
 
 	/* if end of cylinder is set, and we did receive a terminal count, then clear it */
-	if ((fdc.nec765_flags & NEC765_TC)!=0)
+	if ((fdc->nec765_flags & NEC765_TC)!=0)
 	{
 		/* set end of cylinder */
-		fdc.nec765_status[1] &= ~NEC765_ST1_END_OF_CYLINDER;
+		fdc->nec765_status[1] &= ~NEC765_ST1_END_OF_CYLINDER;
 	}
 #endif
 
-	nec765_setup_st0();
+	nec765_setup_st0(device);
 
-	fdc.nec765_result_bytes[0] = fdc.nec765_status[0];
-	fdc.nec765_result_bytes[1] = fdc.nec765_status[1];
-	fdc.nec765_result_bytes[2] = fdc.nec765_status[2];
-	fdc.nec765_result_bytes[3] = fdc.nec765_command_bytes[2]; /* C */
-	fdc.nec765_result_bytes[4] = fdc.nec765_command_bytes[3]; /* H */
-	fdc.nec765_result_bytes[5] = fdc.nec765_command_bytes[4]; /* R */
-	fdc.nec765_result_bytes[6] = fdc.nec765_command_bytes[5]; /* N */
+	fdc->nec765_result_bytes[0] = fdc->nec765_status[0];
+	fdc->nec765_result_bytes[1] = fdc->nec765_status[1];
+	fdc->nec765_result_bytes[2] = fdc->nec765_status[2];
+	fdc->nec765_result_bytes[3] = fdc->nec765_command_bytes[2]; /* C */
+	fdc->nec765_result_bytes[4] = fdc->nec765_command_bytes[3]; /* H */
+	fdc->nec765_result_bytes[5] = fdc->nec765_command_bytes[4]; /* R */
+	fdc->nec765_result_bytes[6] = fdc->nec765_command_bytes[5]; /* N */
 
-	nec765_setup_result_phase(machine,7);
+	nec765_setup_result_phase(device,7);
 }
 
-static void nec765_read_data(running_machine *machine)
+static void nec765_read_data(const device_config *device)
 {
-	const device_config *img = current_image(machine);
+	nec765_t *fdc = get_safe_token(device);
+	const device_config *img = current_image(device);
 
 	if (!(floppy_drive_get_flag_state(img, FLOPPY_DRIVE_READY)))
 	{
-		fdc.nec765_status[0] = 0x0c0 | (1<<4) | fdc.drive | (fdc.side<<2);
-		fdc.nec765_status[1] = 0x00;
-		fdc.nec765_status[2] = 0x00;
+		fdc->nec765_status[0] = 0x0c0 | (1<<4) | fdc->drive | (fdc->side<<2);
+		fdc->nec765_status[1] = 0x00;
+		fdc->nec765_status[2] = 0x00;
 
-		fdc.nec765_result_bytes[0] = fdc.nec765_status[0];
-		fdc.nec765_result_bytes[1] = fdc.nec765_status[1];
-		fdc.nec765_result_bytes[2] = fdc.nec765_status[2];
-		fdc.nec765_result_bytes[3] = fdc.nec765_command_bytes[2]; /* C */
-		fdc.nec765_result_bytes[4] = fdc.nec765_command_bytes[3]; /* H */
-		fdc.nec765_result_bytes[5] = fdc.nec765_command_bytes[4]; /* R */
-		fdc.nec765_result_bytes[6] = fdc.nec765_command_bytes[5]; /* N */
-		nec765_setup_result_phase(machine,7);
+		fdc->nec765_result_bytes[0] = fdc->nec765_status[0];
+		fdc->nec765_result_bytes[1] = fdc->nec765_status[1];
+		fdc->nec765_result_bytes[2] = fdc->nec765_status[2];
+		fdc->nec765_result_bytes[3] = fdc->nec765_command_bytes[2]; /* C */
+		fdc->nec765_result_bytes[4] = fdc->nec765_command_bytes[3]; /* H */
+		fdc->nec765_result_bytes[5] = fdc->nec765_command_bytes[4]; /* R */
+		fdc->nec765_result_bytes[6] = fdc->nec765_command_bytes[5]; /* N */
+		nec765_setup_result_phase(device,7);
 		return;
 	}
 
 	if (LOG_VERBOSE)
-		logerror("sector c: %02x h: %02x r: %02x n: %02x\n",fdc.nec765_command_bytes[2], fdc.nec765_command_bytes[3],fdc.nec765_command_bytes[4], fdc.nec765_command_bytes[5]);
+		logerror("sector c: %02x h: %02x r: %02x n: %02x\n",fdc->nec765_command_bytes[2], fdc->nec765_command_bytes[3],fdc->nec765_command_bytes[4], fdc->nec765_command_bytes[5]);
 
 	/* find a sector to read data from */
 	{
@@ -962,26 +977,26 @@ static void nec765_read_data(running_machine *machine)
 		do
 		{
 			/* get matching sector */
-			if (nec765_get_matching_sector(machine))
+			if (nec765_get_matching_sector(device))
 			{
 
 				/* skip it? */
-				if (nec765_read_skip_sector())
+				if (nec765_read_skip_sector(device))
 				{
 					/* yes */
 
 					/* check that we haven't finished reading all sectors */
-					if (nec765_sector_count_complete(machine))
+					if (nec765_sector_count_complete(device))
 					{
 						/* read complete */
-						nec765_read_complete(machine);
+						nec765_read_complete(device);
 						return;
 					}
 
 					/* read not finished */
 
 					/* increment sector count */
-					nec765_increment_sector(machine);
+					nec765_increment_sector(device);
 				}
 				else
 				{
@@ -992,7 +1007,7 @@ static void nec765_read_data(running_machine *machine)
 			else
 			{
 				/* error in finding sector */
-				nec765_read_complete(machine);
+				nec765_read_complete(device);
 				return;
 			}
 		}
@@ -1002,43 +1017,45 @@ static void nec765_read_data(running_machine *machine)
 	{
 		int data_size;
 
-		data_size = nec765_n_to_bytes(fdc.nec765_command_bytes[5]);
+		data_size = nec765_n_to_bytes(fdc->nec765_command_bytes[5]);
 
-		floppy_drive_read_sector_data(img, fdc.side, fdc.sector_id,nec765_data_buffer,data_size);
+		floppy_drive_read_sector_data(img, fdc->side, fdc->sector_id,fdc->data_buffer,data_size);
 
-        nec765_setup_execution_phase_read(machine,nec765_data_buffer, data_size);
+        nec765_setup_execution_phase_read(device,fdc->data_buffer, data_size);
 	}
 }
 
 
-static void nec765_format_track(running_machine *machine)
+static void nec765_format_track(const device_config *device)
 {
-	const device_config *img = current_image(machine);
+	nec765_t *fdc = get_safe_token(device);
+	const device_config *img = current_image(device);
 
 	/* write protected? */
 	if (floppy_drive_get_flag_state(img, FLOPPY_DRIVE_DISK_WRITE_PROTECTED))
 	{
-		fdc.nec765_status[1] |= NEC765_ST1_NOT_WRITEABLE;
+		fdc->nec765_status[1] |= NEC765_ST1_NOT_WRITEABLE;
 
-		nec765_setup_st0();
+		nec765_setup_st0(device);
 		/* TODO: Check result is correct */
-			fdc.nec765_result_bytes[0] = fdc.nec765_status[0];
-            fdc.nec765_result_bytes[1] = fdc.nec765_status[1];
-            fdc.nec765_result_bytes[2] = fdc.nec765_status[2];
-			fdc.nec765_result_bytes[3] = fdc.format_data[0];
-			fdc.nec765_result_bytes[4] = fdc.format_data[1];
-			fdc.nec765_result_bytes[5] = fdc.format_data[2];
-			fdc.nec765_result_bytes[6] = fdc.format_data[3];
-			nec765_setup_result_phase(machine,7);
+			fdc->nec765_result_bytes[0] = fdc->nec765_status[0];
+            fdc->nec765_result_bytes[1] = fdc->nec765_status[1];
+            fdc->nec765_result_bytes[2] = fdc->nec765_status[2];
+			fdc->nec765_result_bytes[3] = fdc->format_data[0];
+			fdc->nec765_result_bytes[4] = fdc->format_data[1];
+			fdc->nec765_result_bytes[5] = fdc->format_data[2];
+			fdc->nec765_result_bytes[6] = fdc->format_data[3];
+			nec765_setup_result_phase(device,7);
 
 		return;
 	}
 
-    nec765_setup_execution_phase_write(machine, &fdc.format_data[0], 4);
+    nec765_setup_execution_phase_write(device, &fdc->format_data[0], 4);
 }
 
-static void nec765_read_a_track(running_machine *machine)
+static void nec765_read_a_track(const device_config *device)
 {
+	nec765_t *fdc = get_safe_token(device);
 	int data_size;
 
 	/* SKIP not allowed with this command! */
@@ -1046,21 +1063,21 @@ static void nec765_read_a_track(running_machine *machine)
 	/* get next id */
 	chrn_id id;
 
-	nec765_get_next_id(machine, &id);
+	nec765_get_next_id(device, &id);
 
 	/* TO BE CONFIRMED! */
 	/* check id from disc */
-	if (id.C==fdc.nec765_command_bytes[2])
+	if (id.C==fdc->nec765_command_bytes[2])
 	{
-		if (id.H==fdc.nec765_command_bytes[3])
+		if (id.H==fdc->nec765_command_bytes[3])
 		{
-			if (id.R==fdc.nec765_command_bytes[4])
+			if (id.R==fdc->nec765_command_bytes[4])
 			{
-				if (id.N==fdc.nec765_command_bytes[5])
+				if (id.N==fdc->nec765_command_bytes[5])
 				{
 					/* if ID found, then no data is not set */
 					/* otherwise no data will remain set */
-					fdc.nec765_status[1] &=~NEC765_ST1_NO_DATA;
+					fdc->nec765_status[1] &=~NEC765_ST1_NO_DATA;
 				}
 			}
 		}
@@ -1069,25 +1086,26 @@ static void nec765_read_a_track(running_machine *machine)
 
 	data_size = nec765_n_to_bytes(id.N);
 
-	floppy_drive_read_sector_data(current_image(machine), fdc.side, fdc.sector_id,nec765_data_buffer,data_size);
+	floppy_drive_read_sector_data(current_image(device), fdc->side, fdc->sector_id,fdc->data_buffer,data_size);
 
-	nec765_setup_execution_phase_read(machine,nec765_data_buffer, data_size);
+	nec765_setup_execution_phase_read(device,fdc->data_buffer, data_size);
 }
 
-static int nec765_just_read_last_sector_on_track(running_machine *machine)
+static int nec765_just_read_last_sector_on_track(const device_config *device)
 {
-	if (floppy_drive_get_flag_state(current_image(machine), FLOPPY_DRIVE_INDEX))
+	if (floppy_drive_get_flag_state(current_image(device), FLOPPY_DRIVE_INDEX))
 		return 1;
 	return 0;
 }
 
-static void nec765_write_complete(running_machine *machine)
+static void nec765_write_complete(const device_config *device)
 {
+	nec765_t *fdc = get_safe_token(device);
 
 /* causes problems!!! - need to fix */
 #ifdef NO_END_OF_CYLINDER
         /* set end of cylinder */
-        fdc.nec765_status[1] &= ~NEC765_ST1_END_OF_CYLINDER;
+        fdc->nec765_status[1] &= ~NEC765_ST1_END_OF_CYLINDER;
 #else
 	/* completed read command */
 
@@ -1098,77 +1116,79 @@ static void nec765_write_complete(running_machine *machine)
 	 */
 
 	/* if end of cylinder is set, and we did receive a terminal count, then clear it */
-	if ((fdc.nec765_flags & NEC765_TC)!=0)
+	if ((fdc->nec765_flags & NEC765_TC)!=0)
 	{
 		/* set end of cylinder */
-		fdc.nec765_status[1] &= ~NEC765_ST1_END_OF_CYLINDER;
+		fdc->nec765_status[1] &= ~NEC765_ST1_END_OF_CYLINDER;
 	}
 #endif
 
-	nec765_setup_st0();
+	nec765_setup_st0(device);
 
-    fdc.nec765_result_bytes[0] = fdc.nec765_status[0];
-    fdc.nec765_result_bytes[1] = fdc.nec765_status[1];
-    fdc.nec765_result_bytes[2] = fdc.nec765_status[2];
-    fdc.nec765_result_bytes[3] = fdc.nec765_command_bytes[2]; /* C */
-    fdc.nec765_result_bytes[4] = fdc.nec765_command_bytes[3]; /* H */
-    fdc.nec765_result_bytes[5] = fdc.nec765_command_bytes[4]; /* R */
-    fdc.nec765_result_bytes[6] = fdc.nec765_command_bytes[5]; /* N */
+    fdc->nec765_result_bytes[0] = fdc->nec765_status[0];
+    fdc->nec765_result_bytes[1] = fdc->nec765_status[1];
+    fdc->nec765_result_bytes[2] = fdc->nec765_status[2];
+    fdc->nec765_result_bytes[3] = fdc->nec765_command_bytes[2]; /* C */
+    fdc->nec765_result_bytes[4] = fdc->nec765_command_bytes[3]; /* H */
+    fdc->nec765_result_bytes[5] = fdc->nec765_command_bytes[4]; /* R */
+    fdc->nec765_result_bytes[6] = fdc->nec765_command_bytes[5]; /* N */
 
-    nec765_setup_result_phase(machine,7);
+    nec765_setup_result_phase(device,7);
 }
 
 
-static void nec765_write_data(running_machine *machine)
+static void nec765_write_data(const device_config *device)
 {
-	if (!(floppy_drive_get_flag_state(current_image(machine), FLOPPY_DRIVE_READY)))
+	nec765_t *fdc = get_safe_token(device);
+	if (!(floppy_drive_get_flag_state(current_image(device), FLOPPY_DRIVE_READY)))
 	{
-		fdc.nec765_status[0] = 0x0c0 | (1<<4) | fdc.drive | (fdc.side<<2);
-        fdc.nec765_status[1] = 0x00;
-        fdc.nec765_status[2] = 0x00;
+		fdc->nec765_status[0] = 0x0c0 | (1<<4) | fdc->drive | (fdc->side<<2);
+        fdc->nec765_status[1] = 0x00;
+        fdc->nec765_status[2] = 0x00;
 
-        fdc.nec765_result_bytes[0] = fdc.nec765_status[0];
-        fdc.nec765_result_bytes[1] = fdc.nec765_status[1];
-        fdc.nec765_result_bytes[2] = fdc.nec765_status[2];
-        fdc.nec765_result_bytes[3] = fdc.nec765_command_bytes[2]; /* C */
-        fdc.nec765_result_bytes[4] = fdc.nec765_command_bytes[3]; /* H */
-        fdc.nec765_result_bytes[5] = fdc.nec765_command_bytes[4]; /* R */
-        fdc.nec765_result_bytes[6] = fdc.nec765_command_bytes[5]; /* N */
-		nec765_setup_result_phase(machine,7);
+        fdc->nec765_result_bytes[0] = fdc->nec765_status[0];
+        fdc->nec765_result_bytes[1] = fdc->nec765_status[1];
+        fdc->nec765_result_bytes[2] = fdc->nec765_status[2];
+        fdc->nec765_result_bytes[3] = fdc->nec765_command_bytes[2]; /* C */
+        fdc->nec765_result_bytes[4] = fdc->nec765_command_bytes[3]; /* H */
+        fdc->nec765_result_bytes[5] = fdc->nec765_command_bytes[4]; /* R */
+        fdc->nec765_result_bytes[6] = fdc->nec765_command_bytes[5]; /* N */
+		nec765_setup_result_phase(device,7);
 		return;
 	}
 
 	/* write protected? */
-	if (floppy_drive_get_flag_state(current_image(machine), FLOPPY_DRIVE_DISK_WRITE_PROTECTED))
+	if (floppy_drive_get_flag_state(current_image(device), FLOPPY_DRIVE_DISK_WRITE_PROTECTED))
 	{
-		fdc.nec765_status[1] |= NEC765_ST1_NOT_WRITEABLE;
+		fdc->nec765_status[1] |= NEC765_ST1_NOT_WRITEABLE;
 
-		nec765_write_complete(machine);
+		nec765_write_complete(device);
 		return;
 	}
 
-	if (nec765_get_matching_sector(machine))
+	if (nec765_get_matching_sector(device))
 	{
 		int data_size;
 
-		data_size = nec765_n_to_bytes(fdc.nec765_command_bytes[5]);
+		data_size = nec765_n_to_bytes(fdc->nec765_command_bytes[5]);
 
-        nec765_setup_execution_phase_write(machine,nec765_data_buffer, data_size);
+        nec765_setup_execution_phase_write(device,fdc->data_buffer, data_size);
 	}
     else
     {
-        nec765_setup_result_phase(machine,7);
+        nec765_setup_result_phase(device,7);
     }
 }
 
 
 /* return true if we have read all sectors, false if not */
-static int nec765_sector_count_complete(running_machine *machine)
+static int nec765_sector_count_complete(const device_config *device)
 {
+	nec765_t *fdc = get_safe_token(device);
 /* this is not correct?? */
 #if 1
 	/* if terminal count has been set - yes */
-	if (fdc.nec765_flags & NEC765_TC)
+	if (fdc->nec765_flags & NEC765_TC)
 	{
 		/* completed */
 		return 1;
@@ -1177,7 +1197,7 @@ static int nec765_sector_count_complete(running_machine *machine)
 
 
 	/* multi-track? */
-	if (fdc.nec765_command_bytes[0] & 0x080)
+	if (fdc->nec765_command_bytes[0] & 0x080)
 	{
 		/* it appears that in multi-track mode,
 		the EOT parameter of the command is ignored!? -
@@ -1192,14 +1212,14 @@ static int nec765_sector_count_complete(running_machine *machine)
 		*/
 
 		/* if just read last sector and on side 1 - finish */
-		if ((nec765_just_read_last_sector_on_track(machine)) &&
-			(fdc.side==1))
+		if ((nec765_just_read_last_sector_on_track(device)) &&
+			(fdc->side==1))
 		{
 			return 1;
 		}
 
 		/* if not on second side then we haven't finished yet */
-		if (fdc.side!=1)
+		if (fdc->side!=1)
 		{
 			/* haven't finished yet */
 			return 0;
@@ -1208,7 +1228,7 @@ static int nec765_sector_count_complete(running_machine *machine)
 	else
 	{
 		/* sector id == EOT? */
-		if ((fdc.nec765_command_bytes[4]==fdc.nec765_command_bytes[6]))
+		if ((fdc->nec765_command_bytes[4]==fdc->nec765_command_bytes[6]))
 		{
 
 			/* completed */
@@ -1218,7 +1238,7 @@ static int nec765_sector_count_complete(running_machine *machine)
 #else
 
 	/* if terminal count has been set - yes */
-	if (fdc.nec765_flags & NEC765_TC)
+	if (fdc->nec765_flags & NEC765_TC)
 	{
 		/* completed */
 		return 1;
@@ -1277,14 +1297,14 @@ static int nec765_sector_count_complete(running_machine *machine)
   */
 
 	/* sector id == EOT? */
-	if ((fdc.nec765_command_bytes[4]==fdc.nec765_command_bytes[6]))
+	if ((fdc->nec765_command_bytes[4]==fdc->nec765_command_bytes[6]))
 	{
 		/* multi-track? */
-		if (fdc.nec765_command_bytes[0] & 0x080)
+		if (fdc->nec765_command_bytes[0] & 0x080)
 		{
-			/* if we have reached EOT (fdc.nec765_command_bytes[6])
+			/* if we have reached EOT (fdc->nec765_command_bytes[6])
 			on side 1, then read is complete */
-			if (fdc.side==1)
+			if (fdc->side==1)
 				return 1;
 
 			return 0;
@@ -1299,35 +1319,36 @@ static int nec765_sector_count_complete(running_machine *machine)
 	return 0;
 }
 
-static void	nec765_increment_sector(running_machine *machine)
+static void	nec765_increment_sector(const device_config *device)
 {
+	nec765_t *fdc = get_safe_token(device);
 	/* multi-track? */
-	if (fdc.nec765_command_bytes[0] & 0x080)
+	if (fdc->nec765_command_bytes[0] & 0x080)
 	{
 		/* reached EOT? */
-		/* if (fdc.nec765_command_bytes[4]==fdc.nec765_command_bytes[6])*/
-		if (nec765_just_read_last_sector_on_track(machine))
+		/* if (fdc->nec765_command_bytes[4]==fdc->nec765_command_bytes[6])*/
+		if (nec765_just_read_last_sector_on_track(device))
 		{
 			/* yes */
 
 			/* reached EOT */
 			/* change side to 1 */
-			fdc.side = 1;
+			fdc->side = 1;
 			/* reset sector id to 1 */
-			fdc.nec765_command_bytes[4] = 1;
+			fdc->nec765_command_bytes[4] = 1;
 			/* set head to 1 for get next sector test */
-			fdc.nec765_command_bytes[3] = 1;
+			fdc->nec765_command_bytes[3] = 1;
 		}
 		else
 		{
 			/* increment */
-			fdc.nec765_command_bytes[4]++;
+			fdc->nec765_command_bytes[4]++;
 		}
 
 	}
 	else
 	{
-		fdc.nec765_command_bytes[4]++;
+		fdc->nec765_command_bytes[4]++;
 	}
 }
 
@@ -1337,19 +1358,20 @@ static void	nec765_increment_sector(running_machine *machine)
 the data is not skipped. The data is read, but the control mark is set and the read is stopped */
 /* if SK==0, and we are executing a read deleted data command, and a data sector is found,
 the data is not skipped. The data is read, but the control mark is set and the read is stopped */
-static int nec765_read_data_stop(void)
+static int nec765_read_data_stop(const device_config *device)
 {
+	nec765_t *fdc = get_safe_token(device);
 	/* skip not set? */
-	if ((fdc.nec765_command_bytes[0] & (1<<5))==0)
+	if ((fdc->nec765_command_bytes[0] & (1<<5))==0)
 	{
 		/* read data? */
-		if (fdc.command == 0x06)
+		if (fdc->command == 0x06)
 		{
 			/* did we just read a sector with deleted data? */
-			if (fdc.data_type == NEC765_DAM_DELETED_DATA)
+			if (fdc->data_type == NEC765_DAM_DELETED_DATA)
 			{
 				/* set control mark */
-				fdc.nec765_status[2] |= NEC765_ST2_CONTROL_MARK;
+				fdc->nec765_status[2] |= NEC765_ST2_CONTROL_MARK;
 
 				/* quit */
 				return TRUE;
@@ -1357,13 +1379,13 @@ static int nec765_read_data_stop(void)
 		}
 		/* deleted data? */
 		else
-		if (fdc.command == 0x0c)
+		if (fdc->command == 0x0c)
 		{
 			/* did we just read a sector with data? */
-			if (fdc.data_type == NEC765_DAM_DATA)
+			if (fdc->data_type == NEC765_DAM_DATA)
 			{
 				/* set control mark */
-				fdc.nec765_status[2] |= NEC765_ST2_CONTROL_MARK;
+				fdc->nec765_status[2] |= NEC765_ST2_CONTROL_MARK;
 
 				/* quit */
 				return TRUE;
@@ -1377,38 +1399,40 @@ static int nec765_read_data_stop(void)
 
 static TIMER_CALLBACK(nec765_continue_command)
 {
-	if ((fdc.nec765_phase == NEC765_EXECUTION_PHASE_READ) ||
-		(fdc.nec765_phase == NEC765_EXECUTION_PHASE_WRITE))
+	const device_config *device = ptr;
+	nec765_t *fdc = get_safe_token(device);
+	if ((fdc->nec765_phase == NEC765_EXECUTION_PHASE_READ) ||
+		(fdc->nec765_phase == NEC765_EXECUTION_PHASE_WRITE))
 	{
-		switch (fdc.command)
+		switch (fdc->command)
         {
 			/* read a track */
 			case 0x02:
 			{
-				fdc.sector_counter++;
+				fdc->sector_counter++;
 
 				/* sector counter == EOT */
-				if (fdc.sector_counter==fdc.nec765_command_bytes[6])
+				if (fdc->sector_counter==fdc->nec765_command_bytes[6])
 				{
 					/* TODO: Add correct info here */
 
-					fdc.nec765_status[1] |= NEC765_ST1_END_OF_CYLINDER;
+					fdc->nec765_status[1] |= NEC765_ST1_END_OF_CYLINDER;
 
-					nec765_setup_st0();
+					nec765_setup_st0(device);
 
-					fdc.nec765_result_bytes[0] = fdc.nec765_status[0];
-					fdc.nec765_result_bytes[1] = fdc.nec765_status[1];
-					fdc.nec765_result_bytes[2] = fdc.nec765_status[2];
-					fdc.nec765_result_bytes[3] = fdc.nec765_command_bytes[2]; /* C */
-					fdc.nec765_result_bytes[4] = fdc.nec765_command_bytes[3]; /* H */
-					fdc.nec765_result_bytes[5] = fdc.nec765_command_bytes[4]; /* R */
-					fdc.nec765_result_bytes[6] = fdc.nec765_command_bytes[5]; /* N */
+					fdc->nec765_result_bytes[0] = fdc->nec765_status[0];
+					fdc->nec765_result_bytes[1] = fdc->nec765_status[1];
+					fdc->nec765_result_bytes[2] = fdc->nec765_status[2];
+					fdc->nec765_result_bytes[3] = fdc->nec765_command_bytes[2]; /* C */
+					fdc->nec765_result_bytes[4] = fdc->nec765_command_bytes[3]; /* H */
+					fdc->nec765_result_bytes[5] = fdc->nec765_command_bytes[4]; /* R */
+					fdc->nec765_result_bytes[6] = fdc->nec765_command_bytes[5]; /* N */
 
-					nec765_setup_result_phase(machine,7);
+					nec765_setup_result_phase(device,7);
 				}
 				else
 				{
-					nec765_read_a_track(machine);
+					nec765_read_a_track(device);
 				}
 			}
 			break;
@@ -1416,29 +1440,29 @@ static TIMER_CALLBACK(nec765_continue_command)
 			/* format track */
 			case 0x0d:
 			{
-				floppy_drive_format_sector(current_image(machine), fdc.side, fdc.sector_counter,
-					fdc.format_data[0], fdc.format_data[1],
-					fdc.format_data[2], fdc.format_data[3],
-					fdc.nec765_command_bytes[5]);
+				floppy_drive_format_sector(current_image(device), fdc->side, fdc->sector_counter,
+					fdc->format_data[0], fdc->format_data[1],
+					fdc->format_data[2], fdc->format_data[3],
+					fdc->nec765_command_bytes[5]);
 
-				fdc.sector_counter++;
+				fdc->sector_counter++;
 
 				/* sector_counter = SC */
-				if (fdc.sector_counter == fdc.nec765_command_bytes[3])
+				if (fdc->sector_counter == fdc->nec765_command_bytes[3])
 				{
 					/* TODO: Check result is correct */
-					fdc.nec765_result_bytes[0] = fdc.nec765_status[0];
-					fdc.nec765_result_bytes[1] = fdc.nec765_status[1];
-					fdc.nec765_result_bytes[2] = fdc.nec765_status[2];
-					fdc.nec765_result_bytes[3] = fdc.format_data[0];
-					fdc.nec765_result_bytes[4] = fdc.format_data[1];
-					fdc.nec765_result_bytes[5] = fdc.format_data[2];
-					fdc.nec765_result_bytes[6] = fdc.format_data[3];
-					nec765_setup_result_phase(machine,7);
+					fdc->nec765_result_bytes[0] = fdc->nec765_status[0];
+					fdc->nec765_result_bytes[1] = fdc->nec765_status[1];
+					fdc->nec765_result_bytes[2] = fdc->nec765_status[2];
+					fdc->nec765_result_bytes[3] = fdc->format_data[0];
+					fdc->nec765_result_bytes[4] = fdc->format_data[1];
+					fdc->nec765_result_bytes[5] = fdc->format_data[2];
+					fdc->nec765_result_bytes[6] = fdc->format_data[3];
+					nec765_setup_result_phase(device,7);
 				}
 				else
 				{
-					nec765_format_track(machine);
+					nec765_format_track(device);
 				}
 			}
 			break;
@@ -1451,23 +1475,23 @@ static TIMER_CALLBACK(nec765_continue_command)
 				UINT8 ddam;
 
 				ddam = 0;
-				if (fdc.command == 0x09)
+				if (fdc->command == 0x09)
 				{
 					ddam = 1;
 				}
 
 				/* write data to disc */
-				floppy_drive_write_sector_data(current_image(machine), fdc.side, fdc.sector_id,nec765_data_buffer,nec765_n_to_bytes(fdc.nec765_command_bytes[5]),ddam);
+				floppy_drive_write_sector_data(current_image(device), fdc->side, fdc->sector_id,fdc->data_buffer,nec765_n_to_bytes(fdc->nec765_command_bytes[5]),ddam);
 
-				if (nec765_sector_count_complete(machine))
+				if (nec765_sector_count_complete(device))
 				{
-					nec765_increment_sector(machine);
-					nec765_write_complete(machine);
+					nec765_increment_sector(device);
+					nec765_write_complete(device);
 				}
 				else
 				{
-					nec765_increment_sector(machine);
-					nec765_write_data(machine);
+					nec765_increment_sector(device);
+					nec765_write_data(device);
 				}
 			}
 			break;
@@ -1480,14 +1504,14 @@ static TIMER_CALLBACK(nec765_continue_command)
 				/* read all sectors? */
 
 				/* sector id == EOT */
-				if (nec765_sector_count_complete(machine) || nec765_read_data_stop())
+				if (nec765_sector_count_complete(device) || nec765_read_data_stop(device))
 			    {
-					nec765_read_complete(machine);
+					nec765_read_complete(device);
 				}
 				else
 				{
-					nec765_increment_sector(machine);
-					nec765_read_data(machine);
+					nec765_increment_sector(device);
+					nec765_read_data(device);
 				}
 				}
 				break;
@@ -1499,19 +1523,20 @@ static TIMER_CALLBACK(nec765_continue_command)
 }
 
 
-static int nec765_get_command_byte_count(void)
+static int nec765_get_command_byte_count(const device_config *device)
 {
-	fdc.command = fdc.nec765_command_bytes[0] & 0x01f;
+	nec765_t *fdc = get_safe_token(device);
+	fdc->command = fdc->nec765_command_bytes[0] & 0x01f;
 
-	if (fdc.version==NEC765A)
+	if (fdc->version==TYPE_NEC765A)
 	{
-		 return nec765_cmd_size[fdc.command];
+		 return nec765_cmd_size[fdc->command];
     }
 	else
 	{
-		if (fdc.version==SMC37C78)
+		if (fdc->version==TYPE_SMC37C78)
 		{
-			switch (fdc.command)
+			switch (fdc->command)
 			{
 				/* version */
 				case 0x010:
@@ -1540,29 +1565,30 @@ static int nec765_get_command_byte_count(void)
 				/* seek/relative seek are together! */
 
 				default:
-					return nec765_cmd_size[fdc.command];
+					return nec765_cmd_size[fdc->command];
 			}
 		}
 	}
 
-	return nec765_cmd_size[fdc.command];
+	return nec765_cmd_size[fdc->command];
 }
 
 
 
 
 
-void nec765_update_state(running_machine *machine)
+void nec765_update_state(const device_config *device)
 {
-	switch (fdc.nec765_phase) {
+	nec765_t *fdc = get_safe_token(device);
+	switch (fdc->nec765_phase) {
 	case NEC765_RESULT_PHASE:
 		/* set data reg */
-		fdc.nec765_data_reg = fdc.nec765_result_bytes[fdc.nec765_transfer_bytes_count];
+		fdc->nec765_data_reg = fdc->nec765_result_bytes[fdc->nec765_transfer_bytes_count];
 
-		if (fdc.nec765_transfer_bytes_count == 0)
+		if (fdc->nec765_transfer_bytes_count == 0)
 		{
 			/* clear int for specific commands */
-			switch (fdc.command) {
+			switch (fdc->command) {
 			case 2:	/* read a track */
 			case 5:	/* write data */
 			case 6:	/* read data */
@@ -1573,7 +1599,7 @@ void nec765_update_state(running_machine *machine)
 			case 17:	/* scan equal */
 			case 19:	/* scan low or equal */
 			case 29:	/* scan high or equal */
-				nec765_set_int(machine, 0);
+				nec765_set_int(device, 0);
 				break;
 
 			default:
@@ -1582,173 +1608,181 @@ void nec765_update_state(running_machine *machine)
 		}
 
 		if (LOG_VERBOSE)
-			logerror("NEC765: RESULT: %02x\n", fdc.nec765_data_reg);
+			logerror("NEC765: RESULT: %02x\n", fdc->nec765_data_reg);
 
-		fdc.nec765_transfer_bytes_count++;
-		fdc.nec765_transfer_bytes_remaining--;
+		fdc->nec765_transfer_bytes_count++;
+		fdc->nec765_transfer_bytes_remaining--;
 
-		if (fdc.nec765_transfer_bytes_remaining==0)
+		if (fdc->nec765_transfer_bytes_remaining==0)
 		{
-			nec765_idle();
+			nec765_idle(device);
 		}
 		else
 		{
-			nec765_set_data_request();
+			nec765_set_data_request(device);
 		}
 		break;
 
 	case NEC765_EXECUTION_PHASE_READ:
 		/* setup data register */
-		fdc.nec765_data_reg = fdc.execution_phase_data[fdc.nec765_transfer_bytes_count];
-		fdc.nec765_transfer_bytes_count++;
-		fdc.nec765_transfer_bytes_remaining--;
+		fdc->nec765_data_reg = fdc->execution_phase_data[fdc->nec765_transfer_bytes_count];
+		fdc->nec765_transfer_bytes_count++;
+		fdc->nec765_transfer_bytes_remaining--;
 
 		if (LOG_EXTRA)
-			logerror("EXECUTION PHASE READ: %02x\n", fdc.nec765_data_reg);
+			logerror("EXECUTION PHASE READ: %02x\n", fdc->nec765_data_reg);
 
-		if ((fdc.nec765_transfer_bytes_remaining==0) || (fdc.nec765_flags & NEC765_TC))
+		if ((fdc->nec765_transfer_bytes_remaining==0) || (fdc->nec765_flags & NEC765_TC))
 		{
-			timer_adjust_oneshot(fdc.command_timer, attotime_zero, 0);
+			timer_adjust_oneshot(fdc->command_timer, attotime_zero, 0);
 		}
 		else
 		{
 			/* trigger int */
-			nec765_setup_timed_data_request(machine,1);
+			nec765_setup_timed_data_request(device,1);
 		}
 		break;
 
 	case NEC765_COMMAND_PHASE_FIRST_BYTE:
-		fdc.FDC_main |= 0x10;                      /* set BUSY */
+		fdc->FDC_main |= 0x10;                      /* set BUSY */
 
 		if (LOG_VERBOSE)
-			logerror("nec765(): pc=0x%08x command=0x%02x\n", cpu_get_pc(machine->cpu[0]), fdc.nec765_data_reg);
+			logerror("nec765(): pc=0x%08x command=0x%02x\n", cpu_get_pc(device->machine->cpu[0]), fdc->nec765_data_reg);
 
 		/* seek in progress? */
-		if (fdc.nec765_flags & NEC765_SEEK_ACTIVE)
+		if (fdc->nec765_flags & NEC765_SEEK_ACTIVE)
 		{
 			/* any command results in a invalid - I think that seek, recalibrate and
 			sense interrupt status may work*/
-			fdc.nec765_data_reg = 0;
+			fdc->nec765_data_reg = 0;
 		}
 
-		fdc.nec765_command_bytes[0] = fdc.nec765_data_reg;
+		fdc->nec765_command_bytes[0] = fdc->nec765_data_reg;
 
-		fdc.nec765_transfer_bytes_remaining = nec765_get_command_byte_count();
+		fdc->nec765_transfer_bytes_remaining = nec765_get_command_byte_count(device);
 
-		fdc.nec765_transfer_bytes_count = 1;
-		fdc.nec765_transfer_bytes_remaining--;
+		fdc->nec765_transfer_bytes_count = 1;
+		fdc->nec765_transfer_bytes_remaining--;
 
-		if (fdc.nec765_transfer_bytes_remaining==0)
+		if (fdc->nec765_transfer_bytes_remaining==0)
 		{
-			nec765_setup_command(machine);
+			nec765_setup_command(device);
 		}
 		else
 		{
 			/* request more data */
-			nec765_set_data_request();
-			fdc.nec765_phase = NEC765_COMMAND_PHASE_BYTES;
+			nec765_set_data_request(device);
+			fdc->nec765_phase = NEC765_COMMAND_PHASE_BYTES;
 		}
         break;
 
     case NEC765_COMMAND_PHASE_BYTES:
 		if (LOG_VERBOSE)
-			logerror("nec765(): pc=0x%08x command=0x%02x\n", cpu_get_pc(machine->cpu[0]), fdc.nec765_data_reg);
+			logerror("nec765(): pc=0x%08x command=0x%02x\n", cpu_get_pc(device->machine->cpu[0]), fdc->nec765_data_reg);
 
-		fdc.nec765_command_bytes[fdc.nec765_transfer_bytes_count] = fdc.nec765_data_reg;
-		fdc.nec765_transfer_bytes_count++;
-		fdc.nec765_transfer_bytes_remaining--;
+		fdc->nec765_command_bytes[fdc->nec765_transfer_bytes_count] = fdc->nec765_data_reg;
+		fdc->nec765_transfer_bytes_count++;
+		fdc->nec765_transfer_bytes_remaining--;
 
-		if (fdc.nec765_transfer_bytes_remaining==0)
+		if (fdc->nec765_transfer_bytes_remaining==0)
 		{
-			nec765_setup_command(machine);
+			nec765_setup_command(device);
 		}
 		else
 		{
 			/* request more data */
-			nec765_set_data_request();
+			nec765_set_data_request(device);
 		}
 		break;
 
     case NEC765_EXECUTION_PHASE_WRITE:
-		fdc.execution_phase_data[fdc.nec765_transfer_bytes_count]=fdc.nec765_data_reg;
-		fdc.nec765_transfer_bytes_count++;
-		fdc.nec765_transfer_bytes_remaining--;
+		fdc->execution_phase_data[fdc->nec765_transfer_bytes_count]=fdc->nec765_data_reg;
+		fdc->nec765_transfer_bytes_count++;
+		fdc->nec765_transfer_bytes_remaining--;
 
-		if ((fdc.nec765_transfer_bytes_remaining == 0) || (fdc.nec765_flags & NEC765_TC))
+		if ((fdc->nec765_transfer_bytes_remaining == 0) || (fdc->nec765_flags & NEC765_TC))
 		{
-			timer_adjust_oneshot(fdc.command_timer, attotime_zero, 0);
+			timer_adjust_oneshot(fdc->command_timer, attotime_zero, 0);
 		}
 		else
 		{
-			nec765_setup_timed_data_request(machine,1);
+			nec765_setup_timed_data_request(device,1);
 		}
 		break;
 	}
 }
 
 
-READ8_HANDLER(nec765_data_r)
+READ8_DEVICE_HANDLER(nec765_data_r)
 {
-	if ((fdc.FDC_main & 0x0c0) == 0x0c0)
+	nec765_t *fdc = get_safe_token(device);
+	
+	if ((fdc->FDC_main & 0x0c0) == 0x0c0)
 	{
 		if (
-			(fdc.nec765_phase == NEC765_EXECUTION_PHASE_READ) ||
-			(fdc.nec765_phase == NEC765_EXECUTION_PHASE_WRITE))
+			(fdc->nec765_phase == NEC765_EXECUTION_PHASE_READ) ||
+			(fdc->nec765_phase == NEC765_EXECUTION_PHASE_WRITE))
 		{
 
 			/* reading the data byte clears the interrupt */
-			nec765_set_int(space->machine,CLEAR_LINE);
+			nec765_set_int(device,CLEAR_LINE);
 		}
 
 		/* reset data request */
-		nec765_clear_data_request();
+		nec765_clear_data_request(device);
 
 		/* update state */
-		nec765_update_state(space->machine);
+		nec765_update_state(device);
 	}
 
 	if (LOG_EXTRA)
-		logerror("DATA R: %02x\n", fdc.nec765_data_reg);
+		logerror("DATA R: %02x\n", fdc->nec765_data_reg);
 
-	return fdc.nec765_data_reg;
+	return fdc->nec765_data_reg;
 }
 
-WRITE8_HANDLER(nec765_data_w)
+WRITE8_DEVICE_HANDLER(nec765_data_w)
 {
+	nec765_t *fdc = get_safe_token(device);
+	
 	if (LOG_EXTRA)
 		logerror("DATA W: %02x\n", data);
 
 	/* write data to data reg */
-	fdc.nec765_data_reg = data;
+	fdc->nec765_data_reg = data;
 
-	if ((fdc.FDC_main & 0x0c0)==0x080)
+	if ((fdc->FDC_main & 0x0c0)==0x080)
 	{
 		if (
-			(fdc.nec765_phase == NEC765_EXECUTION_PHASE_READ) ||
-			(fdc.nec765_phase == NEC765_EXECUTION_PHASE_WRITE))
+			(fdc->nec765_phase == NEC765_EXECUTION_PHASE_READ) ||
+			(fdc->nec765_phase == NEC765_EXECUTION_PHASE_WRITE))
 		{
 
 			/* reading the data byte clears the interrupt */
-			nec765_set_int(space->machine, CLEAR_LINE);
+			nec765_set_int(device, CLEAR_LINE);
 		}
 
 		/* reset data request */
-		nec765_clear_data_request();
+		nec765_clear_data_request(device);
 
 		/* update state */
-		nec765_update_state(space->machine);
+		nec765_update_state(device);
 	}
 }
 
-static void nec765_setup_invalid(running_machine *machine)
+static void nec765_setup_invalid(const device_config *device)
 {
-	fdc.command = 0;
-	fdc.nec765_result_bytes[0] = 0x080;
-	nec765_setup_result_phase(machine,1);
+	nec765_t *fdc = get_safe_token(device);
+	
+	fdc->command = 0;
+	fdc->nec765_result_bytes[0] = 0x080;
+	nec765_setup_result_phase(device,1);
 }
 
-static void nec765_setup_command(running_machine *machine)
+static void nec765_setup_command(const device_config *device)
 {
+	nec765_t *fdc = get_safe_token(device);
+	
 	static const char *const commands[] =
 	{
 		NULL,						/* [00] */
@@ -1774,81 +1808,81 @@ static void nec765_setup_command(running_machine *machine)
 		"Lock"						/* [14] */
 	};
 
-	const device_config *img = current_image(machine);
+	const device_config *img = current_image(device);
 	const char *cmd = NULL;
 	chrn_id id;
 
 	/* if not in dma mode set execution phase bit */
-	if (!(fdc.nec765_flags & NEC765_DMA_MODE))
+	if (!(fdc->nec765_flags & NEC765_DMA_MODE))
 	{
-        fdc.FDC_main |= 0x020;              /* execution phase */
+        fdc->FDC_main |= 0x020;              /* execution phase */
 	}
 
 	if (LOG_COMMAND)
 	{
-		if ((fdc.nec765_command_bytes[0] & 0x1f) < sizeof(commands) / sizeof(commands[0]))
-			cmd = commands[fdc.nec765_command_bytes[0] & 0x1f];
+		if ((fdc->nec765_command_bytes[0] & 0x1f) < sizeof(commands) / sizeof(commands[0]))
+			cmd = commands[fdc->nec765_command_bytes[0] & 0x1f];
 		logerror("nec765_setup_command(): Setting up command 0x%02X (%s)\n",
-			fdc.nec765_command_bytes[0] & 0x1f, cmd ? cmd : "???");
+			fdc->nec765_command_bytes[0] & 0x1f, cmd ? cmd : "???");
 	}
 
-	switch (fdc.nec765_command_bytes[0] & 0x1f)
+	switch (fdc->nec765_command_bytes[0] & 0x1f)
 	{
 		case 0x03:      /* specify */
 			/* setup step rate */
-			fdc.srt_in_ms = 16-((fdc.nec765_command_bytes[1]>>4) & 0x0f);
+			fdc->srt_in_ms = 16-((fdc->nec765_command_bytes[1]>>4) & 0x0f);
 
-			fdc.nec765_flags &= ~NEC765_DMA_MODE;
+			fdc->nec765_flags &= ~NEC765_DMA_MODE;
 
-			if ((fdc.nec765_command_bytes[2] & 0x01)==0)
+			if ((fdc->nec765_command_bytes[2] & 0x01)==0)
 			{
-				fdc.nec765_flags |= NEC765_DMA_MODE;
+				fdc->nec765_flags |= NEC765_DMA_MODE;
 			}
 
-			nec765_idle();
+			nec765_idle(device);
 			break;
 
 		case 0x04:  /* sense drive status */
-			nec765_setup_drive_and_side();
+			nec765_setup_drive_and_side(device);
 
-			fdc.nec765_status[3] = fdc.drive | (fdc.side<<2);
+			fdc->nec765_status[3] = fdc->drive | (fdc->side<<2);
 
 			if (floppy_drive_get_flag_state(img, FLOPPY_DRIVE_DISK_WRITE_PROTECTED))
 			{
-				fdc.nec765_status[3] |= 0x40;
+				fdc->nec765_status[3] |= 0x40;
 			}
 
 			if (floppy_drive_get_flag_state(img, FLOPPY_DRIVE_READY))
 			{
-				fdc.nec765_status[3] |= 0x20;
+				fdc->nec765_status[3] |= 0x20;
 			}
 
 			if (floppy_drive_get_flag_state(img, FLOPPY_DRIVE_HEAD_AT_TRACK_0))
 			{
-				fdc.nec765_status[3] |= 0x10;
+				fdc->nec765_status[3] |= 0x10;
 			}
 
-			fdc.nec765_status[3] |= 0x08;
+			fdc->nec765_status[3] |= 0x08;
 
 			/* two side and fault not set but should be? */
-			fdc.nec765_result_bytes[0] = fdc.nec765_status[3];
-			nec765_setup_result_phase(machine,1);
+			fdc->nec765_result_bytes[0] = fdc->nec765_status[3];
+			nec765_setup_result_phase(device,1);
 			break;
 
 		case 0x07:          /* recalibrate */
-			nec765_seek_setup(machine, 1);
+			nec765_seek_setup(device, 1);
 			break;
 
 		case 0x0f:          /* seek */
-			nec765_seek_setup(machine, 0);
+			nec765_seek_setup(device, 0);
 			break;
 
 		case 0x0a:      /* read id */
-			nec765_setup_drive_and_side();
+			nec765_setup_drive_and_side(device);
 
-			fdc.nec765_status[0] = fdc.drive | (fdc.side<<2);
-			fdc.nec765_status[1] = 0;
-			fdc.nec765_status[2] = 0;
+			fdc->nec765_status[0] = fdc->drive | (fdc->side<<2);
+			fdc->nec765_status[1] = 0;
+			fdc->nec765_status[2] = 0;
 
 			/* drive ready? */
 			if (floppy_drive_get_flag_state(img, FLOPPY_DRIVE_READY))
@@ -1871,7 +1905,7 @@ static void nec765_setup_command(running_machine *machine)
 					do
 					{
 						/* get next id from disc */
-						if (floppy_drive_get_next_id(img, fdc.side, &id))
+						if (floppy_drive_get_next_id(img, fdc->side, &id))
 						{
 							/* got an id - quit */
 							break;
@@ -1886,15 +1920,15 @@ static void nec765_setup_command(running_machine *machine)
 					while (index_count!=2);
 
 					/* at this point, we have seen a id or two index pulses have occured! */
-					fdc.nec765_result_bytes[0] = fdc.nec765_status[0];
-					fdc.nec765_result_bytes[1] = fdc.nec765_status[1];
-					fdc.nec765_result_bytes[2] = fdc.nec765_status[2];
-					fdc.nec765_result_bytes[3] = id.C; /* C */
-					fdc.nec765_result_bytes[4] = id.H; /* H */
-					fdc.nec765_result_bytes[5] = id.R; /* R */
-					fdc.nec765_result_bytes[6] = id.N; /* N */
+					fdc->nec765_result_bytes[0] = fdc->nec765_status[0];
+					fdc->nec765_result_bytes[1] = fdc->nec765_status[1];
+					fdc->nec765_result_bytes[2] = fdc->nec765_status[2];
+					fdc->nec765_result_bytes[3] = id.C; /* C */
+					fdc->nec765_result_bytes[4] = id.H; /* H */
+					fdc->nec765_result_bytes[5] = id.R; /* R */
+					fdc->nec765_result_bytes[6] = id.N; /* N */
 
-					nec765_setup_result_phase(machine,7);
+					nec765_setup_result_phase(device,7);
 				}
 				else
 				{
@@ -1909,182 +1943,182 @@ static void nec765_setup_command(running_machine *machine)
 				/* what are id values when drive not ready? */
 
 				/* not ready, abnormal termination */
-				fdc.nec765_status[0] |= (1<<3) | (1<<6);
-				fdc.nec765_result_bytes[0] = fdc.nec765_status[0];
-				fdc.nec765_result_bytes[1] = fdc.nec765_status[1];
-				fdc.nec765_result_bytes[2] = fdc.nec765_status[2];
-				fdc.nec765_result_bytes[3] = 0; /* C */
-				fdc.nec765_result_bytes[4] = 0; /* H */
-				fdc.nec765_result_bytes[5] = 0; /* R */
-				fdc.nec765_result_bytes[6] = 0; /* N */
+				fdc->nec765_status[0] |= (1<<3) | (1<<6);
+				fdc->nec765_result_bytes[0] = fdc->nec765_status[0];
+				fdc->nec765_result_bytes[1] = fdc->nec765_status[1];
+				fdc->nec765_result_bytes[2] = fdc->nec765_status[2];
+				fdc->nec765_result_bytes[3] = 0; /* C */
+				fdc->nec765_result_bytes[4] = 0; /* H */
+				fdc->nec765_result_bytes[5] = 0; /* R */
+				fdc->nec765_result_bytes[6] = 0; /* N */
 			}
 			break;
 
 
 		case 0x08: /* sense interrupt status */
 			/* interrupt pending? */
-			if (fdc.nec765_flags & NEC765_INT)
+			if (fdc->nec765_flags & NEC765_INT)
 			{
 				/* yes. Clear int */
-				nec765_set_int(machine, CLEAR_LINE);
+				nec765_set_int(device, CLEAR_LINE);
 
 				/* clear drive seek bits */
-				fdc.FDC_main &= ~(1 | 2 | 4 | 8);
+				fdc->FDC_main &= ~(1 | 2 | 4 | 8);
 
 				/* return status */
-				fdc.nec765_result_bytes[0] = fdc.nec765_status[0];
+				fdc->nec765_result_bytes[0] = fdc->nec765_status[0];
 				/* return pcn */
-				fdc.nec765_result_bytes[1] = fdc.pcn[fdc.drive];
+				fdc->nec765_result_bytes[1] = fdc->pcn[fdc->drive];
 
 				/* return result */
-				nec765_setup_result_phase(machine,2);
+				nec765_setup_result_phase(device,2);
 			}
 			else
 			{
-				if(fdc.version == NEC72065 && (fdc.FDC_main & 0x0f) == 0x00)
+				if(fdc->version == TYPE_NEC72065 && (fdc->FDC_main & 0x0f) == 0x00)
 				{  // based on XM6
-					nec765_setup_invalid(machine);
+					nec765_setup_invalid(device);
 				}
 				else
 				{
 					/* no int */
-					fdc.nec765_result_bytes[0] = 0x80;
+					fdc->nec765_result_bytes[0] = 0x80;
 					/* return pcn */
-					fdc.nec765_result_bytes[1] = fdc.pcn[fdc.drive];
+					fdc->nec765_result_bytes[1] = fdc->pcn[fdc->drive];
 
 					/* return result */
-					nec765_setup_result_phase(machine,2);
+					nec765_setup_result_phase(device,2);
 				}
 			}
 			break;
 
 		case 0x06:  /* read data */
-			nec765_setup_drive_and_side();
+			nec765_setup_drive_and_side(device);
 
-			fdc.nec765_status[0] = fdc.drive | (fdc.side<<2);
-			fdc.nec765_status[1] = 0;
-			fdc.nec765_status[2] = 0;
+			fdc->nec765_status[0] = fdc->drive | (fdc->side<<2);
+			fdc->nec765_status[1] = 0;
+			fdc->nec765_status[2] = 0;
 
-			nec765_read_data(machine);
+			nec765_read_data(device);
 			break;
 
 		case 0x0c:
 			/* read deleted data */
-			nec765_setup_drive_and_side();
+			nec765_setup_drive_and_side(device);
 
-			fdc.nec765_status[0] = fdc.drive | (fdc.side<<2);
-			fdc.nec765_status[1] = 0;
-			fdc.nec765_status[2] = 0;
+			fdc->nec765_status[0] = fdc->drive | (fdc->side<<2);
+			fdc->nec765_status[1] = 0;
+			fdc->nec765_status[2] = 0;
 
 			/* .. for now */
-			nec765_read_data(machine);
+			nec765_read_data(device);
 			break;
 
 		case 0x09:
 			/* write deleted data */
-			nec765_setup_drive_and_side();
+			nec765_setup_drive_and_side(device);
 
-			fdc.nec765_status[0] = fdc.drive | (fdc.side<<2);
-			fdc.nec765_status[1] = 0;
-			fdc.nec765_status[2] = 0;
+			fdc->nec765_status[0] = fdc->drive | (fdc->side<<2);
+			fdc->nec765_status[1] = 0;
+			fdc->nec765_status[2] = 0;
 
 			/* ... for now */
-			nec765_write_data(machine);
+			nec765_write_data(device);
 			break;
 
 		case 0x02:
 			/* read a track */
-			nec765_setup_drive_and_side();
+			nec765_setup_drive_and_side(device);
 
-			fdc.nec765_status[0] = fdc.drive | (fdc.side<<2);
-			fdc.nec765_status[1] = 0;
-			fdc.nec765_status[2] = 0;
+			fdc->nec765_status[0] = fdc->drive | (fdc->side<<2);
+			fdc->nec765_status[1] = 0;
+			fdc->nec765_status[2] = 0;
 
-			fdc.nec765_status[0] |= NEC765_ST1_NO_DATA;
+			fdc->nec765_status[0] |= NEC765_ST1_NO_DATA;
 
 			/* wait for index */
 			do
 			{
 				/* get next id from disc */
-				floppy_drive_get_next_id(img, fdc.side,&id);
+				floppy_drive_get_next_id(img, fdc->side,&id);
 			}
 			while ((floppy_drive_get_flag_state(img, FLOPPY_DRIVE_INDEX))==0);
 
-			fdc.sector_counter = 0;
+			fdc->sector_counter = 0;
 
-			nec765_read_a_track(machine);
+			nec765_read_a_track(device);
 			break;
 
 		case 0x05:  /* write data */
-			nec765_setup_drive_and_side();
+			nec765_setup_drive_and_side(device);
 
-			fdc.nec765_status[0] = fdc.drive | (fdc.side<<2);
-			fdc.nec765_status[1] = 0;
-			fdc.nec765_status[2] = 0;
+			fdc->nec765_status[0] = fdc->drive | (fdc->side<<2);
+			fdc->nec765_status[1] = 0;
+			fdc->nec765_status[2] = 0;
 
-			nec765_write_data(machine);
+			nec765_write_data(device);
 			break;
 
 		case 0x0d:	/* format a track */
-			nec765_setup_drive_and_side();
+			nec765_setup_drive_and_side(device);
 
-			fdc.nec765_status[0] = fdc.drive | (fdc.side<<2);
-			fdc.nec765_status[1] = 0;
-			fdc.nec765_status[2] = 0;
+			fdc->nec765_status[0] = fdc->drive | (fdc->side<<2);
+			fdc->nec765_status[1] = 0;
+			fdc->nec765_status[2] = 0;
 
-			fdc.sector_counter = 0;
+			fdc->sector_counter = 0;
 
-			nec765_format_track(machine);
+			nec765_format_track(device);
 			break;
 
 		default:	/* invalid */
-			switch (fdc.version)
+			switch (fdc->version)
 			{
-				case NEC765A:
-				case NEC72065:
-					nec765_setup_invalid(machine);
+				case TYPE_NEC765A:
+				case TYPE_NEC72065:
+					nec765_setup_invalid(device);
 					break;
 
-				case NEC765B:
+				case TYPE_NEC765B:
 					/* from nec765b data sheet */
-					if ((fdc.nec765_command_bytes[0] & 0x01f)==0x010)
+					if ((fdc->nec765_command_bytes[0] & 0x01f)==0x010)
 					{
 						/* version */
-						fdc.nec765_status[0] = 0x090;
-						fdc.nec765_result_bytes[0] = fdc.nec765_status[0];
-						nec765_setup_result_phase(machine,1);
+						fdc->nec765_status[0] = 0x090;
+						fdc->nec765_result_bytes[0] = fdc->nec765_status[0];
+						nec765_setup_result_phase(device,1);
 					}
 					break;
 
-				case SMC37C78:
+				case TYPE_SMC37C78:
 					/* TO BE COMPLETED!!! !*/
-					switch (fdc.nec765_command_bytes[0] & 0x1f)
+					switch (fdc->nec765_command_bytes[0] & 0x1f)
 					{
 						case 0x10:		/* version */
-							fdc.nec765_status[0] = 0x90;
-							fdc.nec765_result_bytes[0] = fdc.nec765_status[0];
-							nec765_setup_result_phase(machine,1);
+							fdc->nec765_status[0] = 0x90;
+							fdc->nec765_result_bytes[0] = fdc->nec765_status[0];
+							nec765_setup_result_phase(device,1);
 							break;
 
 						case 0x13:		/* configure */
-							nec765_idle();
+							nec765_idle(device);
 							break;
 
 						case 0x0e:		/* dump reg */
-							fdc.nec765_result_bytes[0] = fdc.pcn[0];
-							fdc.nec765_result_bytes[1] = fdc.pcn[1];
-							fdc.nec765_result_bytes[2] = fdc.pcn[2];
-							fdc.nec765_result_bytes[3] = fdc.pcn[3];
+							fdc->nec765_result_bytes[0] = fdc->pcn[0];
+							fdc->nec765_result_bytes[1] = fdc->pcn[1];
+							fdc->nec765_result_bytes[2] = fdc->pcn[2];
+							fdc->nec765_result_bytes[3] = fdc->pcn[3];
 
-							nec765_setup_result_phase(machine,10);
+							nec765_setup_result_phase(device,10);
 							break;
 
 						case 0x12:		/* perpendicular mode */
-							nec765_idle();
+							nec765_idle(device);
 							break;
 
 						case 0x14:		/* lock */
-							nec765_setup_result_phase(machine,1);
+							nec765_setup_result_phase(device,1);
 							break;
 					}
 					break;
@@ -2094,52 +2128,54 @@ static void nec765_setup_command(running_machine *machine)
 
 
 /* dma acknowledge write */
-WRITE8_HANDLER(nec765_dack_w)
+WRITE8_DEVICE_HANDLER(nec765_dack_w)
 {
 	/* clear request */
-	nec765_set_dma_drq(space->machine, CLEAR_LINE);
+	nec765_set_dma_drq(device, CLEAR_LINE);
 
 	/* write data */
-	nec765_data_w(space, offset, data);
+	nec765_data_w(device, offset, data);
 }
 
-READ8_HANDLER(nec765_dack_r)
+READ8_DEVICE_HANDLER(nec765_dack_r)
 {
 	/* clear data request */
-	nec765_set_dma_drq(space->machine,CLEAR_LINE);
+	nec765_set_dma_drq(device,CLEAR_LINE);
 
 	/* read data */
-	return nec765_data_r(space, offset);
+	return nec765_data_r(device, offset);
 }
 
 
-void nec765_reset(running_machine *machine, int offset)
+void nec765_reset(const device_config *device, int offset)
 {
+	nec765_t *fdc = get_safe_token(device);
+	
 	/* nec765 in idle state - ready to accept commands */
-	nec765_idle();
+	nec765_idle(device);
 
 	/* set int low */
-	nec765_set_int(machine, 0);
+	nec765_set_int(device, 0);
 	/* set dma drq output */
-	nec765_set_dma_drq(machine,0);
+	nec765_set_dma_drq(device,0);
 
 	/* tandy 100hx assumes that after NEC is reset, it is in DMA mode */
-	fdc.nec765_flags |= NEC765_DMA_MODE;
+	fdc->nec765_flags |= NEC765_DMA_MODE;
 
 	/* if ready input is set during reset generate an int */
-	if (fdc.nec765_flags & NEC765_FDD_READY)
+	if (fdc->nec765_flags & NEC765_FDD_READY)
 	{
 		int i;
 		int a_drive_is_ready;
 
-		fdc.nec765_status[0] = 0x080 | 0x040;
+		fdc->nec765_status[0] = 0x080 | 0x040;
 
 		/* for the purpose of pc-xt. If any of the drives have a disk inserted,
-		do not set not-ready - need to check with pc_fdc.c whether all drives
+		do not set not-ready - need to check with pc_fdc->c whether all drives
 		are checked or only the drive selected with the drive select bits?? */
 
 		a_drive_is_ready = 0;
-		for (i = 0; i < device_count(machine, IO_FLOPPY); i++)
+		for (i = 0; i < device_count(device->machine, IO_FLOPPY); i++)
 		{
 			if (image_exists(image_from_devtype_and_index(IO_FLOPPY, i)))
 			{
@@ -2149,56 +2185,197 @@ void nec765_reset(running_machine *machine, int offset)
 
 		}
 
-		if (!a_drive_is_ready && fdc.rdy_pin == NEC765_RDY_PIN_CONNECTED )
+		if (!a_drive_is_ready && fdc->intf->rdy_pin == NEC765_RDY_PIN_CONNECTED )
 		{
-			fdc.nec765_status[0] |= 0x08;
+			fdc->nec765_status[0] |= 0x08;
 		}
 
-		nec765_set_int(machine, 1);
+		nec765_set_int(device, 1);
 	}
 }
 
-void nec765_set_reset_state(running_machine *machine, int state)
+void nec765_set_reset_state(const device_config *device, int state)
 {
+	nec765_t *fdc = get_safe_token(device);
+	
 	int flags;
 
 	/* get previous reset state */
-	flags = fdc.nec765_flags;
+	flags = fdc->nec765_flags;
 
 	/* set new reset state */
 	/* clear reset */
-	fdc.nec765_flags &= ~NEC765_RESET;
+	fdc->nec765_flags &= ~NEC765_RESET;
 
 	/* reset */
 	if (state)
 	{
-		fdc.nec765_flags |= NEC765_RESET;
+		fdc->nec765_flags |= NEC765_RESET;
 
-		nec765_set_int(machine, 0);
+		nec765_set_int(device, 0);
 	}
 
 	/* reset changed state? */
-	if (((flags^fdc.nec765_flags) & NEC765_RESET)!=0)
+	if (((flags^fdc->nec765_flags) & NEC765_RESET)!=0)
 	{
 		/* yes */
 
 		/* no longer reset */
-		if ((fdc.nec765_flags & NEC765_RESET)==0)
+		if ((fdc->nec765_flags & NEC765_RESET)==0)
 		{
 			/* reset nec */
-			nec765_reset(machine, 0);
+			nec765_reset(device, 0);
 		}
 	}
 }
 
 
-void	nec765_set_ready_state(int state)
+void nec765_set_ready_state(const device_config *device, int state)
 {
+	nec765_t *fdc = get_safe_token(device);
+	
 	/* clear ready state */
-	fdc.nec765_flags &= ~NEC765_FDD_READY;
+	fdc->nec765_flags &= ~NEC765_FDD_READY;
 
 	if (state)
 	{
-		fdc.nec765_flags |= NEC765_FDD_READY;
+		fdc->nec765_flags |= NEC765_FDD_READY;
+	}
+}
+
+
+/* Device Interface */
+
+static device_start_err common_start(const device_config *device, int device_type)
+{
+	nec765_t *fdc = get_safe_token(device);
+	// validate arguments
+
+	assert(device != NULL);
+	assert(device->tag != NULL);
+	assert(strlen(device->tag) < 20);
+	assert(device->static_config != NULL);
+	
+	fdc->intf = device->static_config;
+
+	fdc->version = device_type;
+	fdc->timer = timer_alloc(device->machine, nec765_timer_callback, (void*)device);
+	fdc->seek_timer = timer_alloc(device->machine, nec765_seek_timer_callback, (void*)device);
+	fdc->command_timer = timer_alloc(device->machine, nec765_continue_command, (void*)device);
+
+	fdc->nec765_flags &= NEC765_FDD_READY;
+	fdc->data_buffer = auto_malloc(32*1024);
+
+
+	// register for state saving
+	//state_save_register_item(device->machine, "nec765", device->tag, 0, nec765->number);
+	return DEVICE_START_OK;
+}
+
+static DEVICE_START( nec765a )
+{
+	return common_start(device, TYPE_NEC765A);
+}
+
+static DEVICE_START( nec765b )
+{
+	return common_start(device, TYPE_NEC765B);
+}
+
+static DEVICE_START( smc37c78 )
+{
+	return common_start(device, TYPE_SMC37C78);
+}
+
+static DEVICE_START( nec72065 )
+{
+	return common_start(device, TYPE_NEC72065);
+}
+
+static DEVICE_RESET( nec765 )
+{
+	int i;
+		
+	for (i = 0; i < device_count(device->machine, IO_FLOPPY); i++) {
+		const device_config *img = image_from_devtype_and_index(IO_FLOPPY, i);
+		floppy_drive_set_controller(img, device);
+		floppy_drive_set_ready_state_change_callback(img, nec765_set_ready_change_callback);
+	}
+	
+	nec765_reset(device,0);
+}
+
+static DEVICE_SET_INFO( nec765 )
+{
+	switch (state)
+	{
+		/* no parameters to set */
+	}
+}
+
+DEVICE_GET_INFO( nec765a )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(nec765_t);					break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
+		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(nec765); break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(nec765a);	break;
+		case DEVINFO_FCT_STOP:							/* Nothing */								break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(nec765);	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							info->s = "NEC765A";						break;
+		case DEVINFO_STR_FAMILY:						info->s = "NEC765A";						break;
+		case DEVINFO_STR_VERSION:						info->s = "1.0";							break;
+		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;							break;
+		case DEVINFO_STR_CREDITS:						info->s = "Copyright MESS Team";			break;
+	}
+}
+
+
+DEVICE_GET_INFO( nec765b )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							info->s = "NEC765B";				break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(nec765b);	break;
+
+		default: 										DEVICE_GET_INFO_CALL(nec765a);				break;
+	}
+}
+
+DEVICE_GET_INFO( smc37c78 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							info->s = "SMC37C78";				break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(smc37c78);	break;
+
+		default: 										DEVICE_GET_INFO_CALL(nec765a);				break;
+	}
+}
+
+DEVICE_GET_INFO( nec72065 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							info->s = "NEC72065";				break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(nec72065);	break;
+
+		default: 										DEVICE_GET_INFO_CALL(nec765a);				break;
 	}
 }

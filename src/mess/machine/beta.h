@@ -16,7 +16,8 @@ int betadisk_is_active(void);
 void betadisk_enable(void);
 void betadisk_disable(void);
 void betadisk_clear_status(void);
-void betadisk_wd179x_callback(running_machine *machine, wd17xx_state_t state, void *param);
+
+extern const wd17xx_interface beta_wd17xx_interface;
 
 READ8_HANDLER(betadisk_status_r);
 READ8_HANDLER(betadisk_track_r);

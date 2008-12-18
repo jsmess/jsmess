@@ -566,7 +566,6 @@ enum
 	LC_FMMFM_mask	= (1 << LC_FMMFM_bit)
 };
 
-static void fdc_callback(running_machine *machine, wd17xx_state_t event, void *param);
 
 static  READ8_HANDLER(concept_fdc_reg_r);
 static WRITE8_HANDLER(concept_fdc_reg_w);
@@ -577,14 +576,12 @@ static void concept_fdc_init(running_machine *machine, int slot)
 	fdc_local_status = 0;
 	fdc_local_command = 0;
 
-	wd17xx_init(machine, WD_TYPE_179X, fdc_callback, NULL);
-
 	install_expansion_slot(slot, concept_fdc_reg_r, concept_fdc_reg_w, concept_fdc_rom_r, NULL);
 }
 
-static void fdc_callback(running_machine *machine, wd17xx_state_t event, void *param)
+static WD17XX_CALLBACK( fdc_callback )
 {
-	switch (event)
+	switch (state)
 	{
 		case WD17XX_IRQ_CLR:
 			fdc_local_status &= ~LS_INT_mask;
@@ -601,8 +598,11 @@ static void fdc_callback(running_machine *machine, wd17xx_state_t event, void *p
 	}
 }
 
+const wd17xx_interface concept_wd17xx_interface = { fdc_callback, NULL };
+
 static  READ8_HANDLER(concept_fdc_reg_r)
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
 	switch (offset)
 	{
 	case 0:
@@ -612,22 +612,22 @@ static  READ8_HANDLER(concept_fdc_reg_r)
 
 	case 8:
 		/* FDC STATUS REG */
-		return wd17xx_status_r(space, offset);
+		return wd17xx_status_r(fdc, offset);
 		break;
 
 	case 9:
 		/* FDC TRACK REG */
-		return wd17xx_track_r(space, offset);
+		return wd17xx_track_r(fdc, offset);
 		break;
 
 	case 10:
 		/* FDC SECTOR REG */
-		return wd17xx_sector_r(space, offset);
+		return wd17xx_sector_r(fdc, offset);
 		break;
 
 	case 11:
 		/* FDC DATA REG */
-		return wd17xx_data_r(space, offset);
+		return wd17xx_data_r(fdc, offset);
 		break;
 	}
 
@@ -637,41 +637,41 @@ static  READ8_HANDLER(concept_fdc_reg_r)
 static WRITE8_HANDLER(concept_fdc_reg_w)
 {
 	int current_drive;
-
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
 	switch (offset)
 	{
 	case 0:
 		/* local command reg */
 		fdc_local_command = data;
 
-		wd17xx_set_side((data & LC_FLPSD1_mask) != 0);
+		wd17xx_set_side(fdc,(data & LC_FLPSD1_mask) != 0);
 		current_drive = ((data >> LC_DE0_bit) & 1) | ((data >> (LC_DE1_bit-1)) & 2);
-		wd17xx_set_drive(current_drive);
+		wd17xx_set_drive(fdc, current_drive);
 		/*motor_on = (data & LC_MOTOROF_mask) == 0;*/
 		// floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, current_drive), (data & LC_MOTOROF_mask) == 0 ? 1 : 0);
 		/*flp_8in = (data & LC_FLP8IN_mask) != 0;*/
-		wd17xx_set_density((data & LC_FMMFM_mask) ? DEN_FM_LO : DEN_MFM_LO);
+		wd17xx_set_density(fdc, (data & LC_FMMFM_mask) ? DEN_FM_LO : DEN_MFM_LO);
 		floppy_drive_set_ready_state(image_from_devtype_and_index(IO_FLOPPY, current_drive), 1, 0);
 		break;
 
 	case 8:
 		/* FDC COMMAMD REG */
-		wd17xx_command_w(space, offset, data);
+		wd17xx_command_w(fdc, offset, data);
 		break;
 
 	case 9:
 		/* FDC TRACK REG */
-		wd17xx_track_w(space, offset, data);
+		wd17xx_track_w(fdc, offset, data);
 		break;
 
 	case 10:
 		/* FDC SECTOR REG */
-		wd17xx_sector_w(space, offset, data);
+		wd17xx_sector_w(fdc, offset, data);
 		break;
 
 	case 11:
 		/* FDC DATA REG */
-		wd17xx_data_w(space, offset, data);
+		wd17xx_data_w(fdc, offset, data);
 		break;
 	}
 }

@@ -34,6 +34,7 @@
 #include "formats/basicdsk.h"
 #include "devices/harddriv.h"
 #include "machine/mm58274c.h"
+#include "machine/wd17xx.h"
 
 static ADDRESS_MAP_START(concept_memmap, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x000000, 0x000007) AM_ROM AM_REGION("main", 0x010000) 	/* boot ROM mirror */
@@ -92,6 +93,8 @@ static MACHINE_DRIVER_START( concept )
 
 	/* via */
 	MDRV_VIA6522_ADD("via6522_0", 1022750, concept_via6522_intf)
+	
+	MDRV_WD179X_ADD("wd179x", concept_wd17xx_interface )
 MACHINE_DRIVER_END
 
 

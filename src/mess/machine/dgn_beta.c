@@ -657,7 +657,8 @@ static READ8_HANDLER(d_pia1_pa_r)
 static WRITE8_HANDLER(d_pia1_pa_w)
 {
 	int	HALT_DMA;
-
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
+	
 	/* Only play with halt line if halt bit changed since last write */
 	if((data & 0x80)!=d_pia1_pa_last)
 	{
@@ -678,17 +679,17 @@ static WRITE8_HANDLER(d_pia1_pa_w)
 	}
 
 	/* Drive selects are binary encoded on PA0 & PA1 */
-	wd17xx_set_drive(~data & DSMask);
+	wd17xx_set_drive(fdc,~data & DSMask);
 
 	/* Set density of WD2797 */
 	if (data & DDenCtrl)
 	{
-		wd17xx_set_density(DEN_FM_LO);
+		wd17xx_set_density(fdc,DEN_FM_LO);
 		LOG_DISK(("Set density low %d\n",(data & DDenCtrl)));
 	}
 	else
 	{
-		wd17xx_set_density(DEN_MFM_LO);
+		wd17xx_set_density(fdc,DEN_MFM_LO);
 		LOG_DISK(("Set density high %d\n",(data & DDenCtrl)));
 	}
 }
@@ -883,13 +884,13 @@ static void cpu1_recalc_firq(running_machine *machine, int state)
 /* Dragon Beta onboard FDC */
 /********************************************************************************************/
 
-static void dgnbeta_fdc_callback(running_machine *machine, wd17xx_state_t event, void *param)
+static WD17XX_CALLBACK( dgnbeta_fdc_callback )
 {
 	/* The INTRQ line goes through pia2 ca1, in exactly the same way as DRQ from DragonDos does */
 	/* DRQ is routed through various logic to the FIRQ inturrupt line on *BOTH* CPUs */
-	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	const address_space *space = cpu_get_address_space( device->machine->cpu[0], ADDRESS_SPACE_PROGRAM );
 
-	switch(event)
+	switch(state)
 	{
 		case WD17XX_IRQ_CLR:
 			pia_2_ca1_w(space, 0, CLEAR_LINE);
@@ -899,35 +900,38 @@ static void dgnbeta_fdc_callback(running_machine *machine, wd17xx_state_t event,
 			break;
 		case WD17XX_DRQ_CLR:
 			/*wd2797_drq=CLEAR_LINE;*/
-			cpu1_recalc_firq(machine, CLEAR_LINE);
+			cpu1_recalc_firq(device->machine, CLEAR_LINE);
 			break;
 		case WD17XX_DRQ_SET:
 			/*wd2797_drq=ASSERT_LINE;*/
-			cpu1_recalc_firq(machine, ASSERT_LINE);
+			cpu1_recalc_firq(device->machine, ASSERT_LINE);
 			break;
 	}
 
-	LOG_DISK(("dgnbeta_fdc_callback(%d)\n",event));
+	LOG_DISK(("dgnbeta_fdc_callback(%d)\n",state));
 }
+
+const wd17xx_interface dgnbeta_wd17xx_interface = { dgnbeta_fdc_callback, NULL };
 
  READ8_HANDLER(dgnbeta_wd2797_r)
 {
 	int result = 0;
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
 
 	switch(offset & 0x03)
 	{
 		case 0:
-			result = wd17xx_status_r(space, 0);
+			result = wd17xx_status_r(fdc, 0);
 			LOG_DISK(("Disk status=%2.2X\n",result));
 			break;
 		case 1:
-			result = wd17xx_track_r(space, 0);
+			result = wd17xx_track_r(fdc, 0);
 			break;
 		case 2:
-			result = wd17xx_sector_r(space, 0);
+			result = wd17xx_sector_r(fdc, 0);
 			break;
 		case 3:
-			result = wd17xx_data_r(space, 0);
+			result = wd17xx_data_r(fdc, 0);
 			break;
 		default:
 			break;
@@ -938,23 +942,25 @@ static void dgnbeta_fdc_callback(running_machine *machine, wd17xx_state_t event,
 
 WRITE8_HANDLER(dgnbeta_wd2797_w)
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
+
     switch(offset & 0x3)
 	{
 		case 0:
 			/* disk head is encoded in the command byte */
 			/* But only for Type 3/4 commands */
 			if(data & 0x80)
-				wd17xx_set_side((data & 0x02) ? 1 : 0);
-			wd17xx_command_w(space, 0, data);
+				wd17xx_set_side(fdc,(data & 0x02) ? 1 : 0);
+			wd17xx_command_w(fdc, 0, data);
 			break;
 		case 1:
-			wd17xx_track_w(space, 0, data);
+			wd17xx_track_w(fdc, 0, data);
 			break;
 		case 2:
-			wd17xx_sector_w(space, 0, data);
+			wd17xx_sector_w(fdc, 0, data);
 			break;
 		case 3:
-			wd17xx_data_w(space, 0, data);
+			wd17xx_data_w(fdc, 0, data);
 			break;
 	};
 }
@@ -1027,6 +1033,8 @@ void dgn_beta_line_interrupt (int data)
 
 static void dgnbeta_reset(running_machine *machine)
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( machine->config->devicelist, WD179X, "wd179x");
+
 	system_rom = memory_region(machine, "main");
 
 	/* Make sure CPU 1 is started out halted ! */
@@ -1061,9 +1069,8 @@ static void dgnbeta_reset(running_machine *machine)
 	DMA_NMI_LAST=0x80;			/* start with DMA NMI inactive, as pulled up */
 //	DMA_NMI=CLEAR_LINE;			/* start with DMA NMI inactive */
 
-	wd17xx_reset(machine);
-	wd17xx_set_density(DEN_MFM_LO);
-	wd17xx_set_drive(0);
+	wd17xx_set_density(fdc,DEN_MFM_LO);
+	wd17xx_set_drive(fdc,0);
 
 	videoram=mess_ram;			/* Point video ram at the start of physical ram */
 }
@@ -1077,7 +1084,6 @@ MACHINE_START( dgnbeta )
 
 	init_video(machine);
 
-	wd17xx_init(machine, WD_TYPE_179X,dgnbeta_fdc_callback, NULL);
 	cpu_set_dasm_override(machine->cpu[0],dgnbeta_dasm_override);
 
 	add_reset_callback(machine, dgnbeta_reset);

@@ -28,9 +28,9 @@ DRIVER_INIT(partner)
 	radio86_tape_value = 0x80;
 }
 
-static void partner_wd17xx_callback(running_machine *machine, wd17xx_state_t state, void *param)
+static WD17XX_CALLBACK( partner_wd17xx_callback )
 {
-	const device_config *dma8257 = device_list_find_by_tag(machine->config->devicelist, DMA8257, "dma8257");
+	const device_config *dma8257 = device_list_find_by_tag(device->machine->config->devicelist, DMA8257, "dma8257");
 	switch(state)
 	{
 		case WD17XX_IRQ_CLR:
@@ -44,11 +44,14 @@ static void partner_wd17xx_callback(running_machine *machine, wd17xx_state_t sta
 			break;
 	}
 }
+
+const wd17xx_interface partner_wd17xx_interface = { partner_wd17xx_callback, NULL };
+
 MACHINE_START(partner)
 {
-	wd17xx_init(machine, WD_TYPE_1793, partner_wd17xx_callback , NULL);
-	wd17xx_set_density (DEN_MFM_HI);	
-	wd17xx_set_pause_time(10);
+	device_config *fdc = (device_config*)device_list_find_by_tag( machine->config->devicelist, WD1793, "wd1793");
+	wd17xx_set_density (fdc,DEN_MFM_HI);	
+	wd17xx_set_pause_time(fdc,10);
 }
 
 DEVICE_IMAGE_LOAD( partner_floppy )
@@ -105,13 +108,15 @@ static void partner_window_2(running_machine *machine, UINT8 bank, UINT16 offset
 }
 
 static READ8_HANDLER ( partner_floppy_r ) {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD1793, "wd1793");
+	
 	if (offset<0x100) {
 		switch(offset & 3) {
-			case 0x00 : return wd17xx_status_r(space,0); 
-			case 0x01 : return wd17xx_track_r(space,0);
-			case 0x02 : return wd17xx_sector_r(space,0);
+			case 0x00 : return wd17xx_status_r(fdc,0); 
+			case 0x01 : return wd17xx_track_r(fdc,0);
+			case 0x02 : return wd17xx_sector_r(fdc,0);
 			default   :
-						return wd17xx_data_r(space,0);
+						return wd17xx_data_r(fdc,0);
 		}
 	} else {
 		return 0;
@@ -119,21 +124,23 @@ static READ8_HANDLER ( partner_floppy_r ) {
 }
 
 static WRITE8_HANDLER ( partner_floppy_w ) {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD1793, "wd1793");
+	
 	if (offset<0x100) {
 		switch(offset & 3) {
-			case 0x00 : wd17xx_command_w(space,0,data); break;
-			case 0x01 : wd17xx_track_w(space,0,data);break;
-			case 0x02 : wd17xx_sector_w(space,0,data);break;
-			default   : wd17xx_data_w(space,0,data);break;
+			case 0x00 : wd17xx_command_w(fdc,0,data); break;
+			case 0x01 : wd17xx_track_w(fdc,0,data);break;
+			case 0x02 : wd17xx_sector_w(fdc,0,data);break;
+			default   : wd17xx_data_w(fdc,0,data);break;
 		}
 	} else {
 		if (((data >> 6) & 1)==1) {
-			wd17xx_set_drive(0);
+			wd17xx_set_drive(fdc,0);
 		}
 		if (((data >> 3) & 1)==1) {
-			wd17xx_set_drive(1);
+			wd17xx_set_drive(fdc,1);
 		}		
-		wd17xx_set_side(data >> 7);	 	
+		wd17xx_set_side(fdc,data >> 7);	 	
 	}
 }
 
@@ -376,12 +383,14 @@ static WRITE8_DEVICE_HANDLER(partner_dma_write_byte)
 
 static READ8_DEVICE_HANDLER ( partner_wd17xx_data_r )
 {
-	return wd17xx_data_r(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), offset);
+	device_config *fdc = (device_config*)device_list_find_by_tag( device->machine->config->devicelist, WD1793, "wd1793");
+	return wd17xx_data_r(fdc, offset);
 }
 
 static WRITE8_DEVICE_HANDLER ( partner_wd17xx_data_w )
 {
-	wd17xx_data_w(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), offset, data);
+	device_config *fdc = (device_config*)device_list_find_by_tag( device->machine->config->devicelist, WD1793, "wd1793");
+	wd17xx_data_w(fdc, offset, data);
 }
 
 const dma8257_interface partner_dma =
@@ -397,26 +406,10 @@ const dma8257_interface partner_dma =
 	{ 0, 0, 0, 0 }
 };
 
-/*
-const dma8257_interface partner_dma =
-{
-	0,
-	XTAL_16MHz / 9,
-
-	radio86_dma_read_byte,
-	partner_dma_write_byte,
-
-	{ wd17xx_data_r,  0, 0, 0 },
-	{ wd17xx_data_w, 0, radio86_write_video, 0 },
-	{ 0, 0, 0, 0 }
-};
-*/
-
 
 MACHINE_RESET( partner )
 {
 	partner_mem_page = 0;
 	partner_win_mem_page = 0;
 	partner_bank_switch(machine);
-	wd17xx_reset(machine);
 }

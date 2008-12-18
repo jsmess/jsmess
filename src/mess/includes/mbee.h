@@ -7,12 +7,14 @@
 #ifndef MBEE_H_
 #define MBEE_H_
 
+#include "machine/wd17xx.h"
 #include "cpu/z80/z80daisy.h"
 
 /*----------- defined in machine/mbee.c -----------*/
 
+extern const wd17xx_interface mbee_wd17xx_interface;
+
 MACHINE_RESET( mbee );
-MACHINE_START( mbee );
 
 extern UINT8 *mbee_workram;
 

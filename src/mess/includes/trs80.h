@@ -8,7 +8,7 @@
 #define TRS80_H_
 
 #include "devices/snapquik.h"
-
+#include "machine/wd17xx.h"
 
 #define TRS80_FONT_W 6
 #define TRS80_FONT_H 12
@@ -16,12 +16,12 @@
 
 /*----------- defined in machine/trs80.c -----------*/
 
+extern const wd17xx_interface trs80_wd17xx_interface;
 extern UINT8 trs80_port_ff;
 
 DEVICE_IMAGE_LOAD( trs80_floppy );
 QUICKLOAD_LOAD( trs80_cmd );
 
-MACHINE_START( trs80 );
 MACHINE_RESET( trs80 );
 DRIVER_INIT( trs80 );
 DRIVER_INIT( lnw80 );

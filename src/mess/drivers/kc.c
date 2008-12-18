@@ -333,9 +333,9 @@ static ADDRESS_MAP_START(kc85_disc_hw_mem, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(kc85_disc_hw_io, ADDRESS_SPACE_IO, 8)
-	AM_RANGE(0x0f0, 0x0f0) AM_READ(nec765_status_r)
-	AM_RANGE(0x0f1, 0x0f1) AM_READWRITE(nec765_data_r, nec765_data_w)
-	AM_RANGE(0x0f2, 0x0f3) AM_READWRITE(nec765_dack_r, nec765_dack_w)
+	AM_RANGE(0x0f0, 0x0f0) AM_DEVREAD( NEC765A, "nec765", nec765_status_r)
+	AM_RANGE(0x0f1, 0x0f1) AM_DEVREADWRITE( NEC765A, "nec765", nec765_data_r, nec765_data_w)
+	AM_RANGE(0x0f2, 0x0f3) AM_DEVREADWRITE( NEC765A, "nec765", nec765_dack_r, nec765_dack_w)
 	AM_RANGE(0x0f4, 0x0f5) AM_READ(kc85_disc_hw_input_gate_r)
 	/*{0x0f6, 0x0f7, SMH_NOP},*/		/* for controller */
 	AM_RANGE(0x0f8, 0x0f9) AM_WRITE( kc85_disc_hw_terminal_count_w) /* terminal count */
@@ -348,6 +348,8 @@ static MACHINE_DRIVER_START( cpu_kc_disc )
 	MDRV_CPU_IO_MAP(kc85_disc_hw_io, 0)
 
 	MDRV_Z80CTC_ADD( "z80ctc_1", kc85_disc_ctc_intf )
+	
+	MDRV_NEC765A_ADD("nec765", kc_fdc_interface)
 MACHINE_DRIVER_END
 
 

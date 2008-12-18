@@ -37,6 +37,7 @@ TODO:
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "devices/basicdsk.h"
+#include "machine/wd17xx.h"
 #include "cpu/z80/z80daisy.h"
 #include "includes/osborne1.h"
 
@@ -168,7 +169,6 @@ static MACHINE_DRIVER_START( osborne1 )
 	MDRV_CPU_IO_MAP( osborne1_io, 0 )
 	MDRV_CPU_CONFIG( osborne1_daisy_chain )
 
-	MDRV_MACHINE_START( osborne1 )
 	MDRV_MACHINE_RESET( osborne1 )
 
 	MDRV_DEVICE_ADD( "osborne1_daisy", OSBORNE1_DAISY )
@@ -184,6 +184,9 @@ static MACHINE_DRIVER_START( osborne1 )
 	MDRV_SPEAKER_STANDARD_MONO( "mono" )
 	MDRV_SOUND_ADD( "beep", BEEP, 0 )
 	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
+	
+	MDRV_MB8877_ADD("mb8877", default_wd17xx_interface )
+	
 MACHINE_DRIVER_END
 
 

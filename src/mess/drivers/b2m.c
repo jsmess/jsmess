@@ -38,10 +38,10 @@ static ADDRESS_MAP_START( b2m_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x14, 0x15) AM_DEVREADWRITE(PIC8259, "pic8259", pic8259_r, pic8259_w )
 	AM_RANGE(0x18, 0x18) AM_DEVREADWRITE(MSM8251, "uart", msm8251_data_r,msm8251_data_w)
 	AM_RANGE(0x19, 0x19) AM_DEVREADWRITE(MSM8251, "uart", msm8251_status_r,msm8251_control_w)
-  	AM_RANGE(0x1c, 0x1c) AM_READWRITE(wd17xx_status_r,wd17xx_command_w) 
-  	AM_RANGE(0x1d, 0x1d) AM_READWRITE(wd17xx_track_r,wd17xx_track_w) 
-  	AM_RANGE(0x1e, 0x1e) AM_READWRITE(wd17xx_sector_r,wd17xx_sector_w) 
-  	AM_RANGE(0x1f, 0x1f) AM_READWRITE(wd17xx_data_r,wd17xx_data_w) 	
+  	AM_RANGE(0x1c, 0x1c) AM_DEVREADWRITE(WD1793, "wd1793", wd17xx_status_r,wd17xx_command_w) 
+  	AM_RANGE(0x1d, 0x1d) AM_DEVREADWRITE(WD1793, "wd1793", wd17xx_track_r,wd17xx_track_w) 
+  	AM_RANGE(0x1e, 0x1e) AM_DEVREADWRITE(WD1793, "wd1793", wd17xx_sector_r,wd17xx_sector_w) 
+  	AM_RANGE(0x1f, 0x1f) AM_DEVREADWRITE(WD1793, "wd1793", wd17xx_data_r,wd17xx_data_w) 	
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( b2m_rom_io, ADDRESS_SPACE_IO, 8 )
@@ -205,6 +205,8 @@ static MACHINE_DRIVER_START( b2m )
 
 	/* uart */
 	MDRV_DEVICE_ADD("uart", MSM8251)
+	
+	MDRV_WD1793_ADD("wd1793", default_wd17xx_interface )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( b2mrom )
@@ -253,4 +255,5 @@ SYSTEM_CONFIG_END
 /*    YEAR  NAME   	PARENT  COMPAT  MACHINE 	INPUT   	INIT  	 CONFIG COMPANY 				 FULLNAME   FLAGS */
 COMP( 1989, b2m, 	0, 	 	0,		b2m, 		b2m, 		b2m, 	 b2m,  	"BNPO",					 "Bashkiria-2M",	 GAME_NOT_WORKING)
 COMP( 1989, b2mrom,	b2m, 	0,		b2mrom,		b2m, 		b2m, 	 b2m,  	"BNPO",					 "Bashkiria-2M ROM-disk",	 GAME_NOT_WORKING)
+
 

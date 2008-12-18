@@ -514,6 +514,8 @@ static MACHINE_DRIVER_START(geneve_60hz)
 	/* tms9902 */
 	MDRV_TMS9902_ADD("tms9902_0", tms9902_params_0)
 	MDRV_TMS9902_ADD("tms9902_1", tms9902_params_1)
+	
+	MDRV_WD179X_ADD("wd179x", ti99_wd17xx_interface )
 MACHINE_DRIVER_END
 
 

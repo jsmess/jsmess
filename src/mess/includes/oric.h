@@ -8,12 +8,13 @@
 #define ORIC_H_
 
 #include "machine/6522via.h"
-
+#include "machine/wd17xx.h"
 
 /*----------- defined in machine/oric.c -----------*/
 
 extern const via6522_interface oric_6522_interface;
 extern const via6522_interface telestrat_via2_interface;
+extern const wd17xx_interface oric_wd17xx_interface;
 
 MACHINE_START( oric );
 MACHINE_RESET( oric );

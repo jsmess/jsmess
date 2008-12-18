@@ -338,7 +338,7 @@ typedef struct
 
 static SVI318_FDC_STRUCT svi318_fdc;
 
-static void svi_fdc_callback(running_machine *machine, wd17xx_state_t state, void *param)
+static WD17XX_CALLBACK( svi_fdc_callback )
 {
 	switch( state )
 	{
@@ -357,16 +357,19 @@ static void svi_fdc_callback(running_machine *machine, wd17xx_state_t state, voi
 	}
 }
 
+const wd17xx_interface svi_wd17xx_interface = { svi_fdc_callback, NULL };
+
 static WRITE8_HANDLER( svi318_fdc_drive_motor_w )
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
 	switch (data & 3)
 	{
 	case 1:
-		wd17xx_set_drive(0);
+		wd17xx_set_drive(fdc,0);
 		svi318_fdc.driveselect = 0;
 		break;
 	case 2:
-		wd17xx_set_drive(1);
+		wd17xx_set_drive(fdc,1);
 		svi318_fdc.driveselect = 1;
 		break;
 	}
@@ -375,10 +378,11 @@ static WRITE8_HANDLER( svi318_fdc_drive_motor_w )
 static WRITE8_HANDLER( svi318_fdc_density_side_w )
 {
 	const device_config *image;
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
 
-	wd17xx_set_density(data & 0x01 ? DEN_FM_LO:DEN_MFM_LO);
+	wd17xx_set_density(fdc, data & 0x01 ? DEN_FM_LO:DEN_MFM_LO);
 
-	wd17xx_set_side(data & 0x02 ? 1:0);
+	wd17xx_set_side(fdc, data & 0x02 ? 1:0);
 
 	image = image_from_devtype_and_index(IO_FLOPPY, svi318_fdc.driveselect);
 	if (image_exists(image))
@@ -608,13 +612,11 @@ static const TMS9928a_interface svi318_tms9929a_interface =
 MACHINE_START( svi318_ntsc )
 {
 	TMS9928A_configure(&svi318_tms9928a_interface);
-	wd17xx_init(machine, WD_TYPE_179X, svi_fdc_callback, NULL);
 }
 
 MACHINE_START( svi318_pal )
 {
 	TMS9928A_configure(&svi318_tms9929a_interface);
-	wd17xx_init(machine, WD_TYPE_179X, svi_fdc_callback, NULL);
 }
 
 MACHINE_RESET( svi318 )
@@ -624,8 +626,6 @@ MACHINE_RESET( svi318 )
 
 	svi.bank_switch = 0xff;
 	svi318_set_banks(machine);
-
-	wd17xx_reset(machine);
 }
 
 INTERRUPT_GEN( svi318_interrupt )
@@ -787,6 +787,7 @@ int svi318_cassette_present(running_machine *machine, int id)
 READ8_HANDLER( svi318_io_ext_r )
 {
 	UINT8 data = 0xff;
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
 
 	if (svi.bankLow == SVI_CART) {
 		return 0xff;
@@ -820,16 +821,16 @@ READ8_HANDLER( svi318_io_ext_r )
 		break;
 
 	case 0x30:
-		data = wd17xx_status_r(space, 0);
+		data = wd17xx_status_r(fdc, 0);
 		break;
 	case 0x31:
-		data = wd17xx_track_r(space, 0);
+		data = wd17xx_track_r(fdc, 0);
 		break;
 	case 0x32:
-		data = wd17xx_sector_r(space, 0);
+		data = wd17xx_sector_r(fdc, 0);
 		break;
 	case 0x33:
-		data = wd17xx_data_r(space, 0);
+		data = wd17xx_data_r(fdc, 0);
 		break;
 	case 0x34:
 		data = svi318_fdc_irqdrq_r(space, 0);
@@ -846,6 +847,8 @@ READ8_HANDLER( svi318_io_ext_r )
 
 WRITE8_HANDLER( svi318_io_ext_w )
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
+	
 	if (svi.bankLow == SVI_CART) {
 		return;
 	}
@@ -879,16 +882,16 @@ WRITE8_HANDLER( svi318_io_ext_w )
 		break;
 
 	case 0x30:
-		wd17xx_command_w(space, 0, data);
+		wd17xx_command_w(fdc, 0, data);
 		break;
 	case 0x31:
-		wd17xx_track_w(space, 0, data);
+		wd17xx_track_w(fdc, 0, data);
 		break;
 	case 0x32:
-		wd17xx_sector_w(space, 0, data);
+		wd17xx_sector_w(fdc, 0, data);
 		break;
 	case 0x33:
-		wd17xx_data_w(space, 0, data);
+		wd17xx_data_w(fdc, 0, data);
 		break;
 	case 0x34:
 		svi318_fdc_drive_motor_w(space, 0, data);

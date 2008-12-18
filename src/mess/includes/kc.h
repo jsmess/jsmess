@@ -11,7 +11,7 @@
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "devices/snapquik.h"
-
+#include "machine/nec765.h"
 
 #define KC85_4_CLOCK 1750000
 #define KC85_3_CLOCK 1750000
@@ -43,6 +43,7 @@ unsigned char *kc85_4_get_video_ram_base(int bank, int colour);
 
 /*----------- defined in machine/kc.c -----------*/
 
+extern const nec765_interface kc_fdc_interface;
 extern QUICKLOAD_LOAD( kc );
 
 MACHINE_RESET( kc85_3 );

@@ -795,26 +795,29 @@ const ppi8255_interface pc8801_8255_config_1 =
 
 READ8_HANDLER(pc8801fd_nec765_tc)
 {
-  nec765_set_tc_state(space->machine, 1);
-  nec765_set_tc_state(space->machine, 0);
+  device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, NEC765A, "nec765");
+  nec765_set_tc_state(fdc, 1);
+  nec765_set_tc_state(fdc, 0);
   return 0;
 }
 
 /* callback for /INT output from FDC */
-static void pc8801_fdc_interrupt(running_machine *machine,int state)
+static NEC765_INTERRUPT( pc8801_fdc_interrupt )
 {
-    cpu_set_input_line(machine->cpu[1], 0, state ? HOLD_LINE : CLEAR_LINE);
+    cpu_set_input_line(device->machine->cpu[1], 0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 /* callback for /DRQ output from FDC */
-static void pc8801_fdc_dma_drq(running_machine *machine,int state, int read_)
+static NEC765_DMA_REQUEST( pc8801_fdc_dma_drq )
 {
 }
 
-static const struct nec765_interface pc8801_fdc_interface=
+const nec765_interface pc8801_fdc_interface=
 {
 	pc8801_fdc_interrupt,
-	pc8801_fdc_dma_drq
+	pc8801_fdc_dma_drq,
+	NULL,
+	NEC765_RDY_PIN_CONNECTED
 };
 
 static void pc8801_init_5fd(running_machine *machine)
@@ -824,7 +827,6 @@ static void pc8801_init_5fd(running_machine *machine)
 		cpu_suspend(machine->cpu[1], SUSPEND_REASON_DISABLE, 1);
 	else
 		cpu_resume(machine->cpu[1], SUSPEND_REASON_DISABLE);
-	nec765_init(machine, &pc8801_fdc_interface,NEC765A,NEC765_RDY_PIN_CONNECTED);
 	cpu_set_input_line_vector(machine->cpu[1],0,0);
 	floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, 0), 1);
 	floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, 1), 1);

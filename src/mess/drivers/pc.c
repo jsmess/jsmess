@@ -1367,6 +1367,8 @@ static MACHINE_DRIVER_START( pcmda )
 
 	/* harddisk */
 	MDRV_IMPORT_FROM( pc_hdc )
+	
+	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
 MACHINE_DRIVER_END
 
 
@@ -1421,6 +1423,8 @@ static MACHINE_DRIVER_START( pcherc )
 
 	/* harddisk */
 	MDRV_IMPORT_FROM( pc_hdc )
+	
+	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
 MACHINE_DRIVER_END
 
 static const cassette_config ibm5150_cassette_config =
@@ -1487,6 +1491,8 @@ static MACHINE_DRIVER_START( ibm5150 )
 	MDRV_IMPORT_FROM( pc_hdc )
 
 	MDRV_CASSETTE_ADD( "cassette", ibm5150_cassette_config )
+	
+	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)	
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pccga )
@@ -1541,6 +1547,8 @@ static MACHINE_DRIVER_START( pccga )
 
 	/* harddisk */
 	MDRV_IMPORT_FROM( pc_hdc )
+	
+	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
 MACHINE_DRIVER_END
 
 
@@ -1588,6 +1596,8 @@ static MACHINE_DRIVER_START( europc )
 
 	/* harddisk */
 	MDRV_IMPORT_FROM( pc_hdc )
+	
+	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
 MACHINE_DRIVER_END
 
 
@@ -1641,6 +1651,8 @@ static MACHINE_DRIVER_START( ibm5160 )
 
 	/* harddisk */
 	MDRV_IMPORT_FROM( pc_hdc )
+	
+	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
 MACHINE_DRIVER_END
 
 
@@ -1681,6 +1693,8 @@ static MACHINE_DRIVER_START( pc200 )
 
 	/* harddisk */
 	MDRV_IMPORT_FROM( pc_hdc )
+	
+	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
 MACHINE_DRIVER_END
 
 
@@ -1723,6 +1737,8 @@ static MACHINE_DRIVER_START( pc1512 )
 
 	/* harddisk */
 	MDRV_IMPORT_FROM( pc_hdc )
+	
+	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
 MACHINE_DRIVER_END
 
 
@@ -1768,6 +1784,8 @@ static MACHINE_DRIVER_START( pc1640 )
 
 	/* harddisk */
 	MDRV_IMPORT_FROM( pc_hdc )
+	
+	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
 MACHINE_DRIVER_END
 
 
@@ -1817,6 +1835,8 @@ static MACHINE_DRIVER_START( xtvga )
 
 	/* harddisk */
 	MDRV_IMPORT_FROM( pc_hdc )
+	
+	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
 MACHINE_DRIVER_END
 
 
@@ -1859,6 +1879,8 @@ static MACHINE_DRIVER_START( t1000hx )
 
 	/* harddisk */
 	MDRV_IMPORT_FROM( pc_hdc )
+	
+	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
 MACHINE_DRIVER_END
 
 
@@ -1900,6 +1922,8 @@ static MACHINE_DRIVER_START( ibmpcjr )
 	MDRV_DEVICE_ADD("printer3", PRINTER)
 
 	MDRV_CASSETTE_ADD( "cassette", ibm5150_cassette_config )
+	
+	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
 MACHINE_DRIVER_END
 
 #if 0

@@ -463,8 +463,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pc8801fd_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf8, 0xf8) AM_READ( pc8801fd_nec765_tc )
-	AM_RANGE(0xfa, 0xfa) AM_READ( nec765_status_r )
-	AM_RANGE(0xfb, 0xfb) AM_READWRITE( nec765_data_r, nec765_data_w )
+	AM_RANGE(0xfa, 0xfa) AM_DEVREAD(NEC765A, "nec765", nec765_status_r )
+	AM_RANGE(0xfb, 0xfb) AM_DEVREADWRITE(NEC765A, "nec765", nec765_data_r, nec765_data_w )
 	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE( PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w )
 ADDRESS_MAP_END
 
@@ -559,6 +559,8 @@ static MACHINE_DRIVER_START( pc88srl )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MDRV_SOUND_ADD("beep", BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	
+	MDRV_NEC765A_ADD("nec765", pc8801_fdc_interface)
 MACHINE_DRIVER_END
 
 

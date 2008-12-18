@@ -390,6 +390,8 @@ static MACHINE_DRIVER_START( comx35p )
 	MDRV_QUICKLOAD_ADD(comx35, "comx", 0)
 
 	MDRV_CASSETTE_ADD( "cassette", comx35_cassette_config )
+
+	MDRV_WD1770_ADD("wd1770", comx35_wd17xx_interface )	
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( comx35n )

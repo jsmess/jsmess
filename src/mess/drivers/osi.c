@@ -355,7 +355,7 @@ static WRITE8_HANDLER( osi630_sound_w )
 	C011 ACIAIO			DISK CONTROLLER ACIA I/O PORT
 */
 
-static void osi470_index_callback(const device_config *img, int state)
+static void osi470_index_callback(const device_config *controller, const device_config *img, int state)
 {
 	osi_state *driver_state = img->machine->driver_data;
 

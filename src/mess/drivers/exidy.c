@@ -342,7 +342,6 @@ static MACHINE_START( exidyd )
 static MACHINE_START( exidy )
 {
 	MACHINE_START_CALL( exidyd );
-	wd17xx_init(machine, WD_TYPE_179X, NULL, NULL);
 }
 
 static MACHINE_RESET( exidyd )
@@ -375,16 +374,17 @@ static MACHINE_RESET( exidy )
 
 static  READ8_HANDLER ( exidy_wd179x_r )
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
 	switch (offset & 0x03)
 	{
 	case 0:
-		return wd17xx_status_r(space, offset);
+		return wd17xx_status_r(fdc, offset);
 	case 1:
-		return wd17xx_track_r(space, offset);
+		return wd17xx_track_r(fdc, offset);
 	case 2:
-		return wd17xx_sector_r(space, offset);
+		return wd17xx_sector_r(fdc, offset);
 	case 3:
-		return wd17xx_data_r(space, offset);
+		return wd17xx_data_r(fdc, offset);
 	default:
 		return 0xff;
 	}
@@ -392,19 +392,20 @@ static  READ8_HANDLER ( exidy_wd179x_r )
 
 static WRITE8_HANDLER ( exidy_wd179x_w )
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
 	switch (offset & 0x03)
 	{
 	case 0:
-		wd17xx_command_w(space, offset, data);
+		wd17xx_command_w(fdc, offset, data);
 		return;
 	case 1:
-		wd17xx_track_w(space, offset, data);
+		wd17xx_track_w(fdc, offset, data);
 		return;
 	case 2:
-		wd17xx_sector_w(space, offset, data);
+		wd17xx_sector_w(fdc, offset, data);
 		return;
 	case 3:
-		wd17xx_data_w(space, offset, data);
+		wd17xx_data_w(fdc, offset, data);
 		return;
 	default:
 		break;
@@ -825,6 +826,8 @@ static MACHINE_DRIVER_START( exidy )
 
 	MDRV_CASSETTE_ADD( "cassette1", exidy_cassette_config )
 	MDRV_CASSETTE_ADD( "cassette2", exidy_cassette_config )
+	
+	MDRV_WD179X_ADD("wd179x", default_wd17xx_interface )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( exidyd )

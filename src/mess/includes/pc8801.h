@@ -7,11 +7,13 @@
 #ifndef PC8801_H_
 #define PC8801_H_
 
+#include "machine/nec765.h"
 
 /*----------- defined in machine/pc8801.c -----------*/
 
 extern const ppi8255_interface pc8801_8255_config_0;
 extern const ppi8255_interface pc8801_8255_config_1;
+extern const nec765_interface pc8801_fdc_interface;
 
 WRITE8_HANDLER(pc8801_write_interrupt_level);
 WRITE8_HANDLER(pc8801_write_interrupt_mask);

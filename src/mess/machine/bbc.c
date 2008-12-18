@@ -1671,9 +1671,9 @@ density disc image
 
 static int bbc_1770_IntEnabled;
 
-static void bbc_wd177x_callback(running_machine *machine, wd17xx_state_t event, void *param)
+static WD17XX_CALLBACK( bbc_wd177x_callback)
 {
-	int state;
+	int bbc_state;
 	/* wd177x_IRQ_SET and latch bit 4 (nmi_enable) are NAND'ED together
 	   wd177x_DRQ_SET and latch bit 4 (nmi_enable) are NAND'ED together
 	   the output of the above two NAND gates are then OR'ED together and sent to the 6502 NMI line.
@@ -1686,11 +1686,11 @@ static void bbc_wd177x_callback(running_machine *machine, wd17xx_state_t event, 
 	  The nmi is edge triggered, and triggers on a +ve edge.
 	*/
 
-	logerror("callback $%02X\n", event);
+	logerror("callback $%02X\n", state);
 
 
 	/* update bbc_wd177x_drq_irq_state depending on event */
-	switch (event)
+	switch (state)
 	{
         case WD17XX_DRQ_SET:
 		{
@@ -1721,51 +1721,57 @@ static void bbc_wd177x_callback(running_machine *machine, wd17xx_state_t event, 
 	if (((bbc_wd177x_drq_irq_state & 3)!=0) && (bbc_1770_IntEnabled))
 	{
 		/* int trigger */
-		state = 1;
+		bbc_state = 1;
 	}
 	else
 	{
 		/* do not trigger int */
-		state = 0;
+		bbc_state = 0;
 	}
 
 	/* nmi is edge triggered, and triggers when the state goes from clear->set.
 	Here we are checking this transition before triggering the nmi */
-	if (state!=previous_wd177x_int_state)
+	if (bbc_state!=previous_wd177x_int_state)
 	{
-		if (state)
+		if (bbc_state)
 		{
 			/* I'll pulse it because if I used hold-line I'm not sure
 			it would clear - to be checked */
-			cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI,PULSE_LINE);
+			cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_NMI,PULSE_LINE);
 		}
 	}
 
-	previous_wd177x_int_state = state;
+	previous_wd177x_int_state = bbc_state;
 
 }
 
+const wd17xx_interface bbc_wd17xx_interface = {
+	bbc_wd177x_callback,
+	NULL
+};
+
 static WRITE8_HANDLER(bbc_wd177x_status_w)
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD177X, "wd177x");	
 	drive_control = data;
 
 	/* set drive */
-	if ((data>>0) & 0x01) wd17xx_set_drive(0);
-	if ((data>>1) & 0x01) wd17xx_set_drive(1);
+	if ((data>>0) & 0x01) wd17xx_set_drive(fdc,0);
+	if ((data>>1) & 0x01) wd17xx_set_drive(fdc,1);
 
 	/* set side */
-	wd17xx_set_side((data>>2) & 0x01);
+	wd17xx_set_side(fdc,(data>>2) & 0x01);
 
 	/* set density */
 	if ((data>>3) & 0x01)
 	{
 		/* single density */
-		wd17xx_set_density(DEN_FM_HI);
+		wd17xx_set_density(fdc,DEN_FM_HI);
 	}
 	else
 	{
 		/* double density */
-		wd17xx_set_density(DEN_MFM_LO);
+		wd17xx_set_density(fdc,DEN_MFM_LO);
 	}
 
 	bbc_1770_IntEnabled=(((data>>4) & 0x01)==0);
@@ -1775,21 +1781,22 @@ static WRITE8_HANDLER(bbc_wd177x_status_w)
 
 
 READ8_HANDLER ( bbc_wd1770_read )
-{
+{	
 	int retval=0xff;
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD177X, "wd177x");
 	switch (offset)
 	{
 	case 4:
-		retval=wd17xx_status_r(space, 0);
+		retval=wd17xx_status_r(fdc, 0);
 		break;
 	case 5:
-		retval=wd17xx_track_r(space, 0);
+		retval=wd17xx_track_r(fdc, 0);
 		break;
 	case 6:
-		retval=wd17xx_sector_r(space, 0);
+		retval=wd17xx_sector_r(fdc, 0);
 		break;
 	case 7:
-		retval=wd17xx_data_r(space, 0);
+		retval=wd17xx_data_r(fdc, 0);
 		break;
 	default:
 		break;
@@ -1801,6 +1808,7 @@ READ8_HANDLER ( bbc_wd1770_read )
 
 WRITE8_HANDLER ( bbc_wd1770_write )
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD177X, "wd177x");
 	logerror("wd177x write: $%02X  $%02X\n", offset,data);
 	switch (offset)
 	{
@@ -1808,16 +1816,16 @@ WRITE8_HANDLER ( bbc_wd1770_write )
 		bbc_wd177x_status_w(space, 0, data);
 		break;
 	case 4:
-		wd17xx_command_w(space, 0, data);
+		wd17xx_command_w(fdc, 0, data);
 		break;
 	case 5:
-		wd17xx_track_w(space, 0, data);
+		wd17xx_track_w(fdc, 0, data);
 		break;
 	case 6:
-		wd17xx_sector_w(space, 0, data);
+		wd17xx_sector_w(fdc, 0, data);
 		break;
 	case 7:
-		wd17xx_data_w(space, 0, data);
+		wd17xx_data_w(fdc, 0, data);
 		break;
 	default:
 		break;
@@ -1864,25 +1872,26 @@ static int opusbank;
 
 static WRITE8_HANDLER( bbc_opus_status_w )
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD177X, "wd177x");
 	drive_control = data;
 
 	/* set drive */
-	if ((data>>1) & 0x01) wd17xx_set_drive(0);
-	if ((data>>2) & 0x01) wd17xx_set_drive(1);
+	if ((data>>1) & 0x01) wd17xx_set_drive(fdc,0);
+	if ((data>>2) & 0x01) wd17xx_set_drive(fdc,1);
 
 	/* set side */
-	wd17xx_set_side((data>>0) & 0x01);
+	wd17xx_set_side(fdc,(data>>0) & 0x01);
 
 	/* set density */
 	if ((data>>5) & 0x01)
 	{
 		/* single density */
-		wd17xx_set_density(DEN_FM_HI);
+		wd17xx_set_density(fdc,DEN_FM_HI);
 	}
 	else
 	{
 		/* double density */
-		wd17xx_set_density(DEN_MFM_LO);
+		wd17xx_set_density(fdc,DEN_MFM_LO);
 	}
 
 	bbc_1770_IntEnabled=(data>>4) & 0x01;
@@ -1891,6 +1900,7 @@ static WRITE8_HANDLER( bbc_opus_status_w )
 
 READ8_HANDLER( bbc_opus_read )
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD177X, "wd177x");
 	logerror("wd177x read: $%02X\n", offset);
 
 	if (bbc_DFSType==6)
@@ -1900,16 +1910,16 @@ READ8_HANDLER( bbc_opus_read )
 			switch (offset)
 			{
 				case 0xf8:
-					return wd17xx_status_r(space, 0);
+					return wd17xx_status_r(fdc, 0);
 					break;
 				case 0xf9:
-					return wd17xx_track_r(space, 0);
+					return wd17xx_track_r(fdc, 0);
 					break;
 				case 0xfa:
-					return wd17xx_sector_r(space, 0);
+					return wd17xx_sector_r(fdc, 0);
 					break;
 				case 0xfb:
-					return wd17xx_data_r(space, 0);
+					return wd17xx_data_r(fdc, 0);
 					break;
 			}
 
@@ -1922,6 +1932,7 @@ READ8_HANDLER( bbc_opus_read )
 
 WRITE8_HANDLER (bbc_opus_write)
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD177X, "wd177x");
 	logerror("wd177x write: $%02X  $%02X\n", offset,data);
 
 	if (bbc_DFSType==6)
@@ -1931,16 +1942,16 @@ WRITE8_HANDLER (bbc_opus_write)
 			switch (offset)
 			{
 				case 0xf8:
-					wd17xx_command_w(space, 0, data);
+					wd17xx_command_w(fdc, 0, data);
 					break;
 				case 0xf9:
-					wd17xx_track_w(space, 0, data);
+					wd17xx_track_w(fdc, 0, data);
 					break;
 				case 0xfa:
-					wd17xx_sector_w(space, 0, data);
+					wd17xx_sector_w(fdc, 0, data);
 					break;
 				case 0xfb:
-					wd17xx_data_w(space, 0, data);
+					wd17xx_data_w(fdc, 0, data);
 					break;
 				case 0xfc:
 					bbc_opus_status_w(space, 0,data);
@@ -1967,19 +1978,20 @@ BBC MASTER DISC SUPPORT
 READ8_HANDLER ( bbcm_wd1770_read )
 {
 	int retval=0xff;
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD177X, "wd177x");
 	switch (offset)
 	{
 	case 0:
-		retval=wd17xx_status_r(space, 0);
+		retval=wd17xx_status_r(fdc, 0);
 		break;
 	case 1:
-		retval=wd17xx_track_r(space, 0);
+		retval=wd17xx_track_r(fdc, 0);
 		break;
 	case 2:
-		retval=wd17xx_sector_r(space, 0);
+		retval=wd17xx_sector_r(fdc, 0);
 		break;
 	case 3:
-		retval=wd17xx_data_r(space, 0);
+		retval=wd17xx_data_r(fdc, 0);
 		break;
 	default:
 		break;
@@ -1990,20 +2002,21 @@ READ8_HANDLER ( bbcm_wd1770_read )
 
 WRITE8_HANDLER ( bbcm_wd1770_write )
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD177X, "wd177x");
 	//logerror("wd177x write: $%02X  $%02X\n", offset,data);
 	switch (offset)
 	{
 	case 0:
-		wd17xx_command_w(space, 0, data);
+		wd17xx_command_w(fdc, 0, data);
 		break;
 	case 1:
-		wd17xx_track_w(space, 0, data);
+		wd17xx_track_w(fdc, 0, data);
 		break;
 	case 2:
-		wd17xx_sector_w(space, 0, data);
+		wd17xx_sector_w(fdc, 0, data);
 		break;
 	case 3:
-		wd17xx_data_w(space, 0, data);
+		wd17xx_data_w(fdc, 0, data);
 		break;
 	default:
 		break;
@@ -2018,25 +2031,26 @@ READ8_HANDLER ( bbcm_wd1770l_read )
 
 WRITE8_HANDLER ( bbcm_wd1770l_write )
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD177X, "wd177x");
 	drive_control = data;
 
 	/* set drive */
-	if ((data>>0) & 0x01) wd17xx_set_drive(0);
-	if ((data>>1) & 0x01) wd17xx_set_drive(1);
+	if ((data>>0) & 0x01) wd17xx_set_drive(fdc,0);
+	if ((data>>1) & 0x01) wd17xx_set_drive(fdc,1);
 
 	/* set side */
-	wd17xx_set_side((data>>4) & 0x01);
+	wd17xx_set_side(fdc,(data>>4) & 0x01);
 
 	/* set density */
 	if ((data>>5) & 0x01)
 	{
 		/* single density */
-		wd17xx_set_density(DEN_FM_HI);
+		wd17xx_set_density(fdc,DEN_FM_HI);
 	}
 	else
 	{
 		/* double density */
-		wd17xx_set_density(DEN_MFM_LO);
+		wd17xx_set_density(fdc,DEN_MFM_LO);
 	}
 
 //	bbc_1770_IntEnabled=(((data>>4) & 0x01)==0);
@@ -2190,7 +2204,6 @@ MACHINE_START( bbcb )
 	//	break;
 	//case 4: case 5: case 6:
 		previous_wd177x_int_state=1;
-	    wd17xx_init(machine, WD_TYPE_177X,bbc_wd177x_callback, NULL);
 	//	break;
 	//}
 }
@@ -2226,7 +2239,6 @@ MACHINE_RESET( bbcb )
 	//case 0:	case 1: case 2: case 3:
 	//	break;
 	//case 4: case 5: case 6:
-	    wd17xx_reset(machine);
 	//	break;
 	//}
 }
@@ -2240,8 +2252,6 @@ MACHINE_START( bbcbp )
 
 	/* bank 6 is the paged ROMs     from b000 to bfff */
 	memory_configure_bank(machine, 6, 0, 16, memory_region(machine, "user1") + 0x3000, 1<<14);
-
-	wd17xx_init(machine, WD_TYPE_177X,bbc_wd177x_callback, NULL);
 }
 
 MACHINE_RESET( bbcbp )
@@ -2256,7 +2266,6 @@ MACHINE_RESET( bbcbp )
 
 
 	previous_wd177x_int_state=1;
-    wd17xx_reset(machine);
 }
 
 
@@ -2273,8 +2282,6 @@ MACHINE_START( bbcm )
 	/* Set ROM/IO bank to point to rom */
 	memory_set_bankptr( machine, 8, memory_region(machine, "user1")+0x43c00); 
 	memory_install_read_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM),0xFC00,0xFEFF,0,0,8);
-
-	wd17xx_init(machine, WD_TYPE_177X,bbc_wd177x_callback, NULL);
 }
 
 MACHINE_RESET( bbcm )
@@ -2288,6 +2295,5 @@ MACHINE_RESET( bbcm )
 	bbcb_IC32_initialise();
 
 
-	previous_wd177x_int_state=1;
-    wd17xx_reset(machine);
+	previous_wd177x_int_state=1;    
 }

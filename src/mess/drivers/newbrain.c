@@ -542,6 +542,7 @@ static WRITE8_HANDLER( tvctl_w )
 
 static WRITE8_HANDLER( fdc_auxiliary_w )
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, NEC765A, "nec765");
 	/*
 
 		bit		description
@@ -560,9 +561,9 @@ static WRITE8_HANDLER( fdc_auxiliary_w )
 	floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, 0), BIT(data, 0));
 	floppy_drive_set_ready_state(image_from_devtype_and_index(IO_FLOPPY, 0), 1, 0);
 
-	nec765_set_reset_state(space->machine, BIT(data, 1));
+	nec765_set_reset_state(fdc, BIT(data, 1));
 
-	nec765_set_tc_state(space->machine, BIT(data, 2));
+	nec765_set_tc_state(fdc, BIT(data, 2));
 }
 
 static READ8_HANDLER( fdc_control_r )
@@ -971,8 +972,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( newbrain_fdc_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(nec765_status_r)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(nec765_data_r, nec765_data_w)
+	AM_RANGE(0x00, 0x00) AM_DEVREAD( NEC765A, "nec765", nec765_status_r)
+	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE( NEC765A, "nec765", nec765_data_r, nec765_data_w)
 	AM_RANGE(0x20, 0x20) AM_WRITE(fdc_auxiliary_w)
 	AM_RANGE(0x40, 0x40) AM_READ(fdc_control_r)
 ADDRESS_MAP_END
@@ -1098,17 +1099,19 @@ static const acia6850_interface newbrain_acia_intf =
 	acia_interrupt
 };
 
-static void newbrain_fdc_interrupt(running_machine *machine, int state)
+static NEC765_INTERRUPT( newbrain_fdc_interrupt )
 {
-	newbrain_state *driver_state = machine->driver_data;
+	newbrain_state *driver_state = device->machine->driver_data;
 
 	driver_state->fdc_int = state;
 }
 
-static const struct nec765_interface newbrain_nec765_interface =
+static const nec765_interface newbrain_nec765_interface =
 {
 	newbrain_fdc_interrupt,
-	NULL
+	NULL,
+	NULL,
+	NEC765_RDY_PIN_NOT_CONNECTED
 };
 
 static const z80ctc_interface newbrain_ctc_intf =
@@ -1164,10 +1167,6 @@ static MACHINE_START( newbrain )
 		memory_configure_bank(machine, bank, 0, 1, memory_region(machine, Z80_TAG) + 0xe000, 0);
 		memory_set_bank(machine, bank, 0);
 	}
-
-	/* initialize devices */
-
-	nec765_init(machine, &newbrain_nec765_interface, NEC765A, NEC765_RDY_PIN_NOT_CONNECTED);
 
 	/* allocate reset timer */
 	
@@ -1270,6 +1269,8 @@ static MACHINE_DRIVER_START( newbrain )
 	/* acia */
 	MDRV_DEVICE_ADD("acia_0", ACIA6850)
 	MDRV_DEVICE_CONFIG(newbrain_acia_intf)	
+		
+	MDRV_NEC765A_ADD("nec765", newbrain_nec765_interface)	
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( newbraim )

@@ -11,15 +11,18 @@
 
 #include "devices/flopdrv.h"
 
+/***************************************************************************
+    MACROS
+***************************************************************************/
 
-/* supported versions */
-typedef enum
-{
-	NEC765A = 0,
-	NEC765B = 1,
-	SMC37C78 = 2,
-	NEC72065 = 3
-} NEC765_VERSION;
+#define NEC765A		DEVICE_GET_INFO_NAME(nec765a)
+#define NEC765B		DEVICE_GET_INFO_NAME(nec765b)
+#define SMC37C78	DEVICE_GET_INFO_NAME(smc37c78)
+#define NEC72065	DEVICE_GET_INFO_NAME(nec72065)
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
 
 /* RDY pin connected state */
 typedef enum
@@ -31,44 +34,65 @@ typedef enum
 #define NEC765_DAM_DELETED_DATA 0x0f8
 #define NEC765_DAM_DATA 0x0fb
 
+typedef void (*nec765_interrupt_func)(const device_config *device, int state);
+#define NEC765_INTERRUPT(name)	void name(const device_config *device, int state )
+
+typedef void (*nec765_dma_drq_func)(const device_config *device, int state,int read_write);
+#define NEC765_DMA_REQUEST(name)	void name(const device_config *device, int state,int read_write )
+
+typedef const device_config *(*nec765_get_image_func)(const device_config *device, int floppy_index);
+#define NEC765_GET_IMAGE(name)	const device_config *name(const device_config *device, int floppy_index )
+
+
 typedef struct nec765_interface
 {
 	/* interrupt issued */
-	void	(*interrupt)(running_machine *machine,int state);
+	nec765_interrupt_func interrupt;
 
 	/* dma data request */
-	void	(*dma_drq)(running_machine *machine,int state,int read_write);
+	nec765_dma_drq_func dma_drq;
 
 	/* image lookup */
-	const device_config *(*get_image)(running_machine *machine,int floppy_index);
+	nec765_get_image_func get_image;
+	
+	NEC765_RDY_PIN rdy_pin;	
 } nec765_interface;
 
-/* init nec765 interface */
-void nec765_init(running_machine *machine, const nec765_interface *iface, NEC765_VERSION version, NEC765_RDY_PIN rdy_pin);
-/* set nec765 terminal count input state */
-void nec765_set_tc_state(running_machine *machine, int);
-/* set nec765 ready input*/
-void nec765_set_ready_state(int);
 
-void nec765_idle(void);
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
+
+/* device interface */
+DEVICE_GET_INFO( nec765a );
+DEVICE_GET_INFO( nec765b );
+DEVICE_GET_INFO( smc37c78 );
+DEVICE_GET_INFO( nec72065 );
 
 /* read of data register */
-READ8_HANDLER(nec765_data_r);
+READ8_DEVICE_HANDLER(nec765_data_r);
 /* write to data register */
-WRITE8_HANDLER(nec765_data_w);
+WRITE8_DEVICE_HANDLER(nec765_data_w);
 /* read of main status register */
-READ8_HANDLER(nec765_status_r);
+READ8_DEVICE_HANDLER(nec765_status_r);
 
 /* dma acknowledge with write */
-WRITE8_HANDLER(nec765_dack_w);
+WRITE8_DEVICE_HANDLER(nec765_dack_w);
 /* dma acknowledge with read */
-READ8_HANDLER(nec765_dack_r);
+READ8_DEVICE_HANDLER(nec765_dack_r);
 
 /* reset nec765 */
-void nec765_reset(running_machine *machine, int);
+void nec765_reset(const device_config *device, int);
 
 /* reset pin of nec765 */
-void nec765_set_reset_state(running_machine *machine, int);
+void nec765_set_reset_state(const device_config *device, int);
+
+/* set nec765 terminal count input state */
+void nec765_set_tc_state(const device_config *device, int);
+/* set nec765 ready input*/
+void nec765_set_ready_state(const device_config *device,int);
+
+void nec765_idle(const device_config *device);
 
 /*********************/
 /* STATUS REGISTER 1 */
@@ -91,5 +115,54 @@ void nec765_set_reset_state(running_machine *machine, int);
 command, or FDC encounters a Data Mark when executing a read deleted data command */
 #define NEC765_ST2_CONTROL_MARK (1<<6)
 
+/***************************************************************************
+    DEVICE CONFIGURATION MACROS
+***************************************************************************/
+
+#define MDRV_NEC765A_ADD(_tag, _intrf) \
+	MDRV_DEVICE_ADD(_tag, NEC765A) \
+	MDRV_DEVICE_CONFIG(_intrf)
+
+#define MDRV_NEC765A_MODIFY(_tag, _intrf) \
+  MDRV_DEVICE_MODIFY(_tag, NEC765A)	      \
+  MDRV_DEVICE_CONFIG(_intrf)
+
+#define MDRV_NEC765A_REMOVE(_tag)		\
+  MDRV_DEVICE_REMOVE(_tag, NEC765A)
+
+#define MDRV_NEC765B_ADD(_tag, _intrf) \
+	MDRV_DEVICE_ADD(_tag, NEC765B) \
+	MDRV_DEVICE_CONFIG(_intrf)
+
+#define MDRV_NEC765B_MODIFY(_tag, _intrf) \
+  MDRV_DEVICE_MODIFY(_tag, NEC765B)	      \
+  MDRV_DEVICE_CONFIG(_intrf)
+
+#define MDRV_NEC765B_REMOVE(_tag)		\
+  MDRV_DEVICE_REMOVE(_tag, NEC765B)
+
+#define MDRV_SMC37C78_ADD(_tag, _intrf) \
+	MDRV_DEVICE_ADD(_tag, SMC37C78) \
+	MDRV_DEVICE_CONFIG(_intrf)
+
+#define MDRV_SMC37C78_MODIFY(_tag, _intrf) \
+  MDRV_DEVICE_MODIFY(_tag, SMC37C78)	      \
+  MDRV_DEVICE_CONFIG(_intrf)
+
+#define MDRV_SMC37C78_REMOVE(_tag)		\
+  MDRV_DEVICE_REMOVE(_tag, SMC37C78)
+
+#define MDRV_NEC72065_ADD(_tag, _intrf) \
+	MDRV_DEVICE_ADD(_tag, NEC72065) \
+	MDRV_DEVICE_CONFIG(_intrf)
+
+#define MDRV_NEC72065_MODIFY(_tag, _intrf) \
+  MDRV_DEVICE_MODIFY(_tag, NEC72065)	      \
+  MDRV_DEVICE_CONFIG(_intrf)
+
+#define MDRV_NEC72065_REMOVE(_tag)		\
+  MDRV_DEVICE_REMOVE(_tag, NEC72065)
+
 #endif /* NEC765_H */
+
 

@@ -80,17 +80,19 @@ Note on the bioses:
 
 static READ8_HANDLER( samcoupe_disk_r )
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD1772, "wd1772");
+	
 	/* drive and side is encoded into bit 5 and 3 */
-	wd17xx_set_drive((offset >> 4) & 1);
-	wd17xx_set_side((offset >> 2) & 1);
+	wd17xx_set_drive(fdc,(offset >> 4) & 1);
+	wd17xx_set_side(fdc,(offset >> 2) & 1);
 
 	/* bit 1 and 2 select the controller register */
 	switch (offset & 0x03)
 	{
-	case 0: return wd17xx_status_r(space, 0);
-	case 1: return wd17xx_track_r(space, 0);
-	case 2: return wd17xx_sector_r(space, 0);
-	case 3: return wd17xx_data_r(space, 0);
+	case 0: return wd17xx_status_r(fdc, 0);
+	case 1: return wd17xx_track_r(fdc, 0);
+	case 2: return wd17xx_sector_r(fdc, 0);
+	case 3: return wd17xx_data_r(fdc, 0);
 	}
 
 	return 0xff;
@@ -99,17 +101,19 @@ static READ8_HANDLER( samcoupe_disk_r )
 
 static WRITE8_HANDLER( samcoupe_disk_w )
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD1772, "wd1772");
+
 	/* drive and side is encoded into bit 5 and 3 */
-	wd17xx_set_drive((offset >> 4) & 1);
-	wd17xx_set_side((offset >> 2) & 1);
+	wd17xx_set_drive(fdc,(offset >> 4) & 1);
+	wd17xx_set_side(fdc,(offset >> 2) & 1);
 
 	/* bit 1 and 2 select the controller register */
 	switch (offset & 0x03)
 	{
-	case 0: wd17xx_command_w(space, 0, data); break;
-	case 1: wd17xx_track_w(space, 0, data);   break;
-	case 2: wd17xx_sector_w(space, 0, data);  break;
-	case 3: wd17xx_data_w(space, 0, data);    break;
+	case 0: wd17xx_command_w(fdc, 0, data); break;
+	case 1: wd17xx_track_w(fdc, 0, data);   break;
+	case 2: wd17xx_sector_w(fdc, 0, data);  break;
+	case 3: wd17xx_data_w(fdc, 0, data);    break;
 	}
 }
 
@@ -517,7 +521,6 @@ static MACHINE_DRIVER_START( samcoupe )
 	MDRV_CPU_IO_MAP(samcoupe_io, 0)
 	MDRV_CPU_VBLANK_INT("main", samcoupe_frame_interrupt)
 
-	MDRV_MACHINE_START(samcoupe)
 	MDRV_MACHINE_RESET(samcoupe)
 
     /* video hardware */
@@ -540,8 +543,9 @@ static MACHINE_DRIVER_START( samcoupe )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MDRV_SOUND_ADD("saa1099", SAA1099, SAMCOUPE_XTAL_X1/3) /* 8 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	
+	MDRV_WD1772_ADD("wd1772", default_wd17xx_interface )	
 MACHINE_DRIVER_END
-
 
 
 /*************************************

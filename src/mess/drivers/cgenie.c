@@ -432,6 +432,8 @@ static MACHINE_DRIVER_START( cgenie )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	MDRV_CASSETTE_ADD( "cassette", cgenie_cassette_config )
+
+	MDRV_WD179X_ADD("wd179x", cgenie_wd17xx_interface )
 MACHINE_DRIVER_END
 
 /***************************************************************************

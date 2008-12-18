@@ -172,7 +172,6 @@ static const DAVE_INTERFACE enterprise_dave_interface =
 };
 
 
-static void enterp_wd177x_callback(running_machine *machine, wd17xx_state_t event, void *param);
 
 static void enterprise_reset(running_machine *machine)
 {
@@ -235,22 +234,22 @@ static void enterprise_reset(running_machine *machine)
 
 static MACHINE_START(enterprise)
 {
-	wd17xx_init(machine, WD_TYPE_177X, enterp_wd177x_callback, NULL);
 	add_reset_callback(machine, enterprise_reset);
 }
 
 static READ8_HANDLER ( enterprise_wd177x_read )
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD177X, "wd177x");
 	switch (offset & 0x03)
 	{
 	case 0:
-		return wd17xx_status_r(space, offset);
+		return wd17xx_status_r(fdc, offset);
 	case 1:
-		return wd17xx_track_r(space, offset);
+		return wd17xx_track_r(fdc, offset);
 	case 2:
-		return wd17xx_sector_r(space, offset);
+		return wd17xx_sector_r(fdc, offset);
 	case 3:
-		return wd17xx_data_r(space, offset);
+		return wd17xx_data_r(fdc, offset);
 	default:
 		break;
 	}
@@ -260,19 +259,20 @@ static READ8_HANDLER ( enterprise_wd177x_read )
 
 static WRITE8_HANDLER (	enterprise_wd177x_write )
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD177X, "wd177x");
 	switch (offset & 0x03)
 	{
 	case 0:
-		wd17xx_command_w(space, offset, data);
+		wd17xx_command_w(fdc, offset, data);
 		return;
 	case 1:
-		wd17xx_track_w(space, offset, data);
+		wd17xx_track_w(fdc, offset, data);
 		return;
 	case 2:
-		wd17xx_sector_w(space, offset, data);
+		wd17xx_sector_w(fdc, offset, data);
 		return;
 	case 3:
-		wd17xx_data_w(space, offset, data);
+		wd17xx_data_w(fdc, offset, data);
 		return;
 	default:
 		break;
@@ -317,40 +317,42 @@ static int EXDOS_GetDriveSelection(int data)
 
 static char EXDOS_CARD_R = 0;
 
-static void enterp_wd177x_callback(running_machine *machine, wd17xx_state_t State, void *param)
+static WD17XX_CALLBACK( enterp_wd177x_callback )
 {
-   if (State==WD17XX_IRQ_CLR)
+   if (state==WD17XX_IRQ_CLR)
    {
 		EXDOS_CARD_R &= ~0x02;
    }
 
-   if (State==WD17XX_IRQ_SET)
+   if (state==WD17XX_IRQ_SET)
    {
 		EXDOS_CARD_R |= 0x02;
    }
 
-   if (State==WD17XX_DRQ_CLR)
+   if (state==WD17XX_DRQ_CLR)
    {
 		EXDOS_CARD_R &= ~0x080;
    }
 
-   if (State==WD17XX_DRQ_SET)
+   if (state==WD17XX_DRQ_SET)
    {
 		EXDOS_CARD_R |= 0x080;
    }
 }
 
+const wd17xx_interface enterp_wd17xx_interface = { enterp_wd177x_callback, NULL };
 
 
 static WRITE8_HANDLER ( exdos_card_w )
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD177X, "wd177x");
 	/* drive side */
 	int head = (data>>4) & 0x01;
 
 	int drive = EXDOS_GetDriveSelection(data);
 
-	wd17xx_set_drive(drive);
-	wd17xx_set_side(head);
+	wd17xx_set_drive(fdc,drive);
+	wd17xx_set_side(fdc,head);
 }
 
 /* bit 0 - ??
@@ -561,6 +563,8 @@ static MACHINE_DRIVER_START( ep128 )
 	MDRV_SOUND_ADD("custom", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(dave_custom_sound)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	
+	MDRV_WD177X_ADD("wd177x", enterp_wd17xx_interface )
 MACHINE_DRIVER_END
 
 ROM_START( ep128 )

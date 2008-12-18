@@ -232,6 +232,7 @@ static ABCBUS_CARD_SELECT( luxor_55_10828 )
 
 static WRITE8_HANDLER( slow_ctrl_w )
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
 	/*
 
 		bit		description
@@ -248,9 +249,9 @@ static WRITE8_HANDLER( slow_ctrl_w )
 	*/
 
 	/* drive selection */
-	if (!BIT(data, 0)) wd17xx_set_drive(0);
-	if (!BIT(data, 1)) wd17xx_set_drive(1);
-//	if (!BIT(data, 2)) wd17xx_set_drive(2);
+	if (!BIT(data, 0)) wd17xx_set_drive(fdc,0);
+	if (!BIT(data, 1)) wd17xx_set_drive(fdc,1);
+//	if (!BIT(data, 2)) wd17xx_set_drive(fdc,2);
 
 	/* motor enable */
 	floppy_drive_set_motor_state(get_floppy_image(0), !BIT(data, 3));
@@ -259,12 +260,12 @@ static WRITE8_HANDLER( slow_ctrl_w )
 	floppy_drive_set_ready_state(get_floppy_image(1), 1, 1);
 
 	/* disk side selection */
-	wd17xx_set_side(!BIT(data, 4));
+	wd17xx_set_side(fdc,!BIT(data, 4));
 
 	if (!BIT(data, 7))
 	{
 		/* FDC master reset */
-		wd17xx_reset(space->machine);
+		wd17xx_reset(fdc);
 	}
 }
 
@@ -397,7 +398,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( slow_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x7c, 0x7f) AM_DEVREADWRITE(Z80PIO, CONKORT_Z80PIO_TAG, z80pio_alt_r, z80pio_alt_w)
-	AM_RANGE(0xbc, 0xbf) AM_READWRITE(wd17xx_r, wd17xx_w)
+	AM_RANGE(0xbc, 0xbf) AM_DEVREADWRITE(WD179X, "wd179x", wd17xx_r, wd17xx_w)
 	AM_RANGE(0xdf, 0xdf) AM_WRITE(slow_status_w)
 	AM_RANGE(0xef, 0xef) AM_WRITE(slow_ctrl_w)
 ADDRESS_MAP_END
@@ -417,8 +418,8 @@ static ADDRESS_MAP_START( fast_io_map, ADDRESS_SPACE_IO, 8 )
 //	AM_RANGE(0x3f, 0x3f) AM_WRITE()
 //	AM_RANGE(0x4f, 0x4f) AM_WRITE()
 	AM_RANGE(0x5d, 0x5d) AM_READ(fast_ctrl_r)
-	AM_RANGE(0x68, 0x6b) AM_READ(wd17xx_r)
-	AM_RANGE(0x78, 0x7b) AM_WRITE(wd17xx_w)
+	AM_RANGE(0x68, 0x6b) AM_DEVREAD(WD1793, "wd1793", wd17xx_r)
+	AM_RANGE(0x78, 0x7b) AM_DEVWRITE(WD1793, "wd1793", wd17xx_w)
 	AM_RANGE(0x87, 0x87) AM_DEVREADWRITE(Z80DMA, CONKORT_Z80DMA_TAG, z80dma_r, z80dma_w)
 ADDRESS_MAP_END
 
@@ -680,9 +681,9 @@ static const z80_daisy_chain fast_daisy_chain[] =
 
 /* FD1791 */
 
-static void slow_wd1791_callback(running_machine *machine, wd17xx_state_t state, void *param)
+static WD17XX_CALLBACK( slow_wd1791_callback )
 {
-	slow_t *conkort = get_safe_token_machine_slow(machine);
+	slow_t *conkort = get_safe_token_machine_slow(device->machine);
 
 	switch(state)
 	{
@@ -699,11 +700,13 @@ static void slow_wd1791_callback(running_machine *machine, wd17xx_state_t state,
 	}
 }
 
+static const wd17xx_interface slow_wd17xx_interface = { slow_wd1791_callback, NULL };
+
 /* FD1793 */
 
-static void fast_wd1793_callback(running_machine *machine, wd17xx_state_t state, void *param)
+static WD17XX_CALLBACK( fast_wd1793_callback )
 {
-	fast_t *conkort = get_safe_token_machine_fast(machine);
+	fast_t *conkort = get_safe_token_machine_fast(device->machine);
 
 	switch(state)
 	{
@@ -720,6 +723,8 @@ static void fast_wd1793_callback(running_machine *machine, wd17xx_state_t state,
 	}
 }
 
+static const wd17xx_interface fast_wd17xx_interface = { fast_wd1793_callback };
+
 /* Machine Driver */
 
 static MACHINE_DRIVER_START( luxor_55_10828 )
@@ -729,6 +734,7 @@ static MACHINE_DRIVER_START( luxor_55_10828 )
 	MDRV_CPU_CONFIG(slow_daisy_chain)
 
 	MDRV_Z80PIO_ADD(CONKORT_Z80PIO_TAG, pio_intf)
+	MDRV_WD179X_ADD("wd179x", slow_wd17xx_interface )		
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( luxor_55_21046 )
@@ -739,6 +745,8 @@ static MACHINE_DRIVER_START( luxor_55_21046 )
 
 	MDRV_DEVICE_ADD(CONKORT_Z80DMA_TAG, Z80DMA)
 	MDRV_DEVICE_CONFIG(dma_intf)
+	
+	MDRV_WD1793_ADD("wd1793", fast_wd17xx_interface )	
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -808,9 +816,6 @@ static DEVICE_START( luxor_55_10828 )
 	astring_printf(tempstring, "%s:%s", device->tag, CONKORT_Z80PIO_TAG);
 	conkort->z80pio = devtag_get_device(device->machine, Z80PIO, astring_c(tempstring));
 
-	/* initialize FDC */
-	wd17xx_init(device->machine, WD_TYPE_179X, slow_wd1791_callback, NULL); // FD1791-01
-
 	/* register for state saving */
 	state_save_register_device_item(device, 0, conkort->status);
 	state_save_register_device_item(device, 0, conkort->data);
@@ -824,7 +829,7 @@ static DEVICE_START( luxor_55_10828 )
 
 static DEVICE_RESET( luxor_55_10828 )
 {
-	wd17xx_reset(device->machine);
+
 }
 
 static DEVICE_SET_INFO( luxor_55_10828 )
@@ -882,9 +887,6 @@ static DEVICE_START( luxor_55_21046 )
 	astring_printf(tempstring, "%s:%s", device->tag, CONKORT_Z80DMA_TAG);
 	conkort->z80dma = devtag_get_device(device->machine, Z80DMA, astring_c(tempstring));
 
-	/* initialize FDC */
-	wd17xx_init(device->machine, WD_TYPE_1793, fast_wd1793_callback, NULL); // FD1793-01
-
 	/* register for state saving */
 	state_save_register_device_item(device, 0, conkort->status);
 	state_save_register_device_item(device, 0, conkort->data);
@@ -897,8 +899,6 @@ static DEVICE_START( luxor_55_21046 )
 
 static DEVICE_RESET( luxor_55_21046 )
 {
-	/* reset the FDC */
-	wd17xx_reset(device->machine);
 }
 
 static DEVICE_SET_INFO( luxor_55_21046 )

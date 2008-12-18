@@ -93,8 +93,6 @@ static TIMER_CALLBACK( handle_cassette_input )
 }
 
 
-static void cgenie_fdc_callback(running_machine *machine, wd17xx_state_t event, void *param);
-
 MACHINE_RESET( cgenie )
 {
 	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
@@ -203,9 +201,6 @@ MACHINE_START( cgenie )
 	memory_install_write8_handler(space, 0x4000, 0x4000 + mess_ram_size - 1, 0, 0, cgenie_videoram_w);
 	videoram = mess_ram;
 	memory_set_bankptr(machine, 1, mess_ram);
-
-	/* set up FDC */
-	wd17xx_init(machine, WD_TYPE_179X, cgenie_fdc_callback, NULL);
 }
 
 
@@ -481,66 +476,74 @@ WRITE8_HANDLER( cgenie_psg_port_b_w )
 
  READ8_HANDLER( cgenie_status_r )
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
 	/* If the floppy isn't emulated, return 0 */
 	if( (input_port_read(space->machine, "DSW0") & 0x80) == 0 )
 		return 0;
-	return wd17xx_status_r(space, offset);
+	return wd17xx_status_r(fdc, offset);
 }
 
  READ8_HANDLER( cgenie_track_r )
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
 	/* If the floppy isn't emulated, return 0xff */
 	if( (input_port_read(space->machine, "DSW0") & 0x80) == 0 )
 		return 0xff;
-	return wd17xx_track_r(space, offset);
+	return wd17xx_track_r(fdc, offset);
 }
 
  READ8_HANDLER( cgenie_sector_r )
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
 	/* If the floppy isn't emulated, return 0xff */
 	if( (input_port_read(space->machine, "DSW0") & 0x80) == 0 )
 		return 0xff;
-	return wd17xx_sector_r(space, offset);
+	return wd17xx_sector_r(fdc, offset);
 }
 
  READ8_HANDLER(cgenie_data_r )
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
 	/* If the floppy isn't emulated, return 0xff */
 	if( (input_port_read(space->machine, "DSW0") & 0x80) == 0 )
 		return 0xff;
-	return wd17xx_data_r(space, offset);
+	return wd17xx_data_r(fdc, offset);
 }
 
 WRITE8_HANDLER( cgenie_command_w )
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
 	/* If the floppy isn't emulated, return immediately */
 	if( (input_port_read(space->machine, "DSW0") & 0x80) == 0 )
 		return;
-	wd17xx_command_w(space, offset, data);
+	wd17xx_command_w(fdc, offset, data);
 }
 
 WRITE8_HANDLER( cgenie_track_w )
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
 	/* If the floppy isn't emulated, ignore the write */
 	if( (input_port_read(space->machine, "DSW0") & 0x80) == 0 )
 		return;
-	wd17xx_track_w(space, offset, data);
+	wd17xx_track_w(fdc, offset, data);
 }
 
 WRITE8_HANDLER( cgenie_sector_w )
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
 	/* If the floppy isn't emulated, ignore the write */
 	if( (input_port_read(space->machine, "DSW0") & 0x80) == 0 )
 		return;
-	wd17xx_sector_w(space, offset, data);
+	wd17xx_sector_w(fdc, offset, data);
 }
 
 WRITE8_HANDLER( cgenie_data_w )
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
 	/* If the floppy isn't emulated, ignore the write */
 	if( (input_port_read(space->machine, "DSW0") & 0x80) == 0 )
 		return;
-	wd17xx_data_w(space, offset, data);
+	wd17xx_data_w(fdc, offset, data);
 }
 
  READ8_HANDLER( cgenie_irq_status_r )
@@ -560,13 +563,13 @@ INTERRUPT_GEN( cgenie_timer_interrupt )
 	}
 }
 
-void cgenie_fdc_callback(running_machine *machine, wd17xx_state_t event, void *param)
+static  WD17XX_CALLBACK( cgenie_fdc_callback )
 {
 	/* if disc hardware is not enabled, do not cause an int */
-	if (!( input_port_read(machine, "DSW0") & 0x80 ))
+	if (!( input_port_read(device->machine, "DSW0") & 0x80 ))
 		return;
 
-	switch( event )
+	switch( state )
 	{
 		case WD17XX_IRQ_CLR:
 			irq_status &= ~IRQ_FDC;
@@ -575,7 +578,7 @@ void cgenie_fdc_callback(running_machine *machine, wd17xx_state_t event, void *p
 			if( (irq_status & IRQ_FDC) == 0 )
 			{
 				irq_status |= IRQ_FDC;
-				cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
+				cpu_set_input_line(device->machine->cpu[0], 0, HOLD_LINE);
 			}
 			break;
 		case WD17XX_DRQ_CLR:
@@ -585,8 +588,11 @@ void cgenie_fdc_callback(running_machine *machine, wd17xx_state_t event, void *p
 	}
 }
 
+const wd17xx_interface cgenie_wd17xx_interface = { cgenie_fdc_callback, NULL };
+
 WRITE8_HANDLER( cgenie_motor_w )
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
 	UINT8 drive = 255;
 
 	logerror("cgenie motor_w $%02X\n", data);
@@ -609,8 +615,8 @@ WRITE8_HANDLER( cgenie_motor_w )
 	/* currently selected drive */
 	motor_drive = drive;
 
-	wd17xx_set_drive(drive);
-	wd17xx_set_side(head);
+	wd17xx_set_drive(fdc,drive);
+	wd17xx_set_side(fdc,head);
 }
 
 /*************************************

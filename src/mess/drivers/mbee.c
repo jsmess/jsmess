@@ -115,10 +115,10 @@ static ADDRESS_MAP_START(mbeeic_ports, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0b, 0x0b) AM_MIRROR(0x10) AM_READWRITE(mbee_video_bank_r, mbee_video_bank_w)
 	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x10) AM_READWRITE(m6545_status_r, m6545_index_w)
 	AM_RANGE(0x0d, 0x0d) AM_MIRROR(0x10) AM_READWRITE(m6545_data_r, m6545_data_w)
-	AM_RANGE(0x44, 0x44) AM_READWRITE(wd17xx_status_r, wd17xx_command_w)
-	AM_RANGE(0x45, 0x45) AM_READWRITE(wd17xx_track_r, wd17xx_track_w)
-	AM_RANGE(0x46, 0x46) AM_READWRITE(wd17xx_sector_r, wd17xx_sector_w)
-	AM_RANGE(0x47, 0x47) AM_READWRITE(wd17xx_data_r, wd17xx_data_w)
+	AM_RANGE(0x44, 0x44) AM_DEVREADWRITE(WD179X, "wd179x", wd17xx_status_r, wd17xx_command_w)
+	AM_RANGE(0x45, 0x45) AM_DEVREADWRITE(WD179X, "wd179x", wd17xx_track_r, wd17xx_track_w)
+	AM_RANGE(0x46, 0x46) AM_DEVREADWRITE(WD179X, "wd179x", wd17xx_sector_r, wd17xx_sector_w)
+	AM_RANGE(0x47, 0x47) AM_DEVREADWRITE(WD179X, "wd179x", wd17xx_data_r, wd17xx_data_w)
 	AM_RANGE(0x48, 0x48) AM_READWRITE(mbee_fdc_status_r, mbee_fdc_motor_w)
 ADDRESS_MAP_END
 
@@ -409,7 +409,6 @@ static MACHINE_DRIVER_START( mbeeic )
 	MDRV_CPU_VBLANK_INT("main", mbee_interrupt)
 
 	MDRV_MACHINE_RESET( mbee )
-	MDRV_MACHINE_START( mbee )
 
 	MDRV_Z80PIO_ADD( "z80pio", mbee_z80pio_intf )
 
@@ -438,6 +437,8 @@ static MACHINE_DRIVER_START( mbeeic )
 	MDRV_Z80BIN_QUICKLOAD_ADD(mbee, 2)
 
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
+	
+	MDRV_WD179X_ADD("wd179x", mbee_wd17xx_interface )
 MACHINE_DRIVER_END
 
 

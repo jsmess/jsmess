@@ -203,9 +203,6 @@ DEVICE_IMAGE_LOAD( trs80_floppy )
     return INIT_PASS;
 }
 
-static void trs80_fdc_callback(running_machine *machine, wd17xx_state_t event, void *param);
-
-
 MACHINE_RESET( trs80 )
 {
 	cassette_data = 0x00;
@@ -287,13 +284,6 @@ DRIVER_INIT( ht108064 )
 	}
 }
 
-
-MACHINE_START( trs80 )
-{
-	wd17xx_init(machine, WD_TYPE_179X,trs80_fdc_callback, NULL);
-}
-
-
 /*************************************
  *
  *				Port handlers.
@@ -355,15 +345,15 @@ INTERRUPT_GEN( trs80_fdc_interrupt )
 	trs80_fdc_interrupt_internal(device->machine);
 }
 
-void trs80_fdc_callback(running_machine *machine, wd17xx_state_t event, void *param)
+static WD17XX_CALLBACK( trs80_fdc_callback )
 {
-	switch (event)
+	switch (state)
 	{
 		case WD17XX_IRQ_CLR:
 			irq_status &= ~IRQ_FDC;
 			break;
 		case WD17XX_IRQ_SET:
-			trs80_fdc_interrupt_internal(machine);
+			trs80_fdc_interrupt_internal(device->machine);
 			break;
 		case WD17XX_DRQ_CLR:
 		case WD17XX_DRQ_SET:
@@ -371,6 +361,9 @@ void trs80_fdc_callback(running_machine *machine, wd17xx_state_t event, void *pa
 			break;
 	}
 }
+
+const wd17xx_interface trs80_wd17xx_interface = { trs80_fdc_callback, NULL };
+
 
 INTERRUPT_GEN( trs80_frame_interrupt )
 {
@@ -408,6 +401,7 @@ WRITE8_HANDLER( trs80_irq_mask_w )
 WRITE8_HANDLER( trs80_motor_w )
 {
 	UINT8 drive = 255;
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
 
 	LOG(("trs80 motor_w $%02X\n", data));
 
@@ -446,8 +440,8 @@ WRITE8_HANDLER( trs80_motor_w )
 	if (drive > 3)
 		return;
 
-    wd17xx_set_drive(drive);
-	wd17xx_set_side(head);
+    wd17xx_set_drive(fdc,drive);
+	wd17xx_set_side(fdc,head);
 
 }
 

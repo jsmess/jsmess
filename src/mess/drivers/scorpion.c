@@ -157,11 +157,6 @@ http://www.z88forever.org.uk/zxplus3e/
 #include "machine/wd17xx.h"
 #include "machine/beta.h"
 
-static MACHINE_START( scorpion )
-{
-	wd17xx_init(machine, WD_TYPE_179X, betadisk_wd179x_callback, NULL);
-}
-
 /****************************************************************************************************/
 /* Zs Scorpion 256 */
 
@@ -319,9 +314,7 @@ static MACHINE_RESET( scorpion )
 	scorpion_256_port_1ffd_data = 0;
 
 	scorpion_update_memory(machine);	
-		
-	wd17xx_reset(machine);	
-	
+			
 	timer_pulse(machine, ATTOTIME_IN_HZ(50), NULL, 0, nmi_check_callback);
 }
 
@@ -329,8 +322,9 @@ static MACHINE_DRIVER_START( scorpion )
 	MDRV_IMPORT_FROM( spectrum_128 )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_IO_MAP(scorpion_io, 0)
-	MDRV_MACHINE_START( scorpion )
 	MDRV_MACHINE_RESET( scorpion )
+	
+	MDRV_WD179X_ADD("wd179x", beta_wd17xx_interface )
 MACHINE_DRIVER_END
 
 

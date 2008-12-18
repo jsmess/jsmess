@@ -329,7 +329,6 @@ static MACHINE_START( apf_imagination )
 {
 	pia_config(machine, 1,&apf_imagination_pia_interface);
 	apf_common_init(machine);
-	wd17xx_init(machine, WD_TYPE_179X, NULL, NULL);
 }
 
 static MACHINE_START( apf_m1000 )
@@ -340,11 +339,12 @@ static MACHINE_START( apf_m1000 )
 static WRITE8_HANDLER(apf_dischw_w)
 {
 	int drive;
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
 
 	/* bit 3 is index of drive to select */
 	drive = (data>>3) & 0x01;
 
-	wd17xx_set_drive(drive);
+	wd17xx_set_drive(fdc, drive);
 
 	logerror("disc w %04x %04x\n",offset,data);
 }
@@ -361,43 +361,43 @@ static WRITE8_HANDLER(serial_w)
 }
 
 static WRITE8_HANDLER(apf_wd179x_command_w)
-{
-	wd17xx_command_w(space, offset,~data);
+{	
+	wd17xx_command_w((device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x"), offset,~data);
 }
 
 static WRITE8_HANDLER(apf_wd179x_track_w)
 {
-	wd17xx_track_w(space, offset,~data);
+	wd17xx_track_w((device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x"), offset,~data);
 }
 
 static WRITE8_HANDLER(apf_wd179x_sector_w)
 {
-	wd17xx_sector_w(space, offset,~data);
+	wd17xx_sector_w((device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x"), offset,~data);
 }
 
 static WRITE8_HANDLER(apf_wd179x_data_w)
 {
-	wd17xx_data_w(space, offset,~data);
+	wd17xx_data_w((device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x"), offset,~data);
 }
 
 static READ8_HANDLER(apf_wd179x_status_r)
 {
-	return ~wd17xx_status_r(space, offset);
+	return ~wd17xx_status_r((device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x"), offset);
 }
 
 static READ8_HANDLER(apf_wd179x_track_r)
 {
-	return ~wd17xx_track_r(space, offset);
+	return ~wd17xx_track_r((device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x"), offset);
 }
 
 static READ8_HANDLER(apf_wd179x_sector_r)
 {
-	return ~wd17xx_sector_r(space, offset);
+	return ~wd17xx_sector_r((device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x"), offset);
 }
 
 static READ8_HANDLER(apf_wd179x_data_r)
 {
-	return wd17xx_data_r(space, offset);
+	return wd17xx_data_r((device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x"), offset);
 }
 
 static ADDRESS_MAP_START(apf_imagination_map, ADDRESS_SPACE_PROGRAM, 8)
@@ -658,8 +658,9 @@ static MACHINE_DRIVER_START( apf_imagination )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_CASSETTE_ADD( "cassette", apf_cassette_config )
+	
+	MDRV_WD179X_ADD("wd179x", default_wd17xx_interface )	
 MACHINE_DRIVER_END
-
 
 static MACHINE_DRIVER_START( apf_m1000 )
 	MDRV_IMPORT_FROM( apf_imagination )

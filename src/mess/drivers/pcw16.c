@@ -1202,12 +1202,17 @@ static void	pcw16_fdc_interrupt(running_machine *machine, int state)
 	pcw16_trigger_fdc_int(machine);
 }
 
+static device_config * pcw16_get_device(running_machine *machine )
+{
+	return (device_config*)device_list_find_by_tag( machine->config->devicelist, NEC765A, "nec765");	
+}
+
 static const struct pc_fdc_interface pcw16_fdc_interface=
 {
-	NEC765A,
-	NEC765_RDY_PIN_CONNECTED,
 	pcw16_fdc_interrupt,
-	NULL
+	NULL,
+	NULL,
+	pcw16_get_device
 };
 
 
@@ -1423,6 +1428,7 @@ static MACHINE_DRIVER_START( pcw16 )
 
 	/* printer */
 	/* MDRV_DEVICE_ADD("printer", PRINTER) */
+	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_connected_interface)
 MACHINE_DRIVER_END
 
 

@@ -11,10 +11,6 @@
 #include "machine/wd17xx.h"
 #include "machine/beta.h"
 
-static MACHINE_START( pentagon )
-{
-	wd17xx_init(machine, WD_TYPE_179X, betadisk_wd179x_callback, NULL);
-}
 
 static int ROMSelection;
 
@@ -111,16 +107,15 @@ static MACHINE_RESET( pentagon )
 	spectrum_128_port_7ffd_data = 0;
 
 	pentagon_update_memory(machine);	
-		
-	wd17xx_reset(machine);	
 }
 
 static MACHINE_DRIVER_START( pentagon )
 	MDRV_IMPORT_FROM( spectrum_128 )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_IO_MAP(pentagon_io, 0)
-	MDRV_MACHINE_START( pentagon )
 	MDRV_MACHINE_RESET( pentagon )
+		
+	MDRV_WD179X_ADD("wd179x", beta_wd17xx_interface )
 MACHINE_DRIVER_END
 
 

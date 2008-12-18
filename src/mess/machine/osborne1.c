@@ -74,7 +74,7 @@ WRITE8_HANDLER( osborne1_1000_w )
 READ8_HANDLER( osborne1_2000_r )
 {
 	UINT8	data = 0xFF;
-
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, MB8877, "mb8877");
 	/* Check whether regular RAM is enabled */
 	if ( ! osborne1.bank2_enabled )
 	{
@@ -85,7 +85,7 @@ READ8_HANDLER( osborne1_2000_r )
 		switch( offset & 0x0F00 )
 		{
 		case 0x100:	/* Floppy */
-			data = wd17xx_r( space, offset );
+			data = wd17xx_r( fdc, offset );
 			break;
 		case 0x200:	/* Keyboard */
 			/* Row 0 */
@@ -121,6 +121,7 @@ READ8_HANDLER( osborne1_2000_r )
 
 WRITE8_HANDLER( osborne1_2000_w )
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, MB8877, "mb8877");
 	/* Check whether regular RAM is enabled */
 	if ( ! osborne1.bank2_enabled )
 	{
@@ -136,7 +137,7 @@ WRITE8_HANDLER( osborne1_2000_w )
 		switch( offset & 0x0F00 )
 		{
 		case 0x100:	/* Floppy */
-			wd17xx_w( space, offset, data );
+			wd17xx_w( fdc, offset, data );
 			break;
 		case 0x900:	/* IEEE488 PIA */
 			pia_0_w( space, offset & 0x03, data );
@@ -276,8 +277,9 @@ static WRITE8_HANDLER( video_pia_out_cb2_dummy )
 
 static WRITE8_HANDLER( video_pia_port_a_w )
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, MB8877, "mb8877");
 	osborne1.new_start_x = data >> 1;
-	wd17xx_set_density( ( data & 0x01 ) ? DEN_FM_LO : DEN_FM_HI );
+	wd17xx_set_density(fdc, ( data & 0x01 ) ? DEN_FM_LO : DEN_FM_HI );
 
 	//logerror("Video pia port a write: %02X, density set to %s\n", data, data & 1 ? "DEN_FM_LO" : "DEN_FM_HI" );
 }
@@ -285,15 +287,16 @@ static WRITE8_HANDLER( video_pia_port_a_w )
 
 static WRITE8_HANDLER( video_pia_port_b_w )
 {
+	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, MB8877, "mb8877");
 	osborne1.new_start_y = data & 0x1F;
 	osborne1.beep = ( data & 0x20 ) ? 1 : 0;
 	if ( data & 0x40 )
 	{
-		wd17xx_set_drive( 0 );
+		wd17xx_set_drive( fdc, 0 );
 	}
 	else if ( data & 0x80 )
 	{
-		wd17xx_set_drive( 1 );
+		wd17xx_set_drive( fdc, 1 );
 	}
 	//logerror("Video pia port b write: %02X\n", data );
 }
@@ -412,6 +415,7 @@ static TIMER_CALLBACK(osborne1_video_callback)
 DEVICE_IMAGE_LOAD( osborne1_floppy )
 {
 	int size, sectors, sectorsize;
+	device_config *fdc = (device_config*)device_list_find_by_tag( image->machine->config->devicelist, MB8877, "mb8877");
 
 	if ( ! image_has_been_created( image ) )
 	{
@@ -422,27 +426,27 @@ DEVICE_IMAGE_LOAD( osborne1_floppy )
 		case 40 * 10 * 256:
 			sectors = 10;
 			sectorsize = 256;
-			wd17xx_set_density( DEN_FM_LO );
+			wd17xx_set_density( fdc, DEN_FM_LO );
 			break;
 		case 40 * 5 * 1024:
 			sectors = 5;
 			sectorsize = 1024;
-			wd17xx_set_density( DEN_FM_HI );
+			wd17xx_set_density( fdc, DEN_FM_HI );
 			break;
 		case 40 * 8 * 512:
 			sectors = 8;
 			sectorsize = 512;
-			wd17xx_set_density( DEN_FM_LO );
+			wd17xx_set_density( fdc, DEN_FM_LO );
 			return INIT_FAIL;
 		case 40 * 18 * 128:
 			sectors = 18;
 			sectorsize = 128;
-			wd17xx_set_density( DEN_FM_LO );
+			wd17xx_set_density( fdc, DEN_FM_LO );
 			return INIT_FAIL;
 		case 40 * 9 * 512:
 			sectors = 9;
 			sectorsize = 512;
-			wd17xx_set_density( DEN_FM_HI );
+			wd17xx_set_density( fdc, DEN_FM_HI );
 			return INIT_FAIL;
 		default:
 			return INIT_FAIL;
@@ -469,13 +473,6 @@ static TIMER_CALLBACK( setup_beep )
 	beep_set_state( 0, 0 );
 	beep_set_frequency( 0, 300 /* 60 * 240 / 2 */ );
 }
-
-
-MACHINE_START( osborne1 )
-{
-	/* Configure the floppy disk interface */
-	wd17xx_init( machine, WD_TYPE_MB8877, NULL, NULL );
-}	
 
 
 MACHINE_RESET( osborne1 )

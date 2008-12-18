@@ -770,6 +770,8 @@ static MACHINE_DRIVER_START( bbcb )
 	MDRV_MACHINE_RESET( bbcb )
 	MDRV_VIDEO_START( bbcb )
 	MDRV_VIA6522_ADD("via6522_1", 1000000, bbcb_user_via)
+
+	MDRV_WD177X_ADD("wd177x", bbc_wd17xx_interface )
 MACHINE_DRIVER_END
 
 
@@ -781,6 +783,7 @@ static MACHINE_DRIVER_START( bbcbp )
 	MDRV_MACHINE_RESET( bbcbp )
 	MDRV_VIDEO_START( bbcbp )
 	MDRV_VIA6522_ADD("via6522_1", 1000000, bbcb_user_via)
+	MDRV_WD177X_ADD("wd177x", bbc_wd17xx_interface )
 MACHINE_DRIVER_END
 
 
@@ -792,6 +795,7 @@ static MACHINE_DRIVER_START( bbcbp128 )
 	MDRV_MACHINE_RESET( bbcbp )
 	MDRV_VIDEO_START( bbcbp )
 	MDRV_VIA6522_ADD("via6522_1", 1000000, bbcb_user_via)
+	MDRV_WD177X_ADD("wd177x", bbc_wd17xx_interface )
 MACHINE_DRIVER_END
 
 
@@ -841,6 +845,7 @@ static MACHINE_DRIVER_START( bbcm )
 	MDRV_UPD7002_ADD("upd7002",BBC_uPD7002)
 	MDRV_VIA6522_ADD("via6522_0", 1000000, bbcb_system_via)
 	MDRV_VIA6522_ADD("via6522_1", 1000000, bbcb_user_via)
+	MDRV_WD177X_ADD("wd177x", bbc_wd17xx_interface )
 MACHINE_DRIVER_END
 
 static void bbc_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
