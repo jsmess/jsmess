@@ -548,7 +548,9 @@ static INPUT_PORTS_START( gameboy )
 INPUT_PORTS_END
 
 static const custom_sound_interface gameboy_sound_interface =
-{ gameboy_sh_start, 0, 0 };
+{
+	gameboy_sh_start, 0, 0
+};
 
 
 static MACHINE_DRIVER_START( gameboy )

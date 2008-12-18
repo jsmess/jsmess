@@ -75,7 +75,7 @@ static void channelf_sh_update(void *param,stream_sample_t **inputs, stream_samp
 
 
 
-void *channelf_sh_custom_start(const device_config *device, int clock, const custom_sound_interface *config)
+CUSTOM_START( channelf_sh_custom_start )
 {
 	int rate;
 

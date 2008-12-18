@@ -62,7 +62,7 @@ void mac_set_screen_buffer( int buffer );
 
 /*----------- defined in audio/mac.c -----------*/
 
-void *mac_sh_start(const device_config *device, int clock, const custom_sound_interface *config);
+CUSTOM_START( mac_sh_start );
 
 void mac_enable_sound( int on );
 void mac_set_sound_buffer( int buffer );

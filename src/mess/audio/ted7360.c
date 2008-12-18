@@ -152,7 +152,8 @@ static void ted7360_update (void *param,stream_sample_t **inputs, stream_sample_
 /************************************/
 /* Sound handler start              */
 /************************************/
-void *ted7360_custom_start (const device_config *device, int clock, const custom_sound_interface *config)
+
+CUSTOM_START( ted7360_custom_start )
 {
 	int i;
 
@@ -195,4 +196,3 @@ void *ted7360_custom_start (const device_config *device, int clock, const custom
 	}
 	return (void *) ~0;
 }
-

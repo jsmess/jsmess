@@ -16,7 +16,7 @@
 #include "streams.h"
 #include "deprecat.h"
 
-static void *dai_sh_start(const device_config *device, int clock, const custom_sound_interface *config);
+static CUSTOM_START( dai_sh_start );
 static void dai_sh_update(void *param,stream_sample_t **inputs, stream_sample_t **_buffer,int length);
 
 static sound_stream *mixer_channel;
@@ -51,7 +51,7 @@ void dai_set_input(int index, int state)
 }
 
 
-static void *dai_sh_start(const device_config *device, int clock, const custom_sound_interface *config)
+static CUSTOM_START( dai_sh_start )
 {
 	dai_input[0] = dai_input[1] = dai_input[2] = 0;
 

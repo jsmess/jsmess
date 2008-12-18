@@ -181,7 +181,9 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 static const custom_sound_interface snes_sound_interface =
-{ snes_sh_start, 0, 0 };
+{
+	snes_sh_start, 0, 0
+};
 
 
 

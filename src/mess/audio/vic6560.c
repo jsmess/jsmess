@@ -228,7 +228,7 @@ static void vic6560_update (void *param,stream_sample_t **inputs, stream_sample_
 /* Sound handler start          */
 /************************************/
 
-void *vic6560_custom_start(const device_config *device, int clock, const custom_sound_interface *config)
+CUSTOM_START( vic6560_custom_start )
 {
 	int i;
 

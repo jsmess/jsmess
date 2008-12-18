@@ -406,7 +406,8 @@ static void b2m_sh_update(void *param,stream_sample_t **inputs, stream_sample_t 
 		sample_left++;
 	}
 }
-static CUSTOM_START (b2m_sh_start)
+
+static CUSTOM_START( b2m_sh_start )
 {
 	b2m_sound_input = 0;
 	mixer_channel = stream_create(device, 0, 1, device->machine->sample_rate, 0, b2m_sh_update);

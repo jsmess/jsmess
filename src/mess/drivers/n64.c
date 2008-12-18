@@ -10,7 +10,6 @@
 #include "cpu/mips/mips3.h"
 #include "sound/custom.h"
 #include "devices/cartslot.h"
-#include "streams.h"
 #include "includes/n64.h"
 
 static ADDRESS_MAP_START( n64_map, ADDRESS_SPACE_PROGRAM, 32 )

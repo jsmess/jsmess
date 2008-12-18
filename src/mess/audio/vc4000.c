@@ -67,12 +67,11 @@ static void vc4000_update(void *param,stream_sample_t **inputs, stream_sample_t 
 /* Sound handler start              */
 /************************************/
 
-static void *vc4000_custom_start(const device_config *device, int clock, const custom_sound_interface *config)
+static CUSTOM_START( vc4000_custom_start )
 {
     vc4000_sound.channel = stream_create(device, 0, 1, device->machine->sample_rate, 0, vc4000_update);
     return (void *) ~0;
 }
-
 
 
 const custom_sound_interface vc4000_sound_interface =

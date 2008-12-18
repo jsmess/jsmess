@@ -47,10 +47,10 @@ static void gmaster_update (void* param, stream_sample_t **inputs, stream_sample
 /************************************/
 /* Sound handler start              */
 /************************************/
-void* gmaster_custom_start (const device_config *device, int clock, const custom_sound_interface *config)
+
+CUSTOM_START( gmaster_custom_start )
 {
   mixer_channel = stream_create(device, 0, 1, device->machine->sample_rate, 0, gmaster_update);
 
   return (void*)~0;
 }
-

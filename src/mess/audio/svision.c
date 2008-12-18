@@ -220,7 +220,8 @@ static void svision_update (void *param,stream_sample_t **inputs, stream_sample_
 /************************************/
 /* Sound handler start              */
 /************************************/
-void *svision_custom_start(const device_config *device, int clock, const custom_sound_interface *config)
+
+CUSTOM_START( svision_custom_start )
 {
 	memset(&svision_dma, 0, sizeof(svision_dma));
 	memset(&svision_noise, 0, sizeof(svision_noise));

@@ -361,7 +361,7 @@ void lynx_audio_reset(void)
 /* Sound handler start              */
 /************************************/
 
-void *lynx_custom_start(const device_config *device, int clock, const custom_sound_interface *config)
+CUSTOM_START( lynx_custom_start )
 {
 	mixer_channel = stream_create(device, 0, 1, device->machine->sample_rate, 0, lynx_update);
 
@@ -372,8 +372,7 @@ void *lynx_custom_start(const device_config *device, int clock, const custom_sou
 }
 
 
-
-void *lynx2_custom_start(const device_config *device, int clock, const custom_sound_interface *config)
+CUSTOM_START( lynx2_custom_start )
 {
     mixer_channel = stream_create(device, 0, 2, device->machine->sample_rate, 0, lynx2_update);
 
@@ -382,4 +381,3 @@ void *lynx2_custom_start(const device_config *device, int clock, const custom_so
     lynx_audio_init();
 	return (void *) ~0;
 }
-

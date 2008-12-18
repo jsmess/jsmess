@@ -6,7 +6,7 @@
 /*----------- defined in audio/gmaster.c -----------*/
 
 int gmaster_io_callback(int ioline, int state);
-void* gmaster_custom_start (const device_config *device, int clock, const custom_sound_interface *config);
+CUSTOM_START( gmaster_custom_start );
 //extern void gmaster_custom_stop (void);
 //extern void gmaster_custom_update (void);
 

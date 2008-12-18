@@ -81,7 +81,7 @@ typedef struct DAVE
 	sound_stream *sound_stream;
 } DAVE;
 
-extern void *Dave_sh_start(const device_config *device, int clock, const custom_sound_interface *config);
+extern CUSTOM_START( Dave_sh_start );
 
 /* id's of external ints */
 enum
