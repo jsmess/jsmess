@@ -55,7 +55,7 @@ static const SOUNDBLASTER_CONFIG soundblaster = { 1,5, {1,0} };
  *************************************************************/
 
 static PIC8259_SET_INT_LINE( at_pic8259_master_set_int_line ) {
-	cpu_set_input_line(device->machine->cpu[0], 0, interrupt ? HOLD_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[0], 0, interrupt ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
