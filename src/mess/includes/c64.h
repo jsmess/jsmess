@@ -30,8 +30,8 @@ extern UINT8 *c64_kernal;
 extern UINT8 *c64_chargen;
 extern UINT8 *c64_memory;
 
-UINT8 c64_m6510_port_read(UINT8 direction);
-void c64_m6510_port_write(UINT8 direction, UINT8 data);
+UINT8 c64_m6510_port_read(const device_config *device, UINT8 direction);
+void c64_m6510_port_write(const device_config *device, UINT8 direction, UINT8 data);
 
 READ8_HANDLER ( c64_colorram_read );
 WRITE8_HANDLER ( c64_colorram_write );

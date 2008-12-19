@@ -46,8 +46,8 @@ WRITE8_HANDLER( vic3_palette_w )
 	vic3.palette_dirty=1;
 }
 
-void vic4567_init (running_machine *machine, int pal, int (*dma_read) (int),
-						  int (*dma_read_color) (int), void (*irq) (int),
+void vic4567_init(running_machine *machine, int pal, int (*dma_read)(running_machine *, int),
+						  int (*dma_read_color)(running_machine *, int), void (*irq) (int),
 						  void (*param_port_changed)(int))
 {
 	memset(&vic2, 0, sizeof(vic2));
@@ -259,8 +259,8 @@ static void vic3_drawlines (running_machine *machine, int first, int last, int s
 
 		for (xoff = vic2.x_begin + XPOS; xoff < x_end2 + XPOS; xoff += 8, offs++)
 		{
-			ch = vic2.dma_read (vic2.videoaddr + offs);
-			attr = vic2.dma_read_color (vic2.videoaddr + offs);
+			ch = vic2.dma_read(machine, vic2.videoaddr + offs);
+			attr = vic2.dma_read_color(machine, vic2.videoaddr + offs);
 			if (HIRESON)
 			{
 				vic2.bitmapmulti[1] = vic2.c64_bitmap[1] = ch >> 4;
@@ -268,11 +268,11 @@ static void vic3_drawlines (running_machine *machine, int first, int last, int s
 				if (MULTICOLORON)
 				{
 					vic2.bitmapmulti[3] = attr;
-					vic2_draw_bitmap_multi (ybegin, yend, offs, yoff, xoff, start_x, end_x);
+					vic2_draw_bitmap_multi(machine, ybegin, yend, offs, yoff, xoff, start_x, end_x);
 				}
 				else
 				{
-					vic2_draw_bitmap (ybegin, yend, offs, yoff, xoff, start_x, end_x);
+					vic2_draw_bitmap(machine, ybegin, yend, offs, yoff, xoff, start_x, end_x);
 				}
 			}
 			else if (ECMON)
@@ -280,17 +280,17 @@ static void vic3_drawlines (running_machine *machine, int first, int last, int s
 				ecm = ch >> 6;
 				vic2.ecmcolor[0] = vic2.colors[ecm];
 				vic2.ecmcolor[1] = attr;
-				vic2_draw_character (ybegin, yend, ch & ~0xC0, yoff, xoff, vic2.ecmcolor, start_x, end_x);
+				vic2_draw_character(machine, ybegin, yend, ch & ~0xC0, yoff, xoff, vic2.ecmcolor, start_x, end_x);
 			}
 			else if (MULTICOLORON && (attr & 8))
 			{
 				vic2.multi[3] = attr & 7;
-				vic2_draw_character_multi (ybegin, yend, ch, yoff, xoff, start_x, end_x);
+				vic2_draw_character_multi(machine, ybegin, yend, ch, yoff, xoff, start_x, end_x);
 			}
 			else
 			{
 				vic2.mono[1] = attr;
-				vic2_draw_character (ybegin, yend, ch, yoff, xoff, vic2.mono, start_x, end_x);
+				vic2_draw_character(machine, ybegin, yend, ch, yoff, xoff, vic2.mono, start_x, end_x);
 			}
 		}
 		/* sprite priority, sprite overwrites lowerprior pixels */

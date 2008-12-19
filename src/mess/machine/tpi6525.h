@@ -34,8 +34,8 @@
 typedef struct {
 	int number;
 	struct {
-		int (*read)(void);
-		void (*output)(int data);
+		int (*read)(running_machine *machine);
+		void (*output)(running_machine *machine, int data);
 		int port, ddr, in;
 	} a,b,c;
 

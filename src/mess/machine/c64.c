@@ -784,10 +784,8 @@ static void c64_bankswitch(running_machine *machine, int reset)
 
 static emu_timer *datasette_timer;
 
-void c64_m6510_port_write(UINT8 direction, UINT8 data)
+void c64_m6510_port_write(const device_config *device, UINT8 direction, UINT8 data)
 {
-	running_machine *machine = Machine;
-
 	/* if line is marked as input then keep current value */
 	data = (c64_port_data & ~direction) | (data & direction);
 
@@ -807,53 +805,52 @@ void c64_m6510_port_write(UINT8 direction, UINT8 data)
 	{
 		if (direction & 0x08) 
 		{
-			cassette_output(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ), (data & 0x08) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
+			cassette_output(device_list_find_by_tag(device->machine->config->devicelist, CASSETTE, "cassette" ), (data & 0x08) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
 		}
 
 		if (direction & 0x20)
 		{
 			if(!(data & 0x20))
 			{
-				cassette_change_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ), CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+				cassette_change_state(device_list_find_by_tag(device->machine->config->devicelist, CASSETTE, "cassette" ), CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 				timer_adjust_periodic(datasette_timer, attotime_zero, 0, ATTOTIME_IN_HZ(44100));
 			}
 			else
 			{
-				cassette_change_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ), CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+				cassette_change_state(device_list_find_by_tag(device->machine->config->devicelist, CASSETTE, "cassette" ), CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 				timer_reset(datasette_timer, attotime_never);
 			}
 		}
 	}
 
-	if (is_c65(machine))
+	if (is_c65(device->machine))
 	{
 		// NPW 8-Feb-2004 - Don't know why I have to do this
 		//c65_bankswitch(machine);
 	}
 
 	else if (!ultimax)
-		c64_bankswitch(machine, 0);
+		c64_bankswitch(device->machine, 0);
 
-	c64_memory[0x000] = memory_read_byte( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0 );
-	c64_memory[0x001] = memory_read_byte( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 1 );
+	c64_memory[0x000] = memory_read_byte( cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM), 0 );
+	c64_memory[0x001] = memory_read_byte( cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM), 1 );
 }
 
-UINT8 c64_m6510_port_read(UINT8 direction)
+UINT8 c64_m6510_port_read(const device_config *device, UINT8 direction)
 {
-	running_machine *machine = Machine;
 	UINT8 data = c64_port_data;
 
 	if (c64_tape_on)
 	{
-		if ((cassette_get_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" )) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
+		if ((cassette_get_state(device_list_find_by_tag(device->machine->config->devicelist, CASSETTE, "cassette" )) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
 			data &= ~0x10;
 		else
 			data |=  0x10;
 	}
 
-	if (is_c65(machine)) 
+	if (is_c65(device->machine)) 
 	{
-		if (input_port_read(machine, "SPECIAL") & 0x20)		/* Check Caps Lock */
+		if (input_port_read(device->machine, "SPECIAL") & 0x20)		/* Check Caps Lock */
 			data &= ~0x40;
 
 		else 
@@ -980,7 +977,7 @@ WRITE8_HANDLER( c64_colorram_write )
  * a15 and a14 portlines
  * 0x1000-0x1fff, 0x9000-0x9fff char rom
  */
-static int c64_dma_read( int offset )
+static int c64_dma_read(running_machine *machine, int offset)
 {
 	if (!c64_game && c64_exrom)
 	{
@@ -996,7 +993,7 @@ static int c64_dma_read( int offset )
 	return c64_vicaddr[offset];
 }
 
-static int c64_dma_read_ultimax( int offset )
+static int c64_dma_read_ultimax(running_machine *machine, int offset )
 {
 	if (offset < 0x3000)
 		return c64_memory[offset];
@@ -1004,7 +1001,7 @@ static int c64_dma_read_ultimax( int offset )
 	return c64_romh[offset & 0x1fff];
 }
 
-static int c64_dma_read_color( int offset )
+static int c64_dma_read_color(running_machine *machine, int offset)
 {
 	return c64_colorram[offset & 0x3ff] & 0xf;
 }

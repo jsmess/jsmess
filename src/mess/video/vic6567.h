@@ -85,7 +85,7 @@
 
 /* call to init videodriver */
 /* dma_read: videochip fetched 1 byte data from system bus */
-extern void vic6567_init (int vic2e, int pal, int (*dma_read) (int), int (*dma_read_color) (int), void (*irq) (int));
+extern void vic6567_init(int vic2e, int pal, int (*dma_read)(running_machine *, int), int (*dma_read_color)(running_machine *, int), void (*irq)(int));
 
 extern void vic2_set_rastering(int onoff);
 

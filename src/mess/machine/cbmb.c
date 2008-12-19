@@ -3,12 +3,11 @@
 
     peter.trauner@jk.uni-linz.ac.at
 ***************************************************************************/
-#include <ctype.h>
+
 #include "driver.h"
 #include "cpu/m6502/m6509.h"
 #include "sound/sid6581.h"
 #include "machine/6526cia.h"
-#include "deprecat.h"
 
 #include "includes/cbm.h"
 #include "machine/tpi6525.h"
@@ -73,20 +72,21 @@ UINT8 *cbmb_memory;
  i1 self pb0
  i0 tod (50 or 60 hertz frequency)
  */
-static int cbmb_tpi0_port_a_r(void)
+static int cbmb_tpi0_port_a_r(running_machine *machine)
 {
-	running_machine *machine = Machine;
 	int data = 0;
+
 	if (cbm_ieee_nrfd_r(machine)) data |= 0x80;
 	if (cbm_ieee_ndac_r(machine)) data |= 0x40;
 	if (cbm_ieee_eoi_r(machine)) data |= 0x20;
 	if (cbm_ieee_dav_r(machine)) data |= 0x10;
 	if (cbm_ieee_atn_r(machine)) data |= 0x08;
 /*	if (cbm_ieee_ren_r(machine)) data |= 0x04; */
+
 	return data;
 }
 
-static void cbmb_tpi0_port_a_w(int data)
+static void cbmb_tpi0_port_a_w(running_machine *machine, int data)
 {
 	cbm_ieee_nrfd_w(0, data & 0x80);
 	cbm_ieee_ndac_w(0, data & 0x40);
@@ -109,97 +109,97 @@ static void cbmb_tpi0_port_a_w(int data)
    port c6 ?
   port c5 .. c0 keyboard line select
   port a7..a0 b7..b0 keyboard input */
-static void cbmb_keyboard_line_select_a(int line)
+static void cbmb_keyboard_line_select_a(running_machine *machine, int line)
 {
 	cbmb_keyline_a=line;
 }
 
-static void cbmb_keyboard_line_select_b(int line)
+static void cbmb_keyboard_line_select_b(running_machine *machine, int line)
 {
 	cbmb_keyline_b=line;
 }
 
-static void cbmb_keyboard_line_select_c(int line)
+static void cbmb_keyboard_line_select_c(running_machine *machine, int line)
 {
 	cbmb_keyline_c=line;
 }
 
-static int cbmb_keyboard_line_a(void)
+static int cbmb_keyboard_line_a(running_machine *machine)
 {
 	int data = 0;
 	
 	if (!(cbmb_keyline_c & 0x01)) 
-		data |= input_port_read(Machine, "ROW0");
+		data |= input_port_read(machine, "ROW0");
 
 	if (!(cbmb_keyline_c & 0x02)) 
-		data |= input_port_read(Machine, "ROW2");
+		data |= input_port_read(machine, "ROW2");
 
 	if (!(cbmb_keyline_c & 0x04)) 
-		data |= input_port_read(Machine, "ROW4");
+		data |= input_port_read(machine, "ROW4");
 
 	if (!(cbmb_keyline_c & 0x08)) 
-		data |= input_port_read(Machine, "ROW6");
+		data |= input_port_read(machine, "ROW6");
 
 	if (!(cbmb_keyline_c & 0x10)) 
-		data |= input_port_read(Machine, "ROW8");
+		data |= input_port_read(machine, "ROW8");
 
 	if (!(cbmb_keyline_c & 0x20)) 
-		data |= input_port_read(Machine, "ROW10");
+		data |= input_port_read(machine, "ROW10");
 
 	return data ^0xff;
 }
 
-static int cbmb_keyboard_line_b(void)
+static int cbmb_keyboard_line_b(running_machine *machine)
 {
 	int data = 0;
 	
 	if (!(cbmb_keyline_c & 0x01)) 
-		data |= input_port_read(Machine, "ROW1");
+		data |= input_port_read(machine, "ROW1");
 
 	if (!(cbmb_keyline_c & 0x02)) 
-		data |= input_port_read(Machine, "ROW3");
+		data |= input_port_read(machine, "ROW3");
 
 	if (!(cbmb_keyline_c & 0x04)) 
-		data |= input_port_read(Machine, "ROW5");
+		data |= input_port_read(machine, "ROW5");
 
 	if (!(cbmb_keyline_c & 0x08)) 
-		data |= input_port_read(Machine, "ROW7");
+		data |= input_port_read(machine, "ROW7");
 
 	if (!(cbmb_keyline_c & 0x10)) 
-		data |= input_port_read(Machine, "ROW9") | ((input_port_read(Machine, "SPECIAL") & 0x04) ? 1 : 0 );
+		data |= input_port_read(machine, "ROW9") | ((input_port_read(machine, "SPECIAL") & 0x04) ? 1 : 0 );
 
 	if (!(cbmb_keyline_c & 0x20)) 
-		data |= input_port_read(Machine, "ROW11");
+		data |= input_port_read(machine, "ROW11");
 
 	return data ^0xff;
 }
 
-static int cbmb_keyboard_line_c(void)
+static int cbmb_keyboard_line_c(running_machine *machine)
 {
 	int data = 0;
 
-	if ((input_port_read(Machine, "ROW0") & ~cbmb_keyline_a) || 
-				(input_port_read(Machine, "ROW1") & ~cbmb_keyline_b)) 
+	if ((input_port_read(machine, "ROW0") & ~cbmb_keyline_a) || 
+				(input_port_read(machine, "ROW1") & ~cbmb_keyline_b)) 
 		 data |= 0x01;
 
-	if ((input_port_read(Machine, "ROW2") & ~cbmb_keyline_a) || 
-				(input_port_read(Machine, "ROW3") & ~cbmb_keyline_b)) 
+	if ((input_port_read(machine, "ROW2") & ~cbmb_keyline_a) || 
+				(input_port_read(machine, "ROW3") & ~cbmb_keyline_b)) 
 		 data |= 0x02;
 
-	if ((input_port_read(Machine, "ROW4") & ~cbmb_keyline_a) || 
-				(input_port_read(Machine, "ROW5") & ~cbmb_keyline_b)) 
+	if ((input_port_read(machine, "ROW4") & ~cbmb_keyline_a) || 
+				(input_port_read(machine, "ROW5") & ~cbmb_keyline_b)) 
 		 data |= 0x04;
 
-	if ((input_port_read(Machine, "ROW6") & ~cbmb_keyline_a) || 
-				(input_port_read(Machine, "ROW7") & ~cbmb_keyline_b)) 
+	if ((input_port_read(machine, "ROW6") & ~cbmb_keyline_a) || 
+				(input_port_read(machine, "ROW7") & ~cbmb_keyline_b)) 
 		 data |= 0x08;
 
-	if ((input_port_read(Machine, "ROW8") & ~cbmb_keyline_a) || 
-				((input_port_read(Machine, "ROW9") | ((input_port_read(Machine, "SPECIAL") & 0x04) ? 1 : 0)) & ~cbmb_keyline_b)) 
+	if ((input_port_read(machine, "ROW8") & ~cbmb_keyline_a) || 
+				((input_port_read(machine, "ROW9") | ((input_port_read(machine, "SPECIAL") & 0x04) ? 1 : 0)) & ~cbmb_keyline_b)) 
 		 data |= 0x10;
 
-	if ((input_port_read(Machine, "ROW10") & ~cbmb_keyline_a) || 
-				(input_port_read(Machine, "ROW11") & ~cbmb_keyline_b)) 
+	if ((input_port_read(machine, "ROW10") & ~cbmb_keyline_a) || 
+				(input_port_read(machine, "ROW11") & ~cbmb_keyline_b)) 
 		 data |= 0x20;
 
 	if (!p500) 
@@ -213,7 +213,7 @@ static int cbmb_keyboard_line_c(void)
 	return data ^0xff;
 }
 
-static void cbmb_irq (running_machine *machine, int level)
+static void cbmb_irq(running_machine *machine, int level)
 {
 	static int old_level = 0;
 
@@ -265,7 +265,7 @@ WRITE8_HANDLER ( cbmb_colorram_w )
 	cbmb_colorram[offset] = data | 0xf0;
 }
 
-static int cbmb_dma_read(int offset)
+static int cbmb_dma_read(running_machine *machine, int offset)
 {
 	if (offset >= 0x1000)
 		return cbmb_videoram[offset & 0x3ff];
@@ -273,7 +273,7 @@ static int cbmb_dma_read(int offset)
 		return cbmb_chargen[offset & 0xfff];
 }
 
-static int cbmb_dma_read_color(int offset)
+static int cbmb_dma_read_color(running_machine *machine, int offset)
 {
 	return cbmb_colorram[offset & 0x3ff];
 }

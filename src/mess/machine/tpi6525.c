@@ -71,9 +71,8 @@
   highest interrupt can be found in air register
   read clears highest interrupt
 */
-#include <ctype.h>
-#include "driver.h"
 
+#include "driver.h"
 #include "tpi6525.h"
 
 
@@ -201,47 +200,47 @@ static void tpi6525_irq4_level(running_machine *machine, TPI6525 *This, int leve
 	}
 }
 
-static int tpi6525_port_a_r(TPI6525 *This, int offset)
+static int tpi6525_port_a_r(running_machine *machine, TPI6525 *This, int offset)
 {
 	int data=This->a.in;
 
-	if (This->a.read) data=This->a.read();
+	if (This->a.read) data=This->a.read(machine);
 	data=(data&~This->a.ddr)|(This->a.ddr&This->a.port);
 
 	return data;
 }
 
-static void tpi6525_port_a_w(TPI6525 *This, int offset, int data)
+static void tpi6525_port_a_w(running_machine *machine, TPI6525 *This, int offset, int data)
 {
 	This->a.in=data;
 }
 
-static int tpi6525_port_b_r(TPI6525 *This, int offset)
+static int tpi6525_port_b_r(running_machine *machine, TPI6525 *This, int offset)
 {
 	int data=This->b.in;
 
-	if (This->b.read) data=This->b.read();
+	if (This->b.read) data=This->b.read(machine);
 	data=(data&~This->b.ddr)|(This->b.ddr&This->b.port);
 
 	return data;
 }
 
-static void tpi6525_port_b_w(TPI6525 *This, int offset, int data)
+static void tpi6525_port_b_w(running_machine *machine, TPI6525 *This, int offset, int data)
 {
 	This->b.in=data;
 }
 
-static int tpi6525_port_c_r(TPI6525 *This, int offset)
+static int tpi6525_port_c_r(running_machine *machine, TPI6525 *This, int offset)
 {
 	int data=This->c.in;
 
-	if (This->c.read) data&=This->c.read();
+	if (This->c.read) data&=This->c.read(machine);
 	data=(data&~This->c.ddr)|(This->c.ddr&This->c.port);
 
 	return data;
 }
 
-static void tpi6525_port_c_w(TPI6525 *This, int offset, int data)
+static void tpi6525_port_c_w(running_machine *machine, TPI6525 *This, int offset, int data)
 {
 	This->c.in=data;
 }
@@ -252,12 +251,12 @@ static int tpi6525_port_r(running_machine *machine, TPI6525 *This, int offset)
 	switch (offset&7) {
 	case 0:
 		data=This->a.in;
-		if (This->a.read) data&=This->a.read();
+		if (This->a.read) data&=This->a.read(machine);
 		data=(data&~This->a.ddr)|(This->a.ddr&This->a.port);
 		break;
 	case 1:
 		data=This->b.in;
-		if (This->b.read) data&=This->b.read();
+		if (This->b.read) data&=This->b.read(machine);
 		data=(data&~This->b.ddr)|(This->b.ddr&This->b.port);
 		break;
 	case 2:
@@ -273,7 +272,7 @@ static int tpi6525_port_r(running_machine *machine, TPI6525 *This, int offset)
 			if (This->cb.level) data|=0x80;
 		} else {
 			data=This->c.in;
-			if (This->c.read) data&=This->c.read();
+			if (This->c.read) data&=This->c.read(machine);
 			data=(data&~This->c.ddr)|(This->c.ddr&This->c.port);
 		}
 		DBG_LOG (2, "tpi6525",
@@ -330,37 +329,37 @@ static void tpi6525_port_w(running_machine *machine, TPI6525 *This, int offset, 
 	case 0:
 		This->a.port=data;
 		if (This->a.output) {
-			This->a.output(This->a.port&This->a.ddr);
+			This->a.output(machine, This->a.port&This->a.ddr);
 		}
 		break;
 	case 1:
 		This->b.port=data;
 		if (This->b.output) {
-			This->b.output(This->b.port&This->b.ddr);
+			This->b.output(machine, This->b.port&This->b.ddr);
 		}
 		break;
 	case 2:
 		This->c.port=data;
 		if (!INTERRUPT_MODE&&This->c.output) {
-			This->c.output(This->c.port&This->c.ddr);
+			This->c.output(machine, This->c.port&This->c.ddr);
 		}
 		break;
 	case 3:
 		This->a.ddr=data;
 		if (This->a.output) {
-			This->a.output(This->a.port&This->a.ddr);
+			This->a.output(machine, This->a.port&This->a.ddr);
 		}
 		break;
 	case 4:
 		This->b.ddr=data;
 		if (This->b.output) {
-			This->b.output(This->b.port&This->b.ddr);
+			This->b.output(machine, This->b.port&This->b.ddr);
 		}
 		break;
 	case 5:
 		This->c.ddr=data;
 		if (!INTERRUPT_MODE&&This->c.output) {
-			This->c.output(This->c.port&This->c.ddr);
+			This->c.output(machine, This->c.port&This->c.ddr);
 		}
 		break;
 	case 6:
@@ -457,22 +456,22 @@ void tpi6525_1_irq4_level(running_machine *machine, int level)
 	tpi6525_irq4_level(machine, tpi6525+1, level);
 }
 
- READ8_HANDLER ( tpi6525_0_port_r )
+READ8_HANDLER ( tpi6525_0_port_r )
 {
 	return tpi6525_port_r(space->machine, tpi6525, offset);
 }
 
- READ8_HANDLER ( tpi6525_1_port_r )
+READ8_HANDLER ( tpi6525_1_port_r )
 {
 	return tpi6525_port_r(space->machine, tpi6525+1, offset);
 }
 
- READ8_HANDLER ( tpi6525_2_port_r )
+READ8_HANDLER ( tpi6525_2_port_r )
 {
 	return tpi6525_port_r(space->machine, tpi6525+2, offset);
 }
 
- READ8_HANDLER ( tpi6525_3_port_r )
+READ8_HANDLER ( tpi6525_3_port_r )
 {
 	return tpi6525_port_r(space->machine, tpi6525+3, offset);
 }
@@ -497,123 +496,122 @@ WRITE8_HANDLER ( tpi6525_3_port_w )
 	tpi6525_port_w(space->machine, tpi6525+3, offset, data);
 }
 
- READ8_HANDLER ( tpi6525_0_port_a_r )
+READ8_HANDLER ( tpi6525_0_port_a_r )
 {
-	return tpi6525_port_a_r(tpi6525, offset);
+	return tpi6525_port_a_r(space->machine, tpi6525, offset);
 }
 
- READ8_HANDLER ( tpi6525_1_port_a_r )
+READ8_HANDLER ( tpi6525_1_port_a_r )
 {
-	return tpi6525_port_a_r(tpi6525+1, offset);
+	return tpi6525_port_a_r(space->machine, tpi6525+1, offset);
 }
 
- READ8_HANDLER ( tpi6525_2_port_a_r )
+READ8_HANDLER ( tpi6525_2_port_a_r )
 {
-	return tpi6525_port_a_r(tpi6525+2, offset);
+	return tpi6525_port_a_r(space->machine, tpi6525+2, offset);
 }
 
- READ8_HANDLER ( tpi6525_3_port_a_r )
+READ8_HANDLER ( tpi6525_3_port_a_r )
 {
-	return tpi6525_port_a_r(tpi6525+3, offset);
+	return tpi6525_port_a_r(space->machine, tpi6525+3, offset);
 }
 
 WRITE8_HANDLER ( tpi6525_0_port_a_w )
 {
-	tpi6525_port_a_w(tpi6525, offset, data);
+	tpi6525_port_a_w(space->machine, tpi6525, offset, data);
 }
 
 WRITE8_HANDLER ( tpi6525_1_port_a_w )
 {
-	tpi6525_port_a_w(tpi6525+1, offset, data);
+	tpi6525_port_a_w(space->machine, tpi6525+1, offset, data);
 }
 
 WRITE8_HANDLER ( tpi6525_2_port_a_w )
 {
-	tpi6525_port_a_w(tpi6525+2, offset, data);
+	tpi6525_port_a_w(space->machine, tpi6525+2, offset, data);
 }
 
 WRITE8_HANDLER ( tpi6525_3_port_a_w )
 {
-	tpi6525_port_a_w(tpi6525+3, offset, data);
+	tpi6525_port_a_w(space->machine, tpi6525+3, offset, data);
 }
 
- READ8_HANDLER ( tpi6525_0_port_b_r )
+READ8_HANDLER ( tpi6525_0_port_b_r )
 {
-	return tpi6525_port_b_r(tpi6525, offset);
+	return tpi6525_port_b_r(space->machine, tpi6525, offset);
 }
 
- READ8_HANDLER ( tpi6525_1_port_b_r )
+READ8_HANDLER ( tpi6525_1_port_b_r )
 {
-	return tpi6525_port_b_r(tpi6525+1, offset);
+	return tpi6525_port_b_r(space->machine, tpi6525+1, offset);
 }
 
- READ8_HANDLER ( tpi6525_2_port_b_r )
+READ8_HANDLER ( tpi6525_2_port_b_r )
 {
-	return tpi6525_port_b_r(tpi6525+2, offset);
+	return tpi6525_port_b_r(space->machine, tpi6525+2, offset);
 }
 
- READ8_HANDLER ( tpi6525_3_port_b_r )
+READ8_HANDLER ( tpi6525_3_port_b_r )
 {
-	return tpi6525_port_b_r(tpi6525+3, offset);
+	return tpi6525_port_b_r(space->machine, tpi6525+3, offset);
 }
 
 WRITE8_HANDLER ( tpi6525_0_port_b_w )
 {
-	tpi6525_port_b_w(tpi6525, offset, data);
+	tpi6525_port_b_w(space->machine, tpi6525, offset, data);
 }
 
 WRITE8_HANDLER ( tpi6525_1_port_b_w )
 {
-	tpi6525_port_b_w(tpi6525+1, offset, data);
+	tpi6525_port_b_w(space->machine, tpi6525+1, offset, data);
 }
 
 WRITE8_HANDLER ( tpi6525_2_port_b_w )
 {
-	tpi6525_port_b_w(tpi6525+2, offset, data);
+	tpi6525_port_b_w(space->machine, tpi6525+2, offset, data);
 }
 
 WRITE8_HANDLER ( tpi6525_3_port_b_w )
 {
-	tpi6525_port_b_w(tpi6525+3, offset, data);
+	tpi6525_port_b_w(space->machine, tpi6525+3, offset, data);
 }
 
- READ8_HANDLER ( tpi6525_0_port_c_r )
+READ8_HANDLER ( tpi6525_0_port_c_r )
 {
-	return tpi6525_port_c_r(tpi6525, offset);
+	return tpi6525_port_c_r(space->machine, tpi6525, offset);
 }
 
- READ8_HANDLER ( tpi6525_1_port_c_r )
+READ8_HANDLER ( tpi6525_1_port_c_r )
 {
-	return tpi6525_port_c_r(tpi6525+1, offset);
+	return tpi6525_port_c_r(space->machine, tpi6525+1, offset);
 }
 
- READ8_HANDLER ( tpi6525_2_port_c_r )
+READ8_HANDLER ( tpi6525_2_port_c_r )
 {
-	return tpi6525_port_c_r(tpi6525+2, offset);
+	return tpi6525_port_c_r(space->machine, tpi6525+2, offset);
 }
 
- READ8_HANDLER ( tpi6525_3_port_c_r )
+READ8_HANDLER ( tpi6525_3_port_c_r )
 {
-	return tpi6525_port_c_r(tpi6525+3, offset);
+	return tpi6525_port_c_r(space->machine, tpi6525+3, offset);
 }
 
 WRITE8_HANDLER ( tpi6525_0_port_c_w )
 {
-	tpi6525_port_c_w(tpi6525, offset, data);
+	tpi6525_port_c_w(space->machine, tpi6525, offset, data);
 }
 
 WRITE8_HANDLER ( tpi6525_1_port_c_w )
 {
-	tpi6525_port_c_w(tpi6525+1, offset, data);
+	tpi6525_port_c_w(space->machine, tpi6525+1, offset, data);
 }
 
 WRITE8_HANDLER ( tpi6525_2_port_c_w )
 {
-	tpi6525_port_c_w(tpi6525+2, offset, data);
+	tpi6525_port_c_w(space->machine, tpi6525+2, offset, data);
 }
 
 WRITE8_HANDLER ( tpi6525_3_port_c_w )
 {
-	tpi6525_port_c_w(tpi6525+3, offset, data);
+	tpi6525_port_c_w(space->machine, tpi6525+3, offset, data);
 }
-

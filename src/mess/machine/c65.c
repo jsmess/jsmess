@@ -769,7 +769,7 @@ void c65_colorram_write (int offset, int value)
  * a15 and a14 portlines
  * 0x1000-0x1fff, 0x9000-0x9fff char rom
  */
-static int c65_dma_read (int offset)
+static int c65_dma_read(running_machine *machine, int offset)
 {
 	if (!c64_game && c64_exrom)
 	{
@@ -792,7 +792,7 @@ static int c65_dma_read (int offset)
 	return c64_vicaddr[offset & 0x3fff];
 }
 
-static int c65_dma_read_color (int offset)
+static int c65_dma_read_color(running_machine *machine, int offset)
 {
 	if (c64mode) return c64_colorram[offset&0x3ff]&0xf;
 	return c64_colorram[offset & 0x7ff];
@@ -813,14 +813,14 @@ static void c65_common_driver_init (running_machine *machine)
 
 	/*memset(c64_memory+0x40000, 0, 0x800000-0x40000); */
 
-	vic4567_init (machine, c64_pal, c65_dma_read, c65_dma_read_color,
+	vic4567_init(machine, c64_pal, c65_dma_read, c65_dma_read_color,
 				  c64_vic_interrupt, c65_bankswitch_interface);
 }
 
 DRIVER_INIT( c65 )
 {
 	dma.version=2;
-	c65_common_driver_init (machine);
+	c65_common_driver_init(machine);
 
 }
 
@@ -828,7 +828,7 @@ DRIVER_INIT( c65pal )
 {
 	dma.version=1;
 	c64_pal = 1;
-	c65_common_driver_init (machine);
+	c65_common_driver_init(machine);
 }
 
 MACHINE_START( c65 )

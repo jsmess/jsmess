@@ -14,7 +14,6 @@
 #include "cpu/m6502/m6502.h"
 #include "sound/sid6581.h"
 #include "machine/6526cia.h"
-#include "deprecat.h"
 
 #include "includes/cbmserb.h"
 #include "includes/vc1541.h"
@@ -25,8 +24,6 @@
 #include "includes/c64.h"
 
 #include "devices/cassette.h"
-
-#include "deprecat.h"
 
 
 #define VERBOSE_LEVEL 0
@@ -184,7 +181,7 @@ static READ8_HANDLER( c128_read_io )
 	return 0xff;
 }
 
-void c128_bankswitch_64 (running_machine *machine, int reset)
+void c128_bankswitch_64(running_machine *machine, int reset)
 {
 	static int old, exrom, game;
 	int data, loram, hiram, charen;
@@ -306,7 +303,7 @@ static int mmu_page0, mmu_page1;
 
 /* typical z80 configuration
    0x3f 0x3f 0x7f 0x3e 0x7e 0xb0 0x0b 0x00 0x00 0x01 0x00 */
-static void c128_bankswitch_z80 (running_machine *machine)
+static void c128_bankswitch_z80(running_machine *machine)
 {
 	 c128_ram = c64_memory + MMU_RAM_ADDR;
 	 c128_va1617 = MMU_VIC_ADDR;
@@ -781,9 +778,9 @@ WRITE8_HANDLER( c128_write_ff05 )
  * a15 and a14 portlines
  * 0x1000-0x1fff, 0x9000-0x9fff char rom
  */
-static int c128_dma_read(int offset)
+static int c128_dma_read(running_machine *machine, int offset)
 {
-	UINT8 c64_port6510 = (UINT8) cpu_get_info_int(Machine->cpu[0], CPUINFO_INT_M6510_PORT);
+	UINT8 c64_port6510 = (UINT8) cpu_get_info_int(machine->cpu[0], CPUINFO_INT_M6510_PORT);
 
 	/* main memory configuration to include */
 	if (c64mode)
@@ -804,9 +801,9 @@ static int c128_dma_read(int offset)
 	return c128_vicaddr[offset];
 }
 
-static int c128_dma_read_color (int offset)
+static int c128_dma_read_color(running_machine *machine, int offset)
 {
-	UINT8 c64_port6510 = (UINT8) cpu_get_info_int(Machine->cpu[0], CPUINFO_INT_M6510_PORT);
+	UINT8 c64_port6510 = (UINT8) cpu_get_info_int(machine->cpu[0], CPUINFO_INT_M6510_PORT);
 
 	if (c64mode)
 		return c64_colorram[offset & 0x3ff] & 0xf;
@@ -822,10 +819,8 @@ static int c128_dma_read_color (int offset)
 
 static emu_timer *datasette_timer;
 
-static void c128_m6510_port_write(UINT8 direction, UINT8 data)
+static void c128_m6510_port_write(const device_config *device, UINT8 direction, UINT8 data)
 {
-	running_machine *machine = Machine;
-
 	/* if line is marked as input then keep current value */
 	data = (c64_port_data & ~direction) | (data & direction);
 
@@ -845,41 +840,40 @@ static void c128_m6510_port_write(UINT8 direction, UINT8 data)
 	{
 		if (direction & 0x08) 
 		{
-			cassette_output(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ), (data & 0x08) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
+			cassette_output(device_list_find_by_tag(device->machine->config->devicelist, CASSETTE, "cassette" ), (data & 0x08) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
 		}
 
 		if (direction & 0x20)
 		{
 			if(!(data & 0x20))
 			{
-				cassette_change_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+				cassette_change_state(device_list_find_by_tag(device->machine->config->devicelist, CASSETTE, "cassette" ),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
 				timer_adjust_periodic(datasette_timer, attotime_zero, 0, ATTOTIME_IN_HZ(44100));
 			}
 			else
 			{
-				cassette_change_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ),CASSETTE_MOTOR_DISABLED ,CASSETTE_MASK_MOTOR);
+				cassette_change_state(device_list_find_by_tag(device->machine->config->devicelist, CASSETTE, "cassette" ),CASSETTE_MOTOR_DISABLED ,CASSETTE_MASK_MOTOR);
 				timer_reset(datasette_timer, attotime_never);
 			}
 		}
 	}
 
-	c128_bankswitch_64(machine, 0);
+	c128_bankswitch_64(device->machine, 0);
 
-	c64_memory[0x000] = memory_read_byte( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0 );
-	c64_memory[0x001] = memory_read_byte( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 1 );
+	c64_memory[0x000] = memory_read_byte( cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM), 0 );
+	c64_memory[0x001] = memory_read_byte( cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM), 1 );
 }
 
-static UINT8 c128_m6510_port_read(UINT8 direction)
+static UINT8 c128_m6510_port_read(const device_config *device, UINT8 direction)
 {
-	running_machine *machine = Machine;
 	UINT8 data = c64_port_data;
 
-	if ((cassette_get_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" )) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
+	if ((cassette_get_state(device_list_find_by_tag(device->machine->config->devicelist, CASSETTE, "cassette" )) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
 		data &= ~0x10;
 	else
 		data |=  0x10;
 
-	if (input_port_read(machine, "SPECIAL") & 0x20)		/* Check Caps Lock */
+	if (input_port_read(device->machine, "SPECIAL") & 0x20)		/* Check Caps Lock */
 	{
 		data &= ~0x40;
 	} else {
