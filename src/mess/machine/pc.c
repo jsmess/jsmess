@@ -790,7 +790,7 @@ static WRITE8_DEVICE_HANDLER ( ibm5150_ppi_portb_w )
 	/* KB controller port B */
 	pc_ppi.portb = data;
 	pc_ppi.portc_switch_high = data & 0x08;
-		pc_ppi.keyboard_clear = data & 0x80;
+	pc_ppi.keyboard_clear = data & 0x80;
 	pc_ppi.keyb_clock = data & 0x40;
 	pit8253_gate_w( pc_devices.pit8253, 2, data & 1);
 	pc_speaker_set_spkrdata( data & 0x02 );
@@ -900,10 +900,7 @@ static READ8_DEVICE_HANDLER (ibm5160_ppi_porta_r)
 	}
 	else
 	{
-		if ( pc_ppi.keyb_clock )
-		{
-			data = pc_keyb_read();
-		}
+		data = pc_ppi.shift_register;
 	}
     PIO_LOG(1,"PIO_A_r",("$%02x\n", data));
     return data;
@@ -945,6 +942,69 @@ static READ8_DEVICE_HANDLER ( ibm5160_ppi_portc_r )
 
 static WRITE8_DEVICE_HANDLER( ibm5160_ppi_portb_w )
 {
+	/* PPI controller port B*/
+	pc_ppi.portb = data;
+	pc_ppi.portc_switch_high = data & 0x08;
+	pc_ppi.keyboard_clear = data & 0x80;
+	pc_ppi.keyb_clock = data & 0x40;
+	pit8253_gate_w( pc_devices.pit8253, 2, data & 0x01 );
+	pc_speaker_set_spkrdata( data & 0x02 );
+
+	pc_ppi.clock_signal = ( pc_ppi.keyb_clock ) ? 1 : 0;
+	pc_ppi.clock_callback( cpu_get_address_space( device->machine->cpu[0], ADDRESS_SPACE_PROGRAM ), 0, pc_ppi.clock_signal );
+
+	/* If PB7 is set clear the shift register and reset the IRQ line */
+	if ( pc_ppi.keyboard_clear )
+	{
+		pic8259_set_irq_line(pc_devices.pic8259_master, 1, 0);
+		pc_ppi.shift_register = 0;
+		pc_ppi.shift_enable = 1;
+	}
+}
+
+
+const ppi8255_interface ibm5160_ppi8255_interface =
+{
+	ibm5160_ppi_porta_r,
+	ibm5150_ppi_portb_r,
+	ibm5160_ppi_portc_r,
+	ibm5150_ppi_porta_w,
+	ibm5160_ppi_portb_w,
+	ibm5150_ppi_portc_w
+};
+
+
+static READ8_DEVICE_HANDLER (pc_ppi_porta_r)
+{
+	int data = 0xFF;
+	running_machine *machine = device->machine;
+
+	/* KB port A */
+	if (pc_ppi.keyboard_clear)
+	{
+		/*   0  0 - no floppy drives
+		 *   1  Not used
+		 * 2-3  The number of memory banks on the system board
+		 * 4-5  Display mode
+		 *      11 = monochrome
+		 *      10 - color 80x25
+		 *      01 - color 40x25
+		 * 6-7  The number of floppy disk drives
+		 */
+		data = input_port_read(device->machine, "DSW0");
+	}
+	else
+	{
+		data = pc_keyb_read();
+	}
+	PIO_LOG(1,"PIO_A_r",("$%02x\n", data));
+	return data;
+}
+
+
+static WRITE8_DEVICE_HANDLER( pc_ppi_portb_w )
+{
+	/* PPI controller port B*/
 	pc_ppi.portb = data;
 	pc_ppi.portc_switch_high = data & 0x08;
 	pc_ppi.keyboard_clear = data & 0x80;
@@ -958,13 +1018,13 @@ static WRITE8_DEVICE_HANDLER( ibm5160_ppi_portb_w )
 }
 
 
-const ppi8255_interface ibm5160_ppi8255_interface =
+const ppi8255_interface pc_ppi8255_interface =
 {
-	ibm5160_ppi_porta_r,
+	pc_ppi_porta_r,
 	ibm5150_ppi_portb_r,
 	ibm5160_ppi_portc_r,
 	ibm5150_ppi_porta_w,
-	ibm5160_ppi_portb_w,
+	pc_ppi_portb_w,
 	ibm5150_ppi_portc_w
 };
 
@@ -1102,7 +1162,8 @@ static void pc_set_keyb_int(int state) {
 
 void mess_init_pc_common(running_machine *machine, UINT32 flags, void (*set_keyb_int_func)(int), void (*set_hdc_int_func)(int,int)) 
 {
-	init_pc_common(machine, flags, set_keyb_int_func);
+	if ( set_keyb_int_func != NULL )
+		init_pc_common(machine, flags, set_keyb_int_func);
 
 	/* MESS managed RAM */
 	if ( mess_ram )
@@ -1128,7 +1189,7 @@ void mess_init_pc_common(running_machine *machine, UINT32 flags, void (*set_keyb
 
 DRIVER_INIT( ibm5150 )
 {
-	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
+	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, NULL, pc_set_irq_line);
 	pc_rtc_init(machine);
 
 	/* Attach keyboard to the keyboard controller */
@@ -1139,15 +1200,23 @@ DRIVER_INIT( ibm5150 )
 
 DRIVER_INIT( pccga )
 {
-	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
+	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, NULL, pc_set_irq_line);
 	pc_rtc_init(machine);
+
+	/* Attach keyboard to the keyboard controller */
+	ibm5150_set_keyboard_interface( machine, kb_keytronic_set_clock_signal, kb_keytronic_set_data_signal );
+	kb_keytronic_set_host_interface( machine, ibm5150_kb_set_clock_signal, ibm5150_kb_set_data_signal );
 }
 
 
 DRIVER_INIT( bondwell )
 {
-	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
+	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, NULL, pc_set_irq_line);
 	pc_turbo_setup(machine, 0, "DSW2", 0x02, 4.77/12, 1);
+
+	/* Attach keyboard to the keyboard controller */
+	ibm5150_set_keyboard_interface( machine, kb_keytronic_set_clock_signal, kb_keytronic_set_data_signal );
+	kb_keytronic_set_host_interface( machine, ibm5150_kb_set_clock_signal, ibm5150_kb_set_data_signal );
 }
 
 DRIVER_INIT( pcmda )

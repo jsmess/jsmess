@@ -508,7 +508,7 @@ static INPUT_PORTS_START( pcmda )
 	PORT_BIT( 0x02, 0x02,	IPT_UNUSED ) /* no turbo switch */
 	PORT_BIT( 0x01, 0x01,	IPT_UNUSED )
 
-	PORT_INCLUDE( at_keyboard )		/* IN4 - IN11 */
+	PORT_INCLUDE( kb_keytronic )
 	PORT_INCLUDE( pc_mouse_microsoft )	/* IN12 - IN14 */
 	PORT_INCLUDE( pc_joystick )			/* IN15 - IN19 */
 INPUT_PORTS_END
@@ -584,7 +584,7 @@ static INPUT_PORTS_START( pccga )
 	PORT_BIT( 0x02, 0x02,	IPT_UNUSED ) /* no turbo switch */
 	PORT_BIT( 0x01, 0x01,	IPT_UNUSED )
 
-	PORT_INCLUDE( pc_keyboard )		/* IN4 - IN11 */
+	PORT_INCLUDE( kb_keytronic )
 	PORT_INCLUDE( pc_mouse_microsoft )	/* IN12 - IN14 */
 	PORT_INCLUDE( pc_joystick )			/* IN15 - IN19 */
 	PORT_INCLUDE( pcvideo_cga )
@@ -796,7 +796,8 @@ static INPUT_PORTS_START( bondwell )
 	PORT_DIPSETTING(	0x02, "On (12 MHz)" )
 	PORT_BIT( 0x01, 0x01,	IPT_UNUSED )
 
-	PORT_INCLUDE( at_keyboard )		/* IN4 - IN11 */
+//	PORT_INCLUDE( at_keyboard )		/* IN4 - IN11 */
+    PORT_INCLUDE( kb_keytronic )
 	PORT_INCLUDE( pc_mouse_microsoft )	/* IN12 - IN14 */
 	PORT_INCLUDE( pc_joystick )			/* IN15 - IN19 */
 	PORT_INCLUDE( pcvideo_cga )
@@ -1360,6 +1361,9 @@ static MACHINE_DRIVER_START( pcmda )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 #endif
 
+	/* keyboard */
+	MDRV_IMPORT_FROM( kb_keytronic )
+
 	/* printer */
 	MDRV_DEVICE_ADD("printer", PRINTER)
 	MDRV_DEVICE_ADD("printer2", PRINTER)
@@ -1416,6 +1420,9 @@ static MACHINE_DRIVER_START( pcherc )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 #endif
 
+	/* keyboard */
+	MDRV_IMPORT_FROM( kb_keytronic )
+
 	/* printer */
 	MDRV_DEVICE_ADD("printer", PRINTER)
 	MDRV_DEVICE_ADD("printer2", PRINTER)
@@ -1427,12 +1434,14 @@ static MACHINE_DRIVER_START( pcherc )
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
 MACHINE_DRIVER_END
 
+
 static const cassette_config ibm5150_cassette_config =
 {
 	cassette_default_formats,
 	NULL,
 	CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED
 };
+
 
 static MACHINE_DRIVER_START( ibm5150 )
 	/* basic machine hardware */
@@ -1480,6 +1489,7 @@ static MACHINE_DRIVER_START( ibm5150 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 #endif
 
+	/* keyboard */
 	MDRV_IMPORT_FROM( kb_keytronic )
 
 	/* printer */
@@ -1494,6 +1504,7 @@ static MACHINE_DRIVER_START( ibm5150 )
 	
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)	
 MACHINE_DRIVER_END
+
 
 static MACHINE_DRIVER_START( pccga )
 	/* basic machine hardware */
@@ -1538,7 +1549,8 @@ static MACHINE_DRIVER_START( pccga )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 #endif
 
-//	MDRV_IMPORT_FROM( kb_keytronic )
+	/* keyboard */
+	MDRV_IMPORT_FROM( kb_keytronic )
 
 	/* printer */
 	MDRV_DEVICE_ADD("printer", PRINTER)
@@ -1567,7 +1579,7 @@ static MACHINE_DRIVER_START( europc )
 
 	MDRV_PIC8259_ADD( "pic8259_slave", ibm5150_pic8259_slave_config )
 
-	MDRV_PPI8255_ADD( "ppi8255", ibm5150_ppi8255_interface )
+	MDRV_PPI8255_ADD( "ppi8255", pc_ppi8255_interface )
 
 	MDRV_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
 	MDRV_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
@@ -1642,7 +1654,8 @@ static MACHINE_DRIVER_START( ibm5160 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 #endif
 
-//	MDRV_IMPORT_FROM( kb_keytronic )
+	/* keyboard */
+	MDRV_IMPORT_FROM( kb_keytronic )
 
 	/* printer */
 	MDRV_DEVICE_ADD("printer", PRINTER)
@@ -1671,7 +1684,7 @@ static MACHINE_DRIVER_START( pc200 )
 
 	MDRV_PIC8259_ADD( "pic8259_slave", ibm5150_pic8259_slave_config )
 
-	MDRV_PPI8255_ADD( "ppi8255", ibm5150_ppi8255_interface )
+	MDRV_PPI8255_ADD( "ppi8255", pc_ppi8255_interface )
 
 	MDRV_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
 	MDRV_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
@@ -1713,7 +1726,7 @@ static MACHINE_DRIVER_START( pc1512 )
 
 	MDRV_PIC8259_ADD( "pic8259_slave", ibm5150_pic8259_slave_config )
 
-	MDRV_PPI8255_ADD( "ppi8255", ibm5150_ppi8255_interface )
+	MDRV_PPI8255_ADD( "ppi8255", pc_ppi8255_interface )
 
 	MDRV_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
 	MDRV_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
@@ -1757,7 +1770,7 @@ static MACHINE_DRIVER_START( pc1640 )
 
 	MDRV_PIC8259_ADD( "pic8259_slave", ibm5150_pic8259_slave_config )
 
-	MDRV_PPI8255_ADD( "ppi8255", ibm5150_ppi8255_interface )
+	MDRV_PPI8255_ADD( "ppi8255", pc_ppi8255_interface )
 
 	MDRV_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
 	MDRV_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
@@ -1804,7 +1817,7 @@ static MACHINE_DRIVER_START( xtvga )
 
 	MDRV_PIC8259_ADD( "pic8259_slave", ibm5150_pic8259_slave_config )
 
-	MDRV_PPI8255_ADD( "ppi8255", ibm5150_ppi8255_interface )
+	MDRV_PPI8255_ADD( "ppi8255", pc_ppi8255_interface )
 
 	MDRV_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
 	MDRV_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
@@ -1855,7 +1868,7 @@ static MACHINE_DRIVER_START( t1000hx )
 
 	MDRV_PIC8259_ADD( "pic8259_slave", ibm5150_pic8259_slave_config )
 
-	MDRV_PPI8255_ADD( "ppi8255", ibm5150_ppi8255_interface )
+	MDRV_PPI8255_ADD( "ppi8255", pc_ppi8255_interface )
 
 	MDRV_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
 	MDRV_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
@@ -1921,6 +1934,7 @@ static MACHINE_DRIVER_START( ibmpcjr )
 	MDRV_DEVICE_ADD("printer2", PRINTER)
 	MDRV_DEVICE_ADD("printer3", PRINTER)
 
+	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", ibm5150_cassette_config )
 	
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
@@ -2059,7 +2073,12 @@ ROM_START( bondwell )
 	/* Character rom */
 	ROM_REGION(0x2000,"gfx1", 0)
 	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f))
+
+	/* 8051 keytronic keyboard controller */
+	ROM_REGION( 0x2000, KEYTRONIC_KB3270PC_CPU, 0 )
+	ROM_LOAD("14166.bin", 0x0000, 0x2000, CRC(1aea1b53) SHA1(b75b6d4509036406052157bc34159f7039cdc72e))
 ROM_END
+
 
 ROM_START( pcmda )
 	ROM_REGION(0x100000,"main", 0)
@@ -2067,7 +2086,12 @@ ROM_START( pcmda )
 	ROM_LOAD("pcxt.rom",    0xfe000, 0x02000, CRC(031aafad) SHA1(a641b505bbac97b8775f91fe9b83d9afdf4d038f))
 	ROM_REGION(0x08100,"gfx1", 0)
 	ROM_LOAD("mda.rom",     0x00000, 0x02000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) // taken from original IBM MDA
+
+	/* 8051 keytronic keyboard controller */
+	ROM_REGION( 0x2000, KEYTRONIC_KB3270PC_CPU, 0 )
+	ROM_LOAD("14166.bin", 0x0000, 0x2000, CRC(1aea1b53) SHA1(b75b6d4509036406052157bc34159f7039cdc72e))
 ROM_END
+
 
 ROM_START( pcherc )
 	ROM_REGION(0x100000,"main", 0)
@@ -2075,6 +2099,10 @@ ROM_START( pcherc )
 	ROM_LOAD("pcxt.rom",    0xfe000, 0x02000, CRC(031aafad) SHA1(a641b505bbac97b8775f91fe9b83d9afdf4d038f))
 	ROM_REGION(0x1000,"gfx1", 0)
 	ROM_LOAD("um2301.bin",  0x00000, 0x1000, CRC(0827bdac) SHA1(15f1aceeee8b31f0d860ff420643e3c7f29b5ffc))
+
+	/* 8051 keytronic keyboard controller */
+	ROM_REGION( 0x2000, KEYTRONIC_KB3270PC_CPU, 0 )
+	ROM_LOAD("14166.bin", 0x0000, 0x2000, CRC(1aea1b53) SHA1(b75b6d4509036406052157bc34159f7039cdc72e))
 ROM_END
 
 
@@ -2087,7 +2115,12 @@ ROM_START( pc )
 	/* Character rom */
 	ROM_REGION(0x2000,"gfx1", 0)
 	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f))
+
+	/* 8051 keytronic keyboard controller */
+	ROM_REGION( 0x2000, KEYTRONIC_KB3270PC_CPU, 0 )
+	ROM_LOAD("14166.bin", 0x0000, 0x2000, CRC(1aea1b53) SHA1(b75b6d4509036406052157bc34159f7039cdc72e))
 ROM_END
+
 
 ROM_START( europc )
 	ROM_REGION(0x100000,"main", 0)
@@ -2325,6 +2358,10 @@ ROM_START( ibm5160 )
 //	ROM_REGION(0x4000,"gfx2", 0)
 //      ROM_LOAD("1504161.u11", 0x00000, 0x2000, CRC(d9246cf5) SHA1(2eaed495893a4e6649b04d10dada7b5ef4abd140)) /* silkscreen: "AMI 8613MAJ // 9591-041 // S2364B // 1504161 // PHILIPPINES" - Purpose: Pixels 0 thru 7 of built-in 3270 terminal font*/
 //      ROM_LOAD("1504162.u26", 0x02000, 0x2000, CRC(59e1dc32) SHA1(337b5cced203345a5acfb02532d6b5f526902ee7)) /* silkscreen: "AMI 8607MAH // 9591-042 // S2364B // 1504162 // PHILIPPINES" - Purpose: Pixel 8 of built-in 3270 terminal font*/
+
+	/* 8051 keytronic keyboard controller */
+	ROM_REGION( 0x2000, KEYTRONIC_KB3270PC_CPU, 0 )
+	ROM_LOAD("14166.bin", 0x0000, 0x2000, CRC(1aea1b53) SHA1(b75b6d4509036406052157bc34159f7039cdc72e))
 ROM_END
 
 
@@ -2334,6 +2371,7 @@ ROM_START( xtvga )
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */
 	ROM_LOAD("pcxt.rom",    0xfe000, 0x02000, CRC(031aafad) SHA1(a641b505bbac97b8775f91fe9b83d9afdf4d038f))
 ROM_END
+
 
 ROM_START( pc200 )
 //    ROM_REGION(0x100000,"main", 0)
@@ -2346,6 +2384,7 @@ ROM_START( pc200 )
 	ROM_REGION(0x08100,"gfx1", 0)
 	ROM_LOAD("40109.bin",     0x00000, 0x08000, CRC(a8b67639) SHA1(99663bfb61798526e092205575370c2ad34249a1))
 ROM_END
+
 
 ROM_START( pc20 )
 //    ROM_REGION(0x100000,"main", 0)
@@ -2363,6 +2402,7 @@ ROM_START( pc20 )
 	ROM_LOAD("40109.bin",     0x00000, 0x08000, CRC(a8b67639) SHA1(99663bfb61798526e092205575370c2ad34249a1))
 ROM_END
 
+
 ROM_START( ppc512 )
 //    ROM_REGION(0x100000,"main", 0)
 	ROM_REGION16_LE(0x100000,"main", 0)
@@ -2374,6 +2414,7 @@ ROM_START( ppc512 )
 	ROM_REGION(0x08100,"gfx1", 0)
 	ROM_LOAD("40109.bin",     0x00000, 0x08000, CRC(a8b67639) SHA1(99663bfb61798526e092205575370c2ad34249a1))
 ROM_END
+
 
 ROM_START( ppc640 )
 //    ROM_REGION(0x100000,"main", 0)
@@ -2387,6 +2428,7 @@ ROM_START( ppc640 )
 	ROM_LOAD("40109.bin",     0x00000, 0x08000, CRC(a8b67639) SHA1(99663bfb61798526e092205575370c2ad34249a1))
 ROM_END
 
+
 ROM_START( pc1512 )
 //    ROM_REGION(0x100000,"main", 0)
 	ROM_REGION16_LE(0x100000,"main", 0)
@@ -2397,6 +2439,7 @@ ROM_START( pc1512 )
 	ROM_LOAD("40045.bin",     0x00000, 0x02000, CRC(dd5e030f) SHA1(7d858bbb2e8d6143aa67ab712edf5f753c2788a7))
 ROM_END
 
+
 ROM_START( pc1512v2 )
 //    ROM_REGION(0x100000,"main", 0)
 	ROM_REGION16_LE(0x100000,"main", 0)
@@ -2406,6 +2449,7 @@ ROM_START( pc1512v2 )
 	ROM_REGION(0x08100,"gfx1", 0)
 	ROM_LOAD("40078.bin",     0x00000, 0x02000, CRC(ae9c0d04) SHA1(bc8dc4dcedeea5bc1c04986b1f105ad93cb2ebcd))
 ROM_END
+
 
 ROM_START( pc1640 )
 //    ROM_REGION(0x100000,"main", 0)
@@ -2418,6 +2462,7 @@ ROM_START( pc1640 )
 	ROM_LOAD("40045.bin",     0x00000, 0x02000, CRC(dd5e030f) SHA1(7d858bbb2e8d6143aa67ab712edf5f753c2788a7))
 ROM_END
 
+
 ROM_START( dgone )
 	ROM_REGION(0x100000,"main", 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */
@@ -2425,6 +2470,10 @@ ROM_START( dgone )
 
 	ROM_REGION(0x08100, "gfx1", 0)
 	ROM_LOAD("cga.chr", 0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
+
+	/* 8051 keytronic keyboard controller */
+	ROM_REGION( 0x2000, KEYTRONIC_KB3270PC_CPU, 0 )
+	ROM_LOAD("14166.bin", 0x0000, 0x2000, CRC(1aea1b53) SHA1(b75b6d4509036406052157bc34159f7039cdc72e))
 ROM_END
 
 
@@ -2489,7 +2538,6 @@ SYSTEM_CONFIG_END
 /*     YEAR     NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        CONFIG   COMPANY     FULLNAME */
 COMP(  1981,	ibm5150,	0,			0,	ibm5150,    ibm5150,    ibm5150,    ibm5150, "International Business Machines",  "IBM PC 5150" , 0)
 COMP(  1984,	dgone,		ibm5150,	0,	pccga,      pccga,	    pccga,	    ibm5160, "Data General",  "Data General/One" , GAME_NOT_WORKING)	/* CGA, 2x 3.5" disk drives */
-COMP(  1987,	pc,			ibm5150,	0,	pccga,      pccga,		pccga,	    ibm5160, "",  "PC (CGA)" , 0)
 COMP(  1985,	bondwell,	ibm5150,	0,	pccga,		bondwell,   bondwell,	ibm5160, "Bondwell Holding",  "BW230 (PRO28 Series)", GAME_NOT_WORKING )
 COMP(  1988,	europc,		ibm5150,	0,	europc,     europc,		europc,     ibm5160, "Schneider Rdf. AG",  "EURO PC", GAME_NOT_WORKING)
 
@@ -2499,7 +2547,7 @@ COMP(  1987,	t1000hx,	ibm5150,	0,	t1000hx,    tandy1t,	t1000hx,	ibm5160, "Tandy 
 COMP(  1987,	t1000sx,	ibm5150,	0,	t1000hx,    tandy1t,	t1000hx,	ibm5160, "Tandy Radio Shack",  "Tandy 1000SX", GAME_NOT_WORKING)
 
 // xt class (pc but 8086)
-COMP(  1982,	ibm5160,	ibm5150,	0,	ibm5160,    xtcga,		pccga,		ibm5160, "International Business Machines",  "IBM XT 5160" , 0)
+COMP(  1982,	ibm5160,	ibm5150,	0,	ibm5160,    ibm5150,	ibm5150,	ibm5160, "International Business Machines",  "IBM XT 5160" , 0)
 COMP(  1988,	pc200,		ibm5150,	0,	pc200,		pc200,		pc200,		ibm5160, "Sinclair Research",  "PC200 Professional Series", GAME_NOT_WORKING)
 COMP(  1988,	pc20,		ibm5150,	0,	pc200,		pc200,		pc200,		ibm5160, "Amstrad plc",  "Amstrad PC20" , GAME_NOT_WORKING)
 COMP(  1987,	ppc512,		ibm5150,	0,	pc200,		pc200,		pc200,		ibm5160, "Amstrad plc",  "Amstrad PPC512", GAME_NOT_WORKING)
@@ -2508,7 +2556,8 @@ COMP(  1986,	pc1512,		ibm5150,	0,	pc1512,     pc1512,		pc1512,		ibm5160, "Amstra
 COMP(  198?,	pc1512v2,	ibm5150,	0,	pc1512,     pc1512,		pc1512,		ibm5160, "Amstrad plc",  "Amstrad PC1512 (version 2)", GAME_NOT_WORKING)
 COMP(  1987,	pc1640,		ibm5150,	0,	pc1640,     pc1640,		pc1640,		ibm5160, "Amstrad plc",  "Amstrad PC1640 / PC6400 (US)", GAME_NOT_WORKING )
 // pc2086 pc1512 with vga??
-COMP ( 1987,	pcmda,		ibm5150,	0,	pcmda,      pcmda,		pcmda,	    ibm5160, "",  "PC (MDA)" , 0)
-COMP ( 1987,    pcherc,		ibm5150,	0,	pcherc,     pcmda,      pcmda,      ibm5160, "MESS",  "PC (Hercules)" , 0)
-COMP ( 1987,	xtvga,		ibm5150,	0,	xtvga,      xtvga,		pc_vga,     ibm5160, "",  "PC/XT (VGA, MF2 Keyboard)" , GAME_NOT_WORKING)
+COMP(  1987,	pc,			ibm5150,	0,	pccga,		pccga,		pccga,		ibm5160, "MESS",  "PC (CGA)" , 0)
+COMP ( 1987,	pcmda,		ibm5150,	0,	pcmda,      pcmda,		ibm5150,    ibm5160, "MESS",  "PC (MDA)" , 0)
+COMP ( 1987,    pcherc,		ibm5150,	0,	pcherc,     pcmda,      ibm5150,	ibm5160, "MESS",  "PC (Hercules)" , 0)
+COMP ( 1987,	xtvga,		ibm5150,	0,	xtvga,      xtvga,		pc_vga,		ibm5160, "",  "PC/XT (VGA, MF2 Keyboard)" , GAME_NOT_WORKING)
 
