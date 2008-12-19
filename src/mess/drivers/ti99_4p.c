@@ -282,7 +282,7 @@ static MACHINE_DRIVER_START(ti99_4p_60hz)
 
 	MDRV_IMPORT_FROM( smc92x4_hd )
 
-	MDRV_DEVICE_ADD( "ide_harddisk", IDE_HARDDISK )
+	MDRV_IDE_HARDDISK_ADD( "ide_harddisk" )
 
 	/* MDRV_CASSETTE_ADD( "cassette", default_cassette_config ) */
 	

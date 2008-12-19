@@ -503,7 +503,7 @@ static MACHINE_DRIVER_START(geneve_60hz)
 
 	MDRV_IMPORT_FROM( smc92x4_hd )
 
-	MDRV_DEVICE_ADD( "ide_harddisk", IDE_HARDDISK )
+	MDRV_IDE_HARDDISK_ADD( "ide_harddisk" )
 	
 	/* rtc */
 	MDRV_MM58274C_ADD("mm58274c", geneve_mm58274c_interface)

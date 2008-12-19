@@ -86,7 +86,7 @@ static MACHINE_DRIVER_START( concept )
 
 	/* no sound? */
 
-	MDRV_DEVICE_ADD( "harddisk1", HARDDISK )
+	MDRV_HARDDISK_ADD( "harddisk1" )
 	
 	/* rtc */
 	MDRV_MM58274C_ADD("mm58274c", concept_mm58274c_interface)

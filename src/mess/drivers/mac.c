@@ -141,8 +141,8 @@ static MACHINE_DRIVER_START( macplus )
 
 	MDRV_MACHINE_START(macscsi)
 
-	MDRV_DEVICE_ADD( "harddisk1", HARDDISK )
-	MDRV_DEVICE_ADD( "harddisk2", HARDDISK )
+	MDRV_HARDDISK_ADD( "harddisk1" )
+	MDRV_HARDDISK_ADD( "harddisk2" )
 MACHINE_DRIVER_END
 
 

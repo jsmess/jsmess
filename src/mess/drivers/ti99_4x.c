@@ -540,7 +540,7 @@ static MACHINE_DRIVER_START(ti99_4_60hz)
 
 	MDRV_IMPORT_FROM( smc92x4_hd )
 
-	MDRV_DEVICE_ADD( "ide_harddisk", IDE_HARDDISK )
+	MDRV_IDE_HARDDISK_ADD( "ide_harddisk" )
 
 	MDRV_CASSETTE_ADD( "cassette1", default_cassette_config )
 	MDRV_CASSETTE_ADD( "cassette2", default_cassette_config )
@@ -588,7 +588,7 @@ static MACHINE_DRIVER_START(ti99_4_50hz)
 
 	MDRV_IMPORT_FROM( smc92x4_hd )
 
-	MDRV_DEVICE_ADD( "ide_harddisk", IDE_HARDDISK )
+	MDRV_IDE_HARDDISK_ADD( "ide_harddisk" )
 
 	MDRV_CASSETTE_ADD( "cassette1", default_cassette_config )
 	MDRV_CASSETTE_ADD( "cassette2", default_cassette_config )
@@ -636,7 +636,7 @@ static MACHINE_DRIVER_START(ti99_4a_60hz)
 
 	MDRV_IMPORT_FROM( smc92x4_hd )
 
-	MDRV_DEVICE_ADD( "ide_harddisk", IDE_HARDDISK )
+	MDRV_IDE_HARDDISK_ADD( "ide_harddisk" )
 
 	MDRV_CASSETTE_ADD( "cassette1", default_cassette_config )
 	MDRV_CASSETTE_ADD( "cassette2", default_cassette_config )
@@ -686,7 +686,7 @@ static MACHINE_DRIVER_START(ti99_4a_50hz)
 
 	MDRV_IMPORT_FROM( smc92x4_hd )
 
-	MDRV_DEVICE_ADD( "ide_harddisk", IDE_HARDDISK )
+	MDRV_IDE_HARDDISK_ADD( "ide_harddisk" )
 
 	MDRV_CASSETTE_ADD( "cassette1", default_cassette_config )
 	MDRV_CASSETTE_ADD( "cassette2", default_cassette_config )
@@ -743,7 +743,7 @@ static MACHINE_DRIVER_START(ti99_4ev_60hz)
 
 	MDRV_IMPORT_FROM( smc92x4_hd )
 
-	MDRV_DEVICE_ADD( "ide_harddisk", IDE_HARDDISK )
+	MDRV_IDE_HARDDISK_ADD( "ide_harddisk" )
 
 	MDRV_CASSETTE_ADD( "cassette1", default_cassette_config )
 	MDRV_CASSETTE_ADD( "cassette2", default_cassette_config )

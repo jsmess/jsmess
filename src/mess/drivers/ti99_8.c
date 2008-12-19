@@ -428,11 +428,11 @@ static MACHINE_DRIVER_START(ti99_8_60hz)
 	/* devices */
 	MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )	/* FIXME */
 
-	MDRV_DEVICE_ADD( "harddisk1", HARDDISK )
-	MDRV_DEVICE_ADD( "harddisk2", HARDDISK )
-	MDRV_DEVICE_ADD( "harddisk3", HARDDISK )
+	MDRV_HARDDISK_ADD( "harddisk1" )
+	MDRV_HARDDISK_ADD( "harddisk2" )
+	MDRV_HARDDISK_ADD( "harddisk3" )
 
-	MDRV_DEVICE_ADD( "ide_harddisk", IDE_HARDDISK )
+	MDRV_IDE_HARDDISK_ADD( "ide_harddisk" )
 
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
 	
@@ -472,11 +472,11 @@ static MACHINE_DRIVER_START(ti99_8_50hz)
 	/* devices */
 	MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )	/* FIXME */
 
-	MDRV_DEVICE_ADD( "harddisk1", HARDDISK )
-	MDRV_DEVICE_ADD( "harddisk2", HARDDISK )
-	MDRV_DEVICE_ADD( "harddisk3", HARDDISK )
+	MDRV_HARDDISK_ADD( "harddisk1" )
+	MDRV_HARDDISK_ADD( "harddisk2" )
+	MDRV_HARDDISK_ADD( "harddisk3" )
 
-	MDRV_DEVICE_ADD( "ide_harddisk", IDE_HARDDISK )
+	MDRV_IDE_HARDDISK_ADD( "ide_harddisk" )
 
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
 

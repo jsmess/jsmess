@@ -131,7 +131,7 @@ static MACHINE_DRIVER_START( bebox )
 	MDRV_NVRAM_HANDLER( bebox )
 
 	MDRV_DEVICE_ADD( "cdrom", CDROM )
-	MDRV_DEVICE_ADD( "harddisk1", HARDDISK )
+	MDRV_HARDDISK_ADD( "harddisk1" )
 
 	/* pci */
 	MDRV_PCI_BUS_ADD("pcibus", 0)
