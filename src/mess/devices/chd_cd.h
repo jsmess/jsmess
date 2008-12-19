@@ -13,7 +13,13 @@
 
 #define CDROM DEVICE_GET_INFO_NAME(cdrom)
 
+
+#define MDRV_CDROM_ADD(_tag) \
+	MDRV_DEVICE_ADD(_tag, CDROM) \
+
+
 DEVICE_GET_INFO(cdrom);
+
 
 cdrom_file *mess_cd_get_cdrom_file(const device_config *device);
 

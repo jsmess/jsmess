@@ -178,7 +178,7 @@ static MACHINE_DRIVER_START( pce )
 	MDRV_SOUND_ROUTE( 0, "left", 1.00 )
 	MDRV_SOUND_ROUTE( 1, "right", 1.00 )
 
-	MDRV_DEVICE_ADD( "cdrom", CDROM )
+	MDRV_CDROM_ADD( "cdrom" )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( sgx )

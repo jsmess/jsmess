@@ -332,7 +332,7 @@ static MACHINE_DRIVER_START( cdtv )
 	MDRV_SOUND_ROUTE( 1, "right", 1.0 )
 
 	/* cdrom */
-	MDRV_DEVICE_ADD( "cdrom", CDROM )
+	MDRV_CDROM_ADD( "cdrom" )
 
 	/* cia */
 	MDRV_DEVICE_MODIFY("cia_0", CIA8520)

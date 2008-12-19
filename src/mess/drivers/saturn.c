@@ -2441,7 +2441,7 @@ static MACHINE_DRIVER_START( saturn )
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 
-	MDRV_DEVICE_ADD( "cdrom", CDROM )
+	MDRV_CDROM_ADD( "cdrom" )
 MACHINE_DRIVER_END
 
 
