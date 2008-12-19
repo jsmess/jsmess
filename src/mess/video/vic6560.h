@@ -105,8 +105,8 @@ extern UINT8 vic6560[16];
 /* call to init videodriver */
 /* pal version */
 /* dma_read: videochip fetched 12 bit data from system bus */
-extern void vic6560_init (int (*dma_read) (int), int (*dma_read_color) (int));
-extern void vic6561_init (int (*dma_read) (int), int (*dma_read_color) (int));
+extern void vic6560_init (int (*dma_read) (running_machine *machine, int), int (*dma_read_color) (running_machine *machine, int));
+extern void vic6561_init (int (*dma_read) (running_machine *machine, int), int (*dma_read_color) (running_machine *machine, int));
 
 /* internal */
 extern int vic6560_pal;

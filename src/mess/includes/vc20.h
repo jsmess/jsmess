@@ -30,10 +30,10 @@ WRITE8_HANDLER( vc20_6000_w );
 
 /* split for more performance */
 /* VIC reads bits 8 till 11 */
-int vic6560_dma_read_color (int offset);
+int vic6560_dma_read_color (running_machine *machine, int offset);
 
 /* VIC reads bits 0 till 7 */
-int vic6560_dma_read (int offset);
+int vic6560_dma_read (running_machine *machine, int offset);
 
 DRIVER_INIT( vc20 );
 DRIVER_INIT( vic20 );

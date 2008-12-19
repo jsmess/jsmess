@@ -29,7 +29,6 @@
 #include "devices/cassette.h"
 #include "devices/cartslot.h"
 
-#include "deprecat.h"
 
 #define VERBOSE_LEVEL 0
 #define DBG_LOG(N,M,A) \
@@ -472,14 +471,14 @@ WRITE8_HANDLER ( vc20_write_9400 )
 }
 
 
-int vic6560_dma_read_color (int offset)
+int vic6560_dma_read_color (running_machine *machine, int offset)
 {
 	return vc20_memory_9400[offset & 0x3ff];
 }
 
-int vic6560_dma_read (int offset)
+int vic6560_dma_read (running_machine *machine, int offset)
 {
-	const address_space *space = cputag_get_address_space(Machine, "main", ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
 	/* should read real system bus between 0x9000 and 0xa000 */
 	return memory_read_byte(space, VIC6560ADDR2VC20ADDR (offset));
 }

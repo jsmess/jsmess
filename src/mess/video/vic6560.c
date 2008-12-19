@@ -99,10 +99,10 @@ int vic6560_pal;
 
 static bitmap_t *vic6560_bitmap;
 static int rasterline = 0, lastline = 0;
-static void vic6560_drawlines (int start, int last);
+static void vic6560_drawlines (running_machine *machine, int start, int last);
 
-static int (*vic_dma_read) (int);
-static int (*vic_dma_read_color) (int);
+static int (*vic_dma_read) (running_machine *machine, int);
+static int (*vic_dma_read_color) (running_machine *machine, int);
 
 static int vic656x_xsize, vic656x_ysize, vic656x_lines, vic656x_vretracerate;
 static int charheight, matrix8x16, inverted;
@@ -124,7 +124,7 @@ static void vic656x_init (void)
 	vic656x_vretracerate = VIC656X_VRETRACERATE;
 }
 
-void vic6560_init (int (*dma_read) (int), int (*dma_read_color) (int))
+void vic6560_init (int (*dma_read) (running_machine *machine, int), int (*dma_read_color) (running_machine *machine, int))
 {
 	vic6560_pal = FALSE;
 	vic_dma_read = dma_read;
@@ -132,7 +132,7 @@ void vic6560_init (int (*dma_read) (int), int (*dma_read_color) (int))
 	vic656x_init ();
 }
 
-void vic6561_init (int (*dma_read) (int), int (*dma_read_color) (int))
+void vic6561_init (int (*dma_read) (running_machine *machine, int), int (*dma_read_color) (running_machine *machine, int))
 {
 	vic6560_pal = TRUE;
 	vic_dma_read = dma_read;
@@ -175,7 +175,7 @@ WRITE8_HANDLER ( vic6560_port_w )
 		case 5:
 		case 0xe:
 		case 0xf:
-			vic6560_drawlines (lastline, rasterline);
+			vic6560_drawlines (space->machine, lastline, rasterline);
 			break;
 		}
 		vic6560[offset] = data;
@@ -229,7 +229,7 @@ READ8_HANDLER ( vic6560_port_r )
 		val = ((rasterline & 1) << 7) | (vic6560[offset] & 0x7f);
 		break;
 	case 4:						   /*rasterline */
-		vic6560_drawlines (lastline, rasterline);
+		vic6560_drawlines (space->machine, lastline, rasterline);
 		val = (rasterline / 2) & 0xff;
 		break;
 	case 6:						   /*lightpen horizontal */
@@ -262,7 +262,7 @@ READ8_HANDLER ( vic6560_port_r )
 	return val;
 }
 
-static void vic6560_draw_character (int ybegin, int yend,
+static void vic6560_draw_character (running_machine *machine, int ybegin, int yend,
 									int ch, int yoff, int xoff,
 									UINT16 *color)
 {
@@ -270,7 +270,7 @@ static void vic6560_draw_character (int ybegin, int yend,
 
 	for (y = ybegin; y <= yend; y++)
 	{
-		code = vic_dma_read ((chargenaddr + ch * charheight + y) & 0x3fff);
+		code = vic_dma_read (machine, (chargenaddr + ch * charheight + y) & 0x3fff);
 		*BITMAP_ADDR16(vic6560_bitmap, y + yoff, xoff + 0) = color[code >> 7];
 		*BITMAP_ADDR16(vic6560_bitmap, y + yoff, xoff + 1) = color[(code >> 6) & 1];
 		*BITMAP_ADDR16(vic6560_bitmap, y + yoff, xoff + 2) = color[(code >> 5) & 1];
@@ -282,14 +282,14 @@ static void vic6560_draw_character (int ybegin, int yend,
 	}
 }
 
-static void vic6560_draw_character_multi (int ybegin, int yend,
+static void vic6560_draw_character_multi (running_machine *machine, int ybegin, int yend,
 										  int ch, int yoff, int xoff, UINT16 *color)
 {
 	int y, code;
 
 	for (y = ybegin; y <= yend; y++)
 	{
-		code = vic_dma_read ((chargenaddr + ch * charheight + y) & 0x3fff);
+		code = vic_dma_read (machine, (chargenaddr + ch * charheight + y) & 0x3fff);
 		*BITMAP_ADDR16(vic6560_bitmap, y + yoff, xoff + 0) =
 			*BITMAP_ADDR16(vic6560_bitmap, y + yoff, xoff + 1) = color[code >> 6];
 		*BITMAP_ADDR16(vic6560_bitmap, y + yoff, xoff + 2) =
@@ -302,7 +302,7 @@ static void vic6560_draw_character_multi (int ybegin, int yend,
 }
 
 
-static void vic6560_drawlines (int first, int last)
+static void vic6560_drawlines (running_machine *machine, int first, int last)
 {
 	int line, vline;
 	int offs, yoff, xoff, ybegin, yend, i;
@@ -341,20 +341,20 @@ static void vic6560_drawlines (int first, int last)
 		}
 		for (xoff = xpos; (xoff < xpos + xsize) && (xoff < vic656x_xsize); xoff += 8, offs++)
 		{
-			ch = vic_dma_read ((videoaddr + offs) & 0x3fff);
-			attr = (vic_dma_read_color ((videoaddr + offs) & 0x3fff)) & 0xf;
+			ch = vic_dma_read (machine, (videoaddr + offs) & 0x3fff);
+			attr = (vic_dma_read_color (machine, (videoaddr + offs) & 0x3fff)) & 0xf;
 			if (inverted)
 			{
 				if (attr & 8)
 				{
 					multiinverted[0] = attr & 7;
-					vic6560_draw_character_multi (ybegin, yend, ch, yoff, xoff,
+					vic6560_draw_character_multi (machine, ybegin, yend, ch, yoff, xoff,
 												  multiinverted);
 				}
 				else
 				{
 					monoinverted[0] = attr;
-					vic6560_draw_character (ybegin, yend, ch, yoff, xoff, monoinverted);
+					vic6560_draw_character (machine, ybegin, yend, ch, yoff, xoff, monoinverted);
 				}
 			}
 			else
@@ -362,12 +362,12 @@ static void vic6560_drawlines (int first, int last)
 				if (attr & 8)
 				{
 					multi[2] = attr & 7;
-					vic6560_draw_character_multi (ybegin, yend, ch, yoff, xoff, multi);
+					vic6560_draw_character_multi (machine, ybegin, yend, ch, yoff, xoff, multi);
 				}
 				else
 				{
 					mono[1] = attr;
-					vic6560_draw_character (ybegin, yend, ch, yoff, xoff, mono);
+					vic6560_draw_character (machine, ybegin, yend, ch, yoff, xoff, mono);
 				}
 			}
 		}
@@ -403,7 +403,7 @@ INTERRUPT_GEN( vic656x_raster_interrupt )
 	if (rasterline >= vic656x_lines)
 	{
 		rasterline = 0;
-		vic6560_drawlines (lastline, vic656x_lines);
+		vic6560_drawlines (device->machine, lastline, vic656x_lines);
 		lastline = 0;
 	}
 }
