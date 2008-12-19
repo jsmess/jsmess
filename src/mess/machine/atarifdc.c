@@ -402,7 +402,7 @@ static void add_serin(UINT8 data, int with_checksum)
 		make_chksum(&atari_fdc.serin_chksum, data);
 }
 
-static void atari_set_frame_message(running_machine *machine, const char *fmt, ...)
+static void ATTR_PRINTF(2,3) atari_set_frame_message(running_machine *machine, const char *fmt, ...)
 {
 	va_list arg;
 	va_start(arg, fmt);

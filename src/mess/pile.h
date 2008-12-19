@@ -38,7 +38,11 @@ INLINE size_t pile_size(mess_pile *pile)
 }
 
 int pile_vprintf(mess_pile *pile, const char *fmt, va_list args);
+#ifdef __GNUC__
+int pile_printf(mess_pile *pile, const char *fmt, ...)/* ATTR_PRINTF(2,3)*/__attribute__((format(printf, 2, 3)));
+#else
 int pile_printf(mess_pile *pile, const char *fmt, ...)/* ATTR_PRINTF(2,3)*/;
+#endif
 int pile_putc(mess_pile *pile, char c);
 int pile_puts(mess_pile *pile, const char *s);
 
