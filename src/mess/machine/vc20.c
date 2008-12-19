@@ -117,9 +117,9 @@ static READ8_DEVICE_HANDLER( vc20_via0_read_porta )
 	/* should be reduced to about 1 or 2 microseconds */
 	/*  if ((input_port_read(space->machine, "CTRLSEL") & 0x20 ) && (input_port_read(space->machine, "JOY") & 0x40) )  // i.e. LIGHTPEN_BUTTON
 		value &= ~0x20; */
-	if (!serial_clock || !cbm_serial_clock_read ())
+	if (!serial_clock || !cbm_serial_clock_read (device->machine))
 		value &= ~0x01;
-	if (!serial_data || !cbm_serial_data_read ())
+	if (!serial_data || !cbm_serial_data_read (device->machine))
 		value &= ~0x02;
 
 	if ((cassette_get_state(device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" )) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
@@ -133,7 +133,7 @@ static READ8_DEVICE_HANDLER( vc20_via0_read_porta )
 static WRITE8_DEVICE_HANDLER( vc20_via0_write_porta )
 {
 	running_machine *machine = device->machine;
-	cbm_serial_atn_write (serial_atn = !(data & 0x80));
+	cbm_serial_atn_write (machine, serial_atn = !(data & 0x80));
 	DBG_LOG (1, "serial out", ("atn %s\n", serial_atn ? "high" : "low"));
 }
 
@@ -192,7 +192,7 @@ static READ8_DEVICE_HANDLER( vc20_via1_read_ca1 )
 
 static WRITE8_DEVICE_HANDLER( vc20_via1_write_ca2 )
 {
-	cbm_serial_clock_write (serial_clock = !data);
+	cbm_serial_clock_write (device->machine, serial_clock = !data);
 }
 
 static READ8_DEVICE_HANDLER( vc20_via1_read_portb )
@@ -333,12 +333,12 @@ static READ8_DEVICE_HANDLER( vc20_via1_read_cb1 )
 {
 	running_machine *machine = device->machine;
 	DBG_LOG (1, "serial in", ("request read\n"));
-	return cbm_serial_request_read ();
+	return cbm_serial_request_read (device->machine);
 }
 
 static WRITE8_DEVICE_HANDLER( vc20_via1_write_cb2 )
 {
-	cbm_serial_data_write (serial_data = !data);
+	cbm_serial_data_write (device->machine, serial_data = !data);
 }
 
 /* ieee 6522 number 1 (via4)
@@ -623,7 +623,7 @@ MACHINE_RESET( vic20 )
 	else
 	{
 		serial_config(machine, &sim_drive_interface);
-		cbm_serial_reset_write (0);
+		cbm_serial_reset_write (machine, 0);
 
 		if (ieee) 
 		{

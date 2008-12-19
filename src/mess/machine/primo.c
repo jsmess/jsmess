@@ -111,11 +111,11 @@ READ8_HANDLER( primo_be_2_r )
 	// bit 7, 6 - not used
 
 	// bit 5 - SCLK
-	if (!serial_clock || !cbm_serial_clock_read ())
+	if (!serial_clock || !cbm_serial_clock_read (space->machine))
 		data &= ~0x20;
 
 	// bit 4 - SDATA
-	if (!serial_data || !cbm_serial_data_read ())
+	if (!serial_data || !cbm_serial_data_read (space->machine))
 		data &= ~0x10;
 
 	// bit 3 - SRQ
@@ -124,7 +124,7 @@ READ8_HANDLER( primo_be_2_r )
 	// bit 2 - joystic 2 (not implemeted yet)
 
 	// bit 1 - ATN
-	if (!serial_atn || !cbm_serial_atn_read ())
+	if (!serial_atn || !cbm_serial_atn_read (space->machine))
 		data &= ~0x02;
 
 	// bit 0 - joystic 1 (not implemeted yet)
@@ -174,20 +174,20 @@ WRITE8_HANDLER( primo_ki_2_w )
 	// bit 7, 6 - not used
 
 	// bit 5 - SCLK
-	cbm_serial_clock_write (serial_clock = !(data & 0x20));
+	cbm_serial_clock_write (space->machine, serial_clock = !(data & 0x20));
 	logerror ("W - SCLK: %d ", serial_clock ? 1 : 0);
 
 	// bit 4 - SDATA
-	cbm_serial_data_write (serial_data = !(data & 0x10));
+	cbm_serial_data_write (space->machine, serial_data = !(data & 0x10));
 	logerror ("SDATA: %d ", serial_data ? 1 : 0);
 
 	// bit 3 - not used
 
 	// bit 2 - SRQ
-	cbm_serial_request_write (!(data & 0x04));
+	cbm_serial_request_write (space->machine, !(data & 0x04));
 
 	// bit 1 - ATN
-	cbm_serial_atn_write (serial_atn = !(data & 0x02));
+	cbm_serial_atn_write (space->machine, serial_atn = !(data & 0x02));
 	logerror ("ATN: %d\n", serial_atn ? 1 : 0);
 
 	// bit 0 - not used
@@ -259,7 +259,7 @@ MACHINE_RESET( primob )
 	primo_common_machine_init(machine);
 
 	serial_config(machine, &sim_drive_interface);	
-	cbm_serial_reset_write (0);
+	cbm_serial_reset_write (machine, 0);
 	cbm_drive_0_config (SERIAL, 8);
 	cbm_drive_1_config (SERIAL, 9);
 }

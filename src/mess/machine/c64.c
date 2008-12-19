@@ -391,10 +391,10 @@ static UINT8 c64_cia1_port_a_r (const device_config *device)
 {
 	UINT8 value = 0xff;
 
-	if (!serial_clock || !cbm_serial_clock_read ())
+	if (!serial_clock || !cbm_serial_clock_read (device->machine))
 		value &= ~0x40;
 
-	if (!serial_data || !cbm_serial_data_read ())
+	if (!serial_data || !cbm_serial_data_read (device->machine))
 		value &= ~0x80;
 
 	return value;
@@ -404,9 +404,9 @@ static void c64_cia1_port_a_w (const device_config *device, UINT8 data)
 {
 	static const int helper[4] = {0xc000, 0x8000, 0x4000, 0x0000};
 
-	cbm_serial_clock_write (serial_clock = !(data & 0x10));
-	cbm_serial_data_write (serial_data = !(data & 0x20));
-	cbm_serial_atn_write (serial_atn = !(data & 0x08));
+	cbm_serial_clock_write (device->machine, serial_clock = !(data & 0x10));
+	cbm_serial_data_write (device->machine, serial_data = !(data & 0x20));
+	cbm_serial_atn_write (device->machine, serial_atn = !(data & 0x08));
 	c64_vicaddr = c64_memory + helper[data & 0x03];
 	if (is_c128(device->machine))
 	{
@@ -1091,7 +1091,7 @@ void c64_common_init_machine (running_machine *machine)
 	else if (c64_cia1_on)
 	{
 		serial_config(machine, &sim_drive_interface);
-		cbm_serial_reset_write (0);
+		cbm_serial_reset_write (machine, 0);
 		cbm_drive_0_config (SERIAL, 8);
 		cbm_drive_1_config (SERIAL, 9);
 		serial_clock = serial_data = serial_atn = 1;

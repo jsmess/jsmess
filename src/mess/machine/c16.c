@@ -117,9 +117,9 @@ void c16_m7501_port_write(UINT8 data)
 	int dat, atn, clk;
 
 	/* bit zero then output 0 */
-	cbm_serial_atn_write (atn = !(data & 0x04));
-	cbm_serial_clock_write (clk = !(data & 0x02));
-	cbm_serial_data_write (dat = !(data & 0x01));
+	cbm_serial_atn_write (Machine, atn = !(data & 0x04));
+	cbm_serial_clock_write (Machine, clk = !(data & 0x02));
+	cbm_serial_data_write (Machine, dat = !(data & 0x01));
 
 //	vc20_tape_write (!(data & 0x02));		// CASSETTE_RECORD not implemented yet
 }
@@ -130,10 +130,10 @@ UINT8 c16_m7501_port_read(void)
 	UINT8 data = 0xff;
 	UINT8 c16_port7501 = (UINT8) cpu_get_info_int(machine->cpu[0], CPUINFO_INT_M6510_PORT);
 
-	if ((c16_port7501 & 0x01) || !cbm_serial_data_read())
+	if ((c16_port7501 & 0x01) || !cbm_serial_data_read(Machine))
 		data &= ~0x80;
 
-	if ((c16_port7501 & 0x02) || !cbm_serial_clock_read())
+	if ((c16_port7501 & 0x02) || !cbm_serial_clock_read(Machine))
 		data &= ~0x40;
 
 //	data &= ~0x20; // port bit not in pinout
@@ -592,7 +592,7 @@ MACHINE_RESET( c16 )
 	else								/* simulated drives */
 	{
 		serial_config(machine, &sim_drive_interface);
-		cbm_serial_reset_write (0);
+		cbm_serial_reset_write (machine, 0);
 		cbm_drive_0_config (SERIAL, 8);
 		cbm_drive_1_config (SERIAL, 9);
 	}

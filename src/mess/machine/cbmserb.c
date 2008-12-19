@@ -4,7 +4,6 @@
 #include <string.h>
 #include "driver.h"
 #include "image.h"
-#include "deprecat.h"
 
 #include "includes/cbmserb.h"
 
@@ -20,7 +19,7 @@
 **************************************/
 
 
-static void sim_drive_reset_write (int level)
+static void sim_drive_reset_write (running_machine *machine, int level)
 {
 	int i;
 
@@ -29,50 +28,50 @@ static void sim_drive_reset_write (int level)
 	/* init bus signals */
 }
 
-static int sim_drive_request_read (void)
+static int sim_drive_request_read (running_machine *machine)
 {
 	/* in c16 not connected */
 	return 1;
 }
 
-static void sim_drive_request_write (int level)
+static void sim_drive_request_write (running_machine *machine, int level)
 {
 }
 
-static int sim_drive_atn_read (void)
+static int sim_drive_atn_read (running_machine *machine)
 {
 	int i;
 
 	cbm_serial.atn[0] = cbm_serial.atn[1];
 	for (i = 0; i < cbm_serial.count; i++)
 		cbm_serial.atn[0] &= cbm_serial.atn[i + 2] =
-			vc1541_atn_read (Machine, cbm_serial.drives[i]);
+			vc1541_atn_read (machine, cbm_serial.drives[i]);
 	return cbm_serial.atn[0];
 }
 
-static int sim_drive_data_read (void)
+static int sim_drive_data_read (running_machine *machine)
 {
 	int i;
 
 	cbm_serial.data[0] = cbm_serial.data[1];
 	for (i = 0; i < cbm_serial.count; i++)
 		cbm_serial.data[0] &= cbm_serial.data[i + 2] =
-			vc1541_data_read (Machine, cbm_serial.drives[i]);
+			vc1541_data_read (machine, cbm_serial.drives[i]);
 	return cbm_serial.data[0];
 }
 
-static int sim_drive_clock_read (void)
+static int sim_drive_clock_read (running_machine *machine)
 {
 	int i;
 
 	cbm_serial.clock[0] = cbm_serial.clock[1];
 	for (i = 0; i < cbm_serial.count; i++)
 		cbm_serial.clock[0] &= cbm_serial.clock[i + 2] =
-			vc1541_clock_read (Machine, cbm_serial.drives[i]);
+			vc1541_clock_read (machine, cbm_serial.drives[i]);
 	return cbm_serial.clock[0];
 }
 
-static void sim_drive_data_write (int level)
+static void sim_drive_data_write (running_machine *machine, int level)
 {
 	int i;
 
@@ -83,10 +82,10 @@ static void sim_drive_data_write (int level)
 		cbm_serial.data[0] &= cbm_serial.data[i + 2];
 	/* inform drives */
 	for (i = 0; i < cbm_serial.count; i++)
-		vc1541_data_write (Machine, cbm_serial.drives[i], cbm_serial.data[0]);
+		vc1541_data_write (machine, cbm_serial.drives[i], cbm_serial.data[0]);
 }
 
-static void sim_drive_clock_write (int level)
+static void sim_drive_clock_write (running_machine *machine, int level)
 {
 	int i;
 
@@ -97,10 +96,10 @@ static void sim_drive_clock_write (int level)
 		cbm_serial.clock[0] &= cbm_serial.clock[i + 2];
 	/* inform drives */
 	for (i = 0; i < cbm_serial.count; i++)
-		vc1541_clock_write (Machine, cbm_serial.drives[i], cbm_serial.clock[0]);
+		vc1541_clock_write (machine, cbm_serial.drives[i], cbm_serial.clock[0]);
 }
 
-static void sim_drive_atn_write (int level)
+static void sim_drive_atn_write (running_machine *machine, int level)
 {
 	int i;
 
@@ -111,7 +110,7 @@ static void sim_drive_atn_write (int level)
 		cbm_serial.atn[0] &= cbm_serial.atn[i + 2];
 	/* inform drives */
 	for (i = 0; i < cbm_serial.count; i++)
-		vc1541_atn_write (Machine, cbm_serial.drives[i], cbm_serial.atn[0]);
+		vc1541_atn_write (machine, cbm_serial.drives[i], cbm_serial.atn[0]);
 }
 
 
@@ -137,47 +136,47 @@ const cbm_serial_interface sim_drive_interface =
 **************************************/
 
 
-static void emu_drive_reset_write( int level )
+static void emu_drive_reset_write( running_machine *machine, int level )
 {
 	vc1541_serial_reset_write(0, level);
 }
 
-static int emu_drive_request_read( void )	
+static int emu_drive_request_read( running_machine *machine )	
 {
 	return vc1541_serial_request_read(0);
 }
 	
-static void emu_drive_request_write( int level )
+static void emu_drive_request_write( running_machine *machine, int level )
 {
 	vc1541_serial_request_write(0, level);
 }
 
-static int emu_drive_atn_read( void )
+static int emu_drive_atn_read( running_machine *machine )
 {
 	return vc1541_serial_atn_read(0);
 }
 
-static int emu_drive_data_read( void )
+static int emu_drive_data_read( running_machine *machine )
 {
 	return vc1541_serial_data_read(0);
 }
 
-static int emu_drive_clock_read( void )
+static int emu_drive_clock_read( running_machine *machine )
 {
 	return vc1541_serial_clock_read(0);
 }
 
-static void emu_drive_atn_write( int level )
+static void emu_drive_atn_write( running_machine *machine, int level )
 {
-	vc1541_serial_atn_write(Machine, 0, level);
+	vc1541_serial_atn_write(machine, 0, level);
 }
 
-static void emu_drive_data_write( int level )
+static void emu_drive_data_write( running_machine *machine, int level )
 {
 	vc1541_serial_data_write(0, level);
 }
 
-static void emu_drive_clock_write( int level )
+static void emu_drive_clock_write( running_machine *machine, int level )
 {
 	vc1541_serial_clock_write(0, level);
 }
@@ -206,43 +205,43 @@ const cbm_serial_interface emu_drive_interface =
 
 /* In sx64, c16v & vic20v we use these while fixing handlers for real emulation */
 
-static void fake_drive_reset_write( int level )
+static void fake_drive_reset_write( running_machine *machine, int level )
 {
 }
 
-static int fake_drive_request_read( void )	
+static int fake_drive_request_read( running_machine *machine )	
 {
 	return 0;
 }
 	
-static void fake_drive_request_write( int level )
+static void fake_drive_request_write( running_machine *machine, int level )
 {
 }
 
-static int fake_drive_atn_read( void )
-{
-	return 0;
-}
-
-static int fake_drive_data_read( void )
+static int fake_drive_atn_read( running_machine *machine )
 {
 	return 0;
 }
 
-static int fake_drive_clock_read( void )
+static int fake_drive_data_read( running_machine *machine )
 {
 	return 0;
 }
 
-static void fake_drive_atn_write( int level )
+static int fake_drive_clock_read( running_machine *machine )
+{
+	return 0;
+}
+
+static void fake_drive_atn_write( running_machine *machine, int level )
 {
 }
 
-static void fake_drive_data_write( int level )
+static void fake_drive_data_write( running_machine *machine, int level )
 {
 }
 
-static void fake_drive_clock_write( int level )
+static void fake_drive_clock_write( running_machine *machine, int level )
 {
 }
 
@@ -298,47 +297,47 @@ void serial_config(running_machine *machine, const cbm_serial_interface *intf)
 
 
 /* bus handling */
-void cbm_serial_reset_write (int level)
+void cbm_serial_reset_write (running_machine *machine, int level)
 {
-	serial_intf->serial_reset_write(level);
+	serial_intf->serial_reset_write(machine, level);
 }
 
-int cbm_serial_request_read (void)
+int cbm_serial_request_read (running_machine *machine)
 {
-	return serial_intf->serial_request_read();
+	return serial_intf->serial_request_read(machine);
 }
 
-void cbm_serial_request_write (int level)
+void cbm_serial_request_write (running_machine *machine, int level)
 {
-	serial_intf->serial_request_write(level);
+	serial_intf->serial_request_write(machine, level);
 }
 
-int cbm_serial_atn_read (void)
+int cbm_serial_atn_read (running_machine *machine)
 {
-	return serial_intf->serial_atn_read();
+	return serial_intf->serial_atn_read(machine);
 }
 
-int cbm_serial_data_read (void)
+int cbm_serial_data_read (running_machine *machine)
 {
-	return serial_intf->serial_data_read();
+	return serial_intf->serial_data_read(machine);
 }
 
-int cbm_serial_clock_read (void)
+int cbm_serial_clock_read (running_machine *machine)
 {
-	return serial_intf->serial_clock_read();
+	return serial_intf->serial_clock_read(machine);
 }
 
-void cbm_serial_data_write (int level)
+void cbm_serial_data_write (running_machine *machine, int level)
 {
-	serial_intf->serial_data_write(level);
+	serial_intf->serial_data_write(machine, level);
 }
 
-void cbm_serial_clock_write (int level)
+void cbm_serial_clock_write (running_machine *machine, int level)
 {
-	serial_intf->serial_clock_write(level);
+	serial_intf->serial_clock_write(machine, level);
 }
 
-void cbm_serial_atn_write (int level)
+void cbm_serial_atn_write (running_machine *machine, int level)
 {
-	serial_intf->serial_atn_write(level);
+	serial_intf->serial_atn_write(machine, level);
 }
