@@ -24,8 +24,6 @@
 #include "devices/cassette.h"
 #include "devices/cartslot.h"
 
-#include "deprecat.h"
-
 
 #define VERBOSE_LEVEL 0
 #define DBG_LOG(N,M,A) \
@@ -112,38 +110,37 @@ static UINT8 read_cfg1(running_machine *machine)
   p7 serial data in, serial bus 5
 */
 
-void c16_m7501_port_write(UINT8 data)
+void c16_m7501_port_write(const device_config *device, UINT8 direction, UINT8 data)
 {
 	int dat, atn, clk;
 
 	/* bit zero then output 0 */
-	cbm_serial_atn_write (Machine, atn = !(data & 0x04));
-	cbm_serial_clock_write (Machine, clk = !(data & 0x02));
-	cbm_serial_data_write (Machine, dat = !(data & 0x01));
+	cbm_serial_atn_write (device->machine, atn = !(data & 0x04));
+	cbm_serial_clock_write (device->machine, clk = !(data & 0x02));
+	cbm_serial_data_write (device->machine, dat = !(data & 0x01));
 
 //	vc20_tape_write (!(data & 0x02));		// CASSETTE_RECORD not implemented yet
 }
 
-UINT8 c16_m7501_port_read(void)
+UINT8 c16_m7501_port_read(const device_config *device, UINT8 direction)
 {
-	running_machine *machine = Machine;
 	UINT8 data = 0xff;
-	UINT8 c16_port7501 = (UINT8) cpu_get_info_int(machine->cpu[0], CPUINFO_INT_M6510_PORT);
+	UINT8 c16_port7501 = (UINT8) cpu_get_info_int(device->machine->cpu[0], CPUINFO_INT_M6510_PORT);
 
-	if ((c16_port7501 & 0x01) || !cbm_serial_data_read(Machine))
+	if ((c16_port7501 & 0x01) || !cbm_serial_data_read(device->machine))
 		data &= ~0x80;
 
-	if ((c16_port7501 & 0x02) || !cbm_serial_clock_read(Machine))
+	if ((c16_port7501 & 0x02) || !cbm_serial_clock_read(device->machine))
 		data &= ~0x40;
 
 //	data &= ~0x20; // port bit not in pinout
 
-	if (cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" )) > +0.0)
+	if (cassette_input(device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" )) > +0.0)
 		data |=  0x10;
 	else
 		data &= ~0x10;
 
-	cassette_change_state(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ), (c16_port7501 & 0x08) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+	cassette_change_state(device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" ), (c16_port7501 & 0x08) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 
 	return data;
 }

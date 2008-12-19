@@ -10,8 +10,8 @@
 
 /*----------- defined in machine/c16.c -----------*/
 
-UINT8 c16_m7501_port_read(void);
-void c16_m7501_port_write(UINT8 data);
+UINT8 c16_m7501_port_read(const device_config *device, UINT8 direction);
+void c16_m7501_port_write(const device_config *device, UINT8 direction, UINT8 data);
 
 extern WRITE8_HANDLER(c16_6551_port_w);
 extern  READ8_HANDLER(c16_6551_port_r);
