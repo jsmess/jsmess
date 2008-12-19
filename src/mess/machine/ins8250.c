@@ -74,7 +74,6 @@ History:
 **********************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/ins8250.h"
 #include "includes/pc_mouse.h"
 #include "memconv.h"
@@ -83,7 +82,7 @@ History:
 #define LOG(LEVEL,N,M,A)  \
 	do { \
 		if( M ) \
-			logerror("%11.6f: %-24s",attotime_to_double(timer_get_time(Machine)),(char*)M ); \
+			logerror("%-24s",(char*)M ); \
 		logerror A; \
 	} while (0)
 
