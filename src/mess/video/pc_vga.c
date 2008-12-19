@@ -29,7 +29,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "pc_vga.h"
 #include "pc_video.h"
 
@@ -52,8 +51,8 @@ static VIDEO_START( vga );
 static VIDEO_RESET( ega );
 static VIDEO_RESET( vga );
 
-static pc_video_update_proc pc_vga_choosevideomode(int *width, int *height, struct mscrtc6845 *crtc);
-static pc_video_update_proc pc_ega_choosevideomode(int *width, int *height, struct mscrtc6845 *crtc);
+static pc_video_update_proc pc_vga_choosevideomode(running_machine *machine, int *width, int *height, struct mscrtc6845 *crtc);
+static pc_video_update_proc pc_ega_choosevideomode(running_machine *machine, int *width, int *height, struct mscrtc6845 *crtc);
 
 /***************************************************************************
 
@@ -1371,7 +1370,7 @@ static void vga_vh_vga(bitmap_t *bitmap, struct mscrtc6845 *crtc)
 	}
 }
 
-static pc_video_update_proc pc_ega_choosevideomode(int *width, int *height, struct mscrtc6845 *crtc)
+static pc_video_update_proc pc_ega_choosevideomode(running_machine *machine, int *width, int *height, struct mscrtc6845 *crtc)
 {
 	pc_video_update_proc proc = NULL;
 	int i;
@@ -1379,7 +1378,7 @@ static pc_video_update_proc pc_ega_choosevideomode(int *width, int *height, stru
 	if (CRTC_ON)
 	{
 		for (i = 0; i < 16; i++)
-			vga.pens[i]=Machine->pens[i/*vga.attribute.data[i]&0x3f*/];
+			vga.pens[i]=machine->pens[i/*vga.attribute.data[i]&0x3f*/];
 
 		if (!GRAPHIC_MODE)
 		{
@@ -1397,7 +1396,7 @@ static pc_video_update_proc pc_ega_choosevideomode(int *width, int *height, stru
 	return proc;
 }
 
-static pc_video_update_proc pc_vga_choosevideomode(int *width, int *height, struct mscrtc6845 *crtc)
+static pc_video_update_proc pc_vga_choosevideomode(running_machine *machine, int *width, int *height, struct mscrtc6845 *crtc)
 {
 	pc_video_update_proc proc = NULL;
 	int i;
@@ -1408,7 +1407,7 @@ static pc_video_update_proc pc_vga_choosevideomode(int *width, int *height, stru
 		{
 			for (i=0; i<256;i++)
 			{
-				palette_set_color_rgb(Machine, i,(vga.dac.color[i].red & 0x3f) << 2,
+				palette_set_color_rgb(machine, i,(vga.dac.color[i].red & 0x3f) << 2,
 									 (vga.dac.color[i].green & 0x3f) << 2,
 									 (vga.dac.color[i].blue & 0x3f) << 2);
 			}
@@ -1419,7 +1418,7 @@ static pc_video_update_proc pc_vga_choosevideomode(int *width, int *height, stru
 		{
 			for (i=0; i<16;i++)
 			{
-				vga.pens[i] = Machine->pens[(vga.attribute.data[i]&0x0f)
+				vga.pens[i] = machine->pens[(vga.attribute.data[i]&0x0f)
 										 |((vga.attribute.data[0x14]&0xf)<<4)];
 			}
 		}
@@ -1427,7 +1426,7 @@ static pc_video_update_proc pc_vga_choosevideomode(int *width, int *height, stru
 		{
 			for (i=0; i<16;i++)
 			{
-				vga.pens[i]=Machine->pens[(vga.attribute.data[i]&0x3f)
+				vga.pens[i]=machine->pens[(vga.attribute.data[i]&0x3f)
 										 |((vga.attribute.data[0x14]&0xc)<<4)];
 			}
 		}
