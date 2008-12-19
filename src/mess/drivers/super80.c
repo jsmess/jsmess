@@ -1043,7 +1043,7 @@ static MACHINE_DRIVER_START( super80 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* printer */
-	MDRV_DEVICE_ADD("printer", PRINTER)
+	MDRV_PRINTER_ADD("printer")
 
 	/* quickload */
 	MDRV_Z80BIN_QUICKLOAD_ADD(default, 1)
@@ -1099,7 +1099,7 @@ static MACHINE_DRIVER_START( super80v )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* printer */
-	MDRV_DEVICE_ADD("printer", PRINTER)
+	MDRV_PRINTER_ADD("printer")
 
 	/* quickload */
 	MDRV_Z80BIN_QUICKLOAD_ADD(default, 1)

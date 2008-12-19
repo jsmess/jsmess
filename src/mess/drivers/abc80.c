@@ -537,7 +537,7 @@ static MACHINE_DRIVER_START( abc80 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* printer */
-	MDRV_DEVICE_ADD("printer", PRINTER)
+	MDRV_PRINTER_ADD("printer")
 
 	/* cassette */
 	MDRV_CASSETTE_ADD("cassette", default_cassette_config)

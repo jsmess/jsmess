@@ -737,7 +737,7 @@ static MACHINE_DRIVER_START ( to7 )
      MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.) /* speech synthesis */
 
 /* printer */
-     MDRV_DEVICE_ADD("printer", PRINTER)
+     MDRV_PRINTER_ADD("printer")
 
 /* cassette */
      MDRV_CASSETTE_ADD( "cassette", to7_cassette_config )

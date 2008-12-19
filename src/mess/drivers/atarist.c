@@ -1802,7 +1802,7 @@ static MACHINE_DRIVER_START( atarist )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* printer */
-	MDRV_DEVICE_ADD("printer", PRINTER)
+	MDRV_PRINTER_ADD("printer")
 
 	/* acia */
 	MDRV_DEVICE_ADD("acia_0", ACIA6850)
@@ -1865,7 +1865,7 @@ static MACHINE_DRIVER_START( atariste )
 //	MDRV_DEVICE_CONFIG(atariste_lmc1992_intf)
 
 	/* printer */
-	MDRV_DEVICE_ADD("printer", PRINTER)
+	MDRV_PRINTER_ADD("printer")
 
 	/* acia */
 	MDRV_DEVICE_ADD("acia_0", ACIA6850)
@@ -1920,7 +1920,7 @@ static MACHINE_DRIVER_START( stbook )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* printer */
-	MDRV_DEVICE_ADD("printer", PRINTER)
+	MDRV_PRINTER_ADD("printer")
 
 	/* acia */
 	MDRV_DEVICE_ADD("acia_0", ACIA6850)

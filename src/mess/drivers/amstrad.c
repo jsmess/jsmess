@@ -2982,7 +2982,7 @@ static MACHINE_DRIVER_START( amstrad )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* printer */
-	MDRV_DEVICE_ADD("printer", PRINTER)
+	MDRV_PRINTER_ADD("printer")
 
 	/* snapshot */
 	MDRV_SNAPSHOT_ADD(amstrad, "sna", 0)

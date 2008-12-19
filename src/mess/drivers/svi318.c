@@ -301,7 +301,7 @@ static MACHINE_DRIVER_START( svi318 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	/* printer */
-	MDRV_DEVICE_ADD("printer", PRINTER)
+	MDRV_PRINTER_ADD("printer")
 
 	MDRV_CASSETTE_ADD( "cassette", svi318_cassette_config )
 		
@@ -380,7 +380,7 @@ static MACHINE_DRIVER_START( svi328_806 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	/* printer */
-	MDRV_DEVICE_ADD("printer", PRINTER)
+	MDRV_PRINTER_ADD("printer")
 
 	MDRV_CASSETTE_ADD( "cassette", svi318_cassette_config )
 MACHINE_DRIVER_END

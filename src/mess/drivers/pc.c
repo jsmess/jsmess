@@ -1365,9 +1365,9 @@ static MACHINE_DRIVER_START( pcmda )
 	MDRV_IMPORT_FROM( kb_keytronic )
 
 	/* printer */
-	MDRV_DEVICE_ADD("printer", PRINTER)
-	MDRV_DEVICE_ADD("printer2", PRINTER)
-	MDRV_DEVICE_ADD("printer3", PRINTER)
+	MDRV_PRINTER_ADD("printer")
+	MDRV_PRINTER_ADD("printer2")
+	MDRV_PRINTER_ADD("printer3")
 
 	/* harddisk */
 	MDRV_IMPORT_FROM( pc_hdc )
@@ -1424,9 +1424,9 @@ static MACHINE_DRIVER_START( pcherc )
 	MDRV_IMPORT_FROM( kb_keytronic )
 
 	/* printer */
-	MDRV_DEVICE_ADD("printer", PRINTER)
-	MDRV_DEVICE_ADD("printer2", PRINTER)
-	MDRV_DEVICE_ADD("printer3", PRINTER)
+	MDRV_PRINTER_ADD("printer")
+	MDRV_PRINTER_ADD("printer2")
+	MDRV_PRINTER_ADD("printer3")
 
 	/* harddisk */
 	MDRV_IMPORT_FROM( pc_hdc )
@@ -1493,9 +1493,9 @@ static MACHINE_DRIVER_START( ibm5150 )
 	MDRV_IMPORT_FROM( kb_keytronic )
 
 	/* printer */
-	MDRV_DEVICE_ADD("printer", PRINTER)
-	MDRV_DEVICE_ADD("printer2", PRINTER)
-	MDRV_DEVICE_ADD("printer3", PRINTER)
+	MDRV_PRINTER_ADD("printer")
+	MDRV_PRINTER_ADD("printer2")
+	MDRV_PRINTER_ADD("printer3")
 
 	/* harddisk */
 	MDRV_IMPORT_FROM( pc_hdc )
@@ -1553,9 +1553,9 @@ static MACHINE_DRIVER_START( pccga )
 	MDRV_IMPORT_FROM( kb_keytronic )
 
 	/* printer */
-	MDRV_DEVICE_ADD("printer", PRINTER)
-	MDRV_DEVICE_ADD("printer2", PRINTER)
-	MDRV_DEVICE_ADD("printer3", PRINTER)
+	MDRV_PRINTER_ADD("printer")
+	MDRV_PRINTER_ADD("printer2")
+	MDRV_PRINTER_ADD("printer3")
 
 	/* harddisk */
 	MDRV_IMPORT_FROM( pc_hdc )
@@ -1602,9 +1602,9 @@ static MACHINE_DRIVER_START( europc )
 	MDRV_NVRAM_HANDLER( europc_rtc )
 
 	/* printer */
-	MDRV_DEVICE_ADD("printer", PRINTER)
-	MDRV_DEVICE_ADD("printer2", PRINTER)
-	MDRV_DEVICE_ADD("printer3", PRINTER)
+	MDRV_PRINTER_ADD("printer")
+	MDRV_PRINTER_ADD("printer2")
+	MDRV_PRINTER_ADD("printer3")
 
 	/* harddisk */
 	MDRV_IMPORT_FROM( pc_hdc )
@@ -1658,9 +1658,9 @@ static MACHINE_DRIVER_START( ibm5160 )
 	MDRV_IMPORT_FROM( kb_keytronic )
 
 	/* printer */
-	MDRV_DEVICE_ADD("printer", PRINTER)
-	MDRV_DEVICE_ADD("printer2", PRINTER)
-	MDRV_DEVICE_ADD("printer3", PRINTER)
+	MDRV_PRINTER_ADD("printer")
+	MDRV_PRINTER_ADD("printer2")
+	MDRV_PRINTER_ADD("printer3")
 
 	/* harddisk */
 	MDRV_IMPORT_FROM( pc_hdc )
@@ -1700,9 +1700,9 @@ static MACHINE_DRIVER_START( pc200 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* printer */
-	MDRV_DEVICE_ADD("printer", PRINTER)
-	MDRV_DEVICE_ADD("printer2", PRINTER)
-	MDRV_DEVICE_ADD("printer3", PRINTER)
+	MDRV_PRINTER_ADD("printer")
+	MDRV_PRINTER_ADD("printer2")
+	MDRV_PRINTER_ADD("printer3")
 
 	/* harddisk */
 	MDRV_IMPORT_FROM( pc_hdc )
@@ -1744,9 +1744,9 @@ static MACHINE_DRIVER_START( pc1512 )
 	MDRV_NVRAM_HANDLER( mc146818 )
 
 	/* printer */
-	MDRV_DEVICE_ADD("printer", PRINTER)
-	MDRV_DEVICE_ADD("printer2", PRINTER)
-	MDRV_DEVICE_ADD("printer3", PRINTER)
+	MDRV_PRINTER_ADD("printer")
+	MDRV_PRINTER_ADD("printer2")
+	MDRV_PRINTER_ADD("printer3")
 
 	/* harddisk */
 	MDRV_IMPORT_FROM( pc_hdc )
@@ -1791,9 +1791,9 @@ static MACHINE_DRIVER_START( pc1640 )
 	MDRV_NVRAM_HANDLER( mc146818 )
 
 	/* printer */
-	MDRV_DEVICE_ADD("printer", PRINTER)
-	MDRV_DEVICE_ADD("printer2", PRINTER)
-	MDRV_DEVICE_ADD("printer3", PRINTER)
+	MDRV_PRINTER_ADD("printer")
+	MDRV_PRINTER_ADD("printer2")
+	MDRV_PRINTER_ADD("printer3")
 
 	/* harddisk */
 	MDRV_IMPORT_FROM( pc_hdc )
@@ -1886,9 +1886,9 @@ static MACHINE_DRIVER_START( t1000hx )
 	MDRV_NVRAM_HANDLER( tandy1000 )
 
 	/* printer */
-	MDRV_DEVICE_ADD("printer", PRINTER)
-	MDRV_DEVICE_ADD("printer2", PRINTER)
-	MDRV_DEVICE_ADD("printer3", PRINTER)
+	MDRV_PRINTER_ADD("printer")
+	MDRV_PRINTER_ADD("printer2")
+	MDRV_PRINTER_ADD("printer3")
 
 	/* harddisk */
 	MDRV_IMPORT_FROM( pc_hdc )
@@ -1930,9 +1930,9 @@ static MACHINE_DRIVER_START( ibmpcjr )
 	MDRV_NVRAM_HANDLER( tandy1000 )
 
 	/* printer */
-	MDRV_DEVICE_ADD("printer", PRINTER)
-	MDRV_DEVICE_ADD("printer2", PRINTER)
-	MDRV_DEVICE_ADD("printer3", PRINTER)
+	MDRV_PRINTER_ADD("printer")
+	MDRV_PRINTER_ADD("printer2")
+	MDRV_PRINTER_ADD("printer3")
 
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", ibm5150_cassette_config )

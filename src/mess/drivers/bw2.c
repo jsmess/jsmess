@@ -863,7 +863,7 @@ static MACHINE_DRIVER_START( bw2 )
 	MDRV_DEVICE_CONFIG(bw2_msm6255_intf)
 
 	/* printer */
-	MDRV_DEVICE_ADD("printer", PRINTER)
+	MDRV_PRINTER_ADD("printer")
 
 	/* uart */
 	MDRV_DEVICE_ADD(MSM8251_TAG, MSM8251)

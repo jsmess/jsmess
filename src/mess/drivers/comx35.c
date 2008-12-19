@@ -383,7 +383,7 @@ static MACHINE_DRIVER_START( comx35p )
 
 	// printer
 
-	MDRV_DEVICE_ADD("printer", PRINTER)
+	MDRV_PRINTER_ADD("printer")
 
 	// quickload
 
@@ -428,7 +428,7 @@ static MACHINE_DRIVER_START( comx35n )
 
 	// printer
 
-	MDRV_DEVICE_ADD("printer", PRINTER)
+	MDRV_PRINTER_ADD("printer")
 
 	// quickload
 

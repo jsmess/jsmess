@@ -662,7 +662,7 @@ static MACHINE_DRIVER_START( dragon32 )
 	MDRV_IMPORT_FROM( coco_sound )
 
 	/* printer */
-	MDRV_DEVICE_ADD("printer", PRINTER)
+	MDRV_PRINTER_ADD("printer")
 
 	/* snapshot/quickload */
 	MDRV_SNAPSHOT_ADD(coco_pak, "pak", 0)
@@ -692,7 +692,7 @@ static MACHINE_DRIVER_START( dragon64 )
 	MDRV_IMPORT_FROM( coco_sound )
 
 	/* printer */
-	MDRV_DEVICE_ADD("printer", PRINTER)
+	MDRV_PRINTER_ADD("printer")
 
 	/* snapshot/quickload */
 	MDRV_SNAPSHOT_ADD(coco_pak, "pak", 0)
@@ -726,7 +726,7 @@ static MACHINE_DRIVER_START( d64plus )
 	MDRV_IMPORT_FROM( coco_sound )
 
 	/* printer */
-	MDRV_DEVICE_ADD("printer", PRINTER)
+	MDRV_PRINTER_ADD("printer")
 
 	/* snapshot/quickload */
 	MDRV_SNAPSHOT_ADD(coco_pak, "pak", 0)
@@ -763,7 +763,7 @@ static MACHINE_DRIVER_START( dgnalpha )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	/* printer */
-	MDRV_DEVICE_ADD("printer", PRINTER)
+	MDRV_PRINTER_ADD("printer")
 
 	/* snapshot/quickload */
 	MDRV_SNAPSHOT_ADD(coco_pak, "pak", 0)
@@ -797,7 +797,7 @@ static MACHINE_DRIVER_START( tanodr64 )
 	MDRV_IMPORT_FROM( coco_sound )
 
 	/* printer */
-	MDRV_DEVICE_ADD("printer", PRINTER)
+	MDRV_PRINTER_ADD("printer")
 
 	/* snapshot/quickload */
 	MDRV_SNAPSHOT_ADD(coco_pak, "pak", 0)

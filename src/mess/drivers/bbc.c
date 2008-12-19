@@ -832,7 +832,7 @@ static MACHINE_DRIVER_START( bbcm )
 	MDRV_NVRAM_HANDLER( mc146818 )
 
 	/* printer */
-	MDRV_DEVICE_ADD("printer", PRINTER)
+	MDRV_PRINTER_ADD("printer")
 
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", bbc_cassette_config )

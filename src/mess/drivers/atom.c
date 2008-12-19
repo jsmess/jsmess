@@ -274,7 +274,7 @@ static MACHINE_DRIVER_START( atom )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* printer */
-	MDRV_DEVICE_ADD("printer", PRINTER)
+	MDRV_PRINTER_ADD("printer")
 
 	/* quickload */
 	MDRV_QUICKLOAD_ADD(atom, "atm", 0)

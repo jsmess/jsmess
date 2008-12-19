@@ -816,7 +816,7 @@ static MACHINE_DRIVER_START( sc3000 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* printer */
-	MDRV_DEVICE_ADD("printer", PRINTER)
+	MDRV_PRINTER_ADD("printer")
 
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", sc3000_cassette_config )
@@ -850,8 +850,8 @@ static MACHINE_DRIVER_START( sf7000 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* printer */
-	MDRV_DEVICE_ADD("printer", PRINTER)
-	MDRV_DEVICE_ADD("sp400", PRINTER)
+	MDRV_PRINTER_ADD("printer")
+	MDRV_PRINTER_ADD("sp400")
 
 	/* cassette */
 	MDRV_CASSETTE_ADD("cassette", sc3000_cassette_config)

@@ -334,7 +334,7 @@ static MACHINE_DRIVER_START(laser110)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	/* printer */
-	MDRV_DEVICE_ADD("printer", PRINTER)
+	MDRV_PRINTER_ADD("printer")
 
 	/* snapshot/quickload */
 	MDRV_SNAPSHOT_ADD(vtech1, "vz", 1.5)

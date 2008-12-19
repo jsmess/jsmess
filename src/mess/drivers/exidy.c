@@ -819,7 +819,7 @@ static MACHINE_DRIVER_START( exidy )
 	MDRV_AY31015_ADD( "ay_3_1015", exidy_ay31015_config )
 
 	/* printer */
-	MDRV_DEVICE_ADD("printer", PRINTER)
+	MDRV_PRINTER_ADD("printer")
 
 	/* quickload */
 	MDRV_Z80BIN_QUICKLOAD_ADD(exidy, 3)

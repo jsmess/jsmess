@@ -151,7 +151,7 @@ static MACHINE_DRIVER_START(votrpss)
 	//votrax goes here too
 
 	/* printer */
-	//MDRV_DEVICE_ADD("printer", PRINTER)
+	//MDRV_PRINTER_ADD("printer")
 
 MACHINE_DRIVER_END
 

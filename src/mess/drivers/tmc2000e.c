@@ -328,7 +328,7 @@ static MACHINE_DRIVER_START( tmc2000e )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* printer */
-	MDRV_DEVICE_ADD("printer", PRINTER)
+	MDRV_PRINTER_ADD("printer")
 
 	MDRV_CASSETTE_ADD( "cassette", tmc2000_cassette_config )
 MACHINE_DRIVER_END

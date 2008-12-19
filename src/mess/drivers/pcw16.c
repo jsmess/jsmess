@@ -1427,7 +1427,7 @@ static MACHINE_DRIVER_START( pcw16 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* printer */
-	/* MDRV_DEVICE_ADD("printer", PRINTER) */
+	/* MDRV_PRINTER_ADD("printer") */
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_connected_interface)
 MACHINE_DRIVER_END
 

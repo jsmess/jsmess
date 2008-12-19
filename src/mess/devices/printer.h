@@ -19,6 +19,9 @@
 #define PRINTER	DEVICE_GET_INFO_NAME(printer)
 
 
+#define MDRV_PRINTER_ADD(_tag) \
+	MDRV_DEVICE_ADD(_tag, PRINTER) \
+
 
 /***************************************************************************
     FUNCTION PROTOTYPES

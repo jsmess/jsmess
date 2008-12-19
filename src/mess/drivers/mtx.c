@@ -253,7 +253,7 @@ static MACHINE_DRIVER_START( mtx512 )
 	MDRV_Z80CTC_ADD( "z80ctc", mtx_ctc_intf )
 
 	/* printer */
-	MDRV_DEVICE_ADD("printer", PRINTER)
+	MDRV_PRINTER_ADD("printer")
 
 	/* snapshot */
 	MDRV_SNAPSHOT_ADD(mtx, "mtb", 0.5)

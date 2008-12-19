@@ -464,9 +464,9 @@ static MACHINE_DRIVER_START( ibm5170 )
 	MDRV_NVRAM_HANDLER( mc146818 )
 
 	/* printers */
-	MDRV_DEVICE_ADD("printer1", PRINTER)
-	MDRV_DEVICE_ADD("printer2", PRINTER)
-	MDRV_DEVICE_ADD("printer3", PRINTER)
+	MDRV_PRINTER_ADD("printer1")
+	MDRV_PRINTER_ADD("printer2")
+	MDRV_PRINTER_ADD("printer3")
 
 	/* harddisk */
 	MDRV_IMPORT_FROM( pc_hdc )
@@ -519,9 +519,9 @@ static MACHINE_DRIVER_START( ibm5162 )
 	MDRV_NVRAM_HANDLER( mc146818 )
 
 	/* printers */
-	MDRV_DEVICE_ADD("printer1", PRINTER)
-	MDRV_DEVICE_ADD("printer2", PRINTER)
-	MDRV_DEVICE_ADD("printer3", PRINTER)
+	MDRV_PRINTER_ADD("printer1")
+	MDRV_PRINTER_ADD("printer2")
+	MDRV_PRINTER_ADD("printer3")
 
 	/* harddisk */
 	MDRV_IMPORT_FROM( pc_hdc )
@@ -581,9 +581,9 @@ static MACHINE_DRIVER_START( ps2m30286 )
 	MDRV_NVRAM_HANDLER( mc146818 )
 
 	/* printers */
-	MDRV_DEVICE_ADD("printer1", PRINTER)
-	MDRV_DEVICE_ADD("printer2", PRINTER)
-	MDRV_DEVICE_ADD("printer3", PRINTER)
+	MDRV_PRINTER_ADD("printer1")
+	MDRV_PRINTER_ADD("printer2")
+	MDRV_PRINTER_ADD("printer3")
 
 	/* harddisk */
 	MDRV_IMPORT_FROM( pc_hdc )
@@ -645,9 +645,9 @@ static MACHINE_DRIVER_START( atvga )
 	MDRV_NVRAM_HANDLER( mc146818 )
 
 	/* printers */
-	MDRV_DEVICE_ADD("printer1", PRINTER)
-	MDRV_DEVICE_ADD("printer2", PRINTER)
-	MDRV_DEVICE_ADD("printer3", PRINTER)
+	MDRV_PRINTER_ADD("printer1")
+	MDRV_PRINTER_ADD("printer2")
+	MDRV_PRINTER_ADD("printer3")
 
 	/* harddisk */
 	MDRV_IMPORT_FROM( pc_hdc )
@@ -706,9 +706,9 @@ static MACHINE_DRIVER_START( at386 )
 	MDRV_NVRAM_HANDLER( mc146818 )
 
 	/* printers */
-	MDRV_DEVICE_ADD("printer1", PRINTER)
-	MDRV_DEVICE_ADD("printer2", PRINTER)
-	MDRV_DEVICE_ADD("printer3", PRINTER)
+	MDRV_PRINTER_ADD("printer1")
+	MDRV_PRINTER_ADD("printer2")
+	MDRV_PRINTER_ADD("printer3")
 
 	/* harddisk */
 	MDRV_IMPORT_FROM( pc_hdc )

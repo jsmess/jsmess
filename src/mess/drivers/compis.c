@@ -268,7 +268,7 @@ static MACHINE_DRIVER_START( compis )
 	MDRV_VIDEO_UPDATE(compis_gdc)
 
 	/* printer */
-	MDRV_DEVICE_ADD("printer", PRINTER)
+	MDRV_PRINTER_ADD("printer")
 
 	/* uart */
 	MDRV_DEVICE_ADD("uart", MSM8251)

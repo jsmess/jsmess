@@ -1063,7 +1063,7 @@ static MACHINE_DRIVER_START( msx )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	/* printer */
-	MDRV_DEVICE_ADD("printer", PRINTER)
+	MDRV_PRINTER_ADD("printer")
 
 	MDRV_CASSETTE_ADD( "cassette", msx_cassette_config )
 	
@@ -1128,7 +1128,7 @@ static MACHINE_DRIVER_START( msx2 )
 	MDRV_NVRAM_HANDLER( msx2 )
 
 	/* printer */
-	MDRV_DEVICE_ADD("printer", PRINTER)
+	MDRV_PRINTER_ADD("printer")
 
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", msx_cassette_config )

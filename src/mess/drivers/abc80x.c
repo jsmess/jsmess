@@ -1282,7 +1282,7 @@ static MACHINE_DRIVER_START( abc800m )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* printer */
-	MDRV_DEVICE_ADD("printer", PRINTER)
+	MDRV_PRINTER_ADD("printer")
 
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
@@ -1329,7 +1329,7 @@ static MACHINE_DRIVER_START( abc800c )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* printer */
-	MDRV_DEVICE_ADD("printer", PRINTER)
+	MDRV_PRINTER_ADD("printer")
 
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
@@ -1376,7 +1376,7 @@ static MACHINE_DRIVER_START( abc802 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* printer */
-	MDRV_DEVICE_ADD("printer", PRINTER)
+	MDRV_PRINTER_ADD("printer")
 
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
@@ -1421,7 +1421,7 @@ static MACHINE_DRIVER_START( abc806 )
 	MDRV_DEVICE_CONFIG(abc806_e0516_intf)
 
 	/* printer */
-	MDRV_DEVICE_ADD("printer", PRINTER)
+	MDRV_PRINTER_ADD("printer")
 
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
