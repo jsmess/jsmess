@@ -569,7 +569,7 @@ static void vc20_common_driver_init (running_machine *machine)
 	datasette_timer = timer_alloc(machine, vic20_tape_timer, NULL);
 
 	if (has_vc1541)
-		drive_config (type_1541, 0, 0, 1, 8);
+		drive_config (machine, type_1541, 0, 0, 1, 8);
 }
 
 DRIVER_INIT( vc20 )

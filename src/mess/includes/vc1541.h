@@ -49,7 +49,7 @@ format_g64,				/* 1541 image in GCR format */
 };
 
 
-int drive_config(int type, int id, int mode, int cpunr, int devicenr);
+int drive_config(running_machine *machine, int type, int id, int mode, int cpunr, int devicenr);
 void drive_reset(void);
 
 void vc1541_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);

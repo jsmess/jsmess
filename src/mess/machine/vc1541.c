@@ -137,7 +137,6 @@ GCR - http://www.baltissen.org/newhtm/1541c.htm
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "image.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/6522via.h"
@@ -1358,12 +1357,12 @@ int c1551x_0_read_status(running_machine *machine)
 
 **************************************/
 
-int drive_config (int type, int id, int mode, int cpunr, int devicenr)
+int drive_config (running_machine *machine, int type, int id, int mode, int cpunr, int devicenr)
 {
 	drive->type = type;
 	drive->cpunumber = cpunr;
 	drive->drive.serial.deviceid = devicenr;
-	drive->timer = timer_alloc(Machine, drive_timer, NULL);
+	drive->timer = timer_alloc(machine, drive_timer, NULL);
 
 	if (type == type_1551)
 	{
@@ -1372,7 +1371,7 @@ int drive_config (int type, int id, int mode, int cpunr, int devicenr)
 
 		/* time should be small enough to allow quitting of the irq
 		line before the next interrupt is triggered */
-		drive->drive.c1551.irq_timer = timer_alloc(Machine, c1551_irq_timer, NULL);
+		drive->drive.c1551.irq_timer = timer_alloc(machine, c1551_irq_timer, NULL);
 		timer_adjust_periodic(drive->drive.c1551.irq_timer, attotime_zero, 0, ATTOTIME_IN_HZ(60));
 	}
 

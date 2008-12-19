@@ -941,13 +941,13 @@ DRIVER_INIT( c128pal )
 DRIVER_INIT( c128d )
 {
 	DRIVER_INIT_CALL( c128 );
-//	drive_config (type_1541, 0, 0, 1, 8);
+//	drive_config (machine, type_1541, 0, 0, 1, 8);
 }
 
 DRIVER_INIT( c128dpal )
 {
 	DRIVER_INIT_CALL( c128d );
-//	drive_config (type_1541, 0, 0, 1, 8);
+//	drive_config (machine, type_1541, 0, 0, 1, 8);
 }
 
 

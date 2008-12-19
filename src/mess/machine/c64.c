@@ -1077,7 +1077,7 @@ DRIVER_INIT( sx64 )
 	c64_tape_on = 0;
 	c64_pal = 1;
 	c64_common_driver_init (machine);
-	drive_config (type_1541, 0, 0, 1, 8);
+	drive_config (machine, type_1541, 0, 0, 1, 8);
 }
 
 void c64_common_init_machine (running_machine *machine)
