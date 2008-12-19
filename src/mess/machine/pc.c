@@ -130,7 +130,7 @@ static DMA8237_CHANNEL_READ( pc_dma8237_fdc_dack_r )
 
 static DMA8237_CHANNEL_READ( pc_dma8237_hdc_dack_r )
 {
-	return pc_hdc_dack_r();
+	return pc_hdc_dack_r( device->machine );
 }
 
 
@@ -142,7 +142,7 @@ static DMA8237_CHANNEL_WRITE( pc_dma8237_fdc_dack_w )
 
 static DMA8237_CHANNEL_WRITE( pc_dma8237_hdc_dack_w )
 {
-	pc_hdc_dack_w( data );
+	pc_hdc_dack_w( device->machine, data );
 }
 
 

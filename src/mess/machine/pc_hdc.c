@@ -34,7 +34,6 @@
 #include "machine/8237dma.h"
 #include "devices/harddriv.h"
 #include "memconv.h"
-#include "deprecat.h"
 
 
 #define LOG_HDC_STATUS		0
@@ -209,23 +208,23 @@ void pc_hdc_set_dma8237_device( const device_config *dma8237 )
 }
 
 
-static hard_disk_file *pc_hdc_file(int id)
+static hard_disk_file *pc_hdc_file(running_machine *machine, int id)
 {
 	const device_config *img = NULL;
 
 	switch( id )
 	{
 	case 0:
-		img = device_list_find_by_tag( Machine->config->devicelist, HARDDISK, "harddisk1" );
+		img = device_list_find_by_tag( machine->config->devicelist, HARDDISK, "harddisk1" );
 		break;
 	case 1:
-		img = device_list_find_by_tag( Machine->config->devicelist, HARDDISK, "harddisk2" );
+		img = device_list_find_by_tag( machine->config->devicelist, HARDDISK, "harddisk2" );
 		break;
 	case 2:
-		img = device_list_find_by_tag( Machine->config->devicelist, HARDDISK, "harddisk3" );
+		img = device_list_find_by_tag( machine->config->devicelist, HARDDISK, "harddisk3" );
 		break;
 	case 3:
-		img = device_list_find_by_tag( Machine->config->devicelist, HARDDISK, "harddisk4" );
+		img = device_list_find_by_tag( machine->config->devicelist, HARDDISK, "harddisk4" );
 		break;
 	}
 
@@ -287,13 +286,13 @@ static int no_dma(void)
 
 
 
-static int get_lbasector(void)
+static int get_lbasector(running_machine *machine)
 {
 	hard_disk_info *info;
 	hard_disk_file *file;
 	int lbasector;
 
-	file = pc_hdc_file(idx);
+	file = pc_hdc_file(machine, idx);
 	info = hard_disk_get_info(file);
 
 	lbasector = cylinder[idx];
@@ -322,20 +321,20 @@ static int hdcdma_read;
 static int hdcdma_write;
 static int hdcdma_size;
 
-int pc_hdc_dack_r(void)
+int pc_hdc_dack_r(running_machine *machine)
 {
 	UINT8 result;
 	hard_disk_info *info;
 	hard_disk_file *file;
 
-	file = pc_hdc_file(idx);
+	file = pc_hdc_file(machine, idx);
 	if (!file)
 		return 0;
 	info = hard_disk_get_info(file);
 
 	if (hdcdma_read == 0)
 	{
-		hard_disk_read(file, get_lbasector(), hdcdma_data);
+		hard_disk_read(file, get_lbasector(machine), hdcdma_data);
 		hdcdma_read = 512;
 		hdcdma_size -= 512;
 		hdcdma_src = hdcdma_data;
@@ -363,12 +362,12 @@ int pc_hdc_dack_r(void)
 
 
 
-void pc_hdc_dack_w(int data)
+void pc_hdc_dack_w(running_machine *machine, int data)
 {
 	hard_disk_info *info;
 	hard_disk_file *file;
 
-	file = pc_hdc_file(idx);
+	file = pc_hdc_file(machine, idx);
 	if (!file)
 		return;
 	info = hard_disk_get_info(file);
@@ -377,7 +376,7 @@ void pc_hdc_dack_w(int data)
 
 	if( --hdcdma_write == 0 )
 	{
-		hard_disk_write(file, get_lbasector(), hdcdma_data);
+		hard_disk_write(file, get_lbasector(machine), hdcdma_data);
 		hdcdma_write = 512;
 		hdcdma_size -= 512;
 
@@ -397,14 +396,14 @@ void pc_hdc_dack_w(int data)
 
 
 
-static void execute_read(void)
+static void execute_read(running_machine *machine)
 {
-	hard_disk_file *disk = pc_hdc_file(idx);
+	hard_disk_file *disk = pc_hdc_file(machine, idx);
 	UINT8 data[512], *src = data;
 	int size = sector_cnt[idx] * 512;
 	int read_ = 0;
 
-	disk = pc_hdc_file(idx);
+	disk = pc_hdc_file(machine, idx);
 	if (!disk)
 		return;
 
@@ -417,7 +416,7 @@ static void execute_read(void)
 	{
 		do
 		{
-			buffer[data_cnt++] = pc_hdc_dack_r();
+			buffer[data_cnt++] = pc_hdc_dack_r( machine );
 		} while (hdcdma_read || hdcdma_size);
 	}
 	else
@@ -428,14 +427,14 @@ static void execute_read(void)
 
 
 
-static void execute_write(void)
+static void execute_write(running_machine *machine)
 {
-	hard_disk_file *disk = pc_hdc_file(idx);
+	hard_disk_file *disk = pc_hdc_file(machine, idx);
 	UINT8 data[512], *dst = data;
 	int size = sector_cnt[idx] * 512;
 	int write_ = 512;
 
-	disk = pc_hdc_file(idx);
+	disk = pc_hdc_file(machine, idx);
 	if (!disk)
 		return;
 
@@ -448,7 +447,7 @@ static void execute_write(void)
 	{
 		do
 		{
-			pc_hdc_dack_w(buffer[data_cnt++]);
+			pc_hdc_dack_w(machine, buffer[data_cnt++]);
 		}
 		while (hdcdma_write || hdcdma_size);
 	}
@@ -481,9 +480,9 @@ static void get_chsn(int n)
 	error[n] = 0x80;	/* a potential error has C/H/S/N info */
 }
 
-static int test_ready(int n)
+static int test_ready(running_machine *machine, int n)
 {
-	if( !pc_hdc_file(idx) )
+	if( !pc_hdc_file(machine, idx) )
 	{
 		csb[n] |= CSB_ERROR;
 		error[n] |= 0x04;	/* drive not ready */
@@ -519,7 +518,7 @@ static TIMER_CALLBACK(pc_hdc_command)
 	{
 		case CMD_TESTREADY:
 			set_error_info = 0;
-			test_ready(n);
+			test_ready(machine, n);
             break;
 		case CMD_SENSE:
 			/* Perform error code translation. This may need to be expanded in the future. */
@@ -540,7 +539,7 @@ static TIMER_CALLBACK(pc_hdc_command)
 		case CMD_SEEK:
 		case CMD_DRIVEDIAG:
 			get_chsn(n);
-			test_ready(n);
+			test_ready(machine, n);
             break;
 
 		case CMD_READ:
@@ -553,8 +552,8 @@ static TIMER_CALLBACK(pc_hdc_command)
 					(unsigned) cpu_get_reg(machine->cpu[0], REG_PC), idx, drv, cylinder[idx], head[idx], sector[idx], sector_cnt[idx], control[idx]);
 			}
 
-			if (test_ready(n))
-				execute_read();
+			if (test_ready(machine, n))
+				execute_read(machine);
 			set_error_info = 0;
 			break;
 
@@ -568,8 +567,8 @@ static TIMER_CALLBACK(pc_hdc_command)
 					(unsigned) cpu_get_reg(machine->cpu[0], REG_PC), idx, drv, cylinder[idx], head[idx], sector[idx], sector_cnt[idx], control[idx]);
 			}
 
-			if (test_ready(n))
-				execute_write();
+			if (test_ready(machine, n))
+				execute_write(machine);
 			break;
 
 		case CMD_SETPARAM:
@@ -616,7 +615,7 @@ static TIMER_CALLBACK(pc_hdc_command)
  *	cccccccc write precomp l
  *	eeeeeeee ecc
  */
-static void pc_hdc_data_w(int n, int data)
+static void pc_hdc_data_w(running_machine *machine, int n, int data)
 {
 	if( data_cnt == 0 )
 	{
@@ -674,7 +673,7 @@ static void pc_hdc_data_w(int n, int data)
 		if (--data_cnt == 0)
 		{
 			if (LOG_HDC_STATUS)
-				logerror("pc_hdc_data_w(): Launching command; pc=0x%08x\n", (unsigned) cpu_get_reg(Machine->cpu[0], REG_PC));
+				logerror("pc_hdc_data_w(): Launching command; pc=0x%08x\n", (unsigned) cpu_get_reg(machine->cpu[0], REG_PC));
 
             status[n] &= ~STA_COMMAND;
 			status[n] &= ~STA_REQUEST;
@@ -711,12 +710,12 @@ static void pc_hdc_select_w(int n, int data)
 
 
 
-static void pc_hdc_control_w(int n, int data)
+static void pc_hdc_control_w(running_machine *machine, int n, int data)
 {
 	int irq = irq = (dip[n] & 0x40) ? 5 : 2;
 
 	if (LOG_HDC_STATUS)
-		logerror("pc_hdc_control_w(): Control write pc=0x%08x data=%d\n", (unsigned) cpu_get_reg(Machine->cpu[0], REG_PC), data);
+		logerror("pc_hdc_control_w(): Control write pc=0x%08x data=%d\n", (unsigned) cpu_get_reg(machine->cpu[0], REG_PC), data);
 
 	hdc_control = data;
 
@@ -785,7 +784,7 @@ static UINT8 pc_hdc_dipswitch_r(int n)
  *
  *************************************************************************/
 
-static UINT8 pc_HDC_r(int chip, offs_t offs)
+static UINT8 pc_HDC_r(running_machine *machine, int chip, offs_t offs)
 {
 	UINT8 data = 0xff;
 
@@ -798,24 +797,24 @@ static UINT8 pc_HDC_r(int chip, offs_t offs)
 	}
 
 	if (LOG_HDC_CALL)
-		logerror("pc_HDC_r(): pc=%06X chip=%d offs=%d result=0x%02x\n", cpu_get_pc(Machine->cpu[0]), chip, offs, data);
+		logerror("pc_HDC_r(): pc=%06X chip=%d offs=%d result=0x%02x\n", cpu_get_pc(machine->cpu[0]), chip, offs, data);
 
 	return data;
 }
 
 
 
-static void pc_HDC_w(int chip, offs_t offs, UINT8 data)
+static void pc_HDC_w(running_machine *machine, int chip, offs_t offs, UINT8 data)
 {
 	if (LOG_HDC_CALL)
-		logerror("pc_HDC_w(): pc=%06X chip=%d offs=%d data=0x%02x\n", cpu_get_pc(Machine->cpu[0]), chip, offs, data);
+		logerror("pc_HDC_w(): pc=%06X chip=%d offs=%d data=0x%02x\n", cpu_get_pc(machine->cpu[0]), chip, offs, data);
 
 	switch( offs )
 	{
-		case 0: pc_hdc_data_w(chip,data);	 break;
+		case 0: pc_hdc_data_w(machine, chip,data);	 break;
 		case 1: pc_hdc_reset_w(chip,data);	 break;
 		case 2: pc_hdc_select_w(chip,data);  break;
-		case 3: pc_hdc_control_w(chip,data); break;
+		case 3: pc_hdc_control_w(machine, chip, data); break;
 	}
 }
 
@@ -826,10 +825,10 @@ static void pc_HDC_w(int chip, offs_t offs, UINT8 data)
  *
  *************************************/
 
-READ8_HANDLER ( pc_HDC1_r ) { return pc_HDC_r(0, offset); }
-READ8_HANDLER ( pc_HDC2_r ) { return pc_HDC_r(1, offset); }
-WRITE8_HANDLER ( pc_HDC1_w ) { pc_HDC_w(0, offset, data); }
-WRITE8_HANDLER ( pc_HDC2_w ) { pc_HDC_w(1, offset, data); }
+READ8_HANDLER ( pc_HDC1_r ) { return pc_HDC_r(space->machine, 0, offset); }
+READ8_HANDLER ( pc_HDC2_r ) { return pc_HDC_r(space->machine, 1, offset); }
+WRITE8_HANDLER ( pc_HDC1_w ) { pc_HDC_w(space->machine, 0, offset, data); }
+WRITE8_HANDLER ( pc_HDC2_w ) { pc_HDC_w(space->machine, 1, offset, data); }
 
 READ16_HANDLER ( pc16le_HDC1_r ) { return read16le_with_read8_handler(pc_HDC1_r, space, offset, mem_mask); }
 READ16_HANDLER ( pc16le_HDC2_r ) { return read16le_with_read8_handler(pc_HDC2_r, space, offset, mem_mask); }

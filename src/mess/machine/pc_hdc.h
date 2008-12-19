@@ -20,8 +20,8 @@ WRITE32_HANDLER ( pc32le_HDC1_w );
 READ32_HANDLER  ( pc32le_HDC2_r );
 WRITE32_HANDLER ( pc32le_HDC2_w );
 
-int pc_hdc_dack_r(void);
-void pc_hdc_dack_w(int data);
+int pc_hdc_dack_r(running_machine *machine);
+void pc_hdc_dack_w(running_machine *machine,int data);
 
 void pc_hdc_set_dma8237_device( const device_config *dma8237 );
 
