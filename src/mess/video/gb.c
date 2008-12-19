@@ -15,7 +15,6 @@
 #include "includes/gb.h"
 #include "cpu/lr35902/lr35902.h"
 #include "profiler.h"
-#include "deprecat.h"
 
 #define LCDCONT		gb_vid_regs[0x00]	/* LCD control register                       */
 #define LCDSTAT		gb_vid_regs[0x01]	/* LCD status register                        */
@@ -1302,9 +1301,9 @@ void gb_video_init( running_machine *machine, int mode ) {
 	}
 }
 
-static void gbc_hdma(UINT16 length) {
+static void gbc_hdma(running_machine *machine, UINT16 length) {
 	UINT16 src, dst;
-	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
 	src = ((UINT16)HDMA1 << 8) | (HDMA2 & 0xF0);
 	dst = ((UINT16)(HDMA3 & 0x1F) << 8) | (HDMA4 & 0xF0);
@@ -1628,7 +1627,7 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 			gb_lcd.pal_locked = UNLOCKED;
             /* Check for HBLANK DMA */
 			if( gb_lcd.hdma_enabled ) {
-				gbc_hdma(0x10);
+				gbc_hdma(machine, 0x10);
 //				cpunum_set_reg( 0, LR35902_DMA_CYCLES, 36 );
 			} else {
 				gb_lcd.hdma_possible = 1;
@@ -2116,7 +2115,7 @@ WRITE8_HANDLER ( gbc_video_w ) {
 			else
 			{
 				/* General DMA */
-				gbc_hdma( ((data & 0x7F) + 1) * 0x10 );
+				gbc_hdma( space->machine, ((data & 0x7F) + 1) * 0x10 );
 //				cpunum_set_reg( 0, LR35902_DMA_CYCLES, 4 + ( ( ( data & 0x7F ) + 1 ) * 32 ) );
 				data = 0xff;
 			}
@@ -2129,7 +2128,7 @@ WRITE8_HANDLER ( gbc_video_w ) {
 			gb_vid_regs[offset] = data;
 			/* Check if HDMA should be immediately performed */
 			if ( gb_lcd.hdma_possible ) {
-				gbc_hdma( 0x10 );
+				gbc_hdma( space->machine, 0x10 );
 //				cpunum_set_reg( 0, LR35902_DMA_CYCLES, 36 );
 				gb_lcd.hdma_possible = 0;
 			}
