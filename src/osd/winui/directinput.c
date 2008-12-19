@@ -100,7 +100,7 @@ BOOL DirectInputInitialize()
 
 		if (FAILED(hr))
 		{
-			ErrorMsg("DirectInputCreate failed! error=%x\n", hr);
+			ErrorMsg("DirectInputCreate failed! error=%x\n", (unsigned int)hr);
 			di = NULL;
 			return FALSE;
 		}

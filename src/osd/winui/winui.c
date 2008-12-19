@@ -237,7 +237,6 @@ static int MIN_HEIGHT = DBU_MIN_HEIGHT;
  ***************************************************************************/
 extern const ICONDATA g_iconData[];
 extern const TCHAR g_szPlayGameString[];
-extern const char g_szGameCountString[];
 
 typedef struct _play_options play_options;
 struct _play_options
@@ -1754,7 +1753,7 @@ static BOOL Win32UI_init(HINSTANCE hInstance, LPSTR lpCmdLine, int nCmdShow)
 	InitCommonControls();
 
 	// Are we using an Old comctl32.dll?
-	dprintf("common controlversion %i %i",common_control_version >> 16,
+	dprintf("common controlversion %ld %ld",common_control_version >> 16,
 			common_control_version & 0xffff);
 			 
 	oldControl = (common_control_version < PACKVERSION(4,71));
@@ -3103,7 +3102,7 @@ static void UpdateStatusBar()
 	}
 
 	/* Show number of games in the current 'View' in the status bar */
-	SetStatusBarTextF(2, g_szGameCountString, games_shown);
+	SetStatusBarTextF(2, "%d %s", games_shown, GAMESNOUN);
 
 	i = Picker_GetSelectedItem(hwndList);
 
@@ -5650,7 +5649,7 @@ void SetStatusBarTextF(int part_index, const char *fmt, ...)
 	SetStatusBarText(part_index, buf);
 }
 
-static void CLIB_DECL MameMessageBox(const char *fmt, ...)
+static void CLIB_DECL ATTR_PRINTF(1,2) MameMessageBox(const char *fmt, ...)
 {
 	char buf[2048];
 	va_list va;

@@ -53,7 +53,7 @@ static DWORD WINAPI AuditThreadProc(LPVOID hDlg);
 static INT_PTR CALLBACK AuditWindowProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lParam);
 static void ProcessNextRom(void);
 static void ProcessNextSample(void);
-static void CLIB_DECL DetailsPrintf(const char *fmt, ...);
+static void CLIB_DECL DetailsPrintf(const char *fmt, ...) ATTR_PRINTF(1,2);
 static const char * StatusString(int iStatus);
 
 /***************************************************************************

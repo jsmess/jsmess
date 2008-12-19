@@ -113,7 +113,7 @@ int GetIndexFromSortedIndex(int sorted_index);
 
 // sets text in part of the status bar on the main window
 void SetStatusBarText(int part_index, const char *message);
-void SetStatusBarTextF(int part_index, const char *fmt, ...);
+void SetStatusBarTextF(int part_index, const char *fmt, ...) ATTR_PRINTF(2,3);
 
 int MameUIMain(HINSTANCE	hInstance,
                    LPSTR    lpCmdLine,

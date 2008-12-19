@@ -14,8 +14,13 @@
 #ifndef MUI_UTIL_H
 #define MUI_UTIL_H
 
-extern void __cdecl ErrorMsg(const char* fmt, ...);
-extern void __cdecl dprintf(const char* fmt, ...);
+#ifdef __GNUC__
+extern void __cdecl ErrorMsg(const char* fmt, ...)/* ATTR_PRINTF(1,2)*/__attribute__((format(printf, 1, 2)));
+extern void __cdecl dprintf(const char* fmt, ...)/* ATTR_PRINTF(1,2)*/__attribute__((format(printf, 1, 2)));
+#else
+extern void __cdecl ErrorMsg(const char* fmt, ...)/* ATTR_PRINTF(1,2)*/;
+extern void __cdecl dprintf(const char* fmt, ...)/* ATTR_PRINTF(1,2)*/;
+#endif
 
 extern UINT GetDepth(HWND hWnd);
 
