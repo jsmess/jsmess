@@ -1619,46 +1619,46 @@ static int c1551_read_status (CBM_Drive * drive)
 	return drive->i.iec.status;
 }
 
-void c1551_0_write_data (int data)
+void c1551_0_write_data(running_machine *machine, int data)
 {
-	c1551_write_data (cbm_drive, data);
+	c1551_write_data(cbm_drive, data);
 }
-int c1551_0_read_data (void)
+int c1551_0_read_data(running_machine *machine)
 {
-	return c1551_read_data (cbm_drive);
+	return c1551_read_data(cbm_drive);
 }
-void c1551_0_write_handshake (int data)
+void c1551_0_write_handshake(running_machine *machine, int data)
 {
-	c1551_write_handshake (cbm_drive, data);
+	c1551_write_handshake(cbm_drive, data);
 }
-int c1551_0_read_handshake (void)
+int c1551_0_read_handshake(running_machine *machine)
 {
-	return c1551_read_handshake (cbm_drive);
+	return c1551_read_handshake(cbm_drive);
 }
-int c1551_0_read_status (void)
+int c1551_0_read_status(running_machine *machine)
 {
-	return c1551_read_status (cbm_drive);
+	return c1551_read_status(cbm_drive);
 }
 
-void c1551_1_write_data (int data)
+void c1551_1_write_data(running_machine *machine, int data)
 {
-	c1551_write_data (cbm_drive + 1, data);
+	c1551_write_data(cbm_drive + 1, data);
 }
-int c1551_1_read_data (void)
+int c1551_1_read_data(running_machine *machine)
 {
-	return c1551_read_data (cbm_drive + 1);
+	return c1551_read_data(cbm_drive + 1);
 }
-void c1551_1_write_handshake (int data)
+void c1551_1_write_handshake(running_machine *machine, int data)
 {
 	c1551_write_handshake (cbm_drive + 1, data);
 }
-int c1551_1_read_handshake (void)
+int c1551_1_read_handshake(running_machine *machine)
 {
-	return c1551_read_handshake (cbm_drive + 1);
+	return c1551_read_handshake(cbm_drive + 1);
 }
-int c1551_1_read_status (void)
+int c1551_1_read_status(running_machine *machine)
 {
-	return c1551_read_status (cbm_drive + 1);
+	return c1551_read_status(cbm_drive + 1);
 }
 
 /**************************************

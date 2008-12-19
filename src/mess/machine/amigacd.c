@@ -421,7 +421,7 @@ static const amiga_autoconfig_device dmac_device =
 
 ***************************************************************************/
 
-static int tp6525_portc_r( void )
+static int tp6525_portc_r(running_machine *machine)
 {
 	int	ret = 0;
 
@@ -436,7 +436,7 @@ static int tp6525_portc_r( void )
 	return ret;
 }
 
-static void tp6525_portb_w( int data )
+static void tp6525_portb_w(running_machine *machine, int data)
 {
 	if ( tpi6525[0].b.ddr & 0x01 ) /* if pin 0 is set to output */
 		matsucd_cmd_w( data & 1 ); /* write to the /CMD signal */

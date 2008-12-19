@@ -1243,7 +1243,7 @@ static READ8_HANDLER ( c1551_port_r )
 	6 input sync 0 active
 	7 input handshake in
  */
-static int c1551_port_c_r(void)
+static int c1551_port_c_r(running_machine *machine)
 {
 	int data = 0xff;
 	
@@ -1255,9 +1255,8 @@ static int c1551_port_c_r(void)
 	return data;
 }
 
-static int c1551_port_b_r (void)
+static int c1551_port_b_r(running_machine *machine)
 {
-	running_machine *machine = Machine;
 	int data = drive->gcr.data[drive->pos];
 	DBG_LOG(2, "c1551 drive",("port a read %.2x\n", data));
 	return data;
@@ -1328,29 +1327,29 @@ static int c1551x_read_status (running_machine *machine, TPI6525 *This)
 	return data;
 }
 
-void c1551x_0_write_data (int data)
+void c1551x_0_write_data(running_machine *machine, int data)
 {
-	c1551x_write_data(Machine, tpi6525, data);
+	c1551x_write_data(machine, tpi6525, data);
 }
 
-int c1551x_0_read_data (void)
+int c1551x_0_read_data(running_machine *machine)
 {
-	return c1551x_read_data(Machine, tpi6525);
+	return c1551x_read_data(machine, tpi6525);
 }
 
-void c1551x_0_write_handshake (int data)
+void c1551x_0_write_handshake(running_machine *machine, int data)
 {
-	c1551x_write_handshake(Machine, tpi6525, data);
+	c1551x_write_handshake(machine, tpi6525, data);
 }
 
-int c1551x_0_read_handshake (void)
+int c1551x_0_read_handshake(running_machine *machine)
 {
-	return c1551x_read_handshake(Machine, tpi6525);
+	return c1551x_read_handshake(machine, tpi6525);
 }
 
-int c1551x_0_read_status (void)
+int c1551x_0_read_status(running_machine *machine)
 {
-	return c1551x_read_status(Machine, tpi6525);
+	return c1551x_read_status(machine, tpi6525);
 }
 
 /**************************************
