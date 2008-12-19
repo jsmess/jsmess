@@ -254,7 +254,7 @@ static DRIVER_INIT( gmaster )
 }
 
 #if 0
-static int gmaster_load_rom(int id)
+static int gmaster_load_rom(running_machine *machine, int id)
 {
 	FILE *cartfile;
 	UINT8 *rom = memory_region(machine, "main");
@@ -262,7 +262,7 @@ static int gmaster_load_rom(int id)
 
 	if (device_filename(IO_CARTSLOT, id) == NULL)
 	{
-		printf("%s requires Cartridge!\n", Machine->gamedrv->name);
+		printf("%s requires Cartridge!\n", machine->gamedrv->name);
 		return 0;
 	}
 	
