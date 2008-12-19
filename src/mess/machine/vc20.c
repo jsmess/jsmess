@@ -365,9 +365,9 @@ static READ8_DEVICE_HANDLER( vc20_via4_read_portb )
 
 static WRITE8_DEVICE_HANDLER( vc20_via4_write_portb )
 {
-	cbm_ieee_dav_w(0, data & 0x01);
-	cbm_ieee_nrfd_w(0, data & 0x02);
-	cbm_ieee_ndac_w(0, data & 0x04);
+	cbm_ieee_dav_w(device->machine, 0, data & 0x01);
+	cbm_ieee_nrfd_w(device->machine, 0, data & 0x02);
+	cbm_ieee_ndac_w(device->machine, 0, data & 0x04);
 }
 
 /* ieee 6522 number 2 (via5)
@@ -379,7 +379,7 @@ static WRITE8_DEVICE_HANDLER( vc20_via4_write_portb )
 */
 static WRITE8_DEVICE_HANDLER( vc20_via5_write_porta )
 {
-	cbm_ieee_data_w(0, data);
+	cbm_ieee_data_w(device->machine, 0, data);
 }
 
 static READ8_DEVICE_HANDLER( vc20_via5_read_portb )
@@ -389,7 +389,7 @@ static READ8_DEVICE_HANDLER( vc20_via5_read_portb )
 
 static WRITE8_DEVICE_HANDLER( vc20_via5_write_ca2 )
 {
-	cbm_ieee_atn_w(0, data);
+	cbm_ieee_atn_w(device->machine, 0, data);
 }
 
 static READ8_DEVICE_HANDLER( vc20_via5_read_cb1 )
@@ -399,7 +399,7 @@ static READ8_DEVICE_HANDLER( vc20_via5_read_cb1 )
 
 static WRITE8_DEVICE_HANDLER( vc20_via5_write_cb2 )
 {
-	cbm_ieee_eoi_w(0, data);
+	cbm_ieee_eoi_w(device->machine, 0, data);
 }
 
 const via6522_interface vc20_via0 =

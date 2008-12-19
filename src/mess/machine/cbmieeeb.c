@@ -359,46 +359,46 @@ void cbm_ieee_open(void)
 	}
 }
 
-void cbm_ieee_dav_w(int device, int data)
+void cbm_ieee_dav_w(running_machine *machine, int device, int data)
 {
 //	DBG_LOG(1,"cbm ieee dav",("%.4x dev:%d %d\n", activecpu_get_pc(), device, data));
 	cbmieee.bus[device].dav=data;
-	if (device==0) c2031_state(cbm_drive);
+	if (device==0) c2031_state(machine, cbm_drive);
 }
 
-void cbm_ieee_nrfd_w(int device, int data)
+void cbm_ieee_nrfd_w(running_machine *machine, int device, int data)
 {
 //	DBG_LOG(1,"cbm ieee nrfd",("%.4x dev:%d %d\n", activecpu_get_pc(), device, data));
 	cbmieee.bus[device].nrfd=data;
-	if (device==0) c2031_state(cbm_drive);
+	if (device==0) c2031_state(machine, cbm_drive);
 }
 
-void cbm_ieee_ndac_w(int device, int data)
+void cbm_ieee_ndac_w(running_machine *machine, int device, int data)
 {
 //	DBG_LOG(1,"cbm ieee ndac",("%.4x dev:%d %d\n", activecpu_get_pc(), device, data));
 	cbmieee.bus[device].ndac=data;
-	if (device==0) c2031_state(cbm_drive);
+	if (device==0) c2031_state(machine, cbm_drive);
 }
 
-void cbm_ieee_atn_w(int device, int data)
+void cbm_ieee_atn_w(running_machine *machine, int device, int data)
 {
 //	DBG_LOG(1,"cbm ieee atn",("%.4x dev:%d %d\n", activecpu_get_pc(), device, data));
 	cbmieee.bus[device].atn=data;
-	if (device==0) c2031_state(cbm_drive);
+	if (device==0) c2031_state(machine, cbm_drive);
 }
 
-void cbm_ieee_eoi_w(int device, int data)
+void cbm_ieee_eoi_w(running_machine *machine, int device, int data)
 {
 //	DBG_LOG(1,"cbm ieee eoi",("%.4x dev:%d %d\n", activecpu_get_pc(), device, data));
 	cbmieee.bus[device].eoi=data;
-	if (device==0) c2031_state(cbm_drive);
+	if (device==0) c2031_state(machine, cbm_drive);
 }
 
-void cbm_ieee_data_w(int device, int data)
+void cbm_ieee_data_w(running_machine *machine, int device, int data)
 {
 //	DBG_LOG(1,"cbm ieee data",("%.4x dev:%d %.2x\n", activecpu_get_pc(), device, data));
 	cbmieee.bus[device].data=data;
-	if (device==0) c2031_state(cbm_drive);
+	if (device==0) c2031_state(machine, cbm_drive);
 }
 
 int cbm_ieee_srq_r(running_machine *machine)

@@ -88,12 +88,12 @@ static int cbmb_tpi0_port_a_r(running_machine *machine)
 
 static void cbmb_tpi0_port_a_w(running_machine *machine, int data)
 {
-	cbm_ieee_nrfd_w(0, data & 0x80);
-	cbm_ieee_ndac_w(0, data & 0x40);
-	cbm_ieee_eoi_w(0, data & 0x20);
-	cbm_ieee_dav_w(0, data & 0x10);
-	cbm_ieee_atn_w(0, data & 0x08);
-/*	cbm_ieee_ren_w(0, data & 0x04); */
+	cbm_ieee_nrfd_w(machine, 0, data & 0x80);
+	cbm_ieee_ndac_w(machine, 0, data & 0x40);
+	cbm_ieee_eoi_w(machine, 0, data & 0x20);
+	cbm_ieee_dav_w(machine, 0, data & 0x10);
+	cbm_ieee_atn_w(machine, 0, data & 0x08);
+/*	cbm_ieee_ren_w(machine, 0, data & 0x04); */
 	logerror("cbm ieee %d %d\n", data & 0x02, data & 0x01);
 }
 
@@ -241,7 +241,7 @@ static UINT8 cbmb_cia_port_a_r(const device_config *device)
 
 static void cbmb_cia_port_a_w(const device_config *device, UINT8 data)
 {
-	cbm_ieee_data_w(0, data);
+	cbm_ieee_data_w(device->machine, 0, data);
 }
 
 static void cbmb_tpi6525_0_irq2_level( const device_config *device, int level )

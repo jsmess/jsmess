@@ -86,9 +86,9 @@ extern CBM_Serial cbm_serial;
 
 
 void cbm_drive_open_helper (void);
-void c1551_state (CBM_Drive * drive);
-void vc1541_state (CBM_Drive * drive);
-void c2031_state (CBM_Drive *drive);
+void c1551_state (running_machine *machine, CBM_Drive * drive);
+void vc1541_state (running_machine *machine, CBM_Drive * drive);
+void c2031_state (running_machine *machine, CBM_Drive *drive);
 
 void cbm_drive_0_config (int interface, int serialnr);
 void cbm_drive_1_config (int interface, int serialnr);
@@ -114,12 +114,12 @@ int c1551_1_read_status(running_machine *machine);
 
 /* To be passed to serial bus emulation */
 void drive_reset_write (CBM_Drive * drive, int level);
-int vc1541_atn_read (CBM_Drive * drive);
-int vc1541_data_read (CBM_Drive * drive);
-int vc1541_clock_read (CBM_Drive * drive);
-void vc1541_atn_write (CBM_Drive * drive, int level);
-void vc1541_data_write (CBM_Drive * drive, int level);
-void vc1541_clock_write (CBM_Drive * drive, int level);
+int vc1541_atn_read (running_machine *machine, CBM_Drive * drive);
+int vc1541_data_read (running_machine *machine, CBM_Drive * drive);
+int vc1541_clock_read (running_machine *machine, CBM_Drive * drive);
+void vc1541_atn_write (running_machine *machine, CBM_Drive * drive, int level);
+void vc1541_data_write (running_machine *machine, CBM_Drive * drive, int level);
+void vc1541_clock_write (running_machine *machine, CBM_Drive * drive, int level);
 
 
 void cbmfloppy_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);

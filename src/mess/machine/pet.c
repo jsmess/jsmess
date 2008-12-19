@@ -154,7 +154,7 @@ static READ8_HANDLER( pet_pia0_ca1_in )
 
 static WRITE8_HANDLER( pet_pia0_ca2_out )
 {
-	cbm_ieee_eoi_w(0, data);
+	cbm_ieee_eoi_w(space->machine, 0, data);
 }
 
 static WRITE8_HANDLER( pet_pia0_cb2_out )
@@ -201,7 +201,7 @@ static READ8_HANDLER ( pet_pia1_port_a_read )
 
 static WRITE8_HANDLER ( pet_pia1_port_b_write )
 {
-	cbm_ieee_data_w(0, data);
+	cbm_ieee_data_w(space->machine, 0, data);
 }
 
 static READ8_HANDLER ( pet_pia1_ca1_read )
@@ -211,12 +211,12 @@ static READ8_HANDLER ( pet_pia1_ca1_read )
 
 static WRITE8_HANDLER ( pet_pia1_ca2_write )
 {
-	cbm_ieee_ndac_w(0, data);
+	cbm_ieee_ndac_w(space->machine, 0, data);
 }
 
 static WRITE8_HANDLER ( pet_pia1_cb2_write )
 {
-	cbm_ieee_dav_w(0, data);
+	cbm_ieee_dav_w(space->machine, 0, data);
 }
 
 static READ8_HANDLER ( pet_pia1_cb1_read )
@@ -331,8 +331,8 @@ static READ8_DEVICE_HANDLER( pet_via_cb1_r )
 
 static WRITE8_DEVICE_HANDLER( pet_via_port_b_w )
 {
-	cbm_ieee_nrfd_w(0, data & 2);
-	cbm_ieee_atn_w(0, data & 4);
+	cbm_ieee_nrfd_w(device->machine, 0, data & 2);
+	cbm_ieee_atn_w(device->machine, 0, data & 4);
 }
 
 

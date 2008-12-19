@@ -46,7 +46,7 @@ static int sim_drive_atn_read (void)
 	cbm_serial.atn[0] = cbm_serial.atn[1];
 	for (i = 0; i < cbm_serial.count; i++)
 		cbm_serial.atn[0] &= cbm_serial.atn[i + 2] =
-			vc1541_atn_read (cbm_serial.drives[i]);
+			vc1541_atn_read (Machine, cbm_serial.drives[i]);
 	return cbm_serial.atn[0];
 }
 
@@ -57,7 +57,7 @@ static int sim_drive_data_read (void)
 	cbm_serial.data[0] = cbm_serial.data[1];
 	for (i = 0; i < cbm_serial.count; i++)
 		cbm_serial.data[0] &= cbm_serial.data[i + 2] =
-			vc1541_data_read (cbm_serial.drives[i]);
+			vc1541_data_read (Machine, cbm_serial.drives[i]);
 	return cbm_serial.data[0];
 }
 
@@ -68,7 +68,7 @@ static int sim_drive_clock_read (void)
 	cbm_serial.clock[0] = cbm_serial.clock[1];
 	for (i = 0; i < cbm_serial.count; i++)
 		cbm_serial.clock[0] &= cbm_serial.clock[i + 2] =
-			vc1541_clock_read (cbm_serial.drives[i]);
+			vc1541_clock_read (Machine, cbm_serial.drives[i]);
 	return cbm_serial.clock[0];
 }
 
@@ -83,7 +83,7 @@ static void sim_drive_data_write (int level)
 		cbm_serial.data[0] &= cbm_serial.data[i + 2];
 	/* inform drives */
 	for (i = 0; i < cbm_serial.count; i++)
-		vc1541_data_write (cbm_serial.drives[i], cbm_serial.data[0]);
+		vc1541_data_write (Machine, cbm_serial.drives[i], cbm_serial.data[0]);
 }
 
 static void sim_drive_clock_write (int level)
@@ -97,7 +97,7 @@ static void sim_drive_clock_write (int level)
 		cbm_serial.clock[0] &= cbm_serial.clock[i + 2];
 	/* inform drives */
 	for (i = 0; i < cbm_serial.count; i++)
-		vc1541_clock_write (cbm_serial.drives[i], cbm_serial.clock[0]);
+		vc1541_clock_write (Machine, cbm_serial.drives[i], cbm_serial.clock[0]);
 }
 
 static void sim_drive_atn_write (int level)
@@ -111,7 +111,7 @@ static void sim_drive_atn_write (int level)
 		cbm_serial.atn[0] &= cbm_serial.atn[i + 2];
 	/* inform drives */
 	for (i = 0; i < cbm_serial.count; i++)
-		vc1541_atn_write (cbm_serial.drives[i], cbm_serial.atn[0]);
+		vc1541_atn_write (Machine, cbm_serial.drives[i], cbm_serial.atn[0]);
 }
 
 
