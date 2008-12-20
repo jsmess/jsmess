@@ -1495,7 +1495,7 @@ const via6522_interface telestrat_via2_interface=
 
 #if 0
 /* interrupt state from acia6551 */
-static void telestrat_acia_callback(int irq_state)
+static void telestrat_acia_callback(running_machine *machine, int irq_state)
 {
 	oric_irqs&=~(1<<3);
 
@@ -1504,7 +1504,7 @@ static void telestrat_acia_callback(int irq_state)
 		oric_irqs |= (1<<3);
 	}
 
-	oric_refresh_ints(Machine);
+	oric_refresh_ints(machine);
 }
 #endif
 
