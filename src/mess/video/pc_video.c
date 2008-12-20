@@ -54,7 +54,7 @@ struct mscrtc6845 *pc_video_start(running_machine *machine, const struct mscrtc6
 
 	if (config)
 	{
-		pc_crtc = mscrtc6845_init(config);
+		pc_crtc = mscrtc6845_init(machine, config);
 		if (!pc_crtc)
 			return NULL;
 	}
