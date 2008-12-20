@@ -954,7 +954,7 @@ static MACHINE_DRIVER_START( coco3 )
 	MDRV_QUICKLOAD_ADD(coco, "bin", 0.5)
 
 	/* devices */
-	MDRV_DEVICE_ADD("vhd", COCO_VHD)
+	MDRV_COCO_VHD_ADD("vhd")
 	MDRV_DEVICE_ADD("disto", MSM6242)
 
 	/* cassette */
