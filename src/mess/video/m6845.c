@@ -9,7 +9,6 @@
  ************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "video/m6845.h"
 
 #define True 1
@@ -825,20 +824,22 @@ static void m6845_set_new_vsync_clear_time(int cycles)
 
 	if (crtc_cycles_to_vsync_end!=-1)
 	{
-		m6845_vsync_clear_timer = timer_set(machine, ATTOTIME_IN_USEC(crtc_cycles_to_vsync_end), NULL, 0, m6845_vsync_clear_timer_callback);
+		m6845_vsync_clear_timer = timer_set(machine, ATTOTIME_IN_USEC(crtc_cycles_to_vsync_end), machine, 0, m6845_vsync_clear_timer_callback);
 	}
 }
 
 /* for these two below, might be better to record the current cpu time, and use that
 to recalculate where the start/end of the vsync will next occur! */
 
-static void m6845_vsync_clear_timer_callback(int dummy)
+static TIMER_CALLBACK( m6845_vsync_clear_timer_callback )
 {
+	const running_machine *machine = ptr;
+	
 	/* clear vsync */
 	crtc.VSYNC = 0;
 
 	/* call function to let emulation "know" */
-	if (crct6845_calls.out_VS_func) (crct6845_calls.out_VS_func)(Machine,0,crtc.VSYNC); /* call VS update */
+	if (crct6845_calls.out_VS_func) (crct6845_calls.out_VS_func)(machine,0,crtc.VSYNC); /* call VS update */
 
 
 	/* if we got to here the vsync has just ended */
