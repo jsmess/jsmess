@@ -888,8 +888,7 @@ static MACHINE_DRIVER_START( avigo )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* real time clock */
-	MDRV_DEVICE_ADD("rtc", TC8521)
-	MDRV_DEVICE_CONFIG(avigo_tc8521_interface)
+	MDRV_TC8521_ADD("rtc", avigo_tc8521_interface)
 MACHINE_DRIVER_END
 
 

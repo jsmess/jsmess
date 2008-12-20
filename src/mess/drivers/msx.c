@@ -1135,7 +1135,7 @@ static MACHINE_DRIVER_START( msx2 )
 	MDRV_CASSETTE_ADD( "cassette", msx_cassette_config )
 
 	/* real time clock */
-	MDRV_DEVICE_ADD("rtc", TC8521)
+	MDRV_TC8521_ADD("rtc", default_tc8521_interface)
 	
 	MDRV_WD179X_ADD("wd179x", msx_wd17xx_interface )	
 MACHINE_DRIVER_END

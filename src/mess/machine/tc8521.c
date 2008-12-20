@@ -145,14 +145,17 @@ INLINE tc8521_t *get_token(const device_config *device)
 
 INLINE const tc8521_interface *get_interface(const device_config *device)
 {
-	static const tc8521_interface dummy_config = {0, };
-
 	assert(device != NULL);
 	assert(device->type == TC8521);
-	return (device->static_config != NULL)
-		? (tc8521_interface *) device->static_config
-		: &dummy_config;
+	return (tc8521_interface *) device->static_config;
 }
+
+
+/***************************************************************************
+    GLOBAL VARIABLES
+***************************************************************************/
+
+const tc8521_interface default_tc8521_interface = {0, };
 
 
 /***************************************************************************

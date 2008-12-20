@@ -1711,8 +1711,7 @@ static MACHINE_DRIVER_START( nc100 )
 	MDRV_MSM8251_ADD("uart", nc100_uart_interface)
 
 	/* rtc */
-	MDRV_DEVICE_ADD("rtc", TC8521)
-	MDRV_DEVICE_CONFIG(nc100_tc8521_interface)
+	MDRV_TC8521_ADD("rtc", nc100_tc8521_interface)
 MACHINE_DRIVER_END
 
 
@@ -1737,7 +1736,7 @@ static MACHINE_DRIVER_START( nc200 )
 	MDRV_MSM8251_ADD("uart", nc200_uart_interface)
 
 	/* no rtc */
-	MDRV_DEVICE_REMOVE("rtc", TC8521)
+	MDRV_TC8521_REMOVE("rtc")
 	
 	MDRV_NEC765A_ADD("nec765", nc200_nec765_interface)
 MACHINE_DRIVER_END
