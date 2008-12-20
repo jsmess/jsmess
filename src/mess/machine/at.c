@@ -5,7 +5,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 
 #include "cpu/i386/i386.h"
 #include "cpu/i8x41/i8x41.h"
@@ -142,10 +141,10 @@ const struct pit8253_config at_pit8254_config =
 };
 
 
-static void at_set_gate_a20(int a20)
+static void at_set_gate_a20(running_machine *machine, int a20)
 {
 	/* set the CPU's A20 line */
-	cpu_set_input_line(Machine->cpu[0], INPUT_LINE_A20, a20);
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_A20, a20);
 }
 
 
@@ -178,7 +177,7 @@ static void init_at_common(running_machine *machine, const struct kbdc8042_inter
 
 
 
-static void at_keyboard_interrupt(int state)
+static void at_keyboard_interrupt(running_machine *machine, int state)
 {
 	pic8259_set_irq_line(at_devices.pic8259_master, 1, state);
 }
@@ -485,7 +484,7 @@ static WRITE8_HANDLER( at_kbdc8042_p2_w )
 {
 	logerror("%04x: writing $%02x to P2\n", cpu_get_pc(space->machine->cpu[0]), data );
 
-	at_set_gate_a20( ( data & 0x02 ) ? 1 : 0 );
+	at_set_gate_a20( space->machine, ( data & 0x02 ) ? 1 : 0 );
 	
 	cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_RESET, ( data & 0x01 ) ? CLEAR_LINE : ASSERT_LINE );
 
