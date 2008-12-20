@@ -203,7 +203,7 @@ static int Einstein_scr_y = 0;
 //}
 //
 //// called when the 6845 changes the VSync
-//static void Einstein_Set_VSync(int offset, int data)
+//static void Einstein_Set_VSync(running_machine *machine, int offset, int data)
 //{
 //  Einstein_VSync=data;
 //  if (!Einstein_VSync)

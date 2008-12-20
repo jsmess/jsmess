@@ -484,7 +484,7 @@ static void BBC_Set_HSync(running_machine *machine, int offset, int data)
 }
 
 // called when the 6845 changes the VSync
-static void BBC_Set_VSync(int offset, int data)
+static void BBC_Set_VSync(running_machine *machine, int offset, int data)
 {
 	// catch the falling edge
 	if ((!data)&&(BBC_VSync))

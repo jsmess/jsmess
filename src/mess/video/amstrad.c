@@ -1212,7 +1212,7 @@ static void amstrad_Set_HS(running_machine *machine, int offset, int data)
 }
 
 /* CRTC - Set new Vertical Sync Status*/
-static void amstrad_Set_VS(int offset, int data)
+static void amstrad_Set_VS(running_machine *machine, int offset, int data)
 {
 /* New CRTC_VSync */
 //  if (((amstrad_CRTC_VS^data) != 0)&&(data != 0)) {

@@ -9,6 +9,7 @@
  ************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "video/m6845.h"
 
 #define True 1
@@ -485,7 +486,7 @@ void m6845_clock(running_machine *machine)
 			if (crtc.Character_Row_Counter==R7_vertical_sync_position)
 			{
 				crtc.VSYNC=True;
-				if (crct6845_calls.out_VS_func) (crct6845_calls.out_VS_func)(0,crtc.VSYNC); /* call VS update */
+				if (crct6845_calls.out_VS_func) (crct6845_calls.out_VS_func)(machine, 0,crtc.VSYNC); /* call VS update */
 			}
 
 
@@ -499,7 +500,7 @@ void m6845_clock(running_machine *machine)
                         {
                                 crtc.Vertical_Sync_Width_Counter=0;
                                 crtc.VSYNC=False;
-                                if (crct6845_calls.out_VS_func) (crct6845_calls.out_VS_func)(0,crtc.VSYNC); /* call VS update */
+                                if (crct6845_calls.out_VS_func) (crct6845_calls.out_VS_func)(machine, 0,crtc.VSYNC); /* call VS update */
                         }
                 }
 
@@ -525,7 +526,7 @@ void m6845_clock(running_machine *machine)
 				if (crtc.Character_Row_Counter==R7_vertical_sync_position)
 				{
 					crtc.VSYNC=True;
-					if (crct6845_calls.out_VS_func) (crct6845_calls.out_VS_func)(0,crtc.VSYNC); /* call VS update */
+					if (crct6845_calls.out_VS_func) (crct6845_calls.out_VS_func)(machine,0,crtc.VSYNC); /* call VS update */
 				}
 			}
 		}
@@ -837,7 +838,7 @@ static void m6845_vsync_clear_timer_callback(int dummy)
 	crtc.VSYNC = 0;
 
 	/* call function to let emulation "know" */
-	if (crct6845_calls.out_VS_func) (crct6845_calls.out_VS_func)(0,crtc.VSYNC); /* call VS update */
+	if (crct6845_calls.out_VS_func) (crct6845_calls.out_VS_func)(Machine,0,crtc.VSYNC); /* call VS update */
 
 
 	/* if we got to here the vsync has just ended */
@@ -857,7 +858,7 @@ static void m6845_vsync_set_timer_callback(int dummy)
 	crtc.VSYNC = 1;
 
 	/* call function to let emulation "know" */
-	if (crct6845_calls.out_VS_func) (crct6845_calls.out_VS_func)(0,crtc.VSYNC); /* call VS update */
+	if (crct6845_calls.out_VS_func) (crct6845_calls.out_VS_func)(Machine,0,crtc.VSYNC); /* call VS update */
 
 
 	/* if we got to here the vsync has just been set, and has just started */

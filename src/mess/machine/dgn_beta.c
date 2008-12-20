@@ -822,7 +822,7 @@ static READ8_HANDLER(d_pia2_pb_r)
 static WRITE8_HANDLER(d_pia2_pb_w)
 {
 	/* Update top video address lines */
-	vid_set_gctrl(data);
+	vid_set_gctrl(space->machine, data);
 }
 
 static void d_pia2_irq_a(running_machine *machine, int state)

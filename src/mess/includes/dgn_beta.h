@@ -104,7 +104,7 @@ void dgn_beta_line_interrupt (int data);
 /* mc6845 video display generator */
 void init_video(running_machine *machine);
 extern VIDEO_UPDATE( dgnbeta );
-void vid_set_gctrl(int data);
+void vid_set_gctrl(running_machine *machine, int data);
 
 /* 74HC670 4x4bit colour ram */
 WRITE8_HANDLER(colour_ram_w);

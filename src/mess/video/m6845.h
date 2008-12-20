@@ -24,7 +24,7 @@ struct m6845_interface
 	void (*out_MA_func)(int offset, int data);
 	void (*out_RA_func)(int offset, int data);
 	void (*out_HS_func)(running_machine *machine, int offset, int data);
-	void (*out_VS_func)(int offset, int data);
+	void (*out_VS_func)(running_machine *machine, int offset, int data);
 	void (*out_DE_func)(int offset, int data);
 	void (*out_CR_func)(int offset, int data);
 	void (*out_CRE_func)(int offset, int data);

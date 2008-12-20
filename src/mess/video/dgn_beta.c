@@ -80,7 +80,6 @@ the access to the video memory is unclear to me at the moment.
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/dgn_beta.h"
 #include "video/m6845.h"
 
@@ -133,7 +132,7 @@ static int NoScreen		= 0;
 
 /* Debugging commands and handlers. */
 static void execute_beta_vid_log(running_machine *machine, int ref, int params, const char *param[]);
-static void RegLog(int offset, int data);
+static void RegLog(running_machine *machine, int offset, int data);
 static void execute_beta_vid_fill(running_machine *machine, int ref, int params, const char *param[]);
 static void execute_beta_vid_box(running_machine *machine, int ref, int params, const char *param[]);
 static void execute_beta_vid(running_machine *machine, int ref, int params, const char *param[]);
@@ -152,7 +151,7 @@ static int VidAddr		= 0;	// Last address reg written
 
 static void beta_Set_RA(int offset, int data);
 static void beta_Set_HSync(running_machine *machine, int offset, int data);
-static void beta_Set_VSync(int offset, int data);
+static void beta_Set_VSync(running_machine *machine, int offset, int data);
 static void beta_Set_DE(int offset, int data);
 
 static const struct m6845_interface beta_m6845_interface = {
@@ -217,11 +216,11 @@ typedef enum {
 /* 6821-I28, this allows the 6845 to access the full 64K address range, however    */
 /* since the ram data is addressed as a 16bit wide unit, this allows the 6845      */
 /* access to the first 128K or ram.                                                */
-void vid_set_gctrl(int data)
+void vid_set_gctrl(running_machine *machine, int data)
 {
 	GCtrl=data;
 	if (LogRegWrites)
-		debug_console_printf(Machine, "I28-PB=$%2X, %2X-%s-%s-%s-%s-%s-%s PC=%4X\n",
+		debug_console_printf(machine, "I28-PB=$%2X, %2X-%s-%s-%s-%s-%s-%s PC=%4X\n",
 				     data,
 				     data & GCtrlAddrLines,
 				     data & GCtrlFS 		? "FS" : "  ",
@@ -230,7 +229,7 @@ void vid_set_gctrl(int data)
 				     data & GCtrlHiLo		? "Hi" : "Lo",
 				     data & GCtrlSWChar		? "C0" : "C1",
 				     data & GCtrlWI		? "Wi" : "  ",
-				     cpu_get_pc( Machine->cpu[0] ));
+				     cpu_get_pc( machine->cpu[0] ));
 }
 
 // called when the 6845 changes the character row
@@ -268,7 +267,7 @@ static void beta_Set_HSync(running_machine *machine, int offset, int data)
 }
 
 // called when the 6845 changes the VSync
-static void beta_Set_VSync(int offset, int data)
+static void beta_Set_VSync(running_machine *machine, int offset, int data)
 {
 	beta_VSync=data;
 	if (!beta_VSync)
@@ -294,7 +293,7 @@ static void beta_Set_VSync(int offset, int data)
 		VSyncMin=beta_scr_y;
 	}
 
-	dgn_beta_frame_interrupt(Machine, data);
+	dgn_beta_frame_interrupt(machine, data);
 }
 
 static void beta_Set_DE(int offset, int data)
@@ -710,7 +709,7 @@ WRITE8_HANDLER(dgnbeta_6845_w)
 		VidAddr=data;				/* Record reg being written to */
 	}
 	if (LogRegWrites)
-		RegLog(offset,data);
+		RegLog(space->machine, offset,data);
 }
 
 /* Write handler for colour, pallate ram */
@@ -733,7 +732,7 @@ static void execute_beta_vid_log(running_machine *machine, int ref, int params, 
 }
 
 
-static void RegLog(int offset, int data)
+static void RegLog(running_machine *machine, int offset, int data)
 {
 	char	RegName[16];
 
@@ -758,7 +757,7 @@ static void RegLog(int offset, int data)
 	}
 
 	if(offset&0x1)
-		debug_console_printf(Machine, "6845 write Reg %s Addr=%3d Data=%3d ($%2.2X) \n",RegName,VidAddr,data,data);
+		debug_console_printf(machine, "6845 write Reg %s Addr=%3d Data=%3d ($%2.2X) \n",RegName,VidAddr,data,data);
 }
 
 static void execute_beta_vid_fill(running_machine *machine, int ref, int params, const char *param[])
