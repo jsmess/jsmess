@@ -351,7 +351,7 @@ static READ8_HANDLER(sord_sys_r)
 	if (cassette_input(cassette_device_image(space->machine)) >=0)
 		data |=(1<<0);
 
-	printer_handshake = centronics_read_handshake(0);
+	printer_handshake = centronics_read_handshake(space->machine, 0);
 
 	/* if printer is not online, it is busy */
 	if ((printer_handshake & CENTRONICS_ONLINE)!=0)
@@ -394,8 +394,8 @@ static WRITE8_HANDLER(sord_sys_w)
 	cassette_output(cassette_device_image(space->machine), (data & (1<<0)) ? -1.0 : 1.0);
 
 	/* assumption: select is tied low */
-	centronics_write_handshake(0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
-	centronics_write_handshake(0, handshake, CENTRONICS_STROBE);
+	centronics_write_handshake(space->machine, 0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
+	centronics_write_handshake(space->machine, 0, handshake, CENTRONICS_STROBE);
 
 	logerror("sys write: %02x\n",data);
 }
@@ -403,7 +403,7 @@ static WRITE8_HANDLER(sord_sys_w)
 static WRITE8_HANDLER(sord_printer_w)
 {
 //  logerror("centronics w: %02x\n",data);
-	centronics_write_data(0,data);
+	centronics_write_data(space->machine, 0,data);
 }
 
 static ADDRESS_MAP_START( sord_m5_io , ADDRESS_SPACE_IO, 8)
@@ -469,9 +469,9 @@ static MACHINE_RESET( sord_m5 )
 	/* should be done in a special callback to work properly! */
 	memory_set_bankptr(machine, 1, memory_region(machine, "user1"));
 
-	centronics_config(0, sordm5_cent_config);
+	centronics_config(machine, 0, sordm5_cent_config);
 	/* assumption: select is tied low */
-	centronics_write_handshake(0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
+	centronics_write_handshake(machine, 0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
 }
 
 /* 2008-05 FP: 

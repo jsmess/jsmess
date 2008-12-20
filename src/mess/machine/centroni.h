@@ -21,10 +21,10 @@ typedef enum {
 } PRINTER_TYPE;
 
 typedef struct {
-	UINT8 (*read_data)(int nr);
-	void (*write_data)(int nr, UINT8 data);
-	int (*handshake_in)(int nr);
-	void (*handshake_out)(int nr, int data, int mask);
+	UINT8 (*read_data)(running_machine *machine,int nr);
+	void (*write_data)(running_machine *machine,int nr, UINT8 data);
+	int (*handshake_in)(running_machine *machine,int nr);
+	void (*handshake_out)(running_machine *machine,int nr, int data, int mask);
 } CENTRONICS_DEVICE;
 
 
@@ -43,18 +43,18 @@ typedef struct {
 
 typedef struct {
 	PRINTER_TYPE type;
-	void (*handshake_out)(int n, int data, int mask);
+	void (*handshake_out)(running_machine *machine,int n, int data, int mask);
 } CENTRONICS_CONFIG;
 
 
 /*----------- defined in machine/centroni.c -----------*/
 
-void centronics_config(int nr, const CENTRONICS_CONFIG *config);
+void centronics_config(running_machine *machine,int nr, const CENTRONICS_CONFIG *config);
 
-void centronics_write_data(int nr, UINT8 data);
-void centronics_write_handshake(int nr, int data, int mask);
-UINT8 centronics_read_data(int nr);
-int centronics_read_handshake(int nr);
+void centronics_write_data(running_machine *machine,int nr, UINT8 data);
+void centronics_write_handshake(running_machine *machine,int nr, int data, int mask);
+UINT8 centronics_read_data(running_machine *machine,int nr);
+int centronics_read_handshake(running_machine *machine,int nr);
 
 extern const CENTRONICS_DEVICE CENTRONICS_PRINTER_DEVICE;
 

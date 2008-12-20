@@ -404,8 +404,8 @@ static WRITE8_DEVICE_HANDLER( bw2_ppi8255_a_w )
 	}
 
 	/* assumption: select is tied low */
-	centronics_write_handshake(0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT | CENTRONICS_NO_RESET);
-	centronics_write_handshake(0, BIT(data, 7) ? 0 : CENTRONICS_STROBE, CENTRONICS_STROBE);
+	centronics_write_handshake(device->machine,0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT | CENTRONICS_NO_RESET);
+	centronics_write_handshake(device->machine,0, BIT(data, 7) ? 0 : CENTRONICS_STROBE, CENTRONICS_STROBE);
 }
 
 static READ8_DEVICE_HANDLER( bw2_ppi8255_b_r )
@@ -473,8 +473,8 @@ static READ8_DEVICE_HANDLER( bw2_ppi8255_c_r )
 	UINT8 data = 0;
 
 	/* assumption: select is tied low */
-	centronics_write_handshake(0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT | CENTRONICS_NO_RESET);
-	data = ((centronics_read_handshake(0) & CENTRONICS_NOT_BUSY) == 0) ? 0x10 : 0;
+	centronics_write_handshake(device->machine,0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT | CENTRONICS_NO_RESET);
+	data = ((centronics_read_handshake(device->machine,0) & CENTRONICS_NOT_BUSY) == 0) ? 0x10 : 0;
 
 	data |= state->mfdbk << 5;
 	
@@ -552,7 +552,7 @@ static const CENTRONICS_CONFIG bw2_centronics_config[1] =
 
 static WRITE8_HANDLER( bw2_centronics_data_w )
 {
-	centronics_write_data(0, data);
+	centronics_write_data(space->machine,0, data);
 }
 
 /* Video */
@@ -598,7 +598,7 @@ static MACHINE_START( bw2 )
 	device_config *fdc = (device_config*)device_list_find_by_tag( machine->config->devicelist, WD179X, "wd179x");
 
 
-	centronics_config(0, bw2_centronics_config);
+	centronics_config(machine,0, bw2_centronics_config);
 
 	wd17xx_set_density(fdc,DEN_MFM_LO);
 

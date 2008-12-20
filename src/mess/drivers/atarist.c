@@ -1299,7 +1299,7 @@ static WRITE8_HANDLER( ym2149_port_a_w )
 	// 0x08 = RTS
 	// 0x10 = DTR
 
-	centronics_write_handshake(0, BIT(data, 5) ? 0 : CENTRONICS_STROBE, CENTRONICS_STROBE);
+	centronics_write_handshake(space->machine,0, BIT(data, 5) ? 0 : CENTRONICS_STROBE, CENTRONICS_STROBE);
 
 	// 0x40 = General Purpose Output
 	// 0x80 = Reserved
@@ -1307,7 +1307,7 @@ static WRITE8_HANDLER( ym2149_port_a_w )
 
 static WRITE8_HANDLER( ym2149_port_b_w )
 {
-	centronics_write_data(0, data);
+	centronics_write_data(space->machine,0, data);
 }
 
 static const ay8910_interface ym2149_interface =
@@ -1372,7 +1372,7 @@ static MC68901_GPIO_READ( mfp_gpio_r )
 
 	atarist_state *state = device->machine->driver_data;
 
-	UINT8 data = (centronics_read_handshake(0) & CENTRONICS_NOT_BUSY) >> 7;
+	UINT8 data = (centronics_read_handshake(device->machine,0) & CENTRONICS_NOT_BUSY) >> 7;
 
 	mc68901_tai_w(device, data & 0x01);
 
@@ -1499,7 +1499,7 @@ static MACHINE_START( atarist )
 	atarist_configure_memory(machine);
 
 	/* configure devices */
-	centronics_config(0, atarist_centronics_config);
+	centronics_config(machine, 0, atarist_centronics_config);
 
 	/* set CPU interrupt callback */
 	cpu_set_irq_callback(machine->cpu[0], atarist_int_ack);
@@ -1542,7 +1542,7 @@ static MC68901_GPIO_READ( atariste_mfp_gpio_r )
 
 	atarist_state *state = device->machine->driver_data;
 
-	UINT8 data = (centronics_read_handshake(0) & CENTRONICS_NOT_BUSY) >> 7;
+	UINT8 data = (centronics_read_handshake(device->machine,0) & CENTRONICS_NOT_BUSY) >> 7;
 
 	data |= (state->acia_irq << 4);
 	data |= (state->fdc_irq << 5);
@@ -1594,7 +1594,7 @@ static MACHINE_START( atariste )
 	atarist_configure_memory(machine);
 
 	/* configure devices */
-	centronics_config(0, atarist_centronics_config);
+	centronics_config(machine, 0, atarist_centronics_config);
 	
 	/* set CPU interrupt callback */
 	cpu_set_irq_callback(machine->cpu[0], atarist_int_ack);
@@ -1669,7 +1669,7 @@ static WRITE8_HANDLER( stbook_ym2149_port_a_w )
 	// 0x08 = RTS
 	// 0x10 = DTR
 
-	centronics_write_handshake(0, (data & 0x20) ? 0 : CENTRONICS_STROBE, CENTRONICS_STROBE);
+	centronics_write_handshake(space->machine, 0, (data & 0x20) ? 0 : CENTRONICS_STROBE, CENTRONICS_STROBE);
 
 	// 0x40 = IDE RESET
 	// 0x80 = FDD_DENSE_SEL
@@ -1718,7 +1718,7 @@ static MC68901_GPIO_READ( stbook_mfp_gpio_r )
 
 	atarist_state *state = device->machine->driver_data;
 
-	UINT8 data = (centronics_read_handshake(0) & CENTRONICS_NOT_BUSY) >> 7;
+	UINT8 data = (centronics_read_handshake(device->machine,0) & CENTRONICS_NOT_BUSY) >> 7;
 
 	data |= (state->acia_irq << 4);
 	data |= (state->fdc_irq << 5);
@@ -1748,7 +1748,7 @@ static MACHINE_START( stbook )
 	stbook_configure_memory(machine);
 
 	/* configure devices */
-	centronics_config(0, atarist_centronics_config);
+	centronics_config(machine, 0, atarist_centronics_config);
 	rp5c15_init(machine, &rtc_intf);
 
 	/* set CPU interrupt callback */

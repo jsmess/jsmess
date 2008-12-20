@@ -5,7 +5,6 @@
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "centroni.h"
 #include "devices/printer.h"
 
@@ -36,20 +35,20 @@ static CENTRONICS cent[3]={
 
 static TIMER_CALLBACK(centronics_timer_callback);
 
-void centronics_config(int nr, const CENTRONICS_CONFIG *config)
+void centronics_config(running_machine *machine,int nr, const CENTRONICS_CONFIG *config)
 {
 	CENTRONICS *This=cent+nr;
 	This->config=config;
-	This->timer = timer_alloc(Machine, centronics_timer_callback, NULL);
+	This->timer = timer_alloc(machine, centronics_timer_callback, NULL);
 }
 
-void centronics_write_data(int nr, UINT8 data)
+void centronics_write_data(running_machine *machine,int nr, UINT8 data)
 {
 	CENTRONICS *This=cent+nr;
 	This->data=data;
 }
 
-UINT8 centronics_read_data(int nr)
+UINT8 centronics_read_data(running_machine *machine,int nr)
 {
 	CENTRONICS *This=cent+nr;
 	return This->data;
@@ -68,7 +67,7 @@ static TIMER_CALLBACK(centronics_timer_callback)
 
 	/* if callback is specified, call it with the new state of the outputs from the printer */
 	if (This->config->handshake_out)
-		This->config->handshake_out(nr, This->control, This->new_control_mask);
+		This->config->handshake_out(machine, nr, This->control, This->new_control_mask);
 
 	/* phase 2: schedule ack end */
 	if ( This->control & CENTRONICS_ACKNOWLEDGE )
@@ -115,7 +114,7 @@ static const device_config *printer_device(running_machine *machine, int index)
 	return device_list_find_by_tag(machine->config->devicelist, PRINTER, tag);
 }
 
-void centronics_write_handshake(int nr, int data, int mask)
+void centronics_write_handshake(running_machine *machine,int nr, int data, int mask)
 {
 	CENTRONICS *This=cent+nr;
 	const device_config *device;
@@ -133,7 +132,7 @@ void centronics_write_handshake(int nr, int data, int mask)
 			timer_adjust_oneshot(This->timer, ATTOTIME_IN_USEC(5), nr);
 
 			/* output */
-			device = printer_device(Machine, nr);
+			device = printer_device(machine, nr);
 			if (device != NULL)
 				printer_output(device, This->data);
 		}
@@ -142,7 +141,7 @@ void centronics_write_handshake(int nr, int data, int mask)
 	This->control=neu;
 }
 
-int centronics_read_handshake(int nr)
+int centronics_read_handshake(running_machine *machine,int nr)
 {
 	CENTRONICS *This=cent+nr;
 	UINT8 data=0;
@@ -161,7 +160,7 @@ int centronics_read_handshake(int nr)
 
 	data |= CENTRONICS_NO_ERROR;
 
-	device = printer_device(Machine, nr);
+	device = printer_device(machine, nr);
 	if ((device == NULL) || !printer_is_ready(device))
 		data |= CENTRONICS_NO_PAPER;
 

@@ -94,7 +94,6 @@
  ******************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/nc.h"
 #include "includes/serial.h"	/* for serial data transfers */
 #include "machine/msm8251.h"	/* for NC100 uart */
@@ -122,7 +121,7 @@
 receive clock and transmit clock inputs */
 static emu_timer *nc_serial_timer;
 
-static void nc_printer_update(int);
+static void nc_printer_update(running_machine *machine,int);
 
 UINT8 nc_type;
 
@@ -793,7 +792,7 @@ static TIMER_CALLBACK(nc_serial_timer_callback)
 static WRITE8_HANDLER(nc_uart_control_w)
 {
 	/* update printer state */
-	nc_printer_update(data);
+	nc_printer_update(space->machine, data);
 
 	/* on/off changed state? */
 	if (((nc_uart_control ^ data) & (1<<3))!=0)
@@ -818,11 +817,11 @@ static WRITE8_HANDLER(nc_uart_control_w)
 static WRITE8_HANDLER(nc_printer_data_w)
 {
 	LOG(("printer write %02x\n",data));
-	centronics_write_data(0,data);
+	centronics_write_data(space->machine, 0,data);
 }
 
 /* same for nc100 and nc200 */
-static void	nc_printer_update(int port0x030)
+static void	nc_printer_update(running_machine *machine,int port0x030)
 {
 	int handshake = 0;
 
@@ -831,8 +830,8 @@ static void	nc_printer_update(int port0x030)
 		handshake = CENTRONICS_STROBE;
 	}
 	/* assumption: select is tied low */
-	centronics_write_handshake(0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
-	centronics_write_handshake(0, handshake, CENTRONICS_STROBE);
+	centronics_write_handshake(machine, 0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
+	centronics_write_handshake(machine, 0, handshake, CENTRONICS_STROBE);
 }
 
 /********************************************************************************************************/
@@ -935,7 +934,7 @@ static const msm8251_interface nc100_uart_interface =
 	nc100_rxrdy_callback
 };
 
-static void nc100_printer_handshake_in(int number, int data, int mask)
+static void nc100_printer_handshake_in(running_machine *machine,int number, int data, int mask)
 {
 	nc_irq_status &= ~(1<<2);
 
@@ -947,7 +946,7 @@ static void nc100_printer_handshake_in(int number, int data, int mask)
 		}
 	}
 	/* trigger an int if the irq is set */
-	nc_update_interrupts(Machine);
+	nc_update_interrupts(machine);
 }
 
 static const CENTRONICS_CONFIG nc100_cent_config[1]={
@@ -968,9 +967,9 @@ static MACHINE_RESET( nc100 )
 
     nc_common_init_machine(machine);
 
-	centronics_config(0, nc100_cent_config);
+	centronics_config(machine, 0, nc100_cent_config);
 	/* assumption: select is tied low */
-	centronics_write_handshake(0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
+	centronics_write_handshake(machine, 0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
 
 	nc_common_open_stream_for_reading(machine);
 
@@ -1042,9 +1041,9 @@ static  READ8_HANDLER(nc100_card_battery_status_r)
 
 
 	/* assumption: select is tied low */
-	centronics_write_handshake(0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
+	centronics_write_handshake(space->machine, 0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
 
-	printer_handshake = centronics_read_handshake(0);
+	printer_handshake = centronics_read_handshake(space->machine, 0);
 
 	nc_card_battery_status |=(1<<1);
 
@@ -1247,7 +1246,7 @@ static WRITE8_HANDLER(nc200_display_memory_start_w)
 }
 #endif
 
-static void nc200_printer_handshake_in(int number, int data, int mask)
+static void nc200_printer_handshake_in(running_machine *machine,int number, int data, int mask)
 {
 	nc_irq_status &= ~(1<<0);
 
@@ -1259,7 +1258,7 @@ static void nc200_printer_handshake_in(int number, int data, int mask)
 		}
 	}
 	/* trigger an int if the irq is set */
-	nc_update_interrupts(Machine);
+	nc_update_interrupts(machine);
 }
 
 static const CENTRONICS_CONFIG nc200_cent_config[1]={
@@ -1379,9 +1378,9 @@ static MACHINE_RESET( nc200 )
 
 	nc200_uart_interrupt_irq = 0;
 
-	centronics_config(0, nc200_cent_config);
+	centronics_config(machine, 0, nc200_cent_config);
 	/* assumption: select is tied low */
-	centronics_write_handshake(0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
+	centronics_write_handshake(machine, 0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
 
 	nc_common_open_stream_for_reading(machine);
 	if (file)
@@ -1470,9 +1469,9 @@ static  READ8_HANDLER(nc200_printer_status_r)
 	int printer_handshake;
 
 	/* assumption: select is tied low */
-	centronics_write_handshake(0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
+	centronics_write_handshake(space->machine, 0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
 
-	printer_handshake = centronics_read_handshake(0);
+	printer_handshake = centronics_read_handshake(space->machine, 0);
 
 	nc200_printer_status |=(1<<0);
 

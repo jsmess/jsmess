@@ -35,7 +35,7 @@ void pc_lpt_set_device(int nr, const CENTRONICS_DEVICE *device);
 
 /* line definitions in centroni.h */
 /* only those lines in mask are modified */
-void pc_lpt_handshake_in(int nr, int data, int mask);
+void pc_lpt_handshake_in(running_machine *machine,int nr, int data, int mask);
 
 READ8_HANDLER ( pc_parallelport0_r );
 READ8_HANDLER ( pc_parallelport1_r );

@@ -452,13 +452,13 @@ static Z80PIO_ON_ARDY_CHANGED( einstein_pio_ardy )
 		handshake = CENTRONICS_STROBE;
 
 	/* ardy is connected to strobe */
-	centronics_write_handshake(0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
-	centronics_write_handshake(0, handshake, CENTRONICS_STROBE);
+	centronics_write_handshake(device->machine,0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
+	centronics_write_handshake(device->machine,0, handshake, CENTRONICS_STROBE);
 }
 
 static WRITE8_DEVICE_HANDLER( einstein_pio_port_a_w )
 {
-	centronics_write_data(0,data);
+	centronics_write_data(device->machine,0,data);
 }
 
 
@@ -874,8 +874,8 @@ static READ8_HANDLER(einstein_key_int_r)
 
 	einstein_update_interrupts(space->machine);
 
-	centronics_write_handshake(0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
-	centronics_handshake = centronics_read_handshake(0);
+	centronics_write_handshake(space->machine,0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
+	centronics_handshake = centronics_read_handshake(space->machine,0);
 
 	/* bit 7: 0=shift pressed */
 	/* bit 6: 0=control pressed */
@@ -1367,7 +1367,7 @@ ADDRESS_MAP_END
 
 
 
-static void einstein_printer_handshake_in(int number, int data, int mask)
+static void einstein_printer_handshake_in(running_machine *machine,int number, int data, int mask)
 {
 	if (mask & CENTRONICS_ACKNOWLEDGE)
 	{
@@ -1464,9 +1464,9 @@ static MACHINE_RESET( einstein )
 	einstein_ctc_trigger = 0;
 	timer_pulse(machine, ATTOTIME_IN_HZ(2000000), (void *)device_list_find_by_tag(machine->config->devicelist, Z80CTC, "z80ctc"), 0, einstein_ctc_trigger_callback);
 
-	centronics_config(0, einstein_cent_config);
+	centronics_config(machine, 0, einstein_cent_config);
 	/* assumption: select is tied low */
-	centronics_write_handshake(0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
+	centronics_write_handshake(machine, 0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
 
 }
 

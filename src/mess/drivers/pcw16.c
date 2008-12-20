@@ -1361,7 +1361,7 @@ static MACHINE_RESET( pcw16 )
 	pc_fdc_init(machine, &pcw16_fdc_interface);
 
 	pc_lpt_config(0, &lpt_config);
-	centronics_config(0, &cent_config);
+	centronics_config(machine, 0, &cent_config);
 	pc_lpt_set_device(0, &CENTRONICS_PRINTER_DEVICE);
 
 	/* initialise mouse */

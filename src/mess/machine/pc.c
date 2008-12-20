@@ -1173,13 +1173,13 @@ void mess_init_pc_common(running_machine *machine, UINT32 flags, void (*set_keyb
 	pc_hdc_setup(machine, set_hdc_int_func);
 
 	pc_lpt_config(0, lpt_config);
-	centronics_config(0, cent_config);
+	centronics_config(machine, 0, cent_config);
 	pc_lpt_set_device(0, &CENTRONICS_PRINTER_DEVICE);
 	pc_lpt_config(1, lpt_config+1);
-	centronics_config(1, cent_config+1);
+	centronics_config(machine, 1, cent_config+1);
 	pc_lpt_set_device(1, &CENTRONICS_PRINTER_DEVICE);
 	pc_lpt_config(2, lpt_config+2);
-	centronics_config(2, cent_config+2);
+	centronics_config(machine, 2, cent_config+2);
 	pc_lpt_set_device(2, &CENTRONICS_PRINTER_DEVICE);
 
 	/* serial mouse */

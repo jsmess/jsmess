@@ -610,7 +610,7 @@ static READ8_DEVICE_HANDLER( sf7000_ppi8255_a_r )
 
 	sg1000_state *state = device->machine->driver_data;
 
-	int centronics_handshake = centronics_read_handshake(1);
+	int centronics_handshake = centronics_read_handshake(device->machine,1);
 	int busy = 0;
 
 	if ((centronics_handshake & CENTRONICS_NOT_BUSY) == 0)
@@ -636,7 +636,7 @@ static WRITE8_DEVICE_HANDLER( sf7000_ppi8255_b_w )
         PB7     Data output to Centronics printer
     */
 
-	centronics_write_data(1, data);
+	centronics_write_data(device->machine, 1, data);
 }
 
 static WRITE8_DEVICE_HANDLER( sf7000_ppi8255_c_w )
@@ -672,7 +672,7 @@ static WRITE8_DEVICE_HANDLER( sf7000_ppi8255_c_w )
 	memory_set_bank(device->machine, 1, (data & 0x40) >> 6);
 
 	/* printer strobe */
-	centronics_write_handshake(1, (data & 0x80) ? 0 : CENTRONICS_STROBE, CENTRONICS_STROBE);
+	centronics_write_handshake(device->machine, 1, (data & 0x80) ? 0 : CENTRONICS_STROBE, CENTRONICS_STROBE);
 }
 
 static const ppi8255_interface sf7000_ppi8255_intf[2] =
@@ -736,7 +736,7 @@ static MACHINE_START( sf7000 )
 	floppy_drive_set_index_pulse_callback(image_from_devtype_and_index(IO_FLOPPY, 0), sf7000_fdc_index_callback);
 
 	/* configure PPI */
-	centronics_config(1, sf7000_centronics_config);
+	centronics_config(machine, 1, sf7000_centronics_config);
 
 	/* configure memory banking */
 	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, "main"), 0);

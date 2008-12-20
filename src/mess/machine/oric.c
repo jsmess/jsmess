@@ -19,7 +19,6 @@
 
 #include <stdio.h>
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/oric.h"
 #include "machine/wd17xx.h"
 #include "machine/6522via.h"
@@ -247,7 +246,7 @@ static WRITE8_DEVICE_HANDLER ( oric_via_out_a_func )
 	if (oric_psg_control==0)
 	{
 		/* if psg not selected, write to printer */
-		centronics_write_data(0,data);
+		centronics_write_data(device->machine,0,data);
 	}
 }
 
@@ -342,18 +341,18 @@ static WRITE8_DEVICE_HANDLER ( oric_via_out_b_func )
 	}
 
 	/* assumption: select is tied low */
-	centronics_write_handshake(0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
-	centronics_write_handshake(0, printer_handshake, CENTRONICS_STROBE);
+	centronics_write_handshake(device->machine, 0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
+	centronics_write_handshake(device->machine, 0, printer_handshake, CENTRONICS_STROBE);
 
 	oric_psg_connection_refresh(device->machine);
 	previous_portb_data = data;
 
 }
 
-static void oric_printer_handshake_in(int number, int data, int mask)
+static void oric_printer_handshake_in(running_machine *machine,int number, int data, int mask)
 {
 	int acknowledge;
-	const device_config *via_0 = device_list_find_by_tag(Machine->config->devicelist, VIA6522, "via6522_0");
+	const device_config *via_0 = device_list_find_by_tag(machine->config->devicelist, VIA6522, "via6522_0");
 
 	acknowledge = 1;
 
@@ -1148,9 +1147,9 @@ static void oric_common_init_machine(running_machine *machine)
 
     timer_pulse(machine, ATTOTIME_IN_HZ(4800), NULL, 0, oric_refresh_tape);
 
-	centronics_config(0, oric_cent_config);
+	centronics_config(machine, 0, oric_cent_config);
 	/* assumption: select is tied low */
-	centronics_write_handshake(0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
+	centronics_write_handshake(machine, 0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
     via_ca1_w(via_0, 0, 1);
 }
 

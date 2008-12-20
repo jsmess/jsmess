@@ -68,7 +68,7 @@ static void pc_LPT_w(running_machine *machine, int n, int offset, int data)
 	{
 		case 0:
 			if (This->device->write_data)
-				This->device->write_data(n, data);
+				This->device->write_data(machine, n, data);
 			This->data = data;
 			LPT_LOG(1,"LPT_data_w",("LPT%d $%02x\n", n, data));
 			break;
@@ -84,7 +84,7 @@ static void pc_LPT_w(running_machine *machine, int n, int offset, int data)
 				if (data&CONTROL_NO_RESET) lines|=CENTRONICS_NO_RESET;
 				if (data&CONTROL_AUTOLINEFEED) lines|=CENTRONICS_AUTOLINEFEED;
 				if (data&CONTROL_STROBE) lines|=CENTRONICS_STROBE;
-				This->device->handshake_out(n, lines, CENTRONICS_SELECT
+				This->device->handshake_out(machine, n, lines, CENTRONICS_SELECT
 											|CENTRONICS_NO_RESET
 											|CENTRONICS_AUTOLINEFEED
 											|CENTRONICS_STROBE);
@@ -103,14 +103,14 @@ static int pc_LPT_r(running_machine *machine, int n, int offset)
 	{
 		case 0:
 			if (This->device->read_data)
-				data=This->device->read_data(n);
+				data=This->device->read_data(machine,n);
 			else
 				data = This->data;
 			LPT_LOG(1,"LPT_data_r",("LPT%d $%02x\n", n, data));
 			break;
 		case 1:
 			if (This->device&&This->device->handshake_in) {
-				int lines=This->device->handshake_in(n);
+				int lines=This->device->handshake_in(machine,n);
 				data=0;
 				if (lines&CENTRONICS_NOT_BUSY) data|=STATUS_NOT_BUSY;
 				if (lines&CENTRONICS_ACKNOWLEDGE) data|=STATUS_ACKNOWLEDGE;
@@ -139,7 +139,7 @@ static int pc_LPT_r(running_machine *machine, int n, int offset)
 	return data;
 }
 
-void pc_lpt_handshake_in(int nr, int data, int mask)
+void pc_lpt_handshake_in(running_machine *machine,int nr, int data, int mask)
 {
 	PC_LPT *This=LPT+nr;
 	int neu=(data&mask)|(This->status&~mask);

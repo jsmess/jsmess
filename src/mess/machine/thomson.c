@@ -748,7 +748,7 @@ static to7_io_dev to7_io_mode( running_machine *machine )
 
 
 
-static void to7_io_ack ( int n, int data, int mask )
+static void to7_io_ack ( running_machine *machine, int n, int data, int mask )
 {
 	/* acknowledge from centronics printer to PIA */
 	int ack = (data & CENTRONICS_ACKNOWLEDGE) ? 1 : 0;
@@ -784,7 +784,7 @@ static READ8_HANDLER ( to7_io_porta_in )
 	if ( to7_io_mode(space->machine) == TO7_IO_RS232 )
 		cts = to7_io_line.input_state & SERIAL_STATE_CTS ? 0 : 1;
 	else
-		cts = ( centronics_read_handshake( 0 ) & CENTRONICS_NOT_BUSY ) ? 1 : 0;
+		cts = ( centronics_read_handshake( space->machine, 0 ) & CENTRONICS_NOT_BUSY ) ? 1 : 0;
 
 	LOG_IO(( "$%04x %f to7_io_porta_in: mode=%i cts=%i, dsr=%i, rd=%i\n", cpu_get_previouspc( space->machine->cpu[0] ), attotime_to_double(timer_get_time(space->machine)), to7_io_mode(space->machine), cts, dsr, rd ));
 
@@ -799,7 +799,7 @@ static WRITE8_HANDLER ( to7_io_portb_out )
 
 	LOG_IO(( "$%04x %f to7_io_portb_out: CENTRONICS set data=$%02X\n", cpu_get_previouspc( space->machine->cpu[0] ), attotime_to_double(timer_get_time(space->machine)), data ));
 
-	centronics_write_data( 0, data );
+	centronics_write_data( space->machine, 0, data );
 }
 
 
@@ -810,7 +810,7 @@ static WRITE8_HANDLER ( to7_io_cb2_out )
 
 	LOG_IO(( "$%04x %f to7_io_cb2_out: CENTRONICS set strobe=%i\n", cpu_get_previouspc( space->machine->cpu[0] ), attotime_to_double(timer_get_time(space->machine)), data ));
 
-	centronics_write_handshake( 0, data ? CENTRONICS_STROBE : 0, CENTRONICS_STROBE );
+	centronics_write_handshake( space->machine, 0, data ? CENTRONICS_STROBE : 0, CENTRONICS_STROBE );
 }
 
 
@@ -841,12 +841,12 @@ static const CENTRONICS_CONFIG to7_centronics = { PRINTER_CENTRONICS, to7_io_ack
 static void thom_centronics_reset( running_machine *machine )
 {
 	centronics_write_handshake
-		( 0,
+		( machine, 0,
 		  CENTRONICS_SELECT | CENTRONICS_NOT_BUSY | CENTRONICS_STROBE,
 		  CENTRONICS_SELECT | CENTRONICS_NO_RESET | CENTRONICS_NOT_BUSY |
 		  CENTRONICS_STROBE | CENTRONICS_ACKNOWLEDGE );
 
-	centronics_write_handshake ( 0, CENTRONICS_NO_RESET, CENTRONICS_NO_RESET );
+	centronics_write_handshake ( machine, 0, CENTRONICS_NO_RESET, CENTRONICS_NO_RESET );
 }
 
 
@@ -870,7 +870,7 @@ static void to7_io_init( running_machine *machine )
 {
 	LOG (( "to7_io_init: CC 90-323 serial / parallel extension\n" ));
 	pia_config( machine, THOM_PIA_IO, &to7_io );
-	centronics_config( 0, &to7_centronics );
+	centronics_config( machine, 0, &to7_centronics );
 	serial_connection_init( &to7_io_line );
 	serial_connection_set_in_callback( &to7_io_line, to7_io_in_cb );
 }
@@ -2939,8 +2939,8 @@ static void to9_update_centronics ( running_machine *machine )
 	UINT8 a = pia_get_output_a( THOM_PIA_SYS );
 	UINT8 b = pia_get_output_b( THOM_PIA_SYS );
 	UINT8 data = (a & 0xfe) | (b & 1);
-	centronics_write_data( 0, data );
-	centronics_write_handshake( 0, (b & 2) ? CENTRONICS_STROBE : 0, CENTRONICS_STROBE );
+	centronics_write_data( machine, 0, data );
+	centronics_write_handshake( machine, 0, (b & 2) ? CENTRONICS_STROBE : 0, CENTRONICS_STROBE );
 
 	LOG_IO(( "$%04x %f to9_update_centronics: data=$%02X strobe=%i\n",
 		  cpu_get_previouspc( machine->cpu[0] ), attotime_to_double(timer_get_time(machine)), data,
@@ -3060,7 +3060,7 @@ MACHINE_START ( to9 )
 	/* subsystems */
 	thom_irq_init(machine);
 	pia_config( machine, THOM_PIA_SYS, &to9_sys );
-	centronics_config( 0, &to9_centronics );
+	centronics_config( machine, 0, &to9_centronics );
 	to7_game_init(machine);
 	to9_floppy_init( machine, mem + 0xe000, mem + 0x40000 );
 	to9_kbd_init(machine);
@@ -3913,7 +3913,7 @@ static READ8_DEVICE_HANDLER ( to8_timer_port_in )
 {
 	int lightpen = (input_port_read(device->machine, "lightpen_button") & 1) ? 2 : 0;
 	int cass = to7_get_cassette(device->machine) ? 0x80 : 0;
-	int dtr = (centronics_read_handshake( 0 ) & CENTRONICS_NOT_BUSY) ? 0 : 0x40;
+	int dtr = (centronics_read_handshake( device->machine, 0 ) & CENTRONICS_NOT_BUSY) ? 0 : 0x40;
 	int lock = to8_kbd_caps ? 0 : 8; /* undocumented! */
 	return lightpen | cass | dtr | lock;
 }
@@ -4027,7 +4027,7 @@ MACHINE_START ( to8 )
 	/* subsystems */
 	thom_irq_init(machine);
 	pia_config( machine, THOM_PIA_SYS, &to8_sys );
-	centronics_config( 0, &to9_centronics );
+	centronics_config( machine, 0, &to9_centronics );
 	to7_game_init(machine);
 	to8_floppy_init(machine);
 	to8_kbd_init(machine);
@@ -4103,7 +4103,7 @@ static READ8_DEVICE_HANDLER ( to9p_timer_port_in )
 {
 	int lightpen = (input_port_read(device->machine, "lightpen_button") & 1) ? 2 : 0;
 	int cass = to7_get_cassette(device->machine) ? 0x80 : 0;
-	int dtr = (centronics_read_handshake( 0 ) & CENTRONICS_NOT_BUSY) ? 0 : 0x40;
+	int dtr = (centronics_read_handshake( device->machine, 0 ) & CENTRONICS_NOT_BUSY) ? 0 : 0x40;
 	return lightpen | cass | dtr;
 }
 
@@ -4188,7 +4188,7 @@ MACHINE_START ( to9p )
 	/* subsystems */
 	thom_irq_init(machine);
 	pia_config( machine, THOM_PIA_SYS, &to9p_sys );
-	centronics_config( 0, &to9_centronics );
+	centronics_config( machine, 0, &to9_centronics );
 	to7_game_init(machine);
 	to8_floppy_init( machine );
 	to9_kbd_init(machine);
@@ -4398,14 +4398,14 @@ static WRITE8_HANDLER ( mo6_game_porta_out )
 {
 	/* centronics data */
 	LOG (( "$%04x %f mo6_game_porta_out: CENTRONICS set data=$%02X\n", cpu_get_previouspc( space->machine->cpu[0] ), attotime_to_double(timer_get_time(space->machine)), data ));
-	centronics_write_data( 0, data );
+	centronics_write_data( space->machine, 0, data );
 }
 
 
 
 static READ8_HANDLER ( mo6_game_cb1_in )
 {
-	int dtr = ( centronics_read_handshake( 0 ) & CENTRONICS_NOT_BUSY ) ? 0 : 1;
+	int dtr = ( centronics_read_handshake( space->machine, 0 ) & CENTRONICS_NOT_BUSY ) ? 0 : 1;
 	/* note: printer busy signal replaces button */
 	LOG (( "$%04x %f mo6_game_cb1_in: CENTRONICS get dtr=%i\n", cpu_get_previouspc( space->machine->cpu[0] ), attotime_to_double(timer_get_time(space->machine)), dtr ));
 	return dtr;
@@ -4417,7 +4417,7 @@ static WRITE8_HANDLER ( mo6_game_cb2_out )
 {
 	/* centronics strobe */
 	LOG (( "$%04x %f mo6_game_cb2_out: CENTRONICS set strobe=%i\n", cpu_get_previouspc( space->machine->cpu[0] ), attotime_to_double(timer_get_time(space->machine)), data ));
-	centronics_write_handshake( 0, data ? CENTRONICS_STROBE : 0, CENTRONICS_STROBE );
+	centronics_write_handshake( space->machine, 0, data ? CENTRONICS_STROBE : 0, CENTRONICS_STROBE );
 }
 
 
@@ -4772,7 +4772,7 @@ MACHINE_START ( mo6 )
 	/* subsystems */
 	thom_irq_init(machine);
 	pia_config( machine, THOM_PIA_SYS, &mo6_sys );
-	centronics_config( 0, &to9_centronics );
+	centronics_config( machine, 0, &to9_centronics );
 	mo6_game_init(machine);
 	to7_floppy_init( machine, mem + 0x30000 );
 	to9_palette_init(machine);
@@ -4866,11 +4866,11 @@ READ8_HANDLER ( mo5nr_prn_r )
 	{
 
 	case 1:
-		return centronics_read_data( 0 );
+		return centronics_read_data( space->machine, 0 );
 
 	case 3:
 		/* TODO: understand other bits */
-		if ( centronics_read_handshake( 0 ) & CENTRONICS_NOT_BUSY )
+		if ( centronics_read_handshake( space->machine, 0 ) & CENTRONICS_NOT_BUSY )
 			return 0;
 		else
 			return 0x80;
@@ -4889,12 +4889,12 @@ WRITE8_HANDLER ( mo5nr_prn_w )
 	{
 
 	case 1:
-		centronics_write_data( 0, data );
+		centronics_write_data( space->machine, 0, data );
 		break;
 
 	case 3:
 		/* TODO: understand other bits */
-		centronics_write_handshake( 0, ( data & 8 ) ? CENTRONICS_STROBE : 0, CENTRONICS_STROBE );
+		centronics_write_handshake( space->machine, 0, ( data & 8 ) ? CENTRONICS_STROBE : 0, CENTRONICS_STROBE );
 		break;
 
 	default:
@@ -5039,7 +5039,7 @@ MACHINE_START ( mo5nr )
 	/* subsystems */
 	thom_irq_init(machine);
 	pia_config( machine, THOM_PIA_SYS, &mo5nr_sys );
-	centronics_config( 0, &to9_centronics );
+	centronics_config( machine, 0, &to9_centronics );
 	mo5nr_game_init(machine);
 	to7_floppy_init( machine, mem + 0x30000 );
 	to9_palette_init(machine);

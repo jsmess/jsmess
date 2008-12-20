@@ -454,7 +454,7 @@ static TIMER_CALLBACK( super80_timer )
 	The most commonly used I/O range is DC-DE (DC = centronics, DD = serial data, DE = serial control
 	All the home-brew roms use this, except for super80e which uses BC-BE (which we don't support yet). */
 
-static void super80_printer_handshake_in(int number, int data, int mask)
+static void super80_printer_handshake_in(running_machine *machine,int number, int data, int mask)
 {
 	if (mask & CENTRONICS_ACKNOWLEDGE)
 	{
@@ -523,10 +523,10 @@ static WRITE8_HANDLER( super80v_11_w )
 static WRITE8_HANDLER( super80_dc_w )
 {
 	/* hardware strobe driven from port select, bit 7..0 = data */
-	centronics_write_handshake(0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
-	centronics_write_handshake(0, 1, CENTRONICS_STROBE);
-	centronics_write_data(0, data);
-	centronics_write_handshake(0, 0, CENTRONICS_STROBE);
+	centronics_write_handshake(space->machine, 0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
+	centronics_write_handshake(space->machine, 0, 1, CENTRONICS_STROBE);
+	centronics_write_data(space->machine, 0, data);
+	centronics_write_handshake(space->machine, 0, 0, CENTRONICS_STROBE);
 }
 
 static UINT8 last_data;
@@ -1000,9 +1000,9 @@ static TIMER_CALLBACK( super80_reset )
 static MACHINE_RESET( super80 )
 {
 	super80_z80pio = device_list_find_by_tag( machine->config->devicelist, Z80PIO, "z80pio" );
-	centronics_config(0, super80_cent_config);
+	centronics_config(machine,0, super80_cent_config);
 	/* assumption: select is tied low */
-	centronics_write_handshake(0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
+	centronics_write_handshake(machine,0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
 	timer_set(machine, ATTOTIME_IN_USEC(10), NULL, 0, super80_reset);
 	memory_set_bank(machine, 1, 1);
 }

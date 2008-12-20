@@ -309,7 +309,7 @@ static TIMER_CALLBACK(exidy_cassette_tc)
 	}
 }
 
-static void exidy_printer_handshake_in(int number, int data, int mask)
+static void exidy_printer_handshake_in(running_machine *machine,int number, int data, int mask)
 {
 	if (mask & CENTRONICS_ACKNOWLEDGE)
 	{
@@ -356,9 +356,9 @@ static MACHINE_RESET( exidyd )
 
 	exidy_ay31015 = device_list_find_by_tag( machine->config->devicelist, AY31015, "ay_3_1015" );
 
-	centronics_config(0, exidy_cent_config);
+	centronics_config(machine, 0, exidy_cent_config);
 	/* assumption: select is tied low */
-	centronics_write_handshake(0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
+	centronics_write_handshake(machine, 0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
 	exidy_fe_port_w(space, 0, 0);
 
 	timer_set(machine, ATTOTIME_IN_USEC(10), NULL, 0, exidy_reset);
@@ -513,17 +513,17 @@ static WRITE8_HANDLER(exidy_ff_port_w)
 
 		case 2: /* Centronics 7-bit printer */
 			/* bit 7 = strobe, bit 6..0 = data */
-			centronics_write_handshake(0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
-			centronics_write_handshake(0, (~data>>7) & 0x01, CENTRONICS_STROBE);
-			centronics_write_data(0, data & 0x7f);
+			centronics_write_handshake(space->machine, 0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
+			centronics_write_handshake(space->machine, 0, (~data>>7) & 0x01, CENTRONICS_STROBE);
+			centronics_write_data(space->machine, 0, data & 0x7f);
 			break;
 
 		case 4: /* 8-bit parallel output */
 			/* hardware strobe driven from port select, bit 7..0 = data */
-			centronics_write_handshake(0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
-			centronics_write_handshake(0, 1, CENTRONICS_STROBE);
-			centronics_write_data(0, data);
-			centronics_write_handshake(0, 0, CENTRONICS_STROBE);
+			centronics_write_handshake(space->machine, 0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
+			centronics_write_handshake(space->machine, 0, 1, CENTRONICS_STROBE);
+			centronics_write_data(space->machine, 0, data);
+			centronics_write_handshake(space->machine, 0, 0, CENTRONICS_STROBE);
 			break;
 	}
 }
