@@ -25,6 +25,7 @@
 
 extern const scc8530_interface mac_scc8530_interface;
 extern const via6522_interface mac_via6522_intf;
+extern const via6522_interface mac_via6522_2_intf;
 extern const via6522_interface mac_via6522_adb_intf;
 
 MACHINE_START( macscsi );
@@ -35,15 +36,19 @@ DRIVER_INIT(mac512ke);
 DRIVER_INIT(macplus);
 DRIVER_INIT(macse);
 DRIVER_INIT(macclassic);
+DRIVER_INIT(maclc);
 
 READ16_HANDLER ( mac_via_r );
 WRITE16_HANDLER ( mac_via_w );
+READ16_HANDLER ( mac_via2_r );
+WRITE16_HANDLER ( mac_via2_w );
 READ16_HANDLER ( mac_autovector_r );
 WRITE16_HANDLER ( mac_autovector_w );
 READ16_HANDLER ( mac_iwm_r );
 WRITE16_HANDLER ( mac_iwm_w );
 READ16_HANDLER ( mac_scc_r );
 WRITE16_HANDLER ( mac_scc_w );
+WRITE16_HANDLER ( mac_scc_2_w );
 READ16_HANDLER ( macplus_scsi_r );
 WRITE16_HANDLER ( macplus_scsi_w );
 NVRAM_HANDLER( mac );
