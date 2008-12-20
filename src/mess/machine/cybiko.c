@@ -456,7 +456,7 @@ static READ8_HANDLER( cybiko_io_reg_r )
 		}
 		break;
 		// serial dataflash
-		case H8S_IO_PORT3 : if (at45dbxx_pin_so()) data = data | H8S_P3_RXD1; break;
+		case H8S_IO_PORT3 : if (at45dbxx_pin_so(space->machine)) data = data | H8S_P3_RXD1; break;
 		// rs232
 		case H8S_IO_PORT5 : if (cybiko_rs232_pin_rxd()) data = data | H8S_P5_RXD2; break;
 		// real-time clock
@@ -489,9 +489,9 @@ static WRITE8_HANDLER( cybiko_io_reg_w )
 		// serial dataflash
 		case H8S_IO_P3DR :
 		{
-			at45dbxx_pin_cs ( (data & H8S_P3_SCK0) ? 0 : 1);
-			at45dbxx_pin_si ( (data & H8S_P3_TXD1) ? 1 : 0);
-			at45dbxx_pin_sck( (data & H8S_P3_SCK1) ? 1 : 0);
+			at45dbxx_pin_cs ( space->machine, (data & H8S_P3_SCK0) ? 0 : 1);
+			at45dbxx_pin_si ( space->machine, (data & H8S_P3_TXD1) ? 1 : 0);
+			at45dbxx_pin_sck( space->machine, (data & H8S_P3_SCK1) ? 1 : 0);
 		}
 		break;
 		// rs232

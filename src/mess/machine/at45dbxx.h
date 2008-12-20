@@ -26,10 +26,10 @@ enum
 void at45dbxx_init(running_machine *machine, int type);
 
 // pins
-void at45dbxx_pin_cs( int data);
-void at45dbxx_pin_sck( int data);
-void at45dbxx_pin_si( int data);
-int  at45dbxx_pin_so( void);
+void at45dbxx_pin_cs(running_machine *machine,  int data);
+void at45dbxx_pin_sck(running_machine *machine,  int data);
+void at45dbxx_pin_si(running_machine *machine,  int data);
+int  at45dbxx_pin_so(running_machine *machine);
 
 // load/save
 void at45dbxx_load(running_machine *machine, mame_file *file);

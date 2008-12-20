@@ -11,7 +11,6 @@
 */
 
 #include "at45dbxx.h"
-#include "deprecat.h"
 
 #define LOG_LEVEL  1
 #define _logerror(level,x)  do { if (LOG_LEVEL > level) logerror x; } while (0)
@@ -126,7 +125,7 @@ static void at45dbxx_state_save(running_machine *machine)
 	state_save_register_item(machine, name, NULL, 0, flash.pin.busy);
 }
 
-static UINT8 at45dbxx_read_byte( void)
+static UINT8 at45dbxx_read_byte( running_machine *machine)
 {
 	UINT8 data;
 	// check mode
@@ -138,14 +137,14 @@ static UINT8 at45dbxx_read_byte( void)
 	return data;
 }
 
-static void flash_set_io( UINT8* data, UINT32 size, UINT32 pos)
+static void flash_set_io( running_machine *machine, UINT8* data, UINT32 size, UINT32 pos)
 {
 	flash.io.data = data;
 	flash.io.size = size;
 	flash.io.pos  = pos;
 }
 
-static UINT32 flash_get_page_addr( void)
+static UINT32 flash_get_page_addr( running_machine *machine)
 {
 	switch (flash.devid)
 	{
@@ -156,7 +155,7 @@ static UINT32 flash_get_page_addr( void)
 	}
 }
 
-static UINT32 flash_get_byte_addr( void)
+static UINT32 flash_get_byte_addr( running_machine *machine)
 {
 	switch (flash.devid)
 	{
@@ -167,7 +166,7 @@ static UINT32 flash_get_byte_addr( void)
 	}
 }
 
-static void at45dbxx_write_byte( UINT8 data)
+static void at45dbxx_write_byte(running_machine *machine,  UINT8 data)
 {
 	// check mode
 	if (flash.mode != FLASH_MODE_SI) return;
@@ -190,7 +189,7 @@ static void at45dbxx_write_byte( UINT8 data)
 				{
 					_logerror( 1, ("at45dbxx opcode %02X - status register read\n", opcode));
 					flash.status = (flash.status & 0xC7) | flash.devid; // 80 = busy / 40 = compare fail
-					flash_set_io( &flash.status, 1, 0);
+					flash_set_io( machine, &flash.status, 1, 0);
 					flash.mode = FLASH_MODE_SO;
 					flash.cmd.size = 8;
 				}
@@ -204,7 +203,7 @@ static void at45dbxx_write_byte( UINT8 data)
 				{
 					UINT32 page;
 					UINT8 comp;
-					page = flash_get_page_addr();
+					page = flash_get_page_addr(machine);
 					_logerror( 1, ("at45dbxx opcode %02X - main memory page to buffer 1 compare [%04X]\n", opcode, page));
 					comp = memcmp( flash.data + page * flash.page_size, flash.buffer1, flash.page_size) == 0 ? 0 : 1;
 					if (comp) flash.status |= 0x40; else flash.status &= ~0x40;
@@ -221,10 +220,10 @@ static void at45dbxx_write_byte( UINT8 data)
 				if (flash.cmd.size == 8)
 				{
 					UINT32 page, byte;
-					page = flash_get_page_addr();
-					byte = flash_get_byte_addr();
+					page = flash_get_page_addr(machine);
+					byte = flash_get_byte_addr(machine);
 					_logerror( 1, ("at45dbxx opcode %02X - main memory page read [%04X/%04X]\n", opcode, page, byte));
-					flash_set_io( flash.data + page * flash.page_size, flash.page_size, byte);
+					flash_set_io( machine, flash.data + page * flash.page_size, flash.page_size, byte);
 					flash.mode = FLASH_MODE_SO;
 					flash.cmd.size = 8;
 				}
@@ -237,10 +236,10 @@ static void at45dbxx_write_byte( UINT8 data)
 				if (flash.cmd.size == 4)
 				{
 					UINT32 page, byte;
-					page = flash_get_page_addr();
-					byte = flash_get_byte_addr();
+					page = flash_get_page_addr(machine);
+					byte = flash_get_byte_addr(machine);
 					_logerror( 1, ("at45dbxx opcode %02X - main memory page program through buffer 1 [%04X/%04X]\n",opcode, page, byte));
-					flash_set_io( flash.buffer1, flash.page_size, byte);
+					flash_set_io( machine, flash.buffer1, flash.page_size, byte);
 					memset( flash.buffer1, 0xFF, flash.page_size);
 					flash.mode = FLASH_MODE_SI;
 					flash.cmd.size = 8;
@@ -267,19 +266,19 @@ static void at45dbxx_write_byte( UINT8 data)
 	}
 }
 
-int at45dbxx_pin_so( void)
+int at45dbxx_pin_so( running_machine *machine)
 {
 	if (flash.pin.cs == 0) return 0;
 	return flash.pin.so;
 }
 
-void at45dbxx_pin_si( int data)
+void at45dbxx_pin_si(running_machine *machine,  int data)
 {
 	if (flash.pin.cs == 0) return;
 	flash.pin.si = data;
 }
 
-void at45dbxx_pin_cs( int data)
+void at45dbxx_pin_cs(running_machine *machine,  int data)
 {
 	// check if changed
 	if (flash.pin.cs == data) return;
@@ -290,19 +289,19 @@ void at45dbxx_pin_cs( int data)
 		if ((flash.cmd.size >= 4) && (flash.cmd.data[0] == FLASH_CMD_82))
 		{
 			UINT32 page, byte;
-			page = flash_get_page_addr();
-			byte = flash_get_byte_addr();
+			page = flash_get_page_addr(machine);
+			byte = flash_get_byte_addr(machine);
 			_logerror( 1, ("at45dbxx - program data stored in buffer 1 into selected page in main memory [%04X/%04X]\n", page, byte));
 			memcpy( flash.data + page * flash.page_size, flash.buffer1, flash.page_size);
 		}
 		// reset
-		at45dbxx_reset(Machine);
+		at45dbxx_reset(machine);
 	}
 	// save cs
 	flash.pin.cs = data;
 }
 
-void at45dbxx_pin_sck( int data)
+void at45dbxx_pin_sck(running_machine *machine,  int data)
 {
 	// check if changed
 	if (flash.pin.sck == data) return;
@@ -313,7 +312,7 @@ void at45dbxx_pin_sck( int data)
 		if (flash.so_bits == 8)
 		{
 			flash.so_bits = 0;
-			flash.so_byte = at45dbxx_read_byte();
+			flash.so_byte = at45dbxx_read_byte(machine);
 		}
 		// input
 		if (flash.pin.si) flash.si_byte = flash.si_byte | (1 << flash.si_bits);
@@ -321,7 +320,7 @@ void at45dbxx_pin_sck( int data)
 		if (flash.si_bits == 8)
 		{
 			flash.si_bits = 0;
-			at45dbxx_write_byte( flash.si_byte);
+			at45dbxx_write_byte( machine, flash.si_byte);
 			flash.si_byte = 0;
 		}
 		// output (part 2)
