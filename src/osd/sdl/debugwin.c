@@ -458,31 +458,16 @@ static void memorywin_new(running_machine *machine)
 
 	debug_view_begin_update(mem->memory);
 	memory_view_set_expression(mem->memory, "0");
-//	debug_view_set_property_UINT32(mem->memory, DVP_MEM_TRACK_LIVE, 1);
 	debug_view_end_update(mem->memory);
-
 
 	// populate the combobox
 	if (!memorycombo)
 	{
-		memorycombo_item **tail = &memorycombo;
-
 		cursel = item = 0;
 
 		for (subview = memory_view_get_subview_list(mem->memory); subview != NULL; subview = subview->next)
 		{
-			memorycombo_item *ci = malloc_or_die(sizeof(*ci));
-			memset(ci, 0, sizeof(*ci));
-			ci->machine = machine;
-			ci->prefsize = 4;
-			ci->subview = subview;
-			ci->device = curcpu;
-
-			strncpy(ci->name, subview->name, sizeof(ci->name));
-		
-			*tail = ci;
-			tail = &ci->next;
-
+			gtk_combo_box_append_text(mem->zone_w, subview->name);
 			if (cursel == 0 && subview->space != NULL && subview->space->cpu == curcpu)
 				cursel = item;
 
