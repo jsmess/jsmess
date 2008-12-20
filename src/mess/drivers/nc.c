@@ -1218,13 +1218,13 @@ INPUT_PORTS_END
 /* to be completed! */
 
 #if 0
-void nc150_init_machine(void)
+void nc150_init_machine(running_machine *machine)
 {
         nc_membank_internal_ram_mask = 7;
 
         nc_membank_card_ram_mask = 0x03f;
 
-        nc_common_init_machine(Machine);
+        nc_common_init_machine(machine);
 }
 #endif
 
