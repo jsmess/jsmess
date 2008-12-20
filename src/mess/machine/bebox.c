@@ -852,9 +852,9 @@ WRITE64_HANDLER( bebox_flash_w )
  *
  *************************************/
 
-static void bebox_keyboard_interrupt(int state)
+static void bebox_keyboard_interrupt(running_machine *machine,int state)
 {
-	bebox_set_irq_bit(Machine, 16, state);
+	bebox_set_irq_bit(machine, 16, state);
 	if ( bebox_devices.pic8259_master ) {
 		pic8259_set_irq_line( bebox_devices.pic8259_master, 1, state);
 	}
