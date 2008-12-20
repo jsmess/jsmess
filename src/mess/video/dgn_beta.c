@@ -151,7 +151,7 @@ static int MaxY	= 0x0000;
 static int VidAddr		= 0;	// Last address reg written
 
 static void beta_Set_RA(int offset, int data);
-static void beta_Set_HSync(int offset, int data);
+static void beta_Set_HSync(running_machine *machine, int offset, int data);
 static void beta_Set_VSync(int offset, int data);
 static void beta_Set_DE(int offset, int data);
 
@@ -240,7 +240,7 @@ static void beta_Set_RA(int offset, int data)
 }
 
 // called when the 6845 changes the HSync
-static void beta_Set_HSync(int offset, int data)
+static void beta_Set_HSync(running_machine *machine, int offset, int data)
 {
 	int Dots; 	/* Pixels per 16 bits */
 
@@ -644,7 +644,7 @@ VIDEO_UPDATE( dgnbeta )
 	while((beta_VSync)&&(c<ClkMax))
 	{
 		// Clock the 6845
-		m6845_clock();
+		m6845_clock(screen->machine);
 		c++;
 	}
 
@@ -654,7 +654,7 @@ VIDEO_UPDATE( dgnbeta )
 	{
 		while ((beta_HSync)&&(c<ClkMax))
 		{
-			m6845_clock();
+			m6845_clock(screen->machine);
 			c++;
 		}
 
@@ -680,7 +680,7 @@ VIDEO_UPDATE( dgnbeta )
 				beta_scr_x+=8;
 
 			// Clock the 6845
-			m6845_clock();
+			m6845_clock(screen->machine);
 			c++;
 		}
 	}

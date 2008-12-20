@@ -8,7 +8,6 @@
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "devices/snapquik.h"
 #include "includes/amstrad.h"
 
@@ -873,10 +872,10 @@ static void aleste_draw_screen_enabled_mode_3(void)
 
 
 /* execute crtc_execute_cycles of crtc */
-void amstrad_vh_execute_crtc_cycles(int dummy)
+void amstrad_vh_execute_crtc_cycles(running_machine *machine, int dummy)
 {
 	int scrwidth = AMSTRAD_SCREEN_WIDTH;
-	m6845_clock(); // Clock the 6845
+	m6845_clock(machine); // Clock the 6845
 	if(aleste_mode & 0x02)
 	{
 //		scrwidth = ALESTE_SCREEN_WIDTH;
@@ -1128,10 +1127,8 @@ static void amstrad_Set_DE(int offset, int data)
 }
 
 /* CRTC - Set new Horizontal Sync Status */
-static void amstrad_Set_HS(int offset, int data)
+static void amstrad_Set_HS(running_machine *machine, int offset, int data)
 {
-	running_machine *machine = Machine;
-
 	if (data != 0)
 	{
 		amstrad_render_mode = amstrad_current_mode;

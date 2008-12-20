@@ -395,7 +395,7 @@ void m6845_frameclock(void)
 }
 
 /* clock the 6845 */
-void m6845_clock(void)
+void m6845_clock(running_machine *machine)
 {
 	/* KT - I think the compiler might generate shit code when using "%" operator! */
 	/*crtc.Memory_Address=(crtc.Memory_Address+1)%0x4000;*/
@@ -568,7 +568,7 @@ void m6845_clock(void)
                 if (crtc.horizontal_sync_width!=0)
                 {
                         crtc.HSYNC=True;
-                        if (crct6845_calls.out_HS_func) (crct6845_calls.out_HS_func)(0,crtc.HSYNC); /* call HS update */
+                        if (crct6845_calls.out_HS_func) (crct6845_calls.out_HS_func)(machine, 0,crtc.HSYNC); /* call HS update */
                 }
         }
 
@@ -580,7 +580,7 @@ void m6845_clock(void)
 
                         crtc.Horizontal_Sync_Width_Counter=0;
                         crtc.HSYNC=False;
-                        if (crct6845_calls.out_HS_func) (crct6845_calls.out_HS_func)(0,crtc.HSYNC); /* call HS update */
+                        if (crct6845_calls.out_HS_func) (crct6845_calls.out_HS_func)(machine, 0,crtc.HSYNC); /* call HS update */
                 }
         }
 	if (crct6845_calls.out_MA_func) (crct6845_calls.out_MA_func)(0,crtc.Memory_Address);	/* call MA update */

@@ -1996,15 +1996,15 @@ static const UINT8 amstrad_cycle_table_ex[256]=
 
 #ifdef UNUSED_FUNCTION
 /* every 2us let's the crtc do the job !*/
-static void amstrad_update_video_1(int dummy)
+static void amstrad_update_video_1(running_machine *machine, int dummy)
 {
-	amstrad_vh_execute_crtc_cycles(2);
+	amstrad_vh_execute_crtc_cycles(machine, 2);
 }
 #endif
 
 static TIMER_CALLBACK(amstrad_vh_execute_crtc_cycles_callback)
 {
-	amstrad_vh_execute_crtc_cycles(param);
+	amstrad_vh_execute_crtc_cycles(machine, param);
 }
 
 static void amstrad_common_init(running_machine *machine)
@@ -2058,7 +2058,6 @@ static void amstrad_common_init(running_machine *machine)
 The CRTC generates a memory address using it's MA and RA signal outputs
 The Gate-Array fetches two bytes for each address*/
 
-//  timer_pulse(machine, ATTOTIME_IN_USEC(AMSTRAD_US_PER_SCANLINE), NULL, 0, amstrad_vh_execute_crtc_cycles);
 	timer_pulse(machine, ATTOTIME_IN_USEC(1), NULL, 0, amstrad_vh_execute_crtc_cycles_callback);
 
 	/* The opcode timing in the Amstrad is different to the opcode

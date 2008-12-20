@@ -23,7 +23,7 @@ struct m6845_interface
 {
 	void (*out_MA_func)(int offset, int data);
 	void (*out_RA_func)(int offset, int data);
-	void (*out_HS_func)(int offset, int data);
+	void (*out_HS_func)(running_machine *machine, int offset, int data);
 	void (*out_VS_func)(int offset, int data);
 	void (*out_DE_func)(int offset, int data);
 	void (*out_CR_func)(int offset, int data);
@@ -97,7 +97,7 @@ void m6845_register_w(int offset, int data);
 
 
 /* clock the 6845 */
-void m6845_clock(void);
+void m6845_clock(running_machine *machine);
 
 /* called every frame to advance the cursor count */
 void m6845_frameclock(void);

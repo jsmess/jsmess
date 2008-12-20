@@ -98,7 +98,7 @@ This gives a total of 19968 NOPs per frame. */
 
 extern VIDEO_START( amstrad );
 extern VIDEO_UPDATE( amstrad );
-void amstrad_vh_execute_crtc_cycles(int);
+void amstrad_vh_execute_crtc_cycles(running_machine*, int);
 void amstrad_vh_update_colour(int, int);
 void amstrad_vh_update_mode(int);
 

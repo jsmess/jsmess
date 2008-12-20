@@ -460,7 +460,7 @@ static void BBC_Set_Character_Row(int offset, int data)
 }
 
 // called when the 6845 changes the HSync
-static void BBC_Set_HSync(int offset, int data)
+static void BBC_Set_HSync(running_machine *machine, int offset, int data)
 {
 	// catch the falling edge
 	if((!data)&&(BBC_HSync))
@@ -621,7 +621,7 @@ VIDEO_UPDATE( bbc )
 	while((BBC_VSync)&&(c<60000))
 	{
 		// Clock the 6845
-		m6845_clock();
+		m6845_clock(screen->machine);
 		c++;
 	}
 
@@ -636,7 +636,7 @@ VIDEO_UPDATE( bbc )
 		if (VideoULA_CR) BBC_Clock_CR();
 
 		// Clock the 6845
-		m6845_clock();
+		m6845_clock(screen->machine);
 		c++;
 	}
 

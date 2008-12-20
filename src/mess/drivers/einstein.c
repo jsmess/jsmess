@@ -192,7 +192,7 @@ static int Einstein_scr_y = 0;
 //
 //
 //// called when the 6845 changes the HSync
-//static void Einstein_Set_HSync(int offset, int data)
+//static void Einstein_Set_HSync(running_machine *machine, int offset, int data)
 //{
 //  Einstein_HSync=data;
 //  if(!Einstein_HSync)
@@ -1673,7 +1673,7 @@ static const ay8910_interface einstein_ay_interface =
 //  while((Einstein_VSync)&&(c<33274))
 //  {
 //      // Clock the 6845
-//      m6845_clock();
+//      m6845_clock(screen->machine);
 //      c++;
 //  }
 //
@@ -1683,7 +1683,7 @@ static const ay8910_interface einstein_ay_interface =
 //  {
 //      while ((Einstein_HSync)&&(c<33274))
 //      {
-//          m6845_clock();
+//          m6845_clock(screen->machine);
 //          c++;
 //      }
 //      // Do all the clever split mode changes in here before the next while loop
@@ -1699,7 +1699,7 @@ static const ay8910_interface einstein_ay_interface =
 //          Einstein_scr_x+=8;
 //
 //          // Clock the 6845
-//          m6845_clock();
+//          m6845_clock(screen->machine);
 //          c++;
 //      }
 //  }
