@@ -959,6 +959,8 @@ static MACHINE_DRIVER_START( coco3 )
 
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
+	
+	MDRV_WD1773_ADD("wd1773", coco_wd17xx_interface )	
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco3p )
