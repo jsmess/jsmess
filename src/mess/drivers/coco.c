@@ -610,11 +610,6 @@ static const bitbanger_config coco_bitbanger_config =
 	0
 };
 
-static MACHINE_DRIVER_START( coco_bitbanger )
-	MDRV_DEVICE_ADD("bitbanger", BITBANGER)
-	MDRV_DEVICE_CONFIG(coco_bitbanger_config)
-MACHINE_DRIVER_END
-
 /* ----------------------------------------------------------------------- */
 
 /* AY-8912 for Dragon Alpha, the AY-8912 simply an AY-8910 with only one io port. */
@@ -833,7 +828,7 @@ static MACHINE_DRIVER_START( coco )
 	MDRV_IMPORT_FROM( coco_sound )
 
 	/* bitbanger/printer */
-	MDRV_IMPORT_FROM( coco_bitbanger )
+	MDRV_BITBANGER_ADD("bitbanger", coco_bitbanger_config)
 
 	/* snapshot/quickload */
 	MDRV_SNAPSHOT_ADD(coco_pak, "pak", 0)
@@ -868,7 +863,7 @@ static MACHINE_DRIVER_START( coco2 )
 	MDRV_IMPORT_FROM( coco_sound )
 
 	/* bitbanger/printer */
-	MDRV_IMPORT_FROM( coco_bitbanger )
+	MDRV_BITBANGER_ADD("bitbanger", coco_bitbanger_config)
 
 	/* snapshot/quickload */
 	MDRV_SNAPSHOT_ADD(coco_pak, "pak", 0)
@@ -903,7 +898,7 @@ static MACHINE_DRIVER_START( coco2b )
 	MDRV_IMPORT_FROM( coco_sound )
 
 	/* bitbanger/printer */
-	MDRV_IMPORT_FROM( coco_bitbanger )
+	MDRV_BITBANGER_ADD("bitbanger", coco_bitbanger_config)
 
 	/* snapshot/quickload */
 	MDRV_SNAPSHOT_ADD(coco_pak, "pak", 0)
@@ -947,7 +942,7 @@ static MACHINE_DRIVER_START( coco3 )
 	MDRV_IMPORT_FROM( coco_sound )
 
 	/* bitbanger/printer */
-	MDRV_IMPORT_FROM( coco_bitbanger )
+	MDRV_BITBANGER_ADD("bitbanger", coco_bitbanger_config)
 
 	/* snapshot/quickload */
 	MDRV_SNAPSHOT_ADD(coco3_pak, "pak", 0)

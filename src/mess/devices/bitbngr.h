@@ -19,6 +19,9 @@
 
 #define BITBANGER	DEVICE_GET_INFO_NAME(bitbanger)
 
+#define MDRV_BITBANGER_ADD(_tag, _intrf) \
+	MDRV_DEVICE_ADD(_tag, BITBANGER) \
+	MDRV_DEVICE_CONFIG(_intrf)
 
 
 /***************************************************************************
