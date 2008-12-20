@@ -384,6 +384,8 @@ static MACHINE_DRIVER_START( svi328_806 )
 	MDRV_PRINTER_ADD("printer")
 
 	MDRV_CASSETTE_ADD( "cassette", svi318_cassette_config )
+	
+	MDRV_WD179X_ADD("wd179x", svi_wd17xx_interface )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( svi328n_806 )
