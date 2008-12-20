@@ -25,6 +25,8 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/spc700/spc700.h"
+#include "cpu/g65816/g65816.h"
 #include "deprecat.h"
 #include "includes/snes.h"
 #include "machine/snescart.h"

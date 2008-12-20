@@ -64,6 +64,7 @@ Notes:
 */
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "includes/sg1000.h"
 #include "devices/basicdsk.h"
 #include "devices/cartslot.h"

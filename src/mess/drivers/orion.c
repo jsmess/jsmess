@@ -9,6 +9,7 @@
 
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/8255ppi.h"
 #include "machine/mc146818.h"

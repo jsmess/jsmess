@@ -14,6 +14,7 @@ todo for apf m1000:
 
  ******************************************************************************/
 #include "driver.h"
+#include "cpu/m6800/m6800.h"
 #include "video/m6847.h"
 #include "includes/apf.h"
 

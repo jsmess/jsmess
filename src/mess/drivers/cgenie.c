@@ -27,6 +27,7 @@ NMI
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "includes/cgenie.h"
 #include "devices/basicdsk.h"
 #include "devices/cartslot.h"

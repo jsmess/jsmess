@@ -275,6 +275,7 @@ PCB Layouts missing
 */
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "machine/8255ppi.h"
 #include "machine/tc8521.h"

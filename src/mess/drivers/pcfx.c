@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/v810/v810.h"
 #include "video/vdc.h"
 
 static ADDRESS_MAP_START( pcfx_mem, ADDRESS_SPACE_PROGRAM, 32 )

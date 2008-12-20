@@ -23,6 +23,7 @@ Missing:
 ******************************************************************************/
 
 #include "driver.h"
+#include "cpu/m6502/m6502.h"
 #include "includes/electron.h"
 #include "devices/cassette.h"
 #include "formats/uef_cas.h"

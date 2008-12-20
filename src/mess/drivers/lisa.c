@@ -9,6 +9,8 @@
 *********************************************************************/
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
+#include "cpu/m6502/m6502.h"
 #include "includes/lisa.h"
 #include "devices/sonydriv.h"
 #include "machine/applefdc.h"

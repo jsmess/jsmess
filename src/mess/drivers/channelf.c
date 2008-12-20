@@ -9,6 +9,7 @@
  ******************************************************************/
 
 #include "driver.h"
+#include "cpu/f8/f8.h"
 #include "sound/custom.h"
 #include "includes/channelf.h"
 #include "devices/cartslot.h"

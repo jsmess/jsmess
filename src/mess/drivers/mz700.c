@@ -65,6 +65,7 @@
 
 /* Core includes */
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "machine/8255ppi.h"
 #include "includes/mz700.h"
 #include "machine/pit8253.h"

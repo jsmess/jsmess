@@ -177,6 +177,7 @@ Notes:
 */
 
 #include "driver.h"
+#include "cpu/m6502/m6502.h"
 #include "includes/osi.h"
 #include "machine/6850acia.h"
 #include "machine/6821pia.h"

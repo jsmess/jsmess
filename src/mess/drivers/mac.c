@@ -38,6 +38,7 @@
 ****************************************************************************/
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "includes/mac.h"
 #include "machine/6522via.h"
 #include "machine/ncr5380.h"

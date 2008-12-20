@@ -32,6 +32,7 @@
  ******************************************************************************/
 
 #include "driver.h"
+//#include "cpu/i86/i86.h"
 #include "machine/8255ppi.h"
 #include "includes/compis.h"
 #include "video/i82720.h"

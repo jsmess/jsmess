@@ -61,6 +61,7 @@ DC00      - Selection buttons #2, 9-16 (R)
  ******************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
 #include "sound/2413intf.h"
 #include "includes/sms.h"

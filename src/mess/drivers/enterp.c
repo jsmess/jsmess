@@ -16,6 +16,7 @@
  ******************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "audio/dave.h"
 #include "includes/enterp.h"
 #include "video/epnick.h"

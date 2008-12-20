@@ -80,6 +80,7 @@ change from 1 to 0.
 ******************************************************************************/
 
 #include "driver.h"
+#include "cpu/m6502/m6502.h"
 #include "machine/6530miot.h"
 #include "devices/cassette.h"
 #include "formats/kim1_cas.h"

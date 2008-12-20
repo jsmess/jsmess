@@ -96,6 +96,7 @@ Keyboard: Full-sized 102 key QWERTY (19 key numeric keypad!; 4 direction
 
 
 #include "driver.h"
+//#include "cpu/i86/i86.h"
 #include "cpu/m6502/m6509.h"
 #include "sound/sid6581.h"
 #include "machine/6526cia.h"

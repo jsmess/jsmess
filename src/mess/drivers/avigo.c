@@ -39,6 +39,7 @@
  ******************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "includes/avigo.h"
 #include "machine/intelfsh.h"
 #include "machine/tc8521.h"

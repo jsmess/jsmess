@@ -7,6 +7,7 @@
 */
 
 #include "driver.h"
+#include "cpu/rsp/rsp.h"
 #include "cpu/mips/mips3.h"
 #include "sound/custom.h"
 #include "devices/cartslot.h"

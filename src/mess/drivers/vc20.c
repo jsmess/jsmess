@@ -83,6 +83,7 @@ interface; no special expansion modules like ieee488 interface
 
 
 #include "driver.h"
+#include "cpu/m6502/m6502.h"
 
 #include "machine/6522via.h"
 #include "includes/vc1541.h"

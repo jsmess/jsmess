@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "cpu/cop400/cop400.h"
 #include "machine/nec765.h"

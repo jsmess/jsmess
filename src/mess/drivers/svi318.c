@@ -10,6 +10,7 @@
 */
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "video/mc6845.h"
 #include "includes/svi318.h"
 #include "video/tms9928a.h"

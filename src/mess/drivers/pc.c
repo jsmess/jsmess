@@ -97,6 +97,8 @@ TODO: Which clock signals are available in a PC Jr?
 
 
 #include "driver.h"
+//#include "cpu/nec/nec.h"
+//#include "cpu/i86/i86.h"
 #include "deprecat.h"
 
 #include "machine/8255ppi.h"

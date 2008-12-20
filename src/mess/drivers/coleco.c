@@ -63,6 +63,7 @@
 */
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
 #include "video/tms9928a.h"
 #include "devices/cartslot.h"

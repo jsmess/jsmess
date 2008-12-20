@@ -38,6 +38,7 @@
 */
 
 #include "driver.h"
+#include "cpu/mcs51/mcs51.h"
 #include "includes/ql.h"
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/m68000/m68000.h"

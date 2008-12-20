@@ -27,6 +27,7 @@
 ******************************************************************************/
 
 #include "driver.h"
+#include "cpu/m6800/m6800.h"
 #include "devices/cartslot.h"
 #include "includes/mekd2.h"
 

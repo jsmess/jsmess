@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "cpu/m6805/m6805.h"
 
 typedef struct _comxpl80_state comxpl80_state;
 struct _comxpl80_state

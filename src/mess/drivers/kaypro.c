@@ -10,6 +10,7 @@
  ******************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "includes/kaypro.h"
 
 #include "machine/wd17xx.h"

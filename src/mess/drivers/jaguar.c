@@ -43,6 +43,7 @@
 
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "cpu/mips/r3000.h"
 #include "cpu/jaguar/jaguar.h"
 #include "includes/jaguar.h"

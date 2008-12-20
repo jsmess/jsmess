@@ -29,6 +29,7 @@
 */
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "includes/concept.h"
 #include "devices/mflopimg.h"
 #include "formats/basicdsk.h"

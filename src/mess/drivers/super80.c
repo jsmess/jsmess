@@ -1,6 +1,7 @@
 /* Super80.c written by Robbbert, 2005-2008. See the MESS wiki for documentation. */
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "machine/z80pio.h"
 #include "cpu/z80/z80daisy.h"
 #include "devices/snapquik.h"

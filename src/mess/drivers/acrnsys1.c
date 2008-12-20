@@ -10,6 +10,7 @@
 
 /* Core includes */
 #include "driver.h"
+#include "cpu/m6502/m6502.h"
 
 /* Components */
 #include "machine/ins8154.h"

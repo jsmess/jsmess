@@ -11,6 +11,8 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/m6809/m6809.h"
+#include "cpu/hd6309/hd6309.h"
 #include "machine/6821pia.h"
 #include "video/m6847.h"
 #include "machine/msm6242.h"

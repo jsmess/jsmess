@@ -381,6 +381,8 @@ normal keyboards?
 
 
 #include "driver.h"
+#include "cpu/m6809/m6809.h"
+#include "cpu/m6502/m6502.h"
 
 #include "machine/6821pia.h"
 #include "machine/6522via.h"

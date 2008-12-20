@@ -18,6 +18,7 @@ would commence ($C00000).
 
 /* Core includes */
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "deprecat.h"
 #include "includes/amiga.h"
 

@@ -5,6 +5,8 @@
 ***************************************************************************/
 
 #include "driver.h"
+//#include "cpu/i86/i286.h"
+#include "cpu/i386/i386.h"
 #include "sound/3812intf.h"
 #include "machine/8255ppi.h"
 #include "machine/ins8250.h"

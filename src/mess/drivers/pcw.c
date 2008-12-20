@@ -93,6 +93,7 @@
   - emulation of other hardware...?
  ******************************************************************************/
 #include "driver.h"
+#include "cpu/z80/z80.h"
 // nec765 interface
 #include "machine/nec765.h"
 #include "devices/dsk.h"

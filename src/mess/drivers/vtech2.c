@@ -64,6 +64,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "includes/vtech2.h"
 #include "devices/cartslot.h"
 #include "devices/cassette.h"

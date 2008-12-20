@@ -14,6 +14,7 @@
  ******************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "includes/z88.h"
 #include "sound/speaker.h"
 
