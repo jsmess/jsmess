@@ -197,8 +197,8 @@ static struct {
 
 	int (*dma_read)(running_machine *, int);
 	int (*dma_read_color)(running_machine *, int);
-	void (*interrupt) (int);
-	void (*port_changed)(int);
+	void (*interrupt) (running_machine *, int);
+	void (*port_changed)(running_machine *, int);
 
 	int lines;
 
@@ -265,7 +265,7 @@ static void vic2_drawlines (running_machine *machine, int first, int last, int s
 
 void vic6567_init (int chip_vic2e, int pal,
 				   int (*dma_read) (running_machine *, int), int (*dma_read_color) (running_machine *, int),
-				   void (*irq) (int))
+				   void (*irq) (running_machine *, int))
 {
 	memset(&vic2, 0, sizeof(vic2));
 
@@ -316,7 +316,7 @@ static void vic2_set_interrupt(running_machine *machine, int mask)
 		{
 			DBG_LOG (2, "vic2", ("irq start %.2x\n", mask));
 			vic2.reg[0x19] |= 0x80;
-			vic2.interrupt (1);
+			vic2.interrupt (machine, 1);
 		}
 	}
 	vic2.reg[0x19] |= mask;
@@ -329,7 +329,7 @@ static void vic2_clear_interrupt (running_machine *machine, int mask)
 	{
 		DBG_LOG (2, "vic2", ("irq end %.2x\n", mask));
 		vic2.reg[0x19] &= ~0x80;
-		vic2.interrupt (0);
+		vic2.interrupt (machine, 0);
 	}
 }
 

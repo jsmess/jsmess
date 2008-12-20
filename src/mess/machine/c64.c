@@ -352,13 +352,13 @@ static void c64_cia0_interrupt (const device_config *device, int level)
 	c64_irq (device->machine, level || vicirq);
 }
 
-void c64_vic_interrupt (int level)
+void c64_vic_interrupt (running_machine *machine, int level)
 {
-	const device_config *cia_0 = device_list_find_by_tag(Machine->config->devicelist, CIA6526R1, "cia_0");
+	const device_config *cia_0 = device_list_find_by_tag(machine->config->devicelist, CIA6526R1, "cia_0");
 #if 1
 	if (level != vicirq)
 	{
-		c64_irq (Machine, level || cia_get_irq(cia_0));
+		c64_irq (machine, level || cia_get_irq(cia_0));
 		vicirq = level;
 	}
 #endif

@@ -47,8 +47,8 @@ WRITE8_HANDLER( vic3_palette_w )
 }
 
 void vic4567_init(running_machine *machine, int pal, int (*dma_read)(running_machine *, int),
-						  int (*dma_read_color)(running_machine *, int), void (*irq) (int),
-						  void (*param_port_changed)(int))
+						  int (*dma_read_color)(running_machine *, int), void (*irq) (running_machine *, int),
+						  void (*param_port_changed)(running_machine *, int))
 {
 	memset(&vic2, 0, sizeof(vic2));
 
@@ -90,7 +90,7 @@ WRITE8_HANDLER ( vic3_port_w )
 		if (vic2.port_changed!=NULL) {
 			DBG_LOG (2, "vic write", ("%.2x:%.2x\n", offset, data));
 			vic2.reg[offset] = data;
-			vic2.port_changed(data);
+			vic2.port_changed(machine, data);
 		}
 		break;
 	case 0x31:

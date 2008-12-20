@@ -6,7 +6,6 @@
  ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 
 #include "cpu/m6502/m6502.h"
 #include "sound/sid6581.h"
@@ -594,10 +593,9 @@ static int c65_io_on=0, c65_io_dc00_on=0;
 /* bit 1 external sync enable (genlock)
    bit 2 palette enable
    bit 6 vic3 c65 character set */
-static void c65_bankswitch_interface(int value)
+static void c65_bankswitch_interface(running_machine *machine, int value)
 {
 	static int old=0;
-	running_machine *machine = Machine;
 	read8_space_func rh;
 	write8_space_func wh;
 
@@ -844,6 +842,6 @@ MACHINE_START( c65 )
 
 	c64mode = 0;
 
-	c65_bankswitch_interface(0xff);
+	c65_bankswitch_interface(machine, 0xff);
 	c65_bankswitch (machine);
 }

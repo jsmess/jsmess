@@ -13,8 +13,8 @@
 extern const unsigned char vic3_palette[0x100 * 3];
 
 extern void vic4567_init (running_machine *machine, int pal, int (*dma_read)(running_machine *, int),
-						  int (*dma_read_color)(running_machine *, int), void (*irq)(int),
-						  void (*param_port_changed)(int));
+						  int (*dma_read_color)(running_machine *, int), void (*irq)(running_machine *, int),
+						  void (*param_port_changed)(running_machine *, int));
 
 extern INTERRUPT_GEN( vic3_raster_irq );
 
