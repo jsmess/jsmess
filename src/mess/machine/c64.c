@@ -27,7 +27,6 @@
 #include "machine/6526cia.h"
 #include "video/vic6567.h"
 #include "video/vdc8563.h"
-#include "deprecat.h"
 
 #include "includes/cbm.h"
 #include "includes/cbmserb.h"
@@ -861,40 +860,40 @@ UINT8 c64_m6510_port_read(const device_config *device, UINT8 direction)
 }
 
 
-int c64_paddle_read (int which)
+int c64_paddle_read (running_machine *machine, int which)
 {
 	int pot1 = 0xff, pot2 = 0xff, pot3 = 0xff, pot4 = 0xff, temp;
-	UINT8 cia0porta = cia_get_output_a(device_list_find_by_tag(Machine->config->devicelist, CIA6526R1, "cia_0"));
-	int controller1 = input_port_read(Machine, "CTRLSEL") & 0x07;
-	int controller2 = input_port_read(Machine, "CTRLSEL") & 0x70;
+	UINT8 cia0porta = cia_get_output_a(device_list_find_by_tag(machine->config->devicelist, CIA6526R1, "cia_0"));
+	int controller1 = input_port_read(machine, "CTRLSEL") & 0x07;
+	int controller2 = input_port_read(machine, "CTRLSEL") & 0x70;
 
 	/* Notice that only a single input is defined for Mouse & Lightpen in both ports */
 	switch (controller1)
 	{
 		case 0x01:
 			if (which)
-				pot2 = input_port_read(Machine, "PADDLE2");
+				pot2 = input_port_read(machine, "PADDLE2");
 			else
-				pot1 = input_port_read(Machine, "PADDLE1");
+				pot1 = input_port_read(machine, "PADDLE1");
 			break;
 
 		case 0x02:
 			if (which)
-				pot2 = input_port_read(Machine, "TRACKY");
+				pot2 = input_port_read(machine, "TRACKY");
 			else
-				pot1 = input_port_read(Machine, "TRACKX");
+				pot1 = input_port_read(machine, "TRACKX");
 			break;
 
 		case 0x03:
-			if (which && (input_port_read(Machine, "JOY1_2B") & 0x20))	/* Joy1 Button 2 */
+			if (which && (input_port_read(machine, "JOY1_2B") & 0x20))	/* Joy1 Button 2 */
 				pot1 = 0x00;
 			break;
 
 		case 0x04:
 			if (which)
-				pot2 = input_port_read(Machine, "LIGHTY");
+				pot2 = input_port_read(machine, "LIGHTY");
 			else
-				pot1 = input_port_read(Machine, "LIGHTX");
+				pot1 = input_port_read(machine, "LIGHTX");
 			break;
 
 		case 0x00:
@@ -910,28 +909,28 @@ int c64_paddle_read (int which)
 	{
 		case 0x10:
 			if (which)
-				pot4 = input_port_read(Machine, "PADDLE4");
+				pot4 = input_port_read(machine, "PADDLE4");
 			else
-				pot3 = input_port_read(Machine, "PADDLE3");
+				pot3 = input_port_read(machine, "PADDLE3");
 			break;
 
 		case 0x20:
 			if (which)
-				pot4 = input_port_read(Machine, "TRACKY");
+				pot4 = input_port_read(machine, "TRACKY");
 			else
-				pot3 = input_port_read(Machine, "TRACKX");
+				pot3 = input_port_read(machine, "TRACKX");
 			break;
 
 		case 0x30:
-			if (which && (input_port_read(Machine, "JOY2_2B") & 0x20))	/* Joy2 Button 2 */
+			if (which && (input_port_read(machine, "JOY2_2B") & 0x20))	/* Joy2 Button 2 */
 				pot4 = 0x00;
 			break;
 
 		case 0x40:
 			if (which)
-				pot4 = input_port_read(Machine, "LIGHTY");
+				pot4 = input_port_read(machine, "LIGHTY");
 			else
-				pot3 = input_port_read(Machine, "LIGHTX");
+				pot3 = input_port_read(machine, "LIGHTX");
 			break;
 
 		case 0x00:
@@ -943,7 +942,7 @@ int c64_paddle_read (int which)
 			break;
 	}
 
-	if (input_port_read(Machine, "CTRLSEL") & 0x80)		/* Swap */
+	if (input_port_read(machine, "CTRLSEL") & 0x80)		/* Swap */
 	{
 		temp = pot1; pot1 = pot2; pot2 = pot1;
 		temp = pot3; pot3 = pot4; pot4 = pot3;

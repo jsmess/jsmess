@@ -53,7 +53,7 @@ WRITE8_HANDLER(c64_ioarea_w);
 
 WRITE8_HANDLER ( c64_write_io );
 READ8_HANDLER ( c64_read_io );
-int c64_paddle_read (int which);
+int c64_paddle_read (running_machine *machine, int which);
 void c64_vic_interrupt (running_machine *machine, int level);
 
 extern int c64_pal;
