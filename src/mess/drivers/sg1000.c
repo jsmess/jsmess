@@ -858,7 +858,7 @@ static MACHINE_DRIVER_START( sf7000 )
 	MDRV_CASSETTE_ADD("cassette", sc3000_cassette_config)
 
 	/* uart */
-	MDRV_DEVICE_ADD("uart", MSM8251)
+	MDRV_MSM8251_ADD("uart", default_msm8251_interface)
 	
 	MDRV_NEC765A_ADD("nec765", sf7000_nec765_interface)		
 MACHINE_DRIVER_END

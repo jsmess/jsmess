@@ -272,8 +272,7 @@ static MACHINE_DRIVER_START( compis )
 	MDRV_PRINTER_ADD("printer")
 
 	/* uart */
-	MDRV_DEVICE_ADD("uart", MSM8251)
-	MDRV_DEVICE_CONFIG(compis_usart_interface)
+	MDRV_MSM8251_ADD("uart", compis_usart_interface)
 	
 	/* rtc */
 	MDRV_MM58274C_ADD("mm58274c", compis_mm58274c_interface)	

@@ -204,7 +204,7 @@ static MACHINE_DRIVER_START( b2m )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)	
 
 	/* uart */
-	MDRV_DEVICE_ADD("uart", MSM8251)
+	MDRV_MSM8251_ADD("uart", default_msm8251_interface)
 	
 	MDRV_WD1793_ADD("wd1793", default_wd17xx_interface )
 MACHINE_DRIVER_END

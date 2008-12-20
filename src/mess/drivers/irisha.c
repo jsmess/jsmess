@@ -155,7 +155,7 @@ static MACHINE_DRIVER_START( irisha )
     MDRV_VIDEO_UPDATE(irisha)
 
 	/* uart */
-	MDRV_DEVICE_ADD("uart", MSM8251)
+	MDRV_MSM8251_ADD("uart", default_msm8251_interface)
 MACHINE_DRIVER_END
 
 /* ROM definition */

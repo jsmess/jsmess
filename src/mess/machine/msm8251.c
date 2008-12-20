@@ -82,13 +82,16 @@ INLINE msm8251_t *get_token(const device_config *device)
 
 INLINE const msm8251_interface *get_interface(const device_config *device)
 {
-	static msm8251_interface dummy_interface = {0, };
-
 	assert(device->type == MSM8251);
-	return device->static_config != NULL
-		? (const msm8251_interface *) device->static_config
-		: &dummy_interface;
+	return (const msm8251_interface *) device->static_config;
 }
+
+
+/***************************************************************************
+    GLOBAL VARIABLES
+***************************************************************************/
+
+const msm8251_interface default_msm8251_interface = {0, };
 
 
 /***************************************************************************

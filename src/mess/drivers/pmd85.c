@@ -573,7 +573,7 @@ static MACHINE_DRIVER_START( pmd85 )
 	MDRV_CASSETTE_ADD( "cassette", pmd85_cassette_config )
 
 	/* uart */
-	MDRV_DEVICE_ADD("uart", MSM8251)
+	MDRV_MSM8251_ADD("uart", default_msm8251_interface)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pmd851 )
@@ -622,7 +622,7 @@ static MACHINE_DRIVER_START( mato )
 	MDRV_PPI8255_ADD( "ppi8255_0", mato_ppi8255_interface )
 
 	/* no uart */
-	MDRV_DEVICE_REMOVE( "uart", MSM8251 )
+	MDRV_MSM8251_REMOVE( "uart" )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( c2717 )

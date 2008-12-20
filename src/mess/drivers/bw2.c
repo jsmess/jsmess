@@ -866,7 +866,7 @@ static MACHINE_DRIVER_START( bw2 )
 	MDRV_PRINTER_ADD("printer")
 
 	/* uart */
-	MDRV_DEVICE_ADD(MSM8251_TAG, MSM8251)
+	MDRV_MSM8251_ADD(MSM8251_TAG, default_msm8251_interface)
 		
 	MDRV_WD179X_ADD("wd179x", default_wd17xx_interface )			
 MACHINE_DRIVER_END

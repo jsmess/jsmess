@@ -28,6 +28,12 @@
 #define MSM8251_STATUS_RX_READY	0x02
 #define MSM8251_STATUS_TX_READY	0x01
 
+#define MDRV_MSM8251_ADD(_tag, _intrf) \
+	MDRV_DEVICE_ADD(_tag, MSM8251) \
+	MDRV_DEVICE_CONFIG(_intrf)
+
+#define MDRV_MSM8251_REMOVE(_tag) \
+	MDRV_DEVICE_REMOVE(_tag, MSM8251)
 
 
 /***************************************************************************
@@ -49,6 +55,8 @@ struct _msm8251_interface
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
+
+extern const msm8251_interface default_msm8251_interface;
 
 /* device get info function */
 DEVICE_GET_INFO(msm8251);

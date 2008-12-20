@@ -1748,7 +1748,7 @@ static MACHINE_DRIVER_START( einstein )
 	MDRV_PRINTER_ADD("printer")
 
 	/* uart */
-	MDRV_DEVICE_ADD("uart", MSM8251)
+	MDRV_MSM8251_ADD("uart", default_msm8251_interface)
 	
 	MDRV_WD177X_ADD("wd177x", default_wd17xx_interface )
 MACHINE_DRIVER_END
