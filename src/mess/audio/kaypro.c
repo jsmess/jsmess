@@ -27,11 +27,11 @@ static	INT32 click_counter;
 #endif
 
 #ifdef UNUSED_FUNCTION
-static void kaypro_sound_update(void *param,stream_sample_t **inputs, stream_sample_t **_buffer,int length)
+static void kaypro_sound_update(void *param,stream_sample_t **inputs, stream_sample_t **outputs,int samples)
 {
-	stream_sample_t *buffer = _buffer[0];
+	stream_sample_t *buffer = outputs[0];
 
-	while (length-- > 0)
+	while (samples-- > 0)
 	{
 		if ((bell_counter -= BELL_FREQ) < 0)
 		{

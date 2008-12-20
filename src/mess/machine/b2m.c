@@ -388,15 +388,15 @@ DEVICE_IMAGE_LOAD( b2m_floppy )
 }
 
 
-static void b2m_sh_update(void *param,stream_sample_t **inputs, stream_sample_t **buffer,int length)
+static void b2m_sh_update(void *param,stream_sample_t **inputs, stream_sample_t **outputs,int samples)
 {
 	INT16 channel_1_signal;
 
-	stream_sample_t *sample_left = buffer[0];
+	stream_sample_t *sample_left = outputs[0];
 
 	channel_1_signal = b2m_sound_input ? 3000 : -3000;
 
-	while (length--)
+	while (samples--)
 	{
 		*sample_left = channel_1_signal;		
 		sample_left++;

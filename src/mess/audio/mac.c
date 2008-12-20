@@ -36,29 +36,29 @@ static int snd_cache_tail;
 /* Stream updater                   */
 /************************************/
 
-static void mac_sound_update(void *param,stream_sample_t **inputs, stream_sample_t **_buffer,int length)
+static void mac_sound_update(void *param,stream_sample_t **inputs, stream_sample_t **outputs,int samples)
 {
 	INT16 last_val = 0;
-	stream_sample_t *buffer = _buffer[0];
+	stream_sample_t *buffer = outputs[0];
 
 	/* if we're not enabled, just fill with 0 */
 	if (Machine->sample_rate == 0)
 	{
-		memset(buffer, 0, length * sizeof(*buffer));
+		memset(buffer, 0, samples * sizeof(*buffer));
 		return;
 	}
 
 	/* fill in the sample */
-	while (length && snd_cache_len)
+	while (samples && snd_cache_len)
 	{
 		*buffer++ = last_val = ((snd_cache[snd_cache_head] << 8) ^ 0x8000) & 0xff00;
 		snd_cache_head++;
 		snd_cache_head %= SND_CACHE_SIZE;
 		snd_cache_len--;
-		length--;
+		samples--;
 	}
 
-	while (length--)
+	while (samples--)
 	{	/* should never happen */
 		*buffer++ = last_val;
 	}

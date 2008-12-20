@@ -578,20 +578,20 @@ const custom_sound_interface odyssey2_sound_interface =
 	odyssey2_sh_start
 };
 
-void odyssey2_sh_update( void *param,stream_sample_t **inputs, stream_sample_t **_buffer,int length )
+void odyssey2_sh_update( void *param,stream_sample_t **inputs, stream_sample_t **outputs,int samples )
 {
 	static UINT32 signal;
 	static UINT16 count = 0;
 	int ii;
 	int period;
-	stream_sample_t *buffer = _buffer[0];
+	stream_sample_t *buffer = outputs[0];
 
 	/* Generate the signal */
 	signal = o2_vdc.s.shift3 | (o2_vdc.s.shift2 << 8) | (o2_vdc.s.shift1 << 16);
 
 	if( o2_vdc.s.sound & 0x80 )	/* Sound is enabled */
 	{
-		for( ii = 0; ii < length; ii++, buffer++ )
+		for( ii = 0; ii < samples; ii++, buffer++ )
 		{
 			*buffer = 0;
 			*buffer = signal & 0x1;
@@ -634,7 +634,7 @@ void odyssey2_sh_update( void *param,stream_sample_t **inputs, stream_sample_t *
 	else
 	{
 		/* Sound disabled, so clear the buffer */
-		for( ii = 0; ii < length; ii++, buffer++ )
+		for( ii = 0; ii < samples; ii++, buffer++ )
 			*buffer = 0;
 	}
 }

@@ -258,14 +258,14 @@ void lynx_audio_write(int offset, UINT8 data)
 /************************************/
 /* Sound handler update             */
 /************************************/
-static void lynx_update (void *param,stream_sample_t **inputs, stream_sample_t **_buffer,int length)
+static void lynx_update (void *param,stream_sample_t **inputs, stream_sample_t **outputs,int samples)
 {
 	int i, j;
 	LYNX_AUDIO *channel;
 	int v;
-	stream_sample_t *buffer = _buffer[0];
+	stream_sample_t *buffer = outputs[0];
 
-	for (i = 0; i < length; i++, buffer++)
+	for (i = 0; i < samples; i++, buffer++)
 	{
 		*buffer = 0;
 		for (channel=lynx_audio, j=0; j<ARRAY_LENGTH(lynx_audio); j++, channel++)
@@ -277,14 +277,14 @@ static void lynx_update (void *param,stream_sample_t **inputs, stream_sample_t *
 	}
 }
 
-static void lynx2_update (void *param,stream_sample_t **inputs, stream_sample_t **buffer,int length)
+static void lynx2_update (void *param,stream_sample_t **inputs, stream_sample_t **outputs,int samples)
 {
-	stream_sample_t *left=buffer[0], *right=buffer[1];
+	stream_sample_t *left=outputs[0], *right=outputs[1];
 	int i, j;
 	LYNX_AUDIO *channel;
 	int v;
 
-	for (i = 0; i < length; i++, left++, right++)
+	for (i = 0; i < samples; i++, left++, right++)
 	{
 		*left = 0;
 		*right= 0;

@@ -36,16 +36,16 @@ void channelf_sound_w(int mode)
 
 
 
-static void channelf_sh_update(void *param,stream_sample_t **inputs, stream_sample_t **_buffer,int length)
+static void channelf_sh_update(void *param,stream_sample_t **inputs, stream_sample_t **outputs,int samples)
 {
 	UINT32 mask = 0, target = 0;
-	stream_sample_t *buffer = _buffer[0];
+	stream_sample_t *buffer = outputs[0];
 	stream_sample_t *sample = buffer;
 
 	switch( sound_mode )
 	{
 		case 0: /* sound off */
-			memset(buffer,0,sizeof(*buffer)*length);
+			memset(buffer,0,sizeof(*buffer)*samples);
 			return;
 
 		case 1: /* high tone (2V) - 1000Hz */
@@ -62,7 +62,7 @@ static void channelf_sh_update(void *param,stream_sample_t **inputs, stream_samp
 			break;
 	}
 
-	while (length-- > 0)
+	while (samples-- > 0)
 	{
 		if ((sample_counter & mask) == target)
 			*sample++ = envelope;

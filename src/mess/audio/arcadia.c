@@ -44,12 +44,12 @@ void arcadia_soundport_w (running_machine *machine, int offset, int data)
 /* Sound handler update             */
 /************************************/
 
-static void arcadia_update(void *param,stream_sample_t **inputs, stream_sample_t **_buffer,int length)
+static void arcadia_update(void *param,stream_sample_t **inputs, stream_sample_t **outputs,int samples)
 {
 	int i;
-	stream_sample_t *buffer = _buffer[0];
+	stream_sample_t *buffer = outputs[0];
 
-	for (i = 0; i < length; i++, buffer++)
+	for (i = 0; i < samples; i++, buffer++)
 	{
 		*buffer = 0;
 		if (arcadia_sound.reg[1] && arcadia_sound.pos <= arcadia_sound.size/2)

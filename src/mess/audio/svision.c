@@ -109,13 +109,13 @@ void svision_soundport_w (running_machine *machine, SVISION_CHANNEL *channel, in
 /************************************/
 /* Sound handler update             */
 /************************************/
-static void svision_update (void *param,stream_sample_t **inputs, stream_sample_t **_buffer,int length)
+static void svision_update (void *param,stream_sample_t **inputs, stream_sample_t **outputs,int samples)
 {
-	stream_sample_t *left=_buffer[0], *right=_buffer[1];
+	stream_sample_t *left=outputs[0], *right=outputs[1];
 	int i, j;
 	SVISION_CHANNEL *channel;
 
-	for (i = 0; i < length; i++, left++, right++)
+	for (i = 0; i < samples; i++, left++, right++)
 	{
 		*left = 0;
 		*right = 0;

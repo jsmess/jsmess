@@ -40,7 +40,7 @@ READ8_HANDLER ( odyssey2_video_r );
 WRITE8_HANDLER ( odyssey2_video_w );
 WRITE8_HANDLER ( odyssey2_lum_w );
 
-void odyssey2_sh_update( void *param,stream_sample_t **inputs, stream_sample_t **_buffer,int length );
+void odyssey2_sh_update( void *param,stream_sample_t **inputs, stream_sample_t **outputs,int samples );
 
 extern const custom_sound_interface odyssey2_sound_interface;
 

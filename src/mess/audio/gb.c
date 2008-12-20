@@ -155,7 +155,7 @@ static struct SOUNDC snd_control;
 
 static UINT8 snd_regs[0x30];
 
-static void gameboy_update(void *param,stream_sample_t **inputs, stream_sample_t **_buffer,int length);
+static void gameboy_update(void *param,stream_sample_t **inputs, stream_sample_t **outputs,int samples);
 
 
 READ8_HANDLER( gb_wave_r )
@@ -388,11 +388,11 @@ WRITE8_HANDLER( gb_sound_w )
 
 
 
-static void gameboy_update(void *param,stream_sample_t **inputs, stream_sample_t **buffer,int length)
+static void gameboy_update(void *param,stream_sample_t **inputs, stream_sample_t **outputs,int samples)
 {
 	stream_sample_t sample, left, right, mode4_mask;
 
-	while( length-- > 0 )
+	while( samples-- > 0 )
 	{
 		left = right = 0;
 
@@ -632,8 +632,8 @@ static void gameboy_update(void *param,stream_sample_t **inputs, stream_sample_t
 		right <<= 6;
 
 		/* Update the buffers */
-		*(buffer[0]++) = left;
-		*(buffer[1]++) = right;
+		*(outputs[0]++) = left;
+		*(outputs[1]++) = right;
 	}
 
 	snd_regs[NR52] = (snd_regs[NR52]&0xf0) | snd_1.on | (snd_2.on << 1) | (snd_3.on << 2) | (snd_4.on << 3);

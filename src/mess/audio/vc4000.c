@@ -41,12 +41,12 @@ void vc4000_soundport_w (running_machine *machine, int offset, int data)
 /* Sound handler update             */
 /************************************/
 
-static void vc4000_update(void *param,stream_sample_t **inputs, stream_sample_t **_buffer,int length)
+static void vc4000_update(void *param,stream_sample_t **inputs, stream_sample_t **outputs,int samples)
 {
 	int i;
-	stream_sample_t *buffer = _buffer[0];
+	stream_sample_t *buffer = outputs[0];
 
-	for (i = 0; i < length; i++, buffer++)
+	for (i = 0; i < samples; i++, buffer++)
 	{
 		*buffer = 0;
 		if (vc4000_sound.reg[0] && vc4000_sound.pos <= vc4000_sound.size/2)

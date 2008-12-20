@@ -141,11 +141,11 @@ WRITE8_HANDLER( wswan_sound_port_w ) {
 	}
 }
 
-static void wswan_sh_update(void *param,stream_sample_t **inputs, stream_sample_t **buffer,int length)
+static void wswan_sh_update(void *param,stream_sample_t **inputs, stream_sample_t **outputs,int samples)
 {
 	stream_sample_t sample, left, right;
 
-	while( length-- > 0 )
+	while( samples-- > 0 )
 	{
 		left = right = 0;
 
@@ -214,8 +214,8 @@ static void wswan_sh_update(void *param,stream_sample_t **inputs, stream_sample_
 		left <<= 5;
 		right <<= 5;
 
-		*(buffer[0]++) = left;
-		*(buffer[1]++) = right;
+		*(outputs[0]++) = left;
+		*(outputs[1]++) = right;
 	}
 }
 

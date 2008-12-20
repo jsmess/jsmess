@@ -17,7 +17,7 @@
 #include "deprecat.h"
 
 static CUSTOM_START( dai_sh_start );
-static void dai_sh_update(void *param,stream_sample_t **inputs, stream_sample_t **_buffer,int length);
+static void dai_sh_update(void *param,stream_sample_t **inputs, stream_sample_t **outputs,int samples);
 
 static sound_stream *mixer_channel;
 
@@ -62,20 +62,20 @@ static CUSTOM_START( dai_sh_start )
 	return (void *) ~0;
 }
 
-static void dai_sh_update(void *param,stream_sample_t **inputs, stream_sample_t **buffer,int length)
+static void dai_sh_update(void *param,stream_sample_t **inputs, stream_sample_t **outputs,int samples)
 {
 	INT16 channel_0_signal;
 	INT16 channel_1_signal;
 	INT16 channel_2_signal;
 
-	stream_sample_t *sample_left = buffer[0];
-	stream_sample_t *sample_right = buffer[1];
+	stream_sample_t *sample_left = outputs[0];
+	stream_sample_t *sample_right = outputs[1];
 
 	channel_0_signal = dai_input[0] ? dai_osc_volume_table[dai_osc_volume[0]] : -dai_osc_volume_table[dai_osc_volume[0]];
 	channel_1_signal = dai_input[1] ? dai_osc_volume_table[dai_osc_volume[1]] : -dai_osc_volume_table[dai_osc_volume[1]];
 	channel_2_signal = dai_input[2] ? dai_osc_volume_table[dai_osc_volume[2]] : -dai_osc_volume_table[dai_osc_volume[2]];
 
-	while (length--)
+	while (samples--)
 	{
 		*sample_left = 0;
 		*sample_right = 0;

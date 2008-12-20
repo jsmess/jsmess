@@ -177,7 +177,7 @@ void Dave_Init(running_machine *machine)
 	}
 }
 
-static void dave_update_sound(void *param,stream_sample_t **inputs, stream_sample_t **_buffer,int length)
+static void dave_update_sound(void *param,stream_sample_t **inputs, stream_sample_t **outputs,int samples)
 {
 	stream_sample_t *buffer1, *buffer2;
 	/* 0 = channel 0 left volume, 1 = channel 0 right volume,
@@ -190,10 +190,10 @@ static void dave_update_sound(void *param,stream_sample_t **inputs, stream_sampl
 
 	//logerror("sound update!\n");
 
-	buffer1 = _buffer[0];
-	buffer2 = _buffer[1];
+	buffer1 = outputs[0];
+	buffer2 = outputs[1];
 
-	while (length)
+	while (samples)
 	{
 		int vol[4];
 		int i;
@@ -256,7 +256,7 @@ static void dave_update_sound(void *param,stream_sample_t **inputs, stream_sampl
 		*(buffer1++) = left_volume;
 		*(buffer2++) = right_volume;
 
-		length--;
+		samples--;
 	}
 }
 
