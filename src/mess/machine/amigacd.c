@@ -184,7 +184,7 @@ static READ16_HANDLER( amiga_dmac_r )
 		case 0x50:
 		{
 			LOG(( "DMAC: PC=%08x - CDROM RESP Read\n", cpu_get_pc(space->cpu) ));
-			return matsucd_response_r();
+			return matsucd_response_r(space->machine);
 		}
 		break;
 
@@ -387,14 +387,16 @@ static WRITE16_HANDLER( amiga_dmac_w )
 
 static void	dmac_install(offs_t base)
 {
-	memory_install_read16_handler(cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM), base, base + 0xFFFF, 0, 0, amiga_dmac_r);
-	memory_install_write16_handler(cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM), base, base + 0xFFFF, 0, 0, amiga_dmac_w);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	memory_install_read16_handler(space, base, base + 0xFFFF, 0, 0, amiga_dmac_r);
+	memory_install_write16_handler(space, base, base + 0xFFFF, 0, 0, amiga_dmac_w);
 }
 
 static void	dmac_uninstall(offs_t base)
 {
-	memory_install_read16_handler(cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM), base, base + 0xFFFF, 0, 0, SMH_UNMAP);
-	memory_install_write16_handler(cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM), base, base + 0xFFFF, 0, 0, SMH_UNMAP);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	memory_install_read16_handler(space, base, base + 0xFFFF, 0, 0, SMH_UNMAP);
+	memory_install_write16_handler(space, base, base + 0xFFFF, 0, 0, SMH_UNMAP);
 }
 
 static const amiga_autoconfig_device dmac_device =
@@ -479,25 +481,25 @@ static void tp6525_irq( running_machine *machine, int level )
 	}
 }
 
-static void cdrom_status_enabled( int level )
+static void cdrom_status_enabled( running_machine *machine, int level )
 {
 	/* PC3 on the 6525 */
-	tpi6525_0_irq3_level( Machine, level );
+	tpi6525_0_irq3_level( machine, level );
 }
 
-static void cdrom_status_change( int level )
+static void cdrom_status_change( running_machine *machine, int level )
 {
 	/* invert */
 	level = level ? 0 : 1;
 
 	/* PC2 on the 6525 */
-	tpi6525_0_irq2_level( Machine, level );
+	tpi6525_0_irq2_level( machine, level );
 }
 
-static void cdrom_subcode_ready( int level )
+static void cdrom_subcode_ready( running_machine *machine, int level )
 {
 	/* PC1 on the 6525 */
-	tpi6525_0_irq1_level( Machine, level );
+	tpi6525_0_irq1_level( machine, level );
 }
 
 MACHINE_START( amigacd )

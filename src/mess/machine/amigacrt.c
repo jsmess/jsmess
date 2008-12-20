@@ -33,9 +33,9 @@ static int amiga_cart_type;
 
 ***************************************************************************/
 
-static int check_kickstart_12_13( const char *cart_name )
+static int check_kickstart_12_13( running_machine *machine, const char *cart_name )
 {
-	UINT16 * ksmem = (UINT16 *)memory_region( Machine, "user1" );
+	UINT16 * ksmem = (UINT16 *)memory_region( machine, "user1" );
 
 	if ( ksmem[2] == 0x00FC )
 		return 1;
@@ -136,7 +136,7 @@ static void amiga_ar1_init( running_machine *machine )
 	void *ar_ram;
 
 	/* check kickstart version */
-	if ( !check_kickstart_12_13( "Amiga Action Replay" ) )
+	if ( !check_kickstart_12_13( machine, "Amiga Action Replay" ) )
 	{
 		amiga_cart_type = -1;
 		return;
@@ -344,7 +344,7 @@ static void amiga_ar23_init( running_machine *machine, int ar3 )
 	void *ar_ram;
 
 	/* check kickstart version */
-	if ( !check_kickstart_12_13( "Action Replay MKII or MKIII" ) )
+	if ( !check_kickstart_12_13( machine, "Action Replay MKII or MKIII" ) )
 	{
 		amiga_cart_type = -1;
 		return;
@@ -441,18 +441,19 @@ void amiga_cart_check_overlay( running_machine *machine )
 
 void amiga_cart_nmi( void )
 {
+	running_machine *machine = Machine;
 	if ( amiga_cart_type < 0 )
 		return;
 
 	switch( amiga_cart_type )
 	{
 		case ACTION_REPLAY:
-			amiga_ar1_nmi(Machine);
+			amiga_ar1_nmi(machine);
 		break;
 
 		case ACTION_REPLAY_MKII:
 		case ACTION_REPLAY_MKIII:
-			amiga_ar23_nmi(Machine);
+			amiga_ar23_nmi(machine);
 		break;
 	}
 }

@@ -412,28 +412,30 @@ static void amiga_cia_0_portA_w(const device_config *device, UINT8 data)
 
 static UINT16 amiga_read_joy0dat(void)
 {
-	if ( input_port_read(Machine, "input") & 0x20 ) {
+	running_machine *machine = Machine;
+	if ( input_port_read(machine, "input") & 0x20 ) {
 		/* Joystick */
-		return input_port_read_safe(Machine, "JOY0DAT", 0xffff);
+		return input_port_read_safe(machine, "JOY0DAT", 0xffff);
 	} else {
 		/* Mouse */
 		int input;
-		input  = ( input_port_read(Machine, "P0MOUSEX") & 0xff );
-		input |= ( input_port_read(Machine, "P0MOUSEY") & 0xff ) << 8;
+		input  = ( input_port_read(machine, "P0MOUSEX") & 0xff );
+		input |= ( input_port_read(machine, "P0MOUSEY") & 0xff ) << 8;
 		return input;
 	}
 }
 
 static UINT16 amiga_read_joy1dat(void)
 {
-	if ( input_port_read(Machine, "input") & 0x10 ) {
+	running_machine *machine = Machine;
+	if ( input_port_read(machine, "input") & 0x10 ) {
 		/* Joystick */
-		return input_port_read_safe(Machine, "JOY1DAT", 0xffff);
+		return input_port_read_safe(machine, "JOY1DAT", 0xffff);
 	} else {
 		/* Mouse */
 		int input;
-		input  = ( input_port_read(Machine, "P1MOUSEX") & 0xff );
-		input |= ( input_port_read(Machine, "P1MOUSEY") & 0xff ) << 8;
+		input  = ( input_port_read(machine, "P1MOUSEX") & 0xff );
+		input |= ( input_port_read(machine, "P1MOUSEY") & 0xff ) << 8;
 		return input;
 	}
 }
@@ -454,15 +456,16 @@ static void amiga_write_dsklen(UINT16 data)
 
 static void amiga_reset(void)
 {
-	if (input_port_read(Machine, "hardware") & 0x08)
+	running_machine *machine = Machine;
+	if (input_port_read(machine, "hardware") & 0x08)
 	{
 		/* Install RTC */
-		memory_install_readwrite16_handler(cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xdc0000, 0xdc003f, 0, 0, amiga_clock_r, amiga_clock_w);
+		memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xdc0000, 0xdc003f, 0, 0, amiga_clock_r, amiga_clock_w);
 	}
 	else
 	{
 		/* No RTC support */
-		memory_install_readwrite16_handler(cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xdc0000, 0xdc003f, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xdc0000, 0xdc003f, 0, 0, SMH_UNMAP, SMH_UNMAP);
 	}
 }
 

@@ -76,11 +76,11 @@ static int tms9995_mode;
 
 	IDE interrupt callback
 */
-void ti99_ide_interrupt(running_machine *machine, int state)
+void ti99_ide_interrupt(const device_config *device, int state)
 {
 	ide_irq = state;
 	if (cru_register & cru_reg_int_en)
-		ti99_peb_set_ila_bit(machine, inta_ide_bit, state);
+		ti99_peb_set_ila_bit(device->machine, inta_ide_bit, state);
 }
 
 /*

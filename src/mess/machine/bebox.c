@@ -538,9 +538,9 @@ WRITE64_HANDLER( bebox_800003F0_w )
 }
 
 
-void bebox_ide_interrupt(int state)
+void bebox_ide_interrupt(const device_config *device, int state)
 {
-	bebox_set_irq_bit(Machine, 7, state);
+	bebox_set_irq_bit(device->machine, 7, state);
 	if ( bebox_devices.pic8259_master ) {
 		pic8259_set_irq_line( bebox_devices.pic8259_master, 6, state);
 	}

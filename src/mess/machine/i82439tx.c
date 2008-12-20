@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/i82439tx.h"
 #include "machine/pci.h"
 
@@ -121,7 +120,7 @@ static void intel82439tx_configure_memory(running_machine *machine, UINT8 val, o
 
 void intel82439tx_pci_write(const device_config *busdevice, const device_config *device, int function, int offset, UINT32 data, UINT32 mem_mask)
 {
-	running_machine *machine = Machine;
+	running_machine *machine = busdevice->machine;
 
 	if (function != 0)
 		return;
