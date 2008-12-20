@@ -361,36 +361,40 @@ static INS8250_HANDSHAKE_OUT( bebox_uart_handshake )
 }
 
 
-const ins8250_interface bebox_uart_inteface[4] =
+const ins8250_interface bebox_uart_inteface_0 =
 {
-	{
-		0,
-		NULL,
-		NULL,
-		NULL,
-		NULL
-	},
-	{
-		0,
-		NULL,
-		NULL,
-		NULL,
-		NULL
-	},
-	{
-		0,
-		NULL,
-		NULL,
-		NULL,
-		NULL
-	},
-	{
-		0,
-		NULL,
-		bebox_uart_transmit,
-		bebox_uart_handshake,
-		NULL
-	}
+	0,
+	NULL,
+	NULL,
+	NULL,
+	NULL
+};
+
+const ins8250_interface bebox_uart_inteface_1 =
+{
+	0,
+	NULL,
+	NULL,
+	NULL,
+	NULL
+};
+
+const ins8250_interface bebox_uart_inteface_2 =
+{
+	0,
+	NULL,
+	NULL,
+	NULL,
+	NULL
+};
+
+const ins8250_interface bebox_uart_inteface_3 =
+{
+	0,
+	NULL,
+	bebox_uart_transmit,
+	bebox_uart_handshake,
+	NULL
 };
 
 

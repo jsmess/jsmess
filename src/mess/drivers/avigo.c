@@ -866,8 +866,7 @@ static MACHINE_DRIVER_START( avigo )
 	MDRV_MACHINE_RESET( avigo )
 	MDRV_NVRAM_HANDLER( avigo )
 
-	MDRV_DEVICE_ADD( "ns16550", NS16550 )
-	MDRV_DEVICE_CONFIG( avigo_com_interface )
+	MDRV_NS16550_ADD( "ns16550", avigo_com_interface )
 
     /* video hardware */
 	MDRV_SCREEN_ADD("main", LCD)

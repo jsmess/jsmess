@@ -101,17 +101,10 @@ static MACHINE_DRIVER_START( bebox )
 
 	MDRV_PIC8259_ADD( "pic8259_slave", bebox_pic8259_slave_config )
 
-	MDRV_DEVICE_ADD( "ns16550_0", NS16550 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( bebox_uart_inteface[0] )
-
-	MDRV_DEVICE_ADD( "ns16550_1", NS16550 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( bebox_uart_inteface[1] )
-
-	MDRV_DEVICE_ADD( "ns16550_2", NS16550 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( bebox_uart_inteface[2] )
-
-	MDRV_DEVICE_ADD( "ns16550_3", NS16550 )			/* TODO: Verify model */
-	MDRV_DEVICE_CONFIG( bebox_uart_inteface[3] )
+	MDRV_NS16550_ADD( "ns16550_0", bebox_uart_inteface_0 )			/* TODO: Verify model */
+	MDRV_NS16550_ADD( "ns16550_1", bebox_uart_inteface_1 )			/* TODO: Verify model */
+	MDRV_NS16550_ADD( "ns16550_2", bebox_uart_inteface_2 )			/* TODO: Verify model */
+	MDRV_NS16550_ADD( "ns16550_3", bebox_uart_inteface_3 )			/* TODO: Verify model */
 
 	MDRV_IDE_CONTROLLER_ADD( "ide", bebox_ide_interrupt )	/* FIXME */
 
