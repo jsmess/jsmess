@@ -16,7 +16,6 @@
 
 #include "sound/ay8910.h"
 
-static m6845_state amstrad_vidhrdw_6845_state;
 int prev_reg;
 
 static int amstrad_plus_dma_repeat[3];  // marks the location of the channels' last repeat
@@ -1189,12 +1188,8 @@ static void amstrad_Set_HS(running_machine *machine, int offset, int data)
 			{
 				if(m6845_get_row_counter() == ((amstrad_plus_split_scanline >> 3) & 0x1f) && m6845_get_scanline_counter() == (amstrad_plus_split_scanline & 0x07)) // split occurs here (hopefully)
 				{
-					m6845_state vid;
-					m6845_get_state(0,&vid);
+					m6845_set_address(amstrad_plus_split_address);
 //					logerror("SSCR: Split screen occured at scanline %i",amstrad_plus_split_scanline);
-					vid.Memory_Address_of_next_Character_Row = vid.Memory_Address_of_this_Character_Row = amstrad_plus_split_address;
-					vid.Memory_Address = amstrad_plus_split_address;
-					m6845_set_state(0,&vid);
 				}
 			}
 			// CPC+/GX4000 soft scroll register
@@ -1293,10 +1288,7 @@ VIDEO_START( amstrad )
 {
 	amstrad_init_lookups();
 
-	m6845_start();
 	m6845_config(&amstrad6845);
-	m6845_reset(0);
-	m6845_get_state(0, &amstrad_vidhrdw_6845_state);
 
 	draw_function = amstrad_draw_screen_disabled;
 

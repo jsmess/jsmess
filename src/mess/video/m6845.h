@@ -30,62 +30,6 @@ struct m6845_interface
 	void (*out_CRE_func)(int offset, int data);
 };
 
-typedef struct m6845_state
-{
-	/* Register Select */
-	int address_register;
-	/* register data */
-	int registers[32];
-	/* vertical and horizontal sync widths */
-	int vertical_sync_width, horizontal_sync_width;
-
-	int screen_start_address;         /* = R12<<8 + R13 */
-	int cursor_address;				  /* = R14<<8 + R15 */
-	int light_pen_address;			  /* = R16<<8 + R17 */
-
-	int scan_lines_increment;
-
-	int Horizontal_Counter;
-	int Horizontal_Counter_Reset;
-
-	int Scan_Line_Counter;
-	int Scan_Line_Counter_Reset;
-
-	int Character_Row_Counter;
-	int Character_Row_Counter_Reset;
-
-	int Horizontal_Sync_Width_Counter;
-	int Vertical_Sync_Width_Counter;
-
-	int HSYNC;
-	int VSYNC;
-
-	int Vertical_Total_Adjust_Active;
-	int Vertical_Total_Adjust_Counter;
-
-	int Memory_Address;
-	int Memory_Address_of_next_Character_Row;
-	int Memory_Address_of_this_Character_Row;
-
-	int Horizontal_Display_Enabled;
-	int Vertical_Display_Enabled;
-	int Display_Enabled;
-	int Display_Delayed_Enabled;
-
-	int Cursor_Delayed_Status;
-
-	int Cursor_Flash_Count;
-
-	int Delay_Flags;
-	int Cursor_Start_Delay;
-	int Display_Enabled_Delay;
-	int Display_Disable_Delay;
-
-	int	Vertical_Adjust_Done;
-//	int cycles_to_vsync_start;
-//	int cycles_to_vsync_end;
-} m6845_state;
-
 /* set up the local copy of the 6845 external procedure calls */
 void m6845_config(const struct m6845_interface *intf);
 
@@ -114,12 +58,9 @@ int m6845_cursor_enabled_r(int offset);
 void m6845_recalc(int offset, int cycles);
 #endif
 
-void m6845_set_state(int offset, m6845_state *state);
-void m6845_get_state(int offset, m6845_state *state);
+void m6845_set_address(int address);
 
-void m6845_reset(int which);
-
-void m6845_start(void);
+void m6845_reset(void);
 
 void m6845_set_personality(m6845_personality_t personality);
 
