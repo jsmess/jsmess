@@ -18,6 +18,9 @@
 
 #define APPLE2_LANGCARD		DEVICE_GET_INFO_NAME(apple2_langcard)
 
+#define MDRV_APPLE2_LANGCARD_ADD(_tag)	\
+	MDRV_DEVICE_ADD((_tag), APPLE2_LANGCARD)
+
 
 
 /***************************************************************************

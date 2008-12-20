@@ -403,7 +403,7 @@ static MACHINE_DRIVER_START( telstrat)
 	MDRV_MACHINE_RESET( NULL )
 
 	/* acia */
-	MDRV_DEVICE_ADD("acia", ACIA6551)
+	MDRV_ACIA6551_ADD("acia")
 
 	/* via */
 	MDRV_VIA6522_ADD( "via6522_1", 1000000, telestrat_via2_interface )

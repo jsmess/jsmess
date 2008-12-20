@@ -56,7 +56,7 @@ static MACHINE_DRIVER_START( apple3 )
 	MDRV_APPLEFDC_ADD("fdc", apple3_fdc_interface)
 
 	/* acia */
-	MDRV_DEVICE_ADD("acia", ACIA6551)
+	MDRV_ACIA6551_ADD("acia")
 
 	/* via */
 	MDRV_VIA6522_ADD("via6522_0", 1000000, apple3_via_0_intf)

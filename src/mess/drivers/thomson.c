@@ -755,7 +755,7 @@ static MACHINE_DRIVER_START ( to7 )
      MDRV_MC6854_ADD( "mc6854", to7_network_iface )
 
 /* acia */
-     MDRV_DEVICE_ADD( "acia", ACIA6551 )
+     MDRV_ACIA6551_ADD("acia")
 
 /* modem */
      MDRV_DEVICE_ADD( "acia6850", ACIA6850 )

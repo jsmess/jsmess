@@ -3,6 +3,10 @@
 
 #define E0516	DEVICE_GET_INFO_NAME(e0516)
 
+#define MDRV_E0516_ADD(_tag, _config)	\
+	MDRV_DEVICE_ADD(_tag, E0516)		\
+	MDRV_DEVICE_CONFIG(_config)
+
 /* interface */
 typedef struct _e0516_interface e0516_interface;
 struct _e0516_interface

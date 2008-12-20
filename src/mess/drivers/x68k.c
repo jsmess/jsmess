@@ -2136,8 +2136,7 @@ static MACHINE_DRIVER_START( x68000 )
 	MDRV_MACHINE_RESET( x68000 )
 
 	/* device hardware */
-	MDRV_DEVICE_ADD(MC68901_TAG, MC68901)
-	MDRV_DEVICE_CONFIG(mfp_interface)
+	MDRV_MC68901_ADD(MC68901_TAG, mfp_interface)
 
 	MDRV_PPI8255_ADD( "ppi8255",  ppi_interface )
 

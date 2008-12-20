@@ -1417,8 +1417,7 @@ static MACHINE_DRIVER_START( abc806 )
 	MDRV_Z80DART_ADD(Z80DART_TAG, abc806_dart_intf)
 
 	/* real time clock */
-	MDRV_DEVICE_ADD(E0516_TAG, E0516)
-	MDRV_DEVICE_CONFIG(abc806_e0516_intf)
+	MDRV_E0516_ADD(E0516_TAG, abc806_e0516_intf)
 
 	/* printer */
 	MDRV_PRINTER_ADD("printer")

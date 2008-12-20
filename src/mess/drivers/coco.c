@@ -703,7 +703,7 @@ static MACHINE_DRIVER_START( dragon64 )
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
 
 	/* acia */
-	MDRV_DEVICE_ADD("acia", ACIA6551)
+	MDRV_ACIA6551_ADD("acia")
 	
 	MDRV_WD179X_ADD("wd179x", dragon_wd17xx_interface )
 MACHINE_DRIVER_END

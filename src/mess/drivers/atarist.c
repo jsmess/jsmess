@@ -1782,8 +1782,7 @@ static MACHINE_DRIVER_START( atarist )
 	MDRV_MACHINE_START(atarist)
 
 	// device hardware
-	MDRV_DEVICE_ADD(MC68901_TAG, MC68901)
-	MDRV_DEVICE_CONFIG(mfp_intf)
+	MDRV_MC68901_ADD(MC68901_TAG, mfp_intf)
 	MDRV_SCC8530_ADD("scc", atarist_scc8530_interface)
 
 	// video hardware
@@ -1836,8 +1835,7 @@ static MACHINE_DRIVER_START( atariste )
 	MDRV_MACHINE_START(atariste)
 
 	// device hardware
-	MDRV_DEVICE_ADD(MC68901_TAG, MC68901)
-	MDRV_DEVICE_CONFIG(atariste_mfp_intf)
+	MDRV_MC68901_ADD(MC68901_TAG, atariste_mfp_intf)
 	MDRV_SCC8530_ADD("scc", atarist_scc8530_interface)
 
 	// video hardware
@@ -1897,8 +1895,7 @@ static MACHINE_DRIVER_START( stbook )
 	MDRV_MACHINE_START(stbook)
 
 	// device hardware
-	MDRV_DEVICE_ADD(MC68901_TAG, MC68901)
-	MDRV_DEVICE_CONFIG(stbook_mfp_intf)
+	MDRV_MC68901_ADD(MC68901_TAG, stbook_mfp_intf)
 	MDRV_SCC8530_ADD("scc", atarist_scc8530_interface)
 
 	// video hardware

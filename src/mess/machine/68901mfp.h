@@ -61,6 +61,15 @@ typedef void (*mc68901_gpio_write_func) (const device_config *device, UINT8 data
 #define MC68901 DEVICE_GET_INFO_NAME( mc68901 )
 #define MK68901 DEVICE_GET_INFO_NAME( mk68901 )
 
+#define MDRV_MC68901_ADD(_tag, _config)	\
+	MDRV_DEVICE_ADD((_tag), MC68901)	\
+	MDRV_DEVICE_CONFIG(_config)
+
+#define MDRV_MK68901_ADD(_tag, _config)	\
+	MDRV_DEVICE_ADD((_tag), MK68901)	\
+	MDRV_DEVICE_CONFIG(_config)
+
+
 /* interface */
 typedef struct _mc68901_interface mc68901_interface;
 struct _mc68901_interface

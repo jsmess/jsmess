@@ -255,7 +255,7 @@ static MACHINE_DRIVER_START( microtan )
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
 
 	/* acia */
-	MDRV_DEVICE_ADD("acia", ACIA6551)
+	MDRV_ACIA6551_ADD("acia")
 
 	/* via */
 	MDRV_VIA6522_ADD("via6522_0", 0, microtan_via6522_0)

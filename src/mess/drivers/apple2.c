@@ -591,8 +591,8 @@ static MACHINE_DRIVER_START( apple2_common )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* slot devices */
-	MDRV_DEVICE_ADD("langcard", APPLE2_LANGCARD)
-	MDRV_DEVICE_ADD("mockingboard", MOCKINGBOARD)
+	MDRV_APPLE2_LANGCARD_ADD("langcard")
+	MDRV_MOCKINGBOARD_ADD("mockingboard")
 	MDRV_APPLEFDC_ADD("fdc", apple2_fdc_interface)
 
 	/* slots */
