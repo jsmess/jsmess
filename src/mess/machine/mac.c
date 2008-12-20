@@ -1875,7 +1875,7 @@ static void macscsi_exit(running_machine *machine)
 
 MACHINE_START( macscsi )
 {
-	ncr5380_init(&macplus_5380intf);
+	ncr5380_init(machine, &macplus_5380intf);
 	
 	add_exit_callback(machine, macscsi_exit);
 }

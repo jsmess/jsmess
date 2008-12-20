@@ -82,7 +82,6 @@ easier to manage.
 #include <assert.h>
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
 #include "includes/coco.h"
@@ -136,10 +135,10 @@ static void d_pia0_irq_a(running_machine *machine, int state);
 static void d_pia0_irq_b(running_machine *machine, int state);
 static void d_pia1_firq_a(running_machine *machine, int state);
 static void d_pia1_firq_b(running_machine *machine, int state);
-static void d_sam_set_pageonemode(int val);
-static void d_sam_set_mpurate(int val);
-static void d_sam_set_memorysize(int val);
-static void d_sam_set_maptype(int val);
+static void d_sam_set_pageonemode(running_machine *machine,int val);
+static void d_sam_set_mpurate(running_machine *machine,int val);
+static void d_sam_set_memorysize(running_machine *machine,int val);
+static void d_sam_set_maptype(running_machine *machine,int val);
 static void coco_setcartline(running_machine *machine, coco_cartridge *cartridge, cococart_line line, cococart_line_value value);
 static void twiddle_cart_line_if_q(running_machine *machine);
 
@@ -160,8 +159,8 @@ static void coco3_pia0_irq_a(running_machine *machine, int state);
 static void coco3_pia0_irq_b(running_machine *machine, int state);
 static void coco3_pia1_firq_a(running_machine *machine, int state);
 static void coco3_pia1_firq_b(running_machine *machine, int state);
-static void coco3_sam_set_maptype(int val);
-static const UINT8 *coco3_sam_get_rambase(void);
+static void coco3_sam_set_maptype(running_machine *machine, int val);
+static const UINT8 *coco3_sam_get_rambase(running_machine *machine);
 
 /* Dragon 32 specific */
 static READ8_HANDLER ( d_pia1_pb_r_dragon32 );
@@ -497,7 +496,7 @@ static void pak_load_trailer(running_machine *machine, const pak_decodedtrailer 
 	 * access that bit or or whether it is something else.  So that is why
 	 * I am specifying 0x7fff instead of 0xffff here
 	 */
-	sam_set_state(trailer->sam, 0x7fff);
+	sam_set_state(machine, trailer->sam, 0x7fff);
 }
 
 static int generic_pak_load(const device_config *image, int rambase_index, int rombase_index, int pakbase_index)
@@ -1458,21 +1457,21 @@ static WRITE8_HANDLER ( d_pia1_cb2_w )
 }
 
 /* Printer output functions used by d_pia1_pa_w */
-static void (*printer_out)(int data);
+static void (*printer_out)(running_machine *machine, int data);
 
 /* Printer output for the CoCo, output to bitbanger port */
-static void printer_out_coco(int data)
+static void printer_out_coco(running_machine *machine, int data)
 {
-	bitbanger_output(bitbanger_image(Machine), (data & 2) >> 1);
+	bitbanger_output(bitbanger_image(machine), (data & 2) >> 1);
 }
 
 /* Printer output for the Dragon, output to Paralel port */
-static void printer_out_dragon(int data)
+static void printer_out_dragon(running_machine *machine, int data)
 {
 	/* If strobe bit is high send data from pia0 port b to dragon parallel printer */
 	if (data & 0x02)
 	{
-		printer_output(printer_image(Machine), pia_get_output_b(0));
+		printer_output(printer_image(machine), pia_get_output_b(0));
 	}
 }
 
@@ -1543,7 +1542,7 @@ static WRITE8_HANDLER ( d_pia1_pa_w )
 
 	/* Handle printer output, serial for CoCos, Paralell for Dragons */
 
-	printer_out(data);
+	printer_out(space->machine, data);
 }
 
 /*
@@ -1868,7 +1867,7 @@ WRITE8_HANDLER ( plus_reg_w )
   Misc
 ***************************************************************************/
 
-static void d_sam_set_mpurate(int val)
+static void d_sam_set_mpurate(running_machine *machine, int val)
 {
 	/* The infamous speed up poke.
 	 *
@@ -1892,7 +1891,7 @@ static void d_sam_set_mpurate(int val)
 	 * TODO:  Make the overclock more accurate.  In dual speed, ROM was a fast
 	 * access but RAM was not.  I don't know how to simulate this.
 	 */
-    cpu_set_clockscale(Machine->cpu[0], val ? 2 : 1);
+    cpu_set_clockscale(machine->cpu[0], val ? 2 : 1);
 }
 
 READ8_HANDLER(dragon_alpha_mapped_irq_r)
@@ -1953,9 +1952,9 @@ static void setup_memory_map(running_machine *machine)
 
 	/* We need to init these vars from the sam, as this may be called from outside the sam callbacks */
 	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
-	UINT8 memsize	= get_sam_memorysize();
-	UINT8 maptype	= get_sam_maptype();
-//	UINT8 pagemode	= get_sam_pagemode();
+	UINT8 memsize	= get_sam_memorysize(machine);
+	UINT8 maptype	= get_sam_maptype(machine);
+//	UINT8 pagemode	= get_sam_pagemode(machine);
 	int 		last_ram_block;		/* Last block that will be RAM, dependent on maptype */
 	int 		block_index;		/* Index of block being processed */
 	int	 	wbank;			/* bank no to go in this block */
@@ -2021,7 +2020,7 @@ static void setup_memory_map(running_machine *machine)
 }
 
 
-static void d_sam_set_pageonemode(int val)
+static void d_sam_set_pageonemode(running_machine *machine, int val)
 {
 	/* Page mode - allowed switching between the low 32k and the high 32k,
 	 * assuming that 64k wasn't enabled
@@ -2030,18 +2029,18 @@ static void d_sam_set_pageonemode(int val)
 	 * this (it probably ignored it)
 	 */
 
-	if (!get_sam_maptype())		// Ignored in maptype 1
+	if (!get_sam_maptype(machine))		// Ignored in maptype 1
 	{
 		if((mess_ram_size>0x8000) && val)
 			bottom_32k=&mess_ram[0x8000];
 		else
 			bottom_32k=mess_ram;
 
-		setup_memory_map(Machine);
+		setup_memory_map(machine);
 	}
 }
 
-static void d_sam_set_memorysize(int val)
+static void d_sam_set_memorysize(running_machine *machine, int val)
 {
 	/* Memory size - allowed restricting memory accesses to something less than
 	 * 32k
@@ -2067,7 +2066,7 @@ static void d_sam_set_memorysize(int val)
 	 * TODO:  Verify that the CoCo 3 ignored this
 	 */
 
-	setup_memory_map(Machine);
+	setup_memory_map(machine);
 }
 
 
@@ -2163,12 +2162,12 @@ static void coco3_timer_init(running_machine *machine)
 /* way as the CoCo 1/2 and Dragon 32, this now has been reduced to a call to */
 /* setup_memory_map() - 2007-01-02 phs. */
 
-static void d_sam_set_maptype(int val)
+static void d_sam_set_maptype(running_machine *machine,int val)
 {
 	if(val)
 		bottom_32k=mess_ram;	// Always reset, when in maptype 1
 
-	setup_memory_map(Machine);
+	setup_memory_map(machine);
 }
 
 /*************************************
@@ -2570,7 +2569,7 @@ WRITE8_HANDLER(coco3_gime_w)
 
 
 
-static const UINT8 *coco3_sam_get_rambase(void)
+static const UINT8 *coco3_sam_get_rambase(running_machine *machine)
 {
 	UINT32 video_base;
 	video_base = coco3_get_video_base(0xE0, 0x3F);
@@ -2580,10 +2579,10 @@ static const UINT8 *coco3_sam_get_rambase(void)
 
 
 
-static void coco3_sam_set_maptype(int val)
+static void coco3_sam_set_maptype(running_machine *machine,int val)
 {
 	coco3_enable_64k = val;
-	coco3_mmu_update(Machine, 4, 8);
+	coco3_mmu_update(machine, 4, 8);
 }
 
 
@@ -2826,7 +2825,7 @@ struct _machine_init_interface
 	const pia6821_interface *piaintf;			/* PIA initializer */
 	int	piaintf_count;							/* PIA count */
 	timer_fired_func recalc_interrupts_;			/* recalculate inturrupts callback */
-	void (*printer_out_)(int data);				/* printer output callback */
+	void (*printer_out_)(running_machine *machine, int data);				/* printer output callback */
 	timer_fired_func cart_timer_proc;				/* cartridge timer proc */
 	const char *fdc_cart_hardware;				/* normal cartridge hardware */
 	void (*map_memory)(running_machine *machine, coco_cartridge *cartridge, UINT32 offset, UINT32 mask);

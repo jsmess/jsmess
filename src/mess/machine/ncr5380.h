@@ -38,7 +38,7 @@ enum
 #define R5380_OUTDATA_DTACK	(R5380_OUTDATA | 0x10)
 #define R5380_CURDATA_DTACK	(R5380_CURDATA | 0x10)
 
-extern void ncr5380_init( const struct NCR5380interface *interface );
+extern void ncr5380_init( running_machine *machine, const struct NCR5380interface *interface );
 extern void ncr5380_exit( const struct NCR5380interface *interface );
 extern void ncr5380_read_data(int bytes, UINT8 *pData);
 extern void ncr5380_write_data(int bytes, UINT8 *pData);

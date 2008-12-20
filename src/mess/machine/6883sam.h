@@ -29,28 +29,28 @@ typedef struct _sam6883_interface sam6883_interface;
 struct _sam6883_interface
 {
 	sam6883_type type;
-	const UINT8 *(*get_rambase)(void);
-	void (*set_pageonemode)(int val);
-	void (*set_mpurate)(int val);
-	void (*set_memorysize)(int val);
-	void (*set_maptype)(int val);
+	const UINT8 *(*get_rambase)(running_machine *machine);
+	void (*set_pageonemode)(running_machine *machine, int val);
+	void (*set_mpurate)(running_machine *machine, int val);
+	void (*set_memorysize)(running_machine *machine, int val);
+	void (*set_maptype)(running_machine *machine, int val);
 };
 
 /* initialize the SAM */
 void sam_init(running_machine *machine, const sam6883_interface *intf);
 
 /* set the state of the SAM */
-void sam_set_state(UINT16 state, UINT16 mask);
+void sam_set_state(running_machine *machine,UINT16 state, UINT16 mask);
 
 /* used by video/m6847.c to read the position of the SAM */
-const UINT8 *sam_m6847_get_video_ram(int scanline);
+const UINT8 *sam_m6847_get_video_ram(running_machine *machine,int scanline);
 
 /* write to the SAM */
 WRITE8_HANDLER(sam_w);
 
 /* used to get memory size and pagemode independent of callbacks */
-UINT8 get_sam_memorysize(void);
-UINT8 get_sam_pagemode(void);
-UINT8 get_sam_maptype(void);
+UINT8 get_sam_memorysize(running_machine *machine);
+UINT8 get_sam_pagemode(running_machine *machine);
+UINT8 get_sam_maptype(running_machine *machine);
 
 #endif /* __6833SAM_H__ */

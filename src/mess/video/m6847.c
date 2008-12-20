@@ -109,7 +109,7 @@ struct _m6847_vdg
 	void (*horizontal_sync_callback)(running_machine *machine,int line);
 	void (*field_sync_callback)(running_machine *machine,int line);
 	UINT8 (*get_attributes)(UINT8 video_byte);
-	const UINT8 *(*get_video_ram)(int scanline);
+	const UINT8 *(*get_video_ram)(running_machine *machine, int scanline);
 	int (*new_frame_callback)(void);	/* returns whether the M6847 is in charge of this frame */
 	void (*custom_prepare_scanline)(int scanline);
 
@@ -1489,7 +1489,7 @@ static int get_beamx(void)
 }
 
 
-INLINE void prepare_scanline(int xpos)
+INLINE void prepare_scanline(running_machine *machine, int xpos)
 {
 	UINT8 attrs, data, attr;
 	int scanline;
@@ -1535,7 +1535,7 @@ INLINE void prepare_scanline(int xpos)
 			scanline -= m6847->top_border_scanlines;
 			if ((scanline >= 0) && (scanline < m6847->display_scanlines))
 			{
-				video_ram = m6847->get_video_ram(scanline);
+				video_ram = m6847->get_video_ram(machine,scanline);
 				dirty = m6847->dirty;
 				scanline_data = m6847->screendata[scanline];
 
@@ -1634,7 +1634,7 @@ static TIMER_CALLBACK(hs_rise)
 		attotime_make(0, m6847->horizontal_sync_period), 0);
 
 	set_horizontal_sync(machine);
-	prepare_scanline(0);
+	prepare_scanline(machine,0);
 }
 
 static TIMER_CALLBACK(fs_fall)

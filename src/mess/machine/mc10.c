@@ -179,7 +179,7 @@ static ATTR_CONST UINT8 mc10_get_attributes(UINT8 c)
 }
 
 
-static const UINT8 *mc10_get_video_ram(int scanline)
+static const UINT8 *mc10_get_video_ram(running_machine *machine, int scanline)
 {
 	offs_t offset = 0;
 

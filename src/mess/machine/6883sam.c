@@ -93,7 +93,7 @@ static const UINT8 sam_video_mode_row_pitches[] =
 
 static void sam_reset(running_machine *machine);
 
-static void update_sam(void)
+static void update_sam(running_machine *machine)
 {
 	UINT16 xorval;
 
@@ -102,26 +102,26 @@ static void update_sam(void)
 
 	/* Check changes in Page #1 */
 	if ((xorval & 0x0400) && sam.intf->set_pageonemode)
-		sam.intf->set_pageonemode((sam.state & 0x0400) / 0x0400);
+		sam.intf->set_pageonemode(machine,(sam.state & 0x0400) / 0x0400);
 
 	/* Check changes in MPU Rate */
 	if ((xorval & 0x1800) && sam.intf->set_mpurate)
-		sam.intf->set_mpurate((sam.state & 0x1800) / 0x0800);
+		sam.intf->set_mpurate(machine,(sam.state & 0x1800) / 0x0800);
 
 	/* Check changes in Memory Size */
 	if ((xorval & 0x6000) && sam.intf->set_memorysize)
-		sam.intf->set_memorysize((sam.state & 0x6000) / 0x2000);
+		sam.intf->set_memorysize(machine,(sam.state & 0x6000) / 0x2000);
 
 	/* Check changes in Map Type */
 	if ((xorval & 0x8000) && sam.intf->set_maptype)
-		sam.intf->set_maptype((sam.state & 0x8000) / 0x8000);
+		sam.intf->set_maptype(machine,(sam.state & 0x8000) / 0x8000);
 }
 
 
 
 static STATE_POSTLOAD( update_sam_postload )
 {
-	update_sam();
+	update_sam(machine);
 }
 
 
@@ -146,16 +146,16 @@ static void sam_reset(running_machine *machine)
 {
 	sam.state = 0;
 	sam.old_state = ~0;
-	update_sam();
+	update_sam(machine);
 }
 
 
 
-void sam_set_state(UINT16 state, UINT16 mask)
+void sam_set_state(running_machine *machine, UINT16 state, UINT16 mask)
 {
 	sam.state &= ~mask;
 	sam.state |= (state & mask);
-	update_sam();
+	update_sam(machine);
 }
 
 
@@ -171,13 +171,13 @@ WRITE8_HANDLER(sam_w)
 			sam.state |= mask;
 		else
 			sam.state &= ~mask;
-		update_sam();
+		update_sam(space->machine);
 	}
 }
 
 
 
-const UINT8 *sam_m6847_get_video_ram(int scanline)
+const UINT8 *sam_m6847_get_video_ram(running_machine *machine,int scanline)
 {
 	const UINT8 *ram_base;
 	UINT16 video_position;
@@ -216,21 +216,21 @@ const UINT8 *sam_m6847_get_video_ram(int scanline)
 		logerror("sam_m6847_get_video_ram(): scanline=%d video_position=0x%04X\n", scanline, video_position);
 
 	/* return actual position */
-	ram_base = sam.intf->get_rambase ? sam.intf->get_rambase() : mess_ram;
+	ram_base = sam.intf->get_rambase ? sam.intf->get_rambase(machine) : mess_ram;
 	return &ram_base[video_position];
 }
 
-UINT8 get_sam_memorysize(void)
+UINT8 get_sam_memorysize(running_machine *machine)
 {
 	return (sam.state & 0x6000) / 0x2000;
 }
 
-UINT8 get_sam_pagemode(void)
+UINT8 get_sam_pagemode(running_machine *machine)
 {
 	return (sam.state & 0x0400) / 0x0400;
 }
 
-UINT8 get_sam_maptype(void)
+UINT8 get_sam_maptype(running_machine *machine)
 {
 	return (sam.state & 0x8000) / 0x8000;
 }

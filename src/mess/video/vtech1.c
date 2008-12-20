@@ -71,7 +71,7 @@ static ATTR_CONST UINT8 vtech1_get_attributes(UINT8 c)
 }
 
 
-static const UINT8 *vtech1_get_video_ram(int scanline)
+static const UINT8 *vtech1_get_video_ram(running_machine *machine, int scanline)
 {
 	return videoram + (scanline / (vtech1_latch & 0x08 ? 3 : 12)) * 0x20;
 }

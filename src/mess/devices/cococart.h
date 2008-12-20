@@ -67,9 +67,9 @@ union _cococartinfo
 	genf *  f;															/* generic function pointers */
 	char *	s;															/* generic strings */
 
-	void	(*init)(coco_cartridge *cartridge);							/* COCOCARTINFO_PTR_INIT */
-	UINT8	(*rh)(coco_cartridge *cartridge, UINT16 addr);				/* COCOCARTINFO_PTR_FF40_R */
-	void	(*wh)(coco_cartridge *cartridge, UINT16 addr, UINT8 data);	/* COCOCARTINFO_PTR_FF40_W */
+	void	(*init)(running_machine *machine,coco_cartridge *cartridge);							/* COCOCARTINFO_PTR_INIT */
+	UINT8	(*rh)(running_machine *machine,coco_cartridge *cartridge, UINT16 addr);				/* COCOCARTINFO_PTR_FF40_R */
+	void	(*wh)(running_machine *machine,coco_cartridge *cartridge, UINT16 addr, UINT8 data);	/* COCOCARTINFO_PTR_FF40_W */
 };
 
 typedef void (*cococart_getinfo)(UINT32 state, cococartinfo *info);

@@ -39,7 +39,7 @@ static orch90_info *orch90_get_info(coco_cartridge *cartridge)
     orch90_init - initializer for the Orch-90
 -------------------------------------------------*/
 
-static void orch90_init(coco_cartridge *cartridge)
+static void orch90_init(running_machine *machine, coco_cartridge *cartridge)
 {
 	orch90_info *info = orch90_get_info(cartridge);
 
@@ -54,7 +54,7 @@ static void orch90_init(coco_cartridge *cartridge)
     orch90_w - function to write to the Orch-90
 -------------------------------------------------*/
 
-static void orch90_w(coco_cartridge *cartridge, UINT16 addr, UINT8 data)
+static void orch90_w(running_machine *machine, coco_cartridge *cartridge, UINT16 addr, UINT8 data)
 {
 	orch90_info *info = orch90_get_info(cartridge);
 

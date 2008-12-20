@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "device.h"
 #include "cococart.h"
 
@@ -16,9 +15,9 @@
     pak_init - initializer for the PAKs
 -------------------------------------------------*/
 
-static void pak_init(coco_cartridge *cartridge)
+static void pak_init(running_machine *machine, coco_cartridge *cartridge)
 {
-	cococart_set_line(Machine, cartridge, COCOCART_LINE_CART, COCOCART_LINE_VALUE_Q);
+	cococart_set_line(machine, cartridge, COCOCART_LINE_CART, COCOCART_LINE_VALUE_Q);
 }
 
 
@@ -50,9 +49,9 @@ void cococart_pak(UINT32 state, cococartinfo *info)
     banked_pak_set_bank - function to set the bank
 -------------------------------------------------*/
 
-static void banked_pak_set_bank(coco_cartridge *cartridge, UINT32 bank)
+static void banked_pak_set_bank(running_machine *machine, coco_cartridge *cartridge, UINT32 bank)
 {
-	cococart_map_memory(Machine, cartridge, bank * 0x4000, 0x3FFF);
+	cococart_map_memory(machine, cartridge, bank * 0x4000, 0x3FFF);
 }
 
 
@@ -61,10 +60,10 @@ static void banked_pak_set_bank(coco_cartridge *cartridge, UINT32 bank)
     banked_pak_init
 -------------------------------------------------*/
 
-static void banked_pak_init(coco_cartridge *cartridge)
+static void banked_pak_init(running_machine *machine, coco_cartridge *cartridge)
 {
-	pak_init(cartridge);
-	banked_pak_set_bank(cartridge, 0);
+	pak_init(machine,cartridge);
+	banked_pak_set_bank(machine,cartridge, 0);
 }
 
 
@@ -73,13 +72,13 @@ static void banked_pak_init(coco_cartridge *cartridge)
     banked_pak_w - function to write to $FF40
 -------------------------------------------------*/
 
-static void banked_pak_w(coco_cartridge *cartridge, UINT16 addr, UINT8 data)
+static void banked_pak_w(running_machine *machine, coco_cartridge *cartridge, UINT16 addr, UINT8 data)
 {
 	switch(addr)
 	{
 		case 0:
 			/* set the bank */
-			banked_pak_set_bank(cartridge, data);
+			banked_pak_set_bank(machine, cartridge, data);
 			break;
 	}
 }

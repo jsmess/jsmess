@@ -62,8 +62,6 @@ static void coco_field_sync_callback(running_machine *machine, int data)
 	pia_0_cb1_w(space, 0, data);
 }
 
-
-
 static void internal_video_start_coco(running_machine *machine, m6847_type type)
 {
 	m6847_config cfg;

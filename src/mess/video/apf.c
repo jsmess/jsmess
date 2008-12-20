@@ -41,7 +41,7 @@ static void apf_vsync_int(running_machine *machine, int line)
 
 
 
-static const UINT8 *apf_get_video_ram(int scanline)
+static const UINT8 *apf_get_video_ram(running_machine *machine, int scanline)
 {
   if (apf_m6847_attr&M6847_AG) {
     /* apf has only 1kbyte ram and can't use all for video of course
