@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/ins8250.h"
 #include "includes/pc_mouse.h"
 
@@ -28,10 +27,10 @@ static struct {
 
 static TIMER_CALLBACK(pc_mouse_scan);
 
-void pc_mouse_initialise(void)
+void pc_mouse_initialise(running_machine *machine)
 {
 	pc_mouse.head = pc_mouse.tail = 0;
-	pc_mouse.timer = timer_alloc(Machine, pc_mouse_scan, NULL);
+	pc_mouse.timer = timer_alloc(machine, pc_mouse_scan, NULL);
 	pc_mouse.inputs=UART8250_HANDSHAKE_IN_DSR|UART8250_HANDSHAKE_IN_CTS;
 	pc_mouse.ins8250 = NULL;
 }

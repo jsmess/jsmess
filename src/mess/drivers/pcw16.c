@@ -1366,7 +1366,7 @@ static MACHINE_RESET( pcw16 )
 	pc_lpt_set_device(0, &CENTRONICS_PRINTER_DEVICE);
 
 	/* initialise mouse */
-	pc_mouse_initialise();
+	pc_mouse_initialise(machine);
 	pc_mouse_set_serial_port( device_list_find_by_tag( machine->config->devicelist, NS16550, "ns16550_0" ) );
 
 	/* initialise keyboard */

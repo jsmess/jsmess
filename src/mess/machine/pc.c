@@ -1183,7 +1183,7 @@ void mess_init_pc_common(running_machine *machine, UINT32 flags, void (*set_keyb
 	pc_lpt_set_device(2, &CENTRONICS_PRINTER_DEVICE);
 
 	/* serial mouse */
-	pc_mouse_initialise();
+	pc_mouse_initialise(machine);
 }
 
 
