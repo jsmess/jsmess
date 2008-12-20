@@ -652,7 +652,7 @@ static WRITE8_HANDLER( ei_enrg2_w )
 		0		_USERP		0 enables user data bus interrupt and also parallel latched data output (or centronics printer) interrupt
 		1		ANP			1 enables ADC conversion complete interrupt and also calling indicator interrupt
 		2		MLTMD		1 enables serial receive clock into multiplier input of DAC and signals data terminal not ready
-		3		MSPD		1 enables 50K Baud serial data rate to be obtained ie. CTC input clock of 800KHz. 0 selects xxx.692KHz
+		3		MSPD		1 enables 50K Baud serial data rate to be obtained ie. CTC input clock of 800 kHz. 0 selects xxx.692 kHz
 		4		ENOR		1 enables serial receive clock to sound output summer, and also selects serial input from the printer port. 0 selects serial input from the comms port
 		5		ANSW		1 enables second bank of 4 analogue inputs (voltage, non-ratiometric), ie. ch4-7, and enabled sound output, 0 selects ch03
 		6		ENOT		1 enables serial transmit clock to sound ouput summer, and also selects serial output to the printer port. 0 selects serial output to the comms port

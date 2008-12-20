@@ -42,7 +42,7 @@ Custom 16bit DSP:
 
 Sound:
 - 16bit stereo sound
-- 44.1KHz sound sampling rate
+- 44.1 kHz sound sampling rate
 - Fully support Dolby(tm) Surround Sound
 
 Memory:

@@ -68,8 +68,8 @@
 			bit 1: test 1
 			bit 0: test 0
 		0x0f: RESET etc
-			bit 3: 1hz enable
-			bit 2: 16hz enable
+			bit 3: 1 Hz enable
+			bit 2: 16 Hz enable
 			bit 1: timer reset
 			bit 0: alarm reset
 
@@ -226,19 +226,19 @@ static void tc8521_set_alarm_output(const device_config *device)
 
 	/* what happens when all are enabled? I assume they are all or'd together */
 
-	/* 16hz enabled? */
+	/* 16 Hz enabled? */
     if ((rtc->registers[TC8521_RESET_REGISTER] & (1<<2))==0)
     {
 		/* yes */
 
-		/* add in state of 16hz output */
+		/* add in state of 16 Hz output */
 		alarm_output |= (rtc->alarm_outputs & ALARM_OUTPUT_16HZ);
 	}
 
 	if ((rtc->registers[TC8521_RESET_REGISTER] & (1<<3))==0)
 	{
 		/* yes */
-		/* add in stat of 1hz output */
+		/* add in stat of 1 Hz output */
 		alarm_output |= ((rtc->alarm_outputs & ALARM_OUTPUT_1HZ)>>1);
 	}
 
@@ -296,9 +296,9 @@ static TIMER_CALLBACK(tc8521_timer_callback)
 	tc8521_t *rtc = get_token(device);
 
 	/* Assumption how it works */
-	/* 16hz output = 16 cycles per second, 16 cycles of high-low from counter */
+	/* 16 Hz output = 16 cycles per second, 16 cycles of high-low from counter */
 
-	/* toggle 16hz wave state */
+	/* toggle 16 Hz wave state */
 	rtc->alarm_outputs ^= ALARM_OUTPUT_16HZ;
 	/* set in alarm output */
 	tc8521_set_alarm_output(device);
@@ -309,7 +309,7 @@ static TIMER_CALLBACK(tc8521_timer_callback)
 	{
 		rtc->thirty_two_hz_counter = 0;
 
-		/* toggle 1hz output */
+		/* toggle 1 Hz output */
 		rtc->alarm_outputs ^= ALARM_OUTPUT_1HZ;
 		/* set in alarm output */
 		tc8521_set_alarm_output(device);
@@ -478,12 +478,12 @@ WRITE8_DEVICE_HANDLER(tc8521_w)
 		{
 			if ((data & 0x08)==0)
 			{
-			   LOG(("1hz enable\n"));
+			   LOG(("1 Hz enable\n"));
 			}
 
 			if ((data & 0x04)==0)
 			{
-			   LOG(("16hz enable\n"));
+			   LOG(("16 Hz enable\n"));
 			}
 
 			if (data & 0x02)

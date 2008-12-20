@@ -111,7 +111,7 @@ typedef struct
 
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
-/* digital filters work at 8KHz */
+/* digital filters work at 8 kHz */
 #define F0 8096
 
 /* filtered output is supersampled x 8 */
@@ -477,7 +477,7 @@ static void mea8000_stop_frame( mea8000_t* mea8000 )
 
 
 
-/* next sample in frame, sampling at 64 KHz */
+/* next sample in frame, sampling at 64 kHz */
 static TIMER_CALLBACK( mea8000_timer_expire )
 {
 	device_config* device = (device_config*) ptr;

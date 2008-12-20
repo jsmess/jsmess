@@ -338,7 +338,7 @@ boot floppy.
   - AZERTY keyboard, 58-keys, French with accents
   - cartridge 16 KB (up to 64 KB using bank-switching),
     the MESS cartridge device is named -cart
-  - cassette 900 bauds (frequency signals: 0=4.5Khz, 1=6.3KHz)
+  - cassette 900 bauds (frequency signals: 0=4.5 kHz, 1=6.3 kHz)
     the MESS cassette device is named -cass
   - 1-bit internal buzzer
   - lightpen, with 8-pixel horizontal resolution, 1-pixel vertical
@@ -1001,7 +1001,7 @@ Unlike the TO7, the BASIC 1.0 is integrated and the MO5 can be used "as-is".
     . the right SHIFT key has been replaced with a BASIC key
     . no caps-lock led
   - the famous lightpen is optional
-  - cassette 1200 bauds (frequency signals: 0=4.5Khz, 1=6.3KHz),
+  - cassette 1200 bauds (frequency signals: 0=4.5kHz, 1=6.3kHz),
     TO7-incompatible
   - optional cartridge, up to 64 KB, incompatible with TO7,
     masks the integrated BASIC ROM

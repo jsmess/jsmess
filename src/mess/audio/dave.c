@@ -7,7 +7,7 @@ DAVE SOUND CHIP FOUND IN ENTERPRISE
 
 	- pure tone
 	- sampled sounds
-	- 1kHz, 50Hz and 1Hz ints
+	- 1 kHz, 50 Hz and 1 Hz ints
 	- external ints (int1 and int2) - not correct speed yet
 
 */
@@ -678,7 +678,7 @@ b5 = 1: Reset INT1 latch
 b4 = 1: Enable INT1
 b3 = 1: Reset 1Hz interrupt latch
 b2 = 1: Enable 1Hz interrupt
-b1 = 1: Reset 1kHz/50hz/TG latch
+b1 = 1: Reset 1kHz/50Hz/TG latch
 b0 = 1: Enable 1kHz/50Hz/TG latch
 */
 

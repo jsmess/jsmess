@@ -44,8 +44,8 @@ INLINE const device_config* thom_cassette_img( running_machine *machine )
 
 /* On the TO7 & compatible (TO7/70,TO8,TO9, but not MO5,MO6), bits are coded
    in FM format with a 1.1 ms period (900 bauds):
-   - 0 is 5 periods at 4.5 KHz
-   - 1 is 7 periods at 6.3 KHz
+   - 0 is 5 periods at 4.5 kHz
+   - 1 is 7 periods at 6.3 kHz
 
    Moreover, a byte is represented using 11 bits:
    - one 0 start bit
@@ -58,8 +58,8 @@ INLINE const device_config* thom_cassette_img( running_machine *machine )
 
    The computer outputs a modulated wave that is directly put on the cassette.
    However, the input is demodulated by the cassette-reader before being
-   sent to the computer: we got 0 when the signal is around 4.5 KHz and
-   1 when the signal is around 6.3 KHz.
+   sent to the computer: we got 0 when the signal is around 4.5 kHz and
+   1 when the signal is around 6.3 kHz.
 */
 
 #define TO7_BIT_LENGTH 0.001114
@@ -70,7 +70,7 @@ static UINT8* to7_k7_bits;
 
 
 /* 1-bit cassette input to the computer
-   inside the controller, two frequency filters (adjusted to 6.3 and 4.5 KHz)
+   inside the controller, two frequency filters (adjusted to 6.3 and 4.5 kHz)
    and a comparator demodulate the raw signal into 0s and 1s.
 */
 static int to7_get_cassette ( running_machine *machine )
