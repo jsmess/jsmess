@@ -7,7 +7,6 @@
 *********************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "msm8251.h"
 #include "includes/serial.h"
 
@@ -64,7 +63,7 @@ struct _msm8251_t
 ***************************************************************************/
 
 static void msm8251_receive_character(const device_config *device, UINT8 ch);
-static void msm8251_in_callback(int id, unsigned long state);
+static void msm8251_in_callback(running_machine *machine, int id, unsigned long state);
 static void msm8251_update_tx_empty(const device_config *device);
 static void msm8251_update_tx_ready(const device_config *device);
 
@@ -100,14 +99,14 @@ INLINE const msm8251_interface *get_interface(const device_config *device)
     msm8251_in_callback
 -------------------------------------------------*/
 
-static void msm8251_in_callback(int id, unsigned long state)
+static void msm8251_in_callback(running_machine *machine, int id, unsigned long state)
 {
 	const device_config *device;
 	msm8251_t *uart;
 	int changed;
 
 	/* NPW 29-Nov-2008 - These two lines are a hack and indicate why our "serial" infrastructure needs to be updated */
-	device = device_list_find_by_tag(Machine->config->devicelist, MSM8251, "uart");
+	device = device_list_find_by_tag(machine->config->devicelist, MSM8251, "uart");
 	uart = get_token(device);
 
 	changed = uart->connection.input_state^state;
@@ -136,8 +135,8 @@ static DEVICE_START( msm8251 )
 	serial_helper_setup();
 
 	/* setup this side of the serial connection */
-	serial_connection_init(&uart->connection);
-	serial_connection_set_in_callback(&uart->connection, msm8251_in_callback);
+	serial_connection_init(device->machine,&uart->connection);
+	serial_connection_set_in_callback(device->machine,&uart->connection, msm8251_in_callback);
 	uart->connection.input_state = 0;
 	return DEVICE_START_OK;
 }
@@ -228,7 +227,7 @@ void msm8251_transmit_clock(const device_config *device)
 		if ((uart->transmit_reg.flags & TRANSMIT_REGISTER_EMPTY)==0)
 		{
 	//		logerror("MSM8251\n");
-			transmit_register_send_bit(&uart->transmit_reg, &uart->connection);
+			transmit_register_send_bit(device->machine,&uart->transmit_reg, &uart->connection);
 		}
 	}
 
@@ -315,7 +314,7 @@ static void msm8251_update_tx_empty(const device_config *device)
 	{
 		/* tx is in marking state (high) when tx empty! */
 		set_out_data_bit(uart->connection.State, 1);
-		serial_connection_out(&uart->connection);
+		serial_connection_out(device->machine,&uart->connection);
 	}
 
 	if (uart_interface->tx_empty_callback != NULL)
@@ -342,7 +341,7 @@ static DEVICE_RESET( msm8251 )
 
 	/* assumption, rts is set to 1 */
 	uart->connection.State &= ~SERIAL_STATE_RTS;
-	serial_connection_out(&uart->connection);
+	serial_connection_out(device->machine, &uart->connection);
 
 	transmit_register_reset(&uart->transmit_reg);
 	receive_register_reset(&uart->receive_reg);
@@ -659,7 +658,7 @@ WRITE8_DEVICE_HANDLER(msm8251_control_w)
 
 
 		/* refresh outputs */
-		serial_connection_out(&uart->connection);
+		serial_connection_out(device->machine, &uart->connection);
 
 		if (data & (1<<4))
 		{
@@ -780,7 +779,7 @@ void msm8251_connect_to_serial_device(const device_config *device, const device_
 void msm8251_connect(const device_config *device, struct serial_connection *other_connection)
 {
 	msm8251_t *uart = get_token(device);
-	serial_connection_link(&uart->connection, other_connection);
+	serial_connection_link(device->machine, &uart->connection, other_connection);
 }
 
 

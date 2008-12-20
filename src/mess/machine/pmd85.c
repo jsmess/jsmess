@@ -762,7 +762,7 @@ const ppi8255_interface mato_ppi8255_interface =
 
 static struct serial_connection pmd85_cassette_serial_connection;
 
-static void pmd85_cassette_write(int id, unsigned long state)
+static void pmd85_cassette_write(running_machine *machine, int id, unsigned long state)
 {
 	pmd85_cassette_serial_connection.input_state = state;
 }
@@ -797,7 +797,7 @@ static TIMER_CALLBACK(pmd85_cassette_timer_callback)
 							data = (!previous_level && current_level) ? 1 : 0;
 
 							set_out_data_bit(pmd85_cassette_serial_connection.State, data);
-							serial_connection_out(&pmd85_cassette_serial_connection);
+							serial_connection_out(machine, &pmd85_cassette_serial_connection);
 							msm8251_receive_clock(device_list_find_by_tag( machine->config->devicelist, MSM8251, "uart" ));
 
 							clk_level_tape = 1;
@@ -854,8 +854,8 @@ static void pmd85_common_driver_init (running_machine *machine)
 	pmd85_cassette_timer = timer_alloc(machine, pmd85_cassette_timer_callback, NULL);
 	timer_adjust_periodic(pmd85_cassette_timer, attotime_zero, 0, ATTOTIME_IN_HZ(2400));
 
-	serial_connection_init(&pmd85_cassette_serial_connection);
-	serial_connection_set_in_callback(&pmd85_cassette_serial_connection, pmd85_cassette_write);
+	serial_connection_init(machine, &pmd85_cassette_serial_connection);
+	serial_connection_set_in_callback(machine, &pmd85_cassette_serial_connection, pmd85_cassette_write);
 }
 
 DRIVER_INIT ( pmd851 )

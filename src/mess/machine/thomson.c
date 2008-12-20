@@ -770,7 +770,7 @@ static WRITE8_HANDLER ( to7_io_porta_out )
 		to7_io_line.State &= ~SERIAL_STATE_DTR;
 
 	set_out_data_bit( to7_io_line.State, tx );
-	serial_connection_out( &to7_io_line );
+	serial_connection_out( space->machine, &to7_io_line );
 }
 
 
@@ -815,12 +815,12 @@ static WRITE8_HANDLER ( to7_io_cb2_out )
 
 
 
-static void to7_io_in_cb ( int id, unsigned long state )
+static void to7_io_in_cb ( running_machine *machine, int id, unsigned long state )
 {
 	/* our peer's state has changed */
 	to7_io_line.input_state = state;
 
-	//LOG_IO(( "%f to7_io_in_callback:  cts=%i dsr=%i rd=%i\n", attotime_to_double(timer_get_time(machine)), (state & SERIAL_STATE_CTS) ? 1 : 0, (state & SERIAL_STATE_DSR) ? 1 : 0, (int)get_in_data_bit( state ) ));
+	LOG_IO(( "%f to7_io_in_callback:  cts=%i dsr=%i rd=%i\n", attotime_to_double(timer_get_time(machine)), (state & SERIAL_STATE_CTS) ? 1 : 0, (state & SERIAL_STATE_DSR) ? 1 : 0, (int)get_in_data_bit( state ) ));
 }
 
 
@@ -861,7 +861,7 @@ static void to7_io_reset( running_machine *machine )
 	to7_io_line.State &= ~SERIAL_STATE_DTR;
 	to7_io_line.State |=  SERIAL_STATE_RTS;  /* always ready to send */
 	set_out_data_bit( to7_io_line.State, 1 );
-	serial_connection_out( &to7_io_line );
+	serial_connection_out( machine, &to7_io_line );
 }
 
 
@@ -871,8 +871,8 @@ static void to7_io_init( running_machine *machine )
 	LOG (( "to7_io_init: CC 90-323 serial / parallel extension\n" ));
 	pia_config( machine, THOM_PIA_IO, &to7_io );
 	centronics_config( machine, 0, &to7_centronics );
-	serial_connection_init( &to7_io_line );
-	serial_connection_set_in_callback( &to7_io_line, to7_io_in_cb );
+	serial_connection_init( machine, &to7_io_line );
+	serial_connection_set_in_callback( machine, &to7_io_line, to7_io_in_cb );
 }
 
 

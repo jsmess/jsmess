@@ -13,7 +13,6 @@
 *********************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "6551.h"
 #include "includes/serial.h"
 
@@ -79,13 +78,13 @@ INLINE acia6551_t *get_token(const device_config *device)
 	has updated state
 -------------------------------------------------*/
 
-static void acia_6551_in_callback(int id, unsigned long state)
+static void acia_6551_in_callback(running_machine *machine, int id, unsigned long state)
 {
 	const device_config *device;
 	acia6551_t *acia;
 
 	/* NPW 29-Nov-2008 - These two lines are a hack and indicate why our "serial" infrastructure needs to be updated */
-	device = device_list_find_by_tag(Machine->config->devicelist, ACIA6551, "acia");
+	device = device_list_find_by_tag(machine->config->devicelist, ACIA6551, "acia");
 	acia = get_token(device);
 
 	acia->connection.input_state = state;
@@ -130,7 +129,7 @@ static TIMER_CALLBACK(acia_6551_timer_callback)
 	if ((acia->transmit_reg.flags & TRANSMIT_REGISTER_EMPTY)==0)
 	{
 	//	logerror("UART6551\n");
-		transmit_register_send_bit(&acia->transmit_reg, &acia->connection);
+		transmit_register_send_bit(machine, &acia->transmit_reg, &acia->connection);
 	}
 }
 
@@ -151,8 +150,8 @@ DEVICE_START( acia6551 )
 	acia->status_register |= (1<<4);
 	acia->timer = timer_alloc(device->machine, acia_6551_timer_callback, (void *) device);
 
-	serial_connection_init(&acia->connection);
-	serial_connection_set_in_callback(&acia->connection, acia_6551_in_callback);
+	serial_connection_init(device->machine, &acia->connection);
+	serial_connection_set_in_callback(device->machine, &acia->connection, acia_6551_in_callback);
 	transmit_register_reset(&acia->transmit_reg);
 	receive_register_reset(&acia->receive_reg);
 	return DEVICE_START_OK;
@@ -398,7 +397,7 @@ WRITE8_DEVICE_HANDLER(acia_6551_w)
 				break;
 			}
 
-			serial_connection_out(&acia->connection);
+			serial_connection_out(device->machine, &acia->connection);
 
 			acia_6551_update_data_form(device);
 		}

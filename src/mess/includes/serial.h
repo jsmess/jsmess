@@ -123,28 +123,28 @@ struct serial_connection
 
 	/* this callback is executed when this side has refreshed it's state,
     to let the other end know */
-	void	(*out_callback)(int id, unsigned long state);
+	void	(*out_callback)(running_machine *machine, int id, unsigned long state);
 	/* this callback is executed when the other side has refreshed it's state,
     to let the other end know */
-	void	(*in_callback)(int id, unsigned long state);
+	void	(*in_callback)(running_machine *machine, int id, unsigned long state);
 };
 
 /*----------- defined in machine/serial.c -----------*/
 
 /* setup out and in callbacks */
-void serial_connection_init(struct serial_connection *connection);
+void serial_connection_init(running_machine *machine, struct serial_connection *connection);
 
 /* set callback which will be executed when out status has changed */
-void serial_connection_set_out_callback(struct serial_connection *connection, void (*out_cb)(int id, unsigned long state));
+void serial_connection_set_out_callback(running_machine *machine, struct serial_connection *connection, void (*out_cb)(running_machine *machine, int id, unsigned long state));
 
 /* set callback which will be executed when in status has changed */
-void serial_connection_set_in_callback(struct serial_connection *connection, void (*in_cb)(int id, unsigned long state));
+void serial_connection_set_in_callback(running_machine *machine, struct serial_connection *connection, void (*in_cb)(running_machine *machine, int id, unsigned long state));
 
 /* output status, if callback is setup it will be executed with the new status */
-void serial_connection_out(struct serial_connection *connection);
+void serial_connection_out(running_machine *machine, struct serial_connection *connection);
 
 /* join two serial connections */
-void serial_connection_link(struct serial_connection *connection_a, struct serial_connection *connection_b);
+void serial_connection_link(running_machine *machine, struct serial_connection *connection_a, struct serial_connection *connection_b);
 
 
 /*******************************************************************************/
@@ -225,7 +225,7 @@ struct serial_transmit_register
 int transmit_register_get_data_bit(struct serial_transmit_register *transmit_reg);
 /* setup transmit reg ready for transmit */
 void transmit_register_setup(struct serial_transmit_register *transmit_reg, struct data_form *data_form,unsigned char data_byte);
-void	transmit_register_send_bit(struct serial_transmit_register *transmit_reg, struct serial_connection *connection);
+void	transmit_register_send_bit(running_machine *machine, struct serial_transmit_register *transmit_reg, struct serial_connection *connection);
 void	transmit_register_reset(struct serial_transmit_register *transmit_reg);
 
 /*******************************************************************************/
