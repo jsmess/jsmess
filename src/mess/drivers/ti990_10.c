@@ -87,7 +87,7 @@ static MACHINE_RESET( ti990_10 )
 
 	ti990_reset_int();
 
-	ti990_tpc_init(ti990_set_int9);
+	ti990_tpc_init(machine, ti990_set_int9);
 	ti990_hdc_init(machine, ti990_set_int13);
 }
 
@@ -95,7 +95,7 @@ static INTERRUPT_GEN( ti990_10_line_interrupt )
 {
 	vdt911_keyboard(device->machine, 0);
 
-	ti990_line_interrupt();
+	ti990_line_interrupt(device->machine);
 }
 
 /*static void idle_callback(int state)

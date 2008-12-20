@@ -5,7 +5,6 @@
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "ti990.h"
 
 /*
@@ -43,34 +42,34 @@ void ti990_set_int2(const device_config *device, int state)
 	ti990_set_int_line(device->machine, 2, state);
 }
 
-void ti990_set_int3(int state)
+void ti990_set_int3(running_machine *machine, int state)
 {
-	ti990_set_int_line(Machine, 3, state);
+	ti990_set_int_line(machine, 3, state);
 }
 
-void ti990_set_int6(int state)
+void ti990_set_int6(running_machine *machine, int state)
 {
-	ti990_set_int_line(Machine, 6, state);
+	ti990_set_int_line(machine, 6, state);
 }
 
-void ti990_set_int7(int state)
+void ti990_set_int7(running_machine *machine, int state)
 {
-	ti990_set_int_line(Machine, 7, state);
+	ti990_set_int_line(machine, 7, state);
 }
 
-void ti990_set_int9(int state)
+void ti990_set_int9(running_machine *machine, int state)
 {
-	ti990_set_int_line(Machine, 9, state);
+	ti990_set_int_line(machine, 9, state);
 }
 
-void ti990_set_int10(int state)
+void ti990_set_int10(running_machine *machine, int state)
 {
-	ti990_set_int_line(Machine, 10, state);
+	ti990_set_int_line(machine, 10, state);
 }
 
-void ti990_set_int13(int state)
+void ti990_set_int13(running_machine *machine, int state)
 {
-	ti990_set_int_line(Machine, 13, state);
+	ti990_set_int_line(machine, 13, state);
 }
 
 /*
@@ -96,10 +95,10 @@ void ti990_hold_load(running_machine *machine)
 SMI sheet 4) */
 static char ckon_state;
 
-void ti990_line_interrupt(void)
+void ti990_line_interrupt(running_machine *machine)
 {
 	if (ckon_state)
-		ti990_set_int_line(Machine, 5, 1);
+		ti990_set_int_line(machine, 5, 1);
 }
 
 void ti990_ckon_ckof_callback(const device_config *device, int state)

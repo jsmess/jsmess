@@ -184,12 +184,12 @@ void ti99_rs232_reset(running_machine *machine)
 */
 static TMS9902_INT_CALLBACK( int_callback_0 )
 {
-	ti99_peb_set_ila_bit(inta_rs232_1_bit, INT);
+	ti99_peb_set_ila_bit(device->machine, inta_rs232_1_bit, INT);
 }
 
 static TMS9902_INT_CALLBACK( int_callback_1 )
 {
-	ti99_peb_set_ila_bit(inta_rs232_2_bit, INT);
+	ti99_peb_set_ila_bit(device->machine, inta_rs232_2_bit, INT);
 }
 
 static TMS9902_XMIT_CALLBACK( xmit_callback_0 )

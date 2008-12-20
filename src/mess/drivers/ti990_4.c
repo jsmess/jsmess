@@ -53,10 +53,10 @@ static MACHINE_RESET(ti990_4)
 	ti990_reset_int();
 
 #if !VIDEO_911
-	asr733_reset(0);
+	asr733_reset(machine, 0);
 #endif
 
-	fd800_machine_init(ti990_set_int7);
+	fd800_machine_init(machine, ti990_set_int7);
 }
 
 
@@ -68,7 +68,7 @@ static INTERRUPT_GEN( ti990_4_line_interrupt )
 	asr733_keyboard(device->machine, 0);
 #endif
 
-	ti990_line_interrupt();
+	ti990_line_interrupt(device->machine);
 }
 
 /*static void idle_callback(int state)

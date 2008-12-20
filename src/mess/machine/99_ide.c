@@ -18,6 +18,7 @@
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/idectrl.h"
 #include "machine/rtc65271.h"
 #include "ti99_4x.h"
@@ -75,11 +76,11 @@ static int tms9995_mode;
 
 	IDE interrupt callback
 */
-void ti99_ide_interrupt(int state)
+void ti99_ide_interrupt(running_machine *machine, int state)
 {
 	ide_irq = state;
 	if (cru_register & cru_reg_int_en)
-		ti99_peb_set_ila_bit(inta_ide_bit, state);
+		ti99_peb_set_ila_bit(machine, inta_ide_bit, state);
 }
 
 /*
@@ -90,7 +91,7 @@ void ti99_ide_interrupt(int state)
 static void clk_interrupt_callback(int state)
 {
 	clk_irq = state;
-	ti99_peb_set_ila_bit(inta_ide_clk_bit, state);
+	ti99_peb_set_ila_bit(Machine, inta_ide_clk_bit, state);
 }
 
 /*
@@ -209,7 +210,7 @@ static void ide_cru_w(running_machine *machine, int offset, int data)
 			cru_register &= ~ (1 << offset);
 
 		if (offset == 6)
-			ti99_peb_set_ila_bit(inta_ide_bit, (cru_register & cru_reg_int_en) && ide_irq);
+			ti99_peb_set_ila_bit(machine, inta_ide_bit, (cru_register & cru_reg_int_en) && ide_irq);
 
 		if ((offset == 6) || (offset == 7))
 			if ((cru_register & cru_reg_int_en) && !(cru_register & cru_reg_reset))

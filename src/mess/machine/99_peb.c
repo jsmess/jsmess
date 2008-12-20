@@ -101,7 +101,6 @@
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "99_peb.h"
 
 /* TRUE if we are using the snug sgcpu 99/4p 16-bit extensions */
@@ -281,19 +280,19 @@ void ti99_peb_set_16bit_card_handlers(int cru_base, const ti99_peb_16bit_card_ha
 		bit of the ILA register)
 	state: 1 to assert bit, 0 to clear
 */
-void ti99_peb_set_ila_bit(int bit, int state)
+void ti99_peb_set_ila_bit(running_machine *machine, int bit, int state)
 {
 	if (state)
 	{
 		ila |= 1 << bit;
 		if (inta_callback)
-			(*inta_callback)(Machine, 1);
+			(*inta_callback)(machine, 1);
 	}
 	else
 	{
 		ila &= ~(1 << bit);
 		if ((! ila) && inta_callback)
-			(*inta_callback)(Machine, 0);
+			(*inta_callback)(machine, 0);
 	}
 }
 
@@ -306,19 +305,19 @@ void ti99_peb_set_ila_bit(int bit, int state)
 		bit of the ILB register)
 	state: 1 to assert bit, 0 to clear
 */
-void ti99_peb_set_ilb_bit(int bit, int state)
+void ti99_peb_set_ilb_bit(running_machine *machine, int bit, int state)
 {
 	if (state)
 	{
 		ilb |= 1 << bit;
 		if (intb_callback)
-			(*intb_callback)(Machine, 1);
+			(*intb_callback)(machine, 1);
 	}
 	else
 	{
 		ilb &= ~(1 << bit);
 		if ((! ilb) && intb_callback)
-			(*intb_callback)(Machine, 0);
+			(*intb_callback)(machine, 0);
 	}
 }
 

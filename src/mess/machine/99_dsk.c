@@ -373,11 +373,11 @@ static WD17XX_CALLBACK( fdc_callback )
 	{
 	case WD17XX_IRQ_CLR:
 		DRQ_IRQ_status &= ~fdc_IRQ;
-		ti99_peb_set_ilb_bit(intb_fdc_bit, 0);
+		ti99_peb_set_ilb_bit(device->machine, intb_fdc_bit, 0);
 		break;
 	case WD17XX_IRQ_SET:
 		DRQ_IRQ_status |= fdc_IRQ;
-		ti99_peb_set_ilb_bit(intb_fdc_bit, 1);
+		ti99_peb_set_ilb_bit(device->machine, intb_fdc_bit, 1);
 		break;
 	case WD17XX_DRQ_CLR:
 		DRQ_IRQ_status &= ~fdc_DRQ;

@@ -58,8 +58,8 @@ void ti99_peb_reset(int in_has_16bit_peb, void (*in_inta_callback)(running_machi
 
 void ti99_peb_set_card_handlers(int cru_base, const ti99_peb_card_handlers_t *handler);
 void ti99_peb_set_16bit_card_handlers(int cru_base, const ti99_peb_16bit_card_handlers_t *handler);
-void ti99_peb_set_ila_bit(int bit, int state);
-void ti99_peb_set_ilb_bit(int bit, int state);
+void ti99_peb_set_ila_bit(running_machine *machine, int bit, int state);
+void ti99_peb_set_ilb_bit(running_machine *machine, int bit, int state);
 
  READ8_HANDLER ( ti99_4x_peb_cru_r );
 WRITE8_HANDLER ( ti99_4x_peb_cru_w );

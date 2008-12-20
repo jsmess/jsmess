@@ -60,7 +60,7 @@ static struct
 
 	int x;
 
-	void (*int_callback)(int state);
+	void (*int_callback)(running_machine *, int state);
 
 	bitmap_t *bitmap;
 } asr[MAX_ASR];
@@ -167,7 +167,7 @@ void asr733_init(running_machine *machine)
 	memcpy(dst, fontdata6x8, asrfontdata_size);
 }
 
-int asr733_init_term(running_machine *machine, int unit, void (*int_callback)(int state))
+int asr733_init_term(running_machine *machine, int unit, void (*int_callback)(running_machine *, int state))
 {
 	const device_config *screen = video_screen_first(machine->config);
 	int width = video_screen_get_width(screen);
@@ -183,30 +183,30 @@ int asr733_init_term(running_machine *machine, int unit, void (*int_callback)(in
 	return 0;
 }
 
-static void asr_field_interrupt(int unit)
+static void asr_field_interrupt(running_machine *machine, int unit)
 {
 	if ((asr[unit].mode & AM_enint_mask) && (asr[unit].new_status_flag))	/* right??? */
 	{
 		asr[unit].status |= AS_int_mask;
 		if (asr[unit].int_callback)
-			(*asr[unit].int_callback)(1);
+			(*asr[unit].int_callback)(machine, 1);
 	}
 	else
 	{
 		asr[unit].status &= ~AS_int_mask;
 		if (asr[unit].int_callback)
-			(*asr[unit].int_callback)(0);
+			(*asr[unit].int_callback)(machine, 0);
 	}
 }
 
-void asr733_reset(int unit)
+void asr733_reset(running_machine *machine, int unit)
 {
 	/*asr[unit].OutQueueLen = 0;*/
 
 	asr[unit].status = AS_dsr_mask | AS_wrq_mask;
 	asr[unit].mode = 0;
 
-	asr_field_interrupt(unit);
+	asr_field_interrupt(machine, unit);
 }
 
 /* write a single char on screen */
@@ -295,7 +295,7 @@ static void asr_transmit(running_machine *machine, int unit, UINT8 data)
 
 	asr[unit].status |= AS_wrq_mask;
 	asr[unit].new_status_flag = 1;	/* right??? */
-	asr_field_interrupt(unit);
+	asr_field_interrupt(machine, unit);
 }
 
 #if 0
@@ -309,7 +309,7 @@ static void asr_receive_callback(int dummy)
 
 	ASR.status |= AS_rrq_mask;
 	ASR.new_status_flag = 1;	/* right??? */
-	asr_field_interrupt();
+	asr_field_interrupt(machine, 0);
 }
 #endif
 
@@ -389,18 +389,18 @@ void asr733_cru_w(running_machine *machine, int offset, int data, int unit)
 		else
 			asr[unit].mode &= ~ (1 << (offset - 8));
 		if (offset == 14)
-			asr_field_interrupt(unit);
+			asr_field_interrupt(machine, unit);
 		break;
 
 	case 11:	/* clear write request (write any value to execute) */
 	case 12:	/* clear read request (write any value to execute) */
 		asr[unit].status &= ~ (1 << (offset - 8));
-		asr_field_interrupt(unit);
+		asr_field_interrupt(machine, unit);
 		break;
 
 	case 13:	/* clear new status flag - whatever it means (write any value to execute) */
 		asr[unit].new_status_flag = 0;
-		asr_field_interrupt(unit);
+		asr_field_interrupt(machine, unit);
 		break;
 	}
 }
@@ -671,7 +671,7 @@ void asr733_keyboard(running_machine *machine, int unit)
 				{	/* repeat current key */
 					asr[unit].status |= AS_rrq_mask;
 					asr[unit].new_status_flag = 1;	/* right??? */
-					asr_field_interrupt(unit);
+					asr_field_interrupt(machine, unit);
 					repeat_timer = 0;
 				}
 			}
@@ -704,7 +704,7 @@ void asr733_keyboard(running_machine *machine, int unit)
 						asr[unit].recv_buf = (int)key_translate[modifier_state][last_key_pressed];
 						asr[unit].status |= AS_rrq_mask;
 						asr[unit].new_status_flag = 1;	/* right??? */
-						asr_field_interrupt(unit);
+						asr_field_interrupt(machine, unit);
 						return;
 					}
 				}

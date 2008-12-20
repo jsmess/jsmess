@@ -33,7 +33,7 @@
 #include "990_tap.h"
 #include "image.h"
 
-static void update_interrupt(void);
+static void update_interrupt(running_machine *machine);
 
 #define MAX_TAPE_UNIT 4
 
@@ -49,7 +49,7 @@ typedef struct tpc_t
 {
 	UINT16 w[8];
 
-	void (*interrupt_callback)(int state);
+	void (*interrupt_callback)(running_machine *machine, int state);
 
 	tape_unit_t t[MAX_TAPE_UNIT];
 } tpc_t;
@@ -171,7 +171,7 @@ DEVICE_IMAGE_UNLOAD( ti990_tape )
 /*
 	Init the tape controller core
 */
-void ti990_tpc_init(void (*interrupt_callback)(int state))
+void ti990_tpc_init(running_machine *machine, void (*interrupt_callback)(running_machine *machine, int state))
 {
 	memset(tpc.w, 0, sizeof(tpc.w));
 	/* The PE bit is always set for the MT3200 (but not MT1600) */
@@ -180,7 +180,7 @@ void ti990_tpc_init(void (*interrupt_callback)(int state))
 
 	tpc.interrupt_callback = interrupt_callback;
 
-	update_interrupt();
+	update_interrupt(machine);
 }
 
 /*
@@ -212,10 +212,10 @@ static int cur_tape_unit(void)
 /*
 	Update interrupt state
 */
-static void update_interrupt(void)
+static void update_interrupt(running_machine *machine)
 {
 	if (tpc.interrupt_callback)
-		(*tpc.interrupt_callback)((tpc.w[7] & w7_idle)
+		(*tpc.interrupt_callback)(machine, (tpc.w[7] & w7_idle)
 									&& (((tpc.w[7] & w7_int_enable) && (tpc.w[7] & (w7_complete | w7_error)))
 										|| ((tpc.w[0] & ~(tpc.w[0] >> 4)) & w0_rewind_mask)));
 }
@@ -244,14 +244,14 @@ static void cmd_read_binary_forward(running_machine *machine)
 	{
 		/* No idea what to report... */
 		tpc.w[7] |= w7_idle | w7_error | w7_hard_error;
-		update_interrupt();
+		update_interrupt(machine);
 		return;
 	}
 	else if (! image_exists(tpc.t[tap_sel].img))
 	{	/* offline */
 		tpc.w[0] |= w0_offline;
 		tpc.w[7] |= w7_idle | w7_error | w7_tape_error;
-		update_interrupt();
+		update_interrupt(machine);
 		return;
 	}
 #if 0
@@ -259,7 +259,7 @@ static void cmd_read_binary_forward(running_machine *machine)
 	{	/* rewind in progress */
 		tpc.w[0] |= 0x80 >> tap_sel;
 		tpc.w[7] |= w7_idle | w7_error | w7_tape_error;
-		update_interrupt();
+		update_interrupt(machine);
 		return;
 	}
 #endif
@@ -278,7 +278,7 @@ static void cmd_read_binary_forward(running_machine *machine)
 			tpc.t[tap_sel].eot = 1;
 			tpc.w[0] |= w0_EOT;	/* or should it be w0_command_timeout? */
 			tpc.w[7] |= w7_idle | w7_error | w7_tape_error;
-			update_interrupt();
+			update_interrupt(machine);
 			goto update_registers;
 		}
 		else
@@ -289,7 +289,7 @@ static void cmd_read_binary_forward(running_machine *machine)
 			image_unload(tpc.t[tap_sel].img);
 			tpc.w[0] |= w0_offline;
 			tpc.w[7] |= w7_idle | w7_error | w7_hard_error;
-			update_interrupt();
+			update_interrupt(machine);
 			goto update_registers;
 		}
 	}
@@ -302,7 +302,7 @@ static void cmd_read_binary_forward(running_machine *machine)
 		image_unload(tpc.t[tap_sel].img);
 		tpc.w[0] |= w0_offline;
 		tpc.w[7] |= w7_idle | w7_error | w7_hard_error;
-		update_interrupt();
+		update_interrupt(machine);
 		goto update_registers;
 	}
 
@@ -312,7 +312,7 @@ static void cmd_read_binary_forward(running_machine *machine)
 		logerror("read binary forward: found EOF, requested %d\n", char_count);
 		tpc.w[0] |= w0_EOF;
 		tpc.w[7] |= w7_idle | w7_error | w7_tape_error;
-		update_interrupt();
+		update_interrupt(machine);
 		goto update_registers;
 	}
 
@@ -329,7 +329,7 @@ static void cmd_read_binary_forward(running_machine *machine)
 		image_unload(tpc.t[tap_sel].img);
 		tpc.w[0] |= w0_offline;
 		tpc.w[7] |= w7_idle | w7_error | w7_hard_error;
-		update_interrupt();
+		update_interrupt(machine);
 		goto update_registers;
 	}
 
@@ -339,7 +339,7 @@ static void cmd_read_binary_forward(running_machine *machine)
 	{
 		tpc.w[0] |= w0_EOR;
 		tpc.w[7] |= w7_idle | w7_error | w7_tape_error;
-		update_interrupt();
+		update_interrupt(machine);
 		goto skip_trailer;
 	}
 
@@ -373,7 +373,7 @@ static void cmd_read_binary_forward(running_machine *machine)
 			image_unload(tpc.t[tap_sel].img);
 			tpc.w[0] |= w0_offline;
 			tpc.w[7] |= w7_idle | w7_error | w7_hard_error;
-			update_interrupt();
+			update_interrupt(machine);
 			goto update_registers;
 		}
 	}
@@ -382,7 +382,7 @@ static void cmd_read_binary_forward(running_machine *machine)
 	{
 		tpc.w[0] |= w0_EOR;
 		tpc.w[7] |= w7_idle | w7_error | w7_tape_error;
-		update_interrupt();
+		update_interrupt(machine);
 		goto skip_trailer;
 	}
 
@@ -394,7 +394,7 @@ static void cmd_read_binary_forward(running_machine *machine)
 			image_unload(tpc.t[tap_sel].img);
 			tpc.w[0] |= w0_offline;
 			tpc.w[7] |= w7_idle | w7_error | w7_hard_error;
-			update_interrupt();
+			update_interrupt(machine);
 			goto update_registers;
 		}
 	}
@@ -406,7 +406,7 @@ skip_trailer:
 		image_unload(tpc.t[tap_sel].img);
 		tpc.w[0] |= w0_offline;
 		tpc.w[7] |= w7_idle | w7_error | w7_hard_error;
-		update_interrupt();
+		update_interrupt(machine);
 		goto update_registers;
 	}
 
@@ -416,7 +416,7 @@ skip_trailer:
 		image_unload(tpc.t[tap_sel].img);
 		tpc.w[0] |= w0_offline;
 		tpc.w[7] |= w7_idle | w7_error | w7_hard_error;
-		update_interrupt();
+		update_interrupt(machine);
 		goto update_registers;
 	}
 	if (buffer[2] || buffer[3])
@@ -427,14 +427,14 @@ skip_trailer:
 		image_unload(tpc.t[tap_sel].img);
 		tpc.w[0] |= w0_offline;
 		tpc.w[7] |= w7_idle | w7_error | w7_hard_error;
-		update_interrupt();
+		update_interrupt(machine);
 		goto update_registers;
 	}
 
 	if (! (tpc.w[7] & w7_error))
 	{
 		tpc.w[7] |= w7_idle | w7_complete;
-		update_interrupt();
+		update_interrupt(machine);
 	}
 
 update_registers:
@@ -449,7 +449,7 @@ update_registers:
 /*
 	Handle the record skip forward command: skip a specified number of records.
 */
-static void cmd_record_skip_forward(void)
+static void cmd_record_skip_forward(running_machine *machine)
 {
 	UINT8 buffer[4];
 	int reclen;
@@ -463,14 +463,14 @@ static void cmd_record_skip_forward(void)
 	{
 		/* No idea what to report... */
 		tpc.w[7] |= w7_idle | w7_error | w7_hard_error;
-		update_interrupt();
+		update_interrupt(machine);
 		return;
 	}
 	else if (! image_exists(tpc.t[tap_sel].img))
 	{	/* offline */
 		tpc.w[0] |= w0_offline;
 		tpc.w[7] |= w7_idle | w7_error | w7_tape_error;
-		update_interrupt();
+		update_interrupt(machine);
 		return;
 	}
 #if 0
@@ -478,7 +478,7 @@ static void cmd_record_skip_forward(void)
 	{	/* rewind in progress */
 		tpc.w[0] |= 0x80 >> tap_sel;
 		tpc.w[7] |= w7_idle | w7_error | w7_tape_error;
-		update_interrupt();
+		update_interrupt(machine);
 		return;
 	}
 #endif
@@ -498,7 +498,7 @@ static void cmd_record_skip_forward(void)
 				tpc.t[tap_sel].eot = 1;
 				tpc.w[0] |= w0_EOT;	/* or should it be w0_command_timeout? */
 				tpc.w[7] |= w7_idle | w7_error | w7_tape_error;
-				update_interrupt();
+				update_interrupt(machine);
 				goto update_registers;
 			}
 			else
@@ -508,7 +508,7 @@ static void cmd_record_skip_forward(void)
 				image_unload(tpc.t[tap_sel].img);
 				tpc.w[0] |= w0_offline;
 				tpc.w[7] |= w7_idle | w7_error | w7_hard_error;
-				update_interrupt();
+				update_interrupt(machine);
 				goto update_registers;
 			}
 		}
@@ -520,7 +520,7 @@ static void cmd_record_skip_forward(void)
 			image_unload(tpc.t[tap_sel].img);
 			tpc.w[0] |= w0_offline;
 			tpc.w[7] |= w7_idle | w7_error | w7_hard_error;
-			update_interrupt();
+			update_interrupt(machine);
 			goto update_registers;
 		}
 
@@ -530,7 +530,7 @@ static void cmd_record_skip_forward(void)
 			logerror("record skip forward: found EOF\n");
 			tpc.w[0] |= w0_EOF;
 			tpc.w[7] |= w7_idle | w7_error | w7_tape_error;
-			update_interrupt();
+			update_interrupt(machine);
 			goto update_registers;
 		}
 
@@ -540,7 +540,7 @@ static void cmd_record_skip_forward(void)
 			image_unload(tpc.t[tap_sel].img);
 			tpc.w[0] |= w0_offline;
 			tpc.w[7] |= w7_idle | w7_error | w7_hard_error;
-			update_interrupt();
+			update_interrupt(machine);
 			goto update_registers;
 		}
 
@@ -549,7 +549,7 @@ static void cmd_record_skip_forward(void)
 			image_unload(tpc.t[tap_sel].img);
 			tpc.w[0] |= w0_offline;
 			tpc.w[7] |= w7_idle | w7_error | w7_hard_error;
-			update_interrupt();
+			update_interrupt(machine);
 			goto update_registers;
 		}
 
@@ -558,7 +558,7 @@ static void cmd_record_skip_forward(void)
 			image_unload(tpc.t[tap_sel].img);
 			tpc.w[0] |= w0_offline;
 			tpc.w[7] |= w7_idle | w7_error | w7_hard_error;
-			update_interrupt();
+			update_interrupt(machine);
 			goto update_registers;
 		}
 		if (buffer[2] || buffer[3])
@@ -568,7 +568,7 @@ static void cmd_record_skip_forward(void)
 			image_unload(tpc.t[tap_sel].img);
 			tpc.w[0] |= w0_offline;
 			tpc.w[7] |= w7_idle | w7_error | w7_hard_error;
-			update_interrupt();
+			update_interrupt(machine);
 			goto update_registers;
 		}
 
@@ -576,7 +576,7 @@ static void cmd_record_skip_forward(void)
 	}
 
 	tpc.w[7] |= w7_idle | w7_complete;
-	update_interrupt();
+	update_interrupt(machine);
 
 update_registers:
 	tpc.w[4] = record_count;
@@ -585,7 +585,7 @@ update_registers:
 /*
 	Handle the record skip reverse command: skip a specified number of records backwards.
 */
-static void cmd_record_skip_reverse(void)
+static void cmd_record_skip_reverse(running_machine *machine)
 {
 	UINT8 buffer[4];
 	int reclen;
@@ -600,14 +600,14 @@ static void cmd_record_skip_reverse(void)
 	{
 		/* No idea what to report... */
 		tpc.w[7] |= w7_idle | w7_error | w7_hard_error;
-		update_interrupt();
+		update_interrupt(machine);
 		return;
 	}
 	else if (! image_exists(tpc.t[tap_sel].img))
 	{	/* offline */
 		tpc.w[0] |= w0_offline;
 		tpc.w[7] |= w7_idle | w7_error | w7_tape_error;
-		update_interrupt();
+		update_interrupt(machine);
 		return;
 	}
 #if 0
@@ -615,7 +615,7 @@ static void cmd_record_skip_reverse(void)
 	{	/* rewind in progress */
 		tpc.w[0] |= 0x80 >> tap_sel;
 		tpc.w[7] |= w7_idle | w7_error | w7_tape_error;
-		update_interrupt();
+		update_interrupt(machine);
 		return;
 	}
 #endif
@@ -632,7 +632,7 @@ static void cmd_record_skip_reverse(void)
 			tpc.t[tap_sel].bot = 1;
 			tpc.w[0] |= w0_BOT;
 			tpc.w[7] |= w7_idle | w7_error | w7_tape_error;
-			update_interrupt();
+			update_interrupt(machine);
 			goto update_registers;
 		}
 		if (image_fseek(tpc.t[tap_sel].img, -4, SEEK_CUR))
@@ -640,7 +640,7 @@ static void cmd_record_skip_reverse(void)
 			image_unload(tpc.t[tap_sel].img);
 			tpc.w[0] |= w0_offline;
 			tpc.w[7] |= w7_idle | w7_error | w7_hard_error;
-			update_interrupt();
+			update_interrupt(machine);
 			goto update_registers;
 		}
 		bytes_read = image_fread(tpc.t[tap_sel].img, buffer, 4);
@@ -652,7 +652,7 @@ static void cmd_record_skip_reverse(void)
 			image_unload(tpc.t[tap_sel].img);
 			tpc.w[0] |= w0_offline;
 			tpc.w[7] |= w7_idle | w7_error | w7_hard_error;
-			update_interrupt();
+			update_interrupt(machine);
 			goto update_registers;
 		}
 		reclen = (((int) buffer[1]) << 8) | buffer[0];
@@ -663,7 +663,7 @@ static void cmd_record_skip_reverse(void)
 			image_unload(tpc.t[tap_sel].img);
 			tpc.w[0] |= w0_offline;
 			tpc.w[7] |= w7_idle | w7_error | w7_hard_error;
-			update_interrupt();
+			update_interrupt(machine);
 			goto update_registers;
 		}
 
@@ -676,12 +676,12 @@ static void cmd_record_skip_reverse(void)
 				image_unload(tpc.t[tap_sel].img);
 				tpc.w[0] |= w0_offline;
 				tpc.w[7] |= w7_idle | w7_error | w7_hard_error;
-				update_interrupt();
+				update_interrupt(machine);
 				goto update_registers;
 			}
 			tpc.w[0] |= w0_EOF;
 			tpc.w[7] |= w7_idle | w7_error | w7_tape_error;
-			update_interrupt();
+			update_interrupt(machine);
 			goto update_registers;
 		}
 
@@ -690,7 +690,7 @@ static void cmd_record_skip_reverse(void)
 			image_unload(tpc.t[tap_sel].img);
 			tpc.w[0] |= w0_offline;
 			tpc.w[7] |= w7_idle | w7_error | w7_hard_error;
-			update_interrupt();
+			update_interrupt(machine);
 			goto update_registers;
 		}
 
@@ -699,7 +699,7 @@ static void cmd_record_skip_reverse(void)
 			image_unload(tpc.t[tap_sel].img);
 			tpc.w[0] |= w0_offline;
 			tpc.w[7] |= w7_idle | w7_error | w7_hard_error;
-			update_interrupt();
+			update_interrupt(machine);
 			goto update_registers;
 		}
 		if (reclen != ((((int) buffer[1]) << 8) | buffer[0]))
@@ -707,7 +707,7 @@ static void cmd_record_skip_reverse(void)
 			image_unload(tpc.t[tap_sel].img);
 			tpc.w[0] |= w0_offline;
 			tpc.w[7] |= w7_idle | w7_error | w7_hard_error;
-			update_interrupt();
+			update_interrupt(machine);
 			goto update_registers;
 		}
 		if (buffer[2] || buffer[3])
@@ -717,7 +717,7 @@ static void cmd_record_skip_reverse(void)
 			image_unload(tpc.t[tap_sel].img);
 			tpc.w[0] |= w0_offline;
 			tpc.w[7] |= w7_idle | w7_error | w7_hard_error;
-			update_interrupt();
+			update_interrupt(machine);
 			goto update_registers;
 		}
 
@@ -726,7 +726,7 @@ static void cmd_record_skip_reverse(void)
 			image_unload(tpc.t[tap_sel].img);
 			tpc.w[0] |= w0_offline;
 			tpc.w[7] |= w7_idle | w7_error | w7_hard_error;
-			update_interrupt();
+			update_interrupt(machine);
 			goto update_registers;
 		}
 
@@ -734,7 +734,7 @@ static void cmd_record_skip_reverse(void)
 	}
 
 	tpc.w[7] |= w7_idle | w7_complete;
-	update_interrupt();
+	update_interrupt(machine);
 
 update_registers:
 	tpc.w[4] = record_count;
@@ -743,7 +743,7 @@ update_registers:
 /*
 	Handle the rewind command: rewind to BOT.
 */
-static void cmd_rewind(void)
+static void cmd_rewind(running_machine *machine)
 {
 	int tap_sel = cur_tape_unit();
 
@@ -751,14 +751,14 @@ static void cmd_rewind(void)
 	{
 		/* No idea what to report... */
 		tpc.w[7] |= w7_idle | w7_error | w7_hard_error;
-		update_interrupt();
+		update_interrupt(machine);
 		return;
 	}
 	else if (! image_exists(tpc.t[tap_sel].img))
 	{	/* offline */
 		tpc.w[0] |= w0_offline;
 		tpc.w[7] |= w7_idle | w7_error | w7_tape_error;
-		update_interrupt();
+		update_interrupt(machine);
 		return;
 	}
 #if 0
@@ -766,7 +766,7 @@ static void cmd_rewind(void)
 	{	/* rewind in progress */
 		tpc.w[0] |= 0x80 >> tap_sel;
 		tpc.w[7] |= w7_idle | w7_error | w7_tape_error;
-		update_interrupt();
+		update_interrupt(machine);
 		return;
 	}
 #endif
@@ -778,19 +778,19 @@ static void cmd_rewind(void)
 		image_unload(tpc.t[tap_sel].img);
 		tpc.w[0] |= w0_offline;
 		tpc.w[7] |= w7_idle | w7_error | w7_hard_error;
-		update_interrupt();
+		update_interrupt(machine);
 		return;
 	}
 	tpc.t[tap_sel].bot = 1;
 
 	tpc.w[7] |= w7_idle | w7_complete;
-	update_interrupt();
+	update_interrupt(machine);
 }
 
 /*
 	Handle the rewind and offline command: disable the tape unit.
 */
-static void cmd_rewind_and_offline(void)
+static void cmd_rewind_and_offline(running_machine *machine)
 {
 	int tap_sel = cur_tape_unit();
 
@@ -798,14 +798,14 @@ static void cmd_rewind_and_offline(void)
 	{
 		/* No idea what to report... */
 		tpc.w[7] |= w7_idle | w7_error | w7_hard_error;
-		update_interrupt();
+		update_interrupt(machine);
 		return;
 	}
 	else if (! image_exists(tpc.t[tap_sel].img))
 	{	/* offline */
 		tpc.w[0] |= w0_offline;
 		tpc.w[7] |= w7_idle | w7_error | w7_tape_error;
-		update_interrupt();
+		update_interrupt(machine);
 		return;
 	}
 #if 0
@@ -813,7 +813,7 @@ static void cmd_rewind_and_offline(void)
 	{	/* rewind in progress */
 		tpc.w[0] |= 0x80 >> tap_sel;
 		tpc.w[7] |= w7_idle | w7_error | w7_tape_error;
-		update_interrupt();
+		update_interrupt(machine);
 		return;
 	}
 #endif
@@ -822,13 +822,13 @@ static void cmd_rewind_and_offline(void)
 	image_unload(tpc.t[tap_sel].img);
 
 	tpc.w[7] |= w7_idle | w7_complete;
-	update_interrupt();
+	update_interrupt(machine);
 }
 
 /*
 	Handle the read transport status command: return the current tape status.
 */
-static void read_transport_status(void)
+static void read_transport_status(running_machine *machine)
 {
 	int tap_sel = cur_tape_unit();
 
@@ -836,20 +836,20 @@ static void read_transport_status(void)
 	{
 		/* No idea what to report... */
 		tpc.w[7] |= w7_idle | w7_error | w7_hard_error;
-		update_interrupt();
+		update_interrupt(machine);
 	}
 	else if (! image_exists(tpc.t[tap_sel].img))
 	{	/* offline */
 		tpc.w[0] |= w0_offline;
 		tpc.w[7] |= w7_idle | w7_error | w7_tape_error;
-		update_interrupt();
+		update_interrupt(machine);
 	}
 #if 0
 	else if (0)
 	{	/* rewind in progress */
 		tpc.w[0] |= /*...*/;
 		tpc.w[7] |= w7_idle | w7_error | w7_tape_error;
-		update_interrupt();
+		update_interrupt(machine);
 	}
 #endif
 	else
@@ -861,7 +861,7 @@ static void read_transport_status(void)
 		if (tpc.t[tap_sel].wp)
 			tpc.w[0] |= w0_write_ring;
 		tpc.w[7] |= w7_idle | w7_complete;
-		update_interrupt();
+		update_interrupt(machine);
 	}
 }
 
@@ -881,25 +881,25 @@ static void execute_command(running_machine *machine)
 		/* NOP */
 		logerror("NOP\n");
 		tpc.w[7] |= w7_idle | w7_complete;
-		update_interrupt();
+		update_interrupt(machine);
 		break;
 	case 0x01:
 		/* buffer sync: means nothing under emulation */
 		logerror("buffer sync\n");
 		tpc.w[7] |= w7_idle | w7_complete;
-		update_interrupt();
+		update_interrupt(machine);
 		break;
 	case 0x02:
 		/* write EOF - not emulated */
 		logerror("write EOF\n");
 		/* ... */
 		tpc.w[7] |= w7_idle | w7_error | w7_hard_error;
-		update_interrupt();
+		update_interrupt(machine);
 		break;
 	case 0x03:
 		/* record skip reverse - not fully tested */
 		logerror("record skip reverse\n");
-		cmd_record_skip_reverse();
+		cmd_record_skip_reverse(machine);
 		break;
 	case 0x04:
 		/* read binary forward */
@@ -909,44 +909,44 @@ static void execute_command(running_machine *machine)
 	case 0x05:
 		/* record skip forward - not tested */
 		logerror("record skip forward\n");
-		cmd_record_skip_forward();
+		cmd_record_skip_forward(machine);
 		break;
 	case 0x06:
 		/* write binary forward - not emulated */
 		logerror("write binary forward\n");
 		/* ... */
 		tpc.w[7] |= w7_idle | w7_error | w7_hard_error;
-		update_interrupt();
+		update_interrupt(machine);
 		break;
 	case 0x07:
 		/* erase - not emulated */
 		logerror("erase\n");
 		/* ... */
 		tpc.w[7] |= w7_idle | w7_error | w7_hard_error;
-		update_interrupt();
+		update_interrupt(machine);
 		break;
 	case 0x08:
 	case 0x09:
 		/* read transport status */
 		logerror("read transport status\n");
-		read_transport_status();
+		read_transport_status(machine);
 		break;
 	case 0x0A:
 		/* rewind - not tested */
 		logerror("rewind\n");
-		cmd_rewind();
+		cmd_rewind(machine);
 		break;
 	case 0x0B:
 		/* rewind and offline - not tested */
 		logerror("rewind and offline\n");
-		cmd_rewind_and_offline();
+		cmd_rewind_and_offline(machine);
 		break;
 	case 0x0F:
 		/* extended control and status - not emulated */
 		logerror("extended control and status\n");
 		/* ... */
 		tpc.w[7] |= w7_idle | w7_error | w7_hard_error;
-		update_interrupt();
+		update_interrupt(machine);
 		break;
 	}
 }
@@ -979,7 +979,7 @@ WRITE16_HANDLER(ti990_tpc_w)
 			tpc.w[offset] = (tpc.w[offset] & ((~w_mask[offset]) | mem_mask)) | (data & w_mask[offset] & ~mem_mask);
 
 			if ((offset == 0) || (offset == 7))
-				update_interrupt();
+				update_interrupt(space->machine);
 
 			if ((offset == 7) && (old_data & w7_idle) && ! (data & w7_idle))
 			{	/* idle has been cleared: start command execution */

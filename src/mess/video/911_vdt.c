@@ -83,7 +83,7 @@ typedef struct vdt_t
 {
 	vdt911_screen_size_t screen_size;	/* char_960 for 960-char, 12-line model; char_1920 for 1920-char, 24-line model */
 	vdt911_model_t model;				/* country code */
-	void (*int_callback)(int state);	/* interrupt callback, called when the state of irq changes */
+	void (*int_callback)(running_machine *machine, int state);	/* interrupt callback, called when the state of irq changes */
 
 	UINT8 data_reg;						/* vdt911 write buffer */
 	UINT8 display_RAM[2048];			/* vdt911 char buffer (1kbyte for 960-char model, 2kbytes for 1920-char model) */
@@ -285,7 +285,7 @@ static TIMER_CALLBACK(beep_callback)
 /*
 	CRU interface read
 */
-int vdt911_cru_r(int offset, int unit)
+static int vdt911_cru_r(int offset, int unit)
 {
 	int reply=0;
 
@@ -336,7 +336,7 @@ int vdt911_cru_r(int offset, int unit)
 /*
 	CRU interface write
 */
-void vdt911_cru_w(int offset, int data, int unit)
+static void vdt911_cru_w(const address_space *space, int offset, int data, int unit)
 {
 	offset &= 0xf;
 
@@ -386,7 +386,7 @@ void vdt911_cru_w(int offset, int data, int unit)
 		case 0xc:
 			/* keyboard interrupt enable */
 			vdt[unit].keyboard_interrupt_enable = data;
-			(*vdt[unit].int_callback)(vdt[unit].keyboard_interrupt_enable && vdt[unit].keyboard_data_ready);
+			(*vdt[unit].int_callback)(space->machine, vdt[unit].keyboard_interrupt_enable && vdt[unit].keyboard_data_ready);
 			break;
 
 		case 0xd:
@@ -444,7 +444,7 @@ void vdt911_cru_w(int offset, int data, int unit)
 			{
 				vdt[unit].keyboard_data_ready = 0;
 				if (vdt[unit].keyboard_interrupt_enable)
-					(*vdt[unit].int_callback)(0);
+					(*vdt[unit].int_callback)(space->machine, 0);
 			}
 			/*vdt[unit].keyboard_parity_error = 0;*/
 			break;
@@ -472,7 +472,7 @@ void vdt911_cru_w(int offset, int data, int unit)
 
 WRITE8_HANDLER(vdt911_0_cru_w)
 {
-	vdt911_cru_w(offset, data, 0);
+	vdt911_cru_w(space, offset, data, 0);
 }
 
 /*
@@ -681,7 +681,7 @@ void vdt911_keyboard(running_machine *machine, int unit)
 						vdt[unit].keyboard_data = (int)key_translate[vdt[unit].model][modifier_state][last_key_pressed];
 						vdt[unit].keyboard_data_ready = 1;
 						if (vdt[unit].keyboard_interrupt_enable)
-							(*vdt[unit].int_callback)(1);
+							(*vdt[unit].int_callback)(machine, 1);
 						return;
 					}
 				}

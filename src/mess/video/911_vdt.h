@@ -37,7 +37,7 @@ typedef struct vdt911_init_params_t
 {
 	vdt911_screen_size_t screen_size;
 	vdt911_model_t model;
-	void (*int_callback)(int state);
+	void (*int_callback)(running_machine *machine, int state);
 } vdt911_init_params_t;
 
 PALETTE_INIT( vdt911 );
@@ -46,9 +46,6 @@ void vdt911_init(running_machine *machine);
 void vdt911_init_term(running_machine *machine,int unit, const vdt911_init_params_t *params);
 
 void vdt911_reset(void);
-
-int vdt911_cru_r(int offset, int unit);
-void vdt911_cru_w(int offset, int data, int unit);
 
  READ8_HANDLER(vdt911_0_cru_r);
 WRITE8_HANDLER(vdt911_0_cru_w);
