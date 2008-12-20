@@ -655,7 +655,6 @@ static MACHINE_DRIVER_START( pet_general )
 	MDRV_CPU_ADD("main", M6502, 7833600)        /* 7.8336 MHz */
 	MDRV_CPU_PROGRAM_MAP(pet_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", pet_frame_interrupt)
-	MDRV_INTERLEAVE(0)
 
 	MDRV_MACHINE_RESET( pet )
 
