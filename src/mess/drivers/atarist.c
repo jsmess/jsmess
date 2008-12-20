@@ -1859,8 +1859,7 @@ static MACHINE_DRIVER_START( atariste )
     MDRV_SOUND_ROUTE(0, "right", 0.50)
     MDRV_SOUND_ROUTE(1, "left", 0.50)
 */
-	MDRV_DEVICE_ADD(LMC1992_TAG, LMC1992)
-//	MDRV_DEVICE_CONFIG(atariste_lmc1992_intf)
+	MDRV_DEVICE_ADD(LMC1992_TAG, LMC1992 /* ,atariste_lmc1992_intf */)
 
 	/* printer */
 	MDRV_PRINTER_ADD("printer")

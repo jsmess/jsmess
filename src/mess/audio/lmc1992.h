@@ -28,6 +28,9 @@
 
 #define LMC1992		DEVICE_GET_INFO_NAME(lmc1992)
 
+#define MDRV_LMC1992_ADD(_tag)		\
+	MDRV_DEVICE_ADD(_tag, LMC1992)
+
 /* interface */
 typedef struct _lmc1992_interface lmc1992_interface;
 struct _lmc1992_interface
