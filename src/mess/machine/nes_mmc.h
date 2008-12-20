@@ -29,7 +29,7 @@ extern write8_space_func mmc_write_mid;
 extern read8_space_func mmc_read_mid;
 extern write8_space_func mmc_write;
 
-int mapper_reset (int mapperNum);
+int mapper_reset (running_machine *machine, int mapperNum);
 
 WRITE8_HANDLER( nes_low_mapper_w );
 READ8_HANDLER ( nes_low_mapper_r );

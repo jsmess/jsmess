@@ -80,7 +80,7 @@ MACHINE_RESET( nes );
 READ8_HANDLER( nes_IN0_r );
 READ8_HANDLER( nes_IN1_r );
 
-int nes_ppu_vidaccess( int num, int address, int data );
+int nes_ppu_vidaccess( running_machine *machine, int num, int address, int data );
 
 void nes_partialhash(char *dest, const unsigned char *data,
 	unsigned long length, unsigned int functions);

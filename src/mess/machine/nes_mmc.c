@@ -23,12 +23,8 @@
 	really MMC3, Mapper 9 is MMC2 and Mapper 10 is MMC4. Makes perfect sense, right?
 */
 
-#include <string.h>
-
 #include "cpu/m6502/m6502.h"
 #include "video/ppu2c0x.h"
-#include "osdepend.h"
-#include "deprecat.h"
 #include "driver.h"
 #include "includes/nes.h"
 #include "nes_mmc.h"
@@ -617,7 +613,7 @@ static void mapper4_set_chr (void)
 	ppu2c0x_set_videorom_bank(0, chr_page ^ 7, 1, MMC3_chr_base * 64 | ( MMC3_chr[5] & ( MMC3_chr_mask * 64 ) ), 1);
 }
 
-static void mapper4_irq ( int num, int scanline, int vblank, int blanked )
+static void mapper4_irq ( running_machine *machine, int num, int scanline, int vblank, int blanked )
 {
 	if ((scanline < PPU_BOTTOM_VISIBLE_SCANLINE) /*|| (scanline == ppu_scanlines_per_frame-1)*/)
 	{
@@ -632,8 +628,8 @@ static void mapper4_irq ( int num, int scanline, int vblank, int blanked )
 
 		if (IRQ_enable && !blanked && (IRQ_count == 0) && priorCount)
 		{
-			logerror("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline, video_screen_get_vpos(Machine->primary_screen), video_screen_get_hpos(Machine->primary_screen));
-			cpu_set_input_line(Machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
+			logerror("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline, video_screen_get_vpos(machine->primary_screen), video_screen_get_hpos(machine->primary_screen));
+			cpu_set_input_line(machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
 //			timer_adjust_oneshot(nes_irq_timer, cpu_clocks_to_attotime(machine->cpu[0], 4), 0);
 		}
 	}
@@ -826,7 +822,7 @@ static WRITE8_HANDLER( mapper118_w )
 	}
 }
 
-static void mapper5_irq ( int num, int scanline, int vblank, int blanked )
+static void mapper5_irq ( running_machine *machine, int num, int scanline, int vblank, int blanked )
 {
 #if 1
 	if (scanline == 0)
@@ -838,7 +834,7 @@ static void mapper5_irq ( int num, int scanline, int vblank, int blanked )
 	if (scanline == IRQ_count)
 	{
 		if (IRQ_enable)
-			cpu_set_input_line(Machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
+			cpu_set_input_line(machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
 
 		IRQ_status = 0xff;
 	}
@@ -1578,7 +1574,7 @@ static WRITE8_HANDLER( mapper15_w )
 	}
 }
 
-static void bandai_irq ( int num, int scanline, int vblank, int blanked )
+static void bandai_irq ( running_machine *machine, int num, int scanline, int vblank, int blanked )
 {
 	/* 114 is the number of cycles per scanline */
 	/* TODO: change to reflect the actual number of cycles spent */
@@ -1587,7 +1583,7 @@ static void bandai_irq ( int num, int scanline, int vblank, int blanked )
 	{
 		if (IRQ_count <= 114)
 		{
-			cpu_set_input_line(Machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
+			cpu_set_input_line(machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
 		}
 		IRQ_count -= 114;
 	}
@@ -1713,7 +1709,7 @@ static WRITE8_HANDLER( mapper17_l_w )
 	}
 }
 
-static void jaleco_irq ( int num, int scanline, int vblank, int blanked )
+static void jaleco_irq ( running_machine *machine, int num, int scanline, int vblank, int blanked )
 {
 	if (scanline <= PPU_BOTTOM_VISIBLE_SCANLINE)
 	{
@@ -1727,23 +1723,23 @@ static void jaleco_irq ( int num, int scanline, int vblank, int blanked )
 			{
 				if ((IRQ_count & 0x0f) == 0x00)
 					/* rollover every 0x10 */
-					cpu_set_input_line(Machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
+					cpu_set_input_line(machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
 			}
 			else if (IRQ_mode & 0x04)
 			{
 				if ((IRQ_count & 0x0ff) == 0x00)
 					/* rollover every 0x100 */
-					cpu_set_input_line(Machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
+					cpu_set_input_line(machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
 			}
 			else if (IRQ_mode & 0x02)
 			{
 				if ((IRQ_count & 0x0fff) == 0x000)
 					/* rollover every 0x1000 */
-					cpu_set_input_line(Machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
+					cpu_set_input_line(machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
 			}
 			else if (IRQ_count == 0)
 				/* rollover at 0x10000 */
-				cpu_set_input_line(Machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
+				cpu_set_input_line(machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
 		}
 	}
 	else
@@ -1955,13 +1951,13 @@ static WRITE8_HANDLER( mapper18_w )
 	}
 }
 
-static void namcot_irq ( int num, int scanline, int vblank, int blanked )
+static void namcot_irq ( running_machine *machine, int num, int scanline, int vblank, int blanked )
 {
 	IRQ_count ++;
 	/* Increment & check the IRQ scanline counter */
 	if (IRQ_enable && (IRQ_count == 0x7fff))
 	{
-		cpu_set_input_line(Machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
+		cpu_set_input_line(machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
 	}
 }
 
@@ -2015,17 +2011,17 @@ static WRITE8_HANDLER( mapper19_w )
 	}
 }
 
-static void fds_irq ( int num, int scanline, int vblank, int blanked )
+static void fds_irq ( running_machine *machine, int num, int scanline, int vblank, int blanked )
 {
 	if (IRQ_enable_latch)
-		cpu_set_input_line(Machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
+		cpu_set_input_line(machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
 
 	/* Increment & check the IRQ scanline counter */
 	if (IRQ_enable)
 	{
 		if (IRQ_count <= 114)
 		{
-			cpu_set_input_line(Machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
+			cpu_set_input_line(machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
 			IRQ_enable = 0;
 			nes_fds.status0 |= 0x01;
 		}
@@ -2129,14 +2125,14 @@ WRITE8_HANDLER ( fds_w )
 	LOG_FDS(("fds_w, address: %04x, data: %02x\n", offset + 0x4020, data));
 }
 
-static void konami_irq ( int num, int scanline, int vblank, int blanked )
+static void konami_irq ( running_machine *machine, int num, int scanline, int vblank, int blanked )
 {
 	/* Increment & check the IRQ scanline counter */
 	if (IRQ_enable && (++IRQ_count == 0x100))
 	{
 		IRQ_count = IRQ_count_latch;
 		IRQ_enable = IRQ_enable_latch;
-		cpu_set_input_line(Machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
+		cpu_set_input_line(machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
 	}
 }
 
@@ -2796,14 +2792,14 @@ static WRITE8_HANDLER( mapper34_w )
 	prg32 (space, data);
 }
 
-static void mapper40_irq ( int num, int scanline, int vblank, int blanked )
+static void mapper40_irq ( running_machine *machine, int num, int scanline, int vblank, int blanked )
 {
 	/* Decrement & check the IRQ scanline counter */
 	if (IRQ_enable)
 	{
 		if (--IRQ_count == 0)
 		{
-			cpu_set_input_line(Machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
+			cpu_set_input_line(machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
 		}
 	}
 }
@@ -3241,13 +3237,13 @@ static WRITE8_HANDLER( mapper64_w )
 	}
 }
 
-static void irem_irq ( int num, int scanline, int vblank, int blanked )
+static void irem_irq ( running_machine *machine, int num, int scanline, int vblank, int blanked )
 {
 	/* Increment & check the IRQ scanline counter */
 	if (IRQ_enable)
 	{
 		if (--IRQ_count == 0)
-			cpu_set_input_line(Machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
+			cpu_set_input_line(machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
 	}
 }
 
@@ -3316,7 +3312,7 @@ static WRITE8_HANDLER( mapper66_w )
 	chr8 (data & 0x03);
 }
 
-static void sunsoft_irq ( int num, int scanline, int vblank, int blanked )
+static void sunsoft_irq ( running_machine *machine, int num, int scanline, int vblank, int blanked )
 {
 	/* 114 is the number of cycles per scanline */
 	/* TODO: change to reflect the actual number of cycles spent */
@@ -3325,7 +3321,7 @@ static void sunsoft_irq ( int num, int scanline, int vblank, int blanked )
 	{
 		if (IRQ_count <= 114)
 		{
-			cpu_set_input_line(Machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
+			cpu_set_input_line(machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
 		}
 		IRQ_count -= 114;
 	}
@@ -4309,7 +4305,7 @@ static WRITE8_HANDLER( mapper182_w )
 	}
 }
 
-static void mapper182_irq( int num, int scanline, int vblank, int blanked )
+static void mapper182_irq( running_machine *machine, int num, int scanline, int vblank, int blanked )
 {
 	if ((scanline < PPU_BOTTOM_VISIBLE_SCANLINE) /*|| (scanline == ppu_scanlines_per_frame-1)*/)
 	{
@@ -4324,8 +4320,8 @@ static void mapper182_irq( int num, int scanline, int vblank, int blanked )
 
 		if (IRQ_enable && !blanked && (IRQ_count == 0) && priorCount)
 		{
-			logerror("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline, video_screen_get_vpos(Machine->primary_screen), video_screen_get_hpos(Machine->primary_screen));
-			cpu_set_input_line(Machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
+			logerror("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline, video_screen_get_vpos(machine->primary_screen), video_screen_get_hpos(machine->primary_screen));
+			cpu_set_input_line(machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
 		}
 	}
 }
@@ -4815,7 +4811,7 @@ static WRITE8_HANDLER( mapper248_w )
 	}
 }
 
-static void mapper248_irq( int num, int scanline, int vblank, int blanked )
+static void mapper248_irq( running_machine *machine, int num, int scanline, int vblank, int blanked )
 {
 	if ((scanline < PPU_BOTTOM_VISIBLE_SCANLINE) /*|| (scanline == ppu_scanlines_per_frame-1)*/)
 	{
@@ -4830,8 +4826,8 @@ static void mapper248_irq( int num, int scanline, int vblank, int blanked )
 
 		if (IRQ_enable && !blanked && (IRQ_count == 0) && priorCount)
 		{
-			logerror("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline, video_screen_get_vpos(Machine->primary_screen), video_screen_get_hpos(Machine->primary_screen));
-			cpu_set_input_line(Machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
+			logerror("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline, video_screen_get_vpos(machine->primary_screen), video_screen_get_hpos(machine->primary_screen));
+			cpu_set_input_line(machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
 		}
 	}
 }
@@ -4846,9 +4842,9 @@ static void mapper248_irq( int num, int scanline, int vblank, int blanked )
 // 1 = no mapper found
 // 2 = mapper not supported
 */
-int mapper_reset (int mapperNum)
+int mapper_reset (running_machine *machine, int mapperNum)
 {
-	const address_space *space = cpu_get_address_space( Machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
 	int err = 0;
 	const mmc *mapper;
 
@@ -4861,7 +4857,7 @@ int mapper_reset (int mapperNum)
 	ppu2c0x_set_hblank_callback (0, mapper ? mapper->mmc_hblank :  NULL);
 
 	if (!nes_irq_timer)
-		nes_irq_timer = timer_alloc(Machine, nes_irq_callback, NULL);
+		nes_irq_timer = timer_alloc(machine, nes_irq_callback, NULL);
 
 	mapper_warning = 0;
 	/* 8k mask */

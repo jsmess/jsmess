@@ -6,10 +6,7 @@
 
 ***************************************************************************/
 
-#include <math.h>
-
 #include "driver.h"
-#include "deprecat.h"
 #include "video/ppu2c0x.h"
 #include "includes/nes.h"
 #include "machine/nes_mmc.h"
@@ -17,9 +14,9 @@
 int nes_vram_sprite[8]; /* Used only by mmc5 for now */
 static int last_frame_flip = 0;
 
-static void ppu_nmi(int num, int *ppu_regs)
+static void ppu_nmi(running_machine *machine, int num, int *ppu_regs)
 {
-	cpu_set_input_line(Machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static void nes_vh_reset(running_machine *machine)
@@ -64,7 +61,7 @@ static void nes_vh_start(running_machine *machine, ppu_t ppu_type, double scanli
 	add_reset_callback(machine, nes_vh_reset);
 
 	/* Reset the mapper variables. Will also mark the char-gen ram as dirty */
-	mapper_reset(nes.mapper);
+	mapper_reset(machine, nes.mapper);
 }
 
 
