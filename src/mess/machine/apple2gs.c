@@ -1317,19 +1317,19 @@ static WRITE8_HANDLER( apple2gs_aux4000_w )
 
 
 
-static void apple2gs_mem_000000(offs_t begin, offs_t end, apple2_meminfo *meminfo)
+static void apple2gs_mem_000000(running_machine *machine,offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
 	meminfo->read_mem			= (a2 & VAR_ALTZP)	? 0x010000 : 0x000000;
 	meminfo->write_mem			= (a2 & VAR_ALTZP)	? 0x010000 : 0x000000;
 }
 
-static void apple2gs_mem_000200(offs_t begin, offs_t end, apple2_meminfo *meminfo)
+static void apple2gs_mem_000200(running_machine *machine,offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
 	meminfo->read_mem			= (a2 & VAR_RAMRD)	? 0x010200 : 0x000200;
 	meminfo->write_mem			= (a2 & VAR_RAMWRT)	? 0x010200 : 0x000200;
 }
 
-static void apple2gs_mem_000400(offs_t begin, offs_t end, apple2_meminfo *meminfo)
+static void apple2gs_mem_000400(running_machine *machine,offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
 	if (a2 & VAR_80STORE)
 	{
@@ -1345,13 +1345,13 @@ static void apple2gs_mem_000400(offs_t begin, offs_t end, apple2_meminfo *meminf
 	}
 }
 
-static void apple2gs_mem_000800(offs_t begin, offs_t end, apple2_meminfo *meminfo)
+static void apple2gs_mem_000800(running_machine *machine,offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
 	meminfo->read_mem			= (a2 & VAR_RAMRD)	? 0x010800 : 0x000800;
 	meminfo->write_mem			= (a2 & VAR_RAMWRT)	? 0x010800 : 0x000800;
 }
 
-static void apple2gs_mem_002000(offs_t begin, offs_t end, apple2_meminfo *meminfo)
+static void apple2gs_mem_002000(running_machine *machine,offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
 	if ((a2 & (VAR_80STORE|VAR_HIRES)) == (VAR_80STORE|VAR_HIRES))
 	{
@@ -1367,13 +1367,13 @@ static void apple2gs_mem_002000(offs_t begin, offs_t end, apple2_meminfo *meminf
 	}
 }
 
-static void apple2gs_mem_004000(offs_t begin, offs_t end, apple2_meminfo *meminfo)
+static void apple2gs_mem_004000(running_machine *machine,offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
 	meminfo->read_mem			= (a2 & VAR_RAMRD)	? 0x014000 : 0x004000;
 	meminfo->write_handler		= (a2 & VAR_RAMWRT)	? apple2gs_aux4000_w : apple2gs_main4000_w;
 }
 
-static void apple2gs_mem_xxD000(apple2_meminfo *meminfo, UINT32 lcmem)
+static void apple2gs_mem_xxD000(running_machine *machine,apple2_meminfo *meminfo, UINT32 lcmem)
 {
 	if (a2 & VAR_LCRAM)
 	{
@@ -1400,7 +1400,7 @@ static void apple2gs_mem_xxD000(apple2_meminfo *meminfo, UINT32 lcmem)
 	}
 }
 
-static void apple2gs_mem_xxE000(apple2_meminfo *meminfo, UINT32 lcmem)
+static void apple2gs_mem_xxE000(running_machine *machine,apple2_meminfo *meminfo, UINT32 lcmem)
 {
 	if (a2 & VAR_LCRAM)
 		meminfo->read_mem		= lcmem | 0x00E000;
@@ -1413,7 +1413,7 @@ static void apple2gs_mem_xxE000(apple2_meminfo *meminfo, UINT32 lcmem)
 		meminfo->write_mem		= APPLE2_MEM_FLOATING;
 }
 
-static void apple2gs_mem_00D000(offs_t begin, offs_t end, apple2_meminfo *meminfo)
+static void apple2gs_mem_00D000(running_machine *machine,offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
 	if (apple2gs_shadow & 0x40)
 	{
@@ -1422,11 +1422,11 @@ static void apple2gs_mem_00D000(offs_t begin, offs_t end, apple2_meminfo *meminf
 	}
 	else
 	{
-		apple2gs_mem_xxD000(meminfo, (a2 & VAR_ALTZP) ? 0x010000 : 0x000000);
+		apple2gs_mem_xxD000(machine,meminfo, (a2 & VAR_ALTZP) ? 0x010000 : 0x000000);
 	}
 }
 
-static void apple2gs_mem_00E000(offs_t begin, offs_t end, apple2_meminfo *meminfo)
+static void apple2gs_mem_00E000(running_machine *machine,offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
 	if (apple2gs_shadow & 0x40)
 	{
@@ -1435,11 +1435,11 @@ static void apple2gs_mem_00E000(offs_t begin, offs_t end, apple2_meminfo *meminf
 	}
 	else
 	{
-		apple2gs_mem_xxE000(meminfo, (a2 & VAR_ALTZP) ? 0x010000 : 0x000000);
+		apple2gs_mem_xxE000(machine,meminfo, (a2 & VAR_ALTZP) ? 0x010000 : 0x000000);
 	}
 }
 
-static void apple2gs_mem_01D000(offs_t begin, offs_t end, apple2_meminfo *meminfo)
+static void apple2gs_mem_01D000(running_machine *machine,offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
 	if (apple2gs_shadow & 0x40)
 	{
@@ -1448,11 +1448,11 @@ static void apple2gs_mem_01D000(offs_t begin, offs_t end, apple2_meminfo *meminf
 	}
 	else
 	{
-		apple2gs_mem_xxD000(meminfo, 0x010000);
+		apple2gs_mem_xxD000(machine,meminfo, 0x010000);
 	}
 }
 
-static void apple2gs_mem_01E000(offs_t begin, offs_t end, apple2_meminfo *meminfo)
+static void apple2gs_mem_01E000(running_machine *machine,offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
 	if (apple2gs_shadow & 0x40)
 	{
@@ -1461,28 +1461,28 @@ static void apple2gs_mem_01E000(offs_t begin, offs_t end, apple2_meminfo *meminf
 	}
 	else
 	{
-		apple2gs_mem_xxE000(meminfo, 0x010000);
+		apple2gs_mem_xxE000(machine,meminfo, 0x010000);
 	}
 }
 
-static void apple2gs_mem_E0D000(offs_t begin, offs_t end, apple2_meminfo *meminfo)
+static void apple2gs_mem_E0D000(running_machine *machine,offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
-	apple2gs_mem_xxD000(meminfo, 0x000000 | APPLE2_MEM_AUX);
+	apple2gs_mem_xxD000(machine,meminfo, 0x000000 | APPLE2_MEM_AUX);
 }
 
-static void apple2gs_mem_E0E000(offs_t begin, offs_t end, apple2_meminfo *meminfo)
+static void apple2gs_mem_E0E000(running_machine *machine,offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
-	apple2gs_mem_xxE000(meminfo, 0x000000 | APPLE2_MEM_AUX);
+	apple2gs_mem_xxE000(machine,meminfo, 0x000000 | APPLE2_MEM_AUX);
 }
 
-static void apple2gs_mem_E1D000(offs_t begin, offs_t end, apple2_meminfo *meminfo)
+static void apple2gs_mem_E1D000(running_machine *machine,offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
-	apple2gs_mem_xxD000(meminfo, 0x010000 | APPLE2_MEM_AUX);
+	apple2gs_mem_xxD000(machine,meminfo, 0x010000 | APPLE2_MEM_AUX);
 }
 
-static void apple2gs_mem_E1E000(offs_t begin, offs_t end, apple2_meminfo *meminfo)
+static void apple2gs_mem_E1E000(running_machine *machine,offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
-	apple2gs_mem_xxE000(meminfo, 0x010000 | APPLE2_MEM_AUX);
+	apple2gs_mem_xxE000(machine,meminfo, 0x010000 | APPLE2_MEM_AUX);
 }
 
 
@@ -1545,7 +1545,7 @@ static UINT8 apple2gs_xxCxxx_r(running_machine *machine, offs_t address)
 		if ((slot > 7) || ((apple2gs_sltromsel & (1 << slot)) == 0))
 			result = *apple2gs_getslotmem(machine, address);
 		else
-			result = apple2_getfloatingbusvalue();
+			result = apple2_getfloatingbusvalue(machine);
 	}
 	return result;
 }

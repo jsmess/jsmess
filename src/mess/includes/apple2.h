@@ -75,7 +75,7 @@ UINT8 apple2_iwm_getdiskreg(void);
 
 void apple2_init_common(running_machine *machine);
 MACHINE_START( apple2 );
-UINT8 apple2_getfloatingbusvalue(void);
+UINT8 apple2_getfloatingbusvalue(running_machine *machine);
 READ8_HANDLER( apple2_c0xx_r );
 WRITE8_HANDLER( apple2_c0xx_w );
 
@@ -129,7 +129,7 @@ struct _apple2_memmap_entry
 {
 	offs_t begin;
 	offs_t end;
-	void (*get_meminfo)(offs_t begin, offs_t end, apple2_meminfo *meminfo);
+	void (*get_meminfo)(running_machine *machine, offs_t begin, offs_t end, apple2_meminfo *meminfo);
 	bank_disposition_t bank_disposition;
 };
 

@@ -12,7 +12,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m6502/m6502.h"
 #include "includes/apple2.h"
 #include "machine/ap2_slot.h"
@@ -85,7 +84,7 @@ static apple2_meminfo *apple2_current_meminfo;
 
 static READ8_HANDLER(read_floatingbus)
 {
-	return apple2_getfloatingbusvalue();
+	return apple2_getfloatingbusvalue(space->machine);
 }
 
 
@@ -133,7 +132,7 @@ void apple2_update_memory(running_machine *machine)
 	{
 		/* retrieve information on this entry */
 		memset(&meminfo, 0, sizeof(meminfo));
-		apple2_mem_config.memmap[i].get_meminfo(apple2_mem_config.memmap[i].begin, apple2_mem_config.memmap[i].end, &meminfo);
+		apple2_mem_config.memmap[i].get_meminfo(machine, apple2_mem_config.memmap[i].begin, apple2_mem_config.memmap[i].end, &meminfo);
 
 		bank_disposition = apple2_mem_config.memmap[i].bank_disposition;
 
@@ -385,19 +384,19 @@ WRITE8_HANDLER(apple2_c0xx_w)
 
 
 
-static void apple2_mem_0000(offs_t begin, offs_t end, apple2_meminfo *meminfo)
+static void apple2_mem_0000(running_machine *machine, offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
 	meminfo->read_mem			= (a2 & VAR_ALTZP)	? 0x010000 : 0x000000;
 	meminfo->write_mem			= (a2 & VAR_ALTZP)	? 0x010000 : 0x000000;
 }
 
-static void apple2_mem_0200(offs_t begin, offs_t end, apple2_meminfo *meminfo)
+static void apple2_mem_0200(running_machine *machine, offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
 	meminfo->read_mem			= (a2 & VAR_RAMRD)	? 0x010200 : 0x000200;
 	meminfo->write_mem			= (a2 & VAR_RAMWRT)	? 0x010200 : 0x000200;
 }
 
-static void apple2_mem_0400(offs_t begin, offs_t end, apple2_meminfo *meminfo)
+static void apple2_mem_0400(running_machine *machine, offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
 	if (a2 & VAR_80STORE)
 	{
@@ -413,13 +412,13 @@ static void apple2_mem_0400(offs_t begin, offs_t end, apple2_meminfo *meminfo)
 	}
 }
 
-static void apple2_mem_0800(offs_t begin, offs_t end, apple2_meminfo *meminfo)
+static void apple2_mem_0800(running_machine *machine, offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
 	meminfo->read_mem			= (a2 & VAR_RAMRD)	? 0x010800 : 0x000800;
 	meminfo->write_mem			= (a2 & VAR_RAMWRT)	? 0x010800 : 0x000800;
 }
 
-static void apple2_mem_2000(offs_t begin, offs_t end, apple2_meminfo *meminfo)
+static void apple2_mem_2000(running_machine *machine, offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
 	if ((a2 & (VAR_80STORE|VAR_HIRES)) == (VAR_80STORE|VAR_HIRES))
 	{
@@ -435,19 +434,19 @@ static void apple2_mem_2000(offs_t begin, offs_t end, apple2_meminfo *meminfo)
 	}
 }
 
-static void apple2_mem_4000(offs_t begin, offs_t end, apple2_meminfo *meminfo)
+static void apple2_mem_4000(running_machine *machine, offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
 	meminfo->read_mem			= (a2 & VAR_RAMRD)	? 0x014000 : 0x004000;
 	meminfo->write_mem			= (a2 & VAR_RAMWRT)	? 0x014000 : 0x004000;
 }
 
-static void apple2_mem_C000(offs_t begin, offs_t end, apple2_meminfo *meminfo)
+static void apple2_mem_C000(running_machine *machine, offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
 	meminfo->read_handler = apple2_c0xx_r;
 	meminfo->write_handler = apple2_c0xx_w;
 }
 
-static void apple2_mem_Cx00(offs_t begin, offs_t end, apple2_meminfo *meminfo)
+static void apple2_mem_Cx00(running_machine *machine, offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
 	if (a2 & VAR_INTCXROM)
 	{
@@ -461,7 +460,7 @@ static void apple2_mem_Cx00(offs_t begin, offs_t end, apple2_meminfo *meminfo)
 	}
 }
 
-static void apple2_mem_C300(offs_t begin, offs_t end, apple2_meminfo *meminfo)
+static void apple2_mem_C300(running_machine *machine, offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
 	if ((a2 & (VAR_INTCXROM|VAR_SLOTC3ROM)) != VAR_SLOTC3ROM)
 	{
@@ -475,15 +474,15 @@ static void apple2_mem_C300(offs_t begin, offs_t end, apple2_meminfo *meminfo)
 	}
 }
 
-static void apple2_mem_C800(offs_t begin, offs_t end, apple2_meminfo *meminfo)
+static void apple2_mem_C800(running_machine *machine, offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
 	meminfo->read_mem			= (begin & 0x0FFF) | (a2 & VAR_ROMSWITCH ? 0x4000 : 0x0000) | APPLE2_MEM_ROM;
 	meminfo->write_mem			= APPLE2_MEM_FLOATING;
 }
 
-static void apple2_mem_CE00(offs_t begin, offs_t end, apple2_meminfo *meminfo)
+static void apple2_mem_CE00(running_machine *machine, offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
-	if ((a2 & VAR_ROMSWITCH) && !strcmp(Machine->gamedrv->name, "apple2cp"))
+	if ((a2 & VAR_ROMSWITCH) && !strcmp(machine->gamedrv->name, "apple2cp"))
 	{
 		meminfo->read_mem		= APPLE2_MEM_AUX;
 		meminfo->write_mem		= APPLE2_MEM_AUX;
@@ -495,7 +494,7 @@ static void apple2_mem_CE00(offs_t begin, offs_t end, apple2_meminfo *meminfo)
 	}
 }
 
-static void apple2_mem_D000(offs_t begin, offs_t end, apple2_meminfo *meminfo)
+static void apple2_mem_D000(running_machine *machine, offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
 	if (a2 & VAR_LCRAM)
 	{
@@ -523,7 +522,7 @@ static void apple2_mem_D000(offs_t begin, offs_t end, apple2_meminfo *meminfo)
 	}
 }
 
-static void apple2_mem_E000(offs_t begin, offs_t end, apple2_meminfo *meminfo)
+static void apple2_mem_E000(running_machine *machine, offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
 	if (a2 & VAR_LCRAM)
 	{
@@ -594,7 +593,7 @@ void apple2_setvar(running_machine *machine, UINT32 val, UINT32 mask)
  *     with FIX:
  * ----------------------------------------------------------------------- */
 
-UINT8 apple2_getfloatingbusvalue(void)
+UINT8 apple2_getfloatingbusvalue(running_machine *machine)
 {
 	enum
 	{
@@ -629,7 +628,7 @@ UINT8 apple2_getfloatingbusvalue(void)
 
 	// video scanner data
 	//
-	i = cpu_get_total_cycles(Machine->cpu[0]) % kClocksPerVSync; // cycles into this VSync
+	i = cpu_get_total_cycles(machine->cpu[0]) % kClocksPerVSync; // cycles into this VSync
 
 	// machine state switches
 	//
@@ -882,7 +881,7 @@ WRITE8_HANDLER ( apple2_c00x_w )
 
 READ8_HANDLER ( apple2_c01x_r )
 {
-	UINT8 result = apple2_getfloatingbusvalue() & 0x7F;
+	UINT8 result = apple2_getfloatingbusvalue(space->machine) & 0x7F;
 
 	profiler_mark(PROFILER_C01X);
 
@@ -934,7 +933,7 @@ WRITE8_HANDLER( apple2_c01x_w )
 READ8_HANDLER( apple2_c02x_r )
 {
 	apple2_c02x_w(space, offset, 0);
-	return apple2_getfloatingbusvalue();
+	return apple2_getfloatingbusvalue(space->machine);
 }
 
 
@@ -969,7 +968,7 @@ READ8_HANDLER ( apple2_c03x_r )
 			a2_speaker_state = 0xFF;
 		dac_data_w(0, a2_speaker_state);
 	}
-	return apple2_getfloatingbusvalue();
+	return apple2_getfloatingbusvalue(space->machine);
 }
 
 
@@ -999,7 +998,7 @@ READ8_HANDLER ( apple2_c05x_r )
 
 	mask = 0x100 << (offset / 2);
 	apple2_setvar(space->machine, (offset & 1) ? mask : 0, mask);
-	return apple2_getfloatingbusvalue();
+	return apple2_getfloatingbusvalue(space->machine);
 }
 
 
@@ -1056,7 +1055,7 @@ READ8_HANDLER ( apple2_c06x_r )
 			/* c060 Empty Cassette head read
 			 * and any other non joystick c06 port returns this according to applewin
 			 */
-			return apple2_getfloatingbusvalue();
+			return apple2_getfloatingbusvalue(space->machine);
 			break;
 	}
 	return result ? 0x80 : 0x00;
