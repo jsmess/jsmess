@@ -11,9 +11,7 @@
 
 ***************************************************************************/
 
-#include <assert.h>
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/pc.h"
 
 #include "machine/8255ppi.h"
@@ -562,7 +560,7 @@ static void pcjr_set_keyb_int(int state)
 			pcjr_keyb.latch = 1;
 			if ( nmi_enabled & 0x80 )
 			{
-				cpu_set_input_line( Machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE );
+				cpu_set_input_line( pc_devices.pit8253->machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE );
 			}
 		}
 	}
