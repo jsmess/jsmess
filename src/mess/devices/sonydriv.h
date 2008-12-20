@@ -30,15 +30,15 @@ enum
 
 void sonydriv_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
 
-void sony_set_lines(UINT8 lines);
-void sony_set_enable_lines(int enable_mask);
-void sony_set_sel_line(int sel);
+void sony_set_lines(const device_config *device,UINT8 lines);
+void sony_set_enable_lines(const device_config *device,int enable_mask);
+void sony_set_sel_line(const device_config *device,int sel);
 
 void sony_set_speed(int speed);
 
-UINT8 sony_read_data(void);
-void sony_write_data(UINT8 data);
-int sony_read_status(void);
+UINT8 sony_read_data(const device_config *device);
+void sony_write_data(const device_config *device,UINT8 data);
+int sony_read_status(const device_config *device);
 
 
 #endif /* SONYDRIV_H */

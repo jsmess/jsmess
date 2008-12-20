@@ -1112,29 +1112,29 @@ static int apple2_fdc_has_525(running_machine *machine)
 	return device_count_tag_from_machine(machine, "apple525driv") > 0;
 }
 
-static void apple2_fdc_set_lines(UINT8 lines)
+static void apple2_fdc_set_lines(const device_config *device, UINT8 lines)
 {
 	if (apple2_fdc_diskreg & 0x40)
 	{
-		if (apple2_fdc_has_35(Machine))
+		if (apple2_fdc_has_35(device->machine))
 		{
 			/* slot 5: 3.5" disks */
-			sony_set_lines(lines);
+			sony_set_lines(device,lines);
 		}
 	}
 	else
 	{
-		if (apple2_fdc_has_525(Machine))
+		if (apple2_fdc_has_525(device->machine))
 		{
 			/* slot 6: 5.25" disks */
-			apple525_set_lines(lines);
+			apple525_set_lines(device,lines);
 		}
 	}
 }
 
 
 
-static void apple2_fdc_set_enable_lines(int enable_mask)
+static void apple2_fdc_set_enable_lines(const device_config *device,int enable_mask)
 {
 	int slot5_enable_mask = 0;
 	int slot6_enable_mask = 0;
@@ -1144,39 +1144,39 @@ static void apple2_fdc_set_enable_lines(int enable_mask)
 	else
 		slot6_enable_mask = enable_mask;
 
-	if (apple2_fdc_has_35(Machine))
+	if (apple2_fdc_has_35(device->machine))
 	{
 		/* set the 3.5" enable lines */
-		sony_set_enable_lines(slot5_enable_mask);
+		sony_set_enable_lines(device,slot5_enable_mask);
 	}
 
-	if (apple2_fdc_has_525(Machine))
+	if (apple2_fdc_has_525(device->machine))
 	{
 		/* set the 5.25" enable lines */
-		apple525_set_enable_lines(slot6_enable_mask);
+		apple525_set_enable_lines(device,slot6_enable_mask);
 	}
 }
 
 
 
-static UINT8 apple2_fdc_read_data(void)
+static UINT8 apple2_fdc_read_data(const device_config *device)
 {
 	UINT8 result = 0x00;
 
 	if (apple2_fdc_diskreg & 0x40)
 	{
-		if (apple2_fdc_has_35(Machine))
+		if (apple2_fdc_has_35(device->machine))
 		{
 			/* slot 5: 3.5" disks */
-			result = sony_read_data();
+			result = sony_read_data(device);
 		}
 	}
 	else
 	{
-		if (apple2_fdc_has_525(Machine))
+		if (apple2_fdc_has_525(device->machine))
 		{
 			/* slot 6: 5.25" disks */
-			result = apple525_read_data();
+			result = apple525_read_data(device);
 		}
 	}
 	return result;
@@ -1184,46 +1184,46 @@ static UINT8 apple2_fdc_read_data(void)
 
 
 
-static void apple2_fdc_write_data(UINT8 data)
+static void apple2_fdc_write_data(const device_config *device, UINT8 data)
 {
 	if (apple2_fdc_diskreg & 0x40)
 	{
-		if (apple2_fdc_has_35(Machine))
+		if (apple2_fdc_has_35(device->machine))
 		{
 			/* slot 5: 3.5" disks */
-			sony_write_data(data);
+			sony_write_data(device,data);
 		}
 	}
 	else
 	{
-		if (apple2_fdc_has_525(Machine))
+		if (apple2_fdc_has_525(device->machine))
 		{
 			/* slot 6: 5.25" disks */
-			apple525_write_data(data);
+			apple525_write_data(device,data);
 		}
 	}
 }
 
 
 
-static int apple2_fdc_read_status(void)
+static int apple2_fdc_read_status(const device_config *device)
 {
 	int result = 0;
 
 	if (apple2_fdc_diskreg & 0x40)
 	{
-		if (apple2_fdc_has_35(Machine))
+		if (apple2_fdc_has_35(device->machine))
 		{
 			/* slot 5: 3.5" disks */
-			result = sony_read_status();
+			result = sony_read_status(device);
 		}
 	}
 	else
 	{
-		if (apple2_fdc_has_525(Machine))
+		if (apple2_fdc_has_525(device->machine))
 		{
 			/* slot 6: 5.25" disks */
-			result = apple525_read_status();
+			result = apple525_read_status(device);
 		}
 	}
 	return result;
@@ -1235,7 +1235,7 @@ void apple2_iwm_setdiskreg(running_machine *machine, UINT8 data)
 {
 	apple2_fdc_diskreg = data & 0xC0;
 	if (apple2_fdc_has_35(machine))
-		sony_set_sel_line(apple2_fdc_diskreg & 0x80);
+		sony_set_sel_line( (device_config*)device_list_find_by_tag( machine->config->devicelist,APPLEFDC,"fdc"),apple2_fdc_diskreg & 0x80);
 }
 
 

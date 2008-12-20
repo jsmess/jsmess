@@ -593,8 +593,7 @@ static MACHINE_DRIVER_START( apple2_common )
 	/* slot devices */
 	MDRV_DEVICE_ADD("langcard", APPLE2_LANGCARD)
 	MDRV_DEVICE_ADD("mockingboard", MOCKINGBOARD)
-	MDRV_DEVICE_ADD("fdc", APPLEFDC)
-	MDRV_DEVICE_CONFIG(apple2_fdc_interface)
+	MDRV_APPLEFDC_ADD("fdc", apple2_fdc_interface)
 
 	/* slots */
 	MDRV_APPLE2_SLOT_ADD(0, "langcard", apple2_langcard_r, apple2_langcard_w)
@@ -639,8 +638,7 @@ static MACHINE_DRIVER_START( apple2c_iwm )
 
 	/* replace the old-style FDC with an IWM */
 	MDRV_DEVICE_REMOVE("fdc", APPLEFDC)
-	MDRV_DEVICE_ADD("fdc", IWM)
-	MDRV_DEVICE_CONFIG(apple2_fdc_interface)
+	MDRV_IWM_ADD("fdc", apple2_fdc_interface)
 MACHINE_DRIVER_END
 
 

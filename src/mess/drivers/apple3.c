@@ -53,8 +53,7 @@ static MACHINE_DRIVER_START( apple3 )
 	MDRV_VIDEO_UPDATE( apple3 )
 
 	/* fdc */
-	MDRV_DEVICE_ADD("fdc", APPLEFDC)
-	MDRV_DEVICE_CONFIG(apple3_fdc_interface)
+	MDRV_APPLEFDC_ADD("fdc", apple3_fdc_interface)
 
 	/* acia */
 	MDRV_DEVICE_ADD("acia", ACIA6551)

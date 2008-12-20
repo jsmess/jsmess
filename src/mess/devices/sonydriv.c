@@ -37,7 +37,7 @@
 *********************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
+#include "machine/applefdc.h"
 #include "sonydriv.h"
 #include "formats/ap_dsk35.h"
 #include "flopdrv.h"
@@ -114,7 +114,7 @@ static floppy *get_sony_floppy(const device_config *img)
 #endif
 
 
-static void load_track_data(int floppy_select)
+static void load_track_data(const device_config *device,int floppy_select)
 {
 	int track_size;
 	const device_config *cur_image;
@@ -122,7 +122,7 @@ static void load_track_data(int floppy_select)
 	floppy *f;
 
 	f = &sony_floppy[floppy_select];
-	cur_image = image_from_devtag_and_index(Machine, "sonydriv", floppy_select);
+	cur_image = image_from_devtag_and_index(device->machine, "sonydriv", floppy_select);
 
 	track_size = floppy_get_track_size(flopimg_get_image(cur_image), f->head, floppy_drive_get_current_track(cur_image));
 	new_data = image_realloc(cur_image, f->loadedtrack_data, track_size);
@@ -139,14 +139,14 @@ static void load_track_data(int floppy_select)
 
 
 
-static void save_track_data(int floppy_select)
+static void save_track_data(const device_config *device, int floppy_select)
 {
 	const device_config *cur_image;
 	floppy *f;
 	int len;
 
 	f = &sony_floppy[floppy_select];
-	cur_image = image_from_devtag_and_index(Machine, "sonydriv", floppy_select);
+	cur_image = image_from_devtag_and_index(device->machine, "sonydriv", floppy_select);
 
 	if (f->loadedtrack_dirty)
 	{
@@ -158,7 +158,7 @@ static void save_track_data(int floppy_select)
 
 
 
-UINT8 sony_read_data(void)
+UINT8 sony_read_data(const device_config *device)
 {
 	UINT8 result = 0;
 	const device_config *cur_image;
@@ -168,12 +168,12 @@ UINT8 sony_read_data(void)
 		return 0xFF;			/* right ??? */
 
 	f = &sony_floppy[sony_floppy_select];
-	cur_image = image_from_devtag_and_index(Machine, "sonydriv", sony_floppy_select);
+	cur_image = image_from_devtag_and_index(device->machine, "sonydriv", sony_floppy_select);
 	if (!image_exists(cur_image))
 		return 0xFF;
 
 	if (!f->loadedtrack_valid)
-		load_track_data(sony_floppy_select);
+		load_track_data(device, sony_floppy_select);
 
 	result = sony_fetchtrack(f->loadedtrack_data, f->loadedtrack_size, &f->loadedtrack_pos);
 	return result;
@@ -181,18 +181,18 @@ UINT8 sony_read_data(void)
 
 
 
-void sony_write_data(UINT8 data)
+void sony_write_data(const device_config *device,UINT8 data)
 {
 	const device_config *cur_image;
 	floppy *f;
 
 	f = &sony_floppy[sony_floppy_select];
-	cur_image = image_from_devtag_and_index(Machine, "sonydriv", sony_floppy_select);
+	cur_image = image_from_devtag_and_index(device->machine, "sonydriv", sony_floppy_select);
 	if (!image_exists(cur_image))
 		return;
 
 	if (!f->loadedtrack_valid)
-		load_track_data(sony_floppy_select);
+		load_track_data(device,sony_floppy_select);
 	sony_filltrack(f->loadedtrack_data, f->loadedtrack_size, &f->loadedtrack_pos, data);
 	f->loadedtrack_dirty = 1;
 }
@@ -252,7 +252,7 @@ static int sony_rpm(floppy *f, const device_config *cur_image)
 	return result;
 }
 
-int sony_read_status(void)
+int sony_read_status(const device_config *device)
 {
 	int result = 1;
 	int action;
@@ -264,13 +264,13 @@ int sony_read_status(void)
 	if (LOG_SONY_EXTRA)
 	{
 		logerror("sony_status(): action=%d pc=0x%08x%s\n",
-			action, (int) cpu_get_pc(Machine->cpu[0]), sony_floppy_enable ? "" : " (no drive enabled)");
+			action, (int) cpu_get_pc(device->machine->cpu[0]), sony_floppy_enable ? "" : " (no drive enabled)");
 	}
 
 	if ((! sony_enable2()) && sony_floppy_enable)
 	{
 		f = &sony_floppy[sony_floppy_select];
-		cur_image = image_from_devtag_and_index(Machine, "sonydriv", sony_floppy_select);
+		cur_image = image_from_devtag_and_index(device->machine, "sonydriv", sony_floppy_select);
 		if (!image_exists(cur_image))
 			cur_image = NULL;
 
@@ -281,7 +281,7 @@ int sony_read_status(void)
 		case 0x01:	/* Lower head activate */
 			if (f->head != 0)
 			{
-				save_track_data(sony_floppy_select);
+				save_track_data(device,sony_floppy_select);
 				f->head = 0;
 				f->loadedtrack_valid = 0;
 			}
@@ -293,7 +293,7 @@ int sony_read_status(void)
 		case 0x03:	/* Upper head activate */
 			if (f->head != 1)
 			{
-				save_track_data(sony_floppy_select);
+				save_track_data(device,sony_floppy_select);
 				f->head = 1;
 				f->loadedtrack_valid = 0;
 			}
@@ -319,7 +319,7 @@ int sony_read_status(void)
 				result = floppy_get_heads_per_disk(flopimg_get_image(cur_image)) - 1;
 			break;
 		case 0x0a:	/* At track 0: 0=track zero 1=not track zero */
-			logerror("sony_status(): reading Track 0 pc=0x%08x\n", (int) cpu_get_pc(Machine->cpu[0]));
+			logerror("sony_status(): reading Track 0 pc=0x%08x\n", (int) cpu_get_pc(device->machine->cpu[0]));
 			if (cur_image)
 				result = floppy_drive_get_flag_state(cur_image, FLOPPY_DRIVE_HEAD_AT_TRACK_0) ? 0 : 1;
 			else
@@ -347,7 +347,7 @@ int sony_read_status(void)
 			break;
 		case 0x0e:	/* Tachometer */
 			/* (time in seconds) / (60 sec/minute) * (rounds/minute) * (60 pulses) * (2 pulse phases) */
-			result = ((int) (attotime_to_double(timer_get_time(Machine)) / 60.0 * sony_rpm(f, cur_image) * 60.0 * 2.0)) & 1;
+			result = ((int) (attotime_to_double(timer_get_time(device->machine)) / 60.0 * sony_rpm(f, cur_image) * 60.0 * 2.0)) & 1;
 			break;
 		case 0x0f:	/* Drive installed: 0=drive connected, 1=drive not connected */
 			result = 0;
@@ -364,7 +364,7 @@ int sony_read_status(void)
 
 
 
-static void sony_doaction(void)
+static void sony_doaction(const device_config *device)
 {
 	int action;
 	floppy *f;
@@ -375,13 +375,13 @@ static void sony_doaction(void)
 	if (LOG_SONY)
 	{
 		logerror("sony_doaction(): action=%d pc=0x%08x%s\n",
-			action, (int) cpu_get_pc(Machine->cpu[0]), (sony_floppy_enable) ? "" : " (MOTOR OFF)");
+			action, (int) cpu_get_pc(device->machine->cpu[0]), (sony_floppy_enable) ? "" : " (MOTOR OFF)");
 	}
 
 	if (sony_floppy_enable)
 	{
 		f = &sony_floppy[sony_floppy_select];
-		cur_image = image_from_devtag_and_index(Machine, "sonydriv", sony_floppy_select);
+		cur_image = image_from_devtag_and_index(device->machine, "sonydriv", sony_floppy_select);
 		if (!image_exists(cur_image))
 			cur_image = NULL;
 
@@ -399,7 +399,7 @@ static void sony_doaction(void)
 		case 0x04:	/* Step disk */
 			if (cur_image)
 			{
-				save_track_data(sony_floppy_select);
+				save_track_data(device,sony_floppy_select);
 				if (f->step)
 					floppy_drive_seek(cur_image, -1);
 				else
@@ -429,7 +429,7 @@ static void sony_doaction(void)
 
 
 
-void sony_set_lines(UINT8 lines)
+void sony_set_lines(const device_config *device,UINT8 lines)
 {
 	int old_sony_lines = sony_lines;
 
@@ -439,7 +439,7 @@ void sony_set_lines(UINT8 lines)
 	if ((sony_lines & ~old_sony_lines) & SONY_LSTRB)
 	{
 		/* if so, write drive reg */
-		sony_doaction();
+		sony_doaction(device);
 	}
 
 	if (LOG_SONY_EXTRA)
@@ -448,7 +448,7 @@ void sony_set_lines(UINT8 lines)
 
 
 
-void sony_set_enable_lines(int enable_mask)
+void sony_set_enable_lines(const device_config *device,int enable_mask)
 {
 	switch (enable_mask)
 	{
@@ -472,7 +472,7 @@ void sony_set_enable_lines(int enable_mask)
 
 
 
-void sony_set_sel_line(int sel)
+void sony_set_sel_line(const device_config *device,int sel)
 {
 	sony_sel_line = sel ? 1 : 0;
 
@@ -495,7 +495,7 @@ static DEVICE_IMAGE_UNLOAD( sonydriv_floppy )
 	device_image_unload_func parent_unload;
 
 	id = image_index_in_device(image);
-	save_track_data(id);
+	save_track_data((device_config*)device_list_find_by_tag( image->machine->config->devicelist,APPLEFDC,"fdc"),id);
 	memset(&sony_floppy[id], 0, sizeof(sony_floppy[id]));
 
 	parent_unload = (device_image_unload_func) mess_device_get_info_fct(&parent_devclass, MESS_DEVINFO_PTR_UNLOAD);

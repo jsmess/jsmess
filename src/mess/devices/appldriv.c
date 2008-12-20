@@ -9,7 +9,6 @@
 #include "appldriv.h"
 #include "flopdrv.h"
 #include "mflopimg.h"
-#include "deprecat.h"
 #include "formats/ap2_dsk.h"
 
 
@@ -31,7 +30,7 @@ static int apple525_enable_mask = 1;
 
 
 
-void apple525_set_enable_lines(int enable_mask)
+void apple525_set_enable_lines(const device_config *device,int enable_mask)
 {
 	apple525_enable_mask = enable_mask;
 }
@@ -104,7 +103,7 @@ static void apple525_seek_disk(const device_config *img, struct apple525_disk *d
 
 
 
-static void apple525_disk_set_lines(const device_config *image, UINT8 new_state)
+static void apple525_disk_set_lines(const device_config *device,const device_config *image, UINT8 new_state)
 {
 	struct apple525_disk *cur_disk;
 	UINT8 old_state;
@@ -145,20 +144,20 @@ static void apple525_disk_set_lines(const device_config *image, UINT8 new_state)
 
 
 
-void apple525_set_lines(UINT8 lines)
+void apple525_set_lines(const device_config *device,UINT8 lines)
 {
 	int i, count;
 	const device_config *image;
 
-	count = device_count_tag_from_machine(Machine, APPLE525TAG);
+	count = device_count_tag_from_machine(device->machine, APPLE525TAG);
 
 	for (i = 0; i < count; i++)
 	{
 		if (apple525_enable_mask & (1 << i))
 		{
-			image = image_from_devtag_and_index(Machine, APPLE525TAG, i);
+			image = image_from_devtag_and_index(device->machine, APPLE525TAG, i);
 			if (image)
-				apple525_disk_set_lines(image, lines);
+				apple525_disk_set_lines(device,image, lines);
 		}
 	}
 }
@@ -234,37 +233,37 @@ static const device_config *apple525_selected_image(running_machine *machine)
 
 
 
-UINT8 apple525_read_data(void)
+UINT8 apple525_read_data(const device_config *device)
 {
 	const device_config *image;
-	image = apple525_selected_image(Machine);
+	image = apple525_selected_image(device->machine);
 	return image ? apple525_process_byte(image, -1) : 0xFF;
 }
 
 
 
-void apple525_write_data(UINT8 data)
+void apple525_write_data(const device_config *device,UINT8 data)
 {
 	const device_config *image;
-	image = apple525_selected_image(Machine);
+	image = apple525_selected_image(device->machine);
 	if (image)
 		apple525_process_byte(image, data);
 }
 
 
 
-int apple525_read_status(void)
+int apple525_read_status(const device_config *device)
 {
 	int i, count, result = 0;
 	const device_config *image;
 
-	count = device_count_tag_from_machine(Machine, APPLE525TAG);
+	count = device_count_tag_from_machine(device->machine, APPLE525TAG);
 
 	for (i = 0; i < count; i++)
 	{
 		if (apple525_enable_mask & (1 << i))
 		{
-			image = image_from_devtag_and_index(Machine, APPLE525TAG, i);
+			image = image_from_devtag_and_index(device->machine, APPLE525TAG, i);
 			if (image && !image_is_writable(image))
 				result = 1;
 		}

@@ -48,17 +48,17 @@ ADDRESS_MAP_END
     DEVICE CONFIG
 ***************************************************************************/
 
-static void lisa2_set_iwm_enable_lines(int enable_mask)
+static void lisa2_set_iwm_enable_lines(const device_config *device,int enable_mask)
 {
 	/* E1 & E2 is connected to the Sony SEL line (?) */
 	/*logerror("new sel line state %d\n", (enable_mask) ? 0 : 1);*/
-	sony_set_sel_line((enable_mask) ? 0 : 1);
+	sony_set_sel_line(device,(enable_mask) ? 0 : 1);
 }
 
-static void lisa210_set_iwm_enable_lines(int enable_mask)
+static void lisa210_set_iwm_enable_lines(const device_config *device,int enable_mask)
 {
 	/* E2 is connected to the Sony enable line (?) */
-	sony_set_enable_lines(enable_mask >> 1);
+	sony_set_enable_lines(device,enable_mask >> 1);
 }
 
 static const applefdc_interface lisa2_fdc_interface =
@@ -122,8 +122,7 @@ static MACHINE_DRIVER_START( lisa )
 	MDRV_NVRAM_HANDLER(lisa)
 
 	/* devices */
-	MDRV_DEVICE_ADD("fdc", IWM)
-	MDRV_DEVICE_CONFIG(lisa2_fdc_interface)
+	MDRV_IWM_ADD("fdc", lisa2_fdc_interface)
 
 	/* via */
 	MDRV_VIA6522_ADD("via6522_0", 500000, lisa_via6522_0_intf)
@@ -137,8 +136,7 @@ static MACHINE_DRIVER_START( lisa210 )
 	MDRV_CPU_PROGRAM_MAP(lisa210_fdc_map, 0)
 
 	/* Lisa 2/10 and MacXL had a slightly different FDC interface */	
-	MDRV_DEVICE_MODIFY("fdc", IWM)
-	MDRV_DEVICE_CONFIG(lisa210_fdc_interface)
+	MDRV_IWM_MODIFY("fdc", lisa210_fdc_interface)
 
 	/* via */
 	MDRV_VIA6522_REMOVE("via6522_0")

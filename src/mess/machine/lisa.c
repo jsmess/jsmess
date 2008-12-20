@@ -1177,7 +1177,7 @@ MACHINE_RESET( lisa )
 	/* initialize floppy */
 	{
 		if (lisa_features.floppy_hardware == sony_lisa2)
-			sony_set_enable_lines(1);	/* on lisa2, drive unit 1 is always selected (?) */
+			sony_set_enable_lines((device_config*)device_list_find_by_tag( machine->config->devicelist,APPLEFDC,"fdc"),1);	/* on lisa2, drive unit 1 is always selected (?) */
 	}
 }
 
@@ -1328,7 +1328,7 @@ INLINE void lisa_fdc_ttl_glue_access(running_machine *machine, offs_t offset)
 		/*if (lisa_features.floppy_hardware == twiggy)
 			twiggy_set_head_line(offset & 1);
 		else*/ if (lisa_features.floppy_hardware == sony_lisa210)
-			sony_set_sel_line(offset & 1);
+			sony_set_sel_line((device_config*)device_list_find_by_tag( machine->config->devicelist,APPLEFDC,"fdc"), offset & 1);
 		break;
 	case 6:
 		DISK_DIAG = offset & 1;

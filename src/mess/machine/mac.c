@@ -160,21 +160,21 @@ static int has_adb(void)
 }
 
 // handle disk enable lines
-void mac_fdc_set_enable_lines(int enable_mask)
+void mac_fdc_set_enable_lines(const device_config *device,int enable_mask)
 {
 	if (mac_model < MODEL_MAC_SE)
 	{
-		sony_set_enable_lines(enable_mask);
+		sony_set_enable_lines(device,enable_mask);
 	}
 	else
 	{
 		if (enable_mask)
 		{
-			sony_set_enable_lines(mac_drive_select ? 1 : 2);
+			sony_set_enable_lines(device,mac_drive_select ? 1 : 2);
 		}
 		else
 		{
-			sony_set_enable_lines(enable_mask);
+			sony_set_enable_lines(device,enable_mask);
 		}
 	}
 }
@@ -1658,7 +1658,7 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_a)
 {
 	set_scc_waitrequest((data & 0x80) >> 7);
 	mac_set_screen_buffer((data & 0x40) >> 6);
-	sony_set_sel_line((data & 0x20) >> 5);
+	sony_set_sel_line((device_config*)device_list_find_by_tag( device->machine->config->devicelist,APPLEFDC,"fdc"),(data & 0x20) >> 5);
 	if (mac_model == MODEL_MAC_SE)	// on SE this selects which floppy drive (0 = upper, 1 = lower)
 	{
 		mac_drive_select = ((data & 0x10) >> 4);

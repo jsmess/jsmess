@@ -26,7 +26,7 @@
 
 UINT32 a3;
 
-static void apple3_update_drives(void);
+static void apple3_update_drives(const device_config *device);
 
 static UINT8 via_0_a;
 static UINT8 via_0_b;
@@ -178,7 +178,7 @@ static READ8_HANDLER( apple3_c0xx_r )
 				a3 |= VAR_EXTA0 << ((offset - 0xD0) / 2);
 			else
 				a3 &= ~(VAR_EXTA0 << ((offset - 0xD0) / 2));
-			apple3_update_drives();
+			apple3_update_drives((device_config*)device_list_find_by_tag( space->machine->config->devicelist,APPLEFDC,"fdc"));
 			result = 0x00;
 			break;
 
@@ -246,7 +246,7 @@ static WRITE8_HANDLER( apple3_c0xx_w )
 				a3 |= VAR_EXTA0 << ((offset - 0xD0) / 2);
 			else
 				a3 &= ~(VAR_EXTA0 << ((offset - 0xD0) / 2));
-			apple3_update_drives();
+			apple3_update_drives((device_config*)device_list_find_by_tag( space->machine->config->devicelist,APPLEFDC,"fdc"));
 			break;
 
 		case 0xDB:
@@ -670,7 +670,7 @@ static DIRECT_UPDATE_HANDLER( apple3_opbase )
 
 
 
-static void apple3_update_drives(void)
+static void apple3_update_drives(const device_config *device)
 {
 	int enable_mask = 0x00;
 
@@ -693,15 +693,15 @@ static void apple3_update_drives(void)
 		}
 	}
 
-	apple525_set_enable_lines(enable_mask);
+	apple525_set_enable_lines(device,enable_mask);
 }
 
 
 
-static void apple3_set_enable_lines(int enable_mask)
+static void apple3_set_enable_lines(const device_config *device,int enable_mask)
 {
 	apple3_enable_mask = enable_mask;
-	apple3_update_drives();
+	apple3_update_drives(device);
 }
 
 
@@ -722,7 +722,7 @@ DRIVER_INIT( apple3 )
 	memory_region(machine, "main")[0x0685] = 0x00;
 
 	apple3_enable_mask = 0;
-	apple3_update_drives();
+	apple3_update_drives((device_config*)device_list_find_by_tag( machine->config->devicelist,APPLEFDC,"fdc"));
 
 	AY3600_init(machine);
 

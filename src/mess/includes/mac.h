@@ -48,7 +48,7 @@ READ16_HANDLER ( macplus_scsi_r );
 WRITE16_HANDLER ( macplus_scsi_w );
 NVRAM_HANDLER( mac );
 void mac_scc_mouse_irq( running_machine *machine, int x, int y );
-void mac_fdc_set_enable_lines(int enable_mask);
+void mac_fdc_set_enable_lines(const device_config *device, int enable_mask);
 
 
 /*----------- defined in video/mac.c -----------*/

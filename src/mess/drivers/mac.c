@@ -129,8 +129,7 @@ static MACHINE_DRIVER_START( mac512ke )
 	MDRV_NVRAM_HANDLER(mac)
 
 	/* devices */
-	MDRV_DEVICE_ADD("fdc", IWM)
-	MDRV_DEVICE_CONFIG(mac_iwm_interface)
+	MDRV_IWM_ADD("fdc", mac_iwm_interface)
 	MDRV_SCC8530_ADD("scc", mac_scc8530_interface)
 	MDRV_VIA6522_ADD("via6522_0", 1000000, mac_via6522_intf)
 MACHINE_DRIVER_END
