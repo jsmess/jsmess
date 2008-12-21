@@ -19,38 +19,79 @@
 
 #include "driver.h"
 
-typedef enum
-{
-	SAM6883_ORIGINAL,
-	SAM6883_GIME
-} sam6883_type;
+
+/***************************************************************************
+    MACROS
+***************************************************************************/
+
+#define SAM6883			DEVICE_GET_INFO_NAME(sam6883)
+#define SAM6883_GIME	DEVICE_GET_INFO_NAME(sam6883_gime)
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+typedef UINT8 *(*sam6883_get_rambase_func)(const device_config *device);
+#define SAM6883_GET_RAMBASE(name)	UINT8 *name(const device_config *device )
+
+typedef void (*sam6883_set_pageonemode_func)(const device_config *device, int val);
+#define SAM6883_SET_PAGE_ONE_MODE(name)	void name(const device_config *device, int val )
+
+typedef void (*sam6883_set_mpurate_func)(const device_config *device, int val);
+#define SAM6883_SET_MPU_RATE(name)	void name(const device_config *device, int val )
+
+typedef void (*sam6883_set_memorysize_func)(const device_config *device, int val);
+#define SAM6883_SET_MEMORY_SIZE(name)	void name(const device_config *device, int val )
+
+typedef void (*sam6883_set_map_type_func)(const device_config *device, int val);
+#define SAM6883_SET_MAP_TYPE(name)	void name(const device_config *device, int val )
+
 
 typedef struct _sam6883_interface sam6883_interface;
 struct _sam6883_interface
 {
-	sam6883_type type;
-	const UINT8 *(*get_rambase)(running_machine *machine);
-	void (*set_pageonemode)(running_machine *machine, int val);
-	void (*set_mpurate)(running_machine *machine, int val);
-	void (*set_memorysize)(running_machine *machine, int val);
-	void (*set_maptype)(running_machine *machine, int val);
+	sam6883_get_rambase_func get_rambase;
+	sam6883_set_pageonemode_func set_pageonemode;
+	sam6883_set_mpurate_func set_mpurate;
+	sam6883_set_memorysize_func set_memorysize;
+	sam6883_set_map_type_func set_maptype;
 };
 
-/* initialize the SAM */
-void sam_init(running_machine *machine, const sam6883_interface *intf);
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
 
-/* set the state of the SAM */
-void sam_set_state(running_machine *machine,UINT16 state, UINT16 mask);
+/* device interface */
+DEVICE_GET_INFO( sam6883 );
+DEVICE_GET_INFO( sam6883_gime );
 
-/* used by video/m6847.c to read the position of the SAM */
-const UINT8 *sam_m6847_get_video_ram(running_machine *machine,int scanline);
+/* Standard handlers */
 
 /* write to the SAM */
-WRITE8_HANDLER(sam_w);
+WRITE8_DEVICE_HANDLER(sam6883_w);
+
+/* set the state of the SAM */
+void sam_set_state(const device_config *device,UINT16 state, UINT16 mask);
+
+/* used by video/m6847.c to read the position of the SAM */
+const UINT8 *sam_m6847_get_video_ram(const device_config *device,int scanline);
 
 /* used to get memory size and pagemode independent of callbacks */
-UINT8 get_sam_memorysize(running_machine *machine);
-UINT8 get_sam_pagemode(running_machine *machine);
-UINT8 get_sam_maptype(running_machine *machine);
+UINT8 get_sam_memorysize(const device_config *device);
+UINT8 get_sam_pagemode(const device_config *device);
+UINT8 get_sam_maptype(const device_config *device);
+
+
+/***************************************************************************
+    DEVICE CONFIGURATION MACROS
+***************************************************************************/
+
+#define MDRV_SAM6883_ADD(_tag, _intrf) \
+	MDRV_DEVICE_ADD(_tag, SAM6883) \
+	MDRV_DEVICE_CONFIG(_intrf)
+
+#define MDRV_SAM6883_GIME_ADD(_tag, _intrf) \
+	MDRV_DEVICE_ADD(_tag, SAM6883_GIME) \
+	MDRV_DEVICE_CONFIG(_intrf)
+
 
 #endif /* __6833SAM_H__ */

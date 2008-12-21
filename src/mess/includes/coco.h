@@ -11,6 +11,7 @@
 
 #include "devices/snapquik.h"
 #include "machine/wd17xx.h"
+#include "machine/6883sam.h"
 
 #define COCO_CPU_SPEED_HZ		894886	/* 0.894886 MHz */
 #define COCO_FRAMES_PER_SECOND	(COCO_CPU_SPEED_HZ / 57.0 / 263)
@@ -41,6 +42,8 @@ void coco3_vh_blink(void);
 extern const wd17xx_interface dragon_wd17xx_interface;
 extern const wd17xx_interface coco_wd17xx_interface;
 extern const wd17xx_interface dgnalpha_wd17xx_interface;
+extern const sam6883_interface coco_sam_intf;
+extern const sam6883_interface coco3_sam_intf;
 extern UINT8 coco3_gimereg[16];
 
 MACHINE_START( dragon32 );

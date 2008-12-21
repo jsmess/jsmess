@@ -58,7 +58,7 @@ static ADDRESS_MAP_START( coco_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xff20, 0xff3f) AM_READWRITE(pia_1_r,			coco_pia_1_w)
 	AM_RANGE(0xff40, 0xff8f) AM_READWRITE(coco_cartridge_r,	coco_cartridge_w)
 	AM_RANGE(0xff90, 0xffbf) AM_NOP
-	AM_RANGE(0xffc0, 0xffdf) AM_WRITE(sam_w)
+	AM_RANGE(0xffc0, 0xffdf) AM_DEVWRITE(SAM6883, "sam", sam6883_w)
 	AM_RANGE(0xffe0, 0xffef) AM_NOP
 	AM_RANGE(0xfff0, 0xffff) AM_ROM AM_REGION("main", 0x3ff0)
 ADDRESS_MAP_END
@@ -89,7 +89,7 @@ static ADDRESS_MAP_START( coco3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xff90, 0xff9f) AM_READWRITE(coco3_gime_r,			coco3_gime_w)
 	AM_RANGE(0xffa0, 0xffaf) AM_READWRITE(coco3_mmu_r,			coco3_mmu_w)
 	AM_RANGE(0xffb0, 0xffbf) AM_READWRITE(SMH_BANK10,			coco3_palette_w)
-	AM_RANGE(0xffc0, 0xffdf) AM_WRITE(sam_w)
+	AM_RANGE(0xffc0, 0xffdf) AM_DEVWRITE(SAM6883_GIME, "sam", sam6883_w)
 	AM_RANGE(0xffe0, 0xffef) AM_NOP
 	AM_RANGE(0xfff0, 0xffff) AM_ROM AM_REGION("main", 0x7ff0)
 ADDRESS_MAP_END
@@ -118,7 +118,7 @@ static ADDRESS_MAP_START( d64_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xff20, 0xff3f) AM_READWRITE(pia_1_r,				coco_pia_1_w)
 	AM_RANGE(0xff40, 0xff8f) AM_READWRITE(coco_cartridge_r,		coco_cartridge_w)
 	AM_RANGE(0xff90, 0xffbf) AM_NOP
-	AM_RANGE(0xffc0, 0xffdf) AM_WRITE(sam_w)
+	AM_RANGE(0xffc0, 0xffdf) AM_DEVWRITE(SAM6883, "sam", sam6883_w)
 	AM_RANGE(0xffe0, 0xffef) AM_NOP
 	AM_RANGE(0xfff0, 0xffff) AM_ROM AM_REGION("main", 0x3ff0)
 ADDRESS_MAP_END
@@ -152,7 +152,7 @@ static ADDRESS_MAP_START( d64_plus_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xff20, 0xff3f) AM_READWRITE(pia_1_r,coco_pia_1_w)
 	AM_RANGE(0xff40, 0xff8f) AM_READWRITE(coco_cartridge_r,	coco_cartridge_w)
 	AM_RANGE(0xff90, 0xffbf) AM_NOP
-	AM_RANGE(0xffc0, 0xffdf) AM_WRITE(sam_w)
+	AM_RANGE(0xffc0, 0xffdf) AM_DEVWRITE(SAM6883, "sam", sam6883_w)
 	AM_RANGE(0xffe0, 0xffe1) AM_NOP
 	AM_RANGE(0xffe2, 0xffe2) AM_READWRITE(plus_reg_r,plus_reg_w)	/* Dragon plus control / status reg */
 	AM_RANGE(0xffe3, 0xffef) AM_NOP
@@ -233,7 +233,7 @@ static ADDRESS_MAP_START( dgnalpha_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xff2c, 0xff2f) AM_READWRITE(wd2797_r,			wd2797_w)	/* Alpha onboard disk interface */
 	AM_RANGE(0xff40, 0xff8f) AM_READWRITE(coco_cartridge_r,	coco_cartridge_w)
 	AM_RANGE(0xff90, 0xffbf) AM_NOP
-	AM_RANGE(0xffc0, 0xffdf) AM_WRITE(sam_w)
+	AM_RANGE(0xffc0, 0xffdf) AM_DEVWRITE(SAM6883, "sam", sam6883_w)
 	AM_RANGE(0xffe0, 0xffef) AM_NOP
 	AM_RANGE(0xfff0, 0xffff) AM_READ(dragon_alpha_mapped_irq_r)
 ADDRESS_MAP_END
@@ -667,6 +667,8 @@ static MACHINE_DRIVER_START( dragon32 )
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
 	
 	MDRV_WD179X_ADD("wd179x", dragon_wd17xx_interface )
+	
+	MDRV_SAM6883_ADD("sam", coco_sam_intf)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dragon64 )
@@ -701,6 +703,8 @@ static MACHINE_DRIVER_START( dragon64 )
 	MDRV_ACIA6551_ADD("acia")
 	
 	MDRV_WD179X_ADD("wd179x", dragon_wd17xx_interface )
+	
+	MDRV_SAM6883_ADD("sam", coco_sam_intf)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( d64plus )
@@ -735,6 +739,8 @@ static MACHINE_DRIVER_START( d64plus )
 	MDRV_DEVICE_ADD("acia", ACIA6551)
 	
 	MDRV_WD179X_ADD("wd179x", dragon_wd17xx_interface )
+	
+	MDRV_SAM6883_ADD("sam", coco_sam_intf)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dgnalpha )
@@ -772,6 +778,8 @@ static MACHINE_DRIVER_START( dgnalpha )
 	MDRV_DEVICE_ADD("acia", ACIA6551)
 	
 	MDRV_WD179X_ADD("wd179x", dgnalpha_wd17xx_interface )
+	
+	MDRV_SAM6883_ADD("sam", coco_sam_intf)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( tanodr64 )
@@ -806,6 +814,8 @@ static MACHINE_DRIVER_START( tanodr64 )
 	MDRV_DEVICE_ADD("acia", ACIA6551)
 	
 	MDRV_WD1773_ADD("wd1773", coco_wd17xx_interface )	
+	
+	MDRV_SAM6883_ADD("sam", coco_sam_intf)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco )
@@ -841,6 +851,8 @@ static MACHINE_DRIVER_START( coco )
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
 	
 	MDRV_WD1773_ADD("wd1773", coco_wd17xx_interface )	
+	
+	MDRV_SAM6883_ADD("sam", coco_sam_intf)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco2 )
@@ -876,6 +888,8 @@ static MACHINE_DRIVER_START( coco2 )
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
 	
 	MDRV_WD1773_ADD("wd1773", coco_wd17xx_interface )	
+	
+	MDRV_SAM6883_ADD("sam", coco_sam_intf)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco2b )
@@ -911,6 +925,8 @@ static MACHINE_DRIVER_START( coco2b )
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
 	
 	MDRV_WD1773_ADD("wd1773", coco_wd17xx_interface )	
+	
+	MDRV_SAM6883_ADD("sam", coco_sam_intf)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco3 )
@@ -956,6 +972,8 @@ static MACHINE_DRIVER_START( coco3 )
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
 	
 	MDRV_WD1773_ADD("wd1773", coco_wd17xx_interface )	
+	
+	MDRV_SAM6883_GIME_ADD("sam", coco3_sam_intf)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco3p )

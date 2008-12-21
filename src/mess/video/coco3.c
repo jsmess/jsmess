@@ -790,6 +790,11 @@ static STATE_POSTLOAD( coco3_video_postload )
 }
 
 
+const UINT8 *get_video_ram_coco3(running_machine *machine,int scanline)
+{
+	device_config *sam = (device_config*)device_list_find_by_tag( machine->config->devicelist, SAM6883_GIME, "sam");
+	return sam_m6847_get_video_ram(sam,scanline);
+}
 
 static void internal_video_start_coco3(running_machine *machine, m6847_type type)
 {
@@ -834,7 +839,7 @@ static void internal_video_start_coco3(running_machine *machine, m6847_type type
 	cfg.type = type;
 	cfg.cpu0_timing_factor = 4;
 	cfg.get_attributes = coco_get_attributes;
-	cfg.get_video_ram = sam_m6847_get_video_ram;
+	cfg.get_video_ram = get_video_ram_coco3;
 	cfg.horizontal_sync_callback = coco3_horizontal_sync_callback;
 	cfg.field_sync_callback = coco3_field_sync_callback;
 	cfg.custom_palette = video->palette_colors;

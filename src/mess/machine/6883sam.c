@@ -55,17 +55,27 @@
 
 #define LOG_VIDEO_POSITION	0
 
-typedef struct _sam6883 sam6883;
-struct _sam6883
+typedef enum
 {
+	TYPE_SAM6883 = 0,
+	TYPE_SAM6883_GIME = 1,
+} SAM6883_VERSION;
+
+
+/*****************************************************************************
+ Type definitions
+*****************************************************************************/
+
+typedef struct _sam6883_t sam6883_t;
+struct _sam6883_t
+{
+	SAM6883_VERSION type;
 	const sam6883_interface *intf;
 	UINT16 state;
 	UINT16 old_state;
 	UINT16 video_position;
 	int last_scanline;
 };
-
-static sam6883 sam;
 
 static const UINT8 sam_video_mode_row_heights[] =
 {
@@ -91,120 +101,105 @@ static const UINT8 sam_video_mode_row_pitches[] =
 	32	/* 7 - Reserved/Invalid */
 };
 
-static void sam_reset(running_machine *machine);
 
-static void update_sam(running_machine *machine)
+/*****************************************************************************
+ Implementation
+*****************************************************************************/
+
+INLINE sam6883_t *get_safe_token(const device_config *device)
 {
-	UINT16 xorval;
+	assert(device != NULL);
+	assert(device->token != NULL);
 
-	xorval = sam.old_state ^ sam.state;
-	sam.old_state = sam.state;
+	return (sam6883_t *)device->token;
+}
+
+static void update_sam(const device_config *device)
+{
+	sam6883_t *sam = get_safe_token(device);
+	UINT16 xorval;	
+
+	xorval = sam->old_state ^ sam->state;
+	sam->old_state = sam->state;
 
 	/* Check changes in Page #1 */
-	if ((xorval & 0x0400) && sam.intf->set_pageonemode)
-		sam.intf->set_pageonemode(machine,(sam.state & 0x0400) / 0x0400);
+	if ((xorval & 0x0400) && sam->intf->set_pageonemode)
+		sam->intf->set_pageonemode(device,(sam->state & 0x0400) / 0x0400);
 
 	/* Check changes in MPU Rate */
-	if ((xorval & 0x1800) && sam.intf->set_mpurate)
-		sam.intf->set_mpurate(machine,(sam.state & 0x1800) / 0x0800);
+	if ((xorval & 0x1800) && sam->intf->set_mpurate)
+		sam->intf->set_mpurate(device,(sam->state & 0x1800) / 0x0800);
 
 	/* Check changes in Memory Size */
-	if ((xorval & 0x6000) && sam.intf->set_memorysize)
-		sam.intf->set_memorysize(machine,(sam.state & 0x6000) / 0x2000);
+	if ((xorval & 0x6000) && sam->intf->set_memorysize)
+		sam->intf->set_memorysize(device,(sam->state & 0x6000) / 0x2000);
 
 	/* Check changes in Map Type */
-	if ((xorval & 0x8000) && sam.intf->set_maptype)
-		sam.intf->set_maptype(machine,(sam.state & 0x8000) / 0x8000);
+	if ((xorval & 0x8000) && sam->intf->set_maptype)
+		sam->intf->set_maptype(device,(sam->state & 0x8000) / 0x8000);
 }
 
 
 
 static STATE_POSTLOAD( update_sam_postload )
 {
-	update_sam(machine);
+	const device_config *device = (const device_config *)param;
+	update_sam(device);
 }
 
-
-
-void sam_init(running_machine *machine, const sam6883_interface *intf)
+void sam_set_state(const device_config *device, UINT16 state, UINT16 mask)
 {
-	sam.state = 0;
-	sam.old_state = ~0;
-	sam.intf = intf;
-
-	add_reset_callback(machine, sam_reset);
-
-	/* save state registration */
-	state_save_register_item(machine, "6883sam", NULL, 0, sam.state);
-	state_save_register_item(machine, "6883sam", NULL, 0, sam.video_position);
-	state_save_register_postload(machine, update_sam_postload, NULL);
+	sam6883_t *sam = get_safe_token(device);
+	sam->state &= ~mask;
+	sam->state |= (state & mask);
+	update_sam(device);
 }
 
-
-
-static void sam_reset(running_machine *machine)
-{
-	sam.state = 0;
-	sam.old_state = ~0;
-	update_sam(machine);
-}
-
-
-
-void sam_set_state(running_machine *machine, UINT16 state, UINT16 mask)
-{
-	sam.state &= ~mask;
-	sam.state |= (state & mask);
-	update_sam(machine);
-}
-
-
-
-WRITE8_HANDLER(sam_w)
+WRITE8_DEVICE_HANDLER(sam6883_w)
 {
 	UINT16 mask;
-
+	sam6883_t *sam = get_safe_token(device);
+	
 	if (offset < 32)
 	{
 		mask = 1 << (offset / 2);
 		if (offset & 1)
-			sam.state |= mask;
+			sam->state |= mask;
 		else
-			sam.state &= ~mask;
-		update_sam(space->machine);
+			sam->state &= ~mask;
+		update_sam(device);
 	}
 }
 
-
-
-const UINT8 *sam_m6847_get_video_ram(running_machine *machine,int scanline)
+const UINT8 *sam_m6847_get_video_ram(const device_config *device,int scanline)
 {
+	sam6883_t *sam = get_safe_token(device);
 	const UINT8 *ram_base;
 	UINT16 video_position;
 
-	if (scanline != sam.last_scanline)
+	if (scanline != sam->last_scanline)
 	{
 		/* first scanline? */
 		if (scanline == 0)
 		{
 			/* reset video position */
-			sam.video_position = (sam.state & 0x03F8) << 6;
+			sam->video_position = (sam->state & 0x03F8) << 6;
 		}
 		else
 		{
 			/* time to advance a row? */
-			if ((scanline % sam_video_mode_row_heights[sam.state & 0x0007]) == 0)
-				sam.video_position += sam_video_mode_row_pitches[sam.state & 0x0007];
+			if ((scanline % sam_video_mode_row_heights[sam->state & 0x0007]) == 0)
+				sam->video_position += sam_video_mode_row_pitches[sam->state & 0x0007];
 		}
-		sam.last_scanline = scanline;
+		sam->last_scanline = scanline;
 	}
 
-	video_position = sam.video_position;
+	video_position = sam->video_position;
 
-	if (sam.intf->type != SAM6883_GIME)
+	if (sam->type != TYPE_SAM6883_GIME)
 	{
 		/* mask the video position according to the SAM's settings */
-		switch(sam.state & 0x6000)
+		switch(sam->state & 0x6000)
 		{
 			case 0x0000:	video_position &= 0x0FFF;	break;	/* 4k */
 			case 0x2000:	video_position &= 0x3FFF;	break;	/* 16k */
@@ -216,21 +211,112 @@ const UINT8 *sam_m6847_get_video_ram(running_machine *machine,int scanline)
 		logerror("sam_m6847_get_video_ram(): scanline=%d video_position=0x%04X\n", scanline, video_position);
 
 	/* return actual position */
-	ram_base = sam.intf->get_rambase ? sam.intf->get_rambase(machine) : mess_ram;
+	ram_base = sam->intf->get_rambase ? sam->intf->get_rambase(device) : mess_ram;
 	return &ram_base[video_position];
 }
 
-UINT8 get_sam_memorysize(running_machine *machine)
+UINT8 get_sam_memorysize(const device_config *device)
 {
-	return (sam.state & 0x6000) / 0x2000;
+	sam6883_t *sam = get_safe_token(device);
+	return (sam->state & 0x6000) / 0x2000;
 }
 
-UINT8 get_sam_pagemode(running_machine *machine)
+UINT8 get_sam_pagemode(const device_config *device)
 {
-	return (sam.state & 0x0400) / 0x0400;
+	sam6883_t *sam = get_safe_token(device);
+	return (sam->state & 0x0400) / 0x0400;
 }
 
-UINT8 get_sam_maptype(running_machine *machine)
+UINT8 get_sam_maptype(const device_config *device)
 {
-	return (sam.state & 0x8000) / 0x8000;
+	sam6883_t *sam = get_safe_token(device);
+	return (sam->state & 0x8000) / 0x8000;
+}
+
+/* Device Interface */
+static device_start_err common_start(const device_config *device, SAM6883_VERSION device_type)
+{	
+	sam6883_t *sam = get_safe_token(device);
+	// validate arguments
+	assert(device != NULL);
+	assert(device->tag != NULL);
+	assert(strlen(device->tag) < 20);
+	assert(device->static_config != NULL);
+
+	sam->intf = device->static_config;
+
+	sam->type = device_type;
+	
+	sam->state = 0;
+	sam->old_state = ~0;
+	
+	/* save state registration */
+	state_save_register_item(device->machine, "6883sam", NULL, 0, sam->state);
+	state_save_register_item(device->machine, "6883sam", NULL, 0, sam->video_position);
+	state_save_register_postload(device->machine, update_sam_postload, (void*)device);
+	return DEVICE_START_OK;
+}
+
+static DEVICE_START( sam6883 )
+{
+	return common_start(device, TYPE_SAM6883);
+}
+
+static DEVICE_START( sam6883_gime )
+{
+	return common_start(device, TYPE_SAM6883_GIME);
+}
+
+static DEVICE_RESET( sam6883 )
+{
+	sam6883_t *sam = get_safe_token(device);
+	sam->state = 0;
+	sam->old_state = ~0;
+	update_sam(device);
+}
+
+static DEVICE_SET_INFO( sam6883 )
+{
+	switch (state)
+	{
+		/* no parameters to set */
+	}
+}
+
+DEVICE_GET_INFO( sam6883 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(sam6883_t);					break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
+		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(sam6883); break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(sam6883);		break;
+		case DEVINFO_FCT_STOP:							/* Nothing */								break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(sam6883);		break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							info->s = "6883 SAM";						break;
+		case DEVINFO_STR_FAMILY:						info->s = "6883 SAM";						break;
+		case DEVINFO_STR_VERSION:						info->s = "1.0";							break;
+		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;							break;
+		case DEVINFO_STR_CREDITS:						info->s = "Copyright MESS Team";			break;
+	}
+}
+
+DEVICE_GET_INFO( sam6883_gime )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							info->s = "6883 SAM GIME";				break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(sam6883_gime);	break;
+
+		default: 										DEVICE_GET_INFO_CALL(sam6883);				break;
+	}
 }

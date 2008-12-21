@@ -135,10 +135,10 @@ static void d_pia0_irq_a(running_machine *machine, int state);
 static void d_pia0_irq_b(running_machine *machine, int state);
 static void d_pia1_firq_a(running_machine *machine, int state);
 static void d_pia1_firq_b(running_machine *machine, int state);
-static void d_sam_set_pageonemode(running_machine *machine,int val);
-static void d_sam_set_mpurate(running_machine *machine,int val);
-static void d_sam_set_memorysize(running_machine *machine,int val);
-static void d_sam_set_maptype(running_machine *machine,int val);
+static SAM6883_SET_PAGE_ONE_MODE( d_sam_set_pageonemode );
+static SAM6883_SET_MPU_RATE( d_sam_set_mpurate );
+static SAM6883_SET_MEMORY_SIZE( d_sam_set_memorysize);
+static SAM6883_SET_MAP_TYPE( d_sam_set_maptype );
 static void coco_setcartline(running_machine *machine, coco_cartridge *cartridge, cococart_line line, cococart_line_value value);
 static void twiddle_cart_line_if_q(running_machine *machine);
 
@@ -159,8 +159,9 @@ static void coco3_pia0_irq_a(running_machine *machine, int state);
 static void coco3_pia0_irq_b(running_machine *machine, int state);
 static void coco3_pia1_firq_a(running_machine *machine, int state);
 static void coco3_pia1_firq_b(running_machine *machine, int state);
-static void coco3_sam_set_maptype(running_machine *machine, int val);
-static const UINT8 *coco3_sam_get_rambase(running_machine *machine);
+
+static SAM6883_SET_MAP_TYPE( coco3_sam_set_maptype );
+static SAM6883_GET_RAMBASE( coco3_sam_get_rambase );
 
 /* Dragon 32 specific */
 static READ8_HANDLER ( d_pia1_pb_r_dragon32 );
@@ -372,9 +373,8 @@ static const pia6821_interface dgnalpha_pia_intf[] =
 
 };
 
-static const sam6883_interface coco_sam_intf =
+const sam6883_interface coco_sam_intf =
 {
-	SAM6883_ORIGINAL,
 	NULL,
 	d_sam_set_pageonemode,
 	d_sam_set_mpurate,
@@ -382,9 +382,8 @@ static const sam6883_interface coco_sam_intf =
 	d_sam_set_maptype
 };
 
-static const sam6883_interface coco3_sam_intf =
+const sam6883_interface coco3_sam_intf =
 {
-	SAM6883_GIME,
 	coco3_sam_get_rambase,
 	NULL,
 	d_sam_set_mpurate,
@@ -456,6 +455,7 @@ static int load_pak_into_region(const device_config *image, int *pakbase, int *p
 
 static void pak_load_trailer(running_machine *machine, const pak_decodedtrailer *trailer)
 {
+	device_config *sam = (device_config*)device_list_find_by_tag( machine->config->devicelist, SAM6883, "sam");
 	cpu_set_reg(machine->cpu[0], M6809_PC, trailer->reg_pc);
 	cpu_set_reg(machine->cpu[0], M6809_X, trailer->reg_x);
 	cpu_set_reg(machine->cpu[0], M6809_Y, trailer->reg_y);
@@ -496,7 +496,7 @@ static void pak_load_trailer(running_machine *machine, const pak_decodedtrailer 
 	 * access that bit or or whether it is something else.  So that is why
 	 * I am specifying 0x7fff instead of 0xffff here
 	 */
-	sam_set_state(machine, trailer->sam, 0x7fff);
+	sam_set_state(sam, trailer->sam, 0x7fff);
 }
 
 static int generic_pak_load(const device_config *image, int rambase_index, int rombase_index, int pakbase_index)
@@ -1867,7 +1867,7 @@ WRITE8_HANDLER ( plus_reg_w )
   Misc
 ***************************************************************************/
 
-static void d_sam_set_mpurate(running_machine *machine, int val)
+static SAM6883_SET_MPU_RATE( d_sam_set_mpurate )
 {
 	/* The infamous speed up poke.
 	 *
@@ -1891,7 +1891,7 @@ static void d_sam_set_mpurate(running_machine *machine, int val)
 	 * TODO:  Make the overclock more accurate.  In dual speed, ROM was a fast
 	 * access but RAM was not.  I don't know how to simulate this.
 	 */
-    cpu_set_clockscale(machine->cpu[0], val ? 2 : 1);
+    cpu_set_clockscale(device->machine->cpu[0], val ? 2 : 1);
 }
 
 READ8_HANDLER(dragon_alpha_mapped_irq_r)
@@ -1952,8 +1952,9 @@ static void setup_memory_map(running_machine *machine)
 
 	/* We need to init these vars from the sam, as this may be called from outside the sam callbacks */
 	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
-	UINT8 memsize	= get_sam_memorysize(machine);
-	UINT8 maptype	= get_sam_maptype(machine);
+	device_config *sam = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, SAM6883, "sam");
+	UINT8 memsize	= get_sam_memorysize(sam);
+	UINT8 maptype	= get_sam_maptype(sam);
 //	UINT8 pagemode	= get_sam_pagemode(machine);
 	int 		last_ram_block;		/* Last block that will be RAM, dependent on maptype */
 	int 		block_index;		/* Index of block being processed */
@@ -2020,7 +2021,7 @@ static void setup_memory_map(running_machine *machine)
 }
 
 
-static void d_sam_set_pageonemode(running_machine *machine, int val)
+static SAM6883_SET_PAGE_ONE_MODE( d_sam_set_pageonemode )
 {
 	/* Page mode - allowed switching between the low 32k and the high 32k,
 	 * assuming that 64k wasn't enabled
@@ -2029,18 +2030,18 @@ static void d_sam_set_pageonemode(running_machine *machine, int val)
 	 * this (it probably ignored it)
 	 */
 
-	if (!get_sam_maptype(machine))		// Ignored in maptype 1
+	if (!get_sam_maptype(device))		// Ignored in maptype 1
 	{
 		if((mess_ram_size>0x8000) && val)
 			bottom_32k=&mess_ram[0x8000];
 		else
 			bottom_32k=mess_ram;
 
-		setup_memory_map(machine);
+		setup_memory_map(device->machine);
 	}
 }
 
-static void d_sam_set_memorysize(running_machine *machine, int val)
+static SAM6883_SET_MEMORY_SIZE( d_sam_set_memorysize )
 {
 	/* Memory size - allowed restricting memory accesses to something less than
 	 * 32k
@@ -2066,7 +2067,7 @@ static void d_sam_set_memorysize(running_machine *machine, int val)
 	 * TODO:  Verify that the CoCo 3 ignored this
 	 */
 
-	setup_memory_map(machine);
+	setup_memory_map(device->machine);
 }
 
 
@@ -2162,12 +2163,12 @@ static void coco3_timer_init(running_machine *machine)
 /* way as the CoCo 1/2 and Dragon 32, this now has been reduced to a call to */
 /* setup_memory_map() - 2007-01-02 phs. */
 
-static void d_sam_set_maptype(running_machine *machine,int val)
+static SAM6883_SET_MAP_TYPE( d_sam_set_maptype )
 {
 	if(val)
 		bottom_32k=mess_ram;	// Always reset, when in maptype 1
 
-	setup_memory_map(machine);
+	setup_memory_map(device->machine);
 }
 
 /*************************************
@@ -2569,7 +2570,7 @@ WRITE8_HANDLER(coco3_gime_w)
 
 
 
-static const UINT8 *coco3_sam_get_rambase(running_machine *machine)
+static SAM6883_GET_RAMBASE( coco3_sam_get_rambase )
 {
 	UINT32 video_base;
 	video_base = coco3_get_video_base(0xE0, 0x3F);
@@ -2579,10 +2580,10 @@ static const UINT8 *coco3_sam_get_rambase(running_machine *machine)
 
 
 
-static void coco3_sam_set_maptype(running_machine *machine,int val)
+static SAM6883_SET_MAP_TYPE( coco3_sam_set_maptype )
 {
 	coco3_enable_64k = val;
-	coco3_mmu_update(machine, 4, 8);
+	coco3_mmu_update(device->machine, 4, 8);
 }
 
 
@@ -2924,9 +2925,6 @@ static void generic_coco12_dragon_init(running_machine *machine, const machine_i
 
 	/* Do generic Inits */
 	generic_init_machine(machine, init);
-
-	/* Init SAM */
-	sam_init(machine, &coco_sam_intf);
 }
 
 /******* Machine Setups Dragons **********/
@@ -3095,9 +3093,6 @@ MACHINE_START( coco3 )
 	init.fdc_cart_hardware	= "coco3_plus_fdc";
 
 	generic_init_machine(machine, &init);
-
-	/* Init SAM */
-	sam_init(machine, &coco3_sam_intf);
 
 	/* CoCo 3 specific function pointers */
 	update_keyboard = coco3_update_keyboard;

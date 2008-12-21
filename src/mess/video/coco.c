@@ -62,6 +62,12 @@ static void coco_field_sync_callback(running_machine *machine, int data)
 	pia_0_cb1_w(space, 0, data);
 }
 
+const UINT8 *get_video_ram_coco(running_machine *machine,int scanline)
+{
+	device_config *sam = (device_config*)device_list_find_by_tag( machine->config->devicelist, SAM6883, "sam");
+	return sam_m6847_get_video_ram(sam,scanline);
+}
+
 static void internal_video_start_coco(running_machine *machine, m6847_type type)
 {
 	m6847_config cfg;
@@ -75,7 +81,7 @@ static void internal_video_start_coco(running_machine *machine, m6847_type type)
 		cfg.cpu0_timing_factor = 4;
 
 	cfg.get_attributes = coco_get_attributes;
-	cfg.get_video_ram = sam_m6847_get_video_ram;
+	cfg.get_video_ram = get_video_ram_coco;
 	cfg.horizontal_sync_callback = coco_horizontal_sync_callback;
 	cfg.field_sync_callback = coco_field_sync_callback;
 

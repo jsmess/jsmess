@@ -97,6 +97,8 @@ Source Changes:
 
 - Changed the NEC765 implementation to be a device.  [Miodrag Milanovic]
 
+- Changed the SAM6883 implementation to be a device.  [Miodrag Milanovic]
+
 - Various code cleanups.  [Atari Ace]
 
 - Fixed regression that could cause hanging when creating an image from the
