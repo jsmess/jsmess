@@ -284,7 +284,7 @@ static MACHINE_DRIVER_START( cybikov1 )
 	// non-volatile ram
 //  MDRV_NVRAM_HANDLER( cybikov1)
 	/* rtc */
-	MDRV_DEVICE_ADD("rtc", PCF8593)
+	MDRV_PCF8593_ADD("rtc")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( cybikov2 )

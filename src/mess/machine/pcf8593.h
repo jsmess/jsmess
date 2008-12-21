@@ -18,6 +18,12 @@
 
 #define PCF8593		DEVICE_GET_INFO_NAME(pcf8593)
 
+#define MDRV_PCF8593_ADD(_tag) \
+	MDRV_DEVICE_ADD(_tag, PCF8593) \
+
+#define MDRV_PCF8593_REMOVE(_tag) \
+	MDRV_DEVICE_REMOVE(_tag, PCF8593)
+
 
 
 /***************************************************************************
