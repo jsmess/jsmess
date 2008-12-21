@@ -27,7 +27,6 @@
 #include "driver.h"
 #include "cpu/spc700/spc700.h"
 #include "cpu/g65816/g65816.h"
-#include "deprecat.h"
 #include "includes/snes.h"
 #include "machine/snescart.h"
 
@@ -202,7 +201,6 @@ static MACHINE_DRIVER_START( snes )
 
 	MDRV_CPU_ADD("sound", SPC700, 1024000)	/* 1.024 MHz */
 	MDRV_CPU_PROGRAM_MAP(spc_map, 0)
-	MDRV_CPU_VBLANK_INT_HACK(NULL, 0)
 
 	MDRV_INTERLEAVE(800)
 
