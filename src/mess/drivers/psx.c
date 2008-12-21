@@ -109,7 +109,7 @@ static void psxexe_conv32( UINT32 *p_uint32 )
 
 static QUICKLOAD_LOAD( psx_exe_load )
 {
-	const address_space *space = cpu_get_address_space( Machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	const address_space *space = cpu_get_address_space( image->machine->cpu[0], ADDRESS_SPACE_PROGRAM );
 
 	if( image_fread( image, &m_psxexe_header, sizeof( m_psxexe_header ) ) != sizeof( m_psxexe_header ) )
 	{
