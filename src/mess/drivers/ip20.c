@@ -17,7 +17,6 @@
 \*********************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/mips/mips3.h"
 #include "machine/8530scc.h"
 #include "machine/sgi.h"
@@ -478,57 +477,6 @@ static WRITE32_HANDLER( int_w )
 	mame_printf_info("INT: write %x to ofs %x (mask %x) (PC=%x)\n", data, offset, mem_mask, cpu_get_pc(space->cpu));
 }
 
-static INTERRUPT_GEN( ip20_update_chips )
-{
-	mc_update();
-	nRTC_Temp++;
-	if( nRTC_Temp == 100 )
-	{
-		nRTC_Temp = 0;
-		RTC_HUNDREDTH++;
-	}
-	if( ( RTC_HUNDREDTH & 0x0f ) == 0x0a )
-	{
-		RTC_HUNDREDTH -= 0x0a;
-		RTC_HUNDREDTH += 0x10;
-		if( ( RTC_HUNDREDTH & 0xa0 ) == 0xa0 )
-		{
-			RTC_HUNDREDTH = 0;
-			RTC_SECOND++;
-		}
-	}
-	if( ( RTC_SECOND & 0x0f ) == 0x0a )
-	{
-		RTC_SECOND -= 0x0a;
-		RTC_SECOND += 0x10;
-		if( RTC_SECOND == 0x60 )
-		{
-			RTC_SECOND = 0;
-			RTC_MINUTE++;
-		}
-	}
-	if( ( RTC_MINUTE & 0x0f ) == 0x0a )
-	{
-		RTC_MINUTE -= 0x0a;
-		RTC_MINUTE += 0x10;
-		if( RTC_MINUTE == 0x60 )
-		{
-			RTC_MINUTE = 0;
-			RTC_HOUR++;
-		}
-	}
-	if( ( RTC_HOUR & 0x0f ) == 0x0a )
-	{
-		RTC_HOUR -= 0x0a;
-		RTC_HOUR += 0x10;
-		if( RTC_HOUR == 0x24 )
-		{
-			RTC_HOUR = 0;
-			RTC_DAY++;
-		}
-	}
-}
-
 static ADDRESS_MAP_START( ip204415_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE( 0x00000000, 0x001fffff ) AM_RAM AM_SHARE(10)
 	AM_RANGE( 0x08000000, 0x08ffffff ) AM_RAM AM_SHARE(5)
@@ -582,6 +530,66 @@ static DRIVER_INIT( ip204415 )
 	add_exit_callback(machine, ip204415_exit);
 }
 
+// mc_update wants once every millisecond (1/1000th of a second)
+static TIMER_CALLBACK(ip20_timer)
+{
+	mc_update();
+
+	// update RTC every 10 milliseconds
+	nRTC_Temp++;
+	if (nRTC_Temp >= 10)
+	{
+		nRTC_Temp = 0;
+		RTC_HUNDREDTH++;
+
+		if( ( RTC_HUNDREDTH & 0x0f ) == 0x0a )
+		{
+			RTC_HUNDREDTH -= 0x0a;
+			RTC_HUNDREDTH += 0x10;
+			if( ( RTC_HUNDREDTH & 0xa0 ) == 0xa0 )
+			{
+				RTC_HUNDREDTH = 0;
+				RTC_SECOND++;
+
+				if( ( RTC_SECOND & 0x0f ) == 0x0a )
+				{
+					RTC_SECOND -= 0x0a;
+					RTC_SECOND += 0x10;
+					if( RTC_SECOND == 0x60 )
+					{
+						RTC_SECOND = 0;
+						RTC_MINUTE++;
+
+						if( ( RTC_MINUTE & 0x0f ) == 0x0a )
+						{
+							RTC_MINUTE -= 0x0a;
+							RTC_MINUTE += 0x10;
+							if( RTC_MINUTE == 0x60 )
+							{
+								RTC_MINUTE = 0;
+								RTC_HOUR++;
+
+								if( ( RTC_HOUR & 0x0f ) == 0x0a )
+								{
+									RTC_HOUR -= 0x0a;
+									RTC_HOUR += 0x10;
+									if( RTC_HOUR == 0x24 )
+									{
+										RTC_HOUR = 0;
+										RTC_DAY++;
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	timer_set(machine, ATTOTIME_IN_MSEC(1), NULL, 0, ip20_timer);
+}
+
 static MACHINE_RESET( ip204415 )
 {
 	wd33c93_init(machine, &scsi_intf);
@@ -596,6 +604,8 @@ static MACHINE_RESET( ip204415 )
 	nHPC_VMEIntMask1 = 0;
 
 	nRTC_Temp = 0;
+
+	timer_set(machine, ATTOTIME_IN_MSEC(1), NULL, 0, ip20_timer);
 }
 
 static INPUT_PORTS_START( ip204415 )
@@ -618,7 +628,6 @@ static MACHINE_DRIVER_START( ip204415 )
 	MDRV_CPU_ADD( "main", R4600BE, 50000000*3 )
 	MDRV_CPU_CONFIG( config )
 	MDRV_CPU_PROGRAM_MAP( ip204415_map, 0 )
-	MDRV_CPU_VBLANK_INT_HACK(ip20_update_chips, 10000)
 
 	MDRV_MACHINE_RESET( ip204415 )
 	MDRV_NVRAM_HANDLER(93C56)
