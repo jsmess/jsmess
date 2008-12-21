@@ -363,9 +363,7 @@ static MACHINE_DRIVER_START( comx35p )
 	MDRV_MACHINE_RESET(comx35)
 
 	// keyboard encoder
-
-	MDRV_DEVICE_ADD(CDP1871_TAG, CDP1871)
-	MDRV_DEVICE_CONFIG(comx35p_cdp1871_intf)
+	MDRV_CDP1871_ADD(CDP1871_TAG, comx35p_cdp1871_intf)
 	
 	// video hardware
 
@@ -408,9 +406,7 @@ static MACHINE_DRIVER_START( comx35n )
 	MDRV_MACHINE_RESET(comx35)
 
 	// keyboard encoder
-
-	MDRV_DEVICE_ADD(CDP1871_TAG, CDP1871)
-	MDRV_DEVICE_CONFIG(comx35n_cdp1871_intf)
+	MDRV_CDP1871_ADD(CDP1871_TAG, comx35n_cdp1871_intf)
 
 	// video hardware
 
