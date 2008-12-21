@@ -20,8 +20,6 @@
 #include "sound/psx.h"
 #include "debugger.h"
 
-// RB: there is no longer an opbase handler so the quickload won't work as designed.
-#if 0
 static struct
 {
 	UINT8 id[ 8 ];
@@ -81,16 +79,16 @@ static DIRECT_UPDATE_HANDLER( psx_setopbase )
 
 		free( m_p_psxexe );
 
-		cpu_set_reg(machine->cpu[0],  MIPS_PC, m_psxexe_header.pc0 );
-		cpu_set_reg(machine->cpu[0],  MIPS_R28, m_psxexe_header.gp0 );
+		cpu_set_reg( space->machine->cpu[0], PSXCPU_PC, m_psxexe_header.pc0 );
+		cpu_set_reg( space->machine->cpu[0], PSXCPU_R28, m_psxexe_header.gp0 );
 		n_stack = m_psxexe_header.s_addr + m_psxexe_header.s_size;
 		if( n_stack != 0 )
 		{
-			cpu_set_reg(machine->cpu[0],  MIPS_R29, n_stack );
-			cpu_set_reg(machine->cpu[0],  MIPS_R30, n_stack );
+			cpu_set_reg( space->machine->cpu[0], PSXCPU_R29, n_stack );
+			cpu_set_reg( space->machine->cpu[0], PSXCPU_R30, n_stack );
 		}
 
-		memory_set_direct_update_handler( 0, NULL );
+		memory_set_direct_update_handler( space, NULL );
 
 		return ~0;
 	}
@@ -111,6 +109,8 @@ static void psxexe_conv32( UINT32 *p_uint32 )
 
 static QUICKLOAD_LOAD( psx_exe_load )
 {
+	const address_space *space = cpu_get_address_space( Machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+
 	if( image_fread( image, &m_psxexe_header, sizeof( m_psxexe_header ) ) != sizeof( m_psxexe_header ) )
 	{
 		logerror( "psx_exe_load: invalid exe\n" );
@@ -147,10 +147,9 @@ static QUICKLOAD_LOAD( psx_exe_load )
 		return INIT_FAIL;
 	}
 	image_fread( image, m_p_psxexe, m_psxexe_header.t_size );
-	memory_set_direct_update_handler( 0, psx_setopbase );
+	memory_set_direct_update_handler( space, psx_setopbase );
 	return INIT_PASS;
 }
-#endif
 
 #define PAD_STATE_IDLE ( 0 )
 #define PAD_STATE_LISTEN ( 1 )
@@ -806,7 +805,7 @@ static MACHINE_DRIVER_START( psxntsc )
 	MDRV_SOUND_ROUTE( 1, "right", 1.00 )
 
 	/* quickload */
-//	MDRV_QUICKLOAD_ADD(psx_exe_load, "exe,psx", 0)
+	MDRV_QUICKLOAD_ADD(psx_exe_load, "exe,psx", 0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( psxpal )
@@ -839,7 +838,7 @@ static MACHINE_DRIVER_START( psxpal )
 	MDRV_SOUND_ROUTE( 1, "right", 1.00 )
 
 	/* quickload */
-//	MDRV_QUICKLOAD_ADD(psx_exe_load, "exe,psx", 0)
+	MDRV_QUICKLOAD_ADD(psx_exe_load, "exe,psx", 0)
 MACHINE_DRIVER_END
 
 ROM_START( psj )
