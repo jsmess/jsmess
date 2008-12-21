@@ -42,6 +42,21 @@ typedef double (*adc080x_input_read) (const device_config *device, int channel);
 #define ADC0808		DEVICE_GET_INFO_NAME(adc0808)
 #define ADC0809		DEVICE_GET_INFO_NAME(adc0809)
 
+#define MDRV_ADC0808_ADD(_tag, _intrf) \
+	MDRV_DEVICE_ADD(_tag, ADC0808) \
+	MDRV_DEVICE_CONFIG(_intrf)
+
+#define MDRV_ADC0808_REMOVE(_tag) \
+	MDRV_DEVICE_REMOVE(_tag, ADC0808)
+
+#define MDRV_ADC0809_ADD(_tag, _intrf) \
+	MDRV_DEVICE_ADD(_tag, ADC0809) \
+	MDRV_DEVICE_CONFIG(_intrf)
+
+#define MDRV_ADC0809_REMOVE(_tag) \
+	MDRV_DEVICE_REMOVE(_tag, ADC0809)
+
+
 /* interface */
 typedef struct _adc080x_interface adc080x_interface;
 struct _adc080x_interface

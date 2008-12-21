@@ -1256,9 +1256,7 @@ static MACHINE_DRIVER_START( newbrain )
 	MDRV_Z80CTC_ADD( "z80ctc", newbrain_ctc_intf )
 
 	// A/D converter
-
-	MDRV_DEVICE_ADD(ADC0809_TAG, ADC0809)
-	MDRV_DEVICE_CONFIG(newbrain_adc0809_intf)
+	MDRV_ADC0809_ADD(ADC0809_TAG, newbrain_adc0809_intf)
 
 	// video hardware
 
