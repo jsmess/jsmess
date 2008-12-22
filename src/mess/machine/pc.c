@@ -1345,25 +1345,7 @@ static const struct pc_vga_interface vga_interface =
 
 DRIVER_INIT( pc1640 )
 {
-	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
 	const address_space *io_space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_IO );
-
-	pc_vga_init(machine, &vga_interface, NULL);
-	memory_install_read16_handler(space, 0xa0000, 0xaffff, 0, 0, SMH_BANK1 );
-	memory_install_read16_handler(space, 0xb0000, 0xb7fff, 0, 0, SMH_BANK2 );
-	memory_install_read16_handler(space, 0xb8000, 0xbffff, 0, 0, SMH_BANK3 );
-
-	memory_install_write16_handler(space, 0xa0000, 0xaffff, 0, 0, SMH_BANK1 );
-	memory_install_write16_handler(space, 0xb0000, 0xb7fff, 0, 0, SMH_BANK2 );
-	memory_install_write16_handler(space, 0xb8000, 0xbffff, 0, 0, SMH_BANK3 );
-
-	memory_install_read16_handler(io_space, 0x3b0, 0x3bf, 0, 0, vga_port16le_03b0_r );
-	memory_install_read16_handler(io_space, 0x3c0, 0x3cf, 0, 0, paradise_ega16le_03c0_r );
-	memory_install_read16_handler(io_space, 0x3d0, 0x3df, 0, 0, pc1640_16le_port3d0_r );
-
-	memory_install_write16_handler(io_space, 0x3b0, 0x3bf, 0, 0, vga_port16le_03b0_w );
-	memory_install_write16_handler(io_space, 0x3c0, 0x3cf, 0, 0, vga_port16le_03c0_w );
-	memory_install_write16_handler(io_space, 0x3d0, 0x3df, 0, 0, vga_port16le_03d0_w );
 
 	memory_install_read16_handler(io_space, 0x278, 0x27b, 0, 0, pc1640_16le_port278_r );
 	memory_install_read16_handler(io_space, 0x4278, 0x427b, 0, 0, pc1640_16le_port4278_r );

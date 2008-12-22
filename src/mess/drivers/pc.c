@@ -59,6 +59,12 @@ IBM PC-XT 5160
 - Optional up to 2 external 360KB double-sided 5 1/4" floppy drive
 
 
+Amstrad PC1640
+==============
+
+More information can be found at http://www.seasip.info/AmstradXT/1640tech/index.html
+
+
 Tandy 1000
 ==========
 
@@ -112,6 +118,7 @@ TODO: Which clock signals are available in a PC Jr?
 #include "video/pc_mda.h"
 #include "video/pc_aga.h"
 #include "video/pc_t1t.h"
+#include "video/pc_ega.h"
 #include "video/pc_video.h"
 
 #include "includes/pc_ide.h"
@@ -411,8 +418,8 @@ static ADDRESS_MAP_START( pc1640_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xa0000, 0xbffff) AM_NOP
 	AM_RANGE(0xc0000, 0xc7fff) AM_ROM
 	AM_RANGE(0xc8000, 0xcffff) AM_ROM
-	AM_RANGE(0xd0000, 0xfbfff) AM_NOP
-	AM_RANGE(0xfc000, 0xfffff) AM_ROM
+	AM_RANGE(0xd0000, 0xeffff) AM_NOP
+	AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -1780,10 +1787,7 @@ static MACHINE_DRIVER_START( pc1640 )
 	MDRV_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3] )			/* TODO: Verify model */
 
 	/* video hardware */
-	MDRV_IMPORT_FROM(pcvideo_pc1640)
-	MDRV_SCREEN_MODIFY("main")
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MDRV_IMPORT_FROM( pcvideo_ega )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -2027,7 +2031,7 @@ ROM_START( ibm5150 )
 	ROMX_LOAD("5700027.u30", 0xf8000, 0x2000, CRC(bfff99b8) SHA1(ca2f126ba69c1613b7b5a4137d8d8cf1db36a8e6), ROM_BIOS(2))		/* ROM Basic 1.0 F8000-F9FFF */
 	ROMX_LOAD("5700035.u31", 0xfa000, 0x2000, CRC(9fe4ec11) SHA1(89af8138185938c3da3386f97d3b0549a51de5ef), ROM_BIOS(2))		/* ROM Basic 1.0 FA000-FBFFF */
 	ROMX_LOAD("5700043.u32", 0xfc000, 0x2000, CRC(ea2794e6) SHA1(22fe58bc853ffd393d5e2f98defda7456924b04f), ROM_BIOS(2))		/* ROM Basic 1.0 FC000-FDFFF */
-	ROMX_LOAD("5700051.u33", 0xfe000, 0x2000, NO_DUMP, ROM_BIOS(2))
+	ROMX_LOAD("5700051.u33", 0xfe000, 0x2000, CRC(12d33fb8) SHA1(f046058faa016ad13aed5a082a45b21dea43d346), ROM_BIOS(2))		/* TODO: ROM is pending verification */
 
 	/* IBM PC 5150 (rev 2: 10/19/81) 2-screw case, 16-64k MB w/MDA Card, ROM Basic 1.0 */
 	ROM_SYSTEM_BIOS( 2, "rev2", "IBM PC 5150 5700671 10/19/81" )
@@ -2456,12 +2460,22 @@ ROM_END
 ROM_START( pc1640 )
 //    ROM_REGION(0x100000,"main", 0)
 	ROM_REGION16_LE(0x100000,"main", 0)
-	ROM_LOAD("40100", 0xc0000, 0x8000, CRC(d2d1f1ae) SHA1(98302006ee38a17c09bd75504cc18c0649174e33)) // this bios seams to be made for the amstrad pc
+	ROM_LOAD("40100", 0xc0000, 0x8000, CRC(d2d1f1ae) SHA1(98302006ee38a17c09bd75504cc18c0649174e33)) /* Internal Graphics Adapter ROM */
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */
+
 	ROM_LOAD16_BYTE("40043.v3", 0xfc001, 0x2000, CRC(e40a1513) SHA1(447eff2057e682e51b1c7593cb6fad0e53879fa8)) // v3
+	ROM_RELOAD(0xf8001,0x2000)
+	ROM_RELOAD(0xf4001,0x2000)
+	ROM_RELOAD(0xf0001,0x2000)
 	ROM_LOAD16_BYTE("40044.v3", 0xfc000, 0x2000, CRC(f1c074f3) SHA1(a055ea7e933d137623c22fe24004e870653c7952))
+	ROM_RELOAD(0xf8000,0x2000)
+	ROM_RELOAD(0xf4000,0x2000)
+	ROM_RELOAD(0xf0000,0x2000)
+
 	ROM_REGION(0x08100,"gfx1", 0)
 	ROM_LOAD("40045.bin",     0x00000, 0x02000, CRC(dd5e030f) SHA1(7d858bbb2e8d6143aa67ab712edf5f753c2788a7))
+
+	ROM_REGION(0x50000, "gfx2", ROMREGION_ERASE00)
 ROM_END
 
 
