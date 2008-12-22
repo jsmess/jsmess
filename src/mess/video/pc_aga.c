@@ -9,7 +9,6 @@
 #include "video/pc_aga.h"
 #include "video/pc_cga.h"
 #include "video/pc_mda.h"
-#include "includes/crtc6845.h"
 #include "includes/amstr_pc.h"
 #include "video/mc6845.h"
 #include "video/pc_video.h"
