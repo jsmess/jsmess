@@ -20,6 +20,8 @@ System Driver Changes:
 
 - [ABC806] Added keyboard simulation and HR graphics. [Curt Coder, Erik Isaksson]
 
+- [ADVISION] Fixed cartridge ROM banking. (bug #1690) [Curt Coder]
+
 - [B2M] bug #1661 fixed [Miodrag Milanovic]
 
 - [BBC] Changed memory handling for the 0xfc00 to 0xfeff memory region

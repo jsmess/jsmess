@@ -79,8 +79,8 @@ static MACHINE_DRIVER_START( advision )
 	MDRV_CPU_CONFIG(advision_cop411_interface)
 	MDRV_CPU_IO_MAP(sound_io_map, 0)
 
-	MDRV_MACHINE_START( advision )
-	MDRV_MACHINE_RESET( advision )
+	MDRV_MACHINE_START(advision)
+	MDRV_MACHINE_RESET(advision)
 
     /* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -95,6 +95,7 @@ static MACHINE_DRIVER_START( advision )
 	MDRV_VIDEO_START(advision)
 	MDRV_VIDEO_UPDATE(advision)
 
+	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
