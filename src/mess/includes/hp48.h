@@ -71,6 +71,9 @@ extern DEVICE_GET_INFO( hp48_port );
 
 #define HP48_PORT DEVICE_GET_INFO_NAME( hp48_port )
 
+#define MDRV_HP48_PORT_ADD(_tag, _intrf) \
+	MDRV_DEVICE_ADD(_tag, HP48_PORT) \
+	MDRV_DEVICE_CONFIG(_intrf)
 
 /****************************** machine ******************************/
 

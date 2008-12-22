@@ -977,10 +977,8 @@ static MACHINE_DRIVER_START ( hp48gx )
 	MDRV_DEFAULT_LAYOUT ( layout_hp48gx )
 
 	/* expansion ports */
-	MDRV_DEVICE_ADD     ( "port1", HP48_PORT )
-	MDRV_DEVICE_CONFIG  ( hp48gx_port1_config )
-	MDRV_DEVICE_ADD     ( "port2", HP48_PORT )
-	MDRV_DEVICE_CONFIG  ( hp48gx_port2_config )
+	MDRV_HP48_PORT_ADD ( "port1", hp48gx_port1_config )
+	MDRV_HP48_PORT_ADD ( "port2", hp48gx_port2_config )
 		
 	/* serial I/O */
 	MDRV_XMODEM_ADD( "rs232_x", hp48_xmodem_rs232_conf )
@@ -1005,10 +1003,8 @@ static MACHINE_DRIVER_START ( hp48sx )
 	MDRV_DEFAULT_LAYOUT ( layout_hp48sx )
 
 	/* expansion ports */
-	MDRV_DEVICE_ADD     ( "port1", HP48_PORT )
-	MDRV_DEVICE_CONFIG  ( hp48sx_port1_config )
-	MDRV_DEVICE_ADD     ( "port2", HP48_PORT )
-	MDRV_DEVICE_CONFIG  ( hp48sx_port2_config )
+	MDRV_HP48_PORT_ADD  ( "port1", hp48sx_port1_config )
+	MDRV_HP48_PORT_ADD  ( "port2", hp48sx_port2_config )
 
 	/* serial I/O */
 	MDRV_KERMIT_ADD( "rs232_k", hp48_kermit_rs232_conf )
