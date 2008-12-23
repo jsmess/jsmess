@@ -1724,8 +1724,8 @@ static MACHINE_DRIVER_START( einstein )
 
 	MDRV_Z80PIO_ADD( "z80pio", einstein_pio_intf )
 	MDRV_Z80CTC_ADD( "z80ctc", EINSTEIN_SYSTEM_CLOCK, einstein_ctc_intf )
-	MDRV_DEVICE_ADD( "keyboard_daisy", DEVICE_GET_INFO_NAME( einstein_daisy ) )
-	MDRV_DEVICE_ADD( "adc_daisy", DEVICE_GET_INFO_NAME( einstein_daisy ) )
+	MDRV_DEVICE_ADD( "keyboard_daisy", DEVICE_GET_INFO_NAME( einstein_daisy ), 0 )
+	MDRV_DEVICE_ADD( "adc_daisy", DEVICE_GET_INFO_NAME( einstein_daisy ), 0 )
 
     /* video hardware */
 	MDRV_IMPORT_FROM(tms9928a)

@@ -483,10 +483,10 @@ DRVLIBS = \
 	$(MESSOBJ)/multitch.a \
 	$(MESSOBJ)/nascom1.a \
 	$(MESSOBJ)/sord.a \
+	$(MESSOBJ)/tatung.a \
 	$(MESSOBJ)/veb.a \
 	$(MESSOBJ)/vtech.a \
 
-#	$(MESSOBJ)/tatung.a \
 #	$(MESSOBJ)/ti99.a \
 #	$(MESSOBJ)/thomson.a \
 

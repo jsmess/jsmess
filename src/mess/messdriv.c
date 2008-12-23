@@ -567,8 +567,8 @@ XL/XE 16kB OS roms
 	DRIVER( apfimag )
 
 	/* Tatung */
-//0128u7	DRIVER( einstein )
-//0128u7	DRIVER( einstei2 )
+	DRIVER( einstein )
+	DRIVER( einstei2 )
 
 	/* INTELLIGENT SOFTWARE */
 	DRIVER( ep128 )		/* Enterprise 128 k									*/
