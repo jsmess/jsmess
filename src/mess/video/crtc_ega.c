@@ -734,6 +734,7 @@ static void common_start(const device_config *device, int device_type)
 		assert(crtc_ega->intf->hpixels_per_column > 0);
 
 		/* copy the initial parameters */
+		crtc_ega->clock = device->clock;
 		crtc_ega->hpixels_per_column = crtc_ega->intf->hpixels_per_column;
 
 		/* get the screen device */
