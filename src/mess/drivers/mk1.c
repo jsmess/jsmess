@@ -42,7 +42,7 @@ TODO:
 #include "driver.h"
 
 #include "cpu/f8/f8.h"
-#include "cpu/f8/f3853.h"
+#include "machine/f3853.h"
 #include "mk1.lh"
 
 #define MAIN_CLOCK	1000000
@@ -104,8 +104,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mk1_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x0, 0x1 ) AM_READWRITE( mk1_f8_r, mk1_f8_w )
-	AM_RANGE( 0xc, 0xf ) AM_READWRITE( f3853_r, f3853_w )
+	AM_RANGE( 0xc, 0xf ) AM_DEVREADWRITE( F3853, "f3853", f3853_r, f3853_w )
 ADDRESS_MAP_END
+
 
 static INPUT_PORTS_START( mk1 )
 	PORT_START("RESET")	/* 0 */
@@ -142,10 +143,9 @@ static INPUT_PORTS_START( mk1 )
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Black 8    ep") PORT_CODE(KEYCODE_8)
 INPUT_PORTS_END
 
-static MACHINE_RESET( mk1 ) {
-}
 
-static TIMER_CALLBACK( mk1_update_leds ) {
+static TIMER_CALLBACK( mk1_update_leds )
+{
 	int i;
 
 	for ( i = 0; i < 4; i++ ) {
@@ -161,6 +161,20 @@ static MACHINE_START( mk1 )
 	timer_pulse(machine,  ATTOTIME_IN_HZ(30), NULL, 0, mk1_update_leds );
 }
 
+
+static void mk1_interrupt( const device_config *device, UINT16 addr, int level )
+{
+	cpu_set_input_line_vector(device->machine->cpu[0], 0, addr );
+	cpu_set_input_line(device->machine->cpu[0], 0, level ? F8_INT_INTR : F8_INT_NONE );
+}
+
+
+static const f3853_config mk1_config =
+{
+	mk1_interrupt
+};
+
+
 static MACHINE_DRIVER_START( mk1 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD( "main", F8, MAIN_CLOCK )        /* MK3850 */
@@ -169,31 +183,19 @@ static MACHINE_DRIVER_START( mk1 )
 	MDRV_QUANTUM_TIME(HZ(60))
 
 	MDRV_MACHINE_START( mk1 )
-	MDRV_MACHINE_RESET( mk1 )
+
+	MDRV_F3853_ADD( "f3853", MAIN_CLOCK, mk1_config )
 
     /* video hardware */
 	MDRV_DEFAULT_LAYOUT( layout_mk1 )
 MACHINE_DRIVER_END
+
 
 ROM_START( mk1 )
 	ROM_REGION(0x10000,"main",0)
 	ROM_LOAD("82c210-1", 0x0000, 0x800, CRC(278f7bf3) SHA1(b384c95ba691d52dfdddd35987a71e9746a46170))
 ROM_END
 
-static void mk1_interrupt( running_machine *machine, UINT16 addr, int level )
-{
-    cpu_set_input_line_vector(machine->cpu[0], 0, addr );
-    cpu_set_input_line(machine->cpu[0], 0, level ? F8_INT_INTR : F8_INT_NONE );
-}
-
-static const f3853_config mk1_config = {
-	MAIN_CLOCK,
-	mk1_interrupt
-};
-
-static DRIVER_INIT( mk1 ) {
-    f3853_init( machine, &mk1_config );
-}
 
 /***************************************************************************
 
@@ -203,5 +205,5 @@ static DRIVER_INIT( mk1 ) {
 
 // seams to be developed by mostek (MK)
 /*     YEAR   NAME  PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY                 FULLNAME */
-CONS( 1979,  mk1,  0, 		0,		mk1,	mk1,	mk1,	NULL,	"Computer Electronic",  "Chess Champion MK I", 0 )
+CONS( 1979,  mk1,  0, 		0,		mk1,	mk1,	0,	NULL,	"Computer Electronic",  "Chess Champion MK I", 0 )
 

@@ -1101,7 +1101,6 @@ $(MESSOBJ)/lynx.a:     \
 	$(MESS_MACHINE)/lynx.o
 
 $(MESSOBJ)/mk1.a:      \
-	$(OBJ)/emu/cpu/f8/f3853.o	\
 	$(MESS_DRIVERS)/mk1.o
 
 $(MESSOBJ)/mk2.a:      \
