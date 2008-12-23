@@ -382,7 +382,7 @@ static void laser_get_track(running_machine *machine)
     sprintf(laser_frame_message, "#%d get track %02d", laser_drive, laser_track_x2[laser_drive]/2);
     laser_frame_time = 30;
     /* drive selected or and image file ok? */
-    if( laser_drive >= 0 && laser_file() != NULL )
+    if( laser_drive >= 0 && laser_file(machine) != NULL )
     {
         int size, offs;
         size = TRKSIZE_VZ;
