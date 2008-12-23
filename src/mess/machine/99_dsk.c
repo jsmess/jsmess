@@ -352,7 +352,7 @@ FLOPPY_OPTIONS_START( ti99 )
 	FLOPPY_OPTION( ti99, "dsk",	"TI99 disk image",	ti99_floppy_identify,	ti99_floppy_construct, NULL)
 FLOPPY_OPTIONS_END
 
-static void ti99_install_tracktranslate_procs(void)
+static void ti99_install_tracktranslate_procs(running_machine *machine)
 {
 	int id;
 	const device_config *image;
@@ -403,7 +403,7 @@ void ti99_floppy_controllers_init_all(running_machine *machine)
 	/* initialize the controller chip for HFDC */
 	smc92x4_init(0, & hfdc_intf);
 
-	ti99_install_tracktranslate_procs();
+	ti99_install_tracktranslate_procs(machine);
 
 	motor_on_timer = timer_alloc(machine, motor_on_timer_callback, NULL);
 }
@@ -1403,12 +1403,12 @@ static  READ8_HANDLER(hfdc_mem_r)
 		switch (offset)
 		{
 		case 0x0fd0:
-			reply = smc92x4_r(0, 0);
+			reply = smc92x4_r(space->machine,0, 0);
 			//logerror("hfdc9234 data read\n");
 			break;
 
 		case 0x0fd4:
-			reply = smc92x4_r(0, 1);
+			reply = smc92x4_r(space->machine,0, 1);
 			//logerror("hfdc9234 status read\n");
 			break;
 		}
@@ -1453,12 +1453,12 @@ static WRITE8_HANDLER(hfdc_mem_w)
 		switch (offset)
 		{
 		case 0x0fd2:
-			smc92x4_w(0, 0, data);
+			smc92x4_w(space->machine,0, 0, data);
 			//logerror("hfdc9234 data write %d\n", data);
 			break;
 
 		case 0x0fd6:
-			smc92x4_w(0, 1, data);
+			smc92x4_w(space->machine,0, 1, data);
 			//logerror("hfdc9234 command write %d\n", data);
 			break;
 		}

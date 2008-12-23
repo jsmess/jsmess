@@ -741,7 +741,7 @@ static to7_io_dev to7_io_mode( running_machine *machine )
 {
 	if ( printer_is_ready(printer_device(machine) ) )
 		return TO7_IO_CENTRONICS;
-	else if ( image_exists( image_from_devtype_and_index( IO_SERIAL, THOM_SERIAL_CC90323 ) ) )
+	else if ( image_exists( image_from_devtype_and_index( machine, IO_SERIAL, THOM_SERIAL_CC90323 ) ) )
 		return TO7_IO_RS232;
 	return TO7_IO_NONE;
 }

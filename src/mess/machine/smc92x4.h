@@ -44,8 +44,8 @@ typedef struct smc92x4_intf
 
 void smc92x4_init(int which, const smc92x4_intf *intf);
 void smc92x4_reset(int which);
-int smc92x4_r(int which, int offset);
-void smc92x4_w(int which, int offset, int data);
+int smc92x4_r(running_machine *machine,int which, int offset);
+void smc92x4_w(running_machine *machine,int which, int offset, int data);
  READ8_HANDLER(smc92x4_0_r);
 WRITE8_HANDLER(smc92x4_0_w);
 

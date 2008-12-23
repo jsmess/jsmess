@@ -987,9 +987,9 @@ static void thmfc_floppy_index_pulse_cb ( const device_config *controller,const 
 
 
 
-static int thmfc_floppy_find_sector ( chrn_id* dst )
+static int thmfc_floppy_find_sector ( running_machine *machine,chrn_id* dst )
 {
-	const device_config* img = thmfc_floppy_image();
+	const device_config* img = thmfc_floppy_image(machine);
 	chrn_id id;
 	int r = 0;
 
@@ -1033,7 +1033,7 @@ static void thmfc_floppy_cmd_complete( running_machine *machine )
 	if ( thmfc1->op == THMFC1_OP_WRITE_SECT )
 	{
 		/* TODO: detect ddam (?) */
-		const device_config * img = thmfc_floppy_image();
+		const device_config * img = thmfc_floppy_image(machine);
 		floppy_drive_write_sector_data( img, thmfc1->side, thmfc1->sector, thmfc1->data + 3, thmfc1->data_size - 3, 0 );
 	}
 	thmfc1->op = THMFC1_OP_RESET;
@@ -1085,11 +1085,11 @@ static UINT8 thmfc_floppy_raw_read_byte ( running_machine *machine )
 	{
 		if ( thmfc_floppy_is_qdd() )
 			/* QDD: track = whole disk */
-			thmfc1->data_raw_size = thom_qdd_make_disk ( thmfc_floppy_image(), thmfc1->data );
+			thmfc1->data_raw_size = thom_qdd_make_disk ( thmfc_floppy_image(machine), thmfc1->data );
 		else
 		{
 			thmfc1->data_raw_idx = 0;
-			thmfc1->data_raw_size = thom_floppy_make_track( thmfc_floppy_image(), thmfc1->data,
+			thmfc1->data_raw_size = thom_floppy_make_track( thmfc_floppy_image(machine), thmfc1->data,
 									thmfc1->sector_size, thmfc1->side );
 		}
 		assert( thmfc1->data_raw_size < sizeof( thmfc1->data ) );
@@ -1123,7 +1123,7 @@ static void thmfc_floppy_qdd_write_byte ( running_machine *machine, UINT8 data )
 
 		if ( ! thmfc1->data_raw_size )
 		{
-			thmfc1->data_raw_size = thom_qdd_make_disk ( thmfc_floppy_image(), thmfc1->data );
+			thmfc1->data_raw_size = thom_qdd_make_disk ( thmfc_floppy_image(machine), thmfc1->data );
 			assert( thmfc1->data_raw_size < sizeof( thmfc1->data ) );
 		}
 
@@ -1153,7 +1153,7 @@ static void thmfc_floppy_qdd_write_byte ( running_machine *machine, UINT8 data )
 
 			LOG(( "%f $%04x thmfc_floppy_qdd_write_byte: id field, sector=%i\n", attotime_to_double(timer_get_time(machine)), cpu_get_previouspc( machine->cpu[0] ), sector ));
 
-			floppy_drive_format_sector( thmfc_floppy_image(), 0, sector, 0, 0, sector, 128, filler );
+			floppy_drive_format_sector( thmfc_floppy_image(machine), 0, sector, 0, 0, sector, 128, filler );
 			thmfc1->data_idx = 0;
 		}
 
@@ -1175,7 +1175,7 @@ static void thmfc_floppy_qdd_write_byte ( running_machine *machine, UINT8 data )
 			if ( i >= 0 )
 			{
 				/* got an id & a data field => write */
-				const device_config * img = thmfc_floppy_image();
+				const device_config * img = thmfc_floppy_image(machine);
 				int sector = (int) thmfc1->data[ i + 1 ] * 256 +
 					(int) thmfc1->data[ i + 2 ];
 
@@ -1235,7 +1235,7 @@ static void thmfc_floppy_format_byte ( running_machine *machine, UINT8 data )
 			if ( !memcmp ( thmfc1->data, header, sizeof( header ) ) )
 			{
 				/* got id field => format */
-				const device_config * img = thmfc_floppy_image();
+				const device_config * img = thmfc_floppy_image(machine);
 				UINT8 track  = thmfc1->data[4];
 				UINT8 side   = thmfc1->data[5];
 				UINT8 sector = thmfc1->data[6];
@@ -1265,7 +1265,7 @@ READ8_HANDLER ( thmfc_floppy_r )
 	case 1: /* STAT1 */
 	{
 		UINT8 data = 0;
-		const device_config * img = thmfc_floppy_image();
+		const device_config * img = thmfc_floppy_image(space->machine);
 		int flags = floppy_drive_get_flag_state( img, -1 );
 		if ( thmfc_floppy_is_qdd() )
 		{
@@ -1352,7 +1352,7 @@ WRITE8_HANDLER ( thmfc_floppy_w )
 		case THMFC1_OP_WRITE_SECT:
 			if ( qdd )
 				logerror( "thmfc_floppy_w: smart operation 1 not supported for QDD\n" );
-			else if ( thmfc_floppy_find_sector( NULL ) )
+			else if ( thmfc_floppy_find_sector( space->machine, NULL ) )
 			{
 				thmfc1->data_idx = 0;
 				thmfc1->data_size = thmfc1->sector_size + 3; /* A1 A1 FB <data> */
@@ -1366,7 +1366,7 @@ WRITE8_HANDLER ( thmfc_floppy_w )
 		case THMFC1_OP_READ_ADDR:
 			if ( qdd )
 				logerror( "thmfc_floppy_w: smart operation 2 not supported for QDD\n" );
-			else if ( thmfc_floppy_find_sector( &id ) )
+			else if ( thmfc_floppy_find_sector( space->machine, &id ) )
 			{
 				thmfc1->data_size =
 					thom_floppy_make_addr( id, thmfc1->data, thmfc1->sector_size );
@@ -1382,10 +1382,10 @@ WRITE8_HANDLER ( thmfc_floppy_w )
 		case THMFC1_OP_READ_SECT:
 			if ( qdd )
 				logerror( "thmfc_floppy_w: smart operation 3 not supported for QDD\n" );
-			else if ( thmfc_floppy_find_sector( &id ) )
+			else if ( thmfc_floppy_find_sector( space->machine, &id ) )
 			{
 				thmfc1->data_size = thom_floppy_make_sector
-					( thmfc_floppy_image(), id, thmfc1->data, thmfc1->sector_size );
+					( thmfc_floppy_image(space->machine), id, thmfc1->data, thmfc1->sector_size );
 				assert( thmfc1->data_size < sizeof( thmfc1->data ) );
 				thmfc1->data_finish = thmfc1->sector_size + 4;
 				thmfc1->data_idx = 1;
@@ -1399,7 +1399,7 @@ WRITE8_HANDLER ( thmfc_floppy_w )
 		/* synchronize to word, if needed (QDD only) */
 		if ( wsync && qdd ) {
 			if ( ! thmfc1->data_raw_size )
-				thmfc1->data_raw_size = thom_qdd_make_disk ( thmfc_floppy_image(), thmfc1->data );
+				thmfc1->data_raw_size = thom_qdd_make_disk ( thmfc_floppy_image(space->machine), thmfc1->data );
 			while ( thmfc1->data_raw_idx < thmfc1->data_raw_size &&
 				thmfc1->data[ thmfc1->data_raw_idx ] != thmfc1->wsync )
 			{
@@ -1447,7 +1447,7 @@ WRITE8_HANDLER ( thmfc_floppy_w )
 			thmfc1->drive |= 1 ^ ((data >> 6) & 1);
 		}
 
-		img = thmfc_floppy_image();
+		img = thmfc_floppy_image(space->machine);
 		thom_floppy_active( space->machine, 0 );
 
 		LOG (( "%f $%04x thmfc_floppy_w: CMD2=$%02X drv=%i step=%i motor=%i\n",
@@ -1503,7 +1503,7 @@ WRITE8_HANDLER ( thmfc_floppy_w )
 		thmfc1->track = data;
 		LOG (( "%f $%04x thmfc_floppy_w: WTRCK=%i (real=%i)\n",
 		       attotime_to_double(timer_get_time(space->machine)), cpu_get_previouspc( space->machine->cpu[0] ), data,
-		       floppy_drive_get_current_track( thmfc_floppy_image() ) ));
+		       floppy_drive_get_current_track( thmfc_floppy_image(space->machine) ) ));
 		break;
 
 	case 7: /* WCELL */

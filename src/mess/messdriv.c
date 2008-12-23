@@ -517,26 +517,26 @@ XL/XE 16kB OS roms
 	DRIVER( ip244415 )
 
 	/* TEXAS INSTRUMENTS */
-//0128u7	DRIVER( ti990_10 )	/* 1975 TI 990/10									*/
-//0128u7	DRIVER( ti990_4 )	/* 1976 TI 990/4									*/
-//0128u7	DRIVER( 990189 )	/* 1978 TM 990/189									*/
-//0128u7	DRIVER( 990189v )	/* 1980 TM 990/189 with Color Video Board			*/
+	DRIVER( ti990_10 )	/* 1975 TI 990/10									*/
+	DRIVER( ti990_4 )	/* 1976 TI 990/4									*/
+	DRIVER( 990189 )	/* 1978 TM 990/189									*/
+	DRIVER( 990189v )	/* 1980 TM 990/189 with Color Video Board			*/
 
-//0128u7	DRIVER( ti99_224 )	/* 1983 TI 99/2 (24kb ROMs)							*/
-//0128u7	DRIVER( ti99_232 )	/* 1983 TI 99/2 (32kb ROMs)							*/
-//0128u7	DRIVER( ti99_4 )	/* 1979 TI-99/4										*/
-//0128u7	DRIVER( ti99_4e )	/* 1980 TI-99/4 with 50Hz video						*/
-//0128u7	DRIVER( ti99_4a )	/* 1981 TI-99/4A									*/
-//0128u7	DRIVER( ti99_4ae )	/* 1981 TI-99/4A with 50Hz video					*/
-//0128u7	DRIVER( ti99_4ev)	/* 1994 TI-99/4A with EVPC video card				*/
-//0128u7	DRIVER( ti99_8 )	/* 1983 TI-99/8										*/
-//0128u7	DRIVER( ti99_8e )	/* 1983 TI-99/8 with 50Hz video						*/
+	DRIVER( ti99_224 )	/* 1983 TI 99/2 (24kb ROMs)							*/
+	DRIVER( ti99_232 )	/* 1983 TI 99/2 (32kb ROMs)							*/
+	DRIVER( ti99_4 )	/* 1979 TI-99/4										*/
+	DRIVER( ti99_4e )	/* 1980 TI-99/4 with 50Hz video						*/
+	DRIVER( ti99_4a )	/* 1981 TI-99/4A									*/
+	DRIVER( ti99_4ae )	/* 1981 TI-99/4A with 50Hz video					*/
+	DRIVER( ti99_4ev)	/* 1994 TI-99/4A with EVPC video card				*/
+	DRIVER( ti99_8 )	/* 1983 TI-99/8										*/
+	DRIVER( ti99_8e )	/* 1983 TI-99/8 with 50Hz video						*/
 
 	/* TI 99 clones */
-//0128u7	DRIVER( tutor)		/* 1983? Tomy Tutor									*/
-//0128u7	DRIVER( geneve )	/* 1987? Myarc Geneve 9640							*/
-//0128u7	DRIVER( genmod )	/* 199?? Myarc Geneve 9640							*/
-//0128u7	DRIVER( ti99_4p )	/* 1996 SNUG 99/4P (a.k.a. SGCPU)					*/
+	DRIVER( tutor)		/* 1983? Tomy Tutor									*/
+	DRIVER( geneve )	/* 1987? Myarc Geneve 9640							*/
+	DRIVER( genmod )	/* 199?? Myarc Geneve 9640							*/
+	DRIVER( ti99_4p )	/* 1996 SNUG 99/4P (a.k.a. SGCPU)					*/
 
 	DRIVER( avigo )		/*													*/
 
@@ -917,19 +917,19 @@ XL/XE 16kB OS roms
 	DRIVER( gamecom )	/* Tiger Game.com									*/
 
 	/* Thomson */
-//0128u7	DRIVER( t9000 )		/* 1980 Thomson T9000 (TO7 prototype)				*/
-//0128u7	DRIVER( to7 )		/* 1982 Thomson TO7									*/
-//0128u7	DRIVER( to770 )		/* 1984 Thomson TO7/70								*/
-//0128u7	DRIVER( to770a )	/* 198? Thomson TO7/70 arabic version				*/
-//0128u7	DRIVER( mo5 )		/* 1984 Thomson MO5									*/
-//0128u7	DRIVER( mo5e )		/* 1986 Thomson MO5E (export version)				*/
-//0128u7	DRIVER( to9 )		/* 1985 Thomson T09									*/
-//0128u7	DRIVER( to8 )		/* 1986 Thomson T08									*/
-//0128u7	DRIVER( to8d )		/* 1987 Thomson T08D								*/
-//0128u7	DRIVER( to9p )		/* 1986 Thomson T09+								*/
-//0128u7	DRIVER( mo6 )		/* 1986 Thomson MO6									*/
-//0128u7	DRIVER( mo5nr )		/* 1986 Thomson MO5 NR								*/
-//0128u7	DRIVER( pro128 )	/* 1986 Olivetti Prodest PC 128						*/
+	DRIVER( t9000 )		/* 1980 Thomson T9000 (TO7 prototype)				*/
+	DRIVER( to7 )		/* 1982 Thomson TO7									*/
+	DRIVER( to770 )		/* 1984 Thomson TO7/70								*/
+	DRIVER( to770a )	/* 198? Thomson TO7/70 arabic version				*/
+	DRIVER( mo5 )		/* 1984 Thomson MO5									*/
+	DRIVER( mo5e )		/* 1986 Thomson MO5E (export version)				*/
+	DRIVER( to9 )		/* 1985 Thomson T09									*/
+	DRIVER( to8 )		/* 1986 Thomson T08									*/
+	DRIVER( to8d )		/* 1987 Thomson T08D								*/
+	DRIVER( to9p )		/* 1986 Thomson T09+								*/
+	DRIVER( mo6 )		/* 1986 Thomson MO6									*/
+	DRIVER( mo5nr )		/* 1986 Thomson MO5 NR								*/
+	DRIVER( pro128 )	/* 1986 Olivetti Prodest PC 128						*/
 
 	/* Cybiko, Inc. */
 //	DRIVER( cybikov1 )	/* Cybiko Wireless Intertainment System - Classic V1 */

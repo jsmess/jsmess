@@ -129,7 +129,7 @@ static hfdc_t hfdc[MAX_HFDC];
 	disk_unit: floppy drive index
 	head: selected head
 */
-static int floppy_read_id(int which, int disk_unit, int head)
+static int floppy_read_id(running_machine *machine,int which, int disk_unit, int head)
 {
 	const device_config *disk_img = image_from_devtype_and_index(machine, IO_FLOPPY, disk_unit);
 	UINT8 revolution_count;
@@ -161,7 +161,7 @@ static int floppy_read_id(int which, int disk_unit, int head)
 	which: udc controller index
 	disk_unit: floppy drive index
 */
-static int floppy_find_sector(int which, int disk_unit, int cylinder, int head, int check_secnum, int sector, int *sector_data_id, int *sector_len)
+static int floppy_find_sector(running_machine *machine,int which, int disk_unit, int cylinder, int head, int check_secnum, int sector, int *sector_data_id, int *sector_len)
 {
 	const device_config *disk_img = image_from_devtype_and_index(machine, IO_FLOPPY, disk_unit);
 	UINT8 revolution_count;
@@ -202,14 +202,14 @@ static int floppy_find_sector(int which, int disk_unit, int cylinder, int head, 
 	return FALSE;
 }
 
-static int smc92x4_floppy_read_sector(int which, int disk_unit, int cylinder, int head, int check_secnum, int sector, int *dma_address)
+static int smc92x4_floppy_read_sector(running_machine *machine,int which, int disk_unit, int cylinder, int head, int check_secnum, int sector, int *dma_address)
 {
 	int sector_data_id, sector_len;
 	UINT8 buf[MAX_SECTOR_LEN];
 	int i;
 	const device_config *disk_img = image_from_devtype_and_index(machine, IO_FLOPPY, disk_unit);
 
-	if (! floppy_find_sector(which, disk_unit, cylinder, head, check_secnum, sector, & sector_data_id, & sector_len))
+	if (! floppy_find_sector(machine,which, disk_unit, cylinder, head, check_secnum, sector, & sector_data_id, & sector_len))
 	{
 		hfdc[which].status |= ST_TC_RDIDERR;
 		return FALSE;
@@ -224,14 +224,14 @@ static int smc92x4_floppy_read_sector(int which, int disk_unit, int cylinder, in
 	return TRUE;
 }
 
-static int smc92x4_floppy_write_sector(int which, int disk_unit, int cylinder, int head, int check_secnum, int sector, int *dma_address)
+static int smc92x4_floppy_write_sector(running_machine *machine,int which, int disk_unit, int cylinder, int head, int check_secnum, int sector, int *dma_address)
 {
 	int sector_data_id, sector_len;
 	UINT8 buf[MAX_SECTOR_LEN];
 	int i;
 	const device_config *disk_img = image_from_devtype_and_index(machine, IO_FLOPPY, disk_unit);
 
-	if (! floppy_find_sector(which, disk_unit, cylinder, head, check_secnum, sector, & sector_data_id, & sector_len))
+	if (! floppy_find_sector(machine,which, disk_unit, cylinder, head, check_secnum, sector, & sector_data_id, & sector_len))
 	{
 		hfdc[which].status |= ST_TC_RDIDERR;
 		return FALSE;
@@ -246,13 +246,13 @@ static int smc92x4_floppy_write_sector(int which, int disk_unit, int cylinder, i
 	return TRUE;
 }
 
-static void floppy_step(int which, int disk_unit, int direction)
+static void floppy_step(running_machine *machine,int which, int disk_unit, int direction)
 {
 	const device_config *disk_img = image_from_devtype_and_index(machine, IO_FLOPPY, disk_unit);
 	floppy_drive_seek(disk_img, direction);
 }
 
-static UINT8 floppy_get_disk_status(int which, int disk_unit)
+static UINT8 floppy_get_disk_status(running_machine *machine,int which, int disk_unit)
 {
 	const device_config *disk_img = image_from_devtype_and_index(machine, IO_FLOPPY, disk_unit);
 	int status = floppy_status(disk_img, -1);
@@ -570,7 +570,7 @@ INLINE void set_command_done(int which)
 		smc92x4_set_interrupt(which, 1);
 }
 
-INLINE void step(int which, select_mode_t select_mode, int disk_unit, int direction)
+INLINE void step(running_machine *machine,int which, select_mode_t select_mode, int disk_unit, int direction)
 {
 	switch (select_mode)
 	{
@@ -588,7 +588,7 @@ INLINE void step(int which, select_mode_t select_mode, int disk_unit, int direct
 
 	case sm_floppy_slow:
 	case sm_floppy_fast:
-		floppy_step(which, disk_unit, direction);
+		floppy_step(machine,which, disk_unit, direction);
 		break;
 	}
 }
@@ -596,7 +596,7 @@ INLINE void step(int which, select_mode_t select_mode, int disk_unit, int direct
 /*
 	Perform the read_id phase on a drive
 */
-INLINE int read_id(int which, select_mode_t select_mode, int disk_unit, int head,
+INLINE int read_id(running_machine *machine,int which, select_mode_t select_mode, int disk_unit, int head,
 					int do_implied_seek, int desired_cylinder)
 {
 	int reply;
@@ -618,7 +618,7 @@ INLINE int read_id(int which, select_mode_t select_mode, int disk_unit, int head
 
 	case sm_floppy_slow:
 	case sm_floppy_fast:
-		reply = floppy_read_id(which, disk_unit, head);
+		reply = floppy_read_id(machine,which, disk_unit, head);
 		break;
 	}
 
@@ -668,7 +668,7 @@ INLINE int read_id(int which, select_mode_t select_mode, int disk_unit, int head
 		}
 
 		for (i=0; i<step_count; i++)
-			step(which, select_mode, disk_unit, step_direction);
+			step(machine,which, select_mode, disk_unit, step_direction);
 	}
 
 	return reply;
@@ -677,7 +677,7 @@ INLINE int read_id(int which, select_mode_t select_mode, int disk_unit, int head
 /*
 	Get the status of a drive
 */
-INLINE UINT8 get_disk_status(int which, select_mode_t select_mode, int disk_unit)
+INLINE UINT8 get_disk_status(running_machine *machine,int which, select_mode_t select_mode, int disk_unit)
 {
 	UINT8 reply;
 
@@ -698,7 +698,7 @@ INLINE UINT8 get_disk_status(int which, select_mode_t select_mode, int disk_unit
 
 	case sm_floppy_slow:
 	case sm_floppy_fast:
-		reply = floppy_get_disk_status(which, disk_unit);
+		reply = floppy_get_disk_status(machine,which, disk_unit);
 		break;
 
 	}
@@ -709,7 +709,7 @@ INLINE UINT8 get_disk_status(int which, select_mode_t select_mode, int disk_unit
 /*
 	Handle the step command
 */
-static void do_step(int which, int mode)
+static void do_step(running_machine *machine,int which, int mode)
 {
 	select_mode_t select_mode;
 	int disk_unit = 0;
@@ -727,20 +727,20 @@ static void do_step(int which, int mode)
 		goto cleanup;
 	}
 
-	step(which, select_mode, disk_unit, (mode & 2) ? -1 : +1);
+	step(machine,which, select_mode, disk_unit, (mode & 2) ? -1 : +1);
 
 cleanup:
 	/* update register state */
 	set_command_done(which);
 
 	/* set drive status */
-	hfdc[which].regs[hfdc_reg_drive_stat] = get_disk_status(which, select_mode, disk_unit);
+	hfdc[which].regs[hfdc_reg_drive_stat] = get_disk_status(machine,which, select_mode, disk_unit);
 }
 
 /*
 	Handle the restore command
 */
-static void do_restore(int which, int mode)
+static void do_restore(running_machine *machine,int which, int mode)
 {
 	select_mode_t select_mode;
 	int disk_unit = 0;
@@ -773,9 +773,9 @@ static void do_restore(int which, int mode)
 	case sm_floppy_fast:
 		seek_count = 0;
 		/* limit iterations to 2048 to prevent an endless loop if the disc is locked */
-		while ((seek_count < 2048) && ! (get_disk_status(which, select_mode, disk_unit) & DS_TRK00))
+		while ((seek_count < 2048) && ! (get_disk_status(machine,which, select_mode, disk_unit) & DS_TRK00))
 		{
-			step(which, select_mode, disk_unit, -1);
+			step(machine,which, select_mode, disk_unit, -1);
 			seek_count++;
 		}
 		break;
@@ -786,7 +786,7 @@ cleanup:
 	set_command_done(which);
 
 	/* set drive status */
-	hfdc[which].regs[hfdc_reg_drive_stat] = get_disk_status(which, select_mode, disk_unit);
+	hfdc[which].regs[hfdc_reg_drive_stat] = get_disk_status(machine,which, select_mode, disk_unit);
 }
 
 /*
@@ -796,7 +796,7 @@ cleanup:
 	physical_flag: if 1, read consecutive sectors, ignoring sector IDs
 	mode: extra flags (ignored)
 */
-static void do_read(int which, int physical_flag, int mode)
+static void do_read(running_machine *machine,int which, int physical_flag, int mode)
 {
 	select_mode_t select_mode;
 	int disk_unit = 0;
@@ -825,7 +825,7 @@ static void do_read(int which, int physical_flag, int mode)
 		goto cleanup;
 	}
 
-	if (! (get_disk_status(which, select_mode, disk_unit) & DS_READY))
+	if (! (get_disk_status(machine,which, select_mode, disk_unit) & DS_READY))
 	{
 		/* unit is not ready */
 		hfdc[which].status |= ST_TC_RDIDERR;
@@ -837,7 +837,7 @@ static void do_read(int which, int physical_flag, int mode)
 	/* if we enable write-protect test in read operations, the ti99 HFDC DSR is
 	unable to read write-protected floppies! */
 	if ((hfdc[which].regs[hfdc_reg_term] & TC_TWPROT)
-			&& (get_disk_status(which, select_mode, disk_unit) & DS_WRPROT))
+			&& (get_disk_status(machine,which, select_mode, disk_unit) & DS_WRPROT))
 	{
 		/* unit is write protected */
 		hfdc[which].status |= ST_TC_RDIDERR;	/* right??? */
@@ -845,7 +845,7 @@ static void do_read(int which, int physical_flag, int mode)
 	}
 #endif
 
-	read_id(which, select_mode, disk_unit, head, ! (mode & 0x02), cylinder);
+	read_id(machine,which, select_mode, disk_unit, head, ! (mode & 0x02), cylinder);
 
 	while (hfdc[which].regs[hfdc_reg_sector_count])
 	{
@@ -867,7 +867,7 @@ static void do_read(int which, int physical_flag, int mode)
 
 		case sm_floppy_slow:
 		case sm_floppy_fast:
-			if (! smc92x4_floppy_read_sector(which, disk_unit, cylinder, head, 1, sector, &dma_address))
+			if (! smc92x4_floppy_read_sector(machine,which, disk_unit, cylinder, head, 1, sector, &dma_address))
 				goto cleanup;
 			break;
 		}
@@ -898,7 +898,7 @@ cleanup:
 	hfdc[which].regs[hfdc_reg_des_sector] = sector;
 
 	/* set drive status */
-	hfdc[which].regs[hfdc_reg_drive_stat] = get_disk_status(which, select_mode, disk_unit);
+	hfdc[which].regs[hfdc_reg_drive_stat] = get_disk_status(machine,which, select_mode, disk_unit);
 }
 
 /*
@@ -908,7 +908,7 @@ cleanup:
 	physical_flag: if 1, ignore CRC/ECC bytes??? (ignored)
 	mode: extra flags (ignored)
 */
-static void do_write(int which, int physical_flag, int mode)
+static void do_write(running_machine *machine,int which, int physical_flag, int mode)
 {
 	select_mode_t select_mode;
 	int disk_unit = 0;
@@ -937,7 +937,7 @@ static void do_write(int which, int physical_flag, int mode)
 		goto cleanup;
 	}
 
-	if (! (get_disk_status(which, select_mode, disk_unit) & DS_READY))
+	if (! (get_disk_status(machine,which, select_mode, disk_unit) & DS_READY))
 	{
 		/* unit is not ready */
 		hfdc[which].status |= ST_TC_RDIDERR;
@@ -946,7 +946,7 @@ static void do_write(int which, int physical_flag, int mode)
 	}
 
 	if ((hfdc[which].regs[hfdc_reg_term] & TC_TWPROT)
-			&& (get_disk_status(which, select_mode, disk_unit) & DS_WRPROT))
+			&& (get_disk_status(machine,which, select_mode, disk_unit) & DS_WRPROT))
 	{
 		/* unit is write protected */
 		hfdc[which].status |= ST_TC_RDIDERR;	/* right??? */
@@ -954,7 +954,7 @@ static void do_write(int which, int physical_flag, int mode)
 	}
 
 
-	read_id(which, select_mode, disk_unit, head, ! (mode & 0x40), cylinder);
+	read_id(machine,which, select_mode, disk_unit, head, ! (mode & 0x40), cylinder);
 
 	while (hfdc[which].regs[hfdc_reg_sector_count])
 	{
@@ -976,7 +976,7 @@ static void do_write(int which, int physical_flag, int mode)
 
 		case sm_floppy_slow:
 		case sm_floppy_fast:
-			if (!smc92x4_floppy_write_sector(which, disk_unit, cylinder, head, 1, sector, &dma_address))
+			if (!smc92x4_floppy_write_sector(machine,which, disk_unit, cylinder, head, 1, sector, &dma_address))
 				goto cleanup;
 			break;
 		}
@@ -1007,13 +1007,13 @@ cleanup:
 	hfdc[which].regs[hfdc_reg_des_sector] = sector;
 
 	/* set drive status */
-	hfdc[which].regs[hfdc_reg_drive_stat] = get_disk_status(which, select_mode, disk_unit);
+	hfdc[which].regs[hfdc_reg_drive_stat] = get_disk_status(machine,which, select_mode, disk_unit);
 }
 
 /*
 	Process a command
 */
-static void smc92x4_process_command(int which, int opcode)
+static void smc92x4_process_command(running_machine *machine,int which, int opcode)
 {
 	if (opcode < 0x80)
 	{
@@ -1043,7 +1043,7 @@ static void smc92x4_process_command(int which, int opcode)
 					/* bit 0: 0 -> command ends after last seek pulse, 1 -> command
 						ends when the drive asserts the seek complete pin */
 					logerror("smc92x4 restore command %X\n", opcode & 0x01);
-					do_restore(which, opcode & 0x01);
+					do_restore(machine,which, opcode & 0x01);
 					break;
 				}
 			}
@@ -1054,7 +1054,7 @@ static void smc92x4_process_command(int which, int opcode)
 				/* bit 0: 0 -> command ends after last seek pulse, 1 -> command
 					ends when the drive asserts the seek complete pin */
 				logerror("smc92x4 step command %X\n", opcode & 0x3);
-				do_step(which, opcode & 0x03);
+				do_step(machine,which, opcode & 0x03);
 			}
 			else
 			{
@@ -1107,7 +1107,7 @@ static void smc92x4_process_command(int which, int opcode)
 				{
 				case 0:
 					logerror("smc92x4 read physical command %X\n", opcode & 0x1);
-					do_read(which, 1, opcode & 0x3);
+					do_read(machine,which, 1, opcode & 0x3);
 					break;
 				case 1:
 					logerror("smc92x4 read track command %X\n", opcode & 0x1);
@@ -1115,7 +1115,7 @@ static void smc92x4_process_command(int which, int opcode)
 				case 2:
 				case 3:
 					logerror("smc92x4 read logical command %X\n", opcode & 0x3);
-					do_read(which, 0, opcode & 0x3);
+					do_read(machine,which, 0, opcode & 0x3);
 					break;
 				}
 			}
@@ -1144,19 +1144,19 @@ static void smc92x4_process_command(int which, int opcode)
 		{
 		case 0:
 			logerror("smc92x4 write physical command %X\n", opcode & 0x7f);
-			do_write(which, 1, opcode & 0x7f);
+			do_write(machine,which, 1, opcode & 0x7f);
 			break;
 		case 1:
 			logerror("smc92x4 write logical command %X\n", opcode & 0x7f);
-			do_write(which, 0, opcode & 0x7f);
+			do_write(machine,which, 0, opcode & 0x7f);
 			break;
 		case 2:
 			logerror("smc92x4 write physical command??? %X\n", opcode & 0x7f);
-			do_write(which, 1, opcode & 0x7f);
+			do_write(machine,which, 1, opcode & 0x7f);
 			break;
 		case 3:
 			logerror("smc92x4 write logical command??? %X\n", opcode & 0x7f);
-			do_write(which, 0, opcode & 0x7f);
+			do_write(machine,which, 0, opcode & 0x7f);
 			break;
 		}
 	}
@@ -1169,7 +1169,7 @@ static void smc92x4_process_command(int which, int opcode)
 /*
 	Read a byte of data from a smc99x4 controller
 */
-int smc92x4_r(int which, int offset)
+int smc92x4_r(running_machine *machine,int which, int offset)
 {
 	int reply = 0;
 
@@ -1208,7 +1208,7 @@ int smc92x4_r(int which, int offset)
 /*
 	Write a byte to a smc99x4 controller
 */
-void smc92x4_w(int which, int offset, int data)
+void smc92x4_w(running_machine *machine,int which, int offset, int data)
 {
 	data &= 0xff;
 
@@ -1235,19 +1235,19 @@ void smc92x4_w(int which, int offset, int data)
 
 	case 1:
 		/* command register */
-		smc92x4_process_command(which, data);
+		smc92x4_process_command(machine,which, data);
 		break;
 	}
 }
 
  READ8_HANDLER(smc92x4_0_r)
 {
-	return smc92x4_r(0, offset);
+	return smc92x4_r(space->machine,0, offset);
 }
 
 WRITE8_HANDLER(smc92x4_0_w)
 {
-	smc92x4_w(0, offset, data);
+	smc92x4_w(space->machine,0, offset, data);
 }
 
 static const struct harddisk_callback_config smc92x4_harddisk_config =
