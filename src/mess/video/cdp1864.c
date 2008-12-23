@@ -360,11 +360,11 @@ static DEVICE_START( cdp1864 )
 	assert(device != NULL);
 	assert(device->tag != NULL);
 	assert(strlen(device->tag) < 20);
+	assert(device->clock > 0);
 
 	cdp1864->intf = device->static_config;
 
 	assert(cdp1864->intf != NULL);
-	assert(cdp1864->intf->clock > 0);
 	assert(cdp1864->intf->on_int_changed != NULL);
 	assert(cdp1864->intf->on_dmao_changed != NULL);
 	assert(cdp1864->intf->on_efx_changed != NULL);

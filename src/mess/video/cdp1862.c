@@ -132,11 +132,11 @@ static DEVICE_START( cdp1862 )
 	assert(device != NULL);
 	assert(device->tag != NULL);
 	assert(strlen(device->tag) < 20);
+	assert(device->clock > 0);
 
 	cdp1862->intf = device->static_config;
 
 	assert(cdp1862->intf != NULL);
-	assert(cdp1862->intf->clock > 0);
 
 	/* get the screen device */
 	cdp1862->screen = device_list_find_by_tag(device->machine->config->devicelist, VIDEO_SCREEN, cdp1862->intf->screen_tag);

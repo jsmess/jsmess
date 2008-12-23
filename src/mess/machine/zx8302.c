@@ -574,11 +574,11 @@ static DEVICE_START( zx8302 )
 	assert(device != NULL);
 	assert(device->tag != NULL);
 	assert(strlen(device->tag) < 20);
+	assert(device->clock > 0);
 
 	zx8302->intf = device->static_config;
 
 	assert(zx8302->intf != NULL);
-	assert(zx8302->intf->clock > 0);
 	assert(zx8302->intf->rtc_clock > 0);
 	assert(zx8302->intf->comdata_w != NULL);
 

@@ -236,11 +236,11 @@ static DEVICE_START( zx8301 )
 	assert(device != NULL);
 	assert(device->tag != NULL);
 	assert(strlen(device->tag) < 20);
+	assert(device->clock > 0);
 
 	zx8301->intf = device->static_config;
 
 	assert(zx8301->intf != NULL);
-	assert(zx8301->intf->clock > 0);
 	assert(zx8301->intf->on_vsync_changed != NULL);
 	assert(zx8301->intf->ram_r != NULL);
 	assert(zx8301->intf->ram_w != NULL);
