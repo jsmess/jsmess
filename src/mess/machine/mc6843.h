@@ -22,7 +22,7 @@ struct _mc6843_interface
 
 
 #define MDRV_MC6843_ADD(_tag, _intrf) \
-  MDRV_DEVICE_ADD(_tag, MC6843)	      \
+  MDRV_DEVICE_ADD(_tag, MC6843, 0)	      \
   MDRV_DEVICE_CONFIG(_intrf)
 
 #define MDRV_MC6843_REMOVE(_tag)		\

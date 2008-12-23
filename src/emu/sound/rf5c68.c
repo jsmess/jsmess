@@ -39,16 +39,16 @@ struct rf5c68pcm
 /*    RF5C68 stream update                      */
 /************************************************/
 
-static void rf5c68_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length)
+static STREAM_UPDATE( rf5c68_update )
 {
 	struct rf5c68pcm *chip = param;
-	stream_sample_t *left = buffer[0];
-	stream_sample_t *right = buffer[1];
+	stream_sample_t *left = outputs[0];
+	stream_sample_t *right = outputs[1];
 	int i, j;
 
 	/* start with clean buffers */
-	memset(left, 0, length * sizeof(*left));
-	memset(right, 0, length * sizeof(*right));
+	memset(left, 0, samples * sizeof(*left));
+	memset(right, 0, samples * sizeof(*right));
 
 	/* bail if not enabled */
 	if (!chip->enable)
@@ -66,7 +66,7 @@ static void rf5c68_update(void *param, stream_sample_t **inputs, stream_sample_t
 			int rv = ((chan->pan >> 4) & 0x0f) * chan->env;
 
 			/* loop over the sample buffer */
-			for (j = 0; j < length; j++)
+			for (j = 0; j < samples; j++)
 			{
 				int sample;
 
@@ -100,7 +100,7 @@ static void rf5c68_update(void *param, stream_sample_t **inputs, stream_sample_t
 	}
 
 	/* now clamp and shift the result (output is only 10 bits) */
-	for (j = 0; j < length; j++)
+	for (j = 0; j < samples; j++)
 	{
 		stream_sample_t temp;
 
@@ -126,7 +126,6 @@ static SND_START( rf5c68 )
 	/* allocate memory for the chip */
 	struct rf5c68pcm *chip = auto_malloc(sizeof(*chip));
 	memset(chip, 0, sizeof(*chip));
-	memset(chip->data, 0xff, sizeof(chip->data));
 
 	/* allocate the stream */
 	chip->stream = stream_create(device, 0, 2, clock / 384, chip, rf5c68_update);
@@ -243,17 +242,17 @@ SND_GET_INFO( rf5c68 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( rf5c68 );		break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( rf5c68 );				break;
-		case SNDINFO_PTR_STOP:							/* Nothing */							break;
-		case SNDINFO_PTR_RESET:							/* Nothing */							break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( rf5c68 );	break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( rf5c68 );			break;
+		case SNDINFO_PTR_STOP:							/* Nothing */									break;
+		case SNDINFO_PTR_RESET:							/* Nothing */									break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							info->s = "RF5C68";						break;
-		case SNDINFO_STR_CORE_FAMILY:					info->s = "Ricoh PCM";					break;
-		case SNDINFO_STR_CORE_VERSION:					info->s = "1.0";						break;
-		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
-		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "RF5C68");						break;
+		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Ricoh PCM");					break;
+		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");							break;
+		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
+		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

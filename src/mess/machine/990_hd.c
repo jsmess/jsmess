@@ -1033,13 +1033,13 @@ static const struct harddisk_callback_config ti990_harddisk_config =
 };
 
 MACHINE_DRIVER_START( ti990_hdc )
-	MDRV_DEVICE_ADD( "harddisk1", HARDDISK )
+	MDRV_DEVICE_ADD( "harddisk1", HARDDISK, 0 )
 	MDRV_DEVICE_CONFIG( ti990_harddisk_config )
-	MDRV_DEVICE_ADD( "harddisk2", HARDDISK )
+	MDRV_DEVICE_ADD( "harddisk2", HARDDISK, 0 )
 	MDRV_DEVICE_CONFIG( ti990_harddisk_config )
-	MDRV_DEVICE_ADD( "harddisk3", HARDDISK )
+	MDRV_DEVICE_ADD( "harddisk3", HARDDISK, 0 )
 	MDRV_DEVICE_CONFIG( ti990_harddisk_config )
-	MDRV_DEVICE_ADD( "harddisk4", HARDDISK )
+	MDRV_DEVICE_ADD( "harddisk4", HARDDISK, 0 )
 	MDRV_DEVICE_CONFIG( ti990_harddisk_config )
 MACHINE_DRIVER_END
 

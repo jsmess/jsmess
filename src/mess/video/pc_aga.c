@@ -34,7 +34,6 @@ static VIDEO_START( pc200 );
 
 static const mc6845_interface mc6845_aga_intf = {
 	AGA_SCREEN_NAME,	/* screen number */
-	XTAL_14_31818MHz/8,	/* clock */
 	8,					/* numbers of pixels per video memory address */
 	NULL,				/* begin_update */
 	aga_update_row,		/* update_row */
@@ -73,8 +72,7 @@ MACHINE_DRIVER_START( pcvideo_aga )
 
 	MDRV_PALETTE_INIT( pc_aga )
 
-	MDRV_DEVICE_ADD( AGA_MC6845_NAME, MC6845 )
-	MDRV_DEVICE_CONFIG( mc6845_aga_intf )
+	MDRV_MC6845_ADD( AGA_MC6845_NAME, MC6845, XTAL_14_31818MHz/8, mc6845_aga_intf )
 
 	MDRV_VIDEO_START( pc_aga )
 	MDRV_VIDEO_UPDATE( mc6845_aga )

@@ -124,7 +124,7 @@ static DEVICE_START(at28c16)
 	/* validate some basic stuff */
 	assert(device != NULL);
 //  assert(device->static_config != NULL);
-	assert(device->inline_config == NULL);
+//  assert(device->inline_config == NULL);
 	assert(device->machine != NULL);
 	assert(device->machine->config != NULL);
 
@@ -134,17 +134,11 @@ static DEVICE_START(at28c16)
 	c->oe_12v = 0;
 	c->last_write = -1;
 	c->write_timer = timer_alloc(device->machine,  write_finished, c );
+	c->default_data = device->region;
 
-	config = device->static_config;
-	if( config != NULL && config->data != NULL )
-	{
-		c->default_data = memory_region( device->machine, config->data );
-	}
-
-	if( config != NULL && config->id != NULL )
-	{
+	config = device->inline_config;
+	if (config->id != NULL)
 		c->default_id = memory_region( device->machine, config->id );
-	}
 
 	/* create the name for save states */
 	state_save_register_device_item_pointer( device, 0, c->data, SIZE_DATA );
@@ -225,7 +219,7 @@ DEVICE_GET_INFO(at28c16)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(at28c16_state); break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = 0; break; // sizeof(at28c16_config)
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = sizeof(at28c16_config); break;
 		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_PERIPHERAL; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
@@ -236,10 +230,10 @@ DEVICE_GET_INFO(at28c16)
 		case DEVINFO_FCT_NVRAM:					info->nvram = DEVICE_NVRAM_NAME(at28c16); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:					info->s = "AT28C16"; break;
-		case DEVINFO_STR_FAMILY:				info->s = "EEPROM"; break;
-		case DEVINFO_STR_VERSION:				info->s = "1.0"; break;
-		case DEVINFO_STR_SOURCE_FILE:			info->s = __FILE__; break;
-		case DEVINFO_STR_CREDITS:				info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case DEVINFO_STR_NAME:					strcpy(info->s, "AT28C16"); break;
+		case DEVINFO_STR_FAMILY:				strcpy(info->s, "EEPROM"); break;
+		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0"); break;
+		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__); break;
+		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }

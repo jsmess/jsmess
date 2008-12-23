@@ -1220,7 +1220,7 @@ MACHINE_RESET( oric )
 		}
 		break;
 	}
-	cpu_reset(cputag_get_cpu(machine, "main"));
+	device_reset(cputag_get_cpu(machine, "main"));
 }
 
 
@@ -1257,7 +1257,7 @@ READ8_HANDLER ( oric_IO_r )
 	{
 		if ((offset & 0x0f)!=0x0d)
 		{
-			logerror("via 0 r: %04x %04x\n",offset, (unsigned) cpu_get_reg(space->machine->cpu[0], REG_PC));
+			logerror("via 0 r: %04x %04x\n",offset, (unsigned) cpu_get_reg(space->machine->cpu[0], REG_GENPC));
 		}
 	}
 	/* it is repeated */
@@ -1298,7 +1298,7 @@ WRITE8_HANDLER ( oric_IO_w )
 #endif
 	if (enable_logging)
 	{
-		logerror("via 0 w: %04x %02x %04x\n",offset,data,(unsigned) cpu_get_reg(space->machine->cpu[0], REG_PC));
+		logerror("via 0 w: %04x %02x %04x\n",offset,data,(unsigned) cpu_get_reg(space->machine->cpu[0], REG_GENPC));
 	}
 
 	via_w(via_0, offset & 0x0f,data);

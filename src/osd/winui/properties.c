@@ -602,14 +602,14 @@ void InitPropertyPageToPage(HINSTANCE hInst, HWND hWnd, HICON hIcon, OPTIONS_TYP
 /* Build CPU info string */
 static char *GameInfoCPU(UINT nIndex)
 {
-	int chipnum;
+	//int chipnum;
 	static char buf[1024] = "";
 	machine_config *config = machine_config_alloc(drivers[nIndex]->machine_config);
 
 	ZeroMemory(buf, sizeof(buf));
 
-	cpuintrf_init(NULL);
-
+// FIXME 0.128u7
+#if 0
 	for (chipnum = 0; chipnum < ARRAY_LENGTH(config->cpu); chipnum++)
 	{
 		if (config->cpu[chipnum].type != CPU_DUMMY)
@@ -630,9 +630,9 @@ static char *GameInfoCPU(UINT nIndex)
 			strcat(buf, "\n");
 		}
     }
+#endif
 	/* Free the structure */
 	machine_config_free(config);
-
 	return buf;
 }
 

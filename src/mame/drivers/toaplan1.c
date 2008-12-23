@@ -62,6 +62,8 @@ To Do:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
+#include "cpu/m68000/m68000.h"
 #include "cpu/tms32010/tms32010.h"
 #include "toaplan1.h"
 #include "sound/3812intf.h"
@@ -1249,7 +1251,7 @@ static MACHINE_DRIVER_START( rallybik )
 	MDRV_CPU_PROGRAM_MAP(toaplan1_sound_map, 0)
 	MDRV_CPU_IO_MAP(rallybik_sound_io_map, 0)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_MACHINE_RESET(toaplan1)
 
@@ -1289,7 +1291,7 @@ static MACHINE_DRIVER_START( truxton )
 	MDRV_CPU_PROGRAM_MAP(toaplan1_sound_map, 0)
 	MDRV_CPU_IO_MAP(truxton_sound_io_map, 0)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_MACHINE_RESET(toaplan1)
 
@@ -1329,7 +1331,7 @@ static MACHINE_DRIVER_START( hellfire )
 	MDRV_CPU_PROGRAM_MAP(toaplan1_sound_map, 0)
 	MDRV_CPU_IO_MAP(hellfire_sound_io_map, 0)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_MACHINE_RESET(toaplan1)
 
@@ -1369,7 +1371,7 @@ static MACHINE_DRIVER_START( zerowing )
 	MDRV_CPU_PROGRAM_MAP(toaplan1_sound_map, 0)
 	MDRV_CPU_IO_MAP(zerowing_sound_io_map, 0)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_MACHINE_RESET(zerozone)
 
@@ -1413,7 +1415,7 @@ static MACHINE_DRIVER_START( demonwld )
 	MDRV_CPU_PROGRAM_MAP(DSP_program_map,0)
 	MDRV_CPU_IO_MAP(DSP_io_map,0)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_MACHINE_RESET(demonwld)
 
@@ -1487,7 +1489,7 @@ static MACHINE_DRIVER_START( outzone )
 	MDRV_CPU_PROGRAM_MAP(toaplan1_sound_map, 0)
 	MDRV_CPU_IO_MAP(outzone_sound_io_map, 0)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_MACHINE_RESET(zerozone)
 

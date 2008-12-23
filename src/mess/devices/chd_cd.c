@@ -159,13 +159,13 @@ DEVICE_GET_INFO(cdrom)
 		case DEVINFO_PTR_IMAGE_CREATE_OPTSPEC+0:	info->p = (void *) mess_cd_option_spec; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:						info->s = "Cdrom"; break;
-		case DEVINFO_STR_FAMILY:					info->s = "Cdrom"; break;
-		case DEVINFO_STR_SOURCE_FILE:				info->s = __FILE__; break;
-		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:		info->s = "chd"; break;
-		case DEVINFO_STR_IMAGE_CREATE_OPTNAME+0:	info->s = "chdcd"; break;
-		case DEVINFO_STR_IMAGE_CREATE_OPTDESC+0:	info->s = "MAME/MESS CHD CD-ROM drive"; break;
-		case DEVINFO_STR_IMAGE_CREATE_OPTEXTS+0:	info->s = "chd"; break;
+		case DEVINFO_STR_NAME:						strcpy(info->s, "Cdrom"); break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Cdrom"); break;
+		case DEVINFO_STR_SOURCE_FILE:				strcpy(info->s, __FILE__); break;
+		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:		strcpy(info->s, "chd"); break;
+		case DEVINFO_STR_IMAGE_CREATE_OPTNAME+0:	strcpy(info->s, "chdcd"); break;
+		case DEVINFO_STR_IMAGE_CREATE_OPTDESC+0:	strcpy(info->s, "MAME/MESS CHD CD-ROM drive"); break;
+		case DEVINFO_STR_IMAGE_CREATE_OPTEXTS+0:	strcpy(info->s, "chd"); break;
 	}
 }
 

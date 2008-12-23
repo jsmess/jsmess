@@ -746,8 +746,8 @@ static WRITE16_HANDLER( x68k_fdc_w )
 				output_set_indexed_value("eject_drv",drive,(data & 0x40) ? 1 : 0);
 				if(data & 0x20)  // ejects disk
 				{
-					image_unload(image_from_devtype_and_index(IO_FLOPPY, drive));
-					floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, drive), 0);  // I'll presume ejecting the disk stops the drive motor :)
+					image_unload(image_from_devtype_and_index(space->machine, IO_FLOPPY, drive));
+					floppy_drive_set_motor_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, drive), 0);  // I'll presume ejecting the disk stops the drive motor :)
 				}
 			}
 		}
@@ -757,14 +757,14 @@ static WRITE16_HANDLER( x68k_fdc_w )
 	case 0x03:
 		sys.fdc.media_density[data & 0x03] = data & 0x10;
 		sys.fdc.motor[data & 0x03] = data & 0x80;
-		floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, data & 0x03), (data & 0x80));
+		floppy_drive_set_motor_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, data & 0x03), (data & 0x80));
 		if(data & 0x80)
 		{
 			for(drive=0;drive<4;drive++) // enable motor for this drive
 			{
 				if(drive == (data & 0x03))
 				{
-					floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, drive), 1);
+					floppy_drive_set_motor_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, drive), 1);
 					output_set_indexed_value("access_drv",drive,0);
 				}
 				else
@@ -775,17 +775,17 @@ static WRITE16_HANDLER( x68k_fdc_w )
 		{
 			for(drive=0;drive<4;drive++)
 			{
-				floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, drive), 0);
+				floppy_drive_set_motor_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, drive), 0);
 				output_set_indexed_value("access_drv",drive,1);
 			}
 		}
-		floppy_drive_set_ready_state(image_from_devtype_and_index(IO_FLOPPY, 0),1,1);
-		floppy_drive_set_ready_state(image_from_devtype_and_index(IO_FLOPPY, 1),1,1);
-		floppy_drive_set_ready_state(image_from_devtype_and_index(IO_FLOPPY, 2),1,1);
-		floppy_drive_set_ready_state(image_from_devtype_and_index(IO_FLOPPY, 3),1,1);
+		floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 0),1,1);
+		floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 1),1,1);
+		floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 2),1,1);
+		floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 3),1,1);
 //		for(drive=0;drive<4;drive++)
 //		{
-//			if(floppy_drive_get_flag_state(image_from_devtype_and_index(IO_FLOPPY, drive),FLOPPY_DRIVE_MOTOR_ON))
+//			if(floppy_drive_get_flag_state(image_from_devtype_and_index(machine, IO_FLOPPY, drive),FLOPPY_DRIVE_MOTOR_ON))
 //				output_set_indexed_value("access_drv",drive,0);
 //			else
 //				output_set_indexed_value("access_drv",drive,1);
@@ -1391,11 +1391,11 @@ static TIMER_CALLBACK(x68k_fake_bus_error)
 	if(mess_ram[0x09] != 0x02)  // normal vector for bus errors points to 02FF0540
 	{
 		int addr = (mess_ram[0x09] << 24) | (mess_ram[0x08] << 16) |(mess_ram[0x0b] << 8) | mess_ram[0x0a];
-		int sp = cpu_get_reg(machine->cpu[0],REG_SP);
-		int pc = cpu_get_reg(machine->cpu[0],REG_PC);
+		int sp = cpu_get_reg(machine->cpu[0],REG_GENSP);
+		int pc = cpu_get_reg(machine->cpu[0],REG_GENPC);
 		int sr = cpu_get_reg(machine->cpu[0],M68K_SR);
 		//int pda = cpu_get_reg(machine->cpu[0],M68K_PREF_DATA);
-		cpu_set_reg(machine->cpu[0],REG_SP,sp-14);
+		cpu_set_reg(machine->cpu[0],REG_GENSP,sp-14);
 		mess_ram[sp-11] = (val & 0xff000000) >> 24;
 		mess_ram[sp-12] = (val & 0x00ff0000) >> 16;
 		mess_ram[sp-9] = (val & 0x0000ff00) >> 8;
@@ -1406,7 +1406,7 @@ static TIMER_CALLBACK(x68k_fake_bus_error)
 		mess_ram[sp-2] = (pc & 0x000000ff);  // place PC onto the stack
 		mess_ram[sp-5] = (sr & 0xff00) >> 8;
 		mess_ram[sp-6] = (sr & 0x00ff);  // place SR onto the stack
-		cpu_set_reg(machine->cpu[0],REG_PC,addr);  // real exceptions seem to take too long to be acknowledged
+		cpu_set_reg(machine->cpu[0],REG_GENPC,addr);  // real exceptions seem to take too long to be acknowledged
 		popmessage("Expansion access [%08x]: PC jump to %08x",val,addr);
 	}
 }
@@ -1999,7 +1999,7 @@ static MACHINE_RESET( x68000 )
 	// check for disks
 	for(drive=0;drive<4;drive++)
 	{
-		if(image_exists(image_from_devtype_and_index(IO_FLOPPY,drive)))
+		if(image_exists(image_from_devtype_and_index(machine, IO_FLOPPY,drive)))
 			sys.fdc.disk_inserted[drive] = 1;
 		else
 			sys.fdc.disk_inserted[drive] = 0;
@@ -2046,7 +2046,7 @@ static MACHINE_RESET( x68000 )
 	}
 	
 	// reset CPU
-	cpu_reset(machine->cpu[0]);
+	device_reset(machine->cpu[0]);
 }
 
 static MACHINE_START( x68000 )
@@ -2130,7 +2130,7 @@ static MACHINE_DRIVER_START( x68000 )
 	MDRV_CPU_ADD("main", M68000, 10000000)  /* 10 MHz */
 	MDRV_CPU_PROGRAM_MAP(x68k_map, 0)
 	MDRV_CPU_VBLANK_INT("main", x68k_vsync_irq)
-	MDRV_INTERLEAVE(1)
+	MDRV_QUANTUM_TIME(HZ(60))
 
 	MDRV_MACHINE_START( x68000 )
 	MDRV_MACHINE_RESET( x68000 )
@@ -2140,10 +2140,9 @@ static MACHINE_DRIVER_START( x68000 )
 
 	MDRV_PPI8255_ADD( "ppi8255",  ppi_interface )
 
-	MDRV_DEVICE_ADD( "hd63450", HD63450 )
-	MDRV_DEVICE_CONFIG( dmac_interface )
+	MDRV_HD63450_ADD( "hd63450", dmac_interface )
 
-	MDRV_DEVICE_ADD( "x68k_hdc", X68KHDC )
+	MDRV_X68KHDC_ADD( "x68k_hdc" )
 
 	MDRV_SCC8530_ADD( "scc", x68000_scc8530_interface )
 

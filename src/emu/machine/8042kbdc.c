@@ -430,13 +430,6 @@ READ8_HANDLER(kbdc8042_8_r)
 
 
 
-static TIMER_CALLBACK(at_8042_receive_timer)
-{
-	at_8042_receive(machine, param);
-}
-
-
-
 WRITE8_HANDLER(kbdc8042_8_w)
 {
 	switch (offset) {
@@ -516,10 +509,7 @@ WRITE8_HANDLER(kbdc8042_8_w)
 			at_8042_receive(space->machine, PS2_MOUSE_ON ? 0x00 : 0xff);
 			break;
 		case 0xaa:	/* selftest */
-			if (space->machine->config->cpu[0].type == CPU_I486)
-				timer_set(space->machine, ATTOTIME_IN_MSEC(10), NULL, 0x55, at_8042_receive_timer); /* HACK */
-			else
-				at_8042_receive(space->machine, 0x55);
+			at_8042_receive(space->machine, 0x55);
 			break;
 		case 0xab:	/* test keyboard */
 			at_8042_receive(space->machine, KEYBOARD_ON ? 0x00 : 0xff);

@@ -81,6 +81,8 @@ TODO:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
+#include "cpu/alph8201/alph8201.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 
@@ -128,7 +130,7 @@ static WRITE8_HANDLER( irq_enable_w )
 {
 	int bit = data & 1;
 
-	cpu_interrupt_enable(0,bit);
+	cpu_interrupt_enable(space->machine->cpu[0],bit);
 	if (!bit)
 		cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 }
@@ -637,7 +639,7 @@ static MACHINE_DRIVER_START( champmcu )
 	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
 
 	/* to MCU timeout champbbj */
-	MDRV_INTERLEAVE(50)
+	MDRV_QUANTUM_TIME(HZ(3000))
 MACHINE_DRIVER_END
 
 

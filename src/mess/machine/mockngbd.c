@@ -131,7 +131,7 @@ READ8_DEVICE_HANDLER(mockingboard_r)
 
 		default:
 			if (LOG_MOCKINGBOARD)
-				logerror("mockingboard_r unmapped, offset: %02x, pc: %04x\n", offset, (unsigned) cpu_get_reg(device->machine->cpu[0], REG_PC));
+				logerror("mockingboard_r unmapped, offset: %02x, pc: %s\n", offset, cpuexec_describe_context(device->machine));
 			break;
 	}
 	return 0x00;
@@ -229,9 +229,9 @@ DEVICE_GET_INFO(mockingboard)
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(mockingboard);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "Apple II Mockingboard";			break;
-		case DEVINFO_STR_FAMILY:						info->s = "Apple II Mockingboard";			break;
-		case DEVINFO_STR_VERSION:						info->s = "1.0";							break;
-		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;							break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Apple II Mockingboard");			break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Apple II Mockingboard");			break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);							break;
 	}
 }

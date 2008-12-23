@@ -495,6 +495,9 @@
 
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
+#include "cpu/m68000/m68000.h"
+#include "cpu/hd6309/hd6309.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
 #include "machine/6522via.h"
@@ -589,13 +592,15 @@ static const via6522_interface via_interface =
 
 void itech8_update_interrupts(running_machine *machine, int periodic, int tms34061, int blitter)
 {
+	cpu_type main_cpu_type = cpu_get_type(machine->cpu[0]);
+
 	/* update the states */
 	if (periodic != -1) periodic_int = periodic;
 	if (tms34061 != -1) tms34061_int = tms34061;
 	if (blitter != -1) blitter_int = blitter;
 
 	/* handle the 6809 case */
-	if (machine->config->cpu[0].type == CPU_M6809 || machine->config->cpu[0].type == CPU_HD6309)
+	if (main_cpu_type == CPU_M6809 || main_cpu_type == CPU_HD6309)
 	{
 		/* just modify lines that have changed */
 		if (periodic != -1) cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, periodic ? ASSERT_LINE : CLEAR_LINE);
@@ -673,11 +678,13 @@ static MACHINE_START( sstrike )
 
 static MACHINE_RESET( itech8 )
 {
+	cpu_type main_cpu_type = cpu_get_type(machine->cpu[0]);
+
 	/* make sure bank 0 is selected */
-	if (machine->config->cpu[0].type == CPU_M6809 || machine->config->cpu[0].type == CPU_HD6309)
+	if (main_cpu_type == CPU_M6809 || main_cpu_type == CPU_HD6309)
 	{
 		memory_set_bankptr(machine, 1, &memory_region(machine, "main")[0x4000]);
-		cpu_reset(machine->cpu[0]);
+		device_reset(machine->cpu[0]);
 	}
 
 	/* reset the PIA (if used) */

@@ -36,6 +36,7 @@ Notes:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 #include "sound/2151intf.h"
 
@@ -812,7 +813,7 @@ static MACHINE_DRIVER_START( whizz )
 	MDRV_CPU_IO_MAP(whizz_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_INTERLEAVE(1000)
+	MDRV_QUANTUM_TIME(HZ(60000))
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)

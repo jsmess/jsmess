@@ -396,7 +396,6 @@ static WRITE8_DEVICE_HANDLER ( partner_wd17xx_data_w )
 const dma8257_interface partner_dma =
 {
 	0,
-	XTAL_16MHz / 9,
 
 	radio86_dma_read_byte,
 	partner_dma_write_byte,

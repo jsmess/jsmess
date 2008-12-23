@@ -237,7 +237,6 @@ static CDP1861_ON_EFX_CHANGED( studio2_efx_w )
 static CDP1861_INTERFACE( studio2_cdp1861_intf )
 {
 	SCREEN_TAG,
-	XTAL_3_52128MHz,
 	studio2_int_w,
 	studio2_dmao_w,
 	studio2_efx_w
@@ -272,7 +271,6 @@ static CDP1864_ON_EFX_CHANGED( mpt02_efx_w )
 static CDP1864_INTERFACE( mpt02_cdp1864_intf )
 {
 	SCREEN_TAG,
-	CDP1864_CLOCK,
 	CDP1864_INTERLACED,
 	mpt02_int_w,
 	mpt02_dmao_w,
@@ -458,8 +456,7 @@ static MACHINE_DRIVER_START( studio2 )
 	MDRV_PALETTE_INIT(black_and_white)
 	MDRV_VIDEO_UPDATE(studio2)
 
-	MDRV_DEVICE_ADD(CDP1861_TAG, CDP1861)
-	MDRV_DEVICE_CONFIG(studio2_cdp1861_intf)
+	MDRV_CDP1861_ADD(CDP1861_TAG, XTAL_3_52128MHz, studio2_cdp1861_intf)
 
 	// sound hardware
 
@@ -491,8 +488,7 @@ static MACHINE_DRIVER_START( visicom )
 	MDRV_PALETTE_INIT(black_and_white)
 	MDRV_VIDEO_UPDATE(studio2)
 
-	MDRV_DEVICE_ADD(CDP1861_TAG, CDP1861)
-	MDRV_DEVICE_CONFIG(studio2_cdp1861_intf)
+	MDRV_CDP1861_ADD(CDP1861_TAG, XTAL_3_52128MHz, studio2_cdp1861_intf)
 
 	// sound hardware
 
@@ -523,8 +519,7 @@ static MACHINE_DRIVER_START( mpt02 )
 	MDRV_PALETTE_LENGTH(8+8)
 	MDRV_VIDEO_UPDATE(mpt02)
 
-	MDRV_DEVICE_ADD(CDP1864_TAG, CDP1864)
-	MDRV_DEVICE_CONFIG(mpt02_cdp1864_intf)
+	MDRV_CDP1864_ADD(CDP1864_TAG, CDP1864_CLOCK, mpt02_cdp1864_intf)
 
 	// sound hardware
 

@@ -136,6 +136,8 @@ Stephh's notes (based on the games M68000 code and some tests) :
 ******************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
+#include "cpu/m68000/m68000.h"
 #include "sound/2610intf.h"
 #include "includes/mcatadv.h"
 
@@ -490,7 +492,7 @@ static MACHINE_DRIVER_START( mcatadv )
 	MDRV_GFXDECODE(mcatadv)
 	MDRV_PALETTE_LENGTH(0x2000/2)
 
-	MDRV_WATCHDOG_TIME_INIT(UINT64_ATTOTIME_IN_SEC(3))	/* a guess, and certainly wrong */
+	MDRV_WATCHDOG_TIME_INIT(SEC(3))	/* a guess, and certainly wrong */
 
 	MDRV_VIDEO_START(mcatadv)
 	MDRV_VIDEO_EOF(mcatadv) // Buffer Spriteram

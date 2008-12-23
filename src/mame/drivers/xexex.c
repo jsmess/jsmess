@@ -62,6 +62,7 @@ Unresolved Issues:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "deprecat.h"
 #include "video/konamiic.h"
 #include "cpu/z80/z80.h"
@@ -463,7 +464,7 @@ static MACHINE_DRIVER_START( xexex )
 	MDRV_CPU_ADD("audio", Z80, 8000000)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
-	MDRV_INTERLEAVE(32)
+	MDRV_QUANTUM_TIME(HZ(1920))
 
 	MDRV_MACHINE_START(xexex)
 	MDRV_MACHINE_RESET(xexex)

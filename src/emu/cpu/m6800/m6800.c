@@ -1287,7 +1287,7 @@ static CPU_INIT( m6801 )
 	cpustate->data = cpu_get_address_space(device, ADDRESS_SPACE_DATA);
 	cpustate->io = cpu_get_address_space(device, ADDRESS_SPACE_IO);
 
-	cpustate->clock = clock;
+	cpustate->clock = device->clock / 4;
 	cpustate->m6800_rx_timer = timer_alloc(device->machine, m6800_rx_tick, cpustate);
 	cpustate->m6800_tx_timer = timer_alloc(device->machine, m6800_tx_tick, cpustate);
 
@@ -1333,7 +1333,7 @@ static CPU_INIT( m6803 )
 	cpustate->data = cpu_get_address_space(device, ADDRESS_SPACE_DATA);
 	cpustate->io = cpu_get_address_space(device, ADDRESS_SPACE_IO);
 
-	cpustate->clock = clock;
+	cpustate->clock = device->clock / 4;
 	cpustate->m6800_rx_timer = timer_alloc(device->machine, m6800_rx_tick, cpustate);
 	cpustate->m6800_tx_timer = timer_alloc(device->machine, m6800_tx_tick, cpustate);
 
@@ -1695,7 +1695,7 @@ static CPU_INIT( hd63701 )
 	cpustate->data = cpu_get_address_space(device, ADDRESS_SPACE_DATA);
 	cpustate->io = cpu_get_address_space(device, ADDRESS_SPACE_IO);
 
-	cpustate->clock = clock;
+	cpustate->clock = device->clock / 4;
 	cpustate->m6800_rx_timer = timer_alloc(device->machine, m6800_rx_tick, cpustate);
 	cpustate->m6800_tx_timer = timer_alloc(device->machine, m6800_tx_tick, cpustate);
 
@@ -2693,15 +2693,15 @@ CPU_GET_INFO( m6800 )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 12;							break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 9;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 8;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 16;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 9;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE + M6800_IRQ_LINE:	info->i = cpustate->irq_state[M6800_IRQ_LINE]; break;
 		case CPUINFO_INT_INPUT_STATE + M6800_TIN_LINE:	info->i = cpustate->irq_state[M6800_TIN_LINE]; break;
@@ -2720,13 +2720,13 @@ CPU_GET_INFO( m6800 )
 		case CPUINFO_INT_REGISTER + M6800_WAI_STATE:	info->i = cpustate->wai_state;				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(m6800);			break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m6800);				break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(m6800);				break;
-		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(m6800);				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(m6800);			break;
-		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m6800);			break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(m6800);			break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(m6800);				break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(m6800);				break;
+		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(m6800);				break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(m6800);			break;
+		case CPUINFO_FCT_BURN:							info->burn = NULL;						break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m6800);			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -2770,13 +2770,13 @@ CPU_GET_INFO( m6801 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case CPUINFO_INT_CLOCK_DIVIDER:							info->i = 4;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 9;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 8;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 9;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m6801);				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(m6803);			break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m6801);			break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(m6801);				break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(m6803);			break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m6801);			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "M6801");				break;
@@ -2800,8 +2800,8 @@ CPU_GET_INFO( m6802 )
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 4;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m6802);				break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m6802);			break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(m6802);				break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m6802);			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "M6802");				break;
@@ -2823,15 +2823,15 @@ CPU_GET_INFO( m6803 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case CPUINFO_INT_CLOCK_DIVIDER:							info->i = 4;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 9;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 8;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 9;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m6803);				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(m6803);			break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m6803);			break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(m6803);				break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(m6803);			break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m6803);			break;
 
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map8 = ADDRESS_MAP_NAME(m6803_mem); break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM: info->internal_map8 = ADDRESS_MAP_NAME(m6803_mem); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "M6803");				break;
@@ -2855,8 +2855,8 @@ CPU_GET_INFO( m6808 )
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 4;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m6808);				break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m6808);			break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(m6808);				break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m6808);			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "M6808");				break;
@@ -2878,13 +2878,13 @@ CPU_GET_INFO( hd63701 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case CPUINFO_INT_CLOCK_DIVIDER:							info->i = 4;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 9;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 8;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 9;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(hd63701);				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(hd63701);		break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(hd63701);		break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(hd63701);				break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(hd63701);		break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(hd63701);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "HD63701");				break;
@@ -2908,9 +2908,9 @@ CPU_GET_INFO( nsc8105 )
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 4;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(nsc8105);				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(nsc8105);		break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(nsc8105);		break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(nsc8105);				break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(nsc8105);		break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(nsc8105);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "NSC8105");				break;

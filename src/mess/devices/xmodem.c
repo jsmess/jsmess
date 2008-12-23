@@ -352,12 +352,12 @@ DEVICE_GET_INFO( xmodem )
 	case DEVINFO_FCT_IMAGE_LOAD:		    info->f = (genf *) DEVICE_IMAGE_LOAD_NAME( xmodem );     break;
 	case DEVINFO_FCT_IMAGE_UNLOAD:		    info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME( xmodem );   break;
 	case DEVINFO_FCT_IMAGE_CREATE:		    info->f = (genf *) DEVICE_IMAGE_CREATE_NAME( xmodem );   break;
-	case DEVINFO_STR_IMAGE_BRIEF_INSTANCE_NAME: info->s = "x";	                                     break;
+	case DEVINFO_STR_IMAGE_BRIEF_INSTANCE_NAME: strcpy(info->s, "x");	                                     break;
 	case DEVINFO_STR_IMAGE_INSTANCE_NAME:
-	case DEVINFO_STR_NAME:		            info->s = "xmodem";	                                     break;
-	case DEVINFO_STR_FAMILY:                    info->s = "serial protocol";	                     break;
-	case DEVINFO_STR_SOURCE_FILE:		    info->s = __FILE__;                                      break;
-	case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	    info->s = "";                                            break;
+	case DEVINFO_STR_NAME:		            strcpy(info->s, "xmodem");	                                     break;
+	case DEVINFO_STR_FAMILY:                    strcpy(info->s, "serial protocol");	                     break;
+	case DEVINFO_STR_SOURCE_FILE:		    strcpy(info->s, __FILE__);                                      break;
+	case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	    strcpy(info->s, "");                                            break;
 	}
 }
 

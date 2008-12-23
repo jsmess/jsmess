@@ -94,6 +94,7 @@ Part list of Goldstar 3DO Interactive Multiplayer
 #include "driver.h"
 #include "includes/3do.h"
 #include "devices/chd_cd.h"
+#include "cpu/arm7/arm7.h"
 
 
 /* The 3DO has an ARM6 core which is a bit different from the current

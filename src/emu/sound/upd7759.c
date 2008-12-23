@@ -148,6 +148,7 @@ enum
 
 struct upd7759_chip
 {
+	const device_config *device;
 	sound_stream *channel;					/* stream channel for playback */
 
 	/* internal clock to output sample rate mapping */
@@ -161,7 +162,7 @@ struct upd7759_chip
 	UINT8		reset;						/* current state of the RESET line */
 	UINT8		start;						/* current state of the START line */
 	UINT8		drq;						/* current state of the DRQ line */
-	void (*drqcallback)(int param);			/* drq callback */
+	void (*drqcallback)(const device_config *device, int param);			/* drq callback */
 
 	/* internal state machine */
 	INT8		state;						/* current overall chip state */
@@ -459,14 +460,14 @@ static void advance_state(struct upd7759_chip *chip)
 
 *************************************************************/
 
-static void upd7759_update(void *param, stream_sample_t **inputs, stream_sample_t **_buffer, int samples)
+static STREAM_UPDATE( upd7759_update )
 {
 	struct upd7759_chip *chip = param;
 	INT32 clocks_left = chip->clocks_left;
 	INT16 sample = chip->sample;
 	UINT32 step = chip->step;
 	UINT32 pos = chip->pos;
-	stream_sample_t *buffer = _buffer[0];
+	stream_sample_t *buffer = outputs[0];
 
 	/* loop until done */
 	if (chip->state != STATE_IDLE)
@@ -536,7 +537,7 @@ static TIMER_CALLBACK( upd7759_slave_update )
 	/* if the DRQ changed, update it */
 	logerror("slave_update: DRQ %d->%d\n", olddrq, chip->drq);
 	if (olddrq != chip->drq && chip->drqcallback)
-		(*chip->drqcallback)(chip->drq);
+		(*chip->drqcallback)(chip->device, chip->drq);
 
 	/* set a timer to go off when that is done */
 	if (chip->state != STATE_IDLE)
@@ -633,6 +634,8 @@ static SND_START( upd7759 )
 
 	chip = auto_malloc(sizeof(*chip));
 	memset(chip, 0, sizeof(*chip));
+
+	chip->device = device;
 
 	/* allocate a stream channel */
 	chip->channel = stream_create(device, 0, 1, clock/4, chip, upd7759_update);
@@ -791,17 +794,17 @@ SND_GET_INFO( upd7759 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( upd7759 );		break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( upd7759 );			break;
-		case SNDINFO_PTR_STOP:							/* Nothing */							break;
-		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( upd7759 );							break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( upd7759 );	break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( upd7759 );		break;
+		case SNDINFO_PTR_STOP:							/* Nothing */									break;
+		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( upd7759 );		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							info->s = "UPD7759";					break;
-		case SNDINFO_STR_CORE_FAMILY:					info->s = "NEC ADPCM";					break;
-		case SNDINFO_STR_CORE_VERSION:					info->s = "1.0";						break;
-		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
-		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "UPD7759");						break;
+		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "NEC ADPCM");					break;
+		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");							break;
+		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
+		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

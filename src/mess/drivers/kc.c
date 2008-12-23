@@ -318,8 +318,6 @@ static const z80_daisy_chain kc85_daisy_chain[] =
 
 static const z80ctc_interface kc85_disc_ctc_intf =
 {
-	"main",			/* cpu */
-	0,				/* timer clock */
 	0,				/* timer disablers */
 	NULL,			/* interrupt callback */
 	NULL,			/* ZC/TO0 callback */
@@ -347,7 +345,7 @@ static MACHINE_DRIVER_START( cpu_kc_disc )
 	MDRV_CPU_PROGRAM_MAP(kc85_disc_hw_mem, 0)
 	MDRV_CPU_IO_MAP(kc85_disc_hw_io, 0)
 
-	MDRV_Z80CTC_ADD( "z80ctc_1", kc85_disc_ctc_intf )
+	MDRV_Z80CTC_ADD( "z80ctc_1", 0, kc85_disc_ctc_intf )
 	
 	MDRV_NEC765A_ADD("nec765", kc_fdc_interface)
 MACHINE_DRIVER_END
@@ -360,12 +358,12 @@ static MACHINE_DRIVER_START( kc85_3 )
 	MDRV_CPU_PROGRAM_MAP(kc85_3_mem, 0)
 	MDRV_CPU_IO_MAP(kc85_3_io, 0)
 	MDRV_CPU_CONFIG(kc85_daisy_chain)
-	MDRV_INTERLEAVE(1)
+	MDRV_QUANTUM_TIME(HZ(60))
 
 	MDRV_MACHINE_RESET( kc85_3 )
 
 	MDRV_Z80PIO_ADD( "z80pio", kc85_pio_intf )
-	MDRV_Z80CTC_ADD( "z80ctc", kc85_ctc_intf )
+	MDRV_Z80CTC_ADD( "z80ctc", 1379310.344828, kc85_ctc_intf )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -410,7 +408,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( kc85_4d )
 	MDRV_IMPORT_FROM( kc85_4 )
 	MDRV_IMPORT_FROM( cpu_kc_disc )
-	MDRV_INTERLEAVE( 2 )
+	MDRV_QUANTUM_TIME(HZ(120))
 	MDRV_MACHINE_RESET( kc85_4d )
 MACHINE_DRIVER_END
 

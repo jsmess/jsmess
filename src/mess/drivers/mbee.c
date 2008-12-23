@@ -554,7 +554,7 @@ static Z80BIN_EXECUTE( mbee )
 	if (autorun)
 	{
 		memory_write_word_16le(space, 0xa2, execute_address);		/* fix warm-start vector to get around some copy-protections */
-		cpu_set_reg(cpu, REG_PC, execute_address);
+		cpu_set_reg(cpu, REG_GENPC, execute_address);
 	}
 	else
 	{
@@ -587,7 +587,7 @@ static QUICKLOAD_LOAD( mbee )
 		if (sw)
 		{
 			memory_write_word_16le(space, 0xa2,0x801e);	/* fix warm-start vector to get around some copy-protections */
-			cpu_set_reg(cpu, REG_PC, 0x801e);
+			cpu_set_reg(cpu, REG_GENPC, 0x801e);
 		}
 		else
 			memory_write_word_16le(space, 0xa2,0x8517);
@@ -607,7 +607,7 @@ static QUICKLOAD_LOAD( mbee )
 				return INIT_FAIL;
 		}
 
-		if (sw) cpu_set_reg(cpu, REG_PC, 0x100);
+		if (sw) cpu_set_reg(cpu, REG_GENPC, 0x100);
 	}
 
 	return INIT_PASS;

@@ -987,7 +987,7 @@ static void upd7810_sio_output(upd7810_state *cpustate)
 	{
 		TXD = cpustate->txs & 1;
 		if (cpustate->config.io_callback)
-			(*cpustate->config.io_callback)(UPD7810_TXD,TXD);
+			(*cpustate->config.io_callback)(cpustate->device,UPD7810_TXD,TXD);
 		cpustate->txs >>= 1;
 		cpustate->txcnt--;
 		if (0 == cpustate->txcnt)
@@ -1086,7 +1086,7 @@ static void upd7810_sio_input(upd7810_state *cpustate)
 	if (cpustate->rxcnt > 0)
 	{
 		if (cpustate->config.io_callback)
-			RXD = (*cpustate->config.io_callback)(UPD7810_RXD,RXD);
+			RXD = (*cpustate->config.io_callback)(cpustate->device,UPD7810_RXD,RXD);
 		cpustate->rxs = (cpustate->rxs >> 1) | ((UINT16)RXD << 15);
 		cpustate->rxcnt--;
 		if (0 == cpustate->rxcnt)
@@ -1288,7 +1288,7 @@ static void upd7810_timers(upd7810_state *cpustate, int cycles)
 					{
 						TO ^= 1;
 						if (cpustate->config.io_callback)
-							(*cpustate->config.io_callback)(UPD7810_TO,TO);
+							(*cpustate->config.io_callback)(cpustate->device,UPD7810_TO,TO);
 					}
 					/* timer 1 chained with timer 0 ? */
 					if ((TMM & 0xe0) == 0x60)
@@ -1303,7 +1303,7 @@ static void upd7810_timers(upd7810_state *cpustate, int cycles)
 							{
 								TO ^= 1;
 								if (cpustate->config.io_callback)
-									(*cpustate->config.io_callback)(UPD7810_TO,TO);
+									(*cpustate->config.io_callback)(cpustate->device,UPD7810_TO,TO);
 							}
 						}
 					}
@@ -1325,7 +1325,7 @@ static void upd7810_timers(upd7810_state *cpustate, int cycles)
 					{
 						TO ^= 1;
 						if (cpustate->config.io_callback)
-							(*cpustate->config.io_callback)(UPD7810_TO,TO);
+							(*cpustate->config.io_callback)(cpustate->device,UPD7810_TO,TO);
 					}
 					/* timer 1 chained with timer 0 ? */
 					if ((TMM & 0xe0) == 0x60)
@@ -1340,7 +1340,7 @@ static void upd7810_timers(upd7810_state *cpustate, int cycles)
 							{
 								TO ^= 1;
 								if (cpustate->config.io_callback)
-									(*cpustate->config.io_callback)(UPD7810_TO,TO);
+									(*cpustate->config.io_callback)(cpustate->device,UPD7810_TO,TO);
 							}
 						}
 					}
@@ -1376,7 +1376,7 @@ static void upd7810_timers(upd7810_state *cpustate, int cycles)
 					{
 						TO ^= 1;
 						if (cpustate->config.io_callback)
-							(*cpustate->config.io_callback)(UPD7810_TO,TO);
+							(*cpustate->config.io_callback)(cpustate->device,UPD7810_TO,TO);
 					}
 				}
 			}
@@ -1396,7 +1396,7 @@ static void upd7810_timers(upd7810_state *cpustate, int cycles)
 					{
 						TO ^= 1;
 						if (cpustate->config.io_callback)
-							(*cpustate->config.io_callback)(UPD7810_TO,TO);
+							(*cpustate->config.io_callback)(cpustate->device,UPD7810_TO,TO);
 					}
 				}
 			}
@@ -1417,7 +1417,7 @@ static void upd7810_timers(upd7810_state *cpustate, int cycles)
 		{
 			TO ^= 1;
 			if (cpustate->config.io_callback)
-				(*cpustate->config.io_callback)(UPD7810_TO,TO);
+				(*cpustate->config.io_callback)(cpustate->device,UPD7810_TO,TO);
 			OVCF -= 3;
 		}
 	}
@@ -1609,7 +1609,7 @@ static void upd78c05_timers(upd7810_state *cpustate, int cycles)
 			if (0x00 == (TMM & 0x03)) {
 				TO ^= 1;
 				if (cpustate->config.io_callback)
-					(*cpustate->config.io_callback)(UPD7810_TO,TO);
+					(*cpustate->config.io_callback)(cpustate->device,UPD7810_TO,TO);
 			}
 
 			while ( cpustate->ovc0 <= 0 ) {
@@ -2016,15 +2016,15 @@ CPU_GET_INFO( upd7810 )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 40;							break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 8;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 16;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 8;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 8;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	info->i = (IRR & INTNMI) ? ASSERT_LINE : CLEAR_LINE; break;
 		case CPUINFO_INT_INPUT_STATE + UPD7810_INTF1:	info->i = (IRR & INTF1) ? ASSERT_LINE : CLEAR_LINE; break;
@@ -2087,13 +2087,13 @@ CPU_GET_INFO( upd7810 )
 		case CPUINFO_INT_REGISTER + UPD7810_CO1:		info->i = CO1;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(upd7810);		break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(upd7810);				break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(upd7810);			break;
-		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(upd7810);				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(upd7810);		break;
-		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(upd7810);		break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(upd7810);		break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(upd7810);				break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(upd7810);			break;
+		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(upd7810);				break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(upd7810);		break;
+		case CPUINFO_FCT_BURN:							info->burn = NULL;						break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(upd7810);		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -2178,8 +2178,8 @@ CPU_GET_INFO( upd7807 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(upd7807);			break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(upd7807);		break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(upd7807);			break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(upd7807);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "uPD7807");				break;
@@ -2190,8 +2190,8 @@ CPU_GET_INFO( upd7807 )
 
 CPU_GET_INFO( upd7801 ) {
 	switch( state ) {
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(upd7801);			break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(upd7801);		break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(upd7801);			break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(upd7801);		break;
 
 		case CPUINFO_STR_NAME:							strcpy(info->s, "uPD7801");				break;
 
@@ -2203,8 +2203,8 @@ CPU_GET_INFO( upd78c05 ) {
 	switch ( state ) {
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 4;							break;
 
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(upd78c05);			break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(upd78c05);		break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(upd78c05);			break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(upd78c05);		break;
 
 		case CPUINFO_STR_NAME:							strcpy(info->s, "uPD78C05");			break;
 
@@ -2248,7 +2248,7 @@ CPU_GET_INFO( upd78c05 ) {
 
 CPU_GET_INFO( upd78c06 ) {
 	switch ( state ) {
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(upd78c06);			break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(upd78c06);			break;
 
 		case CPUINFO_STR_NAME:							strcpy(info->s, "uPD78C06");			break;
 

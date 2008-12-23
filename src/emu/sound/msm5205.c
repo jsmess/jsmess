@@ -90,23 +90,23 @@ static void ComputeTables (struct MSM5205Voice *voice)
 }
 
 /* stream update callbacks */
-static void MSM5205_update(void *param,stream_sample_t **inputs, stream_sample_t **_buffer,int length)
+static STREAM_UPDATE( MSM5205_update )
 {
 	struct MSM5205Voice *voice = param;
-	stream_sample_t *buffer = _buffer[0];
+	stream_sample_t *buffer = outputs[0];
 
 	/* if this voice is active */
 	if(voice->signal)
 	{
 		short val = voice->signal * 16;
-		while (length)
+		while (samples)
 		{
 			*buffer++ = val;
-			length--;
+			samples--;
 		}
 	}
 	else
-		memset (buffer,0,length*sizeof(*buffer));
+		memset (buffer,0,samples*sizeof(*buffer));
 }
 
 /* timer callback at VCLK low eddge */
@@ -318,17 +318,17 @@ SND_GET_INFO( msm5205 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( msm5205 );		break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( msm5205 );break;
-		case SNDINFO_PTR_STOP:							/* nothing */							break;
-		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( msm5205 );break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( msm5205 );	break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( msm5205 );		break;
+		case SNDINFO_PTR_STOP:							/* nothing */									break;
+		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( msm5205 );		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							info->s = "MSM5205";					break;
-		case SNDINFO_STR_CORE_FAMILY:					info->s = "ADPCM";						break;
-		case SNDINFO_STR_CORE_VERSION:					info->s = "1.0";						break;
-		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
-		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "MSM5205");						break;
+		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "ADPCM");						break;
+		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");							break;
+		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
+		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

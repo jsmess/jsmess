@@ -320,7 +320,7 @@ static MACHINE_DRIVER_START( ssystem3 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M6502, 1000000)
 	MDRV_CPU_PROGRAM_MAP(ssystem3_map, 0)
-	MDRV_INTERLEAVE(1)
+	MDRV_QUANTUM_TIME(HZ(60))
 
     /* video hardware */
 	MDRV_SCREEN_ADD("main", LCD)

@@ -560,10 +560,10 @@ DEVICE_GET_INFO( tc8521 )
 		case DEVINFO_FCT_RESET:							/* Nothing */								break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "Toshiba 8521 RTC";				break;
-		case DEVINFO_STR_FAMILY:						info->s = "Toshiba 8521 RTC";				break;
-		case DEVINFO_STR_VERSION:						info->s = "1.0";							break;
-		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;							break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Toshiba 8521 RTC");		break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Toshiba 8521 RTC");		break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");						break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);					break;
 		case DEVINFO_STR_CREDITS:						/* Nothing */								break;
 	}
 }

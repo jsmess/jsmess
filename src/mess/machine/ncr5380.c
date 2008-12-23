@@ -372,7 +372,7 @@ void ncr5380_init( running_machine *machine, const struct NCR5380interface *inte
 	// try to open the devices
 	for (i = 0; i < interface->scsidevs->devs_present; i++)
 	{
-		SCSIAllocInstance( interface->scsidevs->devices[i].scsiClass, &devices[interface->scsidevs->devices[i].scsiID], interface->scsidevs->devices[i].diskregion );
+		SCSIAllocInstance( machine, interface->scsidevs->devices[i].scsiClass, &devices[interface->scsidevs->devices[i].scsiID], interface->scsidevs->devices[i].diskregion );
 	}
 
 	state_save_register_item_array(machine, "ncr5380", NULL, 0, n5380_Registers);
@@ -472,11 +472,11 @@ DEVICE_GET_INFO( ncr5380 ) {
 		case DEVINFO_FCT_RESET:				info->reset = DEVICE_RESET_NAME(ncr5380);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:				info->s = "NCR 5380";		   		break;
-		case DEVINFO_STR_FAMILY:			info->s = "NCR53xx";		   		break;
-		case DEVINFO_STR_VERSION:			info->s = "1.1";		   		break;
-		case DEVINFO_STR_SOURCE_FILE:			info->s = __FILE__;		   		break;
-		case DEVINFO_STR_CREDITS:			info->s = "Copyright the MAME and MESS Teams"; break;
+		case DEVINFO_STR_NAME:				strcpy(info->s, "NCR 5380");		   		break;
+		case DEVINFO_STR_FAMILY:			strcpy(info->s, "NCR53xx");		   		break;
+		case DEVINFO_STR_VERSION:			strcpy(info->s, "1.1");		   		break;
+		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);		   		break;
+		case DEVINFO_STR_CREDITS:			strcpy(info->s, "Copyright the MAME and MESS Teams"); break;
 	}
 }
 #endif

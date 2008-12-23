@@ -359,7 +359,7 @@ static void ti99_install_tracktranslate_procs(void)
 
 	for (id=0; id<MAX_FLOPPIES; id++)
 	{
-		image = image_from_devtype_and_index(IO_FLOPPY, id);
+		image = image_from_devtype_and_index(machine, IO_FLOPPY, id);
 		floppy_install_tracktranslate_proc(image, ti99_tracktranslate);
 	}
 }

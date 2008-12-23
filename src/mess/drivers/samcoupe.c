@@ -536,7 +536,7 @@ static MACHINE_DRIVER_START( samcoupe )
 
 	/* devices */
 	MDRV_DRIVER_DATA(coupe_asic)
-	MDRV_DEVICE_ADD("sambus_clock", MSM6242)
+	MDRV_MSM6242_ADD("sambus_clock")
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

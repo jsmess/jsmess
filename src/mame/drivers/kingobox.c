@@ -16,6 +16,7 @@ Main CPU:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 
@@ -559,7 +560,7 @@ static MACHINE_DRIVER_START( kingofb )
 	MDRV_CPU_IO_MAP(sound_io_map,0)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 6000)	/* Hz */
 
-	MDRV_INTERLEAVE(100) /* We really need heavy synching among the processors */
+	MDRV_QUANTUM_TIME(HZ(6000)) /* We really need heavy synching among the processors */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -609,7 +610,7 @@ static MACHINE_DRIVER_START( ringking )
 	MDRV_CPU_IO_MAP(rk_sound_io_map,0)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 6000)	/* Hz */
 
-	MDRV_INTERLEAVE(100) /* We really need heavy synching among the processors */
+	MDRV_QUANTUM_TIME(HZ(6000)) /* We really need heavy synching among the processors */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

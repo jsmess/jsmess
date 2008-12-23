@@ -828,10 +828,10 @@ static void pc8801_init_5fd(running_machine *machine)
 	else
 		cpu_resume(machine->cpu[1], SUSPEND_REASON_DISABLE);
 	cpu_set_input_line_vector(machine->cpu[1],0,0);
-	floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, 0), 1);
-	floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, 1), 1);
-	floppy_drive_set_ready_state(image_from_devtype_and_index(IO_FLOPPY, 0), 1,0);
-	floppy_drive_set_ready_state(image_from_devtype_and_index(IO_FLOPPY, 1), 1,0);
+	floppy_drive_set_motor_state(image_from_devtype_and_index(machine, IO_FLOPPY, 0), 1);
+	floppy_drive_set_motor_state(image_from_devtype_and_index(machine, IO_FLOPPY, 1), 1);
+	floppy_drive_set_ready_state(image_from_devtype_and_index(machine, IO_FLOPPY, 0), 1,0);
+	floppy_drive_set_ready_state(image_from_devtype_and_index(machine, IO_FLOPPY, 1), 1,0);
 }
 
 /*

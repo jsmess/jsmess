@@ -86,11 +86,11 @@ UINT8 get_sam_maptype(const device_config *device);
 ***************************************************************************/
 
 #define MDRV_SAM6883_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, SAM6883) \
+	MDRV_DEVICE_ADD(_tag, SAM6883, 0) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
 #define MDRV_SAM6883_GIME_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, SAM6883_GIME) \
+	MDRV_DEVICE_ADD(_tag, SAM6883_GIME, 0) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
 

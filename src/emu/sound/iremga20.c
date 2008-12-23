@@ -55,7 +55,7 @@ struct IremGA20_chip_def
 	struct IremGA20_channel_def channel[4];
 };
 
-static void IremGA20_update( void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length )
+static STREAM_UPDATE( IremGA20_update )
 {
 	struct IremGA20_chip_def *chip = param;
 	UINT32 rate[4], pos[4], frac[4], end[4], vol[4], play[4];
@@ -74,12 +74,12 @@ static void IremGA20_update( void *param, stream_sample_t **inputs, stream_sampl
 		play[i] = chip->channel[i].play;
 	}
 
-	i = length;
+	i = samples;
 	pSamples = chip->rom;
-	outL = buffer[0];
-	outR = buffer[1];
+	outL = outputs[0];
+	outR = outputs[1];
 
-	for (i = 0; i < length; i++)
+	for (i = 0; i < samples; i++)
 	{
 		sampleout = 0;
 
@@ -288,17 +288,17 @@ SND_GET_INFO( iremga20 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( iremga20 );		break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( iremga20 );			break;
-		case SNDINFO_PTR_STOP:							/* nothing */							break;
-		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( iremga20 );			break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( iremga20 );	break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( iremga20 );		break;
+		case SNDINFO_PTR_STOP:							/* nothing */									break;
+		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( iremga20 );		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							info->s = "Irem GA20";					break;
-		case SNDINFO_STR_CORE_FAMILY:					info->s = "Irem custom";				break;
-		case SNDINFO_STR_CORE_VERSION:					info->s = "1.0";						break;
-		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
-		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "Irem GA20");					break;
+		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Irem custom");					break;
+		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");							break;
+		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
+		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

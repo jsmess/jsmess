@@ -235,8 +235,8 @@ const nec765_interface kc_fdc_interface=
 
 static TIMER_CALLBACK(kc85_disk_reset_timer_callback)
 {
-	cpu_set_reg(machine->cpu[1], REG_PC, 0x0f000);
-	cpu_set_reg(machine->cpu[0], REG_PC, 0x0f000);
+	cpu_set_reg(machine->cpu[1], REG_GENPC, 0x0f000);
+	cpu_set_reg(machine->cpu[0], REG_GENPC, 0x0f000);
 }
 
 static void kc_disc_interface_init(running_machine *machine)
@@ -1680,7 +1680,7 @@ static DIRECT_UPDATE_HANDLER( kc85_3_opbaseoverride )
 
 	kc85_3_update_0x00000(machine);
 
-	return (cpunum_get_reg(0, REG_PC) & 0x0ffff);
+	return (cpunum_get_reg(0, REG_GENPC) & 0x0ffff);
 }
 
 
@@ -1690,14 +1690,14 @@ static DIRECT_UPDATE_HANDLER( kc85_4_opbaseoverride )
 
 	kc85_4_update_0x00000(machine);
 
-	return (cpunum_get_reg(0, REG_PC) & 0x0ffff);
+	return (cpunum_get_reg(0, REG_GENPC) & 0x0ffff);
 }
 #endif
 
 
 static TIMER_CALLBACK(kc85_reset_timer_callback)
 {
-	cpu_set_reg(machine->cpu[0], REG_PC, 0x0f000);
+	cpu_set_reg(machine->cpu[0], REG_GENPC, 0x0f000);
 }
 
  READ8_HANDLER ( kc85_pio_data_r )
@@ -1836,8 +1836,6 @@ static WRITE8_DEVICE_HANDLER(kc85_zc2_callback)
 
 const z80ctc_interface	kc85_ctc_intf =
 {
-	"main",
-	1379310.344828,
 	0,
     kc85_ctc_interrupt,
 	kc85_zc0_callback,

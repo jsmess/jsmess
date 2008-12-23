@@ -120,7 +120,7 @@ void pc_fdc_init(running_machine *machine, const struct pc_fdc_interface *iface)
 
 	for (i = 0; i < device_count(machine, IO_FLOPPY); i++)
 	{
-		img = image_from_devtype_and_index(IO_FLOPPY, i);
+		img = image_from_devtype_and_index(machine, IO_FLOPPY, i);
 		floppy_drive_set_geometry(img, FLOPPY_DRIVE_DS_80);
 	}
 }
@@ -134,11 +134,11 @@ static NEC765_GET_IMAGE ( pc_fdc_get_image )
 	if (!fdc->fdc_interface.get_image)
 	{
 		if (floppy_index < device_count(device->machine, IO_FLOPPY))
-			image = image_from_devtype_and_index(IO_FLOPPY, floppy_index);
+			image = image_from_devtype_and_index(device->machine, IO_FLOPPY, floppy_index);
 	}
 	else
 	{
-		image = fdc->fdc_interface.get_image(floppy_index);
+		image = fdc->fdc_interface.get_image(device->machine, floppy_index);
 	}
 	return image;
 }
@@ -259,7 +259,7 @@ static void pc_fdc_dor_w(running_machine *machine, UINT8 data)
 	floppy_count = device_count(machine, IO_FLOPPY);
 
 	if (floppy_count > (fdc->digital_output_register & 0x03))
-		floppy_drive_set_ready_state(image_from_devtype_and_index(IO_FLOPPY, fdc->digital_output_register & 0x03), 1, 0);
+		floppy_drive_set_ready_state(image_from_devtype_and_index(machine, IO_FLOPPY, fdc->digital_output_register & 0x03), 1, 0);
 
 	fdc->digital_output_register = data;
 
@@ -267,18 +267,18 @@ static void pc_fdc_dor_w(running_machine *machine, UINT8 data)
 
 	/* set floppy drive motor state */
 	if (floppy_count > 0)
-		floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, 0),	(data>>4) & 0x0f);
+		floppy_drive_set_motor_state(image_from_devtype_and_index(machine, IO_FLOPPY, 0),	(data>>4) & 0x0f);
 	if (floppy_count > 1)
-		floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, 1),	(data>>5) & 0x01);
+		floppy_drive_set_motor_state(image_from_devtype_and_index(machine, IO_FLOPPY, 1),	(data>>5) & 0x01);
 	if (floppy_count > 2)
-		floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, 2),	(data>>6) & 0x01);
+		floppy_drive_set_motor_state(image_from_devtype_and_index(machine, IO_FLOPPY, 2),	(data>>6) & 0x01);
 	if (floppy_count > 3)
-		floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, 3),	(data>>7) & 0x01);
+		floppy_drive_set_motor_state(image_from_devtype_and_index(machine, IO_FLOPPY, 3),	(data>>7) & 0x01);
 
 	if ((data>>4) & (1<<selected_drive))
 	{
 		if (floppy_count > selected_drive)
-			floppy_drive_set_ready_state(image_from_devtype_and_index(IO_FLOPPY, selected_drive), 1, 0);
+			floppy_drive_set_ready_state(image_from_devtype_and_index(machine, IO_FLOPPY, selected_drive), 1, 0);
 	}
 
 	/* changing the DMA enable bit, will affect the terminal count state
@@ -364,12 +364,12 @@ static void pcjr_fdc_dor_w(running_machine *machine, UINT8 data)
 
 	/* set floppy drive motor state */
 	if (floppy_count > 0)
-		floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, 0), data & 0x01);
+		floppy_drive_set_motor_state(image_from_devtype_and_index(machine, IO_FLOPPY, 0), data & 0x01);
 
 	if ( data & 0x01 )
 	{
 		if ( floppy_count )
-			floppy_drive_set_ready_state(image_from_devtype_and_index(IO_FLOPPY, 0), 1, 0);
+			floppy_drive_set_ready_state(image_from_devtype_and_index(machine, IO_FLOPPY, 0), 1, 0);
 	}
 
 	/* Is the watchdog timer disabled */
@@ -453,7 +453,7 @@ READ8_HANDLER ( pc_fdc_r )
     }
 
 	if (LOG_FDC)
-		logerror("pc_fdc_r(): pc=0x%08x offset=%d result=0x%02X\n", (unsigned) cpu_get_reg(space->machine->cpu[0],REG_PC), offset, data);
+		logerror("pc_fdc_r(): pc=0x%08x offset=%d result=0x%02X\n", (unsigned) cpu_get_reg(space->machine->cpu[0],REG_GENPC), offset, data);
 	return data;
 }
 
@@ -462,7 +462,7 @@ READ8_HANDLER ( pc_fdc_r )
 WRITE8_HANDLER ( pc_fdc_w )
 {
 	if (LOG_FDC)
-		logerror("pc_fdc_w(): pc=0x%08x offset=%d data=0x%02X\n", (unsigned) cpu_get_reg(space->machine->cpu[0],REG_PC), offset, data);
+		logerror("pc_fdc_w(): pc=0x%08x offset=%d data=0x%02X\n", (unsigned) cpu_get_reg(space->machine->cpu[0],REG_GENPC), offset, data);
 
 	switch(offset)
 	{
@@ -501,7 +501,7 @@ WRITE8_HANDLER ( pc_fdc_w )
 WRITE8_HANDLER ( pcjr_fdc_w )
 {
 	if (LOG_FDC)
-		logerror("pcjr_fdc_w(): pc=0x%08x offset=%d data=0x%02X\n", (unsigned) cpu_get_reg(space->machine->cpu[0],REG_PC), offset, data);
+		logerror("pcjr_fdc_w(): pc=0x%08x offset=%d data=0x%02X\n", (unsigned) cpu_get_reg(space->machine->cpu[0],REG_GENPC), offset, data);
 
 	switch(offset)
 	{

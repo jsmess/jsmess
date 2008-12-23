@@ -55,7 +55,7 @@ READ16_DEVICE_HANDLER( ttl74145_r );
 ***************************************************************************/
 
 #define MDRV_TTL74145_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, TTL74145) \
+	MDRV_DEVICE_ADD(_tag, TTL74145, 0) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
 

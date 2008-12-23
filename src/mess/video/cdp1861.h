@@ -59,12 +59,15 @@ typedef void (*cdp1861_on_efx_changed_func) (const device_config *device, int le
 
 #define CDP1861		DEVICE_GET_INFO_NAME(cdp1861)
 
+#define MDRV_CDP1861_ADD(_tag, _clock, _config) \
+	MDRV_DEVICE_ADD(_tag, CDP1861, _clock) \
+	MDRV_DEVICE_CONFIG(_config)
+
 /* interface */
 typedef struct _cdp1861_interface cdp1861_interface;
 struct _cdp1861_interface
 {
 	const char *screen_tag;		/* screen we are acting on */
-	int clock;					/* the clock (pin 1) of the chip */
 
 	/* this gets called for every change of the INT pin (pin 3) */
 	cdp1861_on_int_changed_func		on_int_changed;

@@ -76,7 +76,7 @@ static MACHINE_DRIVER_START( lynx )
 	MDRV_CPU_ADD("main", M65SC02, 4000000)        /* vti core, integrated in vlsi, stz, but not bbr bbs */
 	MDRV_CPU_PROGRAM_MAP(lynx_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", lynx_frame_int)
-	MDRV_INTERLEAVE(1)
+	MDRV_QUANTUM_TIME(HZ(60))
 
 	MDRV_MACHINE_START( lynx )
 

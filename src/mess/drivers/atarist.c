@@ -1804,10 +1804,8 @@ static MACHINE_DRIVER_START( atarist )
 	MDRV_PRINTER_ADD("printer")
 
 	/* acia */
-	MDRV_DEVICE_ADD("acia_0", ACIA6850)
-	MDRV_DEVICE_CONFIG(acia_ikbd_intf)
-	MDRV_DEVICE_ADD("acia_1", ACIA6850)
-	MDRV_DEVICE_CONFIG(acia_midi_intf)
+	MDRV_ACIA6850_ADD("acia_0", acia_ikbd_intf)
+	MDRV_ACIA6850_ADD("acia_1", acia_midi_intf)
 	
 	MDRV_WD1772_ADD("wd1772", atarist_wd17xx_interface )
 MACHINE_DRIVER_END
@@ -1865,10 +1863,8 @@ static MACHINE_DRIVER_START( atariste )
 	MDRV_PRINTER_ADD("printer")
 
 	/* acia */
-	MDRV_DEVICE_ADD("acia_0", ACIA6850)
-	MDRV_DEVICE_CONFIG(acia_ikbd_intf)
-	MDRV_DEVICE_ADD("acia_1", ACIA6850)
-	MDRV_DEVICE_CONFIG(acia_midi_intf)
+	MDRV_ACIA6850_ADD("acia_0", acia_ikbd_intf)
+	MDRV_ACIA6850_ADD("acia_1", acia_midi_intf)
 	
 	MDRV_WD1772_ADD("wd1772", atarist_wd17xx_interface )
 MACHINE_DRIVER_END
@@ -1919,10 +1915,8 @@ static MACHINE_DRIVER_START( stbook )
 	MDRV_PRINTER_ADD("printer")
 
 	/* acia */
-	MDRV_DEVICE_ADD("acia_0", ACIA6850)
-	MDRV_DEVICE_CONFIG(stbook_acia_ikbd_intf)
-	MDRV_DEVICE_ADD("acia_1", ACIA6850)
-	MDRV_DEVICE_CONFIG(acia_midi_intf)
+	MDRV_ACIA6850_ADD("acia_0", stbook_acia_ikbd_intf)
+	MDRV_ACIA6850_ADD("acia_1", acia_midi_intf)
 	
 	MDRV_WD1772_ADD("wd1772", atarist_wd17xx_interface )
 MACHINE_DRIVER_END

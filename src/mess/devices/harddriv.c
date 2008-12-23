@@ -304,13 +304,13 @@ DEVICE_GET_INFO(mess_hd)
 		case DEVINFO_PTR_IMAGE_CREATE_OPTSPEC+0:	info->p = (void *) mess_hd_option_spec; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:						info->s = "Harddisk"; break;
-		case DEVINFO_STR_FAMILY:					info->s = "Harddisk"; break;
-		case DEVINFO_STR_SOURCE_FILE:				info->s = __FILE__; break;
-		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:		info->s = "chd,hd"; break;
-		case DEVINFO_STR_IMAGE_CREATE_OPTNAME+0:	info->s = "chd"; break;
-		case DEVINFO_STR_IMAGE_CREATE_OPTDESC+0:	info->s = "MAME/MESS CHD Hard drive"; break;
-		case DEVINFO_STR_IMAGE_CREATE_OPTEXTS+0:	info->s = "chd,hd"; break;
+		case DEVINFO_STR_NAME:						strcpy(info->s, "Harddisk"); break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Harddisk"); break;
+		case DEVINFO_STR_SOURCE_FILE:				strcpy(info->s, __FILE__); break;
+		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:		strcpy(info->s, "chd,hd"); break;
+		case DEVINFO_STR_IMAGE_CREATE_OPTNAME+0:	strcpy(info->s, "chd"); break;
+		case DEVINFO_STR_IMAGE_CREATE_OPTDESC+0:	strcpy(info->s, "MAME/MESS CHD Hard drive"); break;
+		case DEVINFO_STR_IMAGE_CREATE_OPTEXTS+0:	strcpy(info->s, "chd,hd"); break;
 	}
 }
 
@@ -431,9 +431,9 @@ DEVICE_GET_INFO(mess_ide)
 //		case DEVINFO_FCT_IMAGE_VERIFY:				info->f = (genf *) ide_hd_validity_check; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:						info->s = "IDE harddisk"; break;
-		case DEVINFO_STR_IMAGE_INSTANCE_NAME:		info->s = "ideharddrive"; break;
-		case DEVINFO_STR_IMAGE_BRIEF_INSTANCE_NAME:	info->s = "idehd"; break;
+		case DEVINFO_STR_NAME:						strcpy(info->s, "IDE harddisk"); break;
+		case DEVINFO_STR_IMAGE_INSTANCE_NAME:		strcpy(info->s, "ideharddrive"); break;
+		case DEVINFO_STR_IMAGE_BRIEF_INSTANCE_NAME:	strcpy(info->s, "idehd"); break;
 
 		default:									DEVICE_GET_INFO_CALL( mess_hd ); break;
 	}

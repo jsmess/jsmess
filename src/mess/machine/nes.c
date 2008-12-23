@@ -63,9 +63,9 @@ static void nes_machine_stop(running_machine *machine);
     FUNCTIONS
 ***************************************************************************/
 
-static const device_config *cartslot_image(void)
+static const device_config *cartslot_image(running_machine *machine)
 {
-	return image_from_devtype_and_index(IO_CARTSLOT, 0);
+	return image_from_devtype_and_index(machine, IO_CARTSLOT, 0);
 }
 
 static void init_nes_core (running_machine *machine)
@@ -197,7 +197,7 @@ static void nes_machine_stop(running_machine *machine)
 {
 	/* Write out the battery file if necessary */
 	if (nes.battery)
-		image_battery_save(cartslot_image(), battery_ram, BATTERY_SIZE);
+		image_battery_save(cartslot_image(machine), battery_ram, BATTERY_SIZE);
 }
 
 

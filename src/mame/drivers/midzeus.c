@@ -25,6 +25,7 @@ The Grid         v1.2   10/18/2000
 **************************************************************************/
 
 #include "driver.h"
+#include "cpu/tms32031/tms32031.h"
 #include "cpu/tms34010/tms34010.h"
 #include "cpu/adsp2100/adsp2100.h"
 #include "includes/midzeus.h"
@@ -93,7 +94,7 @@ static MACHINE_RESET( midzeus )
 {
 	memcpy(ram_base, memory_region(machine, "user1"), 0x40000*4);
 	*ram_base <<= 1;
-	cpu_reset(machine->cpu[0]);
+	device_reset(machine->cpu[0]);
 
 	cmos_protected = TRUE;
 }
@@ -1150,7 +1151,7 @@ static MACHINE_DRIVER_START( midzeus2 )
 	/* sound hardware */
 	MDRV_IMPORT_FROM(dcs2_audio_2104)
 
-	MDRV_DEVICE_ADD( "m48t35", M48T35 )
+	MDRV_M48T35_ADD( "m48t35" )
 MACHINE_DRIVER_END
 
 

@@ -45,7 +45,7 @@ WRITE8_DEVICE_HANDLER(i8271_data_w);
 ***************************************************************************/
 
 #define MDRV_I8271_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, I8271) \
+	MDRV_DEVICE_ADD(_tag, I8271, 0) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
 #endif /* I8271_H_ */

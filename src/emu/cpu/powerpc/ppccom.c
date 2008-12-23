@@ -184,7 +184,7 @@ INLINE void set_decrementer(powerpc_state *ppc, UINT32 newdec)
     structure based on the configured type
 -------------------------------------------------*/
 
-void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_divisor, const device_config *device, int index, int clock, cpu_irq_callback irqcallback)
+void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_divisor, const device_config *device, cpu_irq_callback irqcallback)
 {
 	const powerpc_config *config = device->static_config;
 
@@ -194,12 +194,12 @@ void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_di
 	ppc->cap = cap;
 	ppc->cache_line_size = 32;
 	ppc->tb_divisor = tb_divisor;
-	ppc->cpu_clock = clock;
+	ppc->cpu_clock = device->clock;
 	ppc->irq_callback = irqcallback;
 	ppc->device = device;
 	ppc->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	ppc->system_clock = (config != NULL) ? config->bus_frequency : clock;
-	ppc->tb_divisor = (ppc->tb_divisor * clock + ppc->system_clock / 2 - 1) / ppc->system_clock;
+	ppc->system_clock = (config != NULL) ? config->bus_frequency : device->clock;
+	ppc->tb_divisor = (ppc->tb_divisor * device->clock + ppc->system_clock / 2 - 1) / ppc->system_clock;
 
 	/* allocate the virtual TLB */
 	ppc->vtlb = vtlb_alloc(device, ADDRESS_SPACE_PROGRAM, (cap & PPCCAP_603_MMU) ? PPC603_FIXED_TLB_ENTRIES : 0, POWERPC_TLB_ENTRIES);
@@ -1089,11 +1089,11 @@ void ppccom_get_info(powerpc_state *ppc, UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 40;							break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 64;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 32;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = 0;					break;
-		case CPUINFO_INT_LOGADDR_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 32;					break;
-		case CPUINFO_INT_PAGE_SHIFT + ADDRESS_SPACE_PROGRAM: 	info->i = POWERPC_MIN_PAGE_SHIFT;break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 64;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 32;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
+		case CPUINFO_INT_LOGADDR_WIDTH_PROGRAM: info->i = 32;					break;
+		case CPUINFO_INT_PAGE_SHIFT_PROGRAM: 	info->i = POWERPC_MIN_PAGE_SHIFT;break;
 
 		case CPUINFO_INT_INPUT_STATE + PPC_IRQ:			info->i = ppc->irq_pending ? ASSERT_LINE : CLEAR_LINE; break;
 
@@ -1156,13 +1156,13 @@ void ppccom_get_info(powerpc_state *ppc, UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + PPC_R31:			info->i = ppc->r[31];					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						/* provided by core */					break;
-		case CPUINFO_PTR_INIT:							/* provided by core */					break;
-		case CPUINFO_PTR_RESET:							/* provided by core */					break;
-		case CPUINFO_PTR_EXIT:							/* provided by core */					break;
-		case CPUINFO_PTR_EXECUTE:						/* provided by core */					break;
-		case CPUINFO_PTR_TRANSLATE:						/* provided by core */					break;
-		case CPUINFO_PTR_DISASSEMBLE:					/* provided by core */					break;
+		case CPUINFO_FCT_SET_INFO:						/* provided by core */					break;
+		case CPUINFO_FCT_INIT:							/* provided by core */					break;
+		case CPUINFO_FCT_RESET:							/* provided by core */					break;
+		case CPUINFO_FCT_EXIT:							/* provided by core */					break;
+		case CPUINFO_FCT_EXECUTE:						/* provided by core */					break;
+		case CPUINFO_FCT_TRANSLATE:						/* provided by core */					break;
+		case CPUINFO_FCT_DISASSEMBLE:					/* provided by core */					break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &ppc->icount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -1656,7 +1656,7 @@ static TIMER_CALLBACK( ppc4xx_spu_callback )
 		{
 			/* if we have a transmit handler, send it that way */
 			if (ppc->spu.tx_handler != NULL)
-				(*ppc->spu.tx_handler)(ppc->spu.txbuf);
+				(*ppc->spu.tx_handler)(ppc->device, ppc->spu.txbuf);
 
 			/* indicate that we have moved it to the shift register */
 			ppc->spu.regs[SPU4XX_LINE_STATUS] |= 0x04;
@@ -1714,7 +1714,7 @@ updateirq:
 
 static READ8_HANDLER( ppc4xx_spu_r )
 {
-	powerpc_state *ppc = cpu_get_info_ptr(space->cpu, CPUINFO_PTR_CONTEXT);
+	powerpc_state *ppc = *(powerpc_state **)space->cpu->token;
 	UINT8 result = 0xff;
 
 	switch (offset)
@@ -1741,7 +1741,7 @@ static READ8_HANDLER( ppc4xx_spu_r )
 
 static WRITE8_HANDLER( ppc4xx_spu_w )
 {
-	powerpc_state *ppc = cpu_get_info_ptr(space->cpu, CPUINFO_PTR_CONTEXT);
+	powerpc_state *ppc = *(powerpc_state **)space->cpu->token;
 	UINT8 oldstate, newstate;
 
 	if (PRINTF_SPU)
@@ -1829,7 +1829,7 @@ void ppc4xx_set_info(powerpc_state *ppc, UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_PPC_RX_DATA:					ppc4xx_spu_rx_data(ppc, info->i);					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SPU_TX_HANDLER:				ppc->spu.tx_handler = (ppc4xx_spu_tx_handler)info->f; break;
+		case CPUINFO_FCT_SPU_TX_HANDLER:				ppc->spu.tx_handler = (ppc4xx_spu_tx_handler)info->f; break;
 
 		/* --- everything else is handled generically --- */
 		default:										ppccom_set_info(ppc, state, info);		break;
@@ -1854,14 +1854,14 @@ void ppc4xx_get_info(powerpc_state *ppc, UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_INPUT_STATE + PPC_IRQ_LINE_3:	info->i = ppc4xx_get_irq_line(ppc, PPC4XX_IRQ_BIT_EXT3);		break;
 		case CPUINFO_INT_INPUT_STATE + PPC_IRQ_LINE_4:	info->i = ppc4xx_get_irq_line(ppc, PPC4XX_IRQ_BIT_EXT4);		break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 32;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 31;					break;
-		case CPUINFO_INT_LOGADDR_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 32;					break;
-		case CPUINFO_INT_PAGE_SHIFT + ADDRESS_SPACE_PROGRAM: 	info->i = POWERPC_MIN_PAGE_SHIFT;break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 32;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 31;					break;
+		case CPUINFO_INT_LOGADDR_WIDTH_PROGRAM: info->i = 32;					break;
+		case CPUINFO_INT_PAGE_SHIFT_PROGRAM: 	info->i = POWERPC_MIN_PAGE_SHIFT;break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							/* provided per-CPU */					break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map32 = ADDRESS_MAP_NAME(internal_ppc4xx); break;
+		case CPUINFO_FCT_INIT:							/* provided per-CPU */					break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM: info->internal_map32 = ADDRESS_MAP_NAME(internal_ppc4xx); break;
 
 		/* --- everything else is handled generically --- */
 		default:										ppccom_get_info(ppc, state, info);		break;

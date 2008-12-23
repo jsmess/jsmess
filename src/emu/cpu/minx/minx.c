@@ -214,9 +214,9 @@ static unsigned minx_get_reg( int regnum )
 {
 	switch( regnum )
 	{
-	case REG_PC:	return GET_MINX_PC;
+	case REG_GENPC:	return GET_MINX_PC;
 	case MINX_PC:	return regs.PC;
-	case REG_SP:
+	case REG_GENSP:
 	case MINX_SP:	return regs.SP;
 	case MINX_BA:	return regs.BA;
 	case MINX_HL:	return regs.HL;
@@ -239,9 +239,9 @@ static void minx_set_reg( int regnum, unsigned val )
 {
 	switch( regnum )
 	{
-	case REG_PC:	break;
+	case REG_GENPC:	break;
 	case MINX_PC:	regs.PC = val; break;
-	case REG_SP:
+	case REG_GENSP:
 	case MINX_SP:	regs.SP = val; break;
 	case MINX_BA:	regs.BA = val; break;
 	case MINX_HL:	regs.HL = val; break;
@@ -312,18 +312,18 @@ CPU_GET_INFO( minx )
 	case CPUINFO_INT_MAX_INSTRUCTION_BYTES:						info->i = 5; break;
 	case CPUINFO_INT_MIN_CYCLES:								info->i = 1; break;
 	case CPUINFO_INT_MAX_CYCLES:								info->i = 4; break;
-	case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:		info->i = 8; break;
-	case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM:		info->i = 24; break;
-	case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM:		info->i = 0; break;
-	case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:		info->i = 0; break;
-	case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:		info->i = 0; break;
-	case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA:		info->i = 0; break;
-	case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:			info->i = 0; break;
-	case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:			info->i = 0; break;
-	case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:			info->i = 0; break;
+	case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:		info->i = 8; break;
+	case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM:		info->i = 24; break;
+	case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM:		info->i = 0; break;
+	case CPUINFO_INT_DATABUS_WIDTH_DATA:		info->i = 0; break;
+	case CPUINFO_INT_ADDRBUS_WIDTH_DATA:		info->i = 0; break;
+	case CPUINFO_INT_ADDRBUS_SHIFT_DATA:		info->i = 0; break;
+	case CPUINFO_INT_DATABUS_WIDTH_IO:			info->i = 0; break;
+	case CPUINFO_INT_ADDRBUS_WIDTH_IO:			info->i = 0; break;
+	case CPUINFO_INT_ADDRBUS_SHIFT_IO:			info->i = 0; break;
 	case CPUINFO_INT_INPUT_STATE + 0:							info->i = 0; break;
-	case CPUINFO_INT_REGISTER + REG_PC:							info->i = GET_MINX_PC; break;
-	case CPUINFO_INT_REGISTER + REG_SP:
+	case CPUINFO_INT_REGISTER + REG_GENPC:							info->i = GET_MINX_PC; break;
+	case CPUINFO_INT_REGISTER + REG_GENSP:
 	case CPUINFO_INT_REGISTER + MINX_PC:
 	case CPUINFO_INT_REGISTER + MINX_SP:
 	case CPUINFO_INT_REGISTER + MINX_BA:
@@ -339,13 +339,13 @@ CPU_GET_INFO( minx )
 	case CPUINFO_INT_REGISTER + MINX_XI:
 	case CPUINFO_INT_REGISTER + MINX_YI:						info->i = minx_get_reg( state - CPUINFO_INT_REGISTER ); break;
 	case CPUINFO_INT_PREVIOUSPC:								info->i = 0x0000; break;
-	case CPUINFO_PTR_SET_INFO:									info->setinfo = CPU_SET_INFO_NAME(minx); break;
-	case CPUINFO_PTR_INIT:										info->init = CPU_INIT_NAME(minx); break;
-	case CPUINFO_PTR_RESET:										info->reset = CPU_RESET_NAME(minx); break;
-	case CPUINFO_PTR_EXIT:										info->exit = CPU_EXIT_NAME(minx); break;
-	case CPUINFO_PTR_EXECUTE:									info->execute = CPU_EXECUTE_NAME(minx); break;
-	case CPUINFO_PTR_BURN:										info->burn = CPU_BURN_NAME(minx); break;
-	case CPUINFO_PTR_DISASSEMBLE:								info->disassemble = CPU_DISASSEMBLE_NAME(minx); break;
+	case CPUINFO_FCT_SET_INFO:									info->setinfo = CPU_SET_INFO_NAME(minx); break;
+	case CPUINFO_FCT_INIT:										info->init = CPU_INIT_NAME(minx); break;
+	case CPUINFO_FCT_RESET:										info->reset = CPU_RESET_NAME(minx); break;
+	case CPUINFO_FCT_EXIT:										info->exit = CPU_EXIT_NAME(minx); break;
+	case CPUINFO_FCT_EXECUTE:									info->execute = CPU_EXECUTE_NAME(minx); break;
+	case CPUINFO_FCT_BURN:										info->burn = CPU_BURN_NAME(minx); break;
+	case CPUINFO_FCT_DISASSEMBLE:								info->disassemble = CPU_DISASSEMBLE_NAME(minx); break;
 	case CPUINFO_PTR_INSTRUCTION_COUNTER:						info->icount = &minx_icount; break;
 	case CPUINFO_STR_NAME:										strcpy( info->s, "Minx" ); break;
 	case CPUINFO_STR_CORE_FAMILY:								strcpy( info->s, "Nintendo Minx" ); break;

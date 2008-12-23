@@ -66,6 +66,7 @@ Notes:
  *************************************************************/
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "video/ygv608.h"
 #include "cpu/h83002/h8.h"
 #include "namcond1.h"
@@ -293,7 +294,7 @@ static MACHINE_DRIVER_START( namcond1 )
 	MDRV_CPU_IO_MAP( nd1h8iomap, 0 )
 	MDRV_CPU_VBLANK_INT("main", mcu_interrupt)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	MDRV_MACHINE_START(namcond1)
 	MDRV_MACHINE_RESET(namcond1)
@@ -321,7 +322,7 @@ static MACHINE_DRIVER_START( namcond1 )
 	MDRV_SOUND_ROUTE(2, "right", 1.00)
 	MDRV_SOUND_ROUTE(3, "left", 1.00)
 
-	MDRV_DEVICE_ADD( "at28c16", AT28C16 )
+	MDRV_AT28C16_ADD( "at28c16", NULL )
 MACHINE_DRIVER_END
 
 ROM_START( ncv1 )

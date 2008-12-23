@@ -153,8 +153,8 @@ static DEVICE_GET_INFO(snapquick)
 		case DEVINFO_FCT_SNAPSHOT_QUICKLOAD_LOAD:		info->f = (genf *) get_config(device)->load; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__; break;
-		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:			info->s = get_config(device)->file_extensions; break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__); break;
+		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:			strcpy(info->s, get_config(device)->file_extensions); break;
 	}
 }
 
@@ -173,8 +173,8 @@ DEVICE_GET_INFO(snapshot)
 		case DEVINFO_INT_IMAGE_TYPE:					info->i = IO_SNAPSHOT; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "Snapshot"; break;
-		case DEVINFO_STR_FAMILY:						info->s = "Snapshot"; break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Snapshot"); break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Snapshot"); break;
 
 		default: DEVICE_GET_INFO_CALL(snapquick); break;
 	}
@@ -195,8 +195,8 @@ DEVICE_GET_INFO(quickload)
 		case DEVINFO_INT_IMAGE_TYPE:					info->i = IO_QUICKLOAD; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "Quickload"; break;
-		case DEVINFO_STR_FAMILY:						info->s = "Quickload"; break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Quickload"); break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Quickload"); break;
 
 		default: DEVICE_GET_INFO_CALL(snapquick); break;
 	}

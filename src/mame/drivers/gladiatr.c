@@ -182,6 +182,7 @@ TODO:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/m6809/m6809.h"
 #include "machine/tait8741.h"
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
@@ -271,7 +272,7 @@ static MACHINE_RESET( gladiator )
 	{
 		UINT8 *rom = memory_region(machine, "audio") + 0x10000;
 		memory_set_bankptr(machine, 2,rom);
-		cpu_reset(machine->cpu[2]);
+		device_reset(machine->cpu[2]);
 	}
 }
 
@@ -321,7 +322,7 @@ static READ8_HANDLER( glad_cpu_sound_command_r )
 
 static WRITE8_HANDLER( gladiatr_flipscreen_w )
 {
-	flip_screen_set(data & 1);
+	flip_screen_set(space->machine, data & 1);
 }
 
 
@@ -704,7 +705,7 @@ static MACHINE_DRIVER_START( ppking )
 	MDRV_CPU_ADD("audio", M6809, XTAL_12MHz/16) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(ppking_cpu3_map,0)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	MDRV_MACHINE_RESET(ppking)
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -753,7 +754,7 @@ static MACHINE_DRIVER_START( gladiatr )
 	MDRV_CPU_ADD("audio", M6809, XTAL_12MHz/16) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(gladiatr_cpu3_map,0)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_MACHINE_RESET(gladiator)
 	MDRV_NVRAM_HANDLER(generic_0fill)

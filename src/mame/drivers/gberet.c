@@ -66,6 +66,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "sound/sn76496.h"
 
@@ -119,7 +120,7 @@ static WRITE8_HANDLER( gberet_flipscreen_w )
 	nmi_enable = data & 0x01;
 	irq_enable = data & 0x04;
 
-	flip_screen_set(data & 0x08);
+	flip_screen_set(space->machine, data & 0x08);
 }
 
 static WRITE8_HANDLER( mrgoemon_coin_counter_w )
@@ -140,7 +141,7 @@ static WRITE8_HANDLER( mrgoemon_flipscreen_w )
 	nmi_enable = data & 0x01;
 	irq_enable = data & 0x02;
 
-	flip_screen_set(data & 0x08);
+	flip_screen_set(space->machine, data & 0x08);
 }
 
 /* Memory Maps */

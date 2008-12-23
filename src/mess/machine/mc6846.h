@@ -33,7 +33,7 @@ struct _mc6846_interface
 
 
 #define MDRV_MC6846_ADD(_tag, _intrf) \
-  MDRV_DEVICE_ADD(_tag, MC6846)	      \
+  MDRV_DEVICE_ADD(_tag, MC6846, 0)	      \
   MDRV_DEVICE_CONFIG(_intrf)
 
 #define MDRV_MC6846_MODIFY(_tag, _intrf) \

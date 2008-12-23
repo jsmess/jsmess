@@ -153,7 +153,7 @@ static void at_set_irq_line(int irq, int state) {
 }
 
 
-static void at_set_keyb_int(int state) {
+static void at_set_keyb_int(running_machine *machine, int state) {
 	pic8259_set_irq_line(at_devices.pic8259_master, 1, state);
 }
 
@@ -222,7 +222,7 @@ WRITE8_HANDLER(at_page8_w)
 
 	if (LOG_PORT80 && (offset == 0))
 	{
-		logerror(" at_page8_w(): Port 80h <== 0x%02x (PC=0x%08x)\n", data, (unsigned) cpu_get_reg(space->machine->cpu[0],REG_PC));
+		logerror(" at_page8_w(): Port 80h <== 0x%02x (PC=0x%08x)\n", data, (unsigned) cpu_get_reg(space->machine->cpu[0],REG_GENPC));
 	}
 
 	switch(offset % 8) {

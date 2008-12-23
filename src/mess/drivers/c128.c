@@ -621,10 +621,8 @@ static MACHINE_DRIVER_START( c128 )
 	MDRV_CASSETTE_ADD( "cassette", cbm_cassette_config )
 
 	/* cia */
-	MDRV_DEVICE_ADD("cia_0", CIA6526R1)
-	MDRV_DEVICE_CONFIG(c64_ntsc_cia0)
-	MDRV_DEVICE_ADD("cia_1", CIA6526R1)
-	MDRV_DEVICE_CONFIG(c64_ntsc_cia1)
+	MDRV_CIA6526_ADD("cia_0", CIA6526R1, 0, c64_ntsc_cia0)
+	MDRV_CIA6526_ADD("cia_1", CIA6526R1, 0, c64_ntsc_cia1)
 MACHINE_DRIVER_END
 
 

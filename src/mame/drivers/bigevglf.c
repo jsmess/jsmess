@@ -56,6 +56,7 @@ J1100072A
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "sound/ay8910.h"
 #include "sound/msm5232.h"
@@ -445,7 +446,7 @@ static MACHINE_DRIVER_START( bigevglf )
 	MDRV_CPU_ADD("mcu", M68705,2000000)	/* ??? */
 	MDRV_CPU_PROGRAM_MAP(m68705_map,0)
 
-	MDRV_INTERLEAVE(10)	/* 10 CPU slices per frame - interleaving is forced on the fly */
+	MDRV_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - interleaving is forced on the fly */
 
 	MDRV_MACHINE_RESET(bigevglf)
 	/* video hardware */

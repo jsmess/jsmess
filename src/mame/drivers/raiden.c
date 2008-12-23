@@ -36,6 +36,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
 #include "audio/seibu.h"
 #include "sound/3812intf.h"
@@ -244,7 +245,7 @@ static MACHINE_DRIVER_START( raiden )
 
 	SEIBU_SOUND_SYSTEM_CPU(XTAL_14_31818MHz/4) /* verified on pcb */
 
-	MDRV_INTERLEAVE(200)
+	MDRV_QUANTUM_TIME(HZ(12000))
 
 	MDRV_MACHINE_RESET(seibu_sound)
 
@@ -283,7 +284,7 @@ static MACHINE_DRIVER_START( raidena )
 
 	SEIBU_SOUND_SYSTEM_CPU(XTAL_14_31818MHz/4) /* verified on pcb */
 
-	MDRV_INTERLEAVE(120)
+	MDRV_QUANTUM_TIME(HZ(7200))
 
 	MDRV_MACHINE_RESET(seibu_sound)
 

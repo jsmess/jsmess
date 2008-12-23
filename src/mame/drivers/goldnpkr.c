@@ -594,6 +594,7 @@
 #define CPU_CLOCK		(MASTER_CLOCK/16)
 
 #include "driver.h"
+#include "cpu/m6502/m6502.h"
 #include "video/mc6845.h"
 #include "machine/6821pia.h"
 #include "sound/discrete.h"
@@ -2266,7 +2267,7 @@ static MACHINE_DRIVER_START( goldnpkr_base )
 	MDRV_SCREEN_SIZE((39+1)*8, (31+1)*8)                  /* From MC6845 init, registers 00 & 04 (programmed with value-1). */
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 29*8-1)    /* From MC6845 init, registers 01 & 06. */
 
-	MDRV_DEVICE_ADD("crtc", MC6845)
+	MDRV_MC6845_ADD("crtc", MC6845, 0, mc6845_null_interface)
 
 	MDRV_GFXDECODE(goldnpkr)
 	MDRV_PALETTE_INIT(goldnpkr)

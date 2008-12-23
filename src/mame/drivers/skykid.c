@@ -14,6 +14,7 @@ Notes:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/m6809/m6809.h"
 #include "cpu/m6800/m6800.h"
 #include "sound/namco.h"
 
@@ -90,7 +91,7 @@ static WRITE8_HANDLER( skykid_bankswitch_w )
 static WRITE8_HANDLER( skykid_irq_1_ctrl_w )
 {
 	int bit = !BIT(offset,11);
-	cpu_interrupt_enable(0,bit);
+	cpu_interrupt_enable(space->machine->cpu[0],bit);
 	if (!bit)
 		cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 }
@@ -98,7 +99,7 @@ static WRITE8_HANDLER( skykid_irq_1_ctrl_w )
 static WRITE8_HANDLER( skykid_irq_2_ctrl_w )
 {
 	int bit = !BIT(offset,13);
-	cpu_interrupt_enable(1,bit);
+	cpu_interrupt_enable(space->machine->cpu[1],bit);
 	if (!bit)
 		cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
 }
@@ -459,7 +460,7 @@ static MACHINE_DRIVER_START( skykid )
 	MDRV_CPU_IO_MAP(mcu_port_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
-	MDRV_INTERLEAVE(100)	/* we need heavy synch */
+	MDRV_QUANTUM_TIME(HZ(6000))	/* we need heavy synch */
 
 	MDRV_MACHINE_START(skykid)
 

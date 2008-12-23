@@ -199,7 +199,7 @@ void intel82439tx_pci_write(const device_config *busdevice, const device_config 
 	}
 
 	/* hack to compensate for weird issue (maybe the Pentium core needs to support caching? */
-	if ((cpu_get_reg(machine->cpu[0], REG_PC) == 0xFCB01) && !strcmp(machine->gamedrv->name, "at586"))
+	if ((cpu_get_reg(machine->cpu[0], REG_GENPC) == 0xFCB01) && !strcmp(machine->gamedrv->name, "at586"))
 	{
 		memory_region(machine, "user1")[0x3CB01] = 0xF3;
 		memory_region(machine, "user1")[0x3CB02] = 0xA4;

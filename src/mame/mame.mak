@@ -35,8 +35,7 @@ OBJDIRS += \
 
 CPUS += Z80
 CPUS += Z180
-CPUS += 8080
-CPUS += 8085A
+CPUS += I8085
 CPUS += M6502
 CPUS += M65C02
 CPUS += M65SC02
@@ -133,12 +132,7 @@ CPUS += TMS32031
 CPUS += TMS32032
 CPUS += TMS32051
 CPUS += CCPU
-CPUS += ADSP2100
-CPUS += ADSP2101
-CPUS += ADSP2104
-CPUS += ADSP2105
-CPUS += ADSP2115
-CPUS += ADSP2181
+CPUS += ADSP21XX
 CPUS += PSXCPU
 CPUS += CXD8661R
 CPUS += ASAP
@@ -1173,6 +1167,7 @@ $(MAMEOBJ)/sanritsu.a: \
 	$(DRIVERS)/bankp.o $(VIDEO)/bankp.o \
 	$(DRIVERS)/chinsan.o \
 	$(DRIVERS)/drmicro.o $(VIDEO)/drmicro.o \
+	$(DRIVERS)/jantotsu.o \
 	$(DRIVERS)/mayumi.o $(VIDEO)/mayumi.o \
 	$(DRIVERS)/mermaid.o $(VIDEO)/mermaid.o \
 	$(DRIVERS)/mjkjidai.o $(VIDEO)/mjkjidai.o \
@@ -1363,6 +1358,7 @@ $(MAMEOBJ)/taito.a: \
 	$(DRIVERS)/nycaptor.o $(MACHINE)/nycaptor.o $(VIDEO)/nycaptor.o \
 	$(DRIVERS)/opwolf.o $(MACHINE)/opwolf.o \
 	$(DRIVERS)/othunder.o $(VIDEO)/othunder.o \
+	$(DRIVERS)/parentj.o \
 	$(DRIVERS)/pitnrun.o $(MACHINE)/pitnrun.o $(VIDEO)/pitnrun.o \
 	$(DRIVERS)/qix.o $(MACHINE)/qix.o $(AUDIO)/qix.o $(VIDEO)/qix.o \
 	$(DRIVERS)/rainbow.o $(MACHINE)/rainbow.o \
@@ -1555,8 +1551,8 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/koftball.o \
 	$(DRIVERS)/calomega.o $(VIDEO)/calomega.o \
 	$(DRIVERS)/carrera.o \
+	$(DRIVERS)/caswin.o \
 	$(DRIVERS)/cave.o $(VIDEO)/cave.o \
-	$(DRIVERS)/cherrym.o \
 	$(DRIVERS)/cidelsa.o $(VIDEO)/cidelsa.o \
 	$(DRIVERS)/coinmstr.o \
 	$(DRIVERS)/comebaby.o \
@@ -1606,6 +1602,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/itgambl3.o \
 	$(DRIVERS)/itgamble.o \
 	$(DRIVERS)/jackpool.o \
+	$(DRIVERS)/janshi.o \
 	$(DRIVERS)/jokrwild.o \
 	$(DRIVERS)/jongkyo.o \
 	$(DRIVERS)/kingpin.o \
@@ -1617,7 +1614,6 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/limenko.o \
 	$(DRIVERS)/ltcasino.o \
 	$(DRIVERS)/lucky74.o $(VIDEO)/lucky74.o \
-	$(DRIVERS)/lucky8.o \
 	$(DRIVERS)/magic10.o \
 	$(DRIVERS)/magicfly.o \
 	$(DRIVERS)/magictg.o \

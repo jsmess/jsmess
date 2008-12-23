@@ -15,7 +15,7 @@
 
 
 #define MDRV_CDROM_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, CDROM) \
+	MDRV_DEVICE_ADD(_tag, CDROM, 0) \
 
 
 DEVICE_GET_INFO(cdrom);

@@ -54,10 +54,10 @@ static void timer_handler_262(void *param,int timer, attotime period)
 	}
 }
 
-static void ymf262_stream_update(void *param, stream_sample_t **inputs, stream_sample_t **buffers, int length)
+static STREAM_UPDATE( ymf262_stream_update )
 {
 	struct ymf262_info *info = param;
-	ymf262_update_one(info->chip, buffers, length);
+	ymf262_update_one(info->chip, outputs, samples);
 }
 
 static void _stream_update(void *param, int interval)
@@ -181,11 +181,11 @@ SND_GET_INFO( ymf262 )
 		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( ymf262 );				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							info->s = "YMF262";						break;
-		case SNDINFO_STR_CORE_FAMILY:					info->s = "Yamaha FM";					break;
-		case SNDINFO_STR_CORE_VERSION:					info->s = "1.0";						break;
-		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
-		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "YMF262");							break;
+		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Yamaha FM");						break;
+		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");								break;
+		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);							break;
+		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

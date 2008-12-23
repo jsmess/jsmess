@@ -27,6 +27,8 @@ TODO:
 
 ***************************************************************************/
 #include "driver.h"
+#include "cpu/z80/z80.h"
+#include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 
 VIDEO_START( zerozone );
@@ -181,7 +183,7 @@ static MACHINE_DRIVER_START( zerozone )
 	MDRV_CPU_ADD("audio", Z80, 1000000)	/* 1 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

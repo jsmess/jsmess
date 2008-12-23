@@ -66,7 +66,6 @@ static MC6845_ON_VSYNC_CHANGED( mda_vsync_changed );
 static const mc6845_interface mc6845_mda_intf =
 {
 	MDA_SCREEN_NAME,	/* screen number */
-	MDA_CLOCK/9 /*?*/,	/* clock */
 	9,					/* number of pixels per video memory address */
 	NULL,				/* begin_update */
 	mda_update_row,		/* update_row */
@@ -84,8 +83,7 @@ MACHINE_DRIVER_START( pcvideo_mda )
 
 	MDRV_PALETTE_INIT(pc_mda)
 
-	MDRV_DEVICE_ADD( MDA_MC6845_NAME, MC6845)
-	MDRV_DEVICE_CONFIG( mc6845_mda_intf )
+	MDRV_MC6845_ADD( MDA_MC6845_NAME, MC6845, MDA_CLOCK/9, mc6845_mda_intf)
 
 	MDRV_VIDEO_START( pc_mda )
 	MDRV_VIDEO_UPDATE( mc6845_mda)
@@ -424,7 +422,6 @@ The divder/pixels per 6845 clock is 9 for text mode and 16 for graphics mode.
 static const mc6845_interface mc6845_hercules_intf =
 {
 	HERCULES_SCREEN_NAME,	/* screen number */
-	MDA_CLOCK/9 /*?*/,		/* clock */
 	9,						/* number of pixels per video memory address */
 	NULL,					/* begin_update */
 	mda_update_row,			/* update_row */
@@ -442,8 +439,7 @@ MACHINE_DRIVER_START( pcvideo_hercules )
 
 	MDRV_PALETTE_INIT(pc_mda)
 
-	MDRV_DEVICE_ADD( HERCULES_MC6845_NAME, MC6845)
-	MDRV_DEVICE_CONFIG( mc6845_hercules_intf )
+	MDRV_MC6845_ADD( HERCULES_MC6845_NAME, MC6845, MDA_CLOCK/9, mc6845_hercules_intf)
 
 	MDRV_VIDEO_START( pc_hercules )
 	MDRV_VIDEO_UPDATE( mc6845_hercules )

@@ -42,15 +42,15 @@ typedef double (*adc080x_input_read) (const device_config *device, int channel);
 #define ADC0808		DEVICE_GET_INFO_NAME(adc0808)
 #define ADC0809		DEVICE_GET_INFO_NAME(adc0809)
 
-#define MDRV_ADC0808_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, ADC0808) \
+#define MDRV_ADC0808_ADD(_tag, _clock, _intrf) \
+	MDRV_DEVICE_ADD(_tag, ADC0808, _clock) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
 #define MDRV_ADC0808_REMOVE(_tag) \
 	MDRV_DEVICE_REMOVE(_tag, ADC0808)
 
-#define MDRV_ADC0809_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, ADC0809) \
+#define MDRV_ADC0809_ADD(_tag, _clock, _intrf) \
+	MDRV_DEVICE_ADD(_tag, ADC0809, _clock) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
 #define MDRV_ADC0809_REMOVE(_tag) \
@@ -61,8 +61,6 @@ typedef double (*adc080x_input_read) (const device_config *device, int channel);
 typedef struct _adc080x_interface adc080x_interface;
 struct _adc080x_interface
 {
-	int clock;					/* the clock (pin 10) of the chip */
-
 	/* this gets called for every change of the EOC pin (pin 7) */
 	adc080x_on_eoc_changed_func		on_eoc_changed;
 

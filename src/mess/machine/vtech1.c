@@ -222,7 +222,7 @@ SNAPSHOT_LOAD(vtech1)
 		memory_write_byte(space, 0x788e, start % 256); /* usr subroutine address */
 		memory_write_byte(space, 0x788f, start / 256);
 		image_message(image, " %s (M)\nsize=%04X : start=%04X : end=%04X",pgmname,size,start,end);
-		cpu_set_reg(cputag_get_cpu(image->machine, "main"), REG_PC, start);				/* start program */
+		cpu_set_reg(cputag_get_cpu(image->machine, "main"), REG_GENPC, start);				/* start program */
 		break;
 
 	default:
@@ -239,12 +239,12 @@ SNAPSHOT_LOAD(vtech1)
  Floppy Handling
 ******************************************************************************/
 
-static const device_config *vtech1_file(void)
+static const device_config *vtech1_file(running_machine *machine)
 {
 	if (vtech1_drive < 0)
 		return NULL;
 
-	return image_from_devtype_and_index(IO_FLOPPY, vtech1_drive);
+	return image_from_devtype_and_index(machine, IO_FLOPPY, vtech1_drive);
 }
 
 /*

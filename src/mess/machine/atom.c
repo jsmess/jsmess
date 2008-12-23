@@ -316,7 +316,7 @@ QUICKLOAD_LOAD(atom)
 
 
 	/* set new pc address */
-	cpu_set_reg( image->machine->cpu[0], REG_PC, exec);
+	cpu_set_reg( image->machine->cpu[0], REG_GENPC, exec);
 
 	/* free the data */
 	free(quickload_data);

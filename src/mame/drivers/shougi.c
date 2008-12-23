@@ -82,6 +82,7 @@ PROM  : Type MB7051
 
 
 #include "driver.h"
+#include "cpu/alph8201/alph8201.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "video/resnet.h"
@@ -387,7 +388,7 @@ static MACHINE_DRIVER_START( shougi )
 	MDRV_CPU_ADD("mcu", ALPHA8201, 10000000/4/8)
 	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 	MDRV_WATCHDOG_VBLANK_INIT(16)	// assuming it's the same as champbas
 
 	/* video hardware */

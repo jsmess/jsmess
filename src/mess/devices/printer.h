@@ -20,7 +20,7 @@
 
 
 #define MDRV_PRINTER_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, PRINTER) \
+	MDRV_DEVICE_ADD(_tag, PRINTER, 0) \
 
 
 /***************************************************************************

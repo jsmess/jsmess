@@ -598,7 +598,7 @@ static MACHINE_START( adam )
 
 static MACHINE_RESET( adam )
 {
-	if (image_exists(image_from_devtype_and_index(IO_CARTSLOT, 0)))
+	if (image_exists(image_from_devtype_and_index(machine, IO_CARTSLOT, 0)))
 	{
 		/* ColecoVision Mode Reset (Cartridge Mounted) */
 		adam_lower_memory = 3; /* OS7 + 24k RAM */

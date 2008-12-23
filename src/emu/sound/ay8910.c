@@ -473,19 +473,19 @@ static void ay8910_write_reg(ay8910_context *psg, int r, int v)
 	}
 }
 
-static void ay8910_update(void *param,stream_sample_t **inputs, stream_sample_t **buffer,int length)
+static STREAM_UPDATE( ay8910_update )
 {
 	ay8910_context *psg = param;
 	stream_sample_t *buf[NUM_CHANNELS];
 	int chan;
 
-	buf[0] = buffer[0];
+	buf[0] = outputs[0];
 	buf[1] = NULL;
 	buf[2] = NULL;
 	if (psg->streams == NUM_CHANNELS)
 	{
-		buf[1] = buffer[1];
-		buf[2] = buffer[2];
+		buf[1] = outputs[1];
+		buf[2] = outputs[2];
 	}
 
 	/* hack to prevent us from hanging when starting filtered outputs */
@@ -493,7 +493,7 @@ static void ay8910_update(void *param,stream_sample_t **inputs, stream_sample_t 
 	{
 		for (chan = 0; chan < NUM_CHANNELS; chan++)
 			if (buf[chan] != NULL)
-				memset(buf[chan], 0, length * sizeof(*buf[chan]));
+				memset(buf[chan], 0, samples * sizeof(*buf[chan]));
 	}
 
 	/* The 8910 has three outputs, each output is the mix of one of the three */
@@ -504,7 +504,7 @@ static void ay8910_update(void *param,stream_sample_t **inputs, stream_sample_t 
 	/* is 1, not 0, and can be modulated changing the volume. */
 
 	/* buffering loop */
-	while (length)
+	while (samples)
 	{
 		for (chan = 0; chan < NUM_CHANNELS; chan++)
 		{
@@ -601,7 +601,7 @@ static void ay8910_update(void *param,stream_sample_t **inputs, stream_sample_t 
 			             + vol_enabled[2] * psg->vol_table[psg->Vol[2]]) / psg->step;
 #endif
 		}
-		length--;
+		samples--;
 	}
 }
 
@@ -867,20 +867,20 @@ SND_GET_INFO( ay8910 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_ALIAS:							info->i = SOUND_AY8910;					break;
+		case SNDINFO_INT_ALIAS:							info->i = SOUND_AY8910;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( ay8910 );		break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ay8910 );				break;
-		case SNDINFO_PTR_STOP:							info->stop = SND_STOP_NAME( ay8910 );				break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( ay8910 );	break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ay8910 );			break;
+		case SNDINFO_PTR_STOP:							info->stop = SND_STOP_NAME( ay8910 );			break;
 		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( ay8910 );			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							info->s = "AY-3-8910A";					break;
-		case SNDINFO_STR_CORE_FAMILY:					info->s = "PSG";						break;
-		case SNDINFO_STR_CORE_VERSION:					info->s = "1.0";						break;
-		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
-		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "AY-3-8910A");					break;
+		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "PSG");							break;
+		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");							break;
+		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
+		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 
@@ -888,9 +888,9 @@ SND_GET_INFO( ay8912 )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ay8910 );				break;
-		case SNDINFO_STR_NAME:							info->s = "AY-3-8912A";					break;
-		default: 										SND_GET_INFO_CALL(ay8910);	break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ay8910 );			break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "AY-3-8912A");					break;
+		default: 										SND_GET_INFO_CALL(ay8910);						break;
 	}
 }
 
@@ -898,9 +898,9 @@ SND_GET_INFO( ay8913 )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ay8910 );				break;
-		case SNDINFO_STR_NAME:							info->s = "AY-3-8913A";					break;
-		default: 										SND_GET_INFO_CALL(ay8910);	break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ay8910 );			break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "AY-3-8913A");					break;
+		default: 										SND_GET_INFO_CALL(ay8910);						break;
 	}
 }
 
@@ -908,9 +908,9 @@ SND_GET_INFO( ay8930 )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ay8910 );				break;
-		case SNDINFO_STR_NAME:							info->s = "AY8930";						break;
-		default: 										SND_GET_INFO_CALL(ay8910);	break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ay8910 );			break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "AY8930");						break;
+		default: 										SND_GET_INFO_CALL(ay8910);						break;
 	}
 }
 
@@ -918,9 +918,9 @@ SND_GET_INFO( ym2149 )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ym2149 );				break;
-		case SNDINFO_STR_NAME:							info->s = "YM2149";						break;
-		default: 										SND_GET_INFO_CALL(ay8910);	break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ym2149 );			break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "YM2149");						break;
+		default: 										SND_GET_INFO_CALL(ay8910);						break;
 	}
 }
 
@@ -928,9 +928,9 @@ SND_GET_INFO( ym3439 )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ym2149 );				break;
-		case SNDINFO_STR_NAME:							info->s = "YM3439";						break;
-		default: 										SND_GET_INFO_CALL(ay8910);	break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ym2149 );			break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "YM3439");						break;
+		default: 										SND_GET_INFO_CALL(ay8910);						break;
 	}
 }
 
@@ -938,9 +938,9 @@ SND_GET_INFO( ymz284 )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ym2149 );				break;
-		case SNDINFO_STR_NAME:							info->s = "YMZ284";						break;
-		default: 										SND_GET_INFO_CALL(ay8910);	break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ym2149 );			break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "YMZ284");						break;
+		default: 										SND_GET_INFO_CALL(ay8910);						break;
 	}
 }
 
@@ -948,9 +948,9 @@ SND_GET_INFO( ymz294 )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ym2149 );				break;
-		case SNDINFO_STR_NAME:							info->s = "YMZ294";						break;
-		default: 										SND_GET_INFO_CALL(ay8910);	break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ym2149 );			break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "YMZ294");						break;
+		default: 										SND_GET_INFO_CALL(ay8910);						break;
 	}
 }
 

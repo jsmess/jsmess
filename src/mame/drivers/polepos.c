@@ -211,6 +211,8 @@ Notes:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
+#include "cpu/mb88xx/mb88xx.h"
 #include "deprecat.h"
 #include "machine/namcoio.h"
 #include "sound/namco.h"
@@ -286,7 +288,7 @@ static WRITE8_HANDLER( polepos_latch_w )
 	switch (offset)
 	{
 		case 0x00:	/* IRQON */
-			cpu_interrupt_enable(0,bit);
+			cpu_interrupt_enable(space->machine->cpu[0],bit);
 			if (!bit)
 				cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 			break;
@@ -330,7 +332,7 @@ static WRITE16_HANDLER( polepos_z8002_nvi_enable_w )
 {
 	data &= 1;
 
-	cpu_interrupt_enable(cpu_get_index(space->cpu),data);
+	cpu_interrupt_enable(space->cpu,data);
 	if (!data)
 		cpu_set_input_line(space->cpu, 0, CLEAR_LINE);
 }
@@ -857,7 +859,7 @@ static MACHINE_DRIVER_START( polepos )
 
 	MDRV_WATCHDOG_VBLANK_INIT(16)	// 128V clocks the same as VBLANK
 
-	MDRV_INTERLEAVE(100)	/* some interleaving */
+	MDRV_QUANTUM_TIME(HZ(6000))	/* some interleaving */
 
 	MDRV_MACHINE_RESET(polepos)
 	MDRV_NVRAM_HANDLER(generic_1fill)

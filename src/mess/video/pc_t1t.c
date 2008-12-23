@@ -32,7 +32,6 @@ static MC6845_ON_VSYNC_CHANGED( pcjr_vsync_changed );
 
 static const mc6845_interface mc6845_t1000_intf = {
 	T1000_SCREEN_NAME,		/* screen number */
-	XTAL_14_31818MHz/8,		/* clock, needs verification */
 	8,						/* numbers of pixels per video memory address */
 	NULL,					/* begin_update */
 	t1000_update_row,		/* update_row */
@@ -50,8 +49,7 @@ MACHINE_DRIVER_START( pcvideo_t1000 )
 	MDRV_PALETTE_LENGTH( 16 )
 	MDRV_PALETTE_INIT(pcjr)
 
-	MDRV_DEVICE_ADD(T1000_MC6845_NAME, MC6845)
-	MDRV_DEVICE_CONFIG( mc6845_t1000_intf )
+	MDRV_MC6845_ADD(T1000_MC6845_NAME, MC6845, XTAL_14_31818MHz/8, mc6845_t1000_intf)
 
 	MDRV_VIDEO_START(pc_t1t)
 	MDRV_VIDEO_UPDATE( mc6845_t1000 )
@@ -60,7 +58,6 @@ MACHINE_DRIVER_END
 
 static const mc6845_interface mc6845_pcjr_intf = {
 	T1000_SCREEN_NAME,		/* screen number */
-	XTAL_14_31818MHz/16,	/* clock, needs verification */
 	8,						/* numbers of pixels per video memory address */
 	NULL,					/* begin_update */
 	t1000_update_row,		/* update_row */
@@ -78,8 +75,7 @@ MACHINE_DRIVER_START( pcvideo_pcjr )
 	MDRV_PALETTE_LENGTH( 16 )
 	MDRV_PALETTE_INIT(pcjr)
 
-	MDRV_DEVICE_ADD(T1000_MC6845_NAME, MC6845)
-	MDRV_DEVICE_CONFIG( mc6845_pcjr_intf )
+	MDRV_MC6845_ADD(T1000_MC6845_NAME, MC6845, XTAL_14_31818MHz/16, mc6845_pcjr_intf)
 
 	MDRV_VIDEO_START(pc_pcjr)
 	MDRV_VIDEO_UPDATE( mc6845_t1000 )

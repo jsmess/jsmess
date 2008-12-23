@@ -9,6 +9,7 @@ Markham (c) 1983 Sun Electronics
 *****************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
 
 WRITE8_HANDLER( markham_videoram_w );
@@ -206,7 +207,7 @@ static MACHINE_DRIVER_START( markham )
 	MDRV_CPU_PROGRAM_MAP(readmem2,writemem2)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

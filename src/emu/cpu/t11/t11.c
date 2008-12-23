@@ -57,7 +57,6 @@ struct _t11_state
 #define PSW 	psw.b.l
 
 
-
 /*************************************
  *
  *  Low-level memory operations
@@ -74,25 +73,25 @@ INLINE int ROPCODE(t11_state *cpustate)
 
 INLINE int RBYTE(t11_state *cpustate, int addr)
 {
-	return T11_RDMEM(cpustate, addr);
+	return memory_read_byte_16le(cpustate->program, addr);
 }
 
 
 INLINE void WBYTE(t11_state *cpustate, int addr, int data)
 {
-	T11_WRMEM(cpustate, addr, data);
+	memory_write_byte_16le(cpustate->program, addr, data);
 }
 
 
 INLINE int RWORD(t11_state *cpustate, int addr)
 {
-	return T11_RDMEM_WORD(cpustate, addr & 0xfffe);
+	return memory_read_word_16le(cpustate->program, addr & 0xfffe);
 }
 
 
 INLINE void WWORD(t11_state *cpustate, int addr, int data)
 {
-	T11_WRMEM_WORD(cpustate, addr & 0xfffe, data);
+	memory_write_word_16le(cpustate->program, addr & 0xfffe, data);
 }
 
 
@@ -419,15 +418,15 @@ CPU_GET_INFO( t11 )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 12;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 110;							break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 16;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 16;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE + T11_IRQ0:		info->i = (cpustate->irq_state & 1) ? ASSERT_LINE : CLEAR_LINE; break;
 		case CPUINFO_INT_INPUT_STATE + T11_IRQ1:		info->i = (cpustate->irq_state & 2) ? ASSERT_LINE : CLEAR_LINE; break;
@@ -449,11 +448,11 @@ CPU_GET_INFO( t11 )
 		case CPUINFO_INT_REGISTER + T11_R5:				info->i = cpustate->REGD(5);			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(t11);			break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(t11);				break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(t11);				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(t11);			break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(t11);	break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(t11);			break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(t11);				break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(t11);				break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(t11);			break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(t11);	break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

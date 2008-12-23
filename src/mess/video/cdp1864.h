@@ -71,6 +71,10 @@ typedef void (*cdp1864_on_efx_changed_func) (const device_config *device, int le
 
 #define CDP1864		DEVICE_GET_INFO_NAME(cdp1864)
 
+#define MDRV_CDP1864_ADD(_tag, _clock, _config) \
+	MDRV_DEVICE_ADD(_tag, CDP1864, _clock) \
+	MDRV_DEVICE_CONFIG(_config)
+
 typedef enum _cdp1864_format cdp1864_format;
 enum _cdp1864_format {
 	CDP1864_NON_INTERLACED = 0,
@@ -82,7 +86,6 @@ typedef struct _cdp1864_interface cdp1864_interface;
 struct _cdp1864_interface
 {
 	const char *screen_tag;		/* screen we are acting on */
-	int clock;					/* the clock (pin 2) of the chip */
 
 	cdp1864_format interlace;	/* interlace */
 

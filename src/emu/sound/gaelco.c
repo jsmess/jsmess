@@ -83,13 +83,13 @@ static void *	wavraw;					/* raw waveform */
             Writes length bytes to the sound buffer
   ============================================================================*/
 
-static void gaelco_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length)
+static STREAM_UPDATE( gaelco_update )
 {
 	struct GAELCOSND *info = param;
 	int j, ch;
 
     /* fill all data needed */
-	for(j = 0; j < length; j++){
+	for(j = 0; j < samples; j++){
 		int output_l = 0, output_r = 0;
 
 		/* for each channel */
@@ -175,12 +175,12 @@ static void gaelco_update(void *param, stream_sample_t **inputs, stream_sample_t
 #endif
 
 		/* now that we have computed all channels, save current data to the output buffer */
-		buffer[0][j] = output_l;
-		buffer[1][j] = output_r;
+		outputs[0][j] = output_l;
+		outputs[1][j] = output_r;
 	}
 
 	if (wavraw)
-		wav_add_data_32lr(wavraw, buffer[0], buffer[1], length, 0);
+		wav_add_data_32lr(wavraw, outputs[0], outputs[1], samples, 0);
 }
 
 /*============================================================================
@@ -319,14 +319,14 @@ SND_GET_INFO( gaelco_gae1 )
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( gaelco_gae1 );	break;
 		case SNDINFO_PTR_START:							info->start = SND_START_NAME( gaelco_gae1 );		break;
 		case SNDINFO_PTR_STOP:							info->stop = SND_STOP_NAME( gaelco );				break;
-		case SNDINFO_PTR_RESET:							/* nothing */							break;
+		case SNDINFO_PTR_RESET:							/* nothing */										break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							info->s = "Gaelco GAE1";				break;
-		case SNDINFO_STR_CORE_FAMILY:					info->s = "Gaelco custom";				break;
-		case SNDINFO_STR_CORE_VERSION:					info->s = "1.0";						break;
-		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
-		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "Gaelco GAE1");						break;
+		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Gaelco custom");					break;
+		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");								break;
+		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);							break;
+		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 
@@ -355,14 +355,14 @@ SND_GET_INFO( gaelco_cg1v )
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( gaelco_cg1v );	break;
 		case SNDINFO_PTR_START:							info->start = SND_START_NAME( gaelco_cg1v );		break;
 		case SNDINFO_PTR_STOP:							info->stop = SND_STOP_NAME( gaelco );				break;
-		case SNDINFO_PTR_RESET:							/* nothing */							break;
+		case SNDINFO_PTR_RESET:							/* nothing */										break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							info->s = "Gaelco CG1V";				break;
-		case SNDINFO_STR_CORE_FAMILY:					info->s = "Gaelco custom";				break;
-		case SNDINFO_STR_CORE_VERSION:					info->s = "1.0";						break;
-		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
-		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "Gaelco CG1V");						break;
+		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Gaelco custom");					break;
+		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");								break;
+		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);							break;
+		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

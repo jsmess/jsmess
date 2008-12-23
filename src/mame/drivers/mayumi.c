@@ -7,6 +7,7 @@ Kikiippatsu Mayumi-chan (c) 1988 Victory L.L.C.
 *****************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 
 #define MCLK 10000000
@@ -36,7 +37,7 @@ static WRITE8_HANDLER( bank_sel_w )
 
 	int_enable = data & 1;
 
-	flip_screen_set(data & 2);
+	flip_screen_set(space->machine, data & 2);
 }
 
 static MACHINE_RESET( mayumi )

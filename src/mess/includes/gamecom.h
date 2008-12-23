@@ -158,8 +158,8 @@ extern READ8_HANDLER( gamecom_internal_r );
 extern WRITE8_HANDLER( gamecom_vram_w );
 extern READ8_HANDLER( gamecom_vram_r );
 
-extern void gamecom_handle_dma( int cycles );
-extern void gamecom_update_timers( int cycles );
+extern void gamecom_handle_dma( const device_config *device, int cycles );
+extern void gamecom_update_timers( const device_config *device, int cycles );
 
 extern UINT8 internal_registers[];
 extern UINT8 gamecom_vram[];

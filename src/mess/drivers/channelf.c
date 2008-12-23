@@ -237,7 +237,7 @@ static MACHINE_DRIVER_START( channelf )
 	MDRV_CPU_ADD("main", F8, 3579545/2)        /* Colorburst/2 */
 	MDRV_CPU_PROGRAM_MAP(channelf_map, 0)
 	MDRV_CPU_IO_MAP(channelf_io, 0)
-	MDRV_INTERLEAVE(1)
+	MDRV_QUANTUM_TIME(HZ(60))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

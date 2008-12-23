@@ -217,7 +217,6 @@ static MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 static const mc6845_interface mc6845_intf =
 {
 	"main",					/* screen we are acting on */
-	MC6845_CLOCK,			/* the clock (pin 21) of the chip */
 	8,						/* number of pixels per video memory address */
 	NULL,					/* before pixel update callback */
 	NULL,					/* row update callback */
@@ -426,9 +425,9 @@ static WRITE8_HANDLER( peplus_output_bank_c_w )
 
 static WRITE8_HANDLER(i2c_nvram_w)
 {
-	i2cmem_write(0, I2CMEM_SCL, BIT(data, 2));
+	i2cmem_write(space->machine, 0, I2CMEM_SCL, BIT(data, 2));
 	sda_dir = BIT(data, 1);
-	i2cmem_write(0, I2CMEM_SDA, BIT(data, 0));
+	i2cmem_write(space->machine, 0, I2CMEM_SDA, BIT(data, 0));
 }
 
 
@@ -518,7 +517,7 @@ static READ8_HANDLER( peplus_input_bank_a_r )
 	UINT8 sda = 0;
 	if(!sda_dir)
 	{
-		sda = i2cmem_read(0, I2CMEM_SDA);
+		sda = i2cmem_read(space->machine, 0, I2CMEM_SDA);
 	}
 
 	if ((input_port_read_safe(space->machine, "SENSOR",0x00) & 0x01) == 0x01 && coin_state == 0) {
@@ -1006,8 +1005,7 @@ static MACHINE_DRIVER_START( peplus )
 	MDRV_GFXDECODE(peplus)
 	MDRV_PALETTE_LENGTH(16*16)
 
-	MDRV_DEVICE_ADD("crtc", R6545_1)
-	MDRV_DEVICE_CONFIG(mc6845_intf)
+	MDRV_MC6845_ADD("crtc", R6545_1, MC6845_CLOCK, mc6845_intf)
 
 	MDRV_PALETTE_INIT(peplus)
 	MDRV_VIDEO_START(peplus)

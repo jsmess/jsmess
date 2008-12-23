@@ -18,6 +18,7 @@
 
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "machine/atarigen.h"
 #include "audio/atarijsa.h"
 #include "thunderj.h"
@@ -324,7 +325,7 @@ static MACHINE_DRIVER_START( thunderj )
 
 	MDRV_MACHINE_RESET(thunderj)
 	MDRV_NVRAM_HANDLER(atarigen)
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

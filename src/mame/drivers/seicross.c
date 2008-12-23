@@ -43,6 +43,8 @@ This info came from http://www.ne.jp/asahi/cc-sakura/akkun/old/fryski.html
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
+#include "cpu/m6800/m6800.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 
@@ -98,7 +100,7 @@ static WRITE8_HANDLER( friskyt_portB_w )
 {
 //logerror("PC %04x: 8910 port B = %02x\n",cpu_get_pc(space->cpu),data);
 	/* bit 0 is IRQ enable */
-	cpu_interrupt_enable(0,data & 1);
+	cpu_interrupt_enable(space->machine->cpu[0],data & 1);
 
 	/* bit 1 flips screen */
 
@@ -410,7 +412,7 @@ static MACHINE_DRIVER_START( nvram )
 	MDRV_CPU_ADD("mcu", NSC8105, 6000000)	/* ??? */
 	MDRV_CPU_PROGRAM_MAP(mcu_nvram_map,0)
 
-	MDRV_INTERLEAVE(20)	/* 20 CPU slices per frame - an high value to ensure proper */
+	MDRV_QUANTUM_TIME(HZ(1200))	/* 20 CPU slices per frame - an high value to ensure proper */
 						/* synchronization of the CPUs */
 	MDRV_MACHINE_RESET(friskyt)
 	MDRV_NVRAM_HANDLER(seicross)

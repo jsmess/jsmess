@@ -144,14 +144,14 @@ static DEVICE_START( adc080x )
 	adc080x->intf = device->static_config;
 
 	assert(adc080x->intf != NULL);
-	assert(adc080x->intf->clock > 0);
+	assert(device->clock > 0);
 
 	/* set initial values */
 	adc080x->eoc = 1;
 
 	/* allocate cycle timer */
 	adc080x->cycle_timer = timer_alloc(device->machine, cycle_tick, (void *)device);
-	timer_adjust_periodic(adc080x->cycle_timer, attotime_zero, 0, ATTOTIME_IN_HZ(adc080x->intf->clock));
+	timer_adjust_periodic(adc080x->cycle_timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock));
 
 	/* register for state saving */
 	state_save_register_item(device->machine, "adc080x", device->tag, 0, adc080x->address);
@@ -189,11 +189,11 @@ DEVICE_GET_INFO( adc0808 )
 		case DEVINFO_FCT_RESET:							/* Nothing */								break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "National Semiconductor ADC0808";	break;
-		case DEVINFO_STR_FAMILY:						info->s = "National Semiconductor ADC080";	break;
-		case DEVINFO_STR_VERSION:						info->s = "1.0";							break;
-		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;							break;
-		case DEVINFO_STR_CREDITS:						info->s = "Copyright MESS Team";			break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "National Semiconductor ADC0808");	break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "National Semiconductor ADC080");	break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);							break;
+		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");			break;
 	}
 }
 
@@ -202,7 +202,7 @@ DEVICE_GET_INFO( adc0809 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "National Semiconductor ADC0809";	break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "National Semiconductor ADC0809");	break;
 
 		default:										DEVICE_GET_INFO_CALL(adc0808);				break;
 	}

@@ -11,7 +11,6 @@ TODO:
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "amiga.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/6526cia.h"
@@ -439,9 +438,8 @@ void amiga_cart_check_overlay( running_machine *machine )
 	}
 }
 
-void amiga_cart_nmi( void )
+void amiga_cart_nmi( running_machine *machine )
 {
-	running_machine *machine = Machine;
 	if ( amiga_cart_type < 0 )
 		return;
 

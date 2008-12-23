@@ -19,6 +19,7 @@ Notes:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "deprecat.h"
 #include "video/konamiic.h"
 #include "machine/eeprom.h"
@@ -401,7 +402,7 @@ static MACHINE_DRIVER_START( overdriv )
 						/* 60 fps, that's how I fixed it for now. */
 	MDRV_CPU_PROGRAM_MAP(overdriv_s_readmem,overdriv_s_writemem)
 
-	MDRV_INTERLEAVE(200)
+	MDRV_QUANTUM_TIME(HZ(12000))
 
 	MDRV_MACHINE_RESET(overdriv)
 	MDRV_NVRAM_HANDLER(overdriv)

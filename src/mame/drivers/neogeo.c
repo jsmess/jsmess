@@ -80,6 +80,7 @@
 ****************************************************************************/
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "neogeo.h"
 #include "machine/pd4990a.h"
 #include "cpu/z80/z80.h"
@@ -1011,7 +1012,7 @@ static MACHINE_RESET( neogeo )
 	/* reset system control registers */
 	for (offs = 0; offs < 8; offs++)
 		system_control_w(space, offs, 0, 0x00ff);
-	cpu_reset(machine->cpu[0]);
+	device_reset(machine->cpu[0]);
 
 	neogeo_reset_rng();
 
@@ -1234,7 +1235,7 @@ static MACHINE_DRIVER_START( neogeo )
 	MDRV_CPU_PROGRAM_MAP(audio_map,0)
 	MDRV_CPU_IO_MAP(auido_io_map,0)
 
-	MDRV_WATCHDOG_TIME_INIT(UINT64_ATTOTIME_IN_USEC(128762))
+	MDRV_WATCHDOG_TIME_INIT(USEC(128762))
 
 	MDRV_MACHINE_START(neogeo)
 	MDRV_MACHINE_RESET(neogeo)

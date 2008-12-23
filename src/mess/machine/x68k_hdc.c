@@ -469,14 +469,14 @@ DEVICE_GET_INFO(x68k_hdc)
 		case DEVINFO_FCT_IMAGE_CREATE:					info->f = (genf *)DEVICE_IMAGE_CREATE_NAME(sasihd);	break;
 
 			/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "SASI Hard Disk";	break;
-		case DEVINFO_STR_FAMILY:						info->s = "SASI Hard Disk Controller";			break;
-		case DEVINFO_STR_VERSION:						info->s = "1.0";							break;
-		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;							break;
-		case DEVINFO_STR_CREDITS:						info->s = "Copyright the MESS Team"; 		break;
-		case DEVINFO_STR_IMAGE_INSTANCE_NAME:			info->s = "sasihd"; 			break;
-		case DEVINFO_STR_IMAGE_BRIEF_INSTANCE_NAME:		info->s = "sasi"; 			break;
-		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:			info->s = "hdf"; break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "SASI Hard Disk");	break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "SASI Hard Disk Controller");			break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);							break;
+		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team"); 		break;
+		case DEVINFO_STR_IMAGE_INSTANCE_NAME:			strcpy(info->s, "sasihd"); 			break;
+		case DEVINFO_STR_IMAGE_BRIEF_INSTANCE_NAME:		strcpy(info->s, "sasi"); 			break;
+		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:			strcpy(info->s, "hdf"); break;
 	}
 }
 

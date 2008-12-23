@@ -40,6 +40,8 @@ Stephh's notes (based on the game M68000 code and some tests) :
 ********************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
+#include "cpu/m68000/m68000.h"
 #include "taitoipt.h"
 #include "video/taitoic.h"
 #include "audio/taitosnd.h"
@@ -246,7 +248,7 @@ static MACHINE_DRIVER_START( volfied )
 	MDRV_CPU_ADD("audio", Z80, 4000000)   /* sound CPU, required to run the game */
 	MDRV_CPU_PROGRAM_MAP(z80_map,0)
 
-	MDRV_INTERLEAVE(20)
+	MDRV_QUANTUM_TIME(HZ(1200))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

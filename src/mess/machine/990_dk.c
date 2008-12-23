@@ -114,7 +114,7 @@ void fd800_machine_init(running_machine *machine, void (*interrupt_callback)(run
 
 	for (i=0; i<MAX_FLOPPIES; i++)
 	{
-		fd800.drv[i].img = image_from_devtype_and_index(IO_FLOPPY, i);
+		fd800.drv[i].img = image_from_devtype_and_index(machine, IO_FLOPPY, i);
 		fd800.drv[i].phys_cylinder = -1;
 		fd800.drv[i].log_cylinder[0] = fd800.drv[i].log_cylinder[1] = -1;
 		fd800.drv[i].seclen = 64;

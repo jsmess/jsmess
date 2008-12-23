@@ -202,7 +202,6 @@ static MC6845_ON_VSYNC_CHANGED(abc802_vsync_changed)
 
 static const mc6845_interface abc802_mc6845_interface = {
 	SCREEN_TAG,
-	ABC800_CCLK,
 	ABC800_CHAR_WIDTH,
 	NULL,
 	abc802_update_row,
@@ -258,8 +257,7 @@ static VIDEO_UPDATE( abc802 )
 
 MACHINE_DRIVER_START( abc802_video )
 	// device interface
-	MDRV_DEVICE_ADD(MC6845_TAG, MC6845)
-	MDRV_DEVICE_CONFIG(abc802_mc6845_interface)
+	MDRV_MC6845_ADD(MC6845_TAG, MC6845, ABC800_CCLK, abc802_mc6845_interface)
 
 	// video hardware
 	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)

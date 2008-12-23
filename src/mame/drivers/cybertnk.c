@@ -170,6 +170,8 @@ lev 7 : 0x7c : 0000 07e0 - input device clear?
 *******************************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
+#include "cpu/m68000/m68000.h"
 #include "deprecat.h"
 #include "sound/3812intf.h"
 
@@ -572,7 +574,7 @@ static MACHINE_DRIVER_START( cybertnk )
 	MDRV_CPU_ADD("audio", Z80,3579500)
 	MDRV_CPU_PROGRAM_MAP(sound_mem,0)
 
-	MDRV_INTERLEAVE(100)//arbitrary value,needed to get the communication to work
+	MDRV_QUANTUM_TIME(HZ(6000))//arbitrary value,needed to get the communication to work
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

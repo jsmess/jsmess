@@ -42,7 +42,7 @@ typedef void (*cdp1871_on_rpt_changed_func) (const device_config *device, int le
 #define CDP1871		DEVICE_GET_INFO_NAME(cdp1871)
 
 #define MDRV_CDP1871_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, CDP1871) \
+	MDRV_DEVICE_ADD(_tag, CDP1871, 0) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
 #define MDRV_CDP1871_REMOVE(_tag) \

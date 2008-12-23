@@ -57,7 +57,7 @@ static DIRECT_UPDATE_HANDLER(spectrum_direct)
 {
 	/* Hack for correct handling 0xffff interrupt vector */
 	if (address == 0x0001)
-		if (cpu_get_reg(space->machine->cpu[0], REG_PREVIOUSPC)==0xffff)
+		if (cpu_get_reg(space->machine->cpu[0], REG_GENPCBASE)==0xffff)
 		{
 			cpu_set_reg(space->machine->cpu[0], Z80_PC, 0xfff4);
 			return 0xfff4;

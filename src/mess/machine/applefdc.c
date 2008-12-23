@@ -627,9 +627,9 @@ static DEVICE_GET_INFO(applefdc_base)
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(applefdc);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FAMILY:						info->s = "Apple FDC";						break;
-		case DEVINFO_STR_VERSION:						info->s = "1.0";							break;
-		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;							break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Apple FDC");						break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);							break;
 	}
 }
 
@@ -658,7 +658,7 @@ DEVICE_GET_INFO(applefdc)
 	switch (state)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "Apple FDC";				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Apple FDC");				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(oldfdc);	break;
@@ -692,7 +692,7 @@ DEVICE_GET_INFO(iwm)
 	switch (state)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "Apple IWM (Integrated Woz Machine)";				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Apple IWM (Integrated Woz Machine)");				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(iwm);	break;
@@ -726,7 +726,7 @@ DEVICE_GET_INFO(swim)
 	switch (state)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "Apple SWIM (Steve Woz Integrated Machine)";				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Apple SWIM (Steve Woz Integrated Machine)");				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(swim);	break;

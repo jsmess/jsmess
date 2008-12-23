@@ -107,6 +107,7 @@ DSW2 stored @ $f237
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "cpu/m6805/m6805.h"
 #include "cpu/mcs51/mcs51.h"
@@ -242,7 +243,7 @@ static WRITE8_HANDLER( mcu_p1_w )
 			coin_lockout_global_w((data & 1) ^ invert_coin_lockout);
 			break;
 		case 4:
-			flip_screen_set(data & 1);
+			flip_screen_set(space->machine, data & 1);
 			break;
 		case 5:
 			port1 = data;
@@ -304,7 +305,7 @@ static READ8_HANDLER( bootleg_in0_r )
 
 static WRITE8_HANDLER( bootleg_flipscreen_w )
 {
-	flip_screen_set(~data & 1);
+	flip_screen_set(space->machine, ~data & 1);
 }
 
 
@@ -1060,7 +1061,7 @@ static MACHINE_DRIVER_START( sqix )
 	MDRV_CPU_ADD("mcu", I8751, 12000000/3)	/* ??? */
 	MDRV_CPU_IO_MAP(mcu_io_map,0)
 
-	MDRV_INTERLEAVE(500)
+	MDRV_QUANTUM_TIME(HZ(30000))
 
 	MDRV_MACHINE_START(superqix)
 

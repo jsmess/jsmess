@@ -39,7 +39,7 @@ struct _tms5501_interface
 ***************************************************************************/
 
 #define MDRV_TMS5501_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, TMS5501) \
+	MDRV_DEVICE_ADD(_tag, TMS5501, 0) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
 

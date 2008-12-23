@@ -56,6 +56,7 @@ JALCF1   BIN     1,048,576  02-07-99  1:11a JALCF1.BIN
 *******************************************************************************************/
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "deprecat.h"
 #include "sound/okim6295.h"
 
@@ -112,12 +113,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			int xx,yy,x;
 			int delta = 16;
 
-			flipx ^= flip_screen_get();
-			flipy ^= flip_screen_get();
+			flipx ^= flip_screen_get(machine);
+			flipy ^= flip_screen_get(machine);
 
 			if ((pri&pri_mask)!=priority) continue;
 
-			if (flip_screen_get())
+			if (flip_screen_get(machine))
 			{
 				sx = 368 - sx;
 				sy = 240 - sy;

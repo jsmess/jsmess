@@ -31,7 +31,7 @@ typedef enum
  * It will be called whenever an output signal changes or a new
  * input line state is to be sampled.
  */
-typedef int (*upd7810_io_callback)(int ioline, int state);
+typedef int (*upd7810_io_callback)(const device_config *device, int ioline, int state);
 
 // use it as reset parameter in the Machine struct
 typedef struct {
@@ -76,6 +76,12 @@ CPU_GET_INFO( upd7807 );
 CPU_GET_INFO( upd7801 );
 CPU_GET_INFO( upd78c05 );
 CPU_GET_INFO( upd78c06 );
+
+#define CPU_UPD7810 CPU_GET_INFO_NAME( upd7810 )
+#define CPU_UPD7807 CPU_GET_INFO_NAME( upd7807 )
+#define CPU_UPD7801 CPU_GET_INFO_NAME( upd7801 )
+#define CPU_UPD78C05 CPU_GET_INFO_NAME( upd78c05 )
+#define CPU_UPD78C06 CPU_GET_INFO_NAME( upd78c06 )
 
 CPU_DISASSEMBLE( upd7810 );
 CPU_DISASSEMBLE( upd7807 );

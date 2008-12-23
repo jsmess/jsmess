@@ -15,7 +15,7 @@
 #include "includes/special.h"
 
 static CUSTOM_START( specimx_sh_start );
-static void specimx_sh_update(void *param,stream_sample_t **inputs, stream_sample_t **outputs,int samples);
+static STREAM_UPDATE( specimx_sh_update );
 
 static sound_stream *mixer_channel;
 static int specimx_input[3];
@@ -34,7 +34,7 @@ static CUSTOM_START( specimx_sh_start )
 	return (void *) ~0;
 }
 
-static void specimx_sh_update(void *param,stream_sample_t **inputs, stream_sample_t **outputs,int samples)
+static STREAM_UPDATE( specimx_sh_update )
 {
 	INT16 channel_0_signal;
 	INT16 channel_1_signal;

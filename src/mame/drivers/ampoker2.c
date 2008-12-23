@@ -356,6 +356,7 @@
 #define MASTER_CLOCK	XTAL_6MHz
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "ampoker2.lh"
 #include "sigmapkr.lh"
@@ -1024,7 +1025,7 @@ static MACHINE_DRIVER_START( ampoker2 )
 	MDRV_CPU_PROGRAM_MAP(ampoker2_map, 0)
 	MDRV_CPU_IO_MAP(ampoker2_io_map, 0)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 1536)
-	MDRV_WATCHDOG_TIME_INIT(UINT64_ATTOTIME_IN_MSEC(200))	/* 200 ms, measured */
+	MDRV_WATCHDOG_TIME_INIT(MSEC(200))	/* 200 ms, measured */
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 

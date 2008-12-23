@@ -22,6 +22,8 @@ TODO:
 *************************************************************************************************/
 
 #include "driver.h"
+#include "cpu/nec/nec.h"
+#include "cpu/i86/i86.h"
 #include "fashion.lh"
 
 static UINT16 *blit_ram;

@@ -26,6 +26,7 @@ TODO:
 */
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "machine/8255ppi.h"
 #include "machine/mc8123.h"
 #include "sound/sn76496.h"
@@ -65,9 +66,9 @@ static WRITE8_HANDLER( flipscreen_w )
 {
 	/* flip Y/X could be the other way round... */
 	if (offset)
-		flip_screen_y_set(~data & 1);
+		flip_screen_y_set(space->machine, ~data & 1);
 	else
-		flip_screen_x_set(~data & 1);
+		flip_screen_x_set(space->machine, ~data & 1);
 }
 
 static WRITE8_HANDLER( coin_w )

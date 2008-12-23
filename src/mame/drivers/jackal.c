@@ -92,7 +92,7 @@ static READ8_HANDLER( topgunbl_rotary_r )
 static WRITE8_HANDLER( jackal_flipscreen_w )
 {
 	irq_enable = data & 0x02;
-	flip_screen_set(data & 0x08);
+	flip_screen_set(space->machine, data & 0x08);
 }
 
 /* Memory Maps */
@@ -307,7 +307,7 @@ static MACHINE_DRIVER_START( jackal )
 	MDRV_CPU_ADD("slave", M6809, MASTER_CLOCK/12) // verified on pcb
 	MDRV_CPU_PROGRAM_MAP(slave_map, 0)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	MDRV_MACHINE_RESET(jackal)
 

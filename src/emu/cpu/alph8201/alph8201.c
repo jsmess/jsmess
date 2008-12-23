@@ -891,15 +891,15 @@ static CPU_GET_INFO( alpha8xxx )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 16;							break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 10;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 6;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 8;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 10;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 8;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 6;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
 #if HANDLE_HALT_LINE
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_HALT:		info->i = cpustate->halt ? ASSERT_LINE : CLEAR_LINE; break;
 #endif
@@ -930,12 +930,12 @@ static CPU_GET_INFO( alpha8xxx )
 		case CPUINFO_INT_REGISTER + ALPHA8201_R7:			info->i = RD_REG(7);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(alpha8201);		break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(alpha8201);			break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(alpha8201);			break;
-		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(alpha8201);			break;
-		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(alpha8201);		break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(alpha8201);		break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(alpha8201);			break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(alpha8201);			break;
+		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(alpha8201);			break;
+		case CPUINFO_FCT_BURN:							info->burn = NULL;						break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(alpha8201);		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -976,7 +976,7 @@ CPU_GET_INFO( alpha8201 )
 	switch (state)
 	{
 	case CPUINFO_STR_NAME:							strcpy(info->s, "ALPHA-8201");				break;
-	case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(alpha8201);			break;
+	case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(alpha8201);			break;
 	default:
 		/* 8201 / 8301 */
 		CPU_GET_INFO_CALL(alpha8xxx);
@@ -990,7 +990,7 @@ CPU_GET_INFO( alpha8301 )
 	switch (state)
 	{
 	case CPUINFO_STR_NAME:							strcpy(info->s, "ALPHA-8301");				break;
-	case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(ALPHA8301);			break;
+	case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(ALPHA8301);			break;
 	default:
 		/* 8201 / 8301 */
 		CPU_GET_INFO_CALL(alpha8xxx);

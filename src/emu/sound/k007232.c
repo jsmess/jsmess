@@ -216,13 +216,13 @@ static void KDAC_A_make_fncode( struct kdacApcm *info ){
 /*    Konami PCM update                         */
 /************************************************/
 
-static void KDAC_A_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int buffer_len)
+static STREAM_UPDATE( KDAC_A_update )
 {
   struct kdacApcm *info = param;
   int i;
 
-  memset(buffer[0],0,buffer_len * sizeof(*buffer[0]));
-  memset(buffer[1],0,buffer_len * sizeof(*buffer[1]));
+  memset(outputs[0],0,samples * sizeof(*outputs[0]));
+  memset(outputs[1],0,samples * sizeof(*outputs[1]));
 
   for( i = 0; i < KDAC_A_PCM_MAX; i++ )
     {
@@ -242,7 +242,7 @@ static void KDAC_A_update(void *param, stream_sample_t **inputs, stream_sample_t
 	  volB = (volB + cen) < 0x1fe ? (volB + cen) : 0x1fe;
 #endif
 
-	  for( j = 0; j < buffer_len; j++ )
+	  for( j = 0; j < samples; j++ )
 	    {
 	      old_addr = addr;
 	      addr = info->start[i] + ((info->addr[i]>>BASE_SHIFT)&0x000fffff);
@@ -282,8 +282,8 @@ static void KDAC_A_update(void *param, stream_sample_t **inputs, stream_sample_t
 
 	      out = (info->pcmbuf[i][addr] & 0x7f) - 0x40;
 
-	      buffer[0][j] += out * volA;
-	      buffer[1][j] += out * volB;
+	      outputs[0][j] += out * volA;
+	      outputs[1][j] += out * volB;
 	    }
 	}
     }
@@ -494,17 +494,17 @@ SND_GET_INFO( k007232 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( k007232 );		break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( k007232 );			break;
-		case SNDINFO_PTR_STOP:							/* nothing */							break;
-		case SNDINFO_PTR_RESET:							/* nothing */							break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( k007232 );	break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( k007232 );		break;
+		case SNDINFO_PTR_STOP:							/* nothing */									break;
+		case SNDINFO_PTR_RESET:							/* nothing */									break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							info->s = "K007232";					break;
-		case SNDINFO_STR_CORE_FAMILY:					info->s = "Konami custom";				break;
-		case SNDINFO_STR_CORE_VERSION:					info->s = "1.0";						break;
-		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
-		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "K007232");						break;
+		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Konami custom");				break;
+		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");							break;
+		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
+		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

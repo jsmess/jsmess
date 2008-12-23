@@ -44,6 +44,10 @@ Year + Game             Main CPU    Sound CPU    Sound            Video
 ***************************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
+#include "cpu/nec/nec.h"
+#include "cpu/i86/i86.h"
+#include "cpu/i86/i86.h"
 #include "sound/2151intf.h"
 #include "sound/3812intf.h"
 #include "sound/dac.h"
@@ -826,7 +830,7 @@ static MACHINE_DRIVER_START( fantland )
 
 	MDRV_MACHINE_RESET(fantland)
 
-	MDRV_INTERLEAVE(8000/60)	// sound irq must feed the DAC at 8kHz
+	MDRV_QUANTUM_TIME(HZ(8000))	// sound irq must feed the DAC at 8kHz
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

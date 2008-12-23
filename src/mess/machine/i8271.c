@@ -190,7 +190,7 @@ INLINE i8271_t *get_safe_token(const device_config *device)
 static const device_config *current_image(const device_config *device)
 {
 	i8271_t *i8271 = get_safe_token(device);
-	return image_from_devtype_and_index(IO_FLOPPY, i8271->drive);
+	return image_from_devtype_and_index(device->machine, IO_FLOPPY, i8271->drive);
 }
 
 
@@ -1074,12 +1074,12 @@ static void i8271_command_execute(const device_config *device)
 			status |= (1<<2) | (1<<6);
 
 			/* these two do not appear to be set at all! ?? */
-			if (floppy_drive_get_flag_state(image_from_devtype_and_index(IO_FLOPPY, 0), FLOPPY_DRIVE_READY))
+			if (floppy_drive_get_flag_state(image_from_devtype_and_index(img->machine, IO_FLOPPY, 0), FLOPPY_DRIVE_READY))
 			{
 				status |= (1<<2);
 			}
 
-			if (floppy_drive_get_flag_state(image_from_devtype_and_index(IO_FLOPPY, 1), FLOPPY_DRIVE_READY))
+			if (floppy_drive_get_flag_state(image_from_devtype_and_index(img->machine, IO_FLOPPY, 1), FLOPPY_DRIVE_READY))
 			{
 				status |= (1<<6);
 			}
@@ -1613,11 +1613,11 @@ DEVICE_GET_INFO( i8271 )
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(i8271);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "Intel 8271";						break;
-		case DEVINFO_STR_FAMILY:						info->s = "Intel 8271";						break;
-		case DEVINFO_STR_VERSION:						info->s = "1.0";							break;
-		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;							break;
-		case DEVINFO_STR_CREDITS:						info->s = "Copyright MESS Team";			break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Intel 8271");						break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Intel 8271");						break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);							break;
+		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");			break;
 	}
 }
 

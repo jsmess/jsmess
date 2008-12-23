@@ -294,5 +294,5 @@ MACHINE_RESET( sym1 )
 	memory_install_readwrite8_handler(cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM ),
 			0xf800, 0xffff, 0, 0, SMH_BANK1, SMH_NOP);
 	memory_set_bankptr(machine, 1, sym1_monitor + 0x800);
-	cpu_reset(cputag_get_cpu(machine, "main"));
+	device_reset(cputag_get_cpu(machine, "main"));
 }

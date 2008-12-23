@@ -201,7 +201,7 @@ static MACHINE_DRIVER_START( mephisto )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main",M65C02,4915200)        /* 65C02 */
 	MDRV_CPU_PROGRAM_MAP(mephisto_mem, 0)
-	MDRV_INTERLEAVE(1)
+	MDRV_QUANTUM_TIME(HZ(60))
 	MDRV_MACHINE_START( mephisto )
 	MDRV_MACHINE_RESET( mephisto )
 

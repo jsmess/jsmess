@@ -14,6 +14,7 @@ OKI M6295 sound ROM dump is bad.
 */
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
 #include "includes/bublbobl.h"
@@ -96,7 +97,7 @@ static VIDEO_UPDATE( missb2 )
 				x = sx + xc * 8;
 				y = (sy + yc * 8) & 0xff;
 
-				if (flip_screen_get())
+				if (flip_screen_get(screen->machine))
 				{
 					x = 248 - x;
 					y = 248 - y;
@@ -368,7 +369,7 @@ static MACHINE_DRIVER_START( missb2 )
 //  MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 	MDRV_CPU_VBLANK_INT("main", missb2_interrupt)
 
-	MDRV_INTERLEAVE(100) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
+	MDRV_QUANTUM_TIME(HZ(6000)) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
 	// video hardware
 

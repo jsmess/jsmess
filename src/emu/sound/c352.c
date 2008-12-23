@@ -325,26 +325,26 @@ static void c352_mix_one_channel(struct c352_info *info, unsigned long ch, long 
 }
 
 
-static void c352_update(void *param, stream_sample_t **inputs, stream_sample_t **buf, int sample_count)
+static STREAM_UPDATE( c352_update )
 {
 	struct c352_info *info = param;
 	int i, j;
-	stream_sample_t *bufferl = buf[0];
-	stream_sample_t *bufferr = buf[1];
-	stream_sample_t *bufferl2 = buf[2];
-	stream_sample_t *bufferr2 = buf[3];
+	stream_sample_t *bufferl = outputs[0];
+	stream_sample_t *bufferr = outputs[1];
+	stream_sample_t *bufferl2 = outputs[2];
+	stream_sample_t *bufferr2 = outputs[3];
 
-	for(i = 0 ; i < sample_count ; i++)
+	for(i = 0 ; i < samples ; i++)
 	{
 	       info->channel_l[i] = info->channel_r[i] = info->channel_l2[i] = info->channel_r2[i] = 0;
 	}
 
 	for (j = 0 ; j < 32 ; j++)
 	{
-		c352_mix_one_channel(info, j, sample_count);
+		c352_mix_one_channel(info, j, samples);
 	}
 
-	for(i = 0 ; i < sample_count ; i++)
+	for(i = 0 ; i < samples ; i++)
 	{
 		*bufferl++ = (short) (info->channel_l[i] >>3);
 		*bufferr++ = (short) (info->channel_r[i] >>3);
@@ -593,17 +593,17 @@ SND_GET_INFO( c352 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( c352 );			break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( c352 );				break;
-		case SNDINFO_PTR_STOP:							/* nothing */							break;
-		case SNDINFO_PTR_RESET:							/* nothing */							break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( c352 );	break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( c352 );		break;
+		case SNDINFO_PTR_STOP:							/* nothing */								break;
+		case SNDINFO_PTR_RESET:							/* nothing */								break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							info->s = "C352";						break;
-		case SNDINFO_STR_CORE_FAMILY:					info->s = "Namco PCM";					break;
-		case SNDINFO_STR_CORE_VERSION:					info->s = "1.1";						break;
-		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
-		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "C352");					break;
+		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Namco PCM");				break;
+		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.1");						break;
+		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);					break;
+		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

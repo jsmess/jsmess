@@ -121,6 +121,7 @@ TODO:
 ******************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 #include "sound/samples.h"
 #include "machine/mc8123.h"
@@ -193,7 +194,7 @@ static WRITE8_HANDLER( ninjakd2_soundreset_w )
 	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 
 	// bit 7 flips screen
-	flip_screen_set(data & 0x80);
+	flip_screen_set(space->machine, data & 0x80);
 
 	// other bits unused
 }

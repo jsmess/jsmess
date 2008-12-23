@@ -216,6 +216,21 @@ static TIMER_DEVICE_CALLBACK( abc80_keyboard_tick )
 	abc80_keyboard_scan(timer->machine);
 }
 
+static READ8_DEVICE_HANDLER(z80pio_alt_r)
+{
+	int channel = BIT(offset, 1);
+	return (offset & 1) ? z80pio_c_r(device, channel) : z80pio_d_r(device, channel);
+}
+
+static WRITE8_DEVICE_HANDLER(z80pio_alt_w)
+{
+	int channel = BIT(offset, 1);
+	if (offset & 1)
+		z80pio_c_w(device, channel, data);
+	else
+		z80pio_d_w(device, channel, data);
+}
+
 /* Memory Maps */
 
 static ADDRESS_MAP_START( abc80_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -364,7 +379,7 @@ static TIMER_DEVICE_CALLBACK( z80pio_astb_tick )
 	z80pio_astb_w(state->z80pio, state->z80pio_astb);
 }
 
-static Z80PIO_ON_INT_CHANGED( abc80_pio_interrupt )
+static void abc80_pio_interrupt(const device_config *device, int state)
 {
 	cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_IRQ0, state);
 }
@@ -440,10 +455,8 @@ static WRITE8_DEVICE_HANDLER( abc80_pio_port_b_w )
 	cassette_output(cassette_device_image(device->machine), BIT(data, 6) ? -1.0 : +1.0);
 };
 
-static Z80PIO_INTERFACE( abc80_pio_intf )
+static const z80pio_interface abc80_pio_intf =
 {
-	Z80_TAG,					/* CPU */
-	0,							/* clock (get from main CPU) */
 	abc80_pio_interrupt,		/* callback when change interrupt status */
 	abc80_pio_port_a_r,			/* port A read callback */
 	abc80_pio_port_b_r,			/* port B read callback */

@@ -161,11 +161,11 @@ static TIMER_CALLBACK(reset_check_callback)
 	UINT8 val = input_port_read(machine, "RESET");
 	if ((val & 1)==1) {
 		memory_set_bankptr(machine, 1, memory_region(machine, "main") + 0x10000);
-		cpu_reset(machine->cpu[0]);
+		device_reset(machine->cpu[0]);
 	}
 	if ((val & 2)==2) {
 		memory_set_bankptr(machine, 1, mess_ram + 0x0000);
-		cpu_reset(machine->cpu[0]);
+		device_reset(machine->cpu[0]);
 	}
 }
 

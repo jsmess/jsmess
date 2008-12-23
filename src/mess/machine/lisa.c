@@ -1141,7 +1141,7 @@ MACHINE_RESET( lisa )
 	memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[0],ADDRESS_SPACE_PROGRAM), lisa_OPbaseoverride);
 	memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[1],ADDRESS_SPACE_PROGRAM), lisa_fdc_OPbaseoverride);
 
-	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_M68K_RESET_CALLBACK, (genf *)/*lisa_reset_instr_callback*/NULL);
+	device_set_info_fct(machine->cpu[0], CPUINFO_FCT_M68K_RESET_CALLBACK, (genf *)/*lisa_reset_instr_callback*/NULL);
 
 	/* init MMU */
 

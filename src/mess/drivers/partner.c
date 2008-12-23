@@ -163,8 +163,7 @@ static MACHINE_DRIVER_START( partner )
 	MDRV_SOUND_ADD("cassette", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_DEVICE_ADD("dma8257", DMA8257)
-	MDRV_DEVICE_CONFIG(partner_dma)
+	MDRV_DMA8257_ADD("dma8257", XTAL_16MHz / 9, partner_dma)
 
 	MDRV_CASSETTE_ADD( "cassette", partner_cassette_config )
 	

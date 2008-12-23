@@ -24,7 +24,7 @@ typedef struct {
 
 
 #define MDRV_XMODEM_ADD(_tag, _intrf) \
-  MDRV_DEVICE_ADD(_tag, XMODEM)	      \
+  MDRV_DEVICE_ADD(_tag, XMODEM, 0)	      \
   MDRV_DEVICE_CONFIG(_intrf)
 
 #define MDRV_XMODEM_REMOVE(_tag)		\

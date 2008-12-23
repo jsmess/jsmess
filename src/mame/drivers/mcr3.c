@@ -83,6 +83,7 @@
 
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "machine/z80ctc.h"
 #include "audio/mcr.h"
@@ -260,7 +261,7 @@ static READ8_HANDLER( rampage_ip4_r )
 static WRITE8_HANDLER( rampage_op6_w )
 {
 	/* bit 5 controls reset of the Sounds Good board */
-	soundsgood_reset_w((~data >> 5) & 1);
+	soundsgood_reset_w(space->machine, (~data >> 5) & 1);
 
 	/* low 5 bits go directly to the Sounds Good board */
 	soundsgood_data_w(space, offset, data);
@@ -304,7 +305,7 @@ static WRITE8_HANDLER( powerdrv_op5_w )
 static WRITE8_HANDLER( powerdrv_op6_w )
 {
 	/* bit 5 controls reset of the Sounds Good board */
-	soundsgood_reset_w((~data >> 5) & 1);
+	soundsgood_reset_w(space->machine, (~data >> 5) & 1);
 
 	/* low 5 bits go directly to the Sounds Good board */
 	soundsgood_data_w(space, offset, data);
@@ -347,7 +348,7 @@ static WRITE8_HANDLER( stargrds_op5_w )
 static WRITE8_HANDLER( stargrds_op6_w )
 {
 	/* bit 6 controls reset of the Sounds Good board */
-	soundsgood_reset_w((~data >> 6) & 1);
+	soundsgood_reset_w(space->machine, (~data >> 6) & 1);
 
 	/* unline the other games, the STROBE is in the high bit instead of the low bit */
 	soundsgood_data_w(space, offset, (data << 1) | (data >> 7));
@@ -1055,7 +1056,7 @@ static MACHINE_DRIVER_START( mcr3_base )
 	MDRV_CPU_CONFIG(mcr_daisy_chain)
 	MDRV_CPU_VBLANK_INT_HACK(mcr_interrupt,2)
 
-	MDRV_Z80CTC_ADD("ctc", mcr_ctc_intf)
+	MDRV_Z80CTC_ADD("ctc", MASTER_CLOCK/4 /* same as "main" */, mcr_ctc_intf)
 
 	MDRV_WATCHDOG_VBLANK_INIT(16)
 	MDRV_MACHINE_START(mcr)

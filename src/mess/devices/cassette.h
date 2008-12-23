@@ -72,7 +72,7 @@ DEVICE_GET_INFO(cassette);
 ***************************************************************************/
 
 #define MDRV_CASSETTE_ADD(_tag, _config) 	\
-	MDRV_DEVICE_ADD(_tag, CASSETTE)			\
+	MDRV_DEVICE_ADD(_tag, CASSETTE, 0)			\
 	MDRV_DEVICE_CONFIG(_config)
 
 #define MDRV_CASSETTE_REMOVE(_tag)			\

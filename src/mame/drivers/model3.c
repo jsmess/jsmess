@@ -359,6 +359,7 @@ ALL VROM ROMs are 16M MASK
 */
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "deprecat.h"
 #include "cpu/powerpc/ppc.h"
 #include "machine/eeprom.h"
@@ -379,7 +380,7 @@ static int model3_crom_bank = 0;
 static int model3_controls_bank;
 static UINT32 real3d_device_id;
 
-static void real3d_dma_callback(UINT32 src, UINT32 dst, int length, int byteswap);
+static void real3d_dma_callback(running_machine *machine, UINT32 src, UINT32 dst, int length, int byteswap);
 
 static UINT16 *model3_soundram;
 
@@ -765,9 +766,9 @@ static WRITE64_HANDLER(scsi_w)
 	}
 }
 
-static UINT32 scsi_fetch(UINT32 dsp)
+static UINT32 scsi_fetch(running_machine *machine, UINT32 dsp)
 {
-	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	UINT32 result;
 	result = memory_read_dword(space, dsp);
 	return FLIPENDIAN_INT32(result);
@@ -825,11 +826,11 @@ static WRITE64_HANDLER( real3d_dma_w )
 				int length = FLIPENDIAN_INT32((UINT32)(data >> 32)) * 4;
 				if (dma_endian & 0x80)
 				{
-					real3d_dma_callback(dma_source, dma_dest, length, 0);
+					real3d_dma_callback(space->machine, dma_source, dma_dest, length, 0);
 				}
 				else
 				{
-					real3d_dma_callback(dma_source, dma_dest, length, 1);
+					real3d_dma_callback(space->machine, dma_source, dma_dest, length, 1);
 				}
 				dma_irq |= 0x01;
 				scsi_irq_callback(space->machine, 1);
@@ -871,9 +872,9 @@ static WRITE64_HANDLER( real3d_dma_w )
 	fatalerror("real3d_dma_w: %08X, %08X%08X, %08X%08X", offset, (UINT32)(data >> 32), (UINT32)(data), (UINT32)(mem_mask >> 32), (UINT32)(mem_mask));
 }
 
-static void real3d_dma_callback(UINT32 src, UINT32 dst, int length, int byteswap)
+static void real3d_dma_callback(running_machine *machine, UINT32 src, UINT32 dst, int length, int byteswap)
 {
-	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	switch(dst >> 24)
 	{
 		case 0x88:		/* Display List End Trigger */
@@ -897,7 +898,7 @@ static void real3d_dma_callback(UINT32 src, UINT32 dst, int length, int byteswap
 		case 0x9c:		/* Unknown */
 			break;
 		default:
-			fatalerror("dma_callback: %08X, %08X, %d at %08X", src, dst, length, cpu_get_pc(Machine->cpu[0]));
+			fatalerror("dma_callback: %08X, %08X, %d at %08X", src, dst, length, cpu_get_pc(machine->cpu[0]));
 			break;
 	}
 }
@@ -981,25 +982,25 @@ static void model3_exit(running_machine *machine)
 static void configure_fast_ram(running_machine *machine)
 {
 	/* set conservative DRC options */
-	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_DRC_OPTIONS, PPCDRC_COMPATIBLE_OPTIONS - PPCDRC_ACCURATE_SINGLES);
+	device_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_DRC_OPTIONS, PPCDRC_COMPATIBLE_OPTIONS - PPCDRC_ACCURATE_SINGLES);
 
 	/* configure fast RAM regions for DRC */
-	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_SELECT, 0);
-	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_START, 0x00000000);
-	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_END, 0x007fffff);
-	cpu_set_info_ptr(machine->cpu[0], CPUINFO_PTR_PPC_FASTRAM_BASE, work_ram);
-	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_READONLY, 0);
+	device_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_SELECT, 0);
+	device_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_START, 0x00000000);
+	device_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_END, 0x007fffff);
+	device_set_info_ptr(machine->cpu[0], CPUINFO_PTR_PPC_FASTRAM_BASE, work_ram);
+	device_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_READONLY, 0);
 }
 
 static MACHINE_START(model3_10)
 {
-	lsi53c810_init(&scsi_intf);
+	lsi53c810_init(machine, &scsi_intf);
 	add_exit_callback(machine, model3_exit);
 	configure_fast_ram(machine);
 }
 static MACHINE_START(model3_15)
 {
-	lsi53c810_init(&scsi_intf);
+	lsi53c810_init(machine, &scsi_intf);
 	add_exit_callback(machine, model3_exit);
 	configure_fast_ram(machine);
 }
@@ -1022,7 +1023,7 @@ static void model3_init(running_machine *machine, int step)
 
 	// copy the 68k vector table into RAM
 	memcpy(model3_soundram, memory_region(machine, "audio")+0x80000, 16);
-	cpu_reset(cputag_get_cpu(machine, "audio"));
+	device_reset(cputag_get_cpu(machine, "audio"));
 
 	model3_machine_init(step);	// step 1.5
 	model3_tap_reset();
@@ -4342,7 +4343,7 @@ static MACHINE_DRIVER_START( model3_10 )
 	MDRV_CPU_ADD("audio", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(model3_snd, 0)
 
- 	MDRV_INTERLEAVE(10)
+ 	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_MACHINE_START(model3_10)
 	MDRV_MACHINE_RESET(model3_10)

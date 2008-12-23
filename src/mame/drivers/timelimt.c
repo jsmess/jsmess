@@ -11,6 +11,7 @@ Notes:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 
 /* from video */
@@ -270,7 +271,7 @@ static MACHINE_DRIVER_START( timelimt )
 	MDRV_CPU_IO_MAP(sound_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold) /* ? */
 
-	MDRV_INTERLEAVE(50)
+	MDRV_QUANTUM_TIME(HZ(3000))
 
 	MDRV_MACHINE_START(timelimt)
 	MDRV_MACHINE_RESET(timelimt)

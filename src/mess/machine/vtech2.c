@@ -374,7 +374,7 @@ DEVICE_IMAGE_LOAD( laser_floppy )
 
 static const device_config *laser_file(void)
 {
-	return image_from_devtype_and_index(IO_FLOPPY, laser_drive);
+	return image_from_devtype_and_index(machine, IO_FLOPPY, laser_drive);
 }
 
 static void laser_get_track(void)

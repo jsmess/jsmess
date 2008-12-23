@@ -337,7 +337,7 @@ static void to7_5p14_reset( running_machine *machine )
 	wd17xx_reset(fdc);
 	for ( i = 0; i < device_count( machine, IO_FLOPPY ); i++ )
 	{
-		const device_config * img = image_from_devtype_and_index( IO_FLOPPY, i );
+		const device_config * img = image_from_devtype_and_index( machine, IO_FLOPPY, i );
 		floppy_drive_set_ready_state( img, FLOPPY_DRIVE_READY, 0 );
 		floppy_drive_set_rpm( img, 300. );
 		floppy_drive_seek( img, - floppy_drive_get_current_track( img ) );
@@ -439,7 +439,7 @@ static void to7_5p14sd_reset( running_machine *machine )
 	thom_floppy_set_density( DEN_FM_LO );
 	for ( i = 0; i < device_count( machine, IO_FLOPPY ); i++ )
 	{
-		const device_config * img = image_from_devtype_and_index( IO_FLOPPY, i );
+		const device_config * img = image_from_devtype_and_index( machine, IO_FLOPPY, i );
 		floppy_drive_set_ready_state( img, FLOPPY_DRIVE_READY, 0 );
 		floppy_drive_set_rpm( img, 300. );
 		floppy_drive_seek( img, - floppy_drive_get_current_track( img ) );
@@ -545,17 +545,17 @@ static void to7_qdd_index_pulse_cb ( const device_config *controller,const devic
 
 
 
-static const device_config * to7_qdd_image ( void )
+static const device_config * to7_qdd_image ( running_machine *machine )
 {
-	return image_from_devtype_and_index( IO_FLOPPY, 0 );
+	return image_from_devtype_and_index( machine, IO_FLOPPY, 0 );
 }
 
 
 
 /* update MC6852 status register */
-static void to7_qdd_stat_update( void )
+static void to7_qdd_stat_update( running_machine *machine )
 {
-	int flags = floppy_drive_get_flag_state( to7_qdd_image(), -1 );
+	int flags = floppy_drive_get_flag_state( to7_qdd_image(machine), -1 );
 
 	/* byte-ready */
 	to7qdd->status |= QDD_S_RDA | QDD_S_TDRA;
@@ -594,7 +594,7 @@ static UINT8 to7_qdd_read_byte( running_machine *machine )
 	/* rebuild disk if needed */
 	if ( !to7qdd->data_size )
 	{
-		to7qdd->data_size = thom_qdd_make_disk( to7_qdd_image(), to7qdd->data );
+		to7qdd->data_size = thom_qdd_make_disk( to7_qdd_image(machine), to7qdd->data );
 		assert( to7qdd->data_idx < sizeof( to7qdd->data ) );
 	}
 
@@ -627,7 +627,7 @@ static void to7_qdd_write_byte( running_machine *machine, UINT8 data )
 	/* rebuild disk if needed */
 	if ( !to7qdd->data_size )
 	{
-		to7qdd->data_size = thom_qdd_make_disk( to7_qdd_image(), to7qdd->data );
+		to7qdd->data_size = thom_qdd_make_disk( to7_qdd_image(machine), to7qdd->data );
 		assert( to7qdd->data_idx < sizeof( to7qdd->data ) );
 	}
 
@@ -661,7 +661,7 @@ static void to7_qdd_write_byte( running_machine *machine, UINT8 data )
 			LOG(( "%f $%04x to7_qdd_write_byte: got id field for sector=%i\n",
 			      attotime_to_double(timer_get_time(machine)), cpu_get_previouspc( machine->cpu[0] ), sector ));
 
-			floppy_drive_format_sector( to7_qdd_image(),
+			floppy_drive_format_sector( to7_qdd_image(machine),
 						    0, sector, 0, 0, sector, 128, filler );
 			to7qdd->start_idx = to7qdd->data_idx;
 		}
@@ -690,7 +690,7 @@ static void to7_qdd_write_byte( running_machine *machine, UINT8 data )
 				LOG(( "%f $%04x to7_qdd_write_byte: goto data field for sector=%i\n",
 				      attotime_to_double(timer_get_time(machine)), cpu_get_previouspc( machine->cpu[0] ), sector ));
 
-				floppy_drive_write_sector_data( to7_qdd_image(), 0, sector, to7qdd->data + to7qdd->start_idx + 1, 128, 0 );
+				floppy_drive_write_sector_data( to7_qdd_image(machine), 0, sector, to7qdd->data + to7qdd->start_idx + 1, 128, 0 );
 			}
 
 			to7qdd->start_idx = to7qdd->data_idx;
@@ -708,7 +708,7 @@ static READ8_HANDLER ( to7_qdd_r )
 	{
 
 	case 0: /* MC6852 status */
-		to7_qdd_stat_update();
+		to7_qdd_stat_update(space->machine);
 		VLOG(( "%f $%04x to7_qdd_r: STAT=$%02X irq=%i pe=%i ovr=%i und=%i tr=%i rd=%i ncts=%i\n",
 		       attotime_to_double(timer_get_time(space->machine)), cpu_get_previouspc( space->machine->cpu[0] ), to7qdd->status,
 		       to7qdd->status & QDD_S_IRQ  ? 1 : 0,
@@ -722,13 +722,13 @@ static READ8_HANDLER ( to7_qdd_r )
 
 	case 1: /* MC6852 data input => read byte from disk */
 		to7qdd->status &= ~(QDD_S_RDA | QDD_S_PE | QDD_S_OVR);
-		to7_qdd_stat_update();
+		to7_qdd_stat_update(space->machine);
 		return to7_qdd_read_byte( space->machine );
 
 	case 8: /* floppy status */
 	{
 		UINT8 data = 0;
-		const device_config* img = to7_qdd_image();
+		const device_config* img = to7_qdd_image(space->machine);
 		if ( ! image_exists( img ) )
 			data |= 0x40; /* disk present */
 		if ( to7qdd->index_pulse )
@@ -758,7 +758,7 @@ static WRITE8_HANDLER( to7_qdd_w )
 			to7qdd->status &= ~(QDD_S_TDRA | QDD_S_TUF);
 
 		to7qdd->ctrl1 = ( data & ~(QDD_C1_RRESET | QDD_C1_TRESET) ) |( data &  (QDD_C1_RRESET | QDD_C1_TRESET) & to7qdd->ctrl1 );
-		to7_qdd_stat_update();
+		to7_qdd_stat_update(space->machine);
 		VLOG(( "%f $%04x to7_qdd_w: CTRL1=$%02X reset=%c%c %s%sirq=%c%c\n",
 		       attotime_to_double(timer_get_time(space->machine)), cpu_get_previouspc( space->machine->cpu[0] ), data,
 		       data & QDD_C1_RRESET ? 'r' : '-', data & QDD_C1_TRESET ? 't' : '-',
@@ -782,7 +782,7 @@ static WRITE8_HANDLER( to7_qdd_w )
 			int bits, parity;
 			bits   = bit[ (data >> 3) & 7 ];
 			parity = par[ (data >> 3) & 7 ];
-			to7_qdd_stat_update();
+			to7_qdd_stat_update(space->machine);
 			VLOG(( "%f $%04x to7_qdd_w: CTRL2=$%02X bits=%i par=%s blen=%i under=%s%s\n",
 			       attotime_to_double(timer_get_time(space->machine)), cpu_get_previouspc( space->machine->cpu[0] ), data,
 			       bits, parname[ parity ], data & QDD_C2_BLEN ? 1 : 2,
@@ -800,7 +800,7 @@ static WRITE8_HANDLER( to7_qdd_w )
 				to7qdd->status &= ~QDD_S_TUF;
 			if ( data & QDD_C3_CLRCTS )
 				to7qdd->status &= ~QDD_S_NCTS;
-			to7_qdd_stat_update();
+			to7_qdd_stat_update(space->machine);
 			VLOG(( "%f $%04x to7_qdd_w: CTRL3=$%02X %s%ssync-len=%i sync-mode=%s\n",
 			       attotime_to_double(timer_get_time(space->machine)), cpu_get_previouspc( space->machine->cpu[0] ), data,
 			       data & QDD_C3_CLRTUF ? "clr-tuf " : "",
@@ -846,7 +846,7 @@ static void to7_qdd_reset( running_machine *machine )
 
 	for ( i = 0; i < device_count( machine, IO_FLOPPY ); i++ )
 	{
-		const device_config * img = image_from_devtype_and_index( IO_FLOPPY, i );
+		const device_config * img = image_from_devtype_and_index( machine, IO_FLOPPY, i );
 		floppy_drive_set_index_pulse_callback( img, to7_qdd_index_pulse_cb );
 		floppy_drive_set_ready_state( img, FLOPPY_DRIVE_READY, 0 );
 		floppy_drive_set_motor_state( img, 1 );
@@ -859,7 +859,7 @@ static void to7_qdd_reset( running_machine *machine )
 	to7qdd->ctrl2 &= 0x7c; /* clear EIE, PC2-PC1 */
 	to7qdd->ctrl3 &= 0xfe; /* internal sync */
 	to7qdd->drive = 0;
-	to7_qdd_stat_update();
+	to7_qdd_stat_update(machine);
 }
 
 
@@ -943,9 +943,9 @@ static emu_timer* thmfc_floppy_cmd;
 
 
 
-static const device_config * thmfc_floppy_image ( void )
+static const device_config * thmfc_floppy_image ( running_machine *machine )
 {
-	return image_from_devtype_and_index( IO_FLOPPY, thmfc1->drive );
+	return image_from_devtype_and_index( machine, IO_FLOPPY, thmfc1->drive );
 }
 
 
@@ -959,7 +959,7 @@ static int thmfc_floppy_is_qdd ( void )
 
 static void thmfc_floppy_index_pulse_cb ( const device_config *controller,const device_config *image, int state )
 {
-	if ( image != thmfc_floppy_image() )
+	if ( image != thmfc_floppy_image(image->machine) )
 		return;
 
 	if ( thmfc_floppy_is_qdd() )
@@ -1527,7 +1527,7 @@ void thmfc_floppy_reset( running_machine *machine )
 
 	for ( i = 0; i < device_count( machine, IO_FLOPPY ); i++ )
 	{
-		const device_config * img = image_from_devtype_and_index( IO_FLOPPY, i );
+		const device_config * img = image_from_devtype_and_index( machine, IO_FLOPPY, i );
 		floppy_drive_set_index_pulse_callback( img, thmfc_floppy_index_pulse_cb );
 		floppy_drive_set_ready_state( img, FLOPPY_DRIVE_READY, 0 );
 		floppy_drive_seek( img, - floppy_drive_get_current_track( img ) );

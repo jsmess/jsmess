@@ -114,9 +114,7 @@ enum
 
 	CPUINFO_PTR_PPC_FASTRAM_BASE = CPUINFO_PTR_CPU_SPECIFIC,
 
-	CPUINFO_PTR_SPU_TX_HANDLER,
-
-	CPUINFO_PTR_CONTEXT			/* temporary */
+	CPUINFO_FCT_SPU_TX_HANDLER = CPUINFO_FCT_CPU_SPECIFIC
 };
 
 
@@ -136,7 +134,7 @@ enum
     STRUCTURES AND TYPEDEFS
 ***************************************************************************/
 
-typedef void (*ppc4xx_spu_tx_handler)(UINT8 data);
+typedef void (*ppc4xx_spu_tx_handler)(const device_config *device, UINT8 data);
 
 typedef struct _powerpc_config powerpc_config;
 struct _powerpc_config
@@ -152,38 +150,47 @@ struct _powerpc_config
 
 #if (HAS_PPC403GA)
 CPU_GET_INFO( ppc403ga );
+#define CPU_PPC403GA CPU_GET_INFO_NAME( ppc403ga )
 #endif
 
 #if (HAS_PPC403GCX)
 CPU_GET_INFO( ppc403gcx );
+#define CPU_PPC403GCX CPU_GET_INFO_NAME( ppc403gcx )
 #endif
 
 #if (HAS_PPC601)
 CPU_GET_INFO( ppc601 );
+#define CPU_PPC601 CPU_GET_INFO_NAME( ppc601 )
 #endif
 
 #if (HAS_PPC602)
 CPU_GET_INFO( ppc602 );
+#define CPU_PPC602 CPU_GET_INFO_NAME( ppc602 )
 #endif
 
 #if (HAS_PPC603)
 CPU_GET_INFO( ppc603 );
+#define CPU_PPC603 CPU_GET_INFO_NAME( ppc603 )
 #endif
 
 #if (HAS_PPC603E)
 CPU_GET_INFO( ppc603e );
+#define CPU_PPC603E CPU_GET_INFO_NAME( ppc603e )
 #endif
 
 #if (HAS_PPC603R)
 CPU_GET_INFO( ppc603r );
+#define CPU_PPC603R CPU_GET_INFO_NAME( ppc603r )
 #endif
 
 #if (HAS_PPC604)
 CPU_GET_INFO( ppc604 );
+#define CPU_PPC604 CPU_GET_INFO_NAME( ppc604 )
 #endif
 
 #if (HAS_MPC8240)
 CPU_GET_INFO( mpc8240 );
+#define CPU_MPC8240 CPU_GET_INFO_NAME( mpc8240 )
 #endif
 
 
@@ -194,13 +201,13 @@ CPU_GET_INFO( mpc8240 );
 
 INLINE void ppc4xx_spu_set_tx_handler(const device_config *cpu, ppc4xx_spu_tx_handler handler)
 {
-	cpu_set_info_fct(cpu, CPUINFO_PTR_SPU_TX_HANDLER, (genf *)handler);
+	device_set_info_fct(cpu, CPUINFO_FCT_SPU_TX_HANDLER, (genf *)handler);
 }
 
 
 INLINE void ppc4xx_spu_receive_byte(const device_config *cpu, UINT8 byteval)
 {
-	cpu_set_info_int(cpu, CPUINFO_INT_PPC_RX_DATA, byteval);
+	device_set_info_int(cpu, CPUINFO_INT_PPC_RX_DATA, byteval);
 }
 
 

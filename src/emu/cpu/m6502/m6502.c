@@ -130,7 +130,7 @@ static void default_wdmem_id(const address_space *space, offs_t offset, UINT8 da
  *
  *****************************************************************************/
 
-static void m6502_common_init(const device_config *device, int index, int clock, cpu_irq_callback irqcallback, UINT8 subtype, void (*const *insn)(m6502_Regs *cpustate), const char *type)
+static void m6502_common_init(const device_config *device, cpu_irq_callback irqcallback, UINT8 subtype, void (*const *insn)(m6502_Regs *cpustate), const char *type)
 {
 	m6502_Regs *cpustate = device->token;
 
@@ -165,7 +165,7 @@ static void m6502_common_init(const device_config *device, int index, int clock,
 
 static CPU_INIT( m6502 )
 {
-	m6502_common_init(device, index, clock, irqcallback, SUBTYPE_6502, insn6502, "m6502");
+	m6502_common_init(device, irqcallback, SUBTYPE_6502, insn6502, "m6502");
 }
 
 static CPU_RESET( m6502 )
@@ -313,7 +313,7 @@ static void m6502_set_irq_line(m6502_Regs *cpustate, int irqline, int state)
 
 static CPU_INIT( n2a03 )
 {
-	m6502_common_init(device, index, clock, irqcallback, SUBTYPE_2A03, insn2a03, "n2a03");
+	m6502_common_init(device, irqcallback, SUBTYPE_2A03, insn2a03, "n2a03");
 }
 
 /* The N2A03 is integrally tied to its PSG (they're on the same die).
@@ -336,7 +336,7 @@ void n2a03_irq(const device_config *device)
 
 static CPU_INIT( m6510 )
 {
-	m6502_common_init(device, index, clock, irqcallback, SUBTYPE_6510, insn6510, "m6510");
+	m6502_common_init(device, irqcallback, SUBTYPE_6510, insn6510, "m6510");
 }
 
 static CPU_RESET( m6510 )
@@ -404,7 +404,7 @@ ADDRESS_MAP_END
 
 static CPU_INIT( m65c02 )
 {
-	m6502_common_init(device, index, clock, irqcallback, SUBTYPE_65C02, insn65c02, "m65c02");
+	m6502_common_init(device, irqcallback, SUBTYPE_65C02, insn65c02, "m65c02");
 }
 
 static CPU_RESET( m65c02 )
@@ -510,7 +510,7 @@ static void m65c02_set_irq_line(m6502_Regs *cpustate, int irqline, int state)
 #if (HAS_M65SC02)
 static CPU_INIT( m65sc02 )
 {
-	m6502_common_init(device, index, clock, irqcallback, SUBTYPE_65SC02, insn65sc02, "m65sc02");
+	m6502_common_init(device, irqcallback, SUBTYPE_65SC02, insn65sc02, "m65sc02");
 }
 #endif
 
@@ -522,7 +522,7 @@ static CPU_INIT( m65sc02 )
 static CPU_INIT( deco16 )
 {
 	m6502_Regs *cpustate = device->token;
-	m6502_common_init(device, index, clock, irqcallback, SUBTYPE_DECO16, insndeco16, "deco16");
+	m6502_common_init(device, irqcallback, SUBTYPE_DECO16, insndeco16, "deco16");
 	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 }
 
@@ -709,15 +709,15 @@ CPU_GET_INFO( m6502 )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 10;							break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 8;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 16;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE + M6502_IRQ_LINE:		info->i = cpustate->irq_state;			break;
 		case CPUINFO_INT_INPUT_STATE + M6502_SET_OVERFLOW:	info->i = cpustate->so_state;			break;
@@ -738,13 +738,13 @@ CPU_GET_INFO( m6502 )
 		case CPUINFO_INT_REGISTER + M6502_SUBTYPE:		info->i = cpustate->subtype;				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(m6502);			break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m6502);				break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(m6502);				break;
-		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(m6502);				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(m6502);			break;
-		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m6502);			break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(m6502);			break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(m6502);				break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(m6502);				break;
+		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(m6502);				break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(m6502);			break;
+		case CPUINFO_FCT_BURN:							info->burn = NULL;						break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m6502);			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;			break;
 		case CPUINFO_PTR_M6502_READINDEXED_CALLBACK:	info->f = (genf *) cpustate->rdmem_id;		break;
 		case CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK:	info->f = (genf *) cpustate->wrmem_id;		break;
@@ -790,7 +790,7 @@ CPU_GET_INFO( n2a03 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(n2a03);				break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(n2a03);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "N2A03");				break;
@@ -827,10 +827,10 @@ CPU_GET_INFO( m6510 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(m6510);			break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m6510);				break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(m6510);				break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m6510);			break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(m6510);			break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(m6510);				break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(m6510);				break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m6510);			break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP:			info->internal_map8 = ADDRESS_MAP_NAME(m6510_mem); break;
 		case CPUINFO_PTR_M6510_PORTREAD:				info->f = (genf *) cpustate->port_read;		break;
 		case CPUINFO_PTR_M6510_PORTWRITE:				info->f = (genf *) cpustate->port_write;	break;
@@ -924,11 +924,11 @@ CPU_GET_INFO( m65c02 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(m65c02);		break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m65c02);				break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(m65c02);				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(m65c02);			break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m65c02);		break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(m65c02);		break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(m65c02);				break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(m65c02);				break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(m65c02);			break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m65c02);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "M65C02");				break;
@@ -949,8 +949,8 @@ CPU_GET_INFO( m65sc02 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m65sc02);				break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m65sc02);		break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(m65sc02);				break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m65sc02);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "M65SC02");				break;
@@ -990,15 +990,15 @@ CPU_GET_INFO( deco16 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 8;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 8;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 8;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(deco16);		break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(deco16);				break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(deco16);				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(deco16);			break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(deco16);		break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(deco16);		break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(deco16);				break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(deco16);				break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(deco16);			break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(deco16);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "DECO CPU16");			break;

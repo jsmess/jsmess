@@ -66,10 +66,10 @@ static void TimerHandler_3812(void *param,int c,attotime period)
 }
 
 
-static void ym3812_stream_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length)
+static STREAM_UPDATE( ym3812_stream_update )
 {
 	struct ym3812_info *info = param;
-	ym3812_update_one(info->chip, buffer[0], length);
+	ym3812_update_one(info->chip, outputs[0], samples);
 }
 
 static void _stream_update_3812(void * param, int interval)
@@ -182,11 +182,11 @@ SND_GET_INFO( ym3812 )
 		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( ym3812 );				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							info->s = "YM3812";						break;
-		case SNDINFO_STR_CORE_FAMILY:					info->s = "Yamaha FM";					break;
-		case SNDINFO_STR_CORE_VERSION:					info->s = "1.0";						break;
-		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
-		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "YM3812");							break;
+		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Yamaha FM");						break;
+		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");								break;
+		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);							break;
+		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 
@@ -237,10 +237,10 @@ static void TimerHandler_3526(void *param,int c,attotime period)
 }
 
 
-static void ym3526_stream_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length)
+static STREAM_UPDATE( ym3526_stream_update )
 {
 	struct ym3526_info *info = param;
-	ym3526_update_one(info->chip, buffer[0], length);
+	ym3526_update_one(info->chip, outputs[0], samples);
 }
 
 static void _stream_update_3526(void *param, int interval)
@@ -352,11 +352,11 @@ SND_GET_INFO( ym3526 )
 		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( ym3526 );				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							info->s = "YM3526";						break;
-		case SNDINFO_STR_CORE_FAMILY:					info->s = "Yamaha FM";					break;
-		case SNDINFO_STR_CORE_VERSION:					info->s = "1.0";						break;
-		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
-		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "YM3526");							break;
+		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Yamaha FM");						break;
+		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");								break;
+		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);							break;
+		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 
@@ -442,10 +442,10 @@ static void Y8950KeyboardHandler_w(void *param,unsigned char data)
 		info->intf->keyboardwrite(space,info->index,data);
 }
 
-static void y8950_stream_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length)
+static STREAM_UPDATE( y8950_stream_update )
 {
 	struct y8950_info *info = param;
-	y8950_update_one(info->chip, buffer[0], length);
+	y8950_update_one(info->chip, outputs[0], samples);
 }
 
 static void _stream_update_8950(void *param, int interval)
@@ -566,11 +566,11 @@ SND_GET_INFO( y8950 )
 		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( y8950 );				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							info->s = "Y8950";						break;
-		case SNDINFO_STR_CORE_FAMILY:					info->s = "Yamaha FM";					break;
-		case SNDINFO_STR_CORE_VERSION:					info->s = "1.0";						break;
-		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
-		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "Y8950");							break;
+		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Yamaha FM");						break;
+		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");								break;
+		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);							break;
+		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

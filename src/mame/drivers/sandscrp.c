@@ -71,6 +71,8 @@ Is there another alt program rom set labeled 9 & 10?
 */
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
+#include "cpu/m68000/m68000.h"
 #include "machine/eeprom.h"
 #include "includes/kaneko16.h"
 #include "sound/2203intf.h"
@@ -441,7 +443,7 @@ static MACHINE_DRIVER_START( sandscrp )
 	MDRV_CPU_PROGRAM_MAP(sandscrp_soundmem,0)
 	MDRV_CPU_IO_MAP(sandscrp_soundport,0)
 
-	MDRV_WATCHDOG_TIME_INIT(UINT64_ATTOTIME_IN_SEC(3))	/* a guess, and certainly wrong */
+	MDRV_WATCHDOG_TIME_INIT(SEC(3))	/* a guess, and certainly wrong */
 
 	MDRV_MACHINE_RESET(sandscrp)
 

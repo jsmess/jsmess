@@ -22,7 +22,7 @@
 /*====================================================================*/
 
 #include "driver.h"
-#include "deprecat.h"
+#include "cpu/m68000/m68000.h"
 #include "cpu/tms34010/tms34010.h"
 #include "cpu/mcs51/mcs51.h"
 #include "sound/2151intf.h"
@@ -874,7 +874,7 @@ static MACHINE_DRIVER_START( micro3d )
 	MDRV_CPU_IO_MAP(soundmem_io,0)
 
 	MDRV_MACHINE_RESET(micro3d)
-	MDRV_INTERLEAVE(50)
+	MDRV_QUANTUM_TIME(HZ(3000))
 
 	MDRV_PALETTE_LENGTH(32768)
 

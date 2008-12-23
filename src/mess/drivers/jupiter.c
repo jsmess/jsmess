@@ -306,7 +306,7 @@ static MACHINE_DRIVER_START( jupiter )
 	MDRV_CPU_ADD("main", Z80, XTAL_6_5MHz/2)        /* 3.25 MHz */
 	MDRV_CPU_PROGRAM_MAP(jupiter_mem, 0)
 	MDRV_CPU_IO_MAP(jupiter_io, 0)
-	MDRV_INTERLEAVE(1)
+	MDRV_QUANTUM_TIME(HZ(60))
 
 	MDRV_MACHINE_START( jupiter )
 

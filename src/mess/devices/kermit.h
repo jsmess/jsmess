@@ -24,7 +24,7 @@ typedef struct {
 
 
 #define MDRV_KERMIT_ADD(_tag, _intrf) \
-  MDRV_DEVICE_ADD(_tag, KERMIT)	      \
+  MDRV_DEVICE_ADD(_tag, KERMIT, 0)	      \
   MDRV_DEVICE_CONFIG(_intrf)
 
 #define MDRV_KERMIT_REMOVE(_tag)		\

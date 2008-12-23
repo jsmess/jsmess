@@ -36,7 +36,7 @@ void channelf_sound_w(int mode)
 
 
 
-static void channelf_sh_update(void *param,stream_sample_t **inputs, stream_sample_t **outputs,int samples)
+static STREAM_UPDATE( channelf_sh_update )
 {
 	UINT32 mask = 0, target = 0;
 	stream_sample_t *buffer = outputs[0];

@@ -109,6 +109,8 @@ Notes:
 
 **********************************************************************/
 #include "driver.h"
+#include "cpu/z80/z80.h"
+#include "cpu/m68000/m68000.h"
 #include "deprecat.h"
 #include "sound/dac.h"
 #include "sound/okim6295.h"
@@ -286,7 +288,7 @@ static WRITE16_HANDLER( sound_command_w )
 static WRITE16_HANDLER( io_w )
 {
 	COMBINE_DATA(&vreg);
-	flip_screen_set(vreg & 0x1000);
+	flip_screen_set(space->machine, vreg & 0x1000);
 }
 
 static int read_latch=0;

@@ -4,8 +4,14 @@
 
 ***************************************************************************/
 
+/* mingw-gcc defines this */
+#ifdef i386
+#undef i386
+#endif /* i386 */
+
 #include "driver.h"
-//#include "cpu/i86/i286.h"
+#include "cpu/i86/i86.h"
+#include "cpu/i86/i286.h"
 #include "cpu/i386/i386.h"
 #include "sound/3812intf.h"
 #include "machine/8255ppi.h"
@@ -412,17 +418,14 @@ static const ym3812_interface at_ym3812_interface =
 #endif
 
 
-#define MDRV_CPU_ATPC(mem, port, type, clock)	\
-	MDRV_CPU_ADD("main", type, clock)					\
-	MDRV_CPU_PROGRAM_MAP(mem##_map, 0)				\
-	MDRV_CPU_IO_MAP(port##_io, 0)					\
-	MDRV_CPU_CONFIG(i286_address_mask)
-
 static MACHINE_DRIVER_START( ibm5170 )
 	/* basic machine hardware */
-	MDRV_CPU_ATPC(at16, at16, I80286, 6000000 /*6000000*/)
+	MDRV_CPU_ADD("main", I80286, 6000000 /*6000000*/)
+	MDRV_CPU_PROGRAM_MAP(at16_map, 0)
+	MDRV_CPU_IO_MAP(at16_io, 0)
+	MDRV_CPU_CONFIG(i286_address_mask)
 
-	MDRV_INTERLEAVE(1)
+	MDRV_QUANTUM_TIME(HZ(60))
 
 	MDRV_PIT8254_ADD( "pit8254", at_pit8254_config )
 
@@ -485,9 +488,12 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ibm5162 )
 	/* basic machine hardware */
-	MDRV_CPU_ATPC(at16, at16, I80286, 6000000 /*6000000*/)
+	MDRV_CPU_ADD("main", I80286, 6000000 /*6000000*/)
+	MDRV_CPU_PROGRAM_MAP(at16_map, 0)
+	MDRV_CPU_IO_MAP(at16_io, 0)
+	MDRV_CPU_CONFIG(i286_address_mask)
 
-	MDRV_INTERLEAVE(1)
+	MDRV_QUANTUM_TIME(HZ(60))
 
 	MDRV_PIT8254_ADD( "pit8254", at_pit8254_config )
 
@@ -534,7 +540,10 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ps2m30286 )
 	/* basic machine hardware */
-	MDRV_CPU_ATPC(at16, at16, I80286, 12000000)
+	MDRV_CPU_ADD("main", I80286, 12000000)
+	MDRV_CPU_PROGRAM_MAP(at16_map, 0)
+	MDRV_CPU_IO_MAP(at16_io, 0)
+	MDRV_CPU_CONFIG(i286_address_mask)
 
 	MDRV_PIT8254_ADD( "pit8254", at_pit8254_config )
 
@@ -596,7 +605,10 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( atvga )
 	/* basic machine hardware */
-	MDRV_CPU_ATPC(at16, at16, I80286, 12000000)
+	MDRV_CPU_ADD("main", I80286, 12000000)
+	MDRV_CPU_PROGRAM_MAP(at16_map, 0)
+	MDRV_CPU_IO_MAP(at16_io, 0)
+	MDRV_CPU_CONFIG(i286_address_mask)
 
 	MDRV_PIT8254_ADD( "pit8254", at_pit8254_config )
 
@@ -661,7 +673,10 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( at386 )
     /* basic machine hardware */
 	/* original at 6 MHz, at03 8 megahertz */
-	MDRV_CPU_ATPC(at386, at386, I386, 12000000)
+	MDRV_CPU_ADD("main", I386, 12000000)
+	MDRV_CPU_PROGRAM_MAP(at386_map, 0)
+	MDRV_CPU_IO_MAP(at386_io, 0)
+	MDRV_CPU_CONFIG(i286_address_mask)
 
 	MDRV_MACHINE_START( at )
 	MDRV_MACHINE_RESET( at )

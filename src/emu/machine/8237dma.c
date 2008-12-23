@@ -174,9 +174,9 @@ static void dma8237_update_status(const device_config *device)
 		}
 
 		/* set the halt line */
-		if (dma8237->intf && dma8237->intf->cpunum >= 0)
+		if (dma8237->intf && dma8237->intf->cputag != NULL)
 		{
-			cpu_set_input_line(device->machine->cpu[dma8237->intf->cpunum], INPUT_LINE_HALT,
+			cputag_set_input_line(device->machine, dma8237->intf->cputag, INPUT_LINE_HALT,
 				pending_transfer ? ASSERT_LINE : CLEAR_LINE);
 		}
 
@@ -440,11 +440,11 @@ DEVICE_GET_INFO( dma8237 ) {
 		case DEVINFO_FCT_RESET:						info->reset = DEVICE_RESET_NAME(dma8237);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:						info->s = "Intel DMA8237";					break;
-		case DEVINFO_STR_FAMILY:					info->s = "DMA8237";						break;
-		case DEVINFO_STR_VERSION:					info->s = "1.00";							break;
-		case DEVINFO_STR_SOURCE_FILE:				info->s = __FILE__;							break;
-		case DEVINFO_STR_CREDITS:					info->s = "Copyright the MAME and MESS Teams";	break;
+		case DEVINFO_STR_NAME:						strcpy(info->s, "Intel DMA8237");			break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "DMA8237");					break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.00");					break;
+		case DEVINFO_STR_SOURCE_FILE:				strcpy(info->s, __FILE__);					break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright the MAME and MESS Teams");	break;
 	}
 }
 

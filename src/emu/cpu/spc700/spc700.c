@@ -64,6 +64,39 @@ Address  Function Register  R/W  When Reset          Remarks
 #include "debugger.h"
 #include "spc700.h"
 
+/* CPU Structure */
+typedef struct
+{
+	uint a;		/* Accumulator */
+	uint x;		/* Index Register X */
+	uint y;		/* Index Register Y */
+	uint s;		/* Stack Pointer */
+	uint pc;	/* Program Counter */
+	uint ppc;	/* Previous Program Counter */
+	uint flag_n;	/* Negative Flag */
+	uint flag_z;	/* Zero flag */
+	uint flag_v;	/* Overflow Flag */
+	uint flag_p;	/* Direct Page Flag */
+	uint flag_b;	/* BRK Instruction Flag */
+	uint flag_h;	/* Half-carry Flag */
+	uint flag_i;	/* Interrupt Mask Flag */
+	uint flag_c;	/* Carry Flag */
+	uint line_irq;	/* Status of the IRQ line */
+	uint line_nmi;	/* Status of the NMI line */
+	uint line_rst;	/* Status of the RESET line */
+	uint ir;		/* Instruction Register */
+	cpu_irq_callback int_ack;
+	const device_config *device;
+	const address_space *program;
+	uint stopped;	/* stopped status */
+	int ICount;
+	uint source;
+	uint destination;
+	uint temp1, temp2, temp3;
+	short spc_int16;
+	int spc_int32;
+} spc700i_cpu;
+
 /* ======================================================================== */
 /* ==================== ARCHITECTURE-DEPENDANT DEFINES ==================== */
 /* ======================================================================== */
@@ -205,6 +238,82 @@ INLINE int MAKE_INT_8(int A) {return (A & 0x80) ? A | ~0xff : A & 0xff;}
 
 #define NZFLAG_16(A) (((A)&0x7f) | (((A)>>1)&0x40) | (((A)>>8)&0xff))
 #define CFLAG_16(A)  ((A)>>8)
+
+
+/* ======================================================================== */
+/* ================================= MAME ================================= */
+/* ======================================================================== */
+
+#define spc700_read_8(addr) memory_read_byte_8le(cpustate->program,addr)
+#define spc700_write_8(addr,data) memory_write_byte_8le(cpustate->program,addr,data)
+
+#define spc700_read_8_direct(A)     spc700_read_8(A)
+#define spc700_write_8_direct(A, V) spc700_write_8(A, V)
+//#define spc700_read_instruction(A)    memory_decrypted_read_byte(cpustate->program,A)
+//#define spc700_read_8_immediate(A)    memory_raw_read_byte(cpustate->program,A)
+#define spc700_read_instruction(A)    memory_read_byte_8le(cpustate->program,A)
+#define spc700_read_8_immediate(A)    memory_read_byte_8le(cpustate->program,A)
+#define spc700_jumping(A)
+#define spc700_branching(A)
+
+
+
+/* ======================================================================== */
+/* ============================= INTERFACE API ============================ */
+/* ======================================================================== */
+
+/* This is the interface, not the implementation.  Please call the  */
+/* implementation APIs below.                                       */
+
+
+CPU_INIT( spc700 );
+
+/* Pulse the RESET pin on the CPU */
+CPU_RESET( spc700 );
+
+/* Set the RESET line on the CPU */
+void spc700_set_reset_line(spc700i_cpu *cpustate, int state, void* param);
+
+/* Clean up after the emulation core - Not used in this core - */
+CPU_EXIT( spc700 );
+
+/* Get the current Program Counter */
+unsigned spc700_get_pc(spc700i_cpu *cpustate);
+
+/* Set the current Program Counter */
+void spc700_set_pc(spc700i_cpu *cpustate,unsigned val);
+
+/* Get the current Stack Pointer */
+unsigned spc700_get_sp(spc700i_cpu *cpustate);
+
+/* Set the current Stack Pointer */
+void spc700_set_sp(spc700i_cpu *cpustate,unsigned val);
+
+/* Get a register from the core */
+unsigned spc700_get_reg(spc700i_cpu *cpustate,int regnum);
+
+/* Set a register in the core */
+void spc700_set_reg(spc700i_cpu *cpustate,int regnum, unsigned val);
+
+/* Note about NMI:
+ *   NMI is a one-shot trigger.  In order to trigger NMI again, you must
+ *   clear NMI and then assert it again.
+ */
+void spc700_set_nmi_line(spc700i_cpu *cpustate,int state);
+
+/* Assert or clear the IRQ pin */
+void spc700_set_irq_line(spc700i_cpu *cpustate,int line, int state);
+
+/* Set the callback that will be called when an interrupt is serviced */
+void spc700_set_irq_callback(spc700i_cpu *cpustate,cpu_irq_callback callback);
+
+/* Get a formatted string representing a register and its contents */
+const char *spc700_info(spc700i_cpu *cpustate,void *context, int regnum);
+
+
+/* Pulse the SO (Set Overflow) pin on the CPU */
+void spc700_pulse_so(spc700i_cpu *cpustate);
+
 
 /* ======================================================================== */
 /* ============================ UTILITY MACROS ============================ */
@@ -1599,7 +1708,7 @@ CPU_GET_INFO( spc700 )
 	spc700i_cpu *cpustate = (device != NULL) ? device->token : NULL;
 	uint p = 0;
 
-	if (device != NULL)
+	if (cpustate != NULL)
 	{
 		p = ((cpustate->flag_n & 0x80)			|
 					((cpustate->flag_v & 0x80) >> 1)	|
@@ -1625,15 +1734,15 @@ CPU_GET_INFO( spc700 )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 2;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 8;							break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 0;				break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 0;				break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;				break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 8;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 16;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 0;				break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 0;				break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;				break;
 
 		case CPUINFO_INT_INPUT_STATE + 0:				info->i = (LINE_IRQ == IRQ_SET) ? ASSERT_LINE : CLEAR_LINE; break;
 
@@ -1649,13 +1758,13 @@ CPU_GET_INFO( spc700 )
 		case CPUINFO_INT_REGISTER + SPC700_Y:				info->i = REG_Y;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:					info->setinfo = CPU_SET_INFO_NAME(spc700);		break;
-		case CPUINFO_PTR_INIT:						info->init = CPU_INIT_NAME(spc700);			break;
-		case CPUINFO_PTR_RESET:						info->reset = CPU_RESET_NAME(spc700);			break;
-		case CPUINFO_PTR_EXIT:						info->exit = CPU_EXIT_NAME(spc700);			break;
-		case CPUINFO_PTR_EXECUTE:					info->execute = CPU_EXECUTE_NAME(spc700);		break;
-		case CPUINFO_PTR_BURN:						info->burn = NULL;					break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(spc700);	break;
+		case CPUINFO_FCT_SET_INFO:					info->setinfo = CPU_SET_INFO_NAME(spc700);		break;
+		case CPUINFO_FCT_INIT:						info->init = CPU_INIT_NAME(spc700);			break;
+		case CPUINFO_FCT_RESET:						info->reset = CPU_RESET_NAME(spc700);			break;
+		case CPUINFO_FCT_EXIT:						info->exit = CPU_EXIT_NAME(spc700);			break;
+		case CPUINFO_FCT_EXECUTE:					info->execute = CPU_EXECUTE_NAME(spc700);		break;
+		case CPUINFO_FCT_BURN:						info->burn = NULL;					break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(spc700);	break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->ICount;				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

@@ -1258,10 +1258,10 @@ static const struct harddisk_callback_config smc92x4_harddisk_config =
 
 
 MACHINE_DRIVER_START( smc92x4_hd )
-	MDRV_DEVICE_ADD( "harddisk1", HARDDISK )
+	MDRV_DEVICE_ADD( "harddisk1", HARDDISK, 0 )
 	MDRV_DEVICE_CONFIG( smc92x4_harddisk_config )
-	MDRV_DEVICE_ADD( "harddisk2", HARDDISK )
+	MDRV_DEVICE_ADD( "harddisk2", HARDDISK, 0 )
 	MDRV_DEVICE_CONFIG( smc92x4_harddisk_config )
-	MDRV_DEVICE_ADD( "harddisk3", HARDDISK )
+	MDRV_DEVICE_ADD( "harddisk3", HARDDISK, 0 )
 	MDRV_DEVICE_CONFIG( smc92x4_harddisk_config )
 MACHINE_DRIVER_END

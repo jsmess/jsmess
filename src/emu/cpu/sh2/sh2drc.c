@@ -685,7 +685,7 @@ static CPU_INIT( sh2 )
 	memset(sh2, 0, sizeof(SH2));
 
 	/* initialize the common core parts */
-	sh2_common_init(sh2, device, index, clock, irqcallback);
+	sh2_common_init(sh2, device, irqcallback);
 
 	/* allocate the implementation-specific state from the full cache */
 	sh2->cache = cache;
@@ -3401,7 +3401,7 @@ static CPU_SET_INFO( sh2 )
 
 CPU_GET_INFO( sh2 )
 {
-	SH2 *sh2 = (device != NULL) ? *(SH2 **)device->token : NULL;
+	SH2 *sh2 = (device != NULL && device->token != NULL) ? *(SH2 **)device->token : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
@@ -3416,20 +3416,20 @@ CPU_GET_INFO( sh2 )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 4;							break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 32;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 32;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 32;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 32;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
 
 		// Internal maps
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map32 = ADDRESS_MAP_NAME(sh2_internal_map); break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:    info->internal_map32 = NULL;	break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_IO:      info->internal_map32 = NULL;	break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM: info->internal_map32 = ADDRESS_MAP_NAME(sh2_internal_map); break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:    info->internal_map32 = NULL;	break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_IO:      info->internal_map32 = NULL;	break;
 
 		case CPUINFO_INT_INPUT_STATE + SH2_INT_VBLIN:	info->i = sh2->irq_line_state[SH2_INT_VBLIN]; break;
 		case CPUINFO_INT_INPUT_STATE + SH2_INT_VBLOUT:	info->i = sh2->irq_line_state[SH2_INT_VBLOUT]; break;
@@ -3480,13 +3480,13 @@ CPU_GET_INFO( sh2 )
 		case CPUINFO_INT_REGISTER + SH2_EA:				info->i = sh2->ea;						break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(sh2);			break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(sh2);					break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(sh2);				break;
-		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(sh2);					break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(sh2);			break;
-		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(sh2);			break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(sh2);			break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(sh2);					break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(sh2);				break;
+		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(sh2);					break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(sh2);			break;
+		case CPUINFO_FCT_BURN:							info->burn = NULL;						break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(sh2);			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &sh2->icount;				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -3545,7 +3545,7 @@ CPU_GET_INFO( sh1 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_RESET:						info->reset = CPU_RESET_NAME(sh1);				break;
+		case CPUINFO_FCT_RESET:						info->reset = CPU_RESET_NAME(sh1);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:	    					strcpy(info->s, "SH-1");				break;

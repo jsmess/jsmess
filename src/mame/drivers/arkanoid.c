@@ -469,6 +469,7 @@ DIP locations verified for:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "arkanoid.h"
 #include "sound/ay8910.h"
 #include "cpu/m6805/m6805.h"
@@ -767,7 +768,7 @@ static MACHINE_DRIVER_START( arkanoid )
 	MDRV_CPU_ADD("mcu", M68705, XTAL_12MHz/4) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(mcu_map, 0)
 
-	MDRV_INTERLEAVE(100)					// 100 CPU slices per second to synchronize between the MCU and the main CPU
+	MDRV_QUANTUM_TIME(HZ(6000))					// 100 CPU slices per second to synchronize between the MCU and the main CPU
 
 	MDRV_MACHINE_START(arkanoid)
 	MDRV_MACHINE_RESET(arkanoid)
@@ -1049,6 +1050,9 @@ ROM_START( arkgcbl )
 	ROM_LOAD( "82s129.5kl",   0x0300, 0x0100, CRC(085d625a) SHA1(26c96a1c1b7562fed84c31dd92fdf7829e96a9c7) )	/* green component = a75-08.bpr*/
 	ROM_LOAD( "82s129.5mn",   0x0400, 0x0100, CRC(0fe0b108) SHA1(fcf27619208922345a1e42b3a219b4274f66968d) )	/* blue component  + */
 	ROM_LOAD( "63s141.5m",    0x0500, 0x0100, CRC(5553f675) SHA1(c50255af8d99664b92e0bb34a527fd42ebf7e759) )	/* blue component  = a75-09.bpr*/
+
+	ROM_REGION( 0x0200, "pal", ROMREGION_DISPOSE )
+	ROM_LOAD( "pal16r8.5f",   0x0000, 0x0104, CRC(36471917) SHA1(d0f295a94d480b44416e66be4b480b299aad5c3c) )
 ROM_END
 
 ROM_START( paddle2 )

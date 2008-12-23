@@ -50,7 +50,7 @@ typedef UINT16 WORD;
 typedef UINT32 DWORD;
 
 #include "v30mz.h"
-#include "necintrf.h"
+#include "nec.h"
 
 extern int necv_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom);
 
@@ -913,7 +913,7 @@ static CPU_DISASSEMBLE( nec )
 	return necv_dasm_one(buffer, pc, oprom);
 }
 
-static void nec_init(const device_config *device, int index, int clock, cpu_irq_callback irqcallback, int type)
+static void nec_init(const device_config *device, cpu_irq_callback irqcallback, int type)
 {
 	v30mz_state *cpustate = device->token;
 
@@ -942,7 +942,7 @@ static void nec_init(const device_config *device, int index, int clock, cpu_irq_
 	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 }
 
-static CPU_INIT( v30mz ) { nec_init(device, index, clock, irqcallback, 3); }
+static CPU_INIT( v30mz ) { nec_init(device, irqcallback, 3); }
 static CPU_EXECUTE( v30mz )
 {
 	v30mz_state *cpustate = device->token;
@@ -1050,15 +1050,15 @@ CPU_GET_INFO( v30mz )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 80;							break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 20;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 8;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 20;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 8;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 16;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE + 0:				info->i = (cpustate->pending_irq & INT_IRQ) ? ASSERT_LINE : CLEAR_LINE; break;
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	info->i = cpustate->nmi_state;					break;
@@ -1086,11 +1086,11 @@ CPU_GET_INFO( v30mz )
 		case CPUINFO_INT_REGISTER + NEC_PENDING:		info->i = cpustate->pending_irq;				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(nec);			break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(nec);				break;
-		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(nec);					break;
-		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(nec);			break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(nec);			break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(nec);				break;
+		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(nec);					break;
+		case CPUINFO_FCT_BURN:							info->burn = NULL;						break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(nec);			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -1138,9 +1138,9 @@ CPU_GET_INFO( v30mz )
         case CPUINFO_STR_REGISTER + NEC_VECTOR:			sprintf(info->s, "V:%02X", cpustate->int_vector); break;
 
 	/* --- the following bits of info are returned as pointers to data or functions --- */
-	case CPUINFO_PTR_INIT:		info->init = CPU_INIT_NAME(v30mz);
+	case CPUINFO_FCT_INIT:		info->init = CPU_INIT_NAME(v30mz);
 					break;
-	case CPUINFO_PTR_EXECUTE:	info->execute = CPU_EXECUTE_NAME(v30mz);
+	case CPUINFO_FCT_EXECUTE:	info->execute = CPU_EXECUTE_NAME(v30mz);
 					break;
 
 	/* --- the following bits of info are returned as NULL-terminated strings --- */

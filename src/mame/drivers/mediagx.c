@@ -64,8 +64,8 @@
 */
 
 #include "driver.h"
+#include "cpu/i386/i386.h"
 #include "devconv.h"
-#include "deprecat.h"
 #include "machine/8237dma.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
@@ -75,7 +75,6 @@
 #include "machine/8042kbdc.h"
 #include "machine/pckeybrd.h"
 #include "machine/idectrl.h"
-#include "cpu/i386/i386.h"
 #include "sound/dmadac.h"
 
 #define SPEEDUP_HACKS	1
@@ -792,7 +791,7 @@ static DMA8237_MEM_WRITE( pc_dma_write_byte )
 
 static const struct dma8237_interface dma8237_1_config =
 {
-	0,
+	"main",
 	1.0e-6, // 1us
 
 	pc_dma_read_byte,
@@ -806,7 +805,7 @@ static const struct dma8237_interface dma8237_1_config =
 
 static const struct dma8237_interface dma8237_2_config =
 {
-	0,
+	"main",
 	1.0e-6, // 1us
 
 	NULL,
@@ -957,7 +956,7 @@ static MACHINE_RESET(mediagx)
 	cpu_set_irq_callback(machine->cpu[0], irq_callback);
 
 	memcpy(bios_ram, rom, 0x40000);
-	cpu_reset(machine->cpu[0]);
+	device_reset(machine->cpu[0]);
 
 	dacl = auto_malloc(65536 * sizeof(INT16));
 	dacr = auto_malloc(65536 * sizeof(INT16));
@@ -1074,12 +1073,12 @@ static MACHINE_DRIVER_START(mediagx)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 MACHINE_DRIVER_END
 
-static void set_gate_a20(int a20)
+static void set_gate_a20(running_machine *machine, int a20)
 {
-	cpu_set_input_line(Machine->cpu[0], INPUT_LINE_A20, a20);
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_A20, a20);
 }
 
-static void keyboard_interrupt(int state)
+static void keyboard_interrupt(running_machine *machine, int state)
 {
 	pic8259_set_irq_line(mediagx_devices.pic8259_1, 1, state);
 }
@@ -1098,7 +1097,7 @@ static const struct kbdc8042_interface at8042 =
 	KBDC8042_AT386, set_gate_a20, keyboard_interrupt, mediagx_get_out2
 };
 
-static void mediagx_set_keyb_int(int state) {
+static void mediagx_set_keyb_int(running_machine *machine, int state) {
 	pic8259_set_irq_line(mediagx_devices.pic8259_1, 1, state);
 }
 

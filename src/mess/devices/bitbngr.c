@@ -246,9 +246,9 @@ DEVICE_GET_INFO(bitbanger)
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(bitbanger); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "Bitbanger"; break;
-		case DEVINFO_STR_FAMILY:						info->s = "Bitbanger"; break;
-		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__; break;
-		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:			info->s = "prn"; break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Bitbanger"); break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Bitbanger"); break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__); break;
+		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:			strcpy(info->s, "prn"); break;
 	}
 }

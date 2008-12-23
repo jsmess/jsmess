@@ -9,7 +9,6 @@
 **************************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/wswan.h"
 #include "streams.h"
 
@@ -141,7 +140,7 @@ WRITE8_HANDLER( wswan_sound_port_w ) {
 	}
 }
 
-static void wswan_sh_update(void *param,stream_sample_t **inputs, stream_sample_t **outputs,int samples)
+static STREAM_UPDATE( wswan_sh_update )
 {
 	stream_sample_t sample, left, right;
 
@@ -189,7 +188,7 @@ static void wswan_sh_update(void *param,stream_sample_t **inputs, stream_sample_
 				if ( snd.sweep_count >= snd.sweep_time ) {
 					snd.sweep_count = 0;
 					snd.audio3.freq += snd.sweep_step;
-					snd.audio3.period = Machine->sample_rate / ( 3072000  / ( ( 2048 - snd.audio3.freq ) << 5 ) );
+					snd.audio3.period = device->machine->sample_rate / ( 3072000  / ( ( 2048 - snd.audio3.freq ) << 5 ) );
 				}
 			}
 			left += snd.audio3.vol_left * sample;

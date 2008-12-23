@@ -149,7 +149,6 @@ WRITE8_DEVICE_HANDLER(radio86_write_video)
 const dma8257_interface radio86_dma =
 {
 	0,
-	XTAL_16MHz / 9,
 
 	radio86_dma_read_byte,
 	0,
@@ -168,7 +167,7 @@ static UINT8 romdisk_lsb,romdisk_msb, disk_sel;
 
 READ8_HANDLER (radio_cpu_state_r )
 {
-	return cpu_get_reg(space->cpu, I8080_STATUS);	
+	return cpu_get_reg(space->cpu, I8085_STATUS);	
 }
 
 READ8_HANDLER (radio_io_r )

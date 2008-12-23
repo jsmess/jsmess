@@ -122,6 +122,7 @@ Dip locations verified with US conversion kit manual.
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "cpu/h6280/h6280.h"
 #include "deco16ic.h"
 #include "sound/2203intf.h"
@@ -564,7 +565,7 @@ static MACHINE_DRIVER_START( dassault )
 	MDRV_CPU_ADD("audio", H6280,32220000/8)	/* Accurate */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
-	MDRV_INTERLEAVE(140) /* 140 CPU slices per frame */
+	MDRV_QUANTUM_TIME(HZ(8400)) /* 140 CPU slices per frame */
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)

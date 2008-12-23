@@ -18,6 +18,7 @@ Notes:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "sound/2203intf.h"
 
@@ -49,7 +50,7 @@ static WRITE8_HANDLER( goindol_bankswitch_w )
 		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
 	}
 
-	flip_screen_set(data & 0x20);
+	flip_screen_set(space->machine, data & 0x20);
 }
 
 

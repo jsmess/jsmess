@@ -46,7 +46,7 @@ struct _dl1416_interface
 ***************************************************************************/
 
 #define MDRV_DL1416_ADD(_tag, _type, _update) \
-	MDRV_DEVICE_ADD(_tag, DL1416) \
+	MDRV_DEVICE_ADD(_tag, DL1416, 0) \
 	MDRV_DEVICE_CONFIG_DATA32(dl1416_interface, type, _type) \
 	MDRV_DEVICE_CONFIG_DATAPTR(dl1416_interface, update, _update)
 

@@ -220,6 +220,9 @@ DIP locations verified for:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
+#include "cpu/m6809/m6809.h"
+#include "cpu/m68000/m68000.h"
 #include "balsente.h"
 #include "sound/cem3394.h"
 
@@ -1191,7 +1194,7 @@ static MACHINE_DRIVER_START( balsente )
 	MDRV_CPU_PROGRAM_MAP(cpu2_map,0)
 	MDRV_CPU_IO_MAP(cpu2_io_map,0)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_MACHINE_RESET(balsente)
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -1244,7 +1247,7 @@ static MACHINE_DRIVER_START( shrike )
 	MDRV_CPU_ADD("68k", M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(shrike68k_map,0)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 MACHINE_DRIVER_END
 
 

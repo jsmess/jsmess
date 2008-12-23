@@ -22,6 +22,7 @@ TODO:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "streams.h"
 #include "sound/sn76496.h"
 #include "sound/okim6295.h"
@@ -46,7 +47,7 @@ static struct mjkjidai_adpcm_state
 	UINT8 *base;
 } mjkjidai_adpcm;
 
-static void mjkjidai_adpcm_callback (void *param, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+static STREAM_UPDATE( mjkjidai_adpcm_callback )
 {
 	struct mjkjidai_adpcm_state *state = param;
 	stream_sample_t *dest = outputs[0];

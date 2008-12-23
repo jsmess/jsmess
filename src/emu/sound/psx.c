@@ -111,7 +111,7 @@ INLINE int limit( int v )
 	return v;
 }
 
-static void PSXSPU_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length)
+static STREAM_UPDATE( PSXSPU_update )
 {
 	struct psxinfo *chip = param;
 	int v;
@@ -136,15 +136,15 @@ static void PSXSPU_update(void *param, stream_sample_t **inputs, stream_sample_t
 		{ 122, -60 }
 	};
 
-	memset( buffer[ 0 ], 0, length * sizeof( *buffer[ 0 ] ));
-	memset( buffer[ 1 ], 0, length * sizeof( *buffer[ 1 ] ));
+	memset( outputs[ 0 ], 0, samples * sizeof( *outputs[ 0 ] ));
+	memset( outputs[ 1 ], 0, samples * sizeof( *outputs[ 1 ] ));
 
 	for( n_channel = 0; n_channel < MAX_CHANNEL; n_channel++ )
 	{
 		voll = volume( chip->m_p_n_volumeleft[ n_channel ] );
 		volr = volume( chip->m_p_n_volumeright[ n_channel ] );
 
-		for( n_sample = 0; n_sample < length; n_sample++ )
+		for( n_sample = 0; n_sample < samples; n_sample++ )
 		{
 			if( chip->m_p_n_blockoffset[ n_channel ] >= ( SAMPLES_PER_BLOCK << PITCH_SHIFT ) )
 			{
@@ -207,16 +207,15 @@ static void PSXSPU_update(void *param, stream_sample_t **inputs, stream_sample_t
 			}
 			v = chip->m_p_n_blockbuffer[ ( n_channel * SAMPLES_PER_BLOCK ) + ( chip->m_p_n_blockoffset[ n_channel ] >> PITCH_SHIFT ) ];
 			chip->m_p_n_blockoffset[ n_channel ] += chip->m_p_n_pitch[ n_channel ];
-			buffer[ 0 ][ n_sample ] = limit( buffer[ 0 ][ n_sample ] + ( ( v * voll ) / 0x4000 ) );
-			buffer[ 1 ][ n_sample ] = limit( buffer[ 1 ][ n_sample ] + ( ( v * volr ) / 0x4000 ) );
+			outputs[ 0 ][ n_sample ] = limit( outputs[ 0 ][ n_sample ] + ( ( v * voll ) / 0x4000 ) );
+			outputs[ 1 ][ n_sample ] = limit( outputs[ 1 ][ n_sample ] + ( ( v * volr ) / 0x4000 ) );
 		}
 	}
 }
 
-static void spu_read( UINT32 n_address, INT32 n_size )
+static void spu_read( running_machine *machine, UINT32 n_address, INT32 n_size )
 {
 	struct psxinfo *chip = sndti_token(SOUND_PSXSPU, 0);
-	running_machine *machine = chip->device->machine;
 	verboselog( machine, 1, "spu_read( %08x, %08x )\n", n_address, n_size );
 
 	while( n_size > 0 )
@@ -233,10 +232,9 @@ static void spu_read( UINT32 n_address, INT32 n_size )
 	}
 }
 
-static void spu_write( UINT32 n_address, INT32 n_size )
+static void spu_write( running_machine *machine, UINT32 n_address, INT32 n_size )
 {
 	struct psxinfo *chip = sndti_token(SOUND_PSXSPU, 0);
-	running_machine *machine = chip->device->machine;
 	verboselog( machine, 1, "spu_write( %08x, %08x )\n", n_address, n_size );
 
 	while( n_size > 0 )
@@ -686,17 +684,17 @@ SND_GET_INFO( psxspu )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( psxspu );		break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( psxspu );				break;
-		case SNDINFO_PTR_STOP:							/* Nothing */							break;
-		case SNDINFO_PTR_RESET:							/* Nothing */							break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( psxspu );	break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( psxspu );			break;
+		case SNDINFO_PTR_STOP:							/* Nothing */									break;
+		case SNDINFO_PTR_RESET:							/* Nothing */									break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							info->s = "SPU";						break;
-		case SNDINFO_STR_CORE_FAMILY:					info->s = "Sony custom";				break;
-		case SNDINFO_STR_CORE_VERSION:					info->s = "1.0";						break;
-		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
-		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "SPU");							break;
+		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Sony custom");					break;
+		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");							break;
+		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
+		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

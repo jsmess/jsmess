@@ -12,13 +12,6 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _miot6530_config miot6530_config;
-struct _miot6530_config
-{
-	UINT32					clock;
-};
-
-
 typedef UINT8 (*miot_read_func)(const device_config *device, UINT8 olddata);
 typedef void (*miot_write_func)(const device_config *device, UINT8 newdata, UINT8 olddata);
 
@@ -39,8 +32,7 @@ struct _miot6530_interface
 ***************************************************************************/
 
 #define MDRV_MIOT6530_ADD(_tag, _clock, _intrf) \
-	MDRV_DEVICE_ADD(_tag, MIOT6530) \
-	MDRV_DEVICE_CONFIG_DATA32(miot6530_config, clock, _clock) \
+	MDRV_DEVICE_ADD(_tag, MIOT6530, _clock) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
 #define MDRV_MIOT6530_REMOVE(_tag) \

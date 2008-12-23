@@ -19,7 +19,7 @@
 #define MOCKINGBOARD		DEVICE_GET_INFO_NAME(mockingboard)
 
 #define MDRV_MOCKINGBOARD_ADD(_tag)	\
-	MDRV_DEVICE_ADD((_tag), MOCKINGBOARD)
+	MDRV_DEVICE_ADD((_tag), MOCKINGBOARD, 0)
 
 
 /***************************************************************************

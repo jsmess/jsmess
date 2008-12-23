@@ -20,6 +20,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "system16.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/segaic16.h"
@@ -210,7 +211,7 @@ static MACHINE_RESET( xboard )
 	segaic16_tilemap_reset(machine, 0);
 
 	/* hook the RESET line, which resets CPU #1 */
-	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_M68K_RESET_CALLBACK, (genf *)xboard_reset);
+	device_set_info_fct(machine->cpu[0], CPUINFO_FCT_M68K_RESET_CALLBACK, (genf *)xboard_reset);
 
 	/* set up the compare/timer chip */
 	segaic16_compare_timer_init(0, sound_data_w, timer_ack_callback);
@@ -1138,7 +1139,7 @@ static MACHINE_DRIVER_START( xboard )
 
 	MDRV_MACHINE_RESET(xboard)
 	MDRV_NVRAM_HANDLER(xboard)
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	/* video hardware */
 	MDRV_GFXDECODE(segaxbd)

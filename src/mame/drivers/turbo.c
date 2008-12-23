@@ -145,6 +145,7 @@
 **************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "machine/8255ppi.h"
 #include "turbo.h"
 #include "machine/segacrpt.h"
@@ -1144,7 +1145,7 @@ static MACHINE_DRIVER_START( buckrog )
 	MDRV_CPU_PROGRAM_MAP(buckrog_cpu2_map,0)
 	MDRV_CPU_IO_MAP(buckrog_cpu2_portmap,0)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 	MDRV_MACHINE_RESET(buckrog)
 
 	MDRV_PPI8255_ADD( "ppi8255_0", buckrog_8255_intf[0] )

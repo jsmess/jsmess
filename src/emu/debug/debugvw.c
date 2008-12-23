@@ -1043,31 +1043,29 @@ static const registers_subview_item *registers_view_enumerate_subviews(running_m
 	astring *tempstring = astring_alloc();
 	registers_subview_item *head = NULL;
 	registers_subview_item **tailptr = &head;
+	const device_config *cpu;
 	int curindex = 0;
-	int cpunum;
 
 	/* iterate over CPUs with program address spaces */
-	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
-		if (machine->cpu[cpunum] != NULL)
-		{
-			const device_config *device = machine->cpu[cpunum];
-			registers_subview_item *subview;
+	for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+	{
+		registers_subview_item *subview;
 
-			/* determine the string and allocate a subview large enough */
-			astring_printf(tempstring, "CPU '%s' (%s)", device->tag, cpu_get_name(device));
-			subview = auto_malloc(sizeof(*subview) + astring_len(tempstring));
-			memset(subview, 0, sizeof(*subview));
+		/* determine the string and allocate a subview large enough */
+		astring_printf(tempstring, "CPU '%s' (%s)", cpu->tag, cpu_get_name(cpu));
+		subview = auto_malloc(sizeof(*subview) + astring_len(tempstring));
+		memset(subview, 0, sizeof(*subview));
 
-			/* populate the subview */
-			subview->next = NULL;
-			subview->index = curindex++;
-			subview->device = device;
-			strcpy(subview->name, astring_c(tempstring));
+		/* populate the subview */
+		subview->next = NULL;
+		subview->index = curindex++;
+		subview->device = cpu;
+		strcpy(subview->name, astring_c(tempstring));
 
-			/* add to the list */
-			*tailptr = subview;
-			tailptr = &subview->next;
-		}
+		/* add to the list */
+		*tailptr = subview;
+		tailptr = &subview->next;
+	}
 
 	/* free the temporary string */
 	astring_free(tempstring);
@@ -1187,12 +1185,12 @@ static void registers_view_recompute(debug_view *view)
 {
 	debug_view_registers *regdata = view->extra_data;
 	int regnum, maxtaglen, maxvallen;
-	const int *list;
+	const cpu_state_table *table;
 
 	/* if no CPU, reset to the first one */
 	if (regdata->device == NULL)
 		regdata->device = view->machine->cpu[0];
-	list = cpu_get_debug_register_list(regdata->device);
+	table = cpu_get_state_table(regdata->device);
 
 	/* reset the view parameters */
 	view->topleft.y = 0;
@@ -1266,15 +1264,22 @@ static void registers_view_recompute(debug_view *view)
 		int regid;
 
 		/* identify the register id */
-		regid = list ? list[regnum] : regnum;
-		if (regid < 0)
-			break;
+		if (table != NULL)
+		{
+			if (regnum >= table->entrycount)
+				break;
+			if ((table->entrylist[regnum].validmask & table->subtypemask) == 0)
+				continue;
+			regid = table->entrylist[regnum].index;
+		}
+		else
+			regid = regnum;
 
 		/* retrieve the string for this register */
 		str = cpu_get_reg_string(regdata->device, regid);
 
 		/* did we get a string? */
-		if (str && str[0] != '\0' && str[0] != '~')
+		if (str != NULL && str[0] != 0 && str[0] != '~')
 			registers_view_add_register(view, regid, str);
 	}
 
@@ -1488,34 +1493,33 @@ static const disasm_subview_item *disasm_view_enumerate_subviews(running_machine
 	astring *tempstring = astring_alloc();
 	disasm_subview_item *head = NULL;
 	disasm_subview_item **tailptr = &head;
+	const device_config *cpu;
 	int curindex = 0;
-	int cpunum;
 
 	/* iterate over CPUs with program address spaces */
-	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
-		if (machine->cpu[cpunum] != NULL)
+	for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+	{
+		const address_space *space = cpu_get_address_space(cpu, ADDRESS_SPACE_PROGRAM);
+		if (space != NULL)
 		{
-			const address_space *space = cpu_get_address_space(machine->cpu[cpunum], ADDRESS_SPACE_PROGRAM);
-			if (space != NULL)
-			{
-				disasm_subview_item *subview;
+			disasm_subview_item *subview;
 
-				/* determine the string and allocate a subview large enough */
-				astring_printf(tempstring, "CPU '%s' (%s)", space->cpu->tag, cpu_get_name(space->cpu));
-				subview = auto_malloc(sizeof(*subview) + astring_len(tempstring));
-				memset(subview, 0, sizeof(*subview));
+			/* determine the string and allocate a subview large enough */
+			astring_printf(tempstring, "CPU '%s' (%s)", cpu->tag, cpu_get_name(cpu));
+			subview = auto_malloc(sizeof(*subview) + astring_len(tempstring));
+			memset(subview, 0, sizeof(*subview));
 
-				/* populate the subview */
-				subview->next = NULL;
-				subview->index = curindex++;
-				subview->space = space;
-				strcpy(subview->name, astring_c(tempstring));
+			/* populate the subview */
+			subview->next = NULL;
+			subview->index = curindex++;
+			subview->space = space;
+			strcpy(subview->name, astring_c(tempstring));
 
-				/* add to the list */
-				*tailptr = subview;
-				tailptr = &subview->next;
-			}
+			/* add to the list */
+			*tailptr = subview;
+			tailptr = &subview->next;
 		}
+	}
 
 	/* free the temporary string */
 	astring_free(tempstring);
@@ -1532,7 +1536,7 @@ static int disasm_view_alloc(debug_view *view)
 {
 	debug_view_disasm *dasmdata;
 	int total_comments = 0;
-	int cpunum;
+	const device_config *cpu;
 
 	/* fail if no available subviews */
 	if (view->machine->debugvw_data->disasm_subviews == NULL)
@@ -1551,9 +1555,8 @@ static int disasm_view_alloc(debug_view *view)
 	debug_view_expression_alloc(&dasmdata->expression);
 
 	/* count the number of comments */
-	for (cpunum = 0; cpunum < ARRAY_LENGTH(view->machine->cpu); cpunum++)
-		if (view->machine->cpu[cpunum] != NULL)
-			total_comments += debug_comment_get_count(view->machine->cpu[cpunum]);
+	for (cpu = view->machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+		total_comments += debug_comment_get_count(cpu);
 
 	/* initialize */
 	dasmdata->right_column = (total_comments > 0) ? DASM_RIGHTCOL_COMMENTS : DASM_RIGHTCOL_RAW;
@@ -2406,51 +2409,50 @@ static const memory_subview_item *memory_view_enumerate_subviews(running_machine
 	astring *tempstring = astring_alloc();
 	memory_subview_item *head = NULL;
 	memory_subview_item **tailptr = &head;
-	int cpunum, spacenum;
+	const device_config *cpu;
+	int spacenum;
 	const char *rgntag;
 	int curindex = 0;
 	int itemnum;
 
 	/* first add all the CPUs' address spaces */
-	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
-		if (machine->cpu[cpunum] != NULL)
-			for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
+	for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
+		{
+			const address_space *space = cpu_get_address_space(cpu, spacenum);
+			if (space != NULL)
 			{
-				const address_space *space = cpu_get_address_space(machine->cpu[cpunum], spacenum);
-				if (space != NULL)
-				{
-					memory_subview_item *subview;
+				memory_subview_item *subview;
 
-					/* determine the string and allocate a subview large enough */
-					astring_printf(tempstring, "CPU '%s' (%s) %s memory", space->cpu->tag, cpu_get_name(space->cpu), space->name);
-					subview = auto_malloc(sizeof(*subview) + astring_len(tempstring));
-					memset(subview, 0, sizeof(*subview));
+				/* determine the string and allocate a subview large enough */
+				astring_printf(tempstring, "CPU '%s' (%s) %s memory", cpu->tag, cpu_get_name(cpu), space->name);
+				subview = auto_malloc(sizeof(*subview) + astring_len(tempstring));
+				memset(subview, 0, sizeof(*subview));
 
-					/* populate the subview */
-					subview->next = NULL;
-					subview->index = curindex++;
-					subview->space = space;
-					subview->endianness = space->endianness;
-					subview->prefsize = space->dbits / 8;
-					strcpy(subview->name, astring_c(tempstring));
+				/* populate the subview */
+				subview->next = NULL;
+				subview->index = curindex++;
+				subview->space = space;
+				subview->endianness = space->endianness;
+				subview->prefsize = space->dbits / 8;
+				strcpy(subview->name, astring_c(tempstring));
 
-					/* add to the list */
-					*tailptr = subview;
-					tailptr = &subview->next;
-				}
-		}
+				/* add to the list */
+				*tailptr = subview;
+				tailptr = &subview->next;
+			}
+	}
 
 	/* then add all the memory regions */
 	for (rgntag = memory_region_next(machine, NULL); rgntag != NULL; rgntag = memory_region_next(machine, rgntag))
 	{
 		UINT32 length = memory_region_length(machine, rgntag);
 		UINT32 flags = memory_region_flags(machine, rgntag);
-
 		if (length > 0 && (flags & ROMREGION_DATATYPEMASK) == ROMREGION_DATATYPEROM)
 		{
-		        UINT8 little_endian = ((flags & ROMREGION_ENDIANMASK) == ROMREGION_LE);
-		        UINT8 width = 1 << ((flags & ROMREGION_WIDTHMASK) >> 8);
-		        memory_subview_item *subview;
+			UINT8 little_endian = ((flags & ROMREGION_ENDIANMASK) == ROMREGION_LE);
+			UINT8 width = 1 << ((flags & ROMREGION_WIDTHMASK) >> 8);
+			memory_subview_item *subview;
 
 			/* determine the string and allocate a subview large enough */
 			astring_printf(tempstring, "Region '%s'", rgntag);
@@ -2666,17 +2668,17 @@ static void memory_view_update(debug_view *view)
 			for (chunknum = 0; chunknum < memdata->chunks_per_row; chunknum++)
 			{
 				int chunkindex = memdata->reverse_view ? (memdata->chunks_per_row - 1 - chunknum) : chunknum;
-		                UINT64 chunkdata;
-		                int ismapped;
+				UINT64 chunkdata;
+				int ismapped;
 
-		                ismapped = memory_view_read(memdata, memdata->bytes_per_chunk, addrbyte + chunknum * memdata->bytes_per_chunk, &chunkdata);
+				ismapped = memory_view_read(memdata, memdata->bytes_per_chunk, addrbyte + chunknum * memdata->bytes_per_chunk, &chunkdata);
 				dest = destrow + memdata->section[1].pos + 1 + chunkindex * posdata->spacing;
 				for (ch = 0; ch < posdata->spacing; ch++, dest++)
 					if (dest >= destmin && dest < destmax)
 					{
 						UINT8 shift = posdata->shift[ch];
 						if (shift < 64)
-							dest->byte = ismapped ? "0123456789ABCDEF"[(chunkdata >> shift) & 0x0f] : '*';              
+							dest->byte = ismapped ? "0123456789ABCDEF"[(chunkdata >> shift) & 0x0f] : '*';
 					}
 			}
 
@@ -2783,7 +2785,6 @@ static void memory_view_char(debug_view *view, int chval)
 			hexchar = strchr(hexvals, tolower(chval));
 			if (hexchar == NULL)
 				break;
-
 			ismapped = memory_view_read(memdata, memdata->bytes_per_chunk, address, &data);
 			if (!ismapped)
 				break;
@@ -3021,6 +3022,7 @@ static int memory_view_read(debug_view_memory *memdata, UINT8 size, offs_t offs,
 		int ismapped;
 
 		ismapped = memdata->no_translation ? TRUE : memory_address_physical(space, TRANSLATE_READ_DEBUG, &dummyaddr);
+		*data = ~(UINT64)0;
 		if (ismapped)
 		{
 			switch (size)
@@ -3031,7 +3033,6 @@ static int memory_view_read(debug_view_memory *memdata, UINT8 size, offs_t offs,
 				case 8:	*data = debug_read_qword(space, offs, !memdata->no_translation); break;
 			}
 		}
-
 		return ismapped;
 	}
 
@@ -3044,22 +3045,19 @@ static int memory_view_read(debug_view_memory *memdata, UINT8 size, offs_t offs,
 		size /= 2;
 		ismapped  = memory_view_read(memdata, size, offs + 0 * size, &data0);
 		ismapped |= memory_view_read(memdata, size, offs + 1 * size, &data1);
-
 		if (memdata->desc->endianness == ENDIANNESS_LITTLE)
 			*data = data0 | (data1 << (size * 8));
 		else
 			*data = data1 | (data0 << (size * 8));
-
 		return ismapped;
 	}
 
 	/* all 0xff if out of bounds */
 	offs ^= memdata->desc->offsetxor;
 	if (offs >= memdata->desc->length)
-	        return FALSE;
-
-    *data = *((UINT8 *)memdata->desc->base + offs);
-    return TRUE;
+		return FALSE;
+	*data = *((UINT8 *)memdata->desc->base + offs);
+	return TRUE;
 }
 
 
@@ -3112,8 +3110,8 @@ static void memory_view_write(debug_view_memory *memdata, UINT8 size, offs_t off
 #ifdef FD1094_HACK
 	if (memdata->desc->base == memory_region(view->machine, "user2"))
 	{
-		extern void fd1094_regenerate_key(void);
-		fd1094_regenerate_key();
+		extern void fd1094_regenerate_key(running_machine *machine);
+		fd1094_regenerate_key(view->machine);
 	}
 #endif
 }

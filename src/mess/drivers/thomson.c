@@ -757,8 +757,7 @@ static MACHINE_DRIVER_START ( to7 )
      MDRV_ACIA6551_ADD("acia")
 
 /* modem */
-     MDRV_DEVICE_ADD( "acia6850", ACIA6850 )
-     MDRV_DEVICE_CONFIG( to7_modem )
+     MDRV_ACIA6850_ADD( "acia6850", to7_modem )
      
      MDRV_WD2793_ADD("wd2793", default_wd17xx_interface )
 MACHINE_DRIVER_END

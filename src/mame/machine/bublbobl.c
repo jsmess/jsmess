@@ -27,14 +27,14 @@ WRITE8_HANDLER( bublbobl_bankswitch_w )
 	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* bit 5 resets mcu */
-	if (space->machine->config->cpu[3].type != CPU_DUMMY)	// only if we have a MCU
+	if (space->machine->cpu[3] != NULL) // only if we have a MCU
 		cpu_set_input_line(space->machine->cpu[3], INPUT_LINE_RESET, (data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* bit 6 enables display */
 	bublbobl_video_enable = data & 0x40;
 
 	/* bit 7 flips screen */
-	flip_screen_set(data & 0x80);
+	flip_screen_set(space->machine, data & 0x80);
 }
 
 WRITE8_HANDLER( tokio_bankswitch_w )
@@ -48,7 +48,7 @@ WRITE8_HANDLER( tokio_bankswitch_w )
 WRITE8_HANDLER( tokio_videoctrl_w )
 {
 	/* bit 7 flips screen */
-	flip_screen_set(data & 0x80);
+	flip_screen_set(space->machine, data & 0x80);
 
 	/* other bits unknown */
 }

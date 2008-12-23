@@ -87,7 +87,7 @@ void amstrad_handle_snapshot(running_machine *machine, unsigned char *pSnapshot)
 
 	RegData = (pSnapshot[0x021] & 0x0ff) | ((pSnapshot[0x022] & 0x0ff)<<8);
 	cpu_set_reg(machine->cpu[0],Z80_SP, RegData);
-	cpu_set_reg(machine->cpu[0],REG_SP,RegData);
+	cpu_set_reg(machine->cpu[0],REG_GENSP,RegData);
 
 	RegData = (pSnapshot[0x023] & 0x0ff) | ((pSnapshot[0x024] & 0x0ff)<<8);
 

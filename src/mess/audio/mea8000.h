@@ -25,7 +25,7 @@ struct _mea8000_interface
 
 
 #define MDRV_MEA8000_ADD(_tag, _intrf)	      \
-  MDRV_DEVICE_ADD(_tag, MEA8000)	      \
+  MDRV_DEVICE_ADD(_tag, MEA8000, 0)	      \
   MDRV_DEVICE_CONFIG(_intrf)
 
 #define MDRV_MEA8000_REMOVE(_tag)		\

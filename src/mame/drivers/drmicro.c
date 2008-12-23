@@ -9,6 +9,7 @@ Quite similar to Appoooh
 *****************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "sound/msm5205.h"
 #include "sound/sn76496.h"
 
@@ -23,7 +24,7 @@ WRITE8_HANDLER( drmicro_priority_w );
 
 WRITE8_HANDLER( drmicro_videoram_w );
 
-extern void drmicro_flip_w( int flip );
+extern void drmicro_flip_w( running_machine *machine, int flip );
 
 /****************************************************************************/
 
@@ -38,7 +39,7 @@ static INTERRUPT_GEN( drmicro_interrupt )
 static WRITE8_HANDLER( nmi_enable_w )
 {	// bit2,3 unknown
 	drmicro_nmi_enable = data & 1;
-	drmicro_flip_w(data & 2);
+	drmicro_flip_w(space->machine, data & 2);
 }
 
 /****************************************************************************/
@@ -224,7 +225,7 @@ static MACHINE_DRIVER_START( drmicro )
 	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT("main", drmicro_interrupt)
 
-	MDRV_INTERLEAVE(1)
+	MDRV_QUANTUM_TIME(HZ(60))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

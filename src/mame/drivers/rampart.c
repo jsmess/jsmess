@@ -23,6 +23,7 @@
 
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "machine/atarigen.h"
 #include "rampart.h"
 #include "sound/okim6295.h"
@@ -528,7 +529,7 @@ static DRIVER_INIT( rampart )
 
 	atarigen_eeprom_default = compressed_default_eeprom;
 	memcpy(&rom[0x140000], &rom[0x40000], 0x8000);
-	atarigen_slapstic_init(machine, 0, 0x140000, 0x438000, 118);
+	atarigen_slapstic_init(machine->cpu[0], 0x140000, 0x438000, 118);
 }
 
 

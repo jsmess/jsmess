@@ -194,6 +194,7 @@ Dip location verified from manual for: cclimber, guzzler, swimmer
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "machine/segacrpt.h"
 #include "sound/ay8910.h"
 #include "sound/samples.h"
@@ -247,7 +248,7 @@ static WRITE8_HANDLER(toprollr_rombank_w)
 
 static TIMER_CALLBACK( disable_interrupts )
 {
-	cpu_interrupt_enable(0,0);
+	cpu_interrupt_enable(machine->cpu[0],0);
 }
 
 

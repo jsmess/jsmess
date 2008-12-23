@@ -231,9 +231,9 @@ static void pc16650d_tx_callback(int channel, int count, UINT8* data)
 	microtouch_rx(count, data);
 };
 
-static void meritm_microtouch_tx_callback(UINT8 data)
+static void meritm_microtouch_tx_callback(running_machine *machine, UINT8 data)
 {
-	pc16552d_rx_data(Machine, 0, 0, data);
+	pc16552d_rx_data(machine, 0, 0, data);
 };
 
 /*************************************
@@ -241,7 +241,7 @@ static void meritm_microtouch_tx_callback(UINT8 data)
  *  Microtouch touch coordinate transformation
  *
  *************************************/
-static int meritm_touch_coord_transform(int *touch_x, int *touch_y)
+static int meritm_touch_coord_transform(running_machine *machine, int *touch_x, int *touch_y)
 {
 	int xscr = (int)((double)(*touch_x)/0x4000*544);
 	int yscr = (int)((double)(*touch_y)/0x4000*480);
@@ -281,11 +281,11 @@ static INTERRUPT_GEN( meritm_interrupt )
 {
 	v9938_set_sprite_limit(0, 0);
 	v9938_set_resolution(0, RENDER_HIGH);
-	v9938_interrupt(0);
+	v9938_interrupt(device->machine, 0);
 
 	v9938_set_sprite_limit(1, 0);
 	v9938_set_resolution(1, RENDER_HIGH);
-	v9938_interrupt(1);
+	v9938_interrupt(device->machine, 1);
 }
 
 static void meritm_vdp0_interrupt(running_machine *machine, int i)
@@ -376,20 +376,20 @@ static VIDEO_UPDATE( meritm )
 static int meritm_bank;
 static int meritm_psd_a15;
 
-static void meritm_crt250_switch_banks( void )
+static void meritm_crt250_switch_banks( running_machine *machine )
 {
 	int rombank = (meritm_bank & 0x07) ^ 0x07;
 
 	//logerror( "CRT250: Switching banks: rom = %0x (bank = %x)\n", rombank, meritm_bank );
-	memory_set_bank(Machine, 1, rombank );
+	memory_set_bank(machine, 1, rombank );
 };
 
 static WRITE8_HANDLER(meritm_crt250_bank_w)
 {
-	meritm_crt250_switch_banks();
+	meritm_crt250_switch_banks(space->machine);
 };
 
-static void meritm_switch_banks( void )
+static void meritm_switch_banks( running_machine *machine )
 {
 	int rambank = (meritm_psd_a15 >> 2) & 0x3;
 	int rombank = (((meritm_bank >> 3) & 0x3) << 5) |
@@ -398,21 +398,21 @@ static void meritm_switch_banks( void )
 			  (meritm_psd_a15 & 0x1);
 
 	//logerror( "Switching banks: rom = %0x (bank = %x), ram = %0x\n", rombank, meritm_bank, rambank);
-	memory_set_bank(Machine, 1, rombank );
-	memory_set_bank(Machine, 2, rombank | 0x01);
-	memory_set_bank(Machine, 3, rambank);
+	memory_set_bank(machine, 1, rombank );
+	memory_set_bank(machine, 2, rombank | 0x01);
+	memory_set_bank(machine, 3, rambank);
 };
 
 static WRITE8_HANDLER(meritm_psd_a15_w)
 {
 	meritm_psd_a15 = data;
 	//logerror( "Writing PSD_A15 with %02x at PC=%04X\n", data, cpu_get_pc(space->cpu) );
-	meritm_switch_banks();
+	meritm_switch_banks(space->machine);
 };
 
 static WRITE8_HANDLER(meritm_bank_w)
 {
-	meritm_switch_banks();
+	meritm_switch_banks(space->machine);
 };
 
 /*************************************
@@ -823,13 +823,6 @@ static const z80pio_interface meritm_io_pio_intf =
 	0
 };
 
-#ifdef UNUSED_FUNCTION
-static void meritm_pio1_portb_input_changed_callback(void *param, UINT32 oldval, UINT32 newval)
-{
-    z80pio_p_w(Machine, 1, 1, (UINT8)newval);
-}
-#endif
-
 static const z80_daisy_chain meritm_daisy_chain[] =
 {
 	{ Z80PIO, "z80pio_1" },
@@ -841,7 +834,6 @@ static MACHINE_START(merit_common)
 {
 	meritm_z80pio[0] = devtag_get_device( machine, Z80PIO, "z80pio_0" );
 	meritm_z80pio[1] = devtag_get_device( machine, Z80PIO, "z80pio_1" );
-	//input_port_set_changed_callback(port_tag_to_index("PIO1_PORTB"), 0xff, meritm_pio1_portb_input_changed_callback, NULL);
 
 };
 
@@ -849,7 +841,7 @@ static MACHINE_START(meritm_crt250)
 {
 	memory_configure_bank(machine, 1, 0, 8, memory_region(machine, "main"), 0x10000);
 	meritm_bank = 0xff;
-	meritm_crt250_switch_banks();
+	meritm_crt250_switch_banks(machine);
 	MACHINE_START_CALL(merit_common);
 	state_save_register_global(machine, meritm_bank);
 
@@ -870,7 +862,7 @@ static MACHINE_START(meritm_crt260)
 	memory_configure_bank(machine, 3, 0, 4, meritm_ram, 0x2000);
 	meritm_bank = 0xff;
 	meritm_psd_a15 = 0;
-	meritm_switch_banks();
+	meritm_switch_banks(machine);
 	MACHINE_START_CALL(merit_common);
 	pc16552d_init(machine, 0, UART_CLK, NULL, pc16650d_tx_callback);
 	microtouch_init(machine, meritm_microtouch_tx_callback, meritm_touch_coord_transform);
@@ -953,7 +945,7 @@ static MACHINE_DRIVER_START(meritm_crt260)
 
 	MDRV_PPI8255_RECONFIG( "ppi8255", crt260_ppi8255_intf )
 
-	MDRV_WATCHDOG_TIME_INIT(UINT64_ATTOTIME_IN_MSEC(1200))	// DS1232, TD connected to VCC
+	MDRV_WATCHDOG_TIME_INIT(MSEC(1200))	// DS1232, TD connected to VCC
 	MDRV_MACHINE_START(meritm_crt260)
 
 	MDRV_NVRAM_HANDLER(meritm_crt260)

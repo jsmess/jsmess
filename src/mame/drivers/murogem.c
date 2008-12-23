@@ -95,6 +95,7 @@ val (hex):  27  20  22  04  26  00  20  20  00  07  00  00  80  00  00  00  ns  
 */
 
 #include "driver.h"
+#include "cpu/m6800/m6800.h"
 #include "video/mc6845.h"
 
 static UINT8 *murogem_videoram;
@@ -212,7 +213,7 @@ static MACHINE_DRIVER_START( murogem )
 	MDRV_PALETTE_INIT(murogem)
 	MDRV_VIDEO_UPDATE(murogem)
 
-	MDRV_DEVICE_ADD("crtc", MC6845)
+	MDRV_MC6845_ADD("crtc", MC6845, 0, mc6845_null_interface)
 MACHINE_DRIVER_END
 
 

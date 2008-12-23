@@ -14,10 +14,9 @@
 #include "machine/8255ppi.h"
 #include "includes/dai.h"
 #include "streams.h"
-#include "deprecat.h"
 
 static CUSTOM_START( dai_sh_start );
-static void dai_sh_update(void *param,stream_sample_t **inputs, stream_sample_t **outputs,int samples);
+static STREAM_UPDATE( dai_sh_update );
 
 static sound_stream *mixer_channel;
 
@@ -62,7 +61,7 @@ static CUSTOM_START( dai_sh_start )
 	return (void *) ~0;
 }
 
-static void dai_sh_update(void *param,stream_sample_t **inputs, stream_sample_t **outputs,int samples)
+static STREAM_UPDATE( dai_sh_update )
 {
 	INT16 channel_0_signal;
 	INT16 channel_1_signal;
@@ -94,7 +93,7 @@ static void dai_sh_update(void *param,stream_sample_t **inputs, stream_sample_t 
 
 		/* noise channel */
 
-		*sample_left += mame_rand(Machine)&0x01 ? dai_noise_volume_table[dai_noise_volume] : -dai_noise_volume_table[dai_noise_volume];
+		*sample_left += mame_rand(device->machine)&0x01 ? dai_noise_volume_table[dai_noise_volume] : -dai_noise_volume_table[dai_noise_volume];
 
 		sample_left++;
 		sample_right++;

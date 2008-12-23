@@ -306,8 +306,7 @@ static MACHINE_DRIVER_START( radio86 )
 	MDRV_SOUND_ADD("cassette", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_DEVICE_ADD("dma8257", DMA8257)
-	MDRV_DEVICE_CONFIG(radio86_dma)
+	MDRV_DMA8257_ADD("dma8257", XTAL_16MHz / 9, radio86_dma)
 
 	MDRV_CASSETTE_ADD( "cassette", radio86_cassette_config )
 MACHINE_DRIVER_END
@@ -322,7 +321,7 @@ static DIRECT_UPDATE_HANDLER( radio16_direct )
 			direct->decrypted = radio16_io_mirror;
 			direct->min = 0x4000;
 			direct->max = 0x7fff;
-			radio16_io_mirror[address] = cpu_get_reg(space->machine->cpu[0], I8080_STATUS);
+			radio16_io_mirror[address] = cpu_get_reg(space->machine->cpu[0], I8085_STATUS);
 	} 
 	return address;
 }

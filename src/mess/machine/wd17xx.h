@@ -96,35 +96,35 @@ extern const wd17xx_interface default_wd17xx_interface;
 ***************************************************************************/
 
 #define MDRV_WD1770_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, WD1770) \
+	MDRV_DEVICE_ADD(_tag, WD1770, 0) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
 #define MDRV_WD1772_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, WD1772) \
+	MDRV_DEVICE_ADD(_tag, WD1772, 0) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
 #define MDRV_WD1773_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, WD1773) \
+	MDRV_DEVICE_ADD(_tag, WD1773, 0) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
 #define MDRV_WD179X_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, WD179X) \
+	MDRV_DEVICE_ADD(_tag, WD179X, 0) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
 #define MDRV_WD1793_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, WD1793) \
+	MDRV_DEVICE_ADD(_tag, WD1793, 0) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
 #define MDRV_WD2793_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, WD2793) \
+	MDRV_DEVICE_ADD(_tag, WD2793, 0) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
 #define MDRV_WD177X_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, WD177X) \
+	MDRV_DEVICE_ADD(_tag, WD177X, 0) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
 #define MDRV_MB8877_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, MB8877) \
+	MDRV_DEVICE_ADD(_tag, MB8877, 0) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
 	

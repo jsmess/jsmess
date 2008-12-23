@@ -323,8 +323,8 @@ static void bebox_set_irq_bit(running_machine *machine, unsigned int interrupt_b
 		assert_always((interrupt_bit < ARRAY_LENGTH(interrupt_names)) && (interrupt_names[interrupt_bit] != NULL), "Raising invalid interrupt");
 
 		logerror("bebox_set_irq_bit(): pc[0]=0x%08x pc[1]=0x%08x %s interrupt #%u (%s)\n",
-			(unsigned) cpu_get_reg( machine->cpu[0], REG_PC),
-			(unsigned) cpu_get_reg( machine->cpu[1], REG_PC),
+			(unsigned) cpu_get_reg( machine->cpu[0], REG_GENPC),
+			(unsigned) cpu_get_reg( machine->cpu[1], REG_GENPC),
 			val ? "Asserting" : "Clearing",
 			interrupt_bit, interrupt_names[interrupt_bit]);
 	}
@@ -423,11 +423,11 @@ static void bebox_fdc_dma_drq(running_machine *machine, int state, int read_)
 }
 
 
-static const device_config *bebox_fdc_get_image(int floppy_index)
+static const device_config *bebox_fdc_get_image(running_machine *machine, int floppy_index)
 {
 	/* the BeBox boot ROM seems to query for floppy #1 when it should be
 	 * querying for floppy #0 */
-	return image_from_devtype_and_index(IO_FLOPPY, 0);
+	return image_from_devtype_and_index(machine, IO_FLOPPY, 0);
 }
 
 static device_config * bebox_get_device(running_machine *machine )
@@ -953,10 +953,10 @@ static WRITE64_HANDLER( scsi53c810_w )
 								((x << 8) & 0xff0000) | \
 								((x << 24) & 0xff000000))
 
-static UINT32 scsi53c810_fetch(UINT32 dsp)
+static UINT32 scsi53c810_fetch(running_machine *machine, UINT32 dsp)
 {
 	UINT32 result;
-	result = memory_read_dword_64be( cpu_get_address_space( Machine->cpu[0], ADDRESS_SPACE_PROGRAM ), dsp & 0x7FFFFFFF);
+	result = memory_read_dword_64be( cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM ), dsp & 0x7FFFFFFF);
 	return BYTE_REVERSE32(result);
 }
 
@@ -967,7 +967,7 @@ static void scsi53c810_irq_callback(running_machine *machine, int value)
 }
 
 
-static void scsi53c810_dma_callback(UINT32 src, UINT32 dst, int length, int byteswap)
+static void scsi53c810_dma_callback(running_machine *machine, UINT32 src, UINT32 dst, int length, int byteswap)
 {
 }
 
@@ -1022,7 +1022,7 @@ void scsi53c810_pci_write(const device_config *busdevice, const device_config *d
 					/* brutal ugly hack; at some point the PCI code should be handling this stuff */
 					if (scsi53c810_data[5] != 0xFFFFFFF0)
 					{
-						const address_space *space = cpu_get_address_space( Machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+						const address_space *space = cpu_get_address_space( device->machine->cpu[0], ADDRESS_SPACE_PROGRAM );
 
 						addr = (scsi53c810_data[5] | 0xC0000000) & ~0xFF;
 						memory_install_read64_handler(space, addr, addr + 0xFF, 0, 0, scsi53c810_r);
@@ -1094,7 +1094,7 @@ MACHINE_START( bebox )
 {
 	pc_fdc_init(machine, &bebox_fdc_interface);
 	/* SCSI */
-	lsi53c810_init(&scsi53c810_intf);
+	lsi53c810_init(machine, &scsi53c810_intf);
 	add_exit_callback(machine, bebox_exit);
 }
 

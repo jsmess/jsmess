@@ -312,25 +312,24 @@ static WRITE8_HANDLER(spectrum_plus3_port_7ffd_w)
 
 static WRITE8_HANDLER(spectrum_plus3_port_1ffd_w)
 {
+	/* D0-D1: ROM/RAM paging */
+	/* D2: Affects if d0-d1 work on ram/rom */
+	/* D3 - Disk motor on/off */
+	/* D4 - parallel port strobe */
 
-		/* D0-D1: ROM/RAM paging */
-		/* D2: Affects if d0-d1 work on ram/rom */
-		/* D3 - Disk motor on/off */
-		/* D4 - parallel port strobe */
+	floppy_drive_set_motor_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 0), data & (1<<3));
+	floppy_drive_set_motor_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 1), data & (1<<3));
+	floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 0), 1, 1);
+	floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 1), 1, 1);
 
-		floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, 0), data & (1<<3));
-		floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, 1), data & (1<<3));
-		floppy_drive_set_ready_state(image_from_devtype_and_index(IO_FLOPPY, 0), 1, 1);
-		floppy_drive_set_ready_state(image_from_devtype_and_index(IO_FLOPPY, 1), 1, 1);
+	spectrum_plus3_port_1ffd_data = data;
 
-		spectrum_plus3_port_1ffd_data = data;
-
-		/* disable paging? */
-		if ((spectrum_128_port_7ffd_data & 0x20)==0)
-		{
-				/* no */
-				spectrum_plus3_update_memory(space->machine);
-		}
+	/* disable paging? */
+	if ((spectrum_128_port_7ffd_data & 0x20)==0)
+	{
+			/* no */
+			spectrum_plus3_update_memory(space->machine);
+	}
 }
 
 /* ports are not decoded full.
@@ -351,8 +350,8 @@ static MACHINE_RESET( spectrum_plus3 )
 {
 	memset(mess_ram,0,128*1024);
 	
-	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 0), FLOPPY_DRIVE_SS_40);
-	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 1), FLOPPY_DRIVE_SS_40);
+	floppy_drive_set_geometry(image_from_devtype_and_index(machine, IO_FLOPPY, 0), FLOPPY_DRIVE_SS_40);
+	floppy_drive_set_geometry(image_from_devtype_and_index(machine, IO_FLOPPY, 1), FLOPPY_DRIVE_SS_40);
 
 	/* Initial configuration */
 	spectrum_128_port_7ffd_data = 0;

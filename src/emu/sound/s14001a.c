@@ -532,7 +532,7 @@ static void s14001a_clock(S14001AChip *chip) /* called once per clock */
    MAME glue code
  **************************************************************************/
 
-static void s14001a_pcm_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int length)
+static STREAM_UPDATE( s14001a_pcm_update )
 {
 	INT32 mix[48000];
 	INT32 *mixp;
@@ -542,7 +542,7 @@ static void s14001a_pcm_update(void *param, stream_sample_t **inputs, stream_sam
 	memset(mix, 0, sizeof(mix));
 
 	mixp = &mix[0];
-	for (i = 0; i < length; i++)
+	for (i = 0; i < samples; i++)
 	{
 		s14001a_clock(chip);
 		if (chip->audioout == ALTFLAG) // input from test pins -> output
@@ -639,10 +639,10 @@ SND_GET_INFO( s14001a )
 		case SNDINFO_PTR_START:						info->start = SND_START_NAME( s14001a );		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:						info->s = "S14001A";		break;
-		case SNDINFO_STR_CORE_FAMILY:				info->s = "TSI S14001A";	break;
-		case SNDINFO_STR_CORE_VERSION:				info->s = "1.31";			break;
-		case SNDINFO_STR_CORE_FILE:					info->s = __FILE__;			break;
-		case SNDINFO_STR_CORE_CREDITS:				info->s = "Copyright Jonathan Gevaryahu"; break;
+		case SNDINFO_STR_NAME:						strcpy(info->s, "S14001A");						break;
+		case SNDINFO_STR_CORE_FAMILY:				strcpy(info->s, "TSI S14001A");					break;
+		case SNDINFO_STR_CORE_VERSION:				strcpy(info->s, "1.31");						break;
+		case SNDINFO_STR_CORE_FILE:					strcpy(info->s, __FILE__);						break;
+		case SNDINFO_STR_CORE_CREDITS:				strcpy(info->s, "Copyright Jonathan Gevaryahu"); break;
 	}
 }

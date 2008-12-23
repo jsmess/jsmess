@@ -122,7 +122,7 @@ static QUICKLOAD_LOAD( z80bin )
 		else
 		{
 			if (autorun)
-				cpu_set_reg(cputag_get_cpu(image->machine, "main"), REG_PC, exec_addr);	
+				cpu_set_reg(cputag_get_cpu(image->machine, "main"), REG_GENPC, exec_addr);	
 		}
 	}
 
@@ -144,8 +144,8 @@ DEVICE_GET_INFO(z80bin)
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(z80bin_config); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__; break;
-		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:			info->s = "bin"; break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__); break;
+		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:			strcpy(info->s, "bin"); break;
 
 		/* --- the following bits of info are returned as pointers to functions --- */
 		case DEVINFO_FCT_SNAPSHOT_QUICKLOAD_LOAD:		info->f = (genf *) quickload_load_z80bin; break;

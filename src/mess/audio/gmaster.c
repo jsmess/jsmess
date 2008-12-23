@@ -16,7 +16,7 @@
 static /*bool*/int level;
 static sound_stream *mixer_channel;
 
-int gmaster_io_callback(int ioline, int state)
+int gmaster_io_callback(const device_config *device, int ioline, int state)
 {
     switch (ioline) {
     case UPD7810_TO:
@@ -33,7 +33,7 @@ int gmaster_io_callback(int ioline, int state)
 /************************************/
 /* Sound handler update             */
 /************************************/
-static void gmaster_update (void* param, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+static STREAM_UPDATE( gmaster_update )
 {
     int i;
     stream_sample_t *buffer=outputs[0];

@@ -222,6 +222,7 @@ Interrupts:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/m6805/m6805.h"
 #include "rendlay.h"
 #include "machine/6821pia.h"
 #include "qix.h"
@@ -559,7 +560,7 @@ static MACHINE_DRIVER_START( qix )
 
 	/* high interleave needed to ensure correct text in service mode */
 	/* Zookeeper settings and high score table seem especially sensitive to this */
-	MDRV_INTERLEAVE(1000)
+	MDRV_QUANTUM_TIME(HZ(60000))
 
 	MDRV_MACHINE_START(qix)
 	MDRV_MACHINE_RESET(qix)
@@ -603,7 +604,8 @@ static MACHINE_DRIVER_START( slither )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(qix)
 
-	MDRV_CPU_REPLACE("main", M6809, SLITHER_CLOCK_OSC/4/4)	/* 1.34 MHz */
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_CLOCK(SLITHER_CLOCK_OSC/4/4)	/* 1.34 MHz */
 
 	MDRV_MACHINE_START(slither)
 

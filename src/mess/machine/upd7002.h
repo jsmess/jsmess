@@ -54,7 +54,7 @@ WRITE8_DEVICE_HANDLER ( uPD7002_w );
 ***************************************************************************/
 
 #define MDRV_UPD7002_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, UPD7002) \
+	MDRV_DEVICE_ADD(_tag, UPD7002, 0) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
 

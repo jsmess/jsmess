@@ -65,6 +65,8 @@ C004      76489 #4 trigger
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
+#include "cpu/m6809/m6809.h"
 #include "sound/sn76496.h"
 #include "sound/flt_rc.h"
 
@@ -429,7 +431,7 @@ static MACHINE_DRIVER_START( tp84 )
 	MDRV_CPU_ADD("audio", Z80,XTAL_14_31818MHz/4) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(audio_map,0)
 
-	MDRV_INTERLEAVE(100)	/* 100 CPU slices per frame - an high value to ensure proper */
+	MDRV_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

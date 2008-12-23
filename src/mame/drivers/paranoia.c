@@ -34,6 +34,8 @@ HuC6280A (Hudson)
 ****************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
+#include "cpu/i8085/i8085.h"
 #include "deprecat.h"
 #include "machine/pcecommn.h"
 #include "video/vdc.h"
@@ -135,7 +137,7 @@ static MACHINE_DRIVER_START( paranoia )
 	MDRV_CPU_IO_MAP(pce_io, 0)
 	MDRV_CPU_VBLANK_INT_HACK(pce_interrupt, VDC_LPF)
 
-	MDRV_INTERLEAVE(1)
+	MDRV_QUANTUM_TIME(HZ(60))
 
 	MDRV_CPU_ADD("sub", 8085A, 18000000/3)
 	MDRV_CPU_PROGRAM_MAP(paranoia_8085_map,0)

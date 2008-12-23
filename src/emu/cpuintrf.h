@@ -18,25 +18,30 @@
 #include "memory.h"
 #include "watchdog.h"
 #include "state.h"
+#include <stddef.h>
 
 
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
 
-#define MAX_CPU 8
+#define MAX_CPU 				8
 #define MAX_INPUT_EVENTS		32
 
 
-/* Interrupt line constants */
+/* I/O line states */
 enum
 {
-	/* line states */
-	CLEAR_LINE = 0,				/* clear (a fired, held or pulsed) line */
+	CLEAR_LINE = 0,				/* clear (a fired or held) line */
 	ASSERT_LINE,				/* assert an interrupt immediately */
 	HOLD_LINE,					/* hold interrupt line until acknowledged */
-	PULSE_LINE,					/* pulse interrupt line for one instruction */
+	PULSE_LINE					/* pulse interrupt line instantaneously (only for NMI, RESET) */
+};
 
+
+/* I/O line definitions */
+enum
+{
 	/* input lines */
 	MAX_INPUT_LINES = 32+3,
 	INPUT_LINE_IRQ0 = 0,
@@ -60,10 +65,14 @@ enum
 };
 
 
-/* Maximum number of registers of any CPU */
+/* register definitions */
 enum
 {
-	MAX_REGS = 256
+	MAX_REGS = 256,
+
+	REG_GENPCBASE = MAX_REGS - 1,	/* generic "base" PC, should point to start of current opcode */
+	REG_GENPC = MAX_REGS - 2,		/* generic PC, may point within an opcode */
+	REG_GENSP = MAX_REGS - 3		/* generic SP, or closest equivalent */
 };
 
 
@@ -73,11 +82,9 @@ enum
 	/* --- the following bits of info are returned as 64-bit signed integers --- */
 	CPUINFO_INT_FIRST = DEVINFO_INT_FIRST,
 
-		/* direct map to device data */
-		CPUINFO_INT_CONTEXT_SIZE = DEVINFO_INT_TOKEN_BYTES,		/* R/O: size of CPU context in bytes */
-
 		/* CPU-specific additions */
-		CPUINFO_INT_INPUT_LINES = DEVINFO_INT_CLASS_SPECIFIC,	/* R/O: number of input lines */
+		CPUINFO_INT_CONTEXT_SIZE = DEVINFO_INT_CLASS_SPECIFIC,	/* R/O: size of CPU context in bytes */
+		CPUINFO_INT_INPUT_LINES,							/* R/O: number of input lines */
 		CPUINFO_INT_OUTPUT_LINES,							/* R/O: number of output lines */
 		CPUINFO_INT_DEFAULT_IRQ_VECTOR,						/* R/O: default IRQ vector */
 		CPUINFO_INT_ENDIANNESS,								/* R/O: either ENDIANNESS_BIG or ENDIANNESS_LITTLE */
@@ -89,24 +96,39 @@ enum
 		CPUINFO_INT_MAX_CYCLES,								/* R/O: maximum cycles for a single instruction */
 
 		CPUINFO_INT_DATABUS_WIDTH,							/* R/O: data bus size for each address space (8,16,32,64) */
+		CPUINFO_INT_DATABUS_WIDTH_PROGRAM = CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM,
+		CPUINFO_INT_DATABUS_WIDTH_DATA = CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA,
+		CPUINFO_INT_DATABUS_WIDTH_IO = CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO,
 		CPUINFO_INT_DATABUS_WIDTH_LAST = CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACES - 1,
 		CPUINFO_INT_ADDRBUS_WIDTH,							/* R/O: address bus size for each address space (12-32) */
+		CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM = CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM,
+		CPUINFO_INT_ADDRBUS_WIDTH_DATA = CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA,
+		CPUINFO_INT_ADDRBUS_WIDTH_IO = CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO,
 		CPUINFO_INT_ADDRBUS_WIDTH_LAST = CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACES - 1,
 		CPUINFO_INT_ADDRBUS_SHIFT,							/* R/O: shift applied to addresses each address space (+3 means >>3, -1 means <<1) */
+		CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM = CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM,
+		CPUINFO_INT_ADDRBUS_SHIFT_DATA = CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA,
+		CPUINFO_INT_ADDRBUS_SHIFT_IO = CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO,
 		CPUINFO_INT_ADDRBUS_SHIFT_LAST = CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACES - 1,
 		CPUINFO_INT_LOGADDR_WIDTH,							/* R/O: address bus size for logical accesses in each space (0=same as physical) */
+		CPUINFO_INT_LOGADDR_WIDTH_PROGRAM = CPUINFO_INT_LOGADDR_WIDTH + ADDRESS_SPACE_PROGRAM,
+		CPUINFO_INT_LOGADDR_WIDTH_DATA = CPUINFO_INT_LOGADDR_WIDTH + ADDRESS_SPACE_DATA,
+		CPUINFO_INT_LOGADDR_WIDTH_IO = CPUINFO_INT_LOGADDR_WIDTH + ADDRESS_SPACE_IO,
 		CPUINFO_INT_LOGADDR_WIDTH_LAST = CPUINFO_INT_LOGADDR_WIDTH + ADDRESS_SPACES - 1,
 		CPUINFO_INT_PAGE_SHIFT,								/* R/O: size of a page log 2 (i.e., 12=4096), or 0 if paging not supported */
+		CPUINFO_INT_PAGE_SHIFT_PROGRAM = CPUINFO_INT_PAGE_SHIFT + ADDRESS_SPACE_PROGRAM,
+		CPUINFO_INT_PAGE_SHIFT_DATA = CPUINFO_INT_PAGE_SHIFT + ADDRESS_SPACE_DATA,
+		CPUINFO_INT_PAGE_SHIFT_IO = CPUINFO_INT_PAGE_SHIFT + ADDRESS_SPACE_IO,
 		CPUINFO_INT_PAGE_SHIFT_LAST = CPUINFO_INT_PAGE_SHIFT + ADDRESS_SPACES - 1,
 
-		CPUINFO_INT_SP,										/* R/W: the current stack pointer value */
-		CPUINFO_INT_PC,										/* R/W: the current PC value */
-		CPUINFO_INT_PREVIOUSPC,								/* R/W: the previous PC value */
 		CPUINFO_INT_INPUT_STATE,							/* R/W: states for each input line */
 		CPUINFO_INT_INPUT_STATE_LAST = CPUINFO_INT_INPUT_STATE + MAX_INPUT_LINES - 1,
 		CPUINFO_INT_OUTPUT_STATE,							/* R/W: states for each output line */
 		CPUINFO_INT_OUTPUT_STATE_LAST = CPUINFO_INT_OUTPUT_STATE + MAX_OUTPUT_LINES - 1,
 		CPUINFO_INT_REGISTER,								/* R/W: values of up to MAX_REGs registers */
+		CPUINFO_INT_SP = CPUINFO_INT_REGISTER + REG_GENSP,		/* R/W: the current stack pointer value */
+		CPUINFO_INT_PC = CPUINFO_INT_REGISTER + REG_GENPC,		/* R/W: the current PC value */
+		CPUINFO_INT_PREVIOUSPC = CPUINFO_INT_REGISTER + REG_GENPCBASE,	/* R/W: the previous PC value */
 		CPUINFO_INT_REGISTER_LAST = CPUINFO_INT_REGISTER + MAX_REGS - 1,
 
 	CPUINFO_INT_CPU_SPECIFIC = 0x08000,						/* R/W: CPU-specific values start here */
@@ -118,8 +140,11 @@ enum
 		CPUINFO_PTR_INSTRUCTION_COUNTER = DEVINFO_PTR_CLASS_SPECIFIC,
 															/* R/O: int *icount */
 		CPUINFO_PTR_INTERNAL_MEMORY_MAP,					/* R/O: const addrmap_token *map */
+		CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM = CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM,
+		CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA = CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA,
+		CPUINFO_PTR_INTERNAL_MEMORY_MAP_IO = CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_IO,
 		CPUINFO_PTR_INTERNAL_MEMORY_MAP_LAST = CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACES - 1,
-		CPUINFO_PTR_DEBUG_REGISTER_LIST,					/* R/O: int *list: list of registers for the debugger */
+		CPUINFO_PTR_STATE_TABLE,							/* R/O: cpu_state_table *state */
 
 	CPUINFO_PTR_CPU_SPECIFIC = DEVINFO_PTR_DEVICE_SPECIFIC,	/* R/W: CPU-specific values start here */
 
@@ -127,20 +152,23 @@ enum
 	CPUINFO_FCT_FIRST = DEVINFO_FCT_FIRST,
 
 		/* CPU-specific additions */
-		CPUINFO_PTR_RESET = DEVINFO_FCT_RESET,				/* R/O: void (*reset)(const device_config *device) */
-		CPUINFO_PTR_EXIT = DEVINFO_FCT_STOP,				/* R/O: void (*exit)(const device_config *device) */
-
-		CPUINFO_PTR_SET_INFO = DEVINFO_FCT_CLASS_SPECIFIC,	/* R/O: void (*set_info)(const device_config *device, UINT32 state, INT64 data, void *ptr) */
-		CPUINFO_PTR_INIT,									/* R/O: void (*init)(const device_config *device, int index, int clock, int (*irqcallback)(const device_config *device, int)) */
-		CPUINFO_PTR_EXECUTE,								/* R/O: int (*execute)(const device_config *device, int cycles) */
-		CPUINFO_PTR_BURN,									/* R/O: void (*burn)(const device_config *device, int cycles) */
-		CPUINFO_PTR_DISASSEMBLE,							/* R/O: offs_t (*disassemble)(const device_config *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram) */
-		CPUINFO_PTR_TRANSLATE,								/* R/O: int (*translate)(const device_config *device, int space, int intention, offs_t *address) */
-		CPUINFO_PTR_READ,									/* R/O: int (*read)(const device_config *device, int space, UINT32 offset, int size, UINT64 *value) */
-		CPUINFO_PTR_WRITE,									/* R/O: int (*write)(const device_config *device, int space, UINT32 offset, int size, UINT64 value) */
-		CPUINFO_PTR_READOP,									/* R/O: int (*readop)(const device_config *device, UINT32 offset, int size, UINT64 *value) */
-		CPUINFO_PTR_DEBUG_INIT,								/* R/O: void (*debug_init)(const device_config *device) */
-		CPUINFO_PTR_VALIDITY_CHECK,							/* R/O: int (*validity_check)(const game_driver *driver, const void *config) */
+		CPUINFO_FCT_SET_INFO = DEVINFO_FCT_CLASS_SPECIFIC,	/* R/O: void (*set_info)(const device_config *device, UINT32 state, INT64 data, void *ptr) */
+		CPUINFO_FCT_INIT,									/* R/O: void (*init)(const device_config *device, int index, int clock, int (*irqcallback)(const device_config *device, int)) */
+		CPUINFO_FCT_RESET,									/* R/O: void (*reset)(const device_config *device) */
+		CPUINFO_FCT_EXIT,									/* R/O: void (*exit)(const device_config *device) */
+		CPUINFO_FCT_EXECUTE,								/* R/O: int (*execute)(const device_config *device, int cycles) */
+		CPUINFO_FCT_BURN,									/* R/O: void (*burn)(const device_config *device, int cycles) */
+		CPUINFO_FCT_DISASSEMBLE,							/* R/O: offs_t (*disassemble)(const device_config *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram) */
+		CPUINFO_FCT_TRANSLATE,								/* R/O: int (*translate)(const device_config *device, int space, int intention, offs_t *address) */
+		CPUINFO_FCT_READ,									/* R/O: int (*read)(const device_config *device, int space, UINT32 offset, int size, UINT64 *value) */
+		CPUINFO_FCT_WRITE,									/* R/O: int (*write)(const device_config *device, int space, UINT32 offset, int size, UINT64 value) */
+		CPUINFO_FCT_READOP,									/* R/O: int (*readop)(const device_config *device, UINT32 offset, int size, UINT64 *value) */
+		CPUINFO_FCT_DEBUG_INIT,								/* R/O: void (*debug_init)(const device_config *device) */
+		CPUINFO_FCT_VALIDITY_CHECK,							/* R/O: int (*validity_check)(const game_driver *driver, const void *config) */
+		CPUINFO_FCT_IMPORT_STATE,							/* R/O: void (*import_state)(const device_config *device, void *baseptr, const cpu_state_entry *entry) */
+		CPUINFO_FCT_EXPORT_STATE,							/* R/O: void (*export_state)(const device_config *device, void *baseptr, const cpu_state_entry *entry) */
+		CPUINFO_FCT_IMPORT_STRING,							/* R/O: void (*import_string)(const device_config *device, void *baseptr, const cpu_state_entry *entry, const char *format, char *string) */
+		CPUINFO_FCT_EXPORT_STRING,							/* R/O: void (*export_string)(const device_config *device, void *baseptr, const cpu_state_entry *entry, const char *format, char *string) */
 
 	CPUINFO_FCT_CPU_SPECIFIC = DEVINFO_FCT_DEVICE_SPECIFIC,	/* R/W: CPU-specific values start here */
 
@@ -160,24 +188,6 @@ enum
 		CPUINFO_STR_REGISTER_LAST = CPUINFO_STR_REGISTER + MAX_REGS - 1,
 
 	CPUINFO_STR_CPU_SPECIFIC = DEVINFO_STR_DEVICE_SPECIFIC	/* R/W: CPU-specific values start here */
-};
-
-
-/* get_reg/set_reg constants */
-enum
-{
-	/* This value is passed to cpu_get_reg to retrieve the previous
-     * program counter value, ie. before a CPU emulation started
-     * to fetch opcodes and arguments for the current instrution. */
-	REG_PREVIOUSPC = CPUINFO_INT_PREVIOUSPC - CPUINFO_INT_REGISTER,
-
-	/* This value is passed to cpu_get_reg to retrieve the current
-     * program counter value. */
-	REG_PC = CPUINFO_INT_PC - CPUINFO_INT_REGISTER,
-
-	/* This value is passed to cpu_get_reg to retrieve the current
-     * stack pointer value. */
-	REG_SP = CPUINFO_INT_SP - CPUINFO_INT_REGISTER
 };
 
 
@@ -207,236 +217,11 @@ enum
 #define DASMFLAG_STEP_OVER_EXTRA(x)			((x) << DASMFLAG_OVERINSTSHIFT)
 
 
-/* list of all possible CPUs we might be compiled with */
-enum _cpu_type
-{
-	CPU_DUMMY,
-	CPU_Z80,
-	CPU_Z180,
-	CPU_8080,
-	CPU_8085A,
-	CPU_M6502,
-	CPU_M65C02,
-	CPU_M65SC02,
-	CPU_M65CE02,
-	CPU_M6509,
-	CPU_M6510,
-	CPU_M6510T,
-	CPU_M7501,
-	CPU_M8502,
-	CPU_N2A03,
-	CPU_DECO16,
-	CPU_M4510,
-	CPU_H6280,
-	CPU_I8086,
-	CPU_I8088,
-	CPU_I80186,
-	CPU_I80188,
-	CPU_I80286,
-	CPU_V20,
-	CPU_V25,
-	CPU_V30,
-	CPU_V33,
-	CPU_V35,
-	CPU_V60,
-	CPU_V70,
-	CPU_I8035,
-	CPU_I8048,
-	CPU_I8648,
-	CPU_I8748,
-	CPU_MB8884,
-	CPU_N7751,
-	CPU_I8039,
-	CPU_I8049,
-	CPU_I8749,
-	CPU_M58715,
-	CPU_I8041,
-	CPU_I8741,
-	CPU_I8042,
-	CPU_I8242,
-	CPU_I8742,
-	CPU_I8031,
-	CPU_I8032,
-	CPU_I8051,
-	CPU_I8052,
-	CPU_I8751,
-	CPU_I8752,
-	CPU_I80C31,
-	CPU_I80C32,
-	CPU_I80C51,
-	CPU_I80C52,
-	CPU_I87C51,
-	CPU_I87C52,
-	CPU_AT89C4051,
-	CPU_DS5002FP,
-	CPU_M6800,
-	CPU_M6801,
-	CPU_M6802,
-	CPU_M6803,
-	CPU_M6808,
-	CPU_HD63701,
-	CPU_NSC8105,
-	CPU_M6805,
-	CPU_M68705,
-	CPU_HD63705,
-	CPU_HD6309,
-	CPU_M6809,
-	CPU_M6809E,
-	CPU_KONAMI,
-	CPU_M68000,
-	CPU_M68008,
-	CPU_M68010,
-	CPU_M68EC020,
-	CPU_M68020,
-	CPU_M68040,
-	CPU_T11,
-	CPU_S2650,
-	CPU_TMS34010,
-	CPU_TMS34020,
-	CPU_TI990_10,
-	CPU_TMS9900,
-	CPU_TMS9980,
-	CPU_TMS9995,
-	CPU_Z8000,
-	CPU_TMS32010,
-	CPU_TMS32025,
-	CPU_TMS32026,
-	CPU_TMS32031,
-	CPU_TMS32032,
-	CPU_TMS32051,
-	CPU_CCPU,
-	CPU_ADSP2100,
- 	CPU_ADSP2101,
-	CPU_ADSP2104,
-	CPU_ADSP2105,
-	CPU_ADSP2115,
-	CPU_ADSP2181,
-	CPU_PSXCPU,
-	CPU_ASAP,
-	CPU_UPD7810,
-	CPU_UPD7807,
-	CPU_UPD7801,
-	CPU_UPD78C05,
-	CPU_UPD78C06,
-	CPU_JAGUARGPU,
-	CPU_JAGUARDSP,
-	CPU_CQUESTSND,
-	CPU_CQUESTROT,
-	CPU_CQUESTLIN,
-	CPU_R3000BE,
-	CPU_R3000LE,
-	CPU_R3041BE,
-	CPU_R3041LE,
-	CPU_R4600BE,
-	CPU_R4600LE,
-	CPU_R4650BE,
-	CPU_R4650LE,
-	CPU_R4700BE,
-	CPU_R4700LE,
-	CPU_R5000BE,
-	CPU_R5000LE,
-	CPU_QED5271BE,
-	CPU_QED5271LE,
-	CPU_RM7000BE,
-	CPU_RM7000LE,
-	CPU_ARM,
-	CPU_ARM7,
-	CPU_SH1,
-	CPU_SH2,
-	CPU_SH4,
-	CPU_DSP32C,
-	CPU_PIC16C54,
-	CPU_PIC16C55,
-	CPU_PIC16C56,
-	CPU_PIC16C57,
-	CPU_PIC16C58,
-	CPU_G65816,
-	CPU_SPC700,
-	CPU_E116T,
-	CPU_E116XT,
-	CPU_E116XS,
-	CPU_E116XSR,
-	CPU_E132N,
-	CPU_E132T,
-	CPU_E132XN,
-	CPU_E132XT,
-	CPU_E132XS,
-	CPU_E132XSR,
-	CPU_GMS30C2116,
-	CPU_GMS30C2132,
-	CPU_GMS30C2216,
-	CPU_GMS30C2232,
-	CPU_I386,
-	CPU_I486,
-	CPU_PENTIUM,
-	CPU_MEDIAGX,
-	CPU_I960,
-	CPU_H83002,
-	CPU_H83007,
-	CPU_H83044,
-	CPU_H83334,
-	CPU_V810,
-	CPU_M37702,
-	CPU_M37710,
-	CPU_PPC403GA,
-	CPU_PPC403GCX,
-	CPU_PPC601,
-	CPU_PPC602,
-	CPU_PPC603,
-	CPU_PPC603E,
-	CPU_PPC603R,
-	CPU_PPC604,
-	CPU_MPC8240,
-	CPU_SE3208,
-	CPU_MC68HC11,
-	CPU_ADSP21062,
-	CPU_DSP56156,
-	CPU_RSP,
-	CPU_ALPHA8201,
-	CPU_ALPHA8301,
-	CPU_CDP1802,
-	CPU_COP401,
-	CPU_COP410,
-	CPU_COP411,
-	CPU_COP402,
-	CPU_COP420,
-	CPU_COP421,
-	CPU_COP422,
-	CPU_COP404,
-	CPU_COP424,
-	CPU_COP425,
-	CPU_COP426,
-	CPU_COP444,
-	CPU_COP445,
-	CPU_TMP90840,
-	CPU_TMP90841,
-	CPU_TMP91640,
-	CPU_TMP91641,
-	CPU_APEXC,
-	CPU_CP1610,
-	CPU_F8,
-	CPU_LH5801,
-	CPU_PDP1,
-	CPU_SATURN,
-	CPU_SC61860,
-	CPU_TX0_64KW,
-	CPU_TX0_8KW,
-	CPU_LR35902,
-	CPU_TMS7000,
-	CPU_TMS7000_EXL,
-	CPU_SM8500,
-	CPU_V30MZ,
-	CPU_MB8841,
-	CPU_MB8842,
-	CPU_MB8843,
-	CPU_MB8844,
-	CPU_MB86233,
-	CPU_SSP1601,
-	CPU_MINX,
-	CPU_CXD8661R,
-    CPU_COUNT
-};
-typedef enum _cpu_type cpu_type;
+/* state table flags */
+#define CPUSTATE_NOSHOW			0x01		/* don't display this entry in the registers view */
+#define CPUSTATE_IMPORT			0x02		/* call the import function after writing new data */
+#define CPUSTATE_IMPORT_SEXT	0x04		/* sign-extend the data when writing new data */
+#define CPUSTATE_EXPORT			0x08		/* call the export function prior to fetching the data */
 
 
 
@@ -446,126 +231,125 @@ typedef enum _cpu_type cpu_type;
 
 #define IRQ_CALLBACK(func)			int func(const device_config *device, int irqline)
 
-#define CPU_GET_INFO_NAME(name)		cpu_get_info_##name
-#define CPU_GET_INFO(name)			void CPU_GET_INFO_NAME(name)(const device_config *device, UINT32 state, cpuinfo *info)
-#define CPU_GET_INFO_CALL(name)		CPU_GET_INFO_NAME(name)(device, state, info)
+#define CPU_GET_INFO_NAME(name)			cpu_get_info_##name
+#define CPU_GET_INFO(name)				void CPU_GET_INFO_NAME(name)(const device_config *device, UINT32 state, cpuinfo *info)
+#define CPU_GET_INFO_CALL(name)			CPU_GET_INFO_NAME(name)(device, state, info)
 
-#define CPU_SET_INFO_NAME(name)		cpu_set_info_##name
-#define CPU_SET_INFO(name)			void CPU_SET_INFO_NAME(name)(const device_config *device, UINT32 state, cpuinfo *info)
-#define CPU_SET_INFO_CALL(name)		CPU_SET_INFO_NAME(name)(device, state, info)
+#define CPU_SET_INFO_NAME(name)			cpu_set_info_##name
+#define CPU_SET_INFO(name)				void CPU_SET_INFO_NAME(name)(const device_config *device, UINT32 state, cpuinfo *info)
+#define CPU_SET_INFO_CALL(name)			CPU_SET_INFO_NAME(name)(device, state, info)
 
-#define CPU_INIT_NAME(name)			cpu_init_##name
-#define CPU_INIT(name)				void CPU_INIT_NAME(name)(const device_config *device, int index, int clock, cpu_irq_callback irqcallback)
-#define CPU_INIT_CALL(name)			CPU_INIT_NAME(name)(device, index, clock, irqcallback)
+#define CPU_INIT_NAME(name)				cpu_init_##name
+#define CPU_INIT(name)					void CPU_INIT_NAME(name)(const device_config *device, cpu_irq_callback irqcallback)
+#define CPU_INIT_CALL(name)				CPU_INIT_NAME(name)(device, irqcallback)
 
-#define CPU_RESET_NAME(name)		cpu_reset_##name
-#define CPU_RESET(name)				void CPU_RESET_NAME(name)(const device_config *device)
-#define CPU_RESET_CALL(name)		CPU_RESET_NAME(name)(device)
+#define CPU_RESET_NAME(name)			cpu_reset_##name
+#define CPU_RESET(name)					void CPU_RESET_NAME(name)(const device_config *device)
+#define CPU_RESET_CALL(name)			CPU_RESET_NAME(name)(device)
 
-#define CPU_EXIT_NAME(name)			cpu_exit_##name
-#define CPU_EXIT(name)				void CPU_EXIT_NAME(name)(const device_config *device)
-#define CPU_EXIT_CALL(name)			CPU_EXIT_NAME(name)(device)
+#define CPU_EXIT_NAME(name)				cpu_exit_##name
+#define CPU_EXIT(name)					void CPU_EXIT_NAME(name)(const device_config *device)
+#define CPU_EXIT_CALL(name)				CPU_EXIT_NAME(name)(device)
 
-#define CPU_EXECUTE_NAME(name)		cpu_execute_##name
-#define CPU_EXECUTE(name)			int CPU_EXECUTE_NAME(name)(const device_config *device, int cycles)
-#define CPU_EXECUTE_CALL(name)		CPU_EXECUTE_NAME(name)(device, cycles)
+#define CPU_EXECUTE_NAME(name)			cpu_execute_##name
+#define CPU_EXECUTE(name)				int CPU_EXECUTE_NAME(name)(const device_config *device, int cycles)
+#define CPU_EXECUTE_CALL(name)			CPU_EXECUTE_NAME(name)(device, cycles)
 
-#define CPU_BURN_NAME(name)			cpu_burn_##name
-#define CPU_BURN(name)				void CPU_BURN_NAME(name)(const device_config *device, int cycles)
-#define CPU_BURN_CALL(name)			CPU_BURN_NAME(name)(device, cycles)
+#define CPU_BURN_NAME(name)				cpu_burn_##name
+#define CPU_BURN(name)					void CPU_BURN_NAME(name)(const device_config *device, int cycles)
+#define CPU_BURN_CALL(name)				CPU_BURN_NAME(name)(device, cycles)
 
-#define CPU_TRANSLATE_NAME(name)	cpu_translate_##name
-#define CPU_TRANSLATE(name)			int CPU_TRANSLATE_NAME(name)(const device_config *device, int space, int intention, offs_t *address)
-#define CPU_TRANSLATE_CALL(name)	CPU_TRANSLATE_NAME(name)(device, space, intention, address)
+#define CPU_TRANSLATE_NAME(name)		cpu_translate_##name
+#define CPU_TRANSLATE(name)				int CPU_TRANSLATE_NAME(name)(const device_config *device, int space, int intention, offs_t *address)
+#define CPU_TRANSLATE_CALL(name)		CPU_TRANSLATE_NAME(name)(device, space, intention, address)
 
-#define CPU_READ_NAME(name)			cpu_read_##name
-#define CPU_READ(name)				int CPU_READ_NAME(name)(const device_config *device, int space, UINT32 offset, int size, UINT64 *value)
-#define CPU_READ_CALL(name)			CPU_READ_NAME(name)(device, space, offset, size, value)
+#define CPU_READ_NAME(name)				cpu_read_##name
+#define CPU_READ(name)					int CPU_READ_NAME(name)(const device_config *device, int space, UINT32 offset, int size, UINT64 *value)
+#define CPU_READ_CALL(name)				CPU_READ_NAME(name)(device, space, offset, size, value)
 
-#define CPU_WRITE_NAME(name)		cpu_write_##name
-#define CPU_WRITE(name)				int CPU_WRITE_NAME(name)(const device_config *device, int space, UINT32 offset, int size, UINT64 value)
-#define CPU_WRITE_CALL(name)		CPU_WRITE_NAME(name)(device, space, offset, size, value)
+#define CPU_WRITE_NAME(name)			cpu_write_##name
+#define CPU_WRITE(name)					int CPU_WRITE_NAME(name)(const device_config *device, int space, UINT32 offset, int size, UINT64 value)
+#define CPU_WRITE_CALL(name)			CPU_WRITE_NAME(name)(device, space, offset, size, value)
 
-#define CPU_READOP_NAME(name)		cpu_readop_##name
-#define CPU_READOP(name)			int CPU_READOP_NAME(name)(const device_config *device, UINT32 offset, int size, UINT64 *value)
-#define CPU_READOP_CALL(name)		CPU_READOP_NAME(name)(device, offset, size, value)
+#define CPU_READOP_NAME(name)			cpu_readop_##name
+#define CPU_READOP(name)				int CPU_READOP_NAME(name)(const device_config *device, UINT32 offset, int size, UINT64 *value)
+#define CPU_READOP_CALL(name)			CPU_READOP_NAME(name)(device, offset, size, value)
 
-#define CPU_DEBUG_INIT_NAME(name) 	cpu_debug_init_##name
-#define CPU_DEBUG_INIT(name)		void CPU_DEBUG_INIT_NAME(name)(const device_config *device)
-#define CPU_DEBUG_INIT_CALL(name)	CPU_DEBUG_INIT_NAME(name)(device)
+#define CPU_DEBUG_INIT_NAME(name) 		cpu_debug_init_##name
+#define CPU_DEBUG_INIT(name)			void CPU_DEBUG_INIT_NAME(name)(const device_config *device)
+#define CPU_DEBUG_INIT_CALL(name)		CPU_DEBUG_INIT_NAME(name)(device)
 
-#define CPU_DISASSEMBLE_NAME(name)	cpu_disassemble_##name
-#define CPU_DISASSEMBLE(name)		offs_t CPU_DISASSEMBLE_NAME(name)(const device_config *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
-#define CPU_DISASSEMBLE_CALL(name)	CPU_DISASSEMBLE_NAME(name)(device, buffer, pc, oprom, opram)
+#define CPU_DISASSEMBLE_NAME(name)		cpu_disassemble_##name
+#define CPU_DISASSEMBLE(name)			offs_t CPU_DISASSEMBLE_NAME(name)(const device_config *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+#define CPU_DISASSEMBLE_CALL(name)		CPU_DISASSEMBLE_NAME(name)(device, buffer, pc, oprom, opram)
 
 #define CPU_VALIDITY_CHECK_NAME(name)	cpu_validity_check_##name
 #define CPU_VALIDITY_CHECK(name)		int CPU_VALIDITY_CHECK_NAME(name)(const game_driver *driver, const void *config)
 #define CPU_VALIDITY_CHECK_CALL(name)	CPU_VALIDITY_CHECK_NAME(name)(driver, config)
 
+#define CPU_IMPORT_STATE_NAME(name)		cpu_state_import_##name
+#define CPU_IMPORT_STATE(name)			void CPU_IMPORT_STATE_NAME(name)(const device_config *device, void *baseptr, const cpu_state_entry *entry)
+#define CPU_IMPORT_STATE_CALL(name)		CPU_IMPORT_STATE_NAME(name)(device, baseptr, entry)
+
+#define CPU_EXPORT_STATE_NAME(name)		cpu_state_export_##name
+#define CPU_EXPORT_STATE(name)			void CPU_EXPORT_STATE_NAME(name)(const device_config *device, void *baseptr, const cpu_state_entry *entry)
+#define CPU_EXPORT_STATE_CALL(name)		CPU_EXPORT_STATE_NAME(name)(device, baseptr, entry)
+
+#define CPU_IMPORT_STRING_NAME(name)	cpu_string_import_##name
+#define CPU_IMPORT_STRING(name)			void CPU_IMPORT_STRING_NAME(name)(const device_config *device, void *baseptr, const cpu_state_entry *entry, char *string)
+#define CPU_IMPORT_STRING_CALL(name)	CPU_IMPORT_STRING_NAME(name)(device, baseptr, entry, string)
+
+#define CPU_EXPORT_STRING_NAME(name)	cpu_string_export_##name
+#define CPU_EXPORT_STRING(name)			void CPU_EXPORT_STRING_NAME(name)(const device_config *device, void *baseptr, const cpu_state_entry *entry, char *string)
+#define CPU_EXPORT_STRING_CALL(name)	CPU_EXPORT_STRING_NAME(name)(device, baseptr, entry, string)
+
+
+
+#define cpu_get_index(cpu)					device_list_index((cpu)->machine->config->devicelist, CPU, (cpu)->tag)
+
 
 /* helpers for accessing common CPU state */
-#define cpu_get_context_size(cpu)			cpu_get_info_int(cpu, CPUINFO_INT_CONTEXT_SIZE)
-#define cpu_get_input_lines(cpu)			cpu_get_info_int(cpu, CPUINFO_INT_INPUT_LINES)
-#define cpu_get_output_lines(cpu)			cpu_get_info_int(cpu, CPUINFO_INT_OUTPUT_LINES)
-#define cpu_get_default_irq_vector(cpu)		cpu_get_info_int(cpu, CPUINFO_INT_DEFAULT_IRQ_VECTOR)
-#define cpu_get_endianness(cpu)				cpu_get_info_int(cpu, CPUINFO_INT_ENDIANNESS)
-#define cpu_get_clock_multiplier(cpu)		cpu_get_info_int(cpu, CPUINFO_INT_CLOCK_MULTIPLIER)
-#define cpu_get_clock_divider(cpu)			cpu_get_info_int(cpu, CPUINFO_INT_CLOCK_DIVIDER)
-#define cpu_get_min_opcode_bytes(cpu)		cpu_get_info_int(cpu, CPUINFO_INT_MIN_INSTRUCTION_BYTES)
-#define cpu_get_max_opcode_bytes(cpu)		cpu_get_info_int(cpu, CPUINFO_INT_MAX_INSTRUCTION_BYTES)
-#define cpu_get_min_cycles(cpu)				cpu_get_info_int(cpu, CPUINFO_INT_MIN_CYCLES)
-#define cpu_get_max_cycles(cpu)				cpu_get_info_int(cpu, CPUINFO_INT_MAX_CYCLES)
-#define cpu_get_databus_width(cpu, space)	cpu_get_info_int(cpu, CPUINFO_INT_DATABUS_WIDTH + (space))
-#define cpu_get_addrbus_width(cpu, space)	cpu_get_info_int(cpu, CPUINFO_INT_ADDRBUS_WIDTH + (space))
-#define cpu_get_addrbus_shift(cpu, space)	cpu_get_info_int(cpu, CPUINFO_INT_ADDRBUS_SHIFT + (space))
-#define cpu_get_logaddr_width(cpu, space)	cpu_get_info_int(cpu, CPUINFO_INT_LOGADDR_WIDTH + (space))
-#define cpu_get_page_shift(cpu, space)		cpu_get_info_int(cpu, CPUINFO_INT_PAGE_SHIFT + (space))
-#define cpu_get_reg(cpu, reg)				cpu_get_info_int(cpu, CPUINFO_INT_REGISTER + (reg))
-#define	cpu_get_previouspc(cpu)				((offs_t)cpu_get_reg(cpu, REG_PREVIOUSPC))
-#define	cpu_get_pc(cpu)						((offs_t)cpu_get_reg(cpu, REG_PC))
-#define	cpu_get_sp(cpu)						cpu_get_reg(cpu, REG_SP)
-#define cpu_get_icount_ptr(cpu)				(int *)cpu_get_info_ptr(cpu, CPUINFO_PTR_INSTRUCTION_COUNTER)
-#define cpu_get_debug_register_list(cpu)	cpu_get_info_ptr(cpu, CPUINFO_PTR_DEBUG_REGISTER_LIST)
-#define cpu_get_name(cpu)					cpu_get_info_string(cpu, CPUINFO_STR_NAME)
-#define cpu_get_core_family(cpu)			cpu_get_info_string(cpu, CPUINFO_STR_CORE_FAMILY)
-#define cpu_get_core_version(cpu)			cpu_get_info_string(cpu, CPUINFO_STR_CORE_VERSION)
-#define cpu_get_core_file(cpu)				cpu_get_info_string(cpu, CPUINFO_STR_CORE_FILE)
-#define cpu_get_core_credits(cpu)			cpu_get_info_string(cpu, CPUINFO_STR_CORE_CREDITS)
-#define cpu_get_flags_string(cpu)			cpu_get_info_string(cpu, CPUINFO_STR_FLAGS)
-#define cpu_get_irq_string(cpu, irq)		cpu_get_info_string(cpu, CPUINFO_STR_IRQ_STATE + (irq))
-#define cpu_get_reg_string(cpu, reg)		cpu_get_info_string(cpu, CPUINFO_STR_REGISTER + (reg))
-#define cpu_set_reg(cpu, reg, val)			cpu_set_info_int(cpu, CPUINFO_INT_REGISTER + (reg), (val))
-
-
-/* helpers for accessing common CPU type state */
-#define cputype_get_context_size(cputype)			cputype_get_info_int(cputype, CPUINFO_INT_CONTEXT_SIZE)
-#define cputype_get_input_lines(cputype)			cputype_get_info_int(cputype, CPUINFO_INT_INPUT_LINES)
-#define cputype_get_output_lines(cputype)			cputype_get_info_int(cputype, CPUINFO_INT_OUTPUT_LINES)
-#define cputype_get_default_irq_vector(cputype)		cputype_get_info_int(cputype, CPUINFO_INT_DEFAULT_IRQ_VECTOR)
-#define cputype_get_endianness(cputype)				cputype_get_info_int(cputype, CPUINFO_INT_ENDIANNESS)
-#define cputype_get_clock_multiplier(cputype)		cputype_get_info_int(cputype, CPUINFO_INT_CLOCK_MULTIPLIER)
-#define cputype_get_clock_divider(cputype)			cputype_get_info_int(cputype, CPUINFO_INT_CLOCK_DIVIDER)
-#define cputype_get_min_instruction_bytes(cputype)	cputype_get_info_int(cputype, CPUINFO_INT_MIN_INSTRUCTION_BYTES)
-#define cputype_get_max_instruction_bytes(cputype)	cputype_get_info_int(cputype, CPUINFO_INT_MAX_INSTRUCTION_BYTES)
-#define cputype_get_min_cycles(cputype)				cputype_get_info_int(cputype, CPUINFO_INT_MIN_CYCLES)
-#define cputype_get_max_cycles(cputype)				cputype_get_info_int(cputype, CPUINFO_INT_MAX_CYCLES)
-#define cputype_get_databus_width(cputype, space)	cputype_get_info_int(cputype, CPUINFO_INT_DATABUS_WIDTH + (space))
-#define cputype_get_addrbus_width(cputype, space)	cputype_get_info_int(cputype, CPUINFO_INT_ADDRBUS_WIDTH + (space))
-#define cputype_get_addrbus_shift(cputype, space)	cputype_get_info_int(cputype, CPUINFO_INT_ADDRBUS_SHIFT + (space))
-#define cputype_get_logaddr_width(cputype, space)	cputype_get_info_int(cputype, CPUINFO_INT_LOGADDR_WIDTH + (space))
-#define cputype_get_page_shift(cputype, space)		cputype_get_info_int(cputype, CPUINFO_INT_PAGE_SHIFT + (space))
-#define cputype_get_debug_register_list(cputype)	cputype_get_info_ptr(cputype, CPUINFO_PTR_DEBUG_REGISTER_LIST)
-#define cputype_get_name(cputype)					cputype_get_info_string(cputype, CPUINFO_STR_NAME)
-#define cputype_get_core_family(cputype)			cputype_get_info_string(cputype, CPUINFO_STR_CORE_FAMILY)
-#define cputype_get_core_version(cputype)			cputype_get_info_string(cputype, CPUINFO_STR_CORE_VERSION)
-#define cputype_get_core_file(cputype)				cputype_get_info_string(cputype, CPUINFO_STR_CORE_FILE)
-#define cputype_get_core_credits(cputype)			cputype_get_info_string(cputype, CPUINFO_STR_CORE_CREDITS)
+#define cpu_get_context_size(cpu)			device_get_info_int(cpu, CPUINFO_INT_CONTEXT_SIZE)
+#define cpu_get_input_lines(cpu)			device_get_info_int(cpu, CPUINFO_INT_INPUT_LINES)
+#define cpu_get_output_lines(cpu)			device_get_info_int(cpu, CPUINFO_INT_OUTPUT_LINES)
+#define cpu_get_default_irq_vector(cpu)		device_get_info_int(cpu, CPUINFO_INT_DEFAULT_IRQ_VECTOR)
+#define cpu_get_endianness(cpu)				device_get_info_int(cpu, CPUINFO_INT_ENDIANNESS)
+#define cpu_get_clock_multiplier(cpu)		device_get_info_int(cpu, CPUINFO_INT_CLOCK_MULTIPLIER)
+#define cpu_get_clock_divider(cpu)			device_get_info_int(cpu, CPUINFO_INT_CLOCK_DIVIDER)
+#define cpu_get_min_opcode_bytes(cpu)		device_get_info_int(cpu, CPUINFO_INT_MIN_INSTRUCTION_BYTES)
+#define cpu_get_max_opcode_bytes(cpu)		device_get_info_int(cpu, CPUINFO_INT_MAX_INSTRUCTION_BYTES)
+#define cpu_get_min_cycles(cpu)				device_get_info_int(cpu, CPUINFO_INT_MIN_CYCLES)
+#define cpu_get_max_cycles(cpu)				device_get_info_int(cpu, CPUINFO_INT_MAX_CYCLES)
+#define cpu_get_databus_width(cpu, space)	device_get_info_int(cpu, CPUINFO_INT_DATABUS_WIDTH + (space))
+#define cpu_get_addrbus_width(cpu, space)	device_get_info_int(cpu, CPUINFO_INT_ADDRBUS_WIDTH + (space))
+#define cpu_get_addrbus_shift(cpu, space)	device_get_info_int(cpu, CPUINFO_INT_ADDRBUS_SHIFT + (space))
+#define cpu_get_logaddr_width(cpu, space)	device_get_info_int(cpu, CPUINFO_INT_LOGADDR_WIDTH + (space))
+#define cpu_get_page_shift(cpu, space)		device_get_info_int(cpu, CPUINFO_INT_PAGE_SHIFT + (space))
+#define cpu_get_reg(cpu, reg)				device_get_info_int(cpu, CPUINFO_INT_REGISTER + (reg))
+#define	cpu_get_previouspc(cpu)				((offs_t)cpu_get_reg(cpu, REG_GENPCBASE))
+#define	cpu_get_pc(cpu)						((offs_t)cpu_get_reg(cpu, REG_GENPC))
+#define	cpu_get_sp(cpu)						cpu_get_reg(cpu, REG_GENSP)
+#define cpu_get_icount_ptr(cpu)				(int *)device_get_info_ptr(cpu, CPUINFO_PTR_INSTRUCTION_COUNTER)
+#define cpu_get_state_table(cpu)			(const cpu_state_table *)device_get_info_ptr(cpu, CPUINFO_PTR_STATE_TABLE)
+#define cpu_get_name(cpu)					device_get_info_string(cpu, CPUINFO_STR_NAME)
+#define cpu_get_core_family(cpu)			device_get_info_string(cpu, CPUINFO_STR_CORE_FAMILY)
+#define cpu_get_core_version(cpu)			device_get_info_string(cpu, CPUINFO_STR_CORE_VERSION)
+#define cpu_get_core_file(cpu)				device_get_info_string(cpu, CPUINFO_STR_CORE_FILE)
+#define cpu_get_core_credits(cpu)			device_get_info_string(cpu, CPUINFO_STR_CORE_CREDITS)
+#define cpu_get_flags_string(cpu)			device_get_info_string(cpu, CPUINFO_STR_FLAGS)
+#define cpu_get_irq_string(cpu, irq)		device_get_info_string(cpu, CPUINFO_STR_IRQ_STATE + (irq))
+#define cpu_get_reg_string(cpu, reg)		device_get_info_string(cpu, CPUINFO_STR_REGISTER + (reg))
+#define cpu_set_reg(cpu, reg, val)			device_set_info_int(cpu, CPUINFO_INT_REGISTER + (reg), (val))
 
 
 /* helpers for using machine/cputag instead of cpu objects */
-#define cputag_reset(mach, tag)						cpu_reset(cputag_get_cpu(mach, tag))
+#define cputag_reset(mach, tag)						device_reset(cputag_get_cpu(mach, tag))
 #define cputag_get_index(mach, tag)					cpu_get_index(cputag_get_cpu(mach, tag))
 #define cputag_get_address_space(mach, tag, space)	cpu_get_address_space(cputag_get_cpu(mach, tag), space)
+
+
+#define CPU_STATE_ENTRY(_index, _symbol, _format, _struct, _member, _datamask, _validmask, _flags) \
+	{ _index, _validmask, offsetof(_struct, _member), _datamask, sizeof(((_struct *)0)->_member), _flags, _symbol, _format },
 
 
 
@@ -573,12 +357,13 @@ typedef enum _cpu_type cpu_type;
     TYPE DEFINITIONS
 ***************************************************************************/
 
-/* opaque definition of CPU debugging info */
+/* opaque definition of CPU internal and debugging info */
 typedef struct _cpu_debug_data cpu_debug_data;
 
 
-/* forward declaration of this union */
+/* forward declaration of types */
 typedef union _cpuinfo cpuinfo;
+typedef struct _cpu_state_entry cpu_state_entry;
 
 
 /* define the various callback functions */
@@ -586,7 +371,7 @@ typedef int (*cpu_irq_callback)(const device_config *device, int irqnum);
 
 typedef void (*cpu_get_info_func)(const device_config *device, UINT32 state, cpuinfo *info);
 typedef void (*cpu_set_info_func)(const device_config *device, UINT32 state, cpuinfo *info);
-typedef void (*cpu_init_func)(const device_config *device, int index, int clock, cpu_irq_callback irqcallback);
+typedef void (*cpu_init_func)(const device_config *device, cpu_irq_callback irqcallback);
 typedef void (*cpu_reset_func)(const device_config *device);
 typedef void (*cpu_exit_func)(const device_config *device);
 typedef int	(*cpu_execute_func)(const device_config *device, int cycles);
@@ -597,8 +382,38 @@ typedef int	(*cpu_write_func)(const device_config *device, int space, UINT32 off
 typedef int	(*cpu_readop_func)(const device_config *device, UINT32 offset, int size, UINT64 *value);
 typedef void (*cpu_debug_init_func)(const device_config *device);
 typedef offs_t (*cpu_disassemble_func)(const device_config *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-
 typedef int (*cpu_validity_check_func)(const game_driver *driver, const void *config);
+typedef void (*cpu_state_io_func)(const device_config *device, void *baseptr, const cpu_state_entry *entry);
+typedef void (*cpu_string_io_func)(const device_config *device, void *baseptr, const cpu_state_entry *entry, char *string);
+
+
+/* structure describing a single item of exposed CPU state */
+struct _cpu_state_entry
+{
+	UINT32					index;						/* state index this entry applies to */
+	UINT32					validmask;					/* mask for which CPU subtypes this entry is valid */
+	FPTR					dataoffs;					/* offset to the data, relative to the baseptr */
+	UINT64					mask;						/* mask applied to the data */
+	UINT8					datasize;					/* size of the data item in memory */
+	UINT8					flags;						/* flags */
+	const char *			symbol;						/* symbol for display; all lower-case version for expressions */
+	const char *			format;						/* supported formats */
+};
+
+
+/* structure describing a table of exposed CPU state */
+typedef struct _cpu_state_table cpu_state_table;
+struct _cpu_state_table
+{
+	void *					baseptr;					/* pointer to the base of state (offsets are relative to this) */
+	UINT32					subtypemask;				/* mask of subtypes that apply to this CPU */
+	UINT32					entrycount;					/* number of entries */
+	const cpu_state_entry *	entrylist;					/* array of entries */
+};
+
+
+/* a cpu_type is just a pointer to the CPU's get_info function */
+typedef cpu_get_info_func cpu_type;
 
 
 /* cpuinfo union used to pass data to/from the get_info/set_info functions */
@@ -609,20 +424,25 @@ union _cpuinfo
 	genf *  				f;							/* generic function pointers */
 	char *					s;							/* generic strings */
 
-	cpu_set_info_func		setinfo;					/* CPUINFO_PTR_SET_INFO */
-	cpu_init_func			init;						/* CPUINFO_PTR_INIT */
-	cpu_reset_func			reset;						/* CPUINFO_PTR_RESET */
-	cpu_exit_func			exit;						/* CPUINFO_PTR_EXIT */
-	cpu_execute_func		execute;					/* CPUINFO_PTR_EXECUTE */
-	cpu_burn_func			burn;						/* CPUINFO_PTR_BURN */
-	cpu_translate_func		translate;					/* CPUINFO_PTR_TRANSLATE */
-	cpu_read_func			read;						/* CPUINFO_PTR_READ */
-	cpu_write_func			write;						/* CPUINFO_PTR_WRITE */
-	cpu_readop_func			readop;						/* CPUINFO_PTR_READOP */
-	cpu_debug_init_func		debug_init;					/* CPUINFO_PTR_DEBUG_INIT */
-	cpu_disassemble_func	disassemble;				/* CPUINFO_PTR_DISASSEMBLE */
-	cpu_validity_check_func	validity_check;				/* CPUINFO_PTR_VALIDITY_CHECK */
+	cpu_set_info_func		setinfo;					/* CPUINFO_FCT_SET_INFO */
+	cpu_init_func			init;						/* CPUINFO_FCT_INIT */
+	cpu_reset_func			reset;						/* CPUINFO_FCT_RESET */
+	cpu_exit_func			exit;						/* CPUINFO_FCT_EXIT */
+	cpu_execute_func		execute;					/* CPUINFO_FCT_EXECUTE */
+	cpu_burn_func			burn;						/* CPUINFO_FCT_BURN */
+	cpu_translate_func		translate;					/* CPUINFO_FCT_TRANSLATE */
+	cpu_read_func			read;						/* CPUINFO_FCT_READ */
+	cpu_write_func			write;						/* CPUINFO_FCT_WRITE */
+	cpu_readop_func			readop;						/* CPUINFO_FCT_READOP */
+	cpu_debug_init_func		debug_init;					/* CPUINFO_FCT_DEBUG_INIT */
+	cpu_disassemble_func	disassemble;				/* CPUINFO_FCT_DISASSEMBLE */
+	cpu_validity_check_func	validity_check;				/* CPUINFO_FCT_VALIDITY_CHECK */
+	cpu_state_io_func		import_state;				/* CPUINFO_FCT_IMPORT_STATE */
+	cpu_state_io_func		export_state;				/* CPUINFO_FCT_EXPORT_STATE */
+	cpu_string_io_func 		import_string;				/* CPUINFO_FCT_IMPORT_STRING */
+	cpu_string_io_func 		export_string;				/* CPUINFO_FCT_EXPORT_STRING */
 	int *					icount;						/* CPUINFO_PTR_INSTRUCTION_COUNTER */
+	const cpu_state_table *	state_table;				/* CPUINFO_PTR_STATE_TABLE */
 	const addrmap8_token *	internal_map8;				/* CPUINFO_PTR_INTERNAL_MEMORY_MAP */
 	const addrmap16_token *	internal_map16;				/* CPUINFO_PTR_INTERNAL_MEMORY_MAP */
 	const addrmap32_token *	internal_map32;				/* CPUINFO_PTR_INTERNAL_MEMORY_MAP */
@@ -634,28 +454,31 @@ union _cpuinfo
 typedef struct _cpu_class_header cpu_class_header;
 struct _cpu_class_header
 {
-	int						index;					/* index of this CPU */
-	cpu_type				cputype; 				/* type index of this CPU */
-	cpu_debug_data *		debug;					/* debugging data */
-	const address_space *	space[ADDRESS_SPACES];	/* address spaces */
+	cpu_debug_data *		debug;						/* debugging data */
+	const address_space *	space[ADDRESS_SPACES];		/* address spaces */
 
 	/* table of core functions */
-	cpu_get_info_func		get_info;
 	cpu_set_info_func		set_info;
-	cpu_init_func			init;
-	cpu_reset_func			reset;
-	cpu_exit_func			exit;
 	cpu_execute_func		execute;
 	cpu_burn_func			burn;
 	cpu_translate_func		translate;
 	cpu_disassemble_func	disassemble;
 	cpu_disassemble_func 	dasm_override;
-
-	/* other frequently-needed information */
-	INT8					address_shift[ADDRESS_SPACES];
-	UINT32					clock_divider;
-	UINT32					clock_multiplier;
 };
+
+
+
+/***************************************************************************
+    CPU DEFINITIONS
+***************************************************************************/
+
+#define cpu_count(config)		device_list_items((config)->devicelist, CPU)
+#define cpu_first(config)		device_list_first((config)->devicelist, CPU)
+#define cpu_next(previous)		device_list_next((previous), CPU)
+
+
+CPU_GET_INFO( dummy );
+#define CPU_DUMMY CPU_GET_INFO_NAME( dummy )
 
 
 
@@ -664,44 +487,7 @@ struct _cpu_class_header
 ***************************************************************************/
 
 
-/* ----- global management ----- */
-
-/* reset the internal CPU tracking */
-void cpuintrf_init(running_machine *machine);
-
-/* circular string buffer */
-char *cpuintrf_temp_str(void);
-
-
-
-/* ----- live context control ----- */
-
-/* find a CPU in the machine by searching */
-int cpu_get_index_slow(const device_config *cpu);
-
-
-
 /* ----- live CPU accessors ----- */
-
-/* initialize a live CPU */
-void cpu_init(const device_config *cpu, int index, int clock, cpu_irq_callback irqcallback);
-
-/* free a live CPU */
-void cpu_exit(const device_config *cpu);
-
-/* return information about a live CPU */
-INT64 cpu_get_info_int(const device_config *cpu, UINT32 state);
-void *cpu_get_info_ptr(const device_config *cpu, UINT32 state);
-genf *cpu_get_info_fct(const device_config *cpu, UINT32 state);
-const char *cpu_get_info_string(const device_config *cpu, UINT32 state);
-
-/* set information about a live CPU */
-void cpu_set_info_int(const device_config *cpu, UINT32 state, INT64 data);
-void cpu_set_info_ptr(const device_config *cpu, UINT32 state, void *data);
-void cpu_set_info_fct(const device_config *cpu, UINT32 state, genf *data);
-
-/* signal a reset for a given CPU */
-void cpu_reset(const device_config *cpu);
 
 /* return the PC, corrected to a byte offset and translated to physical space, on a given CPU */
 offs_t cpu_get_physical_pc_byte(const device_config *cpu);
@@ -714,32 +500,20 @@ void cpu_set_dasm_override(const device_config *cpu, cpu_disassemble_func dasm_o
 
 
 
-/* ----- CPU type accessors ----- */
-
-/* return a header template for a given CPU type */
-const cpu_class_header *cputype_get_header_template(cpu_type cputype);
-
-/* return information about a given CPU type */
-INT64 cputype_get_info_int(cpu_type cputype, UINT32 state);
-void *cputype_get_info_ptr(cpu_type cputype, UINT32 state);
-genf *cputype_get_info_fct(cpu_type cputype, UINT32 state);
-const char *cputype_get_info_string(cpu_type cputype, UINT32 state);
-
-
-
 /***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
 
 /*-------------------------------------------------
-    cpu_get_index - return the index of the
-    specified CPU (deprecated soon)
+    cpu_get_class_header - return a pointer to
+    the class header
 -------------------------------------------------*/
 
-INLINE int cpu_get_index(const device_config *cpu)
+INLINE cpu_class_header *cpu_get_class_header(const device_config *device)
 {
-	cpu_class_header *classheader = cpu->classtoken;
-	return (classheader != NULL) ? classheader->index : cpu_get_index_slow(cpu);
+	if (device->token != NULL)
+		return (cpu_class_header *)((UINT8 *)device->token + device->tokenbytes) - 1;
+	return NULL;
 }
 
 
@@ -748,9 +522,9 @@ INLINE int cpu_get_index(const device_config *cpu)
     the given CPU's debugger data
 -------------------------------------------------*/
 
-INLINE cpu_debug_data *cpu_get_debug_data(const device_config *cpu)
+INLINE cpu_debug_data *cpu_get_debug_data(const device_config *device)
 {
-	cpu_class_header *classheader = cpu->classtoken;
+	cpu_class_header *classheader = cpu_get_class_header(device);
 	return classheader->debug;
 }
 
@@ -760,10 +534,15 @@ INLINE cpu_debug_data *cpu_get_debug_data(const device_config *cpu)
     the given CPU's address space
 -------------------------------------------------*/
 
-INLINE const address_space *cpu_get_address_space(const device_config *cpu, int spacenum)
+INLINE const address_space *cpu_get_address_space(const device_config *device, int spacenum)
 {
-	cpu_class_header *classheader = cpu->classtoken;
-	return classheader->space[spacenum];
+	/* it is faster to pull this from the class header, but only after we've started */
+	if (device->token != NULL)
+	{
+		cpu_class_header *classheader = cpu_get_class_header(device);
+		return classheader->space[spacenum];
+	}
+	return memory_find_address_space(device, spacenum);
 }
 
 
@@ -774,7 +553,7 @@ INLINE const address_space *cpu_get_address_space(const device_config *cpu, int 
 
 INLINE int cpu_execute(const device_config *device, int cycles)
 {
-	cpu_class_header *classheader = device->classtoken;
+	cpu_class_header *classheader = cpu_get_class_header(device);
 	return (*classheader->execute)(device, cycles);
 }
 

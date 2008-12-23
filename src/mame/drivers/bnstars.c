@@ -87,6 +87,8 @@ ROMs    : MR96004-10.1  [125661cd] (IC5 - Samples)
 */
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
+#include "cpu/v60/v60.h"
 #include "deprecat.h"
 #include "sound/ymf271.h"
 #include "rendlay.h"
@@ -1335,7 +1337,7 @@ static MACHINE_DRIVER_START( bnstars )
 //  MDRV_CPU_ADD("audio", Z80, 4000000)
 //  MDRV_CPU_PROGRAM_MAP(bnstars_z80_map, 0)
 
-	MDRV_INTERLEAVE(1000)
+	MDRV_QUANTUM_TIME(HZ(60000))
 
 	MDRV_MACHINE_RESET(ms32)
 

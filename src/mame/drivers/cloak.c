@@ -112,6 +112,7 @@
 */
 
 #include "driver.h"
+#include "cpu/m6502/m6502.h"
 #include "deprecat.h"
 #include "sound/pokey.h"
 #include "includes/cloak.h"
@@ -337,7 +338,7 @@ static MACHINE_DRIVER_START( cloak )
 	MDRV_CPU_PROGRAM_MAP(slave_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 
-	MDRV_INTERLEAVE(5)
+	MDRV_QUANTUM_TIME(HZ(300))
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 

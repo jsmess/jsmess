@@ -48,7 +48,7 @@ WRITE8_HANDLER(st0016_snd_w)
 	}
 }
 
-static void st0016_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int length)
+static STREAM_UPDATE( st0016_update )
 {
 	struct st0016_info *info = param;
 	UINT8 *sound_ram = *info->sound_ram;
@@ -59,7 +59,7 @@ static void st0016_update(void *param, stream_sample_t **inputs, stream_sample_t
 	INT16 sample;
 	int sptr, eptr, freq, lsptr, leptr;
 
-	memset(mix, 0, sizeof(mix[0])*length*2);
+	memset(mix, 0, sizeof(mix[0])*samples*2);
 
 	for (v = 0; v < 8; v++)
 	{
@@ -75,7 +75,7 @@ static void st0016_update(void *param, stream_sample_t **inputs, stream_sample_t
 			lsptr = slot[0x06]<<16 | slot[0x05]<<8 | slot[0x04];
 			leptr = slot[0x0a]<<16 | slot[0x09]<<8 | slot[0x08];
 
-			for (snum = 0; snum < length; snum++)
+			for (snum = 0; snum < samples; snum++)
 			{
 				sample = sound_ram[(sptr + info->vpos[v])&0x1fffff]<<8;
 
@@ -117,7 +117,7 @@ static void st0016_update(void *param, stream_sample_t **inputs, stream_sample_t
 	}
 
 	mixp = &mix[0];
-	for (i = 0; i < length; i++)
+	for (i = 0; i < samples; i++)
 	{
 		outputs[0][i] = (*mixp++)>>4;
 		outputs[1][i] = (*mixp++)>>4;
@@ -161,17 +161,17 @@ SND_GET_INFO( st0016 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( st0016 );		break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( st0016 );				break;
-		case SNDINFO_PTR_STOP:							/* Nothing */							break;
-		case SNDINFO_PTR_RESET:							/* Nothing */							break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( st0016 );	break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( st0016 );			break;
+		case SNDINFO_PTR_STOP:							/* Nothing */									break;
+		case SNDINFO_PTR_RESET:							/* Nothing */									break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							info->s = "ST0016";						break;
-		case SNDINFO_STR_CORE_FAMILY:					info->s = "Seta custom";				break;
-		case SNDINFO_STR_CORE_VERSION:					info->s = "1.0";						break;
-		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
-		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "ST0016");						break;
+		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Seta custom");					break;
+		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");							break;
+		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
+		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

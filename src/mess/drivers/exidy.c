@@ -367,7 +367,7 @@ static MACHINE_RESET( exidyd )
 
 static MACHINE_RESET( exidy )
 {
-	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 0), FLOPPY_DRIVE_DS_80);
+	floppy_drive_set_geometry(image_from_devtype_and_index(machine, IO_FLOPPY, 0), FLOPPY_DRIVE_DS_80);
 	MACHINE_RESET_CALL( exidyd );
 }
 
@@ -911,12 +911,12 @@ static Z80BIN_EXECUTE( exidy )
 		if ((execute_address != 0xc858) && autorun)
 			memory_write_word_16le(space, 0xf028, execute_address);
 
-		cpu_set_reg(cputag_get_cpu(machine, "main"), REG_PC, 0xf01f);
+		cpu_set_reg(cputag_get_cpu(machine, "main"), REG_GENPC, 0xf01f);
 	}
 	else
 	{
 		if (autorun)
-			cpu_set_reg(cputag_get_cpu(machine, "main"), REG_PC, execute_address);
+			cpu_set_reg(cputag_get_cpu(machine, "main"), REG_GENPC, execute_address);
 	}
 }
 

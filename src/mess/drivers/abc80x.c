@@ -842,8 +842,6 @@ static WRITE8_DEVICE_HANDLER( ctc_z2_w )
 
 static const z80ctc_interface ctc_intf =
 {
-	Z80_TAG,			/* cpu */
-	ABC800_X01/2/2,		/* clock */
 	0,              	/* timer disables */
 	ctc_interrupt,		/* interrupt handler */
 	ctc_z0_w,			/* ZC/TO0 callback */
@@ -887,8 +885,6 @@ static int sio_serial_receive( const device_config *device, int channel )
 
 static const z80sio_interface sio_intf =
 {
-	Z80_TAG,				/* cpu */
-	ABC800_X01/2/2,			/* clock */
 	sio_interrupt,			/* interrupt handler */
 	sio_dtr_w,				/* DTR changed handler */
 	0,						/* RTS changed handler */
@@ -1266,11 +1262,11 @@ static MACHINE_DRIVER_START( abc800m )
 	MDRV_IMPORT_FROM(abc800m_video)
 	
 	/* Z80 CTC */
-	MDRV_Z80CTC_ADD(Z80CTC_TAG, ctc_intf)
+	MDRV_Z80CTC_ADD(Z80CTC_TAG, ABC800_X01/2/2, ctc_intf)
 	MDRV_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(ABC800_X01/2/2/2))
 
 	/* Z80 SIO/2 */
-	MDRV_Z80SIO_ADD(Z80SIO_TAG, sio_intf)
+	MDRV_Z80SIO_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
 
 	/* Z80 DART */
 	MDRV_Z80DART_ADD(Z80DART_TAG, abc800_dart_intf)
@@ -1313,11 +1309,11 @@ static MACHINE_DRIVER_START( abc800c )
 	MDRV_IMPORT_FROM(abc800c_video)
 
 	/* Z80 CTC */
-	MDRV_Z80CTC_ADD(Z80CTC_TAG, ctc_intf)
+	MDRV_Z80CTC_ADD(Z80CTC_TAG, ABC800_X01/2/2, ctc_intf)
 	MDRV_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(ABC800_X01/2/2/2))
 
 	/* Z80 SIO/2 */
-	MDRV_Z80SIO_ADD(Z80SIO_TAG, sio_intf)
+	MDRV_Z80SIO_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
 
 	/* Z80 DART */
 	MDRV_Z80DART_ADD(Z80DART_TAG, abc800_dart_intf)
@@ -1360,11 +1356,11 @@ static MACHINE_DRIVER_START( abc802 )
 	MDRV_IMPORT_FROM(abc802_video)
 
 	/* Z80 CTC */
-	MDRV_Z80CTC_ADD(Z80CTC_TAG, ctc_intf)
+	MDRV_Z80CTC_ADD(Z80CTC_TAG, ABC800_X01/2/2, ctc_intf)
 	MDRV_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(ABC800_X01/2/2/2))
 
 	/* Z80 SIO/2 */
-	MDRV_Z80SIO_ADD(Z80SIO_TAG, sio_intf)
+	MDRV_Z80SIO_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
 
 	/* Z80 DART */
 	MDRV_Z80DART_ADD(Z80DART_TAG, abc802_dart_intf)
@@ -1407,11 +1403,11 @@ static MACHINE_DRIVER_START( abc806 )
 	MDRV_IMPORT_FROM(abc806_video)
 
 	/* Z80 CTC */
-	MDRV_Z80CTC_ADD(Z80CTC_TAG, ctc_intf)
+	MDRV_Z80CTC_ADD(Z80CTC_TAG, ABC800_X01/2/2, ctc_intf)
 	MDRV_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(ABC800_X01/2/2/2))
 
 	/* Z80 SIO/2 */
-	MDRV_Z80SIO_ADD(Z80SIO_TAG, sio_intf)
+	MDRV_Z80SIO_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
 
 	/* Z80 DART */
 	MDRV_Z80DART_ADD(Z80DART_TAG, abc806_dart_intf)

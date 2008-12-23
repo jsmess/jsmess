@@ -17,6 +17,7 @@ To do:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 
 
@@ -350,7 +351,7 @@ static MACHINE_DRIVER_START( tankbust )
 	MDRV_CPU_PROGRAM_MAP(map_cpu2,0)
 	MDRV_CPU_IO_MAP(port_map_cpu2,0)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	MDRV_MACHINE_RESET( tankbust )
 

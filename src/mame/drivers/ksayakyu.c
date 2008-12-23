@@ -64,6 +64,7 @@ SRAM:
 */
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
@@ -249,7 +250,7 @@ static MACHINE_DRIVER_START( ksayakyu )
 	MDRV_CPU_PROGRAM_MAP(soundcpu_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
 
-	MDRV_INTERLEAVE(1000)
+	MDRV_QUANTUM_TIME(HZ(60000))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

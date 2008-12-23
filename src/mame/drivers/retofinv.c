@@ -29,6 +29,7 @@ Notes:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "cpu/m6805/m6805.h"
 #include "sound/sn76496.h"
@@ -74,7 +75,7 @@ static WRITE8_HANDLER( irq0_ack_w )
 {
 	int bit = data & 1;
 
-	cpu_interrupt_enable(0,bit);
+	cpu_interrupt_enable(space->machine->cpu[0],bit);
 	if (!bit)
 		cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 }
@@ -83,7 +84,7 @@ static WRITE8_HANDLER( irq1_ack_w )
 {
 	int bit = data & 1;
 
-	cpu_interrupt_enable(1,bit);
+	cpu_interrupt_enable(space->machine->cpu[1],bit);
 	if (!bit)
 		cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
 }
@@ -353,7 +354,7 @@ static MACHINE_DRIVER_START( retofinv )
 	MDRV_CPU_ADD("68705", M68705,18432000/6)	/* 3.072 MHz? */
 	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
 
-	MDRV_INTERLEAVE(100)	/* 100 CPU slices per frame - enough for the sound CPU to read all commands */
+	MDRV_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - enough for the sound CPU to read all commands */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

@@ -6,7 +6,6 @@
 
 #include "driver.h"
 #include "streams.h"
-#include "deprecat.h"
 #include "includes/svision.h"
 
 
@@ -109,7 +108,7 @@ void svision_soundport_w (running_machine *machine, SVISION_CHANNEL *channel, in
 /************************************/
 /* Sound handler update             */
 /************************************/
-static void svision_update (void *param,stream_sample_t **inputs, stream_sample_t **outputs,int samples)
+static STREAM_UPDATE( svision_update )
 {
 	stream_sample_t *left=outputs[0], *right=outputs[1];
 	int i, j;
@@ -191,11 +190,11 @@ static void svision_update (void *param,stream_sample_t **inputs, stream_sample_
 			UINT16 addr = svision_dma.start + (unsigned) svision_dma.pos / 2;
 			if (addr >= 0x8000 && addr < 0xc000)
 			{
-				sample = memory_region(Machine, "user1")[(addr & 0x3fff) | svision_dma.ca14to16];
+				sample = memory_region(device->machine, "user1")[(addr & 0x3fff) | svision_dma.ca14to16];
 			}
 			else
 			{
-				sample = memory_read_byte(cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM), addr);
+				sample = memory_read_byte(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), addr);
 			}
 			if (((unsigned)svision_dma.pos) & 1)
 				s = (sample & 0xf);
@@ -211,7 +210,7 @@ static void svision_update (void *param,stream_sample_t **inputs, stream_sample_
 			{
 				svision_dma.finished = TRUE;
 				svision_dma.on = FALSE;
-				svision_irq( Machine );
+				svision_irq( device->machine );
 			}
 		}
 	}

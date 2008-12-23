@@ -399,7 +399,6 @@ static CDP1861_ON_EFX_CHANGED( vip_efx_w )
 static CDP1861_INTERFACE( vip_cdp1861_intf )
 {
 	SCREEN_TAG,
-	XTAL_3_52128MHz,
 	vip_int_w,
 	vip_dmao_w,
 	vip_efx_w
@@ -408,7 +407,6 @@ static CDP1861_INTERFACE( vip_cdp1861_intf )
 static CDP1862_INTERFACE( vip_cdp1862_intf )
 {
 	SCREEN_TAG,
-	CPD1862_CLOCK,
 	RES_K(1.21), // ???
 	RES_K(2.05), // ???
 	RES_K(2.26), // ???
@@ -622,9 +620,9 @@ static MACHINE_RESET( vip )
 
 	/* reset auxiliary chips */
 
-	state->cdp1861->reset(state->cdp1861);
-	state->cdp1862->reset(state->cdp1862);
-	state->cdp1863->reset(state->cdp1863);
+	device_reset(state->cdp1861);
+	device_reset(state->cdp1862);
+	device_reset(state->cdp1863);
 
 	state->colorram_mwr = CLEAR_LINE;
 
@@ -692,14 +690,13 @@ static MACHINE_DRIVER_START( vip )
 	MDRV_PALETTE_INIT(black_and_white)
 	MDRV_VIDEO_UPDATE(vip)
 
-	MDRV_DEVICE_ADD(CDP1861_TAG, CDP1861)
-	MDRV_DEVICE_CONFIG(vip_cdp1861_intf)
+	MDRV_CDP1861_ADD(CDP1861_TAG, XTAL_3_52128MHz, vip_cdp1861_intf)
 
-	MDRV_DEVICE_ADD(CDP1862_TAG, CDP1862)
+	MDRV_DEVICE_ADD(CDP1862_TAG, CDP1862, CPD1862_CLOCK)
 	MDRV_DEVICE_CONFIG(vip_cdp1862_intf)
 
 	/* sound hardware */
-	MDRV_DEVICE_ADD(CDP1863_TAG, CDP1863)
+	MDRV_DEVICE_ADD(CDP1863_TAG, CDP1863, 0)
 	MDRV_DEVICE_CONFIG(vip_cdp1863_intf)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")

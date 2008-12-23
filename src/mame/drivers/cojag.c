@@ -289,6 +289,7 @@ Notes:
 
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "cpu/mips/r3000.h"
 #include "cpu/jaguar/jaguar.h"
 #include "machine/idectrl.h"
@@ -372,7 +373,7 @@ static MACHINE_RESET( cojag )
 	jaguardsp_ctrl_w(machine->cpu[2], D_CTRL, 0, 0xffffffff);
 
 	/* init the sound system */
-	cojag_sound_reset();
+	cojag_sound_reset(machine);
 
 	/* reset the IDE controller */
 	devtag_reset(machine, IDE_CONTROLLER, "ide");
@@ -1504,7 +1505,7 @@ ROM_END
 static void cojag_common_init(running_machine *machine, UINT16 gpu_jump_offs, UINT16 spin_pc)
 {
 	/* copy over the ROM */
-	cojag_is_r3000 = (machine->config->cpu[0].type == CPU_R3041BE);
+	cojag_is_r3000 = (cpu_get_type(machine->cpu[0]) == CPU_R3041BE);
 
 	/* install synchronization hooks for GPU */
 	if (cojag_is_r3000)

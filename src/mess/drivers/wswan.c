@@ -31,7 +31,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-//#include "cpu/v30mz/nec.h"
+#include "cpu/v30mz/nec.h"
 #include "includes/wswan.h"
 #include "devices/cartslot.h"
 #include "sound/custom.h"
@@ -136,7 +136,7 @@ static MACHINE_DRIVER_START( wswan )
 	MDRV_SCREEN_ADD("main", LCD)
 	MDRV_SCREEN_REFRESH_RATE(75)
 	MDRV_SCREEN_VBLANK_TIME(0)
-	MDRV_INTERLEAVE(1)
+	MDRV_QUANTUM_TIME(HZ(60))
 
 	MDRV_NVRAM_HANDLER( wswan )
 

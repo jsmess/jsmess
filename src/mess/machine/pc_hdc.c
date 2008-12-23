@@ -511,7 +511,7 @@ static TIMER_CALLBACK(pc_hdc_command)
 	{
 		command_name = hdc_command_names[cmd] ? hdc_command_names[cmd] : "Unknown";
 		logerror("pc_hdc_command(): Executing command; pc=0x%08x cmd=0x%02x (%s) drv=%d\n",
-			(unsigned) cpu_get_reg(machine->cpu[0], REG_PC), cmd, command_name, drv);
+			(unsigned) cpu_get_reg(machine->cpu[0], REG_GENPC), cmd, command_name, drv);
 	}
 
 	switch (cmd)
@@ -549,7 +549,7 @@ static TIMER_CALLBACK(pc_hdc_command)
 			if (LOG_HDC_STATUS)
 			{
 				logerror("hdc read pc=0x%08x INDEX #%d D:%d C:%d H:%d S:%d N:%d CTL:$%02x\n",
-					(unsigned) cpu_get_reg(machine->cpu[0], REG_PC), idx, drv, cylinder[idx], head[idx], sector[idx], sector_cnt[idx], control[idx]);
+					(unsigned) cpu_get_reg(machine->cpu[0], REG_GENPC), idx, drv, cylinder[idx], head[idx], sector[idx], sector_cnt[idx], control[idx]);
 			}
 
 			if (test_ready(machine, n))
@@ -564,7 +564,7 @@ static TIMER_CALLBACK(pc_hdc_command)
 			if (LOG_HDC_STATUS)
 			{
 				logerror("hdc write pc=0x%08x INDEX #%d D:%d C:%d H:%d S:%d N:%d CTL:$%02x\n",
-					(unsigned) cpu_get_reg(machine->cpu[0], REG_PC), idx, drv, cylinder[idx], head[idx], sector[idx], sector_cnt[idx], control[idx]);
+					(unsigned) cpu_get_reg(machine->cpu[0], REG_GENPC), idx, drv, cylinder[idx], head[idx], sector[idx], sector_cnt[idx], control[idx]);
 			}
 
 			if (test_ready(machine, n))
@@ -673,7 +673,7 @@ static void pc_hdc_data_w(running_machine *machine, int n, int data)
 		if (--data_cnt == 0)
 		{
 			if (LOG_HDC_STATUS)
-				logerror("pc_hdc_data_w(): Launching command; pc=0x%08x\n", (unsigned) cpu_get_reg(machine->cpu[0], REG_PC));
+				logerror("pc_hdc_data_w(): Launching command; pc=0x%08x\n", (unsigned) cpu_get_reg(machine->cpu[0], REG_GENPC));
 
             status[n] &= ~STA_COMMAND;
 			status[n] &= ~STA_REQUEST;
@@ -715,7 +715,7 @@ static void pc_hdc_control_w(running_machine *machine, int n, int data)
 	int irq = irq = (dip[n] & 0x40) ? 5 : 2;
 
 	if (LOG_HDC_STATUS)
-		logerror("pc_hdc_control_w(): Control write pc=0x%08x data=%d\n", (unsigned) cpu_get_reg(machine->cpu[0], REG_PC), data);
+		logerror("pc_hdc_control_w(): Control write pc=0x%08x data=%d\n", (unsigned) cpu_get_reg(machine->cpu[0], REG_GENPC), data);
 
 	hdc_control = data;
 
@@ -843,10 +843,10 @@ WRITE32_HANDLER ( pc32le_HDC2_w ) { write32le_with_write8_handler(pc_HDC2_w, spa
 
 MACHINE_DRIVER_START( pc_hdc )
 	/* harddisk */
-	MDRV_DEVICE_ADD("harddisk1", HARDDISK)
-	MDRV_DEVICE_ADD("harddisk2", HARDDISK)
-	MDRV_DEVICE_ADD("harddisk3", HARDDISK)
-	MDRV_DEVICE_ADD("harddisk4", HARDDISK)
+	MDRV_HARDDISK_ADD("harddisk1")
+	MDRV_HARDDISK_ADD("harddisk2")
+	MDRV_HARDDISK_ADD("harddisk3")
+	MDRV_HARDDISK_ADD("harddisk4")
 MACHINE_DRIVER_END
 
 

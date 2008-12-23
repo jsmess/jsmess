@@ -139,7 +139,7 @@ static MACHINE_DRIVER_START(votrpss)
     MDRV_CPU_ADD("main", Z80, XTAL_8MHz/2)  /* 4.000 MHz, verified */
     MDRV_CPU_PROGRAM_MAP(z80_mem, 0)
     MDRV_CPU_IO_MAP(z80_io, 0)
-    MDRV_INTERLEAVE(1)
+    MDRV_QUANTUM_TIME(HZ(60))
 
     /* video hardware */
 	MDRV_DEFAULT_LAYOUT(layout_votrpss)

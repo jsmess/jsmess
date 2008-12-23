@@ -243,6 +243,8 @@ To Do / Unknowns:
 
 
 #include "driver.h"
+#include "cpu/z180/z180.h"
+#include "cpu/nec/nec.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/eeprom.h"
@@ -308,7 +310,7 @@ static MACHINE_RESET( toaplan2 )
       This is important for games with common RAM; the RAM test will fail
       when leaving service mode if the sound CPU is not reset.
     */
-	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_M68K_RESET_CALLBACK, (genf *)toaplan2_reset);
+	device_set_info_fct(machine->cpu[0], CPUINFO_FCT_M68K_RESET_CALLBACK, (genf *)toaplan2_reset);
 }
 
 static MACHINE_RESET( ghox )
@@ -3582,7 +3584,7 @@ static MACHINE_DRIVER_START( pipibibs )
 	MDRV_CPU_ADD("audio", Z80,XTAL_27MHz/8)			/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_z80_mem, 0)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_MACHINE_RESET(toaplan2)
 
@@ -3622,7 +3624,7 @@ static MACHINE_DRIVER_START( whoopee )
 											/* Change this to 10MHz when HD647180 gets dumped. 10MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(sound_z80_mem, 0)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_MACHINE_RESET(toaplan2)
 
@@ -3661,7 +3663,7 @@ static MACHINE_DRIVER_START( pipibibi )
 	MDRV_CPU_ADD("audio", Z80, XTAL_27MHz/8)			/* ??? 3.37MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_z80_mem, 0)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_MACHINE_RESET(toaplan2)
 
@@ -3914,7 +3916,7 @@ static MACHINE_DRIVER_START( mahoudai )
 	MDRV_CPU_ADD("audio", Z80, XTAL_32MHz/8)		/* 4MHz , 32MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(raizing_sound_z80_mem, 0)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_MACHINE_RESET(toaplan2)
 
@@ -3956,7 +3958,7 @@ static MACHINE_DRIVER_START( shippumd )
 	MDRV_CPU_ADD("audio", Z80, XTAL_32MHz/8)		/* 4MHz , 32MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(raizing_sound_z80_mem, 0)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_MACHINE_RESET(toaplan2)
 
@@ -3998,7 +4000,7 @@ static MACHINE_DRIVER_START( bgaregga )
 	MDRV_CPU_ADD("audio", Z80, XTAL_32MHz/8)		/* 4MHz , 32MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(bgaregga_sound_z80_mem, 0)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	MDRV_MACHINE_RESET(bgaregga)
 
@@ -4041,7 +4043,7 @@ static MACHINE_DRIVER_START( batrider )
 	MDRV_CPU_PROGRAM_MAP(batrider_sound_z80_mem, 0)
 	MDRV_CPU_IO_MAP(batrider_sound_z80_port, 0)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_MACHINE_RESET(bgaregga)
 
@@ -4087,7 +4089,7 @@ static MACHINE_DRIVER_START( bbakraid )
 	MDRV_CPU_IO_MAP(bbakraid_sound_z80_port, 0)
 	MDRV_CPU_PERIODIC_INT(bbakraid_snd_interrupt, 448)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_MACHINE_RESET(toaplan2)
 	MDRV_NVRAM_HANDLER(bbakraid)

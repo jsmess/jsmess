@@ -16,7 +16,7 @@ static int ROMSelection;
 
 static DIRECT_UPDATE_HANDLER( pentagon_direct )
 {	
-	UINT16 pc = cpu_get_reg(space->machine->cpu[0], REG_PREVIOUSPC);
+	UINT16 pc = cpu_get_reg(space->machine->cpu[0], REG_GENPCBASE);
 	if (betadisk_is_active()) {
 		if (pc >= 0x4000) {
 			ROMSelection = ((spectrum_128_port_7ffd_data>>4) & 0x01) ? 1 : 0;

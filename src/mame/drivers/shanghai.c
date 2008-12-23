@@ -23,6 +23,7 @@ displayed.
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/nec/nec.h"
 #include "audio/seibu.h"
 #include "video/hd63484.h"
 
@@ -496,7 +497,7 @@ static MACHINE_DRIVER_START( kothello )
 
 	SEIBU3A_SOUND_SYSTEM_CPU(14318180/4)
 
-	MDRV_INTERLEAVE(200)
+	MDRV_QUANTUM_TIME(HZ(12000))
 
 	MDRV_MACHINE_RESET(seibu_sound)
 

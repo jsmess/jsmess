@@ -138,6 +138,75 @@ struct _tms32010_opcode_7F
 
 
 
+/****************************************************************************
+ *  Read the state of the BIO pin
+ */
+
+#define TMS32010_BIO_In (memory_read_word_16be(cpustate->io, TMS32010_BIO<<1))
+
+
+/****************************************************************************
+ *  Input a word from given I/O port
+ */
+
+#define TMS32010_In(Port) (memory_read_word_16be(cpustate->io, (Port)<<1))
+
+
+/****************************************************************************
+ *  Output a word to given I/O port
+ */
+
+#define TMS32010_Out(Port,Value) (memory_write_word_16be(cpustate->io, (Port)<<1,Value))
+
+
+
+/****************************************************************************
+ *  Read a word from given ROM memory location
+ */
+
+#define TMS32010_ROM_RDMEM(A) (memory_read_word_16be(cpustate->program, (A)<<1))
+
+
+/****************************************************************************
+ *  Write a word to given ROM memory location
+ */
+
+#define TMS32010_ROM_WRMEM(A,V) (memory_write_word_16be(cpustate->program, (A)<<1,V))
+
+
+
+/****************************************************************************
+ *  Read a word from given RAM memory location
+ */
+
+#define TMS32010_RAM_RDMEM(A) (memory_read_word_16be(cpustate->data, (A)<<1))
+
+
+/****************************************************************************
+ *  Write a word to given RAM memory location
+ */
+
+#define TMS32010_RAM_WRMEM(A,V) (memory_write_word_16be(cpustate->data, (A)<<1,V))
+
+
+
+/****************************************************************************
+ *  TMS32010_RDOP() is identical to TMS32010_RDMEM() except it is used for reading
+ *  opcodes. In case of system with memory mapped I/O, this function can be
+ *  used to greatly speed up emulation
+ */
+
+#define TMS32010_RDOP(A) (memory_decrypted_read_word(cpustate->program, (A)<<1))
+
+
+/****************************************************************************
+ *  TMS32010_RDOP_ARG() is identical to TMS32010_RDOP() except it is used
+ *  for reading opcode arguments. This difference can be used to support systems
+ *  that use different encoding mechanisms for opcodes and opcode arguments
+ */
+
+#define TMS32010_RDOP_ARG(A) (memory_raw_read_word(cpustate->program, (A)<<1))
+
 
 /************************************************************************
  *  Shortcuts
@@ -886,15 +955,15 @@ CPU_GET_INFO( tms32010 )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 3;							break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 12;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = -1;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 	info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA: 	info->i = -1;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 5;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = -1;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 16;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 12;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = -1;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 16;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 8;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = -1;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 16;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 5;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = -1;					break;
 
 		case CPUINFO_INT_INPUT_STATE + 0:				info->i = (cpustate->INTF & TMS32010_INT_PENDING) ? ASSERT_LINE : CLEAR_LINE;	break;
 
@@ -913,15 +982,15 @@ CPU_GET_INFO( tms32010 )
 		case CPUINFO_INT_REGISTER + TMS32010_AR1: 		info->i = cpustate->AR[1];				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(tms32010);		break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(tms32010);				break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(tms32010);				break;
-		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(tms32010);				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(tms32010);			break;
-		case CPUINFO_PTR_BURN:							info->burn = NULL;									break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(tms32010);	break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(tms32010);		break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(tms32010);				break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(tms32010);				break;
+		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(tms32010);				break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(tms32010);			break;
+		case CPUINFO_FCT_BURN:							info->burn = NULL;									break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(tms32010);	break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;					break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:	info->internal_map16 = ADDRESS_MAP_NAME(tms32010_ram); break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:	info->internal_map16 = ADDRESS_MAP_NAME(tms32010_ram); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "TMS32010");					break;

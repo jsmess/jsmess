@@ -252,7 +252,7 @@ static void cbmb_tpi6525_0_irq2_level( const device_config *device, int level )
 const cia6526_interface cbmb_cia =
 {
 	cbmb_tpi6525_0_irq2_level,
-	0.0, 60,
+	60,
 
 	{
 		{ cbmb_cia_port_a_r, cbmb_cia_port_a_w },

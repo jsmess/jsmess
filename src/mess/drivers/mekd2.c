@@ -201,7 +201,7 @@ static MACHINE_DRIVER_START( mekd2 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M6800, 614400)        /* 614.4 kHz */
 	MDRV_CPU_PROGRAM_MAP(mekd2_mem, 0)
-	MDRV_INTERLEAVE(1)
+	MDRV_QUANTUM_TIME(HZ(60))
 
     /* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

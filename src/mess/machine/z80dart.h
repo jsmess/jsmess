@@ -100,7 +100,7 @@ struct _z80dart_interface
 ***************************************************************************/
 
 #define MDRV_Z80DART_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, Z80DART) \
+	MDRV_DEVICE_ADD(_tag, Z80DART, 0) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
 #define MDRV_Z80DART_REMOVE(_tag) \

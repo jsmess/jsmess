@@ -447,7 +447,7 @@ static MACHINE_DRIVER_START( arcadia )
 	MDRV_CPU_PROGRAM_MAP(arcadia_mem, 0)
 	MDRV_CPU_IO_MAP(arcadia_io, 0)
 	MDRV_CPU_PERIODIC_INT(arcadia_video_line, 262*60)
-	MDRV_INTERLEAVE(1)
+	MDRV_QUANTUM_TIME(HZ(60))
 
     /* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

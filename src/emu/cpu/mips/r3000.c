@@ -1183,15 +1183,15 @@ static CPU_GET_INFO( r3000 )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;									break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 40;									break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 32;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 29;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = 0;							break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 	info->i = 0;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA: 	info->i = 0;							break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 0;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 0;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;							break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 32;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 29;							break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;							break;
+		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;							break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;							break;
+		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 0;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 0;							break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;							break;
 
 		case CPUINFO_INT_INPUT_STATE + R3000_IRQ0:		info->i = (r3000->cpr[0][COP0_Cause] & 0x400) ? ASSERT_LINE : CLEAR_LINE; break;
 		case CPUINFO_INT_INPUT_STATE + R3000_IRQ1:		info->i = (r3000->cpr[0][COP0_Cause] & 0x800) ? ASSERT_LINE : CLEAR_LINE; break;
@@ -1241,13 +1241,13 @@ static CPU_GET_INFO( r3000 )
 		case CPUINFO_INT_REGISTER + R3000_R31:			info->i = r3000->r[31];							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(r3000);		break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(r3000);				break;
-		case CPUINFO_PTR_RESET:							/* provided per-CPU */							break;
-		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(r3000);				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(r3000);		break;
-		case CPUINFO_PTR_BURN:							info->burn = NULL;								break;
-		case CPUINFO_PTR_DISASSEMBLE:					/* provided per-CPU */							break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(r3000);		break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(r3000);				break;
+		case CPUINFO_FCT_RESET:							/* provided per-CPU */							break;
+		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(r3000);				break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(r3000);		break;
+		case CPUINFO_FCT_BURN:							info->burn = NULL;								break;
+		case CPUINFO_FCT_DISASSEMBLE:					/* provided per-CPU */							break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &r3000->icount;					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -1310,8 +1310,8 @@ CPU_GET_INFO( r3000be )
 		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(r3000be);			break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(r3000be);	break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(r3000be);			break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(r3000be);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "R3000 (big)");					break;
@@ -1329,8 +1329,8 @@ CPU_GET_INFO( r3000le )
 		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(r3000le);			break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(r3000le);	break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(r3000le);			break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(r3000le);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "R3000 (little)");				break;
@@ -1348,8 +1348,8 @@ CPU_GET_INFO( r3041be )
 		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(r3000be);			break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(r3000be);	break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(r3000be);			break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(r3000be);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "R3041 (big)");					break;
@@ -1367,8 +1367,8 @@ CPU_GET_INFO( r3041le )
 		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(r3000le);			break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(r3000le);	break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(r3000le);			break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(r3000le);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "R3041 (little)");				break;

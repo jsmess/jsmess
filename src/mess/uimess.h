@@ -33,7 +33,7 @@ void ui_mess_init(running_machine *machine);
 int ui_mess_handler_ingame(running_machine *machine);
 
 /* returns whether the "new UI" is active or not */
-int ui_mess_use_new_ui(running_machine *machine);
+int ui_mess_use_new_ui(void);
 
 /* image info screen */
 void ui_mess_menu_image_info(running_machine *machine, ui_menu *menu, void *parameter, void *state);

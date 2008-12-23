@@ -9,6 +9,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "deprecat.h"
 #include "cpu/mips/psx.h"
 #include "cpu/z80/z80.h"
@@ -190,13 +191,13 @@ static READ32_HANDLER( znsecsel_r )
 	return m_n_znsecsel;
 }
 
-static void sio_znsec0_handler( int n_data )
+static void sio_znsec0_handler( running_machine *machine, int n_data )
 {
 	if( ( n_data & PSX_SIO_OUT_CLOCK ) == 0 )
 	{
 		if( m_b_lastclock )
 		{
-			psx_sio_input( Machine, 0, PSX_SIO_IN_DATA, ( znsec_step( 0, ( n_data & PSX_SIO_OUT_DATA ) != 0 ) != 0 ) * PSX_SIO_IN_DATA );
+			psx_sio_input( machine, 0, PSX_SIO_IN_DATA, ( znsec_step( 0, ( n_data & PSX_SIO_OUT_DATA ) != 0 ) != 0 ) * PSX_SIO_IN_DATA );
 		}
 		m_b_lastclock = 0;
 	}
@@ -206,13 +207,13 @@ static void sio_znsec0_handler( int n_data )
 	}
 }
 
-static void sio_znsec1_handler( int n_data )
+static void sio_znsec1_handler( running_machine *machine, int n_data )
 {
 	if( ( n_data & PSX_SIO_OUT_CLOCK ) == 0 )
 	{
 		if( m_b_lastclock )
 		{
-			psx_sio_input( Machine, 0, PSX_SIO_IN_DATA, ( znsec_step( 1, ( n_data & PSX_SIO_OUT_DATA ) != 0 ) != 0 ) * PSX_SIO_IN_DATA );
+			psx_sio_input( machine, 0, PSX_SIO_IN_DATA, ( znsec_step( 1, ( n_data & PSX_SIO_OUT_DATA ) != 0 ) != 0 ) * PSX_SIO_IN_DATA );
 		}
 		m_b_lastclock = 0;
 	}
@@ -222,10 +223,8 @@ static void sio_znsec1_handler( int n_data )
 	}
 }
 
-static void sio_pad_handler( int n_data )
+static void sio_pad_handler( running_machine *machine, int n_data )
 {
-	running_machine *machine = Machine;
-
 	if( ( n_data & PSX_SIO_OUT_DTR ) != 0 )
 	{
 		m_b_znsecport = 1;
@@ -239,13 +238,12 @@ static void sio_pad_handler( int n_data )
 	psx_sio_input( machine, 0, PSX_SIO_IN_DATA | PSX_SIO_IN_DSR, PSX_SIO_IN_DATA | PSX_SIO_IN_DSR );
 }
 
-static void sio_dip_handler( int n_data )
+static void sio_dip_handler( running_machine *machine, int n_data )
 {
 	if( ( n_data & PSX_SIO_OUT_CLOCK ) == 0 )
 	{
 		if( m_b_lastclock )
 		{
-			running_machine *machine = Machine;
 			int bit = ( ( input_port_read(machine, "DSW") >> m_n_dip_bit ) & 1 );
 			verboselog( machine, 2, "read dip %02x -> %02x\n", n_data, bit * PSX_SIO_IN_DATA );
 			psx_sio_input( machine, 0, PSX_SIO_IN_DATA, bit * PSX_SIO_IN_DATA );
@@ -439,11 +437,6 @@ static void zn_machine_init( running_machine *machine )
 	psx_machine_init(machine);
 }
 
-static const at28c16_config at28c16_intf =
-{
-	"at28c16", NULL
-};
-
 static MACHINE_DRIVER_START( zn1_1mb_vram )
 	/* basic machine hardware */
 	MDRV_CPU_ADD( "main", PSXCPU, XTAL_67_7376MHz )
@@ -472,8 +465,7 @@ static MACHINE_DRIVER_START( zn1_1mb_vram )
 	MDRV_SOUND_ROUTE(0, "left", 0.35)
 	MDRV_SOUND_ROUTE(1, "right", 0.35)
 
-	MDRV_DEVICE_ADD( "at28c16", AT28C16 )
-	MDRV_DEVICE_CONFIG( at28c16_intf )
+	MDRV_AT28C16_ADD( "at28c16", NULL )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( zn1_2mb_vram )
@@ -511,8 +503,7 @@ static MACHINE_DRIVER_START( zn2 )
 	MDRV_SOUND_ROUTE(0, "left", 0.35)
 	MDRV_SOUND_ROUTE(1, "right", 0.35)
 
-	MDRV_DEVICE_ADD( "at28c16", AT28C16 )
-	MDRV_DEVICE_CONFIG( at28c16_intf )
+	MDRV_AT28C16_ADD( "at28c16", NULL )
 MACHINE_DRIVER_END
 
 /*
@@ -1599,9 +1590,9 @@ static void atpsx_interrupt(const device_config *device, int state)
 	}
 }
 
-static void atpsx_dma_read( UINT32 n_address, INT32 n_size )
+static void atpsx_dma_read( running_machine *machine, UINT32 n_address, INT32 n_size )
 {
-	const device_config *ide = device_list_find_by_tag(Machine->config->devicelist, IDE_CONTROLLER, "ide");
+	const device_config *ide = device_list_find_by_tag(machine->config->devicelist, IDE_CONTROLLER, "ide");
 
 	logerror("DMA read: %d bytes (%d words) to %08x\n", n_size<<2, n_size, n_address);
 
@@ -1622,7 +1613,7 @@ static void atpsx_dma_read( UINT32 n_address, INT32 n_size )
 	}
 }
 
-static void atpsx_dma_write( UINT32 n_address, INT32 n_size )
+static void atpsx_dma_write( running_machine *machine, UINT32 n_address, INT32 n_size )
 {
 	logerror("DMA write from %08x for %d bytes\n", n_address, n_size<<2);
 }

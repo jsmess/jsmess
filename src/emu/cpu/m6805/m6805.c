@@ -66,6 +66,30 @@ typedef struct
 	int		nmi_state;
 } m6805_Regs;
 
+/****************************************************************************/
+/* Read a byte from given memory location                                   */
+/****************************************************************************/
+#define M6805_RDMEM(Addr) ((unsigned)memory_read_byte_8be(cpustate->program, Addr))
+
+/****************************************************************************/
+/* Write a byte to given memory location                                    */
+/****************************************************************************/
+#define M6805_WRMEM(Addr,Value) (memory_write_byte_8be(cpustate->program, Addr,Value))
+
+/****************************************************************************/
+/* M6805_RDOP() is identical to M6805_RDMEM() except it is used for reading */
+/* opcodes. In case of system with memory mapped I/O, this function can be  */
+/* used to greatly speed up emulation                                       */
+/****************************************************************************/
+#define M6805_RDOP(Addr) ((unsigned)memory_decrypted_read_byte(cpustate->program, Addr))
+
+/****************************************************************************/
+/* M6805_RDOP_ARG() is identical to M6805_RDOP() but it's used for reading  */
+/* opcode arguments. This difference can be used to support systems that    */
+/* use different encoding mechanisms for opcodes and opcode arguments       */
+/****************************************************************************/
+#define M6805_RDOP_ARG(Addr) ((unsigned)memory_raw_read_byte(cpustate->program, Addr))
+
 #define SUBTYPE	cpustate->subtype	/* CPU Type */
 #define SP_MASK cpustate->sp_mask	/* stack pointer mask */
 #define SP_LOW	cpustate->sp_low	/* stack pointer low water mark */
@@ -903,15 +927,15 @@ CPU_GET_INFO( m6805 )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 2;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 10;							break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 12;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 8;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 12;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE + M6805_IRQ_LINE:	info->i = cpustate->irq_state[M6805_IRQ_LINE]; break;
 
@@ -926,13 +950,13 @@ CPU_GET_INFO( m6805 )
 		case CPUINFO_INT_REGISTER + M6805_CC:			info->i = CC;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(m6805);		break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m6805);				break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(m6805);			break;
-		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(m6805);				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(m6805);		break;
-		case CPUINFO_PTR_BURN:							info->burn = NULL;								break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m6805);break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(m6805);		break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(m6805);				break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(m6805);			break;
+		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(m6805);				break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(m6805);		break;
+		case CPUINFO_FCT_BURN:							info->burn = NULL;								break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m6805);break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->iCount;				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -990,9 +1014,9 @@ CPU_GET_INFO( m68705 )
 		case CPUINFO_INT_INPUT_STATE + M68705_INT_TIMER:	info->i = cpustate->irq_state[M68705_INT_TIMER]; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:							info->setinfo = CPU_SET_INFO_NAME(m68705);	break;
-		case CPUINFO_PTR_INIT:								info->init = CPU_INIT_NAME(m68705);			break;
-		case CPUINFO_PTR_RESET:								info->reset = CPU_RESET_NAME(m68705);		break;
+		case CPUINFO_FCT_SET_INFO:							info->setinfo = CPU_SET_INFO_NAME(m68705);	break;
+		case CPUINFO_FCT_INIT:								info->init = CPU_INIT_NAME(m68705);			break;
+		case CPUINFO_FCT_RESET:								info->reset = CPU_RESET_NAME(m68705);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:								strcpy(info->s, "M68705");	break;
@@ -1046,12 +1070,12 @@ CPU_GET_INFO( hd63705 )
 		case CPUINFO_INT_INPUT_STATE + HD63705_INT_ADCONV:	info->i = cpustate->irq_state[HD63705_INT_ADCONV];	break;
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:		info->i = cpustate->irq_state[HD63705_INT_NMI];		break;
 
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 16; break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 16; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(hd63705);	break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(hd63705);		break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(hd63705);		break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(hd63705);	break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(hd63705);		break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(hd63705);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "HD63705");	break;

@@ -209,7 +209,7 @@ const device_config *image_from_devtag_and_index(running_machine *machine, const
 
 /* deprecated device access functions that assume one device of any given type */
 iodevice_t image_devtype(const device_config *device);
-const device_config *image_from_devtype_and_index(iodevice_t type, int id);
+const device_config *image_from_devtype_and_index(running_machine *machine, iodevice_t type, int id);
 
 /* diagnostics */
 int device_valididtychecks(void);

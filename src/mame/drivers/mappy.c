@@ -547,6 +547,7 @@ TODO:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/m6809/m6809.h"
 #include "machine/namcoio.h"
 #include "sound/dac.h"
 #include "sound/namco.h"
@@ -702,13 +703,13 @@ static WRITE8_HANDLER( superpac_latch_w )
 	switch (offset & 0x0e)
 	{
 		case 0x00:	/* INT ON 2 */
-			cpu_interrupt_enable(1,bit);
+			cpu_interrupt_enable(space->machine->cpu[1],bit);
 			if (!bit)
 				cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
 			break;
 
 		case 0x02:	/* INT ON */
-			cpu_interrupt_enable(0,bit);
+			cpu_interrupt_enable(space->machine->cpu[0],bit);
 			if (!bit)
 				cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 			break;
@@ -744,19 +745,19 @@ static WRITE8_HANDLER( phozon_latch_w )
 	switch (offset & 0x0e)
 	{
 		case 0x00:
-			cpu_interrupt_enable(1,bit);
+			cpu_interrupt_enable(space->machine->cpu[1],bit);
 			if (!bit)
 				cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
 			break;
 
 		case 0x02:
-			cpu_interrupt_enable(0,bit);
+			cpu_interrupt_enable(space->machine->cpu[0],bit);
 			if (!bit)
 				cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 			break;
 
 		case 0x04:
-			cpu_interrupt_enable(2,bit);
+			cpu_interrupt_enable(space->machine->cpu[2],bit);
 			if (!bit)
 				cpu_set_input_line(space->machine->cpu[2], 0, CLEAR_LINE);
 			break;
@@ -790,19 +791,19 @@ static WRITE8_HANDLER( mappy_latch_w )
 	switch (offset & 0x0e)
 	{
 		case 0x00:	/* INT ON 2 */
-			cpu_interrupt_enable(1,bit);
+			cpu_interrupt_enable(space->machine->cpu[1],bit);
 			if (!bit)
 				cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
 			break;
 
 		case 0x02:	/* INT ON */
-			cpu_interrupt_enable(0,bit);
+			cpu_interrupt_enable(space->machine->cpu[0],bit);
 			if (!bit)
 				cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 			break;
 
 		case 0x04:	/* FLIP */
-			flip_screen_set(bit);
+			flip_screen_set(space->machine, bit);
 			break;
 
 		case 0x06:	/* SOUND ON */
@@ -1583,7 +1584,7 @@ static MACHINE_DRIVER_START( superpac )
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
 	MDRV_WATCHDOG_VBLANK_INIT(8)
-	MDRV_INTERLEAVE(100)    /* 100 CPU slices per frame - an high value to ensure proper */
+	MDRV_QUANTUM_TIME(HZ(6000))    /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 	MDRV_MACHINE_RESET(superpac)
 
@@ -1634,7 +1635,7 @@ static MACHINE_DRIVER_START( phozon )
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
 	MDRV_WATCHDOG_VBLANK_INIT(8)
-	MDRV_INTERLEAVE(100)    /* 100 CPU slices per frame - an high value to ensure proper */
+	MDRV_QUANTUM_TIME(HZ(6000))    /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 	MDRV_MACHINE_RESET(phozon)
 
@@ -1671,7 +1672,7 @@ static MACHINE_DRIVER_START( mappy )
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
 	MDRV_WATCHDOG_VBLANK_INIT(8)
-	MDRV_INTERLEAVE(100)    /* 100 CPU slices per frame - an high value to ensure proper */
+	MDRV_QUANTUM_TIME(HZ(6000))    /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 	MDRV_MACHINE_RESET(mappy)
 

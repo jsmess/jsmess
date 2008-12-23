@@ -118,6 +118,8 @@ RAM         RW      0f0000-0f3fff       0e0000-0effff?      <
 #define OKI4_SOUND_CLOCK	XTAL_4MHz
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
+#include "cpu/m68000/m68000.h"
 #include "deprecat.h"
 #include "megasys1.h"
 #include "sound/2203intf.h"
@@ -604,7 +606,7 @@ static MACHINE_DRIVER_START( system_A )
 	MDRV_CPU_ADD("sound", M68000, SOUND_CPU_CLOCK) /* 7MHz verified */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem_A,sound_writemem_A)
 
-	MDRV_INTERLEAVE(2000)
+	MDRV_QUANTUM_TIME(HZ(120000))
 
 	MDRV_MACHINE_RESET(megasys1)
 

@@ -145,6 +145,7 @@ the layer is misplaced however, different scroll regs?
 */
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "deprecat.h"
 #include "includes/kaneko16.h"
 #include "sound/okim6295.h"
@@ -500,7 +501,7 @@ static MACHINE_DRIVER_START( galsnew )
 	MDRV_PALETTE_INIT(berlwall)
 
 	/* arm watchdog */
-	MDRV_WATCHDOG_TIME_INIT(UINT64_ATTOTIME_IN_SEC(3))	/* a guess, and certainly wrong */
+	MDRV_WATCHDOG_TIME_INIT(SEC(3))	/* a guess, and certainly wrong */
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -519,7 +520,7 @@ static MACHINE_DRIVER_START( fantasia )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(fantasia_map,0)
 
-	MDRV_WATCHDOG_TIME_INIT(UINT64_ATTOTIME_IN_SEC(0))	/* a guess, and certainly wrong */
+	MDRV_WATCHDOG_TIME_INIT(SEC(0))	/* a guess, and certainly wrong */
 
 MACHINE_DRIVER_END
 

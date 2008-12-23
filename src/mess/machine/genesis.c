@@ -1205,7 +1205,7 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 			genesis_sram_end += 1;
 		
 		genesis_sram = malloc_or_die(genesis_sram_end - genesis_sram_start);
-		image_battery_load(image_from_devtype_and_index(IO_CARTSLOT, 0), genesis_sram, genesis_sram_end - genesis_sram_start);
+		image_battery_load(image_from_devtype_and_index(image->machine, IO_CARTSLOT, 0), genesis_sram, genesis_sram_end - genesis_sram_start);
 
 		megadriv_backupram = (UINT16*)ROM + ((genesis_sram_start & 0x3fffff) / 2);
 		memmove(&megadriv_backupram[0], genesis_sram, genesis_sram_end - genesis_sram_start);
@@ -1229,7 +1229,7 @@ static DEVICE_IMAGE_UNLOAD( genesis_cart )
 	/* Write out the battery file if necessary */
 	if (has_sram && (genesis_sram != NULL) && (genesis_sram_end - genesis_sram_start > 0))
 	{
-		image_battery_save(image_from_devtype_and_index(IO_CARTSLOT, 0), genesis_sram, genesis_sram_end - genesis_sram_start);
+		image_battery_save(image_from_devtype_and_index(image->machine, IO_CARTSLOT, 0), genesis_sram, genesis_sram_end - genesis_sram_start);
 	}
 }
 

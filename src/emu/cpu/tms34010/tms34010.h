@@ -19,7 +19,7 @@
 /* register indexes for get_reg and set_reg */
 enum
 {
-	TMS34010_PC = 1,
+	TMS34010_PC,
 	TMS34010_SP,
 	TMS34010_ST,
 	TMS34010_A0,
@@ -51,7 +51,11 @@ enum
 	TMS34010_B11,
 	TMS34010_B12,
 	TMS34010_B13,
-	TMS34010_B14
+	TMS34010_B14,
+
+	TMS34010_GENPC = REG_GENPC,
+	TMS34010_GENSP = REG_GENSP,
+	TMS34010_GENPCBASE = REG_GENPCBASE
 };
 
 
@@ -207,9 +211,11 @@ VIDEO_UPDATE( tms340x0 );
 void tms34010_get_display_params(const device_config *cpu, tms34010_display_params *params);
 
 CPU_GET_INFO( tms34010 );
+#define CPU_TMS34010 CPU_GET_INFO_NAME( tms34010 )
 
 /* PUBLIC FUNCTIONS - 34020 */
 CPU_GET_INFO( tms34020 );
+#define CPU_TMS34020 CPU_GET_INFO_NAME( tms34020 )
 
 
 /* Host control interface */

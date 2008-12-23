@@ -276,7 +276,7 @@ VIDEO_START(geneve)
 INTERRUPT_GEN( geneve_hblank_interrupt )
 {
 	static int line_count;
-	v9938_interrupt(0);
+	v9938_interrupt(device->machine, 0);
 	if (++line_count == 262)
 	{
 		line_count = 0;

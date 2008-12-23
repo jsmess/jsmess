@@ -22,6 +22,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "cpu/tms34010/tms34010.h"
 #include "video/tlc34076.h"
 #include "artmagic.h"
@@ -699,7 +700,7 @@ static MACHINE_DRIVER_START( artmagic )
 	MDRV_CPU_PROGRAM_MAP(tms_map,0)
 
 	MDRV_MACHINE_RESET(artmagic)
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 	MDRV_NVRAM_HANDLER(generic_1fill)
 
 	/* video hardware */

@@ -236,7 +236,7 @@ static MACHINE_DRIVER_START( p2000m )
 	MDRV_CPU_PROGRAM_MAP(p2000m_mem, 0)
 	MDRV_CPU_IO_MAP(p2000t_io, 0)
 	MDRV_CPU_VBLANK_INT("main", p2000_interrupt)
-	MDRV_INTERLEAVE(1)
+	MDRV_QUANTUM_TIME(HZ(60))
 
     /* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

@@ -71,6 +71,7 @@ TODO:
 *********************************************************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "includes/dynax.h"
 #include "cpu/tlcs90/tlcs90.h"
@@ -3864,7 +3865,7 @@ static MACHINE_DRIVER_START( yarunara )
 	MDRV_SCREEN_VISIBLE_AREA(0, 336-1, 8, 256-1-8-1)
 
 	/* devices */
-	MDRV_DEVICE_ADD("rtc", MSM6242)
+	MDRV_MSM6242_ADD("rtc")
 MACHINE_DRIVER_END
 
 
@@ -3975,7 +3976,7 @@ static MACHINE_DRIVER_START( jantouki )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* devices */
-	MDRV_DEVICE_ADD("rtc", MSM6242)
+	MDRV_MSM6242_ADD("rtc")
 MACHINE_DRIVER_END
 
 
@@ -4122,7 +4123,7 @@ static MACHINE_DRIVER_START( htengoku )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* devices */
-	MDRV_DEVICE_ADD("rtc", MSM6242)
+	MDRV_MSM6242_ADD("rtc")
 MACHINE_DRIVER_END
 
 
@@ -4183,7 +4184,7 @@ static MACHINE_DRIVER_START( tenkai )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* devices */
-	MDRV_DEVICE_ADD("rtc", MSM6242)
+	MDRV_MSM6242_ADD("rtc")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( majrjhdx )

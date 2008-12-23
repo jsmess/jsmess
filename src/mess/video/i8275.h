@@ -66,7 +66,7 @@ void i8275_dack_set_data(const device_config *device, UINT8 data);
 ***************************************************************************/
 
 #define MDRV_I8275_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, I8275) \
+	MDRV_DEVICE_ADD(_tag, I8275, 0) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
 #endif

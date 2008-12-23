@@ -34,7 +34,6 @@ SPOT TABLE test
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "eminline.h"
 #include "video/rgbutil.h"
 #include "namcos22.h"
@@ -174,7 +173,7 @@ Clamp256( int v )
 } /* Clamp256 */
 
 #ifdef MAME_DEBUG
-static void Dump( FILE *f, unsigned addr1, unsigned addr2, const char *name );
+static void Dump( const address_space *space, FILE *f, unsigned addr1, unsigned addr2, const char *name );
 #endif
 
 static struct
@@ -253,7 +252,7 @@ struct _poly_extra_data
 {
 	rgbint fogColor;
 	rgbint fadeColor;
-	int color;
+	const pen_t *pens;
 	int bn;
 	UINT16 flags;
 	int cmode;
@@ -280,7 +279,7 @@ static void renderscanline_uvi_full(void *dest, INT32 scanline, const poly_exten
 	bitmap_t *bitmap = dest;
 	const poly_extra_data *extra = extradata;
 	int bn = extra->bn * 0x1000;
-	const pen_t *pens = &Machine->pens[(extra->color&0x7f)<<8];
+	const pen_t *pens = extra->pens;
 	int fogFactor = 0xff - extra->fogFactor;
 	int fadeFactor = 0xff - extra->fadeFactor;
 	int transFactor = 0xff;
@@ -437,7 +436,7 @@ static void poly3d_DrawQuad(running_machine *machine, bitmap_t *bitmap, int text
 
 	extra = poly_get_extra_data(poly);
 
-	extra->color = color;
+	extra->pens = &machine->pens[(color&0x7f)<<8];
 	extra->bn = textureBank;
 	extra->flags = flags;
 	extra->cmode = cmode;
@@ -491,7 +490,7 @@ static void renderscanline_sprite(void *destbase, INT32 scanline, const poly_ext
 	int dx = extent->param[0].dpdx * 65536.0f;
 	const poly_extra_data *extra = extradata;
 	bitmap_t *destmap = destbase;
-	const pen_t *pal = &Machine->pens[extra->color];
+	const pen_t *pal = extra->pens;
 	int prioverchar = extra->prioverchar;
 	int z = extra->z;
 	int alpha = extra->alpha;
@@ -597,7 +596,7 @@ mydrawgfxzoom(
 		extra->alpha = alpha;
 		extra->prioverchar = prioverchar;
 		extra->line_modulo = gfx->line_modulo;
-		extra->color = gfx->color_base + gfx->color_granularity * (color % gfx->total_colors);
+		extra->pens = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
 		extra->source = gfx->gfxdata + (code % gfx->total_elements) * gfx->char_modulo;
 #ifdef RENDER_AS_QUADS
 		poly_render_quad_fan(poly, dest_bmp, clip, renderscanline_sprite, 2, 4, &vert[0]);
@@ -608,7 +607,7 @@ mydrawgfxzoom(
 } /* mydrawgfxzoom */
 
 static void
-ApplyGamma( bitmap_t *bitmap )
+ApplyGamma( running_machine *machine, bitmap_t *bitmap )
 {
 	int x,y;
 	if( mbSuperSystem22 )
@@ -636,7 +635,7 @@ ApplyGamma( bitmap_t *bitmap )
 	}
 	else
 	{ /* system 22 */
-		const UINT8 *rlut = 0x000+(const UINT8 *)memory_region(Machine, "user1");
+		const UINT8 *rlut = 0x000+(const UINT8 *)memory_region(machine, "user1");
 		const UINT8 *glut = 0x100+rlut;
 		const UINT8 *blut = 0x200+rlut;
 		for( y=0; y<bitmap->height; y++ )
@@ -2246,9 +2245,9 @@ static VIDEO_START( common )
 	mpPolyH = mpPolyM + mPtRomSize;
 
 #ifdef RENDER_AS_QUADS
-	poly = poly_alloc(4000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
+	poly = poly_alloc(machine, 4000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
 #else
-	poly = poly_alloc(4000, sizeof(poly_extra_data), 0);
+	poly = poly_alloc(machine, 4000, sizeof(poly_extra_data), 0);
 #endif
 	add_reset_callback(machine, namcos22_reset);
 	add_exit_callback(machine, namcos22_exit);
@@ -2275,14 +2274,14 @@ VIDEO_UPDATE( namcos22s )
 	UINT32 bgColor;
 	UpdateVideoMixer();
 	bgColor = (mixer.rBackColor<<16)|(mixer.gBackColor<<8)|mixer.bBackColor;
-   bitmap_fill( bitmap, cliprect , bgColor);
-   UpdatePaletteS(screen->machine);
-   DrawCharacterLayer(screen->machine, bitmap, cliprect );
+	bitmap_fill( bitmap, cliprect , bgColor);
+	UpdatePaletteS(screen->machine);
+	DrawCharacterLayer(screen->machine, bitmap, cliprect );
 	DrawPolygons( bitmap );
-   DrawSprites( bitmap, cliprect );
-   RenderScene(screen->machine, bitmap );
+	DrawSprites( bitmap, cliprect );
+	RenderScene(screen->machine, bitmap );
 	DrawTranslucentCharacters( bitmap, cliprect );
-	ApplyGamma( bitmap );
+	ApplyGamma( screen->machine, bitmap );
 
 #ifdef MAME_DEBUG
    if( input_code_pressed(KEYCODE_D) )
@@ -2290,6 +2289,8 @@ VIDEO_UPDATE( namcos22s )
       FILE *f = fopen( "dump.txt", "wb" );
       if( f )
       {
+         const address_space *space = cpu_get_address_space(screen->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
          {
             int i,bank;
             for( bank=0; bank<4; bank++ )
@@ -2303,16 +2304,16 @@ VIDEO_UPDATE( namcos22s )
             }
          }
 
-	      Dump(f,0x810000, 0x81000f, "cz attr" );
-			Dump(f,0x820000, 0x8202ff, "unk_ac" );
-	      Dump(f,0x824000, 0x8243ff, "gamma");
-			Dump(f,0x828000, 0x83ffff, "palette" );
-         Dump(f,0x8a0000, 0x8a000f, "tilemap_attr");
-         Dump(f,0x880000, 0x89ffff, "cgram/textram");
-         Dump(f,0x900000, 0x90ffff, "vics_data");
-         Dump(f,0x940000, 0x94007f, "vics_control");
-         Dump(f,0x980000, 0x9affff, "sprite374" );
-         Dump(f,0xc00000, 0xc1ffff, "polygonram");
+         Dump(space, f,0x810000, 0x81000f, "cz attr" );
+         Dump(space, f,0x820000, 0x8202ff, "unk_ac" );
+         Dump(space, f,0x824000, 0x8243ff, "gamma");
+         Dump(space, f,0x828000, 0x83ffff, "palette" );
+         Dump(space, f,0x8a0000, 0x8a000f, "tilemap_attr");
+         Dump(space, f,0x880000, 0x89ffff, "cgram/textram");
+         Dump(space, f,0x900000, 0x90ffff, "vics_data");
+         Dump(space, f,0x940000, 0x94007f, "vics_control");
+         Dump(space, f,0x980000, 0x9affff, "sprite374" );
+         Dump(space, f,0xc00000, 0xc1ffff, "polygonram");
          fclose( f );
       }
       while( input_code_pressed(KEYCODE_D) ){}
@@ -2324,13 +2325,13 @@ VIDEO_UPDATE( namcos22s )
 VIDEO_UPDATE( namcos22 )
 {
 	UpdateVideoMixer();
-   bitmap_fill( bitmap, cliprect , get_black_pen(screen->machine));
+	bitmap_fill( bitmap, cliprect , get_black_pen(screen->machine));
 	UpdatePalette(screen->machine);
 	DrawCharacterLayer(screen->machine, bitmap, cliprect );
-   DrawPolygons( bitmap );
-   RenderScene(screen->machine, bitmap);
+	DrawPolygons( bitmap );
+	RenderScene(screen->machine, bitmap);
 	DrawTranslucentCharacters( bitmap, cliprect );
-	ApplyGamma( bitmap );
+	ApplyGamma( screen->machine, bitmap );
 
 #ifdef MAME_DEBUG
    if( input_code_pressed(KEYCODE_D) )
@@ -2338,12 +2339,13 @@ VIDEO_UPDATE( namcos22 )
       FILE *f = fopen( "dump.txt", "wb" );
       if( f )
       {
-//        Dump(f,0x90000000, 0x90000003, "led?" );
-//         Dump(f,0x90010000, 0x90017fff, "cz_ram");
-//         Dump(f,0x900a0000, 0x900a000f, "tilemap_attr");
-         Dump(f,0x90020000, 0x90027fff, "gamma");
-			    //   0x90020000, 0x90027fff
-//         Dump(f,0x70000000, 0x7001ffff, "polygonram");
+         const address_space *space = cpu_get_address_space(screen->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
+//         Dump(space, f,0x90000000, 0x90000003, "led?" );
+//         Dump(space, f,0x90010000, 0x90017fff, "cz_ram");
+//         Dump(space, f,0x900a0000, 0x900a000f, "tilemap_attr");
+         Dump(space, f,0x90020000, 0x90027fff, "gamma");
+//         Dump(space, f,0x70000000, 0x7001ffff, "polygonram");
          fclose( f );
       }
       while( input_code_pressed(KEYCODE_D) ){}
@@ -2409,9 +2411,8 @@ WRITE16_HANDLER( namcos22_dspram16_w )
 
 #ifdef MAME_DEBUG
 static void
-Dump( FILE *f, unsigned addr1, unsigned addr2, const char *name )
+Dump( const address_space *space, FILE *f, unsigned addr1, unsigned addr2, const char *name )
 {
-	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
    unsigned addr;
    fprintf( f, "%s:\n", name );
    for( addr=addr1; addr<=addr2; addr+=16 )

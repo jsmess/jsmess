@@ -60,9 +60,9 @@
 */
 
 #include "driver.h"
+#include "cpu/i386/i386.h"
 #include "memconv.h"
 #include "devconv.h"
-#include "deprecat.h"
 #include "machine/8237dma.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
@@ -72,7 +72,6 @@
 #include "machine/8042kbdc.h"
 #include "machine/pckeybrd.h"
 #include "machine/idectrl.h"
-#include "cpu/i386/i386.h"
 
 static void ide_interrupt(const device_config *device, int state);
 
@@ -441,7 +440,7 @@ static DMA8237_MEM_WRITE( pc_dma_write_byte )
 
 static const struct dma8237_interface dma8237_1_config =
 {
-	0,
+	"main",
 	1.0e-6, // 1us
 
 	pc_dma_read_byte,
@@ -455,7 +454,7 @@ static const struct dma8237_interface dma8237_1_config =
 
 static const struct dma8237_interface dma8237_2_config =
 {
-	0,
+	"main",
 	1.0e-6, // 1us
 
 	NULL,
@@ -689,12 +688,12 @@ static MACHINE_DRIVER_START(gamecstl)
 
 MACHINE_DRIVER_END
 
-static void set_gate_a20(int a20)
+static void set_gate_a20(running_machine *machine, int a20)
 {
-	cpu_set_input_line(Machine->cpu[0], INPUT_LINE_A20, a20);
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_A20, a20);
 }
 
-static void keyboard_interrupt(int state)
+static void keyboard_interrupt(running_machine *machine, int state)
 {
 	pic8259_set_irq_line( gamecstl_devices.pic8259_1, 1, state);
 }
@@ -713,7 +712,7 @@ static const struct kbdc8042_interface at8042 =
 	KBDC8042_AT386, set_gate_a20, keyboard_interrupt, gamecstl_get_out2
 };
 
-static void gamecstl_set_keyb_int(int state) {
+static void gamecstl_set_keyb_int(running_machine *machine, int state) {
 	pic8259_set_irq_line(gamecstl_devices.pic8259_1, 1, state);
 }
 

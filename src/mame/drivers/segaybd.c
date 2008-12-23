@@ -10,6 +10,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "system16.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/segaic16.h"
@@ -967,7 +968,7 @@ static MACHINE_DRIVER_START( yboard )
 
 	MDRV_MACHINE_RESET(yboard)
 	MDRV_NVRAM_HANDLER(yboard)
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

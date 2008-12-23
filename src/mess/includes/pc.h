@@ -28,7 +28,7 @@ UINT8 pc_speaker_get_spk(void);
 void pc_speaker_set_spkrdata(UINT8 data);
 void pc_speaker_set_input(UINT8 data);
 
-void mess_init_pc_common( running_machine *machine, UINT32 flags, void (*set_keyb_int_func)(int), void (*set_hdc_int_func)(int,int));
+void mess_init_pc_common( running_machine *machine, UINT32 flags, void (*set_keyb_int_func)(running_machine *, int), void (*set_hdc_int_func)(int,int));
 
 WRITE8_HANDLER( pc_nmi_enable_w );
 READ8_HANDLER( pcjr_nmi_enable_r );

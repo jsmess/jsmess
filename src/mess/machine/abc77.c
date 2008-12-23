@@ -293,7 +293,7 @@ static MACHINE_DRIVER_START( abc77 )
 	MDRV_CPU_IO_MAP(abc77_io_map, 0)
 
 	/* watchdog */
-	MDRV_WATCHDOG_TIME_INIT(UINT64_ATTOTIME_IN_HZ(XTAL_4_608MHz/(3*5)))
+	MDRV_WATCHDOG_TIME_INIT(HZ(XTAL_4_608MHz/(3*5)))
 
 	/* serial clock timer */
 	MDRV_TIMER_ADD_PERIODIC("serial", clock_tick, HZ(XTAL_4_608MHz/(3*5)/16))
@@ -378,10 +378,10 @@ DEVICE_GET_INFO( abc77 )
 		case DEVINFO_FCT_RESET:							/* Nothing */								break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "Luxor ABC-77";					break;
-		case DEVINFO_STR_FAMILY:						info->s = "Luxor ABC";						break;
-		case DEVINFO_STR_VERSION:						info->s = "1.0";							break;
-		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;							break;
-		case DEVINFO_STR_CREDITS:						info->s = "Copyright the MESS Team"; 		break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Luxor ABC-77");			break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Luxor ABC");				break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");						break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);					break;
+		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team"); break;
 	}
 }

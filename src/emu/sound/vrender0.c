@@ -25,10 +25,10 @@ struct _VR0Chip
 
 static void VR0_RenderAudio(struct _VR0Chip *VR0, int nsamples,stream_sample_t *l,stream_sample_t *r);
 
-static void VR0_Update(void *param, stream_sample_t **inputs, stream_sample_t **buf, int samples)
+static STREAM_UPDATE( VR0_Update )
 {
 	struct _VR0Chip *VR0 = param;
-	VR0_RenderAudio(VR0, samples,buf[0],buf[1]);
+	VR0_RenderAudio(VR0, samples,outputs[0],outputs[1]);
 }
 
 //Correct table thanks to Evoga
@@ -258,17 +258,17 @@ SND_GET_INFO( vrender0 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( vrender0 );		break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( vrender0 );			break;
-		case SNDINFO_PTR_STOP:							/* Nothing */							break;
-		case SNDINFO_PTR_RESET:							/* Nothing */							break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( vrender0 );	break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( vrender0 );		break;
+		case SNDINFO_PTR_STOP:							/* Nothing */									break;
+		case SNDINFO_PTR_RESET:							/* Nothing */									break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							info->s = "VRender0";					break;
-		case SNDINFO_STR_CORE_FAMILY:					info->s = "???";						break;
-		case SNDINFO_STR_CORE_VERSION:					info->s = "1.0";						break;
-		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
-		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "VRender0");					break;
+		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "???");							break;
+		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");							break;
+		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
+		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

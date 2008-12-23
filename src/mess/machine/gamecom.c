@@ -384,6 +384,7 @@ WRITE8_HANDLER( gamecom_internal_w )
 
 READ8_HANDLER( gamecom_internal_r )
 {
+	/* NPW 22-Dec-2008 - Shouldn't this entire function be moved to an internal memory map of the CPU core? */
 	if ( offset >= 0x80 ) 
 	{
 		return internal_ram[offset];
@@ -395,7 +396,8 @@ READ8_HANDLER( gamecom_internal_r )
 	case SM8521_R4:  case SM8521_R5:  case SM8521_R6:  case SM8521_R7:
 	case SM8521_R8:  case SM8521_R9:  case SM8521_R10: case SM8521_R11:
 	case SM8521_R12: case SM8521_R13: case SM8521_R14: case SM8521_R15:
-		return sm85cpu_mem_readbyte( offset );
+		return 0;	/* NPW 22-Dec-2008 - Not sure what to do here */
+		/*return sm85cpu_mem_readbyte( state, offset );*/
 	case SM8521_IE0:	return cpu_get_reg( space->machine->cpu[0], SM8500_IE0 );
 	case SM8521_IE1:	return cpu_get_reg( space->machine->cpu[0], SM8500_IE1 );
 	case SM8521_IR0:	return cpu_get_reg( space->machine->cpu[0], SM8500_IR0 );
@@ -512,7 +514,7 @@ static void gamecom_dma_init(running_machine *machine)
    Their usage is also not explained properly in the manuals. Guess we'll have to wait
    for them to show up in some rom images...
  */
-void gamecom_handle_dma( int cycles ) 
+void gamecom_handle_dma( const device_config *device, int cycles ) 
 {
 	unsigned y_count, x_count;
 	/* If not enabled, ignore */
@@ -603,10 +605,10 @@ void gamecom_handle_dma( int cycles )
 		gamecom_dma.dest_current = gamecom_dma.dest_line;
 	}
 	gamecom_dma.enabled = 0;
-	cpu_set_input_line(Machine->cpu[0], DMA_INT, HOLD_LINE );
+	cpu_set_input_line(device->machine->cpu[0], DMA_INT, HOLD_LINE );
 }
 
-void gamecom_update_timers( int cycles ) 
+void gamecom_update_timers( const device_config *device, int cycles ) 
 {
 	if ( gamecom_timer[0].enabled ) 
 	{
@@ -618,7 +620,7 @@ void gamecom_update_timers( int cycles )
 			if ( gamecom_timer[0].counter == gamecom_timer[0].check_value ) 
 			{
 				gamecom_timer[0].counter = 0;
-				cpu_set_input_line(Machine->cpu[0], TIM0_INT, HOLD_LINE );
+				cpu_set_input_line(device->machine->cpu[0], TIM0_INT, HOLD_LINE );
 			}
 		}
 	}
@@ -632,7 +634,7 @@ void gamecom_update_timers( int cycles )
 			if ( gamecom_timer[1].counter == gamecom_timer[1].check_value ) 
 			{
 				gamecom_timer[1].counter = 0;
-				cpu_set_input_line(Machine->cpu[0], TIM1_INT, HOLD_LINE );
+				cpu_set_input_line(device->machine->cpu[0], TIM1_INT, HOLD_LINE );
 			}
 		}
 	}
@@ -650,7 +652,7 @@ READ8_HANDLER( gamecom_vram_r )
 
 DEVICE_START( gamecom_cart )
 {
-	internal_ram = sm8500_internal_ram();
+	internal_ram = device_get_info_ptr(device->machine->cpu[0], CPUINFO_PTR_SM8500_INTERNAL_RAM);
 	return DEVICE_START_OK;
 }
 

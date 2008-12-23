@@ -17,7 +17,7 @@
 #define TC8521			DEVICE_GET_INFO_NAME(tc8521)
 
 #define MDRV_TC8521_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, TC8521) \
+	MDRV_DEVICE_ADD(_tag, TC8521, 0) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
 #define MDRV_TC8521_REMOVE(_tag) \

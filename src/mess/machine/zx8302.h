@@ -44,11 +44,14 @@ typedef void (*zx8302_comdata_write_func) (const device_config *device, int leve
 
 #define ZX8302 DEVICE_GET_INFO_NAME( zx8302 )
 
+#define MDRV_ZX8302_ADD(_tag, _clock, _config) \
+	MDRV_DEVICE_ADD(_tag, ZX8302, _clock) \
+	MDRV_DEVICE_CONFIG(_config)
+
 /* interface */
 typedef struct _zx8302_interface zx8302_interface;
 struct _zx8302_interface
 {
-	int clock;					/* the CPU clock (pin 25) of the chip */
 	int rtc_clock;				/* the RTC clock (pin 30) of the chip */
 
 	const char *mdv1_tag;		/* microdrive 1 */

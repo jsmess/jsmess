@@ -19,6 +19,7 @@ Mods by Tomasz Slanina (2008.06.12):
 ******************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "sound/dac.h"
 #include "sound/msm5205.h"
 #include "sound/ay8910.h"
@@ -54,7 +55,7 @@ static WRITE8_HANDLER( bg_bank_w )
 		tilemap_mark_all_tiles_dirty(bg_tilemap);
 	}
 
-	flip_screen_set(data & 0xc); // probably one bit for flipx and one for flipy
+	flip_screen_set(space->machine, data & 0xc); // probably one bit for flipx and one for flipy
 
 }
 
@@ -316,7 +317,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		sx = (spriteram[offs+3] - 128) + 256 * (attr & 0x01);
 		sy = 248 - spriteram[offs];
 
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;

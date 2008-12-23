@@ -70,6 +70,7 @@ Dip locations and factory settings verified with China Gate US manual.
 
 
 #include "driver.h"
+#include "cpu/hd6309/hd6309.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"
 #include "cpu/mcs48/mcs48.h"
@@ -125,7 +126,7 @@ static WRITE8_HANDLER( chinagat_video_ctrl_w )
 	ddragon_scrolly_hi = ( ( data & 0x02 ) << 7 );
 	ddragon_scrollx_hi = ( ( data & 0x01 ) << 8 );
 
-	flip_screen_set(~data & 0x04);
+	flip_screen_set(space->machine, ~data & 0x04);
 }
 
 static WRITE8_HANDLER( chinagat_bankswitch_w )
@@ -505,7 +506,7 @@ static MACHINE_DRIVER_START( chinagat )
 	MDRV_CPU_ADD("audio", Z80, 3579545)	/* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
-	MDRV_INTERLEAVE(100) /* heavy interleaving to sync up sprite<->main cpu's */
+	MDRV_QUANTUM_TIME(HZ(6000)) /* heavy interleaving to sync up sprite<->main cpu's */
 
 	MDRV_MACHINE_RESET(chinagat)
 
@@ -553,7 +554,7 @@ static MACHINE_DRIVER_START( saiyugb1 )
 	MDRV_CPU_PROGRAM_MAP(i8748_map,0)
 	MDRV_CPU_IO_MAP(i8748_portmap,0)
 
-	MDRV_INTERLEAVE(100)	/* heavy interleaving to sync up sprite<->main cpu's */
+	MDRV_QUANTUM_TIME(HZ(6000))	/* heavy interleaving to sync up sprite<->main cpu's */
 
 	MDRV_MACHINE_RESET(chinagat)
 
@@ -597,7 +598,7 @@ static MACHINE_DRIVER_START( saiyugb2 )
 	MDRV_CPU_ADD("audio", Z80, 3579545)		/* 3.579545 MHz oscillator */
 	MDRV_CPU_PROGRAM_MAP(ym2203c_sound_map,0)
 
-	MDRV_INTERLEAVE(100) /* heavy interleaving to sync up sprite<->main cpu's */
+	MDRV_QUANTUM_TIME(HZ(6000)) /* heavy interleaving to sync up sprite<->main cpu's */
 
 	MDRV_MACHINE_RESET(chinagat)
 

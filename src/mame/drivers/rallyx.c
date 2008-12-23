@@ -189,6 +189,7 @@ TODO:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "audio/timeplt.h"
 #include "sound/namco.h"
 #include "sound/samples.h"
@@ -240,7 +241,7 @@ static WRITE8_HANDLER( rallyx_latch_w )
 			break;
 
 		case 0x01:	/* INT ON */
-			cpu_interrupt_enable(0,bit);
+			cpu_interrupt_enable(space->machine->cpu[0],bit);
 			if (!bit)
 				cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 			break;
@@ -251,7 +252,7 @@ static WRITE8_HANDLER( rallyx_latch_w )
 			break;
 
 		case 0x03:	/* FLIP */
-			flip_screen_set(bit);
+			flip_screen_set(space->machine, bit);
 			break;
 
 		case 0x04:
@@ -284,7 +285,7 @@ static WRITE8_HANDLER( locomotn_latch_w )
 			break;
 
 		case 0x01:	/* INTST */
-			cpu_interrupt_enable(0,bit);
+			cpu_interrupt_enable(space->machine->cpu[0],bit);
 			break;
 
 		case 0x02:	/* MUT */
@@ -292,7 +293,7 @@ static WRITE8_HANDLER( locomotn_latch_w )
 			break;
 
 		case 0x03:	/* FLIP */
-			flip_screen_set(bit);
+			flip_screen_set(space->machine, bit);
 			break;
 
 		case 0x04:	/* OUT1 */

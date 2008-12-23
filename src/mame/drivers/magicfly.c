@@ -396,6 +396,7 @@
 #define MASTER_CLOCK	XTAL_10MHz
 
 #include "driver.h"
+#include "cpu/m6502/m6502.h"
 #include "video/mc6845.h"
 #include "sound/dac.h"
 
@@ -757,7 +758,7 @@ static MACHINE_DRIVER_START( magicfly )
 	MDRV_VIDEO_START(magicfly)
 	MDRV_VIDEO_UPDATE(magicfly)
 
-	MDRV_DEVICE_ADD("crtc", MC6845)
+	MDRV_MC6845_ADD("crtc", MC6845, 0, mc6845_null_interface)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

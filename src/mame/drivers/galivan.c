@@ -28,6 +28,7 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/12/17 -
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "sound/dac.h"
 #include "sound/3812intf.h"
 
@@ -53,7 +54,7 @@ static MACHINE_RESET( galivan )
 	UINT8 *RAM = memory_region(machine, "main");
 
 	memory_set_bankptr(machine, 1,&RAM[0x10000]);
-	cpu_reset(machine->cpu[0]);
+	device_reset(machine->cpu[0]);
 //  layers = 0x60;
 }
 

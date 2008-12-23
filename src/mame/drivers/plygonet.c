@@ -105,6 +105,8 @@ static const UINT16 dsp56k_bank02_size = 0x4000;		static UINT16* dsp56k_bank02_r
 static const UINT16 dsp56k_shared_ram_16_size = 0x2000;	static UINT16* dsp56k_shared_ram_16;
 static const UINT16 dsp56k_bank04_size = 0x1fc0;		static UINT16* dsp56k_bank04_ram;
 
+static direct_update_func dsp56k_update_handler = NULL;
+
 static const eeprom_interface eeprom_intf =
 {
 	7,				/* address bits */
@@ -187,14 +189,12 @@ static READ32_HANDLER( psac_rom_r )
 /* irq 3 is network.  don't generate if you don't emulate the network h/w! */
 /* irq 5 is vblank */
 /* irq 7 does nothing (it jsrs to a rts and then rte) */
-
 static INTERRUPT_GEN(polygonet_interrupt)
 {
 	cpu_set_input_line(device, M68K_IRQ_5, HOLD_LINE);
 }
 
 /* sound CPU communications */
-
 static READ32_HANDLER( sound_r )
 {
 	int latch = soundlatch3_r(space, 0);
@@ -230,7 +230,7 @@ static READ32_HANDLER( dsp_host_interface_r )
 	if (mem_mask == 0x0000ff00)	{ hi_addr++; }	/* Low byte */
 	if (mem_mask == 0xff000000) {}				/* High byte */
 
-	value = dsp56k_host_interface_read((device_config*)space->cpu, hi_addr);
+	value = dsp56k_host_interface_read((device_config*)cputag_get_cpu(space->machine, "dsp"), hi_addr);
 
 	if (mem_mask == 0x0000ff00)	{ value <<= 8;  }
 	if (mem_mask == 0xff000000) { value <<= 24; }
@@ -284,8 +284,7 @@ static WRITE32_HANDLER( dsp_w_lines )
 		cputag_set_input_line(space->machine, "dsp", DSP56K_IRQ_MODB, CLEAR_LINE);
 	}
 
-	/* 0x04000000 is the ??? line */
-
+	/* 0x04000000 is the COMBNK line - it switches who has access to the shared RAM - the dsp or the 68020 */
 }
 
 static WRITE32_HANDLER( dsp_host_interface_w )
@@ -300,7 +299,7 @@ static WRITE32_HANDLER( dsp_host_interface_w )
 	if (mem_mask == 0xff000000) { hi_data = (data & 0xff000000) >> 24; }
 
 	logerror("write (host-side) %08x %08x %08x (HI %04x)\n", offset, mem_mask, data, hi_addr);
-	dsp56k_host_interface_write((device_config*)space->cpu, hi_addr, hi_data);
+	dsp56k_host_interface_write((device_config*)cputag_get_cpu(space->machine, "dsp"), hi_addr, hi_data);
 }
 
 
@@ -308,6 +307,21 @@ static READ32_HANDLER( network_r )
 {
 	return 0x08000000;
 }
+
+
+WRITE32_HANDLER( plygonet_palette_w )
+{
+	int r,g,b;
+
+	COMBINE_DATA(&paletteram32[offset]);
+
+ 	r = (paletteram32[offset] >>16) & 0xff;
+	g = (paletteram32[offset] >> 8) & 0xff;
+	b = (paletteram32[offset] >> 0) & 0xff;
+
+	palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
+}
+
 
 /**********************************************************************************/
 /*******                            DSP56k maps                             *******/
@@ -321,14 +335,22 @@ static READ16_HANDLER( dsp56k_bootload_r )
 
 static DIRECT_UPDATE_HANDLER( plygonet_dsp56k_direct_handler )
 {
-	if (address >= 0x7000 && address <= 0x7fff)
+	/* Call the dsp's update handler first */
+	if (dsp56k_update_handler != NULL)
 	{
-		direct->raw = direct->decrypted = (void*)(dsp56k_p_mirror - 0x7000);
+		if ((*dsp56k_update_handler)(space, address, direct) == ~0)
+			return ~0;
+	}
+
+	/* If the requested region wasn't in there, see if it needs to be caught driver-side */
+	if (address >= (0x7000<<1) && address <= (0x7fff<<1))
+	{
+		direct->raw = direct->decrypted = (UINT8*)(dsp56k_p_mirror) - (0x7000<<1);
 		return ~0;
 	}
-	else if (address >= 0x8000 && address <= 0x87ff)
+	else if (address >= (0x8000<<1) && address <= (0x87ff<<1))
 	{
-		direct->raw = direct->decrypted = (void*)(dsp56k_p_8000 - 0x8000);
+		direct->raw = direct->decrypted = (UINT8*)(dsp56k_p_8000) - (0x8000<<1);
 		return ~0;
 	}
 
@@ -496,20 +518,6 @@ static WRITE16_HANDLER( dsp56k_ram_bank04_write )
 }
 
 
-WRITE32_HANDLER( plygonet_palette_w )
-{
-	int r,g,b;
-
-	COMBINE_DATA(&paletteram32[offset]);
-
- 	r = (paletteram32[offset] >>16) & 0xff;
-	g = (paletteram32[offset] >> 8) & 0xff;
-	b = (paletteram32[offset] >> 0) & 0xff;
-
-	palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
-}
-
-
 /**********************************************************************************/
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 32 )
@@ -643,7 +651,7 @@ static MACHINE_DRIVER_START( plygonet )
 	MDRV_NVRAM_HANDLER(polygonet)
 
 	/* TODO: TEMPORARY!  UNTIL A MORE LOCALIZED SYNC CAN BE MADE */
-	MDRV_INTERLEAVE(20000)
+	MDRV_QUANTUM_TIME(HZ(1200000))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -715,7 +723,7 @@ static DRIVER_INIT(polygonet)
 	memset(dsp56k_bank04_ram,    0, 2 * 8 * dsp56k_bank04_size		  * sizeof(UINT16));
 
 	/* The dsp56k occasionally executes out of mapped memory */
-	memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), plygonet_dsp56k_direct_handler);
+	dsp56k_update_handler = memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), plygonet_dsp56k_direct_handler);
 }
 
 ROM_START( plygonet )

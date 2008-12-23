@@ -377,7 +377,6 @@ UINT8 miot6530_portb_out_get(const device_config *device)
 
 static DEVICE_START( miot6530 )
 {
-	const miot6530_config *config = device->inline_config;
 	miot6530_state *miot = get_safe_token(device);
 
 	/* validate arguments */
@@ -387,7 +386,7 @@ static DEVICE_START( miot6530 )
 
 	/* set static values */
 	miot->intf = device->static_config;
-	miot->clock = config->clock;
+	miot->clock = device->clock;
 
 	/* configure the ports */
 	miot->port[0].in_func = miot->intf->in_a_func;
@@ -453,7 +452,7 @@ DEVICE_GET_INFO( miot6530 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(miot6530_state);		break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(miot6530_config);		break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;							break;
 		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;		break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
@@ -463,10 +462,10 @@ DEVICE_GET_INFO( miot6530 )
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(miot6530);break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "6530 (MIOT)";				break;
-		case DEVINFO_STR_FAMILY:						info->s = "I/O devices";				break;
-		case DEVINFO_STR_VERSION:						info->s = "1.0";						break;
-		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;						break;
-		case DEVINFO_STR_CREDITS:						info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "6530 (MIOT)");				break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "I/O devices");				break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");						break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }

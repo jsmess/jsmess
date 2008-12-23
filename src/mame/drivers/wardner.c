@@ -124,6 +124,7 @@ out:
 
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "cpu/tms32010/tms32010.h"
 #include "twincobr.h"
 #include "sound/3812intf.h"
@@ -451,7 +452,7 @@ static MACHINE_DRIVER_START( wardner )
 	/* Data Map is internal to the CPU */
 	MDRV_CPU_IO_MAP(DSP_io_map, 0)
 
-	MDRV_INTERLEAVE(100)					/* 100 CPU slices per frame */
+	MDRV_QUANTUM_TIME(HZ(6000))					/* 100 CPU slices per frame */
 
 	MDRV_MACHINE_RESET(wardner)
 

@@ -355,7 +355,7 @@ static MACHINE_DRIVER_START( oric )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M6502, 1000000)
 	MDRV_CPU_PROGRAM_MAP(oric_mem, 0)
-	MDRV_INTERLEAVE(1)
+	MDRV_QUANTUM_TIME(HZ(60))
 
 	MDRV_MACHINE_START( oric )
 	MDRV_MACHINE_RESET( oric )

@@ -229,6 +229,7 @@ DONE? (check on real board)
 *****************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"
 #include "includes/stfight.h"
@@ -462,7 +463,7 @@ static MACHINE_DRIVER_START( stfight )
 	MDRV_CPU_PROGRAM_MAP(readmem_cpu2,writemem_cpu2)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,120)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_MACHINE_RESET(stfight)
 

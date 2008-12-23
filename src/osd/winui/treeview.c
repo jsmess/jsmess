@@ -872,6 +872,8 @@ static const char* TrimManufacturer(const char *s)
 
 void CreateCPUFolders(int parent_index)
 {
+// FIXME 0.128u7
+#if 0
 	int i,jj;
 	int nGames = driver_list_get_count(drivers);
 	int nFolder = numFolders;
@@ -928,6 +930,7 @@ void CreateCPUFolders(int parent_index)
 		}
 		machine_config_free(config);
 	}
+#endif
 }
 
 void CreateSoundFolders(int parent_index)

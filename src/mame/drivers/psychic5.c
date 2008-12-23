@@ -310,6 +310,7 @@ The first sprite data is located at f20b,then f21b and so on.
 */
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "sound/2203intf.h"
 
@@ -340,7 +341,7 @@ static UINT8 psychic5_bank_latch;
 static MACHINE_RESET( psychic5 )
 {
 	psychic5_bank_latch = 0xff;
-	flip_screen_set(0);
+	flip_screen_set(machine, 0);
 }
 
 /***************************************************************************
@@ -403,7 +404,7 @@ static WRITE8_HANDLER( psychic5_coin_counter_w )
 	// bit 7 toggles flip screen
 	if (data & 0x80)
 	{
-		flip_screen_set(!flip_screen_get());
+		flip_screen_set(space->machine, !flip_screen_get(space->machine));
 	}
 }
 
@@ -412,7 +413,7 @@ static WRITE8_HANDLER( bombsa_flipscreen_w )
 	// bit 7 toggles flip screen
 	if (data & 0x80)
 	{
-		flip_screen_set(!flip_screen_get());
+		flip_screen_set(space->machine, !flip_screen_get(space->machine));
 	}
 }
 
@@ -691,7 +692,7 @@ static MACHINE_DRIVER_START( psychic5 )
 	MDRV_CPU_PROGRAM_MAP(psychic5_sound_map,0)
 	MDRV_CPU_IO_MAP(psychic5_soundport_map,0)
 
-	MDRV_INTERLEAVE(10)      /* Allow time for 2nd cpu to interleave */
+	MDRV_QUANTUM_TIME(HZ(600))      /* Allow time for 2nd cpu to interleave */
 	MDRV_MACHINE_RESET(psychic5)
 
 	/* video hardware */
@@ -738,7 +739,7 @@ static MACHINE_DRIVER_START( bombsa )
 	MDRV_CPU_PROGRAM_MAP(bombsa_sound_map,0)
 	MDRV_CPU_IO_MAP(bombsa_soundport_map,0)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 	MDRV_MACHINE_RESET(psychic5)
 
 	/* video hardware */

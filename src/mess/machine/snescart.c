@@ -119,14 +119,14 @@ static int char_to_int_conv( char id )
 ***************************************************************************/
 
 /* Loads the battery backed RAM into the appropriate memory area */
-static void snes_load_sram(void)
+static void snes_load_sram(running_machine *machine)
 {
 	UINT8 ii;
 	UINT8 *battery_ram, *ptr;
 
 	battery_ram = malloc_or_die(snes_cart.sram_max);
 	ptr = battery_ram;
-	image_battery_load(image_from_devtype_and_index(IO_CARTSLOT,0), battery_ram, snes_cart.sram_max);
+	image_battery_load(image_from_devtype_and_index(machine, IO_CARTSLOT,0), battery_ram, snes_cart.sram_max);
 
 	if (snes_cart.mode == SNES_MODE_20)
 	{
@@ -165,7 +165,7 @@ static void snes_load_sram(void)
 }
 
 /* Saves the battery backed RAM from the appropriate memory area */
-static void snes_save_sram(void)
+static void snes_save_sram(running_machine *machine)
 {
 	UINT8 ii;
 	UINT8 *battery_ram, *ptr;
@@ -198,7 +198,7 @@ static void snes_save_sram(void)
 		}
 	}
 
-	image_battery_save(image_from_devtype_and_index(IO_CARTSLOT,0), battery_ram, snes_cart.sram_max);
+	image_battery_save(image_from_devtype_and_index(machine, IO_CARTSLOT,0), battery_ram, snes_cart.sram_max);
 
 	free(battery_ram);
 }
@@ -207,7 +207,7 @@ static void snes_machine_stop(running_machine *machine)
 {
 	/* Save SRAM */
 	if( snes_cart.sram > 0 )
-		snes_save_sram();
+		snes_save_sram(machine);
 }
 
 MACHINE_START( snes_mess )
@@ -761,7 +761,7 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 	}
 
 	/* Load SRAM */
-	snes_load_sram();
+	snes_load_sram(space->machine);
 
 	/* All done */
 	return INIT_PASS;

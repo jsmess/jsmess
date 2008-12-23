@@ -460,7 +460,7 @@ MACHINE_DRIVER_START( spectrum )
 	MDRV_CPU_PROGRAM_MAP(spectrum_mem, 0)
 	MDRV_CPU_IO_MAP(spectrum_io, 0)
 	MDRV_CPU_VBLANK_INT("main", spec_interrupt)
-	MDRV_INTERLEAVE(1)
+	MDRV_QUANTUM_TIME(HZ(60))
 
 	MDRV_MACHINE_RESET( spectrum )
 

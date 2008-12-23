@@ -309,18 +309,18 @@ struct _amiga_machine_interface
 {
 	UINT32 chip_ram_mask;
 
-	UINT16 (*joy0dat_r)(void);
-	UINT16 (*joy1dat_r)(void);
-	void (*potgo_w)(UINT16 data);
+	UINT16 (*joy0dat_r)(running_machine *machine);
+	UINT16 (*joy1dat_r)(running_machine *machine);
+	void (*potgo_w)(running_machine *machine, UINT16 data);
 
-	UINT16 (*dskbytr_r)(void);
-	void (*dsklen_w)(UINT16 data);
+	UINT16 (*dskbytr_r)(running_machine *machine);
+	void (*dsklen_w)(running_machine *machine, UINT16 data);
 
-	void (*serdat_w)(UINT16 data);
+	void (*serdat_w)(running_machine *machine, UINT16 data);
 
-	void (*scanline0_callback)(void);
-	void (*reset_callback)(void);
-	void (*nmi_callback)(void);
+	void (*scanline0_callback)(running_machine *machine);
+	void (*reset_callback)(running_machine *machine);
+	void (*nmi_callback)(running_machine *machine);
 
 	UINT32 flags;
 };
@@ -342,10 +342,10 @@ struct _amiga_autoconfig_device
 	UINT16		mfr_number;			/* manufacturers number */
 	UINT32		serial_number;		/* serial number */
 	UINT16		rom_vector;			/* ROM vector offset */
-	UINT8		(*int_control_r)(void); /* interrupt control read */
-	void		(*int_control_w)(UINT8 data); /* interrupt control write */
-	void		(*install)(offs_t base); /* memory installation */
-	void		(*uninstall)(offs_t base); /* memory uninstallation */
+	UINT8		(*int_control_r)(running_machine *machine); /* interrupt control read */
+	void		(*int_control_w)(running_machine *machine, UINT8 data); /* interrupt control write */
+	void		(*install)(running_machine *machine, offs_t base); /* memory installation */
+	void		(*uninstall)(running_machine *machine, offs_t base); /* memory uninstallation */
 };
 
 
@@ -376,10 +376,10 @@ WRITE16_HANDLER( amiga_cia_w );
 READ16_HANDLER( amiga_custom_r );
 WRITE16_HANDLER( amiga_custom_w );
 
-void amiga_serial_in_w(UINT16 data);
-attotime amiga_get_serial_char_period(void);
+void amiga_serial_in_w(running_machine *machine, UINT16 data);
+attotime amiga_get_serial_char_period(running_machine *machine);
 
-void amiga_add_autoconfig(const amiga_autoconfig_device *device);
+void amiga_add_autoconfig(running_machine *machine, const amiga_autoconfig_device *device);
 READ16_HANDLER( amiga_autoconfig_r );
 WRITE16_HANDLER( amiga_autoconfig_w );
 

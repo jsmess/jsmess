@@ -213,7 +213,7 @@ Thrill Drive 713A13  -       713A14  -
 */
 
 #include "driver.h"
-#include "deprecat.h"
+#include "cpu/m68000/m68000.h"
 #include "cpu/powerpc/ppc.h"
 #include "cpu/sharc/sharc.h"
 #include "machine/konppc.h"
@@ -734,16 +734,16 @@ static VIDEO_UPDATE( nwktr )
 
 /*****************************************************************************/
 
-static double adc12138_input_callback(int input)
+static double adc12138_input_callback(running_machine *machine, int input)
 {
 	int value = 0;
 	switch (input)
 	{
-		case 0:		value = input_port_read(Machine, "ANALOG1") - 0x800; break;
-		case 1:		value = input_port_read(Machine, "ANALOG2"); break;
-		case 2:		value = input_port_read(Machine, "ANALOG3"); break;
-		case 3:		value = input_port_read(Machine, "ANALOG4"); break;
-		case 4:		value = input_port_read(Machine, "ANALOG5"); break;
+		case 0:		value = input_port_read(machine, "ANALOG1") - 0x800; break;
+		case 1:		value = input_port_read(machine, "ANALOG2"); break;
+		case 2:		value = input_port_read(machine, "ANALOG3"); break;
+		case 3:		value = input_port_read(machine, "ANALOG4"); break;
+		case 4:		value = input_port_read(machine, "ANALOG5"); break;
 	}
 
 	return (double)(value) / 2047.0;
@@ -804,7 +804,7 @@ static WRITE32_HANDLER( sysreg_w )
 			int di = (data >> 25) & 0x1;
 			int sclk = (data >> 24) & 0x1;
 
-			adc1213x_cs_w(0, cs);
+			adc1213x_cs_w(space->machine, 0, cs);
 			adc1213x_conv_w(0, conv);
 			adc1213x_di_w(0, di);
 			adc1213x_sclk_w(0, sclk);
@@ -949,14 +949,14 @@ static WRITE32_HANDLER( lanc2_w )
 static MACHINE_START( nwktr )
 {
 	/* set conservative DRC options */
-	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_DRC_OPTIONS, PPCDRC_COMPATIBLE_OPTIONS);
+	device_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_DRC_OPTIONS, PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_SELECT, 0);
-	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_START, 0x00000000);
-	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_END, 0x003fffff);
-	cpu_set_info_ptr(machine->cpu[0], CPUINFO_PTR_PPC_FASTRAM_BASE, work_ram);
-	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_READONLY, 0);
+	device_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_SELECT, 0);
+	device_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_START, 0x00000000);
+	device_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_END, 0x003fffff);
+	device_set_info_ptr(machine->cpu[0], CPUINFO_PTR_PPC_FASTRAM_BASE, work_ram);
+	device_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_READONLY, 0);
 }
 
 static ADDRESS_MAP_START( nwktr_map, ADDRESS_SPACE_PROGRAM, 32 )
@@ -1090,11 +1090,6 @@ static MACHINE_RESET( nwktr )
 	cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-static const timekeeper_config timekeeper_intf =
-{
-	"m48t58"
-};
-
 static MACHINE_DRIVER_START( nwktr )
 
 	/* basic machine hardware */
@@ -1108,7 +1103,7 @@ static MACHINE_DRIVER_START( nwktr )
 	MDRV_CPU_CONFIG(sharc_cfg)
 	MDRV_CPU_DATA_MAP(sharc_map, 0)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	MDRV_MACHINE_START(nwktr)
 	MDRV_MACHINE_RESET(nwktr)
@@ -1137,8 +1132,7 @@ static MACHINE_DRIVER_START( nwktr )
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 
-	MDRV_DEVICE_ADD( "m48t58", M48T58 )
-	MDRV_DEVICE_CONFIG( timekeeper_intf )
+	MDRV_M48T58_ADD( "m48t58" )
 MACHINE_DRIVER_END
 
 /*****************************************************************************/
@@ -1153,8 +1147,8 @@ static void sound_irq_callback(running_machine *machine, int irq)
 
 static DRIVER_INIT(nwktr)
 {
-	init_konami_cgboard(1, CGBOARD_TYPE_NWKTR);
-	set_cgboard_texture_bank(0, 5, memory_region(machine, "user5"));
+	init_konami_cgboard(machine, 1, CGBOARD_TYPE_NWKTR);
+	set_cgboard_texture_bank(machine, 0, 5, memory_region(machine, "user5"));
 
 	sharc_dataram = auto_malloc(0x100000);
 	led_reg0 = led_reg1 = 0x7f;
@@ -1162,8 +1156,8 @@ static DRIVER_INIT(nwktr)
 	K056800_init(machine, sound_irq_callback);
 	K033906_init(machine);
 
-//  cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_SPU_TX_HANDLER, (genf *)jamma_jvs_w);
-//  cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_SPU_RX_HANDLER, (genf *)jamma_jvs_r);
+//  device_set_info_fct(machine->cpu[0], CPUINFO_FCT_SPU_TX_HANDLER, (genf *)jamma_jvs_w);
+//  device_set_info_fct(machine->cpu[0], CPUINFO_FCT_SPU_RX_HANDLER, (genf *)jamma_jvs_r);
 
 	adc1213x_init(0, adc12138_input_callback);
 	lanc2_init();

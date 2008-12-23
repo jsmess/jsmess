@@ -10,6 +10,9 @@
 
 #define CRTC_EGA	DEVICE_GET_INFO_NAME(crtc_ega)
 
+#define MDRV_CRTC_EGA_ADD(_tag, _clock, _intrf) \
+	MDRV_DEVICE_ADD(_tag, CRTC_EGA, _clock) \
+	MDRV_DEVICE_CONFIG(_intrf)
 
 /* callback definitions */
 typedef void * (*crtc_ega_begin_update_func)(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect);
@@ -43,7 +46,6 @@ typedef struct _crtc_ega_interface crtc_ega_interface;
 struct _crtc_ega_interface
 {
 	const char *screen_tag;		/* screen we are acting on */
-	int clock;					/* the clock of the chip */
 	int hpixels_per_column;		/* number of pixels per video memory address */
 
 	/* if specified, this gets called before any pixel update,

@@ -48,6 +48,7 @@
 #include "cpuexec.h"
 #include "streams.h"
 #include "nes_apu.h"
+#include "driver.h"
 #include "cpu/m6502/m6502.h"
 
 #include "nes_defs.h"
@@ -659,10 +660,10 @@ WRITE8_HANDLER( nes_psg_0_w ) {apu_write(0,offset,data);}
 WRITE8_HANDLER( nes_psg_1_w ) {apu_write(1,offset,data);}
 
 /* UPDATE APU SYSTEM */
-static void nes_psg_update_sound(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length)
+static STREAM_UPDATE( nes_psg_update_sound )
 {
   struct nesapu_info *info = param;
-  apu_update(info, buffer[0], length);
+  apu_update(info, outputs[0], samples);
 }
 
 
@@ -775,17 +776,17 @@ SND_GET_INFO( nesapu )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( nesapu );       break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( nesapu );		break;
-		case SNDINFO_PTR_STOP:							/* Nothing */				break;
-		case SNDINFO_PTR_RESET:							/* Nothing */				break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( nesapu );	break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( nesapu );			break;
+		case SNDINFO_PTR_STOP:							/* Nothing */									break;
+		case SNDINFO_PTR_RESET:							/* Nothing */									break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:						info->s = "N2A03";				break;
-		case SNDINFO_STR_CORE_FAMILY:					info->s = "Nintendo custom";			break;
-		case SNDINFO_STR_CORE_VERSION:					info->s = "1.0";				break;
-		case SNDINFO_STR_CORE_FILE:					info->s = __FILE__;		      		break;
-		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright Nicola Salmoria and the MAME Team";  break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "N2A03");						break;
+		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Nintendo custom");				break;
+		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");							break;
+		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);      					break;
+		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team");  break;
 	}
 }
 

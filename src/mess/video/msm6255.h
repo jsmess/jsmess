@@ -16,7 +16,7 @@ typedef UINT8 (*msm6255_char_ram_read_func)(const device_config *device, UINT16 
 #define MSM6255		DEVICE_GET_INFO_NAME(msm6255)
 
 #define MDRV_MSM6255_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, MSM6255) \
+	MDRV_DEVICE_ADD(_tag, MSM6255, 0) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
 #define MDRV_MSM6255_REMOVE(_tag) \

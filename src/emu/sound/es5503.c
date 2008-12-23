@@ -141,7 +141,7 @@ static TIMER_CALLBACK( es5503_timer_cb )
 	stream_update(chip->stream);
 }
 
-static void es5503_pcm_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int length)
+static STREAM_UPDATE( es5503_pcm_update )
 {
 	INT32 mix[48000*2];
 	INT32 *mixp;
@@ -169,7 +169,7 @@ static void es5503_pcm_update(void *param, stream_sample_t **inputs, stream_samp
 			int resshift = resshifts[pOsc->resolution] - pOsc->wavetblsize;
 			UINT32 sizemask = accmasks[pOsc->wavetblsize];
 
-			for (snum = 0; snum < length; snum++)
+			for (snum = 0; snum < samples; snum++)
 			{
 				ramptr = (acc >> resshift) & sizemask;
 				altram = acc >> resshift;
@@ -216,7 +216,7 @@ static void es5503_pcm_update(void *param, stream_sample_t **inputs, stream_samp
 	}
 
 	mixp = &mix[0];
-	for (i = 0; i < length; i++)
+	for (i = 0; i < samples; i++)
 	{
 		outputs[0][i] = (*mixp++)>>1;
 		outputs[1][i] = (*mixp++)>>1;
@@ -534,17 +534,17 @@ SND_GET_INFO( es5503 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( es5503 );		break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( es5503 );				break;
-		case SNDINFO_PTR_STOP:							/* Nothing */							break;
-		case SNDINFO_PTR_RESET:							/* Nothing */							break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( es5503 );	break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( es5503 );			break;
+		case SNDINFO_PTR_STOP:							/* Nothing */									break;
+		case SNDINFO_PTR_RESET:							/* Nothing */									break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							info->s = "ES5503";						break;
-		case SNDINFO_STR_CORE_FAMILY:					info->s = "Ensoniq ES550x";					break;
-		case SNDINFO_STR_CORE_VERSION:					info->s = "1.0";						break;
-		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
-		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright R. Belmont"; break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "ES5503");						break;
+		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Ensoniq ES550x");				break;
+		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");							break;
+		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
+		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright R. Belmont");	 	break;
 	}
 }
 

@@ -104,10 +104,10 @@ void ym2608_update_request(void *param)
 	stream_update(info->stream);
 }
 
-static void ym2608_stream_update(void *param, stream_sample_t **inputs, stream_sample_t **buffers, int length)
+static STREAM_UPDATE( ym2608_stream_update )
 {
 	struct ym2608_info *info = param;
-	ym2608_update_one(info->chip, buffers, length);
+	ym2608_update_one(info->chip, outputs, samples);
 }
 
 
@@ -317,10 +317,10 @@ SND_GET_INFO( ym2608 )
 		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( ym2608 );				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							info->s = "YM2608";						break;
-		case SNDINFO_STR_CORE_FAMILY:					info->s = "Yamaha FM";					break;
-		case SNDINFO_STR_CORE_VERSION:					info->s = "1.0";						break;
-		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
-		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "YM2608");							break;
+		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Yamaha FM");						break;
+		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");								break;
+		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);							break;
+		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }

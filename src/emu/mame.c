@@ -25,7 +25,6 @@
             - calls init_machine() [mame.c]
 
             init_machine() [mame.c]
-                - calls cpuintrf_init() [cpuintrf.c] to determine which CPUs are available
                 - calls sndintrf_init() [sndintrf.c] to determine which sound chips are available
                 - calls fileio_init() [fileio.c] to initialize file I/O info
                 - calls config_init() [config.c] to initialize configuration system
@@ -182,7 +181,7 @@ struct _mame_private
 ***************************************************************************/
 
 /* the active machine */
-running_machine *Machine;
+static running_machine *Machine;
 
 /* the current options */
 static core_options *mame_opts;
@@ -216,7 +215,6 @@ extern int mame_validitychecks(const game_driver *driver);
 static int parse_ini_file(core_options *options, const char *name);
 
 static running_machine *create_machine(const game_driver *driver);
-static void prepare_machine(running_machine *machine);
 static void destroy_machine(running_machine *machine);
 static void init_machine(running_machine *machine);
 static TIMER_CALLBACK( soft_reset );
@@ -241,11 +239,10 @@ static void logfile_callback(running_machine *machine, const char *buffer);
 
 INLINE void eat_all_cpu_cycles(running_machine *machine)
 {
-	int cpunum;
+	const device_config *cpu;
 
-	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
-		if (machine->cpu[cpunum] != NULL)
-			cpu_eat_cycles(machine->cpu[cpunum], 1000000000);
+	for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+		cpu_eat_cycles(cpu, 1000000000);
 }
 
 
@@ -301,7 +298,6 @@ int mame_execute(core_options *options)
 
 		/* create the machine structure and driver */
 		machine = create_machine(driver);
-		prepare_machine(machine);
 		mame = machine->mame_data;
 
 		/* start in the "pre-init phase" */
@@ -1148,6 +1144,7 @@ static void fatalerror_common(running_machine *machine, int exitcode, const char
 
 void CLIB_DECL fatalerror(const char *text, ...)
 {
+	extern running_machine *Machine;
 	running_machine *machine = Machine;
 	va_list arg;
 
@@ -1206,6 +1203,7 @@ void CLIB_DECL popmessage(const char *format, ...)
 
 void CLIB_DECL logerror(const char *format, ...)
 {
+	extern running_machine *Machine;
 	running_machine *machine = Machine;
 
 	/* currently, we need a machine to do this */
@@ -1404,18 +1402,28 @@ static running_machine *create_machine(const game_driver *driver)
 	machine->basename = mame_strdup(driver->name);
 	machine->config = machine_config_alloc(driver->machine_config);
 
-	/* temporary: create fake CPU devices */
-	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
-		if (machine->config->cpu[cpunum].type != CPU_DUMMY)
-			machine->cpu[cpunum] = cpuexec_create_cpu_device(&machine->config->cpu[cpunum]);
-
 	/* allocate the driver data */
 	if (machine->config->driver_data_size != 0)
 	{
 		machine->driver_data = malloc(machine->config->driver_data_size);
 		if (machine->driver_data == NULL)
 			goto error;
+		memset(machine->driver_data, 0, machine->config->driver_data_size);
 	}
+
+	/* find devices */
+	machine->cpu[0] = cpu_first(machine->config);
+	for (cpunum = 1; cpunum < ARRAY_LENGTH(machine->cpu) && machine->cpu[cpunum - 1] != NULL; cpunum++)
+		machine->cpu[cpunum] = machine->cpu[cpunum - 1]->typenext;
+	machine->primary_screen = video_screen_first(machine->config);
+
+	/* attach this machine to all the devices in the configuration */
+	device_list_attach_machine(machine);
+
+	/* fetch core options */
+	machine->sample_rate = options_get_int(mame_options(), OPTION_SAMPLERATE);
+	machine->debug_flags = options_get_bool(mame_options(), OPTION_DEBUG) ? (DEBUG_FLAG_ENABLED | DEBUG_FLAG_CALL_HOOK) : 0;
+
 	return machine;
 
 error:
@@ -1432,56 +1440,12 @@ error:
 
 
 /*-------------------------------------------------
-    prepare_machine - reset the state of the
-    machine object
--------------------------------------------------*/
-
-static void prepare_machine(running_machine *machine)
-{
-	/* reset most portions of the machine */
-
-	/* graphics layout */
-	memset(machine->gfx, 0, sizeof(machine->gfx));
-
-	/* palette-related information */
-	machine->pens = NULL;
-	machine->shadow_table = NULL;
-
-	/* audio-related information */
-	machine->sample_rate = options_get_int(mame_options(), OPTION_SAMPLERATE);
-
-	/* input-related information */
-	machine->portconfig = NULL;
-
-	/* debugger-related information */
-	machine->debug_flags = options_get_bool(mame_options(), OPTION_DEBUG) ? (DEBUG_FLAG_ENABLED | DEBUG_FLAG_CALL_HOOK) : 0;
-
-	/* reset the global MAME data and clear the other privates */
-	memset(machine->mame_data, 0, sizeof(*machine->mame_data));
-	machine->palette_data = NULL;
-	machine->streams_data = NULL;
-
-	/* reset the driver data */
-	if (machine->config->driver_data_size != 0)
-		memset(machine->driver_data, 0, machine->config->driver_data_size);
-}
-
-
-
-/*-------------------------------------------------
     destroy_machine - free the machine data
 -------------------------------------------------*/
 
 static void destroy_machine(running_machine *machine)
 {
-	int cpunum;
-
 	assert(machine == Machine);
-
-	/* temporary: free the fake CPU devices */
-	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
-		if (machine->cpu[cpunum] != NULL)
-			free((void *)machine->cpu[cpunum]);
 
 	if (machine->driver_data != NULL)
 		free(machine->driver_data);
@@ -1507,7 +1471,6 @@ static void init_machine(running_machine *machine)
 	time_t newbase;
 
 	/* initialize basic can't-fail systems here */
-	cpuintrf_init(machine);
 	sndintrf_init(machine);
 	fileio_init(machine);
 	config_init(machine);
@@ -1560,15 +1523,15 @@ static void init_machine(running_machine *machine)
 	mess_predevice_init(machine);
 #endif /* MESS */
 
+	/* start up the devices */
+	device_list_start(machine);
+
 	/* call the game driver's init function */
 	/* this is where decryption is done and memory maps are altered */
 	/* so this location in the init order is important */
 	ui_set_startup_text(machine, "Initializing...", TRUE);
 	if (machine->gamedrv->driver_init != NULL)
 		(*machine->gamedrv->driver_init)(machine);
-
-	/* start up the devices */
-	device_list_start(machine);
 
 #ifdef MESS
 	/* second MESS initialization */

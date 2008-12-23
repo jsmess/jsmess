@@ -258,6 +258,7 @@ TODO:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "snk.h"
 #include "sound/snkwave.h"
 #include "sound/ay8910.h"
@@ -3584,7 +3585,7 @@ static MACHINE_DRIVER_START( marvins )
 	MDRV_CPU_IO_MAP(marvins_sound_portmap,0)
 	MDRV_CPU_PERIODIC_INT(nmi_line_assert, 244)	// schematics show a separate 244Hz timer
 
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
@@ -3645,7 +3646,7 @@ static MACHINE_DRIVER_START( jcross )
 	MDRV_CPU_IO_MAP(jcross_sound_portmap,0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_assert, 244)	// Marvin's frequency, sounds ok
 
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
@@ -3728,7 +3729,7 @@ static MACHINE_DRIVER_START( tnk3 )
 	MDRV_CPU_ADD("audio", Z80, XTAL_8MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(tnk3_YM3526_sound_map,0)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
@@ -3819,7 +3820,7 @@ static MACHINE_DRIVER_START( ikari )
 	MDRV_CPU_ADD("audio", Z80, XTAL_8MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(YM3526_YM3526_sound_map,0)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
@@ -3879,7 +3880,7 @@ static MACHINE_DRIVER_START( bermudat )
 	MDRV_CPU_ADD("audio", Z80, XTAL_8MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(YM3526_Y8950_sound_map,0)
 
-	MDRV_INTERLEAVE(400)
+	MDRV_QUANTUM_TIME(HZ(24000))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -3990,7 +3991,7 @@ static MACHINE_DRIVER_START( tdfever )
 	MDRV_CPU_ADD("audio", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(YM3526_Y8950_sound_map,0)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)

@@ -3,6 +3,6 @@
 
 void amiga_cart_init( running_machine *machine );
 void amiga_cart_check_overlay( running_machine *machine );
-void amiga_cart_nmi( void );
+void amiga_cart_nmi( running_machine *machine );
 
 #endif /* AMIGACRT_H */

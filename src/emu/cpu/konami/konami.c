@@ -522,7 +522,7 @@ static CPU_SET_INFO( konami )
 		case CPUINFO_INT_REGISTER + KONAMI_DP:			DP = info->i;							break;
 
 		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_PTR_KONAMI_SETLINES_CALLBACK:		cpustate->setlines_callback = (konami_set_lines_func)info->f; break;
+		case CPUINFO_FCT_KONAMI_SETLINES_CALLBACK:		cpustate->setlines_callback = (konami_set_lines_func)info->f; break;
 	}
 }
 
@@ -549,15 +549,15 @@ CPU_GET_INFO( konami )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 13;							break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 8;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 16;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE + KONAMI_IRQ_LINE:	info->i = cpustate->irq_state[KONAMI_IRQ_LINE]; break;
 		case CPUINFO_INT_INPUT_STATE + KONAMI_FIRQ_LINE:info->i = cpustate->irq_state[KONAMI_FIRQ_LINE]; break;
@@ -578,15 +578,15 @@ CPU_GET_INFO( konami )
 		case CPUINFO_INT_REGISTER + KONAMI_DP:			info->i = DP;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(konami);		break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(konami);				break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(konami);			break;
-		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(konami);				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(konami);		break;
-		case CPUINFO_PTR_BURN:							info->burn = NULL;								break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(konami);break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(konami);		break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(konami);				break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(konami);			break;
+		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(konami);				break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(konami);		break;
+		case CPUINFO_FCT_BURN:							info->burn = NULL;								break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(konami);break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;				break;
-		case CPUINFO_PTR_KONAMI_SETLINES_CALLBACK:		info->f = (genf *)cpustate->setlines_callback;	break;
+		case CPUINFO_FCT_KONAMI_SETLINES_CALLBACK:		info->f = (genf *)cpustate->setlines_callback;	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "KONAMI");				break;

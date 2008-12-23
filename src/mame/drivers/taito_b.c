@@ -168,7 +168,7 @@ Notes:
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
+#include "cpu/z80/z80.h"
 #include "taitoipt.h"
 #include "cpu/m68000/m68000.h"
 #include "video/taitoic.h"
@@ -341,12 +341,12 @@ static WRITE16_HANDLER( gain_control_w )
 	{
 		if (offset==0)
 		{
-			MB87078_data_w(0, data>>8, 0);
+			MB87078_data_w(space->machine, 0, data>>8, 0);
             //logerror("MB87078 dsel=0 data=%4x\n",data);
 		}
 		else
 		{
-			MB87078_data_w(0, data>>8, 1);
+			MB87078_data_w(space->machine, 0, data>>8, 1);
             //logerror("MB87078 dsel=1 data=%4x\n",data);
 		}
 	}
@@ -2387,11 +2387,11 @@ static const ym2203_interface ym2203_config =
     Both ym2610 and ym2610b generate 3 (PSG like) + 2 (fm left,right) channels.
     I use mixer_set_volume() to emulate the effect.
 */
-static void mb87078_gain_changed(int channel, int percent)
+static void mb87078_gain_changed(running_machine *machine, int channel, int percent)
 {
 	if (channel==1)
 	{
-		sound_type type = Machine->config->sound[0].type;
+		sound_type type = machine->config->sound[0].type;
 		sndti_set_output_gain(type, 0, 0, percent / 100.0);
 		sndti_set_output_gain(type, 1, 0, percent / 100.0);
 		sndti_set_output_gain(type, 2, 0, percent / 100.0);
@@ -2407,7 +2407,7 @@ static const struct MB87078interface mb87078_interface =
 
 static MACHINE_RESET( mb87078 )
 {
-	MB87078_start(0, &mb87078_interface); /*chip #0*/
+	MB87078_start(machine, 0, &mb87078_interface); /*chip #0*/
 /*
     {
         int i;
@@ -2428,7 +2428,7 @@ static MACHINE_DRIVER_START( rastsag2 )
 	MDRV_CPU_ADD("audio", Z80, 4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -2466,7 +2466,7 @@ static MACHINE_DRIVER_START( ashura )
 	MDRV_CPU_ADD("audio", Z80, 4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -2504,7 +2504,7 @@ static MACHINE_DRIVER_START( crimec )
 	MDRV_CPU_ADD("audio", Z80, 4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -2542,7 +2542,7 @@ static MACHINE_DRIVER_START( tetrist )
 	MDRV_CPU_ADD("audio", Z80, 4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -2579,7 +2579,7 @@ static MACHINE_DRIVER_START( tetrista )
 	MDRV_CPU_ADD("audio", Z80, 4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(masterw_sound_readmem,masterw_sound_writemem)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -2617,7 +2617,7 @@ static MACHINE_DRIVER_START( hitice )
 	MDRV_CPU_ADD("audio", Z80, 4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(viofight_sound_readmem, viofight_sound_writemem)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -2661,7 +2661,7 @@ static MACHINE_DRIVER_START( rambo3 )
 	MDRV_CPU_ADD("audio", Z80, XTAL_24MHz/6)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -2699,7 +2699,7 @@ static MACHINE_DRIVER_START( rambo3a )
 	MDRV_CPU_ADD("audio", Z80, XTAL_24MHz/6)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -2737,7 +2737,7 @@ static MACHINE_DRIVER_START( pbobble )
 	MDRV_CPU_ADD("audio", Z80, 4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_MACHINE_RESET(mb87078)
 	MDRV_NVRAM_HANDLER(taito_b)
@@ -2778,7 +2778,7 @@ static MACHINE_DRIVER_START( spacedx )
 	MDRV_CPU_ADD("audio", Z80, 4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_MACHINE_RESET(mb87078)
 	MDRV_NVRAM_HANDLER(taito_b)
@@ -2819,7 +2819,7 @@ static MACHINE_DRIVER_START( spacedxo )
 	MDRV_CPU_ADD("audio", Z80, 4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -2857,7 +2857,7 @@ static MACHINE_DRIVER_START( qzshowby )
 	MDRV_CPU_ADD("audio", Z80, 4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_MACHINE_RESET(mb87078)
 	MDRV_NVRAM_HANDLER(taito_b)
@@ -2898,7 +2898,7 @@ static MACHINE_DRIVER_START( viofight )
 	MDRV_CPU_ADD("audio", Z80, 6000000)	/* 6 MHz verified */
 	MDRV_CPU_PROGRAM_MAP(viofight_sound_readmem, viofight_sound_writemem)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -2940,7 +2940,7 @@ static MACHINE_DRIVER_START( masterw )
 	MDRV_CPU_ADD("audio", Z80, 4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(masterw_sound_readmem,masterw_sound_writemem)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -2979,7 +2979,7 @@ static MACHINE_DRIVER_START( silentd )
 	MDRV_CPU_ADD("audio", Z80, 4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -3017,7 +3017,7 @@ static MACHINE_DRIVER_START( selfeena )
 	MDRV_CPU_ADD("audio", Z80, 4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -3064,7 +3064,7 @@ static MACHINE_DRIVER_START( ryujin )
 	MDRV_CPU_ADD("audio", Z80, 4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -3109,7 +3109,7 @@ static MACHINE_DRIVER_START( sbm )
 	MDRV_CPU_ADD("audio", Z80, 4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

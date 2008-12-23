@@ -118,7 +118,7 @@ static void sound_save(running_machine *machine, int config_type, xml_data_node 
 static TIMER_CALLBACK( sound_update );
 static void start_sound_chips(running_machine *machine);
 static void route_sound(running_machine *machine);
-static void mixer_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length);
+static STREAM_UPDATE( mixer_update );
 static STATE_POSTLOAD( mixer_postload );
 
 
@@ -770,16 +770,16 @@ static TIMER_CALLBACK( sound_update )
     mixer_update - mix all inputs to one output
 -------------------------------------------------*/
 
-static void mixer_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length)
+static STREAM_UPDATE( mixer_update )
 {
 	speaker_info *speaker = param;
 	int numinputs = speaker->inputs;
 	int pos;
 
-	VPRINTF(("Mixer_update(%d)\n", length));
+	VPRINTF(("Mixer_update(%d)\n", samples));
 
 	/* loop over samples */
-	for (pos = 0; pos < length; pos++)
+	for (pos = 0; pos < samples; pos++)
 	{
 		INT32 sample = inputs[0][pos];
 		int inp;
@@ -787,7 +787,7 @@ static void mixer_update(void *param, stream_sample_t **inputs, stream_sample_t 
 		/* add up all the inputs */
 		for (inp = 1; inp < numinputs; inp++)
 			sample += inputs[inp][pos];
-		buffer[0][pos] = sample;
+		outputs[0][pos] = sample;
 	}
 }
 
@@ -878,11 +878,11 @@ DEVICE_GET_INFO( speaker_output )
 		case DEVINFO_FCT_RESET:							/* Nothing */							break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "Speaker";					break;
-		case DEVINFO_STR_FAMILY:						info->s = "Sound";						break;
-		case DEVINFO_STR_VERSION:						info->s = "1.0";						break;
-		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;						break;
-		case DEVINFO_STR_CREDITS:						info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Speaker");				break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Sound");				break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");					break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);				break;
+		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

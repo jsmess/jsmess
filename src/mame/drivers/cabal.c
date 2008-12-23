@@ -45,6 +45,7 @@ Dip locations verified with Fabtek manual for the trackball version
 ******************************************************************/
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "audio/seibu.h"
 #include "sound/2151intf.h"
@@ -559,7 +560,7 @@ static MACHINE_DRIVER_START( cabalbl )
 	MDRV_CPU_IO_MAP(cabalbl_talk2_portmap,0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,8000)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_MACHINE_RESET(cabalbl)
 

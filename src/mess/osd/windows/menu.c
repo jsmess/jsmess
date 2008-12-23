@@ -2112,7 +2112,7 @@ int win_create_menu(running_machine *machine, HMENU *menus)
 	HMENU menu_bar = NULL;
 	HMODULE module;
 
-	if (ui_mess_use_new_ui(machine))
+	if (ui_mess_use_new_ui())
 	{
 		module = win_resource_module();
 		menu_bar = LoadMenu(module, MAKEINTRESOURCE(IDR_RUNTIME_MENU));
@@ -2148,7 +2148,8 @@ LRESULT CALLBACK win_mess_window_proc(HWND wnd, UINT message, WPARAM wparam, LPA
 			break;
 
 		case WM_PASTE:
-			ui_mess_paste(Machine);
+			// FIXME 0.128u7
+			ui_mess_paste(NULL /*Machine*/);
 			break;
 
 		case WM_COMMAND:

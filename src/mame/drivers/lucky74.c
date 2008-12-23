@@ -667,6 +667,7 @@
 
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/sn76496.h"
 #include "sound/msm5205.h"
@@ -724,7 +725,7 @@ static WRITE8_HANDLER( ym2149_portb_w )
     bit 0 contains the screen orientation.
 */
 	ym2149_portb = data;
-	flip_screen_set(data & 0x01);
+	flip_screen_set(space->machine, data & 0x01);
 }
 
 static READ8_HANDLER( usart_8251_r )

@@ -293,6 +293,8 @@ Notes:
 ****************************************************************************/
 
 #include "driver.h"
+#include "cpu/tms32031/tms32031.h"
+#include "cpu/m6800/m6800.h"
 #include "deprecat.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m68000/m68000.h"
@@ -1745,7 +1747,7 @@ static MACHINE_DRIVER_START( drivedge )
 //  MDRV_CPU_ADD("comm", M6803, 8000000/4) -- network CPU
 
 	MDRV_MACHINE_RESET(drivedge)
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 MACHINE_DRIVER_END
 
 
@@ -1773,7 +1775,7 @@ static MACHINE_DRIVER_START( tourny )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(sftm)
 
-	MDRV_DEVICE_ADD( "m48t02", M48T02 )
+	MDRV_M48T02_ADD( "m48t02"  )
 MACHINE_DRIVER_END
 
 

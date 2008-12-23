@@ -146,7 +146,7 @@ static TIMER_CALLBACK( perform_player_update );
 static void read_track_data(laserdisc_state *ld);
 static void process_track_data(const device_config *device);
 static CUSTOM_START( custom_start );
-static void custom_stream_callback(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+static STREAM_UPDATE( custom_stream_callback );
 static void configuration_load(running_machine *machine, int config_type, xml_data_node *parentnode);
 static void configuration_save(running_machine *machine, int config_type, xml_data_node *parentnode);
 
@@ -957,7 +957,7 @@ static CUSTOM_START( custom_start )
     for laserdiscs
 -------------------------------------------------*/
 
-static void custom_stream_callback(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+static STREAM_UPDATE( custom_stream_callback )
 {
 	sound_token *token = param;
 	laserdisc_state *ld = token->ld;
@@ -1634,10 +1634,10 @@ DEVICE_GET_INFO( laserdisc )
 		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(laserdisc);			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:					info->s = (intf != NULL) ? intf->name : "Unknown Laserdisc Player";	break;
-		case DEVINFO_STR_FAMILY:				info->s = "Laserdisc Player";						break;
-		case DEVINFO_STR_VERSION:				info->s = "1.0";									break;
-		case DEVINFO_STR_SOURCE_FILE:			info->s = __FILE__;									break;
-		case DEVINFO_STR_CREDITS:				info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case DEVINFO_STR_NAME:					strcpy(info->s, (intf != NULL) ? intf->name : "Unknown Laserdisc Player");	break;
+		case DEVINFO_STR_FAMILY:				strcpy(info->s, "Laserdisc Player");				break;
+		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0");								break;
+		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);							break;
+		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }

@@ -138,9 +138,9 @@ static INTERRUPT_GEN( tutor_vblank_interrupt )
 	TMS9928A_interrupt(device->machine);
 }
 
-static const device_config *printer_fp(void)
+static const device_config *printer_fp(running_machine *machine)
 {
-	return image_from_devtype_and_index(IO_PARALLEL, 0);
+	return image_from_devtype_and_index(machine, IO_PARALLEL, 0);
 }
 
 
@@ -331,7 +331,7 @@ static  READ8_HANDLER(tutor_printer_r)
 	{
 	case 0x20:
 		/* busy */
-		reply = printer_fp() ? 0xff : 0x00;
+		reply = printer_fp(space->machine) ? 0xff : 0x00;
 		break;
 
 	default:
@@ -358,8 +358,8 @@ static WRITE8_HANDLER(tutor_printer_w)
 		if (data && ! printer_strobe)
 		{
 			/* strobe is asserted: output data */
-			if (printer_fp())
-				image_fwrite(printer_fp(), & printer_data, 1);
+			if (printer_fp(space->machine))
+				image_fwrite(printer_fp(space->machine), & printer_data, 1);
 		}
 		printer_strobe = data != 0;
 		break;

@@ -99,6 +99,7 @@ TP-S.1 TP-S.2 TP-S.3 TP-B.1  8212 TP-B.2 TP-B.3          TP-B.4
 
 
 #include "driver.h"
+#include "cpu/m6800/m6800.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6805/m6805.h"
 #include "sound/ay8910.h"
@@ -917,7 +918,7 @@ static MACHINE_DRIVER_START( tubep )
 	MDRV_CPU_ADD("nsc",NSC8105,6000000)	/* 6 MHz Xtal - divided internally ??? */
 	MDRV_CPU_PROGRAM_MAP(nsc_map,0)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	MDRV_MACHINE_START(tubep)
 	MDRV_MACHINE_RESET(tubep)

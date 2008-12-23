@@ -104,7 +104,7 @@ void ted7360_soundport_w (running_machine *machine, int offset, int data)
 /************************************/
 /* Sound handler update             */
 /************************************/
-static void ted7360_update (void *param,stream_sample_t **inputs, stream_sample_t **outputs,int samples)
+static STREAM_UPDATE( ted7360_update )
 {
 	int i, v, a;
 	stream_sample_t *buffer = outputs[0];

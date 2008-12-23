@@ -43,6 +43,7 @@ ToDo:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/h6280/h6280.h"
 #include "dec0.h"
@@ -983,7 +984,7 @@ static MACHINE_DRIVER_START( robocop )
 	MDRV_CPU_ADD("sub", H6280,21477200/16) /* 21.4772MHz clock */
 	MDRV_CPU_PROGRAM_MAP(robocop_sub_readmem,robocop_sub_writemem)
 
-	MDRV_INTERLEAVE(50)	/* Interleave between HuC6280 & 68000 */
+	MDRV_QUANTUM_TIME(HZ(3000))	/* Interleave between HuC6280 & 68000 */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -1072,7 +1073,7 @@ static MACHINE_DRIVER_START( hippodrm )
 	MDRV_CPU_ADD("sub", H6280,21477200/16) /* 21.4772MHz clock */
 	MDRV_CPU_PROGRAM_MAP(hippodrm_sub_readmem,hippodrm_sub_writemem)
 
-	MDRV_INTERLEAVE(5)	/* Interleave between H6280 & 68000 */
+	MDRV_QUANTUM_TIME(HZ(300))	/* Interleave between H6280 & 68000 */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

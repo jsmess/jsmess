@@ -1522,17 +1522,17 @@ CPU_GET_INFO( s2650 )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 5;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 13;							break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 15;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM:	info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 8;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM:	info->i = 15;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM:	info->i = 0;					break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = 0;					break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 9;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:		info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 8;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 9;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE + 0:				info->i = s2650c->irq_state;					break;
 		case CPUINFO_INT_INPUT_STATE + 1:				info->i = s2650_get_sense(s2650c) ? ASSERT_LINE : CLEAR_LINE; break;
@@ -1556,13 +1556,13 @@ CPU_GET_INFO( s2650 )
 		case CPUINFO_INT_REGISTER + S2650_FO:			info->i = s2650_get_flag(s2650c);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(s2650);			break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(s2650);				break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(s2650);				break;
-		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(s2650);				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(s2650);			break;
-		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(s2650);			break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(s2650);			break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(s2650);				break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(s2650);				break;
+		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(s2650);				break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(s2650);			break;
+		case CPUINFO_FCT_BURN:							info->burn = NULL;						break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(s2650);			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &s2650c->icount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

@@ -681,7 +681,7 @@ void metro_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectan
 
 			gfxdata		=	base_gfx + (8*8*4/8) * (((attr & 0x000f) << 16) + code);
 
-			if (flip_screen_get())
+			if (flip_screen_get(machine))
 			{
 				flipx = !flipx;		x = max_x - x - width;
 				flipy = !flipy;		y = max_y - y - height;
@@ -691,6 +691,7 @@ void metro_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectan
 			{
 				/* prepare GfxElement on the fly */
 				gfx_element gfx;
+				gfx.machine = machine;
 				gfx.width = width;
 				gfx.height = height;
 				gfx.total_elements = 1;
@@ -703,6 +704,7 @@ void metro_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectan
 				gfx.line_modulo = width;
 				gfx.char_modulo = 0;	/* doesn't matter */
 				gfx.flags = 0;
+				gfx.machine = machine;
 
 				/* Bounds checking */
 				if ( (gfxdata + width * height - 1) >= gfx_max )
@@ -721,6 +723,7 @@ void metro_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectan
 			{
 				/* prepare GfxElement on the fly */
 				gfx_element gfx;
+				gfx.machine = machine;
 				gfx.width = width;
 				gfx.height = height;
 				gfx.total_elements = 1;
@@ -733,6 +736,7 @@ void metro_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectan
 				gfx.line_modulo = width/2;
 				gfx.char_modulo = 0;	/* doesn't matter */
 				gfx.flags = GFX_ELEMENT_PACKED;
+				gfx.machine = machine;
 
 				/* Bounds checking */
 				if ( (gfxdata + width/2 * height - 1) >= gfx_max )
@@ -929,7 +933,7 @@ VIDEO_UPDATE( metro )
         ---- ---- ---- --1-     ? Blank Screen
         ---- ---- ---- ---0     Flip  Screen    */
 	if (screenctrl & 2)	return 0;
-	flip_screen_set(screenctrl & 1);
+	flip_screen_set(screen->machine, screenctrl & 1);
 
 	/* If the game supports 16x16 tiles, make sure that the
        16x16 and 8x8 tilemaps of a given layer are not simultaneously

@@ -33,7 +33,6 @@ typedef struct _cdp1862_interface cdp1862_interface;
 struct _cdp1862_interface
 {
 	const char *screen_tag;		/* screen we are acting on */
-	int clock;					/* the clock (pin 14) of the chip */
 
 	double res_r;				/* red output resistor value */
 	double res_g;				/* green output resistor value */

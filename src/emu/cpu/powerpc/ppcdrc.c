@@ -531,7 +531,7 @@ INLINE UINT32 compute_spr(UINT32 spr)
     ppcdrc_init - initialize the processor
 -------------------------------------------------*/
 
-static void ppcdrc_init(powerpc_flavor flavor, UINT8 cap, int tb_divisor, const device_config *device, int index, int clock, cpu_irq_callback irqcallback)
+static void ppcdrc_init(powerpc_flavor flavor, UINT8 cap, int tb_divisor, const device_config *device, cpu_irq_callback irqcallback)
 {
 	drcfe_config feconfig =
 	{
@@ -556,7 +556,7 @@ static void ppcdrc_init(powerpc_flavor flavor, UINT8 cap, int tb_divisor, const 
 	memset(ppc, 0, sizeof(*ppc));
 
 	/* initialize the core */
-	ppccom_init(ppc, flavor, cap, tb_divisor, device, index, clock, irqcallback);
+	ppccom_init(ppc, flavor, cap, tb_divisor, device, irqcallback);
 
 	/* allocate the implementation-specific state from the full cache */
 	ppc->impstate = drccache_memory_alloc_near(cache, sizeof(*ppc->impstate));
@@ -795,7 +795,7 @@ static CPU_SET_INFO( ppcdrc )
 
 static CPU_GET_INFO( ppcdrc )
 {
-	powerpc_state *ppc = (device != NULL) ? *(powerpc_state **)device->token : NULL;
+	powerpc_state *ppc = (device != NULL && device->token != NULL) ? *(powerpc_state **)device->token : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
@@ -803,14 +803,13 @@ static CPU_GET_INFO( ppcdrc )
 		case CPUINFO_INT_PREVIOUSPC:					/* not implemented */							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(ppcdrc);		break;
-		case CPUINFO_PTR_INIT:							/* provided per-CPU */							break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(ppcdrc);			break;
-		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(ppcdrc);				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(ppcdrc);		break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(ppcdrc);break;
-		case CPUINFO_PTR_TRANSLATE:						info->translate = CPU_TRANSLATE_NAME(ppcdrc);	break;
-		case CPUINFO_PTR_CONTEXT:						info->p = ppc;									break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(ppcdrc);		break;
+		case CPUINFO_FCT_INIT:							/* provided per-CPU */							break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(ppcdrc);			break;
+		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(ppcdrc);				break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(ppcdrc);		break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(ppcdrc);break;
+		case CPUINFO_FCT_TRANSLATE:						info->translate = CPU_TRANSLATE_NAME(ppcdrc);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
@@ -4199,7 +4198,7 @@ static void log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desclist, i
 
 static CPU_GET_INFO( ppcdrc4xx )
 {
-	powerpc_state *ppc = (device != NULL) ? *(powerpc_state **)device->token : NULL;
+	powerpc_state *ppc = (device != NULL && device->token != NULL) ? *(powerpc_state **)device->token : NULL;
 	CPU_GET_INFO_CALL(ppcdrc);
 	ppc4xx_get_info(ppc, state, info);
 }
@@ -4229,7 +4228,7 @@ static CPU_SET_INFO( ppcdrc4xx )
 
 static CPU_INIT( ppc403ga )
 {
-	ppcdrc_init(PPC_MODEL_403GA, PPCCAP_4XX, 1, device, index, clock, irqcallback);
+	ppcdrc_init(PPC_MODEL_403GA, PPCCAP_4XX, 1, device, irqcallback);
 }
 
 
@@ -4245,8 +4244,8 @@ CPU_GET_INFO( ppc403ga )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(ppc403ga);				break;
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(ppcdrc4xx);		break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(ppc403ga);				break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(ppcdrc4xx);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "PowerPC 403GA");		break;
@@ -4268,7 +4267,7 @@ CPU_GET_INFO( ppc403ga )
 
 static CPU_INIT( ppc403gcx )
 {
-	ppcdrc_init(PPC_MODEL_403GCX, PPCCAP_4XX, 1, device, index, clock, irqcallback);
+	ppcdrc_init(PPC_MODEL_403GCX, PPCCAP_4XX, 1, device, irqcallback);
 }
 
 
@@ -4284,8 +4283,8 @@ CPU_GET_INFO( ppc403gcx )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(ppc403gcx);			break;
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(ppcdrc4xx);		break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(ppc403gcx);			break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(ppcdrc4xx);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "PowerPC 403GCX");		break;
@@ -4312,7 +4311,7 @@ CPU_GET_INFO( ppc403gcx )
 
 static CPU_INIT( ppc601 )
 {
-	ppcdrc_init(PPC_MODEL_601, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED, 0/* no TB */, device, index, clock, irqcallback);
+	ppcdrc_init(PPC_MODEL_601, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED, 0/* no TB */, device, irqcallback);
 }
 
 
@@ -4328,7 +4327,7 @@ CPU_GET_INFO( ppc601 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(ppc601);				break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(ppc601);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "PowerPC 601");			break;
@@ -4350,7 +4349,7 @@ CPU_GET_INFO( ppc601 )
 
 static CPU_INIT( ppc602 )
 {
-	ppcdrc_init(PPC_MODEL_602, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, device, index, clock, irqcallback);
+	ppcdrc_init(PPC_MODEL_602, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, device, irqcallback);
 }
 
 
@@ -4366,7 +4365,7 @@ CPU_GET_INFO( ppc602 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(ppc602);				break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(ppc602);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "PowerPC 602");			break;
@@ -4388,7 +4387,7 @@ CPU_GET_INFO( ppc602 )
 
 static CPU_INIT( ppc603 )
 {
-	ppcdrc_init(PPC_MODEL_603, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, device, index, clock, irqcallback);
+	ppcdrc_init(PPC_MODEL_603, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, device, irqcallback);
 }
 
 
@@ -4404,7 +4403,7 @@ CPU_GET_INFO( ppc603 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(ppc603);				break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(ppc603);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "PowerPC 603");			break;
@@ -4426,7 +4425,7 @@ CPU_GET_INFO( ppc603 )
 
 static CPU_INIT( ppc603e )
 {
-	ppcdrc_init(PPC_MODEL_603E, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, device, index, clock, irqcallback);
+	ppcdrc_init(PPC_MODEL_603E, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, device, irqcallback);
 }
 
 
@@ -4442,7 +4441,7 @@ CPU_GET_INFO( ppc603e )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(ppc603e);				break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(ppc603e);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "PowerPC 603e");		break;
@@ -4464,7 +4463,7 @@ CPU_GET_INFO( ppc603e )
 
 static CPU_INIT( ppc603r )
 {
-	ppcdrc_init(PPC_MODEL_603R, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, device, index, clock, irqcallback);
+	ppcdrc_init(PPC_MODEL_603R, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, device, irqcallback);
 }
 
 
@@ -4480,7 +4479,7 @@ CPU_GET_INFO( ppc603r )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(ppc603r);				break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(ppc603r);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "PowerPC 603R");		break;
@@ -4502,7 +4501,7 @@ CPU_GET_INFO( ppc603r )
 
 static CPU_INIT( ppc604 )
 {
-	ppcdrc_init(PPC_MODEL_604, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED, 4, device, index, clock, irqcallback);
+	ppcdrc_init(PPC_MODEL_604, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED, 4, device, irqcallback);
 }
 
 
@@ -4518,7 +4517,7 @@ CPU_GET_INFO( ppc604 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(ppc604);				break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(ppc604);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "PowerPC 604");			break;
@@ -4545,7 +4544,7 @@ CPU_GET_INFO( ppc604 )
 
 static CPU_INIT( mpc8240 )
 {
-	ppcdrc_init(PPC_MODEL_MPC8240, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED, 4/* unknown */, device, index, clock, irqcallback);
+	ppcdrc_init(PPC_MODEL_MPC8240, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED, 4/* unknown */, device, irqcallback);
 }
 
 
@@ -4561,7 +4560,7 @@ CPU_GET_INFO( mpc8240 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(mpc8240);				break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(mpc8240);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "PowerPC MPC8240");		break;

@@ -50,6 +50,8 @@ Flying Tiger
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
+#include "cpu/m68000/m68000.h"
 #include "deprecat.h"
 #include "sound/2203intf.h"
 #include "sound/2151intf.h"
@@ -71,7 +73,7 @@ static MACHINE_START( lastday )
 
 static WRITE8_HANDLER( flip_screen_w )
 {
-	flip_screen_set(data);
+	flip_screen_set(space->machine, data);
 }
 
 /***************************************************************************

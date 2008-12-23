@@ -675,14 +675,14 @@ INLINE INT32 calculate_1op_fm_1(YMF271Chip *chip, int slotnum)
 	return slot_output;
 }
 
-static void ymf271_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int length)
+static STREAM_UPDATE( ymf271_update )
 {
 	int i, j;
 	int op;
 	INT32 *mixp;
 	YMF271Chip *chip = param;
 
-	memset(mix, 0, sizeof(mix[0])*length*2);
+	memset(mix, 0, sizeof(mix[0])*samples*2);
 
 	for (j = 0; j < 12; j++)
 	{
@@ -707,7 +707,7 @@ static void ymf271_update(void *param, stream_sample_t **inputs, stream_sample_t
 
 				if (chip->slots[slot1].active)
 				{
-					for (i = 0; i < length; i++)
+					for (i = 0; i < samples; i++)
 					{
 						INT64 output1 = 0, output2 = 0, output3 = 0, output4 = 0, phase_mod1 = 0, phase_mod2 = 0;
 						switch (chip->slots[slot1].algorithm)
@@ -893,7 +893,7 @@ static void ymf271_update(void *param, stream_sample_t **inputs, stream_sample_t
 					mixp = &mix[0];
 					if (chip->slots[slot1].active)
 					{
-						for (i = 0; i < length; i++)
+						for (i = 0; i < samples; i++)
 						{
 							INT64 output1 = 0, output2 = 0, phase_mod = 0;
 							switch (chip->slots[slot1].algorithm & 3)
@@ -946,7 +946,7 @@ static void ymf271_update(void *param, stream_sample_t **inputs, stream_sample_t
 
 				if (chip->slots[slot1].active)
 				{
-					for (i = 0; i < length; i++)
+					for (i = 0; i < samples; i++)
 					{
 						INT64 output1 = 0, output2 = 0, output3 = 0, phase_mod = 0;
 						switch (chip->slots[slot1].algorithm & 7)
@@ -1028,16 +1028,16 @@ static void ymf271_update(void *param, stream_sample_t **inputs, stream_sample_t
 					}
 				}
 
-				update_pcm(chip, j + (3*12), mixp, length);
+				update_pcm(chip, j + (3*12), mixp, samples);
 				break;
 			}
 
 			case 3:		// PCM
 			{
-				update_pcm(chip, j + (0*12), mixp, length);
-				update_pcm(chip, j + (1*12), mixp, length);
-				update_pcm(chip, j + (2*12), mixp, length);
-				update_pcm(chip, j + (3*12), mixp, length);
+				update_pcm(chip, j + (0*12), mixp, samples);
+				update_pcm(chip, j + (1*12), mixp, samples);
+				update_pcm(chip, j + (2*12), mixp, samples);
+				update_pcm(chip, j + (3*12), mixp, samples);
 				break;
 			}
 
@@ -1046,7 +1046,7 @@ static void ymf271_update(void *param, stream_sample_t **inputs, stream_sample_t
 	}
 
 	mixp = &mix[0];
-	for (i = 0; i < length; i++)
+	for (i = 0; i < samples; i++)
 	{
 		outputs[0][i] = (*mixp++)>>2;
 		outputs[1][i] = (*mixp++)>>2;
@@ -1829,16 +1829,16 @@ SND_GET_INFO( ymf271 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( ymf271 );		break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ymf271 );				break;
-		case SNDINFO_PTR_STOP:							/* Nothing */							break;
-		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( ymf271 );				break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( ymf271 );	break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ymf271 );			break;
+		case SNDINFO_PTR_STOP:							/* Nothing */									break;
+		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( ymf271 );			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							info->s = "YMF271";						break;
-		case SNDINFO_STR_CORE_FAMILY:					info->s = "Yamaha FM";					break;
-		case SNDINFO_STR_CORE_VERSION:					info->s = "1.0";						break;
-		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
-		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "YMF271");						break;
+		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Yamaha FM");					break;
+		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");							break;
+		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
+		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }

@@ -9,7 +9,6 @@
 
 #include "driver.h"
 #include "streams.h"
-#include "deprecat.h"
 
 #include "video/vic6560.h"
 
@@ -146,7 +145,7 @@ void vic6560_soundport_w (running_machine *machine, int offset, int data)
 /************************************/
 /* Sound handler update             */
 /************************************/
-static void vic6560_update (void *param,stream_sample_t **inputs, stream_sample_t **outputs,int samples)
+static STREAM_UPDATE( vic6560_update )
 {
 	int i, v;
 	stream_sample_t *buffer = outputs[0];
@@ -164,7 +163,7 @@ static void vic6560_update (void *param,stream_sample_t **inputs, stream_sample_
 			if (tone1pos >= tone1samples)
 			{
 				tone1pos = 0;
-				tone1samples = Machine->sample_rate / TONE1_FREQUENCY;
+				tone1samples = device->machine->sample_rate / TONE1_FREQUENCY;
 				if (tone1samples == 0)
 					tone1samples = 1;
 			}
@@ -180,7 +179,7 @@ static void vic6560_update (void *param,stream_sample_t **inputs, stream_sample_
 			if (tone2pos >= tone2samples)
 			{
 				tone2pos = 0;
-				tone2samples = Machine->sample_rate / TONE2_FREQUENCY;
+				tone2samples = device->machine->sample_rate / TONE2_FREQUENCY;
 				if (tone2samples == 0)
 					tone2samples = 1;
 			}
@@ -196,7 +195,7 @@ static void vic6560_update (void *param,stream_sample_t **inputs, stream_sample_
 			if (tone3pos >= tone3samples)
 			{
 				tone3pos = 0;
-				tone3samples = Machine->sample_rate / TONE3_FREQUENCY;
+				tone3samples = device->machine->sample_rate / TONE3_FREQUENCY;
 				if (tone3samples == 0)
 					tone3samples = 1;
 			}

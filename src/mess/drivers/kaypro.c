@@ -241,7 +241,7 @@ static MACHINE_DRIVER_START( kaypro )
 	MDRV_CPU_PROGRAM_MAP(kaypro_mem, 0)
 	MDRV_CPU_IO_MAP(kaypro_io, 0)
 	MDRV_CPU_VBLANK_INT("main", kaypro_interrupt)
-	MDRV_INTERLEAVE(4)
+	MDRV_QUANTUM_TIME(HZ(240))
 
 	MDRV_MACHINE_RESET( kaypro )
 

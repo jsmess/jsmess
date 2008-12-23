@@ -315,7 +315,7 @@ static MACHINE_DRIVER_START(laser110)
     MDRV_CPU_IO_MAP(vtech1_io, 0)
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(M6847_PAL_FRAMES_PER_SECOND)
-    MDRV_INTERLEAVE(1)
+    MDRV_QUANTUM_TIME(HZ(60))
 
 	MDRV_MACHINE_START(laser110)
 
@@ -453,12 +453,12 @@ static Z80BIN_EXECUTE( vtech1 )
 		if (!autorun)
 			memory_write_byte(space, 0x7929, 0xb6);	/* turn off autorun */
 
-		cpu_set_reg(cpu, REG_PC, 0x791e);
+		cpu_set_reg(cpu, REG_GENPC, 0x791e);
 	}
 	else
 	{
 		if (autorun)
-			cpu_set_reg(cpu, REG_PC, execute_address);
+			cpu_set_reg(cpu, REG_GENPC, execute_address);
 	}
 }
 

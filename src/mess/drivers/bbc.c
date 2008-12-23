@@ -727,7 +727,7 @@ static MACHINE_DRIVER_START( bbca )
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(128))
-	MDRV_INTERLEAVE(1)
+	MDRV_QUANTUM_TIME(HZ(60))
 
 	MDRV_MACHINE_START( bbca )
 	MDRV_MACHINE_RESET( bbca )
@@ -752,8 +752,7 @@ static MACHINE_DRIVER_START( bbca )
 	MDRV_CASSETTE_ADD( "cassette", bbc_cassette_config )
 
 	/* acia */
-	MDRV_DEVICE_ADD("acia6850", ACIA6850)
-	MDRV_DEVICE_CONFIG(bbc_acia6850_interface)
+	MDRV_ACIA6850_ADD("acia6850", bbc_acia6850_interface)
 	
 	/* devices */
 	MDRV_UPD7002_ADD("upd7002",BBC_uPD7002)
@@ -806,7 +805,7 @@ static MACHINE_DRIVER_START( bbcm )
 	MDRV_CPU_PROGRAM_MAP( bbcm_mem, 0 )
 	MDRV_CPU_VBLANK_INT("main", bbcb_vsync)				/* screen refresh interrupts */
 	MDRV_CPU_PERIODIC_INT(bbcm_keyscan, 1000)		/* scan keyboard */
-	MDRV_INTERLEAVE(1)
+	MDRV_QUANTUM_TIME(HZ(60))
 
 	MDRV_MACHINE_START( bbcm )
 	MDRV_MACHINE_RESET( bbcm )
@@ -838,8 +837,7 @@ static MACHINE_DRIVER_START( bbcm )
 	MDRV_CASSETTE_ADD( "cassette", bbc_cassette_config )
 
 	/* acia */
-	MDRV_DEVICE_ADD("acia6850", ACIA6850)
-	MDRV_DEVICE_CONFIG(bbc_acia6850_interface)
+	MDRV_ACIA6850_ADD("acia6850", bbc_acia6850_interface)
 	
 	/* devices */
 	MDRV_UPD7002_ADD("upd7002",BBC_uPD7002)

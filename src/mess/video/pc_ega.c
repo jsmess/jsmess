@@ -534,7 +534,6 @@ static WRITE32_HANDLER( pc_ega_videoram32le_w );
 static const crtc_ega_interface crtc_ega_ega_intf =
 {
 	EGA_SCREEN_NAME,	/* screen number */
-	16257000/8,			/* clock */
 	8,					/* numbers of pixels per video memory address */
 	NULL,				/* begin_update */
 	ega_update_row,		/* update_row */
@@ -554,8 +553,7 @@ MACHINE_DRIVER_START( pcvideo_ega )
 
 	MDRV_PALETTE_INIT(pc_ega)
 
-	MDRV_DEVICE_ADD(EGA_CRTC_NAME, CRTC_EGA)
-	MDRV_DEVICE_CONFIG( crtc_ega_ega_intf )
+	MDRV_CRTC_EGA_ADD(EGA_CRTC_NAME, 16257000/8, crtc_ega_ega_intf)
 
 	MDRV_VIDEO_START( pc_ega )
 	MDRV_VIDEO_UPDATE( pc_ega )

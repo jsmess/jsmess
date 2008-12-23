@@ -72,19 +72,19 @@ struct namco_52xx
 static void namco_52xx_reset(struct namco_52xx *chip);
 
 
-static void namco_52xx_stream_update_one(void *param, stream_sample_t **inputs, stream_sample_t **_buffer, int length)
+static STREAM_UPDATE( namco_52xx_stream_update_one )
 {
 	struct namco_52xx *chip = param;
 	int i, rom_pos, whole_pb_cycles, buf;
-	stream_sample_t *buffer = _buffer[0];
+	stream_sample_t *buffer = outputs[0];
 
 	if (chip->n52_start >= chip->n52_end)
 	{
-		memset(buffer, 0, length * sizeof(*buffer));
+		memset(buffer, 0, samples * sizeof(*buffer));
 		return;
 	}
 
-	for (i = 0; i < length; i++)
+	for (i = 0; i < samples; i++)
 	{
 		chip->n52_pb_cycle += chip->n52_step;
 		if (chip->n52_pb_cycle >= 1)
@@ -97,8 +97,8 @@ static void namco_52xx_stream_update_one(void *param, stream_sample_t **inputs, 
 		if (chip->n52_pos > chip->n52_length)
 		{
 			/* sample done */
-			memset(&buffer[i], 0, (length - i) * sizeof(INT16));
-			i = length;
+			memset(&buffer[i], 0, (samples - i) * sizeof(INT16));
+			i = samples;
 			namco_52xx_reset(chip);
 		}
 		else
@@ -217,15 +217,15 @@ SND_GET_INFO( namco_52xx )
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( namco_52xx );	break;
 		case SNDINFO_PTR_START:							info->start = SND_START_NAME( namco_52xx );			break;
-		case SNDINFO_PTR_STOP:							/* Nothing */							break;
+		case SNDINFO_PTR_STOP:							/* Nothing */										break;
 		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( namco_52xx );			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							info->s = "Namco 52XX";					break;
-		case SNDINFO_STR_CORE_FAMILY:					info->s = "Namco custom";				break;
-		case SNDINFO_STR_CORE_VERSION:					info->s = "1.0";						break;
-		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
-		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "Namco 52XX");						break;
+		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Namco custom");					break;
+		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");								break;
+		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);							break;
+		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

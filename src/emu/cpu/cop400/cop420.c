@@ -198,29 +198,29 @@ static CPU_INIT( cop420 )
 
 	/* set clock divider */
 
-	cpu_set_info_int(device, CPUINFO_INT_CLOCK_DIVIDER, cop400->intf->cki);
+	device_set_info_int(device, CPUINFO_INT_CLOCK_DIVIDER, cop400->intf->cki);
 
 	/* allocate serial timer */
 
 	cop400->serial_timer = timer_alloc(device->machine, cop400_serial_tick, cop400);
-	timer_adjust_periodic(cop400->serial_timer, attotime_zero, 0, ATTOTIME_IN_HZ(clock));
+	timer_adjust_periodic(cop400->serial_timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock / 16));
 
 	/* allocate counter timer */
 
 	cop400->counter_timer = timer_alloc(device->machine, cop400_counter_tick, cop400);
-	timer_adjust_periodic(cop400->counter_timer, attotime_zero, 0, ATTOTIME_IN_HZ(clock / 4));
+	timer_adjust_periodic(cop400->counter_timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock / 16 / 4));
 
 	/* allocate IN latch timer */
 
 	cop400->inil_timer = timer_alloc(device->machine, cop400_inil_tick, cop400);
-	timer_adjust_periodic(cop400->inil_timer, attotime_zero, 0, ATTOTIME_IN_HZ(clock));
+	timer_adjust_periodic(cop400->inil_timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock / 16));
 
 	/* allocate Microbus timer */
 
 	if (cop400->intf->microbus == COP400_MICROBUS_ENABLED)
 	{
 		cop400->microbus_timer = timer_alloc(device->machine, cop400_microbus_tick, cop400);
-		timer_adjust_periodic(cop400->microbus_timer, attotime_zero, 0, ATTOTIME_IN_HZ(clock));
+		timer_adjust_periodic(cop400->microbus_timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock / 16));
 	}
 
 	/* initialize instruction length array */
@@ -497,15 +497,15 @@ CPU_GET_INFO( cop420 )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 2;							break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 10;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 	info->i = 6;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 9;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 8;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 10;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 8;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 6;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 8;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 9;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE + 0:				info->i = 0;						    break;
 
@@ -526,18 +526,18 @@ CPU_GET_INFO( cop420 )
 		case CPUINFO_INT_REGISTER + COP400_SKL:			info->i = SKL;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(cop420);		break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(cop420);				break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(cop420);				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(cop420);			break;
-		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(cop420);		break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(cop420);		break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(cop420);				break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(cop420);				break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(cop420);			break;
+		case CPUINFO_FCT_BURN:							info->burn = NULL;						break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(cop420);		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cop400->icount;			break;
-		case CPUINFO_PTR_VALIDITY_CHECK:				info->validity_check = CPU_VALIDITY_CHECK_NAME(cop420);	break;
+		case CPUINFO_FCT_VALIDITY_CHECK:				info->validity_check = CPU_VALIDITY_CHECK_NAME(cop420);	break;
 
-        case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:
+        case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:
             info->internal_map8 = ADDRESS_MAP_NAME(cop420_internal_rom);                              break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:
  			info->internal_map8 = ADDRESS_MAP_NAME(cop420_internal_ram);								break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -573,8 +573,8 @@ CPU_GET_INFO( cop421 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(cop421);				break;
-		case CPUINFO_PTR_VALIDITY_CHECK:				info->validity_check = CPU_VALIDITY_CHECK_NAME(cop421);	break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(cop421);				break;
+		case CPUINFO_FCT_VALIDITY_CHECK:				info->validity_check = CPU_VALIDITY_CHECK_NAME(cop421);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "COP421");				break;
@@ -591,8 +591,8 @@ CPU_GET_INFO( cop422 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(cop422);				break;
-		case CPUINFO_PTR_VALIDITY_CHECK:				info->validity_check = CPU_VALIDITY_CHECK_NAME(cop421);	break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(cop422);				break;
+		case CPUINFO_FCT_VALIDITY_CHECK:				info->validity_check = CPU_VALIDITY_CHECK_NAME(cop421);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "COP422");				break;
@@ -609,7 +609,7 @@ CPU_GET_INFO( cop402 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:
  			info->internal_map8 = NULL;															break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

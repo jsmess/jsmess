@@ -230,7 +230,7 @@ static void enterprise_reset(running_machine *machine)
 
 	cpu_set_input_line_vector(machine->cpu[0],0,0x0ff);
 
-	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 0), FLOPPY_DRIVE_DS_80);
+	floppy_drive_set_geometry(image_from_devtype_and_index(machine, IO_FLOPPY, 0), FLOPPY_DRIVE_DS_80);
 }
 
 static MACHINE_START(enterprise)
@@ -541,7 +541,7 @@ static MACHINE_DRIVER_START( ep128 )
 	MDRV_CPU_ADD("main", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(enterprise_mem, 0)
 	MDRV_CPU_IO_MAP(enterprise_io, 0)
-	MDRV_INTERLEAVE(1)
+	MDRV_QUANTUM_TIME(HZ(60))
 
 	MDRV_MACHINE_START( enterprise )
 

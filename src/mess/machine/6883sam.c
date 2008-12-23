@@ -299,11 +299,11 @@ DEVICE_GET_INFO( sam6883 )
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(sam6883);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "6883 SAM";						break;
-		case DEVINFO_STR_FAMILY:						info->s = "6883 SAM";						break;
-		case DEVINFO_STR_VERSION:						info->s = "1.0";							break;
-		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;							break;
-		case DEVINFO_STR_CREDITS:						info->s = "Copyright MESS Team";			break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "6883 SAM");						break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "6883 SAM");						break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);							break;
+		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");			break;
 	}
 }
 
@@ -312,7 +312,7 @@ DEVICE_GET_INFO( sam6883_gime )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "6883 SAM GIME";				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "6883 SAM GIME");				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(sam6883_gime);	break;

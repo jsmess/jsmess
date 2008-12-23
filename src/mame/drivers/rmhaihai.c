@@ -29,6 +29,7 @@ TODO:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
 
@@ -142,7 +143,7 @@ static WRITE8_HANDLER( adpcm_w )
 
 static WRITE8_HANDLER( ctrl_w )
 {
-	flip_screen_set(data & 0x01);
+	flip_screen_set(space->machine, data & 0x01);
 
 	// (data & 0x02) is switched on and off in service mode
 

@@ -720,7 +720,7 @@ static const device_config *find_device_by_identity(running_machine *machine, co
 	else
 	{
 		/* perform a legacy lookup by device type */
-		device = image_from_devtype_and_index(ident->type, ident->slot);
+		device = image_from_devtype_and_index(machine, ident->type, ident->slot);
 	}
 
 	/* did the image slot lookup fail? */
@@ -1070,7 +1070,7 @@ void osd_update(running_machine *machine, int skip_redraw)
 		for (cpunum = 0; (cpunum < ARRAY_LENGTH(machine->cpu)) && (machine->cpu[cpunum] != NULL); cpunum++)
 		{
 			runtime_hash *= 57;
-			runtime_hash ^= cpu_get_reg(machine->cpu[cpunum], REG_PC);	/* TODO - Add more registers? */
+			runtime_hash ^= cpu_get_reg(machine->cpu[cpunum], REG_GENPC);	/* TODO - Add more registers? */
 		}
 	}
 

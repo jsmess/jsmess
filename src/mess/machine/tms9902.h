@@ -54,7 +54,7 @@ WRITE8_DEVICE_HANDLER( tms9902_cru_w );
 ***************************************************************************/
 
 #define MDRV_TMS9902_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, TMS9902) \
+	MDRV_DEVICE_ADD(_tag, TMS9902, 0) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
 #endif /* __TMS9902_H__ */

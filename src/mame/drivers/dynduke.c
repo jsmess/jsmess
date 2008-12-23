@@ -63,6 +63,7 @@ Also, implemented conditional port for Coin Mode (SW1:1)
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
 #include "audio/seibu.h"
 #include "sound/3812intf.h"
@@ -292,7 +293,7 @@ static MACHINE_DRIVER_START( dynduke )
 
 	SEIBU_SOUND_SYSTEM_CPU(14318180/4)
 
-	MDRV_INTERLEAVE(60)
+	MDRV_QUANTUM_TIME(HZ(3600))
 
 	MDRV_MACHINE_RESET(seibu_sound)
 

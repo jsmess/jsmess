@@ -220,7 +220,7 @@ static TIMER_CALLBACK( pcjr_delayed_pic8259_irq )
 
 static PIC8259_SET_INT_LINE( pcjr_pic8259_master_set_int_line )
 {
-	if ( cpu_get_reg( device->machine->cpu[0], REG_PC ) == 0xF0454 )
+	if ( cpu_get_reg( device->machine->cpu[0], REG_GENPC ) == 0xF0454 )
 	{
 		timer_adjust_oneshot( pc_int_delay_timer, cpu_clocks_to_attotime(device->machine->cpu[0], 1), interrupt );
 	}
@@ -521,7 +521,7 @@ static TIMER_CALLBACK( pcjr_keyb_signal_callback )
 }
 
 
-static void pcjr_set_keyb_int(int state)
+static void pcjr_set_keyb_int(running_machine *machine, int state)
 {
 	if ( state )
 	{
@@ -1147,7 +1147,8 @@ static void pc_set_irq_line(int irq, int state) {
 	pic8259_set_irq_line(pc_devices.pic8259_master, irq, state);
 }
 
-static void pc_set_keyb_int(int state) {
+static void pc_set_keyb_int(running_machine *machine, int state)
+{
 	pc_set_irq_line( 1, state );
 }
 
@@ -1158,7 +1159,7 @@ static void pc_set_keyb_int(int state) {
  *
  **********************************************************/
 
-void mess_init_pc_common(running_machine *machine, UINT32 flags, void (*set_keyb_int_func)(int), void (*set_hdc_int_func)(int,int)) 
+void mess_init_pc_common(running_machine *machine, UINT32 flags, void (*set_keyb_int_func)(running_machine *, int), void (*set_hdc_int_func)(int,int)) 
 {
 	if ( set_keyb_int_func != NULL )
 		init_pc_common(machine, flags, set_keyb_int_func);

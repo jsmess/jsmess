@@ -250,7 +250,7 @@ static MACHINE_DRIVER_START( mtx512 )
 	MDRV_SOUND_ADD("sn76489a", SN76489A, MTX_SYSTEM_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MDRV_Z80CTC_ADD( "z80ctc", mtx_ctc_intf )
+	MDRV_Z80CTC_ADD( "z80ctc", MTX_SYSTEM_CLOCK, mtx_ctc_intf )
 
 	/* printer */
 	MDRV_PRINTER_ADD("printer")

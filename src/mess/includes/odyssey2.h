@@ -40,7 +40,7 @@ READ8_HANDLER ( odyssey2_video_r );
 WRITE8_HANDLER ( odyssey2_video_w );
 WRITE8_HANDLER ( odyssey2_lum_w );
 
-void odyssey2_sh_update( void *param,stream_sample_t **inputs, stream_sample_t **outputs,int samples );
+STREAM_UPDATE( odyssey2_sh_update );
 
 extern const custom_sound_interface odyssey2_sound_interface;
 
@@ -66,7 +66,7 @@ READ8_HANDLER( odyssey2_getbus );
 WRITE8_HANDLER ( odyssey2_putbus );
 
 READ8_HANDLER( odyssey2_t0_r );
-void the_voice_lrq_callback( int state );
+void the_voice_lrq_callback( const device_config *device, int state );
 
 READ8_HANDLER ( g7400_bus_r );
 WRITE8_HANDLER ( g7400_bus_w );

@@ -160,14 +160,14 @@ INLINE UINT32 namco_update_one(struct namco_sound *chip, stream_sample_t *buffer
 
 
 /* generate sound to the mix buffer in mono */
-static void namco_update_mono(void *param, stream_sample_t **inputs, stream_sample_t **_buffer, int length)
+static STREAM_UPDATE( namco_update_mono )
 {
 	struct namco_sound *chip = param;
-	stream_sample_t *buffer = _buffer[0];
+	stream_sample_t *buffer = outputs[0];
 	sound_channel *voice;
 
 	/* zap the contents of the buffer */
-	memset(buffer, 0, length * sizeof(*buffer));
+	memset(buffer, 0, samples * sizeof(*buffer));
 
 	/* if no sound, we're done */
 	if (chip->sound_enable == 0)
@@ -194,7 +194,7 @@ static void namco_update_mono(void *param, stream_sample_t **inputs, stream_samp
 				int i;
 
 				/* add our contribution */
-				for (i = 0; i < length; i++)
+				for (i = 0; i < samples; i++)
 				{
 					int cnt;
 
@@ -235,7 +235,7 @@ static void namco_update_mono(void *param, stream_sample_t **inputs, stream_samp
 				const INT16 *w = &chip->waveform[v][voice->waveform_select * 32];
 
 				/* generate sound into buffer and update the counter for this voice */
-				voice->counter = namco_update_one(chip, mix, length, w, voice->counter, voice->frequency);
+				voice->counter = namco_update_one(chip, mix, samples, w, voice->counter, voice->frequency);
 			}
 		}
 	}
@@ -243,14 +243,14 @@ static void namco_update_mono(void *param, stream_sample_t **inputs, stream_samp
 
 
 /* generate sound to the mix buffer in stereo */
-static void namco_update_stereo(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length)
+static STREAM_UPDATE( namco_update_stereo )
 {
 	struct namco_sound *chip = param;
 	sound_channel *voice;
 
 	/* zap the contents of the buffers */
-	memset(buffer[0], 0, length * sizeof(*buffer[0]));
-	memset(buffer[1], 0, length * sizeof(*buffer[1]));
+	memset(outputs[0], 0, samples * sizeof(*outputs[0]));
+	memset(outputs[1], 0, samples * sizeof(*outputs[1]));
 
 	/* if no sound, we're done */
 	if (chip->sound_enable == 0)
@@ -259,8 +259,8 @@ static void namco_update_stereo(void *param, stream_sample_t **inputs, stream_sa
 	/* loop over each voice and add its contribution */
 	for (voice = chip->channel_list; voice < chip->last_channel; voice++)
 	{
-		stream_sample_t *lmix = buffer[0];
-		stream_sample_t *rmix = buffer[1];
+		stream_sample_t *lmix = outputs[0];
+		stream_sample_t *rmix = outputs[1];
 		int lv = voice->volume[0];
 		int rv = voice->volume[1];
 
@@ -280,7 +280,7 @@ static void namco_update_stereo(void *param, stream_sample_t **inputs, stream_sa
 				int i;
 
 				/* add our contribution */
-				for (i = 0; i < length; i++)
+				for (i = 0; i < samples; i++)
 				{
 					int cnt;
 
@@ -333,7 +333,7 @@ static void namco_update_stereo(void *param, stream_sample_t **inputs, stream_sa
 					const INT16 *lw = &chip->waveform[lv][voice->waveform_select * 32];
 
 					/* generate sound into the buffer */
-					c = namco_update_one(chip, lmix, length, lw, voice->counter, voice->frequency);
+					c = namco_update_one(chip, lmix, samples, lw, voice->counter, voice->frequency);
 				}
 
 				/* only update if we have non-zero right volume */
@@ -342,7 +342,7 @@ static void namco_update_stereo(void *param, stream_sample_t **inputs, stream_sa
 					const INT16 *rw = &chip->waveform[rv][voice->waveform_select * 32];
 
 					/* generate sound into the buffer */
-					c = namco_update_one(chip, rmix, length, rw, voice->counter, voice->frequency);
+					c = namco_update_one(chip, rmix, samples, rw, voice->counter, voice->frequency);
 				}
 
 				/* update the counter for this voice */
@@ -820,17 +820,17 @@ SND_GET_INFO( namco )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( namco );		break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( namco );				break;
-		case SNDINFO_PTR_STOP:							/* Nothing */							break;
-		case SNDINFO_PTR_RESET:							/* Nothing */							break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( namco );	break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( namco );			break;
+		case SNDINFO_PTR_STOP:							/* Nothing */									break;
+		case SNDINFO_PTR_RESET:							/* Nothing */									break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							info->s = "Namco";						break;
-		case SNDINFO_STR_CORE_FAMILY:					info->s = "Namco custom";				break;
-		case SNDINFO_STR_CORE_VERSION:					info->s = "1.0";						break;
-		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
-		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "Namco");						break;
+		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Namco custom");				break;
+		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");							break;
+		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
+		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 
@@ -856,15 +856,15 @@ SND_GET_INFO( namco_15xx )
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( namco_15xx );	break;
 		case SNDINFO_PTR_START:							info->start = SND_START_NAME( namco );				break;
-		case SNDINFO_PTR_STOP:							/* Nothing */							break;
-		case SNDINFO_PTR_RESET:							/* Nothing */							break;
+		case SNDINFO_PTR_STOP:							/* Nothing */										break;
+		case SNDINFO_PTR_RESET:							/* Nothing */										break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							info->s = "Namco 15XX";					break;
-		case SNDINFO_STR_CORE_FAMILY:					info->s = "Namco custom";				break;
-		case SNDINFO_STR_CORE_VERSION:					info->s = "1.0";						break;
-		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
-		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "Namco 15XX");						break;
+		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Namco custom");					break;
+		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");								break;
+		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);							break;
+		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 
@@ -890,15 +890,15 @@ SND_GET_INFO( namco_cus30 )
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( namco_cus30 );	break;
 		case SNDINFO_PTR_START:							info->start = SND_START_NAME( namco );				break;
-		case SNDINFO_PTR_STOP:							/* Nothing */							break;
-		case SNDINFO_PTR_RESET:							/* Nothing */							break;
+		case SNDINFO_PTR_STOP:							/* Nothing */										break;
+		case SNDINFO_PTR_RESET:							/* Nothing */										break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							info->s = "Namco CUS30";				break;
-		case SNDINFO_STR_CORE_FAMILY:					info->s = "Namco custom";				break;
-		case SNDINFO_STR_CORE_VERSION:					info->s = "1.0";						break;
-		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
-		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "Namco CUS30");						break;
+		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Namco custom");					break;
+		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");								break;
+		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);							break;
+		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

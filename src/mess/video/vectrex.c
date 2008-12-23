@@ -186,14 +186,16 @@ VIDEO_UPDATE(vectrex)
 	vectrex_configuration(screen->machine);
 
 	/* start black */
-	vector_add_point(vectrex_points[display_start].x, 
+	vector_add_point(screen->machine,
+					 vectrex_points[display_start].x, 
 					 vectrex_points[display_start].y, 
 					 vectrex_points[display_start].col,
 					 0);
 
 	for (i = display_start; i != display_end; i = (i + 1) % NVECT)
 	{
-		vector_add_point(vectrex_points[i].x,
+		vector_add_point(screen->machine,
+						 vectrex_points[i].x,
 						 vectrex_points[i].y,
 						 vectrex_points[i].col,
 						 vectrex_points[i].intensity);

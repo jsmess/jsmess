@@ -164,7 +164,7 @@ static const device_config *current_image(const device_config *device)
 	if (!fdc->intf->get_image)
 	{
 		if (fdc->drive < device_count(device->machine, IO_FLOPPY))
-			image = image_from_devtype_and_index(IO_FLOPPY, fdc->drive);
+			image = image_from_devtype_and_index(device->machine, IO_FLOPPY, fdc->drive);
 	}
 	else
 	{
@@ -2177,7 +2177,7 @@ void nec765_reset(const device_config *device, int offset)
 		a_drive_is_ready = 0;
 		for (i = 0; i < device_count(device->machine, IO_FLOPPY); i++)
 		{
-			if (image_exists(image_from_devtype_and_index(IO_FLOPPY, i)))
+			if (image_exists(image_from_devtype_and_index(device->machine, IO_FLOPPY, i)))
 			{
 				a_drive_is_ready = 1;
 				break;
@@ -2297,7 +2297,7 @@ static DEVICE_RESET( nec765 )
 	int i;
 		
 	for (i = 0; i < device_count(device->machine, IO_FLOPPY); i++) {
-		const device_config *img = image_from_devtype_and_index(IO_FLOPPY, i);
+		const device_config *img = image_from_devtype_and_index(device->machine, IO_FLOPPY, i);
 		floppy_drive_set_controller(img, device);
 		floppy_drive_set_ready_state_change_callback(img, nec765_set_ready_change_callback);
 	}
@@ -2329,11 +2329,11 @@ DEVICE_GET_INFO( nec765a )
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(nec765);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "NEC765A";						break;
-		case DEVINFO_STR_FAMILY:						info->s = "NEC765A";						break;
-		case DEVINFO_STR_VERSION:						info->s = "1.0";							break;
-		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;							break;
-		case DEVINFO_STR_CREDITS:						info->s = "Copyright MESS Team";			break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "NEC765A");						break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "NEC765A");						break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);							break;
+		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");			break;
 	}
 }
 
@@ -2343,7 +2343,7 @@ DEVICE_GET_INFO( nec765b )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "NEC765B";				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "NEC765B");				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(nec765b);	break;
@@ -2357,7 +2357,7 @@ DEVICE_GET_INFO( smc37c78 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "SMC37C78";				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "SMC37C78");				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(smc37c78);	break;
@@ -2371,7 +2371,7 @@ DEVICE_GET_INFO( nec72065 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "NEC72065";				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "NEC72065");				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(nec72065);	break;

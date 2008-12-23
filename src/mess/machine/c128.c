@@ -96,7 +96,7 @@ WRITE8_HANDLER( c128_write_d000 )
 	const device_config *cia_0 = device_list_find_by_tag(space->machine->config->devicelist, CIA6526R1, "cia_0");
 	const device_config *cia_1 = device_list_find_by_tag(space->machine->config->devicelist, CIA6526R1, "cia_1");
 
-	UINT8 c64_port6510 = (UINT8) cpu_get_info_int(space->machine->cpu[0], CPUINFO_INT_M6510_PORT);
+	UINT8 c64_port6510 = (UINT8) device_get_info_int(space->machine->cpu[0], CPUINFO_INT_M6510_PORT);
 
 	if (!c128_write_io)
 	{
@@ -190,7 +190,7 @@ void c128_bankswitch_64(running_machine *machine, int reset)
 	if (!c64mode)
 		return;
 
-	data = (UINT8) cpu_get_info_int(machine->cpu[0], CPUINFO_INT_M6510_PORT) & 0x07;
+	data = (UINT8) device_get_info_int(machine->cpu[0], CPUINFO_INT_M6510_PORT) & 0x07;
 	if ((data == old)&&(exrom==c64_exrom)&&(game==c64_game)&&!reset)
 		return;
 
@@ -586,8 +586,8 @@ static void c128_bankswitch (running_machine *machine, int reset)
 			 * driver used to work with this behavior, so I am doing this hack
 			 * where I set CPU #1's PC to 0x1100 on reset.
 			 */
-			if (cpu_get_reg(machine->cpu[1], REG_PC) == 0x0000)
-				cpu_set_reg(machine->cpu[1], REG_PC, 0x1100);
+			if (cpu_get_reg(machine->cpu[1], REG_GENPC) == 0x0000)
+				cpu_set_reg(machine->cpu[1], REG_GENPC, 0x1100);
 		}
 		mmu_cpu = MMU_CPU8502;
 		return;
@@ -780,7 +780,7 @@ WRITE8_HANDLER( c128_write_ff05 )
  */
 static int c128_dma_read(running_machine *machine, int offset)
 {
-	UINT8 c64_port6510 = (UINT8) cpu_get_info_int(machine->cpu[0], CPUINFO_INT_M6510_PORT);
+	UINT8 c64_port6510 = (UINT8) device_get_info_int(machine->cpu[0], CPUINFO_INT_M6510_PORT);
 
 	/* main memory configuration to include */
 	if (c64mode)
@@ -803,7 +803,7 @@ static int c128_dma_read(running_machine *machine, int offset)
 
 static int c128_dma_read_color(running_machine *machine, int offset)
 {
-	UINT8 c64_port6510 = (UINT8) cpu_get_info_int(machine->cpu[0], CPUINFO_INT_M6510_PORT);
+	UINT8 c64_port6510 = (UINT8) device_get_info_int(machine->cpu[0], CPUINFO_INT_M6510_PORT);
 
 	if (c64mode)
 		return c64_colorram[offset & 0x3ff] & 0xf;
@@ -890,8 +890,8 @@ static void c128_common_driver_init(running_machine *machine)
 	int i;
 
 	/* configure the M6510 port */
-	cpu_set_info_fct(machine->cpu[1], CPUINFO_PTR_M6510_PORTREAD, (genf *) c128_m6510_port_read);
-	cpu_set_info_fct(machine->cpu[1], CPUINFO_PTR_M6510_PORTWRITE, (genf *) c128_m6510_port_write);
+	device_set_info_fct(machine->cpu[1], CPUINFO_PTR_M6510_PORTREAD, (genf *) c128_m6510_port_read);
+	device_set_info_fct(machine->cpu[1], CPUINFO_PTR_M6510_PORTWRITE, (genf *) c128_m6510_port_write);
 
 	c64_memory = ram;
 

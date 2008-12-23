@@ -42,6 +42,7 @@ Emulation Notes:
 #define MASTER_CLOCK 22118400
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
 
@@ -304,7 +305,7 @@ static MACHINE_DRIVER_START( carrera )
 
 	MDRV_VIDEO_UPDATE(carrera)
 
-	MDRV_DEVICE_ADD("crtc", MC6845)
+	MDRV_MC6845_ADD("crtc", MC6845, 0, mc6845_null_interface)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

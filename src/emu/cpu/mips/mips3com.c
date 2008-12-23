@@ -70,7 +70,7 @@ INLINE int tlb_entry_is_global(const mips3_tlb_entry *entry)
     structure based on the configured type
 -------------------------------------------------*/
 
-void mips3com_init(mips3_state *mips, mips3_flavor flavor, int bigendian, const device_config *device, int index, int clock, cpu_irq_callback irqcallback)
+void mips3com_init(mips3_state *mips, mips3_flavor flavor, int bigendian, const device_config *device, cpu_irq_callback irqcallback)
 {
 	const mips3_config *config = device->static_config;
 	int tlbindex;
@@ -79,7 +79,7 @@ void mips3com_init(mips3_state *mips, mips3_flavor flavor, int bigendian, const 
 	memset(mips, 0, sizeof(*mips));
 	mips->flavor = flavor;
 	mips->bigendian = bigendian;
-	mips->cpu_clock = clock;
+	mips->cpu_clock = device->clock;
 	mips->irq_callback = irqcallback;
 	mips->device = device;
 	mips->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
@@ -457,11 +457,11 @@ void mips3com_get_info(mips3_state *mips, UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 40;							break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = MIPS3_MAX_PADDR_SHIFT;break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 32;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = 0;					break;
-		case CPUINFO_INT_LOGADDR_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 32;					break;
-		case CPUINFO_INT_PAGE_SHIFT + ADDRESS_SPACE_PROGRAM: 	info->i = MIPS3_MIN_PAGE_SHIFT;	break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = MIPS3_MAX_PADDR_SHIFT;break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 32;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
+		case CPUINFO_INT_LOGADDR_WIDTH_PROGRAM: info->i = 32;					break;
+		case CPUINFO_INT_PAGE_SHIFT_PROGRAM: 	info->i = MIPS3_MIN_PAGE_SHIFT;	break;
 
 		case CPUINFO_INT_INPUT_STATE + MIPS3_IRQ0:		info->i = (mips->cpr[0][COP0_Cause] & 0x400) ? ASSERT_LINE : CLEAR_LINE;	break;
 		case CPUINFO_INT_INPUT_STATE + MIPS3_IRQ1:		info->i = (mips->cpr[0][COP0_Cause] & 0x800) ? ASSERT_LINE : CLEAR_LINE;	break;
@@ -525,13 +525,13 @@ void mips3com_get_info(mips3_state *mips, UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + MIPS3_LO:			info->i = mips->r[REG_LO];				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						/* provided by core */					break;
-		case CPUINFO_PTR_INIT:							/* provided by core */					break;
-		case CPUINFO_PTR_RESET:							/* provided by core */					break;
-		case CPUINFO_PTR_EXIT:							/* provided by core */					break;
-		case CPUINFO_PTR_EXECUTE:						/* provided by core */					break;
-		case CPUINFO_PTR_TRANSLATE:						/* provided by core */					break;
-		case CPUINFO_PTR_DISASSEMBLE:					/* provided by core */					break;
+		case CPUINFO_FCT_SET_INFO:						/* provided by core */					break;
+		case CPUINFO_FCT_INIT:							/* provided by core */					break;
+		case CPUINFO_FCT_RESET:							/* provided by core */					break;
+		case CPUINFO_FCT_EXIT:							/* provided by core */					break;
+		case CPUINFO_FCT_EXECUTE:						/* provided by core */					break;
+		case CPUINFO_FCT_TRANSLATE:						/* provided by core */					break;
+		case CPUINFO_FCT_DISASSEMBLE:					/* provided by core */					break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &mips->icount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

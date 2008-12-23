@@ -177,7 +177,7 @@ void Dave_Init(running_machine *machine)
 	}
 }
 
-static void dave_update_sound(void *param,stream_sample_t **inputs, stream_sample_t **outputs,int samples)
+static STREAM_UPDATE( dave_update_sound )
 {
 	stream_sample_t *buffer1, *buffer2;
 	/* 0 = channel 0 left volume, 1 = channel 0 right volume,

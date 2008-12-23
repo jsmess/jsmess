@@ -1737,7 +1737,7 @@ MACHINE_START( apple2gs )
 	apple2_init_common(machine);
 
 	/* set up Apple IIgs vectoring */
-	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_G65816_READVECTOR_CALLBACK, (genf *) apple2gs_read_vector);
+	device_set_info_fct(machine->cpu[0], CPUINFO_PTR_G65816_READVECTOR_CALLBACK, (genf *) apple2gs_read_vector);
 
 	/* setup globals */
 	apple2gs_cur_slot6_image = NULL;

@@ -66,7 +66,7 @@ static MACHINE_DRIVER_START( pokemini )
 	MDRV_CPU_ADD( "main", MINX, 4000000 )
 	MDRV_CPU_PROGRAM_MAP( pokemini_mem_map, 0 )
 
-	MDRV_INTERLEAVE(1)
+	MDRV_QUANTUM_TIME(HZ(60))
 
 	MDRV_MACHINE_RESET( pokemini )
 

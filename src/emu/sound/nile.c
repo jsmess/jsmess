@@ -131,7 +131,7 @@ WRITE16_HANDLER(nile_snd_w)
 //  printf("v%02d: %04x to reg %02d (PC=%x)\n", v, nile_sound_regs[offset], r, cpu_get_pc(space->cpu));
 }
 
-static void nile_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int length)
+static STREAM_UPDATE( nile_update )
 {
 	struct nile_info *info = param;
 	UINT8 *sound_ram = info->sound_ram;
@@ -144,7 +144,7 @@ static void nile_update(void *param, stream_sample_t **inputs, stream_sample_t *
 
 	lsptr=leptr=0;
 
-	memset(mix, 0, sizeof(mix[0])*length*2);
+	memset(mix, 0, sizeof(mix[0])*samples*2);
 
 	for (v = 0; v < NILE_VOICES; v++)
 	{
@@ -161,7 +161,7 @@ static void nile_update(void *param, stream_sample_t **inputs, stream_sample_t *
 			lsptr = slot[NILE_REG_LSPTR_HI]<<16 | slot[NILE_REG_LSPTR_LO];
 			leptr = slot[NILE_REG_LEPTR_HI]<<16 | slot[NILE_REG_LEPTR_LO];
 
-			for (snum = 0; snum < length; snum++)
+			for (snum = 0; snum < samples; snum++)
 			{
 				sample = sound_ram[sptr + info->vpos[v]]<<8;
 
@@ -209,7 +209,7 @@ static void nile_update(void *param, stream_sample_t **inputs, stream_sample_t *
 		}
 	}
 	mixp = &mix[0];
-	for (i = 0; i < length; i++)
+	for (i = 0; i < samples; i++)
 	{
 		outputs[0][i] = (*mixp++)>>4;
 		outputs[1][i] = (*mixp++)>>4;
@@ -252,17 +252,17 @@ SND_GET_INFO( nile )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( nile );		break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( nile );				break;
-		case SNDINFO_PTR_STOP:							/* Nothing */							break;
-		case SNDINFO_PTR_RESET:							/* Nothing */							break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( nile );	break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( nile );		break;
+		case SNDINFO_PTR_STOP:							/* Nothing */								break;
+		case SNDINFO_PTR_RESET:							/* Nothing */								break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							info->s = "NiLe";						break;
-		case SNDINFO_STR_CORE_FAMILY:					info->s = "Seta custom";				break;
-		case SNDINFO_STR_CORE_VERSION:					info->s = "1.0";						break;
-		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
-		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "NiLe");					break;
+		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Seta custom");				break;
+		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");						break;
+		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);					break;
+		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

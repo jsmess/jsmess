@@ -9,6 +9,14 @@
 
 #define DMA8257 DEVICE_GET_INFO_NAME(dma8257)
 
+#define MDRV_DMA8257_ADD(_tag, _clock, _config) \
+	MDRV_DEVICE_ADD(_tag, DMA8257, _clock) \
+	MDRV_DEVICE_CONFIG(_config)
+
+#define MDRV_DMA8257_REMOVE(_tag) \
+	MDRV_DEVICE_REMOVE(_tag, DMA8257)
+
+
 #define DMA8257_STATUS_UPDATE		0x10
 #define DMA8257_STATUS_TC_CH3		0x08
 #define DMA8257_STATUS_TC_CH2		0x04
@@ -22,10 +30,7 @@ typedef struct _dma8257_interface dma8257_interface;
 struct _dma8257_interface
 {
 	/* CPU to halt when DMA is active */
-	int cpunum;
-
-	/* clock */
-	int clockhz;
+	const char *cputag;
 
 	/* accessors to main memory */
 	read8_device_func	memory_read;

@@ -48,6 +48,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "sound/custom.h"
 #include "includes/amiga.h"
 #include "machine/6526cia.h"
@@ -174,7 +175,7 @@ static INPUT_CHANGED( coin_changed_callback )
 }
 
 
-static void arcadia_reset_coins(void)
+static void arcadia_reset_coins(running_machine *machine)
 {
 	/* reset coin counters */
 	coin_counter[0] = coin_counter[1] = 0;
@@ -283,7 +284,6 @@ static const custom_sound_interface amiga_custom_interface =
 static const cia6526_interface cia_0_intf =
 {
 	amiga_cia_0_irq,										/* irq_func */
-	AMIGA_68000_NTSC_CLOCK / 10,							/* clock */
 	0,														/* tod_clock */
 	{
 		{ arcadia_cia_0_porta_r, arcadia_cia_0_porta_w },	/* port A */
@@ -294,7 +294,6 @@ static const cia6526_interface cia_0_intf =
 static const cia6526_interface cia_1_intf =
 {
 	amiga_cia_1_irq,										/* irq_func */
-	AMIGA_68000_NTSC_CLOCK / 10,							/* clock */
 	0,														/* tod_clock */
 	{
 		{ NULL, NULL },										/* port A */
@@ -337,10 +336,8 @@ static MACHINE_DRIVER_START( arcadia )
 	MDRV_SOUND_ROUTE(3, "left", 0.50)
 
 	/* cia */
-	MDRV_DEVICE_ADD("cia_0", CIA8520)
-	MDRV_DEVICE_CONFIG(cia_0_intf)
-	MDRV_DEVICE_ADD("cia_1", CIA8520)
-	MDRV_DEVICE_CONFIG(cia_1_intf)
+	MDRV_CIA8520_ADD("cia_0", AMIGA_68000_NTSC_CLOCK / 10, cia_0_intf)
+	MDRV_CIA8520_ADD("cia_1", AMIGA_68000_NTSC_CLOCK / 10, cia_1_intf)
 MACHINE_DRIVER_END
 
 

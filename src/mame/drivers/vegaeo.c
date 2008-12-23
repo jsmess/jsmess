@@ -13,6 +13,7 @@
  *********************************************************************/
 
 #include "driver.h"
+#include "cpu/e132xs/e132xs.h"
 #include "deprecat.h"
 #include "machine/at28c16.h"
 #include "eolithsp.h"
@@ -182,7 +183,7 @@ static MACHINE_DRIVER_START( vega )
 	MDRV_VIDEO_UPDATE(vega)
 
 	/* sound hardware */
-	MDRV_DEVICE_ADD( "at28c16", AT28C16 )
+	MDRV_AT28C16_ADD( "at28c16", NULL )
 MACHINE_DRIVER_END
 
 /*

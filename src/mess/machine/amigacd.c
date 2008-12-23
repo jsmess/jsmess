@@ -17,7 +17,6 @@ DMAC controller.
 #include "machine/tpi6525.h"
 #include "devices/chd_cd.h"
 #include "matsucd.h"
-#include "deprecat.h"
 
 
 #define VERBOSE_DMAC 0
@@ -385,16 +384,16 @@ static WRITE16_HANDLER( amiga_dmac_w )
 
 ***************************************************************************/
 
-static void	dmac_install(offs_t base)
+static void	dmac_install(running_machine *machine, offs_t base)
 {
-	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	memory_install_read16_handler(space, base, base + 0xFFFF, 0, 0, amiga_dmac_r);
 	memory_install_write16_handler(space, base, base + 0xFFFF, 0, 0, amiga_dmac_w);
 }
 
-static void	dmac_uninstall(offs_t base)
+static void	dmac_uninstall(running_machine *machine, offs_t base)
 {
-	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	memory_install_read16_handler(space, base, base + 0xFFFF, 0, 0, SMH_UNMAP);
 	memory_install_write16_handler(space, base, base + 0xFFFF, 0, 0, SMH_UNMAP);
 }
@@ -526,7 +525,7 @@ MACHINE_START( amigacd )
 	tpi6525[0].cb.output = NULL;
 
 	/* set up DMAC with autoconfig */
-	amiga_add_autoconfig( &dmac_device );
+	amiga_add_autoconfig( machine, &dmac_device );
 }
 
 MACHINE_RESET( amigacd )

@@ -739,6 +739,6 @@ DRIVER_INIT( apple3 )
 	/* the Apple /// does some weird tricks whereby it monitors the SYNC pin
 	 * on the CPU to check for indexed instructions and directs them to
 	 * different memory locations */
-	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_M6502_READINDEXED_CALLBACK, (genf *) apple3_indexed_read);
-	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK, (genf *) apple3_indexed_write);
+	device_set_info_fct(machine->cpu[0], CPUINFO_PTR_M6502_READINDEXED_CALLBACK, (genf *) apple3_indexed_read);
+	device_set_info_fct(machine->cpu[0], CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK, (genf *) apple3_indexed_write);
 }

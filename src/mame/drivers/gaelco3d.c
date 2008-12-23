@@ -143,6 +143,7 @@ REF. 970429
 **************************************************************************/
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "gaelco3d.h"
 #include "cpu/tms32031/tms32031.h"
 #include "cpu/adsp2100/adsp2100.h"
@@ -193,9 +194,6 @@ static MACHINE_RESET( common )
 		adsp_ram_base[i] = opcode;
 	}
 
-	/* initialize the ADSP Tx callback */
-	adsp21xx_set_tx_handler(machine->cpu[2], adsp_tx_callback);
-
 	/* allocate a timer for feeding the autobuffer */
 	adsp_autobuffer_timer = timer_alloc(machine, adsp_autobuffer_irq, NULL);
 
@@ -242,7 +240,7 @@ static MACHINE_RESET( gaelco3d2 )
 
 static INTERRUPT_GEN( vblank_gen )
 {
-	gaelco3d_render();
+	gaelco3d_render(device->machine->primary_screen);
 	cpu_set_input_line(device, 2, ASSERT_LINE);
 }
 
@@ -907,6 +905,13 @@ INPUT_PORTS_END
  *
  *************************************/
 
+static const adsp21xx_config adsp_config =
+{
+	NULL,					/* callback for serial receive */
+	adsp_tx_callback,		/* callback for serial transmit */
+	NULL					/* callback for timer fired */
+};
+
 static const tms32031_config tms_config =
 {
 	0x1000,
@@ -924,17 +929,18 @@ static MACHINE_DRIVER_START( gaelco3d )
 	MDRV_CPU_VBLANK_INT("main", vblank_gen)
 
 	MDRV_CPU_ADD("tms", TMS32031, 60000000)
-	MDRV_CPU_PROGRAM_MAP(tms_map,0)
 	MDRV_CPU_CONFIG(tms_config)
+	MDRV_CPU_PROGRAM_MAP(tms_map,0)
 
 	MDRV_CPU_ADD("adsp", ADSP2115, 16000000)
+	MDRV_CPU_CONFIG(adsp_config)
 	MDRV_CPU_PROGRAM_MAP(adsp_program_map,0)
 	MDRV_CPU_DATA_MAP(adsp_data_map, 0)
 
 	MDRV_MACHINE_RESET(gaelco3d)
 	MDRV_NVRAM_HANDLER(93C66B)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

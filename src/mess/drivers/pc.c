@@ -103,8 +103,8 @@ TODO: Which clock signals are available in a PC Jr?
 
 
 #include "driver.h"
-//#include "cpu/nec/nec.h"
-//#include "cpu/i86/i86.h"
+#include "cpu/nec/nec.h"
+#include "cpu/i86/i86.h"
 #include "deprecat.h"
 
 #include "machine/8255ppi.h"
@@ -1331,7 +1331,7 @@ static MACHINE_DRIVER_START( pcmda )
 	MDRV_CPU_IO_MAP(pc8_io, 0)
 	MDRV_CPU_VBLANK_INT_HACK(pc_frame_interrupt, 4)
 
-	MDRV_INTERLEAVE(1)
+	MDRV_QUANTUM_TIME(HZ(60))
 
 	MDRV_MACHINE_START(pc)
 	MDRV_MACHINE_RESET(pc)
@@ -1459,7 +1459,7 @@ static MACHINE_DRIVER_START( ibm5150 )
 	MDRV_CPU_IO_MAP(pc8_io, 0)
 	MDRV_CPU_CONFIG(i86_address_mask)
 
-	MDRV_INTERLEAVE(1)
+	MDRV_QUANTUM_TIME(HZ(60))
 
 	MDRV_MACHINE_START(pc)
 	MDRV_MACHINE_RESET(pc)
@@ -1519,7 +1519,7 @@ static MACHINE_DRIVER_START( pccga )
 	/* basic machine hardware */
 	MDRV_CPU_PC(pc8, pc8, I8088, 4772720, pc_frame_interrupt)	/* 4,77 MHz */
 
-	MDRV_INTERLEAVE(1)
+	MDRV_QUANTUM_TIME(HZ(60))
 
 	MDRV_MACHINE_START(pc)
 	MDRV_MACHINE_RESET(pc)

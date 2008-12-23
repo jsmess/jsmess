@@ -41,7 +41,7 @@ void vc4000_soundport_w (running_machine *machine, int offset, int data)
 /* Sound handler update             */
 /************************************/
 
-static void vc4000_update(void *param,stream_sample_t **inputs, stream_sample_t **outputs,int samples)
+static STREAM_UPDATE( vc4000_update )
 {
 	int i;
 	stream_sample_t *buffer = outputs[0];

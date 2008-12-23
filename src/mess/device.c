@@ -294,14 +294,14 @@ DEVICE_GET_INFO(mess_device)
 		case DEVINFO_FCT_GET_NAME:				info->f = (genf *) DEVICE_GET_NAME_NAME(mess_device);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:					info->s = "Legacy MESS Device";					break;
-		case DEVINFO_STR_FAMILY:				info->s = "Legacy MESS Device";					break;
-		case DEVINFO_STR_VERSION:				info->s = "1.0";								break;
-		case DEVINFO_STR_SOURCE_FILE:			info->s = __FILE__;								break;
-		case DEVINFO_STR_CREDITS:				info->s = "Copyright the MESS Team";			break;
-		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	info->s = mess_device_get_info_string(&mess_device->io_device.devclass, MESS_DEVINFO_STR_FILE_EXTENSIONS); break;
-		case DEVINFO_STR_IMAGE_INSTANCE_NAME:	info->s = mess_device_get_info_string(&mess_device->io_device.devclass, MESS_DEVINFO_STR_NAME + mess_device->io_device.index_in_device); break;
-		case DEVINFO_STR_IMAGE_BRIEF_INSTANCE_NAME:	info->s = mess_device_get_info_string(&mess_device->io_device.devclass, MESS_DEVINFO_STR_SHORT_NAME + mess_device->io_device.index_in_device); break;
+		case DEVINFO_STR_NAME:					strcpy(info->s, "Legacy MESS Device");					break;
+		case DEVINFO_STR_FAMILY:				strcpy(info->s, "Legacy MESS Device");					break;
+		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0");								break;
+		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);								break;
+		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright the MESS Team");			break;
+		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	strcpy(info->s, mess_device_get_info_string(&mess_device->io_device.devclass, MESS_DEVINFO_STR_FILE_EXTENSIONS)); break;
+		case DEVINFO_STR_IMAGE_INSTANCE_NAME:	strcpy(info->s, mess_device_get_info_string(&mess_device->io_device.devclass, MESS_DEVINFO_STR_NAME + mess_device->io_device.index_in_device)); break;
+		case DEVINFO_STR_IMAGE_BRIEF_INSTANCE_NAME:	strcpy(info->s, mess_device_get_info_string(&mess_device->io_device.devclass, MESS_DEVINFO_STR_SHORT_NAME + mess_device->io_device.index_in_device)); break;
 
 		default:
 			if ((state >= DEVINFO_PTR_IMAGE_CREATE_OPTSPEC) && (state < DEVINFO_PTR_IMAGE_CREATE_OPTSPEC + DEVINFO_CREATE_OPTMAX))
@@ -406,7 +406,7 @@ static void create_mess_device(device_config **listheadptr, device_getinfo_handl
 		}
 
 		/* create a bonafide MAME device */
-		device = device_list_add(listheadptr, MESS_DEVICE, mame_tag);
+		device = device_list_add(listheadptr, NULL, MESS_DEVICE, mame_tag, 0);
 		mess_device = (mess_device_config *) device->inline_config;
 
 		/* we need to copy the mess_tag into the structure */
@@ -656,13 +656,13 @@ iodevice_t image_devtype(const device_config *image)
 
 
 
-const device_config *image_from_devtype_and_index(iodevice_t type, int id)
+const device_config *image_from_devtype_and_index(running_machine *machine, iodevice_t type, int id)
 {
 	const device_config *image = NULL;
 	const device_config *dev;
 	const legacy_mess_device *iodev;
 
-	for (dev = device_list_first(Machine->config->devicelist, MESS_DEVICE); dev != NULL; dev = device_list_next(dev, MESS_DEVICE))
+	for (dev = device_list_first(machine->config->devicelist, MESS_DEVICE); dev != NULL; dev = device_list_next(dev, MESS_DEVICE))
 	{
 		iodev = mess_device_from_core_device(dev);
 		if ((type == iodev->type) && (iodev->index_in_device == id))

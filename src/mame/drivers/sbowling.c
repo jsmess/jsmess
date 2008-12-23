@@ -38,6 +38,7 @@ PROMs : NEC B406 (1kx4) x2
 ***********************************************************/
 
 #include "driver.h"
+#include "cpu/i8085/i8085.h"
 #include "deprecat.h"
 #include "cpu/mcs48/mcs48.h"
 #include "video/resnet.h"
@@ -60,9 +61,9 @@ static TILE_GET_INFO( get_sb_tile_info )
 	SET_TILE_INFO(0, tileno, 0, 0);
 }
 
-static void plot_pixel_sbw(int x, int y, int col)
+static void plot_pixel_sbw(int x, int y, int col, int flip)
 {
-	if (flip_screen_get())
+	if (flip)
 	{
 		y = 255-y;
 		x = 247-x;
@@ -72,6 +73,7 @@ static void plot_pixel_sbw(int x, int y, int col)
 
 static WRITE8_HANDLER( sbw_videoram_w )
 {
+	int flip = flip_screen_get(space->machine);
 	int x,y,i,v1,v2;
 
 	videoram[offset] = data;
@@ -86,7 +88,7 @@ static WRITE8_HANDLER( sbw_videoram_w )
 
 	for(i = 0; i < 8; i++)
 	{
-		plot_pixel_sbw(x++, y, color_prom_address | ( ((v1&1)*0x20) | ((v2&1)*0x40) ) );
+		plot_pixel_sbw(x++, y, color_prom_address | ( ((v1&1)*0x20) | ((v2&1)*0x40) ), flip);
 		v1 >>= 1;
 		v2 >>= 1;
 	}
@@ -147,7 +149,7 @@ static WRITE8_HANDLER (system_w)
         -----x-- 1 ?
         ----x--- flip screen/controls
     */
-	flip_screen_set(data&1);
+	flip_screen_set(space->machine, data&1);
 
 	if((sbw_system^data)&1)
 	{

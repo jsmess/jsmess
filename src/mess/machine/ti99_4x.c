@@ -889,7 +889,7 @@ INTERRUPT_GEN( ti99_vblank_interrupt )
 INTERRUPT_GEN( ti99_4ev_hblank_interrupt )
 {
 	static int line_count;
-	v9938_interrupt(0);
+	v9938_interrupt(device->machine, 0);
 	if (++line_count == 262)
 	{
 		line_count = 0;

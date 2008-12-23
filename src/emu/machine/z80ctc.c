@@ -90,7 +90,6 @@ typedef struct _z80ctc z80ctc;
 struct _z80ctc
 {
 	UINT8				vector;				/* interrupt vector */
-	UINT32				clock;				/* system clock */
 	attotime			period16;			/* 16/system clock */
 	attotime			period256;			/* 256/system clock */
 	void (*intr)(const device_config *device, int which);	/* interrupt callback */
@@ -465,21 +464,10 @@ static DEVICE_START( z80ctc )
 	const z80ctc_interface *intf = device->static_config;
 	astring *tempstring = astring_alloc();
 	z80ctc *ctc = get_safe_token(device);
-	const device_config *cpu = NULL;
 	int ch;
 
-	if (intf->cpu != NULL)
-	{
-		cpu = cputag_get_cpu(device->machine, device_inherit_tag(tempstring, device->tag, intf->cpu));
-		if (cpu == NULL)
-			fatalerror("Z80CTC:Unable to find CPU %s\n", device_inherit_tag(tempstring, device->tag, intf->cpu));
-	}
-	if (cpu != NULL)
-		ctc->clock = cpu_get_clock(cpu);
-	else
-		ctc->clock = intf->baseclock;
-	ctc->period16 = attotime_mul(ATTOTIME_IN_HZ(ctc->clock), 16);
-	ctc->period256 = attotime_mul(ATTOTIME_IN_HZ(ctc->clock), 256);
+	ctc->period16 = attotime_mul(ATTOTIME_IN_HZ(device->clock), 16);
+	ctc->period256 = attotime_mul(ATTOTIME_IN_HZ(device->clock), 256);
 	for (ch = 0; ch < 4; ch++)
 	{
 		ctc_channel *channel = &ctc->channel[ch];
@@ -557,11 +545,11 @@ DEVICE_GET_INFO( z80ctc )
 		case DEVINFO_FCT_IRQ_RETI:						info->f = (genf *)z80ctc_irq_reti;		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "Zilog Z80 CTC";				break;
-		case DEVINFO_STR_FAMILY:						info->s = "Z80";						break;
-		case DEVINFO_STR_VERSION:						info->s = "1.0";						break;
-		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;						break;
-		case DEVINFO_STR_CREDITS:						info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Zilog Z80 CTC");		break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Z80");					break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");					break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);				break;
+		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

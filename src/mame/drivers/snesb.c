@@ -80,6 +80,8 @@ TODO:
 
 ***************************************************************************/
 #include "driver.h"
+#include "cpu/spc700/spc700.h"
+#include "cpu/g65816/g65816.h"
 #include "includes/snes.h"
 
 static INT8 *shared_ram;
@@ -551,7 +553,7 @@ static MACHINE_DRIVER_START( kinstb )
 	MDRV_CPU_ADD("sound", SPC700, 2048000/2)	/* 2.048 Mhz, but internal divider */
 	MDRV_CPU_PROGRAM_MAP(spc_mem, 0)
 
-	MDRV_INTERLEAVE(600)
+	MDRV_QUANTUM_TIME(HZ(36000))
 
 	MDRV_MACHINE_START( snes )
 	MDRV_MACHINE_RESET( snes )

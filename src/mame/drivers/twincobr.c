@@ -188,6 +188,7 @@ Shark   Zame
 
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms32010/tms32010.h"
 #include "twincobr.h"
@@ -716,7 +717,7 @@ static MACHINE_DRIVER_START( twincobr )
 	/* Data Map is internal to the CPU */
 	MDRV_CPU_IO_MAP(DSP_io_map, 0)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	MDRV_MACHINE_RESET(twincobr)	/* Reset fshark bootleg 8741 MCU data */
 

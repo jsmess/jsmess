@@ -144,6 +144,7 @@ Video board has additional chips:
 */
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "sound/ay8910.h"
 #include "video/hd63484.h"
 #include "machine/microtch.h"
@@ -174,7 +175,7 @@ static void duart_tx(const device_config *device, int channel, UINT8 data)
 	}
 };
 
-static void microtouch_tx(UINT8 data)
+static void microtouch_tx(running_machine *machine, UINT8 data)
 {
 	duart68681_rx_data(skattv_devices.duart68681, 0, data);
 }
@@ -196,7 +197,6 @@ static MACHINE_RESET( skattv )
 
 static const duart68681_config skattv_duart68681_config =
 {
-	XTAL_8_664MHz / 2, //??
 	duart_irq_handler,
 	duart_tx,
 	duart_input,
@@ -535,8 +535,7 @@ static MACHINE_DRIVER_START( quickjac )
 	MDRV_MACHINE_START(skattv)
 	MDRV_MACHINE_RESET(skattv)
 
-	MDRV_DEVICE_ADD( "duart68681", DUART68681 )
-	MDRV_DEVICE_CONFIG( skattv_duart68681_config )
+	MDRV_DUART68681_ADD( "duart68681", XTAL_8_664MHz / 2, skattv_duart68681_config )
 
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(30)
@@ -564,8 +563,7 @@ static MACHINE_DRIVER_START( skattv )
 	MDRV_MACHINE_START(skattv)
 	MDRV_MACHINE_RESET(skattv)
 
-	MDRV_DEVICE_ADD( "duart68681", DUART68681 )
-	MDRV_DEVICE_CONFIG( skattv_duart68681_config )
+	MDRV_DUART68681_ADD( "duart68681", XTAL_8_664MHz / 2, skattv_duart68681_config )
 
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(30)

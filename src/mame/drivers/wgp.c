@@ -394,6 +394,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "taitoipt.h"
 #include "cpu/m68000/m68000.h"
 #include "video/taitoic.h"
@@ -969,7 +970,7 @@ static MACHINE_DRIVER_START( wgp )
 	MDRV_MACHINE_START(wgp)
 	MDRV_MACHINE_RESET(wgp)
 
-	MDRV_INTERLEAVE(500)
+	MDRV_QUANTUM_TIME(HZ(30000))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -1000,7 +1001,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( wgp2 )
 	MDRV_IMPORT_FROM(wgp)
 
-	MDRV_INTERLEAVE(200)
+	MDRV_QUANTUM_TIME(HZ(12000))
 	/* video hardware */
 	MDRV_VIDEO_START(wgp2)
 MACHINE_DRIVER_END

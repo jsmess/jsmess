@@ -70,7 +70,7 @@ enum
 typedef struct _dsp32_config dsp32_config;
 struct _dsp32_config
 {
-	void	(*output_pins_changed)(UINT32 pins);	/* a change has occurred on an output pin */
+	void	(*output_pins_changed)(const device_config *device, UINT32 pins);	/* a change has occurred on an output pin */
 };
 
 
@@ -80,6 +80,7 @@ struct _dsp32_config
 ***************************************************************************/
 
 extern CPU_GET_INFO( dsp32c );
+#define CPU_DSP32C CPU_GET_INFO_NAME( dsp32c )
 
 extern void dsp32c_pio_w(const device_config *device, int reg, int data);
 extern int dsp32c_pio_r(const device_config *device, int reg);

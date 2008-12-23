@@ -216,6 +216,8 @@ cpu #2 (PC=0000060E): unmapped memory word read from 0000683A & FFFF
 ****************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
+#include "cpu/m68000/m68000.h"
 #include "taitoipt.h"
 #include "audio/taitosnd.h"
 #include "video/taitoic.h"
@@ -611,7 +613,7 @@ static MACHINE_DRIVER_START( airsys )
 	MDRV_CPU_DATA_MAP(DSP_map_data, 0)
 	MDRV_CPU_IO_MAP(DSP_map_io, 0)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_MACHINE_START(taitoair)
 

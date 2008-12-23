@@ -150,8 +150,7 @@ static MACHINE_DRIVER_START( apogee )
 	MDRV_SOUND_ADD("cassette", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_DEVICE_ADD("dma8257", DMA8257)
-	MDRV_DEVICE_CONFIG(radio86_dma)
+	MDRV_DMA8257_ADD("dma8257", XTAL_16MHz / 9, radio86_dma)
 
 	MDRV_CASSETTE_ADD( "cassette", apogee_cassette_config )
 MACHINE_DRIVER_END

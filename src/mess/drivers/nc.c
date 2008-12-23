@@ -94,6 +94,7 @@
  ******************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "includes/nc.h"
 #include "includes/serial.h"	/* for serial data transfers */
 #include "machine/msm8251.h"	/* for NC100 uart */
@@ -1371,8 +1372,8 @@ static MACHINE_RESET( nc200 )
     nc_common_init_machine(machine);
 
     /* double sided, 80 track drive */
-	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 0), FLOPPY_DRIVE_DS_80);
-	//floppy_drive_set_index_pulse_callback(image_from_devtype_and_index(IO_FLOPPY, 0), nc200_floppy_drive_index_callback);
+	floppy_drive_set_geometry(image_from_devtype_and_index(machine, IO_FLOPPY, 0), FLOPPY_DRIVE_DS_80);
+	//floppy_drive_set_index_pulse_callback(image_from_devtype_and_index(machine, IO_FLOPPY, 0), nc200_floppy_drive_index_callback);
 
 	mc146818_init(machine, MC146818_STANDARD);
 
@@ -1679,7 +1680,7 @@ static MACHINE_DRIVER_START( nc100 )
 	MDRV_CPU_ADD("main", Z80, /*6000000*/ 4606000)        /* Russell Marks says this is more accurate */
 	MDRV_CPU_PROGRAM_MAP(nc_map, 0)
 	MDRV_CPU_IO_MAP(nc100_io, 0)
-	MDRV_INTERLEAVE(1)
+	MDRV_QUANTUM_TIME(HZ(60))
 
 	MDRV_MACHINE_START( nc100 )
 	MDRV_MACHINE_RESET( nc100 )

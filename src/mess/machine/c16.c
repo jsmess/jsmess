@@ -125,7 +125,7 @@ void c16_m7501_port_write(const device_config *device, UINT8 direction, UINT8 da
 UINT8 c16_m7501_port_read(const device_config *device, UINT8 direction)
 {
 	UINT8 data = 0xff;
-	UINT8 c16_port7501 = (UINT8) cpu_get_info_int(device->machine->cpu[0], CPUINFO_INT_M6510_PORT);
+	UINT8 c16_port7501 = (UINT8) device_get_info_int(device->machine->cpu[0], CPUINFO_INT_M6510_PORT);
 
 	if ((c16_port7501 & 0x01) || !cbm_serial_data_read(device->machine))
 		data &= ~0x80;
@@ -432,8 +432,8 @@ static void c16_common_driver_init (running_machine *machine)
 	UINT8 *rom;
 
 	/* configure the M7501 port */
-	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_M6510_PORTREAD, (genf *) c16_m7501_port_read);
-	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_M6510_PORTWRITE, (genf *) c16_m7501_port_write);
+	device_set_info_fct(machine->cpu[0], CPUINFO_PTR_M6510_PORTREAD, (genf *) c16_m7501_port_read);
+	device_set_info_fct(machine->cpu[0], CPUINFO_PTR_M6510_PORTWRITE, (genf *) c16_m7501_port_write);
 
 	c16_select_roms (cputag_get_address_space(machine,"main",ADDRESS_SPACE_PROGRAM), 0, 0);
 	c16_switch_to_rom (cputag_get_address_space(machine,"main",ADDRESS_SPACE_PROGRAM), 0, 0);

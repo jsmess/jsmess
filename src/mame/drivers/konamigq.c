@@ -46,6 +46,7 @@
 */
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "cpu/mips/psx.h"
 #include "includes/psx.h"
 #include "machine/konamigx.h"
@@ -278,7 +279,7 @@ static const k054539_interface k054539_config =
 
 static UINT8 sector_buffer[ 512 ];
 
-static void scsi_dma_read( UINT32 n_address, INT32 n_size )
+static void scsi_dma_read( running_machine *machine, UINT32 n_address, INT32 n_size )
 {
 	int i;
 	int n_this;
@@ -311,7 +312,7 @@ static void scsi_dma_read( UINT32 n_address, INT32 n_size )
 	}
 }
 
-static void scsi_dma_write( UINT32 n_address, INT32 n_size )
+static void scsi_dma_write( running_machine *machine, UINT32 n_address, INT32 n_size )
 {
 }
 

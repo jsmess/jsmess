@@ -19,6 +19,6 @@ DEVICE_GET_INFO(coco_vhd);
 #define COCO_VHD	DEVICE_GET_INFO_NAME(coco_vhd)
 
 #define MDRV_COCO_VHD_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, COCO_VHD) \
+	MDRV_DEVICE_ADD(_tag, COCO_VHD, 0) \
 	
 #endif /* COCOVHD_H */

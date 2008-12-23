@@ -174,7 +174,7 @@ Check gticlub.c for details on the bottom board.
 */
 
 #include "driver.h"
-#include "deprecat.h"
+#include "cpu/m68000/m68000.h"
 #include "cpu/powerpc/ppc.h"
 #include "cpu/sharc/sharc.h"
 #include "sound/k054539.h"
@@ -299,7 +299,7 @@ static VIDEO_UPDATE( zr107 )
 
 static CUSTOM_INPUT( adcdo_r )
 {
-	return adc083x_do_read(0);
+	return adc083x_do_read(field->port->machine, 0);
 }
 
 static READ8_HANDLER( sysreg_r )
@@ -323,7 +323,7 @@ static READ8_HANDLER( sysreg_r )
                 0x20 = SARS (A/D busy flag)
                 0x10 = EEPDO (EEPROM DO)
             */
-			r = (adc083x_sars_read(0) << 5) | (eeprom_read_bit() << 4);
+			r = (adc083x_sars_read(space->machine, 0) << 5) | (eeprom_read_bit() << 4);
 			break;
 
 		case 5:	/* Parallel data port */
@@ -382,9 +382,9 @@ static WRITE8_HANDLER( sysreg_w )
 			if (data & 0x40)	/* CG Board 0 IRQ Ack */
 				cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_IRQ0, CLEAR_LINE);
 			set_cgboard_id((data >> 4) & 3);
-			adc083x_cs_write(0, (data >> 2) & 1);
-			adc083x_di_write(0, (data >> 1) & 1);
-			adc083x_clk_write(0, (data >> 0) & 1);
+			adc083x_cs_write(space->machine, 0, (data >> 2) & 1);
+			adc083x_di_write(space->machine, 0, (data >> 1) & 1);
+			adc083x_clk_write(space->machine, 0, (data >> 0) & 1);
 			mame_printf_debug("System register 1 = %02X\n", data);
 			break;
 
@@ -399,16 +399,16 @@ static WRITE8_HANDLER( sysreg_w )
 	}
 }
 
-static double adc0838_callback(int input)
+static double adc0838_callback(running_machine *machine, int input)
 {
 	switch (input)
 	{
 		case ADC083X_CH0:
-			return (double)(5 * input_port_read(Machine, "ANALOG1")) / 255.0;
+			return (double)(5 * input_port_read(machine, "ANALOG1")) / 255.0;
 		case ADC083X_CH1:
-			return (double)(5 * input_port_read(Machine, "ANALOG2")) / 255.0;
+			return (double)(5 * input_port_read(machine, "ANALOG2")) / 255.0;
 		case ADC083X_CH2:
-			return (double)(5 * input_port_read(Machine, "ANALOG3")) / 255.0;
+			return (double)(5 * input_port_read(machine, "ANALOG3")) / 255.0;
 		case ADC083X_CH3:
 			return 0;
 		case ADC083X_COM:
@@ -459,14 +459,14 @@ static UINT32 *workram;
 static MACHINE_START( zr107 )
 {
 	/* set conservative DRC options */
-	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_DRC_OPTIONS, PPCDRC_COMPATIBLE_OPTIONS);
+	device_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_DRC_OPTIONS, PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_SELECT, 0);
-	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_START, 0x00000000);
-	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_END, 0x000fffff);
-	cpu_set_info_ptr(machine->cpu[0], CPUINFO_PTR_PPC_FASTRAM_BASE, workram);
-	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_READONLY, 0);
+	device_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_SELECT, 0);
+	device_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_START, 0x00000000);
+	device_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_END, 0x000fffff);
+	device_set_info_ptr(machine->cpu[0], CPUINFO_PTR_PPC_FASTRAM_BASE, workram);
+	device_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_READONLY, 0);
 }
 
 static ADDRESS_MAP_START( zr107_map, ADDRESS_SPACE_PROGRAM, 32 )
@@ -748,7 +748,7 @@ static MACHINE_DRIVER_START( zr107 )
 	MDRV_CPU_CONFIG(sharc_cfg)
 	MDRV_CPU_DATA_MAP(sharc_map, 0)
 
-	MDRV_INTERLEAVE(500)
+	MDRV_QUANTUM_TIME(HZ(30000))
 
 	MDRV_NVRAM_HANDLER(93C46)
 	MDRV_MACHINE_START(zr107)
@@ -793,7 +793,7 @@ static MACHINE_DRIVER_START( jetwave )
 	MDRV_CPU_CONFIG(sharc_cfg)
 	MDRV_CPU_DATA_MAP(sharc_map, 0)
 
-	MDRV_INTERLEAVE(500)
+	MDRV_QUANTUM_TIME(HZ(30000))
 
 	MDRV_NVRAM_HANDLER(93C46)
 	MDRV_MACHINE_START(zr107)
@@ -853,13 +853,13 @@ static void init_zr107(running_machine *machine)
 
 static DRIVER_INIT(zr107)
 {
-	init_konami_cgboard(1, CGBOARD_TYPE_ZR107);
+	init_konami_cgboard(machine, 1, CGBOARD_TYPE_ZR107);
 	init_zr107(machine);
 }
 
 static DRIVER_INIT(jetwave)
 {
-	init_konami_cgboard(1, CGBOARD_TYPE_GTICLUB);
+	init_konami_cgboard(machine, 1, CGBOARD_TYPE_GTICLUB);
 	init_zr107(machine);
 }
 

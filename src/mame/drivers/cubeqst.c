@@ -18,6 +18,7 @@
 ****************************************************************************/
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "cpu/cubeqcpu/cubeqcpu.h"
 #include "sound/dac.h"
 #include "sound/custom.h"
@@ -504,7 +505,7 @@ static MACHINE_DRIVER_START( cubeqst )
 	MDRV_CPU_PROGRAM_MAP(line_sound_map, 0)
 	MDRV_CPU_CONFIG(snd_config)
 
-	MDRV_INTERLEAVE(800)
+	MDRV_QUANTUM_TIME(HZ(48000))
 
 	MDRV_MACHINE_START(cubeqst)
 	MDRV_MACHINE_RESET(cubeqst)

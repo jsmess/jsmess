@@ -517,26 +517,26 @@ XL/XE 16kB OS roms
 	DRIVER( ip244415 )
 
 	/* TEXAS INSTRUMENTS */
-	DRIVER( ti990_10 )	/* 1975 TI 990/10									*/
-	DRIVER( ti990_4 )	/* 1976 TI 990/4									*/
-	DRIVER( 990189 )	/* 1978 TM 990/189									*/
-	DRIVER( 990189v )	/* 1980 TM 990/189 with Color Video Board			*/
+//0128u7	DRIVER( ti990_10 )	/* 1975 TI 990/10									*/
+//0128u7	DRIVER( ti990_4 )	/* 1976 TI 990/4									*/
+//0128u7	DRIVER( 990189 )	/* 1978 TM 990/189									*/
+//0128u7	DRIVER( 990189v )	/* 1980 TM 990/189 with Color Video Board			*/
 
-	DRIVER( ti99_224 )	/* 1983 TI 99/2 (24kb ROMs)							*/
-	DRIVER( ti99_232 )	/* 1983 TI 99/2 (32kb ROMs)							*/
-	DRIVER( ti99_4 )	/* 1979 TI-99/4										*/
-	DRIVER( ti99_4e )	/* 1980 TI-99/4 with 50Hz video						*/
-	DRIVER( ti99_4a )	/* 1981 TI-99/4A									*/
-	DRIVER( ti99_4ae )	/* 1981 TI-99/4A with 50Hz video					*/
-	DRIVER( ti99_4ev)	/* 1994 TI-99/4A with EVPC video card				*/
-	DRIVER( ti99_8 )	/* 1983 TI-99/8										*/
-	DRIVER( ti99_8e )	/* 1983 TI-99/8 with 50Hz video						*/
+//0128u7	DRIVER( ti99_224 )	/* 1983 TI 99/2 (24kb ROMs)							*/
+//0128u7	DRIVER( ti99_232 )	/* 1983 TI 99/2 (32kb ROMs)							*/
+//0128u7	DRIVER( ti99_4 )	/* 1979 TI-99/4										*/
+//0128u7	DRIVER( ti99_4e )	/* 1980 TI-99/4 with 50Hz video						*/
+//0128u7	DRIVER( ti99_4a )	/* 1981 TI-99/4A									*/
+//0128u7	DRIVER( ti99_4ae )	/* 1981 TI-99/4A with 50Hz video					*/
+//0128u7	DRIVER( ti99_4ev)	/* 1994 TI-99/4A with EVPC video card				*/
+//0128u7	DRIVER( ti99_8 )	/* 1983 TI-99/8										*/
+//0128u7	DRIVER( ti99_8e )	/* 1983 TI-99/8 with 50Hz video						*/
 
 	/* TI 99 clones */
-	DRIVER( tutor)		/* 1983? Tomy Tutor									*/
-	DRIVER( geneve )	/* 1987? Myarc Geneve 9640							*/
-	DRIVER( genmod )	/* 199?? Myarc Geneve 9640							*/
-	DRIVER( ti99_4p )	/* 1996 SNUG 99/4P (a.k.a. SGCPU)					*/
+//0128u7	DRIVER( tutor)		/* 1983? Tomy Tutor									*/
+//0128u7	DRIVER( geneve )	/* 1987? Myarc Geneve 9640							*/
+//0128u7	DRIVER( genmod )	/* 199?? Myarc Geneve 9640							*/
+//0128u7	DRIVER( ti99_4p )	/* 1996 SNUG 99/4P (a.k.a. SGCPU)					*/
 
 	DRIVER( avigo )		/*													*/
 
@@ -559,16 +559,16 @@ XL/XE 16kB OS roms
 	DRIVER( jupiter )	/* Jupiter Ace										*/
 
 	/* SORD */
-	DRIVER( sordm5 )
-	DRIVER( srdm5fd5 )
+//0128u7	DRIVER( sordm5 )
+//0128u7	DRIVER( srdm5fd5 )
 
 	/* APF Electronics Inc. */
 	DRIVER( apfm1000 )
 	DRIVER( apfimag )
 
 	/* Tatung */
-	DRIVER( einstein )
-	DRIVER( einstei2 )
+//0128u7	DRIVER( einstein )
+//0128u7	DRIVER( einstei2 )
 
 	/* INTELLIGENT SOFTWARE */
 	DRIVER( ep128 )		/* Enterprise 128 k									*/
@@ -578,16 +578,16 @@ XL/XE 16kB OS roms
 
 	/* VEB MIKROELEKTRONIK */
 	/* KC compact is partial CPC compatible */
-	DRIVER( kc85_4 )	/* VEB KC 85/4										*/
-	DRIVER( kc85_3 )	/* VEB KC 85/3										*/
-	DRIVER( kc85_4d )	/* VEB KC 85/4 with disk interface					*/
+//0128u7	DRIVER( kc85_4 )	/* VEB KC 85/4										*/
+//0128u7	DRIVER( kc85_3 )	/* VEB KC 85/3										*/
+//0128u7	DRIVER( kc85_4d )	/* VEB KC 85/4 with disk interface					*/
 
 	/* MICROBEE SYSTEMS */
-	DRIVER( mbee )		/* Microbee 16 Standard or Plus						*/
-	DRIVER( mbeeic )	/* Microbee 32 IC									*/
-	DRIVER( mbeepc )	/* Microbee 32 PC									*/
-	DRIVER( mbeepc85 )	/* Microbee 32 PC85									*/
-	DRIVER( mbee56 )	/* Microbee 56K (CP/M)								*/
+//0128u7	DRIVER( mbee )		/* Microbee 16 Standard or Plus						*/
+//0128u7	DRIVER( mbeeic )	/* Microbee 32 IC									*/
+//0128u7	DRIVER( mbeepc )	/* Microbee 32 PC									*/
+//0128u7	DRIVER( mbeepc85 )	/* Microbee 32 PC85									*/
+//0128u7	DRIVER( mbee56 )	/* Microbee 56K (CP/M)								*/
 
 	/* TANDY RADIO SHACK */
 	DRIVER( trs80 )		/* TRS-80 Model I - Level I BASIC					*/
@@ -622,22 +622,22 @@ XL/XE 16kB OS roms
 	/* system 80 trs80 compatible */
 
 	/* VIDEO TECHNOLOGY */
-	DRIVER( crvision )	/* 1981 creatiVision								*/
-	DRIVER( fnvision )	/* 1983 FunVision									*/
-	DRIVER( laser110 )	/* 1983 Laser 110									*/
-	DRIVER( las110de )	/* 1983 Sanyo Laser 110 (Germany)					*/
-	DRIVER( laser200 )	/* 1983 Laser 200 (color version of 110)			*/
+//0128u7	DRIVER( crvision )	/* 1981 creatiVision								*/
+//0128u7	DRIVER( fnvision )	/* 1983 FunVision									*/
+//0128u7	DRIVER( laser110 )	/* 1983 Laser 110									*/
+//0128u7	DRIVER( las110de )	/* 1983 Sanyo Laser 110 (Germany)					*/
+//0128u7	DRIVER( laser200 )	/* 1983 Laser 200 (color version of 110)			*/
 //	DRIVER( vz200de )	/* 1983 VZ-200 (Germany)							*/
-	DRIVER( fellow )	/* 1983 Salora Fellow (Finland) 					*/
-	DRIVER( tx8000 )	/* 1983 Texet TX-8000 (U.K.)						*/
-	DRIVER( laser210 )	/* 1984 Laser 210 (200 with more memory)			*/
-	DRIVER( las210de )	/* 1984 Sanyo Laser 210 (Germany)					*/
-	DRIVER( vz200 )		/* 1984 Dick Smith Electronics VZ-200				*/
-	DRIVER( laser310 )	/* 1984 Laser 310 (210 with diff. keyboard and RAM)	*/
-	DRIVER( vz300 )		/* 1984 Dick Smith Electronics VZ-300				*/
-	DRIVER( laser350 )	/* 1984? Laser 350									*/
-	DRIVER( laser500 )	/* 1984? Laser 500									*/
-	DRIVER( laser700 )	/* 1984? Laser 700									*/
+//0128u7	DRIVER( fellow )	/* 1983 Salora Fellow (Finland) 					*/
+//0128u7	DRIVER( tx8000 )	/* 1983 Texet TX-8000 (U.K.)						*/
+//0128u7	DRIVER( laser210 )	/* 1984 Laser 210 (200 with more memory)			*/
+//0128u7	DRIVER( las210de )	/* 1984 Sanyo Laser 210 (Germany)					*/
+//0128u7	DRIVER( vz200 )		/* 1984 Dick Smith Electronics VZ-200				*/
+//0128u7	DRIVER( laser310 )	/* 1984 Laser 310 (210 with diff. keyboard and RAM)	*/
+//0128u7	DRIVER( vz300 )		/* 1984 Dick Smith Electronics VZ-300				*/
+//0128u7	DRIVER( laser350 )	/* 1984? Laser 350									*/
+//0128u7	DRIVER( laser500 )	/* 1984? Laser 500									*/
+//0128u7	DRIVER( laser700 )	/* 1984? Laser 700									*/
 
 	/* TANGERINE */
 	DRIVER( microtan )	/* 1979 Microtan 65									*/
@@ -787,8 +787,8 @@ XL/XE 16kB OS roms
 
 
 	/* NASCOM MICROCOMPUTERS */
-	DRIVER( nascom1 )	/* 1978 Nascom 1									*/
-	DRIVER( nascom2 )	/* 1979 Nascom 2									*/
+//0128u7	DRIVER( nascom1 )	/* 1978 Nascom 1									*/
+//0128u7	DRIVER( nascom2 )	/* 1979 Nascom 2									*/
 
 	/* MILES GORDON TECHNOLOGY */
 	DRIVER( samcoupe )	/* 1989 Sam Coupe									*/
@@ -884,8 +884,8 @@ XL/XE 16kB OS roms
 	DRIVER(compis)		/* 1985 Telenova Compis								*/
 
 	/* Multitech */
-	DRIVER(mpf1)		/* 1979 Multitech Micro Professor 1					*/
-	DRIVER(mpf1b)		/* 1979 Multitech Micro Professor 1B				*/
+//0128u7	DRIVER(mpf1)		/* 1979 Multitech Micro Professor 1					*/
+//0128u7	DRIVER(mpf1b)		/* 1979 Multitech Micro Professor 1B				*/
 
 	/* Telercas Oy */
 //	DRIVER(tmc1800)
@@ -903,11 +903,11 @@ XL/XE 16kB OS roms
 	DRIVER( tx0_8kw )	/* 1962 MIT TX-0 (8kw RAM)							*/
 
 	/* Luxor Datorer AB */
-	DRIVER( abc80 )
-	DRIVER( abc802 )
-	DRIVER( abc800m )
-	DRIVER( abc800c )
-	DRIVER( abc806 )
+//0128u7	DRIVER( abc80 )
+//0128u7	DRIVER( abc802 )
+//0128u7	DRIVER( abc800m )
+//0128u7	DRIVER( abc800c )
+//0128u7	DRIVER( abc806 )
 
 	/* Be Incorporated */
 	DRIVER( bebox )		/* BeBox Dual603-66									*/
@@ -917,19 +917,19 @@ XL/XE 16kB OS roms
 	DRIVER( gamecom )	/* Tiger Game.com									*/
 
 	/* Thomson */
-	DRIVER( t9000 )		/* 1980 Thomson T9000 (TO7 prototype)				*/
-	DRIVER( to7 )		/* 1982 Thomson TO7									*/
-	DRIVER( to770 )		/* 1984 Thomson TO7/70								*/
-	DRIVER( to770a )	/* 198? Thomson TO7/70 arabic version				*/
-	DRIVER( mo5 )		/* 1984 Thomson MO5									*/
-	DRIVER( mo5e )		/* 1986 Thomson MO5E (export version)				*/
-	DRIVER( to9 )		/* 1985 Thomson T09									*/
-	DRIVER( to8 )		/* 1986 Thomson T08									*/
-	DRIVER( to8d )		/* 1987 Thomson T08D								*/
-	DRIVER( to9p )		/* 1986 Thomson T09+								*/
-	DRIVER( mo6 )		/* 1986 Thomson MO6									*/
-	DRIVER( mo5nr )		/* 1986 Thomson MO5 NR								*/
-	DRIVER( pro128 )	/* 1986 Olivetti Prodest PC 128						*/
+//0128u7	DRIVER( t9000 )		/* 1980 Thomson T9000 (TO7 prototype)				*/
+//0128u7	DRIVER( to7 )		/* 1982 Thomson TO7									*/
+//0128u7	DRIVER( to770 )		/* 1984 Thomson TO7/70								*/
+//0128u7	DRIVER( to770a )	/* 198? Thomson TO7/70 arabic version				*/
+//0128u7	DRIVER( mo5 )		/* 1984 Thomson MO5									*/
+//0128u7	DRIVER( mo5e )		/* 1986 Thomson MO5E (export version)				*/
+//0128u7	DRIVER( to9 )		/* 1985 Thomson T09									*/
+//0128u7	DRIVER( to8 )		/* 1986 Thomson T08									*/
+//0128u7	DRIVER( to8d )		/* 1987 Thomson T08D								*/
+//0128u7	DRIVER( to9p )		/* 1986 Thomson T09+								*/
+//0128u7	DRIVER( mo6 )		/* 1986 Thomson MO6									*/
+//0128u7	DRIVER( mo5nr )		/* 1986 Thomson MO5 NR								*/
+//0128u7	DRIVER( pro128 )	/* 1986 Olivetti Prodest PC 128						*/
 
 	/* Cybiko, Inc. */
 //	DRIVER( cybikov1 )	/* Cybiko Wireless Intertainment System - Classic V1 */
@@ -937,12 +937,12 @@ XL/XE 16kB OS roms
 //	DRIVER( cybikoxt )	/* Cybiko Wireless Intertainment System - Xtreme     */
 
 	/* Dick Smith */
-	DRIVER( super80 )
-	DRIVER( super80d )
-	DRIVER( super80e )
-	DRIVER( super80m )
-	DRIVER( super80r )
-	DRIVER( super80v )
+//0128u7	DRIVER( super80 )
+//0128u7	DRIVER( super80d )
+//0128u7	DRIVER( super80e )
+//0128u7	DRIVER( super80m )
+//0128u7	DRIVER( super80r )
+//0128u7	DRIVER( super80v )
 
 	/* Galeb */
 	DRIVER( galeb )

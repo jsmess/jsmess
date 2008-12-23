@@ -46,6 +46,7 @@ Notes:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "lwings.h"
 #include "sound/2203intf.h"
@@ -80,7 +81,7 @@ static WRITE8_HANDLER( lwings_bankswitch_w )
 	int bank;
 
 	/* bit 0 is flip screen */
-	flip_screen_set(~data & 0x01);
+	flip_screen_set(space->machine, ~data & 0x01);
 
 	/* bits 1 and 2 select ROM bank */
 	RAM = memory_region(space->machine, "main");

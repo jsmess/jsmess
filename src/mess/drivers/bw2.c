@@ -41,9 +41,9 @@
 #include "video/msm6255.h"
 #include "bw2.lh"
 
-static const device_config *get_floppy_image(int drive)
+static const device_config *get_floppy_image(running_machine *machine, int drive)
 {
-	return image_from_devtype_and_index(IO_FLOPPY, drive);
+	return image_from_devtype_and_index(machine, IO_FLOPPY, drive);
 }
 
 static int get_ramdisk_size(running_machine *machine)
@@ -478,7 +478,7 @@ static READ8_DEVICE_HANDLER( bw2_ppi8255_c_r )
 
 	data |= state->mfdbk << 5;
 	
-	data |= floppy_drive_get_flag_state(get_floppy_image(state->selected_drive), FLOPPY_DRIVE_DISK_WRITE_PROTECTED) ? 0x00 : 0x80;
+	data |= floppy_drive_get_flag_state(get_floppy_image(device->machine, state->selected_drive), FLOPPY_DRIVE_DISK_WRITE_PROTECTED) ? 0x00 : 0x80;
 
 	return data;
 }
@@ -515,11 +515,11 @@ static PIT8253_OUTPUT_CHANGED( bw2_timer2_w )
 	driver_state->mtron = state;
 	driver_state->mfdbk = !state;
 			
-	floppy_drive_set_motor_state(get_floppy_image(0), !driver_state->mtron);
-	floppy_drive_set_motor_state(get_floppy_image(1), !driver_state->mtron);
+	floppy_drive_set_motor_state(get_floppy_image(device->machine, 0), !driver_state->mtron);
+	floppy_drive_set_motor_state(get_floppy_image(device->machine, 1), !driver_state->mtron);
 	
-	floppy_drive_set_ready_state(get_floppy_image(0), 1, 1);
-	floppy_drive_set_ready_state(get_floppy_image(1), 1, 1);
+	floppy_drive_set_ready_state(get_floppy_image(device->machine, 0), 1, 1);
+	floppy_drive_set_ready_state(get_floppy_image(device->machine, 1), 1, 1);
 }
 
 static const struct pit8253_config bw2_pit8253_interface =
@@ -841,9 +841,7 @@ static MACHINE_DRIVER_START( bw2 )
 	MDRV_MACHINE_START( bw2 )
 	MDRV_MACHINE_RESET( bw2 )
 
-	MDRV_DEVICE_ADD( PIT8253_TAG, PIT8253 )
-	MDRV_DEVICE_CONFIG( bw2_pit8253_interface )
-
+	MDRV_PIT8253_ADD( PIT8253_TAG, bw2_pit8253_interface )
 	MDRV_PPI8255_ADD( PPI8255_TAG, bw2_ppi8255_interface )
 
 	/* video hardware */

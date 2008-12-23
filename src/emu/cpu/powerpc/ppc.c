@@ -1816,15 +1816,15 @@ static CPU_GET_INFO( ppc )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 40;							break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 32;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 32;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 32;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 32;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE:					info->i = CLEAR_LINE;					break;
 
@@ -1876,8 +1876,8 @@ static CPU_GET_INFO( ppc )
 
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(ppc);			break;
+		case CPUINFO_FCT_BURN:							info->burn = NULL;						break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(ppc);			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &ppc_icount;				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -1945,18 +1945,18 @@ CPU_GET_INFO( ppc403 )
 		case CPUINFO_INT_REGISTER + PPC_EXISR:			info->i = EXISR;						break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(ppc403);		break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(ppc403);				break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(ppc403);				break;
-		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(ppc403);				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(ppc403);			break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(ppc403);		break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(ppc403);				break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(ppc403);				break;
+		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(ppc403);				break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(ppc403);			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "PPC403");				break;
 		case CPUINFO_STR_REGISTER + PPC_EXIER:			sprintf(info->s, "EXIER: %08X", EXIER); break;
 		case CPUINFO_STR_REGISTER + PPC_EXISR:			sprintf(info->s, "EXISR: %08X", EXISR); break;
 
-		default:										ppc_get_info(state, info);				break;
+		default:										CPU_GET_INFO_CALL(ppc);				break;
 	}
 }
 #endif
@@ -1970,28 +1970,28 @@ CPU_GET_INFO( ppc603 )
 		case CPUINFO_INT_INPUT_LINES:					info->i = 5;							break;
 		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 64;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 32;					break;
-		case CPUINFO_INT_LOGADDR_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 32;					break;
-		case CPUINFO_INT_PAGE_SHIFT + ADDRESS_SPACE_PROGRAM: 	info->i = 17;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 64;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 32;					break;
+		case CPUINFO_INT_LOGADDR_WIDTH_PROGRAM: info->i = 32;					break;
+		case CPUINFO_INT_PAGE_SHIFT_PROGRAM: 	info->i = 17;					break;
 		case CPUINFO_INT_REGISTER + PPC_DEC:			info->i = read_decrementer();			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(ppc603);		break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(ppc603);				break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(ppc603);				break;
-		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(ppc603);				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(ppc603);			break;
-		case CPUINFO_PTR_READ:							info->read = CPU_GET_READ_NAME(ppc);					break;
-		case CPUINFO_PTR_WRITE:							info->write = CPU_GET_WRITE_NAME(ppc);				break;
-		case CPUINFO_PTR_READOP:						info->readop = CPU_GET_READOP_NAME(ppc);				break;
-		case CPUINFO_PTR_TRANSLATE:						info->translate = ppc_translate_address_cb;	break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(ppc603);		break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(ppc603);				break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(ppc603);				break;
+		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(ppc603);				break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(ppc603);			break;
+		case CPUINFO_FCT_READ:							info->read = CPU_GET_READ_NAME(ppc);					break;
+		case CPUINFO_FCT_WRITE:							info->write = CPU_GET_WRITE_NAME(ppc);				break;
+		case CPUINFO_FCT_READOP:						info->readop = CPU_GET_READOP_NAME(ppc);				break;
+		case CPUINFO_FCT_TRANSLATE:						info->translate = ppc_translate_address_cb;	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "PPC603");				break;
 		case CPUINFO_STR_REGISTER + PPC_DEC:			sprintf(info->s, "DEC: %08X", read_decrementer()); break;
 
-		default:										ppc_get_info(state, info);				break;
+		default:										CPU_GET_INFO_CALL(ppc);				break;
 	}
 }
 #endif
@@ -2022,25 +2022,25 @@ CPU_GET_INFO( ppc602 )
 		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 		case CPUINFO_INT_REGISTER + PPC_IBR:			info->i = ppc.ibr;						break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 64;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 32;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 64;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 32;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(ppc602);		break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(ppc602);				break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(ppc602);				break;
-		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(ppc602);				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(ppc602);			break;
-		case CPUINFO_PTR_READ:							info->read = CPU_GET_READ_NAME(ppc);					break;
-		case CPUINFO_PTR_WRITE:							info->write = CPU_GET_WRITE_NAME(ppc);				break;
-		case CPUINFO_PTR_READOP:						info->readop = CPU_GET_READOP_NAME(ppc);				break;
-		case CPUINFO_PTR_TRANSLATE:						info->translate = ppc_translate_address_cb;	break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(ppc602);		break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(ppc602);				break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(ppc602);				break;
+		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(ppc602);				break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(ppc602);			break;
+		case CPUINFO_FCT_READ:							info->read = CPU_GET_READ_NAME(ppc);					break;
+		case CPUINFO_FCT_WRITE:							info->write = CPU_GET_WRITE_NAME(ppc);				break;
+		case CPUINFO_FCT_READOP:						info->readop = CPU_GET_READOP_NAME(ppc);				break;
+		case CPUINFO_FCT_TRANSLATE:						info->translate = ppc_translate_address_cb;	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "PPC602");				break;
 		case CPUINFO_STR_REGISTER + PPC_IBR:			sprintf(info->s, "IBR: %08X", ppc.ibr); break;
 
-		default:										ppc_get_info(state, info);				break;
+		default:										CPU_GET_INFO_CALL(ppc);				break;
 	}
 }
 #endif
@@ -2069,23 +2069,23 @@ CPU_GET_INFO( mpc8240 )
 		case CPUINFO_INT_INPUT_LINES:					info->i = 5;							break;
 		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 64;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 32;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 64;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 32;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(mpc8240);		break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(mpc8240);				break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(ppc603);				break;
-		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(mpc8240);				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(ppc603);			break;
-		case CPUINFO_PTR_READ:							info->read = CPU_GET_READ_NAME(ppc);					break;
-		case CPUINFO_PTR_WRITE:							info->write = CPU_GET_WRITE_NAME(ppc);				break;
-		case CPUINFO_PTR_READOP:						info->readop = CPU_GET_READOP_NAME(ppc);				break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(mpc8240);		break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(mpc8240);				break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(ppc603);				break;
+		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(mpc8240);				break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(ppc603);			break;
+		case CPUINFO_FCT_READ:							info->read = CPU_GET_READ_NAME(ppc);					break;
+		case CPUINFO_FCT_WRITE:							info->write = CPU_GET_WRITE_NAME(ppc);				break;
+		case CPUINFO_FCT_READOP:						info->readop = CPU_GET_READOP_NAME(ppc);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "MPC8240");				break;
 
-		default:										ppc_get_info(state, info);				break;
+		default:										CPU_GET_INFO_CALL(ppc);				break;
 	}
 }
 #endif
@@ -2114,23 +2114,23 @@ CPU_GET_INFO( ppc601 )
 		case CPUINFO_INT_INPUT_LINES:					info->i = 5;							break;
 		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 64;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 32;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 64;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 32;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(ppc601);		break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(ppc601);				break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(ppc603);				break;
-		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(ppc601);				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(ppc603);			break;
-		case CPUINFO_PTR_READ:							info->read = CPU_GET_READ_NAME(ppc);					break;
-		case CPUINFO_PTR_WRITE:							info->write = CPU_GET_WRITE_NAME(ppc);				break;
-		case CPUINFO_PTR_READOP:						info->readop = CPU_GET_READOP_NAME(ppc);				break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(ppc601);		break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(ppc601);				break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(ppc603);				break;
+		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(ppc601);				break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(ppc603);			break;
+		case CPUINFO_FCT_READ:							info->read = CPU_GET_READ_NAME(ppc);					break;
+		case CPUINFO_FCT_WRITE:							info->write = CPU_GET_WRITE_NAME(ppc);				break;
+		case CPUINFO_FCT_READOP:						info->readop = CPU_GET_READOP_NAME(ppc);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "PPC601");				break;
 
-		default:										ppc_get_info(state, info);				break;
+		default:										CPU_GET_INFO_CALL(ppc);				break;
 	}
 }
 #endif
@@ -2159,23 +2159,23 @@ CPU_GET_INFO( ppc604 )
 		case CPUINFO_INT_INPUT_LINES:					info->i = 5;							break;
 		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 64;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 32;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 64;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 32;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(ppc604);		break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(ppc604);				break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(ppc603);				break;
-		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(ppc604);				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(ppc603);			break;
-		case CPUINFO_PTR_READ:							info->read = CPU_GET_READ_NAME(ppc);					break;
-		case CPUINFO_PTR_WRITE:							info->write = CPU_GET_WRITE_NAME(ppc);				break;
-		case CPUINFO_PTR_READOP:						info->readop = CPU_GET_READOP_NAME(ppc);				break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(ppc604);		break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(ppc604);				break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(ppc603);				break;
+		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(ppc604);				break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(ppc603);			break;
+		case CPUINFO_FCT_READ:							info->read = CPU_GET_READ_NAME(ppc);					break;
+		case CPUINFO_FCT_WRITE:							info->write = CPU_GET_WRITE_NAME(ppc);				break;
+		case CPUINFO_FCT_READOP:						info->readop = CPU_GET_READOP_NAME(ppc);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "PPC604");				break;
 
-		default:										ppc_get_info(state, info);				break;
+		default:										CPU_GET_INFO_CALL(ppc);				break;
 	}
 }
 #endif

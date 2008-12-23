@@ -30,6 +30,8 @@ TODO:
 ****************************************/
 
 #include "driver.h"
+#include "cpu/m6809/m6809.h"
+#include "cpu/m68000/m68000.h"
 #include "machine/namcoio.h"
 #include "sound/namco.h"
 
@@ -77,7 +79,7 @@ static WRITE8_HANDLER( out_coin1 )
 }
 static WRITE8_HANDLER( flip )
 {
-	flip_screen_set(data & 1);
+	flip_screen_set(space->machine, data & 1);
 }
 
 /* chip #0: player inputs, buttons, coins */
@@ -154,30 +156,30 @@ static WRITE16_HANDLER( toypop_m68000_sharedram_w )
 
 static READ8_HANDLER( toypop_main_interrupt_enable_r )
 {
-	cpu_interrupt_enable(0,1);
+	cpu_interrupt_enable(space->machine->cpu[0],1);
 	return 0;
 }
 
 static WRITE8_HANDLER( toypop_main_interrupt_enable_w )
 {
-	cpu_interrupt_enable(0,1);
+	cpu_interrupt_enable(space->machine->cpu[0],1);
 	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( toypop_main_interrupt_disable_w )
 {
-	cpu_interrupt_enable(0,0);
+	cpu_interrupt_enable(space->machine->cpu[0],0);
 }
 
 static WRITE8_HANDLER( toypop_sound_interrupt_enable_acknowledge_w )
 {
-	cpu_interrupt_enable(1,1);
+	cpu_interrupt_enable(space->machine->cpu[1],1);
 	cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( toypop_sound_interrupt_disable_w )
 {
-	cpu_interrupt_enable(1,0);
+	cpu_interrupt_enable(space->machine->cpu[1],0);
 }
 
 static INTERRUPT_GEN( toypop_main_interrupt )
@@ -212,9 +214,9 @@ static WRITE8_HANDLER( toypop_m68000_assert_w )
 
 static TIMER_CALLBACK( disable_interrupts )
 {
-	cpu_interrupt_enable(0,0);
+	cpu_interrupt_enable(machine->cpu[0],0);
 	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
-	cpu_interrupt_enable(1,0);
+	cpu_interrupt_enable(machine->cpu[1],0);
 	cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE);
 	interrupt_enable_68k = 0;
 }
@@ -580,7 +582,7 @@ static MACHINE_DRIVER_START( liblrabl )
 	MDRV_CPU_PROGRAM_MAP(readmem_68k,writemem_68k)
 	MDRV_CPU_VBLANK_INT("main", toypop_m68000_interrupt)
 
-	MDRV_INTERLEAVE(100)    /* 100 CPU slices per frame - an high value to ensure proper */
+	MDRV_QUANTUM_TIME(HZ(6000))    /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 	MDRV_MACHINE_RESET(toypop)
 

@@ -33,6 +33,8 @@ Stephh's notes (based on the game M6502 code and some tests) :
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
+#include "cpu/m6809/m6809.h"
 #include "sound/2203intf.h"
 
 extern UINT8 *scotrsht_scroll;
@@ -51,7 +53,7 @@ static int irq_enable;
 static WRITE8_HANDLER( ctrl_w )
 {
 	irq_enable = data & 0x02;
-	flip_screen_set(data & 0x08);
+	flip_screen_set(space->machine, data & 0x08);
 }
 
 static INTERRUPT_GEN( scotrsht_interrupt )

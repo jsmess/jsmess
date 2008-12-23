@@ -68,7 +68,7 @@ static MACHINE_DRIVER_START( concept )
 	MDRV_CPU_PROGRAM_MAP(concept_memmap, 0)
 	MDRV_CPU_VBLANK_INT("main", concept_interrupt)
 
-	MDRV_INTERLEAVE(1)
+	MDRV_QUANTUM_TIME(HZ(60))
 	MDRV_MACHINE_START(concept)
 
 	/* video hardware */

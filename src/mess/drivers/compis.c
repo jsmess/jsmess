@@ -32,7 +32,7 @@
  ******************************************************************************/
 
 #include "driver.h"
-//#include "cpu/i86/i86.h"
+#include "cpu/i86/i86.h"
 #include "machine/8255ppi.h"
 #include "includes/compis.h"
 #include "video/i82720.h"
@@ -240,7 +240,7 @@ static MACHINE_DRIVER_START( compis )
 	MDRV_CPU_VBLANK_INT("main", compis_vblank_int)
 	MDRV_CPU_CONFIG(i86_address_mask)
 
-	MDRV_INTERLEAVE(1)
+	MDRV_QUANTUM_TIME(HZ(60))
 
 	MDRV_MACHINE_RESET(compis)
 

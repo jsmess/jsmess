@@ -695,6 +695,8 @@ TODO:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
+#include "cpu/mb88xx/mb88xx.h"
 #include "machine/atari_vg.h"
 #include "machine/namcoio.h"
 #include "machine/namco50.h"
@@ -725,12 +727,12 @@ static READ8_HANDLER( bosco_dsw_r )
 
 static WRITE8_HANDLER( galaga_flip_screen_w )
 {
-	flip_screen_set(data & 1);
+	flip_screen_set(space->machine, data & 1);
 }
 
 static WRITE8_HANDLER( bosco_flip_screen_w )
 {
-	flip_screen_set(~data & 1);
+	flip_screen_set(space->machine, ~data & 1);
 }
 
 
@@ -741,19 +743,19 @@ static WRITE8_HANDLER( bosco_latch_w )
 	switch (offset)
 	{
 		case 0x00:	/* IRQ1 */
-			cpu_interrupt_enable(0,bit);
+			cpu_interrupt_enable(space->machine->cpu[0],bit);
 			if (!bit)
 				cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 			break;
 
 		case 0x01:	/* IRQ2 */
-			cpu_interrupt_enable(1,bit);
+			cpu_interrupt_enable(space->machine->cpu[1],bit);
 			if (!bit)
 				cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
 			break;
 
 		case 0x02:	/* NMION */
-			cpu_interrupt_enable(2,!bit);
+			cpu_interrupt_enable(space->machine->cpu[2],!bit);
 			break;
 
 		case 0x03:	/* RESET */
@@ -1647,7 +1649,7 @@ static MACHINE_DRIVER_START( bosco )
 	MDRV_CPU_IO_MAP(namco_54xx_map_io,0)
 
 	MDRV_WATCHDOG_VBLANK_INIT(8)
-	MDRV_INTERLEAVE(100)	/* 100 CPU slices per frame - an high value to ensure proper */
+	MDRV_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 	MDRV_MACHINE_START(galaga)
 	MDRV_MACHINE_RESET(bosco)
@@ -1706,7 +1708,7 @@ static MACHINE_DRIVER_START( galaga )
 	MDRV_CPU_IO_MAP(namco_54xx_map_io,0)
 
 	MDRV_WATCHDOG_VBLANK_INIT(8)
-	MDRV_INTERLEAVE(100)	/* 100 CPU slices per frame - an high value to ensure proper */
+	MDRV_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 	MDRV_MACHINE_START(galaga)
 	MDRV_MACHINE_RESET(galaga)
@@ -1780,7 +1782,7 @@ static MACHINE_DRIVER_START( xevious )
 	MDRV_CPU_IO_MAP(namco_54xx_map_io,0)
 
 	MDRV_WATCHDOG_VBLANK_INIT(8)
-	MDRV_INTERLEAVE(1000)	/* 1000 CPU slices per frame - an high value to ensure proper */
+	MDRV_QUANTUM_TIME(HZ(60000))	/* 1000 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 	MDRV_MACHINE_START(galaga)
 	MDRV_MACHINE_RESET(xevious)
@@ -1853,7 +1855,7 @@ static MACHINE_DRIVER_START( digdug )
 	MDRV_CPU_ADD("sub2", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(digdug_map,0)
 
-	MDRV_INTERLEAVE(100)	/* 100 CPU slices per frame - an high value to ensure proper */
+	MDRV_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 	MDRV_MACHINE_START(galaga)
 	MDRV_MACHINE_RESET(digdug)

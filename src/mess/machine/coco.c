@@ -629,7 +629,7 @@ QUICKLOAD_LOAD ( coco )
 		if (preamble != 0)
 		{
 			/* start address - just set the address and return */
-			cpu_set_reg(image->machine->cpu[0], REG_PC, block_address);
+			cpu_set_reg(image->machine->cpu[0], REG_GENPC, block_address);
 			done = TRUE;
 		}
 		else
@@ -1133,9 +1133,9 @@ static int coco_hiresjoy_ry(running_machine *machine)
 #define SOUNDMUX_STATUS_SEL2	2
 #define SOUNDMUX_STATUS_SEL1	1
 
-static const device_config *cartslot_image(void)
+static const device_config *cartslot_image(running_machine *machine)
 {
-	return image_from_devtype_and_index(IO_CARTSLOT, 0);
+	return image_from_devtype_and_index(machine, IO_CARTSLOT, 0);
 }
 
 static const device_config *cassette_device_image(running_machine *machine)
@@ -2749,9 +2749,9 @@ static void coco_setcartline(running_machine *machine, coco_cartridge *cartridge
     generic_mapmemory
 -------------------------------------------------*/
 
-static void generic_mapmemory(coco_cartridge *cartridge, UINT32 offset, UINT32 mask, UINT8 *cartmem, UINT32 cartmem_size)
+static void generic_mapmemory(running_machine *machine, coco_cartridge *cartridge, UINT32 offset, UINT32 mask, UINT8 *cartmem, UINT32 cartmem_size)
 {
-	const device_config *image = cartslot_image();
+	const device_config *image = cartslot_image(machine);
 	const UINT8 *cart_ptr;
 	UINT32 cart_size, i;
 
@@ -2773,7 +2773,7 @@ static void generic_mapmemory(coco_cartridge *cartridge, UINT32 offset, UINT32 m
 
 static void coco_mapmemory(running_machine *machine, coco_cartridge *cartridge, UINT32 offset, UINT32 mask)
 {
-	generic_mapmemory(cartridge, offset, mask, &coco_rom[0x4000], 0x3FFF);
+	generic_mapmemory(machine, cartridge, offset, mask, &coco_rom[0x4000], 0x3FFF);
 }
 
 
@@ -2784,7 +2784,7 @@ static void coco_mapmemory(running_machine *machine, coco_cartridge *cartridge, 
 
 static void coco3_mapmemory(running_machine *machine, coco_cartridge *cartridge, UINT32 offset, UINT32 mask)
 {
-	generic_mapmemory(cartridge, offset, mask, &coco_rom[0xC000], 0x3FFF);
+	generic_mapmemory(machine, cartridge, offset, mask, &coco_rom[0xC000], 0x3FFF);
 }
 
 
@@ -2886,7 +2886,7 @@ static void generic_init_machine(running_machine *machine, const machine_init_in
 	halt_timer = timer_alloc(machine, halt_timer_proc, NULL);
 
 	/* determine which cartridge hardware we should be using */
-	cart_image = cartslot_image();
+	cart_image = cartslot_image(machine);
 	if (image_exists(cart_image))
 	{
 		/* we have a mounted cartridge; check the extra info */

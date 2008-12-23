@@ -24,6 +24,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6805/m6805.h"
 #include "sound/2203intf.h"
@@ -42,7 +43,7 @@ static WRITE16_HANDLER( pushman_flipscreen_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		flip_screen_set(data & 0x0200);
+		flip_screen_set(space->machine, data & 0x0200);
 		coin_counter_w(0, data & 0x4000);
 		coin_counter_w(1, data & 0x8000);
 	}
@@ -463,7 +464,7 @@ static MACHINE_DRIVER_START( pushman )
 	MDRV_CPU_ADD("mcu", M68705, 4000000)	/* No idea */
 	MDRV_CPU_PROGRAM_MAP(mcu_readmem,mcu_writemem)
 
-	MDRV_INTERLEAVE(60)
+	MDRV_QUANTUM_TIME(HZ(3600))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -501,7 +502,7 @@ static MACHINE_DRIVER_START( bballs )
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_io_map,0)
 
-	MDRV_INTERLEAVE(60)
+	MDRV_QUANTUM_TIME(HZ(3600))
 
 	MDRV_MACHINE_RESET(bballs)
 

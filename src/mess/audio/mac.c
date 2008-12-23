@@ -9,7 +9,6 @@
 #include "driver.h"
 #include "includes/mac.h"
 #include "streams.h"
-#include "deprecat.h"
 
 
 static sound_stream *mac_stream;
@@ -36,13 +35,13 @@ static int snd_cache_tail;
 /* Stream updater                   */
 /************************************/
 
-static void mac_sound_update(void *param,stream_sample_t **inputs, stream_sample_t **outputs,int samples)
+static STREAM_UPDATE( mac_sound_update )
 {
 	INT16 last_val = 0;
 	stream_sample_t *buffer = outputs[0];
 
 	/* if we're not enabled, just fill with 0 */
-	if (Machine->sample_rate == 0)
+	if (device->machine->sample_rate == 0)
 	{
 		memset(buffer, 0, samples * sizeof(*buffer));
 		return;

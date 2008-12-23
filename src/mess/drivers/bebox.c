@@ -89,7 +89,7 @@ static MACHINE_DRIVER_START( bebox )
 	MDRV_CPU_ADD("ppc2", PPC603, 66000000)	/* 66 MHz */
 	MDRV_CPU_PROGRAM_MAP(bebox_mem, 0)
 
-	MDRV_INTERLEAVE(1)
+	MDRV_QUANTUM_TIME(HZ(60))
 
 	MDRV_PIT8254_ADD( "pit8254", bebox_pit8254_config )
 

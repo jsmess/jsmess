@@ -78,6 +78,7 @@ Sonic Hedgehog 2        171-6215A   837-6963-62       610-0239-62          MPR-1
 
 */
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "genesis.h"
 #include "rendlay.h"
 #include "megadriv.h"
@@ -542,7 +543,7 @@ static WRITE8_HANDLER (megatech_bios_port_ctrl_w)
 
 static READ8_HANDLER (megatech_bios_joypad_r)
 {
-	return megatech_bios_port_cc_dc_r(offset,bios_port_ctrl);
+	return megatech_bios_port_cc_dc_r(space->machine,offset,bios_port_ctrl);
 }
 
 

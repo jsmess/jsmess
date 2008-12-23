@@ -121,7 +121,6 @@ static MC6845_ON_VSYNC_CHANGED(abc800_vsync_changed)
 
 static const mc6845_interface abc800m_mc6845_interface = {
 	SCREEN_TAG,
-	ABC800_CCLK,
 	ABC800_CHAR_WIDTH,
 	NULL,
 	abc800m_update_row,
@@ -292,8 +291,7 @@ static VIDEO_UPDATE( abc800c )
 /* Machine Drivers */
 
 MACHINE_DRIVER_START( abc800m_video )
-	MDRV_DEVICE_ADD(MC6845_TAG, MC6845)
-	MDRV_DEVICE_CONFIG(abc800m_mc6845_interface)
+	MDRV_MC6845_ADD(MC6845_TAG, MC6845, ABC800_CCLK, abc800m_mc6845_interface)
 
 	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

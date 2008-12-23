@@ -362,7 +362,7 @@ DRIVER_INIT( msx )
 		UINT8 *table = auto_malloc (0x100);
 		const UINT8 *old_table;
 
-		old_table = cpu_get_info_ptr (machine->cpu[0],
+		old_table = device_get_info_ptr (machine->cpu[0],
 				CPUINFO_PTR_Z80_CYCLE_TABLE + z80_cycle_table[i]);
 		memcpy (table, old_table, 0x100);
 
@@ -380,7 +380,7 @@ DRIVER_INIT( msx )
 				}
 			}
 		}
-		cpu_set_info_ptr (machine->cpu[0],
+		device_set_info_ptr (machine->cpu[0],
 					CPUINFO_PTR_Z80_CYCLE_TABLE + z80_cycle_table[i],
 					(void*)table);
 	}
@@ -390,7 +390,7 @@ INTERRUPT_GEN( msx2_interrupt )
 {
 	v9938_set_sprite_limit(0, input_port_read(device->machine, "DSW") & 0x20);
 	v9938_set_resolution(0, input_port_read(device->machine, "DSW") & 0x03);
-	v9938_interrupt(0);
+	v9938_interrupt(device->machine, 0);
 }
 
 INTERRUPT_GEN( msx_interrupt )

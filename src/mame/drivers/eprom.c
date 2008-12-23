@@ -24,6 +24,7 @@
 
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "machine/atarigen.h"
 #include "audio/atarijsa.h"
 #include "eprom.h"
@@ -416,7 +417,7 @@ static MACHINE_DRIVER_START( eprom )
 	MDRV_CPU_ADD("extra", M68000, ATARI_CLOCK_14MHz/2)
 	MDRV_CPU_PROGRAM_MAP(extra_map,0)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	MDRV_MACHINE_RESET(eprom)
 	MDRV_NVRAM_HANDLER(atarigen)
@@ -447,7 +448,7 @@ static MACHINE_DRIVER_START( klaxp )
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", atarigen_video_int_gen)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_MACHINE_RESET(klaxp)
 	MDRV_NVRAM_HANDLER(atarigen)
@@ -477,7 +478,7 @@ static MACHINE_DRIVER_START( guts )
 	MDRV_CPU_PROGRAM_MAP(guts_map,0)
 	MDRV_CPU_VBLANK_INT("main", atarigen_video_int_gen)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_MACHINE_RESET(eprom)
 	MDRV_NVRAM_HANDLER(atarigen)

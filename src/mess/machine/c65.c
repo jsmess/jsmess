@@ -658,7 +658,7 @@ void c65_bankswitch (running_machine *machine)
 	read8_space_func rh4, rh8;
 	write8_space_func wh5, wh9;
 
-	data = (UINT8) cpu_get_info_int(machine->cpu[0], CPUINFO_INT_M6510_PORT);
+	data = (UINT8) device_get_info_int(machine->cpu[0], CPUINFO_INT_M6510_PORT);
 	if (data == old)
 		return;
 

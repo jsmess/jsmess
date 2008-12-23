@@ -42,8 +42,7 @@ include $(SRC)/mess/messcore.mak
 
 CPUS += Z80
 #CPUS += Z180
-CPUS += 8080
-#CPUS += 8085A
+CPUS += I8085
 CPUS += M6502
 CPUS += M65C02
 CPUS += M65SC02
@@ -78,10 +77,10 @@ CPUS += I8035
 #CPUS += I8041
 CPUS += I8048
 #CPUS += I8648
-#CPUS += I8748
+CPUS += I8748
 #CPUS += MB8884
 CPUS += I8039
-#CPUS += I8049
+CPUS += I8049
 CPUS += I8749
 #CPUS += N7751
 #CPUS += M58715
@@ -140,12 +139,7 @@ CPUS += TMS99010
 #CPUS += TMS32032
 #CPUS += TMS32051
 #CPUS += CCPU
-#CPUS += ADSP2100
-#CPUS += ADSP2101
-#CPUS += ADSP2104
-#CPUS += ADSP2105
-#CPUS += ADSP2115
-#CPUS += ADSP2181
+#CPUS += ADSP21XX
 CPUS += PSXCPU
 #CPUS += CXD8661R
 #CPUS += ASAP
@@ -245,6 +239,14 @@ CPUS += TMS7000
 CPUS += TMS7000_EXL
 CPUS += SM8500
 CPUS += MINX
+CPUS += 8080
+CPUS += 8085A
+#CPUS += ADSP2100
+#CPUS += ADSP2101
+#CPUS += ADSP2104
+#CPUS += ADSP2105
+#CPUS += ADSP2115
+#CPUS += ADSP2181
 CPUS += I8X41
 #CPUS += M68000
 #CPUS += M68008
@@ -419,11 +421,9 @@ DRVLIBS = \
 	$(MESSOBJ)/kaypro.a \
 	$(MESSOBJ)/kim1.a \
 	$(MESSOBJ)/kramermc.a \
-	$(MESSOBJ)/luxor.a \
 	$(MESSOBJ)/lviv.a \
 	$(MESSOBJ)/lynx.a \
 	$(MESSOBJ)/magnavox.a \
-	$(MESSOBJ)/mbee.a \
 	$(MESSOBJ)/mc10.a \
 	$(MESSOBJ)/memotech.a \
 	$(MESSOBJ)/mephisto.a \
@@ -431,8 +431,6 @@ DRVLIBS = \
 	$(MESSOBJ)/mk1.a \
 	$(MESSOBJ)/mk2.a \
 	$(MESSOBJ)/motorola.a \
-	$(MESSOBJ)/multitch.a \
-	$(MESSOBJ)/nascom1.a \
 	$(MESSOBJ)/nec.a \
 	$(MESSOBJ)/necpc.a \
 	$(MESSOBJ)/nintendo.a \
@@ -461,31 +459,36 @@ DRVLIBS = \
 	$(MESSOBJ)/sharp.a \
 	$(MESSOBJ)/sinclair.a \
 	$(MESSOBJ)/sony.a \
-	$(MESSOBJ)/sord.a \
 	$(MESSOBJ)/special.a \
 	$(MESSOBJ)/ssystem3.a \
-	$(MESSOBJ)/super80.a \
 	$(MESSOBJ)/svi.a \
 	$(MESSOBJ)/svision.a \
 	$(MESSOBJ)/synertec.a \
 	$(MESSOBJ)/tangerin.a \
-	$(MESSOBJ)/tatung.a \
 	$(MESSOBJ)/teamconc.a \
 	$(MESSOBJ)/telmac.a \
-	$(MESSOBJ)/thomson.a \
 	$(MESSOBJ)/ti85.a \
-	$(MESSOBJ)/ti99.a \
 	$(MESSOBJ)/tiger.a \
 	$(MESSOBJ)/trs80.a \
 	$(MESSOBJ)/tutor.a \
 	$(MESSOBJ)/tx0.a \
 	$(MESSOBJ)/ut88.a \
 	$(MESSOBJ)/vc4000.a \
-	$(MESSOBJ)/veb.a \
 	$(MESSOBJ)/vector06.a \
 	$(MESSOBJ)/votrax.a \
-	$(MESSOBJ)/vtech.a \
 	$(MESSOBJ)/shared.a \
+
+#	$(MESSOBJ)/luxor.a \
+#	$(MESSOBJ)/mbee.a \
+#	$(MESSOBJ)/multitch.a \
+#	$(MESSOBJ)/nascom1.a \
+#	$(MESSOBJ)/sord.a \
+#	$(MESSOBJ)/super80.a \
+#	$(MESSOBJ)/tatung.a \
+#	$(MESSOBJ)/ti99.a \
+#	$(MESSOBJ)/thomson.a \
+#	$(MESSOBJ)/veb.a \
+#	$(MESSOBJ)/vtech.a \
 
 
 #-------------------------------------------------

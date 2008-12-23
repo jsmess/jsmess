@@ -559,8 +559,8 @@ static WRITE8_HANDLER( fdc_auxiliary_w )
 
 	*/
 
-	floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, 0), BIT(data, 0));
-	floppy_drive_set_ready_state(image_from_devtype_and_index(IO_FLOPPY, 0), 1, 0);
+	floppy_drive_set_motor_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 0), BIT(data, 0));
+	floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 0), 1, 0);
 
 	nec765_set_reset_state(fdc, BIT(data, 1));
 
@@ -864,7 +864,6 @@ static ADC080X_INPUT_READ( newbrain_adc_input_r )
 
 static ADC080X_INTERFACE( newbrain_adc0809_intf )
 {
-	500000,
 	newbrain_adc_on_eoc_changed,
 	newbrain_adc_vref_pos_r,
 	newbrain_adc_vref_neg_r,
@@ -1117,8 +1116,6 @@ static const nec765_interface newbrain_nec765_interface =
 
 static const z80ctc_interface newbrain_ctc_intf =
 {
-	Z80_TAG,				/* cpu */
-	0,						/* clock */
 	0,              		/* timer disables */
 	NULL,			  		/* interrupt handler */
 	NULL,					/* ZC/TO0 callback */
@@ -1253,10 +1250,10 @@ static MACHINE_DRIVER_START( newbrain )
 	MDRV_MACHINE_START(newbrain)
 	MDRV_MACHINE_RESET(newbrain)
 
-	MDRV_Z80CTC_ADD( "z80ctc", newbrain_ctc_intf )
+	MDRV_Z80CTC_ADD( "z80ctc", 0, newbrain_ctc_intf )
 
 	// A/D converter
-	MDRV_ADC0809_ADD(ADC0809_TAG, newbrain_adc0809_intf)
+	MDRV_ADC0809_ADD(ADC0809_TAG, 500000, newbrain_adc0809_intf)
 
 	// video hardware
 
@@ -1266,8 +1263,7 @@ static MACHINE_DRIVER_START( newbrain )
 	MDRV_CASSETTE_ADD( "cassette2", newbrain_cassette_config )
 	
 	/* acia */
-	MDRV_DEVICE_ADD("acia_0", ACIA6850)
-	MDRV_DEVICE_CONFIG(newbrain_acia_intf)	
+	MDRV_ACIA6850_ADD("acia_0", newbrain_acia_intf)
 		
 	MDRV_NEC765A_ADD("nec765", newbrain_nec765_interface)	
 MACHINE_DRIVER_END
@@ -1289,7 +1285,7 @@ static MACHINE_DRIVER_START( newbraim )
 	MDRV_MACHINE_START(newbrain)
 	MDRV_MACHINE_RESET(newbrain)
 
-	MDRV_Z80CTC_ADD( "z80ctc", newbrain_ctc_intf )
+	MDRV_Z80CTC_ADD( "z80ctc", 0, newbrain_ctc_intf )
 
 	// video hardware
 
@@ -1299,8 +1295,7 @@ static MACHINE_DRIVER_START( newbraim )
 	MDRV_CASSETTE_ADD( "cassette2", newbrain_cassette_config )
 
 	/* acia */
-	MDRV_DEVICE_ADD("acia_0", ACIA6850)
-	MDRV_DEVICE_CONFIG(newbrain_acia_intf)	
+	MDRV_ACIA6850_ADD("acia_0", newbrain_acia_intf)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( newbraia )
@@ -1328,8 +1323,7 @@ static MACHINE_DRIVER_START( newbraia )
 	MDRV_CASSETTE_ADD( "cassette2", newbrain_cassette_config )
 
 	/* acia */
-	MDRV_DEVICE_ADD("acia_0", ACIA6850)
-	MDRV_DEVICE_CONFIG(newbrain_acia_intf)	
+	MDRV_ACIA6850_ADD("acia_0", newbrain_acia_intf)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( newbraiv )
@@ -1349,7 +1343,7 @@ static MACHINE_DRIVER_START( newbraiv )
 	MDRV_MACHINE_START(newbrain)
 	MDRV_MACHINE_RESET(newbrain)
 
-	MDRV_Z80CTC_ADD( "z80ctc", newbrain_ctc_intf )
+	MDRV_Z80CTC_ADD( "z80ctc", 0, newbrain_ctc_intf )
 
 	// video hardware
 
@@ -1359,8 +1353,7 @@ static MACHINE_DRIVER_START( newbraiv )
 	MDRV_CASSETTE_ADD( "cassette2", newbrain_cassette_config )
 
 	/* acia */
-	MDRV_DEVICE_ADD("acia_0", ACIA6850)
-	MDRV_DEVICE_CONFIG(newbrain_acia_intf)	
+	MDRV_ACIA6850_ADD("acia_0", newbrain_acia_intf)
 MACHINE_DRIVER_END
 
 /* ROMs */

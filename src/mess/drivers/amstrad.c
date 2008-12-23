@@ -1455,10 +1455,10 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 			/* FDC Motor Control - Bit 0 defines the state of the FDD motor:
 			 * "1" the FDD motor will be active.
 			 * "0" the FDD motor will be in-active.*/
-					floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, 0), (data & 0x01));
-					floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, 1), (data & 0x01));
-					floppy_drive_set_ready_state(image_from_devtype_and_index(IO_FLOPPY, 0), 1,1);
-					floppy_drive_set_ready_state(image_from_devtype_and_index(IO_FLOPPY, 1), 1,1);
+					floppy_drive_set_motor_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 0), (data & 0x01));
+					floppy_drive_set_motor_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 1), (data & 0x01));
+					floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 0), 1,1);
+					floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 1), 1,1);
 			  break;
 
 		  case 0x03: /* Write Data register of FDC */
@@ -2042,7 +2042,7 @@ static void amstrad_common_init(running_machine *machine)
 	memory_install_write8_handler(space, 0xc000, 0xdfff, 0, 0, SMH_BANK15);
 	memory_install_write8_handler(space, 0xe000, 0xffff, 0, 0, SMH_BANK16);
 
-	cpu_reset(space->machine->cpu[0]);
+	device_reset(space->machine->cpu[0]);
 	if(amstrad_system_type == SYSTEM_CPC)
 		cpu_set_input_line_vector(machine->cpu[0], 0,0xff);
 	else
@@ -2050,8 +2050,8 @@ static void amstrad_common_init(running_machine *machine)
 
 	if(amstrad_system_type != SYSTEM_GX4000)
 	{
-		floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 0),  FLOPPY_DRIVE_SS_40);
-		floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 1),  FLOPPY_DRIVE_SS_40);
+		floppy_drive_set_geometry(image_from_devtype_and_index(machine, IO_FLOPPY, 0),  FLOPPY_DRIVE_SS_40);
+		floppy_drive_set_geometry(image_from_devtype_and_index(machine, IO_FLOPPY, 1),  FLOPPY_DRIVE_SS_40);
 	}
 /* Every microsecond:
 
@@ -2070,12 +2070,12 @@ The Gate-Array fetches two bytes for each address*/
 
 	/* Using the cool code Juergen has provided, I will override
     the timing tables with the values for the amstrad */
-	cpu_set_info_ptr(machine->cpu[0],CPUINFO_PTR_Z80_CYCLE_TABLE+Z80_TABLE_op, (void*)amstrad_cycle_table_op);
-	cpu_set_info_ptr(machine->cpu[0],CPUINFO_PTR_Z80_CYCLE_TABLE+Z80_TABLE_cb, (void*)amstrad_cycle_table_cb);
-	cpu_set_info_ptr(machine->cpu[0],CPUINFO_PTR_Z80_CYCLE_TABLE+Z80_TABLE_ed, (void*)amstrad_cycle_table_ed);
-	cpu_set_info_ptr(machine->cpu[0],CPUINFO_PTR_Z80_CYCLE_TABLE+Z80_TABLE_xy, (void*)amstrad_cycle_table_xy);
-	cpu_set_info_ptr(machine->cpu[0],CPUINFO_PTR_Z80_CYCLE_TABLE+Z80_TABLE_xycb, (void*)amstrad_cycle_table_xycb);
-	cpu_set_info_ptr(machine->cpu[0],CPUINFO_PTR_Z80_CYCLE_TABLE+Z80_TABLE_ex, (void*)amstrad_cycle_table_ex);
+	device_set_info_ptr(machine->cpu[0],CPUINFO_PTR_Z80_CYCLE_TABLE+Z80_TABLE_op, (void*)amstrad_cycle_table_op);
+	device_set_info_ptr(machine->cpu[0],CPUINFO_PTR_Z80_CYCLE_TABLE+Z80_TABLE_cb, (void*)amstrad_cycle_table_cb);
+	device_set_info_ptr(machine->cpu[0],CPUINFO_PTR_Z80_CYCLE_TABLE+Z80_TABLE_ed, (void*)amstrad_cycle_table_ed);
+	device_set_info_ptr(machine->cpu[0],CPUINFO_PTR_Z80_CYCLE_TABLE+Z80_TABLE_xy, (void*)amstrad_cycle_table_xy);
+	device_set_info_ptr(machine->cpu[0],CPUINFO_PTR_Z80_CYCLE_TABLE+Z80_TABLE_xycb, (void*)amstrad_cycle_table_xycb);
+	device_set_info_ptr(machine->cpu[0],CPUINFO_PTR_Z80_CYCLE_TABLE+Z80_TABLE_ex, (void*)amstrad_cycle_table_ex);
 
 	/* Juergen is a cool dude! */
 	cpu_set_irq_callback(machine->cpu[0], amstrad_cpu_acknowledge_int);
@@ -2246,8 +2246,8 @@ static MACHINE_RESET( aleste )
 	amstrad_common_init(machine);
 	amstrad_reset_machine(machine);
 
-	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 0),  FLOPPY_DRIVE_DS_80);
-	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 1),  FLOPPY_DRIVE_DS_80);
+	floppy_drive_set_geometry(image_from_devtype_and_index(machine, IO_FLOPPY, 0),  FLOPPY_DRIVE_DS_80);
+	floppy_drive_set_geometry(image_from_devtype_and_index(machine, IO_FLOPPY, 1),  FLOPPY_DRIVE_DS_80);
 }
 
 /* Memory is banked in 16k blocks. However, the multiface
@@ -2951,7 +2951,7 @@ static MACHINE_DRIVER_START( amstrad )
 	MDRV_CPU_PROGRAM_MAP(amstrad_mem, 0)
 	MDRV_CPU_IO_MAP(amstrad_io, 0)
 
-	MDRV_INTERLEAVE(1)
+	MDRV_QUANTUM_TIME(HZ(60))
 
 	MDRV_MACHINE_RESET( amstrad )
 

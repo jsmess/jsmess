@@ -150,7 +150,6 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/adsp2100/adsp2100.h"
 #include "dcs.h"
 #include "sound/dmadac.h"
@@ -319,8 +318,8 @@ struct _dcs_state
 	UINT8		last_output_full;
 	UINT8		last_input_empty;
 	UINT16 		progflags;
-	void		(*output_full_cb)(int);
-	void		(*input_empty_cb)(int);
+	void		(*output_full_cb)(running_machine *, int);
+	void		(*input_empty_cb)(running_machine *, int);
 	UINT16		(*fifo_data_r)(const device_config *device);
 	UINT16		(*fifo_status_r)(const device_config *device);
 
@@ -370,7 +369,6 @@ static UINT16 *dcs_polling_base;
 
 static UINT32 *dcs_internal_program_ram;
 static UINT32 *dcs_external_program_ram;
-
 
 
 
@@ -586,6 +584,21 @@ ADDRESS_MAP_END
 
 /*************************************
  *
+ *  CPU configuration
+ *
+ *************************************/
+
+static const adsp21xx_config adsp_config =
+{
+	NULL,					/* callback for serial receive */
+	sound_tx_callback,		/* callback for serial transmit */
+	timer_enable_callback	/* callback for timer fired */
+};
+
+
+
+/*************************************
+ *
  *  Original DCS Machine Drivers
  *
  *************************************/
@@ -593,6 +606,7 @@ ADDRESS_MAP_END
 /* Basic DCS system with ADSP-2105 and 2k of SRAM (T-unit, V-unit, Killer Instinct) */
 MACHINE_DRIVER_START( dcs_audio_2k )
 	MDRV_CPU_ADD("dcs", ADSP2105, XTAL_10MHz)
+	MDRV_CPU_CONFIG(adsp_config)
 	MDRV_CPU_PROGRAM_MAP(dcs_2k_program_map,0)
 	MDRV_CPU_DATA_MAP(dcs_2k_data_map,0)
 
@@ -631,6 +645,7 @@ MACHINE_DRIVER_END
 
 MACHINE_DRIVER_START( dcs2_audio_2115 )
 	MDRV_CPU_ADD("dcs2", ADSP2115, XTAL_16MHz)
+	MDRV_CPU_CONFIG(adsp_config)
 	MDRV_CPU_PROGRAM_MAP(dcs2_2115_program_map,0)
 	MDRV_CPU_DATA_MAP(dcs2_2115_data_map,0)
 
@@ -661,6 +676,7 @@ MACHINE_DRIVER_END
 
 MACHINE_DRIVER_START( dcs2_audio_dsio )
 	MDRV_CPU_ADD("dsio", ADSP2181, XTAL_32MHz)
+	MDRV_CPU_CONFIG(adsp_config)
 	MDRV_CPU_PROGRAM_MAP(dsio_program_map,0)
 	MDRV_CPU_DATA_MAP(dsio_data_map,0)
 	MDRV_CPU_IO_MAP(dsio_io_map,0)
@@ -684,6 +700,7 @@ MACHINE_DRIVER_END
 
 MACHINE_DRIVER_START( dcs2_audio_denver )
 	MDRV_CPU_ADD("denver", ADSP2181, XTAL_33_333MHz)
+	MDRV_CPU_CONFIG(adsp_config)
 	MDRV_CPU_PROGRAM_MAP(denver_program_map,0)
 	MDRV_CPU_DATA_MAP(denver_data_map,0)
 	MDRV_CPU_IO_MAP(denver_io_map,0)
@@ -824,9 +841,9 @@ static TIMER_CALLBACK( dcs_reset )
 	SET_INPUT_EMPTY();
 	SET_OUTPUT_EMPTY();
 	if (!dcs.last_input_empty && dcs.input_empty_cb)
-		(*dcs.input_empty_cb)(dcs.last_input_empty = 1);
+		(*dcs.input_empty_cb)(machine, dcs.last_input_empty = 1);
 	if (dcs.last_output_full && dcs.output_full_cb)
-		(*dcs.output_full_cb)(dcs.last_output_full = 0);
+		(*dcs.output_full_cb)(machine, dcs.last_output_full = 0);
 
 	/* boot */
 	dcs_boot();
@@ -905,7 +922,6 @@ static void dcs_register_state(running_machine *machine)
 		state_save_register_postload(machine, sdrc_postload, NULL);
 }
 
-
 void dcs_init(running_machine *machine)
 {
 	memset(&dcs, 0, sizeof(dcs));
@@ -917,10 +933,6 @@ void dcs_init(running_machine *machine)
 	dcs.data = cpu_get_address_space(dcs.cpu, ADDRESS_SPACE_DATA);
 	dcs.rev = 1;
 	dcs.channels = 1;
-
-	/* initialize the ADSP Tx and timer callbacks */
-	adsp21xx_set_tx_handler(dcs.cpu, sound_tx_callback);
-	adsp21xx_set_timer_handler(dcs.cpu, timer_enable_callback);
 
 	/* configure boot and sound ROMs */
 	dcs.bootrom = (UINT16 *)memory_region(machine, "dcs");
@@ -970,10 +982,6 @@ void dcs2_init(running_machine *machine, int dram_in_mb, offs_t polling_offset)
 	dcs.program = cpu_get_address_space(dcs.cpu, ADDRESS_SPACE_PROGRAM);
 	dcs.data = cpu_get_address_space(dcs.cpu, ADDRESS_SPACE_DATA);
 	dcs.channels = 2;
-
-	/* initialize the ADSP Tx and timer callbacks */
-	adsp21xx_set_tx_handler(dcs.cpu, sound_tx_callback);
-	adsp21xx_set_timer_handler(dcs.cpu, timer_enable_callback);
 
 	/* always boot from the base of "dcs" */
 	dcs.bootrom = (UINT16 *)memory_region(machine, "dcs");
@@ -1068,7 +1076,7 @@ static WRITE16_HANDLER( dcs_data_bank_select_w )
  *
  *************************************/
 
-INLINE void sdrc_update_bank_pointers(void)
+INLINE void sdrc_update_bank_pointers(running_machine *machine)
 {
 	if (SDRC_SM_EN != 0)
 	{
@@ -1079,15 +1087,15 @@ INLINE void sdrc_update_bank_pointers(void)
 		{
 			/* ROM-based; use the memory page to select from ROM */
 			if (SDRC_ROM_MS == 1 && SDRC_ROM_ST != 3)
-				memory_set_bankptr(Machine, 25, &dcs.sounddata[(SDRC_EPM_PG * pagesize) % dcs.sounddata_words]);
+				memory_set_bankptr(machine, 25, &dcs.sounddata[(SDRC_EPM_PG * pagesize) % dcs.sounddata_words]);
 		}
 		else
 		{
 			/* RAM-based; use the ROM page to select from ROM, and the memory page to select from RAM */
 			if (SDRC_ROM_MS == 1 && SDRC_ROM_ST != 3)
-				memory_set_bankptr(Machine, 25, &dcs.bootrom[(SDRC_ROM_PG * 4096 /*pagesize*/) % dcs.bootrom_words]);
+				memory_set_bankptr(machine, 25, &dcs.bootrom[(SDRC_ROM_PG * 4096 /*pagesize*/) % dcs.bootrom_words]);
 			if (SDRC_DM_ST != 0)
-				memory_set_bankptr(Machine, 26, &dcs.sounddata[(SDRC_DM_PG * 1024) % dcs.sounddata_words]);
+				memory_set_bankptr(machine, 26, &dcs.sounddata[(SDRC_DM_PG * 1024) % dcs.sounddata_words]);
 		}
 	}
 }
@@ -1148,7 +1156,7 @@ static void sdrc_remap_memory(running_machine *machine)
 	}
 
 	/* update the bank pointers */
-	sdrc_update_bank_pointers();
+	sdrc_update_bank_pointers(machine);
 }
 
 
@@ -1232,7 +1240,7 @@ static WRITE16_HANDLER( sdrc_w )
 			if (diff & 0x1833)
 				sdrc_remap_memory(space->machine);
 			if (diff & 0x0380)
-				sdrc_update_bank_pointers();
+				sdrc_update_bank_pointers(space->machine);
 			break;
 
 		/* offset 1 controls RAM mapping */
@@ -1247,7 +1255,7 @@ static WRITE16_HANDLER( sdrc_w )
 		case 2:
 			sdrc.reg[2] = data;
 			if (diff & 0x1fff)
-				sdrc_update_bank_pointers();
+				sdrc_update_bank_pointers(space->machine);
 			break;
 
 		/* offset 3 controls security */
@@ -1458,7 +1466,7 @@ READ32_HANDLER( dsio_idma_data_r )
     DCS COMMUNICATIONS
 ****************************************************************************/
 
-void dcs_set_io_callbacks(void (*output_full_cb)(int), void (*input_empty_cb)(int))
+void dcs_set_io_callbacks(void (*output_full_cb)(running_machine *, int), void (*input_empty_cb)(running_machine *, int))
 {
 	dcs.input_empty_cb = input_empty_cb;
 	dcs.output_full_cb = output_full_cb;
@@ -1476,7 +1484,7 @@ int dcs_control_r(void)
 {
 	/* only boost for DCS2 boards */
 	if (!dcs.auto_ack && !transfer.hle_enabled)
-		cpuexec_boost_interleave(Machine, ATTOTIME_IN_NSEC(500), ATTOTIME_IN_USEC(5));
+		cpuexec_boost_interleave(dcs.cpu->machine, ATTOTIME_IN_NSEC(500), ATTOTIME_IN_USEC(5));
 	return dcs.latch_control;
 }
 
@@ -1486,10 +1494,10 @@ void dcs_reset_w(int state)
 	/* going high halts the CPU */
 	if (state)
 	{
-		logerror("%s: DCS reset = %d\n", cpuexec_describe_context(Machine), state);
+		logerror("%s: DCS reset = %d\n", cpuexec_describe_context(dcs.cpu->machine), state);
 
 		/* just run through the init code again */
-		timer_call_after_resynch(Machine, NULL, 0, dcs_reset);
+		timer_call_after_resynch(dcs.cpu->machine, NULL, 0, dcs_reset);
 		cpu_set_input_line(dcs.cpu, INPUT_LINE_RESET, ASSERT_LINE);
 	}
 
@@ -1541,7 +1549,7 @@ static void dcs_delayed_data_w(running_machine *machine, int data)
 
 	/* indicate we are no longer empty */
 	if (dcs.last_input_empty && dcs.input_empty_cb)
-		(*dcs.input_empty_cb)(dcs.last_input_empty = 0);
+		(*dcs.input_empty_cb)(machine, dcs.last_input_empty = 0);
 	SET_INPUT_FULL();
 
 	/* set the data */
@@ -1558,21 +1566,21 @@ static TIMER_CALLBACK( dcs_delayed_data_w_callback )
 void dcs_data_w(int data)
 {
 	/* preprocess the write */
-	if (preprocess_write(Machine, data))
+	if (preprocess_write(dcs.cpu->machine, data))
 		return;
 
 	/* if we are DCS1, set a timer to latch the data */
 	if (!dcs.sport_timer)
-		timer_call_after_resynch(Machine, NULL, data, dcs_delayed_data_w_callback);
+		timer_call_after_resynch(dcs.cpu->machine, NULL, data, dcs_delayed_data_w_callback);
 	else
-	 	dcs_delayed_data_w(Machine, data);
+	 	dcs_delayed_data_w(dcs.cpu->machine, data);
 }
 
 
 static WRITE16_HANDLER( input_latch_ack_w )
 {
 	if (!dcs.last_input_empty && dcs.input_empty_cb)
-		(*dcs.input_empty_cb)(dcs.last_input_empty = 1);
+		(*dcs.input_empty_cb)(space->machine, dcs.last_input_empty = 1);
 	SET_INPUT_EMPTY();
 	cpu_set_input_line(dcs.cpu, ADSP2105_IRQ2, CLEAR_LINE);
 }
@@ -1596,7 +1604,7 @@ static READ16_HANDLER( input_latch_r )
 static TIMER_CALLBACK( latch_delayed_w )
 {
 	if (!dcs.last_output_full && dcs.output_full_cb)
-		(*dcs.output_full_cb)(dcs.last_output_full = 1);
+		(*dcs.output_full_cb)(machine, dcs.last_output_full = 1);
 	SET_OUTPUT_FULL();
 	dcs.output_data = param;
 }
@@ -1624,7 +1632,7 @@ static TIMER_CALLBACK( delayed_ack_w_callback )
 
 void dcs_ack_w(void)
 {
-	timer_call_after_resynch(Machine, NULL, 0, delayed_ack_w_callback);
+	timer_call_after_resynch(dcs.cpu->machine, NULL, 0, delayed_ack_w_callback);
 }
 
 
@@ -1632,12 +1640,12 @@ int dcs_data_r(void)
 {
 	/* data is actually only 8 bit (read from d8-d15) */
 	if (dcs.last_output_full && dcs.output_full_cb)
-		(*dcs.output_full_cb)(dcs.last_output_full = 0);
+		(*dcs.output_full_cb)(dcs.cpu->machine, dcs.last_output_full = 0);
 	if (dcs.auto_ack)
 		delayed_ack_w();
 
 	if (LOG_DCS_IO)
-		logerror("%s:dcs_data_r(%04X)\n", cpuexec_describe_context(Machine), dcs.output_data);
+		logerror("%s:dcs_data_r(%04X)\n", cpuexec_describe_context(dcs.cpu->machine), dcs.output_data);
 	return dcs.output_data;
 }
 
@@ -2064,7 +2072,7 @@ void dcs_fifo_notify(int count, int max)
 	if (transfer.state != 5 || transfer.fifo_entries == transfer.writes_left || transfer.fifo_entries >= 256)
 	{
 		for ( ; transfer.fifo_entries; transfer.fifo_entries--)
-			preprocess_write(Machine, (*dcs.fifo_data_r)(dcs.cpu));
+			preprocess_write(dcs.cpu->machine, (*dcs.fifo_data_r)(dcs.cpu));
 	}
 }
 
@@ -2363,9 +2371,9 @@ static int preprocess_write(running_machine *machine, UINT16 data)
 	if (result && dcs.input_empty_cb)
 	{
 		if (dcs.last_input_empty)
-			(*dcs.input_empty_cb)(dcs.last_input_empty = 0);
+			(*dcs.input_empty_cb)(machine, dcs.last_input_empty = 0);
 		if (!dcs.last_input_empty)
-			(*dcs.input_empty_cb)(dcs.last_input_empty = 1);
+			(*dcs.input_empty_cb)(machine, dcs.last_input_empty = 1);
 	}
 	return result;
 }

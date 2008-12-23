@@ -32,6 +32,7 @@ Notes:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
@@ -262,7 +263,7 @@ GFXDECODE_END
 static void irqhandler(running_machine *machine, int linestate)
 {
 	/* system 16c doesn't have the sound CPU */
-	if (machine->config->cpu[1].type != CPU_DUMMY)
+	if (machine->cpu[1] != NULL)
 		cpu_set_input_line(machine->cpu[1],0,linestate);
 }
 

@@ -25,6 +25,8 @@ Notes:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
+#include "cpu/m6502/m6502.h"
 #include "deprecat.h"
 #include "thedeep.h"
 #include "sound/2203intf.h"
@@ -71,11 +73,11 @@ static WRITE8_HANDLER( thedeep_protection_w )
 	switch (protection_command)
 	{
 		case 0x11:
-			flip_screen_set(1);
+			flip_screen_set(space->machine, 1);
 		break;
 
 		case 0x20:
-			flip_screen_set(0);
+			flip_screen_set(space->machine, 0);
 		break;
 
 		case 0x30:

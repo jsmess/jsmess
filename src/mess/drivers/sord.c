@@ -296,8 +296,6 @@ static void sord_m5_ctc_interrupt(const device_config *device, int state)
 
 static const z80ctc_interface	sord_m5_ctc_intf =
 {
-	"main",
-	3800000,
 	0,
 	sord_m5_ctc_interrupt,
 	0,
@@ -625,14 +623,14 @@ static MACHINE_DRIVER_START( sord_m5 )
 	MDRV_CPU_IO_MAP(sord_m5_io, 0)
 	MDRV_CPU_VBLANK_INT("main", sord_interrupt)
 	MDRV_CPU_CONFIG( sord_m5_daisy_chain )
-	MDRV_INTERLEAVE(1)
+	MDRV_QUANTUM_TIME(HZ(60))
 
 	MDRV_MACHINE_START( sord_m5 )
 	MDRV_MACHINE_RESET( sord_m5 )
 
 	MDRV_PPI8255_ADD( "ppi8255", sord_ppi8255_interface )
 
-	MDRV_Z80CTC_ADD( "z80ctc", sord_m5_ctc_intf )
+	MDRV_Z80CTC_ADD( "z80ctc", 3800000, sord_m5_ctc_intf )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(tms9928a)
@@ -663,7 +661,7 @@ static MACHINE_DRIVER_START( sord_m5_fd5 )
 	MDRV_CPU_PROGRAM_MAP(sord_fd5_mem, 0)
 	MDRV_CPU_IO_MAP(sord_fd5_io, 0)
 
-	MDRV_INTERLEAVE(20)
+	MDRV_QUANTUM_TIME(HZ(1200))
 	MDRV_MACHINE_RESET( sord_m5_fd5 )
 	
 	MDRV_NEC765A_ADD("nec765", sord_fd5_nec765_interface)

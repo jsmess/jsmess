@@ -216,7 +216,7 @@ VIDEO_UPDATE( gamepock )
 }
 
 /* This is called whenever the T0 pin switches state */
-int gamepock_io_callback( int ioline, int state ) 
+int gamepock_io_callback( const device_config *device, int ioline, int state ) 
 {
 	if ( ioline == UPD7810_TO ) 
 	{

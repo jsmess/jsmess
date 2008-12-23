@@ -69,6 +69,7 @@ I/O read/write
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
 #include "sound/samples.h"
 #include "machine/segacrpt.h"
@@ -94,7 +95,7 @@ static INTERRUPT_GEN( senjyo_interrupt )
 
 static WRITE8_HANDLER( flip_screen_w )
 {
-	flip_screen_set(data);
+	flip_screen_set(space->machine, data);
 }
 
 static WRITE8_HANDLER( paletteram_IIBBGGRR_w )
@@ -606,7 +607,7 @@ static MACHINE_DRIVER_START( senjyo )
 	MDRV_MACHINE_RESET(senjyo)
 
 	MDRV_Z80PIO_ADD( "z80pio", senjyo_pio_intf )
-	MDRV_Z80CTC_ADD( "z80ctc", senjyo_ctc_intf )
+	MDRV_Z80CTC_ADD( "z80ctc", 2000000 /* same as "sub" */, senjyo_ctc_intf )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

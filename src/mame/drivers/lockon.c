@@ -10,6 +10,8 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
+#include "cpu/nec/nec.h"
 #include "sound/2203intf.h"
 #include "sound/flt_vol.h"
 #include "lockon.h"
@@ -471,8 +473,8 @@ static MACHINE_DRIVER_START( lockon )
 	MDRV_CPU_PROGRAM_MAP(sound_prg, 0)
 	MDRV_CPU_IO_MAP(sound_io, 0)
 
-	MDRV_WATCHDOG_TIME_INIT(UINT64_ATTOTIME_IN_NSEC(PERIOD_OF_555_ASTABLE_NSEC(10000, 4700, 10000e-12) * 4096))
-	MDRV_INTERLEAVE(10)
+	MDRV_WATCHDOG_TIME_INIT(NSEC(PERIOD_OF_555_ASTABLE_NSEC(10000, 4700, 10000e-12) * 4096))
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 

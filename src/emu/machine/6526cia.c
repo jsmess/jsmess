@@ -67,7 +67,6 @@ struct _cia_state
 {
 	const device_config *device;
 	void			(*irq_func)(const device_config *device, int state);
-	int				clock;
 
 	cia_port		port[2];
 	cia_timer		timer[2];
@@ -141,7 +140,6 @@ static DEVICE_START( cia )
 	/* clear out CIA structure, and copy the interface */
 	memset(cia, 0, sizeof(*cia));
 	cia->device = device;
-	cia->clock = (intf->clock != 0) ? intf->clock : cpu_get_clock(device->machine->cpu[0]);
 	cia->irq_func = intf->irq_func;
 
 	/* setup ports */
@@ -309,7 +307,7 @@ static void cia_timer_update(cia_timer *timer, INT32 new_count)
 	/* update the timer count, if necessary */
 	if ((new_count == -1) && is_timer_active(timer->timer))
 	{
-		UINT16 current_count = attotime_to_double(attotime_mul(timer_timeelapsed(timer->timer), timer->cia->clock));
+		UINT16 current_count = attotime_to_double(attotime_mul(timer_timeelapsed(timer->timer), timer->cia->device->clock));
 		timer->count = timer->count - MIN(timer->count, current_count);
 	}
 
@@ -321,7 +319,7 @@ static void cia_timer_update(cia_timer *timer, INT32 new_count)
 	if ((timer->mode & 0x01) && ((timer->mode & (which ? 0x60 : 0x20)) == 0x00))
 	{
 		/* timer is on and is connected to clock */
-		attotime period = attotime_mul(ATTOTIME_IN_HZ(timer->cia->clock), (timer->count ? timer->count : 0x10000));
+		attotime period = attotime_mul(ATTOTIME_IN_HZ(timer->cia->device->clock), (timer->count ? timer->count : 0x10000));
 		timer_adjust_oneshot(timer->timer, period, 0);
 	}
 	else
@@ -856,10 +854,10 @@ DEVICE_GET_INFO(cia6526r1)
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(cia);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "6526 CIA rev1";					break;
-		case DEVINFO_STR_FAMILY:						info->s = "6526 CIA";						break;
-		case DEVINFO_STR_VERSION:						info->s = "1.0";							break;
-		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;							break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "6526 CIA rev1");			break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "6526 CIA");				break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");						break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);					break;
 		case DEVINFO_STR_CREDITS:						/* Nothing */								break;
 	}
 }
@@ -874,7 +872,7 @@ DEVICE_GET_INFO(cia6526r2)
 	switch (state)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "6526 CIA rev2";					break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "6526 CIA rev2");			break;
 		default:	DEVICE_GET_INFO_CALL(cia6526r1);	break;
 	}
 }
@@ -889,7 +887,7 @@ DEVICE_GET_INFO(cia8520)
 	switch (state)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "8520 CIA";						break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "8520 CIA");				break;
 		default:	DEVICE_GET_INFO_CALL(cia6526r1);	break;
 	}
 }

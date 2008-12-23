@@ -384,7 +384,7 @@ static WRITE8_HANDLER( svi318_fdc_density_side_w )
 
 	wd17xx_set_side(fdc, data & 0x02 ? 1:0);
 
-	image = image_from_devtype_and_index(IO_FLOPPY, svi318_fdc.driveselect);
+	image = image_from_devtype_and_index(space->machine, IO_FLOPPY, svi318_fdc.driveselect);
 	if (image_exists(image))
 	{
 		UINT8 sectors;
@@ -566,7 +566,7 @@ DRIVER_INIT( svi318 )
 		UINT8 *table = auto_malloc (0x100);
 		const UINT8 *old_table;
 
-		old_table = cpu_get_info_ptr(machine->cpu[0], CPUINFO_PTR_Z80_CYCLE_TABLE + z80_cycle_table[i]);
+		old_table = device_get_info_ptr(machine->cpu[0], CPUINFO_PTR_Z80_CYCLE_TABLE + z80_cycle_table[i]);
 		memcpy (table, old_table, 0x100);
 
 		if (z80_cycle_table[i] == Z80_TABLE_ex)
@@ -587,7 +587,7 @@ DRIVER_INIT( svi318 )
 				}
 			}
 		}
-		cpu_set_info_ptr(machine->cpu[0], CPUINFO_PTR_Z80_CYCLE_TABLE + z80_cycle_table[i], (void*)table);
+		device_set_info_ptr(machine->cpu[0], CPUINFO_PTR_Z80_CYCLE_TABLE + z80_cycle_table[i], (void*)table);
 	}
 }
 

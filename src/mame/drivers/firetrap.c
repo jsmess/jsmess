@@ -57,6 +57,7 @@ write:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/3812intf.h"
@@ -239,7 +240,7 @@ static WRITE8_HANDLER( firetrap_adpcm_data_w )
 
 static WRITE8_HANDLER( flip_screen_w )
 {
-	flip_screen_set(data);
+	flip_screen_set(space->machine, data);
 }
 
 

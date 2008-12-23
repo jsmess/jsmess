@@ -17,7 +17,7 @@
 #define ACIA6551		DEVICE_GET_INFO_NAME(acia6551)
 
 #define MDRV_ACIA6551_ADD(_tag)	\
-	MDRV_DEVICE_ADD((_tag), ACIA6551)
+	MDRV_DEVICE_ADD((_tag), ACIA6551, 0)
 
 
 /***************************************************************************

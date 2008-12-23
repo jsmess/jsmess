@@ -3,7 +3,6 @@
 ******************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "streams.h"
 #include "includes/lynx.h"
 
@@ -258,7 +257,7 @@ void lynx_audio_write(int offset, UINT8 data)
 /************************************/
 /* Sound handler update             */
 /************************************/
-static void lynx_update (void *param,stream_sample_t **inputs, stream_sample_t **outputs,int samples)
+static STREAM_UPDATE( lynx_update )
 {
 	int i, j;
 	LYNX_AUDIO *channel;
@@ -270,14 +269,14 @@ static void lynx_update (void *param,stream_sample_t **inputs, stream_sample_t *
 		*buffer = 0;
 		for (channel=lynx_audio, j=0; j<ARRAY_LENGTH(lynx_audio); j++, channel++)
 		{
-			lynx_audio_execute(Machine, channel);
+			lynx_audio_execute(device->machine, channel);
 			v=channel->reg.n.output;
 			*buffer+=v*15;
 		}
 	}
 }
 
-static void lynx2_update (void *param,stream_sample_t **inputs, stream_sample_t **outputs,int samples)
+static STREAM_UPDATE( lynx2_update )
 {
 	stream_sample_t *left=outputs[0], *right=outputs[1];
 	int i, j;
@@ -290,7 +289,7 @@ static void lynx2_update (void *param,stream_sample_t **inputs, stream_sample_t 
 		*right= 0;
 		for (channel=lynx_audio, j=0; j<ARRAY_LENGTH(lynx_audio); j++, channel++)
 		{
-			lynx_audio_execute(Machine, channel);
+			lynx_audio_execute(device->machine, channel);
 			v=channel->reg.n.output;
 			if (!(master_enable&(0x10<<j)))
 			{

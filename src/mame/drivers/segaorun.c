@@ -14,6 +14,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "system16.h"
 #include "machine/fd1089.h"
 #include "machine/segaic16.h"
@@ -257,7 +258,7 @@ static MACHINE_RESET( outrun )
 	segaic16_tilemap_reset(machine, 0);
 
 	/* hook the RESET line, which resets CPU #1 */
-	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_M68K_RESET_CALLBACK, (genf *)outrun_reset);
+	device_set_info_fct(machine->cpu[0], CPUINFO_FCT_M68K_RESET_CALLBACK, (genf *)outrun_reset);
 
 	/* start timers to track interrupts */
 	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 223, 0), NULL, 223, scanline_callback);
@@ -816,7 +817,7 @@ static MACHINE_DRIVER_START( outrundx )
 	MDRV_CPU_IO_MAP(sound_portmap,0)
 
 	MDRV_MACHINE_RESET(outrun)
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	MDRV_PPI8255_ADD( "ppi8255", single_ppi_intf )
 

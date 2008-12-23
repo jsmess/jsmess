@@ -34,9 +34,14 @@ Notes:
           VSync: 60Hz
           HSync: 15.15kHz
 
+ This appears to be based off a Blue
+ Dyna Cherry Master board -- emualted goldstar.c
+ but with extra protection (the sub-board with CPU)
+
 */
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "machine/8255ppi.h"
 #include "sound/ay8910.h"
 

@@ -67,5 +67,9 @@ int hd63450_get_error_vector(const device_config* device, int channel);
 
 #define HD63450 DEVICE_GET_INFO_NAME(hd63450)
 
+#define MDRV_HD63450_ADD(_tag, _config) \
+	MDRV_DEVICE_ADD(_tag, HD63450, 0) \
+	MDRV_DEVICE_CONFIG(_config)
+
 READ16_DEVICE_HANDLER( hd63450_r );
 WRITE16_DEVICE_HANDLER( hd63450_w );

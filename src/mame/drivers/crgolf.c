@@ -30,6 +30,7 @@ Dip locations and factory settings verified with manual
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "crgolf.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
@@ -375,7 +376,7 @@ static MACHINE_DRIVER_START( crgolf )
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_MACHINE_START(crgolf)
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(crgolf_video)

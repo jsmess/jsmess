@@ -39,11 +39,14 @@
 ***************************************************************************/
 static CPU_RESET( dsp56k );
 
+
 /***************************************************************************
     ONBOARD MEMORY ALLOCATION
 ***************************************************************************/
+// TODO: Put these in the cpustate!!!
 static UINT16 *dsp56k_peripheral_ram;
 static UINT16 *dsp56k_program_ram;
+
 
 /***************************************************************************
     COMPONENT FUNCTIONALITY
@@ -62,6 +65,22 @@ static UINT16 *dsp56k_program_ram;
 
 // 4-8 Memory handlers for on-chip peripheral memory.
 #include "dsp56mem.c"
+
+
+/***************************************************************************
+    Direct Update Handler
+***************************************************************************/
+static DIRECT_UPDATE_HANDLER( dsp56k_direct_handler )
+{
+	if (address >= (0x0000<<1) && address <= (0x07ff<<1))
+	{
+		direct->raw = direct->decrypted = (void*)(dsp56k_program_ram - (0x0000<<1));
+		return ~0;
+	}
+
+	return address;
+}
+
 
 /***************************************************************************
     MEMORY ACCESSORS
@@ -150,9 +169,9 @@ static CPU_INIT( dsp56k )
 	dsp56k_core* cpustate = device->token;
 
 	// Call specific module inits
-	pcu_init(cpustate, index);
-	// agu_init(cpustate, index);
-	// alu_init(cpustate, index);
+	pcu_init(cpustate);
+	// agu_init(cpustate);
+	// alu_init(cpustate);
 
 	// HACK - You're not in bootstrap mode upon bootup
 	cpustate->bootstrap_mode = BOOTSTRAP_OFF;
@@ -172,6 +191,10 @@ static CPU_INIT( dsp56k )
 	cpustate->device = device;
 	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 	cpustate->data = memory_find_address_space(device, ADDRESS_SPACE_DATA);
+
+	/* Setup the direct memory handler for this CPU */
+	/* NOTE: Be sure to grab this guy and call him if you ever install another direct_update_hander in a driver! */
+	memory_set_direct_update_handler(cpustate->program, dsp56k_direct_handler);
 }
 
 static void agu_reset(dsp56k_core* cpustate)
@@ -219,7 +242,7 @@ static CPU_RESET( dsp56k )
 	agu_reset(cpustate);
 	alu_reset(cpustate);
 
-	/* HACK - Put a jump to 0x0000 at 0x0000 - this keeps the CPU put in MAME */
+	/* HACK - Put a jump to 0x0000 at 0x0000 - this keeps the CPU locked to the instruction at address 0x0000 */
 	memory_write_word_16le(cpustate->program, 0x0000, 0x0124);
 }
 
@@ -381,15 +404,15 @@ CPU_GET_INFO( dsp56k )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;	// ?
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 8;							break;	// ?
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 16;					break;	// 1-5
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 16;					break;	// 1-5
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = -1;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 	info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA: 	info->i = -1;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 16;					break;	// 1-5
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 16;					break;	// 1-5
+		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = -1;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 16;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 16;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = -1;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE + DSP56K_IRQ_MODA:			info->i = DSP56K_IRQ_MODA;		break;
 		case CPUINFO_INT_INPUT_STATE + DSP56K_IRQ_MODB:			info->i = DSP56K_IRQ_MODB;		break;
@@ -451,22 +474,22 @@ CPU_GET_INFO( dsp56k )
 		case CPUINFO_INT_REGISTER + DSP56K_ST15:		info->i = ST15;							break;
 
 		// --- the following bits of info are returned as pointers to data or functions ---
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(dsp56k);			break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(dsp56k);					break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(dsp56k);				break;
-		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(dsp56k);					break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(dsp56k);			break;
-		case CPUINFO_PTR_BURN:							info->burn = NULL;									break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(dsp56k);	break;
-		case CPUINFO_PTR_DEBUG_INIT:					info->debug_init = NULL;				break;
-		case CPUINFO_PTR_TRANSLATE:						info->translate = NULL;					break;
-		case CPUINFO_PTR_READ:							info->read = NULL;						break;
-		case CPUINFO_PTR_WRITE:							info->write = NULL;						break;
-		case CPUINFO_PTR_READOP:						info->readop = NULL;					break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(dsp56k);			break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(dsp56k);					break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(dsp56k);				break;
+		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(dsp56k);					break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(dsp56k);			break;
+		case CPUINFO_FCT_BURN:							info->burn = NULL;									break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(dsp56k);	break;
+		case CPUINFO_FCT_DEBUG_INIT:					info->debug_init = NULL;				break;
+		case CPUINFO_FCT_TRANSLATE:						info->translate = NULL;					break;
+		case CPUINFO_FCT_READ:							info->read = NULL;						break;
+		case CPUINFO_FCT_WRITE:							info->write = NULL;						break;
+		case CPUINFO_FCT_READOP:						info->readop = NULL;					break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;		break;
- 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:
+ 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:
  			info->internal_map16 = ADDRESS_MAP_NAME(dsp56156_x_data_map);						break;
- 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:
+ 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:
  			info->internal_map16 = ADDRESS_MAP_NAME(dsp56156_program_map);						break;
 
 		// --- the following bits of info are returned as NULL-terminated strings ---

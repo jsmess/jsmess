@@ -4465,12 +4465,12 @@ static DEVICE_START( voodoo )
 	v->device = device;
 
 	/* copy config data */
-	v->freq = config->clock;
+	v->freq = device->clock;
 	v->fbi.vblank_client = config->vblank;
 	v->pci.stall_callback = config->stall;
 
 	/* create a multiprocessor work queue */
-	v->poly = poly_alloc(64, sizeof(poly_extra_data), 0);
+	v->poly = poly_alloc(device->machine, 64, sizeof(poly_extra_data), 0);
 	v->thread_stats = auto_malloc(sizeof(v->thread_stats[0]) * WORK_MAX_THREADS);
 
 	/* create a table of precomputed 1/n and log2(n) values */
@@ -4682,16 +4682,16 @@ DEVICE_GET_INFO( voodoo )
 			switch (config->type)
 			{
 				default:
-				case VOODOO_1:					info->s = "3dfx Voodoo Graphics";		break;
-				case VOODOO_2:					info->s = "3dfx Voodoo 2";				break;
-				case VOODOO_BANSHEE:			info->s = "3dfx Voodoo Banshee";		break;
-				case VOODOO_3:					info->s = "3dfx Voodoo 3";				break;
+				case VOODOO_1:					strcpy(info->s, "3dfx Voodoo Graphics");break;
+				case VOODOO_2:					strcpy(info->s, "3dfx Voodoo 2");		break;
+				case VOODOO_BANSHEE:			strcpy(info->s, "3dfx Voodoo Banshee");	break;
+				case VOODOO_3:					strcpy(info->s, "3dfx Voodoo 3");		break;
 			}
 			break;
-		case DEVINFO_STR_FAMILY:				info->s = "3dfx Voodoo Graphics";		break;
-		case DEVINFO_STR_VERSION:				info->s = "1.0";						break;
-		case DEVINFO_STR_SOURCE_FILE:			info->s = __FILE__;						break;
-		case DEVINFO_STR_CREDITS:				info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case DEVINFO_STR_FAMILY:				strcpy(info->s, "3dfx Voodoo Graphics");break;
+		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0");					break;
+		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);				break;
+		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

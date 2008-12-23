@@ -20,6 +20,8 @@
 
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
+#include "cpu/m6502/m6502.h"
 #include "rendlay.h"
 #include "machine/atarigen.h"
 #include "audio/atarijsa.h"
@@ -424,7 +426,7 @@ static MACHINE_DRIVER_START( cyberbal )
 	MDRV_CPU_PROGRAM_MAP(sound_68k_map,0)
 	MDRV_CPU_PERIODIC_INT(cyberbal_sound_68k_irq_gen, 10000)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_MACHINE_RESET(cyberbal)
 	MDRV_NVRAM_HANDLER(atarigen)
@@ -971,14 +973,14 @@ static const UINT16 default_eeprom[] =
 static DRIVER_INIT( cyberbal )
 {
 	atarigen_eeprom_default = default_eeprom;
-	atarigen_slapstic_init(machine, 0, 0x018000, 0, 0);
+	atarigen_slapstic_init(machine->cpu[0], 0x018000, 0, 0);
 }
 
 
 static DRIVER_INIT( cyberbt )
 {
 	atarigen_eeprom_default = default_eeprom;
-	atarigen_slapstic_init(machine, 0, 0x018000, 0, 116);
+	atarigen_slapstic_init(machine->cpu[0], 0x018000, 0, 116);
 }
 
 

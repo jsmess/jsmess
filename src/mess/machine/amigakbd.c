@@ -69,7 +69,7 @@ static INPUT_CHANGED( kbd_update )
 
 		if ( amiga_intf != NULL && amiga_intf->nmi_callback )
 		{
-			(*amiga_intf->nmi_callback)();
+			(*amiga_intf->nmi_callback)(field->port->machine);
 		}
 	}
 	else

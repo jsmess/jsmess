@@ -767,11 +767,11 @@ DEVICE_GET_INFO( ay31015 )
 		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME( ay31015 );		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:					info->s = "AY-3-1015";							break;
-		case DEVINFO_STR_FAMILY:				info->s = "AY-3-1015/AY-5-1013 UARTs";			break;
-		case DEVINFO_STR_VERSION:				info->s = "1.00";								break;
-		case DEVINFO_STR_SOURCE_FILE:			info->s = __FILE__;								break;
-		case DEVINFO_STR_CREDITS:				info->s = "Copyright the MAME and MESS Teams";	break;
+		case DEVINFO_STR_NAME:					strcpy(info->s, "AY-3-1015");							break;
+		case DEVINFO_STR_FAMILY:				strcpy(info->s, "AY-3-1015/AY-5-1013 UARTs");			break;
+		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.00");								break;
+		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);								break;
+		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright the MAME and MESS Teams");	break;
 	}
 }
 

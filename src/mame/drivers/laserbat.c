@@ -17,6 +17,7 @@ TODO:
 */
 
 #include "driver.h"
+#include "cpu/m6800/m6800.h"
 #include "cpu/s2650/s2650.h"
 #include "machine/6821pia.h"
 #include "video/s2636.h"
@@ -79,7 +80,7 @@ static WRITE8_HANDLER( laserbat_input_mux_w )
 {
 	laserbat_input_mux = (data & 0x30) >> 4;
 
-	flip_screen_set_no_update(data & 0x08);
+	flip_screen_set_no_update(space->machine, data & 0x08);
 
 	coin_counter_w(0,data & 1);
 

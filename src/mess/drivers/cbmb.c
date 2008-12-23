@@ -326,7 +326,6 @@ static PALETTE_INIT( cbm700 )
 
 static const mc6845_interface cbm600_crtc = {
 	"main",
-	XTAL_18MHz / 8 /*?*/,	/*  I do not know if this is correct, please verify */
 	8 /*?*/,
 	NULL,
 	cbm600_update_row,
@@ -337,8 +336,7 @@ static const mc6845_interface cbm600_crtc = {
 };
 
 static const mc6845_interface cbm700_crtc = {
-	"main",
-	XTAL_18MHz / 8 /*?*/,	/* I do not know if this is correct, please verify */
+	"main",	
 	9 /*?*/,
 	NULL,
 	cbm700_update_row,
@@ -374,8 +372,7 @@ static MACHINE_DRIVER_START( cbm600 )
 	MDRV_PALETTE_LENGTH(sizeof (cbm700_palette) / sizeof (cbm700_palette[0]) / 3)
 	MDRV_PALETTE_INIT( cbm700 )
 
-	MDRV_DEVICE_ADD("crtc", MC6845)
-	MDRV_DEVICE_CONFIG( cbm600_crtc )
+	MDRV_MC6845_ADD("crtc", MC6845, XTAL_18MHz / 8 /*?*/ /*  I do not know if this is correct, please verify */, cbm600_crtc)
 
 	MDRV_VIDEO_START( cbmb_crtc )
 	MDRV_VIDEO_UPDATE( cbmb_crtc )
@@ -389,8 +386,7 @@ static MACHINE_DRIVER_START( cbm600 )
 	MDRV_QUICKLOAD_ADD(cbmb, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	/* cia */
-	MDRV_DEVICE_ADD("cia", CIA6526R1)
-	MDRV_DEVICE_CONFIG(cbmb_cia)
+	MDRV_CIA6526_ADD("cia", CIA6526R1, 0, cbmb_cia)
 MACHINE_DRIVER_END
 
 
@@ -408,8 +404,8 @@ static MACHINE_DRIVER_START( cbm700 )
 	MDRV_SCREEN_VISIBLE_AREA(0, 720 - 1, 0, 350 - 1)
 	MDRV_GFXDECODE( cbm700 )
 
-	MDRV_DEVICE_MODIFY("crtc", MC6845)
-	MDRV_DEVICE_CONFIG( cbm700_crtc )
+	MDRV_MC6845_REMOVE("crtc", MC6845)
+	MDRV_MC6845_ADD("crtc", MC6845, XTAL_18MHz / 8 /*? I do not know if this is correct, please verify */, cbm700_crtc)
 
 	MDRV_VIDEO_START( cbm700 )
 MACHINE_DRIVER_END
@@ -452,8 +448,7 @@ static MACHINE_DRIVER_START( p500 )
 	MDRV_QUICKLOAD_ADD(p500, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	/* cia */
-	MDRV_DEVICE_ADD("cia", CIA6526R1)
-	MDRV_DEVICE_CONFIG(cbmb_cia)
+	MDRV_CIA6526_ADD("cia", CIA6526R1, 0, cbmb_cia)
 MACHINE_DRIVER_END
 
 

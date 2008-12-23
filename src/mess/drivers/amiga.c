@@ -19,7 +19,6 @@ would commence ($C00000).
 /* Core includes */
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
-#include "deprecat.h"
 #include "includes/amiga.h"
 
 /* Components */
@@ -224,7 +223,6 @@ static const custom_sound_interface amiga_custom_interface =
 static const cia6526_interface cia_0_ntsc_intf =
 {
 	amiga_cia_0_irq,									/* irq_func */
-	AMIGA_68000_NTSC_CLOCK / 10,						/* clock */
 	60,													/* tod_clock */
 	{
 		{ amiga_cia_0_portA_r, amiga_cia_0_portA_w },	/* port A */
@@ -235,7 +233,6 @@ static const cia6526_interface cia_0_ntsc_intf =
 static const cia6526_interface cia_0_pal_intf =
 {
 	amiga_cia_0_irq,									/* irq_func */
-	AMIGA_68000_PAL_CLOCK / 10,							/* clock */
 	50,													/* tod_clock */
 	{
 		{ amiga_cia_0_portA_r, amiga_cia_0_portA_w },	/* port A */
@@ -246,7 +243,6 @@ static const cia6526_interface cia_0_pal_intf =
 static const cia6526_interface cia_1_intf =
 {
 	amiga_cia_1_irq,									/* irq_func */
-	0,													/* clock */
 	0,													/* tod_clock */
 	{
 		{ NULL, NULL, },								/* port A */
@@ -257,7 +253,6 @@ static const cia6526_interface cia_1_intf =
 static const cia6526_interface cia_0_cdtv_intf =
 {
 	amiga_cia_0_irq,									/* irq_func */
-	CDTV_CLOCK_X1 / 40,									/* clock */
 	0,													/* tod_clock */
 	{
 		{ amiga_cia_0_portA_r, amiga_cia_0_portA_w },	/* port A */
@@ -268,7 +263,6 @@ static const cia6526_interface cia_0_cdtv_intf =
 static const cia6526_interface cia_1_cdtv_intf =
 {
 	amiga_cia_1_irq,									/* irq_func */
-	0,													/* clock */
 	0,													/* tod_clock */
 	{
 		{ NULL, NULL, },								/* port A */
@@ -299,7 +293,7 @@ static MACHINE_DRIVER_START( ntsc )
 	MDRV_VIDEO_UPDATE(amiga)
 
 	/* devices */
-	MDRV_DEVICE_ADD("rtc", MSM6242)
+	MDRV_MSM6242_ADD("rtc")
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
@@ -312,10 +306,8 @@ static MACHINE_DRIVER_START( ntsc )
 	MDRV_SOUND_ROUTE(3, "left", 0.50)
 
 	/* cia */
-	MDRV_DEVICE_ADD("cia_0", CIA8520)
-	MDRV_DEVICE_CONFIG(cia_0_ntsc_intf)
-	MDRV_DEVICE_ADD("cia_1", CIA8520)
-	MDRV_DEVICE_CONFIG(cia_1_intf)
+	MDRV_CIA8520_ADD("cia_0", AMIGA_68000_NTSC_CLOCK / 10, cia_0_ntsc_intf)
+	MDRV_CIA8520_ADD("cia_1", 0, cia_1_intf)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( cdtv )
@@ -336,10 +328,10 @@ static MACHINE_DRIVER_START( cdtv )
 	MDRV_CDROM_ADD( "cdrom" )
 
 	/* cia */
-	MDRV_DEVICE_MODIFY("cia_0", CIA8520)
-	MDRV_DEVICE_CONFIG(cia_0_cdtv_intf)
-	MDRV_DEVICE_MODIFY("cia_1", CIA8520)
-	MDRV_DEVICE_CONFIG(cia_1_cdtv_intf)
+	MDRV_CIA8520_REMOVE("cia_0")
+	MDRV_CIA8520_REMOVE("cia_1")
+	MDRV_CIA8520_ADD("cia_0", CDTV_CLOCK_X1 / 40, cia_0_cdtv_intf)
+	MDRV_CIA8520_ADD("cia_1", 0, cia_1_cdtv_intf)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( a1000n )
@@ -360,8 +352,8 @@ static MACHINE_DRIVER_START( pal )
 	MDRV_SCREEN_VISIBLE_AREA(214, (228*4)-1, 34, 312-1)
 
 	/* cia */
-	MDRV_DEVICE_MODIFY("cia_0", CIA8520)
-	MDRV_DEVICE_CONFIG(cia_0_pal_intf)
+	MDRV_CIA8520_REMOVE("cia_0")
+	MDRV_CIA8520_ADD("cia_0", AMIGA_68000_PAL_CLOCK / 10, cia_0_pal_intf)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( a1000p )
@@ -410,9 +402,8 @@ static void amiga_cia_0_portA_w(const device_config *device, UINT8 data)
 	output_set_value("power_led", ( data & 2 ) ? 0 : 1);
 }
 
-static UINT16 amiga_read_joy0dat(void)
+static UINT16 amiga_read_joy0dat(running_machine *machine)
 {
-	running_machine *machine = Machine;
 	if ( input_port_read(machine, "input") & 0x20 ) {
 		/* Joystick */
 		return input_port_read_safe(machine, "JOY0DAT", 0xffff);
@@ -425,9 +416,8 @@ static UINT16 amiga_read_joy0dat(void)
 	}
 }
 
-static UINT16 amiga_read_joy1dat(void)
+static UINT16 amiga_read_joy1dat(running_machine *machine)
 {
-	running_machine *machine = Machine;
 	if ( input_port_read(machine, "input") & 0x10 ) {
 		/* Joystick */
 		return input_port_read_safe(machine, "JOY1DAT", 0xffff);
@@ -440,23 +430,22 @@ static UINT16 amiga_read_joy1dat(void)
 	}
 }
 
-static UINT16 amiga_read_dskbytr(void)
+static UINT16 amiga_read_dskbytr(running_machine *machine)
 {
 	return amiga_fdc_get_byte();
 }
 
-static void amiga_write_dsklen(UINT16 data)
+static void amiga_write_dsklen(running_machine *machine, UINT16 data)
 {
 	if ( data & 0x8000 ) {
 		if ( CUSTOM_REG(REG_DSKLEN) & 0x8000 )
-			amiga_fdc_setup_dma(Machine);
+			amiga_fdc_setup_dma(machine);
 	}
 }
 
 
-static void amiga_reset(void)
+static void amiga_reset(running_machine *machine)
 {
-	running_machine *machine = Machine;
 	if (input_port_read(machine, "hardware") & 0x08)
 	{
 		/* Install RTC */

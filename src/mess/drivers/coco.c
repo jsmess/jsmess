@@ -736,7 +736,7 @@ static MACHINE_DRIVER_START( d64plus )
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
 
 	/* acia */
-	MDRV_DEVICE_ADD("acia", ACIA6551)
+	MDRV_ACIA6551_ADD("acia")
 	
 	MDRV_WD179X_ADD("wd179x", dragon_wd17xx_interface )
 	
@@ -775,7 +775,7 @@ static MACHINE_DRIVER_START( dgnalpha )
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
 
 	/* acia */
-	MDRV_DEVICE_ADD("acia", ACIA6551)
+	MDRV_ACIA6551_ADD("acia")
 	
 	MDRV_WD179X_ADD("wd179x", dgnalpha_wd17xx_interface )
 	
@@ -811,7 +811,7 @@ static MACHINE_DRIVER_START( tanodr64 )
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
 
 	/* acia */
-	MDRV_DEVICE_ADD("acia", ACIA6551)
+	MDRV_ACIA6551_ADD("acia")
 	
 	MDRV_WD1773_ADD("wd1773", coco_wd17xx_interface )	
 	
@@ -845,7 +845,7 @@ static MACHINE_DRIVER_START( coco )
 	MDRV_QUICKLOAD_ADD(coco, "bin", 0.5)
 
 	/* devices */
-	MDRV_DEVICE_ADD("disto", MSM6242)
+	MDRV_MSM6242_ADD("disto")
 
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
@@ -882,7 +882,7 @@ static MACHINE_DRIVER_START( coco2 )
 	MDRV_QUICKLOAD_ADD(coco, "bin", 0.5)
 
 	/* devices */
-	MDRV_DEVICE_ADD("disto", MSM6242)
+	MDRV_MSM6242_ADD("disto")
 
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
@@ -919,7 +919,7 @@ static MACHINE_DRIVER_START( coco2b )
 	MDRV_QUICKLOAD_ADD(coco, "bin", 0.5)
 
 	/* devices */
-	MDRV_DEVICE_ADD("disto", MSM6242)
+	MDRV_MSM6242_ADD("disto")
 
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
@@ -966,7 +966,7 @@ static MACHINE_DRIVER_START( coco3 )
 
 	/* devices */
 	MDRV_COCO_VHD_ADD("vhd")
-	MDRV_DEVICE_ADD("disto", MSM6242)
+	MDRV_MSM6242_ADD("disto")
 
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )

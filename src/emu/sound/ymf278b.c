@@ -255,7 +255,7 @@ static void ymf278b_envelope_next(YMF278BSlot *slot)
 	}
 }
 
-static void ymf278b_pcm_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int length)
+static STREAM_UPDATE( ymf278b_pcm_update )
 {
 	YMF278BChip *chip = param;
 	int i, j;
@@ -265,7 +265,7 @@ static void ymf278b_pcm_update(void *param, stream_sample_t **inputs, stream_sam
 	INT32 *mixp;
 	INT32 vl, vr;
 
-	memset(mix, 0, sizeof(mix[0])*length*2);
+	memset(mix, 0, sizeof(mix[0])*samples*2);
 
 	rombase = chip->rom;
 
@@ -277,7 +277,7 @@ static void ymf278b_pcm_update(void *param, stream_sample_t **inputs, stream_sam
 		{
 			mixp = mix;
 
-			for (j = 0; j < length; j++)
+			for (j = 0; j < samples; j++)
 			{
 				switch (slot->bits)
 				{
@@ -329,7 +329,7 @@ static void ymf278b_pcm_update(void *param, stream_sample_t **inputs, stream_sam
 	mixp = mix;
 	vl = chip->mix_level[chip->pcm_l];
 	vr = chip->mix_level[chip->pcm_r];
-	for (i = 0; i < length; i++)
+	for (i = 0; i < samples; i++)
 	{
 		outputs[0][i] = (*mixp++ * vl) >> 16;
 		outputs[1][i] = (*mixp++ * vr) >> 16;
@@ -808,17 +808,17 @@ SND_GET_INFO( ymf278b )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( ymf278b );		break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ymf278b );			break;
-		case SNDINFO_PTR_STOP:							/* Nothing */							break;
-		case SNDINFO_PTR_RESET:							/* Nothing */							break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( ymf278b );	break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ymf278b );		break;
+		case SNDINFO_PTR_STOP:							/* Nothing */									break;
+		case SNDINFO_PTR_RESET:							/* Nothing */									break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							info->s = "YMF278B";					break;
-		case SNDINFO_STR_CORE_FAMILY:					info->s = "Yamaha FM";					break;
-		case SNDINFO_STR_CORE_VERSION:					info->s = "1.0";						break;
-		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
-		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "YMF278B");						break;
+		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Yamaha FM");					break;
+		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");							break;
+		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
+		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

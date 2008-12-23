@@ -1220,10 +1220,10 @@ WRITE8_HANDLER( pokemini_hwreg_w )
 			   Bit 7   R/W IR received bit (mirror, if device not selected: 0)
 			*/
 		if ( pm_reg[0x60] & 0x04 )
-			i2cmem_write( 0, I2CMEM_SDA, ( data & 0x04 ) ? 1 : 0 );
+			i2cmem_write( space->machine, 0, I2CMEM_SDA, ( data & 0x04 ) ? 1 : 0 );
 
 		if ( pm_reg[0x60] & 0x08 )
-			i2cmem_write( 0, I2CMEM_SCL, ( data & 0x08 ) ? 1 : 0 );
+			i2cmem_write( space->machine, 0, I2CMEM_SCL, ( data & 0x08 ) ? 1 : 0 );
 		break;
 	case 0x70:	/* Sound related */
 		pm_reg[0x70] = data;
@@ -1384,7 +1384,7 @@ READ8_HANDLER( pokemini_hwreg_r )
 	case 0x61:
 		if ( ! ( pm_reg[0x60] & 0x04 ) )
 		{
-			data = ( data & ~ 0x04 ) | ( i2cmem_read( 0, I2CMEM_SDA ) ? 0x04 : 0x00 );
+			data = ( data & ~ 0x04 ) | ( i2cmem_read( space->machine, 0, I2CMEM_SDA ) ? 0x04 : 0x00 );
 		}
 
 		if ( ! ( pm_reg[0x60] & 0x08 ) )

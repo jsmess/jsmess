@@ -75,6 +75,7 @@ ROMS: All ROM labels say only "PROM" and a number.
 
 */
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "sound/ay8910.h"
 
@@ -143,13 +144,13 @@ static VIDEO_UPDATE(pturn)
 		flipy=spriteram[offs+1]&0x80;
 
 
-		if (flip_screen_x_get())
+		if (flip_screen_x_get(screen->machine))
 		{
 			sx = 224 - sx;
 			flipx ^= 0x40;
 		}
 
-		if (flip_screen_y_get())
+		if (flip_screen_y_get(screen->machine))
 		{
 			flipy ^= 0x80;
 			sy = 224 - sy;
@@ -242,7 +243,7 @@ static WRITE8_HANDLER(bgbank_w)
 
 static WRITE8_HANDLER(flip_w)
 {
-	flip_screen_set(data);
+	flip_screen_set(space->machine, data);
 }
 
 

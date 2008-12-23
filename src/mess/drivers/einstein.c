@@ -258,7 +258,6 @@ static MC6845_ON_DE_CHANGED( einstein_6845_display_enable_changed )
 
 static const mc6845_interface einstein_crtc6845_interface = {
 	"main",
-	EINSTEIN_SYSTEM_CLOCK /*?*/,
 	8 /*?*/,
 	NULL,
 	einstein_6845_update_row,
@@ -525,11 +524,11 @@ static DEVICE_GET_INFO( einstein_daisy )
 		case DEVINFO_FCT_IRQ_RETI:						info->f = (genf *)einstein_daisy_irq_reti;				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "Einstein daisy";								break;
-		case DEVINFO_STR_FAMILY:						info->s = "Z80";										break;
-		case DEVINFO_STR_VERSION:						info->s = "1.0";										break;
-		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;										break;
-		case DEVINFO_STR_CREDITS:						info->s = "Copyright the MESS Team";					break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Einstein daisy");								break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Z80");										break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");										break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);										break;
+		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team");					break;
 	}
 }
 
@@ -1451,7 +1450,7 @@ static MACHINE_RESET( einstein )
 	/* a reset causes the fire int, adc int, keyboard int mask
     to be set to 1, which causes all these to be DISABLED */
 	einstein_int_mask = 0;
-	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 0), FLOPPY_DRIVE_SS_40);
+	floppy_drive_set_geometry(image_from_devtype_and_index(machine, IO_FLOPPY, 0), FLOPPY_DRIVE_SS_40);
 
 	cpu_set_irq_callback(machine->cpu[0], einstein_cpu_acknowledge_int);
 
@@ -1722,7 +1721,7 @@ static MACHINE_DRIVER_START( einstein )
 	MDRV_CPU_PROGRAM_MAP(einstein_mem, 0)
 	MDRV_CPU_IO_MAP(einstein_io, 0)
 	MDRV_CPU_CONFIG(einstein_daisy_chain)
-	MDRV_INTERLEAVE(1)
+	MDRV_QUANTUM_TIME(HZ(60))
 
 	MDRV_MACHINE_START( einstein )
 	MDRV_MACHINE_RESET( einstein )
@@ -1766,8 +1765,7 @@ static MACHINE_DRIVER_START( einstei2 )
 	MDRV_SCREEN_SIZE(640, 400)
 	MDRV_SCREEN_VISIBLE_AREA(0,640-1, 0, 400-1)
 
-	MDRV_DEVICE_ADD("crtc", MC6845)
-	MDRV_DEVICE_CONFIG( einstein_crtc6845_interface )
+	MDRV_MC6845_ADD("crtc", MC6845, EINSTEIN_SYSTEM_CLOCK /*?*/, einstein_crtc6845_interface)
 
 	MDRV_VIDEO_UPDATE( einstein2 )
 MACHINE_DRIVER_END

@@ -170,7 +170,7 @@ static MACHINE_DRIVER_START( mk2 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M6502, 1000000)        /* 6504 */
 	MDRV_CPU_PROGRAM_MAP(mk2_mem, 0)
-	MDRV_INTERLEAVE(1)
+	MDRV_QUANTUM_TIME(HZ(60))
 
 	MDRV_MACHINE_START( mk2 )
 

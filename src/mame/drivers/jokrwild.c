@@ -91,6 +91,7 @@
 #define MASTER_CLOCK	XTAL_8MHz	/* guess */
 
 #include "driver.h"
+#include "cpu/m6809/m6809.h"
 #include "video/mc6845.h"
 #include "machine/6821pia.h"
 
@@ -357,7 +358,7 @@ static MACHINE_DRIVER_START( jokrwild )
 	MDRV_VIDEO_START(jokrwild)
 	MDRV_VIDEO_UPDATE(jokrwild)
 
-	MDRV_DEVICE_ADD("crtc", MC6845)
+	MDRV_MC6845_ADD("crtc", MC6845, 0, mc6845_null_interface)
 
 MACHINE_DRIVER_END
 

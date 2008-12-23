@@ -18,6 +18,7 @@
 
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "machine/atarigen.h"
 #include "audio/atarijsa.h"
 #include "xybots.h"
@@ -383,7 +384,7 @@ ROM_END
 static DRIVER_INIT( xybots )
 {
 	atarigen_eeprom_default = NULL;
-	atarigen_slapstic_init(machine, 0, 0x008000, 0, 107);
+	atarigen_slapstic_init(machine->cpu[0], 0x008000, 0, 107);
 	atarijsa_init(machine, "FFE200", 0x0100);
 }
 

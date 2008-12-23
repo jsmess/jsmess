@@ -326,9 +326,6 @@ void video_init(running_machine *machine)
 	global.frameskip_level = options_get_int(mame_options(), OPTION_FRAMESKIP);
 	global.seconds_to_run = options_get_int(mame_options(), OPTION_SECONDS_TO_RUN);
 
-	/* set the first screen device as the primary - this will set NULL if screenless */
-	machine->primary_screen = video_screen_first(machine->config);
-
 	/* create spriteram buffers if necessary */
 	if (machine->config->video_attributes & VIDEO_BUFFERS_SPRITERAM)
 		init_buffered_spriteram(machine);
@@ -1110,7 +1107,7 @@ attotime video_screen_get_frame_period(const device_config *screen)
 
 	/* a lot of modules want to the period of the primary screen, so
        if we are screenless, return something reasonable so that we don't fall over */
-	if (screen == NULL || video_screen_count(screen->machine->config) == 0)
+	if (screen == NULL || !screen->started || video_screen_count(screen->machine->config) == 0)
 	{
 		ret = DEFAULT_FRAME_PERIOD;
 	}
@@ -1337,11 +1334,11 @@ DEVICE_GET_INFO( video_screen )
 		case DEVINFO_FCT_RESET:					/* Nothing */							break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:					info->s = "Raster";						break;
-		case DEVINFO_STR_FAMILY:				info->s = "Video Screen";				break;
-		case DEVINFO_STR_VERSION:				info->s = "1.0";						break;
-		case DEVINFO_STR_SOURCE_FILE:			info->s = __FILE__;						break;
-		case DEVINFO_STR_CREDITS:				info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case DEVINFO_STR_NAME:					strcpy(info->s, "Raster");				break;
+		case DEVINFO_STR_FAMILY:				strcpy(info->s, "Video Screen");		break;
+		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0");					break;
+		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);				break;
+		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

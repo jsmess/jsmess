@@ -601,7 +601,6 @@ GFXDECODE_END
 
 static const mc6845_interface crtc_pet40 = {
 	"main",
-	XTAL_17_73447MHz/3,			/* This is a wild guess and mostly likely incorrect */
 	8,
 	NULL,
 	pet40_update_row,
@@ -613,7 +612,6 @@ static const mc6845_interface crtc_pet40 = {
 
 static const mc6845_interface crtc_pet80 = {
 	"main",
-	XTAL_12MHz / 2,			/* This is a wild guess and mostly likely incorrect */
 	16,
 	NULL,
 	pet80_update_row,
@@ -697,8 +695,7 @@ static MACHINE_DRIVER_START( pet40 )
 	MDRV_CPU_MODIFY( "main" )
 	MDRV_CPU_PROGRAM_MAP( pet40_mem, 0 )
 
-	MDRV_DEVICE_ADD("crtc", MC6845)
-	MDRV_DEVICE_CONFIG( crtc_pet40 )
+	MDRV_MC6845_ADD("crtc", MC6845, XTAL_17_73447MHz/3	/* This is a wild guess and mostly likely incorrect */, crtc_pet40)
 
 	MDRV_VIDEO_START( pet_crtc )
 	MDRV_VIDEO_UPDATE( pet_crtc )
@@ -724,8 +721,7 @@ static MACHINE_DRIVER_START( pet80 )
 	MDRV_SCREEN_SIZE(640, 250)
 	MDRV_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 250 - 1)
 
-	MDRV_DEVICE_ADD("crtc", MC6845)
-	MDRV_DEVICE_CONFIG( crtc_pet80 )
+	MDRV_MC6845_ADD("crtc", MC6845, XTAL_12MHz / 2	/* This is a wild guess and mostly likely incorrect */, crtc_pet80)
 
 	MDRV_GFXDECODE( pet80 )
 	MDRV_VIDEO_START( pet_crtc )

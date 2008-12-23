@@ -405,7 +405,7 @@ static MACHINE_DRIVER_START( cgenie )
 	MDRV_CPU_IO_MAP(cgenie_io, 0)
 	MDRV_CPU_VBLANK_INT("main", cgenie_frame_interrupt)
 	MDRV_CPU_PERIODIC_INT(cgenie_timer_interrupt, 40)
-	MDRV_INTERLEAVE(4)
+	MDRV_QUANTUM_TIME(HZ(240))
 
 	MDRV_MACHINE_START( cgenie )
 	MDRV_MACHINE_RESET( cgenie )

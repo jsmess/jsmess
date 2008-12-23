@@ -24,6 +24,7 @@
 */
 
 #include "driver.h"
+#include "cpu/e132xs/e132xs.h"
 #include "machine/eeprom.h"
 #include "sound/okim6295.h"
 #include "cpu/mcs51/mcs51.h"
@@ -380,6 +381,7 @@ static void draw_sprites(running_machine *machine, UINT32 *sprites, const rectan
 		gfxdata	= base_gfx + 64 * code;
 
 		/* prepare GfxElement on the fly */
+		gfx.machine = machine;
 		gfx.width = width;
 		gfx.height = height;
 		gfx.total_elements = 1;

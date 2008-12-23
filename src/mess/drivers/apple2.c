@@ -563,7 +563,7 @@ static MACHINE_DRIVER_START( apple2_common )
 	MDRV_CPU_ADD("main", M6502, 1021800)		/* close to actual CPU frequency of 1.020484 MHz */
 	MDRV_CPU_PROGRAM_MAP(apple2_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(apple2_interrupt, 192/8)
-	MDRV_INTERLEAVE(1)
+	MDRV_QUANTUM_TIME(HZ(60))
 
 	MDRV_MACHINE_START( apple2 )
 

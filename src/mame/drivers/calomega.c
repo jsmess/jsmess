@@ -616,6 +616,7 @@
 #define SND_CLOCK	(MASTER_CLOCK/8)
 
 #include "driver.h"
+#include "cpu/m6502/m6502.h"
 #include "video/mc6845.h"
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
@@ -1929,7 +1930,7 @@ static MACHINE_DRIVER_START( sys903 )
 	MDRV_VIDEO_START(calomega)
 	MDRV_VIDEO_UPDATE(calomega)
 
-	MDRV_DEVICE_ADD("crtc", MC6845)
+	MDRV_MC6845_ADD("crtc", MC6845, 0, mc6845_null_interface)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -1938,8 +1939,7 @@ static MACHINE_DRIVER_START( sys903 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	/* acia */
-	MDRV_DEVICE_ADD("acia6850_0", ACIA6850)
-	MDRV_DEVICE_CONFIG(acia6850_intf)
+	MDRV_ACIA6850_ADD("acia6850_0", acia6850_intf)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( sys905 )

@@ -284,7 +284,7 @@ static void wd17xx_set_irq(const device_config *device);
 static const device_config *wd17xx_current_image(const device_config *device)
 {
 	wd17xx_t *w = get_safe_token(device);
-	return image_from_devtype_and_index(IO_FLOPPY, w->current_drive);
+	return image_from_devtype_and_index(device->machine, IO_FLOPPY, w->current_drive);
 }
 
 
@@ -1666,7 +1666,7 @@ static DEVICE_RESET( wd17xx )
 	
 	for (i = 0; i < device_count(device->machine, IO_FLOPPY); i++)
 	{
-		const device_config *img = image_from_devtype_and_index(IO_FLOPPY, i);
+		const device_config *img = image_from_devtype_and_index(device->machine, IO_FLOPPY, i);
 		floppy_drive_set_controller(img,device);
 		floppy_drive_set_index_pulse_callback(img, wd17xx_index_pulse_callback);
 		floppy_drive_set_rpm( img, 300.);
@@ -1740,11 +1740,11 @@ DEVICE_GET_INFO( wd1770 )
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(wd17xx);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "WD1770";						break;
-		case DEVINFO_STR_FAMILY:						info->s = "WD17xx";						break;
-		case DEVINFO_STR_VERSION:						info->s = "1.0";							break;
-		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;							break;
-		case DEVINFO_STR_CREDITS:						info->s = "Copyright MESS Team";			break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "WD1770");						break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "WD17xx");						break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);							break;
+		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");			break;
 	}
 }
 
@@ -1754,7 +1754,7 @@ DEVICE_GET_INFO( wd1772 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "WD1772";				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "WD1772");				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(wd1772);	break;
@@ -1767,7 +1767,7 @@ DEVICE_GET_INFO( wd1773 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "WD1773";				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "WD1773");				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(wd1773);	break;
@@ -1780,7 +1780,7 @@ DEVICE_GET_INFO( wd179x )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "WD179x";				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "WD179x");				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(wd179x);	break;
@@ -1793,7 +1793,7 @@ DEVICE_GET_INFO( wd1793 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "WD1793";				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "WD1793");				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(wd1793);	break;
@@ -1806,7 +1806,7 @@ DEVICE_GET_INFO( wd2793 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "WD2793";				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "WD2793");				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(wd2793);	break;
@@ -1819,7 +1819,7 @@ DEVICE_GET_INFO( wd177x )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "WD177x";				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "WD177x");				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(wd177x);	break;
@@ -1832,7 +1832,7 @@ DEVICE_GET_INFO( mb8877 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "MB8877";				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "MB8877");				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(mb8877);	break;

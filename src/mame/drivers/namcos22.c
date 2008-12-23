@@ -1109,6 +1109,7 @@
  */
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "deprecat.h"
 #include "namcos22.h"
 #include "cpu/tms32025/tms32025.h"
@@ -2790,7 +2791,7 @@ static MACHINE_DRIVER_START( namcos22s )
 	MDRV_CPU_IO_MAP( mcu_io, 0 )
 	MDRV_CPU_VBLANK_INT_HACK(mcu_interrupt, 3)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	MDRV_NVRAM_HANDLER(namcos22)
 	MDRV_SCREEN_ADD("main", RASTER)

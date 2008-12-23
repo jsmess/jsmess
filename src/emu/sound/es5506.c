@@ -769,12 +769,12 @@ logerror("IRQ raised on voice %d!!\n",v);
 
 ***********************************************************************************************/
 
-static void es5506_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length)
+static STREAM_UPDATE( es5506_update )
 {
 	struct ES5506Chip *chip = param;
 	INT32 *lsrc = chip->scratch, *rsrc = chip->scratch;
-	stream_sample_t *ldest = buffer[0];
-	stream_sample_t *rdest = buffer[1];
+	stream_sample_t *ldest = outputs[0];
+	stream_sample_t *rdest = outputs[1];
 
 #if MAKE_WAVS
 	/* start the logging once we have a sample rate */
@@ -786,18 +786,18 @@ static void es5506_update(void *param, stream_sample_t **inputs, stream_sample_t
 #endif
 
 	/* loop until all samples are output */
-	while (length)
+	while (samples)
 	{
-		int samples = (length > MAX_SAMPLE_CHUNK) ? MAX_SAMPLE_CHUNK : length;
+		int length = (samples > MAX_SAMPLE_CHUNK) ? MAX_SAMPLE_CHUNK : samples;
 		int samp;
 
 		/* determine left/right source data */
 		lsrc = chip->scratch;
-		rsrc = chip->scratch + samples;
-		generate_samples(chip, lsrc, rsrc, samples);
+		rsrc = chip->scratch + length;
+		generate_samples(chip, lsrc, rsrc, length);
 
 		/* copy the data */
-		for (samp = 0; samp < samples; samp++)
+		for (samp = 0; samp < length; samp++)
 		{
 			*ldest++ = lsrc[samp] >> 4;
 			*rdest++ = rsrc[samp] >> 4;
@@ -806,11 +806,11 @@ static void es5506_update(void *param, stream_sample_t **inputs, stream_sample_t
 #if MAKE_WAVS
 		/* log the raw data */
 		if (chip->wavraw)
-			wav_add_data_32lr(chip->wavraw, lsrc, rsrc, samples, 4);
+			wav_add_data_32lr(chip->wavraw, lsrc, rsrc, length, 4);
 #endif
 
 		/* account for these samples */
-		length -= samples;
+		samples -= length;
 	}
 }
 
@@ -2167,11 +2167,11 @@ SND_GET_INFO( es5505 )
 		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( es5505 );				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							info->s = "ES5505";						break;
-		case SNDINFO_STR_CORE_FAMILY:					info->s = "Ensoniq Wavetable";			break;
-		case SNDINFO_STR_CORE_VERSION:					info->s = "1.0";						break;
-		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
-		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "ES5505");							break;
+		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Ensoniq Wavetable");				break;
+		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");								break;
+		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);							break;
+		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 
@@ -2202,11 +2202,11 @@ SND_GET_INFO( es5506 )
 		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( es5506 );				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							info->s = "ES5506";						break;
-		case SNDINFO_STR_CORE_FAMILY:					info->s = "Ensoniq Wavetable";			break;
-		case SNDINFO_STR_CORE_VERSION:					info->s = "1.0";						break;
-		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
-		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "ES5506");							break;
+		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Ensoniq Wavetable");				break;
+		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");								break;
+		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);							break;
+		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

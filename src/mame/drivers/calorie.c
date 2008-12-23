@@ -78,6 +78,7 @@ Notes:
 */
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "machine/segacrpt.h"
 #include "sound/ay8910.h"
 
@@ -141,7 +142,7 @@ static VIDEO_UPDATE( calorie )
 		ypos = 0xff - calorie_sprites[x+2];
 		xpos = calorie_sprites[x+3];
 
-		if(flip_screen_get())
+		if(flip_screen_get(screen->machine))
 		{
 			if( calorie_sprites[x+1] & 0x10 )
 				ypos = 0xff - ypos + 32;
@@ -185,7 +186,7 @@ static WRITE8_HANDLER( calorie_bg_w )
 
 static WRITE8_HANDLER( calorie_flipscreen_w )
 {
-	flip_screen_set(data & 1);
+	flip_screen_set(space->machine, data & 1);
 }
 
 static READ8_HANDLER( calorie_soundlatch_r )

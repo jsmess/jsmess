@@ -569,7 +569,7 @@ static const apple2_memmap_entry apple2_memmap_entries[] =
 
 void apple2_setvar(running_machine *machine, UINT32 val, UINT32 mask)
 {
-	LOG(("apple2_setvar(): val=0x%06x mask=0x%06x pc=0x%04x\n", val, mask, (unsigned int) cpu_get_reg(machine->cpu[0], REG_PC)));
+	LOG(("apple2_setvar(): val=0x%06x mask=0x%06x pc=0x%04x\n", val, mask, (unsigned int) cpu_get_reg(machine->cpu[0], REG_GENPC)));
 
 	assert((val & mask) == val);
 

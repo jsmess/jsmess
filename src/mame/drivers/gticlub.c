@@ -219,12 +219,12 @@ Hang Pilot (uses an unknown but similar video board)                12W         
 */
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "machine/eeprom.h"
 #include "cpu/powerpc/ppc.h"
 #include "cpu/sharc/sharc.h"
 #include "machine/konppc.h"
 #include "machine/konamiic.h"
-#include "machine/adc083x.h"
 #include "sound/rf5c400.h"
 #include "video/voodoo.h"
 #include "video/gticlub.h"
@@ -598,14 +598,14 @@ WRITE32_HANDLER( lanc_ram_w )
 static MACHINE_START( gticlub )
 {
 	/* set conservative DRC options */
-	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_DRC_OPTIONS, PPCDRC_COMPATIBLE_OPTIONS);
+	device_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_DRC_OPTIONS, PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_SELECT, 0);
-	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_START, 0x00000000);
-	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_END, 0x000fffff);
-	cpu_set_info_ptr(machine->cpu[0], CPUINFO_PTR_PPC_FASTRAM_BASE, work_ram);
-	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_READONLY, 0);
+	device_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_SELECT, 0);
+	device_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_START, 0x00000000);
+	device_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_END, 0x000fffff);
+	device_set_info_ptr(machine->cpu[0], CPUINFO_PTR_PPC_FASTRAM_BASE, work_ram);
+	device_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_READONLY, 0);
 }
 
 static ADDRESS_MAP_START( gticlub_map, ADDRESS_SPACE_PROGRAM, 32 )
@@ -924,7 +924,7 @@ static MACHINE_DRIVER_START( gticlub )
 	MDRV_CPU_CONFIG(sharc_cfg)
 	MDRV_CPU_DATA_MAP(sharc_map, 0)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	MDRV_NVRAM_HANDLER(gticlub)
 	MDRV_MACHINE_START(gticlub)
@@ -972,7 +972,7 @@ static MACHINE_DRIVER_START( hangplt )
 	MDRV_CPU_CONFIG(sharc_cfg)
 	MDRV_CPU_DATA_MAP(hangplt_sharc1_map, 0)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	MDRV_NVRAM_HANDLER(gticlub)
 	MDRV_MACHINE_START(gticlub)
@@ -1167,7 +1167,7 @@ static void sound_irq_callback(running_machine *machine, int irq)
 
 static DRIVER_INIT(gticlub)
 {
-	init_konami_cgboard(1, CGBOARD_TYPE_GTICLUB);
+	init_konami_cgboard(machine, 1, CGBOARD_TYPE_GTICLUB);
 
 	sharc_dataram_0 = auto_malloc(0x100000);
 	gticlub_led_reg0 = gticlub_led_reg1 = 0x7f;
@@ -1181,9 +1181,9 @@ static DRIVER_INIT(gticlub)
 
 static DRIVER_INIT(hangplt)
 {
-	init_konami_cgboard(2, CGBOARD_TYPE_HANGPLT);
-	set_cgboard_texture_bank(0, 5, memory_region(machine, "user5"));
-	set_cgboard_texture_bank(1, 6, memory_region(machine, "user5"));
+	init_konami_cgboard(machine, 2, CGBOARD_TYPE_HANGPLT);
+	set_cgboard_texture_bank(machine, 0, 5, memory_region(machine, "user5"));
+	set_cgboard_texture_bank(machine, 1, 6, memory_region(machine, "user5"));
 
 	sharc_dataram_0 = auto_malloc(0x100000);
 	sharc_dataram_1 = auto_malloc(0x100000);

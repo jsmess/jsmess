@@ -347,7 +347,7 @@ Notes:
 
 UINT16* s24_mainram1;
 
-extern void s24_fd1094_machine_init(void);
+extern void s24_fd1094_machine_init(running_machine *machine);
 extern void s24_fd1094_driver_init(running_machine *machine);
 
 VIDEO_START(system24);
@@ -697,7 +697,7 @@ static void reset_reset(running_machine *machine)
 			cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
 //          mame_printf_debug("enable 2nd cpu!\n");
 //          debugger_break(machine);
-			s24_fd1094_machine_init();
+			s24_fd1094_machine_init(machine);
 
 		} else
 			cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
@@ -1812,7 +1812,7 @@ static MACHINE_DRIVER_START( system24 )
 	MDRV_CPU_ADD("sub", M68000, MASTER_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(system24_cpu2_map, 0)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	MDRV_MACHINE_START(system24)
 	MDRV_MACHINE_RESET(system24)

@@ -46,12 +46,15 @@ typedef void (*zx8301_ram_write_func)(const device_config *device, UINT32 da, UI
 
 #define ZX8301 DEVICE_GET_INFO_NAME( zx8301 )
 
+#define MDRV_ZX8301_ADD(_tag, _clock, _config) \
+	MDRV_DEVICE_ADD(_tag, ZX8301, _clock) \
+	MDRV_DEVICE_CONFIG(_config)
+
 /* interface */
 typedef struct _zx8301_interface zx8301_interface;
 struct _zx8301_interface
 {
 	const char *screen_tag;		/* screen we are acting on */
-	int clock;					/* the clock (pin 7) of the chip */
 
 	/* this gets called for every change of the VSYNC pin (pin 11) */
 	zx8301_on_vsync_changed_func	on_vsync_changed;

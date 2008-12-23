@@ -388,7 +388,7 @@ DEVICE_IMAGE_LOAD( b2m_floppy )
 }
 
 
-static void b2m_sh_update(void *param,stream_sample_t **inputs, stream_sample_t **outputs,int samples)
+static STREAM_UPDATE( b2m_sh_update )
 {
 	INT16 channel_1_signal;
 

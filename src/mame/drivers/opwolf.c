@@ -107,6 +107,8 @@ register. So what is controlling priority.
 #define SOUND_CPU_CLOCK		(XTAL_8MHz / 2)		/* clock for Z80 sound CPU */
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
+#include "cpu/m68000/m68000.h"
 #include "taitoipt.h"
 #include "video/taitoic.h"
 #include "audio/taitosnd.h"
@@ -584,7 +586,7 @@ static MACHINE_DRIVER_START( opwolf )
 	MDRV_CPU_ADD("audio", Z80, SOUND_CPU_CLOCK )	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(z80_readmem,z80_writemem)
 
-	MDRV_INTERLEAVE(10)	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
+	MDRV_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
 	MDRV_MACHINE_START(opwolf)
 	MDRV_MACHINE_RESET(opwolf)
@@ -637,7 +639,7 @@ static MACHINE_DRIVER_START( opwolfb ) /* OSC clocks unknown for the bootleg, bu
 	MDRV_CPU_PROGRAM_MAP(sub_z80_readmem,sub_z80_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_INTERLEAVE(10)	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
+	MDRV_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
 	MDRV_MACHINE_START(opwolf)
 

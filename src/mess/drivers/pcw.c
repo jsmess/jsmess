@@ -549,20 +549,20 @@ static WRITE8_HANDLER(pcw_system_control_w)
 		/* disc motor on */
 		case 9:
 		{
-			floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, 0), 1);
-			floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, 1), 1);
-			floppy_drive_set_ready_state(image_from_devtype_and_index(IO_FLOPPY, 0), 1,1);
-			floppy_drive_set_ready_state(image_from_devtype_and_index(IO_FLOPPY, 1), 1,1);
+			floppy_drive_set_motor_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 0), 1);
+			floppy_drive_set_motor_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 1), 1);
+			floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 0), 1,1);
+			floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 1), 1,1);
 		}
 		break;
 
 		/* disc motor off */
 		case 10:
 		{
-			floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, 0), 0);
-			floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, 1), 0);
-			floppy_drive_set_ready_state(image_from_devtype_and_index(IO_FLOPPY, 0), 1,1);
-			floppy_drive_set_ready_state(image_from_devtype_and_index(IO_FLOPPY, 1), 1,1);
+			floppy_drive_set_motor_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 0), 0);
+			floppy_drive_set_motor_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 1), 0);
+			floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 0), 1,1);
+			floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 1), 1,1);
 		}
 		break;
 
@@ -751,7 +751,7 @@ static TIMER_CALLBACK(setup_beep)
 static MACHINE_START( pcw )
 {
 	fdc_interrupt_code = 0;
-	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 0), FLOPPY_DRIVE_DS_80);
+	floppy_drive_set_geometry(image_from_devtype_and_index(machine, IO_FLOPPY, 0), FLOPPY_DRIVE_DS_80);
 }
 
 
@@ -987,7 +987,7 @@ static MACHINE_DRIVER_START( pcw )
 	MDRV_CPU_ADD("main", Z80, 4000000)       /* clock supplied to chip, but in reality it is 3.4 MHz */
 	MDRV_CPU_PROGRAM_MAP(pcw_map, 0)
 	MDRV_CPU_IO_MAP(pcw_io, 0)
-	MDRV_INTERLEAVE(1)
+	MDRV_QUANTUM_TIME(HZ(60))
 
 	MDRV_MACHINE_START(pcw)
 

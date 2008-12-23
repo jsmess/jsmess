@@ -107,7 +107,7 @@ ADDRESS_MAP_END
 static INPUT_CHANGED( kim1_reset )
 {
 	if (newval == 0)
-		cpu_reset(field->port->machine->cpu[0]);
+		device_reset(field->port->machine->cpu[0]);
 }
 
 
@@ -325,7 +325,7 @@ static MACHINE_DRIVER_START( kim1 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M6502, 1000000)        /* 1 MHz */
 	MDRV_CPU_PROGRAM_MAP(kim1_map, 0)
-	MDRV_INTERLEAVE(1)
+	MDRV_QUANTUM_TIME(HZ(60))
 
 	MDRV_MACHINE_START( kim1 )
 	MDRV_MACHINE_RESET( kim1 )

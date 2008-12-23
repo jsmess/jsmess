@@ -385,7 +385,7 @@ static MACHINE_DRIVER_START( level1 )
 	MDRV_CPU_IO_MAP(io_level1, 0)
 	MDRV_CPU_VBLANK_INT("main", trs80_frame_interrupt)
 	MDRV_CPU_PERIODIC_INT(trs80_timer_interrupt, 40)
-	MDRV_INTERLEAVE(1)
+	MDRV_QUANTUM_TIME(HZ(60))
 
 	MDRV_MACHINE_RESET( trs80 )
 

@@ -421,7 +421,6 @@ static void c64_cia1_interrupt (const device_config *device, int level)
 const cia6526_interface c64_ntsc_cia0 =
 {
 	c64_cia0_interrupt,
-	0.0,
 	60,
 
 	{
@@ -433,7 +432,6 @@ const cia6526_interface c64_ntsc_cia0 =
 const cia6526_interface c64_pal_cia0 =
 {
 	c64_cia0_interrupt,
-	0.0,
 	50,
 
 	{
@@ -445,7 +443,6 @@ const cia6526_interface c64_pal_cia0 =
 const cia6526_interface c64_ntsc_cia1 =
 {
 	c64_cia1_interrupt,
-	0.0,
 	60,
 
 	{
@@ -457,7 +454,6 @@ const cia6526_interface c64_ntsc_cia1 =
 const cia6526_interface c64_pal_cia1 =
 {
 	c64_cia1_interrupt,
-	0.0,
 	50,
 
 	{
@@ -676,7 +672,7 @@ static void c64_bankswitch(running_machine *machine, int reset)
 	static int old = -1, exrom, game;
 	int loram, hiram, charen;
 	int ultimax_mode = 0;
-	int data = (UINT8) cpu_get_info_int(machine->cpu[0], CPUINFO_INT_M6510_PORT) & 0x07;
+	int data = (UINT8) device_get_info_int(machine->cpu[0], CPUINFO_INT_M6510_PORT) & 0x07;
 
 	/* If nothing has changed or reset = 0, don't do anything */
 	if ((data == old) && (exrom == c64_exrom) && (game == c64_game) && !reset) 
@@ -1021,8 +1017,8 @@ TIMER_CALLBACK( c64_tape_timer )
 static void c64_common_driver_init (running_machine *machine)
 {
 	/* configure the M6510 port */
-	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_M6510_PORTREAD, (genf *) c64_m6510_port_read);
-	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_M6510_PORTWRITE, (genf *) c64_m6510_port_write);
+	device_set_info_fct(machine->cpu[0], CPUINFO_PTR_M6510_PORTREAD, (genf *) c64_m6510_port_read);
+	device_set_info_fct(machine->cpu[0], CPUINFO_PTR_M6510_PORTWRITE, (genf *) c64_m6510_port_write);
 
 	if (!ultimax) 
 	{

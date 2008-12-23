@@ -353,7 +353,7 @@ static MACHINE_RESET(model2_scsp)
 
 	// copy the 68k vector table into RAM
 	memcpy(model2_soundram, memory_region(machine, "audio")+0x80000, 16);
-	cpu_reset(cputag_get_cpu(machine, "audio"));
+	device_reset(cputag_get_cpu(machine, "audio"));
 }
 
 static MACHINE_RESET(model2)
@@ -1890,7 +1890,7 @@ static MACHINE_DRIVER_START( model2b )
 	//MDRV_CPU_CONFIG(sharc_cfg)
 	//MDRV_CPU_DATA_MAP(geo_sharc_map, 0)
 
-	MDRV_INTERLEAVE(300)
+	MDRV_QUANTUM_TIME(HZ(18000))
 
 	MDRV_MACHINE_RESET(model2b)
 	MDRV_NVRAM_HANDLER( model2 )

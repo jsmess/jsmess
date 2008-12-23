@@ -708,7 +708,7 @@ static MACHINE_START( c1pmf )
 	pia_config(machine, 0, &osi470_pia_intf);
 
 	/* set floppy index hole callback */
-	floppy_drive_set_index_pulse_callback(image_from_devtype_and_index(IO_FLOPPY, 0), osi470_index_callback);
+	floppy_drive_set_index_pulse_callback(image_from_devtype_and_index(machine, IO_FLOPPY, 0), osi470_index_callback);
 }
 
 /* Machine Drivers */
@@ -732,8 +732,7 @@ static MACHINE_DRIVER_START( osi600 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* cassette ACIA */
-	MDRV_DEVICE_ADD("acia_0", ACIA6850)
-	MDRV_DEVICE_CONFIG(osi600_acia_intf)
+	MDRV_ACIA6850_ADD("acia_0", osi600_acia_intf)
 
 	/* cassette */
 	MDRV_TIMER_ADD_PERIODIC("cassette", cassette_tick, HZ(4800))
@@ -753,8 +752,7 @@ static MACHINE_DRIVER_START( uk101 )
 	MDRV_IMPORT_FROM(uk101_video)
 
 	/* cassette ACIA */
-	MDRV_DEVICE_ADD("acia_0", ACIA6850)
-	MDRV_DEVICE_CONFIG(uk101_acia_intf)
+	MDRV_ACIA6850_ADD("acia_0", uk101_acia_intf)
 
 	/* cassette */
 	MDRV_TIMER_ADD_PERIODIC("cassette", cassette_tick, HZ(4800))
@@ -782,8 +780,7 @@ static MACHINE_DRIVER_START( c1p )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* cassette ACIA */
-	MDRV_DEVICE_ADD("acia_0", ACIA6850)
-	MDRV_DEVICE_CONFIG(osi600_acia_intf)
+	MDRV_ACIA6850_ADD("acia_0", osi600_acia_intf)
 
 	/* cassette */
 	MDRV_TIMER_ADD_PERIODIC("cassette", cassette_tick, HZ(4800))
@@ -799,8 +796,7 @@ static MACHINE_DRIVER_START( c1pmf )
 	MDRV_MACHINE_START(c1pmf)
 
 	/* floppy ACIA */
-	MDRV_DEVICE_ADD("acia_1", ACIA6850)
-	MDRV_DEVICE_CONFIG(osi470_acia_intf)
+	MDRV_ACIA6850_ADD("acia_1", osi470_acia_intf)
 MACHINE_DRIVER_END
 
 /* ROMs */

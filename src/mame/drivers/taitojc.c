@@ -350,6 +350,8 @@ Notes:
 */
 
 #include "driver.h"
+#include "cpu/tms32051/tms32051.h"
+#include "cpu/m68000/m68000.h"
 #include "taito_f3.h"
 #include "cpu/mc68hc11/mc68hc11.h"
 #include "sound/es5506.h"
@@ -1307,7 +1309,7 @@ static MACHINE_DRIVER_START( taitojc )
 	MDRV_CPU_PROGRAM_MAP(tms_program_map, 0)
 	MDRV_CPU_DATA_MAP(tms_data_map, 0)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	MDRV_MACHINE_RESET(taitojc)
 	MDRV_NVRAM_HANDLER(93C46)

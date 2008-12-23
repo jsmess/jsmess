@@ -441,7 +441,7 @@ static MACHINE_RESET(sfkick)
 
 static INTERRUPT_GEN( sfkick_interrupt )
 {
-	v9938_interrupt(0);
+	v9938_interrupt(device->machine, 0);
 }
 static void irqhandler(running_machine *machine, int irq)
 {
@@ -465,7 +465,7 @@ static MACHINE_DRIVER_START( sfkick )
 	MDRV_CPU_IO_MAP(main_io,0)
 	MDRV_CPU_VBLANK_INT_HACK(sfkick_interrupt,262)
 
-	MDRV_INTERLEAVE(1000)
+	MDRV_QUANTUM_TIME(HZ(60000))
 
 	MDRV_CPU_ADD("sound",Z80,MASTER_CLOCK/6)
 	MDRV_CPU_PROGRAM_MAP(sound_mem,0)

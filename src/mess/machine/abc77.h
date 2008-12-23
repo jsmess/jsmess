@@ -51,7 +51,7 @@ struct _abc77_interface
 /* inline configuration */
 #define MDRV_ABC77_ADD(config) \
 	MDRV_SPEAKER_STANDARD_MONO("mono")\
-	MDRV_DEVICE_ADD(ABC77_TAG, ABC77)\
+	MDRV_DEVICE_ADD(ABC77_TAG, ABC77, 0)\
 	MDRV_DEVICE_CONFIG(config)
 
 /* device interface */

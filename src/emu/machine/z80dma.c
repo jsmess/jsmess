@@ -242,7 +242,7 @@ static void z80dma_update_status(const device_config *device)
 	{
 		z80dma->is_read = 1;
 		z80dma->cur_cycle = (PORTA_IS_SOURCE(z80dma) ? PORTA_CYCLE_LEN(z80dma) : PORTB_CYCLE_LEN(z80dma));
-		next = ATTOTIME_IN_HZ(z80dma->intf->clockhz);
+		next = ATTOTIME_IN_HZ(device->clock);
 		timer_adjust_periodic(z80dma->timer,
 			attotime_zero,
 			0,
@@ -256,10 +256,10 @@ static void z80dma_update_status(const device_config *device)
 	}
 
 	/* set the halt line */
-	if (z80dma->intf && z80dma->intf->cpunum >= 0)
+	if (z80dma->intf && z80dma->intf->cputag != NULL)
 	{
 		//FIXME: Synchronization is done by BUSREQ!
-		cpu_set_input_line(device->machine->cpu[z80dma->intf->cpunum], INPUT_LINE_HALT,
+		cputag_set_input_line(device->machine, z80dma->intf->cputag, INPUT_LINE_HALT,
 			pending_transfer ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
@@ -511,11 +511,11 @@ DEVICE_GET_INFO( z80dma )
 		case DEVINFO_FCT_IRQ_RETI:						info->f = (genf *)z80dma_irq_reti;		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "Z80DMA";						break;
-		case DEVINFO_STR_FAMILY:						info->s = "DMA controllers";			break;
-		case DEVINFO_STR_VERSION:						info->s = "1.0";						break;
-		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;						break;
-		case DEVINFO_STR_CREDITS:						info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Z80DMA");				break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "DMA controllers");		break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");					break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);				break;
+		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

@@ -578,7 +578,7 @@ const custom_sound_interface odyssey2_sound_interface =
 	odyssey2_sh_start
 };
 
-void odyssey2_sh_update( void *param,stream_sample_t **inputs, stream_sample_t **outputs,int samples )
+STREAM_UPDATE( odyssey2_sh_update )
 {
 	static UINT32 signal;
 	static UINT16 count = 0;
@@ -622,7 +622,7 @@ void odyssey2_sh_update( void *param,stream_sample_t **inputs, stream_sample_t *
 			/* Throw an interrupt if enabled */
 			if( o2_vdc.s.control & 0x4 )
 			{
-				cpu_set_input_line(Machine->cpu[0], 1, HOLD_LINE); /* Is this right? */
+				cpu_set_input_line(device->machine->cpu[0], 1, HOLD_LINE); /* Is this right? */
 			}
 
 			/* Adjust volume */

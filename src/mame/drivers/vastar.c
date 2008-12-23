@@ -62,6 +62,7 @@ write:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "sound/ay8910.h"
 
@@ -109,7 +110,7 @@ static WRITE8_HANDLER( vastar_sharedram_w )
 
 static WRITE8_HANDLER( flip_screen_w )
 {
-	flip_screen_set(data);
+	flip_screen_set(space->machine, data);
 }
 
 
@@ -317,7 +318,7 @@ static MACHINE_DRIVER_START( vastar )
 	MDRV_CPU_IO_MAP(cpu2_port_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* ??? */
 
-	MDRV_INTERLEAVE(10)	/* 10 CPU slices per frame - seems enough to ensure proper */
+	MDRV_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - seems enough to ensure proper */
 						/* synchronization of the CPUs */
 	MDRV_MACHINE_RESET(vastar)
 

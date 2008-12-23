@@ -132,6 +132,7 @@ Region byte at offset 0x031:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "video/taitoic.h"
 #include "audio/taitosnd.h"
@@ -535,7 +536,7 @@ static MACHINE_DRIVER_START( slapshot )
 	MDRV_CPU_ADD("audio", Z80,32000000/8)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(z80_sound_readmem,z80_sound_writemem)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_MACHINE_START(slapshot)
 
@@ -564,7 +565,7 @@ static MACHINE_DRIVER_START( slapshot )
 	MDRV_SOUND_ROUTE(1, "left",  1.0)
 	MDRV_SOUND_ROUTE(2, "right", 1.0)
 
-	MDRV_DEVICE_ADD( "mk48t08", MK48T08 )
+	MDRV_MK48T08_ADD( "mk48t08" )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( opwolf3 )
@@ -577,7 +578,7 @@ static MACHINE_DRIVER_START( opwolf3 )
 	MDRV_CPU_ADD("audio", Z80,32000000/8)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(z80_sound_readmem,z80_sound_writemem)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -604,7 +605,7 @@ static MACHINE_DRIVER_START( opwolf3 )
 	MDRV_SOUND_ROUTE(1, "left",  1.0)
 	MDRV_SOUND_ROUTE(2, "right", 1.0)
 
-	MDRV_DEVICE_ADD( "mk48t08", MK48T08 )
+	MDRV_MK48T08_ADD( "mk48t08" )
 MACHINE_DRIVER_END
 
 /***************************************************************************

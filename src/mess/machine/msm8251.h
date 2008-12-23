@@ -29,7 +29,7 @@
 #define MSM8251_STATUS_TX_READY	0x01
 
 #define MDRV_MSM8251_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, MSM8251) \
+	MDRV_DEVICE_ADD(_tag, MSM8251, 0) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
 #define MDRV_MSM8251_REMOVE(_tag) \

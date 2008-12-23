@@ -22,6 +22,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "kyugo.h"
 #include "sound/ay8910.h"
@@ -40,7 +41,7 @@ MACHINE_RESET( kyugo )
 {
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	// must start with interrupts and sub CPU disabled
-	cpu_interrupt_enable(0, 0);
+	cpu_interrupt_enable(machine->cpu[0], 0);
 	kyugo_sub_cpu_control_w(space, 0, 0);
 }
 
@@ -472,7 +473,7 @@ static MACHINE_DRIVER_START( gyrodine )
 	MDRV_CPU_IO_MAP(gyrodine_sub_portmap,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	MDRV_MACHINE_RESET(kyugo)
 

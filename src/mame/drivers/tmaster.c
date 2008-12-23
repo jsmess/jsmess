@@ -99,6 +99,7 @@ To Do:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "deprecat.h"
 #include "sound/okim6295.h"
 #include "machine/eeprom.h"
@@ -157,7 +158,7 @@ static void duart_tx(const device_config *device, int channel, UINT8 data)
 	}
 };
 
-static void microtouch_tx(UINT8 data)
+static void microtouch_tx(running_machine *machine, UINT8 data)
 {
 	duart68681_rx_data(tmaster_devices.duart68681, 0, data);
 }
@@ -764,7 +765,7 @@ static INTERRUPT_GEN( tm3k_interrupt )
 
 static const duart68681_config tmaster_duart68681_config =
 {
-	XTAL_8_664MHz / 2, //??
+
 	duart_irq_handler,
 	duart_tx,
 	NULL,
@@ -779,8 +780,7 @@ static MACHINE_DRIVER_START( tm3k )
 	MDRV_MACHINE_START(tmaster)
 	MDRV_MACHINE_RESET(tmaster)
 
-	MDRV_DEVICE_ADD( "duart68681", DUART68681 )
-	MDRV_DEVICE_CONFIG( tmaster_duart68681_config )
+	MDRV_DUART68681_ADD( "duart68681", XTAL_8_664MHz / 2 /*??*/, tmaster_duart68681_config )
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
@@ -832,7 +832,7 @@ static MACHINE_RESET( galgames )
 	memory_set_bank(machine, 2, 0);	// ram
 	memory_set_bank(machine, 4, 0);	// ram
 
-	cpu_reset(machine->cpu[0]);
+	device_reset(machine->cpu[0]);
 }
 
 static MACHINE_DRIVER_START( galgames )

@@ -29,6 +29,7 @@ Notes:
 ******************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "nb1413m3.h"
 #include "sound/ay8910.h"
@@ -68,7 +69,7 @@ static READ8_HANDLER( nbmj8991_sound_r )
 
 static MACHINE_RESET( nbmj8991 )
 {
-	if (machine->config->cpu[1].type == CPU_Z80)
+	if (cpu_get_type(machine->cpu[1]) == CPU_Z80)
 	{
 		memory_configure_bank(machine, 1, 0, 4, memory_region(machine, "audio") + 0x8000, 0x8000);
 		memory_set_bank(machine, 1, 0);

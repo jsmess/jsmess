@@ -340,7 +340,7 @@ INLINE void save_fast_iregs(mips3_state *mips3, drcuml_block *block)
     mips3_init - initialize the processor
 -------------------------------------------------*/
 
-static void mips3_init(mips3_flavor flavor, int bigendian, const device_config *device, int index, int clock, cpu_irq_callback irqcallback)
+static void mips3_init(mips3_flavor flavor, int bigendian, const device_config *device, cpu_irq_callback irqcallback)
 {
 	drcfe_config feconfig =
 	{
@@ -365,7 +365,7 @@ static void mips3_init(mips3_flavor flavor, int bigendian, const device_config *
 	memset(mips3, 0, sizeof(*mips3));
 
 	/* initialize the core */
-	mips3com_init(mips3, flavor, bigendian, device, index, clock, irqcallback);
+	mips3com_init(mips3, flavor, bigendian, device, irqcallback);
 
 	/* allocate the implementation-specific state from the full cache */
 	mips3->impstate = drccache_memory_alloc_near(cache, sizeof(*mips3->impstate));
@@ -600,7 +600,7 @@ static CPU_SET_INFO( mips3 )
 
 static CPU_GET_INFO( mips3 )
 {
-	mips3_state *mips3 = (device != NULL) ? *(mips3_state **)device->token : NULL;
+	mips3_state *mips3 = (device != NULL && device->token != NULL) ? *(mips3_state **)device->token : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
@@ -608,13 +608,13 @@ static CPU_GET_INFO( mips3 )
 		case CPUINFO_INT_PREVIOUSPC:					/* not implemented */							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(mips3);		break;
-		case CPUINFO_PTR_INIT:							/* provided per-CPU */							break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(mips3);			break;
-		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(mips3);				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(mips3);		break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(mips3);break;
-		case CPUINFO_PTR_TRANSLATE:						info->translate = CPU_TRANSLATE_NAME(mips3);	break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(mips3);		break;
+		case CPUINFO_FCT_INIT:							/* provided per-CPU */							break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(mips3);			break;
+		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(mips3);				break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(mips3);		break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(mips3);break;
+		case CPUINFO_FCT_TRANSLATE:						info->translate = CPU_TRANSLATE_NAME(mips3);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
@@ -3625,12 +3625,12 @@ static void log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desclist, i
 #if (HAS_R4600)
 static CPU_INIT( r4600be )
 {
-	mips3_init(MIPS3_TYPE_R4600, TRUE, device, index, clock, irqcallback);
+	mips3_init(MIPS3_TYPE_R4600, TRUE, device, irqcallback);
 }
 
 static CPU_INIT( r4600le )
 {
-	mips3_init(MIPS3_TYPE_R4600, FALSE, device, index, clock, irqcallback);
+	mips3_init(MIPS3_TYPE_R4600, FALSE, device, irqcallback);
 }
 
 CPU_GET_INFO( r4600be )
@@ -3641,7 +3641,7 @@ CPU_GET_INFO( r4600be )
 		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(r4600be);				break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(r4600be);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "R4600 (big)");			break;
@@ -3659,7 +3659,7 @@ CPU_GET_INFO( r4600le )
 		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(r4600le);				break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(r4600le);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "R4600 (little)");		break;
@@ -3679,12 +3679,12 @@ CPU_GET_INFO( r4600le )
 #if (HAS_R4650)
 static CPU_INIT( r4650be )
 {
-	mips3_init(MIPS3_TYPE_R4650, TRUE, device, index, clock, irqcallback);
+	mips3_init(MIPS3_TYPE_R4650, TRUE, device, irqcallback);
 }
 
 static CPU_INIT( r4650le )
 {
-	mips3_init(MIPS3_TYPE_R4650, FALSE, device, index, clock, irqcallback);
+	mips3_init(MIPS3_TYPE_R4650, FALSE, device, irqcallback);
 }
 
 CPU_GET_INFO( r4650be )
@@ -3695,7 +3695,7 @@ CPU_GET_INFO( r4650be )
 		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(r4650be);				break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(r4650be);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "IDT R4650 (big)");		break;
@@ -3713,7 +3713,7 @@ CPU_GET_INFO( r4650le )
 		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(r4650le);				break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(r4650le);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "IDT R4650 (little)");	break;
@@ -3733,12 +3733,12 @@ CPU_GET_INFO( r4650le )
 #if (HAS_R4700)
 static CPU_INIT( r4700be )
 {
-	mips3_init(MIPS3_TYPE_R4700, TRUE, device, index, clock, irqcallback);
+	mips3_init(MIPS3_TYPE_R4700, TRUE, device, irqcallback);
 }
 
 static CPU_INIT( r4700le )
 {
-	mips3_init(MIPS3_TYPE_R4700, FALSE, device, index, clock, irqcallback);
+	mips3_init(MIPS3_TYPE_R4700, FALSE, device, irqcallback);
 }
 
 CPU_GET_INFO( r4700be )
@@ -3749,7 +3749,7 @@ CPU_GET_INFO( r4700be )
 		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(r4700be);				break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(r4700be);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "R4700 (big)");			break;
@@ -3767,7 +3767,7 @@ CPU_GET_INFO( r4700le )
 		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(r4700le);				break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(r4700le);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "R4700 (little)");		break;
@@ -3787,12 +3787,12 @@ CPU_GET_INFO( r4700le )
 #if (HAS_R5000)
 static CPU_INIT( r5000be )
 {
-	mips3_init(MIPS3_TYPE_R5000, TRUE, device, index, clock, irqcallback);
+	mips3_init(MIPS3_TYPE_R5000, TRUE, device, irqcallback);
 }
 
 static CPU_INIT( r5000le )
 {
-	mips3_init(MIPS3_TYPE_R5000, FALSE, device, index, clock, irqcallback);
+	mips3_init(MIPS3_TYPE_R5000, FALSE, device, irqcallback);
 }
 
 CPU_GET_INFO( r5000be )
@@ -3803,7 +3803,7 @@ CPU_GET_INFO( r5000be )
 		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(r5000be);				break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(r5000be);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "R5000 (big)");			break;
@@ -3821,7 +3821,7 @@ CPU_GET_INFO( r5000le )
 		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(r5000le);				break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(r5000le);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "R5000 (little)");		break;
@@ -3841,12 +3841,12 @@ CPU_GET_INFO( r5000le )
 #if (HAS_QED5271)
 static CPU_INIT( qed5271be )
 {
-	mips3_init(MIPS3_TYPE_QED5271, TRUE, device, index, clock, irqcallback);
+	mips3_init(MIPS3_TYPE_QED5271, TRUE, device, irqcallback);
 }
 
 static CPU_INIT( qed5271le )
 {
-	mips3_init(MIPS3_TYPE_QED5271, FALSE, device, index, clock, irqcallback);
+	mips3_init(MIPS3_TYPE_QED5271, FALSE, device, irqcallback);
 }
 
 CPU_GET_INFO( qed5271be )
@@ -3857,7 +3857,7 @@ CPU_GET_INFO( qed5271be )
 		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(qed5271be);			break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(qed5271be);			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "QED5271 (big)");		break;
@@ -3875,7 +3875,7 @@ CPU_GET_INFO( qed5271le )
 		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(qed5271le);			break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(qed5271le);			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "QED5271 (little)");	break;
@@ -3895,12 +3895,12 @@ CPU_GET_INFO( qed5271le )
 #if (HAS_RM7000)
 static CPU_INIT( rm7000be )
 {
-	mips3_init(MIPS3_TYPE_RM7000, TRUE, device, index, clock, irqcallback);
+	mips3_init(MIPS3_TYPE_RM7000, TRUE, device, irqcallback);
 }
 
 static CPU_INIT( rm7000le )
 {
-	mips3_init(MIPS3_TYPE_RM7000, FALSE, device, index, clock, irqcallback);
+	mips3_init(MIPS3_TYPE_RM7000, FALSE, device, irqcallback);
 }
 
 CPU_GET_INFO( rm7000be )
@@ -3911,7 +3911,7 @@ CPU_GET_INFO( rm7000be )
 		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(rm7000be);				break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(rm7000be);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "RM7000 (big)");		break;
@@ -3929,7 +3929,7 @@ CPU_GET_INFO( rm7000le )
 		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(rm7000le);				break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(rm7000le);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "RM7000 (little)");		break;

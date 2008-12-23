@@ -299,6 +299,7 @@ Donkey Kong Junior Notes
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "cpu/s2650/s2650.h"
 #include "cpu/m6502/m6502.h"
 #include "includes/dkong.h"
@@ -338,8 +339,7 @@ static WRITE8_DEVICE_HANDLER( p8257_ctl_w );
 
 static const z80dma_interface dk3_dma =
 {
-	0,
-	CLOCK_1H,
+	"main",
 
 	dk_dma_read_byte,
 	dk_dma_write_byte,
@@ -349,8 +349,7 @@ static const z80dma_interface dk3_dma =
 
 static const dma8257_interface dk_dma =
 {
-	0,
-	CLOCK_1H,
+	"main",
 
 	dk_dma_read_byte,
 	dk_dma_write_byte,
@@ -362,8 +361,7 @@ static const dma8257_interface dk_dma =
 
 static const dma8257_interface hb_dma =
 {
-	0,
-	CLOCK_1H,
+	"main",
 
 	hb_dma_read_byte,
 	hb_dma_write_byte,
@@ -1575,8 +1573,7 @@ static MACHINE_DRIVER_START( dkong_base )
 	MDRV_MACHINE_START(dkong2b)
 	MDRV_MACHINE_RESET(dkong)
 
-	MDRV_DEVICE_ADD("dma8257", DMA8257)
-	MDRV_DEVICE_CONFIG(dk_dma)
+	MDRV_DMA8257_ADD("dma8257", CLOCK_1H, dk_dma)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -1644,8 +1641,7 @@ static MACHINE_DRIVER_START( dkong3 )
 
 	MDRV_MACHINE_START(dkong3)
 
-	MDRV_DEVICE_ADD("z80dma", Z80DMA)
-	MDRV_DEVICE_CONFIG(dk3_dma)
+	MDRV_Z80DMA_ADD("z80dma", CLOCK_1H, dk3_dma)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

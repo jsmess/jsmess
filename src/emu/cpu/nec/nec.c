@@ -110,8 +110,8 @@ typedef UINT8 BYTE;
 typedef UINT16 WORD;
 typedef UINT32 DWORD;
 
+#include "necpriv.h"
 #include "nec.h"
-#include "necintrf.h"
 
 #define PC(n)		(((n)->sregs[PS]<<4)+(n)->ip)
 
@@ -1087,7 +1087,7 @@ static CPU_DISASSEMBLE( nec )
 	return necv_dasm_one(buffer, pc, oprom, nec_state->config);
 }
 
-static void nec_init(const device_config *device, int index, int clock, cpu_irq_callback irqcallback, int type)
+static void nec_init(const device_config *device, cpu_irq_callback irqcallback, int type)
 {
 	const nec_config *config = device->static_config ? device->static_config : &default_config;
 	nec_state_t *nec_state = device->token;
@@ -1212,7 +1212,7 @@ static CPU_INIT( v20 )
 {
 	nec_state_t *nec_state = device->token;
 
-	nec_init(device, index, clock, irqcallback, 0);
+	nec_init(device, irqcallback, 0);
 	configure_memory_8bit(nec_state);
 	nec_state->chip_type=V20;
 	nec_state->prefetch_size = 4;		/* 3 words */
@@ -1225,7 +1225,7 @@ static CPU_INIT( v30 )
 {
 	nec_state_t *nec_state = device->token;
 
-	nec_init(device, index, clock, irqcallback, 1);
+	nec_init(device, irqcallback, 1);
 	configure_memory_16bit(nec_state);
 	nec_state->chip_type=V30;
 	nec_state->prefetch_size = 6;		/* 3 words */
@@ -1239,7 +1239,7 @@ static CPU_INIT( v33 )
 {
 	nec_state_t *nec_state = device->token;
 
-	nec_init(device, index, clock, irqcallback, 2);
+	nec_init(device, irqcallback, 2);
 	nec_state->chip_type=V33;
 	nec_state->prefetch_size = 6;
 	/* FIXME: Need information about prefetch size and cycles for V33.
@@ -1334,15 +1334,15 @@ static CPU_GET_INFO( nec )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 80;							break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 20;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 16;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 20;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 16;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 16;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE + 0:					info->i = (nec_state->pending_irq & INT_IRQ) ? ASSERT_LINE : CLEAR_LINE; break;
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:		info->i = nec_state->nmi_state;				break;
@@ -1371,13 +1371,13 @@ static CPU_GET_INFO( nec )
 		case CPUINFO_INT_REGISTER + NEC_PENDING:		info->i = nec_state->pending_irq;				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(nec);			break;
-		case CPUINFO_PTR_INIT:							/* set per-CPU */						break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(nec);				break;
-		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(nec);					break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(necv);			break;
-		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(nec);			break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(nec);			break;
+		case CPUINFO_FCT_INIT:							/* set per-CPU */						break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(nec);				break;
+		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(nec);					break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(necv);			break;
+		case CPUINFO_FCT_BURN:							info->burn = NULL;						break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(nec);			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &nec_state->icount;				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -1438,11 +1438,11 @@ CPU_GET_INFO( v20 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 8;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 8;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 8;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 8;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(v20);					break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(v20);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "V20");					break;
@@ -1463,11 +1463,11 @@ CPU_GET_INFO( v25 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 8;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 8;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 8;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 8;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(v20);					break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(v20);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "V25");					break;
@@ -1488,7 +1488,7 @@ CPU_GET_INFO( v30 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(v30);					break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(v30);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "V30");					break;
@@ -1509,7 +1509,7 @@ CPU_GET_INFO( v33 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(v33);					break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(v33);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "V33");					break;
@@ -1530,7 +1530,7 @@ CPU_GET_INFO( v35 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(v30);					break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(v30);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "V35");					break;

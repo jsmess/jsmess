@@ -228,8 +228,6 @@ WRITE8_DEVICE_HANDLER( mtx_ctc_w )
 
 const z80ctc_interface mtx_ctc_intf =
 {
-	"main",
-	MTX_SYSTEM_CLOCK,
 	0,
 	mtx_ctc_interrupt,
 	0,

@@ -217,6 +217,7 @@ Custom: GX61A01
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/upd7810/upd7810.h"
 #include "homedata.h"
@@ -1286,7 +1287,7 @@ static MACHINE_DRIVER_START( reikaids )
 	MDRV_CPU_IO_MAP(reikaids_upd7807_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", upd7807_irq)
 
-	MDRV_INTERLEAVE(500)	// very high interleave required to sync for startup tests
+	MDRV_QUANTUM_TIME(HZ(30000))	// very high interleave required to sync for startup tests
 
 	MDRV_MACHINE_RESET(reikaids_upd7807)
 
@@ -1336,7 +1337,7 @@ static MACHINE_DRIVER_START( pteacher )
 	MDRV_CPU_IO_MAP(pteacher_upd7807_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", upd7807_irq)
 
-	MDRV_INTERLEAVE(100)	// should be enough
+	MDRV_QUANTUM_TIME(HZ(6000))	// should be enough
 
 	MDRV_MACHINE_RESET(pteacher_upd7807)
 

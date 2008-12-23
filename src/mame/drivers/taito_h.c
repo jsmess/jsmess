@@ -128,6 +128,8 @@ Recordbr: loads of unmapped IOC reads and writes.
 
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
+#include "cpu/m68000/m68000.h"
 #include "taitoipt.h"
 #include "audio/taitosnd.h"
 #include "video/taitoic.h"
@@ -589,7 +591,7 @@ static MACHINE_DRIVER_START( syvalion )
 	MDRV_MACHINE_START(taitoh)
 	MDRV_MACHINE_RESET(taitoh)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -629,7 +631,7 @@ static MACHINE_DRIVER_START( recordbr )
 	MDRV_MACHINE_START(taitoh)
 	MDRV_MACHINE_RESET(taitoh)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -669,7 +671,7 @@ static MACHINE_DRIVER_START( dleague )
 	MDRV_MACHINE_START(taitoh)
 	MDRV_MACHINE_RESET(taitoh)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

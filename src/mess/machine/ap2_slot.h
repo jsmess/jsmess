@@ -39,7 +39,7 @@ struct _apple2_slot_config
 ***************************************************************************/
 
 #define MDRV_APPLE2_SLOT_ADD(_slot_number, _slot_device_tag, _rh, _wh)		\
-	MDRV_DEVICE_ADD("slot_" #_slot_number, APPLE2_SLOT)			\
+	MDRV_DEVICE_ADD("slot_" #_slot_number, APPLE2_SLOT, 0)			\
 	MDRV_DEVICE_CONFIG_DATAPTR(apple2_slot_config, tag, _slot_device_tag)	\
 	MDRV_DEVICE_CONFIG_DATAPTR(apple2_slot_config, rh, _rh)		\
 	MDRV_DEVICE_CONFIG_DATAPTR(apple2_slot_config, wh, _wh)		\

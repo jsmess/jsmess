@@ -35,7 +35,7 @@ struct _scc8530_interface
 ***************************************************************************/
 
 #define MDRV_SCC8530_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, SCC8530) \
+	MDRV_DEVICE_ADD(_tag, SCC8530, 0) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
 

@@ -133,6 +133,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/samples.h"
 #include "audio/segasnd.h"
@@ -201,7 +202,7 @@ static MACHINE_RESET( g80v )
 {
 	/* if we have a Universal Sound Board, reset it here */
 	if (has_usb)
-		sega_usb_reset(0x10);
+		sega_usb_reset(machine, 0x10);
 }
 
 

@@ -657,8 +657,8 @@ static WRITE8_DEVICE_HANDLER( sf7000_ppi8255_c_w )
     */
 
 	/* floppy motor */
-	floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, 0), (data & 0x02) ? 0 : 1);
-	floppy_drive_set_ready_state(image_from_devtype_and_index(IO_FLOPPY, 0), 1, 0);
+	floppy_drive_set_motor_state(image_from_devtype_and_index(device->machine, IO_FLOPPY, 0), (data & 0x02) ? 0 : 1);
+	floppy_drive_set_ready_state(image_from_devtype_and_index(device->machine, IO_FLOPPY, 0), 1, 0);
 
 	/* FDC terminal count */
 	nec765_set_tc_state(fdc, data & 0x04);
@@ -734,7 +734,7 @@ static MACHINE_START( sf7000 )
 	TMS9928A_configure(&tms9928a_interface);
 
 	/* configure FDC */
-	floppy_drive_set_index_pulse_callback(image_from_devtype_and_index(IO_FLOPPY, 0), sf7000_fdc_index_callback);
+	floppy_drive_set_index_pulse_callback(image_from_devtype_and_index(machine, IO_FLOPPY, 0), sf7000_fdc_index_callback);
 
 	/* configure PPI */
 	centronics_config(machine, 1, sf7000_centronics_config);

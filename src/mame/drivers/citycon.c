@@ -7,6 +7,7 @@ Dip locations added from dip listing at crazykong.com
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/m6809/m6809.h"
 #include "sound/ay8910.h"
 #include "sound/2203intf.h"
 
@@ -24,7 +25,7 @@ VIDEO_START( citycon );
 
 static READ8_HANDLER( citycon_in_r )
 {
-	return input_port_read(space->machine, flip_screen_get() ? "P2" : "P1");
+	return input_port_read(space->machine, flip_screen_get(space->machine) ? "P2" : "P1");
 }
 
 

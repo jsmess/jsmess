@@ -21,21 +21,6 @@
 
 /*************************************
  *
- *  Global access to the currently
- *  executing machine.
- *
- *  Please investigate if it is
- *  possible to use a passed in
- *  'machine' argument.
- *
- *************************************/
-
-extern running_machine *Machine;
-
-
-
-/*************************************
- *
  *  Old way of allowing "VBLANK"
  *  interrupts to fire more than once
  *  a frame.
@@ -49,8 +34,9 @@ extern running_machine *Machine;
  *************************************/
 
 #define MDRV_CPU_VBLANK_INT_HACK(_func, _rate) \
-	TOKEN_UINT32_PACK2(MCONFIG_TOKEN_CPU_VBLANK_INT_HACK, 8, _rate, 24), \
-	TOKEN_PTR(interrupt, _func),
+	MDRV_DEVICE_CONFIG_DATAPTR(cpu_config, vblank_interrupt, _func) \
+	MDRV_DEVICE_CONFIG_DATAPTR(cpu_config, vblank_interrupt_screen, NULL) \
+	MDRV_DEVICE_CONFIG_DATA32(cpu_config, vblank_interrupts_per_frame, _rate)
 
 
 

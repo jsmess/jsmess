@@ -79,6 +79,7 @@ Notes:
 */
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "sound/ay8910.h"
 
@@ -318,7 +319,7 @@ static MACHINE_DRIVER_START( popper )
 	MDRV_CPU_PROGRAM_MAP(popper_sound_readmem,popper_sound_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)		//NMIs caused by the main CPU
 
-	MDRV_INTERLEAVE(30)
+	MDRV_QUANTUM_TIME(HZ(1800))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

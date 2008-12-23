@@ -669,6 +669,8 @@ Notes:
 */
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
+#include "cpu/i386/i386.h"
 #include "machine/ds2404.h"
 #include "machine/eeprom.h"
 #include "machine/intelfsh.h"
@@ -1737,14 +1739,14 @@ static MACHINE_RESET( spi )
 static MACHINE_DRIVER_START( spi )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main",I386, 50000000/2)	/* Intel 386DX, 25MHz */
+	MDRV_CPU_ADD("main", I386, 50000000/2)	/* Intel 386DX, 25MHz */
 	MDRV_CPU_PROGRAM_MAP(spi_map, 0)
 	MDRV_CPU_VBLANK_INT("main", spi_interrupt)
 
 	MDRV_CPU_ADD("sound", Z80, 28636360/4)
 	MDRV_CPU_PROGRAM_MAP(spisound_map, 0)
 
-	MDRV_INTERLEAVE(200)
+	MDRV_QUANTUM_TIME(HZ(12000))
 
 	MDRV_MACHINE_RESET(spi)
 	MDRV_NVRAM_HANDLER(spi)

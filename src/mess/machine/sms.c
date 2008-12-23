@@ -581,7 +581,7 @@ WRITE8_HANDLER(gg_psg_w) {
 static void sms_machine_stop(running_machine *machine) {
 	/* Does the cartridge have SRAM that should be saved? */
 	if ( sms_cartridge[sms_current_cartridge].sram_save ) {
-		image_battery_save( image_from_devtype_and_index(IO_CARTSLOT, 0), sms_cartridge[sms_current_cartridge].cartSRAM, sizeof(UINT8) * NVRAM_SIZE );
+		image_battery_save( image_from_devtype_and_index(machine, IO_CARTSLOT, 0), sms_cartridge[sms_current_cartridge].cartSRAM, sizeof(UINT8) * NVRAM_SIZE );
 	}
 }
 
@@ -1005,7 +1005,7 @@ WRITE8_HANDLER(sms_store_control_w) {
 	} else {
 		/* Pull reset line of CPU #0 low */
 		cpu_suspend( space->machine->cpu[0], SUSPEND_REASON_HALT, 1 );
-		cpu_reset(space->machine->cpu[0]);
+		device_reset(space->machine->cpu[0]);
 	}
 	sms_store_control = data;
 }

@@ -88,10 +88,10 @@ void ti99_ide_interrupt(const device_config *device, int state)
 
 	clock interrupt callback
 */
-static void clk_interrupt_callback(int state)
+static void clk_interrupt_callback(running_machine *machine, int state)
 {
 	clk_irq = state;
-	ti99_peb_set_ila_bit(Machine, inta_ide_clk_bit, state);
+	ti99_peb_set_ila_bit(machine, inta_ide_clk_bit, state);
 }
 
 /*

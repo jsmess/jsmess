@@ -153,7 +153,7 @@ INLINE fast_t *get_safe_token_machine_fast(running_machine *machine)
 
 static const device_config *get_floppy_image(int drive)
 {
-	return image_from_devtype_and_index(IO_FLOPPY, drive);
+	return image_from_devtype_and_index(machine, IO_FLOPPY, drive);
 }
 
 /* Slow Controller */
@@ -662,8 +662,7 @@ static WRITE8_DEVICE_HANDLER( dma_port_b_w )
 
 static const z80dma_interface dma_intf =
 {
-	Z80DMA_CPUNUM,		/* cpunum to HALT */
-	XTAL_16MHz/4,		/* chip clock */
+	CONKORT_Z80_TAG,		/* cpunum to HALT */
 	dma_port_a_r,		/* memory read */
 	dma_port_a_w,		/* memory write */
 	dma_port_a_r,		/* port A read */
@@ -743,8 +742,7 @@ static MACHINE_DRIVER_START( luxor_55_21046 )
 	MDRV_CPU_IO_MAP(fast_io_map, 0)
 	MDRV_CPU_CONFIG(fast_daisy_chain)
 
-	MDRV_DEVICE_ADD(CONKORT_Z80DMA_TAG, Z80DMA)
-	MDRV_DEVICE_CONFIG(dma_intf)
+	MDRV_Z80DMA_ADD(CONKORT_Z80DMA_TAG, XTAL_16MHz/4, dma_intf)
 	
 	MDRV_WD1793_ADD("wd1793", fast_wd17xx_interface )	
 MACHINE_DRIVER_END
@@ -861,11 +859,11 @@ DEVICE_GET_INFO( luxor_55_10828 )
 		case DEVINFO_FCT_ABCBUS_CARD_SELECT:			info->f = (genf *)ABCBUS_CARD_SELECT_NAME(luxor_55_10828);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "Luxor 55 10828-01";								break;
-		case DEVINFO_STR_FAMILY:						info->s = "Luxor ABC";										break;
-		case DEVINFO_STR_VERSION:						info->s = "1.0";											break;
-		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;											break;
-		case DEVINFO_STR_CREDITS:						info->s = "Copyright the MESS Team"; 						break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Luxor 55 10828-01");								break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Luxor ABC");										break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");											break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);											break;
+		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team"); 						break;
 	}
 }
 
@@ -930,10 +928,10 @@ DEVICE_GET_INFO( luxor_55_21046 )
 		case DEVINFO_FCT_ABCBUS_CARD_SELECT:			info->f = (genf *)ABCBUS_CARD_SELECT_NAME(luxor_55_21046);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "Luxor Conkort 55 21046-xx";						break;
-		case DEVINFO_STR_FAMILY:						info->s = "Luxor ABC";										break;
-		case DEVINFO_STR_VERSION:						info->s = "1.0";											break;
-		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;											break;
-		case DEVINFO_STR_CREDITS:						info->s = "Copyright the MESS Team"; 						break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Luxor Conkort 55 21046-xx");						break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Luxor ABC");										break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");											break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);											break;
+		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team"); 						break;
 	}
 }

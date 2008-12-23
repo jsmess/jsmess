@@ -1100,12 +1100,12 @@ DEVICE_GET_INFO( hp48_port )
 	case DEVINFO_FCT_IMAGE_LOAD:		      info->f = (genf *) DEVICE_IMAGE_LOAD_NAME( hp48_port );    break;
 	case DEVINFO_FCT_IMAGE_UNLOAD:		      info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME( hp48_port );  break;
 	case DEVINFO_FCT_IMAGE_CREATE:		      info->f = (genf *) DEVICE_IMAGE_CREATE_NAME( hp48_port );  break;
-	case DEVINFO_STR_IMAGE_BRIEF_INSTANCE_NAME:   info->s = conf ? conf->brief_name : "";                    break;
-	case DEVINFO_STR_IMAGE_INSTANCE_NAME:         info->s = conf ? conf->name : "";                          break;
-	case DEVINFO_STR_NAME:		              info->s = "HP48 memory card";	                         break;
-	case DEVINFO_STR_FAMILY:                      info->s = "HP48 memory card";	                         break;
-	case DEVINFO_STR_SOURCE_FILE:		      info->s = __FILE__;                                        break;
-	case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	      info->s = "crd";                                           break;
+	case DEVINFO_STR_IMAGE_BRIEF_INSTANCE_NAME:   strcpy(info->s, conf ? conf->brief_name : "");                    break;
+	case DEVINFO_STR_IMAGE_INSTANCE_NAME:         strcpy(info->s, conf ? conf->name : "");                          break;
+	case DEVINFO_STR_NAME:		             strcpy( info->s, "HP48 memory card");	                         break;
+	case DEVINFO_STR_FAMILY:                      strcpy(info->s, "HP48 memory card");	                         break;
+	case DEVINFO_STR_SOURCE_FILE:		      strcpy(info->s, __FILE__);                                        break;
+	case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	      strcpy(info->s, "crd");                                           break;
 	}
 }
 

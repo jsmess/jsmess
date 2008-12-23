@@ -175,6 +175,7 @@ TODO:
 *******************************************************************/
 
 #include "driver.h"
+#include "cpu/m6809/m6809.h"
 #include "cpu/m6800/m6800.h"
 #include "sound/2151intf.h"
 #include "sound/namco.h"
@@ -1069,7 +1070,7 @@ static MACHINE_DRIVER_START( hopmappy )
 	MDRV_CPU_IO_MAP(mcu_port_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* ??? */
 
-	MDRV_INTERLEAVE(800)	/* heavy interleaving needed to avoid hangs in rthunder */
+	MDRV_QUANTUM_TIME(HZ(48000))	/* heavy interleaving needed to avoid hangs in rthunder */
 
 	MDRV_MACHINE_RESET(namco86)
 

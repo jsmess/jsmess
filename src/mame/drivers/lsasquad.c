@@ -147,6 +147,7 @@ Notes:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "cpu/m6805/m6805.h"
 #include "sound/ay8910.h"
 #include "sound/2203intf.h"
@@ -162,7 +163,7 @@ static WRITE8_HANDLER( lsasquad_bankswitch_w )
 	/* bit 3 is zeroed on startup, maybe reset sound CPU */
 
 	/* bit 4 flips screen */
-	flip_screen_set(data & 0x10);
+	flip_screen_set(space->machine, data & 0x10);
 
 	/* other bits unknown */
 }
@@ -569,7 +570,7 @@ static MACHINE_DRIVER_START( lsasquad )
 	MDRV_CPU_ADD("mcu", M68705,4000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(m68705_readmem,m68705_writemem)
 
-	MDRV_INTERLEAVE(500)	/* 500 CPU slices per frame - an high value to ensure proper */
+	MDRV_QUANTUM_TIME(HZ(30000))	/* 500 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 							/* main<->sound synchronization depends on this */
 
@@ -612,7 +613,7 @@ static MACHINE_DRIVER_START( daikaiju )
 	MDRV_CPU_PROGRAM_MAP(sound_mem_daikaiju, 0)
 	/* IRQs are triggered by the YM2203 */
 
-	MDRV_INTERLEAVE(500)	/* 500 CPU slices per frame - an high value to ensure proper */
+	MDRV_QUANTUM_TIME(HZ(30000))	/* 500 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 							/* main<->sound synchronization depends on this */
 

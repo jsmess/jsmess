@@ -11,6 +11,9 @@ TO DO:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
+#include "cpu/m6809/m6809.h"
+#include "cpu/konami/konami.h"
 #include "video/konamiic.h"
 #include "sound/2151intf.h"
 #include "sound/k007232.h"
@@ -236,7 +239,7 @@ static MACHINE_DRIVER_START( ajax )
 	MDRV_CPU_ADD("audio", Z80, 3579545)	/* 3.58 MHz */
 	MDRV_CPU_PROGRAM_MAP(ajax_sound_map,0)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_MACHINE_RESET(ajax)
 

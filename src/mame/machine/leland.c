@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/i86/i86.h"
 #include "machine/eeprom.h"
 #include "cpu/z80/z80.h"
 #include "leland.h"
@@ -409,7 +410,7 @@ MACHINE_RESET( leland )
 		memory_set_bankptr(machine, 3, &slave_base[0x10000]);
 
 	/* if we have an I80186 CPU, reset it */
-	if (machine->config->cpu[2].type == CPU_I80186)
+	if (cpu_get_type(machine->cpu[2]) == CPU_I80186)
 		leland_80186_sound_init();
 }
 

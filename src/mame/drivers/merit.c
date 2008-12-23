@@ -40,6 +40,7 @@ Notes: it's important that "user1" is 0xa0000 bytes with empty space filled
 */
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "machine/8255ppi.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
@@ -254,7 +255,6 @@ static MC6845_ON_VSYNC_CHANGED(vsync_changed)
 static const mc6845_interface mc6845_intf =
 {
 	"main",					/* screen we are acting on */
-	CRTC_CLOCK, 			/* the clock (pin 21) of the chip */
 	8,						/* number of pixels per video memory address */
 	begin_update,			/* before pixel update callback */
 	update_row,				/* row update callback */
@@ -289,7 +289,7 @@ static WRITE8_HANDLER( led2_w )
 
 static WRITE8_DEVICE_HANDLER( misc_w )
 {
-	flip_screen_set(~data & 0x10);
+	flip_screen_set(device->machine, ~data & 0x10);
 	extra_video_bank_bit = (data & 2) << 8;
 	lscnblk = (data >> 3) & 1;
 
@@ -298,7 +298,7 @@ static WRITE8_DEVICE_HANDLER( misc_w )
 
 static WRITE8_DEVICE_HANDLER( misc_couple_w )
 {
-	flip_screen_set(~data & 0x10);
+	flip_screen_set(device->machine, ~data & 0x10);
 	extra_video_bank_bit = (data & 2) << 8;
 	lscnblk = (data >> 3) & 1;
 
@@ -1049,8 +1049,7 @@ static MACHINE_DRIVER_START( pitboss )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 512, 0, 512, 256, 0, 256)	/* temporary, CRTC will configure screen */
 
-	MDRV_DEVICE_ADD("crtc", MC6845)
-	MDRV_DEVICE_CONFIG(mc6845_intf)
+	MDRV_MC6845_ADD("crtc", MC6845, CRTC_CLOCK, mc6845_intf)
 
 	MDRV_VIDEO_UPDATE(merit)
 

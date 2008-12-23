@@ -50,7 +50,7 @@ struct _mc6854_interface
 
 
 #define MDRV_MC6854_ADD(_tag, _intrf) \
-  MDRV_DEVICE_ADD(_tag, MC6854)	      \
+  MDRV_DEVICE_ADD(_tag, MC6854, 0)	      \
   MDRV_DEVICE_CONFIG(_intrf)
 
 #define MDRV_MC6854_REMOVE(_tag)		\

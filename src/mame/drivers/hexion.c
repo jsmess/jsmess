@@ -79,6 +79,7 @@ Notes:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "sound/okim6295.h"
 #include "sound/k051649.h"
@@ -104,7 +105,7 @@ static WRITE8_HANDLER( coincntr_w )
 	coin_counter_w(1,data & 0x02);
 
 	/* bit 5 = flip screen */
-	flip_screen_set(data & 0x20);
+	flip_screen_set(space->machine, data & 0x20);
 
 	/* other bit unknown */
 if ((data & 0xdc) != 0x10) popmessage("coincntr %02x",data);

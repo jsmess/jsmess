@@ -151,6 +151,8 @@ struct _seqselect_info
 //	LOCAL VARIABLES
 //============================================================
 
+static running_machine *Machine;	// HACK - please fix
+
 static double pixels_to_xdlgunits;
 static double pixels_to_ydlgunits;
 
@@ -1629,6 +1631,8 @@ WCHAR *win_dialog_wcsdup(dialog_box *dialog, const WCHAR *s)
 
 static void before_display_dialog(running_machine *machine)
 {
+	Machine = machine;
+
 #ifdef UNDER_CE
 	// on WinCE, suspend GAPI
 	gx_suspend();
@@ -1651,6 +1655,8 @@ static void after_display_dialog(running_machine *machine)
 #endif
 
 	winwindow_ui_pause_from_window_thread(machine, FALSE);
+
+	Machine = NULL;
 }
 
 

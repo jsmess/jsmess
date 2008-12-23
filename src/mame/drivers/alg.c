@@ -21,6 +21,7 @@
 **************************************************************************************/
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "render.h"
 #include "includes/amiga.h"
 #include "machine/laserdsc.h"
@@ -113,29 +114,29 @@ static TIMER_CALLBACK( response_timer )
 		UINT8 data = laserdisc_data_r(laserdisc);
 		if (data != 0x0a)
 			mame_printf_debug("Sending serial data = %02X\n", data);
-		amiga_serial_in_w(data);
+		amiga_serial_in_w(machine, data);
 	}
 
 	/* if there's more to come, set another timer */
 	if (laserdisc_line_r(laserdisc, LASERDISC_LINE_DATA_AVAIL) == ASSERT_LINE)
-		timer_adjust_oneshot(serial_timer, amiga_get_serial_char_period(), 0);
+		timer_adjust_oneshot(serial_timer, amiga_get_serial_char_period(machine), 0);
 	else
 		serial_timer_active = FALSE;
 }
 
 
-static void vsync_callback(void)
+static void vsync_callback(running_machine *machine)
 {
 	/* if we have data available, set a timer to read it */
 	if (!serial_timer_active && laserdisc_line_r(laserdisc, LASERDISC_LINE_DATA_AVAIL) == ASSERT_LINE)
 	{
-		timer_adjust_oneshot(serial_timer, amiga_get_serial_char_period(), 0);
+		timer_adjust_oneshot(serial_timer, amiga_get_serial_char_period(machine), 0);
 		serial_timer_active = TRUE;
 	}
 }
 
 
-static void serial_w(UINT16 data)
+static void serial_w(running_machine *machine, UINT16 data)
 {
 	/* write to the laserdisc player */
 	laserdisc_data_w(laserdisc, data & 0xff);
@@ -143,7 +144,7 @@ static void serial_w(UINT16 data)
 	/* if we have data available, set a timer to read it */
 	if (!serial_timer_active && laserdisc_line_r(laserdisc, LASERDISC_LINE_DATA_AVAIL) == ASSERT_LINE)
 	{
-		timer_adjust_oneshot(serial_timer, amiga_get_serial_char_period(), 0);
+		timer_adjust_oneshot(serial_timer, amiga_get_serial_char_period(machine), 0);
 		serial_timer_active = TRUE;
 	}
 }
@@ -156,7 +157,7 @@ static void serial_w(UINT16 data)
  *
  *************************************/
 
-static void alg_potgo_w(UINT16 data)
+static void alg_potgo_w(running_machine *machine, UINT16 data)
 {
 	/* bit 15 controls whether pin 9 is input/output */
 	/* bit 14 controls the value, which selects which player's controls to read */
@@ -390,7 +391,6 @@ static const custom_sound_interface amiga_custom_interface =
 static const cia6526_interface cia_0_intf =
 {
 	amiga_cia_0_irq,								/* irq_func */
-	AMIGA_68000_NTSC_CLOCK / 10,					/* clock */
 	0,												/* tod_clock */
 	{
 		{ alg_cia_0_porta_r, alg_cia_0_porta_w },	/* port A */
@@ -401,7 +401,6 @@ static const cia6526_interface cia_0_intf =
 static const cia6526_interface cia_1_intf =
 {
 	amiga_cia_1_irq,								/* irq_func */
-	AMIGA_68000_NTSC_CLOCK / 10,					/* clock */
 	0,												/* tod_clock */
 	{
 		{ alg_cia_1_porta_r, alg_cia_1_porta_w, },	/* port A */
@@ -450,10 +449,8 @@ static MACHINE_DRIVER_START( alg_r1 )
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 
 	/* cia */
-	MDRV_DEVICE_ADD("cia_0", CIA8520)
-	MDRV_DEVICE_CONFIG(cia_0_intf)
-	MDRV_DEVICE_ADD("cia_1", CIA8520)
-	MDRV_DEVICE_CONFIG(cia_1_intf)
+	MDRV_CIA8520_ADD("cia_0", AMIGA_68000_NTSC_CLOCK / 10, cia_0_intf)
+	MDRV_CIA8520_ADD("cia_1", AMIGA_68000_NTSC_CLOCK / 10, cia_1_intf)
 MACHINE_DRIVER_END
 
 

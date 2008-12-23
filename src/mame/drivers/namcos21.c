@@ -289,6 +289,8 @@ CPU68 PCB:
   JP3
 */
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
+#include "cpu/m6805/m6805.h"
 #include "deprecat.h"
 #include "namcos2.h"
 #include "cpu/m6809/m6809.h"
@@ -557,7 +559,7 @@ namcos21_kickstart( running_machine *machine, int internal )
 }
 
 static UINT16
-ReadWordFromSlaveInput( void )
+ReadWordFromSlaveInput( const address_space *space )
 {
 	UINT16 data = 0;
 	if( mpDspState->slaveBytesAvailable>0 )
@@ -569,7 +571,7 @@ ReadWordFromSlaveInput( void )
 		{
 			mpDspState->slaveBytesAdvertised--;
 		}
-		logerror( "%s:-%04x(0x%04x)\n", cpuexec_describe_context(Machine), data, mpDspState->slaveBytesAvailable );
+		logerror( "%s:-%04x(0x%04x)\n", cpuexec_describe_context(space->machine), data, mpDspState->slaveBytesAvailable );
 	}
 	return data;
 } /* ReadWordFromSlaveInput */
@@ -887,7 +889,7 @@ RenderSlaveOutput( UINT16 data )
 
 static READ16_HANDLER(slave_port0_r)
 {
-	return ReadWordFromSlaveInput();
+	return ReadWordFromSlaveInput(space);
 } /* slave_port0_r */
 
 static WRITE16_HANDLER(slave_port0_w)
@@ -1559,7 +1561,7 @@ static MACHINE_DRIVER_START( s21base )
 	MDRV_CPU_DATA_MAP(slave_dsp_data,0)
 	MDRV_CPU_IO_MAP(slave_dsp_io,0)
 
-	MDRV_INTERLEAVE(200)
+	MDRV_QUANTUM_TIME(HZ(12000))
 
 	MDRV_MACHINE_START(namcos2)
 	MDRV_MACHINE_RESET(namcos2)
@@ -1633,7 +1635,7 @@ static MACHINE_DRIVER_START( driveyes )
 	MDRV_CPU_DATA_MAP(winrun_dsp_data,0)
 	MDRV_CPU_IO_MAP(winrun_dsp_io,0)
 
-	MDRV_INTERLEAVE(100) /* 100 CPU slices per frame */
+	MDRV_QUANTUM_TIME(HZ(6000)) /* 100 CPU slices per frame */
 
 	MDRV_MACHINE_START(namcos2)
 	MDRV_MACHINE_RESET(namcos2)
@@ -1692,7 +1694,7 @@ static MACHINE_DRIVER_START( winrun_c140_typeB )
 	MDRV_CPU_PROGRAM_MAP(am_gpu_winrun,0)
 	MDRV_CPU_VBLANK_INT("main", namcos2_68k_gpu_vblank)
 
-	MDRV_INTERLEAVE(100) /* 100 CPU slices per frame */
+	MDRV_QUANTUM_TIME(HZ(6000)) /* 100 CPU slices per frame */
 
 	MDRV_MACHINE_START(namcos2)
 	MDRV_MACHINE_RESET(namcos2)

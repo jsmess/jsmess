@@ -442,10 +442,10 @@ int sample_loaded(int samplenum)
 }
 
 
-static void sample_update_sound(void *param, stream_sample_t **inputs, stream_sample_t **_buffer, int length)
+static STREAM_UPDATE( sample_update_sound )
 {
 	struct sample_channel *chan = param;
-	stream_sample_t *buffer = _buffer[0];
+	stream_sample_t *buffer = outputs[0];
 
 	if (chan->source && !chan->paused)
 	{
@@ -456,7 +456,7 @@ static void sample_update_sound(void *param, stream_sample_t **inputs, stream_sa
 		const INT16 *sample = chan->source;
 		UINT32 sample_length = chan->source_length;
 
-		while (length--)
+		while (samples--)
 		{
 			/* do a linear interp on the sample */
 			INT32 sample1 = sample[pos];
@@ -478,8 +478,8 @@ static void sample_update_sound(void *param, stream_sample_t **inputs, stream_sa
 				{
 					chan->source = NULL;
 					chan->source_num = -1;
-					if (length > 0)
-						memset(buffer, 0, length * sizeof(*buffer));
+					if (samples > 0)
+						memset(buffer, 0, samples * sizeof(*buffer));
 					break;
 				}
 			}
@@ -490,7 +490,7 @@ static void sample_update_sound(void *param, stream_sample_t **inputs, stream_sa
 		chan->frac = frac;
 	}
 	else
-		memset(buffer, 0, length * sizeof(*buffer));
+		memset(buffer, 0, samples * sizeof(*buffer));
 }
 
 
@@ -598,17 +598,17 @@ SND_GET_INFO( samples )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-        case SNDINFO_PTR_SET_INFO:                      info->set_info = SND_SET_INFO_NAME( samples );      break;
-        case SNDINFO_PTR_START:                         info->start = SND_START_NAME( samples );            break;
-        case SNDINFO_PTR_STOP:                          /* Nothing */                           break;
-        case SNDINFO_PTR_RESET:                         /* Nothing */                           break;
+        case SNDINFO_PTR_SET_INFO:                      info->set_info = SND_SET_INFO_NAME( samples );	break;
+        case SNDINFO_PTR_START:                         info->start = SND_START_NAME( samples );		break;
+        case SNDINFO_PTR_STOP:                          /* Nothing */                           		break;
+        case SNDINFO_PTR_RESET:                         /* Nothing */                           		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-        case SNDINFO_STR_NAME:                          info->s = "Samples";                    break;
-        case SNDINFO_STR_CORE_FAMILY:                   info->s = "Big Hack";                   break;
-        case SNDINFO_STR_CORE_VERSION:                  info->s = "1.1";                        break;
-        case SNDINFO_STR_CORE_FILE:                     info->s = __FILE__;                     break;
-        case SNDINFO_STR_CORE_CREDITS:                  info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+        case SNDINFO_STR_NAME:                          strcpy(info->s, "Samples");                    	break;
+        case SNDINFO_STR_CORE_FAMILY:                   strcpy(info->s, "Big Hack");                   	break;
+        case SNDINFO_STR_CORE_VERSION:                  strcpy(info->s, "1.1");                        	break;
+        case SNDINFO_STR_CORE_FILE:                     strcpy(info->s, __FILE__);                     		break;
+        case SNDINFO_STR_CORE_CREDITS:                  strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

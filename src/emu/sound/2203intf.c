@@ -91,10 +91,10 @@ static void timer_handler(void *param,int c,int count,int clock)
 	}
 }
 
-static void ym2203_stream_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length)
+static STREAM_UPDATE( ym2203_stream_update )
 {
 	struct ym2203_info *info = param;
-	ym2203_update_one(info->chip, buffer[0], length);
+	ym2203_update_one(info->chip, outputs[0], samples);
 }
 
 
@@ -349,10 +349,10 @@ SND_GET_INFO( ym2203 )
 		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( ym2203 );				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							info->s = "YM2203";						break;
-		case SNDINFO_STR_CORE_FAMILY:					info->s = "Yamaha FM";					break;
-		case SNDINFO_STR_CORE_VERSION:					info->s = "1.0";						break;
-		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
-		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "YM2203");							break;
+		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Yamaha FM");						break;
+		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");								break;
+		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);							break;
+		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }

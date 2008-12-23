@@ -424,7 +424,7 @@ static SND_RESET( discrete )
  *
  *************************************/
 
-static void discrete_stream_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length)
+static STREAM_UPDATE( discrete_stream_update )
 {
 	discrete_info *info = param;
 	int samplenum, nodenum, outputnum;
@@ -439,8 +439,8 @@ static void discrete_stream_update(void *param, stream_sample_t **inputs, stream
 		info->input_stream_data[nodenum] = inputs[nodenum];
 	}
 
-	/* Now we must do length iterations of the node list, one output for each step */
-	for (samplenum = 0; samplenum < length; samplenum++)
+	/* Now we must do samples iterations of the node list, one output for each step */
+	for (samplenum = 0; samplenum < samples; samplenum++)
 	{
 		/* loop over all nodes */
 		for (nodenum = 0; nodenum < info->node_count; nodenum++)
@@ -463,7 +463,7 @@ static void discrete_stream_update(void *param, stream_sample_t **inputs, stream
 		for (outputnum = 0; outputnum < info->discrete_outputs; outputnum++)
 		{
 			val = (*info->output_node[outputnum]->input[0]) * (*info->output_node[outputnum]->input[1]);
-			buffer[outputnum][samplenum] = val;
+			outputs[outputnum][samplenum] = val;
 		}
 
 		/* Dump any csv logs */
@@ -764,11 +764,11 @@ SND_GET_INFO( discrete )
 		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( discrete );			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							info->s = "Discrete";					break;
-		case SNDINFO_STR_CORE_FAMILY:					info->s = "Analog";						break;
-		case SNDINFO_STR_CORE_VERSION:					info->s = "1.1";						break;
-		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
-		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "Discrete");						break;
+		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Analog");							break;
+		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.1");								break;
+		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);							break;
+		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 
