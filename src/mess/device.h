@@ -190,7 +190,7 @@ const char *device_brieftypename(iodevice_t type);
 iodevice_t device_typeid(const char *name);
 
 /* device allocation */
-void mess_devices_setup(machine_config *config, const game_driver *gamedrv);
+void mess_devices_setup(running_machine *machine, machine_config *config, const game_driver *gamedrv);
 
 /* device lookup */
 int device_count_tag_from_machine(const running_machine *machine, const char *tag);

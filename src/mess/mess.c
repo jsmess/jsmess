@@ -112,7 +112,7 @@ void mess_predevice_init(running_machine *machine)
 	inputx_init(machine);
 
 	/* allocate the IODevice struct */
-	mess_devices_setup((machine_config *) machine->config, machine->gamedrv);
+	mess_devices_setup(machine, (machine_config *) machine->config, machine->gamedrv);
 
 	/* initialize RAM code */
 	ram_init(machine, machine->gamedrv);

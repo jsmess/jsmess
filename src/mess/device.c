@@ -375,7 +375,7 @@ static char *string_buffer_putstr(char *buffer, size_t buffer_length, size_t *bu
 	MESS device
 -------------------------------------------------*/
 
-static void create_mess_device(device_config **listheadptr, device_getinfo_handler handler, const game_driver *gamedrv,
+static void create_mess_device(running_machine *machine, device_config **listheadptr, device_getinfo_handler handler, const game_driver *gamedrv,
 	int count_override, int *position)
 {
 	mess_device_class mess_devclass;
@@ -418,6 +418,7 @@ static void create_mess_device(device_config **listheadptr, device_getinfo_handl
 
 		/* create a bonafide MAME device */
 		device = device_list_add(listheadptr, NULL, MESS_DEVICE, mame_tag, 0);
+		device->machine = machine;
 		mess_device = (mess_device_config *) device->inline_config;
 
 		/* we need to copy the mess_tag into the structure */
@@ -469,7 +470,7 @@ static void create_mess_device(device_config **listheadptr, device_getinfo_handl
     mess_devices_setup - allocate devices
 -------------------------------------------------*/
 
-void mess_devices_setup(machine_config *config, const game_driver *gamedrv)
+void mess_devices_setup(running_machine *machine, machine_config *config, const game_driver *gamedrv)
 {
 	device_getinfo_handler handlers[64];
 	int count_overrides[sizeof(handlers) / sizeof(handlers[0])];
@@ -493,7 +494,7 @@ void mess_devices_setup(machine_config *config, const game_driver *gamedrv)
 	/* loop through all handlers */
 	for (i = 0; handlers[i] != NULL; i++)
 	{
-		create_mess_device(&config->devicelist, handlers[i], gamedrv, count_overrides[i], &position);
+		create_mess_device(machine, &config->devicelist, handlers[i], gamedrv, count_overrides[i], &position);
 	}
 }
 
@@ -507,7 +508,7 @@ void mess_devices_setup(machine_config *config, const game_driver *gamedrv)
 machine_config *machine_config_alloc_with_mess_devices(const game_driver *gamedrv)
 {
 	machine_config *config = machine_config_alloc(gamedrv->machine_config);
-	mess_devices_setup(config, gamedrv);
+	mess_devices_setup(NULL/*machine?*/, config, gamedrv);
 	return config;
 }
 
