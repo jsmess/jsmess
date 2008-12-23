@@ -1057,7 +1057,7 @@ XL/XE 16kB OS roms
 	DRIVER( compani1 )  /* 1990 Kompanion 1              */
 
 	/* Kramer */
-//0128u7	DRIVER(kramermc) /* 1987 Kramer MC				*/
+	DRIVER(kramermc) /* 1987 Kramer MC				*/
 
 	/* Ei Nis */
 	DRIVER(pecom64)
