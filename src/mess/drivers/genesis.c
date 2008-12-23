@@ -584,22 +584,13 @@ static WRITE16_HANDLER( pico_68k_io_write )
 	  }
 }
 
-static ADDRESS_MAP_START( _pico_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000 , 0x3fffff) AM_READ(SMH_ROM)
+static ADDRESS_MAP_START( _pico_mem, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x3fffff) AM_ROM
 
-	AM_RANGE(0x800000 , 0x80001f) AM_READ(pico_68k_io_read)
+	AM_RANGE(0x800000, 0x80001f) AM_READWRITE(pico_68k_io_read, pico_68k_io_write)
 
-	AM_RANGE(0xc00000 , 0xc0001f) AM_READ(megadriv_vdp_r)
-	AM_RANGE(0xe00000 , 0xe0ffff) AM_READ(SMH_RAM) AM_MIRROR(0x1f0000)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( _pico_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000 , 0x3fffff) AM_WRITE(SMH_ROM)
-
-	AM_RANGE(0x800000 , 0x80001f) AM_WRITE(pico_68k_io_write)
-
-	AM_RANGE(0xc00000 , 0xc0001f) AM_WRITE(megadriv_vdp_w)
-	AM_RANGE(0xe00000 , 0xe0ffff) AM_WRITE(SMH_RAM) AM_MIRROR(0x1f0000) AM_BASE(&megadrive_ram)
+	AM_RANGE(0xc00000, 0xc0001f) AM_READWRITE(megadriv_vdp_r, megadriv_vdp_w)
+	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_MIRROR(0x1f0000) AM_BASE(&megadrive_ram)
 ADDRESS_MAP_END
 
 
@@ -635,7 +626,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( pico )
 	MDRV_IMPORT_FROM(megadriv)
 	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_PROGRAM_MAP(_pico_readmem,_pico_writemem)
+	MDRV_CPU_PROGRAM_MAP(_pico_mem,0)
 
 	MDRV_MACHINE_RESET( ms_megadriv )
 MACHINE_DRIVER_END
