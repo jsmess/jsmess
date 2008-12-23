@@ -431,7 +431,7 @@ static void get_device_instance_name(const machine_config *config, const device_
 
 	/* retrieve info about the device instance */
 	result = device_get_info_string(device, state);
-	if (result != NULL)
+	if ((result != NULL) && (result[0] != '\0'))
 	{
 		/* we got info directly */
 		snprintf(buffer, buffer_len, "%s", result);
