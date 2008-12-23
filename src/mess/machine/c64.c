@@ -856,8 +856,9 @@ UINT8 c64_m6510_port_read(const device_config *device, UINT8 direction)
 }
 
 
-int c64_paddle_read (running_machine *machine, int which)
+int c64_paddle_read (const device_config *device, int which)
 {
+	running_machine *machine = device->machine;
 	int pot1 = 0xff, pot2 = 0xff, pot3 = 0xff, pot4 = 0xff, temp;
 	UINT8 cia0porta = cia_get_output_a(device_list_find_by_tag(machine->config->devicelist, CIA6526R1, "cia_0"));
 	int controller1 = input_port_read(machine, "CTRLSEL") & 0x07;
