@@ -370,7 +370,6 @@ SOUNDS += SP0256
 DRVLIBS = \
 	$(MESSOBJ)/messdriv.o \
 	$(MESSOBJ)/3do.a \
-	$(MESSOBJ)/acorn.a \
 	$(MESSOBJ)/advision.a \
 	$(MESSOBJ)/amiga.a \
 	$(MESSOBJ)/amstrad.a \
@@ -420,7 +419,6 @@ DRVLIBS = \
 	$(MESSOBJ)/jupiter.a \
 	$(MESSOBJ)/kaypro.a \
 	$(MESSOBJ)/kim1.a \
-	$(MESSOBJ)/kramermc.a \
 	$(MESSOBJ)/lviv.a \
 	$(MESSOBJ)/lynx.a \
 	$(MESSOBJ)/magnavox.a \
@@ -478,6 +476,8 @@ DRVLIBS = \
 	$(MESSOBJ)/votrax.a \
 	$(MESSOBJ)/shared.a \
 
+#	$(MESSOBJ)/acorn.a \
+#	$(MESSOBJ)/kramermc.a \
 #	$(MESSOBJ)/luxor.a \
 #	$(MESSOBJ)/mbee.a \
 #	$(MESSOBJ)/multitch.a \

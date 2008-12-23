@@ -196,20 +196,20 @@ const game_driver * const drivers[] =
 
 /****************COMPUTERS***************************************************/
     /* ACORN */
-	DRIVER( acrnsys1 )	/* 1979 Acorn System 1 (Microcomputer Kit)			*/
-	DRIVER( atom )		/* 1979 Acorn Atom									*/
-	DRIVER( atomeb )	/* 1979 Acorn Atom									*/
-	DRIVER( bbca )		/* 1981 BBC Micro Model A							*/
-	DRIVER( bbcb )		/* 1981 BBC Micro Model B							*/
-	DRIVER( bbcbp )		/* 198? BBC Micro Model B+ 64K						*/
-	DRIVER( bbcbp128 )	/* 198? BBC Micro Model B+ 128K						*/
-	DRIVER( bbcm)		/* 198? BBC Master									*/
-	DRIVER( bbcbc )		/* 1985 BBC Bridge Companion						*/
-	DRIVER( electron )	/* 1983 Acorn Electron								*/
+//0128u7	DRIVER( acrnsys1 )	/* 1979 Acorn System 1 (Microcomputer Kit)			*/
+//0128u7	DRIVER( atom )		/* 1979 Acorn Atom									*/
+//0128u7	DRIVER( atomeb )	/* 1979 Acorn Atom									*/
+//0128u7	DRIVER( bbca )		/* 1981 BBC Micro Model A							*/
+//0128u7	DRIVER( bbcb )		/* 1981 BBC Micro Model B							*/
+//0128u7	DRIVER( bbcbp )		/* 198? BBC Micro Model B+ 64K						*/
+//0128u7	DRIVER( bbcbp128 )	/* 198? BBC Micro Model B+ 128K						*/
+//0128u7	DRIVER( bbcm)		/* 198? BBC Master									*/
+//0128u7	DRIVER( bbcbc )		/* 1985 BBC Bridge Companion						*/
+//0128u7	DRIVER( electron )	/* 1983 Acorn Electron								*/
 //	DRIVER( a310 )		/* 1988 Acorn Archimedes 310						*/
 
 	/* CAMBRIDGE COMPUTERS */
-	DRIVER( z88 )		/*													*/
+//0128u7	DRIVER( z88 )		/*													*/
 
 	/* AMSTRAD */
 	DRIVER( cpc464 )	/* Amstrad (Schneider in Germany) 1984				*/
@@ -1057,7 +1057,7 @@ XL/XE 16kB OS roms
 	DRIVER( compani1 )  /* 1990 Kompanion 1              */
 
 	/* Kramer */
-	DRIVER(kramermc) /* 1987 Kramer MC				*/
+//0128u7	DRIVER(kramermc) /* 1987 Kramer MC				*/
 
 	/* Ei Nis */
 	DRIVER(pecom64)
