@@ -123,10 +123,10 @@ static WRITE8_HANDLER(fd5_drive_control_w)
 
 	LOG(("fd5 drive state w: %02x\n",state));
 
-	floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, 0), state);
-	floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, 0), state);
-	floppy_drive_set_ready_state(image_from_devtype_and_index(IO_FLOPPY, 1), 1,1);
-	floppy_drive_set_ready_state(image_from_devtype_and_index(IO_FLOPPY, 1), 1,1);
+	floppy_drive_set_motor_state(image_from_devtype_and_index(machine, IO_FLOPPY, 0), state);
+	floppy_drive_set_motor_state(image_from_devtype_and_index(machine, IO_FLOPPY, 0), state);
+	floppy_drive_set_ready_state(image_from_devtype_and_index(machine, IO_FLOPPY, 1), 1,1);
+	floppy_drive_set_ready_state(image_from_devtype_and_index(machine, IO_FLOPPY, 1), 1,1);
 }
 
 static WRITE8_HANDLER(fd5_tc_w)
@@ -174,8 +174,8 @@ static const struct nec765_interface sord_fd5_nec765_interface=
 
 static MACHINE_RESET( sord_m5_fd5 )
 {
-	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 0), FLOPPY_DRIVE_SS_40);
-	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 1), FLOPPY_DRIVE_SS_40);
+	floppy_drive_set_geometry(image_from_devtype_and_index(machine, IO_FLOPPY, 0), FLOPPY_DRIVE_SS_40);
+	floppy_drive_set_geometry(image_from_devtype_and_index(machine, IO_FLOPPY, 1), FLOPPY_DRIVE_SS_40);
 	MACHINE_RESET_CALL(sord_m5);
 	ppi8255_set_port_c((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), 0x50);
 }

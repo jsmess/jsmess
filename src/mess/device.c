@@ -255,6 +255,17 @@ static DEVICE_GET_NAME(mess_device)
 
 
 /*-------------------------------------------------
+    safe_strcpy - hack
+-------------------------------------------------*/
+
+static void safe_strcpy(char *dst, const char *src)
+{
+	strcpy(dst, src ? src : "");
+}
+
+
+
+/*-------------------------------------------------
     DEVICE_GET_INFO(mess_device) - device get info
     callback
 -------------------------------------------------*/
@@ -299,19 +310,19 @@ DEVICE_GET_INFO(mess_device)
 		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0");								break;
 		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);								break;
 		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright the MESS Team");			break;
-		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	strcpy(info->s, mess_device_get_info_string(&mess_device->io_device.devclass, MESS_DEVINFO_STR_FILE_EXTENSIONS)); break;
-		case DEVINFO_STR_IMAGE_INSTANCE_NAME:	strcpy(info->s, mess_device_get_info_string(&mess_device->io_device.devclass, MESS_DEVINFO_STR_NAME + mess_device->io_device.index_in_device)); break;
-		case DEVINFO_STR_IMAGE_BRIEF_INSTANCE_NAME:	strcpy(info->s, mess_device_get_info_string(&mess_device->io_device.devclass, MESS_DEVINFO_STR_SHORT_NAME + mess_device->io_device.index_in_device)); break;
+		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	safe_strcpy(info->s, mess_device_get_info_string(&mess_device->io_device.devclass, MESS_DEVINFO_STR_FILE_EXTENSIONS)); break;
+		case DEVINFO_STR_IMAGE_INSTANCE_NAME:	safe_strcpy(info->s, mess_device_get_info_string(&mess_device->io_device.devclass, MESS_DEVINFO_STR_NAME + mess_device->io_device.index_in_device)); break;
+		case DEVINFO_STR_IMAGE_BRIEF_INSTANCE_NAME:	safe_strcpy(info->s, mess_device_get_info_string(&mess_device->io_device.devclass, MESS_DEVINFO_STR_SHORT_NAME + mess_device->io_device.index_in_device)); break;
 
 		default:
 			if ((state >= DEVINFO_PTR_IMAGE_CREATE_OPTSPEC) && (state < DEVINFO_PTR_IMAGE_CREATE_OPTSPEC + DEVINFO_CREATE_OPTMAX))
 				info->p = mess_device_get_info_ptr(&mess_device->io_device.devclass, state - DEVINFO_PTR_IMAGE_CREATE_OPTSPEC + MESS_DEVINFO_PTR_CREATE_OPTSPEC);
 			else if ((state >= DEVINFO_STR_IMAGE_CREATE_OPTNAME) && (state < DEVINFO_STR_IMAGE_CREATE_OPTNAME + DEVINFO_CREATE_OPTMAX))
-				info->s = mess_device_get_info_ptr(&mess_device->io_device.devclass, state - DEVINFO_STR_IMAGE_CREATE_OPTNAME + MESS_DEVINFO_STR_CREATE_OPTNAME);
+				safe_strcpy(info->s, mess_device_get_info_ptr(&mess_device->io_device.devclass, state - DEVINFO_STR_IMAGE_CREATE_OPTNAME + MESS_DEVINFO_STR_CREATE_OPTNAME));
 			else if ((state >= DEVINFO_STR_IMAGE_CREATE_OPTDESC) && (state < DEVINFO_STR_IMAGE_CREATE_OPTDESC + DEVINFO_CREATE_OPTMAX))
-				info->s = mess_device_get_info_ptr(&mess_device->io_device.devclass, state - DEVINFO_STR_IMAGE_CREATE_OPTDESC + MESS_DEVINFO_STR_CREATE_OPTDESC);
+				safe_strcpy(info->s, mess_device_get_info_ptr(&mess_device->io_device.devclass, state - DEVINFO_STR_IMAGE_CREATE_OPTDESC + MESS_DEVINFO_STR_CREATE_OPTDESC));
 			else if ((state >= DEVINFO_STR_IMAGE_CREATE_OPTEXTS) && (state < DEVINFO_STR_IMAGE_CREATE_OPTEXTS + DEVINFO_CREATE_OPTMAX))
-				info->s = mess_device_get_info_ptr(&mess_device->io_device.devclass, state - DEVINFO_STR_IMAGE_CREATE_OPTEXTS + MESS_DEVINFO_STR_CREATE_OPTEXTS);
+				safe_strcpy(info->s, mess_device_get_info_ptr(&mess_device->io_device.devclass, state - DEVINFO_STR_IMAGE_CREATE_OPTEXTS + MESS_DEVINFO_STR_CREATE_OPTEXTS));
 			break;
 	}
 }
