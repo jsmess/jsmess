@@ -13,6 +13,7 @@
 #include "cpu/z80/z80.h"
 #include "video/tms9928a.h"
 #include "machine/z80pio.h"
+#include "cpu/z80/z80daisy.h"
 #include "devices/cartslot.h"
 
 static ADDRESS_MAP_START( bbcbc_prg, ADDRESS_SPACE_PROGRAM, 8 )
@@ -35,7 +36,7 @@ static void tms_interrupt(running_machine *machine, int dummy)
 
 static INTERRUPT_GEN( bbcbc_interrupt )
 {
-    TMS9928A_interrupt(device->machine);
+	TMS9928A_interrupt(device->machine);
 }
 
 static const TMS9928a_interface tms9129_interface =
@@ -58,6 +59,12 @@ static const z80pio_interface bbcbc_z80pio_intf =
 	NULL	/* ready b */
 };
 
+static const z80_daisy_chain bbcbc_daisy_chain[] =
+{
+	{ Z80PIO, "z80pio" },
+	{ NULL }
+};
+
 static MACHINE_START( bbcbc )
 {
 	TMS9928A_configure(&tms9129_interface);
@@ -72,13 +79,14 @@ static MACHINE_DRIVER_START( bbcbc )
 	MDRV_CPU_ADD( "main", Z80, 4000000 )
 	MDRV_CPU_PROGRAM_MAP( bbcbc_prg, 0 )
 	MDRV_CPU_IO_MAP( bbcbc_io, 0 )
+	MDRV_CPU_CONFIG(bbcbc_daisy_chain)
+	MDRV_CPU_VBLANK_INT("main", bbcbc_interrupt)
 
 	MDRV_MACHINE_START( bbcbc )
 	MDRV_MACHINE_RESET( bbcbc )
 
 	MDRV_Z80PIO_ADD( "z80pio", bbcbc_z80pio_intf )
 
-	MDRV_CPU_VBLANK_INT("main", bbcbc_interrupt)
 	MDRV_IMPORT_FROM( tms9928a )
 	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_REFRESH_RATE( 50 )
@@ -93,7 +101,7 @@ ROM_START( bbcbc )
 ROM_END
 
 static SYSTEM_CONFIG_START( bbcbc )
-    CONFIG_DEVICE(cartslot_device_getinfo)
+	CONFIG_DEVICE(cartslot_device_getinfo)
 SYSTEM_CONFIG_END
 
 /***************************************************************************

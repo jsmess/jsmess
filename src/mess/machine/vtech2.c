@@ -372,12 +372,12 @@ DEVICE_IMAGE_LOAD( laser_floppy )
 	return INIT_PASS;
 }
 
-static const device_config *laser_file(void)
+static const device_config *laser_file(running_machine *machine)
 {
 	return image_from_devtype_and_index(machine, IO_FLOPPY, laser_drive);
 }
 
-static void laser_get_track(void)
+static void laser_get_track(running_machine *machine)
 {
     sprintf(laser_frame_message, "#%d get track %02d", laser_drive, laser_track_x2[laser_drive]/2);
     laser_frame_time = 30;
@@ -387,23 +387,23 @@ static void laser_get_track(void)
         int size, offs;
         size = TRKSIZE_VZ;
         offs = TRKSIZE_VZ * laser_track_x2[laser_drive]/2;
-        image_fseek(laser_file(), offs, SEEK_SET);
-        size = image_fread(laser_file(), laser_fdc_data, size);
+        image_fseek(laser_file(machine), offs, SEEK_SET);
+        size = image_fread(laser_file(machine), laser_fdc_data, size);
         logerror("get track @$%05x $%04x bytes\n", offs, size);
     }
     laser_fdc_offs = 0;
     laser_fdc_write = 0;
 }
 
-static void laser_put_track(void)
+static void laser_put_track(running_machine *machine)
 {
     /* drive selected and image file ok? */
-    if( laser_drive >= 0 && laser_file() != NULL )
+    if( laser_drive >= 0 && laser_file(machine) != NULL )
     {
         int size, offs;
         offs = TRKSIZE_VZ * laser_track_x2[laser_drive]/2;
-        image_fseek(laser_file(), offs + laser_fdc_start, SEEK_SET);
-        size = image_fwrite(laser_file(), &laser_fdc_data[laser_fdc_start], laser_fdc_write);
+        image_fseek(laser_file(machine), offs + laser_fdc_start, SEEK_SET);
+        size = image_fwrite(laser_file(machine), &laser_fdc_data[laser_fdc_start], laser_fdc_write);
         logerror("put track @$%05X+$%X $%04X/$%04X bytes\n", offs, laser_fdc_start, size, laser_fdc_write);
     }
 }
@@ -469,7 +469,7 @@ WRITE8_HANDLER( laser_fdc_w )
         {
             laser_drive = drive;
             if( laser_drive >= 0 )
-                laser_get_track();
+                laser_get_track(space->machine);
         }
         if( laser_drive >= 0 )
         {
@@ -482,7 +482,7 @@ WRITE8_HANDLER( laser_fdc_w )
                     laser_track_x2[laser_drive]--;
                 logerror("laser_fdc_w(%d) $%02X drive %d: stepout track #%2d.%d\n", offset, data, laser_drive, laser_track_x2[laser_drive]/2,5*(laser_track_x2[laser_drive]&1));
                 if( (laser_track_x2[laser_drive] & 1) == 0 )
-                    laser_get_track();
+                    laser_get_track(space->machine);
             }
             else
             if( (PHI0(data) && !(PHI1(data) || PHI2(data) || PHI3(data)) && PHI3(laser_fdc_latch)) ||
@@ -494,7 +494,7 @@ WRITE8_HANDLER( laser_fdc_w )
                     laser_track_x2[laser_drive]++;
                 logerror("laser_fdc_w(%d) $%02X drive %d: stepin track #%2d.%d\n", offset, data, laser_drive, laser_track_x2[laser_drive]/2,5*(laser_track_x2[laser_drive]&1));
                 if( (laser_track_x2[laser_drive] & 1) == 0 )
-                    laser_get_track();
+                    laser_get_track(space->machine);
             }
             if( (data & 0x40) == 0 )
             {
@@ -538,7 +538,7 @@ WRITE8_HANDLER( laser_fdc_w )
                 {
                     /* data written to track before? */
                     if( laser_fdc_write )
-                        laser_put_track();
+                        laser_put_track(space->machine);
                 }
                 laser_fdc_bits = 8;
                 laser_fdc_write = 0;

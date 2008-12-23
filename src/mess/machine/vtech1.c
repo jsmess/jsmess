@@ -277,16 +277,16 @@ DEVICE_IMAGE_LOAD(vtech1_floppy)
 	return INIT_PASS;
 }
 
-static void vtech1_get_track(void)
+static void vtech1_get_track(running_machine *machine)
 {
     /* drive selected or and image file ok? */
-	if (vtech1_drive >= 0 && image_exists(vtech1_file()))
+	if (vtech1_drive >= 0 && image_exists(vtech1_file(machine)))
 	{
 		int size, offs;
 		size = TRKSIZE_VZ;
 		offs = TRKSIZE_VZ * vtech1_track_x2[vtech1_drive]/2;
-		image_fseek(vtech1_file(), offs, SEEK_SET);
-		size = image_fread(vtech1_file(), vtech1_fdc_data, size);
+		image_fseek(vtech1_file(machine), offs, SEEK_SET);
+		size = image_fread(vtech1_file(machine), vtech1_fdc_data, size);
 		if (LOG_VTECH1_FDC)
 			logerror("get track @$%05x $%04x bytes\n", offs, size);
     }
@@ -294,15 +294,15 @@ static void vtech1_get_track(void)
 	vtech1_fdc_write = 0;
 }
 
-static void vtech1_put_track(void)
+static void vtech1_put_track(running_machine *machine)
 {
     /* drive selected and image file ok? */
-	if (vtech1_drive >= 0 && vtech1_file() != NULL)
+	if (vtech1_drive >= 0 && vtech1_file(machine) != NULL)
 	{
 		int size, offs;
 		offs = TRKSIZE_VZ * vtech1_track_x2[vtech1_drive]/2;
-		image_fseek(vtech1_file(), offs + vtech1_fdc_start, SEEK_SET);
-		size = image_fwrite(vtech1_file(), &vtech1_fdc_data[vtech1_fdc_start], vtech1_fdc_write);
+		image_fseek(vtech1_file(machine), offs + vtech1_fdc_start, SEEK_SET);
+		size = image_fwrite(vtech1_file(machine), &vtech1_fdc_data[vtech1_fdc_start], vtech1_fdc_write);
 		if (LOG_VTECH1_FDC)
 			logerror("put track @$%05X+$%X $%04X/$%04X bytes\n", offs, vtech1_fdc_start, size, vtech1_fdc_write);
     }
@@ -371,7 +371,7 @@ WRITE8_HANDLER(vtech1_fdc_w)
 		{
 			vtech1_drive = drive;
 			if (vtech1_drive >= 0)
-				vtech1_get_track();
+				vtech1_get_track(space->machine);
         }
 		if (vtech1_drive >= 0)
         {
@@ -385,7 +385,7 @@ WRITE8_HANDLER(vtech1_fdc_w)
 				if (LOG_VTECH1_FDC)
 					logerror("vtech1_fdc_w(%d) $%02X drive %d: stepout track #%2d.%d\n", offset, data, vtech1_drive, vtech1_track_x2[vtech1_drive]/2,5*(vtech1_track_x2[vtech1_drive]&1));
 				if ((vtech1_track_x2[vtech1_drive] & 1) == 0)
-					vtech1_get_track();
+					vtech1_get_track(space->machine);
             }
             else
 			if ((PHI0(data) && !(PHI1(data) || PHI2(data) || PHI3(data)) && PHI3(vtech1_fdc_latch)) ||
@@ -398,7 +398,7 @@ WRITE8_HANDLER(vtech1_fdc_w)
 				if (LOG_VTECH1_FDC)
 					logerror("vtech1_fdc_w(%d) $%02X drive %d: stepin track #%2d.%d\n", offset, data, vtech1_drive, vtech1_track_x2[vtech1_drive]/2,5*(vtech1_track_x2[vtech1_drive]&1));
 				if ((vtech1_track_x2[vtech1_drive] & 1) == 0)
-					vtech1_get_track();
+					vtech1_get_track(space->machine);
             }
             if ((data & 0x40) == 0)
 			{
@@ -441,7 +441,7 @@ WRITE8_HANDLER(vtech1_fdc_w)
                 {
                     /* data written to track before? */
 					if (vtech1_fdc_write)
-						vtech1_put_track();
+						vtech1_put_track(space->machine);
                 }
 				vtech1_fdc_bits = 8;
 				vtech1_fdc_write = 0;

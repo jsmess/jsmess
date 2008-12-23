@@ -277,15 +277,13 @@ INPUT_PORTS_END
 
 /* Z80 PIO Interface */
 
-static Z80PIO_ON_INT_CHANGED( mpf1_pio_interrupt )
+static void mpf1_pio_interrupt(const device_config *device, int state)
 {
 	logerror("pio irq state: %02x\n",state);
 }
 
-static Z80PIO_INTERFACE( pio_intf )
+static const z80pio_interface mpf1_pio_intf =
 {
-	"main",
-	0,
 	mpf1_pio_interrupt,
 	NULL,
 	NULL,
@@ -456,7 +454,7 @@ static MACHINE_DRIVER_START( mpf1 )
 
 	MDRV_MACHINE_RESET( mpf1 )
 
-	MDRV_Z80PIO_ADD( "z80pio", pio_intf )
+	MDRV_Z80PIO_ADD( "z80pio", mpf1_pio_intf )
 
 	MDRV_PPI8255_ADD( "ppi8255", ppi8255_intf )
 

@@ -262,10 +262,8 @@ static const ay31015_config nascom1_ay31015_config =
 };
 
 
-static Z80PIO_INTERFACE( nascom1_z80pio_intf )
+static const z80pio_interface nascom1_z80pio_intf =
 {
-	"main",
-	0,
 	NULL,
 	NULL,
 	NULL,

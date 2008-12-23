@@ -196,20 +196,20 @@ const game_driver * const drivers[] =
 
 /****************COMPUTERS***************************************************/
     /* ACORN */
-//0128u7	DRIVER( acrnsys1 )	/* 1979 Acorn System 1 (Microcomputer Kit)			*/
-//0128u7	DRIVER( atom )		/* 1979 Acorn Atom									*/
-//0128u7	DRIVER( atomeb )	/* 1979 Acorn Atom									*/
-//0128u7	DRIVER( bbca )		/* 1981 BBC Micro Model A							*/
-//0128u7	DRIVER( bbcb )		/* 1981 BBC Micro Model B							*/
-//0128u7	DRIVER( bbcbp )		/* 198? BBC Micro Model B+ 64K						*/
-//0128u7	DRIVER( bbcbp128 )	/* 198? BBC Micro Model B+ 128K						*/
-//0128u7	DRIVER( bbcm)		/* 198? BBC Master									*/
-//0128u7	DRIVER( bbcbc )		/* 1985 BBC Bridge Companion						*/
-//0128u7	DRIVER( electron )	/* 1983 Acorn Electron								*/
-//	DRIVER( a310 )		/* 1988 Acorn Archimedes 310						*/
+	DRIVER( acrnsys1 )	/* 1979 Acorn System 1 (Microcomputer Kit)			*/
+	DRIVER( atom )		/* 1979 Acorn Atom									*/
+	DRIVER( atomeb )	/* 1979 Acorn Atom									*/
+	DRIVER( bbca )		/* 1981 BBC Micro Model A							*/
+	DRIVER( bbcb )		/* 1981 BBC Micro Model B							*/
+	DRIVER( bbcbp )		/* 198? BBC Micro Model B+ 64K						*/
+	DRIVER( bbcbp128 )	/* 198? BBC Micro Model B+ 128K						*/
+	DRIVER( bbcm)		/* 198? BBC Master									*/
+	DRIVER( bbcbc )		/* 1985 BBC Bridge Companion						*/
+	DRIVER( electron )	/* 1983 Acorn Electron								*/
+//128u7	DRIVER( a310 )		/* 1988 Acorn Archimedes 310						*/
 
 	/* CAMBRIDGE COMPUTERS */
-//0128u7	DRIVER( z88 )		/*													*/
+	DRIVER( z88 )		/*													*/
 
 	/* AMSTRAD */
 	DRIVER( cpc464 )	/* Amstrad (Schneider in Germany) 1984				*/
@@ -559,8 +559,8 @@ XL/XE 16kB OS roms
 	DRIVER( jupiter )	/* Jupiter Ace										*/
 
 	/* SORD */
-//0128u7	DRIVER( sordm5 )
-//0128u7	DRIVER( srdm5fd5 )
+	DRIVER( sordm5 )
+	DRIVER( srdm5fd5 )
 
 	/* APF Electronics Inc. */
 	DRIVER( apfm1000 )
@@ -578,16 +578,16 @@ XL/XE 16kB OS roms
 
 	/* VEB MIKROELEKTRONIK */
 	/* KC compact is partial CPC compatible */
-//0128u7	DRIVER( kc85_4 )	/* VEB KC 85/4										*/
-//0128u7	DRIVER( kc85_3 )	/* VEB KC 85/3										*/
-//0128u7	DRIVER( kc85_4d )	/* VEB KC 85/4 with disk interface					*/
+//128u7	DRIVER( kc85_4 )	/* VEB KC 85/4										*/
+//128u7	DRIVER( kc85_3 )	/* VEB KC 85/3										*/
+//128u7	DRIVER( kc85_4d )	/* VEB KC 85/4 with disk interface					*/
 
 	/* MICROBEE SYSTEMS */
-//0128u7	DRIVER( mbee )		/* Microbee 16 Standard or Plus						*/
-//0128u7	DRIVER( mbeeic )	/* Microbee 32 IC									*/
-//0128u7	DRIVER( mbeepc )	/* Microbee 32 PC									*/
-//0128u7	DRIVER( mbeepc85 )	/* Microbee 32 PC85									*/
-//0128u7	DRIVER( mbee56 )	/* Microbee 56K (CP/M)								*/
+	DRIVER( mbee )		/* Microbee 16 Standard or Plus						*/
+	DRIVER( mbeeic )	/* Microbee 32 IC									*/
+	DRIVER( mbeepc )	/* Microbee 32 PC									*/
+	DRIVER( mbeepc85 )	/* Microbee 32 PC85									*/
+	DRIVER( mbee56 )	/* Microbee 56K (CP/M)								*/
 
 	/* TANDY RADIO SHACK */
 	DRIVER( trs80 )		/* TRS-80 Model I - Level I BASIC					*/
@@ -787,8 +787,8 @@ XL/XE 16kB OS roms
 
 
 	/* NASCOM MICROCOMPUTERS */
-//0128u7	DRIVER( nascom1 )	/* 1978 Nascom 1									*/
-//0128u7	DRIVER( nascom2 )	/* 1979 Nascom 2									*/
+	DRIVER( nascom1 )	/* 1978 Nascom 1									*/
+	DRIVER( nascom2 )	/* 1979 Nascom 2									*/
 
 	/* MILES GORDON TECHNOLOGY */
 	DRIVER( samcoupe )	/* 1989 Sam Coupe									*/
@@ -884,8 +884,8 @@ XL/XE 16kB OS roms
 	DRIVER(compis)		/* 1985 Telenova Compis								*/
 
 	/* Multitech */
-//0128u7	DRIVER(mpf1)		/* 1979 Multitech Micro Professor 1					*/
-//0128u7	DRIVER(mpf1b)		/* 1979 Multitech Micro Professor 1B				*/
+	DRIVER(mpf1)		/* 1979 Multitech Micro Professor 1					*/
+	DRIVER(mpf1b)		/* 1979 Multitech Micro Professor 1B				*/
 
 	/* Telercas Oy */
 //	DRIVER(tmc1800)
@@ -903,11 +903,11 @@ XL/XE 16kB OS roms
 	DRIVER( tx0_8kw )	/* 1962 MIT TX-0 (8kw RAM)							*/
 
 	/* Luxor Datorer AB */
-//0128u7	DRIVER( abc80 )
-//0128u7	DRIVER( abc802 )
-//0128u7	DRIVER( abc800m )
-//0128u7	DRIVER( abc800c )
-//0128u7	DRIVER( abc806 )
+	DRIVER( abc80 )
+	DRIVER( abc802 )
+	DRIVER( abc800m )
+	DRIVER( abc800c )
+	DRIVER( abc806 )
 
 	/* Be Incorporated */
 	DRIVER( bebox )		/* BeBox Dual603-66									*/
@@ -937,12 +937,12 @@ XL/XE 16kB OS roms
 //	DRIVER( cybikoxt )	/* Cybiko Wireless Intertainment System - Xtreme     */
 
 	/* Dick Smith */
-//0128u7	DRIVER( super80 )
-//0128u7	DRIVER( super80d )
-//0128u7	DRIVER( super80e )
-//0128u7	DRIVER( super80m )
-//0128u7	DRIVER( super80r )
-//0128u7	DRIVER( super80v )
+	DRIVER( super80 )
+	DRIVER( super80d )
+	DRIVER( super80e )
+	DRIVER( super80m )
+	DRIVER( super80r )
+	DRIVER( super80v )
 
 	/* Galeb */
 	DRIVER( galeb )

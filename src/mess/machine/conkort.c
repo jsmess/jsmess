@@ -151,10 +151,11 @@ INLINE fast_t *get_safe_token_machine_fast(running_machine *machine)
 	return get_safe_token_fast(device);
 }
 
-static const device_config *get_floppy_image(int drive)
+static const device_config *get_floppy_image(running_machine *machine, int drive)
 {
 	return image_from_devtype_and_index(machine, IO_FLOPPY, drive);
 }
+
 
 /* Slow Controller */
 
@@ -254,10 +255,10 @@ static WRITE8_HANDLER( slow_ctrl_w )
 //	if (!BIT(data, 2)) wd17xx_set_drive(fdc,2);
 
 	/* motor enable */
-	floppy_drive_set_motor_state(get_floppy_image(0), !BIT(data, 3));
-	floppy_drive_set_motor_state(get_floppy_image(1), !BIT(data, 3));
-	floppy_drive_set_ready_state(get_floppy_image(0), 1, 1);
-	floppy_drive_set_ready_state(get_floppy_image(1), 1, 1);
+	floppy_drive_set_motor_state(get_floppy_image(space->machine, 0), !BIT(data, 3));
+	floppy_drive_set_motor_state(get_floppy_image(space->machine, 1), !BIT(data, 3));
+	floppy_drive_set_ready_state(get_floppy_image(space->machine, 0), 1, 1);
+	floppy_drive_set_ready_state(get_floppy_image(space->machine, 1), 1, 1);
 
 	/* disk side selection */
 	wd17xx_set_side(fdc,!BIT(data, 4));
@@ -386,6 +387,23 @@ static WRITE8_HANDLER( fast_status_w )
 	conkort->status = data;
 }
 
+static READ8_DEVICE_HANDLER(z80pio_alt_r)
+{
+	int channel = BIT(offset, 1);
+
+	return (offset & 1) ? z80pio_c_r(device, channel) : z80pio_d_r(device, channel);
+}
+
+static WRITE8_DEVICE_HANDLER(z80pio_alt_w)
+{
+	int channel = BIT(offset, 1);
+
+	if (offset & 1)
+		z80pio_c_w(device, channel, data);
+	else
+		z80pio_d_w(device, channel, data);
+}
+
 /* Memory Maps */
 
 // Slow Controller
@@ -476,28 +494,28 @@ INPUT_PORTS_END
 
 /* Z80 PIO */
 
-static Z80PIO_ON_INT_CHANGED( pio_interrupt )
+static void conkort_pio_interrupt(const device_config *device, int state)
 {
 	slow_t *conkort = get_safe_token_machine_slow(device->machine);
 
 	cpu_set_input_line(conkort->cpu, INPUT_LINE_IRQ0, state);
 }
 
-static READ8_DEVICE_HANDLER( pio_port_a_r )
+static READ8_DEVICE_HANDLER( conkort_pio_port_a_r )
 {
 	slow_t *conkort = get_safe_token_machine_slow(device->machine);
 
 	return conkort->data;
 }
 
-static WRITE8_DEVICE_HANDLER( pio_port_a_w )
+static WRITE8_DEVICE_HANDLER( conkort_pio_port_a_w )
 {
 	slow_t *conkort = get_safe_token_machine_slow(device->machine);
 
 	conkort->data = data;
 }
 
-static READ8_DEVICE_HANDLER( pio_port_b_r )
+static READ8_DEVICE_HANDLER( conkort_pio_port_b_r )
 {
 	/*
 
@@ -519,7 +537,7 @@ static READ8_DEVICE_HANDLER( pio_port_b_r )
 	return conkort->fdc_irq << 7;
 }
 
-static WRITE8_DEVICE_HANDLER( pio_port_b_w )
+static WRITE8_DEVICE_HANDLER( conkort_pio_port_b_w )
 {
 	/*
 
@@ -538,23 +556,21 @@ static WRITE8_DEVICE_HANDLER( pio_port_b_w )
 
 }
 
-static Z80PIO_ON_ARDY_CHANGED( pio_ardy_w )
+static void conkort_pio_ardy_w(const device_config *device, int state)
 {
 	slow_t *conkort = get_safe_token_machine_slow(device->machine);
 
 	conkort->pio_ardy = state;
 }
 
-static Z80PIO_INTERFACE( pio_intf )
+static const z80pio_interface conkort_pio_intf =
 {
-	NULL,						/* CPU (cannot use from within device) */
-	XTAL_4MHz/2,				/* chip clock */
-	pio_interrupt,				/* interrupt callback */
-	pio_port_a_r,				/* port A read callback */
-	pio_port_b_r,				/* port B read callback */
-	pio_port_a_w,				/* port A write callback */
-	pio_port_b_w,				/* port B write callback */
-	pio_ardy_w,					/* port A ready callback */
+	conkort_pio_interrupt,				/* interrupt callback */
+	conkort_pio_port_a_r,				/* port A read callback */
+	conkort_pio_port_b_r,				/* port B read callback */
+	conkort_pio_port_a_w,				/* port A write callback */
+	conkort_pio_port_b_w,				/* port B write callback */
+	conkort_pio_ardy_w,					/* port A ready callback */
 	NULL						/* port B ready callback */
 };
 
@@ -732,7 +748,7 @@ static MACHINE_DRIVER_START( luxor_55_10828 )
 	MDRV_CPU_IO_MAP(slow_io_map, 0)
 	MDRV_CPU_CONFIG(slow_daisy_chain)
 
-	MDRV_Z80PIO_ADD(CONKORT_Z80PIO_TAG, pio_intf)
+	MDRV_Z80PIO_ADD(CONKORT_Z80PIO_TAG, conkort_pio_intf)
 	MDRV_WD179X_ADD("wd179x", slow_wd17xx_interface )		
 MACHINE_DRIVER_END
 

@@ -123,10 +123,10 @@ static WRITE8_HANDLER(fd5_drive_control_w)
 
 	LOG(("fd5 drive state w: %02x\n",state));
 
-	floppy_drive_set_motor_state(image_from_devtype_and_index(machine, IO_FLOPPY, 0), state);
-	floppy_drive_set_motor_state(image_from_devtype_and_index(machine, IO_FLOPPY, 0), state);
-	floppy_drive_set_ready_state(image_from_devtype_and_index(machine, IO_FLOPPY, 1), 1,1);
-	floppy_drive_set_ready_state(image_from_devtype_and_index(machine, IO_FLOPPY, 1), 1,1);
+	floppy_drive_set_motor_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 0), state);
+	floppy_drive_set_motor_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 0), state);
+	floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 1), 1,1);
+	floppy_drive_set_ready_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, 1), 1,1);
 }
 
 static WRITE8_HANDLER(fd5_tc_w)
@@ -692,7 +692,7 @@ ROM_START(srdm5fd5)
 ROM_END
 
 static FLOPPY_OPTIONS_START( sordm5 )
-	FLOPPY_OPTION( sordm5, "dsk",			"Sord M5 disk image",	basicdsk_identify_default,	basicdsk_construct_default,
+	FLOPPY_OPTION( sordm5, "dsk", "Sord M5 disk image", basicdsk_identify_default, basicdsk_construct_default,
 		HEADS([1])
 		TRACKS([40])
 		SECTORS([18])
@@ -727,5 +727,5 @@ static SYSTEM_CONFIG_START(srdm5fd5)
 SYSTEM_CONFIG_END
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE         INPUT       INIT    CONFIG      COMPANY     FULLNAME */
-COMP( 1983, sordm5,		0,		0,		sord_m5,		sord_m5,	0,		sordm5,		"Sord",		"Sord M5", 0)
-COMP(1983, srdm5fd5,	sordm5,		0,		sord_m5_fd5,	sord_m5,	0,		srdm5fd5,	"Sord",		"Sord M5 + PI5 + FD5", 0 )
+COMP(1983, sordm5,	0,	0,	sord_m5,	sord_m5,	0,	sordm5,		"Sord",	"Sord M5", 0)
+COMP(1983, srdm5fd5,	sordm5,	0,	sord_m5_fd5,	sord_m5,	0,	srdm5fd5,	"Sord",	"Sord M5 + PI5 + FD5", 0 )

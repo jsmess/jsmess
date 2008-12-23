@@ -475,19 +475,19 @@ DRVLIBS = \
 	$(MESSOBJ)/vector06.a \
 	$(MESSOBJ)/votrax.a \
 	$(MESSOBJ)/shared.a \
+	$(MESSOBJ)/super80.a \
+	$(MESSOBJ)/acorn.a \
+	$(MESSOBJ)/luxor.a \
+	$(MESSOBJ)/mbee.a \
+	$(MESSOBJ)/multitch.a \
+	$(MESSOBJ)/nascom1.a \
+	$(MESSOBJ)/sord.a \
+	$(MESSOBJ)/veb.a \
 
-#	$(MESSOBJ)/acorn.a \
 #	$(MESSOBJ)/kramermc.a \
-#	$(MESSOBJ)/luxor.a \
-#	$(MESSOBJ)/mbee.a \
-#	$(MESSOBJ)/multitch.a \
-#	$(MESSOBJ)/nascom1.a \
-#	$(MESSOBJ)/sord.a \
-#	$(MESSOBJ)/super80.a \
 #	$(MESSOBJ)/tatung.a \
 #	$(MESSOBJ)/ti99.a \
 #	$(MESSOBJ)/thomson.a \
-#	$(MESSOBJ)/veb.a \
 #	$(MESSOBJ)/vtech.a \
 
 

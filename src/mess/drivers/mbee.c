@@ -62,6 +62,23 @@ static const device_config *cassette_device_image(running_machine *machine)
 	return device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" );
 }
 
+static READ8_DEVICE_HANDLER(z80pio_alt_r)
+{
+	int channel = BIT(offset, 1);
+
+	return (offset & 1) ? z80pio_c_r(device, channel) : z80pio_d_r(device, channel);
+}
+
+static WRITE8_DEVICE_HANDLER(z80pio_alt_w)
+{
+	int channel = BIT(offset, 1);
+
+	if (offset & 1)
+		z80pio_c_w(device, channel, data);
+	else
+		z80pio_d_w(device, channel, data);
+}
+
 static QUICKLOAD_LOAD( mbee );
 static Z80BIN_EXECUTE( mbee );
 
@@ -288,7 +305,7 @@ static PALETTE_INIT( mbeeic )
 
 static int mbee_vsync;
 
-static Z80PIO_ON_INT_CHANGED( pio_interrupt )
+static void mbee_pio_interrupt(const device_config *device, int state)
 {
 	cpu_set_input_line(device->machine->cpu[0], 0, state);
 }
@@ -338,9 +355,7 @@ static WRITE8_DEVICE_HANDLER( pio_port_b_w )
 
 static const z80pio_interface mbee_z80pio_intf =
 {
-	"main",
-	0,
-	pio_interrupt,	/* callback when change interrupt status */
+	mbee_pio_interrupt,	/* callback when change interrupt status */
 	NULL,
 	pio_port_b_r,
 	NULL,
@@ -357,7 +372,7 @@ static const z80_daisy_chain mbee_daisy_chain[] =
 
 static INTERRUPT_GEN( mbee_interrupt )
 {
-	/* once per frame, pulse the PIO B bit 7 */
+	/* once per frame, pulse the PIO B bit 7 - only needed for networked bees */
 	mbee_vsync = 1;
 }
 

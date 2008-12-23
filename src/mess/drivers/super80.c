@@ -347,9 +347,9 @@ static VIDEO_UPDATE( super80v )
 
 static UINT8 keylatch;
 
-static Z80PIO_ON_INT_CHANGED( pio_interrupt )
+static void super80_pio_interrupt(const device_config *device, int state)
 {
-	cpu_set_input_line( device->machine->cpu[0], 0, state ? ASSERT_LINE : CLEAR_LINE );
+//128u7	cputag_set_input_line(device->machine, "main", 0, state );
 }
 
 static WRITE8_DEVICE_HANDLER( pio_port_a_w )
@@ -372,11 +372,9 @@ static READ8_DEVICE_HANDLER( pio_port_b_r )
 	return data;
 };
 
-static Z80PIO_INTERFACE( pio_intf )
+static const z80pio_interface super80_pio_intf =
 {
-	"main",
-	0,
-	pio_interrupt,		/* callback when change interrupt status */
+	super80_pio_interrupt,		/* callback when change interrupt status */
 	NULL,
 	pio_port_b_r,
 	pio_port_a_w,
@@ -1024,7 +1022,7 @@ static MACHINE_DRIVER_START( super80 )
 
 	MDRV_MACHINE_RESET( super80 )
 
-	MDRV_Z80PIO_ADD( "z80pio", pio_intf )
+	MDRV_Z80PIO_ADD( "z80pio", super80_pio_intf )
 
 	MDRV_GFXDECODE(super80)
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -1078,7 +1076,7 @@ static MACHINE_DRIVER_START( super80v )
 
 	MDRV_MACHINE_RESET( super80 )
 
-	MDRV_Z80PIO_ADD( "z80pio", pio_intf )
+	MDRV_Z80PIO_ADD( "z80pio", super80_pio_intf )
 
 	MDRV_GFXDECODE(super80v)
 	MDRV_SCREEN_ADD("main", RASTER)

@@ -411,7 +411,7 @@ static void einstein_ctc_interrupt(const device_config *device, int state)
 	cpu_set_input_line(device->machine->cpu[0], 1, state);
 }
 
-static Z80PIO_ON_INT_CHANGED( einstein_pio_interrupt )
+static void einstein_pio_interrupt(const device_config *device, int state)
 {
 	logerror("pio irq state: %02x\n",state);
 	cpu_set_input_line(device->machine->cpu[0], 3, state);
@@ -431,8 +431,6 @@ static WRITE8_DEVICE_HANDLER(einstein_serial_receive_clock)
 
 static const z80ctc_interface einstein_ctc_intf =
 {
-	"main",
-	EINSTEIN_SYSTEM_CLOCK,
 	0,
 	einstein_ctc_interrupt,
 	einstein_serial_transmit_clock,
@@ -440,7 +438,7 @@ static const z80ctc_interface einstein_ctc_intf =
 	z80ctc_trg3_w
 };
 
-static Z80PIO_ON_ARDY_CHANGED( einstein_pio_ardy )
+static void einstein_pio_ardy(const device_config *device, int state)
 {
 	int handshake;
 
@@ -461,10 +459,8 @@ static WRITE8_DEVICE_HANDLER( einstein_pio_port_a_w )
 }
 
 
-static Z80PIO_INTERFACE( einstein_pio_intf )
+static const z80pio_interface einstein_pio_intf =
 {
-	"main",
-	0,
 	einstein_pio_interrupt,
 	NULL,
 	NULL,
@@ -1727,7 +1723,7 @@ static MACHINE_DRIVER_START( einstein )
 	MDRV_MACHINE_RESET( einstein )
 
 	MDRV_Z80PIO_ADD( "z80pio", einstein_pio_intf )
-	MDRV_Z80CTC_ADD( "z80ctc", einstein_ctc_intf )
+	MDRV_Z80CTC_ADD( "z80ctc", EINSTEIN_SYSTEM_CLOCK, einstein_ctc_intf )
 	MDRV_DEVICE_ADD( "keyboard_daisy", DEVICE_GET_INFO_NAME( einstein_daisy ) )
 	MDRV_DEVICE_ADD( "adc_daisy", DEVICE_GET_INFO_NAME( einstein_daisy ) )
 
