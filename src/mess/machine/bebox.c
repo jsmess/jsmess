@@ -91,7 +91,6 @@
 #include "driver.h"
 #include "memconv.h"
 #include "includes/bebox.h"
-#include "deprecat.h"
 
 /* Components */
 #include "video/pc_vga.h"

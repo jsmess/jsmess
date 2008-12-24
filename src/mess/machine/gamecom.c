@@ -1,6 +1,5 @@
 
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/gamecom.h"
 #include "cpu/sm8500/sm8500.h"
 #include "image.h"

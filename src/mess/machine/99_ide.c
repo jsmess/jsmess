@@ -18,7 +18,6 @@
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/idectrl.h"
 #include "machine/rtc65271.h"
 #include "ti99_4x.h"
