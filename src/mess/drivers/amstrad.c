@@ -2947,7 +2947,7 @@ static const cassette_config amstrad_cassette_config =
 
 static MACHINE_DRIVER_START( amstrad )
 	/* Machine hardware */
-	MDRV_CPU_ADD("main", Z80, 4000000)
+	MDRV_CPU_ADD("main", Z80, XTAL_16MHz / 4)
 	MDRV_CPU_PROGRAM_MAP(amstrad_mem, 0)
 	MDRV_CPU_IO_MAP(amstrad_io, 0)
 
@@ -2976,7 +2976,7 @@ static MACHINE_DRIVER_START( amstrad )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("cassette", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MDRV_SOUND_ADD("ay", AY8912, 1000000)
+	MDRV_SOUND_ADD("ay", AY8912, XTAL_16MHz / 16)
 	MDRV_SOUND_CONFIG(ay8912_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -3045,7 +3045,7 @@ static MACHINE_DRIVER_START( aleste )
 	MDRV_IMPORT_FROM(amstrad)
 	MDRV_MACHINE_RESET(aleste)
 
-	MDRV_SOUND_REPLACE("ay", AY8910, 1000000)
+	MDRV_SOUND_REPLACE("ay", AY8910, XTAL_16MHz / 16)
 	MDRV_SOUND_CONFIG(ay8912_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MDRV_PALETTE_LENGTH(32+64)
