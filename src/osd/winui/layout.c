@@ -166,6 +166,7 @@ const ICONDATA g_iconData[] =
 };
 
 const TCHAR g_szPlayGameString[] = TEXT("&Play %s");
+const char g_szGameCountString[] = "%d games";
 const char g_szHistoryFileName[] = "history.dat";
 const char g_szMameInfoFileName[] = "mameinfo.dat";
 

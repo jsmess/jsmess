@@ -633,6 +633,7 @@ static char *GameInfoCPU(UINT nIndex)
 #endif
 	/* Free the structure */
 	machine_config_free(config);
+
 	return buf;
 }
 

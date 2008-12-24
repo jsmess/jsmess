@@ -237,6 +237,7 @@ static int MIN_HEIGHT = DBU_MIN_HEIGHT;
  ***************************************************************************/
 extern const ICONDATA g_iconData[];
 extern const TCHAR g_szPlayGameString[];
+extern const char g_szGameCountString[];
 
 typedef struct _play_options play_options;
 struct _play_options
@@ -3102,7 +3103,7 @@ static void UpdateStatusBar()
 	}
 
 	/* Show number of games in the current 'View' in the status bar */
-	SetStatusBarTextF(2, "%d %s", games_shown, GAMESNOUN);
+	SetStatusBarTextF(2, g_szGameCountString, games_shown);
 
 	i = Picker_GetSelectedItem(hwndList);
 
