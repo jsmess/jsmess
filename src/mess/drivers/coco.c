@@ -639,6 +639,26 @@ static const cassette_config coco_cassette_config =
 	CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED
 };
 
+static const cartslot_interface coco_cartslot =
+{
+	"ccc,rom",
+	0,
+	NULL,
+	DEVICE_IMAGE_LOAD_NAME(coco_rom),
+	DEVICE_IMAGE_UNLOAD_NAME(coco_rom),
+	NULL
+};
+
+static const cartslot_interface coco3_cartslot =
+{
+	"ccc,rom",
+	0,
+	NULL,
+	DEVICE_IMAGE_LOAD_NAME(coco3_rom),
+	DEVICE_IMAGE_UNLOAD_NAME(coco3_rom),
+	NULL
+};
+
 static MACHINE_DRIVER_START( dragon32 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 MHz */
@@ -669,6 +689,8 @@ static MACHINE_DRIVER_START( dragon32 )
 	MDRV_WD179X_ADD("wd179x", dragon_wd17xx_interface )
 	
 	MDRV_SAM6883_ADD("sam", coco_sam_intf)
+	
+	MDRV_CARTSLOT_ADD("cart", coco_cartslot)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dragon64 )
@@ -705,6 +727,8 @@ static MACHINE_DRIVER_START( dragon64 )
 	MDRV_WD179X_ADD("wd179x", dragon_wd17xx_interface )
 	
 	MDRV_SAM6883_ADD("sam", coco_sam_intf)
+	
+	MDRV_CARTSLOT_ADD("cart", coco_cartslot)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( d64plus )
@@ -741,6 +765,8 @@ static MACHINE_DRIVER_START( d64plus )
 	MDRV_WD179X_ADD("wd179x", dragon_wd17xx_interface )
 	
 	MDRV_SAM6883_ADD("sam", coco_sam_intf)
+	
+	MDRV_CARTSLOT_ADD("cart", coco_cartslot)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dgnalpha )
@@ -780,6 +806,8 @@ static MACHINE_DRIVER_START( dgnalpha )
 	MDRV_WD179X_ADD("wd179x", dgnalpha_wd17xx_interface )
 	
 	MDRV_SAM6883_ADD("sam", coco_sam_intf)
+	
+	MDRV_CARTSLOT_ADD("cart", coco_cartslot)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( tanodr64 )
@@ -816,6 +844,8 @@ static MACHINE_DRIVER_START( tanodr64 )
 	MDRV_WD1773_ADD("wd1773", coco_wd17xx_interface )	
 	
 	MDRV_SAM6883_ADD("sam", coco_sam_intf)
+	
+	MDRV_CARTSLOT_ADD("cart", coco_cartslot)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco )
@@ -853,6 +883,8 @@ static MACHINE_DRIVER_START( coco )
 	MDRV_WD1773_ADD("wd1773", coco_wd17xx_interface )	
 	
 	MDRV_SAM6883_ADD("sam", coco_sam_intf)
+	
+	MDRV_CARTSLOT_ADD("cart", coco_cartslot)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco2 )
@@ -890,6 +922,8 @@ static MACHINE_DRIVER_START( coco2 )
 	MDRV_WD1773_ADD("wd1773", coco_wd17xx_interface )	
 	
 	MDRV_SAM6883_ADD("sam", coco_sam_intf)
+	
+	MDRV_CARTSLOT_ADD("cart", coco_cartslot)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco2b )
@@ -927,6 +961,8 @@ static MACHINE_DRIVER_START( coco2b )
 	MDRV_WD1773_ADD("wd1773", coco_wd17xx_interface )	
 	
 	MDRV_SAM6883_ADD("sam", coco_sam_intf)
+	
+	MDRV_CARTSLOT_ADD("cart", coco_cartslot)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco3 )
@@ -974,6 +1010,8 @@ static MACHINE_DRIVER_START( coco3 )
 	MDRV_WD1773_ADD("wd1773", coco_wd17xx_interface )	
 	
 	MDRV_SAM6883_GIME_ADD("sam", coco3_sam_intf)
+	
+	MDRV_CARTSLOT_ADD("cart", coco3_cartslot)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco3p )
@@ -1115,48 +1153,6 @@ static void coco_floppy_getinfo(const mess_device_class *devclass, UINT32 state,
 	}
 }
 
-
-
-static void coco_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(coco_rom); break;
-		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(coco_rom); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "ccc,rom"); break;
-
-		default:										cartslot_device_getinfo(devclass, state, info); break;
-	}
-}
-
-
-
-static void coco3_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(coco3_rom); break;
-		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(coco3_rom); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "ccc,rom"); break;
-
-		default:										cartslot_device_getinfo(devclass, state, info); break;
-	}
-}
-
-
-
 /*************************************
  *
  *  CoCo sysconfig structures
@@ -1170,14 +1166,12 @@ SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START( generic_coco12 )
 	CONFIG_IMPORT_FROM( generic_coco )
-	CONFIG_DEVICE( coco_cartslot_getinfo )
 SYSTEM_CONFIG_END
 
 /* These have to be split up, as the CoCo has a bitbanger */
 /* where the Dragon has a paralell printer port */
 static SYSTEM_CONFIG_START( generic_dragon )
 	CONFIG_DEVICE( coco_floppy_getinfo )
-	CONFIG_DEVICE( coco_cartslot_getinfo )
 SYSTEM_CONFIG_END
 
 
@@ -1211,7 +1205,6 @@ SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(coco3)
 	CONFIG_IMPORT_FROM	( generic_coco )
-	CONFIG_DEVICE( coco3_cartslot_getinfo )
 	CONFIG_RAM			(128 * 1024)
 	CONFIG_RAM_DEFAULT	(512 * 1024)
 	CONFIG_RAM			(2048 * 1024)

@@ -13,7 +13,7 @@
 
 #include "video/mc6845.h"
 #include "machine/6526cia.h"
-
+#include "devices/cartslot.h"
 
 /*----------- defined in machine/cbmb.c -----------*/
 
@@ -35,7 +35,7 @@ DRIVER_INIT( cbm600hu );
 DRIVER_INIT( cbm700 );
 MACHINE_RESET( cbmb );
 
-void cbmb_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
+extern const cartslot_interface cbmb_cartslot;
 
 
 /*----------- defined in video/cbmb.c -----------*/

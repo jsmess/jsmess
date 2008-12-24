@@ -302,6 +302,46 @@ static VIDEO_START(sega_store_315_5124) {
 	smsvdp_video_init( machine, &config_store );
 }
 
+static const cartslot_interface sms_cartslot =
+{
+	"sms,bin",
+	0,
+	DEVICE_START_NAME(sms_cart),
+	DEVICE_IMAGE_LOAD_NAME(sms_cart),
+	NULL,
+	NULL
+};
+
+static const cartslot_interface sg1000m3_cartslot =
+{
+	"sms,bin",
+	1,
+	DEVICE_START_NAME(sms_cart),
+	DEVICE_IMAGE_LOAD_NAME(sms_cart),
+	NULL,
+	NULL
+};
+
+static const cartslot_interface smssdisp_cartslot =
+{
+	"sms,bin",
+	1,
+	DEVICE_START_NAME(sms_cart),
+	DEVICE_IMAGE_LOAD_NAME(sms_cart),
+	NULL,
+	NULL
+};
+
+static const cartslot_interface gamegear_cartslot =
+{
+	"gg,bin",
+	1,
+	DEVICE_START_NAME(sms_cart),
+	DEVICE_IMAGE_LOAD_NAME(sms_cart),
+	NULL,
+	NULL
+};
+
 static MACHINE_DRIVER_START(sms1ntsc)
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, XTAL_53_693175MHz/15)
@@ -328,6 +368,8 @@ static MACHINE_DRIVER_START(sms1ntsc)
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("smsiii", SMSIII, XTAL_53_693175MHz/15)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	
+	MDRV_CARTSLOT_ADD("cart1", sms_cartslot )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START(sms2ntsc)
@@ -345,6 +387,11 @@ static MACHINE_DRIVER_START(smssdisp)
 	/* Both CPUs seem to communicate with the VDP etc? */
 	MDRV_CPU_IO_MAP(sms_io, 0)
 
+	MDRV_CARTSLOT_MODIFY("cart1", smssdisp_cartslot )
+	MDRV_CARTSLOT_ADD("cart2", smssdisp_cartslot )
+	MDRV_CARTSLOT_ADD("cart3", smssdisp_cartslot )
+	MDRV_CARTSLOT_ADD("cart4", smssdisp_cartslot )
+	MDRV_CARTSLOT_ADD("cart5", smssdisp_cartslot )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START(sms1pal)
@@ -373,6 +420,8 @@ static MACHINE_DRIVER_START(sms1pal)
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("smsiii", SMSIII, MASTER_CLOCK_PAL/15)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	
+	MDRV_CARTSLOT_ADD("cart1", sms_cartslot )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START(sms2pal)
@@ -385,6 +434,12 @@ static MACHINE_DRIVER_START(smsfm)
 
 	MDRV_SOUND_ADD("ym2413", YM2413, XTAL_53_693175MHz/15)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START(sg1000m3)
+	MDRV_IMPORT_FROM(smsfm)
+
+	MDRV_CARTSLOT_MODIFY("cart1", sg1000m3_cartslot )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START(sms2fm)
@@ -419,6 +474,8 @@ static MACHINE_DRIVER_START(gamegear)
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("gamegear", GAMEGEAR, XTAL_53_693175MHz/15)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	
+	MDRV_CARTSLOT_ADD("cart1", gamegear_cartslot )
 MACHINE_DRIVER_END
 
 ROM_START(sms1)
@@ -510,72 +567,6 @@ ROM_END
 
 #define rom_gamegeaj rom_gamegear
 
-static void sms_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cartslot */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:				info->i = 1; break;
-		case MESS_DEVINFO_INT_MUST_BE_LOADED:		info->i = 0; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_START:				info->start = DEVICE_START_NAME(sms_cart); break;
-		case MESS_DEVINFO_PTR_LOAD:				info->load = DEVICE_IMAGE_LOAD_NAME(sms_cart); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:		strcpy(info->s = device_temp_str(), "sms,bin"); break;
-
-		default:					cartslot_device_getinfo(devclass, state, info); break;
-	}
-}
-
-static SYSTEM_CONFIG_START(sms)
-	CONFIG_DEVICE(sms_cartslot_getinfo)
-SYSTEM_CONFIG_END
-
-
-static void sg1000m3_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info) {
-	/* cartslot */
-	switch(state) {
-		case MESS_DEVINFO_INT_MUST_BE_LOADED:		info->i = 1; break;
-		default:					sms_cartslot_getinfo(devclass, state, info); break;
-	}
-}
-
-static SYSTEM_CONFIG_START(sg1000m3)
-	CONFIG_DEVICE(sg1000m3_cartslot_getinfo)
-SYSTEM_CONFIG_END
-
-static void smssdisp_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info) {
-	switch(state) {
-		case MESS_DEVINFO_INT_COUNT:				info->i = 5; break;
-		case MESS_DEVINFO_INT_MUST_BE_LOADED:	info->i = 1; break;
-		default:					sms_cartslot_getinfo(devclass, state, info); break;
-	}
-}
-
-static SYSTEM_CONFIG_START(smssdisp)
-	CONFIG_DEVICE(smssdisp_cartslot_getinfo)
-SYSTEM_CONFIG_END
-
-static void gamegear_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	switch(state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_INT_COUNT:				info->i = 1; break;
-		case MESS_DEVINFO_INT_MUST_BE_LOADED:		info->i = 1; break;
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:		strcpy(info->s = device_temp_str(), "gg,bin"); break;
-
-		default:					sms_cartslot_getinfo(devclass, state, info); break;
-	}
-}
-
-static SYSTEM_CONFIG_START(gamegear)
-	CONFIG_DEVICE(gamegear_cartslot_getinfo)
-SYSTEM_CONFIG_END
-
 /***************************************************************************
 
   Game driver(s)
@@ -622,14 +613,14 @@ SYSTEM_CONFIG_END
 ***************************************************************************/
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT    CONFIG      COMPANY     FULLNAME                            FLAGS */
-CONS( 1984, sg1000m3,   sms,        0,      smsfm,      sms,    0,      sg1000m3,   "Sega",     "SG-1000 Mark III",                 FLAG_REGION_JAPAN | FLAG_FM )
-CONS( 1986, sms1,       sms,        0,      sms1ntsc,   sms,    0,      sms,        "Sega",     "Master System I",                  FLAG_BIOS_FULL )
-CONS( 1986, sms1pal,    sms,        0,      sms1pal,    sms,    0,      sms,        "Sega",     "Master System I (PAL)" ,           FLAG_BIOS_FULL )
-CONS( 1986, smssdisp,   sms,        0,      smssdisp,   sms,    0,      smssdisp,   "Sega",     "Master System Store Display Unit", GAME_NOT_WORKING )
-CONS( 1987, smsj,       sms,        0,      smsfm,      sms,    0,      sms,        "Sega",     "Master System (Japan)",            FLAG_REGION_JAPAN | FLAG_BIOS_2000 | FLAG_FM )
-CONS( 1990, sms,        0,          0,      sms2ntsc,   sms,    0,      sms,        "Sega",     "Master System II",                 FLAG_BIOS_FULL )
-CONS( 1990, smspal,     sms,        0,      sms2pal,    sms,    0,      sms,        "Sega",     "Master System II (PAL)",           FLAG_BIOS_FULL )
-CONS( 1990, sms2kr,     sms,        0,      sms2fm,     sms,    0,      sms,        "Samsung",  "Gam*Boy II (Korea)",               FLAG_REGION_JAPAN | FLAG_BIOS_FULL | FLAG_FM )
+CONS( 1984, sg1000m3,   sms,        0,      sg1000m3,   sms,    0,      0,   	  "Sega",     "SG-1000 Mark III",                 FLAG_REGION_JAPAN | FLAG_FM )
+CONS( 1986, sms1,       sms,        0,      sms1ntsc,   sms,    0,      0,        "Sega",     "Master System I",                  FLAG_BIOS_FULL )
+CONS( 1986, sms1pal,    sms,        0,      sms1pal,    sms,    0,      0,        "Sega",     "Master System I (PAL)" ,           FLAG_BIOS_FULL )
+CONS( 1986, smssdisp,   sms,        0,      smssdisp,   sms,    0,      0,   	  "Sega",     "Master System Store Display Unit", GAME_NOT_WORKING )
+CONS( 1987, smsj,       sms,        0,      smsfm,      sms,    0,      0,        "Sega",     "Master System (Japan)",            FLAG_REGION_JAPAN | FLAG_BIOS_2000 | FLAG_FM )
+CONS( 1990, sms,        0,          0,      sms2ntsc,   sms,    0,      0,        "Sega",     "Master System II",                 FLAG_BIOS_FULL )
+CONS( 1990, smspal,     sms,        0,      sms2pal,    sms,    0,      0,        "Sega",     "Master System II (PAL)",           FLAG_BIOS_FULL )
+CONS( 1990, sms2kr,     sms,        0,      sms2fm,     sms,    0,      0,        "Samsung",  "Gam*Boy II (Korea)",               FLAG_REGION_JAPAN | FLAG_BIOS_FULL | FLAG_FM )
 
-CONS( 1990, gamegear,   0,          sms,    gamegear,   gg,     0,      gamegear,   "Sega",     "Game Gear (Europe/America)",       FLAG_GAMEGEAR )
-CONS( 1990, gamegeaj,   gamegear,   0,      gamegear,   gg,     0,      gamegear,   "Sega",     "Game Gear (Japan)",                FLAG_REGION_JAPAN | FLAG_GAMEGEAR | FLAG_BIOS_0400 )
+CONS( 1990, gamegear,   0,          sms,    gamegear,   gg,     0,      0,  	  "Sega",     "Game Gear (Europe/America)",       FLAG_GAMEGEAR )
+CONS( 1990, gamegeaj,   gamegear,   0,      gamegear,   gg,     0,      0,   	  "Sega",     "Game Gear (Japan)",                FLAG_REGION_JAPAN | FLAG_GAMEGEAR | FLAG_BIOS_0400 )

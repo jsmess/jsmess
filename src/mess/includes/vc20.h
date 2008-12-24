@@ -8,6 +8,7 @@
 #define VC20_H_
 
 #include "machine/6522via.h"
+#include "devices/cartslot.h"
 
 #define VC20ADDR2VIC6560ADDR(a) (((a) > 0x8000) ? ((a) & 0x1fff) : ((a) | 0x2000))
 #define VIC6560ADDR2VC20ADDR(a) (((a) > 0x2000) ? ((a) & 0x1fff) : ((a) | 0x8000))
@@ -45,6 +46,6 @@ DRIVER_INIT( vic20v );
 MACHINE_RESET( vic20 );
 INTERRUPT_GEN( vic20_frame_interrupt );
 
-void vic20_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
+extern const cartslot_interface vic20_cartslot;
 
 #endif /* VC20_H_ */

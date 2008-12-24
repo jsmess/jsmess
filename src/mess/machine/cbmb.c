@@ -521,19 +521,13 @@ static DEVICE_IMAGE_LOAD(cbmb_cart)
 	return INIT_PASS;
 }
 
-void cbmb_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+
+const cartslot_interface cbmb_cartslot =
 {
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:				info->i = 2; break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:		strcpy(info->s = device_temp_str(), "crt,10,20,40,60"); break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:					info->load = DEVICE_IMAGE_LOAD_NAME(cbmb_cart); break;
-
-		default:									cartslot_device_getinfo(devclass, state, info); break;
-	}
-}
+	"crt,10,20,40,60",
+	0,
+	NULL,
+	DEVICE_IMAGE_LOAD_NAME(cbmb_cart),
+	NULL,
+	NULL
+};

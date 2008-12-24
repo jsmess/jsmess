@@ -185,6 +185,35 @@ static const via6522_interface aim65_user_via =
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 };
 
+static const cartslot_interface aim65_cartslot_1 =
+{
+	"z26",
+	0,
+	NULL,
+	NULL,
+	NULL,
+	NULL
+};
+
+static const cartslot_interface aim65_cartslot_2 =
+{
+	"z25",
+	0,
+	NULL,
+	NULL,
+	NULL,
+	NULL
+};
+
+static const cartslot_interface aim65_cartslot_3 =
+{
+	"z24",
+	0,
+	NULL,
+	NULL,
+	NULL,
+	NULL
+};
 
 /******************************************************************************
  Machine Drivers
@@ -212,6 +241,10 @@ static MACHINE_DRIVER_START( aim65 )
 	MDRV_RIOT6532_ADD("riot", AIM65_CLOCK, aim65_riot_interface)
 	MDRV_VIA6522_ADD("via6522_0", 0, aim65_system_via)
 	MDRV_VIA6522_ADD("via6522_1", 0, aim65_user_via)
+
+	MDRV_CARTSLOT_ADD("cart1", aim65_cartslot_1 )
+	MDRV_CARTSLOT_ADD("cart2", aim65_cartslot_2 )
+	MDRV_CARTSLOT_ADD("cart3", aim65_cartslot_3 )	
 MACHINE_DRIVER_END
 
 
@@ -223,9 +256,9 @@ MACHINE_DRIVER_END
 
 ROM_START( aim65 )
 	ROM_REGION(0x10000, "main", 0)
-	ROM_CART_LOAD(0, "z26", 0xb000, 0x1000, ROM_OPTIONAL)
-	ROM_CART_LOAD(1, "z25", 0xc000, 0x1000, ROM_OPTIONAL)
-	ROM_CART_LOAD(2, "z24", 0xd000, 0x1000, ROM_OPTIONAL)
+	ROM_CART_LOAD("cart1", 0xb000, 0x1000, ROM_OPTIONAL)
+	ROM_CART_LOAD("cart2", 0xc000, 0x1000, ROM_OPTIONAL)
+	ROM_CART_LOAD("cart3", 0xd000, 0x1000, ROM_OPTIONAL)
 	ROM_SYSTEM_BIOS(0, "aim65",  "Rockwell AIM-65")
 	ROMX_LOAD("aim65mon.z23", 0xe000, 0x1000, CRC(90e44afe) SHA1(78e38601edf6bfc787b58750555a636b0cf74c5c), ROM_BIOS(1))
 	ROMX_LOAD("aim65mon.z22", 0xf000, 0x1000, CRC(d01914b0) SHA1(e5b5ddd4cd43cce073a718ee4ba5221f2bc84eaf), ROM_BIOS(1))
@@ -261,7 +294,6 @@ ROM_END
 
 
 static SYSTEM_CONFIG_START( aim65 )
-	CONFIG_DEVICE(cartslot_device_getinfo)
 	CONFIG_RAM_DEFAULT(4 * 1024) /* 4KB RAM */
 	CONFIG_RAM        (3 * 1024) /* 3KB RAM */
 	CONFIG_RAM        (2 * 1024) /* 2KB RAM */

@@ -485,10 +485,19 @@ static const custom_sound_interface svision_sound_interface =
 	svision_custom_start
 };
 
+static const cartslot_interface svision_cartslot =
+{
+	"bin,ws,sv",
+	0,
+	NULL,
+	NULL,
+	NULL,
+	NULL
+};
 
 static MACHINE_DRIVER_START( svision )
 	/* basic machine hardware */
-	 MDRV_CPU_ADD("main", M65C02, 4000000)        /* ? stz used! speed? */
+	MDRV_CPU_ADD("main", M65C02, 4000000)        /* ? stz used! speed? */
 	MDRV_CPU_PROGRAM_MAP(svision_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", svision_frame_int)
 
@@ -512,6 +521,8 @@ static MACHINE_DRIVER_START( svision )
 	MDRV_SOUND_CONFIG(svision_sound_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
+	
+	MDRV_CARTSLOT_ADD("cart", svision_cartslot )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( svisionp )
@@ -545,17 +556,14 @@ MACHINE_DRIVER_END
 
 ROM_START(svision)
 	ROM_REGION(0x20000, "user1", 0)
-	ROM_CART_LOAD(0, "bin,ws,sv", 0x0000, 0x20000, ROM_MIRROR)
+	ROM_CART_LOAD("cart", 0x0000, 0x20000, ROM_MIRROR)
 ROM_END
+
 
 #define rom_svisions rom_svision
 #define rom_svisionn rom_svision
 #define rom_svisionp rom_svision
 #define rom_tvlinkp rom_svision
-
-static SYSTEM_CONFIG_START(svision)
-	CONFIG_DEVICE(cartslot_device_getinfo)
-SYSTEM_CONFIG_END
 
 /***************************************************************************
 
@@ -565,12 +573,12 @@ SYSTEM_CONFIG_END
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        CONFIG      COMPANY     FULLNAME */
 // marketed under a ton of firms and names
-CONS(1992,	svision,	0,	0,	svision,	svision,	svision,	svision,	"Watara",	"Supervision", 0)
+CONS(1992,	svision,	0,	0,	svision,	svision,	svision,	0,	"Watara",	"Supervision", 0)
 // svdual 2 connected via communication port
-CONS( 1992, svisions,      svision,          0,svision,  svisions,    svisions,   svision, "Watara", "Super Vision (PeT Communication Simulation)", 0 )
+CONS( 1992, svisions,      svision,          0,svision,  svisions,    svisions,   0, "Watara", "Super Vision (PeT Communication Simulation)", 0 )
 
-CONS( 1993, svisionp,      svision,          0,svisionp,  svision,    svision,   svision, "Watara", "Super Vision (PAL TV Link Colored)", 0 )
-CONS( 1993, svisionn,      svision,          0,svisionn,  svision,    svision,   svision, "Watara", "Super Vision (NTSC TV Link Colored)", 0 )
+CONS( 1993, svisionp,      svision,          0,svisionp,  svision,    svision,   0, "Watara", "Super Vision (PAL TV Link Colored)", 0 )
+CONS( 1993, svisionn,      svision,          0,svisionn,  svision,    svision,   0, "Watara", "Super Vision (NTSC TV Link Colored)", 0 )
 // svtvlink (2 supervisions)
 // tvlink (pad supervision simulated)
-CONS( 199?, tvlinkp,      svision,          0,tvlinkp,  svision,    svision,   svision, "Watara", "TV Link PAL", 0 )
+CONS( 199?, tvlinkp,      svision,          0,tvlinkp,  svision,    svision,   0, "Watara", "TV Link PAL", 0 )

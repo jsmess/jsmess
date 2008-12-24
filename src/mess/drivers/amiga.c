@@ -270,6 +270,16 @@ static const cia6526_interface cia_1_cdtv_intf =
 	}
 };
 
+static const cartslot_interface amiga_cartslot =
+{
+	"rom,bin",
+	0,
+	NULL,
+	NULL,
+	NULL,
+	NULL
+};
+
 static MACHINE_DRIVER_START( ntsc )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M68000, AMIGA_68000_NTSC_CLOCK)
@@ -337,7 +347,13 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( a1000n )
 	MDRV_IMPORT_FROM(ntsc)
 	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_PROGRAM_MAP(a1000_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(a1000_mem, 0)	
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( a500n )
+	MDRV_IMPORT_FROM(ntsc)
+	MDRV_CARTSLOT_ADD("cart", amiga_cartslot)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pal )
@@ -359,7 +375,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( a1000p )
 	MDRV_IMPORT_FROM(pal)
 	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_PROGRAM_MAP(a1000_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(a1000_mem, 0)	
 MACHINE_DRIVER_END
 
 /***************************************************************************
@@ -564,7 +580,7 @@ static DRIVER_INIT( cdtv )
 
 #define AMIGA_CART			\
 	ROM_REGION16_BE(0x080000, "user2", 0)	\
-	ROM_CART_LOAD(0, "rom,bin", 0x0000, 0x080000, ROM_NOMIRROR | ROM_FILL_FF | ROM_OPTIONAL)	\
+	ROM_CART_LOAD("cart", 0x0000, 0x080000, ROM_NOMIRROR | ROM_FILL_FF | ROM_OPTIONAL)	\
 
 
 
@@ -598,11 +614,6 @@ ROM_END
 ***************************************************************************/
 
 static SYSTEM_CONFIG_START(amiga)
-	CONFIG_DEVICE(cartslot_device_getinfo)
-	CONFIG_DEVICE(amiga_floppy_getinfo)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START(a1000)
 	CONFIG_DEVICE(amiga_floppy_getinfo)
 SYSTEM_CONFIG_END
 
@@ -611,8 +622,8 @@ SYSTEM_CONFIG_END
 ***************************************************************************/
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY                             FULLNAME                 FLAGS */
-COMP( 1985, a1000n, 0,      0,      a1000n, amiga,  amiga,  a1000,  "Commodore Business Machines Co.",  "Amiga 1000 (NTSC)",     GAME_IMPERFECT_GRAPHICS )
-COMP( 1985, a1000p, a1000n, 0,      a1000p, amiga,  amiga,  a1000,  "Commodore Business Machines Co.",  "Amiga 1000 (PAL)",      GAME_IMPERFECT_GRAPHICS )
-COMP( 1987, a500n,  0,      0,      ntsc,   amiga,  amiga,  amiga,  "Commodore Business Machines Co.",  "Amiga 500 (NTSC, OCS)", GAME_IMPERFECT_GRAPHICS )
+COMP( 1985, a1000n, 0,      0,      a1000n, amiga,  amiga,  amiga,  "Commodore Business Machines Co.",  "Amiga 1000 (NTSC)",     GAME_IMPERFECT_GRAPHICS )
+COMP( 1985, a1000p, a1000n, 0,      a1000p, amiga,  amiga,  amiga,  "Commodore Business Machines Co.",  "Amiga 1000 (PAL)",      GAME_IMPERFECT_GRAPHICS )
+COMP( 1987, a500n,  0,      0,      a500n,  amiga,  amiga,  amiga,  "Commodore Business Machines Co.",  "Amiga 500 (NTSC, OCS)", GAME_IMPERFECT_GRAPHICS )
 COMP( 1987, a500p,  a500n,  0,      pal,    amiga,  amiga,  amiga,  "Commodore Business Machines Co.",  "Amiga 500 (PAL, OCS)",  GAME_IMPERFECT_GRAPHICS )
 COMP( 1991, cdtv,   0,      0,      cdtv,   cdtv,   cdtv,   0,      "Commodore Business Machines Co.",  "CDTV (NTSC)",           GAME_IMPERFECT_GRAPHICS )

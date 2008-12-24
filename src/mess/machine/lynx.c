@@ -1981,21 +1981,12 @@ static DEVICE_IMAGE_LOAD( lynx_cart )
 	return INIT_PASS;
 }
 
-void lynx_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+const cartslot_interface lynx_cartslot =
 {
-	/* cartslot */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(lynx_cart); break;
-		case MESS_DEVINFO_PTR_PARTIAL_HASH:					info->partialhash = lynx_partialhash; break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "lnx,lyx"); break;
-
-		default:										cartslot_device_getinfo(devclass, state, info); break;
-	}
-}
+	"lnx,ly",
+	0,
+	NULL,
+	DEVICE_IMAGE_LOAD_NAME(lynx_cart),
+	NULL,
+	lynx_partialhash
+};

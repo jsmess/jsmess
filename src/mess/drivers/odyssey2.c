@@ -165,6 +165,17 @@ static const sp0256_interface the_voice_sp0256 = {
 	0
 };
 
+static const cartslot_interface odyssey2_cartslot =
+{
+	"bin,rom",
+	1,
+	NULL,
+	NULL,
+	NULL,
+	NULL
+	//case MESS_DEVINFO_PTR_VERIFY:						info->imgverify = odyssey2_cart_verify; break;
+};
+
 static MACHINE_DRIVER_START( odyssey2 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", I8048, ( ( XTAL_7_15909MHz * 3 ) / 4 ) )
@@ -196,6 +207,8 @@ static MACHINE_DRIVER_START( odyssey2 )
 	MDRV_SOUND_CONFIG(the_voice_sp0256)
 	/* The Voice uses a speaker with its own volume control so the relative volumes to use are subjective, these sound good */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	
+	MDRV_CARTSLOT_ADD("cart", odyssey2_cartslot)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( videopac )
@@ -228,6 +241,8 @@ static MACHINE_DRIVER_START( videopac )
 	MDRV_SOUND_ADD("sp0256_speech", SP0256, 3120000)
 	MDRV_SOUND_CONFIG(the_voice_sp0256)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	
+	MDRV_CARTSLOT_ADD("cart", odyssey2_cartslot)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( g7400 )
@@ -256,6 +271,8 @@ static MACHINE_DRIVER_START( g7400 )
 	MDRV_SOUND_ADD("custom", CUSTOM, 3547000)
 	MDRV_SOUND_CONFIG(odyssey2_sound_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	
+	MDRV_CARTSLOT_ADD("cart", odyssey2_cartslot)
 MACHINE_DRIVER_END
 
 ROM_START (odyssey2)
@@ -264,7 +281,7 @@ ROM_START (odyssey2)
     ROM_REGION(0x100, "gfx1", ROMREGION_ERASEFF)
 
     ROM_REGION(0x4000, "user1", 0)
-	ROM_CART_LOAD(0, "bin,rom", 0x0000, 0x4000, ROM_MIRROR)
+	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_MIRROR)
 
 	ROM_REGION( 0x10000, "sp0256_speech", 0 )
 	/* SP0256B-019 Speech chip w/2KiB mask rom */
@@ -293,7 +310,7 @@ ROM_START (videopac)
 	ROM_REGION(0x100, "gfx1", ROMREGION_ERASEFF)
 
 	ROM_REGION(0x4000, "user1", 0)
-	ROM_CART_LOAD(0, "bin,rom", 0x0000, 0x4000, ROM_MIRROR)
+	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_MIRROR)
 
 	ROM_REGION( 0x10000, "sp0256_speech", 0 )
 	/* SP0256B-019 Speech chip w/2KiB mask rom */
@@ -310,32 +327,12 @@ ROM_START (g7400)
 	ROM_REGION(0x100, "gfx1", ROMREGION_ERASEFF)
 
 	ROM_REGION(0x4000, "user1", 0)
-	ROM_CART_LOAD(0, "bin,rom", 0x0000, 0x4000, ROM_MIRROR)
+	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_MIRROR)
 ROM_END
 
-static void odyssey2_cartslot_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cartslot */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-		case MESS_DEVINFO_INT_MUST_BE_LOADED:				info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_VERIFY:						info->imgverify = odyssey2_cart_verify; break;
-
-		default:										cartslot_device_getinfo(devclass, state, info); break;
-	}
-}
-
-static SYSTEM_CONFIG_START(odyssey2)
-	CONFIG_DEVICE(odyssey2_cartslot_device_getinfo)
-SYSTEM_CONFIG_END
-
 /*     YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT     INIT      CONFIG    COMPANY     FULLNAME     FLAGS */
-COMP( 1978, odyssey2, 0,		0,		odyssey2, odyssey2, odyssey2, odyssey2, "Magnavox", "Odyssey 2", GAME_IMPERFECT_SOUND )
-COMP( 1979, videopac, odyssey2,	0,		videopac, odyssey2, odyssey2, odyssey2, "Philips", "Videopac G7000/C52", GAME_IMPERFECT_SOUND )
-COMP( 1983, g7400, odyssey2, 0,			g7400,    odyssey2, odyssey2, odyssey2, "Philips", "Videopac Plus G7400", GAME_NOT_WORKING )
+COMP( 1978, odyssey2, 0,		0,		odyssey2, odyssey2, odyssey2, 0, 	"Magnavox", "Odyssey 2", GAME_IMPERFECT_SOUND )
+COMP( 1979, videopac, odyssey2,	0,		videopac, odyssey2, odyssey2, 0, 	"Philips", "Videopac G7000/C52", GAME_IMPERFECT_SOUND )
+COMP( 1983, g7400, odyssey2, 0,			g7400,    odyssey2, odyssey2, 0, 	"Philips", "Videopac Plus G7400", GAME_NOT_WORKING )
 
 

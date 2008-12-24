@@ -237,6 +237,8 @@ MDRV_CPU_VBLANK_INT("main", gmaster_interrupt)
      MDRV_SOUND_ADD("custom", CUSTOM, 0)
      MDRV_SOUND_CONFIG(gmaster_sound_interface)
      MDRV_SOUND_ROUTE(0, "gmaster", 0.50)
+     
+     MDRV_CARTSLOT_ADD("cart", default_cartslot)
 MACHINE_DRIVER_END
 
 
@@ -244,7 +246,7 @@ ROM_START(gmaster)
 	ROM_REGION(0x10000,"main", 0)
      ROM_LOAD("gmaster.bin", 0x0000, 0x1000, CRC(05cc45e5) SHA1(05d73638dea9657ccc2791c0202d9074a4782c1e) )
 //     ROM_CART_LOAD(0, "bin", 0x8000, 0x7f00, 0)
-     ROM_CART_LOAD(0, "bin", 0x8000, 0x8000, 0)
+     ROM_CART_LOAD("cart", 0x8000, 0x8000, 0)
 ROM_END
 
 static DRIVER_INIT( gmaster )
@@ -288,11 +290,7 @@ static int gmaster_load_rom(running_machine *machine, int id)
 }
 #endif
 
-static SYSTEM_CONFIG_START(gmaster)
-     CONFIG_DEVICE(cartslot_device_getinfo)
-SYSTEM_CONFIG_END
-
 /*    YEAR      NAME            PARENT  MACHINE   INPUT     INIT                
 	  COMPANY                 FULLNAME */
-CONS( 1990, gmaster,       0,          0, gmaster,  gmaster,    gmaster,   gmaster, "Hartung", "Gamemaster", GAME_IMPERFECT_SOUND)
+CONS( 1990, gmaster,       0,          0, gmaster,  gmaster,    gmaster,   0, "Hartung", "Gamemaster", GAME_IMPERFECT_SOUND)
 

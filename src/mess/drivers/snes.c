@@ -253,20 +253,6 @@ ROM_START(snespal)
 	ROM_LOAD("dsp1data.bin", 0x000000, 0x000800, CRC(4b02d66d) SHA1(1534f4403d2a0f68ba6e35186fe7595d33de34b1))
 ROM_END
 
-
-
-/***************************************************************************
-
-  System configuration(s)
-
-***************************************************************************/
-
-static SYSTEM_CONFIG_START(snes)
-	CONFIG_DEVICE(snes_cartslot_getinfo)
-SYSTEM_CONFIG_END
-
-
-
 /***************************************************************************
 
   Game driver(s)
@@ -274,5 +260,5 @@ SYSTEM_CONFIG_END
 ***************************************************************************/
 
 /*     YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  INIT  CONFIG  COMPANY     FULLNAME                                      FLAGS */
-CONS( 1989, snes,    0,      0,      snes,    snes,  0,    snes,   "Nintendo", "Super Nintendo Entertainment System (NTSC)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-CONS( 1991, snespal, snes,   0,      snespal, snes,  0,    snes,   "Nintendo", "Super Nintendo Entertainment System (PAL)",  GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+CONS( 1989, snes,    0,      0,      snes,    snes,  0,    0,   "Nintendo", "Super Nintendo Entertainment System (NTSC)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+CONS( 1991, snespal, snes,   0,      snespal, snes,  0,    0,   "Nintendo", "Super Nintendo Entertainment System (PAL)",  GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )

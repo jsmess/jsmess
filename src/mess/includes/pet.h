@@ -9,6 +9,7 @@
 
 #include "video/mc6845.h"
 #include "machine/6522via.h"
+#include "devices/cartslot.h"
 
 /*----------- defined in video/pet.c -----------*/
 
@@ -44,8 +45,7 @@ DRIVER_INIT( superpet );
 MACHINE_RESET( pet );
 INTERRUPT_GEN( pet_frame_interrupt );
 
-void pet_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
-void pet4_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
-
+extern const cartslot_interface pet_cartslot;
+extern const cartslot_interface pet4_cartslot;
 
 #endif /* PET_H_ */

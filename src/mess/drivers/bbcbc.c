@@ -90,6 +90,8 @@ static MACHINE_DRIVER_START( bbcbc )
 	MDRV_IMPORT_FROM( tms9928a )
 	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_REFRESH_RATE( 50 )
+	
+	MDRV_CARTSLOT_ADD("cart", default_cartslot )
 MACHINE_DRIVER_END
 
 
@@ -97,12 +99,8 @@ ROM_START( bbcbc )
 	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD("br_4_1.ic3", 0x0000, 0x2000, CRC(7c880d75) SHA1(954db096bd9e8edfef72946637a12f1083841fb0))
 	ROM_LOAD("br_4_2.ic4", 0x2000, 0x2000, CRC(16a33aef) SHA1(9529f9f792718a3715af2063b91a5fb18f741226))
-	ROM_CART_LOAD(0, "bin", 0x4000, 0xBFFF, ROM_NOMIRROR | ROM_OPTIONAL)
+	ROM_CART_LOAD("cart", 0x4000, 0xBFFF, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
-
-static SYSTEM_CONFIG_START( bbcbc )
-	CONFIG_DEVICE(cartslot_device_getinfo)
-SYSTEM_CONFIG_END
 
 /***************************************************************************
 
@@ -111,5 +109,5 @@ SYSTEM_CONFIG_END
 ***************************************************************************/
 
 /*   YEAR  NAME  PARENT  COMPAT  MACHINE INPUT  INIT  CONFIG  COMPANY  FULLNAME  FLAGS */
-CONS(1985, bbcbc,     0, 0,      bbcbc,  0, 	0,    bbcbc,  "BBC",   "Bridge Companion", GAME_NOT_WORKING )
+CONS(1985, bbcbc,     0, 0,      bbcbc,  0, 	0,    0,  "BBC",   "Bridge Companion", GAME_NOT_WORKING )
 

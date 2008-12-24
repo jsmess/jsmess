@@ -67,6 +67,16 @@ static COP400_INTERFACE( advision_cop411_interface )
 	COP400_MICROBUS_DISABLED
 };
 
+static const cartslot_interface advision_cartslot =
+{
+	"bin",
+	1,
+	NULL,
+	NULL,
+	NULL,
+	NULL
+};
+
 static MACHINE_DRIVER_START( advision )
 	MDRV_DRIVER_DATA(advision_state)
 
@@ -100,13 +110,15 @@ static MACHINE_DRIVER_START( advision )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	
+	MDRV_CARTSLOT_ADD("cart", advision_cartslot)
 MACHINE_DRIVER_END
 
 /* ROMs */
 
 ROM_START( advision )
 	ROM_REGION( 0x1000, "main", 0 )
-	ROM_CART_LOAD( 0, "bin", 0x0000, 0x1000, ROM_NOMIRROR | ROM_FULLSIZE )
+	ROM_CART_LOAD( "cart", 0x0000, 0x1000, ROM_NOMIRROR | ROM_FULLSIZE )
 
 	ROM_REGION( 0x400, "bios", 0 )
     ROM_LOAD( "avbios.u5", 0x000, 0x400, CRC(279e33d1) SHA1(bf7b0663e9125c9bfb950232eab627d9dbda8460) )
@@ -115,13 +127,7 @@ ROM_START( advision )
 	ROM_LOAD( "avsound.u8", 0x000, 0x200, CRC(81e95975) SHA1(8b6f8c30dd3e9d8e43f1ea20fba2361b383790eb) )
 ROM_END
 
-/* System Configuration */
-
-static SYSTEM_CONFIG_START( advision )
-	CONFIG_DEVICE( cartslot_device_getinfo )
-SYSTEM_CONFIG_END
-
 /* Game Driver */
 	
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE   INPUT     INIT        CONFIG      COMPANY					FULLNAME			FLAGS */
-CONS( 1982, advision,	0,		0,		advision, advision,	0,			advision,	"Entex Electronics",	"Adventure Vision", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+CONS( 1982, advision,	0,		0,		advision, advision,	0,			0,	"Entex Electronics",	"Adventure Vision", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )

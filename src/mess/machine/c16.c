@@ -717,19 +717,13 @@ static DEVICE_IMAGE_LOAD(c16_cart)
 	return INIT_PASS;
 }
 
-void c16_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+
+const cartslot_interface c16_cartslot =
 {
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:					info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:						info->load = DEVICE_IMAGE_LOAD_NAME(c16_cart); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:			strcpy(info->s = device_temp_str(), "bin,rom,hi,lo"); break;
-
-		default:										cartslot_device_getinfo(devclass, state, info); break;
-	}
-}
+	"bin,rom,hi,lo",
+	0,
+	NULL,
+	DEVICE_IMAGE_LOAD_NAME(c16_cart),
+	NULL,
+	NULL
+};

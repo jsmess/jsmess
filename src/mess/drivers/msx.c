@@ -1027,6 +1027,15 @@ static const cassette_config msx_cassette_config =
 	CASSETTE_PLAY
 };
 
+static const cartslot_interface msx_cartslot =
+{
+	"mx1,rom",
+	0,
+	NULL,
+	DEVICE_IMAGE_LOAD_NAME(msx_cart),
+	DEVICE_IMAGE_UNLOAD_NAME(msx_cart),
+	NULL
+};
 
 static MACHINE_DRIVER_START( msx )
 	/* basic machine hardware */
@@ -1069,6 +1078,9 @@ static MACHINE_DRIVER_START( msx )
 	MDRV_CASSETTE_ADD( "cassette", msx_cassette_config )
 	
 	MDRV_WD179X_ADD("wd179x", msx_wd17xx_interface )	
+	
+	MDRV_CARTSLOT_ADD("cart1", msx_cartslot)
+	MDRV_CARTSLOT_ADD("cart2", msx_cartslot)
 MACHINE_DRIVER_END
 
 
@@ -1138,6 +1150,9 @@ static MACHINE_DRIVER_START( msx2 )
 	MDRV_TC8521_ADD("rtc", default_tc8521_interface)
 	
 	MDRV_WD179X_ADD("wd179x", msx_wd17xx_interface )	
+	
+	MDRV_CARTSLOT_ADD("cart1", msx_cartslot)
+	MDRV_CARTSLOT_ADD("cart2", msx_cartslot)	
 MACHINE_DRIVER_END
 
 
@@ -3540,29 +3555,9 @@ static void msx_floppy_getinfo(const mess_device_class *devclass, UINT32 state, 
 	}
 }
 
-static void msx_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cartslot */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = MSX_MAX_CARTS; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(msx_cart); break;
-		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(msx_cart); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "mx1,rom"); break;
-
-		default:										cartslot_device_getinfo(devclass, state, info); break;
-	}
-}
-
 
 static SYSTEM_CONFIG_START(msx)
 	CONFIG_DEVICE(msx_floppy_getinfo)
-	CONFIG_DEVICE(msx_cartslot_getinfo)
 SYSTEM_CONFIG_END
 
 MSX_DRIVER_LIST

@@ -242,6 +242,9 @@ static MACHINE_DRIVER_START( c65 )
 	/* cia */
 	MDRV_CIA6526_ADD("cia_0", CIA6526R1, 0, c64_ntsc_cia0)
 	MDRV_CIA6526_ADD("cia_1", CIA6526R1, 0, c64_ntsc_cia1)
+	
+	MDRV_CARTSLOT_ADD("cart1", c64_cartslot)
+	MDRV_CARTSLOT_ADD("cart2", c64_cartslot)	
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( c65pal )
@@ -302,7 +305,7 @@ ROM_END
 
 
 static SYSTEM_CONFIG_START( c65 )
-	CONFIG_DEVICE(c64_cartslot_getinfo)	// to investigate which carts could work in the c65 expansion port!
+	// to investigate which carts could work in the c65 expansion port!
 	CONFIG_DEVICE(cbmfloppy_device_getinfo)
 	CONFIG_RAM_DEFAULT(128 * 1024)
 	CONFIG_RAM((128 + 512) * 1024)

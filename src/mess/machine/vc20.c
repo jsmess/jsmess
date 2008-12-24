@@ -704,10 +704,18 @@ static DEVICE_IMAGE_LOAD(vic20_cart)
 	const char *filetype;
 	const char *tag;
 	int address = 0;
+	int index = 0;
 
 	static const unsigned char magic[] = {0x41, 0x30, 0x20, 0xc3, 0xc2, 0xcd};	/* A0 CBM at 0xa004 (module offset 4) */
 	unsigned char buffer[sizeof (magic)];
 
+	if (strcmp(image->tag,"cart1")==0) {
+		index = 0;
+	}
+	if (strcmp(image->tag,"cart2")==0) {
+		index = 1;
+	}
+	
 	image_fseek (image, 4, SEEK_SET);
 	image_fread (image, buffer, sizeof (magic));
 	image_fseek (image, 0, SEEK_SET);
@@ -740,7 +748,7 @@ static DEVICE_IMAGE_LOAD(vic20_cart)
 	}
 
 	/* Decide the memory region we will load the cart in, to avoid problems when multiple carts need to be loaded */
-	tag = (image_index_in_device(image)) ? "user2" : "user1";
+	tag = index ? "user2" : "user1";
 
 	logerror("Loading cart %s at %.4x size:%.4x\n", image_filename(image), address, size);
 	
@@ -777,21 +785,12 @@ static DEVICE_IMAGE_LOAD(vic20_cart)
 	return INIT_PASS;
 }
 
-
-void vic20_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+const cartslot_interface vic20_cartslot =
 {
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:						info->i = 2; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_START:						info->start = DEVICE_START_NAME(vic20_cart); break;
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(vic20_cart); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "rom,bin,a0,20,40,60"); break;
-
-		default:											cartslot_device_getinfo(devclass, state, info); break;
-	}
-}
+	"rom,bin,a0,20,40,60",
+	0,
+	DEVICE_START_NAME(vic20_cart),
+	DEVICE_IMAGE_LOAD_NAME(vic20_cart),
+	NULL,
+	NULL
+};

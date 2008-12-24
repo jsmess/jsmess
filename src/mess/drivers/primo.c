@@ -273,6 +273,9 @@ static MACHINE_DRIVER_START( primoa32 )
 	MDRV_QUICKLOAD_ADD(primo, "pp", 0)
 
 	MDRV_CASSETTE_ADD( "cassette", primo_cassette_config )
+	
+	MDRV_CARTSLOT_ADD("cart1", default_cartslot )
+	MDRV_CARTSLOT_ADD("cart2", default_cartslot )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( primoa48 )
@@ -328,8 +331,8 @@ ROM_START( primoa32 )
 	ROMX_LOAD( "a32_4.rom", 0x13000, 0x1000, CRC(70f84bc8) SHA1(9ae1c06531edf20c14ba47e78c0747dd2a92612a), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(1, "ver2", "ver 2")
 	ROMX_LOAD( "a32-v2.rom",0x10000, 0x4000, CRC(1544b8cc) SHA1(6a9e67027a349fa3d14cb3624099b0770564c5dd), ROM_BIOS(2) )
-	ROM_CART_LOAD(1, "rom", 0x14000, 0x4000, ROM_FILL_FF | ROM_OPTIONAL)
-	ROM_CART_LOAD(0, "rom", 0x18000, 0x4000, ROM_FILL_FF | ROM_OPTIONAL)
+	ROM_CART_LOAD("cart2", 0x14000, 0x4000, ROM_FILL_FF | ROM_OPTIONAL)
+	ROM_CART_LOAD("cart1", 0x18000, 0x4000, ROM_FILL_FF | ROM_OPTIONAL)
 ROM_END
 
 ROM_START( primoa48 )
@@ -341,8 +344,8 @@ ROM_START( primoa48 )
 	ROMX_LOAD( "a48_4.rom", 0x13000, 0x1000, CRC(e4d0c452) SHA1(4a98ff7502f1236445250d6b4e1c34850734350e), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(1, "ver2", "ver 2")
 	ROMX_LOAD( "a48-v2.rom",0x10000, 0x4000, CRC(3fed4020) SHA1(a78351a9a0e114e59de019fd7177ce6e37f98163), ROM_BIOS(2) )	
-	ROM_CART_LOAD(1, "rom", 0x14000, 0x4000, ROM_FILL_FF | ROM_OPTIONAL)	
-	ROM_CART_LOAD(0, "rom", 0x18000, 0x4000, ROM_FILL_FF | ROM_OPTIONAL)
+	ROM_CART_LOAD("cart2", 0x14000, 0x4000, ROM_FILL_FF | ROM_OPTIONAL)	
+	ROM_CART_LOAD("cart1", 0x18000, 0x4000, ROM_FILL_FF | ROM_OPTIONAL)
 ROM_END
 
 ROM_START( primoa64 )
@@ -354,8 +357,8 @@ ROM_START( primoa64 )
 	ROMX_LOAD( "a64_4.rom", 0x13000, 0x1000, CRC(e4d0c452) SHA1(4a98ff7502f1236445250d6b4e1c34850734350e), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(1, "ver2", "ver 2")
 	ROMX_LOAD( "a64-v2.rom",0x10000, 0x4000, CRC(93e0343a) SHA1(4f6b169668424109c4bca495c849d7cf0ddacad8), ROM_BIOS(2) )	
-	ROM_CART_LOAD(1, "rom", 0x14000, 0x4000, ROM_FILL_FF | ROM_OPTIONAL)
-	ROM_CART_LOAD(0, "rom", 0x18000, 0x4000, ROM_FILL_FF | ROM_OPTIONAL)
+	ROM_CART_LOAD("cart2", 0x14000, 0x4000, ROM_FILL_FF | ROM_OPTIONAL)
+	ROM_CART_LOAD("cart1", 0x18000, 0x4000, ROM_FILL_FF | ROM_OPTIONAL)
 ROM_END
 
 ROM_START( primob32 )
@@ -364,8 +367,8 @@ ROM_START( primob32 )
 	ROMX_LOAD( "b32.rom",   0x10000, 0x4000, CRC(f594d2bb) SHA1(b74961dba008a1a6f15a22ddbd1b89acd7e286c2), ROM_BIOS(1) )	
 	ROM_SYSTEM_BIOS(1, "ver2", "ver 2")
 	ROMX_LOAD( "b32-v2.rom",0x10000, 0x4000, CRC(b22a5d9a) SHA1(e048724f338b1f4e2602960cfd6f42cc49e85d75), ROM_BIOS(2) )	
-	ROM_CART_LOAD(1, "rom", 0x14000, 0x4000, ROM_FILL_FF | ROM_OPTIONAL)
-	ROM_CART_LOAD(0, "rom", 0x18000, 0x4000, ROM_FILL_FF | ROM_OPTIONAL)
+	ROM_CART_LOAD("cart2", 0x14000, 0x4000, ROM_FILL_FF | ROM_OPTIONAL)
+	ROM_CART_LOAD("cart1", 0x18000, 0x4000, ROM_FILL_FF | ROM_OPTIONAL)
 ROM_END
 
 ROM_START( primob48 )
@@ -374,8 +377,8 @@ ROM_START( primob48 )
 	ROMX_LOAD( "b48.rom",   0x10000, 0x4000, CRC(df3d2a57) SHA1(ab9413aa9d7749d30a486da00bc8c6d178a2172c), ROM_BIOS(1) )	
 	ROM_SYSTEM_BIOS(1, "ver2", "ver 2")
 	ROMX_LOAD( "b48-v2.rom",0x10000, 0x4000, CRC(9883a576) SHA1(aeb142ed1e9494371bf34dda600e32b17d454f78), ROM_BIOS(2) )	
-	ROM_CART_LOAD(1, "rom", 0x14000, 0x4000, ROM_FILL_FF | ROM_OPTIONAL)
-	ROM_CART_LOAD(0, "rom", 0x18000, 0x4000, ROM_FILL_FF | ROM_OPTIONAL)
+	ROM_CART_LOAD("cart2", 0x14000, 0x4000, ROM_FILL_FF | ROM_OPTIONAL)
+	ROM_CART_LOAD("cart1", 0x18000, 0x4000, ROM_FILL_FF | ROM_OPTIONAL)
 ROM_END
 
 ROM_START( primob64 )
@@ -386,8 +389,8 @@ ROM_START( primob64 )
 	ROMX_LOAD( "b64-v2.rom",0x10000, 0x4000, CRC(348ed16c) SHA1(abf75fcdaa817abd133d66223ca2608853748557), ROM_BIOS(2) )	
 	ROM_SYSTEM_BIOS(2, "cdos", "CDOS")
 	ROMX_LOAD( "b64-cdos.rom",0x10000, 0x4000, CRC(73305e4d) SHA1(c090c3430cdf19eed8363377b981e1c21a4ed169), ROM_BIOS(3) )	
-	ROM_CART_LOAD(1, "rom", 0x14000, 0x4000, ROM_FILL_FF | ROM_OPTIONAL)
-	ROM_CART_LOAD(0, "rom", 0x18000, 0x4000, ROM_FILL_FF | ROM_OPTIONAL)
+	ROM_CART_LOAD("cart2", 0x14000, 0x4000, ROM_FILL_FF | ROM_OPTIONAL)
+	ROM_CART_LOAD("cart1", 0x18000, 0x4000, ROM_FILL_FF | ROM_OPTIONAL)
 ROM_END
 
 ROM_START( primoc64 )
@@ -399,17 +402,15 @@ ROM_START( primoc64 )
 	ROMX_LOAD( "c64_4.rom", 0x13000, 0x1000, CRC(3770e3e6) SHA1(792cc71d8f89eb447f94aded5afc70d626a26030), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(1, "ver2", "ver 2")
 	ROMX_LOAD( "c64-v2.rom",0x10000, 0x4000, CRC(356ed18a) SHA1(613324f2bab94e427e9c1243c766dcf8486e0fb4), ROM_BIOS(2) )	
-	ROM_CART_LOAD(1, "rom", 0x14000, 0x4000, ROM_FILL_FF | ROM_OPTIONAL)
-	ROM_CART_LOAD(0, "rom", 0x18000, 0x4000, ROM_FILL_FF | ROM_OPTIONAL)
+	ROM_CART_LOAD("cart2", 0x14000, 0x4000, ROM_FILL_FF | ROM_OPTIONAL)
+	ROM_CART_LOAD("cart1", 0x18000, 0x4000, ROM_FILL_FF | ROM_OPTIONAL)
 ROM_END
 
 
-static void primo_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+/*static void primo_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
-	/* cartslot */
 	switch(state)
 	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case MESS_DEVINFO_STR_DESCRIPTION+0:					strcpy(info->s = device_temp_str(), "EPROM Expansion Bank #1"); break;
 		case MESS_DEVINFO_STR_DESCRIPTION+1:					strcpy(info->s = device_temp_str(), "EPROM Expansion Bank #2"); break;
 		case MESS_DEVINFO_STR_DESCRIPTION+2:					strcpy(info->s = device_temp_str(), "EPROM Expansion Bank #3"); break;
@@ -419,20 +420,13 @@ static void primo_cartslot_getinfo(const mess_device_class *devclass, UINT32 sta
 	}
 }
 
-static SYSTEM_CONFIG_START( primoa )
-	CONFIG_DEVICE(primo_cartslot_getinfo)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START( primob )
-	CONFIG_IMPORT_FROM( primoa )
-	//CONFIG_DEVICE(primo_floppy_getinfo)
-SYSTEM_CONFIG_END
+*/
 
 /*     YEAR  NAME      PARENT    COMPAT MACHINE   INPUT  INIT     CONFIG COMPANY  FULLNAME */
-COMP ( 1984, primoa32, 0,        0,     primoa32, primo, primo32, primoa, "Microkey", "Primo A-32" , 0)
-COMP ( 1984, primoa48, primoa32, 0,     primoa48, primo, primo48, primoa, "Microkey", "Primo A-48" , 0)
-COMP ( 1984, primoa64, primoa32, 0,     primoa64, primo, primo64, primoa, "Microkey", "Primo A-64" , 0)
-COMP ( 1984, primob32, primoa32, 0,     primob32, primo, primo32, primob, "Microkey", "Primo B-32" , 0)
-COMP ( 1984, primob48, primoa32, 0,     primob48, primo, primo48, primob, "Microkey", "Primo B-48" , 0)
-COMP ( 1984, primob64, primoa32, 0,     primob64, primo, primo64, primob, "Microkey", "Primo B-64" , 0)
-COMP ( 1984, primoc64, primoa32, 0,     primoc64, primo, primo64, primob, "Microkey", "Primo C-64" , GAME_NOT_WORKING)
+COMP ( 1984, primoa32, 0,        0,     primoa32, primo, primo32, 0, "Microkey", "Primo A-32" , 0)
+COMP ( 1984, primoa48, primoa32, 0,     primoa48, primo, primo48, 0, "Microkey", "Primo A-48" , 0)
+COMP ( 1984, primoa64, primoa32, 0,     primoa64, primo, primo64, 0, "Microkey", "Primo A-64" , 0)
+COMP ( 1984, primob32, primoa32, 0,     primob32, primo, primo32, 0, "Microkey", "Primo B-32" , 0)
+COMP ( 1984, primob48, primoa32, 0,     primob48, primo, primo48, 0, "Microkey", "Primo B-48" , 0)
+COMP ( 1984, primob64, primoa32, 0,     primob64, primo, primo64, 0, "Microkey", "Primo B-64" , 0)
+COMP ( 1984, primoc64, primoa32, 0,     primoc64, primo, primo64, 0, "Microkey", "Primo C-64" , GAME_NOT_WORKING)

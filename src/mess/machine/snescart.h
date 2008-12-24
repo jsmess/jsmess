@@ -6,10 +6,11 @@
 #ifndef _SNESCART_H
 #define _SNESCART_H
 
+#include "devices/cartslot.h"
 
 MACHINE_START( snes_mess );
 
-void snes_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
+extern const cartslot_interface snes_cartslot;
 
 #endif /* _SNESCART_H */
 

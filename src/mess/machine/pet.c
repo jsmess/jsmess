@@ -793,37 +793,23 @@ static DEVICE_IMAGE_LOAD(pet_cart)
 	return INIT_PASS;
 }
 
-
-void pet_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+const cartslot_interface pet_cartslot =
 {
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:				info->i = 2; break;
+	"crt,a0,b0",
+	0,
+	NULL,
+	DEVICE_IMAGE_LOAD_NAME(pet_cart),
+	NULL,
+	NULL
+};
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:		strcpy(info->s = device_temp_str(), "crt,a0,b0"); break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:					info->load = DEVICE_IMAGE_LOAD_NAME(pet_cart); break;
-
-		default:									cartslot_device_getinfo(devclass, state, info); break;
-	}
-}
-
-void pet4_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+const cartslot_interface pet4_cartslot =
 {
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:				info->i = 2; break;
+	"crt,a0",
+	0,
+	NULL,
+	DEVICE_IMAGE_LOAD_NAME(pet_cart),
+	NULL,
+	NULL
+};
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:		strcpy(info->s = device_temp_str(), "crt,a0"); break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:					info->load = DEVICE_IMAGE_LOAD_NAME(pet_cart); break;
-
-		default:									cartslot_device_getinfo(devclass, state, info); break;
-	}
-}

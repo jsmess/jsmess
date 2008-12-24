@@ -258,6 +258,15 @@ static PALETTE_INIT(a7800p)
 #define CLK_PAL 1773447
 #define CLK_NTSC 1789772
 
+static const cartslot_interface a7800_cartslot =
+{
+	"a78",
+	0,
+	DEVICE_START_NAME(a7800_cart),
+	DEVICE_IMAGE_LOAD_NAME(a7800_cart),
+	NULL,
+	a7800_partialhash
+};
 
 
 static MACHINE_DRIVER_START( a7800 )
@@ -290,6 +299,8 @@ static MACHINE_DRIVER_START( a7800 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MDRV_SOUND_ADD("pokey", POKEY, CLK_NTSC)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	
+	MDRV_CARTSLOT_ADD("cart", a7800_cartslot)
 MACHINE_DRIVER_END
 
 
@@ -351,30 +362,6 @@ ROM_START (a7800p)
     ROM_LOAD ("7800pal.rom", 0xc000, 0x4000, CRC(d5b61170) SHA1(5a140136a16d1d83e4ff32a19409ca376a8df874))
 ROM_END
 
-static void a7800_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cartslot */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:						info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_START:						info->start = DEVICE_START_NAME(a7800_cart); break;
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(a7800_cart); break;
-		case MESS_DEVINFO_PTR_PARTIAL_HASH:					info->partialhash = a7800_partialhash; break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "a78"); break;
-
-		default:											cartslot_device_getinfo(devclass, state, info); break;
-	}
-}
-
-static SYSTEM_CONFIG_START(a7800)
-	CONFIG_DEVICE(a7800_cartslot_getinfo)
-SYSTEM_CONFIG_END
-
 /***************************************************************************
 
   Game driver(s)
@@ -382,5 +369,5 @@ SYSTEM_CONFIG_END
 ***************************************************************************/
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT     INIT          CONFIG      COMPANY   FULLNAME */
-CONS( 1986, a7800,    0,        0,		a7800_ntsc,	a7800,    a7800_ntsc,	a7800,		"Atari",  "Atari 7800 NTSC" , 0)
-CONS( 1986, a7800p,   a7800,    0,		a7800_pal,	a7800,    a7800_pal,	a7800,		"Atari",  "Atari 7800 PAL" , 0)
+CONS( 1986, a7800,    0,        0,		a7800_ntsc,	a7800,    a7800_ntsc,	0,		"Atari",  "Atari 7800 NTSC" , 0)
+CONS( 1986, a7800p,   a7800,    0,		a7800_pal,	a7800,    a7800_pal,	0,		"Atari",  "Atari 7800 PAL" , 0)

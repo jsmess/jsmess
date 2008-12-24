@@ -2443,6 +2443,8 @@ static MACHINE_DRIVER_START( saturn )
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 
 	MDRV_CDROM_ADD( "cdrom" )
+	
+	MDRV_CARTSLOT_ADD("cart", default_cartslot )
 MACHINE_DRIVER_END
 
 
@@ -2455,7 +2457,7 @@ ROM_START(saturnjp)
 	ROMX_LOAD("sega1003.bin", 0x00000000, 0x00080000, CRC(b3c63c25) SHA1(7b23b53d62de0f29a23e423d0fe751dfb469c2fa), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(2, "100", "Japan v1.00 (940921)")
 	ROMX_LOAD("sega_100.bin", 0x00000000, 0x00080000, CRC(2aba43c2) SHA1(2b8cb4f87580683eb4d760e4ed210813d667f0a2), ROM_BIOS(3))
-	ROM_CART_LOAD(0, "bin", 0x080000, 0x400000, ROM_NOMIRROR | ROM_FILL_FF | ROM_OPTIONAL)
+	ROM_CART_LOAD("cart", 0x080000, 0x400000, ROM_NOMIRROR | ROM_FILL_FF | ROM_OPTIONAL)
 	ROM_REGION( 0x080000, "slave", 0 ) /* SH2 code */
 	ROM_COPY( "main",0,0,0x080000)
 ROM_END
@@ -2467,7 +2469,7 @@ ROM_START(saturn)
 	ROMX_LOAD("sega_101a.bin", 0x00000000, 0x00080000, CRC(4afcf0fa) SHA1(faa8ea183a6d7bbe5d4e03bb1332519800d3fbc3), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "100a", "Overseas v1.00a (941115)")
 	ROMX_LOAD("sega_100a.bin", 0x00000000, 0x00080000, CRC(f90f0089) SHA1(3bb41feb82838ab9a35601ac666de5aacfd17a58), ROM_BIOS(2))
-	ROM_CART_LOAD(0, "bin", 0x080000, 0x400000, ROM_NOMIRROR | ROM_FILL_FF | ROM_OPTIONAL)
+	ROM_CART_LOAD("cart", 0x080000, 0x400000, ROM_NOMIRROR | ROM_FILL_FF | ROM_OPTIONAL)
 	ROM_REGION( 0x080000, "slave", 0 ) /* SH2 code */
 	ROM_COPY( "main",0,0,0x080000)
 ROM_END
@@ -2478,7 +2480,7 @@ ROM_START(saturneu)
 	ROMX_LOAD("sega_101a.bin", 0x00000000, 0x00080000, CRC(4afcf0fa) SHA1(faa8ea183a6d7bbe5d4e03bb1332519800d3fbc3), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "100a", "Overseas v1.00a (941115)")
 	ROMX_LOAD("sega_100a.bin", 0x00000000, 0x00080000, CRC(f90f0089) SHA1(3bb41feb82838ab9a35601ac666de5aacfd17a58), ROM_BIOS(2))
-	ROM_CART_LOAD(0, "bin", 0x080000, 0x400000, ROM_NOMIRROR | ROM_FILL_FF | ROM_OPTIONAL)
+	ROM_CART_LOAD("cart", 0x080000, 0x400000, ROM_NOMIRROR | ROM_FILL_FF | ROM_OPTIONAL)
 	ROM_REGION( 0x080000, "slave", 0 ) /* SH2 code */
 	ROM_COPY( "main",0,0,0x080000)
 ROM_END
@@ -2486,7 +2488,7 @@ ROM_END
 ROM_START(vsaturn)
 	ROM_REGION( 0x480000, "main", 0 ) /* SH2 code */
 	ROM_LOAD("vsaturn.bin", 0x00000000, 0x00080000, CRC(e4d61811) SHA1(4154e11959f3d5639b11d7902b3a393a99fb5776))
-	ROM_CART_LOAD(0, "bin", 0x080000, 0x400000, ROM_NOMIRROR | ROM_FILL_FF | ROM_OPTIONAL)
+	ROM_CART_LOAD("cart", 0x080000, 0x400000, ROM_NOMIRROR | ROM_FILL_FF | ROM_OPTIONAL)
 	ROM_REGION( 0x080000, "slave", 0 ) /* SH2 code */
 	ROM_COPY( "main",0,0,0x080000)
 ROM_END
@@ -2494,15 +2496,10 @@ ROM_END
 ROM_START(hisaturn)
 	ROM_REGION( 0x480000, "main", 0 ) /* SH2 code */
 	ROM_LOAD("hisaturn.bin", 0x00000000, 0x00080000, CRC(721e1b60) SHA1(49d8493008fa715ca0c94d99817a5439d6f2c796))
-	ROM_CART_LOAD(0, "bin", 0x080000, 0x400000, ROM_NOMIRROR | ROM_FILL_FF | ROM_OPTIONAL)
+	ROM_CART_LOAD("cart", 0x080000, 0x400000, ROM_NOMIRROR | ROM_FILL_FF | ROM_OPTIONAL)
 	ROM_REGION( 0x080000, "slave", 0 ) /* SH2 code */
 	ROM_COPY( "main",0,0,0x080000)
 ROM_END
-
-
-static SYSTEM_CONFIG_START( saturn )
-	CONFIG_DEVICE(cartslot_device_getinfo)
-SYSTEM_CONFIG_END
 
 /***************************************************************************
 
@@ -2511,10 +2508,10 @@ SYSTEM_CONFIG_END
 ***************************************************************************/
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE INPUT   INIT        CONFIG  COMPANY     FULLNAME            FLAGS */
-CONS( 1994, saturn,     0,      0,      saturn, saturn, saturnus,   saturn, "Sega",     "Saturn (USA)",     GAME_NOT_WORKING )
-CONS( 1994, saturnjp,   saturn, 0,      saturn, saturn, saturnjp,   saturn, "Sega",     "Saturn (Japan)",   GAME_NOT_WORKING )
-CONS( 1994, saturneu,   saturn, 0,      saturn, saturn, saturneu,   saturn, "Sega",     "Saturn (PAL)",     GAME_NOT_WORKING )
-CONS( 1995, vsaturn,    saturn, 0,      saturn, saturn, saturnjp,   saturn, "JVC",      "V-Saturn",         GAME_NOT_WORKING )
-CONS( 1995, hisaturn,   saturn, 0,      saturn, saturn, saturnjp,   saturn, "Hitachi",  "HiSaturn",         GAME_NOT_WORKING )
+CONS( 1994, saturn,     0,      0,      saturn, saturn, saturnus,   0, "Sega",     "Saturn (USA)",     GAME_NOT_WORKING )
+CONS( 1994, saturnjp,   saturn, 0,      saturn, saturn, saturnjp,   0, "Sega",     "Saturn (Japan)",   GAME_NOT_WORKING )
+CONS( 1994, saturneu,   saturn, 0,      saturn, saturn, saturneu,   0, "Sega",     "Saturn (PAL)",     GAME_NOT_WORKING )
+CONS( 1995, vsaturn,    saturn, 0,      saturn, saturn, saturnjp,   0, "JVC",      "V-Saturn",         GAME_NOT_WORKING )
+CONS( 1995, hisaturn,   saturn, 0,      saturn, saturn, saturnjp,   0, "Hitachi",  "HiSaturn",         GAME_NOT_WORKING )
 
 

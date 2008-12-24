@@ -257,6 +257,8 @@ static MACHINE_DRIVER_START( channelf )
 	MDRV_SOUND_ADD("custom", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(channelf_sound_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	
+	MDRV_CARTSLOT_ADD("cart", default_cartslot)
 MACHINE_DRIVER_END
 
 ROM_START( channelf )
@@ -266,12 +268,8 @@ ROM_START( channelf )
 	ROM_SYSTEM_BIOS( 1, "sl31253", "Channel F" )
 	ROMX_LOAD("sl31253.rom",  0x0000, 0x0400, CRC(04694ed9) SHA1(81193965a374d77b99b4743d317824b53c3e3c78), ROM_BIOS(2))
 	ROM_LOAD("sl31254.rom",   0x0400, 0x0400, CRC(9c047ba3) SHA1(8f70d1b74483ba3a37e86cf16c849d601a8c3d2c))
-	ROM_CART_LOAD(0, "bin", 0x0800, 0x2000, ROM_NOMIRROR | ROM_OPTIONAL)
+	ROM_CART_LOAD("cart", 0x0800, 0x2000, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
-
-static SYSTEM_CONFIG_START( channelf )
-	CONFIG_DEVICE(cartslot_device_getinfo)
-SYSTEM_CONFIG_END
 
 /***************************************************************************
 
@@ -280,4 +278,4 @@ SYSTEM_CONFIG_END
 ***************************************************************************/
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY         FULLNAME        FLAGS */
-CONS( 1976, channelf,   0,      0,      channelf,   channelf,   0,      channelf,   "Fairchild",    "Channel F",    0 )
+CONS( 1976, channelf,   0,      0,      channelf,   channelf,   0,      0,   "Fairchild",    "Channel F",    0 )

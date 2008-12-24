@@ -406,6 +406,16 @@ static const cassette_config laser_cassette_config =
 	CASSETTE_PLAY
 };
 
+static const cartslot_interface laser_cartslot =
+{
+	"rom",
+	0,
+	NULL,
+	DEVICE_IMAGE_LOAD_NAME(laser_cart),
+	DEVICE_IMAGE_UNLOAD_NAME(laser_cart),
+	NULL
+};
+
 static MACHINE_DRIVER_START( laser350 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, 3694700)        /* 3.694700 MHz */
@@ -438,6 +448,8 @@ static MACHINE_DRIVER_START( laser350 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	MDRV_CASSETTE_ADD( "cassette", laser_cassette_config )
+	
+	MDRV_CARTSLOT_ADD("cart", laser_cartslot )
 MACHINE_DRIVER_END
 
 
@@ -488,25 +500,6 @@ ROM_END
 
 ***************************************************************************/
 
-static void laser_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cartslot */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(laser_cart); break;
-		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(laser_cart); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "rom"); break;
-
-		default:										cartslot_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static void laser_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
@@ -528,7 +521,6 @@ static void laser_floppy_getinfo(const mess_device_class *devclass, UINT32 state
 }
 
 static SYSTEM_CONFIG_START(laser)
-	CONFIG_DEVICE(laser_cartslot_getinfo)
 	CONFIG_DEVICE(laser_floppy_getinfo)
 SYSTEM_CONFIG_END
 

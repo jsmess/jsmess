@@ -7,6 +7,7 @@
 #ifndef C16_H_
 #define C16_H_
 
+#include "devices/cartslot.h"
 
 /*----------- defined in machine/c16.c -----------*/
 
@@ -46,7 +47,7 @@ extern DRIVER_INIT( c16v );
 extern MACHINE_RESET( c16 );
 extern INTERRUPT_GEN( c16_frame_interrupt );
 
-void c16_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
+extern const cartslot_interface c16_cartslot;
 
 
 /*----------- defined in audio/t6721.c -----------*/

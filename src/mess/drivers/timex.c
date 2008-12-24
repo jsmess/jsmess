@@ -598,7 +598,15 @@ static MACHINE_RESET( tc2048 )
 	MACHINE_RESET_CALL(spectrum);
 }
 
-
+static const cartslot_interface ts2068_cartslot =
+{
+	"dck",
+	0,
+	NULL,
+	DEVICE_IMAGE_LOAD_NAME(timex_cart),
+	DEVICE_IMAGE_UNLOAD_NAME(timex_cart),
+	NULL
+};
 
 static MACHINE_DRIVER_START( ts2068 )
 	MDRV_IMPORT_FROM( spectrum_128 )
@@ -617,6 +625,8 @@ static MACHINE_DRIVER_START( ts2068 )
 
 	MDRV_VIDEO_UPDATE( ts2068 )
 	MDRV_VIDEO_EOF( ts2068 )
+	
+	MDRV_CARTSLOT_MODIFY("cart", ts2068_cartslot )
 MACHINE_DRIVER_END
 
 
@@ -658,7 +668,7 @@ MACHINE_DRIVER_END
 ROM_START(tc2048)
 	ROM_REGION(0x10000,"main",0)
 	ROM_LOAD("tc2048.rom",0x0000,0x4000, CRC(f1b5fa67) SHA1(febb2d495b6eda7cdcb4074935d6e9d9f328972d))
-	ROM_CART_LOAD(0, "rom", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
+	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START(ts2068)
@@ -673,33 +683,11 @@ ROM_START(uk2086)
 	ROM_LOAD("ts2068_x.rom",0x14000,0x2000, CRC(ae16233a) SHA1(7e265a2c1f621ed365ea23bdcafdedbc79c1299c))
 ROM_END
 
-
-static void ts2068_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cartslot */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(timex_cart); break;
-		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(timex_cart); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "dck"); break;
-
-		default:										cartslot_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static SYSTEM_CONFIG_START(ts2068)
-	CONFIG_DEVICE(ts2068_cartslot_getinfo)
 	CONFIG_RAM_DEFAULT(48 * 1024)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(tc2048)
-	CONFIG_IMPORT_FROM(spectrum)
 	CONFIG_RAM_DEFAULT(48 * 1024)
 SYSTEM_CONFIG_END
 

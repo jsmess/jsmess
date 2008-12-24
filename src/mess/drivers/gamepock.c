@@ -37,6 +37,35 @@ INPUT_PORTS_END
 
 static const UPD7810_CONFIG gamepock_cpu_config = { TYPE_78C06, gamepock_io_callback };
 
+static DEVICE_START(gamepock_cart) {
+	memory_set_bankptr( device->machine, 1, memory_region(device->machine,  "user1" ) );
+	return DEVICE_START_OK;
+}
+
+static DEVICE_IMAGE_LOAD(gamepock_cart) {
+	UINT8 *cart = memory_region(image->machine,  "user1" );
+	int size = image_length( image );
+
+	if ( image_fread( image, cart, size ) != size ) {
+		image_seterror( image, IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file" );
+		return INIT_FAIL;
+	}
+
+	memory_set_bankptr( image->machine, 1, memory_region(image->machine,  "user1" ) );
+
+	return INIT_PASS;
+}
+
+static const cartslot_interface gamepock_cartslot =
+{
+	"bin",
+	0,
+	DEVICE_START_NAME(gamepock_cart),
+	DEVICE_IMAGE_LOAD_NAME(gamepock_cart),
+	NULL,
+	NULL
+};
+
 static MACHINE_DRIVER_START( gamepock )
 	MDRV_CPU_ADD("main", UPD78C06, XTAL_6MHz)	/* uPD78C06AG */
 	MDRV_CPU_PROGRAM_MAP( gamepock_mem, 0 )
@@ -60,41 +89,9 @@ static MACHINE_DRIVER_START( gamepock )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	
+	MDRV_CARTSLOT_ADD("cart", gamepock_cartslot)
 MACHINE_DRIVER_END
-
-static DEVICE_START(gamepock_cart) {
-	memory_set_bankptr( device->machine, 1, memory_region(device->machine,  "user1" ) );
-	return DEVICE_START_OK;
-}
-
-static DEVICE_IMAGE_LOAD(gamepock_cart) {
-	UINT8 *cart = memory_region(image->machine,  "user1" );
-	int size = image_length( image );
-
-	if ( image_fread( image, cart, size ) != size ) {
-		image_seterror( image, IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file" );
-		return INIT_FAIL;
-	}
-
-	memory_set_bankptr( image->machine, 1, memory_region(image->machine,  "user1" ) );
-
-	return INIT_PASS;
-}
-
-static void gamepock_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info) {
-	switch( state ) {
-	case MESS_DEVINFO_INT_COUNT:										info->i = 1; break;
-	case MESS_DEVINFO_INT_MUST_BE_LOADED:							info->i = 0; break;
-	case MESS_DEVINFO_PTR_START:										info->start = DEVICE_START_NAME(gamepock_cart); break;
-	case MESS_DEVINFO_PTR_LOAD:										info->load = DEVICE_IMAGE_LOAD_NAME(gamepock_cart); break;
-	case MESS_DEVINFO_STR_FILE_EXTENSIONS:							strcpy( info->s = device_temp_str(), "bin" ); break;
-	default:													cartslot_device_getinfo(devclass, state, info); break;
-	}
-}
-
-static SYSTEM_CONFIG_START(gamepock)
-	CONFIG_DEVICE(gamepock_cartslot_getinfo)
-SYSTEM_CONFIG_END
 
 ROM_START( gamepock )
 	ROM_REGION( 0x1000, "main", ROMREGION_ERASEFF )
@@ -102,5 +99,5 @@ ROM_START( gamepock )
 	ROM_REGION( 0x8000, "user1", ROMREGION_ERASEFF )
 ROM_END
 
-CONS( 1984, gamepock, 0, 0, gamepock, gamepock, 0, gamepock, "Epoch", "Game Pocket Computer", 0 )
+CONS( 1984, gamepock, 0, 0, gamepock, gamepock, 0, 0, "Epoch", "Game Pocket Computer", 0 )
 

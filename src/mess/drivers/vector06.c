@@ -151,6 +151,15 @@ static void vector_floppy_getinfo(const mess_device_class *devclass, UINT32 stat
 	}	
 }
 
+const cartslot_interface vector_cartslot =
+{
+	"emr",
+	0,
+	NULL,
+	NULL,
+	NULL,
+	NULL
+};
 
 /* Machine driver */
 static MACHINE_DRIVER_START( vector06 )
@@ -187,7 +196,9 @@ static MACHINE_DRIVER_START( vector06 )
 
 	MDRV_CASSETTE_ADD( "cassette", vector_cassette_config )
 	
-	MDRV_WD1793_ADD("wd1793", default_wd17xx_interface )	  
+	MDRV_WD1793_ADD("wd1793", default_wd17xx_interface )	
+	
+	MDRV_CARTSLOT_ADD("cart", vector_cartslot )  
 MACHINE_DRIVER_END
 
 /* ROM definition */
@@ -206,12 +217,11 @@ ROM_START( vector06 )
     ROMX_LOAD( "bootos.rt",    0x10000, 0x0200, CRC(46bef038) SHA1(6732f4a360cd38112c53c458842d31f5b035cf59), ROM_BIOS(5))
     ROM_SYSTEM_BIOS(5, "boot512", "Boot 512")
     ROMX_LOAD( "boot512.rt",   0x10000, 0x0200, CRC(a0b1c6b2) SHA1(f6fe15cb0974aed30f9b7aa72133324a66d1ed3f), ROM_BIOS(6))
-    ROM_CART_LOAD(0, "emr", 0x18000, 0x8000, ROM_FILL_FF | ROM_OPTIONAL)
+    ROM_CART_LOAD("cart", 0x18000, 0x8000, ROM_FILL_FF | ROM_OPTIONAL)
 ROM_END
 
 static SYSTEM_CONFIG_START(vector06)
  	CONFIG_RAM_DEFAULT(64 * 1024)
- 	CONFIG_DEVICE(cartslot_device_getinfo)
  	CONFIG_DEVICE(vector_floppy_getinfo);
 SYSTEM_CONFIG_END
 

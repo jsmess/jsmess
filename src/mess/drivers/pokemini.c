@@ -60,6 +60,15 @@ static const speaker_interface pokemini_speaker_interface =
 	NULL			/* optional: level lookup table */
 };
 
+static const cartslot_interface pokemini_cartslot =
+{
+	"min,bin",
+	0,
+	DEVICE_START_NAME(pokemini_cart),
+	DEVICE_IMAGE_LOAD_NAME(pokemini_cart),
+	NULL,
+	NULL
+};
 
 static MACHINE_DRIVER_START( pokemini )
 	/* basic machine hardware */
@@ -91,6 +100,8 @@ static MACHINE_DRIVER_START( pokemini )
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_CONFIG(pokemini_speaker_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	
+	MDRV_CARTSLOT_ADD("cart", pokemini_cartslot )
 MACHINE_DRIVER_END
 
 
@@ -99,31 +110,11 @@ static DRIVER_INIT( pokemini )
 	i2cmem_init( machine, 0, I2CMEM_SLAVE_ADDRESS, 0, 0x2000, NULL);
 }
 
-
-static void pokemini_cartslot_getinfo( const mess_device_class *devclass, UINT32 state, union devinfo *info )
-{
-	switch( state )
-	{
-	case MESS_DEVINFO_INT_COUNT:			info->i = 1; break;
-	case MESS_DEVINFO_INT_MUST_BE_LOADED:	info->i = 0; break;
-	case MESS_DEVINFO_PTR_START:			info->start = DEVICE_START_NAME(pokemini_cart); break;
-	case MESS_DEVINFO_PTR_LOAD:			info->load = DEVICE_IMAGE_LOAD_NAME(pokemini_cart); break;
-	case MESS_DEVINFO_STR_FILE_EXTENSIONS:	strcpy( info->s = device_temp_str(), "min,bin"); break;
-	default:				cartslot_device_getinfo( devclass, state, info ); break;
-	}
-}
-
-
-static SYSTEM_CONFIG_START( pokemini )
-	CONFIG_DEVICE( pokemini_cartslot_getinfo )
-SYSTEM_CONFIG_END
-
-
 ROM_START( pokemini )
 	ROM_REGION( 0x200000, "main", 0 )
 	ROM_LOAD( "bios.min", 0x0000, 0x1000, CRC(aed3c14d) SHA1(daad4113713ed776fbd47727762bca81ba74915f) )
 ROM_END
 
 
-CONS( 1999, pokemini, 0, 0, pokemini, pokemini, pokemini, pokemini, "Nintendo", "Pokemon Mini", GAME_NOT_WORKING )
+CONS( 1999, pokemini, 0, 0, pokemini, pokemini, pokemini, 0, "Nintendo", "Pokemon Mini", GAME_NOT_WORKING )
 

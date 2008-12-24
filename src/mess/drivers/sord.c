@@ -647,7 +647,8 @@ static MACHINE_DRIVER_START( sord_m5 )
 	MDRV_PRINTER_ADD("printer")
 
 	MDRV_CASSETTE_ADD( "cassette", sordm5_cassette_config )
-		
+	
+	MDRV_CARTSLOT_ADD("cart", default_cartslot )		
 MACHINE_DRIVER_END
 
 
@@ -678,7 +679,7 @@ ROM_START(sordm5)
 	ROM_REGION(0x010000, "main", 0)
 	ROM_LOAD("sordint.rom",0x0000, 0x02000, CRC(78848d39) SHA1(ac042c4ae8272ad6abe09ae83492ef9a0026d0b2))
 	ROM_REGION(0x5000, "user1", 0)
-	ROM_CART_LOAD(0, "rom", 0x0000, 0x5000, ROM_NOMIRROR)
+	ROM_CART_LOAD("cart", 0x0000, 0x5000, ROM_NOMIRROR)
 ROM_END
 
 
@@ -688,7 +689,7 @@ ROM_START(srdm5fd5)
 	ROM_REGION(0x10000, "floppy", 0)
 	ROM_LOAD("sordfd5.rom",0x0000, 0x04000, NO_DUMP)
 	ROM_REGION(0x5000, "user1", 0)
-	ROM_CART_LOAD(0, "rom", 0x0000, 0x5000, ROM_NOMIRROR | ROM_OPTIONAL)
+	ROM_CART_LOAD("cart", 0x0000, 0x5000, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 static FLOPPY_OPTIONS_START( sordm5 )
@@ -703,7 +704,6 @@ FLOPPY_OPTIONS_END
 
 static SYSTEM_CONFIG_START(sordm5)
 	CONFIG_RAM_DEFAULT(64 * 1024)
-	CONFIG_DEVICE(cartslot_device_getinfo)
 SYSTEM_CONFIG_END
 
 static void srdm5fd5_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)

@@ -140,6 +140,27 @@ static INPUT_PORTS_START( pce )
 INPUT_PORTS_END
 
 
+static void pce_partialhash(char *dest, const unsigned char *data,
+        unsigned long length, unsigned int functions)
+{
+        if ( ( length <= PCE_HEADER_SIZE ) || ( length & PCE_HEADER_SIZE ) ) {
+	        hash_compute(dest, &data[PCE_HEADER_SIZE], length - PCE_HEADER_SIZE, functions);
+	} else {
+		hash_compute(dest, data, length, functions);
+	}
+}
+
+
+static const cartslot_interface pce_cartslot =
+{
+	"pce,bin",
+	1,
+	NULL,
+	DEVICE_IMAGE_LOAD_NAME(pce_cart),
+	NULL,
+	pce_partialhash
+};
+
 static MACHINE_DRIVER_START( pce )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", H6280, MAIN_CLOCK/3)
@@ -179,6 +200,8 @@ static MACHINE_DRIVER_START( pce )
 	MDRV_SOUND_ROUTE( 1, "right", 1.00 )
 
 	MDRV_CDROM_ADD( "cdrom" )
+	
+	MDRV_CARTSLOT_ADD("cart", pce_cartslot )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( sgx )
@@ -217,42 +240,9 @@ static MACHINE_DRIVER_START( sgx )
 	MDRV_SOUND_ADD( "cdda", CDDA, 0 )
 	MDRV_SOUND_ROUTE( 0, "left", 1.00 )
 	MDRV_SOUND_ROUTE( 1, "right", 1.00 )
+	
+	MDRV_CARTSLOT_ADD("cart", pce_cartslot )
 MACHINE_DRIVER_END
-
-static void pce_partialhash(char *dest, const unsigned char *data,
-        unsigned long length, unsigned int functions)
-{
-        if ( ( length <= PCE_HEADER_SIZE ) || ( length & PCE_HEADER_SIZE ) ) {
-	        hash_compute(dest, &data[PCE_HEADER_SIZE], length - PCE_HEADER_SIZE, functions);
-	} else {
-		hash_compute(dest, data, length, functions);
-	}
-}
-
-static void pce_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cartslot */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-		case MESS_DEVINFO_INT_MUST_BE_LOADED:				info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(pce_cart); break;
-		case MESS_DEVINFO_PTR_PARTIAL_HASH:					info->partialhash = pce_partialhash; break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "pce,bin"); break;
-
-		default:										cartslot_device_getinfo(devclass, state, info); break;
-	}
-}
-
-
-static SYSTEM_CONFIG_START(pce)
-	CONFIG_DEVICE(pce_cartslot_getinfo)
-SYSTEM_CONFIG_END
 
 /***************************************************************************
 
@@ -269,7 +259,7 @@ ROM_END
 #define rom_sgx rom_pce
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT    INIT   CONFIG  COMPANY  FULLNAME */
-CONS( 1987, pce,    0,      0,      pce,    pce,     pce,   pce,	"Nippon Electronic Company", "PC Engine", GAME_IMPERFECT_SOUND )
-CONS( 1989, tg16,   pce,    0,      pce,    pce,     tg16,  pce,	"Nippon Electronic Company", "TurboGrafx 16", GAME_IMPERFECT_SOUND )
-CONS( 1989,	sgx,	pce,	0,		sgx,	pce,	sgx,	pce,	"Nippon Electronic Company", "SuperGrafx", GAME_IMPERFECT_SOUND )
+CONS( 1987, pce,    0,      0,      pce,    pce,     pce,   0,	"Nippon Electronic Company", "PC Engine", GAME_IMPERFECT_SOUND )
+CONS( 1989, tg16,   pce,    0,      pce,    pce,     tg16,  0,	"Nippon Electronic Company", "TurboGrafx 16", GAME_IMPERFECT_SOUND )
+CONS( 1989,	sgx,	pce,	0,		sgx,	pce,	 sgx,	0,	"Nippon Electronic Company", "SuperGrafx", GAME_IMPERFECT_SOUND )
 

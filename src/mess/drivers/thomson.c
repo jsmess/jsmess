@@ -198,40 +198,25 @@ INPUT_PORTS_END
 
 /* ------------ cartridge ------------ */
 
-static void to7_cartridge_getinfo( const mess_device_class *devclass,  UINT32 state, union devinfo *info )
+const cartslot_interface to7_cartslot =
 {
-	switch ( state ) {
-	case MESS_DEVINFO_INT_COUNT:
-		info->i = 1;
-		break;
-	case MESS_DEVINFO_PTR_LOAD:
-		info->load = DEVICE_IMAGE_LOAD_NAME(to7_cartridge);
-		break;
-	case MESS_DEVINFO_STR_FILE_EXTENSIONS:
-		strcpy( info->s = device_temp_str(), "m7,rom" );
-		break;
-	default:
-		cartslot_device_getinfo( devclass, state, info );
-	}
-}
+	"m7,rom",
+	0,
+	NULL,
+	DEVICE_IMAGE_LOAD_NAME(to7_cartridge),
+	NULL,
+	NULL
+};
 
-static void mo5_cartridge_getinfo( const mess_device_class *devclass, UINT32 state, union devinfo *info )
+const cartslot_interface mo5_cartslot =
 {
-	switch ( state ) {
-	case MESS_DEVINFO_INT_COUNT:
-		info->i = 1;
-		break;
-	case MESS_DEVINFO_PTR_LOAD:
-		info->load = DEVICE_IMAGE_LOAD_NAME(mo5_cartridge);
-		break;
-	case MESS_DEVINFO_STR_FILE_EXTENSIONS:
-		strcpy( info->s = device_temp_str(), "m5,rom" );
-		break;
-	default:
-		cartslot_device_getinfo( devclass, state, info );
-	}
-}
-
+	"m5,rom",
+	0,
+	NULL,
+	DEVICE_IMAGE_LOAD_NAME(mo5_cartridge),
+	NULL,
+	NULL
+};
 
 /* ------------ serial ------------ */
 
@@ -684,7 +669,6 @@ INPUT_PORTS_END
 /* ------------ config ------------ */
 
 static SYSTEM_CONFIG_START ( to )
-     CONFIG_DEVICE ( to7_cartridge_getinfo )
      CONFIG_DEVICE ( thom_floppy_getinfo )
      CONFIG_DEVICE ( thom_serial_getinfo )
 SYSTEM_CONFIG_END
@@ -760,6 +744,8 @@ static MACHINE_DRIVER_START ( to7 )
      MDRV_ACIA6850_ADD( "acia6850", to7_modem )
      
      MDRV_WD2793_ADD("wd2793", default_wd17xx_interface )
+     
+     MDRV_CARTSLOT_ADD("cart", to7_cartslot )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START ( t9000 )
@@ -1123,7 +1109,6 @@ INPUT_PORTS_END
 /* ------------ config ------------ */
 
 static SYSTEM_CONFIG_START ( mo )
-     CONFIG_DEVICE ( mo5_cartridge_getinfo )
      CONFIG_DEVICE ( thom_floppy_getinfo )
      CONFIG_DEVICE ( thom_serial_getinfo )
 SYSTEM_CONFIG_END
@@ -1151,6 +1136,8 @@ static MACHINE_DRIVER_START ( mo5 )
      MDRV_CASSETTE_MODIFY( "cassette", mo5_cassette_config )
 
      MDRV_MC6846_REMOVE( "mc6846" )
+     
+     MDRV_CARTSLOT_MODIFY("cart", mo5_cartslot )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START ( mo5e )
@@ -2234,6 +2221,8 @@ static MACHINE_DRIVER_START ( mo6 )
      MDRV_CPU_PROGRAM_MAP ( mo6, 0 )
 
      MDRV_MC6846_REMOVE( "mc6846" )
+     
+     MDRV_CARTSLOT_MODIFY("cart", mo5_cartslot )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START ( pro128 )
@@ -2460,6 +2449,8 @@ static MACHINE_DRIVER_START ( mo5nr )
      MDRV_CPU_PROGRAM_MAP ( mo5nr, 0 )
 
      MDRV_MC6846_REMOVE( "mc6846" )
+     
+     MDRV_CARTSLOT_MODIFY("cart", mo5_cartslot )
 MACHINE_DRIVER_END
 
 COMP ( 1986, mo5nr, 0, 0, mo5nr, mo5nr, 0, mo5nr, "Thomson", "MO5 NR", 0 )

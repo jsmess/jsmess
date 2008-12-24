@@ -1013,6 +1013,24 @@ static const cassette_config super80_cassette_config =
 	CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED
 };
 
+
+static DEVICE_IMAGE_LOAD( super80_cart )
+{
+	image_fread(image, memory_region(image->machine, "main") + 0xc000, 0x3000);
+
+	return INIT_PASS;
+}
+
+static const cartslot_interface super80_cartslot =
+{
+	"rom",
+	0,
+	NULL,
+	DEVICE_IMAGE_LOAD_NAME(super80_cart),
+	NULL,
+	NULL
+};
+
 static MACHINE_DRIVER_START( super80 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK/6)		/* 2 MHz */
@@ -1048,6 +1066,8 @@ static MACHINE_DRIVER_START( super80 )
 	MDRV_Z80BIN_QUICKLOAD_ADD(default, 1)
 
 	MDRV_CASSETTE_ADD( "cassette", super80_cassette_config )
+	
+	MDRV_CARTSLOT_ADD("cart", super80_cartslot )  
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( super80d )
@@ -1214,42 +1234,11 @@ ROM_START( super80v )
 	ROM_LOAD("s80hmce.ic24",  0xf000, 0x0800, CRC(a6488a1e) SHA1(7ba613d70a37a6b738dcd80c2bb9988ff1f011ef) )
 ROM_END
 
-/**************************** DEVICES *****************************************************************/
-
-static DEVICE_IMAGE_LOAD( super80_cart )
-{
-	image_fread(image, memory_region(image->machine, "main") + 0xc000, 0x3000);
-
-	return INIT_PASS;
-}
-
-static void super80_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cartslot */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:			info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:			info->load = DEVICE_IMAGE_LOAD_NAME(super80_cart); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:	strcpy(info->s = device_temp_str(), "rom"); break;
-
-		default:				cartslot_device_getinfo(devclass, state, info); break;
-	}
-}
-
-static SYSTEM_CONFIG_START(super80)
-	CONFIG_DEVICE(super80_cartslot_getinfo)
-SYSTEM_CONFIG_END
-
 /*    YEAR  NAME      PARENT COMPAT MACHINE INPUT     INIT       CONFIG   COMPANY       FULLNAME */
-COMP( 1981, super80,  0,       0, super80,  super80,  super80,  super80, "Dick Smith Electronics","Super-80 (V1.2)" , 0)
-COMP( 1981, super80d, super80, 0, super80d, super80d, super80d, super80, "Dick Smith Electronics","Super-80 (V2.2)" , 0)
-COMP( 1981, super80e, super80, 0, super80d, super80d, super80,  super80, "Dick Smith Electronics","Super-80 (El Graphix 4)" , 0)
-COMP( 1981, super80m, super80, 0, super80m, super80m, super80d, super80, "Dick Smith Electronics","Super-80 (8R0)" , 0)
-COMP( 1981, super80r, super80, 0, super80r, super80r, super80v, super80, "Dick Smith Electronics","Super-80 (with VDUEB)" , 0)
-COMP( 1981, super80v, super80, 0, super80v, super80v, super80v, super80, "Dick Smith Electronics","Super-80 (with enhanced VDUEB)" , 0)
+COMP( 1981, super80,  0,       0, super80,  super80,  super80,  0, "Dick Smith Electronics","Super-80 (V1.2)" , 0)
+COMP( 1981, super80d, super80, 0, super80d, super80d, super80d, 0, "Dick Smith Electronics","Super-80 (V2.2)" , 0)
+COMP( 1981, super80e, super80, 0, super80d, super80d, super80,  0, "Dick Smith Electronics","Super-80 (El Graphix 4)" , 0)
+COMP( 1981, super80m, super80, 0, super80m, super80m, super80d, 0, "Dick Smith Electronics","Super-80 (8R0)" , 0)
+COMP( 1981, super80r, super80, 0, super80r, super80r, super80v, 0, "Dick Smith Electronics","Super-80 (with VDUEB)" , 0)
+COMP( 1981, super80v, super80, 0, super80v, super80v, super80v, 0, "Dick Smith Electronics","Super-80 (with enhanced VDUEB)" , 0)
 

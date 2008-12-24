@@ -451,6 +451,16 @@ static const jaguar_cpu_config dsp_config =
 	jaguar_dsp_cpu_int
 };
 
+static const cartslot_interface jaguar_cartslot =
+{
+	"jag,abs,bin,rom,j64",
+	1,
+	NULL,
+	NULL,
+	NULL,
+	NULL
+};
+
 static MACHINE_DRIVER_START( jaguar )
 
 	/* basic machine hardware */
@@ -487,6 +497,8 @@ static MACHINE_DRIVER_START( jaguar )
 
 	/* quickload */
 	MDRV_QUICKLOAD_ADD(jaguar, "bin", 0)
+	
+	MDRV_CARTSLOT_ADD("cart", jaguar_cartslot)
 MACHINE_DRIVER_END
 
 
@@ -500,10 +512,8 @@ MACHINE_DRIVER_END
 ROM_START( jaguar )
 	ROM_REGION( 0xe20000, "main", 0 )  /* 4MB for RAM at 0 */
 	ROM_LOAD16_WORD( "jagboot.rom",          0xe00000, 0x020000, CRC(fb731aaa) SHA1(f8991b0c385f4e5002fa2a7e2f5e61e8c5213356))
-	ROM_CART_LOAD(0, "jag,abs,bin,rom,j64", 0x800000, 0x600000, ROM_NOMIRROR)
+	ROM_CART_LOAD("cart", 0x800000, 0x600000, ROM_NOMIRROR)
 ROM_END
-
-
 
 /*************************************
  *
@@ -529,11 +539,6 @@ static QUICKLOAD_LOAD( jaguar )
 	return INIT_PASS;
 }
 
-static SYSTEM_CONFIG_START(jaguar)
-	CONFIG_DEVICE(cartslot_device_getinfo)
-SYSTEM_CONFIG_END
-
-
 
 /*************************************
  *
@@ -542,4 +547,4 @@ SYSTEM_CONFIG_END
  *************************************/
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT      CONFIG    COMPANY     FULLNAME */
-CONS(1993,	jaguar,   0,        0,		jaguar,   jaguar,   jaguar,   jaguar,	"Atari",	"Atari Jaguar", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND)
+CONS(1993,	jaguar,   0,        0,		jaguar,   jaguar,   jaguar,   0,	"Atari",	"Atari Jaguar", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND)

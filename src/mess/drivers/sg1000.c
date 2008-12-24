@@ -756,6 +756,130 @@ static MACHINE_RESET( sf7000 )
 	memory_set_bank(machine, 2, 0);
 }
 
+static void sg1000_map_cartridge_memory(running_machine *machine, UINT8 *ptr, int size)
+{
+	const address_space *program = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
+
+	switch (size)
+	{
+	case 40 * 1024:
+		memory_install_readwrite8_handler(program, 0x8000, 0x9fff, 0, 0, SMH_BANK1, SMH_UNMAP);
+		memory_configure_bank(machine, 1, 0, 1, memory_region(machine, "main") + 0x8000, 0);
+		memory_set_bank(machine, 1, 0);
+		break;
+
+	case 48 * 1024:
+		memory_install_readwrite8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_BANK1, SMH_UNMAP);
+		memory_configure_bank(machine, 1, 0, 1, memory_region(machine, "main") + 0x8000, 0);
+		memory_set_bank(machine, 1, 0);
+		break;
+
+	default:
+		if (IS_CARTRIDGE_TV_DRAW(ptr))
+		{
+			memory_install_write8_handler(program, 0x6000, 0x6000, 0, 0, &tvdraw_axis_w);
+			memory_install_read8_handler(program, 0x8000, 0x8000, 0, 0, &tvdraw_status_r);
+			memory_install_readwrite8_handler(program, 0xa000, 0xa000, 0, 0, &tvdraw_data_r, SMH_NOP);
+		}
+		else if (IS_CARTRIDGE_THE_CASTLE(ptr))
+		{
+			memory_install_readwrite8_handler(program, 0x8000, 0x9fff, 0, 0, SMH_BANK1, SMH_BANK1);
+		}
+		break;
+	}
+}
+
+static DEVICE_IMAGE_LOAD( sg1000_cart )
+{
+	const address_space *program = cputag_get_address_space(image->machine, "main", ADDRESS_SPACE_PROGRAM);
+	int size = image_length(image);
+	UINT8 *ptr = memory_region(image->machine, "main");
+
+	if (image_fread(image, ptr, size ) != size)
+	{
+		return INIT_FAIL;
+	}
+
+	/* cartridge ROM banking */
+	sg1000_map_cartridge_memory(image->machine, ptr, size);
+
+	/* work RAM banking */
+	memory_install_readwrite8_handler(program, 0xc000, 0xc3ff, 0, 0x3c00, SMH_BANK2, SMH_BANK2);
+
+	return INIT_PASS;
+}
+
+static const cartslot_interface sg1000_cartslot =
+{
+	"sg,bin",
+	1,
+	NULL,
+	DEVICE_IMAGE_LOAD_NAME(sg1000_cart),
+	NULL,
+	NULL
+};
+
+static void sc3000_map_cartridge_memory(running_machine *machine, UINT8 *ptr, int size)
+{
+	const address_space *program = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
+
+	/* include SG-1000 mapping */
+	sg1000_map_cartridge_memory(machine, ptr, size);
+
+	if (IS_CARTRIDGE_BASIC_LEVEL_III(ptr))
+	{
+		memory_install_readwrite8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite8_handler(program, 0xc000, 0xffff, 0, 0, SMH_BANK2, SMH_BANK2);
+	}
+	else if (IS_CARTRIDGE_MUSIC_EDITOR(ptr))
+	{
+		memory_install_readwrite8_handler(program, 0x8000, 0x9fff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite8_handler(program, 0xc000, 0xc7ff, 0, 0x3800, SMH_BANK2, SMH_BANK2);
+	}
+	else
+	{
+		/* regular cartridges */
+		memory_install_readwrite8_handler(program, 0xc000, 0xc7ff, 0, 0x3800, SMH_BANK2, SMH_BANK2);
+	}
+}
+
+static DEVICE_IMAGE_LOAD( sc3000_cart )
+{
+//	const address_space *program = cputag_get_address_space(image->machine, "main", ADDRESS_SPACE_PROGRAM);
+	int size = image_length(image);
+	UINT8 *ptr = memory_region(image->machine, "main");
+
+	if (image_fread(image, ptr, size ) != size)
+	{
+		return INIT_FAIL;
+	}
+
+	/* cartridge ROM and work RAM banking */
+	sc3000_map_cartridge_memory(image->machine, ptr, size);
+
+	return INIT_PASS;
+}
+
+static const cartslot_interface sc3000_cartslot =
+{
+	"sg,sc,bin",
+	1,
+	NULL,
+	DEVICE_IMAGE_LOAD_NAME(sc3000_cart),
+	NULL,
+	NULL
+};
+
+static const cartslot_interface omv_cartslot =
+{
+	"sg,bin",
+	0,
+	NULL,
+	DEVICE_IMAGE_LOAD_NAME(sg1000_cart),
+	NULL,
+	NULL
+};
+
 /* Machine Drivers */
 
 static MACHINE_DRIVER_START( sg1000 )
@@ -779,10 +903,14 @@ static MACHINE_DRIVER_START( sg1000 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("sn76489an", SN76489A, XTAL_10_738635MHz/3)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	
+	MDRV_CARTSLOT_ADD("cart", sg1000_cartslot )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( omv )
 	MDRV_IMPORT_FROM(sg1000)
+	
+	MDRV_CARTSLOT_MODIFY("cart", omv_cartslot )
 MACHINE_DRIVER_END
 
 static const cassette_config sc3000_cassette_config =
@@ -821,6 +949,8 @@ static MACHINE_DRIVER_START( sc3000 )
 
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", sc3000_cassette_config )
+	
+	MDRV_CARTSLOT_ADD("cart", sc3000_cartslot )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( sf7000 )
@@ -898,153 +1028,6 @@ ROM_END
 
 /* System Configuration */
 
-static void sg1000_map_cartridge_memory(running_machine *machine, UINT8 *ptr, int size)
-{
-	const address_space *program = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
-
-	switch (size)
-	{
-	case 40 * 1024:
-		memory_install_readwrite8_handler(program, 0x8000, 0x9fff, 0, 0, SMH_BANK1, SMH_UNMAP);
-		memory_configure_bank(machine, 1, 0, 1, memory_region(machine, "main") + 0x8000, 0);
-		memory_set_bank(machine, 1, 0);
-		break;
-
-	case 48 * 1024:
-		memory_install_readwrite8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_BANK1, SMH_UNMAP);
-		memory_configure_bank(machine, 1, 0, 1, memory_region(machine, "main") + 0x8000, 0);
-		memory_set_bank(machine, 1, 0);
-		break;
-
-	default:
-		if (IS_CARTRIDGE_TV_DRAW(ptr))
-		{
-			memory_install_write8_handler(program, 0x6000, 0x6000, 0, 0, &tvdraw_axis_w);
-			memory_install_read8_handler(program, 0x8000, 0x8000, 0, 0, &tvdraw_status_r);
-			memory_install_readwrite8_handler(program, 0xa000, 0xa000, 0, 0, &tvdraw_data_r, SMH_NOP);
-		}
-		else if (IS_CARTRIDGE_THE_CASTLE(ptr))
-		{
-			memory_install_readwrite8_handler(program, 0x8000, 0x9fff, 0, 0, SMH_BANK1, SMH_BANK1);
-		}
-		break;
-	}
-}
-
-static DEVICE_IMAGE_LOAD( sg1000_cart )
-{
-	const address_space *program = cputag_get_address_space(image->machine, "main", ADDRESS_SPACE_PROGRAM);
-	int size = image_length(image);
-	UINT8 *ptr = memory_region(image->machine, "main");
-
-	if (image_fread(image, ptr, size ) != size)
-	{
-		return INIT_FAIL;
-	}
-
-	/* cartridge ROM banking */
-	sg1000_map_cartridge_memory(image->machine, ptr, size);
-
-	/* work RAM banking */
-	memory_install_readwrite8_handler(program, 0xc000, 0xc3ff, 0, 0x3c00, SMH_BANK2, SMH_BANK2);
-
-	return INIT_PASS;
-}
-
-static void sg1000_cartslot_getinfo( const mess_device_class *devclass, UINT32 state, union devinfo *info )
-{
-	switch( state )
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:					info->i = 1; break;
-		case MESS_DEVINFO_INT_MUST_BE_LOADED:			info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:						info->load = DEVICE_IMAGE_LOAD_NAME(sg1000_cart); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:			strcpy(info->s = device_temp_str(), "sg,bin"); break;
-
-		default:										cartslot_device_getinfo( devclass, state, info ); break;
-	}
-}
-
-static void sc3000_map_cartridge_memory(running_machine *machine, UINT8 *ptr, int size)
-{
-	const address_space *program = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
-
-	/* include SG-1000 mapping */
-	sg1000_map_cartridge_memory(machine, ptr, size);
-
-	if (IS_CARTRIDGE_BASIC_LEVEL_III(ptr))
-	{
-		memory_install_readwrite8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_BANK1, SMH_BANK1);
-		memory_install_readwrite8_handler(program, 0xc000, 0xffff, 0, 0, SMH_BANK2, SMH_BANK2);
-	}
-	else if (IS_CARTRIDGE_MUSIC_EDITOR(ptr))
-	{
-		memory_install_readwrite8_handler(program, 0x8000, 0x9fff, 0, 0, SMH_BANK1, SMH_BANK1);
-		memory_install_readwrite8_handler(program, 0xc000, 0xc7ff, 0, 0x3800, SMH_BANK2, SMH_BANK2);
-	}
-	else
-	{
-		/* regular cartridges */
-		memory_install_readwrite8_handler(program, 0xc000, 0xc7ff, 0, 0x3800, SMH_BANK2, SMH_BANK2);
-	}
-}
-
-static DEVICE_IMAGE_LOAD( sc3000_cart )
-{
-//	const address_space *program = cputag_get_address_space(image->machine, "main", ADDRESS_SPACE_PROGRAM);
-	int size = image_length(image);
-	UINT8 *ptr = memory_region(image->machine, "main");
-
-	if (image_fread(image, ptr, size ) != size)
-	{
-		return INIT_FAIL;
-	}
-
-	/* cartridge ROM and work RAM banking */
-	sc3000_map_cartridge_memory(image->machine, ptr, size);
-
-	return INIT_PASS;
-}
-
-static void sc3000_cartslot_getinfo( const mess_device_class *devclass, UINT32 state, union devinfo *info )
-{
-	switch( state )
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:					info->i = 1; break;
-		case MESS_DEVINFO_INT_MUST_BE_LOADED:			info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:						info->load = DEVICE_IMAGE_LOAD_NAME(sc3000_cart); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:			strcpy(info->s = device_temp_str(), "sg,sc,bin"); break;
-
-		default:										cartslot_device_getinfo( devclass, state, info ); break;
-	}
-}
-
-static void omv_cartslot_getinfo( const mess_device_class *devclass, UINT32 state, union devinfo *info )
-{
-	switch( state )
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:					info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:						info->load = DEVICE_IMAGE_LOAD_NAME(sg1000_cart); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:			strcpy(info->s = device_temp_str(), "sg,bin"); break;
-
-		default:										cartslot_device_getinfo( devclass, state, info ); break;
-	}
-}
-
 static DEVICE_IMAGE_LOAD( sf7000_floppy )
 {
 	if (image_has_been_created(image))
@@ -1102,12 +1085,10 @@ static void sf7000_serial_getinfo(const mess_device_class *devclass, UINT32 stat
 
 static SYSTEM_CONFIG_START( sg1000 )
 	CONFIG_RAM_DEFAULT	(1 * 1024)
-	CONFIG_DEVICE(sg1000_cartslot_getinfo)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START( sc3000 )
 	CONFIG_RAM_DEFAULT	(2 * 1024)
-	CONFIG_DEVICE(sc3000_cartslot_getinfo)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START( sf7000 )
@@ -1116,9 +1097,6 @@ static SYSTEM_CONFIG_START( sf7000 )
 	CONFIG_DEVICE(sf7000_serial_getinfo)
 SYSTEM_CONFIG_END
 
-static SYSTEM_CONFIG_START( omv )
-	CONFIG_DEVICE(omv_cartslot_getinfo)
-SYSTEM_CONFIG_END
 
 /* System Drivers */
 
@@ -1128,5 +1106,5 @@ CONS( 1984,	sg1000m2,	sg1000,	0,		sc3000,		sc3000,		0,		sc3000,		"Sega",	"SG-100
 COMP( 1983,	sc3000,		0,		0,		sc3000,		sc3000,		0,		sc3000,		"Sega",	"SC-3000", GAME_SUPPORTS_SAVE )
 COMP( 1983,	sc3000h,	sc3000,	0,		sc3000,		sc3000,		0,		sc3000,		"Sega",	"SC-3000H", GAME_SUPPORTS_SAVE )
 COMP( 1983,	sf7000,		sc3000, 0,		sf7000,		sf7000,		0,		sf7000,		"Sega",	"SC-3000/Super Control Station SF-7000", GAME_SUPPORTS_SAVE )
-CONS( 1984,	omv1000,    sg1000,	0,      omv,        omv,        0,      omv,        "Tsukuda Original", "Othello Multivision FG-1000", GAME_NOT_WORKING )
-CONS( 1984,	omv2000,    sg1000,	0,      omv,        omv,        0,      omv,        "Tsukuda Original", "Othello Multivision FG-2000", GAME_NOT_WORKING )
+CONS( 1984,	omv1000,    sg1000,	0,      omv,        omv,        0,      0,        "Tsukuda Original", "Othello Multivision FG-1000", GAME_NOT_WORKING )
+CONS( 1984,	omv2000,    sg1000,	0,      omv,        omv,        0,      0,        "Tsukuda Original", "Othello Multivision FG-2000", GAME_NOT_WORKING )

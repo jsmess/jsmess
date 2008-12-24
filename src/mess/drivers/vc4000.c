@@ -187,42 +187,6 @@ static PALETTE_INIT( vc4000 )
 	palette_set_colors(machine, 0, vc4000_palette, ARRAY_LENGTH(vc4000_palette));
 }
 
-static MACHINE_DRIVER_START( vc4000 )
-	/* basic machine hardware */
-	MDRV_CPU_ADD("main", S2650, 865000)        /* 3550000/4, 3580000/3, 4430000/3 */
-	MDRV_CPU_PROGRAM_MAP(vc4000_mem, 0)
-	MDRV_CPU_IO_MAP(vc4000_io, 0)
-	MDRV_CPU_PERIODIC_INT(vc4000_video_line, 312*50)
-	MDRV_QUANTUM_TIME(HZ(60))
-
-	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(226, 312)
-	MDRV_SCREEN_VISIBLE_AREA(10, 182, 0, 269)
-	MDRV_PALETTE_LENGTH(ARRAY_LENGTH(vc4000_palette))
-	MDRV_PALETTE_INIT( vc4000 )
-
-	MDRV_VIDEO_START( vc4000 )
-	MDRV_VIDEO_UPDATE( vc4000 )
-
-	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("custom", CUSTOM, 0)
-	MDRV_SOUND_CONFIG(vc4000_sound_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	/* quickload */
-	MDRV_QUICKLOAD_ADD(vc4000, "tvc", 0)
-MACHINE_DRIVER_END
-
-ROM_START(vc4000)
-	ROM_REGION(0x2000,"main", 0)
-	ROM_FILL( 0x0000, 0x2000, 0xFF )
-
-ROM_END
-
 static DEVICE_IMAGE_LOAD( vc4000_cart )
 {
 	running_machine *machine = image->machine;
@@ -281,24 +245,53 @@ static DEVICE_IMAGE_LOAD( vc4000_cart )
 	return INIT_PASS;
 }
 
-static void vc4000_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+const cartslot_interface vc4000_cartslot =
 {
-	/* cartslot */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-		case MESS_DEVINFO_INT_MUST_BE_LOADED:				info->i = 1; break;
+	"rom,bin",
+	1,
+	NULL,
+	DEVICE_IMAGE_LOAD_NAME(vc4000_cart),
+	NULL,
+	NULL
+};
 
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(vc4000_cart); break;
+static MACHINE_DRIVER_START( vc4000 )
+	/* basic machine hardware */
+	MDRV_CPU_ADD("main", S2650, 865000)        /* 3550000/4, 3580000/3, 4430000/3 */
+	MDRV_CPU_PROGRAM_MAP(vc4000_mem, 0)
+	MDRV_CPU_IO_MAP(vc4000_io, 0)
+	MDRV_CPU_PERIODIC_INT(vc4000_video_line, 312*50)
+	MDRV_QUANTUM_TIME(HZ(60))
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "rom,bin"); break;
+	/* video hardware */
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(50)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(226, 312)
+	MDRV_SCREEN_VISIBLE_AREA(10, 182, 0, 269)
+	MDRV_PALETTE_LENGTH(ARRAY_LENGTH(vc4000_palette))
+	MDRV_PALETTE_INIT( vc4000 )
 
-		default:										cartslot_device_getinfo(devclass, state, info); break;
-	}
-}
+	MDRV_VIDEO_START( vc4000 )
+	MDRV_VIDEO_UPDATE( vc4000 )
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("custom", CUSTOM, 0)
+	MDRV_SOUND_CONFIG(vc4000_sound_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	/* quickload */
+	MDRV_QUICKLOAD_ADD(vc4000, "tvc", 0)
+	
+	MDRV_CARTSLOT_ADD("cart", vc4000_cartslot )
+MACHINE_DRIVER_END
+
+ROM_START(vc4000)
+	ROM_REGION(0x2000,"main", 0)
+	ROM_FILL( 0x0000, 0x2000, 0xFF )
+
+ROM_END
 
 QUICKLOAD_LOAD(vc4000)
 {
@@ -341,7 +334,6 @@ QUICKLOAD_LOAD(vc4000)
 
 static SYSTEM_CONFIG_START(vc4000)
 	CONFIG_RAM_DEFAULT(5 * 1024) 
-	CONFIG_DEVICE(vc4000_cartslot_getinfo)
 SYSTEM_CONFIG_END
 
 /*    	YEAR		NAME	PARENT	COMPAT	MACHINE	INPUT	INIT		CONFIG	COMPANY		FULLNAME */

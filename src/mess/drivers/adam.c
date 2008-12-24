@@ -620,6 +620,17 @@ static MACHINE_RESET( adam )
 	timer_pulse(machine, ATTOTIME_IN_MSEC(20), NULL, 0, adam_paddle_callback);
 }
 
+static const cartslot_interface adam_cartslot =
+{
+	"rom,col,bin",
+	0,
+	NULL,
+	NULL,
+	NULL,
+	NULL
+	//case MESS_DEVINFO_PTR_VERIFY:					info->imgverify = adam_cart_verify; break;
+};
+
 static MACHINE_DRIVER_START( adam )
 	/* Machine hardware */
 	MDRV_CPU_ADD("main", Z80, 3579545)       /* 3.579545 MHz */
@@ -644,6 +655,8 @@ static MACHINE_DRIVER_START( adam )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("sn76489a", SN76489A, 3579545)	/* 3.579545 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	
+	MDRV_CARTSLOT_ADD("cart", adam_cartslot)
 MACHINE_DRIVER_END
 
 
@@ -680,23 +693,11 @@ ROM_START (adam)
 	ROM_LOAD ("os7.rom", 0x30000, 0x2000, CRC(3aa93ef3) SHA1(45bedc4cbdeac66c7df59e9e599195c778d86a92))
 	ROM_LOAD ("eos.rom", 0x38000, 0x2000, CRC(05a37a34) SHA1(ad3c20ef444f10af7ae8eb75c81e500d9b1bba3d))
 
-	ROM_CART_LOAD(0, "rom,col,bin", 0x28000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
+	ROM_CART_LOAD("cart", 0x28000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
 
 	//ROM_REGION( 0x10000, "cpu1", 0)
 	//ROM_LOAD ("master68.rom", 0x0100, 0x0E4, CRC(619a47b8)) /* Replacement 6801 Master ROM */
 ROM_END
-
-static void adam_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cartslot */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_VERIFY:						info->imgverify = adam_cart_verify; break;
-
-		default:										cartslot_device_getinfo(devclass, state, info); break;
-	}
-}
 
 static void adam_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
@@ -714,7 +715,6 @@ static void adam_floppy_getinfo(const mess_device_class *devclass, UINT32 state,
 }
 
 static SYSTEM_CONFIG_START(adam)
-	CONFIG_DEVICE(adam_cartslot_getinfo)
 	CONFIG_DEVICE(adam_floppy_getinfo)
 SYSTEM_CONFIG_END
 

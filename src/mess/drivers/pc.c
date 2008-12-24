@@ -1903,6 +1903,16 @@ static MACHINE_DRIVER_START( t1000hx )
 MACHINE_DRIVER_END
 
 
+static const cartslot_interface pcjr_cartslot =
+{
+	"jrc",
+	0,
+	NULL,
+	DEVICE_IMAGE_LOAD_NAME(pcjr_cartridge),
+	NULL,
+	NULL
+};
+
 static MACHINE_DRIVER_START( ibmpcjr )
 	/* basic machine hardware */
 	MDRV_CPU_PC(ibmpcjr, ibmpcjr, I8088, 4900000, pcjr_frame_interrupt)	/* TODO: Get correct cpu frequency, probably XTAL_14_31818MHz/3 */
@@ -1944,6 +1954,9 @@ static MACHINE_DRIVER_START( ibmpcjr )
 	MDRV_CASSETTE_ADD( "cassette", ibm5150_cassette_config )
 	
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
+	
+	MDRV_CARTSLOT_ADD("cart1", pcjr_cartslot )
+	MDRV_CARTSLOT_ADD("cart2", pcjr_cartslot )	
 MACHINE_DRIVER_END
 
 #if 0
@@ -2508,25 +2521,6 @@ static void ibmpc_floppy_getinfo(const mess_device_class *devclass, UINT32 state
 	}
 }
 
-
-static void pcjr_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	switch( state )
-	{
-	/* --- the following bits of info are returned as 64-bit signed integers --- */
-	case MESS_DEVINFO_INT_COUNT:						info->i = 2; break;
-	case MESS_DEVINFO_INT_MUST_BE_LOADED:				info->i = 0; break;
-
-	/* --- the following bits of info are returned as pointers to data or functions --- */
-	case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME( pcjr_cartridge ); break;
-
-	/* --- the following bits of info are returned as NULL-terminated strings --- */
-	case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy( info->s = device_temp_str(), "jrc" ); break;
-
-	default:											cartslot_device_getinfo( devclass, state, info ); break;
-	}
-}
-
 static SYSTEM_CONFIG_START(ibm5150)
 	CONFIG_RAM_DEFAULT( 640 * 1024 )
 	CONFIG_DEVICE(ibmpc_floppy_getinfo)
@@ -2541,8 +2535,7 @@ SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(pcjr)
 	CONFIG_RAM_DEFAULT( 640 * 1024 )
-	CONFIG_DEVICE(ibmpc_floppy_getinfo)
-	CONFIG_DEVICE(pcjr_cartslot_getinfo)
+	CONFIG_DEVICE(ibmpc_floppy_getinfo)	
 SYSTEM_CONFIG_END
 
 /***************************************************************************

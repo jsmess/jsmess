@@ -601,6 +601,34 @@ static MACHINE_START( ql )
 	state_save_register_global(machine, state->baudx4);
 }
 
+static DEVICE_IMAGE_LOAD( ql_cart )
+{
+	UINT8 *ptr = memory_region(image->machine, "main") + 0x00c000;
+	int	filesize = image_length(image);
+
+	if (filesize <= 16 * 1024)
+	{
+		if (image_fread(image, ptr, filesize) == filesize)
+		{
+			memory_install_readwrite8_handler(cpu_get_address_space(image->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x00c000, 0x00ffff, 0, 0, SMH_BANK1, SMH_UNMAP);
+
+			return INIT_PASS;
+		}
+	}
+
+	return INIT_FAIL;
+}
+
+static const cartslot_interface ql_cartslot =
+{
+	"bin",
+	0,
+	NULL,
+	DEVICE_IMAGE_LOAD_NAME(ql_cart),
+	NULL,
+	NULL
+};
+
 static MACHINE_DRIVER_START( ql )
 	MDRV_DRIVER_DATA(ql_state)
 
@@ -641,6 +669,8 @@ static MACHINE_DRIVER_START( ql )
 
 	/* quickload */
 	MDRV_QUICKLOAD_ADD(ql, "bas", 0)
+	
+	MDRV_CARTSLOT_ADD("cart", ql_cartslot )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( opd )
@@ -652,6 +682,8 @@ static MACHINE_DRIVER_START( opd )
 
 	MDRV_CPU_ADD("ipc", I8051, X4)
 	MDRV_CPU_IO_MAP(ipc_io_map, 0)
+	
+	MDRV_CARTSLOT_REMOVE("cart")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ql_ntsc )
@@ -852,41 +884,6 @@ static void ql_serial_getinfo(const mess_device_class *devclass, UINT32 state, u
 	}
 }
 
-static DEVICE_IMAGE_LOAD( ql_cart )
-{
-	UINT8 *ptr = memory_region(image->machine, "main") + 0x00c000;
-	int	filesize = image_length(image);
-
-	if (filesize <= 16 * 1024)
-	{
-		if (image_fread(image, ptr, filesize) == filesize)
-		{
-			memory_install_readwrite8_handler(cpu_get_address_space(image->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x00c000, 0x00ffff, 0, 0, SMH_BANK1, SMH_UNMAP);
-
-			return INIT_PASS;
-		}
-	}
-
-	return INIT_FAIL;
-}
-
-static void ql_cartslot_getinfo( const mess_device_class *devclass, UINT32 state, union devinfo *info )
-{
-	switch( state )
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:					info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:						info->load = DEVICE_IMAGE_LOAD_NAME(ql_cart); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:			strcpy(info->s = device_temp_str(), "bin");	break;
-		
-		default:										cartslot_device_getinfo( devclass, state, info ); break;
-	}
-}
-
 static DEVICE_IMAGE_LOAD( ql_floppy )
 {
 	if (image_has_been_created(image))
@@ -943,7 +940,6 @@ static SYSTEM_CONFIG_START( ql )
 	CONFIG_RAM			(640 * 1024) // 512K expansion
 	CONFIG_RAM			(896 * 1024) // Trump Card
 	CONFIG_DEVICE(ql_serial_getinfo)
-	CONFIG_DEVICE(ql_cartslot_getinfo)
 	CONFIG_DEVICE(ql_floppy_getinfo)
 SYSTEM_CONFIG_END
 

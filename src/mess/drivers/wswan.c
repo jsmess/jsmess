@@ -127,6 +127,16 @@ static const custom_sound_interface wswan_sound_interface =
 	wswan_sh_start
 };
 
+static const cartslot_interface wswan_cartslot =
+{
+	"ws,wsc,bin",
+	1,
+	DEVICE_START_NAME(wswan_cart),
+	DEVICE_IMAGE_LOAD_NAME(wswan_cart),
+	NULL,
+	NULL
+};
+
 static MACHINE_DRIVER_START( wswan )
 	/* Basic machine hardware */
 	MDRV_CPU_ADD("main", V30MZ, 3072000)
@@ -159,6 +169,8 @@ static MACHINE_DRIVER_START( wswan )
 	MDRV_SOUND_CONFIG(wswan_sound_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
+	
+	MDRV_CARTSLOT_ADD("cart", wswan_cartslot)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( wscolor )
@@ -169,30 +181,6 @@ static MACHINE_DRIVER_START( wscolor )
 	MDRV_PALETTE_LENGTH(4096)
 	MDRV_PALETTE_INIT( wscolor )
 MACHINE_DRIVER_END
-
-static void wswan_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cartslot */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:			info->i = 1; break;
-		case MESS_DEVINFO_INT_MUST_BE_LOADED:	info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_START:			info->start = DEVICE_START_NAME(wswan_cart); break;
-		case MESS_DEVINFO_PTR_LOAD:			info->load = DEVICE_IMAGE_LOAD_NAME(wswan_cart); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:	strcpy(info->s = device_temp_str(), "ws,wsc,bin"); break;
-
-		default:				cartslot_device_getinfo(devclass, state, info); break;
-	}
-}
-
-static SYSTEM_CONFIG_START(wswan)
-	CONFIG_DEVICE(wswan_cartslot_getinfo)
-SYSTEM_CONFIG_END
 
 /***************************************************************************
 
@@ -211,6 +199,6 @@ ROM_START( wscolor )
 ROM_END
 
 /*     YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  INIT  CONFIG  COMPANY   FULLNAME*/
-CONS( 1999, wswan,   0,      0,      wswan,   wswan, 0,    wswan,  "Bandai", "WonderSwan",       GAME_IMPERFECT_SOUND )
-CONS( 2000, wscolor, wswan,  0,      wscolor, wswan, 0,    wswan,  "Bandai", "WonderSwan Color", GAME_IMPERFECT_SOUND )
+CONS( 1999, wswan,   0,      0,      wswan,   wswan, 0,    0,  "Bandai", "WonderSwan",       GAME_IMPERFECT_SOUND )
+CONS( 2000, wscolor, wswan,  0,      wscolor, wswan, 0,    0,  "Bandai", "WonderSwan Color", GAME_IMPERFECT_SOUND )
 

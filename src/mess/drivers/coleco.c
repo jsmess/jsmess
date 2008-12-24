@@ -402,6 +402,53 @@ static MACHINE_RESET( coleco )
     timer_pulse(machine, ATTOTIME_IN_MSEC(20), NULL, 0, paddle_callback);
 }
 
+//static int coleco_cart_verify(const UINT8 *cartdata, size_t size)
+//{
+//	int retval = IMAGE_VERIFY_FAIL;
+//
+//	/* Verify the file is in Colecovision format */
+//	if ((cartdata[0] == 0xAA) && (cartdata[1] == 0x55)) /* Production Cartridge */
+//		retval = IMAGE_VERIFY_PASS;
+//	if ((cartdata[0] == 0x55) && (cartdata[1] == 0xAA)) /* "Test" Cartridge. Some games use this method to skip ColecoVision title screen and delay */
+//		retval = IMAGE_VERIFY_PASS;
+//
+//	return retval;
+//}
+
+static DEVICE_IMAGE_LOAD( czz50_cart )
+{
+	int size = image_length(image);
+	UINT8 *ptr = memory_region(image->machine, "main") + 0x8000;
+
+	if (image_fread(image, ptr, size ) != size)
+	{
+		return INIT_FAIL;
+	}
+
+	return INIT_PASS;
+}
+
+static const cartslot_interface coleco_cartslot =
+{
+	"rom,col,bin",
+	0,
+	NULL,
+	NULL,
+	NULL,
+	NULL
+	//case MESS_DEVINFO_PTR_VERIFY:					info->imgverify = coleco_cart_verify; break;
+};
+
+static const cartslot_interface czz50_cartslot =
+{
+	"rom,col,bin",
+	0,
+	NULL,
+	DEVICE_IMAGE_LOAD_NAME(czz50_cart),
+	NULL,
+	NULL
+};
+
 /* Machine Drivers */
 
 static MACHINE_DRIVER_START( coleco )
@@ -424,6 +471,8 @@ static MACHINE_DRIVER_START( coleco )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("sn76489a", SN76489A, XTAL_7_15909MHz/2)	/* 3.579545 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	
+	MDRV_CARTSLOT_ADD("cart", coleco_cartslot)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( czz50 )
@@ -446,6 +495,8 @@ static MACHINE_DRIVER_START( czz50 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("sn76489a", SN76489A, XTAL_7_15909MHz/2)	// ???
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	
+	MDRV_CARTSLOT_ADD("cart", czz50_cartslot)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dina )
@@ -459,20 +510,20 @@ MACHINE_DRIVER_END
 ROM_START (coleco)
     ROM_REGION( 0x10000, "main", 0 )
     ROM_LOAD( "coleco.rom", 0x0000, 0x2000, CRC(3aa93ef3) SHA1(45bedc4cbdeac66c7df59e9e599195c778d86a92) )
-	ROM_CART_LOAD(0, "rom,col,bin", 0x8000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
+	ROM_CART_LOAD("cart", 0x8000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START (colecoa)
     // differences to 0x3aa93ef3 modified characters, added a pad 2 related fix
     ROM_REGION( 0x10000, "main", 0 )
     ROM_LOAD( "colecoa.rom", 0x0000, 0x2000, CRC(39bb16fc) SHA1(99ba9be24ada3e86e5c17aeecb7a2d68c5edfe59) )
-	ROM_CART_LOAD(0, "rom,col,bin", 0x8000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
+	ROM_CART_LOAD("cart", 0x8000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START (colecob)
     ROM_REGION( 0x10000, "main", 0 )
     ROM_LOAD( "svi603.rom", 0x0000, 0x2000, CRC(19e91b82) SHA1(8a30abe5ffef810b0f99b86db38b1b3c9d259b78) )
-	ROM_CART_LOAD(0, "rom,col,bin", 0x8000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
+	ROM_CART_LOAD("cart", 0x8000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START( czz50 )
@@ -484,72 +535,13 @@ ROM_END
 #define rom_dina rom_czz50
 #define rom_prsarcde rom_czz50
 
-/* System Configuration */
-
-static int coleco_cart_verify(const UINT8 *cartdata, size_t size)
-{
-	int retval = IMAGE_VERIFY_FAIL;
-
-	/* Verify the file is in Colecovision format */
-	if ((cartdata[0] == 0xAA) && (cartdata[1] == 0x55)) /* Production Cartridge */
-		retval = IMAGE_VERIFY_PASS;
-	if ((cartdata[0] == 0x55) && (cartdata[1] == 0xAA)) /* "Test" Cartridge. Some games use this method to skip ColecoVision title screen and delay */
-		retval = IMAGE_VERIFY_PASS;
-
-	return retval;
-}
-
-static void coleco_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cartslot */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_VERIFY:					info->imgverify = coleco_cart_verify; break;
-
-		default:										cartslot_device_getinfo(devclass, state, info); break;
-	}
-}
-
-static SYSTEM_CONFIG_START( coleco )
-	CONFIG_DEVICE(coleco_cartslot_getinfo)
-SYSTEM_CONFIG_END
-
-static DEVICE_IMAGE_LOAD( czz50_cart )
-{
-	int size = image_length(image);
-	UINT8 *ptr = memory_region(image->machine, "main") + 0x8000;
-
-	if (image_fread(image, ptr, size ) != size)
-	{
-		return INIT_FAIL;
-	}
-
-	return INIT_PASS;
-}
-
-static void czz50_cartslot_getinfo( const mess_device_class *devclass, UINT32 state, union devinfo *info )
-{
-	switch( state )
-	{
-		case MESS_DEVINFO_INT_COUNT:					info->i = 1; break;
-		case MESS_DEVINFO_PTR_LOAD:						info->load = DEVICE_IMAGE_LOAD_NAME(czz50_cart); break;
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:			strcpy(info->s = device_temp_str(), "rom,col,bin"); break;
-
-		default:										cartslot_device_getinfo( devclass, state, info ); break;
-	}
-}
-
-static SYSTEM_CONFIG_START( czz50 )
-	CONFIG_DEVICE(czz50_cartslot_getinfo)
-SYSTEM_CONFIG_END
 
 /* System Drivers */
 
 //    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT    CONFIG  COMPANY				FULLNAME							FLAGS
-CONS( 1982, coleco,   0,		0,		coleco,   coleco,   0,		coleco,	"Coleco",			"ColecoVision",						0 )
-CONS( 1982, colecoa,  coleco,	0,		coleco,   coleco,   0,		coleco,	"Coleco",			"ColecoVision (Thick Characters)",	0 )
-CONS( 1983, colecob,  coleco,	0,		coleco,   coleco,   0,		coleco,	"Spectravideo",		"SVI-603 Coleco Game Adapter",		0 )
-CONS( 1986, czz50,	  0,		0,		czz50,	  czz50,	0,		czz50,	"Bit Corporation",	"Chuang Zao Zhe 50",				0 )
-CONS( 1988, dina,	  czz50,	0,		dina,	  czz50,	0,		czz50,	"Telegames",		"Dina",								0 )
-CONS( 1988, prsarcde, czz50,	0,		czz50,	  czz50,	0,		czz50,	"Telegames",		"Personal Arcade",					0 )
+CONS( 1982, coleco,   0,		0,		coleco,   coleco,   0,		0,	"Coleco",			"ColecoVision",						0 )
+CONS( 1982, colecoa,  coleco,	0,		coleco,   coleco,   0,		0,	"Coleco",			"ColecoVision (Thick Characters)",	0 )
+CONS( 1983, colecob,  coleco,	0,		coleco,   coleco,   0,		0,	"Spectravideo",		"SVI-603 Coleco Game Adapter",		0 )
+CONS( 1986, czz50,	  0,		0,		czz50,	  czz50,	0,		0,	"Bit Corporation",	"Chuang Zao Zhe 50",				0 )
+CONS( 1988, dina,	  czz50,	0,		dina,	  czz50,	0,		0,	"Telegames",		"Dina",								0 )
+CONS( 1988, prsarcde, czz50,	0,		czz50,	  czz50,	0,		0,	"Telegames",		"Personal Arcade",					0 )

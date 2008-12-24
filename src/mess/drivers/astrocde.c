@@ -167,6 +167,8 @@ static MACHINE_DRIVER_START( astrocde )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("astrocade", ASTROCADE, ASTROCADE_CLOCK/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	
+	MDRV_CARTSLOT_ADD("cart", default_cartslot)
 MACHINE_DRIVER_END
 
 
@@ -180,28 +182,14 @@ MACHINE_DRIVER_END
 ROM_START( astrocde )
     ROM_REGION( 0x10000, "main", 0 )
     ROM_LOAD( "astro.bin",  0x0000, 0x2000, CRC(ebc77f3a) SHA1(b902c941997c9d150a560435bf517c6a28137ecc))
-    ROM_CART_LOAD(0, "bin", 0x2000, 0x2000, ROM_OPTIONAL)
+    ROM_CART_LOAD("cart", 0x2000, 0x2000, ROM_OPTIONAL)
 ROM_END
 
 ROM_START( astrocdw )
     ROM_REGION( 0x10000, "main", 0 )
     ROM_LOAD( "bioswhit.bin",  0x0000, 0x2000, CRC(6eb53e79) SHA1(d84341feec1a0a0e8aa6151b649bc3cf6ef69fbf))
-    ROM_CART_LOAD(0, "bin", 0x2000, 0x2000, ROM_OPTIONAL)
+    ROM_CART_LOAD("cart", 0x2000, 0x2000, ROM_OPTIONAL)
 ROM_END
-
-
-
-/*************************************
- *
- *  System configs
- *
- *************************************/
-
-static SYSTEM_CONFIG_START(astrocde)
-	CONFIG_DEVICE(cartslot_device_getinfo)
-SYSTEM_CONFIG_END
-
-
 
 /*************************************
  *
@@ -223,5 +211,5 @@ static DRIVER_INIT( astrocde )
  *************************************/
 
 /*    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     INIT      CONFIG    COMPANY                FULLNAME                     FLAGS */
-CONS( 1978, astrocde, 0,        0,        astrocde, astrocde, astrocde, astrocde, "Bally Manufacturing", "Bally Professional Arcade", GAME_SUPPORTS_SAVE )
-CONS( 1977, astrocdw, astrocde, 0,        astrocde, astrocde, astrocde, astrocde, "Bally Manufacturing", "Bally Computer System",     GAME_SUPPORTS_SAVE )
+CONS( 1978, astrocde, 0,        0,        astrocde, astrocde, astrocde, 0, "Bally Manufacturing", "Bally Professional Arcade", GAME_SUPPORTS_SAVE )
+CONS( 1977, astrocdw, astrocde, 0,        astrocde, astrocde, astrocde, 0, "Bally Manufacturing", "Bally Computer System",     GAME_SUPPORTS_SAVE )

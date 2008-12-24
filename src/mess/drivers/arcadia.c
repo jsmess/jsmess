@@ -441,46 +441,6 @@ static PALETTE_INIT( arcadia )
 		colortable_entry_set_value(machine->colortable, i, arcadia_palette[i]);
 }
 
-static MACHINE_DRIVER_START( arcadia )
-	/* basic machine hardware */
-	MDRV_CPU_ADD("main", S2650, 3580000/4)        /* 0.895 MHz */
-	MDRV_CPU_PROGRAM_MAP(arcadia_mem, 0)
-	MDRV_CPU_IO_MAP(arcadia_io, 0)
-	MDRV_CPU_PERIODIC_INT(arcadia_video_line, 262*60)
-	MDRV_QUANTUM_TIME(HZ(60))
-
-    /* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(128+2*XPOS, 262)
-	MDRV_SCREEN_VISIBLE_AREA(0, 2*XPOS+128-1, 0, 262-1)
-	MDRV_GFXDECODE( arcadia )
-	MDRV_PALETTE_LENGTH(ARRAY_LENGTH(arcadia_palette))
-	MDRV_PALETTE_INIT( arcadia )
-
-	MDRV_VIDEO_START( arcadia )
-	MDRV_VIDEO_UPDATE( arcadia )
-
-	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("custom", CUSTOM, 0)
-	MDRV_SOUND_CONFIG(arcadia_sound_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_DRIVER_END
-
-
-ROM_START(arcadia)
-	ROM_REGION(0x8000,"main", ROMREGION_ERASEFF)
-	ROM_REGION(0x100,"gfx1", ROMREGION_ERASEFF)
-ROM_END
-
-ROM_START(vcg)
-	ROM_REGION(0x8000,"main", ROMREGION_ERASEFF)
-	ROM_REGION(0x100,"gfx1", ROMREGION_ERASEFF)
-ROM_END
-
 static DEVICE_IMAGE_LOAD( arcadia_cart )
 {
 	UINT8 *rom = memory_region(image->machine, "main");
@@ -542,28 +502,58 @@ static DEVICE_IMAGE_LOAD( arcadia_cart )
 	return INIT_PASS;
 }
 
-static void arcadia_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+static const cartslot_interface arcadia_cartslot =
 {
-	/* cartslot */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-		case MESS_DEVINFO_INT_MUST_BE_LOADED:				info->i = 1; break;
+	"bin",
+	1,
+	NULL,
+	DEVICE_IMAGE_LOAD_NAME(arcadia_cart),
+	NULL,
+	NULL
+};
 
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(arcadia_cart); break;
+static MACHINE_DRIVER_START( arcadia )
+	/* basic machine hardware */
+	MDRV_CPU_ADD("main", S2650, 3580000/4)        /* 0.895 MHz */
+	MDRV_CPU_PROGRAM_MAP(arcadia_mem, 0)
+	MDRV_CPU_IO_MAP(arcadia_io, 0)
+	MDRV_CPU_PERIODIC_INT(arcadia_video_line, 262*60)
+	MDRV_QUANTUM_TIME(HZ(60))
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "bin"); break;
+    /* video hardware */
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(128+2*XPOS, 262)
+	MDRV_SCREEN_VISIBLE_AREA(0, 2*XPOS+128-1, 0, 262-1)
+	MDRV_GFXDECODE( arcadia )
+	MDRV_PALETTE_LENGTH(ARRAY_LENGTH(arcadia_palette))
+	MDRV_PALETTE_INIT( arcadia )
 
-		default:										cartslot_device_getinfo(devclass, state, info); break;
-	}
-}
+	MDRV_VIDEO_START( arcadia )
+	MDRV_VIDEO_UPDATE( arcadia )
 
-static SYSTEM_CONFIG_START(arcadia)
-	CONFIG_DEVICE(arcadia_cartslot_getinfo)
-SYSTEM_CONFIG_END
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("custom", CUSTOM, 0)
+	MDRV_SOUND_CONFIG(arcadia_sound_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	
+	MDRV_CARTSLOT_ADD("cart", arcadia_cartslot)
+MACHINE_DRIVER_END
+
+
+ROM_START(arcadia)
+	ROM_REGION(0x8000,"main", ROMREGION_ERASEFF)
+	ROM_REGION(0x100,"gfx1", ROMREGION_ERASEFF)
+ROM_END
+
+ROM_START(vcg)
+	ROM_REGION(0x8000,"main", ROMREGION_ERASEFF)
+	ROM_REGION(0x100,"gfx1", ROMREGION_ERASEFF)
+ROM_END
+
 
 /***************************************************************************
 
@@ -708,7 +698,7 @@ static DRIVER_INIT( arcadia )
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE   INPUT     INIT        COMPANY     FULLNAME */
 // marketed from several firms/names
 
-CONS(1982,	arcadia,	0,			0,		arcadia,  arcadia,  arcadia,	arcadia,	"Emerson",		"Arcadia 2001", GAME_IMPERFECT_SOUND )
+CONS(1982,	arcadia,	0,			0,		arcadia,  arcadia,  arcadia,	0,	"Emerson",		"Arcadia 2001", GAME_IMPERFECT_SOUND )
 // schmid tvg 2000 (developer? PAL)
 
 // different cartridge connector
@@ -716,4 +706,4 @@ CONS(1982,	arcadia,	0,			0,		arcadia,  arcadia,  arcadia,	arcadia,	"Emerson",		"
 
 // different cartridge connector (same size as mpt03, but different pinout!)
 // 16 keys instead of 12
-CONS(198?, vcg,		arcadia,	0,		arcadia,  vcg,		arcadia,	arcadia,	"Palladium",		"Video-Computer-Game", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+CONS(198?, vcg,		arcadia,	0,		arcadia,  vcg,		arcadia,	0,	"Palladium",		"Video-Computer-Game", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )

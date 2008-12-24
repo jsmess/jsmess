@@ -1972,6 +1972,15 @@ static const cassette_config a2600_cassette_config =
 	CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED
 };
 
+static const cartslot_interface a2600_cartslot =
+{
+	"bin,a26",
+	1,
+	DEVICE_START_NAME(a2600_cart),
+	DEVICE_IMAGE_LOAD_NAME(a2600_cart),
+	NULL,
+	NULL
+};
 
 static MACHINE_DRIVER_START( a2600 )
 	/* basic machine hardware */
@@ -2002,6 +2011,8 @@ static MACHINE_DRIVER_START( a2600 )
 	MDRV_RIOT6532_ADD("riot", MASTER_CLOCK_NTSC / 3, r6532_interface)
 
 	MDRV_CASSETTE_ADD( "cassette", a2600_cassette_config )
+	
+	MDRV_CARTSLOT_ADD("cart", a2600_cartslot)
 MACHINE_DRIVER_END
 
 
@@ -2034,6 +2045,8 @@ static MACHINE_DRIVER_START( a2600p )
 	MDRV_RIOT6532_ADD("riot", MASTER_CLOCK_PAL / 3, r6532_interface)
 
 	MDRV_CASSETTE_ADD( "cassette", a2600_cassette_config )
+	
+	MDRV_CARTSLOT_ADD("cart", a2600_cartslot)
 MACHINE_DRIVER_END
 
 
@@ -2046,32 +2059,6 @@ ROM_END
 
 #define rom_a2600p rom_a2600
 
-static void a2600_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cartslot */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-		case MESS_DEVINFO_INT_MUST_BE_LOADED:				info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_START:							info->start = DEVICE_START_NAME(a2600_cart); break;
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(a2600_cart); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "bin,a26"); break;
-
-		default:										cartslot_device_getinfo(devclass, state, info); break;
-	}
-}
-
-
-static SYSTEM_CONFIG_START(a2600)
-	CONFIG_DEVICE(a2600_cartslot_getinfo)
-SYSTEM_CONFIG_END
-
-
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY     FULLNAME */
-CONS( 1977,	a2600,	0,		0,		a2600,	a2600,	0,		a2600,	"Atari",	"Atari 2600 (NTSC)" , 0)
-CONS( 1978,	a2600p,	a2600,	0,		a2600p,	a2600,	0,		a2600,  "Atari",    "Atari 2600 (PAL)", 0)
+CONS( 1977,	a2600,	0,		0,		a2600,	a2600,	0,		0,	"Atari",	"Atari 2600 (NTSC)" , 0)
+CONS( 1978,	a2600p,	a2600,	0,		a2600p,	a2600,	0,		0,  "Atari",    "Atari 2600 (PAL)", 0)

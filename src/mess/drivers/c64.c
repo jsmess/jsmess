@@ -511,6 +511,9 @@ static MACHINE_DRIVER_START( c64 )
 	/* via */
 	MDRV_VIA6522_ADD("via6522_2", 0, vc1541_via2)
 	MDRV_VIA6522_ADD("via6522_3", 0, vc1541_via3)
+	
+	MDRV_CARTSLOT_ADD("cart1", c64_cartslot)
+	MDRV_CARTSLOT_ADD("cart2", c64_cartslot)		
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( c64pal )
@@ -545,6 +548,9 @@ static MACHINE_DRIVER_START( c64pal )
 	/* cia */
 	MDRV_CIA6526_ADD("cia_0", CIA6526R1, 0, c64_pal_cia0)
 	MDRV_CIA6526_ADD("cia_1", CIA6526R1, 0, c64_pal_cia1)
+	
+	MDRV_CARTSLOT_ADD("cart1", c64_cartslot)
+	MDRV_CARTSLOT_ADD("cart2", c64_cartslot)			
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ultimax )
@@ -555,6 +561,10 @@ static MACHINE_DRIVER_START( ultimax )
 	MDRV_SOUND_REPLACE("sid", SID6581, VIC6567_CLOCK)
 	MDRV_SOUND_CONFIG(c64_sound_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	
+	MDRV_CARTSLOT_REMOVE("cart1")
+	MDRV_CARTSLOT_REMOVE("cart2")
+	MDRV_CARTSLOT_ADD("cart", ultimax_cartslot)
 MACHINE_DRIVER_END
 
 
@@ -697,23 +707,12 @@ ROM_END
 
 
 static SYSTEM_CONFIG_START(c64)
-	CONFIG_DEVICE(c64_cartslot_getinfo)
 	CONFIG_DEVICE(cbmfloppy_device_getinfo)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(sx64)
-	CONFIG_DEVICE(c64_cartslot_getinfo)
 	CONFIG_DEVICE(vc1541_device_getinfo)
 SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START(ultimax)
-	CONFIG_DEVICE(ultimax_cartslot_getinfo)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START(c64gs)
-	CONFIG_DEVICE(c64_cartslot_getinfo)
-SYSTEM_CONFIG_END
-
 
 /***************************************************************************
 
@@ -723,7 +722,7 @@ SYSTEM_CONFIG_END
 
 /*   YEAR  NAME   PARENT COMPAT MACHINE  INPUT    INIT    CONFIG    COMPANY                            FULLNAME */
 
-COMP(1982, max,	    0,    0,    ultimax, c64,     ultimax, ultimax, "Commodore Business Machines Co.", "Commodore Max Machine", 0)
+COMP(1982, max,	    0,    0,    ultimax, c64,     ultimax, 0, "Commodore Business Machines Co.", "Commodore Max Machine", 0)
 
 COMP(1982, c64,     0,    0,    c64,     c64,     c64,     c64,     "Commodore Business Machines Co.", "Commodore 64 (NTSC)", 0)
 COMP(1982, c64pal,  c64,  0,    c64pal,  c64,     c64pal,  c64,     "Commodore Business Machines Co.", "Commodore 64 (PAL)", 0)
@@ -744,4 +743,4 @@ COMP(1986, c64c,    c64,  0,    c64,     c64,     c64,     c64,     "Commodore B
 COMP(1986, c64cpal, c64,  0,    c64pal,  c64,     c64pal,  c64,     "Commodore Business Machines Co.", "Commodore 64C (PAL)", 0)
 COMP(1986, c64g,    c64,  0,    c64pal,  c64,     c64pal,  c64,     "Commodore Business Machines Co.", "Commodore 64G (PAL)", 0)
 
-CONS(1990, c64gs,   c64,  0,    c64gs,   c64gs,   c64gs,   c64gs,   "Commodore Business Machines Co.", "Commodore 64 Games System (PAL)", 0)
+CONS(1990, c64gs,   c64,  0,    c64gs,   c64gs,   c64gs,   0,   "Commodore Business Machines Co.", "Commodore 64 Games System (PAL)", 0)

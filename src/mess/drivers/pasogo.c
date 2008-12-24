@@ -474,6 +474,30 @@ static const struct pic8259_interface pasogo_pic8259_config = {
 	pasogo_pic8259_set_int_line
 };
 
+static DEVICE_IMAGE_LOAD( pasogo_cart )
+{
+	UINT8 *user = memory_region(image->machine, "user1");
+	int size;
+	size = image_length(image);
+
+	if (image_fread(image, user, size) != size)
+	{
+		logerror("%s load error\n", image_filename(image));
+		return 1;
+	}
+
+	return 0;
+}
+
+static const cartslot_interface pasogo_cartslot =
+{
+	"bin",
+	0,
+	NULL,
+	DEVICE_IMAGE_LOAD_NAME(pasogo_cart),
+	NULL,
+	NULL
+};
 
 static MACHINE_DRIVER_START( pasogo )
 	MDRV_CPU_ADD("main", I80188/*V30HL in vadem vg230*/, 10000000/*?*/)
@@ -501,6 +525,8 @@ static MACHINE_DRIVER_START( pasogo )
 	MDRV_SOUND_CONFIG(gmaster_sound_interface)
 	MDRV_SOUND_ROUTE(0, "gmaster", 0.50)
 #endif
+
+	MDRV_CARTSLOT_ADD("cart", pasogo_cartslot )
 MACHINE_DRIVER_END
 
 
@@ -520,45 +546,7 @@ static DRIVER_INIT( pasogo )
 	memory_set_bankptr( machine, 28, memory_region(machine, "main") + 0xb8000/*?*/ );
 }
 
-
-static DEVICE_IMAGE_LOAD( pasogo_cart )
-{
-	UINT8 *user = memory_region(image->machine, "user1");
-	int size;
-	size = image_length(image);
-
-	if (image_fread(image, user, size) != size)
-	{
-		logerror("%s load error\n", image_filename(image));
-		return 1;
-	}
-
-	return 0;
-}
-
-static void pasogo_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cartslot */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(pasogo_cart); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "bin"); break;
-
-		default:										cartslot_device_getinfo(devclass, state, info); break;
-	}
-}
-
-static SYSTEM_CONFIG_START(pasogo)
-     CONFIG_DEVICE(pasogo_cartslot_getinfo)
-SYSTEM_CONFIG_END
-
 /*    YEAR      NAME            PARENT  MACHINE   INPUT     INIT                
 	  COMPANY                 FULLNAME */
-CONS( 1996, pasogo,       0,          0, pasogo,  pasogo,    pasogo,   pasogo, "KOEI", "PasoGo", GAME_NO_SOUND|GAME_NOT_WORKING)
+CONS( 1996, pasogo,       0,          0, pasogo,  pasogo,    pasogo,   0, "KOEI", "PasoGo", GAME_NO_SOUND|GAME_NOT_WORKING)
 

@@ -1763,6 +1763,35 @@ static MACHINE_START( stbook )
 	state_save_register_global(machine, ktxd);
 }
 
+static DEVICE_IMAGE_LOAD( atarist_cart )
+{
+	UINT8 *RAM = memory_region(image->machine, "main");
+	UINT8 *ptr = RAM + 0xfa0000;
+	int	filesize = image_length(image);
+
+	if (filesize <= 128 * 1024)
+	{
+		if (image_fread(image, ptr, filesize) == filesize)
+		{
+			memory_install_readwrite16_handler(cputag_get_address_space(image->machine, "main", ADDRESS_SPACE_PROGRAM), 0xfa0000, 0xfbffff, 0, 0, SMH_BANK3, SMH_BANK3);
+
+			return INIT_PASS;
+		}
+	}
+
+	return INIT_FAIL;
+}
+
+static const cartslot_interface atarist_cartslot =
+{
+	"stc",
+	0,
+	NULL,
+	DEVICE_IMAGE_LOAD_NAME(atarist_cart),
+	NULL,
+	NULL
+};
+
 static const scc8530_interface atarist_scc8530_interface =
 {
 	NULL
@@ -1808,6 +1837,8 @@ static MACHINE_DRIVER_START( atarist )
 	MDRV_ACIA6850_ADD("acia_1", acia_midi_intf)
 	
 	MDRV_WD1772_ADD("wd1772", atarist_wd17xx_interface )
+	
+	MDRV_CARTSLOT_ADD("cart", atarist_cartslot)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( megast )
@@ -1867,6 +1898,8 @@ static MACHINE_DRIVER_START( atariste )
 	MDRV_ACIA6850_ADD("acia_1", acia_midi_intf)
 	
 	MDRV_WD1772_ADD("wd1772", atarist_wd17xx_interface )
+	
+	MDRV_CARTSLOT_ADD("cart", atarist_cartslot)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( megaste )
@@ -1919,6 +1952,8 @@ static MACHINE_DRIVER_START( stbook )
 	MDRV_ACIA6850_ADD("acia_1", acia_midi_intf)
 	
 	MDRV_WD1772_ADD("wd1772", atarist_wd17xx_interface )
+	
+	MDRV_CARTSLOT_ADD("cart", atarist_cartslot)
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -2161,51 +2196,12 @@ static void megaste_serial_getinfo(const mess_device_class *devclass, UINT32 sta
 	}
 }
 
-static DEVICE_IMAGE_LOAD( atarist_cart )
-{
-	UINT8 *RAM = memory_region(image->machine, "main");
-	UINT8 *ptr = RAM + 0xfa0000;
-	int	filesize = image_length(image);
-
-	if (filesize <= 128 * 1024)
-	{
-		if (image_fread(image, ptr, filesize) == filesize)
-		{
-			memory_install_readwrite16_handler(cputag_get_address_space(image->machine, "main", ADDRESS_SPACE_PROGRAM), 0xfa0000, 0xfbffff, 0, 0, SMH_BANK3, SMH_BANK3);
-
-			return INIT_PASS;
-		}
-	}
-
-	return INIT_FAIL;
-}
-
-static void atarist_cartslot_getinfo( const mess_device_class *devclass, UINT32 state, union devinfo *info )
-{
-	switch( state )
-	{
-	case MESS_DEVINFO_INT_COUNT:
-		info->i = 1;
-		break;
-	case MESS_DEVINFO_PTR_LOAD:
-		info->load = DEVICE_IMAGE_LOAD_NAME(atarist_cart);
-		break;
-	case MESS_DEVINFO_STR_FILE_EXTENSIONS:
-		strcpy(info->s = device_temp_str(), "stc");
-		break;
-	default:
-		cartslot_device_getinfo( devclass, state, info );
-		break;
-	}
-}
-
 static SYSTEM_CONFIG_START( atarist )
 	CONFIG_RAM_DEFAULT(1024 * 1024) // 1040ST
 	CONFIG_RAM		  ( 512 * 1024) //  520ST
 	CONFIG_RAM		  ( 256 * 1024) //  260ST
 	CONFIG_DEVICE(atarist_floppy_getinfo)
 	CONFIG_DEVICE(atarist_serial_getinfo)
-	CONFIG_DEVICE(atarist_cartslot_getinfo)
 	// MIDI
 SYSTEM_CONFIG_END
 
@@ -2215,7 +2211,6 @@ static SYSTEM_CONFIG_START( megast )
 	CONFIG_RAM		  (1024 * 1024) // Mega ST 1
 	CONFIG_DEVICE(atarist_floppy_getinfo)
 	CONFIG_DEVICE(atarist_serial_getinfo)
-	CONFIG_DEVICE(atarist_cartslot_getinfo)
 	// MIDI
 SYSTEM_CONFIG_END
 
@@ -2224,7 +2219,6 @@ static SYSTEM_CONFIG_START( atariste )
 	CONFIG_RAM		  ( 512 * 1024) //  520STe
 	CONFIG_DEVICE(atarist_floppy_getinfo)
 	CONFIG_DEVICE(atarist_serial_getinfo)
-	CONFIG_DEVICE(atarist_cartslot_getinfo)
 	// MIDI
 SYSTEM_CONFIG_END
 
@@ -2234,7 +2228,6 @@ static SYSTEM_CONFIG_START( megaste )
 	CONFIG_RAM		  (1024 * 1024) // Mega STe 1
 	CONFIG_DEVICE(atarist_floppy_getinfo)
 	CONFIG_DEVICE(megaste_serial_getinfo)
-	CONFIG_DEVICE(atarist_cartslot_getinfo)
 	// MIDI
 	// LAN
 SYSTEM_CONFIG_END
@@ -2244,7 +2237,6 @@ static SYSTEM_CONFIG_START( stbook )
 	CONFIG_RAM		  (1024 * 1024)
 	CONFIG_DEVICE(atarist_floppy_getinfo)
 	CONFIG_DEVICE(megaste_serial_getinfo)
-	CONFIG_DEVICE(atarist_cartslot_getinfo)
 	// MIDI
 	// IDE Hard Disk
 SYSTEM_CONFIG_END

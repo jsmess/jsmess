@@ -785,6 +785,15 @@ static const cassette_config exidy_cassette_config =
 	CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED
 };
 
+static const cartslot_interface exidy_cartslot =
+{
+	"rom",
+	0,
+	NULL,
+	NULL,
+	NULL,
+	NULL
+};
 
 static MACHINE_DRIVER_START( exidy )
 	/* basic machine hardware */
@@ -828,6 +837,8 @@ static MACHINE_DRIVER_START( exidy )
 	MDRV_CASSETTE_ADD( "cassette2", exidy_cassette_config )
 	
 	MDRV_WD179X_ADD("wd179x", default_wd17xx_interface )
+	
+	MDRV_CARTSLOT_ADD("cart", exidy_cartslot)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( exidyd )
@@ -858,7 +869,7 @@ ROM_START(exidy)
 	ROM_LOAD("exmo1-2.dat", 0xe800, 0x0800, CRC(ead1d0f6) SHA1(c68bed7344091bca135e427b4793cc7d49ca01be) )
 	ROM_LOAD("exchr-1.dat", 0xf800, 0x0400, CRC(4a7e1cdd) SHA1(2bf07a59c506b6e0c01ec721fb7b747b20f5dced) ) /* char rom */
 	ROM_LOAD_OPTIONAL("diskboot.dat",0xbc00, 0x0100, BAD_DUMP CRC(d82a40d6) SHA1(cd1ef5fb0312cd1640e0853d2442d7d858bc3e3b))
-	ROM_CART_LOAD(0, "rom", 0xc000, 0x2000, ROM_FILL_FF | ROM_OPTIONAL)
+	ROM_CART_LOAD("cart", 0xc000, 0x2000, ROM_FILL_FF | ROM_OPTIONAL)
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD_OPTIONAL("bruce.dat",   0x0000, 0x0020, CRC(fae922cb) SHA1(470a86844cfeab0d9282242e03ff1d8a1b2238d1)) /* video prom */
@@ -869,7 +880,7 @@ ROM_START(exidyd)
 	ROM_LOAD("exmo1-1.dat", 0xe000, 0x0800, CRC(ac924f67) SHA1(72fcad6dd1ed5ec0527f967604401284d0e4b6a1) ) /* monitor roms */
 	ROM_LOAD("exmo1-2.dat", 0xe800, 0x0800, CRC(ead1d0f6) SHA1(c68bed7344091bca135e427b4793cc7d49ca01be) )
 	ROM_LOAD("exchr-1.dat", 0xf800, 0x0400, CRC(4a7e1cdd) SHA1(2bf07a59c506b6e0c01ec721fb7b747b20f5dced) ) /* char rom */
-	ROM_CART_LOAD(0, "rom", 0xc000, 0x2000, ROM_FILL_FF | ROM_OPTIONAL)
+	ROM_CART_LOAD("cart", 0xc000, 0x2000, ROM_FILL_FF | ROM_OPTIONAL)
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD_OPTIONAL("bruce.dat",   0x0000, 0x0020, CRC(fae922cb) SHA1(470a86844cfeab0d9282242e03ff1d8a1b2238d1)) /* video prom */
@@ -941,15 +952,10 @@ static void exidy_floppy_getinfo(const mess_device_class *devclass, UINT32 state
 
 static SYSTEM_CONFIG_START(exidy)
 	CONFIG_DEVICE(exidy_floppy_getinfo)
-	CONFIG_DEVICE(cartslot_device_getinfo)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START(exidyd)
-	CONFIG_DEVICE(cartslot_device_getinfo)
 SYSTEM_CONFIG_END
 
 
 /*    YEAR  NAME    PARENT  COMPAT      MACHINE INPUT   INIT    CONFIG  COMPANY        FULLNAME */
 COMP(1979, exidy,   0,		0,	exidy,	exidy,	exidy,	exidy,	"Exidy Inc", "Sorcerer", 0 )
-COMP(1979, exidyd,  exidy,	0,	exidyd,	exidy,	exidy,	exidyd,	"Exidy Inc", "Sorcerer (Cassette only)", 0 )
+COMP(1979, exidyd,  exidy,	0,	exidyd,	exidy,	exidy,	0,	"Exidy Inc", "Sorcerer (Cassette only)", 0 )
 

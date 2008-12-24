@@ -376,6 +376,16 @@ static INTERRUPT_GEN( mbee_interrupt )
 	mbee_vsync = 1;
 }
 
+const cartslot_interface mbee_cartslot =
+{
+	"rom",
+	0,
+	NULL,
+	DEVICE_IMAGE_LOAD_NAME(mbee_cart),
+	NULL,
+	NULL
+};
+
 static MACHINE_DRIVER_START( mbee )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, XTAL_12MHz / 6)         /* 2 MHz */
@@ -413,6 +423,8 @@ static MACHINE_DRIVER_START( mbee )
 	MDRV_Z80BIN_QUICKLOAD_ADD(mbee, 2)
 
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
+	
+	MDRV_CARTSLOT_ADD("cart", mbee_cartslot )
 MACHINE_DRIVER_END
 
 
@@ -455,6 +467,8 @@ static MACHINE_DRIVER_START( mbeeic )
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
 	
 	MDRV_WD179X_ADD("wd179x", mbee_wd17xx_interface )
+	
+	MDRV_CARTSLOT_ADD("cart", mbee_cartslot )
 MACHINE_DRIVER_END
 
 
@@ -628,25 +642,6 @@ static QUICKLOAD_LOAD( mbee )
 	return INIT_PASS;
 }
 
-
-static void mbee_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cartslot */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:		info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:		info->load = DEVICE_IMAGE_LOAD_NAME(mbee_cart); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:	strcpy(info->s = device_temp_str(), "rom"); break;
-
-		default:				cartslot_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static void mbee_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
@@ -666,18 +661,14 @@ static void mbee_floppy_getinfo(const mess_device_class *devclass, UINT32 state,
 }
 
 
-static SYSTEM_CONFIG_START(mbee)
-	CONFIG_DEVICE(mbee_cartslot_getinfo)
-SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(mbeeic)
-	CONFIG_DEVICE(mbee_cartslot_getinfo)
 	CONFIG_DEVICE(mbee_floppy_getinfo)
 SYSTEM_CONFIG_END
 
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT      CONFIG    COMPANY   FULLNAME */
-COMP( 1982, mbee,     0,	0,	mbee,     mbee,     mbee,     mbee,		"Applied Technology",  "Microbee 16 Standard" , 0)
+COMP( 1982, mbee,     0,	0,	mbee,     mbee,     mbee,     0,			"Applied Technology",  "Microbee 16 Standard" , 0)
 COMP( 1982, mbeeic,   mbee,	0,	mbeeic,   mbee,     mbee,     mbeeic,		"Applied Technology",  "Microbee 32 IC" , 0)
 COMP( 1982, mbeepc,   mbee,	0,	mbeeic,   mbee,     mbee,     mbeeic,		"Applied Technology",  "Microbee 32 PC" , 0)
 COMP( 1985?,mbeepc85, mbee,	0,	mbeeic,   mbee,     mbee,     mbeeic,		"Applied Technology",  "Microbee 32 PC85" , 0)

@@ -308,6 +308,16 @@ static const cassette_config laser_cassette_config =
 	CASSETTE_PLAY
 };
 
+const cartslot_interface vtech1_cartslot =
+{
+	"rom",
+	0,
+	NULL,
+	NULL,
+	NULL,
+	NULL
+};
+
 static MACHINE_DRIVER_START(laser110)
     /* basic machine hardware */
     MDRV_CPU_ADD("main", Z80, VTECH1_CLK)  /* 3.57950 MHz */
@@ -342,6 +352,8 @@ static MACHINE_DRIVER_START(laser110)
 	MDRV_Z80BIN_QUICKLOAD_ADD(vtech1, 1.5)
 
 	MDRV_CASSETTE_ADD( "cassette", laser_cassette_config )
+	
+	MDRV_CARTSLOT_ADD("cart", vtech1_cartslot )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START(laser200)
@@ -375,7 +387,7 @@ ROM_START(laser110)
     ROM_REGION(0x6800, "main", 0)
     ROM_LOAD("vtechv12.u09",   0x0000, 0x2000, CRC(99412d43) SHA1(6aed8872a0818be8e1b08ecdfd92acbe57a3c96d))
     ROM_LOAD("vtechv12.u10",   0x2000, 0x2000, CRC(e4c24e8b) SHA1(9d8fb3d24f3d4175b485cf081a2d5b98158ab2fb))
-    ROM_CART_LOAD(0, "rom",  0x4000, 0x27ff, ROM_NOMIRROR | ROM_OPTIONAL)
+    ROM_CART_LOAD("cart",  0x4000, 0x27ff, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 /* The VZ-200 sold in Germany and the Netherlands came with BASIC V1.1, which
@@ -384,7 +396,7 @@ ROM_START(vz200de)
     ROM_REGION(0x6800, "main", 0)
     ROM_LOAD("vtechv11.u09",   0x0000, 0x2000, NO_DUMP)
     ROM_LOAD("vtechv11.u10",   0x2000, 0x2000, NO_DUMP)
-    ROM_CART_LOAD(0, "rom",  0x4000, 0x27ff, ROM_NOMIRROR | ROM_OPTIONAL)
+    ROM_CART_LOAD("cart",  0x4000, 0x27ff, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 #define rom_las110de    rom_laser110
@@ -399,7 +411,7 @@ ROM_START(laser210)
     ROM_REGION(0x6800, "main", 0)
     ROM_LOAD("vtechv20.u09",   0x0000, 0x2000, CRC(cc854fe9) SHA1(6e66a309b8e6dc4f5b0b44e1ba5f680467353d66))
     ROM_LOAD("vtechv20.u10",   0x2000, 0x2000, CRC(7060f91a) SHA1(8f3c8f24f97ebb98f3c88d4e4ba1f91ffd563440))
-    ROM_CART_LOAD(0, "rom",  0x4000, 0x27ff, ROM_NOMIRROR | ROM_OPTIONAL)
+    ROM_CART_LOAD("cart",  0x4000, 0x27ff, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 #define rom_las210de    rom_laser210
@@ -411,7 +423,7 @@ ROM_START(laser310)
     ROMX_LOAD("vtechv20.u12", 0x0000, 0x4000, CRC(613de12c) SHA1(f216c266bc09b0dbdbad720796e5ea9bc7d91e53), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "basic21", "BASIC V2.1 (hack)")
     ROMX_LOAD("vtechv21.u12", 0x0000, 0x4000, CRC(f7df980f) SHA1(5ba14a7a2eedca331b033901080fa5d205e245ea), ROM_BIOS(2))
-    ROM_CART_LOAD(0, "rom", 0x4000, 0x27ff, ROM_NOMIRROR | ROM_OPTIONAL)
+    ROM_CART_LOAD("cart", 0x4000, 0x27ff, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 #define rom_vz300       rom_laser310
@@ -496,7 +508,6 @@ static void vtech1_floppy_getinfo(const mess_device_class *devclass, UINT32 stat
    easily modified to work on another model. */
 
 static SYSTEM_CONFIG_START(vtech1)
-    CONFIG_DEVICE(cartslot_device_getinfo)
     CONFIG_DEVICE(vtech1_floppy_getinfo)
 	CONFIG_RAM_DEFAULT (66 * 1024)   /* with 64K memory expansion */
 	CONFIG_RAM         (4098 * 1024) /* with 4MB memory expansion */

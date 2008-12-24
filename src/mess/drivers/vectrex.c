@@ -93,6 +93,15 @@ static const ay8910_interface vectrex_ay8910_interface =
 	0
 };
 
+static const cartslot_interface vectrex_cartslot =
+{
+	"bin,gam,vec",
+	0,
+	NULL,
+	DEVICE_IMAGE_LOAD_NAME(vectrex_cart),
+	NULL,
+	NULL
+};
 
 static MACHINE_DRIVER_START(vectrex)
 	/* basic machine hardware */
@@ -120,29 +129,9 @@ static MACHINE_DRIVER_START(vectrex)
 
 	/* via */
 	MDRV_VIA6522_ADD("via6522_0", 0, vectrex_via6522_interface)
+	
+	MDRV_CARTSLOT_ADD("cart", vectrex_cartslot)
 MACHINE_DRIVER_END
-
-static void vectrex_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cartslot */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:                            info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:                         info->load = DEVICE_IMAGE_LOAD_NAME(vectrex_cart); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:              strcpy(info->s = device_temp_str(), "bin,gam,vec"); break;
-
-		default:                                        cartslot_device_getinfo(devclass, state, info); break;
-	}
-}
-
-static SYSTEM_CONFIG_START(vectrex)
-	CONFIG_DEVICE(vectrex_cartslot_getinfo)
-SYSTEM_CONFIG_END
 
 ROM_START(vectrex)
 	ROM_REGION(0x10000,"main", 0)
@@ -224,6 +213,8 @@ static MACHINE_DRIVER_START(raaspec)
 	/* via */
 	MDRV_VIA6522_REMOVE("via6522_0")
 	MDRV_VIA6522_ADD("via6522_0", 0, spectrum1_via6522_interface)
+	
+	MDRV_CARTSLOT_REMOVE("cart")
 MACHINE_DRIVER_END
 
 ROM_START(raaspec)
@@ -239,5 +230,5 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT        CONFIG      COMPANY FULLNAME */
-CONS(1982, vectrex,  0,        0,      vectrex,  vectrex,  vectrex,    vectrex,    "General Consumer Electronics",   "Vectrex" , ROT270)
-CONS(1984, raaspec,  vectrex,  0,      raaspec,  raaspec,  vectrex,    NULL,       "Roy Abel & Associates",   "Spectrum I+" , ROT270)
+CONS(1982, vectrex,  0,        0,      vectrex,  vectrex,  vectrex,    0,    "General Consumer Electronics",   "Vectrex" , ROT270)
+CONS(1984, raaspec,  vectrex,  0,      raaspec,  raaspec,  vectrex,    0,       "Roy Abel & Associates",   "Spectrum I+" , ROT270)

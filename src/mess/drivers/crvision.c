@@ -409,53 +409,6 @@ static MACHINE_RESET( crvision )
 	pia_reset();
 }
 
-/* Machine Driver */
-
-static MACHINE_DRIVER_START( crvision )
-	// basic machine hardware
-	MDRV_CPU_ADD("main", M6502, 2000000)
-	MDRV_CPU_PROGRAM_MAP(crvision_map, 0)
-	MDRV_CPU_VBLANK_INT("main", crvision_int)
-
-	MDRV_MACHINE_START( crvision )
-	MDRV_MACHINE_RESET( crvision )
-
-    // video hardware
-	MDRV_IMPORT_FROM(tms9928a)
-	MDRV_SCREEN_MODIFY("main")
-	MDRV_SCREEN_REFRESH_RATE(10738635.0/2/342/262)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-
-	// sound hardware
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("sn76489", SN76489, 2000000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-
-	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
-MACHINE_DRIVER_END
-
-static MACHINE_DRIVER_START( fnvision )
-	MDRV_IMPORT_FROM( crvision )
-	MDRV_MACHINE_START( fnvision )
-	MDRV_SCREEN_MODIFY("main")
-	MDRV_SCREEN_REFRESH_RATE(10738635.0/2/342/313)
-
-	MDRV_CASSETTE_REMOVE( "cassette" )
-MACHINE_DRIVER_END
-
-/* ROMs */
-
-ROM_START( crvision )
-    ROM_REGION( 0x10000, "main", 0 )
-    ROM_LOAD( "crvision.rom", 0xc000, 0x0800, CRC(c3c590c6) SHA1(5ac620c529e4965efb5560fe824854a44c983757) )
-ROM_END
-
-ROM_START( fnvision )
-    ROM_REGION( 0x10000, "main", 0 )
-    ROM_LOAD( "funboot.rom", 0xc000, 0x0800, CRC(05602697) SHA1(c280b20c8074ba9abb4be4338b538361dfae517f) )
-ROM_END
-
-/* System Configuration */
 
 static DEVICE_IMAGE_LOAD( crvision_cart )
 {
@@ -522,35 +475,66 @@ static DEVICE_IMAGE_LOAD( crvision_cart )
 	return INIT_PASS;
 }
 
-static void crvision_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+static const cartslot_interface crvision_cartslot =
 {
-	/* cartslot */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-		case MESS_DEVINFO_INT_MUST_BE_LOADED:				info->i = 1; break;
+	"rom",
+	1,
+	NULL,
+	DEVICE_IMAGE_LOAD_NAME(crvision_cart),
+	NULL,
+	NULL
+};
 
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(crvision_cart); break;
+/* Machine Driver */
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "rom"); break;
+static MACHINE_DRIVER_START( crvision )
+	// basic machine hardware
+	MDRV_CPU_ADD("main", M6502, 2000000)
+	MDRV_CPU_PROGRAM_MAP(crvision_map, 0)
+	MDRV_CPU_VBLANK_INT("main", crvision_int)
 
-		default:										cartslot_device_getinfo(devclass, state, info); break;
-	}
-}
+	MDRV_MACHINE_START( crvision )
+	MDRV_MACHINE_RESET( crvision )
 
-static SYSTEM_CONFIG_START( crvision )
-	CONFIG_DEVICE(crvision_cartslot_getinfo)
-SYSTEM_CONFIG_END
+    // video hardware
+	MDRV_IMPORT_FROM(tms9928a)
+	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_REFRESH_RATE(10738635.0/2/342/262)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
-static SYSTEM_CONFIG_START( fnvision )
-	CONFIG_DEVICE(crvision_cartslot_getinfo)
-SYSTEM_CONFIG_END
+	// sound hardware
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("sn76489", SN76489, 2000000)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
+	
+	MDRV_CARTSLOT_ADD("cart", crvision_cartslot )
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( fnvision )
+	MDRV_IMPORT_FROM( crvision )
+	MDRV_MACHINE_START( fnvision )
+	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_REFRESH_RATE(10738635.0/2/342/313)
+
+	MDRV_CASSETTE_REMOVE( "cassette" )
+MACHINE_DRIVER_END
+
+/* ROMs */
+
+ROM_START( crvision )
+    ROM_REGION( 0x10000, "main", 0 )
+    ROM_LOAD( "crvision.rom", 0xc000, 0x0800, CRC(c3c590c6) SHA1(5ac620c529e4965efb5560fe824854a44c983757) )
+ROM_END
+
+ROM_START( fnvision )
+    ROM_REGION( 0x10000, "main", 0 )
+    ROM_LOAD( "funboot.rom", 0xc000, 0x0800, CRC(05602697) SHA1(c280b20c8074ba9abb4be4338b538361dfae517f) )
+ROM_END
 
 /* System Drivers */
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY             FULLNAME */
-COMP( 1981, crvision, 0,		0,		crvision,	crvision,	0,		crvision,	"Video Technology", "CreatiVision (NTSC)", GAME_SUPPORTS_SAVE )
-CONS( 1983, fnvision, crvision, 0,		fnvision,	crvision,	0,		fnvision,	"Video Technology", "FunVision Computer Video Games System (PAL)", GAME_SUPPORTS_SAVE )
+COMP( 1981, crvision, 0,		0,		crvision,	crvision,	0,		0,	"Video Technology", "CreatiVision (NTSC)", GAME_SUPPORTS_SAVE )
+CONS( 1983, fnvision, crvision, 0,		fnvision,	crvision,	0,		0,	"Video Technology", "FunVision Computer Video Games System (PAL)", GAME_SUPPORTS_SAVE )

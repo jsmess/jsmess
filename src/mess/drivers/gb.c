@@ -552,6 +552,35 @@ static const custom_sound_interface gameboy_sound_interface =
 	gameboy_sh_start, 0, 0
 };
 
+static const cartslot_interface gameboy_cartslot =
+{
+	"gb,gmb,cgb,gbc,sgb,bin",
+	1,
+	DEVICE_START_NAME(gb_cart),
+	DEVICE_IMAGE_LOAD_NAME(gb_cart),
+	NULL,
+	NULL
+};
+
+static const cartslot_interface gameboy_gb_cartslot =
+{
+	"gb,gmb,cgb,gbc,sgb,bin",
+	0,
+	DEVICE_START_NAME(gb_cart),
+	DEVICE_IMAGE_LOAD_NAME(gb_cart),
+	NULL,
+	NULL
+};
+
+static const cartslot_interface megaduck_cartslot =
+{
+	"bin",
+	1,
+	NULL,
+	DEVICE_IMAGE_LOAD_NAME(megaduck_cart),
+	NULL,
+	NULL
+};
 
 static MACHINE_DRIVER_START( gameboy )
 	/* basic machine hardware */
@@ -586,6 +615,8 @@ static MACHINE_DRIVER_START( gameboy )
 	MDRV_SOUND_CONFIG(gameboy_sound_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
+	
+	MDRV_CARTSLOT_ADD("cart", gameboy_gb_cartslot )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( supergb )
@@ -605,6 +636,8 @@ static MACHINE_DRIVER_START( supergb )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MDRV_PALETTE_LENGTH(32768)
 	MDRV_PALETTE_INIT(sgb)
+	
+	MDRV_CARTSLOT_MODIFY("cart", gameboy_cartslot )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( gbpocket )
@@ -613,6 +646,7 @@ static MACHINE_DRIVER_START( gbpocket )
 	MDRV_CPU_CONFIG(mgb_cpu_reset)
 	MDRV_MACHINE_RESET( gbpocket )
 	MDRV_PALETTE_INIT(gbp)
+	MDRV_CARTSLOT_MODIFY("cart", gameboy_cartslot )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( gbcolor )
@@ -625,49 +659,11 @@ static MACHINE_DRIVER_START( gbcolor )
 
 	MDRV_PALETTE_LENGTH(32768)
 	MDRV_PALETTE_INIT(gbc)
+	
+	MDRV_CARTSLOT_MODIFY("cart", gameboy_cartslot )
 MACHINE_DRIVER_END
 
-static void gameboy_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cartslot */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-		case MESS_DEVINFO_INT_MUST_BE_LOADED:				info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_START:							info->start = DEVICE_START_NAME(gb_cart); break;
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(gb_cart); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "gb,gmb,cgb,gbc,sgb,bin"); break;
-
-		default:										cartslot_device_getinfo(devclass, state, info); break;
-	}
-}
-
-static void gameboy_cartslot_getinfo_gb(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_MUST_BE_LOADED:				info->i = 0; break;
-
-		default:										gameboy_cartslot_getinfo(devclass, state, info); break;
-	}
-}
-
-static SYSTEM_CONFIG_START(gameboy)
-	CONFIG_DEVICE(gameboy_cartslot_getinfo)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START(gameboy_gb)
-	CONFIG_DEVICE(gameboy_cartslot_getinfo_gb)
-SYSTEM_CONFIG_END
-
 static SYSTEM_CONFIG_START(gb_cgb)
-	CONFIG_DEVICE(gameboy_cartslot_getinfo)
 	CONFIG_RAM_DEFAULT(2 * 8 * 1024 + 8 * 4 * 1024)	/* 2 pages of 8KB VRAM, 8 pages of 4KB RAM */
 SYSTEM_CONFIG_END
 
@@ -701,30 +697,9 @@ static MACHINE_DRIVER_START( megaduck )
 	MDRV_SOUND_CONFIG(gameboy_sound_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
+	
+	MDRV_CARTSLOT_ADD("cart", megaduck_cartslot )
 MACHINE_DRIVER_END
-
-static void megaduck_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cartslot */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-		case MESS_DEVINFO_INT_MUST_BE_LOADED:				info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(megaduck_cart); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "bin"); break;
-
-		default:										cartslot_device_getinfo(devclass, state, info); break;
-	}
-}
-
-static SYSTEM_CONFIG_START(megaduck)
-	CONFIG_DEVICE(megaduck_cartslot_getinfo)
-SYSTEM_CONFIG_END
 
 /***************************************************************************
 
@@ -758,13 +733,13 @@ ROM_START( megaduck )
 ROM_END
 
 /*    YEAR  NAME      PARENT   COMPAT   MACHINE   INPUT    INIT  CONFIG   COMPANY     FULLNAME */
-CONS( 1990, gameboy,  0,       0,		gameboy,  gameboy, 0,    gameboy_gb, "Nintendo", "Game Boy"  , 0)
-CONS( 1994, supergb,  0,       gameboy,	supergb,  gameboy, 0,    gameboy, "Nintendo", "Super Game Boy" , 0)
-CONS( 1996, gbpocket, gameboy, 0,		gbpocket, gameboy, 0,    gameboy, "Nintendo", "Game Boy Pocket" , 0)
+CONS( 1990, gameboy,  0,       0,		gameboy,  gameboy, 0,    0, "Nintendo", "Game Boy"  , 0)
+CONS( 1994, supergb,  0,       gameboy,	supergb,  gameboy, 0,    0, "Nintendo", "Super Game Boy" , 0)
+CONS( 1996, gbpocket, gameboy, 0,		gbpocket, gameboy, 0,    0, "Nintendo", "Game Boy Pocket" , 0)
 CONS( 1998, gbcolor,  0,       gameboy,	gbcolor,  gameboy, 0,    gb_cgb, "Nintendo", "Game Boy Color" , 0)
 
 /* Sound is not 100% yet, it generates some sounds which could be ok. Since we're lacking a real
    system there's no way to verify. Same goes for the colors of the LCD. We are no using the default
    Game Boy green colors */
-CONS( 1993, megaduck, 0,       0,       megaduck, gameboy, 0,    megaduck,"Creatronic/Videojet/Timlex/Cougar",  "MegaDuck/Cougar Boy" , 0)
+CONS( 1993, megaduck, 0,       0,       megaduck, gameboy, 0,    0,"Creatronic/Videojet/Timlex/Cougar",  "MegaDuck/Cougar Boy" , 0)
 

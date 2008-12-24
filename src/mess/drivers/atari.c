@@ -684,6 +684,35 @@ static const pokey_interface atari_pokey_interface =
 };
 
 
+static const cartslot_interface a400_cartslot =
+{
+	"rom,bin",
+	0,
+	NULL,
+	DEVICE_IMAGE_LOAD_NAME(a800_cart),
+	DEVICE_IMAGE_UNLOAD_NAME(a800_cart),
+	NULL
+};
+
+static const cartslot_interface a800_cartslot =
+{
+	"rom,bin",
+	0,
+	NULL,
+	DEVICE_IMAGE_LOAD_NAME(a800_cart),
+	DEVICE_IMAGE_UNLOAD_NAME(a800_cart),
+	NULL
+};
+
+static const cartslot_interface a5200_cartslot =
+{
+	"rom,bin",
+	0,
+	NULL,
+	DEVICE_IMAGE_LOAD_NAME(a5200_cart),
+	DEVICE_IMAGE_UNLOAD_NAME(a5200_cart),
+	NULL
+};
 
 static MACHINE_DRIVER_START( atari_common_nodac )
 	/* basic machine hardware */
@@ -727,6 +756,8 @@ static MACHINE_DRIVER_START( a400 )
 	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_REFRESH_RATE(FRAME_RATE_60HZ)
 	MDRV_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_60HZ)
+	
+	MDRV_CARTSLOT_ADD("cart1", a400_cartslot)
 MACHINE_DRIVER_END
 
 
@@ -742,6 +773,8 @@ static MACHINE_DRIVER_START( a400pal )
 	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_REFRESH_RATE(FRAME_RATE_50HZ)
 	MDRV_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_50HZ)
+	
+	MDRV_CARTSLOT_ADD("cart1", a400_cartslot)
 MACHINE_DRIVER_END
 
 
@@ -757,6 +790,9 @@ static MACHINE_DRIVER_START( a800 )
 	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_REFRESH_RATE(FRAME_RATE_60HZ)
 	MDRV_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_60HZ)
+	
+	MDRV_CARTSLOT_ADD("cart1", a800_cartslot)
+	MDRV_CARTSLOT_ADD("cart2", a800_cartslot)
 MACHINE_DRIVER_END
 
 
@@ -772,6 +808,9 @@ static MACHINE_DRIVER_START( a800pal )
 	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_REFRESH_RATE(FRAME_RATE_50HZ)
 	MDRV_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_50HZ)
+
+	MDRV_CARTSLOT_ADD("cart1", a800_cartslot)
+	MDRV_CARTSLOT_ADD("cart2", a800_cartslot)
 MACHINE_DRIVER_END
 
 
@@ -787,6 +826,9 @@ static MACHINE_DRIVER_START( a800xl )
 	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_REFRESH_RATE(FRAME_RATE_60HZ)
 	MDRV_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_60HZ)
+	
+	MDRV_CARTSLOT_ADD("cart1", a800_cartslot)
+	MDRV_CARTSLOT_ADD("cart2", a800_cartslot)	
 MACHINE_DRIVER_END
 
 
@@ -802,6 +844,8 @@ static MACHINE_DRIVER_START( a5200 )
 	MDRV_SCREEN_MODIFY( "main" )
 	MDRV_SCREEN_REFRESH_RATE(FRAME_RATE_60HZ)
 	MDRV_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_60HZ)
+	
+	MDRV_CARTSLOT_ADD("cart", a5200_cartslot)
 MACHINE_DRIVER_END
 
 
@@ -869,78 +913,20 @@ static SYSTEM_CONFIG_START(atari)
 	CONFIG_DEVICE(atari_floppy_getinfo)
 SYSTEM_CONFIG_END
 
-static void a400_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cartslot */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(a800_cart); break;
-		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(a800_cart); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "rom,bin"); break;
-
-		default:										cartslot_device_getinfo(devclass, state, info); break;
-	}
-}
-
 static SYSTEM_CONFIG_START(a400)
 	CONFIG_IMPORT_FROM(atari)
 	CONFIG_RAM_DEFAULT(40 * 1024)
-	CONFIG_DEVICE(a400_cartslot_getinfo)
 SYSTEM_CONFIG_END
 
-static void a800_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cartslot */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(a800_cart); break;
-		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(a800_cart); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "rom,bin"); break;
-
-		default:										cartslot_device_getinfo(devclass, state, info); break;
-	}
-}
 
 static SYSTEM_CONFIG_START(a800)
 	CONFIG_IMPORT_FROM(atari)
 	CONFIG_RAM_DEFAULT(40 * 1024)
-	CONFIG_DEVICE(a800_cartslot_getinfo)
 SYSTEM_CONFIG_END
 
-static void a5200_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cartslot */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(a5200_cart); break;
-		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(a5200_cart); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "rom,bin,a52"); break;
-
-		default:										cartslot_device_getinfo(devclass, state, info); break;
-	}
-}
 
 static SYSTEM_CONFIG_START(a5200)
 	CONFIG_RAM_DEFAULT(16 * 1024)
-	CONFIG_DEVICE(a5200_cartslot_getinfo)
 SYSTEM_CONFIG_END
 
 /***************************************************************************

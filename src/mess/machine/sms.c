@@ -770,12 +770,27 @@ DEVICE_IMAGE_LOAD( sms_cart )
 {
 	running_machine *machine = image->machine;
 	int size = image_length(image);
-	int index = image_index_in_device( image );
+	int index = 0;
 	const char *fname = image_filename( image );
 	int fname_len = fname ? strlen( fname ) : 0;
 	const char *extrainfo = image_extrainfo( image );
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
+	if (strcmp(image->tag,"cart1")==0) {
+		index = 0;
+	}
+	if (strcmp(image->tag,"cart2")==0) {
+		index = 1;
+	}
+	if (strcmp(image->tag,"cart3")==0) {
+		index = 2;
+	}
+	if (strcmp(image->tag,"cart4")==0) {
+		index = 3;
+	}	
+	if (strcmp(image->tag,"cart5")==0) {
+		index = 4;
+	}	
 	/* Check for 512-byte header */
 	if ((size / 512) & 1)
 	{

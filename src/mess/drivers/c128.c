@@ -623,6 +623,9 @@ static MACHINE_DRIVER_START( c128 )
 	/* cia */
 	MDRV_CIA6526_ADD("cia_0", CIA6526R1, 0, c64_ntsc_cia0)
 	MDRV_CIA6526_ADD("cia_1", CIA6526R1, 0, c64_ntsc_cia1)
+	
+	MDRV_CARTSLOT_ADD("cart1", c64_cartslot)
+	MDRV_CARTSLOT_ADD("cart2", c64_cartslot)		
 MACHINE_DRIVER_END
 
 
@@ -864,12 +867,10 @@ ROM_END
 
 
 static SYSTEM_CONFIG_START(c128)
-	CONFIG_DEVICE(c64_cartslot_getinfo)
 	CONFIG_DEVICE(cbmfloppy_device_getinfo)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(c128d)
-	CONFIG_DEVICE(c64_cartslot_getinfo)
 	CONFIG_DEVICE(c1571_device_getinfo)
 SYSTEM_CONFIG_END
 

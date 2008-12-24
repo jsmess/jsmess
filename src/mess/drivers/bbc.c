@@ -717,6 +717,15 @@ static const cassette_config bbc_cassette_config =
 	CASSETTE_PLAY
 };
 
+const cartslot_interface bbc_cartslot =
+{
+	"rom",
+	0,
+	NULL,
+	DEVICE_IMAGE_LOAD_NAME(bbcb_cart),
+	NULL,
+	NULL
+};
 
 static MACHINE_DRIVER_START( bbca )
 	/* basic machine hardware */
@@ -771,6 +780,11 @@ static MACHINE_DRIVER_START( bbcb )
 	MDRV_VIA6522_ADD("via6522_1", 1000000, bbcb_user_via)
 
 	MDRV_WD177X_ADD("wd177x", bbc_wd17xx_interface )
+
+	MDRV_CARTSLOT_ADD("cart1", bbc_cartslot)
+	MDRV_CARTSLOT_ADD("cart2", bbc_cartslot)	
+	MDRV_CARTSLOT_ADD("cart3", bbc_cartslot)
+	MDRV_CARTSLOT_ADD("cart4", bbc_cartslot)	
 MACHINE_DRIVER_END
 
 
@@ -783,6 +797,11 @@ static MACHINE_DRIVER_START( bbcbp )
 	MDRV_VIDEO_START( bbcbp )
 	MDRV_VIA6522_ADD("via6522_1", 1000000, bbcb_user_via)
 	MDRV_WD177X_ADD("wd177x", bbc_wd17xx_interface )
+	
+	MDRV_CARTSLOT_ADD("cart1", bbc_cartslot)
+	MDRV_CARTSLOT_ADD("cart2", bbc_cartslot)	
+	MDRV_CARTSLOT_ADD("cart3", bbc_cartslot)
+	MDRV_CARTSLOT_ADD("cart4", bbc_cartslot)		
 MACHINE_DRIVER_END
 
 
@@ -793,8 +812,14 @@ static MACHINE_DRIVER_START( bbcbp128 )
 	MDRV_MACHINE_START( bbcbp )
 	MDRV_MACHINE_RESET( bbcbp )
 	MDRV_VIDEO_START( bbcbp )
+	
 	MDRV_VIA6522_ADD("via6522_1", 1000000, bbcb_user_via)
 	MDRV_WD177X_ADD("wd177x", bbc_wd17xx_interface )
+	
+	MDRV_CARTSLOT_ADD("cart1", bbc_cartslot)
+	MDRV_CARTSLOT_ADD("cart2", bbc_cartslot)	
+	MDRV_CARTSLOT_ADD("cart3", bbc_cartslot)
+	MDRV_CARTSLOT_ADD("cart4", bbc_cartslot)		
 MACHINE_DRIVER_END
 
 
@@ -844,25 +869,12 @@ static MACHINE_DRIVER_START( bbcm )
 	MDRV_VIA6522_ADD("via6522_0", 1000000, bbcb_system_via)
 	MDRV_VIA6522_ADD("via6522_1", 1000000, bbcb_user_via)
 	MDRV_WD177X_ADD("wd177x", bbc_wd17xx_interface )
+	
+	MDRV_CARTSLOT_ADD("cart1", bbc_cartslot)
+	MDRV_CARTSLOT_ADD("cart2", bbc_cartslot)	
+	MDRV_CARTSLOT_ADD("cart3", bbc_cartslot)
+	MDRV_CARTSLOT_ADD("cart4", bbc_cartslot)		
 MACHINE_DRIVER_END
-
-static void bbc_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cartslot */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(bbcb_cart); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "rom"); break;
-
-		default:										cartslot_device_getinfo(devclass, state, info); break;
-	}
-}
 
 static void bbc_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
@@ -884,7 +896,6 @@ static void bbc_floppy_getinfo(const mess_device_class *devclass, UINT32 state, 
 
 
 static SYSTEM_CONFIG_START(bbc)
-	CONFIG_DEVICE(bbc_cartslot_getinfo)
 	CONFIG_DEVICE(bbc_floppy_getinfo)
 SYSTEM_CONFIG_END
 

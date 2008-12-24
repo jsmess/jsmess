@@ -119,7 +119,9 @@ static MACHINE_DRIVER_START( orion128 )
 
 	MDRV_CASSETTE_ADD( "cassette", orion_cassette_config )
 	
-	MDRV_WD1793_ADD("wd1793", default_wd17xx_interface )		
+	MDRV_WD1793_ADD("wd1793", default_wd17xx_interface )	
+	
+	MDRV_CARTSLOT_ADD("cart", default_cartslot )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( orion128ms )
@@ -176,6 +178,8 @@ static MACHINE_DRIVER_START( orionz80 )
 	MDRV_CASSETTE_ADD( "cassette", orion_cassette_config )
 	
 	MDRV_WD1793_ADD("wd1793", default_wd17xx_interface )		
+	
+	MDRV_CARTSLOT_ADD("cart", default_cartslot )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( orionz80ms )
@@ -221,7 +225,9 @@ static MACHINE_DRIVER_START( orionpro )
 
 	MDRV_CASSETTE_ADD( "cassette", orion_cassette_config )
 	
-	MDRV_WD1793_ADD("wd1793", default_wd17xx_interface )		
+	MDRV_WD1793_ADD("wd1793", default_wd17xx_interface )
+	
+	MDRV_CARTSLOT_ADD("cart", default_cartslot )		
 MACHINE_DRIVER_END
 
 
@@ -245,19 +251,16 @@ static void orion_floppy_getinfo(const mess_device_class *devclass, UINT32 state
 
 static SYSTEM_CONFIG_START(orion128)
 	CONFIG_RAM_DEFAULT(256 * 1024)
-	CONFIG_DEVICE(cartslot_device_getinfo)
 	CONFIG_DEVICE(orion_floppy_getinfo);
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(orionz80)
 	CONFIG_RAM_DEFAULT(512 * 1024)
-	CONFIG_DEVICE(cartslot_device_getinfo)
 	CONFIG_DEVICE(orion_floppy_getinfo);
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(orionpro)
 	CONFIG_RAM_DEFAULT(512 * 1024)
-	CONFIG_DEVICE(cartslot_device_getinfo)
 	CONFIG_DEVICE(orion_floppy_getinfo);
 SYSTEM_CONFIG_END
 
@@ -269,13 +272,13 @@ ROM_START( orion128 )
     ROMX_LOAD( "m2rk.bin",    0x0f800, 0x0800, CRC(2025c234) SHA1(caf86918629be951fe698cddcdf4589f07e2fb96), ROM_BIOS(1) )
     ROM_SYSTEM_BIOS( 1, "m2_2rk", "Version 3.2.2 rk" )
     ROMX_LOAD( "m2_2rk.bin",  0x0f800, 0x0800, CRC(fc662351) SHA1(7c6de67127fae5869281449de1c503597c0c058e), ROM_BIOS(2) )
-    ROM_CART_LOAD(0, "bin", 0x10000, 0x10000, ROM_FILL_FF | ROM_OPTIONAL)
+    ROM_CART_LOAD("cart", 0x10000, 0x10000, ROM_FILL_FF | ROM_OPTIONAL)
 ROM_END
 
 ROM_START( orionms )
     ROM_REGION( 0x30000, "main", ROMREGION_ERASEFF )
     ROM_LOAD( "ms7007.bin",   0x0f800, 0x0800, CRC(c6174ba3) SHA1(8f9a42c3e09684718fe4121a8408e7860129d26f) )
-    ROM_CART_LOAD(0, "bin", 0x10000, 0x10000, ROM_FILL_FF | ROM_OPTIONAL)
+    ROM_CART_LOAD("cart", 0x10000, 0x10000, ROM_FILL_FF | ROM_OPTIONAL)
 ROM_END
 
 ROM_START( orionz80 )
@@ -290,13 +293,13 @@ ROM_START( orionz80 )
     ROMX_LOAD( "m34zrk.bin",  0x0f800, 0x0800, CRC(787c3903) SHA1(476c1c0b88e5efb582292eebec15e24d054c8851), ROM_BIOS(4) )
     ROM_SYSTEM_BIOS( 4, "m35zrkd", "Version 3.5 zrkd" )
     ROMX_LOAD( "m35zrkd.bin", 0x0f800, 0x0800, CRC(9368b38f) SHA1(64a77f22119d40c9b18b64d78ad12acc6fff9efb), ROM_BIOS(5) )
-    ROM_CART_LOAD(0, "bin", 0x10000, 0x10000, ROM_FILL_FF | ROM_OPTIONAL)
+    ROM_CART_LOAD("cart", 0x10000, 0x10000, ROM_FILL_FF | ROM_OPTIONAL)
 ROM_END
 
 ROM_START( orionide )
     ROM_REGION( 0x30000, "main", ROMREGION_ERASEFF )
     ROM_LOAD( "m35zrkh.bin", 0x0f800, 0x0800, CRC(b7745f28) SHA1(c3bd3e662db7ec56ecbab54bf6b3a4c26200d0bb) )
-    ROM_CART_LOAD(0, "bin", 0x10000, 0x10000, ROM_FILL_FF | ROM_OPTIONAL)
+    ROM_CART_LOAD("cart", 0x10000, 0x10000, ROM_FILL_FF | ROM_OPTIONAL)
 ROM_END
 
 ROM_START( orionzms )
@@ -307,18 +310,18 @@ ROM_START( orionzms )
     ROMX_LOAD( "m34zms.bin",  0x0f800, 0x0800, CRC(0f87a80b) SHA1(ab1121092e61268d8162ed8a7d4fd081016a409a), ROM_BIOS(2) )
     ROM_SYSTEM_BIOS( 2, "m35zmsd", "Version 3.5 zmsd" )
     ROMX_LOAD( "m35zmsd.bin", 0x0f800, 0x0800, CRC(f714ff37) SHA1(fbe9514adb3384aff146cbedd4fede37ce9591e1), ROM_BIOS(3) )
-    ROM_CART_LOAD(0, "bin", 0x10000, 0x10000, ROM_FILL_FF | ROM_OPTIONAL)
+    ROM_CART_LOAD("cart", 0x10000, 0x10000, ROM_FILL_FF | ROM_OPTIONAL)
 ROM_END
 
 ROM_START( orionidm )
     ROM_REGION( 0x30000, "main", ROMREGION_ERASEFF )
     ROM_LOAD( "m35zmsh.bin", 0x0f800, 0x0800, CRC(01e66df4) SHA1(8c785a3c32fe3eacda73ec79157b41a6e4b63ba8) )
-    ROM_CART_LOAD(0, "bin", 0x10000, 0x10000, ROM_FILL_FF | ROM_OPTIONAL)
+    ROM_CART_LOAD("cart", 0x10000, 0x10000, ROM_FILL_FF | ROM_OPTIONAL)
 ROM_END
 
 ROM_START( orionpro )
 	ROM_REGION( 0x32000, "main", ROMREGION_ERASEFF )
-    ROM_CART_LOAD(0, "bin",   0x10000, 0x10000, ROM_FILL_FF | ROM_OPTIONAL)
+    ROM_CART_LOAD("cart",   0x10000, 0x10000, ROM_FILL_FF | ROM_OPTIONAL)
 	ROM_SYSTEM_BIOS( 0, "ver21", "Version 2.1" )
     ROMX_LOAD( "rom1-210.bin", 0x20000, 0x2000,  CRC(8e1a0c78) SHA1(61c8a5ed596ce7e3fd32da920dcc80dc5375b421), ROM_BIOS(1) )
 	ROMX_LOAD( "rom2-210.bin", 0x22000, 0x10000, CRC(7cb7a49b) SHA1(601f3dd61db323407c4874fd7f23c10dccac0209), ROM_BIOS(1) )

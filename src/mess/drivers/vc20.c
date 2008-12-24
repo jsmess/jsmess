@@ -294,6 +294,9 @@ static MACHINE_DRIVER_START( vic20 )
 	MDRV_VIA6522_ADD("via6522_3", 0, vc1541_via3)
 	MDRV_VIA6522_ADD("via6522_4", 0, vc20_via4)
 	MDRV_VIA6522_ADD("via6522_5", 0, vc20_via5)
+	
+	MDRV_CARTSLOT_ADD("cart1", vic20_cartslot)
+	MDRV_CARTSLOT_ADD("cart2", vic20_cartslot)		
 MACHINE_DRIVER_END
 
 
@@ -443,7 +446,6 @@ ROM_END
 
 
 static SYSTEM_CONFIG_START(vic20)
-	CONFIG_DEVICE(vic20_cartslot_getinfo)
 	CONFIG_DEVICE(cbmfloppy_device_getinfo)
 	CONFIG_RAM_DEFAULT(5 * 1024)
 	CONFIG_RAM(8 * 1024)
@@ -453,7 +455,6 @@ static SYSTEM_CONFIG_START(vic20)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(vic20v)
-	CONFIG_DEVICE(vic20_cartslot_getinfo)
 	CONFIG_DEVICE(vc1541_device_getinfo)
 	CONFIG_RAM_DEFAULT(5 * 1024)
 	CONFIG_RAM(8 * 1024)

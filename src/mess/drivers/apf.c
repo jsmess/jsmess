@@ -669,6 +669,7 @@ static MACHINE_DRIVER_START( apf_m1000 )
 	MDRV_MACHINE_START( apf_m1000 )
 
 	MDRV_CASSETTE_REMOVE( "cassette" )
+	MDRV_CARTSLOT_ADD("cart", default_cartslot)
 MACHINE_DRIVER_END
 
 
@@ -689,7 +690,7 @@ ROM_START(apfm1000)
 	ROM_REGION(0x10000+0x0800,"main",0)
 	ROM_LOAD("apf_4000.rom",0x010000, 0x0800, CRC(2a331a33) SHA1(387b90882cd0b66c192d9cbaa3bec250f897e4f1))
 //	ROM_LOAD("apf-m1000rom.bin",0x010000, 0x0800, CRC(cc6ac840) SHA1(1110a234bcad99bd0894ad44c591389d16376ca4))
-	ROM_CART_LOAD(0, "bin", 0x8000, 0x2000, ROM_OPTIONAL)
+	ROM_CART_LOAD("cart", 0x8000, 0x2000, ROM_OPTIONAL)
 ROM_END
 
 
@@ -716,9 +717,6 @@ static SYSTEM_CONFIG_START( apfimag )
 	CONFIG_DEVICE(apfimag_floppy_getinfo)
 SYSTEM_CONFIG_END
 
-static SYSTEM_CONFIG_START(apfm1000)
-	CONFIG_DEVICE(cartslot_device_getinfo)
-SYSTEM_CONFIG_END
 
 /***************************************************************************
 
@@ -728,4 +726,4 @@ SYSTEM_CONFIG_END
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE             INPUT               INIT    CONFIG      COMPANY               FULLNAME */
 COMP(1977, apfimag,	0,		0,		apf_imagination,	apf_imagination,	0,		apfimag,	"APF Electronics Inc",  "APF Imagination Machine" ,GAME_NOT_WORKING)
-CONS(1978,	apfm1000,	0,		0,		apf_m1000,			apf_m1000,			0,		apfm1000,		"APF Electronics Inc",  "APF M-1000" ,GAME_NOT_WORKING)
+CONS(1978,	apfm1000,	0,		0,		apf_m1000,			apf_m1000,			0,		0,		"APF Electronics Inc",  "APF M-1000" ,GAME_NOT_WORKING)

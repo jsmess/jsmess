@@ -14,7 +14,7 @@
 #define C64_H_
 
 #include "machine/6526cia.h"
-
+#include "devices/cartslot.h"
 
 /*----------- defined in machine/c64.c -----------*/
 
@@ -67,7 +67,7 @@ extern UINT8 c64_game, c64_exrom;
 extern const cia6526_interface c64_ntsc_cia0, c64_pal_cia0;
 extern const cia6526_interface c64_ntsc_cia1, c64_pal_cia1;
 
-void c64_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
-void ultimax_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
+extern const cartslot_interface c64_cartslot;
+extern const cartslot_interface ultimax_cartslot;
 
 #endif /* C64_H_ */

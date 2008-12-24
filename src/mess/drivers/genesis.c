@@ -332,12 +332,16 @@ static MACHINE_DRIVER_START( ms_megadriv )
 	MDRV_IMPORT_FROM(megadriv)
 
 	MDRV_MACHINE_RESET( ms_megadriv )
+	
+	MDRV_CARTSLOT_ADD("cart", genesis_cartslot )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ms_megdsvp )
 	MDRV_IMPORT_FROM(megdsvp)
 
 	MDRV_MACHINE_RESET( ms_megadriv )
+	
+	MDRV_CARTSLOT_ADD("cart", genesis_cartslot )
 MACHINE_DRIVER_END
 
 
@@ -409,21 +413,6 @@ static DRIVER_INIT( md_jpn )
 	DRIVER_INIT_CALL(megadrij);
 	DRIVER_INIT_CALL(mess_md_common);
 }
-
-
-/*************************************
- *
- *	System configuration(s)
- *
- *************************************/
-
-
-static SYSTEM_CONFIG_START( genesis )
-	CONFIG_DEVICE(genesis_cartslot_getinfo)
-SYSTEM_CONFIG_END
-
-
-
 
 /****************************************** PICO emulation ****************************************/
 
@@ -629,6 +618,8 @@ static MACHINE_DRIVER_START( pico )
 	MDRV_CPU_PROGRAM_MAP(_pico_mem,0)
 
 	MDRV_MACHINE_RESET( ms_megadriv )
+	
+	MDRV_CARTSLOT_ADD("cart", pico_cartslot )
 MACHINE_DRIVER_END
 
 
@@ -648,13 +639,6 @@ ROM_START( picoj )
 	ROM_REGION( 0x10000, "sound", ROMREGION_ERASEFF)
 ROM_END
 
-
-static SYSTEM_CONFIG_START( pico )
-	CONFIG_DEVICE(pico_cartslot_getinfo)
-SYSTEM_CONFIG_END
-
-
-
 /***************************************************************************
 
   Game driver(s)
@@ -662,10 +646,10 @@ SYSTEM_CONFIG_END
 ***************************************************************************/
 
 /*    YEAR  NAME		PARENT		COMPAT  MACHINE    	  INPUT     INIT  		CONFIG		COMPANY   FULLNAME */
-CONS( 1989, genesis,	0,			0,      ms_megadriv,  md,		genesis,	genesis,	"Sega",   "Genesis (USA, NTSC)", 0)
-CONS( 1993, gensvp,		genesis,	0,      ms_megdsvp,   md_svp,	gensvp,		genesis,	"Sega",   "Genesis (USA, NTSC, w/SVP)", 0)
-CONS( 1990, megadriv,	genesis,	0,      ms_megadriv,  md,		md_eur,		genesis,	"Sega",   "Mega Drive (Europe, PAL)", 0)
-CONS( 1988, megadrij,	genesis,	0,      ms_megadriv,  md,		md_jpn,		genesis,	"Sega",   "Mega Drive (Japan, NTSC)", 0)
-CONS( 1994, pico,		0,			0,      pico,	      pico,		md_eur,		pico,		"Sega",   "Pico (Europe, PAL)", 0)
-CONS( 1994, picou,		pico,		0,      pico,	      pico,		genesis,	pico,		"Sega",   "Pico (USA, NTSC)", 0)
-CONS( 1993, picoj,		pico,		0,      pico,	      pico,		md_jpn,		pico,		"Sega",   "Pico (Japan, NTSC)", 0)
+CONS( 1989, genesis,	0,			0,      ms_megadriv,  md,		genesis,	0,		"Sega",   "Genesis (USA, NTSC)", 0)
+CONS( 1993, gensvp,		genesis,	0,      ms_megdsvp,   md_svp,	gensvp,		0,		"Sega",   "Genesis (USA, NTSC, w/SVP)", 0)
+CONS( 1990, megadriv,	genesis,	0,      ms_megadriv,  md,		md_eur,		0,		"Sega",   "Mega Drive (Europe, PAL)", 0)
+CONS( 1988, megadrij,	genesis,	0,      ms_megadriv,  md,		md_jpn,		0,		"Sega",   "Mega Drive (Japan, NTSC)", 0)
+CONS( 1994, pico,		0,			0,      pico,	      pico,		md_eur,		0,		"Sega",   "Pico (Europe, PAL)", 0)
+CONS( 1994, picou,		pico,		0,      pico,	      pico,		genesis,	0,		"Sega",   "Pico (USA, NTSC)", 0)
+CONS( 1993, picoj,		pico,		0,      pico,	      pico,		md_jpn,		0,		"Sega",   "Pico (Japan, NTSC)", 0)

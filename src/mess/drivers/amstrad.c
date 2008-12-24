@@ -2944,6 +2944,15 @@ static const cassette_config amstrad_cassette_config =
 	CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED
 };
 
+static const cartslot_interface cpcplus_cartslot =
+{
+	"cpr,bin",
+	1,
+	NULL,
+	DEVICE_IMAGE_LOAD_NAME(amstrad_plus_cartridge),
+	NULL,
+	NULL
+};
 
 static MACHINE_DRIVER_START( amstrad )
 	/* Machine hardware */
@@ -3016,6 +3025,8 @@ static MACHINE_DRIVER_START( cpcplus )
 
 	MDRV_PALETTE_LENGTH(4096+48)  // extended 12-bit palette, and standard 32 colour palette
 	MDRV_PALETTE_INIT(amstrad_plus)
+	
+	MDRV_CARTSLOT_ADD("cart", cpcplus_cartslot)
 MACHINE_DRIVER_END
 
 
@@ -3038,6 +3049,8 @@ static MACHINE_DRIVER_START( gx4000 )
 
 	MDRV_CASSETTE_REMOVE( "cassette" )
 	MDRV_NEC765A_REMOVE( "nec765" )
+	
+	MDRV_CARTSLOT_ADD("cart", cpcplus_cartslot)
 MACHINE_DRIVER_END
 
 
@@ -3187,27 +3200,6 @@ static void cpc6128_floppy_getinfo(const mess_device_class *devclass, UINT32 sta
 	}
 }
 
-
-static void cpcplus_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cartslot */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-		case MESS_DEVINFO_INT_MUST_BE_LOADED:				info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(amstrad_plus_cartridge); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "cpr,bin"); break;
-
-		default:										cartslot_device_getinfo(devclass, state, info); break;
-	}
-}
-
-
 static void aleste_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
@@ -3231,13 +3223,11 @@ SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START( cpcplus )
 	CONFIG_IMPORT_FROM(cpc6128)
-	CONFIG_DEVICE(cpcplus_cartslot_getinfo)
 SYSTEM_CONFIG_END
 
 
 static SYSTEM_CONFIG_START( gx4000 )
-	CONFIG_RAM_DEFAULT(64 * 1024)  // has 64k RAM
-	CONFIG_DEVICE(cpcplus_cartslot_getinfo)
+	CONFIG_RAM_DEFAULT(64 * 1024)  // has 64k RAM	
 SYSTEM_CONFIG_END
 
 

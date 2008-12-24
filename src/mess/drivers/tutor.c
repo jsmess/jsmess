@@ -570,6 +570,15 @@ static const struct tms9995reset_param tutor_processor_config =
 	NULL		/* no IDLE callback */
 };
 
+static const cartslot_interface tutor_cartslot =
+{
+	"",
+	0,
+	NULL,
+	DEVICE_IMAGE_LOAD_NAME(tutor_cart),
+	DEVICE_IMAGE_UNLOAD_NAME(tutor_cart),
+	NULL
+};
 
 static MACHINE_DRIVER_START(tutor)
 	/* basic machine hardware */
@@ -597,6 +606,8 @@ static MACHINE_DRIVER_START(tutor)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
+	
+	MDRV_CARTSLOT_ADD("cart", tutor_cartslot )
 MACHINE_DRIVER_END
 
 
@@ -609,25 +620,6 @@ ROM_START(tutor)
 	ROM_LOAD("tutor1.bin", 0x0000, 0x8000, CRC(702c38ba) SHA1(ce60607c3038895e31915d41bb5cf71cb8522d7a))      /* system ROM */
 	ROM_LOAD("tutor2.bin", 0x8000, 0x4000, CRC(05f228f5) SHA1(46a14a45f6f9e2c30663a2b87ce60c42768a78d0))      /* BASIC ROM */
 ROM_END
-
-static void tutor_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cartslot */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(tutor_cart); break;
-		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(tutor_cart); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), ""); break;
-
-		default:										cartslot_device_getinfo(devclass, state, info); break;
-	}
-}
 
 static void tutor_parallel_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
@@ -649,7 +641,6 @@ static void tutor_parallel_getinfo(const mess_device_class *devclass, UINT32 sta
 static SYSTEM_CONFIG_START(tutor)
 
 	/* cartridge port is not emulated */
-	CONFIG_DEVICE(tutor_cartslot_getinfo)
 	CONFIG_DEVICE(tutor_parallel_getinfo)
 
 SYSTEM_CONFIG_END

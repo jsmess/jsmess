@@ -93,7 +93,12 @@ DEVICE_IMAGE_LOAD (msx_cart)
 	slot_state *state;
 	int id;
 
-	id = image_index_in_device (image);
+	if (strcmp(image->tag,"cart1")==0) {
+		id = 0;
+	}
+	if (strcmp(image->tag,"cart2")==0) {
+		id = 1;
+	}
 
 	size = image_length (image);
 	if (size < 0x2000) {
@@ -269,7 +274,12 @@ DEVICE_IMAGE_UNLOAD (msx_cart)
 {
 	int id;
 
-	id = image_index_in_device (image);
+	if (strcmp(image->tag,"cart1")==0) {
+		id = 0;
+	}
+	if (strcmp(image->tag,"cart2")==0) {
+		id = 1;
+	}
 	if (msx_slot_list[msx1.cart_state[id]->type].savesram)
 	{
 		msx_slot_list[msx1.cart_state[id]->type].savesram (msx1.cart_state[id]);

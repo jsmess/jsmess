@@ -79,53 +79,6 @@ static MACHINE_RESET( n64 )
 	n64_machine_reset(machine);
 }
 
-static MACHINE_DRIVER_START( n64 )
-	/* basic machine hardware */
-	MDRV_CPU_ADD("main", R4600BE, 93750000)
-	MDRV_CPU_CONFIG(config)
-	MDRV_CPU_PROGRAM_MAP(n64_map, 0)
-	MDRV_CPU_VBLANK_INT("main", n64_vblank)
-
-	MDRV_CPU_ADD("rsp", RSP, 62500000)
-	MDRV_CPU_CONFIG(n64_rsp_config)
-	MDRV_CPU_PROGRAM_MAP(rsp_map, 0)
-
-	MDRV_MACHINE_RESET( n64 )
-	MDRV_QUANTUM_TIME(HZ(600))
-
-	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(640, 525)
-	MDRV_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
-	MDRV_PALETTE_LENGTH(0x1000)
-
-	MDRV_VIDEO_START(n64)
-	MDRV_VIDEO_UPDATE(n64)
-
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
-
-	MDRV_SOUND_ADD("dmadac.l", DMADAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
-	MDRV_SOUND_ADD("dmadac.r", DMADAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
-MACHINE_DRIVER_END
-
-#ifdef UNUSED_FUNCTION
-DRIVER_INIT( n64 )
-{
-}
-#endif
-
-ROM_START( n64)
-    ROM_REGION( 0x800000, "main", ROMREGION_ERASEFF )      /* dummy region for R4300 */
-    ROM_REGION32_BE( 0x800, "user1", 0 )
-    ROM_LOAD( "pifdata.bin", 0x0000, 0x0800, CRC(5ec82be9) SHA1(9174eadc0f0ea2654c95fd941406ab46b9dc9bdd) )
-    ROM_REGION32_BE( 0x4000000, "user2", ROMREGION_ERASEFF)
-ROM_END
-
 static DEVICE_IMAGE_LOAD(n64_cart)
 {
 	int i, length;
@@ -166,28 +119,57 @@ static DEVICE_IMAGE_LOAD(n64_cart)
 	return INIT_PASS;
 }
 
-static void n64_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+static const cartslot_interface n64_cartslot =
 {
-	/* cartslot */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-		case MESS_DEVINFO_INT_MUST_BE_LOADED:				info->i = 1; break;
+	"v64,z64,rom,n64,bin",
+	1,
+	NULL,
+	DEVICE_IMAGE_LOAD_NAME(n64_cart),
+	NULL,
+	NULL
+};
 
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(n64_cart); break;
+static MACHINE_DRIVER_START( n64 )
+	/* basic machine hardware */
+	MDRV_CPU_ADD("main", R4600BE, 93750000)
+	MDRV_CPU_CONFIG(config)
+	MDRV_CPU_PROGRAM_MAP(n64_map, 0)
+	MDRV_CPU_VBLANK_INT("main", n64_vblank)
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "v64,z64,rom,n64,bin"); break;
+	MDRV_CPU_ADD("rsp", RSP, 62500000)
+	MDRV_CPU_CONFIG(n64_rsp_config)
+	MDRV_CPU_PROGRAM_MAP(rsp_map, 0)
 
-		default:										cartslot_device_getinfo(devclass, state, info); break;
-	}
-}
+	MDRV_MACHINE_RESET( n64 )
+	MDRV_QUANTUM_TIME(HZ(600))
 
-static SYSTEM_CONFIG_START(n64)
-	CONFIG_DEVICE(n64_cartslot_getinfo)
-SYSTEM_CONFIG_END
+	/* video hardware */
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MDRV_SCREEN_SIZE(640, 525)
+	MDRV_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
+	MDRV_PALETTE_LENGTH(0x1000)
 
+	MDRV_VIDEO_START(n64)
+	MDRV_VIDEO_UPDATE(n64)
 
-CONS(1996, n64, 	0,		0,		n64, 	n64, 	0,	n64,	"Nintendo", "Nintendo 64", 0 )
+	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+
+	MDRV_SOUND_ADD("dmadac.l", DMADAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
+	MDRV_SOUND_ADD("dmadac.r", DMADAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
+	
+	MDRV_CARTSLOT_ADD("cart", n64_cartslot )
+MACHINE_DRIVER_END
+
+ROM_START( n64)
+    ROM_REGION( 0x800000, "main", ROMREGION_ERASEFF )      /* dummy region for R4300 */
+    ROM_REGION32_BE( 0x800, "user1", 0 )
+    ROM_LOAD( "pifdata.bin", 0x0000, 0x0800, CRC(5ec82be9) SHA1(9174eadc0f0ea2654c95fd941406ab46b9dc9bdd) )
+    ROM_REGION32_BE( 0x4000000, "user2", ROMREGION_ERASEFF)
+ROM_END
+
+CONS(1996, n64, 	0,		0,		n64, 	n64, 	0,	0,	"Nintendo", "Nintendo 64", 0 )

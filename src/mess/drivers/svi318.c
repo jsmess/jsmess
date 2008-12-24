@@ -269,6 +269,16 @@ static const cassette_config svi318_cassette_config =
 	CASSETTE_PLAY
 };
 
+static const cartslot_interface svi318_cartslot =
+{
+	"rom",
+	0,
+	DEVICE_START_NAME(svi318_cart),
+	DEVICE_IMAGE_LOAD_NAME(svi318_cart),
+	DEVICE_IMAGE_UNLOAD_NAME(svi318_cart),
+	NULL
+};
+
 static MACHINE_DRIVER_START( svi318 )
 	/* Basic machine hardware */
 	MDRV_CPU_ADD( "main", Z80, 3579545 )	/* 3.579545 MHz */
@@ -307,6 +317,8 @@ static MACHINE_DRIVER_START( svi318 )
 	MDRV_CASSETTE_ADD( "cassette", svi318_cassette_config )
 		
 	MDRV_WD179X_ADD("wd179x", svi_wd17xx_interface )
+	
+	MDRV_CARTSLOT_ADD("cart", svi318_cartslot )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( svi318n )
@@ -384,6 +396,8 @@ static MACHINE_DRIVER_START( svi328_806 )
 	MDRV_CASSETTE_ADD( "cassette", svi318_cassette_config )
 	
 	MDRV_WD179X_ADD("wd179x", svi_wd17xx_interface )
+	
+	MDRV_CARTSLOT_ADD("cart", svi318_cartslot )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( svi328n_806 )
@@ -461,39 +475,6 @@ ROM_START( sv328n80 )
 	ROMX_LOAD ("svi806se.rom", 0x0000, 0x1000, CRC(daea8956) SHA1(3f16d5513ad35692488ae7d864f660e76c6e8ed3), ROM_BIOS(2))
 ROM_END
 
-
-static void svi318_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cartslot */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:
-			info->i = 1;
-			break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_START:
-			info->start = DEVICE_START_NAME(svi318_cart);
-			break;
-		case MESS_DEVINFO_PTR_LOAD:
-			info->load = DEVICE_IMAGE_LOAD_NAME(svi318_cart);
-			break;
-		case MESS_DEVINFO_PTR_UNLOAD:
-			info->unload = DEVICE_IMAGE_UNLOAD_NAME(svi318_cart);
-			break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:
-			strcpy(info->s = device_temp_str(), "rom");
-			break;
-
-		default:
-			cartslot_device_getinfo(devclass, state, info);
-			break;
-	}
-}
-
 static void svi318_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
@@ -521,7 +502,6 @@ static void svi318_floppy_getinfo(const mess_device_class *devclass, UINT32 stat
 }
 
 static SYSTEM_CONFIG_START( svi318_common )
-	CONFIG_DEVICE(svi318_cartslot_getinfo)
 	CONFIG_DEVICE(svi318_floppy_getinfo)
 SYSTEM_CONFIG_END
 

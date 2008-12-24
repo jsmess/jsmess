@@ -299,6 +299,15 @@ static const cassette_config jupiter_cassette_config =
 	CASSETTE_STOPPED
 };
 
+static const cartslot_interface jupiter_cartslot =
+{
+	"ace",
+	0,
+	NULL,
+	DEVICE_IMAGE_LOAD_NAME(jupiter_ace),
+	NULL,
+	NULL
+};
 
 /* machine definition */
 static MACHINE_DRIVER_START( jupiter )
@@ -328,6 +337,8 @@ static MACHINE_DRIVER_START( jupiter )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_CASSETTE_ADD( "cassette", jupiter_cassette_config )
+	
+	MDRV_CARTSLOT_ADD("cart", jupiter_cartslot )
 MACHINE_DRIVER_END
 
 
@@ -337,30 +348,5 @@ ROM_START (jupiter)
 	ROM_LOAD ("jupiter.hi", 0x1000, 0x1000, CRC(4009f636) SHA1(98c5d4bcd74bcf014268cf4c00b2007ea5cc21f3))
 ROM_END
 
-
-static void jupiter_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cartslot */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(jupiter_ace); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "ace"); break;
-
-		default:										cartslot_device_getinfo(devclass, state, info); break;
-	}
-}
-
-
-static SYSTEM_CONFIG_START(jupiter)
-	CONFIG_DEVICE(jupiter_cartslot_getinfo)
-SYSTEM_CONFIG_END
-
-
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT      CONFIG    COMPANY   FULLNAME */
-COMP( 1981, jupiter,  0,		0,		jupiter,  jupiter,	0,		  jupiter,	"Cantab",  "Jupiter Ace" , 0)
+COMP( 1981, jupiter,  0,		0,		jupiter,  jupiter,	0,		  0,		"Cantab",  "Jupiter Ace" , 0)

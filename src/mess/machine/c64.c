@@ -1405,14 +1405,26 @@ static INT8 cbm_c64_exrom;
 
 static DEVICE_IMAGE_UNLOAD(c64_cart)
 {
-	int index = image_index_in_device(image);
+	int index = 0;
+	if (strcmp(image->tag,"cart1")==0) {
+		index = 0;
+	}
+	if (strcmp(image->tag,"cart2")==0) {
+		index = 1;
+	}
 	c64_cbm_cart[index].size = 0;
 	c64_cbm_cart[index].chip = 0;
 }
 
 static DEVICE_START(c64_cart)
 {
-	int index = image_index_in_device(device);
+	int index = 0;
+	if (strcmp(device->tag,"cart1")==0) {
+		index = 0;
+	}
+	if (strcmp(device->tag,"cart2")==0) {
+		index = 1;
+	}
 	if (index == 0)
 	{
 		cbm_c64_game = -1;
@@ -1639,41 +1651,23 @@ static DEVICE_IMAGE_LOAD(c64_cart)
 	return INIT_PASS;
 }
 
-void c64_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+
+const cartslot_interface c64_cartslot =
 {
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:				info->i = 2; break;
+	"crt,80",
+	0,
+	DEVICE_START_NAME(c64_cart),
+	DEVICE_IMAGE_LOAD_NAME(c64_cart),
+	DEVICE_IMAGE_UNLOAD_NAME(c64_cart),
+	NULL
+};
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:		strcpy(info->s = device_temp_str(), "crt,80"); break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_START:				info->start = DEVICE_START_NAME(c64_cart); break;
-		case MESS_DEVINFO_PTR_LOAD:					info->load = DEVICE_IMAGE_LOAD_NAME(c64_cart); break;
-		case MESS_DEVINFO_PTR_UNLOAD:				info->unload = DEVICE_IMAGE_UNLOAD_NAME(c64_cart); break;
-
-		default:									cartslot_device_getinfo(devclass, state, info);
-	}
-}
-
-void ultimax_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
+const cartslot_interface ultimax_cartslot =
 {
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:				info->i = 1; break;
-		case MESS_DEVINFO_INT_MUST_BE_LOADED:		info->i = 1; break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:		strcpy(info->s = device_temp_str(), "crt,e0,f0"); break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_START:				info->start = DEVICE_START_NAME(c64_cart); break;
-		case MESS_DEVINFO_PTR_LOAD:					info->load = DEVICE_IMAGE_LOAD_NAME(c64_cart); break;
-		case MESS_DEVINFO_PTR_UNLOAD:				info->unload = DEVICE_IMAGE_UNLOAD_NAME(c64_cart); break;
-
-		default:									cartslot_device_getinfo(devclass, state, info); break;
-	}
-}
+	"crt,e0,f0",
+	1,
+	DEVICE_START_NAME(c64_cart),
+	DEVICE_IMAGE_LOAD_NAME(c64_cart),
+	DEVICE_IMAGE_UNLOAD_NAME(c64_cart),
+	NULL
+};

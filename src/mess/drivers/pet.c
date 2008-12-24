@@ -681,12 +681,16 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( pet )
 	MDRV_IMPORT_FROM( pet_general )
 	MDRV_QUICKLOAD_ADD(cbm_pet, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
+	MDRV_CARTSLOT_ADD("cart1", pet_cartslot)
+	MDRV_CARTSLOT_ADD("cart2", pet_cartslot)
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( pet2001 )
 	MDRV_IMPORT_FROM( pet_general )
 	MDRV_QUICKLOAD_ADD(cbm_pet1, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
+	MDRV_CARTSLOT_ADD("cart1", pet_cartslot)
+	MDRV_CARTSLOT_ADD("cart2", pet_cartslot)	
 MACHINE_DRIVER_END
 
 
@@ -699,6 +703,9 @@ static MACHINE_DRIVER_START( pet40 )
 
 	MDRV_VIDEO_START( pet_crtc )
 	MDRV_VIDEO_UPDATE( pet_crtc )
+	
+	MDRV_CARTSLOT_MODIFY("cart1", pet4_cartslot)
+	MDRV_CARTSLOT_MODIFY("cart2", pet4_cartslot)	
 MACHINE_DRIVER_END
 
 
@@ -726,6 +733,9 @@ static MACHINE_DRIVER_START( pet80 )
 	MDRV_GFXDECODE( pet80 )
 	MDRV_VIDEO_START( pet_crtc )
 	MDRV_VIDEO_UPDATE( pet_crtc )
+	
+	MDRV_CARTSLOT_MODIFY("cart1", pet4_cartslot)
+	MDRV_CARTSLOT_MODIFY("cart2", pet4_cartslot)	
 MACHINE_DRIVER_END
 
 
@@ -1090,7 +1100,6 @@ ROM_END
 
 /* Original PET 2001 - Basic 1 - RAM: 4k, 8k */
 static SYSTEM_CONFIG_START( pet2001 )
-	CONFIG_DEVICE(pet_cartslot_getinfo)
 	CONFIG_DEVICE(cbmfloppy_device_getinfo)
 	CONFIG_RAM(4 * 1024)
 	CONFIG_RAM_DEFAULT(8 * 1024)
@@ -1098,7 +1107,6 @@ SYSTEM_CONFIG_END
 
 /* Later PET 2001 - Basic 2 - RAM: 8k, 16k, 32k */
 static SYSTEM_CONFIG_START( pet2 )
-	CONFIG_DEVICE(pet_cartslot_getinfo)
 	CONFIG_DEVICE(cbmfloppy_device_getinfo)
 	CONFIG_RAM(8 * 1024)
 	CONFIG_RAM(16 * 1024)
@@ -1107,7 +1115,6 @@ SYSTEM_CONFIG_END
 
 /* Early PET 4000 - Basic 4 - RAM: 8k, 16k, 32k */
 static SYSTEM_CONFIG_START( pet4o )
-	CONFIG_DEVICE(pet4_cartslot_getinfo)
 	CONFIG_DEVICE(cbmfloppy_device_getinfo)
 	CONFIG_RAM(8 * 1024)
 	CONFIG_RAM(16 * 1024)
@@ -1116,7 +1123,6 @@ SYSTEM_CONFIG_END
 
 /* Later PET 4000 / PET 8000 - Basic 4 - RAM: 32k expandable (expansion through DIPs currently) */
 static SYSTEM_CONFIG_START( pet4 )
-	CONFIG_DEVICE(pet4_cartslot_getinfo)
 	CONFIG_DEVICE(cbmfloppy_device_getinfo)
 	CONFIG_RAM_DEFAULT(32 * 1024)
 SYSTEM_CONFIG_END

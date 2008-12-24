@@ -2114,10 +2114,23 @@ DEVICE_IMAGE_LOAD( bbcb_cart )
 	UINT8 *mem = memory_region (image->machine, "user1");
 	int size, read_;
 	int addr = 0;
+	int index = 0;
 
 	size = image_length (image);
 
-	addr = 0x8000 + (0x4000 * image_index_in_device(image));
+	if (strcmp(image->tag,"cart1")==0) {
+		index = 0;
+	}
+	if (strcmp(image->tag,"cart2")==0) {
+		index = 1;
+	}
+	if (strcmp(image->tag,"cart3")==0) {
+		index = 2;
+	}
+	if (strcmp(image->tag,"cart4")==0) {
+		index = 3;
+	}
+	addr = 0x8000 + (0x4000 * index);
 
 
 	logerror("loading rom %s at %.4x size:%.4x\n",image_filename(image), addr, size);

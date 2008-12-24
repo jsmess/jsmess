@@ -1673,6 +1673,15 @@ INPUT_PORTS_END
 
 /**********************************************************************************************************/
 
+static const cartslot_interface nc_cartslot =
+{
+	"crd,card",
+	0,
+	DEVICE_START_NAME(nc_pcmcia_card),
+	DEVICE_IMAGE_LOAD_NAME(nc_pcmcia_card),
+	DEVICE_IMAGE_UNLOAD_NAME(nc_pcmcia_card),
+	NULL
+};
 
 
 static MACHINE_DRIVER_START( nc100 )
@@ -1713,6 +1722,8 @@ static MACHINE_DRIVER_START( nc100 )
 
 	/* rtc */
 	MDRV_TC8521_ADD("rtc", nc100_tc8521_interface)
+	
+	MDRV_CARTSLOT_ADD("cart", nc_cartslot)
 MACHINE_DRIVER_END
 
 
@@ -1752,7 +1763,7 @@ MACHINE_DRIVER_END
 ROM_START(nc100)
 	ROM_REGION(((64*1024)+(256*1024)), "main",0)
 	ROM_SYSTEM_BIOS(0, "106", "ROM v1.06")
-        ROMX_LOAD("nc100a.rom", 0x010000, 0x040000, CRC(849884f9) SHA1(ff030dd334ca867d620ee4a94b142ef0d93b69b6), ROM_BIOS(1))
+    ROMX_LOAD("nc100a.rom", 0x010000, 0x040000, CRC(849884f9) SHA1(ff030dd334ca867d620ee4a94b142ef0d93b69b6), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "100", "ROM v1.00")
 	ROMX_LOAD("nc100.rom",  0x010000, 0x040000, CRC(a699eca3) SHA1(ce217d5a298b959ccc3d7bc5c93b1dba043f1339), ROM_BIOS(2))
 ROM_END
@@ -1761,26 +1772,6 @@ ROM_START(nc200)
         ROM_REGION(((64*1024)+(512*1024)), "main",0)
         ROM_LOAD("nc200.rom", 0x010000, 0x080000, CRC(bb8180e7) SHA1(fb5c93b0a3e199202c6a12548d2617f7a09bae47))
 ROM_END
-
-static void nc_common_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cartslot */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_START:							info->start = DEVICE_START_NAME(nc_pcmcia_card); break;
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(nc_pcmcia_card); break;
-		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(nc_pcmcia_card); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "crd,card"); break;
-
-		default:										cartslot_device_getinfo(devclass, state, info); break;
-	}
-}
 
 static void nc_common_serial_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
@@ -1805,7 +1796,6 @@ static void nc_common_serial_getinfo(const mess_device_class *devclass, UINT32 s
 }
 
 static SYSTEM_CONFIG_START(nc_common)
-	CONFIG_DEVICE(nc_common_cartslot_getinfo)
 	CONFIG_DEVICE(nc_common_serial_getinfo)
 SYSTEM_CONFIG_END
 

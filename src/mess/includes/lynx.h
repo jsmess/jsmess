@@ -40,7 +40,7 @@ INTERRUPT_GEN( lynx_frame_int );
 int lynx_verify_cart (char *header, int kind);
 void lynx_crc_keyword(const device_config *image);
 
-void lynx_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
+extern const cartslot_interface lynx_cartslot;
 
 
 /*----------- defined in audio/lynx.c -----------*/

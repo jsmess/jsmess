@@ -431,6 +431,45 @@ static MACHINE_RESET( mpt02 )
 	device_reset(state->cdp1864);
 }
 
+
+static DEVICE_IMAGE_LOAD( studio2_cart )
+{
+	UINT8	*ptr = NULL;
+	UINT8	header[ST2_HEADER_SIZE];
+	int	filesize;
+
+	filesize = image_length( image );
+	if ( filesize <= ST2_HEADER_SIZE ) {
+		logerror( "Error loading cartridge: Invalid ROM file: %s.\n", image_filename( image ) );
+		return INIT_FAIL;
+	}
+
+	/* read ST2 header */
+	if ( image_fread(image, header, ST2_HEADER_SIZE ) != ST2_HEADER_SIZE ) {
+		logerror( "Error loading cartridge: Unable to read header from file: %s.\n", image_filename( image ) );
+		return INIT_FAIL;
+	}
+	filesize -= ST2_HEADER_SIZE;
+	/* Read ST2 cartridge contents */
+	ptr = ((UINT8 *)memory_region(image->machine,  CDP1802_TAG ) ) + 0x0400;
+	if ( image_fread(image, ptr, filesize ) != filesize ) {
+		logerror( "Error loading cartridge: Unable to read contents from file: %s.\n", image_filename( image ) );
+		return INIT_FAIL;
+	}
+
+	return INIT_PASS;
+}
+
+static const cartslot_interface studio2_cartslot =
+{
+	"st2",
+	0,
+	NULL,
+	DEVICE_IMAGE_LOAD_NAME(studio2_cart),
+	NULL,
+	NULL
+};
+
 /* Machine Drivers */
 
 static MACHINE_DRIVER_START( studio2 )
@@ -463,6 +502,8 @@ static MACHINE_DRIVER_START( studio2 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("beep", BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	
+	MDRV_CARTSLOT_ADD("cart", studio2_cartslot )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( visicom )
@@ -495,6 +536,8 @@ static MACHINE_DRIVER_START( visicom )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("beep", BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	
+	MDRV_CARTSLOT_ADD("cart", studio2_cartslot )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mpt02 )
@@ -526,6 +569,8 @@ static MACHINE_DRIVER_START( mpt02 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("beep", BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	
+	MDRV_CARTSLOT_ADD("cart", studio2_cartslot )
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -577,63 +622,13 @@ static DRIVER_INIT( studio2 )
 	timer_set(machine, attotime_zero, NULL, 0, setup_beep);
 }
 
-/* System Configuration */
-
-static DEVICE_IMAGE_LOAD( studio2_cart )
-{
-	UINT8	*ptr = NULL;
-	UINT8	header[ST2_HEADER_SIZE];
-	int	filesize;
-
-	filesize = image_length( image );
-	if ( filesize <= ST2_HEADER_SIZE ) {
-		logerror( "Error loading cartridge: Invalid ROM file: %s.\n", image_filename( image ) );
-		return INIT_FAIL;
-	}
-
-	/* read ST2 header */
-	if ( image_fread(image, header, ST2_HEADER_SIZE ) != ST2_HEADER_SIZE ) {
-		logerror( "Error loading cartridge: Unable to read header from file: %s.\n", image_filename( image ) );
-		return INIT_FAIL;
-	}
-	filesize -= ST2_HEADER_SIZE;
-	/* Read ST2 cartridge contents */
-	ptr = ((UINT8 *)memory_region(image->machine,  CDP1802_TAG ) ) + 0x0400;
-	if ( image_fread(image, ptr, filesize ) != filesize ) {
-		logerror( "Error loading cartridge: Unable to read contents from file: %s.\n", image_filename( image ) );
-		return INIT_FAIL;
-	}
-
-	return INIT_PASS;
-}
-
-static void studio2_cartslot_getinfo( const mess_device_class *devclass, UINT32 state, union devinfo *info )
-{
-	switch( state )
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:					info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:						info->load = DEVICE_IMAGE_LOAD_NAME(studio2_cart); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:			strcpy(info->s = device_temp_str(), "st2"); break;
-
-		default:										cartslot_device_getinfo( devclass, state, info ); break;
-	}
-}
-
-static SYSTEM_CONFIG_START( studio2 )
-	CONFIG_DEVICE( studio2_cartslot_getinfo )
-SYSTEM_CONFIG_END
 
 /* Game Drivers */
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        CONFIG      COMPANY   FULLNAME */
-CONS( 1977,	studio2,	0,		0,		studio2,	studio2,	studio2,	studio2,	"RCA",		"Studio II", GAME_SUPPORTS_SAVE )
-CONS( 1978, visicom,	studio2,0,		visicom,	studio2,	studio2,	studio2,	"Toshiba",	"Visicom (Japan)", GAME_NOT_WORKING )
-CONS( 1978,	mpt02s,		studio2,0,		mpt02,		studio2,	studio2,	studio2,	"Soundic",	"MPT-02 Victory Home TV Programmer (Austria)", GAME_NOT_WORKING )
-CONS( 1978,	mpt02h,		studio2,0,		mpt02,		studio2,	studio2,	studio2,	"Hanimex",	"MPT-02 Jeu TV Programmable (France)", GAME_NOT_WORKING )
-CONS( 1978,	mtc9016,	studio2,0,		mpt02,		studio2,	studio2,	studio2,	"Mustang",	"9016 Telespiel Computer (Germany)", GAME_NOT_WORKING )
-CONS( 1978, shmc1200,	studio2,0,		mpt02,		studio2,	studio2,	studio2,	"Sheen",	"1200 Micro Computer (Australia)", GAME_NOT_WORKING )
+CONS( 1977,	studio2,	0,		0,		studio2,	studio2,	studio2,	0,	"RCA",		"Studio II", GAME_SUPPORTS_SAVE )
+CONS( 1978, visicom,	studio2,0,		visicom,	studio2,	studio2,	0,	"Toshiba",	"Visicom (Japan)", GAME_NOT_WORKING )
+CONS( 1978,	mpt02s,		studio2,0,		mpt02,		studio2,	studio2,	0,	"Soundic",	"MPT-02 Victory Home TV Programmer (Austria)", GAME_NOT_WORKING )
+CONS( 1978,	mpt02h,		studio2,0,		mpt02,		studio2,	studio2,	0,	"Hanimex",	"MPT-02 Jeu TV Programmable (France)", GAME_NOT_WORKING )
+CONS( 1978,	mtc9016,	studio2,0,		mpt02,		studio2,	studio2,	0,	"Mustang",	"9016 Telespiel Computer (Germany)", GAME_NOT_WORKING )
+CONS( 1978, shmc1200,	studio2,0,		mpt02,		studio2,	studio2,	0,	"Sheen",	"1200 Micro Computer (Australia)", GAME_NOT_WORKING )

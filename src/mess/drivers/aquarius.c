@@ -394,6 +394,30 @@ static MACHINE_RESET( aquarius )
 	memory_set_bank(machine, 2, 0);
 }
 
+static DEVICE_IMAGE_LOAD( aquarius_cart )
+{
+	int size = image_length(image);
+	UINT8 *ptr = memory_region(image->machine, "main") + 0xc000;
+
+	if (image_fread(image, ptr, size) != size)
+	{
+		return INIT_FAIL;
+	}
+
+	switch (size)
+	{
+	case 8 * 1024:
+		memory_install_readwrite8_handler(cpu_get_address_space(image->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc000, 0xdfff, 0, 0x2000, SMH_BANK2, SMH_UNMAP);
+		break;
+
+	case 16 * 1024:
+		memory_install_readwrite8_handler(cpu_get_address_space(image->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc000, 0xffff, 0, 0, SMH_BANK2, SMH_UNMAP);
+		break;
+	}
+
+	return INIT_PASS;
+}
+
 /* Machine Driver */
 static const cassette_config aquarius_cassette_config =
 {
@@ -402,6 +426,15 @@ static const cassette_config aquarius_cassette_config =
 	CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED
 };
 
+static const cartslot_interface aquarius_cartslot =
+{
+	"bin",
+	0,
+	NULL,
+	DEVICE_IMAGE_LOAD_NAME(aquarius_cart),
+	NULL,
+	NULL
+};
 
 static MACHINE_DRIVER_START( aquarius )
 	/* basic machine hardware */
@@ -440,6 +473,8 @@ static MACHINE_DRIVER_START( aquarius )
 	MDRV_PRINTER_ADD("printer")
 
 	MDRV_CASSETTE_ADD( "cassette", aquarius_cassette_config )
+	
+	MDRV_CARTSLOT_ADD("cart", aquarius_cartslot)
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -454,47 +489,6 @@ ROM_START( aquarius )
 ROM_END
 
 /* System Configuration */
-
-static DEVICE_IMAGE_LOAD( aquarius_cart )
-{
-	int size = image_length(image);
-	UINT8 *ptr = memory_region(image->machine, "main") + 0xc000;
-
-	if (image_fread(image, ptr, size) != size)
-	{
-		return INIT_FAIL;
-	}
-
-	switch (size)
-	{
-	case 8 * 1024:
-		memory_install_readwrite8_handler(cpu_get_address_space(image->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc000, 0xdfff, 0, 0x2000, SMH_BANK2, SMH_UNMAP);
-		break;
-
-	case 16 * 1024:
-		memory_install_readwrite8_handler(cpu_get_address_space(image->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc000, 0xffff, 0, 0, SMH_BANK2, SMH_UNMAP);
-		break;
-	}
-
-	return INIT_PASS;
-}
-
-static void aquarius_cartslot_getinfo( const mess_device_class *devclass, UINT32 state, union devinfo *info )
-{
-	switch( state )
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:					info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:						info->load = DEVICE_IMAGE_LOAD_NAME(aquarius_cart); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:			strcpy(info->s = device_temp_str(), "bin"); break;
-
-		default:										cartslot_device_getinfo( devclass, state, info ); break;
-	}
-}
 
 static DEVICE_IMAGE_LOAD( aquarius_floppy )
 {
@@ -525,7 +519,6 @@ static SYSTEM_CONFIG_START( aquarius )
 	CONFIG_RAM		  ( 8 * 1024)
 	CONFIG_RAM		  (20 * 1024)
 	CONFIG_RAM		  (36 * 1024)
-	CONFIG_DEVICE(aquarius_cartslot_getinfo)
 	CONFIG_DEVICE(aquarius_floppy_getinfo)
 SYSTEM_CONFIG_END
 
