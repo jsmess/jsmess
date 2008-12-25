@@ -870,67 +870,83 @@ static const char* TrimManufacturer(const char *s)
 
 
 
+static void CreateDeviceFolders(int parent_index, device_class class, UINT icon_id)
+{
+	int i, j, device_folder_count = 0;
+	LPTREEFOLDER device_folders[512];
+	LPTREEFOLDER folder;
+	machine_config *config = NULL;
+	const machine_config_token *last_tokens = NULL;
+	const device_config *device;
+	int nFolder = numFolders;
+
+	for (i = 0; drivers[i] != NULL; i++)
+	{
+		// instantiate this device config (if it is different than the previous)
+		if (last_tokens != drivers[i]->machine_config)
+		{
+			if (config != NULL)
+				machine_config_free(config);
+			config = machine_config_alloc(drivers[i]->machine_config);
+			last_tokens = drivers[i]->machine_config;
+		}
+
+		// enumerate through all devices
+		for (device = device_list_class_first(config->devicelist, class); device != NULL;
+			device = device_list_class_next(device, class))
+		{
+			// get the name
+			const char *dev_name = device_get_name(device);
+
+			// do we have a folder for this device?
+			folder = NULL;
+			for (j = 0; j < device_folder_count; j++)
+			{
+				if (!strcmp(dev_name, device_folders[j]->m_lpTitle))
+				{
+					folder = device_folders[j];
+					break;
+				}
+			}
+
+			// are we forced to create a folder?
+			if (folder == NULL)
+			{
+				LPTREEFOLDER lpTemp;
+
+				lpTemp = NewFolder(device_get_name(device), next_folder_id, parent_index, icon_id,
+ 								   GetFolderFlags(numFolders));
+				ExtraFolderData[next_folder_id] = malloc(sizeof(EXFOLDERDATA) );
+				memset(ExtraFolderData[next_folder_id], 0, sizeof(EXFOLDERDATA));
+
+				ExtraFolderData[next_folder_id]->m_nFolderId = next_folder_id;
+				ExtraFolderData[next_folder_id]->m_nIconId = icon_id;
+				ExtraFolderData[next_folder_id]->m_nParent = treeFolders[parent_index]->m_nFolderId;
+				ExtraFolderData[next_folder_id]->m_nSubIconId = -1;
+				strcpy( ExtraFolderData[next_folder_id]->m_szTitle, device_get_name(device) );
+				ExtraFolderData[next_folder_id++]->m_dwFlags = 0;
+				AddFolder(lpTemp);
+				folder = treeFolders[nFolder++];
+
+				// record that we found this folder
+				device_folders[device_folder_count++] = folder;
+			}
+
+			// cpu type #'s are one-based
+			AddGame(folder, i);
+		}
+	}
+
+	// free the config that we're still holding on to
+	if (config != NULL)
+		machine_config_free(config);
+}
+
+
+
 void CreateCPUFolders(int parent_index)
 {
-// FIXME 0.128u7
-#if 0
-	int i,jj;
-	int nGames = driver_list_get_count(drivers);
-	int nFolder = numFolders;
-	LPTREEFOLDER lpFolder = treeFolders[parent_index];
-	LPTREEFOLDER map[CPU_COUNT];
-
-	ZeroMemory(map, sizeof(map));
-	cpuintrf_init(NULL);
-
-	// no games in top level folder
-	SetAllBits(lpFolder->m_lpGameBits,FALSE);
-
-	for (i=1;i<CPU_COUNT;i++)
-	{
-		LPTREEFOLDER lpTemp;
-
-		for (jj = 1; jj < i; jj++)
-			if (!strcmp(cputype_get_name(i), cputype_get_name(jj)))
-				break;
-
-		if (i != jj)
-		{
-			map[i] = map[jj];
-			continue;
-		}
-		if( strlen( cputype_get_name(i) ) <=0 )
-			continue;
-		lpTemp = NewFolder(cputype_get_name(i), next_folder_id, parent_index, IDI_CPU,
- 						   GetFolderFlags(numFolders));
-		ExtraFolderData[next_folder_id] = malloc(sizeof(EXFOLDERDATA) );
-		memset(ExtraFolderData[next_folder_id], 0, sizeof(EXFOLDERDATA));
-
-		ExtraFolderData[next_folder_id]->m_nFolderId = next_folder_id;
-		ExtraFolderData[next_folder_id]->m_nIconId = IDI_CPU;
-		ExtraFolderData[next_folder_id]->m_nParent = lpFolder->m_nFolderId;
-		ExtraFolderData[next_folder_id]->m_nSubIconId = -1;
-		strcpy( ExtraFolderData[next_folder_id]->m_szTitle, cputype_get_name(i) );
-		ExtraFolderData[next_folder_id++]->m_dwFlags = 0;
-		AddFolder(lpTemp);
-		map[i] = treeFolders[nFolder++];
-	}
-
-	for (jj = 0; jj < nGames; jj++)
-	{
-		int n;
-		machine_config *config;
-		config = machine_config_alloc(drivers[jj]->machine_config);
-		for (n = 0; n < MAX_CPU; n++) {
-			if (config->cpu[n].type != CPU_DUMMY)
-			{
-				// cpu type #'s are one-based
-				AddGame(map[config->cpu[n].type],jj);
-			}
-		}
-		machine_config_free(config);
-	}
-#endif
+	CreateDeviceFolders(parent_index, DEVICE_CLASS_CPU_CHIP, IDI_CPU);
 }
 
 void CreateSoundFolders(int parent_index)
