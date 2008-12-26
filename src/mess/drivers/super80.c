@@ -1066,7 +1066,6 @@ static MACHINE_DRIVER_START( super80 )
 	MDRV_Z80BIN_QUICKLOAD_ADD(default, 1)
 
 	MDRV_CASSETTE_ADD( "cassette", super80_cassette_config )
-	
 	MDRV_CARTSLOT_ADD("cart", super80_cartslot )  
 MACHINE_DRIVER_END
 
@@ -1124,6 +1123,7 @@ static MACHINE_DRIVER_START( super80v )
 	MDRV_Z80BIN_QUICKLOAD_ADD(default, 1)
 
 	MDRV_CASSETTE_ADD( "cassette", super80_cassette_config )
+	MDRV_CARTSLOT_ADD("cart", super80_cartslot )  
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( super80r )
