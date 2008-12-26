@@ -239,6 +239,15 @@ static const cassette_config primo_cassette_config =
 	CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED
 };
 
+static const cartslot_interface primo_cartslot =
+{
+	"rom",
+	0,
+	NULL,
+	NULL,
+	NULL,
+	NULL
+};
 
 static MACHINE_DRIVER_START( primoa32 )
 	/* basic machine hardware */
@@ -274,8 +283,8 @@ static MACHINE_DRIVER_START( primoa32 )
 
 	MDRV_CASSETTE_ADD( "cassette", primo_cassette_config )
 	
-	MDRV_CARTSLOT_ADD("cart1", default_cartslot )
-	MDRV_CARTSLOT_ADD("cart2", default_cartslot )
+	MDRV_CARTSLOT_ADD("cart1", primo_cartslot )
+	MDRV_CARTSLOT_ADD("cart2", primo_cartslot )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( primoa48 )

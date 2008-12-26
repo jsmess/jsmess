@@ -372,6 +372,11 @@ static MACHINE_DRIVER_START( pal )
 	MDRV_CIA8520_ADD("cia_0", AMIGA_68000_PAL_CLOCK / 10, cia_0_pal_intf)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( a500p )
+	MDRV_IMPORT_FROM(pal)
+	MDRV_CARTSLOT_ADD("cart", amiga_cartslot)
+MACHINE_DRIVER_END
+
 static MACHINE_DRIVER_START( a1000p )
 	MDRV_IMPORT_FROM(pal)
 	MDRV_CPU_MODIFY("main")
@@ -625,5 +630,5 @@ SYSTEM_CONFIG_END
 COMP( 1985, a1000n, 0,      0,      a1000n, amiga,  amiga,  amiga,  "Commodore Business Machines Co.",  "Amiga 1000 (NTSC)",     GAME_IMPERFECT_GRAPHICS )
 COMP( 1985, a1000p, a1000n, 0,      a1000p, amiga,  amiga,  amiga,  "Commodore Business Machines Co.",  "Amiga 1000 (PAL)",      GAME_IMPERFECT_GRAPHICS )
 COMP( 1987, a500n,  0,      0,      a500n,  amiga,  amiga,  amiga,  "Commodore Business Machines Co.",  "Amiga 500 (NTSC, OCS)", GAME_IMPERFECT_GRAPHICS )
-COMP( 1987, a500p,  a500n,  0,      pal,    amiga,  amiga,  amiga,  "Commodore Business Machines Co.",  "Amiga 500 (PAL, OCS)",  GAME_IMPERFECT_GRAPHICS )
+COMP( 1987, a500p,  a500n,  0,      a500p,  amiga,  amiga,  amiga,  "Commodore Business Machines Co.",  "Amiga 500 (PAL, OCS)",  GAME_IMPERFECT_GRAPHICS )
 COMP( 1991, cdtv,   0,      0,      cdtv,   cdtv,   cdtv,   0,      "Commodore Business Machines Co.",  "CDTV (NTSC)",           GAME_IMPERFECT_GRAPHICS )

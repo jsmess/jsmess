@@ -706,7 +706,7 @@ static const cartslot_interface a800_cartslot =
 
 static const cartslot_interface a5200_cartslot =
 {
-	"rom,bin",
+	"rom,bin,a52",
 	0,
 	NULL,
 	DEVICE_IMAGE_LOAD_NAME(a5200_cart),
