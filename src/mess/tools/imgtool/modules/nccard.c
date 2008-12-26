@@ -817,7 +817,7 @@ static int nc_card_image_nextenum(imgtool_directory *enumeration, imgtool_dirent
 						return IMGTOOLERR_BUFFERTOOSMALL;
 
 					memcpy(ent->fname, dir_entry->filename,12);
-					dir_entry->filename[12] = '\0';
+					ent->fname[12] = '\0';
 
 					/* set file-size -> from directory */
 					ent->filesize = ((dir_entry->size_high_byte & 0x0ff)<<8) | (dir_entry->size_low_byte & 0x0ff);
