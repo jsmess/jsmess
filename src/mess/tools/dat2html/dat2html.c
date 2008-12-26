@@ -108,6 +108,7 @@ int CLIB_DECL main(int ac, char **av)
 	html = fopen(html_filename, "w");
 	if( !html )
 	{
+		fclose(dat);
 		fprintf(stderr, "cannot create output file '%s'.\n", html_filename);
 		return 1;
     }
