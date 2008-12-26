@@ -222,6 +222,8 @@ static MACHINE_DRIVER_START( snes )
 	MDRV_SOUND_CONFIG(snes_sound_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.00)
 	MDRV_SOUND_ROUTE(1, "right", 1.00)
+	
+	MDRV_CARTSLOT_ADD("cart", snes_cartslot)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( snespal )
