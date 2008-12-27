@@ -214,7 +214,7 @@ TIMER_CALLBACK(mfp_update_irq)
 //              if(sys.mfp.iera & (1 << x))
                 {
                     current_vector[6] = (sys.mfp.vr & 0xf0) | (x+8);
-                    cpu_set_input_line_and_vector(machine->cpu[0],sys.mfp.irqline,HOLD_LINE,(sys.mfp.vr & 0xf0) | (x + 8));
+                    cpu_set_input_line_and_vector(machine->cpu[0],sys.mfp.irqline,ASSERT_LINE,(sys.mfp.vr & 0xf0) | (x + 8));
 //                  logerror("MFP: Sent IRQ vector 0x%02x (IRQ line %i)\n",(sys.mfp.vr & 0xf0) | (x+8),sys.mfp.irqline);
                     return;  // one at a time only
                 }
@@ -233,7 +233,7 @@ TIMER_CALLBACK(mfp_update_irq)
 //              if(sys.mfp.ierb & (1 << x))
                 {
                     current_vector[6] = (sys.mfp.vr & 0xf0) | x;
-                    cpu_set_input_line_and_vector(machine->cpu[0],sys.mfp.irqline,HOLD_LINE,(sys.mfp.vr & 0xf0) | x);
+                    cpu_set_input_line_and_vector(machine->cpu[0],sys.mfp.irqline,ASSERT_LINE,(sys.mfp.vr & 0xf0) | x);
 //                  logerror("MFP: Sent IRQ vector 0x%02x (IRQ line %i)\n",(sys.mfp.vr & 0xf0) | x,sys.mfp.irqline);
                     return;  // one at a time only
                 }
@@ -452,7 +452,7 @@ static void x68k_keyboard_push_scancode(running_machine* machine,unsigned char c
 			sys.mfp.rsr |= 0x80;  // Buffer full
 //          mfp_trigger_irq(MFP_IRQ_RX_FULL);
 			current_vector[6] = 0x4c;
-			cpu_set_input_line_and_vector(machine->cpu[0],6,HOLD_LINE,0x4c);
+			cpu_set_input_line_and_vector(machine->cpu[0],6,ASSERT_LINE,0x4c);
 			logerror("MFP: Receive buffer full IRQ sent\n");
 		}
 	}
@@ -462,7 +462,7 @@ static void x68k_keyboard_push_scancode(running_machine* machine,unsigned char c
 		sys.keyboard.headpos = 0;
 //      mfp_trigger_irq(MFP_IRQ_RX_ERROR);
 		current_vector[6] = 0x4b;
-//		cpu_set_input_line_and_vector(machine->cpu[0],6,HOLD_LINE,0x4b);
+//		cpu_set_input_line_and_vector(machine->cpu[0],6,ASSERT_LINE,0x4b);
 	}
 }
 
@@ -1417,7 +1417,7 @@ static READ16_HANDLER( x68k_rom0_r )
        then access causes a bus error */
 	current_vector[2] = 0x02;  // bus error
 	current_irq_line = 2;
-//	cpu_set_input_line_and_vector(space->machine->cpu[0],2,HOLD_LINE,current_vector[2]);
+//	cpu_set_input_line_and_vector(space->machine->cpu[0],2,ASSERT_LINE,current_vector[2]);
 	if(input_port_read(space->machine, "options") & 0x02)
 	{
 		offset *= 2;
@@ -1434,7 +1434,7 @@ static WRITE16_HANDLER( x68k_rom0_w )
        then access causes a bus error */
 	current_vector[2] = 0x02;  // bus error
 	current_irq_line = 2;
-//	cpu_set_input_line_and_vector(space->machine->cpu[0],2,HOLD_LINE,current_vector[2]);
+//	cpu_set_input_line_and_vector(space->machine->cpu[0],2,ASSERT_LINE,current_vector[2]);
 	if(input_port_read(space->machine, "options") & 0x02)
 	{
 		offset *= 2;
@@ -1513,7 +1513,6 @@ static void x68k_fm_irq(running_machine *machine, int irq)
 	{
 		sys.mfp.gpio &= ~0x08;
 	}
-
 }
 
 static MC68901_GPIO_READ( mfp_gpio_r )
@@ -1926,7 +1925,7 @@ static DEVICE_IMAGE_LOAD( x68k_floppy )
 			current_vector[1] = 0x61;
 			sys.ioc.irqstatus |= 0x40;
 			current_irq_line = 1;
-			cpu_set_input_line_and_vector(image->machine->cpu[0],1,HOLD_LINE,current_vector[1]);  // Disk insert/eject interrupt
+			cpu_set_input_line_and_vector(image->machine->cpu[0],1,ASSERT_LINE,current_vector[1]);  // Disk insert/eject interrupt
 			logerror("IOC: Disk image inserted\n");
 		}
 		sys.fdc.disk_inserted[image_index_in_device(image)] = 1;
@@ -1943,7 +1942,7 @@ static DEVICE_IMAGE_UNLOAD( x68k_floppy )
 		current_vector[1] = 0x61;
 		sys.ioc.irqstatus |= 0x40;
 		current_irq_line = 1;
-		cpu_set_input_line_and_vector(image->machine->cpu[0],1,HOLD_LINE,current_vector[1]);  // Disk insert/eject interrupt
+		cpu_set_input_line_and_vector(image->machine->cpu[0],1,ASSERT_LINE,current_vector[1]);  // Disk insert/eject interrupt
 	}
 	sys.fdc.disk_inserted[image_index_in_device(image)] = 0;
 }
