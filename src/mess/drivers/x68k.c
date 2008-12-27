@@ -75,11 +75,11 @@
     ...plus a number of custom chips for video and other stuff...
 
 
-    *** Current status (12/08/07)
+    *** Current status (28/12/08)
     FDC/FDD : Uses the uPD765A code with a small patch to handle Sense Interrupt Status being invalid if not in seek mode
               Extra uPD72065 commands not yet implemented, although I have yet to see them used.
 
-    MFP : Largely works, as far as the X68000 goes.  Timers appear to work fine.
+    MFP : Largely works, as far as the X68000 goes.
 
     PPI : Joystick controls work okay.
 
@@ -87,28 +87,29 @@
 
     RTC : Seems to work. (Tested using SX-Window's Timer application)
 
-    DMA : FDD reading mostly works, other channels should work for effective memory copying (channel 2, often
-          used to copy data to video RAM or the palette in the background).
+    DMA : Works fine.
 
-    Sound : FM works, ADPCM mostly works.
+    Sound : FM works, ADPCM mostly works (timing(?) issues in a few games).
 
-    SCC : Works enough to get the mouse running
+    SCC : Works enough to get the mouse running, although only with the IPL v1.0 BIOS
 
     Video : Text mode works, but is rather slow, especially scrolling up (uses multple "raster copy" commands).
             Graphic layers work.
             BG tiles and sprites work, but many games have the sprites offset by a small amount (some by a lot :))
+            Still a few minor priority issues around.
 
     Other issues:
       Bus error exceptions are a bit late at times.  Currently using a fake bus error for MIDI expansion checks.  These
       are used determine if a piece of expansion hardware is present.
-      Keyboard doesn't work (MFP USART).
+      Keyboard doesn't work properly (MFP USART).
       Supervisor area set isn't implemented.
 
-    Some minor game-specific issues (at 02/12/08):
+    Some minor game-specific issues (at 28/12/08):
       Pacmania:      Black squares on the maze (transparency?).
       Salamander:    System error when using keys in-game.  No error if a joystick is used.
+                     Some text is drawn incorrectly.
       Kyukyoku Tiger:Sprites offset by a looooong way.
-      Dragon Buster: Text is black and unreadable.
+      Dragon Buster: Text is black and unreadable. (Text layer actually covers it)
       Tetris:        Black dots over screen (text layer).
       Parodius Da!:  Black squares in areas.
 
@@ -2169,8 +2170,8 @@ static MACHINE_DRIVER_START( x68000 )
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
     MDRV_SOUND_ADD("okim6258", OKIM6258, 4000000)
     MDRV_SOUND_CONFIG(x68k_okim6258_interface)
-    MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.00)
-    MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.00)
+    MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.50)
+    MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.50)
 
 	MDRV_NVRAM_HANDLER( generic_0fill )
 
