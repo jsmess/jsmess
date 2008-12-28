@@ -85,9 +85,6 @@ static TIMER_CALLBACK(process_snapshot_or_quickload)
 	(*token->load)(device,
 		image_filetype(device),
 		image_length(device));
-
-	/* unload the device */
-	image_unload(device);
 }
 
 
