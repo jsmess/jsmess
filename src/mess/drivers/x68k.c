@@ -452,9 +452,12 @@ static void x68k_keyboard_push_scancode(running_machine* machine,unsigned char c
 		{
 			sys.mfp.rsr |= 0x80;  // Buffer full
 //          mfp_trigger_irq(MFP_IRQ_RX_FULL);
-			current_vector[6] = 0x4c;
-			cpu_set_input_line_and_vector(machine->cpu[0],6,ASSERT_LINE,0x4c);
-			logerror("MFP: Receive buffer full IRQ sent\n");
+			if(input_port_read(machine,"options") & 0x01)
+			{
+				current_vector[6] = 0x4c;
+				cpu_set_input_line_and_vector(machine->cpu[0],6,ASSERT_LINE,0x4c);
+				logerror("MFP: Receive buffer full IRQ sent\n");
+			}
 		}
 	}
 	sys.keyboard.buffer[sys.keyboard.headpos++] = code;
@@ -1829,7 +1832,7 @@ static INPUT_PORTS_START( x68000 )
 	PORT_BIT( 0x00080000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Opt. 2")  PORT_CODE(KEYCODE_PAUSE)  /* Opt2 */
 
 	PORT_START("options")
-	PORT_CONFNAME( 0x01, 0x01, "Enable partial updates on raster IRQ")
+	PORT_CONFNAME( 0x01, 0x01, "Enable keyboard hack")
 	PORT_CONFSETTING(	0x00, DEF_STR( Off ))
 	PORT_CONFSETTING(	0x01, DEF_STR( On ))
 	PORT_CONFNAME( 0x02, 0x02, "Enable fake bus errors")

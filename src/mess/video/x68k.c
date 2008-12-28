@@ -296,10 +296,7 @@ TIMER_CALLBACK(x68k_crtc_raster_irq)
 	if(scan <= sys.crtc.vtotal)
 	{
 		sys.mfp.gpio &= ~0x40;  // GPIP6
-		if((input_port_read(machine, "options") & 0x01))
-		{
-			video_screen_update_partial(machine->primary_screen,scan);
-		}
+		video_screen_update_partial(machine->primary_screen,scan);
 		irq_time = video_screen_get_time_until_pos(machine->primary_screen,scan,2);
 		// end of HBlank period clears GPIP6 also?
 		end_time = video_screen_get_time_until_pos(machine->primary_screen,scan,sys.crtc.hbegin);
