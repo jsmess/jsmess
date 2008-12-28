@@ -97,6 +97,7 @@ easier to manage.
 #include "sound/dac.h"
 #include "sound/ay8910.h"
 #include "devices/cococart.h"
+#include "devices/cartslot.h"
 
 
 /***************************************************************************
@@ -1135,7 +1136,7 @@ static int coco_hiresjoy_ry(running_machine *machine)
 
 static const device_config *cartslot_image(running_machine *machine)
 {
-	return image_from_devtype_and_index(machine, IO_CARTSLOT, 0);
+	return device_list_find_by_tag( machine->config->devicelist, CARTSLOT, "cart" );
 }
 
 static const device_config *cassette_device_image(running_machine *machine)
