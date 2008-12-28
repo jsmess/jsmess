@@ -831,7 +831,7 @@ static MACHINE_DRIVER_START( exidy )
 	MDRV_PRINTER_ADD("printer")
 
 	/* quickload */
-	MDRV_Z80BIN_QUICKLOAD_ADD(exidy, 3)
+	MDRV_Z80BIN_QUICKLOAD_ADD(exidy, 2)
 
 	MDRV_CASSETTE_ADD( "cassette1", exidy_cassette_config )
 	MDRV_CASSETTE_ADD( "cassette2", exidy_cassette_config )
