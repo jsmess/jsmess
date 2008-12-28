@@ -578,9 +578,9 @@ XL/XE 16kB OS roms
 
 	/* VEB MIKROELEKTRONIK */
 	/* KC compact is partial CPC compatible */
-//128u7	DRIVER( kc85_4 )	/* VEB KC 85/4										*/
-//128u7	DRIVER( kc85_3 )	/* VEB KC 85/3										*/
-//128u7	DRIVER( kc85_4d )	/* VEB KC 85/4 with disk interface					*/
+	DRIVER( kc85_4 )	/* VEB KC 85/4										*/
+	DRIVER( kc85_3 )	/* VEB KC 85/3										*/
+	DRIVER( kc85_4d )	/* VEB KC 85/4 with disk interface					*/
 
 	/* MICROBEE SYSTEMS */
 	DRIVER( mbee )		/* Microbee 16 Standard or Plus						*/
