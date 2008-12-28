@@ -370,6 +370,7 @@ SOUNDS += SP0256
 DRVLIBS = \
 	$(MESSOBJ)/messdriv.o \
 	$(MESSOBJ)/3do.a \
+	$(MESSOBJ)/acorn.a \
 	$(MESSOBJ)/advision.a \
 	$(MESSOBJ)/amiga.a \
 	$(MESSOBJ)/amstrad.a \
@@ -419,9 +420,12 @@ DRVLIBS = \
 	$(MESSOBJ)/jupiter.a \
 	$(MESSOBJ)/kaypro.a \
 	$(MESSOBJ)/kim1.a \
+	$(MESSOBJ)/kramermc.a \
+	$(MESSOBJ)/luxor.a \
 	$(MESSOBJ)/lviv.a \
 	$(MESSOBJ)/lynx.a \
 	$(MESSOBJ)/magnavox.a \
+	$(MESSOBJ)/mbee.a \
 	$(MESSOBJ)/mc10.a \
 	$(MESSOBJ)/memotech.a \
 	$(MESSOBJ)/mephisto.a \
@@ -429,6 +433,8 @@ DRVLIBS = \
 	$(MESSOBJ)/mk1.a \
 	$(MESSOBJ)/mk2.a \
 	$(MESSOBJ)/motorola.a \
+	$(MESSOBJ)/multitch.a \
+	$(MESSOBJ)/nascom1.a \
 	$(MESSOBJ)/nec.a \
 	$(MESSOBJ)/necpc.a \
 	$(MESSOBJ)/nintendo.a \
@@ -457,35 +463,29 @@ DRVLIBS = \
 	$(MESSOBJ)/sharp.a \
 	$(MESSOBJ)/sinclair.a \
 	$(MESSOBJ)/sony.a \
+	$(MESSOBJ)/sord.a \
 	$(MESSOBJ)/special.a \
 	$(MESSOBJ)/ssystem3.a \
+	$(MESSOBJ)/super80.a \
 	$(MESSOBJ)/svi.a \
 	$(MESSOBJ)/svision.a \
 	$(MESSOBJ)/synertec.a \
 	$(MESSOBJ)/tangerin.a \
+	$(MESSOBJ)/tatung.a \
 	$(MESSOBJ)/teamconc.a \
 	$(MESSOBJ)/telmac.a \
+	$(MESSOBJ)/thomson.a \
 	$(MESSOBJ)/ti85.a \
+	$(MESSOBJ)/ti99.a \
 	$(MESSOBJ)/tiger.a \
 	$(MESSOBJ)/trs80.a \
 	$(MESSOBJ)/tutor.a \
 	$(MESSOBJ)/tx0.a \
 	$(MESSOBJ)/ut88.a \
 	$(MESSOBJ)/vc4000.a \
+	$(MESSOBJ)/veb.a \
 	$(MESSOBJ)/vector06.a \
 	$(MESSOBJ)/votrax.a \
-	$(MESSOBJ)/super80.a \
-	$(MESSOBJ)/acorn.a \
-	$(MESSOBJ)/kramermc.a \
-	$(MESSOBJ)/luxor.a \
-	$(MESSOBJ)/mbee.a \
-	$(MESSOBJ)/multitch.a \
-	$(MESSOBJ)/nascom1.a \
-	$(MESSOBJ)/sord.a \
-	$(MESSOBJ)/tatung.a \
-	$(MESSOBJ)/ti99.a \
-	$(MESSOBJ)/thomson.a \
-	$(MESSOBJ)/veb.a \
 	$(MESSOBJ)/vtech.a \
 	$(MESSOBJ)/shared.a \
 

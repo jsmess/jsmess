@@ -151,16 +151,6 @@ static void vector_floppy_getinfo(const mess_device_class *devclass, UINT32 stat
 	}	
 }
 
-const cartslot_interface vector_cartslot =
-{
-	"emr",
-	0,
-	NULL,
-	NULL,
-	NULL,
-	NULL
-};
-
 /* Machine driver */
 static MACHINE_DRIVER_START( vector06 )
   /* basic machine hardware */
@@ -197,8 +187,11 @@ static MACHINE_DRIVER_START( vector06 )
 	MDRV_CASSETTE_ADD( "cassette", vector_cassette_config )
 	
 	MDRV_WD1793_ADD("wd1793", default_wd17xx_interface )	
-	
-	MDRV_CARTSLOT_ADD("cart", vector_cartslot )  
+
+	/* cartridge */
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("emr")
+	MDRV_CARTSLOT_NOT_MANDATORY
 MACHINE_DRIVER_END
 
 /* ROM definition */

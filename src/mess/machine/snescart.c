@@ -767,13 +767,9 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 	return INIT_PASS;
 }
 
-const cartslot_interface snes_cartslot =
-{
-	"smc,sfc,fig,swc",
-	1,
-	NULL,
-	DEVICE_IMAGE_LOAD_NAME(snes_cart),
-	NULL,
-	NULL
-};
-
+MACHINE_DRIVER_START( snes_cartslot )
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("smc,sfc,fig,swc")
+	MDRV_CARTSLOT_MANDATORY
+	MDRV_CARTSLOT_LOAD(snes_cart)
+MACHINE_DRIVER_END

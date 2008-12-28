@@ -1903,16 +1903,6 @@ static MACHINE_DRIVER_START( t1000hx )
 MACHINE_DRIVER_END
 
 
-static const cartslot_interface pcjr_cartslot =
-{
-	"jrc",
-	0,
-	NULL,
-	DEVICE_IMAGE_LOAD_NAME(pcjr_cartridge),
-	NULL,
-	NULL
-};
-
 static MACHINE_DRIVER_START( ibmpcjr )
 	/* basic machine hardware */
 	MDRV_CPU_PC(ibmpcjr, ibmpcjr, I8088, 4900000, pcjr_frame_interrupt)	/* TODO: Get correct cpu frequency, probably XTAL_14_31818MHz/3 */
@@ -1954,9 +1944,16 @@ static MACHINE_DRIVER_START( ibmpcjr )
 	MDRV_CASSETTE_ADD( "cassette", ibm5150_cassette_config )
 	
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
-	
-	MDRV_CARTSLOT_ADD("cart1", pcjr_cartslot )
-	MDRV_CARTSLOT_ADD("cart2", pcjr_cartslot )	
+
+	/* cartridge */
+	MDRV_CARTSLOT_ADD("cart1")
+	MDRV_CARTSLOT_EXTENSION_LIST("jrc")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_LOAD(pcjr_cartridge)
+	MDRV_CARTSLOT_ADD("cart2")	
+	MDRV_CARTSLOT_EXTENSION_LIST("jrc")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_LOAD(pcjr_cartridge)
 MACHINE_DRIVER_END
 
 #if 0

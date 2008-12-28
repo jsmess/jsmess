@@ -67,16 +67,6 @@ static COP400_INTERFACE( advision_cop411_interface )
 	COP400_MICROBUS_DISABLED
 };
 
-static const cartslot_interface advision_cartslot =
-{
-	"bin",
-	1,
-	NULL,
-	NULL,
-	NULL,
-	NULL
-};
-
 static MACHINE_DRIVER_START( advision )
 	MDRV_DRIVER_DATA(advision_state)
 
@@ -110,8 +100,11 @@ static MACHINE_DRIVER_START( advision )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	
-	MDRV_CARTSLOT_ADD("cart", advision_cartslot)
+
+	/* cartridge */
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin")
+	MDRV_CARTSLOT_MANDATORY
 MACHINE_DRIVER_END
 
 /* ROMs */

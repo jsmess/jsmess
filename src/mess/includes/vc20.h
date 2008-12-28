@@ -46,6 +46,6 @@ DRIVER_INIT( vic20v );
 MACHINE_RESET( vic20 );
 INTERRUPT_GEN( vic20_frame_interrupt );
 
-extern const cartslot_interface vic20_cartslot;
+MACHINE_DRIVER_EXTERN( vic20_cartslot );
 
 #endif /* VC20_H_ */

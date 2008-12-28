@@ -460,15 +460,12 @@ static DEVICE_IMAGE_LOAD( studio2_cart )
 	return INIT_PASS;
 }
 
-static const cartslot_interface studio2_cartslot =
-{
-	"st2",
-	0,
-	NULL,
-	DEVICE_IMAGE_LOAD_NAME(studio2_cart),
-	NULL,
-	NULL
-};
+static MACHINE_DRIVER_START( studio2_cartslot )
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("st2")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_LOAD(studio2_cart)
+MACHINE_DRIVER_END
 
 /* Machine Drivers */
 
@@ -503,7 +500,7 @@ static MACHINE_DRIVER_START( studio2 )
 	MDRV_SOUND_ADD("beep", BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	
-	MDRV_CARTSLOT_ADD("cart", studio2_cartslot )
+	MDRV_IMPORT_FROM( studio2_cartslot )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( visicom )
@@ -537,7 +534,7 @@ static MACHINE_DRIVER_START( visicom )
 	MDRV_SOUND_ADD("beep", BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	
-	MDRV_CARTSLOT_ADD("cart", studio2_cartslot )
+	MDRV_IMPORT_FROM( studio2_cartslot )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mpt02 )
@@ -570,7 +567,7 @@ static MACHINE_DRIVER_START( mpt02 )
 	MDRV_SOUND_ADD("beep", BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	
-	MDRV_CARTSLOT_ADD("cart", studio2_cartslot )
+	MDRV_IMPORT_FROM( studio2_cartslot )
 MACHINE_DRIVER_END
 
 /* ROMs */

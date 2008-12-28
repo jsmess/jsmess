@@ -113,6 +113,10 @@ static WD17XX_CALLBACK( fdc_callback )
 	coco_cartridge *cartridge = (coco_cartridge *) param;
 	fdc_info *info = fdc_get_info(cartridge);
 
+	/* HACK - fix when we have better CoCo cartridge devicification */
+	if (info == NULL)
+		return;
+
 	switch(state)
 	{
 		case WD17XX_IRQ_CLR:

@@ -1,8 +1,4 @@
-﻿NOTE - WITH THE 0.128u5 UPDATE FROM MAME, SOME DRIVERS HAVE BEEN TEMPORARILY
-DISABLED.  THEY WILL BE REENABLED AS THE 0.129 DEV CYCLE PROGRESSES
-
-
-0.128.1
+﻿0.128.1
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
@@ -105,6 +101,8 @@ Source Changes:
 
 - Fixed regression that could cause hanging when creating an image from the
   command line or the MESSUI.  (bug #1744) [Nathan Woods]
+
+- Changed cartridges to be MAME devices.  [Miodrag Milanovic, Nathan Woods]
 
 
 

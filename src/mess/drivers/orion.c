@@ -121,7 +121,7 @@ static MACHINE_DRIVER_START( orion128 )
 	
 	MDRV_WD1793_ADD("wd1793", default_wd17xx_interface )	
 	
-	MDRV_CARTSLOT_ADD("cart", default_cartslot )
+	MDRV_CARTSLOT_ADD("cart")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( orion128ms )
@@ -179,7 +179,7 @@ static MACHINE_DRIVER_START( orionz80 )
 	
 	MDRV_WD1793_ADD("wd1793", default_wd17xx_interface )		
 	
-	MDRV_CARTSLOT_ADD("cart", default_cartslot )
+	MDRV_CARTSLOT_ADD("cart")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( orionz80ms )
@@ -227,7 +227,7 @@ static MACHINE_DRIVER_START( orionpro )
 	
 	MDRV_WD1793_ADD("wd1793", default_wd17xx_interface )
 	
-	MDRV_CARTSLOT_ADD("cart", default_cartslot )		
+	MDRV_CARTSLOT_ADD("cart")
 MACHINE_DRIVER_END
 
 

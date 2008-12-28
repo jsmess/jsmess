@@ -185,36 +185,6 @@ static const via6522_interface aim65_user_via =
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 };
 
-static const cartslot_interface aim65_cartslot_1 =
-{
-	"z26",
-	0,
-	NULL,
-	NULL,
-	NULL,
-	NULL
-};
-
-static const cartslot_interface aim65_cartslot_2 =
-{
-	"z25",
-	0,
-	NULL,
-	NULL,
-	NULL,
-	NULL
-};
-
-static const cartslot_interface aim65_cartslot_3 =
-{
-	"z24",
-	0,
-	NULL,
-	NULL,
-	NULL,
-	NULL
-};
-
 /******************************************************************************
  Machine Drivers
 ******************************************************************************/
@@ -242,9 +212,15 @@ static MACHINE_DRIVER_START( aim65 )
 	MDRV_VIA6522_ADD("via6522_0", 0, aim65_system_via)
 	MDRV_VIA6522_ADD("via6522_1", 0, aim65_user_via)
 
-	MDRV_CARTSLOT_ADD("cart1", aim65_cartslot_1 )
-	MDRV_CARTSLOT_ADD("cart2", aim65_cartslot_2 )
-	MDRV_CARTSLOT_ADD("cart3", aim65_cartslot_3 )	
+	MDRV_CARTSLOT_ADD("cart1")
+	MDRV_CARTSLOT_EXTENSION_LIST("z26")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_ADD("cart2")
+	MDRV_CARTSLOT_EXTENSION_LIST("z25")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_ADD("cart3")
+	MDRV_CARTSLOT_EXTENSION_LIST("z24")
+	MDRV_CARTSLOT_NOT_MANDATORY
 MACHINE_DRIVER_END
 
 

@@ -1782,15 +1782,12 @@ static DEVICE_IMAGE_LOAD( atarist_cart )
 	return INIT_FAIL;
 }
 
-static const cartslot_interface atarist_cartslot =
-{
-	"stc",
-	0,
-	NULL,
-	DEVICE_IMAGE_LOAD_NAME(atarist_cart),
-	NULL,
-	NULL
-};
+static MACHINE_DRIVER_START( atarist_cartslot )
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("stc")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_LOAD(atarist_cart)
+MACHINE_DRIVER_END
 
 static const scc8530_interface atarist_scc8530_interface =
 {
@@ -1838,7 +1835,7 @@ static MACHINE_DRIVER_START( atarist )
 	
 	MDRV_WD1772_ADD("wd1772", atarist_wd17xx_interface )
 	
-	MDRV_CARTSLOT_ADD("cart", atarist_cartslot)
+	MDRV_IMPORT_FROM(atarist_cartslot)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( megast )
@@ -1899,7 +1896,7 @@ static MACHINE_DRIVER_START( atariste )
 	
 	MDRV_WD1772_ADD("wd1772", atarist_wd17xx_interface )
 	
-	MDRV_CARTSLOT_ADD("cart", atarist_cartslot)
+	MDRV_IMPORT_FROM(atarist_cartslot)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( megaste )
@@ -1953,7 +1950,7 @@ static MACHINE_DRIVER_START( stbook )
 	
 	MDRV_WD1772_ADD("wd1772", atarist_wd17xx_interface )
 	
-	MDRV_CARTSLOT_ADD("cart", atarist_cartslot)
+	MDRV_IMPORT_FROM(atarist_cartslot)
 MACHINE_DRIVER_END
 
 /* ROMs */

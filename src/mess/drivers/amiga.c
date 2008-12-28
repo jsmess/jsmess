@@ -270,15 +270,11 @@ static const cia6526_interface cia_1_cdtv_intf =
 	}
 };
 
-static const cartslot_interface amiga_cartslot =
-{
-	"rom,bin",
-	0,
-	NULL,
-	NULL,
-	NULL,
-	NULL
-};
+static MACHINE_DRIVER_START( amiga_cartslot )
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("rom,bin")
+	MDRV_CARTSLOT_NOT_MANDATORY
+MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ntsc )
 	/* basic machine hardware */
@@ -353,7 +349,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( a500n )
 	MDRV_IMPORT_FROM(ntsc)
-	MDRV_CARTSLOT_ADD("cart", amiga_cartslot)
+	MDRV_IMPORT_FROM(amiga_cartslot)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pal )
@@ -374,7 +370,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( a500p )
 	MDRV_IMPORT_FROM(pal)
-	MDRV_CARTSLOT_ADD("cart", amiga_cartslot)
+	MDRV_IMPORT_FROM(amiga_cartslot)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( a1000p )

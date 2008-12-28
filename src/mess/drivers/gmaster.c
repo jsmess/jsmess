@@ -238,7 +238,7 @@ MDRV_CPU_VBLANK_INT("main", gmaster_interrupt)
      MDRV_SOUND_CONFIG(gmaster_sound_interface)
      MDRV_SOUND_ROUTE(0, "gmaster", 0.50)
      
-     MDRV_CARTSLOT_ADD("cart", default_cartslot)
+     MDRV_CARTSLOT_ADD("cart")
 MACHINE_DRIVER_END
 
 

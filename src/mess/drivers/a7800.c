@@ -258,17 +258,6 @@ static PALETTE_INIT(a7800p)
 #define CLK_PAL 1773447
 #define CLK_NTSC 1789772
 
-static const cartslot_interface a7800_cartslot =
-{
-	"a78",
-	0,
-	DEVICE_START_NAME(a7800_cart),
-	DEVICE_IMAGE_LOAD_NAME(a7800_cart),
-	NULL,
-	a7800_partialhash
-};
-
-
 static MACHINE_DRIVER_START( a7800 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M6502, CLK_NTSC)	/* 1.79 MHz (note: The clock switches to 1.19 MHz
@@ -300,7 +289,12 @@ static MACHINE_DRIVER_START( a7800 )
 	MDRV_SOUND_ADD("pokey", POKEY, CLK_NTSC)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	
-	MDRV_CARTSLOT_ADD("cart", a7800_cartslot)
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("a78")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_START(a7800_cart)
+	MDRV_CARTSLOT_LOAD(a7800_cart)
+	MDRV_CARTSLOT_PARTIALHASH(a7800_partialhash)
 MACHINE_DRIVER_END
 
 

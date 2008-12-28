@@ -165,16 +165,11 @@ static const sp0256_interface the_voice_sp0256 = {
 	0
 };
 
-static const cartslot_interface odyssey2_cartslot =
-{
-	"bin,rom",
-	1,
-	NULL,
-	NULL,
-	NULL,
-	NULL
-	//case MESS_DEVINFO_PTR_VERIFY:						info->imgverify = odyssey2_cart_verify; break;
-};
+static MACHINE_DRIVER_START( odyssey2_cartslot )
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
+	MDRV_CARTSLOT_MANDATORY
+MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( odyssey2 )
 	/* basic machine hardware */
@@ -208,7 +203,7 @@ static MACHINE_DRIVER_START( odyssey2 )
 	/* The Voice uses a speaker with its own volume control so the relative volumes to use are subjective, these sound good */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	
-	MDRV_CARTSLOT_ADD("cart", odyssey2_cartslot)
+	MDRV_IMPORT_FROM(odyssey2_cartslot)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( videopac )
@@ -242,7 +237,7 @@ static MACHINE_DRIVER_START( videopac )
 	MDRV_SOUND_CONFIG(the_voice_sp0256)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	
-	MDRV_CARTSLOT_ADD("cart", odyssey2_cartslot)
+	MDRV_IMPORT_FROM(odyssey2_cartslot)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( g7400 )
@@ -272,7 +267,7 @@ static MACHINE_DRIVER_START( g7400 )
 	MDRV_SOUND_CONFIG(odyssey2_sound_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 	
-	MDRV_CARTSLOT_ADD("cart", odyssey2_cartslot)
+	MDRV_IMPORT_FROM(odyssey2_cartslot)
 MACHINE_DRIVER_END
 
 ROM_START (odyssey2)

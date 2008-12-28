@@ -376,15 +376,12 @@ static INTERRUPT_GEN( mbee_interrupt )
 	mbee_vsync = 1;
 }
 
-const cartslot_interface mbee_cartslot =
-{
-	"rom",
-	0,
-	NULL,
-	DEVICE_IMAGE_LOAD_NAME(mbee_cart),
-	NULL,
-	NULL
-};
+static MACHINE_DRIVER_START( mbee_cartslot )
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("rom")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_LOAD(mbee_cart)
+MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mbee )
 	/* basic machine hardware */
@@ -424,7 +421,8 @@ static MACHINE_DRIVER_START( mbee )
 
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
 	
-	MDRV_CARTSLOT_ADD("cart", mbee_cartslot )
+	/* cartridge */
+	MDRV_IMPORT_FROM(mbee_cartslot)
 MACHINE_DRIVER_END
 
 
@@ -467,8 +465,9 @@ static MACHINE_DRIVER_START( mbeeic )
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
 	
 	MDRV_WD179X_ADD("wd179x", mbee_wd17xx_interface )
-	
-	MDRV_CARTSLOT_ADD("cart", mbee_cartslot )
+
+	/* cartridge */
+	MDRV_IMPORT_FROM(mbee_cartslot)
 MACHINE_DRIVER_END
 
 

@@ -1673,17 +1673,6 @@ INPUT_PORTS_END
 
 /**********************************************************************************************************/
 
-static const cartslot_interface nc_cartslot =
-{
-	"crd,card",
-	0,
-	DEVICE_START_NAME(nc_pcmcia_card),
-	DEVICE_IMAGE_LOAD_NAME(nc_pcmcia_card),
-	DEVICE_IMAGE_UNLOAD_NAME(nc_pcmcia_card),
-	NULL
-};
-
-
 static MACHINE_DRIVER_START( nc100 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, /*6000000*/ 4606000)        /* Russell Marks says this is more accurate */
@@ -1722,8 +1711,14 @@ static MACHINE_DRIVER_START( nc100 )
 
 	/* rtc */
 	MDRV_TC8521_ADD("rtc", nc100_tc8521_interface)
-	
-	MDRV_CARTSLOT_ADD("cart", nc_cartslot)
+
+	/* cartridge */
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("crd,card")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_START(nc_pcmcia_card)
+	MDRV_CARTSLOT_LOAD(nc_pcmcia_card)
+	MDRV_CARTSLOT_UNLOAD(nc_pcmcia_card)
 MACHINE_DRIVER_END
 
 

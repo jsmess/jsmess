@@ -93,16 +93,6 @@ static const ay8910_interface vectrex_ay8910_interface =
 	0
 };
 
-static const cartslot_interface vectrex_cartslot =
-{
-	"bin,gam,vec",
-	0,
-	NULL,
-	DEVICE_IMAGE_LOAD_NAME(vectrex_cart),
-	NULL,
-	NULL
-};
-
 static MACHINE_DRIVER_START(vectrex)
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M6809, XTAL_6MHz / 4)
@@ -129,8 +119,12 @@ static MACHINE_DRIVER_START(vectrex)
 
 	/* via */
 	MDRV_VIA6522_ADD("via6522_0", 0, vectrex_via6522_interface)
-	
-	MDRV_CARTSLOT_ADD("cart", vectrex_cartslot)
+
+	/* cartridge */
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin,gam,vec")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_LOAD(vectrex_cart)
 MACHINE_DRIVER_END
 
 ROM_START(vectrex)

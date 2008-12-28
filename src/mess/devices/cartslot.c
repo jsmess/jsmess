@@ -1,30 +1,42 @@
+/**********************************************************************
+
+    cartslot.c
+
+	Cartridge device
+
+**********************************************************************/
+
 #include <ctype.h>
 #include "driver.h"
 #include "cartslot.h"
 
-const cartslot_interface default_cartslot =
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef struct _cartslot_t cartslot_t;
+struct _cartslot_t
 {
-	"bin",
-	0,
-	NULL,
-	NULL,
-	NULL,
-	NULL
+	char dummy;
 };
 
-typedef struct _dev_cartslot_t	dev_cartslot_t;
-struct _dev_cartslot_t
-{
-	const cartslot_interface *intf;
-};
 
-INLINE dev_cartslot_t *get_safe_token(const device_config *device)
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
+
+INLINE const cartslot_config *get_config(const device_config *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-
-	return (dev_cartslot_t *)device->token;
+	assert(device->type == CARTSLOT);
+	return (const cartslot_config *) device->inline_config;
 }
+
+
+/***************************************************************************
+    IMPLEMENTATION
+***************************************************************************/
 
 static int load_cartridge(running_machine *machine, const rom_entry *romrgn, const rom_entry *roment, const device_config *image)
 {
@@ -140,16 +152,12 @@ static int process_cartridge(const device_config *image, const device_config *fi
 
 static DEVICE_START( cartslot_specified )
 {
-	dev_cartslot_t *cart = get_safe_token(device);
-	// validate arguments
-
+	/* validate arguments */
 	assert(device != NULL);
 	assert(device->tag != NULL);
 	assert(strlen(device->tag) < 20);
-	assert(device->static_config != NULL);
+	assert(device->inline_config != NULL);
 
-	cart->intf = device->static_config;
-	
 	process_cartridge(device, NULL);
 	return DEVICE_START_OK;
 }
@@ -172,42 +180,42 @@ DEVICE_GET_INFO(cartslot)
 	switch( state )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:				info->i = sizeof(dev_cartslot_t); break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = 0; break;
+		case DEVINFO_INT_TOKEN_BYTES:				info->i = sizeof(cartslot_t); break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = sizeof(cartslot_config); break;
 		case DEVINFO_INT_CLASS:						info->i = DEVICE_CLASS_PERIPHERAL; break;
 		case DEVINFO_INT_IMAGE_TYPE:				info->i = IO_CARTSLOT; break;
 		case DEVINFO_INT_IMAGE_READABLE:			info->i = 1; break;
 		case DEVINFO_INT_IMAGE_WRITEABLE:			info->i = 0; break;
 		case DEVINFO_INT_IMAGE_CREATABLE:			info->i = 0; break;
 		case DEVINFO_INT_IMAGE_RESET_ON_LOAD:		info->i = 1; break;
-		case DEVINFO_INT_IMAGE_MUST_BE_LOADED:		if ( device && device->static_config) {
-														info->i = ((cartslot_interface *)device->static_config)->must_be_loaded; 
+		case DEVINFO_INT_IMAGE_MUST_BE_LOADED:		if ( device && device->inline_config) {
+														info->i = get_config(device)->must_be_loaded; 
 													} else {
 														info->i = 0; 
 													}
 													break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:						if ( device && device->static_config && ((cartslot_interface *)device->static_config)->device_start) {
-														info->start = ((cartslot_interface *)device->static_config)->device_start; 
+		case DEVINFO_FCT_START:						if ( device && device->inline_config && get_config(device)->device_start) {
+														info->start = get_config(device)->device_start; 
 													} else {
 														info->start = DEVICE_START_NAME(cartslot_specified); 
 													}
 													break;
-		case DEVINFO_FCT_IMAGE_LOAD:				if ( device && device->static_config && ((cartslot_interface *)device->static_config)->device_load) {
-														info->f = (genf *) ((cartslot_interface *)device->static_config)->device_load; 
+		case DEVINFO_FCT_IMAGE_LOAD:				if ( device && device->inline_config && get_config(device)->device_load) {
+														info->f = (genf *) get_config(device)->device_load; 
 													} else {
 														info->f = (genf *) DEVICE_IMAGE_LOAD_NAME(cartslot_specified); 
 													}
 													break;
-		case DEVINFO_FCT_IMAGE_UNLOAD:				if ( device && device->static_config && ((cartslot_interface *)device->static_config)->device_unload) {
-														info->f = (genf *) ((cartslot_interface *)device->static_config)->device_unload; 
+		case DEVINFO_FCT_IMAGE_UNLOAD:				if ( device && device->inline_config && get_config(device)->device_unload) {
+														info->f = (genf *) get_config(device)->device_unload; 
 													} else {
 														info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(cartslot_specified); 
 													}
 													break;
-		case DEVINFO_FCT_IMAGE_PARTIAL_HASH:		if ( device && device->static_config && ((cartslot_interface *)device->static_config)->device_unload) {
-														info->f = (genf *)((cartslot_interface *)device->static_config)->device_partialhash; 
+		case DEVINFO_FCT_IMAGE_PARTIAL_HASH:		if ( device && device->inline_config && get_config(device)->device_partialhash) {
+														info->f = (genf *) get_config(device)->device_partialhash; 
 													} else {
 														info->f = NULL; 
 													}
@@ -218,9 +226,9 @@ DEVICE_GET_INFO(cartslot)
 		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Cartslot"); break;
 		case DEVINFO_STR_SOURCE_FILE:				strcpy(info->s, __FILE__); break;
 		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:
-			if ( device && device->static_config )
+			if ( device && device->inline_config )
 			{
-				strcpy(info->s,((cartslot_interface *)device->static_config)->extensions);
+				strcpy(info->s, get_config(device)->extensions);
 			}
 			break;
 	}

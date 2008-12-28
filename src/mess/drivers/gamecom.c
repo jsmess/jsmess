@@ -88,16 +88,6 @@ static PALETTE_INIT( gamecom )
 	}
 }
 
-static const cartslot_interface gamecom_cartslot =
-{
-	"bin,tgc",
-	0,
-	DEVICE_START_NAME(gamecom_cart),
-	DEVICE_IMAGE_LOAD_NAME(gamecom_cart),
-	NULL,
-	NULL
-};
-
 static MACHINE_DRIVER_START( gamecom )
 	/* basic machine hardware */
 	MDRV_CPU_ADD( "main", SM8500, XTAL_11_0592MHz/2 )   /* actually it's an sm8521 microcontroller containing an sm8500 cpu */
@@ -131,7 +121,13 @@ static MACHINE_DRIVER_START( gamecom )
 	MDRV_SOUND_ROUTE( 0, "left", 0.50 )
 	MDRV_SOUND_ROUTE( 1, "right", 0.50 )
 #endif
-	MDRV_CARTSLOT_ADD("cart", gamecom_cartslot )
+
+	/* cartridge */
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin,tgc")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_START(gamecom_cart)
+	MDRV_CARTSLOT_LOAD(gamecom_cart)
 MACHINE_DRIVER_END
 
 ROM_START( gamecom )

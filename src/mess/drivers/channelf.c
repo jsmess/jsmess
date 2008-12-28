@@ -258,7 +258,7 @@ static MACHINE_DRIVER_START( channelf )
 	MDRV_SOUND_CONFIG(channelf_sound_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	
-	MDRV_CARTSLOT_ADD("cart", default_cartslot)
+	MDRV_CARTSLOT_ADD("cart")
 MACHINE_DRIVER_END
 
 ROM_START( channelf )

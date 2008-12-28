@@ -454,16 +454,6 @@ static const cassette_config spectrum_cassette_config =
 	CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED
 };
 
-const cartslot_interface spectrum_cartslot =
-{
-	"rom",
-	0,
-	NULL,
-	NULL,
-	NULL,
-	NULL
-};
-
 MACHINE_DRIVER_START( spectrum )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, 3500000)        /* 3.5 MHz */
@@ -499,10 +489,12 @@ MACHINE_DRIVER_START( spectrum )
 	/* devices */
 	MDRV_SNAPSHOT_ADD(spectrum, "sna,z80,sp", 0)
 	MDRV_QUICKLOAD_ADD(spectrum, "scr", 0)
-
 	MDRV_CASSETTE_ADD( "cassette", spectrum_cassette_config )
 	
-	MDRV_CARTSLOT_ADD("cart", spectrum_cartslot )
+	/* cartridge */
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("rom")
+	MDRV_CARTSLOT_NOT_MANDATORY
 MACHINE_DRIVER_END
 
 /***************************************************************************

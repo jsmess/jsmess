@@ -388,8 +388,7 @@ static MACHINE_DRIVER_START( cbm600 )
 	/* cia */
 	MDRV_CIA6526_ADD("cia", CIA6526R1, 0, cbmb_cia)
 	
-	MDRV_CARTSLOT_ADD("cart1", cbmb_cartslot)
-	MDRV_CARTSLOT_ADD("cart2", cbmb_cartslot)
+	MDRV_IMPORT_FROM(cbmb_cartslot)
 MACHINE_DRIVER_END
 
 
@@ -453,8 +452,7 @@ static MACHINE_DRIVER_START( p500 )
 	/* cia */
 	MDRV_CIA6526_ADD("cia", CIA6526R1, 0, cbmb_cia)
 
-	MDRV_CARTSLOT_ADD("cart1", cbmb_cartslot)
-	MDRV_CARTSLOT_ADD("cart2", cbmb_cartslot)	
+	MDRV_IMPORT_FROM(cbmb_cartslot)
 MACHINE_DRIVER_END
 
 

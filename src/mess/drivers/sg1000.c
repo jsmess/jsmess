@@ -809,16 +809,6 @@ static DEVICE_IMAGE_LOAD( sg1000_cart )
 	return INIT_PASS;
 }
 
-static const cartslot_interface sg1000_cartslot =
-{
-	"sg,bin",
-	1,
-	NULL,
-	DEVICE_IMAGE_LOAD_NAME(sg1000_cart),
-	NULL,
-	NULL
-};
-
 static void sc3000_map_cartridge_memory(running_machine *machine, UINT8 *ptr, int size)
 {
 	const address_space *program = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
@@ -860,26 +850,6 @@ static DEVICE_IMAGE_LOAD( sc3000_cart )
 	return INIT_PASS;
 }
 
-static const cartslot_interface sc3000_cartslot =
-{
-	"sg,sc,bin",
-	1,
-	NULL,
-	DEVICE_IMAGE_LOAD_NAME(sc3000_cart),
-	NULL,
-	NULL
-};
-
-static const cartslot_interface omv_cartslot =
-{
-	"sg,bin",
-	0,
-	NULL,
-	DEVICE_IMAGE_LOAD_NAME(sg1000_cart),
-	NULL,
-	NULL
-};
-
 /* Machine Drivers */
 
 static MACHINE_DRIVER_START( sg1000 )
@@ -903,14 +873,21 @@ static MACHINE_DRIVER_START( sg1000 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("sn76489an", SN76489A, XTAL_10_738635MHz/3)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	
-	MDRV_CARTSLOT_ADD("cart", sg1000_cartslot )
+
+	/* cartridge */
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("sg,bin")
+	MDRV_CARTSLOT_MANDATORY
+	MDRV_CARTSLOT_LOAD(sg1000_cart)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( omv )
 	MDRV_IMPORT_FROM(sg1000)
 	
-	MDRV_CARTSLOT_MODIFY("cart", omv_cartslot )
+	MDRV_CARTSLOT_MODIFY("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("sg,bin")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_LOAD(sg1000_cart)
 MACHINE_DRIVER_END
 
 static const cassette_config sc3000_cassette_config =
@@ -949,8 +926,12 @@ static MACHINE_DRIVER_START( sc3000 )
 
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", sc3000_cassette_config )
-	
-	MDRV_CARTSLOT_ADD("cart", sc3000_cartslot )
+
+	/* cartridge */
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("sg,sc,bin")
+	MDRV_CARTSLOT_MANDATORY
+	MDRV_CARTSLOT_LOAD(sc3000_cart)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( sf7000 )

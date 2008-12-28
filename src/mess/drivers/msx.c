@@ -1027,15 +1027,19 @@ static const cassette_config msx_cassette_config =
 	CASSETTE_PLAY
 };
 
-static const cartslot_interface msx_cartslot =
-{
-	"mx1,rom",
-	0,
-	NULL,
-	DEVICE_IMAGE_LOAD_NAME(msx_cart),
-	DEVICE_IMAGE_UNLOAD_NAME(msx_cart),
-	NULL
-};
+static MACHINE_DRIVER_START( msx_cartslot )
+	MDRV_CARTSLOT_ADD("cart1")
+	MDRV_CARTSLOT_EXTENSION_LIST("mx1,rom")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_LOAD(msx_cart)
+	MDRV_CARTSLOT_UNLOAD(msx_cart)
+
+	MDRV_CARTSLOT_ADD("cart2")
+	MDRV_CARTSLOT_EXTENSION_LIST("mx1,rom")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_LOAD(msx_cart)
+	MDRV_CARTSLOT_UNLOAD(msx_cart)
+MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( msx )
 	/* basic machine hardware */
@@ -1079,8 +1083,7 @@ static MACHINE_DRIVER_START( msx )
 	
 	MDRV_WD179X_ADD("wd179x", msx_wd17xx_interface )	
 	
-	MDRV_CARTSLOT_ADD("cart1", msx_cartslot)
-	MDRV_CARTSLOT_ADD("cart2", msx_cartslot)
+	MDRV_IMPORT_FROM(msx_cartslot)
 MACHINE_DRIVER_END
 
 
@@ -1151,8 +1154,7 @@ static MACHINE_DRIVER_START( msx2 )
 	
 	MDRV_WD179X_ADD("wd179x", msx_wd17xx_interface )	
 	
-	MDRV_CARTSLOT_ADD("cart1", msx_cartslot)
-	MDRV_CARTSLOT_ADD("cart2", msx_cartslot)	
+	MDRV_IMPORT_FROM(msx_cartslot)
 MACHINE_DRIVER_END
 
 

@@ -245,16 +245,6 @@ static DEVICE_IMAGE_LOAD( vc4000_cart )
 	return INIT_PASS;
 }
 
-const cartslot_interface vc4000_cartslot =
-{
-	"rom,bin",
-	1,
-	NULL,
-	DEVICE_IMAGE_LOAD_NAME(vc4000_cart),
-	NULL,
-	NULL
-};
-
 static MACHINE_DRIVER_START( vc4000 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", S2650, 865000)        /* 3550000/4, 3580000/3, 4430000/3 */
@@ -283,8 +273,13 @@ static MACHINE_DRIVER_START( vc4000 )
 
 	/* quickload */
 	MDRV_QUICKLOAD_ADD(vc4000, "tvc", 0)
-	
-	MDRV_CARTSLOT_ADD("cart", vc4000_cartslot )
+
+	/* cartridge */
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("rom,bin")
+	MDRV_CARTSLOT_MANDATORY
+	MDRV_CARTSLOT_LOAD(vc4000_cart)
+
 MACHINE_DRIVER_END
 
 ROM_START(vc4000)

@@ -10,7 +10,7 @@
 
 MACHINE_START( snes_mess );
 
-extern const cartslot_interface snes_cartslot;
+MACHINE_DRIVER_EXTERN( snes_cartslot );
 
 #endif /* _SNESCART_H */
 

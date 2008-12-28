@@ -35,7 +35,7 @@ DRIVER_INIT( cbm600hu );
 DRIVER_INIT( cbm700 );
 MACHINE_RESET( cbmb );
 
-extern const cartslot_interface cbmb_cartslot;
+MACHINE_DRIVER_EXTERN( cbmb_cartslot );
 
 
 /*----------- defined in video/cbmb.c -----------*/

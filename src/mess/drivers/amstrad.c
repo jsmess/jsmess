@@ -2944,15 +2944,12 @@ static const cassette_config amstrad_cassette_config =
 	CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED
 };
 
-static const cartslot_interface cpcplus_cartslot =
-{
-	"cpr,bin",
-	1,
-	NULL,
-	DEVICE_IMAGE_LOAD_NAME(amstrad_plus_cartridge),
-	NULL,
-	NULL
-};
+static MACHINE_DRIVER_START( cpcplus_cartslot )
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("cpr,bin")
+	MDRV_CARTSLOT_MANDATORY
+	MDRV_CARTSLOT_LOAD(amstrad_plus_cartridge)
+MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( amstrad )
 	/* Machine hardware */
@@ -3026,7 +3023,7 @@ static MACHINE_DRIVER_START( cpcplus )
 	MDRV_PALETTE_LENGTH(4096+48)  // extended 12-bit palette, and standard 32 colour palette
 	MDRV_PALETTE_INIT(amstrad_plus)
 	
-	MDRV_CARTSLOT_ADD("cart", cpcplus_cartslot)
+	MDRV_IMPORT_FROM(cpcplus_cartslot)
 MACHINE_DRIVER_END
 
 
@@ -3050,7 +3047,7 @@ static MACHINE_DRIVER_START( gx4000 )
 	MDRV_CASSETTE_REMOVE( "cassette" )
 	MDRV_NEC765A_REMOVE( "nec765" )
 	
-	MDRV_CARTSLOT_ADD("cart", cpcplus_cartslot)
+	MDRV_IMPORT_FROM(cpcplus_cartslot)
 MACHINE_DRIVER_END
 
 

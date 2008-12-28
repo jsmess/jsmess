@@ -1,4 +1,4 @@
-/******************************************************************************
+/*****************************************************************************
 
 Video Technology Laser 110-310 computers:
 
@@ -308,16 +308,6 @@ static const cassette_config laser_cassette_config =
 	CASSETTE_PLAY
 };
 
-const cartslot_interface vtech1_cartslot =
-{
-	"rom",
-	0,
-	NULL,
-	NULL,
-	NULL,
-	NULL
-};
-
 static MACHINE_DRIVER_START(laser110)
     /* basic machine hardware */
     MDRV_CPU_ADD("main", Z80, VTECH1_CLK)  /* 3.57950 MHz */
@@ -353,7 +343,9 @@ static MACHINE_DRIVER_START(laser110)
 
 	MDRV_CASSETTE_ADD( "cassette", laser_cassette_config )
 	
-	MDRV_CARTSLOT_ADD("cart", vtech1_cartslot )
+	/* cartridge */
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("rom")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START(laser200)

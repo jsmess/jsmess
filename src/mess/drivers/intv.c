@@ -379,27 +379,6 @@ static INTERRUPT_GEN( intv_interrupt2 )
 	cpu_set_input_line(device->machine->cpu[1], 0, PULSE_LINE);
 }
 
-static const cartslot_interface intv_cartslot =
-{
-	"int,rom",
-	1,
-	DEVICE_START_NAME(intv_cart),
-	DEVICE_IMAGE_LOAD_NAME(intv_cart),
-	NULL,
-	NULL
-};
-
-
-static const cartslot_interface intvkbd_cartslot =
-{
-	"int,rom,bin,itv",
-	0,
-	NULL,
-	DEVICE_IMAGE_LOAD_NAME(intvkbd_cart),
-	NULL,
-	NULL
-};
-
 static MACHINE_DRIVER_START( intv )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", CP1610, XTAL_3_579545MHz/4)        /* Colorburst/4 */
@@ -428,8 +407,13 @@ static MACHINE_DRIVER_START( intv )
 	MDRV_SOUND_ADD("ay8910", AY8910, XTAL_3_579545MHz/2)
 	MDRV_SOUND_CONFIG(intv_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	
-	MDRV_CARTSLOT_ADD("cart", intv_cartslot )
+
+	/* cartridge */
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("int,rom")
+	MDRV_CARTSLOT_MANDATORY
+	MDRV_CARTSLOT_START(intv_cart)
+	MDRV_CARTSLOT_LOAD(intv_cart)
 MACHINE_DRIVER_END
 
 
@@ -447,10 +431,17 @@ static MACHINE_DRIVER_START( intvkbd )
     /* video hardware */
 	MDRV_GFXDECODE(intvkbd)
 	MDRV_VIDEO_UPDATE(intvkbd)
-	
+
+	/* cartridge */
 	MDRV_CARTSLOT_REMOVE("cart")
-	MDRV_CARTSLOT_ADD("cart1", intvkbd_cartslot )
-	MDRV_CARTSLOT_ADD("cart2", intvkbd_cartslot )
+	MDRV_CARTSLOT_ADD("cart1")
+	MDRV_CARTSLOT_EXTENSION_LIST("int,rom,bin,itv")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_LOAD(intvkbd_cart)
+	MDRV_CARTSLOT_ADD("cart2")
+	MDRV_CARTSLOT_EXTENSION_LIST("int,rom,bin,itv")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_LOAD(intvkbd_cart)
 MACHINE_DRIVER_END
 
 ROM_START(intv)

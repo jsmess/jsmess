@@ -127,16 +127,6 @@ static const custom_sound_interface wswan_sound_interface =
 	wswan_sh_start
 };
 
-static const cartslot_interface wswan_cartslot =
-{
-	"ws,wsc,bin",
-	1,
-	DEVICE_START_NAME(wswan_cart),
-	DEVICE_IMAGE_LOAD_NAME(wswan_cart),
-	NULL,
-	NULL
-};
-
 static MACHINE_DRIVER_START( wswan )
 	/* Basic machine hardware */
 	MDRV_CPU_ADD("main", V30MZ, 3072000)
@@ -170,7 +160,12 @@ static MACHINE_DRIVER_START( wswan )
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
 	
-	MDRV_CARTSLOT_ADD("cart", wswan_cartslot)
+	/* cartridge */
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("ws,wsc,bin")
+	MDRV_CARTSLOT_MANDATORY
+	MDRV_CARTSLOT_START(wswan_cart)
+	MDRV_CARTSLOT_LOAD(wswan_cart)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( wscolor )

@@ -552,36 +552,6 @@ static const custom_sound_interface gameboy_sound_interface =
 	gameboy_sh_start, 0, 0
 };
 
-static const cartslot_interface gameboy_cartslot =
-{
-	"gb,gmb,cgb,gbc,sgb,bin",
-	1,
-	DEVICE_START_NAME(gb_cart),
-	DEVICE_IMAGE_LOAD_NAME(gb_cart),
-	NULL,
-	NULL
-};
-
-static const cartslot_interface gameboy_gb_cartslot =
-{
-	"gb,gmb,cgb,gbc,sgb,bin",
-	0,
-	DEVICE_START_NAME(gb_cart),
-	DEVICE_IMAGE_LOAD_NAME(gb_cart),
-	NULL,
-	NULL
-};
-
-static const cartslot_interface megaduck_cartslot =
-{
-	"bin",
-	1,
-	NULL,
-	DEVICE_IMAGE_LOAD_NAME(megaduck_cart),
-	NULL,
-	NULL
-};
-
 static MACHINE_DRIVER_START( gameboy )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", LR35902, 4194304)			/* 4.194304 MHz */
@@ -616,7 +586,11 @@ static MACHINE_DRIVER_START( gameboy )
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
 	
-	MDRV_CARTSLOT_ADD("cart", gameboy_gb_cartslot )
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("gb,gmb,cgb,gbc,sgb,bin")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_START(gb_cart)
+	MDRV_CARTSLOT_LOAD(gb_cart)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( supergb )
@@ -637,7 +611,8 @@ static MACHINE_DRIVER_START( supergb )
 	MDRV_PALETTE_LENGTH(32768)
 	MDRV_PALETTE_INIT(sgb)
 	
-	MDRV_CARTSLOT_MODIFY("cart", gameboy_cartslot )
+	MDRV_CARTSLOT_MODIFY("cart")
+	MDRV_CARTSLOT_MANDATORY
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( gbpocket )
@@ -646,7 +621,9 @@ static MACHINE_DRIVER_START( gbpocket )
 	MDRV_CPU_CONFIG(mgb_cpu_reset)
 	MDRV_MACHINE_RESET( gbpocket )
 	MDRV_PALETTE_INIT(gbp)
-	MDRV_CARTSLOT_MODIFY("cart", gameboy_cartslot )
+
+	MDRV_CARTSLOT_MODIFY("cart")
+	MDRV_CARTSLOT_MANDATORY
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( gbcolor )
@@ -660,7 +637,8 @@ static MACHINE_DRIVER_START( gbcolor )
 	MDRV_PALETTE_LENGTH(32768)
 	MDRV_PALETTE_INIT(gbc)
 	
-	MDRV_CARTSLOT_MODIFY("cart", gameboy_cartslot )
+	MDRV_CARTSLOT_MODIFY("cart")
+	MDRV_CARTSLOT_MANDATORY
 MACHINE_DRIVER_END
 
 static SYSTEM_CONFIG_START(gb_cgb)
@@ -698,7 +676,10 @@ static MACHINE_DRIVER_START( megaduck )
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
 	
-	MDRV_CARTSLOT_ADD("cart", megaduck_cartslot )
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin")
+	MDRV_CARTSLOT_MANDATORY
+	MDRV_CARTSLOT_LOAD(megaduck_cart)
 MACHINE_DRIVER_END
 
 /***************************************************************************

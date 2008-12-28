@@ -624,17 +624,6 @@ static MACHINE_RESET( adam )
 	timer_pulse(machine, ATTOTIME_IN_MSEC(20), NULL, 0, adam_paddle_callback);
 }
 
-static const cartslot_interface adam_cartslot =
-{
-	"rom,col,bin",
-	0,
-	NULL,
-	NULL,
-	NULL,
-	NULL
-	//case MESS_DEVINFO_PTR_VERIFY:					info->imgverify = adam_cart_verify; break;
-};
-
 static MACHINE_DRIVER_START( adam )
 	/* Machine hardware */
 	MDRV_CPU_ADD("main", Z80, 3579545)       /* 3.579545 MHz */
@@ -660,7 +649,10 @@ static MACHINE_DRIVER_START( adam )
 	MDRV_SOUND_ADD("sn76489a", SN76489A, 3579545)	/* 3.579545 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	
-	MDRV_CARTSLOT_ADD("cart", adam_cartslot)
+	/* cartridge */
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("rom,col,bin")
+	MDRV_CARTSLOT_NOT_MANDATORY
 MACHINE_DRIVER_END
 
 

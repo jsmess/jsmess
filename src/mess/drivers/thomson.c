@@ -196,28 +196,6 @@ static INPUT_PORTS_START( thom_lightpen )
 INPUT_PORTS_END
 
 
-/* ------------ cartridge ------------ */
-
-const cartslot_interface to7_cartslot =
-{
-	"m7,rom",
-	0,
-	NULL,
-	DEVICE_IMAGE_LOAD_NAME(to7_cartridge),
-	NULL,
-	NULL
-};
-
-const cartslot_interface mo5_cartslot =
-{
-	"m5,rom",
-	0,
-	NULL,
-	DEVICE_IMAGE_LOAD_NAME(mo5_cartridge),
-	NULL,
-	NULL
-};
-
 /* ------------ serial ------------ */
 
 static const char *const thom_serial_names[3][3]=
@@ -744,8 +722,12 @@ static MACHINE_DRIVER_START ( to7 )
      MDRV_ACIA6850_ADD( "acia6850", to7_modem )
      
      MDRV_WD2793_ADD("wd2793", default_wd17xx_interface )
-     
-     MDRV_CARTSLOT_ADD("cart", to7_cartslot )
+    
+	/* cartridge */
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("m7,rom")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_LOAD(to7_cartridge)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START ( t9000 )
@@ -1137,7 +1119,9 @@ static MACHINE_DRIVER_START ( mo5 )
 
      MDRV_MC6846_REMOVE( "mc6846" )
      
-     MDRV_CARTSLOT_MODIFY("cart", mo5_cartslot )
+	MDRV_CARTSLOT_MODIFY("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("m5,rom")
+	MDRV_CARTSLOT_LOAD(mo5_cartridge)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START ( mo5e )
@@ -2222,7 +2206,9 @@ static MACHINE_DRIVER_START ( mo6 )
 
      MDRV_MC6846_REMOVE( "mc6846" )
      
-     MDRV_CARTSLOT_MODIFY("cart", mo5_cartslot )
+	MDRV_CARTSLOT_MODIFY("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("m5,rom")
+	MDRV_CARTSLOT_LOAD(mo5_cartridge)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START ( pro128 )
@@ -2450,7 +2436,9 @@ static MACHINE_DRIVER_START ( mo5nr )
 
      MDRV_MC6846_REMOVE( "mc6846" )
      
-     MDRV_CARTSLOT_MODIFY("cart", mo5_cartslot )
+	MDRV_CARTSLOT_MODIFY("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("m5,rom")
+	MDRV_CARTSLOT_LOAD(mo5_cartridge)
 MACHINE_DRIVER_END
 
 COMP ( 1986, mo5nr, 0, 0, mo5nr, mo5nr, 0, mo5nr, "Thomson", "MO5 NR", 0 )

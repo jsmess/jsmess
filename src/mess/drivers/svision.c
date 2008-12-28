@@ -485,16 +485,6 @@ static const custom_sound_interface svision_sound_interface =
 	svision_custom_start
 };
 
-static const cartslot_interface svision_cartslot =
-{
-	"bin,ws,sv",
-	0,
-	NULL,
-	NULL,
-	NULL,
-	NULL
-};
-
 static MACHINE_DRIVER_START( svision )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M65C02, 4000000)        /* ? stz used! speed? */
@@ -522,7 +512,10 @@ static MACHINE_DRIVER_START( svision )
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
 	
-	MDRV_CARTSLOT_ADD("cart", svision_cartslot )
+	/* cartridge */
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin,ws,sv")
+	MDRV_CARTSLOT_NOT_MANDATORY
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( svisionp )

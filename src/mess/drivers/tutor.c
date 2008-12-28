@@ -570,16 +570,6 @@ static const struct tms9995reset_param tutor_processor_config =
 	NULL		/* no IDLE callback */
 };
 
-static const cartslot_interface tutor_cartslot =
-{
-	"",
-	0,
-	NULL,
-	DEVICE_IMAGE_LOAD_NAME(tutor_cart),
-	DEVICE_IMAGE_UNLOAD_NAME(tutor_cart),
-	NULL
-};
-
 static MACHINE_DRIVER_START(tutor)
 	/* basic machine hardware */
 	/* TMS9995 CPU @ 10.7 MHz */
@@ -606,8 +596,12 @@ static MACHINE_DRIVER_START(tutor)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
-	
-	MDRV_CARTSLOT_ADD("cart", tutor_cartslot )
+
+	/* cartridge */
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_LOAD(tutor_cart)
+	MDRV_CARTSLOT_UNLOAD(tutor_cart)
 MACHINE_DRIVER_END
 
 

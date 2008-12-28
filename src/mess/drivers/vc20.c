@@ -295,8 +295,7 @@ static MACHINE_DRIVER_START( vic20 )
 	MDRV_VIA6522_ADD("via6522_4", 0, vc20_via4)
 	MDRV_VIA6522_ADD("via6522_5", 0, vc20_via5)
 	
-	MDRV_CARTSLOT_ADD("cart1", vic20_cartslot)
-	MDRV_CARTSLOT_ADD("cart2", vic20_cartslot)		
+	MDRV_IMPORT_FROM(vic20_cartslot)
 MACHINE_DRIVER_END
 
 

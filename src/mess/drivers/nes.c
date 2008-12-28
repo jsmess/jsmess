@@ -212,27 +212,6 @@ ROM_START( famitwin )
 	ROM_FILL( 0x0000, 0x10000, 0x00 )
 ROM_END
 
-
-static const cartslot_interface nes_cartslot =
-{
-	"nes",
-	1,
-	NULL,
-	DEVICE_IMAGE_LOAD_NAME(nes_cart),
-	NULL,
-	nes_partialhash
-};
-
-static const cartslot_interface famicom_cartslot =
-{
-	"nes",
-	0,
-	NULL,
-	DEVICE_IMAGE_LOAD_NAME(nes_cart),
-	NULL,
-	nes_partialhash
-};
-
 static MACHINE_DRIVER_START( nes )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", N2A03, NTSC_CLOCK)
@@ -263,7 +242,11 @@ static MACHINE_DRIVER_START( nes )
 	MDRV_SOUND_CONFIG(nes_apu_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	
-	MDRV_CARTSLOT_ADD("cart", nes_cartslot )
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("nes")
+	MDRV_CARTSLOT_MANDATORY
+	MDRV_CARTSLOT_LOAD(nes_cart)
+	MDRV_CARTSLOT_PARTIALHASH(nes_partialhash)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( nespal )
@@ -287,7 +270,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( famicom )
 	MDRV_IMPORT_FROM( nes )
 	
-	MDRV_CARTSLOT_MODIFY("cart", famicom_cartslot )
+	MDRV_CARTSLOT_MODIFY("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("nes")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_LOAD(nes_cart)
+	MDRV_CARTSLOT_PARTIALHASH(nes_partialhash)
 MACHINE_DRIVER_END
 
 static void famicom_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)

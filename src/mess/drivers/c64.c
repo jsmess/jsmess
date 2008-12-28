@@ -512,8 +512,7 @@ static MACHINE_DRIVER_START( c64 )
 	MDRV_VIA6522_ADD("via6522_2", 0, vc1541_via2)
 	MDRV_VIA6522_ADD("via6522_3", 0, vc1541_via3)
 	
-	MDRV_CARTSLOT_ADD("cart1", c64_cartslot)
-	MDRV_CARTSLOT_ADD("cart2", c64_cartslot)		
+	MDRV_IMPORT_FROM(c64_cartslot)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( c64pal )
@@ -549,8 +548,7 @@ static MACHINE_DRIVER_START( c64pal )
 	MDRV_CIA6526_ADD("cia_0", CIA6526R1, 0, c64_pal_cia0)
 	MDRV_CIA6526_ADD("cia_1", CIA6526R1, 0, c64_pal_cia1)
 	
-	MDRV_CARTSLOT_ADD("cart1", c64_cartslot)
-	MDRV_CARTSLOT_ADD("cart2", c64_cartslot)			
+	MDRV_IMPORT_FROM(c64_cartslot)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ultimax )
@@ -564,7 +562,7 @@ static MACHINE_DRIVER_START( ultimax )
 	
 	MDRV_CARTSLOT_REMOVE("cart1")
 	MDRV_CARTSLOT_REMOVE("cart2")
-	MDRV_CARTSLOT_ADD("cart", ultimax_cartslot)
+	MDRV_IMPORT_FROM(ultimax_cartslot)
 MACHINE_DRIVER_END
 
 

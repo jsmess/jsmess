@@ -598,16 +598,6 @@ static MACHINE_RESET( tc2048 )
 	MACHINE_RESET_CALL(spectrum);
 }
 
-static const cartslot_interface ts2068_cartslot =
-{
-	"dck",
-	0,
-	NULL,
-	DEVICE_IMAGE_LOAD_NAME(timex_cart),
-	DEVICE_IMAGE_UNLOAD_NAME(timex_cart),
-	NULL
-};
-
 static MACHINE_DRIVER_START( ts2068 )
 	MDRV_IMPORT_FROM( spectrum_128 )
 	MDRV_CPU_REPLACE("main", Z80, 3580000)        /* 3.58 MHz */
@@ -625,8 +615,13 @@ static MACHINE_DRIVER_START( ts2068 )
 
 	MDRV_VIDEO_UPDATE( ts2068 )
 	MDRV_VIDEO_EOF( ts2068 )
-	
-	MDRV_CARTSLOT_MODIFY("cart", ts2068_cartslot )
+
+	/* cartridge */
+	MDRV_CARTSLOT_MODIFY("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("dck")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_LOAD(timex_cart)
+	MDRV_CARTSLOT_UNLOAD(timex_cart)
 MACHINE_DRIVER_END
 
 

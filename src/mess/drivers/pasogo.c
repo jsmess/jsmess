@@ -489,16 +489,6 @@ static DEVICE_IMAGE_LOAD( pasogo_cart )
 	return 0;
 }
 
-static const cartslot_interface pasogo_cartslot =
-{
-	"bin",
-	0,
-	NULL,
-	DEVICE_IMAGE_LOAD_NAME(pasogo_cart),
-	NULL,
-	NULL
-};
-
 static MACHINE_DRIVER_START( pasogo )
 	MDRV_CPU_ADD("main", I80188/*V30HL in vadem vg230*/, 10000000/*?*/)
 	MDRV_CPU_PROGRAM_MAP(pasogo_mem, 0)
@@ -526,7 +516,10 @@ static MACHINE_DRIVER_START( pasogo )
 	MDRV_SOUND_ROUTE(0, "gmaster", 0.50)
 #endif
 
-	MDRV_CARTSLOT_ADD("cart", pasogo_cartslot )
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_LOAD(pasogo_cart)
 MACHINE_DRIVER_END
 
 

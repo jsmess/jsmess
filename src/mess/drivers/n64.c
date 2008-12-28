@@ -119,16 +119,6 @@ static DEVICE_IMAGE_LOAD(n64_cart)
 	return INIT_PASS;
 }
 
-static const cartslot_interface n64_cartslot =
-{
-	"v64,z64,rom,n64,bin",
-	1,
-	NULL,
-	DEVICE_IMAGE_LOAD_NAME(n64_cart),
-	NULL,
-	NULL
-};
-
 static MACHINE_DRIVER_START( n64 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", R4600BE, 93750000)
@@ -161,8 +151,12 @@ static MACHINE_DRIVER_START( n64 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 	MDRV_SOUND_ADD("dmadac.r", DMADAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
-	
-	MDRV_CARTSLOT_ADD("cart", n64_cartslot )
+
+	/* cartridge */
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("v64,z64,rom,n64,bin")
+	MDRV_CARTSLOT_MANDATORY
+	MDRV_CARTSLOT_LOAD(n64_cart)
 MACHINE_DRIVER_END
 
 ROM_START( n64)

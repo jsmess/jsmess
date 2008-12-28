@@ -624,8 +624,7 @@ static MACHINE_DRIVER_START( c128 )
 	MDRV_CIA6526_ADD("cia_0", CIA6526R1, 0, c64_ntsc_cia0)
 	MDRV_CIA6526_ADD("cia_1", CIA6526R1, 0, c64_ntsc_cia1)
 	
-	MDRV_CARTSLOT_ADD("cart1", c64_cartslot)
-	MDRV_CARTSLOT_ADD("cart2", c64_cartslot)		
+	MDRV_IMPORT_FROM(c64_cartslot)
 MACHINE_DRIVER_END
 
 

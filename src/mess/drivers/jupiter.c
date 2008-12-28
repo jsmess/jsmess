@@ -299,16 +299,6 @@ static const cassette_config jupiter_cassette_config =
 	CASSETTE_STOPPED
 };
 
-static const cartslot_interface jupiter_cartslot =
-{
-	"ace",
-	0,
-	NULL,
-	DEVICE_IMAGE_LOAD_NAME(jupiter_ace),
-	NULL,
-	NULL
-};
-
 /* machine definition */
 static MACHINE_DRIVER_START( jupiter )
 	/* basic machine hardware */
@@ -338,7 +328,10 @@ static MACHINE_DRIVER_START( jupiter )
 
 	MDRV_CASSETTE_ADD( "cassette", jupiter_cassette_config )
 	
-	MDRV_CARTSLOT_ADD("cart", jupiter_cartslot )
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("ace")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_LOAD(jupiter_ace)
 MACHINE_DRIVER_END
 
 

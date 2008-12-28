@@ -1981,12 +1981,10 @@ static DEVICE_IMAGE_LOAD( lynx_cart )
 	return INIT_PASS;
 }
 
-const cartslot_interface lynx_cartslot =
-{
-	"lnx,lyx",
-	0,
-	NULL,
-	DEVICE_IMAGE_LOAD_NAME(lynx_cart),
-	NULL,
-	lynx_partialhash
-};
+MACHINE_DRIVER_START(lynx_cartslot)
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("lnx,lyx")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_LOAD(lynx_cart)
+	MDRV_CARTSLOT_PARTIALHASH(lynx_partialhash)
+MACHINE_DRIVER_END

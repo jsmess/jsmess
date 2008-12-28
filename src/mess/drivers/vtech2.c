@@ -406,16 +406,6 @@ static const cassette_config laser_cassette_config =
 	CASSETTE_PLAY
 };
 
-static const cartslot_interface laser_cartslot =
-{
-	"rom",
-	0,
-	NULL,
-	DEVICE_IMAGE_LOAD_NAME(laser_cart),
-	DEVICE_IMAGE_UNLOAD_NAME(laser_cart),
-	NULL
-};
-
 static MACHINE_DRIVER_START( laser350 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, 3694700)        /* 3.694700 MHz */
@@ -448,8 +438,13 @@ static MACHINE_DRIVER_START( laser350 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	MDRV_CASSETTE_ADD( "cassette", laser_cassette_config )
-	
-	MDRV_CARTSLOT_ADD("cart", laser_cartslot )
+
+	/* cartridge */
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("rom")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_LOAD(laser_cart)
+	MDRV_CARTSLOT_UNLOAD(laser_cart)
 MACHINE_DRIVER_END
 
 

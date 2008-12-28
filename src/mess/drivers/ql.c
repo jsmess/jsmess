@@ -619,16 +619,6 @@ static DEVICE_IMAGE_LOAD( ql_cart )
 	return INIT_FAIL;
 }
 
-static const cartslot_interface ql_cartslot =
-{
-	"bin",
-	0,
-	NULL,
-	DEVICE_IMAGE_LOAD_NAME(ql_cart),
-	NULL,
-	NULL
-};
-
 static MACHINE_DRIVER_START( ql )
 	MDRV_DRIVER_DATA(ql_state)
 
@@ -669,8 +659,12 @@ static MACHINE_DRIVER_START( ql )
 
 	/* quickload */
 	MDRV_QUICKLOAD_ADD(ql, "bas", 0)
-	
-	MDRV_CARTSLOT_ADD("cart", ql_cartslot )
+
+	/* cartridge */
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_LOAD(ql_cart)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( opd )

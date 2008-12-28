@@ -47,7 +47,7 @@ extern DRIVER_INIT( c16v );
 extern MACHINE_RESET( c16 );
 extern INTERRUPT_GEN( c16_frame_interrupt );
 
-extern const cartslot_interface c16_cartslot;
+MACHINE_DRIVER_EXTERN( c16_cartslot );
 
 
 /*----------- defined in audio/t6721.c -----------*/

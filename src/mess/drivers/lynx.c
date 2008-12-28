@@ -103,7 +103,7 @@ static MACHINE_DRIVER_START( lynx )
 	/* devices */
 	MDRV_QUICKLOAD_ADD(lynx, "o,lnx", 0)
 	
-	MDRV_CARTSLOT_ADD("cart", lynx_cartslot )
+	MDRV_IMPORT_FROM(lynx_cartslot)
 MACHINE_DRIVER_END
 
 

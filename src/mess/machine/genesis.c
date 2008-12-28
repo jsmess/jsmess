@@ -1229,30 +1229,25 @@ static DEVICE_IMAGE_UNLOAD( genesis_cart )
 	/* Write out the battery file if necessary */
 	if (has_sram && (genesis_sram != NULL) && (genesis_sram_end - genesis_sram_start > 0))
 	{
-		image_battery_save(image_from_devtype_and_index(image->machine, IO_CARTSLOT, 0), genesis_sram, genesis_sram_end - genesis_sram_start);
+		image_battery_save(image, genesis_sram, genesis_sram_end - genesis_sram_start);
 	}
 }
 
 
 /******* Cart getinfo *******/
 
-const cartslot_interface genesis_cartslot =
-{
-	"smd,bin,md,gen",
-	1,
-	NULL,
-	DEVICE_IMAGE_LOAD_NAME(genesis_cart),
-	DEVICE_IMAGE_UNLOAD_NAME(genesis_cart),
-	NULL
-};
+MACHINE_DRIVER_START( genesis_cartslot )
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("smd,bin,md,gen")
+	MDRV_CARTSLOT_MANDATORY
+	MDRV_CARTSLOT_LOAD(genesis_cart)
+	MDRV_CARTSLOT_UNLOAD(genesis_cart)
+MACHINE_DRIVER_END
 
-const cartslot_interface pico_cartslot =
-{
-	"bin",
-	1,
-	NULL,
-	DEVICE_IMAGE_LOAD_NAME(genesis_cart),
-	DEVICE_IMAGE_UNLOAD_NAME(genesis_cart),
-	NULL
-};
-
+MACHINE_DRIVER_START( pico_cartslot )
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin")
+	MDRV_CARTSLOT_MANDATORY
+	MDRV_CARTSLOT_LOAD(genesis_cart)
+	MDRV_CARTSLOT_UNLOAD(genesis_cart)
+MACHINE_DRIVER_END

@@ -502,16 +502,6 @@ static DEVICE_IMAGE_LOAD( arcadia_cart )
 	return INIT_PASS;
 }
 
-static const cartslot_interface arcadia_cartslot =
-{
-	"bin",
-	1,
-	NULL,
-	DEVICE_IMAGE_LOAD_NAME(arcadia_cart),
-	NULL,
-	NULL
-};
-
 static MACHINE_DRIVER_START( arcadia )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", S2650, 3580000/4)        /* 0.895 MHz */
@@ -539,8 +529,12 @@ static MACHINE_DRIVER_START( arcadia )
 	MDRV_SOUND_ADD("custom", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(arcadia_sound_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	
-	MDRV_CARTSLOT_ADD("cart", arcadia_cartslot)
+
+	/* cartridge */
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin")
+	MDRV_CARTSLOT_MANDATORY
+	MDRV_CARTSLOT_LOAD(arcadia_cart)
 MACHINE_DRIVER_END
 
 

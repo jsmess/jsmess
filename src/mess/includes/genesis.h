@@ -14,7 +14,7 @@
 MACHINE_RESET( md_mappers );
 DRIVER_INIT( gencommon );
 
-extern const cartslot_interface genesis_cartslot;
-extern const cartslot_interface pico_cartslot;
+MACHINE_DRIVER_EXTERN( genesis_cartslot );
+MACHINE_DRIVER_EXTERN( pico_cartslot );
 
 #endif /* GENESIS_H_ */

@@ -717,15 +717,27 @@ static const cassette_config bbc_cassette_config =
 	CASSETTE_PLAY
 };
 
-const cartslot_interface bbc_cartslot =
-{
-	"rom",
-	0,
-	NULL,
-	DEVICE_IMAGE_LOAD_NAME(bbcb_cart),
-	NULL,
-	NULL
-};
+static MACHINE_DRIVER_START( bbc_cartslot )
+	MDRV_CARTSLOT_ADD("cart1")
+	MDRV_CARTSLOT_EXTENSION_LIST("rom")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_LOAD(bbcb_cart)
+
+	MDRV_CARTSLOT_ADD("cart2")
+	MDRV_CARTSLOT_EXTENSION_LIST("rom")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_LOAD(bbcb_cart)
+
+	MDRV_CARTSLOT_ADD("cart3")
+	MDRV_CARTSLOT_EXTENSION_LIST("rom")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_LOAD(bbcb_cart)
+
+	MDRV_CARTSLOT_ADD("cart4")
+	MDRV_CARTSLOT_EXTENSION_LIST("rom")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_LOAD(bbcb_cart)
+MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( bbca )
 	/* basic machine hardware */
@@ -781,10 +793,7 @@ static MACHINE_DRIVER_START( bbcb )
 
 	MDRV_WD177X_ADD("wd177x", bbc_wd17xx_interface )
 
-	MDRV_CARTSLOT_ADD("cart1", bbc_cartslot)
-	MDRV_CARTSLOT_ADD("cart2", bbc_cartslot)	
-	MDRV_CARTSLOT_ADD("cart3", bbc_cartslot)
-	MDRV_CARTSLOT_ADD("cart4", bbc_cartslot)	
+	MDRV_IMPORT_FROM(bbc_cartslot)
 MACHINE_DRIVER_END
 
 
@@ -798,10 +807,7 @@ static MACHINE_DRIVER_START( bbcbp )
 	MDRV_VIA6522_ADD("via6522_1", 1000000, bbcb_user_via)
 	MDRV_WD177X_ADD("wd177x", bbc_wd17xx_interface )
 	
-	MDRV_CARTSLOT_ADD("cart1", bbc_cartslot)
-	MDRV_CARTSLOT_ADD("cart2", bbc_cartslot)	
-	MDRV_CARTSLOT_ADD("cart3", bbc_cartslot)
-	MDRV_CARTSLOT_ADD("cart4", bbc_cartslot)		
+	MDRV_IMPORT_FROM(bbc_cartslot)
 MACHINE_DRIVER_END
 
 
@@ -816,10 +822,7 @@ static MACHINE_DRIVER_START( bbcbp128 )
 	MDRV_VIA6522_ADD("via6522_1", 1000000, bbcb_user_via)
 	MDRV_WD177X_ADD("wd177x", bbc_wd17xx_interface )
 	
-	MDRV_CARTSLOT_ADD("cart1", bbc_cartslot)
-	MDRV_CARTSLOT_ADD("cart2", bbc_cartslot)	
-	MDRV_CARTSLOT_ADD("cart3", bbc_cartslot)
-	MDRV_CARTSLOT_ADD("cart4", bbc_cartslot)		
+	MDRV_IMPORT_FROM(bbc_cartslot)
 MACHINE_DRIVER_END
 
 
@@ -870,10 +873,7 @@ static MACHINE_DRIVER_START( bbcm )
 	MDRV_VIA6522_ADD("via6522_1", 1000000, bbcb_user_via)
 	MDRV_WD177X_ADD("wd177x", bbc_wd17xx_interface )
 	
-	MDRV_CARTSLOT_ADD("cart1", bbc_cartslot)
-	MDRV_CARTSLOT_ADD("cart2", bbc_cartslot)	
-	MDRV_CARTSLOT_ADD("cart3", bbc_cartslot)
-	MDRV_CARTSLOT_ADD("cart4", bbc_cartslot)		
+	MDRV_IMPORT_FROM(bbc_cartslot)
 MACHINE_DRIVER_END
 
 static void bbc_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)

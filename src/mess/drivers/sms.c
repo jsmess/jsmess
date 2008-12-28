@@ -302,45 +302,13 @@ static VIDEO_START(sega_store_315_5124) {
 	smsvdp_video_init( machine, &config_store );
 }
 
-static const cartslot_interface sms_cartslot =
-{
-	"sms,bin",
-	0,
-	DEVICE_START_NAME(sms_cart),
-	DEVICE_IMAGE_LOAD_NAME(sms_cart),
-	NULL,
-	NULL
-};
-
-static const cartslot_interface sg1000m3_cartslot =
-{
-	"sms,bin",
-	1,
-	DEVICE_START_NAME(sms_cart),
-	DEVICE_IMAGE_LOAD_NAME(sms_cart),
-	NULL,
-	NULL
-};
-
-static const cartslot_interface smssdisp_cartslot =
-{
-	"sms,bin",
-	1,
-	DEVICE_START_NAME(sms_cart),
-	DEVICE_IMAGE_LOAD_NAME(sms_cart),
-	NULL,
-	NULL
-};
-
-static const cartslot_interface gamegear_cartslot =
-{
-	"gg,bin",
-	1,
-	DEVICE_START_NAME(sms_cart),
-	DEVICE_IMAGE_LOAD_NAME(sms_cart),
-	NULL,
-	NULL
-};
+static MACHINE_DRIVER_START( sms_cartslot )
+	MDRV_CARTSLOT_ADD("cart1")
+	MDRV_CARTSLOT_EXTENSION_LIST("sms,bin")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_START(sms_cart)
+	MDRV_CARTSLOT_LOAD(sms_cart)
+MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START(sms1ntsc)
 	/* basic machine hardware */
@@ -369,7 +337,7 @@ static MACHINE_DRIVER_START(sms1ntsc)
 	MDRV_SOUND_ADD("smsiii", SMSIII, XTAL_53_693175MHz/15)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	
-	MDRV_CARTSLOT_ADD("cart1", sms_cartslot )
+	MDRV_IMPORT_FROM( sms_cartslot )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START(sms2ntsc)
@@ -387,11 +355,31 @@ static MACHINE_DRIVER_START(smssdisp)
 	/* Both CPUs seem to communicate with the VDP etc? */
 	MDRV_CPU_IO_MAP(sms_io, 0)
 
-	MDRV_CARTSLOT_MODIFY("cart1", smssdisp_cartslot )
-	MDRV_CARTSLOT_ADD("cart2", smssdisp_cartslot )
-	MDRV_CARTSLOT_ADD("cart3", smssdisp_cartslot )
-	MDRV_CARTSLOT_ADD("cart4", smssdisp_cartslot )
-	MDRV_CARTSLOT_ADD("cart5", smssdisp_cartslot )
+	MDRV_CARTSLOT_MODIFY("cart1")
+	MDRV_CARTSLOT_EXTENSION_LIST("sms,bin")
+	MDRV_CARTSLOT_MANDATORY
+	MDRV_CARTSLOT_START(sms_cart)
+	MDRV_CARTSLOT_LOAD(sms_cart)
+	MDRV_CARTSLOT_ADD("cart2")
+	MDRV_CARTSLOT_EXTENSION_LIST("sms,bin")
+	MDRV_CARTSLOT_MANDATORY
+	MDRV_CARTSLOT_START(sms_cart)
+	MDRV_CARTSLOT_LOAD(sms_cart)
+	MDRV_CARTSLOT_ADD("cart3")
+	MDRV_CARTSLOT_EXTENSION_LIST("sms,bin")
+	MDRV_CARTSLOT_MANDATORY
+	MDRV_CARTSLOT_START(sms_cart)
+	MDRV_CARTSLOT_LOAD(sms_cart)
+	MDRV_CARTSLOT_ADD("cart4")
+	MDRV_CARTSLOT_EXTENSION_LIST("sms,bin")
+	MDRV_CARTSLOT_MANDATORY
+	MDRV_CARTSLOT_START(sms_cart)
+	MDRV_CARTSLOT_LOAD(sms_cart)
+	MDRV_CARTSLOT_ADD("cart5")
+	MDRV_CARTSLOT_EXTENSION_LIST("sms,bin")
+	MDRV_CARTSLOT_MANDATORY
+	MDRV_CARTSLOT_START(sms_cart)
+	MDRV_CARTSLOT_LOAD(sms_cart)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START(sms1pal)
@@ -421,7 +409,7 @@ static MACHINE_DRIVER_START(sms1pal)
 	MDRV_SOUND_ADD("smsiii", SMSIII, MASTER_CLOCK_PAL/15)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	
-	MDRV_CARTSLOT_ADD("cart1", sms_cartslot )
+	MDRV_IMPORT_FROM( sms_cartslot )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START(sms2pal)
@@ -439,7 +427,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START(sg1000m3)
 	MDRV_IMPORT_FROM(smsfm)
 
-	MDRV_CARTSLOT_MODIFY("cart1", sg1000m3_cartslot )
+	MDRV_CARTSLOT_MODIFY("cart1")
+	MDRV_CARTSLOT_EXTENSION_LIST("sms,bin")
+	MDRV_CARTSLOT_MANDATORY
+	MDRV_CARTSLOT_START(sms_cart)
+	MDRV_CARTSLOT_LOAD(sms_cart)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START(sms2fm)
@@ -474,8 +466,13 @@ static MACHINE_DRIVER_START(gamegear)
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("gamegear", GAMEGEAR, XTAL_53_693175MHz/15)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	
-	MDRV_CARTSLOT_ADD("cart1", gamegear_cartslot )
+
+	/* cartridge */
+	MDRV_CARTSLOT_ADD("cart1")
+	MDRV_CARTSLOT_EXTENSION_LIST("gg,bin")
+	MDRV_CARTSLOT_MANDATORY
+	MDRV_CARTSLOT_START(sms_cart)
+	MDRV_CARTSLOT_LOAD(sms_cart)
 MACHINE_DRIVER_END
 
 ROM_START(sms1)

@@ -54,8 +54,6 @@ typedef enum
 	TIMEX_CART_HOME
 } TIMEX_CART_TYPE;
 
-extern const cartslot_interface spectrum_cartslot;
-
 /*----------- defined in machine/spectrum.c -----------*/
 
 extern TIMEX_CART_TYPE timex_cart_type;

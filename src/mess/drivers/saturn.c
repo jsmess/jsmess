@@ -2443,8 +2443,7 @@ static MACHINE_DRIVER_START( saturn )
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 
 	MDRV_CDROM_ADD( "cdrom" )
-	
-	MDRV_CARTSLOT_ADD("cart", default_cartslot )
+	MDRV_CARTSLOT_ADD("cart")
 MACHINE_DRIVER_END
 
 

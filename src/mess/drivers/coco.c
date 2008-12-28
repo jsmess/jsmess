@@ -639,25 +639,21 @@ static const cassette_config coco_cassette_config =
 	CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED
 };
 
-static const cartslot_interface coco_cartslot =
-{
-	"ccc,rom",
-	0,
-	NULL,
-	DEVICE_IMAGE_LOAD_NAME(coco_rom),
-	DEVICE_IMAGE_UNLOAD_NAME(coco_rom),
-	NULL
-};
+static MACHINE_DRIVER_START( coco_cartslot )
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("ccc,rom")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_LOAD(coco_rom)
+	MDRV_CARTSLOT_UNLOAD(coco_rom)
+MACHINE_DRIVER_END
 
-static const cartslot_interface coco3_cartslot =
-{
-	"ccc,rom",
-	0,
-	NULL,
-	DEVICE_IMAGE_LOAD_NAME(coco3_rom),
-	DEVICE_IMAGE_UNLOAD_NAME(coco3_rom),
-	NULL
-};
+static MACHINE_DRIVER_START( coco3_cartslot )
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("ccc,rom")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_LOAD(coco3_rom)
+	MDRV_CARTSLOT_UNLOAD(coco3_rom)
+MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dragon32 )
 	/* basic machine hardware */
@@ -690,7 +686,7 @@ static MACHINE_DRIVER_START( dragon32 )
 	
 	MDRV_SAM6883_ADD("sam", coco_sam_intf)
 	
-	MDRV_CARTSLOT_ADD("cart", coco_cartslot)
+	MDRV_IMPORT_FROM(coco_cartslot)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dragon64 )
@@ -728,7 +724,7 @@ static MACHINE_DRIVER_START( dragon64 )
 	
 	MDRV_SAM6883_ADD("sam", coco_sam_intf)
 	
-	MDRV_CARTSLOT_ADD("cart", coco_cartslot)
+	MDRV_IMPORT_FROM(coco_cartslot)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( d64plus )
@@ -766,7 +762,7 @@ static MACHINE_DRIVER_START( d64plus )
 	
 	MDRV_SAM6883_ADD("sam", coco_sam_intf)
 	
-	MDRV_CARTSLOT_ADD("cart", coco_cartslot)
+	MDRV_IMPORT_FROM(coco_cartslot)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dgnalpha )
@@ -807,7 +803,7 @@ static MACHINE_DRIVER_START( dgnalpha )
 	
 	MDRV_SAM6883_ADD("sam", coco_sam_intf)
 	
-	MDRV_CARTSLOT_ADD("cart", coco_cartslot)
+	MDRV_IMPORT_FROM(coco_cartslot)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( tanodr64 )
@@ -845,7 +841,7 @@ static MACHINE_DRIVER_START( tanodr64 )
 	
 	MDRV_SAM6883_ADD("sam", coco_sam_intf)
 	
-	MDRV_CARTSLOT_ADD("cart", coco_cartslot)
+	MDRV_IMPORT_FROM(coco_cartslot)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco )
@@ -884,7 +880,7 @@ static MACHINE_DRIVER_START( coco )
 	
 	MDRV_SAM6883_ADD("sam", coco_sam_intf)
 	
-	MDRV_CARTSLOT_ADD("cart", coco_cartslot)
+	MDRV_IMPORT_FROM(coco_cartslot)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco2 )
@@ -923,7 +919,7 @@ static MACHINE_DRIVER_START( coco2 )
 	
 	MDRV_SAM6883_ADD("sam", coco_sam_intf)
 	
-	MDRV_CARTSLOT_ADD("cart", coco_cartslot)
+	MDRV_IMPORT_FROM(coco_cartslot)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco2b )
@@ -962,7 +958,7 @@ static MACHINE_DRIVER_START( coco2b )
 	
 	MDRV_SAM6883_ADD("sam", coco_sam_intf)
 	
-	MDRV_CARTSLOT_ADD("cart", coco_cartslot)
+	MDRV_IMPORT_FROM(coco_cartslot)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco3 )
@@ -1011,7 +1007,7 @@ static MACHINE_DRIVER_START( coco3 )
 	
 	MDRV_SAM6883_GIME_ADD("sam", coco3_sam_intf)
 	
-	MDRV_CARTSLOT_ADD("cart", coco3_cartslot)
+	MDRV_IMPORT_FROM(coco3_cartslot)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco3p )

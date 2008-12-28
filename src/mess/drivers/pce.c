@@ -151,15 +151,13 @@ static void pce_partialhash(char *dest, const unsigned char *data,
 }
 
 
-static const cartslot_interface pce_cartslot =
-{
-	"pce,bin",
-	1,
-	NULL,
-	DEVICE_IMAGE_LOAD_NAME(pce_cart),
-	NULL,
-	pce_partialhash
-};
+static MACHINE_DRIVER_START( pce_cartslot )
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("pce,bin")
+	MDRV_CARTSLOT_MANDATORY
+	MDRV_CARTSLOT_LOAD(pce_cart)
+	MDRV_CARTSLOT_PARTIALHASH(pce_partialhash)
+MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pce )
 	/* basic machine hardware */
@@ -201,7 +199,7 @@ static MACHINE_DRIVER_START( pce )
 
 	MDRV_CDROM_ADD( "cdrom" )
 	
-	MDRV_CARTSLOT_ADD("cart", pce_cartslot )
+	MDRV_IMPORT_FROM( pce_cartslot )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( sgx )
@@ -241,7 +239,7 @@ static MACHINE_DRIVER_START( sgx )
 	MDRV_SOUND_ROUTE( 0, "left", 1.00 )
 	MDRV_SOUND_ROUTE( 1, "right", 1.00 )
 	
-	MDRV_CARTSLOT_ADD("cart", pce_cartslot )
+	MDRV_IMPORT_FROM( pce_cartslot )
 MACHINE_DRIVER_END
 
 /***************************************************************************

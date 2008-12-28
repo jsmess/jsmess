@@ -451,16 +451,6 @@ static const jaguar_cpu_config dsp_config =
 	jaguar_dsp_cpu_int
 };
 
-static const cartslot_interface jaguar_cartslot =
-{
-	"jag,abs,bin,rom,j64",
-	1,
-	NULL,
-	NULL,
-	NULL,
-	NULL
-};
-
 static MACHINE_DRIVER_START( jaguar )
 
 	/* basic machine hardware */
@@ -497,8 +487,11 @@ static MACHINE_DRIVER_START( jaguar )
 
 	/* quickload */
 	MDRV_QUICKLOAD_ADD(jaguar, "bin", 0)
-	
-	MDRV_CARTSLOT_ADD("cart", jaguar_cartslot)
+
+	/* cartridge */
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("jag,abs,bin,rom,j64")
+	MDRV_CARTSLOT_MANDATORY
 MACHINE_DRIVER_END
 
 

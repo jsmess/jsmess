@@ -397,16 +397,6 @@ static const cassette_config cgenie_cassette_config =
 	CASSETTE_STOPPED
 };
 
-static const cartslot_interface cgenie_cartslot =
-{
-	"rom",
-	0,
-	NULL,
-	NULL,
-	NULL,
-	NULL
-};
-
 static MACHINE_DRIVER_START( cgenie )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, 2216800)        /* 2,2168 MHz */
@@ -444,8 +434,11 @@ static MACHINE_DRIVER_START( cgenie )
 	MDRV_CASSETTE_ADD( "cassette", cgenie_cassette_config )
 
 	MDRV_WD179X_ADD("wd179x", cgenie_wd17xx_interface )
-	
-	MDRV_CARTSLOT_ADD("cart", cgenie_cartslot)
+
+	/* cartridge */
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("rom")
+	MDRV_CARTSLOT_NOT_MANDATORY
 MACHINE_DRIVER_END
 
 /***************************************************************************

@@ -426,16 +426,6 @@ static const cassette_config aquarius_cassette_config =
 	CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED
 };
 
-static const cartslot_interface aquarius_cartslot =
-{
-	"bin",
-	0,
-	NULL,
-	DEVICE_IMAGE_LOAD_NAME(aquarius_cart),
-	NULL,
-	NULL
-};
-
 static MACHINE_DRIVER_START( aquarius )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, XTAL_3_579545MHz) // ???
@@ -472,9 +462,14 @@ static MACHINE_DRIVER_START( aquarius )
 	/* printer */
 	MDRV_PRINTER_ADD("printer")
 
+	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", aquarius_cassette_config )
-	
-	MDRV_CARTSLOT_ADD("cart", aquarius_cartslot)
+
+	/* cartridge */
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_LOAD(aquarius_cart)
 MACHINE_DRIVER_END
 
 /* ROMs */

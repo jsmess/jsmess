@@ -1021,15 +1021,12 @@ static DEVICE_IMAGE_LOAD( super80_cart )
 	return INIT_PASS;
 }
 
-static const cartslot_interface super80_cartslot =
-{
-	"rom",
-	0,
-	NULL,
-	DEVICE_IMAGE_LOAD_NAME(super80_cart),
-	NULL,
-	NULL
-};
+static MACHINE_DRIVER_START( super80_cartslot )
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("rom")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_LOAD(super80_cart)
+MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( super80 )
 	/* basic machine hardware */
@@ -1065,8 +1062,11 @@ static MACHINE_DRIVER_START( super80 )
 	/* quickload */
 	MDRV_Z80BIN_QUICKLOAD_ADD(default, 1)
 
+	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", super80_cassette_config )
-	MDRV_CARTSLOT_ADD("cart", super80_cartslot )  
+
+	/* cartridge */
+	MDRV_IMPORT_FROM(super80_cartslot)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( super80d )
@@ -1122,8 +1122,11 @@ static MACHINE_DRIVER_START( super80v )
 	/* quickload */
 	MDRV_Z80BIN_QUICKLOAD_ADD(default, 1)
 
+	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", super80_cassette_config )
-	MDRV_CARTSLOT_ADD("cart", super80_cartslot )  
+	
+	/* cartridge */
+	MDRV_IMPORT_FROM(super80_cartslot)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( super80r )

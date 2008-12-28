@@ -195,16 +195,6 @@ static GFXDECODE_START( mekd2 )
 	GFXDECODE_ENTRY( "gfx2", 0, key_layout, 16*2, 2 )
 GFXDECODE_END
 
-static const cartslot_interface mekd2_cartslot =
-{
-	"d2",
-	0,
-	NULL,
-	DEVICE_IMAGE_LOAD_NAME(mekd2_cart),
-	NULL,
-	NULL
-};
-
 static MACHINE_DRIVER_START( mekd2 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M6800, 614400)        /* 614.4 kHz */
@@ -231,7 +221,10 @@ static MACHINE_DRIVER_START( mekd2 )
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	
-	MDRV_CARTSLOT_ADD("cart", mekd2_cartslot )
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("d2")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_LOAD(mekd2_cart)
 MACHINE_DRIVER_END
 
 

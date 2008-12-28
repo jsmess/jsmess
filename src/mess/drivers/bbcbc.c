@@ -91,7 +91,7 @@ static MACHINE_DRIVER_START( bbcbc )
 	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_REFRESH_RATE( 50 )
 	
-	MDRV_CARTSLOT_ADD("cart", default_cartslot )
+	MDRV_CARTSLOT_ADD("cart")
 MACHINE_DRIVER_END
 
 

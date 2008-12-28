@@ -60,16 +60,6 @@ static const speaker_interface pokemini_speaker_interface =
 	NULL			/* optional: level lookup table */
 };
 
-static const cartslot_interface pokemini_cartslot =
-{
-	"min,bin",
-	0,
-	DEVICE_START_NAME(pokemini_cart),
-	DEVICE_IMAGE_LOAD_NAME(pokemini_cart),
-	NULL,
-	NULL
-};
-
 static MACHINE_DRIVER_START( pokemini )
 	/* basic machine hardware */
 	MDRV_CPU_ADD( "main", MINX, 4000000 )
@@ -100,8 +90,13 @@ static MACHINE_DRIVER_START( pokemini )
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_CONFIG(pokemini_speaker_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	
-	MDRV_CARTSLOT_ADD("cart", pokemini_cartslot )
+
+	/* cartridge */
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("min,bin")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_START(pokemini_cart)
+	MDRV_CARTSLOT_LOAD(pokemini_cart)
 MACHINE_DRIVER_END
 
 

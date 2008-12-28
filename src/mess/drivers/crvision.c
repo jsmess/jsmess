@@ -475,16 +475,6 @@ static DEVICE_IMAGE_LOAD( crvision_cart )
 	return INIT_PASS;
 }
 
-static const cartslot_interface crvision_cartslot =
-{
-	"rom",
-	1,
-	NULL,
-	DEVICE_IMAGE_LOAD_NAME(crvision_cart),
-	NULL,
-	NULL
-};
-
 /* Machine Driver */
 
 static MACHINE_DRIVER_START( crvision )
@@ -508,8 +498,12 @@ static MACHINE_DRIVER_START( crvision )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
-	
-	MDRV_CARTSLOT_ADD("cart", crvision_cartslot )
+
+	/* cartridge */
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("rom")
+	MDRV_CARTSLOT_MANDATORY
+	MDRV_CARTSLOT_LOAD(crvision_cart)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( fnvision )

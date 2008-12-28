@@ -428,27 +428,6 @@ static DEVICE_IMAGE_LOAD( czz50_cart )
 	return INIT_PASS;
 }
 
-static const cartslot_interface coleco_cartslot =
-{
-	"rom,col,bin",
-	0,
-	NULL,
-	NULL,
-	NULL,
-	NULL
-	//case MESS_DEVINFO_PTR_VERIFY:					info->imgverify = coleco_cart_verify; break;
-};
-
-static const cartslot_interface czz50_cartslot =
-{
-	"rom,col,bin",
-	0,
-	NULL,
-	DEVICE_IMAGE_LOAD_NAME(czz50_cart),
-	NULL,
-	NULL
-};
-
 /* Machine Drivers */
 
 static MACHINE_DRIVER_START( coleco )
@@ -471,8 +450,11 @@ static MACHINE_DRIVER_START( coleco )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("sn76489a", SN76489A, XTAL_7_15909MHz/2)	/* 3.579545 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	
-	MDRV_CARTSLOT_ADD("cart", coleco_cartslot)
+
+	/* cartridge */
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("rom,col,bin")
+	MDRV_CARTSLOT_NOT_MANDATORY
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( czz50 )
@@ -495,8 +477,12 @@ static MACHINE_DRIVER_START( czz50 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("sn76489a", SN76489A, XTAL_7_15909MHz/2)	// ???
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	
-	MDRV_CARTSLOT_ADD("cart", czz50_cartslot)
+
+	/* cartridge */
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("rom,col,bin")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_LOAD(czz50_cart)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dina )

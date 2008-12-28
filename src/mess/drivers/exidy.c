@@ -785,16 +785,6 @@ static const cassette_config exidy_cassette_config =
 	CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED
 };
 
-static const cartslot_interface exidy_cartslot =
-{
-	"rom",
-	0,
-	NULL,
-	NULL,
-	NULL,
-	NULL
-};
-
 static MACHINE_DRIVER_START( exidy )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, 12638000/6)
@@ -837,8 +827,11 @@ static MACHINE_DRIVER_START( exidy )
 	MDRV_CASSETTE_ADD( "cassette2", exidy_cassette_config )
 	
 	MDRV_WD179X_ADD("wd179x", default_wd17xx_interface )
-	
-	MDRV_CARTSLOT_ADD("cart", exidy_cartslot)
+
+	/* cartridge */
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("rom")
+	MDRV_CARTSLOT_NOT_MANDATORY
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( exidyd )

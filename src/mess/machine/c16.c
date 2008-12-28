@@ -717,13 +717,9 @@ static DEVICE_IMAGE_LOAD(c16_cart)
 	return INIT_PASS;
 }
 
-
-const cartslot_interface c16_cartslot =
-{
-	"bin,rom,hi,lo",
-	0,
-	NULL,
-	DEVICE_IMAGE_LOAD_NAME(c16_cart),
-	NULL,
-	NULL
-};
+MACHINE_DRIVER_START(c16_cartslot)
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom,hi,lo")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_LOAD(c16_cart)
+MACHINE_DRIVER_END

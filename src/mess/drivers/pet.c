@@ -681,16 +681,14 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( pet )
 	MDRV_IMPORT_FROM( pet_general )
 	MDRV_QUICKLOAD_ADD(cbm_pet, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
-	MDRV_CARTSLOT_ADD("cart1", pet_cartslot)
-	MDRV_CARTSLOT_ADD("cart2", pet_cartslot)
+	MDRV_IMPORT_FROM(pet_cartslot)
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( pet2001 )
 	MDRV_IMPORT_FROM( pet_general )
 	MDRV_QUICKLOAD_ADD(cbm_pet1, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
-	MDRV_CARTSLOT_ADD("cart1", pet_cartslot)
-	MDRV_CARTSLOT_ADD("cart2", pet_cartslot)	
+	MDRV_IMPORT_FROM(pet_cartslot)
 MACHINE_DRIVER_END
 
 
@@ -704,8 +702,7 @@ static MACHINE_DRIVER_START( pet40 )
 	MDRV_VIDEO_START( pet_crtc )
 	MDRV_VIDEO_UPDATE( pet_crtc )
 	
-	MDRV_CARTSLOT_MODIFY("cart1", pet4_cartslot)
-	MDRV_CARTSLOT_MODIFY("cart2", pet4_cartslot)	
+	MDRV_IMPORT_FROM(pet4_cartslot)
 MACHINE_DRIVER_END
 
 
@@ -734,8 +731,7 @@ static MACHINE_DRIVER_START( pet80 )
 	MDRV_VIDEO_START( pet_crtc )
 	MDRV_VIDEO_UPDATE( pet_crtc )
 	
-	MDRV_CARTSLOT_MODIFY("cart1", pet4_cartslot)
-	MDRV_CARTSLOT_MODIFY("cart2", pet4_cartslot)	
+	MDRV_IMPORT_FROM(pet4_cartslot)
 MACHINE_DRIVER_END
 
 

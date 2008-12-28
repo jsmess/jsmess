@@ -669,7 +669,7 @@ static MACHINE_DRIVER_START( apf_m1000 )
 	MDRV_MACHINE_START( apf_m1000 )
 
 	MDRV_CASSETTE_REMOVE( "cassette" )
-	MDRV_CARTSLOT_ADD("cart", default_cartslot)
+	MDRV_CARTSLOT_ADD("cart")
 MACHINE_DRIVER_END
 
 

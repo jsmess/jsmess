@@ -1972,15 +1972,13 @@ static const cassette_config a2600_cassette_config =
 	CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED
 };
 
-static const cartslot_interface a2600_cartslot =
-{
-	"bin,a26",
-	1,
-	DEVICE_START_NAME(a2600_cart),
-	DEVICE_IMAGE_LOAD_NAME(a2600_cart),
-	NULL,
-	NULL
-};
+static MACHINE_DRIVER_START( a2600_cartslot )
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin,a26")
+	MDRV_CARTSLOT_MANDATORY
+	MDRV_CARTSLOT_START(a2600_cart)
+	MDRV_CARTSLOT_LOAD(a2600_cart)
+MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( a2600 )
 	/* basic machine hardware */
@@ -2012,7 +2010,7 @@ static MACHINE_DRIVER_START( a2600 )
 
 	MDRV_CASSETTE_ADD( "cassette", a2600_cassette_config )
 	
-	MDRV_CARTSLOT_ADD("cart", a2600_cartslot)
+	MDRV_IMPORT_FROM(a2600_cartslot)
 MACHINE_DRIVER_END
 
 
@@ -2046,7 +2044,7 @@ static MACHINE_DRIVER_START( a2600p )
 
 	MDRV_CASSETTE_ADD( "cassette", a2600_cassette_config )
 	
-	MDRV_CARTSLOT_ADD("cart", a2600_cartslot)
+	MDRV_IMPORT_FROM(a2600_cartslot)
 MACHINE_DRIVER_END
 
 

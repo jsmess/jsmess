@@ -269,15 +269,14 @@ static const cassette_config svi318_cassette_config =
 	CASSETTE_PLAY
 };
 
-static const cartslot_interface svi318_cartslot =
-{
-	"rom",
-	0,
-	DEVICE_START_NAME(svi318_cart),
-	DEVICE_IMAGE_LOAD_NAME(svi318_cart),
-	DEVICE_IMAGE_UNLOAD_NAME(svi318_cart),
-	NULL
-};
+static MACHINE_DRIVER_START( svi318_cartslot )
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("rom")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_START(svi318_cart)
+	MDRV_CARTSLOT_LOAD(svi318_cart)
+	MDRV_CARTSLOT_UNLOAD(svi318_cart)
+MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( svi318 )
 	/* Basic machine hardware */
@@ -318,7 +317,7 @@ static MACHINE_DRIVER_START( svi318 )
 		
 	MDRV_WD179X_ADD("wd179x", svi_wd17xx_interface )
 	
-	MDRV_CARTSLOT_ADD("cart", svi318_cartslot )
+	MDRV_IMPORT_FROM( svi318_cartslot )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( svi318n )
@@ -397,7 +396,7 @@ static MACHINE_DRIVER_START( svi328_806 )
 	
 	MDRV_WD179X_ADD("wd179x", svi_wd17xx_interface )
 	
-	MDRV_CARTSLOT_ADD("cart", svi318_cartslot )
+	MDRV_IMPORT_FROM( svi318_cartslot )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( svi328n_806 )

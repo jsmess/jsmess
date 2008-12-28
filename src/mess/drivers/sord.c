@@ -616,16 +616,6 @@ static const cassette_config sordm5_cassette_config =
 	CASSETTE_PLAY
 };
 
-static const cartslot_interface sord_cartslot =
-{
-	"rom",
-	0,
-	NULL,
-	NULL,
-	NULL,
-	NULL
-};
-
 static MACHINE_DRIVER_START( sord_m5 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, 3800000)
@@ -658,7 +648,10 @@ static MACHINE_DRIVER_START( sord_m5 )
 
 	MDRV_CASSETTE_ADD( "cassette", sordm5_cassette_config )
 	
-	MDRV_CARTSLOT_ADD("cart", sord_cartslot )		
+	/* cartridge */
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("rom")
+	MDRV_CARTSLOT_NOT_MANDATORY
 MACHINE_DRIVER_END
 
 

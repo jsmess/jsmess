@@ -56,16 +56,6 @@ static DEVICE_IMAGE_LOAD(gamepock_cart) {
 	return INIT_PASS;
 }
 
-static const cartslot_interface gamepock_cartslot =
-{
-	"bin",
-	0,
-	DEVICE_START_NAME(gamepock_cart),
-	DEVICE_IMAGE_LOAD_NAME(gamepock_cart),
-	NULL,
-	NULL
-};
-
 static MACHINE_DRIVER_START( gamepock )
 	MDRV_CPU_ADD("main", UPD78C06, XTAL_6MHz)	/* uPD78C06AG */
 	MDRV_CPU_PROGRAM_MAP( gamepock_mem, 0 )
@@ -89,8 +79,13 @@ static MACHINE_DRIVER_START( gamepock )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	
-	MDRV_CARTSLOT_ADD("cart", gamepock_cartslot)
+
+	/* cartridge */
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_START(gamepock_cart)
+	MDRV_CARTSLOT_LOAD(gamepock_cart)
 MACHINE_DRIVER_END
 
 ROM_START( gamepock )

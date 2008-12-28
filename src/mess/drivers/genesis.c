@@ -333,15 +333,15 @@ static MACHINE_DRIVER_START( ms_megadriv )
 
 	MDRV_MACHINE_RESET( ms_megadriv )
 	
-	MDRV_CARTSLOT_ADD("cart", genesis_cartslot )
+	MDRV_IMPORT_FROM( genesis_cartslot )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ms_megdsvp )
 	MDRV_IMPORT_FROM(megdsvp)
 
 	MDRV_MACHINE_RESET( ms_megadriv )
-	
-	MDRV_CARTSLOT_ADD("cart", genesis_cartslot )
+
+	MDRV_IMPORT_FROM( genesis_cartslot )
 MACHINE_DRIVER_END
 
 
@@ -619,7 +619,7 @@ static MACHINE_DRIVER_START( pico )
 
 	MDRV_MACHINE_RESET( ms_megadriv )
 	
-	MDRV_CARTSLOT_ADD("cart", pico_cartslot )
+	MDRV_IMPORT_FROM( pico_cartslot )
 MACHINE_DRIVER_END
 
 
