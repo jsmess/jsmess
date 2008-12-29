@@ -89,8 +89,9 @@ static DIRECT_UPDATE_HANDLER( psx_setopbase )
 
 		memory_set_direct_update_handler( space, NULL );
 
-		return ~0;
+		return m_psxexe_header.pc0;
 	}
+
 	return address;
 }
 
