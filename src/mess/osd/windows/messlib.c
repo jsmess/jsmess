@@ -9,7 +9,9 @@
 // to wrap it
 #define MESSLIB
 #undef main
+#undef wmain
 #define main mame_main
+#define wmain mame_main
 #include "windows/main.c"
 #undef main
 
@@ -17,10 +19,17 @@
 //  mess_cli_main - main entry proc for CLI MESS
 //============================================================
 
+#ifdef __GNUC__
 int __declspec(dllexport) mess_cli_main(int argc, char **argv)
 {
 	return mame_main(argc, argv);
 }
+#else
+int __declspec(dllexport) mess_cli_main(int argc, TCHAR **argv)
+{
+	return mame_main(argc, argv);
+}
+#endif
 
 
 
