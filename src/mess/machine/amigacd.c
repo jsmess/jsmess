@@ -12,9 +12,9 @@ DMAC controller.
 #include "driver.h"
 #include "amiga.h"
 #include "amigacd.h"
+#include "machine/6525tpi.h"
 #include "machine/6526cia.h"
 #include "machine/wd33c93.h"
-#include "machine/tpi6525.h"
 #include "devices/chd_cd.h"
 #include "matsucd.h"
 
@@ -213,8 +213,9 @@ static READ16_HANDLER( amiga_dmac_r )
 		case 0x66:
 		case 0x67:
 		{
+			const device_config *tpi = devtag_get_device(space->machine, TPI6525, "tpi6525");
 			LOG(( "DMAC: PC=%08x - TPI6525 Read(%d)\n", cpu_get_pc(space->cpu), (offset - 0x58) ));
-			return tpi6525_0_port_r(space, offset - 0x58);
+			return tpi6525_r(tpi, offset - 0x58);
 		}
 		break;
 
@@ -339,8 +340,9 @@ static WRITE16_HANDLER( amiga_dmac_w )
 		case 0x66:
 		case 0x67:
 		{
+			const device_config *tpi = devtag_get_device(space->machine, TPI6525, "tpi6525");
 			LOG(( "DMAC: PC=%08x - TPI6525 Write(%d) - data = %04x\n", cpu_get_pc(space->cpu), (offset - 0x58), data ));
-			tpi6525_0_port_w(space, offset - 0x58, data);
+			tpi6525_w(tpi, offset - 0x58, data);
 		}
 		break;
 
@@ -422,27 +424,27 @@ static const amiga_autoconfig_device dmac_device =
 
 ***************************************************************************/
 
-static int tp6525_portc_r(running_machine *machine)
+READ8_DEVICE_HANDLER( amigacd_tpi6525_portc_r )
 {
 	int	ret = 0;
 
-	if ( (tpi6525[0].c.ddr & 0x04) == 0 ) /* if pin 2 is set to input */
+	if ( (tpi6525_get_ddr_c(device) & 0x04) == 0 ) /* if pin 2 is set to input */
 	{
 		ret |= matsucd_stch_r() ? 0x00 : 0x04;	/* read status change signal */
 	}
 
-	if ( (tpi6525[0].c.ddr & 0x08) == 0 ) /* if pin 3 is set to input */
+	if ( (tpi6525_get_ddr_c(device) & 0x08) == 0 ) /* if pin 3 is set to input */
 		ret |= matsucd_sten_r() ? 0x08 : 0x00;	/* read enable signal */
 
 	return ret;
 }
 
-static void tp6525_portb_w(running_machine *machine, int data)
+WRITE8_DEVICE_HANDLER( amigacd_tpi6525_portb_w )
 {
-	if ( tpi6525[0].b.ddr & 0x01 ) /* if pin 0 is set to output */
+	if ( tpi6525_get_ddr_b(device) & 0x01 ) /* if pin 0 is set to output */
 		matsucd_cmd_w( data & 1 ); /* write to the /CMD signal */
 
-	if ( tpi6525[0].b.ddr & 0x02 ) /* if pin 1 is set to output */
+	if ( tpi6525_get_ddr_b(device) & 0x02 ) /* if pin 1 is set to output */
 		matsucd_enable_w( data & 2 ); /* write to the /ENABLE signal */
 }
 
@@ -462,7 +464,7 @@ static TIMER_CALLBACK(tp6525_delayed_irq)
 	}
 }
 
-static void tp6525_irq( running_machine *machine, int level )
+void amigacd_tpi6525_irq(const device_config *device, int level)
 {
 	LOG(( "TPI6525 Interrupt: level = %d\n", level ));
 
@@ -470,7 +472,7 @@ static void tp6525_irq( running_machine *machine, int level )
 	{
 		if ( (CUSTOM_REG(REG_INTREQ) & INTENA_PORTS) == 0 )
 		{
-			amiga_custom_w(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), REG_INTREQ, 0x8000 | INTENA_PORTS, 0xffff);
+			amiga_custom_w(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), REG_INTREQ, 0x8000 | INTENA_PORTS, 0xffff);
 		}
 		else
 		{
@@ -482,23 +484,29 @@ static void tp6525_irq( running_machine *machine, int level )
 
 static void cdrom_status_enabled( running_machine *machine, int level )
 {
+	const device_config *tpi = devtag_get_device(machine, TPI6525, "tpi6525");
+
 	/* PC3 on the 6525 */
-	tpi6525_0_irq3_level( machine, level );
+	tpi6525_irq3_level(tpi, level);
 }
 
 static void cdrom_status_change( running_machine *machine, int level )
 {
+	const device_config *tpi = devtag_get_device(machine, TPI6525, "tpi6525");
+
 	/* invert */
 	level = level ? 0 : 1;
 
 	/* PC2 on the 6525 */
-	tpi6525_0_irq2_level( machine, level );
+	tpi6525_irq2_level(tpi, level);
 }
 
 static void cdrom_subcode_ready( running_machine *machine, int level )
 {
+	const device_config *tpi = devtag_get_device(machine, TPI6525, "tpi6525");
+
 	/* PC1 on the 6525 */
-	tpi6525_0_irq1_level( machine, level );
+	tpi6525_irq1_level(tpi, level);
 }
 
 MACHINE_START( amigacd )
@@ -508,21 +516,6 @@ MACHINE_START( amigacd )
 
 	dmac_data.dma_timer = timer_alloc(machine, dmac_dma_proc, NULL);
 	tp6525_delayed_timer = timer_alloc(machine, tp6525_delayed_irq, NULL);
-
-	/* initialize the 6525 TPI */
-	tpi6525_0_reset();
-
-	tpi6525[0].a.read = NULL;
-	tpi6525[0].b.read = NULL;
-	tpi6525[0].c.read = tp6525_portc_r;
-
-	tpi6525[0].a.output = NULL;
-	tpi6525[0].b.output = tp6525_portb_w;
-	tpi6525[0].c.output = NULL;
-
-	tpi6525[0].interrupt.output = tp6525_irq;
-	tpi6525[0].ca.output = NULL;
-	tpi6525[0].cb.output = NULL;
 
 	/* set up DMAC with autoconfig */
 	amiga_add_autoconfig( machine, &dmac_device );
@@ -536,4 +529,3 @@ MACHINE_RESET( amigacd )
 	matsucd_set_status_changed_callback( cdrom_status_change );
 	matsucd_set_subcode_ready_callback( cdrom_subcode_ready );
 }
-

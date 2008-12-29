@@ -645,7 +645,7 @@ $(MESSOBJ)/amiga.a: \
 
 $(MESSOBJ)/cbmshare.a: \
 	$(MESS_FORMATS)/cbm_tap.o 	\
-	$(MESS_MACHINE)/tpi6525.o	\
+	$(MESS_MACHINE)/6525tpi.o	\
 	$(MESS_MACHINE)/cbm.o		\
 	$(MESS_MACHINE)/cbmdrive.o	\
 	$(MESS_MACHINE)/vc1541.o	\

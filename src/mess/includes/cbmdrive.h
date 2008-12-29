@@ -97,17 +97,17 @@ void cbm_drive_1_config (int interface, int serialnr);
 /* IEC interface for c16 with c1551 */
 
 /* To be passed directly to the drivers */
-void c1551_0_write_data(running_machine *machine, int data);
-int c1551_0_read_data(running_machine *machine);
-void c1551_0_write_handshake(running_machine *machine, int data);
-int c1551_0_read_handshake(running_machine *machine);
-int c1551_0_read_status(running_machine *machine);
+WRITE8_DEVICE_HANDLER( c1551_0_write_data );
+READ8_DEVICE_HANDLER( c1551_0_read_data );
+WRITE8_DEVICE_HANDLER( c1551_0_write_handshake );
+READ8_DEVICE_HANDLER( c1551_0_read_handshake );
+READ8_DEVICE_HANDLER( c1551_0_read_status );
 
-void c1551_1_write_data(running_machine *machine, int data);
-int c1551_1_read_data(running_machine *machine);
-void c1551_1_write_handshake(running_machine *machine, int data);
-int c1551_1_read_handshake(running_machine *machine);
-int c1551_1_read_status(running_machine *machine);
+WRITE8_DEVICE_HANDLER( c1551_1_write_data );
+READ8_DEVICE_HANDLER( c1551_1_read_data );
+WRITE8_DEVICE_HANDLER( c1551_1_write_handshake );
+READ8_DEVICE_HANDLER( c1551_1_read_handshake );
+READ8_DEVICE_HANDLER( c1551_1_read_status );
 
 
 /* Serial bus for vic20, c64 & c16 with vc1541 and some printer */

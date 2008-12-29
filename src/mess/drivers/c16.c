@@ -121,6 +121,7 @@ printers and other devices; most expansion modules; userport; rs232/v.24 interfa
 #include "cpu/m6502/m6502.h"
 #include "sound/sid6581.h"
 
+#include "machine/6525tpi.h"
 #include "includes/vc1541.h"
 #include "machine/cbmipt.h"
 #include "video/ted7360.h"
@@ -362,6 +363,45 @@ static PALETTE_INIT( c16 )
  *
  *************************************/
 
+const tpi6525_interface c16_tpi6525_tpi_2_intf =
+{
+	c1551_0_read_data,
+	c1551_0_read_status,
+	c1551_0_read_handshake,
+	c1551_0_write_data,
+	NULL,
+	c1551_0_write_handshake,
+	NULL,
+	NULL,
+	NULL	
+};
+
+const tpi6525_interface c16_tpi6525_tpi_2_c1551_intf =
+{
+	c1551x_read_data,
+	c1551x_read_status,
+	c1551x_read_handshake,
+	c1551x_write_data,
+	NULL,
+	c1551x_write_handshake,
+	NULL,
+	NULL,
+	NULL
+};
+
+const tpi6525_interface c16_tpi6525_tpi_3_intf =
+{
+	c1551_1_read_data,
+	c1551_1_read_status,
+	c1551_1_read_handshake,
+	c1551_1_write_data,
+	NULL,
+	c1551_1_write_handshake,
+	NULL,
+	NULL,
+	NULL	
+};
+
 
 static MACHINE_DRIVER_START( c16 )
 	/* basic machine hardware */
@@ -403,13 +443,21 @@ static MACHINE_DRIVER_START( c16 )
 	/* via */
 	MDRV_VIA6522_ADD("via6522_2", 0, vc1541_via2)
 	MDRV_VIA6522_ADD("via6522_3", 0, vc1541_via3)
-	
+
+	/* tpi */
+	MDRV_TPI6525_ADD("tpi6535_tpi_2", c16_tpi6525_tpi_2_intf)
+	MDRV_TPI6525_ADD("tpi6535_tpi_3", c16_tpi6525_tpi_3_intf)
+
 	MDRV_IMPORT_FROM(c16_cartslot)
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( c16c )
 	MDRV_IMPORT_FROM( c16 )
+
+	MDRV_TPI6525_REMOVE("tpi6535_tpi_2")
+	MDRV_TPI6525_ADD("tpi6535_tpi_2", c16_tpi6525_tpi_2_c1551_intf)
+
 	MDRV_IMPORT_FROM( cpu_c1551 )
 #ifdef CPU_SYNC
 	MDRV_QUANTUM_TIME(HZ(60))

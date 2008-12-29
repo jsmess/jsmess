@@ -176,11 +176,11 @@ MACHINE_DRIVER_EXTERN( cpu_c1571 );
 /* IEC interface for c16 with c1551 */
 
 /* To be passed directly to the drivers */
-void c1551x_0_write_data(running_machine *machine, int data);
-int c1551x_0_read_data(running_machine *machine);
-void c1551x_0_write_handshake(running_machine *machine, int data);
-int c1551x_0_read_handshake(running_machine *machine);
-int c1551x_0_read_status(running_machine *machine);
+WRITE8_DEVICE_HANDLER( c1551x_write_data );
+READ8_DEVICE_HANDLER( c1551x_read_data );
+WRITE8_DEVICE_HANDLER( c1551x_write_handshake );
+READ8_DEVICE_HANDLER( c1551x_read_handshake );
+READ8_DEVICE_HANDLER( c1551x_read_status );
 
 
 /* serial bus for vic20, c64 & c16 with vc1541 and some printer */

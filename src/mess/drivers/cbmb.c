@@ -99,10 +99,10 @@ Keyboard: Full-sized 102 key QWERTY (19 key numeric keypad!; 4 direction
 //#include "cpu/i86/i86.h"
 #include "cpu/m6502/m6509.h"
 #include "sound/sid6581.h"
+#include "machine/6525tpi.h"
 #include "machine/6526cia.h"
 
 #include "includes/cbm.h"
-#include "machine/tpi6525.h"
 #include "machine/cbmipt.h"
 #include "video/vic6567.h"
 #include "video/mc6845.h"
@@ -136,8 +136,8 @@ static ADDRESS_MAP_START( cbmb_readmem , ADDRESS_SPACE_PROGRAM, 8)
 	/* db00 coprocessor */
 	AM_RANGE(0xfdc00, 0xfdcff) AM_DEVREAD( CIA6526R1, "cia", cia_r )
 	/* dd00 acia */
-	AM_RANGE(0xfde00, 0xfdeff) AM_READ( tpi6525_0_port_r)
-	AM_RANGE(0xfdf00, 0xfdfff) AM_READ( tpi6525_1_port_r)
+	AM_RANGE(0xfde00, 0xfdeff) AM_DEVREAD(TPI6525, "tpi6525_0", tpi6525_r)
+	AM_RANGE(0xfdf00, 0xfdfff) AM_DEVREAD(TPI6525, "tpi6525_1", tpi6525_r)
 	AM_RANGE(0xfe000, 0xfffff) AM_READ( SMH_ROM )
 ADDRESS_MAP_END
 
@@ -159,8 +159,8 @@ static ADDRESS_MAP_START( cbmb_writemem , ADDRESS_SPACE_PROGRAM, 8)
 	/* db00 coprocessor */
 	AM_RANGE(0xfdc00, 0xfdcff) AM_DEVWRITE( CIA6526R1, "cia", cia_w)
 	/* dd00 acia */
-	AM_RANGE(0xfde00, 0xfdeff) AM_WRITE( tpi6525_0_port_w)
-	AM_RANGE(0xfdf00, 0xfdfff) AM_WRITE( tpi6525_1_port_w)
+	AM_RANGE(0xfde00, 0xfdeff) AM_DEVWRITE(TPI6525, "tpi6525_0", tpi6525_w)
+	AM_RANGE(0xfdf00, 0xfdfff) AM_DEVWRITE(TPI6525, "tpi6525_1", tpi6525_w)
 	AM_RANGE(0xfe000, 0xfffff) AM_WRITE( SMH_ROM) AM_BASE( &cbmb_kernal )
 ADDRESS_MAP_END
 
@@ -183,8 +183,8 @@ static ADDRESS_MAP_START( p500_readmem , ADDRESS_SPACE_PROGRAM, 8)
 	/* db00 coprocessor */
 	AM_RANGE(0xfdc00, 0xfdcff) AM_DEVREAD( CIA6526R1, "cia", cia_r )
 	/* dd00 acia */
-	AM_RANGE(0xfde00, 0xfdeff) AM_READ( tpi6525_0_port_r)
-	AM_RANGE(0xfdf00, 0xfdfff) AM_READ( tpi6525_1_port_r)
+	AM_RANGE(0xfde00, 0xfdeff) AM_DEVREAD(TPI6525, "tpi6525_0", tpi6525_r)
+	AM_RANGE(0xfdf00, 0xfdfff) AM_DEVREAD(TPI6525, "tpi6525_1", tpi6525_r)
 	AM_RANGE(0xfe000, 0xfffff) AM_READ( SMH_ROM )
 ADDRESS_MAP_END
 
@@ -207,8 +207,8 @@ static ADDRESS_MAP_START( p500_writemem , ADDRESS_SPACE_PROGRAM, 8)
 	/* db00 coprocessor */
 	AM_RANGE(0xfdc00, 0xfdcff) AM_DEVWRITE( CIA6526R1, "cia", cia_w)
 	/* dd00 acia */
-	AM_RANGE(0xfde00, 0xfdeff) AM_WRITE( tpi6525_0_port_w)
-	AM_RANGE(0xfdf00, 0xfdfff) AM_WRITE( tpi6525_1_port_w)
+	AM_RANGE(0xfde00, 0xfdeff) AM_DEVWRITE(TPI6525, "tpi6525_0", tpi6525_w)
+	AM_RANGE(0xfdf00, 0xfdfff) AM_DEVWRITE(TPI6525, "tpi6525_1", tpi6525_w)
 	AM_RANGE(0xfe000, 0xfffff) AM_WRITE( SMH_ROM) AM_BASE( &cbmb_kernal )
 ADDRESS_MAP_END
 
@@ -353,6 +353,32 @@ static const mc6845_interface cbm700_crtc = {
  *
  *************************************/
 
+const tpi6525_interface cbmb_tpi_0_intf =
+{
+	cbmb_tpi0_port_a_r,
+	NULL,
+	NULL,
+	cbmb_tpi0_port_a_w,
+	NULL,
+	NULL,
+	cbmb_change_font,
+	NULL,
+	cbmb_irq
+};
+
+const tpi6525_interface cbmb_tpi_1_intf =
+{
+	cbmb_keyboard_line_a,
+	cbmb_keyboard_line_b,
+	cbmb_keyboard_line_c,
+	cbmb_keyboard_line_select_a,
+	cbmb_keyboard_line_select_b,
+	cbmb_keyboard_line_select_c,
+	NULL,
+	NULL,
+	NULL
+};
+
 
 static MACHINE_DRIVER_START( cbm600 )
 	/* basic machine hardware */
@@ -388,6 +414,10 @@ static MACHINE_DRIVER_START( cbm600 )
 	/* cia */
 	MDRV_CIA6526_ADD("cia", CIA6526R1, 0, cbmb_cia)
 	
+	/* tpi */
+	MDRV_TPI6525_ADD("tpi6525_0", cbmb_tpi_0_intf)
+	MDRV_TPI6525_ADD("tpi6525_1", cbmb_tpi_1_intf)
+
 	MDRV_IMPORT_FROM(cbmb_cartslot)
 MACHINE_DRIVER_END
 
@@ -452,6 +482,10 @@ static MACHINE_DRIVER_START( p500 )
 	/* cia */
 	MDRV_CIA6526_ADD("cia", CIA6526R1, 0, cbmb_cia)
 
+	/* tpi */
+	MDRV_TPI6525_ADD("tpi6525_0", cbmb_tpi_0_intf)
+	MDRV_TPI6525_ADD("tpi6525_1", cbmb_tpi_1_intf)
+
 	MDRV_IMPORT_FROM(cbmb_cartslot)
 MACHINE_DRIVER_END
 
@@ -506,8 +540,8 @@ ROM_START( b256 )
 ROM_END
 
 
-#define rom_cbm610		rom_b128
-#define rom_cbm620		rom_b256
+#define rom_cbm610	rom_b128
+#define rom_cbm620	rom_b256
 
 
 ROM_START( cbm620hu )
@@ -551,8 +585,8 @@ ROM_START( b256hp )
 	ROM_LOAD( "901232-01.u25", 0x0000, 0x1000, CRC(3a350bc3) SHA1(e7f3cbc8e282f79a00c3e95d75c8d725ee3c6287) )
 ROM_END
 
-#define rom_cbm710		rom_b128hp
-#define rom_cbm720		rom_b256hp
+#define rom_cbm710	rom_b128hp
+#define rom_cbm720	rom_b256hp
 
 
 /* BX-256HP - only ROM loading added */
@@ -596,27 +630,27 @@ ROM_START( p500 )
 	ROM_LOAD( "901225-01.bin", 0x100000, 0x1000, CRC(ec4272ee) SHA1(adc7c31e18c7c7413d54802ef2f4193da14711aa) )
 ROM_END
 
+
 /***************************************************************************
 
   Game driver(s)
 
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT COMPAT MACHINE     INPUT       INIT        CONFIG  COMPANY                             FULLNAME */
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE    INPUT      INIT       CONFIG  COMPANY                             FULLNAME                                  FLAGS */
+COMP( 1983,	b500,     cbm610, 0,      cbm600,    cbm600,    cbm600,    0,      "Commodore Business Machines Co.",  "B500 (proto, 60Hz)",                     GAME_NOT_WORKING )
+COMP( 1983,	b128,     cbm610, 0,      cbm600pal, cbm600pal, cbm600pal, 0,      "Commodore Business Machines Co.",  "B128 (60Hz)",                            GAME_NOT_WORKING )
+COMP( 1983,	b256,     cbm610, 0,      cbm600pal, cbm600pal, cbm600hu,  0,      "Commodore Business Machines Co.",  "B256 (60Hz)",                            GAME_NOT_WORKING )
+COMP( 1983,	cbm610,   0,      0,      cbm600,    cbm600,    cbm600,    0,      "Commodore Business Machines Co.",  "CBM 610 (50Hz)",                         GAME_NOT_WORKING )
+COMP( 1983,	cbm620,   cbm610, 0,      cbm600pal, cbm600pal, cbm600pal, 0,      "Commodore Business Machines Co.",  "CBM 620 (50Hz)",                         GAME_NOT_WORKING )
+COMP( 1983,	cbm620hu, cbm610, 0,      cbm600pal, cbm600pal, cbm600hu,  0,      "Commodore Business Machines Co.",  "CBM 620 (Hungary, 50Hz)",                GAME_NOT_WORKING )
 
-COMP( 1983,	b500,     cbm610,   0,  cbm600,     cbm600,     cbm600,     0,   "Commodore Business Machines Co.",  "B500 (proto, 60Hz)", GAME_NOT_WORKING)
-COMP( 1983,	b128,     cbm610,   0,  cbm600pal,  cbm600pal,  cbm600pal,  0,   "Commodore Business Machines Co.",	"B128 (60Hz)", GAME_NOT_WORKING)
-COMP( 1983,	b256,     cbm610,   0,  cbm600pal,  cbm600pal,  cbm600hu,   0,   "Commodore Business Machines Co.",	"B256 (60Hz)", GAME_NOT_WORKING)
-COMP( 1983,	cbm610,   0,        0,  cbm600,     cbm600,     cbm600,     0,   "Commodore Business Machines Co.",  "CBM 610 (50Hz)", GAME_NOT_WORKING)
-COMP( 1983,	cbm620,   cbm610,   0,  cbm600pal,  cbm600pal,  cbm600pal,  0,   "Commodore Business Machines Co.",	"CBM 620 (50Hz)", GAME_NOT_WORKING)
-COMP( 1983,	cbm620hu, cbm610,   0,  cbm600pal,  cbm600pal,  cbm600hu,   0,   "Commodore Business Machines Co.",	"CBM 620 (Hungary, 50Hz)", GAME_NOT_WORKING)
+COMP( 1983, b128hp,   cbm610, 0,      cbm700,    cbm700,    cbm700,    0,      "Commodore Business Machines Co.",  "B128-80HP (60Hz)",                       GAME_NOT_WORKING )
+COMP( 1983, b256hp,   cbm610, 0,      cbm700,    cbm700,    cbm700,    0,      "Commodore Business Machines Co.",  "B256-80HP (60Hz)",                       GAME_NOT_WORKING )
+COMP( 1983, cbm710,   cbm610, 0,      cbm700pal, cbm700,    cbm700,    0,      "Commodore Business Machines Co.",  "CBM 710 (50Hz)",                         GAME_NOT_WORKING )
+COMP( 1983, cbm720,   cbm610, 0,      cbm700pal, cbm700,    cbm700,    0,      "Commodore Business Machines Co.",  "CBM 720 (50Hz)",                         GAME_NOT_WORKING )
+COMP( 1983, cbm720se, cbm610, 0,      cbm700pal, cbm700,    cbm700,    0,      "Commodore Business Machines Co.",  "CBM 720 (Sweden/Finland, 50Hz)",         GAME_NOT_WORKING )
 
-COMP( 1983, b128hp,   cbm610,   0,  cbm700,     cbm700,     cbm700,     0,   "Commodore Business Machines Co.",  "B128-80HP (60Hz)", GAME_NOT_WORKING)
-COMP( 1983, b256hp,   cbm610,   0,  cbm700,     cbm700,     cbm700,     0,   "Commodore Business Machines Co.",	"B256-80HP (60Hz)", GAME_NOT_WORKING)
-COMP( 1983, cbm710,   cbm610,   0,  cbm700pal,  cbm700,     cbm700,     0,   "Commodore Business Machines Co.",  "CBM 710 (50Hz)", GAME_NOT_WORKING)
-COMP( 1983, cbm720,   cbm610,   0,  cbm700pal,  cbm700,     cbm700,     0,   "Commodore Business Machines Co.",	"CBM 720 (50Hz)", GAME_NOT_WORKING)
-COMP( 1983, cbm720se, cbm610,   0,  cbm700pal,  cbm700,     cbm700,     0,   "Commodore Business Machines Co.",	"CBM 720 (Sweden/Finland, 50Hz)", GAME_NOT_WORKING)
+COMP( 1983,	bx256hp,  cbm610, 0,      bx256hp,   cbm700,    cbm700,    0,      "Commodore Business Machines Co.",  "BX256-80HP (60Hz)",                      GAME_NOT_WORKING )
 
-COMP( 1983,	bx256hp,  cbm610,   0,  bx256hp,    cbm700,     cbm700,     0,   "Commodore Business Machines Co.",	"BX256-80HP (60Hz)", GAME_NOT_WORKING)
-
-COMP( 1983,	p500,     0,        0,  p500,       p500,       p500,       0,   "Commodore Business Machines Co.",	"P500 (proto, a.k.a. B128-40 or Pet-II)", GAME_NOT_WORKING)
+COMP( 1983,	p500,     0,      0,      p500,      p500,      p500,      0,      "Commodore Business Machines Co.",  "P500 (proto, a.k.a. B128-40 or Pet-II)", GAME_NOT_WORKING )

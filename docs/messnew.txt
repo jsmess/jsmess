@@ -97,6 +97,9 @@ Source Changes:
 
 - Changed the SAM6883 implementation to be a device.  [Miodrag Milanovic]
 
+- Changed the 6525 TPI implementation to be a device and added save state
+  support.  [Dirk Best]
+
 - Various code cleanups.  [Atari Ace]
 
 - Fixed regression that could cause hanging when creating an image from the

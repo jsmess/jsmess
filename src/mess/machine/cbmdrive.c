@@ -1617,47 +1617,57 @@ static int c1551_read_status (running_machine *machine, CBM_Drive * drive)
 	return drive->i.iec.status;
 }
 
-void c1551_0_write_data(running_machine *machine, int data)
+
+WRITE8_DEVICE_HANDLER( c1551_0_write_data )
 {
-	c1551_write_data(machine, cbm_drive, data);
-}
-int c1551_0_read_data(running_machine *machine)
-{
-	return c1551_read_data(machine, cbm_drive);
-}
-void c1551_0_write_handshake(running_machine *machine, int data)
-{
-	c1551_write_handshake(machine, cbm_drive, data);
-}
-int c1551_0_read_handshake(running_machine *machine)
-{
-	return c1551_read_handshake(machine, cbm_drive);
-}
-int c1551_0_read_status(running_machine *machine)
-{
-	return c1551_read_status(machine, cbm_drive);
+	c1551_write_data(device->machine, cbm_drive, data);
 }
 
-void c1551_1_write_data(running_machine *machine, int data)
+READ8_DEVICE_HANDLER( c1551_0_read_data )
 {
-	c1551_write_data(machine, cbm_drive + 1, data);
+	return c1551_read_data(device->machine, cbm_drive);
 }
-int c1551_1_read_data(running_machine *machine)
+
+WRITE8_DEVICE_HANDLER( c1551_0_write_handshake )
 {
-	return c1551_read_data(machine, cbm_drive + 1);
+	c1551_write_handshake(device->machine, cbm_drive, data);
 }
-void c1551_1_write_handshake(running_machine *machine, int data)
+
+READ8_DEVICE_HANDLER( c1551_0_read_handshake )
 {
-	c1551_write_handshake (machine, cbm_drive + 1, data);
+	return c1551_read_handshake(device->machine, cbm_drive);
 }
-int c1551_1_read_handshake(running_machine *machine)
+
+READ8_DEVICE_HANDLER( c1551_0_read_status )
 {
-	return c1551_read_handshake(machine, cbm_drive + 1);
+	return c1551_read_status(device->machine, cbm_drive);
 }
-int c1551_1_read_status(running_machine *machine)
+
+WRITE8_DEVICE_HANDLER( c1551_1_write_data )
 {
-	return c1551_read_status(machine, cbm_drive + 1);
+	c1551_write_data(device->machine, cbm_drive + 1, data);
 }
+
+READ8_DEVICE_HANDLER( c1551_1_read_data )
+{
+	return c1551_read_data(device->machine, cbm_drive + 1);
+}
+
+WRITE8_DEVICE_HANDLER( c1551_1_write_handshake )
+{
+	c1551_write_handshake(device->machine, cbm_drive + 1, data);
+}
+
+READ8_DEVICE_HANDLER( c1551_1_read_handshake )
+{
+	return c1551_read_handshake(device->machine, cbm_drive + 1);
+}
+
+READ8_DEVICE_HANDLER( c1551_1_read_status )
+{
+	return c1551_read_status(device->machine, cbm_drive + 1);
+}
+
 
 /**************************************
 

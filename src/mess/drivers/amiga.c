@@ -23,6 +23,7 @@ would commence ($C00000).
 
 /* Components */
 #include "sound/custom.h"
+#include "machine/6525tpi.h"
 #include "machine/6526cia.h"
 #include "machine/amigafdc.h"
 #include "machine/amigakbd.h"
@@ -270,6 +271,20 @@ static const cia6526_interface cia_1_cdtv_intf =
 	}
 };
 
+static const tpi6525_interface cdtv_tpi_intf =
+{
+	NULL,
+	NULL,
+	amigacd_tpi6525_portc_r,
+	NULL,
+	amigacd_tpi6525_portb_w,
+	NULL,
+	NULL,
+	NULL,
+	amigacd_tpi6525_irq
+};
+
+
 static MACHINE_DRIVER_START( amiga_cartslot )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("rom,bin")
@@ -316,6 +331,18 @@ static MACHINE_DRIVER_START( ntsc )
 	MDRV_CIA8520_ADD("cia_1", 0, cia_1_intf)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( a1000n )
+	MDRV_IMPORT_FROM(ntsc)
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_PROGRAM_MAP(a1000_mem, 0)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( a500n )
+	MDRV_IMPORT_FROM(ntsc)
+	MDRV_IMPORT_FROM(amiga_cartslot)
+MACHINE_DRIVER_END
+
+
 static MACHINE_DRIVER_START( cdtv )
 	MDRV_IMPORT_FROM(ntsc)
 	MDRV_CPU_REPLACE("main", M68000, CDTV_CLOCK_X1 / 4)
@@ -332,6 +359,7 @@ static MACHINE_DRIVER_START( cdtv )
 
 	/* cdrom */
 	MDRV_CDROM_ADD( "cdrom" )
+	MDRV_TPI6525_ADD("tpi6525", cdtv_tpi_intf)
 
 	/* cia */
 	MDRV_CIA8520_REMOVE("cia_0")
@@ -340,17 +368,6 @@ static MACHINE_DRIVER_START( cdtv )
 	MDRV_CIA8520_ADD("cia_1", 0, cia_1_cdtv_intf)
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( a1000n )
-	MDRV_IMPORT_FROM(ntsc)
-	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_PROGRAM_MAP(a1000_mem, 0)	
-MACHINE_DRIVER_END
-
-
-static MACHINE_DRIVER_START( a500n )
-	MDRV_IMPORT_FROM(ntsc)
-	MDRV_IMPORT_FROM(amiga_cartslot)
-MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pal )
 	MDRV_IMPORT_FROM(ntsc)
@@ -376,7 +393,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( a1000p )
 	MDRV_IMPORT_FROM(pal)
 	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_PROGRAM_MAP(a1000_mem, 0)	
+	MDRV_CPU_PROGRAM_MAP(a1000_mem, 0)
 MACHINE_DRIVER_END
 
 /***************************************************************************
@@ -617,6 +634,7 @@ ROM_END
 static SYSTEM_CONFIG_START(amiga)
 	CONFIG_DEVICE(amiga_floppy_getinfo)
 SYSTEM_CONFIG_END
+
 
 /***************************************************************************
   Game drivers

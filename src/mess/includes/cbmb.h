@@ -28,6 +28,19 @@ extern const cia6526_interface cbmb_cia;
 
 WRITE8_HANDLER ( cbmb_colorram_w );
 
+READ8_DEVICE_HANDLER( cbmb_tpi0_port_a_r );
+WRITE8_DEVICE_HANDLER( cbmb_tpi0_port_a_w );
+
+WRITE8_DEVICE_HANDLER( cbmb_keyboard_line_select_a );
+WRITE8_DEVICE_HANDLER( cbmb_keyboard_line_select_b );
+WRITE8_DEVICE_HANDLER( cbmb_keyboard_line_select_c );
+READ8_DEVICE_HANDLER( cbmb_keyboard_line_a );
+READ8_DEVICE_HANDLER( cbmb_keyboard_line_b );
+READ8_DEVICE_HANDLER( cbmb_keyboard_line_c );
+void cbmb_irq(const device_config *device, int level);
+
+WRITE8_DEVICE_HANDLER( cbmb_change_font );
+
 DRIVER_INIT( p500 );
 DRIVER_INIT( cbm600 );
 DRIVER_INIT( cbm600pal );

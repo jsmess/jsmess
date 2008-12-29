@@ -139,9 +139,8 @@ GCR - http://www.baltissen.org/newhtm/1541c.htm
 #include "driver.h"
 #include "image.h"
 #include "cpu/m6502/m6502.h"
+#include "machine/6525tpi.h"
 #include "machine/6522via.h"
-
-#include "machine/tpi6525.h"
 
 #include "includes/vc1541.h"
 
@@ -1242,7 +1241,7 @@ static READ8_HANDLER ( c1551_port_r )
 	6 input sync 0 active
 	7 input handshake in
  */
-static int c1551_port_c_r(running_machine *machine)
+READ8_DEVICE_HANDLER( c1551_port_c_r )
 {
 	int data = 0xff;
 	
@@ -1254,8 +1253,9 @@ static int c1551_port_c_r(running_machine *machine)
 	return data;
 }
 
-static int c1551_port_b_r(running_machine *machine)
+READ8_DEVICE_HANDLER( c1551_port_b_r )
 {
+	running_machine *machine = device->machine;
 	int data = drive->gcr.data[drive->pos];
 	DBG_LOG(2, "c1551 drive",("port a read %.2x\n", data));
 	return data;
@@ -1265,91 +1265,67 @@ static int c1551_port_b_r(running_machine *machine)
 static ADDRESS_MAP_START( _1551_map, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x0000, 0x0001) AM_READWRITE(c1551_port_r, c1551_port_w)
 	AM_RANGE(0x0002, 0x07ff) AM_RAM
-    AM_RANGE(0x4000, 0x4007) AM_READWRITE(tpi6525_0_port_r, tpi6525_0_port_w)
+    AM_RANGE(0x4000, 0x4007) AM_DEVREADWRITE(TPI6525, "c1551_tpi", tpi6525_r, tpi6525_w)
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
-static void c1551x_write_data (running_machine *machine, TPI6525 *This, int data)
+WRITE8_DEVICE_HANDLER( c1551x_write_data )
 {
 //	DBG_LOG(1, "c1551 cpu", ("%d write data %.2x\n", cpu_getactivecpu (), data));
 #ifdef CPU_SYNC
 	cpu_sync();
 #endif
-	tpi6525_0_port_a_w(cpu_get_address_space(machine->cpu[drive->cpunumber], ADDRESS_SPACE_PROGRAM), 0,data);
+	tpi6525_porta_w(device, 0, data);
 }
 
-static int c1551x_read_data (running_machine *machine, TPI6525 *This)
+READ8_DEVICE_HANDLER( c1551x_read_data )
 {
 	int data = 0xff;
 #ifdef CPU_SYNC
 	cpu_sync ();
 #endif
 
-	data = tpi6525_0_port_a_r(cpu_get_address_space(machine->cpu[drive->cpunumber], ADDRESS_SPACE_PROGRAM), 0);
+	data = tpi6525_porta_r(device, 0);
 //	DBG_LOG(2, "c1551 cpu",("%d read data %.2x\n", cpu_getactivecpu (), data));
 	return data;
 }
 
-static void c1551x_write_handshake (running_machine *machine, TPI6525 *This, int data)
+WRITE8_DEVICE_HANDLER( c1551x_write_handshake )
 {
 //	DBG_LOG(1, "c1551 cpu",("%d write handshake %.2x\n", cpu_getactivecpu (), data));
 #ifdef CPU_SYNC
 	cpu_sync();
 #endif
 
-	tpi6525_0_port_c_w(cpu_get_address_space(machine->cpu[drive->cpunumber], ADDRESS_SPACE_PROGRAM), 0,data&0x40?0xff:0x7f);
+	tpi6525_portc_w(device, 0, data & 0x40 ? 0xff : 0x7f);
 }
 
-static int c1551x_read_handshake (running_machine *machine, TPI6525 *This)
+READ8_DEVICE_HANDLER( c1551x_read_handshake )
 {
 	int data = 0xff;
 #ifdef CPU_SYNC
 	cpu_sync();
 #endif
 
-	data = tpi6525_0_port_c_r(cpu_get_address_space(machine->cpu[drive->cpunumber], ADDRESS_SPACE_PROGRAM), 0) & 0x08 ? 0x80 : 0x00;
+	data = tpi6525_portc_r(device, 0) & 0x08 ? 0x80 : 0x00;
 //	DBG_LOG(2, "c1551 cpu",("%d read handshake %.2x\n", cpu_getactivecpu (), data));
 	return data;
 }
 
-static int c1551x_read_status (running_machine *machine, TPI6525 *This)
+READ8_DEVICE_HANDLER( c1551x_read_status )
 {
 	int data = 0xff;
 #ifdef CPU_SYNC
 	cpu_sync();
 #endif
 
-	data = tpi6525_0_port_c_r(cpu_get_address_space(machine->cpu[drive->cpunumber], ADDRESS_SPACE_PROGRAM), 0) & 0x03;
+	data = tpi6525_portc_r(device, 0) & 0x03;
 //	DBG_LOG(1, "c1551 cpu",("%d read status %.2x\n", cpu_getactivecpu (), data));
 
 	return data;
 }
 
-void c1551x_0_write_data(running_machine *machine, int data)
-{
-	c1551x_write_data(machine, tpi6525, data);
-}
-
-int c1551x_0_read_data(running_machine *machine)
-{
-	return c1551x_read_data(machine, tpi6525);
-}
-
-void c1551x_0_write_handshake(running_machine *machine, int data)
-{
-	c1551x_write_handshake(machine, tpi6525, data);
-}
-
-int c1551x_0_read_handshake(running_machine *machine)
-{
-	return c1551x_read_handshake(machine, tpi6525);
-}
-
-int c1551x_0_read_status(running_machine *machine)
-{
-	return c1551x_read_status(machine, tpi6525);
-}
 
 /**************************************
 
@@ -1366,9 +1342,6 @@ int drive_config (running_machine *machine, int type, int id, int mode, int cpun
 
 	if (type == type_1551)
 	{
-		tpi6525[0].c.read = c1551_port_c_r;
-		tpi6525[0].b.read = c1551_port_b_r;
-
 		/* time should be small enough to allow quitting of the irq
 		line before the next interrupt is triggered */
 		drive->drive.c1551.irq_timer = timer_alloc(machine, c1551_irq_timer, NULL);
@@ -1391,18 +1364,28 @@ void drive_reset (void)
 	}
 
 	drive->track = 1.0;
-
-	if ((drive->type == type_1551)) 
-	{
-		tpi6525_0_reset();
-	}
 }
+
 
 /**************************************
 
 	Machine drivers
 
 **************************************/
+
+const tpi6525_interface c1551_tpi_intf =
+{
+	NULL,
+	c1551_port_b_r,
+	c1551_port_c_r,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	NULL
+};
+
 
 MACHINE_DRIVER_START( cpu_vc1540 )
 	MDRV_CPU_ADD("cpu_vc1540", M6502, XTAL_16_MHz / 16)
@@ -1425,6 +1408,9 @@ MACHINE_DRIVER_END
 MACHINE_DRIVER_START( cpu_c1551 )
 	MDRV_CPU_ADD("cpu_c1551", M6510T, 2000000)
 	MDRV_CPU_PROGRAM_MAP(_1551_map, 0)
+
+	/* tpi */
+	MDRV_TPI6525_ADD("c1551_tpi", c1551_tpi_intf)
 MACHINE_DRIVER_END
 
 MACHINE_DRIVER_START( cpu_c1571 )
