@@ -91,13 +91,18 @@ DEVICE_IMAGE_LOAD (msx_cart)
 	const char *extra;
 	char *sramfile;
 	slot_state *state;
-	int id;
+	int id = -1;
 
 	if (strcmp(image->tag,"cart1")==0) {
 		id = 0;
 	}
 	if (strcmp(image->tag,"cart2")==0) {
 		id = 1;
+	}
+	
+	if( id == -1 ) {
+		logerror ("error: invalid cart tag '%s'\n", image->tag);
+		return INIT_FAIL;
 	}
 
 	size = image_length (image);
@@ -272,7 +277,7 @@ DEVICE_IMAGE_LOAD (msx_cart)
 
 DEVICE_IMAGE_UNLOAD (msx_cart)
 {
-	int id;
+	int id = -1;
 
 	if (strcmp(image->tag,"cart1")==0) {
 		id = 0;
@@ -280,6 +285,12 @@ DEVICE_IMAGE_UNLOAD (msx_cart)
 	if (strcmp(image->tag,"cart2")==0) {
 		id = 1;
 	}
+	
+	if( id == -1 ) {
+		logerror ("error: invalid cart tag '%s'\n", image->tag);
+		return;
+	}
+	
 	if (msx_slot_list[msx1.cart_state[id]->type].savesram)
 	{
 		msx_slot_list[msx1.cart_state[id]->type].savesram (msx1.cart_state[id]);
