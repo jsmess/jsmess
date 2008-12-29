@@ -84,6 +84,7 @@
 #define	__const				/* delete pseudo-ANSI C keywords */
 #define	__inline
 #define	__signed
+#undef __volatile
 #define	__volatile
 /*
  * In non-ANSI C environments, new programs will want ANSI-only C keywords
