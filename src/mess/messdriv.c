@@ -206,7 +206,7 @@ const game_driver * const drivers[] =
 	DRIVER( bbcm)		/* 198? BBC Master									*/
 	DRIVER( bbcbc )		/* 1985 BBC Bridge Companion						*/
 	DRIVER( electron )	/* 1983 Acorn Electron								*/
-//128u7	DRIVER( a310 )		/* 1988 Acorn Archimedes 310						*/
+//	DRIVER( a310 )		/* 1988 Acorn Archimedes 310						*/
 
 	/* CAMBRIDGE COMPUTERS */
 	DRIVER( z88 )		/*													*/
