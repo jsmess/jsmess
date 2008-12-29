@@ -1,13 +1,13 @@
 /***************************************************************************
 
   Sony Playstaion
-  ========-------
+  ===============
   Preliminary driver by smf
 
   todo:
     add memcard support
     tidy up cd controller
-    work out why bios schph1000 doesn't get past the first screen
+    work out why bios scph1000 doesn't get past the first screen
     add cd image support
 
 ***************************************************************************/
@@ -18,82 +18,10 @@
 #include "includes/psx.h"
 #include "sound/psx.h"
 #include "debugger.h"
+#include "zlib.h"
 
-static struct
-{
-	UINT8 id[ 8 ];
-	UINT32 text;	/* SCE only */
-	UINT32 data;	/* SCE only */
-	UINT32 pc0;
-	UINT32 gp0;		/* SCE only */
-	UINT32 t_addr;
-	UINT32 t_size;
-	UINT32 d_addr;	/* SCE only */
-	UINT32 d_size;	/* SCE only */
-	UINT32 b_addr;	/* SCE only */
-	UINT32 b_size;	/* SCE only */
-	UINT32 s_addr;
-	UINT32 s_size;
-	UINT32 SavedSP;
-	UINT32 SavedFP;
-	UINT32 SavedGP;
-	UINT32 SavedRA;
-	UINT32 SavedS0;
-	UINT8 dummy[ 0x800 - 76 ];
-} m_psxexe_header;
-
-static UINT8 *m_p_psxexe;
-
-static DIRECT_UPDATE_HANDLER( psx_setopbase )
-{
-	if( address == 0x80030000 )
-	{
-		UINT8 *p_ram;
-		UINT8 *p_psxexe;
-		UINT32 n_stack;
-		UINT32 n_ram;
-		UINT32 n_left;
-		UINT32 n_address;
-
-		logerror( "psx_exe_load: pc  %08x\n", m_psxexe_header.pc0 );
-		logerror( "psx_exe_load: org %08x\n", m_psxexe_header.t_addr );
-		logerror( "psx_exe_load: len %08x\n", m_psxexe_header.t_size );
-		logerror( "psx_exe_load: sp  %08x\n", m_psxexe_header.s_addr );
-		logerror( "psx_exe_load: len %08x\n", m_psxexe_header.s_size );
-
-		p_ram = (UINT8 *)g_p_n_psxram;
-		n_ram = g_n_psxramsize;
-
-		p_psxexe = m_p_psxexe;
-
-		n_address = m_psxexe_header.t_addr;
-		n_left = m_psxexe_header.t_size;
-		while( n_left != 0 )
-		{
-			p_ram[ BYTE4_XOR_LE( n_address ) % n_ram ] = *( p_psxexe );
-			n_address++;
-			p_psxexe++;
-			n_left--;
-		}
-
-		free( m_p_psxexe );
-
-		cpu_set_reg( space->machine->cpu[0], PSXCPU_PC, m_psxexe_header.pc0 );
-		cpu_set_reg( space->machine->cpu[0], PSXCPU_R28, m_psxexe_header.gp0 );
-		n_stack = m_psxexe_header.s_addr + m_psxexe_header.s_size;
-		if( n_stack != 0 )
-		{
-			cpu_set_reg( space->machine->cpu[0], PSXCPU_R29, n_stack );
-			cpu_set_reg( space->machine->cpu[0], PSXCPU_R30, n_stack );
-		}
-
-		memory_set_direct_update_handler( space, NULL );
-
-		return m_psxexe_header.pc0;
-	}
-
-	return address;
-}
+static UINT8 *exe_buffer;
+static int exe_size;
 
 static void psxexe_conv32( UINT32 *p_uint32 )
 {
@@ -107,49 +35,387 @@ static void psxexe_conv32( UINT32 *p_uint32 )
 		( p_uint8[ 3 ] << 24 );
 }
 
+static int load_psxexe( const device_config *cpu, unsigned char *p_n_file, int n_len )
+{
+	struct PSXEXE_HEADER
+	{
+		UINT8 id[ 8 ];
+		UINT32 text;	/* SCE only */
+		UINT32 data;	/* SCE only */
+		UINT32 pc0;
+		UINT32 gp0;		/* SCE only */
+		UINT32 t_addr;
+		UINT32 t_size;
+		UINT32 d_addr;	/* SCE only */
+		UINT32 d_size;	/* SCE only */
+		UINT32 b_addr;	/* SCE only */
+		UINT32 b_size;	/* SCE only */
+		UINT32 s_addr;
+		UINT32 s_size;
+		UINT32 SavedSP;
+		UINT32 SavedFP;
+		UINT32 SavedGP;
+		UINT32 SavedRA;
+		UINT32 SavedS0;
+		UINT8 dummy[ 0x800 - 76 ];
+	};
+
+	struct PSXEXE_HEADER *psxexe_header = (struct PSXEXE_HEADER *)p_n_file;
+
+	if( n_len >= sizeof( struct PSXEXE_HEADER ) &&
+		memcmp( psxexe_header->id, "PS-X EXE", 8 ) == 0 )
+	{
+		UINT8 *p_ram;
+		UINT8 *p_psxexe;
+		UINT32 n_stack;
+		UINT32 n_ram;
+		UINT32 n_address;
+		UINT32 n_size;
+
+		psxexe_conv32( &psxexe_header->text );
+		psxexe_conv32( &psxexe_header->data );
+		psxexe_conv32( &psxexe_header->pc0 );
+		psxexe_conv32( &psxexe_header->gp0 );
+		psxexe_conv32( &psxexe_header->t_addr );
+		psxexe_conv32( &psxexe_header->t_size );
+		psxexe_conv32( &psxexe_header->d_addr );
+		psxexe_conv32( &psxexe_header->d_size );
+		psxexe_conv32( &psxexe_header->b_addr );
+		psxexe_conv32( &psxexe_header->b_size );
+		psxexe_conv32( &psxexe_header->s_addr );
+		psxexe_conv32( &psxexe_header->s_size );
+		psxexe_conv32( &psxexe_header->SavedSP );
+		psxexe_conv32( &psxexe_header->SavedFP );
+		psxexe_conv32( &psxexe_header->SavedGP );
+		psxexe_conv32( &psxexe_header->SavedRA );
+		psxexe_conv32( &psxexe_header->SavedS0 );
+
+		/* todo: check size.. */
+
+		logerror( "psx_exe_load: pc    %08x\n", psxexe_header->pc0 );
+		logerror( "psx_exe_load: org   %08x\n", psxexe_header->t_addr );
+		logerror( "psx_exe_load: len   %08x\n", psxexe_header->t_size );
+		logerror( "psx_exe_load: sp    %08x\n", psxexe_header->s_addr );
+		logerror( "psx_exe_load: len   %08x\n", psxexe_header->s_size );
+
+		p_ram = (UINT8 *)g_p_n_psxram;
+		n_ram = g_n_psxramsize;
+
+		p_psxexe = p_n_file + sizeof( struct PSXEXE_HEADER );
+
+		n_address = psxexe_header->t_addr;
+		n_size = psxexe_header->t_size;
+		while( n_size != 0 )
+		{
+			p_ram[ BYTE4_XOR_LE( n_address ) % n_ram ] = *( p_psxexe );
+			n_address++;
+			p_psxexe++;
+			n_size--;
+		}
+
+		cpu_set_reg( cpu, PSXCPU_PC, psxexe_header->pc0 );
+		cpu_set_reg( cpu, PSXCPU_R28, psxexe_header->gp0 );
+		n_stack = psxexe_header->s_addr + psxexe_header->s_size;
+		if( n_stack != 0 )
+		{
+			cpu_set_reg( cpu, PSXCPU_R29, n_stack );
+			cpu_set_reg( cpu, PSXCPU_R30, n_stack );
+		}
+
+		return 1;
+	}
+	return 0;
+}
+
+static void cpe_set_register( const device_config *cpu, int n_reg, int n_value )
+{
+	if( n_reg < 0x80 && ( n_reg % 4 ) == 0 )
+	{
+		logerror( "psx_exe_load: r%-2d   %08x\n", n_reg / 4, n_value );
+		cpu_set_reg( cpu, PSXCPU_R0 + ( n_reg / 4 ), n_value );
+	}
+	else if( n_reg == 0x80 )
+	{
+		logerror( "psx_exe_load: lo    %08x\n", n_value );
+		cpu_set_reg( cpu, PSXCPU_LO, n_value );
+	}
+	else if( n_reg == 0x84 )
+	{
+		logerror( "psx_exe_load: hi    %08x\n", n_value );
+		cpu_set_reg( cpu, PSXCPU_HI, n_value );
+	}
+	else if( n_reg == 0x88 )
+	{
+		logerror( "psx_exe_load: sr    %08x\n", n_value );
+		cpu_set_reg( cpu, PSXCPU_CP0R12, n_value );
+	}
+	else if( n_reg == 0x8c )
+	{
+		logerror( "psx_exe_load: cause %08x\n", n_value );
+		cpu_set_reg( cpu, PSXCPU_CP0R13, n_value );
+	}
+	else if( n_reg == 0x90 )
+	{
+		logerror( "psx_exe_load: pc    %08x\n", n_value );
+		cpu_set_reg( cpu, PSXCPU_PC, n_value );
+	}
+	else if( n_reg == 0x94 )
+	{
+		logerror( "psx_exe_load: prid  %08x\n", n_value );
+		cpu_set_reg( cpu, PSXCPU_CP0R15, n_value );
+	}
+	else
+	{
+		logerror( "psx_exe_load: invalid register %04x/%08x\n", n_reg, n_value );
+	}
+}
+
+static int load_cpe( const device_config *cpu, unsigned char *p_n_file, int n_len )
+{
+	if( n_len >= 4 &&
+		memcmp( p_n_file, "CPE\001", 4 ) == 0 )
+	{
+		int n_offset = 4;
+
+		for( ;; )
+		{
+			if( n_offset >= n_len || p_n_file[ n_offset ] > 8 )
+			{
+				break;
+			}
+
+			switch( p_n_file[ n_offset++ ] )
+			{
+			case 0:
+				/* end of file */
+				return 1;
+			case 1:
+				/* read bytes */
+				{
+					int n_address = ( (int)p_n_file[ n_offset + 0 ] << 0 ) |
+						( (int)p_n_file[ n_offset + 1 ] << 8 ) |
+						( (int)p_n_file[ n_offset + 2 ] << 16 ) |
+						( (int)p_n_file[ n_offset + 3 ] << 24 );
+					int n_size = ( (int)p_n_file[ n_offset + 4 ] << 0 ) |
+						( (int)p_n_file[ n_offset + 5 ] << 8 ) |
+						( (int)p_n_file[ n_offset + 6 ] << 16 ) |
+						( (int)p_n_file[ n_offset + 7 ] << 24 );
+
+					UINT8 *p_ram = (UINT8 *)g_p_n_psxram;
+					UINT32 n_ram = g_n_psxramsize;
+
+					n_offset += 8;
+
+					logerror( "psx_exe_load: org   %08x\n", n_address );
+					logerror( "psx_exe_load: len   %08x\n", n_size );
+
+					while( n_size > 0 )
+					{
+						p_ram[ BYTE4_XOR_LE( n_address ) % n_ram ] = p_n_file[ n_offset++ ];
+						n_address++;
+						n_size--;
+					}
+					break;
+				}
+			case 2:
+				/* run address: not tested */
+				{
+					int n_value = ( (int)p_n_file[ n_offset + 2 ] << 0 ) |
+						( (int)p_n_file[ n_offset + 3 ] << 8 ) |
+						( (int)p_n_file[ n_offset + 4 ] << 16 ) |
+						( (int)p_n_file[ n_offset + 5 ] << 24 );
+
+					n_offset += 4;
+
+					cpe_set_register( cpu, 0x90, n_value );
+					break;
+				}
+			case 3:
+				/* set reg to longword */
+				{
+					int n_reg = ( (int)p_n_file[ n_offset + 0 ] << 0 ) |
+						( (int)p_n_file[ n_offset + 1 ] << 8 );
+					int n_value = ( (int)p_n_file[ n_offset + 2 ] << 0 ) |
+						( (int)p_n_file[ n_offset + 3 ] << 8 ) |
+						( (int)p_n_file[ n_offset + 4 ] << 16 ) |
+						( (int)p_n_file[ n_offset + 5 ] << 24 );
+
+					n_offset += 6;
+
+					cpe_set_register( cpu, n_reg, n_value );
+					break;
+				}
+			case 4:
+				/* set reg to word: not tested */
+				{
+					int n_reg = ( (int)p_n_file[ n_offset + 0 ] << 0 ) |
+						( (int)p_n_file[ n_offset + 1 ] << 8 );
+					int n_value = ( (int)p_n_file[ n_offset + 2 ] << 0 ) |
+						( (int)p_n_file[ n_offset + 3 ] << 8 );
+
+					n_offset += 4;
+
+					cpe_set_register( cpu, n_reg, n_value );
+					break;
+				}
+			case 5:
+				/* set reg to byte: not tested */
+				{
+					int n_reg = ( (int)p_n_file[ n_offset + 0 ] << 0 ) |
+						( (int)p_n_file[ n_offset + 1 ] << 8 );
+					int n_value = ( (int)p_n_file[ n_offset + 2 ] << 0 );
+
+					n_offset += 3;
+
+					cpe_set_register( cpu, n_reg, n_value );
+					break;
+				}
+			case 6:
+				/* set reg to 3-byte: not tested */
+				{
+					int n_reg = ( (int)p_n_file[ n_offset + 0 ] << 0 ) |
+						( (int)p_n_file[ n_offset + 1 ] << 8 );
+					int n_value = ( (int)p_n_file[ n_offset + 2 ] << 0 ) |
+						( (int)p_n_file[ n_offset + 3 ] << 8 ) |
+						( (int)p_n_file[ n_offset + 4 ] << 16 );
+
+					n_offset += 5;
+
+					cpe_set_register( cpu, n_reg, n_value );
+					break;
+				}
+			case 7:
+				/* workspace: not tested */
+				n_offset += 4;
+				break;
+			case 8:
+				/* unit */
+				{
+					int n_unit = p_n_file[ n_offset + 0 ];
+
+					n_offset++;
+
+					logerror( "psx_exe_load: unit  %08x\n", n_unit );
+				}
+				break;
+			}
+		}
+	}
+	return 0;
+}
+
+static int load_psf( const device_config *cpu, unsigned char *p_n_file, int n_len )
+{
+	int n_return;
+	unsigned long n_crc;
+	unsigned long n_compressed;
+	unsigned char *p_n_compressed;
+	unsigned long n_uncompressed;
+	unsigned char *p_n_uncompressed;
+
+	struct PSF_HEADER
+	{
+		unsigned char id[ 4 ];
+		UINT32 reserved_size;
+		UINT32 exe_size;
+		UINT32 exe_crc;
+	};
+
+	struct PSF_HEADER *psf_header = (struct PSF_HEADER *)p_n_file;
+
+	n_return = 0;
+
+	if( n_len >= sizeof( struct PSF_HEADER ) &&
+		memcmp( p_n_file, "PSF", 3 ) == 0 )
+	{
+		psxexe_conv32( &psf_header->reserved_size );
+		psxexe_conv32( &psf_header->exe_size );
+		psxexe_conv32( &psf_header->exe_crc );
+
+		logerror( "psx_exe_load: reserved_size %08x\n", psf_header->reserved_size );
+		logerror( "psx_exe_load: exe_size      %08x\n", psf_header->exe_size );
+		logerror( "psx_exe_load: exe_crc       %08x\n", psf_header->exe_crc );
+
+		n_compressed = psf_header->exe_size;
+		p_n_compressed = p_n_file + sizeof( struct PSF_HEADER ) + psf_header->reserved_size;
+
+		n_crc = crc32( crc32( 0L, Z_NULL, 0 ), p_n_compressed, n_compressed );
+		if( n_crc != psf_header->exe_crc )
+		{
+			logerror( "psx_exe_load: psf invalid crc\n" );
+			return 0;
+		}
+
+		n_uncompressed = 0x200000;
+		p_n_uncompressed = malloc( n_uncompressed );
+
+		if( uncompress( p_n_uncompressed, &n_uncompressed, p_n_compressed, n_compressed ) != Z_OK )
+		{
+			logerror( "psx_exe_load: psf uncompress failed\n" );
+		}
+		else if( !load_psxexe( cpu, p_n_uncompressed, n_uncompressed ) )
+		{
+			logerror( "psx_exe_load: psf load failed\n" );
+		}
+		else
+		{
+			n_return = 1;
+		}
+
+		free( p_n_uncompressed );
+	}
+	return n_return;
+}
+
+static DIRECT_UPDATE_HANDLER( psx_setopbase )
+{
+	if( address == 0x80030000 )
+	{
+		const device_config *cpu = space->machine->cpu[ 0 ];
+
+		memory_set_direct_update_handler( space, NULL );
+
+		if( load_psxexe( cpu, exe_buffer, exe_size ) ||
+			load_cpe( cpu, exe_buffer, exe_size ) ||
+			load_psf( cpu, exe_buffer, exe_size ) )
+		{
+/*			DEBUGGER_BREAK; */
+
+			address = cpu_get_reg( cpu, PSXCPU_PC );
+		}
+		else
+		{
+			logerror( "psx_exe_load: invalid exe\n" );
+		}
+
+		exe_size = 0;
+		free( exe_buffer );
+	}
+	return address;
+}
+
 static QUICKLOAD_LOAD( psx_exe_load )
 {
 	const address_space *space = cpu_get_address_space( image->machine->cpu[0], ADDRESS_SPACE_PROGRAM );
 
-	if( image_fread( image, &m_psxexe_header, sizeof( m_psxexe_header ) ) != sizeof( m_psxexe_header ) )
-	{
-		logerror( "psx_exe_load: invalid exe\n" );
-		return INIT_FAIL;
-	}
-	if( memcmp( m_psxexe_header.id, "PS-X EXE", 8 ) != 0 )
-	{
-		logerror( "psx_exe_load: invalid header id\n" );
-		return INIT_FAIL;
-	}
-
-	psxexe_conv32( &m_psxexe_header.text );
-	psxexe_conv32( &m_psxexe_header.data );
-	psxexe_conv32( &m_psxexe_header.pc0 );
-	psxexe_conv32( &m_psxexe_header.gp0 );
-	psxexe_conv32( &m_psxexe_header.t_addr );
-	psxexe_conv32( &m_psxexe_header.t_size );
-	psxexe_conv32( &m_psxexe_header.d_addr );
-	psxexe_conv32( &m_psxexe_header.d_size );
-	psxexe_conv32( &m_psxexe_header.b_addr );
-	psxexe_conv32( &m_psxexe_header.b_size );
-	psxexe_conv32( &m_psxexe_header.s_addr );
-	psxexe_conv32( &m_psxexe_header.s_size );
-	psxexe_conv32( &m_psxexe_header.SavedSP );
-	psxexe_conv32( &m_psxexe_header.SavedFP );
-	psxexe_conv32( &m_psxexe_header.SavedGP );
-	psxexe_conv32( &m_psxexe_header.SavedRA );
-	psxexe_conv32( &m_psxexe_header.SavedS0 );
-
-	m_p_psxexe = malloc( m_psxexe_header.t_size );
-	if( m_p_psxexe == NULL )
+	exe_size = 0;
+	exe_buffer = malloc( quickload_size );
+	if( exe_buffer == NULL )
 	{
 		logerror( "psx_exe_load: out of memory\n" );
 		return INIT_FAIL;
 	}
-	image_fread( image, m_p_psxexe, m_psxexe_header.t_size );
+	if( image_fread( image, exe_buffer, quickload_size ) != quickload_size )
+	{
+		free( exe_buffer );
+		return INIT_FAIL;
+	}
+	exe_size = quickload_size;
 	memory_set_direct_update_handler( space, psx_setopbase );
 	return INIT_PASS;
 }
+
+/* PAD emulation */
 
 #define PAD_STATE_IDLE ( 0 )
 #define PAD_STATE_LISTEN ( 1 )
@@ -805,7 +1071,7 @@ static MACHINE_DRIVER_START( psxntsc )
 	MDRV_SOUND_ROUTE( 1, "right", 1.00 )
 
 	/* quickload */
-	MDRV_QUICKLOAD_ADD(psx_exe_load, "exe,psx", 0)
+	MDRV_QUICKLOAD_ADD(psx_exe_load, "cpe,exe,psf,psx", 0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( psxpal )
@@ -838,7 +1104,7 @@ static MACHINE_DRIVER_START( psxpal )
 	MDRV_SOUND_ROUTE( 1, "right", 1.00 )
 
 	/* quickload */
-	MDRV_QUICKLOAD_ADD(psx_exe_load, "exe,psx", 0)
+	MDRV_QUICKLOAD_ADD(psx_exe_load, "cpe,exe,psf,psx", 0)
 MACHINE_DRIVER_END
 
 ROM_START( psj )
