@@ -226,9 +226,13 @@ DEVICE_GET_INFO(cartslot)
 		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Cartslot"); break;
 		case DEVINFO_STR_SOURCE_FILE:				strcpy(info->s, __FILE__); break;
 		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:
-			if ( device && device->inline_config )
+			if ( device && device->inline_config && get_config(device)->extensions )
 			{
 				strcpy(info->s, get_config(device)->extensions);
+			}
+			else
+			{
+				strcpy(info->s, "bin");
 			}
 			break;
 	}
