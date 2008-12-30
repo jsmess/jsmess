@@ -152,8 +152,6 @@ INPUT_PORTS_END
 static unsigned char gmaster_palette[2][3] =
 {
 #if 1
-    // ziemlich schwierig den lcd touch rüberzubringen
-    // es ist hauptsächlich die das fleckige grünlich, bläuliche
     { 130, 159, 166 },
     { 45,45,43 }
 #else
@@ -202,7 +200,7 @@ static VIDEO_UPDATE( gmaster )
 
 static INTERRUPT_GEN( gmaster_interrupt )
 {
-  cpu_set_input_line(device->machine->cpu[0], UPD7810_INTFE1, PULSE_LINE);
+  cpu_set_input_line(device->machine->cpu[0], UPD7810_INTFE1, ASSERT_LINE);
 }
 
 static UPD7810_CONFIG config={
