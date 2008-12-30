@@ -160,7 +160,7 @@ static TIMER_CALLBACK( hp48_rs232_byte_recv_cb )
 	/* interrupt */
 	if ( hp48_io[0x10] & 2 )
 	{
-		cpu_set_input_line( machine->cpu[0], SATURN_IRQ_LINE, PULSE_LINE );
+		cpu_set_input_line( machine->cpu[0], SATURN_IRQ_LINE, ASSERT_LINE );
 	}
 }
 
@@ -175,7 +175,7 @@ void hp48_rs232_start_recv_byte( running_machine *machine, UINT8 data )
 	/* interrupt */
 	if ( hp48_io[0x10] & 1 )
 	{
-		cpu_set_input_line( machine->cpu[0], SATURN_IRQ_LINE, PULSE_LINE );
+		cpu_set_input_line( machine->cpu[0], SATURN_IRQ_LINE, ASSERT_LINE );
 	}
 
 	/* schedule end of reception */
@@ -197,7 +197,7 @@ static TIMER_CALLBACK( hp48_rs232_byte_sent_cb )
 	/* interrupt */
 	if ( hp48_io[0x10] & 4 )
 	{
-		cpu_set_input_line( machine->cpu[0], SATURN_IRQ_LINE, PULSE_LINE );
+		cpu_set_input_line( machine->cpu[0], SATURN_IRQ_LINE, ASSERT_LINE );
 	}
 
 	/* protocol action */
@@ -251,7 +251,7 @@ static TIMER_CALLBACK( hp48_chardev_byte_recv_cb )
 	/* interrupt */
 	if ( hp48_io[0x10] & 2 )
 	{
-		cpu_set_input_line( machine->cpu[0], SATURN_IRQ_LINE, PULSE_LINE );
+		cpu_set_input_line( machine->cpu[0], SATURN_IRQ_LINE, ASSERT_LINE );
 	}
 }
 
@@ -267,7 +267,7 @@ static void hp48_chardev_start_recv_byte( running_machine *machine, chardev_err 
 	/* interrupt */
 	if ( hp48_io[0x10] & 1 )
 	{
-		cpu_set_input_line( machine->cpu[0], SATURN_IRQ_LINE, PULSE_LINE );
+		cpu_set_input_line( machine->cpu[0], SATURN_IRQ_LINE, ASSERT_LINE );
 	}
 
 	/* schedule end of reception */
@@ -281,7 +281,7 @@ static void hp48_chardev_ready_to_send( running_machine *machine )
 	/* interrupt */
 	if ( hp48_io[0x10] & 4 )
 	{
-		cpu_set_input_line( machine->cpu[0], SATURN_IRQ_LINE, PULSE_LINE );
+		cpu_set_input_line( machine->cpu[0], SATURN_IRQ_LINE, ASSERT_LINE );
 	}
 }
 
@@ -349,8 +349,8 @@ static void hp48_update_kdn( running_machine *machine )
 	{
 		LOG(( "%f hp48_update_kdn: interrupt\n", attotime_to_double(timer_get_time(machine)) ));
 		hp48_io[0x19] |= 8;                                              /* service request */
-		cpu_set_input_line( machine->cpu[0], SATURN_WAKEUP_LINE, PULSE_LINE );     /* wake-up */
-		cpu_set_input_line( machine->cpu[0], SATURN_IRQ_LINE, PULSE_LINE );      /* interrupt */
+		cpu_set_input_line( machine->cpu[0], SATURN_WAKEUP_LINE, ASSERT_LINE );     /* wake-up */
+		cpu_set_input_line( machine->cpu[0], SATURN_IRQ_LINE, ASSERT_LINE );      /* interrupt */
 	}
 
 	hp48_kdn = (in!=0);
@@ -365,8 +365,8 @@ static TIMER_CALLBACK( hp48_kbd_cb )
 		LOG(( "%f hp48_kbd_cb: keyboard interrupt, on key\n", 
 		      attotime_to_double(timer_get_time(machine)) ));	
 		hp48_io[0x19] |= 8;                                          /* set service request */
-		cpu_set_input_line( machine->cpu[0], SATURN_WAKEUP_LINE, PULSE_LINE );     /* wake-up */
-		cpu_set_input_line( machine->cpu[0], SATURN_NMI_LINE, PULSE_LINE );      /* interrupt */
+		cpu_set_input_line( machine->cpu[0], SATURN_WAKEUP_LINE, ASSERT_LINE );     /* wake-up */
+		cpu_set_input_line( machine->cpu[0], SATURN_NMI_LINE, ASSERT_LINE );      /* interrupt */
 		return;
 	}
 
@@ -469,7 +469,7 @@ static WRITE8_HANDLER ( hp48_io_w )
 		{
 			LOG(( "%f hp48_io_w: software interrupt requested\n", 
 			      attotime_to_double(timer_get_time(space->machine)) ));
-			cpu_set_input_line( space->machine->cpu[0], SATURN_IRQ_LINE, PULSE_LINE );
+			cpu_set_input_line( space->machine->cpu[0], SATURN_IRQ_LINE, ASSERT_LINE );
 			data &= ~1;
 		}
 
@@ -672,7 +672,7 @@ static TIMER_CALLBACK( hp48_timer1_cb )
 		LOG(( "wake-up on timer1\n" ));
 		hp48_io[0x2e] |= 8;                                      /* set service request */
 		hp48_io[0x18] |= 4;                                      /* set service request */
-		cpu_set_input_line( machine->cpu[0], SATURN_WAKEUP_LINE, PULSE_LINE ); /* wake-up */
+		cpu_set_input_line( machine->cpu[0], SATURN_WAKEUP_LINE, ASSERT_LINE ); /* wake-up */
 	}
 	/* interrupt on carry */
 	if ( (hp48_io[0x2e] & 2) && (hp48_timer1 == 0xf) )
@@ -680,7 +680,7 @@ static TIMER_CALLBACK( hp48_timer1_cb )
 		LOG(( "generate timer1 interrupt\n" ));
 		hp48_io[0x2e] |= 8; /* set service request */
 		hp48_io[0x18] |= 4; /* set service request */
-		cpu_set_input_line(machine->cpu[0], SATURN_NMI_LINE, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[0], SATURN_NMI_LINE, ASSERT_LINE);
 	}
 }
 
@@ -696,7 +696,7 @@ static TIMER_CALLBACK( hp48_timer2_cb )
 		LOG(( "wake-up on timer2\n" ));
 		hp48_io[0x2f] |= 8;                                      /* set service request */
 		hp48_io[0x18] |= 4;                                      /* set service request */
-		cpu_set_input_line( machine->cpu[0], SATURN_WAKEUP_LINE, PULSE_LINE ); /* wake-up */
+		cpu_set_input_line( machine->cpu[0], SATURN_WAKEUP_LINE, ASSERT_LINE ); /* wake-up */
 	}
 	/* interrupt on carry */
 	if ( (hp48_io[0x2f] & 2) && (hp48_timer2 == 0xffffffff) )
@@ -704,7 +704,7 @@ static TIMER_CALLBACK( hp48_timer2_cb )
 		LOG(( "generate timer2 interrupt\n" ));
 		hp48_io[0x2f] |= 8;                                      /* set service request */
 		hp48_io[0x18] |= 4;                                      /* set service request */
-		cpu_set_input_line(machine->cpu[0], SATURN_NMI_LINE, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[0], SATURN_NMI_LINE, ASSERT_LINE);
 	}
 }
 
