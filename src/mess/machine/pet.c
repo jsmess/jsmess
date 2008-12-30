@@ -585,10 +585,6 @@ static void pet_common_driver_init(running_machine *machine)
 	state->superpet = 0;
 	state->cbm8096 = 0;
 
-	/* BIG HACK; need to phase out this retarded memory management */
-	if (!pet_memory)
-		pet_memory = mess_ram;
-
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, mess_ram_size - 1, 0, 0, SMH_BANK10);
 	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, mess_ram_size - 1, 0, 0, SMH_BANK10);
 	memory_set_bankptr (machine, 10, pet_memory);
@@ -621,6 +617,7 @@ static void pet_common_driver_init(running_machine *machine)
 DRIVER_INIT( pet2001 )
 {
 	pet_state *state = machine->driver_data;
+	pet_memory = mess_ram;
 	pet_common_driver_init(machine);
 	state->pet_basic1 = 1;
 	pia_config(machine, 0, &pet_pia0);
@@ -629,6 +626,7 @@ DRIVER_INIT( pet2001 )
 
 DRIVER_INIT( pet )
 {
+	pet_memory = mess_ram;
 	pet_common_driver_init(machine);
 	pia_config(machine, 0, &pet_pia0);
 	pet_vh_init(machine);
@@ -636,6 +634,7 @@ DRIVER_INIT( pet )
 
 DRIVER_INIT( petb )
 {
+	pet_memory = mess_ram;
 	pet_common_driver_init(machine);
 	pia_config(machine, 0, &petb_pia0);
 	pet_vh_init(machine);
@@ -643,6 +642,7 @@ DRIVER_INIT( petb )
 
 DRIVER_INIT( pet40 )
 {
+	pet_memory = mess_ram;
 	pet_common_driver_init(machine);
 	pia_config(machine, 0, &pet_pia0);
 	pet_vh_init(machine);
@@ -650,7 +650,6 @@ DRIVER_INIT( pet40 )
 
 DRIVER_INIT( pet80 )
 {
-
 	pet_state *state = machine->driver_data;
 	pet_memory = memory_region(machine, "main");
 
@@ -665,8 +664,8 @@ DRIVER_INIT( pet80 )
 
 DRIVER_INIT( superpet )
 {
-
 	pet_state *state = machine->driver_data;
+	pet_memory = mess_ram;
 	pet_common_driver_init(machine);
 	state->superpet = 1;
 	pia_config(machine, 0, &petb_pia0);
