@@ -60,7 +60,6 @@ static emu_timer *cassette_data_timer;
 static TIMER_CALLBACK( cassette_data_callback )
 {
 	double new_val = cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ));
-	logerror("cassette_data_callback\n");
 
 	/* Check for HI-LO transition */
 	if ( old_cassette_val > -0.2 && new_val < -0.2 )
