@@ -11,6 +11,14 @@
 #include "machine/6522via.h"
 #include "devices/cartslot.h"
 
+typedef struct _pet_state pet_state;
+struct _pet_state
+{
+	int pet_basic1; /* basic version 1 for quickloader */
+	int superpet;
+	int cbm8096;
+};
+
 /*----------- defined in video/pet.c -----------*/
 
 /* call to init videodriver */

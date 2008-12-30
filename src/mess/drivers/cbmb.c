@@ -103,6 +103,7 @@ Keyboard: Full-sized 102 key QWERTY (19 key numeric keypad!; 4 direction
 #include "machine/6526cia.h"
 
 #include "includes/cbm.h"
+#include "includes/cbmb.h"
 #include "machine/cbmipt.h"
 #include "video/vic6567.h"
 #include "video/mc6845.h"
@@ -381,6 +382,7 @@ const tpi6525_interface cbmb_tpi_1_intf =
 
 
 static MACHINE_DRIVER_START( cbm600 )
+	MDRV_DRIVER_DATA(cbmb_state)
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M6509, 7833600)        /* 7.8336 MHz */
 	MDRV_CPU_PROGRAM_MAP(cbmb_readmem, cbmb_writemem)
@@ -458,6 +460,7 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( p500 )
+	MDRV_DRIVER_DATA(cbmb_state)	
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M6509, VIC6567_CLOCK)        /* 7.8336 MHz */
 	MDRV_CPU_PROGRAM_MAP(p500_readmem, p500_writemem)

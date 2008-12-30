@@ -15,6 +15,19 @@
 #include "machine/6526cia.h"
 #include "devices/cartslot.h"
 
+typedef struct _cbmb_state cbmb_state;
+struct _cbmb_state
+{
+	/* keyboard lines */
+	int cbmb_keyline_a;
+	int cbmb_keyline_b;
+	int cbmb_keyline_c;
+	
+	int p500;
+	int cbm700;
+	int cbm_ntsc;
+};
+
 /*----------- defined in machine/cbmb.c -----------*/
 
 extern UINT8 *cbmb_basic;

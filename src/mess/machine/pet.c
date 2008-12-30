@@ -31,17 +31,12 @@
 		} \
 	} while (0)
 
-/* keyboard lines */
-static int pet_basic1 = 0; /* basic version 1 for quickloader */
-static int superpet = 0;
-static int cbm8096 = 0;
-static int pet_keyline_select;
-
 int pet_font = 0;
 UINT8 *pet_memory;
 UINT8 *superpet_memory;
 UINT8 *pet_videoram;
 static UINT8 *pet80_bank1_base;
+static int pet_keyline_select;	
 
 static emu_timer *datasette1_timer;
 static emu_timer *datasette2_timer;
@@ -80,7 +75,7 @@ static WRITE8_HANDLER( pet_mc6845_address_w )
   cb2 cassette 1 motor out
 */
 static READ8_HANDLER ( pet_pia0_port_a_read )
-{
+{	
 	int data = 0xf0 | pet_keyline_select;
 
 	if ((cassette_get_state(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette1" )) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
@@ -121,6 +116,7 @@ static  READ8_HANDLER ( pet_pia0_port_b_read )
 static READ8_HANDLER( petb_pia0_port_b_read )
 {
 	UINT8 data = 0xff;
+	pet_state *state = space->machine->driver_data;
 	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", 
 										"ROW5", "ROW6", "ROW7", "ROW8", "ROW9" };
 	
@@ -130,7 +126,7 @@ static READ8_HANDLER( petb_pia0_port_b_read )
 		/* Check for left-shift lock */
 		/* 2008-05 FP: For some reason, superpet read it in the opposite way!! */
 		/* While waiting for confirmation from docs, we add a workaround here. */
-		if (superpet)
+		if (state->superpet)
 		{
 			if ((pet_keyline_select == 6) && !(input_port_read(space->machine, "SPECIAL") & 0x80)) 
 				data &= 0xfe;
@@ -175,11 +171,11 @@ static WRITE8_HANDLER( pet_pia0_cb2_out )
 static void pet_irq (running_machine *machine, int level)
 {
 	static int old_level = 0;
-
+	pet_state *state = machine->driver_data;
 	if (level != old_level)
 	{
 		DBG_LOG (3, "mos6502", ("irq %s\n", level ? "start" : "end"));
-		if (superpet)
+		if (state->superpet)
 			cpu_set_input_line(machine->cpu[1], M6809_IRQ_LINE, level);
 		cpu_set_input_line(machine->cpu[0], M6502_IRQ_LINE, level);
 		old_level = level;
@@ -583,7 +579,12 @@ static TIMER_CALLBACK( pet_tape2_timer )
 static void pet_common_driver_init(running_machine *machine)
 {
 	int i;
+	pet_state *state = machine->driver_data;
 
+	state->pet_basic1 = 0; 
+	state->superpet = 0;
+	state->cbm8096 = 0;
+	
 	/* BIG HACK; need to phase out this retarded memory management */
 	if (!pet_memory)
 		pet_memory = mess_ram;
@@ -619,8 +620,9 @@ static void pet_common_driver_init(running_machine *machine)
 
 DRIVER_INIT( pet2001 )
 {
-	pet_basic1 = 1;
+	pet_state *state = machine->driver_data;
 	pet_common_driver_init(machine);
+	state->pet_basic1 = 1;
 	pia_config(machine, 0, &pet_pia0);
 	pet_vh_init(machine);
 }
@@ -648,20 +650,25 @@ DRIVER_INIT( pet40 )
 
 DRIVER_INIT( pet80 )
 {
-	cbm8096 = 1;
+	
+	pet_state *state = machine->driver_data;
 	pet_memory = memory_region(machine, "main");
 
 	pet_common_driver_init(machine);
+	state->cbm8096 = 1;	
 	pia_config(machine, 0, &petb_pia0);
 	videoram = &pet_memory[0x8000];
 	videoram_size = 0x800;
 	pet80_vh_init(machine);
+	
 }
 
 DRIVER_INIT( superpet )
 {
-	superpet = 1;
+	
+	pet_state *state = machine->driver_data;
 	pet_common_driver_init(machine);
+	state->superpet = 1;
 	pia_config(machine, 0, &petb_pia0);
 
 	superpet_memory = auto_malloc(0x10000);
@@ -674,9 +681,10 @@ DRIVER_INIT( superpet )
 
 MACHINE_RESET( pet )
 {
+	pet_state *state = machine->driver_data;
 	pia_reset();
-
-	if (superpet)
+	
+	if (state->superpet)
 	{
 		spet.rom = 0;
 		if (input_port_read(machine, "CFG") & 0x04)
@@ -693,7 +701,7 @@ MACHINE_RESET( pet )
 		}
 	}
 
-	if (cbm8096)
+	if (state->cbm8096)
 	{
 		if (input_port_read(machine, "CFG") & 0x08)
 		{
@@ -714,7 +722,8 @@ MACHINE_RESET( pet )
 
 INTERRUPT_GEN( pet_frame_interrupt )
 {
-	if (superpet)
+	pet_state *state = device->machine->driver_data;
+	if (state->superpet)
 	{
 		if (input_port_read(device->machine, "CFG") & 0x04) 
 		{

@@ -649,6 +649,7 @@ static VIDEO_UPDATE( pet_crtc )
  *************************************/
 
 static MACHINE_DRIVER_START( pet_general )
+	MDRV_DRIVER_DATA(pet_state)
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M6502, 7833600)        /* 7.8336 MHz */
 	MDRV_CPU_PROGRAM_MAP(pet_mem, 0)
