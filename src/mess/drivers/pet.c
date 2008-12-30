@@ -1140,7 +1140,7 @@ COMP(1979, pet2001n,  0,   pet2001,   pet,       pet,       pet,       pet2,    
 COMP(1979, pet2001b,  0,   pet2001,   pet,       petb,      petb,      pet2,      "Commodore Business Machines Co.",  "PET 2001-B", GAME_NO_SOUND)
 COMP(1979, cbm30,     0,   pet2001,   pet,       pet,       pet,       pet2,      "Commodore Business Machines Co.",  "CBM 30xx", GAME_NO_SOUND)
 COMP(1979, cbm30b,    0,   pet2001,   pet,       petb,      petb,      pet2,      "Commodore Business Machines Co.",  "CBM 30xx (Business keyboard)", GAME_NO_SOUND)
-COMP(1979, cbm30nor,  0,   pet2001,   pet,       petb,      petb,      pet2,      "Commodore Business Machines Co.",  "CBM 30xx (Norway, Business keyboard)", GAME_NO_SOUND | GAME_NOT_WORKING)
+COMP(1979, cbm30nor,  0,   pet2001,   pet,       petb,      petb,      pet2,      "Commodore Business Machines Co.",  "CBM 30xx (Norway, Business keyboard)", GAME_NO_SOUND)
 
 /* So called, THIN-40 */
 COMP(1980, pet40on,   0,   pet2001,   pet,       pet,       pet,       pet2,      "Commodore Business Machines Co.",  "PET 40xx (Basic 4, no CRTC, Normal keyboard)", GAME_NO_SOUND)
@@ -1151,18 +1151,18 @@ COMP(1980, cbm40ob,   0,   pet2001,   pet,       petb,      petb,      pet2,    
 COMP(1981, pet80,     0,   pet2001,   pet80,     cbm8096,   pet80,     pet4,      "Commodore Business Machines Co.",  "PET 80xx (Basic 4, CRTC 60Hz, 80 columns)", GAME_NO_SOUND)
 COMP(1981, cbm80,     0,   pet2001,   pet80pal,  cbm8096,   pet80,     pet4,      "Commodore Business Machines Co.",  "CBM 80xx (Basic 4, CRTC 50Hz, 80 columns)", GAME_NO_SOUND)
 COMP(1981, cbm80ger,  0,   pet2001,   pet80pal,  cbm8096,   pet80,     pet4,      "Commodore Business Machines Co.",  "CBM 80xx (Germany, Basic 4, CRTC 50Hz, 80 columns)", GAME_NO_SOUND)
-COMP(1981, cbm80hun,  0,   pet2001,   pet80pal,  cbm8096,   pet80,     pet4,      "Commodore Business Machines Co.",  "CBM 80xx (Hungary, Basic 4, CRTC 50Hz, 80 columns)", GAME_NO_SOUND | GAME_NOT_WORKING)
+COMP(1981, cbm80hun,  0,   pet2001,   pet80pal,  cbm8096,   pet80,     pet4,      "Commodore Business Machines Co.",  "CBM 80xx (Hungary, Basic 4, CRTC 50Hz, 80 columns)", GAME_NO_SOUND)
 COMP(1981, cbm80swe,  0,   pet2001,   pet80pal,  cbm8096,   pet80,     pet4,      "Commodore Business Machines Co.",  "CBM 80xx (Sweden, Basic 4, CRTC 50Hz, 80 columns)", GAME_NO_SOUND)
 
 /* So called, FAT-40 */
 COMP(1981, pet40b,    0,   pet2001,   pet80,     cbm8096,   pet80,     pet4,      "Commodore Business Machines Co.",  "PET 40xx (Basic 4, CRTC 60Hz, 80 columns)", GAME_NO_SOUND)
 COMP(1981, pet40n,    0,   pet2001,   pet40,     pet,       pet40,     pet4o,     "Commodore Business Machines Co.",  "PET 40xx (Basic 4, CRTC 60Hz, 40 columns)", GAME_NO_SOUND)
-COMP(1981, cbm40b,	  0,   pet2001,   pet80pal,  cbm8096,   pet80,     pet4,      "Commodore Business Machines Co.",  "CBM 40xx (Basic 4, CRTC 50Hz, 80 columns)", GAME_NO_SOUND)
+COMP(1981, cbm40b,    0,   pet2001,   pet80pal,  cbm8096,   pet80,     pet4,      "Commodore Business Machines Co.",  "CBM 40xx (Basic 4, CRTC 50Hz, 80 columns)", GAME_NO_SOUND)
 COMP(1981, cbm40n,    0,   pet2001,   pet40pal,  pet,       pet40,     pet4o,     "Commodore Business Machines Co.",  "CBM 40xx (Basic 4, CRTC 50Hz, 40 columns)", GAME_NO_SOUND)
 
 COMP(1981, superpet,  0,   pet2001,   superpet,  superpet,  superpet,  pet4,      "Commodore Business Machines Co.",  "SuperPET (CRTC 50Hz)", GAME_NO_SOUND | GAME_NOT_WORKING)
 COMP(1981, sp9000,    0,   pet2001,   superpet,  superpet,  superpet,  pet4,      "Commodore Business Machines Co.",  "CBM SP9000 / MicroMainFrame 9000 (CRTC 50Hz)", GAME_NO_SOUND | GAME_NOT_WORKING)
 COMP(198?, mmf9000s,  0,   pet2001,   superpet,  superpet,  superpet,  pet4,      "Commodore Business Machines Co.",  "MicroMainFrame 9000 (Sweden, CRTC 50Hz)", GAME_NO_SOUND | GAME_NOT_WORKING)
 
-COMP(1984, cbm8296,   0,   pet2001,   pet80pal,  cbm8096,   pet80,     pet4,      "Commodore Business Machines Co.",  "CBM 8296 (Basic 4, CRTC 50Hz, 80 columns)", GAME_NO_SOUND | GAME_NOT_WORKING)
-COMP(1984, cbm8296d,  0,   pet2001,   pet80pal,  cbm8096,   pet80,     pet4,      "Commodore Business Machines Co.",  "CBM 8296D", GAME_NO_SOUND | GAME_NOT_WORKING)
+COMP(1984, cbm8296,   0,   pet2001,   pet80pal,  cbm8096,   pet80,     pet4,      "Commodore Business Machines Co.",  "CBM 8296 (Basic 4, CRTC 50Hz, 80 columns)", GAME_NO_SOUND)
+COMP(1984, cbm8296d,  0,   pet2001,   pet80pal,  cbm8096,   pet80,     pet4,      "Commodore Business Machines Co.",  "CBM 8296D", GAME_NO_SOUND)
