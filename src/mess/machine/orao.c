@@ -35,26 +35,26 @@ READ8_HANDLER( orao_io_r )
 	 
 	 switch(offset) {
 	 	/* Keyboard*/
-	 	case 0x07FC : return input_port_read(space->machine, "LINE0"); break;
-	 	case 0x07FD : return input_port_read(space->machine, "LINE1"); break;
-	 	case 0x07FA : return input_port_read(space->machine, "LINE2"); break;
-	 	case 0x07FB : return input_port_read(space->machine, "LINE3"); break;
-	 	case 0x07F6 : return input_port_read(space->machine, "LINE4"); break;
-	 	case 0x07F7 : return input_port_read(space->machine, "LINE5"); break;
-	 	case 0x07EE : return input_port_read(space->machine, "LINE6"); break;
-	 	case 0x07EF : return input_port_read(space->machine, "LINE7"); break;
-	 	case 0x07DE : return input_port_read(space->machine, "LINE8"); break;
-	 	case 0x07DF : return input_port_read(space->machine, "LINE9"); break;
-	 	case 0x07BE : return input_port_read(space->machine, "LINE10"); break;
-	 	case 0x07BF : return input_port_read(space->machine, "LINE11"); break;
-	 	case 0x077E : return input_port_read(space->machine, "LINE12"); break;
-	 	case 0x077F : return input_port_read(space->machine, "LINE13"); break;
-	 	case 0x06FE : return input_port_read(space->machine, "LINE14"); break;
-	 	case 0x06FF : return input_port_read(space->machine, "LINE15"); break;
-	 	case 0x05FE : return input_port_read(space->machine, "LINE16"); break;
-	 	case 0x05FF : return input_port_read(space->machine, "LINE17"); break;
-	 	case 0x03FE : return input_port_read(space->machine, "LINE18"); break;
-	 	case 0x03FF : return input_port_read(space->machine, "LINE19"); break;
+	 	case 0x07FC : return input_port_read(space->machine, "LINE0");
+	 	case 0x07FD : return input_port_read(space->machine, "LINE1");
+	 	case 0x07FA : return input_port_read(space->machine, "LINE2");
+	 	case 0x07FB : return input_port_read(space->machine, "LINE3");
+	 	case 0x07F6 : return input_port_read(space->machine, "LINE4");
+	 	case 0x07F7 : return input_port_read(space->machine, "LINE5");
+	 	case 0x07EE : return input_port_read(space->machine, "LINE6");
+	 	case 0x07EF : return input_port_read(space->machine, "LINE7");
+	 	case 0x07DE : return input_port_read(space->machine, "LINE8");
+	 	case 0x07DF : return input_port_read(space->machine, "LINE9");
+	 	case 0x07BE : return input_port_read(space->machine, "LINE10");
+	 	case 0x07BF : return input_port_read(space->machine, "LINE11");
+	 	case 0x077E : return input_port_read(space->machine, "LINE12");
+	 	case 0x077F : return input_port_read(space->machine, "LINE13");
+	 	case 0x06FE : return input_port_read(space->machine, "LINE14");
+	 	case 0x06FF : return input_port_read(space->machine, "LINE15");
+	 	case 0x05FE : return input_port_read(space->machine, "LINE16");
+	 	case 0x05FF : return input_port_read(space->machine, "LINE17");
+	 	case 0x03FE : return input_port_read(space->machine, "LINE18");
+	 	case 0x03FF : return input_port_read(space->machine, "LINE19");
 	 	/* Tape */ 
 	 	case 0x07FF : 
 	 				level = cassette_input(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" ));	 									 					
@@ -62,7 +62,6 @@ READ8_HANDLER( orao_io_r )
 						return 0x00; 
 					}
 					return 0xff;	 									 					
-					break;
 	 }
 	 
 	 

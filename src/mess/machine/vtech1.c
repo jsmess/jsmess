@@ -228,7 +228,6 @@ SNAPSHOT_LOAD(vtech1)
 	default:
 		image_seterror(image, IMAGE_ERROR_UNSUPPORTED, "Snapshot format not supported.");
 		return INIT_FAIL;
-		break;
 	}
 
 	return INIT_PASS;

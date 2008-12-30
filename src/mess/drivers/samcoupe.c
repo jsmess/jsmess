@@ -126,8 +126,7 @@ static READ8_HANDLER( samcoupe_pen_r )
 	if (offset & 0x100)
 	{
 		/* return either the current line or 192 for the vblank area */
-		int line = video_screen_get_vpos(space->machine->primary_screen);
-		data = video_screen_get_vblank(space->machine->primary_screen) ? 192 : line;
+		data = video_screen_get_vblank(space->machine->primary_screen) ? 192 : video_screen_get_vpos(space->machine->primary_screen);
 	}
 	else
 	{

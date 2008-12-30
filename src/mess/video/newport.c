@@ -240,15 +240,12 @@ static READ32_HANDLER( newport_cmap0_r )
 	case 0x04:
 		verboselog(machine, 2, "CMAP0 Status Read: %08x\n", 0x00000008 );
 		return 0x00000008;
-		break;
 	case 0x06: /* Revision */
 		verboselog(machine, 2, "CMAP0 Revision Read: CMAP Rev 1, Board Rev 2, 8bpp\n" );
 		return 0x000000a1;
-		break;
 	default:
 		verboselog(machine, 2, "Unknown CMAP0 Register %d Read\n", nREX3_DCBRegSelect );
 		return 0x00000000;
-		break;
 	}
 }
 
@@ -261,15 +258,12 @@ static READ32_HANDLER( newport_cmap1_r )
 	case 0x04:
 		verboselog(machine, 2, "CMAP1 Status Read: %08x\n", 0x00000008 );
 		return 0x00000008;
-		break;
 	case 0x06: /* Revision */
 		verboselog(machine, 2, "CMAP1 Revision Read: CMAP Rev 1, Board Rev 2, 8bpp\n" );
 		return 0x000000a1;
-		break;
 	default:
 		verboselog(machine, 2, "Unknown CMAP0 Register %d Read\n", nREX3_DCBRegSelect );
 		return 0x00000000;
-		break;
 	}
 }
 
@@ -283,23 +277,18 @@ static READ32_HANDLER( newport_xmap0_r )
 	case 0:
 		verboselog(machine, 2, "XMAP0 Config Read: %08x\n", XMAP0_CONFIG );
 		return XMAP0_CONFIG;
-		break;
 	case 1:
 		verboselog(machine, 2, "XMAP0 Revision Read: %08x\n", 0x00 );
 		return 0x00000000;
-		break;
 	case 2:
 		verboselog(machine, 2, "XMAP0 FIFO Availability Read: %08x\n", 0x02 );
 		return 0x00000002;
-		break;
 	case 3:
 		verboselog(machine, 2, "XMAP0 Cursor CMAP MSB Read: %08x\n", XMAP0_CURCMAP );
 		return XMAP0_CURCMAP;
-		break;
 	case 4:
 		verboselog(machine, 2, "XMAP0 Pop Up CMAP MSB Read: %08x\n", XMAP0_POPUPCMAP );
 		return XMAP0_POPUPCMAP;
-		break;
 	case 5:
 		nModeIdx = ( XMAP0_MODETBLIDX & 0x0000007c ) >> 2;
 		switch( XMAP0_MODETBLIDX & 0x00000003 )
@@ -307,25 +296,20 @@ static READ32_HANDLER( newport_xmap0_r )
 		case 0:
 			verboselog(machine, 2, "XMAP0 Mode Register Read: %02x (Byte 0): %08x\n", nModeIdx, ( nXMAP0_ModeTable[ nModeIdx ] & 0x00ff0000 ) >> 16 );
 			return ( nXMAP0_ModeTable[ nModeIdx ] & 0x00ff0000 ) >> 16;
-			break;
 		case 1:
 			verboselog(machine, 2, "XMAP0 Mode Register Read: %02x (Byte 1): %08x\n", nModeIdx, ( nXMAP0_ModeTable[ nModeIdx ] & 0x0000ff00 ) >>  8 );
 			return ( nXMAP0_ModeTable[ nModeIdx ] & 0x0000ff00 ) >>  8;
-			break;
 		case 2:
 			verboselog(machine, 2, "XMAP0 Mode Register Read: %02x (Byte 2): %08x\n", nModeIdx, ( nXMAP0_ModeTable[ nModeIdx ] & 0x000000ff ) );
 			return ( nXMAP0_ModeTable[ nModeIdx ] & 0x000000ff );
-			break;
 		}
 		break;
 	case 6:
 		verboselog(machine, 2, "XMAP0 Unused Read: %08x\n", 0x00000000 );
 		return 0x00000000;
-		break;
 	case 7:
 		verboselog(machine, 2, "XMAP0 Mode Table Address Read: %08x\n", XMAP0_MODETBLIDX );
 		return XMAP0_MODETBLIDX;
-		break;
 	}
 
 	verboselog(machine, 2, "XMAP0 Unknown nREX3_DCBRegSelect Value: %02x, returning 0\n", nREX3_DCBRegSelect );
@@ -381,23 +365,18 @@ static READ32_HANDLER( newport_xmap1_r )
 	case 0:
 		verboselog(machine, 2, "XMAP1 Config Read: %08x\n", XMAP1_CONFIG );
 		return XMAP1_CONFIG;
-		break;
 	case 1:
 		verboselog(machine, 2, "XMAP1 Revision Read: %08x\n", 0x00 );
 		return 0x00000000;
-		break;
 	case 2:
 		verboselog(machine, 2, "XMAP1 FIFO Availability Read: %08x\n", 0x02 );
 		return 0x00000002;
-		break;
 	case 3:
 		verboselog(machine, 2, "XMAP1 Cursor CMAP MSB Read: %08x\n", XMAP1_CURCMAP );
 		return XMAP1_CURCMAP;
-		break;
 	case 4:
 		verboselog(machine, 2, "XMAP1 Pop Up CMAP MSB Read: %08x\n", XMAP1_POPUPCMAP );
 		return XMAP1_POPUPCMAP;
-		break;
 	case 5:
 		nModeIdx = ( XMAP1_MODETBLIDX & 0x0000007c ) >> 2;
 		switch( XMAP1_MODETBLIDX & 0x00000003 )
@@ -405,25 +384,20 @@ static READ32_HANDLER( newport_xmap1_r )
 		case 0:
 			verboselog(machine, 2, "XMAP1 Mode Register Read: %02x (Byte 0): %08x\n", nModeIdx, ( nXMAP1_ModeTable[ nModeIdx ] & 0x00ff0000 ) >> 16 );
 			return ( nXMAP1_ModeTable[ nModeIdx ] & 0x00ff0000 ) >> 16;
-			break;
 		case 1:
 			verboselog(machine, 2, "XMAP1 Mode Register Read: %02x (Byte 1): %08x\n", nModeIdx, ( nXMAP1_ModeTable[ nModeIdx ] & 0x0000ff00 ) >>  8 );
 			return ( nXMAP1_ModeTable[ nModeIdx ] & 0x0000ff00 ) >>  8;
-			break;
 		case 2:
 			verboselog(machine, 2, "XMAP1 Mode Register Read: %02x (Byte 2): %08x\n", nModeIdx, ( nXMAP1_ModeTable[ nModeIdx ] & 0x000000ff ) );
 			return ( nXMAP1_ModeTable[ nModeIdx ] & 0x000000ff );
-			break;
 		}
 		break;
 	case 6:
 		verboselog(machine, 2, "XMAP1 Unused Read: %08x\n", 0x00000000 );
 		return 0x00000000;
-		break;
 	case 7:
 		verboselog(machine, 2, "XMAP1 Mode Table Address Read: %08x\n", XMAP0_MODETBLIDX );
 		return XMAP1_MODETBLIDX;
-		break;
 	}
 
 	verboselog(machine, 2, "XMAP1 Unknown nREX3_DCBRegSelect Value: %02x, returning 0\n", nREX3_DCBRegSelect );
@@ -479,7 +453,6 @@ static READ32_HANDLER( newport_vc2_r )
 	case 0x01: /* Register Read */
 		verboselog(machine, 2, "VC2 Register Read: %02x, %08x\n", nVC2_RegIdx, nVC2_Register[nVC2_RegIdx] );
 		return nVC2_Register[nVC2_RegIdx];
-		break;
 	case 0x03: /* RAM Read */
 		verboselog(machine, 2, "VC2 RAM Read: %04x = %08x\n", VC2_RAMADDR, nVC2_RAM[VC2_RAMADDR] );
 		ret16 = nVC2_RAM[VC2_RAMADDR];
@@ -489,11 +462,9 @@ static READ32_HANDLER( newport_vc2_r )
 			VC2_RAMADDR = 0x0000;
 		}
 		return ret16;
-		break;
 	default:
 		verboselog(machine, 2, "Unknown VC2 Register Read: %02x\n", nREX3_DCBRegSelect );
 		return 0;
-		break;
 	}
 	return 0;
 }
@@ -629,349 +600,276 @@ READ32_HANDLER( newport_rex3_r )
 	case 0x0800/4:
 		verboselog(machine, 2, "REX3 Draw Mode 1 Read: %08x\n", nREX3_DrawMode1 );
 		return nREX3_DrawMode1;
-		break;
 	case 0x0004/4:
 	case 0x0804/4:
 		verboselog(machine, 2, "REX3 Draw Mode 0 Read: %08x\n", nREX3_DrawMode0 );
 		return nREX3_DrawMode0;
-		break;
 	case 0x0008/4:
 	case 0x0808/4:
 		verboselog(machine, 2, "REX3 Line Stipple Mode Read: %08x\n", nREX3_LSMode );
 		return nREX3_LSMode;
-		break;
 	case 0x000c/4:
 	case 0x080c/4:
 		verboselog(machine, 2, "REX3 Line Stipple Pattern Read: %08x\n", nREX3_LSPattern );
 		return nREX3_LSPattern;
-		break;
 	case 0x0010/4:
 	case 0x0810/4:
 		verboselog(machine, 2, "REX3 Line Stipple Pattern (Save) Read: %08x\n", nREX3_LSPatSave );
 		return nREX3_LSPatSave;
-		break;
 	case 0x0014/4:
 	case 0x0814/4:
 		verboselog(machine, 2, "REX3 Pattern Register Read: %08x\n", nREX3_ZPattern );
 		return nREX3_ZPattern;
-		break;
 	case 0x0018/4:
 	case 0x0818/4:
 		verboselog(machine, 2, "REX3 Opaque Pattern / Blendfunc Dest Color Read: %08x\n", nREX3_ColorBack );
 		return nREX3_ColorBack;
-		break;
 	case 0x001c/4:
 	case 0x081c/4:
 		verboselog(machine, 2, "REX3 VRAM Fastclear Color Read: %08x\n", nREX3_ColorVRAM );
 		return nREX3_ColorVRAM;
-		break;
 	case 0x0020/4:
 	case 0x0820/4:
 		verboselog(machine, 2, "REX3 AFUNCTION Reference Alpha Read: %08x\n", nREX3_AlphaRef );
 		return nREX3_AlphaRef;
-		break;
 	case 0x0028/4:
 	case 0x0828/4:
 		verboselog(machine, 2, "REX3 Screenmask 0 X Min/Max Read: %08x\n", nREX3_SMask0X );
 		return nREX3_SMask0X;
-		break;
 	case 0x002c/4:
 	case 0x082c/4:
 		verboselog(machine, 2, "REX3 Screenmask 0 Y Min/Max Read: %08x\n", nREX3_SMask0Y );
 		return nREX3_SMask0Y;
-		break;
 	case 0x0030/4:
 	case 0x0830/4:
 		verboselog(machine, 2, "REX3 Line/Span Setup Read: %08x\n", nREX3_Setup );
 		return nREX3_Setup;
-		break;
 	case 0x0034/4:
 	case 0x0834/4:
 		verboselog(machine, 2, "REX3 ZPattern Enable Read: %08x\n", nREX3_StepZ );
 		return nREX3_StepZ;
-		break;
 	case 0x0100/4:
 	case 0x0900/4:
 		verboselog(machine, 2, "REX3 X Start Read: %08x\n", nREX3_XStart );
 		return nREX3_XStart;
-		break;
 	case 0x0104/4:
 	case 0x0904/4:
 		verboselog(machine, 2, "REX3 YStart Read: %08x\n", nREX3_YStart );
 		return nREX3_YStart;
-		break;
 	case 0x0108/4:
 	case 0x0908/4:
 		verboselog(machine, 2, "REX3 XEnd Read: %08x\n", nREX3_XEnd );
 		return nREX3_XEnd;
-		break;
 	case 0x010c/4:
 	case 0x090c/4:
 		verboselog(machine, 2, "REX3 YEnd Read: %08x\n", nREX3_YEnd );
 		return nREX3_YEnd;
-		break;
 	case 0x0110/4:
 	case 0x0910/4:
 		verboselog(machine, 2, "REX3 XSave Read: %08x\n", nREX3_XSave );
 		return nREX3_XSave;
-		break;
 	case 0x0114/4:
 	case 0x0914/4:
 		verboselog(machine, 2, "REX3 XYMove Read: %08x\n", nREX3_XYMove );
 		return nREX3_XYMove;
-		break;
 	case 0x0118/4:
 	case 0x0918/4:
 		verboselog(machine, 2, "REX3 Bresenham D Read: %08x\n", nREX3_BresD );
 		return nREX3_BresD;
-		break;
 	case 0x011c/4:
 	case 0x091c/4:
 		verboselog(machine, 2, "REX3 Bresenham S1 Read: %08x\n", nREX3_BresS1 );
 		return nREX3_BresS1;
-		break;
 	case 0x0120/4:
 	case 0x0920/4:
 		verboselog(machine, 2, "REX3 Bresenham Octant & Incr1 Read: %08x\n", nREX3_BresOctInc1 );
 		return nREX3_BresOctInc1;
-		break;
 	case 0x0124/4:
 	case 0x0924/4:
 		verboselog(machine, 2, "REX3 Bresenham Octant Rounding Mode & Incr2 Read: %08x\n", nREX3_BresRndInc2 );
 		return nREX3_BresRndInc2;
-		break;
 	case 0x0128/4:
 	case 0x0928/4:
 		verboselog(machine, 2, "REX3 Bresenham E1 Read: %08x\n", nREX3_BresE1 );
 		return nREX3_BresE1;
-		break;
 	case 0x012c/4:
 	case 0x092c/4:
 		verboselog(machine, 2, "REX3 Bresenham S2 Read: %08x\n", nREX3_BresS2 );
 		return nREX3_BresS2;
-		break;
 	case 0x0130/4:
 	case 0x0930/4:
 		verboselog(machine, 2, "REX3 AA Line Weight Table 1/2 Read: %08x\n", nREX3_AWeight0 );
 		return nREX3_AWeight0;
-		break;
 	case 0x0134/4:
 	case 0x0934/4:
 		verboselog(machine, 2, "REX3 AA Line Weight Table 2/2 Read: %08x\n", nREX3_AWeight1 );
 		return nREX3_AWeight1;
-		break;
 	case 0x0138/4:
 	case 0x0938/4:
 		verboselog(machine, 2, "REX3 GL XStart Read: %08x\n", nREX3_XStartF );
 		return nREX3_XStartF;
-		break;
 	case 0x013c/4:
 	case 0x093c/4:
 		verboselog(machine, 2, "REX3 GL YStart Read: %08x\n", nREX3_YStartF );
 		return nREX3_YStartF;
-		break;
 	case 0x0140/4:
 	case 0x0940/4:
 		verboselog(machine, 2, "REX3 GL XEnd Read: %08x\n", nREX3_XEndF );
 		return nREX3_XEndF;
-		break;
 	case 0x0144/4:
 	case 0x0944/4:
 		verboselog(machine, 2, "REX3 GL YEnd Read: %08x\n", nREX3_YEndF );
 		return nREX3_YEndF;
-		break;
 	case 0x0148/4:
 	case 0x0948/4:
 		verboselog(machine, 2, "REX3 XStart (integer) Read: %08x\n", nREX3_XStartI );
 		return nREX3_XStartI;
-		break;
 	case 0x014c/4:
 	case 0x094c/4:
 		verboselog(machine, 2, "REX3 GL XEnd (copy) Read: %08x\n", nREX3_XEndF );
 		return nREX3_XEndF;
-		break;
 	case 0x0150/4:
 	case 0x0950/4:
 		verboselog(machine, 2, "REX3 XYStart (integer) Read: %08x\n", nREX3_XYStartI );
 		return nREX3_XYStartI;
-		break;
 	case 0x0154/4:
 	case 0x0954/4:
 		verboselog(machine, 2, "REX3 XYEnd (integer) Read: %08x\n", nREX3_XYEndI );
 		return nREX3_XYEndI;
-		break;
 	case 0x0158/4:
 	case 0x0958/4:
 		verboselog(machine, 2, "REX3 XStartEnd (integer) Read: %08x\n", nREX3_XStartEndI );
 		return nREX3_XStartEndI;
-		break;
 	case 0x0200/4:
 	case 0x0a00/4:
 		verboselog(machine, 2, "REX3 Red/CI Full State Read: %08x\n", nREX3_ColorRed );
 		return nREX3_ColorRed;
-		break;
 	case 0x0204/4:
 	case 0x0a04/4:
 		verboselog(machine, 2, "REX3 Alpha Full State Read: %08x\n", nREX3_ColorAlpha );
 		return nREX3_ColorAlpha;
-		break;
 	case 0x0208/4:
 	case 0x0a08/4:
 		verboselog(machine, 2, "REX3 Green Full State Read: %08x\n", nREX3_ColorGreen );
 		return nREX3_ColorGreen;
-		break;
 	case 0x020c/4:
 	case 0x0a0c/4:
 		verboselog(machine, 2, "REX3 Blue Full State Read: %08x\n", nREX3_ColorBlue );
 		return nREX3_ColorBlue;
-		break;
 	case 0x0210/4:
 	case 0x0a10/4:
 		verboselog(machine, 2, "REX3 Red/CI Slope Read: %08x\n", nREX3_SlopeRed );
 		return nREX3_SlopeRed;
-		break;
 	case 0x0214/4:
 	case 0x0a14/4:
 		verboselog(machine, 2, "REX3 Alpha Slope Read: %08x\n", nREX3_SlopeAlpha );
 		return nREX3_SlopeAlpha;
-		break;
 	case 0x0218/4:
 	case 0x0a18/4:
 		verboselog(machine, 2, "REX3 Green Slope Read: %08x\n", nREX3_SlopeGreen );
 		return nREX3_SlopeGreen;
-		break;
 	case 0x021c/4:
 	case 0x0a1c/4:
 		verboselog(machine, 2, "REX3 Blue Slope Read: %08x\n", nREX3_SlopeBlue );
 		return nREX3_SlopeBlue;
-		break;
 	case 0x0220/4:
 	case 0x0a20/4:
 		verboselog(machine, 2, "REX3 Write Mask Read: %08x\n", nREX3_WriteMask );
 		return nREX3_WriteMask;
-		break;
 	case 0x0224/4:
 	case 0x0a24/4:
 		verboselog(machine, 2, "REX3 Packed Color Fractions Read: %08x\n", nREX3_ZeroFract );
 		return nREX3_ZeroFract;
-		break;
 	case 0x0228/4:
 	case 0x0a28/4:
 		verboselog(machine, 2, "REX3 Color Index Zeros Overflow Read: %08x\n", nREX3_ZeroOverflow );
 		return nREX3_ZeroOverflow;
-		break;
 	case 0x022c/4:
 	case 0x0a2c/4:
 		verboselog(machine, 2, "REX3 Red/CI Slope (copy) Read: %08x\n", nREX3_SlopeRed );
 		return nREX3_SlopeRed;
-		break;
 	case 0x0230/4:
 	case 0x0a30/4:
 		verboselog(machine, 2, "REX3 Host Data Port MSW Read: %08x\n", nREX3_HostDataPortMSW );
 		return nREX3_HostDataPortMSW;
-		break;
 	case 0x0234/4:
 	case 0x0a34/4:
 		verboselog(machine, 2, "REX3 Host Data Port LSW Read: %08x\n", nREX3_HostDataPortLSW );
 		return nREX3_HostDataPortLSW;
-		break;
 	case 0x0238/4:
 	case 0x0a38/4:
 		verboselog(machine, 2, "REX3 Display Control Bus Mode Read: %08x\n", nREX3_DCBMode );
 		return nREX3_DCBMode;
-		break;
 	case 0x0240/4:
 	case 0x0a40/4:
 		switch( nREX3_DCBSlvSelect )
 		{
 		case 0x00:
 			return newport_vc2_r( space, 0, mem_mask );
-			break;
 		case 0x02:
 			return newport_cmap0_r( space, 0, mem_mask );
-			break;
 		case 0x03:
 			return newport_cmap1_r( space, 0, mem_mask );
-			break;
 		case 0x05:
 			return newport_xmap0_r( space, 0, mem_mask );
-			break;
 		case 0x06:
 			return newport_xmap1_r( space, 0, mem_mask );
-			break;
 		default:
 			verboselog(machine, 2, "REX3 Display Control Bus Data MSW Read: %08x\n", nREX3_DCBDataMSW );
 			break;
 		}
 		return nREX3_DCBDataMSW;
-		break;
 	case 0x0244/4:
 	case 0x0a44/4:
 		verboselog(machine, 2, "REX3 Display Control Bus Data LSW Read: %08x\n", nREX3_DCBDataLSW );
 		return nREX3_DCBDataLSW;
-		break;
 	case 0x1300/4:
 		verboselog(machine, 2, "REX3 Screenmask 1 X Min/Max Read: %08x\n", nREX3_SMask1X );
 		return nREX3_SMask1X;
-		break;
 	case 0x1304/4:
 		verboselog(machine, 2, "REX3 Screenmask 1 Y Min/Max Read: %08x\n", nREX3_SMask1Y );
 		return nREX3_SMask1Y;
-		break;
 	case 0x1308/4:
 		verboselog(machine, 2, "REX3 Screenmask 2 X Min/Max Read: %08x\n", nREX3_SMask2X );
 		return nREX3_SMask2X;
-		break;
 	case 0x130c/4:
 		verboselog(machine, 2, "REX3 Screenmask 2 Y Min/Max Read: %08x\n", nREX3_SMask2Y );
 		return nREX3_SMask2Y;
-		break;
 	case 0x1310/4:
 		verboselog(machine, 2, "REX3 Screenmask 3 X Min/Max Read: %08x\n", nREX3_SMask3X );
 		return nREX3_SMask3X;
-		break;
 	case 0x1314/4:
 		verboselog(machine, 2, "REX3 Screenmask 3 Y Min/Max Read: %08x\n", nREX3_SMask3Y );
 		return nREX3_SMask3Y;
-		break;
 	case 0x1318/4:
 		verboselog(machine, 2, "REX3 Screenmask 4 X Min/Max Read: %08x\n", nREX3_SMask4X );
 		return nREX3_SMask4X;
-		break;
 	case 0x131c/4:
 		verboselog(machine, 2, "REX3 Screenmask 4 Y Min/Max Read: %08x\n", nREX3_SMask4Y );
 		return nREX3_SMask4Y;
-		break;
 	case 0x1320/4:
 		verboselog(machine, 2, "REX3 Top of Screen Scanline Read: %08x\n", nREX3_TopScanline );
 		return nREX3_TopScanline;
-		break;
 	case 0x1324/4:
 		verboselog(machine, 2, "REX3 Clipping Mode Read: %08x\n", nREX3_XYWin );
 		return nREX3_XYWin;
-		break;
 	case 0x1328/4:
 		verboselog(machine, 2, "REX3 Clipping Mode Read: %08x\n", nREX3_ClipMode );
 		return nREX3_ClipMode;
-		break;
 	case 0x1330/4:
 		verboselog(machine, 2, "REX3 Config Read: %08x\n", nREX3_Config );
 		return nREX3_Config;
-		break;
 	case 0x1338/4:
 		verboselog(machine, 2, "REX3 Status Read: %08x\n", 0x00000001 );
 		nTemp = nREX3_Status;
 		nREX3_Status = 0;
 		return 0x00000001;
-		break;
 	case 0x133c/4:
 		verboselog(machine, 2, "REX3 User Status Read: %08x\n", 0x00000001 );
 		return 0x00000001;
-		break;
 	default:
 		verboselog(machine, 2, "Unknown REX3 Read: %08x (%08x)\n", 0x1f0f0000 + ( offset << 2 ), mem_mask );
 		return 0;
-		break;
 	}
 	return 0;
 }

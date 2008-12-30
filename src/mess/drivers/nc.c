@@ -1488,9 +1488,7 @@ static  READ8_HANDLER(nc200_printer_status_r)
 
 static WRITE8_HANDLER(nc200_uart_control_w)
 {
-	int reset_fdc;
-
-	reset_fdc = (nc_uart_control^data) & (1<<5);
+	/* int reset_fdc = (nc_uart_control^data) & (1<<5); */
 
 	nc_uart_control_w(space, offset,data);
 

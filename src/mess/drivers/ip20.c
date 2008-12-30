@@ -122,15 +122,12 @@ static READ32_HANDLER( hpc_r )
 	case 0x05c:
 		verboselog(machine, 2, "HPC Unknown Read: %08x (%08x) (returning 0x000000a5 as kludge)\n", 0x1fb80000 + offset, mem_mask );
 		return 0x0000a500;
-		break;
 	case 0x00ac:
 		verboselog(machine, 2, "HPC Parallel Buffer Pointer Read: %08x (%08x)\n", nHPC_ParBufPtr, mem_mask );
 		return nHPC_ParBufPtr;
-		break;
 	case 0x00c0:
 		verboselog(machine, 2, "HPC Endianness Read: %08x (%08x)\n", 0x0000001f, mem_mask );
 		return 0x0000001f;
-		break;
 	case 0x0120:
 		if (!(mem_mask & 0x0000ff00))
 		{
@@ -140,7 +137,6 @@ static READ32_HANDLER( hpc_r )
 		{
 			return 0;
 		}
-		break;
 	case 0x0124:
 		if (!(mem_mask & 0x0000ff00))
 		{
@@ -150,101 +146,78 @@ static READ32_HANDLER( hpc_r )
 		{
 			return 0;
 		}
-		break;
 	case 0x01b0:
 		verboselog(machine, 2, "HPC Misc. Status Read: %08x (%08x)\n", nHPC_MiscStatus, mem_mask );
 		return nHPC_MiscStatus;
-		break;
 	case 0x01bc:
 //      verboselog(machine, 2, "HPC CPU Serial EEPROM Read\n" );
 		return ( ( eeprom_read_bit() << 4 ) );
-		break;
 	case 0x01c4:
 		verboselog(machine, 2, "HPC Local IO Register 0 Mask Read: %08x (%08x)\n", nHPC_LocalIOReg0Mask, mem_mask );
 		return nHPC_LocalIOReg0Mask;
-		break;
 	case 0x01cc:
 		verboselog(machine, 2, "HPC Local IO Register 1 Mask Read: %08x (%08x)\n", nHPC_LocalIOReg0Mask, mem_mask );
 		return nHPC_LocalIOReg1Mask;
-		break;
 	case 0x01d4:
 		verboselog(machine, 2, "HPC VME Interrupt Mask 0 Read: %08x (%08x)\n", nHPC_LocalIOReg0Mask, mem_mask );
 		return nHPC_VMEIntMask0;
-		break;
 	case 0x01d8:
 		verboselog(machine, 2, "HPC VME Interrupt Mask 1 Read: %08x (%08x)\n", nHPC_LocalIOReg0Mask, mem_mask );
 		return nHPC_VMEIntMask1;
-		break;
 	case 0x0d00:
 		verboselog(machine, 2, "HPC DUART0 Channel B Control Read\n" );
 //      return 0x00000004;
 		return 0x7c; //scc_r(machine, 0);
-		break;
 	case 0x0d04:
 		verboselog(machine, 2, "HPC DUART0 Channel B Data Read\n" );
 //      return 0;
 		scc = device_list_find_by_tag(space->machine->config->devicelist, SCC8530, "scc");
 		return scc_r(scc, 2);
-		break;
 	case 0x0d08:
 		verboselog(machine, 2, "HPC DUART0 Channel A Control Read (%08x)\n", mem_mask	 );
 //      return 0x40;
 		return 0x7c; //scc_r(machine, 1);
-		break;
 	case 0x0d0c:
 		verboselog(machine, 2, "HPC DUART0 Channel A Data Read\n" );
 //      return 0;
 		scc = device_list_find_by_tag(space->machine->config->devicelist, SCC8530, "scc");
 		return scc_r(scc, 3);
-		break;
 	case 0x0d10:
 //      verboselog(machine, 2, "HPC DUART1 Channel B Control Read\n" );
 		return 0x00000004;
-		break;
 	case 0x0d14:
 		verboselog(machine, 2, "HPC DUART1 Channel B Data Read\n" );
 		return 0;
-		break;
 	case 0x0d18:
 		verboselog(machine, 2, "HPC DUART1 Channel A Control Read\n" );
 		return 0;
-		break;
 	case 0x0d1c:
 		verboselog(machine, 2, "HPC DUART1 Channel A Data Read\n" );
 		return 0;
-		break;
 	case 0x0d20:
 		verboselog(machine, 2, "HPC DUART2 Channel B Control Read\n" );
 		return 0x00000004;
-		break;
 	case 0x0d24:
 		verboselog(machine, 2, "HPC DUART2 Channel B Data Read\n" );
 		return 0;
-		break;
 	case 0x0d28:
 		verboselog(machine, 2, "HPC DUART2 Channel A Control Read\n" );
 		return 0;
-		break;
 	case 0x0d2c:
 		verboselog(machine, 2, "HPC DUART2 Channel A Data Read\n" );
 		return 0;
-		break;
 	case 0x0d30:
 		verboselog(machine, 2, "HPC DUART3 Channel B Control Read\n" );
 		return 0x00000004;
-		break;
 	case 0x0d34:
 		verboselog(machine, 2, "HPC DUART3 Channel B Data Read\n" );
 		return 0;
-		break;
 	case 0x0d38:
 		verboselog(machine, 2, "HPC DUART3 Channel A Control Read\n" );
 		return 0;
-		break;
 	case 0x0d3c:
 		verboselog(machine, 2, "HPC DUART3 Channel A Data Read\n" );
 		return 0;
-		break;
 	}
 	verboselog(machine, 0, "Unmapped HPC read: 0x%08x (%08x)\n", 0x1fb80000 + offset, mem_mask );
 	return 0;

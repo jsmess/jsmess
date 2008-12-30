@@ -1540,9 +1540,9 @@ static imgtoolerr_t ti990_image_readfile(imgtool_partition *partition, const cha
 		/* next entry in file block table */
 		lnks_index++;
 	}
-#endif
 
 	return 0;
+#endif
 }
 
 /*
@@ -1664,9 +1664,9 @@ static imgtoolerr_t ti990_image_writefile(imgtool_partition *partition, const ch
 	/* update bitmap */
 	if (write_sector_logical(image->file_handle, 0, & image->geometry, &image->sec0))
 		return IMGTOOLERR_WRITEERROR;
-#endif
 
 	return 0;
+#endif
 }
 
 /*
@@ -1753,9 +1753,9 @@ static imgtoolerr_t ti990_image_deletefile(imgtool_partition *partition, const c
 	/* update bitmap */
 	if (write_sector_logical(image->file_handle, 0, & image->geometry, &image->sec0))
 		return IMGTOOLERR_WRITEERROR;
-#endif
 
 	return 0;
+#endif
 }
 #endif
 

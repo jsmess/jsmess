@@ -277,13 +277,11 @@ static int strataflash_r(int id, offs_t offset, bus_width_t bus_width)
 					return READ_BLOCKLOCK(id, offset >> BLOCK_ADDRESS_SHIFT);
 				}
 				return 0;	// default case
-				break;
 			case 3: // master lock config
 				if (strata[id].master_lock)
 					return 1;
 				else
 					return 0;
-				break;
 			}
 		break;
 	case FM_READQUERY:
@@ -291,23 +289,20 @@ static int strataflash_r(int id, offs_t offset, bus_width_t bus_width)
 		{
 		case 0x00:	// maker ID
 			return 0x89;	// Intel
-			break;
 		case 0x01:	// chip ID
 			return 0x15;	// 64 Mbit
-			break;
 		default:
 			if (((offset && BYTE_ADDRESS_MASK) >> 1) == 2)
 			{	// block lock config
 				return READ_BLOCKLOCK(id, offset >> BLOCK_ADDRESS_SHIFT);
 			}
 			return 0;	// default case
-			break;
 		/*case 0x03: // master lock config
 			if (strata[id].flash_master_lock)
 				return 1;
 			else
 				return 0;
-			break;*/
+		*/
 
 		/* CFI query identification string */
 		case 0x10:

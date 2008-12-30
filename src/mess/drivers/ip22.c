@@ -191,12 +191,10 @@ static READ32_HANDLER( hpc3_pbus6_r )
 		ret8 = pc_parallelport0_r(space, 2) ^ 0x0d;
 		verboselog( machine, 0, "Parallel Control Read: %02x\n", ret8 );
 		return ret8;
-		break;
 	case 0x008/4:
 		ret8 = pc_parallelport0_r(space, 1) ^ 0x80;
 		verboselog( machine, 0, "Parallel Status Read: %02x\n", ret8 );
 		return ret8;
-		break;
 	case 0x030/4:
 		verboselog( machine, 2, "Serial 1 Command Transfer Read, 0x1fbd9830: %02x\n", 0x04 );
 		switch(cpu_get_pc(space->cpu))
@@ -210,20 +208,15 @@ static READ32_HANDLER( hpc3_pbus6_r )
 				return 0x00000005;
 		}
 		return 0x00000004;
-		break;
 	case 0x038/4:
 		verboselog( machine, 2, "Serial 2 Command Transfer Read, 0x1fbd9838: %02x\n", 0x04 );
 		return 0x00000004;
-		break;
 	case 0x40/4:
 		return kbdc8042_8_r(space, 0);
-		break;
 	case 0x44/4:
 		return kbdc8042_8_r(space, 4);
-		break;
 	case 0x58/4:
 		return 0x20;	// chip rev 1, board rev 0, "Guinness" (Indy) => 0x01 for "Full House" (Indigo2)
-		break;
 	case 0x80/4:
 	case 0x84/4:
 	case 0x88/4:
@@ -238,31 +231,25 @@ static READ32_HANDLER( hpc3_pbus6_r )
 	case 0xac/4:
 //      mame_printf_info("INT3: r @ %x mask %08x (PC=%x)\n", offset*4, mem_mask, activecpu_get_pc());
 		return int3_regs[offset-0x80/4];
-		break;
 	case 0xb0/4:
 		ret8 = pit8253_r((device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8254, "pit8254" ), 0);
 		verboselog( machine, 0, "HPC PBUS6 IOC4 Timer Counter 0 Register Read: 0x%02x (%08x)\n", ret8, mem_mask );
 		return ret8;
-		break;
 	case 0xb4/4:
 		ret8 = pit8253_r((device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8254, "pit8254" ), 1);
 		verboselog( machine, 0, "HPC PBUS6 IOC4 Timer Counter 1 Register Read: 0x%02x (%08x)\n", ret8, mem_mask );
 		return ret8;
-		break;
 	case 0xb8/4:
 		ret8 = pit8253_r((device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8254, "pit8254" ), 2);
 		verboselog( machine, 0, "HPC PBUS6 IOC4 Timer Counter 2 Register Read: 0x%02x (%08x)\n", ret8, mem_mask );
 		return ret8;
-		break;
 	case 0xbc/4:
 		ret8 = pit8253_r((device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8254, "pit8254" ), 3);
 		verboselog( machine, 0, "HPC PBUS6 IOC4 Timer Control Word Register Read: 0x%02x (%08x)\n", ret8, mem_mask );
 		return ret8;
-		break;
 	default:
 		verboselog( machine, 0, "Unknown HPC PBUS6 Read: 0x%08x (%08x)\n", 0x1fbd9800 + ( offset << 2 ), mem_mask );
 		return 0;
-		break;
 	}
 	return 0;
 }
@@ -352,22 +339,18 @@ static WRITE32_HANDLER( hpc3_pbus6_w )
 		verboselog( machine, 0, "HPC PBUS6 IOC4 Timer Counter 0 Register Write: 0x%08x (%08x)\n", data, mem_mask );
 		pit8253_w((device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8254, "pit8254" ), 0, data & 0x000000ff);
 		return;
-		break;
 	case 0xb4/4:
 		verboselog( machine, 0, "HPC PBUS6 IOC4 Timer Counter 1 Register Write: 0x%08x (%08x)\n", data, mem_mask );
 		pit8253_w((device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8254, "pit8254" ), 1, data & 0x000000ff);
 		return;
-		break;
 	case 0xb8/4:
 		verboselog( machine, 0, "HPC PBUS6 IOC4 Timer Counter 2 Register Write: 0x%08x (%08x)\n", data, mem_mask );
 		pit8253_w((device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8254, "pit8254" ), 2, data & 0x000000ff);
 		return;
-		break;
 	case 0xbc/4:
 		verboselog( machine, 0, "HPC PBUS6 IOC4 Timer Control Word Register Write: 0x%08x (%08x)\n", data, mem_mask );
 		pit8253_w((device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8254, "pit8254" ), 3, data & 0x000000ff);
 		return;
-		break;
 	default:
 		verboselog( machine, 0, "Unknown HPC PBUS6 Write: 0x%08x: 0x%08x (%08x)\n", 0x1fbd9800 + ( offset << 2 ), data, mem_mask );
 		break;
@@ -388,24 +371,17 @@ static READ32_HANDLER( hpc3_hd_enet_r )
 	{
 	case 0x0004/4:
 		return nHPC_SCSI0Descriptor;
-		break;
-
 	case 0x1004/4:
 		return nHPC_SCSI0DMACtrl;
-		break;
-
 	case 0x4000/4:
 		verboselog(machine, 2, "HPC3 ENETR CBP Read: %08x (%08x): %08x\n", 0x1fb90000 + ( offset << 2), mem_mask, nHPC3_enetr_nbdp );
 		return nHPC3_enetr_cbp;
-		break;
 	case 0x4004/4:
 		verboselog(machine, 2, "HPC3 ENETR NBDP Read: %08x (%08x): %08x\n", 0x1fb90000 + ( offset << 2), mem_mask, nHPC3_enetr_nbdp );
 		return nHPC3_enetr_nbdp;
-		break;
 	default:
 		verboselog(machine, 0, "Unknown HPC3 ENET/HDx Read: %08x (%08x)\n", 0x1fb90000 + ( offset << 2 ), mem_mask );
 		return 0;
-		break;
 	}
 	return 0;
 }
@@ -419,11 +395,9 @@ static WRITE32_HANDLER( hpc3_hd_enet_w )
 	case 0x0004/4:
 		nHPC_SCSI0Descriptor = data;
 		break;
-
 	case 0x1004/4:
 		nHPC_SCSI0DMACtrl = data;
 		break;
-
 	case 0x4000/4:
 		verboselog(machine, 2, "HPC3 ENETR CBP Write: %08x\n", data );
 		nHPC3_enetr_cbp = data;
@@ -455,7 +429,6 @@ static READ32_HANDLER( hpc3_hd0_r )
 		{
 			return 0;
 		}
-		break;
 	case 0x0004/4:
 	case 0x4004/4:
 //      verboselog(machine, 2, "HPC3 HD0 Register Read: %08x (%08x): %08x\n", 0x1fb90000 + ( offset << 2), mem_mask, nHPC3_hd0_regs[nHPC3_hd0_register] );
@@ -467,11 +440,9 @@ static READ32_HANDLER( hpc3_hd0_r )
 		{
 			return 0;
 		}
-		break;
 	default:
 		verboselog(machine, 0, "Unknown HPC3 HD0 Read: %08x (%08x) [%x] PC=%x\n", 0x1fbc0000 + ( offset << 2 ), mem_mask, offset, cpu_get_pc(space->cpu) );
 		return 0;
-		break;
 	}
 	return 0;
 }
@@ -517,19 +488,15 @@ static READ32_HANDLER( hpc3_pbus4_r )
 	case 0x0004/4:
 		verboselog(machine, 2, "HPC3 PBUS4 Unknown 0 Read: (%08x): %08x\n", mem_mask, nHPC3_unk0 );
 		return nHPC3_unk0;
-		break;
 	case 0x000c/4:
 		verboselog(machine, 2, "Interrupt Controller(?) Read: (%08x): %08x\n", mem_mask, nHPC3_IC_Unk0 );
 		return nHPC3_IC_Unk0;
-		break;
 	case 0x0014/4:
 		verboselog(machine, 2, "HPC3 PBUS4 Unknown 1 Read: (%08x): %08x\n", mem_mask, nHPC3_unk1 );
 		return nHPC3_unk1;
-		break;
 	default:
 		verboselog(machine, 0, "Unknown HPC3 PBUS4 Read: %08x (%08x)\n", 0x1fbd9000 + ( offset << 2 ), mem_mask );
 		return 0;
-		break;
 	}
 	return 0;
 }
@@ -603,63 +570,48 @@ static READ32_HANDLER( rtc_r )
 		case 0x0000:
 //          verboselog(machine, 2, "RTC Seconds Read: %d \n", RTC_SECONDS );
 			return RTC_SECONDS;
-			break;
 		case 0x0001:
 //          verboselog(machine, 2, "RTC Seconds Alarm Read: %d \n", RTC_SECONDS_A );
 			return RTC_SECONDS_A;
-			break;
 		case 0x0002:
 			verboselog(machine, 3, "RTC Minutes Read: %d \n", RTC_MINUTES );
 			return RTC_MINUTES;
-			break;
 		case 0x0003:
 			verboselog(machine, 3, "RTC Minutes Alarm Read: %d \n", RTC_MINUTES_A );
 			return RTC_MINUTES_A;
-			break;
 		case 0x0004:
 			verboselog(machine, 3, "RTC Hours Read: %d \n", RTC_HOURS );
 			return RTC_HOURS;
-			break;
 		case 0x0005:
 			verboselog(machine, 3, "RTC Hours Alarm Read: %d \n", RTC_HOURS_A );
 			return RTC_HOURS_A;
-			break;
 		case 0x0006:
 			verboselog(machine, 3, "RTC Day of Week Read: %d \n", RTC_DAYOFWEEK );
 			return RTC_DAYOFWEEK;
-			break;
 		case 0x0007:
 			verboselog(machine, 3, "RTC Day of Month Read: %d \n", RTC_DAYOFMONTH );
 			return RTC_DAYOFMONTH;
-			break;
 		case 0x0008:
 			verboselog(machine, 3, "RTC Month Read: %d \n", RTC_MONTH );
 			return RTC_MONTH;
-			break;
 		case 0x0009:
 			verboselog(machine, 3, "RTC Year Read: %d \n", RTC_YEAR );
 			return RTC_YEAR;
-			break;
 		case 0x000a:
 			verboselog(machine, 3, "RTC Register A Read: %02x \n", RTC_REGISTERA );
 			return RTC_REGISTERA;
-			break;
 		case 0x000b:
 			verboselog(machine, 3, "RTC Register B Read: %02x \n", RTC_REGISTERB );
 			return RTC_REGISTERB;
-			break;
 		case 0x000c:
 			verboselog(machine, 3, "RTC Register C Read: %02x \n", RTC_REGISTERC );
 			return RTC_REGISTERC;
-			break;
 		case 0x000d:
 			verboselog(machine, 3, "RTC Register D Read: %02x \n", RTC_REGISTERD );
 			return RTC_REGISTERD;
-			break;
 		default:
 			verboselog(machine, 3, "Unknown RTC Read: %08x (%08x)\n", 0x1fbe0000 + ( offset << 2 ), mem_mask );
 			return 0;
-			break;
 		}
 	}
 	if( offset >= 0x0e && offset < 0x40 )
@@ -677,77 +629,58 @@ static READ32_HANDLER( rtc_r )
 		case 0x0040:
 			verboselog(machine, 3, "RTC Model Byte Read: %02x\n", RTC_MODELBYTE );
 			return RTC_MODELBYTE;
-			break;
 		case 0x0041:
 			verboselog(machine, 3, "RTC Serial Byte 0 Read: %02x\n", RTC_SERBYTE0 );
 			return RTC_SERBYTE0;
-			break;
 		case 0x0042:
 			verboselog(machine, 3, "RTC Serial Byte 1 Read: %02x\n", RTC_SERBYTE1 );
 			return RTC_SERBYTE1;
-			break;
 		case 0x0043:
 			verboselog(machine, 3, "RTC Serial Byte 2 Read: %02x\n", RTC_SERBYTE2 );
 			return RTC_SERBYTE2;
-			break;
 		case 0x0044:
 			verboselog(machine, 3, "RTC Serial Byte 3 Read: %02x\n", RTC_SERBYTE3 );
 			return RTC_SERBYTE3;
-			break;
 		case 0x0045:
 			verboselog(machine, 3, "RTC Serial Byte 4 Read: %02x\n", RTC_SERBYTE4 );
 			return RTC_SERBYTE4;
-			break;
 		case 0x0046:
 			verboselog(machine, 3, "RTC Serial Byte 5 Read: %02x\n", RTC_SERBYTE5 );
 			return RTC_SERBYTE5;
-			break;
 		case 0x0047:
 			verboselog(machine, 3, "RTC CRC Read: %02x\n", RTC_CRC );
 			return RTC_CRC;
-			break;
 		case 0x0048:
 			verboselog(machine, 3, "RTC Century Read: %02x\n", RTC_CENTURY );
 			return RTC_CENTURY;
-			break;
 		case 0x0049:
 			verboselog(machine, 3, "RTC Day of Month Alarm Read: %02x \n", RTC_DAYOFMONTH_A );
 			return RTC_DAYOFMONTH_A;
-			break;
 		case 0x004a:
 			verboselog(machine, 3, "RTC Extended Control 0 Read: %02x \n", RTC_EXTCTRL0 );
 			return RTC_EXTCTRL0;
-			break;
 		case 0x004b:
 			verboselog(machine, 3, "RTC Extended Control 1 Read: %02x \n", RTC_EXTCTRL1 );
 			return RTC_EXTCTRL1;
-			break;
 		case 0x004e:
 			verboselog(machine, 3, "RTC SMI Recovery Address 2 Read: %02x \n", RTC_RTCADDR2 );
 			return RTC_RTCADDR2;
-			break;
 		case 0x004f:
 			verboselog(machine, 3, "RTC SMI Recovery Address 3 Read: %02x \n", RTC_RTCADDR3 );
 			return RTC_RTCADDR3;
-			break;
 		case 0x0050:
 			verboselog(machine, 3, "RTC RAM LSB Read: %02x \n", RTC_RAMLSB );
 			return RTC_RAMLSB;
-			break;
 		case 0x0051:
 			verboselog(machine, 3, "RTC RAM MSB Read: %02x \n", RTC_RAMMSB );
 			return RTC_RAMMSB;
-			break;
 		case 0x0053:
 			return nRTC_RAM[ ( RTC_RAMMSB << 8 ) | RTC_RAMLSB ];
-			break;
 		case 0x005e:
 			return RTC_WRITECNT;
-			break;
 		default:
 			verboselog(machine, 3, "Unknown RTC Ext. Reg. Read: %02x\n", offset );
 			return 0;
-			break;
 		}
 	}
 	if( offset >= 0x80 )
@@ -944,11 +877,9 @@ static READ32_HANDLER( hal2_r )
 	case 0x0010/4:
 		verboselog(machine, 0, "HAL2 Status read: 0x0004\n" );
 		return 0x0004;
-		break;
 	case 0x0020/4:
 		verboselog(machine, 0, "HAL2 Revision read: 0x4011\n" );
 		return 0x4011;
-		break;
 	}
 	verboselog(machine, 0, "Unknown HAL2 read: 0x%08x (%08x)\n", 0x1fbd8000 + offset*4, mem_mask );
 	return 0;
@@ -1045,28 +976,25 @@ static WRITE32_HANDLER( hal2_w )
 		}
 		verboselog(machine, 0, "    Parameter: %01x\n", ( data & H2_IAR_PARAM ) >> 2 );
 		return;
+		/* FIXME: this code is never excuted */
 		verboselog(machine, 0, "    Read Back Index: %01x\n", ( data & H2_IAR_RB_INDEX ) );
 		break;
 	case 0x0040/4:
 		verboselog(machine, 0, "HAL2 Indirect Data Register 0 Write: 0x%08x (%08x)\n", data, mem_mask );
 		nHAL2_IDR[0] = data;
 		return;
-		break;
 	case 0x0050/4:
 		verboselog(machine, 0, "HAL2 Indirect Data Register 1 Write: 0x%08x (%08x)\n", data, mem_mask );
 		nHAL2_IDR[1] = data;
 		return;
-		break;
 	case 0x0060/4:
 		verboselog(machine, 0, "HAL2 Indirect Data Register 2 Write: 0x%08x (%08x)\n", data, mem_mask );
 		nHAL2_IDR[2] = data;
 		return;
-		break;
 	case 0x0070/4:
 		verboselog(machine, 0, "HAL2 Indirect Data Register 3 Write: 0x%08x (%08x)\n", data, mem_mask );
 		nHAL2_IDR[3] = data;
 		return;
-		break;
 	}
 	verboselog(machine, 0, "Unknown HAL2 write: 0x%08x: 0x%08x (%08x)\n", 0x1fbd8000 + offset*4, data, mem_mask );
 }
@@ -1143,7 +1071,6 @@ static WRITE32_HANDLER( hpc3_pbusdma_w )
 	case 0x0000/4:
 		verboselog(machine, 0, "PBUS DMA Channel %d Buffer Pointer Write: 0x%08x\n", channel, data );
 		return;
-		break;
 	case 0x0004/4:
 		verboselog(machine, 0, "PBUS DMA Channel %d Descriptor Pointer Write: 0x%08x\n", channel, data );
 		if( channel == 1 )
@@ -1158,7 +1085,6 @@ static WRITE32_HANDLER( hpc3_pbusdma_w )
 			verboselog(machine, 0, "nPBUS_DMA_NextPtr = %08x\n", nPBUS_DMA_NextPtr );
 		}
 		return;
-		break;
 	case 0x1000/4:
 		verboselog(machine, 0, "PBUS DMA Channel %d Control Register Write: 0x%08x\n", channel, data );
 		if( data & PBUS_CTRL_ENDIAN )
@@ -1198,7 +1124,6 @@ static WRITE32_HANDLER( hpc3_pbusdma_w )
 			nPBUS_DMA_Active = 1;
 		}
 		return;
-		break;
 	}
 	verboselog(machine, 0, "Unknown PBUS DMA Channel %d Write: 0x%08x: 0x%08x (%08x)\n", channel, 0x1fb80000 + offset*4, data, mem_mask );
 }

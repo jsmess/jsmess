@@ -951,7 +951,6 @@ DEVICE_IMAGE_LOAD( timex_cart )
 				free (file_data);
 				timex_cart_type = TIMEX_CART_NONE;
 				return INIT_FAIL;
-				break;
 	}
 
 	logerror ("Cart loaded\n");

@@ -856,26 +856,24 @@ static  READ8_HANDLER( mapper5_l_r )
 	{
 		case 0x1104: /* $5204 */
 #if 0
-			if (current_scanline == MMC5_scanline) return 0x80;
-			else return 0x00;
+			if (current_scanline == MMC5_scanline) 
+				return 0x80;
+			else 
+				return 0x00;
 #else
 			retVal = IRQ_status;
 			IRQ_status &= ~0x80;
 			return retVal;
 #endif
-			break;
 
 		case 0x1105: /* $5205 */
 			return (mult1 * mult2) & 0xff;
-			break;
 		case 0x1106: /* $5206 */
 			return ((mult1 * mult2) & 0xff00) >> 8;
-			break;
 
 		default:
 			logerror("** MMC5 uncaught read, offset: %04x\n", offset + 0x4100);
 			return 0x00;
-			break;
 	}
 }
 
