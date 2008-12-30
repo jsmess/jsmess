@@ -50,6 +50,9 @@ System Driver Changes:
 
 - [ONDRA] Both computers now work, cassette supported  [Miodrag Milanovic]
 
+- [TS2068] Fixed CPU and AY clocks based on crystal values from schematics
+  [Justin Kerk, Lord Nightmare]
+
 
 
 User Interface Changes:
