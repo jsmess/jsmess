@@ -155,6 +155,13 @@ http://www.z88forever.org.uk/zxplus3e/
 #include "sound/ay8910.h"
 #include "formats/tzx_cas.h"
 
+static const ay8910_interface spectrum_ay_interface =
+{
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	NULL
+};
+
 /****************************************************************************************************/
 /* TS2048 specific functions */
 
@@ -615,6 +622,11 @@ static MACHINE_DRIVER_START( ts2068 )
 
 	MDRV_VIDEO_UPDATE( ts2068 )
 	MDRV_VIDEO_EOF( ts2068 )
+
+	/* sound */
+	MDRV_SOUND_REPLACE("ay8912", AY8912, XTAL_14_112MHz/8)        /* From Schematic; 1.764 MHz */
+	MDRV_SOUND_CONFIG(spectrum_ay_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)	
 
 	/* cartridge */
 	MDRV_CARTSLOT_MODIFY("cart")
