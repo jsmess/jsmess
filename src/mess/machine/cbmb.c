@@ -1,5 +1,5 @@
 /***************************************************************************
-	commodore b series computer
+    commodore b series computer
 
     peter.trauner@jk.uni-linz.ac.at
 ***************************************************************************/
@@ -20,7 +20,7 @@
 
 #include "devices/cartslot.h"
 
-/* 2008-05 FP: Were these added as a reminder to add configs of 
+/* 2008-05 FP: Were these added as a reminder to add configs of
 drivers 8 & 9 as in pet.c ? */
 #define IEEE8ON 0
 #define IEEE9ON 0
@@ -37,6 +37,8 @@ drivers 8 & 9 as in pet.c ? */
 	} while (0)
 
 static TIMER_CALLBACK(cbmb_frame_interrupt);
+/* keyboard lines */
+static int cbmb_keyline_a, cbmb_keyline_b, cbmb_keyline_c;
 
 UINT8 *cbmb_basic;
 UINT8 *cbmb_kernal;
@@ -75,7 +77,7 @@ READ8_DEVICE_HANDLER( cbmb_tpi0_port_a_r )
 	if (cbm_ieee_eoi_r(device->machine)) data |= 0x20;
 	if (cbm_ieee_dav_r(device->machine)) data |= 0x10;
 	if (cbm_ieee_atn_r(device->machine)) data |= 0x08;
-/*	if (cbm_ieee_ren_r(device->machine)) data |= 0x04; */
+/*  if (cbm_ieee_ren_r(device->machine)) data |= 0x04; */
 
 	return data;
 }
@@ -87,7 +89,7 @@ WRITE8_DEVICE_HANDLER( cbmb_tpi0_port_a_w )
 	cbm_ieee_eoi_w(device->machine, 0, data & 0x20);
 	cbm_ieee_dav_w(device->machine, 0, data & 0x10);
 	cbm_ieee_atn_w(device->machine, 0, data & 0x08);
-/*	cbm_ieee_ren_w(device->machine, 0, data & 0x04); */
+/*  cbm_ieee_ren_w(device->machine, 0, data & 0x04); */
 	logerror("cbm ieee %d %d\n", data & 0x02, data & 0x01);
 }
 
@@ -105,42 +107,38 @@ WRITE8_DEVICE_HANDLER( cbmb_tpi0_port_a_w )
   port a7..a0 b7..b0 keyboard input */
 WRITE8_DEVICE_HANDLER( cbmb_keyboard_line_select_a )
 {
-	cbmb_state *state = device->machine->driver_data;
-	state->cbmb_keyline_a = data;
+	cbmb_keyline_a = data;
 }
 
 WRITE8_DEVICE_HANDLER( cbmb_keyboard_line_select_b )
 {
-	cbmb_state *state = device->machine->driver_data;
-	state->cbmb_keyline_b = data;
+	cbmb_keyline_b = data;
 }
 
 WRITE8_DEVICE_HANDLER( cbmb_keyboard_line_select_c )
 {
-	cbmb_state *state = device->machine->driver_data;
-	state->cbmb_keyline_c = data;
+	cbmb_keyline_c = data;
 }
 
 READ8_DEVICE_HANDLER( cbmb_keyboard_line_a )
 {
 	int data = 0;
-	cbmb_state *state = device->machine->driver_data;	
-	if (!(state->cbmb_keyline_c & 0x01)) 
+	if (!(cbmb_keyline_c & 0x01))
 		data |= input_port_read(device->machine, "ROW0");
 
-	if (!(state->cbmb_keyline_c & 0x02)) 
+	if (!(cbmb_keyline_c & 0x02))
 		data |= input_port_read(device->machine, "ROW2");
 
-	if (!(state->cbmb_keyline_c & 0x04)) 
+	if (!(cbmb_keyline_c & 0x04))
 		data |= input_port_read(device->machine, "ROW4");
 
-	if (!(state->cbmb_keyline_c & 0x08)) 
+	if (!(cbmb_keyline_c & 0x08))
 		data |= input_port_read(device->machine, "ROW6");
 
-	if (!(state->cbmb_keyline_c & 0x10)) 
+	if (!(cbmb_keyline_c & 0x10))
 		data |= input_port_read(device->machine, "ROW8");
 
-	if (!(state->cbmb_keyline_c & 0x20)) 
+	if (!(cbmb_keyline_c & 0x20))
 		data |= input_port_read(device->machine, "ROW10");
 
 	return data ^0xff;
@@ -149,23 +147,22 @@ READ8_DEVICE_HANDLER( cbmb_keyboard_line_a )
 READ8_DEVICE_HANDLER( cbmb_keyboard_line_b )
 {
 	int data = 0;
-	cbmb_state *state = device->machine->driver_data;	
-	if (!(state->cbmb_keyline_c & 0x01)) 
+	if (!(cbmb_keyline_c & 0x01))
 		data |= input_port_read(device->machine, "ROW1");
 
-	if (!(state->cbmb_keyline_c & 0x02)) 
+	if (!(cbmb_keyline_c & 0x02))
 		data |= input_port_read(device->machine, "ROW3");
 
-	if (!(state->cbmb_keyline_c & 0x04)) 
+	if (!(cbmb_keyline_c & 0x04))
 		data |= input_port_read(device->machine, "ROW5");
 
-	if (!(state->cbmb_keyline_c & 0x08)) 
+	if (!(cbmb_keyline_c & 0x08))
 		data |= input_port_read(device->machine, "ROW7");
 
-	if (!(state->cbmb_keyline_c & 0x10)) 
+	if (!(cbmb_keyline_c & 0x10))
 		data |= input_port_read(device->machine, "ROW9") | ((input_port_read(device->machine, "SPECIAL") & 0x04) ? 1 : 0 );
 
-	if (!(state->cbmb_keyline_c & 0x20)) 
+	if (!(cbmb_keyline_c & 0x20))
 		data |= input_port_read(device->machine, "ROW11");
 
 	return data ^0xff;
@@ -174,37 +171,37 @@ READ8_DEVICE_HANDLER( cbmb_keyboard_line_b )
 READ8_DEVICE_HANDLER( cbmb_keyboard_line_c )
 {
 	int data = 0;
-	cbmb_state *state = device->machine->driver_data;	
-	if ((input_port_read(device->machine, "ROW0") & ~state->cbmb_keyline_a) || 
-				(input_port_read(device->machine, "ROW1") & ~state->cbmb_keyline_b)) 
+	cbmb_state *state = device->machine->driver_data;
+	if ((input_port_read(device->machine, "ROW0") & ~cbmb_keyline_a) ||
+				(input_port_read(device->machine, "ROW1") & ~cbmb_keyline_b))
 		 data |= 0x01;
 
-	if ((input_port_read(device->machine, "ROW2") & ~state->cbmb_keyline_a) || 
-				(input_port_read(device->machine, "ROW3") & ~state->cbmb_keyline_b)) 
+	if ((input_port_read(device->machine, "ROW2") & ~cbmb_keyline_a) ||
+				(input_port_read(device->machine, "ROW3") & ~cbmb_keyline_b))
 		 data |= 0x02;
 
-	if ((input_port_read(device->machine, "ROW4") & ~state->cbmb_keyline_a) || 
-				(input_port_read(device->machine, "ROW5") & ~state->cbmb_keyline_b)) 
+	if ((input_port_read(device->machine, "ROW4") & ~cbmb_keyline_a) ||
+				(input_port_read(device->machine, "ROW5") & ~cbmb_keyline_b))
 		 data |= 0x04;
 
-	if ((input_port_read(device->machine, "ROW6") & ~state->cbmb_keyline_a) || 
-				(input_port_read(device->machine, "ROW7") & ~state->cbmb_keyline_b)) 
+	if ((input_port_read(device->machine, "ROW6") & ~cbmb_keyline_a) ||
+				(input_port_read(device->machine, "ROW7") & ~cbmb_keyline_b))
 		 data |= 0x08;
 
-	if ((input_port_read(device->machine, "ROW8") & ~state->cbmb_keyline_a) || 
-				((input_port_read(device->machine, "ROW9") | ((input_port_read(device->machine, "SPECIAL") & 0x04) ? 1 : 0)) & ~state->cbmb_keyline_b)) 
+	if ((input_port_read(device->machine, "ROW8") & ~cbmb_keyline_a) ||
+				((input_port_read(device->machine, "ROW9") | ((input_port_read(device->machine, "SPECIAL") & 0x04) ? 1 : 0)) & ~cbmb_keyline_b))
 		 data |= 0x10;
 
-	if ((input_port_read(device->machine, "ROW10") & ~state->cbmb_keyline_a) || 
-				(input_port_read(device->machine, "ROW11") & ~state->cbmb_keyline_b)) 
+	if ((input_port_read(device->machine, "ROW10") & ~cbmb_keyline_a) ||
+				(input_port_read(device->machine, "ROW11") & ~cbmb_keyline_b))
 		 data |= 0x20;
 
-	if (!state->p500) 
+	if (!state->p500)
 	{
-		if (!state->cbm_ntsc) 
+		if (!state->cbm_ntsc)
 			data |= 0x40;
 
-		if (!state->cbm700) 
+		if (!state->cbm700)
 			data |= 0x80;
 	}
 	return data ^0xff;
@@ -298,7 +295,7 @@ static void cbmb_common_driver_init(running_machine *machine)
 DRIVER_INIT( cbm600 )
 {
 	cbmb_state *state = machine->driver_data;
-	cbmb_common_driver_init(machine);	
+	cbmb_common_driver_init(machine);
 	state->cbm_ntsc = 1;
 	cbm600_vh_init(machine);
 }
@@ -349,7 +346,7 @@ static TIMER_CALLBACK(cbmb_frame_interrupt)
 {
 	static int level = 0;
 	const device_config *tpi_0 = devtag_get_device(machine, TPI6525, "tpi6525_0");
-	
+
 #if 0
 	int controller1 = input_port_read(machine, "CTRLSEL") & 0x07;
 	int controller2 = input_port_read(machine, "CTRLSEL") & 0x70;
@@ -366,7 +363,7 @@ static TIMER_CALLBACK(cbmb_frame_interrupt)
 		case 0x00:
 			value &= ~input_port_read(machine, "JOY1_1B");			/* Joy1 Directions + Button 1 */
 			break;
-		
+
 		case 0x01:
 			if (input_port_read(machine, "OTHER") & 0x40)			/* Paddle2 Button */
 				value &= ~0x08;
@@ -380,15 +377,15 @@ static TIMER_CALLBACK(cbmb_frame_interrupt)
 			if (input_port_read(machine, "OTHER") & 0x01)			/* Mouse Button Right */
 				value &= ~0x01;
 			break;
-			
+
 		case 0x03:
 			value &= ~(input_port_read(machine, "JOY1_2B") & 0x1f);	/* Joy1 Directions + Button 1 */
 			break;
-		
+
 		case 0x04:
 /* was there any input on the lightpen? where is it mapped? */
-//			if (input_port_read(machine, "OTHER") & 0x04)			/* Lightpen Signal */
-//				value &= ?? ;
+//          if (input_port_read(machine, "OTHER") & 0x04)           /* Lightpen Signal */
+//              value &= ?? ;
 			break;
 
 		case 0x07:
@@ -408,7 +405,7 @@ static TIMER_CALLBACK(cbmb_frame_interrupt)
 		case 0x00:
 			value &= ~input_port_read(machine, "JOY2_1B");			/* Joy2 Directions + Button 1 */
 			break;
-		
+
 		case 0x10:
 			if (input_port_read(machine, "OTHER") & 0x10)			/* Paddle4 Button */
 				value &= ~0x08;
@@ -422,15 +419,15 @@ static TIMER_CALLBACK(cbmb_frame_interrupt)
 			if (input_port_read(machine, "OTHER") & 0x01)			/* Mouse Button Right */
 				value &= ~0x01;
 			break;
-		
+
 		case 0x30:
 			value &= ~(input_port_read(machine, "JOY2_2B") & 0x1f);	/* Joy2 Directions + Button 1 */
 			break;
 
 		case 0x40:
 /* was there any input on the lightpen? where is it mapped? */
-//			if (input_port_read(machine, "OTHER") & 0x04)			/* Lightpen Signal */
-//				value &= ?? ;
+//          if (input_port_read(machine, "OTHER") & 0x04)           /* Lightpen Signal */
+//              value &= ?? ;
 			break;
 
 		case 0x70:
@@ -445,7 +442,7 @@ static TIMER_CALLBACK(cbmb_frame_interrupt)
 #endif
 
 // 128u4 FIXME
-//	vic2_frame_interrupt (device);
+//  vic2_frame_interrupt (device);
 
 	set_led_status (1, input_port_read(machine, "SPECIAL") & 0x04 ? 1 : 0);		/* Shift Lock */
 }
@@ -453,7 +450,7 @@ static TIMER_CALLBACK(cbmb_frame_interrupt)
 
 /***********************************************
 
-	CBM Business Computers Cartridges
+    CBM Business Computers Cartridges
 
 ***********************************************/
 
@@ -470,12 +467,12 @@ static DEVICE_IMAGE_LOAD(cbmb_cart)
 
  	if (!mame_stricmp (filetype, "crt"))
 	{
-	/* We temporarily remove .crt loading. Previous versions directly used 
-	the same routines used to load C64 .crt file, but I seriously doubt the
-	formats are compatible. While waiting for confirmation about .crt dumps
-	for CBMB machines, we simply do not load .crt files */
+	/* We temporarily remove .crt loading. Previous versions directly used
+    the same routines used to load C64 .crt file, but I seriously doubt the
+    formats are compatible. While waiting for confirmation about .crt dumps
+    for CBMB machines, we simply do not load .crt files */
 	}
-	else 
+	else
 	{
 		/* Assign loading address according to extension */
 		if (!mame_stricmp (filetype, "10"))
@@ -505,11 +502,11 @@ static DEVICE_IMAGE_LOAD(cbmb_cart)
 		if (test != cbmb_cbm_cart[0].size)
 			return INIT_FAIL;
 	}
-				
+
 	/* Finally load the cart */
-//	This could be needed with .crt support
-//	for (i = 0; (i < sizeof(pet_cbm_cart) / sizeof(pet_cbm_cart[0])) && (pet_cbm_cart[i].size != 0); i++) 
-//		memcpy(cbmb_memory + cbmb_cbm_cart[i].addr + 0xf0000, cbmb_cbm_cart[i].chip, cbmb_cbm_cart[i].size);
+//  This could be needed with .crt support
+//  for (i = 0; (i < sizeof(pet_cbm_cart) / sizeof(pet_cbm_cart[0])) && (pet_cbm_cart[i].size != 0); i++)
+//      memcpy(cbmb_memory + cbmb_cbm_cart[i].addr + 0xf0000, cbmb_cbm_cart[i].chip, cbmb_cbm_cart[i].size);
 	memcpy(cbmb_memory + cbmb_cbm_cart[0].addr + 0xf0000, cbmb_cbm_cart[0].chip, cbmb_cbm_cart[0].size);
 
 	return INIT_PASS;

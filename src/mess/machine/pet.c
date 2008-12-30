@@ -1,5 +1,5 @@
 /***************************************************************************
-	commodore pet series computer
+    commodore pet series computer
 
     peter.trauner@jk.uni-linz.ac.at
 ***************************************************************************/
@@ -36,7 +36,7 @@ UINT8 *pet_memory;
 UINT8 *superpet_memory;
 UINT8 *pet_videoram;
 static UINT8 *pet80_bank1_base;
-static int pet_keyline_select;	
+static int pet_keyline_select;
 
 static emu_timer *datasette1_timer;
 static emu_timer *datasette2_timer;
@@ -75,7 +75,7 @@ static WRITE8_HANDLER( pet_mc6845_address_w )
   cb2 cassette 1 motor out
 */
 static READ8_HANDLER ( pet_pia0_port_a_read )
-{	
+{
 	int data = 0xf0 | pet_keyline_select;
 
 	if ((cassette_get_state(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette1" )) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
@@ -84,7 +84,7 @@ static READ8_HANDLER ( pet_pia0_port_a_read )
 	if ((cassette_get_state(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette2" )) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
 		data &= ~0x20;
 
-	if (!cbm_ieee_eoi_r(space->machine)) 
+	if (!cbm_ieee_eoi_r(space->machine))
 		data &= ~0x40;
 
 	return data;
@@ -99,14 +99,14 @@ static WRITE8_HANDLER ( pet_pia0_port_a_write )
 static  READ8_HANDLER ( pet_pia0_port_b_read )
 {
 	UINT8 data = 0xff;
-	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", 
+	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4",
 										"ROW5", "ROW6", "ROW7", "ROW8", "ROW9" };
-	
-	if (pet_keyline_select < 10) 
+
+	if (pet_keyline_select < 10)
 	{
 		data = input_port_read(space->machine, keynames[pet_keyline_select]);
 		/* Check for left-shift lock */
-		if ((pet_keyline_select == 8) && (input_port_read(space->machine, "SPECIAL") & 0x80)) 
+		if ((pet_keyline_select == 8) && (input_port_read(space->machine, "SPECIAL") & 0x80))
 			data &= 0xfe;
 	}
 	return data;
@@ -117,10 +117,10 @@ static READ8_HANDLER( petb_pia0_port_b_read )
 {
 	UINT8 data = 0xff;
 	pet_state *state = space->machine->driver_data;
-	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", 
+	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4",
 										"ROW5", "ROW6", "ROW7", "ROW8", "ROW9" };
-	
-	if (pet_keyline_select < 10) 
+
+	if (pet_keyline_select < 10)
 	{
 		data = input_port_read(space->machine, keynames[pet_keyline_select]);
 		/* Check for left-shift lock */
@@ -128,12 +128,12 @@ static READ8_HANDLER( petb_pia0_port_b_read )
 		/* While waiting for confirmation from docs, we add a workaround here. */
 		if (state->superpet)
 		{
-			if ((pet_keyline_select == 6) && !(input_port_read(space->machine, "SPECIAL") & 0x80)) 
+			if ((pet_keyline_select == 6) && !(input_port_read(space->machine, "SPECIAL") & 0x80))
 				data &= 0xfe;
-		}		
+		}
 		else
 		{
-			if ((pet_keyline_select == 6) && (input_port_read(space->machine, "SPECIAL") & 0x80)) 
+			if ((pet_keyline_select == 6) && (input_port_read(space->machine, "SPECIAL") & 0x80))
 				data &= 0xfe;
 		}
 	}
@@ -297,7 +297,7 @@ static READ8_DEVICE_HANDLER( pet_via_port_b_r )
 
 	if (cbm_ieee_ndac_r(device->machine)) data |= 0x01;
 
-	//	data & 0x08 -> cassette write (it seems to BOTH cassettes from schematics)
+	//  data & 0x08 -> cassette write (it seems to BOTH cassettes from schematics)
 
 	if (!(data & 0x10))
 	{
@@ -443,9 +443,9 @@ WRITE8_HANDLER(cbm8096_w)
 		memory_install_write8_handler(space, 0xb000, 0xbfff, 0, 0, (data & 1) == 0 ? SMH_BANK4 : SMH_NOP);
 
 
-		if (data & 4) 
+		if (data & 4)
 		{
-			if (!(data & 0x20)) 
+			if (!(data & 0x20))
 			{
 				pet80_bank1_base = pet_memory + 0x14000;
 				memory_set_bankptr (space->machine, 1, pet80_bank1_base);
@@ -453,10 +453,10 @@ WRITE8_HANDLER(cbm8096_w)
 			memory_set_bankptr (space->machine, 2, pet_memory + 0x15000);
 			memory_set_bankptr (space->machine, 3, pet_memory + 0x16000);
 			memory_set_bankptr (space->machine, 4, pet_memory + 0x17000);
-		} 
-		else 
+		}
+		else
 		{
-			if (!(data & 0x20)) 
+			if (!(data & 0x20))
 			{
 				pet80_bank1_base = pet_memory + 0x10000;
 				memory_set_bankptr (space->machine, 1, pet80_bank1_base);
@@ -466,19 +466,19 @@ WRITE8_HANDLER(cbm8096_w)
 			memory_set_bankptr (space->machine, 4, pet_memory + 0x13000);
 		}
 
-		if (data & 8) 
+		if (data & 8)
 		{
-			if (!(data & 0x40)) 
+			if (!(data & 0x40))
 			{
 				memory_set_bankptr (space->machine, 7, pet_memory + 0x1e800);
 			}
 			memory_set_bankptr (space->machine, 6, pet_memory + 0x1c000);
 			memory_set_bankptr (space->machine, 8, pet_memory + 0x1f000);
 			memory_set_bankptr (space->machine, 9, pet_memory + 0x1fff1);
-		} 
-		else 
+		}
+		else
 		{
-			if (!(data & 0x40)) 
+			if (!(data & 0x40))
 			{
 				memory_set_bankptr (space->machine, 7, pet_memory+ 0x1a800);
 			}
@@ -530,8 +530,8 @@ WRITE8_HANDLER(superpet_w)
 		case 2:
 		case 3:
 			/* 3: 1 pull down diagnostic pin on the userport
-			   1: 1 if jumpered programable ram r/w
-			   0: 0 if jumpered programable m6809, 1 m6502 selected */
+               1: 1 if jumpered programable ram r/w
+               0: 0 if jumpered programable m6809, 1 m6502 selected */
 			break;
 
 		case 4:
@@ -561,7 +561,7 @@ static TIMER_CALLBACK(pet_interrupt)
 /* NOT WORKING - Just placeholder */
 static TIMER_CALLBACK( pet_tape1_timer )
 {
-//	cassette 1
+//  cassette 1
 	UINT8 data = (cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette1" )) > +0.0) ? 1 : 0;
 	pia_0_ca1_w(cputag_get_address_space(machine,"main",ADDRESS_SPACE_PROGRAM), 0, data);
 }
@@ -570,7 +570,7 @@ static TIMER_CALLBACK( pet_tape1_timer )
 static TIMER_CALLBACK( pet_tape2_timer )
 {
 	const device_config *via_0 = device_list_find_by_tag(machine->config->devicelist, VIA6522, "via6522_0");
-//	cassette 2
+//  cassette 2
 	UINT8 data = (cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette2" )) > +0.0) ? 1 : 0;
 	via_cb1_w(via_0, 0, data);
 }
@@ -581,10 +581,10 @@ static void pet_common_driver_init(running_machine *machine)
 	int i;
 	pet_state *state = machine->driver_data;
 
-	state->pet_basic1 = 0; 
+	state->pet_basic1 = 0;
 	state->superpet = 0;
 	state->cbm8096 = 0;
-	
+
 	/* BIG HACK; need to phase out this retarded memory management */
 	if (!pet_memory)
 		pet_memory = mess_ram;
@@ -650,22 +650,22 @@ DRIVER_INIT( pet40 )
 
 DRIVER_INIT( pet80 )
 {
-	
+
 	pet_state *state = machine->driver_data;
 	pet_memory = memory_region(machine, "main");
 
 	pet_common_driver_init(machine);
-	state->cbm8096 = 1;	
+	state->cbm8096 = 1;
 	pia_config(machine, 0, &petb_pia0);
 	videoram = &pet_memory[0x8000];
 	videoram_size = 0x800;
 	pet80_vh_init(machine);
-	
+
 }
 
 DRIVER_INIT( superpet )
 {
-	
+
 	pet_state *state = machine->driver_data;
 	pet_common_driver_init(machine);
 	state->superpet = 1;
@@ -683,7 +683,7 @@ MACHINE_RESET( pet )
 {
 	pet_state *state = machine->driver_data;
 	pia_reset();
-	
+
 	if (state->superpet)
 	{
 		spet.rom = 0;
@@ -725,13 +725,13 @@ INTERRUPT_GEN( pet_frame_interrupt )
 	pet_state *state = device->machine->driver_data;
 	if (state->superpet)
 	{
-		if (input_port_read(device->machine, "CFG") & 0x04) 
+		if (input_port_read(device->machine, "CFG") & 0x04)
 		{
 			cpu_set_input_line(device, INPUT_LINE_HALT, 1);
 			cpu_set_input_line(device, INPUT_LINE_HALT, 0);
 			pet_font |= 2;
-		} 
-		else 
+		}
+		else
 		{
 			cpu_set_input_line(device, INPUT_LINE_HALT, 0);
 			cpu_set_input_line(device, INPUT_LINE_HALT, 1);
@@ -745,7 +745,7 @@ INTERRUPT_GEN( pet_frame_interrupt )
 
 /***********************************************
 
-	PET Cartridges
+    PET Cartridges
 
 ***********************************************/
 
@@ -763,12 +763,12 @@ static DEVICE_IMAGE_LOAD(pet_cart)
 
  	if (!mame_stricmp (filetype, "crt"))
 	{
-	/* We temporarily remove .crt loading. Previous versions directly used 
-	the same routines used to load C64 .crt file, but I seriously doubt the
-	formats are compatible. While waiting for confirmation about .crt dumps
-	for PET machines, we simply do not load .crt files */
+	/* We temporarily remove .crt loading. Previous versions directly used
+    the same routines used to load C64 .crt file, but I seriously doubt the
+    formats are compatible. While waiting for confirmation about .crt dumps
+    for PET machines, we simply do not load .crt files */
 	}
-	else 
+	else
 	{
 		/* Assign loading address according to extension */
 		if (!mame_stricmp (filetype, "a0"))
@@ -794,9 +794,9 @@ static DEVICE_IMAGE_LOAD(pet_cart)
 	}
 
 	/* Finally load the cart */
-//	This could be needed with .crt support
-//	for (i = 0; (i < sizeof(pet_cbm_cart) / sizeof(pet_cbm_cart[0])) && (pet_cbm_cart[i].size != 0); i++) 
-//		memcpy(pet_memory + pet_cbm_cart[i].addr, pet_cbm_cart[i].chip, pet_cbm_cart[i].size);
+//  This could be needed with .crt support
+//  for (i = 0; (i < sizeof(pet_cbm_cart) / sizeof(pet_cbm_cart[0])) && (pet_cbm_cart[i].size != 0); i++)
+//      memcpy(pet_memory + pet_cbm_cart[i].addr, pet_cbm_cart[i].chip, pet_cbm_cart[i].size);
 	memcpy(pet_memory + pet_cbm_cart[0].addr, pet_cbm_cart[0].chip, pet_cbm_cart[0].size);
 
 	return INIT_PASS;

@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
  * includes/cbmb.h
- * 
+ *
  * Commodore B Series Computer
  *
  * peter.trauner@jk.uni-linz.ac.at
- * 
+ *
  ****************************************************************************/
 
 #ifndef CBMB_H_
@@ -22,7 +22,7 @@ struct _cbmb_state
 	int cbmb_keyline_a;
 	int cbmb_keyline_b;
 	int cbmb_keyline_c;
-	
+
 	int p500;
 	int cbm700;
 	int cbm_ntsc;
