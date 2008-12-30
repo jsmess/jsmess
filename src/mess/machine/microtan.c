@@ -846,6 +846,7 @@ QUICKLOAD_LOAD( microtan_hexfile )
 	buff = malloc(quickload_size + 1);
 	if (!buff)
 	{
+		free(snapshot_buff);
 		LOG(("microtan_hexfile_load: could not allocate %d bytes of buffer\n", quickload_size));
 		return INIT_FAIL;
 	}
