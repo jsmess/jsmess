@@ -50,7 +50,7 @@ INLINE scc8530_t *get_token(const device_config *device)
 INLINE scc8530_interface *get_interface(const device_config *device)
 {
 	assert(device->type == SCC8530);
-	return (scc8530_interface *) device->static_config;
+	return (scc8530_interface *) device->inline_config;
 }
 
 
@@ -359,7 +359,7 @@ DEVICE_GET_INFO( scc8530 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(scc8530_t);				break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(scc8530_interface);		break;
 		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */

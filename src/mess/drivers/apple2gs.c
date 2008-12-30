@@ -148,11 +148,6 @@ static const es5503_interface apple2gs_es5503_interface =
 	apple2gs_docram
 };
 
-static const scc8530_interface apple2gs_scc8530_interface =
-{
-	NULL
-};
-
 static MACHINE_DRIVER_START( apple2gs )
 	MDRV_IMPORT_FROM( apple2e )
 	MDRV_CPU_REPLACE("main", G65816, APPLE2GS_14M/5)
@@ -184,7 +179,7 @@ static MACHINE_DRIVER_START( apple2gs )
 	MDRV_APPLEFDC_REMOVE("fdc")
 	MDRV_IWM_ADD("fdc", apple2_fdc_interface)
 	/* SCC */
-	MDRV_SCC8530_ADD("scc", apple2gs_scc8530_interface)
+	MDRV_SCC8530_ADD("scc")
 MACHINE_DRIVER_END
 
 

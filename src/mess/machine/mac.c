@@ -880,7 +880,7 @@ static void mac_scsi_irq(running_machine *machine, int state)
  * Serial Control Chip
  * *************************************************************************/
 
-static void mac_scc_ack(const device_config *device)
+void mac_scc_ack(const device_config *device)
 {
 	set_scc_interrupt(device->machine, 0);
 }
@@ -939,11 +939,6 @@ WRITE16_HANDLER ( mac_scc_2_w )
 
 	scc_w(scc, offset, wdata);
 }
-
-const scc8530_interface mac_scc8530_interface =
-{
-	mac_scc_ack
-};
 
 
 

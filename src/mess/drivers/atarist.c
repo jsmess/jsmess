@@ -1789,11 +1789,6 @@ static MACHINE_DRIVER_START( atarist_cartslot )
 	MDRV_CARTSLOT_LOAD(atarist_cart)
 MACHINE_DRIVER_END
 
-static const scc8530_interface atarist_scc8530_interface =
-{
-	NULL
-};
-
 static MACHINE_DRIVER_START( atarist )
 	MDRV_DRIVER_DATA(atarist_state)
 
@@ -1809,7 +1804,7 @@ static MACHINE_DRIVER_START( atarist )
 
 	// device hardware
 	MDRV_MC68901_ADD(MC68901_TAG, mfp_intf)
-	MDRV_SCC8530_ADD("scc", atarist_scc8530_interface)
+	MDRV_SCC8530_ADD("scc")
 
 	// video hardware
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -1862,7 +1857,7 @@ static MACHINE_DRIVER_START( atariste )
 
 	// device hardware
 	MDRV_MC68901_ADD(MC68901_TAG, atariste_mfp_intf)
-	MDRV_SCC8530_ADD("scc", atarist_scc8530_interface)
+	MDRV_SCC8530_ADD("scc")
 
 	// video hardware
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -1921,7 +1916,7 @@ static MACHINE_DRIVER_START( stbook )
 
 	// device hardware
 	MDRV_MC68901_ADD(MC68901_TAG, stbook_mfp_intf)
-	MDRV_SCC8530_ADD("scc", atarist_scc8530_interface)
+	MDRV_SCC8530_ADD("scc")
 
 	// video hardware
 	MDRV_SCREEN_ADD("main", LCD)

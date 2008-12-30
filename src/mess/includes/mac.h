@@ -23,7 +23,6 @@
 
 /*----------- defined in machine/mac.c -----------*/
 
-extern const scc8530_interface mac_scc8530_interface;
 extern const via6522_interface mac_via6522_intf;
 extern const via6522_interface mac_via6522_2_intf;
 extern const via6522_interface mac_via6522_adb_intf;
@@ -52,6 +51,7 @@ WRITE16_HANDLER ( mac_scc_2_w );
 READ16_HANDLER ( macplus_scsi_r );
 WRITE16_HANDLER ( macplus_scsi_w );
 NVRAM_HANDLER( mac );
+void mac_scc_ack(const device_config *device);
 void mac_scc_mouse_irq( running_machine *machine, int x, int y );
 void mac_fdc_set_enable_lines(const device_config *device, int enable_mask);
 

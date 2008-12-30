@@ -175,7 +175,8 @@ static MACHINE_DRIVER_START( mac512ke )
 
 	/* devices */
 	MDRV_IWM_ADD("fdc", mac_iwm_interface)
-	MDRV_SCC8530_ADD("scc", mac_scc8530_interface)
+	MDRV_SCC8530_ADD("scc")
+	MDRV_SCC8530_ACK(mac_scc_ack)
 	MDRV_VIA6522_ADD("via6522_0", 1000000, mac_via6522_intf)
 MACHINE_DRIVER_END
 

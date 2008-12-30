@@ -2123,11 +2123,6 @@ static DRIVER_INIT( x68000 )
 	led_timer = timer_alloc(machine, x68k_led_callback,NULL);
 }
 
-static const scc8530_interface x68000_scc8530_interface =
-{
-	NULL
-};
-
 static MACHINE_DRIVER_START( x68000 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M68000, 10000000)  /* 10 MHz */
@@ -2147,7 +2142,7 @@ static MACHINE_DRIVER_START( x68000 )
 
 	MDRV_X68KHDC_ADD( "x68k_hdc" )
 
-	MDRV_SCC8530_ADD( "scc", x68000_scc8530_interface )
+	MDRV_SCC8530_ADD( "scc" )
 
     /* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
