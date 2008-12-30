@@ -247,7 +247,7 @@ static void lisa_field_interrupts(running_machine *machine)
 
 static void set_parity_error_pending(running_machine *machine, int value)
 {
-#if 0
+#if 1
 	/* does not work well due to bugs in 68k cores */
 	parity_error_pending = value;
 	if (parity_error_pending)
