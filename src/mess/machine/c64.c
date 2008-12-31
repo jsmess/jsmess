@@ -941,8 +941,8 @@ int c64_paddle_read (const device_config *device, int which)
 
 	if (input_port_read(machine, "CTRLSEL") & 0x80)		/* Swap */
 	{
-		temp = pot1; pot1 = pot2; pot2 = pot1;
-		temp = pot3; pot3 = pot4; pot4 = pot3;
+		temp = pot1; pot1 = pot2; pot2 = temp;
+		temp = pot3; pot3 = pot4; pot4 = temp;
 	}
 
 	switch (cia0porta & 0xc0) 
