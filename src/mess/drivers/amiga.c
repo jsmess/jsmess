@@ -37,6 +37,7 @@ would commence ($C00000).
 
 
 static UINT8 amiga_cia_0_portA_r(const device_config *device);
+static UINT8 amiga_cia_0_cdtv_portA_r(const device_config *device);
 static void amiga_cia_0_portA_w(const device_config *device, UINT8 data);
 
 /***************************************************************************
@@ -51,7 +52,7 @@ static READ16_HANDLER( amiga_clock_r )
 
 
 static WRITE16_HANDLER( amiga_clock_w )
-{ 
+{
 	const device_config *rtc = device_list_find_by_tag(space->machine->config->devicelist, MSM6242, "rtc");
 	msm6242_w(rtc, offset / 2, data);
 }
@@ -196,7 +197,6 @@ static INPUT_PORTS_START( cdtv )
 	PORT_INCLUDE( amiga_common )
 INPUT_PORTS_END
 
-
 /***************************************************************************
   Machine drivers
 ***************************************************************************/
@@ -256,7 +256,7 @@ static const cia6526_interface cia_0_cdtv_intf =
 	amiga_cia_0_irq,									/* irq_func */
 	0,													/* tod_clock */
 	{
-		{ amiga_cia_0_portA_r, amiga_cia_0_portA_w },	/* port A */
+		{ amiga_cia_0_cdtv_portA_r, amiga_cia_0_portA_w },	/* port A */
 		{ NULL, NULL }									/* port B */
 	}
 };
@@ -267,7 +267,7 @@ static const cia6526_interface cia_1_cdtv_intf =
 	0,													/* tod_clock */
 	{
 		{ NULL, NULL, },								/* port A */
-		{ NULL, amiga_fdc_control_w }					/* port B */
+		{ NULL, NULL }					/* port B */
 	}
 };
 
@@ -409,6 +409,13 @@ static UINT8 amiga_cia_0_portA_r(const device_config *device)
 	ret |= amiga_fdc_status_r();
 	return ret;
 }
+
+
+static UINT8 amiga_cia_0_cdtv_portA_r(const device_config *device)
+{
+	return input_port_read(device->machine, "CIA0PORTA") & 0xc0;	/* Gameport 1 and 0 buttons */
+}
+
 
 static void amiga_cia_0_portA_w(const device_config *device, UINT8 data)
 {
