@@ -880,7 +880,7 @@ static ADDRESS_MAP_START( megast_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfffc02, 0xfffc03) AM_DEVREADWRITE8(ACIA6850, "acia_0", acia6850_data_r, acia6850_data_w, 0xff00)
 	AM_RANGE(0xfffc04, 0xfffc05) AM_DEVREADWRITE8(ACIA6850, "acia_1", acia6850_stat_r, acia6850_ctrl_w, 0xff00)
 	AM_RANGE(0xfffc06, 0xfffc07) AM_DEVREADWRITE8(ACIA6850, "acia_1", acia6850_data_r, acia6850_data_w, 0xff00)
-	AM_RANGE(0xfffc20, 0xfffc3f) AM_READWRITE(rp5c15_r, rp5c15_w)
+	AM_RANGE(0xfffc20, 0xfffc3f) AM_DEVREADWRITE(RP5C15, "rp5c15", rp5c15_r, rp5c15_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ste_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -986,7 +986,7 @@ static ADDRESS_MAP_START( megaste_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfffc02, 0xfffc03) AM_DEVREADWRITE8(ACIA6850, "acia_0", acia6850_data_r, acia6850_data_w, 0xff00)
 	AM_RANGE(0xfffc04, 0xfffc05) AM_DEVREADWRITE8(ACIA6850, "acia_1", acia6850_stat_r, acia6850_ctrl_w, 0xff00)
 	AM_RANGE(0xfffc06, 0xfffc07) AM_DEVREADWRITE8(ACIA6850, "acia_1", acia6850_data_r, acia6850_data_w, 0xff00)
-	AM_RANGE(0xfffc20, 0xfffc3f) AM_READWRITE(rp5c15_r, rp5c15_w)
+	AM_RANGE(0xfffc20, 0xfffc3f) AM_DEVREADWRITE(RP5C15, "rp5c15", rp5c15_r, rp5c15_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( stbook_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -1519,8 +1519,6 @@ static const struct rp5c15_interface rtc_intf =
 static MACHINE_START( megast )
 {
 	MACHINE_START_CALL(atarist);
-
-	rp5c15_init(machine, &rtc_intf);
 }
 
 static MC68901_GPIO_READ( atariste_mfp_gpio_r )
@@ -1616,8 +1614,6 @@ static MACHINE_START( megaste )
 	atarist_state *state = machine->driver_data;
 
 	MACHINE_START_CALL(atariste);
-
-	rp5c15_init(machine, &rtc_intf);
 
 	state_save_register_global(machine, state->megaste_cache);
 }
@@ -1749,7 +1745,6 @@ static MACHINE_START( stbook )
 
 	/* configure devices */
 	centronics_config(machine, 0, atarist_centronics_config);
-	rp5c15_init(machine, &rtc_intf);
 
 	/* set CPU interrupt callback */
 	cpu_set_irq_callback(machine->cpu[0], atarist_int_ack);
@@ -1838,6 +1833,7 @@ static MACHINE_DRIVER_START( megast )
 
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(megast_map, 0)
+	MDRV_RP5C15_ADD("rp5c15",rtc_intf)
 
 	MDRV_MACHINE_START(megast)
 MACHINE_DRIVER_END
@@ -1899,6 +1895,7 @@ static MACHINE_DRIVER_START( megaste )
 
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(megaste_map, 0)
+	MDRV_RP5C15_ADD("rp5c15",rtc_intf)
 
 	MDRV_MACHINE_START(megaste)
 MACHINE_DRIVER_END
@@ -1909,6 +1906,7 @@ static MACHINE_DRIVER_START( stbook )
 	// basic machine hardware
 	MDRV_CPU_ADD("main", M68000, U517/2)
 	MDRV_CPU_PROGRAM_MAP(stbook_map, 0)
+	MDRV_RP5C15_ADD("rp5c15",rtc_intf)
 
 	//MDRV_CPU_ADD("cop888", COP888, Y700)
 

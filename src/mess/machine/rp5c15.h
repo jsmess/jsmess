@@ -7,12 +7,14 @@
 
 #include "driver.h"
 
+typedef struct rp5c15_interface rp5c15_intf;
 struct rp5c15_interface
 {
 	void (*alarm_irq_callback)(int state);
 };
 
-struct rp5c15
+typedef struct _rp5c15_t rp5c15_t;
+struct _rp5c15_t
 {
 	struct
 	{
@@ -52,18 +54,26 @@ struct rp5c15
 	int pulse16_state;
 	void (*timer_fired_func)(int state);
 	void (*alarm_callback)(int state);
+	const rp5c15_intf* intf;
 };  //  Ricoh RP5C15
 
-void rp5c15_init(running_machine *machine, const struct rp5c15_interface*);
+DEVICE_START(rp5c15);
+DEVICE_GET_INFO(rp5c15);
 
-void rtc_add_second(void);
-void rtc_add_minute(void);
-void rtc_add_day(void);
-void rtc_add_month(void);
+void rtc_add_second(const device_config*);
+void rtc_add_minute(const device_config*);
+void rtc_add_day(const device_config*);
+void rtc_add_month(const device_config*);
 
 TIMER_CALLBACK(rtc_alarm_pulse);
 
-READ16_HANDLER( rp5c15_r );
-WRITE16_HANDLER( rp5c15_w );
+#define RP5C15 DEVICE_GET_INFO_NAME(rp5c15)
+
+#define MDRV_RP5C15_ADD(_tag, _config) \
+	MDRV_DEVICE_ADD(_tag, RP5C15, 0) \
+	MDRV_DEVICE_CONFIG(_config)
+
+READ16_DEVICE_HANDLER( rp5c15_r );
+WRITE16_DEVICE_HANDLER( rp5c15_w );
 
 #endif /*RP5C15_H_*/

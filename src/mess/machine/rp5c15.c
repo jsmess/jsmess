@@ -69,111 +69,118 @@
 
 #include "rp5c15.h"
 
-
-static struct rp5c15 rtc;
-
 static emu_timer* rtc_timer;
 
 TIMER_CALLBACK(rtc_alarm_pulse)
 {
-	if(rtc.pulse16_state == 0)  // low
+	const device_config* device = ptr;
+	rp5c15_t* rtc = device->token;
+	
+	if(rtc->pulse16_state == 0)  // low
 	{
-		rtc.pulse16_state = 1;  // make high
-		rtc.pulse_count++;
+		rtc->pulse16_state = 1;  // make high
+		rtc->pulse_count++;
 	}
 	else
 	{
-		rtc.pulse16_state = 0;  // make low
+		rtc->pulse16_state = 0;  // make low
 	}
 
-	if(rtc.pulse_count == 8)
+	if(rtc->pulse_count == 8)
 	{
-		rtc.pulse1_state = 0;
+		rtc->pulse1_state = 0;
 	}
-	if(rtc.pulse_count == 16)
+	if(rtc->pulse_count == 16)
 	{
-		rtc.pulse_count = 0;
-		rtc.pulse1_state = 1;
-		rtc_add_second();
+		rtc->pulse_count = 0;
+		rtc->pulse1_state = 1;
+		rtc_add_second(device);
 	}
 }
 
-void rp5c15_init(running_machine *machine, const struct rp5c15_interface* intf)
+DEVICE_START( rp5c15 )
 {
+	rp5c15_t* rtc = device->token;
 	mame_system_time systm;
 	mame_system_tm time;
 
-	rtc.alarm_callback = intf->alarm_irq_callback;
+	assert(device->machine != NULL);
+	rtc->intf = device->static_config;
 
-	mame_get_base_datetime(machine,&systm);
+	rtc->alarm_callback = rtc->intf->alarm_irq_callback;
+
+	mame_get_base_datetime(device->machine,&systm);
 	time = systm.local_time;
 
 	// date/time is stored as BCD
-	rtc.systime.sec_1 = time.second % 10;
-	rtc.systime.sec_10 = time.second / 10;
-	rtc.systime.min_1 = time.minute % 10;
-	rtc.systime.min_10 = time.minute / 10;
-	rtc.systime.hour_1 = time.hour % 10;
-	rtc.systime.hour_10 = time.hour / 10;
-	rtc.systime.day_1 = time.mday % 10;
-	rtc.systime.day_10 = time.mday / 10;
-	rtc.systime.month_1 = (time.month+1) % 10;
-	rtc.systime.month_10 = (time.month+1) / 10;
-	rtc.systime.year_1 = (time.year - 1980) % 10;
-	rtc.systime.year_10 = (time.year - 1980) / 10;
-	rtc.systime.dayofweek = time.weekday;
-	rtc.alarm.min_1 = time.minute % 10;
-	rtc.alarm.min_10 = time.minute / 10;
-	rtc.alarm.hour_1 = time.hour % 10;
-	rtc.alarm.hour_10 = time.hour / 10;
-	rtc.alarm.day_1 = time.mday % 10;
-	rtc.alarm.day_10 = time.mday / 10;
-	rtc.alarm.dayofweek = time.weekday;
-	rtc.leap = time.year % 4;
+	rtc->systime.sec_1 = time.second % 10;
+	rtc->systime.sec_10 = time.second / 10;
+	rtc->systime.min_1 = time.minute % 10;
+	rtc->systime.min_10 = time.minute / 10;
+	rtc->systime.hour_1 = time.hour % 10;
+	rtc->systime.hour_10 = time.hour / 10;
+	rtc->systime.day_1 = time.mday % 10;
+	rtc->systime.day_10 = time.mday / 10;
+	rtc->systime.month_1 = (time.month+1) % 10;
+	rtc->systime.month_10 = (time.month+1) / 10;
+	rtc->systime.year_1 = (time.year - 1980) % 10;
+	rtc->systime.year_10 = (time.year - 1980) / 10;
+	rtc->systime.dayofweek = time.weekday;
+	rtc->alarm.min_1 = time.minute % 10;
+	rtc->alarm.min_10 = time.minute / 10;
+	rtc->alarm.hour_1 = time.hour % 10;
+	rtc->alarm.hour_10 = time.hour / 10;
+	rtc->alarm.day_1 = time.mday % 10;
+	rtc->alarm.day_10 = time.mday / 10;
+	rtc->alarm.dayofweek = time.weekday;
+	rtc->leap = time.year % 4;
 
-	rtc.mode = 0x08;  // Timer enabled, Alarm disable, BANK 0 selected (defaults are guessed)
-	rtc.reset = 0x00;  // enable both 1Hz and 16Hz alarm counters by default
-	rtc.test = 0x00;
-	rtc.pulse_count = 0;
+	rtc->mode = 0x08;  // Timer enabled, Alarm disable, BANK 0 selected (defaults are guessed)
+	rtc->reset = 0x00;  // enable both 1Hz and 16Hz alarm counters by default
+	rtc->test = 0x00;
+	rtc->pulse_count = 0;
 
-	rtc_timer = timer_alloc(machine, rtc_alarm_pulse, NULL);
+	rtc_timer = timer_alloc(device->machine, rtc_alarm_pulse, (void*)device);
 	timer_adjust_periodic(rtc_timer, attotime_zero, 0, ATTOTIME_IN_HZ(32));
+	
+	return DEVICE_START_OK;
 }
 
-static int rp5c15_read(int offset, UINT16 mem_mask)
+static int rp5c15_read(const device_config* device, int offset, UINT16 mem_mask)
 {
-	if((rtc.mode & 0x01) == 0x00)  // BANK 0 selected
+	rp5c15_t* rtc = device->token;
+	if((rtc->mode & 0x01) == 0x00)  // BANK 0 selected
 	{
 		switch(offset)
 		{
 			case 0:
-				return rtc.systime.sec_1;
+				return rtc->systime.sec_1;
 			case 1:
-				return rtc.systime.sec_10;
+				return rtc->systime.sec_10;
 			case 2:
-				return rtc.systime.min_1;
+				return rtc->systime.min_1;
 			case 3:
-				return rtc.systime.min_10;
+				return rtc->systime.min_10;
 			case 4:
-				return rtc.systime.hour_1;
+				return rtc->systime.hour_1;
 			case 5:
-				return rtc.systime.hour_10;
+				return rtc->systime.hour_10;
 			case 6:
-				return rtc.systime.dayofweek;
+				return rtc->systime.dayofweek;
 			case 7:
-				return rtc.systime.day_1;
+				return rtc->systime.day_1;
 			case 8:
-				return rtc.systime.day_10;
+				return rtc->systime.day_10;
 			case 9:
-				return rtc.systime.month_1;
+				return rtc->systime.month_1;
 			case 10:
-				return rtc.systime.month_10;
+				return rtc->systime.month_10;
 			case 11:
-				return rtc.systime.year_1;
+				return rtc->systime.year_1;
 			case 12:
-				return rtc.systime.year_10;
+				return rtc->systime.year_10;
 			case 13:
-				return rtc.mode & 0x0f;
+				return rtc->mode & 0x0f;
 		}
 	}
 	else  // BANK 1 selected
@@ -181,29 +188,29 @@ static int rp5c15_read(int offset, UINT16 mem_mask)
 		switch(offset)
 		{
 			case 0:  // CLKOUT
-				return rtc.clkout & 0x07;
+				return rtc->clkout & 0x07;
 			case 1:  // Adjustment (always returns 0)
 				return 0;
 			case 2:
-				return rtc.alarm.min_1;
+				return rtc->alarm.min_1;
 			case 3:
-				return rtc.alarm.min_10;
+				return rtc->alarm.min_10;
 			case 4:
-				return rtc.alarm.hour_1;
+				return rtc->alarm.hour_1;
 			case 5:
-				return rtc.alarm.hour_10;
+				return rtc->alarm.hour_10;
 			case 6:
-				return rtc.alarm.dayofweek;
+				return rtc->alarm.dayofweek;
 			case 7:
-				return rtc.alarm.day_1;
+				return rtc->alarm.day_1;
 			case 8:
-				return rtc.alarm.day_10;
+				return rtc->alarm.day_10;
 			case 10:  // 12/24 hour selection (returns AM/PM?)
 				return 0;
 			case 11:  // Leap year
-				return rtc.leap;
+				return rtc->leap;
 			case 13:
-				return rtc.mode & 0x0f;
+				return rtc->mode & 0x0f;
 			default:
 				return 0;
 		}
@@ -211,55 +218,56 @@ static int rp5c15_read(int offset, UINT16 mem_mask)
 	return 0;
 }
 
-static void rp5c15_write(int offset, int data, UINT16 mem_mask)
+static void rp5c15_write(const device_config* device, int offset, int data, UINT16 mem_mask)
 {
+	rp5c15_t* rtc = device->token;
 	if(offset == 13)
 	{
-		rtc.mode = data & 0x0f;
+		rtc->mode = data & 0x0f;
 		return;
 	}
-	if((rtc.mode & 0x01) == 0x00)  // BANK 0 selected
+	if((rtc->mode & 0x01) == 0x00)  // BANK 0 selected
 	{
 		switch(offset)
 		{
 			case 0:
-				rtc.systime.sec_1 = data & 0x0f;
+				rtc->systime.sec_1 = data & 0x0f;
 				break;
 			case 1:
-				rtc.systime.sec_10 = data & 0x0f;
+				rtc->systime.sec_10 = data & 0x0f;
 				break;
 			case 2:
-				rtc.systime.min_1 = data & 0x0f;
+				rtc->systime.min_1 = data & 0x0f;
 				break;
 			case 3:
-				rtc.systime.min_10 = data & 0x0f;
+				rtc->systime.min_10 = data & 0x0f;
 				break;
 			case 4:
-				rtc.systime.hour_1 = data & 0x0f;
+				rtc->systime.hour_1 = data & 0x0f;
 				break;
 			case 5:
-				rtc.systime.hour_10 = data & 0x0f;
+				rtc->systime.hour_10 = data & 0x0f;
 				break;
 			case 6:
-				rtc.systime.dayofweek = data & 0x0f;
+				rtc->systime.dayofweek = data & 0x0f;
 				break;
 			case 7:
-				rtc.systime.day_1 = data & 0x0f;
+				rtc->systime.day_1 = data & 0x0f;
 				break;
 			case 8:
-				rtc.systime.day_10 = data & 0x0f;
+				rtc->systime.day_10 = data & 0x0f;
 				break;
 			case 9:
-				rtc.systime.month_1 = data & 0x0f;
+				rtc->systime.month_1 = data & 0x0f;
 				break;
 			case 10:
-				rtc.systime.month_10 = data & 0x0f;
+				rtc->systime.month_10 = data & 0x0f;
 				break;
 			case 11:
-				rtc.systime.year_1 = data & 0x0f;
+				rtc->systime.year_1 = data & 0x0f;
 				break;
 			case 12:
-				rtc.systime.year_10 = data & 0x0f;
+				rtc->systime.year_10 = data & 0x0f;
 				break;
 		}
 	}
@@ -268,98 +276,103 @@ static void rp5c15_write(int offset, int data, UINT16 mem_mask)
 		switch(offset)
 		{
 			case 0:
-				rtc.clkout = data & 0x07;
+				rtc->clkout = data & 0x07;
 				break;
 			case 1:  // Adjustment  (resets seconds to 0, increases minute by 1 if seconds are > 30
-				if(rtc.systime.sec_10 >= 3)
-					rtc_add_minute();
-				rtc.systime.sec_1 = 0;
-				rtc.systime.sec_10 = 0;
+				if(rtc->systime.sec_10 >= 3)
+					rtc_add_minute(device);
+				rtc->systime.sec_1 = 0;
+				rtc->systime.sec_10 = 0;
 				break;
 			case 2:
-				rtc.alarm.min_1 = data & 0x0f;
+				rtc->alarm.min_1 = data & 0x0f;
 				break;
 			case 3:
-				rtc.alarm.min_10 = data & 0x0f;
+				rtc->alarm.min_10 = data & 0x0f;
 				break;
 			case 4:
-				rtc.alarm.hour_1 = data & 0x0f;
+				rtc->alarm.hour_1 = data & 0x0f;
 				break;
 			case 5:
-				rtc.alarm.hour_10 = data & 0x0f;
+				rtc->alarm.hour_10 = data & 0x0f;
 				break;
 			case 6:
-				rtc.alarm.dayofweek = data & 0x0f;
+				rtc->alarm.dayofweek = data & 0x0f;
 				break;
 			case 7:
-				rtc.alarm.day_1 = data & 0x0f;
+				rtc->alarm.day_1 = data & 0x0f;
 				break;
 			case 8:
-				rtc.alarm.day_10 = data & 0x0f;
+				rtc->alarm.day_10 = data & 0x0f;
 				break;
 			case 10:  // 12/24 hour clock selection
-				rtc.hour24 = data;
+				rtc->hour24 = data;
 				break;
 
 		}
 	}
 }
 
-void rtc_add_second()  // add one second to current time
+void rtc_add_second(const device_config* device)  // add one second to current time
 {
-	if((rtc.mode & 0x08) == 0x00) // if timer is not enabled
+	rp5c15_t* rtc = device->token;
+	
+	if((rtc->mode & 0x08) == 0x00) // if timer is not enabled
 		return;
-	rtc.systime.sec_1++;
-	if(rtc.systime.sec_1 < 10)
+	rtc->systime.sec_1++;
+	if(rtc->systime.sec_1 < 10)
 		return;
-	rtc.systime.sec_1 = 0;
-	rtc.systime.sec_10++;
-	if(rtc.systime.sec_10 < 6)
+	rtc->systime.sec_1 = 0;
+	rtc->systime.sec_10++;
+	if(rtc->systime.sec_10 < 6)
 		return;
-	rtc.systime.sec_10 = 0;
-	rtc_add_minute();
+	rtc->systime.sec_10 = 0;
+	rtc_add_minute(device);
 }
 
-void rtc_add_minute()
+void rtc_add_minute(const device_config* device)
 {
-	rtc.systime.min_1++;
-	if(rtc.systime.min_1 < 10)
+	rp5c15_t* rtc = device->token;
+	
+	rtc->systime.min_1++;
+	if(rtc->systime.min_1 < 10)
 		return;
-	rtc.systime.min_1 = 0;
-	rtc.systime.min_10++;
-	if(rtc.systime.min_10 < 6)
+	rtc->systime.min_1 = 0;
+	rtc->systime.min_10++;
+	if(rtc->systime.min_10 < 6)
 		return;
-	rtc.systime.min_10 = 0;
-	rtc.systime.hour_1++;
-	if(rtc.systime.hour_1 < 10 && rtc.systime.hour_10 < 2)
+	rtc->systime.min_10 = 0;
+	rtc->systime.hour_1++;
+	if(rtc->systime.hour_1 < 10 && rtc->systime.hour_10 < 2)
 		return;
-	if(rtc.systime.hour_10 < 3 && rtc.systime.hour_1 < 4)
+	if(rtc->systime.hour_10 < 3 && rtc->systime.hour_1 < 4)
 		return;
-	rtc.systime.hour_1 = 0;
-	rtc.systime.hour_10++;
-	if(rtc.systime.hour_10 < 3)
+	rtc->systime.hour_1 = 0;
+	rtc->systime.hour_10++;
+	if(rtc->systime.hour_10 < 3)
 		return;
-	rtc.systime.hour_10 = 0;
-	rtc_add_day();
+	rtc->systime.hour_10 = 0;
+	rtc_add_day(device);
 }
 
-void rtc_add_day()
+void rtc_add_day(const device_config* device)
 {
+	rp5c15_t* rtc = device->token;
 	int d,m;
 
-	rtc.systime.dayofweek++;
-	if(rtc.systime.dayofweek >= 7)
-		rtc.systime.dayofweek = 0;
-	d = (rtc.systime.day_10 << 4) | rtc.systime.day_1;
-	m = (rtc.systime.month_10 << 4) | rtc.systime.month_1;
+	rtc->systime.dayofweek++;
+	if(rtc->systime.dayofweek >= 7)
+		rtc->systime.dayofweek = 0;
+	d = (rtc->systime.day_10 << 4) | rtc->systime.day_1;
+	m = (rtc->systime.month_10 << 4) | rtc->systime.month_1;
 	d++;
 	if((d & 0x0f) >= 10)
 	{
 		d &= 0xf0;
 		d += 0x10;
 	}
-	rtc.systime.day_1 = (d & 0x0f);
-	rtc.systime.day_10 = (d & 0xf0) >> 4;
+	rtc->systime.day_1 = (d & 0x0f);
+	rtc->systime.day_10 = (d & 0xf0) >> 4;
 	switch(m)
 	{
 		case 1:
@@ -371,9 +384,9 @@ void rtc_add_day()
 		case 0x12:
 			if(d > 0x31)
 			{
-				rtc.systime.day_1 = 1;
-				rtc.systime.day_10 = 0;
-				rtc_add_month();
+				rtc->systime.day_1 = 1;
+				rtc->systime.day_10 = 0;
+				rtc_add_month(device);
 			}
 			break;
 		case 4:
@@ -382,56 +395,89 @@ void rtc_add_day()
 		case 11:
 			if(d > 0x30)
 			{
-				rtc.systime.day_1 = 1;
-				rtc.systime.day_10 = 0;
-				rtc_add_month();
+				rtc->systime.day_1 = 1;
+				rtc->systime.day_10 = 0;
+				rtc_add_month(device);
 			}
 			break;
 		case 2:
-			if(rtc.leap == 0)  // this is a leap year
+			if(rtc->leap == 0)  // this is a leap year
 			{
 				if(d > 0x29)
 				{
-					rtc.systime.day_1 = 1;
-					rtc.systime.day_10 = 0;
-					rtc_add_month();
+					rtc->systime.day_1 = 1;
+					rtc->systime.day_10 = 0;
+					rtc_add_month(device);
 				}
 			}
 			else  // not a leap year
 			{
 				if(d > 0x28)
 				{
-					rtc.systime.day_1 = 1;
-					rtc.systime.day_10 = 0;
-					rtc_add_month();
+					rtc->systime.day_1 = 1;
+					rtc->systime.day_10 = 0;
+					rtc_add_month(device);
 				}
 			}
 			break;
 	}
 }
 
-void rtc_add_month()
+void rtc_add_month(const device_config* device)
 {
-	rtc.systime.month_1++;
-	if(rtc.systime.month_1 < 10 && rtc.systime.month_10 < 1)
+	rp5c15_t* rtc = device->token;
+	
+	rtc->systime.month_1++;
+	if(rtc->systime.month_1 < 10 && rtc->systime.month_10 < 1)
 		return;
-	if(rtc.systime.month_1 < 3 && rtc.systime.month_10 < 2)
+	if(rtc->systime.month_1 < 3 && rtc->systime.month_10 < 2)
 		return;
-	rtc.systime.month_1 = 0;
-	rtc.systime.month_10++;
-	if(rtc.systime.month_10 < 2)
+	rtc->systime.month_1 = 0;
+	rtc->systime.month_10++;
+	if(rtc->systime.month_10 < 2)
 		return;
-	rtc.systime.month_1 = 1;
-	rtc.systime.month_10 = 0;
-	rtc.systime.year_1++;
-	if(rtc.systime.year_1 < 10)
+	rtc->systime.month_1 = 1;
+	rtc->systime.month_10 = 0;
+	rtc->systime.year_1++;
+	if(rtc->systime.year_1 < 10)
 		return;
-	rtc.systime.year_1 = 0;
-	rtc.systime.year_10++;
-	if(rtc.systime.year_10 < 10)
+	rtc->systime.year_1 = 0;
+	rtc->systime.year_10++;
+	if(rtc->systime.year_10 < 10)
 		return;
-	rtc.systime.year_10 = 0;
+	rtc->systime.year_10 = 0;
 }
 
-READ16_HANDLER(rp5c15_r) { return rp5c15_read(offset,mem_mask); }
-WRITE16_HANDLER(rp5c15_w) { rp5c15_write(offset,data,mem_mask); }
+static DEVICE_SET_INFO( rp5c15 )
+{
+	switch (state)
+	{
+		/* no parameters to set */
+	}
+}
+
+DEVICE_GET_INFO( rp5c15 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_OTHER;				break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(rp5c15_t);				break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(rp5c15); break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(rp5c15);	break;
+		case DEVINFO_FCT_STOP:							/* Nothing */								break;
+		case DEVINFO_FCT_RESET:							/* Nothing */	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Ricoh RP5C15");			break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Real Time Clock");			break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");						break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);					break;
+		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team");	break;
+	}
+}
+
+READ16_DEVICE_HANDLER(rp5c15_r) { return rp5c15_read(device,offset,mem_mask); }
+WRITE16_DEVICE_HANDLER(rp5c15_w) { rp5c15_write(device,offset,data,mem_mask); }

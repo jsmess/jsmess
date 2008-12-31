@@ -100,6 +100,8 @@ Source Changes:
 
 - Changed the SAM6883 implementation to be a device.  [Miodrag Milanovic]
 
+- Changed the RP5C15 RTC implementation to be a device.  [Barry Rodewald]
+
 - Changed the 6525 TPI implementation to be a device and added save state
   support.  [Dirk Best]
 
