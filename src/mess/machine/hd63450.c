@@ -6,6 +6,41 @@
 
 #include "machine/hd63450.h"
 
+typedef struct _hd63450_regs hd63450_regs;
+struct _hd63450_regs
+{  // offsets in bytes
+	unsigned char csr;  // [00] Channel status register (R/W)
+	unsigned char cer;  // [01] Channel error register (R)
+	unsigned char dcr;  // [04] Device control register (R/W)
+	unsigned char ocr;  // [05] Operation control register (R/W)
+	unsigned char scr;  // [06] Sequence control register (R/W)
+	unsigned char ccr;  // [07] Channel control register (R/W)
+	unsigned short mtc;  // [0a,0b]  Memory Transfer Counter (R/W)
+	unsigned long mar;  // [0c-0f]  Memory Address Register (R/W)
+	unsigned long dar;  // [14-17]  Device Address Register (R/W)
+	unsigned short btc;  // [1a,1b]  Base Transfer Counter (R/W)
+	unsigned long bar;  // [1c-1f]  Base Address Register (R/W)
+	unsigned char niv;  // [25]  Normal Interrupt Vector (R/W)
+	unsigned char eiv;  // [27]  Error Interrupt Vector (R/W)
+	unsigned char mfc;  // [29]  Memory Function Code (R/W)
+	unsigned char cpr;  // [2d]  Channel Priority Register (R/W)
+	unsigned char dfc;  // [31]  Device Function Code (R/W)
+	unsigned char bfc;  // [39]  Base Function Code (R/W)
+	unsigned char gcr;  // [3f]  General Control Register (R/W)
+};
+
+typedef struct _hd63450_t hd63450_t;
+struct _hd63450_t
+{
+    hd63450_regs reg[4];
+	emu_timer* timer[4];  // for timing data reading/writing each channel
+	attotime clock[4];
+	attotime burst_clock[4];
+	int in_progress[4];  // if a channel is in use
+	int transfer_size[4];
+	int halted[4];  // non-zero if a channel has been halted, and can be continued later.
+	const hd63450_intf* intf;
+};
 
 static TIMER_CALLBACK(dma_transfer_timer);
 static void dma_transfer_abort(const device_config* device, int channel);

@@ -69,6 +69,50 @@
 
 #include "rp5c15.h"
 
+typedef struct _rp5c15_t rp5c15_t;
+struct _rp5c15_t
+{
+	struct
+	{
+		unsigned char sec_1;
+		unsigned char sec_10;
+		unsigned char min_1;
+		unsigned char min_10;
+		unsigned char hour_1;
+		unsigned char hour_10;
+		unsigned char dayofweek;
+		unsigned char day_1;
+		unsigned char day_10;
+		unsigned char month_1;
+		unsigned char month_10;
+		unsigned char year_1;
+		unsigned char year_10;
+	} systime;
+	struct
+	{
+		unsigned char min_1;
+		unsigned char min_10;
+		unsigned char hour_1;
+		unsigned char hour_10;
+		unsigned char dayofweek;
+		unsigned char day_1;
+		unsigned char day_10;
+	} alarm;
+	int clkout;
+	int adjust;
+	int hour24;  // 12/24 hour clock
+	int leap;  // Years until next leap year (0-3, 0 = this year is leap year)
+	int mode;
+	int test;
+	int reset;
+	int pulse_count;
+	int pulse1_state;
+	int pulse16_state;
+	void (*timer_fired_func)(int state);
+	void (*alarm_callback)(int state);
+	const rp5c15_intf* intf;
+};  //  Ricoh RP5C15
+
 static emu_timer* rtc_timer;
 
 TIMER_CALLBACK(rtc_alarm_pulse)
