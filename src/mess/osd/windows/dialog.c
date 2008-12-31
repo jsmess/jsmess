@@ -1100,7 +1100,7 @@ static void seqselect_start_read_from_main_thread(void *param)
 {
 	seqselect_info *stuff;
 	HWND editwnd;
-	int ret;
+	//int ret;
 	win_window_info fake_window_info;
 	win_window_info *old_window_list;
 	int pause_count;
@@ -1137,7 +1137,7 @@ static void seqselect_start_read_from_main_thread(void *param)
 	while(stuff->poll_state == SEQSELECT_STATE_POLLING)
 	{
 		// poll
-		ret = input_seq_poll(stuff->code);
+		/*ret = */input_seq_poll(stuff->code);
 		seqselect_settext(editwnd);
 	}
 

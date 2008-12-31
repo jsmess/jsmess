@@ -3351,7 +3351,7 @@ static imgtoolerr_t hfs_lookup_path(mac_l2_imgref *l2_img, const char *fpath, UI
 	const char *element_start;
 	int element_len;
 	mac_str255 mac_element_name;
-	int level;
+	//int level;
 	imgtoolerr_t err;
 	hfs_catKey *catrec_key = NULL;
 	hfs_catData *catrec_data = NULL;
@@ -3359,7 +3359,7 @@ static imgtoolerr_t hfs_lookup_path(mac_l2_imgref *l2_img, const char *fpath, UI
 
 	/* iterate each path element */
 	element_start = fpath;
-	level = 0;
+	//level = 0;
 	*parID = 2;	/* root parID is 2 */
 
 	while(*element_start)

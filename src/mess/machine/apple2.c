@@ -621,9 +621,9 @@ UINT8 apple2_getfloatingbusvalue(running_machine *machine)
 
 	// vars
 	//
-	int i, Hires, Mixed, Page2, _80Store, ScanLines, VSyncLine, ScanCycles,
+	int i, Hires, Mixed, Page2, _80Store, ScanLines, /* VSyncLine, ScanCycles,*/
 		h_clock, h_state, h_0, h_1, h_2, h_3, h_4, h_5,
-		v_line, v_state, v_A, v_B, v_C, v_0, v_1, v_2, v_3, v_4, v_5,
+		v_line, v_state, v_A, v_B, v_C, v_0, v_1, v_2, v_3, v_4, /* v_5, */
 		_hires, addend0, addend1, addend2, sum, address;
 
 	// video scanner data
@@ -640,8 +640,8 @@ UINT8 apple2_getfloatingbusvalue(running_machine *machine)
 	// calculate video parameters according to display standard
 	//
 	ScanLines  = 1 ? kNTSCScanLines : kPALScanLines; // FIX: NTSC only?
-	VSyncLine  = 1 ? kNTSCVSyncLine : kPALVSyncLine; // FIX: NTSC only?
-	ScanCycles = ScanLines * kHClocks;
+	// VSyncLine  = 1 ? kNTSCVSyncLine : kPALVSyncLine; // FIX: NTSC only?
+	// ScanCycles = ScanLines * kHClocks;
 
 	// calculate horizontal scanning state
 	//
@@ -674,7 +674,7 @@ UINT8 apple2_getfloatingbusvalue(running_machine *machine)
 	v_2 = (v_state >> 5) & 1;
 	v_3 = (v_state >> 6) & 1;
 	v_4 = (v_state >> 7) & 1;
-	v_5 = (v_state >> 8) & 1;
+	//v_5 = (v_state >> 8) & 1;
 
 	// calculate scanning memory address
 	//

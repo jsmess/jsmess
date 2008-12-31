@@ -384,7 +384,7 @@ static imgtoolerr_t fat_partition_open(imgtool_partition *partition, UINT64 firs
 	fat_partition_info *info;
 	UINT32 fat_bits, total_sectors_l, total_sectors_h, sector_size;
 	UINT64 available_sectors;
-	int has_extended_bios_param_block = TRUE;
+	//int has_extended_bios_param_block = TRUE;
 
 	info = fat_get_partition_info(partition);
 
@@ -409,7 +409,7 @@ static imgtoolerr_t fat_partition_open(imgtool_partition *partition, UINT64 firs
 	else
 	{
 		fat_bits = 8;
-		has_extended_bios_param_block = FALSE;
+		//has_extended_bios_param_block = FALSE;
 	}
 
 	info->fat_bits				= fat_bits;

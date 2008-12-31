@@ -667,13 +667,13 @@ static int thom_floppy_sap_load ( const device_config* image )
 	for ( i = 0; i < d->tracks * d->sectors; i++ )
 	{
 		UINT16 crc;
-		int j, fmt, prot, track, sector;
+		int j, fmt, /*prot,*/ track, sector;
 
 		/* load */
 		image_fseek( image, i * (d->sector_size + 6) + 66, SEEK_SET  );
 		image_fread( image, buf, d->sector_size + 6 );
 		fmt    = buf[0];
-		prot   = buf[1];
+		/* prot   = buf[1]; */
 		track  = buf[2];
 		sector = buf[3];
 

@@ -412,12 +412,11 @@ static void write_track(const device_config *device)
 			int track   = w->buffer[i+1];
 			int side    = w->buffer[i+2];
 			int sector  = w->buffer[i+3];
-			int len     = w->buffer[i+4];
+			//int len     = w->buffer[i+4];
 			int filler  = 0xe5; /* IBM and Thomson */
 			int density = w->density;
 			floppy_drive_format_sector(wd17xx_current_image(device),side,sector,track,
 						w->hd,sector,density?1:0,filler);
-			(void)len;
 			i += 128; /* at least... */
 		}
 		else

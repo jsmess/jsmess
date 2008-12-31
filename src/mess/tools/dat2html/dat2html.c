@@ -42,13 +42,13 @@ static void a_href_url(char *line)
 {
 	char buff[1024], c;
 	char *url_beg = strstr(line, "http://"), *url_end;
-	int length;
+	//int length;
 	if (!url_beg)
 		return;
 	url_end = strchr(url_beg, ' ');
 	if (!url_end)
 		url_end = url_beg + strlen(url_beg);
-	length = (int) (url_end - url_beg);
+	//length = (int) (url_end - url_beg);
 	/* insert the a href */
 	strcpy(buff, line);
 	/* terminate URL */

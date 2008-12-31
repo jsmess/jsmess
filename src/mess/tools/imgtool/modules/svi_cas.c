@@ -183,13 +183,13 @@ static int svi_cas_image_readfile(imgtool_image *img, const char *fname, imgtool
 	INT16 *wavdata;
 	UINT16	temp16;
 	UINT32	temp32;
-	int wavlen, offset;
+	int /*wavlen,*/ offset;
 
 	if (mame_stricmp (fname, image->file_name) )
 		return IMGTOOLERR_MODULENOTFOUND;
 
 	wavdata = image->wavdata;
-	wavlen = image->count;
+	//wavlen = image->count;
     /* write the core header for a WAVE file */
 	offset = stream_write(destf, "RIFF", 4);
     if( offset < 4 )

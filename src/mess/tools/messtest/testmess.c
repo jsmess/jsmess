@@ -569,7 +569,7 @@ static void command_input(running_machine *machine)
 
 static void command_rawinput(running_machine *machine)
 {
-	int parts;
+	//int parts;
 	attotime current_time = timer_get_time(machine);
 	static const char *position;
 #if 0
@@ -582,7 +582,7 @@ static void command_rawinput(running_machine *machine)
 	if (state == STATE_READY)
 	{
 		/* beginning of a raw input command */
-		parts = 1;
+		//parts = 1;
 		position = current_command->u.input_args.input_chars;
 		wait_target = current_time;
 		state = STATE_INCOMMAND;

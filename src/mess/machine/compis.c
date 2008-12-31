@@ -1025,10 +1025,9 @@ static void update_dma_control(running_machine *machine, int which, int new_cont
 		else
 		{
 //			int count = d->count;
-			int dacnum;
 
 			/* adjust for redline racer */
-         		dacnum = (d->dest & 0x3f) / 2;
+         	// int dacnum = (d->dest & 0x3f) / 2;
 
 			if (LOG_DMA) logerror("Initiated DMA %d - count = %04X, source = %04X, dest = %04X\n", which, d->count, d->source, d->dest);
 

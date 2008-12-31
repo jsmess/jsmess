@@ -412,10 +412,10 @@ static imgtoolerr_t vzdos_diskimage_nextenum(imgtool_directory *enumeration, img
 	} else {
 
 		const char *type;
-		int ret, len;
+		int /*ret,*/ len;
 		vzdos_dirent dirent;
 
-		ret = vzdos_get_dirent(imgtool_directory_image(enumeration), iter->index - 1, &dirent);
+		/*ret = */vzdos_get_dirent(imgtool_directory_image(enumeration), iter->index - 1, &dirent);
 
 		if (dirent.ftype == 0x00) {
 			iter->eof = 1;

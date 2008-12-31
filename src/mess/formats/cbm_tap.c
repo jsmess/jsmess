@@ -181,7 +181,7 @@ static int cbm_tap_do_work( INT16 **buffer, int length, const UINT8 *data )
 	/* These waveamp_* values are currently stored but not used. 
 	  Further investigations are needed to find real pulse amplitude 
 	  in Commodore tapes. Implementation here would follow */
-	int waveamp_high, waveamp_low;
+	/* int waveamp_high, waveamp_low; */
 
 	/* Log .TAP info but only once */
 	if (!(buffer == NULL))
@@ -236,15 +236,15 @@ static int cbm_tap_do_work( INT16 **buffer, int length, const UINT8 *data )
 			if (byte != 0x00) 
 			{
 				byte_samples = tap_data_to_samplecount(byte, tap_frequency);
-				waveamp_high = WAVE_HIGH;
+				/* waveamp_high = WAVE_HIGH; */
 			} 
 			else 
 			{
 				byte_samples = tap_data_to_samplecount(PAUSE, tap_frequency);	// tap2wav value
 //				byte_samples = tap_data_to_samplecount(0x100, tap_frequency);	// vice value			
-				waveamp_high = WAVE_PAUSE;           
+				/* waveamp_high = WAVE_PAUSE; */
 			}
-			waveamp_low = WAVE_LOW;
+			/* waveamp_low = WAVE_LOW; */
 		}
 
 		/* .TAP v1 & v2 */
@@ -257,7 +257,7 @@ static int cbm_tap_do_work( INT16 **buffer, int length, const UINT8 *data )
 			if ((byte != 0x00) && !j)
 			{
 				byte_samples = tap_data_to_samplecount(byte, tap_frequency);
-				waveamp_high = WAVE_HIGH;
+				/* waveamp_high = WAVE_HIGH; */
 			} 
 			else 
 			{
@@ -279,7 +279,7 @@ static int cbm_tap_do_work( INT16 **buffer, int length, const UINT8 *data )
 						{
 							over_pulse_length = ((over_pulse_bytes[2] << 16) | (over_pulse_bytes[1] << 8) | over_pulse_bytes[0]) >> 3;
 							byte_samples = tap_data_to_samplecount(over_pulse_length, tap_frequency);
-							waveamp_high = WAVE_PAUSE;
+							/* waveamp_high = WAVE_PAUSE; */
 							j = 0;
 						}
 					}
@@ -293,7 +293,7 @@ static int cbm_tap_do_work( INT16 **buffer, int length, const UINT8 *data )
 				}
 				else j = 1;
 			}
-			waveamp_low = WAVE_LOW;
+			/* waveamp_low = WAVE_LOW; */
 		}
 
 		if (j == 0)

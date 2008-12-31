@@ -581,12 +581,12 @@ static READ8_HANDLER(d_pia0_pb_r)
 static WRITE8_HANDLER(d_pia0_pb_w)
 {
 	int	InClkState;
-	int	OutClkState;
+	//int	OutClkState;
 
 	LOG_KEYBOARD(("PB Write\n"));
 
 	InClkState	= data & KInClk;
-	OutClkState	= data & KOutClk;
+	//OutClkState	= data & KOutClk;
 
 	LOG_KEYBOARD(("InClkState=$%02X OldInClkState=$%02X Keyrow=$%02X ",InClkState,(d_pia0_pb_last & KInClk),Keyrow));
 

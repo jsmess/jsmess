@@ -831,11 +831,11 @@ MSX_SLOT_LOADSRAM(ascii16_sram)
 		p = state->cart.sram.mem;
 
 		if (mame_fread (f, state->cart.sram.mem, 0x200) == 0x200) {
-			int offset, i;
+			int /*offset,*/ i;
 
 			mame_fclose (f);
 
-			offset = 0;
+			//offset = 0;
 			for (i=0; i<7; i++) {
 				memcpy (p + 0x800, p, 0x800);
 				p += 0x800;

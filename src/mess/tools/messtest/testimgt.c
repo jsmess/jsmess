@@ -308,7 +308,7 @@ static void node_checkdirectory(struct imgtooltest_state *state, xml_data_node *
 	imgtool_dirent ent;
 	char expected_listing[1024];
 	char actual_listing[1024];
-	int i, actual_count;
+	int i/*, actual_count*/;
 	int mismatch;
 	xml_attribute_node *attr_node;
 	xml_data_node *child_node;
@@ -357,7 +357,7 @@ static void node_checkdirectory(struct imgtooltest_state *state, xml_data_node *
 	}
 
 	/* now enumerate though listing */
-	actual_count = 0;
+	//actual_count = 0;
 	actual_listing[0] = '\0';
 	mismatch = FALSE;
 

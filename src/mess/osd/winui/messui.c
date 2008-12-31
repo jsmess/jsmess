@@ -848,10 +848,10 @@ static BOOL DevView_GetOpenFileName(HWND hwndDevView, const machine_config *conf
 	BOOL bResult;
 	mess_image_type imagetypes[64];
 	HWND hwndList;
-	int gamenum;
+	//int gamenum;
 
 	hwndList = GetDlgItem(GetMainWindow(), IDC_LIST);
-	gamenum = Picker_GetSelectedItem(hwndList);
+	/*gamenum = */Picker_GetSelectedItem(hwndList);
 
 	SetupImageTypes(config, imagetypes, sizeof(imagetypes) / sizeof(imagetypes[0]), TRUE, dev);
 	bResult = CommonFileImageDialog(last_directory, GetOpenFileName, pszFilename, config, imagetypes);
@@ -866,10 +866,10 @@ static BOOL DevView_GetCreateFileName(HWND hwndDevView, const machine_config *co
 	BOOL bResult;
 	mess_image_type imagetypes[64];
 	HWND hwndList;
-	int gamenum;
+	//int gamenum;
 
 	hwndList = GetDlgItem(GetMainWindow(), IDC_LIST);
-	gamenum = Picker_GetSelectedItem(hwndList);
+	/*gamenum = */Picker_GetSelectedItem(hwndList);
 
 	SetupImageTypes(config, imagetypes, sizeof(imagetypes) / sizeof(imagetypes[0]), TRUE, dev);
 	bResult = CommonFileImageDialog(last_directory, GetSaveFileName, pszFilename, config, imagetypes);

@@ -521,7 +521,7 @@ We are going to "simulate" the behaviour of the master 6801, because we does not
 If you have the source listing or the Rom dump, please send us.
 */
 	int DCB_Num, deviceNum, statusDCB;
-	int i, buffer, byteCount, sectorNmbr, sectorCount, currentSector;
+	int i, buffer, byteCount, sectorNmbr, /*sectorCount,*/ currentSector;
 	UINT8 kbcode;
 	static const UINT8 interleave[8] = {0,5,2,7,4,1,6,3};
 	const device_config *image;
@@ -647,7 +647,7 @@ If you have the source listing or the Rom dump, please send us.
 						if (image_exists(image))
 						{
 							sectorNmbr = ((ram[statusDCB+5])+(ram[statusDCB+6]<<8)+(ram[statusDCB+7]<<16)+(ram[statusDCB+8]<<24))<<1;
-							sectorCount = (byteCount/512)+(byteCount%512==0)? 0:1;
+							/* sectorCount = (byteCount/512)+(byteCount%512==0)? 0:1; */
 							for(i=0;i<=1;i++)
 							{
 								currentSector = floppy_drive_get_current_track(image);

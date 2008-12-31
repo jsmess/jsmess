@@ -245,7 +245,7 @@ static void fdc_coco_dskreg_w(running_machine *machine, coco_cartridge *cartridg
 	fdc_info *info = fdc_get_info(cartridge);
 	UINT8 drive = 0;
 	UINT8 head = 0;
-	int motor_mask = 0;
+	/* int motor_mask = 0; */
 
 	if (LOG_FDC)
 	{
@@ -267,7 +267,7 @@ static void fdc_coco_dskreg_w(running_machine *machine, coco_cartridge *cartridg
 	 * selected in other situations, then both drives are selected, and any
 	 * read signals get yucky.
 	 */
-	motor_mask = 0x08;
+	/* motor_mask = 0x08; */
 
 	if (data & 0x04)
 		drive = 2;
@@ -277,8 +277,9 @@ static void fdc_coco_dskreg_w(running_machine *machine, coco_cartridge *cartridg
 		drive = 0;
 	else if (data & 0x40)
 		drive = 3;
-	else
+	/* else
 		motor_mask = 0;
+	*/
 
 	head = ((data & 0x40) && (drive != 3)) ? 1 : 0;
 

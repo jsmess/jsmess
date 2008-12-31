@@ -641,7 +641,7 @@ static int nc_card_image_writefile(imgtool_image *img, const char *fname, imgtoo
 		int	current_block;
 		int previous_block;
 		unsigned long block_offset;
-		unsigned long file_offset = 0;
+		//unsigned long file_offset = 0;
 		unsigned long length_remaining = length;
 		struct nc_card_dir_entry *dir_entry;
 		int copy_length;
@@ -692,7 +692,7 @@ static int nc_card_image_writefile(imgtool_image *img, const char *fname, imgtoo
 					return IMGTOOLERR_WRITEERROR;
 
 				length_remaining -=copy_length;
-				file_offset+=copy_length;
+				//file_offset+=copy_length;
 
 				/* mark block as used */
 				memcard_fat_write(&nc_card->memcard,current_block, NC_FAT_END_OF_LIST);

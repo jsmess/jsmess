@@ -382,14 +382,14 @@ void	receive_register_extract(struct serial_receive_register *receive_reg, struc
 		case SERIAL_PARITY_ODD:
 		case SERIAL_PARITY_EVEN:
 		{
-			unsigned char computed_parity;
-			unsigned char parity_received;
+			//unsigned char computed_parity;
+			//unsigned char parity_received;
 
 			/* get state of parity bit received */
-			parity_received = (receive_reg->register_data>>data_form->stop_bit_count) & 0x01;
+			//parity_received = (receive_reg->register_data>>data_form->stop_bit_count) & 0x01;
 
 			/* compute parity for received bits */
-			computed_parity = serial_helper_get_parity(data);
+			//computed_parity = serial_helper_get_parity(data);
 
 			if (data_form->parity == SERIAL_PARITY_ODD)
 			{

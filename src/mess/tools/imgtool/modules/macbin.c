@@ -237,7 +237,7 @@ static imgtoolerr_t macbinary_writefile(imgtool_partition *partition, const char
 	UINT64 total_size;
 	UINT32 creation_time;
 	UINT32 lastmodified_time;
-	int version;
+	//int version;
 	imgtool_attribute attr_values[10];
 
 	UINT32 type_code;
@@ -277,7 +277,7 @@ static imgtoolerr_t macbinary_writefile(imgtool_partition *partition, const char
 	if (pick_integer_be(header, 124, 2) != ccitt_crc16(0, header, 124))
 	{
 		/* the CRC does not match; this file is MacBinary I */
-		version = 1;
+		//version = 1;
 	}
 	else if (pick_integer_be(header, 102, 4) != 0x6D42494E)
 	{
@@ -286,7 +286,7 @@ static imgtoolerr_t macbinary_writefile(imgtool_partition *partition, const char
 			return IMGTOOLERR_CORRUPTFILE;
 		if (header[123] < 0x81)
 			return IMGTOOLERR_CORRUPTFILE;
-		version = 2;
+		//version = 2;
 	}
 	else
 	{
@@ -295,7 +295,7 @@ static imgtoolerr_t macbinary_writefile(imgtool_partition *partition, const char
 			return IMGTOOLERR_CORRUPTFILE;
 		if (header[123] < 0x81)
 			return IMGTOOLERR_CORRUPTFILE;
-		version = 3;
+		//version = 3;
 	}
 
 	type_code         = pick_integer_be(header, 65, 4);
