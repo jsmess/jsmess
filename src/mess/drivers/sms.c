@@ -555,7 +555,7 @@ ROM_END
 
 ROM_START(gamegear)
 	ROM_REGION(0x4000, "main",0)
-	ROM_FILL(0x0000,0x4000,0xFF)
+	ROM_FILL(0x0000,0x4000,0x00)
 	ROM_REGION(0x0400, "user1", 0)
 	ROM_SYSTEM_BIOS( 0, "none", "No BIOS" ) /* gamegear */
 	ROM_SYSTEM_BIOS( 1, "majesco", "Majesco BIOS" ) /* gamg */
