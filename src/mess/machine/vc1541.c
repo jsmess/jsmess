@@ -1100,7 +1100,7 @@ ADDRESS_MAP_END
  */
 static TIMER_CALLBACK(c1551_irq_timer)
 {
-	cpu_set_input_line(machine->cpu[drive->cpunumber], M6502_IRQ_LINE, PULSE_LINE);
+	cpu_set_input_line(machine->cpu[drive->cpunumber], M6502_IRQ_LINE, ASSERT_LINE);
 }
 
 /*
