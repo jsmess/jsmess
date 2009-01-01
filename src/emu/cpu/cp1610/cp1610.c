@@ -1554,7 +1554,7 @@ static void cp1610_xori(cp1610_state *cpustate, int d)
 static CPU_RESET( cp1610 )
 {
 	/* This is how we set the reset vector */
-	cpu_set_input_line(device, INPUT_LINE_RESET, PULSE_LINE);
+	cpu_set_input_line(device, CP1610_RESET, PULSE_LINE);
 }
 
 /***************************************************
@@ -3368,7 +3368,7 @@ static CPU_EXECUTE( cp1610 )
 			if (cpustate->reset_pending == 1)
 			{
 				cpustate->reset_pending = 0;
-				cpustate->r[7] = cpustate->irq_callback(cpustate->device, INPUT_LINE_RESET);
+				cpustate->r[7] = cpustate->irq_callback(cpustate->device, CP1610_RESET);
 			}
 		}
 
@@ -3398,7 +3398,7 @@ static void cp1610_set_irq_line(cp1610_state *cpustate, UINT32 irqline, int stat
 				cpustate->intrm_pending = 1;
 			cpustate->intrm_state = state;
 			break;
-		case INPUT_LINE_RESET:
+		case CP1610_RESET:
 			if (state == ASSERT_LINE)
 				cpustate->reset_pending = 1;
 			cpustate->reset_state = state;
@@ -3419,7 +3419,7 @@ static CPU_SET_INFO( cp1610 )
 	/* --- the following bits of info are returned as 64-bit signed integers --- */
 	case CPUINFO_INT_PREVIOUSPC:	break;	/* TODO? */
 	case CPUINFO_INT_INPUT_STATE + CP1610_INT_INTRM:
-	case CPUINFO_INT_INPUT_STATE + INPUT_LINE_RESET:
+	case CPUINFO_INT_INPUT_STATE + CP1610_RESET:
 	case CPUINFO_INT_INPUT_STATE + CP1610_INT_INTR:
 			cp1610_set_irq_line(cpustate, state-CPUINFO_INT_INPUT_STATE, info->i);		break;
 
@@ -3467,7 +3467,7 @@ CPU_GET_INFO( cp1610 )
 	case CPUINFO_INT_PREVIOUSPC:		info->i = 0;	/* TODO??? */		break;
 
 	case CPUINFO_INT_INPUT_STATE + CP1610_INT_INTRM:	info->i = cpustate->intrm_state;	break;
-	case CPUINFO_INT_INPUT_STATE + INPUT_LINE_RESET:		info->i = cpustate->reset_state;	break;
+	case CPUINFO_INT_INPUT_STATE + CP1610_RESET:		info->i = cpustate->reset_state;	break;
 	case CPUINFO_INT_INPUT_STATE + CP1610_INT_INTR:	info->i = cpustate->intr_state;	break;
 
 	case CPUINFO_INT_REGISTER + CP1610_R0: info->i = cpustate->r[0];			break;

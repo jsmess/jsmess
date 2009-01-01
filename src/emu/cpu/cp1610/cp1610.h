@@ -32,7 +32,7 @@ enum
 
 #define CP1610_INT_NONE		0
 #define CP1610_INT_INTRM	1				/* Maskable */
-#define CP1610_RESET		2				/* Non-Maskable */
+#define CP1610_RESET		INPUT_LINE_RESET	/* Non-Maskable */
 #define CP1610_INT_INTR		INPUT_LINE_NMI	/* Non-Maskable */
 
 
