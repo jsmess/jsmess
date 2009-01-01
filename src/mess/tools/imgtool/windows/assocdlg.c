@@ -67,7 +67,7 @@ static INT_PTR CALLBACK win_association_dialog_proc(HWND dialog, UINT message,
 	LRESULT font;
 	LONG_PTR l;
 	RECT r1, r2;
-	int xmargin, /*ymargin,*/ y, width, i;
+	int xmargin, y, width, i;
 	int height = 20;
 	int id;
 	DWORD style;
@@ -89,7 +89,7 @@ static INT_PTR CALLBACK win_association_dialog_proc(HWND dialog, UINT message,
 			GetWindowRect(cancel_button, &r1);
 			GetWindowRect(dialog, &r2);
 			xmargin = r1.left - r2.left;
-			//ymargin = y = r1.top - r2.top - 20;
+			y = r1.top - r2.top - 20;
 			width = r2.right - r2.left - xmargin * 2;
 
 			for (i = 0; i < dlginfo->extension_count; i++)
