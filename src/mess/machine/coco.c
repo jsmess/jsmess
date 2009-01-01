@@ -660,8 +660,10 @@ QUICKLOAD_LOAD ( coco )
   be used in place of PAK files, when possible
 ***************************************************************************/
 
-static int generic_rom_load(const device_config *image, UINT8 *dest, UINT16 destlength)
+DEVICE_IMAGE_LOAD(coco_rom)
 {
+	UINT8 *dest = memory_region(image->machine, "cart");
+	UINT16 destlength = (UINT16) memory_region_length(image->machine, "cart");
 	UINT8 *rombase;
 	int   romsize;
 
@@ -705,28 +707,11 @@ static int generic_rom_load(const device_config *image, UINT8 *dest, UINT16 dest
 	return INIT_PASS;
 }
 
-DEVICE_IMAGE_LOAD(coco_rom)
-{
-	UINT8 *ROM = memory_region(image->machine, "main");
-	return generic_rom_load(image, &ROM[0x4000], 0x4000);
-}
-
 DEVICE_IMAGE_UNLOAD(coco_rom)
 {
-	UINT8 *ROM = memory_region(image->machine, "main");
-	memset(&ROM[0x4000], 0, 0x4000);
-}
-
-DEVICE_IMAGE_LOAD(coco3_rom)
-{
-	UINT8 *ROM = memory_region(image->machine, "main");
-	return generic_rom_load(image, &ROM[0x8000], 0x8000);
-}
-
-DEVICE_IMAGE_UNLOAD(coco3_rom)
-{
-	UINT8 *ROM = memory_region(image->machine, "main");
-	memset(&ROM[0x8000], 0, 0x8000);
+	UINT8 *dest = memory_region(image->machine, "cart");
+	UINT16 destlength = (UINT16) memory_region_length(image->machine, "cart");
+	memset(dest, 0, destlength);
 }
 
 /***************************************************************************
@@ -2005,15 +1990,17 @@ static void setup_memory_map(running_machine *machine)
 	/* If in maptype 0 we need to map in the rom also, for now this just maps in the system and cart roms */
 	if(!maptype)
 	{
+		UINT8 *cart_rom = memory_region(machine, "cart");
+
 		for(block_index=0;block_index<=7;block_index++)
 		{
 			/* If we are in the BASIC rom area $8000-$BFFF, then we map to the bas_rom_bank */
 			/* as this may be in a different block of coco_rom, in the Dragon 64 and Alpha */
 			/* as these machines have mutiple bios roms that can ocupy this area */
-			if(block_index<4)
-				offset=&bas_rom_bank[0x1000*block_index];
+			if (block_index < 4)
+				offset = &bas_rom_bank[0x1000*block_index];
 			else
-				offset=&coco_rom[0x4000+(0x1000*(block_index-4))];
+				offset = &cart_rom[(0x1000*(block_index-4))];
 
 			memory_set_bankptr(machine, block_index + 9,offset);
 			memory_install_write_handler(space, memmap[block_index+8].start, memmap[block_index+8].end, 0, 0, STATIC_NOP);
@@ -2295,6 +2282,7 @@ static void coco3_mmu_update(running_machine *machine, int lowblock, int hiblock
 	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
 	int i, offset, writebank;
 	UINT8 *readbank;
+	UINT8 *cart_rom = memory_region(machine, "cart");
 
 	for (i = lowblock; i <= hiblock; i++)
 	{
@@ -2302,7 +2290,10 @@ static void coco3_mmu_update(running_machine *machine, int lowblock, int hiblock
 		if (offset & 0x80000000)
 		{
 			/* an offset into the CoCo 3 ROM */
-			readbank = &coco_rom[offset & ~0x80000000];
+			if (offset & 0x8000)
+				readbank = &cart_rom[offset & ~0x80008000];
+			else
+				readbank = &coco_rom[offset & ~0x80000000];
 			writebank = STATIC_UNMAP;
 		}
 		else
@@ -2747,11 +2738,13 @@ static void coco_setcartline(running_machine *machine, coco_cartridge *cartridge
 
 
 /*-------------------------------------------------
-    generic_mapmemory
+    coco_mapmemory
 -------------------------------------------------*/
 
-static void generic_mapmemory(running_machine *machine, coco_cartridge *cartridge, UINT32 offset, UINT32 mask, UINT8 *cartmem, UINT32 cartmem_size)
+static void coco_mapmemory(running_machine *machine, coco_cartridge *cartridge, UINT32 offset, UINT32 mask)
 {
+	UINT8 *cartmem = memory_region(machine, "cart");
+	UINT32 cartmem_size = memory_region_length(machine, "cart");
 	const device_config *image = cartslot_image(machine);
 	const UINT8 *cart_ptr;
 	UINT32 cart_size, i;
@@ -2765,29 +2758,6 @@ static void generic_mapmemory(running_machine *machine, coco_cartridge *cartridg
 			cartmem[i] = cart_ptr[((i + offset) & mask) % cart_size];
 	}
 }
-
-
-
-/*-------------------------------------------------
-    coco_mapmemory
--------------------------------------------------*/
-
-static void coco_mapmemory(running_machine *machine, coco_cartridge *cartridge, UINT32 offset, UINT32 mask)
-{
-	generic_mapmemory(machine, cartridge, offset, mask, &coco_rom[0x4000], 0x3FFF);
-}
-
-
-
-/*-------------------------------------------------
-    coco3_mapmemory
--------------------------------------------------*/
-
-static void coco3_mapmemory(running_machine *machine, coco_cartridge *cartridge, UINT32 offset, UINT32 mask)
-{
-	generic_mapmemory(machine, cartridge, offset, mask, &coco_rom[0xC000], 0x3FFF);
-}
-
 
 
 /*-------------------------------------------------
@@ -3090,7 +3060,7 @@ MACHINE_START( coco3 )
 	init.recalc_interrupts_	= coco3_recalc_interrupts;
 	init.printer_out_		= printer_out_coco;
 	init.cart_timer_proc	= coco3_cart_timer_proc;
-	init.map_memory			= coco3_mapmemory;
+	init.map_memory			= coco_mapmemory;
 	init.fdc_cart_hardware	= "coco3_plus_fdc";
 
 	generic_init_machine(machine, &init);

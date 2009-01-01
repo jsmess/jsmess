@@ -34,8 +34,10 @@ System Driver Changes:
 - [BBC] Changed to use MAME's 6850 implemenation.  Deleted MESS's private 6850
   implementation.  [Nathan Woods]
 
-- [COCO] Fixed Dragon Alpha, via mame update, the NMI enable/disable allowing
+- [COCO] Fixed Dragon Alpha, via MAME update, the NMI enable/disable allowing
   disks to boot again.  [Phill Harvey-Smith]
+
+- [COCO] Minor cartridge loading code cleanups.  [Nathan Woods]
 
 - [COMX35] Added support for the 80 column card. [Curt Coder, Marcel van Tongeren]
 
