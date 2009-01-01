@@ -501,7 +501,7 @@ INTERRUPT_GEN( vc4000_video_line )
 		(vc4000_video.sprites[1].finished_now) |
 		(vc4000_video.sprites[0].finished_now))
 	{
-		cpu_set_input_line_and_vector(device->machine->cpu[0], 0, PULSE_LINE, 3);
+		cpu_set_input_line_and_vector(device->machine->cpu[0], 0, ASSERT_LINE, 3);
 	}
 }
 
