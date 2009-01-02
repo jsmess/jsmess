@@ -271,7 +271,7 @@ DEVICE_GET_INFO(coco_vhd)
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(vhd_info); break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0; break;
 		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL; break;
-		case DEVINFO_INT_IMAGE_TYPE:					info->i = IO_VHD; break;
+		case DEVINFO_INT_IMAGE_TYPE:					info->i = IO_HARDDISK; break;
 		case DEVINFO_INT_IMAGE_READABLE:				info->i = 1; break;
 		case DEVINFO_INT_IMAGE_WRITEABLE:				info->i = 1; break;
 		case DEVINFO_INT_IMAGE_CREATABLE:				info->i = 1; break;

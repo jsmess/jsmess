@@ -100,9 +100,6 @@ WRITE8_HANDLER(alpha_modem_w);
 void coco_set_halt_line(running_machine *machine, int halt_line);
 #endif
 
-#define IO_BITBANGER IO_PRINTER
-#define IO_VHD IO_HARDDISK
-
 /* CoCo 3 video vars; controlling key aspects of the emulation */
 struct coco3_video_vars
 {
