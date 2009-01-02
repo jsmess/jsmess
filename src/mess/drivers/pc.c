@@ -2056,7 +2056,7 @@ ROM_START( ibm5150 )
 
 	/* Z80 on the Xebec 1210 and 1220 Hard Disk Controllers */
 //	ROM_REGION(0x10000, "cpu1", 0)
-//	ROM_LOAD("104839re.12a", 0x0000, 0x1000, CRC(3ad32fcc) SHA1(0127fa520aaee91285cb46a640ed835b4554e4b3))	/* Xebec 1210 IBM OEM Hard Disk Controller, silkscreened "104839RE // COPYRIGHT // XEBEC 1986" - Common for both XEBEC 1210 IBM OEM revisions */
+//	ROM_LOAD("104839re.12a", 0x0000, 0x1000, CRC(3ad32fcc) SHA1(0127fa520aaee91285cb46a640ed835b4554e4b3))	/* Xebec 1210 IBM OEM Hard Disk Controller, silkscreened "104839RE // COPYRIGHT // XEBEC 1986" - Common for both XEBEC 1210 IBM OEM revisions. Some cards have the rom marked 104839E instead (John Eliott's card is like this), but contents are the same. */
 //	/* Other versions probably exist for the non-IBM/Retail 1210 and the 1220 */
 
 	/* IBM 1501981(CGA) and 1501985(MDA) Character rom */
@@ -2324,7 +2324,7 @@ ROM_START( ibm5160 )
 
 	/* Z80 ROM on the Xebec 1210 and 1220 Hard Disk Controllers */
 //	ROM_REGION(0x10000, "cpu1", 0)
-//	ROM_LOAD("104839re.12a", 0x0000, 0x1000, CRC(3ad32fcc) SHA1(0127fa520aaee91285cb46a640ed835b4554e4b3))	/* Xebec 1210 IBM OEM Hard Disk Controller, silkscreened "104839RE // COPYRIGHT // XEBEC 1986" - Common for both XEBEC 1210 IBM OEM editions. Some cards have the rom marked 104839E instead (John Eliott's card is like this), but contents are the same. */
+//	ROM_LOAD("104839re.12a", 0x0000, 0x1000, CRC(3ad32fcc) SHA1(0127fa520aaee91285cb46a640ed835b4554e4b3))	/* Xebec 1210 IBM OEM Hard Disk Controller, silkscreened "104839RE // COPYRIGHT // XEBEC 1986" - Common for both XEBEC 1210 IBM OEM revisions. Some cards have the rom marked 104839E instead (John Eliott's card is like this), but contents are the same. */
 //	/* Other versions probably exist for the non-IBM/Retail 1210 and the 1220 */
 
 
