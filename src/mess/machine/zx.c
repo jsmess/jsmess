@@ -21,19 +21,33 @@
 #define LOG_ZX81_VSYNC do { if (DEBUG_ZX81_VSYNC) logerror("VSYNC starts in scanline: %d\n", video_screen_get_vpos(space->machine->primary_screen)); } while (0)
 
 static UINT8 zx_tape_bit = 0x80;
+static UINT16 zx_address = 0xc029;
 
 static WRITE8_HANDLER( zx_ram_w )
 {
-	UINT8 *rom = memory_region(space->machine, "main");	
-	rom[offset | 0x4000] = data;
+	UINT8 *RAM = memory_region(space->machine, "main");	
+	RAM[offset | 0x4000] = data;
 
 	if ((offset > 0x29) && (offset < 0x300))
 	{
 		if (data & 0x40)
+		{
 			memory_write_byte (space, offset | 0xc000, data);
+			RAM[offset | 0xc000] = data;
+		}
 		else
+		{
 			memory_write_byte (space, offset | 0xc000, 0);
+			RAM[offset | 0xc000] = 0;
+		}
 	}
+}
+
+READ8_HANDLER( zx_ram_r )
+{
+	UINT8 *RAM = memory_region(space->machine, "main");	
+	zx_address = offset | 0xc000;
+	return RAM[zx_address];
 }
 
 DRIVER_INIT ( zx )
@@ -61,8 +75,8 @@ static DIRECT_UPDATE_HANDLER ( zx_setdirect )
 	}
 	return address;
 }
-#endif
 
+#endif
 static DIRECT_UPDATE_HANDLER ( zx_setdirect )
 {
 	if (address & 0x8000)
@@ -76,7 +90,6 @@ static DIRECT_UPDATE_HANDLER ( pc8300_setdirect )
 		zx_ula_r(space->machine, address, "gfx1");
 	return address;
 }
-
 
 MACHINE_RESET ( zx80 )
 {

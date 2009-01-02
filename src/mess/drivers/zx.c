@@ -35,17 +35,17 @@ Current issues: 4th and tree4th need their address maps worked out (eg, the stac
 
 static ADDRESS_MAP_START( zx80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0xc000, 0xc2ff) AM_RAM // dummy space for screen memory
+	AM_RANGE(0xc000, 0xffff) AM_RAM AM_READWRITE(zx_ram_r,SMH_NOP)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( zx81_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0xc000, 0xc2ff) AM_RAM // dummy space for screen memory
+	AM_RANGE(0xc000, 0xffff) AM_RAM AM_READWRITE(zx_ram_r,SMH_NOP)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc8300_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0xc000, 0xc2ff) AM_RAM // dummy space for screen memory
+	AM_RANGE(0xc000, 0xffff) AM_RAM AM_READWRITE(zx_ram_r,SMH_NOP)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( zx80_io_map, ADDRESS_SPACE_IO, 8 )
@@ -542,9 +542,9 @@ SYSTEM_CONFIG_END
 /* Game Drivers */
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG  COMPANY                     FULLNAME                                        FLAGS */
-COMP( 1980, zx80,       0,      0,      zx80,       zx80,       zx,     zx80,   "Sinclair Research",        "ZX-80",                                        GAME_NOT_WORKING )
-COMP( 1981, zx81,       0,      0,      zx81,       zx81,       zx,     zx81,   "Sinclair Research",        "ZX-81",                                        GAME_NOT_WORKING )
-COMP( 1982, ts1000,     zx81,   0,      ts1000,     zx81,       zx,     zx81,   "Timex Sinclair",           "Timex Sinclair 1000",                          GAME_NOT_WORKING )
-COMP( 1984, pc8300,     zx81,   0,      pc8300,     pow3000,    zx,     pc8300, "Your Computer",            "PC8300",                                       GAME_NOT_WORKING )
+COMP( 1980, zx80,       0,      0,      zx80,       zx80,       zx,     zx80,   "Sinclair Research",        "ZX-80",                                        0 )
+COMP( 1981, zx81,       0,      0,      zx81,       zx81,       zx,     zx81,   "Sinclair Research",        "ZX-81",                                        0 )
+COMP( 1982, ts1000,     zx81,   0,      ts1000,     zx81,       zx,     zx81,   "Timex Sinclair",           "Timex Sinclair 1000",                          0 )
+COMP( 1984, pc8300,     zx81,   0,      pc8300,     pow3000,    zx,     pc8300, "Your Computer",            "PC8300",                                       0 )
 COMP( 1983, pow3000,    zx81,   0,      pow3000,    pow3000,    zx,     pc8300, "Creon Enterprises",        "Power 3000",                                   GAME_NOT_WORKING )
 COMP( 1982, lambda,     zx81,   0,      pc8300,     pow3000,    zx,     zx81,   "Lambda Electronics Ltd",   "Lambda 8300",                                  GAME_NOT_WORKING )

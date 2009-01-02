@@ -15,6 +15,7 @@ MACHINE_RESET( zx80 );
 MACHINE_RESET( zx81 );
 MACHINE_RESET( pc8300 );
 
+READ8_HANDLER( zx_ram_r );
 READ8_HANDLER ( zx_io_r );
 WRITE8_HANDLER ( zx_io_w );
 
