@@ -21,7 +21,6 @@
 #define LOG_ZX81_VSYNC do { if (DEBUG_ZX81_VSYNC) logerror("VSYNC starts in scanline: %d\n", video_screen_get_vpos(space->machine->primary_screen)); } while (0)
 
 static UINT8 zx_tape_bit = 0x80;
-static UINT16 zx_address = 0xc029;
 
 static WRITE8_HANDLER( zx_ram_w )
 {
@@ -43,11 +42,11 @@ static WRITE8_HANDLER( zx_ram_w )
 	}
 }
 
+/* I know this looks really pointless... but it has to be here */
 READ8_HANDLER( zx_ram_r )
 {
 	UINT8 *RAM = memory_region(space->machine, "main");	
-	zx_address = offset | 0xc000;
-	return RAM[zx_address];
+	return RAM[offset | 0xc000];
 }
 
 DRIVER_INIT ( zx )
@@ -59,24 +58,6 @@ DRIVER_INIT ( zx )
 	memory_set_bankptr(machine, 1, memory_region(machine, "main") + 0x4000);
 }
 
-#if 0
-static DIRECT_UPDATE_HANDLER ( zx_setdirect )
-{
-	if ((address > 0xc029) && (address < 0xc300))
-	{
-		int byte = program_read_byte( address & 0x7fff );
-
-		if (byte & 0x40)
-			program_write_byte( address, byte );
-		else
-			program_write_byte( address, 0 );
-
-		zx_ula_r(machine, address, "main");
-	}
-	return address;
-}
-
-#endif
 static DIRECT_UPDATE_HANDLER ( zx_setdirect )
 {
 	if (address & 0x8000)
