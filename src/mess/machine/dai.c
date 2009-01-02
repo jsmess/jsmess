@@ -32,12 +32,6 @@ static UINT8 dai_cassette_motor[2];
 static const device_config *dai_tms5501;
 
 
-static DIRECT_UPDATE_HANDLER(dai_opbaseoverride)
-{
-	tms5501_set_pio_bit_7 (dai_tms5501, (input_port_read(space->machine, "IN8") & 0x04) ? 1:0);
-	return address;
-}
-
 /* Memory */
 
 WRITE8_HANDLER( dai_stack_interrupt_circuit_w )
@@ -139,18 +133,23 @@ const struct pit8253_config dai_pit8253_intf =
 	}
 };
 
+static TIMER_CALLBACK( dai_timer )
+{
+	tms5501_set_pio_bit_7 (dai_tms5501, (input_port_read(machine, "IN8") & 0x04) ? 1:0);
+}
+
 MACHINE_START( dai )
 {
-	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
-
-	memory_set_direct_update_handler(space, dai_opbaseoverride);
-
-	memory_set_bankptr(machine, 1, mess_ram);
-	memory_configure_bank(machine, 2, 0, 4, memory_region(machine, "main") + 0x010000, 0x1000);
-
-	timer_set(machine, attotime_zero, NULL, 0, dai_bootstrap_callback);
-
 	dai_tms5501 = device_list_find_by_tag( machine->config->devicelist, TMS5501, "tms5501" );
+
+	memory_configure_bank(machine, 2, 0, 4, memory_region(machine, "main") + 0x010000, 0x1000);
+}
+
+MACHINE_RESET( dai )
+{
+	memory_set_bankptr(machine, 1, mess_ram);
+	timer_set(machine, attotime_zero, NULL, 0, dai_bootstrap_callback);
+	timer_pulse(machine, ATTOTIME_IN_HZ(100),NULL,0,dai_timer);	/* timer for tms5501 */
 }
 
 /***************************************************************************

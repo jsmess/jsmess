@@ -22,7 +22,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-/* TMS5501 timer and interrupt controler */
+/* TMS5501 timer and interrupt controller */
 typedef struct _tms5501_interface tms5501_interface;
 struct _tms5501_interface
 {

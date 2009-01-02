@@ -29,7 +29,7 @@
 
 #define DEBUG_TMS5501	0
 
-#define LOG_TMS5501(device, message, data) do { if (DEBUG_TMS5501) logerror ("TMS5501 %s: %s %02x\n", device->tag, message, data); } while (0)
+#define LOG_TMS5501(device, message, data) do { if (DEBUG_TMS5501) printf ("\nTMS5501 %s: %s %02x", device->tag, message, data); } while (0)
 
 /* status register */
 #define TMS5501_FRAME_ERROR		0x01
@@ -114,6 +114,7 @@ INLINE const tms5501_interface *get_interface(const device_config *device)
 	return (const tms5501_interface *) device->static_config;
 }
 
+static const UINT8 timer_name[] = { TMS5501_TIMER_0_INT, TMS5501_TIMER_1_INT, TMS5501_TIMER_2_INT, TMS5501_TIMER_3_INT, TMS5501_TIMER_4_INT };
 
 /***************************************************************************
     IMPLEMENTATION
@@ -165,7 +166,7 @@ static void tms5501_field_interrupts(const device_config *device)
 		int level = find_first_bit(current_ints);
 		LOG_TMS5501(device, "Interrupt level", level);
 
-		/* reseting proper bit in pending interrupts register */
+		/* resetting proper bit in pending interrupts register */
 		tms->pending_interrupts &= ~(1<<level);
 
 		/* selecting  interrupt vector */
@@ -200,7 +201,10 @@ static void tms5501_field_interrupts(const device_config *device)
 static void tms5501_timer_decrementer(const device_config *device, UINT8 mask)
 {
 	tms5501_t *tms = get_token(device);
-	tms->pending_interrupts |= mask;
+
+	if ((mask != TMS5501_TIMER_4_INT) || ((mask == TMS5501_TIMER_4_INT) && (!(tms->command & TMS5501_INT_7_SELECT))))
+		tms->pending_interrupts |= mask;
+
 	tms5501_field_interrupts(device);
 }
 
@@ -229,7 +233,7 @@ static void tms5501_timer_reload(const device_config *device, int timer)
 
 	if (tms->timer_counter[timer])
 	{	/* reset clock interval */
-		timer_adjust_periodic(tms->timer[timer], double_to_attotime((double) tms->timer_counter[0] / (intf->clock_rate / 128.)), timer, double_to_attotime((double) tms->timer_counter[timer] / (intf->clock_rate / 128.)));
+		timer_adjust_periodic(tms->timer[timer], double_to_attotime((double) tms->timer_counter[0] / (intf->clock_rate / 128.)), timer_name[timer], double_to_attotime((double) tms->timer_counter[timer] / (intf->clock_rate / 128.)));
 	}
 	else
 	{	/* clock interval == 0 -> no timer */
@@ -356,7 +360,9 @@ READ8_DEVICE_HANDLER( tms5501_r )
 	const tms5501_interface *intf = get_interface(device);
 
 	UINT8 data = 0x00;
-	switch (offset&0x000f)
+	offset &= 0x0f;
+
+	switch (offset)
 	{
 		case 0x00:	/* Serial input buffer */
 			data = tms->sio_input_buffer;
@@ -409,8 +415,9 @@ WRITE8_DEVICE_HANDLER( tms5501_w )
 {
 	tms5501_t *tms = get_token(device);
 	const tms5501_interface *intf = get_interface(device);
+	offset &= 0x0f;
 
-	switch (offset&0x000f)
+	switch (offset)
 	{
 		case 0x00:	/* Serial input buffer */
 		case 0x01:	/* Keyboard input port, Page blanking signal */
@@ -478,9 +485,10 @@ WRITE8_DEVICE_HANDLER( tms5501_w )
 		case 0x0b:	/* Timer 2 counter */
 		case 0x0c:	/* Timer 3 counter */
 		case 0x0d:	/* Timer 4 counter */
-			tms->timer_counter[(offset&0x0f)-0x09] = data;
-			tms5501_timer_reload(device, (offset&0x0f)-0x09);
-			LOG_TMS5501(device, "Write timer", (offset&0x0f)-0x09);
+			offset -= 9;
+			tms->timer_counter[offset] = data;
+			tms5501_timer_reload(device, offset);
+			LOG_TMS5501(device, "Write timer", offset);
 			LOG_TMS5501(device, "Timer counter set", data);
 			break;
 	}
