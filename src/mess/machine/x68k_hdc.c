@@ -30,10 +30,10 @@ static TIMER_CALLBACK( req_delay )
 
 unsigned char SASIReadByte(const device_config* device)
 {
-	int ret;
+	//int ret;
 	unsigned char val;
 
-	ret = image_fread(device,&val,1);
+	/*ret = */image_fread(device,&val,1);
 	
 	return val;
 }

@@ -521,7 +521,7 @@ We are going to "simulate" the behaviour of the master 6801, because we does not
 If you have the source listing or the Rom dump, please send us.
 */
 	int DCB_Num, deviceNum, statusDCB;
-	int i, buffer, byteCount, sectorNmbr, /*sectorCount,*/ currentSector;
+	int i, buffer, /*byteCount,*/ sectorNmbr, /*sectorCount,*/ currentSector;
 	UINT8 kbcode;
 	static const UINT8 interleave[8] = {0,5,2,7,4,1,6,3};
 	const device_config *image;
@@ -556,7 +556,7 @@ If you have the source listing or the Rom dump, please send us.
 			//logerror("Accesing DCB %02Xh\n", DCB_Num);
 			deviceNum = (ram[statusDCB+0x10]&0x0F)+(ram[statusDCB+0x09]<<4);
 			buffer=(ram[statusDCB+0x01])+(ram[statusDCB+0x02]<<8);
-			byteCount=(ram[statusDCB+0x03])+(ram[statusDCB+0x04]<<8);
+			//byteCount=(ram[statusDCB+0x03])+(ram[statusDCB+0x04]<<8);
 
 			if (deviceNum>=4 && deviceNum<=7)
 			{
