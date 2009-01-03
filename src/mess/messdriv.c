@@ -719,6 +719,8 @@ XL/XE 16kB OS roms
 	DRIVER( yis303 )
 	DRIVER( yis503 )
 	DRIVER( yis503ii )
+	DRIVER( y503iir )
+	DRIVER( y503iir2 )
 	DRIVER( yis503m )
 	DRIVER( yc64 )
 

@@ -2009,6 +2009,42 @@ MSX_LAYOUT_INIT (yis503ii)
 	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
 MSX_LAYOUT_END
 
+/* MSX - Yamaha YIS503IIR Russian */
+	
+ROM_START (y503iir)
+	ROM_REGION (0xe000, "main",0)
+	ROM_LOAD ("yis503iibios.rom",  0x0000, 0x8000, CRC(225a4f9e) SHA1(5173ac403e26c462f904f85c9ef5e7b1e19253e7))
+	ROM_LOAD ("yis503iirdisk.rom", 0x8000, 0x4000, CRC(9eb7e24d) SHA1(3a481c7b7e4f0406a55952bc5b9f8cf9d699376c))
+	ROM_LOAD ("yis503iirnet.rom",  0xc000, 0x2000, CRC(0731db3f) SHA1(264fbb2de69fdb03f87dc5413428f6aa19511a7f))
+ROM_END
+
+MSX_LAYOUT_INIT (y503iir)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)	
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)	
+	MSX_LAYOUT_SLOT (3, 1, 1, 2, DISK_ROM2, 0x4000, 0x8000) /* National disk */
+	MSX_LAYOUT_SLOT (3, 2, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
+	MSX_LAYOUT_SLOT (3, 3, 1, 1, ROM, 0x2000, 0xc000)	/* Net */
+MSX_LAYOUT_END
+
+/* MSX - Yamaha YIS503IIR Estonian */
+	
+ROM_START (y503iir2)
+	ROM_REGION (0xe000, "main",0)
+	ROM_LOAD ("yis503ii2bios.rom",  0x0000, 0x8000, CRC(1548cee3) SHA1(42c7fff25b1bd90776ac0aea971241aedce8947d))
+	ROM_LOAD ("yis503iirdisk.rom", 0x8000, 0x4000, CRC(9eb7e24d) SHA1(3a481c7b7e4f0406a55952bc5b9f8cf9d699376c))
+	ROM_LOAD ("yis503iirnet.rom",  0xc000, 0x2000, CRC(0731db3f) SHA1(264fbb2de69fdb03f87dc5413428f6aa19511a7f))
+ROM_END
+
+MSX_LAYOUT_INIT (y503iir2)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)	
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)	
+	MSX_LAYOUT_SLOT (3, 1, 1, 2, DISK_ROM2, 0x4000, 0x8000) /* National disk */
+	MSX_LAYOUT_SLOT (3, 2, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
+	MSX_LAYOUT_SLOT (3, 3, 1, 1, ROM, 0x2000, 0xc000)	/* Net */
+MSX_LAYOUT_END
+
 /* MSX - Yamaha YIS503M */
 
 ROM_START (yis503m)
@@ -3651,6 +3687,8 @@ MSX_DRIVER_LIST
 	MSX_DRIVER (yis303)
 	MSX_DRIVER (yis503)
 	MSX_DRIVER (yis503ii)
+	MSX_DRIVER (y503iir)
+	MSX_DRIVER (y503iir2)
 	MSX_DRIVER (yis503m)
 	MSX_DRIVER (yc64)
 
@@ -3779,6 +3817,8 @@ COMP(1984, cx5m2,  	msx,	0,	msx_pal,	  msx,      msx,     msx, "Yamaha",	 "CX5MI
 COMP(1984, yis303,  msx,	0,	msx_pal,	  msx,      msx,     msx, "Yamaha",	 "YIS303" , 0)
 COMP(1984, yis503, 	msx,	0,	msx_pal,	  msx,      msx,     msx, "Yamaha",	 "YIS503" , 0)
 COMP(1984, yis503ii,msx,	0,	msx_pal,	  msx,      msx,     msx, "Yamaha",	 "YIS503II" , 0)
+COMP(1986, y503iir, msx,	0,	msx_pal,	  msx,      msx,     msx, "Yamaha",	 "YIS503IIR (Russian)" , 0)
+COMP(1986, y503iir2, msx,	0,	msx_pal,	  msx,      msx,     msx, "Yamaha",	 "YIS503IIR (Estonian)" , 0)
 COMP(1984, yis503m, msx,	0,	msx_pal,	  msx,      msx,     msx, "Yamaha",	 "YIS503M" , GAME_NOT_WORKING)
 COMP(1984, yc64,  	msx,	0,	msx_pal,	  msx,      msx,     msx, "Yashica", "YC-64" , 0)
 

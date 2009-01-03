@@ -6,7 +6,7 @@ New System Drivers Supported (in no particular order):
 - Pecom 64 [Miodrag Milanovic]
 - Sharp MZ80K [Miodrag Milanovic]
 - Sony HB-10P/HB-20P [Miodrag Milanovic]
-
+- Yamaha YIS503IIR Russian/Estonian  [Miodrag Milanovic]
 
 System Driver Changes:
 ----------------------
