@@ -354,7 +354,7 @@ XL/XE 16kB OS roms
 	DRIVER( edu64 )		/* Commodore Educator 64							*/
 	DRIVER( sx64 )		/* Commodore SX-64 Executive Machine (PAL)			*/
 	DRIVER( vip64 )		/* Commodore VIP64 (SX64, PAL, Swedish)				*/
-	DRIVER( dx64 )		/* Commodore DX-64 - Prototype						*/
+//	DRIVER( dx64 )		/* Commodore DX-64 - Prototype						*/
 	DRIVER( c64c )		/* Commodore 64C (NTSC)								*/
 	DRIVER( c64cpal )	/* Commodore 64C (PAL)								*/
 	DRIVER( c64g )		/* Commodore 64G (PAL)								*/
