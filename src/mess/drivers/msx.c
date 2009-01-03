@@ -1638,6 +1638,34 @@ MSX_LAYOUT_INIT (hotbi13p)
 	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM_MM, 0x10000, 0x0000)	/* 64KB Mapper RAM */
 MSX_LAYOUT_END
 
+/* MSX - Sony HB-10P */
+
+ROM_START (hb10p)
+	ROM_REGION (0x10000, "main", 0)
+	ROM_LOAD ("10pbios.rom", 0x0000, 0x8000, CRC(0f488dd8) SHA1(5e7c8eab238712d1e18b0219c0f4d4dae180420d))
+ROM_END
+
+MSX_LAYOUT_INIT (hb10p)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
+MSX_LAYOUT_END
+
+/* MSX - Sony HB-20P */
+
+ROM_START (hb20p)
+	ROM_REGION (0x10000, "main", 0)
+	ROM_LOAD ("20pbios.rom", 0x0000, 0x8000, CRC(21af423f) SHA1(365c93d7652c9f727221689bcc348652832a7b7a))
+ROM_END
+
+MSX_LAYOUT_INIT (hb20p)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
+MSX_LAYOUT_END
+
 /* MSX - Sony HB-201 */
 
 ROM_START (hb201)
@@ -1874,9 +1902,10 @@ ROM_END
 
 MSX_LAYOUT_INIT (hx20)
 	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (0, 0, 2, 2, RAM, 0x8000, 0x8000)	/* 32KB RAM */
 	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
 	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
-	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
+	MSX_LAYOUT_SLOT (3, 0, 2, 0, RAM, 0x8000, 0x0000)	/* 32KB RAM */
 	MSX_LAYOUT_SLOT (3, 3, 1, 2, ROM, 0x8000, 0x8000)
 MSX_LAYOUT_END
 
@@ -2416,7 +2445,7 @@ ROM_START (fsa1f)
 	ROM_REGION (0x50000, "main",0)
 	ROM_LOAD ("a1fbios.rom", 0x0000, 0x8000, CRC(9b3e7b97) SHA1(0081ea0d25bc5cd8d70b60ad8cfdc7307812c0fd))
 	ROM_LOAD ("a1fext.rom", 0x8000, 0x4000, CRC(43e7a7fc) SHA1(0fbd45ef3dd7bb82d4c31f1947884f411f1ca344))
-	ROM_LOAD ("a1fdisk.rom", 0xc000, 0x4000, CRC(d24cd452) SHA1(141e61cc8e0e51382e508fbd77a34b778a4f8444))
+	ROM_LOAD ("a1fdisk.rom", 0xc000, 0x4000, CRC(e25cacca) SHA1(607cfca605eaf82e3efa33459d6583efb7ecc13b))
 	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
 	ROM_FILL (0x10000, 0x10000, 0)
 	ROM_LOAD ("a1fkdr.rom", 0x20000, 0x8000, CRC(2dbea5ec) SHA1(ea35cc2cad9cfdf56cae224d8ee41579de37f000))
@@ -2443,7 +2472,7 @@ ROM_START (fsa1fm)
 	ROM_REGION (0x180000, "main",0)
 	ROM_LOAD ("a1fmbios.rom", 0x0000, 0x8000, CRC(9b3e7b97) SHA1(0081ea0d25bc5cd8d70b60ad8cfdc7307812c0fd))
 	ROM_LOAD ("a1fmext.rom", 0x8000, 0x4000, CRC(ad295b5d) SHA1(d552319a19814494e3016de4b8f010e8f7b97e02))
-	ROM_LOAD ("a1fmdisk.rom", 0xc000, 0x4000, CRC(d24cd452) SHA1(141e61cc8e0e51382e508fbd77a34b778a4f8444))
+	ROM_LOAD ("a1fmdisk.rom", 0xc000, 0x4000, CRC(e25cacca) SHA1(607cfca605eaf82e3efa33459d6583efb7ecc13b))
 	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
 	ROM_FILL (0x10000, 0x10000, 0)
 	ROM_LOAD ("a1fmkfn.rom", 0x40000, 0x20000, CRC(c61ddc5d) SHA1(5e872d5853698731a0ed22fb72dbcdfd59cd19c3))
@@ -3183,9 +3212,10 @@ ROM_END
 
 MSX_LAYOUT_INIT (hx23)
 	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (0, 0, 2, 2, RAM, 0x8000, 0x8000)	/* 32KB RAM	*/
 	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
 	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
-	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM_MM, 0x10000, 0x0000)	/* 64KB Mapper RAM */
+	MSX_LAYOUT_SLOT (3, 0, 0, 2, RAM, 0x8000, 0x0000)	/* 32KB RAM */
 	MSX_LAYOUT_SLOT (3, 1, 0, 1, ROM, 0x4000, 0x8000)
 	MSX_LAYOUT_SLOT (3, 3, 0, 4, ROM, 0x10000, 0x20000)
 	MSX_LAYOUT_RAMIO_SET_BITS (0x80)
@@ -3289,7 +3319,7 @@ ROM_START (fsa1fx)
 	ROM_REGION (0x50000, "main",0)
 	ROM_LOAD ("a1fxbios.rom", 0x0000, 0x8000, CRC(19771608) SHA1(e90f80a61d94c617850c415e12ad70ac41e66bb7))
 	ROM_LOAD ("a1fxext.rom", 0x8000, 0x4000, CRC(b8ba44d3) SHA1(fe0254cbfc11405b79e7c86c7769bd6322b04995))
-	ROM_LOAD ("a1fxdisk.rom", 0xc000, 0x4000, CRC(905daa1b) SHA1(bb59c849898d46a23fdbd0cc04ab35088e74a18d))
+	ROM_LOAD ("a1fxdisk.rom", 0xc000, 0x4000, CRC(2bda0184) SHA1(2a0d228afde36ac7c5d3c2aac9c7c664dd071a8c))
 	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2p parent set */
 	ROM_FILL (0x10000, 0x10000, 0)
 	ROM_LOAD ("a1fxkdr.rom", 0x20000, 0x8000, CRC(a068cba9) SHA1(1ef3956f7f918873fb9b031339bba45d1e5e5878))
@@ -3316,7 +3346,7 @@ ROM_START (fsa1wsx)
 	ROM_REGION (0x270000, "main",0)
 	ROM_LOAD ("a1wsbios.rom", 0x0000, 0x8000, CRC(358ec547) SHA1(f4433752d3bf876bfefb363c749d4d2e08a218b6))
 	ROM_LOAD ("a1wsext.rom", 0x8000, 0x4000, CRC(b8ba44d3) SHA1(fe0254cbfc11405b79e7c86c7769bd6322b04995))
-	ROM_LOAD ("a1wsdisk.rom", 0xc000, 0x4000, CRC(17fa392b) SHA1(7ed7c55e0359737ac5e68d38cb6903f9e5d7c2b6))
+	ROM_LOAD ("a1wsdisk.rom", 0xc000, 0x4000, CRC(ac7d92b4) SHA1(b7068e2aab02072852ca249596b7550ac632c4c2))
 	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2p parent set */
 	ROM_FILL (0x10000, 0x10000, 0)
 	ROM_LOAD ("a1wskdr.rom", 0x20000, 0x8000, CRC(b4fc574d) SHA1(dcc3a67732aa01c4f2ee8d1ad886444a4dbafe06))
@@ -3346,7 +3376,7 @@ ROM_START (fsa1wx)
 	ROM_REGION (0x270000, "main",0)
 	ROM_LOAD ("a1wxbios.rom", 0x0000, 0x8000, CRC(19771608) SHA1(e90f80a61d94c617850c415e12ad70ac41e66bb7))
 	ROM_LOAD ("a1wxext.rom", 0x8000, 0x4000, CRC(b8ba44d3) SHA1(fe0254cbfc11405b79e7c86c7769bd6322b04995))
-	ROM_LOAD ("a1wxdisk.rom", 0xc000, 0x4000, CRC(905daa1b) SHA1(bb59c849898d46a23fdbd0cc04ab35088e74a18d))
+	ROM_LOAD ("a1wxdisk.rom", 0xc000, 0x4000, CRC(2bda0184) SHA1(2a0d228afde36ac7c5d3c2aac9c7c664dd071a8c))
 	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2p parent set */
 	ROM_FILL (0x10000, 0x10000, 0)
 	ROM_LOAD ("a1wxkdr.rom", 0x20000, 0x8000, CRC(a068cba9) SHA1(1ef3956f7f918873fb9b031339bba45d1e5e5878))
@@ -3375,7 +3405,7 @@ ROM_START (fsa1wxa)
 	ROM_REGION (0x270000, "main",0)
 	ROM_LOAD ("a1wxbios.rom", 0x0000, 0x8000, CRC(19771608) SHA1(e90f80a61d94c617850c415e12ad70ac41e66bb7))
 	ROM_LOAD ("a1wxext.rom", 0x8000, 0x4000, CRC(b8ba44d3) SHA1(fe0254cbfc11405b79e7c86c7769bd6322b04995))
-	ROM_LOAD ("a1wxdisk.rom", 0xc000, 0x4000, CRC(905daa1b) SHA1(bb59c849898d46a23fdbd0cc04ab35088e74a18d))
+	ROM_LOAD ("a1wxdisk.rom", 0xc000, 0x4000, CRC(2bda0184) SHA1(2a0d228afde36ac7c5d3c2aac9c7c664dd071a8c))
 	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2p parent set */
 	ROM_FILL (0x10000, 0x10000, 0)
 	ROM_LOAD ("a1wxkdr.rom", 0x20000, 0x8000, CRC(a068cba9) SHA1(1ef3956f7f918873fb9b031339bba45d1e5e5878))
@@ -3598,6 +3628,8 @@ MSX_DRIVER_LIST
 	MSX_DRIVER (hotbi13b)
 	MSX_DRIVER (hotbi13p)
 	MSX_DRIVER (hotbit20)
+	MSX_DRIVER (hb10p)
+	MSX_DRIVER (hb20p)
 	MSX_DRIVER (hb201)
 	MSX_DRIVER (hb201p)
 	MSX_DRIVER (hb501p)
@@ -3724,7 +3756,9 @@ COMP(1985, hotbit11, msx,	0,	msx,	  hotbit,   msx,     msx, "Sharp / Epcom",	 "H
 COMP(1985, hotbit12, msx,	0,	msx,	  hotbit,   msx,     msx, "Sharp / Epcom",	 "HB-8000 Hotbit 1.2" , 0)
 COMP(1985, hotbi13b, msx,	0,	msx,	  hotbit,   msx,     msx, "Sharp / Epcom",	 "HB-8000 Hotbit 1.3b" , 0)
 COMP(1985, hotbi13p, msx,	0,	msx,	  hotbit,   msx,     msx, "Sharp / Epcom",	 "HB-8000 Hotbit 1.3p" , 0)
-COMP(1985, hb201,    msx,	0,      msx,      msxjp,    msx,     msx, "Sony", "HB-201 (Japan)" , 0)
+COMP(1985, hb10p,    msx,	0,  msx_pal,  msx,    	msx,     msx, "Sony", "HB-10P" , 0)
+COMP(1985, hb20p,    msx,	0,  msx_pal,  msx,    	msx,     msx, "Sony", "HB-20P (Spanish)" , 0)
+COMP(1985, hb201,    msx,	0,  msx,      msxjp,    msx,     msx, "Sony", "HB-201 (Japan)" , 0)
 COMP(1985, hb201p,   msx,	0,	msx_pal,  msx,      msx,     msx, "Sony", "HB-201P" , 0)
 COMP(1984, hb501p,   msx,	0,	msx_pal,  msx,      msx,     msx, "Sony", "HB-501P" , 0)
 COMP(1983, hb55d,    msx,	0,	msx_pal,  msx,      msx,     msx, "Sony", "HB-55D (Germany)" , 0)

@@ -696,6 +696,8 @@ XL/XE 16kB OS roms
 	DRIVER( hotbi13b )	/* 1985 MSX	Brazil									*/
 	DRIVER( hotbi13p )	/* 1985 MSX	Brazil									*/
 	DRIVER( hotbit20 )	/* 1986 MSX2 Brazil									*/
+	DRIVER( hb10p )
+	DRIVER( hb20p )
 	DRIVER( hb201 )		/* 1985 MSX Japan									*/
 	DRIVER( hb201p )	/* 1985 MSX											*/
 	DRIVER( hb501p )	/* 1984 MSX											*/

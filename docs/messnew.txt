@@ -5,7 +5,7 @@ New System Drivers Supported (in no particular order):
 - Ivel Ultra [Miodrag Milanovic]
 - Pecom 64 [Miodrag Milanovic]
 - Sharp MZ80K [Miodrag Milanovic]
-
+- Sony HB-10P/HB-20P [Miodrag Milanovic]
 
 
 System Driver Changes:
@@ -49,6 +49,10 @@ System Driver Changes:
   [Michael Zapf]
 
 - [NES] Fixed bug #1672.  [Wilbert Pol]
+
+- [MSX] Update of Panasonic MSX disk ROMs [Miodrag Milanovic]
+
+- [MSX] Update of Toshiba HX-20, HX-23 memory map [Miodrag Milanovic]
 
 - [ONDRA] Both computers now work, cassette supported  [Miodrag Milanovic]
 
