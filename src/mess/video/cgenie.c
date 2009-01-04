@@ -69,7 +69,7 @@ static void cgenie_offset_xy(void)
 ***************************************************************************/
 WRITE8_HANDLER ( cgenie_register_w )
 {
-	int addr;
+	//int addr;
 
 	switch (crt.idx)
 	{
@@ -130,13 +130,13 @@ WRITE8_HANDLER ( cgenie_register_w )
 			if( crt.cursor_top == data )
 				break;
 			crt.cursor_top = data;
-			addr = 256 * crt.cursor_address_hi + crt.cursor_address_lo;
+			//addr = 256 * crt.cursor_address_hi + crt.cursor_address_lo;
             break;
 		case 11:
 			if( crt.cursor_bottom == data )
 				break;
 			crt.cursor_bottom = data;
-			addr = 256 * crt.cursor_address_hi + crt.cursor_address_lo;
+			//addr = 256 * crt.cursor_address_hi + crt.cursor_address_lo;
             break;
 		case 12:
 			data &= 63;
@@ -154,13 +154,13 @@ WRITE8_HANDLER ( cgenie_register_w )
 			if( crt.cursor_address_hi == data )
 				break;
 			crt.cursor_address_hi = data;
-			addr = 256 * crt.cursor_address_hi + crt.cursor_address_lo;
+			//addr = 256 * crt.cursor_address_hi + crt.cursor_address_lo;
             break;
 		case 15:
 			if( crt.cursor_address_lo == data )
 				break;
 			crt.cursor_address_lo = data;
-			addr = 256 * crt.cursor_address_hi + crt.cursor_address_lo;
+			//addr = 256 * crt.cursor_address_hi + crt.cursor_address_lo;
             break;
 	}
 }

@@ -209,7 +209,7 @@ INLINE void gb_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
   number of sprites selected.
  */
 static void gb_select_sprites( void ) {
-	int	i, yindex, line, height;
+	int	i, /*yindex,*/ line, height;
 	UINT8	*oam = gb_oam + 39 * 4;
 
 	gb_lcd.sprCount = 0;
@@ -223,7 +223,7 @@ static void gb_select_sprites( void ) {
 			height = 8;
 		}
 
-		yindex = gb_lcd.current_line;
+		//yindex = gb_lcd.current_line;
 		line = gb_lcd.current_line + 16;
 
 		for( i = 39; i >= 0; i-- ) {

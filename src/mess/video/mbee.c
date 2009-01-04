@@ -169,8 +169,7 @@ WRITE8_HANDLER ( mbee_video_bank_w )
 
 static void m6545_update_strobe(running_machine *machine, int param)
 {
-	int data;
-	data = keyboard_matrix_r(machine, param);
+	/*int data = */keyboard_matrix_r(machine, param);
 	crt.update_strobe = 1;
 //	if( data )
 //		logerror("6545 update_strobe_cb $%04X = $%02X\n", param, data);
