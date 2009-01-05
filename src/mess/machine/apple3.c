@@ -500,7 +500,10 @@ static WRITE8_DEVICE_HANDLER(apple3_via_1_out_b) { apple3_via_out(device->machin
 static void apple2_via_1_irq_func(const device_config *device, int state)
 {
 	if (!via_1_irq && state)
-		cpu_set_input_line(device->machine->cpu[0], M6502_IRQ_LINE, PULSE_LINE);
+	{
+		cpu_set_input_line(device->machine->cpu[0], M6502_IRQ_LINE, ASSERT_LINE);
+		cpu_set_input_line(device->machine->cpu[0], M6502_IRQ_LINE, CLEAR_LINE);
+	}
 	via_1_irq = state;
 }
 
