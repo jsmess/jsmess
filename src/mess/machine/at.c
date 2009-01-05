@@ -36,11 +36,6 @@
 #define LOG_PORT80	0
 #define LOG_KBDC	0
 
-/* 0.129 BREAKAGE - PLEASE FIX ME */
-#define I8X41_DATA	0
-#define I8X41_STAT	0
-#define I8X41_CMND	0
-
 static struct {
 	const device_config	*pic8259_master;
 	const device_config	*pic8259_slave;
@@ -554,8 +549,8 @@ READ8_HANDLER(at_kbdc8042_r)
 
 	switch ( offset )
 	{
-	case 0:
-		data = cpu_get_reg( space->machine->cpu[1], I8X41_DATA );
+	case 0:		/* A2 is wired to 8042 A0 */
+		data = upi41_master_r( space->machine->cpu[1], 0 );
 		break;
 
 	case 1:
@@ -583,8 +578,8 @@ READ8_HANDLER(at_kbdc8042_r)
 			data &= ~0x20;
 		break;
 
-	case 4:
-		data = cpu_get_reg( space->machine->cpu[1], I8X41_STAT );
+	case 4:		/* A2 is wired to 8042 A0 */
+		data = upi41_master_r( space->machine->cpu[1], 1 );
 		break;
 	}
 
@@ -600,8 +595,8 @@ WRITE8_HANDLER(at_kbdc8042_w)
 		logerror("kbdc8042_8_w(): ofset=%d data=0x%02x\n", offset, data);
 
 	switch (offset) {
-	case 0:
-		cpu_set_reg( space->machine->cpu[1], I8X41_DATA, data );
+	case 0:		/* A2 is wired to 8042 A0 */
+		upi41_master_w( space->machine->cpu[1], 0, data );
 		break;
 
 	case 1:
@@ -610,8 +605,8 @@ WRITE8_HANDLER(at_kbdc8042_w)
 		at_speaker_set_spkrdata( data & 0x02 );
 		break;
 
-	case 4:
-		cpu_set_reg( space->machine->cpu[1], I8X41_CMND, data );
+	case 4:		/* A2 is wirted to 8042 A0 */
+		upi41_master_w( space->machine->cpu[1], 1, data );
 		break;
     }
 }
