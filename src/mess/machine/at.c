@@ -605,7 +605,7 @@ WRITE8_HANDLER(at_kbdc8042_w)
 		at_speaker_set_spkrdata( data & 0x02 );
 		break;
 
-	case 4:		/* A2 is wirted to 8042 A0 */
+	case 4:		/* A2 is wired to 8042 A0 */
 		upi41_master_w( space->machine->cpu[1], 1, data );
 		break;
     }
