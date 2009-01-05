@@ -505,8 +505,8 @@ static MACHINE_DRIVER_START( c64 )
 	MDRV_CASSETTE_ADD( "cassette", cbm_cassette_config )
 
 	/* cia */
-	MDRV_CIA6526_ADD("cia_0", CIA6526R1, 0, c64_ntsc_cia0)
-	MDRV_CIA6526_ADD("cia_1", CIA6526R1, 0, c64_ntsc_cia1)
+	MDRV_CIA6526_ADD("cia_0", CIA6526R1, VIC6567_CLOCK/4, c64_ntsc_cia0)
+	MDRV_CIA6526_ADD("cia_1", CIA6526R1, VIC6567_CLOCK/4, c64_ntsc_cia1)
 
 	/* via */
 	MDRV_VIA6522_ADD("via6522_2", 0, vc1541_via2)
@@ -545,8 +545,8 @@ static MACHINE_DRIVER_START( c64pal )
 	MDRV_CASSETTE_ADD( "cassette", cbm_cassette_config )
 
 	/* cia */
-	MDRV_CIA6526_ADD("cia_0", CIA6526R1, 0, c64_pal_cia0)
-	MDRV_CIA6526_ADD("cia_1", CIA6526R1, 0, c64_pal_cia1)
+	MDRV_CIA6526_ADD("cia_0", CIA6526R1, VIC6569_CLOCK/4, c64_pal_cia0)
+	MDRV_CIA6526_ADD("cia_1", CIA6526R1, VIC6569_CLOCK/4, c64_pal_cia1)
 	
 	MDRV_IMPORT_FROM(c64_cartslot)
 MACHINE_DRIVER_END
