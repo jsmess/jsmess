@@ -158,6 +158,7 @@ Keyboard interface:
 #include "cpu/tms9900/tms9900.h"
 #include "devices/mflopimg.h"
 #include "devices/cassette.h"
+#include "devices/cartslot.h"
 #include "machine/smartmed.h"
 #include "sound/5220intf.h"
 #include "devices/harddriv.h"
@@ -397,6 +398,29 @@ static const struct tms9995reset_param ti99_8_processor_config =
 	1				/* MP9537 mask */
 };
 
+MACHINE_DRIVER_START(ti99_8_cartslot)
+ 	MDRV_CARTSLOT_ADD("cart1")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin,c,d,g,m,crom,drom,grom,mrom")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_START(ti99_cart)
+	MDRV_CARTSLOT_LOAD(ti99_cart)
+	MDRV_CARTSLOT_UNLOAD(ti99_cart)
+
+ 	MDRV_CARTSLOT_ADD("cart2")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin,c,d,g,m,crom,drom,grom,mrom")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_START(ti99_cart)
+	MDRV_CARTSLOT_LOAD(ti99_cart)
+	MDRV_CARTSLOT_UNLOAD(ti99_cart)
+
+ 	MDRV_CARTSLOT_ADD("cart3")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin,c,d,g,m,crom,drom,grom,mrom")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_START(ti99_cart)
+	MDRV_CARTSLOT_LOAD(ti99_cart)
+	MDRV_CARTSLOT_UNLOAD(ti99_cart)
+MACHINE_DRIVER_END
+	
 static MACHINE_DRIVER_START(ti99_8_60hz)
 	/* basic machine hardware */
 	/* TMS9995-MP9537 CPU @ 10.7 MHz */
@@ -438,6 +462,8 @@ static MACHINE_DRIVER_START(ti99_8_60hz)
 	
 	/* tms9901 */
 	MDRV_TMS9901_ADD("tms9901", tms9901reset_param_ti99_8)	
+	
+	MDRV_IMPORT_FROM(ti99_8_cartslot)
 MACHINE_DRIVER_END
 
 
@@ -482,6 +508,8 @@ static MACHINE_DRIVER_START(ti99_8_50hz)
 
 	/* tms9901 */
 	MDRV_TMS9901_ADD("tms9901", tms9901reset_param_ti99_8)	
+	
+	MDRV_IMPORT_FROM(ti99_8_cartslot)
 MACHINE_DRIVER_END
 
 /*
@@ -516,27 +544,6 @@ ROM_START(ti99_8)
 ROM_END
 
 #define rom_ti99_8e rom_ti99_8
-
-static void ti99_8_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cartslot */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_TYPE:							info->i = IO_CARTSLOT; break;
-		case MESS_DEVINFO_INT_READABLE:						info->i = 1; break;
-		case MESS_DEVINFO_INT_WRITEABLE:						info->i = 0; break;
-		case MESS_DEVINFO_INT_CREATABLE:						info->i = 0; break;
-		case MESS_DEVINFO_INT_COUNT:							info->i = 3; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(ti99_cart); break;
-		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(ti99_cart); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "bin,c,d,g,m,crom,drom,grom,mrom"); break;
-	}
-}
 
 static void ti99_8_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
@@ -622,16 +629,11 @@ static SYSTEM_CONFIG_START(ti99_8)
 	/* one cassette unit port */
 	/* Hex-bus disk controller: supports up to 4 floppy disk drives */
 	/* expansion port (similar to 99/4(a) - yet slightly different) */
-
-	CONFIG_DEVICE(ti99_8_cartslot_getinfo)
-#if 1
 	CONFIG_DEVICE(ti99_8_floppy_getinfo)
 	CONFIG_DEVICE(ti99_8_parallel_getinfo)
 	CONFIG_DEVICE(ti99_8_serial_getinfo)
 	/*CONFIG_DEVICE(ti99_8_quickload_getinfo)*/
 	CONFIG_DEVICE(ti99_8_memcard_getinfo)
-#endif
-
 SYSTEM_CONFIG_END
 
 /*      YEAR    NAME        PARENT      COMPAT  MACHINE     INPUT   INIT        CONFIG      COMPANY                 FULLNAME */

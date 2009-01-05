@@ -34,6 +34,7 @@ Historical notes: TI made several last minute design changes.
 #include "devices/mflopimg.h"
 #include "devices/harddriv.h"
 #include "devices/cassette.h"
+#include "devices/cartslot.h"
 #include "machine/smartmed.h"
 #include "sound/5220intf.h"
 #include "machine/idectrl.h"
@@ -507,6 +508,29 @@ static const mm58274c_interface floppy_mm58274c_interface =
 	0   /*  first day of week */
 };
 
+MACHINE_DRIVER_START(ti99_4_cartslot)
+ 	MDRV_CARTSLOT_ADD("cart1")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin,c,d,g,m,crom,drom,grom,mrom")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_START(ti99_cart)
+	MDRV_CARTSLOT_LOAD(ti99_cart)
+	MDRV_CARTSLOT_UNLOAD(ti99_cart)
+
+ 	MDRV_CARTSLOT_ADD("cart2")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin,c,d,g,m,crom,drom,grom,mrom")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_START(ti99_cart)
+	MDRV_CARTSLOT_LOAD(ti99_cart)
+	MDRV_CARTSLOT_UNLOAD(ti99_cart)
+
+ 	MDRV_CARTSLOT_ADD("cart3")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin,c,d,g,m,crom,drom,grom,mrom")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_START(ti99_cart)
+	MDRV_CARTSLOT_LOAD(ti99_cart)
+	MDRV_CARTSLOT_UNLOAD(ti99_cart)
+MACHINE_DRIVER_END
+
 static MACHINE_DRIVER_START(ti99_4_60hz)
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0 MHz */
@@ -555,6 +579,8 @@ static MACHINE_DRIVER_START(ti99_4_60hz)
 	MDRV_TMS9902_ADD("tms9902_1", tms9902_params_1)		
 	
 	MDRV_WD179X_ADD("wd179x", ti99_wd17xx_interface )
+	
+	MDRV_IMPORT_FROM(ti99_4_cartslot)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START(ti99_4_50hz)
@@ -603,6 +629,8 @@ static MACHINE_DRIVER_START(ti99_4_50hz)
 	MDRV_TMS9902_ADD("tms9902_1", tms9902_params_1)		
 	
 	MDRV_WD179X_ADD("wd179x", ti99_wd17xx_interface )
+	
+	MDRV_IMPORT_FROM(ti99_4_cartslot)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START(ti99_4a_60hz)
@@ -652,6 +680,8 @@ static MACHINE_DRIVER_START(ti99_4a_60hz)
 	MDRV_TMS9902_ADD("tms9902_1", tms9902_params_1)		
 	
 	MDRV_WD179X_ADD("wd179x", ti99_wd17xx_interface )	
+	
+	MDRV_IMPORT_FROM(ti99_4_cartslot)
 MACHINE_DRIVER_END
 
 
@@ -701,6 +731,8 @@ static MACHINE_DRIVER_START(ti99_4a_50hz)
 	MDRV_TMS9902_ADD("tms9902_1", tms9902_params_1)	
 	
 	MDRV_WD179X_ADD("wd179x", ti99_wd17xx_interface )
+	
+	MDRV_IMPORT_FROM(ti99_4_cartslot)
 MACHINE_DRIVER_END
 
 
@@ -757,7 +789,9 @@ static MACHINE_DRIVER_START(ti99_4ev_60hz)
 	MDRV_TMS9902_ADD("tms9902_0", tms9902_params_0)
 	MDRV_TMS9902_ADD("tms9902_1", tms9902_params_1)
 	
-	MDRV_WD179X_ADD("wd179x", ti99_wd17xx_interface )		
+	MDRV_WD179X_ADD("wd179x", ti99_wd17xx_interface )	
+	
+	MDRV_IMPORT_FROM(ti99_4_cartslot)	
 MACHINE_DRIVER_END
 
 
@@ -862,29 +896,7 @@ ROM_END
  * and you could plug quite a lot of GROMs in the side port.  Neither of these
  * are emulated.
  */
-
-static void ti99_4_cartslot_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cartslot */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_TYPE:							info->i = IO_CARTSLOT; break;
-		case MESS_DEVINFO_INT_READABLE:						info->i = 1; break;
-		case MESS_DEVINFO_INT_WRITEABLE:						info->i = 0; break;
-		case MESS_DEVINFO_INT_CREATABLE:						info->i = 0; break;
-		case MESS_DEVINFO_INT_COUNT:							info->i = 3; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_START:							info->start = DEVICE_START_NAME(ti99_cart); break;
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(ti99_cart); break;
-		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(ti99_cart); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "bin,c,d,g,m,crom,drom,grom,mrom"); break;
-	}
-}
-
+	
 static void ti99_4_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
@@ -985,10 +997,9 @@ static void ti99_4_memcard_getinfo(const mess_device_class *devclass, UINT32 sta
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), ""); break;
 	}
-}
-
-static SYSTEM_CONFIG_START(ti99_4)
-	CONFIG_DEVICE(ti99_4_cartslot_getinfo)
+}		
+	
+static SYSTEM_CONFIG_START(ti99_4)	
 	CONFIG_DEVICE(ti99_4_floppy_getinfo)
 	CONFIG_DEVICE(ti99_4_parallel_getinfo)
 	CONFIG_DEVICE(ti99_4_serial_getinfo)

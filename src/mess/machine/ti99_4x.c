@@ -375,7 +375,17 @@ DRIVER_INIT( ti99_4p )
 
 DEVICE_START( ti99_cart )
 {
-	int id = image_index_in_device(device);
+	int id = 0;
+	if (strcmp(device->tag,"cart1")==0) {
+		id = 0;
+	}
+	if (strcmp(device->tag,"cart2")==0) {
+		id = 1;
+	}
+	if (strcmp(device->tag,"cart3")==0) {
+		id = 2;
+	}
+	
 	cartridge_pages[id] = (UINT16 *) (memory_region(device->machine, "main") + offset_cart + (id * 0x2000));
 	return DEVICE_START_OK;
 }
@@ -397,9 +407,20 @@ DEVICE_IMAGE_LOAD( ti99_cart )
 	/* Original idea by Norberto Bensa */
 	const char *name = image_filename(image);
 	const char *ch, *ch2;
-	int id = image_index_in_device(image);
+	int id = 0;
 	int i;
-	slot_type_t type = (slot_type_t) id;
+	slot_type_t type;
+	
+	if (strcmp(image->tag,"cart1")==0) {
+		id = 0;
+	}
+	if (strcmp(image->tag,"cart2")==0) {
+		id = 1;
+	}
+	if (strcmp(image->tag,"cart3")==0) {
+		id = 2;
+	}	
+	type = (slot_type_t) id;
 
 	/* There is a circuitry in TI99/4(a) that resets the console when a
 	cartridge is inserted or removed.  We emulate this instead of resetting the
@@ -518,8 +539,16 @@ DEVICE_IMAGE_LOAD( ti99_cart )
 DEVICE_IMAGE_UNLOAD( ti99_cart )
 {
 	int i;
-	int id = image_index_in_device(image);
-
+	int id = 0;
+	if (strcmp(image->tag,"cart1")==0) {
+		id = 0;
+	}
+	if (strcmp(image->tag,"cart2")==0) {
+		id = 1;
+	}
+	if (strcmp(image->tag,"cart3")==0) {
+		id = 2;
+	}		
 	/* There is a circuitry in TI99/4(a) that resets the console when a
 	cartridge is inserted or removed.  We emulate this instead of resetting the
 	emulator (which is the default in MESS). */
