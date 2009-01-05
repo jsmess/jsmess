@@ -4,6 +4,7 @@
 #include "includes/nes.h"
 #include "machine/nes_mmc.h"
 #include "sound/nes_apu.h"
+#include "devices/cartslot.h"
 #include "image.h"
 #include "hash.h"
 
@@ -65,7 +66,7 @@ static void nes_machine_stop(running_machine *machine);
 
 static const device_config *cartslot_image(running_machine *machine)
 {
-	return image_from_devtype_and_index(machine, IO_CARTSLOT, 0);
+	return device_list_find_by_tag(machine->config->devicelist, CARTSLOT, "cart");
 }
 
 static void init_nes_core (running_machine *machine)

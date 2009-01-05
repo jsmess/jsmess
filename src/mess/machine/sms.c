@@ -4,6 +4,7 @@
 #include "video/smsvdp.h"
 #include "sound/2413intf.h"
 #include "machine/eeprom.h"
+#include "devices/cartslot.h"
 
 #define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
@@ -581,7 +582,7 @@ WRITE8_HANDLER(gg_psg_w) {
 static void sms_machine_stop(running_machine *machine) {
 	/* Does the cartridge have SRAM that should be saved? */
 	if ( sms_cartridge[sms_current_cartridge].sram_save ) {
-		image_battery_save( image_from_devtype_and_index(machine, IO_CARTSLOT, 0), sms_cartridge[sms_current_cartridge].cartSRAM, sizeof(UINT8) * NVRAM_SIZE );
+		image_battery_save(device_list_find_by_tag(machine->config->devicelist, CARTSLOT, "cart"), sms_cartridge[sms_current_cartridge].cartSRAM, sizeof(UINT8) * NVRAM_SIZE );
 	}
 }
 

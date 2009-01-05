@@ -126,7 +126,7 @@ static void snes_load_sram(running_machine *machine)
 
 	battery_ram = malloc_or_die(snes_cart.sram_max);
 	ptr = battery_ram;
-	image_battery_load(image_from_devtype_and_index(machine, IO_CARTSLOT,0), battery_ram, snes_cart.sram_max);
+	image_battery_load(device_list_find_by_tag(machine->config->devicelist, CARTSLOT, "cart"), battery_ram, snes_cart.sram_max);
 
 	if (snes_cart.mode == SNES_MODE_20)
 	{
@@ -198,7 +198,7 @@ static void snes_save_sram(running_machine *machine)
 		}
 	}
 
-	image_battery_save(image_from_devtype_and_index(machine, IO_CARTSLOT,0), battery_ram, snes_cart.sram_max);
+	image_battery_save(device_list_find_by_tag(machine->config->devicelist, CARTSLOT, "cart"), battery_ram, snes_cart.sram_max);
 
 	free(battery_ram);
 }
