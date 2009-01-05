@@ -493,9 +493,13 @@ static DEVICE_IMAGE_UNLOAD( sonydriv_floppy )
 {
 	int id;
 	device_image_unload_func parent_unload;
+	const device_config *fdc;
+
+	/* locate the FDC */
+	fdc = device_list_find_by_tag( image->machine->config->devicelist, IWM, "fdc");
 
 	id = image_index_in_device(image);
-	save_track_data((device_config*)device_list_find_by_tag( image->machine->config->devicelist,APPLEFDC,"fdc"),id);
+	save_track_data(fdc, id);
 	memset(&sony_floppy[id], 0, sizeof(sony_floppy[id]));
 
 	parent_unload = (device_image_unload_func) mess_device_get_info_fct(&parent_devclass, MESS_DEVINFO_PTR_UNLOAD);
