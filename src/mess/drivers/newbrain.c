@@ -1250,7 +1250,7 @@ static MACHINE_DRIVER_START( newbrain )
 	MDRV_MACHINE_START(newbrain)
 	MDRV_MACHINE_RESET(newbrain)
 
-	MDRV_Z80CTC_ADD( "z80ctc", 0, newbrain_ctc_intf )
+	MDRV_Z80CTC_ADD( "z80ctc", XTAL_16MHz/8, newbrain_ctc_intf )
 
 	// A/D converter
 	MDRV_ADC0809_ADD(ADC0809_TAG, 500000, newbrain_adc0809_intf)
@@ -1285,7 +1285,7 @@ static MACHINE_DRIVER_START( newbraim )
 	MDRV_MACHINE_START(newbrain)
 	MDRV_MACHINE_RESET(newbrain)
 
-	MDRV_Z80CTC_ADD( "z80ctc", 0, newbrain_ctc_intf )
+	MDRV_Z80CTC_ADD( "z80ctc", XTAL_16MHz/8, newbrain_ctc_intf )
 
 	// video hardware
 
@@ -1343,7 +1343,7 @@ static MACHINE_DRIVER_START( newbraiv )
 	MDRV_MACHINE_START(newbrain)
 	MDRV_MACHINE_RESET(newbrain)
 
-	MDRV_Z80CTC_ADD( "z80ctc", 0, newbrain_ctc_intf )
+	MDRV_Z80CTC_ADD( "z80ctc", XTAL_16MHz/8, newbrain_ctc_intf )
 
 	// video hardware
 
