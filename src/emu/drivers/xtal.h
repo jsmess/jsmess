@@ -68,6 +68,7 @@ enum
 	XTAL_7_3728MHz   	= 7372800,
 	XTAL_7_8643MHz 		= 7864300,		/* Used on InterFlip games as video clock */
 	XTAL_8MHz    		= 8000000,		/* Extremely common, used on 100's of PCBs */
+	XTAL_8_4672MHz		= 8467200,		/* Subsino's Ying Hua Lian */
 	XTAL_8_664MHz		= 8664000,		/* Touchmaster */
 	XTAL_8_945MHz		= 8945000,		/* Hit Me */
 	XTAL_9_828MHz		= 9828000,		/* Universal PCBs */
@@ -112,6 +113,7 @@ enum
 	XTAL_21_3MHz  		= 21300000,
 	XTAL_21_4772MHz 	= 21477200,		/* BMC bowling, some Data East 90's games */
 	XTAL_22MHz   		= 22000000,
+	XTAL_22_1184MHz		= 22118400,
 	XTAL_24MHz   		= 24000000,		/* Mario, 80's Data East games, 80's Konami games */
 	XTAL_24_576MHz  	= 24576000,		/* Pole Position h/w, Model 3 CPU board */
 	XTAL_25MHz   		= 25000000,		/* Namco System 22, Taito GNET, Dogyuun h/w */
@@ -136,6 +138,7 @@ enum
 	XTAL_38_76922MHz  	= 38769220,		/* Namco System 21 video board */
 	XTAL_40MHz   		= 40000000,
 	XTAL_42_9545MHz  	= 42954500,		/* CPS3 */
+	XTAL_44_1MHz		= 44100000,		/* Subsino's Bishou Jan */
 	XTAL_45MHz   		= 45000000,		/* Eolith with Hyperstone CPUs */
 	XTAL_45_158MHz  	= 45158000,		/* Sega Model 2A video board, Model 3 CPU board */
 	XTAL_48MHz   		= 48000000,		/* Williams/Midway Y/Z-unit system */

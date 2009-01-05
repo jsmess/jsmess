@@ -33,6 +33,7 @@ Year + Game               Board(s)             CPU      Company            Notes
 93  Mahjong Cafe Doll     D76052208L-2         TLCS-90  Dynax              Larger palette, RTC, Undumped internal rom
 95  Mahjong Tensinhai     D10010318L1          TLCS-90  Dynax              Larger palette, RTC
 96  Janputer '96                               Z80      Dynax              Larger palette, RTC
+99  Mahjong Cafe Break    NS528-9812           TLCS-90  Nakanihon / Dynax  Undumped internal rom
 ---------------------------------------------------------------------------------------------------------------------
 
 TODO:
@@ -479,6 +480,29 @@ static ADDRESS_MAP_START( mjapinky_iomap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x04, 0x04 ) AM_READ_PORT("DSW2")
 	AM_RANGE( 0x10, 0x10 ) AM_READ_PORT("DSW1") AM_WRITE( mjapinky_palbank_w )
 	AM_RANGE( 0x11, 0x11 ) AM_READ_PORT("SYSTEM") AM_WRITE( input_port_select_w )
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( janho_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE( 0x0000, 0x6fff ) AM_READWRITE( SMH_ROM, royalmah_rom_w )
+	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE(1) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE( 0x8000, 0xffff ) AM_WRITE( SMH_RAM ) AM_BASE(&videoram)
+ADDRESS_MAP_END
+
+
+/* this CPU makes little sense - what is it for? why so many addresses accessed?
+  -- it puts a value in shared ram to allow the main CPU to boot, then.. ?
+*/
+static ADDRESS_MAP_START( janoh_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE( 0x0000, 0x3fff ) AM_ROM
+	AM_RANGE( 0x4100, 0x413f ) AM_RAM
+	AM_RANGE( 0x6000, 0x607f ) AM_RAM
+	AM_RANGE( 0x7000, 0x7000 ) AM_READ(SMH_NOP)
+	AM_RANGE( 0x7200, 0x7200 ) AM_WRITE(SMH_NOP)
+	AM_RANGE( 0xf000, 0xffff ) AM_RAM AM_SHARE(1)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( janoh_sub_iomap, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 /****************************************************************************
@@ -2244,6 +2268,20 @@ static MACHINE_DRIVER_START( royalmah )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_DRIVER_END
 
+
+static MACHINE_DRIVER_START( janoh )
+
+	MDRV_IMPORT_FROM(royalmah)
+	MDRV_CPU_REPLACE("main", Z80, 8000000/2)	/* 4 MHz ? */
+	MDRV_CPU_PROGRAM_MAP(janho_map,0)
+
+	MDRV_CPU_ADD("sub", Z80, 4000000)        /* 4 MHz ? */
+	MDRV_CPU_PROGRAM_MAP(janoh_sub_map,0)
+	MDRV_CPU_IO_MAP(janoh_sub_iomap,0)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+MACHINE_DRIVER_END
+
+
 static MACHINE_DRIVER_START( dondenmj )
 	MDRV_IMPORT_FROM(royalmah)
 	MDRV_CPU_REPLACE("main", Z80, 8000000/2)	/* 4 MHz ? */
@@ -3148,6 +3186,296 @@ ROM_START( janoh )
 	ROM_LOAD( "janho.color", 0x00, 0x20, NO_DUMP )
 ROM_END
 
+/***************************************************************************
+
+Mahjong Cafe Break
+Dynax/Nakanihon, 199?
+
+This game runs on Royal Mahjong hardware with a Nakanihon top board
+
+Top PCB Layout
+--------------
+
+NS528-9812
+|-------------------------|
+|X  NS528A2               |
+|   NS528B2  PLCC84 528011|
+|RGB                 DIP32|
+|          8MHz      DIP32|
+|DSW4(10)                 |
+|DSW3(10)   SDIP64  6264  |
+|DSW2(10)                 |
+|DSW1(10)           52802 |
+|                 A3      |
+|BATTERY     A1   A2  Y A4|
+|-------------------------|
+Notes:
+      RGB 3  - wire cable tied to mainboard
+      X      - DIP16 socket with flat cable plugged in coming from main board PROM socket
+      PLCC84 - unknown PLCC84 in a socket
+      DIP32  - unpopulated DIP32 socket
+      SDIP64 - unknown CPU, probably TLCS-90 (TMP91640)
+      A1     - unknown DIP8 IC, possibly MB3771 reset/watchdog chip
+      A2/A3  - unknown DIP14 ICs, probably logic
+      A4     - unknown DIP18 IC, RTC IC
+      Y      - 32.768kHz OSC for RTC
+
+***************************************************************************/
+ROM_START( cafebrk )
+	ROM_REGION( 0x280000, "main", 0 )
+	ROM_LOAD( "528.tmp91640", 0x000000, 0x004000, NO_DUMP )
+	ROM_LOAD( "528011.1f",    0x000000, 0x080000, CRC(440ae60b) SHA1(c24efd76ba73adcb614b1974e8f92592800ba53c) )
+	/* bank switched ROMs follow */
+	ROM_LOAD( "52802.1d",     0x080000, 0x200000, CRC(bf4760fc) SHA1(d54ab9e298800a31d95a5f8b98ab9ba5b2866acf) )
+
+	ROM_REGION( 0x400, "proms", 0 )
+	ROM_LOAD( "ns528b2.4h", 0x000, 0x200, CRC(5699e69a) SHA1(fe13b93dd2c4a16865b4edcb0fee1390fdade725) )
+	ROM_LOAD( "ns528a2.4j", 0x200, 0x200, CRC(b5a3a569) SHA1(8e31c600ae24b672b614908ee920a333ed600941) )
+ROM_END
+
+/*
+
+Janou
+(c)1985 Toaplan (distributed by SNK)
+
+RM-1C (modified Royal Mahjong hardware)
+
+CPU: Z80x2 (on subboard)
+Sound: AY-3-8910
+OSC: 18.432MHz
+
+ROMs:
+JO1
+JO2
+JO3
+JO4
+JO5
+JO6
+JO7
+
+
+Subboard GX002A
+C8 (2764)
+18S030.44
+18S030.45
+
+HM6116
+MSM2128x4
+
+
+dumped by sayu
+
+--- Team Japump!!! ---
+http://japump.i.am/
+
+*/
+
+ROM_START( janoha )
+	ROM_REGION( 0x10000, "main", 0 )
+	ROM_LOAD( "jo1",       0x0000, 0x1000, CRC(1a7dd28d) SHA1(347085c2b305861e4a4a602c3b3b0c57889f7f45) )
+	ROM_LOAD( "jo2",       0x1000, 0x1000, CRC(e92ca79f) SHA1(9714ebee954dd98cf98b340e1dc424a4b2a78c36) )
+	ROM_LOAD( "jo3",       0x2000, 0x1000, CRC(8e349cac) SHA1(27442fc97750ceb6e928682ee545a9ebff4511ac) )
+	ROM_LOAD( "jo4",       0x3000, 0x1000, CRC(f2bcac9a) SHA1(46eea014edf9f260b35b5f9bd0fd0a0236da16ef) )
+	ROM_LOAD( "jo5",       0x4000, 0x1000, CRC(16c09c73) SHA1(ea712f9ca3200ca27434e4200187b488e24f4c65) )
+	ROM_LOAD( "jo6",       0x5000, 0x1000, CRC(92687327) SHA1(4fafba5881dca2a147616d94dd055eba6aa3c653) )
+	ROM_LOAD( "jo7",       0x6000, 0x1000, CRC(f9a3fea6) SHA1(898c030b34f7432568e080e2814619d836d98a2f) )
+
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "c8",       0x0000, 0x2000, CRC(a37ed493) SHA1(a3246c635ee77f96afd96285ef7091f6fc0d7636) )
+
+	ROM_REGION( 0x0040, "proms", 0 )
+	ROM_LOAD( "18s030.45",  0x0000, 0x0020, CRC(c6a24ae9) SHA1(ec7a4dee2fec2f7151ddc39e40a3eee6a1c4992d) )
+	ROM_LOAD( "18s030.44",  0x0020, 0x0020, CRC(d4eabf78) SHA1(f14778b552ff483e36e7c30ee67e8e2075790ea2) )
+ROM_END
+
+/*
+
+Mahjong Shiyou (BET type)
+(c)1986 Visco
+
+Board:  S-0086-001-00
+CPU:    Z80-A x2
+Sound:  AY-3-8910
+        M5205
+OSC:    18.432MHz
+        400KHz
+
+
+1.1K       Z80#2 prg.
+2.1G
+
+3.3G       Z80#1 prg.
+4.3F
+
+COLOR.BPR  color
+
+*/
+
+ROM_START( mjsiyoub )
+	ROM_REGION( 0x10000, "main", 0 )
+	ROM_LOAD( "3.3g", 0x00000, 0x8000, CRC(47d0f16e) SHA1(a125be052668ba93756bf940af31a10e91a3d307) )
+	ROM_LOAD( "4.3f", 0x08000, 0x8000, CRC(6cd6a200) SHA1(1c53e5caacdb9c660bd98f5331bf5354581f74c9) )
+
+	/*encrypted z80*/
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "1.1k", 0x00000, 0x8000, CRC(a1083321) SHA1(b36772e90be60270234df16cf92d87f8d950190d) )
+	ROM_LOAD( "2.1g", 0x08000, 0x4000, CRC(cfe5de1d) SHA1(4acf9a752aa3c02b0889b0b49d3744359fa24460) )
+
+	ROM_REGION( 0x40000, "proms", 0 )
+	ROM_LOAD( "color.bpr", 0x00, 0x20,  CRC(d21367e5) SHA1(b28321ac8f99abfebe2ef4da0c751cefe9f3f3b6) )
+ROM_END
+
+/*
+
+Mahjong Senka
+(c)1986 Visco
+
+Modified Royal Mahjong Hardware
+
+CPU: Z80 <- wrong,they are 2 z80 CPUs -AS
+Sound: AY-3-8910
+OSC: 18.432MHz
+Others: Battery
+
+ROMs:
+1
+2
+3
+4
+1.2L (N82S129N)
+2.2K (N82S123N)
+3.1D (N82S129N)
+4.8K (N82S123N) - color PROM
+
+
+dumped by sayu
+
+--- Team Japump!!! ---
+http://japump.i.am/
+
+*/
+
+ROM_START( mjsenka )
+	ROM_REGION( 0x10000, "main", 0 )
+	ROM_LOAD( "3",       0x0000, 0x4000, CRC(b2d8be1f) SHA1(da75e1072d271de2dbd897a551f6c32593f6421b) )
+	ROM_LOAD( "4",       0x4000, 0x2000, CRC(e9e84999) SHA1(7b5f0edd92cf3a45e85055460e6cb00b154fd152) )
+	ROM_LOAD( "2",       0x6000, 0x2000, CRC(cdb02fc5) SHA1(5de6b15b79ea7c4246a294b17f166e53be6a4abc) )
+
+	/*encrypted z80*/
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "1",       0x0000, 0x2000, CRC(83e943d1) SHA1(c4f9b5036627ccb369e7db03a743e496b149af85) )
+
+	ROM_REGION( 0x0040, "proms", 0 )
+	ROM_LOAD( "4.8k",  0x0000, 0x0020, CRC(41bd4d69) SHA1(4d2da761b338b62b2ea151c201063a24d6e4cc97) )
+	ROM_LOAD( "2.2k",  0x0020, 0x0020, CRC(46014727) SHA1(eec451f292ee319fa6bfbbf223aaa12b231692c1) )
+
+	ROM_REGION( 0x0200, "user1", 0 ) //?
+	ROM_LOAD( "1.2l",  0x0000, 0x0100, CRC(24599429) SHA1(6c93bb2e7bc9902cace0c9d482fc1584c4c1a114) )
+	ROM_LOAD( "3.1d",  0x0100, 0x0100, CRC(86aeafd1) SHA1(c4e5c56ce5baf2be3962675ae333e28bd8108a00) )
+ROM_END
+
+/*
+
+Mahjong Yarou
+(c)1986 Visco/Video System
+
+FRM-00 (modified royal mahjong hardware)
+
+CPU: Z80 (on subboard) <- wrong,they are 2 z80 CPUs -AS
+Sound: AY-3-8910
+OSC: 18.432MHz
+
+ROMs:
+1(2732)
+2(2732)
+3(2732)
+4(2732)
+5(2732)
+6(2732)
+4.6K (18S030) - pin14 is connected to subboard's WS
+                pin9 is not inserted to the socket
+
+Subboard:
+7(2732)
+8(2764)
+N82S129N.IC4
+N82S123N.IC7
+N82S129N.IC15
+
+Connetor between mainboard and subboard
+sub - main
+ CK - LS368 (1K) pin12
+ HD - LS08  (2E) pin1
+ VD - LS08  (2E) pin2
+ WS - 18S030(6K) pin14
+ () - LS138 (3K) pin13
+
+
+Mainboard
+----------------------------------------------------------
+    1         2       3       4       5        6       7
+A 74LS04    74LS86  74LS153  MB8116  MB8116  74LS157
+B 74LS161   74LS86  74LS153  MB8116  MB8116  74LS95
+C 74LS161   74LS86  74LS153  MB8116  MB8116  74LS157
+D 74LS74    74LS86  74LS153  MB8116  MB8116  74LS95    8
+E 74LS161   74LS08  74LS153  MB8116  MB8116  74LS157   9
+F 74LS161   74LS74  74LS00   MB8116  MB8116  74LS95    1
+H 74LS74    74LS00  74LS175  MB8116  MB8116  74LS157   0
+J 74LS107   74LS32  74LS10   MB8116  MB8116  74LS95
+K 74LS368   74LS241 74LS138  74LS08  74LS174 4.6K
+L 18.432MHz 74LS241 74LS138  74LS04  74LS244 74LS174
+M (socket to subbd) 74LS367  74LS08  DIPSW   74LS368
+N                   (74LS245)74LS138 74LS04  TC40H000P
+
+  1     2     3     4     5     6                      6 B
+                                                       1 A
+                                                       1 T
+                                                       6 T
+----------------------------------------------------------
+
+Subboard
+-----------------------------------------------------------
+74LS42(IC21)   ?(IC22)        ?(IC23)        74LS85(IC24)
+74LS125(IC16)  74LS08(IC17)   74LS393(IC9)   82S129N(IC15)
+74LS161(IC6)   82S123N(IC7)   74LS161(IC8)   74LS157(IC14)
+82S129N(IC4)   74LS259(IC5)   74LS32(IC12)   74LS74(IC13)
+7(IC2)                        PAL20X10(IC19) 74LS00(IC20)
+8(IC3)                        74LS245(IC18)  DIPSW
+                                             74LS32(IC11)
+Z80A                                         74LS04(IC10)
+                                             5pin connector
+-----------------------------------------------------------
+
+
+dumped by sayu
+
+--- Team Japump!!! ---
+http://japump.i.am/
+
+*/
+
+ROM_START( mjyarou )
+	ROM_REGION( 0x10000, "main", 0 )
+	ROM_LOAD( "1",       0x0000, 0x1000, CRC(312c3b29) SHA1(ec2e14b392cf761f0a7079376994418fd463a06c) )
+	ROM_LOAD( "2",       0x1000, 0x1000, CRC(98f14097) SHA1(cd1f72d6effa50f95386dfc5fa9b5056d83e554f) )
+	ROM_LOAD( "3",       0x2000, 0x1000, CRC(295dbf40) SHA1(d6ac7bd88da849e418e750e2c91a594f65bdff39) )
+	ROM_LOAD( "4",       0x3000, 0x1000, CRC(a6a078c8) SHA1(936be36c7c938c705e7054a42c1908bb5a5ee1bb) )
+	ROM_LOAD( "5",       0x4000, 0x1000, CRC(3179657e) SHA1(703fc57ae71554345754267c31809cf7af7f1639) )
+	ROM_LOAD( "6",       0x5000, 0x1000, CRC(6ccc05b4) SHA1(6eefba6023673edd86e82a0ad861a4d8f7f6652b) )
+	ROM_LOAD( "8",       0x6000, 0x2000, CRC(1adef246) SHA1(b5f5598daf71694effffbfb486b03fcda5a593ee) ) //might be a rom for the sub cpu.
+
+	/*encrypted z80*/
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "7",       0x0000, 0x1000, CRC(dd144b90) SHA1(56b2c4472aaec49d9fddc99d8aa718b17655812c) )
+
+	ROM_REGION( 0x0040, "proms", 0 )
+	ROM_LOAD( "4.6k",  		  0x0000, 0x0020, CRC(41bd4d69) SHA1(4d2da761b338b62b2ea151c201063a24d6e4cc97) )
+	ROM_LOAD( "82s123n.ic7",  0x0020, 0x0020, CRC(46014727) SHA1(eec451f292ee319fa6bfbbf223aaa12b231692c1) )
+
+	ROM_REGION( 0x0200, "user1", 0 ) //?
+	ROM_LOAD( "82s129n.ic15",  0x0000, 0x0100, CRC(86aeafd1) SHA1(c4e5c56ce5baf2be3962675ae333e28bd8108a00) )
+	ROM_LOAD( "82s129n.ic4",   0x0100, 0x0100, CRC(f09d3c4c) SHA1(a9e752d75e7f3ebd05add4ccf2f9f15d8f9a8d15) )
+ROM_END
 
 static DRIVER_INIT( ippatsu )	{	memory_set_bankptr(machine, 1, memory_region(machine, "main") + 0x8000 );	}
 
@@ -3164,10 +3492,14 @@ GAME( 1981,  royalmj,  0,        royalmah, royalmah, 0,        ROT0, "Nichibutsu
 GAME( 1981?, openmj,   royalmj,  royalmah, royalmah, 0,        ROT0, "Sapporo Mechanic",           "Open Mahjong [BET] (Japan)",            0 )
 GAME( 1982,  royalmah, royalmj,  royalmah, royalmah, 0,        ROT0, "bootleg",                    "Royal Mahjong (Falcon bootleg, v1.01)", 0 )
 GAME( 1983,  janyoup2, royalmj,  ippatsu,  janyoup2, 0,        ROT0, "Cosmo Denshi",               "Janyou Part II (ver 7.03, July 1 1983)",0 )
-GAME( 1984,  janoh,    0,        royalmah, royalmah, 0,        ROT0, "Toaplan",                    "Jan Oh",                                GAME_NOT_WORKING )
+GAME( 1984,  janoh,    0,        royalmah, royalmah, 0,        ROT0, "Toaplan",                    "Jan Oh (set 1)",                        GAME_NOT_WORKING )
+GAME( 1984,  janoha,   janoh,    janoh,    royalmah, 0,        ROT0, "Toaplan",                    "Jan Oh (set 2)", 						GAME_NOT_WORKING ) // this one is complete?
 GAME( 1986,  dondenmj, 0,        dondenmj, majs101b, 0,        ROT0, "Dyna Electronics",           "Don Den Mahjong [BET] (Japan)",         0 )
 GAME( 1986,  ippatsu,  0,        ippatsu,  ippatsu,  ippatsu,  ROT0, "Public Software / Paradais", "Ippatsu Gyakuten [BET] (Japan)",        0 )
 GAME( 1986,  suzume,   0,        suzume,   suzume,   0,        ROT0, "Dyna Electronics",           "Watashiha Suzumechan (Japan)",          0 )
+GAME( 1986,  mjsiyoub, 0,        royalmah, royalmah, 0, 	   ROT0, "Visco",                      "Mahjong Shiyou (Japan)", 				GAME_NOT_WORKING )
+GAME( 1986,  mjsenka,  0,        royalmah, royalmah, 0,        ROT0, "Visco",                 	   "Mahjong Senka (Japan)",     			GAME_NOT_WORKING )
+GAME( 1986,  mjyarou,  0,        royalmah, royalmah, 0,        ROT0, "Visco / Video System",   	   "Mahjong Yarou [BET] (Japan",			GAME_NOT_WORKING )
 GAME( 1987,  mjdiplob, 0,        mjdiplob, mjdiplob, 0,        ROT0, "Dynax",                      "Mahjong Diplomat [BET] (Japan)",        0 )
 GAME( 1987,  tontonb,  0,        tontonb,  tontonb,  0,        ROT0, "Dynax",                      "Tonton [BET] (Japan)",                  0 )
 GAME( 1988,  majs101b, 0,        majs101b, majs101b, 0,        ROT0, "Dynax",                      "Mahjong Studio 101 [BET] (Japan)",      0 )
@@ -3180,3 +3512,4 @@ GAME( 1992,  cafetime, 0,        cafetime, cafetime, 0,        ROT0, "Dynax",   
 GAME( 1993,  cafedoll, 0,        mjifb,    mjifb,    0,        ROT0, "Dynax",                      "Mahjong Cafe Doll (Japan)",             GAME_NOT_WORKING )
 GAME( 1995,  mjtensin, 0,        mjtensin, mjtensin, 0,        ROT0, "Dynax",                      "Mahjong Tensinhai (Japan)",             GAME_NOT_WORKING )
 GAME( 1996,  janptr96, 0,        janptr96, janptr96, janptr96, ROT0, "Dynax",                      "Janputer '96 (Japan)",                  0 )
+GAME( 1999,  cafebrk,  0,        mjifb,    mjifb,    0,        ROT0, "Nakanihon / Dynax",          "Mahjong Cafe Break",                    GAME_NOT_WORKING )

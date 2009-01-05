@@ -2880,7 +2880,7 @@ static void generic_init_machine(running_machine *machine, const machine_init_in
 	coco_cart = cococart_init(machine, cart_hardware, &cart_config);
 
 #ifdef MAME_DEBUG
-	cpu_set_dasm_override(machine->cpu[0], coco_dasm_override);
+	debug_cpu_set_dasm_override(machine->cpu[0], coco_dasm_override);
 #endif
 
 	state_save_register_global(machine, mux_sel1);

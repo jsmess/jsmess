@@ -1283,12 +1283,16 @@ void laserdisc_set_config(const device_config *device, const laserdisc_config *c
 
 static void init_disc(const device_config *device)
 {
+	const laserdisc_config *config = device->inline_config;
 	laserdisc_state *ld = get_safe_token(device);
 	ldcore_data *ldcore = ld->core;
 	chd_error err;
 
-	/* find the disc */
-	ldcore->disc = get_disk_handle(device->tag);
+	/* get a handle to the disc to play */
+	if (config->getdisc != NULL)
+		ldcore->disc = (*config->getdisc)(device);
+	else
+		ldcore->disc = get_disk_handle(device->tag);
 
 	/* set default parameters */
 	ldcore->width = 720;

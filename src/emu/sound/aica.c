@@ -524,8 +524,6 @@ static void AICA_Init(const device_config *device, struct _AICA *AICA, const aic
 
 	// get AICA RAM
 	{
-		memset(AICA,0,sizeof(*AICA));
-
 		if (sndindex == 0)
 		{
 			AICA->Master=1;
@@ -720,7 +718,7 @@ static void AICA_UpdateSlotReg(struct _AICA *AICA,int s,int r)
 static void AICA_UpdateReg(struct _AICA *AICA, int reg)
 {
 	/* temporary hack until this is converted to a device */
-	const address_space *space = cpu_get_address_space(AICA->device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = memory_find_address_space(AICA->device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	switch(reg&0xff)
 	{
 		case 0x4:

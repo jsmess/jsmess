@@ -1337,7 +1337,10 @@ static void static_generate_exception(powerpc_state *ppc, UINT8 exception, int r
 		generate_update_mode(ppc, block);													// <update mode>
 
 		/* determine our target PC */
-		UML_MOV(block, IREG(0), IMM(0x00000000));											// mov     i0,0x00000000
+		if (ppc->flavor == PPC_MODEL_602)
+			UML_MOV(block, IREG(0), SPR32(SPR602_IBR));										// mov     i0,[ibr]
+		else
+			UML_MOV(block, IREG(0), IMM(0x00000000));										// mov     i0,0x00000000
 		UML_TEST(block, MSR32, IMM(MSROEA_IP));												// test    [msr],IP
 		UML_MOVc(block, IF_NZ, IREG(0), IMM(0xfff00000));									// mov     i0,0xfff00000,nz
 		UML_OR(block, IREG(0), IREG(0), IREG(3));											// or      i0,i0,i3
@@ -3709,6 +3712,11 @@ static int generate_instruction_1f(powerpc_state *ppc, drcuml_block *block, comp
 			else
 				UML_AND(block, MSR32, MSR32, IMM(~MSR_EE));									// and     msr,msr,~MSR_EE
 			return TRUE;
+
+		case 0x254: /* ESA */
+		case 0x274: /* DSA */
+			/* no-op for now */
+			return TRUE;
 	}
 
 	return FALSE;
@@ -4189,8 +4197,6 @@ static void log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desclist, i
     PPC 4XX VARIANTS
 ***************************************************************************/
 
-#if (HAS_PPC403GA || HAS_PPC403GCX)
-
 /*-------------------------------------------------
     ppcdrc4xx_get_info - PowerPC 4XX-specific
     information getter
@@ -4216,10 +4222,6 @@ static CPU_SET_INFO( ppcdrc4xx )
 	ppc4xx_set_info(ppc, state, info);
 }
 
-#endif
-
-
-#if (HAS_PPC403GA)
 
 /*-------------------------------------------------
     ppc403ga_init - PowerPC 403GA-specific
@@ -4255,10 +4257,6 @@ CPU_GET_INFO( ppc403ga )
 	}
 }
 
-#endif
-
-
-#if (HAS_PPC403GCX)
 
 /*-------------------------------------------------
     ppc403gcx_init - PowerPC 403GCX-specific
@@ -4294,15 +4292,11 @@ CPU_GET_INFO( ppc403gcx )
 	}
 }
 
-#endif
-
 
 
 /***************************************************************************
     PPC 6XX VARIANTS
 ***************************************************************************/
-
-#if (HAS_PPC601)
 
 /*-------------------------------------------------
     ppc601_init - PowerPC 601-specific
@@ -4337,10 +4331,6 @@ CPU_GET_INFO( ppc601 )
 	}
 }
 
-#endif
-
-
-#if (HAS_PPC602)
 
 /*-------------------------------------------------
     ppc602_init - PowerPC 602-specific
@@ -4375,10 +4365,6 @@ CPU_GET_INFO( ppc602 )
 	}
 }
 
-#endif
-
-
-#if (HAS_PPC603)
 
 /*-------------------------------------------------
     ppc603_init - PowerPC 603-specific
@@ -4413,10 +4399,6 @@ CPU_GET_INFO( ppc603 )
 	}
 }
 
-#endif
-
-
-#if (HAS_PPC603E)
 
 /*-------------------------------------------------
     ppc603e_init - PowerPC 603e-specific
@@ -4451,10 +4433,6 @@ CPU_GET_INFO( ppc603e )
 	}
 }
 
-#endif
-
-
-#if (HAS_PPC603R)
 
 /*-------------------------------------------------
     ppc603r_init - PowerPC 603r-specific
@@ -4489,10 +4467,6 @@ CPU_GET_INFO( ppc603r )
 	}
 }
 
-#endif
-
-
-#if (HAS_PPC604)
 
 /*-------------------------------------------------
     ppc604_init - PowerPC 604-specific
@@ -4527,15 +4501,11 @@ CPU_GET_INFO( ppc604 )
 	}
 }
 
-#endif
-
 
 
 /***************************************************************************
-    PPC 6XX VARIANTS
+    MPC VARIANTS
 ***************************************************************************/
-
-#if (HAS_MPC8240)
 
 /*-------------------------------------------------
     mpc8240_init - PowerPC MPC8240-specific
@@ -4569,5 +4539,3 @@ CPU_GET_INFO( mpc8240 )
 		default:										CPU_GET_INFO_CALL(ppcdrc);			break;
 	}
 }
-
-#endif

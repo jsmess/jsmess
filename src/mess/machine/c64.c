@@ -1018,8 +1018,8 @@ TIMER_CALLBACK( c64_tape_timer )
 static void c64_common_driver_init (running_machine *machine)
 {
 	/* configure the M6510 port */
-	device_set_info_fct(machine->cpu[0], CPUINFO_PTR_M6510_PORTREAD, (genf *) c64_m6510_port_read);
-	device_set_info_fct(machine->cpu[0], CPUINFO_PTR_M6510_PORTWRITE, (genf *) c64_m6510_port_write);
+	device_set_info_fct(machine->cpu[0], CPUINFO_FCT_M6510_PORTREAD, (genf *) c64_m6510_port_read);
+	device_set_info_fct(machine->cpu[0], CPUINFO_FCT_M6510_PORTWRITE, (genf *) c64_m6510_port_write);
 
 	if (!ultimax) 
 	{

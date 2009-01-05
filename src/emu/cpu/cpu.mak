@@ -266,6 +266,23 @@ $(CPUOBJ)/cubeqcpu/cubeqcpu.o:	$(CPUSRC)/cubeqcpu/cubeqcpu.c \
 
 
 #-------------------------------------------------
+# Entertainment Sciences AM29116-based RIP
+#-------------------------------------------------
+
+CPUDEFS += -DHAS_ESRIP=$(if $(filter ESRIP,$(CPUS)),1,0)
+
+ifneq ($(filter ESRIP,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/esrip
+CPUOBJS += $(CPUOBJ)/esrip/esrip.o
+#DBGOBJS += $(CPUOBJ)/esrip/esrip.o
+endif
+
+$(CPUOBJ)/esrip/esrip.o:	$(CPUSRC)/esrip/esrip.c \
+							$(CPUSRC)/esrip/esrip.h
+
+
+
+#-------------------------------------------------
 # RCA CDP1802
 #-------------------------------------------------
 
@@ -641,19 +658,9 @@ $(CPUOBJ)/i8085/i8085.o:	$(CPUSRC)/i8085/i8085.c \
 # Intel MCS-48 (8039 and derivatives)
 #-------------------------------------------------
 
-CPUDEFS += -DHAS_I8035=$(if $(filter I8035,$(CPUS)),1,0)
-CPUDEFS += -DHAS_I8048=$(if $(filter I8048,$(CPUS)),1,0)
-CPUDEFS += -DHAS_I8648=$(if $(filter I8648,$(CPUS)),1,0)
-CPUDEFS += -DHAS_I8748=$(if $(filter I8748,$(CPUS)),1,0)
-CPUDEFS += -DHAS_MB8884=$(if $(filter MB8884,$(CPUS)),1,0)
+CPUDEFS += -DHAS_MCS48=$(if $(filter MCS48,$(CPUS)),1,0)
 
-CPUDEFS += -DHAS_I8039=$(if $(filter I8039,$(CPUS)),1,0)
-CPUDEFS += -DHAS_I8049=$(if $(filter I8049,$(CPUS)),1,0)
-CPUDEFS += -DHAS_I8749=$(if $(filter I8749,$(CPUS)),1,0)
-CPUDEFS += -DHAS_N7751=$(if $(filter N7751,$(CPUS)),1,0)
-CPUDEFS += -DHAS_M58715=$(if $(filter M58715,$(CPUS)),1,0)
-
-ifneq ($(filter I8035 I8048 I8648 I8748 MB8884 I8039 I8049 I8749 N7751 M58715,$(CPUS)),)
+ifneq ($(filter MCS48,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/mcs48
 CPUOBJS += $(CPUOBJ)/mcs48/mcs48.o
 DBGOBJS += $(CPUOBJ)/mcs48/mcs48dsm.o
@@ -661,27 +668,6 @@ endif
 
 $(CPUOBJ)/mcs48/mcs48.o:	$(CPUSRC)/mcs48/mcs48.c \
 							$(CPUSRC)/mcs48/mcs48.h
-
-
-
-#-------------------------------------------------
-# Intel 8x41
-#-------------------------------------------------
-
-CPUDEFS += -DHAS_I8041=$(if $(filter I8041,$(CPUS)),1,0)
-CPUDEFS += -DHAS_I8741=$(if $(filter I8741,$(CPUS)),1,0)
-CPUDEFS += -DHAS_I8042=$(if $(filter I8042,$(CPUS)),1,0)
-CPUDEFS += -DHAS_I8242=$(if $(filter I8242,$(CPUS)),1,0)
-CPUDEFS += -DHAS_I8742=$(if $(filter I8742,$(CPUS)),1,0)
-
-ifneq ($(filter I8041 I8741 I8042 I8242 I8742 ,$(CPUS)),)
-OBJDIRS += $(CPUOBJ)/i8x41
-CPUOBJS += $(CPUOBJ)/i8x41/i8x41.o
-DBGOBJS += $(CPUOBJ)/i8x41/8x41dasm.o
-endif
-
-$(CPUOBJ)/i8x41/i8x41.o:	$(CPUSRC)/i8x41/i8x41.c \
-							$(CPUSRC)/i8x41/i8x41.h
 
 
 
@@ -762,6 +748,8 @@ $(CPUOBJ)/i86/i86.o:	$(CPUSRC)/i86/i86.c \
 
 $(CPUOBJ)/i86/i286.o:	$(CPUSRC)/i86/i286.c \
 						$(CPUSRC)/i86/i286.h \
+						$(CPUSRC)/i86/instr86.c \
+						$(CPUSRC)/i86/instr186.c \
 						$(CPUSRC)/i86/instr286.c \
 						$(I86DEPS)
 
@@ -777,6 +765,22 @@ $(CPUOBJ)/i386/i386.o:	$(CPUSRC)/i386/i386.c \
 						$(CPUSRC)/i386/i386ops.h \
 						$(CPUSRC)/i386/cycles.h
 
+
+
+#-------------------------------------------------
+# Intel i860
+#-------------------------------------------------
+
+CPUDEFS += -DHAS_I860=$(if $(filter I860,$(CPUS)),1,0)
+
+ifneq ($(filter I860,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/i860
+CPUOBJS += $(CPUOBJ)/i860/i860.o
+DBGOBJS += $(CPUOBJ)/i860/i860dasm.o
+endif
+
+$(CPUOBJ)/i860/i860.o:	$(CPUSRC)/i860/i860.c \
+						$(CPUSRC)/i860/i860.h
 
 
 #-------------------------------------------------
@@ -1211,17 +1215,9 @@ $(CPUOBJ)/pdp1/pdp1.o:	$(CPUSRC)/pdp1/pdp1.c \
 # Motorola PowerPC series
 #-------------------------------------------------
 
-CPUDEFS += -DHAS_PPC403GA=$(if $(filter PPC403GA,$(CPUS)),1,0)
-CPUDEFS += -DHAS_PPC403GCX=$(if $(filter PPC403GCX,$(CPUS)),1,0)
-CPUDEFS += -DHAS_PPC601=$(if $(filter PPC601,$(CPUS)),1,0)
-CPUDEFS += -DHAS_PPC602=$(if $(filter PPC602,$(CPUS)),1,0)
-CPUDEFS += -DHAS_PPC603=$(if $(filter PPC603,$(CPUS)),1,0)
-CPUDEFS += -DHAS_PPC603E=$(if $(filter PPC603E,$(CPUS)),1,0)
-CPUDEFS += -DHAS_PPC603R=$(if $(filter PPC603R,$(CPUS)),1,0)
-CPUDEFS += -DHAS_PPC604=$(if $(filter PPC604,$(CPUS)),1,0)
-CPUDEFS += -DHAS_MPC8240=$(if $(filter MPC8240,$(CPUS)),1,0)
+CPUDEFS += -DHAS_POWERPC=$(if $(filter POWERPC,$(CPUS)),1,0)
 
-ifneq ($(filter PPC403GA PPC403GCX PPC601 PPC602 PPC603 PPC603E PPC603R PPC604 MPC8240,$(CPUS)),)
+ifneq ($(filter POWERPC,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/powerpc
 CPUOBJS += $(CPUOBJ)/powerpc/ppccom.o $(CPUOBJ)/powerpc/ppcfe.o $(CPUOBJ)/powerpc/ppcdrc.o $(DRCOBJ)
 DBGOBJS += $(CPUOBJ)/powerpc/ppc_dasm.o

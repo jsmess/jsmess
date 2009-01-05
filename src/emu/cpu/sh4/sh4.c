@@ -3270,9 +3270,9 @@ static CPU_RESET( sh4 )
 	sh4->ftcsr_read_callback = f;
 	sh4->irq_callback = save_irqcallback;
 	sh4->device = device;
-	sh4->internal = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
-	sh4->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
-	sh4->io = cpu_get_address_space(device, ADDRESS_SPACE_IO);
+	sh4->internal = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	sh4->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	sh4->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
 	sh4->dma_timer[0] = tsaved[0];
 	sh4->dma_timer[1] = tsaved[1];
@@ -3383,9 +3383,9 @@ static CPU_INIT( sh4 )
 
 	sh4->irq_callback = irqcallback;
 	sh4->device = device;
-	sh4->internal = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
-	sh4->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
-	sh4->io = cpu_get_address_space(device, ADDRESS_SPACE_IO);
+	sh4->internal = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	sh4->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	sh4->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 	sh4_default_exception_priorities(sh4);
 	sh4->irln = 15;
 	sh4->test_irq = 0;
@@ -3599,7 +3599,7 @@ static CPU_SET_INFO( sh4 )
 		case CPUINFO_INT_SH4_FRT_INPUT:					sh4_set_frt_input(device, info->i); break;
 
 		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_PTR_SH4_FTCSR_READ_CALLBACK:		sh4->ftcsr_read_callback = (void (*) (UINT32 ))info->f; break;
+		case CPUINFO_FCT_SH4_FTCSR_READ_CALLBACK:		sh4->ftcsr_read_callback = (void (*) (UINT32 ))info->f; break;
 		case CPUINFO_PTR_SH4_EXTERNAL_DDT_DMA:			sh4_dma_ddt(sh4, (struct sh4_ddt_dma *)info->f); break;
 	}
 }
@@ -3833,7 +3833,7 @@ CPU_GET_INFO( sh4 )
 		case CPUINFO_STR_REGISTER + SH4_XF14:			sprintf(info->s, "XF14 :%08X %f", FP_XS(14),(double)FP_XFS(14)); break;
 		case CPUINFO_STR_REGISTER + SH4_XF15:			sprintf(info->s, "XF15 :%08X %f", FP_XS(15),(double)FP_XFS(15)); break; //%01.2e
 #endif
-		case CPUINFO_PTR_SH4_FTCSR_READ_CALLBACK:		info->f = (genf*)sh4->ftcsr_read_callback; break;
+		case CPUINFO_FCT_SH4_FTCSR_READ_CALLBACK:		info->f = (genf*)sh4->ftcsr_read_callback; break;
 
 	}
 }

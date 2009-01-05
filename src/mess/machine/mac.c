@@ -80,6 +80,7 @@
 #include "devices/sonydriv.h"
 #include "machine/ncr5380.h"
 #include "includes/mac.h"
+#include "debug/debugcpu.h"
 
 
 #ifdef MAME_DEBUG
@@ -1968,7 +1969,7 @@ static void mac_driver_init(running_machine *machine, mac_model_t model)
 
 	inquiry_timeout = timer_alloc(machine, inquiry_timeout_func, NULL);
 
-	cpu_set_dasm_override(machine->cpu[0], mac_dasm_override);
+	debug_cpu_set_dasm_override(machine->cpu[0], mac_dasm_override);
 
 	/* save state stuff */
 	state_save_register_global(machine, mac_overlay);

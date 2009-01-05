@@ -261,7 +261,8 @@ typedef struct _m68ki_cpu_core m68ki_cpu_core;
 		m68ki_exception_address_error(m68k); \
 		if(m68k->stopped) \
 		{ \
-			SET_CYCLES(m68k, 0); \
+			if (m68k->remaining_cycles > 0) \
+				m68k->remaining_cycles = 0; \
 			return m68k->initial_cycles; \
 		} \
 	}
@@ -454,16 +455,6 @@ typedef struct _m68ki_cpu_core m68ki_cpu_core;
 
 
 
-/* ---------------------------- Cycle Counting ---------------------------- */
-
-#define ADD_CYCLES(M, A)			(M)->remaining_cycles += (A)
-#define USE_CYCLES(M, A)			(M)->remaining_cycles -= (A)
-#define SET_CYCLES(M, A)			(M)->remaining_cycles = A
-#define GET_CYCLES(M)				(M)->remaining_cycles
-#define USE_ALL_CYCLES(M) 			(M)->remaining_cycles = 0
-
-
-
 /* ----------------------------- Read / Write ----------------------------- */
 
 /* Read from the current address space */
@@ -600,6 +591,9 @@ struct _m68ki_cpu_core
 	m68k_memory_interface memory;
 	offs_t encrypted_start;
 	offs_t encrypted_end;
+
+	cpu_state_table state;
+	UINT32		iotemp;
 
 	/* save state data */
 	UINT16 save_sr;
@@ -989,7 +983,7 @@ INLINE UINT32 m68ki_get_ea_ix(m68ki_cpu_core *m68k, UINT32 An)
 
 	/* Full extension format */
 
-	USE_CYCLES(m68k, m68ki_ea_idx_cycle_table[extension&0x3f]);
+	m68k->remaining_cycles -= m68ki_ea_idx_cycle_table[extension&0x3f];
 
 	/* Check if base register is present */
 	if(BIT_7(extension))                /* BS */
@@ -1519,7 +1513,7 @@ INLINE void m68ki_exception_trap(m68ki_cpu_core *m68k, UINT32 vector)
 	m68ki_jump_vector(m68k, vector);
 
 	/* Use up some clock cycles */
-	USE_CYCLES(m68k, m68k->cyc_exception[vector]);
+	m68k->remaining_cycles -= m68k->cyc_exception[vector];
 }
 
 /* Trap#n stacks a 0 frame but behaves like group2 otherwise */
@@ -1530,7 +1524,7 @@ INLINE void m68ki_exception_trapN(m68ki_cpu_core *m68k, UINT32 vector)
 	m68ki_jump_vector(m68k, vector);
 
 	/* Use up some clock cycles */
-	USE_CYCLES(m68k, m68k->cyc_exception[vector]);
+	m68k->remaining_cycles -= m68k->cyc_exception[vector];
 }
 
 /* Exception for trace mode */
@@ -1555,7 +1549,7 @@ INLINE void m68ki_exception_trace(m68ki_cpu_core *m68k)
 	m68k->stopped &= ~STOP_LEVEL_STOP;
 
 	/* Use up some clock cycles */
-	USE_CYCLES(m68k, m68k->cyc_exception[EXCEPTION_TRACE]);
+	m68k->remaining_cycles -= m68k->cyc_exception[EXCEPTION_TRACE];
 }
 
 /* Exception for privilege violation */
@@ -1572,7 +1566,7 @@ INLINE void m68ki_exception_privilege_violation(m68ki_cpu_core *m68k)
 	m68ki_jump_vector(m68k, EXCEPTION_PRIVILEGE_VIOLATION);
 
 	/* Use up some clock cycles and undo the instruction's cycles */
-	USE_CYCLES(m68k, m68k->cyc_exception[EXCEPTION_PRIVILEGE_VIOLATION] - m68k->cyc_instruction[m68k->ir]);
+	m68k->remaining_cycles -= m68k->cyc_exception[EXCEPTION_PRIVILEGE_VIOLATION] - m68k->cyc_instruction[m68k->ir];
 }
 
 /* Exception for A-Line instructions */
@@ -1585,7 +1579,7 @@ INLINE void m68ki_exception_1010(m68ki_cpu_core *m68k)
 	m68ki_jump_vector(m68k, EXCEPTION_1010);
 
 	/* Use up some clock cycles and undo the instruction's cycles */
-	USE_CYCLES(m68k, m68k->cyc_exception[EXCEPTION_1010] - m68k->cyc_instruction[m68k->ir]);
+	m68k->remaining_cycles -= m68k->cyc_exception[EXCEPTION_1010] - m68k->cyc_instruction[m68k->ir];
 }
 
 /* Exception for F-Line instructions */
@@ -1598,7 +1592,7 @@ INLINE void m68ki_exception_1111(m68ki_cpu_core *m68k)
 	m68ki_jump_vector(m68k, EXCEPTION_1111);
 
 	/* Use up some clock cycles and undo the instruction's cycles */
-	USE_CYCLES(m68k, m68k->cyc_exception[EXCEPTION_1111] - m68k->cyc_instruction[m68k->ir]);
+	m68k->remaining_cycles -= m68k->cyc_exception[EXCEPTION_1111] - m68k->cyc_instruction[m68k->ir];
 }
 
 /* Exception for illegal instructions */
@@ -1617,7 +1611,7 @@ INLINE void m68ki_exception_illegal(m68ki_cpu_core *m68k)
 	m68ki_jump_vector(m68k, EXCEPTION_ILLEGAL_INSTRUCTION);
 
 	/* Use up some clock cycles and undo the instruction's cycles */
-	USE_CYCLES(m68k, m68k->cyc_exception[EXCEPTION_ILLEGAL_INSTRUCTION] - m68k->cyc_instruction[m68k->ir]);
+	m68k->remaining_cycles -= m68k->cyc_exception[EXCEPTION_ILLEGAL_INSTRUCTION] - m68k->cyc_instruction[m68k->ir];
 }
 
 /* Exception for format errror in RTE */
@@ -1628,7 +1622,7 @@ INLINE void m68ki_exception_format_error(m68ki_cpu_core *m68k)
 	m68ki_jump_vector(m68k, EXCEPTION_FORMAT_ERROR);
 
 	/* Use up some clock cycles and undo the instruction's cycles */
-	USE_CYCLES(m68k, m68k->cyc_exception[EXCEPTION_FORMAT_ERROR] - m68k->cyc_instruction[m68k->ir]);
+	m68k->remaining_cycles -= m68k->cyc_exception[EXCEPTION_FORMAT_ERROR] - m68k->cyc_instruction[m68k->ir];
 }
 
 /* Exception for address error */
@@ -1654,7 +1648,7 @@ INLINE void m68ki_exception_address_error(m68ki_cpu_core *m68k)
 	m68ki_jump_vector(m68k, EXCEPTION_ADDRESS_ERROR);
 
 	/* Use up some clock cycles and undo the instruction's cycles */
-	USE_CYCLES(m68k, m68k->cyc_exception[EXCEPTION_ADDRESS_ERROR] - m68k->cyc_instruction[m68k->ir]);
+	m68k->remaining_cycles -= m68k->cyc_exception[EXCEPTION_ADDRESS_ERROR] - m68k->cyc_instruction[m68k->ir];
 }
 
 
@@ -1716,7 +1710,7 @@ void m68ki_exception_interrupt(m68ki_cpu_core *m68k, UINT32 int_level)
 	m68ki_jump(m68k, new_pc);
 
 	/* Defer cycle counting until later */
-	USE_CYCLES(m68k, m68k->cyc_exception[vector]);
+	m68k->remaining_cycles -= m68k->cyc_exception[vector];
 }
 
 

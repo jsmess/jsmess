@@ -432,8 +432,8 @@ static void c16_common_driver_init (running_machine *machine)
 	UINT8 *rom;
 
 	/* configure the M7501 port */
-	device_set_info_fct(machine->cpu[0], CPUINFO_PTR_M6510_PORTREAD, (genf *) c16_m7501_port_read);
-	device_set_info_fct(machine->cpu[0], CPUINFO_PTR_M6510_PORTWRITE, (genf *) c16_m7501_port_write);
+	device_set_info_fct(machine->cpu[0], CPUINFO_FCT_M6510_PORTREAD, (genf *) c16_m7501_port_read);
+	device_set_info_fct(machine->cpu[0], CPUINFO_FCT_M6510_PORTWRITE, (genf *) c16_m7501_port_write);
 
 	c16_select_roms (cputag_get_address_space(machine,"main",ADDRESS_SPACE_PROGRAM), 0, 0);
 	c16_switch_to_rom (cputag_get_address_space(machine,"main",ADDRESS_SPACE_PROGRAM), 0, 0);

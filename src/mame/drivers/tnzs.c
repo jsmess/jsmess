@@ -622,7 +622,7 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/11/06
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "taitoipt.h"
-#include "cpu/i8x41/i8x41.h"
+#include "cpu/mcs48/mcs48.h"
 #include "sound/2203intf.h"
 #include "sound/dac.h"
 #include "sound/samples.h"
@@ -894,11 +894,10 @@ static ADDRESS_MAP_START( tnzsb_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( i8742_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x02, 0x02) AM_WRITE(tnzs_port2_w)
-	AM_RANGE(I8X41_p1, I8X41_p1) AM_READ(tnzs_port1_r)
-	AM_RANGE(I8X41_p2, I8X41_p2) AM_READ(tnzs_port2_r)
-	AM_RANGE(I8X41_t0, I8X41_t0) AM_READ_PORT("COIN1")
-	AM_RANGE(I8X41_t1, I8X41_t1) AM_READ_PORT("COIN2")
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READ(tnzs_port1_r)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(tnzs_port2_r, tnzs_port2_w)
+	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ_PORT("COIN1")
+	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ_PORT("COIN2")
 ADDRESS_MAP_END
 
 
@@ -1649,7 +1648,7 @@ static MACHINE_DRIVER_START( arknoid2 )
 	MDRV_CPU_PROGRAM_MAP(sub_readmem,sub_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_QUANTUM_PERFECT_CPU("main")//TIME(HZ(600000))
+	MDRV_QUANTUM_PERFECT_CPU("main")
 
 	MDRV_MACHINE_RESET(tnzs)
 
@@ -1688,7 +1687,7 @@ static MACHINE_DRIVER_START( drtoppel )
 	MDRV_CPU_PROGRAM_MAP(sub_readmem,sub_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_QUANTUM_TIME(HZ(600000))
+	MDRV_QUANTUM_PERFECT_CPU("main")
 
 	MDRV_MACHINE_RESET(tnzs)
 
@@ -1730,7 +1729,7 @@ static MACHINE_DRIVER_START( tnzs )
 	MDRV_CPU_ADD("mcu", I8742 ,12000000/2)	/* 400KHz ??? - Main board Crystal is 12MHz */
 	MDRV_CPU_IO_MAP(i8742_io_map,0)
 
-	MDRV_QUANTUM_TIME(HZ(600000))
+	MDRV_QUANTUM_PERFECT_CPU("main")
 
 	MDRV_MACHINE_RESET(tnzs)
 
@@ -1768,7 +1767,7 @@ static MACHINE_DRIVER_START( insectx )
 	MDRV_CPU_PROGRAM_MAP(sub_readmem,sub_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_QUANTUM_TIME(HZ(600000))
+	MDRV_QUANTUM_PERFECT_CPU("main")
 
 	MDRV_MACHINE_RESET(tnzs)
 
@@ -1806,7 +1805,7 @@ static MACHINE_DRIVER_START( kageki )
 	MDRV_CPU_PROGRAM_MAP(kageki_sub_readmem,kageki_sub_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_QUANTUM_TIME(HZ(600000))
+	MDRV_QUANTUM_PERFECT_CPU("main")
 
 	MDRV_MACHINE_RESET(tnzs)
 
@@ -1855,7 +1854,7 @@ static MACHINE_DRIVER_START( tnzsb )
 	MDRV_CPU_PROGRAM_MAP(tnzsb_cpu2_map,0)
 	MDRV_CPU_IO_MAP(tnzsb_io_map,0)
 
-	MDRV_QUANTUM_TIME(HZ(600000))
+	MDRV_QUANTUM_PERFECT_CPU("main")
 
 	MDRV_MACHINE_RESET(tnzs)
 
@@ -1919,7 +1918,7 @@ static MACHINE_DRIVER_START( jpopnics )
 	MDRV_CPU_PROGRAM_MAP(jpopnics_sub_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_QUANTUM_TIME(HZ(600000))
+	MDRV_QUANTUM_PERFECT_CPU("main")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

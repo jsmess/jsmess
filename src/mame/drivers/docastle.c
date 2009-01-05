@@ -580,6 +580,14 @@ static MACHINE_RESET( docastle )
 	adpcm_status = 0;
 }
 
+static MACHINE_START( docastle )
+{
+    state_save_register_global(machine, adpcm_pos);
+    state_save_register_global(machine, adpcm_data);
+    state_save_register_global(machine, adpcm_idle);
+    state_save_register_global(machine, adpcm_status);
+    docastle_shared_state_register(machine);
+}
 
 static MACHINE_DRIVER_START( docastle )
 	// basic machine hardware
@@ -614,6 +622,7 @@ static MACHINE_DRIVER_START( docastle )
 	MDRV_VIDEO_UPDATE(docastle)
 
 	MDRV_MACHINE_RESET( docastle )
+    MDRV_MACHINE_START( docastle )
 
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -783,7 +792,7 @@ ROM_START( dorunruc )
 	ROM_LOAD( "rev-0-2.n7",   0x0000, 0x4000, CRC(6dac2fa3) SHA1(cd583f379f01788ce20f611f17689105d32ef97a) )
 
 	ROM_REGION( 0x10000, "cpu3", 0 )
-	ROM_LOAD( "bprom2.bin",   0x0200, 0x0200, CRC(2747ca77) SHA1(abc0ca05925974c4b852827605ee2f1caefb8524) )
+	ROM_LOAD( "bprom2.bin",   0x0000, 0x0200, CRC(2747ca77) SHA1(abc0ca05925974c4b852827605ee2f1caefb8524) )
 
 	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "rev-0-5.a3",   0x0000, 0x4000, CRC(e20795b7) SHA1(ae4366d2c45580f3e60ae36f81a5fc912d1eb899) )
@@ -809,7 +818,7 @@ ROM_START( dorunrca )
 	ROM_LOAD( "rev-0-2.n7",   0x0000, 0x4000, CRC(6dac2fa3) SHA1(cd583f379f01788ce20f611f17689105d32ef97a) )
 
 	ROM_REGION( 0x10000, "cpu3", 0 )
-	ROM_LOAD( "bprom2.bin",   0x0200, 0x0200, CRC(2747ca77) SHA1(abc0ca05925974c4b852827605ee2f1caefb8524) )
+	ROM_LOAD( "bprom2.bin",   0x0000, 0x0200, CRC(2747ca77) SHA1(abc0ca05925974c4b852827605ee2f1caefb8524) )
 
 	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "rev-0-5.a3",   0x0000, 0x4000, CRC(e20795b7) SHA1(ae4366d2c45580f3e60ae36f81a5fc912d1eb899) )
@@ -835,7 +844,7 @@ ROM_START( dorunrun )
 	ROM_LOAD( "27128.p7",     0x0000, 0x4000, CRC(8b06d461) SHA1(2434478810c6301197997be76505f5fc6beba5d3) )
 
 	ROM_REGION( 0x10000, "cpu3", 0 )
-	ROM_LOAD( "bprom2.bin",   0x0200, 0x0200, CRC(2747ca77) SHA1(abc0ca05925974c4b852827605ee2f1caefb8524) )
+	ROM_LOAD( "bprom2.bin",   0x0000, 0x0200, CRC(2747ca77) SHA1(abc0ca05925974c4b852827605ee2f1caefb8524) )
 
 	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "27128.a3",     0x0000, 0x4000, CRC(4be96dcf) SHA1(f9b45e6297cbbc4d1ee2df7ac377c5daf5181b0f) )
@@ -861,7 +870,7 @@ ROM_START( dorunru2 )
 	ROM_LOAD( "27128.p7",     0x0000, 0x4000, CRC(8b06d461) SHA1(2434478810c6301197997be76505f5fc6beba5d3) )
 
 	ROM_REGION( 0x10000, "cpu3", 0 )
-	ROM_LOAD( "bprom2.bin",   0x0200, 0x0200, CRC(2747ca77) SHA1(abc0ca05925974c4b852827605ee2f1caefb8524) )
+	ROM_LOAD( "bprom2.bin",   0x0000, 0x0200, CRC(2747ca77) SHA1(abc0ca05925974c4b852827605ee2f1caefb8524) )
 
 	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "27128.a3",     0x0000, 0x4000, CRC(4be96dcf) SHA1(f9b45e6297cbbc4d1ee2df7ac377c5daf5181b0f) )
@@ -887,7 +896,7 @@ ROM_START( spiero )
 	ROM_LOAD( "27128.p7",     0x0000, 0x4000, CRC(8b06d461) SHA1(2434478810c6301197997be76505f5fc6beba5d3) )
 
 	ROM_REGION( 0x10000, "cpu3", 0 )
-	ROM_LOAD( "bprom2.bin",   0x0200, 0x0200, CRC(2747ca77) SHA1(abc0ca05925974c4b852827605ee2f1caefb8524) )
+	ROM_LOAD( "bprom2.bin",   0x0000, 0x0200, CRC(2747ca77) SHA1(abc0ca05925974c4b852827605ee2f1caefb8524) )
 
 	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "sp5.bin",      0x0000, 0x4000, CRC(1b704bb0) SHA1(db3b2f120d632b5f897c47aee115916ec6c52a69) )
@@ -939,7 +948,7 @@ ROM_START( jjack )
 	ROM_LOAD( "j0.bin",       0x0000, 0x4000, CRC(ab042f04) SHA1(06412dbdc43ebd6d376a811f240a4c9ec43ca6e7) )
 
 	ROM_REGION( 0x10000, "cpu3", 0 )
-	ROM_LOAD( "bprom2.bin",   0x0200, 0x0200, CRC(2747ca77) SHA1(abc0ca05925974c4b852827605ee2f1caefb8524) )
+	ROM_LOAD( "bprom2.bin",   0x0000, 0x0200, CRC(2747ca77) SHA1(abc0ca05925974c4b852827605ee2f1caefb8524) )
 
 	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "j5.bin",       0x0000, 0x4000, CRC(75038ff9) SHA1(2a92e0d0adb1abd029c5ee6e350a859fed3f0ae9) )
@@ -1013,16 +1022,16 @@ ROM_END
 
 /* Game Drivers */
 
-GAME( 1983, docastle, 0,        docastle, docastle, 0, ROT270, "Universal", "Mr. Do's Castle (set 1)", 0 )
-GAME( 1983, docastl2, docastle, docastle, docastle, 0, ROT270, "Universal", "Mr. Do's Castle (set 2)", 0 )
-GAME( 1983, docastlo, docastle, docastle, docastle, 0, ROT270, "Universal", "Mr. Do's Castle (older)", 0 )
-GAME( 1983, douni,    docastle, docastle, docastle, 0, ROT270, "Universal", "Mr. Do vs. Unicorns", 0 )
-GAME( 1984, dorunrun, 0,        dorunrun, dorunrun, 0, ROT0,   "Universal", "Do! Run Run (set 1)", 0 )
-GAME( 1984, dorunru2, dorunrun, dorunrun, dorunrun, 0, ROT0,   "Universal", "Do! Run Run (set 2)", 0 )
-GAME( 1984, dorunruc, dorunrun, docastle, dorunrun, 0, ROT0,   "Universal", "Do! Run Run (Do's Castle hardware, set 1)", 0 )
-GAME( 1984, dorunrca, dorunrun, docastle, dorunrun, 0, ROT0,   "Universal", "Do! Run Run (Do's Castle hardware, set 2)", 0 )
-GAME( 1987, spiero,   dorunrun, dorunrun, dorunrun, 0, ROT0,   "Universal", "Super Pierrot (Japan)", 0 )
-GAME( 1984, dowild,   0,        dorunrun, dowild,   0, ROT0,   "Universal", "Mr. Do's Wild Ride", 0 )
-GAME( 1984, jjack,    0,        dorunrun, jjack,    0, ROT270, "Universal", "Jumping Jack", 0 )
-GAME( 1984, kickridr, 0,        dorunrun, kickridr, 0, ROT0,   "Universal", "Kick Rider", 0 )
-GAME( 1985, idsoccer, 0,        idsoccer, idsoccer, 0, ROT0,   "Universal", "Indoor Soccer", GAME_NO_COCKTAIL )
+GAME( 1983, docastle, 0,        docastle, docastle, 0, ROT270, "Universal", "Mr. Do's Castle (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1983, docastl2, docastle, docastle, docastle, 0, ROT270, "Universal", "Mr. Do's Castle (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1983, docastlo, docastle, docastle, docastle, 0, ROT270, "Universal", "Mr. Do's Castle (older)", GAME_SUPPORTS_SAVE )
+GAME( 1983, douni,    docastle, docastle, docastle, 0, ROT270, "Universal", "Mr. Do vs. Unicorns", GAME_SUPPORTS_SAVE )
+GAME( 1984, dorunrun, 0,        dorunrun, dorunrun, 0, ROT0,   "Universal", "Do! Run Run (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1984, dorunru2, dorunrun, dorunrun, dorunrun, 0, ROT0,   "Universal", "Do! Run Run (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1984, dorunruc, dorunrun, docastle, dorunrun, 0, ROT0,   "Universal", "Do! Run Run (Do's Castle hardware, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1984, dorunrca, dorunrun, docastle, dorunrun, 0, ROT0,   "Universal", "Do! Run Run (Do's Castle hardware, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1987, spiero,   dorunrun, dorunrun, dorunrun, 0, ROT0,   "Universal", "Super Pierrot (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1984, dowild,   0,        dorunrun, dowild,   0, ROT0,   "Universal", "Mr. Do's Wild Ride", GAME_SUPPORTS_SAVE )
+GAME( 1984, jjack,    0,        dorunrun, jjack,    0, ROT270, "Universal", "Jumping Jack", GAME_SUPPORTS_SAVE )
+GAME( 1984, kickridr, 0,        dorunrun, kickridr, 0, ROT0,   "Universal", "Kick Rider", GAME_SUPPORTS_SAVE )
+GAME( 1985, idsoccer, 0,        idsoccer, idsoccer, 0, ROT0,   "Universal", "Indoor Soccer", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )

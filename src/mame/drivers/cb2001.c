@@ -45,35 +45,35 @@ In test mode (c) is 2000
 #define xxxx 0x90 /* Unknown */
 
 const UINT8 cb2001_decryption_table[256] = {
-	0xe8,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* 00 */
-//  pppp
-	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, 0x32,xxxx,xxxx,xxxx,0x3a,xxxx,xxxx,xxxx, /* 10 */
-//                                           ????                ????
-	xxxx,0x8e,xxxx,xxxx,xxxx,0x49,xxxx,xxxx, xxxx,xxxx,xxxx,0x75,xxxx,xxxx,xxxx,xxxx, /* 20 */
-//       !!!!                ????                           pppp
-	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0xbe,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0xb0,xxxx, /* 30 */
-//                                pppp                                     ????
+	0xe8,xxxx,xxxx,xxxx,xxxx,0x61,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* 00 */
+//  pppp                     ????
+	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, 0x32,xxxx,xxxx,xxxx,0x3a,xxxx,xxxx,0x1f, /* 10 */
+//                                           pppp                pppp           ????
+	xxxx,0x8e,xxxx,0x0f,xxxx,0x49,0xbc,xxxx, xxxx,xxxx,xxxx,0x75,xxxx,xxxx,xxxx,xxxx, /* 20 */
+//       !!!!      ????      ???? ????                      pppp
+	0x9d,xxxx,xxxx,xxxx,xxxx,xxxx,0xbe,xxxx, xxxx,xxxx,0x74,xxxx,xxxx,0xa6,0xbf,xxxx, /* 30 */
+//  ????                          pppp                 ????           ???? ????
 	xxxx,0xea,xxxx,xxxx,xxxx,0xb0,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* 40 */
 //       !!!!                gggg
-	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,0x78,xxxx,xxxx,xxxx, /* 50 */
+	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0x42,xxxx, xxxx,xxxx,xxxx,xxxx,0xeb,xxxx,xxxx,xxxx, /* 50 */
 //                                ????                           ????
-	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0xba,xxxx, /* 60 */
-//                                                                         gggg
-	0xc3,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* 70 */
-//  pppp                                               ????
+	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, xxxx,0xa5,xxxx,xxxx,xxxx,xxxx,0xba,xxxx, /* 60 */
+//                                                ????                     gggg
+	0xc3,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, 0x72,xxxx,0xf2,xxxx,xxxx,xxxx,xxxx,xxxx, /* 70 */
+//  pppp                                     ????      ????
 	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0x34, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* 80 */
 //                                     ????
-	xxxx,xxxx,0xe9,xxxx,xxxx,xxxx,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,0xb9,xxxx,xxxx,xxxx, /* 90 */
-//            ????                                               pppp
-	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0xb8, xxxx,xxxx,0xfa,xxxx,xxxx,xxxx,xxxx,xxxx, /* A0 */
-//                                     !!!!            ????
-	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* B0 */
-//
-	xxxx,xxxx,0xee,xxxx,xxxx,0xe2,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* C0 */
-//            ????           pppp
-	xxxx,xxxx,0x46,xxxx,xxxx,xxxx,xxxx,xxxx, 0x88,xxxx,xxxx,xxxx,xxxx,0xfa,0xc7,xxxx, /* D0 */
-//              ????                           ????                     ???? !!!!
-	0xb0,xxxx,xxxx,0xc6,xxxx,xxxx,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* E0 */
+	xxxx,xxxx,0xe9,xxxx,xxxx,0xbe,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,0xb9,xxxx,xxxx,xxxx, /* 90 */
+//            ????           ????                                pppp
+	xxxx,xxxx,xxxx,0x06,0xaa,0x9c,xxxx,0xb8, xxxx,xxxx,0xfc,xxxx,xxxx,xxxx,xxxx,xxxx, /* A0 */
+//                 ???? ???? ????      !!!!            ????
+	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,0x1e,xxxx,0x07,0xcf, /* B0 */
+//                                                               ????      ???? ????
+	xxxx,xxxx,0xee,xxxx,xxxx,0xe2,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0xa4,xxxx, /* C0 */
+//            ????           pppp                                          ????
+	xxxx,xxxx,0x46,xxxx,0x60,xxxx,xxxx,xxxx, 0x88,xxxx,xxxx,xxxx,xxxx,0xfa,0xc7,xxxx, /* D0 */
+//              pppp      ????                 pppp                     ???? !!!!
+	0x8a,xxxx,xxxx,0xc6,xxxx,xxxx,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* E0 */
 //  ????           !!!!
 	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* F0 */
 //
@@ -81,9 +81,7 @@ const UINT8 cb2001_decryption_table[256] = {
 
 /* robiza notes:
 
-
 56 -> ????
-
 
 5c -> conditional jmp for sure
 
@@ -93,22 +91,22 @@ aa -> ????
 d8 ????
 dd -> fa (di)
 
-
 guessed:
 45 -> b0 (mov al,#value)
 6e -> ba (mov dw,#value)
 c2 -> ee (out dw,al)
 
-
-
 probably:
-00 -> e8 (call)
+
 2b -> conditional jmp for sure (75)
 36 -> be
-41 -> ea (jmp_far)
-70 -> c3 (ret)
 9c -> it's a counter (like mov cw,#value) -> not sure the register (cw,bw,....) -> b9 (cw)
 c5 -> 75 (loop?)
+
+very probably:
+00 -> e8 (call)
+41 -> ea (jmp_far)
+70 -> c3 (ret)
 
 checked against gussun and quizf1 (start up code):
 21 -> 8e
@@ -116,6 +114,16 @@ a7 -> b8
 de -> c7
 e3 -> c6
 
+opcodes: 36,9c,00,18,d8,d2,c5,70 probably:
+e1af1 36 62 06 mov ix,0662
+      9c 04 00 mov cw,0004
+      00 94 17 call e328e
+
+e328e 18 c0 xor al,al
+      d8 04 mov byte ptr [ix],al
+      d2    inc ix
+      c5 fb dbnz e3290
+      70    ret
 */
 
 

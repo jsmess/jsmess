@@ -351,7 +351,8 @@ static TIMER_DEVICE_CALLBACK( wwfwfest_scanline )
 	/* An interrupt is generated every 16 scanlines */
 	if (scanline % 16 == 0)
 	{
-		video_screen_update_partial(timer->machine->primary_screen, scanline - 1);
+		if (scanline > 0)
+			video_screen_update_partial(timer->machine->primary_screen, scanline - 1);
 		cpu_set_input_line(timer->machine->cpu[0], 2, ASSERT_LINE);
 	}
 
@@ -360,12 +361,6 @@ static TIMER_DEVICE_CALLBACK( wwfwfest_scanline )
 	{
 		video_screen_update_partial(timer->machine->primary_screen, scanline - 1);
 		cpu_set_input_line(timer->machine->cpu[0], 3, ASSERT_LINE);
-	}
-
-	/* Adjust for next scanline */
-	if (++scanline >= video_screen_get_height(timer->machine->primary_screen))
-	{
-		scanline = 0;
 	}
 }
 

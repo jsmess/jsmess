@@ -4275,7 +4275,7 @@ ROM_START( bldyror2 )
 
 	ROM_REGION32_LE( 0x1800000, "user2", 0 )
 	ROM_LOAD( "flash0.021",      0x0000000, 0x200000, CRC(fa7602e1) SHA1(6fb6af09656fbb86d2abda35804b2ed4a4cd7461) )
-	ROM_LOAD( "flash1.024",      0x0200000, 0x200000, BAD_DUMP CRC(4866dce3) SHA1(484e659a8f0ca40b29d7f5e57788e8a9f6957cbc) )
+	ROM_LOAD( "flash1.024",      0x0200000, 0x200000, CRC(59a2e367) SHA1(484fd5a4515a8391f1d2fa95ac681d9bcf52406d) )
 	ROM_LOAD( "rom-1a.028",      0x0800000, 0x400000, CRC(0e711461) SHA1(1d0bd80e6885432ef0623babde28e5760b714bfa) )
 	ROM_LOAD( "rom-1b.29",       0x0c00000, 0x400000, CRC(0cf153f9) SHA1(53bb9f8642079f56d8e925792b069362df666819) )
 	ROM_LOAD( "rom-2a.026",      0x1000000, 0x400000, CRC(b71d955d) SHA1(49fce452c70ceafc8a149fa9ff073589b7261882) )
@@ -4553,7 +4553,7 @@ GAME( 1997, gdarius2, taitofx1, coh1000tb,zn, coh1000tb, ROT0, "Taito", "G-Dariu
 /* A dummy driver, so that the bios can be debugged, and to serve as */
 /* parent for the coh-3002t.353 file, so that we do not have to include */
 /* it in every zip file */
-GAME( 1997, taitogn,  0,        coh3002t, zn, coh3002t, ROT0, "Sony/Taito", "Taito GNET", 0 )
+GAME( 1997, taitogn,  0,        coh3002t, zn, coh3002t, ROT0, "Sony/Taito", "Taito GNET", GAME_IS_BIOS_ROOT )
 
 /* Eighting/Raizing */
 

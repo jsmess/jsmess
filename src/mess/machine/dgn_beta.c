@@ -1083,7 +1083,7 @@ MACHINE_START( dgnbeta )
 
 	init_video(machine);
 
-	cpu_set_dasm_override(machine->cpu[0],dgnbeta_dasm_override);
+	debug_cpu_set_dasm_override(machine->cpu[0],dgnbeta_dasm_override);
 
 	add_reset_callback(machine, dgnbeta_reset);
 	dgnbeta_reset(machine);

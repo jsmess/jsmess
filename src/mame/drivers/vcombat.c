@@ -1,6 +1,8 @@
 /*
 Virtual Combat hardware games.
 
+Driver by Jason Eckhardt and Andrew Gardner.
+
 ----
 
 There are two known games on this hardware.  Both are developed by
@@ -15,7 +17,7 @@ Shadow Fighters (German) (c) Sega? 1989?
 
 There are two boards to this hardware.  The upper, which contains the
 graphics ROMs and the i860, and the lower which contains the main
-and sound CPU's.  Virtual Combat sports two upper boards which presumably
+and sound CPUs.  Virtual Combat sports two upper boards which presumably
 output a different rasterization of the scene for each stereo eye.
 
 UPPER:
@@ -26,6 +28,7 @@ UPPER:
     8-way DIP switch
     574200D x4
     PAL palce24v10 x2 (next to the i860)
+    Bt476 RAMDAC
 
 LOWER:
     Motorola MC68000P12 x2
@@ -70,71 +73,183 @@ TODO :  This is a skeleton driver.  Nearly everything.
 #include <stdio.h>
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/i860/i860.h"
 #include "video/generic.h"
+#include "video/tlc34076.h"
+
+static UINT16* framebuffer;
+static UINT16* vid_0_shared_RAM;
+static UINT16* vid_1_shared_RAM;
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x200000, 0x201fff) AM_RAM		/* At the very least! */
+	AM_RANGE(0x200000, 0x2fffff) AM_RAM
+	AM_RANGE(0x300000, 0x3fffff) AM_RAM AM_BASE(&framebuffer) AM_SHARE(1)
+
+	AM_RANGE(0x400000, 0x43ffff) AM_RAM AM_BASE(&vid_0_shared_RAM) AM_SHARE(2)	/* First i860 shared RAM */
+//  AM_RANGE(0x440000, 0x440003) i860 #1 com 1
+//  AM_RANGE(0x480000, 0x480003) i860 #1 com 2
+//  AM_RANGE(0x4c0000, 0x4c0003) i860 #1 stop/start/reset
+
+	AM_RANGE(0x500000, 0x53ffff) AM_RAM AM_BASE(&vid_1_shared_RAM) AM_SHARE(3)	/* Second i860 shared RAM */
+//  AM_RANGE(0x540000, 0x540003) i860 #2 com 1
+//  AM_RANGE(0x580000, 0x580003) i860 #2 com 2
+//  AM_RANGE(0x5c0000, 0x5c0003) i860 #2 stop/start/reset
+
+	AM_RANGE(0x706000, 0x70601f) AM_READWRITE(tlc34076_lsb_r, tlc34076_lsb_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+
+/* The first i860 - middle board */
+static ADDRESS_MAP_START( vid_0_map, ADDRESS_SPACE_PROGRAM, 32 )
+	AM_RANGE(0x00000000, 0x000fffff) AM_RAM AM_SHARE(1)					/* Shared framebuffer */
+//  AM_RANGE(0x20000000, 0x20000003) com 1      (0x440000 in 68k-land)
+//  AM_RANGE(0x40000000, 0x401fffff) AM_ROM                             /* 3d data ROMs */
+//  AM_RANGE(0x80000000, 0x80000003) com 2      (0x480000 in 68k-land)
+	AM_RANGE(0xfffc0000, 0xffffffff) AM_RAM AM_SHARE(2)					/* Shared RAM with main */
 ADDRESS_MAP_END
 
-/*
-static ADDRESS_MAP_START( video_map, ADDRESS_SPACE_PROGRAM, 16 )
-    AM_RANGE(0x000000, 0x1fffff) AM_ROM
+
+/* The second i860 - top board */
+static ADDRESS_MAP_START( vid_1_map, ADDRESS_SPACE_PROGRAM, 32 )
+	AM_RANGE(0x00000000, 0x000fffff) AM_RAM AM_SHARE(1)					/* Shared framebuffer */
+//  AM_RANGE(0x20000000, 0x20000003) com 1      (0x540000 in 68k-land)
+//  AM_RANGE(0x40000000, 0x401fffff) AM_ROM                             /* 3d data ROMs */
+//  AM_RANGE(0x80000000, 0x80000003) com 2      (0x580000 in 68k-land)
+	AM_RANGE(0xfffc0000, 0xffffffff) AM_RAM AM_SHARE(3)					/* Shared RAM with main */
 ADDRESS_MAP_END
-*/
+
+
+/* Sound CPU - temprarily disabled */
+//static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 16 )
+//  AM_RANGE(0x000000, 0x03ffff) AM_ROM
+//ADDRESS_MAP_END
+
+
+static MACHINE_RESET( vcombat )
+{
+	/* Setup the Bt476 VGA RAMDAC palette chip */
+	tlc34076_reset(6);
+}
+
+static DIRECT_UPDATE_HANDLER( vid_0_direct_handler )
+{
+	if (address >= 0xfffc0000 && address <= 0xffffffff)
+	{
+		direct->raw = direct->decrypted = ((UINT8*)vid_0_shared_RAM) - 0xfffc0000;
+		return ~0;
+	}
+	return address;
+}
+
+static DIRECT_UPDATE_HANDLER( vid_1_direct_handler )
+{
+	if (address >= 0xfffc0000 && address <= 0xffffffff)
+	{
+		direct->raw = direct->decrypted = ((UINT8*)vid_1_shared_RAM) - 0xfffc0000;
+		return ~0;
+	}
+	return address;
+}
+
+static DRIVER_INIT( vcombat )
+{
+	UINT8 *ROM = memory_region(machine, "main");
+
+	/* The two i860s execute out of RAM */
+	memory_set_direct_update_handler(cputag_get_address_space(machine, "vid_0", ADDRESS_SPACE_PROGRAM), vid_0_direct_handler);
+	memory_set_direct_update_handler(cputag_get_address_space(machine, "vid_1", ADDRESS_SPACE_PROGRAM), vid_1_direct_handler);
+
+	// Hacks
+	// pc==4016 : jump 4038 ... There's something strange about how it waits at 402e (interrupts all masked out)
+	ROM[0x4017] = 0x66;
+
+	// Sound CPU comm bits
+	// pc==40fa : jump 40fc ... 600004 should be -16
+	ROM[0x40fb] = 0x67;
+	// pc==410e : jump 4110 ... 600004 should be 31
+	ROM[0x410f] = 0x67;
+
+	// pc==e220 : jump e222 ... 20119a should not be 0. (no interrupts masked)
+	// TODO: I wonder if this is an input bit that's ticked on vblank or something.  The menu selection continually crawls up.
+}
+
 
 static INPUT_PORTS_START( vcombat )
 INPUT_PORTS_END
 
+
 static VIDEO_UPDATE( vcombat )
 {
+	int x, y;
+	int count = 0;
+	const rgb_t *pens = tlc34076_get_pens();
+
+	for(y = 0; y < 480; y++)
+	{
+		for(x = 0; x < 256; x++)
+		{
+			UINT32 color;
+
+			if (x % 2) color = (framebuffer[count] & 0xff00) >> 8;
+			else	   color =  framebuffer[count] & 0x00ff;
+
+			if(x < video_screen_get_visible_area(screen)->max_x && y < video_screen_get_visible_area(screen)->max_y)
+				*BITMAP_ADDR32(bitmap, y, x) = pens[color];
+
+			if (x % 2) count++;
+		}
+	}
 	return 0;
 }
 
+
+// This is just here to show that there is text in the main program ROM.  It probably won't really be a useful decode.
 static const gfx_layout vcombat_charlayout =
 {
 	8, 8,
 	0x100000 / 0x80,
 	8,
 	{ 0,1,2,3,4,5,6,7 },
-	{ 0*16,  1*16,  2*16,  3*16,  4*16,  5*16,  6*16,  7*16 },
+	{ 0*16,   1*16,   2*16,   3*16,   4*16,   5*16,   6*16,   7*16 },
 	{ 0*16*8, 1*16*8, 2*16*8, 3*16*8, 4*16*8, 5*16*8, 6*16*8, 7*16*8 },
 	8 * 0x80
 };
+
 
 static GFXDECODE_START( vcombat )
 	GFXDECODE_ENTRY( "main", 0, vcombat_charlayout, 0, 256 )
 GFXDECODE_END
 
+
 static MACHINE_DRIVER_START( vcombat )
 	MDRV_CPU_ADD("main", M68000, XTAL_12MHz)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq7_line_hold)			/* The only un-masked irq thus far */
+	//MDRV_CPU_VBLANK_INT("main", irq7_line_hold)
 
-	MDRV_CPU_ADD("sound", M68000, XTAL_12MHz)
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	/* The middle board i860 */
+	MDRV_CPU_ADD("vid_0", I860, XTAL_20MHz)
+	MDRV_CPU_PROGRAM_MAP(vid_0_map,0)
 
-/*
-    Virtual combat has an i860 on each of its two upper boards.
-    MDRV_CPU_ADD("video", i860, XTAL_20MHz)
-    MDRV_CPU_PROGRAM_MAP(video_map,0)
-*/
+	/* The top board i860 */
+	MDRV_CPU_ADD("vid_1", I860, XTAL_20MHz)
+	MDRV_CPU_PROGRAM_MAP(vid_1_map,0)
+
+	/* Sound CPU Disabled for now */
+	//MDRV_CPU_ADD("sound", M68000, XTAL_12MHz)
+	//MDRV_CPU_PROGRAM_MAP(sound_map,0)
+
+	MDRV_MACHINE_RESET(vcombat)
+
+	// Likely will go away
+	MDRV_GFXDECODE(vcombat)
 
 	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(640, 480)
-	MDRV_GFXDECODE(vcombat)
 	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-
-	/*MDRV_PALETTE_LENGTH(0x100)*/
-
-	MDRV_QUANTUM_TIME(HZ(120000))	/* Temporary */
 
 	MDRV_VIDEO_UPDATE(vcombat)
 MACHINE_DRIVER_END
@@ -198,6 +313,6 @@ ROM_START( shadfgtr )
 	/* The second upper-board PAL couldn't be read */
 ROM_END
 
-/*    YEAR  NAME      PARENT  MACHINE  INPUT    INIT MONITOR COMPANY     FULLNAME           FLAGS */
-GAME( 1993, vcombat,  0,      vcombat, vcombat, 0,   ROT0,   "VR8 Inc.", "Virtual Combat",  GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 1989, shadfgtr, 0,      vcombat, vcombat, 0,   ROT0,   "Sega?",    "Shadow Fighters", GAME_NOT_WORKING | GAME_NO_SOUND )
+/*    YEAR  NAME      PARENT  MACHINE  INPUT    INIT     MONITOR COMPANY     FULLNAME           FLAGS */
+GAME( 1993, vcombat,  0,      vcombat, vcombat, vcombat, ROT0,   "VR8 Inc.", "Virtual Combat",  GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1989, shadfgtr, 0,      vcombat, vcombat, 0,       ROT0,   "Sega?",    "Shadow Fighters", GAME_NOT_WORKING | GAME_NO_SOUND )
