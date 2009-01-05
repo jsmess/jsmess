@@ -7,7 +7,7 @@
 #include "driver.h"
 
 #include "cpu/i386/i386.h"
-#include "cpu/i8x41/i8x41.h"
+#include "cpu/mcs48/mcs48.h"
 
 #include "machine/pic8259.h"
 #include "machine/8237dma.h"
@@ -35,6 +35,11 @@
 
 #define LOG_PORT80	0
 #define LOG_KBDC	0
+
+/* 0.129 BREAKAGE - PLEASE FIX ME */
+#define I8X41_DATA	0
+#define I8X41_STAT	0
+#define I8X41_CMND	0
 
 static struct {
 	const device_config	*pic8259_master;
@@ -529,10 +534,10 @@ static void at_kbdc8042_set_keyboard_interface( running_machine *machine, write8
 
 
 static ADDRESS_MAP_START( kbdc8042_io, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE( I8X41_t0, I8X41_t0 )	AM_READ( at_kbdc8042_t0_r )
-	AM_RANGE( I8X41_t1, I8X41_t1 )	AM_READ( at_kbdc8042_t1_r )
-	AM_RANGE( I8X41_p1, I8X41_p1 )  AM_READ( at_kbdc8042_p1_r )
-	AM_RANGE( I8X41_p2, I8X41_p2 )  AM_READWRITE( at_kbdc8042_p2_r, at_kbdc8042_p2_w )
+	AM_RANGE( MCS48_PORT_T0, MCS48_PORT_T0 )	AM_READ( at_kbdc8042_t0_r )
+	AM_RANGE( MCS48_PORT_T1, MCS48_PORT_T1 )	AM_READ( at_kbdc8042_t1_r )
+	AM_RANGE( MCS48_PORT_P1, MCS48_PORT_P1 )	AM_READ( at_kbdc8042_p1_r )
+	AM_RANGE( MCS48_PORT_P2, MCS48_PORT_P2 )	AM_READWRITE( at_kbdc8042_p2_r, at_kbdc8042_p2_w )
 ADDRESS_MAP_END
 
 

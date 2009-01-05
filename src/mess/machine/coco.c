@@ -82,6 +82,7 @@ easier to manage.
 #include <assert.h>
 
 #include "driver.h"
+#include "debug/debugcpu.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
 #include "includes/coco.h"
@@ -208,9 +209,7 @@ static void setup_memory_map(running_machine *machine);
 
 #define GIME_TYPE_1987	0
 
-#ifdef MAME_DEBUG
 static offs_t coco_dasm_override(const device_config *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-#endif /* MAME_DEBUG */
 
 
 /* ----------------------------------------------------------------------- */
@@ -2879,9 +2878,7 @@ static void generic_init_machine(running_machine *machine, const machine_init_in
 	cart_config.map_memory = init->map_memory;
 	coco_cart = cococart_init(machine, cart_hardware, &cart_config);
 
-#ifdef MAME_DEBUG
 	debug_cpu_set_dasm_override(machine->cpu[0], coco_dasm_override);
-#endif
 
 	state_save_register_global(machine, mux_sel1);
 	state_save_register_global(machine, mux_sel2);
@@ -3090,8 +3087,6 @@ MACHINE_START( coco3 )
   OS9 Syscalls for disassembly
 ****************************************************************************/
 
-#ifdef MAME_DEBUG
-
 static const char *const os9syscalls[] =
 {
 	"F$Link",          /* Link to Module */
@@ -3258,7 +3253,3 @@ static offs_t coco_dasm_override(const device_config *device, char *buffer, offs
 	}
 	return result;
 }
-
-
-
-#endif /* MAME_DEBUG */
