@@ -17,6 +17,7 @@ TODO:
 
 #include "driver.h"
 #include "includes/wswan.h"
+#include "devices/cartslot.h"
 #include "image.h"
 
 #define INTERNAL_EEPROM_SIZE	1024
@@ -199,7 +200,7 @@ static TIMER_CALLBACK(wswan_rtc_callback)
 
 static void wswan_machine_stop( running_machine *machine ) {
 	if ( eeprom.size ) {
-		image_battery_save( image_from_devtype_and_index(machine, IO_CARTSLOT,0), eeprom.data, eeprom.size );
+		image_battery_save( device_list_find_by_tag(machine->config->devicelist, CARTSLOT, "cart"), eeprom.data, eeprom.size );
 	}
 }
 
