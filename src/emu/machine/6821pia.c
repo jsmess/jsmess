@@ -122,6 +122,16 @@ void pia_config(running_machine *machine, int which, const pia6821_interface *in
 	assert_always((which >= 0) && (which < MAX_PIA), "pia_config called on an invalid PIA!");
 	assert_always(intf, "pia_config called with an invalid interface!");
 
+	{
+		/* NPW 5-Jan-2009 - Multisession hack */
+		int i;
+		for (i = 0; i < ARRAY_LENGTH(pias); i++)
+		{
+			if ((pias[i].machine != NULL) && (pias[i].machine != machine))
+				memset(&pias[i], 0, sizeof(pias[i]));
+		}
+	}
+
 	p = &pias[which];
 	memset(p, 0, sizeof(pias[0]));
 
