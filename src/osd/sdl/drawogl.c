@@ -31,7 +31,7 @@
 
 #include "gl_shader_mgr.h"
 
-#ifdef SDLMAME_WIN32
+#if defined(SDLMAME_WIN32) && !(SDL_VERSION_ATLEAST(1,3,0))
 typedef ptrdiff_t GLsizeiptr;
 #endif
 
@@ -153,6 +153,58 @@ enum
 //============================================================
 //  TYPES
 //============================================================
+
+typedef struct _texture_info texture_info;
+
+#if USE_OPENGL
+typedef void (*texture_copy_func)(texture_info *texture, const render_texinfo *texsource);
+#endif
+	
+/* texture_info holds information about a texture */
+struct _texture_info
+{
+	texture_info *		next;				// next texture in the list
+	HashT				hash;				// hash value for the texture (must be >= pointer size)
+	UINT32				flags;				// rendering flags
+	render_texinfo		texinfo;			// copy of the texture info
+	int					rawwidth, rawheight;	// raw width/height of the texture
+	int					rawwidth_create;	// raw width/height, pow2 compatible, if needed
+	int                 rawheight_create;	// (create and initial set the texture, not for copy!)
+	int					type;				// what type of texture are we?
+	int					format;				// texture format
+	int					borderpix;			// do we have a 1 pixel border?
+	int					xprescale;			// what is our X prescale factor?
+	int					yprescale;			// what is our Y prescale factor?
+	int					prescale_effect;	// which prescale effect (if any) to use
+	int					nocopy;				// must the texture date be copied?
+	
+	UINT32				texture;			// OpenGL texture "name"/ID
+
+	const GLint *		texProperties;		// texture properties
+	texture_copy_func	texCopyFn;			// texture copy function, !=NULL if !nocopy
+	GLenum				texTarget;			// OpenGL texture target
+	int					texpow2;			// Is this texture pow2
+	
+	UINT32				mpass_dest_idx;			// Multipass dest idx [0..1]
+	UINT32				mpass_textureunit[2];	// texture unit names for GLSL
+	
+	UINT32				mpass_texture_mamebm[2];// Multipass OpenGL texture "name"/ID for the shader
+	UINT32				mpass_fbo_mamebm[2];	// framebuffer object for this texture, multipass
+	UINT32				mpass_texture_scrn[2];	// Multipass OpenGL texture "name"/ID for the shader
+	UINT32				mpass_fbo_scrn[2];		// framebuffer object for this texture, multipass
+	
+	UINT32				lut_texture;			// LUT OpenGL texture "name"/ID for the shader
+	int					lut_table_width;		// LUT table width 
+	int					lut_table_height;		// LUT table height
+	
+	UINT32				pbo;					// pixel buffer object for this texture (DYNAMIC only!)
+	UINT32				*data;					// pixels for the texture
+	int					data_own;				// do we own / allocated it ?
+	UINT32				*effectbuf;				// buffer for intermediate effect results or NULL
+	GLfloat				texCoord[8];
+	GLuint				texCoordBufferName;
+
+};
 
 /* sdl_info is the information about SDL for the current screen */
 typedef struct _sdl_info sdl_info;
@@ -476,6 +528,8 @@ static int drawogl_window_create(sdl_window_info *window, int width, int height)
 		SDL_GetCurrentDisplayMode(&mode);
 		mode.w = width;
 		mode.h = height;
+		if (window->refresh)
+			mode.refresh_rate = window->refresh;
 		SDL_SetFullscreenDisplayMode(&mode);	// Try to set mode
 	}
 	else
@@ -484,9 +538,9 @@ static int drawogl_window_create(sdl_window_info *window, int width, int height)
 	window->window_id = SDL_CreateWindow(window->title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
 			width, height, sdl->extra_flags);
 
-	if  (!(SDL_GetWindowFlags(window->window_id) & SDL_WINDOW_OPENGL) )
+	if  (!window->window_id )
 	{
-		mame_printf_error("OpenGL not supported on this driver!\n");
+		mame_printf_error("OpenGL not supported on this driver: %s\n", SDL_GetError());
 		return 1;
 	}
 
@@ -496,8 +550,13 @@ static int drawogl_window_create(sdl_window_info *window, int width, int height)
 	SDL_GetWindowSize(window->window_id, &window->width, &window->height);
 	
 	sdl->gl_context_id = SDL_GL_CreateContext(window->window_id);
+	if  (!sdl->gl_context_id)
+	{
+		mame_printf_error("OpenGL not supported on this driver: %s\n", SDL_GetError());
+		return 1;
+	}
 
-	SDL_GL_SetSwapInterval(options_get_bool(mame_options(), SDLOPTION_WAITVSYNC) ? 2 : 0);
+	SDL_GL_SetSwapInterval(video_config.waitvsync ? 2 : 0);
 	
 #else
 	sdl->extra_flags = (window->fullscreen ?  SDL_FULLSCREEN : SDL_RESIZABLE);
@@ -505,8 +564,7 @@ static int drawogl_window_create(sdl_window_info *window, int width, int height)
 
 	SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
 	#if (SDL_VERSION_ATLEAST(1,2,10))
-	SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, 
-			options_get_bool(mame_options(), SDLOPTION_WAITVSYNC) ? 1 : 0);
+	SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, video_config.waitvsync ? 1 : 0);
 	#endif
 	
 	load_gl_lib();

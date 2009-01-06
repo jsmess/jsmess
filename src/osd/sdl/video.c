@@ -175,55 +175,6 @@ static void video_exit(running_machine *machine)
 
 
 //============================================================
-//  get_modes - code take from SDL_Compat
-//============================================================
-
-#if (SDL_VERSION_ATLEAST(1,3,0))
-static SDL_Rect **get_current_display_modes(void)
-{
-	/* Get modes for current select display */
-    int i, nmodes;
-    SDL_Rect **modes;
-
-    /* Memory leak, but this is a compatibility function, who cares? */
-    nmodes = 0;
-    modes = NULL;
-    for (i = 0; i < SDL_GetNumDisplayModes(); ++i) {
-        SDL_DisplayMode mode;
-        SDL_GetDisplayMode(i, &mode);
-        if (!mode.w || !mode.h) {
-            return (SDL_Rect **) (NULL);
-        }
-        // FIXME: refresh rates
-        if (nmodes > 0 && modes[nmodes - 1]->w == mode.w
-            && modes[nmodes - 1]->h == mode.h) {
-            continue;
-        }
-
-        modes = SDL_realloc(modes, (nmodes + 2) * sizeof(*modes));
-        if (!modes) {
-            return NULL;
-        }
-        modes[nmodes] = (SDL_Rect *) SDL_malloc(sizeof(SDL_Rect));
-        if (!modes[nmodes]) {
-            return NULL;
-        }
-        modes[nmodes]->x = 0;
-        modes[nmodes]->y = 0;
-        modes[nmodes]->w = mode.w;
-        modes[nmodes]->h = mode.h;
-        mame_printf_verbose("Display mode #%d - %d x %d\n", nmodes, mode.w, mode.h);
-        ++nmodes;
-    }
-    if (modes) {
-        modes[nmodes] = NULL;
-    }
-    return modes;
-}
-#endif
-
-
-//============================================================
 //  sdlvideo_monitor_refresh
 //============================================================
 
@@ -448,7 +399,7 @@ static void add_primary_monitor(void *data)
 //  monitor_enum_callback
 //============================================================
 
-#ifdef SDLMAME_WIN32
+#if defined(SDLMAME_WIN32) && !(SDL_VERSION_ATLEAST(1,3,0))
 static BOOL CALLBACK monitor_enum_callback(HMONITOR handle, HDC dc, LPRECT rect, LPARAM data)
 {
 	sdl_monitor_info ***tailptr = (sdl_monitor_info ***)data;
@@ -466,7 +417,7 @@ static BOOL CALLBACK monitor_enum_callback(HMONITOR handle, HDC dc, LPRECT rect,
 	memset(monitor, 0, sizeof(*monitor));
 
 	// copy in the data
-        monitor->handle = (UINT32)handle;
+    monitor->handle = (UINT32)handle;
 	monitor->monitor_width = info.rcMonitor.right - info.rcMonitor.left;
 	monitor->monitor_height = info.rcMonitor.bottom - info.rcMonitor.top;
 	strcpy(monitor->monitor_device, info.szDevice);
@@ -505,9 +456,7 @@ static void init_monitors(void)
 	sdl_monitor_list = NULL;
 	tailptr = &sdl_monitor_list;
 
-	#ifdef SDLMAME_WIN32
-	EnumDisplayMonitors(NULL, NULL, monitor_enum_callback, (LPARAM)&tailptr);
-	#elif (SDL_VERSION_ATLEAST(1,3,0))
+	#if (SDL_VERSION_ATLEAST(1,3,0))
 	{
 		int i, temp;
 
@@ -535,8 +484,6 @@ static void init_monitors(void)
 	        monitor->aspect = (float)(dmode.w) / (float)(dmode.h);
 	        mame_printf_verbose("Adding monitor %s (%d x %d)\n", monitor->monitor_device, dmode.w, dmode.h);
 
-	        monitor->modes = get_current_display_modes();
-	        
 	        // save the primary monitor handle
 	        if (i == 0)
 	        	primary_monitor = monitor;
@@ -547,6 +494,8 @@ static void init_monitors(void)
 		}
 		SDL_SelectVideoDisplay(temp);
 	}
+	#elif defined(SDLMAME_WIN32)
+	EnumDisplayMonitors(NULL, NULL, monitor_enum_callback, (LPARAM)&tailptr);
 	#else
 	add_primary_monitor((void *)&tailptr);
 	sdl_monitor_list->modes = SDL_ListModes(NULL, SDL_FULLSCREEN | SDL_DOUBLEBUF);
@@ -649,7 +598,7 @@ static void check_osd_inputs(running_machine *machine)
 		ui_popup_time(1, "Keepaspect %s", video_config.keepaspect? "enabled":"disabled");
 	}
 	
-	if (USE_OPENGL)
+	if (USE_OPENGL || SDL_VERSION_ATLEAST(1,3,0))
 	{
 		//FIXME: on a per window basis
 		if (ui_input_pressed(machine, IPT_OSD_5))
@@ -731,6 +680,11 @@ static void extract_video_config(running_machine *machine)
  		video_config.mode = VIDEO_MODE_OPENGL;
  		video_config.prefer16bpp_tex = 1;
 	}
+	else if (SDL_VERSION_ATLEAST(1,3,0) && (strcmp(stemp, SDLOPTVAL_SDL13) == 0))
+	{
+ 		video_config.mode = VIDEO_MODE_SDL13;
+ 		video_config.prefer16bpp_tex = 1;
+	}
 	else
 	{
 		mame_printf_warning("Invalid video value %s; reverting to software\n", stemp);
@@ -740,6 +694,12 @@ static void extract_video_config(running_machine *machine)
 	video_config.switchres     = options_get_bool(mame_options(), SDLOPTION_SWITCHRES);
 	video_config.centerh       = options_get_bool(mame_options(), SDLOPTION_CENTERH);
 	video_config.centerv       = options_get_bool(mame_options(), SDLOPTION_CENTERV);
+	video_config.waitvsync     = options_get_bool(mame_options(), SDLOPTION_WAITVSYNC);
+
+	if (USE_OPENGL || SDL_VERSION_ATLEAST(1,3,0))
+	{
+		video_config.filter        = options_get_bool(mame_options(), SDLOPTION_FILTER);
+	}
 
 	if (USE_OPENGL)
 	{
@@ -751,7 +711,6 @@ static void extract_video_config(running_machine *machine)
 		}
 		// default to working video please
 		video_config.prefer16bpp_tex = 0;
-		video_config.filter        = options_get_bool(mame_options(), SDLOPTION_FILTER);
 		video_config.forcepow2texture = options_get_bool(mame_options(), SDLOPTION_GL_FORCEPOW2TEXTURE)==1;
 		video_config.allowtexturerect = options_get_bool(mame_options(), SDLOPTION_GL_NOTEXTURERECT)==0;
 		video_config.vbo         = options_get_bool(mame_options(), SDLOPTION_GL_VBO);

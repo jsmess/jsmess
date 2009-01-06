@@ -124,7 +124,6 @@ static OSDWORK_CALLBACK( draw_video_contents_wt );
 static OSDWORK_CALLBACK( sdlwindow_video_window_destroy_wt );
 static OSDWORK_CALLBACK( sdlwindow_resize_wt );
 static OSDWORK_CALLBACK( sdlwindow_toggle_full_screen_wt );
-static void sdlwindow_clear_surface(sdl_window_info *window);
 static void sdlwindow_update_cursor_state(running_machine *machine, sdl_window_info *window);
 static void sdlwindow_sync(void);
 
@@ -192,7 +191,11 @@ static OSDWORK_CALLBACK(sdlwindow_thread_id)
 
 	if (SDLMAME_INIT_IN_WORKER_THREAD)
 	{
-		if (SDL_Init(SDL_INIT_TIMER|SDL_INIT_AUDIO| SDL_INIT_VIDEO| SDL_INIT_JOYSTICK|SDL_INIT_NOPARACHUTE)) 
+#if (SDL_VERSION_ATLEAST(1,3,0))
+		if (SDL_InitSubSystem(SDL_INIT_TIMER|SDL_INIT_AUDIO| SDL_INIT_VIDEO| SDL_INIT_JOYSTICK|SDL_INIT_NOPARACHUTE))
+#else
+		if (SDL_Init(SDL_INIT_TIMER|SDL_INIT_AUDIO| SDL_INIT_VIDEO| SDL_INIT_JOYSTICK|SDL_INIT_NOPARACHUTE))
+#endif
 		{
 			mame_printf_error("Could not initialize SDL: %s.\n", SDL_GetError());
 			exit(-1);
@@ -243,6 +246,13 @@ int sdlwindow_init(running_machine *machine)
 	if (video_config.mode == VIDEO_MODE_OPENGL)
 	{
 		if (drawogl_init(&draw))
+			video_config.mode = VIDEO_MODE_SOFT;
+	}
+#endif
+#if	SDL_VERSION_ATLEAST(1,3,0)
+	if (video_config.mode == VIDEO_MODE_SDL13)
+	{
+		if (draw13_init(&draw))
 			video_config.mode = VIDEO_MODE_SOFT;
 	}
 #endif
@@ -407,7 +417,7 @@ void sdlwindow_blit_surface_size(sdl_window_info *window, int window_width, int 
 		newwidth = window_width;
 
 	if ((window->blitwidth != newwidth) || (window->blitheight != newheight))
-		sdlwindow_clear_surface(window);
+		sdlwindow_clear(window);
 	
 	window->blitwidth = newwidth;
 	window->blitheight = newheight;
@@ -431,7 +441,7 @@ static OSDWORK_CALLBACK( sdlwindow_resize_wt )
 
 	sdlwindow_blit_surface_size(window, wp->resize_new_width, wp->resize_new_height);
 	
-	sdlwindow_clear_surface(window);
+	sdlwindow_clear(window);
 
 	free(wp);
 	return NULL;
@@ -472,7 +482,7 @@ static OSDWORK_CALLBACK( sdlwindow_clear_surface_wt )
 	return NULL;
 }
 
-static void sdlwindow_clear_surface(sdl_window_info *window)
+void sdlwindow_clear(sdl_window_info *window)
 {
 	worker_param *wp = malloc(sizeof(worker_param));
 
@@ -904,6 +914,74 @@ static void sdlwindow_video_window_destroy(running_machine *machine, sdl_window_
 //  pick_best_mode
 //============================================================
 
+#if SDL_VERSION_ATLEAST(1,3,0)
+static void pick_best_mode(sdl_window_info *window, int *fswidth, int *fsheight)
+{
+	int minimum_width, minimum_height, target_width, target_height;
+	int i;
+	int num;
+	float size_score, best_score = 0.0f;
+
+	// determine the minimum width/height for the selected target
+	render_target_get_minimum_size(window->target, &minimum_width, &minimum_height);
+
+	// use those as the target for now
+	target_width = minimum_width * MAX(1, window->prescale);
+	target_height = minimum_height * MAX(1, window->prescale);
+
+	// if we're not stretching, allow some slop on the minimum since we can handle it
+	{
+		minimum_width -= 4;
+		minimum_height -= 4;
+	}
+
+	num = SDL_GetNumDisplayModes();
+	
+	if (num == 0)
+	{
+		mame_printf_error("SDL: No modes available?!\n");
+		exit(-1);
+	}
+	else
+	{
+		for (i = 0; i < num; ++i)
+		{
+			SDL_DisplayMode mode;
+			SDL_GetDisplayMode(i, &mode);
+
+			// compute initial score based on difference between target and current
+			size_score = 1.0f / (1.0f + fabsf((INT32)mode.w - target_width) + fabsf((INT32)mode.h - target_height));
+
+			// if the mode is too small, give a big penalty
+			if (mode.w < minimum_width || mode.h < minimum_height)
+				size_score *= 0.01f;
+
+			// if mode is smaller than we'd like, it only scores up to 0.1
+			if (mode.w < target_width || mode.h < target_height)
+				size_score *= 0.1f;
+
+			// if we're looking for a particular mode, that's a winner
+			if (mode.w == window->maxwidth && mode.h == window->maxheight)
+				size_score = 2.0f;
+
+			// refresh adds some points
+			if (window->refresh)
+				size_score *= 1.0f / (1.0f + fabsf(window->refresh - mode.refresh_rate) / 10.0f);
+
+			mame_printf_verbose("%4dx%4d@%2d -> %f\n", (int)mode.w, (int)mode.h, (int) mode.refresh_rate, size_score);
+
+			// best so far?
+			if (size_score > best_score)
+			{
+				best_score = size_score;
+				*fswidth = mode.w;
+				*fsheight = mode.h;
+			}
+
+		}
+	}
+}
+#else
 static void pick_best_mode(sdl_window_info *window, int *fswidth, int *fsheight)
 {
 	int minimum_width, minimum_height, target_width, target_height;
@@ -924,7 +1002,7 @@ static void pick_best_mode(sdl_window_info *window, int *fswidth, int *fsheight)
 		minimum_height -= 4;
 	}
 
-#if defined(SDLMAME_WIN32) && !SDL_VERSION_ATLEAST(1,3,0)
+#if defined(SDLMAME_WIN32)
 	/*
 	 *  We need to do this here. If SDL_ListModes is
 	 * called in init_monitors, the call will crash
@@ -977,7 +1055,7 @@ static void pick_best_mode(sdl_window_info *window, int *fswidth, int *fsheight)
 		}
 	}
 }
-
+#endif
 
 //============================================================
 //  sdlwindow_video_window_update
@@ -1391,7 +1469,7 @@ static void get_max_bounds(sdl_window_info *window, int *window_width, int *wind
 	// constrain to fit
 	if (constrain)
 		constrain_to_aspect_ratio(window, &maxwidth, &maxheight, WMSZ_BOTTOMRIGHT);
-	else
+	//else
 	{
 		maxwidth -= WINDOW_DECORATION_WIDTH;
 		maxheight -= WINDOW_DECORATION_HEIGHT;

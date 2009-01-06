@@ -5,11 +5,33 @@
 
 	- Known bugs:
 	
-	  * SDL1.3/X11: Crash on switch to fullscreen. Bug fix submitted to SDL team.
 	  * SDL1.3/X11: Some compound keys, e.g. "'" are not supported by SDL driver
-	  * SDL1.3/X11: No -switchres because SDL does not support it right now.
-	  * SDL1.3/directfb: -switchres broken for directfb >= 1.2.0/works with 1.0.
 	  * SDL1.3: sdlvideofps does not take -numscreens>1 into account.
+	  * SDL1.3/WIN32: crashes with -rd d3d
+	  * SDL1.3/WIN32: resizing does not work
+
+	- fixed returning (w,h) = (0,0) in get_max_bounds 
+	- new video driver "sdl13" utilitizing SDL texture and line 
+	  drawing support. Accelerated drivers like directfb now 
+	  may attain opengl speed. DirectFB does with a radeon card.
+	  The driver determines which pixel formats perform best and 
+	  converts textures to these pixel formats. 
+	  Supported options:
+	  -waitvsync
+	  -filter
+	  -prescale
+	  Supported renderdrivers:
+	  X11: opengl, software, x11 (no artwork!)
+	  DirectFB: directfb, software, opengl (special setup, slow)
+	  Windows: software, gdi (no artwork)
+	- SDL1.3: Clear bck when moving
+	- SDL1.3: now compiles on win32
+	- SDL1.3: Support screen refresh rates, provided the sdl video
+	  layer supports them (e.g. X11).
+	- Use video_config.waitvsync (previously option was queried)
+	- -video soft / -sm  now supports -prescale
+	- removed reqwidth, reqheight from sdl_monitor_info; not used anywhere	
+	- removed layerconfig from sdl_video_config; not used anywhere	
 
 	- fixed yuv issues (firefox) / this was a bug I introduced
 	- removed deprecat.h from output.c
@@ -263,6 +285,7 @@
 #define SDLOPTVAL_OPENGL				"opengl"
 #define SDLOPTVAL_OPENGL16				"opengl16"
 #define SDLOPTVAL_SOFT					"soft"
+#define SDLOPTVAL_SDL13					"sdl13"
 
 #define SDLMAME_LED(x)					"led" #x
 

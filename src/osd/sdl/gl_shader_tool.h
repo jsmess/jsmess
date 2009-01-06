@@ -138,7 +138,7 @@ int gl_compile_shader_sources( GLhandleARB *program, GLhandleARB *vertex_shader,
 
 int gl_delete_shader( GLhandleARB *program, GLhandleARB *vertex_shader, GLhandleARB *fragment_shader );
 
-#if defined(SDLMAME_MACOSX) || defined(SDLMAME_WIN32)
+#if defined(SDLMAME_MACOSX) || (defined(SDLMAME_WIN32) && !(SDL_VERSION_ATLEAST(1,3,0)))
 #ifndef GL_ARB_shader_objects
     typedef char GLcharARB;
     typedef unsigned int GLhandleARB;

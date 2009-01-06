@@ -271,8 +271,15 @@ static void setup_texture(sdl_window_info *window, int tempwidth, int tempheight
 		sdl->yuv_bitmap = NULL;	
 	}
 
-	if (sdl_sm->is_scale)
+	if (sdl_sm->is_scale) 
+	{
 		render_target_get_minimum_size(window->target, &sdl->hw_scale_width, &sdl->hw_scale_height);
+		if (video_config.prescale)
+		{
+			sdl->hw_scale_width *= video_config.prescale;
+			sdl->hw_scale_height *= video_config.prescale;
+		}
+	}
 
 	if (sdl_sm->is_yuv)
 		sdl->yuv_bitmap = malloc_or_die(sdl->hw_scale_width * sdl->hw_scale_height * sizeof(UINT16));
@@ -280,8 +287,13 @@ static void setup_texture(sdl_window_info *window, int tempwidth, int tempheight
 	fmt = (sdl_sm->pixel_format ? sdl_sm->pixel_format : mode.format);
 
 	if (sdl_sm->is_scale)
-		sdl->texture_id = SDL_CreateTexture(fmt, SDL_TEXTUREACCESS_STREAMING, 
-				sdl->hw_scale_width * sdl_sm->mult_w, sdl->hw_scale_height * sdl_sm->mult_h);
+	{
+		int w = sdl->hw_scale_width * sdl_sm->mult_w;
+		int h = sdl->hw_scale_height * sdl_sm->mult_h;
+		
+		sdl->texture_id = SDL_CreateTexture(fmt, SDL_TEXTUREACCESS_STREAMING, w, h);
+		
+	}
 	else
 	{
 		sdl->texture_id = SDL_CreateTexture(fmt, SDL_TEXTUREACCESS_STREAMING, 
@@ -305,6 +317,13 @@ static void yuv_overlay_init(sdl_window_info *window)
 	int minimum_width, minimum_height;
 
 	render_target_get_minimum_size(window->target, &minimum_width, &minimum_height);
+
+	if (video_config.prescale)
+	{
+		minimum_width *= video_config.prescale;
+		minimum_height *= video_config.prescale;
+	}
+	
 	if (sdl->yuvsurf != NULL)
 	{
 		SDL_FreeYUVOverlay(sdl->yuvsurf);
@@ -401,6 +420,8 @@ static int drawsdl_window_create(sdl_window_info *window, int width, int height)
 		SDL_GetCurrentDisplayMode(&mode);
 		mode.w = width;
 		mode.h = height;
+		if (window->refresh)
+			mode.refresh_rate = window->refresh;
 		SDL_SetFullscreenDisplayMode(&mode);	// Try to set mode
 	}
 	else
@@ -420,7 +441,7 @@ static int drawsdl_window_create(sdl_window_info *window, int width, int height)
 
 	// create a texture
 	
-	if (options_get_bool(mame_options(), SDLOPTION_WAITVSYNC))	
+	if (video_config.waitvsync)	
 		SDL_CreateRenderer(window->window_id, -1, SDL_RENDERER_PRESENTFLIP2 | SDL_RENDERER_PRESENTDISCARD | SDL_RENDERER_PRESENTVSYNC);
 	else
 		SDL_CreateRenderer(window->window_id, -1, SDL_RENDERER_PRESENTFLIP2 | SDL_RENDERER_PRESENTDISCARD);
@@ -705,7 +726,9 @@ static int drawsdl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 	if (sdl->blittimer > 0)
 	{
 		/* SDL Underlays need alpha = 0 ! */
-		SDL_RenderFill(0,0,0,0 /*255*/,NULL);
+		SDL_SetRenderDrawColor(0,0,0,0);
+		SDL_RenderFill(NULL);
+		//SDL_RenderFill(0,0,0,0 /*255*/,NULL);
 		sdl->blittimer--;
 	}
 	

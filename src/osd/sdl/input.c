@@ -2,7 +2,7 @@
 //
 //  input.c - SDL implementation of MAME input routines
 //
-//  Copyright (c) 1996-2007, Nicola Salmoria and the MAME Team.
+//  Copyright (c) 1996-2009, Nicola Salmoria and the MAME Team.
 //  Visit http://mamedev.org for licensing and usage restrictions.
 //
 //  SDLMAME by Olivier Galibert and R. Belmont
@@ -47,7 +47,7 @@ enum
 };
 
 #define MAX_KEYS			256
-#define MAX_AXES			8
+#define MAX_AXES			32
 #define MAX_BUTTONS			32
 #define MAX_HATS			8
 #define MAX_POV				4
@@ -727,7 +727,7 @@ static void sdlinput_register_joysticks(running_machine *machine)
 			sprintf(tempname, "A%d %s", axis, devinfo->name);
 			input_device_item_add(devinfo->device, tempname, &devinfo->joystick.axes[axis], itemid, generic_axis_get_state);
 		}
-
+					     
 		// loop over all buttons
 		for (button = 0; button < SDL_JoystickNumButtons(joy); button++)
 		{
@@ -1265,9 +1265,11 @@ void sdlinput_poll(running_machine *machine)
 					{
 						devinfo->joystick.axes[event.jaxis.axis] = (event.jaxis.value * 2); 
 					}
-					if ((axis == 12) || (axis == 13))
+					else
 					{
-						devinfo->joystick.axes[event.jaxis.axis] = (event.jaxis.value / 2) + 16383; 
+						int magic = (event.jaxis.value / 2) + 16384;
+
+						devinfo->joystick.axes[event.jaxis.axis] = magic;
 					}
 				}
 				else
@@ -1436,6 +1438,10 @@ void sdlinput_poll(running_machine *machine)
 				app_has_mouse_focus = 0;
 				break;
 			}
+			case SDL_WINDOWEVENT_MOVED:
+				sdlwindow_clear(window);
+				focus_window = window;
+				break;
 			case SDL_WINDOWEVENT_RESIZED:
 				if (event.window.data1 != window->width || event.window.data2 != window->height)
 					sdlwindow_resize(window, event.window.data1, event.window.data2);

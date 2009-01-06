@@ -287,7 +287,7 @@ static void ShowError(const char *title, const char *message)
 	fprintf(stderr, "%s: %s\n", title, message);
 }
 
-#ifdef SDLMAME_WIN32
+#if defined(SDLMAME_WIN32)
 int SDL_main(int argc, char **argv);
 
 static BOOL OutOfMemory(void)
@@ -300,9 +300,11 @@ int main(int argc, char *argv[])
 {
 	size_t n;
 	char *bufp, *appname;
+
 	int status;
 
 	/* Get the class name from argv[0] */
+
 	appname = argv[0];
 	if ( (bufp=SDL_strrchr(argv[0], '\\')) != NULL ) {
 		appname = bufp+1;
@@ -348,7 +350,7 @@ int main(int argc, char *argv[])
 }
 #endif
 
-#ifndef SDLMAME_WIN32
+#if !defined(SDLMAME_WIN32)
 int main(int argc, char **argv)
 #else
 int SDL_main(int argc, char **argv)
@@ -584,7 +586,11 @@ void osd_init(running_machine *machine)
 	
 	if (!SDLMAME_INIT_IN_WORKER_THREAD)
 	{
+#if (SDL_VERSION_ATLEAST(1,3,0))
+		if (SDL_InitSubSystem(SDL_INIT_TIMER|SDL_INIT_AUDIO| SDL_INIT_VIDEO| SDL_INIT_JOYSTICK|SDL_INIT_NOPARACHUTE)) {
+#else
 		if (SDL_Init(SDL_INIT_TIMER|SDL_INIT_AUDIO| SDL_INIT_VIDEO| SDL_INIT_JOYSTICK|SDL_INIT_NOPARACHUTE)) {
+#endif
 			/* mame_printf_* not fully initialized yet */
 			ShowError("Could not initialize SDL", SDL_GetError());
 			exit(-1);

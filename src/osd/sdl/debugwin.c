@@ -9,7 +9,7 @@
 //
 //============================================================
 
-#if !defined(SDLMAME_WIN32) && !defined(SDLMAME_NO_X11) && !defined(SDLMAME_SOLARIS) && !defined(SDLMAME_OS2)
+#if !defined(NO_DEBUGGER)
 
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>

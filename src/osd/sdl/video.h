@@ -20,8 +20,11 @@
 
 #define MAX_VIDEO_WINDOWS			(4)
 
-#define VIDEO_MODE_SOFT				(0)
-#define VIDEO_MODE_OPENGL			(1)
+enum {
+	VIDEO_MODE_SOFT	= 0,
+	VIDEO_MODE_OPENGL,
+	VIDEO_MODE_SDL13
+};
 
 #define VIDEO_SCALE_MODE_NONE		(0)
 
@@ -33,9 +36,6 @@
 #define SDL_TEXFORMAT_RGB32_PALETTED	(2)
 #define SDL_TEXFORMAT_YUY16				(3)
 #define SDL_TEXFORMAT_YUY16_PALETTED	(4)
-#define SDL_TEXFORMAT_PALETTE16			(5)
-#define SDL_TEXFORMAT_RGB15				(6)
-#define SDL_TEXFORMAT_RGB15_PALETTED	(7)
 #define SDL_TEXFORMAT_PALETTE16			(5)
 #define SDL_TEXFORMAT_RGB15				(6)
 #define SDL_TEXFORMAT_RGB15_PALETTED	(7)
@@ -61,12 +61,12 @@ struct _sdl_monitor_info
 	int					monitor_height;
 	char				monitor_device[64];
 	float				aspect;					// computed/configured aspect ratio of the physical device
-	int					reqwidth;				// requested width for this monitor
-	int					reqheight;				// requested height for this monitor
 	int					center_width;			// width of first physical screen for centering
 	int					center_height;			// height of first physical screen for centering
+#if !SDL_VERSION_ATLEAST(1,3,0)
 	//FIXME: This should not be a SDL-type
 	SDL_Rect **modes;							// supported modes
+#endif
 };
 
 
@@ -94,7 +94,6 @@ struct _sdl_video_config
 	int					prescale;				// prescale factor (not currently supported)
 	int					keepaspect;	 			// keep aspect ratio?
 	int					numscreens;	 			// number of screens
-	int					layerconfig;				// default configuration of layers
 	int					centerh;
 	int					centerv;
 
@@ -153,6 +152,6 @@ int sdlvideo_init(running_machine *machine);
 
 void sdlvideo_monitor_refresh(sdl_monitor_info *monitor);
 float sdlvideo_monitor_get_aspect(sdl_monitor_info *monitor);
-sdl_monitor_info *sdlvideo_monitor_from_handle(UINT32 monitor);
+sdl_monitor_info *sdlvideo_monitor_from_handle(UINT32 monitor); //FIXME: Remove? not referenced
 
 #endif

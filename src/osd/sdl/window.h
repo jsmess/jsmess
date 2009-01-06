@@ -31,58 +31,6 @@ typedef UINT32 HashT;
 //  TYPE DEFINITIONS
 //============================================================
 
-typedef struct _texture_info texture_info;
-
-#if USE_OPENGL
-typedef void (*texture_copy_func)(texture_info *texture, const render_texinfo *texsource);
-#endif
-	
-/* texture_info holds information about a texture */
-struct _texture_info
-{
-	texture_info *		next;				// next texture in the list
-	HashT				hash;				// hash value for the texture (must be >= pointer size)
-	UINT32				flags;				// rendering flags
-	render_texinfo		texinfo;			// copy of the texture info
-	int					rawwidth, rawheight;	// raw width/height of the texture
-	int					rawwidth_create;	// raw width/height, pow2 compatible, if needed
-	int                 rawheight_create;	// (create and initial set the texture, not for copy!)
-	int					type;				// what type of texture are we?
-	int					format;				// texture format
-	int					borderpix;			// do we have a 1 pixel border?
-	int					xprescale;			// what is our X prescale factor?
-	int					yprescale;			// what is our Y prescale factor?
-	int					prescale_effect;	// which prescale effect (if any) to use
-	int					nocopy;				// must the texture date be copied?
-	
-	UINT32				texture;			// OpenGL texture "name"/ID
-#if USE_OPENGL
-	const GLint *		texProperties;		// texture properties
-	texture_copy_func	texCopyFn;			// texture copy function, !=NULL if !nocopy
-	GLenum				texTarget;			// OpenGL texture target
-	int					texpow2;			// Is this texture pow2
-	
-	UINT32				mpass_dest_idx;			// Multipass dest idx [0..1]
-	UINT32				mpass_textureunit[2];	// texture unit names for GLSL
-	
-	UINT32				mpass_texture_mamebm[2];// Multipass OpenGL texture "name"/ID for the shader
-	UINT32				mpass_fbo_mamebm[2];	// framebuffer object for this texture, multipass
-	UINT32				mpass_texture_scrn[2];	// Multipass OpenGL texture "name"/ID for the shader
-	UINT32				mpass_fbo_scrn[2];		// framebuffer object for this texture, multipass
-	
-	UINT32				lut_texture;			// LUT OpenGL texture "name"/ID for the shader
-	int					lut_table_width;		// LUT table width 
-	int					lut_table_height;		// LUT table height
-	
-	UINT32				pbo;					// pixel buffer object for this texture (DYNAMIC only!)
-	UINT32				*data;					// pixels for the texture
-	int					data_own;				// do we own / allocated it ?
-	UINT32				*effectbuf;				// buffer for intermediate effect results or NULL
-	GLfloat				texCoord[8];
-	GLuint				texCoordBufferName;
-#endif
-};
-
 typedef struct _sdl_window_info sdl_window_info;
 struct _sdl_window_info
 {
@@ -180,6 +128,8 @@ void sdlwindow_modify_prescale(running_machine *machine, sdl_window_info *window
 void sdlwindow_modify_effect(running_machine *machine, sdl_window_info *window, int dir);
 void sdlwindow_toggle_draw(running_machine *machine, sdl_window_info *window);
 void sdlwindow_resize(sdl_window_info *window, INT32 width, INT32 height);
+void sdlwindow_clear(sdl_window_info *window);
+
 
 //============================================================
 // PROTOTYPES - drawsdl.c
@@ -190,9 +140,15 @@ const char *drawsdl_scale_mode_str(int index);
 int drawsdl_scale_mode(const char *s);
 
 //============================================================
-// PROTOTYPES - drawsdl.c
+// PROTOTYPES - drawogl.c
 //============================================================
 
 int drawogl_init(sdl_draw_info *callbacks);
+
+//============================================================
+// PROTOTYPES - draw13.c
+//============================================================
+
+int draw13_init(sdl_draw_info *callbacks);
 
 #endif /* __SDLWINDOW__ */
