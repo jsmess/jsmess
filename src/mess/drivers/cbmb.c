@@ -414,7 +414,7 @@ static MACHINE_DRIVER_START( cbm600 )
 	MDRV_QUICKLOAD_ADD(cbmb, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	/* cia */
-	MDRV_CIA6526_ADD("cia", CIA6526R1, 0, cbmb_cia)
+	MDRV_CIA6526_ADD("cia", CIA6526R1, 7833600, cbmb_cia)
 
 	/* tpi */
 	MDRV_TPI6525_ADD("tpi6525_0", cbmb_tpi_0_intf)
@@ -483,7 +483,7 @@ static MACHINE_DRIVER_START( p500 )
 	MDRV_QUICKLOAD_ADD(p500, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	/* cia */
-	MDRV_CIA6526_ADD("cia", CIA6526R1, 0, cbmb_cia)
+	MDRV_CIA6526_ADD("cia", CIA6526R1, VIC6567_CLOCK, cbmb_cia)
 
 	/* tpi */
 	MDRV_TPI6525_ADD("tpi6525_0", cbmb_tpi_0_intf)
