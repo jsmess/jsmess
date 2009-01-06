@@ -242,6 +242,18 @@ static INPUT_PORTS_START( gg )
 	PORT_START("START")
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START ) PORT_NAME("Start") /* Game Gear START */
+
+	PORT_START("CTRLSEL")	/* Controller selection */
+	PORT_CATEGORY_CLASS( 0x0F, 0x00, "Player 1 Controller" )
+	PORT_CATEGORY_ITEM( 0x00, DEF_STR( Joystick ), 10 )
+//  PORT_CATEGORY_ITEM( 0x01, "Light Phaser", 11 )
+	PORT_CATEGORY_ITEM( 0x02, "Sega Paddle Control", 12 )
+	PORT_CATEGORY_ITEM( 0x03, "Sega Sports Pad", 13 )
+	PORT_CATEGORY_CLASS( 0xF0, 0x00, "Player 2 Controller" )
+	PORT_CATEGORY_ITEM( 0x00, DEF_STR( Joystick ), 20 )
+//  PORT_CATEGORY_ITEM( 0x10, "Light Phaser", 21 )
+	PORT_CATEGORY_ITEM( 0x20, "Sega Paddle Control", 22 )
+	PORT_CATEGORY_ITEM( 0x30, "Sega Sports Pad", 23 )
 INPUT_PORTS_END
 
 static PALETTE_INIT( sms ) {
