@@ -82,6 +82,7 @@ would just have taken three extra tracks on the main board and a OR gate in an A
 #include "cpu/tms9900/tms9900.h"
 
 static int ROM_paged;
+static int state = ASSERT_LINE;
 
 static DRIVER_INIT( ti99_2_24 )
 {
@@ -100,6 +101,7 @@ static DRIVER_INIT( ti99_2_32 )
 
 static MACHINE_RESET( ti99_2 )
 {
+	state = ASSERT_LINE;
 	if (! ROM_paged)
 		memory_set_bankptr(machine, 1, memory_region(machine, "main")+0x4000);
 	else
@@ -108,8 +110,8 @@ static MACHINE_RESET( ti99_2 )
 
 static INTERRUPT_GEN( ti99_2_vblank_interrupt )
 {
-	/* We trigger a level-4 interrupt.  The PULSE_LINE is a mere guess. */
-	cpu_set_input_line(device, 1, PULSE_LINE);
+	cpu_set_input_line(device, 1, state);
+	state = (state == ASSERT_LINE) ? CLEAR_LINE : ASSERT_LINE;
 }
 
 

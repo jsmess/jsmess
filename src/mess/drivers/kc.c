@@ -345,7 +345,8 @@ static MACHINE_DRIVER_START( cpu_kc_disc )
 	MDRV_CPU_PROGRAM_MAP(kc85_disc_hw_mem, 0)
 	MDRV_CPU_IO_MAP(kc85_disc_hw_io, 0)
 
-	MDRV_Z80CTC_ADD( "z80ctc_1", 0, kc85_disc_ctc_intf )
+	//FIX: put right clock value for CTC
+	MDRV_Z80CTC_ADD( "z80ctc_1", KC85_4_CLOCK, kc85_disc_ctc_intf )
 	
 	MDRV_NEC765A_ADD("nec765", kc_fdc_interface)
 MACHINE_DRIVER_END
