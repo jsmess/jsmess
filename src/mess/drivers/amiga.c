@@ -328,7 +328,7 @@ static MACHINE_DRIVER_START( ntsc )
 
 	/* cia */
 	MDRV_CIA8520_ADD("cia_0", AMIGA_68000_NTSC_CLOCK / 10, cia_0_ntsc_intf)
-	MDRV_CIA8520_ADD("cia_1", 0, cia_1_intf)
+	MDRV_CIA8520_ADD("cia_1", AMIGA_68000_NTSC_CLOCK, cia_1_intf)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( a1000n )
@@ -365,7 +365,7 @@ static MACHINE_DRIVER_START( cdtv )
 	MDRV_CIA8520_REMOVE("cia_0")
 	MDRV_CIA8520_REMOVE("cia_1")
 	MDRV_CIA8520_ADD("cia_0", CDTV_CLOCK_X1 / 40, cia_0_cdtv_intf)
-	MDRV_CIA8520_ADD("cia_1", 0, cia_1_cdtv_intf)
+	MDRV_CIA8520_ADD("cia_1", CDTV_CLOCK_X1 / 4, cia_1_cdtv_intf)
 MACHINE_DRIVER_END
 
 
