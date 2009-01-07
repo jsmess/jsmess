@@ -156,7 +156,7 @@ static void c64_nmi(running_machine *machine)
 static UINT8 c64_cia0_port_a_r (const device_config *device)
 {
 	UINT8 value = 0xff;
-	UINT8 cia0portb = cia_get_output_b(0);
+	UINT8 cia0portb = cia_get_output_b(devtag_get_device(device->machine, CIA6526R1, "cia_0"));
 
 	if (!(cia0portb & 0x80))
 	{
