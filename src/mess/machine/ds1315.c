@@ -1,124 +1,209 @@
-/* This is an emulation of Dallas Semiconductor's Phantom Time Chip.
-   DS1315.
+/*********************************************************************
 
-   by tim lindner, November 2001.
-*/
+	ds1315.c
 
-#include "driver.h"
+	Dallas Semiconductor's Phantom Time Chip DS1315.
+
+	by tim lindner, November 2001.
+
+*********************************************************************/
+
 #include "ds1315.h"
 
 
-enum
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef enum
 {
-	ds_seek_matching,
-	ds_calendar_io
+	DS_SEEK_MATCHING,
+	DS_CALENDAR_IO
+} ds1315_mode_t;
+
+
+typedef struct _ds1315_t ds1315_t;
+struct _ds1315_t
+{
+	int count;
+	ds1315_mode_t mode;
+	UINT8 raw_data[8*8];
 };
 
-static void ds1315_fill_raw_data( running_machine *machine );
-static void ds1315_input_raw_data( void );
 
-static int ds1315_count;
-static int ds1315_mode;
-static int ds1315_raw_data[8*8];
-static const int ds1315_pattern[] = {  1, 0, 1, 0, 0, 0, 1, 1,
-							     0, 1, 0, 1, 1, 1, 0, 0,
-							     1, 1, 0, 0, 0, 1, 0, 1,
-							     0, 0, 1, 1, 1, 0, 1, 0,
-							     1, 0, 1, 0, 0, 0, 1, 1,
-							     0, 1, 0, 1, 1, 1, 0, 0,
-							     1, 1, 0, 0, 0, 1, 0, 1,
-							     0, 0, 1, 1, 1, 0, 1, 0 };
+/***************************************************************************
+    LOCAL VARIABLES
+***************************************************************************/
 
-void ds1315_init( void )
+static const UINT8 ds1315_pattern[] =
 {
-	ds1315_count = 0;
-	ds1315_mode = ds_seek_matching;
+	1, 0, 1, 0, 0, 0, 1, 1,
+	0, 1, 0, 1, 1, 1, 0, 0,
+	1, 1, 0, 0, 0, 1, 0, 1,
+	0, 0, 1, 1, 1, 0, 1, 0,
+	1, 0, 1, 0, 0, 0, 1, 1,
+	0, 1, 0, 1, 1, 1, 0, 0,
+	1, 1, 0, 0, 0, 1, 0, 1,
+	0, 0, 1, 1, 1, 0, 1, 0
+};
+
+
+/***************************************************************************
+    PROTOTYPES
+***************************************************************************/
+
+static void ds1315_fill_raw_data(const device_config *device);
+static void ds1315_input_raw_data(const device_config *device);
+
+
+
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
+
+INLINE ds1315_t *get_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->type == DS1315);
+	return (ds1315_t *) device->token;
 }
 
- READ8_HANDLER ( ds1315_r_0 )
+
+/***************************************************************************
+    IMPLEMENTATION
+***************************************************************************/
+
+/*-------------------------------------------------
+    DEVICE_START( ds1315 )
+-------------------------------------------------*/
+
+static DEVICE_START(ds1315)
 {
-	if( ds1315_pattern[ ds1315_count++ ] == 0 )
+	ds1315_t *ds1315 = get_token(device);
+
+	memset(ds1315, 0, sizeof(*ds1315));
+	ds1315->count = 0;
+	ds1315->mode = DS_SEEK_MATCHING;
+
+	return DEVICE_START_OK;
+}
+
+
+/*-------------------------------------------------
+    DEVICE_START( ds1315 )
+-------------------------------------------------*/
+
+READ8_DEVICE_HANDLER( ds1315_r_0 )
+{
+	ds1315_t *ds1315 = get_token(device);
+
+	if (ds1315_pattern[ds1315->count++] == 0)
 	{
-		if( ds1315_count == 64 )
+		if (ds1315->count == 64)
 		{
 			/* entire pattern matched */
-			ds1315_count = 0;
-			ds1315_mode = ds_calendar_io;
-			ds1315_fill_raw_data(space->machine);
+			ds1315->count = 0;
+			ds1315->mode = DS_CALENDAR_IO;
+			ds1315_fill_raw_data(device);
 		}
 
 		return 0;
 	}
 
-	ds1315_count = 0;
-	ds1315_mode = ds_seek_matching;
-
+	ds1315->count = 0;
+	ds1315->mode = DS_SEEK_MATCHING;
 	return 0;
 }
 
- READ8_HANDLER ( ds1315_r_1 )
+
+/*-------------------------------------------------
+    ds1315_r_1
+-------------------------------------------------*/
+
+READ8_DEVICE_HANDLER ( ds1315_r_1 )
 {
-	if( ds1315_pattern[ ds1315_count++ ] == 1 )
-		return 0;
+	ds1315_t *ds1315 = get_token(device);
 
-	ds1315_count = 0;
-	ds1315_mode = ds_seek_matching;
-	return 0;
-}
-
- READ8_HANDLER ( ds1315_r_data )
-{
-	UINT8	result;
-
-	if( ds1315_mode == ds_calendar_io )
+	if (ds1315_pattern[ ds1315->count++ ] == 1)
 	{
-		result = ds1315_raw_data[ ds1315_count++ ];
+		ds1315->count %= 64;
+		return 0;
+	}
 
-		if( ds1315_count == 64 )
+	ds1315->count = 0;
+	ds1315->mode = DS_SEEK_MATCHING;
+	return 0;
+}
+
+
+/*-------------------------------------------------
+    ds1315_r_data
+-------------------------------------------------*/
+
+READ8_DEVICE_HANDLER ( ds1315_r_data )
+{
+	UINT8 result;
+	ds1315_t *ds1315 = get_token(device);
+
+	if (ds1315->mode == DS_CALENDAR_IO)
+	{
+		result = ds1315->raw_data[ ds1315->count++ ];
+
+		if (ds1315->count == 64)
 		{
-			ds1315_mode = ds_seek_matching;
-			ds1315_count = 0;
+			ds1315->mode = DS_SEEK_MATCHING;
+			ds1315->count = 0;
 		}
 
 		return result;
 	}
 
-	ds1315_count = 0;
+	ds1315->count = 0;
 	return 0;
 }
 
-WRITE8_HANDLER ( ds1315_w_data )
+
+/*-------------------------------------------------
+    ds1315_w_data
+-------------------------------------------------*/
+
+WRITE8_DEVICE_HANDLER ( ds1315_w_data )
 {
+	ds1315_t *ds1315 = get_token(device);
 
-	if( ds1315_mode == ds_calendar_io )
+	if (ds1315->mode == DS_CALENDAR_IO)
 	{
-		ds1315_raw_data[ ds1315_count++ ] = data & 0x01;
+		ds1315->raw_data[ds1315->count++] = data & 0x01;
 
-		if( ds1315_count == 64 )
+		if (ds1315->count == 64)
 		{
-			ds1315_mode = ds_seek_matching;
-			ds1315_count = 0;
-			ds1315_input_raw_data();
+			ds1315->mode = DS_SEEK_MATCHING;
+			ds1315->count = 0;
+			ds1315_input_raw_data(device);
 		}
-
 		return;
 	}
 
-	ds1315_count = 0;
-	return;
+	ds1315->count = 0;
 }
 
-static void ds1315_fill_raw_data( running_machine *machine )
+
+/*-------------------------------------------------
+    ds1315_fill_raw_data
+-------------------------------------------------*/
+
+static void ds1315_fill_raw_data(const device_config *device)
 {
 	/* This routine will (hopefully) call a standard 'C' library routine to get the current
 	   date and time and then fill in the raw data struct.
 	*/
 
 	mame_system_time systime;
+	ds1315_t *ds1315 = get_token(device);
 	int raw[8], i, j;
 
 	/* get the current date/time from the core */
-	mame_get_current_datetime(machine, &systime);
+	mame_get_current_datetime(device->machine, &systime);
 
 	raw[0] = 0;	/* tenths and hundreths of seconds are always zero */
 	raw[1] = dec_2_bcd(systime.local_time.second);
@@ -132,19 +217,20 @@ static void ds1315_fill_raw_data( running_machine *machine )
 
 	/* Ok now we have the raw bcd bytes. Now we need to push them into our bit array */
 
-	for( i=0; i<64; i++ )
+	for (i = 0; i < 64; i++)
 	{
 		j = i / 8;
-		ds1315_raw_data[i] = (raw[j] & 0x0001);
+		ds1315->raw_data[i] = (raw[j] & 0x0001);
 		raw[j] = raw[j] >> 1;
 	}
-
-	/* After reading the sources for localtime(), I have determined the the
-	   buffer returned is a global variable, thus it does not need to be free()d.
-	*/
 }
 
-static void ds1315_input_raw_data( void )
+
+/*-------------------------------------------------
+    ds1315_input_raw_data
+-------------------------------------------------*/
+
+static void ds1315_input_raw_data(const device_config *device)
 {
 	/* This routine is called when new date and time has been written to the
 	   clock chip. Currently we ignore setting the date and time in the clock
@@ -154,3 +240,45 @@ static void ds1315_input_raw_data( void )
 	*/
 }
 
+
+/*-------------------------------------------------
+    DEVICE_SET_INFO( ds1315 )
+-------------------------------------------------*/
+
+static DEVICE_SET_INFO( ds1315 )
+{
+	switch (state)
+	{
+		/* no parameters to set */
+	}
+}
+
+
+
+/*-------------------------------------------------
+    DEVICE_GET_INFO( ds1315 )
+-------------------------------------------------*/
+
+DEVICE_GET_INFO( ds1315 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(ds1315_t);					break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
+		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(ds1315); break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(ds1315);	break;
+		case DEVINFO_FCT_STOP:							/* Nothing */								break;
+		case DEVINFO_FCT_RESET:							/* Nothing */								break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Dallas Semiconductor DS1315");	break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Dallas Semiconductor DS1315");	break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");						break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);					break;
+		case DEVINFO_STR_CREDITS:						/* Nothing */								break;
+	}
+}

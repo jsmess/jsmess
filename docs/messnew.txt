@@ -26,7 +26,7 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-(none)
+- Changed the DS1315 implementation to be a device.  [Nathan Woods]
 
 
 

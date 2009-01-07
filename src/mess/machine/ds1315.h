@@ -1,11 +1,43 @@
-/* This is an emulation of Dallas Semiconductor's Phantom Time Chip.
-   DS1315.
+/*********************************************************************
 
-   by tim lindner, November 2001.
-*/
+	ds1315.h
 
-void ds1315_init( void );
- READ8_HANDLER ( ds1315_r_0 );
- READ8_HANDLER ( ds1315_r_1 );
- READ8_HANDLER ( ds1315_r_data );
-WRITE8_HANDLER ( ds1315_w_data );
+	Dallas Semiconductor's Phantom Time Chip DS1315.
+
+	by tim lindner, November 2001.
+
+*********************************************************************/
+
+#ifndef __DS1315_H__
+#define __DS1315_H__
+
+#include "driver.h"
+
+
+/***************************************************************************
+    MACROS
+***************************************************************************/
+
+#define DS1315			DEVICE_GET_INFO_NAME(ds1315)
+
+
+
+/***************************************************************************
+    DEVICE CONFIGURATION MACROS
+***************************************************************************/
+
+#define MDRV_DS1315_ADD(_tag) \
+	MDRV_DEVICE_ADD(_tag, DS1315, 0)
+
+
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
+
+DEVICE_GET_INFO( ds1315 );
+READ8_DEVICE_HANDLER( ds1315_r_0 );
+READ8_DEVICE_HANDLER( ds1315_r_1 );
+READ8_DEVICE_HANDLER( ds1315_r_data );
+WRITE8_DEVICE_HANDLER( ds1315_w_data );
+
+#endif /* __DS1315_H__ */

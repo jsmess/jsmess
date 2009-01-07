@@ -408,7 +408,6 @@ static rtc_type_t real_time_clock(running_machine *machine)
 static UINT8 fdc_coco3plus_r(running_machine *machine, coco_cartridge *cartridge, UINT16 addr)
 {
 	const device_config *dev;
-	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
 	UINT8 result = fdc_coco_r(machine, cartridge, addr);
 
 	switch(addr)
@@ -423,17 +422,26 @@ static UINT8 fdc_coco3plus_r(running_machine *machine, coco_cartridge *cartridge
 
 		case 0x38:	/* FF78 */
 			if (real_time_clock(machine) == RTC_CLOUD9)
-				ds1315_r_0(space, addr);
+			{
+				dev = device_list_find_by_tag(machine->config->devicelist, DS1315, "cloud9");
+				ds1315_r_0(dev, addr);
+			}
 			break;
 
 		case 0x39:	/* FF79 */
 			if (real_time_clock(machine) == RTC_CLOUD9)
-				ds1315_r_1(space, addr);
+			{
+				dev = device_list_find_by_tag(machine->config->devicelist, DS1315, "cloud9");
+				ds1315_r_1(dev, addr);
+			}
 			break;
 
 		case 0x3C:	/* FF7C */
 			if (real_time_clock(machine) == RTC_CLOUD9)
-				result = ds1315_r_data(space, addr);
+			{
+				dev = device_list_find_by_tag(machine->config->devicelist, DS1315, "cloud9");
+				result = ds1315_r_data(dev, addr);
+			}
 			break;
 
 		case 0x40:

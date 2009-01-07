@@ -16,6 +16,7 @@
 #include "machine/6821pia.h"
 #include "video/m6847.h"
 #include "machine/msm6242.h"
+#include "machine/ds1315.h"
 #include "machine/6883sam.h"
 #include "includes/coco.h"
 #include "devices/basicdsk.h"
@@ -864,6 +865,7 @@ static MACHINE_DRIVER_START( coco )
 
 	/* devices */
 	MDRV_MSM6242_ADD("disto")
+	MDRV_DS1315_ADD("cloud9")
 
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
@@ -903,6 +905,7 @@ static MACHINE_DRIVER_START( coco2 )
 
 	/* devices */
 	MDRV_MSM6242_ADD("disto")
+	MDRV_DS1315_ADD("cloud9")
 
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
@@ -942,6 +945,7 @@ static MACHINE_DRIVER_START( coco2b )
 
 	/* devices */
 	MDRV_MSM6242_ADD("disto")
+	MDRV_DS1315_ADD("cloud9")
 
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
@@ -991,6 +995,7 @@ static MACHINE_DRIVER_START( coco3 )
 	/* devices */
 	MDRV_COCO_VHD_ADD("vhd")
 	MDRV_MSM6242_ADD("disto")
+	MDRV_DS1315_ADD("cloud9")
 
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
