@@ -636,7 +636,7 @@ static VIDEO_START( pet_crtc )
 
 static VIDEO_UPDATE( pet_crtc )
 {
-	const device_config *mc6845 = device_list_find_by_tag(screen->machine->config->devicelist, MC6845, "crtc");
+	const device_config *mc6845 = devtag_get_device(screen->machine, MC6845, "crtc");
 	mc6845_update(mc6845, bitmap, cliprect);
 	return 0;
 }

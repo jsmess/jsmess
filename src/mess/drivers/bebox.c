@@ -35,8 +35,8 @@
 #include "formats/pc_dsk.h"
 
 
-static READ8_HANDLER(at_dma8237_1_r)  { return dma8237_r((device_config*)device_list_find_by_tag( space->machine->config->devicelist, DMA8237, "dma8237_2" ), offset / 2); }
-static WRITE8_HANDLER(at_dma8237_1_w) { dma8237_w((device_config*)device_list_find_by_tag( space->machine->config->devicelist, DMA8237, "dma8237_2" ), offset / 2, data); }
+static READ8_HANDLER(at_dma8237_1_r)  { return dma8237_r((device_config*)devtag_get_device(space->machine, DMA8237, "dma8237_2"), offset / 2); }
+static WRITE8_HANDLER(at_dma8237_1_w) { dma8237_w((device_config*)devtag_get_device(space->machine, DMA8237, "dma8237_2"), offset / 2, data); }
 
 static READ64_HANDLER( bebox_dma8237_1_r )
 {

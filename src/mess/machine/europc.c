@@ -170,7 +170,7 @@ WRITE8_HANDLER( europc_pio_w )
 		europc_pio.port61=data;
 //		if (data==0x30) pc1640.port62=(pc1640.port65&0x10)>>4;
 //		else if (data==0x34) pc1640.port62=pc1640.port65&0xf;
-		pit8253_gate_w( (device_config*)device_list_find_by_tag( space->machine->config->devicelist, PIT8253, "pit8253" ), 2, data & 1);
+		pit8253_gate_w( (device_config*)devtag_get_device(space->machine, PIT8253, "pit8253"), 2, data & 1);
 		pc_speaker_set_spkrdata( data & 0x02 );
 		pc_keyb_set_clock(data&0x40);
 		break;
@@ -192,7 +192,7 @@ WRITE8_HANDLER( europc_pio_w )
 		data=europc_pio.port61;
 		break;
 	case 2:
-		if (pit8253_get_output(device_list_find_by_tag( space->machine->config->devicelist, PIT8253, "pit8253" ),2)) data|=0x20;
+		if (pit8253_get_output(devtag_get_device(space->machine, PIT8253, "pit8253"),2)) data|=0x20;
 		break;
 	}
 	return data;

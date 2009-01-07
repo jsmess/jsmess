@@ -213,7 +213,7 @@ READ8_DEVICE_HANDLER( aim65_via0_b_r )
 
 MACHINE_START( aim65 )
 {
-	const device_config *via_0 = device_list_find_by_tag(machine->config->devicelist, VIA6522, "via6522_0");
+	const device_config *via_0 = devtag_get_device(machine, VIA6522, "via6522_0");
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
 	/* Init RAM */

@@ -208,7 +208,7 @@ static READ8_HANDLER(apf_imagination_pia_in_b_func)
 
 	data = 0x000;
 
-	if (cassette_input(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" )) > 0.0038)
+	if (cassette_input(devtag_get_device(space->machine, CASSETTE, "cassette")) > 0.0038)
 		data =(1<<7);
 
 	return data;
@@ -255,12 +255,12 @@ static WRITE8_HANDLER(apf_imagination_pia_out_b_func)
 	keyboard_data = input_port_read(space->machine, keynames[keyboard_line]);
 
 	/* bit 4: cassette motor control */
-	cassette_change_state(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" ),
+	cassette_change_state(devtag_get_device(space->machine, CASSETTE, "cassette"),
 		(data & 0x10) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,
 		CASSETTE_MASK_MOTOR);
 
 	/* bit 6: cassette write */
-	cassette_output(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" ),
+	cassette_output(devtag_get_device(space->machine, CASSETTE, "cassette"),
 		(data & 0x40) ? -1.0 : 1.0);
 }
 
@@ -340,7 +340,7 @@ static MACHINE_START( apf_m1000 )
 static WRITE8_HANDLER(apf_dischw_w)
 {
 	int drive;
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD179X, "wd179x");
 
 	/* bit 3 is index of drive to select */
 	drive = (data>>3) & 0x01;
@@ -363,42 +363,42 @@ static WRITE8_HANDLER(serial_w)
 
 static WRITE8_HANDLER(apf_wd179x_command_w)
 {	
-	wd17xx_command_w((device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x"), offset,~data);
+	wd17xx_command_w((device_config*)devtag_get_device(space->machine, WD179X, "wd179x"), offset,~data);
 }
 
 static WRITE8_HANDLER(apf_wd179x_track_w)
 {
-	wd17xx_track_w((device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x"), offset,~data);
+	wd17xx_track_w((device_config*)devtag_get_device(space->machine, WD179X, "wd179x"), offset,~data);
 }
 
 static WRITE8_HANDLER(apf_wd179x_sector_w)
 {
-	wd17xx_sector_w((device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x"), offset,~data);
+	wd17xx_sector_w((device_config*)devtag_get_device(space->machine, WD179X, "wd179x"), offset,~data);
 }
 
 static WRITE8_HANDLER(apf_wd179x_data_w)
 {
-	wd17xx_data_w((device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x"), offset,~data);
+	wd17xx_data_w((device_config*)devtag_get_device(space->machine, WD179X, "wd179x"), offset,~data);
 }
 
 static READ8_HANDLER(apf_wd179x_status_r)
 {
-	return ~wd17xx_status_r((device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x"), offset);
+	return ~wd17xx_status_r((device_config*)devtag_get_device(space->machine, WD179X, "wd179x"), offset);
 }
 
 static READ8_HANDLER(apf_wd179x_track_r)
 {
-	return ~wd17xx_track_r((device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x"), offset);
+	return ~wd17xx_track_r((device_config*)devtag_get_device(space->machine, WD179X, "wd179x"), offset);
 }
 
 static READ8_HANDLER(apf_wd179x_sector_r)
 {
-	return ~wd17xx_sector_r((device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x"), offset);
+	return ~wd17xx_sector_r((device_config*)devtag_get_device(space->machine, WD179X, "wd179x"), offset);
 }
 
 static READ8_HANDLER(apf_wd179x_data_r)
 {
-	return wd17xx_data_r((device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x"), offset);
+	return wd17xx_data_r((device_config*)devtag_get_device(space->machine, WD179X, "wd179x"), offset);
 }
 
 static ADDRESS_MAP_START(apf_imagination_map, ADDRESS_SPACE_PROGRAM, 8)

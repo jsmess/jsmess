@@ -207,7 +207,7 @@ static void kim1_u2_write_b(const device_config *device, UINT8 newdata, UINT8 ol
 	if ( newdata & 0x20 )
 	{
 		/* cassette write/speaker update */
-		cassette_output( device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" ), ( newdata & 0x80 ) ? -1.0 : 1.0 );
+		cassette_output( devtag_get_device(device->machine, CASSETTE, "cassette"), ( newdata & 0x80 ) ? -1.0 : 1.0 );
 	}
 
 	/* Set IRQ when bit 7 is cleared */
@@ -256,7 +256,7 @@ static const miot6530_interface kim1_u3_miot6530_interface =
 
 static TIMER_CALLBACK( kim1_cassette_input )
 {
-	double tap_val = cassette_input( device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ) );
+	double tap_val = cassette_input( devtag_get_device(machine, CASSETTE, "cassette") );
 
 	if ( tap_val <= 0 )
 	{

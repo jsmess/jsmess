@@ -455,7 +455,7 @@ static int load_pak_into_region(const device_config *image, int *pakbase, int *p
 
 static void pak_load_trailer(running_machine *machine, const pak_decodedtrailer *trailer)
 {
-	device_config *sam = (device_config*)device_list_find_by_tag( machine->config->devicelist, SAM6883, "sam");
+	device_config *sam = (device_config*)devtag_get_device(machine, SAM6883, "sam");
 	cpu_set_reg(machine->cpu[0], M6809_PC, trailer->reg_pc);
 	cpu_set_reg(machine->cpu[0], M6809_X, trailer->reg_x);
 	cpu_set_reg(machine->cpu[0], M6809_Y, trailer->reg_y);
@@ -1120,22 +1120,22 @@ static int coco_hiresjoy_ry(running_machine *machine)
 
 static const device_config *cartslot_image(running_machine *machine)
 {
-	return device_list_find_by_tag( machine->config->devicelist, CARTSLOT, "cart" );
+	return devtag_get_device(machine, CARTSLOT, "cart");
 }
 
 static const device_config *cassette_device_image(running_machine *machine)
 {
-	return device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" );
+	return devtag_get_device(machine, CASSETTE, "cassette");
 }
 
 static const device_config *bitbanger_image(running_machine *machine)
 {
-	return device_list_find_by_tag(machine->config->devicelist, BITBANGER, "bitbanger");
+	return devtag_get_device(machine, BITBANGER, "bitbanger");
 }
 
 static const device_config *printer_image(running_machine *machine)
 {
-	return device_list_find_by_tag(machine->config->devicelist, PRINTER, "printer");
+	return devtag_get_device(machine, PRINTER, "printer");
 }
 
 static int get_soundmux_status(void)
@@ -1215,7 +1215,7 @@ READ8_HANDLER ( dgnalpha_psg_porta_read )
 
 WRITE8_HANDLER ( dgnalpha_psg_porta_write )
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD179X, "wd179x");
 	/* Bits 0..3 are the drive select lines for the internal floppy interface */
 	/* Bit 4 is the motor on, in the real hardware these are inverted on their way to the drive */
 	/* Bits 5,6,7 are connected to /DDEN, ENP and 5/8 on the WD2797 */
@@ -1671,7 +1671,7 @@ static WD17XX_CALLBACK( dgnalpha_fdc_callback )
 /* The Dragon Alpha hardware reverses the order of the WD2797 registers */
 READ8_HANDLER(wd2797_r)
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD179X, "wd179x");
 	int result = 0;
 
 	switch(offset & 0x03)
@@ -1697,7 +1697,7 @@ READ8_HANDLER(wd2797_r)
 
 WRITE8_HANDLER(wd2797_w)
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD179X, "wd179x");
     switch(offset & 0x3)
 	{
 		case 0:
@@ -1937,7 +1937,7 @@ static void setup_memory_map(running_machine *machine)
 
 	/* We need to init these vars from the sam, as this may be called from outside the sam callbacks */
 	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
-	device_config *sam = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, SAM6883, "sam");
+	device_config *sam = (device_config*)devtag_get_device(space->machine, SAM6883, "sam");
 	UINT8 memsize	= get_sam_memorysize(sam);
 	UINT8 maptype	= get_sam_maptype(sam);
 //	UINT8 pagemode	= get_sam_pagemode(machine);

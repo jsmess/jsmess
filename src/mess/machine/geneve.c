@@ -290,7 +290,7 @@ INTERRUPT_GEN( geneve_hblank_interrupt )
 */
 static void inta_callback(running_machine *machine, int state)
 {
-	tms9901_set_single_int(device_list_find_by_tag(machine->config->devicelist, TMS9901, "tms9901"), 1, state);
+	tms9901_set_single_int(devtag_get_device(machine, TMS9901, "tms9901"), 1, state);
 	cpu_set_input_line(machine->cpu[0], 1, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -299,7 +299,7 @@ static void inta_callback(running_machine *machine, int state)
 */
 static void intb_callback(running_machine *machine, int state)
 {
-	tms9901_set_single_int(device_list_find_by_tag(machine->config->devicelist, TMS9901, "tms9901"), 12, state);
+	tms9901_set_single_int(devtag_get_device(machine, TMS9901, "tms9901"), 12, state);
 }
 
 
@@ -419,7 +419,7 @@ READ8_HANDLER ( geneve_r )
 			case 0xf13d:
 			case 0xf13e:
 			case 0xf13f:
-				return mm58274c_r((device_config*)device_list_find_by_tag( space->machine->config->devicelist, MM58274C, "mm58274c"), offset-0xf130);
+				return mm58274c_r((device_config*)devtag_get_device(space->machine, MM58274C, "mm58274c"), offset-0xf130);
 
 			default:
 				logerror("unmapped read offs=%d\n", (int) offset);
@@ -465,7 +465,7 @@ READ8_HANDLER ( geneve_r )
 			case 0x801d:
 			case 0x801e:
 			case 0x801f:
-				return mm58274c_r((device_config*)device_list_find_by_tag( space->machine->config->devicelist, MM58274C, "mm58274c"), offset-0xf130);
+				return mm58274c_r((device_config*)devtag_get_device(space->machine, MM58274C, "mm58274c"), offset-0xf130);
 
 			default:
 				logerror("unmapped read offs=%d\n", (int) offset);
@@ -682,7 +682,7 @@ WRITE8_HANDLER ( geneve_w )
 			case 0xf13d:
 			case 0xf13e:
 			case 0xf13f:
-				mm58274c_w((device_config*)device_list_find_by_tag( space->machine->config->devicelist, MM58274C, "mm58274c"), offset-0xf130, data);
+				mm58274c_w((device_config*)devtag_get_device(space->machine, MM58274C, "mm58274c"), offset-0xf130, data);
 				return;
 
 			default:
@@ -731,7 +731,7 @@ WRITE8_HANDLER ( geneve_w )
 			case 0x801d:
 			case 0x801e:
 			case 0x801f:
-				mm58274c_w((device_config*)device_list_find_by_tag( space->machine->config->devicelist, MM58274C, "mm58274c"), offset-0xf130, data);
+				mm58274c_w((device_config*)devtag_get_device(space->machine, MM58274C, "mm58274c"), offset-0xf130, data);
 				return;
 
 			default:
@@ -948,7 +948,7 @@ WRITE8_HANDLER ( geneve_peb_mode_cru_w )
 					KeyQueueLen--;
 				}
 				/* clear keyboard interrupt */
-				tms9901_set_single_int(device_list_find_by_tag(space->machine->config->devicelist, TMS9901, "tms9901"), 8, 0);
+				tms9901_set_single_int(devtag_get_device(space->machine, TMS9901, "tms9901"), 8, 0);
 				KeyInBuf = 0;
 			}
 		}
@@ -969,7 +969,7 @@ static void read_key_if_possible(running_machine *machine)
 	buffer clear is disabled, and key queue is not empty. */
 	if ((! KeyReset) && (mode_flags & mf_keyclock) && (mode_flags & mf_keyclear) && KeyQueueLen)
 	{
-		tms9901_set_single_int(device_list_find_by_tag(machine->config->devicelist, TMS9901, "tms9901"), 8, 1);
+		tms9901_set_single_int(devtag_get_device(machine, TMS9901, "tms9901"), 8, 1);
 		KeyInBuf = 1;
 	}
 }
@@ -1281,7 +1281,7 @@ static void poll_mouse(running_machine *machine)
 */
 /*void tms9901_set_int2(int state)
 {
-	tms9901_set_single_int(device_list_find_by_tag(machine->config->devicelist, TMS9901, "tms9901"), 2, state);
+	tms9901_set_single_int(devtag_get_device(machine, TMS9901, "tms9901"), 2, state);
 }*/
 
 /*

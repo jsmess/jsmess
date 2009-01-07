@@ -496,7 +496,7 @@ static DEVICE_IMAGE_UNLOAD( sonydriv_floppy )
 	const device_config *fdc;
 
 	/* locate the FDC */
-	fdc = device_list_find_by_tag( image->machine->config->devicelist, IWM, "fdc");
+	fdc = devtag_get_device(image->machine, IWM, "fdc");
 
 	id = image_index_in_device(image);
 	save_track_data(fdc, id);

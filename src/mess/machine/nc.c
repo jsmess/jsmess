@@ -146,7 +146,7 @@ DEVICE_IMAGE_UNLOAD( nc_pcmcia_card )
 
 DEVICE_IMAGE_LOAD( nc_serial )
 {
-	const device_config *uart = device_list_find_by_tag(image->machine->config->devicelist, MSM8251, "uart");
+	const device_config *uart = devtag_get_device(image->machine, MSM8251, "uart");
 
 	/* filename specified */
 	if (device_load_serial_device(image)==INIT_PASS)

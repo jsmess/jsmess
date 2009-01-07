@@ -63,9 +63,9 @@ static UINT8 acia_rxd = 1, acia_txd = 1;
 static const device_config *cassette_device_image(running_machine *machine, int index)
 {
 	if ( index )
-		return device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette2" );
+		return devtag_get_device(machine, CASSETTE, "cassette2");
 	else
-		return device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette1" );
+		return devtag_get_device(machine, CASSETTE, "cassette1");
 }
 
 /* Enable/Status */
@@ -543,7 +543,7 @@ static WRITE8_HANDLER( tvctl_w )
 
 static WRITE8_HANDLER( fdc_auxiliary_w )
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, NEC765A, "nec765");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, NEC765A, "nec765");
 	/*
 
 		bit		description

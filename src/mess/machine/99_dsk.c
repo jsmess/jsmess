@@ -436,7 +436,7 @@ static const ti99_peb_card_handlers_t fdc_handlers =
 */
 void ti99_fdc_reset(running_machine *machine)
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( machine->config->devicelist, WD179X, "wd179x");
+	device_config *fdc = (device_config*)devtag_get_device(machine, WD179X, "wd179x");
 	ti99_disk_DSR = memory_region(machine, region_dsr) + offset_fdc_dsr;
 	DSEL = 0;
 	DSKnum = -1;
@@ -491,7 +491,7 @@ static int fdc_cru_r(running_machine *machine, int offset)
 */
 static void fdc_cru_w(running_machine *machine, int offset, int data)
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( machine->config->devicelist, WD179X, "wd179x");
+	device_config *fdc = (device_config*)devtag_get_device(machine, WD179X, "wd179x");
 	
 	switch (offset)
 	{
@@ -571,7 +571,7 @@ static void fdc_cru_w(running_machine *machine, int offset, int data)
 */
 static  READ8_HANDLER(fdc_mem_r)
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD179X, "wd179x");
 	
 	switch (offset)
 	{
@@ -598,7 +598,7 @@ static  READ8_HANDLER(fdc_mem_r)
 */
 static WRITE8_HANDLER(fdc_mem_w)
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD179X, "wd179x");
 	
 	data ^= 0xFF;	/* inverted data bus */
 
@@ -650,7 +650,7 @@ static const ti99_peb_card_handlers_t ccfdc_handlers =
 #if HAS_99CCFDC
 void ti99_ccfdc_reset(running_machine *machine)
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( machine->config->devicelist, WD179X, "wd179x");
+	device_config *fdc = (device_config*)devtag_get_device(machine, WD179X, "wd179x");
 	
 	ti99_disk_DSR = memory_region(machine, region_dsr) + offset_ccfdc_dsr;
 	DSEL = 0;
@@ -704,7 +704,7 @@ static int ccfdc_cru_r(int offset)
 */
 static void ccfdc_cru_w(running_machine *machine, int offset, int data)
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( machine->config->devicelist, WD179X, "wd179x");
+	device_config *fdc = (device_config*)devtag_get_device(machine, WD179X, "wd179x");
 	
 	switch (offset)
 	{
@@ -865,7 +865,7 @@ static UINT8 *bwg_ram;
 */
 void ti99_bwg_reset(running_machine *machine)
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( machine->config->devicelist, WD179X, "wd179x");
+	device_config *fdc = (device_config*)devtag_get_device(machine, WD179X, "wd179x");
 	
 	ti99_disk_DSR = memory_region(machine, region_dsr) + offset_bwg_dsr;
         bwg_ram = memory_region(machine, region_dsr) + offset_bwg_ram;
@@ -922,7 +922,7 @@ static int bwg_cru_r(running_machine *machine, int offset)
 */
 static void bwg_cru_w(running_machine *machine, int offset, int data)
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( machine->config->devicelist, WD179X, "wd179x");
+	device_config *fdc = (device_config*)devtag_get_device(machine, WD179X, "wd179x");
 	
 	switch (offset)
 	{
@@ -1039,7 +1039,7 @@ static void bwg_cru_w(running_machine *machine, int offset, int data)
 */
 static  READ8_HANDLER(bwg_mem_r)
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD179X, "wd179x");
 	
 	int reply = 0;
 
@@ -1050,7 +1050,7 @@ static  READ8_HANDLER(bwg_mem_r)
 	else if (bwg_rtc_enable)
 	{
 		if (! (offset & 1))
-			reply = mm58274c_r((device_config*)device_list_find_by_tag( space->machine->config->devicelist, MM58274C, "mm58274c_floppy"), (offset - 0x1FE0) >> 1);
+			reply = mm58274c_r((device_config*)devtag_get_device(space->machine, MM58274C, "mm58274c_floppy"), (offset - 0x1FE0) >> 1);
 	}
 	else
 	{
@@ -1084,7 +1084,7 @@ static  READ8_HANDLER(bwg_mem_r)
 */
 static WRITE8_HANDLER(bwg_mem_w)
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD179X, "wd179x");
 	
 	if (offset < 0x1c00)
 		;
@@ -1093,7 +1093,7 @@ static WRITE8_HANDLER(bwg_mem_w)
 	else if (bwg_rtc_enable)
 	{
 		if (! (offset & 1))
-			mm58274c_w((device_config*)device_list_find_by_tag( space->machine->config->devicelist, MM58274C, "mm58274c_floppy"), (offset - 0x1FE0) >> 1, data);
+			mm58274c_w((device_config*)devtag_get_device(space->machine, MM58274C, "mm58274c_floppy"), (offset - 0x1FE0) >> 1, data);
 	}
 	else
 	{
@@ -1419,7 +1419,7 @@ static  READ8_HANDLER(hfdc_mem_r)
 	{
 		/* rtc */
 		if (! (offset & 1))
-			reply = mm58274c_r((device_config*)device_list_find_by_tag( space->machine->config->devicelist, MM58274C, "mm58274c_floppy"), (offset - 0x1FE0) >> 1);
+			reply = mm58274c_r((device_config*)devtag_get_device(space->machine, MM58274C, "mm58274c_floppy"), (offset - 0x1FE0) >> 1);
 	}
 	else if (offset < 0x1400)
 	{
@@ -1469,7 +1469,7 @@ static WRITE8_HANDLER(hfdc_mem_w)
 	{
 		/* rtc */
 		if (! (offset & 1))
-			mm58274c_w((device_config*)device_list_find_by_tag( space->machine->config->devicelist, MM58274C, "mm58274c_floppy"), (offset - 0x1FE0) >> 1, data);
+			mm58274c_w((device_config*)devtag_get_device(space->machine, MM58274C, "mm58274c_floppy"), (offset - 0x1FE0) >> 1, data);
 	}
 	else if (offset < 0x1400)
 	{

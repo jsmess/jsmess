@@ -44,7 +44,7 @@ static UINT8 acia_midi_rx = 1, acia_midi_tx = 1;
 
 static void atarist_fdc_dma_transfer(running_machine *machine)
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( machine->config->devicelist, WD1772, "wd1772");
+	device_config *fdc = (device_config*)devtag_get_device(machine, WD1772, "wd1772");
 	const address_space *program = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
 	atarist_state *state = machine->driver_data;
 
@@ -115,7 +115,7 @@ const wd17xx_interface atarist_wd17xx_interface = { atarist_fdc_callback, NULL }
 static READ16_HANDLER( atarist_fdc_data_r )
 {
 	atarist_state *state = space->machine->driver_data;
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD1772, "wd1772");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD1772, "wd1772");
 
 	if (state->fdc_mode & ATARIST_FLOPPY_MODE_SECTOR_COUNT)
 	{
@@ -140,7 +140,7 @@ static READ16_HANDLER( atarist_fdc_data_r )
 static WRITE16_HANDLER( atarist_fdc_data_w )
 {
 	atarist_state *state = space->machine->driver_data;
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD1772, "wd1772");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD1772, "wd1772");
 	
 	if (state->fdc_mode & ATARIST_FLOPPY_MODE_SECTOR_COUNT)
 	{
@@ -1283,7 +1283,7 @@ INPUT_PORTS_END
 
 static WRITE8_HANDLER( ym2149_port_a_w )
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD1772, "wd1772");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD1772, "wd1772");
 	wd17xx_set_side(fdc, BIT(data, 0) ? 0 : 1);
 
 	if (!BIT(data, 1))
@@ -1649,7 +1649,7 @@ static void stbook_configure_memory(running_machine *machine)
 
 static WRITE8_HANDLER( stbook_ym2149_port_a_w )
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD1772, "wd1772");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD1772, "wd1772");
 	wd17xx_set_side(fdc,(data & 0x01) ? 0 : 1);
 
 	if (!(data & 0x02))

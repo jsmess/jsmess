@@ -169,11 +169,11 @@ static READ8_HANDLER( jupiter_io_r )
 	}
 	if ( ! ( offset & 0x8000 ) )
 	{
-//		cassette_output( device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" ), -1 );
+//		cassette_output( devtag_get_device(space->machine, CASSETTE, "cassette"), -1 );
 		speaker_level_w(0,0);
 		data = ( data & 0xe0 ) | ( data & input_port_read( space->machine, "KEY7" ) );;
 	}
-	if ( cassette_input(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" )) > 0 )
+	if ( cassette_input(devtag_get_device(space->machine, CASSETTE, "cassette")) > 0 )
 	{
 		data &= ~0x20;
 	}
@@ -183,7 +183,7 @@ static READ8_HANDLER( jupiter_io_r )
 
 static WRITE8_HANDLER( jupiter_port_fe_w )
 {
-//	cassette_output( device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ), 1 );
+//	cassette_output( devtag_get_device(machine, CASSETTE, "cassette"), 1 );
 	speaker_level_w(0,1);
 }
 

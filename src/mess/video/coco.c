@@ -64,7 +64,7 @@ static void coco_field_sync_callback(running_machine *machine, int data)
 
 const UINT8 *get_video_ram_coco(running_machine *machine,int scanline)
 {
-	device_config *sam = (device_config*)device_list_find_by_tag( machine->config->devicelist, SAM6883, "sam");
+	device_config *sam = (device_config*)devtag_get_device(machine, SAM6883, "sam");
 	return sam_m6847_get_video_ram(sam,scanline);
 }
 

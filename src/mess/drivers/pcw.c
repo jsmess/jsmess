@@ -434,7 +434,7 @@ static WRITE8_HANDLER(pcw_vdu_video_control_register_w)
 
 static WRITE8_HANDLER(pcw_system_control_w)
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, NEC765A, "nec765");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, NEC765A, "nec765");
 	LOG(("SYSTEM CONTROL: %d\n",data));
 
 	switch (data)
@@ -654,7 +654,7 @@ static WRITE8_HANDLER(pcw_expansion_w)
 
 static READ8_HANDLER(pcw_fdc_r)
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, NEC765A, "nec765");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, NEC765A, "nec765");
 	/* from Jacob Nevins docs. FDC I/O is not fully decoded */
 	if (offset & 1)
 	{
@@ -666,7 +666,7 @@ static READ8_HANDLER(pcw_fdc_r)
 
 static WRITE8_HANDLER(pcw_fdc_w)
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, NEC765A, "nec765");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, NEC765A, "nec765");
 	/* from Jacob Nevins docs. FDC I/O is not fully decoded */
 	if (offset & 1)
 	{

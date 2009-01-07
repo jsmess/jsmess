@@ -405,7 +405,7 @@ static void at_fdc_dma_drq(running_machine *machine, int state, int read_)
 
 static device_config * at_get_device(running_machine *machine )
 {
-	return (device_config*)device_list_find_by_tag( machine->config->devicelist, NEC765A, "nec765");	
+	return (device_config*)devtag_get_device(machine, NEC765A, "nec765");
 }
 
 static const struct pc_fdc_interface fdc_interface =
@@ -765,11 +765,11 @@ MACHINE_START( at )
 
 MACHINE_RESET( at )
 {
-	at_devices.pic8259_master = device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_master" );
-	at_devices.pic8259_slave = device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_slave" );
-	at_devices.dma8237_1 = device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_1" );
-	at_devices.dma8237_2 = device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_2" );
-	at_devices.pit8254 = device_list_find_by_tag( machine->config->devicelist, PIT8254, "pit8254" );
-	pc_mouse_set_serial_port( device_list_find_by_tag( machine->config->devicelist, NS16450, "ns16450_0" ) );
+	at_devices.pic8259_master = devtag_get_device(machine, PIC8259, "pic8259_master");
+	at_devices.pic8259_slave = devtag_get_device(machine, PIC8259, "pic8259_slave");
+	at_devices.dma8237_1 = devtag_get_device(machine, DMA8237, "dma8237_1");
+	at_devices.dma8237_2 = devtag_get_device(machine, DMA8237, "dma8237_2");
+	at_devices.pit8254 = devtag_get_device(machine, PIT8254, "pit8254");
+	pc_mouse_set_serial_port( devtag_get_device(machine, NS16450, "ns16450_0") );
 }
 

@@ -370,7 +370,7 @@ static DEVICE_START( cdp1864 )
 	assert(cdp1864->intf->on_efx_changed != NULL);
 
 	/* get the screen device */
-	cdp1864->screen = device_list_find_by_tag(device->machine->config->devicelist, VIDEO_SCREEN, cdp1864->intf->screen_tag);
+	cdp1864->screen = devtag_get_device(device->machine, VIDEO_SCREEN, cdp1864->intf->screen_tag);
 	assert(cdp1864->screen != NULL);
 
 	/* allocate the temporary bitmap */

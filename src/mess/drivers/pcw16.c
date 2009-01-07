@@ -1205,7 +1205,7 @@ static void	pcw16_fdc_interrupt(running_machine *machine, int state)
 
 static device_config * pcw16_get_device(running_machine *machine )
 {
-	return (device_config*)device_list_find_by_tag( machine->config->devicelist, NEC765A, "nec765");	
+	return (device_config*)devtag_get_device(machine, NEC765A, "nec765");
 }
 
 static const struct pc_fdc_interface pcw16_fdc_interface=
@@ -1367,7 +1367,7 @@ static MACHINE_RESET( pcw16 )
 
 	/* initialise mouse */
 	pc_mouse_initialise(machine);
-	pc_mouse_set_serial_port( device_list_find_by_tag( machine->config->devicelist, NS16550, "ns16550_0" ) );
+	pc_mouse_set_serial_port( devtag_get_device(machine, NS16550, "ns16550_0") );
 
 	/* initialise keyboard */
 	at_keyboard_init(machine, AT_KEYBOARD_TYPE_AT);

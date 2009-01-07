@@ -201,9 +201,9 @@ static emu_timer *cassette_timer;
 static const device_config *cassette_device_image(running_machine *machine)
 {
 	if (exidy_fe & 0x20)
-		return device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette2" );
+		return devtag_get_device(machine, CASSETTE, "cassette2");
 	else
-		return device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette1" );
+		return devtag_get_device(machine, CASSETTE, "cassette1");
 }
 
 
@@ -354,7 +354,7 @@ static MACHINE_RESET( exidyd )
 	cass_data.input.length = 0;
 	cass_data.input.bit = 1;
 
-	exidy_ay31015 = device_list_find_by_tag( machine->config->devicelist, AY31015, "ay_3_1015" );
+	exidy_ay31015 = devtag_get_device(machine, AY31015, "ay_3_1015");
 
 	centronics_config(machine, 0, exidy_cent_config);
 	/* assumption: select is tied low */
@@ -374,7 +374,7 @@ static MACHINE_RESET( exidy )
 
 static  READ8_HANDLER ( exidy_wd179x_r )
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD179X, "wd179x");
 	switch (offset & 0x03)
 	{
 	case 0:
@@ -392,7 +392,7 @@ static  READ8_HANDLER ( exidy_wd179x_r )
 
 static WRITE8_HANDLER ( exidy_wd179x_w )
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD179X, "wd179x");
 	switch (offset & 0x03)
 	{
 	case 0:
@@ -451,27 +451,27 @@ static WRITE8_HANDLER(exidy_fe_port_w)
 	{
 		if (data & 0x20)
 		{
-			cassette_change_state(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette1" ), CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
-			cassette_change_state(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette2" ), CASSETTE_SPEAKER_ENABLED, CASSETTE_MASK_SPEAKER);
+			cassette_change_state(devtag_get_device(space->machine, CASSETTE, "cassette1"), CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
+			cassette_change_state(devtag_get_device(space->machine, CASSETTE, "cassette2"), CASSETTE_SPEAKER_ENABLED, CASSETTE_MASK_SPEAKER);
 		}
 		else
 		{
-			cassette_change_state(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette2" ), CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
-			cassette_change_state(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette1" ), CASSETTE_SPEAKER_ENABLED, CASSETTE_MASK_SPEAKER);
+			cassette_change_state(devtag_get_device(space->machine, CASSETTE, "cassette2"), CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
+			cassette_change_state(devtag_get_device(space->machine, CASSETTE, "cassette1"), CASSETTE_SPEAKER_ENABLED, CASSETTE_MASK_SPEAKER);
 		}
 	}
 	else
 	{
-		cassette_change_state(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette2" ), CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
-		cassette_change_state(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette1" ), CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
+		cassette_change_state(devtag_get_device(space->machine, CASSETTE, "cassette2"), CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
+		cassette_change_state(devtag_get_device(space->machine, CASSETTE, "cassette1"), CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
 	}
 
 	/* cassette 1 motor */
-	cassette_change_state(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette1" ),
+	cassette_change_state(devtag_get_device(space->machine, CASSETTE, "cassette1"),
 		(data & 0x10) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 
 	/* cassette 2 motor */
-	cassette_change_state(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette2" ),
+	cassette_change_state(devtag_get_device(space->machine, CASSETTE, "cassette2"),
 		(data & 0x20) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 
 	if ((data & EXIDY_CASSETTE_MOTOR_MASK) && (~data & 0x80))
@@ -574,7 +574,7 @@ static READ8_HANDLER(exidy_fe_port_r)
 
 static const device_config *printer_device(running_machine *machine)
 {
-	return device_list_find_by_tag(machine->config->devicelist, PRINTER, "printer");
+	return devtag_get_device(machine, PRINTER, "printer");
 }
 
 static READ8_HANDLER(exidy_ff_port_r)

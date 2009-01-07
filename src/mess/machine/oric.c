@@ -274,7 +274,7 @@ PB7
 
 static const device_config *cassette_device_image(running_machine *machine)
 {
-	return device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" );
+	return devtag_get_device(machine, CASSETTE, "cassette");
 }
 
 /* not called yet - this will update the via with the state of the tape data.
@@ -283,7 +283,7 @@ static TIMER_CALLBACK(oric_refresh_tape)
 {
 	int data;
 	int input_port_9;
-	const device_config *via_0 = device_list_find_by_tag(machine->config->devicelist, VIA6522, "via6522_0");
+	const device_config *via_0 = devtag_get_device(machine, VIA6522, "via6522_0");
 
 	data = 0;
 
@@ -352,7 +352,7 @@ static WRITE8_DEVICE_HANDLER ( oric_via_out_b_func )
 static void oric_printer_handshake_in(running_machine *machine,int number, int data, int mask)
 {
 	int acknowledge;
-	const device_config *via_0 = device_list_find_by_tag(machine->config->devicelist, VIA6522, "via6522_0");
+	const device_config *via_0 = devtag_get_device(machine, VIA6522, "via6522_0");
 
 	acknowledge = 1;
 
@@ -732,8 +732,8 @@ static WD17XX_CALLBACK( oric_jasmin_wd179x_callback )
 
 static READ8_HANDLER (oric_jasmin_r)
 {
-	const device_config *via_0 = device_list_find_by_tag(space->machine->config->devicelist, VIA6522, "via6522_0");
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
+	const device_config *via_0 = devtag_get_device(space->machine, VIA6522, "via6522_0");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD179X, "wd179x");
 	unsigned char data = 0x0ff;
 
 	switch (offset & 0x0f)
@@ -763,8 +763,8 @@ static READ8_HANDLER (oric_jasmin_r)
 
 static WRITE8_HANDLER(oric_jasmin_w)
 {
-	const device_config *via_0 = device_list_find_by_tag(space->machine->config->devicelist, VIA6522, "via6522_0");
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
+	const device_config *via_0 = devtag_get_device(space->machine, VIA6522, "via6522_0");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD179X, "wd179x");
 	switch (offset & 0x0f)
 	{
 		/* microdisc floppy disc interface */
@@ -970,7 +970,7 @@ static void	oric_microdisc_set_mem_0x0c000(running_machine *machine)
 READ8_HANDLER (oric_microdisc_r)
 {
 	unsigned char data = 0x0ff;
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD179X, "wd179x");
 	
 	switch (offset & 0x0ff)
 	{
@@ -998,7 +998,7 @@ READ8_HANDLER (oric_microdisc_r)
 
 		default:
 			{
-				const device_config *via_0 = device_list_find_by_tag(space->machine->config->devicelist, VIA6522, "via6522_0");
+				const device_config *via_0 = devtag_get_device(space->machine, VIA6522, "via6522_0");
 				data = via_r(via_0, offset & 0x0f);
 			}
 			break;
@@ -1010,7 +1010,7 @@ READ8_HANDLER (oric_microdisc_r)
 
 WRITE8_HANDLER(oric_microdisc_w)
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD179X, "wd179x");
 	switch (offset & 0x0ff)
 	{
 		/* microdisc floppy disc interface */
@@ -1058,7 +1058,7 @@ WRITE8_HANDLER(oric_microdisc_w)
 
 		default:
 			{
-				const device_config *via_0 = device_list_find_by_tag(space->machine->config->devicelist, VIA6522, "via6522_0");
+				const device_config *via_0 = devtag_get_device(space->machine, VIA6522, "via6522_0");
 				via_w(via_0, offset & 0x0f, data);
 			}
 			break;
@@ -1139,7 +1139,7 @@ DEVICE_IMAGE_LOAD( oric_floppy )
 
 static void oric_common_init_machine(running_machine *machine)
 {
-	const device_config *via_0 = device_list_find_by_tag(machine->config->devicelist, VIA6522, "via6522_0");
+	const device_config *via_0 = devtag_get_device(machine, VIA6522, "via6522_0");
 
 	/* clear all irqs */
 	oric_irqs = 0;
@@ -1226,7 +1226,7 @@ MACHINE_RESET( oric )
 
 READ8_HANDLER ( oric_IO_r )
 {
-	const device_config *via_0 = device_list_find_by_tag(space->machine->config->devicelist, VIA6522, "via6522_0");
+	const device_config *via_0 = devtag_get_device(space->machine, VIA6522, "via6522_0");
 #if 0
 	switch (input_port_read(machine, "FLOPPY") & 0x07)
 	{
@@ -1266,7 +1266,7 @@ READ8_HANDLER ( oric_IO_r )
 
 WRITE8_HANDLER ( oric_IO_w )
 {
-	const device_config *via_0 = device_list_find_by_tag(space->machine->config->devicelist, VIA6522, "via6522_0");
+	const device_config *via_0 = devtag_get_device(space->machine, VIA6522, "via6522_0");
 #if 0
 	switch (input_port_read(machine, "FLOPPY") & 0x07)
 	{

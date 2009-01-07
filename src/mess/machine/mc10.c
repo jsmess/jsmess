@@ -135,7 +135,7 @@ READ8_HANDLER ( mc10_port2_r )
      *   BIT 4 CASSETTE TAPE INPUT
      */
 
-	const device_config *img = device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" );
+	const device_config *img = devtag_get_device(space->machine, CASSETTE, "cassette");
 	int val = 0xed;
 
 	if ((input_port_read(space->machine, "LINE6") | mc10_keyboard_strobe) == 0xff)
@@ -150,7 +150,7 @@ READ8_HANDLER ( mc10_port2_r )
 
 WRITE8_HANDLER ( mc10_port2_w )
 {
-	const device_config *img = device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" );
+	const device_config *img = devtag_get_device(space->machine, CASSETTE, "cassette");
 
 	/*   BIT 0 PRINTER OUTFUT & CASS OUTPUT
      */

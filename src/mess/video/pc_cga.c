@@ -517,7 +517,7 @@ static VIDEO_START( pc_cga )
 static VIDEO_UPDATE( mc6845_cga )
 {
 	UINT8 *gfx = memory_region(screen->machine, "gfx1");
-	device_config	*devconf = (device_config *) device_list_find_by_tag(screen->machine->config->devicelist, MC6845, CGA_MC6845_NAME);
+	device_config	*devconf = (device_config *) devtag_get_device(screen->machine, MC6845, CGA_MC6845_NAME);
 	mc6845_update( devconf, bitmap, cliprect);
 
 	/* Check for changes in font dipsetting */
@@ -1059,7 +1059,7 @@ static void pc_cga_set_palette_luts(void)
  */
 static void pc_cga_mode_control_w(running_machine *machine, int data)
 {
-	device_config	*devconf = (device_config *) device_list_find_by_tag(machine->config->devicelist, MC6845, CGA_MC6845_NAME);
+	device_config	*devconf = (device_config *) devtag_get_device(machine, MC6845, CGA_MC6845_NAME);
 
 	CGA_LOG(1,"CGA_mode_control_w",("$%02x: columns %d, gfx %d, hires %d, blink %d\n",
 		data, (data&1)?80:40, (data>>1)&1, (data>>4)&1, (data>>5)&1));
@@ -1197,7 +1197,7 @@ static void pc_cga_plantronics_w(running_machine *machine, int data)
 
 static READ8_HANDLER( pc_cga8_r )
 {
-	device_config	*devconf = (device_config *) device_list_find_by_tag(space->machine->config->devicelist, MC6845, CGA_MC6845_NAME);
+	device_config	*devconf = (device_config *) devtag_get_device(space->machine, MC6845, CGA_MC6845_NAME);
 	int data = 0xff;
 	switch( offset )
 	{
@@ -1222,11 +1222,11 @@ static WRITE8_HANDLER( pc_cga8_w )
 
 	switch(offset) {
 	case 0: case 2: case 4: case 6:
-		devconf = (device_config *) device_list_find_by_tag(space->machine->config->devicelist, MC6845, CGA_MC6845_NAME);
+		devconf = (device_config *) devtag_get_device(space->machine, MC6845, CGA_MC6845_NAME);
 		mc6845_address_w( devconf, offset, data );
 		break;
 	case 1: case 3: case 5: case 7:
-		devconf = (device_config *) device_list_find_by_tag(space->machine->config->devicelist, MC6845, CGA_MC6845_NAME);
+		devconf = (device_config *) devtag_get_device(space->machine, MC6845, CGA_MC6845_NAME);
 		mc6845_register_w( devconf, offset, data );
 		break;
 	case 8:
@@ -1488,7 +1488,7 @@ static MC6845_UPDATE_ROW( pc1512_gfx_4bpp_update_row )
 
 static WRITE8_HANDLER ( pc1512_w )
 {
-	device_config	*devconf = (device_config *) device_list_find_by_tag(space->machine->config->devicelist, MC6845, CGA_MC6845_NAME);
+	device_config	*devconf = (device_config *) devtag_get_device(space->machine, MC6845, CGA_MC6845_NAME);
 
 	switch (offset)
 	{
@@ -1652,7 +1652,7 @@ static VIDEO_START( pc1512 )
 static VIDEO_UPDATE( mc6845_pc1512 )
 {
 	UINT8 *gfx = memory_region(screen->machine, "gfx1");
-	device_config	*devconf = (device_config *) device_list_find_by_tag(screen->machine->config->devicelist, MC6845, CGA_MC6845_NAME);
+	device_config	*devconf = (device_config *) devtag_get_device(screen->machine, MC6845, CGA_MC6845_NAME);
 	mc6845_update( devconf, bitmap, cliprect);
 
 	/* Check for changes in font dipsetting */

@@ -198,7 +198,7 @@ WRITE8_HANDLER( laser_bank_select_w )
 
 static const device_config *vtech2_cassette_image(running_machine *machine)
 {
-	return device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" );
+	return devtag_get_device(machine, CASSETTE, "cassette");
 }
 
 /*************************************************

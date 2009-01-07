@@ -83,7 +83,7 @@ static UINT8 cass_bit;
 
 static TIMER_CALLBACK( handle_cassette_input )
 {
-	UINT8 new_level = ( cassette_input( device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ) ) > 0.0 ) ? 1 : 0;
+	UINT8 new_level = ( cassette_input( devtag_get_device(machine, CASSETTE, "cassette") ) > 0.0 ) ? 1 : 0;
 
 	if ( new_level != cass_level )
 	{
@@ -321,7 +321,7 @@ WRITE8_HANDLER( cgenie_port_ff_w )
 {
 	int port_ff_changed = port_ff ^ data;
 
-	cassette_output ( device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" ), data & 0x01 ? -1.0 : 1.0 );
+	cassette_output ( devtag_get_device(space->machine, CASSETTE, "cassette"), data & 0x01 ? -1.0 : 1.0 );
 
 	/* background bits changed ? */
 	if( port_ff_changed & FF_BGD )
@@ -476,7 +476,7 @@ WRITE8_HANDLER( cgenie_psg_port_b_w )
 
  READ8_HANDLER( cgenie_status_r )
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD179X, "wd179x");
 	/* If the floppy isn't emulated, return 0 */
 	if( (input_port_read(space->machine, "DSW0") & 0x80) == 0 )
 		return 0;
@@ -485,7 +485,7 @@ WRITE8_HANDLER( cgenie_psg_port_b_w )
 
  READ8_HANDLER( cgenie_track_r )
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD179X, "wd179x");
 	/* If the floppy isn't emulated, return 0xff */
 	if( (input_port_read(space->machine, "DSW0") & 0x80) == 0 )
 		return 0xff;
@@ -494,7 +494,7 @@ WRITE8_HANDLER( cgenie_psg_port_b_w )
 
  READ8_HANDLER( cgenie_sector_r )
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD179X, "wd179x");
 	/* If the floppy isn't emulated, return 0xff */
 	if( (input_port_read(space->machine, "DSW0") & 0x80) == 0 )
 		return 0xff;
@@ -503,7 +503,7 @@ WRITE8_HANDLER( cgenie_psg_port_b_w )
 
  READ8_HANDLER(cgenie_data_r )
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD179X, "wd179x");
 	/* If the floppy isn't emulated, return 0xff */
 	if( (input_port_read(space->machine, "DSW0") & 0x80) == 0 )
 		return 0xff;
@@ -512,7 +512,7 @@ WRITE8_HANDLER( cgenie_psg_port_b_w )
 
 WRITE8_HANDLER( cgenie_command_w )
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD179X, "wd179x");
 	/* If the floppy isn't emulated, return immediately */
 	if( (input_port_read(space->machine, "DSW0") & 0x80) == 0 )
 		return;
@@ -521,7 +521,7 @@ WRITE8_HANDLER( cgenie_command_w )
 
 WRITE8_HANDLER( cgenie_track_w )
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD179X, "wd179x");
 	/* If the floppy isn't emulated, ignore the write */
 	if( (input_port_read(space->machine, "DSW0") & 0x80) == 0 )
 		return;
@@ -530,7 +530,7 @@ WRITE8_HANDLER( cgenie_track_w )
 
 WRITE8_HANDLER( cgenie_sector_w )
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD179X, "wd179x");
 	/* If the floppy isn't emulated, ignore the write */
 	if( (input_port_read(space->machine, "DSW0") & 0x80) == 0 )
 		return;
@@ -539,7 +539,7 @@ WRITE8_HANDLER( cgenie_sector_w )
 
 WRITE8_HANDLER( cgenie_data_w )
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD179X, "wd179x");
 	/* If the floppy isn't emulated, ignore the write */
 	if( (input_port_read(space->machine, "DSW0") & 0x80) == 0 )
 		return;
@@ -592,7 +592,7 @@ const wd17xx_interface cgenie_wd17xx_interface = { cgenie_fdc_callback, NULL };
 
 WRITE8_HANDLER( cgenie_motor_w )
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD179X, "wd179x");
 	UINT8 drive = 255;
 
 	logerror("cgenie motor_w $%02X\n", data);

@@ -347,13 +347,13 @@ static TIMER_CALLBACK( x68k_led_callback )
 // 4 channel DMA controller (Hitachi HD63450)
 static WRITE16_HANDLER( x68k_dmac_w )
 {
-	const device_config* device = device_list_find_by_tag(space->machine->config->devicelist,HD63450,"hd63450");
+	const device_config* device = devtag_get_device(space->machine, HD63450, "hd63450");
 	hd63450_w(device, offset, data, mem_mask);
 }
 
 static READ16_HANDLER( x68k_dmac_r )
 {
-	const device_config* device = device_list_find_by_tag(space->machine->config->devicelist,HD63450,"hd63450");
+	const device_config* device = devtag_get_device(space->machine, HD63450, "hd63450");
 	return hd63450_r(device, offset, mem_mask);
 }
 
@@ -557,7 +557,7 @@ static int x68k_read_mouse(running_machine *machine)
 	sys.mouse.inputtype++;
 	if(sys.mouse.inputtype > 2)
 	{
-		const device_config *scc = device_list_find_by_tag(machine->config->devicelist, SCC8530, "scc");
+		const device_config *scc = devtag_get_device(machine, SCC8530, "scc");
 		int val = scc_get_reg_b(scc, 0);
 		sys.mouse.inputtype = 0;
 		sys.mouse.bufferempty = 1;
@@ -577,7 +577,7 @@ static int x68k_read_mouse(running_machine *machine)
 */
 static READ16_HANDLER( x68k_scc_r )
 {
-	const device_config *scc = device_list_find_by_tag(space->machine->config->devicelist, SCC8530, "scc");
+	const device_config *scc = devtag_get_device(space->machine, SCC8530, "scc");
 	offset %= 4;
 	switch(offset)
 	{
@@ -596,7 +596,7 @@ static READ16_HANDLER( x68k_scc_r )
 
 static WRITE16_HANDLER( x68k_scc_w )
 {
-	const device_config *scc = device_list_find_by_tag(space->machine->config->devicelist, SCC8530, "scc");
+	const device_config *scc = devtag_get_device(space->machine, SCC8530, "scc");
 	static unsigned char prev;
 	offset %= 4;
 
@@ -630,7 +630,7 @@ static WRITE16_HANDLER( x68k_scc_w )
 
 static TIMER_CALLBACK(x68k_scc_ack)
 {
-	const device_config *scc = device_list_find_by_tag(machine->config->devicelist, SCC8530, "scc");
+	const device_config *scc = devtag_get_device(machine, SCC8530, "scc");
 	if(sys.mouse.bufferempty != 0)  // nothing to do if the mouse data buffer is empty
 		return;
 
@@ -655,7 +655,7 @@ static TIMER_CALLBACK(x68k_scc_ack)
 
 static void x68k_set_adpcm(running_machine* machine)
 {
-	const device_config *dev = device_list_find_by_tag(machine->config->devicelist, HD63450, "hd63450");
+	const device_config *dev = devtag_get_device(machine, HD63450, "hd63450");
 	UINT32 rate = 0;
 
 	switch(sys.adpcm.rate & 0x0c)
@@ -731,7 +731,7 @@ static WRITE8_DEVICE_HANDLER( ppi_port_c_w )
 // NEC uPD72065 at 0xe94000
 static WRITE16_HANDLER( x68k_fdc_w )
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, NEC72065, "nec72065");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, NEC72065, "nec72065");
 	unsigned int drive, x;
 	switch(offset)
 	{
@@ -806,7 +806,7 @@ static READ16_HANDLER( x68k_fdc_r )
 {
 	unsigned int ret;
 	int x;
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, NEC72065, "nec72065");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, NEC72065, "nec72065");
 	
 	switch(offset)
 	{
@@ -855,7 +855,7 @@ static NEC765_INTERRUPT( fdc_irq )
 static int x68k_fdc_read_byte(running_machine *machine,int addr)
 {
 	int data = -1;
-	device_config *fdc = (device_config*)device_list_find_by_tag( machine->config->devicelist, NEC72065, "nec72065");
+	device_config *fdc = (device_config*)devtag_get_device(machine, NEC72065, "nec72065");
 
 	if(sys.fdc.drq_state != 0)
 		data = nec765_dack_r(fdc, 0);
@@ -865,7 +865,7 @@ static int x68k_fdc_read_byte(running_machine *machine,int addr)
 
 static void x68k_fdc_write_byte(running_machine *machine,int addr, int data)
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( machine->config->devicelist, NEC72065, "nec72065");
+	device_config *fdc = (device_config*)devtag_get_device(machine, NEC72065, "nec72065");
 	nec765_dack_w(fdc, 0, data);
 }
 
@@ -899,7 +899,7 @@ static READ16_HANDLER( x68k_fm_r )
 
 static WRITE8_HANDLER( x68k_ct_w )
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, NEC72065, "nec72065");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, NEC72065, "nec72065");
 	// CT1 and CT2 bits from YM2151 port 0x1b
 	// CT1 - ADPCM clock - 0 = 8MHz, 1 = 4MHz
 	// CT2 - 1 = Set ready state of FDC
@@ -1034,14 +1034,14 @@ static READ16_HANDLER( x68k_sysport_r )
 
 /*static READ16_HANDLER( x68k_mfp_r )
 {
-	const device_config *x68k_mfp = device_list_find_by_tag(space->machine->config->devicelist, MC68901, MC68901_TAG);
+	const device_config *x68k_mfp = devtag_get_device(space->machine, MC68901, MC68901_TAG);
 
 	return mc68901_register_r(x68k_mfp, offset);
 }*/
 
 READ16_HANDLER( x68k_mfp_r )
 {
-	const device_config *x68k_mfp = device_list_find_by_tag(space->machine->config->devicelist, MC68901, MC68901_TAG);
+	const device_config *x68k_mfp = devtag_get_device(space->machine, MC68901, MC68901_TAG);
     // Initial settings indicate that IRQs are generated for FM (YM2151), Receive buffer error or full,
     // MFP Timer C, and the power switch
 //  logerror("MFP: [%08x] Reading offset %i\n",cpu_get_pc(space->cpu),offset);
@@ -1103,7 +1103,7 @@ READ16_HANDLER( x68k_mfp_r )
 
 static WRITE16_HANDLER( x68k_mfp_w )
 {
-	const device_config *x68k_mfp = device_list_find_by_tag(space->machine->config->devicelist, MC68901, MC68901_TAG);
+	const device_config *x68k_mfp = devtag_get_device(space->machine, MC68901, MC68901_TAG);
 
 	/* For the Interrupt registers, the bits are set out as such:
        Reg A - bit 7: GPIP7 (HSync)
@@ -1481,7 +1481,7 @@ static WRITE16_HANDLER( x68k_exp_w )
 
 static void x68k_dma_irq(running_machine *machine, int channel)
 {
-	const device_config *device = device_list_find_by_tag(machine->config->devicelist, HD63450, "hd63450");
+	const device_config *device = devtag_get_device(machine, HD63450, "hd63450");
 	current_vector[3] = hd63450_get_vector(device, channel);
 	current_irq_line = 3;
 	logerror("DMA#%i: DMA End (vector 0x%02x)\n",channel,current_vector[3]);
@@ -1498,7 +1498,7 @@ static void x68k_dma_end(running_machine *machine, int channel,int irq)
 
 static void x68k_dma_error(running_machine *machine, int channel, int irq)
 {
-	const device_config *device = device_list_find_by_tag(machine->config->devicelist, HD63450, "hd63450");
+	const device_config *device = devtag_get_device(machine, HD63450, "hd63450");
 	if(irq != 0)
 	{
 		current_vector[3] = hd63450_get_error_vector(device,channel);
@@ -1562,7 +1562,7 @@ static INTERRUPT_GEN( x68k_vsync_irq )
 
 static IRQ_CALLBACK(x68k_int_ack)
 {
-	const device_config *x68k_mfp = device_list_find_by_tag(device->machine->config->devicelist, MC68901, MC68901_TAG);
+	const device_config *x68k_mfp = devtag_get_device(device->machine, MC68901, MC68901_TAG);
 
 	if(irqline == 6)  // MFP
 	{

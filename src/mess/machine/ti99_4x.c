@@ -747,7 +747,7 @@ MACHINE_RESET( ti99 )
 	handset_buflen = 0;
 	handset_clock = 0;
 	handset_ack = 0;
-	tms9901_set_single_int(device_list_find_by_tag(machine->config->devicelist, TMS9901, "tms9901"), 12, 0);
+	tms9901_set_single_int(devtag_get_device(machine, TMS9901, "tms9901"), 12, 0);
 
 	/* read config */
 	if (ti99_model == model_99_8)
@@ -1715,7 +1715,7 @@ static TIMER_CALLBACK(ti99_handset_ack_callback)
 	handset_clock = ! handset_clock;
 	handset_buf >>= 4;
 	handset_buflen--;
-	tms9901_set_single_int(device_list_find_by_tag(machine->config->devicelist, TMS9901, "tms9901"), 12, 0);
+	tms9901_set_single_int(devtag_get_device(machine, TMS9901, "tms9901"), 12, 0);
 
 	if (handset_buflen == 1)
 	{
@@ -1763,7 +1763,7 @@ static void ti99_handset_post_message(running_machine *machine, int message)
 	handset_clock = 1;
 	handset_buf = ~ message;
 	handset_buflen = 3;
-	tms9901_set_single_int(device_list_find_by_tag(machine->config->devicelist, TMS9901, "tms9901"), 12, 1);
+	tms9901_set_single_int(devtag_get_device(machine, TMS9901, "tms9901"), 12, 1);
 }
 
 /*
@@ -2146,7 +2146,7 @@ nota:
 */
 static void tms9901_set_int1(running_machine *machine, int state)
 {
-	tms9901_set_single_int(device_list_find_by_tag(machine->config->devicelist, TMS9901, "tms9901"), 1, state);
+	tms9901_set_single_int(devtag_get_device(machine, TMS9901, "tms9901"), 1, state);
 }
 
 /*
@@ -2154,7 +2154,7 @@ static void tms9901_set_int1(running_machine *machine, int state)
 */
 void tms9901_set_int2(running_machine *machine, int state)
 {
-	tms9901_set_single_int(device_list_find_by_tag(machine->config->devicelist, TMS9901, "tms9901"), 2, state);
+	tms9901_set_single_int(devtag_get_device(machine, TMS9901, "tms9901"), 2, state);
 }
 
 /*
@@ -2238,7 +2238,7 @@ static READ8_DEVICE_HANDLER( ti99_R9901_1 )
 	}
 	
 	/* we don't take CS2 into account, as CS2 is a write-only unit */
-	/*if (cassette_input(device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette1" )) > 0)
+	/*if (cassette_input(devtag_get_device(device->machine, CASSETTE, "cassette1")) > 0)
 		answer |= 8;*/
 
 	return answer;
@@ -2272,12 +2272,12 @@ static READ8_DEVICE_HANDLER( ti99_R9901_3 )
 	/* we don't take CS2 into account, as CS2 is a write-only unit */
 	if ( ti99_model != model_99_8 )
 	{
-		if (cassette_input(device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette1" )) > 0)
+		if (cassette_input(devtag_get_device(device->machine, CASSETTE, "cassette1")) > 0)
 			answer |= 8;
 	}
 	else
 	{
-		if (cassette_input(device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" )) > 0)
+		if (cassette_input(devtag_get_device(device->machine, CASSETTE, "cassette")) > 0)
 			answer |= 8;
 	}
 
@@ -2374,7 +2374,7 @@ static READ8_DEVICE_HANDLER( ti99_8_R9901_1 )
 	}
 	
 	/* we don't take CS2 into account, as CS2 is a write-only unit */
-	/*if (cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" )) > 0)
+	/*if (cassette_input(devtag_get_device(machine, CASSETTE, "cassette")) > 0)
 		answer |= 8;*/
 
 	return answer;
@@ -2413,11 +2413,11 @@ static WRITE8_DEVICE_HANDLER( ti99_CS_motor )
 
 	if ( ti99_model != model_99_8 )
 	{
-		img = device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, ( offset-6 ) ? "cassette2" :  "cassette1" );
+		img = devtag_get_device(device->machine, CASSETTE, (offset-6 ) ? "cassette2" :  "cassette1" );
 	}
 	else
 	{
-		img = device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" );
+		img = devtag_get_device(device->machine, CASSETTE, "cassette");
 	}
 	cassette_change_state(img, data ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
@@ -2443,12 +2443,12 @@ static WRITE8_DEVICE_HANDLER( ti99_CS_output )
 {
 	if (ti99_model != model_99_8)	/* 99/8 only has one tape port!!! */
 	{
-		cassette_output(device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette1" ), data ? +1 : -1);
-		cassette_output(device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette2" ), data ? +1 : -1);
+		cassette_output(devtag_get_device(device->machine, CASSETTE, "cassette1"), data ? +1 : -1);
+		cassette_output(devtag_get_device(device->machine, CASSETTE, "cassette2"), data ? +1 : -1);
 	}
 	else
 	{
-		cassette_output(device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" ), data ? +1 : -1);
+		cassette_output(devtag_get_device(device->machine, CASSETTE, "cassette"), data ? +1 : -1);
 	}
 }
 

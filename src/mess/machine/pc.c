@@ -750,7 +750,7 @@ static READ8_DEVICE_HANDLER ( ibm5150_ppi_portc_r )
 
 	if ( ! ( pc_ppi.portb & 0x08 ) )
 	{
-		double tap_val = cassette_input( device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" ) );
+		double tap_val = cassette_input( devtag_get_device(device->machine, CASSETTE, "cassette") );
 
 		if ( tap_val < 0 )
 		{
@@ -793,7 +793,7 @@ static WRITE8_DEVICE_HANDLER ( ibm5150_ppi_portb_w )
 	pit8253_gate_w( pc_devices.pit8253, 2, data & 1);
 	pc_speaker_set_spkrdata( data & 0x02 );
 
-	cassette_change_state( device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" ), ( data & 0x08 ) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+	cassette_change_state( devtag_get_device(device->machine, CASSETTE, "cassette"), ( data & 0x08 ) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 
 	pc_ppi.clock_signal = ( pc_ppi.keyb_clock ) ? 1 : 0;
 
@@ -1032,10 +1032,10 @@ static WRITE8_DEVICE_HANDLER ( pcjr_ppi_portb_w )
 	/* KB controller port B */
 	pc_ppi.portb = data;
 	pc_ppi.portc_switch_high = data & 0x08;
-	pit8253_gate_w( device_list_find_by_tag( device->machine->config->devicelist, PIT8253, "pit8253" ), 2, data & 1);
+	pit8253_gate_w( devtag_get_device(device->machine, PIT8253, "pit8253"), 2, data & 1);
 	pc_speaker_set_spkrdata( data & 0x02 );
 
-	cassette_change_state( device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" ), ( data & 0x08 ) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+	cassette_change_state( devtag_get_device(device->machine, CASSETTE, "cassette"), ( data & 0x08 ) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 }
 
 
@@ -1066,7 +1066,7 @@ static READ8_DEVICE_HANDLER (pcjr_ppi_porta_r )
  */
 static READ8_DEVICE_HANDLER ( pcjr_ppi_portc_r )
 {
-	int timer2_output = pit8253_get_output( device_list_find_by_tag( device->machine->config->devicelist, PIT8253, "pit8253" ), 2 );
+	int timer2_output = pit8253_get_output( devtag_get_device(device->machine, PIT8253, "pit8253"), 2 );
 	int data=0xff;
 
 	data&=~0x80;
@@ -1074,7 +1074,7 @@ static READ8_DEVICE_HANDLER ( pcjr_ppi_portc_r )
 	data = ( data & ~0x01 ) | ( pcjr_keyb.latch ? 0x01: 0x00 );
 	if ( ! ( pc_ppi.portb & 0x08 ) )
 	{
-		double tap_val = cassette_input( device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" ) );
+		double tap_val = cassette_input( devtag_get_device(device->machine, CASSETTE, "cassette") );
 
 		if ( tap_val < 0 )
 		{
@@ -1132,7 +1132,7 @@ static void pc_fdc_dma_drq(running_machine *machine, int state, int read_)
 
 static device_config * pc_get_device(running_machine *machine )
 {
-	return (device_config*)device_list_find_by_tag( machine->config->devicelist, NEC765A, "nec765");	
+	return (device_config*)devtag_get_device(machine, NEC765A, "nec765");
 }
 
 static const struct pc_fdc_interface fdc_interface_nc =
@@ -1379,11 +1379,11 @@ MACHINE_RESET( pc )
 {
 	cpu_set_irq_callback(machine->cpu[0], pc_irq_callback);
 
-	pc_devices.pic8259_master = device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_master" );
-	pc_devices.pic8259_slave = device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_slave" );
-	pc_devices.dma8237 = device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237" );
-	pc_devices.pit8253 = device_list_find_by_tag( machine->config->devicelist, PIT8253, "pit8253" );
-	pc_mouse_set_serial_port( device_list_find_by_tag( machine->config->devicelist, INS8250, "ins8250_0" ) );
+	pc_devices.pic8259_master = devtag_get_device(machine, PIC8259, "pic8259_master");
+	pc_devices.pic8259_slave = devtag_get_device(machine, PIC8259, "pic8259_slave");
+	pc_devices.dma8237 = devtag_get_device(machine, DMA8237, "dma8237");
+	pc_devices.pit8253 = devtag_get_device(machine, PIT8253, "pit8253");
+	pc_mouse_set_serial_port( devtag_get_device(machine, INS8250, "ins8250_0") );
 	pc_hdc_set_dma8237_device( pc_devices.dma8237 );
 	speaker_level_w( 0, 0 );
 }

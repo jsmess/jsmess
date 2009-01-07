@@ -358,7 +358,7 @@ static DEVICE_START( msm6255 )
 
 	// get the screen device
 
-	msm6255->screen = device_list_find_by_tag(device->machine->config->devicelist, VIDEO_SCREEN, msm6255->intf->screen_tag);
+	msm6255->screen = devtag_get_device(device->machine, VIDEO_SCREEN, msm6255->intf->screen_tag);
 	assert(msm6255->screen != NULL);
 
 	// register for state saving

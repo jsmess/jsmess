@@ -233,7 +233,7 @@ static ABCBUS_CARD_SELECT( luxor_55_10828 )
 
 static WRITE8_HANDLER( slow_ctrl_w )
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD179X, "wd179x");
 	/*
 
 		bit		description

@@ -111,7 +111,7 @@ static const device_config *printer_device(running_machine *machine, int index)
 			fatalerror("\nInvalid centronics device: %X",index);
 			break;
 	}
-	return device_list_find_by_tag(machine->config->devicelist, PRINTER, tag);
+	return devtag_get_device(machine, PRINTER, tag);
 }
 
 void centronics_write_handshake(running_machine *machine,int nr, int data, int mask)

@@ -604,7 +604,7 @@ static TIMER_CALLBACK(drive_timer)
 	
 		if (drive->type == type_1541) 
 		{
-			const device_config *via_3 = device_list_find_by_tag(machine->config->devicelist, VIA6522, "via6522_3");
+			const device_config *via_3 = devtag_get_device(machine, VIA6522, "via6522_3");
 
 			cpu_set_input_line(machine->cpu[drive->cpunumber], M6502_SET_OVERFLOW, 1);
 			via_ca1_w(via_3, 0, 1);
@@ -642,7 +642,7 @@ static TIMER_CALLBACK(drive_timer)
 
 	if (drive->type == type_1541) 
 	{
-		const device_config *via_3 = device_list_find_by_tag(machine->config->devicelist, VIA6522, "via6522_3");
+		const device_config *via_3 = devtag_get_device(machine, VIA6522, "via6522_3");
 		cpu_set_input_line(machine->cpu[drive->cpunumber], M6502_SET_OVERFLOW, 0);
 		via_ca1_w(via_3, 0, 0);
 	}
@@ -936,7 +936,7 @@ int vc1541_serial_atn_read (int which)
 
 void vc1541_serial_atn_write (running_machine *machine, int which, int level)
 {
-	const device_config *via_2 = device_list_find_by_tag(machine->config->devicelist, VIA6522, "via6522_2");
+	const device_config *via_2 = devtag_get_device(machine, VIA6522, "via6522_2");
 #if 0
 	int value;
 #endif

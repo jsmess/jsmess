@@ -938,7 +938,7 @@ static void pce_cd_init( running_machine *machine )
 
 	pce_cd.subcode_buffer = auto_malloc( 96 );
 
-	device = device_list_find_by_tag(machine->config->devicelist, CDROM, "cdrom" );
+	device = devtag_get_device(machine, CDROM, "cdrom");
 	if ( device )
 	{
 		pce_cd.cd = mess_cd_get_cdrom_file(device);

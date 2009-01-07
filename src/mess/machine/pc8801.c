@@ -723,12 +723,12 @@ MACHINE_RESET( pc88srh )
 
 static UINT8 load_8255_A(running_machine *machine, int chip)
 {
-	return use_5FD ? ppi8255_get_port_b((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, chip ? "ppi8255_0" : "ppi8255_1" ) ) : 0xff;
+	return use_5FD ? ppi8255_get_port_b((device_config*)devtag_get_device(machine, PPI8255, chip? "ppi8255_0" : "ppi8255_1" ) ) : 0xff;
 }
 
 static UINT8 load_8255_B(running_machine *machine, int chip)
 {
-	return use_5FD ? ppi8255_get_port_a((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, chip ? "ppi8255_0" : "ppi8255_1" ) ) : 0xff;
+	return use_5FD ? ppi8255_get_port_a((device_config*)devtag_get_device(machine, PPI8255, chip? "ppi8255_0" : "ppi8255_1" ) ) : 0xff;
 }
 
 static UINT8 load_8255_C(running_machine *machine, int chip)
@@ -738,7 +738,7 @@ static UINT8 load_8255_C(running_machine *machine, int chip)
 
 	if (use_5FD)
 	{
-		port_c = ppi8255_get_port_c((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, chip ? "ppi8255_0" : "ppi8255_1" ) );
+		port_c = ppi8255_get_port_c((device_config*)devtag_get_device(machine, PPI8255, chip? "ppi8255_0" : "ppi8255_1" ) );
 		result = ((port_c >> 4) & 0x0F) | ((port_c << 4) & 0xF0);
 	}
 
@@ -795,7 +795,7 @@ const ppi8255_interface pc8801_8255_config_1 =
 
 READ8_HANDLER(pc8801fd_nec765_tc)
 {
-  device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, NEC765A, "nec765");
+  device_config *fdc = (device_config*)devtag_get_device(space->machine, NEC765A, "nec765");
   nec765_set_tc_state(fdc, 1);
   nec765_set_tc_state(fdc, 0);
   return 0;

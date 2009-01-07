@@ -582,7 +582,7 @@ WRITE8_HANDLER(gg_psg_w) {
 static void sms_machine_stop(running_machine *machine) {
 	/* Does the cartridge have SRAM that should be saved? */
 	if ( sms_cartridge[sms_current_cartridge].sram_save )
-		image_battery_save(device_list_find_by_tag(machine->config->devicelist, CARTSLOT, "cart1"), sms_cartridge[sms_current_cartridge].cartSRAM, sizeof(UINT8) * NVRAM_SIZE );
+		image_battery_save(devtag_get_device(machine, CARTSLOT, "cart1"), sms_cartridge[sms_current_cartridge].cartSRAM, sizeof(UINT8) * NVRAM_SIZE );
 }
 
 void setup_rom(const address_space *space)

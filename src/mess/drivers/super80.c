@@ -394,7 +394,7 @@ static const z80_daisy_chain super80_daisy_chain[] =
 
 static const device_config *cassette_device_image(running_machine *machine)
 {
-	return device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" );
+	return devtag_get_device(machine, CASSETTE, "cassette");
 }
 
 static void cassette_motor( running_machine *machine, UINT8 data )
@@ -472,7 +472,7 @@ static const CENTRONICS_CONFIG super80_cent_config[1]={
 
 static const device_config *printer_device(running_machine *machine)
 {
-	return device_list_find_by_tag(machine->config->devicelist, PRINTER, "printer");
+	return devtag_get_device(machine, PRINTER, "printer");
 }
 
 
@@ -998,7 +998,7 @@ static TIMER_CALLBACK( super80_reset )
 
 static MACHINE_RESET( super80 )
 {
-	super80_z80pio = device_list_find_by_tag( machine->config->devicelist, Z80PIO, "z80pio" );
+	super80_z80pio = devtag_get_device(machine, Z80PIO, "z80pio");
 	centronics_config(machine,0, super80_cent_config);
 	/* assumption: select is tied low */
 	centronics_write_handshake(machine,0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);

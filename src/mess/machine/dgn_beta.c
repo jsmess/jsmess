@@ -656,7 +656,7 @@ static READ8_HANDLER(d_pia1_pa_r)
 static WRITE8_HANDLER(d_pia1_pa_w)
 {
 	int	HALT_DMA;
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD179X, "wd179x");
 	
 	/* Only play with halt line if halt bit changed since last write */
 	if((data & 0x80)!=d_pia1_pa_last)
@@ -915,7 +915,7 @@ const wd17xx_interface dgnbeta_wd17xx_interface = { dgnbeta_fdc_callback, NULL }
  READ8_HANDLER(dgnbeta_wd2797_r)
 {
 	int result = 0;
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD179X, "wd179x");
 
 	switch(offset & 0x03)
 	{
@@ -941,7 +941,7 @@ const wd17xx_interface dgnbeta_wd17xx_interface = { dgnbeta_fdc_callback, NULL }
 
 WRITE8_HANDLER(dgnbeta_wd2797_w)
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD179X, "wd179x");
 
     switch(offset & 0x3)
 	{
@@ -1032,7 +1032,7 @@ void dgn_beta_line_interrupt (int data)
 
 static void dgnbeta_reset(running_machine *machine)
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( machine->config->devicelist, WD179X, "wd179x");
+	device_config *fdc = (device_config*)devtag_get_device(machine, WD179X, "wd179x");
 
 	system_rom = memory_region(machine, "main");
 

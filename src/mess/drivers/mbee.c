@@ -59,7 +59,7 @@
 
 static const device_config *cassette_device_image(running_machine *machine)
 {
-	return device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" );
+	return devtag_get_device(machine, CASSETTE, "cassette");
 }
 
 static READ8_DEVICE_HANDLER(z80pio_alt_r)

@@ -281,7 +281,7 @@ static TIMER_CALLBACK(update_level)
 
 TIMER_CALLBACK(vectrex_imager_eye)
 {
-	const device_config *via_0 = device_list_find_by_tag(machine->config->devicelist, VIA6522, "via6522_0");
+	const device_config *via_0 = devtag_get_device(machine, VIA6522, "via6522_0");
 	int coffset;
 	double rtime = (1.0 / imager_freq);
 

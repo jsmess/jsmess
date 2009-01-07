@@ -1041,7 +1041,7 @@ static READ8_HANDLER( apple2gs_c0xx_r )
 		case 0x39:	/* C039 - SCCAREG */
 		case 0x3A:	/* C03A - SCCBDATA */
 		case 0x3B:	/* C03B - SCCADATA */
-			scc = device_list_find_by_tag(space->machine->config->devicelist, SCC8530, "scc");
+			scc = devtag_get_device(space->machine, SCC8530, "scc");
 			result = scc_r(scc, offset & 0x03);
 			break;
 
@@ -1181,7 +1181,7 @@ static WRITE8_HANDLER( apple2gs_c0xx_w )
 		case 0x39:	/* C039 - SCCAREG */
 		case 0x3A:	/* C03A - SCCBDATA */
 		case 0x3B:	/* C03B - SCCADATA */
-			scc = device_list_find_by_tag(space->machine->config->devicelist, SCC8530, "scc");
+			scc = devtag_get_device(space->machine, SCC8530, "scc");
 			scc_w(scc, offset & 0x03, data);
 			break;
 

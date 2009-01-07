@@ -216,7 +216,7 @@ static READ8_DEVICE_HANDLER(ssystem3_via_read_b)
 
 static WRITE8_DEVICE_HANDLER(ssystem3_via_write_b)
 {
-	const device_config *via_0 = device_list_find_by_tag(device->machine->config->devicelist, VIA6522, "via6522_0");
+	const device_config *via_0 = devtag_get_device(device->machine, VIA6522, "via6522_0");
 	UINT8 d;
 
 	ssystem3_playfield_write(device->machine, data&1, data&8);

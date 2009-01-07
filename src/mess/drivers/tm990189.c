@@ -283,7 +283,7 @@ static TMS9901_INT_CALLBACK( sys9901_interrupt_callback )
 {
 	(void)ic;
 
-	tms9901_set_single_int(device_list_find_by_tag(device->machine->config->devicelist, TMS9901, "tms9901_0"), 5, intreq);
+	tms9901_set_single_int(devtag_get_device(device->machine, TMS9901, "tms9901_0"), 5, intreq);
 }
 
 static READ8_DEVICE_HANDLER( sys9901_r0 )
@@ -296,7 +296,7 @@ static READ8_DEVICE_HANDLER( sys9901_r0 )
 		reply |= input_port_read(device->machine, keynames[digitsel]) << 1;
 
 	/* tape input */
-	if (cassette_input(device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" )) > 0.0)
+	if (cassette_input(devtag_get_device(device->machine, CASSETTE, "cassette")) > 0.0)
 		reply |= 0x40;
 
 	return reply;
@@ -346,7 +346,7 @@ static WRITE8_DEVICE_HANDLER( sys9901_spkrdrive_w )
 
 static WRITE8_DEVICE_HANDLER( sys9901_tapewdata_w )
 {
-	cassette_output(device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" ), data ? +1.0 : -1.0);
+	cassette_output(devtag_get_device(device->machine, CASSETTE, "cassette"), data ? +1.0 : -1.0);
 }
 
 /*
@@ -360,7 +360,7 @@ static TIMER_CALLBACK(rs232_input_callback)
 	if (/*rs232_rts &&*/ /*(mame_ftell(rs232_fp) < mame_fsize(rs232_fp))*/1)
 	{
 		if (image_fread(rs232_fp, &buf, 1) == 1)
-			tms9902_push_data(device_list_find_by_tag(machine->config->devicelist, TMS9902, "tms9902"), buf);
+			tms9902_push_data(devtag_get_device(machine, TMS9902, "tms9902"), buf);
 	}
 }
 
@@ -376,7 +376,7 @@ static DEVICE_IMAGE_LOAD( tm990_189_rs232 )
 
 	rs232_fp = image;
 
-	tms9902_set_dsr(device_list_find_by_tag(image->machine->config->devicelist, TMS9902, "tms9902"), 1);
+	tms9902_set_dsr(devtag_get_device(image->machine, TMS9902, "tms9902"), 1);
 	rs232_input_timer = timer_alloc(image->machine, rs232_input_callback, NULL);
 	timer_adjust_periodic(rs232_input_timer, attotime_zero, 0, ATTOTIME_IN_MSEC(10));
 
@@ -395,7 +395,7 @@ static DEVICE_IMAGE_UNLOAD( tm990_189_rs232 )
 
 	rs232_fp = NULL;
 
-	tms9902_set_dsr(device_list_find_by_tag(image->machine->config->devicelist, TMS9902, "tms9902"), 0);
+	tms9902_set_dsr(devtag_get_device(image->machine, TMS9902, "tms9902"), 0);
 
 	timer_reset(rs232_input_timer, attotime_never);	/* FIXME - timers should only be allocated once */
 }
@@ -436,7 +436,7 @@ static WRITE8_HANDLER(ext_instr_decode)
 	case 5: /* CKON: set DECKCONTROL */
 		LED_state |= 0x20;
 		{
-			const device_config *img = device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" );
+			const device_config *img = devtag_get_device(space->machine, CASSETTE, "cassette");
 			cassette_change_state(img, CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 		}
 		break;
@@ -444,7 +444,7 @@ static WRITE8_HANDLER(ext_instr_decode)
 	case 6: /* CKOF: clear DECKCONTROL */
 		LED_state &= ~0x20;
 		{
-			const device_config *img = device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" );
+			const device_config *img = devtag_get_device(space->machine, CASSETTE, "cassette");
 			cassette_change_state(img, CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 		}
 		break;

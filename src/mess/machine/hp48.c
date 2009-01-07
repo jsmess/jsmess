@@ -186,8 +186,8 @@ void hp48_rs232_start_recv_byte( running_machine *machine, UINT8 data )
 /* end of send event */
 static TIMER_CALLBACK( hp48_rs232_byte_sent_cb )
 {	
-	const device_config *xmodem = device_list_find_by_tag( machine->config->devicelist, XMODEM, "rs232_x" );
-	const device_config *kermit = device_list_find_by_tag( machine->config->devicelist, KERMIT, "rs232_k" );
+	const device_config *xmodem = devtag_get_device(machine, XMODEM, "rs232_x");
+	const device_config *kermit = devtag_get_device(machine, KERMIT, "rs232_k");
 
 	LOG_SERIAL(( "%f hp48_rs232_byte_sent_cb: end of send, data=%02x\n", 
 		     attotime_to_double(timer_get_time(machine)), param ));
@@ -211,8 +211,8 @@ static TIMER_CALLBACK( hp48_rs232_byte_sent_cb )
 /* CPU initiates a send event */
 static void hp48_rs232_send_byte( running_machine *machine )
 {
-	const device_config *xmodem = device_list_find_by_tag( machine->config->devicelist, XMODEM, "rs232_x" );
-	const device_config *kermit = device_list_find_by_tag( machine->config->devicelist, KERMIT, "rs232_k" );	
+	const device_config *xmodem = devtag_get_device(machine, XMODEM, "rs232_x");
+	const device_config *kermit = devtag_get_device(machine, KERMIT, "rs232_k");	
 	UINT8 data = HP48_IO_8(0x16); /* byte to send */
 
 	LOG_SERIAL(( "%05x %f hp48_rs232_send_byte: start sending, data=%02x\n", 
@@ -596,8 +596,8 @@ static READ8_HANDLER ( hp48_io_r )
 	{
                 /* second nibble of received data */
 
-		const device_config *xmodem = device_list_find_by_tag( space->machine->config->devicelist, XMODEM, "rs232_x" );
-		const device_config *kermit = device_list_find_by_tag( space->machine->config->devicelist, KERMIT, "rs232_k" );	
+		const device_config *xmodem = devtag_get_device(space->machine, XMODEM, "rs232_x");
+		const device_config *kermit = devtag_get_device(space->machine, KERMIT, "rs232_k");	
 
 		hp48_io[0x11] &= ~1;  /* clear byte received */
 		data = hp48_io[offset];

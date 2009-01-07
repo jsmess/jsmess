@@ -419,13 +419,13 @@ static void einstein_pio_interrupt(const device_config *device, int state)
 
 static WRITE8_DEVICE_HANDLER(einstein_serial_transmit_clock)
 {
-	const device_config *uart = device_list_find_by_tag(device->machine->config->devicelist, MSM8251, "uart");
+	const device_config *uart = devtag_get_device(device->machine, MSM8251, "uart");
 	msm8251_transmit_clock(uart);
 }
 
 static WRITE8_DEVICE_HANDLER(einstein_serial_receive_clock)
 {
-	const device_config *uart = device_list_find_by_tag(device->machine->config->devicelist, MSM8251, "uart");
+	const device_config *uart = devtag_get_device(device->machine, MSM8251, "uart");
 	msm8251_receive_clock(uart);
 }
 
@@ -593,7 +593,7 @@ static WRITE8_HANDLER(einstein_vdp_w)
 static WRITE8_HANDLER(einstein_fdc_w)
 {
 	int reg = offset & 0x03;
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD177X, "wd177x");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD177X, "wd177x");
 
 	logerror("fdc w: PC: %04x %04x %02x\n",cpu_get_pc(space->machine->cpu[0]),offset,data);
 
@@ -629,7 +629,7 @@ static WRITE8_HANDLER(einstein_fdc_w)
 static  READ8_HANDLER(einstein_fdc_r)
 {
 	int reg = offset & 0x03;
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD177X, "wd177x");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD177X, "wd177x");
 
 	logerror("fdc r: PC: %04x %04x\n",cpu_get_pc(space->machine->cpu[0]),offset);
 
@@ -693,7 +693,7 @@ static WRITE8_DEVICE_HANDLER(einstein_ctc_w)
 
 static WRITE8_HANDLER(einstein_serial_w)
 {
-	const device_config *uart = device_list_find_by_tag(space->machine->config->devicelist, MSM8251, "uart");
+	const device_config *uart = devtag_get_device(space->machine, MSM8251, "uart");
 	int reg = offset & 0x01;
 
 	/* logerror("serial w: %04x %02x\n",offset,data); */
@@ -710,7 +710,7 @@ static WRITE8_HANDLER(einstein_serial_w)
 
 static READ8_HANDLER(einstein_serial_r)
 {
-	const device_config *uart = device_list_find_by_tag(space->machine->config->devicelist, MSM8251, "uart");
+	const device_config *uart = devtag_get_device(space->machine, MSM8251, "uart");
 	int reg = offset & 0x01;
 
 	/* logerror("serial r: %04x\n",offset); */
@@ -820,7 +820,7 @@ static void einstein_page_rom(running_machine *machine)
 
 static WRITE8_HANDLER(einstein_drive_w)
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD177X, "wd177x");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD177X, "wd177x");
 
 	/* bit 4: side select */
 	/* bit 3: select drive 3 */
@@ -1025,7 +1025,7 @@ static READ8_HANDLER(einstein2_port_r)
 		case 0x2d:
 		case 0x2e:
 		case 0x2f:
-			return einstein_ctc_r( device_list_find_by_tag(space->machine->config->devicelist, Z80CTC, "z80ctc"), offset);
+			return einstein_ctc_r( devtag_get_device(space->machine, Z80CTC, "z80ctc"), offset);
 		case 0x30:
 		case 0x31:
 		case 0x32:
@@ -1129,7 +1129,7 @@ static WRITE8_HANDLER(einstein2_port_w)
 		case 0x2d:
 		case 0x2e:
 		case 0x2f:
-			einstein_ctc_w( device_list_find_by_tag(space->machine->config->devicelist, Z80CTC, "z80ctc"), offset,data);
+			einstein_ctc_w( devtag_get_device(space->machine, Z80CTC, "z80ctc"), offset,data);
 			return;
 		case 0x30:
 		case 0x31:
@@ -1218,7 +1218,7 @@ static  READ8_HANDLER(einstein_port_r)
 		case 0x2d:
 		case 0x2e:
 		case 0x2f:
-			return einstein_ctc_r( device_list_find_by_tag(space->machine->config->devicelist, Z80CTC, "z80ctc"), offset);
+			return einstein_ctc_r( devtag_get_device(space->machine, Z80CTC, "z80ctc"), offset);
 		case 0x30:
 		case 0x31:
 		case 0x32:
@@ -1305,7 +1305,7 @@ static WRITE8_HANDLER(einstein_port_w)
 		case 0x2d:
 		case 0x2e:
 		case 0x2f:
-			einstein_ctc_w( device_list_find_by_tag(space->machine->config->devicelist, Z80CTC, "z80ctc"), offset,data);
+			einstein_ctc_w( devtag_get_device(space->machine, Z80CTC, "z80ctc"), offset,data);
 			return;
 		case 0x30:
 		case 0x31:
@@ -1426,7 +1426,7 @@ static MACHINE_START( einstein )
 {
 	TMS9928A_configure(&tms9928a_interface);
 
-	einstein_z80pio = device_list_find_by_tag( machine->config->devicelist, Z80PIO, "z80pio" );
+	einstein_z80pio = devtag_get_device(machine, Z80PIO, "z80pio");
 }
 
 static MACHINE_RESET( einstein )
@@ -1457,7 +1457,7 @@ static MACHINE_RESET( einstein )
 
 	/* the input to channel 0 and 1 of the ctc is a 2 MHz clock */
 	einstein_ctc_trigger = 0;
-	timer_pulse(machine, ATTOTIME_IN_HZ(2000000), (void *)device_list_find_by_tag(machine->config->devicelist, Z80CTC, "z80ctc"), 0, einstein_ctc_trigger_callback);
+	timer_pulse(machine, ATTOTIME_IN_HZ(2000000), (void *)devtag_get_device(machine, Z80CTC, "z80ctc"), 0, einstein_ctc_trigger_callback);
 
 	centronics_config(machine, 0, einstein_cent_config);
 	/* assumption: select is tied low */

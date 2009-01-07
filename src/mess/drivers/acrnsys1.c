@@ -36,7 +36,7 @@ static READ8_DEVICE_HANDLER( ins8154_b1_port_a_r )
 
 static WRITE8_DEVICE_HANDLER( ins8154_b1_port_a_w )
 {
-	ttl74145_w((device_config*)device_list_find_by_tag( device->machine->config->devicelist, TTL74145, "ttl74145" ), 0, data & 0x07);
+	ttl74145_w((device_config*)devtag_get_device(device->machine, TTL74145, "ttl74145"), 0, data & 0x07);
 }
 
 static WRITE8_DEVICE_HANDLER( acrnsys1_led_segment_w )

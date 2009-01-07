@@ -16,7 +16,7 @@ ULA ula;
 static emu_timer *electron_tape_timer;
 
 static const device_config *cassette_device_image( running_machine *machine ) {
-	return device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" );
+	return devtag_get_device(machine, CASSETTE, "cassette");
 }
 
 static void electron_tape_start( void ) {

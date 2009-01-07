@@ -1127,13 +1127,13 @@ MSX_SLOT_INIT(diskrom)
 
 MSX_SLOT_RESET(diskrom)
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( machine->config->devicelist, WD179X, "wd179x");
+	device_config *fdc = (device_config*)devtag_get_device(machine, WD179X, "wd179x");
 	wd17xx_reset(fdc);	
 }
 
 static READ8_HANDLER (msx_diskrom_page1_r)
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD179X, "wd179x");
 	switch (offset) {
 	case 0: return wd17xx_status_r (fdc, 0);
 	case 1: return wd17xx_track_r (fdc, 0);
@@ -1147,7 +1147,7 @@ static READ8_HANDLER (msx_diskrom_page1_r)
 
 static READ8_HANDLER (msx_diskrom_page2_r)
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD179X, "wd179x");
 	if (offset >= 0x7f8) {
 		switch (offset) {
 		case 0x7f8:
@@ -1196,7 +1196,7 @@ MSX_SLOT_MAP(diskrom)
 
 MSX_SLOT_WRITE(diskrom)
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( machine->config->devicelist, WD179X, "wd179x");
+	device_config *fdc = (device_config*)devtag_get_device(machine, WD179X, "wd179x");
 	if (addr >= 0xa000 && addr < 0xc000) {
 		addr -= 0x4000;
 	}
@@ -1243,13 +1243,13 @@ MSX_SLOT_INIT(diskrom2)
 
 MSX_SLOT_RESET(diskrom2)
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( machine->config->devicelist, WD179X, "wd179x");
+	device_config *fdc = (device_config*)devtag_get_device(machine, WD179X, "wd179x");
 	wd17xx_reset (fdc);
 }
 
 static READ8_HANDLER (msx_diskrom2_page1_r)
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD179X, "wd179x");
 	switch (offset) {
 	case 0: return wd17xx_status_r(fdc, 0);
 	case 1: return wd17xx_track_r(fdc, 0);
@@ -1263,7 +1263,7 @@ static READ8_HANDLER (msx_diskrom2_page1_r)
 
 static  READ8_HANDLER (msx_diskrom2_page2_r)
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD179X, "wd179x");
 	if (offset >= 0x7b8) {
 		switch (offset) {
 		case 0x7b8:
@@ -1311,7 +1311,7 @@ MSX_SLOT_MAP(diskrom2)
 
 MSX_SLOT_WRITE(diskrom2)
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( machine->config->devicelist, WD179X, "wd179x");
+	device_config *fdc = (device_config*)devtag_get_device(machine, WD179X, "wd179x");
 	if (addr >= 0xa000 && addr < 0xc000) {
 		addr -= 0x4000;
 	}

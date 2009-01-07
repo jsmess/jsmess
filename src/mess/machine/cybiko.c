@@ -185,13 +185,13 @@ static int nvram_system_save( running_machine *machine, const char *name, nvram_
 
 static void cybiko_pcf8593_load(running_machine *machine, mame_file *file)
 {
-	const device_config *device = device_list_find_by_tag(machine->config->devicelist, PCF8593, "rtc");
+	const device_config *device = devtag_get_device(machine, PCF8593, "rtc");
 	pcf8593_load(device, file);
 }
 
 static void cybiko_pcf8593_save(running_machine *machine, mame_file *file)
 {
-	const device_config *device = device_list_find_by_tag(machine->config->devicelist, PCF8593, "rtc");
+	const device_config *device = devtag_get_device(machine, PCF8593, "rtc");
 	pcf8593_save(device, file);
 }
 
@@ -462,7 +462,7 @@ static READ8_HANDLER( cybiko_io_reg_r )
 		// real-time clock
 		case H8S_IO_PORTF :
 		{
-			const device_config *device = device_list_find_by_tag(space->machine->config->devicelist, PCF8593, "rtc");
+			const device_config *device = devtag_get_device(space->machine, PCF8593, "rtc");
 			data = H8S_PF_PF2;
 			if (pcf8593_pin_sda_r(device)) data |= H8S_PF_PF0;
 		}
@@ -479,7 +479,7 @@ static READ8_HANDLER( cybiko_io_reg_r )
 
 static WRITE8_HANDLER( cybiko_io_reg_w )
 {
-	const device_config *rtc = device_list_find_by_tag(space->machine->config->devicelist, PCF8593, "rtc");
+	const device_config *rtc = devtag_get_device(space->machine, PCF8593, "rtc");
 
 	_logerror( 2, ("cybiko_io_reg_w (%08X/%02X)\n", offset, data));
 	switch (offset)

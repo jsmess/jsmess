@@ -93,8 +93,8 @@ static READ8_HANDLER(c128_dma8726_port_r)
 WRITE8_HANDLER( c128_write_d000 )
 {
 	running_machine *machine = space->machine;
-	const device_config *cia_0 = device_list_find_by_tag(space->machine->config->devicelist, CIA6526R1, "cia_0");
-	const device_config *cia_1 = device_list_find_by_tag(space->machine->config->devicelist, CIA6526R1, "cia_1");
+	const device_config *cia_0 = devtag_get_device(space->machine, CIA6526R1, "cia_0");
+	const device_config *cia_1 = devtag_get_device(space->machine, CIA6526R1, "cia_1");
 
 	UINT8 c64_port6510 = (UINT8) device_get_info_int(space->machine->cpu[0], CPUINFO_INT_M6510_PORT);
 
@@ -148,8 +148,8 @@ WRITE8_HANDLER( c128_write_d000 )
 static READ8_HANDLER( c128_read_io )
 {
 	running_machine *machine = space->machine;
-	const device_config *cia_0 = device_list_find_by_tag(space->machine->config->devicelist, CIA6526R1, "cia_0");
-	const device_config *cia_1 = device_list_find_by_tag(space->machine->config->devicelist, CIA6526R1, "cia_1");
+	const device_config *cia_0 = devtag_get_device(space->machine, CIA6526R1, "cia_0");
+	const device_config *cia_1 = devtag_get_device(space->machine, CIA6526R1, "cia_1");
 
 	if (offset < 0x400)
 		return vic2_port_r (space, offset & 0x3ff);
@@ -840,19 +840,19 @@ static void c128_m6510_port_write(const device_config *device, UINT8 direction, 
 	{
 		if (direction & 0x08) 
 		{
-			cassette_output(device_list_find_by_tag(device->machine->config->devicelist, CASSETTE, "cassette" ), (data & 0x08) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
+			cassette_output(devtag_get_device(device->machine, CASSETTE, "cassette"), (data & 0x08) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
 		}
 
 		if (direction & 0x20)
 		{
 			if(!(data & 0x20))
 			{
-				cassette_change_state(device_list_find_by_tag(device->machine->config->devicelist, CASSETTE, "cassette" ),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+				cassette_change_state(devtag_get_device(device->machine, CASSETTE, "cassette"),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
 				timer_adjust_periodic(datasette_timer, attotime_zero, 0, ATTOTIME_IN_HZ(44100));
 			}
 			else
 			{
-				cassette_change_state(device_list_find_by_tag(device->machine->config->devicelist, CASSETTE, "cassette" ),CASSETTE_MOTOR_DISABLED ,CASSETTE_MASK_MOTOR);
+				cassette_change_state(devtag_get_device(device->machine, CASSETTE, "cassette"),CASSETTE_MOTOR_DISABLED ,CASSETTE_MASK_MOTOR);
 				timer_reset(datasette_timer, attotime_never);
 			}
 		}
@@ -868,7 +868,7 @@ static UINT8 c128_m6510_port_read(const device_config *device, UINT8 direction)
 {
 	UINT8 data = c64_port_data;
 
-	if ((cassette_get_state(device_list_find_by_tag(device->machine->config->devicelist, CASSETTE, "cassette" )) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
+	if ((cassette_get_state(devtag_get_device(device->machine, CASSETTE, "cassette")) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
 		data &= ~0x10;
 	else
 		data |=  0x10;

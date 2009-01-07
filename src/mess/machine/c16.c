@@ -135,12 +135,12 @@ UINT8 c16_m7501_port_read(const device_config *device, UINT8 direction)
 
 //	data &= ~0x20; // port bit not in pinout
 
-	if (cassette_input(device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" )) > +0.0)
+	if (cassette_input(devtag_get_device(device->machine, CASSETTE, "cassette")) > +0.0)
 		data |=  0x10;
 	else
 		data &= ~0x10;
 
-	cassette_change_state(device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" ), (c16_port7501 & 0x08) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+	cassette_change_state(devtag_get_device(device->machine, CASSETTE, "cassette"), (c16_port7501 & 0x08) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 
 	return data;
 }
@@ -303,7 +303,7 @@ READ8_HANDLER(plus4_6529_port_r)
 {
 	int data = 0x00;
 
-	if (!((cassette_get_state(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" )) & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY))
+	if (!((cassette_get_state(devtag_get_device(space->machine, CASSETTE, "cassette")) & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY))
 		data |= 0x04;
 	return data;
 }
@@ -312,7 +312,7 @@ READ8_HANDLER(c16_fd1x_r)
 {
 	int data = 0x00;
 
-	if (!((cassette_get_state(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" )) & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY))
+	if (!((cassette_get_state(devtag_get_device(space->machine, CASSETTE, "cassette")) & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY))
 		data |= 0x04;
 	return data;
 }

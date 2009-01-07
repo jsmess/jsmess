@@ -241,7 +241,7 @@ static void fdc_coco_init(running_machine *machine, coco_cartridge *cartridge)
 
 static void fdc_coco_dskreg_w(running_machine *machine, coco_cartridge *cartridge, UINT8 data)
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( machine->config->devicelist, WD1773, "wd1773");
+	device_config *fdc = (device_config*)devtag_get_device(machine, WD1773, "wd1773");
 	fdc_info *info = fdc_get_info(cartridge);
 	UINT8 drive = 0;
 	UINT8 head = 0;
@@ -300,7 +300,7 @@ static void fdc_coco_dskreg_w(running_machine *machine, coco_cartridge *cartridg
 
 static UINT8 fdc_coco_r(running_machine *machine, coco_cartridge *cartridge, UINT16 addr)
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( machine->config->devicelist, WD1773, "wd1773");
+	device_config *fdc = (device_config*)devtag_get_device(machine, WD1773, "wd1773");
 	UINT8 result = 0;
 	switch(addr & 0xEF)
 	{
@@ -328,7 +328,7 @@ static UINT8 fdc_coco_r(running_machine *machine, coco_cartridge *cartridge, UIN
 
 static void fdc_coco_w(running_machine *machine, coco_cartridge *cartridge, UINT16 addr, UINT8 data)
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( machine->config->devicelist, WD1773, "wd1773");
+	device_config *fdc = (device_config*)devtag_get_device(machine, WD1773, "wd1773");
 	switch(addr & 0xEF)
 	{
 		case 0: case 1: case 2: case 3:
@@ -415,7 +415,7 @@ static UINT8 fdc_coco3plus_r(running_machine *machine, coco_cartridge *cartridge
 		case 0x10:	/* FF50 */
 			if (real_time_clock(machine) == RTC_DISTO)
 			{
-				dev = device_list_find_by_tag(machine->config->devicelist, MSM6242, "disto");
+				dev = devtag_get_device(machine, MSM6242, "disto");
 				result = msm6242_r(dev, msm6242_rtc_address);
 			}
 			break;
@@ -423,7 +423,7 @@ static UINT8 fdc_coco3plus_r(running_machine *machine, coco_cartridge *cartridge
 		case 0x38:	/* FF78 */
 			if (real_time_clock(machine) == RTC_CLOUD9)
 			{
-				dev = device_list_find_by_tag(machine->config->devicelist, DS1315, "cloud9");
+				dev = devtag_get_device(machine, DS1315, "cloud9");
 				ds1315_r_0(dev, addr);
 			}
 			break;
@@ -431,7 +431,7 @@ static UINT8 fdc_coco3plus_r(running_machine *machine, coco_cartridge *cartridge
 		case 0x39:	/* FF79 */
 			if (real_time_clock(machine) == RTC_CLOUD9)
 			{
-				dev = device_list_find_by_tag(machine->config->devicelist, DS1315, "cloud9");
+				dev = devtag_get_device(machine, DS1315, "cloud9");
 				ds1315_r_1(dev, addr);
 			}
 			break;
@@ -439,7 +439,7 @@ static UINT8 fdc_coco3plus_r(running_machine *machine, coco_cartridge *cartridge
 		case 0x3C:	/* FF7C */
 			if (real_time_clock(machine) == RTC_CLOUD9)
 			{
-				dev = device_list_find_by_tag(machine->config->devicelist, DS1315, "cloud9");
+				dev = devtag_get_device(machine, DS1315, "cloud9");
 				result = ds1315_r_data(dev, addr);
 			}
 			break;
@@ -450,7 +450,7 @@ static UINT8 fdc_coco3plus_r(running_machine *machine, coco_cartridge *cartridge
 		case 0x43:
 		case 0x44:
 		case 0x45:
-			dev = device_list_find_by_tag(machine->config->devicelist, DEVICE_GET_INFO_NAME(coco_vhd), "vhd");
+			dev = devtag_get_device(machine, DEVICE_GET_INFO_NAME(coco_vhd), "vhd");
 			if (dev != NULL)
 				result = coco_vhd_io_r((device_config *) dev, addr);
 			break;
@@ -475,7 +475,7 @@ static void fdc_coco3plus_w(running_machine *machine, coco_cartridge *cartridge,
 		case 0x10:	/* FF50 */
 			if (real_time_clock(machine) == RTC_DISTO)
 			{
-				dev = device_list_find_by_tag(machine->config->devicelist, MSM6242, "disto");
+				dev = devtag_get_device(machine, MSM6242, "disto");
 				msm6242_w(dev, msm6242_rtc_address, data);
 			}
 			break;
@@ -491,7 +491,7 @@ static void fdc_coco3plus_w(running_machine *machine, coco_cartridge *cartridge,
 		case 0x43:
 		case 0x44:
 		case 0x45:
-			dev = device_list_find_by_tag(machine->config->devicelist, DEVICE_GET_INFO_NAME(coco_vhd), "vhd");
+			dev = devtag_get_device(machine, DEVICE_GET_INFO_NAME(coco_vhd), "vhd");
 			if (dev != NULL)
 				coco_vhd_io_w((device_config *) dev, addr, data);
 			break;
@@ -571,7 +571,7 @@ static void fdc_dragon_init(running_machine *machine, coco_cartridge *cartridge)
 
 static void fdc_dragon_dskreg_w(running_machine *machine,coco_cartridge *cartridge, UINT8 data)
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( machine->config->devicelist, WD179X, "wd179x");
+	device_config *fdc = (device_config*)devtag_get_device(machine, WD179X, "wd179x");
 	fdc_info *info = fdc_get_info(cartridge);
 
 	if (LOG_FDC)
@@ -603,7 +603,7 @@ static void fdc_dragon_dskreg_w(running_machine *machine,coco_cartridge *cartrid
 
 static UINT8 fdc_dragon_r(running_machine *machine, coco_cartridge *cartridge, UINT16 addr)
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( machine->config->devicelist, WD179X, "wd179x");
+	device_config *fdc = (device_config*)devtag_get_device(machine, WD179X, "wd179x");
 	UINT8 result = 0;
 	switch(addr & 0xEF)
 	{
@@ -631,7 +631,7 @@ static UINT8 fdc_dragon_r(running_machine *machine, coco_cartridge *cartridge, U
 
 static void fdc_dragon_w(running_machine *machine, coco_cartridge *cartridge, UINT16 addr, UINT8 data)
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( machine->config->devicelist, WD179X, "wd179x");
+	device_config *fdc = (device_config*)devtag_get_device(machine, WD179X, "wd179x");
 	switch(addr & 0xEF)
 	{
 		case 0:

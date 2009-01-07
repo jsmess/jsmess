@@ -101,13 +101,13 @@ WRITE8_DEVICE_HANDLER( mikro80_keyboard_w )
 
 WRITE8_HANDLER( mikro80_tape_w )
 {
-	cassette_output(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" ),data & 0x01 ? 1 : -1);
+	cassette_output(devtag_get_device(space->machine, CASSETTE, "cassette"),data & 0x01 ? 1 : -1);
 }
 
 
 READ8_HANDLER( mikro80_tape_r )
 {
-	double level = cassette_input(device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" ));
+	double level = cassette_input(devtag_get_device(space->machine, CASSETTE, "cassette"));
 	if (level <  0) {
 		 	return 0x00;
  	}

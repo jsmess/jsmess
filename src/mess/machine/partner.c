@@ -30,7 +30,7 @@ DRIVER_INIT(partner)
 
 static WD17XX_CALLBACK( partner_wd17xx_callback )
 {
-	const device_config *dma8257 = device_list_find_by_tag(device->machine->config->devicelist, DMA8257, "dma8257");
+	const device_config *dma8257 = devtag_get_device(device->machine, DMA8257, "dma8257");
 	switch(state)
 	{
 		case WD17XX_IRQ_CLR:
@@ -49,7 +49,7 @@ const wd17xx_interface partner_wd17xx_interface = { partner_wd17xx_callback, NUL
 
 MACHINE_START(partner)
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( machine->config->devicelist, WD1793, "wd1793");
+	device_config *fdc = (device_config*)devtag_get_device(machine, WD1793, "wd1793");
 	wd17xx_set_density (fdc,DEN_MFM_HI);	
 	wd17xx_set_pause_time(fdc,10);
 }
@@ -108,7 +108,7 @@ static void partner_window_2(running_machine *machine, UINT8 bank, UINT16 offset
 }
 
 static READ8_HANDLER ( partner_floppy_r ) {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD1793, "wd1793");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD1793, "wd1793");
 	
 	if (offset<0x100) {
 		switch(offset & 3) {
@@ -124,7 +124,7 @@ static READ8_HANDLER ( partner_floppy_r ) {
 }
 
 static WRITE8_HANDLER ( partner_floppy_w ) {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD1793, "wd1793");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD1793, "wd1793");
 	
 	if (offset<0x100) {
 		switch(offset & 3) {
@@ -383,13 +383,13 @@ static WRITE8_DEVICE_HANDLER(partner_dma_write_byte)
 
 static READ8_DEVICE_HANDLER ( partner_wd17xx_data_r )
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( device->machine->config->devicelist, WD1793, "wd1793");
+	device_config *fdc = (device_config*)devtag_get_device(device->machine, WD1793, "wd1793");
 	return wd17xx_data_r(fdc, offset);
 }
 
 static WRITE8_DEVICE_HANDLER ( partner_wd17xx_data_w )
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( device->machine->config->devicelist, WD1793, "wd1793");
+	device_config *fdc = (device_config*)devtag_get_device(device->machine, WD1793, "wd1793");
 	wd17xx_data_w(fdc, offset, data);
 }
 

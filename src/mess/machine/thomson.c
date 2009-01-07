@@ -37,7 +37,7 @@
 /********************* common cassette code ***************************/
 
 INLINE const device_config* thom_cassette_img( running_machine *machine )
-{ return device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ); }
+{ return devtag_get_device(machine, CASSETTE, "cassette"); }
 
 /*-------------- TO7 ------------*/
 
@@ -731,7 +731,7 @@ typedef enum
 
 static const device_config *printer_device(running_machine *machine)
 {
-	return device_list_find_by_tag(machine->config->devicelist, PRINTER, "printer");
+	return devtag_get_device(machine, PRINTER, "printer");
 }
 
 /* test whether a parallel or a serial device is connected: both cannot

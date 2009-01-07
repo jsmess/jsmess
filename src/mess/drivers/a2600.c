@@ -810,14 +810,14 @@ static READ8_HANDLER(modeSS_r)
 
 		/* Check if we should stop the tape */
 		if ( cpu_get_pc(space->machine->cpu[0]) == 0x00FD ) {
-			const device_config *img = device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" );
+			const device_config *img = devtag_get_device(space->machine, CASSETTE, "cassette");
 			if ( img ) {
 				cassette_change_state(img, CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 			}
 		}
 	} else if ( offset == 0xFF9 ) {
 		/* Cassette port read */
-		double tap_val = cassette_input( device_list_find_by_tag( space->machine->config->devicelist, CASSETTE, "cassette" ) );
+		double tap_val = cassette_input( devtag_get_device(space->machine, CASSETTE, "cassette") );
 		//logerror("%04X: Cassette port read, tap_val = %f\n", cpu_get_pc(machine->cpu[0]), tap_val);
 		if ( tap_val < 0 ) {
 			data = 0x00;
@@ -1102,7 +1102,7 @@ static void switch_A_w(const device_config *device, UINT8 olddata, UINT8 data)
 		keypad_right_column = data & 0x0F;
 		break;
 	case 0x0a:	/* KidVid voice module */
-		cassette_change_state( device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ), ( data & 0x02 ) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED | CASSETTE_PLAY, CASSETTE_MOTOR_DISABLED );
+		cassette_change_state( devtag_get_device(machine, CASSETTE, "cassette"), ( data & 0x02 ) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED | CASSETTE_PLAY, CASSETTE_MOTOR_DISABLED );
 		break;
 	}
 }
@@ -1748,7 +1748,7 @@ static MACHINE_RESET( a2600 )
 		modeSS_byte_started = 0;
 		memory_set_direct_update_handler(space, modeSS_opbase );
 		/* Already start the motor of the cassette for the user */
-		cassette_change_state( device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ), CASSETTE_MOTOR_ENABLED, CASSETTE_MOTOR_DISABLED );
+		cassette_change_state( devtag_get_device(machine, CASSETTE, "cassette"), CASSETTE_MOTOR_ENABLED, CASSETTE_MOTOR_DISABLED );
 		break;
 
 	case modeFV:

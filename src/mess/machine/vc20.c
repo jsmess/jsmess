@@ -96,12 +96,12 @@ static WRITE8_DEVICE_HANDLER( vc20_via0_write_ca2 )
 
 	if(via0_ca2)
 	{
-		cassette_change_state(device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" ),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+		cassette_change_state(devtag_get_device(device->machine, CASSETTE, "cassette"),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
 		timer_adjust_periodic(datasette_timer, attotime_zero, 0, ATTOTIME_IN_HZ(44100));
 	}
 	else
 	{
-		cassette_change_state(device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" ),CASSETTE_MOTOR_DISABLED ,CASSETTE_MASK_MOTOR);
+		cassette_change_state(devtag_get_device(device->machine, CASSETTE, "cassette"),CASSETTE_MOTOR_DISABLED ,CASSETTE_MASK_MOTOR);
 		timer_reset(datasette_timer, attotime_never);
 	}
 }
@@ -121,7 +121,7 @@ static READ8_DEVICE_HANDLER( vc20_via0_read_porta )
 	if (!serial_data || !cbm_serial_data_read (device->machine))
 		value &= ~0x02;
 
-	if ((cassette_get_state(device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" )) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
+	if ((cassette_get_state(devtag_get_device(device->machine, CASSETTE, "cassette")) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
 		value &= ~0x40;
 	else
 		value |=  0x40;
@@ -185,7 +185,7 @@ static READ8_DEVICE_HANDLER( vc20_via1_read_porta )
 
 static READ8_DEVICE_HANDLER( vc20_via1_read_ca1 )
 {
-	UINT8 data = (cassette_input(device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" )) > +0.0) ? 1 : 0;
+	UINT8 data = (cassette_input(devtag_get_device(device->machine, CASSETTE, "cassette")) > +0.0) ? 1 : 0;
 	return data;
 }
 
@@ -324,7 +324,7 @@ static WRITE8_DEVICE_HANDLER( vc20_via1_write_porta )
 static WRITE8_DEVICE_HANDLER( vc20_via1_write_portb )
 {
 /*  logerror("via1_write_portb: $%02X\n", data); */
-	cassette_output(device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" ), (data & 0x08) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
+	cassette_output(devtag_get_device(device->machine, CASSETTE, "cassette"), (data & 0x08) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
 	via1_portb = data;
 }
 
@@ -556,8 +556,8 @@ static void vc20_memory_init(running_machine *machine)
 
 static TIMER_CALLBACK( vic20_tape_timer )
 {
-	const device_config *via_1 = device_list_find_by_tag(machine->config->devicelist, VIA6522, "via6522_1");
-	UINT8 data = (cassette_input(device_list_find_by_tag(machine->config->devicelist, CASSETTE, "cassette" )) > +0.0) ? 1 : 0;
+	const device_config *via_1 = devtag_get_device(machine, VIA6522, "via6522_1");
+	UINT8 data = (cassette_input(devtag_get_device(machine, CASSETTE, "cassette")) > +0.0) ? 1 : 0;
 	via_ca1_w(via_1, 0, data);
 }
 
@@ -612,7 +612,7 @@ DRIVER_INIT( vic20i )
 
 MACHINE_RESET( vic20 )
 {
-	const device_config *via_0 = device_list_find_by_tag(machine->config->devicelist, VIA6522, "via6522_0");
+	const device_config *via_0 = devtag_get_device(machine, VIA6522, "via6522_0");
 
 	if (has_vc1541)
 	{
@@ -663,7 +663,7 @@ static TIMER_CALLBACK( lightpen_tick )
 
 INTERRUPT_GEN( vic20_frame_interrupt )
 {
-	const device_config *via_0 = device_list_find_by_tag(device->machine->config->devicelist, VIA6522, "via6522_0");
+	const device_config *via_0 = devtag_get_device(device->machine, VIA6522, "via6522_0");
 
 	via_ca1_w(via_0, 0, vc20_via0_read_ca1(via_0, 0));
 	keyboard[0] = input_port_read(device->machine, "ROW0");

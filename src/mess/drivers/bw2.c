@@ -312,7 +312,7 @@ static WD17XX_CALLBACK( bw2_wd17xx_callback )
 static READ8_HANDLER( bw2_wd2797_r )
 {
 	UINT8 result = 0xff;
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD179X, "wd179x");
 
 	switch (offset & 0x03)
 	{
@@ -335,7 +335,7 @@ static READ8_HANDLER( bw2_wd2797_r )
 
 static WRITE8_HANDLER( bw2_wd2797_w )
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD179X, "wd179x");
 	switch (offset & 0x3)
 	{
 		case 0:
@@ -373,7 +373,7 @@ static WRITE8_HANDLER( bw2_wd2797_w )
 
 static WRITE8_DEVICE_HANDLER( bw2_ppi8255_a_w )
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( device->machine->config->devicelist, WD179X, "wd179x");
+	device_config *fdc = (device_config*)devtag_get_device(device->machine, WD179X, "wd179x");
 	/*
 
 		PA0     KB0 Keyboard line select 0
@@ -595,7 +595,7 @@ static DRIVER_INIT( bw2 )
 static MACHINE_START( bw2 )
 {
 	bw2_state *state = machine->driver_data;
-	device_config *fdc = (device_config*)device_list_find_by_tag( machine->config->devicelist, WD179X, "wd179x");
+	device_config *fdc = (device_config*)devtag_get_device(machine, WD179X, "wd179x");
 
 
 	centronics_config(machine,0, bw2_centronics_config);

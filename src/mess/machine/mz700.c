@@ -168,7 +168,7 @@ static READ8_DEVICE_HANDLER (pio_port_c_r )
     if (mz700_motor_on)
         data |= 0x10;
 
-    if (cassette_input(device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" )) > 0.0038)
+    if (cassette_input(devtag_get_device(device->machine, CASSETTE, "cassette")) > 0.0038)
         data |= 0x20;       /* set the RDATA status */
 
 	if (ne556_out[0])
@@ -217,11 +217,11 @@ static WRITE8_DEVICE_HANDLER ( pio_port_c_w )
 	pio_port_c_output = data;
 
 	cassette_change_state(
-		device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" ),
+		devtag_get_device(device->machine, CASSETTE, "cassette"),
 		((data & 0x08) && mz700_motor_on) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,
 		CASSETTE_MOTOR_DISABLED);
 
-    cassette_output(device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" ), (data & 0x02) ? +1.0 : -1.0);
+    cassette_output(devtag_get_device(device->machine, CASSETTE, "cassette"), (data & 0x02) ? +1.0 : -1.0);
 }
 
 /************************ MMIO ***********************************************/
@@ -236,11 +236,11 @@ READ8_HANDLER ( mz700_mmio_r )
 	{
 	/* the first four ports are connected to a 8255 PPI */
     case 0: case 1: case 2: case 3:
-		data = ppi8255_r((device_config*)device_list_find_by_tag( space->machine->config->devicelist, PPI8255, "ppi8255" ), offset & 3);
+		data = ppi8255_r((device_config*)devtag_get_device(space->machine, PPI8255, "ppi8255"), offset & 3);
 		break;
 
 	case 4: case 5: case 6: case 7:
-		data = pit8253_r((device_config*)device_list_find_by_tag( space->machine->config->devicelist, PIT8253, "pit8253" ), offset & 3);
+		data = pit8253_r((device_config*)devtag_get_device(space->machine, PIT8253, "pit8253"), offset & 3);
         break;
 
 	case 8:
@@ -260,17 +260,17 @@ WRITE8_HANDLER ( mz700_mmio_w )
 	{
 	/* the first four ports are connected to a 8255 PPI */
     case 0: case 1: case 2: case 3:
-		ppi8255_w((device_config*)device_list_find_by_tag( space->machine->config->devicelist, PPI8255, "ppi8255" ), offset & 3, data);
+		ppi8255_w((device_config*)devtag_get_device(space->machine, PPI8255, "ppi8255"), offset & 3, data);
         break;
 
 	/* the next four ports are connected to a 8253 PIT */
     case 4: case 5: case 6: case 7:
-		pit8253_w((device_config*)device_list_find_by_tag( space->machine->config->devicelist, PIT8253, "pit8253" ), offset & 3, data);
+		pit8253_w((device_config*)devtag_get_device(space->machine, PIT8253, "pit8253"), offset & 3, data);
 		break;
 
 	case 8:
 		LOG(1,"mz700_e008_w",("%02X\n", data),space->machine);
-		pit8253_gate_w((device_config*)device_list_find_by_tag( space->machine->config->devicelist, PIT8253, "pit8253" ), 0, data & 1);
+		pit8253_gate_w((device_config*)devtag_get_device(space->machine, PIT8253, "pit8253"), 0, data & 1);
         break;
 	}
 }
@@ -518,11 +518,11 @@ static UINT8 mz800_palette_bank;
 	{
 	/* the first four ports are connected to a 8255 PPI */
     case 0: case 1: case 2: case 3:
-		data = ppi8255_r((device_config*)device_list_find_by_tag( space->machine->config->devicelist, PPI8255, "ppi8255" ), offset & 3);
+		data = ppi8255_r((device_config*)devtag_get_device(space->machine, PPI8255, "ppi8255"), offset & 3);
 		break;
 
 	case 4: case 5: case 6: case 7:
-		data = pit8253_r((device_config*)device_list_find_by_tag( space->machine->config->devicelist, PIT8253, "pit8253" ), offset & 3);
+		data = pit8253_r((device_config*)devtag_get_device(space->machine, PIT8253, "pit8253"), offset & 3);
         break;
 
 	default:

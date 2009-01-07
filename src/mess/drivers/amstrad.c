@@ -211,7 +211,7 @@ static void multiface_reset(void);
 
 static const device_config *printer_device(running_machine *machine)
 {
-	return device_list_find_by_tag(machine->config->devicelist, PRINTER, "printer");
+	return devtag_get_device(machine, PRINTER, "printer");
 }
 
 
@@ -330,7 +330,7 @@ static READ8_DEVICE_HANDLER (amstrad_ppi_portb_r)
 /* Set b7 with cassette tape input */
 	if(amstrad_system_type != SYSTEM_GX4000)
 	{
-		if (cassette_input(device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" )) > 0.03) {
+		if (cassette_input(devtag_get_device(device->machine, CASSETTE, "cassette")) > 0.03) {
 			data |= (1<<7);
 		}
 	}
@@ -396,7 +396,7 @@ static WRITE8_DEVICE_HANDLER ( amstrad_ppi_portc_w )
 	if(amstrad_system_type != SYSTEM_GX4000)
 	{
 		if ((changed_data & 0x20) != 0) {
-			cassette_output(device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" ),
+			cassette_output(devtag_get_device(device->machine, CASSETTE, "cassette"),
 				((data & 0x20) ? -1.0 : +1.0));
 		}
 	}
@@ -405,7 +405,7 @@ static WRITE8_DEVICE_HANDLER ( amstrad_ppi_portc_w )
 	if(amstrad_system_type != SYSTEM_GX4000)
 	{
 		if ((changed_data & 0x10) != 0) {
-			cassette_change_state(device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" ),
+			cassette_change_state(devtag_get_device(device->machine, CASSETTE, "cassette"),
 				((data & 0x10) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED),
 				CASSETTE_MASK_MOTOR);
 		}
@@ -1246,7 +1246,7 @@ Expansion Peripherals Read/Write -   -   -   -   -   0   -   -   -   -   -   -  
 
 static READ8_HANDLER ( AmstradCPC_ReadPortHandler )
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, NEC765A, "nec765");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, NEC765A, "nec765");
 	unsigned char data = 0xFF;
 	unsigned int r1r0 = (unsigned int)((offset & 0x0300) >> 8);
 	m6845_personality_t crtc_type;
@@ -1302,7 +1302,7 @@ b9 b8 | PPI Function Read/Write status
 	if ((offset & (1<<11)) == 0)
 	{
 		if (r1r0 < 0x03 )
-			data = ppi8255_r((device_config*)device_list_find_by_tag( space->machine->config->devicelist, PPI8255, "ppi8255" ), r1r0);
+			data = ppi8255_r((device_config*)devtag_get_device(space->machine, PPI8255, "ppi8255"), r1r0);
 	}
 /* if b10 = 0 : Expansion Peripherals Read selected
 
@@ -1346,7 +1346,7 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 /* Offset handler for write */
 static WRITE8_HANDLER ( AmstradCPC_WritePortHandler )
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, NEC765A, "nec765");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, NEC765A, "nec765");
 	if ((offset & (1<<15)) == 0) 
 	{
 		if(aleste_mode & 0x04) // Aleste mode
@@ -1424,7 +1424,7 @@ b9 b8 | PPI Function Read/Write status
 */
 	if ((offset & (1<<11)) == 0) {
 		unsigned int Index = ((offset & 0x0300) >> 8);
-		ppi8255_w((device_config*)device_list_find_by_tag( space->machine->config->devicelist, PPI8255, "ppi8255" ), Index, data);
+		ppi8255_w((device_config*)devtag_get_device(space->machine, PPI8255, "ppi8255"), Index, data);
 	}
 /* if b10 = 0 : Expansion Peripherals Write selected */
 	if ((offset & (1<<10)) == 0) {

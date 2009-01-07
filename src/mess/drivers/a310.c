@@ -364,7 +364,7 @@ static void latch_timer_cnt(int tmr)
 
 static READ32_HANDLER(ioc_r)
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD1772, "wd1772");	
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD1772, "wd1772");
 	if (offset >= 0x80000 && offset < 0xc0000)
 	{
 		switch (offset & 0x1f)
@@ -418,7 +418,7 @@ static READ32_HANDLER(ioc_r)
 
 static WRITE32_HANDLER(ioc_w)
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD1772, "wd1772");	
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD1772, "wd1772");
 	if (offset >= 0x80000 && offset < 0xc0000)
 	{
 //      logerror("IOC: W %02x @ reg %s (PC=%x)\n", data&0xff, ioc_regnames[offset&0x1f], cpu_get_pc( space->cpu ));

@@ -41,7 +41,7 @@ static READ8_DEVICE_HANDLER (vector06_8255_portb_r )
 
 static READ8_DEVICE_HANDLER (vector06_8255_portc_r )
 {	
-	double level = cassette_input(device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, "cassette" ));
+	double level = cassette_input(devtag_get_device(device->machine, CASSETTE, "cassette"));
 	UINT8 retVal = input_port_read(device->machine, "LINE8");
 	if (level >  0) { 
 		retVal |= 0x10; 
@@ -124,20 +124,20 @@ const ppi8255_interface vector06_ppi8255_interface =
 };
 
 READ8_HANDLER(vector_8255_1_r) {
-	return ppi8255_r((device_config*)device_list_find_by_tag( space->machine->config->devicelist, PPI8255, "ppi8255" ), (offset ^ 0x03));
+	return ppi8255_r((device_config*)devtag_get_device(space->machine, PPI8255, "ppi8255"), (offset ^ 0x03));
 }
 
 WRITE8_HANDLER(vector_8255_1_w) {
-	ppi8255_w((device_config*)device_list_find_by_tag( space->machine->config->devicelist, PPI8255, "ppi8255" ), (offset ^0x03) , data );
+	ppi8255_w((device_config*)devtag_get_device(space->machine, PPI8255, "ppi8255"), (offset ^0x03) , data );
 
 }
 
 READ8_HANDLER(vector_8255_2_r) {
-	return ppi8255_r((device_config*)device_list_find_by_tag( space->machine->config->devicelist, PPI8255, "ppi8255_2" ), (offset ^ 0x03));
+	return ppi8255_r((device_config*)devtag_get_device(space->machine, PPI8255, "ppi8255_2"), (offset ^ 0x03));
 }
 
 WRITE8_HANDLER(vector_8255_2_w) {
-	ppi8255_w((device_config*)device_list_find_by_tag( space->machine->config->devicelist, PPI8255, "ppi8255_2" ), (offset ^0x03) , data );
+	ppi8255_w((device_config*)devtag_get_device(space->machine, PPI8255, "ppi8255_2"), (offset ^0x03) , data );
 
 }
 
@@ -171,7 +171,7 @@ static TIMER_CALLBACK(reset_check_callback)
 
 WRITE8_HANDLER(vector_disc_w)
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD1793, "wd1793");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD1793, "wd1793");
 	wd17xx_set_side (fdc,((data & 4) >> 2) ^ 1);
  	wd17xx_set_drive(fdc,data & 1);					
 }
@@ -205,7 +205,7 @@ DEVICE_IMAGE_LOAD( vector_floppy )
 
 MACHINE_START( vector06 )
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( machine->config->devicelist, WD1793, "wd1793");
+	device_config *fdc = (device_config*)devtag_get_device(machine, WD1793, "wd1793");
 	wd17xx_set_density (fdc, DEN_FM_HI);
 }
 

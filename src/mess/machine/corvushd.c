@@ -1181,7 +1181,7 @@ static hard_disk_file *corvus_hdc_file(running_machine *machine, int id) {
 	/* Only one harddisk supported right now */
 	assert ( id == 0 );
 
-	img = device_list_find_by_tag( machine->config->devicelist, HARDDISK, tags[id] );
+	img = devtag_get_device(machine, HARDDISK, tags[id]);
 
 	if ( !img )
 		return NULL;

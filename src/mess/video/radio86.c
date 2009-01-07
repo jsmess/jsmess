@@ -95,7 +95,7 @@ I8275_DISPLAY_PIXELS(partner_display_pixels)
 
 VIDEO_UPDATE( radio86 )
 {
-	device_config	*devconf = (device_config *) device_list_find_by_tag(screen->machine->config->devicelist, I8275, "i8275");
+	device_config	*devconf = (device_config *) devtag_get_device(screen->machine, I8275, "i8275");
 	i8275_update( devconf, bitmap, cliprect);
 	VIDEO_UPDATE_CALL ( generic_bitmapped );
 	return 0;

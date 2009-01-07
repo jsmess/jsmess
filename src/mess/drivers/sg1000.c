@@ -642,7 +642,7 @@ static WRITE8_DEVICE_HANDLER( sf7000_ppi8255_b_w )
 
 static WRITE8_DEVICE_HANDLER( sf7000_ppi8255_c_w )
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( device->machine->config->devicelist, NEC765A, "nec765");
+	device_config *fdc = (device_config*)devtag_get_device(device->machine, NEC765A, "nec765");
 	/*
         Signal  Description
 

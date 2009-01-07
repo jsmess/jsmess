@@ -187,7 +187,7 @@ static const int spectrum_plus3_memory_selections[]=
 static WRITE8_HANDLER(spectrum_plus3_port_3ffd_w)
 {
 		if (~input_port_read(space->machine, "CONFIG") & 0x20)
-				nec765_data_w((device_config*)device_list_find_by_tag( space->machine->config->devicelist, NEC765A, "nec765"), 0,data);
+				nec765_data_w((device_config*)devtag_get_device(space->machine, NEC765A, "nec765"), 0,data);
 }
 
 static  READ8_HANDLER(spectrum_plus3_port_3ffd_r)
@@ -195,7 +195,7 @@ static  READ8_HANDLER(spectrum_plus3_port_3ffd_r)
 		if (input_port_read(space->machine, "CONFIG") & 0x20)
 				return 0xff;
 		else
-				return nec765_data_r((device_config*)device_list_find_by_tag( space->machine->config->devicelist, NEC765A, "nec765"), 0);
+				return nec765_data_r((device_config*)devtag_get_device(space->machine, NEC765A, "nec765"), 0);
 }
 
 
@@ -204,7 +204,7 @@ static  READ8_HANDLER(spectrum_plus3_port_2ffd_r)
 		if (input_port_read(space->machine, "CONFIG") & 0x20)
 				return 0xff;
 		else
-				return nec765_status_r((device_config*)device_list_find_by_tag( space->machine->config->devicelist, NEC765A, "nec765"), 0);
+				return nec765_status_r((device_config*)devtag_get_device(space->machine, NEC765A, "nec765"), 0);
 }
 
 

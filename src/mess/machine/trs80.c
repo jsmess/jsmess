@@ -59,7 +59,7 @@ static emu_timer *cassette_data_timer;
 
 static TIMER_CALLBACK( cassette_data_callback )
 {
-	double new_val = cassette_input(device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" ));
+	double new_val = cassette_input(devtag_get_device(machine, CASSETTE, "cassette"));
 
 	/* Check for HI-LO transition */
 	if ( old_cassette_val > -0.2 && new_val < -0.2 )
@@ -300,7 +300,7 @@ DRIVER_INIT( ht108064 )
 WRITE8_HANDLER( trs80_port_ff_w )
 {
 	static const double levels[4] = { 0.0, -1.0, 0.0, 1.0 };
-	const device_config *cass = device_list_find_by_tag(space->machine->config->devicelist, CASSETTE, "cassette" );
+	const device_config *cass = devtag_get_device(space->machine, CASSETTE, "cassette");
 
 	cassette_change_state( cass, ( data & 0x04 ) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR );
 
@@ -401,7 +401,7 @@ WRITE8_HANDLER( trs80_irq_mask_w )
 WRITE8_HANDLER( trs80_motor_w )
 {
 	UINT8 drive = 255;
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD179X, "wd179x");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD179X, "wd179x");
 
 	LOG(("trs80 motor_w $%02X\n", data));
 

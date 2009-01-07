@@ -215,16 +215,16 @@ static hard_disk_file *pc_hdc_file(running_machine *machine, int id)
 	switch( id )
 	{
 	case 0:
-		img = device_list_find_by_tag( machine->config->devicelist, HARDDISK, "harddisk1" );
+		img = devtag_get_device(machine, HARDDISK, "harddisk1");
 		break;
 	case 1:
-		img = device_list_find_by_tag( machine->config->devicelist, HARDDISK, "harddisk2" );
+		img = devtag_get_device(machine, HARDDISK, "harddisk2");
 		break;
 	case 2:
-		img = device_list_find_by_tag( machine->config->devicelist, HARDDISK, "harddisk3" );
+		img = devtag_get_device(machine, HARDDISK, "harddisk3");
 		break;
 	case 3:
-		img = device_list_find_by_tag( machine->config->devicelist, HARDDISK, "harddisk4" );
+		img = devtag_get_device(machine, HARDDISK, "harddisk4");
 		break;
 	}
 

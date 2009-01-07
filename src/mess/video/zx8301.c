@@ -249,7 +249,7 @@ static DEVICE_START( zx8301 )
 	zx8301->vsync = 1;
 
 	/* get the screen device */
-	zx8301->screen = device_list_find_by_tag(device->machine->config->devicelist, VIDEO_SCREEN, zx8301->intf->screen_tag);
+	zx8301->screen = devtag_get_device(device->machine, VIDEO_SCREEN, zx8301->intf->screen_tag);
 	assert(zx8301->screen != NULL);
 
 	/* create the timers */

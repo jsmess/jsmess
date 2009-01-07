@@ -1234,7 +1234,7 @@ void apple2_iwm_setdiskreg(running_machine *machine, UINT8 data)
 {
 	apple2_fdc_diskreg = data & 0xC0;
 	if (apple2_fdc_has_35(machine))
-		sony_set_sel_line( (device_config*)device_list_find_by_tag( machine->config->devicelist,APPLEFDC,"fdc"),apple2_fdc_diskreg & 0x80);
+		sony_set_sel_line( (device_config*)devtag_get_device(machine, APPLEFDC, "fdc"),apple2_fdc_diskreg & 0x80);
 }
 
 

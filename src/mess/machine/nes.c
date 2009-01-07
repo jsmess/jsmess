@@ -66,7 +66,7 @@ static void nes_machine_stop(running_machine *machine);
 
 static const device_config *cartslot_image(running_machine *machine)
 {
-	return device_list_find_by_tag(machine->config->devicelist, CARTSLOT, "cart");
+	return devtag_get_device(machine, CARTSLOT, "cart");
 }
 
 static void init_nes_core (running_machine *machine)

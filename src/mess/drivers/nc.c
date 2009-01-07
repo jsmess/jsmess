@@ -784,7 +784,7 @@ static const unsigned long baud_rate_table[]=
 
 static TIMER_CALLBACK(nc_serial_timer_callback)
 {
-	const device_config *uart = device_list_find_by_tag(machine->config->devicelist, MSM8251, "uart");
+	const device_config *uart = devtag_get_device(machine, MSM8251, "uart");
 
 	msm8251_transmit_clock(uart);
 	msm8251_receive_clock(uart);
@@ -975,7 +975,7 @@ static MACHINE_RESET( nc100 )
 	nc_common_open_stream_for_reading(machine);
 
 	{
-		const device_config *rtc = device_list_find_by_tag(machine->config->devicelist, TC8521, "rtc");
+		const device_config *rtc = devtag_get_device(machine, TC8521, "rtc");
 		tc8521_load_stream(rtc, file);
 	}
 
@@ -991,7 +991,7 @@ static void nc100_machine_stop(running_machine *machine)
 {
 	nc_common_open_stream_for_writing(machine);
 	{
-		const device_config *rtc = device_list_find_by_tag(machine->config->devicelist, TC8521, "rtc");
+		const device_config *rtc = devtag_get_device(machine, TC8521, "rtc");
 		tc8521_save_stream(rtc, file);
 	}
 	nc_common_store_memory_to_stream();
@@ -1518,7 +1518,7 @@ static WRITE8_HANDLER(nc200_uart_control_w)
 
 static WRITE8_HANDLER(nc200_memory_card_wait_state_w)
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, NEC765A, "nec765");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, NEC765A, "nec765");
 	LOG_DEBUG(("nc200 memory card wait state: PC: %04x %02x\n",cpu_get_pc(space->machine->cpu[0]),data));
 #if 0
 	floppy_drive_set_motor_state(0,1);

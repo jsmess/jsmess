@@ -600,7 +600,7 @@ static MACHINE_RESET( adam )
 {
 	const device_config *img;
 
-	img = device_list_find_by_tag( machine->config->devicelist, CARTSLOT, "cart" );
+	img = devtag_get_device(machine, CARTSLOT, "cart");
 
 	if (image_exists(img))
 	{

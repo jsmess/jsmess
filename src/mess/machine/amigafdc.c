@@ -606,7 +606,7 @@ static TIMER_CALLBACK(fdc_rev_proc)
 	const device_config *cia;
 
 	/* Issue a index pulse when a disk revolution completes */
-	cia = device_list_find_by_tag(machine->config->devicelist, CIA8520, "cia_1");
+	cia = devtag_get_device(machine, CIA8520, "cia_1");
 	cia_issue_index(cia);
 
 	timer_adjust_oneshot(fdc_status[drive].rev_timer, ATTOTIME_IN_MSEC( ONE_REV_TIME ), drive);

@@ -53,12 +53,12 @@ static void atom_via_irq_func(const device_config *device, int state)
 
 static const device_config *cassette_device_image(running_machine *machine)
 {
-	return device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" );
+	return devtag_get_device(machine, CASSETTE, "cassette");
 }
 
 static const device_config *printer_image(running_machine *machine)
 {
-	return device_list_find_by_tag(machine->config->devicelist, PRINTER, "printer");
+	return devtag_get_device(machine, PRINTER, "printer");
 }
 
 /* printer status */
@@ -414,7 +414,7 @@ WRITE8_DEVICE_HANDLER (atom_8255_portc_w)
 /* KT- I've assumed that the atom 8271 is linked in exactly the same way as on the bbc */
 READ8_HANDLER(atom_8271_r)
 {
-	device_config *i8271 = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, I8271, "i8271" );
+	device_config *i8271 = (device_config*)devtag_get_device(space->machine, I8271, "i8271");
 
 	switch (offset)
 	{
@@ -435,7 +435,7 @@ READ8_HANDLER(atom_8271_r)
 
 WRITE8_HANDLER(atom_8271_w)
 {
-	device_config *i8271 = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, I8271, "i8271" );
+	device_config *i8271 = (device_config*)devtag_get_device(space->machine, I8271, "i8271");
 
 	switch (offset)
 	{

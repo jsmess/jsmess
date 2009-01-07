@@ -510,8 +510,8 @@ static WRITE8_HANDLER ( c65_write_io )
 static WRITE8_HANDLER ( c65_write_io_dc00 )
 {
 	running_machine *machine = space->machine;
-	const device_config *cia_0 = device_list_find_by_tag(space->machine->config->devicelist, CIA6526R1, "cia_0");
-	const device_config *cia_1 = device_list_find_by_tag(space->machine->config->devicelist, CIA6526R1, "cia_1");
+	const device_config *cia_0 = devtag_get_device(space->machine, CIA6526R1, "cia_0");
+	const device_config *cia_1 = devtag_get_device(space->machine, CIA6526R1, "cia_1");
 
 	switch(offset&0xf00) {
 	case 0x000:
@@ -566,8 +566,8 @@ static READ8_HANDLER ( c65_read_io )
 static READ8_HANDLER ( c65_read_io_dc00 )
 {
 	running_machine *machine = space->machine;
-	const device_config *cia_0 = device_list_find_by_tag(space->machine->config->devicelist, CIA6526R1, "cia_0");
-	const device_config *cia_1 = device_list_find_by_tag(space->machine->config->devicelist, CIA6526R1, "cia_1");
+	const device_config *cia_0 = devtag_get_device(space->machine, CIA6526R1, "cia_0");
+	const device_config *cia_1 = devtag_get_device(space->machine, CIA6526R1, "cia_1");
 
 	switch(offset&0x300) {
 	case 0x000:

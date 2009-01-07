@@ -571,7 +571,7 @@ static void keyboard_init(void)
 static TIMER_CALLBACK(kbd_clock)
 {
 	int i;
-	const device_config *via_0 = device_list_find_by_tag(machine->config->devicelist, VIA6522, "via6522_0");
+	const device_config *via_0 = devtag_get_device(machine, VIA6522, "via6522_0");
 
 	if (kbd_comm == TRUE)
 	{
@@ -890,7 +890,7 @@ void mac_scc_ack(const device_config *device)
 
 void mac_scc_mouse_irq(running_machine *machine, int x, int y)
 {
-	const device_config *scc = device_list_find_by_tag(machine->config->devicelist, SCC8530, "scc");
+	const device_config *scc = devtag_get_device(machine, SCC8530, "scc");
 	static int last_was_x = 0;
 
 	if (x && y)
@@ -918,7 +918,7 @@ void mac_scc_mouse_irq(running_machine *machine, int x, int y)
 
 READ16_HANDLER ( mac_scc_r )
 {
-	const device_config *scc = device_list_find_by_tag(space->machine->config->devicelist, SCC8530, "scc");
+	const device_config *scc = devtag_get_device(space->machine, SCC8530, "scc");
 	UINT16 result;
 
 	result = scc_r(scc, offset);
@@ -929,13 +929,13 @@ READ16_HANDLER ( mac_scc_r )
 
 WRITE16_HANDLER ( mac_scc_w )
 {
-	const device_config *scc = device_list_find_by_tag(space->machine->config->devicelist, SCC8530, "scc");
+	const device_config *scc = devtag_get_device(space->machine, SCC8530, "scc");
 	scc_w(scc, offset, (UINT8) data);
 }
 
 WRITE16_HANDLER ( mac_scc_2_w )
 {
-	const device_config *scc = device_list_find_by_tag(space->machine->config->devicelist, SCC8530, "scc");
+	const device_config *scc = devtag_get_device(space->machine, SCC8530, "scc");
 	UINT8 wdata = data>>8;
 
 	scc_w(scc, offset, wdata);
@@ -1512,7 +1512,7 @@ static void mac_adb_talk(running_machine *machine)
 
 static TIMER_CALLBACK(mac_adb_tick)
 {
-	const device_config *via_0 = device_list_find_by_tag(machine->config->devicelist, VIA6522, "via6522_0");
+	const device_config *via_0 = devtag_get_device(machine, VIA6522, "via6522_0");
 
 	// do one clock transition on CB1 to advance the VIA shifter
 	adb_extclock ^= 1;
@@ -1724,7 +1724,7 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_a)
 {
 	set_scc_waitrequest((data & 0x80) >> 7);
 	mac_set_screen_buffer((data & 0x40) >> 6);
-	sony_set_sel_line((device_config*)device_list_find_by_tag( device->machine->config->devicelist,APPLEFDC,"fdc"),(data & 0x20) >> 5);
+	sony_set_sel_line((device_config*)devtag_get_device(device->machine, APPLEFDC, "fdc"),(data & 0x20) >> 5);
 	if (mac_model == MODEL_MAC_SE)	// on SE this selects which floppy drive (0 = upper, 1 = lower)
 	{
 		mac_drive_select = ((data & 0x10) >> 4);
@@ -1777,7 +1777,7 @@ static void mac_via_irq(const device_config *device, int state)
 READ16_HANDLER ( mac_via_r )
 {
 	UINT16 data;
-	const device_config *via_0 = device_list_find_by_tag(space->machine->config->devicelist, VIA6522, "via6522_0");
+	const device_config *via_0 = devtag_get_device(space->machine, VIA6522, "via6522_0");
 
 	offset >>= 8;
 	offset &= 0x0f;
@@ -1791,7 +1791,7 @@ READ16_HANDLER ( mac_via_r )
 
 WRITE16_HANDLER ( mac_via_w )
 {
-	const device_config *via_0 = device_list_find_by_tag(space->machine->config->devicelist, VIA6522, "via6522_0");
+	const device_config *via_0 = devtag_get_device(space->machine, VIA6522, "via6522_0");
 
 	offset >>= 8;
 	offset &= 0x0f;
@@ -1814,7 +1814,7 @@ static void mac_via2_irq(const device_config *device, int state)
 READ16_HANDLER ( mac_via2_r )
 {
 	int data;
-	const device_config *via_1 = device_list_find_by_tag(space->machine->config->devicelist, VIA6522, "via6522_1");
+	const device_config *via_1 = devtag_get_device(space->machine, VIA6522, "via6522_1");
 
 	offset >>= 8;
 	offset &= 0x0f;
@@ -1828,7 +1828,7 @@ READ16_HANDLER ( mac_via2_r )
 
 WRITE16_HANDLER ( mac_via2_w )
 {
-	const device_config *via_1 = device_list_find_by_tag(space->machine->config->devicelist, VIA6522, "via6522_1");
+	const device_config *via_1 = devtag_get_device(space->machine, VIA6522, "via6522_1");
 
 	offset >>= 8;
 	offset &= 0x0f;
@@ -2038,7 +2038,7 @@ DRIVER_INIT(maclc)
 static void mac_vblank_irq(running_machine *machine)
 {
 	static int irq_count = 0, ca1_data = 0, ca2_data = 0;
-	const device_config *via_0 = device_list_find_by_tag(machine->config->devicelist, VIA6522, "via6522_0");
+	const device_config *via_0 = devtag_get_device(machine, VIA6522, "via6522_0");
 
 	/* handle ADB keyboard/mouse */
 	if (has_adb())

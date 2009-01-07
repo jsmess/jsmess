@@ -524,7 +524,7 @@ MACHINE_START( amigacd )
 MACHINE_RESET( amigacd )
 {
 	/* initialize the cdrom */
-	matsucd_init( device_list_find_by_tag( machine->config->devicelist, CDROM, "cdrom" ) );
+	matsucd_init( devtag_get_device(machine, CDROM, "cdrom") );
 	matsucd_set_status_enabled_callback( cdrom_status_enabled );
 	matsucd_set_status_changed_callback( cdrom_status_change );
 	matsucd_set_subcode_ready_callback( cdrom_subcode_ready );

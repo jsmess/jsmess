@@ -325,7 +325,7 @@ MACHINE_START( msx )
 
 MACHINE_START( msx2 )
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( machine->config->devicelist, WD179X, "wd179x");
+	device_config *fdc = (device_config*)devtag_get_device(machine, WD179X, "wd179x");
 	wd17xx_set_density (fdc,DEN_FM_HI);
 	msx1.dsk_stat = 0x7f;
 }
@@ -447,12 +447,12 @@ WRITE8_HANDLER ( msx_psg_w )
 
 static const device_config *cassette_device_image(running_machine *machine)
 {
-	return device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" );
+	return devtag_get_device(machine, CASSETTE, "cassette");
 }
 
 static const device_config *printer_image(running_machine *machine)
 {
-	return device_list_find_by_tag(machine->config->devicelist, PRINTER, "printer");
+	return devtag_get_device(machine, PRINTER, "printer");
 }
 
 READ8_HANDLER ( msx_psg_port_a_r )
@@ -601,19 +601,19 @@ WRITE8_HANDLER (msx_rtc_latch_w)
 
 WRITE8_HANDLER (msx_rtc_reg_w)
 {
-	const device_config *rtc = device_list_find_by_tag(space->machine->config->devicelist, TC8521, "rtc");
+	const device_config *rtc = devtag_get_device(space->machine, TC8521, "rtc");
 	tc8521_w(rtc, msx1.rtc_latch, data);
 }
 
 READ8_HANDLER (msx_rtc_reg_r)
 {
-	const device_config *rtc = device_list_find_by_tag(space->machine->config->devicelist, TC8521, "rtc");
+	const device_config *rtc = devtag_get_device(space->machine, TC8521, "rtc");
 	return tc8521_r(rtc, msx1.rtc_latch);
 }
 
 NVRAM_HANDLER( msx2 )
 {
-	const device_config *rtc = device_list_find_by_tag(machine->config->devicelist, TC8521, "rtc");
+	const device_config *rtc = devtag_get_device(machine, TC8521, "rtc");
 	if (file)
 	{
 		if (read_or_write)

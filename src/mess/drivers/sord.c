@@ -91,9 +91,9 @@ static  READ8_HANDLER(fd5_data_r)
 
 	LOG(("fd5 0x010 r: %02x %04x\n",fd5_databus,cpu_get_pc(space->cpu)));
 
-	ppi8255_set_port_c((device_config*)device_list_find_by_tag( space->machine->config->devicelist, PPI8255, "ppi8255" ), 0x50);
-	ppi8255_set_port_c((device_config*)device_list_find_by_tag( space->machine->config->devicelist, PPI8255, "ppi8255" ), 0x10);
-	ppi8255_set_port_c((device_config*)device_list_find_by_tag( space->machine->config->devicelist, PPI8255, "ppi8255" ), 0x50);
+	ppi8255_set_port_c((device_config*)devtag_get_device(space->machine, PPI8255, "ppi8255"), 0x50);
+	ppi8255_set_port_c((device_config*)devtag_get_device(space->machine, PPI8255, "ppi8255"), 0x10);
+	ppi8255_set_port_c((device_config*)devtag_get_device(space->machine, PPI8255, "ppi8255"), 0x50);
 
 	return fd5_databus;
 }
@@ -105,9 +105,9 @@ static WRITE8_HANDLER(fd5_data_w)
 	fd5_databus = data;
 
 	/* set stb on data write */
-	ppi8255_set_port_c((device_config*)device_list_find_by_tag( space->machine->config->devicelist, PPI8255, "ppi8255" ), 0x50);
-	ppi8255_set_port_c((device_config*)device_list_find_by_tag( space->machine->config->devicelist, PPI8255, "ppi8255" ), 0x40);
-	ppi8255_set_port_c((device_config*)device_list_find_by_tag( space->machine->config->devicelist, PPI8255, "ppi8255" ), 0x50);
+	ppi8255_set_port_c((device_config*)devtag_get_device(space->machine, PPI8255, "ppi8255"), 0x50);
+	ppi8255_set_port_c((device_config*)devtag_get_device(space->machine, PPI8255, "ppi8255"), 0x40);
+	ppi8255_set_port_c((device_config*)devtag_get_device(space->machine, PPI8255, "ppi8255"), 0x50);
 
 	cpu_yield(space->cpu);
 }
@@ -131,7 +131,7 @@ static WRITE8_HANDLER(fd5_drive_control_w)
 
 static WRITE8_HANDLER(fd5_tc_w)
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, NEC765A, "nec765");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, NEC765A, "nec765");
 	nec765_set_tc_state(fdc, 1);
 	nec765_set_tc_state(fdc, 0);
 }
@@ -177,13 +177,13 @@ static MACHINE_RESET( sord_m5_fd5 )
 	floppy_drive_set_geometry(image_from_devtype_and_index(machine, IO_FLOPPY, 0), FLOPPY_DRIVE_SS_40);
 	floppy_drive_set_geometry(image_from_devtype_and_index(machine, IO_FLOPPY, 1), FLOPPY_DRIVE_SS_40);
 	MACHINE_RESET_CALL(sord_m5);
-	ppi8255_set_port_c((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), 0x50);
+	ppi8255_set_port_c((device_config*)devtag_get_device(machine, PPI8255, "ppi8255"), 0x50);
 }
 
 
 static const device_config *cassette_device_image(running_machine *machine)
 {
-	return device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" );
+	return devtag_get_device(machine, CASSETTE, "cassette");
 }
 
 /*********************************************************************************************/
@@ -441,8 +441,8 @@ static void sordm5_video_interrupt_callback(running_machine *machine, int state)
 {
 	if (state)
 	{
-		z80ctc_trg3_w(device_list_find_by_tag(machine->config->devicelist, Z80CTC, "z80ctc"), 0, 1);
-		z80ctc_trg3_w(device_list_find_by_tag(machine->config->devicelist, Z80CTC, "z80ctc"), 0, 0);
+		z80ctc_trg3_w(devtag_get_device(machine, Z80CTC, "z80ctc"), 0, 1);
+		z80ctc_trg3_w(devtag_get_device(machine, Z80CTC, "z80ctc"), 0, 0);
 	}
 }
 

@@ -240,7 +240,7 @@ static MACHINE_START(enterprise)
 
 static READ8_HANDLER ( enterprise_wd177x_read )
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD177X, "wd177x");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD177X, "wd177x");
 	switch (offset & 0x03)
 	{
 	case 0:
@@ -260,7 +260,7 @@ static READ8_HANDLER ( enterprise_wd177x_read )
 
 static WRITE8_HANDLER (	enterprise_wd177x_write )
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD177X, "wd177x");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD177X, "wd177x");
 	switch (offset & 0x03)
 	{
 	case 0:
@@ -346,7 +346,7 @@ const wd17xx_interface enterp_wd17xx_interface = { enterp_wd177x_callback, NULL 
 
 static WRITE8_HANDLER ( exdos_card_w )
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD177X, "wd177x");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD177X, "wd177x");
 	/* drive side */
 	int head = (data>>4) & 0x01;
 

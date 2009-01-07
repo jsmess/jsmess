@@ -74,7 +74,7 @@ WRITE8_HANDLER( osborne1_1000_w )
 READ8_HANDLER( osborne1_2000_r )
 {
 	UINT8	data = 0xFF;
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, MB8877, "mb8877");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, MB8877, "mb8877");
 	/* Check whether regular RAM is enabled */
 	if ( ! osborne1.bank2_enabled )
 	{
@@ -121,7 +121,7 @@ READ8_HANDLER( osborne1_2000_r )
 
 WRITE8_HANDLER( osborne1_2000_w )
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, MB8877, "mb8877");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, MB8877, "mb8877");
 	/* Check whether regular RAM is enabled */
 	if ( ! osborne1.bank2_enabled )
 	{
@@ -277,7 +277,7 @@ static WRITE8_HANDLER( video_pia_out_cb2_dummy )
 
 static WRITE8_HANDLER( video_pia_port_a_w )
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, MB8877, "mb8877");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, MB8877, "mb8877");
 	osborne1.new_start_x = data >> 1;
 	wd17xx_set_density(fdc, ( data & 0x01 ) ? DEN_FM_LO : DEN_FM_HI );
 
@@ -287,7 +287,7 @@ static WRITE8_HANDLER( video_pia_port_a_w )
 
 static WRITE8_HANDLER( video_pia_port_b_w )
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, MB8877, "mb8877");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, MB8877, "mb8877");
 	osborne1.new_start_y = data & 0x1F;
 	osborne1.beep = ( data & 0x20 ) ? 1 : 0;
 	if ( data & 0x40 )
@@ -415,7 +415,7 @@ static TIMER_CALLBACK(osborne1_video_callback)
 DEVICE_IMAGE_LOAD( osborne1_floppy )
 {
 	int size, sectors, sectorsize;
-	device_config *fdc = (device_config*)device_list_find_by_tag( image->machine->config->devicelist, MB8877, "mb8877");
+	device_config *fdc = (device_config*)devtag_get_device(image->machine, MB8877, "mb8877");
 
 	if ( ! image_has_been_created( image ) )
 	{

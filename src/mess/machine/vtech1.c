@@ -166,7 +166,7 @@ WRITE8_HANDLER (vtech1_memory_bank_w)
 
 static const device_config *cassette_device_image(running_machine *machine)
 {
-	return device_list_find_by_tag( machine->config->devicelist, CASSETTE, "cassette" );
+	return devtag_get_device(machine, CASSETTE, "cassette");
 }
 
 
@@ -545,7 +545,7 @@ WRITE8_HANDLER(vtech1_latch_w)
 
 static const device_config *printer_device(running_machine *machine)
 {
-	return device_list_find_by_tag(machine->config->devicelist, PRINTER, "printer");
+	return devtag_get_device(machine, PRINTER, "printer");
 }
 
 /*

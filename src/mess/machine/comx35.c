@@ -178,7 +178,7 @@ const wd17xx_interface comx35_wd17xx_interface = { comx35_fdc_callback, NULL };
 static UINT8 fdc_r(const address_space *space)
 {
 	comx35_state *state = space->machine->driver_data;
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD1770, "wd1770");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD1770, "wd1770");
 
 	UINT8 data;
 
@@ -196,7 +196,7 @@ static UINT8 fdc_r(const address_space *space)
 
 static void fdc_w(const address_space *space, UINT8 data)
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD1770, "wd1770");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD1770, "wd1770");
 	/*
 
 		bit		description

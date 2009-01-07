@@ -270,7 +270,7 @@ static UINT8 to7_5p14_select;
 
 static READ8_HANDLER ( to7_5p14_r )
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD2793, "wd2793");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD2793, "wd2793");
 	
 	if ( offset < 4 )
 		return wd17xx_r( fdc, offset );
@@ -285,7 +285,7 @@ static READ8_HANDLER ( to7_5p14_r )
 
 static WRITE8_HANDLER( to7_5p14_w )
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD2793, "wd2793");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD2793, "wd2793");
 	if ( offset < 4 )
 		wd17xx_w( fdc, offset, data );
 	else if ( offset == 8 )
@@ -331,7 +331,7 @@ static WRITE8_HANDLER( to7_5p14_w )
 static void to7_5p14_reset( running_machine *machine )
 {
 	int i;
-	device_config *fdc = (device_config*)device_list_find_by_tag( machine->config->devicelist, WD2793, "wd2793");	
+	device_config *fdc = (device_config*)devtag_get_device(machine, WD2793, "wd2793");
 	LOG(( "to7_5p14_reset: CD 90-640 controller\n" ));
 	thom_floppy_set_density( DEN_MFM_LO );
 	wd17xx_reset(fdc);

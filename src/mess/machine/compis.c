@@ -288,7 +288,7 @@ static void compis_keyb_init(void)
 /*-------------------------------------------------------------------------*/
 static void compis_fdc_reset(running_machine *machine)
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( machine->config->devicelist, NEC765A, "nec765");		
+	device_config *fdc = (device_config*)devtag_get_device(machine, NEC765A, "nec765");
 	
 	nec765_reset(fdc, 0);
 
@@ -298,7 +298,7 @@ static void compis_fdc_reset(running_machine *machine)
 
 static void compis_fdc_tc(running_machine *machine, int state)
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( machine->config->devicelist, NEC765A, "nec765");
+	device_config *fdc = (device_config*)devtag_get_device(machine, NEC765A, "nec765");
 	/* Terminal count if iSBX-218A has DMA enabled */
   	if (input_port_read(machine, "DSW1"))
 	{
@@ -334,7 +334,7 @@ const nec765_interface compis_fdc_interface =
 
 READ16_HANDLER (compis_fdc_dack_r)
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, NEC765A, "nec765");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, NEC765A, "nec765");
 	UINT16 data;
 	data = 0xffff;	
 	/* DMA acknowledge if iSBX-218A has DMA enabled */
@@ -348,7 +348,7 @@ READ16_HANDLER (compis_fdc_dack_r)
 
 WRITE16_HANDLER (compis_fdc_w)
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, NEC765A, "nec765");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, NEC765A, "nec765");
 	switch(offset)
 	{
 		case 2:
@@ -362,7 +362,7 @@ WRITE16_HANDLER (compis_fdc_w)
 
 READ16_HANDLER (compis_fdc_r)
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, NEC765A, "nec765");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, NEC765A, "nec765");
 	UINT16 data;
 	data = 0xffff;
 	switch(offset)
@@ -389,7 +389,7 @@ READ16_HANDLER (compis_fdc_r)
 
 static const device_config *printer_device(running_machine *machine)
 {
-	return device_list_find_by_tag(machine->config->devicelist, PRINTER, "printer");
+	return devtag_get_device(machine, PRINTER, "printer");
 }
 
 /*-------------------------------------------------------------------------*/
@@ -532,12 +532,12 @@ WRITE16_DEVICE_HANDLER ( compis_osp_pit_w )
 
 READ16_HANDLER ( compis_rtc_r )
 {
-	return mm58274c_r((device_config*)device_list_find_by_tag( space->machine->config->devicelist, MM58274C, "mm58274c"), offset);
+	return mm58274c_r((device_config*)devtag_get_device(space->machine, MM58274C, "mm58274c"), offset);
 }
 
 WRITE16_HANDLER ( compis_rtc_w )
 {
-	mm58274c_w((device_config*)device_list_find_by_tag( space->machine->config->devicelist, MM58274C, "mm58274c"), offset, data);
+	mm58274c_w((device_config*)devtag_get_device(space->machine, MM58274C, "mm58274c"), offset, data);
 }
 
 /*-------------------------------------------------------------------------*/
@@ -560,13 +560,13 @@ const msm8251_interface compis_usart_interface=
 
 READ16_HANDLER ( compis_usart_r )
 {
-	const device_config *uart = device_list_find_by_tag(space->machine->config->devicelist, MSM8251, "uart");
+	const device_config *uart = devtag_get_device(space->machine, MSM8251, "uart");
 	return msm8251_data_r(uart, offset);
 }
 
 WRITE16_HANDLER ( compis_usart_w )
 {
-	const device_config *uart = device_list_find_by_tag(space->machine->config->devicelist, MSM8251, "uart");
+	const device_config *uart = devtag_get_device(space->machine, MSM8251, "uart");
 	switch (offset)
 	{
 		case 0x00:
@@ -1559,8 +1559,8 @@ MACHINE_RESET( compis )
 	/* OSP PIC 8259 */
 	cpu_set_irq_callback(machine->cpu[0], compis_irq_callback);
 
-	compis_devices.pic8259_master = (device_config*)device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_master" );
-	compis_devices.pic8259_slave = (device_config*)device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_slave" );
+	compis_devices.pic8259_master = (device_config*)devtag_get_device(machine, PIC8259, "pic8259_master");
+	compis_devices.pic8259_slave = (device_config*)devtag_get_device(machine, PIC8259, "pic8259_slave");
 }
 
 /*-------------------------------------------------------------------------*/

@@ -98,7 +98,7 @@ static TIMER_CALLBACK(lightpen_trigger)
 {
 	if (vectrex_lightpen_port & 1)
 	{
-		const device_config *via_0 = device_list_find_by_tag(machine->config->devicelist, VIA6522, "via6522_0");
+		const device_config *via_0 = devtag_get_device(machine, VIA6522, "via6522_0");
 		via_ca1_w(via_0, 0, 1);
 		via_ca1_w(via_0, 0, 0);
 	}
@@ -131,13 +131,13 @@ static TIMER_CALLBACK(lightpen_trigger)
 
 READ8_HANDLER(vectrex_via_r)
 {
-	const device_config *via = device_list_find_by_tag(space->machine->config->devicelist, VIA6522, "via6522_0");
+	const device_config *via = devtag_get_device(space->machine, VIA6522, "via6522_0");
 	return via_r(via, offset);
 }
 
 WRITE8_HANDLER(vectrex_via_w) 
 { 
-	const device_config *via = device_list_find_by_tag(space->machine->config->devicelist, VIA6522, "via6522_0");
+	const device_config *via = devtag_get_device(space->machine, VIA6522, "via6522_0");
 	attotime period;
 
 	switch (offset)

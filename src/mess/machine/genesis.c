@@ -1205,7 +1205,7 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 			genesis_sram_end += 1;
 		
 		genesis_sram = malloc_or_die(genesis_sram_end - genesis_sram_start);
-		image_battery_load(device_list_find_by_tag(image->machine->config->devicelist, CARTSLOT, "cart"), genesis_sram, genesis_sram_end - genesis_sram_start);
+		image_battery_load(devtag_get_device(image->machine, CARTSLOT, "cart"), genesis_sram, genesis_sram_end - genesis_sram_start);
 
 		megadriv_backupram = (UINT16*)ROM + ((genesis_sram_start & 0x3fffff) / 2);
 		memmove(&megadriv_backupram[0], genesis_sram, genesis_sram_end - genesis_sram_start);

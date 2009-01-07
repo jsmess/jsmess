@@ -81,7 +81,7 @@ Note on the bioses:
 
 static READ8_HANDLER( samcoupe_disk_r )
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD1772, "wd1772");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD1772, "wd1772");
 	
 	/* drive and side is encoded into bit 5 and 3 */
 	wd17xx_set_drive(fdc,(offset >> 4) & 1);
@@ -102,7 +102,7 @@ static READ8_HANDLER( samcoupe_disk_r )
 
 static WRITE8_HANDLER( samcoupe_disk_w )
 {
-	device_config *fdc = (device_config*)device_list_find_by_tag( space->machine->config->devicelist, WD1772, "wd1772");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD1772, "wd1772");
 
 	/* drive and side is encoded into bit 5 and 3 */
 	wd17xx_set_drive(fdc,(offset >> 4) & 1);
