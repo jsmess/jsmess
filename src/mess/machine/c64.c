@@ -469,6 +469,7 @@ WRITE8_HANDLER( c64_write_io )
 {
 	running_machine *machine = space->machine;
 	const device_config *cia_0 = device_list_find_by_tag(space->machine->config->devicelist, CIA6526R1, "cia_0");
+	const device_config *cia_1 = device_list_find_by_tag(space->machine->config->devicelist, CIA6526R1, "cia_1");
 
 	c64_io_mirror[ offset ] = data;
 	if (offset < 0x400) {
@@ -482,7 +483,7 @@ WRITE8_HANDLER( c64_write_io )
 	else if (offset < 0xe00)
 	{
 		if (c64_cia1_on)
-			cia_w(cia_0, offset, data);
+			cia_w(cia_1, offset, data);
 		else
 			DBG_LOG (1, "io write", ("%.3x %.2x\n", offset, data));
 	}
