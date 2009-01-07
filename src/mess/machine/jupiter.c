@@ -39,8 +39,7 @@ static void jupiter_machine_stop(running_machine *machine);
 
 DIRECT_UPDATE_HANDLER( jupiter_opbaseoverride )
 {
-	int loop;
-	unsigned short tmpword;
+	UINT16 loop,tmpword;
 
 	if (address == 0x059d)
 	{
@@ -79,7 +78,7 @@ DIRECT_UPDATE_HANDLER( jupiter_opbaseoverride )
 			}
 		}
 	}
-	return (-1);
+	return ~1;
 }
 
 MACHINE_START( jupiter )
