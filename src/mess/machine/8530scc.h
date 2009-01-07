@@ -6,8 +6,8 @@
 
 *********************************************************************/
 
-#ifndef __8630SCC_H__
-#define __8630SCC_H__
+#ifndef __8530SCC_H__
+#define __8530SCC_H__
 
 
 /***************************************************************************
@@ -58,4 +58,4 @@ DEVICE_GET_INFO(scc8530);
 READ8_DEVICE_HANDLER(scc_r);
 WRITE8_DEVICE_HANDLER(scc_w);
 
-#endif /* __8630SCC_H__ */
+#endif /* __8530SCC_H__ */

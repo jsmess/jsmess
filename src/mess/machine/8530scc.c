@@ -47,10 +47,10 @@ INLINE scc8530_t *get_token(const device_config *device)
 }
 
 
-INLINE scc8530_interface *get_interface(const device_config *device)
+INLINE const scc8530_interface *get_interface(const device_config *device)
 {
 	assert(device->type == SCC8530);
-	return (scc8530_interface *) device->inline_config;
+	return (const scc8530_interface *) device->inline_config;
 }
 
 
@@ -89,7 +89,7 @@ void scc_set_status(const device_config *device, int status)
 
 static void scc_acknowledge(const device_config *device)
 {
-	scc8530_interface *intf = get_interface(device);
+	const scc8530_interface *intf = get_interface(device);
 	if ((intf != NULL) && (intf->acknowledge != NULL))
 		(*intf->acknowledge)(device);
 }
