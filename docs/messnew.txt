@@ -8,7 +8,7 @@ New System Drivers Supported (in no particular order):
 
 System Driver Changes:
 ----------------------
-(none)
+- [X68000] Added better implementation of 1024x1024 graphic layer.  [Barry Rodewald]
 
 
 

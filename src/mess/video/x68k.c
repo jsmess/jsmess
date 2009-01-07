@@ -35,6 +35,7 @@ UINT16* x68k_spriteram;  // sprite/background RAM
 UINT16* x68k_spritereg;  // sprite/background registers
 
 static bitmap_t* x68k_text_bitmap;  // 1024x1024 4x1bpp planes text
+static bitmap_t* x68k_gfx_big_bitmap;  // 16 colour, 1024x1024, 1 page
 static bitmap_t* x68k_gfx_0_bitmap_16;  // 16 colour, 512x512, 4 pages
 static bitmap_t* x68k_gfx_1_bitmap_16;
 static bitmap_t* x68k_gfx_2_bitmap_16;
@@ -579,14 +580,14 @@ WRITE16_HANDLER( x68k_gvram_w )
 	*/
 	COMBINE_DATA(gvram+offset);
 
+	pageoffset = offset & 0xfffff;
+	xloc = pageoffset % 1024;
+	yloc = pageoffset / 1024;
+	x68k_plot_pixel(x68k_gfx_big_bitmap,xloc,yloc,data & 0x000f);
+
 	pageoffset = offset & 0x3ffff;
 	xloc = pageoffset % 512;
 	yloc = pageoffset / 512;
-	if(sys.crtc.interlace == 1)  // 1024 vertical displayed
-	{
-		// we'll just draw every other scanline for now
-		yloc = pageoffset / 1024;
-	}
 
 	if(offset < 0x40000)  // first page, all colour depths
 	{
@@ -732,16 +733,9 @@ static void x68k_draw_gfx(bitmap_t* bitmap,rectangle cliprect)
 			rect.max_y=rect.min_y + sys.crtc.visible_height-1;
 			if(sys.video.reg[2] & 0x0010 && priority == sys.video.gfxlayer_pri[0])
 			{
-				xscr = sys.crtc.hbegin-(sys.crtc.reg[12] & 0x3ff);
-				yscr = sys.crtc.vbegin-(sys.crtc.reg[13] & 0x3ff);
-				copyscrollbitmap_trans(bitmap, x68k_gfx_0_bitmap_16, 1, &xscr, 1, &yscr ,&cliprect,0);
-				xscr+=512;
-				copyscrollbitmap_trans(bitmap, x68k_gfx_1_bitmap_16, 1, &xscr, 1, &yscr ,&cliprect,0);
-				yscr+=512;
-				xscr-=512;
-				copyscrollbitmap_trans(bitmap, x68k_gfx_2_bitmap_16, 1, &xscr, 1, &yscr ,&cliprect,0);
-				xscr+=512;
-				copyscrollbitmap_trans(bitmap, x68k_gfx_3_bitmap_16, 1, &xscr, 1, &yscr ,&cliprect,0);
+				xscr = sys.crtc.hbegin-(sys.crtc.reg[12]);
+				yscr = sys.crtc.vbegin-(sys.crtc.reg[13]);
+				copyscrollbitmap_trans(bitmap, x68k_gfx_big_bitmap, 1, &xscr, 1, &yscr ,&cliprect,0);
 			}
 		}
 		else  // 512x512 "real" screen size
@@ -940,6 +934,7 @@ VIDEO_START( x68000 )
 	int gfx_index;
 
 	x68k_text_bitmap = auto_bitmap_alloc(1024,1024,BITMAP_FORMAT_INDEXED16);
+	x68k_gfx_big_bitmap = auto_bitmap_alloc(1024,1024,BITMAP_FORMAT_INDEXED16);
 	x68k_gfx_0_bitmap_16 = auto_bitmap_alloc(512,512,BITMAP_FORMAT_INDEXED16);
 	x68k_gfx_1_bitmap_16 = auto_bitmap_alloc(512,512,BITMAP_FORMAT_INDEXED16);
 	x68k_gfx_2_bitmap_16 = auto_bitmap_alloc(512,512,BITMAP_FORMAT_INDEXED16);
