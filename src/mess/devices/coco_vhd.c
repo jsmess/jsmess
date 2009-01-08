@@ -211,7 +211,7 @@ READ8_DEVICE_HANDLER(coco_vhd_io_r)
 
 	switch(offset)
 	{
-		case 0xff83 - 0xff40:
+		case 0xff83 - 0xff80:
 			if (VERBOSE)
 				logerror("vhd: Status read: %d\n", vhd->status);
 			result = vhd->status;
@@ -229,30 +229,30 @@ WRITE8_DEVICE_HANDLER(coco_vhd_io_w)
 
 	switch(offset)
 	{
-		case 0xff80 - 0xff40:
-		case 0xff81 - 0xff40:
-		case 0xff82 - 0xff40:
-			pos = ((0xff82 - 0xff40) - offset) * 8;
+		case 0xff80 - 0xff80:
+		case 0xff81 - 0xff80:
+		case 0xff82 - 0xff80:
+			pos = ((0xff82 - 0xff80) - offset) * 8;
 			vhd->logical_record_number &= ~(0xFF << pos);
 			vhd->logical_record_number += data << pos;
 			if (VERBOSE)
 				logerror("vhd: LRN write: %6.6X\n", vhd->logical_record_number);
 			break;
 
-		case 0xff83 - 0xff40:
+		case 0xff83 - 0xff80:
 			coco_vhd_readwrite(device, data);
 			if (VERBOSE)
 				logerror("vhd: Command: %d\n", data);
 			break;
 
-		case 0xff84 - 0xff40:
+		case 0xff84 - 0xff80:
 			vhd->buffer_address &= 0xFFFF00FF;
 			vhd->buffer_address += data << 8;
 			if (VERBOSE)
 				logerror("vhd: BA write: %X (%2.2X..)\n", vhd->buffer_address, data);
 			break;
 
-		case 0xff85 - 0xff40:
+		case 0xff85 - 0xff80:
 			vhd->buffer_address &= 0xFFFFFF00;
 			vhd->buffer_address += data;
 			if (VERBOSE)
