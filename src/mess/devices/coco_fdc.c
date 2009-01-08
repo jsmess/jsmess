@@ -68,7 +68,6 @@
 
 #include "driver.h"
 #include "cococart.h"
-#include "coco_vhd.h"
 #include "includes/coco.h"
 #include "machine/wd17xx.h"
 #include "machine/ds1315.h"
@@ -443,17 +442,6 @@ static UINT8 fdc_coco3plus_r(running_machine *machine, coco_cartridge *cartridge
 				result = ds1315_r_data(dev, addr);
 			}
 			break;
-
-		case 0x40:
-		case 0x41:
-		case 0x42:
-		case 0x43:
-		case 0x44:
-		case 0x45:
-			dev = devtag_get_device(machine, DEVICE_GET_INFO_NAME(coco_vhd), "vhd");
-			if (dev != NULL)
-				result = coco_vhd_io_r((device_config *) dev, addr);
-			break;
 	}
 	return result;
 }
@@ -483,17 +471,6 @@ static void fdc_coco3plus_w(running_machine *machine, coco_cartridge *cartridge,
 		case 0x11:	/* FF51 */
 			if (real_time_clock(machine) == RTC_DISTO)
 				msm6242_rtc_address = data & 0x0f;
-			break;
-
-		case 0x40:
-		case 0x41:
-		case 0x42:
-		case 0x43:
-		case 0x44:
-		case 0x45:
-			dev = devtag_get_device(machine, DEVICE_GET_INFO_NAME(coco_vhd), "vhd");
-			if (dev != NULL)
-				coco_vhd_io_w((device_config *) dev, addr, data);
 			break;
 	}
 }
