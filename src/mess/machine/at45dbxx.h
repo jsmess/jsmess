@@ -15,25 +15,53 @@
 
 #include "driver.h"
 
-enum
-{
-	AT45DB041,
-	AT45DB081,
-	AT45DB161
-};
 
-// init/exit/reset
-void at45dbxx_init(running_machine *machine, int type);
+/***************************************************************************
+    MACROS
+***************************************************************************/
+
+#define AT45DB041		DEVICE_GET_INFO_NAME(at45db041)
+
+#define MDRV_AT45DB041_ADD(_tag) \
+	MDRV_DEVICE_ADD(_tag, AT45DB041, 0) \
+
+#define MDRV_AT45DB041_REMOVE(_tag) \
+	MDRV_DEVICE_REMOVE(_tag, AT45DB041)
+
+#define AT45DB081		DEVICE_GET_INFO_NAME(at45db081)
+
+#define MDRV_AT45DB081_ADD(_tag) \
+	MDRV_DEVICE_ADD(_tag, AT45DB081, 0) \
+
+#define MDRV_AT45DB081_REMOVE(_tag) \
+	MDRV_DEVICE_REMOVE(_tag, AT45DB081)
+
+#define AT45DB161		DEVICE_GET_INFO_NAME(at45db161)
+
+#define MDRV_AT45DB161_ADD(_tag) \
+	MDRV_DEVICE_ADD(_tag, AT45DB161, 0) \
+
+#define MDRV_AT45DB161_REMOVE(_tag) \
+	MDRV_DEVICE_REMOVE(_tag, AT45DB161)
+
+
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
+
+DEVICE_GET_INFO(at45db041);
+DEVICE_GET_INFO(at45db081);
+DEVICE_GET_INFO(at45db161);
 
 // pins
-void at45dbxx_pin_cs(running_machine *machine,  int data);
-void at45dbxx_pin_sck(running_machine *machine,  int data);
-void at45dbxx_pin_si(running_machine *machine,  int data);
-int  at45dbxx_pin_so(running_machine *machine);
+void at45dbxx_pin_cs(const device_config *device, int data);
+void at45dbxx_pin_sck(const device_config *device,  int data);
+void at45dbxx_pin_si(const device_config *device,  int data);
+int  at45dbxx_pin_so(const device_config *device);
 
 // load/save
-void at45dbxx_load(running_machine *machine, mame_file *file);
-void at45dbxx_save(running_machine *machine, mame_file *file);
+void at45dbxx_load(const device_config *device, mame_file *file);
+void at45dbxx_save(const device_config *device, mame_file *file);
 
 // non-volatile ram handler
 /*

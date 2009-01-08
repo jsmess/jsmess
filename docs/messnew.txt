@@ -27,7 +27,7 @@ Imgtool Changes:
 Source Changes:
 ----------------
 - Changed the DS1315 implementation to be a device.  [Nathan Woods]
-
+- Changed the AT45DBxx and SST39VFxx to be a device [Miodrag Milanovic]
 
 
 0.129

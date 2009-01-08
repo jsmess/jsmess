@@ -12,6 +12,13 @@
 
 #include "at45dbxx.h"
 
+enum
+{
+	TYPE_AT45DB041,
+	TYPE_AT45DB081,
+	TYPE_AT45DB161
+};
+
 #define LOG_LEVEL  1
 #define _logerror(level,x)  do { if (LOG_LEVEL > level) logerror x; } while (0)
 
@@ -23,6 +30,11 @@
 #define FLASH_MODE_XX  0 // unknown
 #define FLASH_MODE_SI  1 // input
 #define FLASH_MODE_SO  2 // output
+
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
 
 typedef struct
 {
@@ -46,7 +58,8 @@ typedef struct
 	UINT32 size, pos;
 } AT45DBXX_IO;
 
-typedef struct
+typedef struct _at45dbxx_t at45dbxx_t;
+struct _at45dbxx_t
 {
 	UINT8 *data;
 	UINT32 size;
@@ -56,142 +69,170 @@ typedef struct
 	UINT8 si_byte, si_bits, so_byte, so_bits;
 	AT45DBXX_CMD cmd;
 	AT45DBXX_IO io;
-} AT45DBXX;
+};
 
-static AT45DBXX flash;
 
-static void at45dbxx_state_save(running_machine *machine);
-static void at45dbxx_reset(running_machine *machine);
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
 
-void at45dbxx_init(running_machine *machine, int type)
+INLINE at45dbxx_t *get_token(const device_config *device)
 {
-	_logerror( 0, ("at45dbxx_init (%d)\n", type));
-	memset( &flash, 0, sizeof( flash));
-	switch (type)
-	{
-		case AT45DB041 : flash.pages = 2048; flash.page_size = 264; flash.devid = 0x18; break;
-		case AT45DB081 : flash.pages = 4096; flash.page_size = 264; flash.devid = 0x20; break;
-		case AT45DB161 : flash.pages = 4096; flash.page_size = 528; flash.devid = 0x28; break;
-	}
-	flash.size = flash.pages * flash.page_size;
-	flash.data = auto_malloc( flash.size);
-	flash.buffer1 = auto_malloc( flash.page_size);
-	flash.buffer2 = auto_malloc( flash.page_size);
-	at45dbxx_state_save(machine);
-
-	add_reset_callback(machine, at45dbxx_reset);
+	assert(device != NULL);
+	return (at45dbxx_t *) device->token;
 }
 
-static void at45dbxx_reset(running_machine *machine)
+
+/***************************************************************************
+    IMPLEMENTATION
+***************************************************************************/
+
+static device_start_err common_start(const device_config *device, int device_type)
 {
+	at45dbxx_t *flash = get_token(device);
+	
+	_logerror( 0, ("at45dbxx_init (%d)\n", device_type));
+	memset( flash, 0, sizeof( flash));
+	switch (device_type)
+	{
+		case TYPE_AT45DB041 : flash->pages = 2048; flash->page_size = 264; flash->devid = 0x18; break;
+		case TYPE_AT45DB081 : flash->pages = 4096; flash->page_size = 264; flash->devid = 0x20; break;
+		case TYPE_AT45DB161 : flash->pages = 4096; flash->page_size = 528; flash->devid = 0x28; break;
+	}
+	flash->size = flash->pages * flash->page_size;
+	flash->data = auto_malloc( flash->size);
+	flash->buffer1 = auto_malloc( flash->page_size);
+	flash->buffer2 = auto_malloc( flash->page_size);
+	
+	// data
+	state_save_register_item_pointer(device->machine, "at45dbxx", device->tag, 0, flash->data, flash->size);
+	// pins
+	state_save_register_item(device->machine, "at45dbxx", device->tag, 0, flash->pin.cs);
+	state_save_register_item(device->machine, "at45dbxx", device->tag, 0, flash->pin.sck);
+	state_save_register_item(device->machine, "at45dbxx", device->tag, 0, flash->pin.si);
+	state_save_register_item(device->machine, "at45dbxx", device->tag, 0, flash->pin.so);
+	state_save_register_item(device->machine, "at45dbxx", device->tag, 0, flash->pin.wp);
+	state_save_register_item(device->machine, "at45dbxx", device->tag, 0, flash->pin.reset);
+	state_save_register_item(device->machine, "at45dbxx", device->tag, 0, flash->pin.busy);
+	return DEVICE_START_OK;	
+}
+
+static DEVICE_START( at45db041 )
+{
+	return common_start(device, TYPE_AT45DB041);
+}
+
+static DEVICE_START( at45db081 )
+{
+	return common_start(device, TYPE_AT45DB081);
+}
+
+static DEVICE_START( at45db161 )
+{
+	return common_start(device, TYPE_AT45DB161);
+}
+
+static DEVICE_RESET( at45dbxx )
+{
+	at45dbxx_t *flash = get_token(device);
 	_logerror( 1, ("at45dbxx_reset\n"));
 	// mode
-	flash.mode = FLASH_MODE_SI;
+	flash->mode = FLASH_MODE_SI;
 	// command
-	memset( &flash.cmd.data[0], 0, sizeof( flash.cmd.data));
-	flash.cmd.size = 0;
+	memset( &flash->cmd.data[0], 0, sizeof( flash->cmd.data));
+	flash->cmd.size = 0;
 	// input/output
-	flash.io.data = NULL;
-	flash.io.size = 0;
-	flash.io.pos  = 0;
+	flash->io.data = NULL;
+	flash->io.size = 0;
+	flash->io.pos  = 0;
 	// pins
-	flash.pin.cs    = 0;
-	flash.pin.sck   = 0;
-	flash.pin.si    = 0;
-	flash.pin.so    = 0;
-	flash.pin.wp    = 0;
-	flash.pin.reset = 0;
-	flash.pin.busy  = 0;
+	flash->pin.cs    = 0;
+	flash->pin.sck   = 0;
+	flash->pin.si    = 0;
+	flash->pin.so    = 0;
+	flash->pin.wp    = 0;
+	flash->pin.reset = 0;
+	flash->pin.busy  = 0;
 	// output
-	flash.so_byte = 0;
-	flash.so_bits = 0;
+	flash->so_byte = 0;
+	flash->so_bits = 0;
 	// input
-	flash.si_byte = 0;
-	flash.si_bits = 0;
+	flash->si_byte = 0;
+	flash->si_bits = 0;
 }
 
-static void at45dbxx_state_save(running_machine *machine)
-{
-	const char *name = "at45dbxx";
-	// data
-	state_save_register_item_pointer(machine, name, NULL, 0, flash.data, flash.size);
-	// pins
-	state_save_register_item(machine, name, NULL, 0, flash.pin.cs);
-	state_save_register_item(machine, name, NULL, 0, flash.pin.sck);
-	state_save_register_item(machine, name, NULL, 0, flash.pin.si);
-	state_save_register_item(machine, name, NULL, 0, flash.pin.so);
-	state_save_register_item(machine, name, NULL, 0, flash.pin.wp);
-	state_save_register_item(machine, name, NULL, 0, flash.pin.reset);
-	state_save_register_item(machine, name, NULL, 0, flash.pin.busy);
-}
-
-static UINT8 at45dbxx_read_byte( running_machine *machine)
+static UINT8 at45dbxx_read_byte( const device_config *device)
 {
 	UINT8 data;
+	at45dbxx_t *flash = get_token(device);
 	// check mode
-	if ((flash.mode != FLASH_MODE_SO) || (!flash.io.data)) return 0;
+	if ((flash->mode != FLASH_MODE_SO) || (!flash->io.data)) return 0;
 	// read byte
-	data = flash.io.data[flash.io.pos++];
-	_logerror( 2, ("at45dbxx_read_byte (%02X) (%03d/%03d)\n", data, flash.io.pos, flash.io.size));
-	if (flash.io.pos == flash.io.size) flash.io.pos = 0;
+	data = flash->io.data[flash->io.pos++];
+	_logerror( 2, ("at45dbxx_read_byte (%02X) (%03d/%03d)\n", data, flash->io.pos, flash->io.size));
+	if (flash->io.pos == flash->io.size) flash->io.pos = 0;
 	return data;
 }
 
-static void flash_set_io( running_machine *machine, UINT8* data, UINT32 size, UINT32 pos)
+static void flash_set_io( const device_config *device, UINT8* data, UINT32 size, UINT32 pos)
 {
-	flash.io.data = data;
-	flash.io.size = size;
-	flash.io.pos  = pos;
+	at45dbxx_t *flash = get_token(device);
+	flash->io.data = data;
+	flash->io.size = size;
+	flash->io.pos  = pos;
 }
 
-static UINT32 flash_get_page_addr( running_machine *machine)
+static UINT32 flash_get_page_addr( const device_config *device)
 {
-	switch (flash.devid)
+	at45dbxx_t *flash = get_token(device);
+	switch (flash->devid)
 	{
-		case 0x18 : return ((flash.cmd.data[1] & 0x0F) << 7) | ((flash.cmd.data[2] & 0xFE) >> 1);
-		case 0x20 : return ((flash.cmd.data[1] & 0x1F) << 7) | ((flash.cmd.data[2] & 0xFE) >> 1);
-		case 0x28 : return ((flash.cmd.data[1] & 0x3F) << 6) | ((flash.cmd.data[2] & 0xFC) >> 2);
+		case 0x18 : return ((flash->cmd.data[1] & 0x0F) << 7) | ((flash->cmd.data[2] & 0xFE) >> 1);
+		case 0x20 : return ((flash->cmd.data[1] & 0x1F) << 7) | ((flash->cmd.data[2] & 0xFE) >> 1);
+		case 0x28 : return ((flash->cmd.data[1] & 0x3F) << 6) | ((flash->cmd.data[2] & 0xFC) >> 2);
 		default   : return 0;
 	}
 }
 
-static UINT32 flash_get_byte_addr( running_machine *machine)
+static UINT32 flash_get_byte_addr( const device_config *device)
 {
-	switch (flash.devid)
+	at45dbxx_t *flash = get_token(device);
+	switch (flash->devid)
 	{
 		case 0x18 : // fall-through
-		case 0x20 : return ((flash.cmd.data[2] & 0x01) << 8) | ((flash.cmd.data[3] & 0xFF) >> 0);
-		case 0x28 : return ((flash.cmd.data[2] & 0x03) << 8) | ((flash.cmd.data[3] & 0xFF) >> 0);
+		case 0x20 : return ((flash->cmd.data[2] & 0x01) << 8) | ((flash->cmd.data[3] & 0xFF) >> 0);
+		case 0x28 : return ((flash->cmd.data[2] & 0x03) << 8) | ((flash->cmd.data[3] & 0xFF) >> 0);
 		default   : return 0;
 	}
 }
 
-static void at45dbxx_write_byte(running_machine *machine,  UINT8 data)
+static void at45dbxx_write_byte(const device_config *device,  UINT8 data)
 {
+	at45dbxx_t *flash = get_token(device);
 	// check mode
-	if (flash.mode != FLASH_MODE_SI) return;
+	if (flash->mode != FLASH_MODE_SI) return;
 	// process byte
-	if (flash.cmd.size < 8)
+	if (flash->cmd.size < 8)
 	{
 		UINT8 opcode;
 		_logerror( 2, ("at45dbxx_write_byte (%02X)\n", data));
 		// add to command buffer
-		flash.cmd.data[flash.cmd.size++] = data;
+		flash->cmd.data[flash->cmd.size++] = data;
 		// check opcode
-		opcode = flash.cmd.data[0];
+		opcode = flash->cmd.data[0];
 		switch (opcode)
 		{
 			// status register read
 			case FLASH_CMD_57 :
 			{
 				// 8 bits command
-				if (flash.cmd.size == 1)
+				if (flash->cmd.size == 1)
 				{
 					_logerror( 1, ("at45dbxx opcode %02X - status register read\n", opcode));
-					flash.status = (flash.status & 0xC7) | flash.devid; // 80 = busy / 40 = compare fail
-					flash_set_io( machine, &flash.status, 1, 0);
-					flash.mode = FLASH_MODE_SO;
-					flash.cmd.size = 8;
+					flash->status = (flash->status & 0xC7) | flash->devid; // 80 = busy / 40 = compare fail
+					flash_set_io( device, &flash->status, 1, 0);
+					flash->mode = FLASH_MODE_SO;
+					flash->cmd.size = 8;
 				}
 			}
 			break;
@@ -199,17 +240,17 @@ static void at45dbxx_write_byte(running_machine *machine,  UINT8 data)
 			case FLASH_CMD_60 :
 			{
 				// 8 bits command + 4 bits reserved + 11 bits page address + 9 bits don't care
-				if (flash.cmd.size == 4)
+				if (flash->cmd.size == 4)
 				{
 					UINT32 page;
 					UINT8 comp;
-					page = flash_get_page_addr(machine);
+					page = flash_get_page_addr(device);
 					_logerror( 1, ("at45dbxx opcode %02X - main memory page to buffer 1 compare [%04X]\n", opcode, page));
-					comp = memcmp( flash.data + page * flash.page_size, flash.buffer1, flash.page_size) == 0 ? 0 : 1;
-					if (comp) flash.status |= 0x40; else flash.status &= ~0x40;
+					comp = memcmp( flash->data + page * flash->page_size, flash->buffer1, flash->page_size) == 0 ? 0 : 1;
+					if (comp) flash->status |= 0x40; else flash->status &= ~0x40;
 					_logerror( 1, ("at45dbxx page compare %s\n", comp ? "failure" : "success"));
-					flash.mode = FLASH_MODE_SI;
-					flash.cmd.size = 8;
+					flash->mode = FLASH_MODE_SI;
+					flash->cmd.size = 8;
 				}
 			}
 			break;
@@ -217,15 +258,15 @@ static void at45dbxx_write_byte(running_machine *machine,  UINT8 data)
 			case FLASH_CMD_52 :
 			{
 				// 8 bits command + 4 bits reserved + 11 bits page address + 9 bits buffer address + 32 bits don't care
-				if (flash.cmd.size == 8)
+				if (flash->cmd.size == 8)
 				{
 					UINT32 page, byte;
-					page = flash_get_page_addr(machine);
-					byte = flash_get_byte_addr(machine);
+					page = flash_get_page_addr(device);
+					byte = flash_get_byte_addr(device);
 					_logerror( 1, ("at45dbxx opcode %02X - main memory page read [%04X/%04X]\n", opcode, page, byte));
-					flash_set_io( machine, flash.data + page * flash.page_size, flash.page_size, byte);
-					flash.mode = FLASH_MODE_SO;
-					flash.cmd.size = 8;
+					flash_set_io( device, flash->data + page * flash->page_size, flash->page_size, byte);
+					flash->mode = FLASH_MODE_SO;
+					flash->cmd.size = 8;
 				}
 			}
 			break;
@@ -233,16 +274,16 @@ static void at45dbxx_write_byte(running_machine *machine,  UINT8 data)
 			case FLASH_CMD_82 :
 			{
 				// 8 bits command + 4 bits reserved + 11 bits page address + 9 bits buffer address
-				if (flash.cmd.size == 4)
+				if (flash->cmd.size == 4)
 				{
 					UINT32 page, byte;
-					page = flash_get_page_addr(machine);
-					byte = flash_get_byte_addr(machine);
+					page = flash_get_page_addr(device);
+					byte = flash_get_byte_addr(device);
 					_logerror( 1, ("at45dbxx opcode %02X - main memory page program through buffer 1 [%04X/%04X]\n",opcode, page, byte));
-					flash_set_io( machine, flash.buffer1, flash.page_size, byte);
-					memset( flash.buffer1, 0xFF, flash.page_size);
-					flash.mode = FLASH_MODE_SI;
-					flash.cmd.size = 8;
+					flash_set_io( device, flash->buffer1, flash->page_size, byte);
+					memset( flash->buffer1, 0xFF, flash->page_size);
+					flash->mode = FLASH_MODE_SI;
+					flash->cmd.size = 8;
 				}
 			}
 			break;
@@ -250,97 +291,103 @@ static void at45dbxx_write_byte(running_machine *machine,  UINT8 data)
 			default :
 			{
 				_logerror( 1, ("at45dbxx opcode %02X - unknown\n", opcode));
-				flash.cmd.data[0] = 0;
-				flash.cmd.size = 0;
+				flash->cmd.data[0] = 0;
+				flash->cmd.size = 0;
 			}
 			break;
 		}
 	}
 	else
 	{
-		_logerror( 2, ("at45dbxx_write_byte (%02X) (%03d/%03d)\n", data, flash.io.pos + 1, flash.io.size));
+		_logerror( 2, ("at45dbxx_write_byte (%02X) (%03d/%03d)\n", data, flash->io.pos + 1, flash->io.size));
 		// store byte
-		flash.io.data[flash.io.pos] = data;
-		flash.io.pos++;
-		if (flash.io.pos == flash.io.size) flash.io.pos = 0;
+		flash->io.data[flash->io.pos] = data;
+		flash->io.pos++;
+		if (flash->io.pos == flash->io.size) flash->io.pos = 0;
 	}
 }
 
-int at45dbxx_pin_so( running_machine *machine)
+int at45dbxx_pin_so( const device_config *device)
 {
-	if (flash.pin.cs == 0) return 0;
-	return flash.pin.so;
+	at45dbxx_t *flash = get_token(device);
+	if (flash->pin.cs == 0) return 0;
+	return flash->pin.so;
 }
 
-void at45dbxx_pin_si(running_machine *machine,  int data)
+void at45dbxx_pin_si(const device_config *device,  int data)
 {
-	if (flash.pin.cs == 0) return;
-	flash.pin.si = data;
+	at45dbxx_t *flash = get_token(device);
+	if (flash->pin.cs == 0) return;
+	flash->pin.si = data;
 }
 
-void at45dbxx_pin_cs(running_machine *machine,  int data)
+void at45dbxx_pin_cs(const device_config *device,  int data)
 {
+	at45dbxx_t *flash = get_token(device);
 	// check if changed
-	if (flash.pin.cs == data) return;
+	if (flash->pin.cs == data) return;
 	// cs low-to-high
 	if (data != 0)
 	{
 		// complete program command
-		if ((flash.cmd.size >= 4) && (flash.cmd.data[0] == FLASH_CMD_82))
+		if ((flash->cmd.size >= 4) && (flash->cmd.data[0] == FLASH_CMD_82))
 		{
 			UINT32 page, byte;
-			page = flash_get_page_addr(machine);
-			byte = flash_get_byte_addr(machine);
+			page = flash_get_page_addr(device);
+			byte = flash_get_byte_addr(device);
 			_logerror( 1, ("at45dbxx - program data stored in buffer 1 into selected page in main memory [%04X/%04X]\n", page, byte));
-			memcpy( flash.data + page * flash.page_size, flash.buffer1, flash.page_size);
+			memcpy( flash->data + page * flash->page_size, flash->buffer1, flash->page_size);
 		}
 		// reset
-		at45dbxx_reset(machine);
+		device_reset_at45dbxx(device);
 	}
 	// save cs
-	flash.pin.cs = data;
+	flash->pin.cs = data;
 }
 
-void at45dbxx_pin_sck(running_machine *machine,  int data)
+void at45dbxx_pin_sck(const device_config *device,  int data)
 {
+	at45dbxx_t *flash = get_token(device);
 	// check if changed
-	if (flash.pin.sck == data) return;
+	if (flash->pin.sck == data) return;
 	// sck high-to-low
 	if (data == 0)
 	{
 		// output (part 1)
-		if (flash.so_bits == 8)
+		if (flash->so_bits == 8)
 		{
-			flash.so_bits = 0;
-			flash.so_byte = at45dbxx_read_byte(machine);
+			flash->so_bits = 0;
+			flash->so_byte = at45dbxx_read_byte(device);
 		}
 		// input
-		if (flash.pin.si) flash.si_byte = flash.si_byte | (1 << flash.si_bits);
-		flash.si_bits++;
-		if (flash.si_bits == 8)
+		if (flash->pin.si) flash->si_byte = flash->si_byte | (1 << flash->si_bits);
+		flash->si_bits++;
+		if (flash->si_bits == 8)
 		{
-			flash.si_bits = 0;
-			at45dbxx_write_byte( machine, flash.si_byte);
-			flash.si_byte = 0;
+			flash->si_bits = 0;
+			at45dbxx_write_byte( device, flash->si_byte);
+			flash->si_byte = 0;
 		}
 		// output (part 2)
-		flash.pin.so = (flash.so_byte >> flash.so_bits) & 1;
-		flash.so_bits++;
+		flash->pin.so = (flash->so_byte >> flash->so_bits) & 1;
+		flash->so_bits++;
 	}
 	// save sck
-	flash.pin.sck = data;
+	flash->pin.sck = data;
 }
 
-void at45dbxx_load(running_machine *machine, mame_file *file)
+void at45dbxx_load(const device_config *device, mame_file *file)
 {
+	at45dbxx_t *flash = get_token(device);
 	_logerror( 0, ("at45dbxx_load (%p)\n", file));
-	mame_fread( file, flash.data, flash.size);
+	mame_fread( file, flash->data, flash->size);
 }
 
-void at45dbxx_save(running_machine *machine, mame_file *file)
+void at45dbxx_save(const device_config *device, mame_file *file)
 {
+	at45dbxx_t *flash = get_token(device);
 	_logerror( 0, ("at45dbxx_save (%p)\n", file));
-	mame_fwrite( file, flash.data, flash.size);
+	mame_fwrite( file, flash->data, flash->size);
 }
 
 /*
@@ -359,8 +406,79 @@ NVRAM_HANDLER( at45dbxx )
 		}
 		else
 		{
-			memset( flash.data, 0xFF, flash.size);
+			memset( flash->data, 0xFF, flash->size);
 		}
 	}
 }
 */
+
+
+/*-------------------------------------------------
+    DEVICE_SET_INFO( at45dbxx )
+-------------------------------------------------*/
+
+static DEVICE_SET_INFO( at45dbxx )
+{
+	switch (state)
+	{
+		/* no parameters to set */
+	}
+}
+
+
+
+/*-------------------------------------------------
+    DEVICE_GET_INFO( at45db041 )
+-------------------------------------------------*/
+
+DEVICE_GET_INFO( at45db041 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(at45dbxx_t);				break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
+		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(at45dbxx); break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(at45db041);	break;
+		case DEVINFO_FCT_STOP:							/* Nothing */								break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(at45dbxx);	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "AT45DB041");					break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "AT45DBxx");					break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:						/* Nothing */								break;
+	}
+}
+
+DEVICE_GET_INFO( at45db081 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "AT45DB081");				break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(at45db081);	break;
+
+		default: 										DEVICE_GET_INFO_CALL(at45db041);				break;
+	}
+}
+
+DEVICE_GET_INFO( at45db161 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "AT45DB161");				break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(at45db161);	break;
+
+		default: 										DEVICE_GET_INFO_CALL(at45db041);				break;
+	}
+}

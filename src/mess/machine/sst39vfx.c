@@ -14,50 +14,91 @@
 #define LOG_LEVEL  1
 #define _logerror(level,x)  do { if (LOG_LEVEL > level) logerror x; } while (0)
 
-typedef struct
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef struct _sst39vfx_t sst39vfx_t;
+struct _sst39vfx_t
 {
 	UINT8 *data;
 	UINT32 size;
 	UINT8 swap;
-} SST39VFX;
+};
 
-static SST39VFX flash;
-
-static void sst39vfx_state_save(running_machine *machine);
-
-void sst39vfx_init(running_machine *machine, int type, int cpu_datawidth, int cpu_endianess)
+enum
 {
-	_logerror( 0, ("sst39vfx_init (%d)\n", type));
-	memset( &flash, 0, sizeof( flash));
-	switch (type)
+	TYPE_SST39VF020,
+	TYPE_SST39VF400A
+};
+
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
+
+INLINE sst39vfx_t *get_token(const device_config *device)
+{
+	assert(device != NULL);
+	return (sst39vfx_t *) device->token;
+}
+
+INLINE const sst39vfx_config *get_config(const device_config *device)
+{
+	assert(device != NULL);
+	return (const sst39vfx_config *) device->inline_config;
+}
+
+
+/***************************************************************************
+    IMPLEMENTATION
+***************************************************************************/
+
+static device_start_err common_start(const device_config *device, int device_type)
+{
+	sst39vfx_t *flash = get_token(device);
+	const sst39vfx_config *config = get_config(device);
+	
+	_logerror( 0, ("sst39vfx_init (%d)\n", device_type));
+	memset( flash, 0, sizeof( flash));
+	switch (device_type)
 	{
-		case SST39VF020  : flash.size = 256 * 1024; break;
-		case SST39VF400A : flash.size = 512 * 1024; break;
+		case TYPE_SST39VF020  : flash->size = 256 * 1024; break;
+		case TYPE_SST39VF400A : flash->size = 512 * 1024; break;
 	}
-	flash.data = auto_malloc( flash.size);
+	flash->data = auto_malloc( flash->size);
 #ifdef LSB_FIRST
-	if (cpu_endianess != ENDIANNESS_LITTLE) flash.swap = cpu_datawidth / 8; else flash.swap = 0;
+	if (config->cpu_endianess != ENDIANNESS_LITTLE) flash->swap = config->cpu_datawidth / 8; else flash->swap = 0;
 #else
-	if (cpu_endianess != ENDIANNESS_BIG) flash.swap = cpu_datawidth / 8; else flash.swap = 0;
+	if (config->cpu_endianess != ENDIANNESS_BIG) flash->swap = config->cpu_datawidth / 8; else flash->swap = 0;
 #endif
-	sst39vfx_state_save(machine);
+
+	state_save_register_item_pointer(device->machine, "sst39vfx", device->tag, 0, flash->data, flash->size);
+	state_save_register_item(device->machine, "sst39vfx", device->tag, 0, flash->swap);
+	
+	return DEVICE_START_OK;	
 }
 
-static void sst39vfx_state_save(running_machine *machine)
+
+static DEVICE_START( sst39vf020 )
 {
-	const char *name = "sst39vfx";
-	state_save_register_item_pointer(machine, name, NULL, 0, flash.data, flash.size);
-	state_save_register_item(machine, name, NULL, 0, flash.swap);
+	return common_start(device, TYPE_SST39VF020);
 }
 
-UINT8* sst39vfx_get_base( void)
+static DEVICE_START( sst39vf400a )
 {
-	return flash.data;
+	return common_start(device, TYPE_SST39VF400A);
 }
 
-UINT32 sst39vfx_get_size( void)
+UINT8* sst39vfx_get_base( const device_config *device)
 {
-	return flash.size;
+	sst39vfx_t *flash = get_token(device);
+	return flash->data;
+}
+
+UINT32 sst39vfx_get_size( const device_config *device)
+{
+	sst39vfx_t *flash = get_token(device);
+	return flash->size;
 }
 
 /*
@@ -68,8 +109,8 @@ UINT32 sst39vfx_get_size( void)
 READ8_HANDLER( sst39vfx_r )
 {
 	_logerror( 1, ("sst39vfx_r (%08X)\n", offset));
-	if (flash.swap) offset = OFFSET_SWAP( offset, flash.swap);
-	return flash.data[offset];
+	if (flash->swap) offset = OFFSET_SWAP( offset, flash->swap);
+	return flash->data[offset];
 }
 */
 
@@ -77,36 +118,42 @@ READ8_HANDLER( sst39vfx_r )
 WRITE8_HANDLER( sst39vfx_w )
 {
 	_logerror( 1, ("sst39vfx_w (%08X/%02X)\n", offset, data));
-	if (flash.swap) offset = OFFSET_SWAP( offset, flash.swap);
-	flash.data[offset] = data;
+	if (flash->swap) offset = OFFSET_SWAP( offset, flash->swap);
+	flash->data[offset] = data;
 }
 */
 
-static void sst39vfx_swap( void)
+static void sst39vfx_swap( const device_config *device)
 {
 	int i, j;
 	UINT8 *base, temp[8];
-	base = flash.data;
-	for (i=0;i<flash.size;i+=flash.swap)
+	sst39vfx_t *flash = get_token(device);
+	
+	base = flash->data;
+	for (i=0;i<flash->size;i+=flash->swap)
 	{
-		memcpy( temp, base, flash.swap);
-		for (j=flash.swap-1;j>=0;j--) *base++ = temp[j];
+		memcpy( temp, base, flash->swap);
+		for (j=flash->swap-1;j>=0;j--) *base++ = temp[j];
 	}
 }
 
-void sst39vfx_load(running_machine *machine, mame_file *file)
+void sst39vfx_load(const device_config *device, mame_file *file)
 {
+	sst39vfx_t *flash = get_token(device);
+	
 	_logerror( 0, ("sst39vfx_load (%p)\n", file));
-	mame_fread( file, flash.data, flash.size);
-	if (flash.swap) sst39vfx_swap();
+	mame_fread( file, flash->data, flash->size);
+	if (flash->swap) sst39vfx_swap(device);
 }
 
-void sst39vfx_save(running_machine *machine, mame_file *file)
+void sst39vfx_save(const device_config *device, mame_file *file)
 {
+	sst39vfx_t *flash = get_token(device);
+	
 	_logerror( 0, ("sst39vfx_save (%p)\n", file));
-	if (flash.swap) sst39vfx_swap();
-	mame_fwrite( file, flash.data, flash.size);
-	if (flash.swap) sst39vfx_swap();
+	if (flash->swap) sst39vfx_swap(device);
+	mame_fwrite( file, flash->data, flash->size);
+	if (flash->swap) sst39vfx_swap(device);
 }
 
 /*
@@ -125,8 +172,63 @@ NVRAM_HANDLER( sst39vfx )
 		}
 		else
 		{
-			memset( flash.data, 0xFF, flash.size);
+			memset( flash->data, 0xFF, flash->size);
 		}
 	}
 }
 */
+/*-------------------------------------------------
+    DEVICE_SET_INFO( sst39vfx )
+-------------------------------------------------*/
+
+static DEVICE_SET_INFO( sst39vfx )
+{
+	switch (state)
+	{
+		/* no parameters to set */
+	}
+}
+
+
+
+/*-------------------------------------------------
+    DEVICE_GET_INFO( sst39vf020 )
+-------------------------------------------------*/
+
+DEVICE_GET_INFO( sst39vf020 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(sst39vfx_t);				break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(sst39vfx_config);			break;
+		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(sst39vfx); break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(sst39vf020);	break;
+		case DEVINFO_FCT_STOP:							/* Nothing */									break;
+		case DEVINFO_FCT_RESET:							/* Nothing */									break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "SST39VF020");					break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "SST39VFxx");					break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:						/* Nothing */									break;
+	}
+}
+
+DEVICE_GET_INFO( sst39vf400a )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "SST39VF400A");				break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(sst39vf400a);	break;
+
+		default: 										DEVICE_GET_INFO_CALL(sst39vf020);				break;
+	}
+}

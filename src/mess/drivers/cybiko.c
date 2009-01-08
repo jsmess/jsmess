@@ -18,7 +18,8 @@
 //#include "cpu/h8s2xxx/h8s2xxx.h"
 #include "video/hd66421.h"
 #include "machine/pcf8593.h"
-
+#include "machine/at45dbxx.h"
+#include "machine/sst39vfx.h"
 /* Layout */
 #include "cybiko.lh"
 
@@ -285,6 +286,7 @@ static MACHINE_DRIVER_START( cybikov1 )
 //  MDRV_NVRAM_HANDLER( cybikov1)
 	/* rtc */
 	MDRV_PCF8593_ADD("rtc")
+	MDRV_AT45DB041_ADD("flash1")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( cybikov2 )
@@ -299,6 +301,7 @@ static MACHINE_DRIVER_START( cybikov2 )
 	MDRV_MACHINE_RESET( cybikov2)
 	// non-volatile ram
 //  MDRV_NVRAM_HANDLER( cybikov2)
+	MDRV_SST39VF020_ADD("flash2",16, ENDIANNESS_BIG)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( cybikoxt )
@@ -316,6 +319,8 @@ static MACHINE_DRIVER_START( cybikoxt )
 	MDRV_MACHINE_RESET( cybikoxt)
 	// non-volatile ram
 //  MDRV_NVRAM_HANDLER( cybikoxt)
+	MDRV_AT45DB041_REMOVE("flash1")
+	MDRV_SST39VF020_ADD("flash2",16, ENDIANNESS_BIG)
 MACHINE_DRIVER_END
 
 //////////////
