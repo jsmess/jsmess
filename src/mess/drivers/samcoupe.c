@@ -54,14 +54,14 @@ Note on the bioses:
 
 /* core includes */
 #include "driver.h"
-#include "cpu/z80/z80.h"
 #include "includes/samcoupe.h"
 
 /* components */
+#include "cpu/z80/z80.h"
 #include "machine/wd17xx.h"
+#include "machine/msm6242.h"
 #include "sound/saa1099.h"
 #include "sound/speaker.h"
-#include "machine/msm6242.h"
 
 /* devices */
 #include "devices/mflopimg.h"
@@ -81,11 +81,11 @@ Note on the bioses:
 
 static READ8_HANDLER( samcoupe_disk_r )
 {
-	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD1772, "wd1772");
-	
+	const device_config *fdc = devtag_get_device(space->machine, WD1772, "wd1772");
+
 	/* drive and side is encoded into bit 5 and 3 */
-	wd17xx_set_drive(fdc,(offset >> 4) & 1);
-	wd17xx_set_side(fdc,(offset >> 2) & 1);
+	wd17xx_set_drive(fdc, (offset >> 4) & 1);
+	wd17xx_set_side(fdc, (offset >> 2) & 1);
 
 	/* bit 1 and 2 select the controller register */
 	switch (offset & 0x03)
@@ -102,11 +102,11 @@ static READ8_HANDLER( samcoupe_disk_r )
 
 static WRITE8_HANDLER( samcoupe_disk_w )
 {
-	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD1772, "wd1772");
+	const device_config *fdc = devtag_get_device(space->machine, WD1772, "wd1772");
 
 	/* drive and side is encoded into bit 5 and 3 */
-	wd17xx_set_drive(fdc,(offset >> 4) & 1);
-	wd17xx_set_side(fdc,(offset >> 2) & 1);
+	wd17xx_set_drive(fdc, (offset >> 4) & 1);
+	wd17xx_set_side(fdc, (offset >> 2) & 1);
 
 	/* bit 1 and 2 select the controller register */
 	switch (offset & 0x03)
@@ -121,17 +121,18 @@ static WRITE8_HANDLER( samcoupe_disk_w )
 
 static READ8_HANDLER( samcoupe_pen_r )
 {
+	const device_config *scr = space->machine->primary_screen;
 	UINT8 data;
 
 	if (offset & 0x100)
 	{
 		/* return either the current line or 192 for the vblank area */
-		data = video_screen_get_vblank(space->machine->primary_screen) ? 192 : video_screen_get_vpos(space->machine->primary_screen);
+		data = video_screen_get_vblank(scr) ? 192 : video_screen_get_vpos(scr);
 	}
 	else
 	{
 		/* horizontal position is encoded into bits 3 to 8 */
-		data = video_screen_get_hpos(space->machine->primary_screen) & 0xfc;
+		data = video_screen_get_hpos(scr) & 0xfc;
 	}
 
 	return data;
@@ -180,8 +181,9 @@ static READ8_HANDLER( samcoupe_lmpr_r )
 
 static WRITE8_HANDLER( samcoupe_lmpr_w )
 {
-	const address_space *space_program = cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space_program = cputag_get_address_space(space->machine, "main", ADDRESS_SPACE_PROGRAM);
 	coupe_asic *asic = space->machine->driver_data;
+
 	asic->lmpr = data;
 	samcoupe_update_memory(space_program);
 }
@@ -196,8 +198,9 @@ static READ8_HANDLER( samcoupe_hmpr_r )
 
 static WRITE8_HANDLER( samcoupe_hmpr_w )
 {
-	const address_space *space_program = cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space_program = cputag_get_address_space(space->machine, "main", ADDRESS_SPACE_PROGRAM);
 	coupe_asic *asic = space->machine->driver_data;
+
 	asic->hmpr = data;
 	samcoupe_update_memory(space_program);
 }
@@ -212,8 +215,9 @@ static READ8_HANDLER( samcoupe_vmpr_r )
 
 static WRITE8_HANDLER( samcoupe_vmpr_w )
 {
-	const address_space *space_program = cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space_program = cputag_get_address_space(space->machine, "main", ADDRESS_SPACE_PROGRAM);
 	coupe_asic *asic = space->machine->driver_data;
+
 	asic->vmpr = data;
 	samcoupe_update_memory(space_program);
 }
@@ -221,14 +225,14 @@ static WRITE8_HANDLER( samcoupe_vmpr_w )
 
 static READ8_HANDLER( samcoupe_midi_r )
 {
-	logerror("Read from midi port\n");
+	logerror("%s: read from midi port\n", cpuexec_describe_context(space->machine));
 	return 0xff;
 }
 
 
 static WRITE8_HANDLER( samcoupe_midi_w )
 {
-	logerror("Write to midi port: 0x%02x\n", data);
+	logerror("%s: write to midi port: 0x%02x\n", cpuexec_describe_context(space->machine), data);
 }
 
 
@@ -263,7 +267,7 @@ static WRITE8_HANDLER( samcoupe_border_w )
 	asic->border = data;
 
 	/* DAC output state */
-	speaker_level_w(0,(data >> 4) & 0x01);
+	speaker_level_w(0, (data >> 4) & 0x01);
 }
 
 
@@ -333,7 +337,7 @@ static TIMER_CALLBACK( irq_off )
 	coupe_asic *asic = machine->driver_data;
 
 	/* clear interrupt */
-	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+	cputag_set_input_line(machine, "main", 0, CLEAR_LINE);
 
 	/* adjust STATUS register */
 	asic->status |= param;
@@ -344,8 +348,8 @@ void samcoupe_irq(const device_config *device, UINT8 src)
 {
 	coupe_asic *asic = device->machine->driver_data;
 
-	/* set irq and a timer to set it off again */
-	cpu_set_input_line(device, 0, HOLD_LINE);
+	/* assert irq and a timer to set it off again */
+	cpu_set_input_line(device, 0, ASSERT_LINE);
 	timer_set(device->machine, ATTOTIME_IN_USEC(20), NULL, src, irq_off);
 
 	/* adjust STATUS register */
@@ -543,8 +547,8 @@ static MACHINE_DRIVER_START( samcoupe )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MDRV_SOUND_ADD("saa1099", SAA1099, SAMCOUPE_XTAL_X1/3) /* 8 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	
-	MDRV_WD1772_ADD("wd1772", default_wd17xx_interface )	
+
+	MDRV_WD1772_ADD("wd1772", default_wd17xx_interface )
 MACHINE_DRIVER_END
 
 

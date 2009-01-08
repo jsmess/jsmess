@@ -132,7 +132,7 @@ void samcoupe_update_memory(const address_space *space)
 
 WRITE8_HANDLER( samcoupe_ext_mem_w )
 {
-	const address_space *space_program = cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space_program = cputag_get_address_space(space->machine, "main", ADDRESS_SPACE_PROGRAM);
 	coupe_asic *asic = space->machine->driver_data;
 
 	if (offset & 1)
@@ -187,4 +187,3 @@ MACHINE_RESET( samcoupe )
 
 	samcoupe_update_memory(space);
 }
-
