@@ -64,6 +64,7 @@
 #define KERMIT_MAX_RETRIES  5
 #define KERMIT_RETRY_DELAY  ATTOTIME_IN_SEC( 10 )
 
+
 /* packet format is:
 
    <mark> <len> <seq> <type> <data0> ... <datan> <check>
@@ -186,20 +187,22 @@ static void kermit_reset( kermit* state );
 
 static void kermit_resend( kermit* state )
 {
-	if ( state->nbout == 0 ) return;
-	if ( state->retries <= 0 )
+	if ( state->conf && state->conf->send ) 
 	{
-		kermit_reset( state );
-		return;
-	}
+		/* retry */
+		if ( state->nbout == 0 ) return;
+		if ( state->retries <= 0 )
+		{
+			kermit_reset( state );
+			return;
+		}
 	
-	if ( state->conf && state->conf->send )
-	{
 		state->conf->send( state->machine, state->pout[ 0 ] );
+
+		state->posout = 1;
+		state->retries--;
+		LOG(( "kermit: resend packet (%i tries left)\n", state->retries ));
 	}
-	state->posout = 1;
-	state->retries--;
-	LOG(( "kermit: resend packet (%i tries left)\n", state->retries ));
 }
 
 /* resend packet periodically */
@@ -393,6 +396,7 @@ static void kermit_reset( kermit* state )
 
 	timer_adjust_periodic( state->resend, attotime_never, 0, attotime_never );
 }
+
 
 /* emulated machine sends a byte to the outside (us) */
 void kermit_receive_byte( const device_config *device, UINT8 data )

@@ -28,6 +28,7 @@
    base RAM is saved as nvram, RAM in expansion ports is saved as image, 
    IO RAM is & CPU state are discarded; save-state saves base & IO RAM, 
    CPU state, but not expansion port RAM)
+   - more accurate IRQ, NMI, sleep and wake-up handling
 */
 
 

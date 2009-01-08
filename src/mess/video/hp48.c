@@ -147,7 +147,7 @@ VIDEO_UPDATE ( hp48 )
 	int right_margin  = HP48_IO_12(0x25) & ~1;       /* -2048..2046 nibbles for main bitmap */
 	int last_line     = HP48_IO_8(0x28) & 0x3f;      /* 2..63 lines of main bitmap before menu */
 	int menu_start    = HP48_IO_20(0x30) & ~1;       /* menu bitmap address */
-	int fg = contrast + 1;
+	int fg = contrast + 2;
 
 	LOG(( "%f hp48 video_update called: ", attotime_to_double(timer_get_time(screen->machine)) ));
 
