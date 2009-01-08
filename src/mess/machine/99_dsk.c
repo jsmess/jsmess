@@ -577,19 +577,14 @@ static  READ8_HANDLER(fdc_mem_r)
 	{
 	case 0x1FF0:					/* Status register */
 		return (wd17xx_status_r(fdc, offset) ^ 0xFF);
-		break;
 	case 0x1FF2:					/* Track register */
 		return wd17xx_track_r(fdc, offset) ^ 0xFF;
-		break;
 	case 0x1FF4:					/* Sector register */
 		return wd17xx_sector_r(fdc, offset) ^ 0xFF;
-		break;
 	case 0x1FF6:					/* Data register */
 		return wd17xx_data_r(fdc, offset) ^ 0xFF;
-		break;
 	default:						/* DSR ROM */
 		return ti99_disk_DSR[offset];
-		break;
 	}
 }
 

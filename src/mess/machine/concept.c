@@ -608,27 +608,22 @@ static  READ8_HANDLER(concept_fdc_reg_r)
 	case 0:
 		/* local Status reg */
 		return fdc_local_status;
-		break;
 
 	case 8:
 		/* FDC STATUS REG */
 		return wd17xx_status_r(fdc, offset);
-		break;
 
 	case 9:
 		/* FDC TRACK REG */
 		return wd17xx_track_r(fdc, offset);
-		break;
 
 	case 10:
 		/* FDC SECTOR REG */
 		return wd17xx_sector_r(fdc, offset);
-		break;
 
 	case 11:
 		/* FDC DATA REG */
 		return wd17xx_data_r(fdc, offset);
-		break;
 	}
 
 	return 0;
@@ -710,12 +705,10 @@ static READ8_HANDLER(concept_hdc_reg_r)
 	case 0:
 		/* HDC Data Register */
 		return corvus_hdc_data_r(space, offset);
-		break;
 
 	case 1:
 		/* HDC Status Register */
 		return corvus_hdc_status_r(space, offset);
-		break;
 	}
 
 	return 0;

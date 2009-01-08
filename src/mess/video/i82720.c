@@ -490,10 +490,8 @@ gdc_disp_mode_to_str(int mode)
 			return "Graphics";
 		case 2:
 			return "Character";
-			break;
 		case 3:
 			return "Invalid";
-			break;
 	}
 	return "";
 }

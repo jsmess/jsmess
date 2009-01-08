@@ -147,11 +147,9 @@ static WRITE8_DEVICE_HANDLER ( lviv_ppi_1_portc_w )	/* kayboard scaning */
 		{
 		case 0:
 			return ppi8255_r((device_config*)devtag_get_device(space->machine, PPI8255, "ppi8255_0"), offset & 3);
-			break;
 
 		case 1:
 			return ppi8255_r((device_config*)devtag_get_device(space->machine, PPI8255, "ppi8255_1"), offset & 3);
-			break;
 
 		case 2:
 		case 3:

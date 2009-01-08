@@ -157,7 +157,7 @@ READ32_HANDLER( clio_r )
 
 	switch( offset )
 	{
-		case 0x0a: return 0x40; break;
+		case 0x0a: return 0x40;
 		case 0x0d:
 		{
 			static const UINT32 irq_sequence[3] = { 0, 4, 12 };

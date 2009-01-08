@@ -247,10 +247,8 @@ static int strataflash_r(int id, offs_t offset, bus_width_t bus_width)
 		break;
 	case FM_READSTATUS:
 		return strata[id].status;
-		break;
 	case FM_WRBUFPART1:
 		return 0x80;
-		break;
 	case FM_READID:
 		if ((offset >= 0x100) && (offset < 0x112))
 		{	/* protection registers */
@@ -267,10 +265,8 @@ static int strataflash_r(int id, offs_t offset, bus_width_t bus_width)
 			{
 			case 0:	// maker ID
 				return 0x89;	// Intel
-				break;
 			case 1:	// chip ID
 				return 0x15;	// 64 Mbit
-				break;
 			default:
 				if (((offset && BYTE_ADDRESS_MASK) >> 1) == 2)
 				{	// block lock config

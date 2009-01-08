@@ -477,7 +477,6 @@ INLINE UINT8 vga_latch_write(int offs, UINT8 data)
 		break;
 	case 1:
 		return vga.gc.latch[offs];
-		break;
 	case 2:
 		if (data&(1<<offs)) {
 			return vga_latch_helper(0xff, vga.gc.latch[offs], vga.gc.data[8]);

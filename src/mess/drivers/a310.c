@@ -375,28 +375,20 @@ static READ32_HANDLER(ioc_r)
 
 			case 16:	// timer 0 read
 				return a310_timerout[0]&0xff;
-				break;
 			case 17:
 				return (a310_timerout[0]>>8)&0xff;
-				break;
 			case 20:	// timer 1 read
 				return a310_timerout[1]&0xff;
-				break;
 			case 21:
 				return (a310_timerout[1]>>8)&0xff;
-				break;
 			case 24:	// timer 2 read
 				return a310_timerout[2]&0xff;
-				break;
 			case 25:
 				return (a310_timerout[2]>>8)&0xff;
-				break;
 			case 28:	// timer 3 read
 				return a310_timerout[3]&0xff;
-				break;
 			case 29:
 				return (a310_timerout[3]>>8)&0xff;
-				break;
 		}
 
 		logerror("IOC: R %s = %02x (PC=%x)\n", ioc_regnames[offset&0x1f], a310_iocregs[offset&0x1f], cpu_get_pc( space->cpu ));

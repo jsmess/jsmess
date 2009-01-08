@@ -580,11 +580,11 @@ READ8_HANDLER ( orionpro_io_r ) {
 		case 0x19 : 
 		case 0x1a : 
 		case 0x1b : 
-					return orion128_system_r(space,(offset & 0xff)-0x18); break;
-		case 0x28 : return orion128_romdisk_r(space,0); break;
-		case 0x29 : return orion128_romdisk_r(space,1); break;
-		case 0x2a : return orion128_romdisk_r(space,2); break;
-		case 0x2b : return orion128_romdisk_r(space,3); break;
+					return orion128_system_r(space,(offset & 0xff)-0x18);
+		case 0x28 : return orion128_romdisk_r(space,0);
+		case 0x29 : return orion128_romdisk_r(space,1);
+		case 0x2a : return orion128_romdisk_r(space,2);
+		case 0x2b : return orion128_romdisk_r(space,3);
 	}
 	if (offset == 0xFFFD) {
 		return ay8910_read_port_0_r (space, 0);

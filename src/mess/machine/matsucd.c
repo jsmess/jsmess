@@ -94,10 +94,10 @@ static int matsucd_getsector_type( void )
 {
 	switch( cd.sector_size )
 	{
-		case 2048: return CD_TRACK_MODE1; break;
-		case 2324: return CD_TRACK_MODE2_FORM2; break;
-		case 2336: return CD_TRACK_MODE2; break;
-		case 2352: return CD_TRACK_MODE2_RAW; break;
+		case 2048: return CD_TRACK_MODE1;
+		case 2324: return CD_TRACK_MODE2_FORM2;
+		case 2336: return CD_TRACK_MODE2;
+		case 2352: return CD_TRACK_MODE2_RAW;
 
 		default: logerror( "MATSUCD: Sector size %d unsupported!\n", cd.sector_size ); break;
 	}

@@ -1318,16 +1318,12 @@ UPD7002_GET_ANALOGUE(BBC_get_analogue_input)
 	{
 		case 0:
 			return ((0xff-input_port_read(device->machine, "JOY0"))<<8);
-			break;
 		case 1:
 			return ((0xff-input_port_read(device->machine, "JOY1"))<<8);
-			break;
 		case 2:
 			return ((0xff-input_port_read(device->machine, "JOY2"))<<8);
-			break;
 		case 3:
 			return ((0xff-input_port_read(device->machine, "JOY3"))<<8);
-			break;
 	}
 
 	return 0;
@@ -1901,16 +1897,12 @@ READ8_HANDLER( bbc_opus_read )
 			{
 				case 0xf8:
 					return wd17xx_status_r(fdc, 0);
-					break;
 				case 0xf9:
 					return wd17xx_track_r(fdc, 0);
-					break;
 				case 0xfa:
 					return wd17xx_sector_r(fdc, 0);
-					break;
 				case 0xfb:
 					return wd17xx_data_r(fdc, 0);
-					break;
 			}
 
 		} else {
@@ -2059,15 +2051,12 @@ READ8_HANDLER( bbc_disc_r )
 	/* case 0 to 3 are all standard 8271 interfaces */
 	case 0: case 1: case 2: case 3:
 		return bbc_i8271_read(space, offset);
-		break;
 	/* case 4 is the acown 1770 interface */
 	case 4:
 		return bbc_wd1770_read(space, offset);
-		break;
 	/* case 5 is the watford 1770 interface */
 	case 5:
 		return bbc_wd1770_read(space, offset);
-		break;
 	/* case 6 is the Opus challenger interface */
 	case 6:
 		/* not connected here, opus drive is connected via the 1MHz Bus */

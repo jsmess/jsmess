@@ -576,14 +576,14 @@ READ16_HANDLER( cybiko_unk2_r )
 {
 	switch (offset << 1)
 	{
-		case 0x000 : return 0xBA0B; break; // magic (part 1)
-		case 0x002 : return 0xAB15; break; // magic (part 2)
-		case 0x004 : return (0x07 << 8) | (0x07 ^0xFF); break; // brightness (or contrast) & value xor FF
-//		case 0x006 : return 0x2B57; break; // do not show "Free Games and Applications at www.cybiko.com" screen
-		case 0x008 : return 0xDEBA; break; // enable debug output
-		case 0x016 : return 0x5000 | 0x03FF; break; // ?
-		case 0x7FC : return 0x22A1; break; // crc32 (part 1)
-		case 0x7FE : return 0x8728; break; // crc32 (part 2)
-		default    : return 0xFFFF; break;
+		case 0x000 : return 0xBA0B; // magic (part 1)
+		case 0x002 : return 0xAB15; // magic (part 2)
+		case 0x004 : return (0x07 << 8) | (0x07 ^0xFF); // brightness (or contrast) & value xor FF
+//		case 0x006 : return 0x2B57; // do not show "Free Games and Applications at www.cybiko.com" screen
+		case 0x008 : return 0xDEBA; // enable debug output
+		case 0x016 : return 0x5000 | 0x03FF; // ?
+		case 0x7FC : return 0x22A1; // crc32 (part 1)
+		case 0x7FE : return 0x8728; // crc32 (part 2)
+		default    : return 0xFFFF;
 	}
 }

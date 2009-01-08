@@ -101,15 +101,12 @@ READ8_DEVICE_HANDLER ( uPD7002_r )
 	{
 		case 0:
 			return uPD7002->status;
-			break;
 
 		case 1:
 			return uPD7002->data1;
-			break;
 
 		case 2: case 3:
 			return uPD7002->data0;
-			break;
 	}
 	return 0;
 }

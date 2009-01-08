@@ -1056,7 +1056,6 @@ READ8_HANDLER ( apple2_c06x_r )
 			 * and any other non joystick c06 port returns this according to applewin
 			 */
 			return apple2_getfloatingbusvalue(space->machine);
-			break;
 	}
 	return result ? 0x80 : 0x00;
 }
