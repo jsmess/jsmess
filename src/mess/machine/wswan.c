@@ -69,7 +69,7 @@ static struct EEPROM eeprom;
 static struct RTC rtc;
 static struct SoundDMA sound_dma;
 static UINT8 *ws_ram;
-static UINT8 *ws_bios_bank = NULL;
+static UINT8 *ws_bios_bank;
 static UINT8 wswan_bios_disabled;
 UINT8 ws_portram[256];
 static const UINT8 ws_portram_init[256] =
@@ -212,20 +212,22 @@ static void wswan_setup_bios( void ) {
 }
 
 MACHINE_START( wswan ) {
+	ws_bios_bank = NULL;
 	system_type = WSWAN;
 	add_exit_callback( machine, wswan_machine_stop );
-	wswan_setup_bios();
 }
 
 MACHINE_START( wscolor ) {
+	ws_bios_bank = NULL;
 	system_type = WSC;
 	add_exit_callback( machine, wswan_machine_stop );
-	wswan_setup_bios();
 }
 
 MACHINE_RESET( wswan )
 {
 	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+
+	wswan_setup_bios();
 
 	/* Intialize ports */
 	memcpy( ws_portram, ws_portram_init, 256 );
