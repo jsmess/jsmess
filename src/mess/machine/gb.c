@@ -196,12 +196,19 @@ static void gb_init(running_machine *machine) {
 	MBC3RTCBank = 0;
 	ROMBank = ROMBank00 + 1;
 	RAMBank = 0;
-	if ( MBCType != MBC_MEGADUCK ) {
-		gb_rom16_4000( machine, ROMMap[ROMBank] );
-		memory_set_bankptr (machine, 2, RAMMap[RAMBank] ? RAMMap[RAMBank] : gb_dummy_ram_bank);
-	} else {
-		memory_set_bankptr( machine, 1, ROMMap[ROMBank] );
-		memory_set_bankptr( machine, 10, ROMMap[0] );
+
+	if (gb_cart)
+	{
+		if ( MBCType != MBC_MEGADUCK )
+		{
+			gb_rom16_4000( machine, ROMMap[ROMBank] );
+			memory_set_bankptr (machine, 2, RAMMap[RAMBank] ? RAMMap[RAMBank] : gb_dummy_ram_bank);
+		}
+		else
+		{
+			memory_set_bankptr( machine, 1, ROMMap[ROMBank] );
+			memory_set_bankptr( machine, 10, ROMMap[0] );
+		}
 	}
 
 	/* Set handlers based on the Memory Bank Controller in the cart */
@@ -322,10 +329,12 @@ MACHINE_RESET( sgb )
 	   For some reason that I haven't figured out, they store the tile
 	   data differently.  Hacks will go once I figure it out */
 	sgb_hack = 0;
-	if( strncmp( (const char*)(gb_cart + 0x134), "DONKEYKONGLAND 2", 16 ) == 0 ||
-		strncmp( (const char*)(gb_cart + 0x134), "DONKEYKONGLAND 3", 16 ) == 0 )
+
+	if (gb_cart)	// make sure cart is in
 	{
-		sgb_hack = 1;
+		if( strncmp( (const char*)(gb_cart + 0x134), "DONKEYKONGLAND 2", 16 ) == 0 ||
+			strncmp( (const char*)(gb_cart + 0x134), "DONKEYKONGLAND 3", 16 ) == 0 )
+				sgb_hack = 1;
 	}
 
 	gb_timer.divcount = 0xABC8;
@@ -386,11 +395,13 @@ MACHINE_RESET( gbc )
 	gb_io_w( cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM ), 0x77, 0x00 );
 
 	/* Are we in colour or mono mode? */
-	if( gb_cart[0x143] == 0x80 || gb_cart[0x143] == 0xC0 )
-		gbc_mode = GBC_MODE_GBC;
-	else
-		gbc_mode = GBC_MODE_MONO;
+	gbc_mode = GBC_MODE_MONO;
 
+	if (gb_cart)	// make sure cart is in
+	{
+		if( gb_cart[0x143] == 0x80 || gb_cart[0x143] == 0xC0 )
+			gbc_mode = GBC_MODE_GBC;
+	}
 	gb_timer.divcount = 0x1E9C;
 }
 

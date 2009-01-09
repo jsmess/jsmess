@@ -1165,11 +1165,10 @@ void gb_video_init( running_machine *machine, int mode ) {
 	int vram_size = 0x2000;
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
-	switch( mode ) {
-	case GB_VIDEO_CGB:	vram_size = 0x4000; break;
-	}
-	gb_vram = memory_region_alloc( machine, "gfx1", vram_size, 0 );
-	gb_oam = memory_region_alloc( machine, "gfx2", 0x100, 0 );
+	if (mode == GB_VIDEO_CGB) vram_size = 0x4000;
+
+	if (!memory_region(machine, "gfx1")) gb_vram = memory_region_alloc( machine, "gfx1", vram_size, 0 );
+	if (!memory_region(machine, "gfx2")) gb_oam = memory_region_alloc( machine, "gfx2", 0x100, 0 );
 	memset( gb_vram, 0, vram_size );
 	memset( &gb_lcd, 0, sizeof(gb_lcd) );
 

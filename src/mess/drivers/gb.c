@@ -587,8 +587,8 @@ static MACHINE_DRIVER_START( gameboy )
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
 	
 	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("gb,gmb,cgb,gbc,sgb,bin")
-	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_EXTENSION_LIST("gb,gmb,cgb,sgb,bin")
+	MDRV_CARTSLOT_MANDATORY
 	MDRV_CARTSLOT_START(gb_cart)
 	MDRV_CARTSLOT_LOAD(gb_cart)
 MACHINE_DRIVER_END
@@ -610,9 +610,6 @@ static MACHINE_DRIVER_START( supergb )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MDRV_PALETTE_LENGTH(32768)
 	MDRV_PALETTE_INIT(sgb)
-	
-	MDRV_CARTSLOT_MODIFY("cart")
-	MDRV_CARTSLOT_MANDATORY
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( gbpocket )
@@ -621,9 +618,6 @@ static MACHINE_DRIVER_START( gbpocket )
 	MDRV_CPU_CONFIG(mgb_cpu_reset)
 	MDRV_MACHINE_RESET( gbpocket )
 	MDRV_PALETTE_INIT(gbp)
-
-	MDRV_CARTSLOT_MODIFY("cart")
-	MDRV_CARTSLOT_MANDATORY
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( gbcolor )
@@ -638,7 +632,7 @@ static MACHINE_DRIVER_START( gbcolor )
 	MDRV_PALETTE_INIT(gbc)
 	
 	MDRV_CARTSLOT_MODIFY("cart")
-	MDRV_CARTSLOT_MANDATORY
+	MDRV_CARTSLOT_EXTENSION_LIST("gb,gmb,cgb,gbc,sgb,bin")
 MACHINE_DRIVER_END
 
 static SYSTEM_CONFIG_START(gb_cgb)
@@ -678,7 +672,6 @@ static MACHINE_DRIVER_START( megaduck )
 	
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("bin")
-	MDRV_CARTSLOT_MANDATORY
 	MDRV_CARTSLOT_LOAD(megaduck_cart)
 MACHINE_DRIVER_END
 
@@ -714,13 +707,13 @@ ROM_START( megaduck )
 ROM_END
 
 /*    YEAR  NAME      PARENT   COMPAT   MACHINE   INPUT    INIT  CONFIG   COMPANY     FULLNAME */
-CONS( 1990, gameboy,  0,       0,		gameboy,  gameboy, 0,    0, "Nintendo", "Game Boy"  , 0)
-CONS( 1994, supergb,  0,       gameboy,	supergb,  gameboy, 0,    0, "Nintendo", "Super Game Boy" , 0)
-CONS( 1996, gbpocket, gameboy, 0,		gbpocket, gameboy, 0,    0, "Nintendo", "Game Boy Pocket" , 0)
-CONS( 1998, gbcolor,  0,       gameboy,	gbcolor,  gameboy, 0,    gb_cgb, "Nintendo", "Game Boy Color" , 0)
+CONS( 1990, gameboy,  0,       0,	gameboy,  gameboy, 0,    0,	 "Nintendo", "Game Boy"  , 0)
+CONS( 1994, supergb,  0,       gameboy,	supergb,  gameboy, 0,    0,	 "Nintendo", "Super Game Boy" , 0)
+CONS( 1996, gbpocket, gameboy, 0,	gbpocket, gameboy, 0,    0,	 "Nintendo", "Game Boy Pocket" , 0)
+CONS( 1998, gbcolor,  0,       gameboy,	gbcolor,  gameboy, 0,    gb_cgb, "Nintendo", "Game Boy Color" , GAME_NOT_WORKING)
 
 /* Sound is not 100% yet, it generates some sounds which could be ok. Since we're lacking a real
    system there's no way to verify. Same goes for the colors of the LCD. We are no using the default
    Game Boy green colors */
-CONS( 1993, megaduck, 0,       0,       megaduck, gameboy, 0,    0,"Creatronic/Videojet/Timlex/Cougar",  "MegaDuck/Cougar Boy" , 0)
+CONS( 1993, megaduck, 0,       0,       megaduck, gameboy, 0,    0,	 "Creatronic/Videojet/Timlex/Cougar",  "MegaDuck/Cougar Boy" , 0)
 
