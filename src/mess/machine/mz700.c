@@ -43,8 +43,6 @@ typedef UINT32 data_t;
 static emu_timer *ne556_timer[2] = {NULL,};	  /* NE556 timer */
 static UINT8 ne556_out[2] = {0,};		/* NE556 current output status */
 
-static UINT8 mz700_motor_on = 0;	/* cassette motor key (play key) */
-
 static READ8_DEVICE_HANDLER ( pio_port_a_r );
 static READ8_DEVICE_HANDLER ( pio_port_b_r );
 static READ8_DEVICE_HANDLER ( pio_port_c_r );
@@ -157,7 +155,7 @@ static READ8_DEVICE_HANDLER ( pio_port_b_r )
 
 static READ8_DEVICE_HANDLER (pio_port_c_r )
 {
-    UINT8 data = pio_port_c_output & 0x0f;
+	UINT8 data = pio_port_c_output & 0x0f;
 
     /*
      * bit 7 in     vertical blank
@@ -165,20 +163,22 @@ static READ8_DEVICE_HANDLER (pio_port_c_r )
      * bit 5 in     tape data (RDATA)
      * bit 4 in     motor (1 = on)
      */
-    if (mz700_motor_on)
-        data |= 0x10;
 
-    if (cassette_input(devtag_get_device(device->machine, CASSETTE, "cassette")) > 0.0038)
-        data |= 0x20;       /* set the RDATA status */
+	/* note: this is actually connected to Q output of the motor-control flip-flop (see below) */
+	if ((cassette_get_state(devtag_get_device(device->machine, CASSETTE, "cassette")) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
+		data |= 0x10;
+
+	if (cassette_input(devtag_get_device(device->machine, CASSETTE, "cassette")) > 0.0038)
+		data |= 0x20;       /* set the RDATA status */
 
 	if (ne556_out[0])
-        data |= 0x40;           /* set the 556OUT status */
+		data |= 0x40;           /* set the 556OUT status */
 
-    data |= input_port_read(device->machine, "STATUS");   /* get VBLANK in bit 7 */
+	data |= input_port_read(device->machine, "STATUS");   /* get VBLANK in bit 7 */
 
 	LOG(2,"mz700_pio_port_c_r",("%02X\n", data),device->machine);
 
-    return data;
+	return data;
 }
 
 static WRITE8_DEVICE_HANDLER (pio_port_a_w )
@@ -213,15 +213,31 @@ static WRITE8_DEVICE_HANDLER ( pio_port_c_w )
      * bit 1 out    tape data (WDATA)
      * bit 0 out    unused
      */
-	LOG(2,"mz700_pio_port_c_w",("%02X\n", data),device->machine);
-	pio_port_c_output = data;
+
+//	UINT8 state = cassette_get_state(devtag_get_device(device->machine, CASSETTE, "cassette"));
+//	UINT8 action = ((~pio_port_c_output & 8) & (data & 8));		/* detect low-to-high transition */
+
+	/* The motor control circuit consists of a resistor, capacitor, invertor, nand-gate, and D flip-flop.
+		The sense input from the cassette player goes low whenever play, rewind or fast-forward is pressed.
+		This connects to most of the above components.
+		The Q output enables the motor, and also connects to Bit 4 (input).
+		Bit 3 outputs a string of pulses to the Clock pin, and therefore cannot be used to control
+		the motor directly.
+		For the moment, the user can use the UI to select play, stop, etc.
+		If you load from the command-line or the software-picker, type in L <enter> immediately.
 
 	cassette_change_state(
 		devtag_get_device(device->machine, CASSETTE, "cassette"),
 		((data & 0x08) && mz700_motor_on) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,
 		CASSETTE_MOTOR_DISABLED);
 
-    cassette_output(devtag_get_device(device->machine, CASSETTE, "cassette"), (data & 0x02) ? +1.0 : -1.0);
+	*/
+
+	LOG(2,"mz700_pio_port_c_w",("%02X\n", data),device->machine);
+
+	cassette_output(devtag_get_device(device->machine, CASSETTE, "cassette"), (data & 0x02) ? +1.0 : -1.0);
+
+	pio_port_c_output = data;
 }
 
 /************************ MMIO ***********************************************/
