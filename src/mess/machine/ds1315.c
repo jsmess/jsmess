@@ -210,7 +210,7 @@ static void ds1315_fill_raw_data(const device_config *device)
 	raw[2] = dec_2_bcd(systime.local_time.minute);
 	raw[3] = dec_2_bcd(systime.local_time.hour);
 
-	raw[4] = dec_2_bcd(systime.local_time.day);
+	raw[4] = dec_2_bcd(systime.local_time.weekday);
 	raw[5] = dec_2_bcd(systime.local_time.mday);
 	raw[6] = dec_2_bcd(systime.local_time.month + 1);
 	raw[7] = dec_2_bcd(systime.local_time.year - 1900); /* Epoch is 1900 */
