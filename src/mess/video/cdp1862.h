@@ -28,6 +28,10 @@
 
 #define CDP1862		DEVICE_GET_INFO_NAME(cdp1862)
 
+#define MDRV_CDP1862_ADD(_tag, _clock, _config) \
+	MDRV_DEVICE_ADD(_tag, CDP1862, _clock) \
+	MDRV_DEVICE_CONFIG(_config)
+
 /* interface */
 typedef struct _cdp1862_interface cdp1862_interface;
 struct _cdp1862_interface

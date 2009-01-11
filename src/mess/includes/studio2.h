@@ -6,9 +6,11 @@
 #define SCREEN_TAG "main"
 #define CDP1802_TAG "cdp1802"
 #define CDP1861_TAG "cdp1861"
+#define CDP1862_TAG "cdp1862"
 #define CDP1864_TAG "cdp1864"
 
-#define ST2_HEADER_SIZE		256
+#define ST2_HEADER_SIZE			256
+#define VISICOM_COLOR_RAM_SIZE	0x100
 
 typedef struct _studio2_state studio2_state;
 struct _studio2_state
@@ -22,10 +24,12 @@ struct _studio2_state
 	/* video state */
 	int cdp1861_efx;
 	int cdp1864_efx;
+	int colorram_mwr;				/* color RAM write */
 	UINT8 *color_ram;
 
 	/* devices */
 	const device_config *cdp1861;
+	const device_config *cdp1862;
 	const device_config *cdp1864;
 };
 
