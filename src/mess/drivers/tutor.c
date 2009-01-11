@@ -70,6 +70,92 @@ TODO :
     seem to be used: triggering these seems to cause a soft reset.  XOPs are
     not used at all: the ROM area where these vectors should be defined is used
     by a ROM branch table.
+
+**** Added by Robbbert, Jan 2009 ****
+
+Memory Map found at http://www.floodgap.com/retrobits/tomy/mmap.html
+
+                   *** $0000-$7FFF is the 32K BIOS ***
+ it is also possible to replace the BIOS with an external ROM (see $E000 range)
+
+0000                            
+                                reset vector (level 0)
+                                0000-0001: WP   0002-0003: PC (%)
+0004
+                                level 1 and 2 IRQ vectors (%)
+                                idem. These just seem to reset the system.
+000C
+                                additional vectors
+0040
+                                XOP vectors (%)
+				The BIOS doesn't seem to use these for XOPs.
+				Instead, this is a branch table.
+0080
+				BIOS code
+				(CRU only: $1EE0-FE: 9995 flag register;
+					$1FDA: MID flag)
+4000
+				GBASIC
+				(on the American v2.3 firmware, the GPL
+					interpreter and VDP RAMLUT co-exist
+					with GBASIC in this range)
+
+              *** $8000-$BFFF is the 16K option ROM area ***
+
+8000
+				BASIC (Tutor only) and/or cartridge ROM
+					(controlled by $E100)
+				To be recognized, a cartridge must have a
+				$55, $66 or $aa header sequence.
+
+                         *** end ROM ***
+C000
+				unmapped (possible use in 24K cartridges)
+E000
+				I/O range
+				---------
+				9918A VDP data/register ports: $E000, E002
+				"MMU" banking controls: $E100-E1FF
+					$E100 write: enable cartridge, disable
+						BIOS at $0000 (???) -- magic
+						required at $E110 for this
+					$E108 write: enable BASIC ROM, disable
+						cartridge at $8000
+					$E10C write: enable cartridge, disable
+						BASIC ROM at $8000
+					$E110 must be $42 to enable $E100
+						and to replace the BIOS with
+						an installed cartridge ROM.
+						BLWP assumed at $0000 (??).
+				SN76489AN sound data port: $E200
+				Device handshaking: $E600
+					Unknown purpose, disk drive maybe?
+				Printer handshaking: $E800
+				This is a standard Centronics port.
+					$E810 write: parallel data bus
+					$E820 read: parallel port busy
+					$E840 write: port handshake output
+				Keyboard lines: $EC00-$EC7E (*CRU*)
+					(CRU physical address $7600-$763F)
+				Cassette lines: $ED00-$EEFF
+					$ED00 (*CRU*): input level
+						(physical address $7680)
+					$EE00 write: tape output zero
+					$EE20 write: tape output one
+					$EE40 write: tape IRQ on
+					$EE60 write: tape IRQ off
+					$EE80, A0, C0, E0: ???
+					
+F000
+                                TMS9995 RAM (*)
+F0FC
+                                ??
+FFFA
+                                decrementer (*)
+FFFC
+                                NMI vector (*)
+FFFF
+
 */
 
 #include "driver.h"
@@ -417,7 +503,7 @@ static WRITE8_HANDLER(tutor_printer_w)
 static ADDRESS_MAP_START(tutor_memmap, ADDRESS_SPACE_PROGRAM, 8)
 
 	AM_RANGE(0x0000, 0x7fff) AM_ROM	/*system ROM*/
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)	/*BASIC ROM & cartridge ROM*/
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)	AM_WRITENOP/*BASIC ROM & cartridge ROM*/
 	AM_RANGE(0xc000, 0xdfff) AM_NOP	/*free for expansion, or cartridge ROM?*/
 
 	AM_RANGE(0xe000, 0xe000) AM_READWRITE(TMS9928A_vram_r, TMS9928A_vram_w)	/*VDP data*/
