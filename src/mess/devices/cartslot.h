@@ -4,12 +4,16 @@
 
 ***************************************************************************/
 
-#ifndef CARTSLOT_H
-#define CARTSLOT_H
+#ifndef __CARTSLOT_H__
+#define __CARTSLOT_H__
 
 #include "device.h"
 #include "image.h"
 
+
+/***************************************************************************
+    MACROS
+***************************************************************************/
 
 #define ROM_CART_LOAD(tag,offset,length,flags)	\
 	{ NULL, tag, offset, length, ROMENTRYTYPE_CARTRIDGE | (flags) },
@@ -80,4 +84,4 @@ DEVICE_GET_INFO(cartslot);
 #define MDRV_CARTSLOT_PARTIALHASH(_partialhash)							\
 	MDRV_DEVICE_CONFIG_DATAPTR(cartslot_config, device_partialhash, _partialhash)
 
-#endif /* CARTSLOT_H */
+#endif /* __CARTSLOT_H__ */
