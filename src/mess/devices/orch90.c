@@ -15,8 +15,12 @@
 #include "sound/dac.h"
 
 
-typedef struct _orch90_info orch90_info;
-struct _orch90_info
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef struct _orch90_t orch90_t;
+struct _orch90_t
 {
 	int left_dac;
 	int right_dac;
@@ -24,16 +28,20 @@ struct _orch90_info
 
 
 
-/*-------------------------------------------------
-    orch90_get_info
--------------------------------------------------*/
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
 
-static orch90_info *orch90_get_info(coco_cartridge *cartridge)
+INLINE orch90_t *get_token(coco_cartridge *cartridge)
 {
 	return cococart_get_extra_data(cartridge);
 }
 
 
+
+/***************************************************************************
+    IMPLEMENTATION
+***************************************************************************/
 
 /*-------------------------------------------------
     orch90_init - initializer for the Orch-90
@@ -41,7 +49,7 @@ static orch90_info *orch90_get_info(coco_cartridge *cartridge)
 
 static void orch90_init(running_machine *machine, coco_cartridge *cartridge)
 {
-	orch90_info *info = orch90_get_info(cartridge);
+	orch90_t *info = get_token(cartridge);
 
 	/* TODO - when we can instantiate DACs, we can do something better here */
 	info->left_dac = 0;
@@ -56,7 +64,7 @@ static void orch90_init(running_machine *machine, coco_cartridge *cartridge)
 
 static void orch90_w(running_machine *machine, coco_cartridge *cartridge, UINT16 addr, UINT8 data)
 {
-	orch90_info *info = orch90_get_info(cartridge);
+	orch90_t *info = get_token(cartridge);
 
 	switch(addr)
 	{
@@ -84,7 +92,7 @@ void cococart_orch90(UINT32 state, cococartinfo *info)
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case COCOCARTINFO_INT_DATASIZE:						info->i = sizeof(orch90_info);	break;
+		case COCOCARTINFO_INT_DATASIZE:						info->i = sizeof(orch90_t);	break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case COCOCARTINFO_PTR_INIT:							info->init = orch90_init;	break;
