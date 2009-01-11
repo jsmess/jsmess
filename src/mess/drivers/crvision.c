@@ -1,4 +1,9 @@
 /*
+	This 1980s computer was manufactured by Vtech of Hong Kong.
+	known as: creatiVision, Dick Smith Wizzard, Funvision, Hanimex Ramses, Laser2001 and possibly others.
+
+	There is also a CreatiVision Mk 2, possibly also known as the Laser 500. This was a proper computer,
+	containing a CreatiVision cartridge slot.
 
     TODO:
 
@@ -142,7 +147,7 @@ static INPUT_PORTS_START( crvision )
 
 	PORT_START("PA2-7")
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
-    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P2 Button 2 / ->") PORT_CODE(KEYCODE_TAB) PORT_CHAR(9) PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P2 Button 2 / ->") PORT_CODE(KEYCODE_TAB) PORT_CHAR(9) PORT_PLAYER(2)
 
 	// Player 2 Keyboard
 
@@ -501,7 +506,7 @@ static MACHINE_DRIVER_START( crvision )
 
 	/* cartridge */
 	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("rom")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
 	MDRV_CARTSLOT_MANDATORY
 	MDRV_CARTSLOT_LOAD(crvision_cart)
 MACHINE_DRIVER_END
