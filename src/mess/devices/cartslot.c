@@ -208,7 +208,10 @@ static DEVICE_IMAGE_UNLOAD( cartslot )
 
 	/* if this cartridge has a custom DEVICE_IMAGE_UNLOAD, use it */
 	if (config->device_unload != NULL)
-		return (*config->device_unload)(image);
+	{
+		(*config->device_unload)(image);
+		return;
+	}
 
 	process_cartridge(image, NULL);
 }
