@@ -612,6 +612,11 @@ WRITE16_HANDLER( x68k_gvram_w )
 
 WRITE16_HANDLER( x68k_tvram_w )
 {
+	UINT16 text_mask;
+
+	text_mask = ~(sys.crtc.reg[23]) & mem_mask;
+	mem_mask = text_mask;
+
 	if(sys.crtc.reg[21] & 0x0100)
 	{  // simultaneous T-VRAM plane access (I think ;))
 		int plane,wr;
