@@ -54,7 +54,7 @@
 #define MEM_RAM_7				((unsigned int)0x0fb)
 
 
-/* state of the wd177x irq/drq lines */
+/* state of the wd1770 irq/drq lines */
 static UINT8 exdos_card_value = 0;
 
 /* The Page index for each 16k page is programmed into
@@ -247,7 +247,7 @@ static MACHINE_START(enterprise)
     FLOPPY/EXDOS
 ***************************************************************************/
 
-static WD17XX_CALLBACK( enterp_wd177x_callback )
+static WD17XX_CALLBACK( enterp_wd1770_callback )
 {
 	switch (state)
 	{
@@ -260,13 +260,13 @@ static WD17XX_CALLBACK( enterp_wd177x_callback )
 
 
 /* bit 0 - ??
-   bit 1 - IRQ from WD1772
+   bit 1 - IRQ from WD1770
    bit 2 - ??
    bit 3 - ??
    bit 4 - ??
    bit 5 - ??
    bit 6 - Disk change signal from disk drive
-   bit 7 - DRQ from WD1772
+   bit 7 - DRQ from WD1770
 */
 static READ8_HANDLER( exdos_card_r )
 {
@@ -285,7 +285,7 @@ static READ8_HANDLER( exdos_card_r )
 */
 static WRITE8_HANDLER( exdos_card_w )
 {
-	const device_config *fdc = devtag_get_device(space->machine, WD177X, "wd177x");
+	const device_config *fdc = devtag_get_device(space->machine, WD1770, "wd1770");
 
 	/* drive */
 	if (BIT(data, 0)) wd17xx_set_drive(fdc, 0);
@@ -314,7 +314,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( enterprise_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_MIRROR(0x04) AM_DEVREADWRITE(WD177X, "wd177x", wd17xx_r, wd17xx_w)
+	AM_RANGE(0x10, 0x13) AM_MIRROR(0x04) AM_DEVREADWRITE(WD1770, "wd1770", wd17xx_r, wd17xx_w)
 	AM_RANGE(0x18, 0x18) AM_MIRROR(0x04) AM_READWRITE(exdos_card_r, exdos_card_w)
 	AM_RANGE(0x80, 0x8f) AM_WRITE(Nick_reg_w)
 	AM_RANGE(0xa0, 0xbf) AM_READWRITE(Dave_reg_r, Dave_reg_w)
@@ -483,7 +483,7 @@ static const custom_sound_interface dave_custom_sound =
 	Dave_sh_start
 };
 
-static const wd17xx_interface enterp_wd17xx_interface = { enterp_wd177x_callback, NULL };
+static const wd17xx_interface enterp_wd1770_interface = { enterp_wd1770_callback, NULL };
 
 /* 4 MHz clock, although it can be changed to 8 MHz! */
 static MACHINE_DRIVER_START( ep128 )
@@ -515,7 +515,7 @@ static MACHINE_DRIVER_START( ep128 )
 	MDRV_SOUND_CONFIG(dave_custom_sound)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MDRV_WD177X_ADD("wd177x", enterp_wd17xx_interface )
+	MDRV_WD1770_ADD("wd1770", enterp_wd1770_interface )
 MACHINE_DRIVER_END
 
 ROM_START( ep128 )
