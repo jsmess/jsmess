@@ -54,6 +54,9 @@
 #define MEM_RAM_7				((unsigned int)0x0fb)
 
 
+/* state of the wd177x irq/drq lines */
+static UINT8 exdos_card_value = 0;
+
 /* The Page index for each 16k page is programmed into
 Dave. This index is a 8-bit number. The array below
 defines what data is pointed to by each of these page index's
@@ -120,7 +123,7 @@ static void enterprise_dave_reg_write(running_machine *machine, int RegIndex, in
 
 static void enterprise_dave_reg_read(running_machine *machine, int RegIndex)
 {
-	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", 
+	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4",
 										"LINE5", "LINE6", "LINE7", "LINE8", "LINE9" };
 	switch (RegIndex)
 	{
@@ -238,59 +241,37 @@ static MACHINE_START(enterprise)
 	add_reset_callback(machine, enterprise_reset);
 }
 
-static READ8_HANDLER ( enterprise_wd177x_read )
-{
-	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD177X, "wd177x");
-	switch (offset & 0x03)
-	{
-	case 0:
-		return wd17xx_status_r(fdc, offset);
-	case 1:
-		return wd17xx_track_r(fdc, offset);
-	case 2:
-		return wd17xx_sector_r(fdc, offset);
-	case 3:
-		return wd17xx_data_r(fdc, offset);
-	default:
-		break;
-	}
 
-	return 0x0ff;
-}
 
-static WRITE8_HANDLER (	enterprise_wd177x_write )
+/***************************************************************************
+    FLOPPY/EXDOS
+***************************************************************************/
+
+static WD17XX_CALLBACK( enterp_wd177x_callback )
 {
-	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD177X, "wd177x");
-	switch (offset & 0x03)
+	switch (state)
 	{
-	case 0:
-		wd17xx_command_w(fdc, offset, data);
-		return;
-	case 1:
-		wd17xx_track_w(fdc, offset, data);
-		return;
-	case 2:
-		wd17xx_sector_w(fdc, offset, data);
-		return;
-	case 3:
-		wd17xx_data_w(fdc, offset, data);
-		return;
-	default:
-		break;
+	case WD17XX_IRQ_CLR: exdos_card_value &= ~0x02; break;
+	case WD17XX_IRQ_SET: exdos_card_value |= 0x02; break;
+	case WD17XX_DRQ_CLR: exdos_card_value &= ~0x80; break;
+	case WD17XX_DRQ_SET: exdos_card_value |= 0x80; break;
 	}
 }
 
 
-
-/* I've done this because the ram is banked in 16k blocks, and
-the rom can be paged into bank 0 and bank 3. */
-static ADDRESS_MAP_START( enterprise_mem , ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE( 0x00000, 0x03fff) AM_READWRITE( SMH_BANK1, SMH_BANK5 )
-	AM_RANGE( 0x04000, 0x07fff) AM_READWRITE( SMH_BANK2, SMH_BANK6 )
-	AM_RANGE( 0x08000, 0x0bfff) AM_READWRITE( SMH_BANK3, SMH_BANK7 )
-	AM_RANGE( 0x0c000, 0x0ffff) AM_READWRITE( SMH_BANK4, SMH_BANK8 )
-ADDRESS_MAP_END
-
+/* bit 0 - ??
+   bit 1 - IRQ from WD1772
+   bit 2 - ??
+   bit 3 - ??
+   bit 4 - ??
+   bit 5 - ??
+   bit 6 - Disk change signal from disk drive
+   bit 7 - DRQ from WD1772
+*/
+static READ8_HANDLER( exdos_card_r )
+{
+	return exdos_card_value;
+}
 
 
 /* bit 0 - select drive 0,
@@ -302,86 +283,48 @@ ADDRESS_MAP_END
    bit 6 - disk change reset
    bit 7 - in use
 */
-
-static int EXDOS_GetDriveSelection(int data)
+static WRITE8_HANDLER( exdos_card_w )
 {
-	if (data & 0x01)
-		return 0;
-	if (data & 0x02)
-		return 1;
-	if (data & 0x04)
-		return 2;
-	if (data & 0x08)
-		return 3;
-	return 0;
+	const device_config *fdc = devtag_get_device(space->machine, WD177X, "wd177x");
+
+	/* drive */
+	if (BIT(data, 0)) wd17xx_set_drive(fdc, 0);
+	if (BIT(data, 1)) wd17xx_set_drive(fdc, 1);
+	if (BIT(data, 2)) wd17xx_set_drive(fdc, 2);
+	if (BIT(data, 3)) wd17xx_set_drive(fdc, 3);
+
+	/* side */
+	wd17xx_set_side(fdc, BIT(data, 4));
 }
 
-static char EXDOS_CARD_R = 0;
 
-static WD17XX_CALLBACK( enterp_wd177x_callback )
-{
-   if (state==WD17XX_IRQ_CLR)
-   {
-		EXDOS_CARD_R &= ~0x02;
-   }
+/***************************************************************************
+    ADDRESS MAPS
+***************************************************************************/
 
-   if (state==WD17XX_IRQ_SET)
-   {
-		EXDOS_CARD_R |= 0x02;
-   }
-
-   if (state==WD17XX_DRQ_CLR)
-   {
-		EXDOS_CARD_R &= ~0x080;
-   }
-
-   if (state==WD17XX_DRQ_SET)
-   {
-		EXDOS_CARD_R |= 0x080;
-   }
-}
-
-const wd17xx_interface enterp_wd17xx_interface = { enterp_wd177x_callback, NULL };
-
-
-static WRITE8_HANDLER ( exdos_card_w )
-{
-	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD177X, "wd177x");
-	/* drive side */
-	int head = (data>>4) & 0x01;
-
-	int drive = EXDOS_GetDriveSelection(data);
-
-	wd17xx_set_drive(fdc,drive);
-	wd17xx_set_side(fdc,head);
-}
-
-/* bit 0 - ??
-   bit 1 - IRQ from WD1772
-   bit 2 - ??
-   bit 3 - ??
-   bit 4 - ??
-   bit 5 - ??
-   bit 6 - Disk change signal from disk drive
-   bit 7 - DRQ from WD1772
-*/
-
-
-static  READ8_HANDLER ( exdos_card_r )
-{
-	return EXDOS_CARD_R;
-}
-
-static ADDRESS_MAP_START( enterprise_io , ADDRESS_SPACE_IO, 8)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x010, 0x017) AM_READWRITE( enterprise_wd177x_read, enterprise_wd177x_write )
-	AM_RANGE( 0x018, 0x018) AM_READWRITE( exdos_card_r, exdos_card_w )
-	AM_RANGE( 0x01c, 0x01c) AM_READWRITE( exdos_card_r, exdos_card_w )
-	AM_RANGE( 0x080, 0x08f) AM_WRITE( Nick_reg_w )
-	AM_RANGE( 0x0a0, 0x0bf) AM_READWRITE( Dave_reg_r, Dave_reg_w )
+/* I've done this because the ram is banked in 16k blocks, and
+   the rom can be paged into bank 0 and bank 3. */
+static ADDRESS_MAP_START( enterprise_mem, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(SMH_BANK1, SMH_BANK5)
+	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(SMH_BANK2, SMH_BANK6)
+	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_BANK3, SMH_BANK7)
+	AM_RANGE(0xc000, 0xffff) AM_READWRITE(SMH_BANK4, SMH_BANK8)
 ADDRESS_MAP_END
 
 
+static ADDRESS_MAP_START( enterprise_io, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x10, 0x13) AM_MIRROR(0x04) AM_DEVREADWRITE(WD177X, "wd177x", wd17xx_r, wd17xx_w)
+	AM_RANGE(0x18, 0x18) AM_MIRROR(0x04) AM_READWRITE(exdos_card_r, exdos_card_w)
+	AM_RANGE(0x80, 0x8f) AM_WRITE(Nick_reg_w)
+	AM_RANGE(0xa0, 0xbf) AM_READWRITE(Dave_reg_r, Dave_reg_w)
+ADDRESS_MAP_END
+
+
+
+/***************************************************************************
+    INPUT PORTS
+***************************************************************************/
 
 /*
 Enterprise Keyboard Matrix
@@ -402,13 +345,13 @@ Line    0    1    2    3    4    5    6    7
 N/C - Not connected or just dont know!
 
 2008-05 FP:
-Notice that I updated the matrix above with the following new info: 
-l1:b1 is LOCK: you press it with CTRL to switch to Caps, you press it again to switch back 
+Notice that I updated the matrix above with the following new info:
+l1:b1 is LOCK: you press it with CTRL to switch to Caps, you press it again to switch back
 	(you can also use it with ALT)
 l3:b7 is ESC: you use it to exit from nested programs (e.g. if you start to write a program in BASIC,
 	then start EXDOS, you can use ESC to go back to BASIC without losing the program you were writing)
 
-According to pictures and manuals, there seem to be no more keys connected, so I label the remaining N/C 
+According to pictures and manuals, there seem to be no more keys connected, so I label the remaining N/C
 as IPT_UNUSED.
 
 Small note about natural keyboard support: currently
@@ -529,13 +472,20 @@ static INPUT_PORTS_START( ep128 )
 
 INPUT_PORTS_END
 
+
+
+/***************************************************************************
+    MACHINE DRIVERS
+***************************************************************************/
+
 static const custom_sound_interface dave_custom_sound =
 {
 	Dave_sh_start
 };
 
-/* 4 MHz clock, although it can be changed to 8 MHz! */
+static const wd17xx_interface enterp_wd17xx_interface = { enterp_wd177x_callback, NULL };
 
+/* 4 MHz clock, although it can be changed to 8 MHz! */
 static MACHINE_DRIVER_START( ep128 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, 4000000)
@@ -564,7 +514,7 @@ static MACHINE_DRIVER_START( ep128 )
 	MDRV_SOUND_ADD("custom", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(dave_custom_sound)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	
+
 	MDRV_WD177X_ADD("wd177x", enterp_wd17xx_interface )
 MACHINE_DRIVER_END
 
