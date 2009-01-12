@@ -2007,10 +2007,8 @@ static MACHINE_DRIVER_START( a2600 )
 
 	/* devices */
 	MDRV_RIOT6532_ADD("riot", MASTER_CLOCK_NTSC / 3, r6532_interface)
-
-	MDRV_CASSETTE_ADD( "cassette", a2600_cassette_config )
-	
 	MDRV_IMPORT_FROM(a2600_cartslot)
+	MDRV_CASSETTE_ADD( "cassette", a2600_cassette_config )
 MACHINE_DRIVER_END
 
 
