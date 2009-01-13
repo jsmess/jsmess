@@ -47,6 +47,56 @@ Notes:
 
 /*
 
+Toshiba Visicom Console (RCA Studio II clone)
+Toshiba, 1978
+
+PCB Layout                                            Many resistors/caps
+----------                                7.5VDC    / transistors in this area
+                                           \/   /---|-----/
+|------------------------------------------||---|-------|   |-----|C|------|
+|D235  POT       TC4011     CART_SLOT           |       |   | TV Modulator |
+|HEATSINK                                       |       |   |              |
+|           TC4515          TC4049 TC4011 74LS08|       |   | SW (VHF Ch1) |
+|DIODES(x20)                       74LS74 74LS73|       |   |    (VHF Ch2) |
+|-----------|                                 3.579545MHz   |              |
+            |        CDP1802                    |  POT  |   |--------------|
+            |TMM331                             |       |
+            |               CDP1861   TC5012 TC5012     |
+            |                     TC4021 TC4021 |       |
+            |                          TC5012   \-----/ |
+            |          2111      2111   2111   74LS74   |
+            |TC4042    2111      2111   2111   TC4011   |
+            |-------------------------------------------|
+Notes: (all chips shown above)
+      CDP1802 - RCA CDP1802 CPU (DIP40), clock 1.7897725MHz [3.579545/2]
+      CDP1861 - RCA CDP1861 Video Controller (DIP24)
+                VSync - 60.4533Hz   \ (measured on pin 6)
+                HSync - 15.8387kHz  /
+                Clock - 223.721562kHz [3.579545/16] (measured on pin 1)
+      2111    - NEC D2111AL-4 256 bytes x4 SRAM (DIP18, x6). Total 1.5k
+      C       - Composite Video Output to TV from TV Modulator
+      TMM331  - Toshiba TMM331AP 2k x8 MASKROM (DIP24)
+                Pinout (preliminary):
+                           TMM331
+                        |----\/----|
+                     A7 |1       24| VCC
+                     A8 |2       23| D0
+                     A9 |3       22| D1
+                    A10 |4       21| D2
+                     A0 |5       20| D3
+                     A1 |6       19| D4
+                     A2 |7       18| D5
+                     A3 |8       17| D6
+                     A4 |9       16| D7
+                     A5 |10      15| CE (LOW)
+                     A6 |11      14| ? (unknown, leave NC?)
+                    GND |12      13| OE (LOW)
+                        |----------|
+
+*/
+
+/*
+
 Mustang 9016 Telespiel Computer
 
 PCB Layout
@@ -139,7 +189,6 @@ Notes:
 	- rewrite cartridge loading
 	- cpu clock from schematics
     - mpt02/mustang cdp1864 colors
-	- cdp1862 for Toshiba Visicom
     - discrete sound
 
 */
@@ -148,7 +197,6 @@ Notes:
 #include "includes/studio2.h"
 #include "cpu/cdp1802/cdp1802.h"
 #include "video/cdp1861.h"
-#include "video/cdp1862.h"
 #include "video/cdp1864.h"
 #include "devices/cartslot.h"
 #include "sound/beep.h"
@@ -177,14 +225,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( visicom_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x0800, 0x09ff) AM_RAM AM_MIRROR(0x400)
-	AM_RANGE(0x1000, 0x10ff) AM_RAM AM_MIRROR(0x300) AM_BASE_MEMBER(studio2_state, color_ram)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( visicom_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x01, 0x01) AM_DEVREAD(CDP1861, CDP1861_TAG, cdp1861_dispon_r)
+	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(CDP1861, CDP1861_TAG, cdp1861_dispon_r, cdp1861_dispoff_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(keylatch_w)
-	AM_RANGE(0x05, 0x05) AM_DEVWRITE(CDP1862, CDP1862_TAG, cdp1862_bkg_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mpt02_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -260,24 +306,6 @@ static VIDEO_UPDATE( studio2 )
 	studio2_state *state = screen->machine->driver_data;
 
 	cdp1861_update(state->cdp1861, bitmap, cliprect);
-
-	return 0;
-}
-
-static CDP1862_INTERFACE( visicom_cdp1862_intf )
-{
-	SCREEN_TAG,
-	RES_K(1.21), // ???
-	RES_K(2.05), // ???
-	RES_K(2.26), // ???
-	RES_K(3.92)	 // ???
-};
-
-static VIDEO_UPDATE( visicom )
-{
-	studio2_state *state = screen->machine->driver_data;
-
-	cdp1862_update(state->cdp1862, bitmap, cliprect);
 
 	return 0;
 }
@@ -366,31 +394,6 @@ static CDP1802_INTERFACE( studio2_config )
 	studio2_dma_w
 };
 
-static CDP1802_DMA_WRITE( visicom_dma_w )
-{
-	studio2_state *state = device->machine->driver_data;
-
-	UINT8 color = state->color_ram[ma & 0xff];
-	
-	int rdata = BIT(color, 0);
-	int gdata = BIT(color, 2);
-	int bdata = BIT(color, 1);
-
-	state->colorram_mwr = ASSERT_LINE;
-
-	cdp1862_dma_w(state->cdp1862, data, state->colorram_mwr, rdata, gdata, bdata);
-}
-
-static CDP1802_INTERFACE( visicom_config )
-{
-	studio2_mode_r,
-	studio2_ef_r,
-	NULL,
-	studio2_q_w,
-	NULL,
-	visicom_dma_w
-};
-
 static CDP1802_EF_READ( mpt02_ef_r )
 {
 	studio2_state *state = device->machine->driver_data;
@@ -460,36 +463,6 @@ static MACHINE_RESET( studio2 )
 
 	/* reset CDP1861 */
 	device_reset(state->cdp1861);
-}
-
-static MACHINE_START( visicom )
-{
-	studio2_state *state = machine->driver_data;
-
-	/* find devices */
-	state->cdp1861 = devtag_get_device(machine, CDP1861, CDP1861_TAG);
-	state->cdp1862 = devtag_get_device(machine, CDP1862, CDP1862_TAG);
-
-	/* register for state saving */
-	state_save_register_global_pointer(machine, state->color_ram, VISICOM_COLOR_RAM_SIZE);
-
-	state_save_register_global(machine, state->cdp1802_mode);
-	state_save_register_global(machine, state->keylatch);
-	state_save_register_global(machine, state->cdp1861_efx);
-	state_save_register_global(machine, state->colorram_mwr);
-}
-
-static MACHINE_RESET( visicom )
-{
-	studio2_state *state = machine->driver_data;
-
-	/* reset CPU */
-	state->cdp1802_mode = CDP1802_MODE_RESET;
-	timer_set(machine, ATTOTIME_IN_MSEC(200), NULL, 0, set_cpu_mode);
-
-	/* reset video chips */
-	device_reset(state->cdp1861);
-	device_reset(state->cdp1862);
 }
 
 static MACHINE_START( mpt02 )
@@ -593,25 +566,25 @@ static MACHINE_DRIVER_START( visicom )
 
 	// basic machine hardware
 
-	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, 3579545/2) // ???
+	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_3_579545MHz/2) // ???
 	MDRV_CPU_PROGRAM_MAP(visicom_map, 0)
 	MDRV_CPU_IO_MAP(visicom_io_map, 0)
-	MDRV_CPU_CONFIG(visicom_config)
+	MDRV_CPU_CONFIG(studio2_config)
 
-	MDRV_MACHINE_START(visicom)
-	MDRV_MACHINE_RESET(visicom)
+	MDRV_MACHINE_START(studio2)
+	MDRV_MACHINE_RESET(studio2)
 
     // video hardware
 
 	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(3579545/2, CDP1861_SCREEN_WIDTH, CDP1861_HBLANK_END, CDP1861_HBLANK_START, CDP1861_TOTAL_SCANLINES, CDP1861_SCANLINE_VBLANK_END, CDP1861_SCANLINE_VBLANK_START)
+	MDRV_SCREEN_RAW_PARAMS(XTAL_3_579545MHz/2, CDP1861_SCREEN_WIDTH, CDP1861_HBLANK_END, CDP1861_HBLANK_START, CDP1861_TOTAL_SCANLINES, CDP1861_SCANLINE_VBLANK_END, CDP1861_SCANLINE_VBLANK_START)
 
-	MDRV_PALETTE_LENGTH(16)
-	MDRV_VIDEO_UPDATE(visicom)
+	MDRV_PALETTE_LENGTH(2)
+	MDRV_PALETTE_INIT(black_and_white)
+	MDRV_VIDEO_UPDATE(studio2)
 
-	MDRV_CDP1861_ADD(CDP1861_TAG, XTAL_3_52128MHz, studio2_cdp1861_intf)
-	MDRV_CDP1862_ADD(CDP1862_TAG, XTAL_3_52128MHz, visicom_cdp1862_intf)
+	MDRV_CDP1861_ADD(CDP1861_TAG, XTAL_3_579545MHz/2/8, studio2_cdp1861_intf)
 
 	// sound hardware
 
@@ -668,7 +641,7 @@ ROM_END
 
 ROM_START( visicom )
 	ROM_REGION( 0x10000, CDP1802_TAG, 0 )
-	ROM_LOAD( "visicom.bin", 0x0000, 0x0800, CRC(23d22074) SHA1(a0a8be23f70621a2bd8010b1134e8a0019075bf1) )
+	ROM_LOAD( "visicom.q003", 0x0000, 0x0800, CRC(23d22074) SHA1(a0a8be23f70621a2bd8010b1134e8a0019075bf1) )
 ROM_END
 
 ROM_START( mtc9016 )
@@ -690,7 +663,6 @@ ROM_END
 ROM_START( mpt02h )
 	ROM_REGION( 0x10000, CDP1802_TAG, 0 )
 ROM_END
-
 
 /* Driver Initialization */
 
