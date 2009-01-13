@@ -33,90 +33,86 @@
 #define ENTERPRISE_SCREEN_WIDTH (50*16)
 #define ENTERPRISE_SCREEN_HEIGHT	(35*8)
 
-/* Enterprise bank allocations */
-#define MEM_EXOS_0		0
-#define MEM_EXOS_1		1
-#define MEM_CART_0		4
-#define MEM_CART_1		5
-#define MEM_CART_2		6
-#define MEM_CART_3		7
-#define MEM_EXDOS_0 	0x020
-#define MEM_EXDOS_1 	0x021
-/* basic 64k ram */
-#define MEM_RAM_0				((unsigned int)0x0fc)
-#define MEM_RAM_1				((unsigned int)0x0fd)
-#define MEM_RAM_2				((unsigned int)0x0fe)
-#define MEM_RAM_3				((unsigned int)0x0ff)
-/* additional 64k ram */
-#define MEM_RAM_4				((unsigned int)0x0f8)
-#define MEM_RAM_5				((unsigned int)0x0f9)
-#define MEM_RAM_6				((unsigned int)0x0fa)
-#define MEM_RAM_7				((unsigned int)0x0fb)
-
 
 /* state of the wd1770 irq/drq lines */
 static UINT8 exdos_card_value = 0;
-
-/* The Page index for each 16k page is programmed into
-Dave. This index is a 8-bit number. The array below
-defines what data is pointed to by each of these page index's
-that can be selected. If NULL, when reading return floating
-bus byte, when writing ignore */
-static unsigned char * Enterprise_Pages_Read[256];
-static unsigned char * Enterprise_Pages_Write[256];
 
 /* index of keyboard line to read */
 static int Enterprise_KeyboardLine = 0;
 
 /* set read/write pointers for CPU page */
-static void	Enterprise_SetMemoryPage(running_machine *machine, int CPU_Page, int EP_Page)
+static void enterprise_update_memory_page(const address_space *space, int page, int index)
 {
-	memory_set_bankptr(machine, (CPU_Page+1), Enterprise_Pages_Read[EP_Page & 0x0ff]);
-	memory_set_bankptr(machine, (CPU_Page+5), Enterprise_Pages_Write[EP_Page & 0x0ff]);
+	int start = (page - 1) * 0x4000;
+	int end = (page - 1) * 0x4000 + 0x3fff;
+
+	switch (index)
+	{
+	case 0x00:
+	case 0x01:
+		memory_install_readwrite8_handler(space, start, end, 0, 0, SMH_BANK(page), SMH_NOP);
+		memory_set_bankptr(space->machine, page, memory_region(space->machine, "exos") + (index * 0x4000));
+		break;
+
+	case 0x04:
+	case 0x05:
+	case 0x06:
+	case 0x07:
+		memory_install_readwrite8_handler(space, start, end, 0, 0, SMH_BANK(page), SMH_NOP);
+		memory_set_bankptr(space->machine, page, memory_region(space->machine, "cartridges") + ((index - 0x04) * 0x4000));
+		break;
+
+	case 0x20:
+	case 0x21:
+		memory_install_readwrite8_handler(space, start, end, 0, 0, SMH_BANK(page), SMH_NOP);
+		memory_set_bankptr(space->machine, page, memory_region(space->machine, "exdos") + ((index - 0x20) * 0x4000));
+		break;
+
+	case 0xf8:
+	case 0xf9:
+	case 0xfa:
+	case 0xfb:
+		/* additional 64k ram */
+		if (mess_ram_size == 128*1024)
+		{
+			memory_install_readwrite8_handler(space, start, end, 0, 0, SMH_BANK(page), SMH_BANK(page));
+			memory_set_bankptr(space->machine, page, mess_ram + (index - 0xf4) * 0x4000);
+		}
+		else
+		{
+			memory_install_readwrite8_handler(space, start, end, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		}
+		break;
+
+	case 0xfc:
+	case 0xfd:
+	case 0xfe:
+	case 0xff:
+		/* basic 64k ram */
+		memory_install_readwrite8_handler(space, start, end, 0, 0, SMH_BANK(page), SMH_BANK(page));
+		memory_set_bankptr(space->machine, page, mess_ram + (index - 0xfc) * 0x4000);
+		break;
+
+	default:
+		memory_install_readwrite8_handler(space, start, end, 0, 0, SMH_UNMAP, SMH_UNMAP);
+	}
 }
+
 
 /* EP specific handling of dave register write */
 static void enterprise_dave_reg_write(running_machine *machine, int RegIndex, int Data)
 {
 	switch (RegIndex)
 	{
-
-	case 0x010:
-		{
-		  /* set CPU memory page 0 */
-			Enterprise_SetMemoryPage(machine, 0, Data);
-		}
+	case 0x10:
+	case 0x11:
+	case 0x12:
+	case 0x13:
+		enterprise_update_memory_page(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), RegIndex - 0x0f, Data);
 		break;
 
-	case 0x011:
-		{
-		  /* set CPU memory page 1 */
-			Enterprise_SetMemoryPage(machine, 1, Data);
-		}
-		break;
-
-	case 0x012:
-		{
-		  /* set CPU memory page 2 */
-			Enterprise_SetMemoryPage(machine, 2, Data);
-		}
-		break;
-
-	case 0x013:
-		{
-		  /* set CPU memory page 3 */
-			Enterprise_SetMemoryPage(machine, 3, Data);
-		}
-		break;
-
-	case 0x015:
-		{
-		  /* write keyboard line */
-			Enterprise_KeyboardLine = Data & 15;
-		}
-		break;
-
-	default:
+	case 0x15:
+		Enterprise_KeyboardLine = Data & 15;
 		break;
 	}
 }
@@ -176,69 +172,22 @@ static const DAVE_INTERFACE enterprise_dave_interface =
 };
 
 
-
-static void enterprise_reset(running_machine *machine)
+static MACHINE_RESET( enterprise )
 {
-	int i;
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-
-	for (i=0; i<256; i++)
-	{
-		/* reads to memory pages that are not set returns 0x0ff */
-		Enterprise_Pages_Read[i] = mess_ram+0x020000;
-		/* writes to memory pages that are not set are ignored */
-		Enterprise_Pages_Write[i] = mess_ram+0x024000;
-	}
-
-	/* setup dummy read area so it will always return 0x0ff */
-	memset(mess_ram+0x020000, 0x0ff, 0x04000);
-
-	/* set read pointers */
-	/* exos */
-	Enterprise_Pages_Read[MEM_EXOS_0] = &memory_region(machine, "main")[0x010000];
-	Enterprise_Pages_Read[MEM_EXOS_1] = &memory_region(machine, "main")[0x014000];
-	/* basic */
-	Enterprise_Pages_Read[MEM_CART_0] = &memory_region(machine, "main")[0x018000];
-	/* ram */
-	Enterprise_Pages_Read[MEM_RAM_0] = mess_ram;
-	Enterprise_Pages_Read[MEM_RAM_1] = mess_ram + 0x04000;
-	Enterprise_Pages_Read[MEM_RAM_2] = mess_ram + 0x08000;
-	Enterprise_Pages_Read[MEM_RAM_3] = mess_ram + 0x0c000;
-	Enterprise_Pages_Read[MEM_RAM_4] = mess_ram + 0x010000;
-	Enterprise_Pages_Read[MEM_RAM_5] = mess_ram + 0x014000;
-	Enterprise_Pages_Read[MEM_RAM_6] = mess_ram + 0x018000;
-	Enterprise_Pages_Read[MEM_RAM_7] = mess_ram + 0x01c000;
-	/* exdos */
-	Enterprise_Pages_Read[MEM_EXDOS_0] = &memory_region(machine, "main")[0x01c000];
-	Enterprise_Pages_Read[MEM_EXDOS_1] = &memory_region(machine, "main")[0x020000];
-
-	/* set write pointers */
-	Enterprise_Pages_Write[MEM_RAM_0] = mess_ram;
-	Enterprise_Pages_Write[MEM_RAM_1] = mess_ram + 0x04000;
-	Enterprise_Pages_Write[MEM_RAM_2] = mess_ram + 0x08000;
-	Enterprise_Pages_Write[MEM_RAM_3] = mess_ram + 0x0c000;
-	Enterprise_Pages_Write[MEM_RAM_4] = mess_ram + 0x010000;
-	Enterprise_Pages_Write[MEM_RAM_5] = mess_ram + 0x014000;
-	Enterprise_Pages_Write[MEM_RAM_6] = mess_ram + 0x018000;
-	Enterprise_Pages_Write[MEM_RAM_7] = mess_ram + 0x01c000;
 
 	Dave_Init(machine);
 
 	Dave_SetIFace(&enterprise_dave_interface);
 
-	Dave_reg_w(space, 0x010,0);
-	Dave_reg_w(space, 0x011,0);
-	Dave_reg_w(space, 0x012,0);
-	Dave_reg_w(space, 0x013,0);
+	Dave_reg_w(space, 0x10, 0);
+	Dave_reg_w(space, 0x11, 0);
+	Dave_reg_w(space, 0x12, 0);
+	Dave_reg_w(space, 0x13, 0);
 
-	cpu_set_input_line_vector(machine->cpu[0],0,0x0ff);
+	cpu_set_input_line_vector(machine->cpu[0], 0, 0xff);
 
 	floppy_drive_set_geometry(image_from_devtype_and_index(machine, IO_FLOPPY, 0), FLOPPY_DRIVE_DS_80);
-}
-
-static MACHINE_START(enterprise)
-{
-	add_reset_callback(machine, enterprise_reset);
 }
 
 
@@ -302,13 +251,11 @@ static WRITE8_HANDLER( exdos_card_w )
     ADDRESS MAPS
 ***************************************************************************/
 
-/* I've done this because the ram is banked in 16k blocks, and
-   the rom can be paged into bank 0 and bank 3. */
 static ADDRESS_MAP_START( enterprise_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(SMH_BANK1, SMH_BANK5)
-	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(SMH_BANK2, SMH_BANK6)
-	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_BANK3, SMH_BANK7)
-	AM_RANGE(0xc000, 0xffff) AM_READWRITE(SMH_BANK4, SMH_BANK8)
+	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK(1)
+	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK(2)
+	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK(3)
+	AM_RANGE(0xc000, 0xffff) AM_RAMBANK(4)
 ADDRESS_MAP_END
 
 
@@ -319,7 +266,6 @@ static ADDRESS_MAP_START( enterprise_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x80, 0x8f) AM_WRITE(Nick_reg_w)
 	AM_RANGE(0xa0, 0xbf) AM_READWRITE(Dave_reg_r, Dave_reg_w)
 ADDRESS_MAP_END
-
 
 
 /***************************************************************************
@@ -361,7 +307,7 @@ Small note about natural keyboard support: currently
 */
 
 
-static INPUT_PORTS_START( ep128 )
+static INPUT_PORTS_START( ep64 )
 	PORT_START("LINE0")		/* keyboard line 0 */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_N)			PORT_CHAR('n') PORT_CHAR('N')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE)		PORT_CHAR('\\') PORT_CHAR('|')
@@ -469,9 +415,7 @@ static INPUT_PORTS_START( ep128 )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("EXTERNAL JOYSTICK 1 DOWN") PORT_CODE(KEYCODE_DOWN) PORT_CODE(JOYCODE_Y_DOWN_SWITCH)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("EXTERNAL JOYSTICK 1 UP") PORT_CODE(KEYCODE_UP) PORT_CODE(JOYCODE_Y_UP_SWITCH)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("EXTERNAL JOYSTICK 1 FIRE") PORT_CODE(KEYCODE_SPACE) PORT_CODE(JOYCODE_BUTTON1)
-
 INPUT_PORTS_END
-
 
 
 /***************************************************************************
@@ -486,14 +430,14 @@ static const custom_sound_interface dave_custom_sound =
 static const wd17xx_interface enterp_wd1770_interface = { enterp_wd1770_callback, NULL };
 
 /* 4 MHz clock, although it can be changed to 8 MHz! */
-static MACHINE_DRIVER_START( ep128 )
+static MACHINE_DRIVER_START( ep64 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(enterprise_mem, 0)
 	MDRV_CPU_IO_MAP(enterprise_io, 0)
 	MDRV_QUANTUM_TIME(HZ(60))
 
-	MDRV_MACHINE_START( enterprise )
+	MDRV_MACHINE_RESET(enterprise)
 
     /* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -518,22 +462,49 @@ static MACHINE_DRIVER_START( ep128 )
 	MDRV_WD1770_ADD("wd1770", enterp_wd1770_interface )
 MACHINE_DRIVER_END
 
-ROM_START( ep128 )
-		/* 128k ram + 32k rom (OS) + 16k rom (BASIC) + 32k rom (EXDOS) */
-		ROM_REGION( 0x24000, "main", 0 )
-		ROM_SYSTEM_BIOS( 0, "default", "EXOS 2.1" )
-		ROMX_LOAD("exos21.rom", 0x10000, 0x8000, CRC(982a3b44) SHA1(55315b20fecb4441a07ee4bc5dc7153f396e0a2e), ROM_BIOS(1) )
-		ROM_SYSTEM_BIOS( 1, "exos20", "EXOS 2.0" )
-		ROMX_LOAD("exos20.rom", 0x10000, 0x8000, CRC(d421795f) SHA1(6033a0535136c40c47137e4d1cd9273c06d5fdff), ROM_BIOS(2) )
-		ROM_LOAD( "exbas.rom", 0x18000, 0x4000, CRC(683cf455) SHA1(50a548d1df3ea86f9b5fa669afd8ff124050e776) )
-		ROM_LOAD( "exdos.rom", 0x1c000, 0x8000, CRC(d1d7e157) SHA1(31c8be089526aa8aa019c380cdf51ddd3ee76454) )
+
+/***************************************************************************
+    ROM DEFINITIONS
+***************************************************************************/
+
+ROM_START( ep64 )
+	ROM_REGION(0x8000, "exos", 0)
+	ROM_SYSTEM_BIOS(0, "default", "EXOS 2.1")
+	ROMX_LOAD("exos21.rom", 0x0000, 0x8000, CRC(982a3b44) SHA1(55315b20fecb4441a07ee4bc5dc7153f396e0a2e), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "exos20", "EXOS 2.0")
+	ROMX_LOAD("exos20.rom", 0x0000, 0x8000, CRC(d421795f) SHA1(6033a0535136c40c47137e4d1cd9273c06d5fdff), ROM_BIOS(2))
+
+	/* 4 cartridge slots */
+	ROM_REGION(0x10000, "cartridges", 0)
+	ROM_LOAD("exbas.rom", 0x0000, 0x4000, CRC(683cf455) SHA1(50a548d1df3ea86f9b5fa669afd8ff124050e776))
+	ROM_FILL(0x4000, 0xc000, 0xff)
+
+	ROM_REGION(0x8000, "exdos", 0)
+	ROM_LOAD("exdos13.rom", 0x0000, 0x8000, CRC(d1d7e157) SHA1(31c8be089526aa8aa019c380cdf51ddd3ee76454))
+ROM_END
+
+#define rom_ep128 rom_ep64
+
+ROM_START( phc64 )
+	ROM_REGION(0x8000, "exos", 0)
+	ROM_SYSTEM_BIOS(0, "default", "EXOS 2.1")
+	ROMX_LOAD("exos21.rom", 0x0000, 0x8000, CRC(982a3b44) SHA1(55315b20fecb4441a07ee4bc5dc7153f396e0a2e), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "exos20", "EXOS 2.0")
+	ROMX_LOAD("exos20.rom", 0x0000, 0x8000, CRC(d421795f) SHA1(6033a0535136c40c47137e4d1cd9273c06d5fdff), ROM_BIOS(2))
+
+	/* 4 cartridge slots */
+	ROM_REGION(0x10000, "cartridges", 0)
+	ROM_LOAD("exbas.rom", 0x0000, 0x4000, CRC(683cf455) SHA1(50a548d1df3ea86f9b5fa669afd8ff124050e776))
+	ROM_LOAD("brd.rom",   0x4000, 0x4000, CRC(f45a7454) SHA1(096c91fad6a4d10323cd67e133b3ebc5c50e2bb2))
+	ROM_FILL(0x8000, 0x8000, 0xff)
+
+	ROM_REGION(0x8000, "exdos", 0)
+	ROM_LOAD("exdos13.rom", 0x0000, 0x8000, CRC(d1d7e157) SHA1(31c8be089526aa8aa019c380cdf51ddd3ee76454))
 ROM_END
 
 
 /***************************************************************************
-
-  Game driver(s)
-
+    SYSTEM CONFIG
 ***************************************************************************/
 
 static void ep128_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
@@ -568,13 +539,22 @@ static void ep128_floppy_getinfo(const mess_device_class *devclass, UINT32 state
 }
 #endif
 
-static SYSTEM_CONFIG_START(ep128)
-	CONFIG_RAM_DEFAULT((128*1024)+32768)
+static SYSTEM_CONFIG_START(ep64)
+	CONFIG_RAM_DEFAULT(64*1024)
 	CONFIG_DEVICE(ep128_floppy_getinfo)
-#if 0
-	CONFIG_DEVICE(ep128_floppy_getinfo)
-#endif
 SYSTEM_CONFIG_END
 
-/*      YEAR  NAME      PARENT  COMPAT  MACHINE INPUT   INIT  CONFIG, COMPANY                 FULLNAME */
-COMP( 1984, ep128,		0,		0,		ep128,	ep128,	0,	  ep128,  "Intelligent Software", "Enterprise 128", GAME_IMPERFECT_SOUND )
+static SYSTEM_CONFIG_START(ep128)
+	CONFIG_RAM_DEFAULT(128*1024)
+	CONFIG_DEVICE(ep128_floppy_getinfo)
+SYSTEM_CONFIG_END
+
+
+/***************************************************************************
+    GAME DRIVERS
+***************************************************************************/
+
+/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  INIT  CONFIG  COMPANY                 FULLNAME */
+COMP( 1985, ep64,  0,      0,      ep64,    ep64, 0,    ep64,   "Intelligent Software", "Enterprise 64", GAME_IMPERFECT_SOUND )
+COMP( 1985, ep128, ep64,   0,      ep64,    ep64, 0,    ep128,  "Intelligent Software", "Enterprise 128", GAME_IMPERFECT_SOUND )
+COMP( 1985, phc64, ep64,   0,      ep64,    ep64, 0,    ep64,   "Hegener & Glaser",     "Mephisto PHC 64", GAME_IMPERFECT_SOUND )

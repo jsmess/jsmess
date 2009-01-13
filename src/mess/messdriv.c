@@ -128,7 +128,7 @@ const game_driver * const drivers[] =
 	DRIVER( visicom )
 //	DRIVER( mpt02s )
 //	DRIVER( mpt02h )
-//	DRIVER( mtc9016 )	/* 1978 Mustang 9016 Telespiel Computer				*/ 
+//	DRIVER( mtc9016 )	/* 1978 Mustang 9016 Telespiel Computer				*/
 //	DRIVER( shmc1200 )
 
 	/* FAIRCHILD */
@@ -467,16 +467,16 @@ XL/XE 16kB OS roms
 	DRIVER( tk95 )		/* 1986 TK95 Color Computer							*/
 	DRIVER( tc2048 )	/* 198? TC2048										*/
 	DRIVER( ts2068 )	/* 1983 TS2068										*/
-	DRIVER( uk2086 )	/* 1986 UK2086										*/  
-	
+	DRIVER( uk2086 )	/* 1986 UK2086										*/
+
 	DRIVER( spec128 )	  /* 1986 ZX Spectrum 128								*/
 	DRIVER( specpls2 )	/* 1986 ZX Spectrum +2								*/
-	DRIVER( specpl2a )	/* 1987 ZX Spectrum +2a								*/	
+	DRIVER( specpl2a )	/* 1987 ZX Spectrum +2a								*/
 	DRIVER( specpls3 )	/* 1987 ZX Spectrum +3								*/
 	DRIVER( specpl3e )	/* 2000 ZX Spectrum +3e								*/
 	DRIVER( sp3e8bit )	/* 2002 ZX Spectrum +3e	8bit IDE			*/
 	DRIVER( sp3ezcf )  	/* 2002 ZX Spectrum +3e	ZXCF   				*/
-	DRIVER( sp3eata )  	/* 2002 ZX Spectrum +3e	ZXATASP  			*/	
+	DRIVER( sp3eata )  	/* 2002 ZX Spectrum +3e	ZXATASP  			*/
 	DRIVER( scorpion )
 	DRIVER( pentagon )
 
@@ -571,7 +571,9 @@ XL/XE 16kB OS roms
 	DRIVER( einstei2 )
 
 	/* INTELLIGENT SOFTWARE */
-	DRIVER( ep128 )		/* Enterprise 128 k									*/
+	DRIVER( ep64 )		/* Enterprise 64									*/
+	DRIVER( ep128 )		/* Enterprise 128									*/
+	DRIVER( phc64 )		/* Hegener & Glaser Mephisto PHC 64					*/
 
 	/* NON LINEAR SYSTEMS */
 	DRIVER( kaypro )	/* Kaypro 2X										*/
@@ -689,7 +691,7 @@ XL/XE 16kB OS roms
 	DRIVER( nms801 )
 	DRIVER( vg802000 )
 	DRIVER( vg802020 )	/* 1985 MSX											*/
-	DRIVER( piopx7 )	
+	DRIVER( piopx7 )
 	DRIVER( mpc100 )
 	DRIVER( hotbit11 )	/* 1985 MSX Brazil									*/
 	DRIVER( hotbit12 )	/* 1985 MSX	Brazil									*/
@@ -715,7 +717,7 @@ XL/XE 16kB OS roms
 	DRIVER( hx20 )		/* 1984 MSX											*/
 	DRIVER( cx5m )
 	DRIVER( cx5m128 )
-	DRIVER( cx5m2 )	
+	DRIVER( cx5m2 )
 	DRIVER( yis303 )
 	DRIVER( yis503 )
 	DRIVER( yis503ii )
@@ -837,10 +839,10 @@ XL/XE 16kB OS roms
 
 	/* Statny */
 	DRIVER( mato )		/* Mato (PMD-85.2 clone)							*/
-	
+
 	/* Zbrojovka Brno */
 	DRIVER( c2717 )		/* Consul 2717 (PMD-85.2 clone)				*/
-	
+
 	/* Microkey */
 	DRIVER( primoa32 )	/* Primo A-32										*/
 	DRIVER( primoa48 )	/* Primo A-48										*/
@@ -1001,14 +1003,14 @@ XL/XE 16kB OS roms
 	DRIVER( mikrosha )
 	DRIVER( partner )
 
-  	/* Homelab */  
+  	/* Homelab */
 	DRIVER (homelab2)
 	DRIVER (homelab3)
 	DRIVER (homelab4)
-	
+
 	/* Irisha */
 	DRIVER (irisha)
-	
+
 	/* PK-8020 */
 	DRIVER (korvet)
 
@@ -1030,7 +1032,7 @@ XL/XE 16kB OS roms
 	DRIVER (sapi1)
 
   /* Spectrum clones */
-  	
+
   /* ICE-Felix */
 	DRIVER( hc85 )    /* 1985 HC-85										  */
 	DRIVER( hc90 )    /* 1990 HC-90										  */
@@ -1040,7 +1042,7 @@ XL/XE 16kB OS roms
 
 	DRIVER( cip03 )   /* 1988 CIP-03										  */
 	DRIVER( jet )     /* 1990 JET										  */
-  
+
   /* Didaktik Skalica */
 	DRIVER( dgama87)  /* 1987 Didaktik Gama 87          */
 	DRIVER( dgama88)  /* 1988 Didaktik Gama 88          */
@@ -1049,9 +1051,9 @@ XL/XE 16kB OS roms
 	DRIVER( didakm91) /* 1991 Didaktik M 91             */
 	DRIVER( didaktk)  /* 1992 Didaktik Kompakt          */
 	DRIVER( didakm93) /* 1993 Didaktik M 93             */
-	
+
 	DRIVER( mistrum ) /* 1988 Mistrum										*/
-	
+
 	/* Russian clones */
 	DRIVER( blitz )     /* 1990 Blic                     */
 	DRIVER( byte )      /* 1990 Byte                     */
@@ -1065,7 +1067,7 @@ XL/XE 16kB OS roms
 
 	/* Ei Nis */
 	DRIVER(pecom64)
-		
+
 	/* Bondwell */
 	DRIVER( bw2 )
 

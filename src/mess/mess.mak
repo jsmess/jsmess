@@ -406,7 +406,7 @@ DRVLIBS = \
 	$(MESSOBJ)/dai.a \
 	$(MESSOBJ)/dgn_beta.a \
 	$(MESSOBJ)/einis.a \
-	$(MESSOBJ)/ep128.a \
+	$(MESSOBJ)/enterp.a \
 	$(MESSOBJ)/epoch.a \
 	$(MESSOBJ)/epson.a \
 	$(MESSOBJ)/exeltel.a \
@@ -916,7 +916,7 @@ $(MESSOBJ)/necpc.a:	   \
 	$(MESS_MACHINE)/pc8801.o	 \
 	$(MESS_VIDEO)/pc8801.o	\
 
-$(MESSOBJ)/ep128.a :   \
+$(MESSOBJ)/enterp.a :   \
 	$(MESS_AUDIO)/dave.o	 \
 	$(MESS_VIDEO)/epnick.o	 \
 	$(MESS_VIDEO)/enterp.o	 \

@@ -2,7 +2,8 @@
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
-(none)
+Intelligent Software Enterprise 64  [Dirk Best]
+Hegener & Glaser Mephisto PHC 64  [Dirk Best]
 
 
 
@@ -10,7 +11,10 @@ System Driver Changes:
 ----------------------
 - [X68000] Added better implementation of 1024x1024 graphic layer.  [Barry Rodewald]
 
-- [ti81, ti85, ti86] added the new ROM_DEFAULT_BIOS feature to select the most recent rom versions[Hobie Troxell]
+- [TI81, TI85, TI86] Added the new ROM_DEFAULT_BIOS feature to select the most
+  recent rom versions.  [Hobie Troxell]
+
+
 
 User Interface Changes:
 -----------------------
@@ -31,6 +35,7 @@ Source Changes:
 
 - Fixed a bug that caused the day of the week to not be properly returned by
   the DS1315.  (bug #1755) [Nathan Woods]
+
 
 
 0.129
