@@ -471,7 +471,7 @@ MACHINE_DRIVER_END
 
 ROM_START( ep64 )
 	ROM_REGION(0x8000, "exos", 0)
-	ROM_LOAD("exos20.rom", 0x0000, 0x8000, CRC(d421795f) SHA1(6033a0535136c40c47137e4d1cd9273c06d5fdff))
+	ROM_LOAD("9256ds-0038_enter05-23-a.u2", 0x0000, 0x8000, CRC(d421795f) SHA1(6033a0535136c40c47137e4d1cd9273c06d5fdff))
 
 	/* 4 cartridge slots */
 	ROM_REGION(0x10000, "cartridges", 0)
@@ -496,7 +496,7 @@ ROM_START( ep128 )
 
 	/* 4 cartridge slots */
 	ROM_REGION(0x10000, "cartridges", 0)
-	ROM_LOAD("basic21.rom", 0x0000, 0x4000, CRC(683cf455) SHA1(50a548d1df3ea86f9b5fa669afd8ff124050e776))
+	ROM_LOAD("9128ds-0237_enter08-46-a.u1", 0x0000, 0x4000, CRC(683cf455) SHA1(50a548d1df3ea86f9b5fa669afd8ff124050e776)) /* BASIC V2.1 */
 	ROM_FILL(0x4000, 0xc000, 0xff)
 
 	ROM_REGION(0x8000, "exdos", 0)
@@ -505,7 +505,7 @@ ROM_END
 
 ROM_START( phc64 )
 	ROM_REGION(0x8000, "exos", 0)
-	ROM_LOAD("exos20.rom", 0x0000, 0x8000, CRC(d421795f) SHA1(6033a0535136c40c47137e4d1cd9273c06d5fdff))
+	ROM_LOAD("9256ds-0038_enter05-23-a.u2", 0x0000, 0x8000, CRC(d421795f) SHA1(6033a0535136c40c47137e4d1cd9273c06d5fdff))
 
 	/* 4 cartridge slots */
 	ROM_REGION(0x10000, "cartridges", 0)
