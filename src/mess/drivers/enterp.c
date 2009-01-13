@@ -50,6 +50,8 @@ static void enterprise_update_memory_page(const address_space *space, int page, 
 	{
 	case 0x00:
 	case 0x01:
+	case 0x02:
+	case 0x03:
 		memory_install_readwrite8_handler(space, start, end, 0, 0, SMH_BANK(page), SMH_NOP);
 		memory_set_bankptr(space->machine, page, memory_region(space->machine, "exos") + (index * 0x4000));
 		break;
@@ -469,33 +471,46 @@ MACHINE_DRIVER_END
 
 ROM_START( ep64 )
 	ROM_REGION(0x8000, "exos", 0)
-	ROM_SYSTEM_BIOS(0, "default", "EXOS 2.1")
-	ROMX_LOAD("exos21.rom", 0x0000, 0x8000, CRC(982a3b44) SHA1(55315b20fecb4441a07ee4bc5dc7153f396e0a2e), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS(1, "exos20", "EXOS 2.0")
-	ROMX_LOAD("exos20.rom", 0x0000, 0x8000, CRC(d421795f) SHA1(6033a0535136c40c47137e4d1cd9273c06d5fdff), ROM_BIOS(2))
+	ROM_LOAD("exos20.rom", 0x0000, 0x8000, CRC(d421795f) SHA1(6033a0535136c40c47137e4d1cd9273c06d5fdff))
 
 	/* 4 cartridge slots */
 	ROM_REGION(0x10000, "cartridges", 0)
-	ROM_LOAD("exbas.rom", 0x0000, 0x4000, CRC(683cf455) SHA1(50a548d1df3ea86f9b5fa669afd8ff124050e776))
+	ROM_LOAD("basic20.rom", 0x0000, 0x4000, CRC(d62e4fb7) SHA1(36e12c4ea782ca769225178f61b55bc9a9afb927))
 	ROM_FILL(0x4000, 0xc000, 0xff)
 
 	ROM_REGION(0x8000, "exdos", 0)
 	ROM_LOAD("exdos13.rom", 0x0000, 0x8000, CRC(d1d7e157) SHA1(31c8be089526aa8aa019c380cdf51ddd3ee76454))
 ROM_END
 
-#define rom_ep128 rom_ep64
-
-ROM_START( phc64 )
-	ROM_REGION(0x8000, "exos", 0)
-	ROM_SYSTEM_BIOS(0, "default", "EXOS 2.1")
-	ROMX_LOAD("exos21.rom", 0x0000, 0x8000, CRC(982a3b44) SHA1(55315b20fecb4441a07ee4bc5dc7153f396e0a2e), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS(1, "exos20", "EXOS 2.0")
-	ROMX_LOAD("exos20.rom", 0x0000, 0x8000, CRC(d421795f) SHA1(6033a0535136c40c47137e4d1cd9273c06d5fdff), ROM_BIOS(2))
+ROM_START( ep128 )
+	ROM_REGION(0x10000, "exos", 0)
+	ROM_SYSTEM_BIOS(0, "exos21", "EXOS 2.1")
+	ROMX_LOAD("9256ds-0019_enter08-45-a.u2", 0x0000, 0x8000, CRC(982a3b44) SHA1(55315b20fecb4441a07ee4bc5dc7153f396e0a2e), ROM_BIOS(1))
+	ROM_FILL(0x8000, 0x8000, 0xff)
+	ROM_SYSTEM_BIOS(1, "exos22", "EXOS 2.2 (unofficial)")
+	ROMX_LOAD("exos22.rom", 0x0000, 0x10000, CRC(c82e699f) SHA1(40cda9573e0c20e6287d27105759e23b9025fa52), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(2, "exos23", "EXOS 2.3 (unofficial)")
+	ROMX_LOAD("exos23.rom", 0x0000, 0x10000, CRC(24838410) SHA1(c6241e1c248193108ce38b9a8e9dd33972cf47ba), ROM_BIOS(3))
+	ROM_SYSTEM_BIOS(3, "exos231", "EXOS 2.31 (unofficial)")
+	ROMX_LOAD("exos231.rom", 0x0000, 0x10000, CRC(d0ecee0d) SHA1(bd0ff3c46f57c88b82b71b0d94a8bda18ea9bafe), ROM_BIOS(4))
 
 	/* 4 cartridge slots */
 	ROM_REGION(0x10000, "cartridges", 0)
-	ROM_LOAD("exbas.rom", 0x0000, 0x4000, CRC(683cf455) SHA1(50a548d1df3ea86f9b5fa669afd8ff124050e776))
-	ROM_LOAD("brd.rom",   0x4000, 0x4000, CRC(f45a7454) SHA1(096c91fad6a4d10323cd67e133b3ebc5c50e2bb2))
+	ROM_LOAD("basic21.rom", 0x0000, 0x4000, CRC(683cf455) SHA1(50a548d1df3ea86f9b5fa669afd8ff124050e776))
+	ROM_FILL(0x4000, 0xc000, 0xff)
+
+	ROM_REGION(0x8000, "exdos", 0)
+	ROM_LOAD("exdos13.rom", 0x0000, 0x8000, CRC(d1d7e157) SHA1(31c8be089526aa8aa019c380cdf51ddd3ee76454))
+ROM_END
+
+ROM_START( phc64 )
+	ROM_REGION(0x8000, "exos", 0)
+	ROM_LOAD("exos20.rom", 0x0000, 0x8000, CRC(d421795f) SHA1(6033a0535136c40c47137e4d1cd9273c06d5fdff))
+
+	/* 4 cartridge slots */
+	ROM_REGION(0x10000, "cartridges", 0)
+	ROM_LOAD("basic20.rom", 0x0000, 0x4000, CRC(d62e4fb7) SHA1(36e12c4ea782ca769225178f61b55bc9a9afb927))
+	ROM_LOAD("brd.rom", 0x4000, 0x4000, CRC(f45a7454) SHA1(096c91fad6a4d10323cd67e133b3ebc5c50e2bb2))
 	ROM_FILL(0x8000, 0x8000, 0xff)
 
 	ROM_REGION(0x8000, "exdos", 0)
