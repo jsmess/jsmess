@@ -12,7 +12,7 @@ Notes:
 6. NVRAM is saved properly only when calculator is turned off before exiting MESS.
 7. To receive data from TI press "R" immediately after TI starts to send data.
 8. To request screen dump from calculator press "S".
-9. TI-81 have not serial link.
+9. TI-81 does not have a serial link.
 
 Needed:
 1. Info about ports 3 (bit 2 seems to be allways 0) and 4.
@@ -399,12 +399,15 @@ MACHINE_DRIVER_END
 
 
 ROM_START (ti81)
+	ROM_DEFAULT_BIOS("v18")
 	ROM_REGION (0x18000, "main",0)
-	ROM_SYSTEM_BIOS( 0, "v18",  "V 1.8" )
-	ROMX_LOAD( "ti81v18.bin", 0x10000, 0x8000, CRC(94ac58e2) SHA1(ba915cfe2fe50a452ef8287db8f2244e29056d54), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 0, "v18", "V 1.8K" )
+	ROMX_LOAD( "ti81v18k.bin", 0x10000, 0x8000, CRC(94ac58e2) SHA1(ba915cfe2fe50a452ef8287db8f2244e29056d54), ROM_BIOS(1) )
+	//No dumps 1.0, 1.6K (?) and 2.0 from ticalc.org, less sure about 1.6K
 ROM_END
 
 ROM_START (ti85)
+	ROM_DEFAULT_BIOS("v100")
 	ROM_REGION (0x30000, "main",0)
 	ROM_SYSTEM_BIOS( 0, "v30a", "V 3.0A" )
 	ROMX_LOAD( "ti85v30a.bin", 0x10000, 0x20000, CRC(de4c0b1a) SHA1(f4cf4b8309372dbe26187bb279545f5d4bd48fc1), ROM_BIOS(1) )
@@ -420,9 +423,11 @@ ROM_START (ti85)
 	ROMX_LOAD( "ti85v90.bin",  0x10000, 0x20000, CRC(6a0a94d0) SHA1(7742bf8a6929a21d06f306b494fc03b1fbdfe3e4), ROM_BIOS(6) )
 	ROM_SYSTEM_BIOS( 6, "v100", "V 10.0" )
 	ROMX_LOAD( "ti85v100.bin", 0x10000, 0x20000, CRC(053325b0) SHA1(36da1080c34e7b53cbe8463be5804e30e4a50dc8), ROM_BIOS(7) )
+	//No_dumps 1.0, 2.0 and 7.0 according to ticalc.org
 ROM_END
 
 ROM_START (ti82)
+	ROM_DEFAULT_BIOS("v19")
 	ROM_REGION (0x30000, "main",0)
 	ROM_SYSTEM_BIOS( 0, "v16", "V 16.0" )
 	ROMX_LOAD( "ti82v16.bin", 0x10000, 0x20000, CRC(e2f5721c) SHA1(df300ae52e105faf2785a8ae9f42e84e4308d460), ROM_BIOS(1) )
@@ -432,9 +437,11 @@ ROM_START (ti82)
 	ROMX_LOAD( "ti82v18.bin", 0x10000, 0x20000, CRC(6a320f03) SHA1(9ee15ebf0a1f8bde5bef982b5db4ce120c605d29), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS( 3, "v19", "V 19.0" )
 	ROMX_LOAD( "ti82v19.bin", 0x10000, 0x20000, CRC(ed4cf9ff) SHA1(10dc2d01c62b4e971a6ed7ebc75ca0f2e3dc4f95), ROM_BIOS(4) )
+	//Rom versions according to ticalc.org 3*, 4*, 7*, 8.0, 10.0, 12.0, 15.0, 16.0, 17.0, 18.0, 19.0, 19.006 
 ROM_END
 
 ROM_START (ti83)
+	ROM_DEFAULT_BIOS("v110")
 	ROM_REGION (0x50000, "main",0)
 	ROM_SYSTEM_BIOS( 0, "v102", "V 1.02" )
 	ROMX_LOAD( "ti83v102.bin", 0x10000, 0x40000, CRC(7ee5d27b) SHA1(ce08f6a808701fc6672230a790167ee485157561), ROM_BIOS(1) )
@@ -450,9 +457,11 @@ ROM_START (ti83)
 	ROMX_LOAD( "ti83v108.bin", 0x10000, 0x40000, CRC(0c6aafcc) SHA1(9c74f0b61655e9e160e92164db472ad7ee02b0f8), ROM_BIOS(6) )
 	ROM_SYSTEM_BIOS( 6, "v110", "V 1.10" )
 	ROMX_LOAD( "ti83v110.bin", 0x10000, 0x40000, CRC(7faee2d2) SHA1(25b373b58523647bb7b904001d391615e0b79bee), ROM_BIOS(7) )
+	//Rom versions according to ticalc.org 1.02, 1.03, 1.04, 1.06, 1.07, 1.08, 1.10
 ROM_END
 
 ROM_START (ti86)
+	ROM_DEFAULT_BIOS("v16")
 	ROM_REGION (0x50000, "main",0)
 	ROM_SYSTEM_BIOS( 0, "v12", "V 1.2" )
 	ROMX_LOAD( "ti86v12.bin", 0x10000, 0x40000, CRC(bdf16105) SHA1(e40b22421c31bf0af104518b748ae79cd21d9c57), ROM_BIOS(1) )
@@ -464,9 +473,11 @@ ROM_START (ti86)
 	ROMX_LOAD( "ti86v15.bin", 0x10000, 0x40000, BAD_DUMP CRC(e6e10546) SHA1(5ca63fdfc965ae3fb8e0695263cf9da41f6ecb90), ROM_BIOS(4) )
 	ROM_SYSTEM_BIOS( 4, "v16", "V 1.6" )
 	ROMX_LOAD( "ti86v16.bin", 0x10000, 0x40000, CRC(37e02acc) SHA1(b5ad204885e5dde23a22f18f8d5eaffca69d638d), ROM_BIOS(5) )
+	//Rom versions according to ticalc.org 1.2, 1.3, 1.4, 1.5, 1.6 
 ROM_END
 
 ROM_START (ti83p)
+	ROM_DEFAULT_BIOS("v112")
 	ROM_REGION (0x90000, "main",0)
 	ROM_SYSTEM_BIOS( 0, "v103", "V 1.03" )
 	ROMX_LOAD( "ti83pv103.bin", 0x10000, 0x80000, CRC(da466be0) SHA1(37eaeeb9fb5c18fb494e322b75070e80cc4d858e), ROM_BIOS(1) )

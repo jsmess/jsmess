@@ -10,7 +10,7 @@ System Driver Changes:
 ----------------------
 - [X68000] Added better implementation of 1024x1024 graphic layer.  [Barry Rodewald]
 
-
+- [ti81, ti85, ti86] added the new ROM_DEFAULT_BIOS feature to select the most recent rom versions[Hobie Troxell]
 
 User Interface Changes:
 -----------------------
