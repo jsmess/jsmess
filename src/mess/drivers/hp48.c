@@ -802,42 +802,42 @@ static kermit_config hp48_kermit_rs232_conf = { &hp48_rs232_start_recv_byte };
    no extension may be physically present).
  */
 ROM_START ( hp48gx )
-        ROM_REGION( 0x80000, "main", 0 ) 
+		ROM_DEFAULT_BIOS("r")
+		ROM_REGION( 0x80000, "main", 0 )
 
-	/* latest revision (preferred) */
-	ROM_SYSTEM_BIOS( 0, "r", "Version R" )
-	ROMX_LOAD( "gxrom-r", 
-		   0x00000, 0x80000, 
-		   CRC(00ee1a62) SHA1(5705fc9ea791916c4456ac35e22275862411db9b),
-		   ROM_BIOS(1) )
-     
-	/* now in chronological order, from first revision */
-	
-        ROM_SYSTEM_BIOS( 1, "k", "Version K" )
+	/* in chronological order, from first revision, version r is default*/
+	ROM_SYSTEM_BIOS( 0, "k", "Version K" )
 	ROMX_LOAD( "gxrom-k", 
 		   0x00000, 0x80000, 
 		   CRC(bdd5d2ee) SHA1(afa1498238e991b1e3d07fb8b4c227b115f7bcc1), 
-		   ROM_BIOS(2) )
+		   ROM_BIOS(1) )
 
-	ROM_SYSTEM_BIOS( 2, "l", "Version L" )
+	ROM_SYSTEM_BIOS( 1, "l", "Version L" )
 	ROMX_LOAD( "gxrom-l", 
 		   0x00000, 0x80000, 
 		   CRC(70958e6b) SHA1(8eebac69ff804086247b989bf320e57a2d8a59a7),
-		   ROM_BIOS(3) )
+		   ROM_BIOS(2) )
 
-	ROM_SYSTEM_BIOS( 3, "m", "Version M" )
+	ROM_SYSTEM_BIOS( 2, "m", "Version M" )
 	ROMX_LOAD( "gxrom-m", 
 		   0x00000, 0x80000, 
 		   CRC(e21a09e4) SHA1(09932d543594e459eeb94a79654168cd15e79a87),
-		   ROM_BIOS(4) )
+		   ROM_BIOS(3) )
 
 	/* there does not seem to exist an N revision? */
-	
-	ROM_SYSTEM_BIOS( 4, "p", "Version P" )
+
+	ROM_SYSTEM_BIOS( 3, "p", "Version P" )
 	ROMX_LOAD( "gxrom-p", 
 		   0x00000, 0x80000, 
 		   CRC(022d46df) SHA1(877a536865641f096212d1ce7296f580afbd6a2d),
+		   ROM_BIOS(4) )
+
+	ROM_SYSTEM_BIOS( 4, "r", "Version R" )
+	ROMX_LOAD( "gxrom-r", 
+		   0x00000, 0x80000, 
+		   CRC(00ee1a62) SHA1(5705fc9ea791916c4456ac35e22275862411db9b),
 		   ROM_BIOS(5) )
+
 ROM_END
 
 #define rom_hp48g rom_hp48gx
@@ -851,48 +851,44 @@ ROM_END
  */
 
 ROM_START ( hp48sx )
-        ROM_REGION( 0x40000, "main", 0 ) 
+		ROM_DEFAULT_BIOS("j")
+		ROM_REGION( 0x40000, "main", 0 )
 
-	/* latest revision (preferred) */
-	ROM_SYSTEM_BIOS( 0, "j", "Version J" )
-	ROMX_LOAD( "sxrom-j", 
-		   0x00000, 0x40000, 
-		   CRC(1a6378ef) SHA1(5235f5379f1fd7edfe9bb6bf466b60d279163e73),
-		   ROM_BIOS(1) )
-
-	/* now in chronological order, from first revision */
-
-	ROM_SYSTEM_BIOS( 1, "a", "Version A" )
+	/* in chronological order, from first revision, version r is default*/
+	ROM_SYSTEM_BIOS( 0, "a", "Version A" )
 	ROMX_LOAD( "sxrom-a", 
 		   0x00000, 0x40000, 
 		   CRC(a87696c7) SHA1(3271b103ad99254d069e20171beb418ace72cc90),
-		   ROM_BIOS(2) )
+		   ROM_BIOS(1) )
 
-	ROM_SYSTEM_BIOS( 2, "b", "Version B" )
+	ROM_SYSTEM_BIOS( 1, "b", "Version B" )
 	ROMX_LOAD( "sxrom-b", 
 		   0x00000, 0x40000, 
 		   CRC(034f6ce4) SHA1(acd256f2efee868ce402008f4131d94b312e60bc),
-		   ROM_BIOS(3) )
+		   ROM_BIOS(2) )
 
-
-	ROM_SYSTEM_BIOS( 3, "c", "Version C" )
+	ROM_SYSTEM_BIOS( 2, "c", "Version C" )
 	ROMX_LOAD( "sxrom-c", 
 		   0x00000, 0x40000, 
 		   CRC(a9a0279d) SHA1(fee852d43ae6941d07a9d0d31f37e68e4f9051b1),
-		   ROM_BIOS(4) )
+		   ROM_BIOS(3) )
 
-
-	ROM_SYSTEM_BIOS( 4, "d", "Version D" )
+	ROM_SYSTEM_BIOS( 3, "d", "Version D" )
 	ROMX_LOAD( "sxrom-d", 
 		   0x00000, 0x40000, 
 		   CRC(f8f5dc58) SHA1(3be5f895f4c731fd4c863237c7342cab4e8c42b1),
-		   ROM_BIOS(5) )
+		   ROM_BIOS(4) )
 
-
-	ROM_SYSTEM_BIOS( 5, "e", "Version E" )
+	ROM_SYSTEM_BIOS( 4, "e", "Version E" )
 	ROMX_LOAD( "sxrom-e", 
 		   0x00000, 0x40000, 
 		   CRC(704ffa08) SHA1(0d498d135bf729c1d775cce522528837729e2e94),
+		   ROM_BIOS(5) )
+
+	ROM_SYSTEM_BIOS( 5, "j", "Version J" )
+	ROMX_LOAD( "sxrom-j", 
+		   0x00000, 0x40000, 
+		   CRC(1a6378ef) SHA1(5235f5379f1fd7edfe9bb6bf466b60d279163e73),
 		   ROM_BIOS(6) )
 
 	/* no F, G, H, I revisions? */
