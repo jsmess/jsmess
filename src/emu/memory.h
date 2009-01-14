@@ -445,7 +445,7 @@ union _addrmap64_token
 #define SMH_ROM							((void *)STATIC_ROM)
 #define SMH_NOP							((void *)STATIC_NOP)
 #define SMH_UNMAP						((void *)STATIC_UNMAP)
-#define SMH_BANK(n)						((void *)(STATIC_BANK1 + (n) - 1))
+#define SMH_BANK(n)						((void *)(STATIC_BANK1 + (FPTR)(n) - 1))
 #define SMH_BANK1						SMH_BANK(1)
 #define SMH_BANK2						SMH_BANK(2)
 #define SMH_BANK3						SMH_BANK(3)

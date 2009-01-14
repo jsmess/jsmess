@@ -17,8 +17,8 @@ DAVE SOUND CHIP
 
 typedef struct DAVE_INTERFACE
 {
-	void (*reg_r)(running_machine *, int);
-	void (*reg_w)(running_machine *, int,int);
+	void (*reg_r)(running_machine *, offs_t);
+	void (*reg_w)(running_machine *, offs_t, int);
 	void (*int_callback)(running_machine *, int);
 } DAVE_INTERFACE;
 
