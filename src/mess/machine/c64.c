@@ -1098,32 +1098,6 @@ void c64_common_init_machine (running_machine *machine)
 	vicirq = 0;
 }
 
-static DIRECT_UPDATE_HANDLER( c64_direct ) 
-{
-	if ((address & 0xf000) == 0xd000) 
-	{
-		if (c64_io_enabled) 
-		{
-			direct->bytemask = 0x0fff;
-			direct->decrypted = c64_io_mirror;
-			direct->raw = c64_io_mirror;
-			direct->bytestart = 0x0000;
-			direct->byteend = 0xcfff;
-			c64_io_mirror[address & 0x0fff] = c64_read_io( space, address & 0x0fff );
-		} 
-		else 
-		{
-			direct->bytemask = 0x0fff;
-			direct->decrypted = c64_io_ram_r_ptr;
-			direct->raw = c64_io_ram_r_ptr;
-			direct->bytestart = 0x0000;
-			direct->byteend = 0xcfff;
-		}
-		return ~0;
-	}
-	return address;
-}
-
 MACHINE_START( c64 )
 {
 	c64_port_data = 0x17;
@@ -1136,8 +1110,6 @@ MACHINE_START( c64 )
 
 	if (!ultimax)
 		c64_bankswitch(machine, 1);
-
-	memory_set_direct_update_handler( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), c64_direct );
 }
 
 
