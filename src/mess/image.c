@@ -203,6 +203,9 @@ void image_init(running_machine *machine)
 		slot->name = astring_alloc();
 		slot->working_directory = astring_alloc();
 
+		/* clear error message */
+		slot->err_message = NULL;
+
 		/* setup the device */
 		slot->dev = dev;
 		slot->info = image_device_getinfo(machine->config, dev);
@@ -796,6 +799,9 @@ static int image_load_internal(const device_config *image, const char *path,
 	/* first unload the image */
 	image_unload(image);
 
+	/* clear any possible error messages */
+	image_clear_error(slot);
+
 	/* record the filename */
 	slot->err = set_image_filename(slot, path);
 	if (slot->err)
@@ -926,7 +932,6 @@ static void image_clear(image_slot_data *image)
 	image->playable = NULL;
 	image->extrainfo = NULL;
 	image->basename_noext = NULL;
-	image->err_message = NULL;
 	image->ptr = NULL;
 }
 
@@ -945,10 +950,10 @@ static void image_unload_internal(image_slot_data *slot)
 		/* call the unload function */
 		if (slot->unload != NULL)
 			slot->unload(slot->dev);
-
-		image_clear(slot);
-		image_clear_error(slot);
 	}
+
+	image_clear(slot);
+	image_clear_error(slot);
 }
 
 
