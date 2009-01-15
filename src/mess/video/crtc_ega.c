@@ -723,7 +723,6 @@ static void common_start(const device_config *device, int device_type)
 	/* validate arguments */
 	assert(device != NULL);
 	assert(device->tag != NULL);
-	assert(strlen(device->tag) < 20);
 	assert(device->clock > 0);
 
 	crtc_ega->intf = device->static_config;

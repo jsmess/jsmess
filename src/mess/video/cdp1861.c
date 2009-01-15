@@ -191,7 +191,6 @@ static DEVICE_START( cdp1861 )
 	/* validate arguments */
 	assert(device != NULL);
 	assert(device->tag != NULL);
-	assert(strlen(device->tag) < 20);
 	assert(device->clock > 0);
 
 	cdp1861->intf = device->static_config;
@@ -228,7 +227,7 @@ static DEVICE_RESET( cdp1861 )
 	timer_adjust_oneshot(cdp1861->int_timer, video_screen_get_time_until_pos(cdp1861->screen, CDP1861_SCANLINE_INT_START, 0), 0);
 	timer_adjust_oneshot(cdp1861->efx_timer, video_screen_get_time_until_pos(cdp1861->screen, CDP1861_SCANLINE_EFX_TOP_START, 0), 0);
 	timer_adjust_oneshot(cdp1861->dma_timer, cpu_clocks_to_attotime(device->machine->cpu[0], CDP1861_CYCLES_DMA_START), 0);
-	
+
 	cdp1861->disp = 0;
 	cdp1861->dmaout = 0;
 

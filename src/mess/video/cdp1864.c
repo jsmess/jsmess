@@ -205,7 +205,7 @@ void cdp1864_aoe_w(const device_config *device, int level)
 	}
 
 	cdp1864->audio = level;
-	
+
 	beep_set_state(0, level); // TODO: remove this
 }
 
@@ -359,7 +359,6 @@ static DEVICE_START( cdp1864 )
 	/* validate arguments */
 	assert(device != NULL);
 	assert(device->tag != NULL);
-	assert(strlen(device->tag) < 20);
 	assert(device->clock > 0);
 
 	cdp1864->intf = device->static_config;
@@ -406,7 +405,7 @@ static DEVICE_RESET( cdp1864 )
 	timer_adjust_oneshot(cdp1864->int_timer, video_screen_get_time_until_pos(cdp1864->screen, CDP1864_SCANLINE_INT_START, 0), 0);
 	timer_adjust_oneshot(cdp1864->efx_timer, video_screen_get_time_until_pos(cdp1864->screen, CDP1864_SCANLINE_EFX_TOP_START, 0), 0);
 	timer_adjust_oneshot(cdp1864->dma_timer, cpu_clocks_to_attotime(device->machine->cpu[0], CDP1864_CYCLES_DMA_START), 0);
-	
+
 	cdp1864->disp = 0;
 	cdp1864->dmaout = 0;
 	cdp1864->bgcolor = 0;

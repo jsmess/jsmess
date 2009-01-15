@@ -1,13 +1,13 @@
 /*****************************************************************************
  *
  * machine/ins8154.h
- * 
+ *
  * INS8154 N-Channel 128-by-8 Bit RAM Input/Output (RAM I/O)
- * 
+ *
  * Written by Dirk Best, January 2008
  *
  * TODO: Strobed modes
- * 
+ *
  ****************************************************************************/
 
 #include "driver.h"
@@ -47,9 +47,7 @@ static DEVICE_START( ins8154 )
 	ins8154_t *ins8154 = device->token;
 
 	/* validate arguments */
-	assert(device->machine != NULL);
 	assert(device->tag != NULL);
-	assert(strlen(device->tag) < 20);
 
 	/* assign interface */
 	ins8154->intf = device->static_config;
@@ -69,7 +67,7 @@ static DEVICE_START( ins8154 )
 static DEVICE_RESET( ins8154 )
 {
 	ins8154_t *ins8154 = device->token;
-	
+
 	ins8154->in_a = 0;
 	ins8154->in_b = 0;
 	ins8154->out_a = 0;
@@ -91,7 +89,7 @@ READ8_DEVICE_HANDLER( ins8154_r )
 			cpu_get_pc( device->machine->cpu[0] ), offset);
 		return 0xff;
 	}
-	
+
 	switch (offset)
 	{
 	case 0x20:
@@ -99,13 +97,13 @@ READ8_DEVICE_HANDLER( ins8154_r )
 			val = i->intf->in_a_func(device, 0);
 		i->in_a = val;
 		break;
-		
+
 	case 0x21:
 		if (i->intf->in_b_func)
 			val = i->intf->in_b_func(device, 0);
 		i->in_b = val;
 		break;
-		
+
 	default:
 		if (offset < 0x08)
 		{
@@ -121,14 +119,14 @@ READ8_DEVICE_HANDLER( ins8154_r )
 		}
 		break;
 	}
-	
+
 	return val;
 }
 
 WRITE8_DEVICE_HANDLER( ins8154_porta_w )
 {
 	ins8154_t *i = device->token;
-	
+
 	i->out_a = data;
 
 	/* Test if any pins are set as outputs */
@@ -146,9 +144,9 @@ WRITE8_DEVICE_HANDLER( ins8154_porta_w )
 WRITE8_DEVICE_HANDLER( ins8154_portb_w )
 {
 	ins8154_t *i = device->token;
-	
+
 	i->out_b = data;
-	
+
 	/* Test if any pins are set as outputs */
 	if (i->odrb)
 	{
@@ -164,42 +162,42 @@ WRITE8_DEVICE_HANDLER( ins8154_portb_w )
 WRITE8_DEVICE_HANDLER( ins8154_w )
 {
 	ins8154_t *i = device->token;
-	
+
 	if (offset > 0x24)
 	{
 		logerror("INS8154 (%04x): Write %02x to invalid offset %02x!\n",
 			cpu_get_pc( device->machine->cpu[0] ), data, offset);
 		return;
 	}
-	
+
 	switch (offset)
 	{
 	case 0x20:
 		ins8154_porta_w(device, 0, data);
 		break;
-		
+
 	case 0x21:
 		ins8154_portb_w(device, 0, data);
 		break;
-		
+
 	case 0x22:
 		LOG(("INS8154 (%04x): ODR for port A set to %02x\n",
 			cpu_get_pc( device->machine->cpu[0] ), data));
 		i->odra = data;
 		break;
-		
+
 	case 0x23:
 		LOG(("INS8154 (%04x): ODR for port B set to %02x\n",
 			cpu_get_pc( device->machine->cpu[0] ), data));
 		i->odrb = data;
 		break;
-		
+
 	case 0x24:
 		LOG(("INS8154 (%04x): MDR set to %02x\n",
 			cpu_get_pc( device->machine->cpu[0] ), data));
 		i->mdr = data;
 		break;
-		
+
 	default:
 		if (offset & 0x10)
 		{
@@ -225,7 +223,7 @@ WRITE8_DEVICE_HANDLER( ins8154_w )
 				ins8154_portb_w(device, 0, i->out_b & ~((offset >> 4) & 0x07));
 			}
 		}
-		
+
 		break;
 	}
 }

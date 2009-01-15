@@ -73,16 +73,16 @@ INLINE ttl74145_t *get_safe_token(const device_config *device)
 	return (ttl74145_t *)device->token;
 }
 
-WRITE8_DEVICE_HANDLER( ttl74145_w ) { 
+WRITE8_DEVICE_HANDLER( ttl74145_w ) {
 	/* Decode number */
 	ttl74145_t *ttl74145 = get_safe_token(device);
 	UINT16 new_number = bcd_2_dec(data & 0x0f);
-	
+
 	/* Call output callbacks if the number changed */
 	if (new_number != ttl74145->number)
 	{
 		const ttl74145_interface *i = ttl74145->intf;
-	
+
 		if (i->output_line_0) i->output_line_0(device, new_number == 0);
 		if (i->output_line_1) i->output_line_1(device, new_number == 1);
 		if (i->output_line_2) i->output_line_2(device, new_number == 2);
@@ -94,15 +94,15 @@ WRITE8_DEVICE_HANDLER( ttl74145_w ) {
 		if (i->output_line_8) i->output_line_8(device, new_number == 8);
 		if (i->output_line_9) i->output_line_9(device, new_number == 9);
 	}
-	
+
 	/* Update state */
-	ttl74145->number = new_number;		
+	ttl74145->number = new_number;
 }
 
-READ16_DEVICE_HANDLER( ttl74145_r ) { 
+READ16_DEVICE_HANDLER( ttl74145_r ) {
 	ttl74145_t *ttl74145 = get_safe_token(device);
-	
-	return ttl74145->number; 
+
+	return ttl74145->number;
 }
 
 /* Device Interface */
@@ -114,12 +114,11 @@ static DEVICE_START( ttl74145 )
 
 	assert(device != NULL);
 	assert(device->tag != NULL);
-	assert(strlen(device->tag) < 20);
 	assert(device->static_config != NULL);
 
 	ttl74145->intf = device->static_config;
 	ttl74145->number = 0;
-	
+
 	// register for state saving
 	state_save_register_item(device->machine, "ttl74145", device->tag, 0, ttl74145->number);
 	return DEVICE_START_OK;

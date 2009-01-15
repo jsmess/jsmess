@@ -262,7 +262,7 @@ static void msm6255_update_graphics(const device_config *device, bitmap_t *bitma
 	msm6255_t *msm6255 = get_safe_token(device);
 
 	UINT8 hn = (msm6255->hnr & MSM6255_HNR_HN_MASK) + 1;
-	UINT8 nx = (msm6255->dvr & MSM6255_DVR_DN_MASK) + 1; 
+	UINT8 nx = (msm6255->dvr & MSM6255_DVR_DN_MASK) + 1;
 	UINT16 sar = (msm6255->sur << 8) | msm6255->slr;
 
 	int y;
@@ -292,7 +292,7 @@ static void msm6255_update_text(const device_config *device, bitmap_t *bitmap, c
 
 	UINT8 hn = (msm6255->hnr & MSM6255_HNR_HN_MASK) + 1;
 	UINT8 vp = (msm6255->pr & MSM6255_PR_VP_MASK) + 1;
-	UINT8 nx = (msm6255->dvr & MSM6255_DVR_DN_MASK) + 1; 
+	UINT8 nx = (msm6255->dvr & MSM6255_DVR_DN_MASK) + 1;
 	UINT16 sar = (msm6255->sur << 8) | msm6255->slr;
 
 	int sy, y;
@@ -349,7 +349,6 @@ static DEVICE_START( msm6255 )
 
 	assert(device != NULL);
 	assert(device->tag != NULL);
-	assert(strlen(device->tag) < 20);
 	assert(device->static_config != NULL);
 
 	msm6255->intf = device->static_config;

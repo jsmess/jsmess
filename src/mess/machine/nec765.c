@@ -128,7 +128,7 @@ struct _nec765_t
 	int timer_type;
 
 	emu_timer *command_timer;
-	
+
 	char *data_buffer;
 	const nec765_interface *intf;
 };
@@ -223,7 +223,7 @@ static void nec765_clear_data_request(const device_config *device)
 }
 
 static void nec765_seek_complete(const device_config *device)
-{	
+{
 	/* tested on Amstrad CPC */
 
 	/* if a seek is done without drive connected: */
@@ -279,7 +279,7 @@ static void nec765_seek_complete(const device_config *device)
 
 	const device_config *img = current_image(device);
 	nec765_t *fdc = get_safe_token(device);
-	
+
 	if (!img)
 		return;
 
@@ -410,7 +410,7 @@ static void nec765_timer_func(const device_config *device, int timer_type)
 }
 
 static TIMER_CALLBACK(nec765_timer_callback)
-{	
+{
 	const device_config *device = ptr;
 	nec765_timer_func(device,param);
 }
@@ -424,7 +424,7 @@ effectively disabled by reading the data before the NMI int can be set.
 static void nec765_setup_timed_generic(const device_config *device, int timer_type, attotime duration)
 {
 	nec765_t *fdc = get_safe_token(device);
-	
+
 	fdc->timer_type = timer_type;
 
 	if (!(fdc->nec765_flags & NEC765_DMA_MODE))
@@ -578,7 +578,7 @@ static void nec765_setup_execution_phase_read(const device_config *device, char 
 static void nec765_setup_execution_phase_write(const device_config *device, char *ptr, int size)
 {
 	nec765_t *fdc = get_safe_token(device);
-	
+
 	fdc->FDC_main &= ~0x040;                     /* FDC->CPU */
 
 	fdc->nec765_transfer_bytes_count = 0;
@@ -594,7 +594,7 @@ static void nec765_setup_execution_phase_write(const device_config *device, char
 static void nec765_setup_result_phase(const device_config *device, int byte_count)
 {
 	nec765_t *fdc = get_safe_token(device);
-	
+
 	fdc->FDC_main |= 0x040;                     /* FDC->CPU */
 	fdc->FDC_main &= ~0x020;                    /* not execution phase */
 
@@ -608,7 +608,7 @@ static void nec765_setup_result_phase(const device_config *device, int byte_coun
 void nec765_idle(const device_config *device)
 {
 	nec765_t *fdc = get_safe_token(device);
-	
+
 	fdc->FDC_main &= ~0x040;                     /* CPU->FDC */
 	fdc->FDC_main &= ~0x020;                    /* not execution phase */
 	fdc->FDC_main &= ~0x010;                     /* not busy */
@@ -625,7 +625,7 @@ static void nec765_change_flags(const device_config *device,unsigned int flags, 
 	unsigned int new_flags;
 	unsigned int changed_flags;
 	nec765_t *fdc = get_safe_token(device);
-	
+
 	assert((flags & ~mask) == 0);
 
 	/* compute the new flags and which ones have changed */
@@ -1716,7 +1716,7 @@ void nec765_update_state(const device_config *device)
 READ8_DEVICE_HANDLER(nec765_data_r)
 {
 	nec765_t *fdc = get_safe_token(device);
-	
+
 	if ((fdc->FDC_main & 0x0c0) == 0x0c0)
 	{
 		if (
@@ -1744,7 +1744,7 @@ READ8_DEVICE_HANDLER(nec765_data_r)
 WRITE8_DEVICE_HANDLER(nec765_data_w)
 {
 	nec765_t *fdc = get_safe_token(device);
-	
+
 	if (LOG_EXTRA)
 		logerror("DATA W: %02x\n", data);
 
@@ -1773,7 +1773,7 @@ WRITE8_DEVICE_HANDLER(nec765_data_w)
 static void nec765_setup_invalid(const device_config *device)
 {
 	nec765_t *fdc = get_safe_token(device);
-	
+
 	fdc->command = 0;
 	fdc->nec765_result_bytes[0] = 0x080;
 	nec765_setup_result_phase(device,1);
@@ -1782,7 +1782,7 @@ static void nec765_setup_invalid(const device_config *device)
 static void nec765_setup_command(const device_config *device)
 {
 	nec765_t *fdc = get_safe_token(device);
-	
+
 	static const char *const commands[] =
 	{
 		NULL,						/* [00] */
@@ -2150,7 +2150,7 @@ READ8_DEVICE_HANDLER(nec765_dack_r)
 void nec765_reset(const device_config *device, int offset)
 {
 	nec765_t *fdc = get_safe_token(device);
-	
+
 	/* nec765 in idle state - ready to accept commands */
 	nec765_idle(device);
 
@@ -2197,7 +2197,7 @@ void nec765_reset(const device_config *device, int offset)
 void nec765_set_reset_state(const device_config *device, int state)
 {
 	nec765_t *fdc = get_safe_token(device);
-	
+
 	int flags;
 
 	/* get previous reset state */
@@ -2233,7 +2233,7 @@ void nec765_set_reset_state(const device_config *device, int state)
 void nec765_set_ready_state(const device_config *device, int state)
 {
 	nec765_t *fdc = get_safe_token(device);
-	
+
 	/* clear ready state */
 	fdc->nec765_flags &= ~NEC765_FDD_READY;
 
@@ -2253,9 +2253,8 @@ static device_start_err common_start(const device_config *device, int device_typ
 
 	assert(device != NULL);
 	assert(device->tag != NULL);
-	assert(strlen(device->tag) < 20);
 	assert(device->static_config != NULL);
-	
+
 	fdc->intf = device->static_config;
 
 	fdc->version = device_type;
@@ -2295,13 +2294,13 @@ static DEVICE_START( nec72065 )
 static DEVICE_RESET( nec765 )
 {
 	int i;
-		
+
 	for (i = 0; i < device_count(device->machine, IO_FLOPPY); i++) {
 		const device_config *img = image_from_devtype_and_index(device->machine, IO_FLOPPY, i);
 		floppy_drive_set_controller(img, device);
 		floppy_drive_set_ready_state_change_callback(img, nec765_set_ready_change_callback);
 	}
-	
+
 	nec765_reset(device,0);
 }
 

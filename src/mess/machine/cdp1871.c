@@ -82,7 +82,7 @@ struct _cdp1871_t
 	int sense;						/* sense input scan counter */
 	int drive;						/* drive output scan counter */
 	int modifiers;					/* modifier inputs */
-	
+
 	int da;							/* data available flag */
 	int next_da;					/* next value of data available flag */
 	int rpt;						/* repeat flag */
@@ -206,7 +206,7 @@ INPUT_PORTS_START( cdp1871 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('´')
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('ï¿½')
 
 	PORT_START("D2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
@@ -295,7 +295,6 @@ static DEVICE_START( cdp1871 )
 	/* validate arguments */
 	assert(device != NULL);
 	assert(device->tag != NULL);
-	assert(strlen(device->tag) < 20);
 
 	cdp1871->intf = device->static_config;
 
@@ -306,7 +305,7 @@ static DEVICE_START( cdp1871 )
 	cdp1871->next_da = 1;
 	cdp1871->next_rpt = 1;
 	change_output_lines(device);
-	
+
 	/* create the timers */
 	cdp1871->scan_timer = timer_alloc(device->machine, cdp1871_scan_tick, (void *)device);
 	timer_adjust_periodic(cdp1871->scan_timer, attotime_zero, 0, ATTOTIME_IN_HZ(cdp1871->intf->clock));

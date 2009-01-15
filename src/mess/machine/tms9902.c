@@ -93,7 +93,7 @@ struct _tms9902_t
 	void *timer;			/* MESS timer, used to emulate the decrementer register */
 
 	/* Pointer to interface */
-	const tms9902_interface *intf;	
+	const tms9902_interface *intf;
 };
 
 /* bits in register_select */
@@ -146,7 +146,7 @@ static void field_interrupts(const device_config *device)
 	function device should be called by the driver when the state of CTS changes
 
 	state == 0: CTS* is inactive (high)
-	state != 0: CTS* is active (low) 
+	state != 0: CTS* is active (low)
 */
 void tms9902_set_cts(const device_config *device, int state)
 {
@@ -213,7 +213,7 @@ static TIMER_CALLBACK(decrementer_callback)
 {
 	const device_config *device = (const device_config *) ptr;
 	tms9902_t *tms9902 = get_token(device);
-	
+
 	if (tms9902->TIMELP)
 		tms9902->TIMERR = 1;
 	else
@@ -273,7 +273,7 @@ static void set_brk(const device_config *device, int state)
 static void initiate_transmit(const device_config *device)
 {
 	tms9902_t *tms9902 = get_token(device);
-	
+
 	/* Load transmit register */
 	tms9902->XSR = tms9902->XBR;
 	tms9902->XSRE = 0;
@@ -369,7 +369,7 @@ READ8_DEVICE_HANDLER( tms9902_cru_r )
 WRITE8_DEVICE_HANDLER( tms9902_cru_w )
 {
 	tms9902_t *tms9902 = get_token(device);
-	
+
 	data &= 1;	/* clear extra bits */
 	offset &= 0x01F;
 
@@ -578,7 +578,7 @@ WRITE8_DEVICE_HANDLER( tms9902_cru_w )
 static DEVICE_STOP( tms9902 )
 {
 	tms9902_t *tms9902 = get_token(device);
-	
+
 	if (tms9902->timer)
 	{
 		timer_reset(tms9902->timer, attotime_never);	/* FIXME - timers should only be allocated once */
@@ -634,7 +634,6 @@ static DEVICE_START( tms9902 )
 
 	assert(device != NULL);
 	assert(device->tag != NULL);
-	assert(strlen(device->tag) < 20);
 	assert(device->static_config != NULL);
 
 	tms9902->intf = device->static_config;

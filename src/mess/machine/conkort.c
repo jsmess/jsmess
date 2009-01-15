@@ -48,15 +48,15 @@ Notes:
     SAB1793 - Siemens SAB1793-02P Floppy Disc Controller
     FDC9229 - SMC FDC9229BT Floppy Disc Interface Circuit
     DM8131  - National Semiconductor DM8131N 6-Bit Unified Bus Comparator
-    CON1	- 
+    CON1	-
     CON2	- AMP4284
-    CON3	- 
-    SW1		- 
-    SW2		- 
-    SW3		- 
-    S1		- 
-   	S3		- 
-    S5		- 
+    CON3	-
+    SW1		-
+    SW2		-
+    SW3		-
+    S1		-
+   	S3		-
+    S5		-
     S6		- Amount of RAM installed (A:2KB, B:8KB)
     S7		- Number of drives connected (0:3, 1:?) *located on solder side
     S8		- 0:8", 1:5.25"
@@ -219,7 +219,7 @@ static ABCBUS_CARD_SELECT( luxor_55_10828 )
 	if (data == 0x2d) // TODO: bit 0 of this is configurable with S1
 	{
 		const address_space *io = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_IO);
-			
+
 		memory_install_readwrite8_handler(io, ABCBUS_INP, ABCBUS_OUT, 0x18, 0, slow_bus_data_r, slow_bus_data_w);
 		memory_install_read8_handler(io, ABCBUS_STAT, ABCBUS_STAT, 0x18, 0, slow_bus_stat_r);
 		memory_install_write8_handler(io, ABCBUS_C1, ABCBUS_C1, 0x18, 0, slow_bus_c1_w);
@@ -277,13 +277,13 @@ static WRITE8_HANDLER( slow_status_w )
 		bit		description
 
 		0		_INT to main Z80
-		1		
-		2		
-		3		
-		4		
-		5		
+		1
+		2
+		3
+		4
+		5
 		6		LS245 DIR
-		7		
+		7
 
 	*/
 
@@ -749,7 +749,7 @@ static MACHINE_DRIVER_START( luxor_55_10828 )
 	MDRV_CPU_CONFIG(slow_daisy_chain)
 
 	MDRV_Z80PIO_ADD(CONKORT_Z80PIO_TAG, conkort_pio_intf)
-	MDRV_WD179X_ADD("wd179x", slow_wd17xx_interface )		
+	MDRV_WD179X_ADD("wd179x", slow_wd17xx_interface )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( luxor_55_21046 )
@@ -759,8 +759,8 @@ static MACHINE_DRIVER_START( luxor_55_21046 )
 	MDRV_CPU_CONFIG(fast_daisy_chain)
 
 	MDRV_Z80DMA_ADD(CONKORT_Z80DMA_TAG, XTAL_16MHz/4, dma_intf)
-	
-	MDRV_WD1793_ADD("wd1793", fast_wd17xx_interface )	
+
+	MDRV_WD1793_ADD("wd1793", fast_wd17xx_interface )
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -818,9 +818,7 @@ static DEVICE_START( luxor_55_10828 )
 	astring *tempstring = astring_alloc();
 
 	/* validate arguments */
-	assert(device->machine != NULL);
 	assert(device->tag != NULL);
-	assert(strlen(device->tag) < 20);
 
 	/* find our CPU */
 	astring_printf(tempstring, "%s:%s", device->tag, CONKORT_Z80_TAG);
@@ -889,9 +887,7 @@ static DEVICE_START( luxor_55_21046 )
 	astring *tempstring = astring_alloc();
 
 	/* validate arguments */
-	assert(device->machine != NULL);
 	assert(device->tag != NULL);
-	assert(strlen(device->tag) < 20);
 
 	/* find our CPU */
 	astring_printf(tempstring, "%s:%s", device->tag, CONKORT_Z80_TAG);

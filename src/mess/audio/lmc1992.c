@@ -140,7 +140,6 @@ static DEVICE_START( lmc1992 )
 	/* validate arguments */
 	assert(device != NULL);
 	assert(device->tag != NULL);
-	assert(strlen(device->tag) < 20);
 
 	lmc1992->intf = device->static_config;
 

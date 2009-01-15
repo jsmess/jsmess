@@ -34,7 +34,7 @@ struct _zx8301_t
 	int flash;						/* flash */
 	int vsync;						/* vertical sync */
 	int vda;						/* valid data address */
-	
+
 	/* timers */
 	emu_timer *flash_timer;			/* flash timer */
 	emu_timer *vsync_timer;			/* vertical sync timer */
@@ -235,7 +235,6 @@ static DEVICE_START( zx8301 )
 	/* validate arguments */
 	assert(device != NULL);
 	assert(device->tag != NULL);
-	assert(strlen(device->tag) < 20);
 	assert(device->clock > 0);
 
 	zx8301->intf = device->static_config;

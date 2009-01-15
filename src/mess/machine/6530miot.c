@@ -382,7 +382,6 @@ static DEVICE_START( miot6530 )
 	/* validate arguments */
 	assert(device != NULL);
 	assert(device->tag != NULL);
-	assert(strlen(device->tag) < 20);
 
 	/* set static values */
 	miot->intf = device->static_config;

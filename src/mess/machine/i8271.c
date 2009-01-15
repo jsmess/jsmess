@@ -1554,7 +1554,6 @@ static DEVICE_START( i8271 )
 
 	assert(device != NULL);
 	assert(device->tag != NULL);
-	assert(strlen(device->tag) < 20);
 	assert(device->static_config != NULL);
 
 	i8271->intf = device->static_config;

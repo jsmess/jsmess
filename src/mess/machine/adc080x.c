@@ -20,7 +20,7 @@ struct _adc080x_t
 	int start;							/* start conversion pin */
 	int eoc;							/* end of conversion pin */
 	int next_eoc;						/* next value end of conversion pin */
-	
+
 	UINT8 sar;							/* successive approximation register */
 
 	int cycle;							/* clock cycle counter */
@@ -139,7 +139,6 @@ static DEVICE_START( adc080x )
 	/* validate arguments */
 	assert(device != NULL);
 	assert(device->tag != NULL);
-	assert(strlen(device->tag) < 20);
 
 	adc080x->intf = device->static_config;
 

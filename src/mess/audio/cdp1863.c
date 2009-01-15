@@ -136,7 +136,6 @@ static DEVICE_START( cdp1863 )
 	/* validate arguments */
 	assert(device != NULL);
 	assert(device->tag != NULL);
-	assert(strlen(device->tag) < 20);
 
 	cdp1863->intf = device->static_config;
 

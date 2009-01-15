@@ -79,7 +79,7 @@ void abc77_reset_w(const device_config *device, int level)
 
 		cpu_set_input_line(abc77->cpu, INPUT_LINE_RESET, ASSERT_LINE);
 		timer_adjust_oneshot(abc77->reset_timer, ATTOTIME_IN_MSEC(t), 0);
-		
+
 		cpu_set_input_line(abc77->cpu, MCS48_INPUT_EA, ea ? CLEAR_LINE : ASSERT_LINE);
 	}
 
@@ -322,9 +322,8 @@ static DEVICE_START( abc77 )
 
 	/* validate arguments */
 
-	assert(device->machine != NULL);
 	assert(device->tag != NULL);
-	assert(strlen(device->tag) < 20);
+
 	abc77->intf = device->static_config;
 	assert(abc77->intf != NULL);
 	assert(abc77->intf->txd_w != NULL);

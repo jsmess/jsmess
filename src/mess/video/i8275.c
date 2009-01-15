@@ -113,14 +113,14 @@ struct _i8275_t
 	UINT8 char_blink_cnt;
 
 	UINT8 next_in_fifo;
-	
+
 	UINT8 lineattr;
 	UINT8 rvv;
 	UINT8 gpa;
 	UINT8 hlgt;
 	UINT8 underline;
 	UINT8 blink;
-	
+
 	UINT8 last_data;
 };
 
@@ -164,7 +164,7 @@ READ8_DEVICE_HANDLER( i8275_r )
 		i8275->status_reg &= ~I8275_STATUS_DMA_UNDERRUN;
 		i8275->status_reg &= ~I8275_STATUS_IMPROPER_COMMAND;
 		i8275->status_reg &= ~I8275_STATUS_LIGHT_PEN;
-		i8275->status_reg &= ~I8275_STATUS_INTERRUPT_REQUEST;		
+		i8275->status_reg &= ~I8275_STATUS_INTERRUPT_REQUEST;
 	}
 	else
 	{
@@ -354,17 +354,17 @@ static void i8275_draw_char_line(const device_config *device)
 					i8275->rvv = (chr >> 4) & 1;
 					i8275->underline = (chr >> 5) & 1;
 				}
-								
-				if (i8275->field_attribute_mode==0) {					
-					chr = (i8275->buffer_used==0) ? i8275->fifo_buffer_2[fifo_read] : i8275->fifo_buffer_1[fifo_read];						
+
+				if (i8275->field_attribute_mode==0) {
+					chr = (i8275->buffer_used==0) ? i8275->fifo_buffer_2[fifo_read] : i8275->fifo_buffer_1[fifo_read];
 					fifo_read = (fifo_read + 1 ) % 16;
-				} else {				
+				} else {
 					vsp = 1;
-				}				
+				}
 			}
 			if (vsp==0 && i8275->blink) {
 				vsp = (i8275->char_blink_cnt < 32)  ? 1: 0;
-			}			
+			}
 			if ((i8275->current_row == i8275->cursor_row) && (xpos ==  i8275->cursor_col - i8275->intf->char_delay)) {
 				int vis = 1;
 				if ((i8275->cursor_format & 2)==0) {
@@ -392,7 +392,7 @@ static void i8275_draw_char_line(const device_config *device)
 				i8275->hlgt  // highlight
 			);
 			vsp = 0;
-		}		
+		}
 		i8275->ypos++;
 	}
 	i8275->current_row++;
@@ -400,54 +400,54 @@ static void i8275_draw_char_line(const device_config *device)
 
 void i8275_dack_set_data(const device_config *device, UINT8 data)
 {
-	i8275_t *i8275 = get_safe_token(device);	
-	
-	if (i8275->next_in_fifo == 1) 
-	{	
+	i8275_t *i8275 = get_safe_token(device);
+
+	if (i8275->next_in_fifo == 1)
+	{
 		i8275->next_in_fifo = 0;
-		
-		if(i8275->buffer_used == 0) 
+
+		if(i8275->buffer_used == 0)
 		{
-			i8275->fifo_buffer_1[i8275->fifo_write] = data & 0x7f;						
-		} 
-		else 
+			i8275->fifo_buffer_1[i8275->fifo_write] = data & 0x7f;
+		}
+		else
 		{
 			i8275->fifo_buffer_2[i8275->fifo_write] = data & 0x7f;
 		}
 		i8275->fifo_write = (i8275->fifo_write + 1) % 16;
-				
+
 		if (i8275->last_data == 0xf1) {
 			i8275->row_pos = i8275->chars_per_row + 1;
 		}
 	}
-	else 
-	{		
-		if(i8275->buffer_used == 0) 
+	else
+	{
+		if(i8275->buffer_used == 0)
 		{
 			i8275->row_buffer_1[i8275->row_pos++] = data;
-		} 
-		else 
+		}
+		else
 		{
 			i8275->row_buffer_2[i8275->row_pos++] = data;
 		}
-		if (i8275->field_attribute_mode==0) 
+		if (i8275->field_attribute_mode==0)
 		{
-			if ((data & 0x80)==0x80) 
+			if ((data & 0x80)==0x80)
 			{
 				i8275->last_data = data;
 				i8275->next_in_fifo = 1;
 			}
 		}
 	}
-	
-	if ((i8275->row_pos - 1)==i8275->chars_per_row ) 
+
+	if ((i8275->row_pos - 1)==i8275->chars_per_row )
 	{
 		i8275->buffer_used = (i8275->buffer_used==0) ? 1 : 0;
 		i8275->row_pos = 0;
 		i8275->fifo_write = 0;
 		i8275_draw_char_line(device);
 	}
-	if (i8275->current_row == (i8275->rows_per_frame + 1)) 
+	if (i8275->current_row == (i8275->rows_per_frame + 1))
 	{
 		i8275->ypos = 0;
 		i8275->current_row = 0;
@@ -463,7 +463,7 @@ void i8275_update(const device_config *device, bitmap_t *bitmap, const rectangle
 	i8275->lineattr = 0;
 	i8275->rvv = 0;
 	i8275->gpa = 0;
-	i8275->hlgt = 0;	
+	i8275->hlgt = 0;
 	i8275->underline = 0;
 	i8275->blink = 0;
 	i8275->row_pos = 0;
@@ -494,7 +494,6 @@ static DEVICE_START( i8275 )
 
 	assert(device != NULL);
 	assert(device->tag != NULL);
-	assert(strlen(device->tag) < 20);
 	assert(device->static_config != NULL);
 
 	i8275->intf = device->static_config;
@@ -575,11 +574,11 @@ static DEVICE_RESET( i8275 )
 	i8275->cursor_blink_cnt = 0;
 	i8275->char_blink_cnt = 0;
 	i8275->next_in_fifo = 0;
-	
+
 	i8275->lineattr = 0;
 	i8275->rvv = 0;
 	i8275->gpa = 0;
-	i8275->hlgt = 0;	
+	i8275->hlgt = 0;
 	i8275->underline = 0;
 	i8275->blink = 0;
 }

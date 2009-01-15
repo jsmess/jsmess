@@ -128,7 +128,7 @@ struct _tms9901_t
 	double clock_rate;
 
 	/* Pointer to interface */
-	const tms9901_interface *intf;	
+	const tms9901_interface *intf;
 };
 
 
@@ -263,7 +263,7 @@ static TIMER_CALLBACK(decrementer_callback)
 {
 	const device_config *device = (const device_config *) ptr;
 	tms9901_t *tms = get_token(device);
-	
+
 	tms->timer_int_pending = TRUE;			/* decrementer interrupt requested */
 
 	tms9901_field_interrupts(device);
@@ -542,7 +542,7 @@ WRITE8_DEVICE_HANDLER ( tms9901_cru_w )
 static DEVICE_STOP( tms9901 )
 {
 	tms9901_t *tms = get_token(device);
-	
+
 	if (tms->timer)
 	{
 		timer_reset(tms->timer, attotime_never);	/* FIXME - timers should only be allocated once */
@@ -585,7 +585,6 @@ static DEVICE_START( tms9901 )
 
 	assert(device != NULL);
 	assert(device->tag != NULL);
-	assert(strlen(device->tag) < 20);
 	assert(device->static_config != NULL);
 
 	tms->intf = device->static_config;
@@ -593,7 +592,7 @@ static DEVICE_START( tms9901 )
 	tms->timer = timer_alloc(device->machine, decrementer_callback, (void *) device);
 
 	tms->supported_int_mask = tms->intf->supported_int_mask;
-	
+
 	tms->clock_rate = tms->intf->clock_rate;
 
 	tms->int_state = 0;

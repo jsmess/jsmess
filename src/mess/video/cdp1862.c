@@ -88,7 +88,7 @@ void cdp1862_dma_w(const device_config *device, UINT8 data, int color_on, int rd
 		/* enable color data input latch */
 		cdp1862->con = ASSERT_LINE;
 	}
-	
+
 	if (cdp1862->con == CLEAR_LINE)
 	{
 		/* latch white dot color */
@@ -131,7 +131,6 @@ static DEVICE_START( cdp1862 )
 	/* validate arguments */
 	assert(device != NULL);
 	assert(device->tag != NULL);
-	assert(strlen(device->tag) < 20);
 	assert(device->clock > 0);
 
 	cdp1862->intf = device->static_config;

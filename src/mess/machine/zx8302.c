@@ -102,7 +102,7 @@ struct _zx8302_t
 
 	int mdv_motor;					/* selected motor */
 	int mdv_offset[8];				/* image offset */
-	
+
 	UINT8 *mdv_image[8];			/* image */
 
 	/* timers */
@@ -224,7 +224,7 @@ static void zx8302_ipc_comm_tick(const device_config *device)
 void zx8302_comctl_w(const device_config *device, int level)
 {
 	if (LOG) logerror("IPC COMCTL W: %x\n", level);
-	
+
 	if (level == 1)
 	{
 		zx8302_ipc_comm_tick(device);
@@ -573,7 +573,6 @@ static DEVICE_START( zx8302 )
 	/* validate arguments */
 	assert(device != NULL);
 	assert(device->tag != NULL);
-	assert(strlen(device->tag) < 20);
 	assert(device->clock > 0);
 
 	zx8302->intf = device->static_config;
@@ -619,7 +618,7 @@ static DEVICE_START( zx8302 )
 	state_save_register_item(device->machine, "zx8302", device->tag, 0, zx8302->ipc_rx);
 	state_save_register_item(device->machine, "zx8302", device->tag, 0, zx8302->ipc_busy);
 	state_save_register_item(device->machine, "zx8302", device->tag, 0, zx8302->baudx4);
-	
+
 	state_save_register_item(device->machine, "zx8302", device->tag, 0, zx8302->tx_bits);
 	state_save_register_item(device->machine, "zx8302", device->tag, 0, zx8302->ser1_rxd);
 	state_save_register_item(device->machine, "zx8302", device->tag, 0, zx8302->ser1_cts);
@@ -632,7 +631,7 @@ static DEVICE_START( zx8302 )
 	state_save_register_item(device->machine, "zx8302", device->tag, 0, zx8302->mdselck);
 	state_save_register_item(device->machine, "zx8302", device->tag, 0, zx8302->mdseld);
 	state_save_register_item(device->machine, "zx8302", device->tag, 0, zx8302->erase);
-	
+
 	state_save_register_item(device->machine, "zx8302", device->tag, 0, zx8302->mdv_motor);
 	state_save_register_item_array(device->machine, "zx8302", device->tag, 0, zx8302->mdv_offset);
 	return DEVICE_START_OK;

@@ -16,7 +16,7 @@ typedef struct _e0516_t e0516_t;
 struct _e0516_t
 {
 	const e0516_interface *intf;	/* interface */
-	
+
 	int cs;							/* chip select */
 	int data_latch;					/* data latch */
 	int reg_latch;					/* register latch */
@@ -47,7 +47,7 @@ static TIMER_CALLBACK(clock_tick)
 	e0516_t *e0516 = get_safe_token(device);
 
 	e0516->reg[E0516_REGISTER_SECOND]++;
-	
+
 	if (e0516->reg[E0516_REGISTER_SECOND] == 60)
 	{
 		e0516->reg[E0516_REGISTER_SECOND] = 0;
@@ -150,7 +150,7 @@ void e0516_clk_w(const device_config *device, int level)
 				e0516->data_latch |= e0516->dio << 7;
 				e0516->data_latch >>= 1;
 			}
-			
+
 			if (e0516->bits == 8)
 			{
 				e0516->state = 0;
@@ -192,7 +192,6 @@ static DEVICE_START( e0516 )
 	/* validate arguments */
 	assert(device != NULL);
 	assert(device->tag != NULL);
-	assert(strlen(device->tag) < 20);
 
 	e0516->intf = device->static_config;
 

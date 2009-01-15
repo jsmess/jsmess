@@ -194,7 +194,7 @@ READ8_DEVICE_HANDLER( mm58274c_r )
 WRITE8_DEVICE_HANDLER (mm58274c_w)
 {
 	mm58274c_t *mm58274c = get_safe_token(device);
-	
+
 	offset &= 0xf;
 	data &= 0xf;
 
@@ -444,11 +444,10 @@ static TIMER_CALLBACK(increment_rtc)
 static DEVICE_START( mm58274c )
 {
 	mm58274c_t *mm58274c = get_safe_token(device);
-	
+
 	// validate arguments
 	assert(device != NULL);
 	assert(device->tag != NULL);
-	assert(strlen(device->tag) < 20);
 	assert(device->static_config != NULL);
 
 	mm58274c->intf = device->static_config;
@@ -470,7 +469,7 @@ static DEVICE_START( mm58274c )
 	state_save_register_item(device->machine, "mm58274c", device->tag, 0, mm58274c->minutes2);
 	state_save_register_item(device->machine, "mm58274c", device->tag, 0, mm58274c->seconds1);
 	state_save_register_item(device->machine, "mm58274c", device->tag, 0, mm58274c->seconds2);
-	state_save_register_item(device->machine, "mm58274c", device->tag, 0, mm58274c->tenths);		
+	state_save_register_item(device->machine, "mm58274c", device->tag, 0, mm58274c->tenths);
 
 	mm58274c->increment_rtc = timer_alloc(device->machine, increment_rtc, ((void*)device));
 	timer_adjust_periodic(mm58274c->increment_rtc, attotime_zero, 0, ATTOTIME_IN_MSEC(100));
@@ -491,7 +490,7 @@ static DEVICE_RESET( mm58274c )
 	mm58274c->clk_set = systime.local_time.year & 3 << 2;
 	if (mm58274c->intf->mode24)
 		mm58274c->clk_set |= clk_set_24;
-                
+
 	/* The clock count starts on 1st January 1900 */
 	mm58274c->wday = 1 + ((systime.local_time.weekday - mm58274c->intf->day1)%7);
 	mm58274c->years1 = (systime.local_time.year / 10) % 10;

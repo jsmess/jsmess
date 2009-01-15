@@ -52,7 +52,6 @@ DEVICE_START(hd63450)
 	hd63450_t* dmac = device->token;
 	int x;
 
-	assert(device->machine != NULL);
 	dmac->intf = device->static_config;
 
 	// Initialise timers and registers

@@ -251,13 +251,13 @@ struct _mc68901_t
 	UINT8 tbcr;							/* timer B control register */
 	UINT8 tcdcr;						/* timers C and D control register */
 	UINT8 tdr[MC68901_MAX_TIMERS];		/* timer data registers */
-	
+
 	UINT8 scr;							/* synchronous character register */
 	UINT8 ucr;							/* USART control register */
 	UINT8 tsr;							/* transmitter status register */
 	UINT8 rsr;							/* receiver status register */
 	UINT8 udr;							/* USART data register */
-	
+
 	/* counter timer state */
 	UINT8 tmc[MC68901_MAX_TIMERS];		/* timer main counters */
 	int ti[MC68901_MAX_TIMERS];			/* timer in latch */
@@ -265,7 +265,7 @@ struct _mc68901_t
 
 	/* interrupt state */
 	int irqlevel;						/* interrupt level latch */
-	
+
 	/* serial state */
 	UINT8 next_rsr;						/* receiver status register latch */
 	int rsr_read;						/* receiver status register read flag */
@@ -288,7 +288,7 @@ struct _mc68901_t
 
 	/* timers */
 	emu_timer *timer[MC68901_MAX_TIMERS]; /* counter timers */
-	
+
 	emu_timer *rx_timer;				/* receive timer */
 	emu_timer *tx_timer;				/* transmit timer */
 
@@ -1378,9 +1378,8 @@ static DEVICE_START( mc68901 )
 	mc68901_t *mc68901 = device->token;
 
 	/* validate arguments */
-	assert(device->machine != NULL);
 	assert(device->tag != NULL);
-	assert(strlen(device->tag) < 20);
+
 	mc68901->intf = device->static_config;
 
 	/* set initial values */

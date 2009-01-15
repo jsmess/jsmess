@@ -34,7 +34,7 @@ unsigned char SASIReadByte(const device_config* device)
 	unsigned char val;
 
 	/*ret = */image_fread(device,&val,1);
-	
+
 	return val;
 }
 
@@ -46,8 +46,6 @@ static void SASIWriteByte(const device_config* device, unsigned char val)
 DEVICE_START( x68k_hdc )
 {
 	sasi_ctrl_t* sasi = device->token;
-
-	assert(device->machine != NULL);
 
 	sasi->status = 0x00;
 	sasi->status_port = 0x00;
@@ -386,7 +384,7 @@ READ16_DEVICE_HANDLER( x68k_hdc_r )
 					sasi->transfer_byte_total = 0;
 				}
 			}
-			
+
 			switch(sasi->command[0])
 			{
 			case SASI_CMD_REQUEST_SENSE:
