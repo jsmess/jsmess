@@ -1640,7 +1640,6 @@ static device_start_err common_start(const device_config *device, wd17xx_type_t 
 
 	assert(device != NULL);
 	assert(device->tag != NULL);
-	assert(strlen(device->tag) < 20);
 	assert(device->static_config != NULL);
 
 	w->intf = device->static_config;
