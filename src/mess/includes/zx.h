@@ -12,7 +12,7 @@
 
 DRIVER_INIT( zx );
 MACHINE_RESET( zx80 );
-MACHINE_RESET( zx81 );
+MACHINE_RESET( lambda );
 MACHINE_RESET( pc8300 );
 
 READ8_HANDLER( zx_ram_r );
@@ -28,7 +28,8 @@ VIDEO_START( zx );
 VIDEO_EOF( zx );
 
 void zx_ula_bkgnd(running_machine *machine, int color);
-void zx_ula_r(running_machine *machine, int offs, const char *region);
+void zx_ula_r(running_machine *machine, int offs, const char *region, const UINT8 param);
+//void zx_ula_r(running_machine *machine, int offs, const char *region);
 //int zx_ula_r(running_machine *machine, int offs, const char *region);
 
 extern emu_timer *ula_nmi;

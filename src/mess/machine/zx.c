@@ -61,14 +61,21 @@ DRIVER_INIT ( zx )
 static DIRECT_UPDATE_HANDLER ( zx_setdirect )
 {
 	if (address & 0x8000)
-		zx_ula_r(space->machine, address, "main");
+		zx_ula_r(space->machine, address, "main", 0);
 	return address;
 }
 
 static DIRECT_UPDATE_HANDLER ( pc8300_setdirect )
 {
 	if (address & 0x8000)
-		zx_ula_r(space->machine, address, "gfx1");
+		zx_ula_r(space->machine, address, "gfx1", 0);
+	return address;
+}
+
+static DIRECT_UPDATE_HANDLER ( lambda_setdirect )
+{
+	if (address & 0x8000)
+		zx_ula_r(space->machine, address, "gfx1", 1);
 	return address;
 }
 
@@ -78,9 +85,9 @@ MACHINE_RESET ( zx80 )
 	zx_tape_bit = 0x80;
 }
 
-MACHINE_RESET ( zx81 )
+MACHINE_RESET ( lambda )
 {
-	memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), zx_setdirect);
+	memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), lambda_setdirect);
 	zx_tape_bit = 0x80;
 }
 

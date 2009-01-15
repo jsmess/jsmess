@@ -430,8 +430,6 @@ static MACHINE_DRIVER_START( zx81 )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(zx81_map, 0)
 
-	MDRV_MACHINE_RESET(zx81)
-
 	MDRV_GFXDECODE(zx81)
 
 	MDRV_CASSETTE_MODIFY( "cassette", zx81_cassette_config )
@@ -465,8 +463,19 @@ static MACHINE_DRIVER_START( pow3000 )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(pc8300_map, 0)
 
-	MDRV_MACHINE_RESET(pc8300)
+	MDRV_MACHINE_RESET(lambda)
 	MDRV_GFXDECODE(pow3000)
+	MDRV_PALETTE_INIT(zx80)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( lambda )
+	MDRV_IMPORT_FROM(ts1000)
+
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_PROGRAM_MAP(pc8300_map, 0)
+
+	MDRV_MACHINE_RESET(lambda)
+	MDRV_GFXDECODE(pc8300)
 	MDRV_PALETTE_INIT(zx80)
 MACHINE_DRIVER_END
 
@@ -547,4 +556,4 @@ COMP( 1981, zx81,       0,      0,      zx81,       zx81,       zx,     zx81,   
 COMP( 1982, ts1000,     zx81,   0,      ts1000,     zx81,       zx,     zx81,   "Timex Sinclair",           "Timex Sinclair 1000",                          0 )
 COMP( 1984, pc8300,     zx81,   0,      pc8300,     pow3000,    zx,     pc8300, "Your Computer",            "PC8300",                                       0 )
 COMP( 1983, pow3000,    zx81,   0,      pow3000,    pow3000,    zx,     pc8300, "Creon Enterprises",        "Power 3000",                                   GAME_NOT_WORKING )
-COMP( 1982, lambda,     zx81,   0,      pc8300,     pow3000,    zx,     zx81,   "Lambda Electronics Ltd",   "Lambda 8300",                                  GAME_NOT_WORKING )
+COMP( 1982, lambda,     zx81,   0,      lambda,     pow3000,    zx,     zx81,   "Lambda Electronics Ltd",   "Lambda 8300",                                  GAME_NOT_WORKING )
