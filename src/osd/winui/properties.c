@@ -139,6 +139,8 @@ b) Exit the dialog.
 #include "winutf8.h"
 #include "sound/2413intf.h"
 #include "sound/3812intf.h"
+#include "sound/samples.h"
+#include "sound/vlm5030.h"
 
 typedef HANDLE HTHEME;
 
