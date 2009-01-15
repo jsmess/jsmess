@@ -854,7 +854,7 @@ ROM_START ( hp48sx )
 		ROM_DEFAULT_BIOS("j")
 		ROM_REGION( 0x40000, "main", 0 )
 
-	/* in chronological order, from first revision, version r is default*/
+	/* in chronological order, from first revision, version j is default*/
 	ROM_SYSTEM_BIOS( 0, "a", "Version A" )
 	ROMX_LOAD( "sxrom-a", 
 		   0x00000, 0x40000, 
