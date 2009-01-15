@@ -135,10 +135,13 @@ The sorcerer has a UART device used by the serial interface and the cassette sys
 So far, it has been tested to work at 300 baud.
 
 ********************************************************************************/
+
 #include "driver.h"
+#include "cpu/z80/z80.h"
+#include "sound/speaker.h"
+#include "sound/wave.h"
 #include "includes/exidy.h"
 #include "machine/centroni.h"
-#include "cpu/z80/z80.h"
 #include "machine/wd17xx.h"
 #include "devices/basicdsk.h"
 #include "devices/cassette.h"
@@ -146,7 +149,6 @@ So far, it has been tested to work at 300 baud.
 #include "devices/cartslot.h"
 #include "devices/printer.h"
 #include "devices/z80bin.h"
-#include "sound/speaker.h"
 #include "machine/ay31015.h"
 
 

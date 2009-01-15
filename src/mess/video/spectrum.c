@@ -118,9 +118,9 @@ VIDEO_UPDATE( spectrum )
 
     for (count=0;count<32*8;count++)
     {
-			decodechar( screen->machine->gfx[0],count,spectrum_characterram);
-			decodechar( screen->machine->gfx[1],count,&spectrum_characterram[0x800]);
-			decodechar( screen->machine->gfx[2],count,&spectrum_characterram[0x1000]);
+		gfx_element_mark_dirty( screen->machine->gfx[0],count);
+		gfx_element_mark_dirty( screen->machine->gfx[1],count);
+		gfx_element_mark_dirty( screen->machine->gfx[2],count);
 	}
 
     for (count=0;count<32*8;count++)

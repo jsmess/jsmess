@@ -1,5 +1,6 @@
 #include "driver.h"
 #include "cpu/upd7810/upd7810.h"
+#include "sound/speaker.h"
 #include "devices/cartslot.h"
 #include "includes/gamepock.h"
 #include "gamepock.lh"

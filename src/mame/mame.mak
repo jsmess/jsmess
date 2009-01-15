@@ -178,19 +178,7 @@ CPUS += RSP
 CPUS += ALPHA8201
 CPUS += ALPHA8301
 CPUS += CDP1802
-CPUS += COP401
-CPUS += COP410
-CPUS += COP411
-CPUS += COP402
-CPUS += COP420
-CPUS += COP421
-CPUS += COP422
-CPUS += COP404
-CPUS += COP424
-CPUS += COP425
-CPUS += COP426
-CPUS += COP444
-CPUS += COP445
+CPUS += COP400
 CPUS += TLCS90
 CPUS += MB8841
 CPUS += MB8842
@@ -274,6 +262,7 @@ SOUNDS += MSM5205
 SOUNDS += MSM5232
 SOUNDS += OKIM6258
 SOUNDS += OKIM6295
+SOUNDS += OKIM6376
 SOUNDS += UPD7759
 SOUNDS += HC55516
 SOUNDS += K005289
@@ -314,6 +303,7 @@ SOUNDS += WAVE
 #SOUNDS += SID6581
 #SOUNDS += SID8580
 SOUNDS += SP0256
+SOUNDS += DIGITALKER
 
 
 #-------------------------------------------------
@@ -328,6 +318,7 @@ DRVLIBS = \
 	$(MAMEOBJ)/alliedl.a \
 	$(MAMEOBJ)/alpha.a \
 	$(MAMEOBJ)/amiga.a \
+	$(MAMEOBJ)/aristocr.a \
 	$(MAMEOBJ)/atari.a \
 	$(MAMEOBJ)/atlus.a \
 	$(MAMEOBJ)/barcrest.a \
@@ -460,6 +451,10 @@ $(MAMEOBJ)/amiga.a: \
 	$(DRIVERS)/cubocd32.o $(MACHINE)/cubocd32.o \
 	$(DRIVERS)/mquake.o \
 	$(DRIVERS)/upscope.o \
+
+$(MAMEOBJ)/aristocr.a: \
+	$(DRIVERS)/86lions.o \
+	$(DRIVERS)/caswin.o \
 
 $(MAMEOBJ)/atari.a: \
  	$(DRIVERS)/atarigx2.o $(VIDEO)/atarigx2.o \
@@ -764,6 +759,7 @@ $(MAMEOBJ)/igs.a: \
 	$(DRIVERS)/igs017.o \
 	$(DRIVERS)/igs_m027.o \
 	$(DRIVERS)/igs_m68.o \
+	$(DRIVERS)/igs_ncs.o \
 	$(DRIVERS)/iqblock.o $(VIDEO)/iqblock.o \
 	$(DRIVERS)/lordgun.o $(VIDEO)/lordgun.o \
 	$(DRIVERS)/pgm.o $(VIDEO)/pgm.o \
@@ -1522,6 +1518,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/39in1.o \
 	$(DRIVERS)/1945kiii.o \
 	$(DRIVERS)/2mindril.o \
+	$(DRIVERS)/3super8.o \
 	$(DRIVERS)/4enraya.o $(VIDEO)/4enraya.o \
 	$(DRIVERS)/4roses.o \
 	$(DRIVERS)/acefruit.o \
@@ -1536,9 +1533,9 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/beaminv.o \
 	$(DRIVERS)/blackt96.o \
 	$(DRIVERS)/brasil.o \
+	$(DRIVERS)/buster.o \
 	$(DRIVERS)/calomega.o $(VIDEO)/calomega.o \
 	$(DRIVERS)/carrera.o \
-	$(DRIVERS)/caswin.o \
 	$(DRIVERS)/cave.o $(VIDEO)/cave.o \
 	$(DRIVERS)/cidelsa.o $(VIDEO)/cidelsa.o \
 	$(DRIVERS)/coinmstr.o \
@@ -1564,7 +1561,6 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/esh.o \
 	$(DRIVERS)/esripsys.o $(VIDEO)/esripsys.o \
 	$(DRIVERS)/ettrivia.o \
-	$(DRIVERS)/filetto.o \
 	$(DRIVERS)/flower.o $(AUDIO)/flower.o $(VIDEO)/flower.o \
 	$(DRIVERS)/fortecar.o \
 	$(DRIVERS)/freekick.o $(VIDEO)/freekick.o \
@@ -1581,6 +1577,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/gumbo.o $(VIDEO)/gumbo.o \
 	$(DRIVERS)/gunpey.o \
 	$(DRIVERS)/hexa.o $(VIDEO)/hexa.o \
+	$(DRIVERS)/highvdeo.o \
 	$(DRIVERS)/homedata.o $(VIDEO)/homedata.o \
 	$(DRIVERS)/hotblock.o \
 	$(DRIVERS)/ilpag.o \
@@ -1627,6 +1624,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/pangofun.o \
 	$(DRIVERS)/pasha2.o \
 	$(DRIVERS)/pass.o $(VIDEO)/pass.o \
+	$(DRIVERS)/pcxt.o \
 	$(DRIVERS)/peplus.o \
 	$(DRIVERS)/pipeline.o \
 	$(DRIVERS)/pkscram.o \
@@ -1644,7 +1642,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/skylncr.o \
 	$(DRIVERS)/sliver.o \
 	$(DRIVERS)/slotcarn.o \
-	$(DRIVERS)/smstrv.o \
+	$(DRIVERS)/sms.o \
 	$(DRIVERS)/snookr10.o $(VIDEO)/snookr10.o \
 	$(DRIVERS)/spool99.o \
 	$(DRIVERS)/sprcros2.o $(VIDEO)/sprcros2.o \
@@ -1657,7 +1655,6 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/tattack.o \
 	$(DRIVERS)/taxidrvr.o $(VIDEO)/taxidrvr.o \
 	$(DRIVERS)/tcl.o \
-	$(DRIVERS)/tetriunk.o \
 	$(DRIVERS)/thayers.o \
 	$(DRIVERS)/thedeep.o $(VIDEO)/thedeep.o \
 	$(DRIVERS)/tiamc1.o $(VIDEO)/tiamc1.o $(AUDIO)/tiamc1.o \
@@ -1677,6 +1674,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/xyonix.o $(VIDEO)/xyonix.o \
 	$(DRIVERS)/hikaru.o \
 	$(DRIVERS)/cb2001.o \
+	$(DRIVERS)/sfbonus.o \
 
 #-------------------------------------------------
 # layout dependencies

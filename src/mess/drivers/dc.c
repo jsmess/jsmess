@@ -126,6 +126,7 @@ static void aica_irq(running_machine *machine, int irq)
 static const aica_interface dc_aica_interface =
 {
 	0,
+	0,
 	aica_irq
 };
 

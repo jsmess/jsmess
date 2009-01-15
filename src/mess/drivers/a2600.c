@@ -7,6 +7,7 @@
 #include "driver.h"
 #include "machine/6532riot.h"
 #include "cpu/m6502/m6502.h"
+#include "sound/wave.h"
 #include "sound/tiaintf.h"
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
@@ -738,9 +739,9 @@ static DIRECT_UPDATE_HANDLER( modeF6_opbase )
 static DIRECT_UPDATE_HANDLER( modeSS_opbase )
 {
 	if ( address & 0x1000 ) {
-		direct->mask = 0x7ff;
-		direct->min = ( address & 0xf800 );
-		direct->max = ( address & 0xf800 ) | 0x7ff;
+		direct->bytemask = 0x7ff;
+		direct->bytestart = ( address & 0xf800 );
+		direct->byteend = ( address & 0xf800 ) | 0x7ff;
 		if ( address & 0x800 ) {
 			direct->decrypted = bank_base[2];
 			direct->raw = bank_base[2];

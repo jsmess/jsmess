@@ -9,6 +9,7 @@
 
 #include "driver.h"
 #include "cpu/i8085/i8085.h"
+#include "sound/wave.h"
 #include "machine/8255ppi.h"
 #include "machine/8257dma.h"
 #include "machine/pit8253.h"
@@ -136,11 +137,11 @@ static UINT8 *mikrosha_io_mirror = NULL;
 static DIRECT_UPDATE_HANDLER( mikrosha_direct )
 {		
 	if (address >= 0x8000 && address <=0xFFFF) {
-			direct->mask = 0xffff;
+			direct->bytemask = 0xffff;
 			direct->raw = mikrosha_io_mirror;
 			direct->decrypted = mikrosha_io_mirror;
-			direct->min = 0x8000;
-			direct->max = 0xffff;
+			direct->bytestart = 0x8000;
+			direct->byteend = 0xffff;
 			mikrosha_io_mirror[address] = cpu_get_reg(space->machine->cpu[0], I8085_STATUS);
 	} 
 	return address;

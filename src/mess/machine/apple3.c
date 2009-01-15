@@ -662,10 +662,10 @@ static DIRECT_UPDATE_HANDLER( apple3_opbase )
 	if ((address & 0xFF00) == 0x0000)
 	{
 		opptr = apple3_get_zpa_addr(address);
-		direct->mask = ~0;
+		direct->bytemask = ~0;
 		direct->raw = direct->decrypted = opptr - address;
-		direct->min = address;
-		direct->max = address;
+		direct->bytestart = address;
+		direct->byteend = address;
 		address = ~0;
 	}
 	return address;

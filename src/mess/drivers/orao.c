@@ -13,6 +13,7 @@
 #include "driver.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/dac.h"
+#include "sound/wave.h"
 #include "includes/orao.h"
 #include "devices/cassette.h"
 #include "formats/orao_cas.h"

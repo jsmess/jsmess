@@ -14,6 +14,7 @@
 #include "sound/pokey.h"
 #include "machine/6821pia.h"
 #include "video/gtia.h"
+#include "sound/dac.h"
 
 /******************************************************************************
     Atari 800 memory map (preliminary)

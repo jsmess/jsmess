@@ -87,6 +87,7 @@ Some bugs left :
 #include "video/m6845.h"		/* CRTC display */
 #include "machine/nec765.h"	/* for floppy disc controller */
 #include "sound/ay8910.h"
+#include "sound/wave.h"
 #include "machine/mc146818.h"  /* Aleste RTC */
 
 /* Devices */

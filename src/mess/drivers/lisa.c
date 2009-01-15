@@ -15,6 +15,7 @@
 #include "devices/sonydriv.h"
 #include "machine/applefdc.h"
 #include "machine/6522via.h"
+#include "sound/speaker.h"
 
 
 /***************************************************************************

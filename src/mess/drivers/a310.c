@@ -296,18 +296,18 @@ static DIRECT_UPDATE_HANDLER( a310_setopbase )
 	// if the boot ROM is mapped in, do some trickery to make it show up
 	if (a310_latchrom)
 	{
-		direct->mask = 0x1fffff;
-		direct->min = 0;
-		direct->max = 0x1fffff;
+		direct->bytemask = 0x1fffff;
+		direct->bytestart = 0;
+		direct->byteend = 0x1fffff;
 		direct->raw = direct->decrypted = memory_region(space->machine, "main");
 	}
 	else	// executing from logical memory
 	{
 		UINT32 page = address / page_sizes[a310_pagesize];
 
-		direct->mask = page_sizes[a310_pagesize]-1;
-		direct->min = page * page_sizes[a310_pagesize];
-		direct->max = direct->min + direct->mask;
+		direct->bytemask = page_sizes[a310_pagesize]-1;
+		direct->bytestart = page * page_sizes[a310_pagesize];
+		direct->byteend = direct->bytestart + direct->bytemask;
 		direct->raw = direct->decrypted = (UINT8 *)&a310_physmem[(a310_pages[page] * page_sizes[a310_pagesize])>>2];
 	}
 

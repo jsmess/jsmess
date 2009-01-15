@@ -882,16 +882,14 @@ VIDEO_UPDATE( ygv608 )
   cos_theta = (double)ygv608.dx / (double)0x10000;
 
   if( ygv608.regs.s.zron )
-    copyrozbitmap( bitmap, work_bitmap,
+    copyrozbitmap( bitmap, cliprect, work_bitmap,
                    ( visarea->min_x << 16 ) +
                     ygv608.ax + 0x10000 * r *
                     ( -sin( alpha ) * cos_theta + cos( alpha ) * sin_theta ),
                    ( visarea->min_y << 16 ) +
                     ygv608.ay + 0x10000 * r *
                     ( cos( alpha ) * cos_theta + sin( alpha ) * sin_theta ),
-                   ygv608.dx, ygv608.dxy, ygv608.dyx, ygv608.dy, 0,
-                   cliprect,
-                   TRANSPARENCY_NONE, 0, 0 );
+                   ygv608.dx, ygv608.dxy, ygv608.dyx, ygv608.dy, 0);
   else
 #endif
     copybitmap( bitmap, work_bitmap, 0, 0, 0, 0, cliprect);
@@ -909,12 +907,11 @@ VIDEO_UPDATE( ygv608 )
 
 #ifdef _ENABLE_ROTATE_ZOOM
   if( ygv608.regs.s.zron )
-    copyrozbitmap( bitmap, work_bitmap,
+    copyrozbitmap_trans( bitmap, cliprect, work_bitmap,
                    ygv608.ax, // + ( visarea->min_x << 16 ),
                    ygv608.ay, // + ( visarea->min_y << 16 ),
                    ygv608.dx, ygv608.dxy, ygv608.dyx, ygv608.dy, 0,
-                   cliprect,
-                   TRANSPARENCY_PEN, 0, 0 );
+                   0 );
   else
 #endif
     copybitmap_trans( bitmap, work_bitmap, 0, 0, 0, 0, cliprect, 0 );
@@ -1046,7 +1043,6 @@ READ16_HANDLER( ygv608_r )
 			if (ygv608.regs.s.r2 & r2_saar)
 				ygv608.regs.s.saa++;
 			return (data << 8);
-			break;
 
 		case 0x02: /* P#2 - scroll data port */
 			data = ygv608.scroll_data_table[(ygv608.regs.s.r2 & r2_b_a) >> 4][ygv608.regs.s.sca];
@@ -1058,7 +1054,6 @@ READ16_HANDLER( ygv608_r )
 					ygv608.regs.s.r2 ^= r2_b_a;
 			}
 			return( data << 8 );
-			break;
 
 		case 0x03: /* P#3 - color palette data port */
 			data = ygv608.colour_palette[ygv608.regs.s.cc][p3_state];
@@ -1069,7 +1064,6 @@ READ16_HANDLER( ygv608_r )
 					ygv608.regs.s.cc++;
 			}
 			return( data << 8 );
-			break;
 
 		case 0x04: /* P#4 - register data port */
 		{

@@ -925,7 +925,7 @@ VIDEO_UPDATE( lisa )
 		for (x = 0; x < resx; x++)
 //			line_buffer[x] = (v[(x+y*resx)>>4] & (0x8000 >> ((x+y*resx) & 0xf))) ? 0 : 1;
 			line_buffer[x] = (v[(x+y*resx)>>4] & (0x8000 >> (x & 0xf))) ? 0 : 1;
-		draw_scanline8(bitmap, 0, y, resx, line_buffer, screen->machine->pens, -1);
+		draw_scanline8(bitmap, 0, y, resx, line_buffer, screen->machine->pens);
 	}
 	return 0;
 }
@@ -956,10 +956,10 @@ static DIRECT_UPDATE_HANDLER (lisa_OPbaseoverride)
 			}
 			else
 			{	/* system ROMs */
-				direct->mask = 0xffffff;
+				direct->bytemask = 0xffffff;
 				direct->raw = direct->decrypted = lisa_rom_ptr - (address & 0xffc000);
-				direct->min = (address & 0xffc000);
-				direct->max = (address & 0xffc000) + 0x003fff;
+				direct->bytestart = (address & 0xffc000);
+				direct->byteend = (address & 0xffc000) + 0x003fff;
 				/*logerror("ROM (setup mode)\n");*/
 			}
 
@@ -988,10 +988,10 @@ static DIRECT_UPDATE_HANDLER (lisa_OPbaseoverride)
 				/* out of segment limits : bus error */
 				logerror("illegal opbase address%lX\n", (long) address);
 			}
-			direct->mask = 0xffffff;
+			direct->bytemask = 0xffffff;
 			direct->raw = direct->decrypted = lisa_ram_ptr + mapped_address - address;
-			direct->min = (address & 0xffc000);
-			direct->max = (address & 0xffc000) + 0x003fff;
+			direct->bytestart = (address & 0xffc000);
+			direct->byteend = (address & 0xffc000) + 0x003fff;
 			/*logerror("RAM\n");*/
 			break;
 
@@ -1004,10 +1004,10 @@ static DIRECT_UPDATE_HANDLER (lisa_OPbaseoverride)
 			break;
 
 		case special_IO:
-			direct->mask = 0xffffff;
+			direct->bytemask = 0xffffff;
 			direct->raw = direct->decrypted = lisa_rom_ptr + (mapped_address & 0x003fff) - address;
-			direct->min = (address & 0xffc000);
-			direct->max = (address & 0xffc000) + 0x003fff;
+			direct->bytestart = (address & 0xffc000);
+			direct->byteend = (address & 0xffc000) + 0x003fff;
 			/*logerror("ROM\n");*/
 			break;
 		}

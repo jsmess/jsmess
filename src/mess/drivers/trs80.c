@@ -78,8 +78,9 @@ Not emulated:
 
 /* Core includes */
 #include "driver.h"
-#include "cpu/z80/z80.h"
 #include "deprecat.h"
+#include "cpu/z80/z80.h"
+#include "sound/wave.h"
 #include "includes/trs80.h"
 
 /* Components */

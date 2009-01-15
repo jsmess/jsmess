@@ -219,11 +219,11 @@ static DIRECT_UPDATE_HANDLER( osborne1_opbase )
 	{
 		if ( ! osborne1.bank2_enabled )
 		{
-			direct->mask = 0x0fff;
+			direct->bytemask = 0x0fff;
 			direct->decrypted = mess_ram + 0x2000;
 			direct->raw = mess_ram + 0x2000;
-			direct->min = 0x2000;
-			direct->max = 0x2fff;
+			direct->bytestart = 0x2000;
+			direct->byteend = 0x2fff;
 			return ~0;
 		}
 	}

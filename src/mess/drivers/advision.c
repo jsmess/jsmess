@@ -21,6 +21,7 @@
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/cop400/cop400.h"
 #include "devices/cartslot.h"
+#include "sound/dac.h"
 
 /* Memory Maps */
  

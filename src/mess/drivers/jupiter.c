@@ -240,8 +240,8 @@ static WRITE8_HANDLER( jupiter_vh_charram_w )
 	jupiter_charram[offset] = data;
 
 	/* decode character graphics again */
-	decodechar(space->machine->gfx[0], offset / 8, jupiter_charram);
-	decodechar(space->machine->gfx[1], offset / 8, jupiter_charram);
+	gfx_element_mark_dirty(space->machine->gfx[0], offset / 8);
+	gfx_element_mark_dirty(space->machine->gfx[1], offset / 8);
 }
 
 

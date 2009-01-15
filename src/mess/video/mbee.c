@@ -77,7 +77,7 @@ WRITE8_HANDLER ( mbee_pcg_w )
 		int chr = 0x80 + offset / 16;
 		pcgram[0x0800+offset] = data;
 		/* decode character graphics again */
-		decodechar(space->machine->gfx[0], chr, pcgram);
+		gfx_element_mark_dirty(space->machine->gfx[0], chr);
 	}
 }
 
@@ -90,7 +90,7 @@ WRITE8_HANDLER ( mbee_pcg_color_w )
 			int chr = 0x80 + offset / 16;
 			pcgram[0x0800+offset] = data;
 			/* decode character graphics again */
-			decodechar(space->machine->gfx[0], chr, pcgram);
+			gfx_element_mark_dirty(space->machine->gfx[0], chr);
 		}
 	}
 	else
@@ -352,7 +352,7 @@ WRITE8_HANDLER ( m6545_data_w )
 		addr = 0x17000+((data & 32) << 6);
 		memcpy(pcgram, memory_region(space->machine, "main")+addr, 0x800);
 		for (i = 0; i < 128; i++)
-			decodechar(space->machine->gfx[0],i, pcgram);
+			gfx_element_mark_dirty(space->machine->gfx[0], i);
 		break;
 	case 13:
 		crt.screen_address_lo = data;
@@ -475,7 +475,7 @@ VIDEO_UPDATE( mbee )
 	for ( i = 0; i < ARRAY_LENGTH(mc6845_cursor); i++)
 		pcgram[0x1000+i] = pcgram[(videoram[cursor]<<4) + i] ^ mc6845_cursor[i];
 
-	decodechar(screen->machine->gfx[0],256, pcgram);			// and into machine graphics
+	gfx_element_mark_dirty(screen->machine->gfx[0],256);			// and into machine graphics
 
 	for( i = 0; i < bytes; i++ )
 	{
@@ -517,7 +517,7 @@ VIDEO_UPDATE( mbeeic )
 	for ( i = 0; i < ARRAY_LENGTH(mc6845_cursor); i++)
 		pcgram[0x1000+i] = pcgram[(videoram[cursor]<<4) + i] ^ mc6845_cursor[i];
 
-	decodechar(screen->machine->gfx[0],256, pcgram);			// and into machine graphics
+	gfx_element_mark_dirty(screen->machine->gfx[0],256);			// and into machine graphics
 
 	for( i = 0; i < bytes; i++ )
 	{

@@ -19,8 +19,10 @@ Historical notes: TI made several last minute design changes.
 */
 
 #include "driver.h"
-#include "cpu/tms9900/tms9900.h"
 #include "deprecat.h"
+#include "cpu/tms9900/tms9900.h"
+#include "sound/sn76496.h"
+#include "sound/wave.h"
 #include "video/v9938.h"
 #include "machine/ti99_4x.h"
 #include "machine/tms9901.h"

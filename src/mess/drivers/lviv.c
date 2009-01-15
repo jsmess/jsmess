@@ -282,6 +282,8 @@ Timings:
 
 #include "driver.h"
 #include "cpu/i8085/i8085.h"
+#include "sound/speaker.h"
+#include "sound/wave.h"
 #include "machine/8255ppi.h"
 #include "includes/lviv.h"
 #include "devices/snapquik.h"

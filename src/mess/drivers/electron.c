@@ -27,6 +27,7 @@ Missing:
 #include "includes/electron.h"
 #include "devices/cassette.h"
 #include "formats/uef_cas.h"
+#include "sound/beep.h"
 
 static const rgb_t electron_palette[8]=
 {

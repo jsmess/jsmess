@@ -74,6 +74,7 @@ Hardware:   PPIA 8255
 #include "devices/printer.h"
 #include "devices/cassette.h"
 #include "devices/snapquik.h"
+#include "sound/speaker.h"
 
 #include "includes/atom.h"
 

@@ -10,6 +10,7 @@
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "cpu/i8085/i8085.h"
+#include "sound/wave.h"
 #include "machine/8255ppi.h"
 #include "machine/wd17xx.h"
 #include "devices/cassette.h"

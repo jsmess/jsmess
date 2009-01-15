@@ -224,7 +224,7 @@ static void asr_linefeed(running_machine *machine, int unit)
 	for (y=asr_window_offset_y; y<asr_window_offset_y+asr_window_height-asr_scroll_step; y++)
 	{
 		extract_scanline8(asr[unit].bitmap, asr_window_offset_x, y+asr_scroll_step, asr_window_width, buf);
-		draw_scanline8(asr[unit].bitmap, asr_window_offset_x, y, asr_window_width, buf, machine->pens, -1);
+		draw_scanline8(asr[unit].bitmap, asr_window_offset_x, y, asr_window_width, buf, machine->pens);
 	}
 
 	bitmap_fill(asr[unit].bitmap, &asr_scroll_clear_window, 0);

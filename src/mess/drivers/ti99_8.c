@@ -161,6 +161,8 @@ Keyboard interface:
 #include "devices/cartslot.h"
 #include "machine/smartmed.h"
 #include "sound/5220intf.h"
+#include "sound/sn76496.h"
+#include "sound/wave.h"
 #include "devices/harddriv.h"
 #include "machine/idectrl.h"
 

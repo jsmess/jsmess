@@ -23,6 +23,7 @@ Galaksija driver by Krzysztof Strzecha and Miodrag Milanovic
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
+#include "sound/wave.h"
 #include "includes/galaxy.h"
 #include "devices/snapquik.h"
 #include "devices/cassette.h"

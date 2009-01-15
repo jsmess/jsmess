@@ -33,6 +33,7 @@ NMI
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
 #include "sound/ay8910.h"
+#include "sound/dac.h"
 #include "formats/cgen_cas.h"
 
 

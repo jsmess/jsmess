@@ -30,6 +30,7 @@ would commence ($C00000).
 #include "machine/amigacd.h"
 #include "machine/amigacrt.h"
 #include "machine/msm6242.h"
+#include "sound/cdda.h"
 
 /* Devices */
 #include "devices/chd_cd.h"

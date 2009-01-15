@@ -137,6 +137,8 @@ b) Exit the dialog.
 #include "winmain.h"
 #include "strconv.h"
 #include "winutf8.h"
+#include "sound/2413intf.h"
+#include "sound/3812intf.h"
 
 typedef HANDLE HTHEME;
 
@@ -651,9 +653,10 @@ static char *GameInfoSound(UINT nIndex)
 	{
 		if (config->sound[chipnum].type != SOUND_DUMMY)
 		{
-			int clock,sound_type,count;
+			int clock,count;
+			sound_type sound_type_;
 
-			sound_type = config->sound[chipnum].type;
+			sound_type_ = config->sound[chipnum].type;
 			clock = config->sound[chipnum].clock;
 
 			count = 1;
@@ -661,7 +664,7 @@ static char *GameInfoSound(UINT nIndex)
 
 			/* Matching chips at the same clock are aggregated */
 			while (chipnum < ARRAY_LENGTH(config->sound)
-				&& config->sound[chipnum].type == sound_type
+				&& config->sound[chipnum].type == sound_type_
 				&& config->sound[chipnum].clock == clock)
 			{
 				count++;
@@ -673,7 +676,7 @@ static char *GameInfoSound(UINT nIndex)
 				sprintf(&buf[strlen(buf)],"%dx",count);
 			}
 
-			sprintf(&buf[strlen(buf)],"%s",sndtype_get_name(sound_type));
+			sprintf(&buf[strlen(buf)],"%s",sndtype_get_name(sound_type_));
 
 			if (clock)
 			{

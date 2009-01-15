@@ -24,16 +24,17 @@ TODO:
 #include "driver.h"
 #include "cpu/nec/nec.h"
 #include "cpu/i86/i86.h"
+#include "sound/okim6376.h"
 #include "fashion.lh"
 
 static UINT16 *blit_ram;
 
-VIDEO_START(brasil)
+static VIDEO_START(brasil)
 {
 
 }
 
-VIDEO_UPDATE(brasil)
+static VIDEO_UPDATE(brasil)
 {
 	int x,y,count;
 
@@ -63,7 +64,7 @@ VIDEO_UPDATE(brasil)
 	return 0;
 }
 
-VIDEO_UPDATE(vidpokr2)
+static VIDEO_UPDATE(vidpokr2)
 {
 	int x,y,count;
 
@@ -275,7 +276,11 @@ static WRITE16_HANDLER( fashion_write2_w )
 
 static WRITE16_HANDLER( write3_w )
 {
-	t3 = data;
+	if (t3 != data) {
+		t3 = data;
+		okim6376_data_0_lsb_w(space, 0, t3, mem_mask);
+		okim6376_data_0_lsb_w(space, 0, (1 << 4), mem_mask);
+	}
 //  popmessage("%04x %04x",t1,t3);
 }
 
@@ -588,7 +593,13 @@ static MACHINE_DRIVER_START( brasil )
 	MDRV_VIDEO_START(brasil)
 	MDRV_VIDEO_UPDATE(brasil)
 
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
 	//OkiM6376
+	MDRV_SOUND_ADD("samples", OKIM6376, XTAL_12MHz/2/2)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
 MACHINE_DRIVER_END
 
 
@@ -610,7 +621,13 @@ static MACHINE_DRIVER_START( vidpokr2 )
 	MDRV_VIDEO_START(brasil)
 	MDRV_VIDEO_UPDATE(vidpokr2)
 
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
 	//OkiM6376
+	MDRV_SOUND_ADD("samples", OKIM6376, XTAL_12MHz/2/2)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
 MACHINE_DRIVER_END
 
 /*
@@ -650,7 +667,7 @@ ROM_START( newmcard )
 	ROM_COPY( "user1", 0x0c0000, 0x000000, 0x40000 )
 
 	ROM_REGION( 0x080000, "samples", 0 ) /* M6376 Samples */
-	ROM_LOAD( "mc33.ic5", 0x00000, 0x80000, CRC(83a855ab) SHA1(7f9384c875b951d17caa91f8a7365edaf7f9afe1) )
+	ROM_LOAD( "mc31.ic15", 0x00000, 0x40000, CRC(8b72ffec) SHA1(fca5cf2594325e0c9fe446ddf2330c669f7f37a9) )
 ROM_END
 
 /*
@@ -709,6 +726,6 @@ static DRIVER_INIT( fashion )
 	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x0002, 0x0003, 0, 0, fashion_write2_w );
 }
 
-GAMEL( 19??, newmcard,  0,      vidpokr2,    brasil,   0,       ROT0,  "New High Video?", "New Magic Card",         GAME_NO_SOUND,                           layout_fashion )
-GAMEL( 2000, brasil,    0,      brasil,      brasil,   0,       ROT0,  "New High Video?", "Bra$il (Version 3)",     GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND, layout_fashion )
-GAMEL( 2000, fashion,   brasil, brasil,      fashion,  fashion, ROT0,  "New High Video?", "Fashion (Version 2.14)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND, layout_fashion )
+GAMEL( 19??, newmcard,  0,      vidpokr2,    brasil,   0,       ROT0,  "New High Video?", "New Magic Card",         0,                           layout_fashion )
+GAMEL( 2000, brasil,    0,      brasil,      brasil,   0,       ROT0,  "New High Video?", "Bra$il (Version 3)",     GAME_IMPERFECT_GRAPHICS, layout_fashion )
+GAMEL( 2000, fashion,   brasil, brasil,      fashion,  fashion, ROT0,  "New High Video?", "Fashion (Version 2.14)", GAME_IMPERFECT_GRAPHICS, layout_fashion )

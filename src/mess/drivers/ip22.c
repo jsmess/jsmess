@@ -40,6 +40,7 @@
 
 #include "driver.h"
 #include "cpu/mips/mips3.h"
+#include "sound/cdda.h"
 #include "machine/sgi.h"
 #include "machine/pckeybrd.h"
 #include "includes/pc_mouse.h"

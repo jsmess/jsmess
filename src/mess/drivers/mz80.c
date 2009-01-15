@@ -8,10 +8,11 @@
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
+#include "sound/speaker.h"
+#include "sound/wave.h"
 #include "machine/8255ppi.h"
 #include "machine/pit8253.h"
 #include "devices/cassette.h"
-#include "sound/speaker.h"
 #include "includes/mz80.h"
  
 static INPUT_PORTS_START( mz80k )

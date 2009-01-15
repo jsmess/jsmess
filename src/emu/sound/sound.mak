@@ -336,6 +336,18 @@ endif
 
 
 #-------------------------------------------------
+# National Semiconductor Digitalker
+#-------------------------------------------------
+
+SOUNDDEFS += -DHAS_DIGITALKER=$(if $(filter DIGITALKER,$(SOUNDS)),1,0)
+
+ifneq ($(filter DIGITALKER,$(SOUNDS)),)
+SOUNDOBJS += $(SOUNDOBJ)/digitalk.o
+endif
+
+
+
+#-------------------------------------------------
 # Nintendo custom sound chips
 #-------------------------------------------------
 
@@ -365,6 +377,7 @@ endif
 
 SOUNDDEFS += -DHAS_MSM5205=$(if $(filter MSM5205,$(SOUNDS)),1,0)
 SOUNDDEFS += -DHAS_MSM5232=$(if $(filter MSM5232,$(SOUNDS)),1,0)
+SOUNDDEFS += -DHAS_OKIM6376=$(if $(filter OKIM6376,$(SOUNDS)),1,0)
 SOUNDDEFS += -DHAS_OKIM6295=$(if $(filter OKIM6295,$(SOUNDS)),1,0)
 SOUNDDEFS += -DHAS_OKIM6258=$(if $(filter OKIM6258,$(SOUNDS)),1,0)
 
@@ -374,6 +387,10 @@ endif
 
 ifneq ($(filter MSM5232,$(SOUNDS)),)
 SOUNDOBJS += $(SOUNDOBJ)/msm5232.o
+endif
+
+ifneq ($(filter OKIM6376,$(SOUNDS)),)
+SOUNDOBJS += $(SOUNDOBJ)/okim6376.o
 endif
 
 ifneq ($(filter OKIM6295,$(SOUNDS)),)

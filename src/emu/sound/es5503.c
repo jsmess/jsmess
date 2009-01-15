@@ -64,7 +64,6 @@ typedef struct
 
 	UINT8 *docram;
 
-	int index;
 	sound_stream * stream;
 
 	void (*irq_callback)(running_machine *machine, int);	// IRQ callback
@@ -232,7 +231,6 @@ static SND_START( es5503 )
 
 	chip = auto_malloc(sizeof(*chip));
 	memset(chip, 0, sizeof(*chip));
-	chip->index = sndindex;
 
 	intf = config;
 
@@ -289,27 +287,21 @@ READ8_HANDLER(es5503_reg_0_r)
 		{
 			case 0:		// freq lo
 				return (chip->oscillators[osc].freq & 0xff);
-				break;
 
 			case 0x20:     	// freq hi
 				return (chip->oscillators[osc].freq >> 8);
-				break;
 
 			case 0x40:	// volume
 				return chip->oscillators[osc].vol;
-				break;
 
 			case 0x60:	// data
 				return chip->oscillators[osc].data;
-				break;
 
 			case 0x80:	// wavetable pointer
 				return (chip->oscillators[osc].wavetblpointer>>8) & 0xff;
-				break;
 
 			case 0xa0:	// oscillator control
 				return chip->oscillators[osc].control;
-				break;
 
 			case 0xc0:	// bank select / wavetable size / resolution
 				retval = 0;
@@ -321,7 +313,6 @@ READ8_HANDLER(es5503_reg_0_r)
 				retval |= (chip->oscillators[osc].wavetblsize<<3);
 				retval |= chip->oscillators[osc].resolution;
 				return retval;
-				break;
 		}
 	}
 	else	 // global registers
@@ -366,11 +357,9 @@ READ8_HANDLER(es5503_reg_0_r)
 				}
 
 				return retval;
-				break;
 
 			case 0xe1:	// oscillator enable
 				return chip->oscsenabled<<1;
-				break;
 
 			case 0xe2:	// A/D converter
 				if (chip->adc_read)

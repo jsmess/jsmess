@@ -9,6 +9,7 @@
 
 #include "driver.h"
 #include "cpu/i8085/i8085.h"
+#include "sound/wave.h"
 #include "machine/8255ppi.h"
 #include "machine/8257dma.h"
 #include "video/i8275.h"

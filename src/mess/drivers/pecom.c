@@ -8,6 +8,8 @@
 
 #include "driver.h"
 #include "cpu/cdp1802/cdp1802.h"
+#include "sound/cdp1869.h"
+#include "sound/wave.h"
 #include "video/cdp1869.h"
 #include "devices/cassette.h"
 #include "includes/pecom.h"

@@ -10,6 +10,7 @@
 
 #include "driver.h"
 #include "cpu/m6800/m6800.h"
+#include "sound/dac.h"
 #include "video/m6847.h"
 #include "includes/mc10.h"
 #include "devices/cassette.h"

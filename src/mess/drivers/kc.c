@@ -21,6 +21,8 @@
 #include "machine/z80sio.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
+#include "sound/speaker.h"
+#include "sound/wave.h"
 #include "machine/nec765.h"
 
 /* Devices */

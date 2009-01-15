@@ -13,6 +13,8 @@
 #include "driver.h"
 #include "includes/comx35.h"
 #include "cpu/cdp1802/cdp1802.h"
+#include "sound/cdp1869.h"
+#include "sound/wave.h"
 #include "devices/basicdsk.h"
 #include "devices/cassette.h"
 #include "devices/printer.h"

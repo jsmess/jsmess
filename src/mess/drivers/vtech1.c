@@ -101,6 +101,7 @@ Notes:
 /* Core includes */
 #include "driver.h"
 #include "cpu/z80/z80.h"
+#include "sound/wave.h"
 #include "includes/vtech1.h"
 
 /* Components */

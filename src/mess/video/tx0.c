@@ -363,7 +363,7 @@ static void tx0_typewriter_linefeed(running_machine *machine)
 	for (y=0; y<typewriter_window_height-typewriter_scroll_step; y++)
 	{
 		extract_scanline8(typewriter_bitmap, 0, y+typewriter_scroll_step, typewriter_window_width, buf);
-		draw_scanline8(typewriter_bitmap, 0, y, typewriter_window_width, buf, machine->pens, -1);
+		draw_scanline8(typewriter_bitmap, 0, y, typewriter_window_width, buf, machine->pens);
 	}
 
 	bitmap_fill(typewriter_bitmap, &typewriter_scroll_clear_window, pen_typewriter_bg);

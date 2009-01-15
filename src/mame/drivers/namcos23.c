@@ -775,6 +775,7 @@ static WRITE32_HANDLER( namcos23_textram_w )
 
 static VIDEO_START( ss23 )
 {
+	gfx_element_set_source(machine->gfx[0], (UINT8 *)namcos23_charram);
 	bgtilemap = tilemap_create(machine, TextTilemapGetInfo, tilemap_scan_rows, 16, 16, 64, 64);
 	tilemap_set_transparent_pen(bgtilemap, 0xf);
 }
@@ -936,11 +937,8 @@ static VIDEO_UPDATE( gorgon )
 
 static WRITE32_HANDLER( s23_txtchar_w )
 {
-	COMBINE_DATA(&namcos23_charram[offset]	);
-
-	decodechar( space->machine->gfx[0],offset/32,(UINT8 *)namcos23_charram );
-
-	tilemap_mark_all_tiles_dirty(bgtilemap);
+	COMBINE_DATA(&namcos23_charram[offset]);
+	gfx_element_mark_dirty(space->machine->gfx[0], offset/32);
 }
 
 static READ32_HANDLER( ss23_vstat_r )
@@ -1152,16 +1150,19 @@ static READ8_HANDLER( s23_mcu_rtc_r )
 			ret = make_bcd(systime.local_time.hour);	// hour (BCD, 0-23)
 			break;
 		case 3:
-			ret = make_bcd(weekday[systime.local_time.weekday]); // day of the week (1 = Monday, 7 = Sunday)
+			ret = make_bcd(weekday[systime.local_time.weekday]);	// low nibble = day of the week
+			ret |= (make_bcd(systime.local_time.mday) & 0x0f)<<4;	// high nibble = low digit of day
 			break;
 		case 4:
-			ret = make_bcd(systime.local_time.mday);	// day (BCD, 1-31)
+			ret = (make_bcd(systime.local_time.mday) >> 4);			// low nibble = high digit of day
+			ret |= (make_bcd(systime.local_time.month + 1) & 0x0f)<<4;	// high nibble = low digit of month
 			break;
 		case 5:
-			ret = make_bcd(systime.local_time.month + 1);	// month (BCD, 1-12)
+			ret = make_bcd(systime.local_time.month + 1) >> 4;	// low nibble = high digit of month
+			ret |= (make_bcd(systime.local_time.year % 10) << 4);	// high nibble = low digit of year
 			break;
 		case 6:
-			ret = make_bcd(systime.local_time.year % 100);	// year (BCD, 0-99)
+			ret = make_bcd(systime.local_time.year % 100) >> 4;	// low nibble = tens digit of year (BCD, 0-9)
 			break;
 	}
 

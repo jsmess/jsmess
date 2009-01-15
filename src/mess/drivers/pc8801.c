@@ -6,6 +6,7 @@
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
+#include "sound/beep.h"
 #include "machine/8255ppi.h"
 #include "includes/pc8801.h"
 #include "machine/nec765.h"

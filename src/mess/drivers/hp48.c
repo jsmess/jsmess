@@ -14,6 +14,7 @@
 #include "devices/xmodem.h"
 #include "devices/kermit.h"
 #include "cpu/saturn/saturn.h"
+#include "sound/dac.h"
 
 #include "includes/hp48.h"
 

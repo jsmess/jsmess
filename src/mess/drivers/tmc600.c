@@ -85,6 +85,7 @@ Notes:
 #include "devices/cassette.h"
 #include "devices/snapquik.h"
 #include "cpu/cdp1802/cdp1802.h"
+#include "sound/cdp1869.h"
 #include "includes/tmc600.h"
 #include "video/cdp1869.h"
 

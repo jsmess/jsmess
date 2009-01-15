@@ -2,8 +2,9 @@
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "machine/z80pio.h"
 #include "cpu/z80/z80daisy.h"
+#include "sound/wave.h"
+#include "machine/z80pio.h"
 #include "devices/snapquik.h"
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
@@ -153,7 +154,7 @@ static WRITE8_HANDLER( super80v_high_w )
 			pcgram[0x800+offset] = data;
 
 			/* decode character graphics again */
-			decodechar(space->machine->gfx[0], chr, pcgram);
+			gfx_element_mark_dirty(space->machine->gfx[0], chr);
 		}
 	}
 }
@@ -306,7 +307,7 @@ static VIDEO_UPDATE( super80v )
 		for ( i = 0; i < ARRAY_LENGTH(mc6845_cursor); i++)
 			pcgram[0x1000+i] = pcgram[(videoram[cursor])*16 + i] ^ mc6845_cursor[i];
 
-	decodechar(screen->machine->gfx[0],256, pcgram);			// and into machine graphics
+	gfx_element_mark_dirty(screen->machine->gfx[0],256);			// and into machine graphics
 
 	for( i = 0; i < bytes; i++ )
 	{

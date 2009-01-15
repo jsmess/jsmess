@@ -46,8 +46,10 @@
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "machine/z80pio.h"
 #include "cpu/z80/z80daisy.h"
+#include "sound/speaker.h"
+#include "sound/wave.h"
+#include "machine/z80pio.h"
 #include "machine/wd17xx.h"
 #include "includes/mbee.h"
 #include "devices/snapquik.h"
@@ -55,7 +57,6 @@
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
 #include "devices/z80bin.h"
-#include "sound/speaker.h"
 
 static const device_config *cassette_device_image(running_machine *machine)
 {

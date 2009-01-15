@@ -36,9 +36,10 @@ TODO:
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
+#include "cpu/z80/z80daisy.h"
+#include "sound/beep.h"
 #include "devices/basicdsk.h"
 #include "machine/wd17xx.h"
-#include "cpu/z80/z80daisy.h"
 #include "includes/osborne1.h"
 
 

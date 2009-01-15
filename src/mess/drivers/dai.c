@@ -60,6 +60,7 @@ Timings:
 
 #include "driver.h"
 #include "cpu/i8085/i8085.h"
+#include "sound/wave.h"
 #include "machine/8255ppi.h"
 #include "includes/dai.h"
 #include "machine/pit8253.h"

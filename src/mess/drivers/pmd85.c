@@ -171,6 +171,7 @@ I/O ports
 
 #include "driver.h"
 #include "cpu/i8085/i8085.h"
+#include "sound/wave.h"
 #include "devices/cassette.h"
 #include "includes/pmd85.h"
 #include "machine/8255ppi.h"

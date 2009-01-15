@@ -1601,10 +1601,10 @@ static DIRECT_UPDATE_HANDLER( apple2gs_opbase )
 
 		if (opptr != NULL)
 		{
-			direct->mask = ~0;
+			direct->bytemask = ~0;
 			direct->raw = direct->decrypted = opptr - address;
-			direct->min = address;
-			direct->max = address;
+			direct->bytestart = address;
+			direct->byteend = address;
 			address = ~0;
 		}
 	}

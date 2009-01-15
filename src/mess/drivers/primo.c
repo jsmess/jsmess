@@ -102,6 +102,8 @@ Interrupts:
 *******************************************************************************/
 
 #include "driver.h"
+#include "sound/speaker.h"
+#include "sound/wave.h"
 #include "includes/primo.h"
 #include "cpu/z80/z80.h"
 #include "devices/cassette.h"

@@ -9,24 +9,25 @@
 
     ROMs wanted:
         * Bouncer
-        * Turbo Sub [later version] (uses 512kbit graphics ROMs)
+        * Turbo Sub [later version] (improved gameplay, uses 27512 ROMs)
 
     Notes:
         * 'turbosub' executes a series of hardware tests on startup.
         To skip, hold down keypad '*' on reset.
         * Hold '*' during the game to access the operator menu.
 
-    Todo:
+    To do:
         * TMS5220 speech. The game is sending speech play commands to
         the sound CPU but any speech code greater than 2 is ignored (see $EC26).
         I think most of the speech data is stored in the upper half of the
         banked sound data ROMs but I don't know how or when the ROM
         bank is switched :/
 
-        * Determine if line drop outs occur on real hardware. Overclocking
-        the RIP CPU eliminates them.
+        * Confirm that occasional line drop outs do occur on real hardware.
+        14 sprites seems to be the maximum number that the RIP CPU can safely
+        process per line.
 
-        * Implement collision detection hardware (not used by Turbo Sub).
+        * Implement collision detection hardware (unused by Turbo Sub).
 
 ****************************************************************************/
 
@@ -238,7 +239,7 @@ static WRITE8_HANDLER( fdt_w )
  *
  *************************************/
 
-READ16_DEVICE_HANDLER( fdt_rip_r )
+static READ16_DEVICE_HANDLER( fdt_rip_r )
 {
 	offset = (offset & 0x7ff) << 1;
 
@@ -248,7 +249,7 @@ READ16_DEVICE_HANDLER( fdt_rip_r )
 		return (fdt_b[offset] << 8) | fdt_b[offset + 1];
 }
 
-WRITE16_DEVICE_HANDLER( fdt_rip_w )
+static WRITE16_DEVICE_HANDLER( fdt_rip_w )
 {
 	offset = (offset & 0x7ff) << 1;
 
@@ -275,17 +276,17 @@ WRITE16_DEVICE_HANDLER( fdt_rip_w )
    D7 = /FDONE
 */
 
-UINT8 rip_status_in(running_machine *machine)
+static UINT8 rip_status_in(running_machine *machine)
 {
-	UINT8 _vblank = !video_screen_get_vblank(machine->primary_screen);
-	UINT8 _hblank = !video_screen_get_hblank(machine->primary_screen);
-	UINT8 v0 =  video_screen_get_vpos(machine->primary_screen) & 1;
+	int vpos =  video_screen_get_vpos(machine->primary_screen);
+	UINT8 _vblank = !(vpos >= ESRIPSYS_VBLANK_START);
+//  UINT8 _hblank = !video_screen_get_hblank(machine->primary_screen);
 
 	return	_vblank
-			| (_hblank << 1)
+			| (esripsys_hblank << 1)
 			| (esripsys__12sel << 2)
 			| (_fbsel << 4)
-			| (v0 << 5)
+			| ((vpos & 1) << 5)
 			| (f_status & 0x80);
 }
 
@@ -464,7 +465,7 @@ static INPUT_CHANGED( coin_interrupt )
  *
  *************************************/
 
-INPUT_PORTS_START( turbosub )
+static INPUT_PORTS_START( turbosub )
 	PORT_START("KEYPAD_A")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )  PORT_PLAYER(3) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Keypad 0") PORT_CHANGED(keypad_interrupt, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )  PORT_PLAYER(3) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Keypad 1") PORT_CHANGED(keypad_interrupt, 0)
@@ -529,7 +530,6 @@ static WRITE8_HANDLER( s_200f_w )
 {
 	/* Bit 6 -> Reset latch U56A */
 	/* Bit 7 -> Clock latch U56B */
-
 	if (s_to_g_latch2 & 0x40)
 	{
 		u56a = 0;
@@ -679,13 +679,37 @@ static DRIVER_INIT( esripsys )
 
 	ptm6840_config(machine, 0, &ptm_intf);
 
-	memory_set_bankptr(machine, 2, &ROM[0x0000+0x0000]);
-	memory_set_bankptr(machine, 3, &ROM[0x0000+0x4000]);
-	memory_set_bankptr(machine, 4, &ROM[0x0000+0x8000]);
+	memory_set_bankptr(machine, 2, &ROM[0x0000]);
+	memory_set_bankptr(machine, 3, &ROM[0x4000]);
+	memory_set_bankptr(machine, 4, &ROM[0x8000]);
 
-	/* TODO: Finish me! */
-//  state_save_register_global_pointer(fdt_a, FDT_RAM_SIZE);
-//  state_save_register_global_pointer(fdt_b, FDT_RAM_SIZE);
+	/* Register stuff for state saving */
+	state_save_register_global_pointer(machine, fdt_a, FDT_RAM_SIZE);
+	state_save_register_global_pointer(machine, fdt_b, FDT_RAM_SIZE);
+	state_save_register_global_pointer(machine, cmos_ram, CMOS_RAM_SIZE);
+
+	state_save_register_global(machine, g_iodata);
+	state_save_register_global(machine, g_ioaddr);
+	state_save_register_global(machine, coin_latch);
+	state_save_register_global(machine, keypad_status);
+	state_save_register_global(machine, g_status);
+	state_save_register_global(machine, f_status);
+	state_save_register_global(machine, io_firq_status);
+	state_save_register_global(machine, cmos_ram_a2_0);
+	state_save_register_global(machine, cmos_ram_a10_3);
+
+	state_save_register_global(machine, u56a);
+	state_save_register_global(machine, u56b);
+	state_save_register_global(machine, g_to_s_latch1);
+	state_save_register_global(machine, g_to_s_latch2);
+	state_save_register_global(machine, s_to_g_latch1);
+	state_save_register_global(machine, s_to_g_latch2);
+	state_save_register_global(machine, dac_msb);
+	state_save_register_global(machine, dac_vol);
+	state_save_register_global(machine, tms_data);
+
+	state_save_register_global(machine, _fasel);
+	state_save_register_global(machine, _fbsel);
 }
 
 static NVRAM_HANDLER( esripsys )
@@ -698,7 +722,7 @@ static NVRAM_HANDLER( esripsys )
 		memset(cmos_ram, 0x00, CMOS_RAM_SIZE);
 }
 
-static esrip_config rip_config =
+static const esrip_config rip_config =
 {
 	fdt_rip_r,
 	fdt_rip_w,
@@ -729,6 +753,7 @@ static MACHINE_DRIVER_START( esripsys )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_RAW_PARAMS(ESRIPSYS_PIXEL_CLOCK, ESRIPSYS_HTOTAL, ESRIPSYS_HBLANK_END, ESRIPSYS_HBLANK_START, ESRIPSYS_VTOTAL, ESRIPSYS_VBLANK_END, ESRIPSYS_VBLANK_START)
 
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MDRV_VIDEO_START(esripsys)
 	MDRV_VIDEO_UPDATE(esripsys)
 
@@ -988,5 +1013,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1985, turbosub, 0,        esripsys, turbosub, esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSCA)", GAME_IMPERFECT_SOUND )
-GAME( 1985, turbosba, turbosub, esripsys, turbosub, esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSC6)", GAME_IMPERFECT_SOUND )
+GAME( 1985, turbosub, 0,        esripsys, turbosub, esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSCA)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+GAME( 1985, turbosba, turbosub, esripsys, turbosub, esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSC6)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )

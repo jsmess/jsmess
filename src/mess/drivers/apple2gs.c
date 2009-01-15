@@ -56,6 +56,7 @@
 #include "machine/mockngbd.h"
 #include "machine/8530scc.h"
 #include "sound/ay8910.h"
+#include "sound/dac.h"
 
 static const gfx_layout apple2gs_text_layout =
 {

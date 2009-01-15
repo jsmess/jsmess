@@ -22,6 +22,7 @@
 #include "devices/cassette.h"
 #include "formats/uef_cas.h"
 #include "formats/csw_cas.h"
+#include "sound/sn76496.h"
 
 
 /******************************************************************************

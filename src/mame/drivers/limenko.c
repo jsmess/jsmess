@@ -246,7 +246,7 @@ static void draw_single_sprite(bitmap_t *dest_bmp,const gfx_element *gfx,
 		const rectangle *clip,int priority)
 {
 	int pal_base = gfx->color_base + gfx->color_granularity * (color % gfx->total_colors);
-	UINT8 *source_base = gfx->gfxdata + (code % gfx->total_elements) * gfx->char_modulo;
+	const UINT8 *source_base = gfx_element_get_data(gfx, code % gfx->total_elements);
 
 	int sprite_screen_height = ((1<<16)*gfx->height+0x8000)>>16;
 	int sprite_screen_width = ((1<<16)*gfx->width+0x8000)>>16;
@@ -316,7 +316,7 @@ static void draw_single_sprite(bitmap_t *dest_bmp,const gfx_element *gfx,
 
 			for( y=sy; y<ey; y++ )
 			{
-				UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+				const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
 				UINT16 *dest = BITMAP_ADDR16(dest_bmp, y, 0);
 				UINT8 *pri = BITMAP_ADDR8(sprites_bitmap_pri, y, 0);
 
@@ -380,24 +380,12 @@ static void draw_sprites(running_machine *machine, UINT32 *sprites, const rectan
 
 		gfxdata	= base_gfx + 64 * code;
 
-		/* prepare GfxElement on the fly */
-		gfx.machine = machine;
-		gfx.width = width;
-		gfx.height = height;
-		gfx.total_elements = 1;
-		gfx.color_depth = 256;
-		gfx.color_granularity = 256;
-		gfx.color_base = 0;
-		gfx.total_colors = 0x10;
-		gfx.pen_usage = NULL;
-		gfx.gfxdata = gfxdata;
-		gfx.line_modulo = width;
-		gfx.char_modulo = 0;	/* doesn't matter */
-		gfx.flags = 0;
-
 		/* Bounds checking */
 		if ( (gfxdata + width * height - 1) >= gfx_max )
 			continue;
+
+		/* prepare GfxElement on the fly */
+		gfx_element_build_temporary(&gfx, machine, gfxdata, width, height, width, 0, 256, 0);
 
 		draw_single_sprite(sprites_bitmap,&gfx,0,color,flipx,flipy,x,y,cliprect,pri);
 

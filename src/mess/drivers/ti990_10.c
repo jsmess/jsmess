@@ -70,6 +70,7 @@ TODO :
 #include "driver.h"
 
 #include "cpu/tms9900/tms9900.h"
+#include "sound/beep.h"
 #include "machine/ti990.h"
 #include "machine/990_hd.h"
 #include "machine/990_tap.h"

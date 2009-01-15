@@ -27,6 +27,8 @@ Current issues: 4th and tree4th need their address maps worked out (eg, the stac
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
+#include "sound/dac.h"
+#include "sound/wave.h"
 #include "includes/zx.h"
 #include "devices/cassette.h"
 #include "formats/zx81_p.h"

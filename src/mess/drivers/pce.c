@@ -59,6 +59,7 @@ Super System Card:
 #include "devices/cartslot.h"
 #include "devices/chd_cd.h"
 #include "sound/c6280.h"
+#include "sound/cdda.h"
 #include "sound/msm5205.h"
 #include "hash.h"
 

@@ -325,6 +325,7 @@ the Edu64-1 used the full C64 BIOS. Confirmations are needed, anyway.
 #include "driver.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/sid6581.h"
+#include "sound/dac.h"
 #include "machine/6526cia.h"
 
 #include "machine/cbmipt.h"

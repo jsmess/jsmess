@@ -195,7 +195,6 @@ READ16_HANDLER( irem_ga20_r )
 	{
 		case 7:	// voice status.  bit 0 is 1 if active. (routine around 0xccc in rtypeleo)
 			return chip->channel[channel].play ? 1 : 0;
-			break;
 
 		default:
 			logerror("GA20: read unk. register %d, channel %d\n", offset & 0xf, channel);
@@ -248,7 +247,7 @@ static SND_START( iremga20 )
 
 	chip->stream = stream_create( device, 0, 2, clock/4, chip, IremGA20_update );
 
-	state_save_register_device_item_array(device, sndindex, chip->regs);
+	state_save_register_device_item_array(device, 0, chip->regs);
 	for (i = 0; i < 4; i++)
 	{
 		state_save_register_device_item(device, i, chip->channel[i].rate);

@@ -10,8 +10,9 @@
 
 #include "driver.h"
 #include "cpu/i8085/i8085.h"
-#include "includes/ut88.h"
 #include "sound/dac.h"
+#include "sound/wave.h"
+#include "includes/ut88.h"
 #include "devices/cassette.h"
 #include "formats/rk_cas.h"
 #include "ut88mini.lh"

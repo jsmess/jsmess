@@ -195,6 +195,7 @@ Apple 3.5 and Apple 5.25 drives - up to three devices
 #include "machine/applefdc.h"
 #include "machine/mockngbd.h"
 #include "sound/ay8910.h"
+#include "sound/dac.h"
 
 
 

@@ -415,6 +415,7 @@ const game_driver * const drivers[] =
 	/* Jangou Night   *//* (c) 1983 */
 	DRIVER( jngolady )  /* (c) 1984 */
 	DRIVER( cntrygrl )  /* (c) 1984 Royal Denshi */
+	DRIVER( luckygrl )  /* (c) 1984 Wing? */
 	DRIVER( nightgal )  /* (c) 1984 */
 	DRIVER( ngtbunny )  /* (c) 1984 */
 	DRIVER( royalngt )  /* (c) 1984 Royal Denshi */
@@ -1857,6 +1858,7 @@ const game_driver * const drivers[] =
 	DRIVER( ashura )	/* C43 (c) 1990 Taito Corporation (Japan) */
 	DRIVER( ashurau )	/* C43 (c) 1990 Taito America Corporation (US) */
 	DRIVER( hitice )	/* C59 (c) 1990 Williams (US) */
+	DRIVER( hiticej )	/* C59 (c) 1990 Midway/Taito Corporation (Japan) */
 	DRIVER( sbm )		/* C69 (c) 1990 Taito Corporation (Japan) */
 	DRIVER( selfeena )	/* ??? (c) 1991 East Technology */
 	DRIVER( silentd )	/* ??? (c) 1992 Taito Corporation Japan (World) */
@@ -4964,6 +4966,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( tbyahhoo )	/* GX424 (c) 1995 (Japan) */
 	DRIVER( tkmmpzdm )	/* GX515 (c) 1995 (Japan) */
 	DRIVER( salmndr2 )	/* GX521 (c) 1996 (Japan) */
+	DRIVER( salmnd2a )	/* GX521 (c) 1996 (Asia) */
 	DRIVER( sexyparo )	/* GX533 (c) 1996 (Japan) */
 	DRIVER( daiskiss )	/* GX535 (c) 1996 (Japan) */
 	DRIVER( tokkae )	/* GX615 (c) 1996 (Japan) */
@@ -7490,6 +7493,8 @@ Other Sun games
 	DRIVER( slqz2 )		/* (c) 1998 */
 	DRIVER( sdmg2 )		/* (c) 1997 */
 
+	DRIVER( igs_ncs )	/* (c) 2000 */
+
 	DRIVER( bigd2 )		/* (c) 2000 */
 	DRIVER( sdwx )		/* (c) 2002 */
 	DRIVER( sddz )		/* (c) 200? */
@@ -8212,6 +8217,7 @@ Other Sun games
 	DRIVER( sidewndr )	/* (c) 1981? ACE */
 	DRIVER( spellbnd )	/* (c) 1981? ACE */
 	DRIVER( starspnr )	/* (c) 1982? ACE */
+	DRIVER( acefruit )	/* (c) 1982? ACE */
 	DRIVER( attckufo )	/* (c) 1980 Ryoto Electric Co. */
 	DRIVER( fortecar )
 	DRIVER( jackpool )	/* (c) 1997 Electronic Projects */
@@ -8221,6 +8227,7 @@ Other Sun games
 	DRIVER( quizmstr )	/* (c) 1985 Coinmaster */
 	DRIVER( trailblz )	/* (c) 1987 Coinmaster */
 	DRIVER( supnudg2 )	/* (c) 1989 Coinmaster */
+	DRIVER( pokeroul ) 	/* (c) 1990 Coinmaster */
 	DRIVER( fruit )     /* (c) 1987? Coinmaster? */
 	DRIVER( egghunt )	/* (c) 1995 Invi Image */
 	DRIVER( magic10 )	/* (c) 1995 A.W.P. Games */
@@ -8366,8 +8373,10 @@ Other Sun games
 	DRIVER( destryea )	/* (c) 1981 Cidelsa */
 	DRIVER( draco )		/* (c) 1981 Cidelsa */
 	DRIVER( rockduck )	/* (c) 1983 Datel SAS */
-	DRIVER( tetriunk )
-	DRIVER( smstrv )	/* (c) 1984 SMS MFG CORP */
+	DRIVER( tetriskr )	/* (c) 1988? bootleg */
+	DRIVER( trvhang )	/* (c) 1984 SMS MFG CORP */
+	DRIVER( trvhanga )	/* (c) 1984 SMS MFG CORP */
+	DRIVER( sureshot )	/* (c) 1985 SMS MFG CORP */
 	DRIVER( skylncr )	/* (c) 1995 Bordun International */
 	DRIVER( butrfly )	/* (c) 1995 Bordun International */
 	DRIVER( madzoo )	/* (c) 1995 Bordun International */
@@ -8416,6 +8425,7 @@ Other Sun games
 	DRIVER( pexp0112 )	/* (c) 1995 IGT - International Gaming Technology */
 	DRIVER( pexs0006 )	/* (c) 1997 IGT - International Gaming Technology */
 	DRIVER( pexmp006 )	/* (c) 1997 IGT - International Gaming Technology */
+	DRIVER( pexmp017 )	/* (c) 1997 IGT - International Gaming Technology */
 	DRIVER( mirage )	/* (c) 1994 Mitchell */
 	DRIVER( dominob )	/* (c) 1990 Wonwoo Systems */
 	DRIVER( jongkyo )	/* (c) 1985 Kiwako */
@@ -8426,7 +8436,7 @@ Other Sun games
 	DRIVER( blazlaz )	/* (c) 1989 Hudson Soft */
 	DRIVER( paranoia )	/* (c) 1990 Naxat Soft */
 	DRIVER( vcombat )	/* (c) 1993 VR8 Inc. */
-	DRIVER( shadfgtr )	/* (c) 1989 Sega? */
+	DRIVER( shadfgtr )	/* (c) 1989 DUTECH Inc. */
 	DRIVER( blackt96 )	/* (c) 1996 D.G.R.M. of Korea */
 	DRIVER( magictg )	/* (c) 199? Acclaim */
 	DRIVER( magictga )	/* (c) 199? Acclaim */
@@ -8473,6 +8483,16 @@ Other Sun games
 	DRIVER( brasil )    /* (c) 2000 unknown */
 	DRIVER( fashion )   /* (c) 2000 unknown */
 
+	/* V30-based italian gambling games */
+ 	DRIVER( tour4000 )	/* (c) 2000 High Video */
+ 	DRIVER( cfever40 )	/* (c) 2000 High Video */
+ 	DRIVER( cfever50 )	/* (c) 2000 High Video */
+ 	DRIVER( tour4010 )	/* (c) 2000 High Video */
+ 	DRIVER( cfever51 )	/* (c) 2000 High Video */
+ 	DRIVER( cfever61 )	/* (c) 2000 High Video */
+ 	DRIVER( cfever1k )	/* (c) 2000 High Video */
+ 	DRIVER( girotutt )	/* (c) 2000 High Video */
+
 	/* M68k based italian gambling games */
 	DRIVER( ilpag )     /* (c) 19?? unknown */
 	DRIVER( mil4000 )   /* (c) 2000 Sure Milano */
@@ -8487,22 +8507,24 @@ Other Sun games
 	DRIVER( showhanc )	/* (c) 1999? Astro Corp. */
 
 	/* Dyna */
-	DRIVER( cb2001 )	/* (c) Dyna */
-	DRIVER( ncb3 )		/* (c) 199? Dyna/bootleg? */
-	DRIVER( cb3a )		/* (c) 199? Dyna/bootleg? */
-	DRIVER( cb3 )		/* (c) 199? Dyna/bootleg? */
+	DRIVER( cb2001 )	/* (c) 2001 Dyna Electronics */
+	DRIVER( ncb3 )		/* (c) 199? Dyna Electronics */
+	DRIVER( cb3a )		/* (c) 199? Dyna Electronics */
+	DRIVER( cb3 )		/* (c) 199? Dyna Electronics */
 	DRIVER( cmv801 )	/* (c) 198? Corsica */
-	DRIVER( cmv4 )		/* (c) 1992 Dyna */
-	DRIVER( cmaster )	/* (c) 1991 Dyna */
-	DRIVER( cm2v841 )	/* (c) 198? Dyna Electronics */
-	DRIVER( cm2841a )	/* (c) 198? Dyna Electronics */
-	DRIVER( cmast91 )	/* (c) 1991 Dyna */
+	DRIVER( cmv4 )		/* (c) 1992 Dyna Electronics */
+	DRIVER( cmv4a )		/* (c) 1992 Dyna Electronics */
+	DRIVER( cmaster )	/* (c) 1991 Dyna Electronics */
+	DRIVER( cmasterb )	/* (c) 1991 Dyna Electronics */
+	DRIVER( cmasterc )	/* (c) 1991 Dyna Electronics */
+	DRIVER( cmast91 )	/* (c) 1991 Dyna Electronics */
 
 	/* STG? */
 	DRIVER ( queen )
 
 	/* Aristocrat */
-	DRIVER ( caswin )
+	DRIVER ( 86lions )	/* (c) 1985? */
+	DRIVER ( caswin )	/* (c) 1985 */
 
 	/* Eagle */
 	DRIVER ( janshi )
@@ -8514,5 +8536,16 @@ Other Sun games
 	DRIVER( lucky8 )	/* (c) 1989 Wing Co. Ltd */
 	DRIVER( lucky8a )	/* (c) 1989 Wing Co. Ltd */
 	DRIVER( luckgrln )	/* (c) 1991 Wing Co. Ltd */
+
+	DRIVER( schery98 )	/* (c) 1998 Amcoe */
+	DRIVER( schery97 )	/* (c) 1998 Amcoe */
+	DRIVER( sfbonus )	/* (c) 199? Amcoe */
+	DRIVER( ladylinr )	/* (c) 198? TAB Austria */
+	DRIVER( kkojnoli )	/* 198? south korean hack */
+	DRIVER( mtonic )	/* 198? (c) Tonic */
+
+	DRIVER( 3super8 )	/* unknown */
+	DRIVER( buster )	/* (c) 1987 Marian Electronics Ltd. */
+	DRIVER( spielbud )	/* (c) 1985 ADP */
 
 #endif	/* DRIVER_RECURSIVE */

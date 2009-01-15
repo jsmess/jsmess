@@ -9,6 +9,7 @@
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
+#include "sound/wave.h"
 #include "devices/cassette.h"
 #include "includes/ondra.h"
 

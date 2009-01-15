@@ -217,6 +217,11 @@ VIDEO_START( arabian )
 		converted_gfx[offs * 4 + 1] = p3;
 		converted_gfx[offs * 4 + 0] = p4;
 	}
+
+    state_save_register_global_pointer(machine, main_bitmap, BITMAP_WIDTH * BITMAP_HEIGHT);
+    state_save_register_global_pointer(machine, converted_gfx, 0x8000 * 2);
+    state_save_register_global(machine, arabian_video_control);
+    state_save_register_global(machine, arabian_flip_screen);
 }
 
 
@@ -381,7 +386,7 @@ VIDEO_UPDATE( arabian )
 	{
 		/* non-flipped case */
 		if (!arabian_flip_screen)
-			draw_scanline8(bitmap, 0, y, BITMAP_WIDTH, &main_bitmap[y * BITMAP_WIDTH], pens, -1);
+			draw_scanline8(bitmap, 0, y, BITMAP_WIDTH, &main_bitmap[y * BITMAP_WIDTH], pens);
 
 		/* flipped case */
 		else
@@ -390,7 +395,7 @@ VIDEO_UPDATE( arabian )
 			int x;
 			for (x = 0; x < BITMAP_WIDTH; x++)
 				scanline[BITMAP_WIDTH - 1 - x] = main_bitmap[y * BITMAP_WIDTH + x];
-			draw_scanline8(bitmap, 0, BITMAP_HEIGHT - 1 - y, BITMAP_WIDTH, scanline, pens, -1);
+			draw_scanline8(bitmap, 0, BITMAP_HEIGHT - 1 - y, BITMAP_WIDTH, scanline, pens);
 		}
 	}
 	return 0;

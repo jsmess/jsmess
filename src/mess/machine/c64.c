@@ -1104,20 +1104,20 @@ static DIRECT_UPDATE_HANDLER( c64_direct )
 	{
 		if (c64_io_enabled) 
 		{
-			direct->mask = 0x0fff;
+			direct->bytemask = 0x0fff;
 			direct->decrypted = c64_io_mirror;
 			direct->raw = c64_io_mirror;
-			direct->min = 0x0000;
-			direct->max = 0xcfff;
+			direct->bytestart = 0x0000;
+			direct->byteend = 0xcfff;
 			c64_io_mirror[address & 0x0fff] = c64_read_io( space, address & 0x0fff );
 		} 
 		else 
 		{
-			direct->mask = 0x0fff;
+			direct->bytemask = 0x0fff;
 			direct->decrypted = c64_io_ram_r_ptr;
 			direct->raw = c64_io_ram_r_ptr;
-			direct->min = 0x0000;
-			direct->max = 0xcfff;
+			direct->bytestart = 0x0000;
+			direct->byteend = 0xcfff;
 		}
 		return ~0;
 	}

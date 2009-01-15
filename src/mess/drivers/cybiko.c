@@ -12,6 +12,7 @@
 
 /* Core includes */
 #include "driver.h"
+#include "sound/speaker.h"
 #include "includes/cybiko.h"
 
 /* Components */

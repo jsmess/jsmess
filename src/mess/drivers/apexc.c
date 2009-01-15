@@ -576,7 +576,7 @@ static void apexc_teletyper_linefeed(running_machine *machine)
 	for (y=teletyper_window_offset_y; y<teletyper_window_offset_y+teletyper_window_height-teletyper_scroll_step; y++)
 	{
 		extract_scanline8(apexc_bitmap, teletyper_window_offset_x, y+teletyper_scroll_step, teletyper_window_width, buf);
-		draw_scanline8(apexc_bitmap, teletyper_window_offset_x, y, teletyper_window_width, buf, machine->pens, -1);
+		draw_scanline8(apexc_bitmap, teletyper_window_offset_x, y, teletyper_window_width, buf, machine->pens);
 	}
 
 	bitmap_fill(apexc_bitmap, &teletyper_scroll_clear_window, 0);

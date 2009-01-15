@@ -15,6 +15,7 @@ Bruce Tomlin (hardware info)
 #include "includes/vectrex.h"
 #include "devices/cartslot.h"
 #include "sound/ay8910.h"
+#include "sound/dac.h"
 
 static ADDRESS_MAP_START(vectrex_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM

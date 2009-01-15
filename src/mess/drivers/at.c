@@ -52,6 +52,10 @@
 #include "machine/pci.h"
 #include "machine/kb_keytro.h"
 
+#include "sound/dac.h"
+#include "sound/speaker.h"
+#include "sound/saa1099.h"
+
 /* window resizing with dirtybuffering traping in xmess window */
 
 #define ym3812_StdClock 3579545

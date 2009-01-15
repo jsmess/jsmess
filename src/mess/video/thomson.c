@@ -989,10 +989,10 @@ VIDEO_UPDATE ( thom )
 	ypos = thom_bheight /* * scale */;
 	for ( y = 0; y < 200; v += xwidth, y++ , ypos ++ /* += scale */ )
 	{
-		draw_scanline16( bitmap, xbleft, ypos, xwidth, v, NULL, -1 );
+		draw_scanline16( bitmap, xbleft, ypos, xwidth, v, NULL );
 #if 0
 		if ( thom_hires )
-			draw_scanline16( bitmap, xbleft, ypos+1, xwidth, v, NULL, -1 );
+			draw_scanline16( bitmap, xbleft, ypos+1, xwidth, v, NULL );
 #endif
 	}
 

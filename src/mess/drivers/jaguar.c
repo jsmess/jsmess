@@ -49,6 +49,7 @@
 #include "includes/jaguar.h"
 #include "devices/cartslot.h"
 #include "devices/snapquik.h"
+#include "sound/dac.h"
 
 #define JAGUAR_CLOCK		XTAL_52MHz
 #define R3000_CLOCK			XTAL_40MHz

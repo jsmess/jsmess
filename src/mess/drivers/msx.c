@@ -290,6 +290,10 @@ PCB Layouts missing
 #include "devices/cassette.h"
 #include "formats/fmsx_cas.h"
 #include "sound/ay8910.h"
+#include "sound/dac.h"
+#include "sound/wave.h"
+#include "sound/k051649.h"
+#include "sound/2413intf.h"
 
 static ADDRESS_MAP_START (readmem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x1fff) AM_READ( SMH_BANK1 )

@@ -29,6 +29,7 @@ Philips P2000 1 Memory map
 #include "driver.h"
 #include "includes/p2000t.h"
 #include "cpu/z80/z80.h"
+#include "sound/speaker.h"
 #include "video/saa5050.h"
 
 

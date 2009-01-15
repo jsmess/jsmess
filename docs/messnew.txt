@@ -2,17 +2,17 @@
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
-Intelligent Software Enterprise 64  [Dirk Best]
-Hegener & Glaser Mephisto PHC 64  [Dirk Best]
+- Intelligent Software Enterprise 64  [Dirk Best]
+- Hegener & Glaser Mephisto PHC 64  [Dirk Best]
 
 
 
 System Driver Changes:
 ----------------------
-- [X68000] Added better implementation of 1024x1024 graphic layer.  [Barry Rodewald]
-
 - [TI81, TI85, TI86] Added the new ROM_DEFAULT_BIOS feature to select the most
   recent rom versions.  [Hobie Troxell]
+
+- [X68000] Added better implementation of 1024x1024 graphic layer.  [Barry Rodewald]
 
 
 
@@ -30,8 +30,12 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
+- The core is based on MAME 0.129u1.  This incorporates all features of the
+  update to this core.  [MAME team]
+
 - Changed the DS1315 implementation to be a device.  [Nathan Woods]
-- Changed the AT45DBxx and SST39VFxx to be a device [Miodrag Milanovic]
+
+- Changed the AT45DBxx and SST39VFxx to be a device. [Miodrag Milanovic]
 
 - Fixed a bug that caused the day of the week to not be properly returned by
   the DS1315.  (bug #1755) [Nathan Woods]

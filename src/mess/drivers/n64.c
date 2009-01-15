@@ -10,6 +10,7 @@
 #include "cpu/rsp/rsp.h"
 #include "cpu/mips/mips3.h"
 #include "sound/custom.h"
+#include "sound/dmadac.h"
 #include "devices/cartslot.h"
 #include "includes/n64.h"
 

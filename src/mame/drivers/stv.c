@@ -222,7 +222,7 @@ static INT32  scu_size_0,		/* Transfer DMA size lv 0*/
 			  scu_size_1,		/* lv 1*/
 			  scu_size_2;		/* lv 2*/
 
-struct
+static struct
 {
 	UINT8 vblank_out;
 	UINT8 vblank_in;
@@ -2426,18 +2426,18 @@ static const gfx_layout tiles16x16x4_layout =
 static const gfx_layout tiles8x8x8_layout =
 {
 	8,8,
-	0x100000/(64*8/8),
+	0x100000/(32*8/8),
 	8,
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0, 8, 16, 24, 32, 40, 48, 56 },
 	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64 },
-	64*8
+	32*8	/* really 64*8, but granularity is 32 bytes */
 };
 
 static const gfx_layout tiles16x16x8_layout =
 {
 	16,16,
-	0x100000/(128*16/8),
+	0x100000/(64*16/8),
 	8,
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0, 8, 16, 24, 32, 40, 48, 56,
@@ -2447,7 +2447,7 @@ static const gfx_layout tiles16x16x8_layout =
 	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
 	64*16, 64*17, 64*18, 64*19, 64*20, 64*21, 64*22, 64*23
 	},
-	128*16
+	64*16	/* really 128*16, but granularity is 32 bytes */
 };
 
 
@@ -2947,6 +2947,7 @@ ROM_END
 
 ROM_START( diehard ) /* must use USA, Europe or Taiwan BIOS */
 	STV_BIOS
+	ROM_DEFAULT_BIOS( "us" )
 
 	ROM_REGION32_BE( 0x3000000, "user1", 0 ) /* SH2 code */
 
@@ -3400,6 +3401,7 @@ ROM_END
 
 ROM_START( smleague ) /* only runs with the USA bios */
 	STV_BIOS
+	ROM_DEFAULT_BIOS( "us" )
 
 	ROM_REGION32_BE( 0x3000000, "user1", 0 ) /* SH2 code */
 	ROM_LOAD16_BYTE( "epr18777.13",               0x0000001, 0x0080000, CRC(8d180866) SHA1(d47ebabab6e06400312d39f68cd818852e496b96) )
@@ -3622,6 +3624,7 @@ On the other side of the PCB are 2 more maskROMs, MPR-18788 @ IC9 and MPR-18789 
 
 ROM_START( critcrsh ) /* Must use Europe or Asia BIOS */
 	STV_BIOS
+	ROM_DEFAULT_BIOS( "euro" )
 
 	ROM_REGION32_BE( 0x3000000, "user1", 0 ) /* SH2 code */
 	ROM_LOAD16_BYTE( "epr-18821.ic13",  0x0000001, 0x0080000, CRC(9a6658e2) SHA1(16dbae3d9ab584713afcb403f89fe71049609245) )

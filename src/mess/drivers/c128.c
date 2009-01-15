@@ -174,6 +174,7 @@ to use an EEPROM reader, in order to obtain a dump of the whole content.
 #include "cpu/z80/z80.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/sid6581.h"
+#include "sound/dac.h"
 #include "machine/6526cia.h"
 
 #include "machine/cbmipt.h"

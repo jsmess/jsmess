@@ -18,6 +18,7 @@
 
 #include "driver.h"
 #include "cpu/m6502/m6502.h"
+#include "sound/wave.h"
 #include "includes/oric.h"
 #include "machine/centroni.h"
 #include "devices/printer.h"

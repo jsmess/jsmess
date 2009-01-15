@@ -44,6 +44,7 @@
 #include "video/tms9928a.h"
 #include "devices/cassette.h"
 #include "sound/speaker.h"
+#include "sound/wave.h"
 
 
 static int load_state;

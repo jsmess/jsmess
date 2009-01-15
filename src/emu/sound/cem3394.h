@@ -13,7 +13,7 @@ struct _cem3394_interface
 {
 	double vco_zero_freq;				/* frequency at 0V for VCO */
 	double filter_zero_freq;			/* frequency at 0V for filter */
-	void (*external)(int, int, short *);/* external input source */
+	void (*external)(const device_config *, int, short *);/* external input source */
 };
 
 /* inputs */
@@ -44,5 +44,6 @@ void cem3394_set_voltage(int chip, int input, double voltage);
 double cem3394_get_parameter(int chip, int input);
 
 SND_GET_INFO( cem3394 );
+#define SOUND_CEM3394 SND_GET_INFO_NAME( cem3394 )
 
 #endif /* __CEM3394_H__ */

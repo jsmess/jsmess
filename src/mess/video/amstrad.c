@@ -940,7 +940,6 @@ static void amstrad_plus_sprite_draw(running_machine *machine, bitmap_t* scr_bit
 			xloc += rect.min_x;
 			yloc = amstrad_plus_asic_ram[sprptr+2] + (amstrad_plus_asic_ram[sprptr+3] << 8);
 			yloc += rect.min_y;
-			decodechar(machine->gfx[0],spr,amstrad_plus_asic_ram);
 			drawgfxzoom(scr_bitmap,machine->gfx[0],spr,0,0,0,xloc,yloc,&rect,
 				TRANSPARENCY_PEN,0,xmag,ymag);
 		}

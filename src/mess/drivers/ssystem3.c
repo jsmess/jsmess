@@ -38,7 +38,7 @@ backup of playfield rom and picture/description of its board
 #include "includes/ssystem3.h"
 #include "machine/6522via.h"
 #include "cpu/m6502/m6502.h"
-//#include "attotime.h"
+#include "sound/dac.h"
 
 static struct {
   UINT8 porta;
