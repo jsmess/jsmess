@@ -376,6 +376,7 @@ SOUNDS += SP0256
 DRVLIBS = \
 	$(MESSOBJ)/messdriv.o \
 	$(MESSOBJ)/3do.a \
+	$(MESSOBJ)/ac1.a \
 	$(MESSOBJ)/acorn.a \
 	$(MESSOBJ)/advision.a \
 	$(MESSOBJ)/amiga.a \
@@ -1388,6 +1389,11 @@ $(MESSOBJ)/einis.a:      \
 	$(MESS_MACHINE)/pecom.o \
 	$(MESS_VIDEO)/pecom.o \
 	
+$(MESSOBJ)/ac1.a:      \
+	$(MESS_DRIVERS)/ac1.o \
+	$(MESS_MACHINE)/ac1.o \
+	$(MESS_VIDEO)/ac1.o \
+
 $(MESSOBJ)/grundy.a: \
 	$(MESS_DRIVERS)/newbrain.o \
 	$(MESS_VIDEO)/newbrain.o \

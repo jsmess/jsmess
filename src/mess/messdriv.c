@@ -1065,6 +1065,10 @@ XL/XE 16kB OS roms
 	/* Kramer */
 	DRIVER(kramermc) /* 1987 Kramer MC				*/
 
+	/* AC1 */
+	DRIVER(ac1) 	/* 1984 Amateurcomputer AC1				*/
+	DRIVER(ac1_32) 	/* 1984 Amateurcomputer AC1 (32 lines)	*/
+
 	/* Ei Nis */
 	DRIVER(pecom64)
 
