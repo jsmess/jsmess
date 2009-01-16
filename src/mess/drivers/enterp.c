@@ -54,7 +54,7 @@ static void enterprise_update_memory_page(const address_space *space, offs_t pag
 	case 0x01:
 	case 0x02:
 	case 0x03:
-		memory_install_readwrite8_handler(space, start, end, 0, 0, SMH_BANK(page), SMH_NOP);
+		memory_install_readwrite8_handler(space, start, end, 0, 0, SMH_BANK((FPTR)page), SMH_NOP);
 		memory_set_bankptr(space->machine, page, memory_region(space->machine, "exos") + (index * 0x4000));
 		break;
 
@@ -62,13 +62,13 @@ static void enterprise_update_memory_page(const address_space *space, offs_t pag
 	case 0x05:
 	case 0x06:
 	case 0x07:
-		memory_install_readwrite8_handler(space, start, end, 0, 0, SMH_BANK(page), SMH_NOP);
+		memory_install_readwrite8_handler(space, start, end, 0, 0, SMH_BANK((FPTR)page), SMH_NOP);
 		memory_set_bankptr(space->machine, page, memory_region(space->machine, "cartridges") + ((index - 0x04) * 0x4000));
 		break;
 
 	case 0x20:
 	case 0x21:
-		memory_install_readwrite8_handler(space, start, end, 0, 0, SMH_BANK(page), SMH_NOP);
+		memory_install_readwrite8_handler(space, start, end, 0, 0, SMH_BANK((FPTR)page), SMH_NOP);
 		memory_set_bankptr(space->machine, page, memory_region(space->machine, "exdos") + ((index - 0x20) * 0x4000));
 		break;
 
@@ -79,7 +79,7 @@ static void enterprise_update_memory_page(const address_space *space, offs_t pag
 		/* additional 64k ram */
 		if (mess_ram_size == 128*1024)
 		{
-			memory_install_readwrite8_handler(space, start, end, 0, 0, SMH_BANK(page), SMH_BANK(page));
+			memory_install_readwrite8_handler(space, start, end, 0, 0, SMH_BANK((FPTR)page), SMH_BANK((FPTR)page));
 			memory_set_bankptr(space->machine, page, mess_ram + (index - 0xf4) * 0x4000);
 		}
 		else
@@ -93,8 +93,8 @@ static void enterprise_update_memory_page(const address_space *space, offs_t pag
 	case 0xfe:
 	case 0xff:
 		/* basic 64k ram */
-		memory_install_readwrite8_handler(space, start, end, 0, 0, SMH_BANK(page), SMH_BANK(page));
-		memory_set_bankptr(space->machine, page, mess_ram + (index - 0xfc) * 0x4000);
+		memory_install_readwrite8_handler(space, start, end, 0, 0, SMH_BANK((FPTR)page), SMH_BANK((FPTR)page));
+		memory_set_bankptr(space->machine, page, mess_ram + (index - 0xfc) * 0x4000);		  		
 		break;
 
 	default:
