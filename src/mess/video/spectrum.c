@@ -19,9 +19,8 @@
 #include "video/border.h"
 
 
-UINT8 *spectrum_characterram;
-UINT8 *spectrum_colorram;
-
+unsigned char *spectrum_video_ram;
+UINT8 retrace_cycles;
 int frame_number;    /* Used for handling FLASH 1 */
 int flash_invert;
 
@@ -32,7 +31,22 @@ VIDEO_START( spectrum )
 {
 	frame_number = 0;
 	flash_invert = 0;
+	
 	EventList_Initialise(30000);
+
+	retrace_cycles = SPEC_RETRACE_CYCLES;
+	
+	spectrum_screen_location = spectrum_video_ram;
+}
+
+VIDEO_START( spectrum_128 )
+{
+	frame_number = 0;
+	flash_invert = 0;
+
+	EventList_Initialise(30000);
+	
+	retrace_cycles = SPEC128_RETRACE_CYCLES;
 }
 
 
@@ -97,128 +111,80 @@ VIDEO_EOF( spectrum )
 
 ***************************************************************************/
 
+INLINE void spectrum_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
+{
+	*BITMAP_ADDR16(bitmap, y, x) = (UINT16)color;
+}
+
 VIDEO_UPDATE( spectrum )
 {
-	int count;
-	int full_refresh = 1;
-    static int last_invert = 0;
+        /* for now do a full-refresh */
+        int x, y, b, scrx, scry;
+        unsigned short ink, pap;
+        unsigned char *attr, *scr;
+		int full_refresh = 1;
 
-	if (full_refresh)
-	{
-		last_invert = flash_invert;
-	}
-	else
-	{
-		/* Update all flashing characters when necessary */
-		if (last_invert != flash_invert)
-		{
-			last_invert = flash_invert;
-		}
-	}
+        scr=spectrum_screen_location;
 
-    for (count=0;count<32*8;count++)
-    {
-		gfx_element_mark_dirty( screen->machine->gfx[0],count);
-		gfx_element_mark_dirty( screen->machine->gfx[1],count);
-		gfx_element_mark_dirty( screen->machine->gfx[2],count);
-	}
+        for (y=0; y<192; y++)
+        {
+                scrx=SPEC_LEFT_BORDER;
+                scry=((y&7) * 8) + ((y&0x38)>>3) + (y&0xC0);
+                attr=spectrum_screen_location + ((scry>>3)*32) + 0x1800;
 
-    for (count=0;count<32*8;count++)
-    {
-		int sx=count%32;
-		int sy=count/32;
-		unsigned char color;
+                for (x=0;x<32;x++)
+                {
+                        /* Get ink and paper colour with bright */
+                        if (flash_invert && (*attr & 0x80))
+                        {
+                                ink=((*attr)>>3) & 0x0f;
+                                pap=((*attr) & 0x07) + (((*attr)>>3) & 0x08);
+                        }
+                        else
+                        {
+                                ink=((*attr) & 0x07) + (((*attr)>>3) & 0x08);
+                                pap=((*attr)>>3) & 0x0f;
+                        }
 
-        color=get_display_color(spectrum_colorram[count],flash_invert);
-		drawgfx(bitmap,screen->machine->gfx[0],
-			count,
-			color+8, // use 2nd part of palette
-			0,0,
-        	(sx*8)+SPEC_LEFT_BORDER,(sy*8)+SPEC_TOP_BORDER,
-			0,TRANSPARENCY_NONE,0);
-
-        color=get_display_color(spectrum_colorram[count+0x100],flash_invert);
-		drawgfx(bitmap,screen->machine->gfx[1],
-			count,
-			color+8, // use 2nd part of palette
-			0,0,
-			(sx*8)+SPEC_LEFT_BORDER,((sy+8)*8)+SPEC_TOP_BORDER,
-			0,TRANSPARENCY_NONE,0);
-            
-        color=get_display_color(spectrum_colorram[count+0x200],flash_invert);
-		drawgfx(bitmap,screen->machine->gfx[2],
-			count,
-			color+8, // use 2nd part of palette
-			0,0,
-			(sx*8)+SPEC_LEFT_BORDER,((sy+16)*8)+SPEC_TOP_BORDER,
-			0,TRANSPARENCY_NONE,0);
+                        for (b=0x80;b!=0;b>>=1)
+                        {
+                                if (*scr&b)
+                                        spectrum_plot_pixel(bitmap,scrx++,SPEC_TOP_BORDER+scry,ink);
+                                else
+                                        spectrum_plot_pixel(bitmap,scrx++,SPEC_TOP_BORDER+scry,pap);
+			}
+                scr++;
+                attr++;
+                }
 	}
 
-    /* When screen refresh is called there is only one blank line
-        (synchronised with start of screen data) before the border lines.
-        There should be 16 blank lines after an interrupt is called.
-    */
-    draw_border(screen->machine, bitmap, full_refresh,
-            SPEC_TOP_BORDER, SPEC_DISPLAY_YSIZE, SPEC_BOTTOM_BORDER,
-            SPEC_LEFT_BORDER, SPEC_DISPLAY_XSIZE, SPEC_RIGHT_BORDER,
-            SPEC_LEFT_BORDER_CYCLES, SPEC_DISPLAY_XSIZE_CYCLES,
-            SPEC_RIGHT_BORDER_CYCLES, SPEC_RETRACE_CYCLES, 200, 0xfe);
+	draw_border(screen->machine, bitmap, full_refresh,
+		SPEC_TOP_BORDER, SPEC_DISPLAY_YSIZE, SPEC_BOTTOM_BORDER,
+		SPEC_LEFT_BORDER, SPEC_DISPLAY_XSIZE, SPEC_RIGHT_BORDER,
+		SPEC_LEFT_BORDER_CYCLES, SPEC_DISPLAY_XSIZE_CYCLES,
+		SPEC_RIGHT_BORDER_CYCLES, retrace_cycles, 200, 0xfe);
 	return 0;
 }
 
-const gfx_layout spectrum_charlayout =
-{
-	8,8,
-	256,
-	1,						/* 1 bits per pixel */
 
-	{ 0 },					/* no bitplanes; 1 bit per pixel */
-
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0, 8*256, 16*256, 24*256, 32*256, 40*256, 48*256, 56*256 },
-
-	8				/* every char takes 1 consecutive byte */
+static const rgb_t spectrum_palette[16] = {
+	MAKE_RGB(0x00, 0x00, 0x00),
+	MAKE_RGB(0x00, 0x00, 0xbf),
+	MAKE_RGB(0xbf, 0x00, 0x00), 
+	MAKE_RGB(0xbf, 0x00, 0xbf),
+	MAKE_RGB(0x00, 0xbf, 0x00), 
+	MAKE_RGB(0x00, 0xbf, 0xbf),
+	MAKE_RGB(0xbf, 0xbf, 0x00), 
+	MAKE_RGB(0xbf, 0xbf, 0xbf),
+	MAKE_RGB(0x00, 0x00, 0x00),
+	MAKE_RGB(0x00, 0x00, 0xff),
+	MAKE_RGB(0xff, 0x00, 0x00),
+	MAKE_RGB(0xff, 0x00, 0xff),
+	MAKE_RGB(0x00, 0xff, 0x00),
+	MAKE_RGB(0x00, 0xff, 0xff),
+	MAKE_RGB(0xff, 0xff, 0x00),
+	MAKE_RGB(0xff, 0xff, 0xff)
 };
-
-#define ZX_COL_0	MAKE_RGB(0x00, 0x00, 0x00)
-#define ZX_COL_1	MAKE_RGB(0x00, 0x00, 0xbf)
-#define ZX_COL_2	MAKE_RGB(0xbf, 0x00, 0x00) 
-#define ZX_COL_3	MAKE_RGB(0xbf, 0x00, 0xbf)
-#define ZX_COL_4	MAKE_RGB(0x00, 0xbf, 0x00) 
-#define ZX_COL_5	MAKE_RGB(0x00, 0xbf, 0xbf)
-#define ZX_COL_6	MAKE_RGB(0xbf, 0xbf, 0x00) 
-#define ZX_COL_7	MAKE_RGB(0xbf, 0xbf, 0xbf)
-#define ZX_COL_8	MAKE_RGB(0x00, 0x00, 0x00)
-#define ZX_COL_9	MAKE_RGB(0x00, 0x00, 0xff)
-#define ZX_COL_A	MAKE_RGB(0xff, 0x00, 0x00)
-#define ZX_COL_B	MAKE_RGB(0xff, 0x00, 0xff)
-#define ZX_COL_C	MAKE_RGB(0x00, 0xff, 0x00)
-#define ZX_COL_D	MAKE_RGB(0x00, 0xff, 0xff)
-#define ZX_COL_E	MAKE_RGB(0xff, 0xff, 0x00)
-#define ZX_COL_F	MAKE_RGB(0xff, 0xff, 0xff)
-
-static const rgb_t spectrum_palette[256 + 16] = {
-	ZX_COL_0,ZX_COL_1,ZX_COL_2,ZX_COL_3,ZX_COL_4,ZX_COL_5,ZX_COL_6,ZX_COL_7,ZX_COL_8,ZX_COL_9,ZX_COL_A,ZX_COL_B,ZX_COL_C,ZX_COL_D,ZX_COL_E,ZX_COL_F,
-	
-	ZX_COL_0,ZX_COL_0,ZX_COL_0,ZX_COL_1,ZX_COL_0,ZX_COL_2,ZX_COL_0,ZX_COL_3,ZX_COL_0,ZX_COL_4,ZX_COL_0,ZX_COL_5,ZX_COL_0,ZX_COL_6,ZX_COL_0,ZX_COL_7,
-	ZX_COL_1,ZX_COL_0,ZX_COL_1,ZX_COL_1,ZX_COL_1,ZX_COL_2,ZX_COL_1,ZX_COL_3,ZX_COL_1,ZX_COL_4,ZX_COL_1,ZX_COL_5,ZX_COL_1,ZX_COL_6,ZX_COL_1,ZX_COL_7,
-	ZX_COL_2,ZX_COL_0,ZX_COL_2,ZX_COL_1,ZX_COL_2,ZX_COL_2,ZX_COL_2,ZX_COL_3,ZX_COL_2,ZX_COL_4,ZX_COL_2,ZX_COL_5,ZX_COL_2,ZX_COL_6,ZX_COL_2,ZX_COL_7,	
-	ZX_COL_3,ZX_COL_0,ZX_COL_3,ZX_COL_1,ZX_COL_3,ZX_COL_2,ZX_COL_3,ZX_COL_3,ZX_COL_3,ZX_COL_4,ZX_COL_3,ZX_COL_5,ZX_COL_3,ZX_COL_6,ZX_COL_3,ZX_COL_7,	
-	ZX_COL_4,ZX_COL_0,ZX_COL_4,ZX_COL_1,ZX_COL_4,ZX_COL_2,ZX_COL_4,ZX_COL_3,ZX_COL_4,ZX_COL_4,ZX_COL_4,ZX_COL_5,ZX_COL_4,ZX_COL_6,ZX_COL_4,ZX_COL_7,	
-	ZX_COL_5,ZX_COL_0,ZX_COL_5,ZX_COL_1,ZX_COL_5,ZX_COL_2,ZX_COL_5,ZX_COL_3,ZX_COL_5,ZX_COL_4,ZX_COL_5,ZX_COL_5,ZX_COL_5,ZX_COL_6,ZX_COL_5,ZX_COL_7,
-	ZX_COL_6,ZX_COL_0,ZX_COL_6,ZX_COL_1,ZX_COL_6,ZX_COL_2,ZX_COL_6,ZX_COL_3,ZX_COL_6,ZX_COL_4,ZX_COL_6,ZX_COL_5,ZX_COL_6,ZX_COL_6,ZX_COL_6,ZX_COL_7,
-	ZX_COL_7,ZX_COL_0,ZX_COL_7,ZX_COL_1,ZX_COL_7,ZX_COL_2,ZX_COL_7,ZX_COL_3,ZX_COL_7,ZX_COL_4,ZX_COL_7,ZX_COL_5,ZX_COL_7,ZX_COL_6,ZX_COL_7,ZX_COL_7,	
-	ZX_COL_8,ZX_COL_8,ZX_COL_8,ZX_COL_9,ZX_COL_8,ZX_COL_A,ZX_COL_8,ZX_COL_B,ZX_COL_8,ZX_COL_C,ZX_COL_8,ZX_COL_D,ZX_COL_8,ZX_COL_E,ZX_COL_8,ZX_COL_F,
-	ZX_COL_9,ZX_COL_8,ZX_COL_9,ZX_COL_9,ZX_COL_9,ZX_COL_A,ZX_COL_9,ZX_COL_B,ZX_COL_9,ZX_COL_C,ZX_COL_9,ZX_COL_D,ZX_COL_9,ZX_COL_E,ZX_COL_9,ZX_COL_F,
-	ZX_COL_A,ZX_COL_8,ZX_COL_A,ZX_COL_9,ZX_COL_A,ZX_COL_A,ZX_COL_A,ZX_COL_B,ZX_COL_A,ZX_COL_C,ZX_COL_A,ZX_COL_D,ZX_COL_A,ZX_COL_E,ZX_COL_A,ZX_COL_F,	
-	ZX_COL_B,ZX_COL_8,ZX_COL_B,ZX_COL_9,ZX_COL_B,ZX_COL_A,ZX_COL_B,ZX_COL_B,ZX_COL_B,ZX_COL_C,ZX_COL_B,ZX_COL_D,ZX_COL_B,ZX_COL_E,ZX_COL_B,ZX_COL_F,	
-	ZX_COL_C,ZX_COL_8,ZX_COL_C,ZX_COL_9,ZX_COL_C,ZX_COL_A,ZX_COL_C,ZX_COL_B,ZX_COL_C,ZX_COL_C,ZX_COL_C,ZX_COL_D,ZX_COL_C,ZX_COL_E,ZX_COL_C,ZX_COL_F,	
-	ZX_COL_D,ZX_COL_8,ZX_COL_D,ZX_COL_9,ZX_COL_D,ZX_COL_A,ZX_COL_D,ZX_COL_B,ZX_COL_D,ZX_COL_C,ZX_COL_D,ZX_COL_D,ZX_COL_D,ZX_COL_E,ZX_COL_D,ZX_COL_F,
-	ZX_COL_E,ZX_COL_8,ZX_COL_E,ZX_COL_9,ZX_COL_E,ZX_COL_A,ZX_COL_E,ZX_COL_B,ZX_COL_E,ZX_COL_C,ZX_COL_E,ZX_COL_D,ZX_COL_E,ZX_COL_E,ZX_COL_E,ZX_COL_F,
-	ZX_COL_F,ZX_COL_8,ZX_COL_F,ZX_COL_9,ZX_COL_F,ZX_COL_A,ZX_COL_F,ZX_COL_B,ZX_COL_F,ZX_COL_C,ZX_COL_F,ZX_COL_D,ZX_COL_F,ZX_COL_E,ZX_COL_F,ZX_COL_F
-	};
-
-
 /* Initialise the palette */
 PALETTE_INIT( spectrum )
 {

@@ -739,7 +739,6 @@ $(MESSOBJ)/kaypro.a:   \
 $(MESSOBJ)/sinclair.a: \
 	$(MESS_VIDEO)/border.o		\
 	$(MESS_VIDEO)/spectrum.o		\
-	$(MESS_VIDEO)/spec128.o		\
 	$(MESS_VIDEO)/timex.o		\
 	$(MESS_VIDEO)/zx.o		\
 	$(MESS_DRIVERS)/zx.o		\

@@ -194,7 +194,7 @@ static int ROMSelection;
 static void scorpion_update_memory(running_machine *machine)
 {
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	spectrum_128_screen_location = mess_ram + ((spectrum_128_port_7ffd_data & 8) ? (7<<14) : (5<<14));
+	spectrum_screen_location = mess_ram + ((spectrum_128_port_7ffd_data & 8) ? (7<<14) : (5<<14));
 
 	memory_set_bankptr(machine, 4, mess_ram + (((spectrum_128_port_7ffd_data & 0x07) | ((scorpion_256_port_1ffd_data & 0x10)>>1)) * 0x4000));
 

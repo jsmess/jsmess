@@ -41,7 +41,7 @@ static DIRECT_UPDATE_HANDLER( pentagon_direct )
 
 static void pentagon_update_memory(running_machine *machine)
 {	
-	spectrum_128_screen_location = mess_ram + ((spectrum_128_port_7ffd_data & 8) ? (7<<14) : (5<<14));
+	spectrum_screen_location = mess_ram + ((spectrum_128_port_7ffd_data & 8) ? (7<<14) : (5<<14));
 
 	memory_set_bankptr(machine, 4, mess_ram + ((spectrum_128_port_7ffd_data & 0x07) * 0x4000));
 

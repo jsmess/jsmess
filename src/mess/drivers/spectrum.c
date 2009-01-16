@@ -155,7 +155,7 @@ http://www.z88forever.org.uk/zxplus3e/
 #include "devices/cassette.h"
 #include "formats/tzx_cas.h"
 
-
+unsigned char *spectrum_screen_location = NULL;
 
 /****************************************************************************************************/
 /* Spectrum 48k functions */
@@ -199,8 +199,7 @@ WRITE8_HANDLER(spectrum_port_fe_w)
 
 static ADDRESS_MAP_START (spectrum_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x57ff) AM_RAM AM_BASE(&spectrum_characterram )
-	AM_RANGE(0x5800, 0x5aff) AM_RAM AM_BASE(&spectrum_colorram )
+	AM_RANGE(0x4000, 0x5aff) AM_RAM AM_BASE(&spectrum_video_ram )
 	AM_RANGE(0x5b00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -294,7 +293,7 @@ READ8_HANDLER(spectrum_port_df_r)
 
 static  READ8_HANDLER ( spectrum_port_ula_r )
 {
-	return video_screen_get_vpos(space->machine->primary_screen)<193 ? spectrum_colorram[(video_screen_get_vpos(space->machine->primary_screen)&0xf8)<<2]:0xff;
+	return video_screen_get_vpos(space->machine->primary_screen)<193 ? spectrum_video_ram[(video_screen_get_vpos(space->machine->primary_screen)&0xf8)<<2]:0xff;
 }
 
 /* ports are not decoded full.
@@ -308,12 +307,6 @@ static ADDRESS_MAP_START (spectrum_io, ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 /****************************************************************************************************/
-static GFXDECODE_START( spectrum )
-	GFXDECODE_ENTRY( 0, 0x0, spectrum_charlayout, 0, 0x80 )
-	GFXDECODE_ENTRY( 0, 0x0, spectrum_charlayout, 0, 0x80 )
-	GFXDECODE_ENTRY( 0, 0x0, spectrum_charlayout, 0, 0x80 )
-GFXDECODE_END
-
 INPUT_PORTS_START( spectrum )
 	PORT_START("LINE0") /* [0] 0xFEFE */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CAPS SHIFT") PORT_CODE(KEYCODE_LSHIFT)
@@ -472,8 +465,7 @@ MACHINE_DRIVER_START( spectrum )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(SPEC_SCREEN_WIDTH, SPEC_SCREEN_HEIGHT)
 	MDRV_SCREEN_VISIBLE_AREA(0, SPEC_SCREEN_WIDTH-1, 0, SPEC_SCREEN_HEIGHT-1)
-	MDRV_GFXDECODE( spectrum )
-	MDRV_PALETTE_LENGTH(256 + 16)
+	MDRV_PALETTE_LENGTH(16)
 	MDRV_PALETTE_INIT( spectrum )
 
 	MDRV_VIDEO_START( spectrum )

@@ -166,7 +166,6 @@ static const ay8910_interface spectrum_ay_interface =
 /* Spectrum 128 specific functions */
 
 int spectrum_128_port_7ffd_data = -1;
-unsigned char *spectrum_128_screen_location = NULL;
 
 static WRITE8_HANDLER(spectrum_128_port_7ffd_w)
 {
@@ -194,12 +193,12 @@ void spectrum_128_update_memory(running_machine *machine)
 	if (spectrum_128_port_7ffd_data & 8)
 	{
 			logerror("SCREEN 1: BLOCK 7\n");
-			spectrum_128_screen_location = mess_ram + (7<<14);
+			spectrum_screen_location = mess_ram + (7<<14);
 	}
 	else
 	{
 			logerror("SCREEN 0: BLOCK 5\n");
-			spectrum_128_screen_location = mess_ram + (5<<14);
+			spectrum_screen_location = mess_ram + (5<<14);
 	}
 
 	/* select ram at 0x0c000-0x0ffff */
@@ -229,7 +228,7 @@ void spectrum_128_update_memory(running_machine *machine)
 
 static  READ8_HANDLER ( spectrum_128_ula_r )
 {
-	return video_screen_get_vpos(space->machine->primary_screen)<193 ? spectrum_128_screen_location[0x1800|(video_screen_get_vpos(space->machine->primary_screen)&0xf8)<<2]:0xff;
+	return video_screen_get_vpos(space->machine->primary_screen)<193 ? spectrum_screen_location[0x1800|(video_screen_get_vpos(space->machine->primary_screen)&0xf8)<<2]:0xff;
 }
 
 static ADDRESS_MAP_START (spectrum_128_io, ADDRESS_SPACE_IO, 8)
@@ -280,10 +279,9 @@ MACHINE_DRIVER_START( spectrum_128 )
     /* video hardware */
 	MDRV_SCREEN_MODIFY("main")
 	MDRV_PALETTE_LENGTH(16)
-	MDRV_PALETTE_INIT( spectrum_128 )
+	MDRV_PALETTE_INIT( spectrum )
 	MDRV_SCREEN_REFRESH_RATE(50.021)
 	MDRV_VIDEO_START( spectrum_128 )
-	MDRV_VIDEO_UPDATE( spectrum_128 )
 
 	/* sound hardware */
 	MDRV_SOUND_ADD("ay8912", AY8912, 1773400)

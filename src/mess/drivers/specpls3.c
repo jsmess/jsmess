@@ -215,12 +215,12 @@ void spectrum_plus3_update_memory(running_machine *machine)
 	if (spectrum_128_port_7ffd_data & 8)
 	{
 			logerror("+3 SCREEN 1: BLOCK 7\n");
-			spectrum_128_screen_location = mess_ram + (7<<14);
+			spectrum_screen_location = mess_ram + (7<<14);
 	}
 	else
 	{
 			logerror("+3 SCREEN 0: BLOCK 5\n");
-			spectrum_128_screen_location = mess_ram + (5<<14);
+			spectrum_screen_location = mess_ram + (5<<14);
 	}
 
 	if ((spectrum_plus3_port_1ffd_data & 0x01)==0)
