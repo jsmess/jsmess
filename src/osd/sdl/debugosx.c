@@ -2213,7 +2213,7 @@ static int memory_handle_command(debugwin_info *info, EventRef inEvent)
 			
 			if ( sel > 0 )
 			{
-				memory_view_set_subview(info->view[0].view, sel);
+				memory_view_set_subview(info->view[0].view, sel-1);
 				memory_update_caption(info);
 
 				// reset the focus
@@ -2464,7 +2464,7 @@ static void disasm_create_window(running_machine *machine)
 		if (cursel == 0 && subview->space->cpu == curcpu)
 			cursel = item;
 	}
-	disasm_view_set_subview(info->view[0].view, cursel);
+	disasm_view_set_subview(info->view[0].view, cursel-1);
 	
 	SetControlData(info->otherwnd[0], kControlEntireControl, kControlPopupButtonOwnedMenuRefTag, sizeof(popupmenu),&popupmenu);
 #if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_4
@@ -2643,7 +2643,7 @@ static int disasm_handle_command(debugwin_info *info, EventRef inEvent)
 			
 			if ( sel > 0 )
 			{
-				disasm_view_set_subview(info->view[0].view, sel);
+				disasm_view_set_subview(info->view[0].view, sel-1);
 				disasm_update_caption(info);
 
 				// reset the focus

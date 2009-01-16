@@ -51,6 +51,7 @@ USE_DISPATCH_GL = 1
 # There is no need to play with this option unless you are doing
 # active development on sdlmame or SDL.
 
+#SDL_INSTALL_ROOT = /usr/local/sdl13w32
 #SDL_INSTALL_ROOT = /usr/local/sdl13
 #SDL_INSTALL_ROOT = /usr/local/test
 
@@ -205,6 +206,10 @@ ifndef NO_OPENGL
 OSDOBJS += $(SDLOBJ)/drawogl.o
 endif
 
+ifdef SDL_INSTALL_ROOT
+OSDOBJS += $(SDLOBJ)/draw13.o
+endif
+
 # add the debugger includes
 CFLAGS += -Isrc/debug
 
@@ -285,6 +290,13 @@ endif # Solaris
 
 # Win32: add the necessary libraries
 ifeq ($(TARGETOS),win32)
+
+ifdef SDL_INSTALL_ROOT
+CFLAGS += -I$(SDL_INSTALL_ROOT)/include
+LIBS += -L$(SDL_INSTALL_ROOT)/lib 
+# -Wl,-rpath,$(SDL_INSTALL_ROOT)/lib -lSDL $(LIBGL)
+endif
+
 OSDCOREOBJS += $(SDLOBJ)/main.o
 SDLMAIN = $(SDLOBJ)/main.o
 
@@ -338,6 +350,9 @@ TOOLS += \
 $(SDLOBJ)/drawsdl.o : $(SRC)/emu/rendersw.c
 
 $(SDLOBJ)/drawogl.o : $(SDLSRC)/drawogl.c $(SDLSRC)/texcopy.c $(SDLSRC)/scale2x.c $(SDLSRC)/scale2x_core.c
+
+# draw13 depends
+$(SDLOBJ)/draw13.o : $(SDLSRC)/blit13.h
 
 # due to quirks of using /bin/sh, we need to explicitly specify the current path
 CURPATH = ./
