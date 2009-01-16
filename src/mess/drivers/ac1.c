@@ -148,5 +148,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT   INIT  CONFIG COMPANY                 FULLNAME   FLAGS */
-COMP( 1984, ac1,     0,      0, 	ac1, 	ac1, 	ac1, NULL,  "", "Amateurcomputer AC1",		 0)
-COMP( 1984, ac1_32,  ac1,    0, 	ac1_32,	ac1, 	ac1, NULL,  "", "Amateurcomputer AC1 (32 lines)",		 0)
+COMP( 1984, ac1,     0,      0, 	ac1, 	ac1, 	ac1, NULL,  "Frank Heyder", "Amateurcomputer AC1",		 0)
+COMP( 1984, ac1_32,  ac1,    0, 	ac1_32,	ac1, 	ac1, NULL,  "Frank Heyder", "Amateurcomputer AC1 (32 lines)",		 0)
