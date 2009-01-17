@@ -5,6 +5,7 @@ New System Drivers Supported (in no particular order):
 - Intelligent Software Enterprise 64  [Dirk Best]
 - Hegener & Glaser Mephisto PHC 64  [Dirk Best]
 - Amateurcomputer AC1 [Miodrag Milanovic]
+- Pilot 1000, Pilot 5000, PalmPilot Personal, PalmPilot Pro, Palm III [MooglyGuy, R. Belmont]
 
 
 System Driver Changes:

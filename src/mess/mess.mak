@@ -463,6 +463,7 @@ DRVLIBS = \
 	$(MESSOBJ)/rca.a \
 	$(MESSOBJ)/rockwell.a \
 	$(MESSOBJ)/rt1715.a \
+	$(MESSOBJ)/palm.a \
 	$(MESSOBJ)/samcoupe.a \
 	$(MESSOBJ)/sapi1.a \
 	$(MESSOBJ)/sega.a \
@@ -1213,6 +1214,11 @@ $(MESSOBJ)/luxor.a:					\
 	$(MESS_MACHINE)/abc99.o	\
 	$(MESS_MACHINE)/e0516.o	\
 	$(MESS_MACHINE)/conkort.o \
+
+$(MESSOBJ)/palm.a:	\
+	$(MESS_DRIVERS)/palm.o		\
+	$(MESS_MACHINE)/mc68328.o	\
+	$(MESS_VIDEO)/mc68328.o		\
 
 $(MESSOBJ)/sgi.a:						\
 	$(MESS_MACHINE)/sgi.o		\

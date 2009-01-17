@@ -448,6 +448,13 @@ XL/XE 16kB OS roms
 	DRIVER( at486 )		/* 19?? IBM AT 486									*/
 	DRIVER( at586 )		/* 19?? AT 586										*/
 
+	/* PALM */
+	DRIVER( pilot1k )	/* Pilot 1000 */
+	DRIVER( pilot5k )	/* Pilot 5000 */
+	DRIVER( palmpers )	/* Palm Pilot Personal */
+	DRIVER( palmpro )	/* Palm Pilot Professional */
+	DRIVER( palmiii )   	/* Palm III */
+
 	/* OSBORNE */
 	DRIVER( osborne1 )	/* 1981 Osborne-1									*/
 
