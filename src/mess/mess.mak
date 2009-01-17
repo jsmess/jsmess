@@ -894,7 +894,6 @@ $(MESSOBJ)/osi.a:    \
 $(MESSOBJ)/amstrad.a:  \
 	$(MESS_DRIVERS)/amstrad.o  \
 	$(MESS_MACHINE)/amstrad.o  \
-	$(MESS_VIDEO)/amstrad.o  \
 	$(MESS_VIDEO)/pcw.o	 \
 	$(MESS_DRIVERS)/pcw.o	 \
 	$(MESS_DRIVERS)/pcw16.o	 \
