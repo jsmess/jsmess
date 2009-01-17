@@ -280,11 +280,11 @@ void image_freeptr(const device_config *img, void *ptr);
   pertaining to that image in the CRC database
 ****************************************************************************/
 
-const char *image_longname(const device_config *img);
-const char *image_manufacturer(const device_config *img);
-const char *image_year(const device_config *img);
-const char *image_playable(const device_config *img);
-const char *image_extrainfo(const device_config *img);
+const char *image_longname(const device_config *device);
+const char *image_manufacturer(const device_config *device);
+const char *image_year(const device_config *device);
+const char *image_playable(const device_config *device);
+const char *image_extrainfo(const device_config *device);
 
 
 

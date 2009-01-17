@@ -1634,45 +1634,65 @@ void image_freeptr(const device_config *image, void *ptr)
   pertaining to that image in the CRC database
 ****************************************************************************/
 
-const char *image_longname(const device_config *image)
+/*-------------------------------------------------
+    image_longname
+-------------------------------------------------*/
+
+const char *image_longname(const device_config *device)
 {
-	image_slot_data *slot = find_image_slot(image);
+	image_slot_data *slot = find_image_slot(device);
 	image_checkhash(slot);
 	return slot->longname;
 }
 
 
 
-const char *image_manufacturer(const device_config *image)
+/*-------------------------------------------------
+    image_manufacturer
+-------------------------------------------------*/
+
+const char *image_manufacturer(const device_config *device)
 {
-	image_slot_data *slot = find_image_slot(image);
+	image_slot_data *slot = find_image_slot(device);
 	image_checkhash(slot);
 	return slot->manufacturer;
 }
 
 
 
-const char *image_year(const device_config *image)
+/*-------------------------------------------------
+    image_year
+-------------------------------------------------*/
+
+const char *image_year(const device_config *device)
 {
-	image_slot_data *slot = find_image_slot(image);
+	image_slot_data *slot = find_image_slot(device);
 	image_checkhash(slot);
 	return slot->year;
 }
 
 
 
-const char *image_playable(const device_config *image)
+/*-------------------------------------------------
+    image_playable
+-------------------------------------------------*/
+
+const char *image_playable(const device_config *device)
 {
-	image_slot_data *slot = find_image_slot(image);
+	image_slot_data *slot = find_image_slot(device);
 	image_checkhash(slot);
 	return slot->playable;
 }
 
 
 
-const char *image_extrainfo(const device_config *image)
+/*-------------------------------------------------
+    image_extrainfo
+-------------------------------------------------*/
+
+const char *image_extrainfo(const device_config *device)
 {
-	image_slot_data *slot = find_image_slot(image);
+	image_slot_data *slot = find_image_slot(device);
 	image_checkhash(slot);
 	return slot->extrainfo;
 }

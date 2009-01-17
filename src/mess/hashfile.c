@@ -71,6 +71,10 @@ static void expat_free(void *ptr);
     CORE IMPLEMENTATION
 ***************************************************************************/
 
+/*-------------------------------------------------
+    parse_error
+-------------------------------------------------*/
+
 static void ATTR_PRINTF(2,3) parse_error(struct hash_parse_state *state, const char *fmt, ...)
 {
 	char buf[256];
@@ -79,13 +83,17 @@ static void ATTR_PRINTF(2,3) parse_error(struct hash_parse_state *state, const c
 	if (state->error_proc)
 	{
 		va_start(va, fmt);
-		vsnprintf(buf, sizeof(buf) / sizeof(buf[0]), fmt, va);
+		vsnprintf(buf, ARRAY_LENGTH(buf), fmt, va);
 		va_end(va);
-		state->error_proc(buf);
+		(*state->error_proc)(buf);
 	}
 }
 
 
+
+/*-------------------------------------------------
+    unknown_tag
+-------------------------------------------------*/
 
 static void unknown_tag(struct hash_parse_state *state, const char *tagname)
 {
@@ -97,6 +105,10 @@ static void unknown_tag(struct hash_parse_state *state, const char *tagname)
 
 
 
+/*-------------------------------------------------
+    unknown_attribute
+-------------------------------------------------*/
+
 static void unknown_attribute(struct hash_parse_state *state, const char *attrname)
 {
 	parse_error(state, "[%lu:%lu]: Unknown attribute: %s\n",
@@ -106,6 +118,10 @@ static void unknown_attribute(struct hash_parse_state *state, const char *attrna
 }
 
 
+
+/*-------------------------------------------------
+    unknown_attribute_value
+-------------------------------------------------*/
 
 static void unknown_attribute_value(struct hash_parse_state *state,
 	const char *attrname, const char *attrvalue)
@@ -118,6 +134,10 @@ static void unknown_attribute_value(struct hash_parse_state *state,
 
 
 
+/*-------------------------------------------------
+    start_handler
+-------------------------------------------------*/
+
 static void start_handler(void *data, const char *tagname, const char **attributes)
 {
 	struct hash_parse_state *state = (struct hash_parse_state *) data;
@@ -129,147 +149,157 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 	iodevice_t device;
 	int i;
 
-	switch(state->pos++) {
-	case POS_ROOT:
-		if (!strcmp(tagname, "hashfile"))
-		{
-		}
-		else
-		{
-			unknown_tag(state, tagname);
-		}
-		break;
-
-	case POS_MAIN:
-		if (!strcmp(tagname, "hash"))
-		{
-			// we are now examining a hash tag
-			name = NULL;
-			memset(hash_string, 0, sizeof(hash_string));
-			all_functions = 0;
-			device = IO_COUNT;
-
-			while(attributes[0])
+	switch(state->pos++)
+	{
+		case POS_ROOT:
+			if (!strcmp(tagname, "hashfile"))
 			{
-				functions = 0;
-				if (!strcmp(attributes[0], "name"))
-				{
-					/* name attribute */
-					name = attributes[1];
-				}
-				else if (!strcmp(attributes[0], "crc32"))
-				{
-					/* crc32 attribute */
-					functions = HASH_CRC;
-				}
-				else if (!strcmp(attributes[0], "md5"))
-				{
-					/* md5 attribute */
-					functions = HASH_MD5;
-				}
-				else if (!strcmp(attributes[0], "sha1"))
-				{
-					/* sha1 attribute */
-					functions = HASH_SHA1;
-				}
-				else if (!strcmp(attributes[0], "type"))
-				{
-					/* type attribute */
-					i = device_typeid(attributes[1]);
-					if (i < 0)
-						unknown_attribute_value(state, attributes[0], attributes[1]);
-					else
-						device = (iodevice_t) i;
-				}
-				else
-				{
-					/* unknown attribute */
-					unknown_attribute(state, attributes[0]);
-				}
-
-				if (functions)
-				{
-					hash_data_insert_printable_checksum(hash_string, functions, attributes[1]);
-					all_functions |= functions;
-				}
-
-				attributes += 2;
-			}
-
-			if (device == IO_COUNT)
-			{
-				for (i = 0; i < IO_COUNT; i++)
-					state->hashfile->functions[i] |= all_functions;
 			}
 			else
-				state->hashfile->functions[device] |= all_functions;
-
-			/* do we use this hash? */
-			if (!state->selector_proc || state->selector_proc(state->hashfile, state->param, name, hash_string))
 			{
-				hi = pool_malloc(state->hashfile->pool, sizeof(hash_info));
-				if (!hi)
-					return;
-				memset(hi, 0, sizeof(*hi));
-
-				hi->longname = pool_strdup(state->hashfile->pool, name);
-				if (!hi->longname)
-					return;
-
-				strcpy(hi->hash, hash_string);
-				state->hi = hi;
+				unknown_tag(state, tagname);
 			}
-		}
-		else
-		{
-			unknown_tag(state, tagname);
-		}
-		break;
+			break;
 
-	case POS_HASH:
-		text_dest = NULL;
+		case POS_MAIN:
+			if (!strcmp(tagname, "hash"))
+			{
+				// we are now examining a hash tag
+				name = NULL;
+				memset(hash_string, 0, sizeof(hash_string));
+				all_functions = 0;
+				device = IO_COUNT;
 
-		if (!strcmp(tagname, "year"))
-			text_dest = (char **) &state->hi->year;
-		else if (!strcmp(tagname, "manufacturer"))
-			text_dest = (char **) &state->hi->manufacturer;
-		else if (!strcmp(tagname, "status"))
-			text_dest = (char **) &state->hi->playable;
-		else if (!strcmp(tagname, "extrainfo"))
-			text_dest = (char **) &state->hi->extrainfo;
-		else
-			unknown_tag(state, tagname);
+				while(attributes[0])
+				{
+					functions = 0;
+					if (!strcmp(attributes[0], "name"))
+					{
+						/* name attribute */
+						name = attributes[1];
+					}
+					else if (!strcmp(attributes[0], "crc32"))
+					{
+						/* crc32 attribute */
+						functions = HASH_CRC;
+					}
+					else if (!strcmp(attributes[0], "md5"))
+					{
+						/* md5 attribute */
+						functions = HASH_MD5;
+					}
+					else if (!strcmp(attributes[0], "sha1"))
+					{
+						/* sha1 attribute */
+						functions = HASH_SHA1;
+					}
+					else if (!strcmp(attributes[0], "type"))
+					{
+						/* type attribute */
+						i = device_typeid(attributes[1]);
+						if (i < 0)
+							unknown_attribute_value(state, attributes[0], attributes[1]);
+						else
+							device = (iodevice_t) i;
+					}
+					else
+					{
+						/* unknown attribute */
+						unknown_attribute(state, attributes[0]);
+					}
 
-		if (text_dest && state->hi)
-			state->text_dest = text_dest;
-		break;
+					if (functions)
+					{
+						hash_data_insert_printable_checksum(hash_string, functions, attributes[1]);
+						all_functions |= functions;
+					}
+
+					attributes += 2;
+				}
+
+				if (device == IO_COUNT)
+				{
+					for (i = 0; i < IO_COUNT; i++)
+						state->hashfile->functions[i] |= all_functions;
+				}
+				else
+					state->hashfile->functions[device] |= all_functions;
+
+				/* do we use this hash? */
+				if (!state->selector_proc || state->selector_proc(state->hashfile, state->param, name, hash_string))
+				{
+					hi = pool_malloc(state->hashfile->pool, sizeof(hash_info));
+					if (!hi)
+						return;
+					memset(hi, 0, sizeof(*hi));
+
+					hi->longname = pool_strdup(state->hashfile->pool, name);
+					if (!hi->longname)
+						return;
+
+					strcpy(hi->hash, hash_string);
+					state->hi = hi;
+				}
+			}
+			else
+			{
+				unknown_tag(state, tagname);
+			}
+			break;
+
+		case POS_HASH:
+			text_dest = NULL;
+
+			if (!strcmp(tagname, "year"))
+				text_dest = (char **) &state->hi->year;
+			else if (!strcmp(tagname, "manufacturer"))
+				text_dest = (char **) &state->hi->manufacturer;
+			else if (!strcmp(tagname, "status"))
+				text_dest = (char **) &state->hi->playable;
+			else if (!strcmp(tagname, "extrainfo"))
+				text_dest = (char **) &state->hi->extrainfo;
+			else
+				unknown_tag(state, tagname);
+
+			if (text_dest && state->hi)
+				state->text_dest = text_dest;
+			break;
 	}
 }
 
 
+
+/*-------------------------------------------------
+    end_handler
+-------------------------------------------------*/
 
 static void end_handler(void *data, const char *name)
 {
 	struct hash_parse_state *state = (struct hash_parse_state *) data;
 	state->text_dest = NULL;
 
-	switch(--state->pos) {
-	case POS_ROOT:
-	case POS_HASH:
-		break;
+	switch(--state->pos)
+	{
+		case POS_ROOT:
+		case POS_HASH:
+			break;
 
-	case POS_MAIN:
-		if (state->hi)
-		{
-			if (state->use_proc)
-				state->use_proc(state->hashfile, state->param, state->hi);
-			state->hi = NULL;
-		}
-		break;
+		case POS_MAIN:
+			if (state->hi)
+			{
+				if (state->use_proc)
+					(*state->use_proc)(state->hashfile, state->param, state->hi);
+				state->hi = NULL;
+			}
+			break;
 	}
 }
 
 
+
+/*-------------------------------------------------
+    data_handler
+-------------------------------------------------*/
 
 static void data_handler(void *data, const XML_Char *s, int len)
 {
@@ -293,6 +323,10 @@ static void data_handler(void *data, const XML_Char *s, int len)
 }
 
 
+
+/*-------------------------------------------------
+    hashfile_parse
+-------------------------------------------------*/
 
 static void hashfile_parse(hash_file *hashfile,
 	int (*selector_proc)(hash_file *hashfile, void *param, const char *name, const char *hash),
@@ -347,7 +381,9 @@ done:
 
 
 
-/* ----------------------------------------------------------------------- */
+/*-------------------------------------------------
+    preload_use_proc
+-------------------------------------------------*/
 
 static void preload_use_proc(hash_file *hashfile, void *param, hash_info *hi)
 {
@@ -363,6 +399,10 @@ static void preload_use_proc(hash_file *hashfile, void *param, hash_info *hi)
 }
 
 
+
+/*-------------------------------------------------
+    hashfile_open_options
+-------------------------------------------------*/
 
 hash_file *hashfile_open_options(core_options *opts, const char *sysname, int is_preload,
 	void (*error_proc)(const char *message))
@@ -408,6 +448,10 @@ error:
 
 
 
+/*-------------------------------------------------
+    hashfile_open
+-------------------------------------------------*/
+
 hash_file *hashfile_open(const char *sysname, int is_preload,
 	void (*error_proc)(const char *message))
 {
@@ -415,6 +459,10 @@ hash_file *hashfile_open(const char *sysname, int is_preload,
 }
 
 
+
+/*-------------------------------------------------
+    hashfile_close
+-------------------------------------------------*/
 
 void hashfile_close(hash_file *hashfile)
 {
@@ -425,13 +473,15 @@ void hashfile_close(hash_file *hashfile)
 
 
 
+/*-------------------------------------------------
+    singular_selector_proc
+-------------------------------------------------*/
+
 struct hashlookup_params
 {
 	const char *hash;
 	hash_info *hi;
 };
-
-
 
 static int singular_selector_proc(hash_file *hashfile, void *param, const char *name, const char *hash)
 {
@@ -442,6 +492,10 @@ static int singular_selector_proc(hash_file *hashfile, void *param, const char *
 
 
 
+/*-------------------------------------------------
+    singular_use_proc
+-------------------------------------------------*/
+
 static void singular_use_proc(hash_file *hashfile, void *param, hash_info *hi)
 {
 	struct hashlookup_params *hlparams = (struct hashlookup_params *) param;
@@ -449,6 +503,10 @@ static void singular_use_proc(hash_file *hashfile, void *param, hash_info *hi)
 }
 
 
+
+/*-------------------------------------------------
+    hashfile_lookup
+-------------------------------------------------*/
 
 const hash_info *hashfile_lookup(hash_file *hashfile, const char *hash)
 {
@@ -471,6 +529,10 @@ const hash_info *hashfile_lookup(hash_file *hashfile, const char *hash)
 
 
 
+/*-------------------------------------------------
+    hashfile_functions_used
+-------------------------------------------------*/
+
 unsigned int hashfile_functions_used(hash_file *hashfile, iodevice_t devtype)
 {
 	assert(devtype >= 0);
@@ -479,6 +541,10 @@ unsigned int hashfile_functions_used(hash_file *hashfile, iodevice_t devtype)
 }
 
 
+
+/*-------------------------------------------------
+    hashfile_verify
+-------------------------------------------------*/
 
 int hashfile_verify(const char *sysname, void (*my_error_proc)(const char *message))
 {
