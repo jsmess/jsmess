@@ -26,8 +26,7 @@ static ADDRESS_MAP_START(mikrosha_mem, ADDRESS_SPACE_PROGRAM, 8)
     AM_RANGE( 0xc000, 0xc003 ) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w) AM_MIRROR(0x07fc)
     AM_RANGE( 0xc800, 0xc803 ) AM_DEVREADWRITE(PPI8255, "ppi8255_2", ppi8255_r, ppi8255_w) AM_MIRROR(0x07fc)
     AM_RANGE( 0xd000, 0xd001 ) AM_DEVREADWRITE(I8275, "i8275", i8275_r, i8275_w) AM_MIRROR(0x07fe) // video
-    AM_RANGE( 0xd803, 0xd803 ) AM_READ(radio_cpu_state_r) AM_MIRROR(0x07fc) // Not connected
-//    AM_RANGE( 0xd800, 0xd803 ) AM_DEVREADWRITE(PIT8253, "pit8253", pit8253_r,pit8253_w) AM_MIRROR(0x07fc) // Timer
+    AM_RANGE( 0xd800, 0xd803 ) AM_DEVREADWRITE(PIT8253, "pit8253", pit8253_r,pit8253_w) AM_MIRROR(0x07fc) // Timer
     AM_RANGE( 0xe000, 0xf7ff ) AM_READ(radio_cpu_state_r) // Not connected
   	AM_RANGE( 0xf800, 0xffff ) AM_DEVWRITE(DMA8257, "dma8257", dma8257_w)	 // DMA
     AM_RANGE( 0xf800, 0xffff ) AM_ROM  // System ROM
@@ -132,27 +131,6 @@ static const cassette_config mikrosha_cassette_config =
 };
 
 
-static UINT8 *mikrosha_io_mirror = NULL;
-
-static DIRECT_UPDATE_HANDLER( mikrosha_direct )
-{		
-	if (address >= 0x8000 && address <=0xFFFF) {
-			direct->bytemask = 0xffff;
-			direct->raw = mikrosha_io_mirror;
-			direct->decrypted = mikrosha_io_mirror;
-			direct->bytestart = 0x8000;
-			direct->byteend = 0xffff;
-			mikrosha_io_mirror[address] = cpu_get_reg(space->machine->cpu[0], I8085_STATUS);
-	} 
-	return address;
-}
-
-static MACHINE_START( mikrosha )
-{
-	mikrosha_io_mirror = auto_malloc( 0x10000 );
-	memory_set_direct_update_handler( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), mikrosha_direct );
-}
-
 static PIT8253_OUTPUT_CHANGED(mikrosha_pit_out2)
 {
 
@@ -181,7 +159,7 @@ static MACHINE_DRIVER_START( mikrosha )
 	MDRV_CPU_ADD("main", 8080, XTAL_16MHz / 9)
 	MDRV_CPU_PROGRAM_MAP(mikrosha_mem, 0)
 	MDRV_CPU_IO_MAP(mikrosha_io, 0)
-	MDRV_MACHINE_START( mikrosha )
+
 	MDRV_MACHINE_RESET( radio86 )
 
 	MDRV_PPI8255_ADD( "ppi8255_1", mikrosha_ppi8255_interface_1 )

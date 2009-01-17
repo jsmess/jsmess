@@ -56,7 +56,7 @@ static ADDRESS_MAP_START(radio86ram_mem, ADDRESS_SPACE_PROGRAM, 8)
     AM_RANGE( 0xf700, 0xf703 ) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
     AM_RANGE( 0xf780, 0xf7bf ) AM_DEVREADWRITE(I8275, "i8275", i8275_r, i8275_w) // video
     AM_RANGE( 0xf684, 0xf687 ) AM_DEVREADWRITE(PPI8255, "ppi8255_2", ppi8255_r, ppi8255_w)
-	  AM_RANGE( 0xf688, 0xf688 ) AM_WRITE( radio86_pagesel )
+	AM_RANGE( 0xf688, 0xf688 ) AM_WRITE( radio86_pagesel )
     AM_RANGE( 0xf800, 0xffff ) AM_DEVWRITE(DMA8257, "dma8257", dma8257_w)	 // DMA
     AM_RANGE( 0xf800, 0xffff ) AM_ROM  // System ROM page 1
 ADDRESS_MAP_END
@@ -312,67 +312,46 @@ static MACHINE_DRIVER_START( radio86 )
 	MDRV_CASSETTE_ADD( "cassette", radio86_cassette_config )
 MACHINE_DRIVER_END
 
-static UINT8 *radio16_io_mirror = NULL;
-
-static DIRECT_UPDATE_HANDLER( radio16_direct )
-{	
-	if (address >= 0x4000 && address <=0x7FFF) {
-			direct->bytemask = 0xffff;
-			direct->raw = radio16_io_mirror;
-			direct->decrypted = radio16_io_mirror;
-			direct->bytestart = 0x4000;
-			direct->byteend = 0x7fff;
-			radio16_io_mirror[address] = cpu_get_reg(space->machine->cpu[0], I8085_STATUS);
-	} 
-	return address;
-}
-
-static MACHINE_START( radio16 )
-{
-	radio16_io_mirror = auto_malloc( 0x8000 );
-	memory_set_direct_update_handler( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), radio16_direct );
-}
 
 static MACHINE_DRIVER_START( radio16 )
-  /* basic machine hardware */
-  MDRV_IMPORT_FROM(radio86)
-  MDRV_CPU_MODIFY("main")
-  MDRV_CPU_PROGRAM_MAP(radio86_16_mem, 0)
-  MDRV_MACHINE_START( radio16 )
+  	/* basic machine hardware */
+  	MDRV_IMPORT_FROM(radio86)
+  	MDRV_CPU_MODIFY("main")
+  	MDRV_CPU_PROGRAM_MAP(radio86_16_mem, 0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( radiorom )
-  /* basic machine hardware */
-  MDRV_IMPORT_FROM(radio86)
-  MDRV_CPU_MODIFY("main")
-  MDRV_CPU_PROGRAM_MAP(radio86rom_mem, 0)
+  	/* basic machine hardware */
+  	MDRV_IMPORT_FROM(radio86)
+  	MDRV_CPU_MODIFY("main")
+  	MDRV_CPU_PROGRAM_MAP(radio86rom_mem, 0)
     
 	MDRV_PPI8255_ADD( "ppi8255_2", radio86_ppi8255_interface_2 )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( radioram )
-  /* basic machine hardware */
-  MDRV_IMPORT_FROM(radio86)
-  MDRV_CPU_MODIFY("main")
-  MDRV_CPU_PROGRAM_MAP(radio86ram_mem, 0)
+  	/* basic machine hardware */
+  	MDRV_IMPORT_FROM(radio86)
+  	MDRV_CPU_MODIFY("main")
+  	MDRV_CPU_PROGRAM_MAP(radio86ram_mem, 0)
 
 	MDRV_PPI8255_ADD( "ppi8255_2", radio86_ppi8255_interface_2 )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( rk7007 )
-  /* basic machine hardware */
-  MDRV_IMPORT_FROM(radio86)
-  MDRV_CPU_MODIFY("main")
-  MDRV_CPU_IO_MAP(rk7007_io, 0)
+  	/* basic machine hardware */
+  	MDRV_IMPORT_FROM(radio86)
+  	MDRV_CPU_MODIFY("main")
+  	MDRV_CPU_IO_MAP(rk7007_io, 0)
 
 	MDRV_PPI8255_ADD( "ms7007", rk7007_ppi8255_interface )
 MACHINE_DRIVER_END
   
 static MACHINE_DRIVER_START( rk700716 )
-  /* basic machine hardware */
-  MDRV_IMPORT_FROM(radio16)
-  MDRV_CPU_MODIFY("main")
-  MDRV_CPU_IO_MAP(rk7007_io, 0)
+  	/* basic machine hardware */
+  	MDRV_IMPORT_FROM(radio16)
+  	MDRV_CPU_MODIFY("main")
+  	MDRV_CPU_IO_MAP(rk7007_io, 0)
     
 	MDRV_PPI8255_ADD( "ms7007", rk7007_ppi8255_interface )    
 MACHINE_DRIVER_END
