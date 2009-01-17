@@ -659,6 +659,7 @@ static MACHINE_DRIVER_START( dragon32 )
 	MDRV_SCREEN_REFRESH_RATE(M6847_PAL_FRAMES_PER_SECOND)
 
 	MDRV_MACHINE_START( dragon32 )
+	MDRV_DRIVER_DATA( coco_state )
 
 	/* video hardware */
 	MDRV_VIDEO_START(dragon)
@@ -691,6 +692,7 @@ static MACHINE_DRIVER_START( dragon64 )
 	MDRV_CPU_PROGRAM_MAP(d64_map, 0)
 
 	MDRV_MACHINE_START( dragon64 )
+	MDRV_DRIVER_DATA( coco_state )
 
 	/* video hardware */
 	MDRV_VIDEO_START(dragon)
@@ -729,6 +731,7 @@ static MACHINE_DRIVER_START( d64plus )
 	MDRV_CPU_PROGRAM_MAP(d64_plus_map, 0)
 
 	MDRV_MACHINE_START( dragon64 )
+	MDRV_DRIVER_DATA( coco_state )
 
 	/* video hardware */
 	MDRV_VIDEO_START(dragon)
@@ -767,6 +770,7 @@ static MACHINE_DRIVER_START( dgnalpha )
 	MDRV_CPU_PROGRAM_MAP(dgnalpha_map, 0)
 
 	MDRV_MACHINE_START( dgnalpha )
+	MDRV_DRIVER_DATA( coco_state )
 
 	/* video hardware */
 	MDRV_VIDEO_START(dragon)
@@ -808,6 +812,7 @@ static MACHINE_DRIVER_START( tanodr64 )
 	MDRV_CPU_PROGRAM_MAP(d64_map, 0)
 
 	MDRV_MACHINE_START( tanodr64 )
+	MDRV_DRIVER_DATA( coco_state )
 
 	/* video hardware */
 	MDRV_VIDEO_START(dragon)
@@ -846,6 +851,7 @@ static MACHINE_DRIVER_START( coco )
 	MDRV_CPU_PROGRAM_MAP(coco_map, 0)
 
 	MDRV_MACHINE_START( coco )
+	MDRV_DRIVER_DATA( coco_state )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -886,6 +892,7 @@ static MACHINE_DRIVER_START( coco2 )
 	MDRV_CPU_PROGRAM_MAP(coco_map, 0)
 
 	MDRV_MACHINE_START( coco2 )
+	MDRV_DRIVER_DATA( coco_state )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -926,6 +933,7 @@ static MACHINE_DRIVER_START( coco2b )
 	MDRV_CPU_PROGRAM_MAP(coco_map, 0)
 
 	MDRV_MACHINE_START( coco2 )
+	MDRV_DRIVER_DATA( coco_state )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -967,6 +975,7 @@ static MACHINE_DRIVER_START( coco3 )
 
 	MDRV_MACHINE_START( coco3 )
 	MDRV_MACHINE_RESET( coco3 )
+	MDRV_DRIVER_DATA( coco_state )
 
 	/* video hardware */
 	MDRV_VIDEO_START(coco3)

@@ -1,23 +1,46 @@
 /*****************************************************************************
- *
- * includes/coco.h
- * 
- * CoCo/Dragon
- *
- ****************************************************************************/
 
-#ifndef COCO_H_
-#define COCO_H_
+	includes/coco.h
+
+	CoCo/Dragon
+
+****************************************************************************/
+
+#ifndef __COCO_H__
+#define __COCO_H__
 
 #include "devices/snapquik.h"
 #include "machine/wd17xx.h"
 #include "machine/6883sam.h"
+
+
+/***************************************************************************
+    CONSTANTS
+***************************************************************************/
 
 #define COCO_CPU_SPEED_HZ		894886	/* 0.894886 MHz */
 #define COCO_FRAMES_PER_SECOND	(COCO_CPU_SPEED_HZ / 57.0 / 263)
 #define COCO_CPU_SPEED			(ATTOTIME_IN_HZ(COCO_CPU_SPEED_HZ))
 #define COCO_TIMER_CMPCARRIER	(COCO_CPU_SPEED * 0.25)
 
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef struct _coco_state coco_state;
+struct _coco_state
+{
+	const device_config *cartslot_device;
+	const device_config *cassette_device;
+	const device_config *bitbanger_device;
+	const device_config *printer_device;
+};
+
+
+/***************************************************************************
+    PROTOTYPES
+***************************************************************************/
 
 /*----------- defined in video/coco.c -----------*/
 
@@ -118,4 +141,4 @@ struct coco3_video_vars
 extern const struct coco3_video_vars coco3_vidvars;
 
 
-#endif /* COCO_H_ */
+#endif /* __COCO_H__ */
