@@ -83,6 +83,15 @@ WRITE8_DEVICE_HANDLER( palm_dac_transition )
 
 
 /***************************************************************************
+    EXTERNAL HARDWARE
+***************************************************************************/
+
+READ8_DEVICE_HANDLER( palm_port_c_in )
+{
+    return 0x10;
+}
+
+/***************************************************************************
     MACHINE DRIVERS
 ***************************************************************************/
 
@@ -95,9 +104,27 @@ mc68328_interface palm_dragonball_iface =
 {
     0,
 
-    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+    NULL,                   // Port A Output
+    NULL,                   // Port B Output
+    NULL,                   // Port C Output
+    NULL,                   // Port D Output
+    NULL,                   // Port E Output
+    NULL,                   // Port F Output
+    NULL,                   // Port G Output
+    NULL,                   // Port J Output
+    NULL,                   // Port K Output
+    NULL,                   // Port M Output
 
-    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+    NULL,                   // Port A Input
+    NULL,                   // Port B Input
+    palm_port_c_in,         // Port C Input
+    NULL,                   // Port D Input
+    NULL,                   // Port E Input
+    NULL,                   // Port F Input
+    NULL,                   // Port G Input
+    NULL,                   // Port J Input
+    NULL,                   // Port K Input
+    NULL,                   // Port M Input
 
     palm_dac_transition
 };
