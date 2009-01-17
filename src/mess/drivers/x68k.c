@@ -535,8 +535,12 @@ void mfp_recv_data(int data)
 // typically read from the SCC data port on receive buffer full interrupt per byte
 static int x68k_read_mouse(running_machine *machine)
 {
+	const device_config *scc = devtag_get_device(machine, SCC8530, "scc");
 	char val = 0;
 	char ipt = 0;
+
+	if(!(scc_get_reg_b(scc,5) & 0x02))
+		return 0xff;
 
 	switch(sys.mouse.inputtype)
 	{
@@ -557,7 +561,6 @@ static int x68k_read_mouse(running_machine *machine)
 	sys.mouse.inputtype++;
 	if(sys.mouse.inputtype > 2)
 	{
-		const device_config *scc = devtag_get_device(machine, SCC8530, "scc");
 		int val = scc_get_reg_b(scc, 0);
 		sys.mouse.inputtype = 0;
 		sys.mouse.bufferempty = 1;
