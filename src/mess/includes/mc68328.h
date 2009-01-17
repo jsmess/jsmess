@@ -122,6 +122,10 @@ struct _mc68328_interface
     read8_device_func   in_port_m_func;     /* 8-bit input */
 
     write8_device_func  out_pwm_func;       /* 1-bit output */
+
+    write16_device_func out_spim_func;      /* 16-bit output */
+    read16_device_func  in_spim_func;       /* 16-bit input */
+    void (*spim_xch_trigger)( const device_config *device );    /* SPIM exchange trigger */
 };
 #define MC68328_INTERFACE(name) const mc68328_interface (name)=
 

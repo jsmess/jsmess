@@ -17,6 +17,9 @@
 
 static offs_t palm_dasm_override(const device_config *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 
+UINT8 port_f_latch;
+UINT16 spim_data;
+
 /***************************************************************************
     MACHINE HARDWARE
 ***************************************************************************/
@@ -43,12 +46,57 @@ static INPUT_CHANGED( button_check )
     mc68328_set_port_d_lines(mc68328_device, button_state, (int)(FPTR)param);
 }
 
+WRITE8_DEVICE_HANDLER( palm_port_f_out )
+{
+    port_f_latch = data;
+}
+
+READ8_DEVICE_HANDLER( palm_port_c_in )
+{
+    return 0x10;
+}
+
+READ8_DEVICE_HANDLER( palm_port_f_in )
+{
+    return port_f_latch;
+}
+
+WRITE16_DEVICE_HANDLER( palm_spim_out )
+{
+    spim_data = data;
+}
+
+READ16_DEVICE_HANDLER( palm_spim_in )
+{
+    return spim_data;
+}
+
+void palm_spim_exchange( const device_config *device )
+{
+    UINT8 x = input_port_read(device->machine, "PENX");
+    UINT8 y = input_port_read(device->machine, "PENY");
+
+    switch( port_f_latch & 0x0f )
+    {
+        case 0x06:
+            spim_data = (0xff - x) * 2;
+            break;
+
+        case 0x09:
+            spim_data = (0xff - y) * 2;
+            break;
+    }
+}
+
 MACHINE_START( palm )
 {
     const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
     memory_install_read16_handler(space,0x000000,mess_ram_size-1,mess_ram_size-1,0,(read16_space_func)1);
     memory_install_write16_handler(space,0x000000,mess_ram_size-1,mess_ram_size-1,0,(write16_space_func)1);
     memory_set_bankptr(machine, 1, mess_ram);
+
+    state_save_register_global(machine, port_f_latch);
+    state_save_register_global(machine, spim_data);
 }
 
 MACHINE_RESET( palm )
@@ -83,15 +131,6 @@ WRITE8_DEVICE_HANDLER( palm_dac_transition )
 
 
 /***************************************************************************
-    EXTERNAL HARDWARE
-***************************************************************************/
-
-READ8_DEVICE_HANDLER( palm_port_c_in )
-{
-    return 0x10;
-}
-
-/***************************************************************************
     MACHINE DRIVERS
 ***************************************************************************/
 
@@ -109,7 +148,7 @@ mc68328_interface palm_dragonball_iface =
     NULL,                   // Port C Output
     NULL,                   // Port D Output
     NULL,                   // Port E Output
-    NULL,                   // Port F Output
+    palm_port_f_out,        // Port F Output
     NULL,                   // Port G Output
     NULL,                   // Port J Output
     NULL,                   // Port K Output
@@ -120,13 +159,17 @@ mc68328_interface palm_dragonball_iface =
     palm_port_c_in,         // Port C Input
     NULL,                   // Port D Input
     NULL,                   // Port E Input
-    NULL,                   // Port F Input
+    palm_port_f_in,         // Port F Input
     NULL,                   // Port G Input
     NULL,                   // Port J Input
     NULL,                   // Port K Input
     NULL,                   // Port M Input
 
-    palm_dac_transition
+    palm_dac_transition,
+
+    palm_spim_out,
+    palm_spim_in,
+    palm_spim_exchange
 };
 
 

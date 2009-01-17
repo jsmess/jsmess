@@ -1248,7 +1248,14 @@ WRITE16_DEVICE_HANDLER( mc68328_w )
 
         case 0x800:
             verboselog(device->machine, 2, "mc68328_w: SPIMDATA = %04x\n", data);
-            mc68328->regs.spimdata = data;
+            if(mc68328->iface->out_spim_func)
+            {
+                (mc68328->iface->out_spim_func)( device, 0, data, 0xffff );
+            }
+            else
+            {
+                mc68328->regs.spimdata = data;
+            }
             break;
 
         case 0x802:
@@ -1266,17 +1273,9 @@ WRITE16_DEVICE_HANDLER( mc68328_w )
             if(data & SPIM_XCH)
             {
                 mc68328->regs.spimcont &= ~SPIM_XCH;
-                if((mc68328->regs.pfdata & 0x0f) == 0x09)
+                if(mc68328->iface->spim_xch_trigger)
                 {
-                    // Read the pen's Y axis
-                    UINT8 y = input_port_read(device->machine, "PENY");
-                    mc68328->regs.spimdata = (0xff - y) * 2;
-                }
-                else if((mc68328->regs.pfdata & 0x0f) == 0x06)
-                {
-                    // Read the pen's X axis
-                    UINT8 x = input_port_read(device->machine, "PENX");
-                    mc68328->regs.spimdata = (0xff - x) * 2;
+                    (mc68328->iface->spim_xch_trigger)( device );
                 }
                 if(data & SPIM_IRQEN)
                 {
@@ -2290,6 +2289,10 @@ READ16_DEVICE_HANDLER( mc68328_r )
 
         case 0x800:
             verboselog(device->machine, 2, "mc68328_r (%04x): SPIMDATA = %04x\n", mem_mask, mc68328->regs.spimdata);
+            if(mc68328->iface->in_spim_func)
+            {
+                return (mc68328->iface->in_spim_func)( device, 0, 0xffff );
+            }
             return mc68328->regs.spimdata;
 
         case 0x802:
