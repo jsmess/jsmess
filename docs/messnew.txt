@@ -14,6 +14,9 @@ System Driver Changes:
 
 - [CPC family] Updated all drivers to use the mc6845 device.  [Wilbert Pol]
 
+- [FAMICOM] Fixed 0.129 regression; once again allows you to run with only a
+  floppy image and no cart.  (bug #1760) [Fabio Priuli]
+
 - [GAMEPOCK] Fixed 128u3 regression.  (bug #1752) [Wilbert Pol]
 
 - [TI81, TI85, TI86] Added the new ROM_DEFAULT_BIOS feature to select the most
