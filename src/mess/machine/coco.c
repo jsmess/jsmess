@@ -2390,8 +2390,9 @@ READ8_HANDLER(coco3_gime_r)
 
 WRITE8_HANDLER(coco3_gime_w)
 {
-        /* take note if timer was $0000; see $FF95 for details */
-	int timer_was_off = (coco3_gimereg[4] == 0x00) && (coco3_gimereg[5] == 0x00);	coco3_gimereg[offset] = data;
+	/* take note if timer was $0000; see $FF95 for details */
+	int timer_was_off = (coco3_gimereg[4] == 0x00) && (coco3_gimereg[5] == 0x00);
+	coco3_gimereg[offset] = data;
 
 	if (LOG_GIME)
 		logerror("CoCo3 GIME: $%04x <== $%02x pc=$%04x\n", offset + 0xff90, data, cpu_get_pc(space->cpu));
