@@ -69,11 +69,18 @@
 				- Magic Sound isn't emulated.
 
 
+   January 2009 - changed drivers to use the mc6845 device implementation
+			   To get rid of duplicated code the drivers have been changed to use the new mc6845 device
+			   implementation. As a result the (runtime) selection of CRTC type has been removed.
+
+
 Some bugs left :
 ----------------
     - CRTC all type support (0,1,2,3,4) ?
     - Gate Array and CRTC aren't synchronised. (The Gate Array can change the color every microseconds?) So the multi-rasters in one line aren't supported (see yao demo p007's part)!
     - Implement full Asic for CPC+ emulation.  Soft scroll is rather dodgy.  8-bit printer port (bit 3 of CRTC reg 12) not implemented.
+	- The KC Compact should not reuse the gate array functionality. Instead z8536 support should be added. (bug #42)
+
  ******************************************************************************/
 
 /* Core includes */
@@ -84,7 +91,6 @@ Some bugs left :
 #include "machine/centroni.h"
 #include "machine/8255ppi.h"	/* for 8255 ppi */
 #include "cpu/z80/z80.h"		/* for cycle tables */
-#include "video/m6845.h"		/* CRTC display */
 #include "video/mc6845.h"		/* CRTC */
 #include "machine/nec765.h"	/* for floppy disc controller */
 #include "sound/ay8910.h"
@@ -367,14 +373,14 @@ lk4     Frequency
    Pre-ASIC??? Amstrad?     4 In the "cost-down" CPC6128, the CRTC functionality is integrated into a single ASIC IC. This ASIC is often refered to as the "Pre-ASIC" because it preceeded the CPC+ ASIC
 As far as I know, the KC compact used HD6845S only.
 */
-	PORT_START("crtc")
-	PORT_CONFNAME( 0xFF, M6845_PERSONALITY_UM6845R, "CRTC Type")
-	PORT_CONFSETTING(M6845_PERSONALITY_UM6845, "Type 0 - UM6845")
-	PORT_CONFSETTING(M6845_PERSONALITY_HD6845S, "Type 0 - HD6845S")
-	PORT_CONFSETTING(M6845_PERSONALITY_UM6845R, "Type 1 - UM6845R")
-	PORT_CONFSETTING(M6845_PERSONALITY_GENUINE, "Type 2 - MC6845")
-	PORT_CONFSETTING(M6845_PERSONALITY_AMS40489, "Type 3 - AMS40489")
-	PORT_CONFSETTING(M6845_PERSONALITY_PREASIC, "Type 4 - Pre-ASIC")
+//	PORT_START("crtc")
+//	PORT_CONFNAME( 0xFF, M6845_PERSONALITY_UM6845R, "CRTC Type")
+//	PORT_CONFSETTING(M6845_PERSONALITY_UM6845, "Type 0 - UM6845")
+//	PORT_CONFSETTING(M6845_PERSONALITY_HD6845S, "Type 0 - HD6845S")
+//	PORT_CONFSETTING(M6845_PERSONALITY_UM6845R, "Type 1 - UM6845R")
+//	PORT_CONFSETTING(M6845_PERSONALITY_GENUINE, "Type 2 - MC6845")
+//	PORT_CONFSETTING(M6845_PERSONALITY_AMS40489, "Type 3 - AMS40489")
+//	PORT_CONFSETTING(M6845_PERSONALITY_PREASIC, "Type 4 - Pre-ASIC")
 
 	PORT_START("multiface")
 	PORT_CONFNAME(0x01, 0x00, "Multiface Two" )
