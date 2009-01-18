@@ -21,6 +21,10 @@ WRITE8_HANDLER ( zx_io_w );
 
 READ8_HANDLER ( pow3000_io_r );
 
+READ8_HANDLER ( zx80_io_r );
+WRITE8_HANDLER ( zx80_io_w );
+READ8_HANDLER ( zx81_io_r );
+WRITE8_HANDLER ( zx81_io_w );
 
 /*----------- defined in video/zx.c -----------*/
 
