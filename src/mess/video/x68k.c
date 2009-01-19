@@ -561,7 +561,12 @@ static void x68k_render_video_word(int offset)
 	for(l=0;l<16;l++)
 	{
 		// apply text layer access mask
-		if((sys.crtc.reg[23] & (1<<l)) == 0)
+		if(sys.crtc.reg[21] & 0x0200)
+		{
+			if((sys.crtc.reg[23] & (1<<l)) == 0)
+				x68k_plot_pixel(x68k_text_bitmap,x+(15-l),y,0x100+x68k_get_text_pixel(offset,l));
+		}
+		else
 			x68k_plot_pixel(x68k_text_bitmap,x+(15-l),y,0x100+x68k_get_text_pixel(offset,l));
 	}
 }
@@ -620,6 +625,10 @@ WRITE16_HANDLER( x68k_tvram_w )
 	UINT16 text_mask;
 
 	text_mask = ~(sys.crtc.reg[23]) & mem_mask;
+
+	if(!(sys.crtc.reg[21] & 0x0200)) // text access mask enable
+		text_mask = 0xffff & mem_mask;
+
 	mem_mask = text_mask;
 
 	if(sys.crtc.reg[21] & 0x0100)
