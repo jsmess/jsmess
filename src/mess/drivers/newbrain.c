@@ -17,7 +17,7 @@
 /*
 
 	NewBrain
-	Grundy Business Systems Ltd.	
+	Grundy Business Systems Ltd.
 
 	32K RAM
 	28K ROM
@@ -25,7 +25,7 @@
 	Z80 @ 2MHz
 	COP420 @ 2MHz
 
-	Z80 @ 4MHz (416): INT/NMI=+5V, WAIT=EXTBUSRQ|BUSAKD, RESET=_FDC RESET, 
+	Z80 @ 4MHz (416): INT/NMI=+5V, WAIT=EXTBUSRQ|BUSAKD, RESET=_FDC RESET,
 	NEC 765AC @ 4 MHz (418)
 	MC6850 ACIA (459)
 	Z80CTC (458)
@@ -109,12 +109,12 @@ static WRITE8_HANDLER( a_enrg1_w )
 		bit		signal		description
 
 		0		_CLK		Clock Enable
-		1		
+		1
 		2		TVP			TV Enable
-		3		
+		3
 		4		_CTS		Clear to Send V24
 		5		DO			Transmit Data V24
-		6		
+		6
 		7		PO			Transmit Data Printer
 
 	*/
@@ -215,11 +215,11 @@ static READ8_HANDLER( a_ust_r )
 
 		0					+5V
 		1		PWRUP
-		2		
-		3		
-		4		
+		2
+		3
+		4
 		5		_CLKINT		clock interrupt
-		6					
+		6
 		7		_COPINT		COP interrupt
 
 	*/
@@ -237,11 +237,11 @@ static READ8_HANDLER( user_r )
 
 		0		RDDK		Received Data V24
 		1		_CTSD		_Clear to Send V24
-		2					
-		3					
-		4					
+		2
+		3
+		4
 		5		TPIN		Tape in
-		6					
+		6
 		7		_CTSP		_Clear to Send Printer
 
 	*/
@@ -319,7 +319,7 @@ static WRITE8_HANDLER( newbrain_cop_g_w )
 	/*
 
 		bit		description
-		
+
 		G0		_COPINT
 		G1		_TM1
 		G2		not connected
@@ -344,7 +344,7 @@ static READ8_HANDLER( newbrain_cop_g_r )
 	/*
 
 		bit		description
-		
+
 		G0		not connected
 		G1		K9
 		G2		K7
@@ -362,7 +362,7 @@ static WRITE8_HANDLER( newbrain_cop_d_w )
 	/*
 
 		bit		description
-		
+
 		D0		inverted to K4 -> CD4024 pin 2 (reset)
 		D1		TDO
 		D2		inverted to K6 -> CD4024 pin 1 (clock), CD4076 pin 7 (clock), inverted to DS8881 pin 3 (enable)
@@ -393,7 +393,7 @@ static WRITE8_HANDLER( newbrain_cop_d_w )
 	if (!BIT(data, 2))
 	{
 		state->keylatch++;
-		
+
 		if (state->keylatch == 16)
 		{
 			state->keylatch = 0;
@@ -410,7 +410,7 @@ static READ8_HANDLER( newbrain_cop_in_r )
 	/*
 
 		bit		description
-		
+
 		IN0		K8
 		IN1		_RD
 		IN2		_COP
@@ -527,10 +527,10 @@ static WRITE8_HANDLER( tvctl_w )
 		1		FS			0 generates 128 characters and 128 reverse field characters from 8 bit character code. 1 generates 256 characters from 8 bit character code
 		2		32/_40		0 generates 320 or 640 horizontal dots in pixel graphics mode. 1 generates 256 or 512 horizontal dots in pixel graphics mode
 		3		UCR			0 selects 256 characters expressed in an 8x10 matrix, and 25 lines (max) displayed. 1 selects 256 characters in an 8x8 matrix, and 31 lines (max) displayed
-		4		
-		5		
+		4
+		5
 		6		80L			0 selects 40 character line length. 1 selects 80 character line length
-		7		
+		7
 
 	*/
 
@@ -550,11 +550,11 @@ static WRITE8_HANDLER( fdc_auxiliary_w )
 		0		MOTON
 		1		765 RESET
 		2		TC
-		3		
-		4		
+		3
+		4
 		5		PA15
-		6		
-		7		
+		6
+		7
 
 	*/
 
@@ -574,11 +574,11 @@ static READ8_HANDLER( fdc_control_r )
 
 		bit		description
 
-		0		
-		1		
-		2		
-		3		
-		4		
+		0
+		1
+		2
+		3
+		4
 		5		FDC INT
 		6		PAGING
 		7		FDC ATT
@@ -598,11 +598,11 @@ static READ8_HANDLER( ust2_r )
 
 		0		RDDK (V24 RxD)
 		1		_CTSD (V24 Clear to Send)
-		2		
-		3		
-		4		
+		2
+		3
+		4
 		5		TPIN
-		6		
+		6
 		7		_CTSP (Printer Clear to Send)
 
 	*/
@@ -740,14 +740,14 @@ static READ8_HANDLER( ei_st1_r )
 
 		bit		signal		description
 
-		0		
-		1		
+		0
+		1
 		2		N/_RV		1 selects normal video on power up (white on black), 0 selects reversed video (appears as D0 on the first 200 EI's)
 		3		ANCH		1 indicates power is being taken from the mains supply
 		4		40/_80		1 indicates that 40 column video is selected on power up. 0 selects 80 column video
-		5		
+		5
 		6		TVCNSL		1 indicates that a video display is required on power up
-		7		
+		7
 
 	*/
 
@@ -764,11 +764,11 @@ static READ8_HANDLER( ei_st2_r )
 
 		0					received serial data from communications port
 		1					0 indicates 'clear-to-send' condition at communications port
-		2		
-		3		
-		4		
+		2
+		3
+		4
 		5					logic level tape input
-		6		
+		6
 		7					0 indicates 'clear-to-send' condition at printer port
 
 	*/
@@ -819,12 +819,12 @@ static WRITE8_HANDLER( ei_paging_w )
 			bit		signal		description
 
 			0		PAGING
-			1		
+			1
 			2		HA16
 			3		MPM
-			4		
+			4
 			5		_FDC RESET
-			6		
+			6
 			7		FDC ATT
 
 		*/
@@ -993,13 +993,13 @@ static INPUT_PORTS_START( newbrain )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x92") PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x90") PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x91") PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
-	
+
 	PORT_START("D2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U) PORT_CHAR('U')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('\'')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CHAR('J')
-	
+
 	PORT_START("D3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_CHAR('I')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9')
@@ -1017,31 +1017,31 @@ static INPUT_PORTS_START( newbrain )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('(') PORT_CHAR('[')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
-	
+
 	PORT_START("D6")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_CHAR('L')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(')') PORT_CHAR(']')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
-	
+
 	PORT_START("D7")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CHAR(';') PORT_CHAR(':')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("* \xC2\xA3") PORT_CHAR('*') PORT_CHAR(0x00A3)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('"')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
-	
+
 	PORT_START("D8")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_CHAR('H')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("VIDEO TEXT") PORT_CODE(KEYCODE_RALT) PORT_CHAR(UCHAR_MAMEKEY(RALT)) // Vd
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V) PORT_CHAR('V')
-	
+
 	PORT_START("D9")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_CHAR('G')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('P')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_CHAR('T')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C')
-	
+
 	PORT_START("D10")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=') PORT_CHAR('@')
@@ -1053,25 +1053,25 @@ static INPUT_PORTS_START( newbrain )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('\\')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('Z')
-	
+
 	PORT_START("D12")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('S')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CHAR('+') PORT_CHAR('^')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('W')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("INSERT") PORT_CODE(KEYCODE_INSERT) PORT_CHAR(UCHAR_MAMEKEY(INSERT))
-	
+
 	PORT_START("D13")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("NEW LINE") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13) // NL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('Q')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_CHAR('K')
-	
+
 	PORT_START("D14")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CHAR('/') PORT_CHAR('?')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SPACE") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("HOME") PORT_CODE(KEYCODE_HOME) PORT_CHAR(UCHAR_MAMEKEY(HOME)) // CH
-	
+
 	PORT_START("D15")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1) // SH
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("GRAPHICS") PORT_CODE(KEYCODE_LALT) PORT_CHAR(UCHAR_MAMEKEY(LALT)) // GR
@@ -1188,12 +1188,12 @@ static TIMER_CALLBACK( pwrup_tick )
 		if (bank < 6)
 		{
 			/* RAM */
-			memory_install_readwrite8_handler(cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM), bank_start, bank_end, 0, 0, SMH_BANK(bank), SMH_BANK(bank));
+			memory_install_readwrite8_handler(cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM), bank_start, bank_end, 0, 0, SMH_BANK((FPTR)bank), SMH_BANK((FPTR)bank));
 		}
 		else
 		{
 			/* ROM */
-			memory_install_readwrite8_handler(cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM), bank_start, bank_end, 0, 0, SMH_BANK(bank), SMH_UNMAP);
+			memory_install_readwrite8_handler(cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM), bank_start, bank_end, 0, 0, SMH_BANK((FPTR)bank), SMH_UNMAP);
 		}
 
 		memory_configure_bank(machine, bank, 0, 1, memory_region(machine, Z80_TAG) + bank_start, 0);
@@ -1213,13 +1213,13 @@ static MACHINE_START( newbrain )
 		UINT16 bank_start = (bank - 1) * 0x2000;
 		UINT16 bank_end = bank_start + 0x1fff;
 
-		memory_install_readwrite8_handler(cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM), bank_start, bank_end, 0, 0, SMH_BANK(bank), SMH_UNMAP);
+		memory_install_readwrite8_handler(cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM), bank_start, bank_end, 0, 0, SMH_BANK((FPTR)bank), SMH_UNMAP);
 		memory_configure_bank(machine, bank, 0, 1, memory_region(machine, Z80_TAG) + 0xe000, 0);
 		memory_set_bank(machine, bank, 0);
 	}
 
 	/* allocate reset timer */
-	
+
 	state->reset_timer = timer_alloc(machine, reset_tick, NULL);
 	timer_adjust_oneshot(state->reset_timer, ATTOTIME_IN_USEC(get_reset_t()), 0);
 
@@ -1262,7 +1262,7 @@ static MACHINE_RESET( newbrain )
 static INTERRUPT_GEN( newbrain_interrupt )
 {
 	newbrain_state *state = device->machine->driver_data;
-	
+
 	if (!(state->enrg1 & NEWBRAIN_ENRG1_CLK))
 	{
 		cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_IRQ0, HOLD_LINE);
@@ -1321,11 +1321,11 @@ static MACHINE_DRIVER_START( newbrain )
 
 	MDRV_CASSETTE_ADD("cassette1", newbrain_cassette_config)
 	MDRV_CASSETTE_ADD("cassette2", newbrain_cassette_config)
-	
+
 	/* acia */
 	MDRV_ACIA6850_ADD(MC6850_TAG, newbrain_acia_intf)
-		
-	MDRV_NEC765A_ADD(NEC765_TAG, newbrain_nec765_interface)	
+
+	MDRV_NEC765A_ADD(NEC765_TAG, newbrain_nec765_interface)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( newbraim )
@@ -1459,17 +1459,17 @@ ROM_START( newbraia )
 	ROM_SYSTEM_BIOS( 0, "rom20", "ROM 2.0" )
 	ROMX_LOAD( "aben20.rom", 0xa000, 0x2000, CRC(3d76d0c8) SHA1(753b4530a518ad832e4b81c4e5430355ba3f62e0), ROM_BIOS(1) )
 	ROMX_LOAD( "cd20tci.rom", 0xc000, 0x4000, CRC(f65b2350) SHA1(1ada7fbf207809537ec1ffb69808524300622ada), ROM_BIOS(1) )
-	
+
 	ROM_SYSTEM_BIOS( 1, "rom191", "ROM 1.91" )
 	ROMX_LOAD( "aben191.rom", 0xa000, 0x2000, CRC(b7be8d89) SHA1(cce8d0ae7aa40245907ea38b7956c62d039d45b7), ROM_BIOS(2) )
 	ROMX_LOAD( "cd.rom", 0xc000, 0x2000, CRC(6b4d9429) SHA1(ef688be4e75aced61f487c928258c8932a0ae00a), ROM_BIOS(2) )
 	ROMX_LOAD( "ef1x.rom", 0xe000, 0x2000, CRC(20dd0b49) SHA1(74b517ca223cefb588e9f49e72ff2d4f1627efc6), ROM_BIOS(2) )
-	
+
 	ROM_SYSTEM_BIOS( 2, "rom19", "ROM 1.9" )
 	ROMX_LOAD( "aben19.rom", 0xa000, 0x2000, CRC(d0283eb1) SHA1(351d248e69a77fa552c2584049006911fb381ff0), ROM_BIOS(3) )
 	ROMX_LOAD( "cd.rom", 0xc000, 0x2000, CRC(6b4d9429) SHA1(ef688be4e75aced61f487c928258c8932a0ae00a), ROM_BIOS(3) )
 	ROMX_LOAD( "ef1x.rom", 0xe000, 0x2000, CRC(20dd0b49) SHA1(74b517ca223cefb588e9f49e72ff2d4f1627efc6), ROM_BIOS(3) )
-	
+
 	ROM_SYSTEM_BIOS( 3, "rom14", "ROM 1.4" )
 	ROMX_LOAD( "aben14.rom", 0xa000, 0x2000, CRC(d0283eb1) SHA1(351d248e69a77fa552c2584049006911fb381ff0), ROM_BIOS(4) )
 	ROMX_LOAD( "cd.rom", 0xc000, 0x2000, CRC(6b4d9429) SHA1(ef688be4e75aced61f487c928258c8932a0ae00a), ROM_BIOS(4) )
