@@ -9,7 +9,7 @@
 #define DAC0808_TAG			"461"
 #define Z80CTC_TAG			"458"
 #define FDC_Z80_TAG			"416"
-#define NEC765AC_TAG		"418"
+#define NEC765_TAG			"418"
 
 #define NEWBRAIN_VIDEO_RV			0x01
 #define NEWBRAIN_VIDEO_FS			0x02
@@ -65,6 +65,11 @@ struct _newbrain_state
 	/* timers */
 	emu_timer *reset_timer;	/* power on reset timer */
 	emu_timer *pwrup_timer;	/* power up timer */
+
+	/* devices */
+	const device_config *mc6850;
+	const device_config *z80ctc;
+	const device_config *nec765;
 };
 
 /* ---------- defined in video/newbrain.c ---------- */
