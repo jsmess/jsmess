@@ -921,8 +921,6 @@ $(MESSOBJ)/necpc.a:	   \
 $(MESSOBJ)/enterp.a :   \
 	$(MESS_AUDIO)/dave.o	 \
 	$(MESS_VIDEO)/epnick.o	 \
-	$(MESS_VIDEO)/enterp.o	 \
-	$(MESS_MACHINE)/enterp.o	 \
 	$(MESS_DRIVERS)/enterp.o
 
 $(MESSOBJ)/ascii.a :   \
