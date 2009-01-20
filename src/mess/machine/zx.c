@@ -10,6 +10,7 @@
 #include "cpu/z80/z80.h"
 #include "includes/zx.h"
 #include "devices/cassette.h"
+#include "sound/speaker.h"
 
 #define video_screen_get_refresh(screen)	(((screen_config *)(screen)->inline_config)->refresh)
 
@@ -27,18 +28,15 @@ static WRITE8_HANDLER( zx_ram_w )
 	UINT8 *RAM = memory_region(space->machine, "main");	
 	RAM[offset + 0x4000] = data;
 
-	if ((offset > 0x29) && (offset < 0x400))
+	if (data & 0x40)
 	{
-		if (data & 0x40)
-		{
-			memory_write_byte (space, offset | 0xc000, data);
-			RAM[offset | 0xc000] = data;
-		}
-		else
-		{
-			memory_write_byte (space, offset | 0xc000, 0);
-			RAM[offset | 0xc000] = 0;
-		}
+		memory_write_byte (space, offset | 0xc000, data);
+		RAM[offset | 0xc000] = data;
+	}
+	else
+	{
+		memory_write_byte (space, offset | 0xc000, 0);
+		RAM[offset | 0xc000] = 0;
 	}
 }
 
@@ -72,7 +70,7 @@ static DIRECT_UPDATE_HANDLER ( pc8300_setdirect )
 	return address;
 }
 
-static DIRECT_UPDATE_HANDLER ( lambda_setdirect )
+static DIRECT_UPDATE_HANDLER ( pow3000_setdirect )
 {
 	if (address & 0xc000)
 		zx_ula_r(space->machine, address, "gfx1", 1);
@@ -85,9 +83,9 @@ MACHINE_RESET ( zx80 )
 	zx_tape_bit = 0x80;
 }
 
-MACHINE_RESET ( lambda )
+MACHINE_RESET ( pow3000 )
 {
-	memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), lambda_setdirect);
+	memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), pow3000_setdirect);
 	zx_tape_bit = 0x80;
 }
 
@@ -104,8 +102,10 @@ static TIMER_CALLBACK(zx_tape_pulse)
 
 READ8_HANDLER ( zx80_io_r )
 {
-/* port FE = read keyboard, cass bit and NTSC/PAL diode
-	The upper 8 bits are used to select a keyboard scan line */
+/* port FE = read keyboard, NTSC/PAL diode, and cass bit; turn off HSYNC-generator/cass-out
+	The upper 8 bits are used to select a keyboard scan line
+
+	The diode doesn't make any visual difference, but it's in the schematic, and used by the code. */
 
 	UINT8 data = 0xff;
 	UINT8 offs = offset & 0xff;
@@ -176,7 +176,7 @@ READ8_HANDLER ( zx80_io_r )
 READ8_HANDLER ( zx81_io_r )
 {
 /* port FB = read printer status, not emulated
-	FE = read keyboard, cass bit and NTSC/PAL diode; turn off HSYNC generator if NMI is off
+	FE = read keyboard, NTSC/PAL diode, and cass bit; turn off HSYNC-generator/cass-out
 	The upper 8 bits are used to select a keyboard scan line */
 
 	UINT8 data = 0xff;
@@ -245,11 +245,109 @@ READ8_HANDLER ( zx81_io_r )
 	return data;
 }
 
-READ8_HANDLER ( pow3000_io_r )
+READ8_HANDLER ( pc8300_io_r )
 {
+/* port F5 = sound
+	F6 = unknown
+	FB = read printer status, not emulated
+	FE = read keyboard and cass bit; turn off HSYNC-generator/cass-out
+	The upper 8 bits are used to select a keyboard scan line.
+	No TV diode */
+
 	UINT8 data = 0xff;
 	UINT8 offs = offset & 0xff;
+	static UINT8 speaker_state = 0;
 
+	if (offs == 0xf5)
+	{
+		speaker_state ^= 1;
+		speaker_level_w(0, speaker_state);
+	}
+	else
+	if (offs == 0xfe)
+	{
+		UINT8 extra1 = input_port_read(space->machine, "SPC1");
+		UINT8 extra2 = input_port_read(space->machine, "SPC2");
+
+		if ((offset & 0x0100) == 0)
+		{
+			data &= input_port_read(space->machine, "ROW0");
+			/* SHIFT for extra keys */
+			if (extra1 != 0xff || extra2 != 0xff)
+				data &= ~0x01;
+		}
+		if ((offset & 0x0200) == 0)
+			data &= input_port_read(space->machine, "ROW1");
+		if ((offset & 0x0400) == 0)
+			data &= input_port_read(space->machine, "ROW2");
+		if ((offset & 0x0800) == 0)
+			data &= input_port_read(space->machine, "ROW3") & extra1;
+		if ((offset & 0x1000) == 0)
+			data &= input_port_read(space->machine, "ROW4") & extra2;
+		if ((offset & 0x2000) == 0)
+			data &= input_port_read(space->machine, "ROW5");
+		if ((offset & 0x4000) == 0)
+			data &= input_port_read(space->machine, "ROW6");
+		if ((offset & 0x8000) == 0)
+			data &= input_port_read(space->machine, "ROW7");
+
+		cassette_output(devtag_get_device(space->machine, CASSETTE, "cassette"), +0.75);
+
+		if (ula_irq_active)
+		{
+			zx_ula_bkgnd(space->machine, 0);
+			ula_irq_active = 0;
+
+//			LOG_ZX81_IOR("ULA IRQs off");
+		}
+		else
+		{
+			if ((cassette_input(devtag_get_device(space->machine, CASSETTE, "cassette")) < -0.75) && zx_tape_bit)
+			{
+				zx_tape_bit = 0x00;
+				timer_set(space->machine, ATTOTIME_IN_USEC(362), NULL, 0, zx_tape_pulse);
+			}
+
+			data &= ~zx_tape_bit;
+
+//			LOG_ZX81_IOR("Tape");
+		}
+		if (ula_frame_vsync == 3)
+		{
+			ula_frame_vsync = 2;
+//			LOG_ZX81_VSYNC;
+		}
+	}
+	else
+		LOG_ZX81_IOR("Unmapped port");
+
+	return data;
+}
+
+READ8_HANDLER ( pow3000_io_r )
+{
+/* port 7E = read NTSC/PAL diode
+	F5 = sound
+	F6 = unknown
+	FB = read printer status, not emulated
+	FE = read keyboard and cass bit; turn off HSYNC-generator/cass-out
+	The upper 8 bits are used to select a keyboard scan line */
+
+	UINT8 data = 0xff;
+	UINT8 offs = offset & 0xff;
+	static UINT8 speaker_state = 0;
+
+	if (offs == 0x7e)
+	{
+		data = (input_port_read(space->machine, "CONFIG"));
+	}
+	else
+	if (offs == 0xf5)
+	{
+		speaker_state ^= 1;
+		speaker_level_w(0, speaker_state);
+	}
+	else
 	if (offs == 0xfe)
 	{
 		UINT8 extra0 = input_port_read(space->machine, "SPC0");
@@ -278,9 +376,6 @@ READ8_HANDLER ( pow3000_io_r )
 		if ((offset & 0x8000) == 0)
 			data &= input_port_read(space->machine, "ROW7") & extra2;
 
-		if (!input_port_read(space->machine, "CONFIG"))
-			data &= ~0x40;
-
 		cassette_output(devtag_get_device(space->machine, CASSETTE, "cassette"), +0.75);
 
 		if (ula_irq_active)
@@ -299,7 +394,7 @@ READ8_HANDLER ( pow3000_io_r )
 
 			data &= ~zx_tape_bit;
 
-			LOG_ZX81_IOR("Tape");
+//			LOG_ZX81_IOR("Tape");
 		}
 		if (ula_frame_vsync == 3)
 		{
@@ -327,7 +422,9 @@ WRITE8_HANDLER( zx80_io_w )
 
 WRITE8_HANDLER ( zx81_io_w )
 {
-/* port FB = write data to printer
+/* port F5 = unknown, pc8300/pow3000/lambda only
+	F6 = unknown, pc8300/pow3000/lambda only
+	FB = write data to printer, not emulated
 	FD = turn off NMI generator
 	FE = turn on NMI generator
 	FF = write HSYNC and cass data */
@@ -370,112 +467,3 @@ WRITE8_HANDLER ( zx81_io_w )
 		LOG_ZX81_IOR("Unmapped port");
 }
 
-READ8_HANDLER ( zx_io_r )
-{
-	const device_config *screen = video_screen_first(space->machine->config);
-	int data = 0xff;
-
-	if ((offset & 1) == 0)
-	{
-		int extra1 = input_port_read(space->machine, "SPC0");
-		int extra2 = input_port_read(space->machine, "SPC1");
-
-//		ula_scancode_count = 0;
-		if ((offset & 0x0100) == 0)
-		{
-			data &= input_port_read(space->machine, "ROW0");
-			/* SHIFT for extra keys */
-			if (extra1 != 0xff || extra2 != 0xff)
-				data &= ~0x01;
-		}
-		if ((offset & 0x0200) == 0)
-			data &= input_port_read(space->machine, "ROW1");
-		if ((offset & 0x0400) == 0)
-			data &= input_port_read(space->machine, "ROW2");
-		if ((offset & 0x0800) == 0)
-			data &= input_port_read(space->machine, "ROW3") & extra1;
-		if ((offset & 0x1000) == 0)
-			data &= input_port_read(space->machine, "ROW4") & extra2;
-		if ((offset & 0x2000) == 0)
-			data &= input_port_read(space->machine, "ROW5");
-		if ((offset & 0x4000) == 0)
-			data &= input_port_read(space->machine, "ROW6");
-		if ((offset & 0x8000) == 0)
-			data &= input_port_read(space->machine, "ROW7");
-		if (video_screen_get_refresh(screen) > 55)
-			data &= ~0x40;
-
-		if (ula_irq_active)
-		{
-			zx_ula_bkgnd(space->machine, 0);
-			ula_irq_active = 0;
-
-			LOG_ZX81_IOR("ULA IRQs off");
-		}
-		else
-		{
-			if ((cassette_input(devtag_get_device(space->machine, CASSETTE, "cassette")) < -0.75) && zx_tape_bit)
-			{
-				zx_tape_bit = 0x00;
-				timer_set(space->machine, ATTOTIME_IN_USEC(362), NULL, 0, zx_tape_pulse);
-			}
-
-			data &= ~zx_tape_bit;
-
-			LOG_ZX81_IOR("Tape");
-		}
-		if (ula_frame_vsync == 3)
-		{
-			ula_frame_vsync = 2;
-//			LOG_ZX81_VSYNC;
-		}
-	}
-	else
-		LOG_ZX81_IOR("Unmapped port");
-
-	return data;
-}
-
-WRITE8_HANDLER ( zx_io_w )
-{
-/* port FB = write data to printer
-	FD = turn off NMI generator
-	FE = turn on NMI generator
-	FF = write HSYNC and cass data */
-
-	const device_config *screen = video_screen_first(space->machine->config);
-	int height = video_screen_get_height(screen);
-	UINT8 offs = offset & 0xff;
-
-	if (!(offs & 2))
-	{
-		timer_reset(ula_nmi, attotime_never);
-
-		LOG_ZX81_IOW("ULA NMIs off");
-	}
-	else
-	if (!(offs & 1))
-	{
-		timer_adjust_periodic(ula_nmi, attotime_zero, 0, cpu_clocks_to_attotime(space->machine->cpu[0], 207));
-
-		LOG_ZX81_IOW("ULA NMIs on");
-
-		/* remove the IRQ */
-		ula_irq_active = 0;
-	}
-	else
-//	if (offs == 0xff)
-	{
-		zx_ula_bkgnd(space->machine, 1);
-		if (ula_frame_vsync == 2)
-		{
-			cpu_spinuntil_time(space->cpu,video_screen_get_time_until_pos(space->machine->primary_screen, height - 1, 0));
-			ula_scanline_count = height - 1;
-			logerror ("S: %d B: %d\n", video_screen_get_vpos(space->machine->primary_screen), video_screen_get_hpos(space->machine->primary_screen));
-		}
-
-		LOG_ZX81_IOW("ULA IRQs on");
-	}
-//	else
-//		LOG_ZX81_IOR("Unmapped port");
-}

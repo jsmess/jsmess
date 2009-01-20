@@ -51,6 +51,7 @@ medium transfer rate is approx. 307 bps (38 bytes/sec) for files that contain
 #define ZX81_START_LOAD_ADDRESS	0x4009
 #define ZX80_START_LOAD_ADDRESS	0x4000
 #define ZX81_DATA_LENGTH_OFFSET	0x0b
+#define ZX80_DATA_LENGTH_OFFSET	0x04
 
 static UINT8 zx_file_name[128];
 static UINT16 real_data_length = 0;
@@ -236,7 +237,7 @@ static int zx80_cassette_calculate_size_in_samples(const UINT8 *bytes, int lengt
 	unsigned int number_of_0_data = 0;
 	unsigned int number_of_1_data = 0;
 
-	real_data_length = bytes[ZX81_DATA_LENGTH_OFFSET] + bytes[ZX81_DATA_LENGTH_OFFSET+1]*256 - ZX81_START_LOAD_ADDRESS;
+	real_data_length = bytes[ZX80_DATA_LENGTH_OFFSET] + bytes[ZX80_DATA_LENGTH_OFFSET+1]*256 - ZX80_START_LOAD_ADDRESS - 1;
 
 	number_of_1_data = zx81_cassette_calculate_number_of_1(bytes, real_data_length);
 	number_of_0_data = length*8-number_of_1_data;
