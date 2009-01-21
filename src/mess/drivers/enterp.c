@@ -25,13 +25,6 @@
 
 #define ENTERPRISE_XTAL_X1	XTAL_8MHz
 
-/* there are 64us per line, although in reality
-   about 50 are visible. */
-/* there are 312 lines per screen, although in reality
-   about 35*8 are visible */
-#define ENTERPRISE_SCREEN_WIDTH (50*16)
-#define ENTERPRISE_SCREEN_HEIGHT	(35*8)
-
 
 /* state of the wd1770 irq/drq lines */
 static UINT8 exdos_card_value = 0;
@@ -195,24 +188,6 @@ static MACHINE_RESET( enterprise )
 	cpu_set_input_line_vector(machine->cpu[0], 0, 0xff);
 
 	floppy_drive_set_geometry(image_from_devtype_and_index(machine, IO_FLOPPY, 0), FLOPPY_DRIVE_DS_80);
-}
-
-
-/***************************************************************************
-    VIDEO
-***************************************************************************/
-
-static VIDEO_START( enterprise )
-{
-	Nick_vh_start();
-	VIDEO_START_CALL(generic_bitmapped);
-}
-
-
-static VIDEO_UPDATE( enterprise )
-{
-	Nick_DoScreen(tmpbitmap);
-	return VIDEO_UPDATE_CALL(generic_bitmapped);
 }
 
 
@@ -482,12 +457,12 @@ static MACHINE_DRIVER_START( ep64 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(ENTERPRISE_SCREEN_WIDTH, ENTERPRISE_SCREEN_HEIGHT)
 	MDRV_SCREEN_VISIBLE_AREA(0, ENTERPRISE_SCREEN_WIDTH-1, 0, ENTERPRISE_SCREEN_HEIGHT-1)
-	/* MDRV_GFXDECODE( enterprise ) */
-	MDRV_PALETTE_LENGTH(NICK_PALETTE_SIZE)
-	MDRV_PALETTE_INIT( nick )
 
-	MDRV_VIDEO_START( enterprise )
-	MDRV_VIDEO_UPDATE( enterprise )
+	MDRV_PALETTE_LENGTH(NICK_PALETTE_SIZE)
+	MDRV_PALETTE_INIT(nick)
+
+	MDRV_VIDEO_START(nick)
+	MDRV_VIDEO_UPDATE(nick)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
