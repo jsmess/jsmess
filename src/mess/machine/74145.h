@@ -4,14 +4,16 @@
  *
  ****************************************************************************/
 
-#ifndef TTL74145_H_
-#define TTL74145_H_
+#ifndef __TTL74145_H__
+#define __TTL74145_H__
+
 
 /***************************************************************************
     MACROS
 ***************************************************************************/
 
 #define TTL74145		DEVICE_GET_INFO_NAME(ttl74145)
+
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -21,11 +23,11 @@ typedef void (*ttl74145_output_line_func)(const device_config *device, int state
 #define TTL74145_OUTPUT_LINE(name)	void name(const device_config *device, int state )
 
 
-/* Interface */
+/* interface */
 typedef struct _ttl74145_interface ttl74145_interface;
 struct _ttl74145_interface
 {
-	/* Outputs */
+	/* outputs */
 	ttl74145_output_line_func output_line_0;
 	ttl74145_output_line_func output_line_1;
 	ttl74145_output_line_func output_line_2;
@@ -46,17 +48,20 @@ struct _ttl74145_interface
 /* device interface */
 DEVICE_GET_INFO( ttl74145 );
 
-/* Standard handlers */
+/* standard handlers */
 WRITE8_DEVICE_HANDLER( ttl74145_w );
 READ16_DEVICE_HANDLER( ttl74145_r );
+
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_TTL74145_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, TTL74145, 0) \
+#define MDRV_TTL74145_ADD(_tag) \
+	MDRV_DEVICE_ADD(_tag, TTL74145, 0)
+
+#define MDRV_TTL74145_CONFIG(_intrf) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
 
-#endif /*TTL74145_H_*/
+#endif /* __TTL74145_H__ */

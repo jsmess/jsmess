@@ -46,24 +46,21 @@
 #include "74145.h"
 
 
-/*****************************************************************************
- Type definitions
-*****************************************************************************/
-
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
 
 typedef struct _ttl74145_t ttl74145_t;
 struct _ttl74145_t
 {
-	/* Pointer to our interface */
-	const ttl74145_interface *intf;
-
-	/* Decoded number */
+	/* decoded number */
 	UINT16 number;
 };
 
-/*****************************************************************************
- Implementation
-*****************************************************************************/
+
+/***************************************************************************
+    IMPLEMENTATION
+***************************************************************************/
 
 INLINE ttl74145_t *get_safe_token(const device_config *device)
 {
@@ -73,62 +70,75 @@ INLINE ttl74145_t *get_safe_token(const device_config *device)
 	return (ttl74145_t *)device->token;
 }
 
-WRITE8_DEVICE_HANDLER( ttl74145_w ) {
-	/* Decode number */
+
+WRITE8_DEVICE_HANDLER( ttl74145_w )
+{
 	ttl74145_t *ttl74145 = get_safe_token(device);
+
+	/* decode number */
 	UINT16 new_number = bcd_2_dec(data & 0x0f);
 
-	/* Call output callbacks if the number changed */
+	/* call output callbacks if the number changed */
 	if (new_number != ttl74145->number)
 	{
-		const ttl74145_interface *i = ttl74145->intf;
+		const ttl74145_interface *i = device->static_config;
 
-		if (i->output_line_0) i->output_line_0(device, new_number == 0);
-		if (i->output_line_1) i->output_line_1(device, new_number == 1);
-		if (i->output_line_2) i->output_line_2(device, new_number == 2);
-		if (i->output_line_3) i->output_line_3(device, new_number == 3);
-		if (i->output_line_4) i->output_line_4(device, new_number == 4);
-		if (i->output_line_5) i->output_line_5(device, new_number == 5);
-		if (i->output_line_6) i->output_line_6(device, new_number == 6);
-		if (i->output_line_7) i->output_line_7(device, new_number == 7);
-		if (i->output_line_8) i->output_line_8(device, new_number == 8);
-		if (i->output_line_9) i->output_line_9(device, new_number == 9);
+		if (i != NULL)
+		{
+			if (i->output_line_0) i->output_line_0(device, new_number == 0);
+			if (i->output_line_1) i->output_line_1(device, new_number == 1);
+			if (i->output_line_2) i->output_line_2(device, new_number == 2);
+			if (i->output_line_3) i->output_line_3(device, new_number == 3);
+			if (i->output_line_4) i->output_line_4(device, new_number == 4);
+			if (i->output_line_5) i->output_line_5(device, new_number == 5);
+			if (i->output_line_6) i->output_line_6(device, new_number == 6);
+			if (i->output_line_7) i->output_line_7(device, new_number == 7);
+			if (i->output_line_8) i->output_line_8(device, new_number == 8);
+			if (i->output_line_9) i->output_line_9(device, new_number == 9);
+		}
 	}
 
-	/* Update state */
+	/* update state */
 	ttl74145->number = new_number;
 }
 
-READ16_DEVICE_HANDLER( ttl74145_r ) {
+
+READ16_DEVICE_HANDLER( ttl74145_r )
+{
 	ttl74145_t *ttl74145 = get_safe_token(device);
 
 	return ttl74145->number;
 }
 
-/* Device Interface */
+
+/***************************************************************************
+    DEVICE INTERFACE
+***************************************************************************/
 
 static DEVICE_START( ttl74145 )
 {
 	ttl74145_t *ttl74145 = get_safe_token(device);
-	// validate arguments
 
+	/* validate arguments */
 	assert(device != NULL);
 	assert(device->tag != NULL);
-	assert(device->static_config != NULL);
 
-	ttl74145->intf = device->static_config;
+	/* initialize with 0 */
 	ttl74145->number = 0;
 
-	// register for state saving
+	/* register for state saving */
 	state_save_register_item(device->machine, "ttl74145", device->tag, 0, ttl74145->number);
+
 	return DEVICE_START_OK;
 }
+
 
 static DEVICE_RESET( ttl74145 )
 {
 	ttl74145_t *ttl74145 = get_safe_token(device);
 	ttl74145->number = 0;
 }
+
 
 static DEVICE_SET_INFO( ttl74145 )
 {
@@ -138,26 +148,27 @@ static DEVICE_SET_INFO( ttl74145 )
 	}
 }
 
+
 DEVICE_GET_INFO( ttl74145 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(ttl74145_t);					break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
+		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(ttl74145_t);				break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = 0;								break;
+		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(ttl74145); break;
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(ttl74145);		break;
-		case DEVINFO_FCT_STOP:							/* Nothing */								break;
-		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(ttl74145);		break;
+		case DEVINFO_FCT_SET_INFO:				info->set_info = DEVICE_SET_INFO_NAME(ttl74145); break;
+		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(ttl74145);	break;
+		case DEVINFO_FCT_STOP:					/* Nothing */								break;
+		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(ttl74145);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "TTL74145");				break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "TTL74145");				break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");						break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);					break;
-		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");		break;
+		case DEVINFO_STR_NAME:					strcpy(info->s, "TTL74145");				break;
+		case DEVINFO_STR_FAMILY:				strcpy(info->s, "TTL74145");				break;
+		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.1");						break;
+		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);					break;
+		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright MESS Team");		break;
 	}
 }

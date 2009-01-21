@@ -26,7 +26,7 @@ static UINT8 key_digit;
 static READ8_DEVICE_HANDLER( ins8154_b1_port_a_r )
 {
 	UINT8 data;
-	static const char *const keynames[] = { "keyboard_0", "keyboard_1", "keyboard_2", "keyboard_3", 
+	static const char *const keynames[] = { "keyboard_0", "keyboard_1", "keyboard_2", "keyboard_3",
 										"keyboard_4", "keyboard_5", "keyboard_6", "keyboard_7" };
 
 	data = input_port_read(device->machine, keynames[key_digit]);
@@ -42,7 +42,7 @@ static WRITE8_DEVICE_HANDLER( ins8154_b1_port_a_w )
 static WRITE8_DEVICE_HANDLER( acrnsys1_led_segment_w )
 {
 	logerror("led %d segment data: %02x\n", key_digit, data);
-	
+
 	output_set_digit_value(key_digit + 0, data);
 }
 
@@ -112,7 +112,7 @@ static INPUT_PORTS_START( acrnsys1 )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("M") PORT_CODE(KEYCODE_M) PORT_CHAR('M')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0) PORT_CHAR('0')
 	PORT_BIT(0xc7, IP_ACTIVE_LOW, IPT_UNUSED)
-	
+
 	PORT_START("keyboard_1")
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9) PORT_CHAR('9')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G") PORT_CODE(KEYCODE_G) PORT_CHAR('G')
@@ -130,7 +130,7 @@ static INPUT_PORTS_START( acrnsys1 )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S") PORT_CODE(KEYCODE_S) PORT_CHAR('S')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3) PORT_CHAR('3')
 	PORT_BIT(0xc7, IP_ACTIVE_LOW, IPT_UNUSED)
-	
+
 	PORT_START("keyboard_4")
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C) PORT_CHAR('C')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("L") PORT_CODE(KEYCODE_L) PORT_CHAR('L')
@@ -158,7 +158,7 @@ static INPUT_PORTS_START( acrnsys1 )
 	PORT_START("reset")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RST") PORT_CODE(KEYCODE_F3) PORT_CHAR(UCHAR_MAMEKEY(F3))
 	PORT_BIT(0xfe, IP_ACTIVE_LOW, IPT_UNUSED)
-	
+
 	PORT_START("switch")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Switch") PORT_CODE(KEYCODE_F3) PORT_CHAR(UCHAR_MAMEKEY(F1))
 	PORT_BIT(0xfe, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -183,12 +183,13 @@ static MACHINE_DRIVER_START( acrnsys1 )
 	MDRV_CPU_PROGRAM_MAP(acrnsys1_map, 0)
 
 	MDRV_MACHINE_RESET(acrnsys1)
-	
+
 	MDRV_DEFAULT_LAYOUT(layout_acrnsys1)
-	
+
 	/* devices */
 	MDRV_INS8154_ADD("b1", ins8154_b1)
-	MDRV_TTL74145_ADD("ttl74145", ic8_7445)
+	MDRV_TTL74145_ADD("ttl74145")
+	MDRV_TTL74145_CONFIG(ic8_7445)
 MACHINE_DRIVER_END
 
 
