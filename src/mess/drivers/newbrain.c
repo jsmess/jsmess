@@ -42,9 +42,10 @@
 
 	TODO:
 
+	- make it boot!
+	- video excess
 	- escape key
 	- COP420 microbus
-	- video
 	- tape
 	- layout for the 16-segment displays
 
@@ -69,14 +70,6 @@ static const device_config *cassette_device_image(running_machine *machine, int 
 }
 
 /* Enable/Status */
-
-#define NEWBRAIN_ENRG1_CLK	0x01
-#define NEWBRAIN_ENRG1_TVP	0x04
-#define NEWBRAIN_ENRG1_CTS	0x10
-#define NEWBRAIN_ENRG1_DO	0x20
-#define NEWBRAIN_ENRG1_PO	0x80
-#define NEWBRAIN_ENRG1_UST_BIT_1_MASK	0x30
-#define NEWBRAIN_ENRG1_UST_BIT_0_MASK	0xc0
 
 static WRITE8_HANDLER( enrg1_w )
 {
@@ -487,34 +480,32 @@ static WRITE8_HANDLER( m_pr_w )
 
 /* Video */
 
+static void newbrain_tvram_w(running_machine *machine, UINT8 data, int a6)
+{
+	newbrain_state *state = machine->driver_data;
+
+	/* latch video address counter bits A5-A0 */
+	state->tvram = (state->tvctl & NEWBRAIN_VIDEO_80L) ? 0x04 : 0x02;
+
+	/* latch video address counter bit A6 */
+	state->tvram |= a6 << 6;
+
+	/* latch data to video address counter bits A14-A7 */
+	state->tvram = (data << 7);
+}
+
 static READ8_HANDLER( tvl_r )
 {
-	newbrain_state *state = space->machine->driver_data;
+	UINT8 data = 0xff;
 
-	if (offset)
-	{
-		state->tvram = 0xff;
-	}
-	else
-	{
-		state->tvram = 0x1ff;
-	}
+	newbrain_tvram_w(space->machine, data, !offset);
 
-	return 0xff;
+	return data;
 }
 
 static WRITE8_HANDLER( tvl_w )
 {
-	newbrain_state *state = space->machine->driver_data;
-
-	if (offset)
-	{
-		state->tvram = data;
-	}
-	else
-	{
-		state->tvram = 0x100 | data;
-	}
+	newbrain_tvram_w(space->machine, data, !offset);
 }
 
 static WRITE8_HANDLER( tvctl_w )
@@ -1439,7 +1430,7 @@ ROM_START( newbrain )
 	ROM_LOAD( "d417-2.rom", 0x0000, 0x2000, CRC(e8bda8b9) SHA1(c85a76a5ff7054f4ef4a472ce99ebaed1abd269c) )
 
 	ROM_REGION( 0x1000, "chargen", 0 )
-	ROM_LOAD( "8248r7.453", 0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "8248r7.453", 0x0000, 0x1000, BAD_DUMP CRC(46ecbc65) SHA1(3fe064d49a4de5e3b7383752e98ad35a674e26dd) )
 ROM_END
 
 ROM_START( newbraim )
@@ -1451,7 +1442,7 @@ ROM_START( newbraim )
 	ROM_LOAD( "cop420.419", 0x000, 0x400, NO_DUMP )
 
 	ROM_REGION( 0x1000, "chargen", 0 )
-	ROM_LOAD( "8248r7.453", 0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "8248r7.453", 0x0000, 0x1000, BAD_DUMP CRC(46ecbc65) SHA1(3fe064d49a4de5e3b7383752e98ad35a674e26dd) )
 ROM_END
 
 ROM_START( newbraia )
@@ -1479,7 +1470,7 @@ ROM_START( newbraia )
 	ROM_LOAD( "cop420.419", 0x000, 0x400, NO_DUMP )
 
 	ROM_REGION( 0x1000, "chargen", 0 )
-	ROM_LOAD( "8248r7.453", 0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "8248r7.453", 0x0000, 0x1000, BAD_DUMP CRC(46ecbc65) SHA1(3fe064d49a4de5e3b7383752e98ad35a674e26dd) )
 ROM_END
 
 #define rom_newbraiv rom_newbraia
