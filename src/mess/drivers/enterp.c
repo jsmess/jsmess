@@ -26,11 +26,12 @@
 #define ENTERPRISE_XTAL_X1	XTAL_8MHz
 
 
-/* state of the wd1770 irq/drq lines */
-static UINT8 exdos_card_value = 0;
-
-/* index of keyboard line to read */
-static int Enterprise_KeyboardLine = 0;
+typedef struct _ep_state ep_state;
+struct _ep_state
+{
+	UINT8 exdos_card_value;  /* state of the wd1770 irq/drq lines */
+	UINT8 keyboard_line;     /* index of keyboard line to read */
+};
 
 
 /***************************************************************************
@@ -100,6 +101,8 @@ static void enterprise_update_memory_page(const address_space *space, offs_t pag
 /* EP specific handling of dave register write */
 static void enterprise_dave_reg_write(running_machine *machine, offs_t RegIndex, int Data)
 {
+	ep_state *ep = machine->driver_data;
+
 	switch (RegIndex)
 	{
 	case 0x10:
@@ -110,7 +113,7 @@ static void enterprise_dave_reg_write(running_machine *machine, offs_t RegIndex,
 		break;
 
 	case 0x15:
-		Enterprise_KeyboardLine = Data & 15;
+		ep->keyboard_line = Data & 15;
 		break;
 	}
 }
@@ -118,14 +121,20 @@ static void enterprise_dave_reg_write(running_machine *machine, offs_t RegIndex,
 
 static void enterprise_dave_reg_read(running_machine *machine, offs_t RegIndex)
 {
-	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4",
-										"LINE5", "LINE6", "LINE7", "LINE8", "LINE9" };
+	static const char *const keynames[] =
+	{
+		"LINE0", "LINE1", "LINE2", "LINE3", "LINE4",
+		"LINE5", "LINE6", "LINE7", "LINE8", "LINE9"
+	};
+
+	ep_state *ep = machine->driver_data;
+
 	switch (RegIndex)
 	{
 	case 0x015:
 		{
 		/* read keyboard line */
-			Dave_setreg(machine, 0x015, input_port_read(machine, keynames[Enterprise_KeyboardLine]));
+			Dave_setreg(machine, 0x015, input_port_read(machine, keynames[ep->keyboard_line]));
 		}
 		break;
 
@@ -134,9 +143,9 @@ static void enterprise_dave_reg_read(running_machine *machine, offs_t RegIndex)
 		int ExternalJoystickInputs;
 		int ExternalJoystickPortInput = input_port_read(machine, "JOY1");
 
-		if (Enterprise_KeyboardLine<=4)
+		if (ep->keyboard_line <= 4)
 		{
-				ExternalJoystickInputs = ExternalJoystickPortInput>>(4-Enterprise_KeyboardLine);
+				ExternalJoystickInputs = ExternalJoystickPortInput>>(4-(ep->keyboard_line));
 		}
 		else
 		{
@@ -197,12 +206,14 @@ static MACHINE_RESET( enterprise )
 
 static WD17XX_CALLBACK( enterp_wd1770_callback )
 {
+	ep_state *ep = device->machine->driver_data;
+
 	switch (state)
 	{
-	case WD17XX_IRQ_CLR: exdos_card_value &= ~0x02; break;
-	case WD17XX_IRQ_SET: exdos_card_value |= 0x02; break;
-	case WD17XX_DRQ_CLR: exdos_card_value &= ~0x80; break;
-	case WD17XX_DRQ_SET: exdos_card_value |= 0x80; break;
+	case WD17XX_IRQ_CLR: ep->exdos_card_value &= ~0x02; break;
+	case WD17XX_IRQ_SET: ep->exdos_card_value |= 0x02; break;
+	case WD17XX_DRQ_CLR: ep->exdos_card_value &= ~0x80; break;
+	case WD17XX_DRQ_SET: ep->exdos_card_value |= 0x80; break;
 	}
 }
 
@@ -218,7 +229,8 @@ static WD17XX_CALLBACK( enterp_wd1770_callback )
 */
 static READ8_HANDLER( exdos_card_r )
 {
-	return exdos_card_value;
+	ep_state *ep = space->machine->driver_data;
+	return ep->exdos_card_value;
 }
 
 
@@ -449,6 +461,7 @@ static MACHINE_DRIVER_START( ep64 )
 	MDRV_CPU_IO_MAP(enterprise_io, 0)
 
 	MDRV_MACHINE_RESET(enterprise)
+	MDRV_DRIVER_DATA(ep_state)
 
     /* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
