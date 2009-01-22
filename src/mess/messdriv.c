@@ -1093,9 +1093,9 @@ XL/XE 16kB OS roms
 
 	/* Grundy Business Systems Ltd */
 	DRIVER( newbrain )
-	DRIVER( newbraim )
+	DRIVER( newbraie )
 	DRIVER( newbraia )
-	DRIVER( newbraiv )
+	DRIVER( newbraim )
 
 	/* Votrax */
 //	DRIVER( votrtnt ) /* Votrax Type-N-Talk */

@@ -19,6 +19,15 @@
 #define NEWBRAIN_ENRG1_UST_BIT_1_MASK	0x30
 #define NEWBRAIN_ENRG1_UST_BIT_0_MASK	0xc0
 
+#define NEWBRAIN_ENRG2_USERP			0x01
+#define NEWBRAIN_ENRG2_ANP				0x02
+#define NEWBRAIN_ENRG2_MLTMD			0x04
+#define NEWBRAIN_ENRG2_MSPD				0x08
+#define NEWBRAIN_ENRG2_ENOR				0x10
+#define NEWBRAIN_ENRG2_ANSW				0x20
+#define NEWBRAIN_ENRG2_ENOT				0x40
+#define NEWBRAIN_ENRG2_CENTRONICS_OUT	0x80
+
 #define NEWBRAIN_VIDEO_RV				0x01
 #define NEWBRAIN_VIDEO_FS				0x02
 #define NEWBRAIN_VIDEO_32_40			0x04
@@ -37,6 +46,7 @@ struct _newbrain_state
 	int copint;				/* COP interrupt */
 	int anint;				/* A/DC interrupt */
 	int bee;				/* identity */
+	int a16;				/* address line 16 */
 	UINT8 enrg1;			/* enable register 1 */
 	UINT8 enrg2;			/* enable register 2 */
 

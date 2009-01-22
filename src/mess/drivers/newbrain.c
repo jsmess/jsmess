@@ -32,6 +32,8 @@
 	ADC0809 (427)
 	DAC0808 (461)
 
+	Models according to the Software Technical Manual:
+
 	Model M: 'Page Register', Expansion Port onto Z80 bus, Video, ACIA/CTC, User Port
 	Model A: Expansion Port, Video, no User Port but has software driver serial port - s/w Printer, s/w V24
 	Model V: ACIA/CTC, User Port
@@ -42,12 +44,14 @@
 
 	TODO:
 
-	- make it boot!
-	- video excess
-	- escape key
+	- boot ends up in HALT because the COP is not responding
+	- a000-bfff should be unmapped for newbrain_m
 	- COP420 microbus
-	- tape
+	- video excess
+	- escape key is missing
 	- layout for the 16-segment displays
+	- convert FDC into a device
+	- convert EIM into a device
 
 	- floppy disc controller
 	- CP/M 2.2
@@ -67,6 +71,15 @@ static const device_config *cassette_device_image(running_machine *machine, int 
 		return devtag_get_device(machine, CASSETTE, "cassette2");
 	else
 		return devtag_get_device(machine, CASSETTE, "cassette1");
+}
+
+static void check_interrupt(running_machine *machine)
+{
+	newbrain_state *state = machine->driver_data;
+
+	int level = (!state->clkint || !state->copint) ? ASSERT_LINE : CLEAR_LINE;
+
+	cputag_set_input_line(machine, Z80_TAG, INPUT_LINE_IRQ0, level);
 }
 
 /* Enable/Status */
@@ -260,6 +273,7 @@ static READ8_HANDLER( clclk_r )
 	newbrain_state *state = space->machine->driver_data;
 
 	state->clkint = 1;
+	check_interrupt(space->machine);
 
 	return 0xff;
 }
@@ -269,6 +283,7 @@ static WRITE8_HANDLER( clclk_w )
 	newbrain_state *state = space->machine->driver_data;
 
 	state->clkint = 1;
+	check_interrupt(space->machine);
 }
 
 static READ8_HANDLER( clusr_r )
@@ -322,9 +337,8 @@ static WRITE8_HANDLER( newbrain_cop_g_w )
 
 	newbrain_state *state = space->machine->driver_data;
 
-	cputag_set_input_line(space->machine, Z80_TAG, INPUT_LINE_IRQ0, BIT(data, 0) ? HOLD_LINE : CLEAR_LINE);
-
 	state->copint = BIT(data, 0);
+	check_interrupt(space->machine);
 
 	/* tape motor enable */
 
@@ -364,6 +378,7 @@ static WRITE8_HANDLER( newbrain_cop_d_w )
 	*/
 
 	newbrain_state *state = space->machine->driver_data;
+	
 	static const char *const keynames[] = { "D0", "D1", "D2", "D3", "D4", "D5", "D6", "D7",
 										"D8", "D9", "D10", "D11", "D12", "D13", "D14", "D15" };
 
@@ -604,9 +619,9 @@ static READ8_HANDLER( ust2_r )
 static READ8_HANDLER( cop_r )
 {
 	newbrain_state *state = space->machine->driver_data;
-	UINT8 data;
+	UINT8 data = 0; // REGINT
 
-	state->cop_rd = 0;
+/*	state->cop_rd = 0;
 	state->cop_wr = 1;
 	state->cop_access = 0;
 
@@ -614,7 +629,7 @@ static READ8_HANDLER( cop_r )
 
 	state->cop_rd = 1;
 	state->cop_wr = 1;
-	state->cop_access = 1;
+	state->cop_access = 1;*/
 
 	return data;
 }
@@ -623,7 +638,7 @@ static WRITE8_HANDLER( cop_w )
 {
 	newbrain_state *state = space->machine->driver_data;
 
-	state->cop_rd = 1;
+/*	state->cop_rd = 1;
 	state->cop_wr = 0;
 	state->cop_access = 0;
 
@@ -631,7 +646,18 @@ static WRITE8_HANDLER( cop_w )
 
 	state->cop_rd = 1;
 	state->cop_wr = 1;
-	state->cop_access = 1;
+	state->cop_access = 1;*/
+
+	state->copint = 1;
+	check_interrupt(space->machine);
+}
+
+static TIMER_DEVICE_CALLBACK( cop_regint_tick )
+{
+	newbrain_state *state = timer->machine->driver_data;
+
+	state->copint = 0;
+	check_interrupt(timer->machine);
 }
 
 /* Expansion Interface Module */
@@ -790,16 +816,18 @@ static WRITE8_HANDLER( ei_paging_w )
 
 			bit		signal		description
 
-			0		PG
-			1		WPL
-			2		A16
-			3		_MPM
-			4		HISLT
+			0		PG			
+			1		WPL			
+			2		A16			address line 16
+			3		_MPM		
+			4		HISLT		
 			5
 			6
 			7
 
 		*/
+
+		state->a16 = BIT(data, 2);
 	}
 	else if (BIT(offset, 9))
 	{
@@ -809,10 +837,10 @@ static WRITE8_HANDLER( ei_paging_w )
 
 			bit		signal		description
 
-			0		PAGING
+			0		PAGING		
 			1
-			2		HA16
-			3		MPM
+			2		HA16		address line 16
+			3		MPM			
 			4
 			5		_FDC RESET
 			6
@@ -912,9 +940,6 @@ static ADDRESS_MAP_START( newbrain_m_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x14, 0x14) AM_MIRROR(0xffc0) AM_READ(ust_r)
 	AM_RANGE(0x15, 0x15) AM_MIRROR(0xffc2) AM_READ(user_r)
 	AM_RANGE(0x16, 0x16) AM_MIRROR(0xffc0) AM_READ(ust2_r)
-	AM_RANGE(0x18, 0x18) AM_MIRROR(0xffc0) AM_DEVREADWRITE(ACIA6850, MC6850_TAG, acia6850_stat_r, acia6850_ctrl_w)
-	AM_RANGE(0x19, 0x19) AM_MIRROR(0xffc0) AM_DEVREADWRITE(ACIA6850, MC6850_TAG, acia6850_data_r, acia6850_data_w)
-	AM_RANGE(0x1c, 0x1c) AM_MIRROR(0xffc0) AM_DEVREADWRITE(Z80CTC, Z80CTC_TAG, z80ctc_r, z80ctc_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( newbrain_a_io_map, ADDRESS_SPACE_IO, 8 )
@@ -928,22 +953,6 @@ static ADDRESS_MAP_START( newbrain_a_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0xffc3) AM_WRITE(tvctl_w)
 	AM_RANGE(0x14, 0x14) AM_MIRROR(0xffc0) AM_READ(a_ust_r)
 	AM_RANGE(0x16, 0x16) AM_MIRROR(0xffc0) AM_READ(ust2_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( newbrain_v_io_map, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xffc0) AM_READWRITE(clusr_r, clusr_w)
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0xffc0) AM_WRITE(user_w)
-	AM_RANGE(0x04, 0x04) AM_MIRROR(0xffc0) AM_READWRITE(clclk_r, clclk_w)
-	AM_RANGE(0x06, 0x06) AM_MIRROR(0xffc0) AM_READWRITE(cop_r, cop_w)
-	AM_RANGE(0x07, 0x07) AM_MIRROR(0xffc0) AM_WRITE(enrg1_w)
-	AM_RANGE(0x08, 0x09) AM_MIRROR(0xffc2) AM_WRITE(tvl_w)
-	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0xffc3) AM_WRITE(tvctl_w)
-	AM_RANGE(0x14, 0x14) AM_MIRROR(0xffc0) AM_READ(ust_r)
-	AM_RANGE(0x15, 0x15) AM_MIRROR(0xffc2) AM_READ(user_r)
-	AM_RANGE(0x18, 0x18) AM_MIRROR(0xffc0) AM_DEVREADWRITE(ACIA6850, MC6850_TAG, acia6850_stat_r, acia6850_ctrl_w)
-	AM_RANGE(0x19, 0x19) AM_MIRROR(0xffc0) AM_DEVREADWRITE(ACIA6850, MC6850_TAG, acia6850_data_r, acia6850_data_w)
-	AM_RANGE(0x1c, 0x1c) AM_MIRROR(0xffc0) AM_DEVREADWRITE(Z80CTC, Z80CTC_TAG, z80ctc_r, z80ctc_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( newbrain_cop_io_map, ADDRESS_SPACE_IO, 8 )
@@ -1167,6 +1176,8 @@ INLINE int get_pwrup_t(void)
 static TIMER_CALLBACK( pwrup_tick )
 {
 	newbrain_state *state = machine->driver_data;
+	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+
 	int bank;
 
 	state->pwrup = 0;
@@ -1179,12 +1190,17 @@ static TIMER_CALLBACK( pwrup_tick )
 		if (bank < 6)
 		{
 			/* RAM */
-			memory_install_readwrite8_handler(cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM), bank_start, bank_end, 0, 0, SMH_BANK((FPTR)bank), SMH_BANK((FPTR)bank));
+			memory_install_readwrite8_handler(program, bank_start, bank_end, 0, 0, SMH_BANK((FPTR)bank), SMH_BANK((FPTR)bank));
+		}
+		else if (bank == 6)
+		{
+			/* unmapped on the M model */
+			memory_install_readwrite8_handler(program, bank_start, bank_end, 0, 0, SMH_BANK((FPTR)bank), SMH_UNMAP);
 		}
 		else
 		{
 			/* ROM */
-			memory_install_readwrite8_handler(cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM), bank_start, bank_end, 0, 0, SMH_BANK((FPTR)bank), SMH_UNMAP);
+			memory_install_readwrite8_handler(program, bank_start, bank_end, 0, 0, SMH_BANK((FPTR)bank), SMH_UNMAP);
 		}
 
 		memory_configure_bank(machine, bank, 0, 1, memory_region(machine, Z80_TAG) + bank_start, 0);
@@ -1220,12 +1236,6 @@ static MACHINE_START( newbrain )
 	timer_adjust_oneshot(state->pwrup_timer, ATTOTIME_IN_USEC(get_pwrup_t()), 0);
 	state->pwrup = 1;
 
-	/* find devices */
-
-	state->z80ctc = devtag_get_device(machine, Z80CTC, Z80CTC_TAG);
-	state->mc6850 = devtag_get_device(machine, ACIA6850, MC6850_TAG);
-	state->nec765 = devtag_get_device(machine, NEC765A, NEC765_TAG);
-
 	/* initialize variables */
 
 	state->userint = 1;
@@ -1238,6 +1248,19 @@ static MACHINE_START( newbrain )
 
 	/* register for state saving */
 
+}
+
+static MACHINE_START( newbrain_eim )
+{
+	newbrain_state *state = machine->driver_data;
+
+	MACHINE_START_CALL(newbrain);
+
+	/* find devices */
+
+	state->z80ctc = devtag_get_device(machine, Z80CTC, Z80CTC_TAG);
+	state->mc6850 = devtag_get_device(machine, ACIA6850, MC6850_TAG);
+	state->nec765 = devtag_get_device(machine, NEC765A, NEC765_TAG);
 }
 
 static MACHINE_RESET( newbrain )
@@ -1256,9 +1279,8 @@ static INTERRUPT_GEN( newbrain_interrupt )
 
 	if (!(state->enrg1 & NEWBRAIN_ENRG1_CLK))
 	{
-		cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_IRQ0, HOLD_LINE);
-
 		state->clkint = 0;
+		check_interrupt(device->machine);
 	}
 }
 
@@ -1278,159 +1300,149 @@ static const cassette_config newbrain_cassette_config =
 	CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED
 };
 
-
-static MACHINE_DRIVER_START( newbrain )
+static MACHINE_DRIVER_START( newbrain_a )
 	MDRV_DRIVER_DATA(newbrain_state)
 
-	// basic system hardware
-
-	MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/8)
-	MDRV_CPU_PROGRAM_MAP(newbrain_map, 0)
-	MDRV_CPU_IO_MAP(newbrain_ei_io_map, 0)
-	MDRV_CPU_VBLANK_INT(SCREEN_TAG, newbrain_interrupt)
-
-	MDRV_CPU_ADD(COP420_TAG, COP420, XTAL_16MHz/8) // COP420-GUW/M
-	MDRV_CPU_IO_MAP(newbrain_cop_io_map, 0)
-	MDRV_CPU_CONFIG(newbrain_cop_intf)
-
-	MDRV_CPU_ADD(FDC_Z80_TAG, Z80, XTAL_4MHz)
-	MDRV_CPU_PROGRAM_MAP(newbrain_fdc_map, 0)
-	MDRV_CPU_IO_MAP(newbrain_fdc_io_map, 0)
-
-	MDRV_MACHINE_START(newbrain)
-	MDRV_MACHINE_RESET(newbrain)
-
-	MDRV_Z80CTC_ADD(Z80CTC_TAG, XTAL_16MHz/8, newbrain_ctc_intf)
-	MDRV_TIMER_ADD_PERIODIC("z80ctc_c2", ctc_c2_tick, HZ(XTAL_16MHz/4/13))
-
-	// A/D converter
-	MDRV_ADC0809_ADD(ADC0809_TAG, 500000, newbrain_adc0809_intf)
-
-	// video hardware
-
-	MDRV_IMPORT_FROM(newbrain_video)
-
-	MDRV_CASSETTE_ADD("cassette1", newbrain_cassette_config)
-	MDRV_CASSETTE_ADD("cassette2", newbrain_cassette_config)
-
-	/* acia */
-	MDRV_ACIA6850_ADD(MC6850_TAG, newbrain_acia_intf)
-
-	MDRV_NEC765A_ADD(NEC765_TAG, newbrain_nec765_interface)
-MACHINE_DRIVER_END
-
-static MACHINE_DRIVER_START( newbraim )
-	MDRV_DRIVER_DATA(newbrain_state)
-
-	// basic system hardware
-
-	MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/8)
-	MDRV_CPU_PROGRAM_MAP(newbrain_map, 0)
-	MDRV_CPU_IO_MAP(newbrain_m_io_map, 0)
-	MDRV_CPU_VBLANK_INT(SCREEN_TAG, newbrain_interrupt)
-
-	MDRV_CPU_ADD(COP420_TAG, COP420, XTAL_16MHz/8) // COP420-GUW/M
-	MDRV_CPU_IO_MAP(newbrain_cop_io_map, 0)
-	MDRV_CPU_CONFIG(newbrain_cop_intf)
-
-	MDRV_MACHINE_START(newbrain)
-	MDRV_MACHINE_RESET(newbrain)
-
-	MDRV_Z80CTC_ADD(Z80CTC_TAG, XTAL_16MHz/8, newbrain_ctc_intf)
-	MDRV_TIMER_ADD_PERIODIC("z80ctc_c2", ctc_c2_tick, HZ(XTAL_16MHz/4/13))
-
-	// video hardware
-
-	MDRV_IMPORT_FROM(newbrain_video)
-
-	MDRV_CASSETTE_ADD("cassette1", newbrain_cassette_config)
-	MDRV_CASSETTE_ADD("cassette2", newbrain_cassette_config)
-
-	/* acia */
-	MDRV_ACIA6850_ADD(MC6850_TAG, newbrain_acia_intf)
-MACHINE_DRIVER_END
-
-static MACHINE_DRIVER_START( newbraia )
-	MDRV_DRIVER_DATA(newbrain_state)
-
-	// basic system hardware
-
+	/* basic system hardware */
 	MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/8)
 	MDRV_CPU_PROGRAM_MAP(newbrain_map, 0)
 	MDRV_CPU_IO_MAP(newbrain_a_io_map, 0)
 	MDRV_CPU_VBLANK_INT(SCREEN_TAG, newbrain_interrupt)
 
-	MDRV_CPU_ADD(COP420_TAG, COP420, XTAL_16MHz/8) // COP420-GUW/M
+	MDRV_CPU_ADD(COP420_TAG, COP420, XTAL_16MHz/8) // COP420-GUW/N
 	MDRV_CPU_IO_MAP(newbrain_cop_io_map, 0)
 	MDRV_CPU_CONFIG(newbrain_cop_intf)
+
+	MDRV_TIMER_ADD_PERIODIC("cop_regint", cop_regint_tick, MSEC(12.5)) // HACK
 
 	MDRV_MACHINE_START(newbrain)
 	MDRV_MACHINE_RESET(newbrain)
 
-	// video hardware
-
+	/* video hardware */
 	MDRV_IMPORT_FROM(newbrain_video)
 
-	MDRV_CASSETTE_ADD( "cassette1", newbrain_cassette_config )
-	MDRV_CASSETTE_ADD( "cassette2", newbrain_cassette_config )
-
-	/* acia */
-	MDRV_ACIA6850_ADD(MC6850_TAG, newbrain_acia_intf)
+	/* cassette */
+	MDRV_CASSETTE_ADD("cassette1", newbrain_cassette_config)
+	MDRV_CASSETTE_ADD("cassette2", newbrain_cassette_config)
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( newbraiv )
-	MDRV_DRIVER_DATA(newbrain_state)
+static MACHINE_DRIVER_START( newbrain_eim )
+	MDRV_IMPORT_FROM(newbrain_a)
+	
+	/* basic system hardware */
+	MDRV_CPU_MODIFY(Z80_TAG)
+	MDRV_CPU_IO_MAP(newbrain_ei_io_map, 0)
 
-	// basic system hardware
+	MDRV_CPU_ADD(FDC_Z80_TAG, Z80, XTAL_4MHz)
+	MDRV_CPU_PROGRAM_MAP(newbrain_fdc_map, 0)
+	MDRV_CPU_IO_MAP(newbrain_fdc_io_map, 0)
 
-	MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/8)
-	MDRV_CPU_PROGRAM_MAP(newbrain_map, 0)
-	MDRV_CPU_IO_MAP(newbrain_v_io_map, 0)
-	MDRV_CPU_VBLANK_INT(SCREEN_TAG, newbrain_interrupt)
+	MDRV_MACHINE_START(newbrain_eim)
 
-	MDRV_CPU_ADD(COP420_TAG, COP420, XTAL_16MHz/8) // COP420-GUW/M
-	MDRV_CPU_IO_MAP(newbrain_cop_io_map, 0)
-	MDRV_CPU_CONFIG(newbrain_cop_intf)
-
-	MDRV_MACHINE_START(newbrain)
-	MDRV_MACHINE_RESET(newbrain)
-
+	/* Z80 CTC */
 	MDRV_Z80CTC_ADD(Z80CTC_TAG, XTAL_16MHz/8, newbrain_ctc_intf)
+	MDRV_TIMER_ADD_PERIODIC("z80ctc_c2", ctc_c2_tick, HZ(XTAL_16MHz/4/13))
 
-	// video hardware
+	/* AD-DA converters */
+	MDRV_ADC0809_ADD(ADC0809_TAG, 500000, newbrain_adc0809_intf)
 
-	MDRV_IMPORT_FROM(newbrain_video)
-
-	MDRV_CASSETTE_ADD( "cassette1", newbrain_cassette_config )
-	MDRV_CASSETTE_ADD( "cassette2", newbrain_cassette_config )
-
-	/* acia */
+	/* MC6850 */
 	MDRV_ACIA6850_ADD(MC6850_TAG, newbrain_acia_intf)
+	
+	/* NEC765 */
+	MDRV_NEC765A_ADD(NEC765_TAG, newbrain_nec765_interface)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( newbrain_m )
+	MDRV_IMPORT_FROM(newbrain_a)
+	
+	/* basic system hardware */
+	MDRV_CPU_MODIFY(Z80_TAG)
+	MDRV_CPU_IO_MAP(newbrain_m_io_map, 0)
 MACHINE_DRIVER_END
 
 /* ROMs */
 
 ROM_START( newbrain )
 	ROM_REGION( 0x10000, Z80_TAG, 0 )
-	ROM_LOAD( "d413-2.rom", 0x8000, 0x2000, CRC(097591f1) SHA1(c2aa1d27d4f3a24ab0c8135df746a4a44201a7f4) )
-	ROM_LOAD( "cdmd.rom", 0xc000, 0x2000, CRC(6b4d9429) SHA1(ef688be4e75aced61f487c928258c8932a0ae00a) )
-	ROM_LOAD( "efmd.rom", 0xe000, 0x2000, CRC(20dd0b49) SHA1(74b517ca223cefb588e9f49e72ff2d4f1627efc6) )
+	ROM_DEFAULT_BIOS( "rom20" )
+
+	ROM_SYSTEM_BIOS( 0, "issue1", "Issue 1 (v?)" )
+	ROMX_LOAD( "aben.ic6",     0xa000, 0x2000, CRC(308f1f72) SHA1(a6fd9945a3dca47636887da2125fde3f9b1d4e25), ROM_BIOS(1) )
+	ROMX_LOAD( "cd iss 1.ic7", 0xc000, 0x2000, CRC(6b4d9429) SHA1(ef688be4e75aced61f487c928258c8932a0ae00a), ROM_BIOS(1) )
+	ROMX_LOAD( "ef iss 1.ic8", 0xe000, 0x2000, CRC(20dd0b49) SHA1(74b517ca223cefb588e9f49e72ff2d4f1627efc6), ROM_BIOS(1) )
+
+	ROM_SYSTEM_BIOS( 1, "issue2", "Issue 2 (v1.9)" )
+	ROMX_LOAD( "aben19.ic6",   0xa000, 0x2000, CRC(d0283eb1) SHA1(351d248e69a77fa552c2584049006911fb381ff0), ROM_BIOS(2) )
+	ROMX_LOAD( "cdi2.ic7",     0xc000, 0x2000, CRC(6b4d9429) SHA1(ef688be4e75aced61f487c928258c8932a0ae00a), ROM_BIOS(2) )
+	ROMX_LOAD( "ef iss 1.ic8", 0xe000, 0x2000, CRC(20dd0b49) SHA1(74b517ca223cefb588e9f49e72ff2d4f1627efc6), ROM_BIOS(2) )
+
+	ROM_SYSTEM_BIOS( 2, "issue3", "Issue 3 (v1.91)" )
+	ROMX_LOAD( "aben191.ic6",  0xa000, 0x2000, CRC(b7be8d89) SHA1(cce8d0ae7aa40245907ea38b7956c62d039d45b7), ROM_BIOS(3) )
+	ROMX_LOAD( "cdi3.ic7",	   0xc000, 0x2000, CRC(6b4d9429) SHA1(ef688be4e75aced61f487c928258c8932a0ae00a), ROM_BIOS(3) )
+	ROMX_LOAD( "ef iss 1.ic8", 0xe000, 0x2000, CRC(20dd0b49) SHA1(74b517ca223cefb588e9f49e72ff2d4f1627efc6), ROM_BIOS(3) )
+
+	ROM_SYSTEM_BIOS( 3, "series2", "Series 2 (v?)" )
+	ROMX_LOAD( "abs2.ic6",	   0xa000, 0x2000, CRC(9a042acb) SHA1(80d83a2ea3089504aa68b6cf978d80d296cd9bda), ROM_BIOS(4) )
+	ROMX_LOAD( "cds2.ic7",	   0xc000, 0x2000, CRC(6b4d9429) SHA1(ef688be4e75aced61f487c928258c8932a0ae00a), ROM_BIOS(4) )
+	ROMX_LOAD( "efs2.ic8",	   0xe000, 0x2000, CRC(b222d798) SHA1(c0c816b4d4135b762f2c5f1b24209d0096f22e56), ROM_BIOS(4) )
+
+	ROM_SYSTEM_BIOS( 4, "rom20", "? (v2.0)" )
+	ROMX_LOAD( "aben20.rom",   0xa000, 0x2000, CRC(3d76d0c8) SHA1(753b4530a518ad832e4b81c4e5430355ba3f62e0), ROM_BIOS(5) )
+	ROMX_LOAD( "cd20tci.rom",  0xc000, 0x4000, CRC(f65b2350) SHA1(1ada7fbf207809537ec1ffb69808524300622ada), ROM_BIOS(5) )
 
 	ROM_REGION( 0x400, COP420_TAG, 0 )
 	ROM_LOAD( "cop420.419", 0x000, 0x400, NO_DUMP )
 
+	ROM_REGION( 0x1000, "chargen", 0 )
+	ROM_LOAD( "char eprom iss 1.ic453", 0x0000, 0x0a01, BAD_DUMP CRC(46ecbc65) SHA1(3fe064d49a4de5e3b7383752e98ad35a674e26dd) ) // 8248R7
+ROM_END
+
+#define rom_newbraia rom_newbrain
+
+ROM_START( newbraie )
+	ROM_REGION( 0x10000, Z80_TAG, 0 )
+	ROM_DEFAULT_BIOS( "rom20" )
+
+	ROM_SYSTEM_BIOS( 0, "issue1", "Issue 1 (v?)" )
+	ROMX_LOAD( "aben.ic6",     0xa000, 0x2000, CRC(308f1f72) SHA1(a6fd9945a3dca47636887da2125fde3f9b1d4e25), ROM_BIOS(1) )
+	ROMX_LOAD( "cd iss 1.ic7", 0xc000, 0x2000, CRC(6b4d9429) SHA1(ef688be4e75aced61f487c928258c8932a0ae00a), ROM_BIOS(1) )
+	ROMX_LOAD( "ef iss 1.ic8", 0xe000, 0x2000, CRC(20dd0b49) SHA1(74b517ca223cefb588e9f49e72ff2d4f1627efc6), ROM_BIOS(1) )
+
+	ROM_SYSTEM_BIOS( 1, "issue2", "Issue 2 (v1.9)" )
+	ROMX_LOAD( "aben19.ic6",   0xa000, 0x2000, CRC(d0283eb1) SHA1(351d248e69a77fa552c2584049006911fb381ff0), ROM_BIOS(2) )
+	ROMX_LOAD( "cdi2.ic7",     0xc000, 0x2000, CRC(6b4d9429) SHA1(ef688be4e75aced61f487c928258c8932a0ae00a), ROM_BIOS(2) )
+	ROMX_LOAD( "ef iss 1.ic8", 0xe000, 0x2000, CRC(20dd0b49) SHA1(74b517ca223cefb588e9f49e72ff2d4f1627efc6), ROM_BIOS(2) )
+
+	ROM_SYSTEM_BIOS( 2, "issue3", "Issue 3 (v1.91)" )
+	ROMX_LOAD( "aben191.ic6",  0xa000, 0x2000, CRC(b7be8d89) SHA1(cce8d0ae7aa40245907ea38b7956c62d039d45b7), ROM_BIOS(3) )
+	ROMX_LOAD( "cdi3.ic7",	   0xc000, 0x2000, CRC(6b4d9429) SHA1(ef688be4e75aced61f487c928258c8932a0ae00a), ROM_BIOS(3) )
+	ROMX_LOAD( "ef iss 1.ic8", 0xe000, 0x2000, CRC(20dd0b49) SHA1(74b517ca223cefb588e9f49e72ff2d4f1627efc6), ROM_BIOS(3) )
+
+	ROM_SYSTEM_BIOS( 3, "series2", "Series 2 (v?)" )
+	ROMX_LOAD( "abs2.ic6",	   0xa000, 0x2000, CRC(9a042acb) SHA1(80d83a2ea3089504aa68b6cf978d80d296cd9bda), ROM_BIOS(4) )
+	ROMX_LOAD( "cds2.ic7",	   0xc000, 0x2000, CRC(6b4d9429) SHA1(ef688be4e75aced61f487c928258c8932a0ae00a), ROM_BIOS(4) )
+	ROMX_LOAD( "efs2.ic8",	   0xe000, 0x2000, CRC(b222d798) SHA1(c0c816b4d4135b762f2c5f1b24209d0096f22e56), ROM_BIOS(4) )
+
+	ROM_SYSTEM_BIOS( 4, "rom20", "? (v2.0)" )
+	ROMX_LOAD( "aben20.rom",   0xa000, 0x2000, CRC(3d76d0c8) SHA1(753b4530a518ad832e4b81c4e5430355ba3f62e0), ROM_BIOS(5) )
+	ROMX_LOAD( "cd20tci.rom",  0xc000, 0x4000, CRC(f65b2350) SHA1(1ada7fbf207809537ec1ffb69808524300622ada), ROM_BIOS(5) )
+
+	ROM_REGION( 0x400, COP420_TAG, 0 )
+	ROM_LOAD( "cop420.419",   0x000, 0x400, NO_DUMP )
+
+	ROM_REGION( 0x1000, "chargen", 0 )
+	ROM_LOAD( "char eprom iss 1.ic453", 0x0000, 0x0a01, BAD_DUMP CRC(46ecbc65) SHA1(3fe064d49a4de5e3b7383752e98ad35a674e26dd) ) // 8248R7
+
 	ROM_REGION( 0x10000, "eim", 0 ) // Expansion Interface Module
 	ROM_LOAD( "e415-2.rom", 0x4000, 0x2000, CRC(5b0e390c) SHA1(0f99cae57af2e64f3f6b02e5325138d6ba015e72) )
-	ROM_LOAD( "e415-3.rom", 0x4000, 0x2000, CRC(2f88bae5) SHA1(04e03f230f4b368027442a7c2084dae877f53713) )
+	ROM_LOAD( "e415-3.rom", 0x4000, 0x2000, CRC(2f88bae5) SHA1(04e03f230f4b368027442a7c2084dae877f53713) ) // 18/8/83.aci
 	ROM_LOAD( "e416-3.rom", 0x6000, 0x2000, CRC(8b5099d8) SHA1(19b0cfce4c8b220eb1648b467f94113bafcb14e0) ) // 10/8/83.mtv
 	ROM_LOAD( "e417-2.rom", 0x8000, 0x2000, CRC(6a7afa20) SHA1(f90db4f8318777313a862b3d5bab83c2fd260010) )
 
 	ROM_REGION( 0x10000, FDC_Z80_TAG, 0 ) // Floppy Disk Controller
 	ROM_LOAD( "d417-1.rom", 0x0000, 0x2000, CRC(40fad31c) SHA1(5137be4cc026972c0ffd4fa6990e8583bdfce163) )
 	ROM_LOAD( "d417-2.rom", 0x0000, 0x2000, CRC(e8bda8b9) SHA1(c85a76a5ff7054f4ef4a472ce99ebaed1abd269c) )
-
-	ROM_REGION( 0x1000, "chargen", 0 )
-	ROM_LOAD( "8248r7.453", 0x0000, 0x1000, BAD_DUMP CRC(46ecbc65) SHA1(3fe064d49a4de5e3b7383752e98ad35a674e26dd) )
 ROM_END
 
 ROM_START( newbraim )
@@ -1442,38 +1454,8 @@ ROM_START( newbraim )
 	ROM_LOAD( "cop420.419", 0x000, 0x400, NO_DUMP )
 
 	ROM_REGION( 0x1000, "chargen", 0 )
-	ROM_LOAD( "8248r7.453", 0x0000, 0x1000, BAD_DUMP CRC(46ecbc65) SHA1(3fe064d49a4de5e3b7383752e98ad35a674e26dd) )
+	ROM_LOAD( "char eprom iss 1.ic453", 0x0000, 0x0a01, BAD_DUMP CRC(46ecbc65) SHA1(3fe064d49a4de5e3b7383752e98ad35a674e26dd) ) // 8248R7
 ROM_END
-
-ROM_START( newbraia )
-	ROM_REGION( 0x10000, Z80_TAG, 0 )
-	ROM_SYSTEM_BIOS( 0, "rom20", "ROM 2.0" )
-	ROMX_LOAD( "aben20.rom", 0xa000, 0x2000, CRC(3d76d0c8) SHA1(753b4530a518ad832e4b81c4e5430355ba3f62e0), ROM_BIOS(1) )
-	ROMX_LOAD( "cd20tci.rom", 0xc000, 0x4000, CRC(f65b2350) SHA1(1ada7fbf207809537ec1ffb69808524300622ada), ROM_BIOS(1) )
-
-	ROM_SYSTEM_BIOS( 1, "rom191", "ROM 1.91" )
-	ROMX_LOAD( "aben191.rom", 0xa000, 0x2000, CRC(b7be8d89) SHA1(cce8d0ae7aa40245907ea38b7956c62d039d45b7), ROM_BIOS(2) )
-	ROMX_LOAD( "cd.rom", 0xc000, 0x2000, CRC(6b4d9429) SHA1(ef688be4e75aced61f487c928258c8932a0ae00a), ROM_BIOS(2) )
-	ROMX_LOAD( "ef1x.rom", 0xe000, 0x2000, CRC(20dd0b49) SHA1(74b517ca223cefb588e9f49e72ff2d4f1627efc6), ROM_BIOS(2) )
-
-	ROM_SYSTEM_BIOS( 2, "rom19", "ROM 1.9" )
-	ROMX_LOAD( "aben19.rom", 0xa000, 0x2000, CRC(d0283eb1) SHA1(351d248e69a77fa552c2584049006911fb381ff0), ROM_BIOS(3) )
-	ROMX_LOAD( "cd.rom", 0xc000, 0x2000, CRC(6b4d9429) SHA1(ef688be4e75aced61f487c928258c8932a0ae00a), ROM_BIOS(3) )
-	ROMX_LOAD( "ef1x.rom", 0xe000, 0x2000, CRC(20dd0b49) SHA1(74b517ca223cefb588e9f49e72ff2d4f1627efc6), ROM_BIOS(3) )
-
-	ROM_SYSTEM_BIOS( 3, "rom14", "ROM 1.4" )
-	ROMX_LOAD( "aben14.rom", 0xa000, 0x2000, CRC(d0283eb1) SHA1(351d248e69a77fa552c2584049006911fb381ff0), ROM_BIOS(4) )
-	ROMX_LOAD( "cd.rom", 0xc000, 0x2000, CRC(6b4d9429) SHA1(ef688be4e75aced61f487c928258c8932a0ae00a), ROM_BIOS(4) )
-	ROMX_LOAD( "ef1x.rom", 0xe000, 0x2000, CRC(20dd0b49) SHA1(74b517ca223cefb588e9f49e72ff2d4f1627efc6), ROM_BIOS(4) )
-
-	ROM_REGION( 0x400, COP420_TAG, 0 )
-	ROM_LOAD( "cop420.419", 0x000, 0x400, NO_DUMP )
-
-	ROM_REGION( 0x1000, "chargen", 0 )
-	ROM_LOAD( "8248r7.453", 0x0000, 0x1000, BAD_DUMP CRC(46ecbc65) SHA1(3fe064d49a4de5e3b7383752e98ad35a674e26dd) )
-ROM_END
-
-#define rom_newbraiv rom_newbraia
 
 /* System Configuration */
 
@@ -1546,31 +1528,21 @@ static void newbrain_serial_getinfo(const mess_device_class *devclass, UINT32 st
 	}
 }
 
-static SYSTEM_CONFIG_START( newbrain )
+static SYSTEM_CONFIG_START( newbrain_a )
 	CONFIG_RAM_DEFAULT	(32 * 1024)
+	CONFIG_DEVICE(newbrain_serial_getinfo)
+SYSTEM_CONFIG_END
+
+static SYSTEM_CONFIG_START( newbrain_eim )
+	CONFIG_RAM_DEFAULT	(96 * 1024)
 	CONFIG_DEVICE(newbrain_floppy_getinfo)
-	CONFIG_DEVICE(newbrain_serial_getinfo)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START( newbraim )
-	CONFIG_RAM_DEFAULT	(32 * 1024)
-	CONFIG_DEVICE(newbrain_serial_getinfo)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START( newbraia )
-	CONFIG_RAM_DEFAULT	(32 * 1024)
-	CONFIG_DEVICE(newbrain_serial_getinfo)
-SYSTEM_CONFIG_END
-
-static SYSTEM_CONFIG_START( newbraiv )
-	CONFIG_RAM_DEFAULT	(32 * 1024)
 	CONFIG_DEVICE(newbrain_serial_getinfo)
 SYSTEM_CONFIG_END
 
 /* System Drivers */
 
-//    YEAR  NAME		PARENT		COMPAT	MACHINE		INPUT		INIT	CONFIG		COMPANY							FULLNAME		FLAGS
-COMP( 1981, newbrain,	0,			0,		newbrain,	newbrain,   0, 		newbrain,	"Grundy Business Systems Ltd.",	"NewBrain MD with Expansion Interface",	GAME_NOT_WORKING | GAME_NO_SOUND )
-COMP( 1981, newbraim,	0,			0,		newbraim,	newbrain,   0, 		newbraim,	"Grundy Business Systems Ltd.",	"NewBrain MD",	GAME_NOT_WORKING | GAME_NO_SOUND )
-COMP( 1981, newbraia,	newbrain,	0,		newbraia,	newbrain,   0, 		newbraia,	"Grundy Business Systems Ltd.",	"NewBrain AD",	GAME_NOT_WORKING | GAME_NO_SOUND )
-COMP( 1981, newbraiv,	newbrain,	0,		newbraiv,	newbrain,   0, 		newbraiv,	"Grundy Business Systems Ltd.",	"NewBrain VD",	GAME_NOT_WORKING | GAME_NO_SOUND )
+//    YEAR  NAME		PARENT		COMPAT	MACHINE			INPUT		INIT	CONFIG			COMPANY							FULLNAME		FLAGS
+COMP( 1981, newbrain,	0,			0,		newbrain_a,		newbrain,   0, 		newbrain_a,		"Grundy Business Systems Ltd.",	"NewBrain AD",	GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1981, newbraie,	newbrain,	0,		newbrain_eim,	newbrain,   0, 		newbrain_eim,	"Grundy Business Systems Ltd.",	"NewBrain AD with Expansion Interface",	GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1981, newbraia,	newbrain,	0,		newbrain_a,		newbrain,   0, 		newbrain_a,		"Grundy Business Systems Ltd.",	"NewBrain A",	GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1981, newbraim,	newbrain,	0,		newbrain_m,		newbrain,   0, 		newbrain_a,		"Grundy Business Systems Ltd.",	"NewBrain MD",	GAME_NOT_WORKING | GAME_NO_SOUND )
