@@ -83,7 +83,6 @@ void zx_ula_bkgnd(running_machine *machine, int color)
 		old_x = (new_x + 1) % width;
 		old_y = new_y;
 		old_c = color;
-//		dac_data_w(0, color ? 255 : 0);
 	}
 }
 

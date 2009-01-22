@@ -16,25 +16,26 @@
 	- Added the NTSC/PAL diode to all systems except pc8300 which doesn't support it.
 	- Applied NTSC timings to pc8300 only, all others depend on the diode.
 	- Many keyboard fixes, and descriptions added to keys.
-	- All ram packs up to 32k are supported.
 	- Fixed .O files from causing an access violation.
-	- Enabled cassette saving.
+	- Enabled cassette saving (wav only).
 	- Many general fixes to pow3000/lambda.
 	- Added sound to pc8300/pow3000/lambda.
 
-    To do:
-    Some memory areas are not mirrored as they should.
-    Video hardware is not fully emulated, so it does not support pseudo hi-res and hi-res modes.
-    Some memory packs are unemulated.
-    h4th and tree4th need their address maps worked out (eg, the stack is set to FB80)
-    Most games don't work
+    To do / problems:
+	- Some memory areas are not mirrored as they should.
+	- Video hardware is not fully emulated, so it does not support pseudo hi-res and hi-res modes.
+	- The screen in pc8300/pow3000/lambda jumps when you type something.
+	- lambda/pow3000 32k memory pack is unemulated, because where is the upper 16k mirror going to be?
+	- h4th and tree4th need their address maps worked out (eg, the stack is set to FB80)
+	- lambda/pow3000 joystick, connected in parallel with the 4,R,F,7,U keys, but the directions are unknown.
+	- Currently, cassettes will be saved in .wav format, even if you choose something else.
+	- Many games don't work.
 
 
 ****************************************************************************/
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-//#include "sound/dac.h"
 #include "sound/speaker.h"
 #include "sound/wave.h"
 #include "includes/zx.h"
@@ -433,8 +434,7 @@ static MACHINE_DRIVER_START( zx80 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-//	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER, 0)	/* Used by pc8300/lambda/pow3000 */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 	MDRV_SOUND_ADD("cassette", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
@@ -554,17 +554,20 @@ static SYSTEM_CONFIG_START(zx81)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START(pc8300)
+	CONFIG_RAM_DEFAULT(16 * 1024)	/* bios hardcoded to only work with 16k */
+SYSTEM_CONFIG_END
+
+static SYSTEM_CONFIG_START(pow3000)
 	CONFIG_RAM_DEFAULT(2 * 1024)
 	CONFIG_RAM(16 * 1024)
-	CONFIG_RAM(32 * 1024)
 SYSTEM_CONFIG_END
 
 /* Game Drivers */
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG  COMPANY                     FULLNAME                                        FLAGS */
-COMP( 1980, zx80,       0,      0,      zx80,       zx80,       zx,     zx80,   "Sinclair Research",        "ZX-80",                                        0 )
-COMP( 1981, zx81,       0,      0,      zx81,       zx81,       zx,     zx81,   "Sinclair Research",        "ZX-81",                                        0 )
-COMP( 1982, ts1000,     zx81,   0,      ts1000,     zx81,       zx,     zx81,   "Timex Sinclair",           "Timex Sinclair 1000",                          0 )
-COMP( 1984, pc8300,     zx81,   0,      pc8300,     pc8300,     zx,     pc8300, "Your Computer",            "PC8300",                                       0 )
-COMP( 1983, pow3000,    zx81,   0,      pow3000,    pow3000,    zx,     pc8300, "Creon Enterprises",        "Power 3000",                                   0 )
-COMP( 1982, lambda,     zx81,   0,      pow3000,    pow3000,    zx,     pc8300, "Lambda Electronics Ltd",   "Lambda 8300",                                  0 )
+COMP( 1980, zx80,       0,      0,      zx80,       zx80,       zx,     zx80,    "Sinclair Research",        "ZX-80",                                        0 )
+COMP( 1981, zx81,       0,      0,      zx81,       zx81,       zx,     zx81,    "Sinclair Research",        "ZX-81",                                        0 )
+COMP( 1982, ts1000,     zx81,   0,      ts1000,     zx81,       zx,     zx81,    "Timex Sinclair",           "Timex Sinclair 1000",                          0 )
+COMP( 1984, pc8300,     zx81,   0,      pc8300,     pc8300,     zx,     pc8300,  "Your Computer",            "PC8300",                                       0 )
+COMP( 1983, pow3000,    zx81,   0,      pow3000,    pow3000,    zx,     pow3000, "Creon Enterprises",        "Power 3000",                                   0 )
+COMP( 1982, lambda,     zx81,   0,      pow3000,    pow3000,    zx,     pow3000, "Lambda Electronics Ltd",   "Lambda 8300",                                  0 )
