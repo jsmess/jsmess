@@ -24,6 +24,12 @@ System Driver Changes:
 
 - [X68000] Added better implementation of 1024x1024 graphic layer.  [Barry Rodewald]
 
+- [ZX] Fixed access violation when mounting a .O tape file;
+       Implemented cassette save (only .wav is supported);
+       Implemented sound; Fixed cassette loading; Added the NTSC/PAL diode;
+       Fixed keyboard labels and layouts; Improved video output;
+       Improved memory handling; Added notes. [Robbbert]
+
 
 
 User Interface Changes:
@@ -48,7 +54,7 @@ Source Changes:
 - Changed the AT45DBxx and SST39VFxx to be a device. [Miodrag Milanovic]
 
 - Fixed a bug that overwrote specific error messages with a generic error
-  message when mounitng an image.  [Wilbert Pol]
+  message when mounting an image.  [Wilbert Pol]
 
 - Fixed a bug that caused the day of the week to not be properly returned by
   the DS1315.  (bug #1755) [Nathan Woods]
