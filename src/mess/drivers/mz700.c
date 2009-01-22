@@ -71,6 +71,7 @@
 #include "machine/8255ppi.h"
 #include "includes/mz700.h"
 #include "machine/pit8253.h"
+#include "machine/74145.h"
 
 /* Devices */
 #include "devices/cassette.h"
@@ -130,7 +131,7 @@ Notice that there is no Backspace key, only a 'Del' one.
 
 Small note about natural keyboard support: currently,
 - "Alpha" is mapped to 'F6'
-- "Graph" is mapped to 'F7'                      
+- "Graph" is mapped to 'F7'
 - "Break" is mapped to 'F8'                      */
 
 static INPUT_PORTS_START( mz700 )
@@ -230,9 +231,6 @@ static INPUT_PORTS_START( mz700 )
     PORT_BIT(0x40, 0x40, IPT_KEYBOARD) PORT_CODE(KEYCODE_F2) 			PORT_CHAR(UCHAR_MAMEKEY(F2))
     PORT_BIT(0x80, 0x80, IPT_KEYBOARD) PORT_CODE(KEYCODE_F1) 			PORT_CHAR(UCHAR_MAMEKEY(F1))
 
-	/* 2005-08 FP: why is this here? According to the Service Manual ROW9 is the last one */
-	PORT_START("ROW10") /* KEY ROW 10 */ 
-
 	PORT_START("JOY")
 	PORT_BIT(0x01, 0x00, IPT_UNUSED)
 	PORT_BIT(0x02, 0x00, IPT_JOYSTICK_UP)		PORT_8WAY
@@ -273,10 +271,6 @@ static MACHINE_DRIVER_START(mz700)
 
 	MDRV_MACHINE_RESET( mz700 )
 
-	MDRV_PIT8253_ADD( "pit8253", mz700_pit8253_config )
-
-	MDRV_PPI8255_ADD( "ppi8255", mz700_ppi8255_interface )
-
 	/* video hardware - include overscan */
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
@@ -287,15 +281,21 @@ static MACHINE_DRIVER_START(mz700)
 
 	MDRV_GFXDECODE(mz700)
 	MDRV_PALETTE_LENGTH(256*2)
-
 	MDRV_PALETTE_INIT(mz700)
+
 	MDRV_VIDEO_UPDATE(mz700)
 
+	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("cassette", WAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	/* devices */
+	MDRV_PIT8253_ADD("pit8253", mz700_pit8253_config)
+	MDRV_PPI8255_ADD("ppi8255", mz700_ppi8255_interface)
+	MDRV_TTL74145_ADD("ls145")
 
 	MDRV_CASSETTE_ADD( "cassette", mz700_cassette_config )
 MACHINE_DRIVER_END

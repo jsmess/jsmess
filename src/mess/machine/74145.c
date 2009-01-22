@@ -54,7 +54,7 @@ typedef struct _ttl74145_t ttl74145_t;
 struct _ttl74145_t
 {
 	/* decoded number */
-	UINT16 number;
+	int number;
 };
 
 
@@ -76,7 +76,7 @@ WRITE8_DEVICE_HANDLER( ttl74145_w )
 	ttl74145_t *ttl74145 = get_safe_token(device);
 
 	/* decode number */
-	UINT16 new_number = bcd_2_dec(data & 0x0f);
+	int new_number = bcd_2_dec(data & 0x0f);
 
 	/* call output callbacks if the number changed */
 	if (new_number != ttl74145->number)
@@ -107,7 +107,7 @@ READ16_DEVICE_HANDLER( ttl74145_r )
 {
 	ttl74145_t *ttl74145 = get_safe_token(device);
 
-	return ttl74145->number;
+	return (1 << ttl74145->number) & 0x3ff;
 }
 
 

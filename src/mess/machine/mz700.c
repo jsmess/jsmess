@@ -17,6 +17,7 @@
 #include "machine/pit8253.h"
 #include "machine/8255ppi.h"
 #include "sound/speaker.h"
+#include "machine/74145.h"
 
 #include "includes/mz700.h"
 
@@ -83,7 +84,6 @@ static TIMER_CALLBACK(ne556_callback)
 }
 
 
-
 DRIVER_INIT( mz700 )
 {
 	videoram_size = 0x5000;
@@ -132,23 +132,30 @@ static PIT8253_OUTPUT_CHANGED( pit_irq_2 )
 
 /************************ PIO ************************************************/
 
-static READ8_DEVICE_HANDLER ( pio_port_a_r )
+static READ8_DEVICE_HANDLER( pio_port_a_r )
 {
 	UINT8 data = pio_port_a_output;
 	LOG(2,"mz700_pio_port_a_r",("%02X\n", data),device->machine);
 	return data;
 }
 
-/* read keyboard row - indexed by a demux LS145 which is connected to PA0-3 */
-static READ8_DEVICE_HANDLER ( pio_port_b_r )
-{
-	UINT8 demux_LS145, data = 0xff;
-	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", 
-										"ROW6", "ROW7", "ROW8", "ROW9", "ROW10" };
 
-    demux_LS145 = pio_port_a_output & 15;
-    data = input_port_read(device->machine, keynames[demux_LS145]);
-	LOG(2,"mz700_pio_port_b_r",("%02X\n", data),device->machine);
+static READ8_DEVICE_HANDLER( pio_port_b_r )
+{
+	const device_config *ls145 = devtag_get_device(device->machine, TTL74145, "ls145");
+	int key_line = ttl74145_r(ls145, 0, 0);
+	UINT8 data = 0xff;
+
+	if (BIT(key_line, 0)) data = input_port_read(device->machine, "ROW0");
+	if (BIT(key_line, 1)) data = input_port_read(device->machine, "ROW1");
+	if (BIT(key_line, 2)) data = input_port_read(device->machine, "ROW2");
+	if (BIT(key_line, 3)) data = input_port_read(device->machine, "ROW3");
+	if (BIT(key_line, 4)) data = input_port_read(device->machine, "ROW4");
+	if (BIT(key_line, 5)) data = input_port_read(device->machine, "ROW5");
+	if (BIT(key_line, 6)) data = input_port_read(device->machine, "ROW6");
+	if (BIT(key_line, 7)) data = input_port_read(device->machine, "ROW7");
+	if (BIT(key_line, 8)) data = input_port_read(device->machine, "ROW8");
+	if (BIT(key_line, 9)) data = input_port_read(device->machine, "ROW9");
 
     return data;
 }
@@ -183,7 +190,13 @@ static READ8_DEVICE_HANDLER (pio_port_c_r )
 
 static WRITE8_DEVICE_HANDLER (pio_port_a_w )
 {
+	const device_config *ls145 = devtag_get_device(device->machine, TTL74145, "ls145");
+
 	LOG(2,"mz700_pio_port_a_w",("%02X\n", data),device->machine);
+
+	/* the ls145 is connected to pa0-pa3 */
+	ttl74145_w(ls145, 0, data & 0x07);
+
 	pio_port_a_output = data;
 }
 
@@ -788,7 +801,7 @@ DRIVER_INIT( mz800 )
 {
 	UINT8 *mem = memory_region(machine, "main");
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	
+
 	videoram_size = 0x5000;
 	videoram = auto_malloc(videoram_size);
 	colorram = auto_malloc(0x800);
