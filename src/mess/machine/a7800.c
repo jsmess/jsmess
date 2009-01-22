@@ -53,7 +53,7 @@ static UINT8 *ROM;
 /* TODO: Convert the definitions into a syntax accepting input_port_read */
 
 static UINT8 riot_input_port_0_r(const device_config *device, UINT8 olddata)
-{	
+{
 	return input_port_0_r(cpu_get_address_space(device->machine->cpu[0],ADDRESS_SPACE_PROGRAM), 0);
 }
 
@@ -62,7 +62,7 @@ static UINT8 riot_input_port_3_r(const device_config *device, UINT8 olddata)
 	return input_port_3_r(cpu_get_address_space(device->machine->cpu[0],ADDRESS_SPACE_PROGRAM), 0);
 }
 
-const riot6532_interface r6532_interface_ntsc =
+const riot6532_interface r6532_interface =
 {
 	riot_input_port_0_r,
 	riot_input_port_3_r,
@@ -70,13 +70,6 @@ const riot6532_interface r6532_interface_ntsc =
 	NULL
 };
 
-const riot6532_interface r6532_interface_pal =
-{
-	riot_input_port_0_r,
-	riot_input_port_3_r,
-	NULL,
-	NULL
-};
 
 /* -----------------------------------------------------------------------
  * Driver/Machine Init
