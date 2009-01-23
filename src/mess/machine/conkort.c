@@ -69,10 +69,6 @@ Notes:
 
 	TODO:
 
-	Common
-	------
-	- separate wd17xx reset from init
-
 	Slow Controller
 	---------------
 	- DS/DD SS/DS jumpers
@@ -83,7 +79,7 @@ Notes:
 
 	Fast Controller
 	---------------
-	- Z80 DMA interrupt
+	- implement missing features to Z80DMA
 	- FDC INT
 	- FDC DRQ
 
@@ -627,8 +623,6 @@ static const z80_daisy_chain slow_daisy_chain[] =
 
 */
 
-#define Z80DMA_CPUNUM 1
-
 static void dma_irq_callback(const device_config *device, int state)
 {
 	fast_t *conkort = get_safe_token_machine_fast(device->machine);
@@ -678,7 +672,7 @@ static WRITE8_DEVICE_HANDLER( dma_port_b_w )
 
 static const z80dma_interface dma_intf =
 {
-	CONKORT_Z80_TAG,		/* cpunum to HALT */
+	"conkort:5a",		/* cpu to HALT */
 	dma_port_a_r,		/* memory read */
 	dma_port_a_w,		/* memory write */
 	dma_port_a_r,		/* port A read */
