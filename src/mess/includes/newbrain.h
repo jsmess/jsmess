@@ -11,6 +11,8 @@
 #define FDC_Z80_TAG			"416"
 #define NEC765_TAG			"418"
 
+#define NEWBRAIN_EIM_RAM_SIZE			0x10000
+
 #define NEWBRAIN_ENRG1_CLK				0x01
 #define NEWBRAIN_ENRG1_TVP				0x04
 #define NEWBRAIN_ENRG1_CTS				0x10
@@ -46,7 +48,6 @@ struct _newbrain_state
 	int copint;				/* COP interrupt */
 	int anint;				/* A/DC interrupt */
 	int bee;				/* identity */
-	int a16;				/* address line 16 */
 	UINT8 enrg1;			/* enable register 1 */
 	UINT8 enrg2;			/* enable register 2 */
 
@@ -64,8 +65,11 @@ struct _newbrain_state
 	int keydata;			/* keyboard column */
 
 	/* paging state */
-	UINT8 paging;			/* paging control register */
+	int paging;				/* paging enabled */
+	int mpm;				/* multi paging mode ? */
+	int a16;				/* address line 16 */
 	UINT8 pr[16];			/* expansion interface paging register */
+	UINT8 *eim_ram;			/* expansion interface RAM */
 
 	/* floppy state */
 	int fdc_int;			/* interrupt */
@@ -79,7 +83,7 @@ struct _newbrain_state
 	UINT8 *char_rom;		/* character ROM */
 
 	/* user bus state */
-	UINT8 user;				
+	UINT8 user;
 
 	/* timers */
 	emu_timer *reset_timer;	/* power on reset timer */

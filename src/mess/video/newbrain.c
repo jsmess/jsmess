@@ -11,7 +11,10 @@ static VIDEO_START( newbrain )
 
 	/* register for state saving */
 
-//	state_save_register_global(machine, state->);
+	state_save_register_global(machine, state->tvcnsl);
+	state_save_register_global(machine, state->tvctl);
+	state_save_register_global(machine, state->tvram);
+	state_save_register_global_array(machine, state->segment_data);
 }
 
 static void newbrain_update(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
@@ -81,16 +84,25 @@ static void newbrain_update(running_machine *machine, bitmap_t *bitmap, const re
 			}
 		}
 
-		/* increase row counter */
-		rc++;
-
-		if (rc == (ucr ? 8 : 10))
+		if (gr)
 		{
-			/* reset row counter */
-			rc = 0;
-
+			/* get new data for each line */
 			videoram_addr += columns;
 			videoram_addr += excess;
+		}
+		else
+		{
+			/* increase row counter */
+			rc++;
+
+			if (rc == (ucr ? 8 : 10))
+			{
+				/* reset row counter */
+				rc = 0;
+
+				videoram_addr += columns;
+				videoram_addr += excess;
+			}
 		}
 	}
 }
