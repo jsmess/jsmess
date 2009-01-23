@@ -178,7 +178,7 @@ Notes:
 	MG-210	Baseball										no
 	MG-211	Speedway/Tag									no
 	MG-212	Spacewar Intercept								no
-	MG-213	Gun Fight/Moon ship								no
+	MG-213	Gun Fight/Moon Ship								no
 
 */
 
@@ -190,6 +190,7 @@ Notes:
 	- cpu clock from schematics
     - mpt02/mustang cdp1864 colors
     - discrete sound
+	- Academy Apollo 80 (Germany)
 
 */
 
@@ -566,7 +567,7 @@ static MACHINE_DRIVER_START( visicom )
 
 	// basic machine hardware
 
-	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_3_579545MHz/2) // ???
+	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_3_579545MHz/2)
 	MDRV_CPU_PROGRAM_MAP(visicom_map, 0)
 	MDRV_CPU_IO_MAP(visicom_io_map, 0)
 	MDRV_CPU_CONFIG(studio2_config)
