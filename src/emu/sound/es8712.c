@@ -209,10 +209,7 @@ static void es8712_state_save_register(struct es8712 *chip, const device_config 
 
 static SND_START( es8712 )
 {
-	struct es8712 *chip;
-
-	chip = auto_malloc(sizeof(*chip));
-	memset(chip, 0, sizeof(*chip));
+	struct es8712 *chip = device->token;
 
 	compute_tables();
 
@@ -230,9 +227,6 @@ static SND_START( es8712 )
 	chip->signal = -2;
 
 	es8712_state_save_register(chip, device);
-
-	/* success */
-	return chip;
 }
 
 
@@ -450,6 +444,7 @@ SND_GET_INFO( es8712 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct es8712);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( es8712 );	break;

@@ -38,9 +38,9 @@ INPUT_PORTS_END
 
 static const UPD7810_CONFIG gamepock_cpu_config = { TYPE_78C06, gamepock_io_callback };
 
-static DEVICE_START(gamepock_cart) {
+static DEVICE_START(gamepock_cart)
+{
 	memory_set_bankptr( device->machine, 1, memory_region(device->machine,  "user1" ) );
-	return DEVICE_START_OK;
 }
 
 static DEVICE_IMAGE_LOAD(gamepock_cart) {

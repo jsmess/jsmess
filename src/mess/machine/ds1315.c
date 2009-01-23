@@ -84,8 +84,6 @@ static DEVICE_START(ds1315)
 	memset(ds1315, 0, sizeof(*ds1315));
 	ds1315->count = 0;
 	ds1315->mode = DS_SEEK_MATCHING;
-
-	return DEVICE_START_OK;
 }
 
 

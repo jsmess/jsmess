@@ -76,7 +76,6 @@ INLINE mockingboard_token *get_token(const device_config *device)
 
 static DEVICE_START(mockingboard)
 {
-	return DEVICE_START_OK;
 }
 
 

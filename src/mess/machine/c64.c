@@ -1403,7 +1403,6 @@ static DEVICE_START(c64_cart)
 		cbm_c64_game = -1;
 		cbm_c64_exrom = -1;
 	}
-	return DEVICE_START_OK;
 }
 
 /* Hardware Types for C64 carts */

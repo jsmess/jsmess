@@ -178,7 +178,6 @@ static DEVICE_START( cartslot )
 		return (*config->device_start)(device);
 	
 	process_cartridge(device, NULL);
-	return DEVICE_START_OK;
 }
 
 

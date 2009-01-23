@@ -66,7 +66,6 @@ static DEVICE_START( scc8530 )
 {
 	scc8530_t *scc = get_token(device);
 	memset(scc, 0, sizeof(*scc));
-	return DEVICE_START_OK;
 }
 
 

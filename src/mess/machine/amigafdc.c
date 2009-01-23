@@ -95,7 +95,6 @@ static DEVICE_START(amiga_fdc)
 	fdc_side = 1;
 	fdc_step = 1;
 	fdc_rdy = 0;
-	return DEVICE_START_OK;
 }
 
 static void check_extended_image( int id )

@@ -652,7 +652,6 @@ READ8_HANDLER( gamecom_vram_r )
 DEVICE_START( gamecom_cart )
 {
 	internal_ram = device_get_info_ptr(device->machine->cpu[0], CPUINFO_PTR_SM8500_INTERNAL_RAM);
-	return DEVICE_START_OK;
 }
 
 DEVICE_IMAGE_LOAD( gamecom_cart )

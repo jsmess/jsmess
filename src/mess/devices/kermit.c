@@ -640,7 +640,6 @@ static DEVICE_START( kermit )
 	state->machine = device->machine;
 	state->resend = timer_alloc(device->machine,  kermit_resend_cb, state );
 	kermit_reset( state );
-	return DEVICE_START_OK;
 }
 
 static DEVICE_RESET( kermit )

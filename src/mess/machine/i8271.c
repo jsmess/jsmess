@@ -1565,7 +1565,6 @@ static DEVICE_START( i8271 )
 
 	// register for state saving
 	//state_save_register_item(device->machine, "i8271", device->tag, 0, i8271->number);
-	return DEVICE_START_OK;
 }
 
 static DEVICE_RESET( i8271 )

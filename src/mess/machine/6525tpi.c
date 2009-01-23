@@ -165,8 +165,6 @@ static DEVICE_START( tpi6525 )
 	state_save_register_device_item(device, 0, tpi6525->cr);
 	state_save_register_device_item(device, 0, tpi6525->air);
 	state_save_register_device_item_array(device, 0, tpi6525->irq_level);
-
-	return DEVICE_START_OK;
 }
 
 

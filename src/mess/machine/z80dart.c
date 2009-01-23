@@ -1349,8 +1349,6 @@ static DEVICE_START( z80dart )
 
 	/* register for state saving */
 	//state_save_register_item_array(machine, "z80dart", device->tag, 0, z80dart->);
-
-	return DEVICE_START_OK;
 }
 
 static DEVICE_RESET( z80dart )

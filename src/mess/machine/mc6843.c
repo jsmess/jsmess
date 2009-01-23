@@ -830,8 +830,6 @@ static DEVICE_START( mc6843 )
 	state_save_register_item( device->machine,"mc6843", device->tag, 0, mc6843->data_size );
 	state_save_register_item( device->machine,"mc6843", device->tag, 0, mc6843->data_idx );
 	state_save_register_item( device->machine,"mc6843", device->tag, 0, mc6843->data_id );
-	
-	return DEVICE_START_OK;
 }
 
 

@@ -763,7 +763,6 @@ DEVICE_START( sms_cart ) {
 
 	/* Initially set the vdp to not use sms compatibility mode for GG */
 	sms_set_ggsmsmode( 0 );
-	return DEVICE_START_OK;
 }
 
 DEVICE_IMAGE_LOAD( sms_cart )

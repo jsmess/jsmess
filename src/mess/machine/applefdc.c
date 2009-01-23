@@ -643,7 +643,6 @@ static DEVICE_GET_INFO(applefdc_base)
 static DEVICE_START(oldfdc)
 {
 	applefdc_start(device, APPLEFDC_APPLE2);
-	return DEVICE_START_OK;
 }
 
 
@@ -677,7 +676,6 @@ DEVICE_GET_INFO(applefdc)
 static DEVICE_START(iwm)
 {
 	applefdc_start(device, APPLEFDC_IWM);
-	return DEVICE_START_OK;
 }
 
 
@@ -711,7 +709,6 @@ DEVICE_GET_INFO(iwm)
 static DEVICE_START(swim)
 {
 	applefdc_start(device, APPLEFDC_SWIM);
-	return DEVICE_START_OK;
 }
 
 

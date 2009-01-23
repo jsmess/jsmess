@@ -450,6 +450,7 @@ DRVLIBS = \
 	$(MESSOBJ)/osborne.a \
 	$(MESSOBJ)/osi.a \
 	$(MESSOBJ)/p2000.a \
+	$(MESSOBJ)/palm.a \
 	$(MESSOBJ)/pasogo.a \
 	$(MESSOBJ)/pc.a \
 	$(MESSOBJ)/pcshare.a \
@@ -463,7 +464,6 @@ DRVLIBS = \
 	$(MESSOBJ)/rca.a \
 	$(MESSOBJ)/rockwell.a \
 	$(MESSOBJ)/rt1715.a \
-	$(MESSOBJ)/palm.a \
 	$(MESSOBJ)/samcoupe.a \
 	$(MESSOBJ)/sapi1.a \
 	$(MESSOBJ)/sega.a \

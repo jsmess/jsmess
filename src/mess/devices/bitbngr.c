@@ -93,7 +93,6 @@ static DEVICE_START(bitbanger)
 	bi->value = config->initial_value;
 	bi->timeout_timer = timer_alloc(device->machine, bitbanger_overthreshhold, (void *) device);
 	bi->over_threshhold = 1;
-	return DEVICE_START_OK;
 }
 
 

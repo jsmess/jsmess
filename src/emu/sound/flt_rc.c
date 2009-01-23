@@ -82,11 +82,8 @@ static void set_RC_info(struct filter_rc_info *info, int type, double R1, double
 
 static SND_START( filter_rc )
 {
-	struct filter_rc_info *info;
-	const flt_rc_config *conf = config;
-
-	info = auto_malloc(sizeof(*info));
-	memset(info, 0, sizeof(*info));
+	struct filter_rc_info *info = device->token;
+	const flt_rc_config *conf = device->static_config;
 
 	info->device = device;
 	info->stream = stream_create(device, 1, 1, device->machine->sample_rate, info, filter_rc_update);
@@ -94,8 +91,6 @@ static SND_START( filter_rc )
 		set_RC_info(info, conf->type, conf->R1, conf->R2, conf->R3, conf->C);
 	else
 		set_RC_info(info, FLT_RC_LOWPASS, 1, 1, 1, 0);
-
-	return info;
 }
 
 
@@ -130,6 +125,7 @@ SND_GET_INFO( filter_rc )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct filter_rc_info);			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( filter_rc );	break;

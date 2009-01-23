@@ -596,7 +596,6 @@ static DEVICE_START( tms9901 )
 	tms->clock_rate = tms->intf->clock_rate;
 
 	tms->int_state = 0;
-	return DEVICE_START_OK;
 }
 
 

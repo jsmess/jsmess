@@ -1018,8 +1018,6 @@ static DEVICE_START( mc6854 )
 	state_save_register_item_array( device->machine, "mc6854", device->tag, 0, mc6854->frame );
 	state_save_register_item( device->machine, "mc6854", device->tag, 0, mc6854->flen );
 	state_save_register_item( device->machine, "mc6854", device->tag, 0, mc6854->fpos );
-
-	return DEVICE_START_OK;
 }
 
 

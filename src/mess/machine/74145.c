@@ -128,8 +128,6 @@ static DEVICE_START( ttl74145 )
 
 	/* register for state saving */
 	state_save_register_item(device->machine, "ttl74145", device->tag, 0, ttl74145->number);
-
-	return DEVICE_START_OK;
 }
 
 

@@ -234,7 +234,7 @@ UINT8 get_sam_maptype(const device_config *device)
 }
 
 /* Device Interface */
-static device_start_err common_start(const device_config *device, SAM6883_VERSION device_type)
+static void common_start(const device_config *device, SAM6883_VERSION device_type)
 {
 	sam6883_t *sam = get_safe_token(device);
 	// validate arguments
@@ -253,17 +253,16 @@ static device_start_err common_start(const device_config *device, SAM6883_VERSIO
 	state_save_register_item(device->machine, "6883sam", NULL, 0, sam->state);
 	state_save_register_item(device->machine, "6883sam", NULL, 0, sam->video_position);
 	state_save_register_postload(device->machine, update_sam_postload, (void*)device);
-	return DEVICE_START_OK;
 }
 
 static DEVICE_START( sam6883 )
 {
-	return common_start(device, TYPE_SAM6883);
+	common_start(device, TYPE_SAM6883);
 }
 
 static DEVICE_START( sam6883_gime )
 {
-	return common_start(device, TYPE_SAM6883_GIME);
+	common_start(device, TYPE_SAM6883_GIME);
 }
 
 static DEVICE_RESET( sam6883 )

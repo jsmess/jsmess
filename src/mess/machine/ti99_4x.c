@@ -387,7 +387,6 @@ DEVICE_START( ti99_cart )
 	}
 	
 	cartridge_pages[id] = (UINT16 *) (memory_region(device->machine, "main") + offset_cart + (id * 0x2000));
-	return DEVICE_START_OK;
 }
 
 /*
@@ -786,8 +785,6 @@ MACHINE_RESET( ti99 )
 		{
 			memory_install_read16_handler(space, 0x9000, 0x93ff, 0, 0, ti99_rspeech_r);
 			memory_install_write16_handler(space, 0x9400, 0x97ff, 0, 0, ti99_wspeech_w);
-
-			sndti_set_info_int(SOUND_TMS5220, 0, SNDINFO_INT_TMS5220_VARIANT, variant_tmc0285);
 		}
 	}
 	else

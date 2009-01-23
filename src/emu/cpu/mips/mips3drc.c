@@ -91,11 +91,7 @@ extern unsigned dasmmips3(char *buffer, unsigned pc, UINT32 op);
     MACROS
 ***************************************************************************/
 
-#ifdef LSB_FIRST
-#define LOPTR(x)				((UINT32 *)(x))
-#else
-#define LOPTR(x)				((UINT32 *)(x) + 1)
-#endif
+#define LOPTR(x)				((UINT32 *)(x) + NATIVE_ENDIAN_VALUE_LE_BE(0,1))
 
 #define R32(reg)				mips3->impstate->regmaplo[reg].type, mips3->impstate->regmaplo[reg].value
 #define LO32					R32(REG_LO)
@@ -1475,8 +1471,9 @@ static void generate_checksum_block(mips3_state *mips3, drcuml_block *block, com
 	{
 		if (!(seqhead->flags & OPFLAG_VIRTUAL_NOOP))
 		{
-			UML_LOAD(block, IREG(0), seqhead->opptr.l, IMM(0), DWORD);				// load    i0,*opptr,0,dword
-			UML_CMP(block, IREG(0), IMM(*seqhead->opptr.l));						// cmp     i0,*opptr
+			void *base = memory_decrypted_read_ptr(mips3->program, seqhead->physpc);
+			UML_LOAD(block, IREG(0), base, IMM(0), DWORD);							// load    i0,base,0,dword
+			UML_CMP(block, IREG(0), IMM(seqhead->opptr.l[0]));						// cmp     i0,opptr[0]
 			UML_EXHc(block, IF_NE, mips3->impstate->nocode, IMM(epc(seqhead)));		// exne    nocode,seqhead->pc
 		}
 	}
@@ -1488,20 +1485,23 @@ static void generate_checksum_block(mips3_state *mips3, drcuml_block *block, com
 		for (curdesc = seqhead->next; curdesc != seqlast->next; curdesc = curdesc->next)
 			if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
 			{
-				UML_LOAD(block, IREG(0), curdesc->opptr.l, IMM(0), DWORD);			// load    i0,*opptr,0,dword
-				UML_CMP(block, IREG(0), IMM(*curdesc->opptr.l));					// cmp     i0,*opptr
+				void *base = memory_decrypted_read_ptr(mips3->program, seqhead->physpc);
+				UML_LOAD(block, IREG(0), base, IMM(0), DWORD);						// load    i0,base,0,dword
+				UML_CMP(block, IREG(0), IMM(curdesc->opptr.l[0]));					// cmp     i0,opptr[0]
 				UML_EXHc(block, IF_NE, mips3->impstate->nocode, IMM(epc(seqhead)));	// exne    nocode,seqhead->pc
 			}
 #else
 		UINT32 sum = 0;
-		UML_LOAD(block, IREG(0), seqhead->opptr.l, IMM(0), DWORD);					// load    i0,*opptr,0,dword
-		sum += *seqhead->opptr.l;
+		void *base = memory_decrypted_read_ptr(mips3->program, seqhead->physpc);
+		UML_LOAD(block, IREG(0), base, IMM(0), DWORD);								// load    i0,base,0,dword
+		sum += seqhead->opptr.l[0];
 		for (curdesc = seqhead->next; curdesc != seqlast->next; curdesc = curdesc->next)
 			if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
 			{
-				UML_LOAD(block, IREG(1), curdesc->opptr.l, IMM(0), DWORD);			// load    i1,*opptr,dword
+				base = memory_decrypted_read_ptr(mips3->program, curdesc->physpc);
+				UML_LOAD(block, IREG(1), base, IMM(0), DWORD);						// load    i1,base,dword
 				UML_ADD(block, IREG(0), IREG(0), IREG(1));							// add     i0,i0,i1
-				sum += *curdesc->opptr.l;
+				sum += curdesc->opptr.l[0];
 			}
 		UML_CMP(block, IREG(0), IMM(sum));											// cmp     i0,sum
 		UML_EXHc(block, IF_NE, mips3->impstate->nocode, IMM(epc(seqhead)));			// exne    nocode,seqhead->pc
@@ -1522,7 +1522,7 @@ static void generate_sequence_instruction(mips3_state *mips3, drcuml_block *bloc
 
 	/* add an entry for the log */
 	if (LOG_UML && !(desc->flags & OPFLAG_VIRTUAL_NOOP))
-		log_add_disasm_comment(mips3, block, desc->pc, *desc->opptr.l);
+		log_add_disasm_comment(mips3, block, desc->pc, desc->opptr.l[0]);
 
 	/* set the PC map variable */
 	expc = (desc->flags & OPFLAG_IN_DELAY_SLOT) ? desc->pc - 3 : desc->pc;
@@ -1533,7 +1533,7 @@ static void generate_sequence_instruction(mips3_state *mips3, drcuml_block *bloc
 
 	/* is this a hotspot? */
 	for (hotnum = 0; hotnum < MIPS3_MAX_HOTSPOTS; hotnum++)
-		if (mips3->impstate->hotspot[hotnum].pc != 0 && desc->pc == mips3->impstate->hotspot[hotnum].pc && *desc->opptr.l == mips3->impstate->hotspot[hotnum].opcode)
+		if (mips3->impstate->hotspot[hotnum].pc != 0 && desc->pc == mips3->impstate->hotspot[hotnum].pc && desc->opptr.l[0] == mips3->impstate->hotspot[hotnum].opcode)
 		{
 			compiler->cycles += mips3->impstate->hotspot[hotnum].cycles;
 			break;
@@ -1623,7 +1623,7 @@ static void generate_sequence_instruction(mips3_state *mips3, drcuml_block *bloc
 		if (!generate_opcode(mips3, block, compiler, desc))
 		{
 			UML_MOV(block, MEM(&mips3->pc), IMM(desc->pc));							// mov     [pc],desc->pc
-			UML_MOV(block, MEM(&mips3->impstate->arg0), IMM(*desc->opptr.l));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, MEM(&mips3->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_unimplemented, mips3);							// callc   cfunc_unimplemented
 		}
 	}
@@ -1637,7 +1637,7 @@ static void generate_sequence_instruction(mips3_state *mips3, drcuml_block *bloc
 static void generate_delay_slot_and_branch(mips3_state *mips3, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT8 linkreg)
 {
 	compiler_state compiler_temp = *compiler;
-	UINT32 op = *desc->opptr.l;
+	UINT32 op = desc->opptr.l[0];
 
 	/* fetch the target register if dynamic, in case it is modified by the delay slot */
 	if (desc->targetpc == BRANCH_TARGET_DYNAMIC)
@@ -1686,7 +1686,7 @@ static void generate_delay_slot_and_branch(mips3_state *mips3, drcuml_block *blo
 static int generate_opcode(mips3_state *mips3, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
 	int in_delay_slot = ((desc->flags & OPFLAG_IN_DELAY_SLOT) != 0);
-	UINT32 op = *desc->opptr.l;
+	UINT32 op = desc->opptr.l[0];
 	UINT8 opswitch = op >> 26;
 	drcuml_codelabel skip;
 
@@ -2208,7 +2208,7 @@ static int generate_opcode(mips3_state *mips3, drcuml_block *block, compiler_sta
 
 static int generate_special(mips3_state *mips3, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
-	UINT32 op = *desc->opptr.l;
+	UINT32 op = desc->opptr.l[0];
 	UINT8 opswitch = op & 63;
 
 	switch (opswitch)
@@ -2601,7 +2601,7 @@ static int generate_special(mips3_state *mips3, drcuml_block *block, compiler_st
 
 static int generate_regimm(mips3_state *mips3, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
-	UINT32 op = *desc->opptr.l;
+	UINT32 op = desc->opptr.l[0];
 	UINT8 opswitch = RTREG;
 	drcuml_codelabel skip;
 
@@ -2679,7 +2679,7 @@ static int generate_regimm(mips3_state *mips3, drcuml_block *block, compiler_sta
 
 static int generate_idt(mips3_state *mips3, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
-	UINT32 op = *desc->opptr.l;
+	UINT32 op = desc->opptr.l[0];
 	UINT8 opswitch = op & 0x1f;
 
 	/* only enabled on IDT processors */
@@ -2847,7 +2847,7 @@ static int generate_get_cop0_reg(mips3_state *mips3, drcuml_block *block, compil
 
 static int generate_cop0(mips3_state *mips3, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
-	UINT32 op = *desc->opptr.l;
+	UINT32 op = desc->opptr.l[0];
 	UINT8 opswitch = RSREG;
 	int skip;
 
@@ -2973,7 +2973,7 @@ static int generate_cop0(mips3_state *mips3, drcuml_block *block, compiler_state
 
 static int generate_cop1(mips3_state *mips3, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
-	UINT32 op = *desc->opptr.l;
+	UINT32 op = desc->opptr.l[0];
 	drcuml_codelabel skip;
 	int condition;
 
@@ -3350,7 +3350,7 @@ static int generate_cop1(mips3_state *mips3, drcuml_block *block, compiler_state
 static int generate_cop1x(mips3_state *mips3, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
 	int in_delay_slot = ((desc->flags & OPFLAG_IN_DELAY_SLOT) != 0);
-	UINT32 op = *desc->opptr.l;
+	UINT32 op = desc->opptr.l[0];
 
 	if (mips3->impstate->drcoptions & MIPS3DRC_STRICT_COP1)
 	{
@@ -3595,7 +3595,7 @@ static void log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desclist, i
 		if (desclist->flags & OPFLAG_VIRTUAL_NOOP)
 			strcpy(buffer, "<virtual nop>");
 		else
-			dasmmips3(buffer, desclist->pc, *desclist->opptr.l);
+			dasmmips3(buffer, desclist->pc, desclist->opptr.l[0]);
 #else
 		strcpy(buffer, "???");
 #endif

@@ -129,7 +129,6 @@ static DEVICE_START(cdrom)
 	dev_cdrom_t	*cdrom = get_safe_token( device );
 
 	cdrom->cdrom_handle = NULL;
-	return DEVICE_START_OK;
 }
 
 

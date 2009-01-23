@@ -1444,7 +1444,6 @@ static DEVICE_START( mc68901 )
 	state_save_register_device_item(device, 0, mc68901->rxtx_stop);
 	state_save_register_device_item(device, 0, mc68901->rsr_read);
 	state_save_register_device_item(device, 0, mc68901->next_rsr);
-	return DEVICE_START_OK;
 }
 
 static DEVICE_RESET( mc68901 )

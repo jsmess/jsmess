@@ -606,8 +606,6 @@ static DEVICE_START( mc6846 )
 	state_save_register_item( device->machine, "mc6846", device->tag, 0, mc6846->latch );
 	state_save_register_item( device->machine, "mc6846", device->tag, 0, mc6846->preset );
 	state_save_register_item( device->machine, "mc6846", device->tag, 0, mc6846->timer_started );
-
-	return DEVICE_START_OK;
 }
 
 

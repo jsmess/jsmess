@@ -53,7 +53,7 @@ INLINE const sst39vfx_config *get_config(const device_config *device)
     IMPLEMENTATION
 ***************************************************************************/
 
-static device_start_err common_start(const device_config *device, int device_type)
+static void common_start(const device_config *device, int device_type)
 {
 	sst39vfx_t *flash = get_token(device);
 	const sst39vfx_config *config = get_config(device);
@@ -74,19 +74,17 @@ static device_start_err common_start(const device_config *device, int device_typ
 
 	state_save_register_item_pointer(device->machine, "sst39vfx", device->tag, 0, flash->data, flash->size);
 	state_save_register_item(device->machine, "sst39vfx", device->tag, 0, flash->swap);
-	
-	return DEVICE_START_OK;	
 }
 
 
 static DEVICE_START( sst39vf020 )
 {
-	return common_start(device, TYPE_SST39VF020);
+	common_start(device, TYPE_SST39VF020);
 }
 
 static DEVICE_START( sst39vf400a )
 {
-	return common_start(device, TYPE_SST39VF400A);
+	common_start(device, TYPE_SST39VF400A);
 }
 
 UINT8* sst39vfx_get_base( const device_config *device)

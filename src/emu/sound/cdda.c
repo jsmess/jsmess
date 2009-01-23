@@ -46,15 +46,12 @@ static STREAM_UPDATE( cdda_update )
 static SND_START( cdda )
 {
 	const struct CDDAinterface *intf;
-	cdda_info *info;
-
-	info = auto_malloc(sizeof(*info));
-	memset(info, 0, sizeof(*info));
+	cdda_info *info = device->token;
 
 	/* allocate an audio cache */
 	info->audio_cache = auto_malloc( CD_MAX_SECTOR_DATA * MAX_SECTORS );
 
-	intf = config;
+	intf = device->static_config;
 
 	info->stream = stream_create(device, 0, 2, 44100, info, cdda_update);
 
@@ -66,8 +63,6 @@ static SND_START( cdda )
 	state_save_register_device_item_pointer( device, 0, info->audio_cache, CD_MAX_SECTOR_DATA * MAX_SECTORS );
 	state_save_register_device_item( device, 0, info->audio_samples );
 	state_save_register_device_item( device, 0, info->audio_bptr );
-
-	return info;
 }
 
 
@@ -280,12 +275,13 @@ static void get_audio_data(cdda_info *info, stream_sample_t *bufL, stream_sample
 	info->audio_length -= sectoread;
 
 	/* CD-DA data on the disc is big-endian, flip if we're not */
-	#ifdef LSB_FIRST
-	for( i = 0; i < info->audio_samples * 2; i++ )
+	if (ENDIANNESS_NATIVE == ENDIANNESS_LITTLE)
 	{
-		audio_cache[ i ] = BIG_ENDIANIZE_INT16( audio_cache[ i ] );
+		for( i = 0; i < info->audio_samples * 2; i++ )
+		{
+			audio_cache[ i ] = BIG_ENDIANIZE_INT16( audio_cache[ i ] );
+		}
 	}
-	#endif
 
 	/* reset feedout ptr */
 	info->audio_bptr = 0;
@@ -314,6 +310,7 @@ SND_GET_INFO( cdda )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(cdda_info);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( cdda );	break;

@@ -97,19 +97,14 @@ void vr0_snd_set_areas(UINT32 *texture,UINT32 *frame)
 static SND_START( vrender0 )
 {
 	const vr0_interface *intf;
-	struct _VR0Chip *VR0;
+	struct _VR0Chip *VR0 = device->token;
 
-	VR0 = auto_malloc(sizeof(*VR0));
-	memset(VR0, 0, sizeof(*VR0));
-
-	intf=config;
+	intf=device->static_config;
 
 	memcpy(&(VR0->Intf),intf,sizeof(vr0_interface));
 	memset(VR0->SOUNDREGS,0,sizeof(VR0->SOUNDREGS));
 
 	VR0->stream = stream_create(device, 0, 2, 44100, VR0, VR0_Update);
-
-	return VR0;
 }
 
 WRITE32_HANDLER(vr0_snd_write)
@@ -256,6 +251,7 @@ SND_GET_INFO( vrender0 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct _VR0Chip);	 			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( vrender0 );	break;

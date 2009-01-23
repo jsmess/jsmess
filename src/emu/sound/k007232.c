@@ -297,12 +297,9 @@ static SND_START( k007232 )
 {
 	static const k007232_interface defintrf = { 0 };
 	int i;
-	struct kdacApcm *info;
+	struct kdacApcm *info = device->token;
 
-	info = auto_malloc(sizeof(*info));
-	memset(info, 0, sizeof(*info));
-
-	info->intf = (config != NULL) ? config : &defintrf;
+	info->intf = (device->static_config != NULL) ? device->static_config : &defintrf;
 
 	/* Set up the chips */
 
@@ -329,8 +326,6 @@ static SND_START( k007232 )
 	info->stream = stream_create(device,0,2,clock/128,info,KDAC_A_update);
 
 	KDAC_A_make_fncode(info);
-
-	return info;
 }
 
 /************************************************/
@@ -492,6 +487,7 @@ SND_GET_INFO( k007232 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct kdacApcm);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( k007232 );	break;

@@ -13,7 +13,6 @@ ROM_END
 
 static DEVICE_START( abc99 )
 {
-	return DEVICE_START_OK;
 }
 
 static DEVICE_SET_INFO( abc99 )

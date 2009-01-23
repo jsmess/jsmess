@@ -54,10 +54,10 @@ static int diff_lookup[49*16];
    attenuation to apply to the sound signal. */
 static int volume_table[4] =
 {
-	0x10,	//   0 dB
-	0x08,	//  -6.0 dB
-	0x04,	// -12.0 dB
-	0x02,	// -24.0 dB
+	0x20,	//   0 dB
+	0x10,	//  -6.0 dB
+	0x08,	// -12.0 dB
+	0x04,	// -24.0 dB
 };
 
 /* tables computed? */
@@ -136,10 +136,10 @@ static INT16 clock_adpcm(struct ADPCMVoice *voice, UINT8 nibble)
 	voice->signal += diff_lookup[voice->step * 16 + (nibble & 15)];
 
 	/* clamp to the maximum 12bit */
-	if (voice->signal > 4095)
-		voice->signal = 4095;
-	else if (voice->signal < -4096)
-		voice->signal = -4096;
+	if (voice->signal > 2047)
+		voice->signal = 2047;
+	else if (voice->signal < -2048)
+		voice->signal = -2048;
 
 	/* adjust the step size and clamp */
 	voice->step += index_shift[nibble & 7];
@@ -289,12 +289,9 @@ static void okim6376_state_save_register(struct okim6376 *info, const device_con
 
 static SND_START( okim6376 )
 {
-	struct okim6376 *info;
+	struct okim6376 *info = device->token;
 	int voice;
 	int divisor = 165;
-
-	info = auto_malloc(sizeof(*info));
-	memset(info, 0, sizeof(*info));
 
 	compute_tables();
 
@@ -314,9 +311,6 @@ static SND_START( okim6376 )
 	}
 
 	okim6376_state_save_register(info, device);
-
-	/* success */
-	return info;
 }
 
 
@@ -599,6 +593,7 @@ SND_GET_INFO( okim6376 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct okim6376);					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( okim6376 );		break;

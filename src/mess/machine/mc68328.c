@@ -2805,8 +2805,6 @@ static DEVICE_START( mc68328 )
     mc68328->pwm = timer_alloc(device->machine, mc68328_pwm_transition, 0);
 
     mc68328_register_state_save(device);
-
-    return DEVICE_START_OK;
 }
 
 static DEVICE_SET_INFO( mc68328 )

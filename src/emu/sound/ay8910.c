@@ -659,12 +659,15 @@ static void ay8910_statesave(ay8910_context *psg, const device_config *device)
  *
  *************************************/
 
-void *ay8910_start_ym(sound_type chip_type, const device_config *device, int clock, const ay8910_interface *intf)
+void *ay8910_start_ym(void *infoptr, sound_type chip_type, const device_config *device, int clock, const ay8910_interface *intf)
 {
-	ay8910_context *info;
+	ay8910_context *info = infoptr;
 
-	info = auto_malloc(sizeof(*info));
-	memset(info, 0, sizeof(*info));
+	if (info == NULL)
+	{
+		info = auto_malloc(sizeof(*info));
+		memset(info, 0, sizeof(*info));
+	}
 	info->device = device;
 	info->intf = intf;
 	if ((info->intf->flags & AY8910_SINGLE_OUTPUT) != 0)
@@ -818,8 +821,8 @@ static SND_START( ay8910 )
 		AY8910_DEFAULT_LOADS,
 		NULL, NULL, NULL, NULL
 	};
-	const ay8910_interface *intf = (config ? config : &generic_ay8910);
-	return ay8910_start_ym(SOUND_AY8910, device, clock, intf);
+	const ay8910_interface *intf = (device->static_config ? device->static_config : &generic_ay8910);
+	ay8910_start_ym(device->token, SOUND_AY8910, device, clock, intf);
 }
 
 static SND_START( ym2149 )
@@ -830,8 +833,8 @@ static SND_START( ym2149 )
 		AY8910_DEFAULT_LOADS,
 		NULL, NULL, NULL, NULL
 	};
-	const ay8910_interface *intf = (config ? config : &generic_ay8910);
-	return ay8910_start_ym(SOUND_YM2149, device, clock, intf);
+	const ay8910_interface *intf = (device->static_config ? device->static_config : &generic_ay8910);
+	ay8910_start_ym(device->token, SOUND_YM2149, device, clock, intf);
 }
 
 static SND_STOP( ay8910 )
@@ -857,7 +860,8 @@ SND_GET_INFO( ay8910 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_FCT_ALIAS:							info->type = SOUND_AY8910;							break;
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(ay8910_context);				break;
+		case SNDINFO_FCT_ALIAS:							info->type = SOUND_AY8910;						break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( ay8910 );	break;

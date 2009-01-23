@@ -630,11 +630,8 @@ static STREAM_UPDATE( ymz280b_update )
 static SND_START( ymz280b )
 {
 	static const ymz280b_interface defintrf = { 0 };
-	const ymz280b_interface *intf = (config != NULL) ? config : &defintrf;
-	struct YMZ280BChip *chip;
-
-	chip = auto_malloc(sizeof(*chip));
-	memset(chip, 0, sizeof(*chip));
+	const ymz280b_interface *intf = (device->static_config != NULL) ? device->static_config : &defintrf;
+	struct YMZ280BChip *chip = device->token;
 
 	chip->device = device;
 	chip->ext_ram_read = intf->ext_read;
@@ -697,9 +694,6 @@ static SND_START( ymz280b )
 #if MAKE_WAVS
 	chip->wavresample = wav_open("resamp.wav", INTERNAL_SAMPLE_RATE, 2);
 #endif
-
-	/* success */
-	return chip;
 }
 
 
@@ -1114,6 +1108,7 @@ SND_GET_INFO( ymz280b )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct YMZ280BChip);			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( ymz280b );	break;

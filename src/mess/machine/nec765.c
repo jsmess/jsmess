@@ -2246,7 +2246,7 @@ void nec765_set_ready_state(const device_config *device, int state)
 
 /* Device Interface */
 
-static device_start_err common_start(const device_config *device, int device_type)
+static void common_start(const device_config *device, int device_type)
 {
 	nec765_t *fdc = get_safe_token(device);
 	// validate arguments
@@ -2268,27 +2268,26 @@ static device_start_err common_start(const device_config *device, int device_typ
 
 	// register for state saving
 	//state_save_register_item(device->machine, "nec765", device->tag, 0, nec765->number);
-	return DEVICE_START_OK;
 }
 
 static DEVICE_START( nec765a )
 {
-	return common_start(device, TYPE_NEC765A);
+	common_start(device, TYPE_NEC765A);
 }
 
 static DEVICE_START( nec765b )
 {
-	return common_start(device, TYPE_NEC765B);
+	common_start(device, TYPE_NEC765B);
 }
 
 static DEVICE_START( smc37c78 )
 {
-	return common_start(device, TYPE_SMC37C78);
+	common_start(device, TYPE_SMC37C78);
 }
 
 static DEVICE_START( nec72065 )
 {
-	return common_start(device, TYPE_NEC72065);
+	common_start(device, TYPE_NEC72065);
 }
 
 static DEVICE_RESET( nec765 )

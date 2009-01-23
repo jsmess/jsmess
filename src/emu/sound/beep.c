@@ -83,17 +83,13 @@ static STREAM_UPDATE( beep_sound_update )
 
 static SND_START( beep )
 {
-	struct beep_sound *pBeep;
-
-	pBeep = auto_malloc(sizeof(*pBeep));
-	memset(pBeep, 0, sizeof(*pBeep));
+	struct beep_sound *pBeep = device->token;
 
 	pBeep->stream = stream_create(device, 0, 1, BEEP_RATE, pBeep, beep_sound_update );
 	pBeep->enable = 0;
 	pBeep->frequency = 3250;
 	pBeep->incr = 0;
 	pBeep->signal = 0x07fff;
-	return pBeep;
 }
 
 
@@ -180,6 +176,7 @@ SND_GET_INFO( beep )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct beep_sound);		break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( beep );	break;

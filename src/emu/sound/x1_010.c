@@ -194,11 +194,8 @@ static STREAM_UPDATE( seta_update )
 static SND_START( x1_010 )
 {
 	int i;
-	const x1_010_interface *intf = config;
-	struct x1_010_info *info;
-
-	info = auto_malloc(sizeof(*info));
-	memset(info, 0, sizeof(*info));
+	const x1_010_interface *intf = device->static_config;
+	struct x1_010_info *info = device->token;
 
 	info->region		= device->region;
 	info->base_clock	= clock;
@@ -214,8 +211,6 @@ static SND_START( x1_010 )
 
 	/* get stream channels */
 	info->stream = stream_create(device,0,2,info->rate,info,seta_update);
-
-	return info;
 }
 
 
@@ -302,6 +297,7 @@ SND_GET_INFO( x1_010 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct x1_010_info); 			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( x1_010 );	break;

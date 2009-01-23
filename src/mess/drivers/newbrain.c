@@ -618,7 +618,7 @@ static READ8_HANDLER( ust2_r )
 
 static READ8_HANDLER( cop_r )
 {
-	newbrain_state *state = space->machine->driver_data;
+/*	newbrain_state *state = space->machine->driver_data; */
 	UINT8 data = 0; // REGINT
 
 /*	state->cop_rd = 0;

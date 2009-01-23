@@ -641,8 +641,6 @@ static DEVICE_START( tms9902 )
 	tms9902->clock_rate = tms9902->intf->clock_rate;
 
 	tms9902->timer = timer_alloc(device->machine, decrementer_callback, (void *) device);
-
-	return DEVICE_START_OK;
 }
 
 

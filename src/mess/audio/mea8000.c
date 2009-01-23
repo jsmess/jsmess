@@ -698,7 +698,6 @@ static DEVICE_START( mea8000 )
 	state_save_register_item( device->machine, "mea8000", device->tag, 0, mea8000->last_pitch );
 	state_save_register_item( device->machine, "mea8000", device->tag, 0, mea8000->pitch );
 	state_save_register_item( device->machine, "mea8000", device->tag, 0, mea8000->noise );
-	return DEVICE_START_OK;
 }
 
 

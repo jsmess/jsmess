@@ -488,7 +488,6 @@ static void einstein_daisy_irq_reti(const device_config *device)
 
 static DEVICE_START( einstein_daisy )
 {
-	return DEVICE_START_OK;
 }
 
 

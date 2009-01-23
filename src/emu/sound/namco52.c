@@ -134,13 +134,10 @@ static SND_RESET( namco_52xx )
 
 static SND_START( namco_52xx )
 {
-	struct namco_52xx *chip;
+	struct namco_52xx *chip = device->token;
 	int rate = clock/32;
 
-	chip = auto_malloc(sizeof(*chip));
-	memset(chip, 0, sizeof(*chip));
-
-	chip->intf = config;
+	chip->intf = device->static_config;
 	chip->rom     = device->region;
 	chip->rom_len = device->regionbytes;
 
@@ -167,8 +164,6 @@ static SND_START( namco_52xx )
 	state_save_register_device_item(device, 0, chip->n52_end);
 	state_save_register_device_item(device, 0, chip->n52_length);
 	state_save_register_device_item(device, 0, chip->n52_pos);
-
-	return chip;
 }
 
 
@@ -213,6 +208,7 @@ SND_GET_INFO( namco_52xx )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct namco_52xx);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( namco_52xx );	break;

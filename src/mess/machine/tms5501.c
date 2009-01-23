@@ -301,7 +301,6 @@ static DEVICE_START( tms5501 )
 
 	tms->command = 0;
 	LOG_TMS5501(device, "Init", 0);
-	return DEVICE_START_OK;
 }
 
 

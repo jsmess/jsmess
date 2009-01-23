@@ -185,8 +185,6 @@ DEVICE_START( rp5c15 )
 
 	rtc_timer = timer_alloc(device->machine, rtc_alarm_pulse, (void*)device);
 	timer_adjust_periodic(rtc_timer, attotime_zero, 0, ATTOTIME_IN_HZ(32));
-
-	return DEVICE_START_OK;
 }
 
 static int rp5c15_read(const device_config* device, int offset, UINT16 mem_mask)

@@ -440,7 +440,6 @@ void *ncr5380_get_device(int id)
 #if NCR5380_DEVICE_CONVERSION
 static DEVICE_START( ncr5380 ) 
 {
-	return DEVICE_START_OK;
 }
 
 

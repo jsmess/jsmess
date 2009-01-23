@@ -261,7 +261,6 @@ static DEVICE_START( floppy )
 {
     image_alloctag(device, FLOPPY_TAG, sizeof(mess_flopimg));
 	floppy_drive_init(device, &mess_floppy_interface);
-	return DEVICE_START_OK;
 }
 
 

@@ -1112,7 +1112,6 @@ DEVICE_START( oric_floppy )
 {
 	/* TODO - THIS DOES NOT MULTITASK BETWEEN ORIC BASICDSKs AND MFM DISKS */
 	floppy_drive_init(device, NULL);
-	return DEVICE_START_OK;
 }
 
 

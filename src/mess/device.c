@@ -181,8 +181,6 @@ static const char *device_uiname(iodevice_t devtype)
 
 static DEVICE_START(mess_device)
 {
-	device_start_err err = DEVICE_START_OK;
-
 	mess_device_config *mess_device = (mess_device_config *) device->inline_config;
 	mess_device_token *token = (mess_device_token *) device->token;
 	device_start_func inner_start;
@@ -193,9 +191,7 @@ static DEVICE_START(mess_device)
 	/* if present, invoke the start handler */
 	inner_start = (device_start_func) mess_device_get_info_fct(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_START);
 	if (inner_start != NULL)
-		err = (*inner_start)(device);
-
-	return err;
+		(*inner_start)(device);
 }
 
 

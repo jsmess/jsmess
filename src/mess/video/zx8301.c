@@ -265,8 +265,6 @@ static DEVICE_START( zx8301 )
 	state_save_register_item(device->machine, "zx8301", device->tag, 0, zx8301->flash);
 	state_save_register_item(device->machine, "zx8301", device->tag, 0, zx8301->vsync);
 	state_save_register_item(device->machine, "zx8301", device->tag, 0, zx8301->vda);
-
-	return DEVICE_START_OK;
 }
 
 static DEVICE_RESET( zx8301 )

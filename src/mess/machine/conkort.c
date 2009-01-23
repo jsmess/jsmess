@@ -835,8 +835,6 @@ static DEVICE_START( luxor_55_10828 )
 	state_save_register_device_item(device, 0, conkort->fdc_irq);
 
 	astring_free(tempstring);
-
-	return DEVICE_START_OK;
 }
 
 static DEVICE_RESET( luxor_55_10828 )
@@ -903,8 +901,6 @@ static DEVICE_START( luxor_55_21046 )
 	state_save_register_device_item(device, 0, conkort->fdc_irq);
 
 	astring_free(tempstring);
-
-	return DEVICE_START_OK;
 }
 
 static DEVICE_RESET( luxor_55_21046 )

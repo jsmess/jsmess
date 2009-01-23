@@ -189,7 +189,6 @@ void tx0_tape_get_open_mode(int id,	unsigned int *readable, unsigned int *writea
 
 DEVICE_START( tx0_tape )
 {
-	return DEVICE_START_OK;
 }
 
 
@@ -547,7 +546,6 @@ static void schedule_unselect(void)
 DEVICE_START( tx0_magtape )
 {
 	magtape.img = device;
-	return DEVICE_START_OK;
 }
 
 /*

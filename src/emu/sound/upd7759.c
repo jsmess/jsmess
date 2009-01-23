@@ -629,11 +629,8 @@ static void register_for_save(struct upd7759_chip *chip, const device_config *de
 static SND_START( upd7759 )
 {
 	static const upd7759_interface defintrf = { 0 };
-	const upd7759_interface *intf = (config != NULL) ? config : &defintrf;
-	struct upd7759_chip *chip;
-
-	chip = auto_malloc(sizeof(*chip));
-	memset(chip, 0, sizeof(*chip));
+	const upd7759_interface *intf = (device->static_config != NULL) ? device->static_config : &defintrf;
+	struct upd7759_chip *chip = device->token;
 
 	chip->device = device;
 
@@ -665,8 +662,6 @@ static SND_START( upd7759 )
 	upd7759_reset(chip);
 
 	register_for_save(chip, device);
-
-	return chip;
 }
 
 
@@ -792,6 +787,7 @@ SND_GET_INFO( upd7759 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct upd7759_chip); 			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( upd7759 );	break;

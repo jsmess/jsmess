@@ -11,7 +11,6 @@
 
 static DEVICE_START(microdrv)
 {
-	return DEVICE_START_OK;
 }
 
 DEVICE_GET_INFO(microdrv)

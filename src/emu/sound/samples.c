@@ -37,21 +37,13 @@ struct samples_info
     read_wav_sample - read a WAV file as a sample
 -------------------------------------------------*/
 
-#ifdef LSB_FIRST
-#define intelLong(x) (x)
-#else
-#define intelLong(x) (((x << 24) | (((unsigned long) x) >> 24) | (( x & 0x0000ff00) << 8) | (( x & 0x00ff0000) >> 8)))
-#endif
-
 static int read_wav_sample(mame_file *f, struct loaded_sample *sample)
 {
 	unsigned long offset = 0;
 	UINT32 length, rate, filesize;
 	UINT16 bits, temp16;
 	char buf[32];
-	#ifndef LSB_FIRST
 	UINT32 sindex;
-	#endif
 
 	/* read the core header and make sure it's a WAVE file */
 	offset += mame_fread(f, buf, 4);
@@ -64,7 +56,7 @@ static int read_wav_sample(mame_file *f, struct loaded_sample *sample)
 	offset += mame_fread(f, &filesize, 4);
 	if (offset < 8)
 		return 0;
-	filesize = intelLong(filesize);
+	filesize = LITTLE_ENDIANIZE_INT32(filesize);
 
 	/* read the RIFF file type and make sure it's a WAVE file */
 	offset += mame_fread(f, buf, 4);
@@ -78,7 +70,7 @@ static int read_wav_sample(mame_file *f, struct loaded_sample *sample)
 	{
 		offset += mame_fread(f, buf, 4);
 		offset += mame_fread(f, &length, 4);
-		length = intelLong(length);
+		length = LITTLE_ENDIANIZE_INT32(length);
 		if (memcmp(&buf[0], "fmt ", 4) == 0)
 			break;
 
@@ -103,7 +95,7 @@ static int read_wav_sample(mame_file *f, struct loaded_sample *sample)
 
 	/* sample rate */
 	offset += mame_fread(f, &rate, 4);
-	rate = intelLong(rate);
+	rate = LITTLE_ENDIANIZE_INT32(rate);
 
 	/* bytes/second and block alignment are ignored */
 	offset += mame_fread(f, buf, 6);
@@ -123,7 +115,7 @@ static int read_wav_sample(mame_file *f, struct loaded_sample *sample)
 	{
 		offset += mame_fread(f, buf, 4);
 		offset += mame_fread(f, &length, 4);
-		length = intelLong(length);
+		length = LITTLE_ENDIANIZE_INT32(length);
 		if (memcmp(&buf[0], "data", 4) == 0)
 			break;
 
@@ -162,10 +154,9 @@ static int read_wav_sample(mame_file *f, struct loaded_sample *sample)
 		sample->data = auto_malloc(sizeof(*sample->data) * (length/2));
 		mame_fread(f, sample->data, length);
 		sample->length /= 2;
-#ifndef LSB_FIRST
-		for (sindex = 0; sindex < sample->length; sindex++)
-			sample->data[sindex] = LITTLE_ENDIANIZE_INT16(sample->data[sindex]);
-#endif
+		if (ENDIANNESS_NATIVE != ENDIANNESS_LITTLE)
+			for (sindex = 0; sindex < sample->length; sindex++)
+				sample->data[sindex] = LITTLE_ENDIANIZE_INT16(sample->data[sindex]);
 	}
 	return 1;
 }
@@ -532,13 +523,10 @@ static STATE_POSTLOAD( samples_postload )
 static SND_START( samples )
 {
 	int i;
-	const samples_interface *intf = config;
-	struct samples_info *info;
+	const samples_interface *intf = device->static_config;
+	struct samples_info *info = device->token;
 
-	info = auto_malloc(sizeof(*info));
-	memset(info, 0, sizeof(*info));
 	info->device = device;
-	sndintrf_register_token(info);
 
 	/* read audio samples */
 	if (intf->samplenames)
@@ -572,8 +560,6 @@ static SND_START( samples )
 	/* initialize any custom handlers */
 	if (intf->start)
 		(*intf->start)(device);
-
-	return info;
 }
 
 
@@ -596,6 +582,7 @@ SND_GET_INFO( samples )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct samples_info);			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
         case SNDINFO_PTR_SET_INFO:                      info->set_info = SND_SET_INFO_NAME( samples );	break;

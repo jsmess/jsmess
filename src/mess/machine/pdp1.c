@@ -372,7 +372,6 @@ void pdp1_get_open_mode(int id, unsigned int *readable, unsigned int *writeable,
 
 DEVICE_START( pdp1_tape )
 {
-	return DEVICE_START_OK;
 }
 
 

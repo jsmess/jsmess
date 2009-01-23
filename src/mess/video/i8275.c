@@ -531,7 +531,6 @@ static DEVICE_START( i8275 )
 
 	state_save_register_item(device->machine, "I8275", device->tag, 0, i8275->burst_space_code);
 	state_save_register_item(device->machine, "I8275", device->tag, 0, i8275->burst_count_code);
-	return DEVICE_START_OK;
 }
 
 static DEVICE_RESET( i8275 )

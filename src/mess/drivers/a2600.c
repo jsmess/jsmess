@@ -543,7 +543,6 @@ static int detect_super_chip(running_machine *machine)
 static DEVICE_START( a2600_cart )
 {
 	banking_mode = 0xFF;
-	return DEVICE_START_OK;
 }
 
 

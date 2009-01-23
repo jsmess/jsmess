@@ -330,11 +330,7 @@ Notes:
 #define LOAD_CD_CONTENT 1
 #define DEBUG_PRINTF 0
 
-#ifdef LSB_FIRST
-	#define DMA_XOR(a)	((a) ^ 1)
-#else
-	#define DMA_XOR(a)	((a) ^ 2)
-#endif
+#define DMA_XOR(a)		((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(1,2))
 
 
 static UINT32* decrypted_bios;
@@ -665,9 +661,11 @@ static const struct game_keys2 keys_table2[] =
 	{ "jojobane", { 0x23323ee3, 0x03021972 },0 },
 	{ "sfiii",    { 0xb5fe053e, 0xfc03925a },0 },
 	{ "sfiiiu",   { 0xb5fe053e, 0xfc03925a },0 },
+	{ "sfiiij",   { 0xb5fe053e, 0xfc03925a },0 },
 	{ "sfiiin",   { 0xb5fe053e, 0xfc03925a },0 },
 	{ "sfiii2",   { 0x00000000, 0x00000000 },1 },
 	{ "sfiii2u",  { 0x00000000, 0x00000000 },1 },
+	{ "sfiii2j",  { 0x00000000, 0x00000000 },1 },
 	{ "sfiii2n",  { 0x00000000, 0x00000000 },1 },
 	{ "sfiii3",   { 0xa55432b4, 0x0c129981 },0 },
 	{ "sfiii3n",  { 0xa55432b4, 0x0c129981 },0 },

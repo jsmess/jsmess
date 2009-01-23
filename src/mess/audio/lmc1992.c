@@ -159,7 +159,6 @@ static DEVICE_START( lmc1992 )
 	state_save_register_device_item(device, 0, lmc1992->fader_lf);
 	state_save_register_device_item(device, 0, lmc1992->fader_rr);
 	state_save_register_device_item(device, 0, lmc1992->fader_lr);
-	return DEVICE_START_OK;
 }
 
 static DEVICE_SET_INFO( lmc1992 )

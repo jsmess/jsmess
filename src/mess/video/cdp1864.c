@@ -395,7 +395,6 @@ static DEVICE_START( cdp1864 )
 	state_save_register_device_item(device, 0, cdp1864->incr);
 
 	state_save_register_bitmap(device->machine, "cdp1864", device->tag, 0, "cdp1864->bitmap", cdp1864->bitmap);
-	return DEVICE_START_OK;
 }
 
 static DEVICE_RESET( cdp1864 )

@@ -218,7 +218,6 @@ DEVICE_START( a7800_cart )
 	/* defaults for PAL bios without cart */
 	a7800_cart_type = 0;
 	a7800_stick_type = 1;
-	return DEVICE_START_OK;
 }
 
 DEVICE_IMAGE_LOAD( a7800_cart )

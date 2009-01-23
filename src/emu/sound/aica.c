@@ -1280,12 +1280,9 @@ static SND_START( aica )
 {
 	const aica_interface *intf;
 
-	struct _AICA *AICA;
+	struct _AICA *AICA = device->token;
 
-	AICA = auto_malloc(sizeof(*AICA));
-	memset(AICA, 0, sizeof(*AICA));
-
-	intf = config;
+	intf = device->static_config;
 
 	// init the emulation
 	AICA_Init(device, AICA, intf);
@@ -1296,8 +1293,6 @@ static SND_START( aica )
 
 		AICA->stream = stream_create(device, 0, 2, 44100, AICA, AICA_Update);
 	}
-
-	return AICA;
 }
 
 #ifdef UNUSED_FUNCTION
@@ -1373,6 +1368,7 @@ SND_GET_INFO( aica )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct _AICA);			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:					info->set_info = SND_SET_INFO_NAME( aica );	break;

@@ -48,7 +48,6 @@ void printer_output(const device_config *printer, UINT8 data)
 
 static DEVICE_START(printer)
 {
-	return DEVICE_START_OK;
 }
 
 

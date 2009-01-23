@@ -151,8 +151,6 @@ static DEVICE_START( cdp1862 )
 	state_save_register_device_item(device, 0, cdp1862->bgcolor);
 	state_save_register_device_item(device, 0, cdp1862->con);
 	state_save_register_device_item_bitmap(device, 0, cdp1862->bitmap);
-
-	return DEVICE_START_OK;
 }
 
 static DEVICE_RESET( cdp1862 )

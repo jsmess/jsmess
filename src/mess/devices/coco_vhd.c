@@ -96,7 +96,6 @@ static DEVICE_START( coco_vhd )
 {
 	vhd_info *vhd = get_safe_token(device);
 	vhd->status = VHDSTATUS_NO_VHD_ATTACHED;
-	return DEVICE_START_OK;
 }
 
 

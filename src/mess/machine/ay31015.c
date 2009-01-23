@@ -721,8 +721,6 @@ static DEVICE_START(ay31015)
 
 	ay31015_update_rx_timer( device );
 	ay31015_update_tx_timer( device );
-
-	return DEVICE_START_OK;
 }
 
 

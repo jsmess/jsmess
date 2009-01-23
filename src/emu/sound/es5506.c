@@ -177,7 +177,7 @@ static void update_internal_irq_state(struct ES5506Chip *chip)
 
 ***********************************************************************************************/
 
-static int compute_tables(struct ES5506Chip *chip)
+static void compute_tables(struct ES5506Chip *chip)
 {
 	int i;
 
@@ -211,8 +211,6 @@ static int compute_tables(struct ES5506Chip *chip)
 
 		chip->volume_lookup[i] = (mantissa << 11) >> (20 - exponent);
 	}
-
-	return 1;
 }
 
 
@@ -821,23 +819,19 @@ static STREAM_UPDATE( es5506_update )
 
 ***********************************************************************************************/
 
-static void *es5506_start_common(const device_config *device, int clock, const void *config, sound_type sndtype)
+static void es5506_start_common(const device_config *device, int clock, const void *config, sound_type sndtype)
 {
 	const es5506_interface *intf = config;
-	struct ES5506Chip *chip;
+	struct ES5506Chip *chip = device->token;
 	int j;
 	UINT32 accum_mask;
-
-	chip = auto_malloc(sizeof(*chip));
-	memset(chip, 0, sizeof(*chip));
 
 	/* debugging */
 	if (LOG_COMMANDS && !eslog)
 		eslog = fopen("es.log", "w");
 
 	/* compute the tables */
-	if (!compute_tables(chip))
-		return NULL;
+	compute_tables(chip);
 
 	/* create the stream */
 	chip->stream = stream_create(device, 0, 2, clock / (16*32), chip, es5506_update);
@@ -870,13 +864,12 @@ static void *es5506_start_common(const device_config *device, int clock, const v
 	chip->scratch = auto_malloc(sizeof(chip->scratch[0]) * 2 * MAX_SAMPLE_CHUNK);
 
 	/* success */
-	return chip;
 }
 
 
 static SND_START( es5506 )
 {
-	return es5506_start_common(device, clock, config, SOUND_ES5506);
+	es5506_start_common(device, clock, device->static_config, SOUND_ES5506);
 }
 
 
@@ -1503,7 +1496,7 @@ void es5506_voice_bank_1_w(int voice, int bank)
 
 static SND_START( es5505 )
 {
-	const es5505_interface *intf = config;
+	const es5505_interface *intf = device->static_config;
 	es5506_interface es5506intf;
 
 	memset(&es5506intf, 0, sizeof(es5506intf));
@@ -1513,7 +1506,7 @@ static SND_START( es5505 )
 	es5506intf.irq_callback = intf->irq_callback;
 	es5506intf.read_port = intf->read_port;
 
-	return es5506_start_common(device, clock, &es5506intf, SOUND_ES5505);
+	es5506_start_common(device, clock, &es5506intf, SOUND_ES5505);
 }
 
 
@@ -2159,6 +2152,7 @@ SND_GET_INFO( es5505 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct ES5506Chip);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( es5505 );		break;
@@ -2194,6 +2188,7 @@ SND_GET_INFO( es5506 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct ES5506Chip);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( es5506 );		break;

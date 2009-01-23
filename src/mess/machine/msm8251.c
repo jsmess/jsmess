@@ -141,7 +141,6 @@ static DEVICE_START( msm8251 )
 	serial_connection_init(device->machine,&uart->connection);
 	serial_connection_set_in_callback(device->machine,&uart->connection, msm8251_in_callback);
 	uart->connection.input_state = 0;
-	return DEVICE_START_OK;
 }
 
 

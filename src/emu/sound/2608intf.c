@@ -129,22 +129,19 @@ static SND_START( ym2608 )
 		},
 		NULL
 	};
-	const ym2608_interface *intf = config ? config : &generic_2608;
+	const ym2608_interface *intf = device->static_config ? device->static_config : &generic_2608;
 	int rate = clock/72;
 	void *pcmbufa;
 	int  pcmsizea;
 
-	struct ym2608_info *info;
-
-	info = auto_malloc(sizeof(*info));
-	memset(info, 0, sizeof(*info));
+	struct ym2608_info *info = device->token;
 
 	info->intf = intf;
 	info->device = device;
 
 	/* FIXME: Force to use simgle output */
-	info->psg = ay8910_start_ym(SOUND_YM2608, device, clock, &intf->ay8910_intf);
-	if (!info->psg) return NULL;
+	info->psg = ay8910_start_ym(NULL, SOUND_YM2608, device, clock, &intf->ay8910_intf);
+	assert_always(info->psg != NULL, "Error creating YM2608/AY8910 chip");
 
 	/* Timer Handler set */
 	info->timer[0] = timer_alloc(device->machine, timer_callback_2608_0, info);
@@ -160,14 +157,9 @@ static SND_START( ym2608 )
 	info->chip = ym2608_init(info,device,clock,rate,
 		           pcmbufa,pcmsizea,
 		           timer_handler,IRQHandler,&psgintf);
+	assert_always(info->chip != NULL, "Error creating YM2608 chip");
 
 	state_save_register_postload(device->machine, ym2608_intf_postload, info);
-
-	if (info->chip)
-		return info;
-
-	/* error */
-	return NULL;
 }
 
 static SND_STOP( ym2608 )
@@ -309,6 +301,7 @@ SND_GET_INFO( ym2608 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct ym2608_info);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( ym2608 );		break;

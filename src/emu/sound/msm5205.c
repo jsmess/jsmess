@@ -172,14 +172,10 @@ static SND_RESET( msm5205 )
 
 static SND_START( msm5205 )
 {
-	struct MSM5205Voice *voice;
-
-	voice = auto_malloc(sizeof(*voice));
-	memset(voice, 0, sizeof(*voice));
-	sndintrf_register_token(voice);
+	struct MSM5205Voice *voice = device->token;
 
 	/* save a global pointer to our interface */
-	voice->intf = config;
+	voice->intf = device->static_config;
 	voice->device = device;
 	voice->clock = clock;
 
@@ -202,9 +198,6 @@ static SND_START( msm5205 )
 	state_save_register_device_item(device, 0, voice->bitwidth);
 	state_save_register_device_item(device, 0, voice->signal);
 	state_save_register_device_item(device, 0, voice->step);
-
-	/* success */
-	return voice;
 }
 
 /*
@@ -321,6 +314,7 @@ SND_GET_INFO( msm5205 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct MSM5205Voice);			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( msm5205 );	break;

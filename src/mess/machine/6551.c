@@ -154,7 +154,6 @@ DEVICE_START( acia6551 )
 	serial_connection_set_in_callback(device->machine, &acia->connection, acia_6551_in_callback);
 	transmit_register_reset(&acia->transmit_reg);
 	receive_register_reset(&acia->receive_reg);
-	return DEVICE_START_OK;
 }
 
 

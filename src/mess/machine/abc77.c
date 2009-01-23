@@ -345,8 +345,6 @@ static DEVICE_START( abc77 )
 	state_save_register_item(device->machine, "abc77", device->tag, 0, abc77->clock);
 	state_save_register_item(device->machine, "abc77", device->tag, 0, abc77->hys);
 	state_save_register_item(device->machine, "abc77", device->tag, 0, abc77->reset);
-
-	return DEVICE_START_OK;
 }
 
 static DEVICE_SET_INFO( abc77 )

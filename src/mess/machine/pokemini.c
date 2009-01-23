@@ -1400,7 +1400,6 @@ READ8_HANDLER( pokemini_hwreg_r )
 
 DEVICE_START( pokemini_cart )
 {
-	return DEVICE_START_OK;
 }
 
 DEVICE_IMAGE_LOAD( pokemini_cart )

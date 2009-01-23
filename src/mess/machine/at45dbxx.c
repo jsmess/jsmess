@@ -87,7 +87,7 @@ INLINE at45dbxx_t *get_token(const device_config *device)
     IMPLEMENTATION
 ***************************************************************************/
 
-static device_start_err common_start(const device_config *device, int device_type)
+static void common_start(const device_config *device, int device_type)
 {
 	at45dbxx_t *flash = get_token(device);
 	
@@ -114,22 +114,21 @@ static device_start_err common_start(const device_config *device, int device_typ
 	state_save_register_item(device->machine, "at45dbxx", device->tag, 0, flash->pin.wp);
 	state_save_register_item(device->machine, "at45dbxx", device->tag, 0, flash->pin.reset);
 	state_save_register_item(device->machine, "at45dbxx", device->tag, 0, flash->pin.busy);
-	return DEVICE_START_OK;	
 }
 
 static DEVICE_START( at45db041 )
 {
-	return common_start(device, TYPE_AT45DB041);
+	common_start(device, TYPE_AT45DB041);
 }
 
 static DEVICE_START( at45db081 )
 {
-	return common_start(device, TYPE_AT45DB081);
+	common_start(device, TYPE_AT45DB081);
 }
 
 static DEVICE_START( at45db161 )
 {
-	return common_start(device, TYPE_AT45DB161);
+	common_start(device, TYPE_AT45DB161);
 }
 
 static DEVICE_RESET( at45dbxx )

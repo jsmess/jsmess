@@ -89,7 +89,6 @@ WRITE8_DEVICE_HANDLER(apple2_langcard_w)
 static DEVICE_START(apple2_langcard)
 {
 	/* nothing to do */
-	return DEVICE_START_OK;
 }
 
 

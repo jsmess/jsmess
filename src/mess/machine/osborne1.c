@@ -547,7 +547,6 @@ static void osborne1_daisy_irq_reti(const device_config *device)
 
 static DEVICE_START( osborne1_daisy )
 {
-	return DEVICE_START_OK;
 }
 
 

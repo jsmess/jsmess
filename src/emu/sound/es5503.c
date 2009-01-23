@@ -227,12 +227,9 @@ static SND_START( es5503 )
 {
 	const es5503_interface *intf;
 	int osc;
-	ES5503Chip *chip;
+	ES5503Chip *chip = device->token;
 
-	chip = auto_malloc(sizeof(*chip));
-	memset(chip, 0, sizeof(*chip));
-
-	intf = config;
+	intf = device->static_config;
 
 	chip->irq_callback = intf->irq_callback;
 	chip->adc_read = intf->adc_read;
@@ -267,8 +264,6 @@ static SND_START( es5503 )
 
 	chip->output_rate = (clock/8)/34;	// (input clock / 8) / # of oscs. enabled + 2
 	chip->stream = stream_create(device, 0, 2, chip->output_rate, chip, es5503_pcm_update);
-
-	return chip;
 }
 
 READ8_HANDLER(es5503_reg_0_r)
@@ -521,6 +516,7 @@ SND_GET_INFO( es5503 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(ES5503Chip);					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( es5503 );	break;

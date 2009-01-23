@@ -273,7 +273,6 @@ static DEVICE_START(mess_hd)
 	harddisk->config = device->static_config;
 	harddisk->chd = NULL;
 	harddisk->hard_disk_handle = NULL;
-	return DEVICE_START_OK;
 }
 
 

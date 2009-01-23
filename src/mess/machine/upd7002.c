@@ -197,7 +197,6 @@ static DEVICE_START( uPD7002 )
 	state_save_register_item(device->machine, "uPD7002", device->tag, 0, uPD7002->data0);
 	state_save_register_item(device->machine, "uPD7002", device->tag, 0, uPD7002->digitalvalue);
 	state_save_register_item(device->machine, "uPD7002", device->tag, 0, uPD7002->conversion_counter);
-	return DEVICE_START_OK;
 }
 
 static DEVICE_RESET( uPD7002 )

@@ -63,7 +63,6 @@ DEVICE_START(hd63450)
 		dmac->clock[x] = dmac->intf->clock[x];
 		dmac->burst_clock[x] = dmac->intf->burst_clock[x];
 	}
-	return DEVICE_START_OK;
 }
 
 int hd63450_read(const device_config* device, int offset, UINT16 mem_mask)

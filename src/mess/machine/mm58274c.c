@@ -474,8 +474,6 @@ static DEVICE_START( mm58274c )
 	mm58274c->increment_rtc = timer_alloc(device->machine, increment_rtc, ((void*)device));
 	timer_adjust_periodic(mm58274c->increment_rtc, attotime_zero, 0, ATTOTIME_IN_MSEC(100));
 	mm58274c->interrupt_timer = timer_alloc(device->machine, rtc_interrupt_callback, ((void*)device));
-
-	return DEVICE_START_OK;
 }
 
 

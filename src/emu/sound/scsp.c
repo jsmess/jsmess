@@ -1225,12 +1225,9 @@ static SND_START( scsp )
 {
 	const scsp_interface *intf;
 
-	struct _SCSP *SCSP;
+	struct _SCSP *SCSP = device->token;
 
-	SCSP = auto_malloc(sizeof(*SCSP));
-	memset(SCSP, 0, sizeof(*SCSP));
-
-	intf = config;
+	intf = device->static_config;
 
 	// init the emulation
 	SCSP_Init(device, SCSP, intf);
@@ -1241,8 +1238,6 @@ static SND_START( scsp )
 
 		SCSP->stream = stream_create(device, 0, 2, 44100, SCSP, SCSP_Update);
 	}
-
-	return SCSP;
 }
 
 
@@ -1385,6 +1380,7 @@ SND_GET_INFO( scsp )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct _SCSP);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( scsp );	break;

@@ -300,7 +300,6 @@ static DEVICE_START( xmodem )
 	state->conf = (xmodem_config*) device->static_config;
 	state->machine = device->machine;
 	state->timer = timer_alloc(device->machine,  xmodem_nak_cb, state );
-	return DEVICE_START_OK;
 }
 
 static DEVICE_RESET( xmodem )

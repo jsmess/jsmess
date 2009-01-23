@@ -1171,11 +1171,9 @@ static STREAM_UPDATE( sp0256_update )
 
 static SND_START( sp0256 )
 {
-	const sp0256_interface *intf = config;
-	struct sp0256 *sp;
+	const sp0256_interface *intf = device->static_config;
+	struct sp0256 *sp = device->token;
 
-	sp = auto_malloc(sizeof(*sp));
-	memset(sp, 0, sizeof(*sp));
 	sp->device = device;
 	sp->drq = intf->lrq_callback;
 	sp->sby = intf->sby_callback;
@@ -1209,8 +1207,6 @@ static SND_START( sp0256 )
     /* -------------------------------------------------------------------- */
 	sp->rom = device->region;
 	sp0256_bitrevbuff(sp->rom, 0, 0xffff);
-
-	return sp;
 }
 
 static SND_STOP( sp0256 )
@@ -1362,6 +1358,7 @@ SND_GET_INFO( sp0256 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct sp0256); 				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( sp0256 );	break;
