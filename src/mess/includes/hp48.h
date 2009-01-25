@@ -83,6 +83,7 @@ extern MACHINE_START( hp48s  );
 extern MACHINE_START( hp48sx );
 extern MACHINE_START( hp48g  );
 extern MACHINE_START( hp48gx );
+extern MACHINE_START( hp48gp );
 
 extern MACHINE_RESET( hp48 );
 

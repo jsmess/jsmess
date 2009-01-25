@@ -2,7 +2,7 @@
 
   Copyright (C) Antoine Mine' 2008
 
-   Hewlett Packard HP48 S/SX & G/GX
+   Hewlett Packard HP48 S/SX & G/GX/G+
 
 **********************************************************************/
 

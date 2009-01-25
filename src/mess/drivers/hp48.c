@@ -2,7 +2,7 @@
 
   Copyright (C) Antoine Mine' 2008
 
-   Hewlett Packard HP48 S/SX & G/GX
+   Hewlett Packard HP48 S/SX & G/GX/G+
 
 **********************************************************************/
 
@@ -45,6 +45,7 @@
   - 1991-04-02 HP48S  (discontinued in 1993)
   - 1993-06-01 HP48G  (discontinued in 1999)
                HP48GX (discontinued in 2003)
+  - 1998-03-30 HP48G+ (discontinued in 2003)
 
   Common characteristics:
   - HP family name: Charlemagne
@@ -95,6 +96,11 @@
     + 2 expansion ports
       . port 1: up to 128 KB RAM, can be merged with base RAM
       . port 2: up to   4 MB RAM, in 32 banks of 128 KB, cannot be merged
+
+  - G+ model specific:
+    + Codename: Plus
+    + 128 KB RAM, not expandable
+    + no expansion port
 
 */
 
@@ -474,7 +480,7 @@ INPUT_PORTS_END
 
 
 
-/* G/GX */
+/* G/GX/G+ */
 static INPUT_PORTS_START( hp48gx_kbd )
 
         PORT_START( "LINE0" ) /* OUT = 0x001 */
@@ -795,12 +801,13 @@ static kermit_config hp48_kermit_rs232_conf = { &hp48_rs232_start_recv_byte };
  */
 
 
-/* These ROMS are common to the G and GX models.
+/* These ROMS are common to the G, GX, and G+ models.
    The ROM detects whether it runs a G or a GX by simply testing the memory:
    if there are 32 KB (i.e., addresses wraps-around at 0x10000), it is a G; if there are
    128 KB, it is a GX.
    When a G is detected, some specially optimized routines may be used (they use the fact that
    no extension may be physically present).
+   The G+ model has always revision R.
  */
 ROM_START ( hp48gx )
 		ROM_DEFAULT_BIOS("r")
@@ -841,7 +848,8 @@ ROM_START ( hp48gx )
 
 ROM_END
 
-#define rom_hp48g rom_hp48gx
+#define rom_hp48g  rom_hp48gx
+#define rom_hp48gp rom_hp48gx
 
 
 /* These ROMS are common to the S and SX models.
@@ -934,6 +942,7 @@ static const saturn_cpu_core hp48_config =
 
 static const char layout_hp48gx[] = "hp48gx";
 static const char layout_hp48g [] = "hp48g";
+static const char layout_hp48gp[] = "hp48gp";
 static const char layout_hp48sx[] = "hp48sx";
 static const char layout_hp48s [] = "hp48s";
 
@@ -994,6 +1003,17 @@ static MACHINE_DRIVER_START ( hp48g )
 MACHINE_DRIVER_END
 
 
+static MACHINE_DRIVER_START ( hp48gp )
+	MDRV_IMPORT_FROM    ( hp48_common )
+	MDRV_MACHINE_START  ( hp48gp )
+	MDRV_DEFAULT_LAYOUT ( layout_hp48gp )
+
+	/* serial I/O */
+	MDRV_XMODEM_ADD( "rs232_x", hp48_xmodem_rs232_conf )
+	MDRV_KERMIT_ADD( "rs232_k", hp48_kermit_rs232_conf )
+MACHINE_DRIVER_END
+
+
 static MACHINE_DRIVER_START ( hp48sx )
 	MDRV_IMPORT_FROM    ( hp48_common )
 	MDRV_CPU_REPLACE    ( "main", SATURN, 2000000 )
@@ -1025,3 +1045,4 @@ COMP ( 1990, hp48sx, 0     , 0, hp48sx, hp48sx, hp48, NULL, "Hewlett Packard", "
 COMP ( 1991, hp48s , hp48sx, 0, hp48s,  hp48sx, hp48, NULL, "Hewlett Packard", "HP48S", 0 )
 COMP ( 1993, hp48gx, 0     , 0, hp48gx, hp48gx, hp48, NULL, "Hewlett Packard", "HP48GX", 0 )
 COMP ( 1993, hp48g , hp48gx, 0, hp48g,  hp48gx, hp48, NULL, "Hewlett Packard", "HP48G", 0 )
+COMP ( 1998, hp48gp, hp48gx, 0, hp48gp, hp48gx, hp48, NULL, "Hewlett Packard", "HP48G+", 0 )

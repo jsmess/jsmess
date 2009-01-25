@@ -864,10 +864,11 @@ XL/XE 16kB OS roms
 	DRIVER( comquest )	/* Comquest Plus German								*/
 
 	/* Hewlett Packard */
-	DRIVER( hp48s )		/* HP48 S */
-	DRIVER( hp48sx )	/* HP48 SX */
-	DRIVER( hp48g )		/* HP48 G */
-	DRIVER( hp48gx )	/* HP48 GX */
+	DRIVER( hp48s )		/* HP 48S */
+	DRIVER( hp48sx )	/* HP 48SX */
+	DRIVER( hp48g )		/* HP 48G */
+	DRIVER( hp48gx )	/* HP 48GX */
+	DRIVER( hp48gp )        /* HP 48G+ */
 
 	/* SpectraVideo */
 	DRIVER( svi318 )	/* SVI-318 (PAL)									*/

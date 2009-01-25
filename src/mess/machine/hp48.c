@@ -2,7 +2,7 @@
 
   Copyright (C) Antoine Mine' 2008
 
-   Hewlett Packard HP48 S/SX & G/GX
+   Hewlett Packard HP48 S/SX & G/GX/G+
 
 **********************************************************************/
 
@@ -42,6 +42,7 @@ typedef enum {
 	HP48_SX,
 	HP48_G,
 	HP48_GX,
+	HP48_GP,
 } hp48_models;
 
 /* memory module configuration */
@@ -87,10 +88,10 @@ struct hp48_port_config
 /* current HP48 model */
 static hp48_models hp48_model;
 
-#define HP48_G_SERIES ((hp48_model==HP48_G) || (hp48_model==HP48_GX))
+#define HP48_G_SERIES ((hp48_model==HP48_G) || (hp48_model==HP48_GX) || (hp48_model==HP48_GP))
 #define HP48_S_SERIES ((hp48_model==HP48_S) || (hp48_model==HP48_SX))
 #define HP48_X_SERIES ((hp48_model==HP48_SX) || (hp48_model==HP48_GX))
-#define HP48_GX_MODEL (hp48_model==HP48_GX)
+#define HP48_GX_MODEL ((hp48_model==HP48_GX) || (hp48_model==HP48_GP))
 
 /* OUT register from SATURN (actually 12-bit) */
 static UINT16 hp48_out;
@@ -1245,4 +1246,9 @@ MACHINE_START( hp48g )
 MACHINE_START( hp48gx )
 {
 	hp48_machine_start( machine, HP48_GX );
+}
+
+MACHINE_START( hp48gp )
+{
+	hp48_machine_start( machine, HP48_GP );
 }
