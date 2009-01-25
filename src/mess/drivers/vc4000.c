@@ -88,6 +88,7 @@ static WRITE8_HANDLER(vc4000_sound_ctl)
 
 
 static ADDRESS_MAP_START( vc4000_mem , ADDRESS_SPACE_PROGRAM, 8)
+	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x07ff) AM_READWRITE( SMH_BANK1, SMH_BANK5 )
 	AM_RANGE(0x0800, 0x0fff) AM_READWRITE( SMH_BANK2, SMH_BANK6 )
 	AM_RANGE(0x1000, 0x15ff) AM_READWRITE( SMH_BANK3, SMH_BANK7 )
@@ -95,6 +96,7 @@ static ADDRESS_MAP_START( vc4000_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x1680, 0x16ff) AM_READWRITE( vc4000_key_r, vc4000_sound_ctl ) AM_MIRROR(0x0800)
 	AM_RANGE(0x1700, 0x17ff) AM_READWRITE( vc4000_video_r, vc4000_video_w ) AM_MIRROR(0x0800)
 	AM_RANGE(0x1800, 0x1bff) AM_READWRITE( SMH_BANK4, SMH_BANK8 )
+	AM_RANGE(0x1c00, 0x1e7f) AM_NOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vc4000_io , ADDRESS_SPACE_IO, 8)
@@ -190,58 +192,45 @@ static PALETTE_INIT( vc4000 )
 static DEVICE_IMAGE_LOAD( vc4000_cart )
 {
 	running_machine *machine = image->machine;
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	int size = image_length(image);
 
-	switch (size)
+	memory_set_bankptr(machine, 1, mess_ram);
+	memory_set_bankptr(machine, 2, mess_ram);
+	memory_set_bankptr(machine, 3, mess_ram);
+	memory_set_bankptr(machine, 4, mess_ram);
+	memory_set_bankptr(machine, 5, mess_ram);
+	memory_set_bankptr(machine, 6, mess_ram);
+	memory_set_bankptr(machine, 7, mess_ram);
+	memory_set_bankptr(machine, 8, mess_ram);
+
+	if (size > 0x2000)
+		size = 0x2000;
+
+	if (size > 0)
 	{
-	case 0x0800: // 2K
-		image_fread(image, memory_region(machine, "main") + 0x0000, 0x0800);
-		memory_install_read8_handler(space, 0x0000, 0x07FF, 0, 0, SMH_BANK1); 
-		memory_install_write8_handler(space, 0x0000, 0x07FF, 0, 0, SMH_BANK5);
+		image_fread(image, memory_region(machine, "main") + 0x0000, size);
 		memory_set_bankptr(machine, 1, memory_region(machine, "main") + 0x0000);
-		memory_install_read8_handler(space, 0x0800, 0x0FFF, 0, 0, SMH_BANK2); 
-		memory_install_write8_handler(space, 0x0800, 0x0FFF, 0, 0, SMH_BANK6);
-		memory_set_bankptr(machine, 2, mess_ram);
-		memory_set_bankptr(machine, 6, mess_ram);
-		break;
-
-	case 0x1000: // 4K
-		image_fread(image, memory_region(machine, "main") + 0x0000, 0x1000);
-		memory_install_read8_handler(space, 0x0000, 0x07FF, 0, 0, SMH_BANK1); 
-		memory_install_write8_handler(space, 0x0000, 0x07FF, 0, 0, SMH_BANK5);
-		memory_set_bankptr(machine, 1, memory_region(machine, "main") + 0x0000);
-		memory_install_read8_handler(space, 0x0800, 0x0FFF, 0, 0, SMH_BANK2); 
-		memory_install_write8_handler(space, 0x0800, 0x0FFF, 0, 0, SMH_BANK6);
-		memory_set_bankptr(machine, 2, memory_region(machine, "main") + 0x0800);
-		memory_install_read8_handler(space, 0x1000, 0x15FF, 0, 0, SMH_BANK3); 
-		memory_install_write8_handler(space, 0x1000, 0x15FF, 0, 0, SMH_BANK7);
-		memory_set_bankptr(machine, 3, mess_ram);
-		memory_set_bankptr(machine, 7, mess_ram);
-		break;
-
-	case 0x1800: // 6K
-		image_fread(image, memory_region(machine, "main") + 0x0000, 0x15FF);
-		memory_install_read8_handler(space, 0x0000, 0x07FF, 0, 0, SMH_BANK1); 
-		memory_install_write8_handler(space, 0x0000, 0x07FF, 0, 0, SMH_BANK5);
-		memory_set_bankptr(machine, 1, memory_region(machine, "main") + 0x0000);
-		memory_install_read8_handler(space, 0x0800, 0x0FFF, 0, 0, SMH_BANK2); 
-		memory_install_write8_handler(space, 0x0800, 0x0FFF, 0, 0, SMH_BANK6);
-		memory_set_bankptr(machine, 2, memory_region(machine, "main") + 0x0800);
-		memory_install_read8_handler(space, 0x1000, 0x15FF, 0, 0, SMH_BANK3); 
-		memory_install_write8_handler(space, 0x0800, 0x15FF, 0, 0, SMH_BANK7);
-		memory_set_bankptr(machine, 3, memory_region(machine, "main") + 0x1000);
-		memory_install_read8_handler(space, 0x1800, 0x1BFF, 0, 0, SMH_BANK4); 
-		memory_install_write8_handler(space, 0x1800, 0x1BFF, 0, 0, SMH_BANK8);
-		memory_set_bankptr(machine, 4, mess_ram);
-		memory_set_bankptr(machine, 8, mess_ram);
-		break;
-
-
-	default:
-		return INIT_FAIL;
+		memory_set_bankptr(machine, 5, memory_region(machine, "main") + 0x0000);
 	}
- 
+
+	if (size > 0x800)
+	{
+		memory_set_bankptr(machine, 2, memory_region(machine, "main") + 0x0800);
+		memory_set_bankptr(machine, 6, memory_region(machine, "main") + 0x0800);
+	}
+
+	if (size > 0x1000)
+	{
+		memory_set_bankptr(machine, 3, memory_region(machine, "main") + 0x1000);
+		memory_set_bankptr(machine, 7, memory_region(machine, "main") + 0x1000);
+	}
+
+	if (size > 0x1800)
+	{
+		memory_set_bankptr(machine, 4, memory_region(machine, "main") + 0x1800);
+		memory_set_bankptr(machine, 8, memory_region(machine, "main") + 0x1800);
+	}
+		
 	return INIT_PASS;
 }
 
@@ -277,7 +266,7 @@ static MACHINE_DRIVER_START( vc4000 )
 	/* cartridge */
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("rom,bin")
-	MDRV_CARTSLOT_MANDATORY
+	MDRV_CARTSLOT_NOT_MANDATORY
 	MDRV_CARTSLOT_LOAD(vc4000_cart)
 
 MACHINE_DRIVER_END
@@ -331,5 +320,5 @@ static SYSTEM_CONFIG_START(vc4000)
 	CONFIG_RAM_DEFAULT(5 * 1024) 
 SYSTEM_CONFIG_END
 
-/*    	YEAR		NAME	PARENT	COMPAT	MACHINE	INPUT	INIT		CONFIG	COMPANY		FULLNAME */
-CONS(1978,	vc4000,	0,		0,		vc4000,	vc4000,	0,	vc4000,	"Interton",	"VC4000", GAME_IMPERFECT_GRAPHICS )
+/*   YEAR	NAME	PARENT	COMPAT	MACHINE	INPUT	INIT	CONFIG	COMPANY		FULLNAME */
+CONS(1978,	vc4000,	0,	0,	vc4000,	vc4000,	0,	vc4000,	"Interton",	"VC4000", GAME_IMPERFECT_GRAPHICS )
