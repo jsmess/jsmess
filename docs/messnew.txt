@@ -28,7 +28,7 @@ System Driver Changes:
        Implemented cassette save (only .wav is supported);
        Implemented sound; Fixed cassette loading; Added the NTSC/PAL diode;
        Fixed keyboard labels and layouts; Improved video output;
-       Improved memory handling; Added notes. [Robbbert]
+       Improved memory handling; Added notes. Bugs #159, #739, #1057, #1061 [Robbbert]
 
 
 
