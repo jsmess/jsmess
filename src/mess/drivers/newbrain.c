@@ -260,6 +260,7 @@ static WRITE8_HANDLER( a_enrg1_w )
 	state->enrg1 = data;
 }
 
+#ifdef UNUSED_FUNCTION
 static READ8_HANDLER( ust_r )
 {
 	/*
@@ -342,6 +343,7 @@ static READ8_HANDLER( ust_r )
 
 	return data;
 }
+#endif /* UNUSED_FUNCTION */
 
 static READ8_HANDLER( a_ust_r )
 {
@@ -694,6 +696,7 @@ static READ8_HANDLER( fdc_control_r )
 	return (state->fdc_att << 7) | (state->paging << 6) | (state->fdc_int << 5);
 }
 
+#ifdef UNUSED_FUNCTION
 static READ8_HANDLER( ust2_r )
 {
 	/*
@@ -713,6 +716,7 @@ static READ8_HANDLER( ust2_r )
 
 	return 0;
 }
+#endif /* UNUSED_FUNCTION */
 
 #define NEWBRAIN_COPCMD_NULLCOM		0xd0
 #define NEWBRAIN_COPCMD_DISPCOM		0xa0
