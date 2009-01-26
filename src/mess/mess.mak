@@ -1011,6 +1011,7 @@ $(MESSOBJ)/acorn.a:    \
 	$(MESS_DRIVERS)/bbc.o	     \
 	$(MESS_DRIVERS)/bbcbc.o	     \
 	$(MESS_DRIVERS)/a310.o	 \
+	$(MAME_MACHINE)/archimds.o \
 	$(MESS_DRIVERS)/z88.o	     \
 	$(MESS_VIDEO)/z88.o      \
 	$(MESS_VIDEO)/atom.o	 \
