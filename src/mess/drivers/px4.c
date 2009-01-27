@@ -13,6 +13,17 @@
 
 
 /***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef struct _px4_state px4_state;
+struct _px4_state
+{
+	UINT8 cmdr;
+};
+
+
+/***************************************************************************
     GAPNIT
 ***************************************************************************/
 
@@ -39,7 +50,10 @@ static READ8_HANDLER( px4_icrhc_r )
 /* command register */
 static WRITE8_HANDLER( px4_cmdr_w )
 {
+	px4_state *px4 = space->machine->driver_data;
 	logerror("%s: px4_cmdr_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
+
+	px4->cmdr = data;
 }
 
 /* barcode trigger */
@@ -116,6 +130,37 @@ static READ8_HANDLER( px4_sior_r )
 static WRITE8_HANDLER( px4_sior_w )
 {
 	logerror("%s: px4_sior_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
+
+	switch (data)
+	{
+	case 0x01: logerror("7508 cmd: Power OFF\n"); break;
+	case 0x02: logerror("7508 cmd: Read Status\n"); break;
+	case 0x03: logerror("7508 cmd: KB Reset\n"); break;
+	case 0x04: logerror("7508 cmd: KB Repeat Timer 1 Set\n"); break;
+	case 0x14: logerror("7508 cmd: KB Repeat Timer 2 Set\n"); break;
+	case 0x24: logerror("7508 cmd: KB Repeat Timer 1 Read\n"); break;
+	case 0x34: logerror("7508 cmd: KB Repeat Timer 2 Read\n"); break;
+	case 0x05: logerror("7508 cmd: KB Repeat OFF\n"); break;
+	case 0x15: logerror("7508 cmd: KB Repeat ON\n"); break;
+	case 0x06: logerror("7508 cmd: KB Interrupt OFF\n"); break;
+	case 0x16: logerror("7508 cmd: KB Interrupt ON\n"); break;
+	case 0x07: logerror("7508 cmd: Clock Read\n"); break;
+	case 0x17: logerror("7508 cmd: Clock Write\n"); break;
+	case 0x08: logerror("7508 cmd: Power Switch Read\n"); break;
+	case 0x09: logerror("7508 cmd: Alarm Read\n"); break;
+	case 0x19: logerror("7508 cmd: Alarm Set\n"); break;
+	case 0x29: logerror("7508 cmd: Alarm OFF\n"); break;
+	case 0x39: logerror("7508 cmd: Alarm ON\n"); break;
+	case 0x0a: logerror("7508 cmd: DIP Switch Read\n"); break;
+	case 0x0b: logerror("7508 cmd: Stop Key Interrupt disable\n"); break;
+	case 0x1b: logerror("7508 cmd: Stop Key Interrupt enable\n"); break;
+	case 0x0c: logerror("7508 cmd: 7 chr. Buffer\n"); break;
+	case 0x1c: logerror("7508 cmd: 1 chr. Buffer\n"); break;
+	case 0x0d: logerror("7508 cmd: 1 sec. Interrupt OFF\n"); break;
+	case 0x1d: logerror("7508 cmd: 1 sec. Interrupt ON\n"); break;
+	case 0x0e: logerror("7508 cmd: KB Clear\n"); break;
+	case 0x0f: logerror("7508 cmd: System Reset\n"); break;
+	}
 }
 
 
@@ -298,6 +343,8 @@ static MACHINE_DRIVER_START( px4 )
 	MDRV_CPU_ADD("main", Z80, XTAL_3_6864MHz)	/* uPD70008 */
 	MDRV_CPU_PROGRAM_MAP(px4_mem, 0)
 	MDRV_CPU_IO_MAP(px4_io, 0)
+
+	MDRV_DRIVER_DATA(px4_state)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", LCD)
