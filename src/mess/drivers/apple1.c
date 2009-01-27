@@ -111,7 +111,7 @@ ADDRESS_MAP_END
 
 const gfx_layout apple1_charlayout =
 {
-	8, 8,				/* character cell is 7 pixels wide by 8 pixels high */
+	7, 8,				/* character cell is 7 pixels wide by 8 pixels high */
 	64,					/* 64 characters in 2513 character generator ROM */
 	1,					/* 1 bitplane */
 	{ 0 },
