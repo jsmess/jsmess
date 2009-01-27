@@ -14,6 +14,8 @@ New System Drivers Supported (in no particular order):
 
 System Driver Changes:
 ----------------------
+- [APPLE1] Fixed character layout.  [rhester72]
+
 - [COCO] Cleanups  [Nathan Woods]
 
 - [CPC family] Updated all drivers to use the mc6845 device.  [Wilbert Pol]
