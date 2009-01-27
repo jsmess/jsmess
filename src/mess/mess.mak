@@ -1271,6 +1271,7 @@ $(MESSOBJ)/osborne.a:			\
 
 $(MESSOBJ)/epson.a:			\
 	$(MESS_DRIVERS)/ex800.o	\
+	$(MESS_DRIVERS)/px4.o
 
 $(MESSOBJ)/epoch.a:				\
 	$(MESS_DRIVERS)/gamepock.o	\

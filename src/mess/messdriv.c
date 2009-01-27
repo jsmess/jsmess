@@ -410,6 +410,10 @@ XL/XE 16kB OS roms
 	DRIVER( c65 )		/* 1991 C65 / C64DX (Prototype, NTSC)				*/
 	DRIVER( c64dx )		/* 1991 C65 / C64DX (Prototype, German PAL)			*/
 
+	/* EPSON */
+	DRIVER( px4 )		/* 1985 Epson PX-4									*/
+	DRIVER( px4p )		/* 1985 Epson PX-4+									*/
+
 	/* IBM PC & Clones */
 	DRIVER( ibm5150 )	/* 1981	IBM 5150									*/
 	DRIVER( dgone )		/* 1984 Data General/One */
