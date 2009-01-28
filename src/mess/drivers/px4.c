@@ -20,6 +20,10 @@ typedef struct _px4_state px4_state;
 struct _px4_state
 {
 	UINT8 cmdr;
+
+	/* lcd screen */
+	UINT8 vadr;
+	UINT8 yoff;
 };
 
 
@@ -171,13 +175,19 @@ static WRITE8_HANDLER( px4_sior_w )
 /* vram start address register */
 static WRITE8_HANDLER( px4_vadr_w )
 {
+	px4_state *px4 = space->machine->driver_data;
 	logerror("%s: px4_vadr_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
+
+	px4->vadr = data;
 }
 
 /* y offset register */
 static WRITE8_HANDLER( px4_yoff_w )
 {
+	px4_state *px4 = space->machine->driver_data;
 	logerror("%s: px4_yoff_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
+
+	px4->yoff = data;
 }
 
 /* frame register */
@@ -269,6 +279,47 @@ static WRITE8_HANDLER( px4_ioctlr_w )
 
 
 /***************************************************************************
+    VIDEO EMULATION
+***************************************************************************/
+
+static VIDEO_UPDATE( px4 )
+{
+	px4_state *px4 = screen->machine->driver_data;
+
+	/* display enabled? */
+	if (BIT(px4->yoff, 7))
+	{
+		int y, x;
+
+		/* get vram start address */
+		UINT8 *vram = &mess_ram[(px4->vadr << 8) + (px4->yoff & 0x1f) * 32];
+
+		for (y = 0; y < 64; y++)
+		{
+			for (x = 0; x < 240/8; x++)
+			{
+				*BITMAP_ADDR16(bitmap, y, x * 8 + 0) = BIT(vram[x + y * 32], 7);
+				*BITMAP_ADDR16(bitmap, y, x * 8 + 1) = BIT(vram[x + y * 32], 6);
+				*BITMAP_ADDR16(bitmap, y, x * 8 + 2) = BIT(vram[x + y * 32], 5);
+				*BITMAP_ADDR16(bitmap, y, x * 8 + 3) = BIT(vram[x + y * 32], 4);
+				*BITMAP_ADDR16(bitmap, y, x * 8 + 4) = BIT(vram[x + y * 32], 3);
+				*BITMAP_ADDR16(bitmap, y, x * 8 + 5) = BIT(vram[x + y * 32], 2);
+				*BITMAP_ADDR16(bitmap, y, x * 8 + 6) = BIT(vram[x + y * 32], 1);
+				*BITMAP_ADDR16(bitmap, y, x * 8 + 7) = BIT(vram[x + y * 32], 0);
+			}
+		}
+	}
+	else
+	{
+		/* display is disabled, draw a black screen */
+		bitmap_fill(bitmap, cliprect, 0);
+	}
+
+	return 0;
+}
+
+
+/***************************************************************************
     DRIVER INIT
 ***************************************************************************/
 
@@ -282,7 +333,7 @@ static DRIVER_INIT( px4 )
 
 	/* memory */
 	memory_install_readwrite8_handler(space, 0x8000, 0xffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
-	memory_set_bankptr(machine, 2, mess_ram);
+	memory_set_bankptr(machine, 2, mess_ram + 0x8000);
 }
 
 
@@ -354,6 +405,8 @@ static MACHINE_DRIVER_START( px4 )
 	MDRV_SCREEN_VISIBLE_AREA(0, 239, 0, 63)
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(black_and_white)
+
+	MDRV_VIDEO_UPDATE(px4)
 
 	/* rom capsules */
 	MDRV_CARTSLOT_ADD("capsule1")
