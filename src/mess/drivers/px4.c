@@ -10,6 +10,7 @@
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "devices/cartslot.h"
+#include "px4.lh"
 
 
 /***************************************************************************
@@ -403,6 +404,9 @@ static MACHINE_DRIVER_START( px4 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(240, 64)
 	MDRV_SCREEN_VISIBLE_AREA(0, 239, 0, 63)
+
+	MDRV_DEFAULT_LAYOUT(layout_px4)
+
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(black_and_white)
 
