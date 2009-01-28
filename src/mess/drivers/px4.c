@@ -319,7 +319,6 @@ static WRITE8_HANDLER( px4_ioctlr_w )
     VIDEO EMULATION
 ***************************************************************************/
 
-/* TODO: y-offset wrap-around */
 static VIDEO_UPDATE( px4 )
 {
 	px4_state *px4 = screen->machine->driver_data;
@@ -336,14 +335,16 @@ static VIDEO_UPDATE( px4 )
 		{
 			for (x = 0; x < 240/8; x++)
 			{
-				*BITMAP_ADDR16(bitmap, y, x * 8 + 0) = BIT(vram[x + y * 32], 7);
-				*BITMAP_ADDR16(bitmap, y, x * 8 + 1) = BIT(vram[x + y * 32], 6);
-				*BITMAP_ADDR16(bitmap, y, x * 8 + 2) = BIT(vram[x + y * 32], 5);
-				*BITMAP_ADDR16(bitmap, y, x * 8 + 3) = BIT(vram[x + y * 32], 4);
-				*BITMAP_ADDR16(bitmap, y, x * 8 + 4) = BIT(vram[x + y * 32], 3);
-				*BITMAP_ADDR16(bitmap, y, x * 8 + 5) = BIT(vram[x + y * 32], 2);
-				*BITMAP_ADDR16(bitmap, y, x * 8 + 6) = BIT(vram[x + y * 32], 1);
-				*BITMAP_ADDR16(bitmap, y, x * 8 + 7) = BIT(vram[x + y * 32], 0);
+				int index = (x + y * 32) % 0x800;
+
+				*BITMAP_ADDR16(bitmap, y, x * 8 + 0) = BIT(vram[index], 7);
+				*BITMAP_ADDR16(bitmap, y, x * 8 + 1) = BIT(vram[index], 6);
+				*BITMAP_ADDR16(bitmap, y, x * 8 + 2) = BIT(vram[index], 5);
+				*BITMAP_ADDR16(bitmap, y, x * 8 + 3) = BIT(vram[index], 4);
+				*BITMAP_ADDR16(bitmap, y, x * 8 + 4) = BIT(vram[index], 3);
+				*BITMAP_ADDR16(bitmap, y, x * 8 + 5) = BIT(vram[index], 2);
+				*BITMAP_ADDR16(bitmap, y, x * 8 + 6) = BIT(vram[index], 1);
+				*BITMAP_ADDR16(bitmap, y, x * 8 + 7) = BIT(vram[index], 0);
 			}
 		}
 	}
@@ -445,10 +446,8 @@ static MACHINE_DRIVER_START( px4 )
 
 	/* rom capsules */
 	MDRV_CARTSLOT_ADD("capsule1")
-	MDRV_CARTSLOT_EXTENSION_LIST("bin")
 	MDRV_CARTSLOT_NOT_MANDATORY
 	MDRV_CARTSLOT_ADD("capsule2")
-	MDRV_CARTSLOT_EXTENSION_LIST("bin")
 	MDRV_CARTSLOT_NOT_MANDATORY
 MACHINE_DRIVER_END
 
