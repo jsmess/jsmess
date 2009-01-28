@@ -21,6 +21,7 @@ typedef struct _px4_state px4_state;
 struct _px4_state
 {
 	UINT8 cmdr;
+	UINT8 bankr;
 
 	/* lcd screen */
 	UINT8 vadr;
@@ -97,30 +98,65 @@ static WRITE8_HANDLER( px4_ier_w )
 /* status register */
 static READ8_HANDLER( px4_str_r )
 {
+	px4_state *px4 = space->machine->driver_data;
 	logerror("%s: px4_str_r\n", cpuexec_describe_context(space->machine));
-	return 0xff;
+
+	return (px4->bankr & 0xf0) | 0x0f;
+}
+
+/* helper function to map rom capsules */
+static void install_rom_capsule(const address_space *space, int size, const char *region)
+{
+	/* ram, part 1 */
+	memory_install_readwrite8_handler(space, 0x0000, 0xdfff - size, 0, 0, SMH_BANK(1), SMH_BANK(1));
+	memory_set_bankptr(space->machine, 1, mess_ram);
+
+	/* actual rom data */
+	memory_install_readwrite8_handler(space, 0xe000 - size, 0xdfff, 0, 0, SMH_BANK(2), SMH_NOP);
+	memory_set_bankptr(space->machine, 2, memory_region(space->machine, region));
+
+	/* ram, continued */
+	memory_install_readwrite8_handler(space, 0xc000, 0xffff, 0, 0, SMH_BANK(3), SMH_BANK(3));
+	memory_set_bankptr(space->machine, 3, mess_ram + 0xc000);
 }
 
 /* bank register */
 static WRITE8_HANDLER( px4_bankr_w )
 {
+	px4_state *px4 = space->machine->driver_data;
+	const address_space *space_program = cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	logerror("%s: px4_bankr_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
 
-	/* clock switch */
-	switch (data & 0x02)
+	px4->bankr = data;
+
+	/* bank switch */
+	switch (data >> 4)
 	{
 	case 0x00:
-	case 0x01:
-		cpu_set_clock(space->machine->cpu[0], 3457600);
+		/* system bank */
+		memory_install_readwrite8_handler(space_program, 0x0000, 0x7fff, 0, 0, SMH_BANK(1), SMH_NOP);
+		memory_set_bankptr(space->machine, 1, memory_region(space->machine, "os"));
+		memory_install_readwrite8_handler(space_program, 0x8000, 0xffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
+		memory_set_bankptr(space->machine, 2, mess_ram + 0x8000);
 		break;
 
-	case 0x02:
-		cpu_set_clock(space->machine->cpu[0], XTAL_3_6864MHz);
+	case 0x04:
+		/* memory */
+		memory_install_readwrite8_handler(space_program, 0x0000, 0xffff, 0, 0, SMH_BANK(1), SMH_BANK(1));
+		memory_set_bankptr(space->machine, 1, mess_ram);
 		break;
 
-	case 0x03:
-		cpu_set_clock(space->machine->cpu[0], 3072000);
-		break;
+	case 0x08: install_rom_capsule(space_program, 0x2000, "capsule1"); break;
+	case 0x09: install_rom_capsule(space_program, 0x4000, "capsule1"); break;
+	case 0x0a: install_rom_capsule(space_program, 0x8000, "capsule1"); break;
+	case 0x0c: install_rom_capsule(space_program, 0x2000, "capsule2"); break;
+	case 0x0d: install_rom_capsule(space_program, 0x4000, "capsule2"); break;
+	case 0x0e: install_rom_capsule(space_program, 0x8000, "capsule2"); break;
+
+	default:
+		logerror("invalid bank switch value: 0x%02x\n", data >> 4);
+
 	}
 }
 
@@ -283,6 +319,7 @@ static WRITE8_HANDLER( px4_ioctlr_w )
     VIDEO EMULATION
 ***************************************************************************/
 
+/* TODO: y-offset wrap-around */
 static VIDEO_UPDATE( px4 )
 {
 	px4_state *px4 = screen->machine->driver_data;
@@ -326,14 +363,8 @@ static VIDEO_UPDATE( px4 )
 
 static DRIVER_INIT( px4 )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-
-	/* map os rom */
-	memory_install_readwrite8_handler(space, 0x0000, 0x7fff, 0, 0, SMH_BANK(1), SMH_NOP);
+	/* map os rom and last half of memory */
 	memory_set_bankptr(machine, 1, memory_region(machine, "os"));
-
-	/* memory */
-	memory_install_readwrite8_handler(space, 0x8000, 0xffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
 	memory_set_bankptr(machine, 2, mess_ram + 0x8000);
 }
 
