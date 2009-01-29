@@ -419,6 +419,17 @@ INPUT_PORTS_END
 
 
 /***************************************************************************
+    PALETTE
+***************************************************************************/
+
+static PALETTE_INIT( px4 )
+{
+	palette_set_color(machine, 0, MAKE_RGB(138, 146, 148));
+	palette_set_color(machine, 1, MAKE_RGB(92, 83, 88));
+}
+
+
+/***************************************************************************
     MACHINE DRIVERS
 ***************************************************************************/
 
@@ -440,7 +451,7 @@ static MACHINE_DRIVER_START( px4 )
 	MDRV_DEFAULT_LAYOUT(layout_px4)
 
 	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(black_and_white)
+	MDRV_PALETTE_INIT(px4)
 
 	MDRV_VIDEO_UPDATE(px4)
 
