@@ -105,6 +105,7 @@ VIDEO_START(vc4000)
 READ8_HANDLER(vc4000_video_r)
 {
 	UINT8 data=0;
+	static UINT8 joy1_x=102,joy1_y=102,joy2_x=102,joy2_y=102;
 	switch (offset) {
 
 	case 0xca:		// Background-sprite collision (bit 7-4) and sprite finished (bit 3-0)
@@ -151,31 +152,81 @@ READ8_HANDLER(vc4000_video_r)
 #else
 
 	case 0xcc:
-		data = 0x66;
-		// between 20 and 225
+		// between 20 and 225 - autocentre is commented out as it is impossible to play a game with the keyboard
 		if (!cpu_get_reg(space->machine->cpu[0], S2650_FO))
 		{
-			if (input_port_read(space->machine, "JOYS") & 0x1) data=20;
-			if (input_port_read(space->machine, "JOYS") & 0x2) data=225;
+			data = input_port_read(space->machine, "JOYS") & 3;
+			switch (data)
+			{
+				case 1:
+					joy1_x-=5;
+					if (joy1_x < 20) joy1_x=20;
+					break;
+				case 2:
+					joy1_x+=5;
+					if (joy1_x > 225) joy1_x=225;
+					break;
+	//			default:			/* autocentre */
+	//				joy1_x=102;
+			}
+			data=joy1_x;
 		}
 		else
 		{
-			if (input_port_read(space->machine, "JOYS") & 0x4) data=225;
-			if (input_port_read(space->machine, "JOYS") & 0x8) data=20;
+			data = input_port_read(space->machine, "JOYS") & 12;
+			switch (data)
+			{
+				case 8:
+					joy1_y-=5;
+					if (joy1_y < 20) joy1_y=20;
+					break;
+				case 4:
+					joy1_y+=5;
+					if (joy1_y > 225) joy1_y=225;
+					break;
+	//			default:
+	//				joy1_y=102;
+			}
+			data=joy1_y;
 		}
 		break;
 
 	case 0xcd:
-		data = 0x66;
 		if (!cpu_get_reg(space->machine->cpu[0], S2650_FO))
 		{
-			if (input_port_read(space->machine, "JOYS") & 0x10) data=20;
-			if (input_port_read(space->machine, "JOYS") & 0x20) data=225;
+			data = input_port_read(space->machine, "JOYS") & 0x30;
+			switch (data)
+			{
+				case 0x10:
+					joy2_x-=5;
+					if (joy2_x < 20) joy2_x=20;
+					break;
+				case 0x20:
+					joy2_x+=5;
+					if (joy2_x > 225) joy2_x=225;
+					break;
+	//			default:
+	//				joy2_x=102;
+			}
+			data=joy2_x;
 		}
 		else
 		{
-			if (input_port_read(space->machine, "JOYS") & 0x40) data=225;
-			if (input_port_read(space->machine, "JOYS") & 0x80) data=20;
+			data = input_port_read(space->machine, "JOYS") & 0xc0;
+			switch (data)
+			{
+				case 0x80:
+					joy2_y-=5;
+					if (joy2_y < 20) joy2_y=20;
+					break;
+				case 0x40:
+					joy2_y+=5;
+					if (joy2_y > 225) joy2_y=225;
+					break;
+	//			default:
+	//				joy2_y=102;
+			}
+			data=joy2_y;
 		}
 		break;
 #endif
@@ -307,66 +358,62 @@ INLINE void vc4000_collision_plot(UINT8 *collision, UINT8 data, UINT8 color, int
 
 static void vc4000_sprite_update(bitmap_t *bitmap, UINT8 *collision, SPRITE *This)
 {
-
 	int i,j,m;
 
 	if (vc4000_video.line==0)
 	{
-	  This->y=This->data->y1;
-	  This->state=0;
-	  This->delay=0;
-	  This->finished=FALSE;
+		This->y=This->data->y1;
+		This->state=0;
+		This->delay=0;
+		This->finished=FALSE;
 	}
+
 	This->finished_now=FALSE;
 
 	if (vc4000_video.line>269) return;
 
-	switch (This->state) {
+	switch (This->state)
+	{
 	case 0:
 		if (vc4000_video.line != This->y + 2) break;
 		This->state++;
+
 	case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8:case 9:case 10:
 
-		if (vc4000_video.line<bitmap->height && This->data->x1<bitmap->width)
+		vc4000_collision_plot(collision+This->data->x1, This->data->bitmap[This->state-1],This->mask,This->size);
+
+		for (j=0,m=0x80; j<8; j++, m>>=1)
 		{
-			vc4000_collision_plot(collision+This->data->x1, This->data->bitmap[This->state-1],
-					This->mask,This->size);
-			for (j=0,m=0x80; j<8; j++, m>>=1)
+			if (This->data->bitmap[This->state-1]&m)
 			{
-				if (This->data->bitmap[This->state-1]&m)
-				{
-					for (i=0; i<This->size; i++)
-					{
- 						*BITMAP_ADDR16(bitmap, vc4000_video.line, This->data->x1 + i + j*This->size) =
-							This->scolor;
-					} 
-				}
+				for (i=0; i<This->size; i++)
+					*BITMAP_ADDR16(bitmap, vc4000_video.line, This->data->x1 + i + j*This->size) = This->scolor;
 			}
 		}
+
 		This->delay++;
+
 		if (This->delay>=This->size)
 		{
-		    This->delay=0;
-		    This->state++;
+			This->delay=0;
+			This->state++;
 		}
+
 		if (This->state>10)
 		{
-		   This->finished=TRUE;
-		   This->finished_now=TRUE;
+			This->finished=TRUE;
+			This->finished_now=TRUE;
 		}
-		break;
-	case 11:
 
+		break;
+
+	case 11:
 		This->y=This->data->y2;
 
 		if (This->y==255)
-		{
-		    This->y=0;
-		}
+			This->y=0;
 		else
-		{
-		This->y++;
-		}
+			This->y++;
 
 		if (This->y>252) break;
 
@@ -382,22 +429,16 @@ static void vc4000_sprite_update(bitmap_t *bitmap, UINT8 *collision, SPRITE *Thi
 		This->state++;
 
 	case 13: case 14: case 15: case 16: case 17: case 18: case 19:case 20:case 21:case 22:
-//		if (vc4000_video.line<bitmap->height && This->data->x2<bitmap->width)
-		if (vc4000_video.line < 269)
+
+		vc4000_collision_plot(collision+This->data->x2,This->data->bitmap[This->state-13],This->mask,This->size);
+		for (j=0,m=0x80; j<8; j++, m>>=1)
 		{
-			vc4000_collision_plot(collision+This->data->x2,This->data->bitmap[This->state-13],
-					This->mask,This->size);
-			for (j=0,m=0x80; j<8; j++, m>>=1)
+			if (This->data->bitmap[This->state-13]&m)
 			{
-				if (This->data->bitmap[This->state-13]&m)
-				{
-					for (i=0; i<This->size; i++)
-					{
- 						*BITMAP_ADDR16(bitmap, vc4000_video.line, This->data->x2 + i + j*This->size) =
-							This->scolor;
-					} 
-				}
+				for (i=0; i<This->size; i++)
+					*BITMAP_ADDR16(bitmap, vc4000_video.line, This->data->x2 + i + j*This->size) = This->scolor;
 			}
+		}
 		This->delay++;
 		if (This->delay<This->size) break;
 		This->delay=0;
@@ -406,8 +447,6 @@ static void vc4000_sprite_update(bitmap_t *bitmap, UINT8 *collision, SPRITE *Thi
 		This->finished=TRUE;
 		This->finished_now=TRUE;
 		This->state=11;
-		break;
-		}
 		break;
 	}
 }
@@ -470,7 +509,7 @@ INLINE void vc4000_draw_grid(running_machine *machine, UINT8 *collision)
 
 static TIMER_CALLBACK( vc4000_clear )
 {
-	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);;
+	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 }
 
 INTERRUPT_GEN( vc4000_video_line )
@@ -526,8 +565,7 @@ INTERRUPT_GEN( vc4000_video_line )
 		(vc4000_video.sprites[0].finished_now))
 	{
 		cpu_set_input_line_and_vector(device->machine->cpu[0], 0, ASSERT_LINE, 3);
-		timer_set(device->machine, ATTOTIME_IN_USEC(450), NULL, 0, vc4000_clear);
-//		cpu_set_input_line(device->machine->cpu[0], 0, CLEAR_LINE);
+		timer_set(device->machine, ATTOTIME_IN_USEC(400), NULL, 0, vc4000_clear);
 	}
 }
 
