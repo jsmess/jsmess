@@ -51,8 +51,7 @@ DRIVER_INIT ( zx )
 {
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
-	memory_install_read8_handler(space, 0x4000, 0x4000 + mess_ram_size - 1, 0, 0, SMH_BANK1);
-	memory_install_write8_handler(space, 0x4000, 0x4000 + mess_ram_size - 1, 0, 0, zx_ram_w);
+	memory_install_readwrite8_handler(space, 0x4000, 0x4000 + mess_ram_size - 1, 0, 0, SMH_BANK1, zx_ram_w);
 	memory_set_bankptr(machine, 1, memory_region(machine, "main") + 0x4000);
 }
 
