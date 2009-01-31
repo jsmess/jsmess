@@ -90,10 +90,9 @@ static WRITE8_HANDLER(vc4000_sound_ctl)
 static ADDRESS_MAP_START( vc4000_mem , ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x1600, 0x167f) AM_NOP
+	AM_RANGE(0x1600, 0x167f) AM_NOP AM_MIRROR(0x0800)
 	AM_RANGE(0x1680, 0x16ff) AM_READWRITE( vc4000_key_r, vc4000_sound_ctl ) AM_MIRROR(0x0800)
 	AM_RANGE(0x1700, 0x17ff) AM_READWRITE( vc4000_video_r, vc4000_video_w ) AM_MIRROR(0x0800)
-	AM_RANGE(0x1c00, 0x1e7f) AM_NOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vc4000_io , ADDRESS_SPACE_IO, 8)
@@ -154,6 +153,11 @@ PORT_BIT(0xff,0x70,IPT_AD_STICK_Y) PORT_SENSITIVITY(70) PORT_KEYDELTA(5) PORT_CE
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Player 2/right") PORT_CODE(KEYCODE_PGDN)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Player 2/down") PORT_CODE(KEYCODE_END)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Player 2/up") PORT_CODE(KEYCODE_HOME)
+
+	PORT_START("CONFIG")
+	PORT_CONFNAME( 0x01, 0x00, "Treat Joystick as...")
+	PORT_CONFSETTING(    0x00, "Buttons")
+	PORT_CONFSETTING(    0x01, "Paddle")
 #endif
 INPUT_PORTS_END
 
@@ -191,10 +195,10 @@ static DEVICE_IMAGE_LOAD( vc4000_cart )
 	running_machine *machine = image->machine;
 	int size = image_length(image);
 
-	if (size > 0x2000)
-		size = 0x2000;
+	if (size > 0x1600)
+		size = 0x1600;
 
-	if (size > 0x1800)
+	if (size > 0x1000)	/* 6k rom + 1k ram - Chess2 only */
 	{
 		memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1000, 0x15ff, 0, 0, SMH_BANK1);	/* extra rom */
 		memory_set_bankptr(machine, 1, memory_region(machine, "main") + 0x1000);
@@ -204,7 +208,7 @@ static DEVICE_IMAGE_LOAD( vc4000_cart )
 		memory_set_bankptr(machine, 4, memory_region(machine, "main") + 0x1800);
 	}
 	else
-	if (size > 0x1000)
+	if (size > 0x0800)	/* some 4k roms have 1k of mirrored ram */
 	{
 		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1000, 0x15ff, 0, 0x800, SMH_BANK1, SMH_BANK2); /* ram */
 		memory_set_bankptr(machine, 1, memory_region(machine, "main") + 0x1000);
@@ -259,7 +263,6 @@ MACHINE_DRIVER_END
 ROM_START(vc4000)
 	ROM_REGION(0x2000,"main", 0)
 	ROM_FILL( 0x0000, 0x2000, 0xFF )
-
 ROM_END
 
 QUICKLOAD_LOAD(vc4000)
@@ -301,9 +304,5 @@ QUICKLOAD_LOAD(vc4000)
 }
 
 
-static SYSTEM_CONFIG_START(vc4000)
-	CONFIG_RAM_DEFAULT(5 * 1024) 
-SYSTEM_CONFIG_END
-
 /*   YEAR	NAME	PARENT	COMPAT	MACHINE	INPUT	INIT	CONFIG	COMPANY		FULLNAME */
-CONS(1978,	vc4000,	0,	0,	vc4000,	vc4000,	0,	vc4000,	"Interton",	"VC4000", GAME_IMPERFECT_GRAPHICS )
+CONS(1978,	vc4000,	0,	0,	vc4000,	vc4000,	0,	0,	"Interton",	"VC4000", GAME_IMPERFECT_GRAPHICS )

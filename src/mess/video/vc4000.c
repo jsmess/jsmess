@@ -151,52 +151,87 @@ READ8_HANDLER(vc4000_video_r)
 		break;
 #else
 
-	case 0xcc:
-		// between 20 and 225 - autocentre is commented out as it is impossible to play a game with the keyboard
-		if (!cpu_get_reg(space->machine->cpu[0], S2650_FO))
-		{
-			data = input_port_read(space->machine, "JOYS") & 3;
-			switch (data)
+	case 0xcc:		/* left joystick */
+		if (input_port_read(space->machine, "CONFIG")&1)
+		{		/* paddle */
+			if (!cpu_get_reg(space->machine->cpu[0], S2650_FO))
 			{
-				case 1:
+				data = input_port_read(space->machine, "JOYS") & 0x03;
+				switch (data)
+				{
+				case 0x01:
 					joy1_x-=5;
 					if (joy1_x < 20) joy1_x=20;
 					break;
-				case 2:
+				case 0x02:
 					joy1_x+=5;
 					if (joy1_x > 225) joy1_x=225;
 					break;
-	//			default:			/* autocentre */
-	//				joy1_x=102;
+				}
+				data=joy1_x;
 			}
-			data=joy1_x;
-		}
-		else
-		{
-			data = input_port_read(space->machine, "JOYS") & 12;
-			switch (data)
+			else
 			{
-				case 8:
+				data = input_port_read(space->machine, "JOYS") & 0x0c;
+				switch (data)
+				{
+				case 0x08:
 					joy1_y-=5;
 					if (joy1_y < 20) joy1_y=20;
 					break;
-				case 4:
+				case 0x04:
 					joy1_y+=5;
 					if (joy1_y > 225) joy1_y=225;
 					break;
-	//			default:
-	//				joy1_y=102;
+				}
+				data=joy1_y;
 			}
-			data=joy1_y;
+		}
+		else
+		{		/* buttons */
+			if (!cpu_get_reg(space->machine->cpu[0], S2650_FO))
+			{
+				data = input_port_read(space->machine, "JOYS") & 0x03;
+				switch (data)
+				{
+				case 0x01:
+					joy1_x=20;
+					break;
+				case 0x02:
+					joy1_x=225;
+					break;
+				default:			/* autocentre */
+					joy1_x=102;
+				}
+				data=joy1_x;
+			}
+			else
+			{
+				data = input_port_read(space->machine, "JOYS") & 0x0c;
+				switch (data)
+				{
+				case 0x08:
+					joy1_y=20;
+					break;
+				case 0x04:
+					joy1_y=225;
+					break;
+				default:
+					joy1_y=102;
+				}
+				data=joy1_y;
+			}
 		}
 		break;
 
-	case 0xcd:
-		if (!cpu_get_reg(space->machine->cpu[0], S2650_FO))
+	case 0xcd:		/* right joystick */
+		if (input_port_read(space->machine, "CONFIG")&1)
 		{
-			data = input_port_read(space->machine, "JOYS") & 0x30;
-			switch (data)
+			if (!cpu_get_reg(space->machine->cpu[0], S2650_FO))
 			{
+				data = input_port_read(space->machine, "JOYS") & 0x30;
+				switch (data)
+				{
 				case 0x10:
 					joy2_x-=5;
 					if (joy2_x < 20) joy2_x=20;
@@ -205,16 +240,14 @@ READ8_HANDLER(vc4000_video_r)
 					joy2_x+=5;
 					if (joy2_x > 225) joy2_x=225;
 					break;
-	//			default:
-	//				joy2_x=102;
+				}
+				data=joy2_x;
 			}
-			data=joy2_x;
-		}
-		else
-		{
-			data = input_port_read(space->machine, "JOYS") & 0xc0;
-			switch (data)
+			else
 			{
+				data = input_port_read(space->machine, "JOYS") & 0xc0;
+				switch (data)
+				{
 				case 0x80:
 					joy2_y-=5;
 					if (joy2_y < 20) joy2_y=20;
@@ -223,10 +256,44 @@ READ8_HANDLER(vc4000_video_r)
 					joy2_y+=5;
 					if (joy2_y > 225) joy2_y=225;
 					break;
-	//			default:
-	//				joy2_y=102;
+				}
+				data=joy2_y;
 			}
-			data=joy2_y;
+		}
+		else
+		{
+			if (!cpu_get_reg(space->machine->cpu[0], S2650_FO))
+			{
+				data = input_port_read(space->machine, "JOYS") & 0x30;
+				switch (data)
+				{
+				case 0x10:
+					joy2_x=20;
+					break;
+				case 0x20:
+					joy2_x=225;
+					break;
+				default:			/* autocentre */
+					joy2_x=102;
+				}
+				data=joy2_x;
+			}
+			else
+			{
+				data = input_port_read(space->machine, "JOYS") & 0xc0;
+				switch (data)
+				{
+				case 0x80:
+					joy2_y=20;
+					break;
+				case 0x40:
+					joy2_y=225;
+					break;
+				default:
+					joy2_y=102;
+				}
+				data=joy2_y;
+			}
 		}
 		break;
 #endif
@@ -327,6 +394,8 @@ static const char led[20][12+1] =
 	"iiiihhhhgggg"
 };
 
+static UINT8 objects[256];
+
 static void vc4000_draw_digit(bitmap_t *bitmap, int x, int y, int d, int line)
 {
 	static const int digit_to_segment[0x10]={
@@ -387,7 +456,10 @@ static void vc4000_sprite_update(bitmap_t *bitmap, UINT8 *collision, SPRITE *Thi
 			if (This->data->bitmap[This->state-1]&m)
 			{
 				for (i=0; i<This->size; i++)
-					*BITMAP_ADDR16(bitmap, vc4000_video.line, This->data->x1 + i + j*This->size) = This->scolor;
+				{
+					objects[This->data->x1 + i + j*This->size] |= This->scolor;
+					objects[This->data->x1 + i + j*This->size] &= 7;
+				}
 			}
 		}
 
@@ -436,7 +508,10 @@ static void vc4000_sprite_update(bitmap_t *bitmap, UINT8 *collision, SPRITE *Thi
 			if (This->data->bitmap[This->state-13]&m)
 			{
 				for (i=0; i<This->size; i++)
-					*BITMAP_ADDR16(bitmap, vc4000_video.line, This->data->x2 + i + j*This->size) = This->scolor;
+				{
+					objects[This->data->x2 + i + j*This->size] |= This->scolor;
+					objects[This->data->x2 + i + j*This->size] &= 7;
+				}
 			}
 		}
 		This->delay++;
@@ -495,12 +570,12 @@ INLINE void vc4000_draw_grid(running_machine *machine, UINT8 *collision)
 		}
 		break;
 	}
-	for (x=30, j=0, m=0x80; j<16; j++, x+=8, m>>=1) {
-		if (vc4000_video.reg.d.grid[i][j>>3]&m) {
+	for (x=30, j=0, m=0x80; j<16; j++, x+=8, m>>=1)
+	{
+		if (vc4000_video.reg.d.grid[i][j>>3]&m)
+		{
 			int l;
-			for (l=0; l<w; l++) {
-			collision[x+l]|=0x10;
-			}
+			for (l=0; l<w; l++) collision[x+l]|=0x10;
 			plot_box(vc4000_video.bitmap, x, vc4000_video.line, w, 1, (vc4000_video.reg.d.background>>4)&7);
 		}
 		if (j==7) m=0x100;
@@ -533,10 +608,19 @@ INTERRUPT_GEN( vc4000_video_line )
 	{
 		vc4000_draw_grid(device->machine, collision);
 
+		/* init object colours */
+		for (y=0; y<256; y++) objects[y]=8;
+
+		/* calculate object colours and OR overlapping object colours */
 		vc4000_sprite_update(vc4000_video.bitmap, collision, &vc4000_video.sprites[0]);
 		vc4000_sprite_update(vc4000_video.bitmap, collision, &vc4000_video.sprites[1]);
 		vc4000_sprite_update(vc4000_video.bitmap, collision, &vc4000_video.sprites[2]);
 		vc4000_sprite_update(vc4000_video.bitmap, collision, &vc4000_video.sprites[3]);
+
+		/* display final object colours */
+		for (y=0; y<256; y++)
+			if (objects[y] < 8)
+					*BITMAP_ADDR16(vc4000_video.bitmap, vc4000_video.line, y) = objects[y];
 
 		for (i=0; i<256; i++)
 		{
