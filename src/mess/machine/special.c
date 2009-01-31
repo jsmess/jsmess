@@ -107,12 +107,12 @@ static WRITE8_DEVICE_HANDLER (specialist_8255_portc_w )
 
 const ppi8255_interface specialist_ppi8255_interface =
 {
-	specialist_8255_porta_r,
-	specialist_8255_portb_r,
-	specialist_8255_portc_r,
-	specialist_8255_porta_w,
-	specialist_8255_portb_w,
-	specialist_8255_portc_w
+	DEVCB_HANDLER(specialist_8255_porta_r),
+	DEVCB_HANDLER(specialist_8255_portb_r),
+	DEVCB_HANDLER(specialist_8255_portc_r),
+	DEVCB_HANDLER(specialist_8255_porta_w),
+	DEVCB_HANDLER(specialist_8255_portb_w),
+	DEVCB_HANDLER(specialist_8255_portc_w)
 };
 
 static TIMER_CALLBACK( special_reset )

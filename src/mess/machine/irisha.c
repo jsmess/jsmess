@@ -89,12 +89,12 @@ static WRITE8_DEVICE_HANDLER (irisha_8255_portc_w )
 
 const ppi8255_interface irisha_ppi8255_interface =
 {
-	NULL,
-	irisha_8255_portb_r,
-	irisha_8255_portc_r,
-	irisha_8255_porta_w,
-	irisha_8255_portb_w,
-	irisha_8255_portc_w,
+	DEVCB_NULL,
+	DEVCB_HANDLER(irisha_8255_portb_r),
+	DEVCB_HANDLER(irisha_8255_portc_r),
+	DEVCB_HANDLER(irisha_8255_porta_w),
+	DEVCB_HANDLER(irisha_8255_portb_w),
+	DEVCB_HANDLER(irisha_8255_portc_w),
 };
 
 static PIC8259_SET_INT_LINE( irisha_pic_set_int_line )

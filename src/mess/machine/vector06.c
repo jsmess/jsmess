@@ -104,23 +104,23 @@ static WRITE8_DEVICE_HANDLER (vector06_romdisk_portc_w )
 
 const ppi8255_interface vector06_ppi8255_2_interface =
 {
-	NULL,
-	vector06_romdisk_portb_r,
-	NULL,
-	vector06_romdisk_porta_w,
-	NULL,
-	vector06_romdisk_portc_w
+	DEVCB_NULL,
+	DEVCB_HANDLER(vector06_romdisk_portb_r),
+	DEVCB_NULL,
+	DEVCB_HANDLER(vector06_romdisk_porta_w),
+	DEVCB_NULL,
+	DEVCB_HANDLER(vector06_romdisk_portc_w)
 };
 
 
 const ppi8255_interface vector06_ppi8255_interface =
 {
-	NULL,
-	vector06_8255_portb_r,
-	vector06_8255_portc_r,
-	vector06_8255_porta_w,
-	vector06_8255_portb_w,
-	NULL
+	DEVCB_NULL,
+	DEVCB_HANDLER(vector06_8255_portb_r),
+	DEVCB_HANDLER(vector06_8255_portc_r),
+	DEVCB_HANDLER(vector06_8255_porta_w),
+	DEVCB_HANDLER(vector06_8255_portb_w),
+	DEVCB_NULL
 };
 
 READ8_HANDLER(vector_8255_1_r) {

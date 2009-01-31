@@ -348,12 +348,12 @@ static READ8_DEVICE_HANDLER (msx_ppi_port_b_r );
 
 const ppi8255_interface msx_ppi8255_interface =
 {
-	NULL,
-	msx_ppi_port_b_r,
-	NULL,
-	msx_ppi_port_a_w,
-	NULL,
-	msx_ppi_port_c_w
+	DEVCB_NULL,
+	DEVCB_HANDLER(msx_ppi_port_b_r),
+	DEVCB_NULL,
+	DEVCB_HANDLER(msx_ppi_port_a_w),
+	DEVCB_NULL,
+	DEVCB_HANDLER(msx_ppi_port_c_w)
 };
 
 DRIVER_INIT( msx )

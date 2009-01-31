@@ -126,12 +126,12 @@ const via6522_interface atom_6522_interface =
 
 const ppi8255_interface atom_8255_int =
 {
-	atom_8255_porta_r,
-	atom_8255_portb_r,
-	atom_8255_portc_r,
-	atom_8255_porta_w,
-	atom_8255_portb_w,
-	atom_8255_portc_w,
+	DEVCB_HANDLER(atom_8255_porta_r),
+	DEVCB_HANDLER(atom_8255_portb_r),
+	DEVCB_HANDLER(atom_8255_portc_r),
+	DEVCB_HANDLER(atom_8255_porta_w),
+	DEVCB_HANDLER(atom_8255_portb_w),
+	DEVCB_HANDLER(atom_8255_portc_w),
 };
 
 static int previous_i8271_int_state = 0;

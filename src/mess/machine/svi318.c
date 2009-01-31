@@ -238,12 +238,12 @@ static WRITE8_DEVICE_HANDLER ( svi318_ppi_port_c_w )
 
 const ppi8255_interface svi318_ppi8255_interface =
 {
-	svi318_ppi_port_a_r,
-	svi318_ppi_port_b_r,
-	NULL,
-	NULL,
-	NULL,
-	svi318_ppi_port_c_w
+	DEVCB_HANDLER(svi318_ppi_port_a_r),
+	DEVCB_HANDLER(svi318_ppi_port_b_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(svi318_ppi_port_c_w)
 };
 
 READ8_DEVICE_HANDLER( svi318_ppi_r )

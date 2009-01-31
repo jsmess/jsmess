@@ -52,12 +52,12 @@ static WRITE8_DEVICE_HANDLER ( pio_port_b_w );
 static WRITE8_DEVICE_HANDLER ( pio_port_c_w );
 
 const ppi8255_interface mz700_ppi8255_interface = {
-	pio_port_a_r,
-	pio_port_b_r,
-	pio_port_c_r,
-	pio_port_a_w,
-	pio_port_b_w,
-	pio_port_c_w
+	DEVCB_HANDLER(pio_port_a_r),
+	DEVCB_HANDLER(pio_port_b_r),
+	DEVCB_HANDLER(pio_port_c_r),
+	DEVCB_HANDLER(pio_port_a_w),
+	DEVCB_HANDLER(pio_port_b_w),
+	DEVCB_HANDLER(pio_port_c_w)
 };
 
 static int pio_port_a_output;

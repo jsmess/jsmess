@@ -689,75 +689,75 @@ WRITE8_HANDLER ( mato_io_w )
 const ppi8255_interface pmd85_ppi8255_interface[4] =
 {
 	{
-		pmd85_ppi_0_porta_r,
-		pmd85_ppi_0_portb_r,
-		pmd85_ppi_0_portc_r,
-		pmd85_ppi_0_porta_w,
-		pmd85_ppi_0_portb_w,
-		pmd85_ppi_0_portc_w
+		DEVCB_HANDLER(pmd85_ppi_0_porta_r),
+		DEVCB_HANDLER(pmd85_ppi_0_portb_r),
+		DEVCB_HANDLER(pmd85_ppi_0_portc_r),
+		DEVCB_HANDLER(pmd85_ppi_0_porta_w),
+		DEVCB_HANDLER(pmd85_ppi_0_portb_w),
+		DEVCB_HANDLER(pmd85_ppi_0_portc_w)
 	},
 	{
-		pmd85_ppi_1_porta_r,
-		pmd85_ppi_1_portb_r,
-		pmd85_ppi_1_portc_r,
-		pmd85_ppi_1_porta_w,
-		pmd85_ppi_1_portb_w,
-		pmd85_ppi_1_portc_w
+		DEVCB_HANDLER(pmd85_ppi_1_porta_r),
+		DEVCB_HANDLER(pmd85_ppi_1_portb_r),
+		DEVCB_HANDLER(pmd85_ppi_1_portc_r),
+		DEVCB_HANDLER(pmd85_ppi_1_porta_w),
+		DEVCB_HANDLER(pmd85_ppi_1_portb_w),
+		DEVCB_HANDLER(pmd85_ppi_1_portc_w)
 	},
 	{
-		pmd85_ppi_2_porta_r,
-		pmd85_ppi_2_portb_r,
-		pmd85_ppi_2_portc_r,
-		pmd85_ppi_2_porta_w,
-		pmd85_ppi_2_portb_w,
-		pmd85_ppi_2_portc_w
+		DEVCB_HANDLER(pmd85_ppi_2_porta_r),
+		DEVCB_HANDLER(pmd85_ppi_2_portb_r),
+		DEVCB_HANDLER(pmd85_ppi_2_portc_r),
+		DEVCB_HANDLER(pmd85_ppi_2_porta_w),
+		DEVCB_HANDLER(pmd85_ppi_2_portb_w),
+		DEVCB_HANDLER(pmd85_ppi_2_portc_w)
 	},
 	{
-		pmd85_ppi_3_porta_r,
-		pmd85_ppi_3_portb_r,
-		pmd85_ppi_3_portc_r,
-		pmd85_ppi_3_porta_w,
-		pmd85_ppi_3_portb_w,
-		pmd85_ppi_3_portc_w
+		DEVCB_HANDLER(pmd85_ppi_3_porta_r),
+		DEVCB_HANDLER(pmd85_ppi_3_portb_r),
+		DEVCB_HANDLER(pmd85_ppi_3_portc_r),
+		DEVCB_HANDLER(pmd85_ppi_3_porta_w),
+		DEVCB_HANDLER(pmd85_ppi_3_portb_w),
+		DEVCB_HANDLER(pmd85_ppi_3_portc_w)
 	}
 };
 
 const ppi8255_interface alfa_ppi8255_interface[3] =
 {
 	{
-		pmd85_ppi_0_porta_r,
-		pmd85_ppi_0_portb_r,
-		pmd85_ppi_0_portc_r,
-		pmd85_ppi_0_porta_w,
-		pmd85_ppi_0_portb_w,
-		pmd85_ppi_0_portc_w
+		DEVCB_HANDLER(pmd85_ppi_0_porta_r),
+		DEVCB_HANDLER(pmd85_ppi_0_portb_r),
+		DEVCB_HANDLER(pmd85_ppi_0_portc_r),
+		DEVCB_HANDLER(pmd85_ppi_0_porta_w),
+		DEVCB_HANDLER(pmd85_ppi_0_portb_w),
+		DEVCB_HANDLER(pmd85_ppi_0_portc_w)
 	},
 	{
-		pmd85_ppi_1_porta_r,
-		pmd85_ppi_1_portb_r,
-		pmd85_ppi_1_portc_r,
-		pmd85_ppi_1_porta_w,
-		pmd85_ppi_1_portb_w,
-		pmd85_ppi_1_portc_w
+		DEVCB_HANDLER(pmd85_ppi_1_porta_r),
+		DEVCB_HANDLER(pmd85_ppi_1_portb_r),
+		DEVCB_HANDLER(pmd85_ppi_1_portc_r),
+		DEVCB_HANDLER(pmd85_ppi_1_porta_w),
+		DEVCB_HANDLER(pmd85_ppi_1_portb_w),
+		DEVCB_HANDLER(pmd85_ppi_1_portc_w)
 	},
 	{
-		pmd85_ppi_2_porta_r,
-		pmd85_ppi_2_portb_r,
-		pmd85_ppi_2_portc_r,
-		pmd85_ppi_2_porta_w,
-		pmd85_ppi_2_portb_w,
-		pmd85_ppi_2_portc_w
+		DEVCB_HANDLER(pmd85_ppi_2_porta_r),
+		DEVCB_HANDLER(pmd85_ppi_2_portb_r),
+		DEVCB_HANDLER(pmd85_ppi_2_portc_r),
+		DEVCB_HANDLER(pmd85_ppi_2_porta_w),
+		DEVCB_HANDLER(pmd85_ppi_2_portb_w),
+		DEVCB_HANDLER(pmd85_ppi_2_portc_w)
 	}
 };
 
 const ppi8255_interface mato_ppi8255_interface =
 {
-	pmd85_ppi_0_porta_r,
-	mato_ppi_0_portb_r,
-	mato_ppi_0_portc_r,
-	pmd85_ppi_0_porta_w,
-	pmd85_ppi_0_portb_w,
-	mato_ppi_0_portc_w
+	DEVCB_HANDLER(pmd85_ppi_0_porta_r),
+	DEVCB_HANDLER(mato_ppi_0_portb_r),
+	DEVCB_HANDLER(mato_ppi_0_portc_r),
+	DEVCB_HANDLER(pmd85_ppi_0_porta_w),
+	DEVCB_HANDLER(pmd85_ppi_0_portb_w),
+	DEVCB_HANDLER(mato_ppi_0_portc_w)
 };
 
 static struct serial_connection pmd85_cassette_serial_connection;

@@ -455,6 +455,8 @@ $(MAMEOBJ)/amiga.a: \
 $(MAMEOBJ)/aristocr.a: \
 	$(DRIVERS)/86lions.o \
 	$(DRIVERS)/caswin.o \
+	$(DRIVERS)/aristmk5.o \
+	$(MACHINE)/archimds.o \
 
 $(MAMEOBJ)/atari.a: \
  	$(DRIVERS)/atarigx2.o $(VIDEO)/atarigx2.o \
@@ -750,6 +752,7 @@ $(MAMEOBJ)/greyhnd.a: \
 	$(DRIVERS)/getrivia.o \
 
 $(MAMEOBJ)/igs.a: \
+	$(DRIVERS)/cabaret.o \
 	$(DRIVERS)/ddz.o \
 	$(DRIVERS)/dunhuang.o \
 	$(DRIVERS)/goldstar.o $(VIDEO)/goldstar.o \
@@ -760,6 +763,7 @@ $(MAMEOBJ)/igs.a: \
 	$(DRIVERS)/igs017.o \
 	$(DRIVERS)/igs_m027.o \
 	$(DRIVERS)/igs_m68.o \
+	$(DRIVERS)/spoker.o \
 	$(DRIVERS)/iqblock.o $(VIDEO)/iqblock.o \
 	$(DRIVERS)/lordgun.o $(VIDEO)/lordgun.o \
 	$(DRIVERS)/pgm.o $(VIDEO)/pgm.o \
@@ -1532,6 +1536,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/attckufo.o $(AUDIO)/attckufo.o $(VIDEO)/attckufo.o \
 	$(DRIVERS)/aztarac.o $(AUDIO)/aztarac.o $(VIDEO)/aztarac.o \
 	$(DRIVERS)/beaminv.o \
+	$(DRIVERS)/big10.o \
 	$(DRIVERS)/blackt96.o \
 	$(DRIVERS)/brasil.o \
 	$(DRIVERS)/buster.o \
@@ -1569,7 +1574,6 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/funworld.o $(VIDEO)/funworld.o \
 	$(DRIVERS)/galaxi.o \
 	$(DRIVERS)/gamecstl.o \
-	$(DRIVERS)/gtipoker.o \
 	$(DRIVERS)/go2000.o \
 	$(DRIVERS)/good.o \
 	$(DRIVERS)/goldnpkr.o \
@@ -1620,6 +1624,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/mrjong.o $(VIDEO)/mrjong.o \
 	$(DRIVERS)/murogem.o \
 	$(DRIVERS)/news.o $(VIDEO)/news.o \
+	$(DRIVERS)/norautp.o \
 	$(DRIVERS)/oneshot.o $(VIDEO)/oneshot.o \
 	$(DRIVERS)/onetwo.o \
 	$(DRIVERS)/othldrby.o $(VIDEO)/othldrby.o \

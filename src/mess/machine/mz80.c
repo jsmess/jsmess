@@ -88,12 +88,12 @@ static PIT8253_OUTPUT_CHANGED( pit_out2_changed )
 
 const ppi8255_interface mz80k_8255_int =
 {
-	NULL,
-	mz80k_8255_portb_r,
-	mz80k_8255_portc_r,
-	mz80k_8255_porta_w,
-	NULL,
-	mz80k_8255_portc_w,
+	DEVCB_NULL,
+	DEVCB_HANDLER(mz80k_8255_portb_r),
+	DEVCB_HANDLER(mz80k_8255_portc_r),
+	DEVCB_HANDLER(mz80k_8255_porta_w),
+	DEVCB_NULL,
+	DEVCB_HANDLER(mz80k_8255_portc_w),
 };
 
 const struct pit8253_config mz80k_pit8253_config =

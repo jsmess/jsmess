@@ -200,22 +200,22 @@ WRITE8_HANDLER ( lviv_io_w )
 
 const ppi8255_interface lviv_ppi8255_interface_0 =
 {
-	lviv_ppi_0_porta_r,
-	lviv_ppi_0_portb_r,
-	lviv_ppi_0_portc_r,
-	lviv_ppi_0_porta_w,
-	lviv_ppi_0_portb_w,
-	lviv_ppi_0_portc_w
+	DEVCB_HANDLER(lviv_ppi_0_porta_r),
+	DEVCB_HANDLER(lviv_ppi_0_portb_r),
+	DEVCB_HANDLER(lviv_ppi_0_portc_r),
+	DEVCB_HANDLER(lviv_ppi_0_porta_w),
+	DEVCB_HANDLER(lviv_ppi_0_portb_w),
+	DEVCB_HANDLER(lviv_ppi_0_portc_w)
 };
 
 const ppi8255_interface lviv_ppi8255_interface_1 =
 {
-	lviv_ppi_1_porta_r,
-	lviv_ppi_1_portb_r,
-	lviv_ppi_1_portc_r,
-	lviv_ppi_1_porta_w,
-	lviv_ppi_1_portb_w,
-	lviv_ppi_1_portc_w
+	DEVCB_HANDLER(lviv_ppi_1_porta_r),
+	DEVCB_HANDLER(lviv_ppi_1_portb_r),
+	DEVCB_HANDLER(lviv_ppi_1_portc_r),
+	DEVCB_HANDLER(lviv_ppi_1_porta_w),
+	DEVCB_HANDLER(lviv_ppi_1_portb_w),
+	DEVCB_HANDLER(lviv_ppi_1_portc_w)
 };
 
 MACHINE_RESET( lviv )

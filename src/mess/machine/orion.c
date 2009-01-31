@@ -54,12 +54,12 @@ static WRITE8_DEVICE_HANDLER (orion_romdisk_portc_w )
 
 const ppi8255_interface orion128_ppi8255_interface_1 =
 {
-	orion_romdisk_porta_r,
-	NULL,
-	NULL,
-	NULL,
-	orion_romdisk_portb_w,
-	orion_romdisk_portc_w
+	DEVCB_HANDLER(orion_romdisk_porta_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(orion_romdisk_portb_w),
+	DEVCB_HANDLER(orion_romdisk_portc_w)
 };
 
 /* Driver initialization */

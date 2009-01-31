@@ -1642,12 +1642,12 @@ static const mc68901_interface mfp_interface =
 
 static const ppi8255_interface ppi_interface =
 {
-	ppi_port_a_r,
-	ppi_port_b_r,
-	ppi_port_c_r,
-	NULL,
-	NULL,
-	ppi_port_c_w
+	DEVCB_HANDLER(ppi_port_a_r),
+	DEVCB_HANDLER(ppi_port_b_r),
+	DEVCB_HANDLER(ppi_port_c_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(ppi_port_c_w)
 };
 
 static const hd63450_intf dmac_interface =

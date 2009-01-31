@@ -775,22 +775,22 @@ static READ8_DEVICE_HANDLER( load_8255_chip1_C )	{ return load_8255_C(device->ma
 
 const ppi8255_interface pc8801_8255_config_0 =
 {
-	load_8255_chip0_A,
-	load_8255_chip0_B,
-	load_8255_chip0_C,
-	NULL,
-	NULL,
-	NULL
+	DEVCB_HANDLER(load_8255_chip0_A),
+	DEVCB_HANDLER(load_8255_chip0_B),
+	DEVCB_HANDLER(load_8255_chip0_C),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 const ppi8255_interface pc8801_8255_config_1 =
 {
-    load_8255_chip1_A,
-    load_8255_chip1_B,
-    load_8255_chip1_C,
-    NULL,
-    NULL,
-    NULL
+	DEVCB_HANDLER(load_8255_chip1_A),
+	DEVCB_HANDLER(load_8255_chip1_B),
+	DEVCB_HANDLER(load_8255_chip1_C),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 READ8_HANDLER(pc8801fd_nec765_tc)

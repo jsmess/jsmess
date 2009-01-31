@@ -569,12 +569,12 @@ static WRITE8_DEVICE_HANDLER( sc3000_ppi8255_c_w )
 
 static const ppi8255_interface sc3000_ppi8255_intf =
 {
-	sc3000_ppi8255_a_r,	// Port A read
-	sc3000_ppi8255_b_r,	// Port B read
-	NULL,				// Port C read
-	NULL,				// Port A write
-	NULL,				// Port B write
-	sc3000_ppi8255_c_w,	// Port C write
+	DEVCB_HANDLER(sc3000_ppi8255_a_r),	// Port A read
+	DEVCB_HANDLER(sc3000_ppi8255_b_r),	// Port B read
+	DEVCB_NULL,							// Port C read
+	DEVCB_NULL,							// Port A write
+	DEVCB_NULL,							// Port B write
+	DEVCB_HANDLER(sc3000_ppi8255_c_w),	// Port C write
 };
 
 static MACHINE_START( sc3000 )
@@ -679,20 +679,20 @@ static WRITE8_DEVICE_HANDLER( sf7000_ppi8255_c_w )
 static const ppi8255_interface sf7000_ppi8255_intf[2] =
 {
 	{
-		sc3000_ppi8255_a_r,		// Port A read
-		sc3000_ppi8255_b_r,		// Port B read
-		NULL,					// Port C read
-		NULL,					// Port A write
-		NULL,					// Port B write
-		sc3000_ppi8255_c_w		// Port C write
+		DEVCB_HANDLER(sc3000_ppi8255_a_r),		// Port A read
+		DEVCB_HANDLER(sc3000_ppi8255_b_r),		// Port B read
+		DEVCB_NULL,								// Port C read
+		DEVCB_NULL,								// Port A write
+		DEVCB_NULL,								// Port B write
+		DEVCB_HANDLER(sc3000_ppi8255_c_w)		// Port C write
 	},
 	{
-		sf7000_ppi8255_a_r,		// Port A read
-		NULL,					// Port B read
-		NULL,					// Port C read
-		NULL,					// Port A write
-		sf7000_ppi8255_b_w,		// Port B write
-		sf7000_ppi8255_c_w		// Port C write
+		DEVCB_HANDLER(sf7000_ppi8255_a_r),		// Port A read
+		DEVCB_NULL,								// Port B read
+		DEVCB_NULL,								// Port C read
+		DEVCB_NULL,								// Port A write
+		DEVCB_HANDLER(sf7000_ppi8255_b_w),		// Port B write
+		DEVCB_HANDLER(sf7000_ppi8255_c_w)		// Port C write
 	}
 };
 

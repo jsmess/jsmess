@@ -421,12 +421,12 @@ static WRITE8_DEVICE_HANDLER( mpf1_portc_w )
 
 static const ppi8255_interface ppi8255_intf =
 {
-	mpf1_porta_r,	/* Port A read */
-	mpf1_portb_r,	/* Port B read */
-	mpf1_portc_r,	/* Port C read */
-	mpf1_porta_w,	/* Port A write */
-	mpf1_portb_w,	/* Port B write */
-	mpf1_portc_w,	/* Port C write */
+	DEVCB_HANDLER(mpf1_porta_r),	/* Port A read */
+	DEVCB_HANDLER(mpf1_portb_r),	/* Port B read */
+	DEVCB_HANDLER(mpf1_portc_r),	/* Port C read */
+	DEVCB_HANDLER(mpf1_porta_w),	/* Port A write */
+	DEVCB_HANDLER(mpf1_portb_w),	/* Port B write */
+	DEVCB_HANDLER(mpf1_portc_w),	/* Port C write */
 };
 
 /* Machine Initialization */

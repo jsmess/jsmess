@@ -868,12 +868,12 @@ static void ibm5150_set_keyboard_interface( running_machine *machine, write8_spa
 status information */
 const ppi8255_interface ibm5150_ppi8255_interface =
 {
-	ibm5150_ppi_porta_r,
-	ibm5150_ppi_portb_r,
-	ibm5150_ppi_portc_r,
-	ibm5150_ppi_porta_w,
-	ibm5150_ppi_portb_w,
-	ibm5150_ppi_portc_w
+	DEVCB_HANDLER(ibm5150_ppi_porta_r),
+	DEVCB_HANDLER(ibm5150_ppi_portb_r),
+	DEVCB_HANDLER(ibm5150_ppi_portc_r),
+	DEVCB_HANDLER(ibm5150_ppi_porta_w),
+	DEVCB_HANDLER(ibm5150_ppi_portb_w),
+	DEVCB_HANDLER(ibm5150_ppi_portc_w)
 };
 
 
@@ -963,12 +963,12 @@ static WRITE8_DEVICE_HANDLER( ibm5160_ppi_portb_w )
 
 const ppi8255_interface ibm5160_ppi8255_interface =
 {
-	ibm5160_ppi_porta_r,
-	ibm5150_ppi_portb_r,
-	ibm5160_ppi_portc_r,
-	ibm5150_ppi_porta_w,
-	ibm5160_ppi_portb_w,
-	ibm5150_ppi_portc_w
+	DEVCB_HANDLER(ibm5160_ppi_porta_r),
+	DEVCB_HANDLER(ibm5150_ppi_portb_r),
+	DEVCB_HANDLER(ibm5160_ppi_portc_r),
+	DEVCB_HANDLER(ibm5150_ppi_porta_w),
+	DEVCB_HANDLER(ibm5160_ppi_portb_w),
+	DEVCB_HANDLER(ibm5150_ppi_portc_w)
 };
 
 
@@ -1018,12 +1018,12 @@ static WRITE8_DEVICE_HANDLER( pc_ppi_portb_w )
 
 const ppi8255_interface pc_ppi8255_interface =
 {
-	pc_ppi_porta_r,
-	ibm5150_ppi_portb_r,
-	ibm5160_ppi_portc_r,
-	ibm5150_ppi_porta_w,
-	pc_ppi_portb_w,
-	ibm5150_ppi_portc_w
+	DEVCB_HANDLER(pc_ppi_porta_r),
+	DEVCB_HANDLER(ibm5150_ppi_portb_r),
+	DEVCB_HANDLER(ibm5160_ppi_portc_r),
+	DEVCB_HANDLER(ibm5150_ppi_porta_w),
+	DEVCB_HANDLER(pc_ppi_portb_w),
+	DEVCB_HANDLER(ibm5150_ppi_portc_w)
 };
 
 
@@ -1101,12 +1101,12 @@ static READ8_DEVICE_HANDLER ( pcjr_ppi_portc_r )
 
 const ppi8255_interface pcjr_ppi8255_interface =
 {
-	pcjr_ppi_porta_r,
-	ibm5150_ppi_portb_r,
-	pcjr_ppi_portc_r,
-	ibm5150_ppi_porta_w,
-	pcjr_ppi_portb_w,
-	ibm5150_ppi_portc_w
+	DEVCB_HANDLER(pcjr_ppi_porta_r),
+	DEVCB_HANDLER(ibm5150_ppi_portb_r),
+	DEVCB_HANDLER(pcjr_ppi_portc_r),
+	DEVCB_HANDLER(ibm5150_ppi_porta_w),
+	DEVCB_HANDLER(pcjr_ppi_portb_w),
+	DEVCB_HANDLER(ibm5150_ppi_portc_w)
 };
 
 

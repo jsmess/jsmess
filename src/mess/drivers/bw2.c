@@ -485,12 +485,12 @@ static READ8_DEVICE_HANDLER( bw2_ppi8255_c_r )
 
 static const ppi8255_interface bw2_ppi8255_interface =
 {
-	NULL,
-	bw2_ppi8255_b_r,
-	bw2_ppi8255_c_r,
-	bw2_ppi8255_a_w,
-	NULL,
-	bw2_ppi8255_c_w,
+	DEVCB_NULL,
+	DEVCB_HANDLER(bw2_ppi8255_b_r),
+	DEVCB_HANDLER(bw2_ppi8255_c_r),
+	DEVCB_HANDLER(bw2_ppi8255_a_w),
+	DEVCB_NULL,
+	DEVCB_HANDLER(bw2_ppi8255_c_w),
 };
 
 /* PIT */

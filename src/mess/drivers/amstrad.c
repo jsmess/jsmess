@@ -123,12 +123,12 @@ Some bugs left :
    -----------------------------*/
 static const ppi8255_interface amstrad_ppi8255_interface =
 {
-	amstrad_ppi_porta_r,   /* port A read */
-	amstrad_ppi_portb_r,   /* port B read */
-	NULL,                  /* port C read */
-	amstrad_ppi_porta_w,   /* port A write */
-	NULL,                  /* port B write */
-	amstrad_ppi_portc_w    /* port C write */
+	DEVCB_HANDLER(amstrad_ppi_porta_r),	/* port A read */
+	DEVCB_HANDLER(amstrad_ppi_portb_r),	/* port B read */
+	DEVCB_NULL,							/* port C read */
+	DEVCB_HANDLER(amstrad_ppi_porta_w),	/* port A write */
+	DEVCB_NULL,							/* port B write */
+	DEVCB_HANDLER(amstrad_ppi_portc_w)	/* port C write */
 };
 
 

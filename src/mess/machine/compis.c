@@ -456,12 +456,12 @@ static WRITE8_DEVICE_HANDLER ( compis_ppi_port_c_w )
 
 const ppi8255_interface compis_ppi_interface =
 {
-    NULL,
-    compis_ppi_port_b_r,
-    NULL,
-    compis_ppi_port_a_w,
-    NULL,
-    compis_ppi_port_c_w
+	DEVCB_NULL,
+	DEVCB_HANDLER(compis_ppi_port_b_r),
+	DEVCB_NULL,
+	DEVCB_HANDLER(compis_ppi_port_a_w),
+	DEVCB_NULL,
+	DEVCB_HANDLER(compis_ppi_port_c_w)
 };
 
 READ16_DEVICE_HANDLER ( compis_ppi_r )

@@ -80,22 +80,22 @@ static WRITE8_DEVICE_HANDLER (radio86_8255_portc_w2 )
 
 const ppi8255_interface radio86_ppi8255_interface_1 =
 {
-	NULL,
-	radio86_8255_portb_r2,
-	radio86_8255_portc_r2,
-	radio86_8255_porta_w2,
-	NULL,
-	radio86_8255_portc_w2,
+	DEVCB_NULL,
+	DEVCB_HANDLER(radio86_8255_portb_r2),
+	DEVCB_HANDLER(radio86_8255_portc_r2),
+	DEVCB_HANDLER(radio86_8255_porta_w2),
+	DEVCB_NULL,
+	DEVCB_HANDLER(radio86_8255_portc_w2),
 };
 
 const ppi8255_interface mikrosha_ppi8255_interface_1 =
 {
-	radio86_8255_portb_r2,
-	NULL,
-	radio86_8255_portc_r2,
-	NULL,
-	radio86_8255_porta_w2,
-	NULL,
+	DEVCB_HANDLER(radio86_8255_portb_r2),
+	DEVCB_NULL,
+	DEVCB_HANDLER(radio86_8255_portc_r2),
+	DEVCB_NULL,
+	DEVCB_HANDLER(radio86_8255_porta_w2),
+	DEVCB_NULL,
 };
 
 
@@ -121,12 +121,12 @@ static READ8_DEVICE_HANDLER (rk7007_8255_portc_r )
 
 const ppi8255_interface rk7007_ppi8255_interface =
 {
-	NULL,
-	radio86_8255_portb_r2,
-	rk7007_8255_portc_r,
-	radio86_8255_porta_w2,
-	NULL,
-	radio86_8255_portc_w2,
+	DEVCB_NULL,
+	DEVCB_HANDLER(radio86_8255_portb_r2),
+	DEVCB_HANDLER(rk7007_8255_portc_r),
+	DEVCB_HANDLER(radio86_8255_porta_w2),
+	DEVCB_NULL,
+	DEVCB_HANDLER(radio86_8255_portc_w2),
 };
 
 static I8275_DMA_REQUEST(radio86_video_dma_request) {
@@ -221,12 +221,12 @@ static WRITE8_DEVICE_HANDLER (radio86_romdisk_portc_w )
 
 const ppi8255_interface radio86_ppi8255_interface_2 =
 {
-	radio86_romdisk_porta_r,
-	NULL,
-	NULL,
-	NULL,
-	radio86_romdisk_portb_w,
-	radio86_romdisk_portc_w
+	DEVCB_HANDLER(radio86_romdisk_porta_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(radio86_romdisk_portb_w),
+	DEVCB_HANDLER(radio86_romdisk_portc_w)
 };
 
 static WRITE8_DEVICE_HANDLER (mikrosha_8255_font_page_w )
@@ -236,12 +236,12 @@ static WRITE8_DEVICE_HANDLER (mikrosha_8255_font_page_w )
 
 const ppi8255_interface mikrosha_ppi8255_interface_2 =
 {
-	NULL,
-	NULL,
-	NULL,
-	NULL,	
-	mikrosha_8255_font_page_w,
-	NULL
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,	
+	DEVCB_HANDLER(mikrosha_8255_font_page_w),
+	DEVCB_NULL
 };
 
 const i8275_interface radio86_i8275_interface = {

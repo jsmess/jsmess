@@ -66,12 +66,12 @@ static WRITE8_DEVICE_HANDLER( mikro80_8255_porta_device_w ) { mikro80_8255_porta
 
 const ppi8255_interface mikro80_ppi8255_interface =
 {
-	NULL,
-	mikro80_8255_portb_device_r,
-	mikro80_8255_portc_device_r,
-	mikro80_8255_porta_device_w,
-	NULL,
-	NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(mikro80_8255_portb_device_r),
+	DEVCB_HANDLER(mikro80_8255_portc_device_r),
+	DEVCB_HANDLER(mikro80_8255_porta_device_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
 };
 
 

@@ -277,12 +277,12 @@ static WRITE8_DEVICE_HANDLER(sord_ppi_portc_w)
 
 static const ppi8255_interface sord_ppi8255_interface =
 {
-	sord_ppi_porta_r,
-	sord_ppi_portb_r,
-	sord_ppi_portc_r,
-	sord_ppi_porta_w,
-	sord_ppi_portb_w,
-	sord_ppi_portc_w
+	DEVCB_HANDLER(sord_ppi_porta_r),
+	DEVCB_HANDLER(sord_ppi_portb_r),
+	DEVCB_HANDLER(sord_ppi_portc_r),
+	DEVCB_HANDLER(sord_ppi_porta_w),
+	DEVCB_HANDLER(sord_ppi_portb_w),
+	DEVCB_HANDLER(sord_ppi_portc_w)
 };
 
 /*********************************************************************************************/

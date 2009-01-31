@@ -2,7 +2,7 @@
  *
  *  Acorn Archimedes custom chips (IOC, MEMC, VIDC)
  *
- *      Memory map (from http://b-em.bbcmicro.com/arculator/archdocs.txt)
+ *  Memory map (from http://b-em.bbcmicro.com/arculator/archdocs.txt)
  *
  *  0000000 - 1FFFFFF - logical RAM (32 meg)
  *  2000000 - 2FFFFFF - physical RAM (supervisor only - max 16MB - requires quad MEMCs)
@@ -27,10 +27,13 @@
  *****************************************************************************/
 
 #include "driver.h"
-#include "machine/wd17xx.h"
 #include "cpu/arm/arm.h"
 #include "sound/dac.h"
 #include "includes/archimds.h"
+
+#ifdef MESS
+#include "machine/wd17xx.h"
+#endif
 
 static const int page_sizes[4] = { 4096, 8192, 16384, 32768 };
 

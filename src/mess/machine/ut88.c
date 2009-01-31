@@ -52,12 +52,12 @@ static WRITE8_DEVICE_HANDLER (ut88_8255_porta_w )
 
 const ppi8255_interface ut88_ppi8255_interface =
 {
-	NULL,
-	ut88_8255_portb_r,
-	ut88_8255_portc_r,
-	ut88_8255_porta_w,
-	NULL,
-	NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(ut88_8255_portb_r),
+	DEVCB_HANDLER(ut88_8255_portc_r),
+	DEVCB_HANDLER(ut88_8255_porta_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
 };
 
 static TIMER_CALLBACK( ut88_reset )

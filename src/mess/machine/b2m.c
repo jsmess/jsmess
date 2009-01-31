@@ -220,12 +220,12 @@ static READ8_DEVICE_HANDLER (b2m_8255_portb_r )
 
 const ppi8255_interface b2m_ppi8255_interface_1 =
 {
-	NULL,
-	b2m_8255_portb_r,
-	NULL,
-	b2m_8255_porta_w,
-	b2m_8255_portb_w,
-	b2m_8255_portc_w
+	DEVCB_NULL,
+	DEVCB_HANDLER(b2m_8255_portb_r),
+	DEVCB_NULL,
+	DEVCB_HANDLER(b2m_8255_porta_w),
+	DEVCB_HANDLER(b2m_8255_portb_w),
+	DEVCB_HANDLER(b2m_8255_portc_w)
 };
 
 
@@ -248,12 +248,12 @@ static WRITE8_DEVICE_HANDLER (b2m_ext_8255_portc_w )
 
 const ppi8255_interface b2m_ppi8255_interface_2 =
 {
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	b2m_ext_8255_portc_w
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(b2m_ext_8255_portc_w)
 };
 
 static READ8_DEVICE_HANDLER (b2m_romdisk_porta_r )
@@ -274,12 +274,12 @@ static WRITE8_DEVICE_HANDLER (b2m_romdisk_portc_w )
 
 const ppi8255_interface b2m_ppi8255_interface_3 =
 {
-	b2m_romdisk_porta_r,
-	NULL,
-	NULL,
-	NULL,
-	b2m_romdisk_portb_w,
-	b2m_romdisk_portc_w
+	DEVCB_HANDLER(b2m_romdisk_porta_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(b2m_romdisk_portb_w),
+	DEVCB_HANDLER(b2m_romdisk_portc_w)
 };
 
 static PIC8259_SET_INT_LINE( b2m_pic_set_int_line )
