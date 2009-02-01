@@ -40,7 +40,7 @@ struct _nes_input
     GLOBAL VARIABLES
 ***************************************************************************/
 
-unsigned char *battery_ram;
+unsigned char *nes_battery_ram;
 static UINT8 battery_data[BATTERY_SIZE];
 
 struct nes_struct nes;
@@ -85,7 +85,7 @@ static void init_nes_core (running_machine *machine)
 	memory_install_write8_handler(space, 0x0000, 0x07ff, 0, 0x1800, SMH_BANK10);
 	memory_set_bankptr(machine, 10, nes.rom);
 
-	battery_ram = nes.wram;
+	nes_battery_ram = nes.wram;
 
 	/* Set up the memory handlers for the mapper */
 	switch (nes.mapper)
@@ -159,7 +159,7 @@ static void init_nes_core (running_machine *machine)
 	/* memory subsystem is set up. When this routine is called */
 	/* everything is ready, so we can just copy over the data */
 	/* we loaded before. */
-	memcpy (battery_ram, battery_data, BATTERY_SIZE);
+	memcpy (nes_battery_ram, battery_data, BATTERY_SIZE);
 }
 
 int nes_ppu_vidaccess( running_machine *machine, int num, int address, int data )
@@ -198,7 +198,7 @@ static void nes_machine_stop(running_machine *machine)
 {
 	/* Write out the battery file if necessary */
 	if (nes.battery)
-		image_battery_save(cartslot_image(machine), battery_ram, BATTERY_SIZE);
+		image_battery_save(cartslot_image(machine), nes_battery_ram, BATTERY_SIZE);
 }
 
 

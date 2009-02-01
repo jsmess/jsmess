@@ -616,12 +616,12 @@ MACHINE_RESET( vic20 )
 
 	if (has_vc1541)
 	{
-		serial_config(machine, &fake_drive_interface);
+		cbm_serial_config(machine, &cbm_fake_drive_interface);
 		drive_reset ();
 	}
 	else
 	{
-		serial_config(machine, &sim_drive_interface);
+		cbm_serial_config(machine, &cbm_sim_drive_interface);
 		cbm_serial_reset_write (machine, 0);
 
 		if (ieee) 

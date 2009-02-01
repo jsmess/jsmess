@@ -61,7 +61,7 @@ static UINT8 riot_console_button_r(const device_config *device, UINT8 olddata)
 	return input_port_read(device->machine, "console_buttons");
 }
 
-const riot6532_interface r6532_interface =
+const riot6532_interface a7800_r6532_interface =
 {
 	riot_joystick_r,
 	riot_console_button_r,

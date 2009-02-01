@@ -54,8 +54,6 @@ WRITE8_HANDLER(gg_sio_w);
 WRITE8_HANDLER(gg_psg_w);
  READ8_HANDLER(gg_input_port_2_r);
 
-void setup_rom(const address_space *space);
-
 void sms_check_pause_button(const address_space *space);
 
 DEVICE_START( sms_cart );

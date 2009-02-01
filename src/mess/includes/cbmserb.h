@@ -26,11 +26,11 @@ struct _cbm_serial_interface
 	void (*serial_clock_write)(running_machine *machine, int level);
 };
 
-void serial_config(running_machine *machine, const cbm_serial_interface *intf);
+void cbm_serial_config(running_machine *machine, const cbm_serial_interface *intf);
 
-extern const cbm_serial_interface sim_drive_interface;		/* serial = 1 */
-extern const cbm_serial_interface emu_drive_interface;		/* serial = 2 */
-extern const cbm_serial_interface fake_drive_interface;	/* serial = 3 */
+extern const cbm_serial_interface cbm_sim_drive_interface;		/* serial = 1 */
+extern const cbm_serial_interface cbm_emu_drive_interface;		/* serial = 2 */
+extern const cbm_serial_interface cbm_fake_drive_interface;	/* serial = 3 */
 
 
 /* Serial bus for vic20, c64 & c16 with vc1541 and some printer */

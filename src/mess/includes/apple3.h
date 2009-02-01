@@ -24,7 +24,7 @@
 
 /*----------- defined in machine/apple3.c -----------*/
 
-extern UINT32 a3;
+extern UINT32 apple3_flags;
 extern const applefdc_interface apple3_fdc_interface;
 extern const via6522_interface apple3_via_0_intf;
 extern const via6522_interface apple3_via_1_intf;

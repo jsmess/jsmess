@@ -19,8 +19,8 @@ DEVICE_IMAGE_LOAD( vectrex_cart );
 extern int vectrex_imager_status;
 extern UINT32 vectrex_beam_color;
 extern unsigned char vectrex_via_out[2];
-extern double imager_freq;
-extern emu_timer *imager_timer;
+extern double vectrex_imager_freq;
+extern emu_timer *vectrex_imager_timer;
 extern int vectrex_lightpen_port;
 extern int vectrex_reset_refresh;
 

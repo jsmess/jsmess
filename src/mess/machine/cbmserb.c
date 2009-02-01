@@ -114,7 +114,7 @@ static void sim_drive_atn_write (running_machine *machine, int level)
 }
 
 
-const cbm_serial_interface sim_drive_interface =
+const cbm_serial_interface cbm_sim_drive_interface =
 {
 	1,
 	sim_drive_reset_write,
@@ -181,7 +181,7 @@ static void emu_drive_clock_write( running_machine *machine, int level )
 	vc1541_serial_clock_write(0, level);
 }
 
-const cbm_serial_interface emu_drive_interface =
+const cbm_serial_interface cbm_emu_drive_interface =
 {
 	2,
 	emu_drive_reset_write,
@@ -245,7 +245,7 @@ static void fake_drive_clock_write( running_machine *machine, int level )
 {
 }
 
-const cbm_serial_interface fake_drive_interface =
+const cbm_serial_interface cbm_fake_drive_interface =
 {
 	3,
 	fake_drive_reset_write,
@@ -279,7 +279,7 @@ const cbm_serial_interface fake_drive_interface =
 
 static cbm_serial_interface serial_intf_static= { 0 }, *serial_intf = &serial_intf_static;
 
-void serial_config(running_machine *machine, const cbm_serial_interface *intf)
+void cbm_serial_config(running_machine *machine, const cbm_serial_interface *intf)
 {
 	serial_intf->serial = intf->serial;
 	serial_intf->serial_reset_write = intf->serial_reset_write;

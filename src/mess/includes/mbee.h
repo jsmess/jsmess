@@ -27,7 +27,7 @@ WRITE8_HANDLER ( mbee_fdc_motor_w );
 /*----------- defined in video/mbee.c -----------*/
 
 extern int mbee_frame_counter;
-extern UINT8 *pcgram;
+extern UINT8 *mbee_pcgram;
 
  READ8_HANDLER ( m6545_status_r );
 WRITE8_HANDLER ( m6545_index_w );

@@ -1003,7 +1003,7 @@ static int c64_dma_read_color(running_machine *machine, int offset)
 	return c64_colorram[offset & 0x3ff] & 0xf;
 }
 
-double last = 0;
+static double last = 0;
 
 TIMER_CALLBACK( c64_tape_timer )
 {
@@ -1081,13 +1081,13 @@ void c64_common_init_machine (running_machine *machine)
 {
 	if (is_sx64 /* || is_c128d(machine) */)
 	{
-		serial_config(machine, &fake_drive_interface);
+		cbm_serial_config(machine, &cbm_fake_drive_interface);
 		drive_reset ();
 	}
 
 	else if (c64_cia1_on)
 	{
-		serial_config(machine, &sim_drive_interface);
+		cbm_serial_config(machine, &cbm_sim_drive_interface);
 		cbm_serial_reset_write (machine, 0);
 		cbm_drive_0_config (SERIAL, 8);
 		cbm_drive_1_config (SERIAL, 9);

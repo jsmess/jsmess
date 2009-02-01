@@ -53,7 +53,7 @@ typedef struct
 
 /*----------- defined in machine/electron.c -----------*/
 
-extern ULA ula;
+extern ULA electron_ula;
 
 READ8_HANDLER( electron_jim_r );
 WRITE8_HANDLER( electron_jim_w );

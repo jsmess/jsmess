@@ -78,7 +78,7 @@ struct blink_hw
 
 /*----------- defined in drivers/z88.c -----------*/
 
-extern struct blink_hw blink;
+extern struct blink_hw z88_blink;
 
 /*----------- defined in video/z88.c -----------*/
 

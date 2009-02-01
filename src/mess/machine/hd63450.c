@@ -46,6 +46,7 @@ static TIMER_CALLBACK(dma_transfer_timer);
 static void dma_transfer_abort(const device_config* device, int channel);
 static void dma_transfer_halt(const device_config* device, int channel);
 static void dma_transfer_continue(const device_config* device, int channel);
+static void dma_transfer_start(const device_config* device, int channel, int dir);
 
 DEVICE_START(hd63450)
 {
@@ -228,7 +229,7 @@ void hd63450_write(const device_config* device, int offset, int data, UINT16 mem
 	}
 }
 
-void dma_transfer_start(const device_config* device, int channel, int dir)
+static void dma_transfer_start(const device_config* device, int channel, int dir)
 {
 	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	hd63450_t* dmac = device->token;

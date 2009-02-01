@@ -32,7 +32,7 @@ static void BBC_draw_RGB_in(running_machine *machine, int offset,int data);
  ************************************************************************/
 
 static int video_refresh;
-unsigned char vidmem[0x10000];
+unsigned char bbc_vidmem[0x10000];
 
 // this is the real location of the start of the BBC's ram in the emulation
 // it can be changed if shadow ram is being used to point at the upper 32K of RAM
@@ -80,7 +80,7 @@ static unsigned int video_ram_lookup3[0x4000];
 
 static unsigned int *video_ram_lookup;
 
-void set_video_memory_lookups(int ramsize)
+void bbc_set_video_memory_lookups(int ramsize)
 {
 
 	int ma; // output from IC2 6845 MA address
@@ -154,7 +154,7 @@ void set_video_memory_lookups(int ramsize)
 
 
 /* called from 6522 system via */
-void setscreenstart(int c0,int c1)
+void bbc_setscreenstart(int c0,int c1)
 {
 	if ((c0==0) && (c1==0)) video_ram_lookup=video_ram_lookup0;
 	if ((c0==1) && (c1==0)) video_ram_lookup=video_ram_lookup1;
@@ -270,7 +270,7 @@ static int y_screen_offset=-8;
 
 
 
-WRITE8_HANDLER ( videoULA_w )
+WRITE8_HANDLER ( bbc_videoULA_w )
 {
 
 	int tpal,tcol,vpos;
@@ -658,10 +658,10 @@ void bbcbp_setvideoshadow(running_machine *machine, int vdusel)
 	if (vdusel)
 	{
 		BBC_Video_RAM= memory_region(machine, "main")+0x8000;
-		vidmem_RAM=(vidmem)+0x8000;
+		vidmem_RAM=(bbc_vidmem)+0x8000;
 	} else {
 		BBC_Video_RAM= memory_region(machine, "main");
-		vidmem_RAM=vidmem;
+		vidmem_RAM=bbc_vidmem;
 	}
 }
 
@@ -673,12 +673,12 @@ void bbcbp_setvideoshadow(running_machine *machine, int vdusel)
 VIDEO_START( bbca )
 {
 	set_pixel_lookup();
-	set_video_memory_lookups(16);
+	bbc_set_video_memory_lookups(16);
 	m6845_config(&BBC6845);
 	saa505x_config(&BBCsaa5050);
 
 	BBC_Video_RAM= memory_region(machine, "main");
-	vidmem_RAM=vidmem;
+	vidmem_RAM=bbc_vidmem;
 	draw_function=*BBC_draw_hi_res;
 }
 
@@ -690,7 +690,7 @@ VIDEO_START( bbcb )
 	saa505x_config(&BBCsaa5050);
 
 	BBC_Video_RAM= memory_region(machine, "main");
-	vidmem_RAM=vidmem;
+	vidmem_RAM=bbc_vidmem;
 	draw_function=*BBC_draw_hi_res;
 }
 
@@ -699,12 +699,12 @@ VIDEO_START( bbcbp )
 	/* need to set up the lookups to work with the BBC B plus memory */
 	set_pixel_lookup();
 
-	set_video_memory_lookups(32);
+	bbc_set_video_memory_lookups(32);
 	m6845_config(&BBC6845);
 	saa505x_config(&BBCsaa5050);
 
 	BBC_Video_RAM= memory_region(machine, "main");
-	vidmem_RAM=vidmem;
+	vidmem_RAM=bbc_vidmem;
 	draw_function=*BBC_draw_hi_res;
 }
 
@@ -712,11 +712,11 @@ VIDEO_START( bbcm )
 {
 	/* need to set up the lookups to work with the BBC B plus memory */
 	set_pixel_lookup();
-	set_video_memory_lookups(32);
+	bbc_set_video_memory_lookups(32);
 	m6845_config(&BBC6845);
 	saa505x_config(&BBCsaa5050);
 
 	BBC_Video_RAM= memory_region(machine, "main");
-	vidmem_RAM=vidmem;
+	vidmem_RAM=bbc_vidmem;
 	draw_function=*BBC_draw_hi_res;
 }

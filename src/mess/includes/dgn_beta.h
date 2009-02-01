@@ -102,12 +102,12 @@ void dgn_beta_line_interrupt (int data);
 /*----------- defined in video/dgn_beta.c -----------*/
 
 /* mc6845 video display generator */
-void init_video(running_machine *machine);
+void dgnbeta_init_video(running_machine *machine);
 extern VIDEO_UPDATE( dgnbeta );
-void vid_set_gctrl(running_machine *machine, int data);
+void dgnbeta_vid_set_gctrl(running_machine *machine, int data);
 
 /* 74HC670 4x4bit colour ram */
-WRITE8_HANDLER(colour_ram_w);
+WRITE8_HANDLER(dgnbeta_colour_ram_w);
 
 READ8_HANDLER(dgnbeta_6845_r);
 WRITE8_HANDLER(dgnbeta_6845_w);

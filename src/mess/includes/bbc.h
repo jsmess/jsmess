@@ -39,29 +39,29 @@ MACHINE_RESET( bbcm );
 INTERRUPT_GEN( bbcb_keyscan );
 INTERRUPT_GEN( bbcm_keyscan );
 
-WRITE8_HANDLER ( memorya1_w );
-WRITE8_HANDLER ( page_selecta_w );
+WRITE8_HANDLER ( bbc_memorya1_w );
+WRITE8_HANDLER ( bbc_page_selecta_w );
 
-WRITE8_HANDLER ( memoryb3_w );
-WRITE8_HANDLER ( memoryb4_w );
-WRITE8_HANDLER ( page_selectb_w );
-
-
-WRITE8_HANDLER ( memorybp1_w );
-//READ8_HANDLER  ( memorybp2_r );
-WRITE8_HANDLER ( memorybp2_w );
-WRITE8_HANDLER ( memorybp4_w );
-WRITE8_HANDLER ( memorybp4_128_w );
-WRITE8_HANDLER ( memorybp6_128_w );
-WRITE8_HANDLER ( page_selectbp_w );
+WRITE8_HANDLER ( bbc_memoryb3_w );
+WRITE8_HANDLER ( bbc_memoryb4_w );
+WRITE8_HANDLER ( bbc_page_selectb_w );
 
 
-WRITE8_HANDLER ( memorybm1_w );
-//READ8_HANDLER  ( memorybm2_r );
-WRITE8_HANDLER ( memorybm2_w );
-WRITE8_HANDLER ( memorybm4_w );
-WRITE8_HANDLER ( memorybm5_w );
-WRITE8_HANDLER ( memorybm7_w );
+WRITE8_HANDLER ( bbc_memorybp1_w );
+//READ8_HANDLER  ( bbc_memorybp2_r );
+WRITE8_HANDLER ( bbc_memorybp2_w );
+WRITE8_HANDLER ( bbc_memorybp4_w );
+WRITE8_HANDLER ( bbc_memorybp4_128_w );
+WRITE8_HANDLER ( bbc_memorybp6_128_w );
+WRITE8_HANDLER ( bbc_page_selectbp_w );
+
+
+WRITE8_HANDLER ( bbc_memorybm1_w );
+//READ8_HANDLER  ( bbc_memorybm2_r );
+WRITE8_HANDLER ( bbc_memorybm2_w );
+WRITE8_HANDLER ( bbc_memorybm4_w );
+WRITE8_HANDLER ( bbc_memorybm5_w );
+WRITE8_HANDLER ( bbc_memorybm7_w );
 READ8_HANDLER  ( bbcm_r );
 WRITE8_HANDLER ( bbcm_w );
 READ8_HANDLER  ( bbcm_ACCCON_read );
@@ -110,14 +110,14 @@ extern VIDEO_START( bbcbp );
 extern VIDEO_START( bbcm );
 extern VIDEO_UPDATE( bbc );
 
-extern unsigned char vidmem[0x10000];
+extern unsigned char bbc_vidmem[0x10000];
 
-void set_video_memory_lookups(int ramsize);
+void bbc_set_video_memory_lookups(int ramsize);
 void bbc_frameclock(void);
-void setscreenstart(int b4,int b5);
+void bbc_setscreenstart(int b4,int b5);
 void bbcbp_setvideoshadow(running_machine *machine, int vdusel);
 
-WRITE8_HANDLER ( videoULA_w );
+WRITE8_HANDLER ( bbc_videoULA_w );
 
 WRITE8_HANDLER ( BBC_6845_w );
 READ8_HANDLER ( BBC_6845_r );

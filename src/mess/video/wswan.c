@@ -16,7 +16,7 @@ static int pal[16][16];
 
 INLINE void wswan_plot_pixel(int x, int y, int pen) {
 	y += 5*8;
-	if ( vdp.display_vertical ) {
+	if ( wswan_vdp.display_vertical ) {
 		*BITMAP_ADDR16(tmpbitmap, 28*8 - 1 - x, y) = pen;
 	} else {
 		*BITMAP_ADDR16(tmpbitmap, y, x) = pen;
@@ -25,18 +25,18 @@ INLINE void wswan_plot_pixel(int x, int y, int pen) {
 
 INLINE void wswan_fillbitmap( int pen, rectangle *rec ) {
 	/* Fill empty area above line 0 when filling line 0 */
-	if ( vdp.current_line != 0 ) {
+	if ( wswan_vdp.current_line != 0 ) {
 		rec->min_y = rec->min_y + 5*8;
 	}
 
 	/* Fill empty area below line 143 when filling line 143 */
-	if ( vdp.current_line != 143 ) {
+	if ( wswan_vdp.current_line != 143 ) {
 		rec->max_y = rec->max_y + 5*8;
 	} else {
 		rec->max_y = 28*8;
 	}
 
-	if ( vdp.display_vertical ) {
+	if ( wswan_vdp.display_vertical ) {
 		rectangle rec2;
 		rec2.min_y = 28*8 - 1 - rec->max_x;
 		rec2.max_y = 28*8 - 1 - rec->min_x;
@@ -51,10 +51,10 @@ INLINE void wswan_fillbitmap( int pen, rectangle *rec ) {
 static void wswan_setup_palettes(void) {
 	int i,j;
 
-	if ( vdp.color_mode ) {
+	if ( wswan_vdp.color_mode ) {
 		for( i = 0; i < 16; i++ ) {
 			for( j = 0; j < 16; j++ ) {
-				pal[i][j] = ( ( vdp.palette_vram[ ( i << 5 ) + j*2 + 1 ] << 8 ) | vdp.palette_vram[ ( i << 5 ) + j*2 ] ) & 0x0FFF;
+				pal[i][j] = ( ( wswan_vdp.palette_vram[ ( i << 5 ) + j*2 + 1 ] << 8 ) | wswan_vdp.palette_vram[ ( i << 5 ) + j*2 ] ) & 0x0FFF;
 			}
 		}
 	} else {
@@ -72,40 +72,40 @@ static void wswan_draw_background( void ) {
 	UINT8	start_column;
 	int	column;
 
-	map_addr = vdp.layer_bg_address + ( ( ( vdp.current_line + vdp.layer_bg_scroll_y ) & 0xF8 ) << 3 );
-	start_column = ( vdp.layer_bg_scroll_x >> 3 );
+	map_addr = wswan_vdp.layer_bg_address + ( ( ( wswan_vdp.current_line + wswan_vdp.layer_bg_scroll_y ) & 0xF8 ) << 3 );
+	start_column = ( wswan_vdp.layer_bg_scroll_x >> 3 );
 	for( column = 0; column < 29; column++ ) {
 		int	tile_data, tile_number, tile_palette, tile_line, tile_address;
 		UINT32	plane0=0, plane1=0, plane2=0, plane3=0;
 		int	x, x_offset;
 
-		tile_data = ( vdp.vram[ map_addr + ( ( ( start_column + column ) & 0x1F ) << 1 ) + 1 ] << 8 )
-		            | vdp.vram[ map_addr + ( ( ( start_column + column ) & 0x1F ) << 1 ) ];
+		tile_data = ( wswan_vdp.vram[ map_addr + ( ( ( start_column + column ) & 0x1F ) << 1 ) + 1 ] << 8 )
+		            | wswan_vdp.vram[ map_addr + ( ( ( start_column + column ) & 0x1F ) << 1 ) ];
 		tile_number = tile_data & 0x01FF;
 		tile_palette = ( tile_data >> 9 ) & 0x0F;
 
-		tile_line = ( vdp.current_line + vdp.layer_bg_scroll_y ) & 0x07;
+		tile_line = ( wswan_vdp.current_line + wswan_vdp.layer_bg_scroll_y ) & 0x07;
 		if ( tile_data & 0x8000 ) {
 			tile_line = 7 - tile_line;
 		}
 
-		if ( vdp.colors_16 ) {
+		if ( wswan_vdp.colors_16 ) {
 			tile_address = ( ( tile_data & 0x2000 ) ? 0x8000 : 0x4000 ) + ( tile_number * 32 ) + ( tile_line << 2 );
-			if ( vdp.tile_packed ) {
-				plane0 = ( vdp.vram[ tile_address + 0 ] << 24 ) | ( vdp.vram[ tile_address + 1 ] << 16 ) | ( vdp.vram[ tile_address + 2 ] << 8 ) | vdp.vram[ tile_address + 3 ];
+			if ( wswan_vdp.tile_packed ) {
+				plane0 = ( wswan_vdp.vram[ tile_address + 0 ] << 24 ) | ( wswan_vdp.vram[ tile_address + 1 ] << 16 ) | ( wswan_vdp.vram[ tile_address + 2 ] << 8 ) | wswan_vdp.vram[ tile_address + 3 ];
 			} else {
-				plane0 = vdp.vram[ tile_address + 0 ];
-				plane1 = vdp.vram[ tile_address + 1 ] << 1;
-				plane2 = vdp.vram[ tile_address + 2 ] << 2;
-				plane3 = vdp.vram[ tile_address + 3 ] << 3;
+				plane0 = wswan_vdp.vram[ tile_address + 0 ];
+				plane1 = wswan_vdp.vram[ tile_address + 1 ] << 1;
+				plane2 = wswan_vdp.vram[ tile_address + 2 ] << 2;
+				plane3 = wswan_vdp.vram[ tile_address + 3 ] << 3;
 			}
 		} else {
 			tile_address = 0x2000 + ( tile_number * 16 ) + ( tile_line << 1 );
-			if ( vdp.tile_packed ) {
-				plane0 = ( vdp.vram[ tile_address + 0 ] << 8 ) | vdp.vram[ tile_address + 1 ];
+			if ( wswan_vdp.tile_packed ) {
+				plane0 = ( wswan_vdp.vram[ tile_address + 0 ] << 8 ) | wswan_vdp.vram[ tile_address + 1 ];
 			} else {
-				plane0 = vdp.vram[ tile_address + 0 ];
-				plane1 = vdp.vram[ tile_address + 1 ] << 1;
+				plane0 = wswan_vdp.vram[ tile_address + 0 ];
+				plane1 = wswan_vdp.vram[ tile_address + 1 ] << 1;
 				plane2 = 0;
 				plane3 = 0;
 			}
@@ -113,8 +113,8 @@ static void wswan_draw_background( void ) {
 
 		for( x = 0; x < 8; x++ ) {
 			int col;
-			if ( vdp.tile_packed ) {
-				if ( vdp.colors_16 ) {
+			if ( wswan_vdp.tile_packed ) {
+				if ( wswan_vdp.colors_16 ) {
 					col = plane0 & 0x0F;
 					plane0 = plane0 >> 4;
 				} else {
@@ -129,26 +129,26 @@ static void wswan_draw_background( void ) {
 				plane0 = plane0 >> 1;
 			}
 			if ( tile_data & 0x4000 ) {
-				x_offset = x + ( column << 3 ) - ( vdp.layer_bg_scroll_x & 0x07 );
+				x_offset = x + ( column << 3 ) - ( wswan_vdp.layer_bg_scroll_x & 0x07 );
 			} else {
-				x_offset = 7 - x + ( column << 3 ) - ( vdp.layer_bg_scroll_x & 0x07 );
+				x_offset = 7 - x + ( column << 3 ) - ( wswan_vdp.layer_bg_scroll_x & 0x07 );
 			}
 			if ( x_offset >= 0 && x_offset < WSWAN_X_PIXELS ) {
-				if ( vdp.colors_16 ) {
+				if ( wswan_vdp.colors_16 ) {
 					if ( col ) {
-						if ( vdp.color_mode ) {
-							wswan_plot_pixel( x_offset, vdp.current_line, pal[tile_palette][col] );
+						if ( wswan_vdp.color_mode ) {
+							wswan_plot_pixel( x_offset, wswan_vdp.current_line, pal[tile_palette][col] );
 						} else {
 							/* Hmmmm, what should we do here... Is this correct?? */
-							wswan_plot_pixel( x_offset, vdp.current_line, pal[tile_palette][col] );
+							wswan_plot_pixel( x_offset, wswan_vdp.current_line, pal[tile_palette][col] );
 						}
 					}
 				} else {
 					if ( col || !(tile_palette & 4 ) ) {
-						if ( vdp.color_mode ) {
-							wswan_plot_pixel( x_offset, vdp.current_line, pal[tile_palette][col] );
+						if ( wswan_vdp.color_mode ) {
+							wswan_plot_pixel( x_offset, wswan_vdp.current_line, pal[tile_palette][col] );
 						} else {
-							wswan_plot_pixel( x_offset, vdp.current_line, vdp.main_palette[pal[tile_palette][col]] );
+							wswan_plot_pixel( x_offset, wswan_vdp.current_line, wswan_vdp.main_palette[pal[tile_palette][col]] );
 						}
 					}
 				}
@@ -161,38 +161,38 @@ static void wswan_draw_foreground_0( void ) {
 	UINT16	map_addr;
 	UINT8	start_column;
 	int	column;
-	map_addr = vdp.layer_fg_address + ( ( ( vdp.current_line + vdp.layer_fg_scroll_y ) & 0xF8 ) << 3 );
-	start_column = ( vdp.layer_fg_scroll_x >> 3 );
+	map_addr = wswan_vdp.layer_fg_address + ( ( ( wswan_vdp.current_line + wswan_vdp.layer_fg_scroll_y ) & 0xF8 ) << 3 );
+	start_column = ( wswan_vdp.layer_fg_scroll_x >> 3 );
 	for( column = 0; column < 29; column++ ) {
 		UINT32	plane0 = 0, plane1 = 0, plane2 = 0, plane3 = 0;
 		int	x, x_offset, tile_line, tile_address;
-		int	tile_data = ( vdp.vram[ map_addr + ( ( ( start_column + column ) & 0x1F ) << 1 ) + 1 ] << 8 )
-                                    | vdp.vram[ map_addr + ( ( ( start_column + column ) & 0x1F ) << 1 ) ];
+		int	tile_data = ( wswan_vdp.vram[ map_addr + ( ( ( start_column + column ) & 0x1F ) << 1 ) + 1 ] << 8 )
+                                    | wswan_vdp.vram[ map_addr + ( ( ( start_column + column ) & 0x1F ) << 1 ) ];
 		int	tile_number = tile_data & 0x01FF;
 		int	tile_palette = ( tile_data >> 9 ) & 0x0F;
 
-		tile_line = ( vdp.current_line + vdp.layer_fg_scroll_y ) & 0x07;
+		tile_line = ( wswan_vdp.current_line + wswan_vdp.layer_fg_scroll_y ) & 0x07;
 		if ( tile_data & 0x8000 ) {
 			tile_line = 7 - tile_line;
 		}
 
-		if ( vdp.colors_16 ) {
+		if ( wswan_vdp.colors_16 ) {
 			tile_address = ( ( tile_data & 0x2000 ) ? 0x8000 : 0x4000 ) + ( tile_number * 32 ) + ( tile_line << 2 );
-			if ( vdp.tile_packed ) {
-				plane0 = ( vdp.vram[ tile_address + 0 ] << 24 ) | ( vdp.vram[ tile_address + 1 ] << 16 ) | ( vdp.vram[ tile_address + 2 ] << 8 ) | vdp.vram[ tile_address + 3 ];
+			if ( wswan_vdp.tile_packed ) {
+				plane0 = ( wswan_vdp.vram[ tile_address + 0 ] << 24 ) | ( wswan_vdp.vram[ tile_address + 1 ] << 16 ) | ( wswan_vdp.vram[ tile_address + 2 ] << 8 ) | wswan_vdp.vram[ tile_address + 3 ];
 			} else {
-				plane0 = vdp.vram[ tile_address + 0 ];
-				plane1 = vdp.vram[ tile_address + 1 ] << 1;
-				plane2 = vdp.vram[ tile_address + 2 ] << 2;
-				plane3 = vdp.vram[ tile_address + 3 ] << 3;
+				plane0 = wswan_vdp.vram[ tile_address + 0 ];
+				plane1 = wswan_vdp.vram[ tile_address + 1 ] << 1;
+				plane2 = wswan_vdp.vram[ tile_address + 2 ] << 2;
+				plane3 = wswan_vdp.vram[ tile_address + 3 ] << 3;
 			}
 		} else {
 			tile_address = 0x2000 + ( tile_number * 16 ) + ( tile_line << 1 );
-			if ( vdp.tile_packed ) {
-				plane0 = ( vdp.vram[ tile_address + 0 ] << 8 ) | vdp.vram[ tile_address + 1 ];
+			if ( wswan_vdp.tile_packed ) {
+				plane0 = ( wswan_vdp.vram[ tile_address + 0 ] << 8 ) | wswan_vdp.vram[ tile_address + 1 ];
 			} else {
-				plane0 = vdp.vram[ tile_address + 0 ];
-				plane1 = vdp.vram[ tile_address + 1 ] << 1;
+				plane0 = wswan_vdp.vram[ tile_address + 0 ];
+				plane1 = wswan_vdp.vram[ tile_address + 1 ] << 1;
 				plane2 = 0;
 				plane3 = 0;
 			}
@@ -200,8 +200,8 @@ static void wswan_draw_foreground_0( void ) {
 
 		for( x = 0; x < 8; x++ ) {
 			int	col;
-			if ( vdp.tile_packed ) {
-				if ( vdp.colors_16 ) {
+			if ( wswan_vdp.tile_packed ) {
+				if ( wswan_vdp.colors_16 ) {
 					col = plane0 & 0x0F;
 					plane0 = plane0 >> 4;
 				} else {
@@ -216,26 +216,26 @@ static void wswan_draw_foreground_0( void ) {
 				plane0 = plane0 >> 1;
 			}
 			if ( tile_data & 0x4000 ) {
-				x_offset = x + ( column << 3 ) - ( vdp.layer_fg_scroll_x & 0x07 );
+				x_offset = x + ( column << 3 ) - ( wswan_vdp.layer_fg_scroll_x & 0x07 );
 			} else {
-				x_offset = 7 - x + ( column << 3 ) - ( vdp.layer_fg_scroll_x & 0x07 );
+				x_offset = 7 - x + ( column << 3 ) - ( wswan_vdp.layer_fg_scroll_x & 0x07 );
 			}
 			if ( x_offset >= 0 && x_offset < WSWAN_X_PIXELS ) {
-				if ( vdp.colors_16 ) {
+				if ( wswan_vdp.colors_16 ) {
 					if ( col ) {
-//						if ( vdp.color_mode ) {
-							wswan_plot_pixel( x_offset, vdp.current_line, pal[tile_palette][col] );
+//						if ( wswan_vdp.color_mode ) {
+							wswan_plot_pixel( x_offset, wswan_vdp.current_line, pal[tile_palette][col] );
 //						} else {
 //							/* Hmmmm, what should we do here... Is this correct?? */
-//							wswan_plot_pixel( x_offset, vdp.current_line, pal[tile_palette][col] );
+//							wswan_plot_pixel( x_offset, wswan_vdp.current_line, pal[tile_palette][col] );
 //						}
 					}
 				} else {
 					if ( col || !(tile_palette & 4 ) ) {
-						if ( vdp.color_mode ) {
-							wswan_plot_pixel( x_offset, vdp.current_line, pal[tile_palette][col] );
+						if ( wswan_vdp.color_mode ) {
+							wswan_plot_pixel( x_offset, wswan_vdp.current_line, pal[tile_palette][col] );
 						} else {
-							wswan_plot_pixel( x_offset, vdp.current_line, vdp.main_palette[pal[tile_palette][col]] );
+							wswan_plot_pixel( x_offset, wswan_vdp.current_line, wswan_vdp.main_palette[pal[tile_palette][col]] );
 						}
 					}
 				}
@@ -248,38 +248,38 @@ static void wswan_draw_foreground_2( void ) {
 	UINT16	map_addr;
 	UINT8	start_column;
 	int	column;
-	map_addr = vdp.layer_fg_address + ( ( ( vdp.current_line + vdp.layer_fg_scroll_y ) & 0xF8 ) << 3 );
-	start_column = ( vdp.layer_fg_scroll_x >> 3 );
+	map_addr = wswan_vdp.layer_fg_address + ( ( ( wswan_vdp.current_line + wswan_vdp.layer_fg_scroll_y ) & 0xF8 ) << 3 );
+	start_column = ( wswan_vdp.layer_fg_scroll_x >> 3 );
 	for( column = 0; column < 29; column++ ) {
 		UINT32	plane0 = 0, plane1 = 0, plane2 = 0, plane3 = 0;
 		int	x, x_offset, tile_line, tile_address;
-		int	tile_data = ( vdp.vram[ map_addr + ( ( ( start_column + column ) & 0x1F ) << 1 ) + 1 ] << 8 )
-			            | vdp.vram[ map_addr + ( ( ( start_column + column ) & 0x1F ) << 1 ) ];
+		int	tile_data = ( wswan_vdp.vram[ map_addr + ( ( ( start_column + column ) & 0x1F ) << 1 ) + 1 ] << 8 )
+			            | wswan_vdp.vram[ map_addr + ( ( ( start_column + column ) & 0x1F ) << 1 ) ];
 		int	tile_number = tile_data & 0x01FF;
 		int	tile_palette = ( tile_data >> 9 ) & 0x0F;
 
-		tile_line = ( vdp.current_line + vdp.layer_fg_scroll_y ) & 0x07;
+		tile_line = ( wswan_vdp.current_line + wswan_vdp.layer_fg_scroll_y ) & 0x07;
 		if ( tile_data & 0x8000 ) {
 			tile_line = 7 - tile_line;
 		}
 
-		if ( vdp.colors_16 ) {
+		if ( wswan_vdp.colors_16 ) {
 			tile_address = ( ( tile_data & 0x2000 ) ? 0x8000 : 0x4000 ) + ( tile_number * 32 ) + ( tile_line << 2 );
-			if ( vdp.tile_packed ) {
-				plane0 = ( vdp.vram[ tile_address + 0 ] << 24 ) | ( vdp.vram[ tile_address + 1 ] << 16 ) | ( vdp.vram[ tile_address + 2 ] << 8 ) | vdp.vram[ tile_address + 3 ];
+			if ( wswan_vdp.tile_packed ) {
+				plane0 = ( wswan_vdp.vram[ tile_address + 0 ] << 24 ) | ( wswan_vdp.vram[ tile_address + 1 ] << 16 ) | ( wswan_vdp.vram[ tile_address + 2 ] << 8 ) | wswan_vdp.vram[ tile_address + 3 ];
 			} else {
-				plane0 = vdp.vram[ tile_address + 0 ];
-				plane1 = vdp.vram[ tile_address + 1 ] << 1;
-				plane2 = vdp.vram[ tile_address + 2 ] << 2;
-				plane3 = vdp.vram[ tile_address + 3 ] << 3;
+				plane0 = wswan_vdp.vram[ tile_address + 0 ];
+				plane1 = wswan_vdp.vram[ tile_address + 1 ] << 1;
+				plane2 = wswan_vdp.vram[ tile_address + 2 ] << 2;
+				plane3 = wswan_vdp.vram[ tile_address + 3 ] << 3;
 			}
 		} else {
 			tile_address = 0x2000 + ( tile_number * 16 ) + ( tile_line << 1 );
-			if ( vdp.tile_packed ) {
-				plane0 = ( vdp.vram[ tile_address + 0 ] << 8 ) | vdp.vram[ tile_address + 1 ];
+			if ( wswan_vdp.tile_packed ) {
+				plane0 = ( wswan_vdp.vram[ tile_address + 0 ] << 8 ) | wswan_vdp.vram[ tile_address + 1 ];
 			} else {
-				plane0 = vdp.vram[ tile_address + 0 ];
-				plane1 = vdp.vram[ tile_address + 1 ] << 1;
+				plane0 = wswan_vdp.vram[ tile_address + 0 ];
+				plane1 = wswan_vdp.vram[ tile_address + 1 ] << 1;
 				plane2 = 0;
 				plane3 = 0;
 			}
@@ -287,8 +287,8 @@ static void wswan_draw_foreground_2( void ) {
 
 		for( x = 0; x < 8; x++ ) {
 			int	col;
-			if ( vdp.tile_packed ) {
-				if ( vdp.colors_16 ) {
+			if ( wswan_vdp.tile_packed ) {
+				if ( wswan_vdp.colors_16 ) {
 					col = plane0 & 0x0F;
 					plane0 = plane0 >> 4;
 				} else {
@@ -303,26 +303,26 @@ static void wswan_draw_foreground_2( void ) {
 				plane0 = plane0 >> 1;
 			}
 			if ( tile_data & 0x4000 ) {
-				x_offset = x + ( column << 3 ) - ( vdp.layer_fg_scroll_x & 0x07 );
+				x_offset = x + ( column << 3 ) - ( wswan_vdp.layer_fg_scroll_x & 0x07 );
 			} else {
-				x_offset = 7 - x + ( column << 3 ) - ( vdp.layer_fg_scroll_x & 0x07 );
+				x_offset = 7 - x + ( column << 3 ) - ( wswan_vdp.layer_fg_scroll_x & 0x07 );
 			}
-			if ( x_offset >= 0 && x_offset >= vdp.window_fg_left && x_offset < vdp.window_fg_right && x_offset < WSWAN_X_PIXELS ) {
-				if ( vdp.colors_16 ) {
+			if ( x_offset >= 0 && x_offset >= wswan_vdp.window_fg_left && x_offset < wswan_vdp.window_fg_right && x_offset < WSWAN_X_PIXELS ) {
+				if ( wswan_vdp.colors_16 ) {
 					if ( col ) {
-						if ( vdp.color_mode ) {
-							wswan_plot_pixel( x_offset, vdp.current_line, pal[tile_palette][col] );
+						if ( wswan_vdp.color_mode ) {
+							wswan_plot_pixel( x_offset, wswan_vdp.current_line, pal[tile_palette][col] );
 						} else {
 							/* Hmmmm, what should we do here... Is this correct?? */
-							wswan_plot_pixel( x_offset, vdp.current_line, pal[tile_palette][col] );
+							wswan_plot_pixel( x_offset, wswan_vdp.current_line, pal[tile_palette][col] );
 						}
 					}
 				} else {
 					if ( col || !(tile_palette & 4 ) ) {
-						if ( vdp.color_mode ) {
-							wswan_plot_pixel( x_offset, vdp.current_line, pal[tile_palette][col] );
+						if ( wswan_vdp.color_mode ) {
+							wswan_plot_pixel( x_offset, wswan_vdp.current_line, pal[tile_palette][col] );
 						} else {
-							wswan_plot_pixel( x_offset, vdp.current_line, vdp.main_palette[pal[tile_palette][col]] );
+							wswan_plot_pixel( x_offset, wswan_vdp.current_line, wswan_vdp.main_palette[pal[tile_palette][col]] );
 						}
 					}
 				}
@@ -335,38 +335,38 @@ static void wswan_draw_foreground_3( void ) {
 	UINT16	map_addr;
 	UINT8	start_column;
 	int	column;
-	map_addr = vdp.layer_fg_address + ( ( ( vdp.current_line + vdp.layer_fg_scroll_y ) & 0xF8 ) << 3 );
-	start_column = ( vdp.layer_fg_scroll_x >> 3 );
+	map_addr = wswan_vdp.layer_fg_address + ( ( ( wswan_vdp.current_line + wswan_vdp.layer_fg_scroll_y ) & 0xF8 ) << 3 );
+	start_column = ( wswan_vdp.layer_fg_scroll_x >> 3 );
 	for( column = 0; column < 29; column++ ) {
 		UINT32	plane0 = 0, plane1 = 0, plane2 = 0, plane3 = 0;
 		int	x, x_offset, tile_line, tile_address;
-		int	tile_data = ( vdp.vram[ map_addr + ( ( ( start_column + column ) & 0x1F ) << 1 ) + 1 ] << 8 )
-			            | vdp.vram[ map_addr + ( ( ( start_column + column ) & 0x1F ) << 1 ) ];
+		int	tile_data = ( wswan_vdp.vram[ map_addr + ( ( ( start_column + column ) & 0x1F ) << 1 ) + 1 ] << 8 )
+			            | wswan_vdp.vram[ map_addr + ( ( ( start_column + column ) & 0x1F ) << 1 ) ];
 		int	tile_number = tile_data & 0x01FF;
 		int	tile_palette = ( tile_data >> 9 ) & 0x0F;
 
-		tile_line = ( vdp.current_line + vdp.layer_fg_scroll_y ) & 0x07;
+		tile_line = ( wswan_vdp.current_line + wswan_vdp.layer_fg_scroll_y ) & 0x07;
 		if ( tile_data & 0x8000 ) {
 			tile_line = 7 - tile_line;
 		}
 
-		if ( vdp.colors_16 ) {
+		if ( wswan_vdp.colors_16 ) {
 			tile_address = ( ( tile_data & 0x2000 ) ? 0x8000 : 0x4000 ) + ( tile_number * 32 ) + ( tile_line << 2 );
-			if ( vdp.tile_packed ) {
-				plane0 = ( vdp.vram[ tile_address + 0 ] << 24 ) | ( vdp.vram[ tile_address + 1 ] << 16 ) | ( vdp.vram[ tile_address + 2 ] << 8 ) | vdp.vram[ tile_address + 3 ];
+			if ( wswan_vdp.tile_packed ) {
+				plane0 = ( wswan_vdp.vram[ tile_address + 0 ] << 24 ) | ( wswan_vdp.vram[ tile_address + 1 ] << 16 ) | ( wswan_vdp.vram[ tile_address + 2 ] << 8 ) | wswan_vdp.vram[ tile_address + 3 ];
 			} else {
-				plane0 = vdp.vram[ tile_address + 0 ];
-				plane1 = vdp.vram[ tile_address + 1 ] << 1;
-				plane2 = vdp.vram[ tile_address + 2 ] << 2;
-				plane3 = vdp.vram[ tile_address + 3 ] << 3;
+				plane0 = wswan_vdp.vram[ tile_address + 0 ];
+				plane1 = wswan_vdp.vram[ tile_address + 1 ] << 1;
+				plane2 = wswan_vdp.vram[ tile_address + 2 ] << 2;
+				plane3 = wswan_vdp.vram[ tile_address + 3 ] << 3;
 			}
 		} else {
 			tile_address = 0x2000 + ( tile_number * 16 ) + ( tile_line << 1 );
-			if ( vdp.tile_packed ) {
-				plane0 = ( vdp.vram[ tile_address + 0 ] << 8 ) | vdp.vram[ tile_address + 1 ];
+			if ( wswan_vdp.tile_packed ) {
+				plane0 = ( wswan_vdp.vram[ tile_address + 0 ] << 8 ) | wswan_vdp.vram[ tile_address + 1 ];
 			} else {
-				plane0 = vdp.vram[ tile_address + 0 ];
-				plane1 = vdp.vram[ tile_address + 1 ] << 1;
+				plane0 = wswan_vdp.vram[ tile_address + 0 ];
+				plane1 = wswan_vdp.vram[ tile_address + 1 ] << 1;
 				plane2 = 0;
 				plane3 = 0;
 			}
@@ -374,8 +374,8 @@ static void wswan_draw_foreground_3( void ) {
 
 		for( x = 0; x < 8; x++ ) {
 			int	col;
-			if ( vdp.tile_packed ) {
-				if ( vdp.colors_16 ) {
+			if ( wswan_vdp.tile_packed ) {
+				if ( wswan_vdp.colors_16 ) {
 					col = plane0 & 0x0F;
 					plane0 = plane0 >> 4;
 				} else {
@@ -390,26 +390,26 @@ static void wswan_draw_foreground_3( void ) {
 				plane0 = plane0 >> 1;
 			}
 			if ( tile_data & 0x4000 ) {
-				x_offset = x + ( column << 3 ) - ( vdp.layer_fg_scroll_x & 0x07 );
+				x_offset = x + ( column << 3 ) - ( wswan_vdp.layer_fg_scroll_x & 0x07 );
 			} else {
-				x_offset = 7 - x + ( column << 3 ) - ( vdp.layer_fg_scroll_x & 0x07 );
+				x_offset = 7 - x + ( column << 3 ) - ( wswan_vdp.layer_fg_scroll_x & 0x07 );
 			}
-			if ( ( x_offset >= 0 && x_offset < vdp.window_fg_left ) || ( x_offset >= vdp.window_fg_right && x_offset < WSWAN_X_PIXELS ) ) {
-				if ( vdp.colors_16 ) {
+			if ( ( x_offset >= 0 && x_offset < wswan_vdp.window_fg_left ) || ( x_offset >= wswan_vdp.window_fg_right && x_offset < WSWAN_X_PIXELS ) ) {
+				if ( wswan_vdp.colors_16 ) {
 					if ( col ) {
-						if ( vdp.color_mode ) {
-							wswan_plot_pixel( x_offset, vdp.current_line, pal[tile_palette][col] );
+						if ( wswan_vdp.color_mode ) {
+							wswan_plot_pixel( x_offset, wswan_vdp.current_line, pal[tile_palette][col] );
 						} else {
 							/* Hmmmm, what should we do here... Is this correct?? */
-							wswan_plot_pixel( x_offset, vdp.current_line, pal[tile_palette][col] );
+							wswan_plot_pixel( x_offset, wswan_vdp.current_line, pal[tile_palette][col] );
 						}
 					}
 				} else {
 					if ( col || !(tile_palette & 4 ) ) {
-						if ( vdp.color_mode ) {
-							wswan_plot_pixel( x_offset, vdp.current_line, pal[tile_palette][col] );
+						if ( wswan_vdp.color_mode ) {
+							wswan_plot_pixel( x_offset, wswan_vdp.current_line, pal[tile_palette][col] );
 						} else {
-							wswan_plot_pixel( x_offset, vdp.current_line, vdp.main_palette[pal[tile_palette][col]] );
+							wswan_plot_pixel( x_offset, wswan_vdp.current_line, wswan_vdp.main_palette[pal[tile_palette][col]] );
 						}
 					}
 				}
@@ -420,18 +420,18 @@ static void wswan_draw_foreground_3( void ) {
 
 static void wswan_handle_sprites( int mask ) {
 	int	i;
-	if ( vdp.sprite_count == 0 )
+	if ( wswan_vdp.sprite_count == 0 )
 		return;
-	for( i = vdp.sprite_first + vdp.sprite_count - 1; i >= vdp.sprite_first; i-- ) {
+	for( i = wswan_vdp.sprite_first + wswan_vdp.sprite_count - 1; i >= wswan_vdp.sprite_first; i-- ) {
 		UINT8	x, y;
 		UINT16	tile_data;
 		int	tile_line;
 
-		tile_data = ( vdp.vram[ vdp.sprite_table_address + i * 4 + 1 ] << 8 )
-		            | vdp.vram[ vdp.sprite_table_address + i * 4 ];
-		y = vdp.vram[ vdp.sprite_table_address + i * 4 + 2 ];
-		x = vdp.vram[ vdp.sprite_table_address + i * 4 + 3 ];
-		tile_line = vdp.current_line - y;
+		tile_data = ( wswan_vdp.vram[ wswan_vdp.sprite_table_address + i * 4 + 1 ] << 8 )
+		            | wswan_vdp.vram[ wswan_vdp.sprite_table_address + i * 4 ];
+		y = wswan_vdp.vram[ wswan_vdp.sprite_table_address + i * 4 + 2 ];
+		x = wswan_vdp.vram[ wswan_vdp.sprite_table_address + i * 4 + 3 ];
+		tile_line = wswan_vdp.current_line - y;
 		tile_line = tile_line & 0xFF;
 		if ( ( tile_line >= 0 ) && ( tile_line < 8 ) && ( ( tile_data & mask ) == mask ) ) {
 			UINT32	plane0 = 0, plane1 = 0, plane2 = 0, plane3 = 0;
@@ -443,35 +443,35 @@ static void wswan_handle_sprites( int mask ) {
 				tile_line = 7 - tile_line;
 			}
 
-			if ( vdp.colors_16 ) {
+			if ( wswan_vdp.colors_16 ) {
 				tile_address = 0x4000 + ( tile_number * 32 ) + ( tile_line << 2 );
-				if ( vdp.tile_packed ) {
-					plane0 = ( vdp.vram[ tile_address + 0 ] << 24 ) | ( vdp.vram[ tile_address + 1 ] << 16 ) | ( vdp.vram[ tile_address + 2 ] << 8 ) | vdp.vram[ tile_address + 3 ];
+				if ( wswan_vdp.tile_packed ) {
+					plane0 = ( wswan_vdp.vram[ tile_address + 0 ] << 24 ) | ( wswan_vdp.vram[ tile_address + 1 ] << 16 ) | ( wswan_vdp.vram[ tile_address + 2 ] << 8 ) | wswan_vdp.vram[ tile_address + 3 ];
 				} else {
-					plane0 = vdp.vram[ tile_address + 0 ];
-					plane1 = vdp.vram[ tile_address + 1 ] << 1;
-					plane2 = vdp.vram[ tile_address + 2 ] << 2;
-					plane3 = vdp.vram[ tile_address + 3 ] << 3;
+					plane0 = wswan_vdp.vram[ tile_address + 0 ];
+					plane1 = wswan_vdp.vram[ tile_address + 1 ] << 1;
+					plane2 = wswan_vdp.vram[ tile_address + 2 ] << 2;
+					plane3 = wswan_vdp.vram[ tile_address + 3 ] << 3;
 				}
 			} else {
 				tile_address = 0x2000 + ( tile_number * 16 ) + ( tile_line << 1 );
-				if ( vdp.tile_packed ) {
-					plane0 = ( vdp.vram[ tile_address + 0 ] << 8 ) | vdp.vram[ tile_address + 1 ];
+				if ( wswan_vdp.tile_packed ) {
+					plane0 = ( wswan_vdp.vram[ tile_address + 0 ] << 8 ) | wswan_vdp.vram[ tile_address + 1 ];
 				} else {
-					plane0 = vdp.vram[ tile_address + 0 ];
-					plane1 = vdp.vram[ tile_address + 1 ] << 1;
+					plane0 = wswan_vdp.vram[ tile_address + 0 ];
+					plane1 = wswan_vdp.vram[ tile_address + 1 ] << 1;
 					plane2 = 0;
 					plane3 = 0;
 				}
 			}
 
-			if ( vdp.window_sprites_enable ) {
+			if ( wswan_vdp.window_sprites_enable ) {
 				if ( tile_data & 0x1000 ) {
-					if ( vdp.current_line >= vdp.window_sprites_top && vdp.current_line <= vdp.window_sprites_bottom ) {
+					if ( wswan_vdp.current_line >= wswan_vdp.window_sprites_top && wswan_vdp.current_line <= wswan_vdp.window_sprites_bottom ) {
 						check_clip = 1;
 					}
 				} else {
-					if ( vdp.current_line < vdp.window_sprites_top || vdp.current_line > vdp.window_sprites_bottom ) {
+					if ( wswan_vdp.current_line < wswan_vdp.window_sprites_top || wswan_vdp.current_line > wswan_vdp.window_sprites_bottom ) {
 						continue;
 					}
 				}
@@ -479,8 +479,8 @@ static void wswan_handle_sprites( int mask ) {
 
 			for ( j = 0; j < 8; j++ ) {
 				int col;
-				if ( vdp.tile_packed ) {
-					if ( vdp.colors_16 ) {
+				if ( wswan_vdp.tile_packed ) {
+					if ( wswan_vdp.colors_16 ) {
 						col = plane0 & 0x0F;
 						plane0 = plane0 >> 4;
 					} else {
@@ -500,33 +500,33 @@ static void wswan_handle_sprites( int mask ) {
 					x_offset = x + 7 - j;
 				}
 				x_offset = x_offset & 0xFF;
-				if ( vdp.window_sprites_enable ) {
+				if ( wswan_vdp.window_sprites_enable ) {
 					if ( tile_data & 0x1000 && check_clip ) {
-						if ( x_offset >= vdp.window_sprites_left && x_offset <= vdp.window_sprites_right ) {
+						if ( x_offset >= wswan_vdp.window_sprites_left && x_offset <= wswan_vdp.window_sprites_right ) {
 							continue;
 						}
 					} else {
-						if ( x_offset < vdp.window_sprites_left || x_offset > vdp.window_sprites_right ) {
+						if ( x_offset < wswan_vdp.window_sprites_left || x_offset > wswan_vdp.window_sprites_right ) {
 //							continue;
 						}
 					}
 				}
 				if ( x_offset >= 0 && x_offset < WSWAN_X_PIXELS ) {
-					if ( vdp.colors_16 ) {
+					if ( wswan_vdp.colors_16 ) {
 						if ( col ) {
-							if ( vdp.color_mode ) {
-								wswan_plot_pixel( x_offset, vdp.current_line, pal[tile_palette][col] );
+							if ( wswan_vdp.color_mode ) {
+								wswan_plot_pixel( x_offset, wswan_vdp.current_line, pal[tile_palette][col] );
 							} else {
 								/* Hmmmm, what should we do here... Is this correct?? */
-								wswan_plot_pixel( x_offset, vdp.current_line, pal[tile_palette][col] );
+								wswan_plot_pixel( x_offset, wswan_vdp.current_line, pal[tile_palette][col] );
 							}
 						}
 					} else {
 						if ( col || !(tile_palette & 4 ) ) {
-							if ( vdp.color_mode ) {
-								wswan_plot_pixel( x_offset, vdp.current_line, pal[tile_palette][col] );
+							if ( wswan_vdp.color_mode ) {
+								wswan_plot_pixel( x_offset, wswan_vdp.current_line, pal[tile_palette][col] );
 							} else {
-								wswan_plot_pixel( x_offset, vdp.current_line, vdp.main_palette[pal[tile_palette][col]] );
+								wswan_plot_pixel( x_offset, wswan_vdp.current_line, wswan_vdp.main_palette[pal[tile_palette][col]] );
 							}
 						}
 					}
@@ -544,13 +544,13 @@ void wswan_refresh_scanline( void )
 
 	rec.min_x = 0;
 	rec.max_x = WSWAN_X_PIXELS;
-	rec.min_y = rec.max_y = vdp.current_line;
+	rec.min_y = rec.max_y = wswan_vdp.current_line;
 	if ( ws_portram[0x14] ) {
 		/* Not sure if these background color checks and settings are correct */
-		if ( vdp.color_mode && vdp.colors_16 ) {
+		if ( wswan_vdp.color_mode && wswan_vdp.colors_16 ) {
 			wswan_fillbitmap( pal[ws_portram[0x01]>>4][ws_portram[0x01]&0x0F], &rec );
 		} else {
-			wswan_fillbitmap( vdp.main_palette[ws_portram[0x01]&0x07], &rec );
+			wswan_fillbitmap( wswan_vdp.main_palette[ws_portram[0x01]&0x07], &rec );
 		}
 	} else {
 		wswan_fillbitmap( 0, &rec );
@@ -560,22 +560,22 @@ void wswan_refresh_scanline( void )
 	/*
 	 * Draw background layer
 	 */
-	if ( vdp.layer_bg_enable ) {
+	if ( wswan_vdp.layer_bg_enable ) {
 		wswan_draw_background();
 	}
 
 	/*
 	 * Draw sprites between background and foreground layers
 	 */
-	if ( vdp.sprites_enable ) {
+	if ( wswan_vdp.sprites_enable ) {
 		wswan_handle_sprites( 0 );
 	}
 
 	/*
 	 * Draw foreground layer, taking window settings into account
 	 */
-	if ( vdp.layer_fg_enable ) {
-		switch( vdp.window_fg_mode ) {
+	if ( wswan_vdp.layer_fg_enable ) {
+		switch( wswan_vdp.window_fg_mode ) {
 		case 0:	/* FG inside & outside window area */
 			wswan_draw_foreground_0();
 			break;
@@ -583,12 +583,12 @@ void wswan_refresh_scanline( void )
 			logerror( "Unknown foreground mode 1 set\n" );
 			break;
 		case 2:	/* FG only inside window area */
-			if ( vdp.current_line >= vdp.window_fg_top && vdp.current_line <= vdp.window_fg_bottom ) {
+			if ( wswan_vdp.current_line >= wswan_vdp.window_fg_top && wswan_vdp.current_line <= wswan_vdp.window_fg_bottom ) {
 				wswan_draw_foreground_2();
 			}
 			break;
 		case 3:	/* FG only outside window area */
-			if ( vdp.current_line < vdp.window_fg_top || vdp.current_line > vdp.window_fg_bottom ) {
+			if ( wswan_vdp.current_line < wswan_vdp.window_fg_top || wswan_vdp.current_line > wswan_vdp.window_fg_bottom ) {
 				wswan_draw_foreground_0();
 			} else {
 				wswan_draw_foreground_3();
@@ -600,7 +600,7 @@ void wswan_refresh_scanline( void )
 	/*
 	 * Draw sprites in front of foreground layer
 	 */
-	if ( vdp.sprites_enable ) {
+	if ( wswan_vdp.sprites_enable ) {
 		wswan_handle_sprites( 0x2000 );
 	}
 }

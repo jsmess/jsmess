@@ -24,7 +24,7 @@
 #include "machine/6551.h"
 
 
-UINT32 a3;
+UINT32 apple3_flags;
 
 static void apple3_update_drives(const device_config *device);
 
@@ -150,9 +150,9 @@ static READ8_HANDLER( apple3_c0xx_r )
 		case 0x54: case 0x55: case 0x56: case 0x57:
 			/* graphics softswitches */
 			if (offset & 1)
-				a3 |= 1 << ((offset - 0x50) / 2);
+				apple3_flags |= 1 << ((offset - 0x50) / 2);
 			else
-				a3 &= ~(1 << ((offset - 0x50) / 2));
+				apple3_flags &= ~(1 << ((offset - 0x50) / 2));
 			break;
 
 		case 0x60: case 0x61: case 0x62: case 0x63:
@@ -175,9 +175,9 @@ static READ8_HANDLER( apple3_c0xx_r )
 		case 0xD4: case 0xD5: case 0xD6: case 0xD7:
 			/* external drive stuff */
 			if (offset & 1)
-				a3 |= VAR_EXTA0 << ((offset - 0xD0) / 2);
+				apple3_flags |= VAR_EXTA0 << ((offset - 0xD0) / 2);
 			else
-				a3 &= ~(VAR_EXTA0 << ((offset - 0xD0) / 2));
+				apple3_flags &= ~(VAR_EXTA0 << ((offset - 0xD0) / 2));
 			apple3_update_drives((device_config*)devtag_get_device(space->machine, APPLEFDC, "fdc"));
 			result = 0x00;
 			break;
@@ -226,9 +226,9 @@ static WRITE8_HANDLER( apple3_c0xx_w )
 		case 0x54: case 0x55: case 0x56: case 0x57:
 			/* graphics softswitches */
 			if (offset & 1)
-				a3 |= 1 << ((offset - 0x50) / 2);
+				apple3_flags |= 1 << ((offset - 0x50) / 2);
 			else
-				a3 &= ~(1 << ((offset - 0x50) / 2));
+				apple3_flags &= ~(1 << ((offset - 0x50) / 2));
 			break;
 
 		case 0xC0: case 0xC1: case 0xC2: case 0xC3:
@@ -243,9 +243,9 @@ static WRITE8_HANDLER( apple3_c0xx_w )
 		case 0xD4: case 0xD5: case 0xD6: case 0xD7:
 			/* external drive stuff */
 			if (offset & 1)
-				a3 |= VAR_EXTA0 << ((offset - 0xD0) / 2);
+				apple3_flags |= VAR_EXTA0 << ((offset - 0xD0) / 2);
 			else
-				a3 &= ~(VAR_EXTA0 << ((offset - 0xD0) / 2));
+				apple3_flags &= ~(VAR_EXTA0 << ((offset - 0xD0) / 2));
 			apple3_update_drives((device_config*)devtag_get_device(space->machine, APPLEFDC, "fdc"));
 			break;
 
@@ -682,7 +682,7 @@ static void apple3_update_drives(const device_config *device)
 
 	if (apple3_enable_mask & 0x02)
 	{
-		switch(a3 & (VAR_EXTA0 | VAR_EXTA1))
+		switch(apple3_flags & (VAR_EXTA0 | VAR_EXTA1))
 		{
 			case VAR_EXTA0:
 				enable_mask |= 0x02;
@@ -731,7 +731,7 @@ DRIVER_INIT( apple3 )
 
 	apple3_profile_init();
 
-	a3 = 0;
+	apple3_flags = 0;
 	via_0_a = ~0;
 	via_1_a = ~0;
 	via_1_irq = 0;

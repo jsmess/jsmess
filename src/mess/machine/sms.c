@@ -69,6 +69,8 @@ static struct {
 } sms_cartridge[MAX_CARTRIDGES];
 static UINT8	sms_current_cartridge;
 
+static void setup_rom(const address_space *space);
+
 static TIMER_CALLBACK( rapid_fire_callback ) {
 	rapid_fire_state_1 ^= 0xFF;
 	rapid_fire_state_2 ^= 0xFF;
@@ -585,7 +587,7 @@ static void sms_machine_stop(running_machine *machine) {
 		image_battery_save(devtag_get_device(machine, CARTSLOT, "cart1"), sms_cartridge[sms_current_cartridge].cartSRAM, sizeof(UINT8) * NVRAM_SIZE );
 }
 
-void setup_rom(const address_space *space)
+static void setup_rom(const address_space *space)
 {
 	running_machine *machine = space->machine;
 

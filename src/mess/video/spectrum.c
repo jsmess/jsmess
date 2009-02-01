@@ -20,17 +20,17 @@
 
 
 unsigned char *spectrum_video_ram;
-UINT8 retrace_cycles;
-int frame_number;    /* Used for handling FLASH 1 */
-int flash_invert;
+static UINT8 retrace_cycles;
+int spectrum_frame_number;    /* Used for handling FLASH 1 */
+int spectrum_flash_invert;
 
 /***************************************************************************
   Start the video hardware emulation.
 ***************************************************************************/
 VIDEO_START( spectrum )
 {
-	frame_number = 0;
-	flash_invert = 0;
+	spectrum_frame_number = 0;
+	spectrum_flash_invert = 0;
 	
 	EventList_Initialise(30000);
 
@@ -41,8 +41,8 @@ VIDEO_START( spectrum )
 
 VIDEO_START( spectrum_128 )
 {
-	frame_number = 0;
-	flash_invert = 0;
+	spectrum_frame_number = 0;
+	spectrum_flash_invert = 0;
 
 	EventList_Initialise(30000);
 	
@@ -66,11 +66,11 @@ VIDEO_EOF( spectrum )
         EVENT_LIST_ITEM *pItem;
         int NumItems;
 
-        frame_number++;
-        if (frame_number >= 25)
+        spectrum_frame_number++;
+        if (spectrum_frame_number >= 25)
         {
-                frame_number = 0;
-                flash_invert = !flash_invert;
+                spectrum_frame_number = 0;
+                spectrum_flash_invert = !spectrum_flash_invert;
         }
 
         /* Empty event buffer for undisplayed frames noting the last border
@@ -135,7 +135,7 @@ VIDEO_UPDATE( spectrum )
                 for (x=0;x<32;x++)
                 {
                         /* Get ink and paper colour with bright */
-                        if (flash_invert && (*attr & 0x80))
+                        if (spectrum_flash_invert && (*attr & 0x80))
                         {
                                 ink=((*attr)>>3) & 0x0f;
                                 pap=((*attr) & 0x07) + (((*attr)>>3) & 0x08);

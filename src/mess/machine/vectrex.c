@@ -31,8 +31,8 @@ enum {
 unsigned char vectrex_via_out[2];
 rgb_t vectrex_beam_color = RGB_WHITE;      /* the color of the vectrex beam */
 int vectrex_imager_status = 0;     /* 0 = off, 1 = right eye, 2 = left eye */
-double imager_freq;
-emu_timer *imager_timer;
+double vectrex_imager_freq;
+emu_timer *vectrex_imager_timer;
 int vectrex_lightpen_port=0;
 int vectrex_reset_refresh;
 
@@ -283,7 +283,7 @@ TIMER_CALLBACK(vectrex_imager_eye)
 {
 	const device_config *via_0 = devtag_get_device(machine, VIA6522, "via6522_0");
 	int coffset;
-	double rtime = (1.0 / imager_freq);
+	double rtime = (1.0 / vectrex_imager_freq);
 
 	if (vectrex_imager_status > 0)
 	{
@@ -331,15 +331,15 @@ WRITE8_HANDLER(vectrex_psg_port_w)
 			   of the whole thing and some constants of the motor's torque/speed curve.
 			   pwl is the negative pulse width and wavel is the whole wavelength. */
 
-			ang_acc = (50.0 - 1.55 * imager_freq) / MMI;
-			imager_freq += ang_acc * pwl + DAMPC * imager_freq / MMI * wavel;
+			ang_acc = (50.0 - 1.55 * vectrex_imager_freq) / MMI;
+			vectrex_imager_freq += ang_acc * pwl + DAMPC * vectrex_imager_freq / MMI * wavel;
 
-			if (imager_freq > 1)
+			if (vectrex_imager_freq > 1)
 			{
-				timer_adjust_periodic(imager_timer,
-									  double_to_attotime(MIN(1.0 / imager_freq, attotime_to_double(timer_timeleft(imager_timer)))),
+				timer_adjust_periodic(vectrex_imager_timer,
+									  double_to_attotime(MIN(1.0 / vectrex_imager_freq, attotime_to_double(timer_timeleft(vectrex_imager_timer)))),
 									  2,
-									  double_to_attotime(1.0 / imager_freq));
+									  double_to_attotime(1.0 / vectrex_imager_freq));
 			}
 		}
 	}

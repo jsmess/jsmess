@@ -86,7 +86,7 @@ struct VDP
 
 /*----------- defined in machine/wswan.c -----------*/
 
-extern struct VDP vdp;
+extern struct VDP wswan_vdp;
 extern UINT8 ws_portram[256];
 
 extern NVRAM_HANDLER( wswan );

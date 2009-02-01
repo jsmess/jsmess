@@ -22,7 +22,6 @@
 #include "sound/sn76496.h"
 #include "sound/tms5220.h"
 
-
 /* BBC Memory Size */
 static int bbc_RAMSize=1;
 /* this stores the DIP switch setting for the DFS type being used */
@@ -60,18 +59,18 @@ Model A memory handling functions
 *************************/
 
 /* for the model A just address the 4 on board ROM sockets */
-WRITE8_HANDLER ( page_selecta_w )
+WRITE8_HANDLER ( bbc_page_selecta_w )
 {
 	memory_set_bankptr(space->machine,4,memory_region(space->machine, "user1")+((data&0x03)<<14));
 }
 
 
-WRITE8_HANDLER ( memorya1_w )
+WRITE8_HANDLER ( bbc_memorya1_w )
 {
 	memory_region(space->machine, "main")[offset]=data;
 
 	// this array is set so that the video emulator know which addresses to redraw
-	vidmem[offset]=1;
+	bbc_vidmem[offset]=1;
 }
 
 /*************************
@@ -80,7 +79,7 @@ Model B memory handling functions
 
 /* the model B address all 16 of the ROM sockets */
 /* I have set bank 1 as a special case to load different DFS roms selectable from MESS's DIP settings var:bbc_DFSTypes */
-WRITE8_HANDLER ( page_selectb_w )
+WRITE8_HANDLER ( bbc_page_selectb_w )
 {
 	bbc_rombank=data&0x0f;
 	if (bbc_rombank!=1)
@@ -92,15 +91,15 @@ WRITE8_HANDLER ( page_selectb_w )
 }
 
 
-WRITE8_HANDLER ( memoryb3_w )
+WRITE8_HANDLER ( bbc_memoryb3_w )
 {
 	if (bbc_RAMSize) {
 		memory_region(space->machine, "main")[offset+0x4000]=data;
 		// this array is set so that the video emulator know which addresses to redraw
-		vidmem[offset+0x4000]=1;
+		bbc_vidmem[offset+0x4000]=1;
 	} else {
 		memory_region(space->machine, "main")[offset]=data;
-		vidmem[offset]=1;
+		bbc_vidmem[offset]=1;
 	}
 
 }
@@ -115,7 +114,7 @@ static const unsigned short bbc_SWRAMtype1[16]={0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1}
 static const unsigned short bbc_SWRAMtype2[16]={0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0};
 static const unsigned short bbc_SWRAMtype3[16]={0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1};
 
-WRITE8_HANDLER ( memoryb4_w )
+WRITE8_HANDLER ( bbc_memoryb4_w )
 {
 	if (bbc_rombank==1)
 	{
@@ -154,7 +153,7 @@ static int vdudriverset(running_machine *machine)
 
 /* the model B Plus addresses all 16 of the ROM sockets plus the extra 12K of ram at 0x8000
    and 20K of shadow ram at 0x3000 */
-WRITE8_HANDLER ( page_selectbp_w )
+WRITE8_HANDLER ( bbc_page_selectbp_w )
 {
 	if ((offset&0x04)==0)
 	{
@@ -188,12 +187,12 @@ WRITE8_HANDLER ( page_selectbp_w )
    the writes to this memory are just done the normal
    way */
 
-WRITE8_HANDLER ( memorybp1_w )
+WRITE8_HANDLER ( bbc_memorybp1_w )
 {
 	memory_region(space->machine, "main")[offset]=data;
 
 	// this array is set so that the video emulator know which addresses to redraw
-	vidmem[offset]=1;
+	bbc_vidmem[offset]=1;
 }
 
 
@@ -231,24 +230,24 @@ static DIRECT_UPDATE_HANDLER( bbcbp_direct_handler )
 }
 
 
-WRITE8_HANDLER ( memorybp2_w )
+WRITE8_HANDLER ( bbc_memorybp2_w )
 {
 	UINT8 *ram = memory_region(space->machine, "main");
 	if (vdusel==0)
 	{
 		// not in shadow ram mode so just write to normal ram
 		ram[offset+0x3000]=data;
-		vidmem[offset+0x3000]=1;
+		bbc_vidmem[offset+0x3000]=1;
 	} else {
 		if (vdudriverset(space->machine))
 		{
 			// if VDUDriver set then write to shadow ram
 			ram[offset+0xb000]=data;
-			vidmem[offset+0xb000]=1;
+			bbc_vidmem[offset+0xb000]=1;
 		} else {
 			// else write to normal ram
 			ram[offset+0x3000]=data;
-			vidmem[offset+0x3000]=1;
+			bbc_vidmem[offset+0x3000]=1;
 		}
 	}
 }
@@ -256,7 +255,7 @@ WRITE8_HANDLER ( memorybp2_w )
 
 /* if the pagedRAM is set write to RAM between 0x8000 to 0xafff
 otherwise this area contains ROM so no write is required */
-WRITE8_HANDLER ( memorybp4_w )
+WRITE8_HANDLER ( bbc_memorybp4_w )
 {
 	if (pagedRAM)
 	{
@@ -276,7 +275,7 @@ which could either be sideways ROM or sideways RAM */
 static const unsigned short bbc_b_plus_sideways_ram_banks[16]={ 1,1,0,0,0,0,0,0,0,0,0,0,1,1,0,0 };
 
 
-WRITE8_HANDLER ( memorybp4_128_w )
+WRITE8_HANDLER ( bbc_memorybp4_128_w )
 {
 	if (pagedRAM)
 	{
@@ -291,7 +290,7 @@ WRITE8_HANDLER ( memorybp4_128_w )
 	}
 }
 
-WRITE8_HANDLER ( memorybp6_128_w )
+WRITE8_HANDLER ( bbc_memorybp6_128_w )
 {
 	if (bbc_b_plus_sideways_ram_banks[bbc_rombank])
 	{
@@ -449,10 +448,10 @@ static WRITE8_HANDLER ( page_selectbm_w )
 
 
 
-WRITE8_HANDLER ( memorybm1_w )
+WRITE8_HANDLER ( bbc_memorybm1_w )
 {
 	memory_region(space->machine, "main")[offset]=data;
-	vidmem[offset]=1;
+	bbc_vidmem[offset]=1;
 }
 
 
@@ -475,21 +474,21 @@ static DIRECT_UPDATE_HANDLER( bbcm_direct_handler )
 
 
 
-WRITE8_HANDLER ( memorybm2_w )
+WRITE8_HANDLER ( bbc_memorybm2_w )
 {
 	UINT8 *ram = memory_region(space->machine, "main");
 	if (ACCCON_X)
 	{
 		ram[offset+0xb000]=data;
-		vidmem[offset+0xb000]=1;
+		bbc_vidmem[offset+0xb000]=1;
 	} else {
 		if (ACCCON_E && bbcm_vdudriverset(space->machine))
 		{
 			ram[offset+0xb000]=data;
-			vidmem[offset+0xb000]=1;
+			bbc_vidmem[offset+0xb000]=1;
 		} else {
 			ram[offset+0x3000]=data;
-			vidmem[offset+0x3000]=1;
+			bbc_vidmem[offset+0x3000]=1;
 		}
 	}
 }
@@ -500,7 +499,7 @@ static const unsigned short bbc_master_sideways_ram_banks[16]=
 };
 
 
-WRITE8_HANDLER ( memorybm4_w )
+WRITE8_HANDLER ( bbc_memorybm4_w )
 {
 	if (pagedRAM)
 	{
@@ -516,7 +515,7 @@ WRITE8_HANDLER ( memorybm4_w )
 }
 
 
-WRITE8_HANDLER ( memorybm5_w )
+WRITE8_HANDLER ( bbc_memorybm5_w )
 {
 	if (bbc_master_sideways_ram_banks[bbc_rombank])
 	{
@@ -525,7 +524,7 @@ WRITE8_HANDLER ( memorybm5_w )
 }
 
 
-WRITE8_HANDLER ( memorybm7_w )
+WRITE8_HANDLER ( bbc_memorybm7_w )
 {
 	if (ACCCON_Y)
 	{
@@ -619,7 +618,7 @@ long myo;
 		if ((myo>=0x08) && (myo<=0x0f)) BBC_6850_w(space, myo-0x08,data);			/* Serial Controller */
 		if ((myo>=0x10) && (myo<=0x17)) BBC_SerialULA_w(space, myo-0x10,data);		/* Serial System Chip */
 		if ((myo>=0x18) && (myo<=0x1f)) uPD7002_w((device_config*)devtag_get_device(space->machine, UPD7002, "upd7002"),myo-0x18,data);			/* A to D converter */
-		if ((myo>=0x20) && (myo<=0x23)) videoULA_w(space, myo-0x20,data);			/* VideoULA */
+		if ((myo>=0x20) && (myo<=0x23)) bbc_videoULA_w(space, myo-0x20,data);			/* VideoULA */
 		if ((myo>=0x24) && (myo<=0x27)) bbcm_wd1770l_write(space, myo-0x24,data); 	/* 1770 */
 		if ((myo>=0x28) && (myo<=0x2f)) bbcm_wd1770_write(space, myo-0x28,data);  	/* disc control latch */
 		if ((myo>=0x30) && (myo<=0x33)) page_selectbm_w(space, myo-0x30,data);		/* page select */
@@ -996,13 +995,13 @@ static WRITE8_DEVICE_HANDLER( bbcb_via_system_write_portb )
 		case 4:
 			if (b4_video0==0) {
 				b4_video0=1;
-				setscreenstart(b4_video0,b5_video1);
+				bbc_setscreenstart(b4_video0,b5_video1);
 			}
 			break;
 		case 5:
 			if (b5_video1==0) {
 				b5_video1=1;
-				setscreenstart(b4_video0,b5_video1);
+				bbc_setscreenstart(b4_video0,b5_video1);
 			}
 			break;
 		case 6:
@@ -1069,13 +1068,13 @@ static WRITE8_DEVICE_HANDLER( bbcb_via_system_write_portb )
 		case 4:
 			if (b4_video0==1) {
 				b4_video0=0;
-				setscreenstart(b4_video0,b5_video1);
+				bbc_setscreenstart(b4_video0,b5_video1);
 			}
 			break;
 		case 5:
 			if (b5_video1==1) {
 				b5_video1=0;
-				setscreenstart(b4_video0,b5_video1);
+				bbc_setscreenstart(b4_video0,b5_video1);
 			}
 			break;
 		case 6:
@@ -2212,11 +2211,11 @@ MACHINE_RESET( bbcb )
 	{
 		/* 32K Model B */
 		memory_set_bankptr(machine, 3,ram+0x4000);
-		set_video_memory_lookups(32);
+		bbc_set_video_memory_lookups(32);
 	} else {
 		/* 16K just repeat the lower 16K*/
 		memory_set_bankptr(machine, 3,ram);
-		set_video_memory_lookups(16);
+		bbc_set_video_memory_lookups(16);
 	}
 
 	memory_set_bankptr(machine, 4,memory_region(machine, "user1"));          /* bank 4 is the paged ROMs     from 8000 to bfff */

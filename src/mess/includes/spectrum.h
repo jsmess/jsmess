@@ -80,7 +80,7 @@ extern READ8_HANDLER(spectrum_port_7f_r);
 extern READ8_HANDLER(spectrum_port_df_r);
 extern READ8_HANDLER(spectrum_port_fe_r);
 extern WRITE8_HANDLER(spectrum_port_fe_w);
-extern int PreviousFE;
+extern int spectrum_PreviousFE;
 
 /*----------- defined in drivers/spec128.c -----------*/
 MACHINE_DRIVER_EXTERN( spectrum_128 );
@@ -98,8 +98,8 @@ extern int ts2068_port_ff_data;
 extern int ts2068_port_f4_data;
 
 /*----------- defined in video/spectrum.c -----------*/
-extern int frame_number;    /* Used for handling FLASH 1 */
-extern int flash_invert;
+extern int spectrum_frame_number;    /* Used for handling FLASH 1 */
+extern int spectrum_flash_invert;
 
 extern PALETTE_INIT( spectrum );
 
@@ -110,7 +110,6 @@ extern VIDEO_UPDATE( spectrum );
 extern VIDEO_EOF( spectrum );
 
 extern unsigned char *spectrum_video_ram;
-extern UINT8 retrace_cycles;
 
 extern const gfx_layout spectrum_charlayout;
 

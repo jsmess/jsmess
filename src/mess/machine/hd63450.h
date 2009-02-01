@@ -23,8 +23,6 @@ void hd63450_write(const device_config* device,int offset, int data, UINT16 mem_
 void hd63450_single_transfer(const device_config* device, int x);
 void hd63450_set_timer(const device_config* device, int channel, attotime tm);
 
-void dma_transfer_start(const device_config* device, int channel, int dir);
-
 int hd63450_get_vector(const device_config* device, int channel);
 int hd63450_get_error_vector(const device_config* device, int channel);
 

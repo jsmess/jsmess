@@ -216,7 +216,7 @@ typedef enum {
 /* 6821-I28, this allows the 6845 to access the full 64K address range, however    */
 /* since the ram data is addressed as a 16bit wide unit, this allows the 6845      */
 /* access to the first 128K or ram.                                                */
-void vid_set_gctrl(running_machine *machine, int data)
+void dgnbeta_vid_set_gctrl(running_machine *machine, int data)
 {
 	GCtrl=data;
 	if (LogRegWrites)
@@ -305,7 +305,7 @@ static void beta_Set_DE(int offset, int data)
 }
 
 /* Video init */
-void init_video(running_machine *machine)
+void dgnbeta_init_video(running_machine *machine)
 {
 	/* initialise 6845 */
 	m6845_config(&beta_m6845_interface);
@@ -713,7 +713,7 @@ WRITE8_HANDLER(dgnbeta_6845_w)
 }
 
 /* Write handler for colour, pallate ram */
-WRITE8_HANDLER(colour_ram_w)
+WRITE8_HANDLER(dgnbeta_colour_ram_w)
 {
 	ColourRAM[offset]=data&0x0f;			/* Colour ram 4 bit and write only to CPU */
 }

@@ -100,13 +100,13 @@ static void apple3_video_text40(bitmap_t *bitmap)
 	{
 		for (x = 0; x < 40; x++)
 		{
-			offset = mess_ram_size - 0x8000 + text_map[y] + x + (a3 & VAR_VM2 ? 0x0400 : 0x0000);
+			offset = mess_ram_size - 0x8000 + text_map[y] + x + (apple3_flags & VAR_VM2 ? 0x0400 : 0x0000);
 			ch = mess_ram[offset];
 
-			if (a3 & VAR_VM0)
+			if (apple3_flags & VAR_VM0)
 			{
 				/* color text */
-				offset = mess_ram_size - 0x8000 + text_map[y] + x + (a3 & VAR_VM2 ? 0x0000 : 0x0400);
+				offset = mess_ram_size - 0x8000 + text_map[y] + x + (apple3_flags & VAR_VM2 ? 0x0000 : 0x0400);
 				bg = (mess_ram[offset] >> 0) & 0x0F;
 				fg = (mess_ram[offset] >> 4) & 0x0F;
 			}
@@ -202,7 +202,7 @@ static void apple3_video_graphics_hgr(bitmap_t *bitmap)
 
 	for (y = 0; y < 192; y++)
 	{
-		if (a3 & VAR_VM2)
+		if (apple3_flags & VAR_VM2)
 			pix_info = &mess_ram[hgr_map[y]];
 		else
 			pix_info = &mess_ram[hgr_map[y] - 0x2000];
@@ -246,7 +246,7 @@ static void apple3_video_graphics_chgr(bitmap_t *bitmap)
 
 	for (y = 0; y < 192; y++)
 	{
-		if (a3 & VAR_VM2)
+		if (apple3_flags & VAR_VM2)
 		{
 			pix_info = &mess_ram[hgr_map[y]];
 			col_info = &mess_ram[hgr_map[y] - 0x2000];
@@ -290,7 +290,7 @@ static void apple3_video_graphics_shgr(bitmap_t *bitmap)
 
 	for (y = 0; y < 192; y++)
 	{
-		if (a3 & VAR_VM2)
+		if (apple3_flags & VAR_VM2)
 		{
 			pix_info1 = &mess_ram[hgr_map[y]];
 			pix_info2 = &mess_ram[hgr_map[y] + 0x2000];
@@ -331,10 +331,10 @@ static void apple3_video_graphics_chires(bitmap_t *bitmap)
 		pen = BITMAP_ADDR16(bitmap, y, 0);
 		for (i = 0; i < 20; i++)
 		{
-			pix.b.l  = mess_ram[hgr_map[y] - 0x2000 + (i * 2) + (a3 & VAR_VM2 ? 1 : 0) + 0];
-			pix.b.h  = mess_ram[hgr_map[y] - 0x0000 + (i * 2) + (a3 & VAR_VM2 ? 1 : 0) + 0];
-			pix.b.h2 = mess_ram[hgr_map[y] - 0x2000 + (i * 2) + (a3 & VAR_VM2 ? 1 : 0) + 1];
-			pix.b.h3 = mess_ram[hgr_map[y] - 0x0000 + (i * 2) + (a3 & VAR_VM2 ? 1 : 0) + 1];
+			pix.b.l  = mess_ram[hgr_map[y] - 0x2000 + (i * 2) + (apple3_flags & VAR_VM2 ? 1 : 0) + 0];
+			pix.b.h  = mess_ram[hgr_map[y] - 0x0000 + (i * 2) + (apple3_flags & VAR_VM2 ? 1 : 0) + 0];
+			pix.b.h2 = mess_ram[hgr_map[y] - 0x2000 + (i * 2) + (apple3_flags & VAR_VM2 ? 1 : 0) + 1];
+			pix.b.h3 = mess_ram[hgr_map[y] - 0x0000 + (i * 2) + (apple3_flags & VAR_VM2 ? 1 : 0) + 1];
 
 			pen[ 0] = pen[ 1] = pen[ 2] = pen[ 3] = ((pix.d >>  0) & 0x0F);
 			pen[ 4] = pen[ 5] = pen[ 6] = pen[ 7] = ((pix.d >>  4) & 0x07) | ((pix.d >>  1) & 0x08);
@@ -352,7 +352,7 @@ static void apple3_video_graphics_chires(bitmap_t *bitmap)
 
 VIDEO_UPDATE( apple3 )
 {
-	switch(a3 & (VAR_VM3|VAR_VM1|VAR_VM0))
+	switch(apple3_flags & (VAR_VM3|VAR_VM1|VAR_VM0))
 	{
 		case 0:
 		case VAR_VM0:

@@ -131,7 +131,7 @@ WRITE8_HANDLER ( nes_mid_mapper_w )
 {
 	if (mmc_write_mid) (*mmc_write_mid)(space, offset, data);
 	else if (nes.mid_ram_enable)
-		battery_ram[offset] = data;
+		nes_battery_ram[offset] = data;
 //	else
 	{
 		logerror("Unimplemented MID mapper write, offset: %04x, data: %02x\n", offset, data);
@@ -148,7 +148,7 @@ WRITE8_HANDLER ( nes_mid_mapper_w )
 READ8_HANDLER ( nes_mid_mapper_r )
 {
 	if ((nes.mid_ram_enable) || (nes.mapper == 5))
-		return battery_ram[offset];
+		return nes_battery_ram[offset];
 	else
 		return 0;
 }
@@ -955,7 +955,7 @@ static WRITE8_HANDLER( mapper5_l_w )
 			logerror ("MMC5 mid RAM bank select: %02x\n", data & 0x07);
 			memory_set_bankptr (space->machine, 5, &nes.wram[data * 0x2000]);
 			/* The & 4 is a hack that'll tide us over for now */
-			battery_ram = &nes.wram[(data & 4) * 0x2000];
+			nes_battery_ram = &nes.wram[(data & 4) * 0x2000];
 			break;
 
 		case 0x1014: /* $5114 */

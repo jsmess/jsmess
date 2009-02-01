@@ -134,7 +134,7 @@
 #include "includes/x68k.h"
 #include "x68000.lh"
 
-struct x68k_system sys;
+struct x68k_system x68k_sys;
 
 static UINT16* sram;   // SRAM
 static UINT8 ppi_port[3];
@@ -148,9 +148,9 @@ static UINT8 mfp_key;
 static emu_timer* kb_timer;
 //emu_timer* mfp_timer[4];
 //emu_timer* mfp_irq;
-emu_timer* scanline_timer;
-emu_timer* raster_irq;
-emu_timer* vblank_irq;
+emu_timer* x68k_scanline_timer;
+emu_timer* x68k_raster_irq;
+emu_timer* x68k_vblank_irq;
 static emu_timer* mouse_timer;  // to set off the mouse interrupts via the SCC
 static emu_timer* led_timer;  // to make disk drive control LEDs blink
 
@@ -180,10 +180,10 @@ static void mfp_init(void);
 
 static void mfp_init()
 {
-	sys.mfp.tadr = sys.mfp.tbdr = sys.mfp.tcdr = sys.mfp.tddr = 0xff;
+	x68k_sys.mfp.tadr = x68k_sys.mfp.tbdr = x68k_sys.mfp.tcdr = x68k_sys.mfp.tddr = 0xff;
 
-	sys.mfp.irqline = 6;  // MFP is connected to 68000 IRQ line 6
-	sys.mfp.current_irq = -1;  // No current interrupt
+	x68k_sys.mfp.irqline = 6;  // MFP is connected to 68000 IRQ line 6
+	x68k_sys.mfp.current_irq = -1;  // No current interrupt
 
 /*  mfp_timer[0] = timer_alloc(machine, mfp_timer_a_callback, NULL);
     mfp_timer[1] = timer_alloc(machine, mfp_timer_b_callback, NULL);
@@ -199,43 +199,43 @@ TIMER_CALLBACK(mfp_update_irq)
 {
     int x;
 
-    if((sys.ioc.irqstatus & 0xc0) != 0)
+    if((x68k_sys.ioc.irqstatus & 0xc0) != 0)
         return;
 
     // check for pending IRQs, in priority order
-    if(sys.mfp.ipra != 0)
+    if(x68k_sys.mfp.ipra != 0)
     {
         for(x=7;x>=0;x--)
         {
-            if((sys.mfp.ipra & (1 << x)) && (sys.mfp.imra & (1 << x)))
+            if((x68k_sys.mfp.ipra & (1 << x)) && (x68k_sys.mfp.imra & (1 << x)))
             {
-                current_irq_line = sys.mfp.irqline;
-                sys.mfp.current_irq = x + 8;
+                current_irq_line = x68k_sys.mfp.irqline;
+                x68k_sys.mfp.current_irq = x + 8;
                 // assert IRQ line
-//              if(sys.mfp.iera & (1 << x))
+//              if(x68k_sys.mfp.iera & (1 << x))
                 {
-                    current_vector[6] = (sys.mfp.vr & 0xf0) | (x+8);
-                    cpu_set_input_line_and_vector(machine->cpu[0],sys.mfp.irqline,ASSERT_LINE,(sys.mfp.vr & 0xf0) | (x + 8));
-//                  logerror("MFP: Sent IRQ vector 0x%02x (IRQ line %i)\n",(sys.mfp.vr & 0xf0) | (x+8),sys.mfp.irqline);
+                    current_vector[6] = (x68k_sys.mfp.vr & 0xf0) | (x+8);
+                    cpu_set_input_line_and_vector(machine->cpu[0],x68k_sys.mfp.irqline,ASSERT_LINE,(x68k_sys.mfp.vr & 0xf0) | (x + 8));
+//                  logerror("MFP: Sent IRQ vector 0x%02x (IRQ line %i)\n",(x68k_sys.mfp.vr & 0xf0) | (x+8),x68k_sys.mfp.irqline);
                     return;  // one at a time only
                 }
             }
         }
     }
-    if(sys.mfp.iprb != 0)
+    if(x68k_sys.mfp.iprb != 0)
     {
         for(x=7;x>=0;x--)
         {
-            if((sys.mfp.iprb & (1 << x)) && (sys.mfp.imrb & (1 << x)))
+            if((x68k_sys.mfp.iprb & (1 << x)) && (x68k_sys.mfp.imrb & (1 << x)))
             {
-                current_irq_line = sys.mfp.irqline;
-                sys.mfp.current_irq = x;
+                current_irq_line = x68k_sys.mfp.irqline;
+                x68k_sys.mfp.current_irq = x;
                 // assert IRQ line
-//              if(sys.mfp.ierb & (1 << x))
+//              if(x68k_sys.mfp.ierb & (1 << x))
                 {
-                    current_vector[6] = (sys.mfp.vr & 0xf0) | x;
-                    cpu_set_input_line_and_vector(machine->cpu[0],sys.mfp.irqline,ASSERT_LINE,(sys.mfp.vr & 0xf0) | x);
-//                  logerror("MFP: Sent IRQ vector 0x%02x (IRQ line %i)\n",(sys.mfp.vr & 0xf0) | x,sys.mfp.irqline);
+                    current_vector[6] = (x68k_sys.mfp.vr & 0xf0) | x;
+                    cpu_set_input_line_and_vector(machine->cpu[0],x68k_sys.mfp.irqline,ASSERT_LINE,(x68k_sys.mfp.vr & 0xf0) | x);
+//                  logerror("MFP: Sent IRQ vector 0x%02x (IRQ line %i)\n",(x68k_sys.mfp.vr & 0xf0) | x,x68k_sys.mfp.irqline);
                     return;  // one at a time only
                 }
             }
@@ -248,20 +248,20 @@ void mfp_trigger_irq(int irq)
     // check if interrupt is enabled
     if(irq > 7)
     {
-        if(!(sys.mfp.iera & (1 << (irq-8))))
+        if(!(x68k_sys.mfp.iera & (1 << (irq-8))))
             return;  // not enabled, no action taken
     }
     else
     {
-        if(!(sys.mfp.ierb & (1 << irq)))
+        if(!(x68k_sys.mfp.ierb & (1 << irq)))
             return;  // not enabled, no action taken
     }
 
     // set requested IRQ as pending
     if(irq > 7)
-        sys.mfp.ipra |= (1 << (irq-8));
+        x68k_sys.mfp.ipra |= (1 << (irq-8));
     else
-        sys.mfp.iprb |= (1 << irq);
+        x68k_sys.mfp.iprb |= (1 << irq);
 
     // check for IRQs to be called
 //  mfp_update_irq(0);
@@ -270,40 +270,40 @@ void mfp_trigger_irq(int irq)
 
 TIMER_CALLBACK(mfp_timer_a_callback)
 {
-    sys.mfp.timer[0].counter--;
-    if(sys.mfp.timer[0].counter == 0)
+    x68k_sys.mfp.timer[0].counter--;
+    if(x68k_sys.mfp.timer[0].counter == 0)
     {
-        sys.mfp.timer[0].counter = sys.mfp.tadr;
+        x68k_sys.mfp.timer[0].counter = x68k_sys.mfp.tadr;
         mfp_trigger_irq(MFP_IRQ_TIMERA);
     }
 }
 
 TIMER_CALLBACK(mfp_timer_b_callback)
 {
-    sys.mfp.timer[1].counter--;
-    if(sys.mfp.timer[1].counter == 0)
+    x68k_sys.mfp.timer[1].counter--;
+    if(x68k_sys.mfp.timer[1].counter == 0)
     {
-        sys.mfp.timer[1].counter = sys.mfp.tbdr;
+        x68k_sys.mfp.timer[1].counter = x68k_sys.mfp.tbdr;
             mfp_trigger_irq(MFP_IRQ_TIMERB);
     }
 }
 
 TIMER_CALLBACK(mfp_timer_c_callback)
 {
-    sys.mfp.timer[2].counter--;
-    if(sys.mfp.timer[2].counter == 0)
+    x68k_sys.mfp.timer[2].counter--;
+    if(x68k_sys.mfp.timer[2].counter == 0)
     {
-        sys.mfp.timer[2].counter = sys.mfp.tcdr;
+        x68k_sys.mfp.timer[2].counter = x68k_sys.mfp.tcdr;
             mfp_trigger_irq(MFP_IRQ_TIMERC);
     }
 }
 
 TIMER_CALLBACK(mfp_timer_d_callback)
 {
-    sys.mfp.timer[3].counter--;
-    if(sys.mfp.timer[3].counter == 0)
+    x68k_sys.mfp.timer[3].counter--;
+    if(x68k_sys.mfp.timer[3].counter == 0)
     {
-        sys.mfp.timer[3].counter = sys.mfp.tddr;
+        x68k_sys.mfp.timer[3].counter = x68k_sys.mfp.tddr;
             mfp_trigger_irq(MFP_IRQ_TIMERD);
     }
 }
@@ -334,7 +334,7 @@ static TIMER_CALLBACK( x68k_led_callback )
 	if(led_state == 1)
 	{
 		for(drive=0;drive<4;drive++)
-			output_set_indexed_value("ctrl_drv",drive,sys.fdc.led_ctrl[drive] ? 0 : 1);
+			output_set_indexed_value("ctrl_drv",drive,x68k_sys.fdc.led_ctrl[drive] ? 0 : 1);
 	}
 	else
 	{
@@ -410,19 +410,19 @@ static void x68k_keyboard_ctrl_w(int data)
 
 	if((data & 0xf8) == 0x48)  // Keyboard enable
 	{
-		sys.keyboard.enabled = data & 0x01;
-		logerror("KB: Keyboard enable bit = %i\n",sys.keyboard.enabled);
+		x68k_sys.keyboard.enabled = data & 0x01;
+		logerror("KB: Keyboard enable bit = %i\n",x68k_sys.keyboard.enabled);
 	}
 
 	if((data & 0xf0) == 0x60)  // Key delay time
 	{
-		sys.keyboard.delay = data & 0x0f;
+		x68k_sys.keyboard.delay = data & 0x0f;
 		logerror("KB: Keypress delay time is now %ims\n",(data & 0x0f)*100+200);
 	}
 
 	if((data & 0xf0) == 0x70)  // Key repeat rate
 	{
-		sys.keyboard.repeat = data & 0x0f;
+		x68k_sys.keyboard.repeat = data & 0x0f;
 		logerror("KB: Keypress repeat rate is now %ims\n",((data & 0x0f)^2)*5+30);
 	}
 
@@ -431,13 +431,13 @@ static void x68k_keyboard_ctrl_w(int data)
 int x68k_keyboard_pop_scancode(void)
 {
 	int ret;
-	if(sys.keyboard.keynum == 0)  // no scancodes in USART buffer
+	if(x68k_sys.keyboard.keynum == 0)  // no scancodes in USART buffer
 		return 0x00;
 
-	sys.keyboard.keynum--;
-	ret = sys.keyboard.buffer[sys.keyboard.tailpos++];
-	if(sys.keyboard.tailpos > 15)
-		sys.keyboard.tailpos = 0;
+	x68k_sys.keyboard.keynum--;
+	ret = x68k_sys.keyboard.buffer[x68k_sys.keyboard.tailpos++];
+	if(x68k_sys.keyboard.tailpos > 15)
+		x68k_sys.keyboard.tailpos = 0;
 
 	logerror("MFP: Keyboard buffer pop 0x%02x\n",ret);
 	return ret;
@@ -445,12 +445,12 @@ int x68k_keyboard_pop_scancode(void)
 
 static void x68k_keyboard_push_scancode(running_machine* machine,unsigned char code)
 {
-	sys.keyboard.keynum++;
-	if(sys.keyboard.keynum >= 1)
+	x68k_sys.keyboard.keynum++;
+	if(x68k_sys.keyboard.keynum >= 1)
 	{ // keyboard buffer full
-		if(sys.keyboard.enabled != 0)
+		if(x68k_sys.keyboard.enabled != 0)
 		{
-			sys.mfp.rsr |= 0x80;  // Buffer full
+			x68k_sys.mfp.rsr |= 0x80;  // Buffer full
 //          mfp_trigger_irq(MFP_IRQ_RX_FULL);
 			if(input_port_read(machine,"options") & 0x01)
 			{
@@ -460,10 +460,10 @@ static void x68k_keyboard_push_scancode(running_machine* machine,unsigned char c
 			}
 		}
 	}
-	sys.keyboard.buffer[sys.keyboard.headpos++] = code;
-	if(sys.keyboard.headpos > 15)
+	x68k_sys.keyboard.buffer[x68k_sys.keyboard.headpos++] = code;
+	if(x68k_sys.keyboard.headpos > 15)
 	{
-		sys.keyboard.headpos = 0;
+		x68k_sys.keyboard.headpos = 0;
 //      mfp_trigger_irq(MFP_IRQ_RX_ERROR);
 		current_vector[6] = 0x4b;
 //		cpu_set_input_line_and_vector(machine->cpu[0],6,ASSERT_LINE,0x4b);
@@ -478,39 +478,39 @@ static TIMER_CALLBACK(x68k_keyboard_poll)
 	for(x=0;x<0x80;x++)
 	{
 		// adjust delay/repeat timers
-		if(sys.keyboard.keytime[x] > 0)
+		if(x68k_sys.keyboard.keytime[x] > 0)
 		{
-			sys.keyboard.keytime[x] -= 5;
+			x68k_sys.keyboard.keytime[x] -= 5;
 		}
 		if(!(input_port_read(machine, keynames[x / 32]) & (1 << (x % 32))))
 		{
-			if(sys.keyboard.keyon[x] != 0)
+			if(x68k_sys.keyboard.keyon[x] != 0)
 			{
 				x68k_keyboard_push_scancode(machine,0x80 + x);
-				sys.keyboard.keytime[x] = 0;
-				sys.keyboard.keyon[x] = 0;
-				sys.keyboard.last_pressed = 0;
+				x68k_sys.keyboard.keytime[x] = 0;
+				x68k_sys.keyboard.keyon[x] = 0;
+				x68k_sys.keyboard.last_pressed = 0;
 				logerror("KB: Released key 0x%02x\n",x);
 			}
 		}
 		// check to see if a key is being held
-		if(sys.keyboard.keyon[x] != 0 && sys.keyboard.keytime[x] == 0 && sys.keyboard.last_pressed == x)
+		if(x68k_sys.keyboard.keyon[x] != 0 && x68k_sys.keyboard.keytime[x] == 0 && x68k_sys.keyboard.last_pressed == x)
 		{
-			if(input_port_read(machine, keynames[sys.keyboard.last_pressed / 32]) & (1 << (sys.keyboard.last_pressed % 32)))
+			if(input_port_read(machine, keynames[x68k_sys.keyboard.last_pressed / 32]) & (1 << (x68k_sys.keyboard.last_pressed % 32)))
 			{
-				x68k_keyboard_push_scancode(machine,sys.keyboard.last_pressed);
-				sys.keyboard.keytime[sys.keyboard.last_pressed] = (sys.keyboard.repeat^2)*5+30;
-				logerror("KB: Holding key 0x%02x\n",sys.keyboard.last_pressed);
+				x68k_keyboard_push_scancode(machine,x68k_sys.keyboard.last_pressed);
+				x68k_sys.keyboard.keytime[x68k_sys.keyboard.last_pressed] = (x68k_sys.keyboard.repeat^2)*5+30;
+				logerror("KB: Holding key 0x%02x\n",x68k_sys.keyboard.last_pressed);
 			}
 		}
 		if((input_port_read(machine,  keynames[x / 32]) & (1 << (x % 32))))
 		{
-			if(sys.keyboard.keyon[x] == 0)
+			if(x68k_sys.keyboard.keyon[x] == 0)
 			{
 				x68k_keyboard_push_scancode(machine,x);
-				sys.keyboard.keytime[x] = sys.keyboard.delay * 100 + 200;
-				sys.keyboard.keyon[x] = 1;
-				sys.keyboard.last_pressed = x;
+				x68k_sys.keyboard.keytime[x] = x68k_sys.keyboard.delay * 100 + 200;
+				x68k_sys.keyboard.keyon[x] = 1;
+				x68k_sys.keyboard.last_pressed = x;
 				logerror("KB: Pushed key 0x%02x\n",x);
 			}
 		}
@@ -521,10 +521,10 @@ static TIMER_CALLBACK(x68k_keyboard_poll)
 #ifdef UNUSED_FUNCTION
 void mfp_recv_data(int data)
 {
-	sys.mfp.rsr |= 0x80;  // Buffer full
-	sys.mfp.tsr |= 0x80;
-	sys.mfp.usart.recv_buffer = 0x00;   // TODO: set up keyboard data
-	sys.mfp.vector = current_vector[6] = (sys.mfp.vr & 0xf0) | 0x0c;
+	x68k_sys.mfp.rsr |= 0x80;  // Buffer full
+	x68k_sys.mfp.tsr |= 0x80;
+	x68k_sys.mfp.usart.recv_buffer = 0x00;   // TODO: set up keyboard data
+	x68k_sys.mfp.vector = current_vector[6] = (x68k_sys.mfp.vr & 0xf0) | 0x0c;
 //  mfp_trigger_irq(MFP_IRQ_RX_FULL);
 //  logerror("MFP: Receive buffer full IRQ sent\n");
 }
@@ -542,28 +542,28 @@ static int x68k_read_mouse(running_machine *machine)
 	if(!(scc_get_reg_b(scc,5) & 0x02))
 		return 0xff;
 
-	switch(sys.mouse.inputtype)
+	switch(x68k_sys.mouse.inputtype)
 	{
 	case 0:
 		ipt = input_port_read(machine, "mouse1");
 		break;
 	case 1:
 		val = input_port_read(machine, "mouse2");
-		ipt = val - sys.mouse.last_mouse_x;
-		sys.mouse.last_mouse_x = val;
+		ipt = val - x68k_sys.mouse.last_mouse_x;
+		x68k_sys.mouse.last_mouse_x = val;
 		break;
 	case 2:
 		val = input_port_read(machine, "mouse3");
-		ipt = val - sys.mouse.last_mouse_y;
-		sys.mouse.last_mouse_y = val;
+		ipt = val - x68k_sys.mouse.last_mouse_y;
+		x68k_sys.mouse.last_mouse_y = val;
 		break;
 	}
-	sys.mouse.inputtype++;
-	if(sys.mouse.inputtype > 2)
+	x68k_sys.mouse.inputtype++;
+	if(x68k_sys.mouse.inputtype > 2)
 	{
 		int val = scc_get_reg_b(scc, 0);
-		sys.mouse.inputtype = 0;
-		sys.mouse.bufferempty = 1;
+		x68k_sys.mouse.inputtype = 0;
+		x68k_sys.mouse.bufferempty = 1;
 		val &= ~0x01;
 		scc_set_reg_b(scc, 0, val);
 		logerror("SCC: mouse buffer empty\n");
@@ -612,7 +612,7 @@ static WRITE16_HANDLER( x68k_scc_w )
 			if(scc_get_reg_b(scc, 5) & 0x02)  // Request to Send
 			{
 				int val = scc_get_reg_b(scc, 0);
-				sys.mouse.bufferempty = 0;
+				x68k_sys.mouse.bufferempty = 0;
 				val |= 0x01;
 				scc_set_reg_b(scc, 0,val);
 			}
@@ -634,10 +634,10 @@ static WRITE16_HANDLER( x68k_scc_w )
 static TIMER_CALLBACK(x68k_scc_ack)
 {
 	const device_config *scc = devtag_get_device(machine, SCC8530, "scc");
-	if(sys.mouse.bufferempty != 0)  // nothing to do if the mouse data buffer is empty
+	if(x68k_sys.mouse.bufferempty != 0)  // nothing to do if the mouse data buffer is empty
 		return;
 
-//	if((sys.ioc.irqstatus & 0xc0) != 0)
+//	if((x68k_sys.ioc.irqstatus & 0xc0) != 0)
 //		return;
 
 	// hard-code the IRQ vector for now, until the SCC code is more complete
@@ -647,7 +647,7 @@ static TIMER_CALLBACK(x68k_scc_ack)
 		{
 			if(scc_get_reg_b(scc, 5) & 0x02)  // RTS signal
 			{
-				sys.mouse.irqactive = 1;
+				x68k_sys.mouse.irqactive = 1;
 				current_vector[5] = 0x54;
 				current_irq_line = 5;
 				cpu_set_input_line_and_vector(machine->cpu[0],5,ASSERT_LINE,0x54);
@@ -661,7 +661,7 @@ static void x68k_set_adpcm(running_machine* machine)
 	const device_config *dev = devtag_get_device(machine, HD63450, "hd63450");
 	UINT32 rate = 0;
 
-	switch(sys.adpcm.rate & 0x0c)
+	switch(x68k_sys.adpcm.rate & 0x0c)
 	{
 		case 0x00:
 			rate = 7812/2;
@@ -676,7 +676,7 @@ static void x68k_set_adpcm(running_machine* machine)
 			logerror("PPI: Invalid ADPCM sample rate set.\n");
 			rate = 15625/2;
 	}
-	if(sys.adpcm.clock != 0)
+	if(x68k_sys.adpcm.clock != 0)
 		rate = rate/2;
 	hd63450_set_timer(dev,3,ATTOTIME_IN_HZ(rate));
 }
@@ -686,7 +686,7 @@ static void x68k_set_adpcm(running_machine* machine)
 static READ8_DEVICE_HANDLER( ppi_port_a_r )
 {
 	// Joystick 1
-	if(sys.joy.joy1_enable == 0)
+	if(x68k_sys.joy.joy1_enable == 0)
 		return input_port_read(device->machine, "joy1");
 	else
 		return 0xff;
@@ -695,7 +695,7 @@ static READ8_DEVICE_HANDLER( ppi_port_a_r )
 static READ8_DEVICE_HANDLER( ppi_port_b_r )
 {
 	// Joystick 2
-	if(sys.joy.joy2_enable == 0)
+	if(x68k_sys.joy.joy2_enable == 0)
 		return input_port_read(device->machine, "joy2");
 	else
 		return 0xff;
@@ -719,15 +719,15 @@ static WRITE8_DEVICE_HANDLER( ppi_port_c_w )
 	// ADPCM / Joystick control
 	
 	ppi_port[2] = data;
-	sys.adpcm.pan = data & 0x03;
-	sys.adpcm.rate = data & 0x0c;
+	x68k_sys.adpcm.pan = data & 0x03;
+	x68k_sys.adpcm.rate = data & 0x0c;
 	x68k_set_adpcm(device->machine);
 	okim6258_set_divider(0, (data >> 2) & 3);
 
-	sys.joy.joy1_enable = data & 0x10;
-	sys.joy.joy2_enable = data & 0x20;
-	sys.joy.ioc6 = data & 0x40;
-	sys.joy.ioc7 = data & 0x80;
+	x68k_sys.joy.joy1_enable = data & 0x10;
+	x68k_sys.joy.joy2_enable = data & 0x20;
+	x68k_sys.joy.ioc6 = data & 0x40;
+	x68k_sys.joy.ioc7 = data & 0x80;
 }
 
 
@@ -748,8 +748,8 @@ static WRITE16_HANDLER( x68k_fdc_w )
 		{
 			if(x & (1 << drive))
 			{
-				sys.fdc.led_ctrl[drive] = data & 0x80;  // blinking drive LED if no disk inserted
-				sys.fdc.led_eject[drive] = data & 0x40;  // eject button LED (on when set to 0)
+				x68k_sys.fdc.led_ctrl[drive] = data & 0x80;  // blinking drive LED if no disk inserted
+				x68k_sys.fdc.led_eject[drive] = data & 0x40;  // eject button LED (on when set to 0)
 				output_set_indexed_value("eject_drv",drive,(data & 0x40) ? 1 : 0);
 				if(data & 0x20)  // ejects disk
 				{
@@ -758,12 +758,12 @@ static WRITE16_HANDLER( x68k_fdc_w )
 				}
 			}
 		}
-		sys.fdc.selected_drive = data & 0x0f;
+		x68k_sys.fdc.selected_drive = data & 0x0f;
 		logerror("FDC: signal control set to %02x\n",data);
 		break;
 	case 0x03:
-		sys.fdc.media_density[data & 0x03] = data & 0x10;
-		sys.fdc.motor[data & 0x03] = data & 0x80;
+		x68k_sys.fdc.media_density[data & 0x03] = data & 0x10;
+		x68k_sys.fdc.motor[data & 0x03] = data & 0x80;
 		floppy_drive_set_motor_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, data & 0x03), (data & 0x80));
 		if(data & 0x80)
 		{
@@ -821,10 +821,10 @@ static READ16_HANDLER( x68k_fdc_r )
 		ret = 0x00;
 		for(x=0;x<4;x++)
 		{
-			if(sys.fdc.selected_drive & (1 << x))
+			if(x68k_sys.fdc.selected_drive & (1 << x))
 			{
 				ret = 0x00;
-				if(sys.fdc.disk_inserted[x] != 0)
+				if(x68k_sys.fdc.disk_inserted[x] != 0)
 				{
 					ret |= 0x80;
 				}
@@ -845,10 +845,10 @@ static READ16_HANDLER( x68k_fdc_r )
 
 static NEC765_INTERRUPT( fdc_irq )
 {
-	if((sys.ioc.irqstatus & 0x04) && state == ASSERT_LINE)
+	if((x68k_sys.ioc.irqstatus & 0x04) && state == ASSERT_LINE)
 	{
-		current_vector[1] = sys.ioc.fdcvector;
-		sys.ioc.irqstatus |= 0x80;
+		current_vector[1] = x68k_sys.ioc.fdcvector;
+		x68k_sys.ioc.irqstatus |= 0x80;
 		current_irq_line = 1;
 		logerror("FDC: IRQ triggered\n");
 		cpu_set_input_line_and_vector(device->machine->cpu[0],1,ASSERT_LINE,current_vector[1]);
@@ -860,7 +860,7 @@ static int x68k_fdc_read_byte(running_machine *machine,int addr)
 	int data = -1;
 	device_config *fdc = (device_config*)devtag_get_device(machine, NEC72065, "nec72065");
 
-	if(sys.fdc.drq_state != 0)
+	if(x68k_sys.fdc.drq_state != 0)
 		data = nec765_dack_r(fdc, 0);
 //  logerror("FDC: DACK reading\n");
 	return data;
@@ -874,7 +874,7 @@ static void x68k_fdc_write_byte(running_machine *machine,int addr, int data)
 
 static NEC765_DMA_REQUEST ( fdc_drq )
 {
-	sys.fdc.drq_state = state;
+	x68k_sys.fdc.drq_state = state;
 }
 
 static WRITE16_HANDLER( x68k_fm_w )
@@ -907,7 +907,7 @@ static WRITE8_HANDLER( x68k_ct_w )
 	// CT1 - ADPCM clock - 0 = 8MHz, 1 = 4MHz
 	// CT2 - 1 = Set ready state of FDC
 	nec765_set_ready_state(fdc,data & 0x01);
-	sys.adpcm.clock = data & 0x02;
+	x68k_sys.adpcm.clock = data & 0x02;
 	x68k_set_adpcm(space->machine);
 	okim6258_set_clock(0, data & 0x02 ? 4000000 : 8000000);
 }
@@ -933,26 +933,26 @@ static WRITE16_HANDLER( x68k_ioc_w )
 	switch(offset)
 	{
 	case 0x00:
-		sys.ioc.irqstatus = data & 0x0f;
+		x68k_sys.ioc.irqstatus = data & 0x0f;
 		logerror("I/O: Status register write %02x\n",data);
 		break;
 	case 0x01:
 		switch(data & 0x03)
 		{
 		case 0x00:
-			sys.ioc.fdcvector = data & 0xfc;
+			x68k_sys.ioc.fdcvector = data & 0xfc;
 			logerror("IOC: FDC IRQ vector = 0x%02x\n",data & 0xfc);
 			break;
 		case 0x01:
-			sys.ioc.fddvector = data & 0xfc;
+			x68k_sys.ioc.fddvector = data & 0xfc;
 			logerror("IOC: FDD IRQ vector = 0x%02x\n",data & 0xfc);
 			break;
 		case 0x02:
-			sys.ioc.hdcvector = data & 0xfc;
+			x68k_sys.ioc.hdcvector = data & 0xfc;
 			logerror("IOC: HDD IRQ vector = 0x%02x\n",data & 0xfc);
 			break;
 		case 0x03:
-			sys.ioc.prnvector = data & 0xfc;
+			x68k_sys.ioc.prnvector = data & 0xfc;
 			logerror("IOC: Printer IRQ vector = 0x%02x\n",data & 0xfc);
 			break;
 		}
@@ -966,7 +966,7 @@ static READ16_HANDLER( x68k_ioc_r )
 	{
 	case 0x00:
 		logerror("I/O: Status register read\n");
-		return (sys.ioc.irqstatus & 0xdf) | 0x20;
+		return (x68k_sys.ioc.irqstatus & 0xdf) | 0x20;
 	default:
 		return 0x00;
 	}
@@ -997,17 +997,17 @@ static WRITE16_HANDLER( x68k_sysport_w )
 	switch(offset)
 	{
 	case 0x00:
-		sys.sysport.contrast = data & 0x0f;  // often used for screen fades / blanking
+		x68k_sys.sysport.contrast = data & 0x0f;  // often used for screen fades / blanking
 		// TODO: implement a decent, not slow, brightness control
 		break;
 	case 0x01:
-		sys.sysport.monitor = data & 0x08;
+		x68k_sys.sysport.monitor = data & 0x08;
 		break;
 	case 0x03:
-		sys.sysport.keyctrl = data & 0x08;  // bit 3 = enable keyboard data transmission
+		x68k_sys.sysport.keyctrl = data & 0x08;  // bit 3 = enable keyboard data transmission
 		break;
 	case 0x06:
-		sys.sysport.sram_writeprotect = data;
+		x68k_sys.sysport.sram_writeprotect = data;
 		break;
 	default:
 //      logerror("SYS: [%08x] Wrote %04x to invalid or unimplemented system port %04x\n",cpu_get_pc(space->cpu),data,offset);
@@ -1021,9 +1021,9 @@ static READ16_HANDLER( x68k_sysport_r )
 	switch(offset)
 	{
 	case 0x00:  // monitor contrast setting (bits3-0)
-		return sys.sysport.contrast;
+		return x68k_sys.sysport.contrast;
 	case 0x01:  // monitor control (bit3) / 3D Scope (bits1,0)
-		ret |= sys.sysport.monitor;
+		ret |= x68k_sys.sysport.monitor;
 		return ret;
 	case 0x03:  // bit 3 = key control (is 1 if keyboard is connected)
 		return 0x08;
@@ -1052,50 +1052,50 @@ READ16_HANDLER( x68k_mfp_r )
     {
 /*    case 0x00:  // GPIP - General purpose I/O register (read-only)
         ret = 0x23;
-        if(video_screen_get_vpos(machine->primary_screen) == sys.crtc.reg[9])
+        if(video_screen_get_vpos(machine->primary_screen) == x68k_sys.crtc.reg[9])
             ret |= 0x40;
-        if(sys.crtc.vblank == 0)
+        if(x68k_sys.crtc.vblank == 0)
             ret |= 0x10;  // Vsync signal (low if in vertical retrace)
-//      if(sys.mfp.isrb & 0x08)
+//      if(x68k_sys.mfp.isrb & 0x08)
 //          ret |= 0x08;  // FM IRQ signal
-        if(video_screen_get_hpos(machine->primary_screen) > sys.crtc.width - 32)
+        if(video_screen_get_hpos(machine->primary_screen) > x68k_sys.crtc.width - 32)
             ret |= 0x80;  // Hsync signal
 //      logerror("MFP: [%08x] Reading offset %i (ret=%02x)\n",cpu_get_pc(space->cpu),offset,ret);
         return ret;  // bit 5 is always 1
     case 3:
-        return sys.mfp.iera;
+        return x68k_sys.mfp.iera;
     case 4:
-        return sys.mfp.ierb;
+        return x68k_sys.mfp.ierb;
     case 5:
-        return sys.mfp.ipra;
+        return x68k_sys.mfp.ipra;
     case 6:
-        return sys.mfp.iprb;
+        return x68k_sys.mfp.iprb;
     case 7:
-        if(sys.mfp.eoi_mode == 0)  // forced low in auto EOI mode
+        if(x68k_sys.mfp.eoi_mode == 0)  // forced low in auto EOI mode
             return 0;
         else
-            return sys.mfp.isra;
+            return x68k_sys.mfp.isra;
     case 8:
-        if(sys.mfp.eoi_mode == 0)  // forced low in auto EOI mode
+        if(x68k_sys.mfp.eoi_mode == 0)  // forced low in auto EOI mode
             return 0;
         else
-            return sys.mfp.isrb;
+            return x68k_sys.mfp.isrb;
     case 9:
-        return sys.mfp.imra;
+        return x68k_sys.mfp.imra;
     case 10:
-        return sys.mfp.imrb;
+        return x68k_sys.mfp.imrb;
     case 15:  // TADR
-        return sys.mfp.timer[0].counter;  // Timer data registers return their main counter values
+        return x68k_sys.mfp.timer[0].counter;  // Timer data registers return their main counter values
     case 16:  // TBDR
-        return sys.mfp.timer[1].counter;
+        return x68k_sys.mfp.timer[1].counter;
     case 17:  // TCDR
-        return sys.mfp.timer[2].counter;
+        return x68k_sys.mfp.timer[2].counter;
     case 18:  // TDDR
-        return sys.mfp.timer[3].counter;*/
+        return x68k_sys.mfp.timer[3].counter;*/
     case 21:  // RSR
-        return sys.mfp.rsr;
+        return x68k_sys.mfp.rsr;
     case 22:  // TSR
-        return sys.mfp.tsr | 0x80;  // buffer is typically empty?
+        return x68k_sys.mfp.tsr | 0x80;  // buffer is typically empty?
     case 23:
         return x68k_keyboard_pop_scancode();
     default:
@@ -1132,97 +1132,97 @@ static WRITE16_HANDLER( x68k_mfp_w )
         // All bits are inputs generally, so no action taken.
         break;
     case 1:  // AER
-        sys.mfp.aer = data;
+        x68k_sys.mfp.aer = data;
         break;
     case 2:  // DDR
-        sys.mfp.ddr = data;  // usually all bits are 0 (input)
+        x68k_sys.mfp.ddr = data;  // usually all bits are 0 (input)
         break;
     case 3:  // IERA
-        sys.mfp.iera = data;
+        x68k_sys.mfp.iera = data;
         break;
     case 4:  // IERB
-        sys.mfp.ierb = data;
+        x68k_sys.mfp.ierb = data;
         break;
     case 5:  // IPRA
-        sys.mfp.ipra = data;
+        x68k_sys.mfp.ipra = data;
         break;
     case 6:  // IPRB
-        sys.mfp.iprb = data;
+        x68k_sys.mfp.iprb = data;
         break;
     case 7:
-        sys.mfp.isra = data;
+        x68k_sys.mfp.isra = data;
         break;
     case 8:
-        sys.mfp.isrb = data;
+        x68k_sys.mfp.isrb = data;
         break;
     case 9:
-        sys.mfp.imra = data;
+        x68k_sys.mfp.imra = data;
 //      mfp_update_irq(0);
 //      logerror("MFP: IRQ Mask A write: %02x\n",data);
         break;
     case 10:
-        sys.mfp.imrb = data;
+        x68k_sys.mfp.imrb = data;
 //      mfp_update_irq(0);
 //      logerror("MFP: IRQ Mask B write: %02x\n",data);
         break;
     case 11:  // VR
-        sys.mfp.vr = 0x40;//data;  // High 4 bits = high 4 bits of IRQ vector
-        sys.mfp.eoi_mode = data & 0x08;  // 0 = Auto, 1 = Software End-of-interrupt
-        if(sys.mfp.eoi_mode == 0)  // In-service registers are cleared if this bit is cleared.
+        x68k_sys.mfp.vr = 0x40;//data;  // High 4 bits = high 4 bits of IRQ vector
+        x68k_sys.mfp.eoi_mode = data & 0x08;  // 0 = Auto, 1 = Software End-of-interrupt
+        if(x68k_sys.mfp.eoi_mode == 0)  // In-service registers are cleared if this bit is cleared.
         {
-            sys.mfp.isra = 0;
-            sys.mfp.isrb = 0;
+            x68k_sys.mfp.isra = 0;
+            x68k_sys.mfp.isrb = 0;
         }
         break;
     case 12:  // TACR
-        sys.mfp.tacr = data;
+        x68k_sys.mfp.tacr = data;
         mfp_set_timer(0,data & 0x0f);
         break;
     case 13:  // TBCR
-        sys.mfp.tbcr = data;
+        x68k_sys.mfp.tbcr = data;
         mfp_set_timer(1,data & 0x0f);
         break;
     case 14:  // TCDCR
-        sys.mfp.tcdcr = data;
+        x68k_sys.mfp.tcdcr = data;
         mfp_set_timer(2,(data & 0x70)>>4);
         mfp_set_timer(3,data & 0x07);
         break;
     case 15:  // TADR
-        sys.mfp.tadr = data;
-        sys.mfp.timer[0].counter = data;
+        x68k_sys.mfp.tadr = data;
+        x68k_sys.mfp.timer[0].counter = data;
         break;
     case 16:  // TBDR
-        sys.mfp.tbdr = data;
-        sys.mfp.timer[1].counter = data;
+        x68k_sys.mfp.tbdr = data;
+        x68k_sys.mfp.timer[1].counter = data;
         break;
     case 17:  // TCDR
-        sys.mfp.tcdr = data;
-        sys.mfp.timer[2].counter = data;
+        x68k_sys.mfp.tcdr = data;
+        x68k_sys.mfp.timer[2].counter = data;
         break;
     case 18:  // TDDR
-        sys.mfp.tddr = data;
-        sys.mfp.timer[3].counter = data;
+        x68k_sys.mfp.tddr = data;
+        x68k_sys.mfp.timer[3].counter = data;
         break;
     case 20:
-        sys.mfp.ucr = data;
+        x68k_sys.mfp.ucr = data;
         break;*/
     case 21:
         if(data & 0x01)
-            sys.mfp.usart.recv_enable = 1;
+            x68k_sys.mfp.usart.recv_enable = 1;
         else
-            sys.mfp.usart.recv_enable = 0;
+            x68k_sys.mfp.usart.recv_enable = 0;
         break;
 	case 22:
 		if(data & 0x01)
-			sys.mfp.usart.send_enable = 1;
+			x68k_sys.mfp.usart.send_enable = 1;
 		else
-			sys.mfp.usart.send_enable = 0;
+			x68k_sys.mfp.usart.send_enable = 0;
 		break;
 	case 23:
-		if(sys.mfp.usart.send_enable != 0)
+		if(x68k_sys.mfp.usart.send_enable != 0)
 		{
 			// Keyboard control command.
-			sys.mfp.usart.send_buffer = data;
+			x68k_sys.mfp.usart.send_buffer = data;
 			x68k_keyboard_ctrl_w(data);
 //          logerror("MFP: [%08x] USART Sent data %04x\n",cpu_get_pc(space->cpu),data);
 		}
@@ -1256,16 +1256,16 @@ static WRITE16_DEVICE_HANDLER( x68k_rtc_w )
 
 static void x68k_rtc_alarm_irq(int state)
 {
-	if(sys.mfp.aer & 0x01)
+	if(x68k_sys.mfp.aer & 0x01)
 	{
 		if(state == 1)
-			sys.mfp.gpio |= 0x01;
+			x68k_sys.mfp.gpio |= 0x01;
 			//mfp_trigger_irq(MFP_IRQ_GPIP0);  // RTC ALARM
 	}
 	else
 	{
 		if(state == 0)
-			sys.mfp.gpio &= ~0x01;
+			x68k_sys.mfp.gpio &= ~0x01;
 			//mfp_trigger_irq(MFP_IRQ_GPIP0);  // RTC ALARM
 	}
 }
@@ -1273,7 +1273,7 @@ static void x68k_rtc_alarm_irq(int state)
 
 static WRITE16_HANDLER( x68k_sram_w )
 {
-	if(sys.sysport.sram_writeprotect == 0x31)
+	if(x68k_sys.sysport.sram_writeprotect == 0x31)
 	{
 		COMBINE_DATA(generic_nvram16+offset);
 	}
@@ -1300,16 +1300,16 @@ static WRITE16_HANDLER( x68k_vid_w )
 	int val;
 	if(offset < 0x100)  // Graphic layer palette
 	{
-		COMBINE_DATA(sys.video.gfx_pal+offset);
-		val = sys.video.gfx_pal[offset];
+		COMBINE_DATA(x68k_sys.video.gfx_pal+offset);
+		val = x68k_sys.video.gfx_pal[offset];
 		palette_set_color_rgb(space->machine,offset,(val & 0x07c0) >> 3,(val & 0xf800) >> 8,(val & 0x003e) << 2);
 		return;
 	}
 
 	if(offset >= 0x100 && offset < 0x200)  // Text / Sprites / Tilemap palette
 	{
-		COMBINE_DATA(sys.video.text_pal+(offset-0x100));
-		val = sys.video.text_pal[offset-0x100];
+		COMBINE_DATA(x68k_sys.video.text_pal+(offset-0x100));
+		val = x68k_sys.video.text_pal[offset-0x100];
 		palette_set_color_rgb(space->machine,offset,(val & 0x07c0) >> 3,(val & 0xf800) >> 8,(val & 0x003e) << 2);
 		return;
 	}
@@ -1317,32 +1317,32 @@ static WRITE16_HANDLER( x68k_vid_w )
 	switch(offset)
 	{
 	case 0x200:
-		COMBINE_DATA(sys.video.reg);
+		COMBINE_DATA(x68k_sys.video.reg);
 		break;
 	case 0x280:  // priority levels
-		COMBINE_DATA(sys.video.reg+1);
+		COMBINE_DATA(x68k_sys.video.reg+1);
 		if(ACCESSING_BITS_0_7)
 		{
-			sys.video.gfxlayer_pri[0] = data & 0x0003;
-			sys.video.gfxlayer_pri[1] = (data & 0x000c) >> 2;
-			sys.video.gfxlayer_pri[2] = (data & 0x0030) >> 4;
-			sys.video.gfxlayer_pri[3] = (data & 0x00c0) >> 6;
+			x68k_sys.video.gfxlayer_pri[0] = data & 0x0003;
+			x68k_sys.video.gfxlayer_pri[1] = (data & 0x000c) >> 2;
+			x68k_sys.video.gfxlayer_pri[2] = (data & 0x0030) >> 4;
+			x68k_sys.video.gfxlayer_pri[3] = (data & 0x00c0) >> 6;
 		}
 		if(ACCESSING_BITS_8_15)
 		{
-			sys.video.gfx_pri = (data & 0x0300) >> 8;
-			sys.video.text_pri = (data & 0x0c00) >> 10;
-			sys.video.sprite_pri = (data & 0x3000) >> 12;
-			if(sys.video.gfx_pri == 3)
-				sys.video.gfx_pri--;
-			if(sys.video.text_pri == 3)
-				sys.video.text_pri--;
-			if(sys.video.sprite_pri == 3)
-				sys.video.sprite_pri--;
+			x68k_sys.video.gfx_pri = (data & 0x0300) >> 8;
+			x68k_sys.video.text_pri = (data & 0x0c00) >> 10;
+			x68k_sys.video.sprite_pri = (data & 0x3000) >> 12;
+			if(x68k_sys.video.gfx_pri == 3)
+				x68k_sys.video.gfx_pri--;
+			if(x68k_sys.video.text_pri == 3)
+				x68k_sys.video.text_pri--;
+			if(x68k_sys.video.sprite_pri == 3)
+				x68k_sys.video.sprite_pri--;
 		}
 		break;
 	case 0x300:
-		COMBINE_DATA(sys.video.reg+2);
+		COMBINE_DATA(x68k_sys.video.reg+2);
 		break;
 	default:
 		logerror("VC: Invalid video controller write (offset = 0x%04x, data = %04x)\n",offset,data);
@@ -1352,19 +1352,19 @@ static WRITE16_HANDLER( x68k_vid_w )
 static READ16_HANDLER( x68k_vid_r )
 {
 	if(offset < 0x100)
-		return sys.video.gfx_pal[offset];
+		return x68k_sys.video.gfx_pal[offset];
 
 	if(offset >= 0x100 && offset < 0x200)
-		return sys.video.text_pal[offset-0x100];
+		return x68k_sys.video.text_pal[offset-0x100];
 
 	switch(offset)
 	{
 	case 0x200:
-		return sys.video.reg[0];
+		return x68k_sys.video.reg[0];
 	case 0x280:
-		return sys.video.reg[1];
+		return x68k_sys.video.reg[1];
 	case 0x300:
-		return sys.video.reg[2];
+		return x68k_sys.video.reg[2];
 	default:
 		logerror("VC: Invalid video controller read (offset = 0x%04x)\n",offset);
 	}
@@ -1514,23 +1514,23 @@ static void x68k_fm_irq(running_machine *machine, int irq)
 {
 	if(irq == CLEAR_LINE)
 	{
-		sys.mfp.gpio |= 0x08;
+		x68k_sys.mfp.gpio |= 0x08;
 	}
 	else
 	{
-		sys.mfp.gpio &= ~0x08;
+		x68k_sys.mfp.gpio &= ~0x08;
 	}
 }
 
 static MC68901_GPIO_READ( mfp_gpio_r )
 {
-	UINT8 data = sys.mfp.gpio;
+	UINT8 data = x68k_sys.mfp.gpio;
 
-	data &= ~(sys.crtc.hblank << 7);
-	data &= ~(sys.crtc.vblank << 4);
+	data &= ~(x68k_sys.crtc.hblank << 7);
+	data &= ~(x68k_sys.crtc.vblank << 4);
 	data |= 0x23;  // GPIP5 is unused, always 1
 
-//	mc68901_tai_w(mfp, sys.crtc.vblank);
+//	mc68901_tai_w(mfp, x68k_sys.crtc.vblank);
 
 	return data;
 }
@@ -1540,7 +1540,7 @@ static MC68901_ON_IRQ_CHANGED( mfp_irq_callback )
 	static int prev;
 	if(prev == CLEAR_LINE && level == CLEAR_LINE)  // eliminate unnecessary calls to set the IRQ line for speed reasons
 		return;
-//	if((sys.ioc.irqstatus & 0xc0) != 0)  // if the FDC is busy, then we don't want to miss that IRQ
+//	if((x68k_sys.ioc.irqstatus & 0xc0) != 0)  // if the FDC is busy, then we don't want to miss that IRQ
 //		return;
 	cpu_set_input_line(device->machine->cpu[0], 6, level);
 	current_vector[6] = 0;
@@ -1549,18 +1549,18 @@ static MC68901_ON_IRQ_CHANGED( mfp_irq_callback )
 
 static INTERRUPT_GEN( x68k_vsync_irq )
 {
-//  if(sys.mfp.ierb & 0x40)
+//  if(x68k_sys.mfp.ierb & 0x40)
 //  {
-//      sys.mfp.isrb |= 0x40;
-//      current_vector[6] = (sys.mfp.vr & 0xf0) | 0x06;  // GPIP4 (V-DISP)
+//      x68k_sys.mfp.isrb |= 0x40;
+//      current_vector[6] = (x68k_sys.mfp.vr & 0xf0) | 0x06;  // GPIP4 (V-DISP)
 //      current_irq_line = 6;
 //  mfp_timer_a_callback(0);  // Timer A is usually always in event count mode, and is tied to V-DISP
 //  mfp_trigger_irq(MFP_IRQ_GPIP4);
 //  }
-//  if(sys.crtc.height == 256)
-//      video_screen_update_partial(machine->primary_screen,256);//sys.crtc.reg[4]/2);
+//  if(x68k_sys.crtc.height == 256)
+//      video_screen_update_partial(machine->primary_screen,256);//x68k_sys.crtc.reg[4]/2);
 //  else
-//      video_screen_update_partial(machine->primary_screen,512);//sys.crtc.reg[4]);
+//      video_screen_update_partial(machine->primary_screen,512);//x68k_sys.crtc.reg[4]);
 }
 
 static IRQ_CALLBACK(x68k_int_ack)
@@ -1569,7 +1569,7 @@ static IRQ_CALLBACK(x68k_int_ack)
 
 	if(irqline == 6)  // MFP
 	{
-		sys.mfp.current_irq = -1;
+		x68k_sys.mfp.current_irq = -1;
 		if(current_vector[6] != 0x4b && current_vector[6] != 0x4c)
 			current_vector[6] = mc68901_get_vector(x68k_mfp);
 		else
@@ -1581,11 +1581,11 @@ static IRQ_CALLBACK(x68k_int_ack)
 	cpu_set_input_line_and_vector(device->machine->cpu[0],irqline,CLEAR_LINE,current_vector[irqline]);
 	if(irqline == 1)  // IOSC
 	{
-		sys.ioc.irqstatus &= ~0xf0;
+		x68k_sys.ioc.irqstatus &= ~0xf0;
 	}
 	if(irqline == 5)  // SCC
 	{
-		sys.mouse.irqactive = 0;
+		x68k_sys.mouse.irqactive = 0;
 	}
 
 	logerror("SYS: IRQ acknowledged (vector=0x%02x, line = %i)\n",current_vector[irqline],irqline);
@@ -1595,8 +1595,8 @@ static IRQ_CALLBACK(x68k_int_ack)
 static ADDRESS_MAP_START(x68k_map, ADDRESS_SPACE_PROGRAM, 16)
 //  AM_RANGE(0x000000, 0xbfffff) AM_RAMBANK(1)
 	AM_RANGE(0xbffffc, 0xbfffff) AM_READWRITE(x68k_rom0_r, x68k_rom0_w)
-//  AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(x68k_gvram_r, x68k_gvram_w) AM_BASE(&gvram)
-//  AM_RANGE(0xe00000, 0xe7ffff) AM_READWRITE(x68k_tvram_r, x68k_tvram_w) AM_BASE(&tvram)
+//  AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(x68k_gvram_r, x68k_gvram_w) AM_BASE(&x68k_gvram)
+//  AM_RANGE(0xe00000, 0xe7ffff) AM_READWRITE(x68k_tvram_r, x68k_tvram_w) AM_BASE(&x68k_tvram)
 	AM_RANGE(0xc00000, 0xdfffff) AM_RAMBANK(2)
 	AM_RANGE(0xe00000, 0xe7ffff) AM_RAMBANK(3)
 	AM_RANGE(0xe80000, 0xe81fff) AM_READWRITE(x68k_crtc_r, x68k_crtc_w)
@@ -1620,7 +1620,7 @@ static ADDRESS_MAP_START(x68k_map, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0xeb0000, 0xeb7fff) AM_READWRITE(x68k_spritereg_r, x68k_spritereg_w)
 	AM_RANGE(0xeb8000, 0xebffff) AM_READWRITE(x68k_spriteram_r, x68k_spriteram_w)
 	AM_RANGE(0xec0000, 0xecffff) AM_NOP  // User I/O
-//  AM_RANGE(0xed0000, 0xed3fff) AM_READWRITE(x68k_sram_r, x68k_sram_w) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+//  AM_RANGE(0xed0000, 0xed3fff) AM_READWRITE(sram_r, sram_w) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0xed0000, 0xed3fff) AM_RAMBANK(4) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0xed4000, 0xefffff) AM_NOP
 	AM_RANGE(0xf00000, 0xffffff) AM_ROM
@@ -1927,15 +1927,15 @@ static DEVICE_IMAGE_LOAD( x68k_floppy )
 			dimdsk_set_geometry(image);
 		else
 			basicdsk_set_geometry(image, 77, 2, 8, 1024, 0x01, 0, FALSE);
-		if(sys.ioc.irqstatus & 0x02)
+		if(x68k_sys.ioc.irqstatus & 0x02)
 		{
 			current_vector[1] = 0x61;
-			sys.ioc.irqstatus |= 0x40;
+			x68k_sys.ioc.irqstatus |= 0x40;
 			current_irq_line = 1;
 			cpu_set_input_line_and_vector(image->machine->cpu[0],1,ASSERT_LINE,current_vector[1]);  // Disk insert/eject interrupt
 			logerror("IOC: Disk image inserted\n");
 		}
-		sys.fdc.disk_inserted[image_index_in_device(image)] = 1;
+		x68k_sys.fdc.disk_inserted[image_index_in_device(image)] = 1;
 		return INIT_PASS;
 	}
 
@@ -1944,14 +1944,14 @@ static DEVICE_IMAGE_LOAD( x68k_floppy )
 
 static DEVICE_IMAGE_UNLOAD( x68k_floppy )
 {
-	if(sys.ioc.irqstatus & 0x02)
+	if(x68k_sys.ioc.irqstatus & 0x02)
 	{
 		current_vector[1] = 0x61;
-		sys.ioc.irqstatus |= 0x40;
+		x68k_sys.ioc.irqstatus |= 0x40;
 		current_irq_line = 1;
 		cpu_set_input_line_and_vector(image->machine->cpu[0],1,ASSERT_LINE,current_vector[1]);  // Disk insert/eject interrupt
 	}
-	sys.fdc.disk_inserted[image_index_in_device(image)] = 0;
+	x68k_sys.fdc.disk_inserted[image_index_in_device(image)] = 0;
 }
 
 static void x68k_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
@@ -1999,42 +1999,42 @@ static MACHINE_RESET( x68000 )
 	memcpy(mess_ram,romdata,8);
 
 	// init keyboard
-	sys.keyboard.delay = 500;  // 3*100+200
-	sys.keyboard.repeat = 110;  // 4^2*5+30
+	x68k_sys.keyboard.delay = 500;  // 3*100+200
+	x68k_sys.keyboard.repeat = 110;  // 4^2*5+30
 
 	// check for disks
 	for(drive=0;drive<4;drive++)
 	{
 		if(image_exists(image_from_devtype_and_index(machine, IO_FLOPPY,drive)))
-			sys.fdc.disk_inserted[drive] = 1;
+			x68k_sys.fdc.disk_inserted[drive] = 1;
 		else
-			sys.fdc.disk_inserted[drive] = 0;
+			x68k_sys.fdc.disk_inserted[drive] = 0;
 	}
 
 	// initialise CRTC, set registers to defaults for the standard text mode (768x512)
-	sys.crtc.reg[0] = 137;  // Horizontal total  (in characters)
-	sys.crtc.reg[1] = 14;   // Horizontal sync end
-	sys.crtc.reg[2] = 28;   // Horizontal start
-	sys.crtc.reg[3] = 124;  // Horizontal end
-	sys.crtc.reg[4] = 567;  // Vertical total
-	sys.crtc.reg[5] = 5;    // Vertical sync end
-	sys.crtc.reg[6] = 40;   // Vertical start
-	sys.crtc.reg[7] = 552;  // Vertical end
-	sys.crtc.reg[8] = 27;   // Horizontal adjust
+	x68k_sys.crtc.reg[0] = 137;  // Horizontal total  (in characters)
+	x68k_sys.crtc.reg[1] = 14;   // Horizontal sync end
+	x68k_sys.crtc.reg[2] = 28;   // Horizontal start
+	x68k_sys.crtc.reg[3] = 124;  // Horizontal end
+	x68k_sys.crtc.reg[4] = 567;  // Vertical total
+	x68k_sys.crtc.reg[5] = 5;    // Vertical sync end
+	x68k_sys.crtc.reg[6] = 40;   // Vertical start
+	x68k_sys.crtc.reg[7] = 552;  // Vertical end
+	x68k_sys.crtc.reg[8] = 27;   // Horizontal adjust
 
 	mfp_init();
 
-	x68k_scanline = video_screen_get_vpos(machine->primary_screen);// = sys.crtc.reg[6];  // Vertical start
+	x68k_scanline = video_screen_get_vpos(machine->primary_screen);// = x68k_sys.crtc.reg[6];  // Vertical start
 
 	// start VBlank timer
-	sys.crtc.vblank = 1;
-	irq_time = video_screen_get_time_until_pos(machine->primary_screen,sys.crtc.reg[6],2);
-	timer_adjust_oneshot(vblank_irq, irq_time, 0);
+	x68k_sys.crtc.vblank = 1;
+	irq_time = video_screen_get_time_until_pos(machine->primary_screen,x68k_sys.crtc.reg[6],2);
+	timer_adjust_oneshot(x68k_vblank_irq, irq_time, 0);
 
 	// start HBlank timer
-	timer_adjust_oneshot(scanline_timer, video_screen_get_scan_period(machine->primary_screen), 1);
+	timer_adjust_oneshot(x68k_scanline_timer, video_screen_get_scan_period(machine->primary_screen), 1);
 
-	sys.mfp.gpio = 0xfb;
+	x68k_sys.mfp.gpio = 0xfb;
 
 	// reset output values
 	output_set_value("key_led_kana",1);
@@ -2065,10 +2065,10 @@ static MACHINE_START( x68000 )
 	memory_set_bankptr(machine, 1,mess_ram);
 	memory_install_read16_handler(space,0xc00000,0xdfffff,0x1fffff,0,(read16_space_func)x68k_gvram_r);
 	memory_install_write16_handler(space,0xc00000,0xdfffff,0x1fffff,0,(write16_space_func)x68k_gvram_w);
-	memory_set_bankptr(machine, 2,gvram);  // so that code in VRAM is executable - needed for Terra Cresta
+	memory_set_bankptr(machine, 2,x68k_gvram);  // so that code in VRAM is executable - needed for Terra Cresta
 	memory_install_read16_handler(space,0xe00000,0xe7ffff,0x07ffff,0,(read16_space_func)x68k_tvram_r);
 	memory_install_write16_handler(space,0xe00000,0xe7ffff,0x07ffff,0,(write16_space_func)x68k_tvram_w);
-	memory_set_bankptr(machine, 3,tvram);  // so that code in VRAM is executable - needed for Terra Cresta
+	memory_set_bankptr(machine, 3,x68k_tvram);  // so that code in VRAM is executable - needed for Terra Cresta
 	memory_install_read16_handler(space,0xed0000,0xed3fff,0x003fff,0,(read16_space_func)x68k_sram_r);
 	memory_install_write16_handler(space,0xed0000,0xed3fff,0x003fff,0,(write16_space_func)x68k_sram_w);
 	memory_set_bankptr(machine, 4,generic_nvram16);  // so that code in SRAM is executable, there is an option for booting from SRAM
@@ -2078,7 +2078,7 @@ static MACHINE_START( x68000 )
 
 	// start mouse timer
 	timer_adjust_periodic(mouse_timer, attotime_zero, 0, ATTOTIME_IN_MSEC(1));  // a guess for now
-	sys.mouse.inputtype = 0;
+	x68k_sys.mouse.inputtype = 0;
 
 	// start LED timer
 	timer_adjust_periodic(led_timer, attotime_zero, 0, ATTOTIME_IN_MSEC(400));
@@ -2088,10 +2088,10 @@ static DRIVER_INIT( x68000 )
 {
 	unsigned char* rom = memory_region(machine, "main");
 	unsigned char* user2 = memory_region(machine, "user2");
-	gvram = auto_malloc(0x200000);
-	memset(gvram,0,0x200000);
-	tvram = auto_malloc(0x080000);
-	memset(tvram,0,0x80000);
+	x68k_gvram = auto_malloc(0x200000);
+	memset(x68k_gvram,0,0x200000);
+	x68k_tvram = auto_malloc(0x080000);
+	memset(x68k_tvram,0,0x80000);
 	sram = auto_malloc(0x4000);
 	memset(sram,0,0x4000);
 
@@ -2108,19 +2108,19 @@ static DRIVER_INIT( x68000 )
 	// copy last half of BIOS to a user region, to use for inital startup
 	memcpy(user2,(rom+0xff0000),0x10000);
 
-	memset(&sys,0,sizeof(sys));
+	memset(&x68k_sys,0,sizeof(x68k_sys));
 
 	mfp_init();
 
 	cpu_set_irq_callback(machine->cpu[0], x68k_int_ack);
 
 	// init keyboard
-	sys.keyboard.delay = 500;  // 3*100+200
-	sys.keyboard.repeat = 110;  // 4^2*5+30
+	x68k_sys.keyboard.delay = 500;  // 3*100+200
+	x68k_sys.keyboard.repeat = 110;  // 4^2*5+30
 	kb_timer = timer_alloc(machine, x68k_keyboard_poll,NULL);
-	scanline_timer = timer_alloc(machine, x68k_hsync,NULL);
-	raster_irq = timer_alloc(machine, x68k_crtc_raster_irq,NULL);
-	vblank_irq = timer_alloc(machine, x68k_crtc_vblank_irq,NULL);
+	x68k_scanline_timer = timer_alloc(machine, x68k_hsync,NULL);
+	x68k_raster_irq = timer_alloc(machine, x68k_crtc_raster_irq,NULL);
+	x68k_vblank_irq = timer_alloc(machine, x68k_crtc_vblank_irq,NULL);
 	mouse_timer = timer_alloc(machine, x68k_scc_ack,NULL);
 	led_timer = timer_alloc(machine, x68k_led_callback,NULL);
 }

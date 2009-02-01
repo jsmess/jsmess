@@ -682,7 +682,7 @@ If you have the source listing or the Rom dump, please send us.
 	}
 }
 
-WRITE8_HANDLER( common_writes_w )
+WRITE8_HANDLER( adam_common_writes_w )
 {
     switch (adam_upper_memory)
     {

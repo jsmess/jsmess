@@ -64,7 +64,7 @@ static UINT8 *ROMMap[256];
 static UINT32 ROMBanks;
 static UINT8 internal_eeprom[INTERNAL_EEPROM_SIZE];
 static UINT8 system_type;
-struct VDP vdp;
+struct VDP wswan_vdp;
 static struct EEPROM eeprom;
 static struct RTC rtc;
 static struct SoundDMA sound_dma;
@@ -233,18 +233,18 @@ MACHINE_RESET( wswan )
 	memcpy( ws_portram, ws_portram_init, 256 );
 
 	/* Initialize VDP */
-	memset( &vdp, 0, sizeof( vdp ) );
+	memset( &wswan_vdp, 0, sizeof( wswan_vdp ) );
 
-	vdp.vram = memory_get_read_ptr( space, 0 );
-	vdp.palette_vram = memory_get_read_ptr( space, ( system_type == WSC ) ? 0xFE00 : 0 );
-	vdp.current_line = 145;  /* Randomly chosen, beginning of VBlank period to give cart some time to boot up */
-	vdp.new_display_vertical = ROMMap[ROMBanks-1][0xfffc] & 0x01;
-	vdp.display_vertical = ~vdp.new_display_vertical;
-	vdp.color_mode = 0;
-	vdp.colors_16 = 0;
-	vdp.tile_packed = 0;
-	vdp.timer = timer_alloc( machine, wswan_scanline_interrupt, &vdp );
-	timer_adjust_periodic( vdp.timer, ticks_to_attotime( 256, 3072000 ), 0, ticks_to_attotime( 256, 3072000 ) );
+	wswan_vdp.vram = memory_get_read_ptr( space, 0 );
+	wswan_vdp.palette_vram = memory_get_read_ptr( space, ( system_type == WSC ) ? 0xFE00 : 0 );
+	wswan_vdp.current_line = 145;  /* Randomly chosen, beginning of VBlank period to give cart some time to boot up */
+	wswan_vdp.new_display_vertical = ROMMap[ROMBanks-1][0xfffc] & 0x01;
+	wswan_vdp.display_vertical = ~wswan_vdp.new_display_vertical;
+	wswan_vdp.color_mode = 0;
+	wswan_vdp.colors_16 = 0;
+	wswan_vdp.tile_packed = 0;
+	wswan_vdp.timer = timer_alloc( machine, wswan_scanline_interrupt, &wswan_vdp );
+	timer_adjust_periodic( wswan_vdp.timer, ticks_to_attotime( 256, 3072000 ), 0, ticks_to_attotime( 256, 3072000 ) );
 
 	/* Initialize sound DMA */
 	memset( &sound_dma, 0, sizeof( sound_dma ) );
@@ -314,7 +314,7 @@ READ8_HANDLER( wswan_port_r )
 	switch( offset )
 	{
 		case 0x02:		/* Current line */
-			value = vdp.current_line;
+			value = wswan_vdp.current_line;
 			break;
 		case 0x4A:		/* Sound DMA source address (low) */
 			value = sound_dma.source & 0xFF;
@@ -344,16 +344,16 @@ READ8_HANDLER( wswan_port_r )
 			}
 			break;
 		case 0xA8:
-			value = vdp.timer_hblank_count & 0xFF;
+			value = wswan_vdp.timer_hblank_count & 0xFF;
 			break;
 		case 0xA9:
-			value = vdp.timer_hblank_count >> 8;
+			value = wswan_vdp.timer_hblank_count >> 8;
 			break;
 		case 0xAA:
-			value = vdp.timer_vblank_count & 0xFF;
+			value = wswan_vdp.timer_vblank_count & 0xFF;
 			break;
 		case 0xAB:
-			value = vdp.timer_vblank_count >> 8;
+			value = wswan_vdp.timer_vblank_count >> 8;
 			break;
 		case 0xCB:		/* RTC data */
 			if ( ws_portram[0xca] == 0x95 && ( rtc.index < 7 ) ) {
@@ -390,11 +390,11 @@ WRITE8_HANDLER( wswan_port_w )
 				             11 - Foreground layer is displayed outside foreground window area
 				   Bit 6-7 - Unknown
 				*/
-			vdp.layer_bg_enable = data & 0x1;
-			vdp.layer_fg_enable = (data & 0x2) >> 1;
-			vdp.sprites_enable = (data & 0x4) >> 2;
-			vdp.window_sprites_enable = (data & 0x8) >> 3;
-			vdp.window_fg_mode = (data & 0x30) >> 4;
+			wswan_vdp.layer_bg_enable = data & 0x1;
+			wswan_vdp.layer_fg_enable = (data & 0x2) >> 1;
+			wswan_vdp.sprites_enable = (data & 0x4) >> 2;
+			wswan_vdp.window_sprites_enable = (data & 0x8) >> 3;
+			wswan_vdp.window_fg_mode = (data & 0x30) >> 4;
 			break;
 		case 0x01:	/* Background colour
 				   In 16 colour mode:
@@ -408,30 +408,30 @@ WRITE8_HANDLER( wswan_port_w )
 		case 0x02:	/* Current scanline
 				   Bit 0-7 - Current scanline (Most likely read-only)
 				*/
-			logerror( "Write to current scanline! Current value: %d  Data to write: %d\n", vdp.current_line, data );
+			logerror( "Write to current scanline! Current value: %d  Data to write: %d\n", wswan_vdp.current_line, data );
 			/* Returning so we don't overwrite the value here, not that it
 			 * really matters */
 			return;
 		case 0x03:	/* Line compare
 				   Bit 0-7 - Line compare
 				*/
-			vdp.line_compare = data;
+			wswan_vdp.line_compare = data;
 			break;
 		case 0x04:	/* Sprite table base address
 				   Bit 0-5 - Determine sprite table base address 0 0xxxxxx0 00000000
 				   Bit 6-7 - Unknown
 				*/
-			vdp.sprite_table_address = ( data & 0x3F ) << 9;
+			wswan_vdp.sprite_table_address = ( data & 0x3F ) << 9;
 			break;
 		case 0x05:	/* Number of sprite to start drawing with
 				   Bit 0-7 - First sprite number
 				*/
-			vdp.sprite_first = data;
+			wswan_vdp.sprite_first = data;
 			break;
 		case 0x06:	/* Number of sprites to draw
 				   Bit 0-7 - Number of sprites to draw
 				*/
-			vdp.sprite_count = data;
+			wswan_vdp.sprite_count = data;
 			break;
 		case 0x07:	/* Background/Foreground table base addresses
 				   Bit 0-2 - Determine background table base address 00xxx000 00000000
@@ -439,74 +439,74 @@ WRITE8_HANDLER( wswan_port_w )
 				   Bit 4-6 - Determine foreground table base address 00xxx000 00000000
 				   Bit 7   - Unknown
 				*/
-			vdp.layer_bg_address = (data & 0x7) << 11;
-			vdp.layer_fg_address = (data & 0x70) << 7;
+			wswan_vdp.layer_bg_address = (data & 0x7) << 11;
+			wswan_vdp.layer_fg_address = (data & 0x70) << 7;
 			break;
 		case 0x08:	/* Left coordinate of foreground window
 				   Bit 0-7 - Left coordinate of foreground window area
 				*/
-			vdp.window_fg_left = data;
+			wswan_vdp.window_fg_left = data;
 			break;
 		case 0x09:	/* Top coordinate of foreground window
 				   Bit 0-7 - Top coordinatte of foreground window area
 				*/
-			vdp.window_fg_top = data;
+			wswan_vdp.window_fg_top = data;
 			break;
 		case 0x0A:	/* Right coordinate of foreground window
 				   Bit 0-7 - Right coordinate of foreground window area
 				*/
-			vdp.window_fg_right = data;
+			wswan_vdp.window_fg_right = data;
 			break;
 		case 0x0B:	/* Bottom coordinate of foreground window
 				   Bit 0-7 - Bottom coordinate of foreground window area
 				*/
-			vdp.window_fg_bottom = data;
+			wswan_vdp.window_fg_bottom = data;
 			break;
 		case 0x0C:	/* Left coordinate of sprite window
 				   Bit 0-7 - Left coordinate of sprite window area
 				*/
-			vdp.window_sprites_left = data;
+			wswan_vdp.window_sprites_left = data;
 			break;
 		case 0x0D:	/* Top coordinate of sprite window
 				   Bit 0-7 - Top coordinate of sprite window area
 				*/
-			vdp.window_sprites_top = data;
+			wswan_vdp.window_sprites_top = data;
 			break;
 		case 0x0E:	/* Right coordinate of sprite window
 				   Bit 0-7 - Right coordinate of sprite window area
 				*/
-			vdp.window_sprites_right = data;
+			wswan_vdp.window_sprites_right = data;
 			break;
 		case 0x0F:	/* Bottom coordinate of sprite window
 				   Bit 0-7 - Bottom coordiante of sprite window area
 				*/
-			vdp.window_sprites_bottom = data;
+			wswan_vdp.window_sprites_bottom = data;
 			break;
 		case 0x10:	/* Background layer X scroll
 				   Bit 0-7 - Background layer X scroll
 				*/
-			vdp.layer_bg_scroll_x = data;
+			wswan_vdp.layer_bg_scroll_x = data;
 			break;
 		case 0x11:	/* Background layer Y scroll
 				   Bit 0-7 - Background layer Y scroll
 				*/
-			vdp.layer_bg_scroll_y = data;
+			wswan_vdp.layer_bg_scroll_y = data;
 			break;
 		case 0x12:	/* Foreground layer X scroll
 				   Bit 0-7 - Foreground layer X scroll
 				*/
-			vdp.layer_fg_scroll_x = data;
+			wswan_vdp.layer_fg_scroll_x = data;
 			break;
 		case 0x13:	/* Foreground layer Y scroll
 				   Bit 0-7 - Foreground layer Y scroll
 				*/
-			vdp.layer_fg_scroll_y = data;
+			wswan_vdp.layer_fg_scroll_y = data;
 			break;
 		case 0x14:	/* LCD control
 				   Bit 0   - LCD enable
 				   Bit 1-7 - Unknown
 				*/
-			vdp.lcd_enable = data & 0x1;
+			wswan_vdp.lcd_enable = data & 0x1;
 			break;
 		case 0x15:	/* LCD icons
 				   Bit 0   - LCD sleep icon enable
@@ -517,7 +517,7 @@ WRITE8_HANDLER( wswan_port_w )
 				   Bit 5   - Dot 3 icon enable
 				   Bit 6-7 - Unknown
 				*/
-			vdp.icons = data;	/* ummmmm */
+			wswan_vdp.icons = data;	/* ummmmm */
 			break;
 		case 0x1c:	/* Palette colors 0 and 1
 				   Bit 0-3 - Gray tone setting for main palette index 0
@@ -526,11 +526,11 @@ WRITE8_HANDLER( wswan_port_w )
 			if ( system_type == WSC ) {
 				int i = 15 - ( data & 0x0F );
 				int j = 15 - ( ( data & 0xF0 ) >> 4 );
-				vdp.main_palette[0] = ( i << 8 ) | ( i << 4 ) | i;
-				vdp.main_palette[1] = ( j << 8 ) | ( j << 4 ) | j;
+				wswan_vdp.main_palette[0] = ( i << 8 ) | ( i << 4 ) | i;
+				wswan_vdp.main_palette[1] = ( j << 8 ) | ( j << 4 ) | j;
 			} else {
-				vdp.main_palette[0] = data & 0x0F;
-				vdp.main_palette[1] = ( data & 0xF0 ) >> 4;
+				wswan_vdp.main_palette[0] = data & 0x0F;
+				wswan_vdp.main_palette[1] = ( data & 0xF0 ) >> 4;
 			}
 			break;
 		case 0x1d:	/* Palette colors 2 and 3
@@ -540,11 +540,11 @@ WRITE8_HANDLER( wswan_port_w )
 			if ( system_type == WSC ) {
 				int i = 15 - ( data & 0x0F );
 				int j = 15 - ( ( data & 0xF0 ) >> 4 );
-				vdp.main_palette[2] = ( i << 8 ) | ( i << 4 ) | i;
-				vdp.main_palette[3] = ( j << 8 ) | ( j << 4 ) | j;
+				wswan_vdp.main_palette[2] = ( i << 8 ) | ( i << 4 ) | i;
+				wswan_vdp.main_palette[3] = ( j << 8 ) | ( j << 4 ) | j;
 			} else {
-				vdp.main_palette[2] = data & 0x0F;
-				vdp.main_palette[3] = ( data & 0xF0 ) >> 4;
+				wswan_vdp.main_palette[2] = data & 0x0F;
+				wswan_vdp.main_palette[3] = ( data & 0xF0 ) >> 4;
 			}
 			break;
 		case 0x1e:	/* Palette colors 4 and 5
@@ -554,11 +554,11 @@ WRITE8_HANDLER( wswan_port_w )
 			if ( system_type == WSC ) {
 				int i = 15 - ( data & 0x0F );
 				int j = 15 - ( ( data & 0xF0 ) >> 4 );
-				vdp.main_palette[4] = ( i << 8 ) | ( i << 4 ) | i;
-				vdp.main_palette[5] = ( j << 8 ) | ( j << 4 ) | j;
+				wswan_vdp.main_palette[4] = ( i << 8 ) | ( i << 4 ) | i;
+				wswan_vdp.main_palette[5] = ( j << 8 ) | ( j << 4 ) | j;
 			} else {
-				vdp.main_palette[4] = data & 0x0F;
-				vdp.main_palette[5] = ( data & 0xF0 ) >> 4;
+				wswan_vdp.main_palette[4] = data & 0x0F;
+				wswan_vdp.main_palette[5] = ( data & 0xF0 ) >> 4;
 			}
 			break;
 		case 0x1f:	/* Palette colors 6 and 7
@@ -568,11 +568,11 @@ WRITE8_HANDLER( wswan_port_w )
 			if ( system_type == WSC ) {
 				int i = 15 - ( data & 0x0F );
 				int j = 15 - ( ( data & 0xF0 ) >> 4 );
-				vdp.main_palette[6] = ( i << 8 ) | ( i << 4 ) | i;
-				vdp.main_palette[7] = ( j << 8 ) | ( j << 4 ) | j;
+				wswan_vdp.main_palette[6] = ( i << 8 ) | ( i << 4 ) | i;
+				wswan_vdp.main_palette[7] = ( j << 8 ) | ( j << 4 ) | j;
 			} else {
-				vdp.main_palette[6] = data & 0x0F;
-				vdp.main_palette[7] = ( data & 0xF0 ) >> 4;
+				wswan_vdp.main_palette[6] = data & 0x0F;
+				wswan_vdp.main_palette[7] = ( data & 0xF0 ) >> 4;
 			}
 			break;
 		case 0x20:	/* tile/sprite palette settings
@@ -749,9 +749,9 @@ WRITE8_HANDLER( wswan_port_w )
 			 * 000  - not packed, 4 color, use 2000, monochrome - Regular WS monochrome
 			 */
 			if ( system_type == WSC ) {
-				vdp.color_mode = data & 0x80;
-				vdp.colors_16 = data & 0x40;
-				vdp.tile_packed = data & 0x20;
+				wswan_vdp.color_mode = data & 0x80;
+				wswan_vdp.colors_16 = data & 0x40;
+				wswan_vdp.tile_packed = data & 0x20;
 			}
 			break;
 		case 0x80:	/* Audio 1 freq (lo)
@@ -856,38 +856,38 @@ WRITE8_HANDLER( wswan_port_w )
 				   Bit 3   - VBlank Timer mode: 0 = one shot, 1 = auto reset
 				   Bit 4-7 - Unknown
 				*/
-			vdp.timer_hblank_enable = data & 0x1;
-			vdp.timer_hblank_mode = (data & 0x2) >> 1;
-			vdp.timer_vblank_enable = (data & 0x4) >> 2;
-			vdp.timer_vblank_mode = (data & 0x8) >> 3;
+			wswan_vdp.timer_hblank_enable = data & 0x1;
+			wswan_vdp.timer_hblank_mode = (data & 0x2) >> 1;
+			wswan_vdp.timer_vblank_enable = (data & 0x4) >> 2;
+			wswan_vdp.timer_vblank_mode = (data & 0x8) >> 3;
 			break;
 		case 0xa4:	/* HBlank timer frequency (low) - reload value
 				   Bit 0-7 - HBlank timer reload value bit 0-7
 				*/
-			vdp.timer_hblank_reload &= 0xff00;
-			vdp.timer_hblank_reload += data;
-			vdp.timer_hblank_count = vdp.timer_hblank_reload;
+			wswan_vdp.timer_hblank_reload &= 0xff00;
+			wswan_vdp.timer_hblank_reload += data;
+			wswan_vdp.timer_hblank_count = wswan_vdp.timer_hblank_reload;
 			break;
 		case 0xa5:	/* HBlank timer frequency (high) - reload value
 				   Bit 8-15 - HBlank timer reload value bit 8-15
 				*/
-			vdp.timer_hblank_reload &= 0xff;
-			vdp.timer_hblank_reload += data << 8;
-			vdp.timer_hblank_count = vdp.timer_hblank_reload;
+			wswan_vdp.timer_hblank_reload &= 0xff;
+			wswan_vdp.timer_hblank_reload += data << 8;
+			wswan_vdp.timer_hblank_count = wswan_vdp.timer_hblank_reload;
 			break;
 		case 0xa6:	/* VBlank timer frequency (low) - reload value
 				   Bit 0-7 - VBlank timer reload value bit 0-7
 				*/
-			vdp.timer_vblank_reload &= 0xff00;
-			vdp.timer_vblank_reload += data;
-			vdp.timer_vblank_count = vdp.timer_vblank_reload;
+			wswan_vdp.timer_vblank_reload &= 0xff00;
+			wswan_vdp.timer_vblank_reload += data;
+			wswan_vdp.timer_vblank_count = wswan_vdp.timer_vblank_reload;
 			break;
 		case 0xa7:	/* VBlank timer frequency (high) - reload value
 				   Bit 0-7 - VBlank timer reload value bit 8-15
 				*/
-			vdp.timer_vblank_reload &= 0xff;
-			vdp.timer_vblank_reload += data << 8;
-			vdp.timer_vblank_count = vdp.timer_vblank_reload;
+			wswan_vdp.timer_vblank_reload &= 0xff;
+			wswan_vdp.timer_vblank_reload += data << 8;
+			wswan_vdp.timer_vblank_count = wswan_vdp.timer_vblank_reload;
 			break;
 		case 0xa8:	/* HBlank counter (low)
 				   Bit 0-7 - HBlank counter bit 0-7
@@ -1364,19 +1364,19 @@ DEVICE_IMAGE_LOAD(wswan_cart)
 
 static TIMER_CALLBACK(wswan_scanline_interrupt)
 {
-	if( vdp.current_line < 144 ) {
+	if( wswan_vdp.current_line < 144 ) {
 		wswan_refresh_scanline();
 	}
 
 	/* Decrement 12kHz (HBlank) counter */
-	if ( vdp.timer_hblank_enable && vdp.timer_hblank_reload != 0 ) {
-		vdp.timer_hblank_count--;
-		logerror( "timer_hblank_count: %X\n", vdp.timer_hblank_count );
-		if ( vdp.timer_hblank_count == 0 ) {
-			if ( vdp.timer_hblank_mode ) {
-				vdp.timer_hblank_count = vdp.timer_hblank_reload;
+	if ( wswan_vdp.timer_hblank_enable && wswan_vdp.timer_hblank_reload != 0 ) {
+		wswan_vdp.timer_hblank_count--;
+		logerror( "timer_hblank_count: %X\n", wswan_vdp.timer_hblank_count );
+		if ( wswan_vdp.timer_hblank_count == 0 ) {
+			if ( wswan_vdp.timer_hblank_mode ) {
+				wswan_vdp.timer_hblank_count = wswan_vdp.timer_hblank_reload;
 			} else {
-				vdp.timer_hblank_reload = 0;
+				wswan_vdp.timer_hblank_reload = 0;
 			}
 			logerror( "trigerring hbltmr interrupt\n" );
 			wswan_set_irq_line( machine, WSWAN_IFLAG_HBLTMR );
@@ -1395,19 +1395,19 @@ static TIMER_CALLBACK(wswan_scanline_interrupt)
 		}
 	}
 
-//	vdp.current_line = (vdp.current_line + 1) % 159;
+//	wswan_vdp.current_line = (wswan_vdp.current_line + 1) % 159;
 
-	if( vdp.current_line == 144 ) {
+	if( wswan_vdp.current_line == 144 ) {
 		wswan_set_irq_line( machine, WSWAN_IFLAG_VBL );
 		/* Decrement 75Hz (VBlank) counter */
-		if ( vdp.timer_vblank_enable && vdp.timer_vblank_reload != 0 ) {
-			vdp.timer_vblank_count--;
-			logerror( "timer_vblank_count: %X\n", vdp.timer_vblank_count );
-			if ( vdp.timer_vblank_count == 0 ) {
-				if ( vdp.timer_vblank_mode ) {
-					vdp.timer_vblank_count = vdp.timer_vblank_reload;
+		if ( wswan_vdp.timer_vblank_enable && wswan_vdp.timer_vblank_reload != 0 ) {
+			wswan_vdp.timer_vblank_count--;
+			logerror( "timer_vblank_count: %X\n", wswan_vdp.timer_vblank_count );
+			if ( wswan_vdp.timer_vblank_count == 0 ) {
+				if ( wswan_vdp.timer_vblank_mode ) {
+					wswan_vdp.timer_vblank_count = wswan_vdp.timer_vblank_reload;
 				} else {
-					vdp.timer_vblank_reload = 0;
+					wswan_vdp.timer_vblank_reload = 0;
 				}
 				logerror( "triggering vbltmr interrupt\n" );
 				wswan_set_irq_line( machine, WSWAN_IFLAG_VBLTMR );
@@ -1415,18 +1415,18 @@ static TIMER_CALLBACK(wswan_scanline_interrupt)
 		}
 	}
 
-//	vdp.current_line = (vdp.current_line + 1) % 159;
+//	wswan_vdp.current_line = (wswan_vdp.current_line + 1) % 159;
 
-	if ( vdp.current_line == vdp.line_compare ) {
+	if ( wswan_vdp.current_line == wswan_vdp.line_compare ) {
 		wswan_set_irq_line( machine, WSWAN_IFLAG_LCMP );
 	}
 
-	vdp.current_line = (vdp.current_line + 1) % 159;
+	wswan_vdp.current_line = (wswan_vdp.current_line + 1) % 159;
 
-	if ( vdp.current_line == 0 ) {
-		if ( vdp.display_vertical != vdp.new_display_vertical ) {
-			vdp.display_vertical = vdp.new_display_vertical;
-			if ( vdp.display_vertical ) {
+	if ( wswan_vdp.current_line == 0 ) {
+		if ( wswan_vdp.display_vertical != wswan_vdp.new_display_vertical ) {
+			wswan_vdp.display_vertical = wswan_vdp.new_display_vertical;
+			if ( wswan_vdp.display_vertical ) {
 				video_screen_set_visarea( machine->primary_screen, 5*8, 5*8 + WSWAN_Y_PIXELS - 1, 0, WSWAN_X_PIXELS - 1 );
 			} else {
 				video_screen_set_visarea( machine->primary_screen, 0, WSWAN_X_PIXELS - 1, 5*8, 5*8 + WSWAN_Y_PIXELS - 1 );

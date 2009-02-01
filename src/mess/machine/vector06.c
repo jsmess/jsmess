@@ -82,8 +82,8 @@ WRITE8_HANDLER(vector06_color_set)
 	palette_set_color( space->machine, vector_color_index, MAKE_RGB(r,g,b) );
 }
 
-UINT8 romdisk_msb;
-UINT8 romdisk_lsb;
+static UINT8 romdisk_msb;
+static UINT8 romdisk_lsb;
 
 static READ8_DEVICE_HANDLER (vector06_romdisk_portb_r )
 {
@@ -141,7 +141,7 @@ WRITE8_HANDLER(vector_8255_2_w) {
 
 }
 
-UINT8 vblank_state = 0;
+static UINT8 vblank_state = 0;
 INTERRUPT_GEN( vector06_interrupt )
 {
 	vblank_state++;

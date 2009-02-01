@@ -279,7 +279,7 @@ static MACHINE_DRIVER_START( a7800_ntsc )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
-	MDRV_RIOT6532_ADD("riot", A7800_NTSC_Y1/12, r6532_interface)
+	MDRV_RIOT6532_ADD("riot", A7800_NTSC_Y1/12, a7800_r6532_interface)
 
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("a78")
@@ -309,7 +309,7 @@ static MACHINE_DRIVER_START( a7800_pal )
 
 	/* devices */
 	MDRV_RIOT6532_REMOVE("riot")
-	MDRV_RIOT6532_ADD("riot", 3546894/3, r6532_interface)
+	MDRV_RIOT6532_ADD("riot", 3546894/3, a7800_r6532_interface)
 MACHINE_DRIVER_END
 
 

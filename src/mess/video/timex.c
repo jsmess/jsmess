@@ -29,11 +29,11 @@ VIDEO_EOF( ts2068 )
         EVENT_LIST_ITEM *pItem;
         int NumItems;
 
-        frame_number++;
-        if (frame_number >= 30)
+        spectrum_frame_number++;
+        if (spectrum_frame_number >= 30)
         {
-                frame_number = 0;
-                flash_invert = !flash_invert;
+                spectrum_frame_number = 0;
+                spectrum_flash_invert = !spectrum_flash_invert;
         }
 
         /* Empty event buffer for undisplayed frames noting the last border
@@ -88,7 +88,7 @@ static void ts2068_hires_scanline(bitmap_t *bitmap, int y, int borderlines)
         for (x=0;x<32;x++)
 	{
                 /* Get ink and paper colour with bright */
-                if (flash_invert && (*attr & 0x80))
+                if (spectrum_flash_invert && (*attr & 0x80))
                 {
                         ink=((*attr)>>3) & 0x0f;
                         pap=((*attr) & 0x07) + (((*attr)>>3) & 0x08);
@@ -167,7 +167,7 @@ static void ts2068_lores_scanline(bitmap_t *bitmap, int y, int borderlines, int 
 	for (x=0;x<32;x++)
 	{
 		/* Get ink and paper colour with bright */
-		if (flash_invert && (*attr & 0x80))
+		if (spectrum_flash_invert && (*attr & 0x80))
 		{
 			ink=((*attr)>>3) & 0x0f;
 			pap=((*attr) & 0x07) + (((*attr)>>3) & 0x08);

@@ -189,11 +189,11 @@ struct x68k_system
 
 /*----------- defined in drivers/x68k.c -----------*/
 
-extern struct x68k_system sys;
+extern struct x68k_system x68k_sys;
 
-extern emu_timer* scanline_timer;
-extern emu_timer* raster_irq;
-extern emu_timer* vblank_irq;
+extern emu_timer* x68k_scanline_timer;
+extern emu_timer* x68k_raster_irq;
+extern emu_timer* x68k_vblank_irq;
 
 #ifdef UNUSED_FUNCTION
 void mfp_trigger_irq(int);
@@ -205,8 +205,8 @@ TIMER_CALLBACK(mfp_timer_d_callback);
 
 /*----------- defined in video/x68k.c -----------*/
 
-extern UINT16* gvram;  // Graphic VRAM
-extern UINT16* tvram;  // Text VRAM
+extern UINT16* x68k_gvram;  // Graphic VRAM
+extern UINT16* x68k_tvram;  // Text VRAM
 extern UINT16* x68k_spriteram;  // sprite/background RAM
 extern UINT16* x68k_spritereg;  // sprite/background registers
 

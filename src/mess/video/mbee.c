@@ -45,7 +45,7 @@ static int m6545_video_bank = 0;
 static int mbee_pcg_color_latch = 0;
 
 int mbee_frame_counter;
-UINT8 *pcgram;
+UINT8 *mbee_pcgram;
 
 static UINT8 mc6845_cursor[16];				// cursor shape
 static void mc6845_cursor_configure(void);
@@ -72,10 +72,10 @@ WRITE8_HANDLER ( mbee_videoram_w )
 
 WRITE8_HANDLER ( mbee_pcg_w )
 {
-	if( pcgram[0x0800+offset] != data )
+	if( mbee_pcgram[0x0800+offset] != data )
 	{
 		int chr = 0x80 + offset / 16;
-		pcgram[0x0800+offset] = data;
+		mbee_pcgram[0x0800+offset] = data;
 		/* decode character graphics again */
 		gfx_element_mark_dirty(space->machine->gfx[0], chr);
 	}
@@ -85,10 +85,10 @@ WRITE8_HANDLER ( mbee_pcg_color_w )
 {
 	if( (m6545_video_bank & 0x01) || (mbee_pcg_color_latch & 0x40) == 0 )
 	{
-		if( pcgram[0x0800+offset] != data )
+		if( mbee_pcgram[0x0800+offset] != data )
 		{
 			int chr = 0x80 + offset / 16;
-			pcgram[0x0800+offset] = data;
+			mbee_pcgram[0x0800+offset] = data;
 			/* decode character graphics again */
 			gfx_element_mark_dirty(space->machine->gfx[0], chr);
 		}
@@ -350,7 +350,7 @@ WRITE8_HANDLER ( m6545_data_w )
 			break;
 		crt.screen_address_hi = data;
 		addr = 0x17000+((data & 32) << 6);
-		memcpy(pcgram, memory_region(space->machine, "main")+addr, 0x800);
+		memcpy(mbee_pcgram, memory_region(space->machine, "main")+addr, 0x800);
 		for (i = 0; i < 128; i++)
 			gfx_element_mark_dirty(space->machine->gfx[0], i);
 		break;
@@ -448,7 +448,7 @@ VIDEO_START( mbee )
 {
 	UINT8 *ram = memory_region(machine, "main");
 	videoram = ram+0x15000;
-	pcgram = ram+0x11000;
+	mbee_pcgram = ram+0x11000;
 }
 
 VIDEO_START( mbeeic )
@@ -456,7 +456,7 @@ VIDEO_START( mbeeic )
 	UINT8 *ram = memory_region(machine, "main");
 	videoram = ram+0x15000;
 	colorram = ram+0x15800;
-	pcgram = ram+0x11000;
+	mbee_pcgram = ram+0x11000;
 }
 
 VIDEO_UPDATE( mbee )
@@ -473,7 +473,7 @@ VIDEO_UPDATE( mbee )
 	/* Get the graphics of the character under the cursor, xor with the visible cursor scan lines,
 	   and store as character number 256. */
 	for ( i = 0; i < ARRAY_LENGTH(mc6845_cursor); i++)
-		pcgram[0x1000+i] = pcgram[(videoram[cursor]<<4) + i] ^ mc6845_cursor[i];
+		mbee_pcgram[0x1000+i] = mbee_pcgram[(videoram[cursor]<<4) + i] ^ mc6845_cursor[i];
 
 	gfx_element_mark_dirty(screen->machine->gfx[0],256);			// and into machine graphics
 
@@ -515,7 +515,7 @@ VIDEO_UPDATE( mbeeic )
 	/* Get the graphics of the character under the cursor, xor with the visible cursor scan lines,
 	   and store as character number 256. */
 	for ( i = 0; i < ARRAY_LENGTH(mc6845_cursor); i++)
-		pcgram[0x1000+i] = pcgram[(videoram[cursor]<<4) + i] ^ mc6845_cursor[i];
+		mbee_pcgram[0x1000+i] = mbee_pcgram[(videoram[cursor]<<4) + i] ^ mc6845_cursor[i];
 
 	gfx_element_mark_dirty(screen->machine->gfx[0],256);			// and into machine graphics
 

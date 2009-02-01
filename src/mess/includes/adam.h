@@ -39,9 +39,9 @@ WRITE8_HANDLER ( adam_memory_map_controller_w );
 READ8_HANDLER ( adam_memory_map_controller_r );
 READ8_HANDLER ( adam_video_r );
 WRITE8_HANDLER ( adam_video_w );
-WRITE8_HANDLER ( common_writes_w );
-READ8_HANDLER  ( master6801_ram_r );
-WRITE8_HANDLER ( master6801_ram_w );
+WRITE8_HANDLER ( adam_common_writes_w );
+READ8_HANDLER  ( adam_master6801_ram_r );
+WRITE8_HANDLER ( adam_master6801_ram_w );
 
 
 #endif /* ADAM_H_ */

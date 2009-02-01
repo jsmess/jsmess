@@ -157,7 +157,7 @@ static ADDRESS_MAP_START( dgnbeta_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xFC28, 0xfC7F)	AM_READWRITE(SMH_NOP		,SMH_NOP)
 	AM_RANGE(0xfc80, 0xfc81)	AM_READWRITE(dgnbeta_6845_r	,dgnbeta_6845_w)
 	AM_RANGE(0xfc82, 0xfC9F)	AM_READWRITE(SMH_NOP		,SMH_NOP)
-	AM_RANGE(0xFCA0, 0xFCA3)	AM_READWRITE(SMH_NOP		,colour_ram_w)		/* 4x4bit colour ram for graphics modes */
+	AM_RANGE(0xFCA0, 0xFCA3)	AM_READWRITE(SMH_NOP		,dgnbeta_colour_ram_w)		/* 4x4bit colour ram for graphics modes */
 	AM_RANGE(0xFCC0, 0xFCC3)	AM_READWRITE(pia_2_r		,pia_2_w)
 	AM_RANGE(0xfcC4, 0xfcdf)	AM_READWRITE(SMH_NOP		,SMH_NOP)
 	AM_RANGE(0xfce0, 0xfce3)	AM_READWRITE(dgnbeta_wd2797_r	,dgnbeta_wd2797_w)	/* Onboard disk interface */

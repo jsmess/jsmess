@@ -167,13 +167,13 @@ unsigned char *spectrum_screen_location = NULL;
  bit 2-0: border colour
 */
 
-int PreviousFE = 0;
+int spectrum_PreviousFE = 0;
 
 WRITE8_HANDLER(spectrum_port_fe_w)
 {
 	unsigned char Changed;
 
-	Changed = PreviousFE^data;
+	Changed = spectrum_PreviousFE^data;
 
 	/* border colour changed? */
 	if ((Changed & 0x07)!=0)
@@ -194,7 +194,7 @@ WRITE8_HANDLER(spectrum_port_fe_w)
 		cassette_output(devtag_get_device(space->machine, CASSETTE, "cassette"), (data & (1<<3)) ? -1.0 : +1.0);
 	}
 
-	PreviousFE = data;
+	spectrum_PreviousFE = data;
 }
 
 static ADDRESS_MAP_START (spectrum_mem, ADDRESS_SPACE_PROGRAM, 8)

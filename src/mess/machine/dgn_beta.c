@@ -821,7 +821,7 @@ static READ8_HANDLER(d_pia2_pb_r)
 static WRITE8_HANDLER(d_pia2_pb_w)
 {
 	/* Update top video address lines */
-	vid_set_gctrl(space->machine, data);
+	dgnbeta_vid_set_gctrl(space->machine, data);
 }
 
 static void d_pia2_irq_a(running_machine *machine, int state)
@@ -1081,7 +1081,7 @@ MACHINE_START( dgnbeta )
 	pia_config(machine, 1, &dgnbeta_pia_intf[1]);
 	pia_config(machine, 2, &dgnbeta_pia_intf[2]);
 
-	init_video(machine);
+	dgnbeta_init_video(machine);
 
 	debug_cpu_set_dasm_override(machine->cpu[0],dgnbeta_dasm_override);
 

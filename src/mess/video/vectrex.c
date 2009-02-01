@@ -303,13 +303,13 @@ VIDEO_START(vectrex)
 	x_max = visarea->max_x << 16;
 	y_max = visarea->max_y << 16;
 
-	imager_freq = 1;
+	vectrex_imager_freq = 1;
 
-	imager_timer = timer_alloc(machine, vectrex_imager_eye, NULL);
-	timer_adjust_periodic(imager_timer, 
-						  ATTOTIME_IN_HZ(imager_freq),
+	vectrex_imager_timer = timer_alloc(machine, vectrex_imager_eye, NULL);
+	timer_adjust_periodic(vectrex_imager_timer, 
+						  ATTOTIME_IN_HZ(vectrex_imager_freq),
 						  2,
-						  ATTOTIME_IN_HZ(imager_freq));
+						  ATTOTIME_IN_HZ(vectrex_imager_freq));
 
 	lp_t = timer_alloc(machine, lightpen_trigger, NULL);
 

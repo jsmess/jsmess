@@ -22,7 +22,7 @@ void ppu_mirror_custom_vrom (int page, int address);
 WRITE8_HANDLER ( nes_IN0_w );
 WRITE8_HANDLER ( nes_IN1_w );
 
-extern unsigned char *battery_ram;
+extern unsigned char *nes_battery_ram;
 
 struct nes_struct
 {

@@ -17,8 +17,8 @@
 
 static offs_t palm_dasm_override(const device_config *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 
-UINT8 port_f_latch;
-UINT16 spim_data;
+static UINT8 port_f_latch;
+static UINT16 spim_data;
 
 /***************************************************************************
     MACHINE HARDWARE
