@@ -37,6 +37,7 @@ typedef int (*device_image_verify_func)(const UINT8 *buf, size_t size);
 typedef void (*device_display_func)(const device_config *image);
 typedef void (*device_image_partialhash_func)(char *, const unsigned char *, unsigned long, unsigned int);
 typedef const char *(*device_get_name_func)(const device_config *device, char *buffer, size_t buffer_length);
+typedef void (*device_get_image_devices_func)(const device_config *device, device_config **listheadptr);
 
 typedef enum
 {
@@ -132,6 +133,7 @@ enum
 	DEVINFO_FCT_DISPLAY,										/* R/O: device_display_func */
 	DEVINFO_FCT_IMAGE_PARTIAL_HASH,								/* R/O: device_image_partialhash_func */
 	DEVINFO_FCT_GET_NAME,										/* R/O: device_get_name_func */
+	DEVINFO_FCT_GET_IMAGE_DEVICES,								/* R/O: device_get_image_devices_func */
 	DEVINFO_FCT_IMAGE_LAST = DEVINFO_FCT_FIRST + 0x0fff,
 
 	/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -156,6 +158,7 @@ enum
 
 /* core initialization */
 void image_init(running_machine *machine);
+void image_unload_all(running_machine *machine);
 
 
 /* ----- image device enumeration ----- */
@@ -209,6 +212,9 @@ const image_device_format *image_device_get_named_creatable_format(const device_
 int image_load(const device_config *img, const char *name);
 int image_create(const device_config *img, const char *name, const image_device_format *create_format, option_resolution *create_args);
 void image_unload(const device_config *img);
+
+/* special call - only use from core */
+int image_finish_load(const device_config *device);
 
 /* used to retrieve error information during image loading */
 const char *image_error(const device_config *img);
@@ -284,6 +290,7 @@ const char *image_longname(const device_config *device);
 const char *image_manufacturer(const device_config *device);
 const char *image_year(const device_config *device);
 const char *image_playable(const device_config *device);
+const char *image_pcb(const device_config *device);
 const char *image_extrainfo(const device_config *device);
 
 
@@ -315,16 +322,19 @@ const device_config *image_from_absolute_index(running_machine *machine, int abs
   Macros for declaring device callbacks
 ****************************************************************************/
 
-#define DEVICE_IMAGE_LOAD_NAME(name)	device_load_##name
-#define DEVICE_IMAGE_LOAD(name)			int DEVICE_IMAGE_LOAD_NAME(name)(const device_config *image)
+#define DEVICE_IMAGE_LOAD_NAME(name)		device_load_##name
+#define DEVICE_IMAGE_LOAD(name)				int DEVICE_IMAGE_LOAD_NAME(name)(const device_config *image)
 
-#define DEVICE_IMAGE_CREATE_NAME(name)	device_create_##name
-#define DEVICE_IMAGE_CREATE(name)		int DEVICE_IMAGE_CREATE_NAME(name)(const device_config *image, int create_format, option_resolution *create_args)
+#define DEVICE_IMAGE_CREATE_NAME(name)		device_create_##name
+#define DEVICE_IMAGE_CREATE(name)			int DEVICE_IMAGE_CREATE_NAME(name)(const device_config *image, int create_format, option_resolution *create_args)
 
-#define DEVICE_IMAGE_UNLOAD_NAME(name)	device_unload_##name
-#define DEVICE_IMAGE_UNLOAD(name)		void DEVICE_IMAGE_UNLOAD_NAME(name)(const device_config *image)
+#define DEVICE_IMAGE_UNLOAD_NAME(name)		device_unload_##name
+#define DEVICE_IMAGE_UNLOAD(name)			void DEVICE_IMAGE_UNLOAD_NAME(name)(const device_config *image)
 
-#define DEVICE_GET_NAME_NAME(name)		device_get_name_##name
-#define DEVICE_GET_NAME(name)			const char *DEVICE_GET_NAME_NAME(name)(const device_config *device, char *buffer, size_t buffer_length)
+#define DEVICE_GET_NAME_NAME(name)			device_get_name_##name
+#define DEVICE_GET_NAME(name)				const char *DEVICE_GET_NAME_NAME(name)(const device_config *device, char *buffer, size_t buffer_length)
+
+#define DEVICE_GET_IMAGE_DEVICES_NAME(name)	device_get_image_devices_##name
+#define DEVICE_GET_IMAGE_DEVICES(name)		void DEVICE_GET_IMAGE_DEVICES_NAME(name)(const device_config *device, device_config **listheadptr)
 
 #endif /* __IMAGE_H__ */

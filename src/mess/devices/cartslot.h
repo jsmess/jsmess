@@ -27,9 +27,18 @@
 #define CARTSLOT	DEVICE_GET_INFO_NAME(cartslot)
 
 
+
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
+
+typedef struct _cartslot_pcb_type cartslot_pcb_type;
+struct _cartslot_pcb_type
+{
+	const char *					name;
+	device_type						devtype;
+};
+
 
 typedef struct _cartslot_config cartslot_config;
 struct _cartslot_config
@@ -40,6 +49,7 @@ struct _cartslot_config
 	device_image_load_func			device_load;
 	device_image_unload_func		device_unload;	
 	device_image_partialhash_func	device_partialhash;
+	cartslot_pcb_type				pcb_types[8];
 };
 
 
@@ -48,6 +58,12 @@ struct _cartslot_config
 ***************************************************************************/
 
 DEVICE_GET_INFO(cartslot);
+
+/* accesses the PCB associated with this cartslot */
+const device_config *cartslot_get_pcb(const device_config *device);
+
+/* accesses a particular socket */
+void *cartslot_get_socket(const device_config *device, const char *socket_name);
 
 
 /***************************************************************************
@@ -83,5 +99,9 @@ DEVICE_GET_INFO(cartslot);
 
 #define MDRV_CARTSLOT_PARTIALHASH(_partialhash)							\
 	MDRV_DEVICE_CONFIG_DATAPTR(cartslot_config, device_partialhash, _partialhash)
+
+#define MDRV_CARTSLOT_PCBTYPE(_index, _pcb_type_name, _pcb_devtype)			\
+	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(cartslot_config, pcb_types, _index, cartslot_pcb_type, name, _pcb_type_name) \
+	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(cartslot_config, pcb_types, _index, cartslot_pcb_type, devtype, _pcb_devtype)
 
 #endif /* __CARTSLOT_H__ */

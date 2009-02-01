@@ -9,6 +9,14 @@
 #include <ctype.h>
 #include "driver.h"
 #include "cartslot.h"
+#include "multcart.h"
+
+
+/***************************************************************************
+    CONSTANTS
+***************************************************************************/
+
+#define TAG_PCB		"pcb"
 
 
 /***************************************************************************
@@ -18,8 +26,17 @@
 typedef struct _cartslot_t cartslot_t;
 struct _cartslot_t
 {
-	char dummy;
+	const device_config *pcb_device;
+	multicart *mc;
 };
+
+
+enum _process_mode
+{
+	PROCESS_CLEAR,
+	PROCESS_LOAD
+};
+typedef enum _process_mode process_mode;
 
 
 /***************************************************************************
@@ -50,7 +67,7 @@ INLINE const cartslot_config *get_config(const device_config *device)
     load_cartridge
 -------------------------------------------------*/
 
-static int load_cartridge(running_machine *machine, const rom_entry *romrgn, const rom_entry *roment, const device_config *image)
+static int load_cartridge(const device_config *device, const rom_entry *romrgn, const rom_entry *roment, process_mode mode)
 {
 	const char *region;
 	const char *type;
@@ -65,19 +82,19 @@ static int load_cartridge(running_machine *machine, const rom_entry *romrgn, con
 	offset = ROM_GETOFFSET(roment);
 	length = ROM_GETLENGTH(roment);
 	flags = ROM_GETFLAGS(roment);
-	ptr = ((UINT8 *) memory_region(machine, region)) + offset;
+	ptr = ((UINT8 *) memory_region(device->machine, region)) + offset;
 
-	if (image)
+	if (mode == PROCESS_LOAD)
 	{
 		/* must this be full size */
 		if (flags & ROM_FULLSIZE)
 		{
-			if (image_length(image) != length)
+			if (image_length(device) != length)
 				return INIT_FAIL;
 		}
 
 		/* read the ROM */
-		pos = read_length = image_fread(image, ptr, length);
+		pos = read_length = image_fread(device, ptr, length);
 
 		/* do we need to mirror the ROM? */
 		if (flags & ROM_MIRROR)
@@ -96,7 +113,7 @@ static int load_cartridge(running_machine *machine, const rom_entry *romrgn, con
 		datawidth = ROMREGION_GETWIDTH(romrgn) / 8;
 
 		/* if the region is inverted, do that now */
-		cpu = cputag_get_cpu(machine, type);
+		cpu = cputag_get_cpu(device->machine, type);
 		if (cpu != NULL)
 		{
 			datawidth = cpu_get_databus_width(cpu, ADDRESS_SPACE_PROGRAM) / 8;
@@ -135,7 +152,7 @@ static int load_cartridge(running_machine *machine, const rom_entry *romrgn, con
     process_cartridge
 -------------------------------------------------*/
 
-static int process_cartridge(const device_config *image, const device_config *file)
+static int process_cartridge(const device_config *image, process_mode mode)
 {
 	const rom_source *source;
 	const rom_entry *romrgn, *roment;
@@ -152,7 +169,7 @@ static int process_cartridge(const device_config *image, const device_config *fi
 				{					
 					if (strcmp(roment->_hashdata,image->tag)==0)
 					{						
-						result = load_cartridge(image->machine, romrgn, roment, file);
+						result = load_cartridge(image, romrgn, roment, mode);
 						if (!result)
 							return result;
 					}
@@ -166,18 +183,70 @@ static int process_cartridge(const device_config *image, const device_config *fi
 
 
 /*-------------------------------------------------
+    cartslot_get_pcb
+-------------------------------------------------*/
+
+const device_config *cartslot_get_pcb(const device_config *device)
+{
+	cartslot_t *cart = get_token(device);
+	return cart->pcb_device;
+}
+
+
+/*-------------------------------------------------
+    cartslot_get_pcb
+-------------------------------------------------*/
+
+void *cartslot_get_socket(const device_config *device, const char *socket_name)
+{
+	cartslot_t *cart = get_token(device);
+	void *result = NULL;
+
+	if (cart->mc != NULL)
+	{
+		const multicart_socket *socket;
+		for (socket = cart->mc->sockets; socket != NULL; socket = socket->next)
+		{
+			if (!strcmp(socket->id, socket_name))
+				break;
+		}
+		result = socket ? socket->ptr : NULL;
+	}
+	else if (socket_name[0] == '\0')
+	{
+		result = image_ptr(device);
+	}
+	return result;
+}
+
+
+/*-------------------------------------------------
     DEVICE_START( cartslot )
 -------------------------------------------------*/
 
 static DEVICE_START( cartslot )
 {
+	cartslot_t *cart = get_token(device);
 	const cartslot_config *config = get_config(device);
+	astring *tempstring = astring_alloc();
 
 	/* if this cartridge has a custom DEVICE_START, use it */
 	if (config->device_start != NULL)
-		return (*config->device_start)(device);
+	{
+		(*config->device_start)(device);
+		goto done;
+	}
 	
-	process_cartridge(device, NULL);
+	/* find the PCB (if there is one) */
+	cart->pcb_device = devtag_get_device(
+		device->machine,
+		DEVICE_TYPE_WILDCARD,
+		device_build_tag(tempstring, device, TAG_PCB));
+
+	process_cartridge(device, PROCESS_CLEAR);
+
+done:
+	astring_free(tempstring);
 }
 
 
@@ -187,13 +256,25 @@ static DEVICE_START( cartslot )
 
 static DEVICE_IMAGE_LOAD( cartslot )
 {	
+	int result;
+	cartslot_t *cart = get_token(image);
 	const cartslot_config *config = get_config(image);
 
 	/* if this cartridge has a custom DEVICE_IMAGE_LOAD, use it */
 	if (config->device_load != NULL)
 		return (*config->device_load)(image);
 
-	return process_cartridge(image, image);
+	/* try opening this as if it were a multicart */
+	multicart_open(image_filename(image), MULTICART_FLAGS_DONT_LOAD_RESOURCES, &cart->mc);
+	if (cart->mc == NULL)
+	{
+		/* otherwise try the normal route */
+		result = process_cartridge(image, PROCESS_LOAD);
+		if (result != INIT_PASS)
+			return result;
+	}
+
+	return INIT_PASS;
 }
 
 
@@ -203,6 +284,7 @@ static DEVICE_IMAGE_LOAD( cartslot )
 
 static DEVICE_IMAGE_UNLOAD( cartslot )
 {
+	cartslot_t *cart = get_token(image);
 	const cartslot_config *config = get_config(image);
 
 	/* if this cartridge has a custom DEVICE_IMAGE_UNLOAD, use it */
@@ -212,7 +294,86 @@ static DEVICE_IMAGE_UNLOAD( cartslot )
 		return;
 	}
 
-	process_cartridge(image, NULL);
+	if (cart->mc != NULL)
+	{
+		multicart_close(cart->mc);
+		cart->mc = NULL;
+	}
+
+	process_cartridge(image, PROCESS_CLEAR);
+}
+
+
+/*-------------------------------------------------
+    identify_pcb
+-------------------------------------------------*/
+
+static const cartslot_pcb_type *identify_pcb(const device_config *device)
+{
+	const cartslot_config *config = get_config(device);
+	astring *pcb_name = astring_alloc();
+	const cartslot_pcb_type *pcb_type = NULL;
+	multicart *mc;
+	int i;
+
+	if (image_exists(device))
+	{
+		/* try opening this as if it were a multicart */
+		multicart_open(image_filename(device), MULTICART_FLAGS_DONT_LOAD_RESOURCES, &mc);
+		if (mc != NULL)
+		{
+			/* this was a multicart - read from it */
+			astring_cpyc(pcb_name, mc->pcb_type);
+			multicart_close(mc);
+		}
+		else if (image_pcb(device) != NULL)
+		{
+			/* read from hash file */
+			astring_cpyc(pcb_name, image_pcb(device));
+		}
+
+		/* look for PCB type with matching name */
+		for (i = 0; (i < ARRAY_LENGTH(config->pcb_types)) && (config->pcb_types[i].name != NULL); i++)
+		{
+			if ((config->pcb_types[i].name[0] == '\0') || !strcmp(astring_c(pcb_name), config->pcb_types[i].name))
+			{
+				pcb_type = &config->pcb_types[i];
+				break;
+			}
+		}
+	}
+	else
+	{
+		/* no device loaded; use the default */
+		pcb_type = (config->pcb_types[0].name != NULL) ? &config->pcb_types[0] : NULL;
+	}
+
+	astring_free(pcb_name);
+	return pcb_type;
+}
+
+
+/*-------------------------------------------------
+    DEVICE_GET_IMAGE_DEVICES(cartslot)
+-------------------------------------------------*/
+
+DEVICE_GET_IMAGE_DEVICES(cartslot)
+{
+	const cartslot_pcb_type *pcb_type;
+	astring *tempstring = astring_alloc();
+
+	pcb_type = identify_pcb(device);
+	if (pcb_type != NULL)
+	{
+		device_list_add(
+			listheadptr,
+			device,
+			pcb_type->devtype,
+			device_build_tag(tempstring, device, TAG_PCB),
+			0);
+	}
+
+	astring_free(tempstring);
 }
 
 
@@ -222,9 +383,6 @@ static DEVICE_IMAGE_UNLOAD( cartslot )
 
 static DEVICE_SET_INFO( cartslot )
 {
-	/* appease compiler */
-	get_token(device);
-
 	switch (state)
 	{
 		/* no parameters to set */
@@ -257,10 +415,11 @@ DEVICE_GET_INFO( cartslot )
 													break;
 
 		/* --- the following bits of info are returned as pointers to functions --- */
-		case DEVINFO_FCT_SET_INFO:					info->set_info = DEVICE_SET_INFO_NAME(cartslot);		break;
-		case DEVINFO_FCT_START:						info->start = DEVICE_START_NAME(cartslot);				break;
-		case DEVINFO_FCT_IMAGE_LOAD:				info->f = (genf *) DEVICE_IMAGE_LOAD_NAME(cartslot);	break; 
-		case DEVINFO_FCT_IMAGE_UNLOAD:				info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(cartslot);	break; 
+		case DEVINFO_FCT_SET_INFO:					info->set_info = DEVICE_SET_INFO_NAME(cartslot);			break;
+		case DEVINFO_FCT_START:						info->start = DEVICE_START_NAME(cartslot);					break;
+		case DEVINFO_FCT_IMAGE_LOAD:				info->f = (genf *) DEVICE_IMAGE_LOAD_NAME(cartslot);		break; 
+		case DEVINFO_FCT_IMAGE_UNLOAD:				info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(cartslot);		break; 
+		case DEVINFO_FCT_GET_IMAGE_DEVICES:			info->f = (genf *) DEVICE_GET_IMAGE_DEVICES_NAME(cartslot);	break;
 		case DEVINFO_FCT_IMAGE_PARTIAL_HASH:		if ( device && device->inline_config && get_config(device)->device_partialhash) {
 														info->f = (genf *) get_config(device)->device_partialhash; 
 													} else {

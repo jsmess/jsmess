@@ -256,6 +256,8 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 				text_dest = (char **) &state->hi->manufacturer;
 			else if (!strcmp(tagname, "status"))
 				text_dest = (char **) &state->hi->playable;
+			else if (!strcmp(tagname, "pcb"))
+				text_dest = (char **) &state->hi->pcb;
 			else if (!strcmp(tagname, "extrainfo"))
 				text_dest = (char **) &state->hi->extrainfo;
 			else

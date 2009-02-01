@@ -8,193 +8,395 @@
 
 #include "driver.h"
 #include "cococart.h"
+#include "cartslot.h"
 
 
-struct _coco_cartridge
+/***************************************************************************
+    PARAMETERS
+***************************************************************************/
+
+#define CARTSLOT_TAG			"cart"
+#define LOG_LINE				0
+
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef struct _coco_cartridge_line coco_cartridge_line;
+struct _coco_cartridge_line
 {
-	UINT8				(*rh)(running_machine *machine, coco_cartridge *cartridge, UINT16 addr);
-	void				(*wh)(running_machine *machine, coco_cartridge *cartridge, UINT16 addr, UINT8 data);
-	void				(*set_line)(running_machine *machine, coco_cartridge *cartridge, cococart_line line, cococart_line_value value);
-	void				(*map_memory)(running_machine *machine, coco_cartridge *cartridge, UINT32 offset, UINT32 mask);
-	void				*extra_data;
-	cococart_line_value	line[3];
-	char				dummy[1];
+	emu_timer					*timer;
+	attotime					delay;
+	cococart_line_value			value;
+	int							line;
+	int							q_count;
+	void						(*callback)(const device_config *, int line);
 };
 
 
-
-static const cococart_getinfo cart_procs[] =
+typedef struct _coco_cartridge_t coco_cartridge_t;
+struct _coco_cartridge_t
 {
-	cococart_fdc_coco,
-	cococart_fdc_coco3_plus,
-	cococart_fdc_dragon,
-	cococart_pak,
-	cococart_pak_banked16k,
-	cococart_orch90
+	const device_config			*pcb;
+	read8_device_func			pcb_r;
+	write8_device_func			pcb_w;
+
+	coco_cartridge_line			cart_line;
+	coco_cartridge_line			nmi_line;
+	coco_cartridge_line			halt_line;
 };
 
 
+/***************************************************************************
+    PROTOTYPES
+***************************************************************************/
+
+static void set_line_timer(const device_config *device, coco_cartridge_line *line, cococart_line_value value);
+
+static TIMER_CALLBACK( cart_timer_callback );
+static TIMER_CALLBACK( nmi_timer_callback );
+static TIMER_CALLBACK( halt_timer_callback );
+
+
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
+
+INLINE coco_cartridge_t *get_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert((device->type == COCO_CARTRIDGE) || (device->type == DRAGON_CARTRIDGE));
+	return (coco_cartridge_t *) device->token;
+}
+
+
+/***************************************************************************
+    GENERAL IMPLEMENTATION
+***************************************************************************/
 
 /*-------------------------------------------------
-    find_cart
+    DEVICE_START(coco_cartridge)
 -------------------------------------------------*/
 
-static cococart_getinfo find_cart(const char *carttype)
+static DEVICE_START(coco_cartridge)
 {
-	int i;
-	for (i = 0; i < ARRAY_LENGTH(cart_procs); i++)
+	const device_config *cartslot;
+	coco_cartridge_t *cococart = get_token(device);
+	const cococart_config *config = (const cococart_config *) device->inline_config; 
+	astring *tempstring = astring_alloc();
+
+	/* initialize */
+	memset(cococart, 0, sizeof(*cococart));
+
+	/* access the PCB, and get the read/write handlers */
+	cartslot = devtag_get_device(device->machine, CARTSLOT, device_build_tag(tempstring, device, CARTSLOT_TAG));
+	if (cartslot != NULL)
 	{
-		const char *that_name = cococart_get_info_string(cart_procs[i], COCOCARTINFO_STR_NAME);
-		if (!mame_stricmp(carttype, that_name))
-			return cart_procs[i];
+		cococart->pcb = cartslot_get_pcb(cartslot);
+		if (cococart->pcb == NULL)
+		{
+			device_delay_init(device);
+			return;
+		}
+
+		cococart->pcb_r = (read8_device_func) device_get_info_fct(cococart->pcb, COCOCARTINFO_FCT_FF40_R);
+		cococart->pcb_w = (write8_device_func) device_get_info_fct(cococart->pcb, COCOCARTINFO_FCT_FF40_W);
 	}
-	return NULL;
+
+	/* finish setup */
+	cococart->cart_line.timer		= timer_alloc(device->machine, cart_timer_callback, (void *) device);
+	cococart->cart_line.delay		= attotime_zero;
+	cococart->cart_line.callback	= config->cart_callback;
+	cococart->nmi_line.timer		= timer_alloc(device->machine, nmi_timer_callback, (void *) device);
+	cococart->nmi_line.delay		= attotime_zero;
+	cococart->nmi_line.callback		= config->nmi_callback;
+	cococart->halt_line.timer		= timer_alloc(device->machine, halt_timer_callback, (void *) device);
+	cococart->halt_line.delay		= cpu_clocks_to_attotime(device->machine->cpu[0], 7);
+	cococart->halt_line.callback	= config->halt_callback;
+
+	astring_free(tempstring);
 }
 
 
-
 /*-------------------------------------------------
-    cococart_init
+    coco_cartridge_r
 -------------------------------------------------*/
 
-coco_cartridge *cococart_init(running_machine *machine, const char *carttype, const coco_cartridge_config *callbacks)
+READ8_DEVICE_HANDLER(coco_cartridge_r)
 {
-	coco_cartridge *cartridge;
-	cococart_getinfo cart_proc;
-	size_t extra_data_size;
-	void (*init)(running_machine *machine,coco_cartridge *cartridge);
+	UINT8 result = 0x00;
+	coco_cartridge_t *cococart = get_token(device);
 
-	/* sanity check */
-	assert_always(mame_get_phase(machine) == MAME_PHASE_INIT, "Can only call cococart_init at init time!");
+	if (cococart->pcb_r != NULL)
+		result = (*cococart->pcb_r)(cococart->pcb, offset);
 
-	/* identify the cartridge type */
-	cart_proc = find_cart(carttype);
-	assert_always(cart_proc != NULL, "Invalid cartridge hardware type");
+	return result;
+}
 
-	/* allocate the cartridge structure */
-	extra_data_size = (size_t) cococart_get_info_int(cart_proc, COCOCARTINFO_INT_DATASIZE);
-	cartridge = auto_malloc(sizeof(*cartridge) + extra_data_size - 1);
-	memset(cartridge, '\0', sizeof(*cartridge) + extra_data_size - 1);
 
-	/* populate the cartridge structure */
-	cartridge->rh			= (UINT8 (*)(running_machine *machine,coco_cartridge *, UINT16)) cococart_get_info_fct(cart_proc, COCOCARTINFO_PTR_FF40_R);
-	cartridge->wh			= (void (*)(running_machine *machine,coco_cartridge *, UINT16, UINT8)) cococart_get_info_fct(cart_proc, COCOCARTINFO_PTR_FF40_W);
-	cartridge->extra_data	= (extra_data_size > 0) ? cartridge->dummy : NULL;
+/*-------------------------------------------------
+    coco_cartridge_w
+-------------------------------------------------*/
 
-	/* copy callbacks */
-	if (callbacks != NULL)
+WRITE8_DEVICE_HANDLER(coco_cartridge_w)
+{
+	coco_cartridge_t *cococart = get_token(device);
+
+	if (cococart->pcb_w != NULL)
+		(*cococart->pcb_w)(cococart->pcb, offset, data);
+}
+
+
+/*-------------------------------------------------
+    line_value_string
+-------------------------------------------------*/
+
+static const char *line_value_string(cococart_line_value value)
+{
+	const char *s = NULL;
+	switch(value)
 	{
-		cartridge->set_line = callbacks->set_line;
-		cartridge->map_memory = callbacks->map_memory;
+		case COCOCART_LINE_VALUE_CLEAR:
+			s = "CLEAR";
+			break;
+		case COCOCART_LINE_VALUE_ASSERT:
+			s = "ASSERT";
+			break;
+		case COCOCART_LINE_VALUE_Q:
+			s = "Q";
+			break;
+		default:
+			fatalerror("Invalid value");
+			break;
 	}
-
-	/* invoke init function */
-	init = (void (*)(running_machine *machine, coco_cartridge *cartridge)) cococart_get_info_fct(cart_proc, COCOCARTINFO_PTR_INIT);
-	if (init != NULL)
-		init(machine, cartridge);
-
-	/* finish up */
-	return cartridge;
+	return s;
 }
 
 
-
 /*-------------------------------------------------
-    cococart_read
+    set_line
 -------------------------------------------------*/
 
-UINT8 cococart_read(running_machine *machine, coco_cartridge *cartridge, UINT16 address)
+static void set_line(const device_config *device, const char *line_name, coco_cartridge_line *line, cococart_line_value value)
 {
-	return cartridge->rh ? cartridge->rh(machine, cartridge, address) : 0xFF;
-}
-
-
-
-/*-------------------------------------------------
-    cococart_write
--------------------------------------------------*/
-
-void cococart_write(running_machine *machine, coco_cartridge *cartridge, UINT16 address, UINT8 data)
-{
-	if (cartridge->wh)
-		cartridge->wh(machine, cartridge, address, data);
-}
-
-
-
-/*-------------------------------------------------
-    cococart_set_line
--------------------------------------------------*/
-
-void cococart_set_line(running_machine *machine, coco_cartridge *cartridge, cococart_line line, cococart_line_value value)
-{
-	assert_always((0 <= line) && (line < ARRAY_LENGTH(cartridge->line)), "Invalid line value");
-
-	if (cartridge->line[line] != value)
+	if ((line->value != value) || (value == COCOCART_LINE_VALUE_Q))
 	{
-		cartridge->line[line] = value;
-		if (cartridge->set_line != NULL)
-			(*cartridge->set_line)(machine, cartridge, line, value);
+		line->value = value;
+
+		if (LOG_LINE)
+			logerror("[%s]: set_line(): %s <= %s", cpuexec_describe_context(device->machine), line_name, line_value_string(value));
+		
+		/* engage in a bit of gymnastics for this odious 'Q' value */
+		switch(line->value)
+		{
+			case COCOCART_LINE_VALUE_CLEAR:
+				line->line = 0x00;
+				line->q_count = 0;
+				break;
+
+			case COCOCART_LINE_VALUE_ASSERT:
+				line->line = 0x01;
+				line->q_count = 0;
+				break;
+
+			case COCOCART_LINE_VALUE_Q:
+				line->line = line->line ? 0x00 : 0x01;
+				if (line->q_count++ < 4)
+					set_line_timer(device, line, value);
+				break;
+		}
+
+		/* invoke the callback, if present */
+		if (line->callback)
+			(*line->callback)(device, line->line);
 	}
 }
 
 
-
 /*-------------------------------------------------
-    cococart_get_line
+    TIMER_CALLBACK( cart_timer_callback )
 -------------------------------------------------*/
 
-cococart_line_value cococart_get_line(running_machine *machine, coco_cartridge *cartridge, cococart_line line)
+static TIMER_CALLBACK( cart_timer_callback )
 {
-	assert_always((0 <= line) && (line < ARRAY_LENGTH(cartridge->line)), "Invalid line value");
-	return cartridge->line[line];
+	const device_config *device = (const device_config *) ptr;
+	set_line(device, "CART", &get_token(device)->cart_line, (cococart_line_value) param);
 }
 
 
-
 /*-------------------------------------------------
-    cococart_map_memory
+    TIMER_CALLBACK( nmi_timer_callback )
 -------------------------------------------------*/
 
-void cococart_map_memory(running_machine *machine, coco_cartridge *cartridge, UINT32 offset, UINT32 mask)
+static TIMER_CALLBACK( nmi_timer_callback )
 {
-	if (cartridge->map_memory != NULL)
-		(*cartridge->map_memory)(machine, cartridge, offset, mask);
+	const device_config *device = (const device_config *) ptr;
+	set_line(device, "NMI", &get_token(device)->nmi_line, (cococart_line_value) param);
 }
 
 
-
 /*-------------------------------------------------
-    cococart_enable_sound
+    TIMER_CALLBACK( halt_timer_callback )
 -------------------------------------------------*/
 
-void cococart_enable_sound(running_machine *machine, coco_cartridge *cartridge, int enable)
+static TIMER_CALLBACK( halt_timer_callback )
 {
-	/* NYI */
+	const device_config *device = (const device_config *) ptr;
+	set_line(device, "HALT", &get_token(device)->halt_line, (cococart_line_value) param);
 }
 
 
-
 /*-------------------------------------------------
-    cococart_temp_str
+	set_line_timer()
 -------------------------------------------------*/
 
-char *cococart_temp_str(void)
+static void set_line_timer(const device_config *device, coco_cartridge_line *line, cococart_line_value value)
 {
-	static char temp_string_pool[16][256];
-	static int temp_string_pool_index;
-	char *string = &temp_string_pool[temp_string_pool_index++ % ARRAY_LENGTH(temp_string_pool)][0];
-	string[0] = 0;
-	return string;
+	timer_adjust_oneshot(line->timer, line->delay, (int) value);
 }
 
 
-
 /*-------------------------------------------------
-    cococart_get_extra_data
+    twiddle_line_if_q
 -------------------------------------------------*/
 
-void *cococart_get_extra_data(coco_cartridge *cartridge)
+static void twiddle_line_if_q(const device_config *device, coco_cartridge_line *line)
 {
-	return cartridge->extra_data;
+	if (line->value == COCOCART_LINE_VALUE_Q)
+	{
+		line->q_count = 0;
+		set_line_timer(device, line, COCOCART_LINE_VALUE_Q);
+	}
+}
+
+
+/*-------------------------------------------------
+    coco_cartridge_twiddle_q_lines - hack to
+	support twiddling the Q line
+-------------------------------------------------*/
+
+void coco_cartridge_twiddle_q_lines(const device_config *device)
+{
+	coco_cartridge_t *cococart = get_token(device);
+	twiddle_line_if_q(device, &cococart->cart_line);
+	twiddle_line_if_q(device, &cococart->nmi_line);
+	twiddle_line_if_q(device, &cococart->halt_line);
+}
+
+
+/*-------------------------------------------------
+    DEVICE_SET_INFO(general_cartridge)
+-------------------------------------------------*/
+
+static DEVICE_SET_INFO(general_cartridge)
+{
+	switch (state)
+	{
+		/* --- the following bits of info are set as 64-bit signed integers --- */
+		case COCOCARTINFO_INT_LINE_CART:
+			set_line_timer(device, &get_token(device)->cart_line, (cococart_line_value) info->i);
+			break;
+
+		case COCOCARTINFO_INT_LINE_NMI:
+			set_line_timer(device, &get_token(device)->nmi_line, (cococart_line_value) info->i);
+			break;
+
+		case COCOCARTINFO_INT_LINE_HALT:
+			set_line_timer(device, &get_token(device)->halt_line, (cococart_line_value) info->i);
+			break;
+	}
+}
+
+
+/*-------------------------------------------------
+    DEVICE_GET_INFO(general_cartridge)
+-------------------------------------------------*/
+
+static DEVICE_GET_INFO(general_cartridge)
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(coco_cartridge_t);			break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(cococart_config);			break;
+		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
+
+		/* --- the following bits of info are returned as pointers to functions --- */
+		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(general_cartridge); break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(coco_cartridge);	break;
+		case DEVINFO_FCT_STOP:							/* Nothing */								break;
+		case DEVINFO_FCT_RESET:							/* Nothing */								break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "CoCo Cartridge Slot");		break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "CoCo Cartridge Slot");		break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");						break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);					break;
+	}
+}
+
+
+/***************************************************************************
+    COCO-SPECIFIC IMPLEMENTATION
+***************************************************************************/
+
+static MACHINE_DRIVER_START( coco_cartridge )
+	MDRV_CARTSLOT_ADD(CARTSLOT_TAG)
+	MDRV_CARTSLOT_EXTENSION_LIST("ccc,rom")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_PCBTYPE(0, "coco_fdc",	COCO_CARTRIDGE_PCB_FDC_COCO)
+	MDRV_CARTSLOT_PCBTYPE(1, "banked_16k",	COCO_CARTRIDGE_PCB_PAK_BANKED16K)
+	MDRV_CARTSLOT_PCBTYPE(2, "orch90",		COCO_CARTRIDGE_PCB_ORCH90)
+	//MDRV_CARTSLOT_PCBTYPE(3, "coco_ssc",	COCO_CARTRIDGE_PCB_SSC)
+	MDRV_CARTSLOT_PCBTYPE(3, "",			COCO_CARTRIDGE_PCB_PAK)
+MACHINE_DRIVER_END
+
+/*-------------------------------------------------
+    DEVICE_GET_INFO(coco_cartridge)
+-------------------------------------------------*/
+
+DEVICE_GET_INFO(coco_cartridge)
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data --- */
+		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME(coco_cartridge); break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "CoCo Cartridge Slot");		break;
+
+		default: 										DEVICE_GET_INFO_CALL(general_cartridge);	break;
+	}
+}
+
+
+/***************************************************************************
+    DRAGON-SPECIFIC IMPLEMENTATION
+***************************************************************************/
+
+static MACHINE_DRIVER_START( dragon_cartridge )
+	MDRV_CARTSLOT_ADD(CARTSLOT_TAG)
+	MDRV_CARTSLOT_EXTENSION_LIST("ccc,rom")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_PCBTYPE(0, "dragon_fdc", COCO_CARTRIDGE_PCB_FDC_DRAGON)
+	MDRV_CARTSLOT_PCBTYPE(1, "",           COCO_CARTRIDGE_PCB_PAK)
+MACHINE_DRIVER_END
+
+/*-------------------------------------------------
+    DEVICE_GET_INFO(dragon_cartridge)
+-------------------------------------------------*/
+
+DEVICE_GET_INFO(dragon_cartridge)
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data --- */
+		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME(dragon_cartridge); break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Dragon Cartridge Slot");		break;
+
+		default: 										DEVICE_GET_INFO_CALL(general_cartridge);	break;
+	}
 }

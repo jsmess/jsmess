@@ -55,6 +55,10 @@ Source Changes:
 - The core is based on MAME 0.129u3.  This incorporates all features of the
   update to this core.  [MAME team]
 
+- Made major changes to allow Cartridge slots to encapsulate hardware as
+  devices.  Updated the CoCo driver to use this standard system.  [Nathan
+  Woods]
+
 - Changed the DS1315 implementation to be a device.  [Nathan Woods]
 
 - Changed the AT45DBxx and SST39VFxx to be a device. [Miodrag Milanovic]

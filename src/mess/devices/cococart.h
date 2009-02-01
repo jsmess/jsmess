@@ -17,141 +17,100 @@
     CONSTANTS
 ***************************************************************************/
 
-typedef enum _cococart_line
-{
-	COCOCART_LINE_CART,		/* connects to PIA1 CB1 */
-	COCOCART_LINE_NMI,		/* connects to NMI line on CPU */
-	COCOCART_LINE_HALT		/* connects to HALT line on CPU */
-} cococart_line;
+#define COCO_CARTRIDGE								DEVICE_GET_INFO_NAME(coco_cartridge)
+#define DRAGON_CARTRIDGE							DEVICE_GET_INFO_NAME(dragon_cartridge)
 
-typedef enum _cococart_line_value
-{
-	COCOCART_LINE_VALUE_CLEAR,
-	COCOCART_LINE_VALUE_ASSERT,
-	COCOCART_LINE_VALUE_Q
-} cococart_line_value;
+#define COCO_CARTRIDGE_PCB_FDC_COCO					DEVICE_GET_INFO_NAME(coco_cartridge_pcb_fdc_coco)
+#define COCO_CARTRIDGE_PCB_FDC_DRAGON				DEVICE_GET_INFO_NAME(coco_cartridge_pcb_fdc_dragon)
+#define COCO_CARTRIDGE_PCB_PAK						DEVICE_GET_INFO_NAME(coco_cartridge_pcb_pak)
+#define COCO_CARTRIDGE_PCB_PAK_BANKED16K			DEVICE_GET_INFO_NAME(coco_cartridge_pcb_pak_banked16k)
+#define COCO_CARTRIDGE_PCB_ORCH90					DEVICE_GET_INFO_NAME(coco_cartridge_pcb_orch90)
+#define COCO_CARTRIDGE_PCB_SSC						DEVICE_GET_INFO_NAME(coco_cartridge_pcb_speechsound)
 
 enum
 {
-	/* --- the following bits of info are returned as 64-bit signed integers --- */
-	COCOCARTINFO_INT_FIRST = 0x00000,
-	COCOCARTINFO_INT_DATASIZE = COCOCARTINFO_INT_FIRST,
+	/* output lines on the CoCo cartridge slot */
+	COCOCARTINFO_INT_LINE_CART	= DEVINFO_INT_DEVICE_SPECIFIC,	/* connects to PIA1 CB1 */
+	COCOCARTINFO_INT_LINE_NMI,									/* connects to NMI line on CPU */
+	COCOCARTINFO_INT_LINE_HALT,									/* connects to HALT line on CPU */
+	COCOCARTINFO_INT_LINE_SOUND_ENABLE,							/* sound enable */
 
-	/* --- the following bits of info are returned as pointers to data or functions --- */
-	COCOCARTINFO_PTR_FIRST = 0x10000,
-
-	COCOCARTINFO_PTR_SET_INFO = COCOCARTINFO_PTR_FIRST,	/* R/O: void (*set_info)(UINT32 state, cococartinfo *info) */
-	COCOCARTINFO_PTR_INIT,								/* R/O: void (*init)(coco_cartridge *cartridge) */
-	COCOCARTINFO_PTR_FF40_R,							/* R/O: UINT8 (*rh)(coco_cartridge *cartridge, UINT16) */
-	COCOCARTINFO_PTR_FF40_W,							/* R/O: void (*wh)(coco_cartridge *cartridge, UINT16, UINT8) */
-
-	/* --- the following bits of info are returned as NULL-terminated strings --- */
-	COCOCARTINFO_STR_FIRST = 0x20000,
-
-	COCOCARTINFO_STR_NAME = COCOCARTINFO_PTR_FIRST,		/* R/O: name of hardware type */
+	COCOCARTINFO_FCT_FF40_R = DEVINFO_FCT_DEVICE_SPECIFIC,		/* read8_device_handler */
+	COCOCARTINFO_FCT_FF40_W,									/* write8_device_handler */
 };
-
-
 
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _coco_cartridge coco_cartridge;
-
-typedef union _cococartinfo cococartinfo;
-union _cococartinfo
+/* since we have a special value "Q" - we have to use a special enum here */
+enum _cococart_line_value
 {
-	INT64	i;															/* generic integers */
-	void *	p;															/* generic pointers */
-	genf *  f;															/* generic function pointers */
-	char *	s;															/* generic strings */
-
-	void	(*init)(running_machine *machine,coco_cartridge *cartridge);							/* COCOCARTINFO_PTR_INIT */
-	UINT8	(*rh)(running_machine *machine,coco_cartridge *cartridge, UINT16 addr);				/* COCOCARTINFO_PTR_FF40_R */
-	void	(*wh)(running_machine *machine,coco_cartridge *cartridge, UINT16 addr, UINT8 data);	/* COCOCARTINFO_PTR_FF40_W */
+	COCOCART_LINE_VALUE_CLEAR,
+	COCOCART_LINE_VALUE_ASSERT,
+	COCOCART_LINE_VALUE_Q
 };
+typedef enum _cococart_line_value cococart_line_value;
 
-typedef void (*cococart_getinfo)(UINT32 state, cococartinfo *info);
-
-
-/* CoCo cartridge configuration */
-typedef struct _coco_cartridge_config coco_cartridge_config;
-struct _coco_cartridge_config
+typedef struct _cococart_config cococart_config;
+struct _cococart_config
 {
-	/* callback to set a line */
-	void (*set_line)(running_machine *machine, coco_cartridge *cartridge, cococart_line line, cococart_line_value value);
-
-	/* callback to map memory */
-	void (*map_memory)(running_machine *machine, coco_cartridge *cartridge, UINT32 offset, UINT32 mask);
+	void (*cart_callback)(const device_config *device, int line);
+	void (*nmi_callback)(const device_config *device, int line);
+	void (*halt_callback)(const device_config *device, int line);
 };
-
 
 
 /***************************************************************************
     CALLS
 ***************************************************************************/
 
-char *cococart_temp_str(void);
-void *cococart_get_extra_data(coco_cartridge *cartridge);
-void cococart_set_line(running_machine *machine, coco_cartridge *cartridge, cococart_line line, cococart_line_value value);
-cococart_line_value cococart_get_line(running_machine *machine, coco_cartridge *cartridge, cococart_line line);
-void cococart_map_memory(running_machine *machine, coco_cartridge *cartridge, UINT32 offset, UINT32 mask);
+/* device get info function */
+DEVICE_GET_INFO(coco_cartridge);
+DEVICE_GET_INFO(dragon_cartridge);
 
-coco_cartridge *cococart_init(running_machine *machine, const char *carttype, const coco_cartridge_config *callbacks);
-UINT8 cococart_read(running_machine *machine, coco_cartridge *cartridge, UINT16 address);
-void cococart_write(running_machine *machine, coco_cartridge *cartridge, UINT16 address, UINT8 data);
-void cococart_enable_sound(running_machine *machine, coco_cartridge *cartridge, int enable);
+/* reading and writing to $FF40-$FF7F */
+READ8_DEVICE_HANDLER(coco_cartridge_r);
+WRITE8_DEVICE_HANDLER(coco_cartridge_w);
 
+/* cartridge PCB types */
+DEVICE_GET_INFO(coco_cartridge_pcb_fdc_coco);
+DEVICE_GET_INFO(coco_cartridge_pcb_fdc_dragon);
+DEVICE_GET_INFO(coco_cartridge_pcb_pak);
+DEVICE_GET_INFO(coco_cartridge_pcb_pak_banked16k);
+DEVICE_GET_INFO(coco_cartridge_pcb_orch90);
+DEVICE_GET_INFO(coco_cartridge_pcb_speechsound);
 
-
-/***************************************************************************
-    CARTRIDGE ACCCESSORS
-***************************************************************************/
-
-INLINE INT64 cococart_get_info_int(cococart_getinfo getinfo, UINT32 state)
-{
-	cococartinfo info;
-	info.i = 0;
-	getinfo(state, &info);
-	return info.i;
-}
-
-INLINE void *cococart_get_info_ptr(cococart_getinfo getinfo, UINT32 state)
-{
-	cococartinfo info;
-	info.p = NULL;
-	getinfo(state, &info);
-	return info.p;
-}
-
-INLINE genf *cococart_get_info_fct(cococart_getinfo getinfo, UINT32 state)
-{
-	cococartinfo info;
-	info.f = NULL;
-	getinfo(state, &info);
-	return info.f;
-}
-
-INLINE const char *cococart_get_info_string(cococart_getinfo getinfo, UINT32 state)
-{
-	cococartinfo info;
-	info.s = cococart_temp_str();
-	getinfo(state, &info);
-	return info.s;
-}
-
+/* hack to support twiddling the Q line */
+void coco_cartridge_twiddle_q_lines(const device_config *device);
 
 
 /***************************************************************************
-    CARTRIDGE GET INFO FUNCS
+    DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-void cococart_fdc_coco(UINT32 state, cococartinfo *info);
-void cococart_fdc_coco3_plus(UINT32 state, cococartinfo *info);
-void cococart_fdc_dragon(UINT32 state, cococartinfo *info);
-void cococart_pak(UINT32 state, cococartinfo *info);
-void cococart_pak_banked16k(UINT32 state, cococartinfo *info);
-void cococart_orch90(UINT32 state, cococartinfo *info);
+#define MDRV_COCO_CARTRIDGE_ADD(_tag) \
+	MDRV_DEVICE_ADD(_tag, COCO_CARTRIDGE, 0)
 
-#endif // __COCOCART_H__
+#define MDRV_COCO_CARTRIDGE_CART_CALLBACK(_callback) \
+	MDRV_DEVICE_CONFIG_DATAPTR(cococart_config, cart_callback, _callback)
+
+#define MDRV_COCO_CARTRIDGE_NMI_CALLBACK(_callback) \
+	MDRV_DEVICE_CONFIG_DATAPTR(cococart_config, nmi_callback, _callback)
+
+#define MDRV_COCO_CARTRIDGE_HALT_CALLBACK(_callback) \
+	MDRV_DEVICE_CONFIG_DATAPTR(cococart_config, halt_callback, _callback)
+
+#define MDRV_DRAGON_CARTRIDGE_ADD(_tag) \
+	MDRV_DEVICE_ADD(_tag, DRAGON_CARTRIDGE, 0)
+
+#define MDRV_DRAGON_CARTRIDGE_CART_CALLBACK(_callback) \
+	MDRV_COCO_CARTRIDGE_CART_CALLBACK(_callback)
+
+#define MDRV_DRAGON_CARTRIDGE_NMI_CALLBACK(_callback) \
+	MDRV_COCO_CARTRIDGE_NMI_CALLBACK(_callback)
+
+#define MDRV_DRAGON_CARTRIDGE_HALT_CALLBACK(_callback) \
+	MDRV_COCO_CARTRIDGE_HALT_CALLBACK(_callback)
+
+#endif /* __COCOCART_H__ */

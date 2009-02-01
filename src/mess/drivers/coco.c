@@ -31,6 +31,7 @@
 #include "devices/bitbngr.h"
 #include "devices/snapquik.h"
 #include "devices/cartslot.h"
+#include "devices/cococart.h"
 #include "devices/coco_vhd.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
@@ -59,13 +60,39 @@ static ADDRESS_MAP_START( coco_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xF000, 0xFEFF) AM_RAMBANK(16)
 	AM_RANGE(0xff00, 0xff1f) AM_READWRITE(pia_0_r,			pia_0_w)
 	AM_RANGE(0xff20, 0xff3f) AM_READWRITE(pia_1_r,			coco_pia_1_w)
-	AM_RANGE(0xff40, 0xff7f) AM_READWRITE(coco_cartridge_r,	coco_cartridge_w)
+	AM_RANGE(0xff40, 0xff7f) AM_DEVREADWRITE(COCO_CARTRIDGE, "coco_cartslot", coco_cartridge_r, coco_cartridge_w)
 	AM_RANGE(0xff90, 0xffbf) AM_NOP
 	AM_RANGE(0xffc0, 0xffdf) AM_DEVWRITE(SAM6883, "sam", sam6883_w)
 	AM_RANGE(0xffe0, 0xffef) AM_NOP
 	AM_RANGE(0xfff0, 0xffff) AM_ROM AM_REGION("main", 0x3ff0)
 ADDRESS_MAP_END
 
+
+static ADDRESS_MAP_START( dragon_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0FFF) AM_RAMBANK(1)
+	AM_RANGE(0x1000, 0x1FFF) AM_RAMBANK(2)
+	AM_RANGE(0x2000, 0x2FFF) AM_RAMBANK(3)
+	AM_RANGE(0x3000, 0x3FFF) AM_RAMBANK(4)
+	AM_RANGE(0x4000, 0x4FFF) AM_RAMBANK(5)
+	AM_RANGE(0x5000, 0x5FFF) AM_RAMBANK(6)
+	AM_RANGE(0x6000, 0x6FFF) AM_RAMBANK(7)
+	AM_RANGE(0x7000, 0x7FFF) AM_RAMBANK(8)
+	AM_RANGE(0x8000, 0x8FFF) AM_RAMBANK(9)
+	AM_RANGE(0x9000, 0x9FFF) AM_RAMBANK(10)
+	AM_RANGE(0xA000, 0xAFFF) AM_RAMBANK(11)
+	AM_RANGE(0xB000, 0xBFFF) AM_RAMBANK(12)
+	AM_RANGE(0xC000, 0xCFFF) AM_RAMBANK(13)
+	AM_RANGE(0xD000, 0xDFFF) AM_RAMBANK(14)
+	AM_RANGE(0xE000, 0xEFFF) AM_RAMBANK(15)
+	AM_RANGE(0xF000, 0xFEFF) AM_RAMBANK(16)
+	AM_RANGE(0xff00, 0xff1f) AM_READWRITE(pia_0_r,			pia_0_w)
+	AM_RANGE(0xff20, 0xff3f) AM_READWRITE(pia_1_r,			coco_pia_1_w)
+	AM_RANGE(0xff40, 0xff7f) AM_DEVREADWRITE(DRAGON_CARTRIDGE, "coco_cartslot", coco_cartridge_r, coco_cartridge_w)
+	AM_RANGE(0xff90, 0xffbf) AM_NOP
+	AM_RANGE(0xffc0, 0xffdf) AM_DEVWRITE(SAM6883, "sam", sam6883_w)
+	AM_RANGE(0xffe0, 0xffef) AM_NOP
+	AM_RANGE(0xfff0, 0xffff) AM_ROM AM_REGION("main", 0x3ff0)
+ADDRESS_MAP_END
 
 
 /* Note that the CoCo 3 doesn't use the SAM VDG mode registers
@@ -88,7 +115,7 @@ static ADDRESS_MAP_START( coco3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfe00, 0xfeff) AM_RAMBANK(9)
 	AM_RANGE(0xff00, 0xff1f) AM_READWRITE(pia_0_r,				pia_0_w)
 	AM_RANGE(0xff20, 0xff3f) AM_READWRITE(pia_1_r,				coco_pia_1_w)
-	AM_RANGE(0xff40, 0xff7f) AM_READWRITE(coco_cartridge_r,		coco_cartridge_w)
+	AM_RANGE(0xff40, 0xff7f) AM_DEVREADWRITE(COCO_CARTRIDGE, "coco_cartslot", coco_cartridge_r, coco_cartridge_w)
 	AM_RANGE(0xff80, 0xff85) AM_DEVREADWRITE(COCO_VHD, "vhd", coco_vhd_io_r, coco_vhd_io_w)
 	AM_RANGE(0xff90, 0xff9f) AM_READWRITE(coco3_gime_r,			coco3_gime_w)
 	AM_RANGE(0xffa0, 0xffaf) AM_READWRITE(coco3_mmu_r,			coco3_mmu_w)
@@ -120,7 +147,7 @@ static ADDRESS_MAP_START( d64_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xff00, 0xff03) AM_READWRITE(pia_0_r,				pia_0_w)		AM_MIRROR(0x0018)
 	AM_RANGE(0xff04, 0xff07) AM_DEVREADWRITE(ACIA6551, "acia", acia_6551_r,			acia_6551_w)	AM_MIRROR(0x0018)
 	AM_RANGE(0xff20, 0xff3f) AM_READWRITE(pia_1_r,				coco_pia_1_w)
-	AM_RANGE(0xff40, 0xff7f) AM_READWRITE(coco_cartridge_r,		coco_cartridge_w)
+	AM_RANGE(0xff40, 0xff7f) AM_DEVREADWRITE(DRAGON_CARTRIDGE, "coco_cartslot", coco_cartridge_r, coco_cartridge_w)
 	AM_RANGE(0xff90, 0xffbf) AM_NOP
 	AM_RANGE(0xffc0, 0xffdf) AM_DEVWRITE(SAM6883, "sam", sam6883_w)
 	AM_RANGE(0xffe0, 0xffef) AM_NOP
@@ -153,8 +180,8 @@ static ADDRESS_MAP_START( d64_plus_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xF000, 0xFEFF) AM_RAMBANK(16)
 	AM_RANGE(0xff00, 0xff03) AM_READWRITE(pia_0_r,pia_0_w)		AM_MIRROR(0x0018)
 	AM_RANGE(0xff04, 0xff07) AM_DEVREADWRITE(ACIA6551, "acia", acia_6551_r,acia_6551_w)	AM_MIRROR(0x0018)
-	AM_RANGE(0xff20, 0xff3f) AM_READWRITE(pia_1_r,coco_pia_1_w)
-	AM_RANGE(0xff40, 0xff7f) AM_READWRITE(coco_cartridge_r,	coco_cartridge_w)
+	AM_RANGE(0xff20, 0xff3f) AM_READWRITE(pia_1_r, coco_pia_1_w)
+	AM_RANGE(0xff40, 0xff7f) AM_DEVREADWRITE(DRAGON_CARTRIDGE, "coco_cartslot", coco_cartridge_r, coco_cartridge_w)
 	AM_RANGE(0xff90, 0xffbf) AM_NOP
 	AM_RANGE(0xffc0, 0xffdf) AM_DEVWRITE(SAM6883, "sam", sam6883_w)
 	AM_RANGE(0xffe0, 0xffe1) AM_NOP
@@ -235,7 +262,7 @@ static ADDRESS_MAP_START( dgnalpha_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xff24, 0xff27) AM_READWRITE(pia_2_r,			pia_2_w) 	/* Third PIA on Dragon Alpha */
 	AM_RANGE(0Xff28, 0xff2b) AM_READWRITE(alpha_modem_r,	alpha_modem_w)	/* Modem, dummy to stop eror log ! */
 	AM_RANGE(0xff2c, 0xff2f) AM_READWRITE(wd2797_r,			wd2797_w)	/* Alpha onboard disk interface */
-	AM_RANGE(0xff40, 0xff7f) AM_READWRITE(coco_cartridge_r,	coco_cartridge_w)
+	AM_RANGE(0xff40, 0xff7f) AM_DEVREADWRITE(DRAGON_CARTRIDGE, "coco_cartslot", coco_cartridge_r, coco_cartridge_w)
 	AM_RANGE(0xff90, 0xffbf) AM_NOP
 	AM_RANGE(0xffc0, 0xffdf) AM_DEVWRITE(SAM6883, "sam", sam6883_w)
 	AM_RANGE(0xffe0, 0xffef) AM_NOP
@@ -643,18 +670,10 @@ static const cassette_config coco_cassette_config =
 	CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED
 };
 
-static MACHINE_DRIVER_START( coco_cartslot )
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("ccc,rom")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_LOAD(coco_rom)
-	MDRV_CARTSLOT_UNLOAD(coco_rom)
-MACHINE_DRIVER_END
-
 static MACHINE_DRIVER_START( dragon32 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 MHz */
-	MDRV_CPU_PROGRAM_MAP(coco_map, 0)
+	MDRV_CPU_PROGRAM_MAP(dragon_map, 0)
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(M6847_PAL_FRAMES_PER_SECOND)
 
@@ -679,11 +698,12 @@ static MACHINE_DRIVER_START( dragon32 )
 
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
 	
-	MDRV_WD179X_ADD("wd179x", dragon_wd17xx_interface )
-	
 	MDRV_SAM6883_ADD("sam", coco_sam_intf)
 	
-	MDRV_IMPORT_FROM(coco_cartslot)
+	MDRV_DRAGON_CARTRIDGE_ADD("coco_cartslot")
+	MDRV_DRAGON_CARTRIDGE_CART_CALLBACK(coco_cart_w)
+	MDRV_DRAGON_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
+	MDRV_DRAGON_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dragon64 )
@@ -718,11 +738,12 @@ static MACHINE_DRIVER_START( dragon64 )
 	/* acia */
 	MDRV_ACIA6551_ADD("acia")
 	
-	MDRV_WD179X_ADD("wd179x", dragon_wd17xx_interface )
-	
 	MDRV_SAM6883_ADD("sam", coco_sam_intf)
 	
-	MDRV_IMPORT_FROM(coco_cartslot)
+	MDRV_DRAGON_CARTRIDGE_ADD("coco_cartslot")
+	MDRV_DRAGON_CARTRIDGE_CART_CALLBACK(coco_cart_w)
+	MDRV_DRAGON_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
+	MDRV_DRAGON_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( d64plus )
@@ -757,11 +778,12 @@ static MACHINE_DRIVER_START( d64plus )
 	/* acia */
 	MDRV_ACIA6551_ADD("acia")
 	
-	MDRV_WD179X_ADD("wd179x", dragon_wd17xx_interface )
-	
 	MDRV_SAM6883_ADD("sam", coco_sam_intf)
 	
-	MDRV_IMPORT_FROM(coco_cartslot)
+	MDRV_DRAGON_CARTRIDGE_ADD("coco_cartslot")
+	MDRV_DRAGON_CARTRIDGE_CART_CALLBACK(coco_cart_w)
+	MDRV_DRAGON_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
+	MDRV_DRAGON_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dgnalpha )
@@ -799,11 +821,12 @@ static MACHINE_DRIVER_START( dgnalpha )
 	/* acia */
 	MDRV_ACIA6551_ADD("acia")
 	
-	MDRV_WD179X_ADD("wd179x", dgnalpha_wd17xx_interface )
-	
 	MDRV_SAM6883_ADD("sam", coco_sam_intf)
 	
-	MDRV_IMPORT_FROM(coco_cartslot)
+	MDRV_DRAGON_CARTRIDGE_ADD("coco_cartslot")
+	MDRV_DRAGON_CARTRIDGE_CART_CALLBACK(coco_cart_w)
+	MDRV_DRAGON_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
+	MDRV_DRAGON_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( tanodr64 )
@@ -838,11 +861,12 @@ static MACHINE_DRIVER_START( tanodr64 )
 	/* acia */
 	MDRV_ACIA6551_ADD("acia")
 	
-	MDRV_WD1773_ADD("wd1773", coco_wd17xx_interface )	
-	
 	MDRV_SAM6883_ADD("sam", coco_sam_intf)
 	
-	MDRV_IMPORT_FROM(coco_cartslot)
+	MDRV_DRAGON_CARTRIDGE_ADD("coco_cartslot")
+	MDRV_DRAGON_CARTRIDGE_CART_CALLBACK(coco_cart_w)
+	MDRV_DRAGON_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
+	MDRV_DRAGON_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco )
@@ -872,18 +896,15 @@ static MACHINE_DRIVER_START( coco )
 	MDRV_SNAPSHOT_ADD(coco_pak, "pak", 0)
 	MDRV_QUICKLOAD_ADD(coco, "bin", 0.5)
 
-	/* devices */
-	MDRV_MSM6242_ADD("disto")
-	MDRV_DS1315_ADD("cloud9")
-
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
 	
-	MDRV_WD1773_ADD("wd1773", coco_wd17xx_interface )	
-	
 	MDRV_SAM6883_ADD("sam", coco_sam_intf)
 	
-	MDRV_IMPORT_FROM(coco_cartslot)
+	MDRV_COCO_CARTRIDGE_ADD("coco_cartslot")
+	MDRV_COCO_CARTRIDGE_CART_CALLBACK(coco_cart_w)
+	MDRV_COCO_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
+	MDRV_COCO_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco2 )
@@ -913,18 +934,15 @@ static MACHINE_DRIVER_START( coco2 )
 	MDRV_SNAPSHOT_ADD(coco_pak, "pak", 0)
 	MDRV_QUICKLOAD_ADD(coco, "bin", 0.5)
 
-	/* devices */
-	MDRV_MSM6242_ADD("disto")
-	MDRV_DS1315_ADD("cloud9")
-
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
 	
-	MDRV_WD1773_ADD("wd1773", coco_wd17xx_interface )	
-	
 	MDRV_SAM6883_ADD("sam", coco_sam_intf)
 	
-	MDRV_IMPORT_FROM(coco_cartslot)
+	MDRV_COCO_CARTRIDGE_ADD("coco_cartslot")
+	MDRV_COCO_CARTRIDGE_CART_CALLBACK(coco_cart_w)
+	MDRV_COCO_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
+	MDRV_COCO_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco2b )
@@ -954,18 +972,15 @@ static MACHINE_DRIVER_START( coco2b )
 	MDRV_SNAPSHOT_ADD(coco_pak, "pak", 0)
 	MDRV_QUICKLOAD_ADD(coco, "bin", 0.5)
 
-	/* devices */
-	MDRV_MSM6242_ADD("disto")
-	MDRV_DS1315_ADD("cloud9")
-
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
 	
-	MDRV_WD1773_ADD("wd1773", coco_wd17xx_interface )	
-	
 	MDRV_SAM6883_ADD("sam", coco_sam_intf)
 	
-	MDRV_IMPORT_FROM(coco_cartslot)
+	MDRV_COCO_CARTRIDGE_ADD("coco_cartslot")
+	MDRV_COCO_CARTRIDGE_CART_CALLBACK(coco_cart_w)
+	MDRV_COCO_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
+	MDRV_COCO_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco3 )
@@ -1006,17 +1021,16 @@ static MACHINE_DRIVER_START( coco3 )
 
 	/* devices */
 	MDRV_COCO_VHD_ADD("vhd")
-	MDRV_MSM6242_ADD("disto")
-	MDRV_DS1315_ADD("cloud9")
 
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
 	
-	MDRV_WD1773_ADD("wd1773", coco_wd17xx_interface )	
-	
 	MDRV_SAM6883_GIME_ADD("sam", coco3_sam_intf)
 	
-	MDRV_IMPORT_FROM(coco_cartslot)
+	MDRV_COCO_CARTRIDGE_ADD("coco_cartslot")
+	MDRV_COCO_CARTRIDGE_CART_CALLBACK(coco3_cart_w)
+	MDRV_COCO_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
+	MDRV_COCO_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco3p )
@@ -1046,8 +1060,9 @@ ROM_START(dragon32)
 	ROM_REGION(0xC000, "main",0)
 	ROM_LOAD(           "d32.rom",      0x0000,  0x4000, CRC(e3879310) SHA1(f2dab125673e653995a83bf6b793e3390ec7f65a))
 
-	ROM_REGION(0x2000,"cart",0)
+	ROM_REGION(0x4000,"cart",0)
 	ROM_LOAD_OPTIONAL(  "ddos10.rom",   0x0000,  0x2000, CRC(b44536f6) SHA1(a8918c71d319237c1e3155bb38620acb114a80bc))
+	ROM_CART_LOAD("coco_cartslot:cart", 0x0000, 0x4000, ROM_OPTIONAL | ROM_MIRROR)
 ROM_END
 
 ROM_START(dragon64)
@@ -1055,8 +1070,9 @@ ROM_START(dragon64)
 	ROM_LOAD(           "d64_1.rom",    0x0000,  0x4000, CRC(60a4634c) SHA1(f119506eaa3b4b70b9aa0dd83761e8cbe043d042))
 	ROM_LOAD(           "d64_2.rom",    0x8000,  0x4000, CRC(17893a42) SHA1(e3c8986bb1d44269c4587b04f1ca27a70b0aaa2e))
 
-	ROM_REGION(0x2000,"cart",0)
+	ROM_REGION(0x4000,"cart",0)
 	ROM_LOAD_OPTIONAL(  "ddos10.rom",   0x0000,  0x2000, CRC(b44536f6) SHA1(a8918c71d319237c1e3155bb38620acb114a80bc))
+	ROM_CART_LOAD("coco_cartslot:cart", 0x0000, 0x4000, ROM_OPTIONAL | ROM_MIRROR)
 ROM_END
 
 ROM_START(d64plus)
@@ -1064,8 +1080,9 @@ ROM_START(d64plus)
 	ROM_LOAD(           "d64_1.rom",    0x0000,  0x4000, CRC(60a4634c) SHA1(f119506eaa3b4b70b9aa0dd83761e8cbe043d042))
 	ROM_LOAD(           "d64_2.rom",    0x8000,  0x4000, CRC(17893a42) SHA1(e3c8986bb1d44269c4587b04f1ca27a70b0aaa2e))
 
-	ROM_REGION(0x2000,"cart",0)
+	ROM_REGION(0x4000,"cart",0)
 	ROM_LOAD_OPTIONAL(  "ddos10.rom",   0x0000,  0x2000, CRC(b44536f6) SHA1(a8918c71d319237c1e3155bb38620acb114a80bc))
+	ROM_CART_LOAD("coco_cartslot:cart", 0x0000, 0x4000, ROM_OPTIONAL | ROM_MIRROR)
 ROM_END
 
 ROM_START(tanodr64)
@@ -1073,8 +1090,9 @@ ROM_START(tanodr64)
 	ROM_LOAD(           "d64_1.rom",    0x0000,  0x4000, CRC(60a4634c) SHA1(f119506eaa3b4b70b9aa0dd83761e8cbe043d042))
 	ROM_LOAD(           "d64_2.rom",    0x8000,  0x4000, CRC(17893a42) SHA1(e3c8986bb1d44269c4587b04f1ca27a70b0aaa2e))
 
-	ROM_REGION(0x2000,"cart",0)
+	ROM_REGION(0x4000,"cart",0)
 	ROM_LOAD_OPTIONAL(  "sdtandy.rom",   0x0000,  0x2000, CRC(5d7779b7) SHA1(ca03942118f2deab2f6c8a89b8a4f41f2d0b94f1))
+	ROM_CART_LOAD("coco_cartslot:cart", 0x0000, 0x4000, ROM_OPTIONAL | ROM_MIRROR)
 ROM_END
 
 ROM_START(dgnalpha)
@@ -1082,16 +1100,17 @@ ROM_START(dgnalpha)
 	ROM_LOAD(           "alpha_bt.rom",    0x2000,  0x2000, CRC(c3dab585) SHA1(4a5851aa66eb426e9bb0bba196f1e02d48156068))
 	ROM_LOAD(           "alpha_ba.rom",    0x8000,  0x4000, CRC(84f68bf9) SHA1(1983b4fb398e3dd9668d424c666c5a0b3f1e2b69))
 
-	ROM_REGION(0x2000,"cart",0)
-	ROM_FILL( 0x0000, 0x2000, 0x00 )
+	ROM_REGION(0x4000,"coco_cartslot:cart",0)
+	ROM_FILL( 0x0000, 0x4000, 0x00 )
 ROM_END
 
 ROM_START(coco)
 	ROM_REGION(0x8000,"main",0)
 	ROM_LOAD(			"bas10.rom",	0x2000, 0x2000, CRC(00b50aaa) SHA1(1f08455cd48ce6a06132aea15c4778f264e19539))
 
-	ROM_REGION(0x2000,"cart",0)
-	ROM_FILL( 0x0000, 0x2000, 0x00 )
+	ROM_REGION(0x4000,"cart",0)
+	ROM_FILL( 0x0000, 0x4000, 0x00 )
+	ROM_CART_LOAD("coco_cartslot:cart", 0x0000, 0x4000, ROM_OPTIONAL | ROM_MIRROR)
 ROM_END
 
 ROM_START(cocoe)
@@ -1099,8 +1118,9 @@ ROM_START(cocoe)
 	ROM_LOAD(			"bas11.rom",	0x2000, 0x2000, CRC(6270955a) SHA1(cecb7c24ff1e0ab5836e4a7a8eb1b8e01f1fded3))
 	ROM_LOAD(	        "extbas10.rom",	0x0000, 0x2000, CRC(6111a086) SHA1(8aa58f2eb3e8bcfd5470e3e35e2b359e9a72848e))
 
-	ROM_REGION(0x2000,"cart",0)
+	ROM_REGION(0x4000,"cart",0)
 	ROM_LOAD_OPTIONAL(	"disk10.rom",	0x0000, 0x2000, CRC(b4f9968e) SHA1(04115be3f97952b9d9310b52f806d04f80b40d03))
+	ROM_CART_LOAD("coco_cartslot:cart", 0x0000, 0x4000, ROM_OPTIONAL | ROM_MIRROR)
 ROM_END
 
 ROM_START(coco2)
@@ -1108,8 +1128,9 @@ ROM_START(coco2)
 	ROM_LOAD(			"bas12.rom",	0x2000, 0x2000, CRC(54368805) SHA1(0f14dc46c647510eb0b7bd3f53e33da07907d04f))
 	ROM_LOAD(      	"extbas11.rom",	0x0000, 0x2000, CRC(a82a6254) SHA1(ad927fb4f30746d820cb8b860ebb585e7f095dea))
 
-	ROM_REGION(0x2000,"cart",0)
+	ROM_REGION(0x4000,"cart",0)
 	ROM_LOAD_OPTIONAL(	"disk11.rom",	0x0000, 0x2000, CRC(0b9c5415) SHA1(10bdc5aa2d7d7f205f67b47b19003a4bd89defd1))
+	ROM_CART_LOAD("coco_cartslot:cart", 0x0000, 0x4000, ROM_OPTIONAL | ROM_MIRROR)
 ROM_END
 
 ROM_START(coco2b)
@@ -1117,8 +1138,9 @@ ROM_START(coco2b)
 	ROM_LOAD(			"bas13.rom",	0x2000, 0x2000, CRC(d8f4d15e) SHA1(28b92bebe35fa4f026a084416d6ea3b1552b63d3))
 	ROM_LOAD(      	"extbas11.rom",	0x0000, 0x2000, CRC(a82a6254) SHA1(ad927fb4f30746d820cb8b860ebb585e7f095dea))
 
-	ROM_REGION(0x2000,"cart",0)
+	ROM_REGION(0x4000,"cart",0)
 	ROM_LOAD_OPTIONAL(	"disk11.rom",	0x0000, 0x2000, CRC(0b9c5415) SHA1(10bdc5aa2d7d7f205f67b47b19003a4bd89defd1))
+	ROM_CART_LOAD("coco_cartslot:cart", 0x0000, 0x4000, ROM_OPTIONAL | ROM_MIRROR)
 ROM_END
 
 ROM_START(coco3)
@@ -1130,6 +1152,7 @@ ROM_START(coco3)
 	ROM_RELOAD(0x2000, 0x2000)
 	ROM_RELOAD(0x4000, 0x2000)
 	ROM_RELOAD(0x6000, 0x2000)
+	ROM_CART_LOAD("coco_cartslot:cart", 0x0000, 0x8000, ROM_OPTIONAL | ROM_MIRROR)
 ROM_END
 
 ROM_START(coco3p)
@@ -1141,14 +1164,16 @@ ROM_START(coco3p)
 	ROM_RELOAD(0x2000, 0x2000)
 	ROM_RELOAD(0x4000, 0x2000)
 	ROM_RELOAD(0x6000, 0x2000)
+	ROM_CART_LOAD("coco_cartslot:cart", 0x0000, 0x8000, ROM_OPTIONAL | ROM_MIRROR)
 ROM_END
 
 ROM_START(cp400)
 	ROM_REGION(0x8000,"main",0)
 	ROM_LOAD("cp400bas.rom",  0x0000, 0x4000, CRC(878396a5) SHA1(292c545da3c77978e043b00a3dbc317201d18c3b))
 
-	ROM_REGION(0x2000,"cart",0)
+	ROM_REGION(0x4000,"cart",0)
 	ROM_LOAD("cp400dsk.rom",  0x0000, 0x2000, CRC(e9ad60a0) SHA1(827697fa5b755f5dc1efb054cdbbeb04e405405b))
+	ROM_CART_LOAD("coco_cartslot:cart", 0x0000, 0x4000, ROM_OPTIONAL | ROM_MIRROR)
 ROM_END
 
 #define rom_coco3h	rom_coco3

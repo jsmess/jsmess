@@ -11,31 +11,90 @@
 #include "cococart.h"
 
 
-/*-------------------------------------------------
-    pak_init - initializer for the PAKs
--------------------------------------------------*/
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
 
-static void pak_init(running_machine *machine, coco_cartridge *cartridge)
+typedef struct _coco_pak_pcb_t coco_pak_pcb_t;
+struct _coco_pak_pcb_t
 {
-	cococart_set_line(machine, cartridge, COCOCART_LINE_CART, COCOCART_LINE_VALUE_Q);
+	const device_config *cococart;
+	const device_config *cart;
+};
+
+
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
+
+INLINE coco_pak_pcb_t *get_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert((device->type == COCO_CARTRIDGE_PCB_PAK) || (device->type == COCO_CARTRIDGE_PCB_PAK_BANKED16K));
+	return (coco_pak_pcb_t *) device->token;
 }
 
 
+/***************************************************************************
+    IMPLEMENTATION
+***************************************************************************/
 
 /*-------------------------------------------------
-    cococart_pak - get info function for standard
-	CoCo cartridges
+    DEVICE_START(coco_pak) - initializer for the PAKs
 -------------------------------------------------*/
 
-void cococart_pak(UINT32 state, cococartinfo *info)
+static DEVICE_START(coco_pak)
+{
+	coco_pak_pcb_t *pak_pcb = get_token(device);
+
+	memset(pak_pcb, 0, sizeof(*pak_pcb));
+	pak_pcb->cococart = device->owner->owner;
+	pak_pcb->cart = device->owner;
+}
+
+
+/*-------------------------------------------------
+    DEVICE_RESET(coco_pak) - initializer for the PAKs
+-------------------------------------------------*/
+
+static DEVICE_RESET(coco_pak)
+{
+	coco_pak_pcb_t *pak_pcb = get_token(device);
+
+	/* normal CoCo PAKs tie their CART line to Q - the system clock */
+	device_set_info_int(
+		pak_pcb->cococart,
+		COCOCARTINFO_INT_LINE_CART,
+		COCOCART_LINE_VALUE_Q);
+}
+
+
+/*-------------------------------------------------
+    DEVICE_GET_INFO(coco_cartridge_pcb_pak) - get
+	info function for standard CoCo cartridges
+-------------------------------------------------*/
+
+DEVICE_GET_INFO(coco_cartridge_pcb_pak)
 {
 	switch(state)
 	{
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case COCOCARTINFO_PTR_INIT:							info->init = pak_init;	break;
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(coco_pak_pcb_t);				break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
+		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
+
+		/* --- the following bits of info are returned as pointers to functions --- */
+		case DEVINFO_FCT_SET_INFO:						/* Nothing */								break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(coco_pak);	break;
+		case DEVINFO_FCT_STOP:							/* Nothing */								break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(coco_pak);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case COCOCARTINFO_STR_NAME:							strcpy(info->s, "pak"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "CoCo Program PAK");		break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "CoCo Program PAK");		break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");						break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);					break;
+		case DEVINFO_STR_CREDITS:						/* Nothing */								break;
 	}
 }
 
@@ -49,21 +108,35 @@ void cococart_pak(UINT32 state, cococartinfo *info)
     banked_pak_set_bank - function to set the bank
 -------------------------------------------------*/
 
-static void banked_pak_set_bank(running_machine *machine, coco_cartridge *cartridge, UINT32 bank)
+static void banked_pak_set_bank(const device_config *device, UINT32 bank)
 {
-	cococart_map_memory(machine, cartridge, bank * 0x4000, 0x3FFF);
+	coco_pak_pcb_t *pak_pcb = get_token(device);
+	UINT64 pos;
+	UINT32 i;
+	UINT8 *rom = memory_region(device->machine, "cart");
+	UINT32 rom_length = memory_region_length(device->machine, "cart");
+	
+	pos = (bank * 0x4000) % image_length(pak_pcb->cart);
+
+	for (i = 0; i < rom_length / 0x4000; i++)
+	{
+		image_fseek(pak_pcb->cart, pos, SEEK_SET);
+		image_fread(pak_pcb->cart, &rom[i * 0x4000], 0x4000);
+	}
+
 }
 
 
 
 /*-------------------------------------------------
-    banked_pak_init
+    DEVICE_RESET(banked_pak)
 -------------------------------------------------*/
 
-static void banked_pak_init(running_machine *machine, coco_cartridge *cartridge)
+static DEVICE_RESET(banked_pak)
 {
-	pak_init(machine,cartridge);
-	banked_pak_set_bank(machine,cartridge, 0);
+	DEVICE_RESET_CALL(coco_pak);
+
+	banked_pak_set_bank(device, 0);
 }
 
 
@@ -72,13 +145,13 @@ static void banked_pak_init(running_machine *machine, coco_cartridge *cartridge)
     banked_pak_w - function to write to $FF40
 -------------------------------------------------*/
 
-static void banked_pak_w(running_machine *machine, coco_cartridge *cartridge, UINT16 addr, UINT8 data)
+static WRITE8_DEVICE_HANDLER( banked_pak_w )
 {
-	switch(addr)
+	switch(offset)
 	{
 		case 0:
 			/* set the bank */
-			banked_pak_set_bank(machine, cartridge, data);
+			banked_pak_set_bank(device, data);
 			break;
 	}
 }
@@ -86,21 +159,21 @@ static void banked_pak_w(running_machine *machine, coco_cartridge *cartridge, UI
 
 
 /*-------------------------------------------------
-    cococart_pak_banked16k - get info function for
-	banked CoCo cartridges
+    DEVICE_GET_INFO(coco_cartridge_pcb_pak_banked16k) -
+	get info function for banked CoCo cartridges
 -------------------------------------------------*/
 
-void cococart_pak_banked16k(UINT32 state, cococartinfo *info)
+DEVICE_GET_INFO(coco_cartridge_pcb_pak_banked16k)
 {
 	switch(state)
 	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case COCOCARTINFO_PTR_INIT:							info->init = banked_pak_init;	break;
-		case COCOCARTINFO_PTR_FF40_W:						info->wh = banked_pak_w;	break;
+		/* --- the following bits of info are returned as pointers to functions --- */
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(banked_pak);	break;
+		case COCOCARTINFO_FCT_FF40_W:					info->f = (genf *) banked_pak_w; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case COCOCARTINFO_STR_NAME:							strcpy(info->s, "pak_banked16k"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "CoCo Program PAK (Banked)");		break;
 
-		default: cococart_pak(state, info); break;
+		default: DEVICE_GET_INFO_CALL(coco_cartridge_pcb_pak); break;
 	}
 }

@@ -32,11 +32,12 @@ struct _orch90_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE orch90_t *get_token(coco_cartridge *cartridge)
+INLINE orch90_t *get_token(const device_config *device)
 {
-	return cococart_get_extra_data(cartridge);
+	assert(device != NULL);
+	assert(device->type == COCO_CARTRIDGE_PCB_ORCH90);
+	return (orch90_t *) device->token;
 }
-
 
 
 /***************************************************************************
@@ -44,12 +45,12 @@ INLINE orch90_t *get_token(coco_cartridge *cartridge)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    orch90_init - initializer for the Orch-90
+    DEVICE_START(orch90) - initializer for the Orch-90
 -------------------------------------------------*/
 
-static void orch90_init(running_machine *machine, coco_cartridge *cartridge)
+static DEVICE_START(orch90)
 {
-	orch90_t *info = get_token(cartridge);
+	orch90_t *info = get_token(device);
 
 	/* TODO - when we can instantiate DACs, we can do something better here */
 	info->left_dac = 0;
@@ -62,11 +63,11 @@ static void orch90_init(running_machine *machine, coco_cartridge *cartridge)
     orch90_w - function to write to the Orch-90
 -------------------------------------------------*/
 
-static void orch90_w(running_machine *machine, coco_cartridge *cartridge, UINT16 addr, UINT8 data)
+static WRITE8_DEVICE_HANDLER( orch90_w )
 {
-	orch90_t *info = get_token(cartridge);
+	orch90_t *info = get_token(device);
 
-	switch(addr)
+	switch(offset)
 	{
 		case 0x3A:
 			/* left channel write */
@@ -83,23 +84,30 @@ static void orch90_w(running_machine *machine, coco_cartridge *cartridge, UINT16
 
 
 /*-------------------------------------------------
-    cococart_orch90 - get info function for the
-	Orch-90
+    DEVICE_GET_INFO(coco_cartridge_pcb_orch90) -
+	get info function for the Orch-90
 -------------------------------------------------*/
 
-void cococart_orch90(UINT32 state, cococartinfo *info)
+DEVICE_GET_INFO(coco_cartridge_pcb_orch90)
 {
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case COCOCARTINFO_INT_DATASIZE:						info->i = sizeof(orch90_t);	break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(orch90_t);				break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;							break;
+		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;		break;
 
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case COCOCARTINFO_PTR_INIT:							info->init = orch90_init;	break;
-		case COCOCARTINFO_PTR_FF40_W:						info->wh = orch90_w;	break;
+		/* --- the following bits of info are returned as pointers to functions --- */
+		case DEVINFO_FCT_SET_INFO:						/* Nothing */							break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(orch90);break;
+		case DEVINFO_FCT_STOP:							/* Nothing */							break;
+		case DEVINFO_FCT_RESET:							/* Nothing */							break;
+		case COCOCARTINFO_FCT_FF40_W:					info->f = (genf *) orch90_w;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case COCOCARTINFO_STR_NAME:							strcpy(info->s, "orch90"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Orch-90");				break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Orch-90");				break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");					break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);				break;
 	}
 }
-

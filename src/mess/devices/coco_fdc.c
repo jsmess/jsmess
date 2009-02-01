@@ -73,19 +73,95 @@
 #include "machine/ds1315.h"
 #include "machine/msm6242.h"
 
-#define LOG_FDC		0
+
+/***************************************************************************
+    PARAMETERS
+***************************************************************************/
+
+#define LOG_FDC					0
+#define WD_TAG					"wd17xx"
+#define DISTO_TAG				"disto"
+#define CLOUD9_TAG				"cloud9"
+#define FDCINFO_PTR_HWTYPE		DEVINFO_PTR_DEVICE_SPECIFIC
 
 
-typedef struct _fdc_info fdc_info;
-struct _fdc_info
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef struct _fdc_hardware_type fdc_hardware_type;
+struct _fdc_hardware_type
 {
+	const char *name;
+	void (*update_lines)(const device_config *device);
+	read8_device_func ff40_r;
+	write8_device_func ff40_w;
+	unsigned initial_drq : 1;
+	device_type wdtype;
+	const machine_config_token *wdmachine;
+};
+
+
+typedef struct _fdc_t fdc_t;
+struct _fdc_t
+{
+	const fdc_hardware_type *hwtype;
+
 	UINT8 dskreg;
 	unsigned drq : 1;
 	unsigned intrq : 1;
 
-	void (*update_lines)(running_machine *machine, coco_cartridge *cartridge);
+	const device_config *cococart;			/* CoCo cart slot interface */
+	const device_config *wd17xx;			/* WD17xx */
+	const device_config *ds1315;			/* DS1315 */
+
+	/* Disto RTC */
+	const device_config *disto_msm6242;		/* 6242 RTC on Disto interface */
+	offs_t msm6242_rtc_address;
 };
 
+
+typedef enum
+{
+	RTC_DISTO	= 0x00,
+	RTC_CLOUD9	= 0x01,
+
+	RTC_NONE	= 0xFF
+} rtc_type_t;
+
+
+/***************************************************************************
+    PROTOTYPES
+***************************************************************************/
+
+static WD17XX_CALLBACK( fdc_callback );
+
+
+/***************************************************************************
+    LOCAL VARIABLES
+***************************************************************************/
+
+static const wd17xx_interface coco_wd17xx_interface =
+{
+	fdc_callback
+};
+
+
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
+
+/*-------------------------------------------------
+    get_token
+-------------------------------------------------*/
+
+INLINE fdc_t *get_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert((device->type == COCO_CARTRIDGE_PCB_FDC_COCO) || (device->type == COCO_CARTRIDGE_PCB_FDC_DRAGON));
+	return (fdc_t *) device->token;
+}
 
 
 /***************************************************************************
@@ -93,14 +169,25 @@ struct _fdc_info
 ***************************************************************************/
 
 /*-------------------------------------------------
-    fdc_get_info
+    real_time_clock
 -------------------------------------------------*/
 
-static fdc_info *fdc_get_info(coco_cartridge *cartridge)
+INLINE rtc_type_t real_time_clock(const device_config *device)
 {
-	return cococart_get_extra_data(cartridge);
-}
+	rtc_type_t result;
+	fdc_t *fdc = get_token(device);
+	
+	result = (int) input_port_read_safe(device->machine, "real_time_clock", RTC_NONE);
 
+	/* check to make sure we don't have any invalid values */
+	if (((result == RTC_DISTO) && (fdc->disto_msm6242 == NULL))
+		|| ((result == RTC_CLOUD9) && (fdc->ds1315 == NULL)))
+	{
+		result = RTC_NONE;
+	}
+
+	return result;
+}
 
 
 /*-------------------------------------------------
@@ -109,80 +196,102 @@ static fdc_info *fdc_get_info(coco_cartridge *cartridge)
 
 static WD17XX_CALLBACK( fdc_callback )
 {
-	coco_cartridge *cartridge = (coco_cartridge *) param;
-	fdc_info *info = fdc_get_info(cartridge);
-
-	/* HACK - fix when we have better CoCo cartridge devicification */
-	if (info == NULL)
-		return;
+	const device_config *fdc_device = device->owner;
+	fdc_t *fdc = get_token(fdc_device);
 
 	switch(state)
 	{
 		case WD17XX_IRQ_CLR:
-			info->intrq = 0;
+			fdc->intrq = 0;
 			break;
 
 		case WD17XX_IRQ_SET:
-			info->intrq = 1;
+			fdc->intrq = 1;
 			break;
 
 		case WD17XX_DRQ_CLR:
-			info->drq = 0;
+			fdc->drq = 0;
 			break;
 
 		case WD17XX_DRQ_SET:
-			info->drq = 1;
+			fdc->drq = 1;
 			break;
 	}
 
-	(*info->update_lines)(device->machine,cartridge);
+	(*fdc->hwtype->update_lines)(fdc_device);
 }
-
-extern coco_cartridge *coco_cart;
-
-static WD17XX_PARAM_CALLBACK( get_coco_cart )
-{
-	return coco_cart;
-}
-
-const wd17xx_interface dragon_wd17xx_interface = {
-	fdc_callback,
-	get_coco_cart
-};
-const wd17xx_interface coco_wd17xx_interface = {
-	fdc_callback,
-	get_coco_cart
-};
 
 
 /*-------------------------------------------------
-    fdc_init - general function to initialize FDC
+    fdc_start - general function to initialize FDC
 -------------------------------------------------*/
 
-static void fdc_init(coco_cartridge *cartridge,
-	void (*update_lines)(running_machine *machine,coco_cartridge *cartridge),
-	int initial_drq)
+static DEVICE_START(fdc)
 {
-	fdc_info *info = fdc_get_info(cartridge);
+	fdc_t *fdc = get_token(device);
+	astring *tempstring = astring_alloc();
+	const fdc_hardware_type *hwtype = device_get_info_ptr(device, FDCINFO_PTR_HWTYPE);
 
 	/* initialize variables */
-	memset(info, 0, sizeof(*info));
-	info->update_lines = update_lines;
-	info->drq = initial_drq ? 1 : 0;
+	memset(fdc, 0, sizeof(*fdc));
+	fdc->hwtype			= hwtype;
+	fdc->drq			= hwtype->initial_drq;
+	fdc->cococart		= device->owner->owner;
+	fdc->disto_msm6242	= devtag_get_device(device->machine, MSM6242,			device_build_tag(tempstring, device, DISTO_TAG));
+	fdc->ds1315			= devtag_get_device(device->machine, DS1315,			device_build_tag(tempstring, device, CLOUD9_TAG));
+	fdc->wd17xx			= devtag_get_device(device->machine, hwtype->wdtype,	device_build_tag(tempstring, device, WD_TAG));
+
+	assert(fdc->wd17xx != NULL);
+
+	astring_free(tempstring);
 }
 
 
 
 /*-------------------------------------------------
-    cococart_fdc - general FDC function
+    DEVICE_SET_INFO( fdc ) - general FDC set info func
 -------------------------------------------------*/
 
-static void cococart_fdc(UINT32 state, cococartinfo *info)
+static DEVICE_SET_INFO( fdc )
+{
+	switch (state)
+	{
+	}
+}
+
+
+
+/*-------------------------------------------------
+    DEVICE_GET_INFO( fdc ) - general FDC get info func
+-------------------------------------------------*/
+
+static void general_fdc_get_info(const device_config *device, UINT32 state, deviceinfo *info,
+	const fdc_hardware_type *hwtype)
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case COCOCARTINFO_INT_DATASIZE:						info->i = sizeof(fdc_info);	break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(fdc_t);					break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
+		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
+
+		/* --- the following bits of info are returned as pointers to data --- */
+		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = hwtype->wdmachine;	break;
+		case FDCINFO_PTR_HWTYPE:						info->p = (void *) hwtype;					break;
+
+		/* --- the following bits of info are returned as pointers to functions --- */
+		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(fdc); break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(fdc);		break;
+		case DEVINFO_FCT_STOP:							/* Nothing */								break;
+		case DEVINFO_FCT_RESET:							/* Nothing */								break;
+		case COCOCARTINFO_FCT_FF40_R:					info->f = (genf *) hwtype->ff40_r;			break;
+		case COCOCARTINFO_FCT_FF40_W:					info->f = (genf *) hwtype->ff40_w;			break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, hwtype->name);				break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "CoCo FDC");				break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");						break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);					break;
 	}
 }
 
@@ -197,38 +306,25 @@ static void cococart_fdc(UINT32 state, cococartinfo *info)
 	controller lines
 -------------------------------------------------*/
 
-static void fdc_coco_update_lines(running_machine *machine, coco_cartridge *cartridge)
+static void fdc_coco_update_lines(const device_config *device)
 {
-	fdc_info *info = fdc_get_info(cartridge);
+	fdc_t *fdc = get_token(device);
 
 	/* clear HALT enable under certain circumstances */
-	if ((info->intrq != 0) && (info->dskreg & 0x20))
-		info->dskreg &= ~0x80;	/* clear halt enable */
+	if ((fdc->intrq != 0) && (fdc->dskreg & 0x20))
+		fdc->dskreg &= ~0x80;	/* clear halt enable */
 
 	/* set the NMI line */
-	cococart_set_line(
-		machine,
-		cartridge,
-		COCOCART_LINE_NMI,
-		((info->intrq != 0) && (info->dskreg & 0x20)) ? COCOCART_LINE_VALUE_ASSERT : COCOCART_LINE_VALUE_CLEAR);
+	device_set_info_int(
+		fdc->cococart,
+		COCOCARTINFO_INT_LINE_NMI,
+		((fdc->intrq != 0) && (fdc->dskreg & 0x20)) ? COCOCART_LINE_VALUE_ASSERT : COCOCART_LINE_VALUE_CLEAR);
 
 	/* set the HALT line */
-	cococart_set_line(
-		machine,
-		cartridge,
-		COCOCART_LINE_HALT,
-		((info->drq == 0) && (info->dskreg & 0x80)) ? COCOCART_LINE_VALUE_ASSERT : COCOCART_LINE_VALUE_CLEAR);
-}
-
-
-
-/*-------------------------------------------------
-    fdc_coco_init - function to initialize CoCo FDC
--------------------------------------------------*/
-
-static void fdc_coco_init(running_machine *machine, coco_cartridge *cartridge)
-{
-	fdc_init(cartridge, fdc_coco_update_lines, 1);
+	device_set_info_int(
+		fdc->cococart,
+		COCOCARTINFO_INT_LINE_HALT,
+		((fdc->drq == 0) && (fdc->dskreg & 0x80)) ? COCOCART_LINE_VALUE_ASSERT : COCOCART_LINE_VALUE_CLEAR);
 }
 
 
@@ -238,13 +334,11 @@ static void fdc_coco_init(running_machine *machine, coco_cartridge *cartridge)
 	dskreg
 -------------------------------------------------*/
 
-static void fdc_coco_dskreg_w(running_machine *machine, coco_cartridge *cartridge, UINT8 data)
+static void fdc_coco_dskreg_w(const device_config *device, UINT8 data)
 {
-	device_config *fdc = (device_config*)devtag_get_device(machine, WD1773, "wd1773");
-	fdc_info *info = fdc_get_info(cartridge);
+	fdc_t *fdc = get_token(device);
 	UINT8 drive = 0;
 	UINT8 head = 0;
-	/* int motor_mask = 0; */
 
 	if (LOG_FDC)
 	{
@@ -266,7 +360,6 @@ static void fdc_coco_dskreg_w(running_machine *machine, coco_cartridge *cartridg
 	 * selected in other situations, then both drives are selected, and any
 	 * read signals get yucky.
 	 */
-	/* motor_mask = 0x08; */
 
 	if (data & 0x04)
 		drive = 2;
@@ -276,19 +369,16 @@ static void fdc_coco_dskreg_w(running_machine *machine, coco_cartridge *cartridg
 		drive = 0;
 	else if (data & 0x40)
 		drive = 3;
-	/* else
-		motor_mask = 0;
-	*/
 
 	head = ((data & 0x40) && (drive != 3)) ? 1 : 0;
 
-	info->dskreg = data;
+	fdc->dskreg = data;
 
-	(*info->update_lines)(machine, cartridge);
+	(*fdc->hwtype->update_lines)(device);
 
-	wd17xx_set_drive(fdc,drive);
-	wd17xx_set_side(fdc,head);
-	wd17xx_set_density(fdc,(info->dskreg & 0x20) ? DEN_MFM_LO : DEN_FM_LO);
+	wd17xx_set_drive(fdc->wd17xx, drive);
+	wd17xx_set_side(fdc->wd17xx, head);
+	wd17xx_set_density(fdc->wd17xx, (fdc->dskreg & 0x20) ? DEN_MFM_LO : DEN_FM_LO);
 }
 
 
@@ -297,23 +387,48 @@ static void fdc_coco_dskreg_w(running_machine *machine, coco_cartridge *cartridg
     fdc_coco_r - function to read from CoCo FDC
 -------------------------------------------------*/
 
-static UINT8 fdc_coco_r(running_machine *machine, coco_cartridge *cartridge, UINT16 addr)
+static UINT8 fdc_coco_r(const device_config *device, offs_t addr)
 {
-	device_config *fdc = (device_config*)devtag_get_device(machine, WD1773, "wd1773");
+	fdc_t *fdc = get_token(device);
 	UINT8 result = 0;
+
 	switch(addr & 0xEF)
 	{
 		case 8:
-			result = wd17xx_status_r(fdc, 0);
+			result = wd17xx_status_r(fdc->wd17xx, 0);
 			break;
 		case 9:
-			result = wd17xx_track_r(fdc, 0);
+			result = wd17xx_track_r(fdc->wd17xx, 0);
 			break;
 		case 10:
-			result = wd17xx_sector_r(fdc, 0);
+			result = wd17xx_sector_r(fdc->wd17xx, 0);
 			break;
 		case 11:
-			result = wd17xx_data_r(fdc, 0);
+			result = wd17xx_data_r(fdc->wd17xx, 0);
+			break;
+	}
+
+	/* other stuff for RTCs */
+	switch(addr)
+	{
+		case 0x10:	/* FF50 */
+			if (real_time_clock(device) == RTC_DISTO)
+				result = msm6242_r(fdc->disto_msm6242, fdc->msm6242_rtc_address);
+			break;
+
+		case 0x38:	/* FF78 */
+			if (real_time_clock(device) == RTC_CLOUD9)
+				ds1315_r_0(fdc->ds1315, addr);
+			break;
+
+		case 0x39:	/* FF79 */
+			if (real_time_clock(device) == RTC_CLOUD9)
+				ds1315_r_1(fdc->ds1315, addr);
+			break;
+
+		case 0x3C:	/* FF7C */
+			if (real_time_clock(device) == RTC_CLOUD9)
+				result = ds1315_r_data(fdc->ds1315, addr);
 			break;
 	}
 	return result;
@@ -325,176 +440,70 @@ static UINT8 fdc_coco_r(running_machine *machine, coco_cartridge *cartridge, UIN
     fdc_coco_w - function to write to CoCo FDC
 -------------------------------------------------*/
 
-static void fdc_coco_w(running_machine *machine, coco_cartridge *cartridge, UINT16 addr, UINT8 data)
+static void fdc_coco_w(const device_config *device, offs_t addr, UINT8 data)
 {
-	device_config *fdc = (device_config*)devtag_get_device(machine, WD1773, "wd1773");
-	switch(addr & 0xEF)
+	fdc_t *fdc = get_token(device);
+
+	switch(addr & 0x1F)
 	{
 		case 0: case 1: case 2: case 3:
 		case 4: case 5: case 6: case 7:
-			fdc_coco_dskreg_w(machine, cartridge, data);
+			fdc_coco_dskreg_w(device, data);
 			break;
 		case 8:
-			wd17xx_command_w(fdc, 0, data);
+			wd17xx_command_w(fdc->wd17xx, 0, data);
 			break;
 		case 9:
-			wd17xx_track_w(fdc, 0, data);
+			wd17xx_track_w(fdc->wd17xx, 0, data);
 			break;
 		case 10:
-			wd17xx_sector_w(fdc, 0, data);
+			wd17xx_sector_w(fdc->wd17xx, 0, data);
 			break;
 		case 11:
-			wd17xx_data_w(fdc, 0, data);
+			wd17xx_data_w(fdc->wd17xx, 0, data);
 			break;
 	};
-}
 
-
-
-/*-------------------------------------------------
-    cococart_fdc_coco - get info function for the
-	CoCo FDC
--------------------------------------------------*/
-
-void cococart_fdc_coco(UINT32 state, cococartinfo *info)
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case COCOCARTINFO_INT_DATASIZE:						info->i = sizeof(fdc_info);	break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case COCOCARTINFO_PTR_INIT:							info->init = fdc_coco_init;	break;
-		case COCOCARTINFO_PTR_FF40_R:						info->rh = fdc_coco_r;	break;
-		case COCOCARTINFO_PTR_FF40_W:						info->wh = fdc_coco_w;	break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case COCOCARTINFO_STR_NAME:							strcpy(info->s, "coco_fdc"); break;
-
-		default: cococart_fdc(state, info); break;
-	}
-}
-
-
-
-/***************************************************************************
-    COCO3 EXTRA FEATURES/HACKS
-***************************************************************************/
-
-typedef enum
-{
-	RTC_DISTO	= 0x00,
-	RTC_CLOUD9	= 0x01
-} rtc_type_t;
-
-static int msm6242_rtc_address;
-
-/*-------------------------------------------------
-    real_time_clock
--------------------------------------------------*/
-
-static rtc_type_t real_time_clock(running_machine *machine)
-{
-	return (rtc_type_t) (int) input_port_read_safe(machine, "real_time_clock", 0x00);
-}
-
-
-
-/*-------------------------------------------------
-    fdc_coco3plus_r
--------------------------------------------------*/
-
-static UINT8 fdc_coco3plus_r(running_machine *machine, coco_cartridge *cartridge, UINT16 addr)
-{
-	const device_config *dev;
-	UINT8 result = fdc_coco_r(machine, cartridge, addr);
-
+	/* other stuff for RTCs */
 	switch(addr)
 	{
 		case 0x10:	/* FF50 */
-			if (real_time_clock(machine) == RTC_DISTO)
-			{
-				dev = devtag_get_device(machine, MSM6242, "disto");
-				result = msm6242_r(dev, msm6242_rtc_address);
-			}
-			break;
-
-		case 0x38:	/* FF78 */
-			if (real_time_clock(machine) == RTC_CLOUD9)
-			{
-				dev = devtag_get_device(machine, DS1315, "cloud9");
-				ds1315_r_0(dev, addr);
-			}
-			break;
-
-		case 0x39:	/* FF79 */
-			if (real_time_clock(machine) == RTC_CLOUD9)
-			{
-				dev = devtag_get_device(machine, DS1315, "cloud9");
-				ds1315_r_1(dev, addr);
-			}
-			break;
-
-		case 0x3C:	/* FF7C */
-			if (real_time_clock(machine) == RTC_CLOUD9)
-			{
-				dev = devtag_get_device(machine, DS1315, "cloud9");
-				result = ds1315_r_data(dev, addr);
-			}
-			break;
-	}
-	return result;
-}
-
-
-
-/*-------------------------------------------------
-    fdc_coco3plus_w
--------------------------------------------------*/
-
-static void fdc_coco3plus_w(running_machine *machine, coco_cartridge *cartridge, UINT16 addr, UINT8 data)
-{
-	const device_config *dev;
-
-	fdc_coco_w(machine, cartridge, addr, data);
-
-	switch(addr)
-	{
-		case 0x10:	/* FF50 */
-			if (real_time_clock(machine) == RTC_DISTO)
-			{
-				dev = devtag_get_device(machine, MSM6242, "disto");
-				msm6242_w(dev, msm6242_rtc_address, data);
-			}
+			if (real_time_clock(device) == RTC_DISTO)
+				msm6242_w(fdc->disto_msm6242, fdc->msm6242_rtc_address, data);
 			break;
 
 		case 0x11:	/* FF51 */
-			if (real_time_clock(machine) == RTC_DISTO)
-				msm6242_rtc_address = data & 0x0f;
+			if (real_time_clock(device) == RTC_DISTO)
+				fdc->msm6242_rtc_address = data & 0x0f;
 			break;
 	}
 }
 
 
-
 /*-------------------------------------------------
-    cococart_fdc_coco3_plus - get info function for
-	CoCo FDC, with extra CoCo 3 features
+    DEVICE_GET_INFO(coco_cartridge_pcb_fdc_coco) -
+	get info function for the CoCo FDC
 -------------------------------------------------*/
 
-void cococart_fdc_coco3_plus(UINT32 state, cococartinfo *info)
+DEVICE_GET_INFO(coco_cartridge_pcb_fdc_coco)
 {
-	switch (state)
+	static MACHINE_DRIVER_START(coco_fdc)
+		MDRV_WD1773_ADD(WD_TAG, coco_wd17xx_interface)
+		MDRV_MSM6242_ADD(DISTO_TAG)
+		MDRV_DS1315_ADD(CLOUD9_TAG)
+	MACHINE_DRIVER_END
+
+	static const fdc_hardware_type hwtype = 
 	{
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case COCOCARTINFO_PTR_FF40_R:						info->rh = fdc_coco3plus_r;	break;
-		case COCOCARTINFO_PTR_FF40_W:						info->wh = fdc_coco3plus_w;	break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case COCOCARTINFO_STR_NAME:							strcpy(info->s, "coco3_plus_fdc"); break;
-
-		default: cococart_fdc_coco(state, info); break;
-	}
+		"CoCo FDC",
+		fdc_coco_update_lines,
+		fdc_coco_r,
+		fdc_coco_w,
+		1,
+		WD1773,
+		MACHINE_DRIVER_NAME(coco_fdc)
+	};
+	general_fdc_get_info(device, state, info, &hwtype);
 }
 
 
@@ -508,37 +517,22 @@ void cococart_fdc_coco3_plus(UINT32 state, cococartinfo *info)
 	controller lines
 -------------------------------------------------*/
 
-static void fdc_dragon_update_lines(running_machine *machine, coco_cartridge *cartridge)
+static void fdc_dragon_update_lines(const device_config *device)
 {
-	fdc_info *info = fdc_get_info(cartridge);
+	fdc_t *fdc = get_token(device);
 
 	/* set the NMI line */
-	cococart_set_line(
-		machine,
-		cartridge,
-		COCOCART_LINE_NMI,
-		((info->intrq != 0) && (info->dskreg & 0x20)) ? COCOCART_LINE_VALUE_ASSERT : COCOCART_LINE_VALUE_CLEAR);
+	device_set_info_int(
+		fdc->cococart,
+		COCOCARTINFO_INT_LINE_NMI,
+		((fdc->intrq != 0) && (fdc->dskreg & 0x20)) ? COCOCART_LINE_VALUE_ASSERT : COCOCART_LINE_VALUE_CLEAR);
 
 	/* set the CART line */
-	cococart_set_line(
-		machine,
-		cartridge,
-		COCOCART_LINE_CART,
-		(info->drq != 0) ? COCOCART_LINE_VALUE_ASSERT : COCOCART_LINE_VALUE_CLEAR);
+	device_set_info_int(
+		fdc->cococart,
+		COCOCARTINFO_INT_LINE_CART,
+		(fdc->drq != 0) ? COCOCART_LINE_VALUE_ASSERT : COCOCART_LINE_VALUE_CLEAR);
 }
-
-
-
-/*-------------------------------------------------
-    fdc_dragon_init - function to initialize Dragon
-	FDC
--------------------------------------------------*/
-
-static void fdc_dragon_init(running_machine *machine, coco_cartridge *cartridge)
-{
-	fdc_init( cartridge, fdc_dragon_update_lines, 0);
-}
-
 
 
 /*-------------------------------------------------
@@ -546,10 +540,9 @@ static void fdc_dragon_init(running_machine *machine, coco_cartridge *cartridge)
 	Dragon dskreg
 -------------------------------------------------*/
 
-static void fdc_dragon_dskreg_w(running_machine *machine,coco_cartridge *cartridge, UINT8 data)
+static void fdc_dragon_dskreg_w(const device_config *device, UINT8 data)
 {
-	device_config *fdc = (device_config*)devtag_get_device(machine, WD179X, "wd179x");
-	fdc_info *info = fdc_get_info(cartridge);
+	fdc_t *fdc = get_token(device);
 
 	if (LOG_FDC)
 	{
@@ -566,10 +559,10 @@ static void fdc_dragon_dskreg_w(running_machine *machine,coco_cartridge *cartrid
 	}
 
 	if (data & 0x04)
-		wd17xx_set_drive(fdc,data & 0x03);
+		wd17xx_set_drive(fdc->wd17xx, data & 0x03);
 
-	wd17xx_set_density(fdc,(data & 0x08) ? DEN_FM_LO: DEN_MFM_LO);
-	info->dskreg = data;
+	wd17xx_set_density(fdc->wd17xx, (data & 0x08) ? DEN_FM_LO: DEN_MFM_LO);
+	fdc->dskreg = data;
 }
 
 
@@ -578,23 +571,24 @@ static void fdc_dragon_dskreg_w(running_machine *machine,coco_cartridge *cartrid
     fdc_dragon_r - function to read from Dragon FDC
 -------------------------------------------------*/
 
-static UINT8 fdc_dragon_r(running_machine *machine, coco_cartridge *cartridge, UINT16 addr)
+static UINT8 fdc_dragon_r(const device_config *device, offs_t addr)
 {
-	device_config *fdc = (device_config*)devtag_get_device(machine, WD179X, "wd179x");
+	fdc_t *fdc = get_token(device);
+
 	UINT8 result = 0;
 	switch(addr & 0xEF)
 	{
 		case 0:
-			result = wd17xx_status_r(fdc, 0);
+			result = wd17xx_status_r(fdc->wd17xx, 0);
 			break;
 		case 1:
-			result = wd17xx_track_r(fdc, 0);
+			result = wd17xx_track_r(fdc->wd17xx, 0);
 			break;
 		case 2:
-			result = wd17xx_sector_r(fdc, 0);
+			result = wd17xx_sector_r(fdc->wd17xx, 0);
 			break;
 		case 3:
-			result = wd17xx_data_r(fdc, 0);
+			result = wd17xx_data_r(fdc->wd17xx, 0);
 			break;
 	}
 	return result;
@@ -606,31 +600,32 @@ static UINT8 fdc_dragon_r(running_machine *machine, coco_cartridge *cartridge, U
     fdc_dragon_w - function to write to Dragon FDC
 -------------------------------------------------*/
 
-static void fdc_dragon_w(running_machine *machine, coco_cartridge *cartridge, UINT16 addr, UINT8 data)
+static void fdc_dragon_w(const device_config *device, offs_t addr, UINT8 data)
 {
-	device_config *fdc = (device_config*)devtag_get_device(machine, WD179X, "wd179x");
+	fdc_t *fdc = get_token(device);
+
 	switch(addr & 0xEF)
 	{
 		case 0:
-			wd17xx_command_w(fdc, 0, data);
+			wd17xx_command_w(fdc->wd17xx, 0, data);
 
 			/* disk head is encoded in the command byte */
 			/* Only for type 3 & 4 commands */
 			if (data & 0x80)
-				wd17xx_set_side(fdc,(data & 0x02) ? 1 : 0);
+				wd17xx_set_side(fdc->wd17xx, (data & 0x02) ? 1 : 0);
 			break;
 		case 1:
-			wd17xx_track_w(fdc, 0, data);
+			wd17xx_track_w(fdc->wd17xx, 0, data);
 			break;
 		case 2:
-			wd17xx_sector_w(fdc, 0, data);
+			wd17xx_sector_w(fdc->wd17xx, 0, data);
 			break;
 		case 3:
-			wd17xx_data_w(fdc, 0, data);
+			wd17xx_data_w(fdc->wd17xx, 0, data);
 			break;
 		case 8: case 9: case 10: case 11:
 		case 12: case 13: case 14: case 15:
-			fdc_dragon_dskreg_w(machine, cartridge, data);
+			fdc_dragon_dskreg_w(device, data);
 			break;
 	};
 }
@@ -638,25 +633,26 @@ static void fdc_dragon_w(running_machine *machine, coco_cartridge *cartridge, UI
 
 
 /*-------------------------------------------------
-    cococart_fdc_dragon - get info function for the
-	Dragon FDC
+    DEVICE_GET_INFO(coco_cartridge_pcb_fdc_dragon) -
+	get info function for the CoCo FDC
 -------------------------------------------------*/
 
-void cococart_fdc_dragon(UINT32 state, cococartinfo *info)
+DEVICE_GET_INFO(coco_cartridge_pcb_fdc_dragon)
 {
-	switch(state)
+	static MACHINE_DRIVER_START(dragon_fdc)
+		MDRV_WD179X_ADD(WD_TAG, coco_wd17xx_interface)
+	MACHINE_DRIVER_END
+
+	static const fdc_hardware_type hwtype = 
 	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case COCOCARTINFO_INT_DATASIZE:						info->i = sizeof(fdc_info);	break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case COCOCARTINFO_PTR_INIT:							info->init = fdc_dragon_init;	break;
-		case COCOCARTINFO_PTR_FF40_R:						info->rh = fdc_dragon_r;	break;
-		case COCOCARTINFO_PTR_FF40_W:						info->wh = fdc_dragon_w;	break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case COCOCARTINFO_STR_NAME:							strcpy(info->s, "dragon_fdc"); break;
-
-		default: cococart_fdc(state, info); break;
-	}
+		"Dragon FDC",
+		fdc_dragon_update_lines,
+		fdc_dragon_r,
+		fdc_dragon_w,
+		0,
+		WD179X,
+		MACHINE_DRIVER_NAME(dragon_fdc)
+	};
+	general_fdc_get_info(device, state, info, &hwtype);
 }
+

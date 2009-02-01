@@ -31,7 +31,7 @@
 typedef struct _coco_state coco_state;
 struct _coco_state
 {
-	const device_config *cartslot_device;
+	const device_config *cococart_device;
 	const device_config *cassette_device;
 	const device_config *bitbanger_device;
 	const device_config *printer_device;
@@ -62,9 +62,6 @@ void coco3_vh_blink(void);
 
 
 /*----------- defined in machine/coco.c -----------*/
-extern const wd17xx_interface dragon_wd17xx_interface;
-extern const wd17xx_interface coco_wd17xx_interface;
-extern const wd17xx_interface dgnalpha_wd17xx_interface;
 extern const sam6883_interface coco_sam_intf;
 extern const sam6883_interface coco3_sam_intf;
 extern UINT8 coco3_gimereg[16];
@@ -91,15 +88,16 @@ READ8_HANDLER ( coco3_mmu_r );
 WRITE8_HANDLER ( coco3_mmu_w );
 READ8_HANDLER ( coco3_gime_r );
 WRITE8_HANDLER ( coco3_gime_w );
-READ8_HANDLER ( coco_cartridge_r);
-WRITE8_HANDLER ( coco_cartridge_w );
-READ8_HANDLER ( coco3_cartridge_r);
-WRITE8_HANDLER ( coco3_cartridge_w );
 offs_t coco3_mmu_translate(int bank, int offset);
 WRITE8_HANDLER( coco_pia_1_w );
 void coco3_horizontal_sync_callback(running_machine *machine,int data);
 void coco3_field_sync_callback(running_machine *machine,int data);
 void coco3_gime_field_sync_callback(running_machine *machine);
+
+void coco_cart_w(const device_config *device, int data);
+void coco3_cart_w(const device_config *device, int data);
+void coco_nmi_w(const device_config *device, int data);
+void coco_halt_w(const device_config *device, int data);
 
 /* Compusense Dragon Plus board */
 READ8_HANDLER ( plus_reg_r );

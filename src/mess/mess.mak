@@ -507,6 +507,7 @@ DRVLIBS = \
 $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/6530miot.o	\
 	$(MESS_DEVICES)/cartslot.o	\
+	$(MESS_DEVICES)/multcart.o	\
 	$(MESS_DEVICES)/flopdrv.o	\
 	$(MESS_DEVICES)/harddriv.o	\
 	$(MESS_DEVICES)/chd_cd.o	\

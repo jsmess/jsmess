@@ -25,6 +25,7 @@ struct _hash_info
 	const char *manufacturer;
 	const char *year;
 	const char *playable;
+	const char *pcb;
 	const char *extrainfo;
 };
 
