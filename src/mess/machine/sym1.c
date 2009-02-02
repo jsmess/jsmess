@@ -33,37 +33,37 @@ static emu_timer *led_update;
 ******************************************************************************/
 
 
-TTL74145_OUTPUT_LINE(sym1_74145_output_0_w)
+static TTL74145_OUTPUT_LINE(sym1_74145_output_0_w)
 {
 	if (state) timer_adjust_oneshot(led_update, LED_REFRESH_DELAY, 0);
 }
 
 
-TTL74145_OUTPUT_LINE(sym1_74145_output_1_w)
+static TTL74145_OUTPUT_LINE(sym1_74145_output_1_w)
 {
 	if (state) timer_adjust_oneshot(led_update, LED_REFRESH_DELAY, 1);
 }
 
 
-TTL74145_OUTPUT_LINE(sym1_74145_output_2_w)
+static TTL74145_OUTPUT_LINE(sym1_74145_output_2_w)
 {
 	if (state) timer_adjust_oneshot(led_update, LED_REFRESH_DELAY, 2);
 }
 
 
-TTL74145_OUTPUT_LINE(sym1_74145_output_3_w)
+static TTL74145_OUTPUT_LINE(sym1_74145_output_3_w)
 {
 	if (state) timer_adjust_oneshot(led_update, LED_REFRESH_DELAY, 3);
 }
 
 
-TTL74145_OUTPUT_LINE(sym1_74145_output_4_w)
+static TTL74145_OUTPUT_LINE(sym1_74145_output_4_w)
 {
 	if (state) timer_adjust_oneshot(led_update, LED_REFRESH_DELAY, 4);
 }
 
 
-TTL74145_OUTPUT_LINE(sym1_74145_output_5_w)
+static TTL74145_OUTPUT_LINE(sym1_74145_output_5_w)
 {
 	if (state) timer_adjust_oneshot(led_update, LED_REFRESH_DELAY, 5);
 }
@@ -76,7 +76,7 @@ static TIMER_CALLBACK( led_refresh )
 
 
 /* The speaker is connected to output 6 of the 74145 */
-TTL74145_OUTPUT_LINE(sym1_74145_output_6_w)
+static TTL74145_OUTPUT_LINE(sym1_74145_output_6_w)
 {
 	speaker_level_w(0, state);
 }

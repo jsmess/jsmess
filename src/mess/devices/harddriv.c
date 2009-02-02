@@ -332,8 +332,6 @@ static DEVICE_START(mess_ide)
 	/* FIXME IDE */
 	/* ide_controller_init_custom(which_bus, intf, NULL); */
 #endif
-
-	return DEVICE_START_CALL(mess_hd);
 }
 
 

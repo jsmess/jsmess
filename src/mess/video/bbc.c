@@ -199,8 +199,8 @@ static int Teletext_Latch_Input_D7=0;
 static int Teletext_Latch=0;
 
 
-static struct saa505x_interface
-BBCsaa5050= {
+static const struct saa505x_interface BBCsaa5050 =
+{
 	BBC_draw_RGB_in,
 };
 

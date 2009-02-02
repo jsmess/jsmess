@@ -400,7 +400,7 @@ static const struct tms9995reset_param ti99_8_processor_config =
 	1				/* MP9537 mask */
 };
 
-MACHINE_DRIVER_START(ti99_8_cartslot)
+static MACHINE_DRIVER_START(ti99_8_cartslot)
  	MDRV_CARTSLOT_ADD("cart1")
 	MDRV_CARTSLOT_EXTENSION_LIST("bin,c,d,g,m,crom,drom,grom,mrom")
 	MDRV_CARTSLOT_NOT_MANDATORY

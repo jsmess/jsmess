@@ -955,7 +955,7 @@ static void	Nick_DoLine(void)
 }
 
 /* MESS specific */
-int	Nick_vh_start(void)
+static int	Nick_vh_start(void)
 {
   Nick_Init();
   return 0;
@@ -1003,7 +1003,7 @@ WRITE8_HANDLER( Nick_reg_w )
   }
 }
 
-void    Nick_DoScreen(bitmap_t *bm)
+static void    Nick_DoScreen(bitmap_t *bm)
 {
   int line = 0;
 

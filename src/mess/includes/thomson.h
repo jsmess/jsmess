@@ -82,17 +82,17 @@ extern MACHINE_START ( to7 );
 extern MACHINE_RESET ( to7 );
 
 /* timer */
-extern mc6846_interface to7_timer;
+extern const mc6846_interface to7_timer;
 
 /* speech synthesis */
-extern mea8000_interface to7_speech;
+extern const mea8000_interface to7_speech;
 
 /* floppy */
-extern mc6843_interface to7_6843_itf;
-extern mc6854_interface to7_network_iface;
+extern const mc6843_interface to7_6843_itf;
+extern const mc6854_interface to7_network_iface;
 
 /* modem */
-extern acia6850_interface to7_modem;
+extern const acia6850_interface to7_modem;
 
 
 /***************************** TO7/70 ******************************/
@@ -104,7 +104,7 @@ extern WRITE8_HANDLER ( to770_gatearray_w );
 extern MACHINE_START ( to770 );
 extern MACHINE_RESET ( to770 );
 
-extern mc6846_interface to770_timer;
+extern const mc6846_interface to770_timer;
 
 /***************************** MO5 ******************************/
 
@@ -147,7 +147,7 @@ extern WRITE8_HANDLER ( to9_kbd_w );
 extern MACHINE_START ( to9 );
 extern MACHINE_RESET ( to9 );
 
-extern mc6846_interface to9_timer;
+extern const mc6846_interface to9_timer;
 
 
 /***************************** TO8 ******************************/
@@ -180,7 +180,7 @@ extern WRITE8_HANDLER ( to8_floppy_w );
 extern MACHINE_START ( to8 );
 extern MACHINE_RESET ( to8 );
 
-extern mc6846_interface to8_timer;
+extern const mc6846_interface to8_timer;
 
 
 /***************************** TO9+ ******************************/
@@ -188,7 +188,7 @@ extern mc6846_interface to8_timer;
 extern MACHINE_START ( to9p );
 extern MACHINE_RESET ( to9p );
 
-extern mc6846_interface to9p_timer;
+extern const mc6846_interface to9p_timer;
 
 
 /***************************** MO6 ******************************/

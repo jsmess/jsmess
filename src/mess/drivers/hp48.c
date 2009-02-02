@@ -787,8 +787,8 @@ INPUT_PORTS_END
 
 /**************************** I/O **********************************/
 
-static xmodem_config hp48_xmodem_rs232_conf = { &hp48_rs232_start_recv_byte };
-static kermit_config hp48_kermit_rs232_conf = { &hp48_rs232_start_recv_byte };
+static const xmodem_config hp48_xmodem_rs232_conf = { &hp48_rs232_start_recv_byte };
+static const kermit_config hp48_kermit_rs232_conf = { &hp48_rs232_start_recv_byte };
 
 
 /**************************** ROMs *********************************/

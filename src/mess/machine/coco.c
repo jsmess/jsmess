@@ -2815,7 +2815,7 @@ MACHINE_START( dgnalpha )
 	dgnalpha_just_reset=1;
 }
 
-const wd17xx_interface dgnalpha_wd17xx_interface = {
+static const wd17xx_interface dgnalpha_wd17xx_interface = {
 	dgnalpha_fdc_callback,
 	NULL
 };

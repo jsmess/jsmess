@@ -206,7 +206,7 @@ void draw_led(running_machine *machine, bitmap_t *bitmap, const char *led, int v
 	}
 }
 
-const char *radius_2_led =
+const char radius_2_led[] =
 	" 111\r"
 	"11111\r"
 	"11111\r"

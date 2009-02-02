@@ -325,7 +325,7 @@ static void asr_receive_callback(int dummy)
 	14: DSR data set ready, 1 if online
 	15: INT interrupt, 1 if interrupt
 */
-int asr733_cru_r(int offset, int unit)
+static int asr733_cru_r(int offset, int unit)
 {
 	int reply = 0;
 
@@ -356,7 +356,7 @@ int asr733_cru_r(int offset, int unit)
 	14: enable interrupts, 1 to enable interrupts
 	15: diagnostic mode, 0 for normal mode
 */
-void asr733_cru_w(running_machine *machine, int offset, int data, int unit)
+static void asr733_cru_w(running_machine *machine, int offset, int data, int unit)
 {
 	switch (offset)
 	{

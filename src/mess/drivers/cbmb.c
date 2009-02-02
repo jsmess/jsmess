@@ -354,7 +354,7 @@ static const mc6845_interface cbm700_crtc = {
  *
  *************************************/
 
-const tpi6525_interface cbmb_tpi_0_intf =
+static const tpi6525_interface cbmb_tpi_0_intf =
 {
 	cbmb_tpi0_port_a_r,
 	NULL,
@@ -367,7 +367,7 @@ const tpi6525_interface cbmb_tpi_0_intf =
 	cbmb_irq
 };
 
-const tpi6525_interface cbmb_tpi_1_intf =
+static const tpi6525_interface cbmb_tpi_1_intf =
 {
 	cbmb_keyboard_line_a,
 	cbmb_keyboard_line_b,

@@ -363,7 +363,7 @@ static PALETTE_INIT( c16 )
  *
  *************************************/
 
-const tpi6525_interface c16_tpi6525_tpi_2_intf =
+static const tpi6525_interface c16_tpi6525_tpi_2_intf =
 {
 	c1551_0_read_data,
 	c1551_0_read_status,
@@ -376,7 +376,7 @@ const tpi6525_interface c16_tpi6525_tpi_2_intf =
 	NULL	
 };
 
-const tpi6525_interface c16_tpi6525_tpi_2_c1551_intf =
+static const tpi6525_interface c16_tpi6525_tpi_2_c1551_intf =
 {
 	c1551x_read_data,
 	c1551x_read_status,
@@ -389,7 +389,7 @@ const tpi6525_interface c16_tpi6525_tpi_2_c1551_intf =
 	NULL
 };
 
-const tpi6525_interface c16_tpi6525_tpi_3_intf =
+static const tpi6525_interface c16_tpi6525_tpi_3_intf =
 {
 	c1551_1_read_data,
 	c1551_1_read_status,

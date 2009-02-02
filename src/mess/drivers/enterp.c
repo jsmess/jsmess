@@ -258,7 +258,7 @@ static WRITE8_HANDLER( exdos_card_w )
 }
 
 
-DEVICE_IMAGE_LOAD( enterprise_floppy )
+static DEVICE_IMAGE_LOAD( enterprise_floppy )
 {
 	const device_config *fdc = devtag_get_device(image->machine, WD1770, "wd1770");
 

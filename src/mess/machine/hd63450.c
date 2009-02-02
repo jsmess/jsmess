@@ -48,7 +48,7 @@ static void dma_transfer_halt(const device_config* device, int channel);
 static void dma_transfer_continue(const device_config* device, int channel);
 static void dma_transfer_start(const device_config* device, int channel, int dir);
 
-DEVICE_START(hd63450)
+static DEVICE_START(hd63450)
 {
 	hd63450_t* dmac = device->token;
 	int x;

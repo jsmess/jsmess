@@ -215,7 +215,7 @@ static void mc68328_maybe_start_timer(const device_config *device, UINT32 index,
     }
 }
 
-void mc68328_timer_compare_event(const device_config *device, UINT32 index)
+static void mc68328_timer_compare_event(const device_config *device, UINT32 index)
 {
     mc68328_t* mc68328 = mc68328_get_safe_token( device );
 
@@ -260,21 +260,21 @@ void mc68328_timer_compare_event(const device_config *device, UINT32 index)
     }
 }
 
-TIMER_CALLBACK( mc68328_timer1_hit )
+static TIMER_CALLBACK( mc68328_timer1_hit )
 {
     const device_config *device = device_list_find_by_tag(machine->config->devicelist, MC68328, MC68328_TAG);
 
     mc68328_timer_compare_event(device, 0);
 }
 
-TIMER_CALLBACK( mc68328_timer2_hit )
+static TIMER_CALLBACK( mc68328_timer2_hit )
 {
     const device_config *device = device_list_find_by_tag(machine->config->devicelist, MC68328, MC68328_TAG);
 
     mc68328_timer_compare_event(device, 1);
 }
 
-TIMER_CALLBACK( mc68328_pwm_transition )
+static TIMER_CALLBACK( mc68328_pwm_transition )
 {
     const device_config *device = device_list_find_by_tag(machine->config->devicelist, MC68328, MC68328_TAG);
     mc68328_t* mc68328 = mc68328_get_safe_token( device );
@@ -322,7 +322,7 @@ TIMER_CALLBACK( mc68328_pwm_transition )
     }
 }
 
-TIMER_CALLBACK( mc68328_rtc_tick )
+static TIMER_CALLBACK( mc68328_rtc_tick )
 {
     const device_config *device = device_list_find_by_tag(machine->config->devicelist, MC68328, MC68328_TAG);
     mc68328_t* mc68328 = mc68328_get_safe_token( device );

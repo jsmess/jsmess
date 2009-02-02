@@ -357,7 +357,7 @@ static const cartslot_pcb_type *identify_pcb(const device_config *device)
     DEVICE_GET_IMAGE_DEVICES(cartslot)
 -------------------------------------------------*/
 
-DEVICE_GET_IMAGE_DEVICES(cartslot)
+static DEVICE_GET_IMAGE_DEVICES(cartslot)
 {
 	const cartslot_pcb_type *pcb_type;
 	astring *tempstring = astring_alloc();

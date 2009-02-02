@@ -383,7 +383,7 @@ static TIMER_CALLBACK(tc8521_timer_callback)
     DEVICE_START( tc8521 )
 -------------------------------------------------*/
 
-DEVICE_START( tc8521 )
+static DEVICE_START( tc8521 )
 {
 	tc8521_t *rtc = get_token(device);
 	memset(rtc, 0, sizeof(*rtc));

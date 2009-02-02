@@ -448,7 +448,7 @@ static void amstrad_init_lookups(void)
 
 
 /* Set the new screen mode (0,1,2,4) from the GateArray */
-void amstrad_vh_update_mode( void )
+static void amstrad_vh_update_mode( void )
 {
 	if ( amstrad_system_type == SYSTEM_PLUS || amstrad_system_type == SYSTEM_GX4000 )
 	{
@@ -1407,7 +1407,7 @@ static DIRECT_UPDATE_HANDLER( amstrad_multiface_directoverride )
 		return pc;
 }
 
-void multiface_init(void)
+static void multiface_init(void)
 {
 	/* after a reset the multiface is visible */
 	multiface_flags = MULTIFACE_VISIBLE;
@@ -1417,7 +1417,7 @@ void multiface_init(void)
 }
 
 /* call when a system reset is done */
-void multiface_reset(void)
+static void multiface_reset(void)
 {
 		/* stop button not pressed and ram/rom disabled */
 		multiface_flags &= ~(MULTIFACE_STOP_BUTTON_PRESSED |
@@ -1426,7 +1426,7 @@ void multiface_reset(void)
 		multiface_flags |= MULTIFACE_VISIBLE;
 }
 
-int multiface_hardware_enabled(running_machine *machine)
+static int multiface_hardware_enabled(running_machine *machine)
 {
 		if (multiface_ram!=NULL)
 		{
@@ -1466,7 +1466,7 @@ static void multiface_rethink_memory(running_machine *machine)
 
 
 /* simulate the stop button has been pressed */
-void multiface_stop(running_machine *machine)
+static void multiface_stop(running_machine *machine)
 {
 	/* multiface hardware enabled? */
 	if (!multiface_hardware_enabled(machine))

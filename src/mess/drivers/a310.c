@@ -206,7 +206,7 @@ static INPUT_PORTS_START( a310 )
 	PORT_BIT (0xf8, 0x80, IPT_UNUSED)
 INPUT_PORTS_END
 
-const wd17xx_interface a310_wd17xx_interface = {
+static const wd17xx_interface a310_wd17xx_interface = {
 	a310_wd177x_callback,
 	NULL
 };

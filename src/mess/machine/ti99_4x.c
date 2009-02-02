@@ -1734,7 +1734,7 @@ static TIMER_CALLBACK(ti99_handset_ack_callback)
 
 	Handler for tms9901 P0 pin (handset data acknowledge)
 */
-WRITE8_DEVICE_HANDLER( ti99_handset_set_ack )
+static WRITE8_DEVICE_HANDLER( ti99_handset_set_ack )
 {
 	if (has_handset && handset_buflen && (data != handset_ack))
 	{

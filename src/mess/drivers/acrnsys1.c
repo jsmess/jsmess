@@ -55,14 +55,14 @@ static const ins8154_interface ins8154_b1 =
 	NULL
 };
 
-TTL74145_OUTPUT_LINE ( acrnsys1_7445_output_0_w ) { if (state) key_digit = 0; }
-TTL74145_OUTPUT_LINE ( acrnsys1_7445_output_1_w ) { if (state) key_digit = 1; }
-TTL74145_OUTPUT_LINE ( acrnsys1_7445_output_2_w ) { if (state) key_digit = 2; }
-TTL74145_OUTPUT_LINE ( acrnsys1_7445_output_3_w ) { if (state) key_digit = 3; }
-TTL74145_OUTPUT_LINE ( acrnsys1_7445_output_4_w ) { if (state) key_digit = 4; }
-TTL74145_OUTPUT_LINE ( acrnsys1_7445_output_5_w ) { if (state) key_digit = 5; }
-TTL74145_OUTPUT_LINE ( acrnsys1_7445_output_6_w ) { if (state) key_digit = 6; }
-TTL74145_OUTPUT_LINE ( acrnsys1_7445_output_7_w ) { if (state) key_digit = 7; }
+static TTL74145_OUTPUT_LINE ( acrnsys1_7445_output_0_w ) { if (state) key_digit = 0; }
+static TTL74145_OUTPUT_LINE ( acrnsys1_7445_output_1_w ) { if (state) key_digit = 1; }
+static TTL74145_OUTPUT_LINE ( acrnsys1_7445_output_2_w ) { if (state) key_digit = 2; }
+static TTL74145_OUTPUT_LINE ( acrnsys1_7445_output_3_w ) { if (state) key_digit = 3; }
+static TTL74145_OUTPUT_LINE ( acrnsys1_7445_output_4_w ) { if (state) key_digit = 4; }
+static TTL74145_OUTPUT_LINE ( acrnsys1_7445_output_5_w ) { if (state) key_digit = 5; }
+static TTL74145_OUTPUT_LINE ( acrnsys1_7445_output_6_w ) { if (state) key_digit = 6; }
+static TTL74145_OUTPUT_LINE ( acrnsys1_7445_output_7_w ) { if (state) key_digit = 7; }
 
 static const ttl74145_interface ic8_7445 =
 {

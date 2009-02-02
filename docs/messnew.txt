@@ -69,7 +69,7 @@ Source Changes:
 - Fixed a bug that caused the day of the week to not be properly returned by
   the DS1315.  (bug #1755) [Nathan Woods]
   
-- Global symbol cleanups.  [Atari Ace]
+- Global symbol, const/static cleanups.  [Atari Ace]
 
 
 

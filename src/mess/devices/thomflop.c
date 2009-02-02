@@ -450,7 +450,7 @@ static void to7_5p14sd_reset( running_machine *machine )
 
 
 
-mc6843_interface to7_6843_itf = { NULL };
+const mc6843_interface to7_6843_itf = { NULL };
 
 
 
@@ -1685,7 +1685,7 @@ static void to7_network_got_frame( const device_config *device, UINT8* data, int
 
 
 
-mc6854_interface to7_network_iface = { NULL, to7_network_got_frame, NULL, NULL };
+const mc6854_interface to7_network_iface = { NULL, to7_network_got_frame, NULL, NULL };
 
 
 

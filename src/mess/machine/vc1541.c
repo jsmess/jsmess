@@ -1241,7 +1241,7 @@ static READ8_HANDLER ( c1551_port_r )
 	6 input sync 0 active
 	7 input handshake in
  */
-READ8_DEVICE_HANDLER( c1551_port_c_r )
+static READ8_DEVICE_HANDLER( c1551_port_c_r )
 {
 	int data = 0xff;
 	
@@ -1253,7 +1253,7 @@ READ8_DEVICE_HANDLER( c1551_port_c_r )
 	return data;
 }
 
-READ8_DEVICE_HANDLER( c1551_port_b_r )
+static READ8_DEVICE_HANDLER( c1551_port_b_r )
 {
 	running_machine *machine = device->machine;
 	int data = drive->gcr.data[drive->pos];
@@ -1373,7 +1373,7 @@ void drive_reset (void)
 
 **************************************/
 
-const tpi6525_interface c1551_tpi_intf =
+static const tpi6525_interface c1551_tpi_intf =
 {
 	NULL,
 	c1551_port_b_r,

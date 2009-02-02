@@ -62,7 +62,7 @@ static void coco_field_sync_callback(running_machine *machine, int data)
 	pia_0_cb1_w(space, 0, data);
 }
 
-const UINT8 *get_video_ram_coco(running_machine *machine,int scanline)
+static const UINT8 *get_video_ram_coco(running_machine *machine,int scanline)
 {
 	device_config *sam = (device_config*)devtag_get_device(machine, SAM6883, "sam");
 	return sam_m6847_get_video_ram(sam,scanline);

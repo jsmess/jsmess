@@ -47,7 +47,7 @@ struct _multicart_load_state
     find_file
 -------------------------------------------------*/
 
-const zip_file_header *find_file(zip_file *zip, const char *filename)
+static const zip_file_header *find_file(zip_file *zip, const char *filename)
 {
 	const zip_file_header *header;
 	for (header = zip_file_first_file(zip); header != NULL; header = zip_file_next_file(zip))

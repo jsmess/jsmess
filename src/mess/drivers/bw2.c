@@ -828,7 +828,7 @@ static const msm6255_interface bw2_msm6255_intf =
 	bw2_charram_r,
 };
 
-const wd17xx_interface bw2_wd17xx_interface = { bw2_wd17xx_callback, NULL };
+static const wd17xx_interface bw2_wd17xx_interface = { bw2_wd17xx_callback, NULL };
 
 static MACHINE_DRIVER_START( bw2 )
 	MDRV_DRIVER_DATA(bw2_state)

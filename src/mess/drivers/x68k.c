@@ -428,7 +428,7 @@ static void x68k_keyboard_ctrl_w(int data)
 
 }
 
-int x68k_keyboard_pop_scancode(void)
+static int x68k_keyboard_pop_scancode(void)
 {
 	int ret;
 	if(x68k_sys.keyboard.keynum == 0)  // no scancodes in USART buffer
@@ -1042,7 +1042,7 @@ static READ16_HANDLER( x68k_sysport_r )
 	return mc68901_register_r(x68k_mfp, offset);
 }*/
 
-READ16_HANDLER( x68k_mfp_r )
+static READ16_HANDLER( x68k_mfp_r )
 {
 	const device_config *x68k_mfp = devtag_get_device(space->machine, MC68901, MC68901_TAG);
     // Initial settings indicate that IRQs are generated for FM (YM2151), Receive buffer error or full,

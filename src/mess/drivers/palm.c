@@ -46,32 +46,32 @@ static INPUT_CHANGED( button_check )
     mc68328_set_port_d_lines(mc68328_device, button_state, (int)(FPTR)param);
 }
 
-WRITE8_DEVICE_HANDLER( palm_port_f_out )
+static WRITE8_DEVICE_HANDLER( palm_port_f_out )
 {
     port_f_latch = data;
 }
 
-READ8_DEVICE_HANDLER( palm_port_c_in )
+static READ8_DEVICE_HANDLER( palm_port_c_in )
 {
     return 0x10;
 }
 
-READ8_DEVICE_HANDLER( palm_port_f_in )
+static READ8_DEVICE_HANDLER( palm_port_f_in )
 {
     return port_f_latch;
 }
 
-WRITE16_DEVICE_HANDLER( palm_spim_out )
+static WRITE16_DEVICE_HANDLER( palm_spim_out )
 {
     spim_data = data;
 }
 
-READ16_DEVICE_HANDLER( palm_spim_in )
+static READ16_DEVICE_HANDLER( palm_spim_in )
 {
     return spim_data;
 }
 
-void palm_spim_exchange( const device_config *device )
+static void palm_spim_exchange( const device_config *device )
 {
     UINT8 x = input_port_read(device->machine, "PENX");
     UINT8 y = input_port_read(device->machine, "PENY");
@@ -88,7 +88,7 @@ void palm_spim_exchange( const device_config *device )
     }
 }
 
-MACHINE_START( palm )
+static MACHINE_START( palm )
 {
     const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
     memory_install_read16_handler(space,0x000000,mess_ram_size-1,mess_ram_size-1,0,(read16_space_func)1);
@@ -99,7 +99,7 @@ MACHINE_START( palm )
     state_save_register_global(machine, spim_data);
 }
 
-MACHINE_RESET( palm )
+static MACHINE_RESET( palm )
 {
     // Copy boot ROM
     UINT8* bios = memory_region(machine, "bios");
@@ -124,7 +124,7 @@ ADDRESS_MAP_END
     AUDIO HARDWARE
 ***************************************************************************/
 
-WRITE8_DEVICE_HANDLER( palm_dac_transition )
+static WRITE8_DEVICE_HANDLER( palm_dac_transition )
 {
     dac_data_w( 0, 0x7f * data );
 }
@@ -134,12 +134,12 @@ WRITE8_DEVICE_HANDLER( palm_dac_transition )
     MACHINE DRIVERS
 ***************************************************************************/
 
-DRIVER_INIT( palm )
+static DRIVER_INIT( palm )
 {
     debug_cpu_set_dasm_override(machine->cpu[0], palm_dasm_override);
 }
 
-mc68328_interface palm_dragonball_iface =
+static const mc68328_interface palm_dragonball_iface =
 {
     0,
 
@@ -294,7 +294,7 @@ ROM_START( palmiii )
     ROM_DEFAULT_BIOS( "3.0e" )
 ROM_END
 
-SYSTEM_CONFIG_START( pilot1k )
+static SYSTEM_CONFIG_START( pilot1k )
     CONFIG_RAM_DEFAULT  (0x020000)      // 128k
     CONFIG_RAM      (0x080000)      // 512k
     CONFIG_RAM      (0x100000)      // 1M
@@ -303,7 +303,7 @@ SYSTEM_CONFIG_START( pilot1k )
     CONFIG_RAM      (0x800000)      // 8M
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START( pilot5k )
+static SYSTEM_CONFIG_START( pilot5k )
     CONFIG_RAM_DEFAULT      (0x080000)      // 512k
     CONFIG_RAM      (0x100000)      // 1M
     CONFIG_RAM      (0x200000)      // 2M
@@ -311,14 +311,14 @@ SYSTEM_CONFIG_START( pilot5k )
     CONFIG_RAM      (0x800000)      // 8M
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START( palmpro )
+static SYSTEM_CONFIG_START( palmpro )
     CONFIG_RAM_DEFAULT      (0x100000)      // 1M
     CONFIG_RAM      (0x200000)      // 2M
     CONFIG_RAM      (0x400000)      // 4M
     CONFIG_RAM      (0x800000)      // 8M
 SYSTEM_CONFIG_END
 
-SYSTEM_CONFIG_START( palmiii )
+static SYSTEM_CONFIG_START( palmiii )
     CONFIG_RAM_DEFAULT  (0x200000)      // 2M
     CONFIG_RAM      (0x400000)      // 4M
     CONFIG_RAM      (0x800000)      // 8M

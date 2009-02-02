@@ -85,7 +85,6 @@ static int *shift_mask;
 static int *shift_xor;
 
 typedef struct {
-    int nr;
     union {
 	UINT8 data[8];
 	struct {
@@ -105,12 +104,7 @@ typedef struct {
     int ticks;
     int count;
 } LYNX_AUDIO;
-static LYNX_AUDIO lynx_audio[4]= {
-	{ 0 },
-	{ 1 },
-	{ 2 },
-	{ 3 }
-};
+static LYNX_AUDIO lynx_audio[4];
 
 static void lynx_audio_reset_channel(LYNX_AUDIO *This)
 {
@@ -127,6 +121,7 @@ void lynx_audio_count_down(running_machine *machine, int nr)
 
 static void lynx_audio_shift(running_machine *machine, LYNX_AUDIO *channel)
 {
+    int nr = (int)(channel - lynx_audio);
     channel->shifter=((channel->shifter<<1)&0x3ff)
 	|shift_xor[channel->shifter&channel->mask];
 
@@ -137,7 +132,7 @@ static void lynx_audio_shift(running_machine *machine, LYNX_AUDIO *channel)
 	    channel->reg.n.output-=channel->reg.n.volume;
 	}
     }
-    switch (channel->nr) {
+    switch (nr) {
     case 0: lynx_audio_count_down(machine, 1); break;
     case 1: lynx_audio_count_down(machine, 2); break;
     case 2: lynx_audio_count_down(machine, 3); break;

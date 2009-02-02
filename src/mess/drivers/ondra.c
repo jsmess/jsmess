@@ -104,7 +104,7 @@ static INPUT_PORTS_START( ondra )
 		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("NMI") PORT_CODE(KEYCODE_ESC)		
 INPUT_PORTS_END
 
-INTERRUPT_GEN( ondra_interrupt )
+static INTERRUPT_GEN( ondra_interrupt )
 {
 	cpu_set_input_line(device, 0, HOLD_LINE);
 }

@@ -139,7 +139,7 @@ static TIMER_CALLBACK(acia_6551_timer_callback)
     DEVICE_START( acia6551 )
 -------------------------------------------------*/
 
-DEVICE_START( acia6551 )
+static DEVICE_START( acia6551 )
 {
 	acia6551_t *acia = get_token(device);
 

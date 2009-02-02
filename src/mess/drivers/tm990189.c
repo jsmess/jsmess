@@ -746,7 +746,7 @@ ADDRESS_MAP_END
 
 
 
-static tms9980areset_param reset_params =
+static const tms9980areset_param reset_params =
 {
 	idle_callback
 };

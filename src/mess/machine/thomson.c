@@ -594,7 +594,7 @@ static WRITE8_DEVICE_HANDLER ( to7_timer_tco_out )
 
 
 
-mc6846_interface to7_timer =
+const mc6846_interface to7_timer =
 {
 	to7_timer_port_out, NULL, to7_timer_cp2_out,
 	to7_timer_port_in, to7_timer_tco_out,
@@ -920,7 +920,7 @@ static const pia6821_interface to7_pia_modem =
 
 
 
-acia6850_interface to7_modem =
+const acia6850_interface to7_modem =
 {
 	1200, 1200, /* 1200 bauds, might be divided by 16 */
 	&to7_modem_rx, &to7_modem_tx,
@@ -954,7 +954,7 @@ static void to7_modem_init( running_machine *machine )
 /* ------------  dispatch MODEM / speech extension ------------ */
 
 
-mea8000_interface to7_speech = { THOM_SOUND_SPEECH, NULL };
+const mea8000_interface to7_speech = { THOM_SOUND_SPEECH, NULL };
 
 
 READ8_HANDLER ( to7_modem_mea8000_r )
@@ -1650,7 +1650,7 @@ static WRITE8_DEVICE_HANDLER ( to770_timer_port_out )
 
 
 
-mc6846_interface to770_timer =
+const mc6846_interface to770_timer =
 {
 	to770_timer_port_out, NULL, to7_timer_cp2_out,
 	to7_timer_port_in, to7_timer_tco_out,
@@ -3003,7 +3003,7 @@ static WRITE8_DEVICE_HANDLER ( to9_timer_port_out )
 
 
 
-mc6846_interface to9_timer =
+const mc6846_interface to9_timer =
 {
 	to9_timer_port_out, NULL, to7_timer_cp2_out,
 	to7_timer_port_in, to7_timer_tco_out,
@@ -3942,7 +3942,7 @@ static WRITE8_DEVICE_HANDLER ( to8_timer_cp2_out )
 
 
 
-mc6846_interface to8_timer =
+const mc6846_interface to8_timer =
 {
 	to8_timer_port_out, NULL, to8_timer_cp2_out,
 	to8_timer_port_in, to7_timer_tco_out,
@@ -4120,7 +4120,7 @@ static WRITE8_DEVICE_HANDLER ( to9p_timer_port_out )
 
 
 
-mc6846_interface to9p_timer =
+const mc6846_interface to9p_timer =
 {
 	to9p_timer_port_out, NULL, to8_timer_cp2_out,
 	to9p_timer_port_in, to7_timer_tco_out,

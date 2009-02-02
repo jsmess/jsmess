@@ -1311,7 +1311,7 @@ const via6522_interface bbcb_user_via =
 BBC Joystick Support
 **************************************/
 
-UPD7002_GET_ANALOGUE(BBC_get_analogue_input)
+static UPD7002_GET_ANALOGUE(BBC_get_analogue_input)
 {
 	switch(channel_number)
 	{
@@ -1328,7 +1328,7 @@ UPD7002_GET_ANALOGUE(BBC_get_analogue_input)
 	return 0;
 }
 
-UPD7002_EOC(BBC_uPD7002_EOC)
+static UPD7002_EOC(BBC_uPD7002_EOC)
 {
 	const device_config *via_0 = devtag_get_device(device->machine, VIA6522, "via6522_0");
 	via_cb1_w(via_0, 0,data);
@@ -1388,7 +1388,7 @@ static void Serial_interrupt(const device_config *device, int level)
 	cpu_set_input_line(device->machine->cpu[0], M6502_IRQ_LINE, level);
 }
 
-UINT8 bbc_tx_pin;
+static UINT8 bbc_tx_pin;
 
 const acia6850_interface bbc_acia6850_interface =
 {

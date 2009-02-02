@@ -63,7 +63,7 @@ void draw_led(running_machine *machine, bitmap_t *bitmap, const char *led, int v
  *	"11111\r"
  *	" 111";
  */
-extern const char *radius_2_led;
+extern const char radius_2_led[];
 
 /**************************************************************************/
 

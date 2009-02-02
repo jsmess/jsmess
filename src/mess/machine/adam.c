@@ -789,6 +789,7 @@ WRITE8_HANDLER(adam_video_w)
     (offset&0x01) ? TMS9928A_register_w(space, 1, data) : TMS9928A_vram_w(space, 0, data);
 }
 
+#ifdef UNUSED_FUNCTION
 READ8_HANDLER( master6801_ram_r )
 {
     /*logerror("Offset %04Xh = %02Xh\n",offset ,memory_region(machine, "main")[offset]);*/
@@ -799,6 +800,7 @@ WRITE8_HANDLER( master6801_ram_w )
 {
     memory_region(space->machine, "main")[offset+0x4000] = data;
 }
+#endif
 
 READ8_HANDLER ( adam_paddle_r )
 {

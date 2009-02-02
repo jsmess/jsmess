@@ -142,7 +142,7 @@ TIMER_CALLBACK(rtc_alarm_pulse)
 	}
 }
 
-DEVICE_START( rp5c15 )
+static DEVICE_START( rp5c15 )
 {
 	rp5c15_t* rtc = device->token;
 	mame_system_time systm;

@@ -510,7 +510,7 @@ static const mm58274c_interface floppy_mm58274c_interface =
 	0   /*  first day of week */
 };
 
-MACHINE_DRIVER_START(ti99_4_cartslot)
+static MACHINE_DRIVER_START(ti99_4_cartslot)
  	MDRV_CARTSLOT_ADD("cart1")
 	MDRV_CARTSLOT_EXTENSION_LIST("bin,c,d,g,m,crom,drom,grom,mrom")
 	MDRV_CARTSLOT_NOT_MANDATORY

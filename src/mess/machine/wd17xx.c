@@ -1680,35 +1680,35 @@ void wd17xx_reset(const device_config *device)
 
 static DEVICE_START( wd1770 )
 {
-	return common_start(device, WD_TYPE_1770);
+	common_start(device, WD_TYPE_1770);
 }
 static DEVICE_START( wd1772 )
 {
-	return common_start(device, WD_TYPE_1772);
+	common_start(device, WD_TYPE_1772);
 }
 static DEVICE_START( wd1773 )
 {
-	return common_start(device, WD_TYPE_1773);
+	common_start(device, WD_TYPE_1773);
 }
 static DEVICE_START( wd179x )
 {
-	return common_start(device, WD_TYPE_179X);
+	common_start(device, WD_TYPE_179X);
 }
 static DEVICE_START( wd1793 )
 {
-	return common_start(device, WD_TYPE_1793);
+	common_start(device, WD_TYPE_1793);
 }
 static DEVICE_START( wd2793 )
 {
-	return common_start(device, WD_TYPE_2793);
+	common_start(device, WD_TYPE_2793);
 }
 static DEVICE_START( wd177x )
 {
-	return common_start(device, WD_TYPE_177X);
+	common_start(device, WD_TYPE_177X);
 }
 static DEVICE_START( mb8877 )
 {
-	return common_start(device, WD_TYPE_MB8877);
+	common_start(device, WD_TYPE_MB8877);
 }
 
 static DEVICE_SET_INFO( wd17xx )

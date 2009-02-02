@@ -149,7 +149,7 @@ static INPUT_PORTS_START( gmaster )
 INPUT_PORTS_END
 
 /* palette in red, green, blue tribles */
-static unsigned char gmaster_palette[2][3] =
+static const unsigned char gmaster_palette[2][3] =
 {
 #if 1
     { 130, 159, 166 },
@@ -203,7 +203,7 @@ static INTERRUPT_GEN( gmaster_interrupt )
   cpu_set_input_line(device->machine->cpu[0], UPD7810_INTFE1, ASSERT_LINE);
 }
 
-static UPD7810_CONFIG config={
+static const UPD7810_CONFIG config={
   //    TYPE_78C10, // 78c11 in handheld
     TYPE_7801, // temporarily until 7810 core fixes synchronized
     gmaster_io_callback

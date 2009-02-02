@@ -27,7 +27,7 @@ static const device_config *cassette_device_image(running_machine *machine)
 static UINT8 ondra_bank1_status;
 static UINT8 ondra_bank2_status;
 
-READ8_HANDLER( ondra_keyboard_r )
+static READ8_HANDLER( ondra_keyboard_r )
 {
 	UINT8 retVal = 0x00;
 	UINT8 ondra_keyboard_line = offset & 0x000f;	
