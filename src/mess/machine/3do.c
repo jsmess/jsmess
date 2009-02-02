@@ -7,9 +7,11 @@ typedef struct {
 	UINT32	memory_configuration;
 } MADAM;
 
+
 typedef struct {
 	UINT32	dummy;
 } CLIO;
+
 
 //static UINT32	unk_318_data_0 = 0;
 static MADAM	madam;
@@ -131,6 +133,7 @@ READ32_HANDLER( madam_r ) {
 	return 0;
 }
 
+
 WRITE32_HANDLER( madam_w ) {
 	logerror( "%08X: MADAM write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(space->machine->cpu[0]), offset, data, mem_mask );
 	switch( offset ) {
@@ -143,6 +146,7 @@ WRITE32_HANDLER( madam_w ) {
 		break;
 	}
 }
+
 
 void madam_init( void )
 {
@@ -176,15 +180,17 @@ WRITE32_HANDLER( clio_w )
 
 	switch( offset )
 	{
+		case 0x09:	/* 03400024 - VDL display control word ? c0020f0f is written here during boot */
+			break;
+
 		case 0x0A:	/* 03400028 - bits 0,1, and 6 are tested (irq sources?) */
-		break;
+			break;
 
 		case 0x0B:	/* 0340002C - ?? during boot 0000000B is written here counter reload related?? */
-		break;
+			break;
 
 		case 0x88:	/* set timer frequency */
-
-		break;
+			break;
 	}
 }
 
