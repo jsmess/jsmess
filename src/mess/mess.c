@@ -144,10 +144,16 @@ void mess_predevice_init(running_machine *machine)
 			/* did the image load fail? */
 			if (result)
 			{
+				/* retrieve image error message */
+				const char *image_err = image_error(image);
+				
+				/* unload all images */
+				image_unload_all(machine);
+
 				fatalerror_exitcode(machine, MAMERR_DEVICE, "Device %s load (%s) failed: %s\n",
 					info.name,
 					osd_basename((char *) image_name),
-					image_error(image));
+					image_err);
 			}
 		}
 		else
@@ -155,6 +161,9 @@ void mess_predevice_init(running_machine *machine)
 			/* no image... must this device be loaded? */
 			if (info.must_be_loaded)
 			{
+				/* unload all images */
+				image_unload_all(machine);
+
 				fatalerror_exitcode(machine, MAMERR_DEVICE, "Driver requires that device \"%s\" must have an image to load\n", info.instance_name);
 			}
 		}
