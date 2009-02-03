@@ -243,8 +243,6 @@ static DEVICE_START( cartslot )
 		DEVICE_TYPE_WILDCARD,
 		device_build_tag(tempstring, device, TAG_PCB));
 
-	process_cartridge(device, PROCESS_CLEAR);
-
 done:
 	astring_free(tempstring);
 }
