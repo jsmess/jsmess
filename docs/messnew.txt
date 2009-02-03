@@ -25,6 +25,8 @@ System Driver Changes:
 
 - [GAMEPOCK] Fixed 128u3 regression.  (bug #1752) [Wilbert Pol]
 
+- [MTX512] Connected CTC channels 0-2 to clock sources. (bug #7819 [Curt Coder]
+
 - [TI81, TI85, TI86] Added the new ROM_DEFAULT_BIOS feature to select the most
   recent rom versions.  [Hobie Troxell]
 
@@ -70,6 +72,8 @@ Source Changes:
   the DS1315.  (bug #1755) [Nathan Woods]
   
 - Global symbol, const/static cleanups.  [Atari Ace]
+
+- Fixed image loading related memory leaks. [Curt Coder]
 
 
 
