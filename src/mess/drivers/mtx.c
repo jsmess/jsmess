@@ -223,6 +223,23 @@ static const z80_daisy_chain mtx_daisy_chain[] =
 	{ NULL }
 };
 
+static TIMER_DEVICE_CALLBACK( ctc_c0_tick )
+{
+	const device_config *z80ctc = devtag_get_device(timer->machine, Z80CTC, "z80ctc");
+
+	z80ctc_trg_w(z80ctc, 0, 1);
+	z80ctc_trg_w(z80ctc, 0, 0);
+}
+
+static TIMER_DEVICE_CALLBACK( ctc_c1_c2_tick )
+{
+	const device_config *z80ctc = devtag_get_device(timer->machine, Z80CTC, "z80ctc");
+
+	z80ctc_trg_w(z80ctc, 1, 1);
+	z80ctc_trg_w(z80ctc, 1, 0);
+	z80ctc_trg_w(z80ctc, 2, 1);
+	z80ctc_trg_w(z80ctc, 2, 0);
+}
 
 
 /*************************************
@@ -251,6 +268,8 @@ static MACHINE_DRIVER_START( mtx512 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_Z80CTC_ADD( "z80ctc", MTX_SYSTEM_CLOCK, mtx_ctc_intf )
+	MDRV_TIMER_ADD_PERIODIC("z80ctc_c0", ctc_c0_tick, HZ(50))
+	MDRV_TIMER_ADD_PERIODIC("z80ctc_c1c2", ctc_c1_c2_tick, HZ(4000000/13))
 
 	/* printer */
 	MDRV_PRINTER_ADD("printer")
