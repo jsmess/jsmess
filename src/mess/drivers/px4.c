@@ -510,7 +510,7 @@ static INPUT_CHANGED( key_callback )
 	px4_state *px4 = field->port->machine->driver_data;
 	UINT32 oldvalue = oldval * field->mask, newvalue = newval * field->mask;
 	UINT32 delta = oldvalue ^ newvalue;
-	int i, scancode, down;
+	int i, scancode = 0, down = 0;
 
 	for (i = 0; i < 32; i++)
 	{
@@ -520,7 +520,7 @@ static INPUT_CHANGED( key_callback )
 			scancode = (int)param * 32 + i;
 
 			/* control keys */
-			if (scancode & 0xa0)
+			if (scancode >= 0xa0)
 				scancode |= down;
 
 			logerror("upd7508: key callback, key=0x%02x\n", scancode);
@@ -529,7 +529,7 @@ static INPUT_CHANGED( key_callback )
 		}
 	}
 
-	if (down || scancode & 0xa0)
+	if (down || scancode >= 0xa0)
 	{
 		px4->key_status = scancode;
 
