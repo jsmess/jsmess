@@ -226,7 +226,7 @@ DRIVER_INIT( trs80 )
 			FNT[i*FH+y] = 0;
 	}
 	/* setup the 2x3 chunky block graphics (two times 64 characters) */
-	for( i = 0x080; i < 0x100; i++ )
+	for( i = 0x80; i < 0x100; i++ )
 	{
 		UINT8 b0, b1, b2, b3, b4, b5;
 		b0 = (i & 0x01) ? 0xe0 : 0x00;
@@ -252,9 +252,13 @@ DRIVER_INIT( radionic )
 		/* copy eight lines from the character generator, reversing the order of the dots */
 		for (y = 0; y < 8; y++)
 			FNT[i*FH+y] = BITSWAP8(FNT[0x800+i*8+y], 0, 1, 2, 3, 4, 5, 6, 7);
+
+		/* now add descenders */
+		for (y = 0; y < 4; y++)
+			FNT[i*FH+y+8] = BITSWAP8(FNT[0x1000+i*8+y], 0, 1, 2, 3, 4, 5, 6, 7);
 	}
 	/* setup the 2x3 chunky block graphics (two times 64 characters) */
-	for( i = 0x080; i < 0x100; i++ )
+	for( i = 0x80; i < 0x100; i++ )
 	{
 		UINT8 b0, b1, b2, b3, b4, b5;
 		b0 = (i & 0x01) ? 0xe0 : 0x00;
