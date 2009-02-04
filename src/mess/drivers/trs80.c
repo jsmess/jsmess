@@ -122,8 +122,7 @@ static ADDRESS_MAP_START( io_level1, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mem_model1, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x3000, 0x37df) AM_NOP
+	AM_RANGE(0x0000, 0x37df) AM_ROM
 	AM_RANGE(0x37e0, 0x37e3) AM_READWRITE(trs80_irq_status_r, trs80_motor_w)
 	AM_RANGE(0x37e4, 0x37e7) AM_NOP
 	AM_RANGE(0x37e8, 0x37eb) AM_READWRITE(trs80_printer_r, trs80_printer_w)
@@ -477,6 +476,21 @@ ROM_START(trs80l2)
 	ROM_LOAD("trs80m1.chr", 0x0800, 0x0400, CRC(0033f2b9) SHA1(0d2cd4197d54e2e872b515bbfdaa98efe502eda7))
 ROM_END
 
+ROM_START(radionic)
+	ROM_REGION(0x10000, "main",0)
+	ROM_LOAD("ep1.bin",0x0000, 0x1000, CRC(e8908f44) SHA1(7a5a60c3afbeb6b8434737dd302332179a7fca59))
+	ROM_LOAD("ep2.bin",0x1000, 0x1000, CRC(46e88fbf) SHA1(a3ca32757f269e09316e1e91ba1502774e2f5155))
+	ROM_LOAD("ep3.bin",0x2000, 0x1000, CRC(306e5d66) SHA1(1e1abcfb5b02d4567cf6a81ffc35318723442369))
+	ROM_LOAD("ep4.bin",0x3000, 0x0400, CRC(70f90f26) SHA1(cbee70da04a3efac08e50b8e3a270262c2440120))
+	ROM_CONTINUE(0x3000, 0x400)
+	ROM_CONTINUE(0x3000, 0x7e0)
+	ROM_IGNORE(0x20)
+
+	ROM_REGION(0x00c00, "gfx1",0)
+	ROM_LOAD("trschar.bin", 0x0800, 0x0400, CRC(02e767b6) SHA1(c431fcc6bd04ce2800ca8c36f6f8aeb2f91ce9f7))
+	ROM_IGNORE(0xc00)
+ROM_END
+
 ROM_START(sys80)
 	ROM_REGION(0x10000, "main",0)
 	ROM_LOAD("sys80rom.1",  0x0000, 0x1000, CRC(8f5214de) SHA1(d8c052be5a2d0ec74433043684791d0554bf203b))
@@ -564,13 +578,14 @@ static SYSTEM_CONFIG_START(trs8012)
 SYSTEM_CONFIG_END
 
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT  INIT  CONFIG   COMPANY  FULLNAME */
-COMP( 1977, trs80,    0,	     0,		level1,   trs80, trs80,    0,		"Tandy Radio Shack",  "TRS-80 Model I (Level I Basic)" , 0)
-COMP( 1978, trs80l2,  trs80,	 0,		model1,   trs80, trs80,    trs8012,	"Tandy Radio Shack",  "TRS-80 Model I (Level II Basic)" , 0)
-COMP( 1980, sys80,    trs80,	 0,		model1,   trs80, trs80,    trs8012,	"EACA Computers Ltd.","System-80" , 0)
-COMP( 1981, lnw80,    trs80,	 0,		model1,   trs80, lnw80,    trs8012,	"LNW Research","LNW-80", 0 )
-COMP( 1980, trs80m3,  trs80,	 0,		model3,   trs80, trs80,    trs8012,	"Tandy Radio Shack",  "TRS-80 Model III", 0 )
-COMP( 1980, trs80m4,  trs80,	 0,		model3,   trs80, trs80,    trs8012,	"Tandy Radio Shack",  "TRS-80 Model 4", 0 )
-COMP( 1983, ht1080z,  trs80,	 0,		ht1080z,  trs80, ht1080z,  trs8012,	"Hiradastechnika Szovetkezet",  "HT-1080Z Series I" , 0)
-COMP( 1984, ht1080z2, trs80,	 0,		ht1080z,  trs80, ht1080z,  trs8012,	"Hiradastechnika Szovetkezet",  "HT-1080Z Series II" , 0)
-COMP( 1985, ht108064, trs80,	 0,		ht108064, trs80, ht108064, trs8012,	"Hiradastechnika Szovetkezet",  "HT-1080Z/64" , 0)
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE	  INPUT  INIT      CONFIG       COMPANY  FULLNAME */
+COMP( 1977, trs80,    0,	0,	level1,   trs80, trs80,    0,		"Tandy Radio Shack",  "TRS-80 Model I (Level I Basic)" , 0)
+COMP( 1978, trs80l2,  trs80,	0,	model1,   trs80, trs80,    trs8012,	"Tandy Radio Shack",  "TRS-80 Model I (Level II Basic)" , 0)
+COMP( 1983, radionic, trs80,	0,	model1,   trs80, radionic, trs8012,	"Komtek",  "Radionic" , 0)
+COMP( 1980, sys80,    trs80,	0,	model1,   trs80, trs80,    trs8012,	"EACA Computers Ltd.","System-80" , 0)
+COMP( 1981, lnw80,    trs80,	0,	model1,   trs80, lnw80,    trs8012,	"LNW Research","LNW-80", 0 )
+COMP( 1980, trs80m3,  trs80,	0,	model3,   trs80, trs80,    trs8012,	"Tandy Radio Shack",  "TRS-80 Model III", 0 )
+COMP( 1980, trs80m4,  trs80,	0,	model3,   trs80, trs80,    trs8012,	"Tandy Radio Shack",  "TRS-80 Model 4", 0 )
+COMP( 1983, ht1080z,  trs80,	0,	ht1080z,  trs80, ht1080z,  trs8012,	"Hiradastechnika Szovetkezet",  "HT-1080Z Series I" , 0)
+COMP( 1984, ht1080z2, trs80,	0,	ht1080z,  trs80, ht1080z,  trs8012,	"Hiradastechnika Szovetkezet",  "HT-1080Z Series II" , 0)
+COMP( 1985, ht108064, trs80,	0,	ht108064, trs80, ht108064, trs8012,	"Hiradastechnika Szovetkezet",  "HT-1080Z/64" , 0)

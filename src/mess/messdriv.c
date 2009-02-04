@@ -619,6 +619,7 @@ XL/XE 16kB OS roms
 	DRIVER( ht1080z ) /* Hradstechnika Szvetkezet HT-1080Z */
 	DRIVER( ht1080z2 ) /* Hradstechnika Szvetkezet HT-1080Z Series II */
 	DRIVER( ht108064 ) /* Hradstechnika Szvetkezet HT-1080Z/64 */
+	DRIVER( radionic )	/* Radionic */
 
 	DRIVER( coco )		/* Color Computer									*/
 	DRIVER( cocoe )		/* Color Computer (Extended BASIC 1.0)				*/
@@ -1138,6 +1139,5 @@ XL/XE 16kB OS roms
 
 /*********** Misc ***********************************************************/
 	DRIVER( ex800 )
-
 
 #endif /* DRIVER_RECURSIVE */
