@@ -21,7 +21,7 @@
 				   DB2  12 |			 | 29  
 				        13 |			 | 28  RESETOUTL
 				        14 |			 | 27  DB7
-				    A5  15 |			 | 26  IPLIL
+				    A5  15 |			 | 26  IPL1L
 				 NETIN  16 |			 | 25  CLKCPU
 				    A1  17 |			 | 24  DB3
 				    A0  18 |			 | 23  DB6
@@ -33,14 +33,11 @@
 #ifndef __ZX8302__
 #define __ZX8302__
 
-typedef void (*zx8302_irq_callback_func) (const device_config *device, int state);
-#define ZX8302_IRQ_CALLBACK(name) void name(const device_config *device, int state)
+#include "devcb.h"
 
-typedef void (*zx8302_on_baudx4_changed_func) (const device_config *device, int level);
-#define ZX8302_ON_BAUDX4_CHANGED(name) void name(const device_config *device, int level)
-
-typedef void (*zx8302_comdata_write_func) (const device_config *device, int level);
-#define ZX8302_COMDATA_WRITE(name) void name(const device_config *device, int level)
+/***************************************************************************
+    MACROS / CONSTANTS
+***************************************************************************/
 
 #define ZX8302 DEVICE_GET_INFO_NAME( zx8302 )
 
@@ -48,7 +45,13 @@ typedef void (*zx8302_comdata_write_func) (const device_config *device, int leve
 	MDRV_DEVICE_ADD(_tag, ZX8302, _clock) \
 	MDRV_DEVICE_CONFIG(_config)
 
-/* interface */
+#define ZX8302_INTERFACE(name) \
+	const zx8302_interface(name) =
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
 typedef struct _zx8302_interface zx8302_interface;
 struct _zx8302_interface
 {
@@ -57,16 +60,19 @@ struct _zx8302_interface
 	const char *mdv1_tag;		/* microdrive 1 */
 	const char *mdv2_tag;		/* microdrive 2 */
 
-	/* this gets called for every change of the IPLIL pin (pin 26) */
-	zx8302_irq_callback_func		irq_callback;
+	/* this gets called for every change of the IPL1L pin (pin 26) */
+	devcb_write_line	out_ipl1l_func;
 
 	/* this gets called for every change of the BAUDX4 pin (pin 5) */
-	zx8302_on_baudx4_changed_func	on_baudx4_changed;
+	devcb_write_line	out_baudx4_func;
 
 	/* this gets called for every write of the COMDATA pin (pin 35) */
-	zx8302_comdata_write_func		comdata_w;
+	devcb_write_line	out_comdata_func;
 };
-#define ZX8302_INTERFACE(name) const zx8302_interface(name) =
+
+/***************************************************************************
+    PROTOTYPES
+***************************************************************************/
 
 /* device interface */
 DEVICE_GET_INFO( zx8302 );

@@ -3,6 +3,9 @@
 
 #define SCREEN_TAG	"main"
 
+#define M68008_TAG	"ic18"
+#define I8749_TAG	"ic24"
+#define I8051_TAG	"i8051"
 #define ZX8301_TAG	"ic22"
 #define ZX8302_TAG	"ic23"
 

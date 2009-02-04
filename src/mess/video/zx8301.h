@@ -34,15 +34,11 @@
 #define __ZX8301__
 
 #include "driver.h"
+#include "devcb.h"
 
-typedef void (*zx8301_on_vsync_changed_func) (const device_config *device, int level);
-#define ZX8301_ON_VSYNC_CHANGED(name) void name(const device_config *device, int level)
-
-typedef UINT8 (*zx8301_ram_read_func)(const device_config *device, UINT32 da);
-#define ZX8301_RAM_READ(name) UINT8 name(const device_config *device, UINT32 da)
-
-typedef void (*zx8301_ram_write_func)(const device_config *device, UINT32 da, UINT8 data);
-#define ZX8301_RAM_WRITE(name) void name(const device_config *device, UINT32 da, UINT8 data)
+/***************************************************************************
+    MACROS / CONSTANTS
+***************************************************************************/
 
 #define ZX8301 DEVICE_GET_INFO_NAME( zx8301 )
 
@@ -50,22 +46,32 @@ typedef void (*zx8301_ram_write_func)(const device_config *device, UINT32 da, UI
 	MDRV_DEVICE_ADD(_tag, ZX8301, _clock) \
 	MDRV_DEVICE_CONFIG(_config)
 
-/* interface */
+#define ZX8301_INTERFACE(name) \
+	const zx8301_interface(name) =
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
 typedef struct _zx8301_interface zx8301_interface;
 struct _zx8301_interface
 {
+	const char *cpu_tag;		/* cpu we are working with */
 	const char *screen_tag;		/* screen we are acting on */
 
-	/* this gets called for every change of the VSYNC pin (pin 11) */
-	zx8301_on_vsync_changed_func	on_vsync_changed;
-
 	/* this gets called for every memory read */
-	zx8301_ram_read_func			ram_r;
+	devcb_read8			in_ram_func;
 
 	/* this gets called for every memory write */
-	zx8301_ram_write_func			ram_w;
+	devcb_write8		out_ram_func;
+
+	/* this gets called for every change of the VSYNC pin (pin 11) */
+	devcb_write_line	out_vsync_func;
 };
-#define ZX8301_INTERFACE(name) const zx8301_interface(name) =
+
+/***************************************************************************
+    PROTOTYPES
+***************************************************************************/
 
 /* device interface */
 DEVICE_GET_INFO( zx8301 );

@@ -1,4 +1,4 @@
-/*
+	/*
 
     Sinclair QL
 
@@ -113,20 +113,20 @@ static WRITE8_HANDLER( ipc_port2_w )
 		switch (ipl)
 		{
 		case 0:
-			cpu_set_input_line(space->machine->cpu[0], M68K_IRQ_7, ASSERT_LINE);
+			cputag_set_input_line(space->machine, M68008_TAG, M68K_IRQ_7, ASSERT_LINE);
 			break;
 
 		case 1:
 			// CTRL-ALT-7 pressed
-			cpu_set_input_line(space->machine->cpu[0], M68K_IRQ_5, ASSERT_LINE);
+			cputag_set_input_line(space->machine, M68008_TAG, M68K_IRQ_5, ASSERT_LINE);
 			break;
 
 		case 2:
-			cpu_set_input_line(space->machine->cpu[0], M68K_IRQ_2, ASSERT_LINE);
+			cputag_set_input_line(space->machine, M68008_TAG, M68K_IRQ_2, ASSERT_LINE);
 			break;
 
 		case 3:
-			cpu_set_input_line(space->machine->cpu[0], M68K_IRQ_7, CLEAR_LINE);
+			cputag_set_input_line(space->machine, M68008_TAG, M68K_IRQ_7, CLEAR_LINE);
 			break;
 		}
 
@@ -164,7 +164,7 @@ static READ8_HANDLER( ipc_port2_r )
 
 	int irq = (state->ser2_rxd | state->ser1_txd);
 
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_IRQ0, irq);
+	cputag_set_input_line(space->machine, I8749_TAG, INPUT_LINE_IRQ0, irq);
 
 	return (state->comdata << 7) | irq;
 }
@@ -468,50 +468,39 @@ INPUT_PORTS_END
 
 /* ZX8301 Interface */
 
-static ZX8301_ON_VSYNC_CHANGED( ql_vsync_w )
+static READ8_HANDLER( ql_ram_r )
 {
-	ql_state *state = device->machine->driver_data;
-
-	zx8302_vsync_w(state->zx8302, level);
+	return mess_ram[offset];
 }
 
-static ZX8301_RAM_READ( ql_ram_r )
+static WRITE8_HANDLER( ql_ram_w )
 {
-	return mess_ram[da];
-}
-
-static ZX8301_RAM_WRITE( ql_ram_w )
-{
-	mess_ram[da] = data;
+	mess_ram[offset] = data;
 }
 
 static ZX8301_INTERFACE( ql_zx8301_intf )
 {
+	M68008_TAG,
 	SCREEN_TAG,
-	ql_vsync_w,
-	ql_ram_r,
-	ql_ram_w
+	DEVCB_MEMORY_HANDLER(M68008_TAG, PROGRAM, ql_ram_r),
+	DEVCB_MEMORY_HANDLER(M68008_TAG, PROGRAM, ql_ram_w),
+	DEVCB_DEVICE_LINE(ZX8302, ZX8302_TAG, zx8302_vsync_w)
 };
 
 /* ZX8302 Interface */
 
-static ZX8302_IRQ_CALLBACK( ql_irq_w )
+static WRITE_LINE_DEVICE_HANDLER( ql_baudx4_w )
 {
-	cpu_set_input_line(device->machine->cpu[0], M68K_IRQ_2, state);
+	ql_state *driver_state = device->machine->driver_data;
+
+	driver_state->baudx4 = state;
 }
 
-static ZX8302_ON_BAUDX4_CHANGED( ql_baudx4_w )
+static WRITE_LINE_DEVICE_HANDLER( ql_comdata_w )
 {
-	ql_state *state = device->machine->driver_data;
+	ql_state *driver_state = device->machine->driver_data;
 
-	state->baudx4 = level;
-}
-
-static ZX8302_COMDATA_WRITE( ql_comdata_w )
-{
-	ql_state *state = device->machine->driver_data;
-
-	state->comdata = level;
+	driver_state->comdata = state;
 }
 
 static ZX8302_INTERFACE( ql_zx8302_intf )
@@ -519,9 +508,9 @@ static ZX8302_INTERFACE( ql_zx8302_intf )
 	X2,
 	MDV1_TAG,
 	MDV2_TAG,
-	ql_irq_w,
-	ql_baudx4_w,
-	ql_comdata_w
+	DEVCB_CPU_INPUT_LINE(M68008_TAG, M68K_IRQ_2),
+	DEVCB_LINE(ql_baudx4_w),
+	DEVCB_LINE(ql_comdata_w)
 };
 
 static VIDEO_UPDATE( ql )
@@ -544,7 +533,7 @@ static MACHINE_START( ql )
 	/* configure ROM cartridge */
 
 	memory_install_readwrite8_handler(program, 0x00c000, 0x00ffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
-	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, "main") + 0x00c000, 0);
+	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, M68008_TAG) + 0x00c000, 0);
 	memory_set_bank(machine, 1, 0);
 
 	/* configure RAM */
@@ -580,7 +569,7 @@ static MACHINE_START( ql )
 		break;
 	}
 
-	memory_configure_bank(machine, 2, 0, 1, memory_region(machine, "main") + 0x050000, 0);
+	memory_configure_bank(machine, 2, 0, 1, memory_region(machine, M68008_TAG) + 0x050000, 0);
 	memory_set_bank(machine, 2, 0);
 
 	// find devices
@@ -603,14 +592,14 @@ static MACHINE_START( ql )
 
 static DEVICE_IMAGE_LOAD( ql_cart )
 {
-	UINT8 *ptr = memory_region(image->machine, "main") + 0x00c000;
+	UINT8 *ptr = memory_region(image->machine, M68008_TAG) + 0x00c000;
 	int	filesize = image_length(image);
 
 	if (filesize <= 16 * 1024)
 	{
 		if (image_fread(image, ptr, filesize) == filesize)
 		{
-			memory_install_readwrite8_handler(cpu_get_address_space(image->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x00c000, 0x00ffff, 0, 0, SMH_BANK1, SMH_UNMAP);
+			memory_install_readwrite8_handler(cputag_get_address_space(image->machine, M68008_TAG, ADDRESS_SPACE_PROGRAM), 0x00c000, 0x00ffff, 0, 0, SMH_BANK1, SMH_UNMAP);
 
 			return INIT_PASS;
 		}
@@ -624,10 +613,10 @@ static MACHINE_DRIVER_START( ql )
 
 	// basic machine hardware
 
-	MDRV_CPU_ADD("main", M68008, X1/2)
+	MDRV_CPU_ADD(M68008_TAG, M68008, X1/2)
 	MDRV_CPU_PROGRAM_MAP(ql_map, 0)
 
-	MDRV_CPU_ADD("ipc", I8749, X4)
+	MDRV_CPU_ADD(I8749_TAG, I8749, X4)
 	MDRV_CPU_IO_MAP(ipc_io_map, 0)
 
 	MDRV_MACHINE_START(ql)
@@ -671,10 +660,10 @@ static MACHINE_DRIVER_START( opd )
 	MDRV_DRIVER_DATA(ql_state)
 
 	// basic machine hardware
-	MDRV_CPU_ADD("main", M68008, 7500000)
+	MDRV_CPU_ADD(M68008_TAG, M68008, 7500000)
 	MDRV_CPU_PROGRAM_MAP(ql_map, 0)
 
-	MDRV_CPU_ADD("ipc", I8051, X4)
+	MDRV_CPU_ADD(I8051_TAG, I8051, X4)
 	MDRV_CPU_IO_MAP(ipc_io_map, 0)
 	
 	MDRV_CARTSLOT_REMOVE("cart")
@@ -683,7 +672,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ql_ntsc )
 	MDRV_IMPORT_FROM(ql)
 
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY(SCREEN_TAG)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_SIZE(960, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
@@ -692,11 +681,11 @@ MACHINE_DRIVER_END
 /* ROMs */
 
 #define ROM_IPC	\
-	ROM_REGION( 0x800, "ipc", 0 )\
+	ROM_REGION( 0x800, I8749_TAG, 0 )\
 	ROM_LOAD( "ipc8049.ic24", 0x0000, 0x0800, CRC(6a0d1f20) SHA1(fcb1c97ee7c66e5b6d8fbb57c06fd2f6509f2e1b) )
 
 ROM_START( ql )
-    ROM_REGION( 0x400000, "main", 0 )
+    ROM_REGION( 0x400000, M68008_TAG, 0 )
 	ROM_SYSTEM_BIOS( 0, "default", "v1.10 (JS)" )
 	ROMX_LOAD( "ql.js 0000.ic33", 0x000000, 0x008000, CRC(1bbad3b8) SHA1(59fd4372771a630967ee102760f4652904d7d5fa), ROM_BIOS(1) )
     ROMX_LOAD( "ql.js 8000.ic34", 0x008000, 0x004000, CRC(c970800e) SHA1(b8c9203026a7de6a44bd0942ec9343e8b222cb41), ROM_BIOS(1) )
@@ -736,7 +725,7 @@ ROM_START( ql )
 ROM_END
 
 ROM_START( ql_us )
-    ROM_REGION( 0x400000, "main", 0 )
+    ROM_REGION( 0x400000, M68008_TAG, 0 )
     ROM_LOAD( "jsu.ic33", 0x000000, 0x008000, BAD_DUMP CRC(e397f49f) SHA1(c06f92eabaf3e6dd298c51cb7f7535d8ef0ef9c5) )
     ROM_LOAD( "jsu.ic34", 0x008000, 0x004000, BAD_DUMP CRC(3debbacc) SHA1(9fbc3e42ec463fa42f9c535d63780ff53a9313ec) )
 
@@ -744,7 +733,7 @@ ROM_START( ql_us )
 ROM_END
 
 ROM_START( ql_es )
-    ROM_REGION( 0x400000, "main", 0 )
+    ROM_REGION( 0x400000, M68008_TAG, 0 )
     ROM_LOAD( "mge.ic33", 0x000000, 0x008000, BAD_DUMP CRC(d5293bde) SHA1(bf5af7e53a472d4e9871f182210787d601db0634) )
     ROM_LOAD( "mge.ic34", 0x008000, 0x004000, BAD_DUMP CRC(a694f8d7) SHA1(bd2868656008de85d7c191598588017ae8aa3339) )
 
@@ -752,7 +741,7 @@ ROM_START( ql_es )
 ROM_END
 
 ROM_START( ql_fr )
-    ROM_REGION( 0x400000, "main", 0 )
+    ROM_REGION( 0x400000, M68008_TAG, 0 )
     ROM_LOAD( "mgf.ic33", 0x000000, 0x008000, NO_DUMP )
     ROM_LOAD( "mgf.ic34", 0x008000, 0x004000, NO_DUMP )
 
@@ -760,7 +749,7 @@ ROM_START( ql_fr )
 ROM_END
 
 ROM_START( ql_de )
-    ROM_REGION( 0x400000, "main", 0 )
+    ROM_REGION( 0x400000, M68008_TAG, 0 )
 	ROM_SYSTEM_BIOS( 0, "default", "v1.10 (MG)" )
     ROMX_LOAD( "mgg.ic33", 0x000000, 0x008000, BAD_DUMP CRC(b4e468fd) SHA1(cd02a3cd79af90d48b65077d0571efc2f12f146e), ROM_BIOS(1) )
     ROMX_LOAD( "mgg.ic34", 0x008000, 0x004000, BAD_DUMP CRC(54959d40) SHA1(ffc0be9649f26019d7be82925c18dc699259877f), ROM_BIOS(1) )
@@ -776,7 +765,7 @@ ROM_START( ql_de )
 ROM_END
 
 ROM_START( ql_it )
-    ROM_REGION( 0x400000, "main", 0 )
+    ROM_REGION( 0x400000, M68008_TAG, 0 )
     ROM_LOAD( "mgi.ic33", 0x000000, 0x008000, BAD_DUMP CRC(d5293bde) SHA1(bf5af7e53a472d4e9871f182210787d601db0634) )
     ROM_LOAD( "mgi.ic34", 0x008000, 0x004000, BAD_DUMP CRC(a2fdfb83) SHA1(162b1052737500f3c13497cdf0f813ba006bdae9) )
 
@@ -784,7 +773,7 @@ ROM_START( ql_it )
 ROM_END
 
 ROM_START( ql_se )
-    ROM_REGION( 0x400000, "main", 0 )
+    ROM_REGION( 0x400000, M68008_TAG, 0 )
     ROM_LOAD( "mgs.ic33", 0x000000, 0x008000, NO_DUMP )
     ROM_LOAD( "mgs.ic34", 0x008000, 0x004000, NO_DUMP )
 
@@ -792,7 +781,7 @@ ROM_START( ql_se )
 ROM_END
 
 ROM_START( ql_gr )
-    ROM_REGION( 0x400000, "main", 0 )
+    ROM_REGION( 0x400000, M68008_TAG, 0 )
     ROM_LOAD( "efp.ic33", 0x000000, 0x008000, BAD_DUMP CRC(eb181641) SHA1(43c1e0215cf540cbbda240b1048910ff55681059) )
     ROM_LOAD( "efp.ic34", 0x008000, 0x004000, BAD_DUMP CRC(4c3b34b7) SHA1(f9dc571d2d4f68520b306ecc7516acaeea69ec0d) )
 
@@ -800,7 +789,7 @@ ROM_START( ql_gr )
 ROM_END
 
 ROM_START( ql_dk )
-    ROM_REGION( 0x400000, "main", 0 )
+    ROM_REGION( 0x400000, M68008_TAG, 0 )
     ROM_LOAD( "mgd.ic33",  0x000000, 0x008000, BAD_DUMP CRC(f57755eb) SHA1(dc57939ffb8741e17967a1d2479c339750ec7ff6) )
     ROM_LOAD( "mgd.ic34",  0x008000, 0x004000, BAD_DUMP CRC(1892465a) SHA1(0ff3046b5276da6639d3fe79b22ae25cc265d540) )
 	ROM_LOAD( "extra.rom", 0x01c000, 0x004000, NO_DUMP )
@@ -809,13 +798,13 @@ ROM_START( ql_dk )
 ROM_END
 
 ROM_START( tonto )
-    ROM_REGION( 0x400000, "main", 0 )
+    ROM_REGION( 0x400000, M68008_TAG, 0 )
 	ROM_LOAD( "bios-1.rom", 0x000000, 0x008000, NO_DUMP )
 	ROM_LOAD( "bios-2.rom", 0x008000, 0x008000, NO_DUMP )
 	ROM_LOAD( "bios-3.rom", 0x010000, 0x008000, NO_DUMP )
 	ROM_LOAD( "bios-4.rom", 0x018000, 0x008000, NO_DUMP )
 
-    ROM_REGION( 0x10000, "i8051", 0 )
+    ROM_REGION( 0x10000, I8051_TAG, 0 )
 	ROM_LOAD( "8051-1.rom", 0x000000, 0x010000, NO_DUMP )
 
     ROM_REGION( 0x10000, "tms5220", 0 )
@@ -830,13 +819,13 @@ ROM_START( tonto )
 ROM_END
 
 ROM_START( megaopd )
-    ROM_REGION( 0x400000, "main", 0 )
+    ROM_REGION( 0x400000, M68008_TAG, 0 )
 	ROM_LOAD( "bios-1.rom", 0x000000, 0x008000, NO_DUMP )
 	ROM_LOAD( "bios-2.rom", 0x008000, 0x008000, NO_DUMP )
 	ROM_LOAD( "bios-3.rom", 0x010000, 0x008000, NO_DUMP )
 	ROM_LOAD( "bios-4.rom", 0x018000, 0x008000, NO_DUMP )
 
-    ROM_REGION( 0x10000, "i8051", 0 )
+    ROM_REGION( 0x10000, I8051_TAG, 0 )
 	ROM_LOAD( "8051-1.rom", 0x000000, 0x010000, NO_DUMP )
 
     ROM_REGION( 0x10000, "tms5220", 0 )
