@@ -60,7 +60,7 @@
 
 #define CDP1861		DEVICE_GET_INFO_NAME(cdp1861)
 
-#define MDRV_CDP1861_ADD(_tag, _config, _clock) \
+#define MDRV_CDP1861_ADD(_tag, _clock, _config) \
 	MDRV_DEVICE_ADD(_tag, CDP1861, _clock) \
 	MDRV_DEVICE_CONFIG(_config)
 

@@ -32,6 +32,12 @@
 #ifndef __CDP1864__
 #define __CDP1864__
 
+#include "devcb.h"
+
+/***************************************************************************
+    PARAMETERS
+***************************************************************************/
+
 #define CDP1864_CLOCK	XTAL_1_75MHz
 
 #define CDP1864_VISIBLE_COLUMNS	64
@@ -60,14 +66,9 @@
 #define CDP1864_SCANLINE_EFX_BOTTOM_START	CDP1864_SCANLINE_DISPLAY_END - 4
 #define CDP1864_SCANLINE_EFX_BOTTOM_END		CDP1864_SCANLINE_DISPLAY_END
 
-typedef void (*cdp1864_on_int_changed_func) (const device_config *device, int level);
-#define CDP1864_ON_INT_CHANGED(name) void name(const device_config *device, int level)
-
-typedef void (*cdp1864_on_dmao_changed_func) (const device_config *device, int level);
-#define CDP1864_ON_DMAO_CHANGED(name) void name(const device_config *device, int level)
-
-typedef void (*cdp1864_on_efx_changed_func) (const device_config *device, int level);
-#define CDP1864_ON_EFX_CHANGED(name) void name(const device_config *device, int level)
+/***************************************************************************
+    MACROS / CONSTANTS
+***************************************************************************/
 
 #define CDP1864		DEVICE_GET_INFO_NAME(cdp1864)
 
@@ -75,35 +76,44 @@ typedef void (*cdp1864_on_efx_changed_func) (const device_config *device, int le
 	MDRV_DEVICE_ADD(_tag, CDP1864, _clock) \
 	MDRV_DEVICE_CONFIG(_config)
 
+#define CDP1864_INTERFACE(name) const cdp1864_interface (name)=
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
 typedef enum _cdp1864_format cdp1864_format;
 enum _cdp1864_format {
 	CDP1864_NON_INTERLACED = 0,
 	CDP1864_INTERLACED
 };
 
-/* interface */
 typedef struct _cdp1864_interface cdp1864_interface;
 struct _cdp1864_interface
 {
+	const char *cpu_tag;		/* cpu we are working with */
 	const char *screen_tag;		/* screen we are acting on */
 
 	cdp1864_format interlace;	/* interlace */
 
 	/* this gets called for every change of the INT pin (pin 36) */
-	cdp1864_on_int_changed_func		on_int_changed;
+	devcb_write_line		out_int_func;
 
 	/* this gets called for every change of the DMAO pin (pin 37) */
-	cdp1864_on_dmao_changed_func	on_dmao_changed;
+	devcb_write_line		out_dmao_func;
 
 	/* this gets called for every change of the EFX pin (pin 18) */
-	cdp1864_on_efx_changed_func		on_efx_changed;
+	devcb_write_line		out_efx_func;
 
 	double res_r;				/* red output resistor value */
 	double res_g;				/* green output resistor value */
 	double res_b;				/* blue output resistor value */
 	double res_bkg;				/* background output resistor value */
 };
-#define CDP1864_INTERFACE(name) const cdp1864_interface (name)=
+
+/***************************************************************************
+    PROTOTYPES
+***************************************************************************/
 
 /* device interface */
 DEVICE_GET_INFO( cdp1864 );

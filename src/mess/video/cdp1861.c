@@ -57,7 +57,9 @@ INLINE const cdp1861_interface *get_interface(const device_config *device)
     IMPLEMENTATION
 ***************************************************************************/
 
-/* Timer Callbacks */
+/*-------------------------------------------------
+    TIMER_CALLBACK( cdp1861_int_tick )
+-------------------------------------------------*/
 
 static TIMER_CALLBACK( cdp1861_int_tick )
 {
@@ -85,6 +87,10 @@ static TIMER_CALLBACK( cdp1861_int_tick )
 		timer_adjust_oneshot(cdp1861->int_timer, video_screen_get_time_until_pos(cdp1861->screen, CDP1861_SCANLINE_INT_START, 0), 0);
 	}
 }
+
+/*-------------------------------------------------
+    TIMER_CALLBACK( cdp1861_efx_tick )
+-------------------------------------------------*/
 
 static TIMER_CALLBACK( cdp1861_efx_tick )
 {
@@ -116,6 +122,10 @@ static TIMER_CALLBACK( cdp1861_efx_tick )
 		break;
 	}
 }
+
+/*-------------------------------------------------
+    TIMER_CALLBACK( cdp1861_dma_tick )
+-------------------------------------------------*/
 
 static TIMER_CALLBACK( cdp1861_dma_tick )
 {
@@ -154,7 +164,9 @@ static TIMER_CALLBACK( cdp1861_dma_tick )
 	}
 }
 
-/* Display On/Off */
+/*-------------------------------------------------
+    cdp1861_dispon_r - turn display on
+-------------------------------------------------*/
 
 READ8_DEVICE_HANDLER( cdp1861_dispon_r )
 {
@@ -164,6 +176,10 @@ READ8_DEVICE_HANDLER( cdp1861_dispon_r )
 
 	return 0xff;
 }
+
+/*-------------------------------------------------
+    cdp1861_dispoff_r - turn display off
+-------------------------------------------------*/
 
 WRITE8_DEVICE_HANDLER( cdp1861_dispoff_w )
 {
@@ -175,7 +191,9 @@ WRITE8_DEVICE_HANDLER( cdp1861_dispoff_w )
 	devcb_call_write_line(&cdp1861->out_dmao_func, CLEAR_LINE);
 }
 
-/* DMA Write */
+/*-------------------------------------------------
+    cdp1861_dma_w - write DMA byte
+-------------------------------------------------*/
 
 void cdp1861_dma_w(const device_config *device, UINT8 data)
 {
@@ -193,7 +211,9 @@ void cdp1861_dma_w(const device_config *device, UINT8 data)
 	}
 }
 
-/* Screen Update */
+/*-------------------------------------------------
+    cdp1861_update - update screen
+-------------------------------------------------*/
 
 void cdp1861_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
@@ -209,7 +229,9 @@ void cdp1861_update(const device_config *device, bitmap_t *bitmap, const rectang
 	}
 }
 
-/* Device Interface */
+/*-------------------------------------------------
+    DEVICE_START( cdp1861 )
+-------------------------------------------------*/
 
 static DEVICE_START( cdp1861 )
 {
@@ -242,6 +264,10 @@ static DEVICE_START( cdp1861 )
 	state_save_register_device_item_bitmap(device, 0, cdp1861->bitmap);
 }
 
+/*-------------------------------------------------
+    DEVICE_RESET( cdp1861 )
+-------------------------------------------------*/
+
 static DEVICE_RESET( cdp1861 )
 {
 	cdp1861_t *cdp1861 = get_safe_token(device);
@@ -258,6 +284,10 @@ static DEVICE_RESET( cdp1861 )
 	devcb_call_write_line(&cdp1861->out_efx_func, CLEAR_LINE);
 }
 
+/*-------------------------------------------------
+    DEVICE_SET_INFO( cdp1861 )
+-------------------------------------------------*/
+
 static DEVICE_SET_INFO( cdp1861 )
 {
 	switch (state)
@@ -265,6 +295,10 @@ static DEVICE_SET_INFO( cdp1861 )
 		/* no parameters to set */
 	}
 }
+
+/*-------------------------------------------------
+    DEVICE_GET_INFO( cdp1861 )
+-------------------------------------------------*/
 
 DEVICE_GET_INFO( cdp1861 )
 {

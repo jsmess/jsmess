@@ -21,16 +21,28 @@
 #include "sound/beep.h"
 #include "video/cdp1864.h"
 
+/***************************************************************************
+    PARAMETERS
+***************************************************************************/
+
 #define CDP1864_DEFAULT_LATCH	0x35
 
 #define CDP1864_CYCLES_DMA_START	2*8
 #define CDP1864_CYCLES_DMA_ACTIVE	8*8
 #define CDP1864_CYCLES_DMA_WAIT		6*8
 
+static const int CDP1864_BACKGROUND_COLOR_SEQUENCE[] = { 2, 0, 1, 4 };
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
 typedef struct _cdp1864_t cdp1864_t;
 struct _cdp1864_t
 {
-	const cdp1864_interface *intf;	/* interface */
+	devcb_resolved_write_line	out_int_func;
+	devcb_resolved_write_line	out_dmao_func;
+	devcb_resolved_write_line	out_efx_func;
 
 	const device_config *screen;	/* screen */
 	bitmap_t *bitmap;				/* bitmap */
@@ -51,9 +63,13 @@ struct _cdp1864_t
 	emu_timer *int_timer;			/* interrupt timer */
 	emu_timer *efx_timer;			/* EFx timer */
 	emu_timer *dma_timer;			/* DMA timer */
+
+	const device_config *cpu;
 };
 
-static const int CDP1864_BACKGROUND_COLOR_SEQUENCE[] = { 2, 0, 1, 4 };
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
 
 INLINE cdp1864_t *get_safe_token(const device_config *device)
 {
@@ -63,9 +79,22 @@ INLINE cdp1864_t *get_safe_token(const device_config *device)
 	return (cdp1864_t *)device->token;
 }
 
-/* Timer Callbacks */
+INLINE const cdp1864_interface *get_interface(const device_config *device)
+{
+	assert(device != NULL);
+	assert((device->type == CDP1864));
+	return (const cdp1864_interface *) device->static_config;
+}
 
-static TIMER_CALLBACK(cdp1864_int_tick)
+/***************************************************************************
+    IMPLEMENTATION
+***************************************************************************/
+
+/*-------------------------------------------------
+    TIMER_CALLBACK( cdp1864_int_tick )
+-------------------------------------------------*/
+
+static TIMER_CALLBACK( cdp1864_int_tick )
 {
 	const device_config *device = ptr;
 	cdp1864_t *cdp1864 = get_safe_token(device);
@@ -76,7 +105,7 @@ static TIMER_CALLBACK(cdp1864_int_tick)
 	{
 		if (cdp1864->disp)
 		{
-			cdp1864->intf->on_int_changed(device, HOLD_LINE);
+			devcb_call_write_line(&cdp1864->out_int_func, ASSERT_LINE);
 		}
 
 		timer_adjust_oneshot(cdp1864->int_timer, video_screen_get_time_until_pos(cdp1864->screen, CDP1864_SCANLINE_INT_END, 0), 0);
@@ -85,14 +114,18 @@ static TIMER_CALLBACK(cdp1864_int_tick)
 	{
 		if (cdp1864->disp)
 		{
-			cdp1864->intf->on_int_changed(device, CLEAR_LINE);
+			devcb_call_write_line(&cdp1864->out_int_func, CLEAR_LINE);
 		}
 
 		timer_adjust_oneshot(cdp1864->int_timer, video_screen_get_time_until_pos(cdp1864->screen, CDP1864_SCANLINE_INT_START, 0), 0);
 	}
 }
 
-static TIMER_CALLBACK(cdp1864_efx_tick)
+/*-------------------------------------------------
+    TIMER_CALLBACK( cdp1864_efx_tick )
+-------------------------------------------------*/
+
+static TIMER_CALLBACK( cdp1864_efx_tick )
 {
 	const device_config *device = ptr;
 	cdp1864_t *cdp1864 = get_safe_token(device);
@@ -102,28 +135,32 @@ static TIMER_CALLBACK(cdp1864_efx_tick)
 	switch (scanline)
 	{
 	case CDP1864_SCANLINE_EFX_TOP_START:
-		cdp1864->intf->on_efx_changed(device, ASSERT_LINE);
+		devcb_call_write_line(&cdp1864->out_efx_func, ASSERT_LINE);
 		timer_adjust_oneshot(cdp1864->efx_timer, video_screen_get_time_until_pos(cdp1864->screen, CDP1864_SCANLINE_EFX_TOP_END, 0), 0);
 		break;
 
 	case CDP1864_SCANLINE_EFX_TOP_END:
-		cdp1864->intf->on_efx_changed(device, CLEAR_LINE);
+		devcb_call_write_line(&cdp1864->out_efx_func, CLEAR_LINE);
 		timer_adjust_oneshot(cdp1864->efx_timer, video_screen_get_time_until_pos(cdp1864->screen, CDP1864_SCANLINE_EFX_BOTTOM_START, 0), 0);
 		break;
 
 	case CDP1864_SCANLINE_EFX_BOTTOM_START:
-		cdp1864->intf->on_efx_changed(device, ASSERT_LINE);
+		devcb_call_write_line(&cdp1864->out_efx_func, ASSERT_LINE);
 		timer_adjust_oneshot(cdp1864->efx_timer, video_screen_get_time_until_pos(cdp1864->screen, CDP1864_SCANLINE_EFX_BOTTOM_END, 0), 0);
 		break;
 
 	case CDP1864_SCANLINE_EFX_BOTTOM_END:
-		cdp1864->intf->on_efx_changed(device, CLEAR_LINE);
+		devcb_call_write_line(&cdp1864->out_efx_func, CLEAR_LINE);
 		timer_adjust_oneshot(cdp1864->efx_timer, video_screen_get_time_until_pos(cdp1864->screen, CDP1864_SCANLINE_EFX_TOP_START, 0), 0);
 		break;
 	}
 }
 
-static TIMER_CALLBACK(cdp1864_dma_tick)
+/*-------------------------------------------------
+    TIMER_CALLBACK( cdp1864_dma_tick )
+-------------------------------------------------*/
+
+static TIMER_CALLBACK( cdp1864_dma_tick )
 {
 	const device_config *device = ptr;
 	cdp1864_t *cdp1864 = get_safe_token(device);
@@ -136,7 +173,7 @@ static TIMER_CALLBACK(cdp1864_dma_tick)
 		{
 			if (scanline >= CDP1864_SCANLINE_DISPLAY_START && scanline < CDP1864_SCANLINE_DISPLAY_END)
 			{
-				cdp1864->intf->on_dmao_changed(device, CLEAR_LINE);
+				devcb_call_write_line(&cdp1864->out_dmao_func, CLEAR_LINE);
 			}
 		}
 
@@ -150,7 +187,7 @@ static TIMER_CALLBACK(cdp1864_dma_tick)
 		{
 			if (scanline >= CDP1864_SCANLINE_DISPLAY_START && scanline < CDP1864_SCANLINE_DISPLAY_END)
 			{
-				cdp1864->intf->on_dmao_changed(device, HOLD_LINE);
+				devcb_call_write_line(&cdp1864->out_dmao_func, ASSERT_LINE);
 			}
 		}
 
@@ -160,19 +197,21 @@ static TIMER_CALLBACK(cdp1864_dma_tick)
 	}
 }
 
-/* Palette Initialization */
+/*-------------------------------------------------
+    cdp1864_init_palette - initialize palette
+-------------------------------------------------*/
 
-static void cdp1864_init_palette(const device_config *device)
+static void cdp1864_init_palette(const device_config *device, const cdp1864_interface *intf)
 {
 	cdp1864_t *cdp1864 = get_safe_token(device);
 	int i;
 
-	double res_total = cdp1864->intf->res_r + cdp1864->intf->res_g + cdp1864->intf->res_b + cdp1864->intf->res_bkg;
+	double res_total = intf->res_r + intf->res_g + intf->res_b + intf->res_bkg;
 
-	int weight_r = (cdp1864->intf->res_r / res_total) * 100;
-	int weight_g = (cdp1864->intf->res_g / res_total) * 100;
-	int weight_b = (cdp1864->intf->res_b / res_total) * 100;
-	int weight_bkg = (cdp1864->intf->res_bkg / res_total) * 100;
+	int weight_r = (intf->res_r / res_total) * 100;
+	int weight_g = (intf->res_g / res_total) * 100;
+	int weight_b = (intf->res_b / res_total) * 100;
+	int weight_bkg = (intf->res_bkg / res_total) * 100;
 
 	for (i = 0; i < 16; i++)
 	{
@@ -193,7 +232,9 @@ static void cdp1864_init_palette(const device_config *device)
 	}
 }
 
-/* Audio Output Enable */
+/*-------------------------------------------------
+    cdp1864_aoe_w - audio output enable
+-------------------------------------------------*/
 
 void cdp1864_aoe_w(const device_config *device, int level)
 {
@@ -209,7 +250,9 @@ void cdp1864_aoe_w(const device_config *device, int level)
 	beep_set_state(0, level); // TODO: remove this
 }
 
-/* Display On/Off */
+/*-------------------------------------------------
+    cdp1864_dispon_r - turn display on
+-------------------------------------------------*/
 
 READ8_DEVICE_HANDLER( cdp1864_dispon_r )
 {
@@ -220,19 +263,25 @@ READ8_DEVICE_HANDLER( cdp1864_dispon_r )
 	return 0xff;
 }
 
+/*-------------------------------------------------
+    cdp1864_dispoff_r - turn display off
+-------------------------------------------------*/
+
 READ8_DEVICE_HANDLER( cdp1864_dispoff_r )
 {
 	cdp1864_t *cdp1864 = get_safe_token(device);
 
 	cdp1864->disp = 0;
 
-	cdp1864->intf->on_int_changed(device, CLEAR_LINE);
-	cdp1864->intf->on_dmao_changed(device, CLEAR_LINE);
+	devcb_call_write_line(&cdp1864->out_int_func, CLEAR_LINE);
+	devcb_call_write_line(&cdp1864->out_dmao_func, CLEAR_LINE);
 
 	return 0xff;
 }
 
-/* Step Background Color */
+/*-------------------------------------------------
+    cdp1864_step_bgcolor_w - step background color
+-------------------------------------------------*/
 
 WRITE8_DEVICE_HANDLER( cdp1864_step_bgcolor_w )
 {
@@ -243,7 +292,9 @@ WRITE8_DEVICE_HANDLER( cdp1864_step_bgcolor_w )
 	if (++cdp1864->bgcolor > 3) cdp1864->bgcolor = 0;
 }
 
-/* Load Tone Latch */
+/*-------------------------------------------------
+    cdp1864_tone_latch_w - load tone latch
+-------------------------------------------------*/
 
 WRITE8_DEVICE_HANDLER( cdp1864_tone_latch_w )
 {
@@ -253,7 +304,9 @@ WRITE8_DEVICE_HANDLER( cdp1864_tone_latch_w )
 	beep_set_frequency(0, CDP1864_CLOCK / 8 / 4 / (data + 1) / 2); // TODO: remove this
 }
 
-/* DMA Write */
+/*-------------------------------------------------
+    cdp1864_dma_w - write DMA byte
+-------------------------------------------------*/
 
 void cdp1864_dma_w(const device_config *device, UINT8 data, int color_on, int rdata, int gdata, int bdata)
 {
@@ -285,7 +338,9 @@ void cdp1864_dma_w(const device_config *device, UINT8 data, int color_on, int rd
 	}
 }
 
-/* Sound Update */
+/*-------------------------------------------------
+    cdp1864_sound_update - update sound
+-------------------------------------------------*/
 
 #ifdef UNUSED_FUNCTION
 static void cdp1864_sound_update(const device_config *device, stream_sample_t **inputs, stream_sample_t **_buffer, int length)
@@ -333,7 +388,9 @@ static void cdp1864_sound_update(const device_config *device, stream_sample_t **
 }
 #endif
 
-/* Screen Update */
+/*-------------------------------------------------
+    cdp1864_update - update screen
+-------------------------------------------------*/
 
 void cdp1864_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
@@ -350,26 +407,25 @@ void cdp1864_update(const device_config *device, bitmap_t *bitmap, const rectang
 	}
 }
 
-/* Device Interface */
+/*-------------------------------------------------
+    DEVICE_START( cdp1864 )
+-------------------------------------------------*/
 
 static DEVICE_START( cdp1864 )
 {
 	cdp1864_t *cdp1864 = get_safe_token(device);
+	const cdp1864_interface *intf = get_interface(device);
 
-	/* validate arguments */
-	assert(device != NULL);
-	assert(device->tag != NULL);
-	assert(device->clock > 0);
+	/* resolve callbacks */
+	devcb_resolve_write_line(&cdp1864->out_int_func, &intf->out_int_func, device);
+	devcb_resolve_write_line(&cdp1864->out_dmao_func, &intf->out_dmao_func, device);
+	devcb_resolve_write_line(&cdp1864->out_efx_func, &intf->out_efx_func, device);
 
-	cdp1864->intf = device->static_config;
-
-	assert(cdp1864->intf != NULL);
-	assert(cdp1864->intf->on_int_changed != NULL);
-	assert(cdp1864->intf->on_dmao_changed != NULL);
-	assert(cdp1864->intf->on_efx_changed != NULL);
+	/* get the cpu */
+	cdp1864->cpu = cputag_get_cpu(device->machine, intf->cpu_tag);
 
 	/* get the screen device */
-	cdp1864->screen = devtag_get_device(device->machine, VIDEO_SCREEN, cdp1864->intf->screen_tag);
+	cdp1864->screen = devtag_get_device(device->machine, VIDEO_SCREEN, intf->screen_tag);
 	assert(cdp1864->screen != NULL);
 
 	/* allocate the temporary bitmap */
@@ -377,7 +433,7 @@ static DEVICE_START( cdp1864 )
 	bitmap_fill(cdp1864->bitmap, 0, CDP1864_BACKGROUND_COLOR_SEQUENCE[cdp1864->bgcolor] + 8);
 
 	/* initialize the palette */
-	cdp1864_init_palette(device);
+	cdp1864_init_palette(device, intf);
 
 	/* create the timers */
 	cdp1864->int_timer = timer_alloc(device->machine, cdp1864_int_tick, (void *)device);
@@ -397,6 +453,10 @@ static DEVICE_START( cdp1864 )
 	state_save_register_bitmap(device->machine, "cdp1864", device->tag, 0, "cdp1864->bitmap", cdp1864->bitmap);
 }
 
+/*-------------------------------------------------
+    DEVICE_RESET( cdp1861 )
+-------------------------------------------------*/
+
 static DEVICE_RESET( cdp1864 )
 {
 	cdp1864_t *cdp1864 = get_safe_token(device);
@@ -409,12 +469,16 @@ static DEVICE_RESET( cdp1864 )
 	cdp1864->dmaout = 0;
 	cdp1864->bgcolor = 0;
 
-	cdp1864->intf->on_int_changed(device, CLEAR_LINE);
-	cdp1864->intf->on_dmao_changed(device, CLEAR_LINE);
-	cdp1864->intf->on_efx_changed(device, CLEAR_LINE);
+	devcb_call_write_line(&cdp1864->out_int_func, CLEAR_LINE);
+	devcb_call_write_line(&cdp1864->out_dmao_func, CLEAR_LINE);
+	devcb_call_write_line(&cdp1864->out_efx_func, CLEAR_LINE);
 
 	cdp1864_aoe_w(device, 0);
 }
+
+/*-------------------------------------------------
+    DEVICE_SET_INFO( cdp1861 )
+-------------------------------------------------*/
 
 static DEVICE_SET_INFO( cdp1864 )
 {
@@ -424,26 +488,30 @@ static DEVICE_SET_INFO( cdp1864 )
 	}
 }
 
+/*-------------------------------------------------
+    DEVICE_GET_INFO( cdp1861 )
+-------------------------------------------------*/
+
 DEVICE_GET_INFO( cdp1864 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(cdp1864_t);				break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(cdp1864_t);						break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;										break;
+		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(cdp1864); break;
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(cdp1864);	break;
-		case DEVINFO_FCT_STOP:							/* Nothing */								break;
-		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(cdp1864);	break;
+		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(cdp1864);		break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(cdp1864);			break;
+		case DEVINFO_FCT_STOP:							/* Nothing */										break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(cdp1864);			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "RCA CDP1861");					break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "RCA CDP1800");					break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "RCA CDP1864");						break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "RCA CDP1800");						break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");								break;
 		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);							break;
-		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");			break;
+		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");				break;
 	}
 }
