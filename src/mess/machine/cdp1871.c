@@ -10,6 +10,10 @@
 #include "driver.h"
 #include "cdp1871.h"
 
+/***************************************************************************
+    PARAMETERS
+***************************************************************************/
+
 static const UINT8 CDP1871_KEY_CODES[4][11][8] =
 {
 	// normal
@@ -73,15 +77,36 @@ static const UINT8 CDP1871_KEY_CODES[4][11][8] =
 	}
 };
 
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
 typedef struct _cdp1871_t cdp1871_t;
 struct _cdp1871_t
 {
-	const cdp1871_interface *intf;
+	devcb_resolved_write_line	out_da_func;
+	devcb_resolved_write_line	out_rpt_func;
+	devcb_resolved_read8		in_d1_func;
+	devcb_resolved_read8		in_d2_func;
+	devcb_resolved_read8		in_d3_func;
+	devcb_resolved_read8		in_d4_func;
+	devcb_resolved_read8		in_d5_func;
+	devcb_resolved_read8		in_d6_func;
+	devcb_resolved_read8		in_d7_func;
+	devcb_resolved_read8		in_d8_func;
+	devcb_resolved_read8		in_d9_func;
+	devcb_resolved_read8		in_d10_func;
+	devcb_resolved_read8		in_d11_func;
+	devcb_resolved_read_line	in_shift_func;
+	devcb_resolved_read_line	in_control_func;
+	devcb_resolved_read_line	in_alpha_func;
 
 	int inhibit;					/* scan counter clock inhibit */
 	int sense;						/* sense input scan counter */
-	int drive;						/* drive output scan counter */
-	int modifiers;					/* modifier inputs */
+	int drive;						/* modifier inputs */
+
+	int shift;						/* latched shift modifier */
+	int control;					/* latched control modifier */
 
 	int da;							/* data available flag */
 	int next_da;					/* next value of data available flag */
@@ -92,6 +117,10 @@ struct _cdp1871_t
 	emu_timer *scan_timer;			/* keyboard scan timer */
 };
 
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
+
 INLINE cdp1871_t *get_safe_token(const device_config *device)
 {
 	assert(device != NULL);
@@ -99,6 +128,17 @@ INLINE cdp1871_t *get_safe_token(const device_config *device)
 
 	return (cdp1871_t *)device->token;
 }
+
+INLINE const cdp1871_interface *get_interface(const device_config *device)
+{
+	assert(device != NULL);
+	assert((device->type == CDP1871));
+	return (const cdp1871_interface *) device->static_config;
+}
+
+/***************************************************************************
+    IMPLEMENTATION
+***************************************************************************/
 
 static void change_output_lines(const device_config *device)
 {
@@ -108,14 +148,14 @@ static void change_output_lines(const device_config *device)
 	{
 		cdp1871->da = cdp1871->next_da;
 
-		cdp1871->intf->on_da_changed(device, cdp1871->da);
+		devcb_call_write_line(&cdp1871->out_da_func, cdp1871->da);
 	}
 
 	if (cdp1871->next_rpt != cdp1871->rpt)
 	{
 		cdp1871->rpt = cdp1871->next_rpt;
 
-		cdp1871->intf->on_rpt_changed(device, cdp1871->rpt);
+		devcb_call_write_line(&cdp1871->out_rpt_func, cdp1871->rpt);
 	}
 }
 
@@ -143,14 +183,30 @@ static void clock_scan_counters(const device_config *device)
 static void detect_keypress(const device_config *device)
 {
 	cdp1871_t *cdp1871 = get_safe_token(device);
-	static const char *const keynames[] = { "D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "D10", "D11" };
 
-	if (input_port_read(device->machine, keynames[cdp1871->drive]) == (1 << cdp1871->sense))
+	UINT8 data = 0;
+	
+	switch (cdp1871->drive)
+	{
+	case 0:		data = devcb_call_read8(&cdp1871->in_d1_func, 0);	break;
+	case 1:		data = devcb_call_read8(&cdp1871->in_d2_func, 0);	break;
+	case 2:		data = devcb_call_read8(&cdp1871->in_d3_func, 0);	break;
+	case 3:		data = devcb_call_read8(&cdp1871->in_d4_func, 0);	break;
+	case 4:		data = devcb_call_read8(&cdp1871->in_d5_func, 0);	break;
+	case 5:		data = devcb_call_read8(&cdp1871->in_d6_func, 0);	break;
+	case 6:		data = devcb_call_read8(&cdp1871->in_d7_func, 0);	break;
+	case 7:		data = devcb_call_read8(&cdp1871->in_d8_func, 0);	break;
+	case 8:		data = devcb_call_read8(&cdp1871->in_d9_func, 0);	break;
+	case 9:		data = devcb_call_read8(&cdp1871->in_d10_func, 0);	break;
+	case 10:	data = devcb_call_read8(&cdp1871->in_d11_func, 0);	break;
+	}
+
+	if (data == (1 << cdp1871->sense))
 	{
 		if (!cdp1871->inhibit)
 		{
-			cdp1871->modifiers = input_port_read(device->machine, "MODIFIERS");
-
+			cdp1871->shift = devcb_call_read_line(&cdp1871->in_shift_func);
+			cdp1871->control = devcb_call_read_line(&cdp1871->in_control_func);
 			cdp1871->inhibit = 1;
 			cdp1871->next_da = 0;
 		}
@@ -166,6 +222,10 @@ static void detect_keypress(const device_config *device)
 	}
 }
 
+/*-------------------------------------------------
+    TIMER_CALLBACK( cdp1871_scan_tick )
+-------------------------------------------------*/
+
 static TIMER_CALLBACK( cdp1871_scan_tick )
 {
 	const device_config *device = ptr;
@@ -175,18 +235,19 @@ static TIMER_CALLBACK( cdp1871_scan_tick )
 	detect_keypress(device);
 }
 
-/* Keyboard Data */
+/*-------------------------------------------------
+    cdp1871_data_r - interface retrieving
+    keyboard data
+-------------------------------------------------*/
 
 READ8_DEVICE_HANDLER( cdp1871_data_r )
 {
 	cdp1871_t *cdp1871 = get_safe_token(device);
 
-	int shift = BIT(cdp1871->modifiers, 0);
-	int control = BIT(cdp1871->modifiers, 1);
-	int alpha = BIT(cdp1871->modifiers, 2);
 	int table = 0;
+	int alpha = devcb_call_read_line(&cdp1871->in_alpha_func);
 
-	if (control) table = 3;	else if (shift)	table = 2; 	else if (alpha) table = 1;
+	if (cdp1871->control) table = 3; else if (cdp1871->shift) table = 2; else if (alpha) table = 1;
 
 	// reset DA on next TPB
 
@@ -195,111 +256,32 @@ READ8_DEVICE_HANDLER( cdp1871_data_r )
 	return CDP1871_KEY_CODES[table][cdp1871->drive][cdp1871->sense];
 }
 
-/* Input Ports */
-
-INPUT_PORTS_START( cdp1871 )
-	PORT_START("D1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR(' ')
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('"')
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR(0xFFFD)
-
-	PORT_START("D2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_CHAR(':') PORT_CHAR('*')
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH2) PORT_CHAR(';') PORT_CHAR('+')
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('=')
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
-
-	PORT_START("D3")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('@') PORT_CHAR('\'')
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C')
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_CHAR('G')
-
-	PORT_START("D4")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_CHAR('H')
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_CHAR('I')
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CHAR('J')
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_CHAR('K')
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_CHAR('L')
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CHAR('M')
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_CHAR('N')
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_CHAR('O')
-
-	PORT_START("D5")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('P')
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('Q')
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CHAR('R')
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('S')
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_CHAR('T')
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U) PORT_CHAR('U')
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V) PORT_CHAR('V')
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('W')
-
-	PORT_START("D6")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('X')
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_CHAR('Y')
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('Z')
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('[') PORT_CHAR('{')
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\\') PORT_CHAR('|')
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}')
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_TILDE) PORT_CHAR('^') PORT_CHAR('~')
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("- Delete") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('_')
-
-	PORT_START("D7")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Space") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Line Feed") PORT_CODE(KEYCODE_HOME) PORT_CHAR(UCHAR_MAMEKEY(HOME)) PORT_CHAR(10)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Escape") PORT_CODE(KEYCODE_ESC) PORT_CHAR(UCHAR_MAMEKEY(ESC))
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Carriage Return") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Delete") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
-
-	PORT_START("D8")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_KEYBOARD )
-
-	PORT_START("D9")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_KEYBOARD )
-
-	PORT_START("D10")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_KEYBOARD )
-
-	PORT_START("D11")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_KEYBOARD )
-
-	PORT_START("MODIFIERS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL)) PORT_CHAR(UCHAR_MAMEKEY(RCONTROL))
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Alpha Lock") PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
-INPUT_PORTS_END
-
-/* Device Interface */
+/*-------------------------------------------------
+    DEVICE_START( cdp1871 )
+-------------------------------------------------*/
 
 static DEVICE_START( cdp1871 )
 {
 	cdp1871_t *cdp1871 = get_safe_token(device);
+	const cdp1871_interface *intf = get_interface(device);
 
-	/* validate arguments */
-	assert(device != NULL);
-	assert(device->tag != NULL);
-
-	cdp1871->intf = device->static_config;
-
-	assert(cdp1871->intf != NULL);
-	assert(cdp1871->intf->clock > 0);
+	/* resolve callbacks */
+	devcb_resolve_write_line(&cdp1871->out_da_func, &intf->out_da_func, device);
+	devcb_resolve_write_line(&cdp1871->out_rpt_func, &intf->out_rpt_func, device);
+	devcb_resolve_read8(&cdp1871->in_d1_func, &intf->in_d1_func, device);
+	devcb_resolve_read8(&cdp1871->in_d2_func, &intf->in_d2_func, device);
+	devcb_resolve_read8(&cdp1871->in_d3_func, &intf->in_d3_func, device);
+	devcb_resolve_read8(&cdp1871->in_d4_func, &intf->in_d4_func, device);
+	devcb_resolve_read8(&cdp1871->in_d5_func, &intf->in_d5_func, device);
+	devcb_resolve_read8(&cdp1871->in_d6_func, &intf->in_d6_func, device);
+	devcb_resolve_read8(&cdp1871->in_d7_func, &intf->in_d7_func, device);
+	devcb_resolve_read8(&cdp1871->in_d8_func, &intf->in_d8_func, device);
+	devcb_resolve_read8(&cdp1871->in_d9_func, &intf->in_d9_func, device);
+	devcb_resolve_read8(&cdp1871->in_d10_func, &intf->in_d10_func, device);
+	devcb_resolve_read8(&cdp1871->in_d11_func, &intf->in_d11_func, device);
+	devcb_resolve_read_line(&cdp1871->in_shift_func, &intf->in_shift_func, device);
+	devcb_resolve_read_line(&cdp1871->in_control_func, &intf->in_control_func, device);
+	devcb_resolve_read_line(&cdp1871->in_alpha_func, &intf->in_alpha_func, device);
 
 	/* set initial values */
 	cdp1871->next_da = 1;
@@ -308,19 +290,23 @@ static DEVICE_START( cdp1871 )
 
 	/* create the timers */
 	cdp1871->scan_timer = timer_alloc(device->machine, cdp1871_scan_tick, (void *)device);
-	timer_adjust_periodic(cdp1871->scan_timer, attotime_zero, 0, ATTOTIME_IN_HZ(cdp1871->intf->clock));
+	timer_adjust_periodic(cdp1871->scan_timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock));
 
 	/* register for state saving */
 	state_save_register_device_item(device, 0, cdp1871->inhibit);
 	state_save_register_device_item(device, 0, cdp1871->sense);
 	state_save_register_device_item(device, 0, cdp1871->drive);
-	state_save_register_device_item(device, 0, cdp1871->modifiers);
-
+	state_save_register_device_item(device, 0, cdp1871->shift);
+	state_save_register_device_item(device, 0, cdp1871->control);
 	state_save_register_device_item(device, 0, cdp1871->da);
 	state_save_register_device_item(device, 0, cdp1871->next_da);
 	state_save_register_device_item(device, 0, cdp1871->rpt);
 	state_save_register_device_item(device, 0, cdp1871->next_rpt);
 }
+
+/*-------------------------------------------------
+    DEVICE_SET_INFO( cdp1871 )
+-------------------------------------------------*/
 
 static DEVICE_SET_INFO( cdp1871 )
 {
@@ -329,6 +315,10 @@ static DEVICE_SET_INFO( cdp1871 )
 		/* no parameters to set */
 	}
 }
+
+/*-------------------------------------------------
+    DEVICE_GET_INFO( cdp1871 )
+-------------------------------------------------*/
 
 DEVICE_GET_INFO( cdp1871 )
 {

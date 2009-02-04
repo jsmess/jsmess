@@ -314,32 +314,48 @@ static CDP1802_INTERFACE( comx35_cdp1802_config )
 
 /* CDP1871 Interface */
 
-static CDP1871_ON_DA_CHANGED( comx35_da_w )
+static WRITE_LINE_DEVICE_HANDLER( comx35_da_w )
 {
-	comx35_state *state = device->machine->driver_data;
+	comx35_state *driver_state = device->machine->driver_data;
 
-	state->cdp1871_efxa = level;
+	driver_state->cdp1871_efxa = state;
 }
 
-static CDP1871_ON_RPT_CHANGED( comx35_rpt_w )
+static WRITE_LINE_DEVICE_HANDLER( comx35_rpt_w )
 {
-	comx35_state *state = device->machine->driver_data;
+	comx35_state *driver_state = device->machine->driver_data;
 
-	state->cdp1871_efxb = level;
+	driver_state->cdp1871_efxb = state;
 }
 
-static CDP1871_INTERFACE( comx35n_cdp1871_intf )
+static READ_LINE_DEVICE_HANDLER( comx35_shift_r )
 {
-	CDP1869_CPU_CLK_PAL / 8,
-	comx35_da_w,
-	comx35_rpt_w
-};
+	return BIT(input_port_read(device->machine, "MODIFIERS"), 0);
+}
 
-static CDP1871_INTERFACE( comx35p_cdp1871_intf )
+static READ_LINE_DEVICE_HANDLER( comx35_control_r )
 {
-	CDP1869_CPU_CLK_NTSC / 8,
-	comx35_da_w,
-	comx35_rpt_w
+	return BIT(input_port_read(device->machine, "MODIFIERS"), 1);
+}
+
+static CDP1871_INTERFACE( comx35_cdp1871_intf )
+{
+	DEVCB_INPUT_PORT("D1"),
+	DEVCB_INPUT_PORT("D2"),
+	DEVCB_INPUT_PORT("D3"),
+	DEVCB_INPUT_PORT("D4"),
+	DEVCB_INPUT_PORT("D5"),
+	DEVCB_INPUT_PORT("D6"),
+	DEVCB_INPUT_PORT("D7"),
+	DEVCB_INPUT_PORT("D8"),
+	DEVCB_INPUT_PORT("D9"),
+	DEVCB_INPUT_PORT("D10"),
+	DEVCB_INPUT_PORT("D11"),
+	DEVCB_LINE(comx35_shift_r),
+	DEVCB_LINE(comx35_control_r),
+	DEVCB_NULL,
+	DEVCB_LINE(comx35_da_w),
+	DEVCB_LINE(comx35_rpt_w)
 };
 
 /* Machine Drivers */
@@ -365,7 +381,7 @@ static MACHINE_DRIVER_START( comx35p )
 	MDRV_MACHINE_RESET(comx35)
 
 	// keyboard encoder
-	MDRV_CDP1871_ADD(CDP1871_TAG, comx35p_cdp1871_intf)
+	MDRV_CDP1871_ADD(CDP1871_TAG, comx35_cdp1871_intf, CDP1869_CPU_CLK_PAL / 8)
 	
 	// video hardware
 
@@ -408,7 +424,7 @@ static MACHINE_DRIVER_START( comx35n )
 	MDRV_MACHINE_RESET(comx35)
 
 	// keyboard encoder
-	MDRV_CDP1871_ADD(CDP1871_TAG, comx35n_cdp1871_intf)
+	MDRV_CDP1871_ADD(CDP1871_TAG, comx35_cdp1871_intf, CDP1869_CPU_CLK_NTSC / 8)
 
 	// video hardware
 

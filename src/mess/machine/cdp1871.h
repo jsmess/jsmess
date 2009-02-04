@@ -33,40 +33,60 @@
 #ifndef __CDP1871__
 #define __CDP1871__
 
-typedef void (*cdp1871_on_da_changed_func) (const device_config *device, int level);
-#define CDP1871_ON_DA_CHANGED(name) void name(const device_config *device, int level)
+#include "devcb.h"
 
-typedef void (*cdp1871_on_rpt_changed_func) (const device_config *device, int level);
-#define CDP1871_ON_RPT_CHANGED(name) void name(const device_config *device, int level)
+/***************************************************************************
+    MACROS / CONSTANTS
+***************************************************************************/
 
 #define CDP1871		DEVICE_GET_INFO_NAME(cdp1871)
 
-#define MDRV_CDP1871_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, CDP1871, 0) \
+#define MDRV_CDP1871_ADD(_tag, _intrf, _clock) \
+	MDRV_DEVICE_ADD(_tag, CDP1871, _clock) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
 #define MDRV_CDP1871_REMOVE(_tag) \
 	MDRV_DEVICE_REMOVE(_tag, CDP1871)
 
-/* interface */
+#define CDP1871_INTERFACE(name) \
+	const cdp1871_interface (name)=
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
 typedef struct _cdp1871_interface cdp1871_interface;
 struct _cdp1871_interface
 {
-	int clock;					/* the clock (pin 34) of the chip */
+	devcb_read8			in_d1_func;
+	devcb_read8			in_d2_func;
+	devcb_read8			in_d3_func;
+	devcb_read8			in_d4_func;
+	devcb_read8			in_d5_func;
+	devcb_read8			in_d6_func;
+	devcb_read8			in_d7_func;
+	devcb_read8			in_d8_func;
+	devcb_read8			in_d9_func;
+	devcb_read8			in_d10_func;
+	devcb_read8			in_d11_func;
+
+	devcb_read_line		in_shift_func;
+	devcb_read_line		in_control_func;
+	devcb_read_line		in_alpha_func;
 
 	/* this gets called for every change of the DA pin (pin 33) */
-	cdp1871_on_da_changed_func		on_da_changed;
+	devcb_write_line	out_da_func;
 
 	/* this gets called for every change of the RPT pin (pin 35) */
-	cdp1871_on_rpt_changed_func		on_rpt_changed;
+	devcb_write_line	out_rpt_func;
 };
-#define CDP1871_INTERFACE(name) const cdp1871_interface (name)=
+
+/***************************************************************************
+    PROTOTYPES
+***************************************************************************/
 
 /* device interface */
 DEVICE_GET_INFO( cdp1871 );
-
-/* keyboard matrix */
-INPUT_PORTS_EXTERN( cdp1871 );
 
 /* keyboard data */
 READ8_DEVICE_HANDLER( cdp1871_data_r );
