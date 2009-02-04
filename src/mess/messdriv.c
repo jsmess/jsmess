@@ -133,6 +133,13 @@ const game_driver * const drivers[] =
 
 	/* FAIRCHILD */
 	DRIVER( channelf )	/* Fairchild Channel F VES - 1976					*/
+	DRIVER( sabavdpl )  /* SABA Videoplay - 1977 (PAL)                      */
+	DRIVER( luxorves )  /* Luxor Video Entertainment System (PAL)           */
+	DRIVER( channlf2 )  /* Fairchild Channel F II - 1978                    */
+	DRIVER( sabavpl2 )	/* SABA Videoplay 2 (PAL)                           */
+	DRIVER( luxorvec )  /* Luxor Video Entertainment Computer (PAL)         */
+	DRIVER( itttelma )  /* ITT Tele-Match Processor (PAL)                   */
+	DRIVER( ingtelma )  /* Ingelen Tele-Match Processor (PAL)               */
 
 	/* COLECO */
 	DRIVER( coleco )	/* ColecoVision (Original BIOS)						*/

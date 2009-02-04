@@ -9,12 +9,15 @@ New System Drivers Supported (in no particular order):
   [MooglyGuy, R. Belmont]
 - Hewlett Packard HP 48 S/SX/G/GX/G+ [Antoine Miné]
 - Epson PX-4 (not working)  [Dirk Best]
+- Various Channel F clones [Fredric QJ Blåholtz]
 
 
 
 System Driver Changes:
 ----------------------
 - [APPLE1] Fixed character layout.  [rhester72]
+
+- [CHANNELF] Added support for "new" sound.  [Fredric QJ Blåholtz]
 
 - [COCO] Cleanups  [Nathan Woods]
 

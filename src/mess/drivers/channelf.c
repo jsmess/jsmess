@@ -6,6 +6,9 @@
  *  Frank Palazzolo
  *  Sean Riddle
  *
+ *  Fredric "e5frog" Blaoholtz, added support large cartridges 
+ *    also spanning from $3000 to $FFFF. Added clones             
+ *
  ******************************************************************/
 
 #include "driver.h"
@@ -20,6 +23,10 @@
 #endif
 
 #define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
+
+#define MASTER_CLOCK_PAL	4433619/2*0.9
+#define PAL_VBLANK_TIME     4623
+
 
 /* The F8 has latches on its port pins
  * These mimic's their behavior
@@ -180,6 +187,7 @@ static ADDRESS_MAP_START( channelf_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x0800, 0x27ff) AM_ROM /* Cartridge Data */
 	AM_RANGE(0x2800, 0x2fff) AM_RAM /* Schach RAM */
+	AM_RANGE(0x3000, 0xffff) AM_ROM /* Cartridge Data continued */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( channelf_io, ADDRESS_SPACE_IO, 8 )
@@ -261,6 +269,95 @@ static MACHINE_DRIVER_START( channelf )
 	MDRV_CARTSLOT_ADD("cart")
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( sabavdpl )
+	/* basic machine hardware */
+	MDRV_CPU_ADD("main", F8, MASTER_CLOCK_PAL)        /* PAL speed */
+	MDRV_CPU_PROGRAM_MAP(channelf_map, 0)
+	MDRV_CPU_IO_MAP(channelf_io, 0)
+	MDRV_QUANTUM_TIME(HZ(50))
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(50)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(PAL_VBLANK_TIME)) /* approximate */
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(128, 64)
+	MDRV_SCREEN_VISIBLE_AREA(4, 112 - 7, 4, 64 - 3)
+	MDRV_PALETTE_LENGTH(8)
+	MDRV_PALETTE_INIT( channelf )
+
+	MDRV_VIDEO_START( channelf )
+	MDRV_VIDEO_UPDATE( channelf )
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("custom", CUSTOM, 0)
+	MDRV_SOUND_CONFIG(channelf_sound_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	
+	MDRV_CARTSLOT_ADD("cart")
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( channlf2 )
+	/* basic machine hardware */
+	MDRV_CPU_ADD("main", F8, 3579545/2)        /* Colorburst / 2 */
+	MDRV_CPU_PROGRAM_MAP(channelf_map, 0)
+	MDRV_CPU_IO_MAP(channelf_io, 0)
+	MDRV_QUANTUM_TIME(HZ(60))
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(128, 64)
+	MDRV_SCREEN_VISIBLE_AREA(4, 112 - 7, 4, 64 - 3)
+	MDRV_PALETTE_LENGTH(8)
+	MDRV_PALETTE_INIT( channelf )
+
+	MDRV_VIDEO_START( channelf )
+	MDRV_VIDEO_UPDATE( channelf )
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("custom", CUSTOM, 0)
+	MDRV_SOUND_CONFIG(channelf_sound_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	
+	MDRV_CARTSLOT_ADD("cart")
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( sabavpl2 )
+	/* basic machine hardware */
+	MDRV_CPU_ADD("main", F8, MASTER_CLOCK_PAL)        /* PAL speed */
+	MDRV_CPU_PROGRAM_MAP(channelf_map, 0)
+	MDRV_CPU_IO_MAP(channelf_io, 0)
+	MDRV_QUANTUM_TIME(HZ(50))
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(50)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(PAL_VBLANK_TIME)) /* not accurate */
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(128, 64)
+	MDRV_SCREEN_VISIBLE_AREA(4, 112 - 7, 4, 64 - 3)
+	MDRV_PALETTE_LENGTH(8)
+	MDRV_PALETTE_INIT( channelf )
+
+	MDRV_VIDEO_START( channelf )
+	MDRV_VIDEO_UPDATE( channelf )
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("custom", CUSTOM, 0)
+	MDRV_SOUND_CONFIG(channelf_sound_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	
+	MDRV_CARTSLOT_ADD("cart")
+MACHINE_DRIVER_END
+
 ROM_START( channelf )
 	ROM_REGION(0x10000,"main",0)
 	ROM_SYSTEM_BIOS( 0, "sl90025", "Luxor Video Entertainment System" )
@@ -268,8 +365,17 @@ ROM_START( channelf )
 	ROM_SYSTEM_BIOS( 1, "sl31253", "Channel F" )
 	ROMX_LOAD("sl31253.rom",  0x0000, 0x0400, CRC(04694ed9) SHA1(81193965a374d77b99b4743d317824b53c3e3c78), ROM_BIOS(2))
 	ROM_LOAD("sl31254.rom",   0x0400, 0x0400, CRC(9c047ba3) SHA1(8f70d1b74483ba3a37e86cf16c849d601a8c3d2c))
-	ROM_CART_LOAD("cart", 0x0800, 0x2000, ROM_NOMIRROR | ROM_OPTIONAL)
+	ROM_CART_LOAD("cart", 0x0800, 0xf800, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
+
+#define rom_sabavdpl rom_channelf
+#define rom_luxorves rom_channelf
+#define rom_channlf2 rom_channelf
+#define rom_sabavdpl rom_channelf
+#define rom_sabavpl2 rom_channelf
+#define rom_luxorvec rom_channelf
+#define rom_itttelma rom_channelf
+#define rom_ingtelma rom_channelf
 
 /***************************************************************************
 
@@ -278,4 +384,11 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY         FULLNAME        FLAGS */
-CONS( 1976, channelf,   0,      0,      channelf,   channelf,   0,      0,   "Fairchild",    "Channel F",    0 )
+CONS( 1976, channelf,   0,       0,    channelf,  channelf,   0,      0,   "Fairchild",    "Channel F",                            0)
+CONS( 1977, sabavdpl,  channelf, 0,    sabavdpl,  channelf,   0,      0,   "SABA",         "SABA Videoplay",                       0)
+CONS( 197?, luxorves,  channelf, 0,    sabavdpl,  channelf,   0,      0,   "Luxor",        "Luxor Video Entertainment System",     0)
+CONS( 1978, channlf2,   0,       0,    channlf2,  channelf,   0,      0,   "Fairchild",    "Channel F II",                         0)
+CONS( 1978, sabavpl2,  channlf2, 0,    sabavpl2,  channelf,   0,      0,   "SABA",         "SABA Videoplay 2",                     0)
+CONS( 197?, luxorvec,  channlf2, 0,    sabavpl2,  channelf,   0,      0,   "Luxor",        "Luxor Video Entertainment Computer",   0)
+CONS( 197?, itttelma,  channlf2, 0,    sabavpl2,  channelf,   0,      0,   "ITT",          "ITT Tele-Match Processor",             0)
+CONS( 1978, ingtelma,  channlf2, 0,    sabavpl2,  channelf,   0,      0,   "Ingelen",      "Ingelen Tele-Match Processor",         0)

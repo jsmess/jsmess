@@ -10,8 +10,12 @@ static int incr;
 static float decay_mult;
 static int envelope;
 static UINT32 sample_counter = 0;
+static int forced_ontime;           //  added for improved sound
+static int min_ontime;              //  added for improved sound
 
 static const int max_amplitude = 0x7fff;
+
+
 
 void channelf_sound_w(int mode)
 {
@@ -25,11 +29,13 @@ void channelf_sound_w(int mode)
     {
 		case 0:
 			envelope = 0;
+			forced_ontime = 0;     //  added for improved sound
 			break;
 		case 1:
 		case 2:
 		case 3:
 			envelope = max_amplitude;
+			forced_ontime = min_ontime;   //  added for improved sound
 			break;
 	}
 }
@@ -64,12 +70,14 @@ static STREAM_UPDATE( channelf_sh_update )
 
 	while (samples-- > 0)
 	{
-		if ((sample_counter & mask) == target)
+		if ((forced_ontime > 0) || ((sample_counter & mask) == target))   //  change made for improved sound
 			*sample++ = envelope;
 		else
 			*sample++ = 0;
 		sample_counter += incr;
 		envelope *= decay_mult;
+		if (forced_ontime > 0)          //  added for improved sound
+			forced_ontime -= 1;		//  added for improved sound
 	}
 }
 
@@ -102,6 +110,10 @@ CUSTOM_START( channelf_sh_custom_start )
 
 	/* This is the proper value to add per sample */
 	incr = 65536.0/(rate/1000.0/2.0);
+
+	//  added for improved sound
+	/* This is the minimum forced ontime, in samples */
+	min_ontime = rate/1000*2;  /* approx 2ms - estimated, not verified on HW */
 
 	/* This was measured, decay envelope with half life of ~9ms */
 	/* (this is decay multiplier per sample) */

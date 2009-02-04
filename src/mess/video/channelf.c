@@ -5,15 +5,16 @@ UINT8 channelf_val_reg = 0;
 UINT8 channelf_row_reg = 0;
 UINT8 channelf_col_reg = 0;
 
-static const UINT8 channelf_palette[] = {
-	0x00, 0x00, 0x00,	/* black */
-	0xff, 0xff, 0xff,	/* white */
-	0xff, 0x00, 0x00,	/* red	 */
-	0x00, 0xff, 0x00,	/* green */
-	0x00, 0x00, 0xff,	/* blue  */
-	0xbf, 0xbf, 0xbf,	/* ltgray  */
-	0xbf, 0xff, 0xbf,	/* ltgreen */
-	0xbf, 0xbf, 0xff	/* ltblue  */
+static const rgb_t channelf_palette[] =
+{
+	MAKE_RGB(0x10, 0x10, 0x10),	/* black */
+	MAKE_RGB(0xfd, 0xfd, 0xfd),	/* white */
+	MAKE_RGB(0xff, 0x31, 0x53),	/* red	 */
+	MAKE_RGB(0x02, 0xcc, 0x5d),	/* green */
+	MAKE_RGB(0x4b, 0x3f, 0xf3),	/* blue  */
+	MAKE_RGB(0xe0, 0xe0, 0xe0),	/* ltgray  */
+	MAKE_RGB(0x91, 0xff, 0xa6),	/* ltgreen */
+	MAKE_RGB(0xce, 0xd0, 0xff)	/* ltblue  */
 };
 
 #define BLACK	0
@@ -35,11 +36,7 @@ static const UINT16 colormap[] = {
 /* Initialise the palette */
 PALETTE_INIT( channelf )
 {
-	int i;
-
-	for ( i = 0; i < sizeof(channelf_palette) / 3; i++ ) {
-		palette_set_color_rgb(machine, i, channelf_palette[i*3], channelf_palette[i*3+1], channelf_palette[i*3+2]);
-	}
+	palette_set_colors(machine, 0, channelf_palette, ARRAY_LENGTH(channelf_palette));
 }
 
 VIDEO_START( channelf )
