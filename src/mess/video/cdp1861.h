@@ -24,6 +24,12 @@
 #ifndef __CDP1861__
 #define __CDP1861__
 
+#include "devcb.h"
+
+/***************************************************************************
+    PARAMETERS
+***************************************************************************/
+
 #define CDP1861_VISIBLE_COLUMNS	64
 #define CDP1861_VISIBLE_LINES	128
 
@@ -48,37 +54,41 @@
 #define CDP1861_SCANLINE_EFX_BOTTOM_START	CDP1861_SCANLINE_DISPLAY_END - 4
 #define CDP1861_SCANLINE_EFX_BOTTOM_END		CDP1861_SCANLINE_DISPLAY_END
 
-typedef void (*cdp1861_on_int_changed_func) (const device_config *device, int level);
-#define CDP1861_ON_INT_CHANGED(name) void name(const device_config *device, int level)
-
-typedef void (*cdp1861_on_dmao_changed_func) (const device_config *device, int level);
-#define CDP1861_ON_DMAO_CHANGED(name) void name(const device_config *device, int level)
-
-typedef void (*cdp1861_on_efx_changed_func) (const device_config *device, int level);
-#define CDP1861_ON_EFX_CHANGED(name) void name(const device_config *device, int level)
+/***************************************************************************
+    MACROS / CONSTANTS
+***************************************************************************/
 
 #define CDP1861		DEVICE_GET_INFO_NAME(cdp1861)
 
-#define MDRV_CDP1861_ADD(_tag, _clock, _config) \
+#define MDRV_CDP1861_ADD(_tag, _config, _clock) \
 	MDRV_DEVICE_ADD(_tag, CDP1861, _clock) \
 	MDRV_DEVICE_CONFIG(_config)
 
-/* interface */
+#define CDP1861_INTERFACE(name) const cdp1861_interface (name)=
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
 typedef struct _cdp1861_interface cdp1861_interface;
 struct _cdp1861_interface
 {
+	const char *cpu_tag;		/* cpu we are working with */
 	const char *screen_tag;		/* screen we are acting on */
 
 	/* this gets called for every change of the INT pin (pin 3) */
-	cdp1861_on_int_changed_func		on_int_changed;
+	devcb_write_line		out_int_func;
 
 	/* this gets called for every change of the DMAO pin (pin 2) */
-	cdp1861_on_dmao_changed_func	on_dmao_changed;
+	devcb_write_line		out_dmao_func;
 
 	/* this gets called for every change of the EFX pin (pin 9) */
-	cdp1861_on_efx_changed_func		on_efx_changed;
+	devcb_write_line		out_efx_func;
 };
-#define CDP1861_INTERFACE(name) const cdp1861_interface (name)=
+
+/***************************************************************************
+    PROTOTYPES
+***************************************************************************/
 
 /* device interface */
 DEVICE_GET_INFO( cdp1861 );

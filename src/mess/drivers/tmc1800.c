@@ -762,13 +762,13 @@ static MACHINE_START( tmc2000 )
 
 	/* RAM banking */
 
-	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "main"), 0x8000);
+	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, CDP1802_TAG), 0x8000);
 
 	/* ROM/colorram banking */
 
 	state->colorram = auto_malloc(TMC2000_COLORRAM_SIZE);
 
-	memory_configure_bank(machine, 2, TMC2000_BANK_MONITOR, 1, memory_region(machine, "main") + 0x8000, 0);
+	memory_configure_bank(machine, 2, TMC2000_BANK_MONITOR, 1, memory_region(machine, CDP1802_TAG) + 0x8000, 0);
 	memory_configure_bank(machine, 2, TMC2000_BANK_COLORRAM, 1, state->colorram, 0);
 
 	/* randomize color RAM contents */
@@ -819,7 +819,7 @@ static MACHINE_START( oscnano )
 
 	/* RAM/ROM banking */
 
-	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "main"), 0x8000);
+	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, CDP1802_TAG), 0x8000);
 
 	/* allocate monitor timer */
 	
@@ -870,7 +870,7 @@ static MACHINE_DRIVER_START( tmc1800 )
 
 	// basic system hardware
 
-	MDRV_CPU_ADD("main", CDP1802, XTAL_1_75MHz)
+	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_1_75MHz)
 	MDRV_CPU_PROGRAM_MAP(tmc1800_map, 0)
 	MDRV_CPU_IO_MAP(tmc1800_io_map, 0)
 	MDRV_CPU_CONFIG(tmc1800_config)
@@ -901,7 +901,7 @@ static MACHINE_DRIVER_START( osc1000b )
 
 	// basic system hardware
 
-	MDRV_CPU_ADD("main", CDP1802, XTAL_1_75MHz)
+	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_1_75MHz)
 	MDRV_CPU_PROGRAM_MAP(osc1000b_map, 0)
 	MDRV_CPU_IO_MAP(osc1000b_io_map, 0)
 	MDRV_CPU_CONFIG(osc1000b_config)
@@ -932,7 +932,7 @@ static MACHINE_DRIVER_START( tmc2000 )
 
 	// basic system hardware
 
-	MDRV_CPU_ADD("main", CDP1802, XTAL_1_75MHz)
+	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_1_75MHz)
 	MDRV_CPU_PROGRAM_MAP(tmc2000_map, 0)
 	MDRV_CPU_IO_MAP(tmc2000_io_map, 0)
 	MDRV_CPU_CONFIG(tmc2000_config)
@@ -963,7 +963,7 @@ static MACHINE_DRIVER_START( oscnano )
 
 	// basic system hardware
 
-	MDRV_CPU_ADD("main", CDP1802, XTAL_1_75MHz)
+	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_1_75MHz)
 	MDRV_CPU_PROGRAM_MAP(oscnano_map, 0)
 	MDRV_CPU_IO_MAP(oscnano_io_map, 0)
 	MDRV_CPU_CONFIG(oscnano_config)
@@ -992,12 +992,12 @@ MACHINE_DRIVER_END
 /* ROMs */
 
 ROM_START( tmc1800 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, CDP1802_TAG, 0 )
 	ROM_LOAD( "mmi6341-1.ic2", 0x8000, 0x0200, NO_DUMP ) // equivalent to 82S141
 ROM_END
 
 ROM_START( osc1000b )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, CDP1802_TAG, 0 )
 	ROM_LOAD( "mmi6341-1.ic2", 0x8000, 0x0200, NO_DUMP ) // equivalent to 82S141
 
 	ROM_REGION( 0x400, "gfx1", ROMREGION_DISPOSE )
@@ -1006,7 +1006,7 @@ ROM_START( osc1000b )
 ROM_END
 
 ROM_START( tmc2000 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, CDP1802_TAG, 0 )
 	ROM_SYSTEM_BIOS( 0, "prom200", "PROM N:o 200" )
 	ROMX_LOAD( "200.m5",    0x8000, 0x0200, BAD_DUMP CRC(79da3221) SHA1(008da3ef4f69ab1a493362dfca856375b19c94bd), ROM_BIOS(1) ) // typed in from the manual
 	ROM_SYSTEM_BIOS( 1, "prom202", "PROM N:o 202" )
@@ -1016,7 +1016,7 @@ ROM_START( tmc2000 )
 ROM_END
 
 ROM_START( oscnano )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, CDP1802_TAG, 0 )
 	ROM_LOAD( "mmi6349.ic", 0x8000, 0x0200, BAD_DUMP CRC(1ec1b432) SHA1(ac41f5e38bcd4b80bd7a5b277a2c600899fd5fb8) ) // equivalent to 82S141
 ROM_END
 
@@ -1024,7 +1024,7 @@ ROM_END
 
 static QUICKLOAD_LOAD( tmc1800 )
 {
-	UINT8 *ptr = memory_region(image->machine, "main");
+	UINT8 *ptr = memory_region(image->machine, CDP1802_TAG);
 	int size = image_length(image);
 
 	if (size > mess_ram_size)

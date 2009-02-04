@@ -1,14 +1,24 @@
 #include "driver.h"
 #include "cdp1861.h"
 
+/***************************************************************************
+    PARAMETERS
+***************************************************************************/
+
 #define CDP1861_CYCLES_DMA_START	2*8
 #define CDP1861_CYCLES_DMA_ACTIVE	8*8
 #define CDP1861_CYCLES_DMA_WAIT		6*8
 
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
 typedef struct _cdp1861_t cdp1861_t;
 struct _cdp1861_t
 {
-	const cdp1861_interface *intf;
+	devcb_resolved_write_line	out_int_func;
+	devcb_resolved_write_line	out_dmao_func;
+	devcb_resolved_write_line	out_efx_func;
 
 	const device_config *screen;	/* screen */
 	bitmap_t *bitmap;				/* bitmap */
@@ -20,7 +30,13 @@ struct _cdp1861_t
 	emu_timer *int_timer;			/* interrupt timer */
 	emu_timer *efx_timer;			/* EFx timer */
 	emu_timer *dma_timer;			/* DMA timer */
+
+	const device_config *cpu;
 };
+
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
 
 INLINE cdp1861_t *get_safe_token(const device_config *device)
 {
@@ -29,6 +45,17 @@ INLINE cdp1861_t *get_safe_token(const device_config *device)
 
 	return (cdp1861_t *)device->token;
 }
+
+INLINE const cdp1861_interface *get_interface(const device_config *device)
+{
+	assert(device != NULL);
+	assert((device->type == CDP1861));
+	return (const cdp1861_interface *) device->static_config;
+}
+
+/***************************************************************************
+    IMPLEMENTATION
+***************************************************************************/
 
 /* Timer Callbacks */
 
@@ -43,7 +70,7 @@ static TIMER_CALLBACK( cdp1861_int_tick )
 	{
 		if (cdp1861->disp)
 		{
-			cdp1861->intf->on_int_changed(device, HOLD_LINE);
+			devcb_call_write_line(&cdp1861->out_int_func, ASSERT_LINE);
 		}
 
 		timer_adjust_oneshot(cdp1861->int_timer, video_screen_get_time_until_pos(cdp1861->screen, CDP1861_SCANLINE_INT_END, 0), 0);
@@ -52,7 +79,7 @@ static TIMER_CALLBACK( cdp1861_int_tick )
 	{
 		if (cdp1861->disp)
 		{
-			cdp1861->intf->on_int_changed(device, CLEAR_LINE);
+			devcb_call_write_line(&cdp1861->out_int_func, CLEAR_LINE);
 		}
 
 		timer_adjust_oneshot(cdp1861->int_timer, video_screen_get_time_until_pos(cdp1861->screen, CDP1861_SCANLINE_INT_START, 0), 0);
@@ -69,22 +96,22 @@ static TIMER_CALLBACK( cdp1861_efx_tick )
 	switch (scanline)
 	{
 	case CDP1861_SCANLINE_EFX_TOP_START:
-		cdp1861->intf->on_efx_changed(device, ASSERT_LINE);
+		devcb_call_write_line(&cdp1861->out_efx_func, ASSERT_LINE);
 		timer_adjust_oneshot(cdp1861->efx_timer, video_screen_get_time_until_pos(cdp1861->screen, CDP1861_SCANLINE_EFX_TOP_END, 0), 0);
 		break;
 
 	case CDP1861_SCANLINE_EFX_TOP_END:
-		cdp1861->intf->on_efx_changed(device, CLEAR_LINE);
+		devcb_call_write_line(&cdp1861->out_efx_func, CLEAR_LINE);
 		timer_adjust_oneshot(cdp1861->efx_timer, video_screen_get_time_until_pos(cdp1861->screen, CDP1861_SCANLINE_EFX_BOTTOM_START, 0), 0);
 		break;
 
 	case CDP1861_SCANLINE_EFX_BOTTOM_START:
-		cdp1861->intf->on_efx_changed(device, ASSERT_LINE);
+		devcb_call_write_line(&cdp1861->out_efx_func, ASSERT_LINE);
 		timer_adjust_oneshot(cdp1861->efx_timer, video_screen_get_time_until_pos(cdp1861->screen, CDP1861_SCANLINE_EFX_BOTTOM_END, 0), 0);
 		break;
 
 	case CDP1861_SCANLINE_EFX_BOTTOM_END:
-		cdp1861->intf->on_efx_changed(device, CLEAR_LINE);
+		devcb_call_write_line(&cdp1861->out_efx_func, CLEAR_LINE);
 		timer_adjust_oneshot(cdp1861->efx_timer, video_screen_get_time_until_pos(cdp1861->screen, CDP1861_SCANLINE_EFX_TOP_START, 0), 0);
 		break;
 	}
@@ -103,11 +130,11 @@ static TIMER_CALLBACK( cdp1861_dma_tick )
 		{
 			if (scanline >= CDP1861_SCANLINE_DISPLAY_START && scanline < CDP1861_SCANLINE_DISPLAY_END)
 			{
-				cdp1861->intf->on_dmao_changed(device, CLEAR_LINE);
+				devcb_call_write_line(&cdp1861->out_dmao_func, CLEAR_LINE);
 			}
 		}
 
-		timer_adjust_oneshot(cdp1861->dma_timer, cpu_clocks_to_attotime(machine->cpu[0], CDP1861_CYCLES_DMA_WAIT), 0);
+		timer_adjust_oneshot(cdp1861->dma_timer, cpu_clocks_to_attotime(cdp1861->cpu, CDP1861_CYCLES_DMA_WAIT), 0);
 
 		cdp1861->dmaout = 0;
 	}
@@ -117,11 +144,11 @@ static TIMER_CALLBACK( cdp1861_dma_tick )
 		{
 			if (scanline >= CDP1861_SCANLINE_DISPLAY_START && scanline < CDP1861_SCANLINE_DISPLAY_END)
 			{
-				cdp1861->intf->on_dmao_changed(device, HOLD_LINE);
+				devcb_call_write_line(&cdp1861->out_dmao_func, ASSERT_LINE);
 			}
 		}
 
-		timer_adjust_oneshot(cdp1861->dma_timer, cpu_clocks_to_attotime(machine->cpu[0], CDP1861_CYCLES_DMA_ACTIVE), 0);
+		timer_adjust_oneshot(cdp1861->dma_timer, cpu_clocks_to_attotime(cdp1861->cpu, CDP1861_CYCLES_DMA_ACTIVE), 0);
 
 		cdp1861->dmaout = 1;
 	}
@@ -144,8 +171,8 @@ WRITE8_DEVICE_HANDLER( cdp1861_dispoff_w )
 
 	cdp1861->disp = 0;
 
-	cdp1861->intf->on_int_changed(device, CLEAR_LINE);
-	cdp1861->intf->on_dmao_changed(device, CLEAR_LINE);
+	devcb_call_write_line(&cdp1861->out_int_func, CLEAR_LINE);
+	devcb_call_write_line(&cdp1861->out_dmao_func, CLEAR_LINE);
 }
 
 /* DMA Write */
@@ -187,21 +214,18 @@ void cdp1861_update(const device_config *device, bitmap_t *bitmap, const rectang
 static DEVICE_START( cdp1861 )
 {
 	cdp1861_t *cdp1861 = get_safe_token(device);
+	const cdp1861_interface *intf = get_interface(device);
 
-	/* validate arguments */
-	assert(device != NULL);
-	assert(device->tag != NULL);
-	assert(device->clock > 0);
+	/* resolve callbacks */
+	devcb_resolve_write_line(&cdp1861->out_int_func, &intf->out_int_func, device);
+	devcb_resolve_write_line(&cdp1861->out_dmao_func, &intf->out_dmao_func, device);
+	devcb_resolve_write_line(&cdp1861->out_efx_func, &intf->out_efx_func, device);
 
-	cdp1861->intf = device->static_config;
-
-	assert(cdp1861->intf != NULL);
-	assert(cdp1861->intf->on_int_changed != NULL);
-	assert(cdp1861->intf->on_dmao_changed != NULL);
-	assert(cdp1861->intf->on_efx_changed != NULL);
+	/* get the cpu */
+	cdp1861->cpu = cputag_get_cpu(device->machine, intf->cpu_tag);
 
 	/* get the screen device */
-	cdp1861->screen = devtag_get_device(device->machine, VIDEO_SCREEN, cdp1861->intf->screen_tag);
+	cdp1861->screen = devtag_get_device(device->machine, VIDEO_SCREEN, intf->screen_tag);
 	assert(cdp1861->screen != NULL);
 
 	/* allocate the temporary bitmap */
@@ -224,14 +248,14 @@ static DEVICE_RESET( cdp1861 )
 
 	timer_adjust_oneshot(cdp1861->int_timer, video_screen_get_time_until_pos(cdp1861->screen, CDP1861_SCANLINE_INT_START, 0), 0);
 	timer_adjust_oneshot(cdp1861->efx_timer, video_screen_get_time_until_pos(cdp1861->screen, CDP1861_SCANLINE_EFX_TOP_START, 0), 0);
-	timer_adjust_oneshot(cdp1861->dma_timer, cpu_clocks_to_attotime(device->machine->cpu[0], CDP1861_CYCLES_DMA_START), 0);
+	timer_adjust_oneshot(cdp1861->dma_timer, cpu_clocks_to_attotime(cdp1861->cpu, CDP1861_CYCLES_DMA_START), 0);
 
 	cdp1861->disp = 0;
 	cdp1861->dmaout = 0;
 
-	cdp1861->intf->on_int_changed(device, CLEAR_LINE);
-	cdp1861->intf->on_dmao_changed(device, CLEAR_LINE);
-	cdp1861->intf->on_efx_changed(device, CLEAR_LINE);
+	devcb_call_write_line(&cdp1861->out_int_func, CLEAR_LINE);
+	devcb_call_write_line(&cdp1861->out_dmao_func, CLEAR_LINE);
+	devcb_call_write_line(&cdp1861->out_efx_func, CLEAR_LINE);
 }
 
 static DEVICE_SET_INFO( cdp1861 )
@@ -247,21 +271,21 @@ DEVICE_GET_INFO( cdp1861 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(cdp1861_t);				break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(cdp1861_t);						break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;										break;
+		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(cdp1861); break;
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(cdp1861);	break;
-		case DEVINFO_FCT_STOP:							/* Nothing */								break;
-		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(cdp1861);	break;
+		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(cdp1861);		break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(cdp1861);			break;
+		case DEVINFO_FCT_STOP:							/* Nothing */										break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(cdp1861);			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "RCA CDP1861");					break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "RCA CDP1800");					break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "RCA CDP1861");						break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "RCA CDP1800");						break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");								break;
 		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);							break;
-		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");			break;
+		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");				break;
 	}
 }

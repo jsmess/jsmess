@@ -277,29 +277,20 @@ INPUT_PORTS_END
 
 /* Video */
 
-static CDP1861_ON_INT_CHANGED( studio2_int_w )
+static WRITE_LINE_DEVICE_HANDLER( studio2_efx_w )
 {
-	cputag_set_input_line(device->machine, CDP1802_TAG, CDP1802_INPUT_LINE_INT, level);
-}
+	studio2_state *driver_state = device->machine->driver_data;
 
-static CDP1861_ON_DMAO_CHANGED( studio2_dmao_w )
-{
-	cputag_set_input_line(device->machine, CDP1802_TAG, CDP1802_INPUT_LINE_DMAOUT, level);
-}
-
-static CDP1861_ON_EFX_CHANGED( studio2_efx_w )
-{
-	studio2_state *state = device->machine->driver_data;
-
-	state->cdp1861_efx = level;
+	driver_state->cdp1861_efx = state;
 }
 
 static CDP1861_INTERFACE( studio2_cdp1861_intf )
 {
+	CDP1802_TAG,
 	SCREEN_TAG,
-	studio2_int_w,
-	studio2_dmao_w,
-	studio2_efx_w
+	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, CDP1802_INPUT_LINE_INT),
+	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, CDP1802_INPUT_LINE_DMAOUT),
+	DEVCB_LINE(studio2_efx_w)
 };
 
 static VIDEO_UPDATE( studio2 )
@@ -551,7 +542,7 @@ static MACHINE_DRIVER_START( studio2 )
 	MDRV_PALETTE_INIT(black_and_white)
 	MDRV_VIDEO_UPDATE(studio2)
 
-	MDRV_CDP1861_ADD(CDP1861_TAG, XTAL_3_52128MHz, studio2_cdp1861_intf)
+	MDRV_CDP1861_ADD(CDP1861_TAG, studio2_cdp1861_intf, XTAL_3_52128MHz)
 
 	// sound hardware
 
@@ -585,7 +576,7 @@ static MACHINE_DRIVER_START( visicom )
 	MDRV_PALETTE_INIT(black_and_white)
 	MDRV_VIDEO_UPDATE(studio2)
 
-	MDRV_CDP1861_ADD(CDP1861_TAG, XTAL_3_579545MHz/2/8, studio2_cdp1861_intf)
+	MDRV_CDP1861_ADD(CDP1861_TAG, studio2_cdp1861_intf, XTAL_3_579545MHz/2/8)
 
 	// sound hardware
 

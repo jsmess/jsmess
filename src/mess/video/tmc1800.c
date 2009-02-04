@@ -7,29 +7,20 @@
 
 /* Telmac 1800 */
 
-static CDP1861_ON_INT_CHANGED( tmc1800_int_w )
+static WRITE_LINE_DEVICE_HANDLER( tmc1800_efx_w )
 {
-	cpu_set_input_line(device->machine->cpu[0], CDP1802_INPUT_LINE_INT, level);
-}
+	tmc1800_state *driver_state = device->machine->driver_data;
 
-static CDP1861_ON_DMAO_CHANGED( tmc1800_dmao_w )
-{
-	cpu_set_input_line(device->machine->cpu[0], CDP1802_INPUT_LINE_DMAOUT, level);
-}
-
-static CDP1861_ON_EFX_CHANGED( tmc1800_efx_w )
-{
-	tmc1800_state *state = device->machine->driver_data;
-
-	state->cdp1861_efx = level;
+	driver_state->cdp1861_efx = state;
 }
 
 static CDP1861_INTERFACE( tmc1800_cdp1861_intf )
 {
+	CDP1802_TAG,
 	SCREEN_TAG,
-	tmc1800_int_w,
-	tmc1800_dmao_w,
-	tmc1800_efx_w
+	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, CDP1802_INPUT_LINE_INT),
+	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, CDP1802_INPUT_LINE_DMAOUT),
+	DEVCB_LINE(tmc1800_efx_w)
 };
 
 static VIDEO_UPDATE( tmc1800 )
@@ -145,7 +136,7 @@ MACHINE_DRIVER_START( tmc1800_video )
 	MDRV_PALETTE_INIT(black_and_white)
 	MDRV_VIDEO_UPDATE(tmc1800)
 
-	MDRV_CDP1861_ADD(CDP1861_TAG, XTAL_1_75MHz, tmc1800_cdp1861_intf)
+	MDRV_CDP1861_ADD(CDP1861_TAG, tmc1800_cdp1861_intf, XTAL_1_75MHz)
 MACHINE_DRIVER_END
 
 MACHINE_DRIVER_START( osc1000b_video )

@@ -379,29 +379,20 @@ INPUT_PORTS_END
 
 /* Video */
 
-static CDP1861_ON_INT_CHANGED( vip_int_w )
+static WRITE_LINE_DEVICE_HANDLER( vip_efx_w )
 {
-	cpu_set_input_line(device->machine->cpu[0], CDP1802_INPUT_LINE_INT, level);
-}
+	vip_state *driver_state = device->machine->driver_data;
 
-static CDP1861_ON_DMAO_CHANGED( vip_dmao_w )
-{
-	cpu_set_input_line(device->machine->cpu[0], CDP1802_INPUT_LINE_DMAOUT, level);
-}
-
-static CDP1861_ON_EFX_CHANGED( vip_efx_w )
-{
-	vip_state *state = device->machine->driver_data;
-
-	state->cdp1861_efx = level;
+	driver_state->cdp1861_efx = state;
 }
 
 static CDP1861_INTERFACE( vip_cdp1861_intf )
 {
+	CDP1802_TAG,
 	SCREEN_TAG,
-	vip_int_w,
-	vip_dmao_w,
-	vip_efx_w
+	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, CDP1802_INPUT_LINE_INT),
+	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, CDP1802_INPUT_LINE_DMAOUT),
+	DEVCB_LINE(vip_efx_w)
 };
 
 static CDP1862_INTERFACE( vip_cdp1862_intf )
@@ -690,7 +681,7 @@ static MACHINE_DRIVER_START( vip )
 	MDRV_PALETTE_INIT(black_and_white)
 	MDRV_VIDEO_UPDATE(vip)
 
-	MDRV_CDP1861_ADD(CDP1861_TAG, XTAL_3_52128MHz, vip_cdp1861_intf)
+	MDRV_CDP1861_ADD(CDP1861_TAG, vip_cdp1861_intf, XTAL_3_52128MHz)
 	MDRV_CDP1862_ADD(CDP1862_TAG, CPD1862_CLOCK, vip_cdp1862_intf)
 
 	/* sound hardware */
