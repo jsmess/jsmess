@@ -140,6 +140,11 @@ INLINE const cdp1871_interface *get_interface(const device_config *device)
     IMPLEMENTATION
 ***************************************************************************/
 
+/*-------------------------------------------------
+    change_output_lines - change output line
+	state
+-------------------------------------------------*/
+
 static void change_output_lines(const device_config *device)
 {
 	cdp1871_t *cdp1871 = get_safe_token(device);
@@ -158,6 +163,11 @@ static void change_output_lines(const device_config *device)
 		devcb_call_write_line(&cdp1871->out_rpt_func, cdp1871->rpt);
 	}
 }
+
+/*-------------------------------------------------
+    clock_scan_counters - clock the keyboard
+	scan counters
+-------------------------------------------------*/
 
 static void clock_scan_counters(const device_config *device)
 {
@@ -179,6 +189,10 @@ static void clock_scan_counters(const device_config *device)
 		}
 	}
 }
+
+/*-------------------------------------------------
+    detect_keypress - detect key press
+-------------------------------------------------*/
 
 static void detect_keypress(const device_config *device)
 {
