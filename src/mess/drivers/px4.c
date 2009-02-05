@@ -300,10 +300,10 @@ static WRITE8_HANDLER( px4_sior_w )
 			px4->sior = 0xc1 | px4->interrupt_status;
 			px4->interrupt_status = 0x00;
 		}
-		else if (px4->key_status != 0x00)
+		else if (px4->key_status != 0xff)
 		{
 			px4->sior = px4->key_status;
-			px4->key_status = 0x00;
+			px4->key_status = 0xff;
 		}
 		else
 		{
@@ -483,6 +483,10 @@ static WRITE8_HANDLER( px4_swr_w )
 static WRITE8_HANDLER( px4_ioctlr_w )
 {
 	logerror("%s: px4_ioctlr_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
+
+	output_set_value("led_0", BIT(data, 4)); /* caps lock */
+	output_set_value("led_1", BIT(data, 5)); /* num lock */
+	output_set_value("led_2", BIT(data, 6));
 }
 
 
@@ -510,17 +514,17 @@ static INPUT_CHANGED( key_callback )
 	px4_state *px4 = field->port->machine->driver_data;
 	UINT32 oldvalue = oldval * field->mask, newvalue = newval * field->mask;
 	UINT32 delta = oldvalue ^ newvalue;
-	int i, scancode = 0, down = 0;
+	int i, scancode = 0xff, down = 0;
 
 	for (i = 0; i < 32; i++)
 	{
 		if (delta & (1 << i))
 		{
-			down = (newvalue & (1 << i)) ? 0x00 : 0x10;
+			down = (newvalue & (1 << i)) ? 0x10 : 0x00;
 			scancode = (int)param * 32 + i;
 
 			/* control keys */
-			if (scancode >= 0xa0)
+			if ((scancode & 0xa0) == 0xa0)
 				scancode |= down;
 
 			logerror("upd7508: key callback, key=0x%02x\n", scancode);
@@ -529,7 +533,7 @@ static INPUT_CHANGED( key_callback )
 		}
 	}
 
-	if (down || scancode >= 0xa0)
+	if (down || (scancode & 0xa0) == 0xa0)
 	{
 		px4->key_status = scancode;
 
