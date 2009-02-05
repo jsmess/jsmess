@@ -2,6 +2,7 @@
 #define __ATARI_ST__
 
 #define SCREEN_TAG	"main"
+#define M68000_TAG	"m68000"
 #define MC68901_TAG	"mc68901"
 #define LMC1992_TAG "lmc1992"
 

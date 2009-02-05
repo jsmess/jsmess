@@ -45,7 +45,7 @@ static UINT8 acia_midi_rx = 1, acia_midi_tx = 1;
 static void atarist_fdc_dma_transfer(running_machine *machine)
 {
 	device_config *fdc = (device_config*)devtag_get_device(machine, WD1772, "wd1772");
-	const address_space *program = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
+	const address_space *program = cputag_get_address_space(machine, M68000_TAG, ADDRESS_SPACE_PROGRAM);
 	atarist_state *state = machine->driver_data;
 
 	if ((state->fdc_mode & ATARIST_FLOPPY_MODE_DMA_DISABLE) == 0)
@@ -478,7 +478,7 @@ static TIMER_CALLBACK( atariste_dmasound_tick )
 	if (state->dmasnd_samples == 0)
 	{
 		int i;
-		UINT8 *RAM = memory_region(machine, "main");
+		UINT8 *RAM = memory_region(machine, M68000_TAG);
 
 		for (i = 0; i < 8; i++)
 		{
@@ -1353,7 +1353,19 @@ static const acia6850_interface acia_midi_intf =
 	acia_interrupt
 };
 
-static MC68901_GPIO_READ( mfp_gpio_r )
+static IRQ_CALLBACK( atarist_int_ack )
+{
+	atarist_state *state = device->machine->driver_data;
+
+	if (irqline == M68K_IRQ_6)
+	{
+		return mc68901_get_vector(state->mc68901);
+	}
+
+	return M68K_INT_ACK_AUTOVECTOR;
+}
+
+static READ8_DEVICE_HANDLER( mfp_gpio_r )
 {
 	/*
 
@@ -1383,35 +1395,26 @@ static MC68901_GPIO_READ( mfp_gpio_r )
 	return data;
 }
 
-static IRQ_CALLBACK( atarist_int_ack )
+static WRITE8_DEVICE_HANDLER( mfp_tdo_w )
 {
-	atarist_state *state = device->machine->driver_data;
-
-	if (irqline == M68K_IRQ_6)
-	{
-		return mc68901_get_vector(state->mc68901);
-	}
-
-	return M68K_INT_ACK_AUTOVECTOR;
-}
-
-static MC68901_ON_IRQ_CHANGED( mfp_interrupt )
-{
-	cpu_set_input_line(device->machine->cpu[0], M68K_IRQ_6, level);
+	mc68901_rx_clock_w(device, data);
+	mc68901_tx_clock_w(device, data);
 }
 
 static MC68901_INTERFACE( mfp_intf )
 {
-	Y2/8,
-	Y1,
-	MC68901_TDO_LOOPBACK,
-	MC68901_TDO_LOOPBACK,
-	&mfp_rx,
-	&mfp_tx,
-	NULL,
-	mfp_interrupt,
-	mfp_gpio_r,
-	NULL
+	Y1,													/* timer clock */
+	0,													/* receive clock */
+	0,													/* transmit clock */
+	DEVCB_DEVICE_HANDLER(MC68901, MC68901_TAG, mfp_gpio_r),	/* GPIO read */
+	DEVCB_NULL,											/* GPIO write */
+	DEVCB_NULL,											/* serial input */
+	DEVCB_NULL,											/* serial output */
+	DEVCB_NULL,											/* TAO */
+	DEVCB_NULL,											/* TBO */
+	DEVCB_NULL,											/* TCO */
+	DEVCB_DEVICE_HANDLER(MC68901, MC68901_TAG, mfp_tdo_w),	/* TDO */
+	DEVCB_CPU_INPUT_LINE(M68000_TAG, M68K_IRQ_6)		/* interrupt */
 };
 
 static const CENTRONICS_CONFIG atarist_centronics_config[1] =
@@ -1425,7 +1428,7 @@ static const CENTRONICS_CONFIG atarist_centronics_config[1] =
 static void atarist_configure_memory(running_machine *machine)
 {
 	const address_space *program = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(machine, M68000_TAG);
 
 	switch (mess_ram_size)
 	{
@@ -1521,7 +1524,7 @@ static MACHINE_START( megast )
 	MACHINE_START_CALL(atarist);
 }
 
-static MC68901_GPIO_READ( atariste_mfp_gpio_r )
+static READ8_DEVICE_HANDLER( atariste_mfp_gpio_r )
 {
 	/*
 
@@ -1551,16 +1554,18 @@ static MC68901_GPIO_READ( atariste_mfp_gpio_r )
 
 static MC68901_INTERFACE( atariste_mfp_intf )
 {
-	Y2/8,
-	Y1,
-	MC68901_TDO_LOOPBACK,
-	MC68901_TDO_LOOPBACK,
-	&mfp_rx,
-	&mfp_tx,
-	NULL,
-	mfp_interrupt,
-	atariste_mfp_gpio_r,
-	NULL
+	Y1,													/* timer clock */
+	0,													/* receive clock */
+	0,													/* transmit clock */
+	DEVCB_DEVICE_HANDLER(MC68901, MC68901_TAG, atariste_mfp_gpio_r),	/* GPIO read */
+	DEVCB_NULL,											/* GPIO write */
+	DEVCB_NULL,											/* serial input */
+	DEVCB_NULL,											/* serial output */
+	DEVCB_NULL,											/* TAO */
+	DEVCB_NULL,											/* TBO */
+	DEVCB_NULL,											/* TCO */
+	DEVCB_DEVICE_HANDLER(MC68901, MC68901_TAG, mfp_tdo_w),	/* TDO */
+	DEVCB_CPU_INPUT_LINE(M68000_TAG, M68K_IRQ_6)		/* interrupt */
 };
 
 static void atariste_state_save(running_machine *machine)
@@ -1621,7 +1626,7 @@ static MACHINE_START( megaste )
 static void stbook_configure_memory(running_machine *machine)
 {
 	const address_space *program = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(machine, M68000_TAG);
 
 	switch (mess_ram_size)
 	{
@@ -1695,7 +1700,7 @@ static const acia6850_interface stbook_acia_ikbd_intf =
 	acia_interrupt
 };
 
-static MC68901_GPIO_READ( stbook_mfp_gpio_r )
+static READ8_DEVICE_HANDLER( stbook_mfp_gpio_r )
 {
 	/*
 
@@ -1724,16 +1729,18 @@ static MC68901_GPIO_READ( stbook_mfp_gpio_r )
 
 static MC68901_INTERFACE( stbook_mfp_intf )
 {
-	Y2/8,
-	Y1,
-	MC68901_TDO_LOOPBACK,
-	MC68901_TDO_LOOPBACK,
-	&mfp_rx,
-	&mfp_tx,
-	NULL,
-	mfp_interrupt,
-	stbook_mfp_gpio_r,
-	NULL
+	Y1,													/* timer clock */
+	0,													/* receive clock */
+	0,													/* transmit clock */
+	DEVCB_DEVICE_HANDLER(MC68901, MC68901_TAG, mfp_gpio_r),	/* GPIO read */
+	DEVCB_NULL,											/* GPIO write */
+	DEVCB_NULL,											/* serial input */
+	DEVCB_NULL,											/* serial output */
+	DEVCB_NULL,											/* TAO */
+	DEVCB_NULL,											/* TBO */
+	DEVCB_NULL,											/* TCO */
+	DEVCB_DEVICE_HANDLER(MC68901, MC68901_TAG, mfp_tdo_w),	/* TDO */
+	DEVCB_CPU_INPUT_LINE(M68000_TAG, M68K_IRQ_6)		/* interrupt */
 };
 
 static MACHINE_START( stbook )
@@ -1760,7 +1767,7 @@ static MACHINE_START( stbook )
 
 static DEVICE_IMAGE_LOAD( atarist_cart )
 {
-	UINT8 *RAM = memory_region(image->machine, "main");
+	UINT8 *RAM = memory_region(image->machine, M68000_TAG);
 	UINT8 *ptr = RAM + 0xfa0000;
 	int	filesize = image_length(image);
 
@@ -1768,7 +1775,7 @@ static DEVICE_IMAGE_LOAD( atarist_cart )
 	{
 		if (image_fread(image, ptr, filesize) == filesize)
 		{
-			memory_install_readwrite16_handler(cputag_get_address_space(image->machine, "main", ADDRESS_SPACE_PROGRAM), 0xfa0000, 0xfbffff, 0, 0, SMH_BANK3, SMH_BANK3);
+			memory_install_readwrite16_handler(cputag_get_address_space(image->machine, M68000_TAG, ADDRESS_SPACE_PROGRAM), 0xfa0000, 0xfbffff, 0, 0, SMH_BANK3, SMH_BANK3);
 
 			return INIT_PASS;
 		}
@@ -1788,7 +1795,7 @@ static MACHINE_DRIVER_START( atarist )
 	MDRV_DRIVER_DATA(atarist_state)
 
 	// basic machine hardware
-	MDRV_CPU_ADD("main", M68000, Y2/4)
+	MDRV_CPU_ADD(M68000_TAG, M68000, Y2/4)
 	MDRV_CPU_PROGRAM_MAP(st_map, 0)
 
 	MDRV_CPU_ADD("keyboard", HD63701, XTAL_4MHz)  /* HD6301 */
@@ -1798,11 +1805,11 @@ static MACHINE_DRIVER_START( atarist )
 	MDRV_MACHINE_START(atarist)
 
 	// device hardware
-	MDRV_MC68901_ADD(MC68901_TAG, mfp_intf)
+	MDRV_MC68901_ADD(MC68901_TAG, Y2/8, mfp_intf)
 	MDRV_SCC8530_ADD("scc")
 
 	// video hardware
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_PALETTE_LENGTH(16)
 	MDRV_VIDEO_START( atarist )
@@ -1831,7 +1838,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( megast )
 	MDRV_IMPORT_FROM(atarist)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY(M68000_TAG)
 	MDRV_CPU_PROGRAM_MAP(megast_map, 0)
 	MDRV_RP5C15_ADD("rp5c15",rtc_intf)
 
@@ -1842,7 +1849,7 @@ static MACHINE_DRIVER_START( atariste )
 	MDRV_DRIVER_DATA(atarist_state)
 
 	// basic machine hardware
-	MDRV_CPU_ADD("main", M68000, Y2/4)
+	MDRV_CPU_ADD(M68000_TAG, M68000, Y2/4)
 	MDRV_CPU_PROGRAM_MAP(ste_map, 0)
 
 	MDRV_CPU_ADD("keyboard", HD63701, XTAL_4MHz)  /* HD6301 */
@@ -1852,11 +1859,11 @@ static MACHINE_DRIVER_START( atariste )
 	MDRV_MACHINE_START(atariste)
 
 	// device hardware
-	MDRV_MC68901_ADD(MC68901_TAG, atariste_mfp_intf)
+	MDRV_MC68901_ADD(MC68901_TAG, Y2/8, atariste_mfp_intf)
 	MDRV_SCC8530_ADD("scc")
 
 	// video hardware
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_PALETTE_LENGTH(512)
 	MDRV_VIDEO_START( atarist )
@@ -1893,7 +1900,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( megaste )
 	MDRV_IMPORT_FROM(atariste)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY(M68000_TAG)
 	MDRV_CPU_PROGRAM_MAP(megaste_map, 0)
 	MDRV_RP5C15_ADD("rp5c15",rtc_intf)
 
@@ -1904,7 +1911,7 @@ static MACHINE_DRIVER_START( stbook )
 	MDRV_DRIVER_DATA(atarist_state)
 
 	// basic machine hardware
-	MDRV_CPU_ADD("main", M68000, U517/2)
+	MDRV_CPU_ADD(M68000_TAG, M68000, U517/2)
 	MDRV_CPU_PROGRAM_MAP(stbook_map, 0)
 	MDRV_RP5C15_ADD("rp5c15",rtc_intf)
 
@@ -1913,11 +1920,11 @@ static MACHINE_DRIVER_START( stbook )
 	MDRV_MACHINE_START(stbook)
 
 	// device hardware
-	MDRV_MC68901_ADD(MC68901_TAG, stbook_mfp_intf)
+	MDRV_MC68901_ADD(MC68901_TAG, U517/8, stbook_mfp_intf)
 	MDRV_SCC8530_ADD("scc")
 
 	// video hardware
-	MDRV_SCREEN_ADD("main", LCD)
+	MDRV_SCREEN_ADD(SCREEN_TAG, LCD)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_SIZE(640, 400)
@@ -1949,7 +1956,7 @@ MACHINE_DRIVER_END
 /* ROMs */
 
 ROM_START( atarist )
-	ROM_REGION16_BE( 0x1000000, "main", 0 )
+	ROM_REGION16_BE( 0x1000000, M68000_TAG, 0 )
 	ROM_SYSTEM_BIOS( 0, "default", "TOS 1.04 (Rainbow TOS)" )
 	ROMX_LOAD( "tos104.img", 0xfc0000, 0x030000, BAD_DUMP CRC(a50d1d43) SHA1(9526ef63b9cb1d2a7109e278547ae78a5c1db6c6), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "tos102", "TOS 1.02 (MEGA TOS)" )
@@ -1966,103 +1973,103 @@ ROM_START( atarist )
 	ROMX_LOAD( "st_7c1_a2.u2", 0xfe0000, 0x008000, CRC(d0513329) SHA1(49855a3585e2f75b2af932dd4414ed64e6d9501f), ROM_SKIP(1) | ROM_BIOS(5) )
 	ROMX_LOAD( "st_7c1_b1.u5", 0xfe0001, 0x008000, CRC(c115cbc8) SHA1(2b52b81a1a4e0818d63f98ee4b25c30e2eba61cb), ROM_SKIP(1) | ROM_BIOS(5) )
 
-	ROM_COPY( "main", 0xfc0000, 0x000000, 0x000008 )
+	ROM_COPY( M68000_TAG, 0xfc0000, 0x000000, 0x000008 )
 
 	ROM_REGION( 0x10000, "keyboard", 0 )
 	ROM_LOAD( "keyboard.u1", 0xf000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
 ROM_START( megast )
-	ROM_REGION16_BE( 0x1000000, "main", 0 )
+	ROM_REGION16_BE( 0x1000000, M68000_TAG, 0 )
 	ROM_SYSTEM_BIOS( 0, "default", "TOS 1.04 (Rainbow TOS)" )
 	ROMX_LOAD( "tos104.img", 0xfc0000, 0x030000, BAD_DUMP CRC(a50d1d43) SHA1(9526ef63b9cb1d2a7109e278547ae78a5c1db6c6), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "tos102", "TOS 1.02 (MEGA TOS)" )
 	ROMX_LOAD( "tos102.img", 0xfc0000, 0x030000, BAD_DUMP CRC(3b5cd0c5) SHA1(87900a40a890fdf03bd08be6c60cc645855cbce5), ROM_BIOS(2) )
-	ROM_COPY( "main", 0xfc0000, 0x000000, 0x000008 )
+	ROM_COPY( M68000_TAG, 0xfc0000, 0x000000, 0x000008 )
 
 	ROM_REGION( 0x10000, "keyboard", 0 )
 	ROM_LOAD( "keyboard.u1", 0xf000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
 ROM_START( stacy )
-	ROM_REGION16_BE( 0x1000000, "main", 0 )
+	ROM_REGION16_BE( 0x1000000, M68000_TAG, 0 )
 	ROM_SYSTEM_BIOS( 0, "tos104", "TOS 1.04 (Rainbow TOS)" )
 	ROMX_LOAD( "tos104.img", 0xfc0000, 0x030000, BAD_DUMP CRC(a50d1d43) SHA1(9526ef63b9cb1d2a7109e278547ae78a5c1db6c6), ROM_BIOS(1) )
-	ROM_COPY( "main", 0xfc0000, 0x000000, 0x000008 )
+	ROM_COPY( M68000_TAG, 0xfc0000, 0x000000, 0x000008 )
 
 	ROM_REGION( 0x10000, "keyboard", 0 )
 	ROM_LOAD( "keyboard.u1", 0xf000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
 ROM_START( atariste )
-	ROM_REGION16_BE( 0x1000000, "main", 0 )
+	ROM_REGION16_BE( 0x1000000, M68000_TAG, 0 )
 	ROM_SYSTEM_BIOS( 0, "default", "TOS 1.62 (STE TOS, Revision 2)" )
 	ROMX_LOAD( "tos162.img", 0xe00000, 0x040000, BAD_DUMP CRC(d1c6f2fa) SHA1(70db24a7c252392755849f78940a41bfaebace71), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "tos106", "TOS 1.06 (STE TOS, Revision 1)" )
 	ROMX_LOAD( "tos106.img", 0xe00000, 0x040000, BAD_DUMP CRC(d72fea29) SHA1(06f9ea322e74b682df0396acfaee8cb4d9c90cad), ROM_BIOS(2) )
-	ROM_COPY( "main", 0xe00000, 0x000000, 0x000008 )
+	ROM_COPY( M68000_TAG, 0xe00000, 0x000000, 0x000008 )
 
 	ROM_REGION( 0x10000, "keyboard", 0 )
 	ROM_LOAD( "keyboard.u1", 0xf000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
 ROM_START( megaste )
-	ROM_REGION16_BE( 0x1000000, "main", 0 )
+	ROM_REGION16_BE( 0x1000000, M68000_TAG, 0 )
 	ROM_SYSTEM_BIOS( 0, "default", "TOS 2.06 (ST/STE TOS)" )
 	ROMX_LOAD( "tos206.img", 0xe00000, 0x040000, BAD_DUMP CRC(08538e39) SHA1(2400ea95f547d6ea754a99d05d8530c03f8b28e3), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "tos205", "TOS 2.05 (Mega STE TOS)" )
 	ROMX_LOAD( "tos205.img", 0xe00000, 0x030000, NO_DUMP, ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 2, "tos202", "TOS 2.02 (Mega STE TOS)" )
 	ROMX_LOAD( "tos202.img", 0xe00000, 0x030000, NO_DUMP, ROM_BIOS(3) )
-	ROM_COPY( "main", 0xe00000, 0x000000, 0x000008 )
+	ROM_COPY( M68000_TAG, 0xe00000, 0x000000, 0x000008 )
 
 	ROM_REGION( 0x10000, "keyboard", 0 )
 	ROM_LOAD( "keyboard.u1", 0xf000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
 ROM_START( stbook )
-	ROM_REGION16_BE( 0x1000000, "main", 0 )
+	ROM_REGION16_BE( 0x1000000, M68000_TAG, 0 )
 	ROM_SYSTEM_BIOS( 0, "tos208", "TOS 2.08" )
 	ROMX_LOAD( "tos208.img", 0xe00000, 0x040000, NO_DUMP, ROM_BIOS(1) )
-	ROM_COPY( "main", 0xe00000, 0x000000, 0x000008 )
+	ROM_COPY( M68000_TAG, 0xe00000, 0x000000, 0x000008 )
 
 	ROM_REGION( 0x10000, "cpu1", 0 )
 	ROM_LOAD( "cop888c0.u703", 0x0000, 0x1000, NO_DUMP )
 ROM_END
 
 ROM_START( stpad )
-	ROM_REGION16_BE( 0x1000000, "main", 0 )
+	ROM_REGION16_BE( 0x1000000, M68000_TAG, 0 )
 	ROM_SYSTEM_BIOS( 0, "tos205", "TOS 2.05" )
 	ROMX_LOAD( "tos205.img", 0xe00000, 0x040000, NO_DUMP, ROM_BIOS(1) )
-	ROM_COPY( "main", 0xe00000, 0x000000, 0x000008 )
+	ROM_COPY( M68000_TAG, 0xe00000, 0x000000, 0x000008 )
 ROM_END
 
 ROM_START( tt030 )
-	ROM_REGION32_BE( 0x4000000, "main", 0 )
+	ROM_REGION32_BE( 0x4000000, M68000_TAG, 0 )
 	ROM_SYSTEM_BIOS( 0, "default", "TOS 3.06 (TT TOS)" )
 	ROMX_LOAD( "tos306.img", 0xe00000, 0x080000, BAD_DUMP CRC(75dda215) SHA1(6325bdfd83f1b4d3afddb2b470a19428ca79478b), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "tos305", "TOS 3.05 (TT TOS)" )
 	ROMX_LOAD( "tos305.img", 0xe00000, 0x080000, NO_DUMP, ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 2, "tos301", "TOS 3.01 (TT TOS)" )
 	ROMX_LOAD( "tos301.img", 0xe00000, 0x080000, NO_DUMP, ROM_BIOS(3) )
-	ROM_COPY( "main", 0xe00000, 0x000000, 0x000008 )
+	ROM_COPY( M68000_TAG, 0xe00000, 0x000000, 0x000008 )
 
 	ROM_REGION( 0x10000, "keyboard", 0 )
 	ROM_LOAD( "keyboard.u1", 0xf000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
 ROM_START( fx1 )
-	ROM_REGION16_BE( 0x1000000, "main", 0 )
+	ROM_REGION16_BE( 0x1000000, M68000_TAG, 0 )
 	ROM_SYSTEM_BIOS( 0, "tos207", "TOS 2.07" )
 	ROMX_LOAD( "tos207.img", 0xe00000, 0x040000, NO_DUMP, ROM_BIOS(1) )
-	ROM_COPY( "main", 0xe00000, 0x000000, 0x000008 )
+	ROM_COPY( M68000_TAG, 0xe00000, 0x000000, 0x000008 )
 
 	ROM_REGION( 0x10000, "keyboard", 0 )
 	ROM_LOAD( "keyboard.u1", 0xf000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
 ROM_START( falcon )
-	ROM_REGION32_BE( 0x4000000, "main", 0 )
+	ROM_REGION32_BE( 0x4000000, M68000_TAG, 0 )
 	ROM_SYSTEM_BIOS( 0, "default", "TOS 4.04" )
 	ROMX_LOAD( "tos404.img", 0xe00000, 0x080000, BAD_DUMP CRC(028b561d) SHA1(27dcdb31b0951af99023b2fb8c370d8447ba6ebc), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "tos402", "TOS 4.02" )
@@ -2071,14 +2078,14 @@ ROM_START( falcon )
 	ROMX_LOAD( "tos401.img", 0xe00000, 0x080000, NO_DUMP, ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS( 3, "tos400", "TOS 4.00" )
 	ROMX_LOAD( "tos400.img", 0xe00000, 0x080000, BAD_DUMP CRC(1fbc5396) SHA1(d74d09f11a0bf37a86ccb50c6e7f91aac4d4b11b), ROM_BIOS(4) )
-	ROM_COPY( "main", 0xe00000, 0x000000, 0x000008 )
+	ROM_COPY( M68000_TAG, 0xe00000, 0x000000, 0x000008 )
 
 	ROM_REGION( 0x10000, "keyboard", 0 )
 	ROM_LOAD( "keyboard.u1", 0xf000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
 ROM_START( falcon40 )
-	ROM_REGION32_BE( 0x4000000, "main", 0 )
+	ROM_REGION32_BE( 0x4000000, M68000_TAG, 0 )
 	ROM_SYSTEM_BIOS( 0, "tos492", "TOS 4.92" )
 	ROMX_LOAD( "tos492.img", 0xe00000, 0x080000, BAD_DUMP CRC(bc8e497f) SHA1(747a38042844a6b632dcd9a76d8525fccb5eb892), ROM_BIOS(2) )
 ROM_END

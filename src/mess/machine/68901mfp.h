@@ -38,63 +38,67 @@
 #define __MC68901__
 
 #include "driver.h"
+#include "devcb.h"
 
-enum {
-	MC68901_TAO_LOOPBACK = -1,
-	MC68901_TBO_LOOPBACK = -2,
-	MC68901_TCO_LOOPBACK = -3,
-	MC68901_TDO_LOOPBACK = -4
-};
-
-typedef void (*mc68901_on_irq_changed_func) (const device_config *device, int level);
-#define MC68901_ON_IRQ_CHANGED(name) void name(const device_config *device, int level)
-
-typedef void (*mc68901_on_to_changed_func) (const device_config *device, int timer, int level);
-#define MC68901_ON_TO_CHANGED(name) void name(const device_config *device, int timer, int level)
-
-typedef UINT8 (*mc68901_gpio_read_func) (const device_config *device);
-#define MC68901_GPIO_READ(name) UINT8 name(const device_config *device)
-
-typedef void (*mc68901_gpio_write_func) (const device_config *device, UINT8 data);
-#define MC68901_GPIO_WRITE(name) void name(const device_config *device, UINT8 data)
+/***************************************************************************
+    MACROS / CONSTANTS
+***************************************************************************/
 
 #define MC68901 DEVICE_GET_INFO_NAME( mc68901 )
 #define MK68901 DEVICE_GET_INFO_NAME( mk68901 )
 
-#define MDRV_MC68901_ADD(_tag, _config)	\
-	MDRV_DEVICE_ADD((_tag), MC68901, 0)	\
+#define MDRV_MC68901_ADD(_tag, _clock, _config) \
+	MDRV_DEVICE_ADD((_tag), MC68901, _clock)	\
 	MDRV_DEVICE_CONFIG(_config)
 
-#define MDRV_MK68901_ADD(_tag, _config)	\
-	MDRV_DEVICE_ADD((_tag), MK68901, 0)	\
+#define MDRV_MK68901_ADD(_tag, _clock, _config) \
+	MDRV_DEVICE_ADD((_tag), MK68901, _clock)	\
 	MDRV_DEVICE_CONFIG(_config)
 
+#define MC68901_INTERFACE(name) const mc68901_interface (name) =
 
-/* interface */
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
 typedef struct _mc68901_interface mc68901_interface;
 struct _mc68901_interface
 {
-	int	chip_clock;			/* chip clock */
 	int	timer_clock;		/* timer clock */
 	int	rx_clock;			/* serial receive clock */
 	int	tx_clock;			/* serial transmit clock */
 
-	UINT8 *rx_pin;			/* serial receive pin (pin 9) */
-	UINT8 *tx_pin;			/* serial transmit pin (pin 8) */
-	
-	/* this gets called for each change of the TxO pins (pins 13-16) */
-	mc68901_on_to_changed_func	on_to_changed;
-
-	/* this gets called on each change of the interrupt line */
-	mc68901_on_irq_changed_func	on_irq_changed;
-
 	/* this is called on each read of the GPIO pins */
-	mc68901_gpio_read_func		gpio_r;
+	devcb_read8				in_gpio_func;
 
 	/* this is called on each write of the GPIO pins */
-	mc68901_gpio_write_func		gpio_w;
+	devcb_write8			out_gpio_func;
+
+	/* this gets called for each read of the SI pin (pin 9) */
+	devcb_read_line			in_si_func;
+	
+	/* this gets called for each change of the SO pin (pin 8) */
+	devcb_write_line		out_so_func;
+
+	/* this gets called for each change of the TAO pin (pin 13) */
+	devcb_write_line		out_tao_func;
+	
+	/* this gets called for each change of the TBO pin (pin 14) */
+	devcb_write_line		out_tbo_func;
+	
+	/* this gets called for each change of the TCO pin (pin 15) */
+	devcb_write_line		out_tco_func;
+	
+	/* this gets called for each change of the TDO pin (pin 16) */
+	devcb_write_line		out_tdo_func;
+
+	/* this gets called on each change of the interrupt line */
+	devcb_write_line		out_irq_func;
 };
-#define MC68901_INTERFACE(name) const mc68901_interface (name) =
+
+/***************************************************************************
+    PROTOTYPES
+***************************************************************************/
 
 /* device interface */
 DEVICE_GET_INFO( mc68901 );
@@ -103,13 +107,19 @@ DEVICE_GET_INFO( mc68901 );
 READ8_DEVICE_HANDLER( mc68901_register_r );
 WRITE8_DEVICE_HANDLER( mc68901_register_w );
 
+/* get interrupt vector */
+int mc68901_get_vector(const device_config *device) ATTR_NONNULL;
+
 /* write to Timer A input (pin 19) */
-void mc68901_tai_w(const device_config *device, int value);
+void mc68901_tai_w(const device_config *device, int state) ATTR_NONNULL;
 
 /* write to Timer B input (pin 20) */
-void mc68901_tbi_w(const device_config *device, int value);
+void mc68901_tbi_w(const device_config *device, int state) ATTR_NONNULL;
 
-/* get interrupt vector */
-int mc68901_get_vector(const device_config *device);
+/* receive clock */
+void mc68901_rx_clock_w(const device_config *device, int state) ATTR_NONNULL;
+
+/* transmit clock */
+void mc68901_tx_clock_w(const device_config *device, int state) ATTR_NONNULL;
 
 #endif

@@ -143,8 +143,6 @@ static UINT8 current_irq_line;
 static unsigned int x68k_scanline;
 static int led_state;
 
-static UINT8 mfp_key;
-
 static emu_timer* kb_timer;
 //emu_timer* mfp_timer[4];
 //emu_timer* mfp_irq;
@@ -1522,7 +1520,7 @@ static void x68k_fm_irq(running_machine *machine, int irq)
 	}
 }
 
-static MC68901_GPIO_READ( mfp_gpio_r )
+static READ8_DEVICE_HANDLER( mfp_gpio_r )
 {
 	UINT8 data = x68k_sys.mfp.gpio;
 
@@ -1535,16 +1533,16 @@ static MC68901_GPIO_READ( mfp_gpio_r )
 	return data;
 }
 
-static MC68901_ON_IRQ_CHANGED( mfp_irq_callback )
+static WRITE_LINE_DEVICE_HANDLER( mfp_irq_callback )
 {
 	static int prev;
-	if(prev == CLEAR_LINE && level == CLEAR_LINE)  // eliminate unnecessary calls to set the IRQ line for speed reasons
+	if(prev == CLEAR_LINE && state == CLEAR_LINE)  // eliminate unnecessary calls to set the IRQ line for speed reasons
 		return;
 //	if((x68k_sys.ioc.irqstatus & 0xc0) != 0)  // if the FDC is busy, then we don't want to miss that IRQ
 //		return;
-	cpu_set_input_line(device->machine->cpu[0], 6, level);
+	cpu_set_input_line(device->machine->cpu[0], 6, state);
 	current_vector[6] = 0;
-	prev = level;
+	prev = state;
 }
 
 static INTERRUPT_GEN( x68k_vsync_irq )
@@ -1626,18 +1624,26 @@ static ADDRESS_MAP_START(x68k_map, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0xf00000, 0xffffff) AM_ROM
 ADDRESS_MAP_END
 
-static const mc68901_interface mfp_interface =
+static WRITE8_DEVICE_HANDLER( mfp_tdo_w )
 {
-	2000000, // 4MHz clock
-	4000000,
-	MC68901_TDO_LOOPBACK,
-	0,
-	&mfp_key,  // Rx
-	NULL,      // Tx
-	NULL,
-	mfp_irq_callback,
-	mfp_gpio_r,
-	NULL
+	mc68901_rx_clock_w(device, data);
+	mc68901_tx_clock_w(device, data);
+}
+
+static MC68901_INTERFACE( mfp_interface )
+{
+	4000000,											/* timer clock */
+	0,													/* receive clock */
+	0,													/* transmit clock */
+	DEVCB_DEVICE_HANDLER(MC68901, MC68901_TAG, mfp_gpio_r),	/* GPIO read */
+	DEVCB_NULL,											/* GPIO write */
+	DEVCB_NULL,											/* serial input */
+	DEVCB_NULL,											/* serial output */
+	DEVCB_NULL,											/* TAO */
+	DEVCB_NULL,											/* TBO */
+	DEVCB_NULL,											/* TCO */
+	DEVCB_DEVICE_HANDLER(MC68901, MC68901_TAG, mfp_tdo_w),	/* TDO */
+	DEVCB_LINE(mfp_irq_callback)						/* interrupt */
 };
 
 static const ppi8255_interface ppi_interface =
@@ -2136,7 +2142,7 @@ static MACHINE_DRIVER_START( x68000 )
 	MDRV_MACHINE_RESET( x68000 )
 
 	/* device hardware */
-	MDRV_MC68901_ADD(MC68901_TAG, mfp_interface)
+	MDRV_MC68901_ADD(MC68901_TAG, 2000000, mfp_interface)
 
 	MDRV_PPI8255_ADD( "ppi8255",  ppi_interface )
 

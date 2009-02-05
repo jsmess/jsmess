@@ -80,7 +80,7 @@ Source Changes:
 - Fixed image loading related memory leaks. [Curt Coder]
 
 - Refactored the following devices to use devcb callbacks:
-  CDP1861, CDP1864, CDP1871, ZX8301, ZX8302 [Curt Coder]
+  CDP1861, CDP1864, CDP1871, MC68901, ZX8301, ZX8302 [Curt Coder]
 
 
 0.129
