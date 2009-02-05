@@ -203,7 +203,6 @@ static TIMER_CALLBACK( cdp1864_dma_tick )
 
 static void cdp1864_init_palette(const device_config *device, const cdp1864_interface *intf)
 {
-	cdp1864_t *cdp1864 = get_safe_token(device);
 	int i;
 
 	double res_total = intf->res_r + intf->res_g + intf->res_b + intf->res_bkg;
