@@ -1266,6 +1266,7 @@ static INPUT_PORTS_START( atariste )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( stbook )
+	PORT_INCLUDE(atarist)	// this fixes "missing port" fatalerror and adds a keyboard - joystick needs investigation
 	PORT_START("SW400")
 	PORT_DIPNAME( 0x80, 0x80, "DMA sound hardware")
 	PORT_DIPSETTING( 0x00, DEF_STR( No ) )
@@ -1700,6 +1701,8 @@ static const acia6850_interface stbook_acia_ikbd_intf =
 	acia_interrupt
 };
 
+#if 0
+/* SVN 4235 - this code is no longer used */
 static READ8_DEVICE_HANDLER( stbook_mfp_gpio_r )
 {
 	/*
@@ -1726,6 +1729,7 @@ static READ8_DEVICE_HANDLER( stbook_mfp_gpio_r )
 
 	return data;
 }
+#endif
 
 static MC68901_INTERFACE( stbook_mfp_intf )
 {
