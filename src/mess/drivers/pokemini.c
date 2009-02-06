@@ -39,18 +39,10 @@ INPUT_PORTS_END
 
 static PALETTE_INIT( pokemini )
 {
-	static const unsigned char pokemini_pal[4][3] =
-	{
-		{ 0xFF, 0xFB, 0x87 },
-		{ 0xB1, 0xAE, 0x4E },
-		{ 0x84, 0x80, 0x4E },
-		{ 0x4E, 0x4E, 0x4E }
-	};
-	int i;
-	for( i = 0; i < 4; i++ )
-	{
-		palette_set_color_rgb( machine, i, pokemini_pal[i][0], pokemini_pal[i][1], pokemini_pal[i][2] );
-	}
+	palette_set_color(machine, 0, MAKE_RGB(0xff, 0xfb, 0x87));
+	palette_set_color(machine, 1, MAKE_RGB(0xb1, 0xae, 0x4e));
+	palette_set_color(machine, 2, MAKE_RGB(0x84, 0x80, 0x4e));
+	palette_set_color(machine, 3, MAKE_RGB(0x4e, 0x4e, 0x4e));
 }
 
 
