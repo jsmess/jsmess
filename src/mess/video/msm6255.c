@@ -10,6 +10,10 @@
 #include "driver.h"
 #include "msm6255.h"
 
+/***************************************************************************
+    PARAMETERS
+***************************************************************************/
+
 #define MSM6255_MOR_GRAPHICS		0x01
 #define MSM6255_MOR_4_BIT_PARALLEL	0x02
 #define MSM6255_MOR_2_BIT_PARALLEL	0x04
@@ -46,10 +50,15 @@ enum
 	MSM6255_REGISTER_CUR
 };
 
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
 typedef struct _msm6255_t msm6255_t;
 struct _msm6255_t
 {
 	const msm6255_interface *intf;	/* interface */
+
 	const device_config *screen;	/* screen */
 
 	UINT8 ir;						/* instruction register */
@@ -67,15 +76,24 @@ struct _msm6255_t
 	int frame;						/* frame counter */
 };
 
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
+
 INLINE msm6255_t *get_safe_token(const device_config *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
-
 	return (msm6255_t *)device->token;
 }
 
-/* Register Access */
+/***************************************************************************
+    IMPLEMENTATION
+***************************************************************************/
+
+/*-------------------------------------------------
+    msm6255_register_r - register read
+-------------------------------------------------*/
 
 READ8_DEVICE_HANDLER( msm6255_register_r )
 {
@@ -121,6 +139,10 @@ READ8_DEVICE_HANDLER( msm6255_register_r )
 		}
 	}
 }
+
+/*-------------------------------------------------
+    msm6255_register_w - register write
+-------------------------------------------------*/
 
 WRITE8_DEVICE_HANDLER( msm6255_register_w )
 {
@@ -173,9 +195,11 @@ WRITE8_DEVICE_HANDLER( msm6255_register_w )
 	}
 }
 
-/* Screen Update */
+/*-------------------------------------------------
+    update_cursor - update cursor state
+-------------------------------------------------*/
 
-static void msm6255_update_cursor(const device_config *device)
+static void update_cursor(const device_config *device)
 {
 	msm6255_t *msm6255 = get_safe_token(device);
 
@@ -219,7 +243,11 @@ static void msm6255_update_cursor(const device_config *device)
 	}
 }
 
-static void msm6255_draw_scanline(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, int y, UINT16 ma, UINT8 ra)
+/*-------------------------------------------------
+    draw_scanline - draw one scanline
+-------------------------------------------------*/
+
+static void draw_scanline(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, int y, UINT16 ma, UINT8 ra)
 {
 	msm6255_t *msm6255 = get_safe_token(device);
 
@@ -257,7 +285,11 @@ static void msm6255_draw_scanline(const device_config *device, bitmap_t *bitmap,
 	}
 }
 
-static void msm6255_update_graphics(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect)
+/*-------------------------------------------------
+    update_graphics - draw graphics mode screen
+-------------------------------------------------*/
+
+static void update_graphics(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	msm6255_t *msm6255 = get_safe_token(device);
 
@@ -272,21 +304,21 @@ static void msm6255_update_graphics(const device_config *device, bitmap_t *bitma
 
 	for (y = 0; y < nx; y++)
 	{
-		// draw upper half scanline
-
+		/* draw upper half scanline */
 		UINT16 ma = sar + (y * hn);
+		draw_scanline(device, bitmap, cliprect, y, ma, 0);
 
-		msm6255_draw_scanline(device, bitmap, cliprect, y, ma, 0);
-
-		// draw lower half scanline
-
+		/* draw lower half scanline */
 		ma = sar + ((y + nx) * hn);
-
-		msm6255_draw_scanline(device, bitmap, cliprect, y + nx, ma, 0);
+		draw_scanline(device, bitmap, cliprect, y + nx, ma, 0);
 	}
 }
 
-static void msm6255_update_text(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect)
+/*-------------------------------------------------
+    update_text - draw text mode screen
+-------------------------------------------------*/
+
+static void update_text(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	msm6255_t *msm6255 = get_safe_token(device);
 
@@ -297,26 +329,26 @@ static void msm6255_update_text(const device_config *device, bitmap_t *bitmap, c
 
 	int sy, y;
 
-	msm6255_update_cursor(device);
+	update_cursor(device);
 
 	for (sy = 0; sy < nx; sy++)
 	{
 		for (y = 0; y < vp; y++)
 		{
-			// draw upper half scanline
-
+			/* draw upper half scanline */
 			UINT16 ma = sar + ((sy * vp) + y) * hn;
+			draw_scanline(device, bitmap, cliprect, (sy * vp) + y, ma, y);
 
-			msm6255_draw_scanline(device, bitmap, cliprect, (sy * vp) + y, ma, y);
-
-			// draw lower half scanline
-
+			/* draw lower half scanline */
 			ma = sar + (((sy + nx) * vp) + y) * hn;
-
-			msm6255_draw_scanline(device, bitmap, cliprect, (sy * vp) + y, ma, y);
+			draw_scanline(device, bitmap, cliprect, (sy * vp) + y, ma, y);
 		}
 	}
 }
+
+/*-------------------------------------------------
+    update_text - draw screen
+-------------------------------------------------*/
 
 void msm6255_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
@@ -326,11 +358,11 @@ void msm6255_update(const device_config *device, bitmap_t *bitmap, const rectang
 	{
 		if (msm6255->mor & MSM6255_MOR_GRAPHICS)
 		{
-			msm6255_update_graphics(device, bitmap, cliprect);
+			update_graphics(device, bitmap, cliprect);
 		}
 		else
 		{
-			msm6255_update_text(device, bitmap, cliprect);
+			update_text(device, bitmap, cliprect);
 		}
 	}
 	else
@@ -339,28 +371,23 @@ void msm6255_update(const device_config *device, bitmap_t *bitmap, const rectang
 	}
 }
 
-/* Device Interface */
+/*-------------------------------------------------
+    DEVICE_START( msm6255 )
+-------------------------------------------------*/
 
 static DEVICE_START( msm6255 )
 {
 	msm6255_t *msm6255 = get_safe_token(device);
 
-	// validate arguments
+	/* resolve callbacks */
+	msm6255->intf = device->static_config;	
+	assert(msm6255->intf->char_ram_r != NULL);	
 
-	assert(device != NULL);
-	assert(device->tag != NULL);
-	assert(device->static_config != NULL);
-
-	msm6255->intf = device->static_config;
-
-	assert(msm6255->intf->char_ram_r != NULL);
-
-	// get the screen device
-
+	/* get the screen */
 	msm6255->screen = devtag_get_device(device->machine, VIDEO_SCREEN, msm6255->intf->screen_tag);
 	assert(msm6255->screen != NULL);
 
-	// register for state saving
+	/* register for state saving */
 	state_save_register_device_item(device, 0, msm6255->ir);
 	state_save_register_device_item(device, 0, msm6255->mor);
 	state_save_register_device_item(device, 0, msm6255->pr);
@@ -371,10 +398,13 @@ static DEVICE_START( msm6255 )
 	state_save_register_device_item(device, 0, msm6255->sur);
 	state_save_register_device_item(device, 0, msm6255->clr);
 	state_save_register_device_item(device, 0, msm6255->cur);
-
 	state_save_register_device_item(device, 0, msm6255->cursor);
 	state_save_register_device_item(device, 0, msm6255->frame);
 }
+
+/*-------------------------------------------------
+    DEVICE_RESET( msm6255 )
+-------------------------------------------------*/
 
 static DEVICE_RESET( msm6255 )
 {
@@ -382,6 +412,10 @@ static DEVICE_RESET( msm6255 )
 
 	msm6255->frame = 0;
 }
+
+/*-------------------------------------------------
+    DEVICE_SET_INFO( msm6255 )
+-------------------------------------------------*/
 
 static DEVICE_SET_INFO( msm6255 )
 {
@@ -391,26 +425,30 @@ static DEVICE_SET_INFO( msm6255 )
 	}
 }
 
+/*-------------------------------------------------
+    DEVICE_GET_INFO( msm6255 )
+-------------------------------------------------*/
+
 DEVICE_GET_INFO( msm6255 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(msm6255_t);				break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(msm6255_t);					break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;									break;
+		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(msm6255); break;
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(msm6255);	break;
-		case DEVINFO_FCT_STOP:							/* Nothing */								break;
-		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(msm6255);	break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(msm6255);		break;
+		case DEVINFO_FCT_STOP:							/* Nothing */									break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(msm6255);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "OKI MSM6255");				break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "OKI MSM6255");				break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");						break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);					break;
-		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");		break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "OKI MSM6255");					break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "OKI MSM6255");					break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");			break;
 	}
 }

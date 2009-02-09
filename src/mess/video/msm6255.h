@@ -10,29 +10,45 @@
 #ifndef __MSM6255_VIDEO__
 #define __MSM6255_VIDEO__
 
-typedef UINT8 (*msm6255_char_ram_read_func)(const device_config *device, UINT16 ma, UINT8 ra);
-#define MSM6255_CHAR_RAM_READ(name) UINT8 name(const device_config *device, UINT16 ma, UINT8 ra)
+/***************************************************************************
+    MACROS / CONSTANTS
+***************************************************************************/
 
 #define MSM6255		DEVICE_GET_INFO_NAME(msm6255)
 
-#define MDRV_MSM6255_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, MSM6255, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MDRV_MSM6255_ADD(_tag, _clock, _config) \
+	MDRV_DEVICE_ADD(_tag, MSM6255, _clock) \
+	MDRV_DEVICE_CONFIG(_config)
 
 #define MDRV_MSM6255_REMOVE(_tag) \
 	MDRV_DEVICE_REMOVE(_tag, MSM6255)
 
-/* interface */
+#define MSM6255_INTERFACE(_name) \
+	const msm6255_interface (_name) =
+
+#define MSM6255_CHAR_RAM_READ(_name) \
+	UINT8 _name(const device_config *device, UINT16 ma, UINT8 ra)
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef UINT8 (*msm6255_char_ram_read_func)(const device_config *device, UINT16 ma, UINT8 ra);
+
 typedef struct _msm6255_interface msm6255_interface;
 struct _msm6255_interface
 {
 	const char *screen_tag;		/* screen we are acting on */
-	int pixel_clock;			/* the pixel clock of the chip */
+	
 	int character_clock;		/* the character clock of the chip */
 
-	/* character memory read function */
+	/* ROM/RAM data read function */
 	msm6255_char_ram_read_func		char_ram_r;
 };
+
+/***************************************************************************
+    PROTOTYPES
+***************************************************************************/
 
 /* device interface */
 DEVICE_GET_INFO( msm6255 );
