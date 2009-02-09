@@ -50,6 +50,8 @@ struct _newbrain_state
 	int bee;				/* identity */
 	UINT8 enrg1;			/* enable register 1 */
 	UINT8 enrg2;			/* enable register 2 */
+	int acia_rxd;			/* ACIA receive */
+	int acia_txd;			/* ACIA transmit */
 
 	/* COP420 state */
 	UINT8 cop_bus;			/* data bus */

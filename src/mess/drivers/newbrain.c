@@ -60,8 +60,6 @@
 
 */
 
-static UINT8 acia_rxd = 1, acia_txd = 1;
-
 static const device_config *cassette_device_image(running_machine *machine, int index)
 {
 	if ( index )
@@ -1266,23 +1264,37 @@ INPUT_PORTS_END
 
 /* Machine Initialization */
 
-static void acia_interrupt(const device_config *device, int state)
+static READ_LINE_DEVICE_HANDLER( acia_rx )
+{
+	newbrain_state *driver_state = device->machine->driver_data;
+
+	return driver_state->acia_rxd;
+}
+
+static WRITE_LINE_DEVICE_HANDLER( acia_tx )
+{
+	newbrain_state *driver_state = device->machine->driver_data;
+
+	driver_state->acia_txd = state;
+}
+
+static WRITE_LINE_DEVICE_HANDLER( acia_interrupt )
 {
 	newbrain_state *driver_state = device->machine->driver_data;
 
 	driver_state->aciaint = state;
 }
 
-static const acia6850_interface newbrain_acia_intf =
+static ACIA6850_INTERFACE( newbrain_acia_intf )
 {
 	0,
 	0,
-	&acia_rxd,
-	&acia_txd,
-	NULL,
-	NULL,
-	NULL,
-	acia_interrupt
+	DEVCB_LINE(acia_rx),
+	DEVCB_LINE(acia_tx),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_LINE(acia_interrupt)
 };
 
 static NEC765_INTERRUPT( newbrain_fdc_interrupt )
@@ -1305,7 +1317,7 @@ static WRITE8_DEVICE_HANDLER( ctc_z0_w )
 	newbrain_state *state = device->machine->driver_data;
 
 	/* connected to the ACIA receive clock */
-	if (data) acia_rx_clock_in(state->mc6850);
+	if (data) acia6850_rx_clock_in(state->mc6850);
 }
 
 static WRITE8_DEVICE_HANDLER( ctc_z1_w )
@@ -1313,7 +1325,7 @@ static WRITE8_DEVICE_HANDLER( ctc_z1_w )
 	newbrain_state *state = device->machine->driver_data;
 
 	/* connected to the ACIA transmit clock */
-	if (data) acia_tx_clock_in(state->mc6850);
+	if (data) acia6850_tx_clock_in(state->mc6850);
 }
 
 static WRITE8_DEVICE_HANDLER( ctc_z2_w )

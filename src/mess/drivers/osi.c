@@ -186,9 +186,6 @@ Notes:
 #include "devices/basicdsk.h"
 #include "devices/cassette.h"
 
-static UINT8 cas_rx, cas_tx;
-static UINT8 fdc_rx, fdc_tx;
-
 static const device_config *cassette_device_image(running_machine *machine)
 {
 	return devtag_get_device(machine, CASSETTE, "cassette");
@@ -599,49 +596,55 @@ INPUT_PORTS_END
 
 /* Machine Start */
 
-static const acia6850_interface osi600_acia_intf =
+static READ_LINE_DEVICE_HANDLER( cassette_rx )
+{
+	const device_config *cassette = cassette_device_image(device->machine);
+
+	return (cassette_input(cassette) > 0.0) ? 1 : 0;
+}
+
+static WRITE_LINE_DEVICE_HANDLER( cassette_tx )
+{
+	const device_config *cassette = cassette_device_image(device->machine);
+
+	cassette_output(cassette, state ? +1.0 : -1.0);
+}
+
+static ACIA6850_INTERFACE( osi600_acia_intf )
 {
 	X1/32,
 	X1/32,
-	&cas_rx,
-	&cas_tx,
-	NULL,
-	NULL,
-	NULL,
-	NULL
+	DEVCB_LINE(cassette_rx),
+	DEVCB_LINE(cassette_tx),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
-static const acia6850_interface uk101_acia_intf =
+static ACIA6850_INTERFACE( uk101_acia_intf )
 {
 	500000, //
 	500000, //
-	&cas_rx,
-	&cas_tx,
-	NULL,
-	NULL,
-	NULL,
-	NULL
+	DEVCB_LINE(cassette_rx),
+	DEVCB_LINE(cassette_tx),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
-static const acia6850_interface osi470_acia_intf =
+static ACIA6850_INTERFACE( osi470_acia_intf )
 {
 	0,				// clocked in from the floppy drive
 	XTAL_4MHz/8,	// 250 kHz
-	&fdc_rx,
-	&fdc_tx,
-	NULL,
-	NULL,
-	NULL,
-	NULL
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
-
-static TIMER_DEVICE_CALLBACK( cassette_tick )
-{
-	const device_config *cassette = cassette_device_image(timer->machine);
-
-	cas_rx = (cassette_input(cassette) > 0.0) ? 1 : 0;
-	cassette_output(cassette, cas_tx ? +1.0 : -1.0);
-}
 
 static MACHINE_START( osi600 )
 {
@@ -735,7 +738,6 @@ static MACHINE_DRIVER_START( osi600 )
 	MDRV_ACIA6850_ADD("acia_0", osi600_acia_intf)
 
 	/* cassette */
-	MDRV_TIMER_ADD_PERIODIC("cassette", cassette_tick, HZ(4800))
 	MDRV_CASSETTE_ADD("cassette", default_cassette_config)
 MACHINE_DRIVER_END
 
@@ -755,7 +757,6 @@ static MACHINE_DRIVER_START( uk101 )
 	MDRV_ACIA6850_ADD("acia_0", uk101_acia_intf)
 
 	/* cassette */
-	MDRV_TIMER_ADD_PERIODIC("cassette", cassette_tick, HZ(4800))
 	MDRV_CASSETTE_ADD("cassette", default_cassette_config)
 MACHINE_DRIVER_END
 
@@ -783,7 +784,6 @@ static MACHINE_DRIVER_START( c1p )
 	MDRV_ACIA6850_ADD("acia_0", osi600_acia_intf)
 
 	/* cassette */
-	MDRV_TIMER_ADD_PERIODIC("cassette", cassette_tick, HZ(4800))
 	MDRV_CASSETTE_ADD("cassette", default_cassette_config)
 MACHINE_DRIVER_END
 

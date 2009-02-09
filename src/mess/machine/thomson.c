@@ -918,14 +918,26 @@ static const pia6821_interface to7_pia_modem =
 	NULL, NULL
 };
 
-
-
-const acia6850_interface to7_modem =
+static READ_LINE_DEVICE_HANDLER( to7_modem_rx_r )
 {
-	1200, 1200, /* 1200 bauds, might be divided by 16 */
-	&to7_modem_rx, &to7_modem_tx,
-	NULL, NULL, NULL,
-	to7_modem_cb
+	return to7_modem_rx;
+}
+
+static WRITE_LINE_DEVICE_HANDLER( to7_modem_tx_w )
+{
+	to7_modem_tx = state;
+}
+
+ACIA6850_INTERFACE( to7_modem )
+{
+	1200, 
+	1200, /* 1200 bauds, might be divided by 16 */
+	DEVCB_LINE(to7_modem_rx_r), /*&to7_modem_rx,*/
+	DEVCB_LINE(to7_modem_tx_w), /*&to7_modem_tx,*/
+	DEVCB_NULL, 
+	DEVCB_NULL, 
+	DEVCB_NULL,
+	DEVCB_LINE(to7_modem_cb)
 };
 
 

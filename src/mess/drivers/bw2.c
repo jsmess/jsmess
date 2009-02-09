@@ -597,7 +597,6 @@ static MACHINE_START( bw2 )
 	bw2_state *state = machine->driver_data;
 	device_config *fdc = (device_config*)devtag_get_device(machine, WD179X, "wd179x");
 
-
 	centronics_config(machine,0, bw2_centronics_config);
 
 	wd17xx_set_density(fdc,DEN_MFM_LO);
@@ -820,7 +819,7 @@ static MSM6255_CHAR_RAM_READ( bw2_charram_r )
 	return state->video_ram[ma & 0x3fff];
 }
 
-static const msm6255_interface bw2_msm6255_intf =
+static MSM6255_INTERFACE( bw2_msm6255_intf )
 {
 	SCREEN_TAG,
 	0,

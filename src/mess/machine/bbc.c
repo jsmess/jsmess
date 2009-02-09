@@ -1383,23 +1383,28 @@ READ8_HANDLER (BBC_6850_r)
 
 
 
-static void Serial_interrupt(const device_config *device, int level)
+static WRITE_LINE_DEVICE_HANDLER( serial_interrupt )
 {
-	cpu_set_input_line(device->machine->cpu[0], M6502_IRQ_LINE, level);
+	cpu_set_input_line(device->machine->cpu[0], M6502_IRQ_LINE, state);
 }
 
 static UINT8 bbc_tx_pin;
 
-const acia6850_interface bbc_acia6850_interface =
+static WRITE_LINE_DEVICE_HANDLER( bbc_tx_w )
 {
-	0,						/* tx_clock */
-	0,						/* rx_clock */
-	NULL,					/* rx_pin */
-	&bbc_tx_pin,			/* tx_pin */
-	NULL,					/* cts_pin */
-	NULL,					/* rts_pin */
-	NULL,					/* dcd_pin */
-	Serial_interrupt,		/* int_callback */
+	bbc_tx_pin = state;
+}
+
+ACIA6850_INTERFACE( bbc_acia6850_interface )
+{
+	0,
+	0,
+	DEVCB_NULL,
+	DEVCB_LINE(bbc_tx_w), /*&bbc_tx_pin,*/
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_LINE(serial_interrupt),
 };
 
 
@@ -1425,7 +1430,7 @@ static void MC6850_Receive_Clock(running_machine *machine, int new_clock)
 	if (!mc6850_clock && new_clock)
 	{
 		const device_config *acia = devtag_get_device(machine, ACIA6850, "acia6850");
-		acia_tx_clock_in(acia);
+		acia6850_tx_clock_in(acia);
 	}
 	mc6850_clock = new_clock;
 }

@@ -36,15 +36,10 @@
 
 */
 
-static UINT8 mfp_rx, mfp_tx;
-static UINT8 ikbd_rx, ikbd_tx;
-static UINT8 acia_midi_rx = 1, acia_midi_tx = 1;
-
 /* Floppy Disk Controller */
 
 static void atarist_fdc_dma_transfer(running_machine *machine)
 {
-	device_config *fdc = (device_config*)devtag_get_device(machine, WD1772, "wd1772");
 	const address_space *program = cputag_get_address_space(machine, M68000_TAG, ADDRESS_SPACE_PROGRAM);
 	atarist_state *state = machine->driver_data;
 
@@ -56,11 +51,11 @@ static void atarist_fdc_dma_transfer(running_machine *machine)
 			{
 				UINT8 data = memory_read_byte_8be(program, state->fdc_dmabase);
 
-				wd17xx_data_w(fdc, 0, data);
+				wd17xx_data_w(state->wd1772, 0, data);
 			}
 			else
 			{
-				UINT8 data = wd17xx_data_r(fdc, 0);
+				UINT8 data = wd17xx_data_r(state->wd1772, 0);
 
 				memory_write_byte_8be(program, state->fdc_dmabase, data);
 			}
@@ -115,7 +110,6 @@ static const wd17xx_interface atarist_wd17xx_interface = { atarist_fdc_callback,
 static READ16_HANDLER( atarist_fdc_data_r )
 {
 	atarist_state *state = space->machine->driver_data;
-	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD1772, "wd1772");
 
 	if (state->fdc_mode & ATARIST_FLOPPY_MODE_SECTOR_COUNT)
 	{
@@ -132,7 +126,7 @@ static READ16_HANDLER( atarist_fdc_data_r )
 		}
 		else
 		{
-			return wd17xx_r(fdc, (state->fdc_mode & ATARIST_FLOPPY_MODE_ADDRESS_MASK) >> 1);
+			return wd17xx_r(state->wd1772, (state->fdc_mode & ATARIST_FLOPPY_MODE_ADDRESS_MASK) >> 1);
 		}
 	}
 }
@@ -140,7 +134,6 @@ static READ16_HANDLER( atarist_fdc_data_r )
 static WRITE16_HANDLER( atarist_fdc_data_w )
 {
 	atarist_state *state = space->machine->driver_data;
-	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD1772, "wd1772");
 	
 	if (state->fdc_mode & ATARIST_FLOPPY_MODE_SECTOR_COUNT)
 	{
@@ -164,7 +157,7 @@ static WRITE16_HANDLER( atarist_fdc_data_w )
 		}
 		else
 		{
-			wd17xx_w(fdc, (state->fdc_mode & ATARIST_FLOPPY_MODE_ADDRESS_MASK) >> 1, data);
+			wd17xx_w(state->wd1772, (state->fdc_mode & ATARIST_FLOPPY_MODE_ADDRESS_MASK) >> 1, data);
 		}
 	}
 }
@@ -283,9 +276,9 @@ static READ8_HANDLER( ikbd_port2_r )
 
     */
 
-//	atarist_state *state = space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data;
 
-	return (ikbd_tx << 3) | (input_port_read_safe(space->machine, "IKBD_JOY1", 0xff) & 0x06);
+	return (state->ikbd_tx << 3) | (input_port_read_safe(space->machine, "IKBD_JOY1", 0xff) & 0x06);
 }
 
 static WRITE8_HANDLER( ikbd_port2_w )
@@ -302,9 +295,9 @@ static WRITE8_HANDLER( ikbd_port2_w )
 
     */
 
-//	atarist_state *state = space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data;
 
-	ikbd_rx = (data & 0x10) >> 4;
+	state->ikbd_rx = (data & 0x10) >> 4;
 }
 
 static WRITE8_HANDLER( ikbd_port3_w )
@@ -754,7 +747,7 @@ static WRITE16_HANDLER( megaste_cache_w )
 
 	state->megaste_cache = data;
 
-	cpu_set_clock(space->machine->cpu[0], BIT(data, 0) ? Y2/2 : Y2/4);
+	cputag_set_clock(space->machine, M68000_TAG, BIT(data, 0) ? Y2/2 : Y2/4);
 }
 
 /* ST Book */
@@ -1266,7 +1259,6 @@ static INPUT_PORTS_START( atariste )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( stbook )
-	PORT_INCLUDE(atarist)	// this fixes "missing port" fatalerror and adds a keyboard - joystick needs investigation
 	PORT_START("SW400")
 	PORT_DIPNAME( 0x80, 0x80, "DMA sound hardware")
 	PORT_DIPSETTING( 0x00, DEF_STR( No ) )
@@ -1284,17 +1276,18 @@ INPUT_PORTS_END
 
 static WRITE8_HANDLER( ym2149_port_a_w )
 {
-	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD1772, "wd1772");
-	wd17xx_set_side(fdc, BIT(data, 0) ? 0 : 1);
+	atarist_state *state = space->machine->driver_data;
+
+	wd17xx_set_side(state->wd1772, BIT(data, 0) ? 0 : 1);
 
 	if (!BIT(data, 1))
 	{
-		wd17xx_set_drive(fdc,0);
+		wd17xx_set_drive(state->wd1772, 0);
 	}
 
 	if (!BIT(data, 2))
 	{
-		wd17xx_set_drive(fdc,1);
+		wd17xx_set_drive(state->wd1772, 1);
 	}
 
 	// 0x08 = RTS
@@ -1323,35 +1316,63 @@ static const ay8910_interface ym2149_interface =
 
 /* Machine Drivers */
 
-static void acia_interrupt(const device_config *device, int state)
+static READ_LINE_DEVICE_HANDLER( ikbd_rx )
+{
+	atarist_state *driver_state = device->machine->driver_data;
+
+	return driver_state->ikbd_rx;
+}
+
+static WRITE_LINE_DEVICE_HANDLER( ikbd_tx )
+{
+	atarist_state *driver_state = device->machine->driver_data;
+
+	driver_state->ikbd_tx = state;
+}
+
+static READ_LINE_DEVICE_HANDLER( midi_rx )
+{
+	atarist_state *driver_state = device->machine->driver_data;
+
+	return driver_state->midi_rx;
+}
+
+static WRITE_LINE_DEVICE_HANDLER( midi_tx )
+{
+	atarist_state *driver_state = device->machine->driver_data;
+
+	driver_state->midi_tx = state;
+}
+
+static WRITE_LINE_DEVICE_HANDLER( acia_interrupt )
 {
 	atarist_state *driver_state = device->machine->driver_data;
 
 	driver_state->acia_irq = state;
 }
 
-static const acia6850_interface acia_ikbd_intf =
+static ACIA6850_INTERFACE( acia_ikbd_intf )
 {
 	Y2/64,
 	Y2/64,
-	&ikbd_rx,
-	&ikbd_tx,
-	NULL,
-	NULL,
-	NULL,
-	acia_interrupt
+	DEVCB_LINE(ikbd_rx),
+	DEVCB_LINE(ikbd_tx),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_LINE(acia_interrupt)
 };
 
-static const acia6850_interface acia_midi_intf =
+static ACIA6850_INTERFACE( acia_midi_intf )
 {
 	Y2/64,
 	Y2/64,
-	&acia_midi_rx,
-	&acia_midi_tx,
-	NULL,
-	NULL,
-	NULL,
-	acia_interrupt
+	DEVCB_LINE(midi_rx),
+	DEVCB_LINE(midi_tx),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_LINE(acia_interrupt)
 };
 
 static IRQ_CALLBACK( atarist_int_ack )
@@ -1428,7 +1449,7 @@ static const CENTRONICS_CONFIG atarist_centronics_config[1] =
 
 static void atarist_configure_memory(running_machine *machine)
 {
-	const address_space *program = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *program = cputag_get_address_space(machine, M68000_TAG, ADDRESS_SPACE_PROGRAM);
 	UINT8 *RAM = memory_region(machine, M68000_TAG);
 
 	switch (mess_ram_size)
@@ -1486,13 +1507,11 @@ static void atarist_state_save(running_machine *machine)
 	state_save_register_global(machine, state->ikbd_mouse_px);
 	state_save_register_global(machine, state->ikbd_mouse_py);
 	state_save_register_global(machine, state->ikbd_mouse_pc);
-	state_save_register_global(machine, ikbd_rx);
-	state_save_register_global(machine, ikbd_tx);
+	state_save_register_global(machine, state->ikbd_rx);
+	state_save_register_global(machine, state->ikbd_tx);
+	state_save_register_global(machine, state->midi_rx);
+	state_save_register_global(machine, state->midi_tx);
 	state_save_register_global(machine, state->acia_irq);
-	state_save_register_global(machine, acia_midi_rx);
-	state_save_register_global(machine, acia_midi_tx);
-	state_save_register_global(machine, mfp_rx);
-	state_save_register_global(machine, mfp_tx);
 }
 
 static MACHINE_START( atarist )
@@ -1506,10 +1525,11 @@ static MACHINE_START( atarist )
 	centronics_config(machine, 0, atarist_centronics_config);
 
 	/* set CPU interrupt callback */
-	cpu_set_irq_callback(machine->cpu[0], atarist_int_ack);
+	cpu_set_irq_callback(cputag_get_cpu(machine, M68000_TAG), atarist_int_ack);
 
 	/* find devices */
 	state->mc68901 = devtag_get_device(machine, MC68901, MC68901_TAG);
+ 	state->wd1772 = devtag_get_device(machine, WD1772, WD1772_TAG);
 
 	/* register for state saving */
 	atarist_state_save(machine);
@@ -1601,7 +1621,7 @@ static MACHINE_START( atariste )
 	centronics_config(machine, 0, atarist_centronics_config);
 	
 	/* set CPU interrupt callback */
-	cpu_set_irq_callback(machine->cpu[0], atarist_int_ack);
+	cpu_set_irq_callback(cputag_get_cpu(machine, M68000_TAG), atarist_int_ack);
 
 	/* allocate timers */
 	state->dmasound_timer = timer_alloc(machine, atariste_dmasound_tick, NULL);
@@ -1609,6 +1629,7 @@ static MACHINE_START( atariste )
 
 	/* find devices */
 	state->mc68901 = devtag_get_device(machine, MC68901, MC68901_TAG);
+ 	state->wd1772 = devtag_get_device(machine, WD1772, WD1772_TAG);
 	state->lmc1992 = devtag_get_device(machine, LMC1992, LMC1992_TAG);
 
 	/* register for state saving */
@@ -1626,7 +1647,7 @@ static MACHINE_START( megaste )
 
 static void stbook_configure_memory(running_machine *machine)
 {
-	const address_space *program = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *program = cputag_get_address_space(machine, M68000_TAG, ADDRESS_SPACE_PROGRAM);
 	UINT8 *RAM = memory_region(machine, M68000_TAG);
 
 	switch (mess_ram_size)
@@ -1655,17 +1676,18 @@ static void stbook_configure_memory(running_machine *machine)
 
 static WRITE8_HANDLER( stbook_ym2149_port_a_w )
 {
-	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD1772, "wd1772");
-	wd17xx_set_side(fdc,(data & 0x01) ? 0 : 1);
+	atarist_state *state = space->machine->driver_data;
+
+	wd17xx_set_side(state->wd1772, (data & 0x01) ? 0 : 1);
 
 	if (!(data & 0x02))
 	{
-		wd17xx_set_drive(fdc,0);
+		wd17xx_set_drive(state->wd1772, 0);
 	}
 
 	if (!(data & 0x04))
 	{
-		wd17xx_set_drive(fdc,1);
+		wd17xx_set_drive(state->wd1772, 1);
 	}
 
 	// 0x08 = RTS
@@ -1687,22 +1709,18 @@ static const ay8910_interface stbook_ym2149_interface =
 	ym2149_port_b_w
 };
 
-static UINT8 krxd, ktxd;
-
-static const acia6850_interface stbook_acia_ikbd_intf =
+static ACIA6850_INTERFACE( stbook_acia_ikbd_intf )
 {
 	U517/2/16, // 500kHz
 	U517/2/2, // 1MHZ
-	&krxd,
-	&ktxd,
-	NULL,
-	NULL,
-	NULL,
-	acia_interrupt
+	DEVCB_LINE(ikbd_rx),
+	DEVCB_LINE(ikbd_tx),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_LINE(acia_interrupt)
 };
 
-#if 0
-/* SVN 4235 - this code is no longer used */
 static READ8_DEVICE_HANDLER( stbook_mfp_gpio_r )
 {
 	/*
@@ -1722,21 +1740,20 @@ static READ8_DEVICE_HANDLER( stbook_mfp_gpio_r )
 
 	atarist_state *state = device->machine->driver_data;
 
-	UINT8 data = (centronics_read_handshake(device->machine,0) & CENTRONICS_NOT_BUSY) >> 7;
+	UINT8 data = (centronics_read_handshake(device->machine, 0) & CENTRONICS_NOT_BUSY) >> 7;
 
 	data |= (state->acia_irq << 4);
 	data |= (state->fdc_irq << 5);
 
 	return data;
 }
-#endif
 
 static MC68901_INTERFACE( stbook_mfp_intf )
 {
 	Y1,													/* timer clock */
 	0,													/* receive clock */
 	0,													/* transmit clock */
-	DEVCB_DEVICE_HANDLER(MC68901, MC68901_TAG, mfp_gpio_r),	/* GPIO read */
+	DEVCB_DEVICE_HANDLER(MC68901, MC68901_TAG, stbook_mfp_gpio_r),	/* GPIO read */
 	DEVCB_NULL,											/* GPIO write */
 	DEVCB_NULL,											/* serial input */
 	DEVCB_NULL,											/* serial output */
@@ -1758,15 +1775,14 @@ static MACHINE_START( stbook )
 	centronics_config(machine, 0, atarist_centronics_config);
 
 	/* set CPU interrupt callback */
-	cpu_set_irq_callback(machine->cpu[0], atarist_int_ack);
+	cpu_set_irq_callback(cputag_get_cpu(machine, M68000_TAG), atarist_int_ack);
 
 	/* find devices */
 	state->mc68901 = devtag_get_device(machine, MC68901, MC68901_TAG);
+ 	state->wd1772 = devtag_get_device(machine, WD1772, WD1772_TAG);
 
 	/* register for state saving */
 	atariste_state_save(machine);
-	state_save_register_global(machine, krxd);
-	state_save_register_global(machine, ktxd);
 }
 
 static DEVICE_IMAGE_LOAD( atarist_cart )
@@ -1802,7 +1818,7 @@ static MACHINE_DRIVER_START( atarist )
 	MDRV_CPU_ADD(M68000_TAG, M68000, Y2/4)
 	MDRV_CPU_PROGRAM_MAP(st_map, 0)
 
-	MDRV_CPU_ADD("keyboard", HD63701, XTAL_4MHz)  /* HD6301 */
+	MDRV_CPU_ADD(HD6301_TAG, HD63701, XTAL_4MHz)  /* HD6301 */
 	MDRV_CPU_PROGRAM_MAP(ikbd_map, 0)
 	MDRV_CPU_IO_MAP(ikbd_io_map, 0)
 
@@ -1834,7 +1850,7 @@ static MACHINE_DRIVER_START( atarist )
 	MDRV_ACIA6850_ADD("acia_0", acia_ikbd_intf)
 	MDRV_ACIA6850_ADD("acia_1", acia_midi_intf)
 	
-	MDRV_WD1772_ADD("wd1772", atarist_wd17xx_interface )
+	MDRV_WD1772_ADD(WD1772_TAG, atarist_wd17xx_interface )
 	
 	MDRV_IMPORT_FROM(atarist_cartslot)
 MACHINE_DRIVER_END
@@ -1844,7 +1860,7 @@ static MACHINE_DRIVER_START( megast )
 
 	MDRV_CPU_MODIFY(M68000_TAG)
 	MDRV_CPU_PROGRAM_MAP(megast_map, 0)
-	MDRV_RP5C15_ADD("rp5c15",rtc_intf)
+	MDRV_RP5C15_ADD("rp5c15", rtc_intf)
 
 	MDRV_MACHINE_START(megast)
 MACHINE_DRIVER_END
@@ -1856,7 +1872,7 @@ static MACHINE_DRIVER_START( atariste )
 	MDRV_CPU_ADD(M68000_TAG, M68000, Y2/4)
 	MDRV_CPU_PROGRAM_MAP(ste_map, 0)
 
-	MDRV_CPU_ADD("keyboard", HD63701, XTAL_4MHz)  /* HD6301 */
+	MDRV_CPU_ADD(HD6301_TAG, HD63701, XTAL_4MHz)  /* HD6301 */
 	MDRV_CPU_PROGRAM_MAP(ikbd_map, 0)
 	MDRV_CPU_IO_MAP(ikbd_io_map, 0)
 
@@ -1896,7 +1912,7 @@ static MACHINE_DRIVER_START( atariste )
 	MDRV_ACIA6850_ADD("acia_0", acia_ikbd_intf)
 	MDRV_ACIA6850_ADD("acia_1", acia_midi_intf)
 	
-	MDRV_WD1772_ADD("wd1772", atarist_wd17xx_interface )
+	MDRV_WD1772_ADD(WD1772_TAG, atarist_wd17xx_interface )
 	
 	MDRV_IMPORT_FROM(atarist_cartslot)
 MACHINE_DRIVER_END
@@ -1906,7 +1922,7 @@ static MACHINE_DRIVER_START( megaste )
 
 	MDRV_CPU_MODIFY(M68000_TAG)
 	MDRV_CPU_PROGRAM_MAP(megaste_map, 0)
-	MDRV_RP5C15_ADD("rp5c15",rtc_intf)
+	MDRV_RP5C15_ADD("rp5c15", rtc_intf)
 
 	MDRV_MACHINE_START(megaste)
 MACHINE_DRIVER_END
@@ -1917,14 +1933,14 @@ static MACHINE_DRIVER_START( stbook )
 	// basic machine hardware
 	MDRV_CPU_ADD(M68000_TAG, M68000, U517/2)
 	MDRV_CPU_PROGRAM_MAP(stbook_map, 0)
-	MDRV_RP5C15_ADD("rp5c15",rtc_intf)
 
-	//MDRV_CPU_ADD("cop888", COP888, Y700)
+	//MDRV_CPU_ADD(COP888_TAG, COP888, Y700)
 
 	MDRV_MACHINE_START(stbook)
 
 	// device hardware
 	MDRV_MC68901_ADD(MC68901_TAG, U517/8, stbook_mfp_intf)
+	MDRV_RP5C15_ADD("rp5c15", rtc_intf)
 	MDRV_SCC8530_ADD("scc")
 
 	// video hardware
@@ -1941,7 +1957,7 @@ static MACHINE_DRIVER_START( stbook )
 
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ym3439", YM3439, U517/8)
+	MDRV_SOUND_ADD(YM3439_TAG, YM3439, U517/8)
 	MDRV_SOUND_CONFIG(stbook_ym2149_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
@@ -1952,7 +1968,7 @@ static MACHINE_DRIVER_START( stbook )
 	MDRV_ACIA6850_ADD("acia_0", stbook_acia_ikbd_intf)
 	MDRV_ACIA6850_ADD("acia_1", acia_midi_intf)
 	
-	MDRV_WD1772_ADD("wd1772", atarist_wd17xx_interface )
+	MDRV_WD1772_ADD(WD1772_TAG, atarist_wd17xx_interface )
 	
 	MDRV_IMPORT_FROM(atarist_cartslot)
 MACHINE_DRIVER_END
@@ -1979,7 +1995,7 @@ ROM_START( atarist )
 
 	ROM_COPY( M68000_TAG, 0xfc0000, 0x000000, 0x000008 )
 
-	ROM_REGION( 0x10000, "keyboard", 0 )
+	ROM_REGION( 0x10000, HD6301_TAG, 0 )
 	ROM_LOAD( "keyboard.u1", 0xf000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
@@ -1991,7 +2007,7 @@ ROM_START( megast )
 	ROMX_LOAD( "tos102.img", 0xfc0000, 0x030000, BAD_DUMP CRC(3b5cd0c5) SHA1(87900a40a890fdf03bd08be6c60cc645855cbce5), ROM_BIOS(2) )
 	ROM_COPY( M68000_TAG, 0xfc0000, 0x000000, 0x000008 )
 
-	ROM_REGION( 0x10000, "keyboard", 0 )
+	ROM_REGION( 0x10000, HD6301_TAG, 0 )
 	ROM_LOAD( "keyboard.u1", 0xf000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
@@ -2001,7 +2017,7 @@ ROM_START( stacy )
 	ROMX_LOAD( "tos104.img", 0xfc0000, 0x030000, BAD_DUMP CRC(a50d1d43) SHA1(9526ef63b9cb1d2a7109e278547ae78a5c1db6c6), ROM_BIOS(1) )
 	ROM_COPY( M68000_TAG, 0xfc0000, 0x000000, 0x000008 )
 
-	ROM_REGION( 0x10000, "keyboard", 0 )
+	ROM_REGION( 0x10000, HD6301_TAG, 0 )
 	ROM_LOAD( "keyboard.u1", 0xf000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
@@ -2013,7 +2029,7 @@ ROM_START( atariste )
 	ROMX_LOAD( "tos106.img", 0xe00000, 0x040000, BAD_DUMP CRC(d72fea29) SHA1(06f9ea322e74b682df0396acfaee8cb4d9c90cad), ROM_BIOS(2) )
 	ROM_COPY( M68000_TAG, 0xe00000, 0x000000, 0x000008 )
 
-	ROM_REGION( 0x10000, "keyboard", 0 )
+	ROM_REGION( 0x10000, HD6301_TAG, 0 )
 	ROM_LOAD( "keyboard.u1", 0xf000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
@@ -2027,7 +2043,7 @@ ROM_START( megaste )
 	ROMX_LOAD( "tos202.img", 0xe00000, 0x030000, NO_DUMP, ROM_BIOS(3) )
 	ROM_COPY( M68000_TAG, 0xe00000, 0x000000, 0x000008 )
 
-	ROM_REGION( 0x10000, "keyboard", 0 )
+	ROM_REGION( 0x10000, HD6301_TAG, 0 )
 	ROM_LOAD( "keyboard.u1", 0xf000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
@@ -2037,7 +2053,7 @@ ROM_START( stbook )
 	ROMX_LOAD( "tos208.img", 0xe00000, 0x040000, NO_DUMP, ROM_BIOS(1) )
 	ROM_COPY( M68000_TAG, 0xe00000, 0x000000, 0x000008 )
 
-	ROM_REGION( 0x10000, "cpu1", 0 )
+	ROM_REGION( 0x10000, COP888_TAG, 0 )
 	ROM_LOAD( "cop888c0.u703", 0x0000, 0x1000, NO_DUMP )
 ROM_END
 
@@ -2058,7 +2074,7 @@ ROM_START( tt030 )
 	ROMX_LOAD( "tos301.img", 0xe00000, 0x080000, NO_DUMP, ROM_BIOS(3) )
 	ROM_COPY( M68000_TAG, 0xe00000, 0x000000, 0x000008 )
 
-	ROM_REGION( 0x10000, "keyboard", 0 )
+	ROM_REGION( 0x10000, HD6301_TAG, 0 )
 	ROM_LOAD( "keyboard.u1", 0xf000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
@@ -2068,7 +2084,7 @@ ROM_START( fx1 )
 	ROMX_LOAD( "tos207.img", 0xe00000, 0x040000, NO_DUMP, ROM_BIOS(1) )
 	ROM_COPY( M68000_TAG, 0xe00000, 0x000000, 0x000008 )
 
-	ROM_REGION( 0x10000, "keyboard", 0 )
+	ROM_REGION( 0x10000, HD6301_TAG, 0 )
 	ROM_LOAD( "keyboard.u1", 0xf000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
@@ -2084,7 +2100,7 @@ ROM_START( falcon )
 	ROMX_LOAD( "tos400.img", 0xe00000, 0x080000, BAD_DUMP CRC(1fbc5396) SHA1(d74d09f11a0bf37a86ccb50c6e7f91aac4d4b11b), ROM_BIOS(4) )
 	ROM_COPY( M68000_TAG, 0xe00000, 0x000000, 0x000008 )
 
-	ROM_REGION( 0x10000, "keyboard", 0 )
+	ROM_REGION( 0x10000, HD6301_TAG, 0 )
 	ROM_LOAD( "keyboard.u1", 0xf000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
@@ -2245,14 +2261,14 @@ SYSTEM_CONFIG_END
 /* System Drivers */
 
 /*     YEAR  NAME    PARENT    COMPAT   MACHINE   INPUT     INIT    CONFIG   COMPANY    FULLNAME */
-COMP( 1985, atarist,  0,        0,	atarist,  atarist,  0,     atarist,  "Atari", "ST", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1987, megast,   atarist,  0,	megast,   atarist,  0,     megast,   "Atari", "Mega ST", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE  )
+COMP( 1985, atarist,  0,        0,		atarist,  atarist,  0,     atarist,  "Atari", "ST", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+COMP( 1987, megast,   atarist,  0,		megast,   atarist,  0,     megast,   "Atari", "Mega ST", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE  )
 /*
 COMP( 1989, stacy,    atarist,  0,      stacy,    stacy,    0,     stacy,    "Atari", "Stacy", GAME_NOT_WORKING )
 */
 COMP( 1989, atariste, 0,		0,		atariste, atariste, 0,     atariste, "Atari", "STE", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE  )
-COMP( 1990, stbook,   atariste, 0,	stbook,   stbook,   0,     stbook,	 "Atari", "STBook", GAME_NOT_WORKING )
-COMP( 1991, megaste,  atariste, 0,	megaste,  atarist,  0,     megaste,  "Atari", "Mega STE", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE  )
+COMP( 1990, stbook,   atariste, 0,		stbook,   stbook,   0,     stbook,	 "Atari", "STBook", GAME_NOT_WORKING )
+COMP( 1991, megaste,  atariste, 0,		megaste,  atarist,  0,     megaste,  "Atari", "Mega STE", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE  )
 /*
 COMP( 1991, stpad,    atariste, 0,      stpad,    stpad,    0,     stpad,    "Atari", "STPad (prototype)", GAME_NOT_WORKING )
 COMP( 1990, tt030,    0,        0,      tt030,    tt030,    0,     tt030,    "Atari", "TT030", GAME_NOT_WORKING )
