@@ -477,7 +477,7 @@ static READ8_DEVICE_HANDLER( bw2_ppi8255_c_r )
 	data = ((centronics_read_handshake(device->machine,0) & CENTRONICS_NOT_BUSY) == 0) ? 0x10 : 0;
 
 	data |= state->mfdbk << 5;
-	
+
 	data |= floppy_drive_get_flag_state(get_floppy_image(device->machine, state->selected_drive), FLOPPY_DRIVE_DISK_WRITE_PROTECTED) ? 0x00 : 0x80;
 
 	return data;
@@ -514,10 +514,10 @@ static PIT8253_OUTPUT_CHANGED( bw2_timer2_w )
 
 	driver_state->mtron = state;
 	driver_state->mfdbk = !state;
-			
+
 	floppy_drive_set_motor_state(get_floppy_image(device->machine, 0), !driver_state->mtron);
 	floppy_drive_set_motor_state(get_floppy_image(device->machine, 1), !driver_state->mtron);
-	
+
 	floppy_drive_set_ready_state(get_floppy_image(device->machine, 0), 1, 1);
 	floppy_drive_set_ready_state(get_floppy_image(device->machine, 1), 1, 1);
 }
@@ -605,7 +605,7 @@ static MACHINE_START( bw2 )
 	/* find devices */
 	state->msm8251 = devtag_get_device(machine, MSM8251, MSM8251_TAG);
 	state->msm6255 = devtag_get_device(machine, MSM6255, MSM6255_TAG);
-	
+
 	/* register for state saving */
 	state_save_register_global(machine, state->keyboard_row);
 	state_save_register_global_pointer(machine, state->work_ram, mess_ram_size);
@@ -624,7 +624,7 @@ static MACHINE_RESET( bw2 )
 	if (get_ramdisk_size(machine) > 0)
 	{
 		// RAMCARD installed
-		
+
 		memory_configure_bank(machine, 1, BANK_RAM1, 1, state->work_ram, 0);
 		memory_configure_bank(machine, 1, BANK_VRAM, 1, state->video_ram, 0);
 		memory_configure_bank(machine, 1, BANK_RAMCARD_ROM, 1, memory_region(machine, "ramcard"), 0);
@@ -823,7 +823,6 @@ static MSM6255_CHAR_RAM_READ( bw2_charram_r )
 static const msm6255_interface bw2_msm6255_intf =
 {
 	SCREEN_TAG,
-	XTAL_16MHz,
 	0,
 	bw2_charram_r,
 };
@@ -857,15 +856,15 @@ static MACHINE_DRIVER_START( bw2 )
 	MDRV_VIDEO_START( bw2 )
 	MDRV_VIDEO_UPDATE( bw2 )
 
-	MDRV_MSM6255_ADD(MSM6255_TAG, bw2_msm6255_intf)
+	MDRV_MSM6255_ADD(MSM6255_TAG, XTAL_16MHz, bw2_msm6255_intf)
 
 	/* printer */
 	MDRV_PRINTER_ADD("printer")
 
 	/* uart */
 	MDRV_MSM8251_ADD(MSM8251_TAG, default_msm8251_interface)
-		
-	MDRV_WD179X_ADD("wd179x", default_wd17xx_interface )			
+
+	MDRV_WD179X_ADD("wd179x", default_wd17xx_interface )
 MACHINE_DRIVER_END
 
 /***************************************************************************
