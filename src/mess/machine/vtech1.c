@@ -50,7 +50,7 @@ Todo:
 #include "video/m6847.h"
 #include "includes/vtech1.h"
 #include "devices/cassette.h"
-#include "devices/printer.h"
+#include "machine/ctronics.h"
 #include "cpu/z80/z80.h"
 #include "sound/speaker.h"
 
@@ -483,11 +483,11 @@ READ8_HANDLER(vtech1_keyboard_r)
 	static int cassette_bit = 0;
 	int row, data = 0xff;
 	double level;
-	static const char *const keynames[] = { "keyboard_0", "keyboard_1", "keyboard_2", "keyboard_3", 
+	static const char *const keynames[] = { "keyboard_0", "keyboard_1", "keyboard_2", "keyboard_3",
 										"keyboard_4", "keyboard_5", "keyboard_6", "keyboard_7" };
 
 	/* scan keyboard rows */
-	for (row = 0; row < 8; row++) 
+	for (row = 0; row < 8; row++)
 	{
 		if (!(offset & (1 << row)))
 			data &= input_port_read(space->machine, keynames[row]);
@@ -543,41 +543,26 @@ WRITE8_HANDLER(vtech1_latch_w)
  Printer Handling
 ******************************************************************************/
 
-static const device_config *printer_device(running_machine *machine)
-{
-	return devtag_get_device(machine, PRINTER, "printer");
-}
-
 /*
 The VZ200/300 printer interface uses I/O port address OE Hex for the ASCII
 character code data and strobe output, and address OOH for the busy/ready-bar
 status input (bit 0).
 */
 
-READ8_HANDLER(vtech1_printer_r)
+READ8_HANDLER( vtech1_printer_r )
 {
-	int data = 0xff;
+	const device_config *printer = devtag_get_device(space->machine, CENTRONICS, "centronics");
+	UINT8 result = 0xff;
 
-	if (printer_is_ready(printer_device(space->machine)))
-		data &= ~0x01;
+	result &= ~(!centronics_busy_r(printer));
 
-	return data;
+	return result;
 }
 
-WRITE8_HANDLER(vtech1_printer_w)
+WRITE8_HANDLER( vtech1_strobe_w )
 {
-	static int prn_data;
-
-	switch (offset) {
-		case 0x0d:	/* strobe data to printer */
-			printer_output(printer_device(space->machine), prn_data);
-			break;
-		case 0x0e:	/* load output latch */
-			prn_data = data;
-			break;
-		default:
-			logerror("vtech1_printer_w $%02x, unknown offset %02x\n", data, offset);
-	}
+	const device_config *printer = devtag_get_device(space->machine, CENTRONICS, "centronics");
+	centronics_strobe_w(printer, FALSE);
 }
 
 

@@ -112,7 +112,7 @@ Notes:
 #include "devices/cartslot.h"
 #include "devices/snapquik.h"
 #include "devices/cassette.h"
-#include "devices/printer.h"
+#include "machine/ctronics.h"
 #include "devices/z80bin.h"
 #include "formats/vt_cas.h"
 
@@ -153,7 +153,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(vtech1_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x0f) AM_READWRITE(vtech1_printer_r, vtech1_printer_w)
+	AM_RANGE(0x00, 0x00) AM_READ(vtech1_printer_r)
+	AM_RANGE(0x0d, 0x0d) AM_WRITE(vtech1_strobe_w)
+	AM_RANGE(0x0e, 0x0e) AM_DEVWRITE(CENTRONICS, "centronics", centronics_data_w)
 	AM_RANGE(0x10, 0x1f) AM_READWRITE(vtech1_fdc_r, vtech1_fdc_w)
 	AM_RANGE(0x20, 0x2f) AM_READ(vtech1_joystick_r)
 	AM_RANGE(0x30, 0x3f) AM_READWRITE(vtech1_serial_r, vtech1_serial_w)
@@ -309,6 +311,7 @@ static const cassette_config laser_cassette_config =
 	CASSETTE_PLAY
 };
 
+
 static MACHINE_DRIVER_START(laser110)
     /* basic machine hardware */
     MDRV_CPU_ADD("main", Z80, VTECH1_CLK)  /* 3.57950 MHz */
@@ -336,14 +339,14 @@ static MACHINE_DRIVER_START(laser110)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	/* printer */
-	MDRV_PRINTER_ADD("printer")
+	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
 
 	/* snapshot/quickload */
 	MDRV_SNAPSHOT_ADD(vtech1, "vz", 1.5)
 	MDRV_Z80BIN_QUICKLOAD_ADD(vtech1, 1.5)
 
 	MDRV_CASSETTE_ADD( "cassette", laser_cassette_config )
-	
+
 	/* cartridge */
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("rom")

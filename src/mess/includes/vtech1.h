@@ -29,7 +29,7 @@ DEVICE_IMAGE_LOAD( vtech1_floppy );
 SNAPSHOT_LOAD( vtech1 );
 
 READ8_HANDLER ( vtech1_printer_r );
-WRITE8_HANDLER( vtech1_printer_w );
+WRITE8_HANDLER( vtech1_strobe_w );
 READ8_HANDLER ( vtech1_fdc_r );
 WRITE8_HANDLER( vtech1_fdc_w );
 READ8_HANDLER ( vtech1_joystick_r );
