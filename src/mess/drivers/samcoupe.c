@@ -60,6 +60,7 @@ Note on the bioses:
 #include "cpu/z80/z80.h"
 #include "machine/wd17xx.h"
 #include "machine/msm6242.h"
+#include "machine/ctronics.h"
 #include "sound/saa1099.h"
 #include "sound/speaker.h"
 
@@ -296,6 +297,34 @@ static WRITE8_HANDLER( samcoupe_sound_w )
 }
 
 
+static READ8_HANDLER( samcoupe_lpt1_busy_r )
+{
+	const device_config *printer = devtag_get_device(space->machine, CENTRONICS, "lpt1");
+	return centronics_busy_r(printer);
+}
+
+
+static WRITE8_HANDLER( samcoupe_lpt1_strobe_w )
+{
+	const device_config *printer = devtag_get_device(space->machine, CENTRONICS, "lpt1");
+	centronics_strobe_w(printer, data);
+}
+
+
+static READ8_HANDLER( samcoupe_lpt2_busy_r )
+{
+	const device_config *printer = devtag_get_device(space->machine, CENTRONICS, "lpt2");
+	return centronics_busy_r(printer);
+}
+
+
+static WRITE8_HANDLER( samcoupe_lpt2_strobe_w )
+{
+	const device_config *printer = devtag_get_device(space->machine, CENTRONICS, "lpt2");
+	centronics_strobe_w(printer, data);
+}
+
+
 
 /*************************************
  *
@@ -314,6 +343,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( samcoupe_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_WRITE(samcoupe_ext_mem_w)
 	AM_RANGE(0xe0, 0xe7) AM_MIRROR(0xff10) AM_MASK(0xffff) AM_READWRITE(samcoupe_disk_r, samcoupe_disk_w)
+	AM_RANGE(0xe8, 0xe8) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_DEVWRITE(CENTRONICS, "lpt1", centronics_data_w)
+	AM_RANGE(0xe9, 0xe9) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(samcoupe_lpt1_busy_r, samcoupe_lpt1_strobe_w)
+	AM_RANGE(0xea, 0xea) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_DEVWRITE(CENTRONICS, "lpt2", centronics_data_w)
+	AM_RANGE(0xeb, 0xeb) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(samcoupe_lpt2_busy_r, samcoupe_lpt2_strobe_w)
 	AM_RANGE(0xf8, 0xf8) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(samcoupe_pen_r, samcoupe_clut_w)
 	AM_RANGE(0xf9, 0xf9) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(samcoupe_status_r, samcoupe_line_int_w)
 	AM_RANGE(0xfa, 0xfa) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(samcoupe_lmpr_r, samcoupe_lmpr_w)
@@ -539,6 +572,8 @@ static MACHINE_DRIVER_START( samcoupe )
 
 	/* devices */
 	MDRV_DRIVER_DATA(coupe_asic)
+	MDRV_CENTRONICS_ADD("lpt1", standard_centronics)
+	MDRV_CENTRONICS_ADD("lpt2", standard_centronics)
 	MDRV_MSM6242_ADD("sambus_clock")
 
 	/* sound hardware */
