@@ -18,6 +18,8 @@ System Driver Changes:
 ----------------------
 - [APPLE1] Fixed character layout.  [rhester72]
 
+- [ATOM] Rewrote printer interface.  [Dirk Best]
+
 - [CHANNELF] Added support for "new" sound.  [Fredric QJ Blåholtz]
 
 - [COCO] Cleanups  [Nathan Woods]
@@ -33,6 +35,8 @@ System Driver Changes:
 
 - [TI81, TI85, TI86] Added the new ROM_DEFAULT_BIOS feature to select the most
   recent rom versions.  [Hobie Troxell]
+
+- [VTECH1] Updated to use the new centronics support.  [Dirk Best]
 
 - [X68000] Added better implementation of 1024x1024 graphic layer.  [Barry Rodewald]
 
