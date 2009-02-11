@@ -9,6 +9,7 @@
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
+#include "machine/ctronics.h"
 #include "devices/cartslot.h"
 #include "px4.lh"
 
@@ -457,20 +458,25 @@ static WRITE8_HANDLER( px4_artmr_w )
 /* io status register */
 static READ8_HANDLER( px4_iostr_r )
 {
+	const device_config *printer = devtag_get_device(space->machine, CENTRONICS, "centronics");
+	int result = 0;
+
 	logerror("%s: px4_iostr_r\n", cpuexec_describe_context(space->machine));
-	return 0xff;
+
+	/* centronics status */
+	result |= centronics_busy_r(printer);
+	result |= !centronics_pe_r(printer) << 1;
+
+	/* cartridge option select signal, set to 'other mode' */
+	result |= 0x40;
+
+	return result;
 }
 
 /* art command register */
 static WRITE8_HANDLER( px4_artcr_w )
 {
 	logerror("%s: px4_artcr_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
-}
-
-/* printer data register */
-static WRITE8_HANDLER( px4_pdr_w )
-{
-	logerror("%s: px4_pdr_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
 }
 
 /* switch register */
@@ -482,8 +488,15 @@ static WRITE8_HANDLER( px4_swr_w )
 /* io control register */
 static WRITE8_HANDLER( px4_ioctlr_w )
 {
+	const device_config *printer = devtag_get_device(space->machine, CENTRONICS, "centronics");
+
 	logerror("%s: px4_ioctlr_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
 
+	/* centronics strobe and reset */
+	centronics_strobe_w(printer, !BIT(data, 0));
+	centronics_prime_w(printer, BIT(data, 1));
+
+	/* status leds */
 	output_set_value("led_0", BIT(data, 4)); /* caps lock */
 	output_set_value("led_1", BIT(data, 5)); /* num lock */
 	output_set_value("led_2", BIT(data, 6));
@@ -643,7 +656,7 @@ static ADDRESS_MAP_START( px4_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x14, 0x14) AM_READWRITE(px4_artdir_r, px4_artdor_w)
 	AM_RANGE(0x15, 0x15) AM_READWRITE(px4_artsr_r, px4_artmr_w)
 	AM_RANGE(0x16, 0x16) AM_READWRITE(px4_iostr_r, px4_artcr_w)
-	AM_RANGE(0x17, 0x17) AM_WRITE(px4_pdr_w)
+	AM_RANGE(0x17, 0x17) AM_DEVWRITE(CENTRONICS, "centronics", centronics_data_w)
 	AM_RANGE(0x18, 0x18) AM_WRITE(px4_swr_w)
 	AM_RANGE(0x19, 0x19) AM_WRITE(px4_ioctlr_w)
 	AM_RANGE(0x1a, 0x1f) AM_NOP
@@ -676,8 +689,8 @@ static INPUT_PORTS_START( px4_dips )
 	PORT_DIPSETTING(0x08, "Spain")
 	PORT_DIPSETTING(0x07, DEF_STR(Japan))
 	PORT_DIPSETTING(0x06, "Norway")
-	PORT_DIPNAME(0x30, 0x30, "LST device")
 
+	PORT_DIPNAME(0x30, 0x30, "LST device")
 	PORT_DIPLOCATION("DIP:4,3")
 	PORT_DIPSETTING(0x00, "SIO")
 	PORT_DIPSETTING(0x10, "Cartridge printer")
@@ -842,6 +855,9 @@ static MACHINE_DRIVER_START( px4 )
 
 	MDRV_TIMER_ADD_PERIODIC("one_sec", upd7508_1sec_callback, SEC(1))
 	MDRV_TIMER_ADD_PERIODIC("frc", frc_tick, NSEC(1600))
+
+	/* centronics printer */
+	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
 
 	/* rom capsules */
 	MDRV_CARTSLOT_ADD("capsule1")
