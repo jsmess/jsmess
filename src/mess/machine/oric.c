@@ -24,10 +24,9 @@
 #include "machine/6522via.h"
 #include "machine/applefdc.h"
 #include "machine/6551.h"
-#include "machine/centroni.h"
+#include "machine/ctronics.h"
 #include "devices/basicdsk.h"
 #include "devices/mfmdisk.h"
-#include "devices/printer.h"
 #include "devices/cassette.h"
 #include "sound/ay8910.h"
 
@@ -246,7 +245,8 @@ static WRITE8_DEVICE_HANDLER ( oric_via_out_a_func )
 	if (oric_psg_control==0)
 	{
 		/* if psg not selected, write to printer */
-		centronics_write_data(device->machine,0,data);
+		const device_config *printer = devtag_get_device(device->machine, CENTRONICS, "centronics");
+		centronics_data_w(printer, 0, data);
 	}
 }
 
@@ -309,7 +309,7 @@ static TIMER_CALLBACK(oric_refresh_tape)
 static unsigned char previous_portb_data = 0;
 static WRITE8_DEVICE_HANDLER ( oric_via_out_b_func )
 {
-	int printer_handshake;
+	const device_config *printer = devtag_get_device(device->machine, CENTRONICS, "centronics");
 
 	/* KEYBOARD */
 	oric_keyboard_line = data & 0x07;
@@ -330,49 +330,12 @@ static WRITE8_DEVICE_HANDLER ( oric_via_out_b_func )
 	/* cassette data out */
 	cassette_output(cassette_device_image(device->machine), (data & (1<<7)) ? -1.0 : +1.0);
 
-
-	/* PRINTER STROBE */
-	printer_handshake = 0;
-
-	/* normal value is 1, 0 is the strobe */
-	if ((data & (1<<4))!=0)
-	{
-		printer_handshake = CENTRONICS_STROBE;
-	}
-
-	/* assumption: select is tied low */
-	centronics_write_handshake(device->machine, 0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
-	centronics_write_handshake(device->machine, 0, printer_handshake, CENTRONICS_STROBE);
+	/* centronics STROBE is connected to PB4 */
+	centronics_strobe_w(printer, BIT(data, 4));
 
 	oric_psg_connection_refresh(device->machine);
 	previous_portb_data = data;
-
 }
-
-static void oric_printer_handshake_in(running_machine *machine,int number, int data, int mask)
-{
-	int acknowledge;
-	const device_config *via_0 = devtag_get_device(machine, VIA6522, "via6522_0");
-
-	acknowledge = 1;
-
-	if (mask & CENTRONICS_ACKNOWLEDGE)
-	{
-		if (data & CENTRONICS_ACKNOWLEDGE)
-		{
-			acknowledge = 0;
-		}
-	}
-
-    via_ca1_w(via_0, 0, acknowledge);
-}
-
-static const CENTRONICS_CONFIG oric_cent_config[1]={
-	{
-		PRINTER_CENTRONICS,
-		oric_printer_handshake_in
-	},
-};
 
 
 static READ8_DEVICE_HANDLER ( oric_via_in_ca2_func )
@@ -599,7 +562,7 @@ static void oric_install_apple2_v2_interface(running_machine *machine)
 	const device_config *fdc = device_list_find_by_tag(machine->config->devicelist,
 		APPLEFDC,
 		"fdc");
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);		
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
 	memory_install_read8_handler(space, 0x0300, 0x030f, 0, 0, oric_IO_r);
 	memory_install_read8_device_handler(space, fdc, 0x0310, 0x031f, 0, 0, applefdc_r);
@@ -971,7 +934,7 @@ READ8_HANDLER (oric_microdisc_r)
 {
 	unsigned char data = 0x0ff;
 	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD179X, "wd179x");
-	
+
 	switch (offset & 0x0ff)
 	{
 		/* microdisc floppy disc interface */
@@ -1068,7 +1031,7 @@ WRITE8_HANDLER(oric_microdisc_w)
 static void oric_install_microdisc_interface(running_machine *machine)
 {
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	
+
 	memory_install_read8_handler(space, 0x0300, 0x030f, 0, 0, oric_IO_r);
 	memory_install_read8_handler(space, 0x0310, 0x031f, 0, 0, oric_microdisc_r);
 	memory_install_read8_handler(space, 0x0320, 0x03ff, 0, 0, oric_IO_r);
@@ -1138,18 +1101,11 @@ DEVICE_IMAGE_LOAD( oric_floppy )
 
 static void oric_common_init_machine(running_machine *machine)
 {
-	const device_config *via_0 = devtag_get_device(machine, VIA6522, "via6522_0");
-
 	/* clear all irqs */
 	oric_irqs = 0;
 	oric_ram_0x0c000 = NULL;
 
     timer_pulse(machine, ATTOTIME_IN_HZ(4800), NULL, 0, oric_refresh_tape);
-
-	centronics_config(machine, 0, oric_cent_config);
-	/* assumption: select is tied low */
-	centronics_write_handshake(machine, 0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
-    via_ca1_w(via_0, 0, 1);
 }
 
 MACHINE_START( oric )
@@ -1166,7 +1122,7 @@ MACHINE_RESET( oric )
 {
 	int disc_interface_id = input_port_read(machine, "FLOPPY") & 0x07;
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	
+
 	switch (disc_interface_id)
 	{
 		default:

@@ -20,8 +20,7 @@
 #include "cpu/m6502/m6502.h"
 #include "sound/wave.h"
 #include "includes/oric.h"
-#include "machine/centroni.h"
-#include "devices/printer.h"
+#include "machine/ctronics.h"
 #include "devices/mflopimg.h"
 #include "devices/cassette.h"
 #include "formats/ap2_dsk.h"
@@ -352,6 +351,14 @@ static const cassette_config oric_cassette_config =
 	CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED
 };
 
+static const centronics_interface oric_contronics_config =
+{
+	FALSE,
+	DEVCB_DEVICE_HANDLER(VIA6522, "via6522_0", via_ca1_w),
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
 static MACHINE_DRIVER_START( oric )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M6502, 1000000)
@@ -383,14 +390,14 @@ static MACHINE_DRIVER_START( oric )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* printer */
-	MDRV_PRINTER_ADD("printer")
+	MDRV_CENTRONICS_ADD("centronics", oric_contronics_config)
 
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", oric_cassette_config )
 
 	/* via */
 	MDRV_VIA6522_ADD( "via6522_0", 1000000, oric_6522_interface )
-	
+
 	MDRV_WD179X_ADD("wd179x", oric_wd17xx_interface )
 MACHINE_DRIVER_END
 
