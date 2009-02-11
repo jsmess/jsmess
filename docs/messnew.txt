@@ -82,6 +82,8 @@ Source Changes:
 - Refactored the following devices to use devcb callbacks: ABC77, CDP1861,
   CDP1864, CDP1871, MC68901, Z80DART, ZX8301, ZX8302 [Curt Coder]
 
+- New centronics printer interface.  [Dirk Best]
+
 
 
 0.129

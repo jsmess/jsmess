@@ -521,6 +521,7 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/ins8250.o \
 	$(MESS_MACHINE)/pc_mouse.o \
 	$(MESS_MACHINE)/centroni.o \
+	$(MESS_MACHINE)/ctronics.o \
 	$(MAME_MACHINE)/pckeybrd.o \
 	$(MESS_MACHINE)/d88.o      \
 	$(MESS_MACHINE)/serial.o   \
