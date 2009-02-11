@@ -25,7 +25,10 @@ void abcbus_init(running_machine *machine, const char *cputag, const abcbus_dais
 		(*tailptr)->next = NULL;
 		(*tailptr)->device = devtag_get_device(machine, daisy->devtype, device_inherit_tag(tempstring, cputag, daisy->devname));
 		if ((*tailptr)->device == NULL)
+		{
+			astring_free(tempstring);
 			fatalerror("Unable to locate device '%s'", daisy->devname);
+		}
 		(*tailptr)->card_select = (abcbus_card_select)device_get_info_fct((*tailptr)->device, DEVINFO_FCT_ABCBUS_CARD_SELECT);
 		tailptr = &(*tailptr)->next;
 	}

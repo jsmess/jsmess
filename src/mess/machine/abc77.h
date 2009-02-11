@@ -17,42 +17,43 @@
 #ifndef __ABC77__
 #define __ABC77__
 
-#include "driver.h"
+#include "devcb.h"
+
+/***************************************************************************
+    MACROS / CONSTANTS
+***************************************************************************/
 
 #define ABC77_TAG	"abc77"
-#define I8035_TAG	"z16"
 
 #define ABC77 DEVICE_GET_INFO_NAME( abc77 )
 
-typedef void (*abc77_on_txd_changed_func) (const device_config *device, int level);
-#define ABC77_ON_TXD_CHANGED(name) void name(const device_config *device, int level)
+#define MDRV_ABC77_ADD(_config) \
+	MDRV_DEVICE_ADD(ABC77_TAG, ABC77, 0)\
+	MDRV_DEVICE_CONFIG(_config)
 
-typedef void (*abc77_on_keydown_changed_func) (const device_config *device, int level);
-#define ABC77_ON_KEYDOWN_CHANGED(name) void name(const device_config *device, int level)
+#define ABC77_INTERFACE(_name) \
+	const abc77_interface (_name) =
 
-typedef void (*abc77_on_clock_changed_func) (const device_config *device, int level);
-#define ABC77_ON_CLOCK_CHANGED(name) void name(const device_config *device, int level)
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
 
-/* interface */
 typedef struct _abc77_interface abc77_interface;
 struct _abc77_interface
 {
 	/* this gets called for every change of the TxD pin (pin 1) */
-	abc77_on_txd_changed_func		txd_w;
+	devcb_write_line	out_txd_func;
 
 	/* this gets called for every change of the CLOCK pin (pin 4) */
-	abc77_on_clock_changed_func		clock_w;
+	devcb_write_line	out_clock_func;
 
 	/* this gets called for every change of the _KEYDOWN pin (pin 5) */
-	abc77_on_keydown_changed_func	keydown_w;
+	devcb_write_line	out_keydown_func;
 };
-#define ABC77_INTERFACE(name) const abc77_interface (name) =
 
-/* inline configuration */
-#define MDRV_ABC77_ADD(config) \
-	MDRV_SPEAKER_STANDARD_MONO("mono")\
-	MDRV_DEVICE_ADD(ABC77_TAG, ABC77, 0)\
-	MDRV_DEVICE_CONFIG(config)
+/***************************************************************************
+    PROTOTYPES
+***************************************************************************/
 
 /* device interface */
 DEVICE_GET_INFO( abc77 );
@@ -61,9 +62,9 @@ DEVICE_GET_INFO( abc77 );
 INPUT_PORTS_EXTERN( abc77 );
 
 /* receive data */
-void abc77_rxd_w(const device_config *device, int level);
+void abc77_rxd_w(const device_config *device, int state);
 
 /* reset */
-void abc77_reset_w(const device_config *device, int level);
+void abc77_reset_w(const device_config *device, int state);
 
 #endif

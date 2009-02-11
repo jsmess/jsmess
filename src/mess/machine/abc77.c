@@ -3,10 +3,22 @@
 #include "cpu/mcs48/mcs48.h"
 #include "sound/discrete.h"
 
+/***************************************************************************
+    PARAMETERS
+***************************************************************************/
+
+#define I8035_TAG	"z16"
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
 typedef struct _abc77_t abc77_t;
 struct _abc77_t
 {
-	const abc77_interface *intf;	/* interface */
+	devcb_resolved_write_line	out_txd_func;
+	devcb_resolved_write_line	out_clock_func;
+	devcb_resolved_write_line	out_keydown_func;
 
 	const device_config *cpu;		/* CPU of the 8035 */
 
@@ -19,15 +31,31 @@ struct _abc77_t
 	emu_timer *reset_timer;			/* reset timer */
 };
 
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
+
 INLINE abc77_t *get_safe_token(const device_config *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
-
 	return (abc77_t *)device->token;
 }
 
-/* Discrete Sound */
+INLINE const abc77_interface *get_interface(const device_config *device)
+{
+	assert(device != NULL);
+	assert((device->type == ABC77));
+	return (const abc77_interface *) device->static_config;
+}
+
+/***************************************************************************
+    IMPLEMENTATION
+***************************************************************************/
+
+/*-------------------------------------------------
+    DISCRETE_SOUND( abc77 )
+-------------------------------------------------*/
 
 static const discrete_555_desc abc77_ne556_a =
 {
@@ -42,14 +70,9 @@ static DISCRETE_SOUND_START( abc77 )
 	DISCRETE_OUTPUT(NODE_02, 5000)
 DISCRETE_SOUND_END
 
-/* Read/Write Handlers */
-
-void abc77_rxd_w(const device_config *device, int level)
-{
-	abc77_t *abc77 = get_safe_token(device);
-
-	cpu_set_input_line(abc77->cpu, MCS48_INPUT_IRQ, level ? CLEAR_LINE : ASSERT_LINE);
-}
+/*-------------------------------------------------
+    TIMER_DEVICE_CALLBACK( clock_tick )
+-------------------------------------------------*/
 
 static TIMER_DEVICE_CALLBACK( clock_tick )
 {
@@ -57,7 +80,13 @@ static TIMER_DEVICE_CALLBACK( clock_tick )
 	abc77_t *abc77 = get_safe_token(device);
 
 	abc77->clock = !abc77->clock;
+
+	devcb_call_write_line(&abc77->out_clock_func, abc77->clock);
 }
+
+/*-------------------------------------------------
+    TIMER_CALLBACK( reset_tick )
+-------------------------------------------------*/
 
 static TIMER_CALLBACK( reset_tick )
 {
@@ -67,24 +96,9 @@ static TIMER_CALLBACK( reset_tick )
 	cpu_set_input_line(abc77->cpu, INPUT_LINE_RESET, CLEAR_LINE);
 }
 
-void abc77_reset_w(const device_config *device, int level)
-{
-	abc77_t *abc77 = get_safe_token(device);
-
-	if (abc77->reset && !level)
-	{
-		/* trigger reset */
-		int t = 1.1 * RES_K(100) * CAP_N(100) * 1000; // t = 1.1 * R1 * C1
-		int ea = BIT(input_port_read(device->machine, "ABC77_DSW"), 7);
-
-		cpu_set_input_line(abc77->cpu, INPUT_LINE_RESET, ASSERT_LINE);
-		timer_adjust_oneshot(abc77->reset_timer, ATTOTIME_IN_MSEC(t), 0);
-
-		cpu_set_input_line(abc77->cpu, MCS48_INPUT_EA, ea ? CLEAR_LINE : ASSERT_LINE);
-	}
-
-	abc77->reset = level;
-}
+/*-------------------------------------------------
+    abc77_clock_r - read serial clock
+-------------------------------------------------*/
 
 static READ8_HANDLER( abc77_clock_r )
 {
@@ -93,6 +107,10 @@ static READ8_HANDLER( abc77_clock_r )
 
 	return abc77->clock;
 }
+
+/*-------------------------------------------------
+    abc77_data_r - read keyboard matrix
+-------------------------------------------------*/
 
 static READ8_HANDLER( abc77_data_r )
 {
@@ -103,6 +121,10 @@ static READ8_HANDLER( abc77_data_r )
 
 	return input_port_read(device->machine, keynames[abc77->keylatch]);
 }
+
+/*-------------------------------------------------
+    abc77_data_w - keyboard control
+-------------------------------------------------*/
 
 static WRITE8_HANDLER( abc77_data_w )
 {
@@ -120,20 +142,26 @@ static WRITE8_HANDLER( abc77_data_w )
 	discrete_sound_w(space, NODE_01, BIT(data, 4));
 
 	/* transmit data */
-	abc77->intf->txd_w(device, BIT(data, 5));
+	devcb_call_write_line(&abc77->out_txd_func, BIT(data, 5));
 
 	/* key down */
-	abc77->intf->keydown_w(device, BIT(data, 6));
+	devcb_call_write_line(&abc77->out_keydown_func, BIT(data, 6));
 
 	/* hysteresis */
 	abc77->hys = BIT(data, 7);
 }
 
-/* Memory Maps */
+/*-------------------------------------------------
+    ADDRESS_MAP( abc77_map )
+-------------------------------------------------*/
 
 static ADDRESS_MAP_START( abc77_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x000, 0xfff) AM_ROM
 ADDRESS_MAP_END
+
+/*-------------------------------------------------
+    ADDRESS_MAP( abc77_io_map )
+-------------------------------------------------*/
 
 static ADDRESS_MAP_START( abc77_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x3f) AM_RAM
@@ -143,7 +171,9 @@ static ADDRESS_MAP_START( abc77_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READ_PORT("ABC77_DSW")
 ADDRESS_MAP_END
 
-/* Input Ports */
+/*-------------------------------------------------
+    INPUT_PORTS( abc77 )
+-------------------------------------------------*/
 
 INPUT_PORTS_START( abc77 )
 	PORT_START("ABC77_X0")
@@ -284,7 +314,9 @@ INPUT_PORTS_START( abc77 )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
-/* Machine Driver */
+/*-------------------------------------------------
+    MACHINE_DRIVER( abc77 )
+-------------------------------------------------*/
 
 static MACHINE_DRIVER_START( abc77 )
 	/* keyboard cpu */
@@ -304,7 +336,9 @@ static MACHINE_DRIVER_START( abc77 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
 
-/* ROMs */
+/*-------------------------------------------------
+    ROM( abc77 )
+-------------------------------------------------*/
 
 ROM_START( abc77 )
 	ROM_REGION( 0x1000, I8035_TAG, 0 )
@@ -313,39 +347,74 @@ ROM_START( abc77 )
 	ROM_FILL( 0, 0x1000, 0 )
 ROM_END
 
-/* Device Interface */
+/*-------------------------------------------------
+    abc77_rxd_w - keyboard serial data in
+-------------------------------------------------*/
+
+void abc77_rxd_w(const device_config *device, int level)
+{
+	abc77_t *abc77 = get_safe_token(device);
+
+	cpu_set_input_line(abc77->cpu, MCS48_INPUT_IRQ, level ? CLEAR_LINE : ASSERT_LINE);
+}
+
+/*-------------------------------------------------
+    abc77_reset_w - keyboard reset
+-------------------------------------------------*/
+
+void abc77_reset_w(const device_config *device, int level)
+{
+	abc77_t *abc77 = get_safe_token(device);
+
+	if (abc77->reset && !level)
+	{
+		int t = 1.1 * RES_K(100) * CAP_N(100) * 1000; // t = 1.1 * R1 * C1
+		int ea = BIT(input_port_read(device->machine, "ABC77_DSW"), 7);
+
+		/* trigger reset */
+		cpu_set_input_line(abc77->cpu, INPUT_LINE_RESET, ASSERT_LINE);
+		timer_adjust_oneshot(abc77->reset_timer, ATTOTIME_IN_MSEC(t), 0);
+
+		cpu_set_input_line(abc77->cpu, MCS48_INPUT_EA, ea ? CLEAR_LINE : ASSERT_LINE);
+	}
+
+	abc77->reset = level;
+}
+
+/*-------------------------------------------------
+    DEVICE_START( abc77 )
+-------------------------------------------------*/
 
 static DEVICE_START( abc77 )
 {
 	abc77_t *abc77 = device->token;
+	const abc77_interface *intf = get_interface(device);
+
 	astring *tempstring = astring_alloc();
 
-	/* validate arguments */
-
-	assert(device->tag != NULL);
-
-	abc77->intf = device->static_config;
-	assert(abc77->intf != NULL);
-	assert(abc77->intf->txd_w != NULL);
-	assert(abc77->intf->keydown_w != NULL);
+	/* resolve callbacks */
+	devcb_resolve_write_line(&abc77->out_txd_func, &intf->out_txd_func, device);
+	devcb_resolve_write_line(&abc77->out_clock_func, &intf->out_clock_func, device);
+	devcb_resolve_write_line(&abc77->out_keydown_func, &intf->out_keydown_func, device);
 
 	/* find our CPU */
-
 	astring_printf(tempstring, "%s:%s", device->tag, I8035_TAG);
 	abc77->cpu = cputag_get_cpu(device->machine, astring_c(tempstring));
 	astring_free(tempstring);
 
 	/* allocate reset timer */
-
 	abc77->reset_timer = timer_alloc(device->machine, reset_tick, (FPTR *) device);
 
 	/* register for state saving */
-
-	state_save_register_item(device->machine, "abc77", device->tag, 0, abc77->keylatch);
-	state_save_register_item(device->machine, "abc77", device->tag, 0, abc77->clock);
-	state_save_register_item(device->machine, "abc77", device->tag, 0, abc77->hys);
-	state_save_register_item(device->machine, "abc77", device->tag, 0, abc77->reset);
+	state_save_register_device_item(device, 0, abc77->keylatch);
+	state_save_register_device_item(device, 0, abc77->clock);
+	state_save_register_device_item(device, 0, abc77->hys);
+	state_save_register_device_item(device, 0, abc77->reset);
 }
+
+/*-------------------------------------------------
+    DEVICE_SET_INFO( abc77 )
+-------------------------------------------------*/
 
 static DEVICE_SET_INFO( abc77 )
 {
@@ -354,6 +423,10 @@ static DEVICE_SET_INFO( abc77 )
 		/* no parameters to set */
 	}
 }
+
+/*-------------------------------------------------
+    DEVICE_GET_INFO( abc77 )
+-------------------------------------------------*/
 
 DEVICE_GET_INFO( abc77 )
 {

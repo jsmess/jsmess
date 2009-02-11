@@ -265,20 +265,24 @@ WRITE8_DEVICE_HANDLER( mtx_dart_control_w )
 
 Z80DART_INTERFACE( mtx_dart_intf )
 {
-		"main",
-		MTX_SYSTEM_CLOCK,
-		0,
-		0,
-		0,
-		NULL,
-		NULL,
-		NULL,
-		NULL,
-		NULL,
-		NULL
+	0,
+	0,
+	0,
+
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+
+	DEVCB_NULL,
 };
-
-
 
 /*************************************
  *

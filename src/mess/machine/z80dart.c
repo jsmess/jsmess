@@ -11,7 +11,6 @@
 
 	TODO:
 
-	- save state support
 	- break detection
 	- wr0 reset tx interrupt pending
 	- wait/ready
@@ -25,16 +24,12 @@
 #include "cpu/z80/z80daisy.h"
 
 /***************************************************************************
-    DEBUGGING
+    PARAMETERS
 ***************************************************************************/
 
 #define VERBOSE 0
 
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
-
-/***************************************************************************
-    CONSTANTS
-***************************************************************************/
 
 enum
 {
@@ -125,6 +120,12 @@ enum
 typedef struct _dart_channel dart_channel;
 struct _dart_channel
 {
+	devcb_resolved_read_line	in_rxd_func;
+	devcb_resolved_write_line	out_txd_func;
+	devcb_resolved_write_line	out_dtr_func;
+	devcb_resolved_write_line	out_rts_func;
+	devcb_resolved_write_line	out_wrdy_func;
+
 	/* register state */
 	UINT8 rr[3];			/* read register */
 	UINT8 wr[6];			/* write register */
@@ -142,7 +143,7 @@ struct _dart_channel
 	int rx_first;			/* first character received */
 	int rx_parity;			/* received data parity */
 	int rx_break;			/* receive break condition */
-	int rx_rr0_latch;		/* read register 0 latched */
+	UINT8 rx_rr0_latch;		/* read register 0 latched */
 
 	int ri;					/* ring indicator latch */
 	int cts;				/* clear to send latch */
@@ -164,11 +165,10 @@ struct _dart_channel
 typedef struct _z80dart_t z80dart_t;
 struct _z80dart_t
 {
-	const z80dart_interface *intf;	/* interface */
-
+	devcb_resolved_write_line	out_int_func;
+	
 	dart_channel channel[2];		/* channels */
 
-	int clock;						/* base clock */
 	int int_state[8];				/* interrupt state */
 
 	/* timers */
@@ -193,78 +193,49 @@ INLINE z80dart_t *get_safe_token(const device_config *device)
 	assert(device != NULL);
 	assert(device->token != NULL);
 	assert(device->type == Z80DART);
-	
 	return (z80dart_t *)device->token;
 }
 
-/***************************************************************************
-    CALLBACK INTERFACE MANAGEMENT
-***************************************************************************/
-
-static int z80dart_rxd_r(const device_config *device, int channel)
+INLINE const z80dart_interface *get_interface(const device_config *device)
 {
-	z80dart_t *z80dart = get_safe_token(device);
-
-	int data = 1;
-
-	if (z80dart->intf->rxd_r)
-	{
-		data = z80dart->intf->rxd_r(device, channel);
-	}
-
-	return data;
-}
-
-static void z80dart_txd_w(const device_config *device, int channel, int state)
-{
-	z80dart_t *z80dart = get_safe_token(device);
-
-	if (z80dart->intf->on_txd_changed)
-	{
-		z80dart->intf->on_txd_changed(device, channel, state);
-	}
-}
-
-static void z80dart_rts_w(const device_config *device, int channel, int state)
-{
-	z80dart_t *z80dart = get_safe_token(device);
-
-	if (z80dart->intf->on_rts_changed)
-	{
-		z80dart->intf->on_rts_changed(device, channel, state);
-	}
-
-	LOG(("Z80DART \"%s\" Channel %c : RTS %u\n", device->tag, 'A' + channel, state));
-}
-
-static void z80dart_dtr_w(const device_config *device, int channel, int state)
-{
-	z80dart_t *z80dart = get_safe_token(device);
-
-	if (z80dart->intf->on_dtr_changed)
-	{
-		z80dart->intf->on_dtr_changed(device, channel, state);
-	}
-
-	LOG(("Z80DART \"%s\" Channel %c : DTR %u\n", device->tag, 'A' + channel, state));
+	assert(device != NULL);
+	assert((device->type == Z80DART));
+	return (const z80dart_interface *) device->static_config;
 }
 
 /***************************************************************************
-    INTERNAL STATE MANAGEMENT
+    IMPLEMENTATION
 ***************************************************************************/
 
-static void z80dart_check_interrupt(const device_config *device)
+#define RXD \
+	devcb_call_read_line(&ch->in_rxd_func)
+
+#define TXD(_state) \
+	devcb_call_write_line(&ch->out_txd_func, _state)
+
+#define RTS(_state) \
+	devcb_call_write_line(&ch->out_rts_func, _state)
+
+#define DTR(_state) \
+	devcb_call_write_line(&ch->out_dtr_func, _state)
+
+/*-------------------------------------------------
+    check_interrupts - control interrupt line
+-------------------------------------------------*/
+
+static void check_interrupts(const device_config *device)
 {
 	z80dart_t *z80dart = get_safe_token(device);
 	int state = (z80dart_irq_state(device) & Z80_DAISY_INT) ? ASSERT_LINE : CLEAR_LINE;
 
-	if (z80dart->intf->on_int_changed)
-	{
-		z80dart->intf->on_int_changed(device, state);
-	}
+	devcb_call_write_line(&z80dart->out_int_func, state);
 }
 
-static void z80dart_trigger_interrupt(const device_config *device, int channel, int level)
+/*-------------------------------------------------
+    take_interrupt - trigger interrupt
+-------------------------------------------------*/
+
+static void take_interrupt(const device_config *device, int channel, int level)
 {
 	z80dart_t *z80dart = get_safe_token(device);
 	dart_channel *ch = &z80dart->channel[channel];
@@ -287,107 +258,89 @@ static void z80dart_trigger_interrupt(const device_config *device, int channel, 
 	z80dart->channel[Z80DART_CH_A].rr[0] |= Z80DART_RR0_INTERRUPT_PENDING;
 
 	/* check for interrupt */
-	z80dart_check_interrupt(device);
+	check_interrupts(device);
 }
 
-static int z80dart_get_clock_mode(const device_config *device, int channel)
-{
-	z80dart_t *z80dart = get_safe_token(device);
-	dart_channel *ch = &z80dart->channel[channel];
+/*-------------------------------------------------
+    get_clock_mode - get clock divisor
+-------------------------------------------------*/
 
+static int get_clock_mode(dart_channel *ch)
+{
 	int clocks = 1;
 
 	switch (ch->wr[4] & Z80DART_WR4_CLOCK_MODE_MASK)
 	{
-	case Z80DART_WR4_CLOCK_MODE_X1:
-		clocks = 1;
-
-	case Z80DART_WR4_CLOCK_MODE_X16:
-		clocks = 16;
-
-	case Z80DART_WR4_CLOCK_MODE_X32:
-		clocks = 32;
-
-	case Z80DART_WR4_CLOCK_MODE_X64:
-		clocks = 64;
+	case Z80DART_WR4_CLOCK_MODE_X1:		clocks = 1;		break;
+	case Z80DART_WR4_CLOCK_MODE_X16:	clocks = 16;	break;
+	case Z80DART_WR4_CLOCK_MODE_X32:	clocks = 32;	break;
+	case Z80DART_WR4_CLOCK_MODE_X64:	clocks = 64;	break;
 	}
 
 	return clocks;
 }
 
-static float z80dart_get_stop_bits(const device_config *device, int channel)
-{
-	z80dart_t *z80dart = get_safe_token(device);
-	dart_channel *ch = &z80dart->channel[channel];
+/*-------------------------------------------------
+    get_stop_bits - get number of stop bits
+-------------------------------------------------*/
 
+static float get_stop_bits(dart_channel *ch)
+{
 	float bits = 1;
 
 	switch (ch->wr[4] & Z80DART_WR4_STOP_BITS_MASK)
 	{
-	case Z80DART_WR4_STOP_BITS_1:
-		bits = 1;
-
-	case Z80DART_WR4_STOP_BITS_1_5:
-		bits = 1.5;
-
-	case Z80DART_WR4_STOP_BITS_2:
-		bits = 2;
+	case Z80DART_WR4_STOP_BITS_1:		bits = 1;		break;
+	case Z80DART_WR4_STOP_BITS_1_5:		bits = 1.5;		break;
+	case Z80DART_WR4_STOP_BITS_2:		bits = 2;		break;
 	}
 
 	return bits;
 }
 
-static int z80dart_get_rx_word_length(const device_config *device, int channel)
-{
-	z80dart_t *z80dart = get_safe_token(device);
-	dart_channel *ch = &z80dart->channel[channel];
+/*-------------------------------------------------
+    get_rx_word_length - get receive word length
+-------------------------------------------------*/
 
+static int get_rx_word_length(dart_channel *ch)
+{
 	int bits = 5;
 
 	switch (ch->wr[3] & Z80DART_WR3_RX_WORD_LENGTH_MASK)
 	{
-	case Z80DART_WR3_RX_WORD_LENGTH_5:
-		bits = 5;
-
-	case Z80DART_WR3_RX_WORD_LENGTH_6:
-		bits = 6;
-
-	case Z80DART_WR3_RX_WORD_LENGTH_7:
-		bits = 7;
-
-	case Z80DART_WR3_RX_WORD_LENGTH_8:
-		bits = 8;
+	case Z80DART_WR3_RX_WORD_LENGTH_5:	bits = 5;		break;
+	case Z80DART_WR3_RX_WORD_LENGTH_6:	bits = 6;		break;
+	case Z80DART_WR3_RX_WORD_LENGTH_7:	bits = 7;		break;
+	case Z80DART_WR3_RX_WORD_LENGTH_8:	bits = 8;		break;
 	}
 
 	return bits;
 }
 
-static int z80dart_get_tx_word_length(const device_config *device, int channel)
-{
-	z80dart_t *z80dart = get_safe_token(device);
-	dart_channel *ch = &z80dart->channel[channel];
+/*-------------------------------------------------
+    get_rx_word_length - get transmit word length
+-------------------------------------------------*/
 
+static int get_tx_word_length(dart_channel *ch)
+{
 	int bits = 5;
 
 	switch (ch->wr[5] & Z80DART_WR5_TX_WORD_LENGTH_MASK)
 	{
-	case Z80DART_WR5_TX_WORD_LENGTH_5:
-		bits = 5;
-
-	case Z80DART_WR5_TX_WORD_LENGTH_6:
-		bits = 6;
-
-	case Z80DART_WR5_TX_WORD_LENGTH_7:
-		bits = 7;
-
-	case Z80DART_WR5_TX_WORD_LENGTH_8:
-		bits = 8;
+	case Z80DART_WR5_TX_WORD_LENGTH_5:	bits = 5;	break;
+	case Z80DART_WR5_TX_WORD_LENGTH_6:	bits = 6;	break;
+	case Z80DART_WR5_TX_WORD_LENGTH_7:	bits = 7;	break;
+	case Z80DART_WR5_TX_WORD_LENGTH_8:	bits = 8;	break;
 	}
 
 	return bits;
 }
 
-static void z80dart_reset_channel(const device_config *device, int channel)
+/*-------------------------------------------------
+    reset_channel - reset channel status
+-------------------------------------------------*/
+
+static void reset_channel(const device_config *device, int channel)
 {
 	z80dart_t *z80dart = get_safe_token(device);
 	dart_channel *ch = &z80dart->channel[channel];
@@ -401,8 +354,8 @@ static void z80dart_reset_channel(const device_config *device, int channel)
 	ch->tx_state = STATE_START;
 
 	/* reset external lines */
-	z80dart_rts_w(device, channel, 1);
-	z80dart_dtr_w(device, channel, 1);
+	RTS(1);
+	DTR(1);
 
 	if (channel == Z80DART_CH_A)
 	{
@@ -414,33 +367,30 @@ static void z80dart_reset_channel(const device_config *device, int channel)
 			z80dart->int_state[i] = 0;
 		}
 
-		z80dart_check_interrupt(device);
+		check_interrupts(device);
 	}
 }
 
-/***************************************************************************
-    SERIAL RECEIVE
-***************************************************************************/
+/*-------------------------------------------------
+    detect_start_bit - detect start bit
+-------------------------------------------------*/
 
-static int detect_start_bit(const device_config *device, int channel)
+static int detect_start_bit(dart_channel *ch)
 {
-	z80dart_t *z80dart = get_safe_token(device);
-	dart_channel *ch = &z80dart->channel[channel];
-	
-	if (!(ch->wr[3] & Z80DART_WR3_RX_ENABLE))
-		return 0;
+	if (!(ch->wr[3] & Z80DART_WR3_RX_ENABLE)) return 0;
 
-	return !z80dart_rxd_r(device, channel);
+	return !RXD;
 }
 
-static void shift_data_in(const device_config *device, int channel)
-{
-	z80dart_t *z80dart = get_safe_token(device);
-	dart_channel *ch = &z80dart->channel[channel];
+/*-------------------------------------------------
+    shift_data_in - shift in serial data
+-------------------------------------------------*/
 
+static void shift_data_in(dart_channel *ch)
+{
 	if (ch->rx_bits < 8)
 	{
-		int rxd = z80dart_rxd_r(device, channel);
+		int rxd = RXD;
 
 		ch->rx_shift >>= 1;
 		ch->rx_shift = (rxd << 7) | (ch->rx_shift & 0x7f);
@@ -449,23 +399,28 @@ static void shift_data_in(const device_config *device, int channel)
 	}
 }
 
-static int character_completed(const device_config *device, int channel)
-{
-	z80dart_t *z80dart = get_safe_token(device);
-	dart_channel *ch = &z80dart->channel[channel];
+/*-------------------------------------------------
+    character_completed - check if complete
+	data word has been transferred
+-------------------------------------------------*/
 
-	return ch->rx_bits == z80dart_get_rx_word_length(device, channel);
+static int character_completed(dart_channel *ch)
+{
+	return ch->rx_bits == get_rx_word_length(ch);
 }
+
+/*-------------------------------------------------
+    detect_parity_error - detect parity error
+-------------------------------------------------*/
 
 static void detect_parity_error(const device_config *device, int channel)
 {
 	z80dart_t *z80dart = get_safe_token(device);
 	dart_channel *ch = &z80dart->channel[channel];
 	
-	int rxd = z80dart_rxd_r(device, channel);
 	int parity = (ch->wr[1] & Z80DART_WR4_PARITY_EVEN) ? 1 : 0;
 
-	if (rxd != (ch->rx_parity ^ parity))
+	if (RXD != (ch->rx_parity ^ parity))
 	{
 		/* parity error detected */
 		ch->rx_error |= Z80DART_RR1_PARITY_ERROR;
@@ -475,29 +430,31 @@ static void detect_parity_error(const device_config *device, int channel)
 		case Z80DART_WR1_RX_INT_FIRST:
 			if (!ch->rx_first)
 			{
-				z80dart_trigger_interrupt(device, channel, INT_SPECIAL);
+				take_interrupt(device, channel, INT_SPECIAL);
 			}
 			break;
 		
 		case Z80DART_WR1_RX_INT_ALL_PARITY:
-			z80dart_trigger_interrupt(device, channel, INT_SPECIAL);
+			take_interrupt(device, channel, INT_SPECIAL);
 			break;
 		
 		case Z80DART_WR1_RX_INT_ALL:
-			z80dart_trigger_interrupt(device, channel, INT_RECEIVE);
+			take_interrupt(device, channel, INT_RECEIVE);
 			break;
 		}
 	}
 }
+
+/*-------------------------------------------------
+    detect_framing_error - detect framing error
+-------------------------------------------------*/
 
 static void detect_framing_error(const device_config *device, int channel)
 {
 	z80dart_t *z80dart = get_safe_token(device);
 	dart_channel *ch = &z80dart->channel[channel];
 	
-	int rxd = z80dart_rxd_r(device, channel);
-
-	if (!rxd)
+	if (!RXD)
 	{
 		/* framing error detected */
 		ch->rx_error |= Z80DART_RR1_FRAMING_ERROR;
@@ -507,30 +464,34 @@ static void detect_framing_error(const device_config *device, int channel)
 		case Z80DART_WR1_RX_INT_FIRST:
 			if (!ch->rx_first)
 			{
-				z80dart_trigger_interrupt(device, channel, INT_SPECIAL);
+				take_interrupt(device, channel, INT_SPECIAL);
 			}
 			break;
 		
 		case Z80DART_WR1_RX_INT_ALL_PARITY:
 		case Z80DART_WR1_RX_INT_ALL:
-			z80dart_trigger_interrupt(device, channel, INT_SPECIAL);
+			take_interrupt(device, channel, INT_SPECIAL);
 			break;
 		}
 	}
 }
+
+/*-------------------------------------------------
+    receive - receive serial data
+-------------------------------------------------*/
 
 static void receive(const device_config *device, int channel)
 {
 	z80dart_t *z80dart = get_safe_token(device);
 	dart_channel *ch = &z80dart->channel[channel];
 	
-	float stop_bits = z80dart_get_stop_bits(device, channel);
+	float stop_bits = get_stop_bits(ch);
 
 	switch (ch->rx_state)
 	{
 	case STATE_START:
 		/* check for start bit */
-		if (detect_start_bit(device, channel))
+		if (detect_start_bit(ch))
 		{
 			/* start bit detected */
 			ch->rx_shift = 0;
@@ -545,9 +506,9 @@ static void receive(const device_config *device, int channel)
 
 	case STATE_DATA:
 		/* shift bit into shift register */
-		shift_data_in(device, channel);
+		shift_data_in(ch);
 		
-		if (character_completed(device, channel))
+		if (character_completed(ch))
 		{
 			/* all data bits received */
 			if (ch->wr[4] & Z80DART_WR4_PARITY_ENABLE)
@@ -568,7 +529,7 @@ static void receive(const device_config *device, int channel)
 
 	case STATE_PARITY:
 		/* shift bit into shift register */
-		shift_data_in(device, channel);
+		shift_data_in(ch);
 
 		/* check for parity error */
 		detect_parity_error(device, channel);
@@ -582,7 +543,7 @@ static void receive(const device_config *device, int channel)
 
 	case STATE_STOP:
 		/* shift bit into shift register */
-		shift_data_in(device, channel);
+		shift_data_in(ch);
 
 		/* check for framing error */
 		detect_framing_error(device, channel);
@@ -593,7 +554,7 @@ static void receive(const device_config *device, int channel)
 
 	case STATE_STOP2:
 		/* shift bit into shift register */
-		shift_data_in(device, channel);
+		shift_data_in(ch);
 
 		/* check for framing error */
 		detect_framing_error(device, channel);
@@ -607,19 +568,17 @@ static void receive(const device_config *device, int channel)
 	}
 }
 
-/***************************************************************************
-    SERIAL TRANSMIT
-***************************************************************************/
-
-#define TXD(state) z80dart_txd_w(device, channel, 1);
+/*-------------------------------------------------
+    transmit - transmit serial data
+-------------------------------------------------*/
 
 static void transmit(const device_config *device, int channel)
 {
 	z80dart_t *z80dart = get_safe_token(device);
 	dart_channel *ch = &z80dart->channel[channel];
 	
-	int word_length = z80dart_get_tx_word_length(device, channel);
-	float stop_bits = z80dart_get_stop_bits(device, channel);
+	int word_length = get_tx_word_length(ch);
+	float stop_bits = get_stop_bits(ch);
 
 	switch (ch->tx_state)
 	{
@@ -636,7 +595,7 @@ static void transmit(const device_config *device, int channel)
 			ch->rr[0] |= Z80DART_RR0_TX_BUFFER_EMPTY;
 
 			if (ch->wr[1] & Z80DART_WR1_TX_INT_ENABLE)
-				z80dart_trigger_interrupt(device, channel, INT_TRANSMIT);
+				take_interrupt(device, channel, INT_TRANSMIT);
 
 			ch->tx_state = STATE_DATA;
 		}
@@ -702,7 +661,7 @@ static void transmit(const device_config *device, int channel)
 
 			/* when the RTS bit is reset, the _RTS output goes high after the transmitter empties */
 			if (!ch->rts)
-				z80dart_rts_w(device, channel, 1);
+				RTS(1);
 		}
 
 		ch->tx_state = STATE_START;
@@ -710,9 +669,9 @@ static void transmit(const device_config *device, int channel)
 	}
 }
 
-/***************************************************************************
-    CONTROL REGISTER READ/WRITE
-***************************************************************************/
+/*-------------------------------------------------
+    z80dart_c_r - read control register
+-------------------------------------------------*/
 
 READ8_DEVICE_HANDLER( z80dart_c_r )
 {
@@ -741,6 +700,10 @@ READ8_DEVICE_HANDLER( z80dart_c_r )
 
 	return data;
 }
+
+/*-------------------------------------------------
+    z80dart_c_w - write control register
+-------------------------------------------------*/
 
 WRITE8_DEVICE_HANDLER( z80dart_c_w )
 {
@@ -782,7 +745,7 @@ WRITE8_DEVICE_HANDLER( z80dart_c_w )
 		case Z80DART_WR0_CHANNEL_RESET:
 			/* channel reset */
 			LOG(("Z80DART \"%s\" Channel %c : Channel Reset\n", device->tag, 'A' + channel));
-			z80dart_reset_channel(device, channel);
+			reset_channel(device, channel);
 			break;
 
 		case Z80DART_WR0_ENABLE_INT_NEXT_RX:
@@ -835,31 +798,31 @@ WRITE8_DEVICE_HANDLER( z80dart_c_w )
 			break;
 		}
 
-		z80dart_check_interrupt(device);
+		check_interrupts(device);
 		break;
 
 	case 2:
 		/* interrupt vector */
-		z80dart_check_interrupt(device);
+		check_interrupts(device);
 		LOG(("Z80DART \"%s\" Channel %c : Interrupt Vector %02x\n", device->tag, 'A' + channel, data));
 		break;
 
 	case 3:
 		LOG(("Z80DART \"%s\" Channel %c : Receiver Enable %u\n", device->tag, 'A' + channel, (data & Z80DART_WR3_RX_ENABLE) ? 1 : 0));
 		LOG(("Z80DART \"%s\" Channel %c : Auto Enables %u\n", device->tag, 'A' + channel, (data & Z80DART_WR3_AUTO_ENABLES) ? 1 : 0));
-		LOG(("Z80DART \"%s\" Channel %c : Receiver Bits/Character %u\n", device->tag, 'A' + channel, z80dart_get_rx_word_length(device, channel)));
+		LOG(("Z80DART \"%s\" Channel %c : Receiver Bits/Character %u\n", device->tag, 'A' + channel, get_rx_word_length(ch)));
 		break;
 
 	case 4:
 		LOG(("Z80DART \"%s\" Channel %c : Parity Enable %u\n", device->tag, 'A' + channel, (data & Z80DART_WR4_PARITY_ENABLE) ? 1 : 0));
 		LOG(("Z80DART \"%s\" Channel %c : Parity %s\n", device->tag, 'A' + channel, (data & Z80DART_WR4_PARITY_EVEN) ? "Even" : "Odd"));
-		LOG(("Z80DART \"%s\" Channel %c : Stop Bits %f\n", device->tag, 'A' + channel, z80dart_get_stop_bits(device, channel)));
-		LOG(("Z80DART \"%s\" Channel %c : Clock Mode %uX\n", device->tag, 'A' + channel, z80dart_get_clock_mode(device, channel)));
+		LOG(("Z80DART \"%s\" Channel %c : Stop Bits %f\n", device->tag, 'A' + channel, get_stop_bits(ch)));
+		LOG(("Z80DART \"%s\" Channel %c : Clock Mode %uX\n", device->tag, 'A' + channel, get_clock_mode(ch)));
 		break;
 
 	case 5:
 		LOG(("Z80DART \"%s\" Channel %c : Transmitter Enable %u\n", device->tag, 'A' + channel, (data & Z80DART_WR5_TX_ENABLE) ? 1 : 0));
-		LOG(("Z80DART \"%s\" Channel %c : Transmitter Bits/Character %u\n", device->tag, 'A' + channel, z80dart_get_tx_word_length(device, channel)));
+		LOG(("Z80DART \"%s\" Channel %c : Transmitter Bits/Character %u\n", device->tag, 'A' + channel, get_tx_word_length(ch)));
 		LOG(("Z80DART \"%s\" Channel %c : Send Break %u\n", device->tag, 'A' + channel, (data & Z80DART_WR5_SEND_BREAK) ? 1 : 0));
 		LOG(("Z80DART \"%s\" Channel %c : Request to Send %u\n", device->tag, 'A' + channel, (data & Z80DART_WR5_RTS) ? 1 : 0));
 		LOG(("Z80DART \"%s\" Channel %c : Data Terminal Ready %u\n", device->tag, 'A' + channel, (data & Z80DART_WR5_DTR) ? 1 : 0));
@@ -867,7 +830,7 @@ WRITE8_DEVICE_HANDLER( z80dart_c_w )
 		if (data & Z80DART_WR5_RTS)
 		{
 			/* when the RTS bit is set, the _RTS output goes low */
-			z80dart_rts_w(device, channel, 0);
+			RTS(0);
 
 			ch->rts = 1;
 		}
@@ -879,14 +842,14 @@ WRITE8_DEVICE_HANDLER( z80dart_c_w )
 
 		/* data terminal ready output follows the state programmed into the DTR bit*/
 		ch->dtr = (data & Z80DART_WR5_DTR) ? 0 : 1;
-		z80dart_dtr_w(device, channel, ch->dtr);
+		DTR(ch->dtr);
 		break;
 	}
 }
 
-/***************************************************************************
-    DATA REGISTER READ/WRITE
-***************************************************************************/
+/*-------------------------------------------------
+    z80dart_d_r - read data register
+-------------------------------------------------*/
 
 READ8_DEVICE_HANDLER( z80dart_d_r )
 {
@@ -918,6 +881,10 @@ READ8_DEVICE_HANDLER( z80dart_d_r )
 	return data;
 }
 
+/*-------------------------------------------------
+    z80dart_d_w - write data register
+-------------------------------------------------*/
+
 WRITE8_DEVICE_HANDLER( z80dart_d_w )
 {
 	z80dart_t *z80dart = get_safe_token(device);
@@ -932,9 +899,9 @@ WRITE8_DEVICE_HANDLER( z80dart_d_w )
 	LOG(("Z80DART \"%s\" Channel %c : Data Register Write '%02x'\n", device->tag, 'A' + channel, data));
 }
 
-/***************************************************************************
-    CONTROL LINE READ/WRITE
-***************************************************************************/
+/*-------------------------------------------------
+    z80dart_receive_data - receive data word
+-------------------------------------------------*/
 
 void z80dart_receive_data(const device_config *device, int channel, UINT8 data)
 {
@@ -953,13 +920,13 @@ void z80dart_receive_data(const device_config *device, int channel, UINT8 data)
 		case Z80DART_WR1_RX_INT_FIRST:
 			if (!ch->rx_first)
 			{
-				z80dart_trigger_interrupt(device, channel, INT_SPECIAL);
+				take_interrupt(device, channel, INT_SPECIAL);
 			}
 			break;
 		
 		case Z80DART_WR1_RX_INT_ALL_PARITY:
 		case Z80DART_WR1_RX_INT_ALL:
-			z80dart_trigger_interrupt(device, channel, INT_SPECIAL);
+			take_interrupt(device, channel, INT_SPECIAL);
 			break;
 		}
 	}
@@ -980,7 +947,7 @@ void z80dart_receive_data(const device_config *device, int channel, UINT8 data)
 	case Z80DART_WR1_RX_INT_FIRST:
 		if (ch->rx_first)
 		{
-			z80dart_trigger_interrupt(device, channel, INT_RECEIVE);
+			take_interrupt(device, channel, INT_RECEIVE);
 
 			ch->rx_first = 0;
 		}
@@ -988,12 +955,16 @@ void z80dart_receive_data(const device_config *device, int channel, UINT8 data)
 
 	case Z80DART_WR1_RX_INT_ALL_PARITY:
 	case Z80DART_WR1_RX_INT_ALL:
-		z80dart_trigger_interrupt(device, channel, INT_RECEIVE);
+		take_interrupt(device, channel, INT_RECEIVE);
 		break;
 	}
 }
 
-void z80dart_cts_w(const device_config *device, int channel, int state)
+/*-------------------------------------------------
+    cts_w - clear to send handler
+-------------------------------------------------*/
+
+static void cts_w(const device_config *device, int channel, int state)
 {
 	z80dart_t *z80dart = get_safe_token(device);
 	dart_channel *ch = &z80dart->channel[channel];
@@ -1021,7 +992,7 @@ void z80dart_cts_w(const device_config *device, int channel, int state)
 			if (ch->wr[1] & Z80DART_WR1_EXT_INT_ENABLE)
 			{
 				/* trigger interrupt */
-				z80dart_trigger_interrupt(device, channel, INT_EXTERNAL);
+				take_interrupt(device, channel, INT_EXTERNAL);
 
 				/* latch read register 0 */
 				ch->rx_rr0_latch = 1;
@@ -1030,7 +1001,29 @@ void z80dart_cts_w(const device_config *device, int channel, int state)
 	}
 }
 
-void z80dart_dcd_w(const device_config *device, int channel, int state)
+/*-------------------------------------------------
+    z80dart_ctsa_w - clear to send (channel A)
+-------------------------------------------------*/
+
+void z80dart_ctsa_w(const device_config *device, int state)
+{
+	cts_w(device, Z80DART_CH_A, state);
+}
+
+/*-------------------------------------------------
+    z80dart_ctsb_w - clear to send (channel B)
+-------------------------------------------------*/
+
+void z80dart_ctsb_w(const device_config *device, int state)
+{
+	cts_w(device, Z80DART_CH_B, state);
+}
+
+/*-------------------------------------------------
+    dcd_w - data carrier detected handler
+-------------------------------------------------*/
+
+void dcd_w(const device_config *device, int channel, int state)
 {
 	z80dart_t *z80dart = get_safe_token(device);
 	dart_channel *ch = &z80dart->channel[channel];
@@ -1057,7 +1050,7 @@ void z80dart_dcd_w(const device_config *device, int channel, int state)
 			if (ch->wr[1] & Z80DART_WR1_EXT_INT_ENABLE)
 			{
 				/* trigger interrupt */
-				z80dart_trigger_interrupt(device, channel, INT_EXTERNAL);
+				take_interrupt(device, channel, INT_EXTERNAL);
 
 				/* latch read register 0 */
 				ch->rx_rr0_latch = 1;
@@ -1066,7 +1059,31 @@ void z80dart_dcd_w(const device_config *device, int channel, int state)
 	}
 }
 
-void z80dart_ri_w(const device_config *device, int channel, int state)
+/*-------------------------------------------------
+    z80dart_dcda_w - data carrier detected 
+	(channel A)
+-------------------------------------------------*/
+
+void z80dart_dcda_w(const device_config *device, int state)
+{
+	dcd_w(device, Z80DART_CH_A, state);
+}
+
+/*-------------------------------------------------
+    z80dart_dcdb_w - data carrier detected 
+	(channel B)
+-------------------------------------------------*/
+
+void z80dart_dcdb_w(const device_config *device, int state)
+{
+	dcd_w(device, Z80DART_CH_B, state);
+}
+
+/*-------------------------------------------------
+    ri_w - ring indicator handler
+-------------------------------------------------*/
+
+static void ri_w(const device_config *device, int channel, int state)
 {
 	z80dart_t *z80dart = get_safe_token(device);
 	dart_channel *ch = &z80dart->channel[channel];
@@ -1088,7 +1105,7 @@ void z80dart_ri_w(const device_config *device, int channel, int state)
 			if (ch->wr[1] & Z80DART_WR1_EXT_INT_ENABLE)
 			{
 				/* trigger interrupt */
-				z80dart_trigger_interrupt(device, channel, INT_EXTERNAL);
+				take_interrupt(device, channel, INT_EXTERNAL);
 
 				/* latch read register 0 */
 				ch->rx_rr0_latch = 1;
@@ -1097,16 +1114,36 @@ void z80dart_ri_w(const device_config *device, int channel, int state)
 	}
 }
 
-/***************************************************************************
-    CLOCK MANAGEMENT
-***************************************************************************/
+/*-------------------------------------------------
+    z80dart_ria_w - ring indicator (channel A)
+-------------------------------------------------*/
 
-void z80dart_rxca_w(const device_config *device)
+void z80dart_ria_w(const device_config *device, int state)
+{
+	ri_w(device, Z80DART_CH_A, state);
+}
+
+/*-------------------------------------------------
+    z80dart_rib_w - ring indicator (channel B)
+-------------------------------------------------*/
+
+void z80dart_rib_w(const device_config *device, int state)
+{
+	ri_w(device, Z80DART_CH_B, state);
+}
+
+/*-------------------------------------------------
+    z80dart_rxca_w - receive clock (channel A)
+-------------------------------------------------*/
+
+void z80dart_rxca_w(const device_config *device, int state)
 {
 	z80dart_t *z80dart = get_safe_token(device);
 	dart_channel *ch = &z80dart->channel[Z80DART_CH_A];
 
-	int clocks = z80dart_get_clock_mode(device, Z80DART_CH_A);
+	int clocks = get_clock_mode(ch);
+
+	if (!state) return;
 
 	LOG(("Z80DART \"%s\" Channel A : Receiver Clock Pulse\n", device->tag));
 	
@@ -1121,12 +1158,18 @@ void z80dart_rxca_w(const device_config *device)
 	}
 }
 
-void z80dart_txca_w(const device_config *device)
+/*-------------------------------------------------
+    z80dart_txca_w - transmit clock (channel A)
+-------------------------------------------------*/
+
+void z80dart_txca_w(const device_config *device, int state)
 {
 	z80dart_t *z80dart = get_safe_token(device);
 	dart_channel *ch = &z80dart->channel[Z80DART_CH_A];
 
-	int clocks = z80dart_get_clock_mode(device, Z80DART_CH_A);
+	int clocks = get_clock_mode(ch);
+
+	if (!state) return;
 
 	LOG(("Z80DART \"%s\" Channel A : Transmitter Clock Pulse\n", device->tag));
 	
@@ -1141,12 +1184,19 @@ void z80dart_txca_w(const device_config *device)
 	}
 }
 
-void z80dart_rxtxcb_w(const device_config *device)
+/*-------------------------------------------------
+    z80dart_rxtxcb_w - receive/transmit clock 
+	(channel B)
+-------------------------------------------------*/
+
+void z80dart_rxtxcb_w(const device_config *device, int state)
 {
 	z80dart_t *z80dart = get_safe_token(device);
 	dart_channel *ch = &z80dart->channel[Z80DART_CH_B];
 
-	int clocks = z80dart_get_clock_mode(device, Z80DART_CH_B);
+	int clocks = get_clock_mode(ch);
+
+	if (!state) return;
 
 	LOG(("Z80DART \"%s\" Channel A : Receiver/Transmitter Clock Pulse\n", device->tag));
 	
@@ -1164,24 +1214,36 @@ void z80dart_rxtxcb_w(const device_config *device)
 	}
 }
 
+/*-------------------------------------------------
+    TIMER_CALLBACK( rxca_tick )
+-------------------------------------------------*/
+
 static TIMER_CALLBACK( rxca_tick )
 {
-	z80dart_rxca_w(ptr);
+	z80dart_rxca_w(ptr, 1);
 }
+
+/*-------------------------------------------------
+    TIMER_CALLBACK( txca_tick )
+-------------------------------------------------*/
 
 static TIMER_CALLBACK( txca_tick )
 {
-	z80dart_txca_w(ptr);
+	z80dart_txca_w(ptr, 1);
 }
+
+/*-------------------------------------------------
+    TIMER_CALLBACK( rxtxcb_tick )
+-------------------------------------------------*/
 
 static TIMER_CALLBACK( rxtxcb_tick )
 {
-	z80dart_rxtxcb_w(ptr);
+	z80dart_rxtxcb_w(ptr, 1);
 }
 
-/***************************************************************************
-    DAISY CHAIN INTERFACE
-***************************************************************************/
+/*-------------------------------------------------
+    z80dart_irq_state - get interrupt status
+-------------------------------------------------*/
 
 static int z80dart_irq_state(const device_config *device)
 {
@@ -1210,6 +1272,10 @@ static int z80dart_irq_state(const device_config *device)
 	return state;
 }
 
+/*-------------------------------------------------
+    z80dart_irq_ack - interrupt acknowledge
+-------------------------------------------------*/
+
 static int z80dart_irq_ack(const device_config *device)
 {
 	z80dart_t *z80dart = get_safe_token( device );
@@ -1226,7 +1292,7 @@ static int z80dart_irq_ack(const device_config *device)
 			/* clear interrupt, switch to the IEO state, and update the IRQs */
 			z80dart->int_state[i] = Z80_DAISY_IEO;
 			z80dart->channel[Z80DART_CH_A].rr[0] &= ~Z80DART_RR0_INTERRUPT_PENDING;
-			z80dart_check_interrupt(device);
+			check_interrupts(device);
 
 			LOG(("Z80DART \"%s\" : Interrupt Acknowledge Vector %02x\n", device->tag, z80dart->channel[Z80DART_CH_B].rr[2]));
 
@@ -1238,6 +1304,10 @@ static int z80dart_irq_ack(const device_config *device)
 	
 	return z80dart->channel[Z80DART_CH_B].rr[2];
 }
+
+/*-------------------------------------------------
+    z80dart_irq_reti - return from interrupt
+-------------------------------------------------*/
 
 static void z80dart_irq_reti(const device_config *device)
 {
@@ -1254,7 +1324,7 @@ static void z80dart_irq_reti(const device_config *device)
 		{
 			/* clear the IEO state and update the IRQs */
 			z80dart->int_state[i] &= ~Z80_DAISY_IEO;
-			z80dart_check_interrupt(device);
+			check_interrupts(device);
 			return;
 		}
 	}
@@ -1262,14 +1332,18 @@ static void z80dart_irq_reti(const device_config *device)
 	logerror("z80dart_irq_reti: failed to find an interrupt to clear IEO on!\n");
 }
 
-/***************************************************************************
-    READ/WRITE HANDLERS
-***************************************************************************/
+/*-------------------------------------------------
+    z80dart_r - register read
+-------------------------------------------------*/
 
 READ8_DEVICE_HANDLER( z80dart_r )
 {
 	return (offset & 2) ? z80dart_c_r(device, offset & 1) : z80dart_d_r(device, offset & 1);
 }
+
+/*-------------------------------------------------
+    z80dart_w - register write
+-------------------------------------------------*/
 
 WRITE8_DEVICE_HANDLER( z80dart_w )
 {
@@ -1279,12 +1353,20 @@ WRITE8_DEVICE_HANDLER( z80dart_w )
 		z80dart_d_w(device, offset & 1, data);
 }
 
+/*-------------------------------------------------
+    z80dart_alt_r - alternate register read
+-------------------------------------------------*/
+
 READ8_DEVICE_HANDLER( z80dart_alt_r )
 {
 	int channel = BIT(offset, 1);
 
 	return (offset & 1) ? z80dart_c_r(device, channel) : z80dart_d_r(device, channel);
 }
+
+/*-------------------------------------------------
+    z80dart_alt_w - alternate register write
+-------------------------------------------------*/
 
 WRITE8_DEVICE_HANDLER( z80dart_alt_w )
 {
@@ -1296,60 +1378,86 @@ WRITE8_DEVICE_HANDLER( z80dart_alt_w )
 		z80dart_d_w(device, channel, data);
 }
 
-/***************************************************************************
-    DEVICE INTERFACE
-***************************************************************************/
+/*-------------------------------------------------
+    DEVICE_START( z80dart )
+-------------------------------------------------*/
 
 static DEVICE_START( z80dart )
 {
-	const z80dart_interface *intf = device->static_config;
 	z80dart_t *z80dart = get_safe_token(device);
-	const device_config *cpu = NULL;
+	const z80dart_interface *intf = device->static_config;
+	int channel;
 
-	assert(intf != NULL);
-	z80dart->intf = intf;
+	/* resolve callbacks */
+	devcb_resolve_read_line(&z80dart->channel[Z80DART_CH_A].in_rxd_func, &intf->in_rxda_func, device);
+	devcb_resolve_write_line(&z80dart->channel[Z80DART_CH_A].out_txd_func, &intf->out_txda_func, device);
+	devcb_resolve_write_line(&z80dart->channel[Z80DART_CH_A].out_dtr_func, &intf->out_dtra_func, device);
+	devcb_resolve_write_line(&z80dart->channel[Z80DART_CH_A].out_rts_func, &intf->out_rtsa_func, device);
+	devcb_resolve_write_line(&z80dart->channel[Z80DART_CH_A].out_wrdy_func, &intf->out_wrdya_func, device);
+	devcb_resolve_read_line(&z80dart->channel[Z80DART_CH_B].in_rxd_func, &intf->in_rxdb_func, device);
+	devcb_resolve_write_line(&z80dart->channel[Z80DART_CH_B].out_txd_func, &intf->out_txdb_func, device);
+	devcb_resolve_write_line(&z80dart->channel[Z80DART_CH_B].out_dtr_func, &intf->out_dtrb_func, device);
+	devcb_resolve_write_line(&z80dart->channel[Z80DART_CH_B].out_rts_func, &intf->out_rtsb_func, device);
+	devcb_resolve_write_line(&z80dart->channel[Z80DART_CH_B].out_wrdy_func, &intf->out_wrdyb_func, device);
+	devcb_resolve_write_line(&z80dart->out_int_func, &intf->out_int_func, device);
 
-	/* get clock */
-
-	if (intf->cpu != NULL)
+	if (intf->rx_clock_a)
 	{
-		cpu = cputag_get_cpu(device->machine, intf->cpu);
+		/* allocate channel A receive timer */
+		z80dart->rxca_timer = timer_alloc(device->machine, rxca_tick, (void *)device);
+		timer_adjust_periodic(z80dart->rxca_timer, attotime_zero, 0, ATTOTIME_IN_HZ(intf->rx_clock_a));
 	}
 
-	if (cpu != NULL)
+	if (intf->tx_clock_a)
 	{
-		z80dart->clock = cpu_get_clock(cpu);
-	}
-	else
-	{
-		assert(intf->clock > 0);
-		z80dart->clock = intf->clock;
+		/* allocate channel A transmit timer */
+		z80dart->txca_timer = timer_alloc(device->machine, txca_tick, (void *)device);
+		timer_adjust_periodic(z80dart->txca_timer, attotime_zero, 0, ATTOTIME_IN_HZ(intf->tx_clock_a));
 	}
 
-	/* allocate channel A receive timer */
-
-	z80dart->rxca_timer = timer_alloc(device->machine, rxca_tick, (void *)device);
-
-	if (z80dart->intf->rx_clock_a)
-		timer_adjust_periodic(z80dart->rxca_timer, attotime_zero, 0, ATTOTIME_IN_HZ(z80dart->intf->rx_clock_a));
-
-	/* allocate channel A transmit timer */
-
-	z80dart->txca_timer = timer_alloc(device->machine, txca_tick, (void *)device);
-
-	if (z80dart->intf->tx_clock_a)
-		timer_adjust_periodic(z80dart->txca_timer, attotime_zero, 0, ATTOTIME_IN_HZ(z80dart->intf->tx_clock_a));
-
-	/* allocate channel B receive/transmit timer */
-
-	z80dart->rxtxcb_timer = timer_alloc(device->machine, rxtxcb_tick, (void *)device);
-
-	if (z80dart->intf->rx_tx_clock_b)
-		timer_adjust_periodic(z80dart->rxtxcb_timer, attotime_zero, 0, ATTOTIME_IN_HZ(z80dart->intf->rx_tx_clock_b));
+	if (intf->rx_tx_clock_b)
+	{
+		/* allocate channel B receive/transmit timer */
+		z80dart->rxtxcb_timer = timer_alloc(device->machine, rxtxcb_tick, (void *)device);
+		timer_adjust_periodic(z80dart->rxtxcb_timer, attotime_zero, 0, ATTOTIME_IN_HZ(intf->rx_tx_clock_b));
+	}
 
 	/* register for state saving */
-	//state_save_register_item_array(machine, "z80dart", device->tag, 0, z80dart->);
+	for (channel = Z80DART_CH_A; channel <= Z80DART_CH_B; channel++)
+	{
+		state_save_register_device_item_array(device, channel, z80dart->channel[channel].rr);
+		state_save_register_device_item_array(device, channel, z80dart->channel[channel].wr);
+		state_save_register_device_item_array(device, channel, z80dart->channel[channel].rx_data_fifo);
+		state_save_register_device_item_array(device, channel, z80dart->channel[channel].rx_error_fifo);
+		state_save_register_device_item(device, channel, z80dart->channel[channel].rx_shift);
+		state_save_register_device_item(device, channel, z80dart->channel[channel].rx_error);
+		state_save_register_device_item(device, channel, z80dart->channel[channel].rx_fifo);
+		state_save_register_device_item(device, channel, z80dart->channel[channel].rx_clock);
+		state_save_register_device_item(device, channel, z80dart->channel[channel].rx_state);
+		state_save_register_device_item(device, channel, z80dart->channel[channel].rx_bits);
+		state_save_register_device_item(device, channel, z80dart->channel[channel].rx_first);
+		state_save_register_device_item(device, channel, z80dart->channel[channel].rx_parity);
+		state_save_register_device_item(device, channel, z80dart->channel[channel].rx_break);
+		state_save_register_device_item(device, channel, z80dart->channel[channel].rx_rr0_latch);
+		state_save_register_device_item(device, channel, z80dart->channel[channel].ri);
+		state_save_register_device_item(device, channel, z80dart->channel[channel].cts);
+		state_save_register_device_item(device, channel, z80dart->channel[channel].dcd);
+		state_save_register_device_item(device, channel, z80dart->channel[channel].tx_data);
+		state_save_register_device_item(device, channel, z80dart->channel[channel].tx_shift);
+		state_save_register_device_item(device, channel, z80dart->channel[channel].tx_clock);
+		state_save_register_device_item(device, channel, z80dart->channel[channel].tx_state);
+		state_save_register_device_item(device, channel, z80dart->channel[channel].tx_bits);
+		state_save_register_device_item(device, channel, z80dart->channel[channel].tx_parity);
+		state_save_register_device_item(device, channel, z80dart->channel[channel].dtr);
+		state_save_register_device_item(device, channel, z80dart->channel[channel].rts);
+	}
+
+	state_save_register_device_item_array(device, 0, z80dart->int_state);
 }
+
+/*-------------------------------------------------
+    DEVICE_RESET( z80dart )
+-------------------------------------------------*/
 
 static DEVICE_RESET( z80dart )
 {
@@ -1359,11 +1467,15 @@ static DEVICE_RESET( z80dart )
 
 	for (channel = Z80DART_CH_A; channel <= Z80DART_CH_B; channel++)
 	{
-		z80dart_reset_channel(device, channel);
+		reset_channel(device, channel);
 	}
 
-	z80dart_check_interrupt(device);
+	check_interrupts(device);
 }
+
+/*-------------------------------------------------
+    DEVICE_SET_INFO( z80dart )
+-------------------------------------------------*/
 
 static DEVICE_SET_INFO( z80dart )
 {
@@ -1372,6 +1484,10 @@ static DEVICE_SET_INFO( z80dart )
 		/* no parameters to set */
 	}
 }
+
+/*-------------------------------------------------
+    DEVICE_GET_INFO( z80dart )
+-------------------------------------------------*/
 
 DEVICE_GET_INFO( z80dart )
 {
@@ -1392,10 +1508,10 @@ DEVICE_GET_INFO( z80dart )
 		case DEVINFO_FCT_IRQ_RETI:						info->f = (genf *)z80dart_irq_reti;				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Zilog Z80 DART");						break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Z80");								break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");								break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);								break;
-		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team");			break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Zilog Z80 DART");				break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Z80");							break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team");		break;
 	}
 }

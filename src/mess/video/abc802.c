@@ -195,7 +195,7 @@ static MC6845_ON_VSYNC_CHANGED(abc802_vsync_changed)
 	}
 
 	/* signal _DEW to DART */
-	z80dart_ri_w(state->z80dart, 1, !vsync);
+	z80dart_rib_w(state->z80dart, !vsync);
 }
 
 /* MC6845 Interfaces */

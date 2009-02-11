@@ -94,6 +94,20 @@ Notes:
 #include "machine/wd17xx.h"
 #include "machine/abcbus.h"
 
+/***************************************************************************
+    PARAMETERS
+***************************************************************************/
+
+#define Z80_TAG		"5a"
+#define Z80PIO_TAG	"3a"
+#define Z80DMA_TAG	"z80dma"
+#define WD1791_TAG	"wd1791"
+#define SAB1793_TAG	"sab1793"
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
 typedef struct _slow_t slow_t;
 struct _slow_t
 {
@@ -105,6 +119,7 @@ struct _slow_t
 	/* devices */
 	const device_config *cpu;
 	const device_config *z80pio;
+	const device_config *wd1791;
 };
 
 typedef struct _fast_t fast_t;
@@ -117,13 +132,17 @@ struct _fast_t
 	/* devices */
 	const device_config *cpu;
 	const device_config *z80dma;
+	const device_config *wd1793;
 };
+
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
 
 INLINE slow_t *get_safe_token_slow(const device_config *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
-
 	return (slow_t *)device->token;
 }
 
@@ -131,7 +150,6 @@ INLINE fast_t *get_safe_token_fast(const device_config *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
-
 	return (fast_t *)device->token;
 }
 
@@ -147,11 +165,14 @@ INLINE fast_t *get_safe_token_machine_fast(running_machine *machine)
 	return get_safe_token_fast(device);
 }
 
-static const device_config *get_floppy_image(running_machine *machine, int drive)
+INLINE const device_config *get_floppy_image(running_machine *machine, int drive)
 {
 	return image_from_devtype_and_index(machine, IO_FLOPPY, drive);
 }
 
+/***************************************************************************
+    IMPLEMENTATION
+***************************************************************************/
 
 /* Slow Controller */
 
@@ -229,7 +250,6 @@ static ABCBUS_CARD_SELECT( luxor_55_10828 )
 
 static WRITE8_HANDLER( slow_ctrl_w )
 {
-	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD179X, "wd179x");
 	/*
 
 		bit		description
@@ -245,10 +265,12 @@ static WRITE8_HANDLER( slow_ctrl_w )
 
 	*/
 
+	slow_t *conkort = get_safe_token_machine_slow(space->machine);
+
 	/* drive selection */
-	if (!BIT(data, 0)) wd17xx_set_drive(fdc,0);
-	if (!BIT(data, 1)) wd17xx_set_drive(fdc,1);
-//	if (!BIT(data, 2)) wd17xx_set_drive(fdc,2);
+	if (!BIT(data, 0)) wd17xx_set_drive(conkort->wd1791, 0);
+	if (!BIT(data, 1)) wd17xx_set_drive(conkort->wd1791, 1);
+//	if (!BIT(data, 2)) wd17xx_set_drive(conkort->wd1791, 2);
 
 	/* motor enable */
 	floppy_drive_set_motor_state(get_floppy_image(space->machine, 0), !BIT(data, 3));
@@ -257,12 +279,12 @@ static WRITE8_HANDLER( slow_ctrl_w )
 	floppy_drive_set_ready_state(get_floppy_image(space->machine, 1), 1, 1);
 
 	/* disk side selection */
-	wd17xx_set_side(fdc,!BIT(data, 4));
+	wd17xx_set_side(conkort->wd1791,!BIT(data, 4));
 
 	if (!BIT(data, 7))
 	{
 		/* FDC master reset */
-		wd17xx_reset(fdc);
+		wd17xx_reset(conkort->wd1791);
 	}
 }
 
@@ -411,8 +433,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slow_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x7c, 0x7f) AM_DEVREADWRITE(Z80PIO, CONKORT_Z80PIO_TAG, z80pio_alt_r, z80pio_alt_w)
-	AM_RANGE(0xbc, 0xbf) AM_DEVREADWRITE(WD179X, "wd179x", wd17xx_r, wd17xx_w)
+	AM_RANGE(0x7c, 0x7f) AM_DEVREADWRITE(Z80PIO, Z80PIO_TAG, z80pio_alt_r, z80pio_alt_w)
+	AM_RANGE(0xbc, 0xbf) AM_DEVREADWRITE(WD179X, WD1791_TAG, wd17xx_r, wd17xx_w)
 	AM_RANGE(0xdf, 0xdf) AM_WRITE(slow_status_w)
 	AM_RANGE(0xef, 0xef) AM_WRITE(slow_ctrl_w)
 ADDRESS_MAP_END
@@ -432,9 +454,9 @@ static ADDRESS_MAP_START( fast_io_map, ADDRESS_SPACE_IO, 8 )
 //	AM_RANGE(0x3f, 0x3f) AM_WRITE()
 //	AM_RANGE(0x4f, 0x4f) AM_WRITE()
 	AM_RANGE(0x5d, 0x5d) AM_READ(fast_ctrl_r)
-	AM_RANGE(0x68, 0x6b) AM_DEVREAD(WD1793, "wd1793", wd17xx_r)
-	AM_RANGE(0x78, 0x7b) AM_DEVWRITE(WD1793, "wd1793", wd17xx_w)
-	AM_RANGE(0x87, 0x87) AM_DEVREADWRITE(Z80DMA, CONKORT_Z80DMA_TAG, z80dma_r, z80dma_w)
+	AM_RANGE(0x68, 0x6b) AM_DEVREAD(WD1793, SAB1793_TAG, wd17xx_r)
+	AM_RANGE(0x78, 0x7b) AM_DEVWRITE(WD1793, SAB1793_TAG, wd17xx_w)
+	AM_RANGE(0x87, 0x87) AM_DEVREADWRITE(Z80DMA, Z80DMA_TAG, z80dma_r, z80dma_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -572,7 +594,7 @@ static const z80pio_interface conkort_pio_intf =
 
 static const z80_daisy_chain slow_daisy_chain[] =
 {
-	{ Z80PIO, CONKORT_Z80PIO_TAG },
+	{ Z80PIO, Z80PIO_TAG },
 	{ NULL }
 };
 
@@ -684,7 +706,7 @@ static const z80dma_interface dma_intf =
 
 static const z80_daisy_chain fast_daisy_chain[] =
 {
-	{ Z80DMA, CONKORT_Z80DMA_TAG },
+	{ Z80DMA, Z80DMA_TAG },
 	{ NULL }
 };
 
@@ -709,7 +731,11 @@ static WD17XX_CALLBACK( slow_wd1791_callback )
 	}
 }
 
-static const wd17xx_interface slow_wd17xx_interface = { slow_wd1791_callback, NULL };
+static const wd17xx_interface slow_wd17xx_interface =
+{
+	slow_wd1791_callback, 
+	NULL
+};
 
 /* FD1793 */
 
@@ -732,29 +758,31 @@ static WD17XX_CALLBACK( fast_wd1793_callback )
 	}
 }
 
-static const wd17xx_interface fast_wd17xx_interface = { fast_wd1793_callback };
+static const wd17xx_interface fast_wd17xx_interface = 
+{ 
+	fast_wd1793_callback
+};
 
 /* Machine Driver */
 
 static MACHINE_DRIVER_START( luxor_55_10828 )
-	MDRV_CPU_ADD(CONKORT_Z80_TAG, Z80, XTAL_4MHz/2)
+	MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_4MHz/2)
 	MDRV_CPU_PROGRAM_MAP(slow_map, 0)
 	MDRV_CPU_IO_MAP(slow_io_map, 0)
 	MDRV_CPU_CONFIG(slow_daisy_chain)
 
-	MDRV_Z80PIO_ADD(CONKORT_Z80PIO_TAG, conkort_pio_intf)
-	MDRV_WD179X_ADD("wd179x", slow_wd17xx_interface )
+	MDRV_Z80PIO_ADD(Z80PIO_TAG, conkort_pio_intf)
+	MDRV_WD179X_ADD(WD1791_TAG, slow_wd17xx_interface )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( luxor_55_21046 )
-	MDRV_CPU_ADD(CONKORT_Z80_TAG, Z80, XTAL_16MHz/4)
+	MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
 	MDRV_CPU_PROGRAM_MAP(fast_map, 0)
 	MDRV_CPU_IO_MAP(fast_io_map, 0)
 	MDRV_CPU_CONFIG(fast_daisy_chain)
 
-	MDRV_Z80DMA_ADD(CONKORT_Z80DMA_TAG, XTAL_16MHz/4, dma_intf)
-
-	MDRV_WD1793_ADD("wd1793", fast_wd17xx_interface )
+	MDRV_Z80DMA_ADD(Z80DMA_TAG, XTAL_16MHz/4, dma_intf)
+	MDRV_WD1793_ADD(SAB1793_TAG, fast_wd17xx_interface )
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -804,7 +832,9 @@ ROM_START( hdd_controller )
 	ROM_LOAD( "st225.bin",    0x0800, 0x0800, CRC(c9f68f81) SHA1(7ff8b2a19f71fe0279ab3e5a0a5fffcb6030360c) ) // Seagate ST225
 ROM_END
 
-/* Device Interface */
+/*-------------------------------------------------
+    DEVICE_START( luxor_55_10828 )
+-------------------------------------------------*/
 
 static DEVICE_START( luxor_55_10828 )
 {
@@ -815,12 +845,14 @@ static DEVICE_START( luxor_55_10828 )
 	assert(device->tag != NULL);
 
 	/* find our CPU */
-	astring_printf(tempstring, "%s:%s", device->tag, CONKORT_Z80_TAG);
+	astring_printf(tempstring, "%s:%s", device->tag, Z80_TAG);
 	conkort->cpu = cputag_get_cpu(device->machine, astring_c(tempstring));
 
 	/* find devices */
-	astring_printf(tempstring, "%s:%s", device->tag, CONKORT_Z80PIO_TAG);
+	astring_printf(tempstring, "%s:%s", device->tag, Z80PIO_TAG);
 	conkort->z80pio = devtag_get_device(device->machine, Z80PIO, astring_c(tempstring));
+	astring_printf(tempstring, "%s:%s", device->tag, WD1791_TAG);
+	conkort->wd1791 = devtag_get_device(device->machine, Z80DMA, astring_c(tempstring));
 
 	/* register for state saving */
 	state_save_register_device_item(device, 0, conkort->status);
@@ -831,10 +863,18 @@ static DEVICE_START( luxor_55_10828 )
 	astring_free(tempstring);
 }
 
+/*-------------------------------------------------
+    DEVICE_RESET( luxor_55_10828 )
+-------------------------------------------------*/
+
 static DEVICE_RESET( luxor_55_10828 )
 {
 
 }
+
+/*-------------------------------------------------
+    DEVICE_SET_INFO( luxor_55_10828 )
+-------------------------------------------------*/
 
 static DEVICE_SET_INFO( luxor_55_10828 )
 {
@@ -843,6 +883,10 @@ static DEVICE_SET_INFO( luxor_55_10828 )
 		/* no parameters to set */
 	}
 }
+
+/*-------------------------------------------------
+    DEVICE_GET_INFO( luxor_55_10828 )
+-------------------------------------------------*/
 
 DEVICE_GET_INFO( luxor_55_10828 )
 {
@@ -865,13 +909,17 @@ DEVICE_GET_INFO( luxor_55_10828 )
 		case DEVINFO_FCT_ABCBUS_CARD_SELECT:			info->f = (genf *)ABCBUS_CARD_SELECT_NAME(luxor_55_10828);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Luxor 55 10828-01");								break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Luxor ABC");										break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");											break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);											break;
-		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team"); 						break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Luxor 55 10828-01");						break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Luxor ABC");								break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");										break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);									break;
+		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team"); 				break;
 	}
 }
+
+/*-------------------------------------------------
+    DEVICE_START( luxor_55_21046 )
+-------------------------------------------------*/
 
 static DEVICE_START( luxor_55_21046 )
 {
@@ -882,12 +930,14 @@ static DEVICE_START( luxor_55_21046 )
 	assert(device->tag != NULL);
 
 	/* find our CPU */
-	astring_printf(tempstring, "%s:%s", device->tag, CONKORT_Z80_TAG);
+	astring_printf(tempstring, "%s:%s", device->tag, Z80_TAG);
 	conkort->cpu = cputag_get_cpu(device->machine, astring_c(tempstring));
 
 	/* find devices */
-	astring_printf(tempstring, "%s:%s", device->tag, CONKORT_Z80DMA_TAG);
+	astring_printf(tempstring, "%s:%s", device->tag, Z80DMA_TAG);
 	conkort->z80dma = devtag_get_device(device->machine, Z80DMA, astring_c(tempstring));
+	astring_printf(tempstring, "%s:%s", device->tag, SAB1793_TAG);
+	conkort->wd1793 = devtag_get_device(device->machine, Z80DMA, astring_c(tempstring));
 
 	/* register for state saving */
 	state_save_register_device_item(device, 0, conkort->status);
@@ -897,9 +947,17 @@ static DEVICE_START( luxor_55_21046 )
 	astring_free(tempstring);
 }
 
+/*-------------------------------------------------
+    DEVICE_RESET( luxor_55_21046 )
+-------------------------------------------------*/
+
 static DEVICE_RESET( luxor_55_21046 )
 {
 }
+
+/*-------------------------------------------------
+    DEVICE_SET_INFO( luxor_55_21046 )
+-------------------------------------------------*/
 
 static DEVICE_SET_INFO( luxor_55_21046 )
 {
@@ -908,6 +966,10 @@ static DEVICE_SET_INFO( luxor_55_21046 )
 		/* no parameters to set */
 	}
 }
+
+/*-------------------------------------------------
+    DEVICE_GET_INFO( luxor_55_21046 )
+-------------------------------------------------*/
 
 DEVICE_GET_INFO( luxor_55_21046 )
 {
@@ -930,10 +992,10 @@ DEVICE_GET_INFO( luxor_55_21046 )
 		case DEVINFO_FCT_ABCBUS_CARD_SELECT:			info->f = (genf *)ABCBUS_CARD_SELECT_NAME(luxor_55_21046);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Luxor Conkort 55 21046-xx");						break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Luxor ABC");										break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");											break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);											break;
-		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team"); 						break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Luxor Conkort 55 21046-xx");				break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Luxor ABC");								break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");										break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);									break;
+		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team"); 				break;
 	}
 }

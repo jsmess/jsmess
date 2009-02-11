@@ -1,7 +1,12 @@
 #include "driver.h"
 #include "e0516.h"
 
-enum {
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+enum
+{
 	E0516_REGISTER_SECOND = 0,
 	E0516_REGISTER_MINUTE,
 	E0516_REGISTER_HOUR,
@@ -15,8 +20,6 @@ enum {
 typedef struct _e0516_t e0516_t;
 struct _e0516_t
 {
-	const e0516_interface *intf;	/* interface */
-
 	int cs;							/* chip select */
 	int data_latch;					/* data latch */
 	int reg_latch;					/* register latch */
@@ -31,17 +34,26 @@ struct _e0516_t
 	emu_timer *clock_timer;		/* clock timer */
 };
 
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
+
 INLINE e0516_t *get_safe_token(const device_config *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
-
 	return (e0516_t *)device->token;
 }
 
-/* Timer Callbacks */
+/***************************************************************************
+    IMPLEMENTATION
+***************************************************************************/
 
-static TIMER_CALLBACK(clock_tick)
+/*-------------------------------------------------
+    TIMER_CALLBACK( clock_tick )
+-------------------------------------------------*/
+
+static TIMER_CALLBACK( clock_tick )
 {
 	const device_config *device = ptr;
 	e0516_t *e0516 = get_safe_token(device);
@@ -85,7 +97,9 @@ static TIMER_CALLBACK(clock_tick)
 	}
 }
 
-/* Serial Data Input/Output */
+/*-------------------------------------------------
+    e0516_dio_r - data out
+-------------------------------------------------*/
 
 int e0516_dio_r(const device_config *device)
 {
@@ -94,6 +108,10 @@ int e0516_dio_r(const device_config *device)
 	return e0516->dio;
 }
 
+/*-------------------------------------------------
+    e0516_dio_w - data in
+-------------------------------------------------*/
+
 void e0516_dio_w(const device_config *device, int level)
 {
 	e0516_t *e0516 = get_safe_token(device);
@@ -101,7 +119,9 @@ void e0516_dio_w(const device_config *device, int level)
 	e0516->dio = level;
 }
 
-/* Clock */
+/*-------------------------------------------------
+    e0516_clk_w - clock in
+-------------------------------------------------*/
 
 void e0516_clk_w(const device_config *device, int level)
 {
@@ -166,7 +186,9 @@ void e0516_clk_w(const device_config *device, int level)
 	}
 }
 
-/* Chip Select */
+/*-------------------------------------------------
+    e0516_clk_w - chip select
+-------------------------------------------------*/
 
 void e0516_cs_w(const device_config *device, int level)
 {
@@ -183,36 +205,32 @@ void e0516_cs_w(const device_config *device, int level)
 	}
 }
 
-/* Device Interface */
+/*-------------------------------------------------
+    DEVICE_START( e0516 )
+-------------------------------------------------*/
 
 static DEVICE_START( e0516 )
 {
 	e0516_t *e0516 = get_safe_token(device);
 
-	/* validate arguments */
-	assert(device != NULL);
-	assert(device->tag != NULL);
-
-	e0516->intf = device->static_config;
-
-	assert(e0516->intf != NULL);
-	assert(e0516->intf->clock > 0);
-
 	/* create the timers */
 	e0516->clock_timer = timer_alloc(device->machine, clock_tick, (void *)device);
-	timer_adjust_periodic(e0516->clock_timer, attotime_zero, 0, ATTOTIME_IN_HZ(e0516->intf->clock / 32768));
+	timer_adjust_periodic(e0516->clock_timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock / 32768));
 
 	/* register for state saving */
-	state_save_register_item(device->machine, "e0516", device->tag, 0, e0516->cs);
-	state_save_register_item(device->machine, "e0516", device->tag, 0, e0516->data_latch);
-	state_save_register_item(device->machine, "e0516", device->tag, 0, e0516->reg_latch);
-	state_save_register_item(device->machine, "e0516", device->tag, 0, e0516->read_write);
-	state_save_register_item(device->machine, "e0516", device->tag, 0, e0516->state);
-	state_save_register_item(device->machine, "e0516", device->tag, 0, e0516->bits);
-	state_save_register_item(device->machine, "e0516", device->tag, 0, e0516->dio);
-
-	state_save_register_item_array(device->machine, "e0516", device->tag, 0, e0516->reg);
+	state_save_register_device_item(device, 0, e0516->cs);
+	state_save_register_device_item(device, 0, e0516->data_latch);
+	state_save_register_device_item(device, 0, e0516->reg_latch);
+	state_save_register_device_item(device, 0, e0516->read_write);
+	state_save_register_device_item(device, 0, e0516->state);
+	state_save_register_device_item(device, 0, e0516->bits);
+	state_save_register_device_item(device, 0, e0516->dio);
+	state_save_register_device_item_array(device, 0, e0516->reg);
 }
+
+/*-------------------------------------------------
+    DEVICE_SET_INFO( e0516 )
+-------------------------------------------------*/
 
 static DEVICE_SET_INFO( e0516 )
 {
@@ -221,6 +239,10 @@ static DEVICE_SET_INFO( e0516 )
 		/* no parameters to set */
 	}
 }
+
+/*-------------------------------------------------
+    DEVICE_GET_INFO( e0516 )
+-------------------------------------------------*/
 
 DEVICE_GET_INFO( e0516 )
 {

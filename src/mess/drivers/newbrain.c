@@ -6,7 +6,6 @@
 #include "machine/6850acia.h"
 #include "machine/adc080x.h"
 #include "machine/z80ctc.h"
-#include "machine/z80dart.h"
 #include "machine/z80sio.h"
 #include "includes/newbrain.h"
 #include "includes/serial.h"

@@ -1,20 +1,18 @@
 #ifndef __E0516__
 #define __E0516__
 
-#define E0516	DEVICE_GET_INFO_NAME(e0516)
+/***************************************************************************
+    MACROS / CONSTANTS
+***************************************************************************/
 
-#define MDRV_E0516_ADD(_tag, _config)	\
-	MDRV_DEVICE_ADD(_tag, E0516, 0)		\
-	MDRV_DEVICE_CONFIG(_config)
+#define E0516 DEVICE_GET_INFO_NAME(e0516)
 
-/* interface */
-typedef struct _e0516_interface e0516_interface;
-struct _e0516_interface
-{
-	int clock;					/* the clock (pin 15) of the chip */
-	
-	int *dio_pin;				/* the DI/O (pin 13) of the chip */
-};
+#define MDRV_E0516_ADD(_tag, _clock) \
+	MDRV_DEVICE_ADD(_tag, E0516, _clock)
+
+/***************************************************************************
+    PROTOTYPES
+***************************************************************************/
 
 /* device interface */
 DEVICE_GET_INFO( e0516 );
