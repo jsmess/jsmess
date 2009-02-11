@@ -8,7 +8,7 @@ New System Drivers Supported (in no particular order):
 - Pilot 1000, Pilot 5000, PalmPilot Personal, PalmPilot Pro, Palm III
   [MooglyGuy, R. Belmont]
 - Hewlett Packard HP 48 S/SX/G/GX/G+ [Antoine Miné]
-- Epson PX-4 (not working)  [Dirk Best]
+- Epson PX-4  [Dirk Best]
 - Various Channel F clones [Fredric QJ Blåholtz]
 - Radionic [Incog, Robbbert]
 

@@ -914,5 +914,5 @@ SYSTEM_CONFIG_END
 ***************************************************************************/
 
 /*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT      INIT  CONFIG  COMPANY  FULLNAME  FLAGS */
-COMP( 1985, px4,  0,      0,      px4,     px4_h450a, px4,  px4,    "Epson", "PX-4",   GAME_NOT_WORKING )
-COMP( 1985, px4p, px4,    0,      px4,     px4_h450a, px4,  px4,    "Epson", "PX-4+",  GAME_NOT_WORKING )
+COMP( 1985, px4,  0,      0,      px4,     px4_h450a, px4,  px4,    "Epson", "PX-4",   0 )
+COMP( 1985, px4p, px4,    0,      px4,     px4_h450a, px4,  px4,    "Epson", "PX-4+",  0 )
