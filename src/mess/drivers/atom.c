@@ -62,7 +62,7 @@ Hardware:   PPIA 8255
 #include "cpu/m6502/m6502.h"
 
 /* Components */
-#include "machine/centroni.h"
+#include "machine/ctronics.h"
 #include "machine/i8271.h"
 #include "machine/8255ppi.h"
 #include "machine/6522via.h"
@@ -71,7 +71,6 @@ Hardware:   PPIA 8255
 /* Devices */
 #include "devices/basicdsk.h"
 #include "devices/flopdrv.h"
-#include "devices/printer.h"
 #include "devices/cassette.h"
 #include "devices/snapquik.h"
 #include "sound/speaker.h"
@@ -248,7 +247,16 @@ static INPUT_PORTS_START (atom)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
-/* sound output */
+
+/* centronics interface */
+static const centronics_interface atom_centronics_config =
+{
+	FALSE,
+	DEVCB_DEVICE_HANDLER(VIA6522, "via6522_0", via_ca1_w),
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
 
 /* machine definition */
 static MACHINE_DRIVER_START( atom )
@@ -276,7 +284,7 @@ static MACHINE_DRIVER_START( atom )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* printer */
-	MDRV_PRINTER_ADD("printer")
+	MDRV_CENTRONICS_ADD("centronics", atom_centronics_config)
 
 	/* quickload */
 	MDRV_QUICKLOAD_ADD(atom, "atm", 0)

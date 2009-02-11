@@ -18,12 +18,12 @@
 #include "driver.h"
 #include "machine/8255ppi.h"
 #include "video/m6847.h"
+#include "machine/ctronics.h"
 #include "machine/i8271.h"
 #include "machine/6522via.h"
 #include "devices/basicdsk.h"
 #include "devices/flopdrv.h"
 #include "devices/cassette.h"
-#include "devices/printer.h"
 #include "devices/snapquik.h"
 #include "includes/atom.h"
 #include "sound/speaker.h"
@@ -33,91 +33,60 @@ UINT8 atom_8255_porta;
 static UINT8 atom_8255_portb;
 UINT8 atom_8255_portc;
 
-/* printer data written */
-static char atom_printer_data = 0x07f;
 
 /* I am not sure if this is correct, the atom appears to have a 2.4 kHz timer used for reading tapes?? */
 static int	timer_state = 0;
-
-static void atom_via_irq_func(const device_config *device, int state)
-{
-	if (state)
-	{
-		cpu_set_input_line(device->machine->cpu[0], 0, HOLD_LINE);
-	}
-	else
-	{
-		cpu_set_input_line(device->machine->cpu[0], 0, CLEAR_LINE);
-	}
-}
 
 static const device_config *cassette_device_image(running_machine *machine)
 {
 	return devtag_get_device(machine, CASSETTE, "cassette");
 }
 
-static const device_config *printer_image(running_machine *machine)
+
+
+/***************************************************************************
+    PRINTER INTERFACE
+***************************************************************************/
+
+static void atom_via_irq_func(const device_config *device, int state)
 {
-	return devtag_get_device(machine, PRINTER, "printer");
+	cpu_set_input_line(device->machine->cpu[0], 0, state);
 }
 
-/* printer status */
-static READ8_DEVICE_HANDLER(atom_via_in_a_func)
+/* BUSY from the centronics interface is connected to PA7 of the via */
+static READ8_DEVICE_HANDLER( atom_printer_busy )
 {
-	unsigned char data;
-
-	data = atom_printer_data;
-
-	if (!printer_is_ready(printer_image(device->machine)))
-	{
-		/* offline */
-		data |=0x080;
-	}
-
-	return data;
+	const device_config *printer = devtag_get_device(device->machine, CENTRONICS, "centronics");
+	return centronics_busy_r(printer) << 7;
 }
 
-/* printer data */
-static WRITE8_DEVICE_HANDLER(atom_via_out_a_func)
+/* DATA lines 0 to 6 are connected to PA0 to PA6 of the via */
+static WRITE8_DEVICE_HANDLER( atom_printer_data )
 {
-	/* data is written to port, this causes a pulse on ca2 (printer /strobe input),
-	and data is written */
-	/* atom has a 7-bit printer port */
-	atom_printer_data = data & 0x07f;
+	const device_config *printer = devtag_get_device(device->machine, CENTRONICS, "centronics");
+	centronics_data_w(printer, 0, data & 0x7f);
 }
 
-static unsigned char previous_ca2_data = 0;
-
-/* one of these is pulsed! */
-static WRITE8_DEVICE_HANDLER(atom_via_out_ca2_func)
+/* the CA2 output is connected to the STROBE signal on the centronics */
+static WRITE8_DEVICE_HANDLER( atom_printer_strobe )
 {
-	/* change in state of ca2 output? */
-	if (((previous_ca2_data^data)&0x01)!=0)
-	{
-		/* only look for one transition state */
-		if (data & 0x01)
-		{
-			/* output data to printer */
-			printer_output(printer_image(device->machine), atom_printer_data);
-		}
-	}
-
-	previous_ca2_data = data;
+	const device_config *printer = devtag_get_device(device->machine, CENTRONICS, "centronics");
+	centronics_strobe_w(printer, data);
 }
 
 const via6522_interface atom_6522_interface =
 {
-	atom_via_in_a_func,		/* printer status */
+	atom_printer_busy,
 	NULL,
 	NULL,
 	NULL,
 	NULL,
 	NULL,
-	atom_via_out_a_func,	/* printer data */
+	atom_printer_data,
 	NULL,
 	NULL,
 	NULL,
-	atom_via_out_ca2_func,	/* printer strobe */
+	atom_printer_strobe,
 	NULL,
 	atom_via_irq_func,
 };
@@ -349,11 +318,11 @@ READ8_DEVICE_HANDLER (atom_8255_porta_r )
 READ8_DEVICE_HANDLER ( atom_8255_portb_r )
 {
 	int row;
-	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", 
+	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5",
 										"KEY6", "KEY7", "KEY8", "KEY9", "KEY10", "KEY11" };
-	
+
 	row = atom_8255_porta & 0x0f;
-	/* logerror("8255: Read port b: %02X %02X\n", input_port_read(machine, port), 
+	/* logerror("8255: Read port b: %02X %02X\n", input_port_read(machine, port),
 									input_port_read(machine, "KEY10") & 0xc0); */
 	return ((input_port_read(device->machine, keynames[row]) & 0x3f) | (input_port_read(device->machine, "KEY10") & 0xc0));
 }
