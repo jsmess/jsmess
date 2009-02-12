@@ -67,13 +67,7 @@ READ_LINE_DEVICE_HANDLER( centronics_fault_r );
     DEFAULT INTERFACES
 ***************************************************************************/
 
-const centronics_interface standard_centronics =
-{
-	FALSE,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
+extern const centronics_interface standard_centronics;
 
 
 #endif /* __CTRONICS_H__ */

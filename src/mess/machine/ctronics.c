@@ -53,6 +53,19 @@ INLINE centronics_state *get_safe_token(const device_config *device)
 
 
 /*****************************************************************************
+    GLOBAL VARIABLES
+*****************************************************************************/
+
+const centronics_interface standard_centronics =
+{
+	FALSE,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+
+/*****************************************************************************
     DEVICE INTERFACE
 *****************************************************************************/
 
