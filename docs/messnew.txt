@@ -16,6 +16,10 @@ New System Drivers Supported (in no particular order):
 
 System Driver Changes:
 ----------------------
+
+- [AMSTRAD] Updated to use the new centronics interface, connected
+  data bit 8 for the CPC Plus machines.  [Dirk Best]
+
 - [APPLE1] Fixed character layout.  [rhester72]
 
 - [ATOM] Rewrote printer interface.  [Dirk Best]

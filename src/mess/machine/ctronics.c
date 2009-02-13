@@ -33,6 +33,8 @@ struct _centronics_state
 	int busy;
 	int ack;
 	int auto_fd;
+	int pe;
+	int fault;
 
 	UINT8 data;
 };
@@ -73,16 +75,12 @@ static DEVICE_START( centronics )
 {
 	centronics_state *centronics = get_safe_token(device);
 	const centronics_interface *intf = device->static_config;
-	char printer_tag[256];
 
 	/* validate some basic stuff */
 	assert(device->static_config != NULL);
 
 	/* get printer device */
-	strcpy(printer_tag, device->tag);
-	strcat(printer_tag, "_p");
-	centronics->printer = devtag_get_device(device->machine, PRINTER, printer_tag);
-
+	centronics->printer = devtag_get_device(device->machine, PRINTER, device->tag);
 	assert(centronics->printer != NULL);
 
 	/* make sure it's running */
@@ -107,8 +105,6 @@ static DEVICE_START( centronics )
 
 static DEVICE_RESET( centronics )
 {
-	centronics_state *centronics = get_safe_token(device);
-	centronics->busy = printer_is_ready(centronics->printer) ? FALSE : TRUE;
 }
 
 static DEVICE_SET_INFO( centronics )
@@ -149,15 +145,19 @@ DEVICE_GET_INFO( centronics )
 ***************************************************************************/
 
 /*-------------------------------------------------
-    update_busy_state - check printer device
-    status and update busy state
+    centronics_printer_online - callback that
+    sets us busy when the printer goes offline
 -------------------------------------------------*/
 
-static int update_busy_state(const device_config *device)
+void centronics_printer_online(const device_config *device, int state)
 {
-	centronics_state *centronics = get_safe_token(device);
-	centronics->busy = printer_is_ready(centronics->printer) ? FALSE : TRUE;
-	return centronics->busy;
+	const device_config *c = devtag_get_device(device->machine, CENTRONICS, device->tag);
+	centronics_state *centronics = get_safe_token(c);
+
+	/* when going online, set PE and FAULT high and BUSY low */
+	centronics->pe = state;
+	centronics->fault = state;
+	centronics->busy = !state;
 }
 
 
@@ -214,6 +214,35 @@ WRITE8_DEVICE_HANDLER( centronics_data_w )
 
 
 /*-------------------------------------------------
+    set_line - helper to set individual bits
+-------------------------------------------------*/
+
+static void set_line(const device_config *device, int line, int state)
+{
+	centronics_state *centronics = get_safe_token(device);
+
+	if (state)
+		centronics->data |= 1 << line;
+	else
+		centronics->data &= ~(1 << line);
+}
+
+
+/*-------------------------------------------------
+    centronics_dx_w - write line dx print data
+-------------------------------------------------*/
+
+WRITE_LINE_DEVICE_HANDLER( centronics_d0_w ) { set_line(device, 0, state); }
+WRITE_LINE_DEVICE_HANDLER( centronics_d1_w ) { set_line(device, 1, state); }
+WRITE_LINE_DEVICE_HANDLER( centronics_d2_w ) { set_line(device, 2, state); }
+WRITE_LINE_DEVICE_HANDLER( centronics_d3_w ) { set_line(device, 3, state); }
+WRITE_LINE_DEVICE_HANDLER( centronics_d4_w ) { set_line(device, 4, state); }
+WRITE_LINE_DEVICE_HANDLER( centronics_d5_w ) { set_line(device, 5, state); }
+WRITE_LINE_DEVICE_HANDLER( centronics_d6_w ) { set_line(device, 6, state); }
+WRITE_LINE_DEVICE_HANDLER( centronics_d7_w ) { set_line(device, 7, state); }
+
+
+/*-------------------------------------------------
     centronics_strobe_w - signal that data is
     ready
 -------------------------------------------------*/
@@ -222,8 +251,8 @@ WRITE_LINE_DEVICE_HANDLER( centronics_strobe_w )
 {
 	centronics_state *centronics = get_safe_token(device);
 
-	/* ignore if we are busy */
-	if (state == FALSE && centronics->busy == FALSE)
+	/* look for a high -> low transition */
+	if (centronics->strobe == TRUE && state == FALSE && centronics->busy == FALSE)
 	{
 		/* STROBE has gone low, data is ready */
 		timer_set(device->machine, ATTOTIME_IN_NSEC(250), centronics, TRUE, busy_callback);
@@ -307,8 +336,8 @@ READ_LINE_DEVICE_HANDLER( centronics_busy_r )
 
 READ_LINE_DEVICE_HANDLER( centronics_pe_r )
 {
-	/* use the busy line as pe line for now */
-	return !update_busy_state(device);
+	centronics_state *centronics = get_safe_token(device);
+	return centronics->pe;
 }
 
 
@@ -343,6 +372,6 @@ READ_LINE_DEVICE_HANDLER( centronics_vcc_r )
 
 READ_LINE_DEVICE_HANDLER( centronics_fault_r )
 {
-	/* use the busy line as fault line for now */
-	return !update_busy_state(device);
+	centronics_state *centronics = get_safe_token(device);
+	return centronics->fault;
 }

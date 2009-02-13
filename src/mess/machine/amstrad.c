@@ -40,9 +40,9 @@ This gives a total of 19968 NOPs per frame.
 #include "machine/8255ppi.h"
 #include "machine/mc146818.h"
 #include "machine/nec765.h"
+#include "machine/ctronics.h"
 #include "devices/dsk.h"
 #include "devices/cassette.h"
-#include "devices/printer.h"
 #include "devices/snapquik.h"
 #include "includes/amstrad.h"
 #include "sound/ay8910.h"
@@ -127,8 +127,6 @@ static unsigned char *Amstrad_ROM_Table[256];
 
 static UINT8 ppi_port_inputs[3];
 static UINT8 ppi_port_outputs[3];
-
-static UINT8 previous_printer_data_byte;
 
 static int aleste_rtc_function;
 static int aleste_fdc_int;
@@ -269,12 +267,6 @@ static MC6845_UPDATE_ROW( amstrad_plus_update_row_sprites );
 static void amstrad_rethinkMemory(running_machine *machine);
 
 
-static const device_config *printer_device(running_machine *machine)
-{
-	return devtag_get_device(machine, PRINTER, "printer");
-}
-
-
 /* Initialise the palette */
 PALETTE_INIT( amstrad_cpc )
 {
@@ -400,18 +392,18 @@ PALETTE_INIT( aleste )
 	for(i=0; i<32; i++)
 	{
 		int r,g,b;
-		
+
 		b = (pal[0x140+i] >> 4) & 0x03;
 		g = (pal[0x140+i] >> 2) & 0x03;
 		r = pal[0x140+i] & 0x03;
-		
+
 		r = (r << 6);
 		g = (g << 6);
 		b = (b << 6);
 
 		palette_set_color_rgb(machine, i, r, g, b);
 	}
-	
+
 	/* MSX colour palette is 6-bit RGB */
 	for(i=0; i<64; i++)
 	{
@@ -786,9 +778,9 @@ static MC6845_UPDATE_ROW( amstrad_plus_update_row_mode0 )
 	/* Apply vertical background scrolling */
 	ra += ( ( amstrad_plus_asic_ram[0x2804] >> 4 ) & 0x07 );
 	if ( ra > 7 )
-	{    
+	{
 		ma += x_count;
-	}   
+	}
 
 	for ( i = 0; i < x_count; i++ )
 	{
@@ -841,9 +833,9 @@ static MC6845_UPDATE_ROW( amstrad_plus_update_row_mode1 )
 	/* Apply vertical background scrolling */
 	ra += ( ( amstrad_plus_asic_ram[0x2804] >> 4 ) & 0x07 );
 	if ( ra > 7 )
-	{    
+	{
 		ma += x_count;
-	}   
+	}
 
 	for ( i = 0; i < x_count; i++ )
 	{
@@ -1645,7 +1637,7 @@ static void amstrad_setLowerRom(running_machine *machine)
 		{
 			bank_base = &memory_region(machine, "main")[0x010000];
 		}
-		else 
+		else
 		{
 			if(aleste_mode & 0x04)
 				bank_base = Aleste_RamBanks[0];
@@ -1732,11 +1724,11 @@ static void amstrad_setUpperRom(running_machine *machine)
 	UINT8 *bank_base = NULL;
 
 	/* b3 : "1" Upper rom area disable or "0" Upper rom area enable */
-	if ( ! ( gate_array.mrer & 0x08 ) ) 
+	if ( ! ( gate_array.mrer & 0x08 ) )
 	{
 		bank_base = Amstrad_ROM_Table[ gate_array.upper_bank ];
 	}
-	else 
+	else
 	{
 		if(aleste_mode & 0x04)
 			bank_base = Aleste_RamBanks[3];
@@ -2432,7 +2424,9 @@ WRITE8_HANDLER ( amstrad_cpc_io_w )
 	device_config *fdc = (device_config*)devtag_get_device( space->machine, NEC765A, "nec765");
 	device_config *mc6845 = (device_config *) devtag_get_device( space->machine, MC6845, "mc6845" );
 
-	if ((offset & (1<<15)) == 0) 
+	static int printer_bit8_selected = FALSE;
+
+	if ((offset & (1<<15)) == 0)
 	{
 		if(aleste_mode & 0x04) // Aleste mode
 		{
@@ -2441,7 +2435,7 @@ WRITE8_HANDLER ( amstrad_cpc_io_w )
 		else
 		{
 			/* if b15 = 0 and b14 = 1 : Gate-Array Write Selected*/
-			if ((offset & (1<<14)) != 0) 
+			if ((offset & (1<<14)) != 0)
 	   			amstrad_GateArray_write(space->machine, data);
 
 			/* if b15 = 0 : RAM Configuration Write Selected*/
@@ -2459,10 +2453,24 @@ WRITE8_HANDLER ( amstrad_cpc_io_w )
 			mc6845_address_w( mc6845, 0, data );
 			if ( amstrad_system_type == SYSTEM_PLUS || amstrad_system_type == SYSTEM_GX4000 )
 				amstrad_plus_seqcheck(data);
+
+			/* printer port d7 */
+			if (data == 0x0c && amstrad_system_type == SYSTEM_PLUS)
+				printer_bit8_selected = TRUE;
+
 			break;
 		case 0x01:		/* Write to selected internal 6845 register Write Only */
 			video_screen_update_partial( space->machine->primary_screen, video_screen_get_vpos( space->machine->primary_screen ) );
 			mc6845_register_w( mc6845, 0, data );
+
+			/* printer port bit 8 */
+			if (printer_bit8_selected && amstrad_system_type == SYSTEM_PLUS)
+			{
+				const device_config *printer = devtag_get_device(space->machine, CENTRONICS, "centronics");
+				centronics_d7_w(printer, BIT(data, 3));
+				printer_bit8_selected = FALSE;
+			}
+
 			break;
 		default:
 			break;
@@ -2482,21 +2490,11 @@ WRITE8_HANDLER ( amstrad_cpc_io_w )
 	{
 		if ((offset & (1<<12)) == 0)
 		{
-			/* on CPC, write to printer through LS chip */
-			/* the amstrad is crippled with a 7-bit port :( */
-			/* bit 7 of the data is the printer /strobe */
+			const device_config *printer = devtag_get_device(space->machine, CENTRONICS, "centronics");
 
-			/* strobe state changed? */
-			if (((previous_printer_data_byte^data) & (1<<7)) !=0 )
-			{
-				/* check for only one transition */
-				if ((data & (1<<7)) == 0)
-				{
-					/* output data to printer */
-					printer_output(printer_device(space->machine), data & 0x07f);
-				}
-			}
-			previous_printer_data_byte = data;
+			/* CPC has a 7-bit data port, bit 8 is the STROBE signal */
+			centronics_data_w(printer, 0, data & 0x7f);
+			centronics_strobe_w(printer, BIT(data, 7));
 		}
 	}
 
@@ -2855,7 +2853,7 @@ static unsigned char amstrad_Psg_FunctionSelected;
 static void update_psg(running_machine *machine)
 {
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	
+
 	if(aleste_mode & 0x20)  // RTC selected
 	{
 		switch(aleste_rtc_function)
@@ -2872,26 +2870,26 @@ static void update_psg(running_machine *machine)
 		}
 		return;
 	}
-  switch (amstrad_Psg_FunctionSelected) 
+  switch (amstrad_Psg_FunctionSelected)
   {
-  	case 0: 
+  	case 0:
 		{/* Inactive */
 		} break;
-  	case 1: 
+  	case 1:
 		{/* b6 = 1 ? : Read from selected PSG register and make the register data available to PPI Port A */
   			ppi_port_inputs[amstrad_ppi_PortA] = ay8910_read_port_0_r(space, 0);
-  		} 
+  		}
 		break;
-  	case 2: 
+  	case 2:
 		{/* b7 = 1 ? : Write to selected PSG register and write data to PPI Port A */
   			ay8910_write_port_0_w(space, 0, ppi_port_outputs[amstrad_ppi_PortA]);
-  		} 
+  		}
 		break;
-  	case 3: 
+  	case 3:
 		{/* b6 and b7 = 1 ? : The register will now be selected and the user can read from or write to it.  The register will remain selected until another is chosen.*/
   			ay8910_control_port_0_w(space, 0, ppi_port_outputs[amstrad_ppi_PortA]);
 			prev_reg = ppi_port_outputs[amstrad_ppi_PortA];
-  		} 
+  		}
 		break;
   	default: {
     } break;
@@ -2952,9 +2950,8 @@ READ8_DEVICE_HANDLER (amstrad_ppi_portb_r)
 /* Set b6 with Parallel/Printer port ready */
 	if(amstrad_system_type != SYSTEM_GX4000)
 	{
-		if (printer_is_ready(printer_device(device->machine))==0 ) {
-			data |= (1<<6);
-		}
+		const device_config *printer = devtag_get_device(device->machine, CENTRONICS, "centronics");
+		data |= centronics_busy_r(printer) << 6;
 	}
 /* Set b4-b1 50Hz/60Hz state and manufacturer name defined by links on PCB */
 	data |= (ppi_port_inputs[amstrad_ppi_PortB] & 0x1e);
@@ -3043,15 +3040,15 @@ READ8_HANDLER ( amstrad_psg_porta_read )
    If keyboard matrix line 11-14 are selected, the byte is always &ff.
    After testing on a real CPC, it is found that these never change, they always return &FF. */
 
-	static const char *const keynames[] = { "keyboard_row_0", "keyboard_row_1", "keyboard_row_2", "keyboard_row_3", "keyboard_row_4", 
+	static const char *const keynames[] = { "keyboard_row_0", "keyboard_row_1", "keyboard_row_2", "keyboard_row_3", "keyboard_row_4",
 										"keyboard_row_5", "keyboard_row_6", "keyboard_row_7", "keyboard_row_8", "keyboard_row_9",
 										"keyboard_row_10" };
 
-	if ( ( ppi_port_outputs[amstrad_ppi_PortC] & 0x0F ) > 10) 
+	if ( ( ppi_port_outputs[amstrad_ppi_PortC] & 0x0F ) > 10)
 	{
 		return 0xFF;
-	} 
-	else 
+	}
+	else
 	{
 		if(aleste_mode == 0x08 && ( ppi_port_outputs[amstrad_ppi_PortC] & 0x0F ) == 10)
 			return 0xff;
@@ -3213,7 +3210,7 @@ static const UINT8 amstrad_cycle_table_ex[256]=
 static void amstrad_common_init(running_machine *machine)
 {
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	
+
 	aleste_mode = 0;
 
 	gate_array.mrer = 0;
@@ -3294,7 +3291,7 @@ MACHINE_RESET( amstrad )
 	amstrad_common_init(machine);
 	amstrad_reset_machine(machine);
 //	amstrad_init_palette(machine);
-	
+
 	multiface_init();
 
 }
@@ -3341,7 +3338,7 @@ MACHINE_RESET( plus )
 	amstrad_plus_asic_ram[0x2805] = 0x01;  // interrupt vector is undefined at startup, except that bit 0 is always 1.
 	AmstradCPC_GA_SetRamConfiguration(machine);
 	amstrad_GateArray_write(machine, 0x081); // Epyx World of Sports requires upper ROM to be enabled by default
-	
+
 	//  multiface_init();
 }
 
