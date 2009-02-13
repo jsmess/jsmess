@@ -22,6 +22,8 @@ System Driver Changes:
 
 - [APPLE1] Fixed character layout.  [rhester72]
 
+- [ATARIST] Updated to use the new centronics interface.  [Dirk Best]
+
 - [ATOM] Rewrote printer interface.  [Dirk Best]
 
 - [CHANNELF] Added support for "new" sound.  [Fredric QJ Blåholtz]

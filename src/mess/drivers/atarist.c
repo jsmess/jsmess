@@ -4,8 +4,7 @@
 #include "cpu/m6800/m6800.h"
 #include "devices/basicdsk.h"
 #include "devices/cartslot.h"
-#include "devices/printer.h"
-#include "machine/centroni.h"
+#include "machine/ctronics.h"
 #include "includes/serial.h"
 #include "machine/6850acia.h"
 #include "machine/68901mfp.h"
@@ -134,7 +133,7 @@ static READ16_HANDLER( atarist_fdc_data_r )
 static WRITE16_HANDLER( atarist_fdc_data_w )
 {
 	atarist_state *state = space->machine->driver_data;
-	
+
 	if (state->fdc_mode & ATARIST_FLOPPY_MODE_SECTOR_COUNT)
 	{
 		if (data == 0)
@@ -1293,7 +1292,7 @@ static WRITE8_HANDLER( ym2149_port_a_w )
 	// 0x08 = RTS
 	// 0x10 = DTR
 
-	centronics_write_handshake(space->machine,0, BIT(data, 5) ? 0 : CENTRONICS_STROBE, CENTRONICS_STROBE);
+	centronics_strobe_w(state->centronics, BIT(data, 5));
 
 	// 0x40 = General Purpose Output
 	// 0x80 = Reserved
@@ -1301,7 +1300,8 @@ static WRITE8_HANDLER( ym2149_port_a_w )
 
 static WRITE8_HANDLER( ym2149_port_b_w )
 {
-	centronics_write_data(space->machine,0, data);
+	atarist_state *state = space->machine->driver_data;
+	centronics_data_w(state->centronics, 0, data);
 }
 
 static const ay8910_interface ym2149_interface =
@@ -1406,7 +1406,7 @@ static READ8_DEVICE_HANDLER( mfp_gpio_r )
 
 	atarist_state *state = device->machine->driver_data;
 
-	UINT8 data = (centronics_read_handshake(device->machine,0) & CENTRONICS_NOT_BUSY) >> 7;
+	UINT8 data = centronics_busy_r(state->centronics);
 
 	mc68901_tai_w(device, data & 0x01);
 
@@ -1439,13 +1439,6 @@ static MC68901_INTERFACE( mfp_intf )
 	DEVCB_CPU_INPUT_LINE(M68000_TAG, M68K_IRQ_6)		/* interrupt */
 };
 
-static const CENTRONICS_CONFIG atarist_centronics_config[1] =
-{
-	{
-		PRINTER_IBM,
-		NULL
-	}
-};
 
 static void atarist_configure_memory(running_machine *machine)
 {
@@ -1521,15 +1514,13 @@ static MACHINE_START( atarist )
 	/* configure RAM banking */
 	atarist_configure_memory(machine);
 
-	/* configure devices */
-	centronics_config(machine, 0, atarist_centronics_config);
-
 	/* set CPU interrupt callback */
 	cpu_set_irq_callback(cputag_get_cpu(machine, M68000_TAG), atarist_int_ack);
 
 	/* find devices */
 	state->mc68901 = devtag_get_device(machine, MC68901, MC68901_TAG);
  	state->wd1772 = devtag_get_device(machine, WD1772, WD1772_TAG);
+ 	state->centronics = devtag_get_device(machine, CENTRONICS, CENTRONICS_TAG);
 
 	/* register for state saving */
 	atarist_state_save(machine);
@@ -1564,7 +1555,7 @@ static READ8_DEVICE_HANDLER( atariste_mfp_gpio_r )
 
 	atarist_state *state = device->machine->driver_data;
 
-	UINT8 data = (centronics_read_handshake(device->machine,0) & CENTRONICS_NOT_BUSY) >> 7;
+	UINT8 data = centronics_busy_r(state->centronics);
 
 	data |= (state->acia_irq << 4);
 	data |= (state->fdc_irq << 5);
@@ -1617,9 +1608,6 @@ static MACHINE_START( atariste )
 	/* configure RAM banking */
 	atarist_configure_memory(machine);
 
-	/* configure devices */
-	centronics_config(machine, 0, atarist_centronics_config);
-	
 	/* set CPU interrupt callback */
 	cpu_set_irq_callback(cputag_get_cpu(machine, M68000_TAG), atarist_int_ack);
 
@@ -1631,6 +1619,7 @@ static MACHINE_START( atariste )
 	state->mc68901 = devtag_get_device(machine, MC68901, MC68901_TAG);
  	state->wd1772 = devtag_get_device(machine, WD1772, WD1772_TAG);
 	state->lmc1992 = devtag_get_device(machine, LMC1992, LMC1992_TAG);
+	state->centronics = devtag_get_device(machine, CENTRONICS, CENTRONICS_TAG);
 
 	/* register for state saving */
 	atariste_state_save(machine);
@@ -1693,7 +1682,7 @@ static WRITE8_HANDLER( stbook_ym2149_port_a_w )
 	// 0x08 = RTS
 	// 0x10 = DTR
 
-	centronics_write_handshake(space->machine, 0, (data & 0x20) ? 0 : CENTRONICS_STROBE, CENTRONICS_STROBE);
+	centronics_strobe_w(state->centronics, BIT(data, 5));
 
 	// 0x40 = IDE RESET
 	// 0x80 = FDD_DENSE_SEL
@@ -1740,7 +1729,7 @@ static READ8_DEVICE_HANDLER( stbook_mfp_gpio_r )
 
 	atarist_state *state = device->machine->driver_data;
 
-	UINT8 data = (centronics_read_handshake(device->machine, 0) & CENTRONICS_NOT_BUSY) >> 7;
+	UINT8 data = centronics_busy_r(state->centronics);
 
 	data |= (state->acia_irq << 4);
 	data |= (state->fdc_irq << 5);
@@ -1771,15 +1760,13 @@ static MACHINE_START( stbook )
 	/* configure RAM banking */
 	stbook_configure_memory(machine);
 
-	/* configure devices */
-	centronics_config(machine, 0, atarist_centronics_config);
-
 	/* set CPU interrupt callback */
 	cpu_set_irq_callback(cputag_get_cpu(machine, M68000_TAG), atarist_int_ack);
 
 	/* find devices */
 	state->mc68901 = devtag_get_device(machine, MC68901, MC68901_TAG);
  	state->wd1772 = devtag_get_device(machine, WD1772, WD1772_TAG);
+ 	state->centronics = devtag_get_device(machine, CENTRONICS, CENTRONICS_TAG);
 
 	/* register for state saving */
 	atariste_state_save(machine);
@@ -1844,14 +1831,14 @@ static MACHINE_DRIVER_START( atarist )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* printer */
-	MDRV_PRINTER_ADD("printer")
+	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
 
 	/* acia */
 	MDRV_ACIA6850_ADD("acia_0", acia_ikbd_intf)
 	MDRV_ACIA6850_ADD("acia_1", acia_midi_intf)
-	
+
 	MDRV_WD1772_ADD(WD1772_TAG, atarist_wd17xx_interface )
-	
+
 	MDRV_IMPORT_FROM(atarist_cartslot)
 MACHINE_DRIVER_END
 
@@ -1906,14 +1893,14 @@ static MACHINE_DRIVER_START( atariste )
 	MDRV_LMC1992_ADD(LMC1992_TAG /* ,atariste_lmc1992_intf */)
 
 	/* printer */
-	MDRV_PRINTER_ADD("printer")
+	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
 
 	/* acia */
 	MDRV_ACIA6850_ADD("acia_0", acia_ikbd_intf)
 	MDRV_ACIA6850_ADD("acia_1", acia_midi_intf)
-	
+
 	MDRV_WD1772_ADD(WD1772_TAG, atarist_wd17xx_interface )
-	
+
 	MDRV_IMPORT_FROM(atarist_cartslot)
 MACHINE_DRIVER_END
 
@@ -1962,14 +1949,14 @@ static MACHINE_DRIVER_START( stbook )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* printer */
-	MDRV_PRINTER_ADD("printer")
+	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
 
 	/* acia */
 	MDRV_ACIA6850_ADD("acia_0", stbook_acia_ikbd_intf)
 	MDRV_ACIA6850_ADD("acia_1", acia_midi_intf)
-	
+
 	MDRV_WD1772_ADD(WD1772_TAG, atarist_wd17xx_interface )
-	
+
 	MDRV_IMPORT_FROM(atarist_cartslot)
 MACHINE_DRIVER_END
 

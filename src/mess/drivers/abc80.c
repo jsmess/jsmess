@@ -80,7 +80,6 @@ Notes:
 #include "includes/abc80.h"
 
 /* Components */
-#include "machine/centroni.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/z80pio.h"
 #include "sound/sn76477.h"
@@ -199,7 +198,7 @@ static void abc80_keyboard_scan(running_machine *machine)
 
 		for (col = 0; col < 8; col++)
 		{
-			if (BIT(data, col)) 
+			if (BIT(data, col))
 			{
 				/* latch key data */
 				state->key_data = abc80_keycodes[row + (table * 7)][col];

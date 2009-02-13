@@ -68,7 +68,6 @@
 /* Components */
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
-#include "machine/centroni.h"
 #include "includes/serial.h"
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
@@ -212,7 +211,7 @@ static void abc800_bankswitch(running_machine *machine)
 {
 	abc800_state *state = machine->driver_data;
 	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
-	
+
 	if (state->fetch_charram)
 	{
 		/* HR video RAM selected */
@@ -267,7 +266,7 @@ static void abc806_bankswitch(running_machine *machine)
 			UINT16 start_addr = 0x1000 * (bank - 1);
 			UINT16 end_addr = start_addr + 0xfff;
 			UINT32 videoram_offset = (videoram_start + start_addr) & videoram_mask;
-			
+
 			//logerror("%04x-%04x: Video RAM %04x (32K)\n", start_addr, end_addr, videoram_offset);
 
 			memory_install_readwrite8_handler(program, start_addr, end_addr, 0, 0, SMH_BANK(bank), SMH_BANK(bank));
@@ -281,7 +280,7 @@ static void abc806_bankswitch(running_machine *machine)
 
 			UINT16 start_addr = 0x1000 * (bank - 1);
 			UINT16 end_addr = start_addr + 0xfff;
-			
+
 			//logerror("%04x-%04x: Work RAM (32K)\n", start_addr, end_addr);
 
 			memory_install_readwrite8_handler(program, start_addr, end_addr, 0, 0, SMH_BANK(bank), SMH_BANK(bank));
@@ -356,7 +355,7 @@ static void abc806_bankswitch(running_machine *machine)
 			UINT16 start_addr = 0x1000 * (bank - 1);
 			UINT16 end_addr = start_addr + 0xfff;
 			UINT32 videoram_offset = (videoram_start + start_addr) & videoram_mask;
-			
+
 			//logerror("%04x-%04x: Video RAM %04x (30K)\n", start_addr, end_addr, videoram_offset);
 
 			if (start_addr == 0x7000)
@@ -782,7 +781,7 @@ static TIMER_DEVICE_CALLBACK( ctc_tick )
 
 	z80ctc_trg_w(z80ctc, 1, 1);
 	z80ctc_trg_w(z80ctc, 1, 0);
-	
+
 	z80ctc_trg_w(z80ctc, 2, 1);
 	z80ctc_trg_w(z80ctc, 2, 0);
 }
@@ -985,7 +984,7 @@ static READ_LINE_DEVICE_HANDLER( abc806_dart_rxdb_r )
 static WRITE_LINE_DEVICE_HANDLER( abc806_dart_dtrb_w )
 {
 	abc806_state *driver_state = device->machine->driver_data;
-	
+
 	driver_state->keydtr = state;
 
 	abc806_bankswitch(device->machine);
@@ -1209,7 +1208,7 @@ static MACHINE_DRIVER_START( abc800m )
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(abc800)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-	
+
 	/* peripheral hardware */
 	MDRV_Z80CTC_ADD(Z80CTC_TAG, ABC800_X01/2/2, ctc_intf)
 	MDRV_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(ABC800_X01/2/2/2))
@@ -1244,7 +1243,7 @@ static MACHINE_DRIVER_START( abc800c )
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(abc800)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-	
+
 	/* peripheral hardware */
 	MDRV_Z80CTC_ADD(Z80CTC_TAG, ABC800_X01/2/2, ctc_intf)
 	MDRV_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(ABC800_X01/2/2/2))
@@ -1305,7 +1304,7 @@ static MACHINE_DRIVER_START( abc806 )
 
 	MDRV_MACHINE_START(abc806)
 	MDRV_MACHINE_RESET(abc806)
-	
+
 	/* video hardware */
 	MDRV_IMPORT_FROM(abc806_video)
 
@@ -1349,7 +1348,7 @@ MACHINE_DRIVER_END
 	--------
 	55 10761-01		"old" controller
 	55 10828-01		"old" controller
-	55 20900-0x		
+	55 20900-0x
 	55 21046-11		Luxor Conkort	25 pin D-sub connector
 	55 21046-21		Luxor Conkort	34 pin FDD connector
 	55 21046-41		Luxor Conkort	both of the above

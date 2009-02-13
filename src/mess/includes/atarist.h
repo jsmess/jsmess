@@ -9,6 +9,7 @@
 #define MC68901_TAG	"mc68901"
 #define LMC1992_TAG "lmc1992"
 #define WD1772_TAG	"wd1772"
+#define CENTRONICS_TAG	"centronics"
 
 // Atari ST
 
@@ -131,6 +132,7 @@ struct _atarist_state
 	const device_config *mc68901;
 	const device_config *lmc1992;
 	const device_config *wd1772;
+	const device_config *centronics;
 
 	/* timers */
 	emu_timer *glue_timer;
