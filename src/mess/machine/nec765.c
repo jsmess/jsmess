@@ -44,10 +44,10 @@ typedef enum
 
 
 /* uncomment the following line for verbose information */
-#define LOG_VERBOSE		1
+#define LOG_VERBOSE		0
 #define LOG_COMMAND		1
-#define LOG_EXTRA		1
-#define LOG_INTERRUPT	1
+#define LOG_EXTRA		0
+#define LOG_INTERRUPT	0
 
 /* uncomment this to not allow end of cylinder "error" */
 #define NO_END_OF_CYLINDER

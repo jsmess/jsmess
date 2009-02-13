@@ -744,15 +744,18 @@ static WRITE16_HANDLER( x68k_fdc_w )
 		x = data & 0x0f;
 		for(drive=0;drive<4;drive++)
 		{
-			if(x & (1 << drive))
+			if(x68k_sys.fdc.selected_drive & (1 << drive))
 			{
-				x68k_sys.fdc.led_ctrl[drive] = data & 0x80;  // blinking drive LED if no disk inserted
-				x68k_sys.fdc.led_eject[drive] = data & 0x40;  // eject button LED (on when set to 0)
-				output_set_indexed_value("eject_drv",drive,(data & 0x40) ? 1 : 0);
-				if(data & 0x20)  // ejects disk
+				if(!(x & (1 << drive)))  // functions take place on 1->0 transitions of drive bits only
 				{
-					image_unload(image_from_devtype_and_index(space->machine, IO_FLOPPY, drive));
-					floppy_drive_set_motor_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, drive), 0);  // I'll presume ejecting the disk stops the drive motor :)
+					x68k_sys.fdc.led_ctrl[drive] = data & 0x80;  // blinking drive LED if no disk inserted
+					x68k_sys.fdc.led_eject[drive] = data & 0x40;  // eject button LED (on when set to 0)
+					output_set_indexed_value("eject_drv",drive,(data & 0x40) ? 1 : 0);
+					if(data & 0x20)  // ejects disk
+					{
+						image_unload(image_from_devtype_and_index(space->machine, IO_FLOPPY, drive));
+						floppy_drive_set_motor_state(image_from_devtype_and_index(space->machine, IO_FLOPPY, drive), 0);  // I'll presume ejecting the disk stops the drive motor :)
+					}
 				}
 			}
 		}

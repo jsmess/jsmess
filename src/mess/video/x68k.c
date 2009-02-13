@@ -503,7 +503,7 @@ READ16_HANDLER( x68k_crtc_r )
 	}*/
 	if(offset < 24)
 	{
-//		logerror("CRTC: [%08x] Read %04x from CRTC register %i\n",activecpu_get_pc(),x68k_sys.crtc.reg[offset],offset);
+//		logerror("CRTC: [%08x] Read %04x from CRTC register %i\n",cpu_get_pc(space->machine->cpu[0]),x68k_sys.crtc.reg[offset],offset);
 		switch(offset)
 		{
 		case 9:
@@ -588,8 +588,54 @@ WRITE16_HANDLER( x68k_gvram_w )
 	   Page 1 - 0xc00000-0xc7ffff    Page 2 - 0xc80000-0xcfffff
 	   Page 3 - 0xd00000-0xd7ffff    Page 4 - 0xd80000-0xdfffff
 	*/
-	COMBINE_DATA(x68k_gvram+offset);
-
+	
+	// handle different G-VRAM page setups
+	if(x68k_sys.crtc.reg[20] & 0x08)  // G-VRAM set to buffer
+	{
+		if(offset < 0x40000)
+			COMBINE_DATA(x68k_gvram+offset);
+	}
+	else
+	{
+		switch(x68k_sys.crtc.reg[20] & 0x0300)
+		{
+			case 0x0300:
+				if(offset < 0x40000)
+					COMBINE_DATA(x68k_gvram+offset);
+				break;
+			case 0x0100:
+				if(offset < 0x40000)
+				{
+					x68k_gvram[offset] = (x68k_gvram[offset] & 0xff00) | (data & 0x00ff);
+				}
+				if(offset >= 0x40000 && offset < 0x80000)
+				{
+					x68k_gvram[offset-0x40000] = (x68k_gvram[offset-0x40000] & 0x00ff) | ((data & 0x00ff) << 8);
+				}
+				break;
+			case 0x0000:
+				if(offset < 0x40000)
+				{
+					x68k_gvram[offset] = (x68k_gvram[offset] & 0xfff0) | (data & 0x000f);
+				}
+				if(offset >= 0x40000 && offset < 0x80000)
+				{
+					x68k_gvram[offset-0x40000] = (x68k_gvram[offset-0x40000] & 0xff0f) | ((data & 0x000f) << 4);
+				}
+				if(offset >= 0x80000 && offset < 0xc0000)
+				{
+					x68k_gvram[offset-0x80000] = (x68k_gvram[offset-0x80000] & 0xf0ff) | ((data & 0x000f) << 8);
+				}
+				if(offset >= 0xc0000 && offset < 0x100000)
+				{
+					x68k_gvram[offset-0xc0000] = (x68k_gvram[offset-0xc0000] & 0x0fff) | ((data & 0x000f) << 12);
+				}
+				break;
+			default:
+				logerror("G-VRAM written while layer setup is undefined.\n");
+		}
+	}
+	
 	pageoffset = offset & 0xfffff;
 	xloc = pageoffset % 1024;
 	yloc = pageoffset / 1024;
@@ -604,6 +650,13 @@ WRITE16_HANDLER( x68k_gvram_w )
 		x68k_plot_pixel(x68k_gfx_0_bitmap_65536,xloc,yloc,(x68k_gvram[offset] >> 1) + 512);
 		x68k_plot_pixel(x68k_gfx_0_bitmap_256,xloc,yloc,data & 0x00ff);
 		x68k_plot_pixel(x68k_gfx_0_bitmap_16,xloc,yloc,data & 0x000f);
+		if((x68k_sys.crtc.reg[20] & 0x0300) == 0x0300 || (x68k_sys.crtc.reg[20] & 0x0800))
+		{  // all 512k is 16-bit wide in 64k colour mode or if GVRAM is set as a buffer
+			x68k_plot_pixel(x68k_gfx_1_bitmap_256,xloc,yloc,(data & 0xff00) >> 8);
+			x68k_plot_pixel(x68k_gfx_1_bitmap_16,xloc,yloc,(data & 0x00f0) >> 4);
+			x68k_plot_pixel(x68k_gfx_2_bitmap_16,xloc,yloc,(data & 0x0f00) >> 8);
+			x68k_plot_pixel(x68k_gfx_3_bitmap_16,xloc,yloc,(data & 0xf000) >> 12);
+		}
 	}
 	if(offset >= 0x40000 && offset < 0x80000)  // second page, 16 or 256 colours
 	{
@@ -654,7 +707,43 @@ WRITE16_HANDLER( x68k_tvram_w )
 
 READ16_HANDLER( x68k_gvram_r )
 {
-	return x68k_gvram[offset];
+	UINT16 ret = 0;
+
+	if(x68k_sys.crtc.reg[20] & 0x08)  // G-VRAM set to buffer
+		return x68k_gvram[offset];
+	
+	switch(x68k_sys.crtc.reg[20] & 0x0300)  // colour setup determines G-VRAM use
+	{
+		case 0x0300: // 65,536 colour (RGB) - 16-bits per word
+			if(offset < 0x40000)
+				ret = x68k_gvram[offset];
+			else
+				ret = 0xffff;
+			break;
+		case 0x0100:  // 256 colour (paletted) - 8 bits per word
+			if(offset < 0x40000)
+				ret = x68k_gvram[offset] & 0x00ff;
+			if(offset >= 0x40000 && offset < 0x80000)
+				ret = (x68k_gvram[offset-0x40000] & 0xff00) >> 8;
+			if(offset >= 0x80000)
+				ret = 0xffff;
+			break;
+		case 0x0000:  // 16 colour (paletted) - 4 bits per word
+			if(offset < 0x40000)
+				ret = x68k_gvram[offset] & 0x000f;
+			if(offset >= 0x40000 && offset < 0x80000)
+				ret = (x68k_gvram[offset-0x40000] & 0x00f0) >> 4;
+			if(offset >= 0x80000 && offset < 0xc0000)
+				ret = (x68k_gvram[offset-0x80000] & 0x0f00) >> 8;
+			if(offset >= 0xc0000 && offset < 0x100000)
+				ret = (x68k_gvram[offset-0xc0000] & 0xf000) >> 12;
+			break;
+		default:
+			logerror("G-VRAM read while layer setup is undefined.\n");
+			ret = 0xffff;
+	}
+	
+	return ret;
 }
 
 READ16_HANDLER( x68k_tvram_r )
