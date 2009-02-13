@@ -45,6 +45,8 @@ System Driver Changes:
 
 - [SAMCOUPE] Added centronics printer support.  [Dirk Best]
 
+- [SF7000] Updated to use the new centronics support.  [Dirk Best]
+
 - [TI81, TI85, TI86] Added the new ROM_DEFAULT_BIOS feature to select the most
   recent rom versions.  [Hobie Troxell]
 

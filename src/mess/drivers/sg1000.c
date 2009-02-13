@@ -31,7 +31,7 @@ PCB Layout
 
 Notes:
     All IC's shown.
-	
+
 	Z80		- NEC D780C-1 / Zilog Z8400A (REV.A) Z80A CPU @ 3.579545
 	TMS9918A- Texas Instruments TMS9918ANL Video Display Processor @ 10.738635MHz
 	MB8118	- Fujitsu MB8118-12 16K x 1 Dynamic RAM
@@ -55,7 +55,7 @@ Notes:
 
 	- OMV keyboard
 	- SC-3000 return instruction referenced by R when reading ports 60-7f,e0-ff
-	- connect the PSG /READY signal 
+	- connect the PSG /READY signal
 	- accurate video timing
     - SP-400 serial printer
 	- SH-400 racing controller
@@ -70,7 +70,7 @@ Notes:
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
 #include "devices/printer.h"
-#include "machine/centroni.h"
+#include "machine/ctronics.h"
 #include "includes/serial.h"
 #include "machine/msm8251.h"
 #include "machine/8255ppi.h"
@@ -421,7 +421,7 @@ static INPUT_PORTS_START( omv )
 	PORT_BIT( 0x, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
 	PORT_BIT( 0x, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_CHAR('G')
 	PORT_BIT( 0x, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_CHAR('H')
-	
+
 	PORT_BIT( 0x, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("S-1") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
 	PORT_BIT( 0x, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("S-1") PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_MAMEKEY(RCONTROL))
 */
@@ -531,7 +531,7 @@ static READ8_DEVICE_HANDLER( sc3000_ppi8255_b_r )
 
 	/* cartridge contact */
 	data |= 0x10;
-	
+
 	/* printer */
 	data |= 0x60;
 
@@ -609,40 +609,21 @@ static READ8_DEVICE_HANDLER( sf7000_ppi8255_a_r )
         PA7
     */
 
+	const device_config *printer = devtag_get_device(device->machine, CENTRONICS, "centronics");
 	sg1000_state *state = device->machine->driver_data;
+	UINT8 result = 0;
 
-	int centronics_handshake = centronics_read_handshake(device->machine,1);
-	int busy = 0;
+	result |= state->fdc_irq;
+	result |= centronics_busy_r(printer) << 1;
+	result |= state->fdc_index << 2;
 
-	if ((centronics_handshake & CENTRONICS_NOT_BUSY) == 0)
-	{
-		busy = 0x02;
-	}
-
-	return (state->fdc_index << 2) | busy | state->fdc_irq;
-}
-
-static WRITE8_DEVICE_HANDLER( sf7000_ppi8255_b_w )
-{
-	/*
-        Signal  Description
-
-        PB0     Data output to Centronics printer
-        PB1     Data output to Centronics printer
-        PB2     Data output to Centronics printer
-        PB3     Data output to Centronics printer
-        PB4     Data output to Centronics printer
-        PB5     Data output to Centronics printer
-        PB6     Data output to Centronics printer
-        PB7     Data output to Centronics printer
-    */
-
-	centronics_write_data(device->machine, 1, data);
+	return result;
 }
 
 static WRITE8_DEVICE_HANDLER( sf7000_ppi8255_c_w )
 {
-	device_config *fdc = (device_config*)devtag_get_device(device->machine, NEC765A, "nec765");
+	const device_config *fdc = devtag_get_device(device->machine, NEC765A, "nec765");
+	const device_config *printer = devtag_get_device(device->machine, CENTRONICS, "centronics");
 	/*
         Signal  Description
 
@@ -670,10 +651,10 @@ static WRITE8_DEVICE_HANDLER( sf7000_ppi8255_c_w )
 	}
 
 	/* ROM selection */
-	memory_set_bank(device->machine, 1, (data & 0x40) >> 6);
+	memory_set_bank(device->machine, 1, BIT(data, 6));
 
 	/* printer strobe */
-	centronics_write_handshake(device->machine, 1, (data & 0x80) ? 0 : CENTRONICS_STROBE, CENTRONICS_STROBE);
+	centronics_strobe_w(printer, BIT(data, 7));
 }
 
 static const ppi8255_interface sf7000_ppi8255_intf[2] =
@@ -691,7 +672,7 @@ static const ppi8255_interface sf7000_ppi8255_intf[2] =
 		DEVCB_NULL,								// Port B read
 		DEVCB_NULL,								// Port C read
 		DEVCB_NULL,								// Port A write
-		DEVCB_HANDLER(sf7000_ppi8255_b_w),		// Port B write
+		DEVCB_DEVICE_HANDLER(CENTRONICS, "centronics", centronics_data_w),	// Port B write
 		DEVCB_HANDLER(sf7000_ppi8255_c_w)		// Port C write
 	}
 };
@@ -719,12 +700,6 @@ static const struct nec765_interface sf7000_nec765_interface =
 	NEC765_RDY_PIN_CONNECTED
 };
 
-static const CENTRONICS_CONFIG sf7000_centronics_config[1] = {
-	{
-		PRINTER_IBM,
-		NULL
-	}
-};
 
 static MACHINE_START( sf7000 )
 {
@@ -735,9 +710,6 @@ static MACHINE_START( sf7000 )
 
 	/* configure FDC */
 	floppy_drive_set_index_pulse_callback(image_from_devtype_and_index(machine, IO_FLOPPY, 0), sf7000_fdc_index_callback);
-
-	/* configure PPI */
-	centronics_config(machine, 1, sf7000_centronics_config);
 
 	/* configure memory banking */
 	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, "main"), 0);
@@ -883,7 +855,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( omv )
 	MDRV_IMPORT_FROM(sg1000)
-	
+
 	MDRV_CARTSLOT_MODIFY("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("sg,bin")
 	MDRV_CARTSLOT_NOT_MANDATORY
@@ -922,7 +894,7 @@ static MACHINE_DRIVER_START( sc3000 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* printer */
-	MDRV_PRINTER_ADD("printer")
+	MDRV_PRINTER_ADD("sp400") /* serial printer */
 
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", sc3000_cassette_config )
@@ -947,7 +919,6 @@ static MACHINE_DRIVER_START( sf7000 )
 	MDRV_MACHINE_RESET( sf7000 )
 
 	MDRV_PPI8255_ADD("ppi8255_0", sf7000_ppi8255_intf[0])
-
 	MDRV_PPI8255_ADD("ppi8255_1", sf7000_ppi8255_intf[1])
 
     /* video hardware */
@@ -962,16 +933,16 @@ static MACHINE_DRIVER_START( sf7000 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* printer */
-	MDRV_PRINTER_ADD("printer")
-	MDRV_PRINTER_ADD("sp400")
+	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
+	MDRV_PRINTER_ADD("sp400") /* serial printer */
 
 	/* cassette */
 	MDRV_CASSETTE_ADD("cassette", sc3000_cassette_config)
 
 	/* uart */
 	MDRV_MSM8251_ADD("uart", default_msm8251_interface)
-	
-	MDRV_NEC765A_ADD("nec765", sf7000_nec765_interface)		
+
+	MDRV_NEC765A_ADD("nec765", sf7000_nec765_interface)
 MACHINE_DRIVER_END
 
 /* ROMs */
