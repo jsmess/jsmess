@@ -559,9 +559,11 @@ READ8_HANDLER( vtech1_printer_r )
 	return result;
 }
 
+/* TODO: figure out how this really works */
 WRITE8_HANDLER( vtech1_strobe_w )
 {
 	const device_config *printer = devtag_get_device(space->machine, CENTRONICS, "centronics");
+	centronics_strobe_w(printer, TRUE);
 	centronics_strobe_w(printer, FALSE);
 }
 
