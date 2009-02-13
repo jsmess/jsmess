@@ -132,7 +132,7 @@ We emulate the use of two cassette units. An option allows you to hear the sound
 of the tape during playback.
 
 The sorcerer has a UART device used by the serial interface and the cassette system.
-So far, it has been tested to work at 300 baud.
+
 
 ********************************************************************************/
 
@@ -141,7 +141,7 @@ So far, it has been tested to work at 300 baud.
 #include "sound/speaker.h"
 #include "sound/wave.h"
 #include "includes/exidy.h"
-#include "machine/centroni.h"
+#include "machine/ctronics.h"
 #include "machine/wd17xx.h"
 #include "devices/basicdsk.h"
 #include "devices/cassette.h"
@@ -311,23 +311,6 @@ static TIMER_CALLBACK(exidy_cassette_tc)
 	}
 }
 
-static void exidy_printer_handshake_in(running_machine *machine,int number, int data, int mask)
-{
-	if (mask & CENTRONICS_ACKNOWLEDGE)
-	{
-		if (data & CENTRONICS_ACKNOWLEDGE)
-		{
-		}
-	}
-}
-
-static const CENTRONICS_CONFIG exidy_cent_config[1]={
-	{
-		PRINTER_CENTRONICS,
-		exidy_printer_handshake_in
-	},
-};
-
 
 /* after the first 4 bytes have been read from ROM, switch the ram back in */
 static TIMER_CALLBACK( exidy_reset )
@@ -358,9 +341,6 @@ static MACHINE_RESET( exidyd )
 
 	exidy_ay31015 = devtag_get_device(machine, AY31015, "ay_3_1015");
 
-	centronics_config(machine, 0, exidy_cent_config);
-	/* assumption: select is tied low */
-	centronics_write_handshake(machine, 0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
 	exidy_fe_port_w(space, 0, 0);
 
 	timer_set(machine, ATTOTIME_IN_USEC(10), NULL, 0, exidy_reset);
@@ -506,6 +486,7 @@ static WRITE8_HANDLER(exidy_fe_port_w)
 
 static WRITE8_HANDLER(exidy_ff_port_w)
 {
+	const device_config *printer = devtag_get_device(space->machine, CENTRONICS, "centronics");
 	/* reading the config switch */
 	switch (input_port_read(space->machine, "CONFIG") & 0x06)
 	{
@@ -515,17 +496,15 @@ static WRITE8_HANDLER(exidy_ff_port_w)
 
 		case 2: /* Centronics 7-bit printer */
 			/* bit 7 = strobe, bit 6..0 = data */
-			centronics_write_handshake(space->machine, 0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
-			centronics_write_handshake(space->machine, 0, (~data>>7) & 0x01, CENTRONICS_STROBE);
-			centronics_write_data(space->machine, 0, data & 0x7f);
+			centronics_strobe_w(printer, (~data>>7) & 0x01);
+			centronics_data_w(printer, 0, data & 0x7f);
 			break;
 
 		case 4: /* 8-bit parallel output */
 			/* hardware strobe driven from port select, bit 7..0 = data */
-			centronics_write_handshake(space->machine, 0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
-			centronics_write_handshake(space->machine, 0, 1, CENTRONICS_STROBE);
-			centronics_write_data(space->machine, 0, data);
-			centronics_write_handshake(space->machine, 0, 0, CENTRONICS_STROBE);
+			centronics_strobe_w(printer, 1);
+			centronics_data_w(printer, 0, data);
+			centronics_strobe_w(printer, 0);
 			break;
 	}
 }
@@ -574,11 +553,6 @@ static READ8_HANDLER(exidy_fe_port_r)
 	return data;
 }
 
-static const device_config *printer_device(running_machine *machine)
-{
-	return devtag_get_device(machine, PRINTER, "printer");
-}
-
 static READ8_HANDLER(exidy_ff_port_r)
 {
 	/* The use of the parallel port as a general purpose port is not emulated.
@@ -586,13 +560,13 @@ static READ8_HANDLER(exidy_ff_port_r)
 	This uses bit 7. The other bits have been set high (=nothing plugged in).
 	This fixes those games that use a joystick. */
 
+	const device_config *printer = devtag_get_device(space->machine, CENTRONICS, "centronics");
 	UINT8 data=0x7f;
 
 	/* bit 7 = printer busy
 	0 = printer is not busy */
 
-	if (printer_is_ready(printer_device(space->machine))==0 )
-		data |= 0x80;
+	data |= centronics_busy_r(printer) << 7;
 
 	return data;
 }
@@ -820,7 +794,7 @@ static MACHINE_DRIVER_START( exidy )
 	MDRV_AY31015_ADD( "ay_3_1015", exidy_ay31015_config )
 
 	/* printer */
-	MDRV_PRINTER_ADD("printer")
+	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
 
 	/* quickload */
 	MDRV_Z80BIN_QUICKLOAD_ADD(exidy, 2)
