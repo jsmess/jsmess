@@ -10,7 +10,7 @@
 #include "devices/cassette.h"
 #include "devices/z80bin.h"
 #include "sound/speaker.h"
-#include "machine/centroni.h"
+#include "machine/ctronics.h"
 #include "devices/printer.h"
 
 static UINT8 super80_mhz=2;	/* state of bit 2 of port F0 */
@@ -454,29 +454,6 @@ static TIMER_CALLBACK( super80_timer )
 	The most commonly used I/O range is DC-DE (DC = centronics, DD = serial data, DE = serial control
 	All the home-brew roms use this, except for super80e which uses BC-BE (which we don't support yet). */
 
-static void super80_printer_handshake_in(running_machine *machine,int number, int data, int mask)
-{
-	if (mask & CENTRONICS_ACKNOWLEDGE)
-	{
-		if (data & CENTRONICS_ACKNOWLEDGE)
-		{
-		}
-	}
-}
-
-static const CENTRONICS_CONFIG super80_cent_config[1]={
-	{
-		PRINTER_CENTRONICS,
-		super80_printer_handshake_in
-	},
-};
-
-static const device_config *printer_device(running_machine *machine)
-{
-	return devtag_get_device(machine, PRINTER, "printer");
-}
-
-
 /**************************** I/O PORTS *****************************************************************/
 
 static READ8_HANDLER( super80v_11_r )
@@ -489,13 +466,13 @@ static READ8_HANDLER( super80v_11_r )
 
 static READ8_HANDLER( super80_dc_r )
 {
+	const device_config *printer = devtag_get_device(space->machine, CENTRONICS, "centronics");
 	UINT8 data=0x7f;
 
 	/* bit 7 = printer busy
 	0 = printer is not busy */
 
-	if (printer_is_ready(printer_device(space->machine))==0 )
-		data |= 0x80;
+	data |= centronics_busy_r(printer) << 7;
 
 	return data;
 }
@@ -523,10 +500,10 @@ static WRITE8_HANDLER( super80v_11_w )
 static WRITE8_HANDLER( super80_dc_w )
 {
 	/* hardware strobe driven from port select, bit 7..0 = data */
-	centronics_write_handshake(space->machine, 0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
-	centronics_write_handshake(space->machine, 0, 1, CENTRONICS_STROBE);
-	centronics_write_data(space->machine, 0, data);
-	centronics_write_handshake(space->machine, 0, 0, CENTRONICS_STROBE);
+	const device_config *printer = devtag_get_device(space->machine, CENTRONICS, "centronics");
+	centronics_strobe_w(printer, 1);
+	centronics_data_w(printer, 0, data);
+	centronics_strobe_w(printer, 0);
 }
 
 static UINT8 last_data;
@@ -1000,9 +977,6 @@ static TIMER_CALLBACK( super80_reset )
 static MACHINE_RESET( super80 )
 {
 	super80_z80pio = devtag_get_device(machine, Z80PIO, "z80pio");
-	centronics_config(machine,0, super80_cent_config);
-	/* assumption: select is tied low */
-	centronics_write_handshake(machine,0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
 	timer_set(machine, ATTOTIME_IN_USEC(10), NULL, 0, super80_reset);
 	memory_set_bank(machine, 1, 1);
 }
@@ -1058,7 +1032,7 @@ static MACHINE_DRIVER_START( super80 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* printer */
-	MDRV_PRINTER_ADD("printer")
+	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
 
 	/* quickload */
 	MDRV_Z80BIN_QUICKLOAD_ADD(default, 1)
@@ -1118,7 +1092,7 @@ static MACHINE_DRIVER_START( super80v )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* printer */
-	MDRV_PRINTER_ADD("printer")
+	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
 
 	/* quickload */
 	MDRV_Z80BIN_QUICKLOAD_ADD(default, 1)
