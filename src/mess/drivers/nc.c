@@ -701,7 +701,7 @@ static READ8_HANDLER(nc_key_data_in_r)
 }
 
 
-static void nc_sound_update(int channel)
+static void nc_sound_update(running_machine *machine, int channel)
 {
         int on;
         int frequency;
@@ -733,7 +733,7 @@ static WRITE8_HANDLER(nc_sound_w)
 		   nc_sound_channel_periods[0]  =
 				(nc_sound_channel_periods[0] & 0x0ff00) | (data & 0x0ff);
 
-		   nc_sound_update(0);
+		   nc_sound_update(space->machine, 0);
 		}
 		break;
 
@@ -742,7 +742,7 @@ static WRITE8_HANDLER(nc_sound_w)
 		   nc_sound_channel_periods[0] =
 				(nc_sound_channel_periods[0] & 0x0ff) | ((data & 0x0ff)<<8);
 
-		   nc_sound_update(0);
+		   nc_sound_update(space->machine, 0);
 		}
 		break;
 
@@ -752,7 +752,7 @@ static WRITE8_HANDLER(nc_sound_w)
 		   nc_sound_channel_periods[1]  =
 				(nc_sound_channel_periods[1] & 0x0ff00) | (data & 0x0ff);
 
-		   nc_sound_update(1);
+		   nc_sound_update(space->machine, 1);
 		}
 		break;
 
@@ -761,7 +761,7 @@ static WRITE8_HANDLER(nc_sound_w)
 		   nc_sound_channel_periods[1] =
 				(nc_sound_channel_periods[1] & 0x0ff) | ((data & 0x0ff)<<8);
 
-		   nc_sound_update(1);
+		   nc_sound_update(space->machine, 1);
 		}
 		break;
 

@@ -9,7 +9,7 @@
 #include "includes/cgenie.h"
 #include "sound/ay8910.h"
 
-static int control_port;
+static UINT8 control_port;
 
 READ8_HANDLER( cgenie_sh_control_port_r )
 {

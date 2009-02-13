@@ -69,11 +69,11 @@ void mac_set_screen_buffer( int buffer );
 
 CUSTOM_START( mac_sh_start );
 
-void mac_enable_sound( int on );
-void mac_set_sound_buffer( int buffer );
-void mac_set_volume( int volume );
+void mac_enable_sound( running_machine *machine, int on );
+void mac_set_sound_buffer( running_machine *machine, int buffer );
+void mac_set_volume( running_machine *machine, int volume );
 
-void mac_sh_updatebuffer(void);
+void mac_sh_updatebuffer(running_machine *machine);
 
 
 #endif /* MAC_H_ */

@@ -1732,9 +1732,9 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_a)
 
 	if (mac_model < MODEL_MAC_SE)	// SE no longer has dual buffers
 	{
-		mac_set_sound_buffer((data & 0x08) >> 3);
+		mac_set_sound_buffer(device->machine, (data & 0x08) >> 3);
 	}
-	mac_set_volume(data & 0x07);
+	mac_set_volume(device->machine, data & 0x07);
 
 	/* Early Mac models had VIA A4 control overlaying.  In the Mac SE (and
 	 * possibly later models), overlay was set on reset, but cleared on the
@@ -1747,7 +1747,7 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_b)
 {
 	int new_rtc_rTCClk;
 
-	mac_enable_sound((data & 0x80) == 0);
+	mac_enable_sound(device->machine, (data & 0x80) == 0);
 
 	// SE and Classic have SCSI enable/disable here
 	if (mac_model >= MODEL_MAC_SE)
@@ -1883,7 +1883,7 @@ MACHINE_RESET(mac)
 	mac_set_screen_buffer(1);
 
 	/* setup sound */
-	mac_set_sound_buffer(0);
+	mac_set_sound_buffer(machine, 0);
 
 	if (has_adb())
 	{
@@ -1895,7 +1895,7 @@ MACHINE_RESET(mac)
 
 	if ((mac_model == MODEL_MAC_SE) || (mac_model == MODEL_MAC_CLASSIC))
 	{
-		mac_set_sound_buffer(1);
+		mac_set_sound_buffer(machine, 1);
 
 		// classic will fail RAM test and try to boot appletalk if RAM is not all zero
 		memset(mess_ram, 0, mess_ram_size);
@@ -2084,7 +2084,7 @@ static TIMER_CALLBACK(mac_scanline_tick)
 {
 	int scanline;
 
-	mac_sh_updatebuffer();
+	mac_sh_updatebuffer(machine);
 
 	scanline = video_screen_get_vpos(machine->primary_screen);
 	if (scanline == MAC_V_VIS)

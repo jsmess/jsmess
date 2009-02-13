@@ -82,7 +82,7 @@ CUSTOM_START( mac_sh_start )
 /*
 	Set the sound enable flag (VIA port line)
 */
-void mac_enable_sound(int on)
+void mac_enable_sound(running_machine *machine, int on)
 {
 	sample_enable = on;
 }
@@ -92,7 +92,7 @@ void mac_enable_sound(int on)
 /*
 	Set the current sound buffer (one VIA port line)
 */
-void mac_set_sound_buffer(int buffer)
+void mac_set_sound_buffer(running_machine *machine, int buffer)
 {
 	if (buffer)
 		mac_snd_buf_ptr = (UINT16 *) (mess_ram + mess_ram_size - MAC_MAIN_SND_BUF_OFFSET);
@@ -105,7 +105,7 @@ void mac_set_sound_buffer(int buffer)
 /*
 	Set the current sound volume (3 VIA port line)
 */
-void mac_set_volume(int volume)
+void mac_set_volume(running_machine *machine, int volume)
 {
 	stream_update(mac_stream);
 
@@ -119,7 +119,7 @@ void mac_set_volume(int volume)
 /*
 	Fetch one byte from sound buffer and put it to sound output (called every scanline)
 */
-void mac_sh_updatebuffer(void)
+void mac_sh_updatebuffer(running_machine *machine)
 {
 	static int indexx;
 	UINT16 *base = mac_snd_buf_ptr;
