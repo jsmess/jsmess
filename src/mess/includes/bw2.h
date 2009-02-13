@@ -8,6 +8,7 @@
 #define PIT8253_TAG	"ic6"
 #define MSM8251_TAG	"ic7"
 #define MSM6255_TAG	"ic49"
+#define CENTRONICS_TAG	"centronics"
 
 #define BW2_VIDEORAM_SIZE	0x4000
 #define BW2_RAMCARD_SIZE	0x80000
@@ -45,6 +46,7 @@ struct _bw2_state
 	/* devices */
 	const device_config *msm8251;
 	const device_config *msm6255;
+	const device_config *centronics;
 };
 
 #endif

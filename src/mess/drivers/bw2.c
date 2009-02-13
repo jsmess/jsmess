@@ -32,12 +32,11 @@
 #include "cpu/z80/z80.h"
 #include "includes/serial.h"
 #include "machine/8255ppi.h"
-#include "machine/centroni.h"
+#include "machine/ctronics.h"
 #include "machine/msm8251.h"
 #include "machine/wd17xx.h"
 #include "machine/pit8253.h"
 #include "devices/basicdsk.h"
-#include "devices/printer.h"
 #include "video/msm6255.h"
 #include "bw2.lh"
 
@@ -403,9 +402,7 @@ static WRITE8_DEVICE_HANDLER( bw2_ppi8255_a_w )
 		wd17xx_set_drive(fdc,state->selected_drive);
 	}
 
-	/* assumption: select is tied low */
-	centronics_write_handshake(device->machine,0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT | CENTRONICS_NO_RESET);
-	centronics_write_handshake(device->machine,0, BIT(data, 7) ? 0 : CENTRONICS_STROBE, CENTRONICS_STROBE);
+	centronics_strobe_w(state->centronics, BIT(data, 7));
 }
 
 static READ8_DEVICE_HANDLER( bw2_ppi8255_b_r )
@@ -472,10 +469,7 @@ static READ8_DEVICE_HANDLER( bw2_ppi8255_c_r )
 
 	UINT8 data = 0;
 
-	/* assumption: select is tied low */
-	centronics_write_handshake(device->machine,0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT | CENTRONICS_NO_RESET);
-	data = ((centronics_read_handshake(device->machine,0) & CENTRONICS_NOT_BUSY) == 0) ? 0x10 : 0;
-
+	data |= centronics_busy_r(state->centronics) << 4;
 	data |= state->mfdbk << 5;
 
 	data |= floppy_drive_get_flag_state(get_floppy_image(device->machine, state->selected_drive), FLOPPY_DRIVE_DISK_WRITE_PROTECTED) ? 0x00 : 0x80;
@@ -540,20 +534,6 @@ static const struct pit8253_config bw2_pit8253_interface =
 	}
 };
 
-/* Printer */
-
-static const CENTRONICS_CONFIG bw2_centronics_config[1] =
-{
-	{
-		PRINTER_IBM,
-		NULL
-	}
-};
-
-static WRITE8_HANDLER( bw2_centronics_data_w )
-{
-	centronics_write_data(space->machine,0, data);
-}
 
 /* Video */
 
@@ -597,13 +577,12 @@ static MACHINE_START( bw2 )
 	bw2_state *state = machine->driver_data;
 	device_config *fdc = (device_config*)devtag_get_device(machine, WD179X, "wd179x");
 
-	centronics_config(machine,0, bw2_centronics_config);
-
 	wd17xx_set_density(fdc,DEN_MFM_LO);
 
 	/* find devices */
 	state->msm8251 = devtag_get_device(machine, MSM8251, MSM8251_TAG);
 	state->msm6255 = devtag_get_device(machine, MSM6255, MSM6255_TAG);
+	state->centronics = devtag_get_device(machine, CENTRONICS, CENTRONICS_TAG);
 
 	/* register for state saving */
 	state_save_register_global(machine, state->keyboard_row);
@@ -664,7 +643,7 @@ static ADDRESS_MAP_START( bw2_io, ADDRESS_SPACE_IO, 8 )
 //	AM_RANGE( 0x30, 0x3f ) SLOT
 	AM_RANGE( 0x40, 0x40 ) AM_DEVREADWRITE( MSM8251, MSM8251_TAG, msm8251_data_r, msm8251_data_w )
 	AM_RANGE( 0x41, 0x41 ) AM_DEVREADWRITE( MSM8251, MSM8251_TAG, msm8251_status_r, msm8251_control_w )
-	AM_RANGE( 0x50, 0x50 ) AM_WRITE( bw2_centronics_data_w )
+	AM_RANGE( 0x50, 0x50 ) AM_DEVWRITE(CENTRONICS, CENTRONICS_TAG, centronics_data_w)
 	AM_RANGE( 0x60, 0x63 ) AM_READWRITE( bw2_wd2797_r, bw2_wd2797_w )
 //	AM_RANGE( 0x70, 0x7f ) MODEMSEL
 ADDRESS_MAP_END
@@ -858,7 +837,7 @@ static MACHINE_DRIVER_START( bw2 )
 	MDRV_MSM6255_ADD(MSM6255_TAG, XTAL_16MHz, bw2_msm6255_intf)
 
 	/* printer */
-	MDRV_PRINTER_ADD("printer")
+	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
 
 	/* uart */
 	MDRV_MSM8251_ADD(MSM8251_TAG, default_msm8251_interface)

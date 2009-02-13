@@ -26,6 +26,8 @@ System Driver Changes:
 
 - [ATOM] Rewrote printer interface.  [Dirk Best]
 
+- [BW2] Updated to use the new centronics interface.  [Dirk Best]
+
 - [CHANNELF] Added support for "new" sound.  [Fredric QJ Blåholtz]
 
 - [COCO] Cleanups  [Nathan Woods]
