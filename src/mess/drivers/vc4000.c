@@ -41,6 +41,8 @@ which consisted of 2K ROM and 2K RAM which are properly mapped as follows:
 2K Ram mapped from $0800 - $0FFF
 The Cartridge is called Hobby Module and properly the Rom is the same as used in
 elektor TV Game Computer which is a kind of developer machine for the VC4000.
+
+Go to the bottom to see the game list and emulation status of each.
 ******************************************************************************/
    
 #include "driver.h"
@@ -90,7 +92,7 @@ static WRITE8_HANDLER(vc4000_sound_ctl)
 static ADDRESS_MAP_START( vc4000_mem , ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x1600, 0x167f) AM_NOP AM_MIRROR(0x0800)
+//	AM_RANGE(0x1600, 0x167f) AM_NOP AM_MIRROR(0x0800)
 	AM_RANGE(0x1680, 0x16ff) AM_READWRITE( vc4000_key_r, vc4000_sound_ctl ) AM_MIRROR(0x0800)
 	AM_RANGE(0x1700, 0x17ff) AM_READWRITE( vc4000_video_r, vc4000_video_w ) AM_MIRROR(0x0800)
 ADDRESS_MAP_END
@@ -172,17 +174,9 @@ static const rgb_t vc4000_palette[] =
 	MAKE_RGB(255, 0, 255), // magenta
 	MAKE_RGB(200, 200, 0), // yellow
 	MAKE_RGB(200, 200, 200), // white
-	// sprite colors
-	// simplier to add another 8 colors else using colormapping
-	// xor 7, bit 2 not green, bit 1 not blue, bit 0 not red
-//	MAKE_RGB(255, 255, 255), // white
-//	MAKE_RGB(255, 255, 0), // yellow
-//	MAKE_RGB(255, 0, 255), // magenta
-//	MAKE_RGB(175, 0, 0), // red
-//	MAKE_RGB(0, 255, 255), // cyan
-//	MAKE_RGB(0, 175, 0), // green
-//	MAKE_RGB(0, 0, 175), // blue
-//	MAKE_RGB(0, 0, 0) // black
+	/* sprite colors
+	The control line simply inverts the RGB lines all at once.
+	We can do that in the code with ^7 */
 };
 
 static PALETTE_INIT( vc4000 )
@@ -225,19 +219,20 @@ static DEVICE_IMAGE_LOAD( vc4000_cart )
 
 static MACHINE_DRIVER_START( vc4000 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", S2650, 865000)        /* 3550000/4, 3580000/3, 4430000/3 */
+//	MDRV_CPU_ADD("main", S2650, 865000)        /* 3550000/4, 3580000/3, 4430000/3 */
+	MDRV_CPU_ADD("main", S2650, 3546875/4)
 	MDRV_CPU_PROGRAM_MAP(vc4000_mem, 0)
 	MDRV_CPU_IO_MAP(vc4000_io, 0)
-	MDRV_CPU_PERIODIC_INT(vc4000_video_line, 312*50)
-	MDRV_QUANTUM_TIME(HZ(60))
+	MDRV_CPU_PERIODIC_INT(vc4000_video_line, 312*53)
+//	MDRV_QUANTUM_TIME(HZ(60))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(226, 312)
-	MDRV_SCREEN_VISIBLE_AREA(8, 182, 0, 269)
-	MDRV_PALETTE_LENGTH(ARRAY_LENGTH(vc4000_palette))
+	MDRV_SCREEN_VISIBLE_AREA(8, 184, 0, 269)
+	MDRV_PALETTE_LENGTH(8)
 	MDRV_PALETTE_INIT( vc4000 )
 
 	MDRV_VIDEO_START( vc4000 )
@@ -306,3 +301,145 @@ QUICKLOAD_LOAD(vc4000)
 
 /*   YEAR	NAME	PARENT	COMPAT	MACHINE	INPUT	INIT	CONFIG	COMPANY		FULLNAME */
 CONS(1978,	vc4000,	0,	0,	vc4000,	vc4000,	0,	0,	"Interton",	"VC4000", GAME_IMPERFECT_GRAPHICS )
+
+/*	Game List and Emulation Status
+
+When you load a game it will normally appear to be unresponsive. Most carts contain a number of variants
+of each game (e.g. Difficulty, Player1 vs Player2 or Player1 vs Computer, etc).
+
+Press F2 (if needed) to select which game variant you would like to play. The variant number will increment
+on-screen. When you've made your choice, press F1 to start. The main keys are unlabelled, because an overlay
+is provided with each cart. See below for a guide.
+
+In some games, the joystick is used like 4 buttons, and other games like a paddle. The two modes are
+incompatible when using a keyboard. Therefore (in the emulation) a config dipswitch is used. The preferred
+setting is listed below.
+
+(AC = Auto-centre, NAC = no auto-centre, 90 = turn controller 90 degrees).
+
+The list is rather incomplete, information will be added as it becomes available.
+
+The game names and numbers were obtained from the Amigan Software site.
+
+Cart Num	Name
+----------------------------------------------
+1.		Grand Prix / Car Races / Autosport / Motor Racing / Road Race
+Config: Paddle, NAC
+Status: Working
+Controls: Left-Right: Steer; Up: Accelerate
+
+2.		Black Jack
+Status: Not working (some digits missing; indicator missing; dealer's cards missing)
+Controls: set bet with S and D; A to deal; 1 to hit, 2 to stay; Q accept insurance, E to decline; double-up (unknown key)
+Indicator: E make a bet then deal; I choose insurance; - you lost; + you won; X hit or stay
+
+3.		Olympics / Paddle Games / Bat & Ball / Pro Sport 60 / Sportsworld
+Config: Paddle, NAC
+Status: Working
+
+4.		Tank Battle / Combat
+Config: Button, 90
+Status: Working
+Controls: Left-Right: Steer; Up: Accelerate; Fire: Shoot
+
+5.		Maths 1
+Status: Working
+Controls: Z difficulty; X = addition or subtraction; C ask question; A=1;S=2;D=3;Q=4;W=5;E=6;1=7;2=8;3=9;0=0; C enter
+
+6.		Maths 2
+Status: Not working
+Controls: Same as above.
+
+7.		Air Sea Attack / Air Sea Battle
+Config: Button, 90
+Status: Working
+Controls: Left-Right: Move; Fire: Shoot
+
+8.		Treasure Hunt / Capture the Flag / Concentration / Memory Match
+Config: Buttons
+Status: Working
+
+9.		Labyrinth / Maze / Intelligence 1
+Config: Buttons
+Status: Working
+
+10.		Winter Sports
+Notes: Background colours should be Cyan and White instead of Red and Black
+
+11.		Hippodrome / Horse Race
+
+12.		Hunting / Shooting Gallery
+
+13.		Chess 1
+Status: Can't see what you're typing, wrong colours
+
+14.		Moto-cros
+
+15.		Four in a row / Intelligence 2
+Config: Buttons
+Status: Working
+Notes: Seems the unused squares should be black. The screen jumps about while the computer is "thinking".
+
+16.		Code Breaker / Master Mind / Intelligence 3 / Challenge
+
+17.		Circus
+STatus: severe gfx issues
+
+18.		Boxing / Prize Fight
+
+19.		Outer Space / Spacewar / Space Attack / Outer Space Combat
+
+20.		Melody Simon / Musical Memory / Follow the Leader / Musical Games / Electronic Music / Face the Music
+
+21.		Capture / Othello / Reversi / Attack / Intelligence 4
+Config: Buttons
+Status: Working
+Notes: Seems the unused squares should be black
+
+22.		Chess 2
+Status: Can't see what you're typing, wrong colours
+
+23.		Pinball / Flipper / Arcade
+Status: gfx issues
+
+24.		Soccer
+
+25.		Bowling / NinePins
+Config: Paddle, rotated 90 degrees, up/down autocentre, left-right does not
+Status: Working
+
+26.		Draughts
+
+27.		Golf
+Status: gfx issues
+
+28.		Cockpit
+Status: gfx issues
+
+29.		Metropolis / Hangman
+Status: gfx issues
+
+30.		Solitaire
+
+31.		Casino
+Status: gfx issues
+
+32.		Invaders / Alien Invasion / Earth Invasion
+
+33.		Super Invaders
+
+34.		(unknown, undumped pacman-like game)
+
+36.		BackGammon
+Status: Not all counters are visible, Dice not visible.
+
+37.		Monster Man / Spider's Web
+
+38.		Hyperspace
+
+40.		Super Space
+
+Public Domain:
+---------------
+* Picture (no controls) - works
+* WinArcadia Stub (no controls) - works */
