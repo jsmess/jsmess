@@ -23,8 +23,7 @@
 #include "sound/sn76496.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
-#include "machine/centroni.h"
-#include "devices/printer.h"
+#include "machine/ctronics.h"
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
 #include "machine/8255ppi.h"
@@ -340,22 +339,14 @@ static WRITE8_DEVICE_HANDLER(sord_ctc_w)
 
 static READ8_HANDLER(sord_sys_r)
 {
-	unsigned char data;
-	int printer_handshake;
-
-	data = 0;
+	const device_config *printer = devtag_get_device(space->machine, CENTRONICS, "centronics");
+	UINT8 data = 0;
 
 	/* cassette read */
 	if (cassette_input(cassette_device_image(space->machine)) >=0)
 		data |=(1<<0);
 
-	printer_handshake = centronics_read_handshake(space->machine, 0);
-
-	/* if printer is not online, it is busy */
-	if ((printer_handshake & CENTRONICS_ONLINE)!=0)
-	{
-		data|=(1<<1);
-	}
+	data |= centronics_busy_r(printer) << 1;
 
 	/* bit 7 must be 0 for saving and loading to work */
 
@@ -374,13 +365,7 @@ static READ8_HANDLER(sord_sys_r)
 
 static WRITE8_HANDLER(sord_sys_w)
 {
-	int handshake;
-
-	handshake = 0;
-	if (data & (1<<0))
-	{
-		handshake = CENTRONICS_STROBE;
-	}
+	const device_config *printer = devtag_get_device(space->machine, CENTRONICS, "centronics");
 
 	/* cassette remote */
 	cassette_change_state(
@@ -391,18 +376,11 @@ static WRITE8_HANDLER(sord_sys_w)
 	/* cassette data */
 	cassette_output(cassette_device_image(space->machine), (data & (1<<0)) ? -1.0 : 1.0);
 
-	/* assumption: select is tied low */
-	centronics_write_handshake(space->machine, 0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
-	centronics_write_handshake(space->machine, 0, handshake, CENTRONICS_STROBE);
+	centronics_strobe_w(printer, BIT(data, 0));
 
 	logerror("sys write: %02x\n",data);
 }
 
-static WRITE8_HANDLER(sord_printer_w)
-{
-//  logerror("centronics w: %02x\n",data);
-	centronics_write_data(space->machine, 0,data);
-}
 
 static ADDRESS_MAP_START( sord_m5_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -411,7 +389,7 @@ static ADDRESS_MAP_START( sord_m5_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x11, 0x11) AM_MIRROR(0x0e)	AM_READWRITE(TMS9928A_register_r,	TMS9928A_register_w)
 	AM_RANGE(0x20, 0x2f)					AM_WRITE(							sn76496_0_w)
 	AM_RANGE(0x30, 0x3f)					AM_READ(sord_keyboard_r)
-	AM_RANGE(0x40, 0x40)					AM_WRITE(							sord_printer_w)
+	AM_RANGE(0x40, 0x40)					AM_DEVWRITE(CENTRONICS, "centronics", centronics_data_w)
 	AM_RANGE(0x50, 0x50)					AM_READWRITE(sord_sys_r,			sord_sys_w)
 ADDRESS_MAP_END
 
@@ -422,20 +400,12 @@ static ADDRESS_MAP_START( srdm5fd5_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x11, 0x11) AM_MIRROR(0x0e)	AM_READWRITE(TMS9928A_register_r,	TMS9928A_register_w)
 	AM_RANGE(0x20, 0x2f)					AM_WRITE(							sn76496_0_w)
 	AM_RANGE(0x30, 0x3f)					AM_READ(sord_keyboard_r)
-	AM_RANGE(0x40, 0x40)					AM_WRITE(							sord_printer_w)
+	AM_RANGE(0x40, 0x40)					AM_DEVWRITE(CENTRONICS, "centronics", centronics_data_w)
 	AM_RANGE(0x50, 0x50)					AM_READWRITE(sord_sys_r,			sord_sys_w)
 	AM_RANGE(0x70, 0x73)					AM_DEVREADWRITE(PPI8255, "ppi8255", ppi8255_r, ppi8255_w)
 ADDRESS_MAP_END
 
 
-
-static const CENTRONICS_CONFIG sordm5_cent_config[1] =
-{
-	{
-		PRINTER_CENTRONICS,
-		NULL
-	},
-};
 
 static void sordm5_video_interrupt_callback(running_machine *machine, int state)
 {
@@ -466,13 +436,9 @@ static MACHINE_RESET( sord_m5 )
 
 	/* should be done in a special callback to work properly! */
 	memory_set_bankptr(machine, 1, memory_region(machine, "user1"));
-
-	centronics_config(machine, 0, sordm5_cent_config);
-	/* assumption: select is tied low */
-	centronics_write_handshake(machine, 0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
 }
 
-/* 2008-05 FP: 
+/* 2008-05 FP:
 Small note about natural keyboard: currently
 - "Reset" is mapped to 'Esc'
 - "Func" is mapped to 'F1'
@@ -644,10 +610,10 @@ static MACHINE_DRIVER_START( sord_m5 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* printer */
-	MDRV_PRINTER_ADD("printer")
+	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
 
 	MDRV_CASSETTE_ADD( "cassette", sordm5_cassette_config )
-	
+
 	/* cartridge */
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("rom")
@@ -667,7 +633,7 @@ static MACHINE_DRIVER_START( sord_m5_fd5 )
 
 	MDRV_QUANTUM_TIME(HZ(1200))
 	MDRV_MACHINE_RESET( sord_m5_fd5 )
-	
+
 	MDRV_NEC765A_ADD("nec765", sord_fd5_nec765_interface)
 MACHINE_DRIVER_END
 
