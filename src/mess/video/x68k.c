@@ -830,6 +830,9 @@ static void x68k_draw_gfx(bitmap_t* bitmap,rectangle cliprect)
 	int xscr,yscr;
 	int gpage;
 
+	if(x68k_sys.crtc.reg[20] & 0x0800)  // if graphic layers are set to buffer, then they aren't visible
+		return;
+		
 	for(priority=3;priority>=0;priority--)
 	{
 		if(x68k_sys.crtc.reg[20] & 0x0400)  // 1024x1024 "real" screen size - use 1024x1024 16-colour gfx layer
@@ -1178,9 +1181,7 @@ VIDEO_UPDATE( x68000 )
 		{
 			xscr = x68k_sys.crtc.hbegin-(x68k_sys.crtc.reg[10] & 0x3ff);
 			yscr = x68k_sys.crtc.vbegin-(x68k_sys.crtc.reg[11] & 0x3ff);
-#ifdef MAME_DEBUG
-			if(!input_code_pressed(KEYCODE_Q))
-#endif
+			if(!(x68k_sys.crtc.reg[20] & 0x1000))  // if text layer is set to buffer, then it's not visible
 				copyscrollbitmap_trans(bitmap, x68k_text_bitmap, 1, &xscr, 1, &yscr, &rect, 0x100);
 		}
 	}
