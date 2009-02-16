@@ -92,7 +92,6 @@ static WRITE8_HANDLER(vc4000_sound_ctl)
 static ADDRESS_MAP_START( vc4000_mem , ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
-//	AM_RANGE(0x1600, 0x167f) AM_NOP AM_MIRROR(0x0800)
 	AM_RANGE(0x1680, 0x16ff) AM_READWRITE( vc4000_key_r, vc4000_sound_ctl ) AM_MIRROR(0x0800)
 	AM_RANGE(0x1700, 0x17ff) AM_READWRITE( vc4000_video_r, vc4000_video_w ) AM_MIRROR(0x0800)
 ADDRESS_MAP_END
@@ -223,8 +222,7 @@ static MACHINE_DRIVER_START( vc4000 )
 	MDRV_CPU_ADD("main", S2650, 3546875/4)
 	MDRV_CPU_PROGRAM_MAP(vc4000_mem, 0)
 	MDRV_CPU_IO_MAP(vc4000_io, 0)
-	MDRV_CPU_PERIODIC_INT(vc4000_video_line, 312*53)
-//	MDRV_QUANTUM_TIME(HZ(60))
+	MDRV_CPU_PERIODIC_INT(vc4000_video_line, 312*53)	// GOLF needs this exact value
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -309,7 +307,7 @@ of each game (e.g. Difficulty, Player1 vs Player2 or Player1 vs Computer, etc).
 
 Press F2 (if needed) to select which game variant you would like to play. The variant number will increment
 on-screen. When you've made your choice, press F1 to start. The main keys are unlabelled, because an overlay
-is provided with each cart. See below for a guide.
+is provided with each cart. See below for a guide. You need to read the instructions that come with each game.
 
 In some games, the joystick is used like 4 buttons, and other games like a paddle. The two modes are
 incompatible when using a keyboard. Therefore (in the emulation) a config dipswitch is used. The preferred
@@ -422,24 +420,55 @@ Status: gfx issues
 30.		Solitaire
 
 31.		Casino
-Status: gfx issues
+Status: gfx issues, items missing and unplayable
+Controls: 1 or 3=START; q=GO; E=STOP; D=$; Z=^; X=tens; C=units
 
 32.		Invaders / Alien Invasion / Earth Invasion
+Status: Works
+Config: Buttons
 
 33.		Super Invaders
-
-34.		(unknown, undumped pacman-like game)
+Status: Stars are missing, colours are wrong
+Config: Buttons (90)
 
 36.		BackGammon
-Status: Not all counters are visible, Dice not visible.
+Status: Not all counters are visible, Dice & game number not visible.
+Controls: Fire=Exec; 1=D+; 3=D-; Q,W,E=4,5,6; A,S,D=1,2,3; Z=CL; X=STOP; C=SET
 
 37.		Monster Man / Spider's Web
+Status: Works
+Config: Buttons
 
 38.		Hyperspace
+Status: Works
+Config: Buttons (90)
+Controls: 3 - status button; Q,W,E,A,S,D,Z,X,C selects which galaxy to visit
+
 
 40.		Super Space
+Status: Works, some small gfx issues near the bottom
+Config: Buttons
 
-Public Domain:
+
+
+Acetronic: (dumps are compatible)
+------------
+
+* Shooting Gallery
+Status: works but screen flickers
+Config: Buttons
+
+* Planet Defender
+Status: Works
+Config: Paddle (NAC)
+
+* Laser Attack
+Status: Works
+Config: Buttons
+
+
+
+Public Domain: (written for emulators, may not work on real hardware)
 ---------------
 * Picture (no controls) - works
-* WinArcadia Stub (no controls) - works */
+* Wincadia Stub (no controls) - works, small graphic error */
