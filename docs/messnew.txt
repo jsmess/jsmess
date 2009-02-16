@@ -41,6 +41,9 @@ System Driver Changes:
 
 - [MTX512] Connected CTC channels 0-2 to clock sources. (bug #781) [Curt Coder]
 
+- [NC100/NC200] Updated to use the new centronics interface and fixed
+  printing.  [Dirk Best]
+
 - [ORIC] Updated to use the new centronics interface.  [Dirk Best]
 
 - [SAMCOUPE] Added centronics printer support.  [Dirk Best]

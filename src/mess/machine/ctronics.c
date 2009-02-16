@@ -79,6 +79,11 @@ static DEVICE_START( centronics )
 	/* validate some basic stuff */
 	assert(device->static_config != NULL);
 
+	/* set some initial values */
+	centronics->pe = FALSE;
+	centronics->fault = FALSE;
+	centronics->busy = TRUE;
+
 	/* get printer device */
 	centronics->printer = devtag_get_device(device->machine, PRINTER, device->tag);
 	assert(centronics->printer != NULL);
