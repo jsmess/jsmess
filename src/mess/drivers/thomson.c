@@ -73,6 +73,7 @@
 */
 
 #include "includes/thomson.h"
+#include "machine/ctronics.h"
 
 
 /**************************** common *******************************/
@@ -698,7 +699,7 @@ static MACHINE_DRIVER_START ( to7 )
      MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.) /* speech synthesis */
 
 /* printer */
-     MDRV_PRINTER_ADD("printer")
+     MDRV_CENTRONICS_ADD("centronics", to7_centronics_config)
 
 /* cassette */
      MDRV_CASSETTE_ADD( "cassette", to7_cassette_config )
@@ -720,9 +721,9 @@ static MACHINE_DRIVER_START ( to7 )
 
 /* modem */
      MDRV_ACIA6850_ADD( "acia6850", to7_modem )
-     
+
      MDRV_WD2793_ADD("wd2793", default_wd17xx_interface )
-    
+
 	/* cartridge */
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("m7,rom")
@@ -1118,7 +1119,7 @@ static MACHINE_DRIVER_START ( mo5 )
      MDRV_CASSETTE_MODIFY( "cassette", mo5_cassette_config )
 
      MDRV_MC6846_REMOVE( "mc6846" )
-     
+
 	MDRV_CARTSLOT_MODIFY("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("m5,rom")
 	MDRV_CARTSLOT_LOAD(mo5_cartridge)
@@ -1469,6 +1470,9 @@ static MACHINE_DRIVER_START ( to9 )
      MDRV_CPU_MODIFY( "main" )
      MDRV_CPU_PROGRAM_MAP ( to9, 0 )
 
+	MDRV_CENTRONICS_REMOVE("centronics")
+	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
+
      MDRV_MC6846_MODIFY( "mc6846", to9_timer )
 MACHINE_DRIVER_END
 
@@ -1703,6 +1707,9 @@ static MACHINE_DRIVER_START ( to8 )
      MDRV_CPU_MODIFY( "main" )
      MDRV_CPU_PROGRAM_MAP ( to8, 0 )
 
+	MDRV_CENTRONICS_REMOVE("centronics")
+	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
+
      MDRV_MC6846_MODIFY( "mc6846", to8_timer )
 MACHINE_DRIVER_END
 
@@ -1857,6 +1864,9 @@ static MACHINE_DRIVER_START ( to9p )
 
      MDRV_CPU_MODIFY( "main" )
      MDRV_CPU_PROGRAM_MAP ( to9p, 0 )
+
+	MDRV_CENTRONICS_REMOVE("centronics")
+	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
 
      MDRV_MC6846_MODIFY( "mc6846", to9p_timer )
 MACHINE_DRIVER_END
@@ -2205,7 +2215,10 @@ static MACHINE_DRIVER_START ( mo6 )
      MDRV_CPU_PROGRAM_MAP ( mo6, 0 )
 
      MDRV_MC6846_REMOVE( "mc6846" )
-     
+
+	MDRV_CENTRONICS_REMOVE("centronics")
+	MDRV_CENTRONICS_ADD("centronics", mo6_centronics_config)
+
 	MDRV_CARTSLOT_MODIFY("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("m5,rom")
 	MDRV_CARTSLOT_LOAD(mo5_cartridge)
@@ -2263,7 +2276,8 @@ static ADDRESS_MAP_START ( mo5nr, ADDRESS_SPACE_PROGRAM, 8 )
      AM_RANGE ( 0xa7cc, 0xa7cf ) AM_READWRITE ( pia_1_alt_r,  pia_1_alt_w )
      AM_RANGE ( 0xa7d0, 0xa7d9 ) AM_READWRITE ( mo5nr_net_r, mo5nr_net_w )
      AM_RANGE ( 0xa7da, 0xa7dd ) AM_READWRITE ( mo6_vreg_r, mo6_vreg_w )
-     AM_RANGE ( 0xa7e0, 0xa7e3 ) AM_READWRITE ( mo5nr_prn_r, mo5nr_prn_w )
+     AM_RANGE ( 0xa7e1, 0xa7e1 ) AM_DEVREADWRITE(CENTRONICS, "centronics", centronics_data_r, centronics_data_w)
+     AM_RANGE ( 0xa7e3, 0xa7e3 ) AM_READWRITE ( mo5nr_prn_r, mo5nr_prn_w )
      AM_RANGE ( 0xa7e4, 0xa7e7 ) AM_READWRITE ( mo6_gatearray_r,
 						mo6_gatearray_w )
      AM_RANGE ( 0xa7e8, 0xa7eb ) AM_DEVREADWRITE(ACIA6551, "acia",  acia_6551_r, acia_6551_w )
@@ -2435,7 +2449,10 @@ static MACHINE_DRIVER_START ( mo5nr )
      MDRV_CPU_PROGRAM_MAP ( mo5nr, 0 )
 
      MDRV_MC6846_REMOVE( "mc6846" )
-     
+
+	MDRV_CENTRONICS_REMOVE("centronics")
+	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
+
 	MDRV_CARTSLOT_MODIFY("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("m5,rom")
 	MDRV_CARTSLOT_LOAD(mo5_cartridge)

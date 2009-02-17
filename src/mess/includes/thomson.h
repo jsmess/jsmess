@@ -17,9 +17,8 @@
 #include "machine/6551.h"
 #include "sound/dac.h"
 #include "audio/mea8000.h"
+#include "machine/ctronics.h"
 #include "devices/cartslot.h"
-#include "machine/centroni.h"
-#include "devices/printer.h"
 #include "includes/serial.h"
 #include "devices/cassette.h"
 #include "machine/wd17xx.h"
@@ -80,6 +79,10 @@ extern WRITE8_HANDLER ( to7_midi_w );
 
 extern MACHINE_START ( to7 );
 extern MACHINE_RESET ( to7 );
+
+/* centronics */
+extern const centronics_interface to7_centronics_config;
+extern const centronics_interface mo6_centronics_config;
 
 /* timer */
 extern const mc6846_interface to7_timer;

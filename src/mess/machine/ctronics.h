@@ -33,6 +33,7 @@ struct _centronics_interface
 DEVICE_GET_INFO( centronics );
 
 WRITE8_DEVICE_HANDLER( centronics_data_w );
+READ8_DEVICE_HANDLER( centronics_data_r );
 
 /* access to the individual bits */
 WRITE_LINE_DEVICE_HANDLER( centronics_d0_w );

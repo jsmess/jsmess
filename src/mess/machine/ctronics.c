@@ -180,7 +180,7 @@ static TIMER_CALLBACK( ack_callback )
 		printer_output(centronics->printer, centronics->data);
 
 		/* timer to return BUSY to low, 5us max */
-		timer_set(machine, ATTOTIME_IN_USEC(4), ptr, FALSE, busy_callback);
+		timer_set(machine, ATTOTIME_IN_USEC(5), ptr, FALSE, busy_callback);
 	}
 }
 
@@ -197,12 +197,12 @@ static TIMER_CALLBACK( busy_callback )
 	if (param == TRUE)
 	{
 		/* timer to turn ACK low to receive data */
-		timer_set(machine, ATTOTIME_IN_NSEC(250), ptr, FALSE, ack_callback);
+		timer_set(machine, ATTOTIME_IN_USEC(1), ptr, FALSE, ack_callback);
 	}
 	else
 	{
 		/* timer to return ACK to high state, 5us max */
-		timer_set(machine, ATTOTIME_IN_USEC(4), ptr, TRUE, ack_callback);
+		timer_set(machine, ATTOTIME_IN_USEC(5), ptr, TRUE, ack_callback);
 	}
 }
 
@@ -215,6 +215,17 @@ WRITE8_DEVICE_HANDLER( centronics_data_w )
 {
 	centronics_state *centronics = get_safe_token(device);
 	centronics->data = data;
+}
+
+
+/*-------------------------------------------------
+    centronics_data_r - return current data
+-------------------------------------------------*/
+
+READ8_DEVICE_HANDLER( centronics_data_r )
+{
+	centronics_state *centronics = get_safe_token(device);
+	return centronics->data;
 }
 
 
@@ -260,7 +271,7 @@ WRITE_LINE_DEVICE_HANDLER( centronics_strobe_w )
 	if (centronics->strobe == TRUE && state == FALSE && centronics->busy == FALSE)
 	{
 		/* STROBE has gone low, data is ready */
-		timer_set(device->machine, ATTOTIME_IN_NSEC(250), centronics, TRUE, busy_callback);
+		timer_set(device->machine, ATTOTIME_IN_USEC(1), centronics, TRUE, busy_callback);
 	}
 
 	centronics->strobe = state;
