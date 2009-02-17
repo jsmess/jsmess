@@ -1,5 +1,5 @@
-#ifndef __GMASTER_H_
-#define __GMASTER_H_
+#ifndef __GMASTER_H__
+#define __GMASTER_H__
 
 #include "sound/custom.h"
 
@@ -8,4 +8,4 @@
 int gmaster_io_callback(const device_config *device, int ioline, int state);
 CUSTOM_START( gmaster_custom_start );
 
-#endif
+#endif /* __GMASTER_H__ */

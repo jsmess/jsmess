@@ -387,7 +387,7 @@ static void add_serout(int expect_data)
 	atari_fdc.serout_count = expect_data + 1;
 }
 
-static void clr_serin(int ser_delay)
+static void clr_serin(running_machine *machine, int ser_delay)
 {
 	atari_fdc.serin_chksum = 0;
 	atari_fdc.serin_offs = 0;
@@ -423,7 +423,7 @@ static void a800_serial_command(running_machine *machine)
 			logerror("atari serout command offset = 0\n");
 		return;
 	}
-	clr_serin(10);
+	clr_serin(machine, 10);
 
 	if (VERBOSE_SERIAL)
 	{

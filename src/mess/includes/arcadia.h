@@ -23,9 +23,9 @@
 /*----------- defined in video/arcadia.c -----------*/
 
 extern INTERRUPT_GEN( arcadia_video_line );
- READ8_HANDLER(arcadia_vsync_r);
+READ8_HANDLER(arcadia_vsync_r);
 
- READ8_HANDLER(arcadia_video_r);
+READ8_HANDLER(arcadia_video_r);
 WRITE8_HANDLER(arcadia_video_w);
 
 extern VIDEO_START( arcadia );
