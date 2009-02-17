@@ -351,7 +351,7 @@ static const cassette_config oric_cassette_config =
 	CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED
 };
 
-static const centronics_interface oric_contronics_config =
+static const centronics_interface oric_centronics_config =
 {
 	FALSE,
 	DEVCB_DEVICE_HANDLER(VIA6522, "via6522_0", via_ca1_w),
@@ -390,7 +390,7 @@ static MACHINE_DRIVER_START( oric )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* printer */
-	MDRV_CENTRONICS_ADD("centronics", oric_contronics_config)
+	MDRV_CENTRONICS_ADD("centronics", oric_centronics_config)
 
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", oric_cassette_config )

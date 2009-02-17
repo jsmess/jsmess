@@ -370,7 +370,7 @@ READ_LINE_DEVICE_HANDLER( centronics_not_busy_r )
 
 
 /*-------------------------------------------------
-    centronics_not_busy_r - return the state of the
+    centronics_vcc_r - return the state of the
     vcc line
 -------------------------------------------------*/
 
