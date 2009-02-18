@@ -2,7 +2,8 @@
 #include "rendlay.h"
 #include "includes/comx35.h"
 #include "cpu/cdp1802/cdp1802.h"
-#include "video/cdp1869.h"
+#include "sound/cdp1869.h"
+#include "sound/wave.h"
 #include "video/mc6845.h"
 
 /* CDP1869 */
@@ -56,38 +57,44 @@ static CDP1869_PCB_READ( comx35_pcb_r )
 	return BIT(state->pageram[pageaddr], 7);
 }
 
-static CDP1869_ON_PRD_CHANGED( comx35_prd_w )
+static WRITE_LINE_DEVICE_HANDLER( comx35_prd_w )
 {
-	comx35_state *state = device->machine->driver_data;
+	comx35_state *driver_state = device->machine->driver_data;
 
-	if (!state->iden && !prd)
+	if (!driver_state->iden && !state)
 	{
-		cpu_set_input_line(device->machine->cpu[0], CDP1802_INPUT_LINE_INT, ASSERT_LINE);
+		cputag_set_input_line(device->machine, CDP1802_TAG, CDP1802_INPUT_LINE_INT, ASSERT_LINE);
 	}
 
-	state->cdp1869_prd = prd;
+	driver_state->cdp1869_prd = state;
 }
 
-static CDP1869_INTERFACE( comx35p_cdp1869_intf )
+static CDP1869_INTERFACE( pal_cdp1869_intf )
 {
+	CDP1802_TAG,
+	SCREEN_TAG,
+	CDP1869_COLOR_CLK_PAL,
 	CDP1869_PAL,
 	comx35_pageram_r,
 	comx35_pageram_w,
 	comx35_pcb_r,
 	comx35_charram_r,
 	comx35_charram_w,
-	comx35_prd_w
+	DEVCB_LINE(comx35_prd_w)
 };
 
-static CDP1869_INTERFACE( comx35n_cdp1869_intf )
+static CDP1869_INTERFACE( ntsc_cdp1869_intf )
 {
+	CDP1802_TAG,
+	SCREEN_TAG,
+	CDP1869_COLOR_CLK_NTSC,
 	CDP1869_NTSC,
 	comx35_pageram_r,
 	comx35_pageram_w,
 	comx35_pcb_r,
 	comx35_charram_r,
 	comx35_charram_w,
-	comx35_prd_w
+	DEVCB_LINE(comx35_prd_w)
 };
 
 static VIDEO_START( comx35 )
@@ -116,7 +123,7 @@ static VIDEO_UPDATE( comx35 )
 
 	if (screen == screen_40)
 	{
-		const device_config *cdp1869 = devtag_get_device(screen->machine, CDP1869_VIDEO, CDP1869_TAG);
+		const device_config *cdp1869 = devtag_get_device(screen->machine, SOUND, CDP1869_TAG);
 
 		cdp1869_update(cdp1869, bitmap, cliprect);
 	}
@@ -222,7 +229,15 @@ MACHINE_DRIVER_START( comx35p_video )
 	MDRV_VIDEO_START(comx35)
 	MDRV_VIDEO_UPDATE(comx35)
 
-	MDRV_CDP1869_ADD(CDP1869_TAG, SCREEN_TAG, CDP1869_DOT_CLK_PAL, CDP1869_COLOR_CLK_PAL, CDP1802_TAG, comx35p_cdp1869_intf)
+	// sound hardware
+
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_CDP1869_ADD(CDP1869_TAG, CDP1869_DOT_CLK_PAL, pal_cdp1869_intf)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	MDRV_SOUND_ADD("cassette", WAVE, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MDRV_IMPORT_FROM(comx35_80_video)
 MACHINE_DRIVER_END
@@ -240,7 +255,15 @@ MACHINE_DRIVER_START( comx35n_video )
 	MDRV_VIDEO_START(comx35)
 	MDRV_VIDEO_UPDATE(comx35)
 
-	MDRV_CDP1869_ADD(CDP1869_TAG, SCREEN_TAG, CDP1869_DOT_CLK_NTSC, CDP1869_COLOR_CLK_NTSC, CDP1802_TAG, comx35n_cdp1869_intf)
+	// sound hardware
+
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_CDP1869_ADD(CDP1869_TAG, CDP1869_DOT_CLK_NTSC, ntsc_cdp1869_intf)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	MDRV_SOUND_ADD("cassette", WAVE, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MDRV_IMPORT_FROM(comx35_80_video)
 MACHINE_DRIVER_END

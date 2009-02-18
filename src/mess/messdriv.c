@@ -1100,8 +1100,8 @@ XL/XE 16kB OS roms
 //	DRIVER( exeltel )
 
 	/* Comx World Operations Ltd */
-//0.129u4	DRIVER( comx35p )
-//0.129u4	DRIVER( comx35n )
+	DRIVER( comx35p )
+	DRIVER( comx35n )
 //	DRIVER( comxpl80 )
 
 	/* Grundy Business Systems Ltd */

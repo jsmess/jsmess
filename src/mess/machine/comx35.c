@@ -39,7 +39,7 @@ Notes:
 #include "devices/basicdsk.h"
 #include "devices/printer.h"
 #include "devices/snapquik.h"
-#include "video/cdp1869.h"
+#include "sound/cdp1869.h"
 #include "video/mc6845.h"
 #include "includes/comx35.h"
 #include "machine/rescap.h"

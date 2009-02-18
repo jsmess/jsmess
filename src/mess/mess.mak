@@ -391,6 +391,7 @@ DRVLIBS = \
 	$(MESSOBJ)/coco.a \
 	$(MESSOBJ)/coleco.a \
 	$(MESSOBJ)/compis.a \
+	$(MESSOBJ)/comx.a \
 	$(MESSOBJ)/concept.a \
 	$(MESSOBJ)/cpschngr.a \
 	$(MESSOBJ)/cybiko.a \
@@ -483,7 +484,6 @@ DRVLIBS = \
 	$(MESSOBJ)/vtech.a \
 	$(MESSOBJ)/shared.a \
 
-#	$(MESSOBJ)/comx.a \
 #	$(MESSOBJ)/einis.a \
 #	$(MESSOBJ)/telmac.a \
 

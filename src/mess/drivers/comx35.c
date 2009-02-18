@@ -21,7 +21,6 @@
 #include "devices/snapquik.h"
 #include "machine/cdp1871.h"
 #include "machine/wd17xx.h"
-#include "video/cdp1869.h"
 #include "video/mc6845.h"
 
 static const device_config *cassette_device_image(running_machine *machine)
@@ -39,19 +38,19 @@ static ADDRESS_MAP_START( comx35_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xdfff) AM_RAMBANK(1)
 	AM_RANGE(0xe000, 0xefff) AM_ROMBANK(3)
-	AM_RANGE(0xf400, 0xf7ff) AM_DEVREADWRITE(CDP1869_VIDEO, CDP1869_TAG, cdp1869_charram_r, cdp1869_charram_w)
-	AM_RANGE(0xf800, 0xffff) AM_DEVREADWRITE(CDP1869_VIDEO, CDP1869_TAG, cdp1869_pageram_r, cdp1869_pageram_w)
+	AM_RANGE(0xf400, 0xf7ff) AM_DEVREADWRITE(SOUND, CDP1869_TAG, cdp1869_charram_r, cdp1869_charram_w)
+	AM_RANGE(0xf800, 0xffff) AM_DEVREADWRITE(SOUND, CDP1869_TAG, cdp1869_pageram_r, cdp1869_pageram_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( comx35_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x01, 0x01) AM_WRITE(comx35_bank_select_w)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(comx35_io_r, comx35_io_w)
-	AM_RANGE(0x03, 0x03) AM_DEVREAD(CDP1871, CDP1871_TAG, cdp1871_data_r) AM_DEVWRITE(CDP1869_VIDEO, CDP1869_TAG, cdp1869_out3_w)
-	AM_RANGE(0x04, 0x04) AM_READ(comx35_io2_r) AM_DEVWRITE(CDP1869_VIDEO, CDP1869_TAG, cdp1869_out4_w)
-	AM_RANGE(0x05, 0x05) AM_DEVWRITE(CDP1869_VIDEO, CDP1869_TAG, cdp1869_out5_w)
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE(CDP1869_VIDEO, CDP1869_TAG, cdp1869_out6_w)
-	AM_RANGE(0x07, 0x07) AM_DEVWRITE(CDP1869_VIDEO, CDP1869_TAG, cdp1869_out7_w)
+	AM_RANGE(0x03, 0x03) AM_DEVREAD(CDP1871, CDP1871_TAG, cdp1871_data_r) AM_DEVWRITE(SOUND, CDP1869_TAG, cdp1869_out3_w)
+	AM_RANGE(0x04, 0x04) AM_READ(comx35_io2_r) AM_DEVWRITE(SOUND, CDP1869_TAG, cdp1869_out4_w)
+	AM_RANGE(0x05, 0x05) AM_DEVWRITE(SOUND, CDP1869_TAG, cdp1869_out5_w)
+	AM_RANGE(0x06, 0x06) AM_DEVWRITE(SOUND, CDP1869_TAG, cdp1869_out6_w)
+	AM_RANGE(0x07, 0x07) AM_DEVWRITE(SOUND, CDP1869_TAG, cdp1869_out7_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -383,19 +382,9 @@ static MACHINE_DRIVER_START( comx35p )
 	// keyboard encoder
 	MDRV_CDP1871_ADD(CDP1871_TAG, comx35_cdp1871_intf, CDP1869_CPU_CLK_PAL / 8)
 	
-	// video hardware
+	// sound and video hardware
 
 	MDRV_IMPORT_FROM(comx35p_video)
-
-	// sound hardware
-
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-
-	MDRV_SOUND_ADD("cdp1869", CDP1869, CDP1869_DOT_CLK_PAL)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-
-	MDRV_SOUND_ADD("cassette", WAVE, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// printer
 
@@ -426,19 +415,9 @@ static MACHINE_DRIVER_START( comx35n )
 	// keyboard encoder
 	MDRV_CDP1871_ADD(CDP1871_TAG, comx35_cdp1871_intf, CDP1869_CPU_CLK_NTSC / 8)
 
-	// video hardware
+	// sound and video hardware
 
 	MDRV_IMPORT_FROM(comx35n_video)
-
-	// sound hardware
-
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-
-	MDRV_SOUND_ADD("cdp1869", CDP1869, CDP1869_DOT_CLK_NTSC)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-
-	MDRV_SOUND_ADD("cassette", WAVE, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// printer
 
