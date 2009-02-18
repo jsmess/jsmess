@@ -86,11 +86,10 @@
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/wd17xx.h"
-#include "machine/centroni.h"
+#include "machine/ctronics.h"
 #include "machine/msm8251.h"
 #include "devices/dsk.h"
 #include "devices/basicdsk.h"
-#include "devices/printer.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
 
@@ -438,24 +437,17 @@ static const z80ctc_interface einstein_ctc_intf =
 	z80ctc_trg3_w
 };
 
+
 static void einstein_pio_ardy(const device_config *device, int state)
 {
-	int handshake;
-
-	handshake = 0;
-
-	/* strobe is inverted state of ardy */
-	if (state != 0)
-		handshake = CENTRONICS_STROBE;
-
-	/* ardy is connected to strobe */
-	centronics_write_handshake(device->machine,0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
-	centronics_write_handshake(device->machine,0, handshake, CENTRONICS_STROBE);
+	const device_config *printer = devtag_get_device(device->machine, CENTRONICS, "centronics");
+	centronics_strobe_w(printer, state);
 }
 
 static WRITE8_DEVICE_HANDLER( einstein_pio_port_a_w )
 {
-	centronics_write_data(device->machine,0,data);
+	const device_config *printer = devtag_get_device(device->machine, CENTRONICS, "centronics");
+	centronics_data_w(printer, 0, data);
 }
 
 
@@ -860,16 +852,13 @@ static WRITE8_HANDLER(einstein_rom_w)
 
 static READ8_HANDLER(einstein_key_int_r)
 {
-	int centronics_handshake;
+	const device_config *printer = devtag_get_device(space->machine, CENTRONICS, "centronics");
 	int data;
 
 	/* clear key int. a read of this I/O port will do this or a reset */
 	einstein_int &= ~EINSTEIN_KEY_INT;
 
 	einstein_update_interrupts(space->machine);
-
-	centronics_write_handshake(space->machine,0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
-	centronics_handshake = centronics_read_handshake(space->machine,0);
 
 	/* bit 7: 0=shift pressed */
 	/* bit 6: 0=control pressed */
@@ -881,31 +870,9 @@ static READ8_HANDLER(einstein_key_int_r)
 	/* bit 0: fire 0 */
 	data = ((input_port_read(space->machine, "EXTRA") & 0x07)<<5) | (input_port_read(space->machine, "BUTTONS") & 0x03) | 0x01c;
 
-	/* error? */
-	if (centronics_handshake & CENTRONICS_NO_ERROR)
-	{
-		/* if CENTRONICS_NO_ERROR flag set there is no error */
-
-		/* no error */
-		data |= (1<<4);
-	}
-
-	/* no paper? */
-	if ((centronics_handshake & CENTRONICS_NO_PAPER)==0)
-	{
-		/* if CENTRONICS_NO_PAPER flag set there is no paper */
-
-		/* has paper */
-		data |= (1<<3);
-	}
-
-	if ((centronics_handshake & CENTRONICS_NOT_BUSY)==0)
-	{
-		/*  if CENTRONICS_NOT_BUSY flag set then not busy */
-
-		/* busy */
-		data |= (1<<2);
-	}
+	data |= centronics_fault_r(printer) << 4;
+	data |= centronics_pe_r(printer) << 3;
+	data |= centronics_busy_r(printer) << 2;
 
 	logerror("key int r: %02x\n",data);
 
@@ -1360,31 +1327,6 @@ ADDRESS_MAP_END
 
 
 
-
-static void einstein_printer_handshake_in(running_machine *machine,int number, int data, int mask)
-{
-	if (mask & CENTRONICS_ACKNOWLEDGE)
-	{
-		if (data & CENTRONICS_ACKNOWLEDGE)
-		{
-			/* /ack into /astb */
-			z80pio_astb_w( einstein_z80pio, 0);
-		}
-		else
-		{
-			z80pio_astb_w( einstein_z80pio, 1);
-		}
-	}
-}
-
-static const CENTRONICS_CONFIG einstein_cent_config[1]={
-	{
-		PRINTER_CENTRONICS,
-		einstein_printer_handshake_in
-	},
-};
-
-
 /* when Z80 acknowledges int, /IORQ and /M1 will be low */
 /* this allows I057 octal latch to output data onto the bus */
 static IRQ_CALLBACK(einstein_cpu_acknowledge_int)
@@ -1457,11 +1399,6 @@ static MACHINE_RESET( einstein )
 	/* the input to channel 0 and 1 of the ctc is a 2 MHz clock */
 	einstein_ctc_trigger = 0;
 	timer_pulse(machine, ATTOTIME_IN_HZ(2000000), (void *)devtag_get_device(machine, Z80CTC, "z80ctc"), 0, einstein_ctc_trigger_callback);
-
-	centronics_config(machine, 0, einstein_cent_config);
-	/* assumption: select is tied low */
-	centronics_write_handshake(machine, 0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
-
 }
 
 static MACHINE_RESET( einstein2 )
@@ -1609,6 +1546,14 @@ static const ay8910_interface einstein_ay_interface =
 	NULL
 };
 
+static const centronics_interface einstein_centronics_config =
+{
+	FALSE,
+	DEVCB_DEVICE_LINE(Z80PIO, "z80pio", z80pio_astb_w),
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
 /*
     0: 126 (127) horizontal total
     1: 80 horizontal displayed
@@ -1739,11 +1684,11 @@ static MACHINE_DRIVER_START( einstein )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	/* printer */
-	MDRV_PRINTER_ADD("printer")
+	MDRV_CENTRONICS_ADD("centronics", einstein_centronics_config)
 
 	/* uart */
 	MDRV_MSM8251_ADD("uart", default_msm8251_interface)
-	
+
 	MDRV_WD177X_ADD("wd177x", default_wd17xx_interface )
 MACHINE_DRIVER_END
 

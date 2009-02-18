@@ -34,6 +34,8 @@ System Driver Changes:
 
 - [CPC family] Updated all drivers to use the mc6845 device.  [Wilbert Pol]
 
+- [EINSTEIN] Updated to use the new centronics interface.  [Dirk Best]
+
 - [FAMICOM] Fixed 0.129 regression; once again allows you to run with only a
   floppy image and no cart.  (bug #1760) [Fabio Priuli]
 
