@@ -10,7 +10,6 @@
 #include "cpu/cdp1802/cdp1802.h"
 #include "sound/cdp1869.h"
 #include "sound/wave.h"
-#include "video/cdp1869.h"
 #include "devices/cassette.h"
 #include "includes/pecom.h"
 
@@ -27,11 +26,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pecom64_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x01, 0x01) AM_WRITE(pecom_bank_w)
-	AM_RANGE(0x03, 0x03) AM_READ(pecom_keyboard_r) AM_DEVWRITE(CDP1869_VIDEO, CDP1869_TAG, cdp1869_out3_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE(CDP1869_VIDEO, CDP1869_TAG, cdp1869_out4_w)
-	AM_RANGE(0x05, 0x05) AM_DEVWRITE(CDP1869_VIDEO, CDP1869_TAG, cdp1869_out5_w)
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE(CDP1869_VIDEO, CDP1869_TAG, cdp1869_out6_w)
-	AM_RANGE(0x07, 0x07) AM_DEVWRITE(CDP1869_VIDEO, CDP1869_TAG, cdp1869_out7_w)
+	AM_RANGE(0x03, 0x03) AM_READ(pecom_keyboard_r) AM_DEVWRITE(SOUND, CDP1869_TAG, cdp1869_out3_w)
+	AM_RANGE(0x04, 0x04) AM_DEVWRITE(SOUND, CDP1869_TAG, cdp1869_out4_w)
+	AM_RANGE(0x05, 0x05) AM_DEVWRITE(SOUND, CDP1869_TAG, cdp1869_out5_w)
+	AM_RANGE(0x06, 0x06) AM_DEVWRITE(SOUND, CDP1869_TAG, cdp1869_out6_w)
+	AM_RANGE(0x07, 0x07) AM_DEVWRITE(SOUND, CDP1869_TAG, cdp1869_out7_w)
 ADDRESS_MAP_END 
 
 /* Input ports */
@@ -146,17 +145,9 @@ static MACHINE_DRIVER_START( pecom64 )
   	MDRV_MACHINE_START( pecom )
   	MDRV_MACHINE_RESET( pecom )
 		
-	// video hardware
+	// sound and video hardware
 
 	MDRV_IMPORT_FROM(pecom_video)
-
-	// sound hardware	
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-
-	MDRV_SOUND_ADD("cdp1869", CDP1869, CDP1869_DOT_CLK_PAL)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MDRV_SOUND_ADD("cassette", WAVE, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	
 	MDRV_CASSETTE_ADD( "cassette", pecom_cassette_config )
 MACHINE_DRIVER_END

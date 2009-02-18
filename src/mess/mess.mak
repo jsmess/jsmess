@@ -397,6 +397,7 @@ DRVLIBS = \
 	$(MESSOBJ)/cybiko.a \
 	$(MESSOBJ)/dai.a \
 	$(MESSOBJ)/dgn_beta.a \
+	$(MESSOBJ)/einis.a \
 	$(MESSOBJ)/enterp.a \
 	$(MESSOBJ)/epoch.a \
 	$(MESSOBJ)/epson.a \
@@ -484,7 +485,6 @@ DRVLIBS = \
 	$(MESSOBJ)/vtech.a \
 	$(MESSOBJ)/shared.a \
 
-#	$(MESSOBJ)/einis.a \
 #	$(MESSOBJ)/telmac.a \
 
 

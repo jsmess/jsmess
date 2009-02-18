@@ -8,7 +8,7 @@
 
 #include "driver.h"
 #include "cpu/cdp1802/cdp1802.h"
-#include "video/cdp1869.h"
+#include "sound/cdp1869.h"
 #include "devices/cassette.h"
 #include "includes/pecom.h"
  
@@ -62,7 +62,7 @@ MACHINE_RESET( pecom )
 
 WRITE8_HANDLER( pecom_bank_w )
 {
-	const device_config *cdp1869 = devtag_get_device(space->machine, CDP1869_VIDEO, CDP1869_TAG);
+	const device_config *cdp1869 = devtag_get_device(space->machine, SOUND, CDP1869_TAG);
 	const address_space *space2 = cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = memory_region(space->machine, "main");
 	memory_install_write8_handler(cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, SMH_BANK1);

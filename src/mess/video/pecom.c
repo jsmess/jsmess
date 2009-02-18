@@ -7,7 +7,8 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "video/cdp1869.h"
+#include "sound/cdp1869.h"
+#include "sound/wave.h"
 #include "cpu/cdp1802/cdp1802.h"
 #include "includes/pecom.h"
 
@@ -62,31 +63,34 @@ static CDP1869_PCB_READ( pecom_pcb_r )
 }
 
 
-static CDP1869_ON_PRD_CHANGED( pecom_prd_w )
+static WRITE_LINE_DEVICE_HANDLER( pecom_prd_w )
 {
-	pecom_state *state = device->machine->driver_data;
+	pecom_state *driver_state = device->machine->driver_data;
 	// every other PRD triggers a DMAOUT request
-	if (state->dma)
+	if (driver_state->dma)
 	{
-		state->dma = 0;
+		driver_state->dma = 0;
 
 		cpu_set_input_line(device->machine->cpu[0], CDP1802_INPUT_LINE_DMAOUT, HOLD_LINE);
 	}
 	else
 	{
-		state->dma = 1;
+		driver_state->dma = 1;
 	}
 }
 
 static CDP1869_INTERFACE( pecom_cdp1869_intf )
 {
+	"main",
+	SCREEN_TAG,	
+	CDP1869_COLOR_CLK_PAL,
 	CDP1869_PAL,
 	pecom_page_ram_r,
 	pecom_page_ram_w,
 	pecom_pcb_r,
 	pecom_char_ram_r,
 	pecom_char_ram_w,
-	pecom_prd_w
+	DEVCB_LINE(pecom_prd_w)
 };
 
 
@@ -102,7 +106,7 @@ static VIDEO_START( pecom )
 
 	/* find devices */
 
-	state->cdp1869 = devtag_get_device(machine, CDP1869_VIDEO, CDP1869_TAG);
+	state->cdp1869 = devtag_get_device(machine, SOUND, CDP1869_TAG);
 
 	/* register for state saving */
 	state_save_register_global(machine, state->cdp1802_mode);
@@ -128,5 +132,10 @@ MACHINE_DRIVER_START( pecom_video )
 	MDRV_VIDEO_UPDATE(pecom)
 	MDRV_SCREEN_RAW_PARAMS(CDP1869_DOT_CLK_PAL, CDP1869_SCREEN_WIDTH, CDP1869_HBLANK_END, CDP1869_HBLANK_START, CDP1869_TOTAL_SCANLINES_PAL, CDP1869_SCANLINE_VBLANK_END_PAL, CDP1869_SCANLINE_VBLANK_START_PAL)
 
-	MDRV_CDP1869_ADD(CDP1869_TAG, SCREEN_TAG, CDP1869_DOT_CLK_PAL, CDP1869_COLOR_CLK_PAL, "main", pecom_cdp1869_intf)
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_CDP1869_ADD(CDP1869_TAG, CDP1869_DOT_CLK_PAL, pecom_cdp1869_intf)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MDRV_SOUND_ADD("cassette", WAVE, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END

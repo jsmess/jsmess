@@ -1090,7 +1090,7 @@ XL/XE 16kB OS roms
 	DRIVER(ac1_32) 	/* 1984 Amateurcomputer AC1 (32 lines)	*/
 
 	/* Ei Nis */
-//0.129u4	DRIVER(pecom64)
+	DRIVER(pecom64)
 
 	/* Bondwell */
 	DRIVER( bw2 )
