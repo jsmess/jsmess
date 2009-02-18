@@ -86,7 +86,8 @@ WRITE8_DEVICE_HANDLER( ut88_keyboard_w )
 
 WRITE8_HANDLER( ut88_sound_w )
 {
-	dac_data_w(0,data); //beeper
+	const device_config *dac_device = devtag_get_device(space->machine, SOUND, "dac");
+	dac_data_w(dac_device, data); //beeper
 	cassette_output(devtag_get_device(space->machine, CASSETTE, "cassette"),data & 0x01 ? 1 : -1);	
 }
 

@@ -149,8 +149,10 @@ static UINT8 mk2_read_b(const device_config *device, UINT8 olddata)
 
 static void mk2_write_b(const device_config *device, UINT8 newdata, UINT8 olddata)
 {
+	const device_config *dac_device = devtag_get_device(device->machine, SOUND, "dac");
+
 	if ((newdata&0x06)==0x06)
-		dac_data_w(0,newdata&1?80:0);
+		dac_data_w(dac_device,newdata&1?80:0);
 	mk2_led[4]|=newdata;
 
 	cpu_set_input_line( device->machine->cpu[0], M6502_IRQ_LINE, (newdata & 0x80) ? CLEAR_LINE : ASSERT_LINE );

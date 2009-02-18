@@ -19,8 +19,8 @@
 
 
 #define AYWriteReg(chip,port,value) \
-	ay8910_control_port_0_w(space, 0,port);  \
-	ay8910_write_port_0_w(space, 0,value)
+	ay8910_address_w(ay8910, 0,port);  \
+	ay8910_data_w(ay8910, 0,value)
 
 #define TAPE_HEADER "Colour Genie - Virtual Tape File"
 
@@ -96,6 +96,7 @@ static TIMER_CALLBACK( handle_cassette_input )
 MACHINE_RESET( cgenie )
 {
 	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	const device_config *ay8910 = devtag_get_device(machine, SOUND, "ay8910");
 	UINT8 *ROM = memory_region(machine, "main");
 
 	/* reset the AY8910 to be quiet, since the cgenie BIOS doesn't */
@@ -414,12 +415,12 @@ static UINT8 psg_b_out = 0x00;
 static UINT8 psg_a_inp = 0x00;
 static UINT8 psg_b_inp = 0x00;
 
- READ8_HANDLER( cgenie_psg_port_a_r )
+READ8_HANDLER( cgenie_psg_port_a_r )
 {
 	return psg_a_inp;
 }
 
- READ8_HANDLER( cgenie_psg_port_b_r )
+READ8_HANDLER( cgenie_psg_port_b_r )
 {
 	if( psg_a_out < 0xd0 )
 	{

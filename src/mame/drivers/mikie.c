@@ -91,9 +91,9 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x8000, 0x8000) AM_WRITENOP	// sound command latch
 	AM_RANGE(0x8001, 0x8001) AM_WRITENOP	// ???
-	AM_RANGE(0x8002, 0x8002) AM_WRITE(sn76496_0_w)	// trigger read of latch
+	AM_RANGE(0x8002, 0x8002) AM_DEVWRITE(SOUND, "sn1", sn76496_w)	// trigger read of latch
 	AM_RANGE(0x8003, 0x8003) AM_READ(soundlatch_r)
-	AM_RANGE(0x8004, 0x8004) AM_WRITE(sn76496_1_w)	// trigger read of latch
+	AM_RANGE(0x8004, 0x8004) AM_DEVWRITE(SOUND, "sn2", sn76496_w)	// trigger read of latch
 	AM_RANGE(0x8005, 0x8005) AM_READ(mikie_sh_timer_r)
 	AM_RANGE(0x8079, 0x8079) AM_WRITENOP	// ???
 	AM_RANGE(0xa003, 0xa003) AM_WRITENOP	// ???
@@ -269,12 +269,13 @@ static MACHINE_DRIVER_START( mikie )
 	MDRV_VIDEO_UPDATE(mikie)
 
 	// sound hardware
+	// manual says 2xSN76489AN but SN76489 sounds correct in the locker room level (sound test 24)
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("sn1", SN76496, XTAL/8)
+	MDRV_SOUND_ADD("sn1", SN76489, XTAL/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MDRV_SOUND_ADD("sn2", SN76496, CLK)
+	MDRV_SOUND_ADD("sn2", SN76489, CLK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_DRIVER_END
 

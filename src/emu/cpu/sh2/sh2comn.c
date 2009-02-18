@@ -22,10 +22,7 @@
 #endif
 
 
-// Atrocious hack that makes the soldivid music correct
-
-//static const int div_tab[4] = { 3, 5, 7, 0 };
-static const int div_tab[4] = { 3, 5, 3, 0 };
+static const int div_tab[4] = { 3, 5, 7, 0 };
 
 INLINE UINT32 RL(SH2 *sh2, offs_t A)
 {
@@ -278,7 +275,7 @@ static void sh2_dmac_check(SH2 *sh2, int dma)
 	{
 		if(sh2->dma_timer_active[dma])
 		{
-			logerror("SH2: DMA %d cancelled in-flight", dma);
+			logerror("SH2: DMA %d cancelled in-flight\n", dma);
 			timer_adjust_oneshot(sh2->dma_timer[dma], attotime_never, 0);
 			sh2->dma_timer_active[dma] = 0;
 		}

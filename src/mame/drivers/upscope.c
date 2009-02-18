@@ -81,7 +81,7 @@ static void upscope_reset(running_machine *machine)
  *
  *************************************/
 
-static void upscope_cia_0_porta_w(const device_config *device, UINT8 data)
+static WRITE8_DEVICE_HANDLER( upscope_cia_0_porta_w )
 {
 	/* switch banks as appropriate */
 	memory_set_bank(device->machine, 1, data & 1);
@@ -113,12 +113,12 @@ static void upscope_cia_0_porta_w(const device_config *device, UINT8 data)
  *
  *************************************/
 
-static void upscope_cia_0_portb_w(const device_config *device, UINT8 data)
+static WRITE8_DEVICE_HANDLER( upscope_cia_0_portb_w )
 {
 	parallel_data = data;
 }
 
-static UINT8 upscope_cia_0_portb_r(const device_config *device)
+static READ8_DEVICE_HANDLER( upscope_cia_0_portb_r )
 {
 	return nvram_data_latch;
 }
@@ -140,12 +140,12 @@ static UINT8 upscope_cia_0_portb_r(const device_config *device)
  *
  *************************************/
 
-static UINT8 upscope_cia_1_porta_r(const device_config *device)
+static READ8_DEVICE_HANDLER( upscope_cia_1_porta_r )
 {
 	return 0xf8 | (prev_cia1_porta & 0x07);
 }
 
-static void upscope_cia_1_porta_w(const device_config *device, UINT8 data)
+static WRITE8_DEVICE_HANDLER( upscope_cia_1_porta_w )
 {
 	/* on a low transition of POUT, we latch stuff for the NVRAM */
 	if ((prev_cia1_porta & 2) && !(data & 2))
@@ -270,40 +270,27 @@ INPUT_PORTS_END
 
 /*************************************
  *
- *  Sound definitions
- *
- *************************************/
-
-static const custom_sound_interface amiga_custom_interface =
-{
-	amiga_sh_start
-};
-
-
-
-/*************************************
- *
  *  Machine driver
  *
  *************************************/
 
 static const cia6526_interface cia_0_intf =
 {
-	amiga_cia_0_irq,										/* irq_func */
+	DEVCB_LINE(amiga_cia_0_irq),										/* irq_func */
 	0,														/* tod_clock */
 	{
-		{ NULL, upscope_cia_0_porta_w },					/* port A */
-		{ upscope_cia_0_portb_r, upscope_cia_0_portb_w }	/* port B */
+		{ DEVCB_NULL, DEVCB_HANDLER(upscope_cia_0_porta_w) },					/* port A */
+		{ DEVCB_HANDLER(upscope_cia_0_portb_r), DEVCB_HANDLER(upscope_cia_0_portb_w) }	/* port B */
 	}
 };
 
 static const cia6526_interface cia_1_intf =
 {
-	amiga_cia_1_irq,										/* irq_func */
+	DEVCB_LINE(amiga_cia_1_irq),										/* irq_func */
 	0,														/* tod_clock */
 	{
-		{ upscope_cia_1_porta_r, upscope_cia_1_porta_w, },	/* port A */
-		{ NULL, NULL }										/* port B */
+		{ DEVCB_HANDLER(upscope_cia_1_porta_r), DEVCB_HANDLER(upscope_cia_1_porta_w), },	/* port A */
+		{ DEVCB_NULL, DEVCB_NULL }										/* port B */
 	}
 };
 
@@ -335,8 +322,7 @@ static MACHINE_DRIVER_START( upscope )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD("amiga", CUSTOM, 3579545)
-	MDRV_SOUND_CONFIG(amiga_custom_interface)
+	MDRV_SOUND_ADD("amiga", AMIGA, 3579545)
 	MDRV_SOUND_ROUTE(0, "right", 0.50)
 	MDRV_SOUND_ROUTE(1, "left", 0.50)
 	MDRV_SOUND_ROUTE(2, "left", 0.50)

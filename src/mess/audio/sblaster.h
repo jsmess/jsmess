@@ -30,8 +30,5 @@ typedef struct {
 void soundblaster_config(const SOUNDBLASTER_CONFIG *config);
 void soundblaster_reset(void);
 
-//        { SOUND_CUSTOM, &soundblaster_interface },
-//extern custom_sound_interface soundblaster_interface;
-
 
 #endif /* SBLASTER_H_ */

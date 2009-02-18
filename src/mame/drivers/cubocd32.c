@@ -46,7 +46,6 @@
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
-#include "sound/custom.h"
 #include "sound/cdda.h"
 #include "includes/amiga.h"
 #include "includes/cubocd32.h"
@@ -86,15 +85,10 @@ static WRITE32_HANDLER( aga_overlay_w )
  *
  *************************************/
 
-static UINT8 cd32_cia_0_porta_r(const device_config *device)
-{
-	return input_port_read(device->machine, "CIA0PORTA");
-}
-
-static void cd32_cia_0_porta_w(const device_config *device, UINT8 data)
+static WRITE8_DEVICE_HANDLER( cd32_cia_0_porta_w )
 {
 	/* bit 1 = cd audio mute */
-	sndti_set_output_gain(SOUND_CDDA, 0, 0, ( data & 1 ) ? 0.0 : 1.0 );
+	sound_set_output_gain(devtag_get_device(device->machine, SOUND, "cdda"), 0, ( data & 1 ) ? 0.0 : 1.0 );
 
 	/* bit 2 = Power Led on Amiga */
 	set_led_status(0, (data & 2) ? 0 : 1);
@@ -115,14 +109,14 @@ static void cd32_cia_0_porta_w(const device_config *device, UINT8 data)
  *
  *************************************/
 
-static UINT8 cd32_cia_0_portb_r(const device_config *device)
+static READ8_DEVICE_HANDLER( cd32_cia_0_portb_r )
 {
 	/* parallel port */
 	logerror("%s:CIA0_portb_r\n", cpuexec_describe_context(device->machine));
 	return 0xff;
 }
 
-static void cd32_cia_0_portb_w(const device_config *device, UINT8 data)
+static WRITE8_DEVICE_HANDLER( cd32_cia_0_portb_w )
 {
 	/* parallel port */
 	logerror("%s:CIA0_portb_w(%02x)\n", cpuexec_describe_context(device->machine), data);
@@ -215,30 +209,23 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const custom_sound_interface amiga_custom_interface =
-{
-	amiga_sh_start
-};
-
-
-
 static const cia6526_interface cia_0_intf =
 {
-	amiga_cia_0_irq,									/* irq_func */
+	DEVCB_LINE(amiga_cia_0_irq),									/* irq_func */
 	0,													/* tod_clock */
 	{
-		{ cd32_cia_0_porta_r, cd32_cia_0_porta_w },		/* port A */
-		{ cd32_cia_0_portb_r, cd32_cia_0_portb_w }		/* port B */
+		{ DEVCB_INPUT_PORT("CIA0PORTA"), DEVCB_HANDLER(cd32_cia_0_porta_w) },		/* port A */
+		{ DEVCB_HANDLER(cd32_cia_0_portb_r), DEVCB_HANDLER(cd32_cia_0_portb_w) }		/* port B */
 	}
 };
 
 static const cia6526_interface cia_1_intf =
 {
-	amiga_cia_1_irq,									/* irq_func */
+	DEVCB_LINE(amiga_cia_1_irq),									/* irq_func */
 	0,													/* tod_clock */
 	{
-		{ NULL, NULL },									/* port A */
-		{ NULL, NULL }									/* port B */
+		{ DEVCB_NULL, DEVCB_NULL },									/* port A */
+		{ DEVCB_NULL, DEVCB_NULL }									/* port B */
 	}
 };
 
@@ -270,8 +257,7 @@ static MACHINE_DRIVER_START( cd32 )
 	/* sound hardware */
     MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-    MDRV_SOUND_ADD("amiga", CUSTOM, 3579545)
-    MDRV_SOUND_CONFIG(amiga_custom_interface)
+    MDRV_SOUND_ADD("amiga", AMIGA, 3579545)
     MDRV_SOUND_ROUTE(0, "left", 0.25)
     MDRV_SOUND_ROUTE(1, "right", 0.25)
     MDRV_SOUND_ROUTE(2, "right", 0.25)

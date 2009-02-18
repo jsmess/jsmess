@@ -480,11 +480,6 @@ static MACHINE_RESET( tvlink )
 	tvlink.palette[3] = MAKE24_RGB15(svisionp_palette[(PALETTE_START+3)*3+0], svisionp_palette[(PALETTE_START+3)*3+1], svisionp_palette[(PALETTE_START+3)*3+2]);
 }
 
-static const custom_sound_interface svision_sound_interface =
-{
-	svision_custom_start
-};
-
 static MACHINE_DRIVER_START( svision )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M65C02, 4000000)        /* ? stz used! speed? */
@@ -507,8 +502,7 @@ static MACHINE_DRIVER_START( svision )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
-	MDRV_SOUND_ADD("custom", CUSTOM, 0)
-	MDRV_SOUND_CONFIG(svision_sound_interface)
+	MDRV_SOUND_ADD("custom", SVISION, 0)
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
 	

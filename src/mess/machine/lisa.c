@@ -138,24 +138,24 @@ static int KBIR;	/* COPS VIA interrupt pending */
 const via6522_interface lisa_via6522_0_intf =
 {
 	/* COPS via */
-	NULL, COPS_via_in_b,
-	NULL, NULL,
-	NULL, NULL,
-	COPS_via_out_a, COPS_via_out_b,
-	COPS_via_out_ca2, COPS_via_out_cb2,
-	NULL, NULL,
-	COPS_via_irq_func,
+	DEVCB_NULL, DEVCB_HANDLER(COPS_via_in_b),
+	DEVCB_NULL, DEVCB_NULL,
+	DEVCB_NULL, DEVCB_NULL,
+	DEVCB_HANDLER(COPS_via_out_a), DEVCB_HANDLER(COPS_via_out_b),
+	DEVCB_HANDLER(COPS_via_out_ca2), DEVCB_HANDLER(COPS_via_out_cb2),
+	DEVCB_NULL, DEVCB_NULL,
+	DEVCB_LINE(COPS_via_irq_func),
 };
 
 const via6522_interface lisa_via6522_1_intf =
 {
 	/* parallel interface via - incomplete */
-	NULL, parallel_via_in_b,
-	NULL, NULL,
-	NULL, NULL,
-	NULL, NULL,
-	NULL, NULL,
-	NULL, NULL,
+	DEVCB_NULL, DEVCB_HANDLER(parallel_via_in_b),
+	DEVCB_NULL, DEVCB_NULL,
+	DEVCB_NULL, DEVCB_NULL,
+	DEVCB_NULL, DEVCB_NULL,
+	DEVCB_NULL, DEVCB_NULL,
+	DEVCB_NULL, DEVCB_NULL,
 };
 
 /*

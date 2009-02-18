@@ -526,8 +526,7 @@ static MACHINE_DRIVER_START( arcadia )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("custom", CUSTOM, 0)
-	MDRV_SOUND_CONFIG(arcadia_sound_interface)
+	MDRV_SOUND_ADD("custom", ARCADIA, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* cartridge */

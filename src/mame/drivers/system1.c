@@ -29,6 +29,7 @@ TODO: - background is misplaced in wbmlju
 #include "sound/sn76496.h"
 
 static UINT8 *system1_ram;
+static UINT8 dakkochn_mux_data;
 
 
 static MACHINE_RESET( system1 )
@@ -40,6 +41,13 @@ static MACHINE_RESET( system1_banked )
 {
 	MACHINE_RESET_CALL(system1);
 	memory_configure_bank(machine, 1, 0, 4, memory_region(machine, "main") + 0x10000, 0x4000);
+}
+
+static MACHINE_RESET( dakkochn )
+{
+	MACHINE_RESET_CALL(system1);
+	memory_configure_bank(machine, 1, 0, 4, memory_region(machine, "main") + 0x10000, 0x4000);
+	dakkochn_mux_data = 0;
 }
 
 static MACHINE_RESET( wbml )
@@ -249,6 +257,44 @@ static ADDRESS_MAP_START( chplft_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xef00, 0xefff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( gardiab_writemem, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x8000, 0xbfff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xc000, 0xcfff) AM_WRITE(SMH_RAM) // ROM
+	AM_RANGE(0xd000, 0xd1ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xd800, 0xddff) AM_WRITE(system1_paletteram_w) AM_BASE(&paletteram)
+	AM_RANGE(0xe7bd, 0xe7bd) AM_WRITE(SMH_RAM) AM_BASE(&system1_scroll_y)	// ???
+	AM_RANGE(0xe7c0, 0xe7c1) AM_WRITE(SMH_RAM) AM_BASE(&system1_scroll_x)
+	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(SMH_RAM) AM_BASE(&system1_videoram) AM_SIZE(&system1_videoram_size)
+	AM_RANGE(0xe800, 0xeeff) AM_WRITE(system1_backgroundram_w) AM_BASE(&system1_backgroundram) AM_SIZE(&system1_backgroundram_size)
+	AM_RANGE(0xf000, 0xf3ff) AM_WRITE(system1_background_collisionram_w) AM_BASE(&system1_background_collisionram)
+	AM_RANGE(0xf800, 0xfbff) AM_WRITE(system1_sprites_collisionram_w) AM_BASE(&system1_sprites_collisionram)
+
+	 /* needed for P.O.S.T. */
+	AM_RANGE(0xd200, 0xd7ff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xde00, 0xdfff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xef00, 0xefff) AM_WRITE(SMH_RAM)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( dakkochn_writemem, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x8000, 0xbfff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xc000, 0xcfff) AM_WRITE(SMH_RAM) // ROM
+	AM_RANGE(0xd000, 0xd1ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xd800, 0xddff) AM_WRITE(system1_paletteram_w) AM_BASE(&paletteram)
+	AM_RANGE(0xe7bb, 0xe7bb) AM_WRITE(SMH_RAM) AM_BASE(&system1_scroll_y) //TODO: hook it up
+	AM_RANGE(0xe7c0, 0xe7ff) AM_WRITE(choplifter_scroll_x_w) AM_BASE(&system1_scrollx_ram)
+	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(SMH_RAM) AM_BASE(&system1_videoram) AM_SIZE(&system1_videoram_size)
+	AM_RANGE(0xe800, 0xeeff) AM_WRITE(system1_backgroundram_w) AM_BASE(&system1_backgroundram) AM_SIZE(&system1_backgroundram_size)
+	AM_RANGE(0xf000, 0xf3ff) AM_WRITE(system1_background_collisionram_w) AM_BASE(&system1_background_collisionram)
+	AM_RANGE(0xf800, 0xfbff) AM_WRITE(system1_sprites_collisionram_w) AM_BASE(&system1_sprites_collisionram)
+
+	 /* needed for P.O.S.T. */
+	AM_RANGE(0xd200, 0xd7ff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xde00, 0xdfff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xef00, 0xefff) AM_WRITE(SMH_RAM)
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( nobo_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0xbfff) AM_WRITE(SMH_ROM)
@@ -401,8 +447,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x1800) AM_RAM
-	AM_RANGE(0xa000, 0xa003) AM_MIRROR(0x1ffc) AM_WRITE(sn76496_0_w)    /* Choplifter writes to the four addresses */
-	AM_RANGE(0xc000, 0xc003) AM_MIRROR(0x1ffc) AM_WRITE(sn76496_1_w)    /* in sequence */
+	AM_RANGE(0xa000, 0xa003) AM_MIRROR(0x1ffc) AM_DEVWRITE(SOUND, "sn1", sn76496_w)    /* Choplifter writes to the four addresses */
+	AM_RANGE(0xc000, 0xc003) AM_MIRROR(0x1ffc) AM_DEVWRITE(SOUND, "sn2", sn76496_w)    /* in sequence */
 	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1fff) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
@@ -1522,6 +1568,87 @@ static INPUT_PORTS_START( wbml )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( dakkochn )
+	PORT_INCLUDE( chplft )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("SYSTEM")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) //start 1 & 2 not connected.
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	/*TODO: Dip-Switches */
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SWB:2")
+	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) )		PORT_DIPLOCATION("SWB:3,4")
+	PORT_DIPSETTING(	0x04, "3" )
+	PORT_DIPSETTING(	0x0c, "4" )
+	PORT_DIPSETTING(	0x08, "5" )
+/* 0x00 gives 4 lives */
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SWB:5")
+	PORT_DIPSETTING(	0x10, "30000 100000 200000" )
+	PORT_DIPSETTING(	0x00, "50000 150000 250000" )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SWB:6")
+	PORT_DIPSETTING(	0x20, DEF_STR( Easy ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Hard ) )
+	PORT_DIPNAME( 0x40, 0x40, "Test Mode" )			PORT_DIPLOCATION("SWB:7")
+	PORT_DIPSETTING(	0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SWB:8")
+	PORT_DIPSETTING(	0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+
+	PORT_START("KEY0")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("KEY1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_B )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_C )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_D )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("KEY2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_E )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_G )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_H )
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("KEY3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_I )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_J )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_L )
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("KEY4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_M )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_N )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("KEY5")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_BET )
+	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("KEY6")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
+	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
 /*
 
  To enter Test Mode all DIP Switches in DSW1 must be ON (example Difficulty = Easy)
@@ -1681,17 +1808,31 @@ static MACHINE_DRIVER_START( chplft )
 
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( gardiab )
+
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM( chplft )
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_PROGRAM_MAP(brain_readmem,gardiab_writemem)
+	MDRV_CPU_IO_MAP(chplft_io_map,0)
+
+	MDRV_MACHINE_RESET(system1_banked)
+
+	/* video hardware */
+	MDRV_VIDEO_UPDATE(system1)
+MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dakkochn )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( chplft )
 	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_PROGRAM_MAP(brain_readmem,dakkochn_writemem)
 	MDRV_CPU_IO_MAP(wbml_io_map,0)
 
 	/* video hardware */
 	MDRV_VIDEO_START(wbml)
-
+	MDRV_MACHINE_RESET(dakkochn)
 MACHINE_DRIVER_END
 
 
@@ -4109,19 +4250,49 @@ static DRIVER_INIT( ufosensi )  { mc8123_decrypt_rom(machine, "main", "user1", 1
 
 static UINT8 dakkochn_control;
 
+/*
+This game doesn't seem to have any mux writes, so I'm assuming that the mux does HW auto-incrementing.
+I need schematics to understand how it's properly mapped anyway, because it could be for example tied
+with vblank/video bits.
+The program flow is:
+I/O $00 R
+I/O $15 W 0xe
+I/O $15 W 0xc
+I/O $00 R
+I/O $15 W 0xe
+(and so on)
+
+*/
 static READ8_HANDLER( dakkochn_port_00_r )
 {
-	return 0x00;
+	static UINT8 res;
+
+	switch(dakkochn_mux_data)
+	{
+		case 0: res = input_port_read(space->machine, "KEY0"); break;
+		case 1: res = input_port_read(space->machine, "KEY1"); break;
+		case 2: res = input_port_read(space->machine, "KEY2"); break;
+		case 3: res = input_port_read(space->machine, "KEY3"); break;
+		case 4: res = input_port_read(space->machine, "KEY4"); break;
+		case 5: res = input_port_read(space->machine, "KEY5"); break;
+		case 6: res = input_port_read(space->machine, "KEY6"); break;
+	}
+
+	dakkochn_mux_data++;
+	if(dakkochn_mux_data >= 7)
+		dakkochn_mux_data = 0;
+
+	return res;
 }
 
 static READ8_HANDLER( dakkochn_port_03_r )
 {
-	return 0x00;
+	return 0;
 }
 
 static READ8_HANDLER( dakkochn_port_04_r )
 {
-	return 0x00;
+	return 0;
 }
 
 static WRITE8_HANDLER( dakkochn_port_15_w )
@@ -4286,7 +4457,7 @@ GAME( 1986, wboyu,    wboy,     system1,  wboyu,    0,        ROT0,   "Sega (Esc
 GAME( 1986, wboysys2, wboy,     wbml,     wboysys2, wboy,     ROT0,   "Sega (Escape license)", "Wonder Boy (system 2)", GAME_SUPPORTS_SAVE )
 GAME( 1986, wbdeluxe, wboy,     system1,  wbdeluxe, 0,        ROT0,   "Sega (Escape license)", "Wonder Boy Deluxe", GAME_SUPPORTS_SAVE )
 GAME( 1986, gardia,   0,        brain,    gardia,   gardia,   ROT270, "Sega / Coreland", "Gardia (317-0006)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE)
-GAME( 1986, gardiab,  gardia,   brain,    gardia,   gardiab,  ROT270, "bootleg",         "Gardia (317-0007?, bootleg)", GAME_NOT_WORKING | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1986, gardiab,  gardia,   gardiab,  gardia,   gardiab,  ROT270, "bootleg",         "Gardia (317-0007?, bootleg)", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1986, nob,      nobb,     nob,      nob,      0,        ROT270, "Data East Corporation", "Noboranka (Japan)", GAME_NOT_WORKING )
 GAME( 1986, nobb,     0,        nobb,     nob,      nobb,     ROT270, "bootleg",               "Noboranka (Japan, bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1987, blockgal, 0,        system1,  blockgal, blockgal, ROT90,  "Sega / Vic Tokai", "Block Gal (MC-8123B, 317-0029)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE)
@@ -4297,6 +4468,6 @@ GAME( 1987, wbmljo,   wbml,     wbml,     wbml,     wbml,     ROT0,   "Sega / We
 GAME( 1987, wbmljb,   wbml,     wbml,     wbml,     bootlegb, ROT0,   "bootleg",         "Wonder Boy in Monster Land (Japan not encrypted)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1987, wbmlb,    wbml,     wbml,     wbml,     bootlegb, ROT0,   "bootleg",         "Wonder Boy in Monster Land (English bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE)
 GAME( 1987, wbmlbg,   wbml,     wbml,     wbml,     bootlegb, ROT0,   "bootleg",         "Wonder Boy in Monster Land (Galaxy Electronics English bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE)
-GAME( 1987, dakkochn, 0,        dakkochn, wbml,     dakkochn, ROT0,   "Whiteboard",      "DakkoChan House (MC-8123, 317-0014)", GAME_NOT_WORKING | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
+GAME( 1987, dakkochn, 0,        dakkochn, dakkochn, dakkochn, ROT0,   "Whiteboard",      "DakkoChan House (MC-8123, 317-0014)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
 GAME( 1988, ufosensi, 0,        ufosensi, ufosensi, ufosensi, ROT0,   "Sega",            "Ufo Senshi Yohko Chan (MC-8123, 317-0064)", GAME_SUPPORTS_SAVE )
 GAME( 1988, ufosensb, ufosensi, ufosensi, ufosensi, bootlegb, ROT0,   "bootleg",         "Ufo Senshi Yohko Chan (not encrypted)", GAME_SUPPORTS_SAVE )

@@ -172,7 +172,7 @@ static READ8_DEVICE_HANDLER ( oric_via_in_a_func )
 		/* if psg is in read register state return reg data */
 		if (oric_psg_control==0x01)
 		{
-			return ay8910_read_port_0_r(space, 0);
+			return ay8910_r(devtag_get_device(space->machine, SOUND_AY8912, "ay8912"), 0);
 		}
 
 		/* return high-impedance */
@@ -215,15 +215,15 @@ static void oric_psg_connection_refresh(running_machine *machine)
 			/* write register data */
 			case 2:
 			{
-				const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
-				ay8910_write_port_0_w(space, 0, oric_via_port_a_data);
+				const device_config *ay8912 = devtag_get_device(machine, SOUND_AY8912, "ay8912");
+				ay8910_data_w(ay8912, 0, oric_via_port_a_data);
 			}
 			break;
 			/* write register index */
 			case 3:
 			{
-				const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
-				ay8910_control_port_0_w(space, 0, oric_via_port_a_data);
+				const device_config *ay8912 = devtag_get_device(machine, SOUND_AY8912, "ay8912");
+				ay8910_address_w(ay8912, 0, oric_via_port_a_data);
 			}
 			break;
 
@@ -432,19 +432,19 @@ CB2
 
 const via6522_interface oric_6522_interface=
 {
-	oric_via_in_a_func,
-	oric_via_in_b_func,
-	NULL,				/* printer acknowledge - handled by callback*/
-	NULL,				/* tape input - handled by timer */
-	oric_via_in_ca2_func,
-	oric_via_in_cb2_func,
-	oric_via_out_a_func,
-	oric_via_out_b_func,
-	NULL,
-	NULL,
-	oric_via_out_ca2_func,
-	oric_via_out_cb2_func,
-	oric_via_irq_func,
+	DEVCB_HANDLER(oric_via_in_a_func),
+	DEVCB_HANDLER(oric_via_in_b_func),
+	DEVCB_NULL,				/* printer acknowledge - handled by callback*/
+	DEVCB_NULL,				/* tape input - handled by timer */
+	DEVCB_HANDLER(oric_via_in_ca2_func),
+	DEVCB_HANDLER(oric_via_in_cb2_func),
+	DEVCB_HANDLER(oric_via_out_a_func),
+	DEVCB_HANDLER(oric_via_out_b_func),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(oric_via_out_ca2_func),
+	DEVCB_HANDLER(oric_via_out_cb2_func),
+	DEVCB_LINE(oric_via_irq_func),
 };
 
 
@@ -1433,19 +1433,19 @@ static void	telestrat_via2_irq_func(const device_config *device, int state)
 }
 const via6522_interface telestrat_via2_interface=
 {
-	telestrat_via2_in_a_func,
-	telestrat_via2_in_b_func,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	telestrat_via2_out_a_func,
-	telestrat_via2_out_b_func,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	telestrat_via2_irq_func,
+	DEVCB_HANDLER(telestrat_via2_in_a_func),
+	DEVCB_HANDLER(telestrat_via2_in_b_func),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(telestrat_via2_out_a_func),
+	DEVCB_HANDLER(telestrat_via2_out_b_func),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_LINE(telestrat_via2_irq_func),
 };
 
 #if 0

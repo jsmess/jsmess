@@ -9,7 +9,6 @@
 #include <stdio.h>
 #include "driver.h"
 #include "utils.h"
-#include "sound/custom.h"
 
 #include "vic6560.h"
 
@@ -37,11 +36,6 @@ const unsigned char vic6560_palette[] =
 	0xc0, 0xa0, 0x00, 0xff, 0xa0, 0x00, 0xf0, 0x80, 0x80, 0x00, 0xff, 0xff,
 /* light violett, light green, light blue, light yellow */
 	0xff, 0x00, 0xff, 0x00, 0xff, 0x00, 0x00, 0xa0, 0xff, 0xff, 0xff, 0x00
-};
-
-const custom_sound_interface vic6560_sound_interface =
-{
-	vic6560_custom_start
 };
 
 UINT8 vic6560[16];

@@ -851,6 +851,8 @@ static WRITE32_HANDLER( ds2404_clk_w )
 
 static WRITE32_HANDLER( eeprom_w )
 {
+	const device_config *oki2 = devtag_get_device(space->machine, SOUND, "oki2");
+
 	// tile banks
 	if( ACCESSING_BITS_16_23 ) {
 		rf2_set_layer_banks(data >> 16);
@@ -860,8 +862,8 @@ static WRITE32_HANDLER( eeprom_w )
 	}
 
 	// oki banking
-	if (sndti_exists(SOUND_OKIM6295, 1))
-		okim6295_set_bank_base(1, (data & 0x4000000) ? 0x40000 : 0);
+	if (oki2 != NULL)
+		okim6295_set_bank_base(oki2, (data & 0x4000000) ? 0x40000 : 0);
 }
 
 static WRITE32_HANDLER( z80_prg_fifo_w )
@@ -906,30 +908,6 @@ static READ32_HANDLER( spi_controls2_r )
 		return input_port_read(space->machine, "SYSTEM");
 	}
 	return 0xffffffff;
-}
-
-static READ32_HANDLER( spi_6295_0_r )
-{
-	return okim6295_status_0_r(space, 0);
-}
-
-static READ32_HANDLER( spi_6295_1_r )
-{
-	return okim6295_status_1_r(space, 0);
-}
-
-static WRITE32_HANDLER( spi_6295_0_w )
-{
-	if( ACCESSING_BITS_0_7 ) {
-		okim6295_data_0_w(space, 0, data & 0xff);
-	}
-}
-
-static WRITE32_HANDLER( spi_6295_1_w )
-{
-	if( ACCESSING_BITS_0_7 ) {
-		okim6295_data_1_w(space, 0, data & 0xff);
-	}
 }
 
 /********************************************************************/
@@ -1046,7 +1024,7 @@ static ADDRESS_MAP_START( spisound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x400b, 0x400b) AM_WRITENOP			/* Unknown */
 	AM_RANGE(0x4013, 0x4013) AM_READ(z80_coin_r)
 	AM_RANGE(0x401b, 0x401b) AM_WRITE(z80_bank_w)		/* control register: bits 0-2 = bank @ 8000, bit 3 = watchdog? */
-	AM_RANGE(0x6000, 0x600f) AM_READWRITE(ymf271_0_r, ymf271_0_w)
+	AM_RANGE(0x6000, 0x600f) AM_DEVREADWRITE(SOUND, "ymf", ymf271_r, ymf271_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK(4)
 ADDRESS_MAP_END
 
@@ -1077,18 +1055,18 @@ static WRITE8_DEVICE_HANDLER( flashrom_write )
 	}
 }
 
-static void irqhandler(running_machine *machine, int state)
+static void irqhandler(const device_config *device, int state)
 {
 	if (state)
-		cpu_set_input_line_and_vector(machine->cpu[1], 0, ASSERT_LINE, 0xd7);	// IRQ is RST10
+		cpu_set_input_line_and_vector(device->machine->cpu[1], 0, ASSERT_LINE, 0xd7);	// IRQ is RST10
 	else
-		cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE);
+		cpu_set_input_line(device->machine->cpu[1], 0, CLEAR_LINE);
 }
 
 static const ymf271_interface ymf271_config =
 {
-	flashrom_read,
-	flashrom_write,
+	DEVCB_HANDLER(flashrom_read),
+	DEVCB_HANDLER(flashrom_write),
 	irqhandler
 };
 
@@ -1112,8 +1090,8 @@ static ADDRESS_MAP_START( seibu386_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITE(eeprom_w)
 	AM_RANGE(0x00000800, 0x0003ffff) AM_RAM AM_BASE(&spimainram)
 	AM_RANGE(0x00200000, 0x003fffff) AM_ROM AM_SHARE(2)
-	AM_RANGE(0x01200000, 0x01200003) AM_READWRITE(spi_6295_0_r, spi_6295_0_w)
-	AM_RANGE(0x01200004, 0x01200007) AM_READWRITE(spi_6295_1_r, spi_6295_1_w)
+	AM_RANGE(0x01200000, 0x01200003) AM_DEVREADWRITE8(SOUND, "oki1", okim6295_r, okim6295_w, 0x000000ff)
+	AM_RANGE(0x01200004, 0x01200007) AM_DEVREADWRITE8(SOUND, "oki2", okim6295_r, okim6295_w, 0x000000ff)
 	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("user1", 0) AM_SHARE(2)		/* ROM location in real-mode */
 ADDRESS_MAP_END
 
@@ -1297,7 +1275,7 @@ INPUT_PORTS_END
 
 #define PLANE_CHAR 0
 #define PLANE_TILE 0
-#define PLANE_SPRITE 1
+#define PLANE_SPRITE 0
 
 static const gfx_layout spi_charlayout =
 {
@@ -2037,7 +2015,7 @@ static DRIVER_INIT( rfjet )
 	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x002894c, 0x002894f, 0, 0, rfjet_speedup_r );
 	seibuspi_rise11_text_decrypt(memory_region(machine, "gfx1"));
 	seibuspi_rise11_bg_decrypt(memory_region(machine, "gfx2"), memory_region_length(machine, "gfx2"));
-	seibuspi_rise11_sprite_decrypt(memory_region(machine, "gfx3"), 0x800000);
+	seibuspi_rise11_sprite_decrypt_rfjet(memory_region(machine, "gfx3"), 0x800000);
 
 	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x560, 0x563, 0, 0, sprite_dma_start_w);
 }
@@ -2786,6 +2764,36 @@ ROM_START(rdft2j) /* SPI Cart, Japan */
 	ROM_LOAD("sound1.u0222", 0x200000, 0x080000, CRC(b7bd3703) SHA1(6427a7e6de10d6743d6e64b984a1d1c647f5643a) )
 ROM_END
 
+ROM_START(rdft2j2) /* SPI Cart, Japan */
+	ROM_REGION32_LE(0x200000, "user1", 0)	/* i386 program */
+	ROM_LOAD32_BYTE("rf2.1",    0x000000, 0x80000, CRC(391d5057) SHA1(a1849142cbf7344ac1279781597e27b3b8ae6127) )
+	ROM_LOAD32_BYTE("u212.bin", 0x000001, 0x80000, CRC(58ccb10c) SHA1(0cce4057bfada78121d9586574b98d46cdd7dd46) )
+	ROM_LOAD32_BYTE("u210.bin", 0x000002, 0x80000, CRC(47fc3c96) SHA1(7378f8caa847f89f235b5be6779118721076873b) )
+	ROM_LOAD32_BYTE("u29.bin",  0x000003, 0x80000, CRC(271bdd4b) SHA1(0a805568cbd6a9c18bdb755a41972ff6bba9e6eb) )
+
+	ROM_REGION( 0x30000, "gfx1", 0)	/* text layer roms */
+	ROM_LOAD24_BYTE("gd_5.423", 0x000000, 0x10000, CRC(8f8d4e14) SHA1(06c803975767ae98f40ba7ac5764a5bc8baa3a30) )
+	ROM_LOAD24_BYTE("gd_6.424", 0x000001, 0x10000, CRC(6ac64968) SHA1(ec395205c24c4f864a1f805bb0d4641562d4faa9) )
+	ROM_LOAD24_BYTE("gd_7.48",  0x000002, 0x10000, CRC(4d87e1ea) SHA1(3230e9b643fad773e61ab8ce09c0cd7d4d0558e3) )
+
+	ROM_REGION( 0x600000, "gfx2", 0)	/* background layer roms */
+	ROM_LOAD24_WORD("gd_bg1-d.415", 0x000000, 0x200000, CRC(6a68054c) SHA1(5cbfc4ac90045f1401c2dda7a51936558c9de07e) )
+	ROM_LOAD24_BYTE("gd_bg1-p.410", 0x000002, 0x100000, CRC(3400794a) SHA1(719808f7442bac612cefd7b7fffcd665e6337ad0) )
+	ROM_LOAD24_WORD("gd_bg2-d.416", 0x300000, 0x200000, CRC(61cd2991) SHA1(bb608e3948bf9ea35b5e1615d2ba6858d029dcbe) )
+	ROM_LOAD24_BYTE("gd_bg2-p.49",  0x300002, 0x100000, CRC(502d5799) SHA1(c3a0e1a4f5a7b35572ae1ff31315da4ed08aa2fe) )
+
+	ROM_REGION( 0xc00000, "gfx3", 0)	/* sprites */
+	ROM_LOAD("gd_obj-1.322", 0x000000, 0x400000, CRC(59d86c99) SHA1(d3c9241e7b51fe21f8351051b063f91dc69bf905) )
+	ROM_LOAD("gd_obj-2.324", 0x400000, 0x400000, CRC(1ceb0b6f) SHA1(97225a9b3e7be18080aa52f6570af2cce8f25c06) )
+	ROM_LOAD("gd_obj-3.323", 0x800000, 0x400000, CRC(36e93234) SHA1(51917a80b7da5c32a9434a1076fc2916d62e6a3e) )
+
+	ROM_REGION(0x200000, "ymf", ROMREGION_ERASE00)
+
+	ROM_REGION(0x280000, "user2", ROMREGION_ERASE00)	/* sound roms */
+	ROM_LOAD("gd_pcm.217", 0x000000, 0x200000, CRC(31253ad7) SHA1(c81c8d50f8f287f5cbfaec77b30d969b01ce11a9) )
+	ROM_LOAD("gd_8.216",   0x200000, 0x080000, CRC(f88cb6e4) SHA1(fb35b41307b490d5d08e4b8a70f8ff4ce2ca8105) )
+ROM_END
+
 ROM_START(rdft2a) /* SPI Cart, Asia (Metrotainment license) */
 	ROM_REGION32_LE(0x200000, "user1", 0)	/* i386 program */
 	ROM_LOAD32_BYTE("prg0.met", 0x000000, 0x80000, CRC(046b3f0e) SHA1(033898f658d6007f891828835734422d4af36321) )
@@ -3188,6 +3196,7 @@ GAME( 1997, rdft2,     0,       spi,      spi_2button, rdft2,  ROT270, "Seibu Ka
 GAME( 1997, rdft2a2,   rdft2,   spi,      spi_2button, rdft2,  ROT270, "Seibu Kaihatsu (Dream Island license)", "Raiden Fighters 2 (Asia, Dream Island license, SPI)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 1997, rdft2a,    rdft2,   spi,      spi_2button, rdft2,  ROT270, "Seibu Kaihatsu (Metrotainment license)", "Raiden Fighters 2 (Asia, Metrotainment license, SPI)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 1997, rdft2j,    rdft2,   spi,      spi_2button, rdft2,  ROT270, "Seibu Kaihatsu", "Raiden Fighters 2 (Japan, SPI)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1997, rdft2j2,   rdft2,   spi,      spi_2button, rdft2,  ROT270, "Seibu Kaihatsu", "Raiden Fighters 2 (Japan set 2, SPI)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 1997, rdft2t,    rdft2,   spi,      spi_2button, rdft2,  ROT270, "Seibu Kaihatsu", "Raiden Fighters 2 (Taiwan, SPI)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 1997, rdft2u,    rdft2,   spi,      spi_2button, rdft2,  ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden Fighters 2 (USA, SPI)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 

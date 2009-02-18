@@ -7,7 +7,6 @@
 #ifndef GB_H_
 #define GB_H_
 
-#include "sound/custom.h"
 
 
 /* Interrupts */
@@ -35,12 +34,14 @@
 
 /*----------- defined in audio/gb.c -----------*/
 
+#define SOUND_GAMEBOY	DEVICE_GET_INFO_NAME(gameboy_sound)
+
 /* Custom Sound Interface */
-extern READ8_HANDLER( gb_sound_r );
-extern WRITE8_HANDLER( gb_sound_w );
-extern READ8_HANDLER( gb_wave_r );
-extern WRITE8_HANDLER( gb_wave_w );
-CUSTOM_START( gameboy_sh_start );
+DEVICE_GET_INFO( gameboy_sound );
+READ8_DEVICE_HANDLER( gb_sound_r );
+WRITE8_DEVICE_HANDLER( gb_sound_w );
+READ8_DEVICE_HANDLER( gb_wave_r );
+WRITE8_DEVICE_HANDLER( gb_wave_w );
 
 
 /*----------- defined in machine/gb.c -----------*/

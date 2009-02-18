@@ -451,22 +451,24 @@ static WRITE8_DEVICE_HANDLER( sio2_w )
 
 static READ8_HANDLER( abc800_pling_r )
 {
+	const device_config *discrete = devtag_get_device(space->machine, SOUND, "discrete");
 	abc800_state *state = space->machine->driver_data;
 
 	state->pling = !state->pling;
 
-	discrete_sound_w(space, NODE_01, state->pling);
+	discrete_sound_w(discrete, NODE_01, state->pling);
 
 	return 0xff;
 }
 
 static READ8_HANDLER( abc802_pling_r )
 {
+	const device_config *discrete = devtag_get_device(space->machine, SOUND, "discrete");
 	abc802_state *state = space->machine->driver_data;
 
 	state->pling = !state->pling;
 
-	discrete_sound_w(space, NODE_01, state->pling);
+	discrete_sound_w(discrete, NODE_01, state->pling);
 
 	return 0xff;
 }

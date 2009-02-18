@@ -123,6 +123,7 @@ CPUS += TMS99010
 #CPUS += TMS32031
 #CPUS += TMS32032
 #CPUS += TMS32051
+#CPUS += TMS57002
 #CPUS += CCPU
 #CPUS += ADSP21XX
 CPUS += PSXCPU
@@ -255,7 +256,6 @@ CPUS += I8X41
 # only for MAME and so aren't included
 #-------------------------------------------------
 
-SOUNDS += CUSTOM
 #SOUNDS += SAMPLES
 SOUNDS += DAC
 SOUNDS += DMADAC
@@ -352,6 +352,8 @@ SOUNDS += SID6581
 SOUNDS += SID8580
 SOUNDS += SP0256
 #SOUNDS += DIGITALKER
+SOUNDS += TMS5200
+SOUNDS += TMC0285
 
 
 #-------------------------------------------------
@@ -389,13 +391,11 @@ DRVLIBS = \
 	$(MESSOBJ)/coco.a \
 	$(MESSOBJ)/coleco.a \
 	$(MESSOBJ)/compis.a \
-	$(MESSOBJ)/comx.a \
 	$(MESSOBJ)/concept.a \
 	$(MESSOBJ)/cpschngr.a \
 	$(MESSOBJ)/cybiko.a \
 	$(MESSOBJ)/dai.a \
 	$(MESSOBJ)/dgn_beta.a \
-	$(MESSOBJ)/einis.a \
 	$(MESSOBJ)/enterp.a \
 	$(MESSOBJ)/epoch.a \
 	$(MESSOBJ)/epson.a \
@@ -468,7 +468,6 @@ DRVLIBS = \
 	$(MESSOBJ)/tangerin.a \
 	$(MESSOBJ)/tatung.a \
 	$(MESSOBJ)/teamconc.a \
-	$(MESSOBJ)/telmac.a \
 	$(MESSOBJ)/thomson.a \
 	$(MESSOBJ)/ti85.a \
 	$(MESSOBJ)/ti99.a \
@@ -484,6 +483,9 @@ DRVLIBS = \
 	$(MESSOBJ)/vtech.a \
 	$(MESSOBJ)/shared.a \
 
+#	$(MESSOBJ)/comx.a \
+#	$(MESSOBJ)/einis.a \
+#	$(MESSOBJ)/telmac.a \
 
 
 #-------------------------------------------------

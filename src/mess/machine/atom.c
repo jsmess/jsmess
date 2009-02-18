@@ -48,47 +48,33 @@ static const device_config *cassette_device_image(running_machine *machine)
     PRINTER INTERFACE
 ***************************************************************************/
 
-static void atom_via_irq_func(const device_config *device, int state)
-{
-	cpu_set_input_line(device->machine->cpu[0], 0, state);
-}
-
 /* BUSY from the centronics interface is connected to PA7 of the via */
 static READ8_DEVICE_HANDLER( atom_printer_busy )
 {
-	const device_config *printer = devtag_get_device(device->machine, CENTRONICS, "centronics");
-	return centronics_busy_r(printer) << 7;
+	return centronics_busy_r(device) << 7;
 }
 
 /* DATA lines 0 to 6 are connected to PA0 to PA6 of the via */
 static WRITE8_DEVICE_HANDLER( atom_printer_data )
 {
-	const device_config *printer = devtag_get_device(device->machine, CENTRONICS, "centronics");
-	centronics_data_w(printer, 0, data & 0x7f);
-}
-
-/* the CA2 output is connected to the STROBE signal on the centronics */
-static WRITE8_DEVICE_HANDLER( atom_printer_strobe )
-{
-	const device_config *printer = devtag_get_device(device->machine, CENTRONICS, "centronics");
-	centronics_strobe_w(printer, data);
+	centronics_data_w(device, 0, data & 0x7f);
 }
 
 const via6522_interface atom_6522_interface =
 {
-	atom_printer_busy,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	atom_printer_data,
-	NULL,
-	NULL,
-	NULL,
-	atom_printer_strobe,
-	NULL,
-	atom_via_irq_func,
+	DEVCB_DEVICE_HANDLER(CENTRONICS, "centronics", atom_printer_busy),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DEVICE_HANDLER(CENTRONICS, "centronics", atom_printer_data),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DEVICE_LINE(CENTRONICS, "centronics", centronics_strobe_w), /* the CA2 output is connected to the STROBE signal on the centronics */
+	DEVCB_NULL,
+	DEVCB_CPU_INPUT_LINE("main", 0)
 };
 
 

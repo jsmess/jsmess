@@ -449,16 +449,21 @@ static int validate_driver(int drivnum, const machine_config *config)
 	const game_driver *driver = drivers[drivnum];
 	const game_driver *clone_of;
 	quark_entry *entry;
-	int error = FALSE;
+	int error = FALSE, is_clone;
 	const char *s;
 	UINT32 crc;
 
+	enum { NAME_LEN_PARENT = 8, NAME_LEN_CLONE = 16 };
+
 	/* determine the clone */
+	is_clone = strcmp(driver->parent, "0");
 	clone_of = driver_get_clone(driver);
+	if (clone_of && (clone_of->flags & GAME_IS_BIOS_ROOT))
+		is_clone = 0;
 
 	/* if we have at least 100 drivers, validate the clone */
 	/* (100 is arbitrary, but tries to avoid tiny.mak dependencies) */
-	if (driver_list_get_count(drivers) > 100 && !clone_of && strcmp(driver->parent, "0"))
+	if (driver_list_get_count(drivers) > 100 && !clone_of && is_clone)
 	{
 		mame_printf_error("%s: %s is a non-existant clone\n", driver->source_file, driver->parent);
 		error = TRUE;
@@ -479,9 +484,10 @@ static int validate_driver(int drivnum, const machine_config *config)
 	}
 
 	/* make sure the driver name is 8 chars or less */
-	if (strlen(driver->name) > 8)
+	if ((is_clone && strlen(driver->name) > NAME_LEN_CLONE) || ((!is_clone) && strlen(driver->name) > NAME_LEN_PARENT))
 	{
-		mame_printf_error("%s: %s driver name must be 8 characters or less\n", driver->source_file, driver->name);
+		mame_printf_error("%s: %s %s driver name must be %d characters or less\n", driver->source_file, driver->name,
+						  is_clone ? "clone" : "parent", is_clone ? NAME_LEN_CLONE : NAME_LEN_PARENT);
 		error = TRUE;
 	}
 
@@ -496,7 +502,7 @@ static int validate_driver(int drivnum, const machine_config *config)
 
 #ifndef MESS
 	/* make sure sound-less drivers are flagged */
-	if ((driver->flags & GAME_IS_BIOS_ROOT) == 0 && config->sound[0].type == SOUND_DUMMY && (driver->flags & GAME_NO_SOUND) == 0 && strcmp(driver->name, "minivadr"))
+	if ((driver->flags & GAME_IS_BIOS_ROOT) == 0 && sound_first(config) == NULL && (driver->flags & GAME_NO_SOUND) == 0 && strcmp(driver->name, "minivadr"))
 	{
 		mame_printf_error("%s: %s missing GAME_NO_SOUND flag\n", driver->source_file, driver->name);
 		error = TRUE;
@@ -594,7 +600,7 @@ static int validate_roms(int drivnum, const machine_config *config, region_info 
 				/* load by name entries must be 8 characters or less */
 				else if (ROMREGION_ISLOADBYNAME(romp) && strlen(regiontag) > 8)
 				{
-					mame_printf_error("%s: %s has load-by-name region \"%s\" with name >8 characters\n", driver->source_file, driver->name, regiontag);
+					mame_printf_error("%s: %s has load-by-name region '%s' with name >8 characters\n", driver->source_file, driver->name, regiontag);
 					error = TRUE;
 				}
 
@@ -619,7 +625,7 @@ static int validate_roms(int drivnum, const machine_config *config, region_info 
 						/* fail if we hit a duplicate */
 						if (astring_cmp(fulltag, rgninfo->entries[rgnnum].tag) == 0)
 						{
-							mame_printf_error("%s: %s has duplicate ROM_REGION tag \"%s\"\n", driver->source_file, driver->name, astring_c(fulltag));
+							mame_printf_error("%s: %s has duplicate ROM_REGION tag '%s'\n", driver->source_file, driver->name, astring_c(fulltag));
 							error = TRUE;
 							astring_free(fulltag);
 							break;
@@ -815,7 +821,7 @@ static int validate_cpu(int drivnum, const machine_config *config, const input_p
 						/* stop if we hit an empty */
 						if (rgninfo->entries[rgnnum].tag == NULL)
 						{
-							mame_printf_error("%s: %s CPU '%s' %s space memory map entry %X-%X references non-existant region \"%s\"\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], entry->addrstart, entry->addrend, entry->region);
+							mame_printf_error("%s: %s CPU '%s' %s space memory map entry %X-%X references non-existant region '%s'\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], entry->addrstart, entry->addrend, entry->region);
 							error = TRUE;
 							break;
 						}
@@ -826,7 +832,7 @@ static int validate_cpu(int drivnum, const machine_config *config, const input_p
 							offs_t length = rgninfo->entries[rgnnum].length;
 							if (entry->rgnoffs + (byteend - bytestart + 1) > length)
 							{
-								mame_printf_error("%s: %s CPU '%s' %s space memory map entry %X-%X extends beyond region \"%s\" size (%X)\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], entry->addrstart, entry->addrend, entry->region, length);
+								mame_printf_error("%s: %s CPU '%s' %s space memory map entry %X-%X extends beyond region '%s' size (%X)\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], entry->addrstart, entry->addrend, entry->region, length);
 								error = TRUE;
 							}
 							break;
@@ -837,19 +843,19 @@ static int validate_cpu(int drivnum, const machine_config *config, const input_p
 				/* make sure all devices exist */
 				if (entry->read_devtype != NULL && device_list_find_by_tag(config->devicelist, entry->read_devtype, entry->read_devtag) == NULL)
 				{
-					mame_printf_error("%s: %s CPU '%s' %s space memory map entry references nonexistant device type %s, tag %s\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], devtype_get_name(entry->read_devtype), entry->read_devtag);
+					mame_printf_error("%s: %s CPU '%s' %s space memory map entry references nonexistant device %s '%s'\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], devtype_get_name(entry->read_devtype), entry->read_devtag);
 					error = TRUE;
 				}
 				if (entry->write_devtype != NULL && device_list_find_by_tag(config->devicelist, entry->write_devtype, entry->write_devtag) == NULL)
 				{
-					mame_printf_error("%s: %s CPU '%s' %s space memory map entry references nonexistant device type %s, tag %s\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], devtype_get_name(entry->write_devtype), entry->write_devtag);
+					mame_printf_error("%s: %s CPU '%s' %s space memory map entry references nonexistant device %s '%s'\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], devtype_get_name(entry->write_devtype), entry->write_devtag);
 					error = TRUE;
 				}
 
 				/* make sure ports exist */
 				if (entry->read_porttag != NULL && input_port_by_tag(portlist, entry->read_porttag) == NULL)
 				{
-					mame_printf_error("%s: %s CPU '%s' %s space memory map entry references nonexistant port tag %s\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], entry->read_porttag);
+					mame_printf_error("%s: %s CPU '%s' %s space memory map entry references nonexistant port tag '%s'\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], entry->read_porttag);
 					error = TRUE;
 				}
 			}
@@ -924,7 +930,7 @@ static int validate_display(int drivnum, const machine_config *config)
 		/* sanity check dimensions */
 		if ((scrconfig->width <= 0) || (scrconfig->height <= 0))
 		{
-			mame_printf_error("%s: %s screen \"%s\" has invalid display dimensions\n", driver->source_file, driver->name, device->tag);
+			mame_printf_error("%s: %s screen '%s' has invalid display dimensions\n", driver->source_file, driver->name, device->tag);
 			error = TRUE;
 		}
 
@@ -936,7 +942,7 @@ static int validate_display(int drivnum, const machine_config *config)
 				(scrconfig->visarea.max_x >= scrconfig->width) ||
 				(scrconfig->visarea.max_y >= scrconfig->height))
 			{
-				mame_printf_error("%s: %s screen \"%s\" has an invalid display area\n", driver->source_file, driver->name, device->tag);
+				mame_printf_error("%s: %s screen '%s' has an invalid display area\n", driver->source_file, driver->name, device->tag);
 				error = TRUE;
 			}
 
@@ -945,7 +951,7 @@ static int validate_display(int drivnum, const machine_config *config)
 				scrconfig->format != BITMAP_FORMAT_RGB15 &&
 				scrconfig->format != BITMAP_FORMAT_RGB32)
 			{
-				mame_printf_error("%s: %s screen \"%s\" has unsupported format\n", driver->source_file, driver->name, device->tag);
+				mame_printf_error("%s: %s screen '%s' has unsupported format\n", driver->source_file, driver->name, device->tag);
 				error = TRUE;
 			}
 			if (scrconfig->format == BITMAP_FORMAT_INDEXED16)
@@ -955,7 +961,7 @@ static int validate_display(int drivnum, const machine_config *config)
 		/* check for zero frame rate */
 		if (scrconfig->refresh == 0)
 		{
-			mame_printf_error("%s: %s screen \"%s\" has a zero refresh rate\n", driver->source_file, driver->name, device->tag);
+			mame_printf_error("%s: %s screen '%s' has a zero refresh rate\n", driver->source_file, driver->name, device->tag);
 			error = TRUE;
 		}
 	}
@@ -1011,7 +1017,7 @@ static int validate_gfx(int drivnum, const machine_config *config, region_info *
 				/* stop if we hit an empty */
 				if (rgninfo->entries[rgnnum].tag == NULL)
 				{
-					mame_printf_error("%s: %s has gfx[%d] referencing non-existent region \"%s\"\n", driver->source_file, driver->name, gfxnum, region);
+					mame_printf_error("%s: %s has gfx[%d] referencing non-existent region '%s'\n", driver->source_file, driver->name, gfxnum, region);
 					error = TRUE;
 					break;
 				}
@@ -1042,7 +1048,7 @@ static int validate_gfx(int drivnum, const machine_config *config, region_info *
 						/* if not, this is an error */
 						if ((start + len) / 8 > avail)
 						{
-							mame_printf_error("%s: %s has gfx[%d] extending past allocated memory of region \"%s\"\n", driver->source_file, driver->name, gfxnum, region);
+							mame_printf_error("%s: %s has gfx[%d] extending past allocated memory of region '%s'\n", driver->source_file, driver->name, gfxnum, region);
 							error = TRUE;
 						}
 					}
@@ -1349,7 +1355,7 @@ static int validate_inputs(int drivnum, const machine_config *config, const inpu
 			for (scanport = port->next; scanport != NULL; scanport = scanport->next)
 				if (scanport->tag != NULL && strcmp(port->tag, scanport->tag) == 0)
 				{
-					mame_printf_error("%s: %s has a duplicate input port tag \"%s\"\n", driver->source_file, driver->name, port->tag);
+					mame_printf_error("%s: %s has a duplicate input port tag '%s'\n", driver->source_file, driver->name, port->tag);
 					error = TRUE;
 				}
 
@@ -1424,7 +1430,7 @@ static int validate_inputs(int drivnum, const machine_config *config, const inpu
 				/* if none, error */
 				if (scanport == NULL)
 				{
-					mame_printf_error("%s: %s has a condition referencing non-existent input port tag \"%s\"\n", driver->source_file, driver->name, field->condition.tag);
+					mame_printf_error("%s: %s has a condition referencing non-existent input port tag '%s'\n", driver->source_file, driver->name, field->condition.tag);
 					error = TRUE;
 				}
 			}
@@ -1441,7 +1447,7 @@ static int validate_inputs(int drivnum, const machine_config *config, const inpu
 					/* if none, error */
 					if (scanport == NULL)
 					{
-						mame_printf_error("%s: %s has a condition referencing non-existent input port tag \"%s\"\n", driver->source_file, driver->name, setting->condition.tag);
+						mame_printf_error("%s: %s has a condition referencing non-existent input port tag '%s'\n", driver->source_file, driver->name, setting->condition.tag);
 						error = TRUE;
 					}
 				}
@@ -1464,16 +1470,13 @@ static int validate_inputs(int drivnum, const machine_config *config, const inpu
 
 static int validate_sound(int drivnum, const machine_config *config)
 {
+	const device_config *curspeak, *checkspeak, *cursound, *checksound;
 	const game_driver *driver = drivers[drivnum];
-	const device_config *curspeak, *checkspeak;
 	int error = FALSE;
-	int sndnum;
 
 	/* make sure the speaker layout makes sense */
 	for (curspeak = speaker_output_first(config); curspeak != NULL; curspeak = speaker_output_next(curspeak))
 	{
-		int check;
-
 		/* check for duplicate tags */
 		for (checkspeak = speaker_output_first(config); checkspeak != NULL; checkspeak = speaker_output_next(checkspeak))
 			if (checkspeak != curspeak && strcmp(checkspeak->tag, curspeak->tag) == 0)
@@ -1483,8 +1486,8 @@ static int validate_sound(int drivnum, const machine_config *config)
 			}
 
 		/* make sure there are no sound chips with the same tag */
-		for (check = 0; check < MAX_SOUND && config->sound[check].type != SOUND_DUMMY; check++)
-			if (config->sound[check].tag && strcmp(curspeak->tag, config->sound[check].tag) == 0)
+		for (checksound = sound_first(config); checksound != NULL; checksound = sound_next(checksound))
+			if (strcmp(curspeak->tag, checksound->tag) == 0)
 			{
 				mame_printf_error("%s: %s has both a speaker and a sound chip tagged as '%s'\n", driver->source_file, driver->name, curspeak->tag);
 				error = TRUE;
@@ -1492,43 +1495,30 @@ static int validate_sound(int drivnum, const machine_config *config)
 	}
 
 	/* make sure the sounds are wired to the speakers correctly */
-	for (sndnum = 0; sndnum < MAX_SOUND && config->sound[sndnum].type != SOUND_DUMMY; sndnum++)
+	for (cursound = sound_first(config); cursound != NULL; cursound = sound_next(cursound))
 	{
-		int routenum, checknum;
-
-		/* check for duplicate tags */
-		if (config->sound[sndnum].tag != NULL)
-			for (checknum = 0; checknum < sndnum; checknum++)
-				if (config->sound[checknum].tag != NULL && strcmp(config->sound[sndnum].tag, config->sound[checknum].tag) == 0)
-				{
-					mame_printf_error("%s: %s has multiple sound chips tagged as '%s'\n", driver->source_file, driver->name, config->sound[sndnum].tag);
-					error = TRUE;
-				}
-
-		/* validate the sound tag */
-		error |= validate_tag(driver, "sound", config->sound[sndnum].tag);
+		const sound_config *curconfig = cursound->inline_config;
+		const sound_route *route;
 
 		/* loop over all the routes */
-		for (routenum = 0; routenum < config->sound[sndnum].routes; routenum++)
+		for (route = curconfig->routelist; route != NULL; route = route->next)
 		{
 			/* find a speaker with the requested tag */
 			for (checkspeak = speaker_output_first(config); checkspeak != NULL; checkspeak = speaker_output_next(checkspeak))
-				if (strcmp(config->sound[sndnum].route[routenum].target, checkspeak->tag) == 0)
+				if (strcmp(route->target, checkspeak->tag) == 0)
 					break;
 
 			/* if we didn't find one, look for another sound chip with the tag */
 			if (checkspeak == NULL)
 			{
-				int check;
-
-				for (check = 0; check < MAX_SOUND && config->sound[check].type != SOUND_DUMMY; check++)
-					if (check != sndnum && config->sound[check].tag && strcmp(config->sound[check].tag, config->sound[sndnum].route[routenum].target) == 0)
+				for (checksound = sound_first(config); checksound != NULL; checksound = sound_next(checksound))
+					if (checksound != cursound && strcmp(route->target, checksound->tag) == 0)
 						break;
 
 				/* if we didn't find one, it's an error */
-				if (check >= MAX_SOUND || config->sound[check].type == SOUND_DUMMY)
+				if (checksound == NULL)
 				{
-					mame_printf_error("%s: %s attempting to route sound to non-existant speaker '%s'\n", driver->source_file, driver->name, config->sound[sndnum].route[routenum].target);
+					mame_printf_error("%s: %s attempting to route sound to non-existant speaker '%s'\n", driver->source_file, driver->name, route->target);
 					error = TRUE;
 				}
 			}
@@ -1618,9 +1608,6 @@ int mame_validitychecks(const game_driver *curdriver)
 
 	/* validate inline function behavior */
 	error = validate_inlines() || error;
-
-	/* make sure the CPU and sound interfaces are up and running */
-	sndintrf_init(NULL);
 
 	init_resource_tracking();
 	begin_resource_tracking();

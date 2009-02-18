@@ -535,7 +535,7 @@ static const UINT8 controller_table[] =
 	0x04, 0x16, 0x02, 0x13, 0x01, 0x19, 0x08, 0x1c
 };
 
- READ8_HANDLER( intv_right_control_r )
+READ8_HANDLER( intv_right_control_r )
 {
 	UINT8 rv = 0x00;
 
@@ -567,7 +567,7 @@ static const UINT8 controller_table[] =
 	return rv ^ 0xff;
 }
 
- READ8_HANDLER( intv_left_control_r )
+READ8_HANDLER( intv_left_control_r )
 {
 	return 0xff;
 }

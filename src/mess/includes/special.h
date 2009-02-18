@@ -8,7 +8,6 @@
 #define SPECIAL_H_
 
 #include "mame.h"
-#include "sound/custom.h"
 #include "machine/8255ppi.h"
 #include "machine/pit8253.h"
 
@@ -76,7 +75,9 @@ extern const rgb_t specimx_palette[16];
 
 /*----------- defined in audio/special.c -----------*/
 
-extern const custom_sound_interface specimx_sound_interface;
-void specimx_set_input(int index, int state);
+#define SOUND_SPECIMX	DEVICE_GET_INFO_NAME( specimx_sound )
+
+void specimx_set_input(running_machine *machine, int index, int state);
+DEVICE_GET_INFO( specimx_sound );
 
 #endif /* SPECIAL_H_ */

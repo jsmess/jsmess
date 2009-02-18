@@ -253,11 +253,12 @@ static READ8_HANDLER( osi600_keyboard_r )
 
 static WRITE8_HANDLER( osi600_keyboard_w )
 {
+	const device_config *discrete = devtag_get_device(space->machine, SOUND, "discrete");
 	osi_state *state = space->machine->driver_data;
 
 	state->keylatch = data;
 
-	discrete_sound_w(space, NODE_01, (data >> 2) & 0x0f);
+	discrete_sound_w(discrete, NODE_01, (data >> 2) & 0x0f);
 }
 
 static WRITE8_HANDLER( uk101_keyboard_w )
@@ -284,12 +285,13 @@ static WRITE8_HANDLER( osi600_ctrl_w )
 
 	*/
 
+	const device_config *discrete = devtag_get_device(space->machine, SOUND, "discrete");
 	osi_state *state = space->machine->driver_data;
 
 	state->_32 = BIT(data, 0);
 	state->coloren = BIT(data, 1);
 
-	discrete_sound_w(space, NODE_10, BIT(data, 4));
+	discrete_sound_w(discrete, NODE_10, BIT(data, 4));
 }
 
 static WRITE8_HANDLER( osi630_ctrl_w )

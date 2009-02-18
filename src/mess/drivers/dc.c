@@ -90,7 +90,7 @@ static ADDRESS_MAP_START( dc_map, ADDRESS_SPACE_PROGRAM, 64 )
 	AM_RANGE(0x005f7c00, 0x005f7cff) AM_READWRITE( pvr_ctrl_r, pvr_ctrl_w )
 	AM_RANGE(0x005f8000, 0x005f9fff) AM_READWRITE( pvr_ta_r, pvr_ta_w )
 	AM_RANGE(0x00600000, 0x006007ff) AM_READWRITE( dc_modem_r, dc_modem_w )
-	AM_RANGE(0x00700000, 0x00707fff) AM_READWRITE( dc_aica_reg_r, dc_aica_reg_w )
+	AM_RANGE(0x00700000, 0x00707fff) AM_DEVREADWRITE( SOUND, "aica", dc_aica_reg_r, dc_aica_reg_w )
 	AM_RANGE(0x00710000, 0x0071000f) AM_READWRITE( dc_rtc_r, dc_rtc_w )
 	AM_RANGE(0x00800000, 0x009fffff) AM_READWRITE( dc_arm_r, dc_arm_w )
 	AM_RANGE(0x04000000, 0x04ffffff) AM_RAM	AM_SHARE(2)	// texture memory
@@ -109,7 +109,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dc_audio_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE(&dc_sound_ram)		/* shared with SH-4 */
-	AM_RANGE(0x00800000, 0x00807fff) AM_READWRITE(dc_arm_aica_r, dc_arm_aica_w)
+	AM_RANGE(0x00800000, 0x00807fff) AM_DEVREADWRITE(SOUND, "aica", dc_arm_aica_r, dc_arm_aica_w)
 ADDRESS_MAP_END
 
 static MACHINE_RESET( dc_console )
@@ -118,9 +118,9 @@ static MACHINE_RESET( dc_console )
 	aica_set_ram_base(0, dc_sound_ram, 2*1024*1024);
 }
 
-static void aica_irq(running_machine *machine, int irq)
+static void aica_irq(const device_config *device, int irq)
 {
-	cpu_set_input_line(machine->cpu[1], ARM7_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[1], ARM7_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const aica_interface dc_aica_interface =

@@ -7,7 +7,6 @@
 
 #include "driver.h"
 #include "includes/kaypro.h"
-#include "sound/custom.h"
 #include "streams.h"
 
 #ifdef UNUSED_FUNCTION

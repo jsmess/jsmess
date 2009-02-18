@@ -16,7 +16,6 @@
 #include "machine/wd17xx.h"
 #include "machine/pic8259.h"
 #include "machine/msm8251.h"
-#include "sound/custom.h"
 #include "streams.h"
 #include "includes/b2m.h"
 
@@ -403,16 +402,22 @@ static STREAM_UPDATE( b2m_sh_update )
 	}
 }
 
-static CUSTOM_START( b2m_sh_start )
+static DEVICE_START(b2m_sound)
 {
 	b2m_sound_input = 0;
 	mixer_channel = stream_create(device, 0, 1, device->machine->sample_rate, 0, b2m_sh_update);
-	return (void *) ~0;
 }
 
-const custom_sound_interface b2m_sound_interface =
+
+DEVICE_GET_INFO( b2m_sound )
 {
-	b2m_sh_start,
-	NULL,
-	NULL
-};
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(b2m_sound);	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "B2M Sound");				break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
+	}
+}

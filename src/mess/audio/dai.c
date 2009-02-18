@@ -9,13 +9,11 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "sound/custom.h"
 #include "machine/pit8253.h"
 #include "machine/8255ppi.h"
 #include "includes/dai.h"
 #include "streams.h"
 
-static CUSTOM_START( dai_sh_start );
 static STREAM_UPDATE( dai_sh_update );
 
 static sound_stream *mixer_channel;
@@ -34,15 +32,7 @@ static const UINT16 dai_noise_volume_table[] = {
 				           500, 1000, 1500, 2000,
 					  2500, 3000, 3500, 4000};
 
-const custom_sound_interface dai_sound_interface =
-{
-	dai_sh_start,
-	NULL,
-	NULL
-};
-
-
-void dai_set_input(int index, int state)
+void dai_set_input(running_machine *machine, int index, int state)
 {
 	stream_update( mixer_channel );
 
@@ -50,15 +40,13 @@ void dai_set_input(int index, int state)
 }
 
 
-static CUSTOM_START( dai_sh_start )
+static DEVICE_START(dai_sound)
 {
 	dai_input[0] = dai_input[1] = dai_input[2] = 0;
 
 	mixer_channel = stream_create(device, 0, 2, device->machine->sample_rate, 0, dai_sh_update);
 	
 	logerror ("sample rate: %d\n", device->machine->sample_rate);
-
-	return (void *) ~0;
 }
 
 static STREAM_UPDATE( dai_sh_update )
@@ -100,3 +88,17 @@ static STREAM_UPDATE( dai_sh_update )
 	}
 }
 
+
+
+DEVICE_GET_INFO( dai_sound )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(dai_sound);	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Dai Sound");				break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
+	}
+}

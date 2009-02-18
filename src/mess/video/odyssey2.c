@@ -566,16 +566,24 @@ VIDEO_UPDATE( odyssey2 )
 	return 0;
 }
 
-static CUSTOM_START( odyssey2_sh_start )
+static DEVICE_START( odyssey2_sound )
 {
-	odyssey2_sh_channel = stream_create(device, 0, 1, clock/(I824X_LINE_CLOCKS*4), 0, odyssey2_sh_update );
-	return (void *) ~0;
+	odyssey2_sh_channel = stream_create(device, 0, 1, device->clock/(I824X_LINE_CLOCKS*4), 0, odyssey2_sh_update );
 }
 
-const custom_sound_interface odyssey2_sound_interface =
+
+DEVICE_GET_INFO( odyssey2_sound )
 {
-	odyssey2_sh_start
-};
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(odyssey2_sound);	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Odyssey2 Sound");				break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
+	}
+}
 
 STREAM_UPDATE( odyssey2_sh_update )
 {

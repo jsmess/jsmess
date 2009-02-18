@@ -94,10 +94,16 @@ static WRITE8_HANDLER( mainevt_sh_irqtrigger_w )
 	cpu_set_input_line_and_vector(space->machine->cpu[1],0,HOLD_LINE,0xff);
 }
 
+static READ8_DEVICE_HANDLER( mainevt_sh_busy_r )
+{
+	return upd7759_busy_r(device);
+}
+
 static WRITE8_HANDLER( mainevt_sh_irqcontrol_w )
 {
-	upd7759_reset_w(0, data & 2);
-	upd7759_start_w(0, data & 1);
+	const device_config *upd = devtag_get_device(space->machine, SOUND, "upd");
+	upd7759_reset_w(upd, data & 2);
+	upd7759_start_w(upd, data & 1);
 
 	interrupt_enable_w(space,0,data & 4);
 }
@@ -116,13 +122,13 @@ static WRITE8_HANDLER( mainevt_sh_bankswitch_w )
 	/* bits 0-3 select the 007232 banks */
 	bank_A=(data&0x3);
 	bank_B=((data>>2)&0x3);
-	k007232_set_bank( 0, bank_A, bank_B );
+	k007232_set_bank( devtag_get_device(space->machine, SOUND, "konami"), bank_A, bank_B );
 
 	/* bits 4-5 select the UPD7759 bank */
-	upd7759_set_bank_base(0, ((data >> 4) & 0x03) * 0x20000);
+	upd7759_set_bank_base(devtag_get_device(space->machine, SOUND, "upd"), ((data >> 4) & 0x03) * 0x20000);
 }
 
-static WRITE8_HANDLER( dv_sh_bankswitch_w )
+static WRITE8_DEVICE_HANDLER( dv_sh_bankswitch_w )
 {
 	int bank_A,bank_B;
 
@@ -131,7 +137,7 @@ static WRITE8_HANDLER( dv_sh_bankswitch_w )
 	/* bits 0-3 select the 007232 banks */
 	bank_A=(data&0x3);
 	bank_B=((data>>2)&0x3);
-	k007232_set_bank( 0, bank_A, bank_B );
+	k007232_set_bank( device, bank_A, bank_B );
 }
 
 
@@ -199,15 +205,15 @@ static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x83ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
-	AM_RANGE(0xb000, 0xb00d) AM_READ(k007232_read_port_0_r)
-	AM_RANGE(0xd000, 0xd000) AM_READ(upd7759_0_busy_r)
+	AM_RANGE(0xb000, 0xb00d) AM_DEVREAD(SOUND, "konami", k007232_r)
+	AM_RANGE(0xd000, 0xd000) AM_DEVREAD(SOUND, "upd", mainevt_sh_busy_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x83ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xb000, 0xb00d) AM_WRITE(k007232_write_port_0_w)
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(upd7759_0_port_w)
+	AM_RANGE(0xb000, 0xb00d) AM_DEVWRITE(SOUND, "konami", k007232_w)
+	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE(SOUND, "upd", upd7759_port_w)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(mainevt_sh_irqcontrol_w)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(mainevt_sh_bankswitch_w)
 ADDRESS_MAP_END
@@ -216,18 +222,17 @@ static ADDRESS_MAP_START( dv_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x83ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
-	AM_RANGE(0xb000, 0xb00d) AM_READ(k007232_read_port_0_r)
-	AM_RANGE(0xc001, 0xc001) AM_READ(ym2151_status_port_0_r)
+	AM_RANGE(0xb000, 0xb00d) AM_DEVREAD(SOUND, "konami", k007232_r)
+	AM_RANGE(0xc000, 0xc001) AM_DEVREAD(SOUND, "ym", ym2151_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dv_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x83ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xb000, 0xb00d) AM_WRITE(k007232_write_port_0_w)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0xc001, 0xc001) AM_WRITE(ym2151_data_port_0_w)
+	AM_RANGE(0xb000, 0xb00d) AM_DEVWRITE(SOUND, "konami", k007232_w)
+	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE(SOUND, "ym", ym2151_w)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(devstor_sh_irqcontrol_w)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(dv_sh_bankswitch_w)
+	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE(SOUND, "konami", dv_sh_bankswitch_w)
 ADDRESS_MAP_END
 
 
@@ -479,10 +484,10 @@ INPUT_PORTS_END
 
 /*****************************************************************************/
 
-static void volume_callback(int v)
+static void volume_callback(const device_config *device, int v)
 {
-	k007232_set_volume(0,0,(v >> 4) * 0x11,0);
-	k007232_set_volume(0,1,0,(v & 0x0f) * 0x11);
+	k007232_set_volume(device,0,(v >> 4) * 0x11,0);
+	k007232_set_volume(device,1,0,(v & 0x0f) * 0x11);
 }
 
 static const k007232_interface k007232_config =
@@ -597,7 +602,7 @@ ROM_START( mainevt )
 	ROM_LOAD( "799b05.k4",    0x80000, 0x80000, CRC(571c5831) SHA1(2a18f0bcf6946ada6e0bde7edbd11afd4db1c170) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "63s141n.bin",  0x0000, 0x0100, CRC(61f6c8d1) SHA1(c70f1f8e434aaaffb89e30e2230a08374ef324ad) )	/* priority encoder (not used) */
+	ROM_LOAD( "63s141n.k14",  0x0000, 0x0100, CRC(61f6c8d1) SHA1(c70f1f8e434aaaffb89e30e2230a08374ef324ad) )	/* priority encoder (not used) */
 
 	ROM_REGION( 0x80000, "konami", 0 )	/* 512k for 007232 samples */
 	ROM_LOAD( "799b03.d4",    0x00000, 0x80000, CRC(f1cfd342) SHA1(079afc5c631de7f5b652d0ce6fd44b3aacd14a1b) )
@@ -628,7 +633,7 @@ ROM_START( mainevto )
 	ROM_LOAD( "799b05.k4",    0x80000, 0x80000, CRC(571c5831) SHA1(2a18f0bcf6946ada6e0bde7edbd11afd4db1c170) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "63s141n.bin",  0x0000, 0x0100, CRC(61f6c8d1) SHA1(c70f1f8e434aaaffb89e30e2230a08374ef324ad) )	/* priority encoder (not used) */
+	ROM_LOAD( "63s141n.k14",  0x0000, 0x0100, CRC(61f6c8d1) SHA1(c70f1f8e434aaaffb89e30e2230a08374ef324ad) )	/* priority encoder (not used) */
 
 	ROM_REGION( 0x80000, "konami", 0 )	/* 512k for 007232 samples */
 	ROM_LOAD( "799b03.d4",    0x00000, 0x80000, CRC(f1cfd342) SHA1(079afc5c631de7f5b652d0ce6fd44b3aacd14a1b) )
@@ -659,7 +664,7 @@ ROM_START( mainev2p )
 	ROM_LOAD( "799b05.k4",    0x80000, 0x80000, CRC(571c5831) SHA1(2a18f0bcf6946ada6e0bde7edbd11afd4db1c170) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "63s141n.bin",  0x0000, 0x0100, CRC(61f6c8d1) SHA1(c70f1f8e434aaaffb89e30e2230a08374ef324ad) )	/* priority encoder (not used) */
+	ROM_LOAD( "63s141n.k14",  0x0000, 0x0100, CRC(61f6c8d1) SHA1(c70f1f8e434aaaffb89e30e2230a08374ef324ad) )	/* priority encoder (not used) */
 
 	ROM_REGION( 0x80000, "konami", 0 )	/* 512k for 007232 samples */
 	ROM_LOAD( "799b03.d4",    0x00000, 0x80000, CRC(f1cfd342) SHA1(079afc5c631de7f5b652d0ce6fd44b3aacd14a1b) )
@@ -690,7 +695,7 @@ ROM_START( ringohja )
 	ROM_LOAD( "799b05.k4",    0x80000, 0x80000, CRC(571c5831) SHA1(2a18f0bcf6946ada6e0bde7edbd11afd4db1c170) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "63s141n.bin",  0x0000, 0x0100, CRC(61f6c8d1) SHA1(c70f1f8e434aaaffb89e30e2230a08374ef324ad) )	/* priority encoder (not used) */
+	ROM_LOAD( "63s141n.k14",  0x0000, 0x0100, CRC(61f6c8d1) SHA1(c70f1f8e434aaaffb89e30e2230a08374ef324ad) )	/* priority encoder (not used) */
 
 	ROM_REGION( 0x80000, "konami", 0 )	/* 512k for 007232 samples */
 	ROM_LOAD( "799b03.d4",    0x00000, 0x80000, CRC(f1cfd342) SHA1(079afc5c631de7f5b652d0ce6fd44b3aacd14a1b) )
@@ -701,52 +706,52 @@ ROM_END
 
 ROM_START( devstors )
 	ROM_REGION( 0x40000, "main", 0 )
-	ROM_LOAD( "890-z02.k11",  0x10000, 0x08000, CRC(ebeb306f) SHA1(838fcfe95dfedd61f21f34301d48e337db765ab2) )
+	ROM_LOAD( "890z02.k11",  0x10000, 0x08000, CRC(ebeb306f) SHA1(838fcfe95dfedd61f21f34301d48e337db765ab2) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
 	ROM_REGION( 0x10000, "audio", 0 )
-	ROM_LOAD( "dev-k01.rom",  0x00000, 0x08000, CRC(d44b3eb0) SHA1(26109fc56668b65f1a5aa6d8ec2c08fd70ca7c51) )
+	ROM_LOAD( "890k01.f7",  0x00000, 0x08000, CRC(d44b3eb0) SHA1(26109fc56668b65f1a5aa6d8ec2c08fd70ca7c51) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 )	/* graphics (addressable by the main CPU) */
-	ROM_LOAD16_BYTE( "dev-f06.rom",  0x00000, 0x10000, CRC(26592155) SHA1(aa1f8662f091ca1eb495223e41a35edd861ae9e9) )
-	ROM_LOAD16_BYTE( "dev-f07.rom",  0x00001, 0x10000, CRC(6c74fa2e) SHA1(419a2ad31d269fafe4c474bf512e935d5e018846) )
-	ROM_LOAD16_BYTE( "dev-f08.rom",  0x20000, 0x10000, CRC(29e12e80) SHA1(6d09e190055218e2dfd07838f1446dfb5f801206) )
-	ROM_LOAD16_BYTE( "dev-f09.rom",  0x20001, 0x10000, CRC(67ca40d5) SHA1(ff719f55d2534ff076fbdd2bcb7d12c683bfe958) )
+	ROM_LOAD16_BYTE( "890f06.f22",  0x00000, 0x10000, CRC(26592155) SHA1(aa1f8662f091ca1eb495223e41a35edd861ae9e9) )
+	ROM_LOAD16_BYTE( "890f07.h22",  0x00001, 0x10000, CRC(6c74fa2e) SHA1(419a2ad31d269fafe4c474bf512e935d5e018846) )
+	ROM_LOAD16_BYTE( "890f08.j22",  0x20000, 0x10000, CRC(29e12e80) SHA1(6d09e190055218e2dfd07838f1446dfb5f801206) )
+	ROM_LOAD16_BYTE( "890f09.k22",  0x20001, 0x10000, CRC(67ca40d5) SHA1(ff719f55d2534ff076fbdd2bcb7d12c683bfe958) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )	/* graphics (addressable by the main CPU) */
-	ROM_LOAD( "dev-f04.rom",  0x00000, 0x80000, CRC(f16cd1fa) SHA1(60ea19c19918a71aded3c9ea398c956908e217f1) )
-	ROM_LOAD( "dev-f05.rom",  0x80000, 0x80000, CRC(da37db05) SHA1(0b48d1021cf0dec78dae0ef183b4c61fea783533) )
+	ROM_LOAD( "890f04.h4",  0x00000, 0x80000, CRC(f16cd1fa) SHA1(60ea19c19918a71aded3c9ea398c956908e217f1) )
+	ROM_LOAD( "890f05.k4",  0x80000, 0x80000, CRC(da37db05) SHA1(0b48d1021cf0dec78dae0ef183b4c61fea783533) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "devaprom.bin", 0x0000, 0x0100, CRC(d3620106) SHA1(528a0a34754902d0f262a9619c6105da6de99354) )	/* priority encoder (not used) */
+	ROM_LOAD( "63s141n.k14", 0x0000, 0x0100, CRC(d3620106) SHA1(528a0a34754902d0f262a9619c6105da6de99354) )	/* priority encoder (not used) */
 
 	ROM_REGION( 0x80000, "konami", 0 )	/* 512k for 007232 samples */
- 	ROM_LOAD( "dev-f03.rom",  0x00000, 0x80000, CRC(19065031) SHA1(12c47fbe28f85fa2f901fe52601188a5e9633f22) )
+ 	ROM_LOAD( "890f03.d4",  0x00000, 0x80000, CRC(19065031) SHA1(12c47fbe28f85fa2f901fe52601188a5e9633f22) )
 ROM_END
 
 ROM_START( devstor2 )
 	ROM_REGION( 0x40000, "main", 0 )
-	ROM_LOAD( "dev-x02.rom",  0x10000, 0x08000, CRC(e58ebb35) SHA1(4253b6a7128534cc0866bc910a271d91ac8b40fd) )
-	ROM_CONTINUE(             0x08000, 0x08000 )
+	ROM_LOAD( "890x02.k11",  0x10000, 0x08000, CRC(e58ebb35) SHA1(4253b6a7128534cc0866bc910a271d91ac8b40fd) )
+	ROM_CONTINUE(            0x08000, 0x08000 )
 
 	ROM_REGION( 0x10000, "audio", 0 )
-	ROM_LOAD( "dev-k01.rom",  0x00000, 0x08000, CRC(d44b3eb0) SHA1(26109fc56668b65f1a5aa6d8ec2c08fd70ca7c51) )
+	ROM_LOAD( "890k01.f7",  0x00000, 0x08000, CRC(d44b3eb0) SHA1(26109fc56668b65f1a5aa6d8ec2c08fd70ca7c51) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 )	/* graphics (addressable by the main CPU) */
-	ROM_LOAD16_BYTE( "dev-f06.rom",  0x00000, 0x10000, CRC(26592155) SHA1(aa1f8662f091ca1eb495223e41a35edd861ae9e9) )
-	ROM_LOAD16_BYTE( "dev-f07.rom",  0x00001, 0x10000, CRC(6c74fa2e) SHA1(419a2ad31d269fafe4c474bf512e935d5e018846) )
-	ROM_LOAD16_BYTE( "dev-f08.rom",  0x20000, 0x10000, CRC(29e12e80) SHA1(6d09e190055218e2dfd07838f1446dfb5f801206) )
-	ROM_LOAD16_BYTE( "dev-f09.rom",  0x20001, 0x10000, CRC(67ca40d5) SHA1(ff719f55d2534ff076fbdd2bcb7d12c683bfe958) )
+	ROM_LOAD16_BYTE( "890f06.f22",  0x00000, 0x10000, CRC(26592155) SHA1(aa1f8662f091ca1eb495223e41a35edd861ae9e9) )
+	ROM_LOAD16_BYTE( "890f07.h22",  0x00001, 0x10000, CRC(6c74fa2e) SHA1(419a2ad31d269fafe4c474bf512e935d5e018846) )
+	ROM_LOAD16_BYTE( "890f08.j22",  0x20000, 0x10000, CRC(29e12e80) SHA1(6d09e190055218e2dfd07838f1446dfb5f801206) )
+	ROM_LOAD16_BYTE( "890f09.k22",  0x20001, 0x10000, CRC(67ca40d5) SHA1(ff719f55d2534ff076fbdd2bcb7d12c683bfe958) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )	/* graphics (addressable by the main CPU) */
-	ROM_LOAD( "dev-f04.rom",  0x00000, 0x80000, CRC(f16cd1fa) SHA1(60ea19c19918a71aded3c9ea398c956908e217f1) )
-	ROM_LOAD( "dev-f05.rom",  0x80000, 0x80000, CRC(da37db05) SHA1(0b48d1021cf0dec78dae0ef183b4c61fea783533) )
+	ROM_LOAD( "890f04.h4",  0x00000, 0x80000, CRC(f16cd1fa) SHA1(60ea19c19918a71aded3c9ea398c956908e217f1) )
+	ROM_LOAD( "890f05.k4",  0x80000, 0x80000, CRC(da37db05) SHA1(0b48d1021cf0dec78dae0ef183b4c61fea783533) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "devaprom.bin", 0x0000, 0x0100, CRC(d3620106) SHA1(528a0a34754902d0f262a9619c6105da6de99354) )	/* priority encoder (not used) */
+	ROM_LOAD( "63s141n.k14", 0x0000, 0x0100, CRC(d3620106) SHA1(528a0a34754902d0f262a9619c6105da6de99354) )	/* priority encoder (not used) */
 
 	ROM_REGION( 0x80000, "konami", 0 )	/* 512k for 007232 samples */
- 	ROM_LOAD( "dev-f03.rom",  0x00000, 0x80000, CRC(19065031) SHA1(12c47fbe28f85fa2f901fe52601188a5e9633f22) )
+ 	ROM_LOAD( "890f03.d4",  0x00000, 0x80000, CRC(19065031) SHA1(12c47fbe28f85fa2f901fe52601188a5e9633f22) )
 ROM_END
 
 ROM_START( devstor3 )
@@ -755,48 +760,48 @@ ROM_START( devstor3 )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
 	ROM_REGION( 0x10000, "audio", 0 )
-	ROM_LOAD( "dev-k01.rom",  0x00000, 0x08000, CRC(d44b3eb0) SHA1(26109fc56668b65f1a5aa6d8ec2c08fd70ca7c51) )
+	ROM_LOAD( "890k01.f7",  0x00000, 0x08000, CRC(d44b3eb0) SHA1(26109fc56668b65f1a5aa6d8ec2c08fd70ca7c51) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 )	/* graphics (addressable by the main CPU) */
-	ROM_LOAD16_BYTE( "dev-f06.rom",  0x00000, 0x10000, CRC(26592155) SHA1(aa1f8662f091ca1eb495223e41a35edd861ae9e9) )
-	ROM_LOAD16_BYTE( "dev-f07.rom",  0x00001, 0x10000, CRC(6c74fa2e) SHA1(419a2ad31d269fafe4c474bf512e935d5e018846) )
-	ROM_LOAD16_BYTE( "dev-f08.rom",  0x20000, 0x10000, CRC(29e12e80) SHA1(6d09e190055218e2dfd07838f1446dfb5f801206) )
-	ROM_LOAD16_BYTE( "dev-f09.rom",  0x20001, 0x10000, CRC(67ca40d5) SHA1(ff719f55d2534ff076fbdd2bcb7d12c683bfe958) )
+	ROM_LOAD16_BYTE( "890f06.f22",  0x00000, 0x10000, CRC(26592155) SHA1(aa1f8662f091ca1eb495223e41a35edd861ae9e9) )
+	ROM_LOAD16_BYTE( "890f07.h22",  0x00001, 0x10000, CRC(6c74fa2e) SHA1(419a2ad31d269fafe4c474bf512e935d5e018846) )
+	ROM_LOAD16_BYTE( "890f08.j22",  0x20000, 0x10000, CRC(29e12e80) SHA1(6d09e190055218e2dfd07838f1446dfb5f801206) )
+	ROM_LOAD16_BYTE( "890f09.k22",  0x20001, 0x10000, CRC(67ca40d5) SHA1(ff719f55d2534ff076fbdd2bcb7d12c683bfe958) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )	/* graphics (addressable by the main CPU) */
-	ROM_LOAD( "dev-f04.rom",  0x00000, 0x80000, CRC(f16cd1fa) SHA1(60ea19c19918a71aded3c9ea398c956908e217f1) )
-	ROM_LOAD( "dev-f05.rom",  0x80000, 0x80000, CRC(da37db05) SHA1(0b48d1021cf0dec78dae0ef183b4c61fea783533) )
+	ROM_LOAD( "890f04.h4",  0x00000, 0x80000, CRC(f16cd1fa) SHA1(60ea19c19918a71aded3c9ea398c956908e217f1) )
+	ROM_LOAD( "890f05.k4",  0x80000, 0x80000, CRC(da37db05) SHA1(0b48d1021cf0dec78dae0ef183b4c61fea783533) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "devaprom.bin", 0x0000, 0x0100, CRC(d3620106) SHA1(528a0a34754902d0f262a9619c6105da6de99354) )	/* priority encoder (not used) */
+	ROM_LOAD( "63s141n.k14", 0x0000, 0x0100, CRC(d3620106) SHA1(528a0a34754902d0f262a9619c6105da6de99354) )	/* priority encoder (not used) */
 
 	ROM_REGION( 0x80000, "konami", 0 )	/* 512k for 007232 samples */
- 	ROM_LOAD( "dev-f03.rom",  0x00000, 0x80000, CRC(19065031) SHA1(12c47fbe28f85fa2f901fe52601188a5e9633f22) )
+ 	ROM_LOAD( "890f03.d4",  0x00000, 0x80000, CRC(19065031) SHA1(12c47fbe28f85fa2f901fe52601188a5e9633f22) )
 ROM_END
 
 ROM_START( garuka )
 	ROM_REGION( 0x40000, "main", 0 )
-	ROM_LOAD( "890w02.bin",   0x10000, 0x08000, CRC(b2f6f538) SHA1(95dad3258a2e4c5648d0fc22c06fa3e2da3b5ed1) )
+	ROM_LOAD( "890w02.k11",   0x10000, 0x08000, CRC(b2f6f538) SHA1(95dad3258a2e4c5648d0fc22c06fa3e2da3b5ed1) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
 	ROM_REGION( 0x10000, "audio", 0 )
-	ROM_LOAD( "dev-k01.rom",  0x00000, 0x08000, CRC(d44b3eb0) SHA1(26109fc56668b65f1a5aa6d8ec2c08fd70ca7c51) )
+	ROM_LOAD( "890k01.f7",  0x00000, 0x08000, CRC(d44b3eb0) SHA1(26109fc56668b65f1a5aa6d8ec2c08fd70ca7c51) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 )	/* graphics (addressable by the main CPU) */
-	ROM_LOAD16_BYTE( "dev-f06.rom",  0x00000, 0x10000, CRC(26592155) SHA1(aa1f8662f091ca1eb495223e41a35edd861ae9e9) )
-	ROM_LOAD16_BYTE( "dev-f07.rom",  0x00001, 0x10000, CRC(6c74fa2e) SHA1(419a2ad31d269fafe4c474bf512e935d5e018846) )
-	ROM_LOAD16_BYTE( "dev-f08.rom",  0x20000, 0x10000, CRC(29e12e80) SHA1(6d09e190055218e2dfd07838f1446dfb5f801206) )
-	ROM_LOAD16_BYTE( "dev-f09.rom",  0x20001, 0x10000, CRC(67ca40d5) SHA1(ff719f55d2534ff076fbdd2bcb7d12c683bfe958) )
+	ROM_LOAD16_BYTE( "890f06.f22",  0x00000, 0x10000, CRC(26592155) SHA1(aa1f8662f091ca1eb495223e41a35edd861ae9e9) )
+	ROM_LOAD16_BYTE( "890f07.h22",  0x00001, 0x10000, CRC(6c74fa2e) SHA1(419a2ad31d269fafe4c474bf512e935d5e018846) )
+	ROM_LOAD16_BYTE( "890f08.j22",  0x20000, 0x10000, CRC(29e12e80) SHA1(6d09e190055218e2dfd07838f1446dfb5f801206) )
+	ROM_LOAD16_BYTE( "890f09.k22",  0x20001, 0x10000, CRC(67ca40d5) SHA1(ff719f55d2534ff076fbdd2bcb7d12c683bfe958) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )	/* graphics (addressable by the main CPU) */
-	ROM_LOAD( "dev-f04.rom",  0x00000, 0x80000, CRC(f16cd1fa) SHA1(60ea19c19918a71aded3c9ea398c956908e217f1) )
-	ROM_LOAD( "dev-f05.rom",  0x80000, 0x80000, CRC(da37db05) SHA1(0b48d1021cf0dec78dae0ef183b4c61fea783533) )
+	ROM_LOAD( "890f04.h4",  0x00000, 0x80000, CRC(f16cd1fa) SHA1(60ea19c19918a71aded3c9ea398c956908e217f1) )
+	ROM_LOAD( "890f05.k4",  0x80000, 0x80000, CRC(da37db05) SHA1(0b48d1021cf0dec78dae0ef183b4c61fea783533) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "devaprom.bin", 0x0000, 0x0100, CRC(d3620106) SHA1(528a0a34754902d0f262a9619c6105da6de99354) )	/* priority encoder (not used) */
+	ROM_LOAD( "63s141n.k14", 0x0000, 0x0100, CRC(d3620106) SHA1(528a0a34754902d0f262a9619c6105da6de99354) )	/* priority encoder (not used) */
 
 	ROM_REGION( 0x80000, "konami", 0 )	/* 512k for 007232 samples */
- 	ROM_LOAD( "dev-f03.rom",  0x00000, 0x80000, CRC(19065031) SHA1(12c47fbe28f85fa2f901fe52601188a5e9633f22) )
+ 	ROM_LOAD( "890f03.d4",  0x00000, 0x80000, CRC(19065031) SHA1(12c47fbe28f85fa2f901fe52601188a5e9633f22) )
 ROM_END
 
 

@@ -49,7 +49,6 @@
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
-#include "sound/custom.h"
 #include "includes/amiga.h"
 #include "machine/6526cia.h"
 
@@ -93,12 +92,7 @@ static WRITE16_HANDLER( arcadia_multibios_change_game )
  *
  *************************************/
 
-static UINT8 arcadia_cia_0_porta_r(const device_config *device)
-{
-	return input_port_read(device->machine, "CIA0PORTA");
-}
-
-static void arcadia_cia_0_porta_w(const device_config *device, UINT8 data)
+static WRITE8_DEVICE_HANDLER( arcadia_cia_0_porta_w )
 {
 	/* switch banks as appropriate */
 	memory_set_bank(device->machine, 1, data & 1);
@@ -133,12 +127,7 @@ static void arcadia_cia_0_porta_w(const device_config *device, UINT8 data)
  *
  *************************************/
 
-static UINT8 arcadia_cia_0_portb_r(const device_config *device)
-{
-	return input_port_read(device->machine, "CIA0PORTB");
-}
-
-static void arcadia_cia_0_portb_w(const device_config *device, UINT8 data)
+static WRITE8_DEVICE_HANDLER( arcadia_cia_0_portb_w )
 {
 	/* writing a 0 in the low bit clears one of the coins */
 	if ((data & 1) == 0)
@@ -264,40 +253,27 @@ INPUT_PORTS_END
 
 /*************************************
  *
- *  Sound definitions
- *
- *************************************/
-
-static const custom_sound_interface amiga_custom_interface =
-{
-	amiga_sh_start
-};
-
-
-
-/*************************************
- *
  *  Machine driver
  *
  *************************************/
 
 static const cia6526_interface cia_0_intf =
 {
-	amiga_cia_0_irq,										/* irq_func */
+	DEVCB_LINE(amiga_cia_0_irq),										/* irq_func */
 	0,														/* tod_clock */
 	{
-		{ arcadia_cia_0_porta_r, arcadia_cia_0_porta_w },	/* port A */
-		{ arcadia_cia_0_portb_r, arcadia_cia_0_portb_w }	/* port B */
+		{ DEVCB_INPUT_PORT("CIA0PORTA"), DEVCB_HANDLER(arcadia_cia_0_porta_w) },	/* port A */
+		{ DEVCB_INPUT_PORT("CIA0PORTB"), DEVCB_HANDLER(arcadia_cia_0_portb_w) }	/* port B */
 	}
 };
 
 static const cia6526_interface cia_1_intf =
 {
-	amiga_cia_1_irq,										/* irq_func */
+	DEVCB_LINE(amiga_cia_1_irq),										/* irq_func */
 	0,														/* tod_clock */
 	{
-		{ NULL, NULL },										/* port A */
-		{ NULL, NULL }										/* port B */
+		{ DEVCB_NULL, DEVCB_NULL },										/* port A */
+		{ DEVCB_NULL, DEVCB_NULL }										/* port B */
 	}
 };
 
@@ -328,8 +304,7 @@ static MACHINE_DRIVER_START( arcadia )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD("amiga", CUSTOM, 3579545)
-	MDRV_SOUND_CONFIG(amiga_custom_interface)
+	MDRV_SOUND_ADD("amiga", AMIGA, 3579545)
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
 	MDRV_SOUND_ROUTE(2, "right", 0.50)

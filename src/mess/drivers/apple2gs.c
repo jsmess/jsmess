@@ -137,7 +137,7 @@ static PALETTE_INIT( apple2gs )
 	}
 }
 
-static READ8_HANDLER( apple2gs_adc_read )
+static READ8_DEVICE_HANDLER( apple2gs_adc_read )
 {
 	return 0x80;
 }

@@ -1845,15 +1845,19 @@ static READ32_HANDLER( stv_sh2_soundram_r )
 
 static READ32_HANDLER( stv_scsp_regs_r32 )
 {
+	const device_config *scsp = devtag_get_device(space->machine, SOUND_SCSP, "scsp");
+
 	offset <<= 1;
-	return (scsp_0_r(space, offset+1, 0xffff) | (scsp_0_r(space, offset, 0xffff)<<16));
+	return (scsp_r(scsp, offset+1, 0xffff) | (scsp_r(scsp, offset, 0xffff)<<16));
 }
 
 static WRITE32_HANDLER( stv_scsp_regs_w32 )
 {
+	const device_config *scsp = devtag_get_device(space->machine, SOUND_SCSP, "scsp");
+
 	offset <<= 1;
-	scsp_0_w(space, offset, data>>16, mem_mask >> 16);
-	scsp_0_w(space, offset+1, data, mem_mask);
+	scsp_w(scsp, offset, data>>16, mem_mask >> 16);
+	scsp_w(scsp, offset+1, data, mem_mask);
 }
 
 /* communication,SLAVE CPU acquires data from the MASTER CPU and triggers an irq.  *
@@ -1947,7 +1951,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_BASE(&sound_ram)
-	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(scsp_0_r, scsp_0_w)
+	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE(SOUND_SCSP, "scsp", scsp_r, scsp_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( saturn )
@@ -2234,7 +2238,7 @@ static int scsp_last_line = 0;
 
 static MACHINE_START( saturn )
 {
-	SCSP_set_ram_base(0, sound_ram);
+	scsp_set_ram_base(devtag_get_device(machine, SOUND_SCSP, "scsp"), sound_ram);
 
 	// save states
 	state_save_register_global_pointer(machine, smpc_ram, 0x80);
@@ -2372,7 +2376,7 @@ GFXDECODE_END
 static const sh2_cpu_core sh2_conf_master = { 0 };
 static const sh2_cpu_core sh2_conf_slave  = { 1 };
 
-static void scsp_irq(running_machine *machine, int irq)
+static void scsp_irq(const device_config *device, int irq)
 {
 	// don't bother the 68k if it's off
 	if (!en_68k)
@@ -2383,15 +2387,15 @@ static void scsp_irq(running_machine *machine, int irq)
 	if (irq > 0)
 	{
 		scsp_last_line = irq;
-		cpu_set_input_line(machine->cpu[2], irq, ASSERT_LINE);
+		cpu_set_input_line(device->machine->cpu[2], irq, ASSERT_LINE);
 	}
 	else if (irq < 0)
 	{
-		cpu_set_input_line(machine->cpu[2], -irq, CLEAR_LINE);
+		cpu_set_input_line(device->machine->cpu[2], -irq, CLEAR_LINE);
 	}
 	else
 	{
-		cpu_set_input_line(machine->cpu[2], scsp_last_line, CLEAR_LINE);
+		cpu_set_input_line(device->machine->cpu[2], scsp_last_line, CLEAR_LINE);
 	}
 }
 

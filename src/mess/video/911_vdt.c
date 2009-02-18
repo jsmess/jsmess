@@ -230,8 +230,7 @@ void vdt911_init(running_machine *machine)
 
 static TIMER_CALLBACK(setup_beep)
 {
-	int unit = param;
-	beep_set_frequency(unit, 2000);
+	beep_set_frequency(devtag_get_device(machine, SOUND, "beep"), 2000);
 }
 
 /*
@@ -278,8 +277,7 @@ static TIMER_CALLBACK(blink_callback)
 */
 static TIMER_CALLBACK(beep_callback)
 {
-	int unit = param;
-	beep_set_state(unit, 0);
+	beep_set_state(devtag_get_device(machine, SOUND, "beep"), 0);
 }
 
 /*
@@ -451,7 +449,7 @@ static void vdt911_cru_w(const address_space *space, int offset, int data, int u
 
 		case 0xe:
 			/* beep enable strobe - not tested */
-			beep_set_state(unit, 1);
+			beep_set_state(devtag_get_device(space->machine, SOUND, "beep"), 1);
 
 			timer_adjust_oneshot(vdt[unit].beep_timer, ATTOTIME_IN_USEC(300), unit);
 			break;

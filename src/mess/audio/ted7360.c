@@ -153,7 +153,7 @@ static STREAM_UPDATE( ted7360_update )
 /* Sound handler start              */
 /************************************/
 
-CUSTOM_START( ted7360_custom_start )
+static DEVICE_START(ted7360_sound)
 {
 	int i;
 
@@ -194,5 +194,18 @@ CUSTOM_START( ted7360_custom_start )
 				noiseshift <<= 1;
 		}
 	}
-	return (void *) ~0;
+}
+
+
+DEVICE_GET_INFO( ted7360_sound )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(ted7360_sound);	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Ted7360 Sound");				break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
+	}
 }

@@ -133,33 +133,33 @@ int matsucd_get_next_byte( UINT8 *data )
 	return 0;
 }
 
-static void matsucd_cdda_stop( void )
+static void matsucd_cdda_stop( running_machine *machine )
 {
-	int cddanum = cdda_num_from_cdrom(cd.cdrom);
+	const device_config *cdda = cdda_from_cdrom(machine, cd.cdrom);
 
-	if (cddanum != -1)
+	if (cdda != NULL)
 	{
-		cdda_stop_audio(cddanum);
+		cdda_stop_audio(cdda);
 		timer_reset( cd.frame_timer, attotime_never );
 	}
 }
 
-static void matsucd_cdda_play( UINT32 lba, UINT32 num_blocks )
+static void matsucd_cdda_play( running_machine *machine, UINT32 lba, UINT32 num_blocks )
 {
-	int cddanum = cdda_num_from_cdrom(cd.cdrom);
-	if (cddanum != -1)
+	const device_config *cdda = cdda_from_cdrom(machine, cd.cdrom);
+	if (cdda != NULL)
 	{
-		cdda_start_audio(cddanum, lba, num_blocks);
+		cdda_start_audio(cdda, lba, num_blocks);
 		timer_adjust_oneshot(cd.frame_timer, ATTOTIME_IN_HZ( 75 ), 0);
 	}
 }
 
-static void matsucd_cdda_pause( int pause )
+static void matsucd_cdda_pause( running_machine *machine, int pause )
 {
-	int cddanum = cdda_num_from_cdrom(cd.cdrom);
-	if (cddanum != -1)
+	const device_config *cdda = cdda_from_cdrom(machine, cd.cdrom);
+	if (cdda != NULL)
 	{
-		cdda_pause_audio(cddanum, pause);
+		cdda_pause_audio(cdda, pause);
 
 		if ( pause )
 		{
@@ -172,19 +172,19 @@ static void matsucd_cdda_pause( int pause )
 	}
 }
 
-static UINT8 matsucd_cdda_getstatus( UINT32 *lba )
+static UINT8 matsucd_cdda_getstatus( running_machine *machine, UINT32 *lba )
 {
-	int cddanum = cdda_num_from_cdrom(cd.cdrom);
+	const device_config *cdda = cdda_from_cdrom(machine, cd.cdrom);
 
 	if ( lba ) *lba = 0;
 
-	if (cddanum != -1)
+	if (cdda != NULL)
 	{
-		if (cdda_audio_active(cddanum))
+		if (cdda_audio_active(cdda))
 		{
-			if ( lba ) *lba = cdda_get_audio_lba(cddanum);
+			if ( lba ) *lba = cdda_get_audio_lba(cdda);
 
-			if (cdda_audio_paused(cddanum))
+			if (cdda_audio_paused(cdda))
 			{
 				return 0x12;	/* audio paused */
 			}
@@ -193,7 +193,7 @@ static UINT8 matsucd_cdda_getstatus( UINT32 *lba )
 				return 0x11;	/* audio in progress */
 			}
 		}
-		else if (cdda_audio_ended(cddanum))
+		else if (cdda_audio_ended(cdda))
 		{
 			return 0x13;	/* audio ended */
 		}
@@ -278,13 +278,13 @@ static void matsucd_set_status( running_machine *machine, UINT8 status )
 
 static TIMER_CALLBACK(matsu_subcode_proc)
 {
-	int cddanum = cdda_num_from_cdrom(cd.cdrom);
+	const device_config *cdda = cdda_from_cdrom(machine, cd.cdrom);
 
 	(void)param;
 
-	if (cddanum != -1)
+	if (cdda != NULL)
 	{
-		UINT8	s = matsucd_cdda_getstatus(NULL);
+		UINT8	s = matsucd_cdda_getstatus(machine, NULL);
 		UINT8	newstatus = cd.status;
 
 		if ( s == 0x11 || s == 0x12 )
@@ -380,7 +380,7 @@ void matsucd_command_w( running_machine *machine, UINT8 data )
 				return;
 
 			/* stop CDDA audio if necessary */
-			matsucd_cdda_stop();
+			matsucd_cdda_stop(machine);
 
 			cd.motor = 1;
 
@@ -395,7 +395,7 @@ void matsucd_command_w( running_machine *machine, UINT8 data )
 				return;
 
 			/* stop CDDA audio if necessary */
-			matsucd_cdda_stop();
+			matsucd_cdda_stop(machine);
 
 			/* LBA */
 			cd.lba = cd.input[1];
@@ -445,7 +445,7 @@ void matsucd_command_w( running_machine *machine, UINT8 data )
 				return;
 
 			/* stop CDDA audio if necessary */
-			matsucd_cdda_stop();
+			matsucd_cdda_stop(machine);
 
 			cd.motor = 0;
 
@@ -473,7 +473,7 @@ void matsucd_command_w( running_machine *machine, UINT8 data )
 			numblocks <<= 8;
 			numblocks |= cd.input[6];
 
-			matsucd_cdda_play( lba, numblocks );
+			matsucd_cdda_play( machine, lba, numblocks );
 
 			cd.motor = 1;
 
@@ -512,11 +512,11 @@ void matsucd_command_w( running_machine *machine, UINT8 data )
 
 			if ( lba_end <= lba_start )
 			{
-				matsucd_cdda_stop();
+				matsucd_cdda_stop(machine);
 			}
 			else
 			{
-				matsucd_cdda_play( lba_start, lba_end - lba_start );
+				matsucd_cdda_play( machine, lba_start, lba_end - lba_start );
 				cd.motor = 1;
 			}
 
@@ -550,11 +550,11 @@ void matsucd_command_w( running_machine *machine, UINT8 data )
 
 			if ( lba_end <= lba_start )
 			{
-				matsucd_cdda_stop();
+				matsucd_cdda_stop(machine);
 			}
 			else
 			{
-				matsucd_cdda_play( lba_start, lba_end - lba_start );
+				matsucd_cdda_play( machine, lba_start, lba_end - lba_start );
 				cd.motor = 1;
 			}
 
@@ -623,7 +623,7 @@ void matsucd_command_w( running_machine *machine, UINT8 data )
 
 			memset( cd.output, 0, 13 );
 
-			cd.output[0] = matsucd_cdda_getstatus( &lba );
+			cd.output[0] = matsucd_cdda_getstatus( machine, &lba );
 
 			if ( lba > 0 )
 			{
@@ -692,7 +692,7 @@ void matsucd_command_w( running_machine *machine, UINT8 data )
 				return;
 
 			/* stop CDDA audio if necessary */
-			matsucd_cdda_stop();
+			matsucd_cdda_stop(machine);
 
 			track = cd.input[2];
 			msfmode = (cd.input[1] & 0x02) ? 1 : 0;
@@ -735,7 +735,7 @@ void matsucd_command_w( running_machine *machine, UINT8 data )
 			if ( cd.input_pos < 7 )
 				return;
 
-			matsucd_cdda_pause( (cd.input[1] == 0) ? 1 : 0 );
+			matsucd_cdda_pause( machine, (cd.input[1] == 0) ? 1 : 0 );
 			memset( cd.output, 0, 7 );
 			matsucd_complete_cmd( machine, 0 );
 		}

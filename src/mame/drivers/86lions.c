@@ -89,8 +89,7 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1801, 0x1801) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x5000, 0x500f) AM_READWRITE(lions_via_r, lions_via_w)
 	AM_RANGE(0x5300, 0x5300) AM_READ(test_r)//AM_READ_PORT("IN0")
-	AM_RANGE(0x5382, 0x5382) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x5383, 0x5383) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x5382, 0x5383) AM_DEVWRITE(SOUND, "ay", ay8910_data_address_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -214,10 +213,10 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	input_port_2_r,	/* DSW? */
-	input_port_3_r,	/* DSW? */
-	NULL,
-	NULL
+	DEVCB_INPUT_PORT("IN2"),	/* DSW? */
+	DEVCB_INPUT_PORT("IN3"),	/* DSW? */
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 //static READ8_DEVICE_HANDLER( input_a )
@@ -293,18 +292,13 @@ static WRITE8_DEVICE_HANDLER( output_cb2 )
 	// ...
 }
 
-static void via_irq(const device_config *device, int state)
-{
-	cpu_set_input_line(device->machine->cpu[0], M6809_FIRQ_LINE, state);
-}
-
 static const via6522_interface via_interface =
 {
-	/*inputs : A/B         */ DEVICE8_PORT("IN0"), DEVICE8_PORT("IN1"),
-	/*inputs : CA/B1,CA/B2 */ input_ca1, input_cb1, input_ca2, input_cb2,
-	/*outputs: A/B         */ output_a, output_b,
-	/*outputs: CA/B1,CA/B2 */ output_ca1, output_cb1, output_ca2, output_cb2,
-	/*irq                  */ via_irq
+	/*inputs : A/B         */ DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"),
+	/*inputs : CA/B1,CA/B2 */ DEVCB_HANDLER(input_ca1), DEVCB_HANDLER(input_cb1), DEVCB_HANDLER(input_ca2), DEVCB_HANDLER(input_cb2),
+	/*outputs: A/B         */ DEVCB_HANDLER(output_a), DEVCB_HANDLER(output_b),
+	/*outputs: CA/B1,CA/B2 */ DEVCB_HANDLER(output_ca1), DEVCB_HANDLER(output_cb1), DEVCB_HANDLER(output_ca2), DEVCB_HANDLER(output_cb2),
+	/*irq                  */ DEVCB_CPU_INPUT_LINE("main", M6809_FIRQ_LINE)
 };
 
 static INTERRUPT_GEN( lions_irq )

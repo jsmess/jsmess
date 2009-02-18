@@ -387,12 +387,13 @@ static void add_serout(int expect_data)
 	atari_fdc.serout_count = expect_data + 1;
 }
 
-static void clr_serin(int ser_delay)
+static void clr_serin(running_machine *machine, int ser_delay)
 {
+	const device_config *pokey = devtag_get_device(machine, SOUND, "pokey");
 	atari_fdc.serin_chksum = 0;
 	atari_fdc.serin_offs = 0;
 	atari_fdc.serin_count = 0;
-	pokey1_serin_ready(ser_delay * 40);
+	pokey_serin_ready(pokey, ser_delay * 40);
 }
 
 static void add_serin(UINT8 data, int with_checksum)
@@ -423,7 +424,7 @@ static void a800_serial_command(running_machine *machine)
 			logerror("atari serout command offset = 0\n");
 		return;
 	}
-	clr_serin(10);
+	clr_serin(machine, 10);
 
 	if (VERBOSE_SERIAL)
 	{
@@ -610,7 +611,7 @@ static void a800_serial_write(running_machine *machine)
 			atari_fdc.serout_offs, atari_fdc.serout_chksum);
 	}
 
-	clr_serin(80);
+	clr_serin(machine, 80);
 	if (atari_fdc.serout_chksum == 0)
 	{
 		if (VERBOSE_SERIAL)
@@ -669,6 +670,8 @@ READ8_HANDLER ( atari_serin_r )
 
 	if (atari_fdc.serin_count)
 	{
+		const device_config *pokey = devtag_get_device(space->machine, SOUND_POKEY, "pokey");
+
 		data = atari_fdc.serin_buff[atari_fdc.serin_offs];
 		ser_delay = 2 * 40;
 		if (atari_fdc.serin_offs < 3)
@@ -681,7 +684,7 @@ READ8_HANDLER ( atari_serin_r )
 		if (--atari_fdc.serin_count == 0)
 			atari_fdc.serin_offs = 0;
 		else
-			pokey1_serin_ready(ser_delay);
+			pokey_serin_ready(pokey, ser_delay);
 	}
 
 	if (VERBOSE_SERIAL)

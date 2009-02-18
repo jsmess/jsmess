@@ -73,33 +73,33 @@ static int speech_rom_address = 0;
 static UINT8 ls259_buf[8] = {0,0,0,0,0,0,0,0};
 
 
-static void start_talking (const address_space *space)
+static void start_talking (const device_config *tms)
 {
 	speech_rom_address = 0x0;
-	tms5110_ctl_w(space,0,TMS5110_CMD_SPEAK);
-	tms5110_pdc_w(space,0,0);
-	tms5110_pdc_w(space,0,1);
-	tms5110_pdc_w(space,0,0);
+	tms5110_ctl_w(tms,0,TMS5110_CMD_SPEAK);
+	tms5110_pdc_w(tms,0,0);
+	tms5110_pdc_w(tms,0,1);
+	tms5110_pdc_w(tms,0,0);
 }
 
-static void reset_talking (const address_space *space)
+static void reset_talking (const device_config *tms)
 {
 /*To be extremely accurate there should be a delays between each of
   the function calls below. In real they happen with the frequency of 160 kHz.
 */
 
-	tms5110_ctl_w(space,0,TMS5110_CMD_RESET);
-	tms5110_pdc_w(space,0,0);
-	tms5110_pdc_w(space,0,1);
-	tms5110_pdc_w(space,0,0);
+	tms5110_ctl_w(tms,0,TMS5110_CMD_RESET);
+	tms5110_pdc_w(tms,0,0);
+	tms5110_pdc_w(tms,0,1);
+	tms5110_pdc_w(tms,0,0);
 
-	tms5110_pdc_w(space,0,0);
-	tms5110_pdc_w(space,0,1);
-	tms5110_pdc_w(space,0,0);
+	tms5110_pdc_w(tms,0,0);
+	tms5110_pdc_w(tms,0,1);
+	tms5110_pdc_w(tms,0,0);
 
-	tms5110_pdc_w(space,0,0);
-	tms5110_pdc_w(space,0,1);
-	tms5110_pdc_w(space,0,0);
+	tms5110_pdc_w(tms,0,0);
+	tms5110_pdc_w(tms,0,1);
+	tms5110_pdc_w(tms,0,0);
 
 	speech_rom_address = 0x0;
 }
@@ -152,13 +152,14 @@ static WRITE8_HANDLER( bagman_ls259_w )
 
 		if (offset==3)
 		{
+			const device_config *tms = devtag_get_device(space->machine, SOUND, "tms");
 			if (ls259_buf[3] == 0)	/* 1->0 transition */
 			{
-				reset_talking(space);
+				reset_talking(tms);
 			}
 			else
 			{
-				start_talking(space);	/* 0->1 transition */
+				start_talking(tms);	/* 0->1 transition */
 			}
 		}
 	}
@@ -220,15 +221,14 @@ static ADDRESS_MAP_START( pickin_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa007, 0xa007) AM_WRITE(SMH_NOP)	/* ???? */
 
 	/* guess */
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(ay8910_control_port_1_w)
-	AM_RANGE(0xb800, 0xb800) AM_READWRITE(ay8910_read_port_1_r, ay8910_write_port_1_w)
+	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE(SOUND, "ay2", ay8910_address_w)
+	AM_RANGE(0xb800, 0xb800) AM_DEVREADWRITE(SOUND, "ay2", ay8910_r, ay8910_data_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x08, 0x08) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x09, 0x09) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x0c, 0x0c) AM_READ(ay8910_read_port_0_r)
+	AM_RANGE(0x08, 0x09) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
+	AM_RANGE(0x0c, 0x0c) AM_DEVREAD(SOUND, "ay", ay8910_r)
 	//AM_RANGE(0x56, 0x56) AM_WRITE(SMH_NOP)
 ADDRESS_MAP_END
 
@@ -341,8 +341,8 @@ static INPUT_PORTS_START( squaitsa )
  	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
  	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
  	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
- 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY // these must be tied to a spinner somehow?
- 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY // ^
+ 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL ) // special handling for the p1 dial
+ 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) // ^
  	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
  	PORT_START("P2")
@@ -351,8 +351,8 @@ static INPUT_PORTS_START( squaitsa )
  	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
  	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
  	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
- 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL // these must be tied to a spinner somehow?
- 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL // ^
+ 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL ) // special handling for the p2 dial
+ 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) // ^
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 
 	PORT_START("DSW")
@@ -378,6 +378,12 @@ static INPUT_PORTS_START( squaitsa )
     PORT_DIPNAME(    0x80, 0x00, "Protection?" )	/* Left empty in the dips scan */
     PORT_DIPSETTING( 0x80, DEF_STR( Off ) )
     PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+
+	PORT_START("DIAL_P1")
+    PORT_BIT( 0xff, 0, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(5)
+
+	PORT_START("DIAL_P2")
+    PORT_BIT( 0xff, 0, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(5) PORT_COCKTAIL
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =
@@ -423,20 +429,72 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	input_port_0_r,
-	input_port_1_r,
-	NULL,
-	NULL
+	DEVCB_INPUT_PORT("P1"),
+	DEVCB_INPUT_PORT("P2"),
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+/* squaitsa doesn't map the dial directly, instead it polls the results of the dial thru an external circuitry.
+   I don't know if the following is correct, there can possbily be multiple solutions for the same problem. */
+static READ8_DEVICE_HANDLER( dial_input_p1_r )
+{
+	static UINT8 res,dial_val,old_val;
+
+	dial_val = input_port_read(device->machine, "DIAL_P1");
+
+	if(res != 0x60)
+		res = 0x60;
+	else if(dial_val > old_val)
+		res = 0x40;
+	else if(dial_val < old_val)
+		res = 0x20;
+	else
+		res = 0x60;
+
+	old_val = dial_val;
+
+	return (input_port_read(device->machine, "P1") & 0x9f) | (res);
+}
+
+static READ8_DEVICE_HANDLER( dial_input_p2_r )
+{
+	static UINT8 res,dial_val,old_val;
+
+	dial_val = input_port_read(device->machine, "DIAL_P2");
+
+	if(res != 0x60)
+		res = 0x60;
+	else if(dial_val > old_val)
+		res = 0x40;
+	else if(dial_val < old_val)
+		res = 0x20;
+	else
+		res = 0x60;
+
+	old_val = dial_val;
+
+	return (input_port_read(device->machine, "P2") & 0x9f) | (res);
+}
+
+static const ay8910_interface ay8910_dial_config =
+{
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_HANDLER(dial_input_p1_r),
+	DEVCB_HANDLER(dial_input_p2_r),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static const ay8910_interface ay8910_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	NULL,
-	NULL,
-	NULL,
-	NULL
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static const tms5110_interface bagman_tms5110_interface =
@@ -507,7 +565,7 @@ static MACHINE_DRIVER_START( pickin )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay1", AY8910, 1500000)
+	MDRV_SOUND_ADD("ay", AY8910, 1500000)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
@@ -562,7 +620,7 @@ static MACHINE_DRIVER_START( botanic )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay1", AY8910, 1500000)
+	MDRV_SOUND_ADD("ay", AY8910, 1500000)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
@@ -570,6 +628,14 @@ static MACHINE_DRIVER_START( botanic )
 	MDRV_SOUND_CONFIG(ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( squaitsa )
+	MDRV_IMPORT_FROM( botanic )
+	MDRV_SOUND_MODIFY("ay")
+	MDRV_SOUND_CONFIG(ay8910_dial_config)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+MACHINE_DRIVER_END
+
 
 /***************************************************************************
 
@@ -902,5 +968,5 @@ GAME( 1984, sbagman,  0, 	   bagman,  sbagman, 0,        ROT270, "Valadon Automa
 GAME( 1984, sbagmans, sbagman, bagman,  sbagman, 0,        ROT270, "Valadon Automation (Stern license)", "Super Bagman (Stern)", 0 )
 GAME( 1983, pickin,	  0,	   pickin,  pickin,  0,        ROT270, "Valadon Automation", "Pickin'", 0 )
 GAME( 1984, botanic,  0,       botanic, botanic, 0,        ROT270, "Valadon Automation (Itisa license)", "Botanic", 0 )
-GAME( 1984, squaitsa,  0,       botanic, squaitsa, 0,        ROT0, "Itisa", "Squash (Itisa)", GAME_NOT_WORKING )
+GAME( 1984, squaitsa, 0,       squaitsa,squaitsa,0,        ROT0,   "Itisa",              "Squash (Itisa)", 0 )
 

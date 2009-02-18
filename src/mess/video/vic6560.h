@@ -49,15 +49,8 @@
  *
  ****************************************************************************/
 
-#ifndef VIC6560_H_
-#define VIC6560_H_
-
-#include "sound/custom.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
+#ifndef __VIC6560_H__
+#define __VIC6560_H__
 
 /* to be inserted in MachineDriver-Structure */
 #define VIC6560_VRETRACERATE 60
@@ -115,9 +108,6 @@ extern VIDEO_START( vic6560 );
 extern VIDEO_UPDATE( vic6560 );
 extern const unsigned char vic6560_palette[16 * 3];
 
-/* to be inserted in GameDriver-Structure */
-extern const custom_sound_interface vic6560_sound_interface;
-
 extern INTERRUPT_GEN( vic656x_raster_interrupt );
 
 /* to be called when writting to port */
@@ -129,13 +119,9 @@ extern  READ8_HANDLER ( vic6560_port_r );
 
 /*----------- defined in audio/vic6560.c -----------*/
 
-/* private area */
-CUSTOM_START( vic6560_custom_start );
+#define SOUND_VIC6560		DEVICE_GET_INFO_NAME( vic6560_sound )
+DEVICE_GET_INFO( vic6560_sound );
 void vic6560_soundport_w (running_machine *machine, int mode, int data);
 
 
-#ifdef __cplusplus
-}
-#endif
-
-#endif /* VIC6560_H_ */
+#endif /* __VIC6560_H__ */

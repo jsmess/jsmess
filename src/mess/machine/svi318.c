@@ -219,7 +219,7 @@ static WRITE8_DEVICE_HANDLER ( svi318_ppi_port_c_w )
 	/* key click */
 	val = (data & 0x80) ? 0x3e : 0;
 	val += (data & 0x40) ? 0x3e : 0;
-	dac_signed_data_w (0, val);
+	dac_signed_data_w (devtag_get_device(device->machine, SOUND, "dac"), val);
 
 	/* cassette motor on/off */
 	if (svi318_cassette_present(device->machine, 0))

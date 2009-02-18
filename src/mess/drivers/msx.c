@@ -324,7 +324,7 @@ static ADDRESS_MAP_START (readport, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x90, 0x91) AM_READ( msx_printer_r )
-	AM_RANGE( 0xa0, 0xa7) AM_READ( msx_psg_r )
+	AM_RANGE( 0xa0, 0xa7) AM_DEVREAD( SOUND_AY8910, "ay8910", ay8910_r )
 	AM_RANGE( 0xa8, 0xab) AM_DEVREAD( PPI8255, "ppi8255", ppi8255_r )
 	AM_RANGE( 0x98, 0x98) AM_READ( TMS9928A_vram_r )
 	AM_RANGE( 0x99, 0x99) AM_READ( TMS9928A_register_r )
@@ -336,7 +336,8 @@ static ADDRESS_MAP_START (writeport, ADDRESS_SPACE_IO, 8)
 	AM_RANGE( 0x77, 0x77) AM_WRITE( msx_90in1_w )
 	AM_RANGE( 0x7c, 0x7d) AM_WRITE( msx_fmpac_w )
 	AM_RANGE( 0x90, 0x91) AM_WRITE( msx_printer_w )
-	AM_RANGE( 0xa0, 0xa7) AM_WRITE( msx_psg_w )
+	AM_RANGE( 0xa0, 0xa0) AM_DEVWRITE( SOUND_AY8910, "ay8910", ay8910_address_w ) AM_MIRROR(0x06)
+	AM_RANGE( 0xa1, 0xa1) AM_DEVWRITE( SOUND_AY8910, "ay8910", ay8910_data_w ) AM_MIRROR(0x06)
 	AM_RANGE( 0xa8, 0xab) AM_DEVWRITE( PPI8255, "ppi8255", ppi8255_w )
 	AM_RANGE( 0x98, 0x98) AM_WRITE( TMS9928A_vram_w )
 	AM_RANGE( 0x99, 0x99) AM_WRITE( TMS9928A_register_w )
@@ -347,7 +348,7 @@ static ADDRESS_MAP_START (readport2, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x90, 0x91) AM_READ( msx_printer_r )
-	AM_RANGE( 0xa0, 0xa7) AM_READ( msx_psg_r )
+	AM_RANGE( 0xa0, 0xa7) AM_DEVREAD( SOUND_AY8910, "ay8910", ay8910_r )
 	AM_RANGE( 0xa8, 0xab) AM_DEVREAD( PPI8255, "ppi8255", ppi8255_r )
 	AM_RANGE( 0x98, 0x98) AM_READ( v9938_0_vram_r )
 	AM_RANGE( 0x99, 0x99) AM_READ( v9938_0_status_r )
@@ -361,7 +362,8 @@ static ADDRESS_MAP_START (writeport2, ADDRESS_SPACE_IO, 8)
 	AM_RANGE( 0x77, 0x77) AM_WRITE( msx_90in1_w )
 	AM_RANGE( 0x7c, 0x7d) AM_WRITE( msx_fmpac_w )
 	AM_RANGE( 0x90, 0x91) AM_WRITE( msx_printer_w )
-	AM_RANGE( 0xa0, 0xa7) AM_WRITE( msx_psg_w )
+	AM_RANGE( 0xa0, 0xa0) AM_DEVWRITE( SOUND_AY8910, "ay8910", ay8910_address_w ) AM_MIRROR(0x06)
+	AM_RANGE( 0xa1, 0xa1) AM_DEVWRITE( SOUND_AY8910, "ay8910", ay8910_data_w ) AM_MIRROR(0x06)
 	AM_RANGE( 0xa8, 0xab) AM_DEVWRITE( PPI8255, "ppi8255", ppi8255_w )
 	AM_RANGE( 0x98, 0x98) AM_WRITE( v9938_0_vram_w )
 	AM_RANGE( 0x99, 0x99) AM_WRITE( v9938_0_command_w )
@@ -1005,10 +1007,10 @@ static const ay8910_interface msx_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	msx_psg_port_a_r,
-	msx_psg_port_b_r,
-	msx_psg_port_a_w,
-	msx_psg_port_b_w
+	DEVCB_MEMORY_HANDLER("main", PROGRAM, msx_psg_port_a_r),
+	DEVCB_MEMORY_HANDLER("main", PROGRAM, msx_psg_port_b_r),
+	DEVCB_MEMORY_HANDLER("main", PROGRAM, msx_psg_port_a_w),
+	DEVCB_MEMORY_HANDLER("main", PROGRAM, msx_psg_port_b_w)
 };
 
 static VIDEO_START( msx2 )

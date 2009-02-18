@@ -956,7 +956,7 @@ MACHINE_RESET( c128 )
 	c64_common_init_machine(machine);
 	c128_vicaddr = c64_vicaddr = c64_memory;
 
-	sndti_reset(SOUND_SID6581, 0);
+	devtag_reset(machine, SOUND_SID6581, "sid6581");
 
 	c64mode = 0;
 	c128_mmu8722_reset (machine);

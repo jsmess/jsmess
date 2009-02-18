@@ -16,10 +16,15 @@ A3-1J
         A1-4P           A1-9N (6301)
                         A1-9P
 
+ Notes:
+ - According to some original screenshots floating around the net, this game uses a weird coloring scheme for
+   the char text that dynamically changes the color of an entire column. For now I can only guess about how
+   it truly works.
+   An original snap of these can be seen at -> http://mamedev.emulab.it/kale/fast/files/A00000211628-007.jpg
+
  To do:
- - finish and fix inputs
- - colours ?
- - proms ?
+ - Needs schematics to check if the current implementation of the "global column coloring" is correct.
+ - Check unknown read/writes, too many of them.
 
 */
 
@@ -27,109 +32,79 @@ A3-1J
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 
-static tilemap *fg_tilemap;
-static UINT8 *char_bank;
+static UINT8 *char_bank,*col_line;
 
-static WRITE8_HANDLER( supdrapo_videoram_w )
+static READ8_HANDLER( sdpoker_rng_r )
 {
-	videoram[offset] = data;
-	tilemap_mark_tile_dirty(fg_tilemap, offset);
+	return mame_rand(space->machine);
 }
 
-#ifdef UNUSED_FUNCTION
-WRITE8_HANDLER( supdrapo_char_bank_w )
-{
-	char_bank[offset] = data;
-	tilemap_mark_tile_dirty(fg_tilemap, offset);
-}
-#endif
-
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x4fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x5800, 0x5817) AM_READ(SMH_RAM)
-	AM_RANGE(0x6000, 0x67ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x6c00, 0x6fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("IN4") //?
+static ADDRESS_MAP_START( sdpoker_mem, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x4fff) AM_ROM
+	AM_RANGE(0x5000, 0x50ff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x57ff, 0x57ff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x5800, 0x58ff) AM_RAM AM_SHARE(1) AM_BASE(&col_line)
+	AM_RANGE(0x6000, 0x67ff) AM_RAM //work ram
+	AM_RANGE(0x6800, 0x6bff) AM_RAM AM_BASE(&videoram)
+	AM_RANGE(0x6c00, 0x6fff) AM_RAM AM_BASE(&char_bank)
+	AM_RANGE(0x7000, 0x7bff) AM_RAM //$7600 seems watchdog
+	AM_RANGE(0x7c00, 0x7c00) AM_WRITENOP //?
+	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("IN4") AM_WRITENOP
 	AM_RANGE(0x8001, 0x8001) AM_READ_PORT("IN0")
 	AM_RANGE(0x8002, 0x8002) AM_READ_PORT("IN1")
-	AM_RANGE(0x8003, 0x8003) AM_READ_PORT("IN2")
-	AM_RANGE(0x8004, 0x8004) AM_READ_PORT("IN3")
-	AM_RANGE(0x8005, 0x8005) AM_READ_PORT("IN6") //?
+	AM_RANGE(0x8003, 0x8003) AM_READ_PORT("IN2") AM_WRITENOP
+	AM_RANGE(0x8004, 0x8004) AM_READ_PORT("IN3") AM_WRITENOP
+	AM_RANGE(0x8005, 0x8005) AM_READ_PORT("IN6")
 	AM_RANGE(0x8006, 0x8006) AM_READ_PORT("IN5") //dips?
-	AM_RANGE(0x9000, 0x9097) AM_READ(SMH_RAM)
-	AM_RANGE(0x909d, 0x909d) AM_READ(SMH_RAM)
-	AM_RANGE(0x9400, 0x9400) AM_READ_PORT("IN7") //need check
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x4fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x5000, 0x50ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x5800, 0x5837) AM_WRITE(SMH_RAM) //every 2, starts 5801
-	AM_RANGE(0x583b, 0x583b) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x6000, 0x67ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x6800, 0x6bff) AM_WRITE(supdrapo_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x6c00, 0x6fff) AM_WRITE(SMH_RAM) AM_BASE(&char_bank)
-	AM_RANGE(0x7000, 0x77ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x7800, 0x7c00) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x8003, 0x8003) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x8004, 0x8004) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x9000, 0x9097) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x9081, 0x9081) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x909d, 0x909d) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x9800, 0x9800) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x9801, 0x9801) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x9000, 0x90ff) AM_RAM
+	AM_RANGE(0x9400, 0x9400) AM_READ(sdpoker_rng_r)
+	AM_RANGE(0x9800, 0x9801) AM_DEVWRITE(SOUND, "ay", ay8910_data_address_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( supdrapo )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) //win
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) //cancel
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1) //deal
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1) //bet
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN4 ) //10 scores
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN3 ) // 5 scores
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 ) // 2 scores
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) // 1 score
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_NAME("P1 Win") PORT_CODE(KEYCODE_D) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("P1 Cancel") PORT_CODE(KEYCODE_S) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON11 ) PORT_NAME("P1 Bet") PORT_CODE(KEYCODE_A) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME("Coin : 10")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_NAME("Coin :  5")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("Coin :  2")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("Coin :  1")
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_PLAYER(1) //hold 5 p1
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_PLAYER(1) //hold 4 p1
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_PLAYER(1) //hold 3 p1
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_PLAYER(1) //hold 2 p1
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_PLAYER(1) //hold 1 p1
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_PLAYER(1) //black p1
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(1) //red p1
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(1) //double p1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("P1 Hold 5") PORT_CODE(KEYCODE_B) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P1 Hold 4") PORT_CODE(KEYCODE_V) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 Hold 3") PORT_CODE(KEYCODE_C) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Hold 2") PORT_CODE(KEYCODE_X) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Hold 1") PORT_CODE(KEYCODE_Z) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("P1 Black") PORT_CODE(KEYCODE_Q) PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("P1 Red") PORT_CODE(KEYCODE_W) PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_NAME("P1 Double Up") PORT_CODE(KEYCODE_E) PORT_PLAYER(1)
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) //win
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) //cancel
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2) //deal
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2) //bet
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN4 ) //10 scores
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN3 ) // 5 scores
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 ) // 2 scores
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) // 1 score
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Win") PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Cancel") PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Bet") PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Coin : 10")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Coin :  5")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Coin :  2")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Coin :  1")
 
 	PORT_START("IN3")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) //hold 5 p2
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) //hold 4 p2
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2) //hold 3 p2
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2) //hold 2 p2
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN4 ) // hold 1 p2
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN3 ) // black p2
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 ) // red p2
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) // double p2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Hold 5") PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Hold 4") PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Hold 3") PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Hold 2") PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Hold 1") PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Black") PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Red") PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Double Up") PORT_PLAYER(2)
 
 	PORT_START("IN4")
-	PORT_DIPNAME( 0x01, 0x00, "4-1" ) //select player 1
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "4-2" ) //select player 2
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 Flip") PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Flip") PORT_PLAYER(2)
 	PORT_DIPNAME( 0x04, 0x00, "4-3" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
@@ -139,13 +114,11 @@ static INPUT_PORTS_START( supdrapo )
 	PORT_DIPNAME( 0x10, 0x00, "4-5" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "4-6" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Credit Clear")
 	PORT_SERVICE_NO_TOGGLE( 0x40, IP_ACTIVE_HIGH )
-	PORT_DIPNAME( 0x80, 0x00, "4-8" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x00, "1 Player" )
+	PORT_DIPSETTING(    0x80, "2 Players" )
 
 	PORT_START("IN5")
 	PORT_DIPNAME( 0x01, 0x00, "5-1" )
@@ -198,32 +171,6 @@ static INPUT_PORTS_START( supdrapo )
 	PORT_DIPNAME( 0x80, 0x00, "6-8" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-
-	PORT_START("IN7")
-	PORT_DIPNAME( 0x01, 0x00, "7-1" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "7-2" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "7-3" ) //reveal
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "7-4" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, "7-5" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "7-6" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "7-7" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "7-8" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =
@@ -241,28 +188,65 @@ static GFXDECODE_START( supdrapo )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 16 )
 GFXDECODE_END
 
-static TILE_GET_INFO( get_tile_info )
-{
-	int code = videoram[tile_index] + char_bank[tile_index] * 0x100;
-
-	SET_TILE_INFO( 0, code, 0, 0);
-}
-
 static VIDEO_START( supdrapo )
 {
-	fg_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan_rows,8,8,32,32);
 }
 
 static VIDEO_UPDATE( supdrapo )
 {
-	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
+	int x,y;
+	int count;
+	int color;
+
+	count = 0;
+
+	for(y=0;y<32;y++)
+	{
+		for(x=0;x<32;x++)
+		{
+			int tile = videoram[count] + char_bank[count] * 0x100;
+			/* Global Column Coloring, GUESS! */
+			color = col_line[(x*2)+1] ? (col_line[(x*2)+1]-1) & 0x7 : 0;
+
+			drawgfx(bitmap,screen->machine->gfx[0],tile,color,0,0,x*8,y*8,cliprect,TRANSPARENCY_NONE,0);
+
+			count++;
+		}
+	}
 
 	return 0;
 }
 
+
+/*Maybe bit 2 & 3 of the second color prom are intensity bits? */
+static PALETTE_INIT( sdpoker )
+{
+	int	bit0, bit1, bit2 , r, g, b;
+	int	i;
+
+	for (i = 0; i < 0x100; ++i)
+	{
+		bit0 = 0;//(color_prom[0] >> 0) & 0x01;
+		bit1 = (color_prom[0] >> 0) & 0x01;
+		bit2 = (color_prom[0] >> 1) & 0x01;
+		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = 0;//(color_prom[0] >> 3) & 0x01;
+		bit1 = (color_prom[0] >> 2) & 0x01;
+		bit2 = (color_prom[0] >> 3) & 0x01;
+		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = 0;//(color_prom[0] >> 0) & 0x01;
+		bit1 = (color_prom[0x100] >> 0) & 0x01;
+		bit2 = (color_prom[0x100] >> 1) & 0x01;
+		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		color_prom++;
+	}
+}
+
 static MACHINE_DRIVER_START( supdrapo )
-	MDRV_CPU_ADD("main", Z80,8000000/2)		 /* ??? */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_ADD("main", Z80,8000000/2) /* ??? */
+	MDRV_CPU_PROGRAM_MAP(sdpoker_mem,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
@@ -274,14 +258,15 @@ static MACHINE_DRIVER_START( supdrapo )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 
 	MDRV_GFXDECODE(supdrapo)
-	MDRV_PALETTE_LENGTH(16)
+	MDRV_PALETTE_LENGTH(0x100)
+	MDRV_PALETTE_INIT(sdpoker)
 
 	MDRV_VIDEO_START(supdrapo)
 	MDRV_VIDEO_UPDATE(supdrapo)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, 8000000/2)
+	MDRV_SOUND_ADD("ay", AY8910, 8000000/2) /* ??? */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
@@ -299,11 +284,10 @@ ROM_START( supdrapo )
 	ROM_LOAD( "a1-4l",        0x2000, 0x1000, CRC(534f7b94) SHA1(44b83053827b27b9e45f6fc50d3878984ef5c5cc) )
 	ROM_LOAD( "a1-4k",        0x3000, 0x1000, CRC(3d881f5b) SHA1(53d8800a098e4393224de0b82f8e516f73fd6b62) )
 
-	ROM_REGION( 0x00100, "proms", 0 )
+	ROM_REGION( 0x00200, "proms", 0 )
 	ROM_LOAD( "a1-9n",        0x0000, 0x0100, CRC(e62529e3) SHA1(176f2069b0c06c1d088909e81658652af06c8eec) )
-	ROM_LOAD( "a1-9p",        0x0000, 0x0100, CRC(a0547746) SHA1(747c8aef5afa26124fe0763e7f96c4ff6be31863) )
-
+	ROM_LOAD( "a1-9p",        0x0100, 0x0100, CRC(a0547746) SHA1(747c8aef5afa26124fe0763e7f96c4ff6be31863) )
 ROM_END
 
 
-GAME( 1983, supdrapo, 0, supdrapo, supdrapo, 0, ROT90, "Stern", "Super Draw Poker", GAME_NOT_WORKING )
+GAME( 1983, supdrapo, 0, supdrapo, supdrapo, 0, ROT90, "Valadon Automation (Stern license)", "Super Draw Poker", 0 )

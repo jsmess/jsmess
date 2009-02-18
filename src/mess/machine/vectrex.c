@@ -245,9 +245,9 @@ READ8_DEVICE_HANDLER(v_via_pa_r)
 	if ((!(vectrex_via_out[PORTB] & 0x10)) && (vectrex_via_out[PORTB] & 0x08))
 		/* BDIR inactive, we can read the PSG. BC1 has to be active. */
 	{
-		const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+		const device_config *ay = devtag_get_device(device->machine, SOUND_AY8912, "ay8912");
 
-		vectrex_via_out[PORTA] = ay8910_read_port_0_r(space, 0)
+		vectrex_via_out[PORTA] = ay8910_r(ay, 0)
 			& ~(vectrex_imager_pinlevel & 0x80);
 	}
 	return vectrex_via_out[PORTA];

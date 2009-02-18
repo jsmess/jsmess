@@ -412,43 +412,44 @@ READ8_HANDLER(arcadia_video_r)
 WRITE8_HANDLER(arcadia_video_w)
 {
 	arcadia_video.reg.data[offset]=data;
-    switch (offset) {
-    case 0xfc:
-	arcadia_video.ypos=255-data+YPOS;
-	break;
-    case 0xfd:
-	arcadia_soundport_w(space->machine, offset&3, data);
-	arcadia_video.multicolor=data&0x80;
-	break;
-    case 0xfe:
-	arcadia_soundport_w(space->machine, offset&3, data);
-	arcadia_video.shift=(data>>5);
-	break;
-    case 0xf0: case 0xf2: case 0xf4: case 0xf6:
-	arcadia_video.pos[(offset>>1)&3].y=(data^0xff)+1;
-	break;
-    case 0xf1: case 0xf3: case 0xf5: case 0xf7:
-	arcadia_video.pos[(offset>>1)&3].x=data-43;
-	break;
-    case 0x180: case 0x181: case 0x182: case 0x183: case 0x184: case 0x185: case 0x186: case 0x187:
-    case 0x188: case 0x189: case 0x18a: case 0x18b: case 0x18c: case 0x18d: case 0x18e: case 0x18f:
-    case 0x190: case 0x191: case 0x192: case 0x193: case 0x194: case 0x195: case 0x196: case 0x197:
-    case 0x198: case 0x199: case 0x19a: case 0x19b: case 0x19c: case 0x19d: case 0x19e: case 0x19f:
-    case 0x1a0: case 0x1a1: case 0x1a2: case 0x1a3: case 0x1a4: case 0x1a5: case 0x1a6: case 0x1a7:
-    case 0x1a8: case 0x1a9: case 0x1aa: case 0x1ab: case 0x1ac: case 0x1ad: case 0x1ae: case 0x1af:
-    case 0x1b0: case 0x1b1: case 0x1b2: case 0x1b3: case 0x1b4: case 0x1b5: case 0x1b6: case 0x1b7:
-    case 0x1b8: case 0x1b9: case 0x1ba: case 0x1bb: case 0x1bc: case 0x1bd: case 0x1be: case 0x1bf:
-	chars[0x38|((offset>>3)&7)][offset&7]=data;
-	break;
-    case 0x1f8:
-	arcadia_video.lines26=data&0x40;
-	arcadia_video.graphics=data&0x80;
-	break;
-    case 0x1f9:
-	arcadia_video.doublescan=!(data&0x80);
-	arcadia_video.ad_delay=10;
-	break;
-    }
+	switch (offset)
+	{
+		case 0xfc:
+			arcadia_video.ypos=255-data+YPOS;
+			break;
+		case 0xfd:
+			arcadia_soundport_w(devtag_get_device(space->machine, SOUND_ARCADIA, "custom"), offset&3, data);
+			arcadia_video.multicolor=data&0x80;
+			break;
+		case 0xfe:
+			arcadia_soundport_w(devtag_get_device(space->machine, SOUND_ARCADIA, "custom"), offset&3, data);
+			arcadia_video.shift=(data>>5);
+			break;
+		case 0xf0: case 0xf2: case 0xf4: case 0xf6:
+			arcadia_video.pos[(offset>>1)&3].y=(data^0xff)+1;
+			break;
+		case 0xf1: case 0xf3: case 0xf5: case 0xf7:
+			arcadia_video.pos[(offset>>1)&3].x=data-43;
+			break;
+		case 0x180: case 0x181: case 0x182: case 0x183: case 0x184: case 0x185: case 0x186: case 0x187:
+		case 0x188: case 0x189: case 0x18a: case 0x18b: case 0x18c: case 0x18d: case 0x18e: case 0x18f:
+		case 0x190: case 0x191: case 0x192: case 0x193: case 0x194: case 0x195: case 0x196: case 0x197:
+		case 0x198: case 0x199: case 0x19a: case 0x19b: case 0x19c: case 0x19d: case 0x19e: case 0x19f:
+		case 0x1a0: case 0x1a1: case 0x1a2: case 0x1a3: case 0x1a4: case 0x1a5: case 0x1a6: case 0x1a7:
+		case 0x1a8: case 0x1a9: case 0x1aa: case 0x1ab: case 0x1ac: case 0x1ad: case 0x1ae: case 0x1af:
+		case 0x1b0: case 0x1b1: case 0x1b2: case 0x1b3: case 0x1b4: case 0x1b5: case 0x1b6: case 0x1b7:
+		case 0x1b8: case 0x1b9: case 0x1ba: case 0x1bb: case 0x1bc: case 0x1bd: case 0x1be: case 0x1bf:
+			chars[0x38|((offset>>3)&7)][offset&7]=data;
+			break;
+		case 0x1f8:
+			arcadia_video.lines26=data&0x40;
+			arcadia_video.graphics=data&0x80;
+			break;
+		case 0x1f9:
+			arcadia_video.doublescan=!(data&0x80);
+			arcadia_video.ad_delay=10;
+			break;
+	}
 }
 
 INLINE void arcadia_draw_char(running_machine *machine, bitmap_t *bitmap, UINT8 *ch, int charcode,

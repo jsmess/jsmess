@@ -220,12 +220,25 @@ static STREAM_UPDATE( svision_update )
 /* Sound handler start              */
 /************************************/
 
-CUSTOM_START( svision_custom_start )
+static DEVICE_START(svision_sound)
 {
 	memset(&svision_dma, 0, sizeof(svision_dma));
 	memset(&svision_noise, 0, sizeof(svision_noise));
 	memset(svision_channel, 0, sizeof(svision_channel));
 
 	mixer_channel = stream_create(device, 0, 2, device->machine->sample_rate, 0, svision_update);
-	return (void *) ~0;
+}
+
+
+DEVICE_GET_INFO( svision_sound )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(svision_sound);	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "SuperVision Sound");				break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
+	}
 }

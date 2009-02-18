@@ -135,7 +135,7 @@ static const ay8910_interface orionz80_ay_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	NULL
+	DEVCB_NULL
 };
 
 static MACHINE_DRIVER_START( orionz80 )

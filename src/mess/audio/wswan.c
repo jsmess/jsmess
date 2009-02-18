@@ -218,7 +218,7 @@ static STREAM_UPDATE( wswan_sh_update )
 	}
 }
 
-CUSTOM_START( wswan_sh_start )
+static DEVICE_START(wswan_sound)
 {
 	channel = stream_create(device, 0, 2, device->machine->sample_rate, 0, wswan_sh_update);
 
@@ -234,6 +234,18 @@ CUSTOM_START( wswan_sh_start )
 	snd.audio4.on = 0;
 	snd.audio4.signal = 16;
 	snd.audio4.pos = 0;
+}
 
-	return (void *) ~0;
+
+DEVICE_GET_INFO( wswan_sound )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(wswan_sound);	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Wswan Sound");				break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
+	}
 }

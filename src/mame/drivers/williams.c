@@ -1447,7 +1447,7 @@ static MACHINE_DRIVER_START( defender )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
+	MDRV_SOUND_ADD("wmsdac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* pia */
@@ -1681,9 +1681,6 @@ static MACHINE_DRIVER_START( joust2 )
 
 	MDRV_MACHINE_START(joust2)
 	MDRV_MACHINE_RESET(joust2)
-
-	/* sound hardware */
-	MDRV_SOUND_REMOVE("wmsdac")
 
 	/* pia */
 	MDRV_PIA6821_MODIFY("pia_1", joust2_pia_1_intf)

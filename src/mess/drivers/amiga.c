@@ -22,7 +22,6 @@ would commence ($C00000).
 #include "includes/amiga.h"
 
 /* Components */
-#include "sound/custom.h"
 #include "machine/6525tpi.h"
 #include "machine/6526cia.h"
 #include "machine/amigafdc.h"
@@ -37,9 +36,9 @@ would commence ($C00000).
 #include "devices/cartslot.h"
 
 
-static UINT8 amiga_cia_0_portA_r(const device_config *device);
-static UINT8 amiga_cia_0_cdtv_portA_r(const device_config *device);
-static void amiga_cia_0_portA_w(const device_config *device, UINT8 data);
+static READ8_DEVICE_HANDLER( amiga_cia_0_portA_r );
+static READ8_DEVICE_HANDLER( amiga_cia_0_cdtv_portA_r );
+static WRITE8_DEVICE_HANDLER( amiga_cia_0_portA_w );
 
 /***************************************************************************
   Battery Backed-Up Clock (MSM6264)
@@ -217,58 +216,53 @@ static MACHINE_RESET( cdtv )
 }
 
 
-static const custom_sound_interface amiga_custom_interface =
-{
-	amiga_sh_start
-};
-
 static const cia6526_interface cia_0_ntsc_intf =
 {
-	amiga_cia_0_irq,									/* irq_func */
+	DEVCB_LINE(amiga_cia_0_irq),									/* irq_func */
 	60,													/* tod_clock */
 	{
-		{ amiga_cia_0_portA_r, amiga_cia_0_portA_w },	/* port A */
-		{ NULL, NULL }									/* port B */
+		{ DEVCB_HANDLER(amiga_cia_0_portA_r), DEVCB_HANDLER(amiga_cia_0_portA_w) },	/* port A */
+		{ DEVCB_NULL, DEVCB_NULL }									/* port B */
 	}
 };
 
 static const cia6526_interface cia_0_pal_intf =
 {
-	amiga_cia_0_irq,									/* irq_func */
+	DEVCB_LINE(amiga_cia_0_irq),									/* irq_func */
 	50,													/* tod_clock */
 	{
-		{ amiga_cia_0_portA_r, amiga_cia_0_portA_w },	/* port A */
-		{ NULL, NULL }									/* port B */
+		{ DEVCB_HANDLER(amiga_cia_0_portA_r), DEVCB_HANDLER(amiga_cia_0_portA_w) },	/* port A */
+		{ DEVCB_NULL, DEVCB_NULL }									/* port B */
 	}
 };
 
 static const cia6526_interface cia_1_intf =
 {
-	amiga_cia_1_irq,									/* irq_func */
+	DEVCB_LINE(amiga_cia_1_irq),									/* irq_func */
 	0,													/* tod_clock */
 	{
-		{ NULL, NULL, },								/* port A */
-		{ NULL, amiga_fdc_control_w }					/* port B */
+		{ DEVCB_NULL, DEVCB_NULL },								/* port A */
+		{ DEVCB_NULL, DEVCB_HANDLER(amiga_fdc_control_w) }					/* port B */
 	}
 };
 
 static const cia6526_interface cia_0_cdtv_intf =
 {
-	amiga_cia_0_irq,									/* irq_func */
+	DEVCB_LINE(amiga_cia_0_irq),									/* irq_func */
 	0,													/* tod_clock */
 	{
-		{ amiga_cia_0_cdtv_portA_r, amiga_cia_0_portA_w },	/* port A */
-		{ NULL, NULL }									/* port B */
+		{ DEVCB_HANDLER(amiga_cia_0_cdtv_portA_r), DEVCB_HANDLER(amiga_cia_0_portA_w) },	/* port A */
+		{ DEVCB_NULL, DEVCB_NULL }									/* port B */
 	}
 };
 
 static const cia6526_interface cia_1_cdtv_intf =
 {
-	amiga_cia_1_irq,									/* irq_func */
+	DEVCB_LINE(amiga_cia_1_irq),									/* irq_func */
 	0,													/* tod_clock */
 	{
-		{ NULL, NULL, },								/* port A */
-		{ NULL, NULL }					/* port B */
+		{ DEVCB_NULL, DEVCB_NULL, },								/* port A */
+		{ DEVCB_NULL, DEVCB_NULL }					/* port B */
 	}
 };
 
@@ -320,8 +314,7 @@ static MACHINE_DRIVER_START( ntsc )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD("custom", CUSTOM, 3579545)
-	MDRV_SOUND_CONFIG(amiga_custom_interface)
+	MDRV_SOUND_ADD("amiga", AMIGA, 3579545)
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
 	MDRV_SOUND_ROUTE(2, "right", 0.50)
@@ -404,7 +397,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 
-static UINT8 amiga_cia_0_portA_r(const device_config *device)
+static READ8_DEVICE_HANDLER( amiga_cia_0_portA_r )
 {
 	UINT8 ret = input_port_read(device->machine, "CIA0PORTA") & 0xc0;	/* Gameport 1 and 0 buttons */
 	ret |= amiga_fdc_status_r();
@@ -412,13 +405,13 @@ static UINT8 amiga_cia_0_portA_r(const device_config *device)
 }
 
 
-static UINT8 amiga_cia_0_cdtv_portA_r(const device_config *device)
+static READ8_DEVICE_HANDLER( amiga_cia_0_cdtv_portA_r )
 {
 	return input_port_read(device->machine, "CIA0PORTA") & 0xc0;	/* Gameport 1 and 0 buttons */
 }
 
 
-static void amiga_cia_0_portA_w(const device_config *device, UINT8 data)
+static WRITE8_DEVICE_HANDLER( amiga_cia_0_portA_w )
 {
 	/* switch banks as appropriate */
 	memory_set_bank(device->machine, 1, data & 1);

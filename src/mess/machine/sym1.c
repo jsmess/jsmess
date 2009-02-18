@@ -215,55 +215,55 @@ static WRITE8_DEVICE_HANDLER( sym1_via2_a_w )
 
 const via6522_interface sym1_via0 =
 {
-	NULL,           /* VIA Port A Input */
-	sym1_via0_b_r,  /* VIA Port B Input */
-	NULL,           /* VIA Port CA1 Input */
-	NULL,           /* VIA Port CB1 Input */
-	NULL,           /* VIA Port CA2 Input */
-	NULL,           /* VIA Port CB2 Input */
-	NULL,           /* VIA Port A Output */
-	sym1_via0_b_w,  /* VIA Port B Output */
-	NULL,           /* VIA Port CA1 Output */
-	NULL,           /* VIA Port CB1 Output */
-	NULL,           /* VIA Port CA2 Output */
-	NULL,           /* VIA Port CB2 Output */
-	sym1_irq        /* VIA IRQ Callback */
+	DEVCB_NULL,           /* VIA Port A Input */
+	DEVCB_HANDLER(sym1_via0_b_r),  /* VIA Port B Input */
+	DEVCB_NULL,           /* VIA Port CA1 Input */
+	DEVCB_NULL,           /* VIA Port CB1 Input */
+	DEVCB_NULL,           /* VIA Port CA2 Input */
+	DEVCB_NULL,           /* VIA Port CB2 Input */
+	DEVCB_NULL,           /* VIA Port A Output */
+	DEVCB_HANDLER(sym1_via0_b_w),  /* VIA Port B Output */
+	DEVCB_NULL,           /* VIA Port CA1 Output */
+	DEVCB_NULL,           /* VIA Port CB1 Output */
+	DEVCB_NULL,           /* VIA Port CA2 Output */
+	DEVCB_NULL,           /* VIA Port CB2 Output */
+	DEVCB_LINE(sym1_irq)        /* VIA IRQ Callback */
 };
 
 
 const via6522_interface sym1_via1 =
 {
-	NULL,           /* VIA Port A Input */
-	NULL,           /* VIA Port B Input */
-	NULL,           /* VIA Port CA1 Input */
-	NULL,           /* VIA Port CB1 Input */
-	NULL,           /* VIA Port CA2 Input */
-	NULL,           /* VIA Port CB2 Input */
-	NULL,           /* VIA Port A Output */
-	NULL,           /* VIA Port B Output */
-	NULL,           /* VIA Port CA1 Output */
-	NULL,           /* VIA Port CB1 Output */
-	NULL,           /* VIA Port CA2 Output */
-	NULL,           /* VIA Port CB2 Output */
-	sym1_irq        /* VIA IRQ Callback */
+	DEVCB_NULL,           /* VIA Port A Input */
+	DEVCB_NULL,           /* VIA Port B Input */
+	DEVCB_NULL,           /* VIA Port CA1 Input */
+	DEVCB_NULL,           /* VIA Port CB1 Input */
+	DEVCB_NULL,           /* VIA Port CA2 Input */
+	DEVCB_NULL,           /* VIA Port CB2 Input */
+	DEVCB_NULL,           /* VIA Port A Output */
+	DEVCB_NULL,           /* VIA Port B Output */
+	DEVCB_NULL,           /* VIA Port CA1 Output */
+	DEVCB_NULL,           /* VIA Port CB1 Output */
+	DEVCB_NULL,           /* VIA Port CA2 Output */
+	DEVCB_NULL,           /* VIA Port CB2 Output */
+	DEVCB_LINE(sym1_irq)        /* VIA IRQ Callback */
 };
 
 
 const via6522_interface sym1_via2 =
 {
-	NULL,           /* VIA Port A Input */
-	NULL,           /* VIA Port B Input */
-	NULL,           /* VIA Port CA1 Input */
-	NULL,           /* VIA Port CB1 Input */
-	NULL,           /* VIA Port CA2 Input */
-	NULL,           /* VIA Port CB2 Input */
-	sym1_via2_a_w,  /* VIA Port A Output */
-	NULL,           /* VIA Port B Output */
-	NULL,           /* VIA Port CA1 Output */
-	NULL,           /* VIA Port CB1 Output */
-	NULL,           /* VIA Port CA2 Output */
-	NULL,           /* VIA Port CB2 Output */
-	sym1_irq        /* VIA IRQ Callback */
+	DEVCB_NULL,           /* VIA Port A Input */
+	DEVCB_NULL,           /* VIA Port B Input */
+	DEVCB_NULL,           /* VIA Port CA1 Input */
+	DEVCB_NULL,           /* VIA Port CB1 Input */
+	DEVCB_NULL,           /* VIA Port CA2 Input */
+	DEVCB_NULL,           /* VIA Port CB2 Input */
+	DEVCB_HANDLER(sym1_via2_a_w),  /* VIA Port A Output */
+	DEVCB_NULL,           /* VIA Port B Output */
+	DEVCB_NULL,           /* VIA Port CA1 Output */
+	DEVCB_NULL,           /* VIA Port CB1 Output */
+	DEVCB_NULL,           /* VIA Port CA2 Output */
+	DEVCB_NULL,           /* VIA Port CB2 Output */
+	DEVCB_LINE(sym1_irq)        /* VIA IRQ Callback */
 };
 
 

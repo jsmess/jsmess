@@ -126,7 +126,7 @@ ADDRESS_MAP_END
 
 static WRITE8_DEVICE_HANDLER( palm_dac_transition )
 {
-    dac_data_w( 0, 0x7f * data );
+    dac_data_w( devtag_get_device(device->machine, SOUND, "dac"), 0x7f * data );
 }
 
 

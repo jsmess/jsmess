@@ -13,7 +13,6 @@
 
 #include "driver.h"
 #include "cpu/f8/f8.h"
-#include "sound/custom.h"
 #include "includes/channelf.h"
 #include "devices/cartslot.h"
 
@@ -152,7 +151,7 @@ static WRITE8_HANDLER( channelf_port_4_w )
 static WRITE8_HANDLER( channelf_port_5_w )
 {
     latch[3] = data;
-	channelf_sound_w((data>>6)&3);
+	channelf_sound_w(space->machine, (data>>6)&3);
     channelf_row_reg = (data | 0xc0) ^ 0xff;
 }
 
@@ -234,11 +233,6 @@ static INPUT_PORTS_START( channelf )
 
 INPUT_PORTS_END
 
-static const custom_sound_interface channelf_sound_interface =
-{
-	channelf_sh_custom_start
-};
-
 
 static MACHINE_DRIVER_START( channelf )
 	/* basic machine hardware */
@@ -262,8 +256,7 @@ static MACHINE_DRIVER_START( channelf )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("custom", CUSTOM, 0)
-	MDRV_SOUND_CONFIG(channelf_sound_interface)
+	MDRV_SOUND_ADD("custom", CHANNELF, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	
 	MDRV_CARTSLOT_ADD("cart")
@@ -291,8 +284,7 @@ static MACHINE_DRIVER_START( sabavdpl )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("custom", CUSTOM, 0)
-	MDRV_SOUND_CONFIG(channelf_sound_interface)
+	MDRV_SOUND_ADD("custom", CHANNELF, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	
 	MDRV_CARTSLOT_ADD("cart")
@@ -321,8 +313,7 @@ static MACHINE_DRIVER_START( channlf2 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("custom", CUSTOM, 0)
-	MDRV_SOUND_CONFIG(channelf_sound_interface)
+	MDRV_SOUND_ADD("custom", CHANNELF, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	
 	MDRV_CARTSLOT_ADD("cart")
@@ -351,8 +342,7 @@ static MACHINE_DRIVER_START( sabavpl2 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("custom", CUSTOM, 0)
-	MDRV_SOUND_CONFIG(channelf_sound_interface)
+	MDRV_SOUND_ADD("custom", CHANNELF, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	
 	MDRV_CARTSLOT_ADD("cart")

@@ -398,7 +398,7 @@ INLINE void adjust_addresses(address_space *space, offs_t *start, offs_t *end, o
 	/* adjust to byte values */
 	*start = memory_address_to_byte(space, *start);
 	*end = memory_address_to_byte_end(space, *end);
-	*mask = memory_address_to_byte(space, *mask);
+	*mask = memory_address_to_byte_end(space, *mask);
 	*mirror = memory_address_to_byte(space, *mirror);
 }
 
@@ -876,7 +876,7 @@ direct_update_func memory_set_direct_update_handler(const address_space *space, 
     update the opcode base for the given address
 -------------------------------------------------*/
 
-int memory_set_direct_region(const address_space *space, offs_t byteaddress)
+int memory_set_direct_region(const address_space *space, offs_t *byteaddress)
 {
 	memory_private *memdata = space->machine->memory_data;
 	address_space *spacerw = (address_space *)space;
@@ -884,21 +884,24 @@ int memory_set_direct_region(const address_space *space, offs_t byteaddress)
 	const handler_data *handlers;
 	direct_range *range;
 	offs_t maskedbits;
+	offs_t overrideaddress = *byteaddress;
 	UINT8 entry;
 
 	/* allow overrides */
 	if (spacerw->directupdate != NULL)
 	{
-		byteaddress = (*spacerw->directupdate)(spacerw, byteaddress, &spacerw->direct);
-		if (byteaddress == ~0)
+		overrideaddress = (*spacerw->directupdate)(spacerw, overrideaddress, &spacerw->direct);
+		if (overrideaddress == ~0)
 			return TRUE;
+
+		*byteaddress = overrideaddress;
 	}
 
 	/* remove the masked bits (we'll put them back later) */
-	maskedbits = byteaddress & ~spacerw->bytemask;
+	maskedbits = overrideaddress & ~spacerw->bytemask;
 
 	/* find or allocate a matching range */
-	range = direct_range_find(spacerw, byteaddress, &entry);
+	range = direct_range_find(spacerw, overrideaddress, &entry);
 
 	/* keep track of current entry */
 	spacerw->direct.entry = entry;
@@ -909,7 +912,8 @@ int memory_set_direct_region(const address_space *space, offs_t byteaddress)
 		/* ensure future updates to land here as well until we get back into a bank */
 		spacerw->direct.byteend = 0;
 		spacerw->direct.bytestart = 1;
-		logerror("CPU '%s': warning - attempt to direct-map address %08X in %s space\n", space->cpu->tag, byteaddress, space->name);
+		if (!spacerw->debugger_access)
+			logerror("CPU '%s': warning - attempt to direct-map address %08X in %s space\n", space->cpu->tag, overrideaddress, space->name);
 		return FALSE;
 	}
 
@@ -2967,9 +2971,9 @@ static direct_range *direct_range_find(address_space *space, offs_t byteaddress,
 
 	/* determine which entry */
 	byteaddress &= space->bytemask;
-	*entry = space->readlookup[LEVEL1_INDEX(byteaddress)];
+	*entry = space->read.table[LEVEL1_INDEX(byteaddress)];
 	if (*entry >= SUBTABLE_BASE)
-		*entry = space->readlookup[LEVEL2_INDEX(*entry, byteaddress)];
+		*entry = space->read.table[LEVEL2_INDEX(*entry, byteaddress)];
 	rangelistptr = &space->direct.rangelist[*entry];
 
 	/* scan our table */

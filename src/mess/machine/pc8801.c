@@ -844,10 +844,11 @@ static void pc88sr_init_fmsound(void)
   FM_IRQ_save=0;
 }
 
-void pc88sr_sound_interupt(running_machine *machine, int irq)
+void pc88sr_sound_interupt(const device_config *device, int irq)
 {
 	FM_IRQ_save=irq;
-	if(FM_IRQ_save && enable_FM_IRQ) pc8801_raise_interrupt(machine, FM_IRQ_LEVEL);
+	if(FM_IRQ_save && enable_FM_IRQ)
+		pc8801_raise_interrupt(device->machine, FM_IRQ_LEVEL);
 }
 
 /*

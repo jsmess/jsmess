@@ -1424,16 +1424,16 @@ static WRITE8_HANDLER( latch_w )
 	}
 }
 
-static READ8_HANDLER( upd7759_r )
+static READ8_DEVICE_HANDLER( upd_r )
 {
-	return 2 | upd7759_busy_r(0);
+	return 2 | upd7759_busy_r(device);
 }
 
-static WRITE8_HANDLER( upd7759_w )
+static WRITE8_DEVICE_HANDLER( upd_w )
 {
-	upd7759_reset_w(0, data & 0x80);
-	upd7759_port_w(0, data & 0x3f);
-	upd7759_start_w(0, data & 0x40 ? 0 : 1);
+	upd7759_reset_w(device, data & 0x80);
+	upd7759_port_w(device, 0, data & 0x3f);
+	upd7759_start_w(device, data & 0x40 ? 0 : 1);
 }
 
 static ADDRESS_MAP_START( m6809_prog_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1444,8 +1444,8 @@ static ADDRESS_MAP_START( m6809_prog_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2800, 0x2800) AM_RAM		// W
 	AM_RANGE(0x2A00, 0x2A02) AM_READWRITE(latch_r, latch_w)
 	AM_RANGE(0x2E00, 0x2E00) AM_READ(int_latch_r)
-	AM_RANGE(0x3001, 0x3001) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x3201, 0x3201) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE(SOUND, "ay", ay8910_data_w)
+	AM_RANGE(0x3201, 0x3201) AM_DEVWRITE(SOUND, "ay", ay8910_address_w)
 	AM_RANGE(0x3404, 0x3404) AM_DEVREADWRITE(ACIA6850, "acia6850_1", acia6850_stat_r, acia6850_ctrl_w)
 	AM_RANGE(0x3405, 0x3405) AM_DEVREADWRITE(ACIA6850, "acia6850_1", acia6850_data_r, acia6850_data_w)
 	AM_RANGE(0x3406, 0x3406) AM_DEVREADWRITE(ACIA6850, "acia6850_2", acia6850_stat_r, acia6850_ctrl_w)
@@ -1453,7 +1453,7 @@ static ADDRESS_MAP_START( m6809_prog_map, ADDRESS_SPACE_PROGRAM, 8 )
 //  AM_RANGE(0x3408, 0x3408) AM_NOP
 //  AM_RANGE(0x340A, 0x340A) AM_NOP
 //  AM_RANGE(0x3600, 0x3600) AM_NOP
-	AM_RANGE(0x3801, 0x3801) AM_READWRITE(upd7759_r, upd7759_w)
+	AM_RANGE(0x3801, 0x3801) AM_DEVREADWRITE(SOUND, "upd", upd_r, upd_w)
 	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(SMH_NOP)	/* Watchdog */
 ADDRESS_MAP_END
@@ -1576,54 +1576,86 @@ static void init_ram(void)
 	memset(video_ram, 0, 0x20000);
 }
 
-static void z80_acia_irq(const device_config *device, int state)
+/*
+    What are the correct ACIA clocks ?
+*/
+
+static READ_LINE_DEVICE_HANDLER( z80_acia_rx_r )
+{
+	return m6809_z80_line;
+}
+
+static WRITE_LINE_DEVICE_HANDLER( z80_acia_tx_w )
+{
+	z80_m6809_line = state;
+}
+
+static WRITE_LINE_DEVICE_HANDLER( z80_acia_irq )
 {
 	acia_irq = state ? CLEAR_LINE : ASSERT_LINE;
 	update_irqs(device->machine);
 }
 
-static void m6809_data_irq(const device_config *device, int state)
+static ACIA6850_INTERFACE( z80_acia_if )
+{
+	500000,
+	500000,
+	DEVCB_LINE(z80_acia_rx_r), /*&m6809_z80_line,*/
+	DEVCB_LINE(z80_acia_tx_w), /*&z80_m6809_line,*/
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_LINE(z80_acia_irq)
+};
+
+static READ_LINE_DEVICE_HANDLER( m6809_acia_rx_r )
+{
+	return z80_m6809_line;
+}
+
+static WRITE_LINE_DEVICE_HANDLER( m6809_acia_tx_w )
+{
+	m6809_z80_line = state;
+}
+
+static WRITE_LINE_DEVICE_HANDLER( m6809_data_irq )
 {
 	cpu_set_input_line(device->machine->cpu[1], M6809_IRQ_LINE, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
-/*
-    What are the correct ACIA clocks ?
-*/
-static const acia6850_interface z80_acia_if =
+static ACIA6850_INTERFACE( m6809_acia_if )
 {
 	500000,
 	500000,
-	&m6809_z80_line,
-	&z80_m6809_line,
-	NULL,
-	NULL,
-	NULL,
-	z80_acia_irq
+	DEVCB_LINE(m6809_acia_rx_r),/*&z80_m6809_line,*/
+	DEVCB_LINE(m6809_acia_tx_w),/*&m6809_z80_line,*/
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
-static const acia6850_interface m6809_acia_if =
+static READ_LINE_DEVICE_HANDLER( data_acia_rx_r )
 {
-	500000,
-	500000,
-	&z80_m6809_line,
-	&m6809_z80_line,
-	NULL,
-	NULL,
-	NULL,
-	NULL
-};
+	return data_r;
+}
 
-static const acia6850_interface data_acia_if =
+static WRITE_LINE_DEVICE_HANDLER( data_acia_tx_w )
+{
+	 data_t = state;
+}
+
+
+static ACIA6850_INTERFACE( data_acia_if )
 {
 	500000,
 	500000,
-	&data_r,
-	&data_t,
-	NULL,
-	NULL,
-	NULL,
-	m6809_data_irq
+	DEVCB_LINE(data_acia_rx_r),/*data_r,*/
+	DEVCB_LINE(data_acia_tx_w),/*data_t,*/
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_LINE(m6809_data_irq)
 };
 
 

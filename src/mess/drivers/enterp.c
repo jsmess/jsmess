@@ -99,27 +99,27 @@ static void enterprise_update_memory_page(const address_space *space, offs_t pag
 
 
 /* EP specific handling of dave register write */
-static void enterprise_dave_reg_write(running_machine *machine, offs_t RegIndex, int Data)
+static WRITE8_DEVICE_HANDLER( enterprise_dave_reg_write )
 {
-	ep_state *ep = machine->driver_data;
+	ep_state *ep = device->machine->driver_data;
 
-	switch (RegIndex)
+	switch (offset)
 	{
 	case 0x10:
 	case 0x11:
 	case 0x12:
 	case 0x13:
-		enterprise_update_memory_page(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), RegIndex - 0x0f, Data);
+		enterprise_update_memory_page(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), offset - 0x0f, data);
 		break;
 
 	case 0x15:
-		ep->keyboard_line = Data & 15;
+		ep->keyboard_line = data & 15;
 		break;
 	}
 }
 
 
-static void enterprise_dave_reg_read(running_machine *machine, offs_t RegIndex)
+static READ8_DEVICE_HANDLER( enterprise_dave_reg_read )
 {
 	static const char *const keynames[] =
 	{
@@ -127,73 +127,52 @@ static void enterprise_dave_reg_read(running_machine *machine, offs_t RegIndex)
 		"LINE5", "LINE6", "LINE7", "LINE8", "LINE9"
 	};
 
-	ep_state *ep = machine->driver_data;
+	ep_state *ep = device->machine->driver_data;
 
-	switch (RegIndex)
+	switch (offset)
 	{
-	case 0x015:
-		{
-		/* read keyboard line */
-			Dave_setreg(machine, 0x015, input_port_read(machine, keynames[ep->keyboard_line]));
-		}
-		break;
+		case 0x015:
+			/* read keyboard line */
+			dave_set_reg(device, 0x015, input_port_read(device->machine, keynames[ep->keyboard_line]));
+			break;
 
-	case 0x016:
-	{
-		int ExternalJoystickInputs;
-		int ExternalJoystickPortInput = input_port_read(machine, "JOY1");
-
-		if (ep->keyboard_line <= 4)
+		case 0x016:
 		{
+			int ExternalJoystickInputs;
+			int ExternalJoystickPortInput = input_port_read(device->machine, "JOY1");
+
+			if (ep->keyboard_line <= 4)
+			{
 				ExternalJoystickInputs = ExternalJoystickPortInput>>(4-(ep->keyboard_line));
-		}
-		else
-		{
+			}
+			else
+			{
 				ExternalJoystickInputs = 1;
+			}
+
+			dave_set_reg(device, 0x016, (0x0fe | (ExternalJoystickInputs & 0x01)));
 		}
-
-		Dave_setreg(machine, 0x016, (0x0fe | (ExternalJoystickInputs & 0x01)));
-	}
-	break;
-
-	default:
 		break;
+
+		default:
+			break;
 	}
-}
-
-
-static void enterprise_dave_interrupt(running_machine *machine, int state)
-{
-	if (state)
-		cpu_set_input_line(machine->cpu[0],0,HOLD_LINE);
-	else
-		cpu_set_input_line(machine->cpu[0],0,CLEAR_LINE);
+	return 0;
 }
 
 /* enterprise interface to dave - ok, so Dave chip is unique
 to Enterprise. But these functions make it nice and easy to see
 whats going on. */
-static const DAVE_INTERFACE enterprise_dave_interface =
+static const dave_interface enterprise_dave_interface =
 {
-	enterprise_dave_reg_read,
-	enterprise_dave_reg_write,
-	enterprise_dave_interrupt,
+	DEVCB_HANDLER(enterprise_dave_reg_read),
+	DEVCB_HANDLER(enterprise_dave_reg_write),
+	DEVCB_CPU_INPUT_LINE("main", 0)
 };
 
 
 static MACHINE_RESET( enterprise )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-
-	Dave_Init(machine);
-
-	Dave_SetIFace(&enterprise_dave_interface);
-
-	Dave_reg_w(space, 0x10, 0);
-	Dave_reg_w(space, 0x11, 0);
-	Dave_reg_w(space, 0x12, 0);
-	Dave_reg_w(space, 0x13, 0);
-
 	cpu_set_input_line_vector(machine->cpu[0], 0, 0xff);
 
 	floppy_drive_set_geometry(image_from_devtype_and_index(machine, IO_FLOPPY, 0), FLOPPY_DRIVE_DS_80);
@@ -289,7 +268,7 @@ static ADDRESS_MAP_START( enterprise_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x10, 0x13) AM_MIRROR(0x04) AM_DEVREADWRITE(WD1770, "wd1770", wd17xx_r, wd17xx_w)
 	AM_RANGE(0x18, 0x18) AM_MIRROR(0x04) AM_READWRITE(exdos_card_r, exdos_card_w)
 	AM_RANGE(0x80, 0x8f) AM_WRITE(Nick_reg_w)
-	AM_RANGE(0xa0, 0xbf) AM_READWRITE(Dave_reg_r, Dave_reg_w)
+	AM_RANGE(0xa0, 0xbf) AM_DEVREADWRITE(SOUND_DAVE, "custom", dave_reg_r, dave_reg_w)
 ADDRESS_MAP_END
 
 
@@ -447,11 +426,6 @@ INPUT_PORTS_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static const custom_sound_interface dave_custom_sound =
-{
-	Dave_sh_start
-};
-
 static const wd17xx_interface enterp_wd1770_interface = { enterp_wd1770_callback, NULL };
 
 static MACHINE_DRIVER_START( ep64 )
@@ -479,8 +453,7 @@ static MACHINE_DRIVER_START( ep64 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("custom", CUSTOM, 0)
-	MDRV_SOUND_CONFIG(dave_custom_sound)
+	MDRV_SOUND_ADD("custom", DAVE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_WD1770_ADD("wd1770", enterp_wd1770_interface )

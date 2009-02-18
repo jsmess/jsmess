@@ -448,10 +448,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( psychic5_soundport_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(ym2203_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(ym2203_write_port_0_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(ym2203_control_port_1_w)
-	AM_RANGE(0x81, 0x81) AM_WRITE(ym2203_write_port_1_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE(SOUND, "ym1", ym2203_w)
+	AM_RANGE(0x80, 0x81) AM_DEVWRITE(SOUND, "ym2", ym2203_w)
 ADDRESS_MAP_END
 
 
@@ -483,10 +481,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bombsa_soundport_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(ym2203_status_port_0_r, ym2203_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(ym2203_read_port_0_r, ym2203_write_port_0_w)
-	AM_RANGE(0x80, 0x80) AM_READWRITE(ym2203_status_port_1_r, ym2203_control_port_1_w)
-	AM_RANGE(0x81, 0x81) AM_READWRITE(ym2203_read_port_1_r, ym2203_write_port_1_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE(SOUND, "ym1", ym2203_r, ym2203_w)
+	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE(SOUND, "ym2", ym2203_r, ym2203_w)
 ADDRESS_MAP_END
 
 
@@ -666,9 +662,9 @@ GFXDECODE_END
 
 
 
-static void irqhandler(running_machine *machine, int irq)
+static void irqhandler(const device_config *device, int irq)
 {
-	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -676,7 +672,7 @@ static const ym2203_interface ym2203_config =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		NULL, NULL, NULL, NULL
+		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	},
 	irqhandler
 };
@@ -781,6 +777,8 @@ MACHINE_DRIVER_END
 
 ***************************************************************************/
 
+
+
 ROM_START( psychic5 )
 	ROM_REGION( 0x20000, "main", 0 ) 					/* Main CPU */
 	ROM_LOAD( "p5d",          0x00000, 0x08000, CRC(90259249) SHA1(ac2d8dd95f6c04b6ad726136931e37dcd537e977) )
@@ -799,8 +797,35 @@ ROM_START( psychic5 )
 
 	ROM_REGION( 0x08000, "gfx3", ROMREGION_DISPOSE )	/* foreground tiles */
 	ROM_LOAD( "p5f",          0x00000, 0x08000, CRC(04d7e21c) SHA1(6046c506bdedc233e3730f90c7897e847bec8758) )
+
+	ROM_REGION( 0x08000, "proms", ROMREGION_DISPOSE )	/* Proms */
+	ROM_LOAD( "my10.7l",    0x000, 0x200, CRC(6a7d13c0) SHA1(2a835a4ac1acb7663d0b915d0339af9800284da6) )
+	ROM_LOAD( "my09.3t",    0x200, 0x400, CRC(59e44236) SHA1(f53d99694fa5acd7cc51dd78e09f0d2ef730e7a4) )
 ROM_END
 
+ROM_START( psychic5a )
+	ROM_REGION( 0x20000, "main", 0 ) 					/* Main CPU */
+	ROM_LOAD( "myp5d",          0x00000, 0x08000, CRC(1d40a8c7) SHA1(79b36e690ea334c066b55b1e39ceb5fe0688cd7b) )
+	ROM_LOAD( "myp5e",          0x10000, 0x10000, CRC(2fa7e8c0) SHA1(d5096ebec58329346a3292ad2da1be3742fad093) )
+
+	ROM_REGION( 0x10000, "audio", 0 ) 					/* Sound CPU */
+	ROM_LOAD( "myp5a",          0x00000, 0x10000, CRC(6efee094) SHA1(ae2b5bf6199121520bf8428b8b160b987f5b474f) )
+
+	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )	/* sprite tiles */
+	ROM_LOAD( "p5b",          0x00000, 0x10000, CRC(7e3f87d4) SHA1(b8e7fa3f96d2e3937e4cb530f105bb84d5743b43) )
+	ROM_LOAD( "p5c",          0x10000, 0x10000, CRC(8710fedb) SHA1(c7e8dc6b733e4ecce37d56fc429c00ade8736ff3) )
+
+	ROM_REGION( 0x20000, "gfx2", ROMREGION_DISPOSE )	/* background tiles */
+	ROM_LOAD( "myp5g",          0x00000, 0x10000, CRC(617b074b) SHA1(7aaac9fddf5675b6698373333db3e096471d7ad6) )
+	ROM_LOAD( "myp5h",          0x10000, 0x10000, CRC(a9dfbe67) SHA1(f31f75e88f9b37d7fe5b1a1a8e0299151b729ccf) )
+
+	ROM_REGION( 0x08000, "gfx3", ROMREGION_DISPOSE )	/* foreground tiles */
+	ROM_LOAD( "p5f",          0x00000, 0x08000, CRC(04d7e21c) SHA1(6046c506bdedc233e3730f90c7897e847bec8758) )
+
+	ROM_REGION( 0x08000, "proms", ROMREGION_DISPOSE )	/* Proms */
+	ROM_LOAD( "my10.7l",    0x000, 0x200, CRC(6a7d13c0) SHA1(2a835a4ac1acb7663d0b915d0339af9800284da6) )
+	ROM_LOAD( "my09.3t",    0x200, 0x400, CRC(59e44236) SHA1(f53d99694fa5acd7cc51dd78e09f0d2ef730e7a4) )
+ROM_END
 
 /*
 Bombs Away
@@ -898,5 +923,6 @@ ROM_START( bombsa )
 ROM_END
 
 
-GAME( 1987, psychic5, 0, psychic5, psychic5, 0, ROT270, "Jaleco", "Psychic 5", 0 )
-GAME( 1988, bombsa,   0, bombsa,   bombsa,   0, ROT270, "Jaleco", "Bombs Away", GAME_NOT_WORKING )
+GAME( 1987, psychic5,  0,        psychic5, psychic5, 0, ROT270, "Jaleco", "Psychic 5 (set 1)", 0 )
+GAME( 1987, psychic5a, psychic5, psychic5, psychic5, 0, ROT270, "Jaleco", "Psychic 5 (set 2)", 0 ) // player doesn't die as early in attract mode on this set..
+GAME( 1988, bombsa,    0,        bombsa,   bombsa,   0, ROT270, "Jaleco", "Bombs Away", GAME_NOT_WORKING )

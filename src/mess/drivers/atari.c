@@ -211,7 +211,7 @@ static ADDRESS_MAP_START(a400_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xc000, 0xcfff) AM_ROM
 	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE(atari_gtia_r, atari_gtia_w)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
-	AM_RANGE(0xd200, 0xd2ff) AM_READWRITE(pokey1_r, pokey1_w)
+	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE(SOUND_POKEY, "pokey", pokey_r, pokey_w)
 	AM_RANGE(0xd300, 0xd3ff) AM_READWRITE(pia_0_alt_r, pia_0_alt_w)
 	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE(atari_antic_r, atari_antic_w)
 	AM_RANGE(0xd500, 0xd7ff) AM_NOP
@@ -225,7 +225,7 @@ static ADDRESS_MAP_START(a800_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xc000, 0xcfff) AM_ROM
 	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE(atari_gtia_r, atari_gtia_w)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
-	AM_RANGE(0xd200, 0xd2ff) AM_READWRITE(pokey1_r, pokey1_w)
+	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE(SOUND_POKEY, "pokey", pokey_r, pokey_w)
 	AM_RANGE(0xd300, 0xd3ff) AM_READWRITE(pia_0_alt_r, pia_0_alt_w)
 	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE(atari_antic_r, atari_antic_w)
 	AM_RANGE(0xd500, 0xd7ff) AM_NOP
@@ -241,7 +241,7 @@ static ADDRESS_MAP_START(a800xl_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(SMH_BANK3, SMH_BANK3)
 	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE(atari_gtia_r, atari_gtia_w)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
-	AM_RANGE(0xd200, 0xd2ff) AM_READWRITE(pokey1_r, pokey1_w)
+	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE(SOUND_POKEY, "pokey", pokey_r, pokey_w)
 	AM_RANGE(0xd300, 0xd3ff) AM_READWRITE(pia_0_alt_r, pia_0_alt_w)
 	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE(atari_antic_r, atari_antic_w)
 	AM_RANGE(0xd500, 0xd7ff) AM_NOP
@@ -254,7 +254,7 @@ static ADDRESS_MAP_START(a5200_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x4000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc0ff) AM_READWRITE(atari_gtia_r, atari_gtia_w)
 	AM_RANGE(0xd400, 0xd5ff) AM_READWRITE(atari_antic_r, atari_antic_w)
-	AM_RANGE(0xe800, 0xe8ff) AM_READWRITE(pokey1_r, pokey1_w)
+	AM_RANGE(0xe800, 0xe8ff) AM_DEVREADWRITE(SOUND_POKEY, "pokey", pokey_r, pokey_w)
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -654,33 +654,21 @@ static PALETTE_INIT( atari )
 }
 
 
-
-static READ8_HANDLER( analog_0_r ) { return (UINT8) input_port_read(space->machine, "analog_0"); }
-static READ8_HANDLER( analog_1_r ) { return (UINT8) input_port_read(space->machine, "analog_1"); }
-static READ8_HANDLER( analog_2_r ) { return (UINT8) input_port_read(space->machine, "analog_2"); }
-static READ8_HANDLER( analog_3_r ) { return (UINT8) input_port_read(space->machine, "analog_3"); }
-static READ8_HANDLER( analog_4_r ) { return (UINT8) input_port_read(space->machine, "analog_4"); }
-static READ8_HANDLER( analog_5_r ) { return (UINT8) input_port_read(space->machine, "analog_5"); }
-static READ8_HANDLER( analog_6_r ) { return (UINT8) input_port_read(space->machine, "analog_6"); }
-static READ8_HANDLER( analog_7_r ) { return (UINT8) input_port_read(space->machine, "analog_7"); }
-
-
-
 static const pokey_interface atari_pokey_interface =
 {
 	{
-		analog_0_r,
-		analog_1_r,
-		analog_2_r,
-		analog_3_r,
-		analog_4_r,
-		analog_5_r,
-		analog_6_r,
-		analog_7_r
+		DEVCB_INPUT_PORT("analog_0"),
+		DEVCB_INPUT_PORT("analog_1"),
+		DEVCB_INPUT_PORT("analog_2"),
+		DEVCB_INPUT_PORT("analog_3"),
+		DEVCB_INPUT_PORT("analog_4"),
+		DEVCB_INPUT_PORT("analog_5"),
+		DEVCB_INPUT_PORT("analog_6"),
+		DEVCB_INPUT_PORT("analog_7")
 	},
-	0,
-	atari_serin_r,
-	atari_serout_w,
+	DEVCB_NULL,
+	DEVCB_MEMORY_HANDLER("main", PROGRAM, atari_serin_r),
+	DEVCB_MEMORY_HANDLER("main", PROGRAM, atari_serout_w),
 	atari_interrupt_cb,
 };
 

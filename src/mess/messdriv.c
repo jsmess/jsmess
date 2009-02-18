@@ -915,14 +915,14 @@ XL/XE 16kB OS roms
 
 	/* Telercas Oy */
 //	DRIVER(tmc1800)
-	DRIVER(tmc2000)
-	DRIVER(tmc2000e)
+//0.129u4	DRIVER(tmc2000)
+//0.129u4	DRIVER(tmc2000e)
 //	DRIVER(tmc600s1)
-	DRIVER(tmc600s2)
+//0.129u4	DRIVER(tmc600s2)
 
 	/* OSCOM Oy */
 //	DRIVER(osc1000b)
-	DRIVER(oscnano)
+//0.129u4	DRIVER(oscnano)
 
 	/* MIT */
 	DRIVER( tx0_64kw )	/* April 1956 MIT TX-0 (64kw RAM)					*/
@@ -1090,7 +1090,7 @@ XL/XE 16kB OS roms
 	DRIVER(ac1_32) 	/* 1984 Amateurcomputer AC1 (32 lines)	*/
 
 	/* Ei Nis */
-	DRIVER(pecom64)
+//0.129u4	DRIVER(pecom64)
 
 	/* Bondwell */
 	DRIVER( bw2 )
@@ -1100,8 +1100,8 @@ XL/XE 16kB OS roms
 //	DRIVER( exeltel )
 
 	/* Comx World Operations Ltd */
-	DRIVER( comx35p )
-	DRIVER( comx35n )
+//0.129u4	DRIVER( comx35p )
+//0.129u4	DRIVER( comx35n )
 //	DRIVER( comxpl80 )
 
 	/* Grundy Business Systems Ltd */

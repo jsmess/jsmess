@@ -1178,8 +1178,10 @@ static void soundmux_update(running_machine *machine)
 	cassette_change_state(cassette_device_image(machine), new_state, CASSETTE_MASK_SPEAKER);
 }
 
-static void coco_sound_update(void)
+static void coco_sound_update(running_machine *machine)
 {
+	const device_config *dac_device = devtag_get_device(machine, SOUND, "dac");
+
 	/* Call this function whenever you need to update the sound. It will
 	 * automatically mute any devices that are switched out.
 	 */
@@ -1191,19 +1193,19 @@ static void coco_sound_update(void)
 	{
 		case SOUNDMUX_STATUS_ENABLE:
 			/* DAC */
-			dac_data_w(0, pia1_pb1 + (dac >> 1) );  /* Mixing the two sources */
+			dac_data_w(dac_device, pia1_pb1 + (dac >> 1) );  /* Mixing the two sources */
 			break;
 		case SOUNDMUX_STATUS_ENABLE | SOUNDMUX_STATUS_SEL1:
 			/* CSN */
-			dac_data_w(0, pia1_pb1); /* Mixing happens elsewhere */
+			dac_data_w(dac_device, pia1_pb1); /* Mixing happens elsewhere */
 			break;
 		case SOUNDMUX_STATUS_ENABLE | SOUNDMUX_STATUS_SEL2:
 			/* CART Sound */
-			dac_data_w(0, pia1_pb1); /* To do: mix in cart signal */
+			dac_data_w(dac_device, pia1_pb1); /* To do: mix in cart signal */
 			break;
 		default:
 			/* This pia line is always connected to the output */
-			dac_data_w(0, pia1_pb1);
+			dac_data_w(dac_device, pia1_pb1);
 			break;
 	}
 }
@@ -1476,7 +1478,7 @@ static WRITE8_HANDLER ( d_pia1_pa_w )
 	UINT8 dac = pia_get_output_a(1) & 0xFC;
 	static int dclg_previous_bit;
 
-	coco_sound_update();
+	coco_sound_update(space->machine);
 
 	if (get_input_device(space->machine, INPUTPORT_SERIAL) == INPUTDEVICE_DIECOM_LIGHTGUN)
 	{
@@ -1552,7 +1554,7 @@ static WRITE8_HANDLER( d_pia1_pb_w )
 	 *
 	 * Source:  Page 31 of the Tandy Color Computer Serice Manual
 	 */
-	coco_sound_update();
+	coco_sound_update(space->machine);
 }
 
 static WRITE8_HANDLER( dragon64_pia1_pb_w )
@@ -1586,6 +1588,7 @@ static WRITE8_HANDLER( dragon64_pia1_pb_w )
 
 static WRITE8_HANDLER( dgnalpha_pia2_pa_w )
 {
+	const device_config *ay8910 = devtag_get_device(space->machine, SOUND_AY8910, "ay8910");
 	int	bc_flags;		/* BCDDIR/BC1, as connected to PIA2 port a bits 0 and 1 */
 
 	/* If bit 2 of the pia2 ddra is 1 then this pin is an output so use it */
@@ -1606,13 +1609,13 @@ static WRITE8_HANDLER( dgnalpha_pia2_pa_w )
 		case 0x00	: 		/* Inactive, do nothing */
 			break;
 		case 0x01	: 		/* Write to selected port */
-			ay8910_write_port_0_w(space, 0, pia_get_output_b(2));
+			ay8910_data_w(ay8910, 0, pia_get_output_b(2));
 			break;
 		case 0x02	: 		/* Read from selected port */
-			pia_set_input_b(2, ay8910_read_port_0_r(space, 0));
+			pia_set_input_b(2, ay8910_r(ay8910, 0));
 			break;
 		case 0x03	:		/* Select port to write to */
-			ay8910_control_port_0_w(space, 0, pia_get_output_b(2));
+			ay8910_address_w(ay8910, 0, pia_get_output_b(2));
 			break;
 	}
 }

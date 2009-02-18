@@ -146,6 +146,8 @@ static int soundblaster_operation(int data)
 
 WRITE8_HANDLER( soundblaster_w )
 {
+	const device_config *dac_device = devtag_get_device(space->machine, SOUND, "dac");
+
 	switch (offset) {
 	case 6:
 		if (data!=0) { //reset
@@ -162,18 +164,10 @@ WRITE8_HANDLER( soundblaster_w )
 			blaster.output_state=0;
 			break;
 		case 10:
-			dac_data_w(0, data);
+			dac_data_w(dac_device, data);
 			blaster.output_state=0;
 			break;
 		}
 		break;
 	}
 }
-
-#if 0
-const custom_sound_interface soundblaster_interface = {
-	soundblaster_start,
-	soundblaster_stop,
-	soundblaster_update
-};
-#endif

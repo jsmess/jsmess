@@ -125,24 +125,6 @@ static WRITE8_DEVICE_HANDLER(at_dma8237_1_w)
 }
 
 
-#ifdef ADLIB
-static READ8_HANDLER(at_adlib_r)
-{
-	if ( offset )
-		return 0xFF;
-	else
-		return ym3812_status_port_0_r( space, 0 );
-}
-
-static WRITE8_HANDLER(at_adlib_w)
-{
-	if ( offset )
-		ym3812_write_port_0_w( space, 0, data );
-	else
-		ym3812_control_port_0_w( space, 0, data );
-}
-#endif
-
 static ADDRESS_MAP_START(at16_io, ADDRESS_SPACE_IO, 16)
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8(DMA8237, "dma8237_1", dma8237_r, dma8237_w, 0xffff)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8(PIC8259, "pic8259_master", pic8259_r, pic8259_w, 0xffff)
@@ -162,7 +144,8 @@ static ADDRESS_MAP_START(at16_io, ADDRESS_SPACE_IO, 16)
 //	AM_RANGE(0x0324, 0x0327) AM_READWRITE8(pc_HDC2_r,                pc_HDC2_w, 0xffff)
 	AM_RANGE(0x0378, 0x037f) AM_READWRITE8(pc_parallelport1_r,       pc_parallelport1_w, 0xffff)
 #ifdef ADLIB
-	AM_RANGE(0x0388, 0x0389) AM_READWRITE8(at_adlib_r,               at_adlib_w, 0xffff)
+	AM_RANGE(0x0388, 0x0388) AM_DEVREADWRITE8(SOUND_YM3812, "ym3812", ym3812_status_port_r,ym3812_control_port_w, 0xffff)
+	AM_RANGE(0x0389, 0x0389) AM_DEVWRITE8(SOUND_YM3812, "ym3812", ym3812_write_port_w, 0xffff)
 #endif
 	AM_RANGE(0x03bc, 0x03bf) AM_READWRITE8(pc_parallelport0_r,       pc_parallelport0_w, 0xffff)
 	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE8(NS16450, "ns16450_2", ins8250_r, ins8250_w, 0xffff)
@@ -236,8 +219,8 @@ static ADDRESS_MAP_START(ps2m30286_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0324, 0x0327) AM_READWRITE(pc_HDC2_r,				pc_HDC2_w)
 	AM_RANGE(0x0378, 0x037f) AM_READWRITE(pc_parallelport1_r,		pc_parallelport1_w)
 #ifdef ADLIB
-	AM_RANGE(0x0388, 0x0388) AM_READWRITE(ym3812_status_port_0_r,	ym3812_control_port_0_w)
-	AM_RANGE(0x0389, 0x0389) AM_WRITE(								ym3812_write_port_0_w)
+	AM_RANGE(0x0388, 0x0388) AM_DEVREADWRITE(SOUND_YM3812, "ym3812", ym3812_status_port_r,ym3812_control_port_w)
+	AM_RANGE(0x0389, 0x0389) AM_DEVWRITE(SOUND_YM3812, "ym3812", ym3812_write_port_w)
 #endif
 	AM_RANGE(0x03bc, 0x03be) AM_READWRITE(pc_parallelport0_r,		pc_parallelport0_w)
 	AM_RANGE(0x03e8, 0x03ef) AM_READWRITE(uart8250_2_r,				uart8250_2_w)
@@ -412,12 +395,10 @@ static const unsigned i286_address_mask = 0x00ffffff;
 
 
 #if defined(ADLIB)
-/* irq line not connected to pc on adlib cards (and compatibles) */
-static void irqhandler(running_machine *machine, int linestate) {}
-
 static const ym3812_interface at_ym3812_interface =
 {
-	irqhandler
+	/* irq line not connected to pc on adlib cards (and compatibles) */
+	NULL
 };
 #endif
 

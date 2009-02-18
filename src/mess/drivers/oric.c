@@ -337,10 +337,10 @@ static const ay8910_interface oric_ay_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	0,
-	0,
-	oric_psg_porta_write,
-	0
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_MEMORY_HANDLER("main", PROGRAM, oric_psg_porta_write),
+	DEVCB_NULL,
 };
 
 

@@ -225,28 +225,28 @@ static WRITE8_HANDLER( input_port_select_w )
 	input_port_select = data;
 }
 
-static READ8_HANDLER( royalmah_player_1_port_r )
+static READ8_DEVICE_HANDLER( royalmah_player_1_port_r )
 {
-	int ret = (input_port_read(space->machine, "KEY0") & 0xc0) | 0x3f;
+	int ret = (input_port_read(device->machine, "KEY0") & 0xc0) | 0x3f;
 
-	if ((input_port_select & 0x01) == 0)  ret &= input_port_read(space->machine, "KEY0");
-	if ((input_port_select & 0x02) == 0)  ret &= input_port_read(space->machine, "KEY1");
-	if ((input_port_select & 0x04) == 0)  ret &= input_port_read(space->machine, "KEY2");
-	if ((input_port_select & 0x08) == 0)  ret &= input_port_read(space->machine, "KEY3");
-	if ((input_port_select & 0x10) == 0)  ret &= input_port_read(space->machine, "KEY4");
+	if ((input_port_select & 0x01) == 0)  ret &= input_port_read(device->machine, "KEY0");
+	if ((input_port_select & 0x02) == 0)  ret &= input_port_read(device->machine, "KEY1");
+	if ((input_port_select & 0x04) == 0)  ret &= input_port_read(device->machine, "KEY2");
+	if ((input_port_select & 0x08) == 0)  ret &= input_port_read(device->machine, "KEY3");
+	if ((input_port_select & 0x10) == 0)  ret &= input_port_read(device->machine, "KEY4");
 
 	return ret;
 }
 
-static READ8_HANDLER( royalmah_player_2_port_r )
+static READ8_DEVICE_HANDLER( royalmah_player_2_port_r )
 {
-	int ret = (input_port_read(space->machine, "KEY5") & 0xc0) | 0x3f;
+	int ret = (input_port_read(device->machine, "KEY5") & 0xc0) | 0x3f;
 
-	if ((input_port_select & 0x01) == 0)  ret &= input_port_read(space->machine, "KEY5");
-	if ((input_port_select & 0x02) == 0)  ret &= input_port_read(space->machine, "KEY6");
-	if ((input_port_select & 0x04) == 0)  ret &= input_port_read(space->machine, "KEY7");
-	if ((input_port_select & 0x08) == 0)  ret &= input_port_read(space->machine, "KEY8");
-	if ((input_port_select & 0x10) == 0)  ret &= input_port_read(space->machine, "KEY9");
+	if ((input_port_select & 0x01) == 0)  ret &= input_port_read(device->machine, "KEY5");
+	if ((input_port_select & 0x02) == 0)  ret &= input_port_read(device->machine, "KEY6");
+	if ((input_port_select & 0x04) == 0)  ret &= input_port_read(device->machine, "KEY7");
+	if ((input_port_select & 0x08) == 0)  ret &= input_port_read(device->machine, "KEY8");
+	if ((input_port_select & 0x10) == 0)  ret &= input_port_read(device->machine, "KEY9");
 
 	return ret;
 }
@@ -382,18 +382,16 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( royalmah_iomap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x01, 0x01 ) AM_READ( ay8910_read_port_0_r )
-	AM_RANGE( 0x02, 0x02 ) AM_WRITE( ay8910_write_port_0_w )
-	AM_RANGE( 0x03, 0x03 ) AM_WRITE( ay8910_control_port_0_w )
+	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD( SOUND, "ay", ay8910_r )
+	AM_RANGE( 0x02, 0x03 ) AM_DEVWRITE( SOUND, "ay", ay8910_data_address_w )
 	AM_RANGE( 0x10, 0x10 ) AM_READ_PORT("DSW1") AM_WRITE( royalmah_palbank_w )
 	AM_RANGE( 0x11, 0x11 ) AM_READ_PORT("SYSTEM") AM_WRITE( input_port_select_w )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ippatsu_iomap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x01, 0x01 ) AM_READ( ay8910_read_port_0_r )
-	AM_RANGE( 0x02, 0x02 ) AM_WRITE( ay8910_write_port_0_w )
-	AM_RANGE( 0x03, 0x03 ) AM_WRITE( ay8910_control_port_0_w )
+	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD( SOUND, "ay", ay8910_r )
+	AM_RANGE( 0x02, 0x03 ) AM_DEVWRITE( SOUND, "ay", ay8910_data_address_w )
 	AM_RANGE( 0x10, 0x10 ) AM_READ_PORT("DSW1") AM_WRITE( royalmah_palbank_w )
 	AM_RANGE( 0x11, 0x11 ) AM_READ_PORT("SYSTEM") AM_WRITE( input_port_select_w )
 	AM_RANGE( 0x12, 0x12 ) AM_READ_PORT("DSW2")
@@ -402,9 +400,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( suzume_iomap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x01, 0x01 ) AM_READ( ay8910_read_port_0_r )
-	AM_RANGE( 0x02, 0x02 ) AM_WRITE( ay8910_write_port_0_w )
-	AM_RANGE( 0x03, 0x03 ) AM_WRITE( ay8910_control_port_0_w )
+	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD( SOUND, "ay", ay8910_r )
+	AM_RANGE( 0x02, 0x03 ) AM_DEVWRITE( SOUND, "ay", ay8910_data_address_w )
 	AM_RANGE( 0x10, 0x10 ) AM_READ_PORT("DSW1") AM_WRITE( royalmah_palbank_w )
 	AM_RANGE( 0x11, 0x11 ) AM_READ_PORT("SYSTEM") AM_WRITE( input_port_select_w )
 	AM_RANGE( 0x80, 0x80 ) AM_READ( suzume_dsw_r )
@@ -413,9 +410,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dondenmj_iomap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x01, 0x01 ) AM_READ( ay8910_read_port_0_r )
-	AM_RANGE( 0x02, 0x02 ) AM_WRITE( ay8910_write_port_0_w )
-	AM_RANGE( 0x03, 0x03 ) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD( SOUND, "ay", ay8910_r )
+	AM_RANGE( 0x02, 0x03 ) AM_DEVWRITE( SOUND, "ay", ay8910_data_address_w)
 	AM_RANGE( 0x10, 0x10 ) AM_READ_PORT("DSW1") AM_WRITE( royalmah_palbank_w )
 	AM_RANGE( 0x11, 0x11 ) AM_READ_PORT("SYSTEM") AM_WRITE( input_port_select_w )
 	AM_RANGE( 0x85, 0x85 ) AM_READ_PORT("DSW2")	// DSW2
@@ -425,9 +421,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjdiplob_iomap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x01, 0x01 ) AM_READ( ay8910_read_port_0_r )
-	AM_RANGE( 0x02, 0x02 ) AM_WRITE( ay8910_write_port_0_w )
-	AM_RANGE( 0x03, 0x03 ) AM_WRITE( ay8910_control_port_0_w )
+	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD( SOUND, "ay", ay8910_r )
+	AM_RANGE( 0x02, 0x03 ) AM_DEVWRITE( SOUND, "ay", ay8910_data_address_w )
 	AM_RANGE( 0x10, 0x10 ) AM_READ_PORT("DSW1") AM_WRITE( royalmah_palbank_w )
 	AM_RANGE( 0x11, 0x11 ) AM_READ_PORT("SYSTEM") AM_WRITE( input_port_select_w )
 	AM_RANGE( 0x61, 0x61 ) AM_WRITE(tontonb_bank_w)
@@ -437,9 +432,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tontonb_iomap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x01, 0x01 ) AM_READ( ay8910_read_port_0_r )
-	AM_RANGE( 0x02, 0x02 ) AM_WRITE( ay8910_write_port_0_w )
-	AM_RANGE( 0x03, 0x03 ) AM_WRITE( ay8910_control_port_0_w )
+	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD( SOUND, "ay", ay8910_r )
+	AM_RANGE( 0x02, 0x03 ) AM_DEVWRITE( SOUND, "ay", ay8910_data_address_w )
 	AM_RANGE( 0x10, 0x10 ) AM_READ_PORT("DSW1") AM_WRITE( royalmah_palbank_w )
 	AM_RANGE( 0x11, 0x11 ) AM_READ_PORT("SYSTEM") AM_WRITE( input_port_select_w )
 	AM_RANGE( 0x44, 0x44 ) AM_WRITE( tontonb_bank_w )
@@ -449,9 +443,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( majs101b_iomap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x01, 0x01 ) AM_READ( ay8910_read_port_0_r )
-	AM_RANGE( 0x02, 0x02 ) AM_WRITE( ay8910_write_port_0_w )
-	AM_RANGE( 0x03, 0x03 ) AM_WRITE( ay8910_control_port_0_w )
+	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD( SOUND, "ay", ay8910_r )
+	AM_RANGE( 0x02, 0x03 ) AM_DEVWRITE( SOUND, "ay", ay8910_data_address_w )
 	AM_RANGE( 0x10, 0x10 ) AM_READ_PORT("DSW1") AM_WRITE( royalmah_palbank_w )
 	AM_RANGE( 0x11, 0x11 ) AM_READ_PORT("SYSTEM") AM_WRITE( input_port_select_w )
 	AM_RANGE( 0x00, 0x00 ) AM_READWRITE( majs101b_dsw_r, dynax_bank_w )
@@ -459,9 +452,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjderngr_iomap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x01, 0x01 ) AM_READ( ay8910_read_port_0_r )
-	AM_RANGE( 0x02, 0x02 ) AM_WRITE( ay8910_write_port_0_w )
-	AM_RANGE( 0x03, 0x03 ) AM_WRITE( ay8910_control_port_0_w )
+	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD( SOUND, "ay", ay8910_r )
+	AM_RANGE( 0x02, 0x03 ) AM_DEVWRITE( SOUND, "ay", ay8910_data_address_w )
 //  AM_RANGE( 0x10, 0x10 ) AM_READ_PORT("DSW1")
 	AM_RANGE( 0x10, 0x10 ) AM_WRITE( mjderngr_coin_w )	// palette bank is set separately
 	AM_RANGE( 0x11, 0x11 ) AM_READ_PORT("SYSTEM") AM_WRITE( input_port_select_w )
@@ -474,9 +466,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mjapinky_iomap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x00 ) AM_WRITE( mjapinky_bank_w )
-	AM_RANGE( 0x01, 0x01 ) AM_READ( ay8910_read_port_0_r )
-	AM_RANGE( 0x02, 0x02 ) AM_WRITE( ay8910_write_port_0_w )
-	AM_RANGE( 0x03, 0x03 ) AM_WRITE( ay8910_control_port_0_w )
+	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD( SOUND, "ay", ay8910_r )
+	AM_RANGE( 0x02, 0x03 ) AM_DEVWRITE( SOUND, "ay", ay8910_data_address_w )
 	AM_RANGE( 0x04, 0x04 ) AM_READ_PORT("DSW2")
 	AM_RANGE( 0x10, 0x10 ) AM_READ_PORT("DSW1") AM_WRITE( mjapinky_palbank_w )
 	AM_RANGE( 0x11, 0x11 ) AM_READ_PORT("SYSTEM") AM_WRITE( input_port_select_w )
@@ -571,9 +562,8 @@ static ADDRESS_MAP_START( janptr96_iomap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x20, 0x20 ) AM_READWRITE( janptr96_unknown_r, janptr96_rambank_w )
 	AM_RANGE( 0x50, 0x50 ) AM_WRITE( mjderngr_palbank_w )
 	AM_RANGE( 0x60, 0x6f ) AM_DEVREADWRITE(MSM6242, "rtc", msm6242_r, msm6242_w)
-	AM_RANGE( 0x81, 0x81 ) AM_READ( ay8910_read_port_0_r )
-	AM_RANGE( 0x82, 0x82 ) AM_WRITE( ay8910_write_port_0_w )
-	AM_RANGE( 0x83, 0x83 ) AM_WRITE( ay8910_control_port_0_w )
+	AM_RANGE( 0x81, 0x81 ) AM_DEVREAD( SOUND, "ay", ay8910_r )
+	AM_RANGE( 0x82, 0x83 ) AM_DEVWRITE( SOUND, "ay", ay8910_data_address_w )
 	AM_RANGE( 0x93, 0x93 ) AM_WRITE( input_port_select_w )
 	AM_RANGE( 0xd8, 0xd8 ) AM_WRITE( janptr96_coin_counter_w )
 	AM_RANGE( 0xd9, 0xd9 ) AM_READ_PORT("SYSTEM")
@@ -603,7 +593,7 @@ static READ8_HANDLER( mjifb_rom_io_r )
 	{
 		case 0x8000:	return input_port_read(space->machine, "DSW4");		// dsw 4
 		case 0x8200:	return input_port_read(space->machine, "DSW3");		// dsw 3
-		case 0x9001:	return ay8910_read_port_0_r(space, 0);	// inputs
+		case 0x9001:	return ay8910_r(devtag_get_device(space->machine,SOUND,"ay"), 0);	// inputs
 		case 0x9011:	return input_port_read(space->machine, "SYSTEM");
 	}
 
@@ -624,8 +614,8 @@ static WRITE8_HANDLER( mjifb_rom_io_w )
 	switch(offset)
 	{
 		case 0x8e00:	palette_base = data & 0x1f;	return;
-		case 0x9002:	ay8910_write_port_0_w(space,0,data);			return;
-		case 0x9003:	ay8910_control_port_0_w(space,0,data);		return;
+		case 0x9002:	ay8910_data_w(devtag_get_device(space->machine,SOUND,"ay"),0,data);			return;
+		case 0x9003:	ay8910_address_w(devtag_get_device(space->machine,SOUND,"ay"),0,data);		return;
 		case 0x9010:
 			mjifb_coin_counter_w(space,0,data);
 			return;
@@ -710,7 +700,7 @@ static READ8_HANDLER( mjdejavu_rom_io_r )
 	{
 		case 0x8000:	return input_port_read(space->machine, "DSW2");		// dsw 2
 		case 0x8001:	return input_port_read(space->machine, "DSW1");		// dsw 1
-		case 0x9001:	return ay8910_read_port_0_r(space, 0);	// inputs
+		case 0x9001:	return ay8910_r(devtag_get_device(space->machine,SOUND,"ay"), 0);	// inputs
 		case 0x9011:	return input_port_read(space->machine, "SYSTEM");
 	}
 
@@ -730,8 +720,8 @@ static WRITE8_HANDLER( mjdejavu_rom_io_w )
 	switch(offset)
 	{
 		case 0x8802:	palette_base = data & 0x1f;					return;
-		case 0x9002:	ay8910_write_port_0_w(space,0,data);		return;
-		case 0x9003:	ay8910_control_port_0_w(space,0,data);	return;
+		case 0x9002:	ay8910_data_w(devtag_get_device(space->machine,SOUND,"ay"),0,data);		return;
+		case 0x9003:	ay8910_address_w(devtag_get_device(space->machine,SOUND,"ay"),0,data);	return;
 		case 0x9010:	mjifb_coin_counter_w(space,0,data);		return;
 		case 0x9011:	input_port_select_w(space,0,data);		return;
 		case 0x9013:
@@ -777,9 +767,8 @@ static WRITE8_HANDLER( mjtensin_6ff3_w )
 static ADDRESS_MAP_START( mjtensin_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
 	AM_RANGE( 0x6000, 0x6fbf ) AM_RAM
-	AM_RANGE( 0x6fc1, 0x6fc1 ) AM_READ( ay8910_read_port_0_r )
-	AM_RANGE( 0x6fc2, 0x6fc2 ) AM_WRITE( ay8910_write_port_0_w )
-	AM_RANGE( 0x6fc3, 0x6fc3 ) AM_WRITE( ay8910_control_port_0_w )
+	AM_RANGE( 0x6fc1, 0x6fc1 ) AM_DEVREAD( SOUND, "ay", ay8910_r )
+	AM_RANGE( 0x6fc2, 0x6fc3 ) AM_DEVWRITE( SOUND, "ay", ay8910_data_address_w )
 	AM_RANGE( 0x6fd0, 0x6fd0 ) AM_WRITE( janptr96_coin_counter_w )
 	AM_RANGE( 0x6fd1, 0x6fd1 ) AM_READ_PORT("SYSTEM") AM_WRITE( input_port_select_w )
 	AM_RANGE( 0x6fe0, 0x6fef ) AM_DEVREADWRITE(MSM6242, "rtc", msm6242_r, msm6242_w)
@@ -846,9 +835,8 @@ static WRITE8_HANDLER( cafetime_7fe3_w )
 static ADDRESS_MAP_START( cafetime_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
 	AM_RANGE( 0x6000, 0x7eff ) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE( 0x7fc1, 0x7fc1 ) AM_READ( ay8910_read_port_0_r )
-	AM_RANGE( 0x7fc2, 0x7fc2 ) AM_WRITE( ay8910_write_port_0_w )
-	AM_RANGE( 0x7fc3, 0x7fc3 ) AM_WRITE( ay8910_control_port_0_w )
+	AM_RANGE( 0x7fc1, 0x7fc1 ) AM_DEVREAD( SOUND, "ay", ay8910_r )
+	AM_RANGE( 0x7fc2, 0x7fc3 ) AM_DEVWRITE( SOUND, "ay", ay8910_data_address_w )
 	AM_RANGE( 0x7fd0, 0x7fd0 ) AM_WRITE( janptr96_coin_counter_w )
 	AM_RANGE( 0x7fd1, 0x7fd1 ) AM_READ_PORT("SYSTEM") AM_WRITENOP
 	AM_RANGE( 0x7fd3, 0x7fd3 ) AM_WRITE( input_port_select_w )
@@ -2234,8 +2222,8 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	royalmah_player_1_port_r,
-	royalmah_player_2_port_r
+	DEVCB_HANDLER(royalmah_player_1_port_r),
+	DEVCB_HANDLER(royalmah_player_2_port_r)
 };
 
 static MACHINE_DRIVER_START( royalmah )
@@ -2659,6 +2647,42 @@ D29-2.4D
 ROM_START( mjifb )
 	ROM_REGION( 0xd0000, "main", 0 )
 	ROM_LOAD( "2911.1b",    0x00000, 0x10000, CRC(138a31a1) SHA1(7e77c63a968206b8e61aaa423e19a766e4142554) )
+	/* bank switched ROMs follow */
+	ROM_RELOAD(             0x10000, 0x08000 )	// bank 0 = 8000-bfff
+	ROM_CONTINUE(           0x10000, 0x08000 )
+	ROM_LOAD( "2903.1d",    0x30000, 0x20000, CRC(90c44965) SHA1(6904bfa7475f9de921bc2abcfc337b3daf7e0fad) )
+	ROM_LOAD( "2906.1g",    0x50000, 0x20000, CRC(ad469345) SHA1(914ea4c77a540467da779ea78c52e66b05c30475) )
+	ROM_LOAD( "2904.1e",    0x70000, 0x20000, CRC(2791abfa) SHA1(a8fd1a7e1cf4441b447a4605ad2f1c13775f92da) )
+	ROM_LOAD( "2905.1f",    0x90000, 0x20000, CRC(b7a73cf7) SHA1(d93111e6d5f84e331f8198d8c595e3500abed133) )
+	ROM_LOAD( "2902.1c",    0xb0000, 0x10000, CRC(0ce02a98) SHA1(69f6bca9af8548038401839047a304a4aa97cfe6) )
+	ROM_RELOAD(             0xc0000, 0x10000 )
+
+	ROM_REGION( 0x400, "proms", 0 )
+	ROM_LOAD( "d29-2.4d",   0x000, 0x200, CRC(78252f6a) SHA1(1869147bc6b7573c2543bdf6b17d6c3c1debdddb) )
+	ROM_LOAD( "d29-1.4c",   0x200, 0x200, CRC(4aaec8cf) SHA1(fbe1c3729d078a422ffe68dfde495fcb9f329cdd) )
+ROM_END
+
+ROM_START( mjifb2 )
+	ROM_REGION( 0xd0000, "main", 0 )
+	ROM_LOAD( "2921.bin",    0x00000, 0x10000, CRC(9f2bfa4e) SHA1(7d6ca22bf0a91d65fde34ae321054638df705eef) )
+	/* bank switched ROMs follow */
+	ROM_RELOAD(             0x10000, 0x08000 )	// bank 0 = 8000-bfff
+	ROM_CONTINUE(           0x10000, 0x08000 )
+	ROM_LOAD( "2903.1d",    0x30000, 0x20000, CRC(90c44965) SHA1(6904bfa7475f9de921bc2abcfc337b3daf7e0fad) )
+	ROM_LOAD( "2906.1g",    0x50000, 0x20000, CRC(ad469345) SHA1(914ea4c77a540467da779ea78c52e66b05c30475) )
+	ROM_LOAD( "2904.1e",    0x70000, 0x20000, CRC(2791abfa) SHA1(a8fd1a7e1cf4441b447a4605ad2f1c13775f92da) )
+	ROM_LOAD( "2905.1f",    0x90000, 0x20000, CRC(b7a73cf7) SHA1(d93111e6d5f84e331f8198d8c595e3500abed133) )
+	ROM_LOAD( "2902.1c",    0xb0000, 0x10000, CRC(0ce02a98) SHA1(69f6bca9af8548038401839047a304a4aa97cfe6) )
+	ROM_RELOAD(             0xc0000, 0x10000 )
+
+	ROM_REGION( 0x400, "proms", 0 )
+	ROM_LOAD( "d29-2.4d",   0x000, 0x200, CRC(78252f6a) SHA1(1869147bc6b7573c2543bdf6b17d6c3c1debdddb) )
+	ROM_LOAD( "d29-1.4c",   0x200, 0x200, CRC(4aaec8cf) SHA1(fbe1c3729d078a422ffe68dfde495fcb9f329cdd) )
+ROM_END
+
+ROM_START( mjifb3 )
+	ROM_REGION( 0xd0000, "main", 0 )
+	ROM_LOAD( "2931.bin",    0x00000, 0x10000, CRC(2a3133de) SHA1(9fdc8c145d3da17ec5f86810716f1b1a2abd8023) )
 	/* bank switched ROMs follow */
 	ROM_RELOAD(             0x10000, 0x08000 )	// bank 0 = 8000-bfff
 	ROM_CONTINUE(           0x10000, 0x08000 )
@@ -3171,6 +3195,24 @@ ROM_START( mjdejavu )
 	ROM_LOAD( "82s147.4c", 0x200, 0x200, CRC(30cf7831) SHA1(b4593d51c6ceb301279a01a98665e4be8a3c403d) )
 ROM_END
 
+ROM_START( mjdejav2 )
+	ROM_REGION( 0xd0000, "main", 0 )
+	ROM_LOAD( "210a.1b", 0x00000, 0x10000, CRC(caa5c267) SHA1(c779f9217f56d9d3b1ee9fadca07f7917d203e8e) )
+	/* bank switched ROMs follow */
+	ROM_RELOAD(          0x10000, 0x08000 )
+	ROM_CONTINUE(        0x10000, 0x08000 )	// 0
+	// unused
+	ROM_LOAD( "2103.1d", 0x30000, 0x20000, CRC(ed5fde4b) SHA1(d55487ae1007d43b71f06ae5c407c75db7054515) )	// 8
+	// unused
+	ROM_LOAD( "2104.1e", 0x70000, 0x20000, CRC(cfb8075d) SHA1(31f613a1a9b5f4295b552aeeddb760605ce2ac70) )	// 18
+	// unused
+	ROM_LOAD( "210b.1c", 0xb0000, 0x20000, CRC(d4383830) SHA1(491333277e5e2341d1c1cc20f8cc32aa6b020b6c) )	// 28
+
+	ROM_REGION( 0x400, "proms", 0 )
+	ROM_LOAD( "82s147.4d", 0x000, 0x200, CRC(d43f4c7c) SHA1(117d2e4e8d5bea3e5dc903a4b87bd71786ae009c) )
+	ROM_LOAD( "82s147.4c", 0x200, 0x200, CRC(30cf7831) SHA1(b4593d51c6ceb301279a01a98665e4be8a3c403d) )
+ROM_END
+
 // Incomplete romset (missing rom7 at $6000): "Jan Oh" by Toaplan, on royalmah hardware (try pc=64f).
 ROM_START( janoh )
 	ROM_REGION( 0x10000, "main", 0 )
@@ -3558,8 +3600,11 @@ GAME( 1987,  tontonb,  0,        tontonb,  tontonb,  0,        ROT0, "Dynax",   
 GAME( 1988,  majs101b, 0,        majs101b, majs101b, 0,        ROT0, "Dynax",                      "Mahjong Studio 101 [BET] (Japan)",      0 )
 GAME( 1988,  mjapinky, 0,        mjapinky, mjapinky, 0,        ROT0, "Dynax",                      "Almond Pinky [BET] (Japan)",            0 )
 GAME( 1989,  mjdejavu, 0,        mjdejavu, mjdejavu, 0,        ROT0, "Dynax",                      "Mahjong Shinkirou Deja Vu (Japan)",     0 )
+GAME( 1989,  mjdejav2, mjdejavu, mjdejavu, mjdejavu, 0,        ROT0, "Dynax",                      "Mahjong Shinkirou Deja Vu 2 (Japan)",   0 )
 GAME( 1989,  mjderngr, 0,        mjderngr, majs101b, 0,        ROT0, "Dynax",                      "Mahjong Derringer (Japan)",             0 )
 GAME( 1990,  mjifb,    0,        mjifb,    mjifb,    0,        ROT0, "Dynax",                      "Mahjong If...? [BET]",                  0 )
+GAME( 1990,  mjifb2,   mjifb,    mjifb,    mjifb,    0,        ROT0, "Dynax",                      "Mahjong If...? [BET](2921)",            0 )
+GAME( 1990,  mjifb3,   mjifb,    mjifb,    mjifb,    0,        ROT0, "Dynax",                      "Mahjong If...? [BET](2931)",            0 )
 GAME( 1991,  mjvegas,  0,        mjifb,    mjifb,    0,        ROT0, "Dynax",                      "Mahjong Vegas (Japan)",                 GAME_NOT_WORKING )
 GAME( 1992,  cafetime, 0,        cafetime, cafetime, 0,        ROT0, "Dynax",                      "Mahjong Cafe Time",                     0 )
 GAME( 1993,  cafedoll, 0,        mjifb,    mjifb,    0,        ROT0, "Dynax",                      "Mahjong Cafe Doll (Japan)",             GAME_NOT_WORKING )

@@ -54,10 +54,10 @@
 static ADDRESS_MAP_START( microtan_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x0200, 0x03ff) AM_RAM_WRITE(microtan_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0xbc00, 0xbc00) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0xbc01, 0xbc01) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)
-	AM_RANGE(0xbc02, 0xbc02) AM_WRITE(ay8910_control_port_1_w)
-	AM_RANGE(0xbc03, 0xbc03) AM_READWRITE(ay8910_read_port_1_r, ay8910_write_port_1_w)
+	AM_RANGE(0xbc00, 0xbc00) AM_DEVWRITE(SOUND_AY8910, "ay8910.1", ay8910_address_w)
+	AM_RANGE(0xbc01, 0xbc01) AM_DEVREADWRITE(SOUND_AY8910, "ay8910.1", ay8910_r, ay8910_data_w)
+	AM_RANGE(0xbc02, 0xbc02) AM_DEVWRITE(SOUND_AY8910, "ay8910.2", ay8910_address_w)
+	AM_RANGE(0xbc03, 0xbc03) AM_DEVREADWRITE(SOUND_AY8910, "ay8910.2", ay8910_r, ay8910_data_w)
 	AM_RANGE(0xbfc0, 0xbfcf) AM_DEVREADWRITE(VIA6522, "via6522_0", via_r, via_w)
 	AM_RANGE(0xbfd0, 0xbfd3) AM_DEVREADWRITE(ACIA6551, "acia", acia_6551_r, acia_6551_w)
 	AM_RANGE(0xbfe0, 0xbfef) AM_DEVREADWRITE(VIA6522, "via6522_1", via_r, via_w)
@@ -208,10 +208,10 @@ static const ay8910_interface microtan_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	0,
-	0,
-	0,
-	0
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static MACHINE_DRIVER_START( microtan )

@@ -247,13 +247,14 @@ TODO:
   snk68.c for another game that needs this). tdfever dots still flicker a lot,
   however I'm not sure if this is an emulation bug or the real game behaviour.
 
-- psychos: in all games using the gwar video, palette colors 0x180-0x1ff are not
-  used because bit 3 of the sprite attribute is used for tile bank select instead.
-  In all games, those colors 0x180-0x1ff are a copy of 0x100-0x17f so even if the
-  bit was wired to the palette, it would make no difference. In psychos, however,
-  the colors are different. Game colors appear to be correct as they are, and
-  connecting bit 3 would break them, so it's unknown if colors 0x180-0x1ff should
-  be used and how.
+- psychos: the pcb has glitches (colored lines of length up to 16 pixels) during
+  scrolling on the left side of the screen. This doesn't happen in the emulation
+  so it might be an unemulated  hardware bug.
+
+- worldwar: at the beginning of the game, the bottom 16 pixels of the bg are
+  blank. I think that this is related to the psychos glitch above, i.e. the pcb
+  wouldn't display that area correctly anyway so operators were supposed to
+  adjust the screen size to make them invisible.
 
 ***************************************************************************/
 
@@ -262,7 +263,9 @@ TODO:
 #include "snk.h"
 #include "sound/snkwave.h"
 #include "sound/ay8910.h"
+#include "sound/3526intf.h"
 #include "sound/3812intf.h"
+#include "sound/8950intf.h"
 
 
 static int countryc_trackball;
@@ -444,16 +447,16 @@ static TIMER_CALLBACK( sndirq_update_callback )
 
 
 
-static void ymirq_callback_1(running_machine *machine, int irq)
+static void ymirq_callback_1(const device_config *device, int irq)
 {
 	if (irq)
-		timer_call_after_resynch(machine, NULL, YM1IRQ_ASSERT, sndirq_update_callback);
+		timer_call_after_resynch(device->machine, NULL, YM1IRQ_ASSERT, sndirq_update_callback);
 }
 
-static void ymirq_callback_2(running_machine *machine, int irq)
+static void ymirq_callback_2(const device_config *device, int irq)
 {
 	if (irq)
-		timer_call_after_resynch(machine, NULL, YM2IRQ_ASSERT, sndirq_update_callback);
+		timer_call_after_resynch(device->machine, NULL, YM2IRQ_ASSERT, sndirq_update_callback);
 }
 
 
@@ -1326,11 +1329,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( marvins_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x4000) AM_READ(marvins_soundlatch_r)
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x8001, 0x8001) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x8002, 0x8007) AM_WRITE(snkwave_w)
-	AM_RANGE(0x8008, 0x8008) AM_WRITE(ay8910_control_port_1_w)
-	AM_RANGE(0x8009, 0x8009) AM_WRITE(ay8910_write_port_1_w)
+	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE(SOUND, "ay1", ay8910_address_data_w)
+	AM_RANGE(0x8002, 0x8007) AM_DEVWRITE(SOUND, "wave", snkwave_w)
+	AM_RANGE(0x8008, 0x8009) AM_DEVWRITE(SOUND, "ay2", ay8910_address_data_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ(marvins_sound_nmi_ack_r)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
 ADDRESS_MAP_END
@@ -1346,11 +1347,9 @@ static ADDRESS_MAP_START( jcross_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ(sgladiat_soundlatch_r)
 	AM_RANGE(0xc000, 0xc000) AM_READ(sgladiat_sound_nmi_ack_r)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0xe001, 0xe001) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0xe000, 0xe001) AM_DEVWRITE(SOUND, "ay1", ay8910_address_data_w)
 	AM_RANGE(0xe002, 0xe003) AM_WRITENOP	// ? always FFFF, snkwave leftover?
-	AM_RANGE(0xe004, 0xe004) AM_WRITE(ay8910_control_port_1_w)
-	AM_RANGE(0xe005, 0xe005) AM_WRITE(ay8910_write_port_1_w)
+	AM_RANGE(0xe004, 0xe005) AM_DEVWRITE(SOUND, "ay2", ay8910_address_data_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jcross_sound_portmap, ADDRESS_SPACE_IO, 8 )
@@ -1364,11 +1363,9 @@ static ADDRESS_MAP_START( hal21_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ(sgladiat_soundlatch_r)
 	AM_RANGE(0xc000, 0xc000) AM_READ(sgladiat_sound_nmi_ack_r)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0xe001, 0xe001) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0xe000, 0xe001) AM_DEVWRITE(SOUND, "ay1", ay8910_address_data_w)
 //  AM_RANGE(0xe002, 0xe002) AM_WRITENOP    // bitfielded(0-5) details unknown. Filter enable?
-	AM_RANGE(0xe008, 0xe008) AM_WRITE(ay8910_control_port_1_w)
-	AM_RANGE(0xe009, 0xe009) AM_WRITE(ay8910_write_port_1_w)
+	AM_RANGE(0xe008, 0xe009) AM_DEVWRITE(SOUND, "ay2", ay8910_address_data_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hal21_sound_portmap, ADDRESS_SPACE_IO, 8 )
@@ -1382,8 +1379,7 @@ static ADDRESS_MAP_START( tnk3_YM3526_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
 	AM_RANGE(0xc000, 0xc000) AM_READ(tnk3_busy_clear_r)
-	AM_RANGE(0xe000, 0xe000) AM_READWRITE(ym3526_status_port_0_r, ym3526_control_port_0_w)
-	AM_RANGE(0xe001, 0xe001) AM_WRITE(ym3526_write_port_0_w)
+	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE(SOUND, "ym1", ym3526_r, ym3526_w)
 	AM_RANGE(0xe004, 0xe004) AM_READ(tnk3_cmdirq_ack_r)
 	AM_RANGE(0xe006, 0xe006) AM_READ(tnk3_ymirq_ack_r)
 ADDRESS_MAP_END
@@ -1393,8 +1389,7 @@ static ADDRESS_MAP_START( aso_YM3526_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_r)
 	AM_RANGE(0xe000, 0xe000) AM_READ(tnk3_busy_clear_r)
-	AM_RANGE(0xf000, 0xf000) AM_READWRITE(ym3526_status_port_0_r, ym3526_control_port_0_w)
-	AM_RANGE(0xf001, 0xf001) AM_WRITE(ym3526_write_port_0_w)
+	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE(SOUND, "ym1", ym3526_r, ym3526_w)
 //  AM_RANGE(0xf002, 0xf002) AM_READNOP unknown
 	AM_RANGE(0xf004, 0xf004) AM_READ(tnk3_cmdirq_ack_r)
 	AM_RANGE(0xf006, 0xf006) AM_READ(tnk3_ymirq_ack_r)
@@ -1404,10 +1399,10 @@ static ADDRESS_MAP_START( YM3526_YM3526_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
-	AM_RANGE(0xe800, 0xe800) AM_READWRITE(ym3526_status_port_0_r, ym3526_control_port_0_w)
-	AM_RANGE(0xec00, 0xec00) AM_WRITE(ym3526_write_port_0_w)
-	AM_RANGE(0xf000, 0xf000) AM_READWRITE(ym3526_status_port_1_r, ym3526_control_port_1_w)
-	AM_RANGE(0xf400, 0xf400) AM_WRITE(ym3526_write_port_1_w)
+	AM_RANGE(0xe800, 0xe800) AM_DEVREADWRITE(SOUND, "ym1", ym3526_status_port_r, ym3526_control_port_w)
+	AM_RANGE(0xec00, 0xec00) AM_DEVWRITE(SOUND, "ym1", ym3526_write_port_w)
+	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE(SOUND, "ym2", ym3526_status_port_r, ym3526_control_port_w)
+	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE(SOUND, "ym2", ym3526_write_port_w)
 	AM_RANGE(0xf800, 0xf800) AM_READWRITE(snk_sound_status_r, snk_sound_status_w)
 ADDRESS_MAP_END
 
@@ -1415,8 +1410,8 @@ static ADDRESS_MAP_START( YM3812_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
-	AM_RANGE(0xe800, 0xe800) AM_READWRITE(ym3812_status_port_0_r, ym3812_control_port_0_w)
-	AM_RANGE(0xec00, 0xec00) AM_WRITE(ym3812_write_port_0_w)
+	AM_RANGE(0xe800, 0xe800) AM_DEVREADWRITE(SOUND, "ym1", ym3812_status_port_r, ym3812_control_port_w)
+	AM_RANGE(0xec00, 0xec00) AM_DEVWRITE(SOUND, "ym1", ym3812_write_port_w)
 	AM_RANGE(0xf800, 0xf800) AM_READWRITE(snk_sound_status_r, snk_sound_status_w)
 ADDRESS_MAP_END
 
@@ -1424,10 +1419,10 @@ static ADDRESS_MAP_START( YM3526_Y8950_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
-	AM_RANGE(0xe800, 0xe800) AM_READWRITE(ym3526_status_port_0_r, ym3526_control_port_0_w)
-	AM_RANGE(0xec00, 0xec00) AM_WRITE(ym3526_write_port_0_w)
-	AM_RANGE(0xf000, 0xf000) AM_READWRITE(y8950_status_port_0_r, y8950_control_port_0_w)
-	AM_RANGE(0xf400, 0xf400) AM_WRITE(y8950_write_port_0_w)
+	AM_RANGE(0xe800, 0xe800) AM_DEVREADWRITE(SOUND, "ym1", ym3526_status_port_r, ym3526_control_port_w)
+	AM_RANGE(0xec00, 0xec00) AM_DEVWRITE(SOUND, "ym1", ym3526_write_port_w)
+	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE(SOUND, "ym2", y8950_status_port_r, y8950_control_port_w)
+	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE(SOUND, "ym2", y8950_write_port_w)
 	AM_RANGE(0xf800, 0xf800) AM_READWRITE(snk_sound_status_r, snk_sound_status_w)
 ADDRESS_MAP_END
 
@@ -1435,10 +1430,10 @@ static ADDRESS_MAP_START( YM3812_Y8950_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
-	AM_RANGE(0xe800, 0xe800) AM_READWRITE(ym3812_status_port_0_r, ym3812_control_port_0_w)
-	AM_RANGE(0xec00, 0xec00) AM_WRITE(ym3812_write_port_0_w)
-	AM_RANGE(0xf000, 0xf000) AM_READWRITE(y8950_status_port_0_r, y8950_control_port_0_w)
-	AM_RANGE(0xf400, 0xf400) AM_WRITE(y8950_write_port_0_w)
+	AM_RANGE(0xe800, 0xe800) AM_DEVREADWRITE(SOUND, "ym1", ym3812_status_port_r, ym3812_control_port_w)
+	AM_RANGE(0xec00, 0xec00) AM_DEVWRITE(SOUND, "ym1", ym3812_write_port_w)
+	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE(SOUND, "ym2", y8950_status_port_r, y8950_control_port_w)
+	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE(SOUND, "ym2", y8950_write_port_w)
 	AM_RANGE(0xf800, 0xf800) AM_READWRITE(snk_sound_status_r, snk_sound_status_w)
 ADDRESS_MAP_END
 
@@ -1446,8 +1441,8 @@ static ADDRESS_MAP_START( Y8950_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
-	AM_RANGE(0xf000, 0xf000) AM_READWRITE(y8950_status_port_0_r, y8950_control_port_0_w)
-	AM_RANGE(0xf400, 0xf400) AM_WRITE(y8950_write_port_0_w)
+	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE(SOUND, "ym2", y8950_status_port_r, y8950_control_port_w)
+	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE(SOUND, "ym2", y8950_write_port_w)
 	AM_RANGE(0xf800, 0xf800) AM_READWRITE(snk_sound_status_r, snk_sound_status_w)
 ADDRESS_MAP_END
 
@@ -3555,9 +3550,8 @@ GFXDECODE_END
 static GFXDECODE_START( gwar )
 	GFXDECODE_ENTRY( "tx_tiles",   0, charlayout_4bpp,      0x000, 0x100>>4 )
 	GFXDECODE_ENTRY( "bg_tiles",   0, tilelayout_4bpp,      0x300, 0x100>>4 )
-	GFXDECODE_ENTRY( "sp16_tiles", 0, spritelayout_4bpp,    0x100, 0x080>>4 )
+	GFXDECODE_ENTRY( "sp16_tiles", 0, spritelayout_4bpp,    0x100, 0x100>>4 )
 	GFXDECODE_ENTRY( "sp32_tiles", 0, bigspritelayout_4bpp, 0x200, 0x100>>4 )
-	/* what about colors 0x180-0x1ff? */
 GFXDECODE_END
 
 static GFXDECODE_START( tdfever )
@@ -3886,10 +3880,9 @@ static MACHINE_DRIVER_START( bermudat )
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	// visible area uncertain but this size avoids glitches at the bottom of the screen
-	// in worldwar at the beginning of the game
+	// this visible area matches the psychos pcb
 	MDRV_SCREEN_SIZE(50*8, 28*8)
-	MDRV_SCREEN_VISIBLE_AREA(2*8, 48*8-1, 0*8, 28*8-1)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 50*8-1, 0*8, 28*8-1)
 
 	MDRV_GFXDECODE(gwar)
 	MDRV_PALETTE_LENGTH(0x400)
@@ -3908,6 +3901,15 @@ static MACHINE_DRIVER_START( bermudat )
 	MDRV_SOUND_ADD("ym2", Y8950, XTAL_8MHz/2) /* verified on pcb */
 	MDRV_SOUND_CONFIG(y8950_config_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( psychos )
+
+	MDRV_IMPORT_FROM(bermudat)
+
+	/* video hardware */
+	MDRV_VIDEO_START(psychos)
 MACHINE_DRIVER_END
 
 
@@ -6196,8 +6198,8 @@ GAME( 1987, bermudat, 0,        bermudat, bermudat, 0,        ROT270, "SNK", "Be
 GAME( 1987, bermudaj, bermudat, bermudat, bermudat, 0,        ROT270, "SNK", "Bermuda Triangle (Japan)", 0 )
 GAME( 1987, worldwar, 0,        bermudat, worldwar, 0,        ROT270, "SNK", "World Wars (World?)", 0 )
 GAME( 1987, bermudaa, worldwar, bermudat, bermudaa, 0,        ROT270, "SNK", "Bermuda Triangle (World Wars) (US)", 0 )
-GAME( 1987, psychos,  0,        bermudat, psychos,  0,        ROT0,   "SNK", "Psycho Soldier (US)", 0 )
-GAME( 1987, psychosj, psychos,  bermudat, psychos,  0,        ROT0,   "SNK", "Psycho Soldier (Japan)", 0 )
+GAME( 1987, psychos,  0,        psychos,  psychos,  0,        ROT0,   "SNK", "Psycho Soldier (US)", 0 )
+GAME( 1987, psychosj, psychos,  psychos,  psychos,  0,        ROT0,   "SNK", "Psycho Soldier (Japan)", 0 )
 GAME( 1987, gwar,     0,        gwar,     gwar,     0,        ROT270, "SNK", "Guerrilla War (US)", 0 )
 GAME( 1987, gwarj,    gwar,     gwar,     gwar,     0,        ROT270, "SNK", "Guevara (Japan)", 0 )
 GAME( 1987, gwara,    gwar,     gwara,    gwar,     0,        ROT270, "SNK", "Guerrilla War (Version 1)", 0 )

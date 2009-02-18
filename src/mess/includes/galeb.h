@@ -13,7 +13,6 @@
 extern DRIVER_INIT( galeb );
 extern MACHINE_RESET( galeb );
 extern READ8_HANDLER( galeb_keyboard_r );
-extern WRITE8_HANDLER( galeb_speaker_w );
 
 
 /*----------- defined in video/galeb.c -----------*/

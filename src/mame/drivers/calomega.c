@@ -651,20 +651,13 @@ static READ8_HANDLER( dipsw_1_r )
 	return input_port_read(space->machine, "SW1");
 }
 
-static void tx_rx_clk (const device_config *device, int dsw2)
+static WRITE_LINE_DEVICE_HANDLER( tx_rx_clk )
 {
 	int trx_clk;
-	dsw2 = input_port_read(device->machine, "SW2");
+	UINT8 dsw2 = input_port_read(device->machine, "SW2");
 	trx_clk = UART_CLOCK * dsw2 / 128;
 	acia6850_set_rx_clock(device, trx_clk);
 	acia6850_set_tx_clock(device, trx_clk);
-
-	return;
-}
-
-static READ8_HANDLER( dipsw_3_r )
-{
-	return input_port_read(space->machine, "SW3");
 }
 
 static int s903_mux_data = 0;
@@ -759,8 +752,7 @@ static WRITE8_HANDLER( lamps_b_w )
 static ADDRESS_MAP_START( sys903_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0x0840, 0x0840) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x0841, 0x0841) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x0840, 0x0841) AM_DEVWRITE(SOUND, "ay8912", ay8910_address_data_w)
 	AM_RANGE(0x0880, 0x0880) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
 	AM_RANGE(0x0881, 0x0881) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x08c4, 0x08c7) AM_READWRITE(pia_0_r, pia_0_w)
@@ -775,8 +767,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( s903mod_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0x0840, 0x0840) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x0841, 0x0841) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x0840, 0x0841) AM_DEVWRITE(SOUND, "ay8912", ay8910_address_data_w)
 	AM_RANGE(0x0880, 0x0880) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
 	AM_RANGE(0x0881, 0x0881) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x08c4, 0x08c7) AM_READWRITE(pia_0_r, pia_0_w)
@@ -789,8 +780,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sys905_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0x1040, 0x1040) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x1041, 0x1041) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x1040, 0x1041) AM_DEVWRITE(SOUND, "ay8912", ay8910_address_data_w)
 	AM_RANGE(0x1080, 0x1080) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
 	AM_RANGE(0x1081, 0x1081) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x10c4, 0x10c7) AM_READWRITE(pia_0_r, pia_0_w)
@@ -1846,16 +1836,26 @@ static const pia6821_interface sys905_pia1_intf =
 *    ACIA Interface    *
 ***********************/
 
-static const acia6850_interface acia6850_intf =
+static READ_LINE_DEVICE_HANDLER( acia_rx_r )
+{
+	return rx_line;
+}
+
+static WRITE_LINE_DEVICE_HANDLER( acia_tx_w )
+{
+	tx_line = state;
+}
+
+static ACIA6850_INTERFACE( acia6850_intf )
 {
 	UART_CLOCK,
 	UART_CLOCK,
-	&rx_line,
-	&tx_line,
-	NULL,
-	NULL,
-	NULL,
-	tx_rx_clk
+	DEVCB_LINE(acia_rx_r), /*&rx_line,*/
+	DEVCB_LINE(acia_tx_w), /*&tx_line,*/
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_LINE(tx_rx_clk)
 };
 
 
@@ -1889,20 +1889,20 @@ static const ay8910_interface sys903_ay8912_intf =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	dipsw_3_r,				/* from schematics */
-	NULL,
-	NULL,
-	NULL
+	DEVCB_INPUT_PORT("SW3"),				/* from schematics */
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static const ay8910_interface sys905_ay8912_intf =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	NULL,
-	NULL,
-	NULL,
-	NULL
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 

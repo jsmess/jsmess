@@ -319,14 +319,14 @@ static  READ8_HANDLER ( geneve_speech_r )
 {
 	cpu_adjust_icount(space->machine->cpu[0],-8);		/* this is just a minimum, it can be more */
 
-	return tms5220_status_r(space, offset);
+	return tms5220_status_r(devtag_get_device(space->machine, SOUND_TMS5220, "tms5220"), offset);
 }
 
 #if 0
 
 static void speech_kludge_callback(int dummy)
 {
-	if (! tms5220_ready_r())
+	if (! tms5220_ready_r(devtag_get_device(space->machine, SOUND_TMS5220, "tms5220")))
 	{
 		/* Weirdly enough, we are always seeing some problems even though
 		everything is working fine. */
@@ -350,9 +350,9 @@ static WRITE8_HANDLER ( geneve_speech_w )
 	there are 15 bytes in FIFO.  It should be 16.  Of course, if it were the
 	case, we would need to store the value on the bus, which would be more
 	complex. */
-	if (! tms5220_ready_r())
+	if (! tms5220_ready_r(devtag_get_device(space->machine, SOUND_TMS5220, "tms5220")))
 	{
-		attotime time_to_ready = double_to_attotime(tms5220_time_to_ready());
+		attotime time_to_ready = double_to_attotime(tms5220_time_to_ready(devtag_get_device(space->machine, SOUND_TMS5220, "tms5220")));
 		int cycles_to_ready = ceil(cpu_attotime_to_clocks(space->machine->cpu[0], time_to_ready));
 
 		logerror("time to ready: %f -> %d\n", attotime_to_double(time_to_ready), (int) cycles_to_ready);
@@ -362,7 +362,7 @@ static WRITE8_HANDLER ( geneve_speech_w )
 	}
 #endif
 
-	tms5220_data_w(space, offset, data);
+	tms5220_data_w(devtag_get_device(space->machine, SOUND_TMS5220, "tms5220"), offset, data);
 }
 
 READ8_HANDLER ( geneve_r )
@@ -663,7 +663,7 @@ WRITE8_HANDLER ( geneve_w )
 				return*/
 
 			case 0xf120:
-				sn76496_0_w(space, 0, data);
+				sn76496_w(devtag_get_device(space->machine, SOUND_SN76489, "sn76496"), 0, data);
 				break;
 
 			case 0xf130:
@@ -747,7 +747,7 @@ WRITE8_HANDLER ( geneve_w )
 			{
 			case 1:
 				/* sound write */
-				sn76496_0_w(space, 0, data);
+				sn76496_w(devtag_get_device(space->machine, SOUND_SN76489, "sn76496"), 0, data);
 				return;
 
 			case 3:

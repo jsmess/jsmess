@@ -209,34 +209,28 @@ static const UPD7810_CONFIG config={
     gmaster_io_callback
 };
 
-static const custom_sound_interface gmaster_sound_interface =
-{
-	gmaster_custom_start
-};
-
 static MACHINE_DRIVER_START( gmaster )
-     MDRV_CPU_ADD("main", UPD7810, MAIN_XTAL/2/*?*/)
-MDRV_CPU_PROGRAM_MAP(gmaster_mem, 0)
-MDRV_CPU_IO_MAP( gmaster_io, 0 )
-MDRV_CPU_CONFIG( config )
-MDRV_CPU_VBLANK_INT("main", gmaster_interrupt)
+	MDRV_CPU_ADD("main", UPD7810, MAIN_XTAL/2/*?*/)
+	MDRV_CPU_PROGRAM_MAP(gmaster_mem, 0)
+	MDRV_CPU_IO_MAP( gmaster_io, 0 )
+	MDRV_CPU_CONFIG( config )
+	MDRV_CPU_VBLANK_INT("main", gmaster_interrupt)
 
-     MDRV_SCREEN_ADD("main", LCD)
-     MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-     MDRV_SCREEN_REFRESH_RATE(60)
-     MDRV_SCREEN_SIZE(64, 64)
-     MDRV_SCREEN_VISIBLE_AREA(0, 64-1-3, 0, 64-1)
-  MDRV_PALETTE_LENGTH(sizeof(gmaster_palette)/sizeof(gmaster_palette[0]))
-  MDRV_VIDEO_UPDATE(gmaster)
-     MDRV_PALETTE_INIT(gmaster)
-     MDRV_DEFAULT_LAYOUT(layout_gmaster)
+	MDRV_SCREEN_ADD("main", LCD)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_SIZE(64, 64)
+	MDRV_SCREEN_VISIBLE_AREA(0, 64-1-3, 0, 64-1)
+	MDRV_PALETTE_LENGTH(sizeof(gmaster_palette)/sizeof(gmaster_palette[0]))
+	MDRV_VIDEO_UPDATE(gmaster)
+	MDRV_PALETTE_INIT(gmaster)
+	MDRV_DEFAULT_LAYOUT(layout_gmaster)
 
-     MDRV_SPEAKER_STANDARD_MONO("gmaster")
-     MDRV_SOUND_ADD("custom", CUSTOM, 0)
-     MDRV_SOUND_CONFIG(gmaster_sound_interface)
-     MDRV_SOUND_ROUTE(0, "gmaster", 0.50)
-     
-     MDRV_CARTSLOT_ADD("cart")
+	MDRV_SPEAKER_STANDARD_MONO("gmaster")
+	MDRV_SOUND_ADD("custom", GMASTER, 0)
+	MDRV_SOUND_ROUTE(0, "gmaster", 0.50)
+
+	MDRV_CARTSLOT_ADD("cart")
 MACHINE_DRIVER_END
 
 

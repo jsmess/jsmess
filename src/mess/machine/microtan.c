@@ -316,25 +316,25 @@ static void via_1_irq(const device_config *device, int state)
 const via6522_interface microtan_via6522_0 =
 {
 	/* VIA#1 at bfc0-bfcf*/
-	via_0_in_a,   via_0_in_b,
-	via_0_in_ca1, via_0_in_cb1,
-	via_0_in_ca2, via_0_in_cb2,
-	via_0_out_a,  via_0_out_b,
-	0, 0,
-	via_0_out_ca2,via_0_out_cb2,
-	via_0_irq
+	DEVCB_HANDLER(via_0_in_a),   DEVCB_HANDLER(via_0_in_b),
+	DEVCB_HANDLER(via_0_in_ca1), DEVCB_HANDLER(via_0_in_cb1),
+	DEVCB_HANDLER(via_0_in_ca2), DEVCB_HANDLER(via_0_in_cb2),
+	DEVCB_HANDLER(via_0_out_a),  DEVCB_HANDLER(via_0_out_b),
+	DEVCB_NULL, DEVCB_NULL,
+	DEVCB_HANDLER(via_0_out_ca2),DEVCB_HANDLER(via_0_out_cb2),
+	DEVCB_LINE(via_0_irq)
 };
 
 const via6522_interface microtan_via6522_1 =
 {
 	/* VIA#1 at bfe0-bfef*/
-	via_1_in_a,   via_1_in_b,
-	via_1_in_ca1, via_1_in_cb1,
-	via_1_in_ca2, via_1_in_cb2,
-	via_1_out_a,  via_1_out_b,
-	0, 0,
-	via_1_out_ca2,via_1_out_cb2,
-	via_1_irq
+	DEVCB_HANDLER(via_1_in_a),   DEVCB_HANDLER(via_1_in_b),
+	DEVCB_HANDLER(via_1_in_ca1), DEVCB_HANDLER(via_1_in_cb1),
+	DEVCB_HANDLER(via_1_in_ca2), DEVCB_HANDLER(via_1_in_cb2),
+	DEVCB_HANDLER(via_1_out_a),  DEVCB_HANDLER(via_1_out_b),
+	DEVCB_NULL, DEVCB_NULL,
+	DEVCB_HANDLER(via_1_out_ca2),DEVCB_HANDLER(via_1_out_cb2),
+	DEVCB_LINE(via_1_irq)
 };
 
 static TIMER_CALLBACK(microtan_read_cassette)
@@ -716,6 +716,7 @@ static void microtan_snapshot_copy(running_machine *machine, UINT8 *snapshot_buf
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	const device_config *via_0 = devtag_get_device(machine, VIA6522, "via6522_0");
 	const device_config *via_1 = devtag_get_device(machine, VIA6522, "via6522_1");
+	const device_config *ay8910 = devtag_get_device(machine, SOUND, "ay8910.1");
 	
     /* check for .DMP file format */
     if (snapshot_size == 8263)
@@ -791,15 +792,15 @@ static void microtan_snapshot_copy(running_machine *machine, UINT8 *snapshot_buf
         /* first set of AY8910 registers */
         for (i = 0; i < 16; i++ )
         {
-            ay8910_control_port_0_w(space, 0, i);
-            ay8910_write_port_0_w(space, 0, snapshot_buff[base++]);
+            ay8910_address_w(ay8910, 0, i);
+            ay8910_data_w(ay8910, 0, snapshot_buff[base++]);
         }
 
         /* second set of AY8910 registers */
         for (i = 0; i < 16; i++ )
         {
-            ay8910_control_port_0_w(space, 0, i);
-            ay8910_write_port_0_w(space, 0, snapshot_buff[base++]);
+            ay8910_address_w(ay8910, 0, i);
+            ay8910_data_w(ay8910, 0, snapshot_buff[base++]);
         }
 
         for (i = 0; i < 32*16; i++)

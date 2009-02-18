@@ -1082,7 +1082,7 @@ WRITE16_HANDLER ( ti99_wsnd_w )
 {
 	cpu_adjust_icount(space->machine->cpu[0],-4);
 
-	sn76496_0_w(space, offset, (data >> 8) & 0xff);
+	sn76496_w(devtag_get_device(space->machine, SOUND_SN76489, "sn76496"), offset, (data >> 8) & 0xff);
 }
 
 /*
@@ -1171,7 +1171,7 @@ static READ16_HANDLER ( ti99_rspeech_r )
 {
 	cpu_adjust_icount(space->machine->cpu[0],-(18+3));		/* this is just a minimum, it can be more */
 
-	return ((int) tms5220_status_r(space, offset)) << 8;
+	return ((int) tms5220_status_r(devtag_get_device(space->machine, SOUND_TMS5220, "tms5220"), offset)) << 8;
 }
 
 #if 0
@@ -1202,9 +1202,9 @@ static WRITE16_HANDLER ( ti99_wspeech_w )
 	there are 15 bytes in FIFO.  It should be 16.  Of course, if it were the
 	case, we would need to store the value on the bus, which would be more
 	complex. */
-	if (! tms5220_ready_r())
+	if (! tms5220_ready_r(devtag_get_device(space->machine, SOUND_TMS5220, "tms5220")))
 	{
-		attotime time_to_ready = double_to_attotime(tms5220_time_to_ready());
+		attotime time_to_ready = double_to_attotime(tms5220_time_to_ready(devtag_get_device(space->machine, SOUND_TMS5220, "tms5220")));
 		int cycles_to_ready = cpu_attotime_to_clocks(space->machine->cpu[0], time_to_ready);
 
 		logerror("time to ready: %f -> %d\n", attotime_to_double(time_to_ready), (int) cycles_to_ready);
@@ -1214,7 +1214,7 @@ static WRITE16_HANDLER ( ti99_wspeech_w )
 	}
 #endif
 
-	tms5220_data_w(space, offset, (data >> 8) & 0xff);
+	tms5220_data_w(devtag_get_device(space->machine, SOUND_TMS5220, "tms5220"), offset, (data >> 8) & 0xff);
 }
 
 /*
@@ -1394,7 +1394,7 @@ WRITE16_HANDLER ( ti99_4p_wgpl_w )
 				if (! (offset & 1))
 				{
 					cpu_adjust_icount(space->machine->cpu[0],-16*4);		/* this is just a minimum, it can be more */
-					reply = tms5220_status_r(space, 0);
+					reply = tms5220_status_r(devtag_get_device(space->machine, SOUND_TMS5220, "tms5220"), 0);
 				}
 				break;
 
@@ -1505,7 +1505,7 @@ WRITE8_HANDLER ( ti99_8_w )
 			case 1:
 				/* sound write + RAM */
 				if (offset < 0x8410)
-					sn76496_0_w(space, offset, data);
+					sn76496_w(devtag_get_device(space->machine, SOUND_SN76489, "sn76496"), offset, data);
 				else
 					sRAM_ptr_8[offset & 0x1fff] = data;
 				break;
@@ -1563,9 +1563,9 @@ WRITE8_HANDLER ( ti99_8_w )
 					there are 15 bytes in FIFO.  It should be 16.  Of course, if it were the
 					case, we would need to store the value on the bus, which would be more
 					complex. */
-					if (! tms5220_ready_r())
+					if (! tms5220_ready_r(devtag_get_device(space->machine, SOUND_TMS5220, "tms5220")))
 					{
-						attotime time_to_ready = double_to_attotime(tms5220_time_to_ready());
+						attotime time_to_ready = double_to_attotime(tms5220_time_to_ready(devtag_get_device(space->machine, SOUND_TMS5220, "tms5220")));
 						double d = ceil(cpu_attotime_to_clocks(space->machine->cpu[0], time_to_ready));
 						int cycles_to_ready = ((int) (d + 3)) & ~3;
 
@@ -1576,7 +1576,7 @@ WRITE8_HANDLER ( ti99_8_w )
 						timer_set(space->machine, attotime_zero, NULL, 0, /*speech_kludge_callback*/NULL);
 					}
 
-					tms5220_data_w(space, offset, data);
+					tms5220_data_w(devtag_get_device(space->machine, SOUND_TMS5220, "tms5220"), offset, data);
 				}
 				break;
 

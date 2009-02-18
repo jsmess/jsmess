@@ -334,15 +334,15 @@ static WRITE8_DEVICE_HANDLER( pet_via_port_b_w )
 
 const via6522_interface pet_via =
 {
-	NULL,					/* in_a_func */
-	pet_via_port_b_r,		/* in_b_func */
-	NULL,					/* in_ca1_func */
-	pet_via_cb1_r,			/* in_cb1_func */
-	NULL,					/* in_ca2_func */
-	NULL,					/* in_cb2_func */
-	NULL,					/* out_a_func */
-	pet_via_port_b_w,		/* out_b_func */
-	pet_address_line_11		/* out_ca2_func */
+	DEVCB_NULL,					/* in_a_func */
+	DEVCB_HANDLER(pet_via_port_b_r),		/* in_b_func */
+	DEVCB_NULL,					/* in_ca1_func */
+	DEVCB_HANDLER(pet_via_cb1_r),			/* in_cb1_func */
+	DEVCB_NULL,					/* in_ca2_func */
+	DEVCB_NULL,					/* in_cb2_func */
+	DEVCB_NULL,					/* out_a_func */
+	DEVCB_HANDLER(pet_via_port_b_w),		/* out_b_func */
+	DEVCB_HANDLER(pet_address_line_11)		/* out_ca2_func */
 };
 
 static struct {

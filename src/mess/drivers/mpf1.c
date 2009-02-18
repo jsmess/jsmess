@@ -389,6 +389,8 @@ static WRITE8_DEVICE_HANDLER( mpf1_portb_w )
 
 static WRITE8_DEVICE_HANDLER( mpf1_portc_w )
 {
+	const device_config *dac_device = devtag_get_device(device->machine, SOUND, "dac");
+
 	kbdlatch = ~data;
 
 	if (data & 0x3f)
@@ -412,7 +414,7 @@ static WRITE8_DEVICE_HANDLER( mpf1_portc_w )
 	set_led_status(0, led_tone);
 
 	// speaker
-	dac_data_w(0, 0xFF * led_tone);
+	dac_data_w(dac_device, 0xFF * led_tone);
 
 	verboselog( 1, "PPI port C (LED/Kbd Col select) write: %02x\n", data );
 }

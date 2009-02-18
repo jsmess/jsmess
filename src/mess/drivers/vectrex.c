@@ -88,10 +88,10 @@ static const ay8910_interface vectrex_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	input_port_4_r,
-	0,
-	vectrex_psg_port_w,
-	0
+	DEVCB_INPUT_PORT("BUTTONS"),
+	DEVCB_NULL,
+	DEVCB_MEMORY_HANDLER("main", PROGRAM, vectrex_psg_port_w),
+	DEVCB_NULL
 };
 
 static MACHINE_DRIVER_START(vectrex)

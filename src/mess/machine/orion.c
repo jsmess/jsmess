@@ -401,7 +401,7 @@ INTERRUPT_GEN( orionz80_interrupt )
 
 READ8_HANDLER ( orionz80_io_r ) {
 	if (offset == 0xFFFD) {
-		return ay8910_read_port_0_r (space, 0);
+		return ay8910_r (devtag_get_device(space->machine, SOUND_AY8912, "ay8912"), 0);
 	}
 	return 0xff;
 }
@@ -416,10 +416,10 @@ WRITE8_HANDLER ( orionz80_io_w ) {
 		case 0xff : orionz80_sound_w(space,0,data);break;
 	}
 	switch(offset) {
-		case 0xfffd : ay8910_control_port_0_w(space, 0, data);
+		case 0xfffd : ay8910_address_w(devtag_get_device(space->machine, SOUND_AY8912, "ay8912"), 0, data);
 					  break;
 		case 0xbffd :
-		case 0xbefd : ay8910_write_port_0_w(space, 0, data);
+		case 0xbefd : ay8910_data_w(devtag_get_device(space->machine, SOUND_AY8912, "ay8912"), 0, data);
 		 			  break;		
 	}
 }
@@ -587,7 +587,7 @@ READ8_HANDLER ( orionpro_io_r ) {
 		case 0x2b : return orion128_romdisk_r(space,3);
 	}
 	if (offset == 0xFFFD) {
-		return ay8910_read_port_0_r (space, 0);
+		return ay8910_r (devtag_get_device(space->machine, SOUND_AY8912, "ay8912"), 0);
 	}
 	return 0xff;
 }
@@ -624,10 +624,10 @@ WRITE8_HANDLER ( orionpro_io_w ) {
 		case 0xff : orionz80_sound_w(space,0,data);break;
 	}
 	switch(offset) {
-		case 0xfffd : ay8910_control_port_0_w(space, 0, data);
+		case 0xfffd : ay8910_address_w(devtag_get_device(space->machine, SOUND_AY8912, "ay8912"), 0, data);
 					  break;
 		case 0xbffd :
-		case 0xbefd : ay8910_write_port_0_w(space, 0, data);
+		case 0xbefd : ay8910_data_w(devtag_get_device(space->machine, SOUND_AY8912, "ay8912"), 0, data);
 		 			  break;		
 	}
 }

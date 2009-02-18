@@ -160,9 +160,10 @@ static GFXDECODE_START( odyssey2 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, odyssey2_spritelayout, 0, 2 )
 GFXDECODE_END
 
-static const sp0256_interface the_voice_sp0256 = {
-	the_voice_lrq_callback,
-	0
+static const sp0256_interface the_voice_sp0256 =
+{
+	DEVCB_LINE(the_voice_lrq_callback),
+	DEVCB_NULL
 };
 
 static MACHINE_DRIVER_START( odyssey2_cartslot )
@@ -194,8 +195,7 @@ static MACHINE_DRIVER_START( odyssey2 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("custom", CUSTOM, XTAL_7_15909MHz/2)
-	MDRV_SOUND_CONFIG(odyssey2_sound_interface)
+	MDRV_SOUND_ADD("custom", ODYSSEY2, XTAL_7_15909MHz/2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MDRV_SOUND_ADD("sp0256_speech", SP0256, 3120000)
@@ -229,8 +229,7 @@ static MACHINE_DRIVER_START( videopac )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("custom", CUSTOM, XTAL_17_73447MHz/5)
-	MDRV_SOUND_CONFIG(odyssey2_sound_interface)
+	MDRV_SOUND_ADD("custom", ODYSSEY2, XTAL_17_73447MHz/5)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MDRV_SOUND_ADD("sp0256_speech", SP0256, 3120000)
@@ -263,8 +262,7 @@ static MACHINE_DRIVER_START( g7400 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("custom", CUSTOM, 3547000)
-	MDRV_SOUND_CONFIG(odyssey2_sound_interface)
+	MDRV_SOUND_ADD("custom", ODYSSEY2, 3547000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 	
 	MDRV_IMPORT_FROM(odyssey2_cartslot)

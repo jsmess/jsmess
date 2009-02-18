@@ -8,30 +8,20 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "sound/custom.h"
 #include "machine/pit8253.h"
 #include "includes/dai.h"
 #include "streams.h"
 #include "includes/special.h"
 
-static CUSTOM_START( specimx_sh_start );
 static STREAM_UPDATE( specimx_sh_update );
 
 static sound_stream *mixer_channel;
 static int specimx_input[3];
 
-const custom_sound_interface specimx_sound_interface =
-{
-	specimx_sh_start,
-	NULL,
-	NULL
-};
-
-static CUSTOM_START( specimx_sh_start )
+static DEVICE_START(specimx_sound)
 {
 	specimx_input[0] = specimx_input[1] = specimx_input[2] = 0;
 	mixer_channel = stream_create(device, 0, 1, device->machine->sample_rate, 0, specimx_sh_update);
-	return (void *) ~0;
 }
 
 static STREAM_UPDATE( specimx_sh_update )
@@ -63,12 +53,26 @@ static STREAM_UPDATE( specimx_sh_update )
 	}
 }
 
-void specimx_set_input(int index, int state)
+void specimx_set_input(running_machine *machine, int index, int state)
 {
 	if (mixer_channel!=NULL) {
 		stream_update( mixer_channel );
 	}
 	specimx_input[index] = state;
+}
+
+
+DEVICE_GET_INFO( specimx_sound )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(specimx_sound);	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "SpeciMX Sound");				break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
+	}
 }
 
 

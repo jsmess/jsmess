@@ -7,7 +7,6 @@
 #ifndef ODYSSEY2_H_
 #define ODYSSEY2_H_
 
-#include "sound/custom.h"
 #include "streams.h"
 
 
@@ -42,10 +41,12 @@ WRITE8_HANDLER ( odyssey2_lum_w );
 
 STREAM_UPDATE( odyssey2_sh_update );
 
-extern const custom_sound_interface odyssey2_sound_interface;
-
 void ef9341_w( int command, int b, UINT8 data );
 UINT8 ef9341_r( int command, int b );
+
+#define SOUND_ODYSSEY2		DEVICE_GET_INFO_NAME( odyssey2_sound )
+
+DEVICE_GET_INFO( odyssey2_sound );
 
 /*----------- defined in machine/odyssey2.c -----------*/
 

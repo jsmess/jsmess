@@ -500,10 +500,11 @@ static CDP1802_EF_READ( vip_ef_r )
 
 static CDP1802_Q_WRITE( vip_q_w )
 {
+	const device_config *discrete = devtag_get_device(device->machine, SOUND, "discrete");
 	vip_state *state = device->machine->driver_data;
 
 	/* sound output */
-	discrete_sound_w(cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM), NODE_01, level);
+	discrete_sound_w(discrete, NODE_01, level);
 
 	if (input_port_read(device->machine, "SOUND") == VIP_SOUND_CDP1863)
 	{

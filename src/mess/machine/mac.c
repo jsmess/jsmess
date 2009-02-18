@@ -134,35 +134,35 @@ static offs_t mac_dasm_override(const device_config *device, char *buffer, offs_
 
 const via6522_interface mac_via6522_intf =
 {
-	mac_via_in_a, mac_via_in_b,
-	NULL, NULL,
-	NULL, NULL,
-	mac_via_out_a, mac_via_out_b,
-	NULL, NULL,
-	NULL, mac_via_out_cb2,
-	mac_via_irq
+	DEVCB_HANDLER(mac_via_in_a), DEVCB_HANDLER(mac_via_in_b),
+	DEVCB_NULL, DEVCB_NULL,
+	DEVCB_NULL, DEVCB_NULL,
+	DEVCB_HANDLER(mac_via_out_a), DEVCB_HANDLER(mac_via_out_b),
+	DEVCB_NULL, DEVCB_NULL,
+	DEVCB_NULL, DEVCB_HANDLER(mac_via_out_cb2),
+	DEVCB_LINE(mac_via_irq)
 };
 
 const via6522_interface mac_via6522_adb_intf =
 {
-	mac_via_in_a, mac_via_in_b,
-	NULL, NULL,
-	NULL, mac_adb_via_in_cb2,
-	mac_via_out_a, mac_via_out_b,
-	NULL, NULL,
-	NULL, mac_adb_via_out_cb2,
-	mac_via_irq
+	DEVCB_HANDLER(mac_via_in_a), DEVCB_HANDLER(mac_via_in_b),
+	DEVCB_NULL, DEVCB_NULL,
+	DEVCB_NULL, DEVCB_HANDLER(mac_adb_via_in_cb2),
+	DEVCB_HANDLER(mac_via_out_a), DEVCB_HANDLER(mac_via_out_b),
+	DEVCB_NULL, DEVCB_NULL,
+	DEVCB_NULL, DEVCB_HANDLER(mac_adb_via_out_cb2),
+	DEVCB_LINE(mac_via_irq)
 };
 
 const via6522_interface mac_via6522_2_intf =
 {
-	mac_via2_in_a, mac_via2_in_b,
-	NULL, NULL,
-	NULL, NULL,
-	mac_via2_out_a, mac_via2_out_b,
-	NULL, NULL,
-	NULL, NULL,
-	mac_via2_irq
+	DEVCB_HANDLER(mac_via2_in_a), DEVCB_HANDLER(mac_via2_in_b),
+	DEVCB_NULL, DEVCB_NULL,
+	DEVCB_NULL, DEVCB_NULL,
+	DEVCB_HANDLER(mac_via2_out_a), DEVCB_HANDLER(mac_via2_out_b),
+	DEVCB_NULL, DEVCB_NULL,
+	DEVCB_NULL, DEVCB_NULL,
+	DEVCB_LINE(mac_via2_irq)
 };
 
 /* tells which model is being emulated (set by macxxx_init) */

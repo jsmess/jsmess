@@ -711,32 +711,23 @@ static WRITE8_DEVICE_HANDLER( pia_portb_out )
  *
  *************************************/
 
-static void via_irq(const device_config *device, int state)
-{
-	if (state)
-		cpu_set_input_line(device->machine->cpu[1], M6809_FIRQ_LINE, ASSERT_LINE);
-	else
-		cpu_set_input_line(device->machine->cpu[1], M6809_FIRQ_LINE, CLEAR_LINE);
-}
-
-
 static const via6522_interface via_interface =
 {
-	/*inputs : A/B         */ 0, 0,
-	/*inputs : CA/B1,CA/B2 */ 0, 0, 0, 0,
-	/*outputs: A/B         */ 0, pia_portb_out,
-	/*outputs: CA/B1,CA/B2 */ 0, 0, 0, 0,
-	/*irq                  */ via_irq
+	/*inputs : A/B         */ DEVCB_NULL, DEVCB_NULL,
+	/*inputs : CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*outputs: A/B         */ DEVCB_NULL, DEVCB_HANDLER(pia_portb_out),
+	/*outputs: CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*irq                  */ DEVCB_CPU_INPUT_LINE("sound", M6809_FIRQ_LINE)
 };
 
 
 static const via6522_interface drivedge_via_interface =
 {
-	/*inputs : A/B         */ 0, 0,
-	/*inputs : CA/B1,CA/B2 */ 0, 0, 0, 0,
-	/*outputs: A/B         */ 0, drivedge_portb_out,
-	/*outputs: CA/B1,CA/B2 */ 0, 0, 0, drivedge_turbo_light,
-	/*irq                  */ via_irq
+	/*inputs : A/B         */ DEVCB_NULL, DEVCB_NULL,
+	/*inputs : CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*outputs: A/B         */ DEVCB_NULL, DEVCB_HANDLER(drivedge_portb_out),
+	/*outputs: CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(drivedge_turbo_light),
+	/*irq                  */ DEVCB_CPU_INPUT_LINE("sound", M6809_FIRQ_LINE)
 };
 
 
@@ -1057,8 +1048,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0000) AM_WRITE(sound_return_w)
 	AM_RANGE(0x0400, 0x0400) AM_READ(sound_data_r)
-	AM_RANGE(0x0800, 0x083f) AM_MIRROR(0x80) AM_READWRITE(es5506_data_0_r, es5506_data_0_w)
-	AM_RANGE(0x0880, 0x08bf) AM_READ(es5506_data_0_r)
+	AM_RANGE(0x0800, 0x083f) AM_MIRROR(0x80) AM_DEVREADWRITE(SOUND, "ensoniq", es5506_r, es5506_w)
 	AM_RANGE(0x0c00, 0x0c00) AM_WRITE(sound_bank_w)
 	AM_RANGE(0x1000, 0x1000) AM_WRITENOP	/* noisy */
 	AM_RANGE(0x1400, 0x140f) AM_DEVREADWRITE(VIA6522, "via6522_0", via_r, via_w)
@@ -1071,7 +1061,7 @@ ADDRESS_MAP_END
 /*------ Rev 2 sound board memory layout ------*/
 static ADDRESS_MAP_START( sound_020_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0000) AM_MIRROR(0x400) AM_READ(sound_data_r)
-	AM_RANGE(0x0800, 0x083f) AM_MIRROR(0x80) AM_READWRITE(es5506_data_0_r, es5506_data_0_w)
+	AM_RANGE(0x0800, 0x083f) AM_MIRROR(0x80) AM_DEVREADWRITE(SOUND, "ensoniq", es5506_r, es5506_w)
 	AM_RANGE(0x0c00, 0x0c00) AM_WRITE(sound_bank_w)
 	AM_RANGE(0x1400, 0x1400) AM_WRITE(firq_clear_w)
 	AM_RANGE(0x1800, 0x1800) AM_READWRITE(sound_data_buffer_r, SMH_NOP)

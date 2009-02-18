@@ -573,7 +573,7 @@ static WRITE8_DEVICE_HANDLER ( to7_timer_port_out )
 
 static WRITE8_DEVICE_HANDLER ( to7_timer_cp2_out )
 {
-	dac_data_w( THOM_SOUND_BUZ, data ? 0x80 : 0); /* 1-bit buzzer */
+	dac_data_w( devtag_get_device(device->machine, SOUND, "buzzer"), data ? 0x80 : 0); /* 1-bit buzzer */
 }
 
 
@@ -958,7 +958,7 @@ static void to7_modem_init( running_machine *machine )
 /* ------------  dispatch MODEM / speech extension ------------ */
 
 
-const mea8000_interface to7_speech = { THOM_SOUND_SPEECH, NULL };
+const mea8000_interface to7_speech = { "speech", NULL };
 
 
 READ8_HANDLER ( to7_modem_mea8000_r )
@@ -1048,7 +1048,7 @@ static UINT8 to7_get_mouse_signal( running_machine *machine )
 
 static void to7_game_sound_update ( running_machine *machine )
 {
-	dac_data_w( THOM_SOUND_GAME, to7_game_mute ? 0 : (to7_game_sound << 2) );
+	dac_data_w( devtag_get_device(machine, SOUND_DAC, "dac"), to7_game_mute ? 0 : (to7_game_sound << 2) );
 }
 
 
@@ -1848,7 +1848,7 @@ static READ8_HANDLER ( mo5_sys_porta_in )
 
 static WRITE8_HANDLER ( mo5_sys_portb_out )
 {
-	dac_data_w( THOM_SOUND_BUZ, (data & 1) ? 0x80 : 0); /* 1-bit buzzer */
+	dac_data_w( devtag_get_device(space->machine, SOUND, "buzzer"), (data & 1) ? 0x80 : 0); /* 1-bit buzzer */
 }
 
 
@@ -4525,7 +4525,7 @@ static WRITE8_HANDLER ( mo6_sys_porta_out )
 
 static WRITE8_HANDLER ( mo6_sys_portb_out )
 {
-	dac_data_w( THOM_SOUND_BUZ, (data & 1) ? 0x80 : 0); /* bit 0: buzzer */
+	dac_data_w( devtag_get_device(space->machine, SOUND, "buzzer"), (data & 1) ? 0x80 : 0); /* bit 0: buzzer */
 }
 
 

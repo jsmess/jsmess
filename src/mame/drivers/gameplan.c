@@ -111,11 +111,11 @@ static WRITE8_DEVICE_HANDLER( coin_w )
 
 static const via6522_interface via_1_interface =
 {
-	io_port_r, 0,	 /*inputs : A/B         */
-	0, 0, 0, 0,		 /*inputs : CA/B1,CA/B2 */
-	0, io_select_w,	 /*outputs: A/B         */
-	0, 0, 0, coin_w, /*outputs: CA/B1,CA/B2 */
-	0				 /*irq                  */
+	DEVCB_HANDLER(io_port_r), DEVCB_NULL,	 /*inputs : A/B         */
+	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,		 /*inputs : CA/B1,CA/B2 */
+	DEVCB_NULL, DEVCB_HANDLER(io_select_w),	 /*outputs: A/B         */
+	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(coin_w), /*outputs: CA/B1,CA/B2 */
+	DEVCB_NULL				 /*irq                  */
 };
 
 
@@ -152,20 +152,13 @@ static WRITE8_DEVICE_HANDLER( audio_trigger_w )
 }
 
 
-static READ8_DEVICE_HANDLER( via_soundlatch_r )
-{
-	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	return soundlatch_r(space, offset);
-}
-
-
 static const via6522_interface via_2_interface =
 {
-	0, via_soundlatch_r,				  /*inputs : A/B         */
-	0, 0, 0, 0,							  /*inputs : CA/B1,CA/B2 */
-	audio_cmd_w, 0,						  /*outputs: A/B         */
-	0, 0, audio_trigger_w, audio_reset_w, /*outputs: CA/B1,CA/B2 */
-	0									  /*irq                  */
+	DEVCB_NULL, DEVCB_MEMORY_HANDLER("main", PROGRAM, soundlatch_r),				  /*inputs : A/B         */
+	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,							  /*inputs : CA/B1,CA/B2 */
+	DEVCB_HANDLER(audio_cmd_w), DEVCB_NULL,						  /*outputs: A/B         */
+	DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(audio_trigger_w), DEVCB_HANDLER(audio_reset_w), /*outputs: CA/B1,CA/B2 */
+	DEVCB_NULL									  /*irq                  */
 };
 
 
@@ -257,9 +250,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( gameplan_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x1780) AM_RAM  /* 6532 internal RAM */
 	AM_RANGE(0x0800, 0x081f) AM_MIRROR(0x17e0) AM_DEVREADWRITE(RIOT6532, "riot", riot6532_r, riot6532_w)
-	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1ffc) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0xa001, 0xa001) AM_MIRROR(0x1ffc) AM_READ(ay8910_read_port_0_r)
-	AM_RANGE(0xa002, 0xa002) AM_MIRROR(0x1ffc) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1ffc) AM_DEVWRITE(SOUND, "ay", ay8910_address_w)
+	AM_RANGE(0xa001, 0xa001) AM_MIRROR(0x1ffc) AM_DEVREAD(SOUND, "ay", ay8910_r)
+	AM_RANGE(0xa002, 0xa002) AM_MIRROR(0x1ffc) AM_DEVWRITE(SOUND, "ay", ay8910_data_w)
 	AM_RANGE(0xe000, 0xe7ff) AM_MIRROR(0x1800) AM_ROM
 ADDRESS_MAP_END
 
@@ -268,9 +261,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( leprechn_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x1780) AM_RAM  /* 6532 internal RAM */
 	AM_RANGE(0x0800, 0x081f) AM_MIRROR(0x17e0) AM_DEVREADWRITE(RIOT6532, "riot", riot6532_r, riot6532_w)
-	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1ffc) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0xa001, 0xa001) AM_MIRROR(0x1ffc) AM_READ(ay8910_read_port_0_r)
-	AM_RANGE(0xa002, 0xa002) AM_MIRROR(0x1ffc) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1ffc) AM_DEVWRITE(SOUND, "ay", ay8910_address_w)
+	AM_RANGE(0xa001, 0xa001) AM_MIRROR(0x1ffc) AM_DEVREAD(SOUND, "ay", ay8910_r)
+	AM_RANGE(0xa002, 0xa002) AM_MIRROR(0x1ffc) AM_DEVWRITE(SOUND, "ay", ay8910_data_w)
 	AM_RANGE(0xe000, 0xefff) AM_MIRROR(0x1000) AM_ROM
 ADDRESS_MAP_END
 
@@ -1165,8 +1158,8 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	input_port_6_r,
-	input_port_7_r
+	DEVCB_INPUT_PORT("DSW2"),
+	DEVCB_INPUT_PORT("DSW3")
 };
 
 

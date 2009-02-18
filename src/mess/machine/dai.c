@@ -99,19 +99,19 @@ const ppi8255_interface dai_ppi82555_intf =
 
 static PIT8253_OUTPUT_CHANGED(dai_pit_out0)
 {
-	dai_set_input(0, state);
+	dai_set_input(device->machine, 0, state);
 }
 
 
 static PIT8253_OUTPUT_CHANGED(dai_pit_out1)
 {
-	dai_set_input(1, state);
+	dai_set_input(device->machine, 1, state);
 }
 
 
 static PIT8253_OUTPUT_CHANGED(dai_pit_out2)
 {
-	dai_set_input(2, state);
+	dai_set_input(device->machine, 2, state);
 }
 
 

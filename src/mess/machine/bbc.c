@@ -11,6 +11,8 @@
 #include "ctype.h"
 #include "driver.h"
 #include "cpu/m6502/m6502.h"
+#include "sound/sn76496.h"
+#include "sound/tms5220.h"
 #include "machine/6522via.h"
 #include "machine/wd17xx.h"
 #include "includes/bbc.h"
@@ -19,8 +21,6 @@
 #include "machine/mc146818.h"
 #include "devices/basicdsk.h"
 #include "devices/cassette.h"
-#include "sound/sn76496.h"
-#include "sound/tms5220.h"
 
 /* BBC Memory Size */
 static int bbc_RAMSize=1;
@@ -927,7 +927,7 @@ static WRITE8_DEVICE_HANDLER( bbcb_via_system_write_porta )
 	if (b0_sound==0)
 	{
  		//logerror("Doing an unsafe write to the sound chip %d \n",data);
-		sn76496_0_w(space, 0,via_system_porta);
+		sn76496_w(devtag_get_device(device->machine, SOUND_SN76489, "sn76489"), 0,via_system_porta);
 	}
 	if (b3_keyboard==0)
 	{
@@ -1023,7 +1023,7 @@ static WRITE8_DEVICE_HANDLER( bbcb_via_system_write_portb )
 		case 0:
 			if (b0_sound==1) {
 				b0_sound=0;
-				sn76496_0_w(space, 0,via_system_porta);
+				sn76496_w(devtag_get_device(space->machine, SOUND_SN76489, "sn76489"), 0, via_system_porta);
 			}
 			break;
 		case 1:
@@ -1201,18 +1201,18 @@ static void bbc_via_system_irq(const device_config *device, int level)
 
 const via6522_interface bbcb_system_via =
 {
-	bbcb_via_system_read_porta,
-	bbcb_via_system_read_portb,
-	bbcb_via_system_read_ca1,
-	bbcb_via_system_read_cb1,
-	bbcb_via_system_read_ca2,
-	bbcb_via_system_read_cb2,
-	bbcb_via_system_write_porta,
-	bbcb_via_system_write_portb,
-	NULL, NULL,
-	bbcb_via_system_write_ca2,
-	bbcb_via_system_write_cb2,
-	bbc_via_system_irq
+	DEVCB_HANDLER(bbcb_via_system_read_porta),
+	DEVCB_HANDLER(bbcb_via_system_read_portb),
+	DEVCB_HANDLER(bbcb_via_system_read_ca1),
+	DEVCB_HANDLER(bbcb_via_system_read_cb1),
+	DEVCB_HANDLER(bbcb_via_system_read_ca2),
+	DEVCB_HANDLER(bbcb_via_system_read_cb2),
+	DEVCB_HANDLER(bbcb_via_system_write_porta),
+	DEVCB_HANDLER(bbcb_via_system_write_portb),
+	DEVCB_NULL, DEVCB_NULL,
+	DEVCB_HANDLER(bbcb_via_system_write_ca2),
+	DEVCB_HANDLER(bbcb_via_system_write_cb2),
+	DEVCB_LINE(bbc_via_system_irq)
 };
 
 
@@ -1291,19 +1291,19 @@ static void bbc_via_user_irq(const device_config *device, int level)
 
 const via6522_interface bbcb_user_via =
 {
-	bbcb_via_user_read_porta,//via_user_read_porta,
-	bbcb_via_user_read_portb,//via_user_read_portb,
-	bbcb_via_user_read_ca1,//via_user_read_ca1,
-	0,//via_user_read_cb1,
-	bbcb_via_user_read_ca2,//via_user_read_ca2,
-	0,//via_user_read_cb2,
-	bbcb_via_user_write_porta,//via_user_write_porta,
-	bbcb_via_user_write_portb,//via_user_write_portb,
-	0, //via_user_write_ca1
-	0, //via_user_write_cb1
-	bbcb_via_user_write_ca2,//via_user_write_ca2,
-	0,//via_user_write_cb2,
-	bbc_via_user_irq //via_user_irq
+	DEVCB_HANDLER(bbcb_via_user_read_porta),//via_user_read_porta,
+	DEVCB_HANDLER(bbcb_via_user_read_portb),//via_user_read_portb,
+	DEVCB_HANDLER(bbcb_via_user_read_ca1),//via_user_read_ca1,
+	DEVCB_NULL,//via_user_read_cb1,
+	DEVCB_HANDLER(bbcb_via_user_read_ca2),//via_user_read_ca2,
+	DEVCB_NULL,//via_user_read_cb2,
+	DEVCB_HANDLER(bbcb_via_user_write_porta),//via_user_write_porta,
+	DEVCB_HANDLER(bbcb_via_user_write_portb),//via_user_write_portb,
+	DEVCB_NULL, //via_user_write_ca1
+	DEVCB_NULL, //via_user_write_cb1
+	DEVCB_HANDLER(bbcb_via_user_write_ca2),//via_user_write_ca2,
+	DEVCB_NULL,//via_user_write_cb2,
+	DEVCB_LINE(bbc_via_user_irq) //via_user_irq
 };
 
 

@@ -691,7 +691,8 @@ static void fdc_motor( int drive, int off ) {
 	fdc_status[drive].motor_on = on;
 }
 
-void amiga_fdc_control_w( const device_config *device, UINT8 data ) {
+WRITE8_DEVICE_HANDLER( amiga_fdc_control_w )
+{
 	int step_pulse;
 	int drive;
 

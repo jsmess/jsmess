@@ -7,7 +7,6 @@
 #ifndef VC4000_H_
 #define VC4000_H_
 
-#include "sound/custom.h"
 
 
 // define this to use digital inputs instead of the slow
@@ -29,7 +28,9 @@ extern VIDEO_UPDATE( vc4000 );
 
 /*----------- defined in audio/vc4000.c -----------*/
 
-extern const custom_sound_interface vc4000_sound_interface;
+#define SOUND_VC4000	DEVICE_GET_INFO_NAME( vc4000_sound )
+
+DEVICE_GET_INFO( vc4000_sound );
 
 void vc4000_soundport_w (running_machine *machine, int mode, int data);
 

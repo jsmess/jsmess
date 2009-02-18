@@ -7,7 +7,6 @@
 #ifndef WSWAN_H_
 #define WSWAN_H_
 
-#include "sound/custom.h"
 
 
 #define WSWAN_TYPE_MONO 0
@@ -108,8 +107,10 @@ extern void wswan_refresh_scanline( void );
 
 /*----------- defined in audio/wswan.c -----------*/
 
-extern WRITE8_HANDLER( wswan_sound_port_w );
-extern CUSTOM_START( wswan_sh_start );
+#define SOUND_WSWAN		DEVICE_GET_INFO_NAME( wswan_sound )
+
+WRITE8_HANDLER( wswan_sound_port_w );
+DEVICE_GET_INFO( wswan_sound );
 
 
 #endif /* WSWAN_H_ */

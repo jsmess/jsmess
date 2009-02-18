@@ -432,19 +432,6 @@ INTERRUPT_GEN( msx_interrupt )
 ** The I/O funtions
 */
 
-READ8_HANDLER ( msx_psg_r )
-{
-	return ay8910_read_port_0_r (space, offset);
-}
-
-WRITE8_HANDLER ( msx_psg_w )
-{
-	if (offset & 0x01)
-		ay8910_write_port_0_w (space, offset, data);
-	else
-		ay8910_control_port_0_w (space, offset, data);
-}
-
 static const device_config *cassette_device_image(running_machine *machine)
 {
 	return devtag_get_device(machine, CASSETTE, "cassette");
@@ -548,7 +535,7 @@ WRITE8_HANDLER ( msx_printer_w )
 	{
 		/* SIMPL emulation */
 		if (offset == 1)
-			dac_signed_data_w (0, data);
+			dac_signed_data_w (devtag_get_device(space->machine, SOUND, "dac"), data);
 	}
 	else {
 
@@ -579,14 +566,14 @@ READ8_HANDLER ( msx_printer_r )
 
 WRITE8_HANDLER (msx_fmpac_w)
 {
-	if (msx1.opll_active) {
+	if (msx1.opll_active)
+	{
+		const device_config *ym = devtag_get_device(space->machine, SOUND_YM2413, "ym2413");
 
-		if (offset == 1) {
-			ym2413_data_port_0_w (space, 0, data);
-		}
-		else {
-			ym2413_register_port_0_w (space, 0, data);
-		}
+		if (offset == 1)
+			ym2413_w (ym, 1, data);
+		else
+			ym2413_w (ym, 0, data);
 	}
 }
 
@@ -719,7 +706,7 @@ static WRITE8_DEVICE_HANDLER ( msx_ppi_port_c_w )
 
 	/* key click */
 	if ( (old_val ^ data) & 0x80)
-		dac_signed_data_w (0, (data & 0x80 ? 0x7f : 0));
+		dac_signed_data_w (devtag_get_device(device->machine, SOUND, "dac"), (data & 0x80 ? 0x7f : 0));
 
 	/* cassette motor on/off */
 	if ( (old_val ^ data) & 0x10)

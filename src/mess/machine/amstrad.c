@@ -530,7 +530,6 @@ DMA commands
 static void amstrad_plus_dma_parse(running_machine *machine, int channel)
 {
 	unsigned short command;
-	const address_space* space = cpu_get_address_space( machine->cpu[0],ADDRESS_SPACE_PROGRAM );
 
 	if( asic.dma_addr[channel] & 0x01)
 		asic.dma_addr[channel]++;  // align to even address
@@ -550,9 +549,12 @@ static void amstrad_plus_dma_parse(running_machine *machine, int channel)
 	switch (command & 0xf000)
 	{
 	case 0x0000:  // Load PSG register
-		ay8910_control_port_0_w(space, 0,(command & 0x0f00) >> 8);
-		ay8910_write_port_0_w(space, 0,command & 0x00ff);
-		ay8910_control_port_0_w(space, 0,prev_reg);
+		{
+			const device_config *ay8910 = devtag_get_device(machine, SOUND, "ay");
+			ay8910_address_w(ay8910, 0, (command & 0x0f00) >> 8);
+			ay8910_data_w(ay8910, 0, command & 0x00ff);
+			ay8910_address_w(ay8910, 0, prev_reg);
+		}
 		logerror("DMA %i: LOAD %i, %i\n",channel,(command & 0x0f00) >> 8, command & 0x00ff);
 		break;
 	case 0x1000:  // Pause for n HSYNCs (0 - 4095)
@@ -2583,7 +2585,8 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 static void amstrad_handle_snapshot(running_machine *machine, unsigned char *pSnapshot)
 {
 	const address_space* space = cpu_get_address_space(machine->cpu[0],ADDRESS_SPACE_PROGRAM);
-	const device_config *mc6845 = (device_config *) devtag_get_device( space->machine, MC6845, "mc6845" );
+	const device_config *mc6845 = devtag_get_device( space->machine, MC6845, "mc6845" );
+	const device_config *ay8910 = devtag_get_device(machine, SOUND, "ay");
 	int RegData;
 	int i;
 
@@ -2681,21 +2684,20 @@ static void amstrad_handle_snapshot(running_machine *machine, unsigned char *pSn
 	gate_array.upper_bank = pSnapshot[0x055];
 
 	/* PPI */
-	ppi8255_w((device_config*)devtag_get_device(machine, PPI8255, "ppi8255"),3,pSnapshot[0x059] & 0x0ff);
+	ppi8255_w(devtag_get_device(machine, PPI8255, "ppi8255"),3,pSnapshot[0x059] & 0x0ff);
 
-	ppi8255_w((device_config*)devtag_get_device(machine, PPI8255, "ppi8255"),0,pSnapshot[0x056] & 0x0ff);
-	ppi8255_w((device_config*)devtag_get_device(machine, PPI8255, "ppi8255"),1,pSnapshot[0x057] & 0x0ff);
-	ppi8255_w((device_config*)devtag_get_device(machine, PPI8255, "ppi8255"),2,pSnapshot[0x058] & 0x0ff);
+	ppi8255_w(devtag_get_device(machine, PPI8255, "ppi8255"),0,pSnapshot[0x056] & 0x0ff);
+	ppi8255_w(devtag_get_device(machine, PPI8255, "ppi8255"),1,pSnapshot[0x057] & 0x0ff);
+	ppi8255_w(devtag_get_device(machine, PPI8255, "ppi8255"),2,pSnapshot[0x058] & 0x0ff);
 
 	/* PSG */
 	for (i=0; i<16; i++)
 	{
-		ay8910_control_port_0_w(space, 0,i);
-
-		ay8910_write_port_0_w(space, 0,pSnapshot[0x05b + i] & 0x0ff);
+		ay8910_address_w(ay8910, 0, i);
+		ay8910_data_w(ay8910, 0, pSnapshot[0x05b + i] & 0x0ff);
 	}
 
-	ay8910_control_port_0_w(space, 0,pSnapshot[0x05a]);
+	ay8910_address_w(ay8910, 0, pSnapshot[0x05a]);
 
 	{
 		int MemSize;
@@ -2853,7 +2855,8 @@ static unsigned char amstrad_Psg_FunctionSelected;
 static void update_psg(running_machine *machine)
 {
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-
+	const device_config *ay8910 = devtag_get_device(machine, SOUND, "ay");
+	
 	if(aleste_mode & 0x20)  // RTC selected
 	{
 		switch(aleste_rtc_function)
@@ -2877,17 +2880,17 @@ static void update_psg(running_machine *machine)
 		} break;
   	case 1:
 		{/* b6 = 1 ? : Read from selected PSG register and make the register data available to PPI Port A */
-  			ppi_port_inputs[amstrad_ppi_PortA] = ay8910_read_port_0_r(space, 0);
+  			ppi_port_inputs[amstrad_ppi_PortA] = ay8910_r(ay8910, 0);
   		}
 		break;
   	case 2:
 		{/* b7 = 1 ? : Write to selected PSG register and write data to PPI Port A */
-  			ay8910_write_port_0_w(space, 0, ppi_port_outputs[amstrad_ppi_PortA]);
+  			ay8910_data_w(ay8910, 0, ppi_port_outputs[amstrad_ppi_PortA]);
   		}
 		break;
   	case 3:
 		{/* b6 and b7 = 1 ? : The register will now be selected and the user can read from or write to it.  The register will remain selected until another is chosen.*/
-  			ay8910_control_port_0_w(space, 0, ppi_port_outputs[amstrad_ppi_PortA]);
+  			ay8910_address_w(ay8910, 0, ppi_port_outputs[amstrad_ppi_PortA]);
 			prev_reg = ppi_port_outputs[amstrad_ppi_PortA];
   		}
 		break;

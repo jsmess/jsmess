@@ -288,15 +288,6 @@ static READ8_HANDLER( samcoupe_attributes_r )
 }
 
 
-static WRITE8_HANDLER( samcoupe_sound_w )
-{
-	if (offset & 0x100)
-		saa1099_control_port_0_w(space, 0, data);
-	else
-		saa1099_write_port_0_w(space, 0, data);
-}
-
-
 static READ8_HANDLER( samcoupe_lpt1_busy_r )
 {
 	const device_config *printer = devtag_get_device(space->machine, CENTRONICS, "lpt1");
@@ -354,7 +345,9 @@ static ADDRESS_MAP_START( samcoupe_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xfc, 0xfc) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(samcoupe_vmpr_r, samcoupe_vmpr_w)
 	AM_RANGE(0xfd, 0xfd) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(samcoupe_midi_r, samcoupe_midi_w)
 	AM_RANGE(0xfe, 0xfe) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(samcoupe_keyboard_r, samcoupe_border_w)
-	AM_RANGE(0xff, 0xff) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(samcoupe_attributes_r, samcoupe_sound_w)
+	AM_RANGE(0xff, 0xff) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READ(samcoupe_attributes_r)
+	AM_RANGE(0xff, 0xff) AM_MIRROR(0xfe00) AM_MASK(0xffff) AM_DEVWRITE(SOUND_SAA1099, "saa1099", saa1099_data_w)
+	AM_RANGE(0x1ff, 0x1ff) AM_MIRROR(0xfe00) AM_MASK(0xffff) AM_DEVWRITE(SOUND_SAA1099, "saa1099", saa1099_control_w)
 ADDRESS_MAP_END
 
 

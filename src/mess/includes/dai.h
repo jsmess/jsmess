@@ -8,7 +8,6 @@
 #define DAI_H_
 
 #include "mame.h"
-#include "sound/custom.h"
 #include "machine/8255ppi.h"
 #include "machine/tms5501.h"
 
@@ -43,8 +42,10 @@ PALETTE_INIT( dai );
 
 /*----------- defined in audio/dai.c -----------*/
 
-extern const custom_sound_interface dai_sound_interface;
-void dai_set_input(int index, int state);
+#define SOUND_DAI	DEVICE_GET_INFO_NAME( dai_sound )
+
+DEVICE_GET_INFO( dai_sound );
+void dai_set_input(running_machine *machine, int index, int state);
 
 
 #endif /* DAI_H_ */

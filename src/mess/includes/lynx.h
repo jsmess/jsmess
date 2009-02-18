@@ -7,7 +7,6 @@
 #ifndef LYNX_H_
 #define LYNX_H_
 
-#include "sound/custom.h"
 #include "devices/cartslot.h"
 
 
@@ -45,12 +44,15 @@ MACHINE_DRIVER_EXTERN( lynx_cartslot );
 
 /*----------- defined in audio/lynx.c -----------*/
 
+#define SOUND_LYNX		DEVICE_GET_INFO_NAME( lynx_sound )
+#define SOUND_LYNX2		DEVICE_GET_INFO_NAME( lynx2_sound )
+
 void lynx_audio_reset(void);
 void lynx_audio_write(int offset, UINT8 data);
 UINT8 lynx_audio_read(int offset);
 void lynx_audio_count_down(running_machine *machine, int nr);
-CUSTOM_START( lynx_custom_start );
-CUSTOM_START( lynx2_custom_start );
+DEVICE_GET_INFO( lynx_sound );
+DEVICE_GET_INFO( lynx2_sound );
 
 
 #endif /* LYNX_H_ */

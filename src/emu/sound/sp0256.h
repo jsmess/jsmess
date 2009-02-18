@@ -3,6 +3,8 @@
 #ifndef __SP0256_H__
 #define __SP0256_H__
 
+#include "devcb.h"
+
 /*
    GI SP0256 Narrator Speech Processor
 
@@ -24,19 +26,20 @@
 */
 
 typedef struct _sp0256_interface sp0256_interface;
-struct _sp0256_interface {
-	void (*lrq_callback)(const device_config *device, int state);
-	void (*sby_callback)(const device_config *device, int state);
+struct _sp0256_interface
+{
+	devcb_write_line lrq_callback;
+	devcb_write_line sby_callback;
 };
 
 void sp0256_bitrevbuff(UINT8 *buffer, unsigned int start, unsigned int length);
 
-WRITE8_HANDLER( sp0256_ALD_w );
+WRITE8_DEVICE_HANDLER( sp0256_ALD_w );
 
-READ16_HANDLER( spb640_r );
-WRITE16_HANDLER( spb640_w );
+READ16_DEVICE_HANDLER( spb640_r );
+WRITE16_DEVICE_HANDLER( spb640_w );
 
-SND_GET_INFO( sp0256 );
-#define SOUND_SP0256 SND_GET_INFO_NAME( sp0256 )
+DEVICE_GET_INFO( sp0256 );
+#define SOUND_SP0256 DEVICE_GET_INFO_NAME( sp0256 )
 
 #endif /* __SP0256_H__ */

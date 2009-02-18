@@ -11,10 +11,8 @@
 
 /*----------- defined in audio/cgenie.c -----------*/
 
-WRITE8_HANDLER ( cgenie_sh_control_port_w );
-WRITE8_HANDLER ( cgenie_sh_data_port_w );
-READ8_HANDLER ( cgenie_sh_control_port_r );
-READ8_HANDLER ( cgenie_sh_data_port_r );
+READ8_DEVICE_HANDLER( cgenie_sh_control_port_r );
+WRITE8_DEVICE_HANDLER( cgenie_sh_control_port_w );
 
 
 /*----------- defined in machine/cgenie.c -----------*/

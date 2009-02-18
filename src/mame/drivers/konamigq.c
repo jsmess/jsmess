@@ -220,11 +220,11 @@ static READ16_HANDLER( dual539_r )
 	data = 0;
 	if( ACCESSING_BITS_0_7 )
 	{
-		data |= k054539_1_r( space, offset );
+		data |= k054539_r( devtag_get_device(space->machine, SOUND, "konami2"), offset );
 	}
 	if( ACCESSING_BITS_8_15 )
 	{
-		data |= k054539_0_r( space, offset ) << 8;
+		data |= k054539_r( devtag_get_device(space->machine, SOUND, "konami1"), offset ) << 8;
 	}
 	return data;
 }
@@ -233,11 +233,11 @@ static WRITE16_HANDLER( dual539_w )
 {
 	if( ACCESSING_BITS_0_7 )
 	{
-		k054539_1_w( space, offset, data );
+		k054539_w( devtag_get_device(space->machine, SOUND, "konami2"), offset, data );
 	}
 	if( ACCESSING_BITS_8_15 )
 	{
-		k054539_0_w( space, offset, data >> 8 );
+		k054539_w( devtag_get_device(space->machine, SOUND, "konami1"), offset, data >> 8 );
 	}
 }
 
@@ -249,6 +249,24 @@ static READ16_HANDLER( sndcomm68k_r )
 static WRITE16_HANDLER( sndcomm68k_w )
 {
 	sndtor3k[ offset ] = data;
+}
+
+static READ16_HANDLER(tms57002_data_word_r)
+{
+	return 0;
+}
+
+static WRITE16_HANDLER(tms57002_data_word_w)
+{
+}
+
+static READ16_HANDLER(tms57002_status_word_r)
+{
+	return 0;
+}
+
+static WRITE16_HANDLER(tms57002_control_word_w)
+{
 }
 
 /* 68000 memory handling */
@@ -364,7 +382,6 @@ static MACHINE_START( konamigq )
 static MACHINE_RESET( konamigq )
 {
 	psx_machine_init(machine);
-	tms57002_init();
 }
 
 static MACHINE_DRIVER_START( konamigq )

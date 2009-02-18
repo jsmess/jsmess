@@ -22,8 +22,8 @@
 typedef struct _orch90_t orch90_t;
 struct _orch90_t
 {
-	int left_dac;
-	int right_dac;
+	const device_config *left_dac;
+	const device_config *right_dac;
 };
 
 
@@ -53,8 +53,8 @@ static DEVICE_START(orch90)
 	orch90_t *info = get_token(device);
 
 	/* TODO - when we can instantiate DACs, we can do something better here */
-	info->left_dac = 0;
-	info->right_dac = 0;
+	info->left_dac = devtag_get_device(device->machine, SOUND, "dac");
+	info->right_dac = devtag_get_device(device->machine, SOUND, "dac");
 }
 
 

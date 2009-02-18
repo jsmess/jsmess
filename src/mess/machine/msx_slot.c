@@ -25,6 +25,7 @@
 #include "sound/k051649.h"
 #include "sound/2413intf.h"
 #include "sound/dac.h"
+#include "sound/ay8910.h"
 
 static void msx_cpu_setbank (running_machine *machine, int page, UINT8 *mem)
 {
@@ -329,7 +330,7 @@ MSX_SLOT_RESET(konami_scc)
 	state->cart.scc.active = 0;
 }
 
-static  READ8_HANDLER (konami_scc_bank5)
+static READ8_HANDLER (konami_scc_bank5)
 {
 	if (offset & 0x80) {
 #if 0
@@ -340,7 +341,7 @@ static  READ8_HANDLER (konami_scc_bank5)
 		return 0xff;
 	}
 	else {
-		return k051649_waveform_r (space, offset & 0x7f);
+		return k051649_waveform_r (devtag_get_device(space->machine, SOUND_K051649, "k051649"), offset & 0x7f);
 	}
 }
 
@@ -393,21 +394,22 @@ MSX_SLOT_WRITE(konami_scc)
 		}
 	}
 	else if (state->cart.scc.active && addr >= 0x9800 && addr < 0xa000) {
+		const device_config *k051649 = devtag_get_device(space->machine, SOUND_K051649, "k051649");
 		int offset = addr & 0xff;
 
 		if (offset < 0x80) {
-			k051649_waveform_w (space, offset, val);
+			k051649_waveform_w (k051649, offset, val);
 		}
 		else if (offset < 0xa0) {
 			offset &= 0xf;
 			if (offset < 0xa) {
-				k051649_frequency_w (space, offset, val);
+				k051649_frequency_w (k051649, offset, val);
 			}
 			else if (offset < 0xf) {
-				k051649_volume_w (space, offset - 0xa, val);
+				k051649_volume_w (k051649, offset - 0xa, val);
 			}
 			else {
-				k051649_keyonoff_w (space, 0, val);
+				k051649_keyonoff_w (k051649, 0, val);
 			}
 		}
 #if 0
@@ -1382,7 +1384,7 @@ MSX_SLOT_MAP(synthesizer)
 MSX_SLOT_WRITE(synthesizer)
 {
 	if (addr >= 0x4000 && addr < 0x8000 && !(addr & 0x0010)) {
-		dac_data_w (0, val);
+		dac_data_w (devtag_get_device(machine, SOUND, "dac"), val);
 	}
 }
 
@@ -1434,7 +1436,7 @@ MSX_SLOT_MAP(majutsushi)
 MSX_SLOT_WRITE(majutsushi)
 {
 	if (addr >= 0x5000 && addr < 0x6000) {
-		dac_data_w (0, val);
+		dac_data_w (devtag_get_device(machine, SOUND, "dac"), val);
 	}
 	else if (addr >= 0x6000 && addr < 0x8000) {
 		state->banks[1] = val & 0x0f;
@@ -1549,12 +1551,12 @@ MSX_SLOT_WRITE(fmpac)
 	switch (addr) {
 	case 0x7ff4:
 		if (state->cart.fmpac.opll_active) {
-			ym2413_register_port_0_w (space, 0, val);
+			ym2413_w (devtag_get_device(space->machine, SOUND_AY8910, "ay8910"), 0, val);
 		}
 		break;
 	case 0x7ff5:
 		if (state->cart.fmpac.opll_active) {
-			ym2413_data_port_0_w (space, 0, val);
+			ym2413_w (devtag_get_device(space->machine, SOUND_AY8910, "ay8910"), 1, val);
 		}
 		break;
 	case 0x7ff6:
@@ -1997,14 +1999,14 @@ static  READ8_HANDLER (soundcartridge_scc)
 	reg = offset & 0xff;
 
 	if (reg < 0x80) {
-		return k051649_waveform_r (space, reg);
+		return k051649_waveform_r (devtag_get_device(space->machine, SOUND_K051649, "k051649"), reg);
 	}
 	else if (reg < 0xa0) {
 		/* nothing */
 	}
 	else if (reg < 0xc0) {
 		/* read wave 5 */
-		return k051649_waveform_r (space, 0x80 + (reg & 0x1f));
+		return k051649_waveform_r (devtag_get_device(space->machine, SOUND_K051649, "k051649"), 0x80 + (reg & 0x1f));
 	}
 #if 0
 	else if (reg < 0xe0) {
@@ -2027,7 +2029,7 @@ static  READ8_HANDLER (soundcartridge_sccp)
 	reg = offset & 0xff;
 
 	if (reg < 0xa0) {
-		return k051649_waveform_r (space, reg);
+		return k051649_waveform_r (devtag_get_device(space->machine, SOUND_K051649, "k051649"), reg);
 	}
 #if 0
 	else if (reg >= 0xc0 && reg < 0xe0) {
@@ -2115,22 +2117,23 @@ MSX_SLOT_WRITE(soundcartridge)
 			}
 		}
 		else if (addr >= 0x9800 && state->cart.sccp.scc_active) {
+			const device_config *k051649 = devtag_get_device(space->machine, SOUND_K051649, "k051649");
 			int offset = addr & 0xff;
 
 			if (offset < 0x80) {
-				k051649_waveform_w (space, offset, val);
+				k051649_waveform_w (k051649, offset, val);
 			}
 			else if (offset < 0xa0) {
 				offset &= 0xf;
 
 				if (offset < 0xa) {
-					k051649_frequency_w (space, offset, val);
+					k051649_frequency_w (k051649, offset, val);
 				}
 				else if (offset < 0x0f) {
-					k051649_volume_w (space, offset - 0xa, val);
+					k051649_volume_w (k051649, offset - 0xa, val);
 				}
 				else if (offset == 0x0f) {
-					k051649_keyonoff_w (space, 0, val);
+					k051649_keyonoff_w (k051649, 0, val);
 				}
 			}
 #if 0
@@ -2155,22 +2158,23 @@ MSX_SLOT_WRITE(soundcartridge)
 			}
 		}
 		else if (addr >= 0xb800 && state->cart.sccp.sccp_active) {
+			const device_config *k051649 = devtag_get_device(space->machine, SOUND_K051649, "k051649");
 			int offset = addr & 0xff;
 
 			if (offset < 0xa0) {
-				k052539_waveform_w (space, offset, val);
+				k052539_waveform_w (k051649, offset, val);
 			}
 			else if (offset < 0xc0) {
 				offset &= 0x0f;
 
 				if (offset < 0x0a) {
-					k051649_frequency_w (space, offset, val);
+					k051649_frequency_w (k051649, offset, val);
 				}
 				else if (offset < 0x0f) {
-					k051649_volume_w (space, offset - 0x0a, val);
+					k051649_volume_w (k051649, offset - 0x0a, val);
 				}
 				else if (offset == 0x0f) {
-					k051649_keyonoff_w (space, 0, val);
+					k051649_keyonoff_w (k051649, 0, val);
 				}
 			}
 #if 0

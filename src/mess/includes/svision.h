@@ -7,7 +7,6 @@
 #ifndef SVISION_H_
 #define SVISION_H_
 
-#include "sound/custom.h"
 
 
 /*----------- defined in drivers/svision.c -----------*/
@@ -61,7 +60,9 @@ typedef struct
 
 extern SVISION_CHANNEL svision_channel[2];
 
-CUSTOM_START( svision_custom_start );
+#define SOUND_SVISION	DEVICE_GET_INFO_NAME( svision_sound )
+
+DEVICE_GET_INFO( svision_sound );
 
 void svision_soundport_w (running_machine *machine, SVISION_CHANNEL *channel, int offset, int data);
 WRITE8_HANDLER( svision_sounddma_w );

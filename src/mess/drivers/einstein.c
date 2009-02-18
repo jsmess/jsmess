@@ -741,6 +741,7 @@ static READ8_HANDLER(einstein_serial_r)
 
 static WRITE8_HANDLER(einstein_psg_w)
 {
+	const device_config *ay8910 = devtag_get_device(space->machine, SOUND_AY8910, "ay8910");
 	int reg = offset & 0x03;
 
 	/*logerror("psg w: %04x %02x\n",offset,data); */
@@ -750,13 +751,13 @@ static WRITE8_HANDLER(einstein_psg_w)
 		/* case 0 and 1 are not handled */
 		case 2:
 		{
-			ay8910_control_port_0_w(space, 0, data);
+			ay8910_address_w(ay8910, 0, data);
 		}
 		break;
 
 		case 3:
 		{
-			ay8910_write_port_0_w(space, 0, data);
+			ay8910_data_w(ay8910, 0, data);
 		}
 		break;
 
@@ -765,15 +766,16 @@ static WRITE8_HANDLER(einstein_psg_w)
 	}
 }
 
-static  READ8_HANDLER(einstein_psg_r)
+static READ8_HANDLER(einstein_psg_r)
 {
+	const device_config *ay8910 = devtag_get_device(space->machine, SOUND_AY8910, "ay8910");
 	int reg = offset & 0x03;
 
 	switch (reg)
 	{
 		/* case 0 and 1 are not handled */
 		case 2:
-			return ay8910_read_port_0_r(space, 0);
+			return ay8910_r(ay8910, 0);
 
 		default:
 			break;
@@ -1540,10 +1542,10 @@ static const ay8910_interface einstein_ay_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	NULL,
-	einstein_port_b_read,
-	einstein_port_a_write,
-	NULL
+	DEVCB_NULL,
+	DEVCB_MEMORY_HANDLER("main", PROGRAM, einstein_port_b_read),
+	DEVCB_MEMORY_HANDLER("main", PROGRAM, einstein_port_a_write),
+	DEVCB_NULL
 };
 
 static const centronics_interface einstein_centronics_config =

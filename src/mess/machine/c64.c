@@ -153,7 +153,7 @@ static void c64_nmi(running_machine *machine)
  * flag cassette read input, serial request in
  * irq to irq connected
  */
-static UINT8 c64_cia0_port_a_r (const device_config *device)
+static READ8_DEVICE_HANDLER( c64_cia0_port_a_r )
 {
 	UINT8 value = 0xff;
 	UINT8 cia0portb = cia_get_output_b(devtag_get_device(device->machine, CIA6526R1, "cia_0"));
@@ -278,7 +278,7 @@ static UINT8 c64_cia0_port_a_r (const device_config *device)
 	return value;
 }
 
-static UINT8 c64_cia0_port_b_r (const device_config *device)
+static READ8_DEVICE_HANDLER( c64_cia0_port_b_r )
 {
     UINT8 value = 0xff;
 	UINT8 cia0porta = cia_get_output_a(devtag_get_device(device->machine, CIA6526R1, "cia_0"));
@@ -315,7 +315,7 @@ static UINT8 c64_cia0_port_b_r (const device_config *device)
     return value;
 }
 
-static void c64_cia0_port_b_w (const device_config *device, UINT8 data)
+static WRITE8_DEVICE_HANDLER( c64_cia0_port_b_w )
 {
     vic2_lightpen_write (data & 0x10);
 }
@@ -386,7 +386,7 @@ void c64_vic_interrupt (running_machine *machine, int level)
  * flag restore key or rs232 received data input
  * irq to nmi connected ?
  */
-static UINT8 c64_cia1_port_a_r (const device_config *device)
+static READ8_DEVICE_HANDLER( c64_cia1_port_a_r )
 {
 	UINT8 value = 0xff;
 
@@ -399,7 +399,7 @@ static UINT8 c64_cia1_port_a_r (const device_config *device)
 	return value;
 }
 
-static void c64_cia1_port_a_w (const device_config *device, UINT8 data)
+static WRITE8_DEVICE_HANDLER( c64_cia1_port_a_w )
 {
 	static const int helper[4] = {0xc000, 0x8000, 0x4000, 0x0000};
 
@@ -420,45 +420,45 @@ static void c64_cia1_interrupt (const device_config *device, int level)
 
 const cia6526_interface c64_ntsc_cia0 =
 {
-	c64_cia0_interrupt,
+	DEVCB_LINE(c64_cia0_interrupt),
 	60,
 
 	{
-		{ c64_cia0_port_a_r, NULL },
-		{ c64_cia0_port_b_r, c64_cia0_port_b_w }
+		{ DEVCB_HANDLER(c64_cia0_port_a_r), DEVCB_NULL },
+		{ DEVCB_HANDLER(c64_cia0_port_b_r), DEVCB_HANDLER(c64_cia0_port_b_w) }
 	}
 };
 
 const cia6526_interface c64_pal_cia0 =
 {
-	c64_cia0_interrupt,
+	DEVCB_LINE(c64_cia0_interrupt),
 	50,
 
 	{
-		{ c64_cia0_port_a_r, NULL },
-		{ c64_cia0_port_b_r, c64_cia0_port_b_w }
+		{ DEVCB_HANDLER(c64_cia0_port_a_r), DEVCB_NULL },
+		{ DEVCB_HANDLER(c64_cia0_port_b_r), DEVCB_HANDLER(c64_cia0_port_b_w) }
 	}
 };
 
 const cia6526_interface c64_ntsc_cia1 =
 {
-	c64_cia1_interrupt,
+	DEVCB_LINE(c64_cia1_interrupt),
 	60,
 
 	{
-		{ c64_cia1_port_a_r, c64_cia1_port_a_w },
-		{ 0, 0 }
+		{ DEVCB_HANDLER(c64_cia1_port_a_r), DEVCB_HANDLER(c64_cia1_port_a_w) },
+		{ DEVCB_NULL, DEVCB_NULL }
 	}
 };
 
 const cia6526_interface c64_pal_cia1 =
 {
-	c64_cia1_interrupt,
+	DEVCB_LINE(c64_cia1_interrupt),
 	50,
 
 	{
-		{ c64_cia1_port_a_r, c64_cia1_port_a_w },
-		{ 0, 0 }
+		{ DEVCB_HANDLER(c64_cia1_port_a_r), DEVCB_HANDLER(c64_cia1_port_a_w) },
+		{ DEVCB_NULL, DEVCB_NULL }
 	}
 };
 

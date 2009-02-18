@@ -273,7 +273,7 @@ static WRITE8_DEVICE_HANDLER( led1_w )
 	set_led_status(4,~data & 0x10);
 }
 
-static WRITE8_HANDLER( led2_w )
+static WRITE8_DEVICE_HANDLER( led2_w )
 {
 	/* 5 button lamps player 2 */
 	set_led_status(5,~data & 0x01);
@@ -333,10 +333,8 @@ static CUSTOM_INPUT(rndbit_r)
 static ADDRESS_MAP_START( pitboss_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN1")
-	AM_RANGE(0xa001, 0xa001) AM_READ_PORT("IN0")
-	AM_RANGE(0xa002, 0xa002) AM_NOP /* dips ? */
-/*  AM_RANGE(0xc000, 0xc002) AM_NOP */
+	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xc000, 0xc003) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
 	AM_RANGE(0xe001, 0xe001) AM_DEVWRITE(MC6845, "crtc", mc6845_register_w)
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE(&ram_attr)
@@ -405,8 +403,8 @@ static ADDRESS_MAP_START( trvwhiz_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( trvwhiz_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x8100, 0x8100) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE(SOUND, "ay", ay8910_address_w)
+	AM_RANGE(0x8100, 0x8100) AM_DEVWRITE(SOUND, "ay", ay8910_data_w)
 ADDRESS_MAP_END
 
 
@@ -426,8 +424,8 @@ static ADDRESS_MAP_START( phrcraze_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( phrcraze_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0xc004, 0xc004) AM_MIRROR(0x1cf3) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0xc104, 0xc104) AM_MIRROR(0x1cf3) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0xc004, 0xc004) AM_MIRROR(0x1cf3) AM_DEVWRITE(SOUND, "ay", ay8910_address_w)
+	AM_RANGE(0xc104, 0xc104) AM_MIRROR(0x1cf3) AM_DEVWRITE(SOUND, "ay", ay8910_data_w)
 ADDRESS_MAP_END
 
 
@@ -447,8 +445,8 @@ static ADDRESS_MAP_START( tictac_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tictac_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0xc00c, 0xc00c) AM_MIRROR(0x1cf3) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0xc10c, 0xc10c) AM_MIRROR(0x1cf3) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0xc00c, 0xc00c) AM_MIRROR(0x1cf3) AM_DEVWRITE(SOUND, "ay", ay8910_address_w)
+	AM_RANGE(0xc10c, 0xc10c) AM_MIRROR(0x1cf3) AM_DEVWRITE(SOUND, "ay", ay8910_data_w)
 ADDRESS_MAP_END
 
 
@@ -782,40 +780,85 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( pitboss )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_DIPNAME( 0x02, 0x02, "0-1" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "0-2" )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "0-3" )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_Z) PORT_NAME("P1/P2 Button 1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_X) PORT_NAME("P1/P2 Button 2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_C) PORT_NAME("P1/P2 Button 3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CODE(KEYCODE_V) PORT_NAME("P1/P2 Button 4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_B) PORT_NAME("P1/P2 Button 5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("P1/P2 Play")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_CODE(KEYCODE_A) PORT_NAME("P1/P2 Cancel")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) //causes "unauthorized conversion" msg.
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x08, 0x08, "0-4" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "0-4" )
+	PORT_DIPNAME( 0x10, 0x10, "0-5" )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "0-5" )
+	PORT_DIPNAME( 0x20, 0x20, "0-6" )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "0-6" )
+	PORT_DIPNAME( 0x40, 0x40, "0-7" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "0-7" )
+	PORT_DIPNAME( 0x80, 0x80, "0-8" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) /* z */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON6 ) /* x */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON7 ) /* c */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON8 ) /* v */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON9 ) /* b */
+	/*probably unused*/
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x01, 0x01, "1-1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "1-2" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "1-3" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "1-4" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "1-5" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "1-6" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "1-7" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "1-8" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x01, 0x00, "DSW" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -829,7 +872,7 @@ static INPUT_PORTS_START( casino5 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Play")
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) // putting this on makes the horse racing game to not work
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -1100,8 +1143,8 @@ static const ay8910_interface merit_ay8912_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	NULL, NULL,
-	led2_w, NULL
+	DEVCB_NULL, DEVCB_NULL,
+	DEVCB_HANDLER(led2_w), DEVCB_NULL
 };
 
 static NVRAM_HANDLER(dodge)
@@ -1235,8 +1278,8 @@ MACHINE_DRIVER_END
 
 ROM_START( pitboss )
 	ROM_REGION( 0x10000, "main", 0 )
-	ROM_LOAD( "u5-0c.rom", 0x0000, 0x2000, CRC(d8902656) SHA1(06da829201f6141a6b23afa0e277a3c7a122c26e) )
-	ROM_LOAD( "u6-0.rom",  0x2000, 0x2000, CRC(bf903b01) SHA1(1f5f69cfd3eb105bd9bad071016931a79defa16b) )
+	ROM_LOAD( "u5-0c.rom", 0x0000, 0x2000, CRC(d8902656) SHA1(06da829201f6141a6b23afa0e277a3c7a122c26e) ) /* Games included in this set are: */
+	ROM_LOAD( "u6-0.rom",  0x2000, 0x2000, CRC(bf903b01) SHA1(1f5f69cfd3eb105bd9bad071016931a79defa16b) ) /* Joker Poker, Blackjack, Super Slots & The Dice Game */
 	ROM_LOAD( "u7-0.rom",  0x4000, 0x2000, CRC(306351b9) SHA1(32cd243aa65571ee7fc72971b6a16beeb4ed9d85) )
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
@@ -1250,8 +1293,8 @@ ROM_END
 
 ROM_START( pitbossa )
  	ROM_REGION( 0x10000, "main", 0 )
- 	ROM_LOAD( "m4a1.u5",   0x0000, 0x2000, CRC(f5284472) SHA1(9170b90d06caa382be29feb2f6e80993bba1e07e) )
- 	ROM_LOAD( "m4a1.u6",   0x2000, 0x2000, CRC(dd8df5fe) SHA1(dab8c1077058263729b2589dd9bf9989ad53be1c) )
+ 	ROM_LOAD( "m4a1.u5",   0x0000, 0x2000, CRC(f5284472) SHA1(9170b90d06caa382be29feb2f6e80993bba1e07e) ) /* Games included in this set are: */
+ 	ROM_LOAD( "m4a1.u6",   0x2000, 0x2000, CRC(dd8df5fe) SHA1(dab8c1077058263729b2589dd9bf9989ad53be1c) ) /* Draw Poker, Blackjack, Acey Deucey & The Dice Game */
  	ROM_LOAD( "m4a1.u7",   0x4000, 0x2000, CRC(5fa5d436) SHA1(9f3fd81eae7f378268f3b4af8fd299ffb97d7fb6) )
 
  	ROM_REGION( 0x6000, "gfx1", 0 )
@@ -1261,6 +1304,22 @@ ROM_START( pitbossa )
 
 	ROM_REGION( 0x2000, "gfx2", 0 )
 	ROM_LOAD( "chr2.u40",  0x0000, 0x2000, CRC(40c94dce) SHA1(86611e3a1048b2a3fffcc0110811656a2d0fc4a5) )
+ROM_END
+
+ROM_START( pitbossb )
+ 	ROM_REGION( 0x10000, "main", 0 )
+ 	ROM_LOAD( "2214-04.u5-0",   0x0000, 0x2000, CRC(10b782e7) SHA1(158819898ad81506c47b76ffe2a949ee7208740f) ) /* Games included in this set are: */
+ 	ROM_LOAD( "2214-04.u6-0",   0x2000, 0x2000, CRC(c3fd6510) SHA1(8c89fd2cbcb6f12fa6427883700971f7c39f6ccf) ) /* Joker Poker, Blackjack, Foto Finish & The Dice Game */
+	ROM_RELOAD( 0x4000, 0x2000 )
+ 	ROM_LOAD( "2214-04.u7-0",   0x6000, 0x4000, CRC(c5cf7060) SHA1(4a3209ad24ae649348b0e0470fc446d37b667975) ) /* 27128 eprom */
+
+ 	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "chr7.u39",   0x0000, 0x2000, CRC(6662f607) SHA1(6b423f8de011d196700839af0be37effbf87383f) )
+	ROM_LOAD( "chr7.u38",   0x2000, 0x2000, CRC(a014b44f) SHA1(906d426b1de75f26030c19dcd599b6570909f510) )
+	ROM_LOAD( "chr7.u37",   0x4000, 0x2000, CRC(cb12e139) SHA1(06fe91281faae5d0c0ae4b3cd8ad103bd3995c38) )
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "chr7.u40",  0x0000, 0x2000, CRC(db62c5ec) SHA1(a9967eb51436f342902fa3ce9c43d4d1ec5e0f3c) )
 ROM_END
 
 ROM_START( casino5 )
@@ -1810,6 +1869,7 @@ static DRIVER_INIT( couple )
 
 GAME( 1983, pitboss,  0,       pitboss,  pitboss,  0,      ROT0,  "Merit", "Pit Boss (Set 1)",                            GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
 GAME( 1983, pitbossa, pitboss, pitboss,  pitboss,  0,      ROT0,  "Merit", "Pit Boss (Set 2)",                            GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
+GAME( 1983, pitbossb, pitboss, casino5,  pitboss,  0,      ROT0,  "Merit", "Pit Boss (Set 3)",                            GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
 
 GAME( 1984, casino5,  0,       casino5,  casino5,  0,      ROT0,  "Merit", "Casino Five",                                 GAME_SUPPORTS_SAVE )
 
@@ -1831,8 +1891,8 @@ GAME( 1985, trvwz4a,  trvwz4,  trvwhziv, trvwhziv, key_5,  ROT90, "Merit", "Triv
 
 GAME( 1985, tictac,   0,       tictac,   tictac,   key_4,  ROT0,  "Merit", "Tic Tac Trivia",                              GAME_SUPPORTS_SAVE )
 
-GAME( 1986, phrcraze, 0,       phrcraze, phrcraze, key_7,  ROT0,  "Merit", "Phraze Craze (set 1)",      	   	          GAME_SUPPORTS_SAVE )
-GAME( 1986, phrcraza, phrcraze,phrcraze, phrcraze, key_7,  ROT0,  "Merit", "Phraze Craze (set 2)",          		      GAME_SUPPORTS_SAVE )
+GAME( 1986, phrcraze, 0,       phrcraze, phrcraze, key_7,  ROT0,  "Merit", "Phraze Craze (set 1)",                        GAME_SUPPORTS_SAVE )
+GAME( 1986, phrcraza, phrcraze,phrcraze, phrcraze, key_7,  ROT0,  "Merit", "Phraze Craze (set 2)",                        GAME_SUPPORTS_SAVE )
 GAME( 1986, phrcrazs, phrcraze,phrcraze, phrcrazs, key_7,  ROT90, "Merit", "Phraze Craze (Sex Kit)",                      GAME_SUPPORTS_SAVE )
 
 GAME( 1986, bigappg,  0,       bigappg,  bigappg,  0,      ROT0,  "Merit", "Big Apple Games",                             GAME_SUPPORTS_SAVE )

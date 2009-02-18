@@ -64,11 +64,11 @@ static WRITE8_DEVICE_HANDLER (v_via_cb2_w);
 
 const via6522_interface vectrex_via6522_interface =
 {
-	v_via_pa_r, v_via_pb_r,         /* read PA/B */
-	0, 0, 0, 0,                     /* read ca1, cb1, ca2, cb2 */
-	v_via_pa_w, v_via_pb_w,         /* write PA/B */
-	0, 0, v_via_ca2_w, v_via_cb2_w, /* write ca1, cb1, ca2, cb2 */
-	v_via_irq,                      /* IRQ */
+	DEVCB_HANDLER(v_via_pa_r), DEVCB_HANDLER(v_via_pb_r),         /* read PA/B */
+	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,                     /* read ca1, cb1, ca2, cb2 */
+	DEVCB_HANDLER(v_via_pa_w), DEVCB_HANDLER(v_via_pb_w),         /* write PA/B */
+	DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(v_via_ca2_w), DEVCB_HANDLER(v_via_cb2_w), /* write ca1, cb1, ca2, cb2 */
+	DEVCB_LINE(v_via_irq),                      /* IRQ */
 };
 
 static int x_center, y_center, x_max, y_max;
@@ -330,10 +330,12 @@ VIDEO_START(vectrex)
 
 static void vectrex_multiplexer(running_machine *machine, int mux)
 {
+	const device_config *dac_device = devtag_get_device(machine, SOUND, "dac");
+
 	timer_set(machine, ATTOTIME_IN_NSEC(ANALOG_DELAY), &analog[mux], vectrex_via_out[PORTA], update_signal);
 
 	if (mux == A_AUDIO)
-		dac_data_w(0, vectrex_via_out[PORTA]);
+		dac_data_w(dac_device, vectrex_via_out[PORTA]);
 }
 
 
@@ -402,12 +404,12 @@ static WRITE8_DEVICE_HANDLER(v_via_pb_w)
 	/* Sound */
 	if (data & 0x10)
 	{
-		const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+		const device_config *ay8912 = devtag_get_device(device->machine, SOUND_AY8912, "ay8912");
 
 		if (data & 0x08) /* BC1 (do we select a reg or write it ?) */
-			ay8910_control_port_0_w(space, 0, vectrex_via_out[PORTA]);
+			ay8910_address_w(ay8912, 0, vectrex_via_out[PORTA]);
 		else
-			ay8910_write_port_0_w(space, 0, vectrex_via_out[PORTA]);
+			ay8910_data_w(ay8912, 0, vectrex_via_out[PORTA]);
 	}
 
 	if (!(data & 0x1) && (vectrex_via_out[PORTB] & 0x1))
@@ -475,9 +477,9 @@ static WRITE8_DEVICE_HANDLER(v_via_cb2_w)
 
 const via6522_interface spectrum1_via6522_interface =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ v_via_pa_r, s1_via_pb_r, 0, 0, 0, 0,
-	/*outputs: A/B,CA/B1,CA/B2 */ v_via_pa_w, v_via_pb_w, 0, 0, v_via_ca2_w, v_via_cb2_w,
-	/*irq                      */ v_via_irq,
+	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(v_via_pa_r), DEVCB_HANDLER(s1_via_pb_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*outputs: A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(v_via_pa_w), DEVCB_HANDLER(v_via_pb_w), DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(v_via_ca2_w), DEVCB_HANDLER(v_via_cb2_w),
+	/*irq                      */ DEVCB_LINE(v_via_irq),
 };
 
 

@@ -88,6 +88,8 @@ READ8_HANDLER ( mc10_bfff_r )
 
 WRITE8_HANDLER ( mc10_bfff_w )
 {
+	const device_config *dac_device = devtag_get_device(space->machine, SOUND, "dac");
+
 	/*   BIT 2 GM2 6847 CONTROL & INT/EXT CONTROL
      *   BIT 3 GM1 6847 CONTROL
      *   BIT 4 GM0 6847 CONTROL
@@ -96,7 +98,7 @@ WRITE8_HANDLER ( mc10_bfff_w )
      *   BIT 7 SOUND OUTPUT BIT
      */
 	mc10_bfff = data;
-	dac_data_w(0, data & 0x80);
+	dac_data_w(dac_device, data & 0x80);
 }
 
 

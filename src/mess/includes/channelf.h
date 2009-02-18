@@ -7,7 +7,6 @@
 #ifndef CHANNELF_H_
 #define CHANNELF_H_
 
-#include "sound/custom.h"
 
 
 /*----------- defined in video/channelf.c -----------*/
@@ -23,8 +22,10 @@ extern VIDEO_UPDATE( channelf );
 
 /*----------- defined in audio/channelf.c -----------*/
 
-void channelf_sound_w(int);
-CUSTOM_START( channelf_sh_custom_start );
+#define SOUND_CHANNELF	DEVICE_GET_INFO_NAME( channelf_sound )
+
+void channelf_sound_w(running_machine *machine, int mode);
+DEVICE_GET_INFO( channelf_sound );
 
 
 #endif /* CHANNELF_H_ */

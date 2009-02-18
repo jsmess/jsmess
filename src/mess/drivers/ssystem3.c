@@ -230,17 +230,17 @@ static WRITE8_DEVICE_HANDLER(ssystem3_via_write_b)
 
 static const via6522_interface ssystem3_via_config=
 {
-	ssystem3_via_read_a,//read8_machine_func in_a_func;
-	ssystem3_via_read_b,//read8_machine_func in_b_func;
-	0,//read8_machine_func in_ca1_func;
-	0,//read8_machine_func in_cb1_func;
-	0,//read8_machine_func in_ca2_func;
-	0,//read8_machine_func in_cb2_func;
-	ssystem3_via_write_a,//write8_machine_func out_a_func;
-	ssystem3_via_write_b,//write8_machine_func out_b_func;
-	0,//write8_machine_func out_ca2_func;
-	0,//write8_machine_func out_cb2_func;
-	0,//void (*irq_func)(int state);
+	DEVCB_HANDLER(ssystem3_via_read_a),//read8_machine_func in_a_func;
+	DEVCB_HANDLER(ssystem3_via_read_b),//read8_machine_func in_b_func;
+	DEVCB_NULL,//read8_machine_func in_ca1_func;
+	DEVCB_NULL,//read8_machine_func in_cb1_func;
+	DEVCB_NULL,//read8_machine_func in_ca2_func;
+	DEVCB_NULL,//read8_machine_func in_cb2_func;
+	DEVCB_HANDLER(ssystem3_via_write_a),//write8_machine_func out_a_func;
+	DEVCB_HANDLER(ssystem3_via_write_b),//write8_machine_func out_b_func;
+	DEVCB_NULL,//write8_machine_func out_ca2_func;
+	DEVCB_NULL,//write8_machine_func out_cb2_func;
+	DEVCB_NULL,//void (*irq_func)(int state);
 };
 
 static DRIVER_INIT( ssystem3 )

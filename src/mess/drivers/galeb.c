@@ -20,11 +20,13 @@ static GFXDECODE_START( galeb )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, galeb_charlayout, 0, 1 )
 GFXDECODE_END
 
+static WRITE8_DEVICE_HANDLER( galeb_dac_data_w ) { dac_data_w(device, data); }
+
 /* Address maps */
 static ADDRESS_MAP_START(galeb_mem, ADDRESS_SPACE_PROGRAM, 8)
     AM_RANGE( 0x0000, 0x1fff ) AM_RAM  // RAM
     AM_RANGE( 0xbfe0, 0xbfe7 ) AM_READ ( galeb_keyboard_r )
-    AM_RANGE( 0xbfe0, 0xbfe0 ) AM_WRITE( galeb_speaker_w  )
+    AM_RANGE( 0xbfe0, 0xbfe0 ) AM_DEVWRITE( SOUND, "dac", galeb_dac_data_w )
     AM_RANGE( 0xb000, 0xb3ff ) AM_RAM  AM_BASE(&galeb_video_ram) // video ram
     AM_RANGE( 0xc000, 0xc7ff ) AM_ROM  // BASIC 01 ROM
     AM_RANGE( 0xc800, 0xcfff ) AM_ROM  // BASIC 02 ROM

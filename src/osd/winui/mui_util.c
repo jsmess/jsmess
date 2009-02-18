@@ -337,21 +337,6 @@ BOOL isDriverVector(const machine_config *config)
 int numberOfSpeakers(const machine_config *config)
 {
 	int speakers = speaker_output_count(config);
-	int has_sound = FALSE;
-	int sndnum;
-
-	/* see if we have any sound chips to report */
-	for (sndnum = 0; sndnum < ARRAY_LENGTH(config->sound); sndnum++)
-		if (config->sound[sndnum].type != SOUND_DUMMY)
-		{
-			has_sound = TRUE;
-			break;
-		}
-
-	/* if we don't have sound, set speaker count to 0 */
-	if (!has_sound)
-		speakers = 0;
-
 	return speakers;
 }
 
@@ -359,7 +344,7 @@ static struct DriversInfo* GetDriversInfo(int driver_index)
 {
 	if (drivers_info == NULL)
 	{
-		int ndriver, i;
+		int ndriver;
 		drivers_info = malloc(sizeof(struct DriversInfo) * driver_list_get_count(drivers));
 		for (ndriver = 0; ndriver < driver_list_get_count(drivers); ndriver++)
 		{
@@ -423,26 +408,26 @@ static struct DriversInfo* GetDriversInfo(int driver_index)
 			
 			if (HAS_SAMPLES || HAS_VLM5030)
 			{
-				for (i = 0; config->sound[i].type && i < MAX_SOUND; i++)
+				const device_config *sound;
+				const char * const * samplenames = NULL;
+
+				for (sound = device_list_class_first(config->devicelist, DEVICE_CLASS_SOUND_CHIP); sound != NULL;
+					sound = device_list_class_next(sound, DEVICE_CLASS_SOUND_CHIP))
 				{
-					const char * const * samplenames = NULL;
-					
-#if (HAS_SAMPLES || HAS_VLM5030)
-					for( i = 0; config->sound[i].type && i < MAX_SOUND; i++ )
+
 					{
 #if (HAS_SAMPLES)
 						if( config->sound[i].type == SOUND_SAMPLES )
 							samplenames = ((samples_interface *)config->sound[i].config)->samplenames;
 #endif
 					}
-#endif
-					if (samplenames != 0 && samplenames[0] != 0)
-					{
-						gameinfo->usesSamples = TRUE;
-						break;
-					}
 				}
-				
+
+				if (samplenames != 0 && samplenames[0] != 0)
+				{
+					gameinfo->usesSamples = TRUE;
+					break;
+				}			
 			}
 			/* Free the structure */
 			machine_config_free(config);

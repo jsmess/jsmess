@@ -1,85 +1,245 @@
+/**********************************************************************
 
-/********************************
-DAVE SOUND CHIP FOUND IN ENTERPRISE
-*********************************/
+    "Dave" Sound Chip
 
-/* working:
+	DAVE SOUND CHIP FOUND IN ENTERPRISE
+
+	 working:
 
 	- pure tone
 	- sampled sounds
 	- 1 kHz, 50 Hz and 1 Hz ints
 	- external ints (int1 and int2) - not correct speed yet
 
-*/
+**********************************************************************/
 
 #include "driver.h"
 #include "audio/dave.h"
 
+
+/***************************************************************************
+    MACROS / CONSTANTS
+***************************************************************************/
+
 #define STEP 0x08000
 
-static DAVE dave;
-static const DAVE_INTERFACE *dave_iface;
 
-//static unsigned char Dave_IntRegRead(void);
-//static void Dave_IntRegWrite(unsigned char);
-//static void     Dave_SetInterruptWanted(void);
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
 
-/* temp here */
-static int nick_virq = 0;
+typedef struct _dave_t dave_t;
+struct _dave_t
+{
+	devcb_resolved_read8 reg_r;
+	devcb_resolved_write8 reg_w;
+	devcb_resolved_write_line int_callback;
+
+	unsigned char Regs[32];
+
+	/* int latches (used by 1Hz, int1 and int2) */
+	unsigned long int_latch;
+	/* int enables */
+	unsigned long int_enable;
+	/* int inputs */
+	unsigned long int_input;
+
+	unsigned long int_irq;
+
+	/* INTERRUPTS */
+
+	/* internal timer */
+	/* bit 2: 1kHz timer irq */
+	/* bit 1: 50kHz timer irq */
+	int timer_irq;
+	/* 1khz timer - divided into 1kHz, 50Hz and 1Hz timer */
+	emu_timer	*int_timer;
+	/* state of 1kHz timer */
+	unsigned long one_khz_state;
+	/* state of 50Hz timer */
+	unsigned long fifty_hz_state;
+
+	/* counter used to trigger 50Hz from 1kHz timer */
+	unsigned long fifty_hz_count;
+	/* counter used to trigger 1Hz from 1kHz timer */
+	unsigned long one_hz_count;
 
 
-static void Dave_reset(void)
+	/* SOUND SYNTHESIS */
+	int Period[4];
+	int Count[4];
+	int	level[4];
+
+	/* these are used to force channels on/off */
+	/* if one of the or values is 0x0ff, this means
+	the volume will be forced on,else it is dependant on
+	the state of the wave */
+	int level_or[8];
+	/* if one of the values is 0x00, this means the
+	volume is forced off, else it is dependant on the wave */
+	int level_and[8];
+
+	/* these are the current channel volumes in MAME form */
+	int mame_volumes[8];
+
+	/* update step */
+	int UpdateStep;
+
+	sound_stream *sound_stream;
+
+	/* temp here */
+	int nick_virq;
+};
+
+
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
+
+INLINE dave_t *get_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->type == SOUND_DAVE);
+	return (dave_t *) device->token;
+}
+
+
+
+INLINE const dave_interface *get_interface(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->type == SOUND_DAVE);
+	return (const dave_interface *) device->static_config;
+}
+
+
+/***************************************************************************
+    PROTOTYPES
+***************************************************************************/
+
+static void dave_set_external_int_state(const device_config *device, int IntID, int State);
+static TIMER_CALLBACK(dave_1khz_callback);
+static STREAM_UPDATE(dave_update_sound);
+
+
+/***************************************************************************
+    IMPLEMENTATION
+***************************************************************************/
+
+/*-------------------------------------------------
+    DEVICE_START( dave_sound )
+-------------------------------------------------*/
+
+static DEVICE_START( dave_sound )
 {
 	int i;
+	dave_t *dave = get_token(device);
+	const dave_interface *intf = get_interface(device);
 
-	for (i=0; i<32; i++)
+	memset(dave, 0, sizeof(*dave));
+
+	/* resolve callbacks */
+	devcb_resolve_read8(&dave->reg_r, &intf->reg_r, device);
+	devcb_resolve_write8(&dave->reg_w, &intf->reg_w, device);
+	devcb_resolve_write_line(&dave->int_callback, &intf->int_callback, device);
+
+	/* temp! */
+	dave->nick_virq = 0;
+
+	/* initialise 1kHz timer */
+	dave->int_latch = 0;
+	dave->int_input = 0;
+	dave->int_enable = 0;
+	dave->timer_irq = 0;
+	dave->fifty_hz_state = 0;
+	dave->one_khz_state = 0;
+	dave->fifty_hz_count = DAVE_FIFTY_HZ_COUNTER_RELOAD;
+	dave->one_hz_count = DAVE_ONE_HZ_COUNTER_RELOAD;
+	timer_pulse(device->machine, ATTOTIME_IN_HZ(1000), (void *) device, 0, dave_1khz_callback);
+
+	for (i=0; i<3; i++)
 	{
-		dave.Regs[i] = 0;
+		dave->Period[i] = (STEP * device->machine->sample_rate) / 125000;
+		dave->Count[i] = (STEP * device->machine->sample_rate) / 125000;
+		dave->level[i] = 0;
 	}
+
+	/* dave has 3 tone channels and 1 noise channel.
+	the volumes are mixed internally and output as left and right volume */
+
+	/* 3 tone channels + 1 noise channel */
+	dave->sound_stream = stream_create(device, 0, 2, device->machine->sample_rate, NULL, dave_update_sound);
 }
 
 
-static void dave_refresh_ints(running_machine *machine)
+/*-------------------------------------------------
+    DEVICE_RESET( dave_sound )
+-------------------------------------------------*/
+
+static DEVICE_RESET( dave_sound )
 {
+	dave_t *dave = get_token(device);
+	int i;
+
+	for (i = 0; i < 32; i++)
+		dave->Regs[i] = 0;
+
+	dave_reg_w(device, 0x10, 0);
+	dave_reg_w(device, 0x11, 0);
+	dave_reg_w(device, 0x12, 0);
+	dave_reg_w(device, 0x13, 0);
+
+}
+
+
+/*-------------------------------------------------
+    dave_refresh_ints
+-------------------------------------------------*/
+
+static void dave_refresh_ints(const device_config *device)
+{
+	dave_t *dave = get_token(device);
 	int int_wanted;
 
-	logerror("int latch: %02x enable: %02x input: %02x\n", (int) dave.int_latch, (int) dave.int_enable, (int) dave.int_input);
+	logerror("int latch: %02x enable: %02x input: %02x\n", (int) dave->int_latch, (int) dave->int_enable, (int) dave->int_input);
 
-	int_wanted = (((dave.int_enable<<1) & dave.int_latch)!=0);
-
-	if (dave_iface->int_callback)
-	{
-		dave_iface->int_callback(machine, int_wanted);
-	}
+	int_wanted = ((dave->int_enable<<1) & dave->int_latch) != 0;
+	devcb_call_write_line(&dave->int_callback, int_wanted);
 }
 
 
-static void dave_refresh_selectable_int(running_machine *machine)
+/*-------------------------------------------------
+    dave_refresh_selectable_int
+-------------------------------------------------*/
+
+static void dave_refresh_selectable_int(const device_config *device)
 {
+	dave_t *dave = get_token(device);
+
 	/* update 1kHz/50Hz/tg latch and int input */
-	switch ((dave.Regs[7]>>5) & 0x03)
+	switch ((dave->Regs[7]>>5) & 0x03)
 	{
 		/* 1kHz */
 		case 0:
 		{
-			dave.int_latch &=~(1<<1);
-			dave.int_latch |= (dave.int_irq>>1) & 0x02;
+			dave->int_latch &=~(1<<1);
+			dave->int_latch |= (dave->int_irq>>1) & 0x02;
 
 			/* set int input state */
-			dave.int_input &= ~(1<<0);
-			dave.int_input |= (dave.one_khz_state & 0x01)<<0;
+			dave->int_input &= ~(1<<0);
+			dave->int_input |= (dave->one_khz_state & 0x01)<<0;
 		}
 		break;
 
 		/* 50Hz */
 		case 1:
 		{
-			dave.int_latch &=~(1<<1);
-			dave.int_latch |= dave.int_irq & 0x02;
+			dave->int_latch &=~(1<<1);
+			dave->int_latch |= dave->int_irq & 0x02;
 
 			/* set int input state */
-			dave.int_input &= ~(1<<0);
-			dave.int_input |= (dave.fifty_hz_state & 0x01)<<0;
+			dave->int_input &= ~(1<<0);
+			dave->int_input |= (dave->fifty_hz_state & 0x01)<<0;
 		}
 		break;
 
@@ -88,97 +248,77 @@ static void dave_refresh_selectable_int(running_machine *machine)
 			break;
 	}
 
-	dave_refresh_ints(machine);
+	dave_refresh_ints(device);
 }
+
+
+/*-------------------------------------------------
+    dave_1khz_callback
+-------------------------------------------------*/
 
 static TIMER_CALLBACK(dave_1khz_callback)
 {
-//	logerror("1kHz int\n");
+	const device_config *device = ptr;
+	dave_t *dave = get_token(device);
 
 	/* time over - want int */
-	dave.one_khz_state^=0x0ffffffff;
+	dave->one_khz_state ^= 0x0ffffffff;
 
 	/* lo-high transition causes int */
-	if (dave.one_khz_state!=0)
+	if (dave->one_khz_state!=0)
 	{
-		dave.int_irq |=(1<<2);
+		dave->int_irq |=(1<<2);
 	}
 
 
 	/* update fifty Hz counter */
-	dave.fifty_hz_count--;
+	dave->fifty_hz_count--;
 
-	if (dave.fifty_hz_count==0)
+	if (dave->fifty_hz_count==0)
 	{
 		/* these two lines are temp here */
-		nick_virq^=0x0ffffffff;
-		Dave_SetExternalIntState(machine, DAVE_INT1_ID, nick_virq);
+		dave->nick_virq ^= 0x0ffffffff;
+		dave_set_external_int_state(device, DAVE_INT1_ID, dave->nick_virq);
 
 
-		dave.fifty_hz_count = DAVE_FIFTY_HZ_COUNTER_RELOAD;
-		dave.fifty_hz_state^=0x0ffffffff;
+		dave->fifty_hz_count = DAVE_FIFTY_HZ_COUNTER_RELOAD;
+		dave->fifty_hz_state^=0x0ffffffff;
 
-		if (dave.fifty_hz_state!=0)
+		if (dave->fifty_hz_state!=0)
 		{
-			dave.int_irq |= (1<<1);
+			dave->int_irq |= (1<<1);
 		}
 	}
 
-	dave.one_hz_count--;
+	dave->one_hz_count--;
 
-	if (dave.one_hz_count==0)
+	if (dave->one_hz_count==0)
 	{
 		/* reload counter */
-		dave.one_hz_count = DAVE_ONE_HZ_COUNTER_RELOAD;
+		dave->one_hz_count = DAVE_ONE_HZ_COUNTER_RELOAD;
 
 		/* change state */
-		dave.int_input ^= (1<<2);
+		dave->int_input ^= (1<<2);
 
-		if (dave.int_input & (1<<2))
+		if (dave->int_input & (1<<2))
 		{
 			/* transition from 0->1 */
 			/* int requested */
-			dave.int_latch |=(1<<3);
+			dave->int_latch |=(1<<3);
 		}
 	}
 
-	dave_refresh_selectable_int(machine);
+	dave_refresh_selectable_int(device);
 }
 
 
-
-void Dave_Init(running_machine *machine)
-{
-	int i;
-
-	//logerror("dave init\n");
-
-	Dave_reset();
-
-	/* temp! */
-	nick_virq = 0;
-
-	/* initialise 1kHz timer */
-	dave.int_latch = 0;
-	dave.int_input = 0;
-	dave.int_enable = 0;
-	dave.timer_irq = 0;
-	dave.fifty_hz_state = 0;
-	dave.one_khz_state = 0;
-	dave.fifty_hz_count = DAVE_FIFTY_HZ_COUNTER_RELOAD;
-	dave.one_hz_count = DAVE_ONE_HZ_COUNTER_RELOAD;
-	timer_pulse(machine, ATTOTIME_IN_HZ(1000), NULL, 0, dave_1khz_callback);
-
-	for (i=0; i<3; i++)
-	{
-		dave.Period[i] = ((STEP  * machine->sample_rate)/125000);
-		dave.Count[i] = ((STEP  * machine->sample_rate)/125000);
-		dave.level[i] = 0;
-	}
-}
+/*-------------------------------------------------
+    dave_update_sound
+-------------------------------------------------*/
 
 static STREAM_UPDATE( dave_update_sound )
 {
+	dave_t *dave = get_token(device);
 	stream_sample_t *buffer1, *buffer2;
 	/* 0 = channel 0 left volume, 1 = channel 0 right volume,
 	2 = channel 1 left volume, 3 = channel 1 right volume,
@@ -198,18 +338,17 @@ static STREAM_UPDATE( dave_update_sound )
 		int vol[4];
 		int i;
 
-
 		/* vol[] keeps track of how long each square wave stays */
 		/* in the 1 position during the sample period. */
 		vol[0] = vol[1] = vol[2] = vol[3] = 0;
 
 		for (i = 0;i < 3;i++)
 		{
-			if ((dave.Regs[7] & (1<<i))==0)
+			if ((dave->Regs[7] & (1<<i))==0)
 			{
 
-				if (dave.level[i]) vol[i] += dave.Count[i];
-				dave.Count[i] -= STEP;
+				if (dave->level[i]) vol[i] += dave->Count[i];
+				dave->Count[i] -= STEP;
 				/* Period[i] is the half period of the square wave. Here, in each */
 				/* loop I add Period[i] twice, so that at the end of the loop the */
 				/* square wave is in the same status (0 or 1) it was at the start. */
@@ -218,19 +357,20 @@ static STREAM_UPDATE( dave_update_sound )
 				/* If we exit the loop in the middle, Output[i] has to be inverted */
 				/* and vol[i] incremented only if the exit status of the square */
 				/* wave is 1. */
-				while (dave.Count[i] <= 0)
+				while (dave->Count[i] <= 0)
 				{
-					dave.Count[i] += dave.Period[i];
-					if (dave.Count[i] > 0)
+					dave->Count[i] += dave->Period[i];
+					if (dave->Count[i] > 0)
 					{
-						dave.level[i] ^= 0x0ffffffff;
-						if (dave.level[i]) vol[i] += dave.Period[i];
-						break;
+						dave->level[i] ^= 0x0ffffffff;
+						if (dave->level[i]) vol[i] += dave->Period[i];
+							break;
 					}
-					dave.Count[i] += dave.Period[i];
-					vol[i] += dave.Period[i];
+					dave->Count[i] += dave->Period[i];
+					vol[i] += dave->Period[i];
 				}
-				if (dave.level[i]) vol[i] -= dave.Count[i];
+				if (dave->level[i])
+					vol[i] -= dave->Count[i];
 			}
 		}
 
@@ -238,17 +378,17 @@ static STREAM_UPDATE( dave_update_sound )
 
 		/* setup output volumes for each channel */
 		/* channel 0 */
-		output_volumes[0] = ((dave.level[0] & dave.level_and[0]) | dave.level_or[0]) & dave.mame_volumes[0];
-		output_volumes[1] = ((dave.level[0] & dave.level_and[1]) | dave.level_or[1]) & dave.mame_volumes[4];
+		output_volumes[0] = ((dave->level[0] & dave->level_and[0]) | dave->level_or[0]) & dave->mame_volumes[0];
+		output_volumes[1] = ((dave->level[0] & dave->level_and[1]) | dave->level_or[1]) & dave->mame_volumes[4];
 		/* channel 1 */
-		output_volumes[2] = ((dave.level[1] & dave.level_and[2]) | dave.level_or[2]) & dave.mame_volumes[1];
-		output_volumes[3] = ((dave.level[1] & dave.level_and[3]) | dave.level_or[3]) & dave.mame_volumes[5];
+		output_volumes[2] = ((dave->level[1] & dave->level_and[2]) | dave->level_or[2]) & dave->mame_volumes[1];
+		output_volumes[3] = ((dave->level[1] & dave->level_and[3]) | dave->level_or[3]) & dave->mame_volumes[5];
 		/* channel 2 */
-		output_volumes[4] = ((dave.level[2] & dave.level_and[4]) | dave.level_or[4]) & dave.mame_volumes[2];
-		output_volumes[5] = ((dave.level[2] & dave.level_and[5]) | dave.level_or[5]) & dave.mame_volumes[6];
+		output_volumes[4] = ((dave->level[2] & dave->level_and[4]) | dave->level_or[4]) & dave->mame_volumes[2];
+		output_volumes[5] = ((dave->level[2] & dave->level_and[5]) | dave->level_or[5]) & dave->mame_volumes[6];
 		/* channel 3 */
-		output_volumes[6] = ((dave.level[3] & dave.level_and[6]) | dave.level_or[6]) & dave.mame_volumes[3];
-		output_volumes[7] = ((dave.level[3] & dave.level_and[7]) | dave.level_or[7]) & dave.mame_volumes[7];
+		output_volumes[6] = ((dave->level[3] & dave->level_and[6]) | dave->level_or[6]) & dave->mame_volumes[3];
+		output_volumes[7] = ((dave->level[3] & dave->level_and[7]) | dave->level_or[7]) & dave->mame_volumes[7];
 
 		left_volume = (output_volumes[0] + output_volumes[2] + output_volumes[4] + output_volumes[6])>>2;
 		right_volume = (output_volumes[1] + output_volumes[3] + output_volumes[5] + output_volumes[7])>>2;
@@ -261,25 +401,17 @@ static STREAM_UPDATE( dave_update_sound )
 }
 
 
-/* dave has 3 tone channels and 1 noise channel.
-the volumes are mixed internally and output as left and right volume */
-CUSTOM_START(Dave_sh_start)
+/*-------------------------------------------------
+    dave_sound_w - used to update sound output
+	based on data writes
+-------------------------------------------------*/
+
+static WRITE8_DEVICE_HANDLER(dave_sound_w)
 {
-	/* 3 tone channels + 1 noise channel */
-	dave.sound_stream = stream_create(device, 0, 2, device->machine->sample_rate, NULL, dave_update_sound);
-	return (void *) ~0;
-}
-
-
-
-/* used to update sound output based on data writes */
-static WRITE8_HANDLER(Dave_sound_w)
-{
-
-	//logerror("sound w: %04x %02x\n",offset,data);
+	dave_t *dave = get_token(device);
 
 	/* update stream */
-	stream_update(dave.sound_stream);
+	stream_update(dave->sound_stream);
 
 	/* new write */
 	switch (offset)
@@ -307,13 +439,13 @@ static WRITE8_HANDLER(Dave_sound_w)
 			{
 				case 0:
 				{
-					count = (data & 0x0ff) | ((dave.Regs[offset+1] & 0x0f)<<8);
+					count = (data & 0x0ff) | ((dave->Regs[offset+1] & 0x0f)<<8);
 				}
 				break;
 
 				case 1:
 				{
-					count = (dave.Regs[offset-1] & 0x0ff) | ((data & 0x0f)<<8);
+					count = (dave->Regs[offset-1] & 0x0ff) | ((data & 0x0f)<<8);
 
 				}
 				break;
@@ -322,7 +454,7 @@ static WRITE8_HANDLER(Dave_sound_w)
 			count++;
 
 
-			dave.Period[channel_index] = ((STEP  * space->machine->sample_rate)/125000) * count;
+			dave->Period[channel_index] = ((STEP  * device->machine->sample_rate)/125000) * count;
 
 		}
 		break;
@@ -347,7 +479,7 @@ static WRITE8_HANDLER(Dave_sound_w)
 			/* update mame version of volume from data written */
 			/* 0x03f->0x07e00. Max is 0x07fff */
 			/* I believe the volume is linear - to be checked! */
-			dave.mame_volumes[offset-8] = (data & 0x03f)<<9;
+			dave->mame_volumes[offset-8] = (data & 0x03f)<<9;
 		}
 		break;
 
@@ -394,122 +526,123 @@ static WRITE8_HANDLER(Dave_sound_w)
 			if (data & (1<<3))
 			{
 				/* force r8 value */
-				dave.level_or[0] = 0x0ffff;
-				dave.level_and[0] = 0x00;
+				dave->level_or[0] = 0x0ffff;
+				dave->level_and[0] = 0x00;
 
 				/* remove r9 value */
-				dave.level_or[2] = 0x000;
-				dave.level_and[2] = 0x00;
+				dave->level_or[2] = 0x000;
+				dave->level_and[2] = 0x00;
 
 				/* remove r10 value */
-				dave.level_or[4] = 0x000;
-				dave.level_and[4] = 0x00;
+				dave->level_or[4] = 0x000;
+				dave->level_and[4] = 0x00;
 
 				/* remove r11 value */
-				dave.level_or[6] = 0x000;
-				dave.level_and[6] = 0x00;
+				dave->level_or[6] = 0x000;
+				dave->level_and[6] = 0x00;
 			}
 			else
 			{
 				/* use r8 value */
-				dave.level_or[0] = 0x000;
-				dave.level_and[0] = 0xffff;
+				dave->level_or[0] = 0x000;
+				dave->level_and[0] = 0xffff;
 
 				/* use r9 value */
-				dave.level_or[2] = 0x000;
-				dave.level_and[2] = 0xffff;
+				dave->level_or[2] = 0x000;
+				dave->level_and[2] = 0xffff;
 
 				/* use r10 value */
-				dave.level_or[4] = 0x000;
-				dave.level_and[4] = 0xffff;
+				dave->level_or[4] = 0x000;
+				dave->level_and[4] = 0xffff;
 
 				/* use r11 value */
-				dave.level_or[6] = 0x000;
-				dave.level_and[6] = 0xffff;
+				dave->level_or[6] = 0x000;
+				dave->level_and[6] = 0xffff;
 			}
 
 			/* turn L.H audio output into D/A, outputting value in R12 */
 			if (data & (1<<4))
 			{
 				/* force r12 value */
-				dave.level_or[1] = 0x0ffff;
-				dave.level_and[1] = 0x00;
+				dave->level_or[1] = 0x0ffff;
+				dave->level_and[1] = 0x00;
 
 				/* remove r13 value */
-				dave.level_or[3] = 0x000;
-				dave.level_and[3] = 0x00;
+				dave->level_or[3] = 0x000;
+				dave->level_and[3] = 0x00;
 
 				/* remove r14 value */
-				dave.level_or[5] = 0x000;
-				dave.level_and[5] = 0x00;
+				dave->level_or[5] = 0x000;
+				dave->level_and[5] = 0x00;
 
 				/* remove r15 value */
-				dave.level_or[7] = 0x000;
-				dave.level_and[7] = 0x00;
+				dave->level_or[7] = 0x000;
+				dave->level_and[7] = 0x00;
 			}
 			else
 			{
 				/* use r12 value */
-				dave.level_or[1] = 0x000;
-				dave.level_and[1] = 0xffff;
+				dave->level_or[1] = 0x000;
+				dave->level_and[1] = 0xffff;
 
 				/* use r13 value */
-				dave.level_or[3] = 0x000;
-				dave.level_and[3] = 0xffff;
+				dave->level_or[3] = 0x000;
+				dave->level_and[3] = 0xffff;
 
 				/* use r14 value */
-				dave.level_or[5] = 0x000;
-				dave.level_and[5] = 0xffff;
+				dave->level_or[5] = 0x000;
+				dave->level_and[5] = 0xffff;
 
 				/* use r15 value */
-				dave.level_or[7] = 0x000;
-				dave.level_and[7] = 0xffff;
+				dave->level_or[7] = 0x000;
+				dave->level_and[7] = 0xffff;
 			}
 		}
 		break;
 
 		default:
 			break;
-
-
 	}
-
-
-
 }
 
 
-WRITE8_HANDLER ( Dave_reg_w )
+/*-------------------------------------------------
+    dave_reg_w
+-------------------------------------------------*/
+
+WRITE8_DEVICE_HANDLER ( dave_reg_w )
 {
+	dave_t *dave = get_token(device);
+
 	logerror("dave w: %04x %02x\n",offset,data);
 
-	Dave_sound_w(space, offset, data);
+	dave_sound_w(device, offset, data);
 
-	dave.Regs[offset & 0x01f] = data;
+	dave->Regs[offset & 0x01f] = data;
 
 	switch (offset)
 	{
 		case 0x07:
 		{
-			dave_refresh_selectable_int(space->machine);
+			dave_refresh_selectable_int(device);
 		}
 		break;
 
 		case 0x014:
 		{
 			/* enabled ints */
-			dave.int_enable = data & 0x055;
+			dave->int_enable = data & 0x055;
 			/* clear latches */
-			dave.int_latch &=~(data & 0x0aa);
+			dave->int_latch &=~(data & 0x0aa);
 
 			/* reset 1kHz, 50Hz latch */
 			if (data & (1<<1))
 			{
-				dave.int_irq = 0;
+				dave->int_irq = 0;
 			}
 
 			/* refresh ints */
-			dave_refresh_ints(space->machine);
+			dave_refresh_ints(device);
 		}
 		break;
 
@@ -517,26 +650,32 @@ WRITE8_HANDLER ( Dave_reg_w )
 			break;
 	}
 
-	if (dave_iface!=NULL)
-	{
-		dave_iface->reg_w(space->machine, offset, data);
-	}
+	devcb_call_write8(&dave->reg_w, offset, data);
 }
 
 
-void Dave_setreg(running_machine *machine, offs_t offset, UINT8 data)
+/*-------------------------------------------------
+    dave_set_reg
+-------------------------------------------------*/
+
+void dave_set_reg(const device_config *device, offs_t offset, UINT8 data)
 {
-	dave.Regs[offset & 0x01f] = data;
+	dave_t *dave = get_token(device);
+	dave->Regs[offset & 0x01f] = data;
 }
 
-READ8_HANDLER (	Dave_reg_r )
+
+/*-------------------------------------------------
+    dave_reg_r
+-------------------------------------------------*/
+
+READ8_DEVICE_HANDLER( dave_reg_r )
 {
+	dave_t *dave = get_token(device);
+
 	logerror("dave r: %04x\n",offset);
 
-	if (dave_iface!=NULL)
-	{
-		dave_iface->reg_r(space->machine, offset);
-	}
+	devcb_call_read8(&dave->reg_r, offset);
 
 	switch (offset)
 	{
@@ -567,19 +706,26 @@ READ8_HANDLER (	Dave_reg_r )
 			return 0x0ff;
 
 		case 0x014:
-			return (dave.int_latch & 0x0aa) | (dave.int_input & 0x055);
+			return (dave->int_latch & 0x0aa) | (dave->int_input & 0x055);
 
 
 		default:
 			break;
 	}
 
-	return dave.Regs[offset & 0x01f];
+	return dave->Regs[offset & 0x01f];
 }
 
-/* negative edge triggered */
-void	Dave_SetExternalIntState(running_machine *machine, int IntID, int State)
+
+/*-------------------------------------------------
+    dave_set_external_int_state - negative edge
+	triggered
+-------------------------------------------------*/
+
+static void dave_set_external_int_state(const device_config *device, int IntID, int State)
 {
+	dave_t *dave = get_token(device);
+
 	switch (IntID)
 	{
 		/* connected to Nick virq */
@@ -587,25 +733,25 @@ void	Dave_SetExternalIntState(running_machine *machine, int IntID, int State)
 		{
 			int previous_state;
 
-			previous_state = dave.int_input;
+			previous_state = dave->int_input;
 
-			dave.int_input &=~(1<<4);
+			dave->int_input &=~(1<<4);
 
 			if (State)
 			{
-				dave.int_input |=(1<<4);
+				dave->int_input |=(1<<4);
 			}
 
-			if ((previous_state ^ dave.int_input) & (1<<4))
+			if ((previous_state ^ dave->int_input) & (1<<4))
 			{
 				/* changed state */
 
-				if (dave.int_input & (1<<4))
+				if (dave->int_input & (1<<4))
 				{
 					/* int request */
-					dave.int_latch |= (1<<5);
+					dave->int_latch |= (1<<5);
 
-					dave_refresh_ints(machine);
+					dave_refresh_ints(device);
 				}
 			}
 
@@ -616,25 +762,25 @@ void	Dave_SetExternalIntState(running_machine *machine, int IntID, int State)
 		{
 			int previous_state;
 
-			previous_state = dave.int_input;
+			previous_state = dave->int_input;
 
-			dave.int_input &= ~(1<<6);
+			dave->int_input &= ~(1<<6);
 
 			if (State)
 			{
-				dave.int_input |=(1<<6);
+				dave->int_input |=(1<<6);
 			}
 
-			if ((previous_state ^ dave.int_input) & (1<<6))
+			if ((previous_state ^ dave->int_input) & (1<<6))
 			{
 				/* changed state */
 
-				if (dave.int_input & (1<<6))
+				if (dave->int_input & (1<<6))
 				{
 					/* int request */
-					dave.int_latch|=(1<<7);
+					dave->int_latch|=(1<<7);
 
-					dave_refresh_ints(machine);
+					dave_refresh_ints(device);
 				}
 			}
 		}
@@ -644,19 +790,6 @@ void	Dave_SetExternalIntState(running_machine *machine, int IntID, int State)
 			break;
 	}
 }
-
-
-
-int	Dave_getreg(int RegIndex)
-{
-	return dave.Regs[RegIndex & 0x01f];
-}
-
-void	Dave_SetIFace(const struct DAVE_INTERFACE *newInterface)
-{
-	dave_iface = newInterface;
-}
-
 
 /*
 Reg 4 READ:
@@ -682,24 +815,21 @@ b1 = 1: Reset 1kHz/50Hz/TG latch
 b0 = 1: Enable 1kHz/50Hz/TG latch
 */
 
-#if 0
-static void	Dave_SetInterruptWanted(void)
-{
-}
 
-void    Dave_UpdateInterruptLatches(int input_mask)
+
+DEVICE_GET_INFO( dave_sound )
 {
-	if (((dave.previous_int_input^dave.int_input)&(input_mask))!=0)
+	switch (state)
 	{
-		/* it changed */
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(dave_t);				break;
 
-		if ((dave.int_input & (input_mask))==0)
-		{
-				/* negative edge */
-				dave.int_latch |= (input_mask<<1);
-		}
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(dave_sound);	break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(dave_sound);	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Dave Sound");				break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
 	}
 }
-
-#endif
-

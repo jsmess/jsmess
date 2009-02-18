@@ -8,7 +8,6 @@
 #define b2m_H_
 
 #include "mame.h"
-#include "sound/custom.h"
 #include "machine/8255ppi.h"
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
@@ -26,7 +25,6 @@ extern const ppi8255_interface b2m_ppi8255_interface_1;
 extern const ppi8255_interface b2m_ppi8255_interface_2;
 extern const ppi8255_interface b2m_ppi8255_interface_3;
 
-extern const custom_sound_interface b2m_sound_interface;
 extern void b2m_sh_change_clock(double);
 
 extern DRIVER_INIT( b2m );
@@ -38,6 +36,10 @@ extern WRITE8_HANDLER( b2m_palette_w );
 extern READ8_HANDLER( b2m_localmachine_r );
 extern WRITE8_HANDLER( b2m_localmachine_w );
 extern DEVICE_IMAGE_LOAD( b2m_floppy );
+
+#define SOUND_B2M		DEVICE_GET_INFO_NAME( b2m_sound )
+
+DEVICE_GET_INFO( b2m_sound );
 
 
 /*----------- defined in video/b2m.c -----------*/

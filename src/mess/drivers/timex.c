@@ -159,7 +159,7 @@ static const ay8910_interface spectrum_ay_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	NULL
+	DEVCB_NULL
 };
 
 /****************************************************************************************************/
@@ -541,14 +541,14 @@ void ts2068_update_memory(running_machine *machine)
 }
 
 static ADDRESS_MAP_START (ts2068_io, ADDRESS_SPACE_IO, 8)	
-	AM_RANGE(0x1f, 0x1f ) AM_READ( spectrum_port_1f_r ) AM_MIRROR(0xff00)
-	AM_RANGE(0x7f, 0x7f ) AM_READ( spectrum_port_7f_r ) AM_MIRROR(0xff00)
-	AM_RANGE(0xdf, 0xdf ) AM_READ( spectrum_port_df_r ) AM_MIRROR(0xff00)
-	AM_RANGE(0xf4, 0xf4 ) AM_READWRITE( ts2068_port_f4_r,ts2068_port_f4_w ) AM_MIRROR(0xff00)
-	AM_RANGE(0xf5, 0xf5 ) AM_WRITE( ay8910_control_port_0_w ) AM_MIRROR(0xff00)
-	AM_RANGE(0xf6, 0xf6 ) AM_READWRITE( ay8910_read_port_0_r,ay8910_write_port_0_w ) AM_MIRROR(0xff00)
-	AM_RANGE(0xfe, 0xfe ) AM_READWRITE( spectrum_port_fe_r,spectrum_port_fe_w )  AM_MIRROR(0xff00)  AM_MASK(0xffff)
-	AM_RANGE(0xff, 0xff ) AM_READWRITE( ts2068_port_ff_r,ts2068_port_ff_w ) AM_MIRROR(0xff00)
+	AM_RANGE(0x1f, 0x1f) AM_READ( spectrum_port_1f_r ) AM_MIRROR(0xff00)
+	AM_RANGE(0x7f, 0x7f) AM_READ( spectrum_port_7f_r ) AM_MIRROR(0xff00)
+	AM_RANGE(0xdf, 0xdf) AM_READ( spectrum_port_df_r ) AM_MIRROR(0xff00)
+	AM_RANGE(0xf4, 0xf4) AM_READWRITE( ts2068_port_f4_r,ts2068_port_f4_w ) AM_MIRROR(0xff00)
+	AM_RANGE(0xf5, 0xf5) AM_DEVWRITE( SOUND_AY8912, "ay8912", ay8910_address_w ) AM_MIRROR(0xff00)
+	AM_RANGE(0xf6, 0xf6) AM_DEVREADWRITE( SOUND_AY8912, "ay8912", ay8910_r, ay8910_data_w ) AM_MIRROR(0xff00)
+	AM_RANGE(0xfe, 0xfe) AM_READWRITE( spectrum_port_fe_r,spectrum_port_fe_w )  AM_MIRROR(0xff00)  AM_MASK(0xffff)
+	AM_RANGE(0xff, 0xff) AM_READWRITE( ts2068_port_ff_r,ts2068_port_ff_w ) AM_MIRROR(0xff00)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START (ts2068_mem, ADDRESS_SPACE_PROGRAM, 8)

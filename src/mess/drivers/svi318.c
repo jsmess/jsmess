@@ -47,9 +47,9 @@ static ADDRESS_MAP_START( svi318_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x81, 0x81) AM_WRITE( TMS9928A_register_w )
 	AM_RANGE( 0x84, 0x84) AM_READ( TMS9928A_vram_r )
 	AM_RANGE( 0x85, 0x85) AM_READ( TMS9928A_register_r )
-	AM_RANGE( 0x88, 0x88) AM_WRITE( ay8910_control_port_0_w )
-	AM_RANGE( 0x8c, 0x8c) AM_WRITE( ay8910_write_port_0_w )
-	AM_RANGE( 0x90, 0x90) AM_READ( ay8910_read_port_0_r )
+	AM_RANGE( 0x88, 0x88) AM_DEVWRITE( SOUND_AY8910, "ay8910", ay8910_address_w )
+	AM_RANGE( 0x8c, 0x8c) AM_DEVWRITE( SOUND_AY8910, "ay8910", ay8910_data_w )
+	AM_RANGE( 0x90, 0x90) AM_DEVREAD( SOUND_AY8910, "ay8910", ay8910_r )
 	AM_RANGE( 0x96, 0x97) AM_DEVWRITE( PPI8255, "ppi8255", svi318_ppi_w )
 	AM_RANGE( 0x98, 0x9a) AM_DEVREAD( PPI8255, "ppi8255", svi318_ppi_r )
 ADDRESS_MAP_END
@@ -62,9 +62,9 @@ static ADDRESS_MAP_START( svi328_806_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x81, 0x81) AM_WRITE( TMS9928A_register_w )
 	AM_RANGE( 0x84, 0x84) AM_READ( TMS9928A_vram_r )
 	AM_RANGE( 0x85, 0x85) AM_READ( TMS9928A_register_r )
-	AM_RANGE( 0x88, 0x88) AM_WRITE( ay8910_control_port_0_w )
-	AM_RANGE( 0x8c, 0x8c) AM_WRITE( ay8910_write_port_0_w )
-	AM_RANGE( 0x90, 0x90) AM_READ( ay8910_read_port_0_r )
+	AM_RANGE( 0x88, 0x88) AM_DEVWRITE( SOUND_AY8910, "ay8910", ay8910_address_w )
+	AM_RANGE( 0x8c, 0x8c) AM_DEVWRITE( SOUND_AY8910, "ay8910", ay8910_data_w )
+	AM_RANGE( 0x90, 0x90) AM_DEVREAD( SOUND_AY8910, "ay8910", ay8910_r )
 	AM_RANGE( 0x96, 0x97) AM_DEVWRITE( PPI8255, "ppi8255", svi318_ppi_w )
 	AM_RANGE( 0x98, 0x9a) AM_DEVREAD( PPI8255, "ppi8255", svi318_ppi_r )
 ADDRESS_MAP_END
@@ -257,10 +257,10 @@ static const ay8910_interface svi318_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	svi318_psg_port_a_r,
-	NULL,
-	NULL,
-	svi318_psg_port_b_w
+	DEVCB_MEMORY_HANDLER("main", PROGRAM, svi318_psg_port_a_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_MEMORY_HANDLER("main", PROGRAM, svi318_psg_port_b_w)
 };
 
 static const cassette_config svi318_cassette_config =

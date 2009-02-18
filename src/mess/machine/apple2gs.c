@@ -335,15 +335,15 @@ static void apple2gs_remove_irq(running_machine *machine, UINT8 irq_mask)
 	}
 }
 
-void apple2gs_doc_irq(running_machine *machine, int state)
+void apple2gs_doc_irq(const device_config *device, int state)
 {
 	if (state)
 	{
-		apple2gs_add_irq(machine, IRQ_DOC);
+		apple2gs_add_irq(device->machine, IRQ_DOC);
 	}
 	else
 	{
-		apple2gs_remove_irq(machine, IRQ_DOC);
+		apple2gs_remove_irq(device->machine, IRQ_DOC);
 	}
 }
 
@@ -861,7 +861,8 @@ static READ8_HANDLER( gssnd_r )
 			}
 			else
 			{
-				sndglu_dummy_read = es5503_reg_0_r(space, sndglu_addr);
+				const device_config *es5503 = devtag_get_device(space->machine, SOUND_ES5503, "es5503");
+				sndglu_dummy_read = es5503_r(es5503, sndglu_addr);
 			}
 
 			if (sndglu_ctrl & 0x20)	// auto-increment
@@ -900,7 +901,8 @@ static WRITE8_HANDLER( gssnd_w )
 			}
 			else
 			{
-				es5503_reg_0_w(space, sndglu_addr, data);
+				const device_config *es5503 = devtag_get_device(space->machine, SOUND_ES5503, "es5503");
+				es5503_w(es5503, sndglu_addr, data);
 			}
 
 			if (sndglu_ctrl & 0x20)	// auto-increment

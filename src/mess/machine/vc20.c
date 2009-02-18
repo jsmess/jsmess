@@ -403,66 +403,66 @@ static WRITE8_DEVICE_HANDLER( vc20_via5_write_cb2 )
 
 const via6522_interface vc20_via0 =
 {
-	vc20_via0_read_porta,
-	0,								   /*via0_read_portb, */
-	vc20_via0_read_ca1,
-	0,								   /*via0_read_cb1, */
-	vc20_via0_read_ca2,
-	0,								   /*via0_read_cb2, */
-	vc20_via0_write_porta,
-	0,								   /*via0_write_portb, */
-	0,                                 /*via0_write_ca1, */
-	0,                                 /*via0_write_cb1, */
-	vc20_via0_write_ca2,
-	0,								   /*via0_write_cb2, */
-	vc20_via0_irq
+	DEVCB_HANDLER(vc20_via0_read_porta),
+	DEVCB_NULL,								   /*via0_read_portb, */
+	DEVCB_HANDLER(vc20_via0_read_ca1),
+	DEVCB_NULL,								   /*via0_read_cb1, */
+	DEVCB_HANDLER(vc20_via0_read_ca2),
+	DEVCB_NULL,								   /*via0_read_cb2, */
+	DEVCB_HANDLER(vc20_via0_write_porta),
+	DEVCB_NULL,								   /*via0_write_portb, */
+	DEVCB_NULL,                                 /*via0_write_ca1, */
+	DEVCB_NULL,                                 /*via0_write_cb1, */
+	DEVCB_HANDLER(vc20_via0_write_ca2),
+	DEVCB_NULL,								   /*via0_write_cb2, */
+	DEVCB_LINE(vc20_via0_irq)
 }, vc20_via1 =
 {
-	vc20_via1_read_porta,
-	vc20_via1_read_portb,
-	vc20_via1_read_ca1,
-	vc20_via1_read_cb1,
-	0,								   /*via1_read_ca2, */
-	0,								   /*via1_read_cb2, */
-	vc20_via1_write_porta,								   /*via1_write_porta, */
-	vc20_via1_write_portb,
-	0,                                 /*via1_write_ca1, */
-	0,                                 /*via1_write_cb1, */
-	vc20_via1_write_ca2,
-	vc20_via1_write_cb2,
-	vc20_via1_irq
+	DEVCB_HANDLER(vc20_via1_read_porta),
+	DEVCB_HANDLER(vc20_via1_read_portb),
+	DEVCB_HANDLER(vc20_via1_read_ca1),
+	DEVCB_HANDLER(vc20_via1_read_cb1),
+	DEVCB_NULL,								   /*via1_read_ca2, */
+	DEVCB_NULL,								   /*via1_read_cb2, */
+	DEVCB_HANDLER(vc20_via1_write_porta),								   /*via1_write_porta, */
+	DEVCB_HANDLER(vc20_via1_write_portb),
+	DEVCB_NULL,                                 /*via1_write_ca1, */
+	DEVCB_NULL,                                 /*via1_write_cb1, */
+	DEVCB_HANDLER(vc20_via1_write_ca2),
+	DEVCB_HANDLER(vc20_via1_write_cb2),
+	DEVCB_LINE(vc20_via1_irq)
 },
 /* via2,3 used by vc1541 and 2031 disk drives */
 vc20_via4 =
 {
-	0, /*vc20_via4_read_porta, */
-	vc20_via4_read_portb,
-	0, /*vc20_via4_read_ca1, */
-	0, /*vc20_via5_read_cb1, */
-	0, /* via1_read_ca2 */
-	0,								   /*via1_read_cb2, */
-	0,								   /*via1_write_porta, */
-	vc20_via4_write_portb,
-	0,                                 /*via0_write_ca1, */
-	0,                                 /*via0_write_cb1, */
-	0, /*vc20_via5_write_ca2, */
-	0, /*vc20_via5_write_cb2, */
-	vc20_via1_irq
+	DEVCB_NULL, /*vc20_via4_read_porta, */
+	DEVCB_HANDLER(vc20_via4_read_portb),
+	DEVCB_NULL, /*vc20_via4_read_ca1, */
+	DEVCB_NULL, /*vc20_via5_read_cb1, */
+	DEVCB_NULL, /* via1_read_ca2 */
+	DEVCB_NULL,								   /*via1_read_cb2, */
+	DEVCB_NULL,								   /*via1_write_porta, */
+	DEVCB_HANDLER(vc20_via4_write_portb),
+	DEVCB_NULL,                                 /*via0_write_ca1, */
+	DEVCB_NULL,                                 /*via0_write_cb1, */
+	DEVCB_NULL, /*vc20_via5_write_ca2, */
+	DEVCB_NULL, /*vc20_via5_write_cb2, */
+	DEVCB_LINE(vc20_via1_irq)
 }, vc20_via5 =
 {
-	0,/*vc20_via5_read_porta, */
-	vc20_via5_read_portb,
-	0, /*vc20_via5_read_ca1, */
-	vc20_via5_read_cb1,
-	0,								   /*via1_read_ca2, */
-	0,								   /*via1_read_cb2, */
-	vc20_via5_write_porta,
-	0,/*vc20_via5_write_portb, */
-	0,                                 /*via0_write_ca1, */
-	0,                                 /*via0_write_cb1, */
-	vc20_via5_write_ca2,
-	vc20_via5_write_cb2,
-	vc20_via1_irq
+	DEVCB_NULL,/*vc20_via5_read_porta, */
+	DEVCB_HANDLER(vc20_via5_read_portb),
+	DEVCB_NULL, /*vc20_via5_read_ca1, */
+	DEVCB_HANDLER(vc20_via5_read_cb1),
+	DEVCB_NULL,								   /*via1_read_ca2, */
+	DEVCB_NULL,								   /*via1_read_cb2, */
+	DEVCB_HANDLER(vc20_via5_write_porta),
+	DEVCB_NULL,/*vc20_via5_write_portb, */
+	DEVCB_NULL,                                 /*via0_write_ca1, */
+	DEVCB_NULL,                                 /*via0_write_cb1, */
+	DEVCB_HANDLER(vc20_via5_write_ca2),
+	DEVCB_HANDLER(vc20_via5_write_cb2),
+	DEVCB_LINE(vc20_via1_irq)
 };
 
 WRITE8_HANDLER ( vc20_write_9400 )

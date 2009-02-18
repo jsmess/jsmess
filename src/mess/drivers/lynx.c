@@ -60,16 +60,6 @@ static PALETTE_INIT( lynx )
 	}
 }
 
-static const custom_sound_interface lynx_sound_interface =
-{
-	lynx_custom_start
-};
-
-static const custom_sound_interface lynx2_sound_interface =
-{
-	lynx2_custom_start
-};
-
 
 static MACHINE_DRIVER_START( lynx )
 	/* basic machine hardware */
@@ -96,8 +86,7 @@ static MACHINE_DRIVER_START( lynx )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("lynx", CUSTOM, 0)
-	MDRV_SOUND_CONFIG(lynx_sound_interface)
+	MDRV_SOUND_ADD("lynx", LYNX, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
@@ -114,8 +103,7 @@ static MACHINE_DRIVER_START( lynx2 )
 	MDRV_SPEAKER_REMOVE("mono")
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 	MDRV_SOUND_REMOVE("lynx")
-	MDRV_SOUND_ADD("lynx2", CUSTOM, 0)
-	MDRV_SOUND_CONFIG(lynx2_sound_interface)
+	MDRV_SOUND_ADD("lynx2", LYNX2, 0)
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
 MACHINE_DRIVER_END

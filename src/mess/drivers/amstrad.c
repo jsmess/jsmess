@@ -779,10 +779,10 @@ static const ay8910_interface ay8912_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	amstrad_psg_porta_read,	/* portA read */
-	amstrad_psg_porta_read,	/* portB read */
-	NULL,					/* portA write */
-	NULL					/* portB write */
+	DEVCB_MEMORY_HANDLER("main", PROGRAM, amstrad_psg_porta_read),	/* portA read */
+	DEVCB_MEMORY_HANDLER("main", PROGRAM, amstrad_psg_porta_read),	/* portB read */
+	DEVCB_NULL,					/* portA write */
+	DEVCB_NULL					/* portB write */
 };
 
 

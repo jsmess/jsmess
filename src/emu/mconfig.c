@@ -32,6 +32,33 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 ***************************************************************************/
 
 /*-------------------------------------------------
+    remove_device - remove the head device from
+    the given configuration
+-------------------------------------------------*/
+
+INLINE void remove_device(device_config **listheadptr, device_type type, const char *tag)
+{
+	device_config *device = (device_config *)device_list_find_by_tag(*listheadptr, type, tag);
+	device_custom_config_func custom;
+
+	assert(device != NULL);
+
+	/* call the custom config free function first */
+	custom = (device_custom_config_func)devtype_get_info_fct(device->type, DEVINFO_FCT_CUSTOM_CONFIG);
+	if (custom != NULL)
+		(*custom)(device, MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_FREE, NULL);
+
+	/* remove the device from the list */
+	device_list_remove(listheadptr, type, tag);
+}
+
+
+
+/***************************************************************************
+    MACHINE CONFIGURATIONS
+***************************************************************************/
+
+/*-------------------------------------------------
     machine_config_alloc - allocate a new
     machine configuration and populate it using
     the supplied constructor
@@ -58,90 +85,12 @@ machine_config *machine_config_alloc(const machine_config_token *tokens)
 
 void machine_config_free(machine_config *config)
 {
-	int soundnum;
-
 	/* release the device list */
 	while (config->devicelist != NULL)
-		device_list_remove(&config->devicelist, config->devicelist->type, config->devicelist->tag);
-
-	/* release the strings */
-	for (soundnum = 0; soundnum < ARRAY_LENGTH(config->soundtag); soundnum++)
-		if (config->soundtag[soundnum] != NULL)
-			astring_free(config->soundtag[soundnum]);
+		remove_device(&config->devicelist, config->devicelist->type, config->devicelist->tag);
 
 	/* release the configuration itself */
 	free(config);
-}
-
-
-/*-------------------------------------------------
-    sound_add - add a sound system during
-    machine driver expansion
--------------------------------------------------*/
-
-static sound_config *sound_add(machine_config *machine, const char *tag, sound_type type, int clock)
-{
-	int soundnum;
-
-	for (soundnum = 0; soundnum < MAX_SOUND; soundnum++)
-		if (machine->sound[soundnum].type == SOUND_DUMMY)
-		{
-			if (machine->soundtag[soundnum] == NULL)
-				machine->soundtag[soundnum] = astring_alloc();
-			astring_cpyc(machine->soundtag[soundnum], tag);
-			machine->sound[soundnum].tag = astring_c(machine->soundtag[soundnum]);
-			machine->sound[soundnum].type = type;
-			machine->sound[soundnum].clock = clock;
-			machine->sound[soundnum].config = NULL;
-			machine->sound[soundnum].routes = 0;
-			return &machine->sound[soundnum];
-		}
-
-	fatalerror("Out of sounds!\n");
-	return NULL;
-}
-
-
-/*-------------------------------------------------
-    sound_find - find a tagged sound system during
-    machine driver expansion
--------------------------------------------------*/
-
-static sound_config *sound_find(machine_config *machine, const char *tag)
-{
-	int soundnum;
-
-	for (soundnum = 0; soundnum < MAX_SOUND; soundnum++)
-		if (machine->sound[soundnum].tag && strcmp(machine->sound[soundnum].tag, tag) == 0)
-			return &machine->sound[soundnum];
-
-	fatalerror("Can't find sound '%s'!\n", tag);
-	return NULL;
-}
-
-
-/*-------------------------------------------------
-    sound_remove - remove a tagged sound system
-    during machine driver expansion
--------------------------------------------------*/
-
-static void sound_remove(machine_config *machine, const char *tag)
-{
-	int soundnum;
-
-	for (soundnum = 0; soundnum < MAX_SOUND; soundnum++)
-		if (machine->sound[soundnum].tag && strcmp(machine->sound[soundnum].tag, tag) == 0)
-		{
-			if (machine->soundtag[soundnum] != NULL)
-				astring_free(machine->soundtag[soundnum]);
-			memmove(&machine->sound[soundnum], &machine->sound[soundnum + 1], sizeof(machine->sound[0]) * (MAX_SOUND - soundnum - 1));
-			memmove(&machine->soundtag[soundnum], &machine->soundtag[soundnum + 1], sizeof(machine->soundtag[0]) * (MAX_SOUND - soundnum - 1));
-			memset(&machine->sound[MAX_SOUND - 1], 0, sizeof(machine->sound[0]));
-			memset(&machine->soundtag[MAX_SOUND - 1], 0, sizeof(machine->soundtag[0]));
-			return;
-		}
-
-	fatalerror("Can't find sound '%s'!\n", tag);
 }
 
 
@@ -155,15 +104,14 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 	UINT32 entrytype = MCONFIG_TOKEN_INVALID;
 	astring *tempstring = astring_alloc();
 	device_config *device = NULL;
-	sound_config *sound = NULL;
 
 	/* loop over tokens until we hit the end */
 	while (entrytype != MCONFIG_TOKEN_END)
 	{
-		int size, offset, bits, in, out;
-		UINT32 data32, clock, gain;
+		device_custom_config_func custom;
+		int size, offset, bits;
+		UINT32 data32, clock;
 		device_type devtype;
-		sound_type type;
 		const char *tag;
 		UINT64 data64;
 
@@ -192,7 +140,7 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 			case MCONFIG_TOKEN_DEVICE_REMOVE:
 				devtype = TOKEN_GET_PTR(tokens, devtype);
 				tag = TOKEN_GET_STRING(tokens);
-				device_list_remove(&config->devicelist, devtype, device_build_tag(tempstring, owner, tag));
+				remove_device(&config->devicelist, devtype, device_build_tag(tempstring, owner, tag));
 				device = NULL;
 				break;
 
@@ -215,10 +163,26 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 				device->static_config = TOKEN_GET_PTR(tokens, voidptr);
 				break;
 
+			case MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_1:
+			case MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_2:
+			case MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_3:
+			case MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_4:
+			case MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_5:
+			case MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_6:
+			case MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_7:
+			case MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_8:
+			case MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_9:
+			case MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_FREE:
+				assert(device != NULL);
+				custom = (device_custom_config_func)devtype_get_info_fct(device->type, DEVINFO_FCT_CUSTOM_CONFIG);
+				assert(custom != NULL);
+				tokens = (*custom)(device, entrytype, tokens);
+				break;
+
 			case MCONFIG_TOKEN_DEVICE_CONFIG_DATA32:
 				assert(device != NULL);
 				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT32_UNPACK3(tokens, entrytype, 8, size, 6, offset, 12);
+				TOKEN_GET_UINT32_UNPACK3(tokens, entrytype, 8, size, 4, offset, 12);
 				data32 = TOKEN_GET_UINT32(tokens);
 				switch (size)
 				{
@@ -231,7 +195,7 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 			case MCONFIG_TOKEN_DEVICE_CONFIG_DATA64:
 				assert(device != NULL);
 				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT32_UNPACK3(tokens, entrytype, 8, size, 6, offset, 12);
+				TOKEN_GET_UINT32_UNPACK3(tokens, entrytype, 8, size, 4, offset, 12);
 				TOKEN_EXTRACT_UINT64(tokens, data64);
 				switch (size)
 				{
@@ -245,24 +209,12 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 			case MCONFIG_TOKEN_DEVICE_CONFIG_DATAFP32:
 				assert(device != NULL);
 				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT32_UNPACK4(tokens, entrytype, 8, size, 6, bits, 6, offset, 12);
+				TOKEN_GET_UINT32_UNPACK4(tokens, entrytype, 8, size, 4, bits, 6, offset, 12);
 				data32 = TOKEN_GET_UINT32(tokens);
 				switch (size)
 				{
 					case 4: *(float *)((UINT8 *)device->inline_config + offset) = (float)(INT32)data32 / (float)(1 << bits); break;
 					case 8: *(double *)((UINT8 *)device->inline_config + offset) = (double)(INT32)data32 / (double)(1 << bits); break;
-				}
-				break;
-
-			case MCONFIG_TOKEN_DEVICE_CONFIG_DATAFP64:
-				assert(device != NULL);
-				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT32_UNPACK4(tokens, entrytype, 8, size, 6, bits, 6, offset, 12);
-				TOKEN_EXTRACT_UINT64(tokens, data64);
-				switch (size)
-				{
-					case 4: *(float *)((UINT8 *)device->inline_config + offset) = (float)(INT64)data64 / (float)((UINT64)1 << bits); break;
-					case 8: *(double *)((UINT8 *)device->inline_config + offset) = (double)(INT64)data64 / (double)((UINT64)1 << bits); break;
 				}
 				break;
 
@@ -356,57 +308,6 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 
 			case MCONFIG_TOKEN_SOUND_RESET:
 				config->sound_reset = TOKEN_GET_PTR(tokens, sound_reset);
-				break;
-
-			/* add/remove/replace sounds */
-			case MCONFIG_TOKEN_SOUND_ADD:
-				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT64_UNPACK2(tokens, entrytype, 8, clock, 32);
-				type = TOKEN_GET_PTR(tokens, sndtype);
-				tag = TOKEN_GET_STRING(tokens);
-				sound = sound_add(config, device_build_tag(tempstring, owner, tag), type, clock);
-				break;
-
-			case MCONFIG_TOKEN_SOUND_REMOVE:
-				sound_remove(config, TOKEN_GET_STRING(tokens));
-				break;
-
-			case MCONFIG_TOKEN_SOUND_MODIFY:
-				tag = TOKEN_GET_STRING(tokens);
-				sound = sound_find(config, device_build_tag(tempstring, owner, tag));
-				if (sound == NULL)
-					fatalerror("Unable to find sound: tag=%s\n", astring_c(tempstring));
-				sound->routes = 0;
-				break;
-
-			case MCONFIG_TOKEN_SOUND_CONFIG:
-				assert(sound != NULL);
-				sound->config = TOKEN_GET_PTR(tokens, voidptr);
-				break;
-
-			case MCONFIG_TOKEN_SOUND_REPLACE:
-				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT64_UNPACK2(tokens, entrytype, 8, clock, 32);
-				type = TOKEN_GET_PTR(tokens, sndtype);
-				tag = TOKEN_GET_STRING(tokens);
-				sound = sound_find(config, device_build_tag(tempstring, owner, tag));
-				if (sound == NULL)
-					fatalerror("Unable to find sound: tag=%s\n", astring_c(tempstring));
-				sound->type = type;
-				sound->clock = clock;
-				sound->config = NULL;
-				sound->routes = 0;
-				break;
-
-			case MCONFIG_TOKEN_SOUND_ROUTE:
-				assert(sound != NULL);
-				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT64_UNPACK4(tokens, entrytype, 8, out, -12, in, -12, gain, 32);
-				sound->route[sound->routes].input = in;
-				sound->route[sound->routes].output = out;
-				sound->route[sound->routes].gain = (float)gain / 16777216.0f;
-				sound->route[sound->routes].target = TOKEN_GET_STRING(tokens);
-				sound->routes++;
 				break;
 
 			default:

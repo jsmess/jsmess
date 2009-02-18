@@ -33,8 +33,8 @@ Galaksija driver by Krzysztof Strzecha and Miodrag Milanovic
 static ADDRESS_MAP_START (galaxyp_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0x01)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xbe, 0xbe) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0xbf, 0xbf) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0xbe, 0xbe) AM_DEVWRITE(SOUND_AY8910, "ay8910", ay8910_address_w)
+	AM_RANGE(0xbf, 0xbf) AM_DEVWRITE(SOUND_AY8910, "ay8910", ay8910_data_w)
 ADDRESS_MAP_END
 
 
@@ -147,7 +147,7 @@ static const ay8910_interface galaxy_ay_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	NULL
+	DEVCB_NULL
 };
 
 #define XTAL 6144000

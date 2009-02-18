@@ -466,9 +466,9 @@ static ADDRESS_MAP_START(gb_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xc000, 0xfdff) AM_RAM						/* 8k low RAM, echo RAM */
 	AM_RANGE(0xfe00, 0xfeff) AM_READWRITE( gb_oam_r, gb_oam_w )	/* OAM RAM */
 	AM_RANGE(0xff00, 0xff0f) AM_READWRITE( gb_io_r, gb_io_w )		/* I/O */
-	AM_RANGE(0xff10, 0xff26) AM_READWRITE( gb_sound_r, gb_sound_w )		/* sound registers */
+	AM_RANGE(0xff10, 0xff26) AM_DEVREADWRITE( SOUND_GAMEBOY, "custom", gb_sound_r, gb_sound_w )		/* sound registers */
 	AM_RANGE(0xff27, 0xff2f) AM_NOP						/* unused */
-	AM_RANGE(0xff30, 0xff3f) AM_READWRITE( gb_wave_r, gb_wave_w )		/* Wave ram */
+	AM_RANGE(0xff30, 0xff3f) AM_DEVREADWRITE( SOUND_GAMEBOY, "custom", gb_wave_r, gb_wave_w )		/* Wave ram */
 	AM_RANGE(0xff40, 0xff7f) AM_READWRITE( gb_video_r, gb_io2_w)		/* Video controller & BIOS flip-flop */
 	AM_RANGE(0xff80, 0xfffe) AM_RAM						/* High RAM */
 	AM_RANGE(0xffff, 0xffff) AM_READWRITE( gb_ie_r, gb_ie_w )		/* Interrupt enable register */
@@ -485,9 +485,9 @@ static ADDRESS_MAP_START(sgb_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xc000, 0xfdff) AM_RAM						/* 8k low RAM, echo RAM */
 	AM_RANGE(0xfe00, 0xfeff) AM_READWRITE( gb_oam_r, gb_oam_w )	/* OAM RAM */
 	AM_RANGE(0xff00, 0xff0f) AM_READWRITE( gb_io_r, sgb_io_w )		/* I/O */
-	AM_RANGE(0xff10, 0xff26) AM_READWRITE( gb_sound_r, gb_sound_w )		/* sound registers */
+	AM_RANGE(0xff10, 0xff26) AM_DEVREADWRITE( SOUND_GAMEBOY, "custom", gb_sound_r, gb_sound_w )		/* sound registers */
 	AM_RANGE(0xff27, 0xff2f) AM_NOP						/* unused */
-	AM_RANGE(0xff30, 0xff3f) AM_READWRITE( gb_wave_r, gb_wave_w )		/* Wave RAM */
+	AM_RANGE(0xff30, 0xff3f) AM_DEVREADWRITE( SOUND_GAMEBOY, "custom", gb_wave_r, gb_wave_w )		/* Wave RAM */
 	AM_RANGE(0xff40, 0xff7f) AM_READWRITE( gb_video_r, gb_io2_w )		/* Video controller & BIOS flip-flop */
 	AM_RANGE(0xff80, 0xfffe) AM_RAM						/* High RAM */
 	AM_RANGE(0xffff, 0xffff) AM_READWRITE( gb_ie_r, gb_ie_w )		/* Interrupt enable register */
@@ -506,9 +506,9 @@ static ADDRESS_MAP_START(gbc_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xe000, 0xfdff) AM_RAM						/* echo RAM */
 	AM_RANGE(0xfe00, 0xfeff) AM_READWRITE( gb_oam_r, gb_oam_w )	/* OAM RAM */
 	AM_RANGE(0xff00, 0xff0f) AM_READWRITE( gb_io_r, gb_io_w )		/* I/O */
-	AM_RANGE(0xff10, 0xff26) AM_READWRITE( gb_sound_r, gb_sound_w )		/* sound controller */
+	AM_RANGE(0xff10, 0xff26) AM_DEVREADWRITE( SOUND_GAMEBOY, "custom", gb_sound_r, gb_sound_w )		/* sound controller */
 	AM_RANGE(0xff27, 0xff2f) AM_NOP						/* unused */
-	AM_RANGE(0xff30, 0xff3f) AM_READWRITE( gb_wave_r, gb_wave_w )		/* Wave RAM */
+	AM_RANGE(0xff30, 0xff3f) AM_DEVREADWRITE( SOUND_GAMEBOY, "custom", gb_wave_r, gb_wave_w )		/* Wave RAM */
 	AM_RANGE(0xff40, 0xff7f) AM_READWRITE( gbc_io2_r, gbc_io2_w )		/* Other I/O and video controller */
 	AM_RANGE(0xff80, 0xfffe) AM_RAM						/* high RAM */
 	AM_RANGE(0xffff, 0xffff) AM_READWRITE( gb_ie_r, gb_ie_w )		/* Interrupt enable register */
@@ -525,7 +525,7 @@ static ADDRESS_MAP_START(megaduck_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xff00, 0xff0f) AM_READWRITE( gb_io_r, gb_io_w )			/* I/O */
 	AM_RANGE(0xff10, 0xff1f) AM_READWRITE( megaduck_video_r, megaduck_video_w )	/* video controller */
 	AM_RANGE(0xff20, 0xff2f) AM_READWRITE( megaduck_sound_r1, megaduck_sound_w1)	/* sound controller pt1 */
-	AM_RANGE(0xff30, 0xff3f) AM_READWRITE( gb_wave_r, gb_wave_w )			/* wave ram */
+	AM_RANGE(0xff30, 0xff3f) AM_DEVREADWRITE( SOUND_GAMEBOY, "custom", gb_wave_r, gb_wave_w )			/* wave ram */
 	AM_RANGE(0xff40, 0xff46) AM_READWRITE( megaduck_sound_r2, megaduck_sound_w2)	/* sound controller pt2 */
 	AM_RANGE(0xff47, 0xff7f) AM_NOP							/* unused */
 	AM_RANGE(0xff80, 0xfffe) AM_RAM							/* high RAM */
@@ -546,11 +546,6 @@ static INPUT_PORTS_START( gameboy )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START) PORT_NAME("Start")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SELECT) PORT_NAME("Select")
 INPUT_PORTS_END
-
-static const custom_sound_interface gameboy_sound_interface =
-{
-	gameboy_sh_start, 0, 0
-};
 
 static MACHINE_DRIVER_START( gameboy )
 	/* basic machine hardware */
@@ -581,8 +576,7 @@ static MACHINE_DRIVER_START( gameboy )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
-	MDRV_SOUND_ADD("custom", CUSTOM, 0)
-	MDRV_SOUND_CONFIG(gameboy_sound_interface)
+	MDRV_SOUND_ADD("custom", GAMEBOY, 0)
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
 	
@@ -671,8 +665,7 @@ static MACHINE_DRIVER_START( megaduck )
 	MDRV_PALETTE_INIT(megaduck)
 
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
-	MDRV_SOUND_ADD("custom", CUSTOM, 0)
-	MDRV_SOUND_CONFIG(gameboy_sound_interface)
+	MDRV_SOUND_ADD("custom", GAMEBOY, 0)
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
 	

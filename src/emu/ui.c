@@ -297,7 +297,7 @@ int ui_display_startup_screens(running_machine *machine, int first_time, int sho
 				if (show_warnings && astring_len(warnings_string(machine, messagebox_text)) > 0)
 				{
 					ui_set_handler(handler_messagebox_ok, 0);
-					if (machine->gamedrv->flags & (GAME_WRONG_COLORS | GAME_IMPERFECT_COLORS | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NO_SOUND))
+					if (machine->gamedrv->flags & (GAME_WRONG_COLORS | GAME_IMPERFECT_COLORS | GAME_REQUIRES_ARTWORK | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NO_SOUND))
 						messagebox_backcolor = UI_YELLOWCOLOR;
 					if (machine->gamedrv->flags & (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION))
 						messagebox_backcolor = UI_REDCOLOR;
@@ -890,6 +890,7 @@ static astring *warnings_string(running_machine *machine, astring *string)
 						GAME_UNEMULATED_PROTECTION | \
 						GAME_WRONG_COLORS | \
 						GAME_IMPERFECT_COLORS | \
+						GAME_REQUIRES_ARTWORK | \
 						GAME_NO_SOUND |  \
 						GAME_IMPERFECT_SOUND |  \
 						GAME_IMPERFECT_GRAPHICS | \
@@ -932,6 +933,13 @@ static astring *warnings_string(running_machine *machine, astring *string)
 			astring_catc(string, "The game lacks sound.\n");
 		if (machine->gamedrv->flags & GAME_NO_COCKTAIL)
 			astring_catc(string, "Screen flipping in cocktail mode is not supported.\n");
+
+		/* check if external artwork is present before displaying this warning? */
+		if (machine->gamedrv->flags & GAME_REQUIRES_ARTWORK)
+			astring_catc(string, "The game requires external artwork files\n");
+
+
+
 
 		/* if there's a NOT WORKING or UNEMULATED PROTECTION warning, make it stronger */
 		if (machine->gamedrv->flags & (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION))
@@ -985,7 +993,7 @@ astring *game_info_astring(running_machine *machine, astring *string)
 	int scrcount = video_screen_count(machine->config);
 	const device_config *scandevice;
 	const device_config *device;
-	int sndnum;
+	int found_sound = FALSE;
 	int count;
 
 	/* print description, manufacturer, and CPU: */
@@ -1016,31 +1024,32 @@ astring *game_info_astring(running_machine *machine, astring *string)
 	}
 
 	/* loop over all sound chips */
-	for (sndnum = 0; sndnum < MAX_SOUND && machine->config->sound[sndnum].type != SOUND_DUMMY; sndnum += count)
+	for (device = sound_first(machine->config); device != NULL; device = scandevice)
 	{
-		sound_type type = machine->config->sound[sndnum].type;
-		int clock = machine->config->sound[sndnum].clock;
-
 		/* append the Sound: string */
-		if (sndnum == 0)
+		if (!found_sound)
 			astring_catc(string, "\nSound:\n");
+		found_sound = TRUE;
 
 		/* count how many identical sound chips we have */
-		for (count = 1; sndnum + count < MAX_SOUND; count++)
-			if (machine->config->sound[sndnum + count].type != type ||
-		        machine->config->sound[sndnum + count].clock != clock)
-		    	break;
+		count = 1;
+		for (scandevice = device->typenext; scandevice != NULL; scandevice = scandevice->typenext)
+		{
+			if (sound_get_type(device) != sound_get_type(scandevice) || device->clock != scandevice->clock)
+				break;
+			count++;
+		}
 
-		/* if more than one, prepend a #x in front of the SND name */
+		/* if more than one, prepend a #x in front of the CPU name */
 		if (count > 1)
 			astring_catprintf(string, "%d" UTF8_MULTIPLY, count);
-		astring_catc(string, sndtype_get_name(type));
+		astring_catc(string, device_get_name(device));
 
 		/* display clock in kHz or MHz */
-		if (clock >= 1000000)
-			astring_catprintf(string, " %d.%06d" UTF8_NBSP "MHz\n", clock / 1000000, clock % 1000000);
-		else if (clock != 0)
-			astring_catprintf(string, " %d.%03d" UTF8_NBSP "kHz\n", clock / 1000, clock % 1000);
+		if (device->clock >= 1000000)
+			astring_catprintf(string, " %d.%06d" UTF8_NBSP "MHz\n", device->clock / 1000000, device->clock % 1000000);
+		else if (device->clock != 0)
+			astring_catprintf(string, " %d.%03d" UTF8_NBSP "kHz\n", device->clock / 1000, device->clock % 1000);
 		else
 			astring_catc(string, "\n");
 	}

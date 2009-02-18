@@ -48,11 +48,16 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static WRITE8_HANDLER( D7759_write_port_0_w )
+static WRITE8_DEVICE_HANDLER( D7759_write_port_0_w )
 {
-	upd7759_port_w(offset,data);
-	upd7759_start_w (0,0);
-	upd7759_start_w (0,1);
+	upd7759_port_w(device, 0, data);
+	upd7759_start_w(device, 0);
+	upd7759_start_w(device, 1);
+}
+
+static WRITE8_DEVICE_HANDLER( D7759_upd_reset_w )
+{
+	upd7759_reset_w(device, data & 1);
 }
 
 static ADDRESS_MAP_START( prehisle_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -64,10 +69,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( prehisle_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(ym3812_status_port_0_r, ym3812_control_port_0_w)
-	AM_RANGE(0x20, 0x20) AM_WRITE(ym3812_write_port_0_w)
-	AM_RANGE(0x40, 0x40) AM_WRITE(D7759_write_port_0_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(upd7759_0_reset_w)
+	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE(SOUND, "ym", ym3812_status_port_r, ym3812_control_port_w)
+	AM_RANGE(0x20, 0x20) AM_DEVWRITE(SOUND, "ym", ym3812_write_port_w)
+	AM_RANGE(0x40, 0x40) AM_DEVWRITE(SOUND, "upd", D7759_write_port_0_w)
+	AM_RANGE(0x80, 0x80) AM_DEVWRITE(SOUND, "upd", D7759_upd_reset_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -195,9 +200,9 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-static void irqhandler(running_machine *machine, int irq)
+static void irqhandler(const device_config *device, int irq)
 {
-	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym3812_interface ym3812_config =
@@ -247,11 +252,11 @@ MACHINE_DRIVER_END
 
 ROM_START( prehisle )
 	ROM_REGION( 0x40000, "main", 0 )
-	ROM_LOAD16_BYTE( "gt.2", 0x00000, 0x20000, CRC(7083245a) SHA1(c4f72440e3fb130c8c44224c958bf70c61e8c34e) )
-	ROM_LOAD16_BYTE( "gt.3", 0x00001, 0x20000, CRC(6d8cdf58) SHA1(0078e54db899132d2b1244aed0b974173717f82e) )
+	ROM_LOAD16_BYTE( "gt-e2.2h", 0x00000, 0x20000, CRC(7083245a) SHA1(c4f72440e3fb130c8c44224c958bf70c61e8c34e) ) /* red "E" stamped on printed label */
+	ROM_LOAD16_BYTE( "gt-e3.3h", 0x00001, 0x20000, CRC(6d8cdf58) SHA1(0078e54db899132d2b1244aed0b974173717f82e) ) /* red "E" stamped on printed label */
 
 	ROM_REGION( 0x10000, "audio", 0 )	/* Sound CPU */
-	ROM_LOAD( "gt.1",  0x000000, 0x10000, CRC(80a4c093) SHA1(abe59e43259eb80b504bd5541f58cd0e5eb998ab) )
+	ROM_LOAD( "gt1.1",  0x000000, 0x10000, CRC(80a4c093) SHA1(abe59e43259eb80b504bd5541f58cd0e5eb998ab) )
 
 	ROM_REGION( 0x008000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "gt15.b15",   0x000000, 0x08000, CRC(ac652412) SHA1(916c04c3a8a7bfb961313ab73c0a27d7f5e48de1) )
@@ -264,22 +269,22 @@ ROM_START( prehisle )
 
 	ROM_REGION( 0x0a0000, "gfx4", ROMREGION_DISPOSE )
 	ROM_LOAD( "pi8910.k14", 0x000000, 0x80000, CRC(5a101b0b) SHA1(9645ab1f8d058cf2c6c42ccb4ce92a9b5db10c51) )
-	ROM_LOAD( "gt.5",       0x080000, 0x20000, CRC(3d3ab273) SHA1(b5706ada9eb2c22fcc0ac8ede2d2ee02ee853191) )
+	ROM_LOAD( "gt5.5",      0x080000, 0x20000, CRC(3d3ab273) SHA1(b5706ada9eb2c22fcc0ac8ede2d2ee02ee853191) )
 
 	ROM_REGION( 0x10000, "gfx5", 0 )	/* background tilemaps */
-	ROM_LOAD( "gt.11",  0x000000, 0x10000, CRC(b4f0fcf0) SHA1(b81cc0b6e3e6f5616789bb3e77807dc0ef718a38) )
+	ROM_LOAD( "gt11.11",  0x000000, 0x10000, CRC(b4f0fcf0) SHA1(b81cc0b6e3e6f5616789bb3e77807dc0ef718a38) )
 
 	ROM_REGION( 0x20000, "upd", 0 )	/* ADPCM samples */
-	ROM_LOAD( "gt.4",  0x000000, 0x20000, CRC(85dfb9ec) SHA1(78c865e7ccffddb71dcddccab358fa945f521f25) )
+	ROM_LOAD( "gt4.4",  0x000000, 0x20000, CRC(85dfb9ec) SHA1(78c865e7ccffddb71dcddccab358fa945f521f25) )
 ROM_END
 
 ROM_START( prehislu )
 	ROM_REGION( 0x40000, "main", 0 )
-	ROM_LOAD16_BYTE( "gt-u2.2h", 0x00000, 0x20000, CRC(a14f49bb) SHA1(6b39a894c3d3862be349a58c748d2d763d5a269c) )
-	ROM_LOAD16_BYTE( "gt-u3.3h", 0x00001, 0x20000, CRC(f165757e) SHA1(26cf369fed1713deec182852d76fe014ed46d6ac) )
+	ROM_LOAD16_BYTE( "gt-u2.2h", 0x00000, 0x20000, CRC(a14f49bb) SHA1(6b39a894c3d3862be349a58c748d2d763d5a269c) ) /* red "U" stamped on printed label */
+	ROM_LOAD16_BYTE( "gt-u3.3h", 0x00001, 0x20000, CRC(f165757e) SHA1(26cf369fed1713deec182852d76fe014ed46d6ac) ) /* red "U" stamped on printed label */
 
 	ROM_REGION( 0x10000, "audio", 0 )	/* Sound CPU */
-	ROM_LOAD( "gt.1",  0x000000, 0x10000, CRC(80a4c093) SHA1(abe59e43259eb80b504bd5541f58cd0e5eb998ab) )
+	ROM_LOAD( "gt1.1",  0x000000, 0x10000, CRC(80a4c093) SHA1(abe59e43259eb80b504bd5541f58cd0e5eb998ab) )
 
 	ROM_REGION( 0x008000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "gt15.b15",   0x000000, 0x08000, CRC(ac652412) SHA1(916c04c3a8a7bfb961313ab73c0a27d7f5e48de1) )
@@ -292,22 +297,22 @@ ROM_START( prehislu )
 
 	ROM_REGION( 0x0a0000, "gfx4", ROMREGION_DISPOSE )
 	ROM_LOAD( "pi8910.k14", 0x000000, 0x80000, CRC(5a101b0b) SHA1(9645ab1f8d058cf2c6c42ccb4ce92a9b5db10c51) )
-	ROM_LOAD( "gt.5",       0x080000, 0x20000, CRC(3d3ab273) SHA1(b5706ada9eb2c22fcc0ac8ede2d2ee02ee853191) )
+	ROM_LOAD( "gt5.5",      0x080000, 0x20000, CRC(3d3ab273) SHA1(b5706ada9eb2c22fcc0ac8ede2d2ee02ee853191) )
 
 	ROM_REGION( 0x10000, "gfx5", 0 )	/* background tilemaps */
-	ROM_LOAD( "gt.11",  0x000000, 0x10000, CRC(b4f0fcf0) SHA1(b81cc0b6e3e6f5616789bb3e77807dc0ef718a38) )
+	ROM_LOAD( "gt11.11",  0x000000, 0x10000, CRC(b4f0fcf0) SHA1(b81cc0b6e3e6f5616789bb3e77807dc0ef718a38) )
 
 	ROM_REGION( 0x20000, "upd", 0 )	/* ADPCM samples */
-	ROM_LOAD( "gt.4",  0x000000, 0x20000, CRC(85dfb9ec) SHA1(78c865e7ccffddb71dcddccab358fa945f521f25) )
+	ROM_LOAD( "gt4.4",  0x000000, 0x20000, CRC(85dfb9ec) SHA1(78c865e7ccffddb71dcddccab358fa945f521f25) )
 ROM_END
 
 ROM_START( gensitou )
 	ROM_REGION( 0x40000, "main", 0 )
-	ROM_LOAD16_BYTE( "gt2j.bin", 0x00000, 0x20000, CRC(a2da0b6b) SHA1(d102118f83b96094fd4ea4b3468713c4946c949d) )
-	ROM_LOAD16_BYTE( "gt3j.bin", 0x00001, 0x20000, CRC(c1a0ae8e) SHA1(2c9643abfd71edf8612e63d69cea4fbc19aad19d) )
+	ROM_LOAD16_BYTE( "gt-j2.2h", 0x00000, 0x20000, CRC(a2da0b6b) SHA1(d102118f83b96094fd4ea4b3468713c4946c949d) ) /* red "J" stamped on printed label */
+	ROM_LOAD16_BYTE( "gt-j3.3h", 0x00001, 0x20000, CRC(c1a0ae8e) SHA1(2c9643abfd71edf8612e63d69cea4fbc19aad19d) ) /* red "J" stamped on printed label */
 
 	ROM_REGION( 0x10000, "audio", 0 )	/* Sound CPU */
-	ROM_LOAD( "gt.1",  0x000000, 0x10000, CRC(80a4c093) SHA1(abe59e43259eb80b504bd5541f58cd0e5eb998ab) )
+	ROM_LOAD( "gt1.1",  0x000000, 0x10000, CRC(80a4c093) SHA1(abe59e43259eb80b504bd5541f58cd0e5eb998ab) )
 
 	ROM_REGION( 0x008000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "gt15.b15",   0x000000, 0x08000, CRC(ac652412) SHA1(916c04c3a8a7bfb961313ab73c0a27d7f5e48de1) )
@@ -320,19 +325,19 @@ ROM_START( gensitou )
 
 	ROM_REGION( 0x0a0000, "gfx4", ROMREGION_DISPOSE )
 	ROM_LOAD( "pi8910.k14", 0x000000, 0x80000, CRC(5a101b0b) SHA1(9645ab1f8d058cf2c6c42ccb4ce92a9b5db10c51) )
-	ROM_LOAD( "gt.5",       0x080000, 0x20000, CRC(3d3ab273) SHA1(b5706ada9eb2c22fcc0ac8ede2d2ee02ee853191) )
+	ROM_LOAD( "gt5.5",      0x080000, 0x20000, CRC(3d3ab273) SHA1(b5706ada9eb2c22fcc0ac8ede2d2ee02ee853191) )
 
 	ROM_REGION( 0x10000, "gfx5", 0 )	/* background tilemaps */
-	ROM_LOAD( "gt.11",  0x000000, 0x10000, CRC(b4f0fcf0) SHA1(b81cc0b6e3e6f5616789bb3e77807dc0ef718a38) )
+	ROM_LOAD( "gt11.11",  0x000000, 0x10000, CRC(b4f0fcf0) SHA1(b81cc0b6e3e6f5616789bb3e77807dc0ef718a38) )
 
 	ROM_REGION( 0x20000, "upd", 0 )	/* ADPCM samples */
-	ROM_LOAD( "gt.4",  0x000000, 0x20000, CRC(85dfb9ec) SHA1(78c865e7ccffddb71dcddccab358fa945f521f25) )
+	ROM_LOAD( "gt4.4",  0x000000, 0x20000, CRC(85dfb9ec) SHA1(78c865e7ccffddb71dcddccab358fa945f521f25) )
 ROM_END
 
 /******************************************************************************/
 
 
-GAME( 1989, prehisle, 0,		prehisle, prehisle, 0, ROT0, "SNK", "Prehistoric Isle in 1930 (World)", GAME_SUPPORTS_SAVE )
+GAME( 1989, prehisle, 0,        prehisle, prehisle, 0, ROT0, "SNK", "Prehistoric Isle in 1930 (World)", GAME_SUPPORTS_SAVE )
 GAME( 1989, prehislu, prehisle, prehisle, prehisle, 0, ROT0, "SNK of America", "Prehistoric Isle in 1930 (US)", GAME_SUPPORTS_SAVE )
 GAME( 1989, gensitou, prehisle, prehisle, prehisle, 0, ROT0, "SNK", "Genshi-Tou 1930's", GAME_SUPPORTS_SAVE )
 

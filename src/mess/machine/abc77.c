@@ -129,6 +129,7 @@ static READ8_HANDLER( abc77_data_r )
 static WRITE8_HANDLER( abc77_data_w )
 {
 	const device_config *device = devtag_get_device(space->machine, ABC77, ABC77_TAG);
+	const device_config *discrete = devtag_get_device(space->machine, SOUND, "discrete");
 	abc77_t *abc77 = get_safe_token(device);
 
 	abc77->keylatch = data & 0x0f;
@@ -139,7 +140,7 @@ static WRITE8_HANDLER( abc77_data_w )
 	}
 
 	/* beep */
-	discrete_sound_w(space, NODE_01, BIT(data, 4));
+	discrete_sound_w(discrete, NODE_01, BIT(data, 4));
 
 	/* transmit data */
 	devcb_call_write_line(&abc77->out_txd_func, BIT(data, 5));

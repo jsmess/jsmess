@@ -67,9 +67,7 @@ void msx_vdp_interrupt(running_machine *machine, int i);
 
 /* I/O functions */
 WRITE8_HANDLER ( msx_printer_w );
- READ8_HANDLER ( msx_printer_r );
-WRITE8_HANDLER ( msx_psg_w );
- READ8_HANDLER ( msx_psg_r );
+READ8_HANDLER ( msx_printer_r );
 WRITE8_HANDLER ( msx_psg_port_a_w );
 READ8_HANDLER ( msx_psg_port_a_r );
 WRITE8_HANDLER ( msx_psg_port_b_w );

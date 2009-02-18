@@ -883,12 +883,8 @@ static WRITE16_HANDLER( x68k_fm_w )
 	switch(offset)
 	{
 	case 0x00:
-		ym2151_register_port_0_w(space, 0, data);
-		logerror("YM: Register select 0x%02x\n",data);
-		break;
 	case 0x01:
-		ym2151_data_port_0_w(space, 0, data);
-		logerror("YM: Data write 0x%02x\n",data);
+		ym2151_w(devtag_get_device(space->machine, SOUND_YM2151, "ym2151"), offset, data);
 		break;
 	}
 }
@@ -896,21 +892,23 @@ static WRITE16_HANDLER( x68k_fm_w )
 static READ16_HANDLER( x68k_fm_r )
 {
 	if(offset == 0x01)
-		return ym2151_status_port_0_r(space, 0);
+		return ym2151_r(devtag_get_device(space->machine, SOUND_YM2151, "ym2151"), 0);
 
 	return 0xff;
 }
 
-static WRITE8_HANDLER( x68k_ct_w )
+static WRITE8_DEVICE_HANDLER( x68k_ct_w )
 {
-	device_config *fdc = (device_config*)devtag_get_device(space->machine, NEC72065, "nec72065");
+	const device_config *fdc = devtag_get_device(device->machine, NEC72065, "nec72065");
+	const device_config *okim = devtag_get_device(device->machine, SOUND_OKIM6258, "okim6258");
+
 	// CT1 and CT2 bits from YM2151 port 0x1b
 	// CT1 - ADPCM clock - 0 = 8MHz, 1 = 4MHz
 	// CT2 - 1 = Set ready state of FDC
 	nec765_set_ready_state(fdc,data & 0x01);
 	x68k_sys.adpcm.clock = data & 0x02;
-	x68k_set_adpcm(space->machine);
-	okim6258_set_clock(0, data & 0x02 ? 4000000 : 8000000);
+	x68k_set_adpcm(device->machine);
+	okim6258_set_clock(okim, data & 0x02 ? 4000000 : 8000000);
 }
 
 /*
@@ -1511,7 +1509,7 @@ static void x68k_dma_error(running_machine *machine, int channel, int irq)
 	}
 }
 
-static void x68k_fm_irq(running_machine *machine, int irq)
+static void x68k_fm_irq(const device_config *device, int irq)
 {
 	if(irq == CLEAR_LINE)
 	{
@@ -1609,8 +1607,8 @@ static ADDRESS_MAP_START(x68k_map, ADDRESS_SPACE_PROGRAM, 16)
 //  AM_RANGE(0xe8c000, 0xe8dfff) AM_READWRITE(x68k_printer_r, x68k_printer_w)
 	AM_RANGE(0xe8e000, 0xe8ffff) AM_READWRITE(x68k_sysport_r, x68k_sysport_w)
 	AM_RANGE(0xe90000, 0xe91fff) AM_READWRITE(x68k_fm_r, x68k_fm_w)
-	AM_RANGE(0xe92000, 0xe92001) AM_READWRITE(okim6258_status_0_lsb_r, okim6258_ctrl_0_lsb_w)
-	AM_RANGE(0xe92002, 0xe92003) AM_READWRITE(okim6258_data_0_lsb_r, okim6258_data_0_lsb_w)
+	AM_RANGE(0xe92000, 0xe92001) AM_DEVREADWRITE8(SOUND_OKIM6258, "okim6258", okim6258_status_r, okim6258_ctrl_w, 0x00ff)
+	AM_RANGE(0xe92002, 0xe92003) AM_DEVREADWRITE8(SOUND_OKIM6258, "okim6258", okim6258_status_r, okim6258_data_w, 0x00ff)
 	AM_RANGE(0xe94000, 0xe95fff) AM_READWRITE(x68k_fdc_r, x68k_fdc_w)
 	AM_RANGE(0xe96000, 0xe97fff) AM_DEVREADWRITE(X68KHDC,"x68k_hdc",x68k_hdc_r, x68k_hdc_w)
 	AM_RANGE(0xe98000, 0xe99fff) AM_READWRITE(x68k_scc_r, x68k_scc_w)

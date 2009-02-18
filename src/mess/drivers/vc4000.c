@@ -238,8 +238,7 @@ static MACHINE_DRIVER_START( vc4000 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("custom", CUSTOM, 0)
-	MDRV_SOUND_CONFIG(vc4000_sound_interface)
+	MDRV_SOUND_ADD("custom", VC4000, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* quickload */

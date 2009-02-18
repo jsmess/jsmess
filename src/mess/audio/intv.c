@@ -11,16 +11,16 @@
 
 static const int mapping8914to8910[16] = { 0, 2, 4, 11, 1, 3, 5, 12, 7, 6, 13, 8, 9, 10, 14, 15 };
 
-READ16_HANDLER( AY8914_directread_port_0_lsb_r )
+READ16_DEVICE_HANDLER( AY8914_directread_port_0_lsb_r )
 {
-	int rv;
-	ay8910_control_port_0_w(space, 0, mapping8914to8910[offset&0xff]);
-	rv = (int)ay8910_read_port_0_r(space, 0);
+	UINT16 rv;
+	ay8910_address_w(device, 0, mapping8914to8910[offset & 0xff]);
+	rv = (UINT16)ay8910_r(device, 0);
 	return rv;
 }
 
-WRITE16_HANDLER( AY8914_directwrite_port_0_lsb_w )
+WRITE16_DEVICE_HANDLER( AY8914_directwrite_port_0_lsb_w )
 {
-	ay8910_control_port_0_w(space, 0, mapping8914to8910[offset&0xff]);
-	ay8910_write_port_0_w(space, 0, data&0xff);
+	ay8910_address_w(device, 0, mapping8914to8910[offset & 0xff]);
+	ay8910_data_w(device, 0, data & 0xff);
 }

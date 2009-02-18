@@ -17,7 +17,7 @@ typedef struct _mea8000_interface mea8000_interface;
 struct _mea8000_interface
 {
   /* output channel */
-  int                channel;
+  const char *           channel;
 
   /* 1-bit 'ready' output, not negated */
   write8_device_func req_out_func;

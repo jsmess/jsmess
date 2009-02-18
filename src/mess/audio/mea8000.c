@@ -467,12 +467,12 @@ static void mea8000_start_frame( mea8000_t* mea8000 )
 
 
 
-static void mea8000_stop_frame( mea8000_t* mea8000 )
+static void mea8000_stop_frame( running_machine *machine, mea8000_t* mea8000 )
 {
 	/* enter stop mode */
 	timer_reset( mea8000->timer, attotime_never );
 	mea8000->state = MEA8000_STOPPED;
-	dac_signed_data_16_w(mea8000->iface->channel, 0x8000);
+	dac_signed_data_16_w(devtag_get_device(machine, SOUND, mea8000->iface->channel), 0x8000);
 }
 
 
@@ -489,7 +489,7 @@ static TIMER_CALLBACK( mea8000_timer_expire )
 		/* sample is really computed only every 8-th time */
 		mea8000->lastsample = mea8000->sample;
 		mea8000->sample = mea8000_compute_sample(mea8000);
-		dac_signed_data_16_w(mea8000->iface->channel, 0x8000+mea8000->lastsample);
+		dac_signed_data_16_w(devtag_get_device(machine, SOUND, mea8000->iface->channel), 0x8000+mea8000->lastsample);
 	}
 	else
 	{
@@ -497,7 +497,7 @@ static TIMER_CALLBACK( mea8000_timer_expire )
 		int sample =
 			mea8000->lastsample +
 			((pos*(mea8000->sample-mea8000->lastsample)) / SUPERSAMPLING);
-		dac_signed_data_16_w(mea8000->iface->channel, 0x8000+sample);
+		dac_signed_data_16_w(devtag_get_device(machine, SOUND, mea8000->iface->channel), 0x8000+sample);
 	}
 
 	mea8000->framepos++;
@@ -529,7 +529,7 @@ static TIMER_CALLBACK( mea8000_timer_expire )
 		else if (mea8000->state == MEA8000_SLOWING)
 		{
 			LOG(( "%f mea8000_timer_expire: stop frame\n", attotime_to_double(timer_get_time(machine)) ));
-			mea8000_stop_frame(mea8000);
+			mea8000_stop_frame(machine, mea8000);
 		}
 		mea8000_update_req(device);
 	}
@@ -620,7 +620,7 @@ WRITE8_DEVICE_HANDLER ( mea8000_w )
 			mea8000->roe = data & 1;
 
 		if (stop)
-			mea8000_stop_frame(mea8000);
+			mea8000_stop_frame(device->machine, mea8000);
 
 		LOG(( "$%04x %f: mea8000_w command %02X stop=%i cont=%i roe=%i\n",
 		      cpu_get_previouspc(device->machine->cpu[0]), attotime_to_double(timer_get_time(device->machine)), data,

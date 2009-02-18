@@ -423,13 +423,6 @@ static INTERRUPT_GEN( pasogo_interrupt )
 //	cpu_set_input_line(machine->cpu[0], UPD7810_INTFE1, PULSE_LINE);
 }
 
-#if 0
-static const custom_sound_interface gmaster_sound_interface =
-{
-	gmaster_custom_start
-};
-#endif
-
 static IRQ_CALLBACK(pasogo_irq_callback)
 {
 	return pic8259_acknowledge( (device_config*)devtag_get_device(device->machine, PIC8259, "pic8259"));

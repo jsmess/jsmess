@@ -1,4 +1,7 @@
-﻿0.129.1
+﻿NOTE - AS A PART OF THE 0.129u4 UPDATE, SOME DRIVERS HAVE BEEN TEMPORARILY
+REMOVED
+
+0.129.1
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
@@ -87,7 +90,7 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-- The core is based on MAME 0.129u3.  This incorporates all features of the
+- The core is based on MAME 0.129u4.  This incorporates all features of the
   update to this core.  [MAME team]
 
 - Made major changes to allow Cartridge slots to encapsulate hardware as

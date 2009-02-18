@@ -97,11 +97,13 @@ static WRITE8_DEVICE_HANDLER (specialist_8255_portb_w )
 }
 static WRITE8_DEVICE_HANDLER (specialist_8255_portc_w )
 {		
+	const device_config *dac_device = devtag_get_device(device->machine, SOUND, "dac");
+
 	specialist_8255_portc = data;
 	
 	cassette_output(devtag_get_device(device->machine, CASSETTE, "cassette"),data & 0x80 ? 1 : -1);	
 
-	dac_data_w(0,data & 0x20); //beeper
+	dac_data_w(dac_device, data & 0x20); //beeper
 	
 }
 
@@ -207,21 +209,21 @@ DRIVER_INIT(specimx)
 
 static PIT8253_OUTPUT_CHANGED(specimx_pit8253_out0_changed)
 {
-	specimx_set_input( 0, state );
+	specimx_set_input( device->machine, 0, state );
 }
 
 
 
 static PIT8253_OUTPUT_CHANGED(specimx_pit8253_out1_changed)
 {
-	specimx_set_input( 1, state );
+	specimx_set_input( device->machine, 1, state );
 }
 
 
 
 static PIT8253_OUTPUT_CHANGED(specimx_pit8253_out2_changed)
 {
-	specimx_set_input( 2, state );
+	specimx_set_input( device->machine, 2, state );
 }
 
 

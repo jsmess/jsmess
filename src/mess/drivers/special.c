@@ -379,8 +379,7 @@ static MACHINE_DRIVER_START( specimx )
    	MDRV_VIDEO_UPDATE(specimx)
 
     /* audio hardware */
-	MDRV_SOUND_ADD("custom", CUSTOM, 0)
-	MDRV_SOUND_CONFIG(specimx_sound_interface)
+	MDRV_SOUND_ADD("custom", SPECIMX, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 		
 	MDRV_WD1793_ADD("wd1793", default_wd17xx_interface )	

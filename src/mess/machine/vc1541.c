@@ -891,34 +891,34 @@ static WRITE8_DEVICE_HANDLER( vc1541_via1_write_portca2 )
 
 const via6522_interface vc1541_via2 =
 {
-	0,								   /*vc1541_via0_read_porta, */
-	vc1541_via0_read_portb,
-	0,								   /*via2_read_ca1, */
-	0,								   /*via2_read_cb1, */
-	0,								   /*via2_read_ca2, */
-	0,								   /*via2_read_cb2, */
-	0,								   /*via2_write_porta, */
-	vc1541_via0_write_portb,
-	0,                                 /*via2_write_ca1, */
-	0,                                 /*via2_write_cb1, */
-	0,								   /*via2_write_ca2, */
-	0,								   /*via2_write_cb2, */
-	vc1541_via0_irq
+	DEVCB_NULL,								   /*vc1541_via0_read_porta, */
+	DEVCB_HANDLER(vc1541_via0_read_portb),
+	DEVCB_NULL,								   /*via2_read_ca1, */
+	DEVCB_NULL,								   /*via2_read_cb1, */
+	DEVCB_NULL,								   /*via2_read_ca2, */
+	DEVCB_NULL,								   /*via2_read_cb2, */
+	DEVCB_NULL,								   /*via2_write_porta, */
+	DEVCB_HANDLER(vc1541_via0_write_portb),
+	DEVCB_NULL,                                 /*via2_write_ca1, */
+	DEVCB_NULL,                                 /*via2_write_cb1, */
+	DEVCB_NULL,								   /*via2_write_ca2, */
+	DEVCB_NULL,								   /*via2_write_cb2, */
+	DEVCB_LINE(vc1541_via0_irq)
 }, vc1541_via3 =
 {
-	vc1541_via1_read_porta,
-	vc1541_via1_read_portb,
-	0,								   /*via3_read_ca1, */
-	0,								   /*via3_read_cb1, */
-	0,								   /*via3_read_ca2, */
-	0,								   /*via3_read_cb2, */
-	vc1541_via1_write_porta,
-	vc1541_via1_write_portb,
-	vc1541_via1_write_portca1,         /*via3_write_ca1, */
-	0,                                 /*via3_write_cb1, */
-	vc1541_via1_write_portca2,		   /*via3_write_ca2, */
-	0,								   /*via3_write_cb2, */
-	vc1541_via1_irq
+	DEVCB_HANDLER(vc1541_via1_read_porta),
+	DEVCB_HANDLER(vc1541_via1_read_portb),
+	DEVCB_NULL,								   /*via3_read_ca1, */
+	DEVCB_NULL,								   /*via3_read_cb1, */
+	DEVCB_NULL,								   /*via3_read_ca2, */
+	DEVCB_NULL,								   /*via3_read_cb2, */
+	DEVCB_HANDLER(vc1541_via1_write_porta),
+	DEVCB_HANDLER(vc1541_via1_write_portb),
+	DEVCB_HANDLER(vc1541_via1_write_portca1),         /*via3_write_ca1, */
+	DEVCB_NULL,                                 /*via3_write_cb1, */
+	DEVCB_HANDLER(vc1541_via1_write_portca2),		   /*via3_write_ca2, */
+	DEVCB_NULL,								   /*via3_write_cb2, */
+	DEVCB_LINE(vc1541_via1_irq)
 };
 
 

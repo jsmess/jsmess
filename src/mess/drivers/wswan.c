@@ -40,7 +40,6 @@
 #include "cpu/v30mz/nec.h"
 #include "includes/wswan.h"
 #include "devices/cartslot.h"
-#include "sound/custom.h"
 
 static ADDRESS_MAP_START (wswan_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x00000, 0x03fff) AM_RAM		/* 16kb RAM / 4 colour tiles */
@@ -128,11 +127,6 @@ static PALETTE_INIT( wscolor ) {
 	}
 }
 
-static const custom_sound_interface wswan_sound_interface =
-{
-	wswan_sh_start
-};
-
 static MACHINE_DRIVER_START( wswan )
 	/* Basic machine hardware */
 	MDRV_CPU_ADD("main", V30MZ, 3072000)
@@ -161,8 +155,7 @@ static MACHINE_DRIVER_START( wswan )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
-	MDRV_SOUND_ADD("custom", CUSTOM, 0)
-	MDRV_SOUND_CONFIG(wswan_sound_interface)
+	MDRV_SOUND_ADD("custom", WSWAN, 0)
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
 	

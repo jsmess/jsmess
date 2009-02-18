@@ -71,7 +71,9 @@ READ8_HANDLER( orao_io_r )
 
 WRITE8_HANDLER( orao_io_w )
 {	 
-	if (offset == 0x0800) {		
-		dac_data_w(0,data); //beeper
+	if (offset == 0x0800)
+	{
+		const device_config *dac_device = devtag_get_device(space->machine, SOUND, "dac");
+		dac_data_w(dac_device, data); //beeper
 	}
 }

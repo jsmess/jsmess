@@ -17,7 +17,7 @@ static const int max_amplitude = 0x7fff;
 
 
 
-void channelf_sound_w(int mode)
+void channelf_sound_w(running_machine *machine, int mode)
 {
 	if (mode == sound_mode)
 		return;
@@ -83,7 +83,7 @@ static STREAM_UPDATE( channelf_sh_update )
 
 
 
-CUSTOM_START( channelf_sh_custom_start )
+static DEVICE_START(channelf_sound)
 {
 	int rate;
 
@@ -121,6 +121,18 @@ CUSTOM_START( channelf_sh_custom_start )
 
 	/* initial conditions */
 	envelope = 0;
+}
 
-	return (void *) ~0;
+
+DEVICE_GET_INFO( channelf_sound )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(channelf_sound);	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Channel F");				break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
+	}
 }

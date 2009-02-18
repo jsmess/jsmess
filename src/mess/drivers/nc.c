@@ -701,22 +701,33 @@ static READ8_HANDLER(nc_key_data_in_r)
 
 static void nc_sound_update(running_machine *machine, int channel)
 {
-        int on;
-        int frequency;
-        int period;
+	int on;
+	int frequency;
+	int period;
+	const char *beep_device = NULL;
 
-        period = nc_sound_channel_periods[channel];
+	switch(channel)
+	{
+		case 0:
+			beep_device = "beep.1";
+			break;
+		case 1:
+			beep_device = "beep.2";
+			break;
+	}
 
-        /* if top bit is 0, sound is on */
-        on = ((period & (1<<15))==0);
+	period = nc_sound_channel_periods[channel];
 
-        /* calculate frequency from period */
-        frequency = (int)(1000000.0f/((float)((period & 0x07fff)<<1) * 1.6276f));
+	/* if top bit is 0, sound is on */
+	on = ((period & (1<<15))==0);
 
-        /* set state */
-        beep_set_state(channel, on);
-        /* set frequency */
-        beep_set_frequency(channel, frequency);
+	/* calculate frequency from period */
+	frequency = (int)(1000000.0f/((float)((period & 0x07fff)<<1) * 1.6276f));
+
+	/* set state */
+	beep_set_state(devtag_get_device(machine, SOUND_BEEP, beep_device), on);
+	/* set frequency */
+	beep_set_frequency(devtag_get_device(machine, SOUND_BEEP, beep_device), frequency);
 }
 
 static WRITE8_HANDLER(nc_sound_w)

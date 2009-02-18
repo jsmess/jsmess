@@ -66,14 +66,21 @@ static STREAM_UPDATE( vc4000_update )
 /* Sound handler start              */
 /************************************/
 
-static CUSTOM_START( vc4000_custom_start )
+static DEVICE_START(vc4000_sound)
 {
     vc4000_sound.channel = stream_create(device, 0, 1, device->machine->sample_rate, 0, vc4000_update);
-    return (void *) ~0;
 }
 
 
-const custom_sound_interface vc4000_sound_interface =
+DEVICE_GET_INFO( vc4000_sound )
 {
-	vc4000_custom_start
-};
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(vc4000_sound);	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "VC4000 Sound");				break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
+	}
+}

@@ -556,7 +556,7 @@ static const ay8910_interface apple2_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	NULL
+	DEVCB_NULL
 };
 
 static MACHINE_DRIVER_START( apple2_common )

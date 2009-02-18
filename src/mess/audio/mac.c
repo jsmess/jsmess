@@ -69,12 +69,11 @@ static STREAM_UPDATE( mac_sound_update )
 /* Sound handler start              */
 /************************************/
 
-CUSTOM_START( mac_sh_start )
+static DEVICE_START(mac_sound)
 {
 	snd_cache = auto_malloc(SND_CACHE_SIZE * sizeof(*snd_cache));
 	mac_stream = stream_create(device, 0, 1, MAC_SAMPLE_RATE, 0, mac_sound_update);
 	snd_cache_head = snd_cache_len = snd_cache_tail = 0;
-	return (void *) ~0;
 }
 
 
@@ -107,11 +106,13 @@ void mac_set_sound_buffer(running_machine *machine, int buffer)
 */
 void mac_set_volume(running_machine *machine, int volume)
 {
+	const device_config *device = devtag_get_device(machine, DEVICE_GET_INFO_NAME(mac_sound), "custom");
+
 	stream_update(mac_stream);
 
 	volume = (100 / 7) * volume;
 
-	sndti_set_output_gain(SOUND_CUSTOM, 0, 0, volume / 100.0);
+	sound_set_output_gain(device, 0, volume / 100.0);
 }
 
 
@@ -141,4 +142,18 @@ void mac_sh_updatebuffer(running_machine *machine)
 	snd_cache_tail++;
 	snd_cache_tail %= SND_CACHE_SIZE;
 	snd_cache_len++;
+}
+
+
+DEVICE_GET_INFO( mac_sound )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(mac_sound);	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Mac Sound Custom");				break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
+	}
 }

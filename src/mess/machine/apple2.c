@@ -962,11 +962,13 @@ READ8_HANDLER ( apple2_c03x_r )
 {
 	if (!offset)
 	{
+		const device_config *dac_device = devtag_get_device(space->machine, SOUND, "dac");
+
 		if (a2_speaker_state == 0xFF)
 			a2_speaker_state = 0;
 		else
 			a2_speaker_state = 0xFF;
-		dac_data_w(0, a2_speaker_state);
+		dac_data_w(dac_device, a2_speaker_state);
 	}
 	return apple2_getfloatingbusvalue(space->machine);
 }

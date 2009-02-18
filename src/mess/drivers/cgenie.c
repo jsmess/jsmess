@@ -59,8 +59,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START (cgenie_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf8, 0xf8) AM_READWRITE( cgenie_sh_control_port_r, cgenie_sh_control_port_w )
-	AM_RANGE(0xf9, 0xf9) AM_READWRITE( cgenie_sh_data_port_r, cgenie_sh_data_port_w )
+	AM_RANGE(0xf8, 0xf8) AM_DEVREADWRITE( SOUND_AY8910, "ay8910", cgenie_sh_control_port_r, cgenie_sh_control_port_w )
+	AM_RANGE(0xf9, 0xf9) AM_DEVREADWRITE( SOUND_AY8910, "ay8910", ay8910_r, ay8910_data_w )
 	AM_RANGE(0xfa, 0xfa) AM_READWRITE( cgenie_index_r, cgenie_index_w )
 	AM_RANGE(0xfb, 0xfb) AM_READWRITE( cgenie_register_r, cgenie_register_w )
 	AM_RANGE(0xff, 0xff) AM_READWRITE( cgenie_port_ff_r, cgenie_port_ff_w )
@@ -384,10 +384,10 @@ static const ay8910_interface cgenie_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	cgenie_psg_port_a_r,
-	cgenie_psg_port_b_r,
-	cgenie_psg_port_a_w,
-	cgenie_psg_port_b_w
+	DEVCB_MEMORY_HANDLER("main", PROGRAM, cgenie_psg_port_a_r),
+	DEVCB_MEMORY_HANDLER("main", PROGRAM, cgenie_psg_port_b_r),
+	DEVCB_MEMORY_HANDLER("main", PROGRAM, cgenie_psg_port_a_w),
+	DEVCB_MEMORY_HANDLER("main", PROGRAM, cgenie_psg_port_b_w)
 };
 
 

@@ -116,6 +116,7 @@ CPUS += TMS32026
 CPUS += TMS32031
 CPUS += TMS32032
 CPUS += TMS32051
+CPUS += TMS57002
 CPUS += CCPU
 CPUS += ADSP21XX
 CPUS += PSXCPU
@@ -526,6 +527,7 @@ $(MAMEOBJ)/atari.a: \
 	$(DRIVERS)/tank8.o $(AUDIO)/tank8.o $(VIDEO)/tank8.o \
 	$(DRIVERS)/tempest.o \
 	$(DRIVERS)/thunderj.o $(VIDEO)/thunderj.o \
+	$(DRIVERS)/tomcat.o \
 	$(DRIVERS)/toobin.o $(VIDEO)/toobin.o \
 	$(DRIVERS)/tourtabl.o $(VIDEO)/tia.o \
 	$(DRIVERS)/triplhnt.o $(AUDIO)/triplhnt.o $(VIDEO)/triplhnt.o \
@@ -554,12 +556,13 @@ $(MAMEOBJ)/atlus.a: \
 $(MAMEOBJ)/barcrest.a: \
 	$(MACHINE)/meters.o \
 	$(DRIVERS)/mpu4.o \
+	$(DRIVERS)/mpu5.o \
 	$(MACHINE)/steppers.o \
 
 $(MAMEOBJ)/bfm.a: \
 	$(DRIVERS)/bfcobra.o \
 	$(DRIVERS)/bfm_sc2.o $(VIDEO)/bfm_adr2.o \
-	$(MACHINE)/bfm_bd1.o \
+	$(MACHINE)/bfm_bd1.o $(VIDEO)/bfm_dm01.o $(VIDEO)/awpvid.o\
 
 $(MAMEOBJ)/bmc.a: \
 	$(DRIVERS)/bmcbowl.o \
@@ -823,6 +826,7 @@ $(MAMEOBJ)/jaleco.a: \
 
 $(MAMEOBJ)/jpm.a: \
 	$(DRIVERS)/guab.o \
+	$(DRIVERS)/jpmsys5.o \
 	$(DRIVERS)/jpmimpct.o $(VIDEO)/jpmimpct.o \
 
 $(MAMEOBJ)/kaneko.a: \
@@ -1245,6 +1249,7 @@ $(MAMEOBJ)/seibu.a: \
 	$(DRIVERS)/legionna.o $(VIDEO)/legionna.o \
 	$(MACHINE)/seicop.o \
 	$(DRIVERS)/toki.o $(VIDEO)/toki.o \
+	$(DRIVERS)/feversoc.o \
 
 $(MAMEOBJ)/seta.a: \
 	$(DRIVERS)/aleck64.o $(MACHINE)/n64.o $(VIDEO)/n64.o \
@@ -1304,6 +1309,7 @@ $(MAMEOBJ)/suna.a: \
 	$(DRIVERS)/goindol.o $(VIDEO)/goindol.o \
 	$(DRIVERS)/suna8.o $(AUDIO)/suna8.o $(VIDEO)/suna8.o \
 	$(DRIVERS)/suna16.o $(VIDEO)/suna16.o \
+	$(DRIVERS)/go2000.o \
 
 $(MAMEOBJ)/taito.a: \
 	$(DRIVERS)/40love.o $(VIDEO)/40love.o \
@@ -1514,7 +1520,6 @@ $(MAMEOBJ)/zaccaria.a: \
 	$(DRIVERS)/zaccaria.o $(VIDEO)/zaccaria.o \
 
 
-
 #-------------------------------------------------
 # remaining drivers
 #-------------------------------------------------
@@ -1538,7 +1543,6 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/beaminv.o \
 	$(DRIVERS)/big10.o \
 	$(DRIVERS)/blackt96.o \
-	$(DRIVERS)/brasil.o \
 	$(DRIVERS)/buster.o \
 	$(DRIVERS)/calomega.o $(VIDEO)/calomega.o \
 	$(DRIVERS)/carrera.o \
@@ -1570,11 +1574,9 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/flower.o $(AUDIO)/flower.o $(VIDEO)/flower.o \
 	$(DRIVERS)/fortecar.o \
 	$(DRIVERS)/freekick.o $(VIDEO)/freekick.o \
-	$(DRIVERS)/fruit.o \
 	$(DRIVERS)/funworld.o $(VIDEO)/funworld.o \
 	$(DRIVERS)/galaxi.o \
 	$(DRIVERS)/gamecstl.o \
-	$(DRIVERS)/go2000.o \
 	$(DRIVERS)/good.o \
 	$(DRIVERS)/goldnpkr.o \
 	$(DRIVERS)/gotcha.o $(VIDEO)/gotcha.o \
@@ -1628,6 +1630,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/oneshot.o $(VIDEO)/oneshot.o \
 	$(DRIVERS)/onetwo.o \
 	$(DRIVERS)/othldrby.o $(VIDEO)/othldrby.o \
+	$(DRIVERS)/pachifev.o \
 	$(DRIVERS)/pangofun.o \
 	$(DRIVERS)/pasha2.o \
 	$(DRIVERS)/pass.o $(VIDEO)/pass.o \
@@ -1657,7 +1660,6 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/ssfindo.o \
 	$(DRIVERS)/ssingles.o \
 	$(DRIVERS)/sstrangr.o \
-	$(DRIVERS)/steaser.o \
 	$(DRIVERS)/statriv2.o \
 	$(DRIVERS)/supertnk.o \
 	$(DRIVERS)/tattack.o \
@@ -1705,11 +1707,15 @@ $(DRIVERS)/atarifb.o:	$(LAYOUT)/atarifb.lh \
 
 $(DRIVERS)/avalnche.o:	$(LAYOUT)/avalnche.lh
 
-$(DRIVERS)/brasil.o:	$(LAYOUT)/fashion.lh
+$(DRIVERS)/highvdeo.o:	$(LAYOUT)/fashion.lh
 
 $(DRIVERS)/bzone.o:		$(LAYOUT)/bzone.lh
 
 $(DRIVERS)/bfm_sc2.o:	$(LAYOUT)/bfm_sc2.lh \
+						$(LAYOUT)/awpdmd.lh \
+						$(LAYOUT)/awpvid14.lh \
+						$(LAYOUT)/awpvid16.lh \
+						$(LAYOUT)/drwho.lh \
 						$(LAYOUT)/gldncrwn.lh \
 						$(LAYOUT)/quintoon.lh \
 						$(LAYOUT)/paradice.lh \

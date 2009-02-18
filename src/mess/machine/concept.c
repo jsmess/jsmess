@@ -51,13 +51,13 @@ static void via_irq_func(const device_config *device, int state);
 
 const via6522_interface concept_via6522_intf =
 {	/* main via */
-	via_in_a, via_in_b,
-	NULL, NULL,
-	NULL, NULL,
-	via_out_a, via_out_b,
-	NULL, NULL,
-	NULL, via_out_cb2,
-	via_irq_func
+	DEVCB_HANDLER(via_in_a), DEVCB_HANDLER(via_in_b),
+	DEVCB_NULL, DEVCB_NULL,
+	DEVCB_NULL, DEVCB_NULL,
+	DEVCB_HANDLER(via_out_a), DEVCB_HANDLER(via_out_b),
+	DEVCB_NULL, DEVCB_NULL,
+	DEVCB_NULL, DEVCB_HANDLER(via_out_cb2),
+	DEVCB_LINE(via_irq_func)
 };
 
 /* keyboard interface */

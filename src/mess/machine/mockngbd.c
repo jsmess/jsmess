@@ -144,7 +144,8 @@ READ8_DEVICE_HANDLER(mockingboard_r)
 
 WRITE8_DEVICE_HANDLER(mockingboard_w)
 {
-	const address_space* space = cpu_get_address_space(device->machine->cpu[0],ADDRESS_SPACE_PROGRAM);
+	const device_config *ay8910_1 = devtag_get_device(device->machine, SOUND_AY8913, "ay8910.1");
+	const device_config *ay8910_2 = devtag_get_device(device->machine, SOUND_AY8913, "ay8910.2");
 	mockingboard_token *token = get_token(device);
 
 	if (LOG_MOCKINGBOARD)
@@ -157,15 +158,15 @@ WRITE8_DEVICE_HANDLER(mockingboard_w)
 			switch (data)
 			{
 				case 0x00: /* reset */
-					sndti_reset(SOUND_AY8910, 0);
+					device_reset(ay8910_1);
 					break;
 				case 0x04: /* make inactive */
 					break;
 				case 0x06: /* write data */
-					ay8910_write_port_0_w(space, 0, token->latch0);
+					ay8910_data_w(ay8910_1, 0, token->latch0);
 					break;
 				case 0x07: /* set register */
-					ay8910_control_port_0_w(space, 0, token->latch0);
+					ay8910_address_w(ay8910_1, 0, token->latch0);
 					break;
 			}
 			break;
@@ -182,15 +183,15 @@ WRITE8_DEVICE_HANDLER(mockingboard_w)
 			switch (data)
 			{
 				case 0x00: /* reset */
-					sndti_reset(SOUND_AY8910, 1);
+					device_reset(ay8910_2);
 					break;
 				case 0x04: /* make inactive */
 					break;
 				case 0x06: /* write data */
-					ay8910_write_port_1_w(space, 0, token->latch1);
+					ay8910_data_w(ay8910_2, 0, token->latch1);
 					break;
 				case 0x07: /* set register */
-					ay8910_control_port_1_w(space, 0, token->latch1);
+					ay8910_address_w(ay8910_2, 0, token->latch1);
 					break;
 			}
 			break;

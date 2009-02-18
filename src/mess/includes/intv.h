@@ -58,8 +58,8 @@ WRITE8_HANDLER ( intvkbd_dualport8_msb_w );
 
 /*----------- defined in audio/intv.c -----------*/
 
-READ16_HANDLER( AY8914_directread_port_0_lsb_r );
-WRITE16_HANDLER( AY8914_directwrite_port_0_lsb_w );
+READ16_DEVICE_HANDLER( AY8914_directread_port_0_lsb_r );
+WRITE16_DEVICE_HANDLER( AY8914_directwrite_port_0_lsb_w );
 
 
 #endif /* INTV_H_ */

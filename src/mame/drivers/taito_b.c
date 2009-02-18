@@ -968,15 +968,14 @@ static ADDRESS_MAP_START( masterw_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK1)
 	AM_RANGE(0x8000, 0x8fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x9000, 0x9000) AM_READ(ym2203_status_port_0_r)
+	AM_RANGE(0x9000, 0x9001) AM_DEVREAD(SOUND, "ym", ym2203_r)
 	AM_RANGE(0xa001, 0xa001) AM_READ(taitosound_slave_comm_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( masterw_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(ym2203_control_port_0_w)
-	AM_RANGE(0x9001, 0x9001) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0x9000, 0x9001) AM_DEVWRITE(SOUND, "ym", ym2203_w)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xa001, 0xa001) AM_WRITE(taitosound_slave_comm_w)
 ADDRESS_MAP_END
@@ -985,9 +984,7 @@ static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK1)
 	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe000, 0xe000) AM_READ(ym2610_status_port_0_a_r)
-	AM_RANGE(0xe001, 0xe001) AM_READ(ym2610_read_port_0_r)
-	AM_RANGE(0xe002, 0xe002) AM_READ(ym2610_status_port_0_b_r)
+	AM_RANGE(0xe000, 0xe003) AM_DEVREAD(SOUND, "ym", ym2610_r)
 	AM_RANGE(0xe200, 0xe200) AM_READ(SMH_NOP)
 	AM_RANGE(0xe201, 0xe201) AM_READ(taitosound_slave_comm_r)
 	AM_RANGE(0xea00, 0xea00) AM_READ(SMH_NOP)
@@ -996,10 +993,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(ym2610_control_port_0_a_w)
-	AM_RANGE(0xe001, 0xe001) AM_WRITE(ym2610_data_port_0_a_w)
-	AM_RANGE(0xe002, 0xe002) AM_WRITE(ym2610_control_port_0_b_w)
-	AM_RANGE(0xe003, 0xe003) AM_WRITE(ym2610_data_port_0_b_w)
+	AM_RANGE(0xe000, 0xe003) AM_DEVWRITE(SOUND, "ym", ym2610_w)
 	AM_RANGE(0xe200, 0xe200) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xe201, 0xe201) AM_WRITE(taitosound_slave_comm_w)
 	AM_RANGE(0xe400, 0xe403) AM_WRITE(SMH_NOP) /* pan */
@@ -1013,17 +1007,16 @@ static ADDRESS_MAP_START( viofight_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK1)
 	AM_RANGE(0x8000, 0x8fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x9000, 0x9000) AM_READ(ym2203_status_port_0_r)
-	AM_RANGE(0xb000, 0xb000) AM_READ(okim6295_status_0_r)
+	AM_RANGE(0x9000, 0x9001) AM_DEVREAD(SOUND, "ym", ym2203_r)
+	AM_RANGE(0xb000, 0xb000) AM_DEVREAD(SOUND, "oki", okim6295_r)
 	AM_RANGE(0xa001, 0xa001) AM_READ(taitosound_slave_comm_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( viofight_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(ym2203_control_port_0_w)
-	AM_RANGE(0x9001, 0x9001) AM_WRITE(ym2203_write_port_0_w)
-	AM_RANGE(0xb000, 0xb001) AM_WRITE(okim6295_data_0_w)		/* yes, both addresses for the same chip */
+	AM_RANGE(0x9000, 0x9001) AM_DEVWRITE(SOUND, "ym", ym2203_w)
+	AM_RANGE(0xb000, 0xb001) AM_DEVWRITE(SOUND, "oki", okim6295_w)		/* yes, both addresses for the same chip */
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xa001, 0xa001) AM_WRITE(taitosound_slave_comm_w)
 ADDRESS_MAP_END
@@ -2353,9 +2346,9 @@ GFXDECODE_END
 
 
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
-static void irqhandler(running_machine *machine, int irq)
+static void irqhandler(const device_config *device, int irq)
 {
-	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
@@ -2368,10 +2361,10 @@ static const ym2203_interface ym2203_config =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		NULL,
-		NULL,
-		bankswitch_w,
-		NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_MEMORY_HANDLER("audio", PROGRAM, bankswitch_w),
+		DEVCB_NULL,
 	},
 	irqhandler
 };
@@ -2391,10 +2384,10 @@ static void mb87078_gain_changed(running_machine *machine, int channel, int perc
 {
 	if (channel==1)
 	{
-		sound_type type = machine->config->sound[0].type;
-		sndti_set_output_gain(type, 0, 0, percent / 100.0);
-		sndti_set_output_gain(type, 1, 0, percent / 100.0);
-		sndti_set_output_gain(type, 2, 0, percent / 100.0);
+		const device_config *ym = devtag_get_device(machine, SOUND, "ym");
+		sound_set_output_gain(ym, 0, percent / 100.0);
+		sound_set_output_gain(ym, 1, percent / 100.0);
+		sound_set_output_gain(ym, 2, percent / 100.0);
 		//popmessage("MB87078 gain ch#%i percent=%i",channel,percent);
 	}
 }
@@ -3524,7 +3517,8 @@ ROM_START( spacedx )
 	ROM_LOAD( "pal16l8b-d72-06.ic50",  0x0200, 0x0104, CRC(e4aa4b2b) SHA1(46710ec46e6753656e502007b5515a56b60deb55) )
 	ROM_LOAD( "palce20v8-d72-07.ic28", 0x0400, 0x0157, CRC(6359e64c) SHA1(83786f047aef591eb147a16a282f5312b36bc489) )
 	ROM_LOAD( "palce20v8-d72-09.ic47", 0x0600, 0x0157, CRC(de1760fd) SHA1(332156699408e5b0a698f031c01f8aa85c3d5d32) )
-	ROM_LOAD( "palce16v8-d72-10.ic12", 0x0800, 0x0117, CRC(a5181ba2) SHA1(8315d6efa26be2ed98d4c0b39a196033789ab947) )
+	ROM_LOAD( "palce16v8-d72-10.ic12-read_1", 0x0800, 0x0117, BAD_DUMP CRC(a5181ba2) SHA1(8315d6efa26be2ed98d4c0b39a196033789ab947) ) /* One or both of these is bad */
+	ROM_LOAD( "palce16v8-d72-10.ic12-read_2", 0x0800, 0x0117, BAD_DUMP CRC(a01c8336) SHA1(25c0ec11e84d1b22c48bbe22f7a32cd7c5d69e94) ) /* we to need to verify this dump */
 	ROM_LOAD( "pal20l8b-d89-04.ic40",  0x0a00, 0x0144, NO_DUMP ) /* PAL is read protected */
 ROM_END
 
@@ -3549,7 +3543,8 @@ ROM_START( spacedxj )
 	ROM_LOAD( "pal16l8-d72-06.ic50",   0x0200, 0x0104, CRC(e96b7f37) SHA1(568087d0ab0ed55814deccc11630d3e26f765450) )
 	ROM_LOAD( "palce20v8-d72-07.ic28", 0x0400, 0x0157, CRC(6359e64c) SHA1(83786f047aef591eb147a16a282f5312b36bc489) )
 	ROM_LOAD( "palce20v8-d72-09.ic47", 0x0600, 0x0157, CRC(de1760fd) SHA1(332156699408e5b0a698f031c01f8aa85c3d5d32) )
-	ROM_LOAD( "palce16v8-d72-10.ic12", 0x0800, 0x0117, CRC(a01c8336) SHA1(25c0ec11e84d1b22c48bbe22f7a32cd7c5d69e94) )
+	ROM_LOAD( "palce16v8-d72-10.ic12-read_1", 0x0800, 0x0117, BAD_DUMP CRC(a5181ba2) SHA1(8315d6efa26be2ed98d4c0b39a196033789ab947) ) /* One or both of these is bad */
+	ROM_LOAD( "palce16v8-d72-10.ic12-read_2", 0x0800, 0x0117, BAD_DUMP CRC(a01c8336) SHA1(25c0ec11e84d1b22c48bbe22f7a32cd7c5d69e94) ) /* we to need to verify this dump */
 	ROM_LOAD( "pal20l8b-d89-04.ic40",  0x0a00, 0x0144, NO_DUMP ) /* PAL is read protected */
 ROM_END
 
@@ -3639,34 +3634,50 @@ ROM_END
 
 ROM_START( masterw )
 	ROM_REGION( 0x80000, "main", 0 )     /* 512k for 68000 code */
-	ROM_LOAD16_BYTE( "b72-06.rom", 0x00000, 0x20000, CRC(ae848eff) SHA1(8715e64c5e03097aff5bf1a27e3809619a7731f0) )
-	ROM_LOAD16_BYTE( "b72-12.rom", 0x00001, 0x20000, CRC(7176ce70) SHA1(f3462ab9fe7e118b16fbe31d8caca27452280bf9) )
-	ROM_LOAD16_BYTE( "b72-04.rom", 0x40000, 0x20000, CRC(141e964c) SHA1(324e881317a3bf9885c81bb53cdc3de782ec2952) )
-	ROM_LOAD16_BYTE( "b72-03.rom", 0x40001, 0x20000, CRC(f4523496) SHA1(2c3e9d014ace1ae5127f432292f8d19c3a0ae1b0) )
+	ROM_LOAD16_BYTE( "b72_06.33", 0x00000, 0x20000, CRC(ae848eff) SHA1(8715e64c5e03097aff5bf1a27e3809619a7731f0) )
+	ROM_LOAD16_BYTE( "b72_12.24", 0x00001, 0x20000, CRC(7176ce70) SHA1(f3462ab9fe7e118b16fbe31d8caca27452280bf9) )
+	ROM_LOAD16_BYTE( "b72_04.34", 0x40000, 0x20000, CRC(141e964c) SHA1(324e881317a3bf9885c81bb53cdc3de782ec2952) )
+	ROM_LOAD16_BYTE( "b72_03.25", 0x40001, 0x20000, CRC(f4523496) SHA1(2c3e9d014ace1ae5127f432292f8d19c3a0ae1b0) )
 
 	ROM_REGION( 0x1c000, "audio", 0 )     /* 64k for Z80 code */
-	ROM_LOAD( "b72-07.rom", 0x00000, 0x4000, CRC(2b1a946f) SHA1(cc9512e44bd92020ab5a53716b6399b7a6cde76d) )
+	ROM_LOAD( "b72_07.30", 0x00000, 0x4000, CRC(2b1a946f) SHA1(cc9512e44bd92020ab5a53716b6399b7a6cde76d) )
 	ROM_CONTINUE(           0x10000, 0xc000 ) /* banked stuff */
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "b72-02.rom", 0x000000, 0x080000, CRC(c519f65a) SHA1(f40cd7e09fa50abdafa95b7f9edf229e94e53d6f) )
-	ROM_LOAD( "b72-01.rom", 0x080000, 0x080000, CRC(a24ac26e) SHA1(895715a2bb0cb15334cba2283bd228b4fc08cd0c) )
+	ROM_LOAD( "b72-01.5", 0x080000, 0x080000, CRC(a24ac26e) SHA1(895715a2bb0cb15334cba2283bd228b4fc08cd0c) )
 ROM_END
 
 ROM_START( masterwu )
 	ROM_REGION( 0x80000, "main", 0 )     /* 512k for 68000 code */
-	ROM_LOAD16_BYTE( "b72-06.rom", 0x00000, 0x20000, CRC(ae848eff) SHA1(8715e64c5e03097aff5bf1a27e3809619a7731f0) )
-	ROM_LOAD16_BYTE( "b72-11.rom", 0x00001, 0x20000, CRC(0671fee6) SHA1(6bec65d5e6704b4ec62c91f814675841ae9316a0) )
-	ROM_LOAD16_BYTE( "b72-04.rom", 0x40000, 0x20000, CRC(141e964c) SHA1(324e881317a3bf9885c81bb53cdc3de782ec2952) )
-	ROM_LOAD16_BYTE( "b72-03.rom", 0x40001, 0x20000, CRC(f4523496) SHA1(2c3e9d014ace1ae5127f432292f8d19c3a0ae1b0) )
+	ROM_LOAD16_BYTE( "b72_06.33", 0x00000, 0x20000, CRC(ae848eff) SHA1(8715e64c5e03097aff5bf1a27e3809619a7731f0) )
+	ROM_LOAD16_BYTE( "b72_11.24", 0x00001, 0x20000, CRC(0671fee6) SHA1(6bec65d5e6704b4ec62c91f814675841ae9316a0) )
+	ROM_LOAD16_BYTE( "b72_04.34", 0x40000, 0x20000, CRC(141e964c) SHA1(324e881317a3bf9885c81bb53cdc3de782ec2952) )
+	ROM_LOAD16_BYTE( "b72_03.25", 0x40001, 0x20000, CRC(f4523496) SHA1(2c3e9d014ace1ae5127f432292f8d19c3a0ae1b0) )
 
 	ROM_REGION( 0x1c000, "audio", 0 )     /* 64k for Z80 code */
-	ROM_LOAD( "b72-07.rom", 0x00000, 0x4000, CRC(2b1a946f) SHA1(cc9512e44bd92020ab5a53716b6399b7a6cde76d) )
+	ROM_LOAD( "b72_07.30", 0x00000, 0x4000, CRC(2b1a946f) SHA1(cc9512e44bd92020ab5a53716b6399b7a6cde76d) )
 	ROM_CONTINUE(           0x10000, 0xc000 ) /* banked stuff */
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "b72-02.rom", 0x000000, 0x080000, CRC(c519f65a) SHA1(f40cd7e09fa50abdafa95b7f9edf229e94e53d6f) )
-	ROM_LOAD( "b72-01.rom", 0x080000, 0x080000, CRC(a24ac26e) SHA1(895715a2bb0cb15334cba2283bd228b4fc08cd0c) )
+	ROM_LOAD( "b72-01.5", 0x080000, 0x080000, CRC(a24ac26e) SHA1(895715a2bb0cb15334cba2283bd228b4fc08cd0c) )
+ROM_END
+
+ROM_START( masterwj )
+	ROM_REGION( 0x80000, "main", 0 )     /* 512k for 68000 code */
+	ROM_LOAD16_BYTE( "b72_06.33", 0x00000, 0x20000, CRC(ae848eff) SHA1(8715e64c5e03097aff5bf1a27e3809619a7731f0) )
+	ROM_LOAD16_BYTE( "b72_05.24", 0x00001, 0x20000, CRC(9f78af5c) SHA1(5f3ca663c7257f5cec071907b1526fff3ab07b20) )
+	ROM_LOAD16_BYTE( "b72_04.34", 0x40000, 0x20000, CRC(141e964c) SHA1(324e881317a3bf9885c81bb53cdc3de782ec2952) )
+	ROM_LOAD16_BYTE( "b72_03.25", 0x40001, 0x20000, CRC(f4523496) SHA1(2c3e9d014ace1ae5127f432292f8d19c3a0ae1b0) )
+
+	ROM_REGION( 0x1c000, "audio", 0 )     /* 64k for Z80 code */
+	ROM_LOAD( "b72_07.30", 0x00000, 0x4000, CRC(2b1a946f) SHA1(cc9512e44bd92020ab5a53716b6399b7a6cde76d) )
+	ROM_CONTINUE(          0x10000, 0xc000 ) /* banked stuff */
+
+	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD( "b72-02.6", 0x000000, 0x080000, CRC(843444eb) SHA1(2b466045f882996c80e0090009ee957e11d32825) )
+	ROM_LOAD( "b72-01.5", 0x080000, 0x080000, CRC(a24ac26e) SHA1(895715a2bb0cb15334cba2283bd228b4fc08cd0c) )
 ROM_END
 
 ROM_START( silentd )
@@ -3809,6 +3820,7 @@ static DRIVER_INIT( taito_b )
 
 GAME( 1989, masterw,  0,       masterw,  masterw,  taito_b, ROT270, "Taito Corporation Japan", "Master of Weapon (World)", GAME_SUPPORTS_SAVE )
 GAME( 1989, masterwu, masterw, masterw,  masterw,  taito_b, ROT270, "Taito America Corporation", "Master of Weapon (US)", GAME_SUPPORTS_SAVE )
+GAME( 1989, masterwj, masterw, masterw,  masterw,  taito_b, ROT270, "Taito Corporation", "Master of Weapon (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1988, nastar,   0,       rastsag2, nastar,   taito_b, ROT0,   "Taito Corporation Japan", "Nastar (World)", GAME_SUPPORTS_SAVE )
 GAME( 1988, nastarw,  nastar,  rastsag2, nastarw,  taito_b, ROT0,   "Taito America Corporation", "Nastar Warrior (US)", GAME_SUPPORTS_SAVE )
 GAME( 1988, rastsag2, nastar,  rastsag2, rastsag2, taito_b, ROT0,   "Taito Corporation", "Rastan Saga 2 (Japan)", GAME_SUPPORTS_SAVE )

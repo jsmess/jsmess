@@ -305,16 +305,22 @@ READ8_HANDLER(sms_input_port_0_r) {
 	}
 }
 
-WRITE8_HANDLER(sms_ym2413_register_port_0_w) {
-	if ( HAS_FM ) {
-		ym2413_register_port_0_w(space, offset, (data & 0x3F));
+WRITE8_HANDLER(sms_ym2413_register_port_0_w)
+{
+	if ( HAS_FM )
+	{
+		const device_config *ym = devtag_get_device(space->machine, SOUND_YM2413, "ym2413");
+		ym2413_w(ym, 0, (data & 0x3F));
 	}
 }
 
-WRITE8_HANDLER(sms_ym2413_data_port_0_w) {
-	if ( HAS_FM ) {
+WRITE8_HANDLER(sms_ym2413_data_port_0_w)
+{
+	if ( HAS_FM )
+	{
+		const device_config *ym = devtag_get_device(space->machine, SOUND_YM2413, "ym2413");
 		logerror("data_port_0_w %x %x\n", offset, data);
-		ym2413_data_port_0_w(space, offset, data);
+		ym2413_w(ym, 1, data);
 	}
 }
 

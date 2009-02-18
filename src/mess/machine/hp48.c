@@ -304,7 +304,7 @@ void hp48_reg_out( const device_config *device, int out )
 	/* bits 9-10: unused */
 	
 	/* bit 11: beeper */
-	dac_data_w( 0, (out & 0x800) ? 0x80 : 00 );
+	dac_data_w( devtag_get_device(device->machine, SOUND, "dac"), (out & 0x800) ? 0x80 : 00 );
 }
 
 static int hp48_get_in( running_machine *machine )

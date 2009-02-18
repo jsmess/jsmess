@@ -164,25 +164,25 @@ static const riot6532_interface aim65_riot_interface =
 /* system via interface */
 static const via6522_interface aim65_system_via =
 {
-	NULL,
-	aim65_via0_b_r,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	aim65_via0_a_w,
-	aim65_via0_b_w,
-	NULL,
-	NULL,
-	NULL,
-	aim65_printer_on,
-	aim65_via_irq_func
+	DEVCB_NULL,
+	DEVCB_HANDLER(aim65_via0_b_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(aim65_via0_a_w),
+	DEVCB_HANDLER(aim65_via0_b_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(aim65_printer_on),
+	DEVCB_LINE(aim65_via_irq_func)
 };
 
 /* user via interface */
 static const via6522_interface aim65_user_via =
 {
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
+	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 };
 
 /******************************************************************************

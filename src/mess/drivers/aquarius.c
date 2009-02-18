@@ -206,8 +206,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( aquarius_io, ADDRESS_SPACE_IO, 8)
 //	AM_RANGE(0x7e, 0x7f) AM_MIRROR(0xff00) AM_READWRITE(modem_r, modem_w)
 //	AM_RANGE(0xe0, 0xef) AM_MIRROR(0xff00) AM_READWRITE(floppy_r, floppy_w)
-	AM_RANGE(0xf6, 0xf6) AM_MIRROR(0xff00) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)
-	AM_RANGE(0xf7, 0xf7) AM_MIRROR(0xff00) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0xf6, 0xf6) AM_MIRROR(0xff00) AM_DEVREADWRITE(SOUND_AY8910, "ay8910", ay8910_r, ay8910_data_w)
+	AM_RANGE(0xf7, 0xf7) AM_MIRROR(0xff00) AM_DEVWRITE(SOUND_AY8910, "ay8910", ay8910_address_w)
 	AM_RANGE(0xfc, 0xfc) AM_MIRROR(0xff00) AM_READWRITE(cassette_r, cassette_w)
 	AM_RANGE(0xfd, 0xfd) AM_MIRROR(0xff00) AM_READWRITE(vsync_r, mapper_w)
 	AM_RANGE(0xfe, 0xfe) AM_MIRROR(0xff00) AM_READWRITE(printer_r, printer_w)
@@ -333,24 +333,14 @@ static INTERRUPT_GEN( aquarius_interrupt )
 
 /* Sound Interface */
 
-static READ8_HANDLER( aquarius_ay8910_port_a_r )
-{
-	return input_port_read(space->machine, "RIGHT");
-}
-
-static READ8_HANDLER( aquarius_ay8910_port_b_r )
-{
-	return input_port_read(space->machine, "LEFT");
-}
-
 static const ay8910_interface aquarius_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	aquarius_ay8910_port_a_r,
-	aquarius_ay8910_port_b_r,
-	NULL,
-	NULL
+	DEVCB_INPUT_PORT("RIGHT"),
+	DEVCB_INPUT_PORT("LEFT"),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 /* Machine Initialization */

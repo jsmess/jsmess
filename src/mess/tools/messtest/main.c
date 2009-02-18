@@ -92,10 +92,6 @@ int CLIB_DECL main(int argc, char *argv[])
 	failure_count = 0;
 	messtest_options = NULL;
 
-	/* since the cpuintrf and sndintrf structures are filled dynamically now, we
-	 * have to init first */
-	sndintrf_init(NULL);
-
 	/* register options */
 	messtest_options = options_create(messtest_fail);
 	options_add_entries(messtest_options, messtest_option_entries);

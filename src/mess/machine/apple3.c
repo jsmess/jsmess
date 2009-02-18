@@ -509,36 +509,36 @@ static void apple2_via_1_irq_func(const device_config *device, int state)
 
 const via6522_interface apple3_via_0_intf =
 {
-	NULL,					/* in_a_func */
-	NULL,					/* in_b_func */
-	NULL,					/* in_ca1_func */
-	NULL,					/* in_cb1_func */
-	NULL,					/* in_ca2_func */
-	NULL,					/* in_cb2_func */
-	apple3_via_0_out_a,		/* out_a_func */
-	apple3_via_0_out_b,		/* out_b_func */
-	NULL,					/* out_ca1_func */
-	NULL,					/* out_cb1_func */
-	NULL,					/* out_ca2_func */
-	NULL,					/* out_cb2_func */
-	NULL					/* irq_func */
+	DEVCB_NULL,					/* in_a_func */
+	DEVCB_NULL,					/* in_b_func */
+	DEVCB_NULL,					/* in_ca1_func */
+	DEVCB_NULL,					/* in_cb1_func */
+	DEVCB_NULL,					/* in_ca2_func */
+	DEVCB_NULL,					/* in_cb2_func */
+	DEVCB_HANDLER(apple3_via_0_out_a),		/* out_a_func */
+	DEVCB_HANDLER(apple3_via_0_out_b),		/* out_b_func */
+	DEVCB_NULL,					/* out_ca1_func */
+	DEVCB_NULL,					/* out_cb1_func */
+	DEVCB_NULL,					/* out_ca2_func */
+	DEVCB_NULL,					/* out_cb2_func */
+	DEVCB_NULL					/* irq_func */
 };
 
 const via6522_interface apple3_via_1_intf =
 {
-	apple3_via_1_in_a,		/* in_a_func */
-	apple3_via_1_in_b,		/* in_b_func */
-	NULL,					/* in_ca1_func */
-	NULL,					/* in_cb1_func */
-	NULL,					/* in_ca2_func */
-	NULL,					/* in_cb2_func */
-	apple3_via_1_out_a,		/* out_a_func */
-	apple3_via_1_out_b,		/* out_b_func */
-	NULL,					/* out_ca1_func */
-	NULL,					/* out_cb1_func */
-	NULL,					/* out_ca2_func */
-	NULL,					/* out_cb2_func */
-	apple2_via_1_irq_func	/* irq_func */
+	DEVCB_HANDLER(apple3_via_1_in_a),		/* in_a_func */
+	DEVCB_HANDLER(apple3_via_1_in_b),		/* in_b_func */
+	DEVCB_NULL,					/* in_ca1_func */
+	DEVCB_NULL,					/* in_cb1_func */
+	DEVCB_NULL,					/* in_ca2_func */
+	DEVCB_NULL,					/* in_cb2_func */
+	DEVCB_HANDLER(apple3_via_1_out_a),		/* out_a_func */
+	DEVCB_HANDLER(apple3_via_1_out_b),		/* out_b_func */
+	DEVCB_NULL,					/* out_ca1_func */
+	DEVCB_NULL,					/* out_cb1_func */
+	DEVCB_NULL,					/* out_ca2_func */
+	DEVCB_NULL,					/* out_cb2_func */
+	DEVCB_LINE(apple2_via_1_irq_func)	/* irq_func */
 };
 
 

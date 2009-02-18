@@ -21,6 +21,7 @@
   * fix root counters in machine/psx.c so the hack here (actually MAME 0.89's machine/psx.c code)
     can be removed
   * integrate ATAPI code with Aaron's ATA/IDE code
+  * emulate memory card board GE885-PWB(A)A ( contains Toshiba tmpr3904af, ram, rom, tranceiver and glue ).
 
   -----------------------------------------------------------------------------------------
 
@@ -202,7 +203,68 @@
         C2242      - 2SC2242 Transistor
         PC817      - Sharp PC817 Photo-coupler IC (DIP4)
         PAL        - AMD PALCE16V8Q, stamped 'E765Bx' (DIP20)
-*/
+
+
+  Digital I/O PCB
+  ---------------
+
+  GX894-PWB(B)A (C)1999 KONAMI CO. LTD.
+
+             |-------------|
+             |        CN12 |
+             |             |
+             | PC847 PC847 |
+             |             |
+             |        CN11 |
+             |             |
+             | PC847 PC847 |
+             |             |
+             | DS2401 CN10 |
+             |             |
+             | PC847 PC847 |
+             |             |
+             |  CN14  CN13 |
+  |----------|             |----------|
+  |                  PC847            |
+  | ADM232 CN17              XC9536   |
+  |                                   |
+  |                    19.6608MHz     |-----------|
+  | ADM232 CN15  CY7C109                          |
+  |                       HY51V65164A HY51V65164A |
+  |                            HY51V65164A        |
+  |      CN16    XCS40XL                          |
+  |                                               |
+  | AK4309B   CN18         29.450MHz  MAS3507D    |
+  |                                               |
+  |                           CN3                 |
+  | HYC24855  RCA-L/R                             |
+  |-----------------------------------------------|
+
+  Notes:
+
+  PC847       - High Density Mounting Type Photocoupler
+  CN12        - 13 pin connector with 8 wires to external connectors
+  CN11        - 12 pin connector with 8 wires to external connectors
+  DS2401      - DS2401 911C2  Silicon serial number
+  CN10        - 10 pin connector with 8 wires to external connectors
+  CN14        - 7 pin connector
+  CN13        - 5 pin connector with 2 wires to external connectors
+  ADM232      - ADM232AARN 9933 H48475  High Speed, 5 V, 0.1 uF CMOS RS-232 Drivers/Receivers
+  CN17        - 3 pin connector
+  XC9536      - XILINX XC9536 PC44AEM9933 F1096429A 15C
+  CN15        - 8 pin connector
+  CY7C109     - CY7C109-25VC 931 H 04 404825  128k x 8 Static RAM
+  HY51V65164A - 64M bit dynamic EDO RAM
+  CN16        - 4 pin connector joining this PCB to the CD-DA IN on the MAIN PCB.
+  XCS40XL     - XILINX XCS40XL PQ208AKP9929 A2033251A 4C
+  AK4309B     - AKM AK4309B 3N932N  16bit SCF DAC
+  CN18        - 6 pin connector
+  MAS3507D    - IM MAS3507D D8 9173 51 HM U 072953.000 ES  MPEG 1/2 Layer 2/3 Audio Decoder
+  CN3         - Connector joining this PCB to the MAIN PCB
+  HYC24855    - ?
+  RCA-L/R     - RCA connectors for left/right audio output
+
+  */
 
 #include "driver.h"
 #include "cdrom.h"
@@ -1302,7 +1364,7 @@ static ADDRESS_MAP_START( konami573_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x1f801008, 0x1f80100b) AM_RAM /* ?? */
 	AM_RANGE(0x1f80100c, 0x1f80102f) AM_WRITENOP
 	AM_RANGE(0x1f801010, 0x1f801013) AM_READNOP
-	AM_RANGE(0x1f801014, 0x1f801017) AM_READ(psx_spu_delay_r)
+	AM_RANGE(0x1f801014, 0x1f801017) AM_DEVREAD(SOUND, "spu", psx_spu_delay_r)
 	AM_RANGE(0x1f801040, 0x1f80105f) AM_READWRITE(psx_sio_r, psx_sio_w)
 	AM_RANGE(0x1f801060, 0x1f80106f) AM_WRITENOP
 	AM_RANGE(0x1f801070, 0x1f801077) AM_READWRITE(psx_irq_r, psx_irq_w)
@@ -1310,7 +1372,7 @@ static ADDRESS_MAP_START( konami573_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x1f801100, 0x1f80112f) AM_READWRITE(k573_counter_r, k573_counter_w)
 	AM_RANGE(0x1f801810, 0x1f801817) AM_READWRITE(psx_gpu_r, psx_gpu_w)
 	AM_RANGE(0x1f801820, 0x1f801827) AM_READWRITE(psx_mdec_r, psx_mdec_w)
-	AM_RANGE(0x1f801c00, 0x1f801dff) AM_READWRITE(psx_spu_r, psx_spu_w)
+	AM_RANGE(0x1f801c00, 0x1f801dff) AM_DEVREADWRITE(SOUND, "spu", psx_spu_r, psx_spu_w)
 	AM_RANGE(0x1f802020, 0x1f802033) AM_RAM /* ?? */
 	AM_RANGE(0x1f802040, 0x1f802043) AM_WRITENOP
 	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_SHARE(2) AM_REGION("user1", 0) /* bios */
@@ -1525,10 +1587,15 @@ static MACHINE_RESET( konami573 )
 	flash_bank = -1;
 }
 
+static void spu_irq(const device_config *device, UINT32 data)
+{
+	psx_irq_set(device->machine, data);
+}
+
 static const psx_spu_interface konami573_psxspu_interface =
 {
 	&g_p_n_psxram,
-	psx_irq_set,
+	spu_irq,
 	psx_dma_install_read_handler,
 	psx_dma_install_write_handler
 };
@@ -1560,7 +1627,7 @@ static void update_mode( running_machine *machine )
 	if( inserted_cdrom != new_cdrom )
 	{
 		inserted_cdrom = new_cdrom;
-		cdda_set_cdrom(0, atapi_get_device());
+		cdda_set_cdrom(devtag_get_device(machine, SOUND, "cdda"), atapi_get_device());
 	}
 }
 
