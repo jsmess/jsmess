@@ -87,7 +87,6 @@ Notes:
 #include "cpu/cdp1802/cdp1802.h"
 #include "sound/cdp1869.h"
 #include "includes/tmc600.h"
-#include "video/cdp1869.h"
 
 static const device_config *cassette_device_image(running_machine *machine)
 {
@@ -118,14 +117,14 @@ static WRITE8_HANDLER( printer_w )
 static ADDRESS_MAP_START( tmc600_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x4fff) AM_ROM
 	AM_RANGE(0x6000, 0xbfff) AM_RAMBANK(1)
-	AM_RANGE(0xf400, 0xf7ff) AM_DEVREADWRITE(CDP1869_VIDEO, CDP1869_TAG, cdp1869_charram_r, cdp1869_charram_w)
-	AM_RANGE(0xf800, 0xffff) AM_DEVREADWRITE(CDP1869_VIDEO, CDP1869_TAG, cdp1869_pageram_r, cdp1869_pageram_w)
+	AM_RANGE(0xf400, 0xf7ff) AM_DEVREADWRITE(SOUND, CDP1869_TAG, cdp1869_charram_r, cdp1869_charram_w)
+	AM_RANGE(0xf800, 0xffff) AM_DEVREADWRITE(SOUND, CDP1869_TAG, cdp1869_pageram_r, cdp1869_pageram_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tmc600_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x03, 0x03) AM_WRITE(keyboard_latch_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(printer_w)
-	AM_RANGE(0x05, 0x05) AM_DEVWRITE(CDP1869_VIDEO, CDP1869_TAG, tmc600_vismac_data_w)
+	AM_RANGE(0x05, 0x05) AM_DEVWRITE(SOUND, CDP1869_TAG, tmc600_vismac_data_w)
 //  AM_RANGE(0x06, 0x06) AM_WRITE(floppy_w)
 	AM_RANGE(0x07, 0x07) AM_WRITE(tmc600_vismac_register_w)
 ADDRESS_MAP_END
@@ -282,7 +281,7 @@ static CDP1802_INTERFACE( tmc600_cdp1802_config )
 static MACHINE_START( tmc600 )
 {
 	tmc600_state *state = machine->driver_data;
-	const address_space *program = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
+	const address_space *program = cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
 
 	/* configure RAM */
 
@@ -313,7 +312,7 @@ static MACHINE_START( tmc600 )
 
 static MACHINE_RESET( tmc600 )
 {
-	cputag_set_input_line(machine, "main", INPUT_LINE_RESET, PULSE_LINE);
+	cputag_set_input_line(machine, CDP1802_TAG, INPUT_LINE_RESET, PULSE_LINE);
 }
 
 /* Machine Drivers */
@@ -330,7 +329,7 @@ static MACHINE_DRIVER_START( tmc600 )
 
 	// basic system hardware
 
-	MDRV_CPU_ADD("main", CDP1802, 3579545)	// ???
+	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, 3579545)	// ???
 	MDRV_CPU_PROGRAM_MAP(tmc600_map, 0)
 	MDRV_CPU_IO_MAP(tmc600_io_map, 0)
 	MDRV_CPU_CONFIG(tmc600_cdp1802_config)
@@ -338,16 +337,9 @@ static MACHINE_DRIVER_START( tmc600 )
 	MDRV_MACHINE_START(tmc600)
 	MDRV_MACHINE_RESET(tmc600)
 
-	// video hardware
+	// sound and video hardware
 
 	MDRV_IMPORT_FROM(tmc600_video)
-
-	// sound hardware
-
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-
-	MDRV_SOUND_ADD("cdp1869", CDP1869, CDP1869_DOT_CLK_PAL)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* printer */
 	MDRV_PRINTER_ADD("printer")
@@ -359,7 +351,7 @@ MACHINE_DRIVER_END
 /* ROMs */
 
 ROM_START( tmc600s1 )
-	ROM_REGION( 0x5000, "main", 0 )
+	ROM_REGION( 0x5000, CDP1802_TAG, 0 )
 	ROM_LOAD( "sb20",		0x0000, 0x1000, NO_DUMP )
 	ROM_LOAD( "sb21",		0x1000, 0x1000, NO_DUMP )
 	ROM_LOAD( "sb22",		0x2000, 0x1000, NO_DUMP )
@@ -371,7 +363,7 @@ ROM_START( tmc600s1 )
 ROM_END
 
 ROM_START( tmc600s2 )
-	ROM_REGION( 0x5000, "main", 0 )
+	ROM_REGION( 0x5000, CDP1802_TAG, 0 )
 	ROM_LOAD( "sb30",		0x0000, 0x1000, CRC(95d1292a) SHA1(1fa52d59d3005f8ac74a32c2164fdb22947c2748) )
 	ROM_LOAD( "sb31",		0x1000, 0x1000, CRC(2c8f3d17) SHA1(f14e8adbcddeaeaa29b1e7f3dfa741f4e230f599) )
 	ROM_LOAD( "sb32",		0x2000, 0x1000, CRC(dd58a128) SHA1(be9bdb0fc5e0cc3dcc7f2fb7ccab69bf5b043803) )

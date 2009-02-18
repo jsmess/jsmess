@@ -1,5 +1,5 @@
 #include "driver.h"
-#include "video/cdp1869.h"
+#include "sound/cdp1869.h"
 #include "includes/tmc600.h"
 
 WRITE8_HANDLER( tmc600_vismac_register_w )
@@ -111,13 +111,16 @@ static CDP1869_PCB_READ( tmc600_pcb_r )
 
 static CDP1869_INTERFACE( tmc600_cdp1869_intf )
 {
+	CDP1802_TAG,
+	SCREEN_TAG,
+	CDP1869_COLOR_CLK_PAL,
 	CDP1869_PAL,
 	tmc600_page_ram_r,
 	tmc600_page_ram_w,
 	tmc600_pcb_r,
 	tmc600_char_ram_r,
 	NULL,
-	NULL
+	DEVCB_NULL
 };
 
 static VIDEO_START( tmc600 )
@@ -131,7 +134,7 @@ static VIDEO_START( tmc600 )
 
 	/* find devices */
 
-	state->cdp1869 = devtag_get_device(machine, CDP1869_VIDEO, CDP1869_TAG);
+	state->cdp1869 = devtag_get_device(machine, SOUND, CDP1869_TAG);
 
 	/* find memory regions */
 
@@ -168,5 +171,7 @@ MACHINE_DRIVER_START( tmc600_video )
 	MDRV_VIDEO_UPDATE(tmc600)
 	MDRV_SCREEN_RAW_PARAMS(CDP1869_DOT_CLK_PAL, CDP1869_SCREEN_WIDTH, CDP1869_HBLANK_END, CDP1869_HBLANK_START, CDP1869_TOTAL_SCANLINES_PAL, CDP1869_SCANLINE_VBLANK_END_PAL, CDP1869_SCANLINE_VBLANK_START_PAL)
 
-	MDRV_CDP1869_ADD(CDP1869_TAG, SCREEN_TAG, CDP1869_DOT_CLK_PAL, CDP1869_COLOR_CLK_PAL, "main", tmc600_cdp1869_intf)
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_CDP1869_ADD(CDP1869_TAG, CDP1869_DOT_CLK_PAL, tmc600_cdp1869_intf)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
