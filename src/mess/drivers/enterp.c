@@ -268,7 +268,7 @@ static ADDRESS_MAP_START( enterprise_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x10, 0x13) AM_MIRROR(0x04) AM_DEVREADWRITE(WD1770, "wd1770", wd17xx_r, wd17xx_w)
 	AM_RANGE(0x18, 0x18) AM_MIRROR(0x04) AM_READWRITE(exdos_card_r, exdos_card_w)
 	AM_RANGE(0x80, 0x8f) AM_WRITE(Nick_reg_w)
-	AM_RANGE(0xa0, 0xbf) AM_DEVREADWRITE(SOUND_DAVE, "custom", dave_reg_r, dave_reg_w)
+	AM_RANGE(0xa0, 0xbf) AM_DEVREADWRITE(SOUND, "custom", dave_reg_r, dave_reg_w)
 ADDRESS_MAP_END
 
 

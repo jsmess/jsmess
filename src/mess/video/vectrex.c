@@ -404,7 +404,7 @@ static WRITE8_DEVICE_HANDLER(v_via_pb_w)
 	/* Sound */
 	if (data & 0x10)
 	{
-		const device_config *ay8912 = devtag_get_device(device->machine, SOUND_AY8912, "ay8912");
+		const device_config *ay8912 = devtag_get_device(device->machine, SOUND, "ay8912");
 
 		if (data & 0x08) /* BC1 (do we select a reg or write it ?) */
 			ay8910_address_w(ay8912, 0, vectrex_via_out[PORTA]);

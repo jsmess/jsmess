@@ -67,7 +67,7 @@ static ADDRESS_MAP_START( mtx_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x04, 0x04) AM_READWRITE(mtx_prt_r, mtx_prt_w)
 	AM_RANGE(0x05, 0x05) AM_READWRITE(mtx_key_lo_r, mtx_sense_w)
 	AM_RANGE(0x06, 0x06) AM_READ(mtx_key_hi_r)
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE(SOUND_SN76489A, "sn76489a", sn76496_w)
+	AM_RANGE(0x06, 0x06) AM_DEVWRITE(SOUND, "sn76489a", sn76496_w)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE(Z80CTC, "z80ctc", mtx_ctc_r, mtx_ctc_w)
 ADDRESS_MAP_END
 

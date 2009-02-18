@@ -230,8 +230,8 @@ static ADDRESS_MAP_START(pc8_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0340, 0x0357) AM_READ(return8_FF) /* anonymous bios should not recogniced realtimeclock */
 	AM_RANGE(0x0378, 0x037f) AM_READWRITE(pc_parallelport1_r,	pc_parallelport1_w)
 #ifdef ADLIB
-	AM_RANGE(0x0388, 0x0388) AM_DEVREADWRITE(SOUND_YM3812, "ym3812", ym3812_status_port_r,ym3812_control_port_w)
-	AM_RANGE(0x0389, 0x0389) AM_DEVWRITE(SOUND_YM3812, "ym3812", ym3812_write_port_w)
+	AM_RANGE(0x0388, 0x0388) AM_DEVREADWRITE(SOUND, "ym3812", ym3812_status_port_r,ym3812_control_port_w)
+	AM_RANGE(0x0389, 0x0389) AM_DEVWRITE(SOUND, "ym3812", ym3812_write_port_w)
 #endif
 	AM_RANGE(0x03bc, 0x03be) AM_READWRITE(pc_parallelport0_r,	pc_parallelport0_w)
 	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE(INS8250, "ins8250_2", ins8250_r, ins8250_w)
@@ -261,8 +261,8 @@ static ADDRESS_MAP_START(pc16_io, ADDRESS_SPACE_IO, 16)
 	AM_RANGE(0x0340, 0x0357) AM_READ(return16_FFFF) /* anonymous bios should not recogniced realtimeclock */
 	AM_RANGE(0x0378, 0x037f) AM_READWRITE(pc16le_parallelport1_r,	pc16le_parallelport1_w)
 #ifdef ADLIB
-	AM_RANGE(0x0388, 0x0388) AM_DEVREADWRITE8(SOUND_YM3812, "ym3812", ym3812_status_port_r,ym3812_control_port_w, 0xffff)
-	AM_RANGE(0x0389, 0x0389) AM_DEVWRITE8(SOUND_YM3812, "ym3812", ym3812_write_port_w, 0xffff)
+	AM_RANGE(0x0388, 0x0388) AM_DEVREADWRITE8(SOUND, "ym3812", ym3812_status_port_r,ym3812_control_port_w, 0xffff)
+	AM_RANGE(0x0389, 0x0389) AM_DEVWRITE8(SOUND, "ym3812", ym3812_write_port_w, 0xffff)
 #endif
 	AM_RANGE(0x03bc, 0x03bf) AM_READWRITE(pc16le_parallelport0_r,	pc16le_parallelport0_w)
 	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE8(INS8250, "ins8250_2", ins8250_r, ins8250_w, 0xffff)
@@ -300,8 +300,8 @@ static ADDRESS_MAP_START(europc_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0324, 0x0327) AM_READWRITE(pc_HDC2_r,			pc_HDC2_w)
 	AM_RANGE(0x0378, 0x037b) AM_READWRITE(pc_parallelport1_r,	pc_parallelport1_w)
 #ifdef ADLIB
-	AM_RANGE(0x0388, 0x0388) AM_DEVREADWRITE(SOUND_YM3812, "ym3812", ym3812_status_port_r,ym3812_control_port_w)
-	AM_RANGE(0x0389, 0x0389) AM_DEVWRITE(SOUND_YM3812, "ym3812", ym3812_write_port_w)
+	AM_RANGE(0x0388, 0x0388) AM_DEVREADWRITE(SOUND, "ym3812", ym3812_status_port_r,ym3812_control_port_w)
+	AM_RANGE(0x0389, 0x0389) AM_DEVWRITE(SOUND, "ym3812", ym3812_write_port_w)
 #endif
 //	AM_RANGE(0x03bc, 0x03bf) AM_READWRITE(pc16le_parallelport0_r,   pc16le_parallelport0_w)
 	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE(INS8250, "ins8250_2", ins8250_r, ins8250_w)

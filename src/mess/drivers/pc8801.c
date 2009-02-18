@@ -417,7 +417,7 @@ static ADDRESS_MAP_START( pc88sr_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x32, 0x32) AM_READWRITE( pc88sr_inport_32, pc88sr_outport_32 )
 	AM_RANGE(0x34, 0x35) AM_WRITE( pc88sr_ALU )
 	AM_RANGE(0x40, 0x40) AM_READWRITE( pc88sr_inport_40, pc88sr_outport_40 )
-	AM_RANGE(0x44, 0x45) AM_DEVREAD( SOUND_YM2203, "ym2203", ym2203_r )
+	AM_RANGE(0x44, 0x45) AM_DEVREAD( SOUND, "ym2203", ym2203_r )
 	AM_RANGE(0x46, 0x47) AM_NOP										/* OPNA extra port (not yet) */
 	AM_RANGE(0x50, 0x51) AM_READWRITE( pc8801_crtc_read, pc8801_crtc_write )
 	AM_RANGE(0x52, 0x5b) AM_WRITE( pc8801_palette_out )

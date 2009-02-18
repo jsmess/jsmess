@@ -344,7 +344,7 @@ INPUT_PORTS_END
 static ADDRESS_MAP_START( intv_mem , ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x0000, 0x003f) AM_READWRITE( stic_r, stic_w )
     AM_RANGE(0x0100, 0x01ef) AM_READWRITE( intv_ram8_r, intv_ram8_w )
-    AM_RANGE(0x01f0, 0x01ff) AM_DEVREADWRITE( SOUND_AY8910, "ay8910", AY8914_directread_port_0_lsb_r, AY8914_directwrite_port_0_lsb_w )
+    AM_RANGE(0x01f0, 0x01ff) AM_DEVREADWRITE( SOUND, "ay8910", AY8914_directread_port_0_lsb_r, AY8914_directwrite_port_0_lsb_w )
  	AM_RANGE(0x0200, 0x035f) AM_READWRITE( intv_ram16_r, intv_ram16_w )
 	AM_RANGE(0x1000, 0x1fff) AM_ROM	AM_REGION("main", 0x1000<<1)	/* Exec ROM, 10-bits wide */
 	AM_RANGE(0x3000, 0x37ff) AM_ROM	AM_REGION("main", 0x3000<<1)	/* GROM,     8-bits wide */
@@ -355,7 +355,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( intvkbd_mem , ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x0000, 0x003f) AM_READWRITE( stic_r, stic_w )
     AM_RANGE(0x0100, 0x01ef) AM_READWRITE( intv_ram8_r, intv_ram8_w )
-    AM_RANGE(0x01f0, 0x01ff) AM_DEVREADWRITE( SOUND_AY8910, "ay8910", AY8914_directread_port_0_lsb_r, AY8914_directwrite_port_0_lsb_w )
+    AM_RANGE(0x01f0, 0x01ff) AM_DEVREADWRITE( SOUND, "ay8910", AY8914_directread_port_0_lsb_r, AY8914_directwrite_port_0_lsb_w )
  	AM_RANGE(0x0200, 0x035f) AM_READWRITE( intv_ram16_r, intv_ram16_w )
 	AM_RANGE(0x1000, 0x1fff) AM_ROM	AM_REGION("main", 0x1000<<1)	/* Exec ROM, 10-bits wide */
 	AM_RANGE(0x3000, 0x37ff) AM_ROM	AM_REGION("main", 0x3000<<1)	/* GROM,     8-bits wide */

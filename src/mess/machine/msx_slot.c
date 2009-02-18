@@ -1551,12 +1551,12 @@ MSX_SLOT_WRITE(fmpac)
 	switch (addr) {
 	case 0x7ff4:
 		if (state->cart.fmpac.opll_active) {
-			ym2413_w (devtag_get_device(space->machine, SOUND_AY8910, "ay8910"), 0, val);
+			ym2413_w (devtag_get_device(space->machine, SOUND, "ay8910"), 0, val);
 		}
 		break;
 	case 0x7ff5:
 		if (state->cart.fmpac.opll_active) {
-			ym2413_w (devtag_get_device(space->machine, SOUND_AY8910, "ay8910"), 1, val);
+			ym2413_w (devtag_get_device(space->machine, SOUND, "ay8910"), 1, val);
 		}
 		break;
 	case 0x7ff6:

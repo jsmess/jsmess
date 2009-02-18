@@ -172,7 +172,7 @@ static READ8_DEVICE_HANDLER ( oric_via_in_a_func )
 		/* if psg is in read register state return reg data */
 		if (oric_psg_control==0x01)
 		{
-			return ay8910_r(devtag_get_device(space->machine, SOUND_AY8912, "ay8912"), 0);
+			return ay8910_r(devtag_get_device(space->machine, SOUND, "ay8912"), 0);
 		}
 
 		/* return high-impedance */
@@ -215,14 +215,14 @@ static void oric_psg_connection_refresh(running_machine *machine)
 			/* write register data */
 			case 2:
 			{
-				const device_config *ay8912 = devtag_get_device(machine, SOUND_AY8912, "ay8912");
+				const device_config *ay8912 = devtag_get_device(machine, SOUND, "ay8912");
 				ay8910_data_w(ay8912, 0, oric_via_port_a_data);
 			}
 			break;
 			/* write register index */
 			case 3:
 			{
-				const device_config *ay8912 = devtag_get_device(machine, SOUND_AY8912, "ay8912");
+				const device_config *ay8912 = devtag_get_device(machine, SOUND, "ay8912");
 				ay8910_address_w(ay8912, 0, oric_via_port_a_data);
 			}
 			break;

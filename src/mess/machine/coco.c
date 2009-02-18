@@ -1588,7 +1588,7 @@ static WRITE8_HANDLER( dragon64_pia1_pb_w )
 
 static WRITE8_HANDLER( dgnalpha_pia2_pa_w )
 {
-	const device_config *ay8910 = devtag_get_device(space->machine, SOUND_AY8910, "ay8910");
+	const device_config *ay8910 = devtag_get_device(space->machine, SOUND, "ay8910");
 	int	bc_flags;		/* BCDDIR/BC1, as connected to PIA2 port a bits 0 and 1 */
 
 	/* If bit 2 of the pia2 ddra is 1 then this pin is an output so use it */

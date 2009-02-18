@@ -741,7 +741,7 @@ static READ8_HANDLER(einstein_serial_r)
 
 static WRITE8_HANDLER(einstein_psg_w)
 {
-	const device_config *ay8910 = devtag_get_device(space->machine, SOUND_AY8910, "ay8910");
+	const device_config *ay8910 = devtag_get_device(space->machine, SOUND, "ay8910");
 	int reg = offset & 0x03;
 
 	/*logerror("psg w: %04x %02x\n",offset,data); */
@@ -768,7 +768,7 @@ static WRITE8_HANDLER(einstein_psg_w)
 
 static READ8_HANDLER(einstein_psg_r)
 {
-	const device_config *ay8910 = devtag_get_device(space->machine, SOUND_AY8910, "ay8910");
+	const device_config *ay8910 = devtag_get_device(space->machine, SOUND, "ay8910");
 	int reg = offset & 0x03;
 
 	switch (reg)

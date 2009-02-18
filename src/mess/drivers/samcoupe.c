@@ -346,8 +346,8 @@ static ADDRESS_MAP_START( samcoupe_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xfd, 0xfd) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(samcoupe_midi_r, samcoupe_midi_w)
 	AM_RANGE(0xfe, 0xfe) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(samcoupe_keyboard_r, samcoupe_border_w)
 	AM_RANGE(0xff, 0xff) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READ(samcoupe_attributes_r)
-	AM_RANGE(0xff, 0xff) AM_MIRROR(0xfe00) AM_MASK(0xffff) AM_DEVWRITE(SOUND_SAA1099, "saa1099", saa1099_data_w)
-	AM_RANGE(0x1ff, 0x1ff) AM_MIRROR(0xfe00) AM_MASK(0xffff) AM_DEVWRITE(SOUND_SAA1099, "saa1099", saa1099_control_w)
+	AM_RANGE(0xff, 0xff) AM_MIRROR(0xfe00) AM_MASK(0xffff) AM_DEVWRITE(SOUND, "saa1099", saa1099_data_w)
+	AM_RANGE(0x1ff, 0x1ff) AM_MIRROR(0xfe00) AM_MASK(0xffff) AM_DEVWRITE(SOUND, "saa1099", saa1099_control_w)
 ADDRESS_MAP_END
 
 
