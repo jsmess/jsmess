@@ -132,7 +132,8 @@ static WRITE8_HANDLER(apf_m1000_pia_out_ca2_func)
 
 static WRITE8_HANDLER(apf_m1000_pia_out_cb2_func)
 {
-	speaker_level_w(0, data);
+	const device_config *speaker = devtag_get_device(space->machine, SOUND, "speaker");
+	speaker_level_w(speaker, data);
 }
 
 /* use bit 0 to identify state of irq from pia 0 */

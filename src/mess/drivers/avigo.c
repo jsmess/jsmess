@@ -764,6 +764,7 @@ static  READ8_HANDLER(avigo_ad_data_r)
 
 static WRITE8_HANDLER(avigo_speaker_w)
 {
+	const device_config *speaker = devtag_get_device(space->machine, SOUND, "speaker");
 	UINT8 previous_speaker;
 
 	previous_speaker = avigo_speaker_data;
@@ -773,7 +774,7 @@ static WRITE8_HANDLER(avigo_speaker_w)
 	if (((data^avigo_speaker_data) & (1<<3))!=0)
 	{
 		/* DAC output state */
-		speaker_level_w(0,(data>>3) & 0x01);
+		speaker_level_w(speaker,(data>>3) & 0x01);
 	}
 }
 

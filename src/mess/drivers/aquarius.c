@@ -66,7 +66,8 @@ static WRITE8_HANDLER( cassette_w )
 
 	*/
 
-	speaker_level_w(0, data & 0x01);
+	const device_config *speaker = devtag_get_device(space->machine, SOUND, "speaker");
+	speaker_level_w(speaker, data & 0x01);
 
 	cassette_output(cassette_device_image(space->machine), (data & 0x01) ? +1.0 : -1.0);
 }
