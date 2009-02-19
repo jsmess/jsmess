@@ -211,7 +211,7 @@ static ADDRESS_MAP_START(a400_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xc000, 0xcfff) AM_ROM
 	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE(atari_gtia_r, atari_gtia_w)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
-	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE(SOUND_POKEY, "pokey", pokey_r, pokey_w)
+	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE(SOUND, "pokey", pokey_r, pokey_w)
 	AM_RANGE(0xd300, 0xd3ff) AM_READWRITE(pia_0_alt_r, pia_0_alt_w)
 	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE(atari_antic_r, atari_antic_w)
 	AM_RANGE(0xd500, 0xd7ff) AM_NOP
@@ -225,7 +225,7 @@ static ADDRESS_MAP_START(a800_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xc000, 0xcfff) AM_ROM
 	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE(atari_gtia_r, atari_gtia_w)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
-	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE(SOUND_POKEY, "pokey", pokey_r, pokey_w)
+	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE(SOUND, "pokey", pokey_r, pokey_w)
 	AM_RANGE(0xd300, 0xd3ff) AM_READWRITE(pia_0_alt_r, pia_0_alt_w)
 	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE(atari_antic_r, atari_antic_w)
 	AM_RANGE(0xd500, 0xd7ff) AM_NOP
@@ -241,7 +241,7 @@ static ADDRESS_MAP_START(a800xl_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(SMH_BANK3, SMH_BANK3)
 	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE(atari_gtia_r, atari_gtia_w)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
-	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE(SOUND_POKEY, "pokey", pokey_r, pokey_w)
+	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE(SOUND, "pokey", pokey_r, pokey_w)
 	AM_RANGE(0xd300, 0xd3ff) AM_READWRITE(pia_0_alt_r, pia_0_alt_w)
 	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE(atari_antic_r, atari_antic_w)
 	AM_RANGE(0xd500, 0xd7ff) AM_NOP
@@ -254,7 +254,7 @@ static ADDRESS_MAP_START(a5200_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x4000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc0ff) AM_READWRITE(atari_gtia_r, atari_gtia_w)
 	AM_RANGE(0xd400, 0xd5ff) AM_READWRITE(atari_antic_r, atari_antic_w)
-	AM_RANGE(0xe800, 0xe8ff) AM_DEVREADWRITE(SOUND_POKEY, "pokey", pokey_r, pokey_w)
+	AM_RANGE(0xe800, 0xe8ff) AM_DEVREADWRITE(SOUND, "pokey", pokey_r, pokey_w)
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

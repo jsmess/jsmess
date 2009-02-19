@@ -900,7 +900,7 @@ static READ16_HANDLER( x68k_fm_r )
 static WRITE8_DEVICE_HANDLER( x68k_ct_w )
 {
 	const device_config *fdc = devtag_get_device(device->machine, NEC72065, "nec72065");
-	const device_config *okim = devtag_get_device(device->machine, SOUND_OKIM6258, "okim6258");
+	const device_config *okim = devtag_get_device(device->machine, SOUND, "okim6258");
 
 	// CT1 and CT2 bits from YM2151 port 0x1b
 	// CT1 - ADPCM clock - 0 = 8MHz, 1 = 4MHz
@@ -1607,8 +1607,8 @@ static ADDRESS_MAP_START(x68k_map, ADDRESS_SPACE_PROGRAM, 16)
 //  AM_RANGE(0xe8c000, 0xe8dfff) AM_READWRITE(x68k_printer_r, x68k_printer_w)
 	AM_RANGE(0xe8e000, 0xe8ffff) AM_READWRITE(x68k_sysport_r, x68k_sysport_w)
 	AM_RANGE(0xe90000, 0xe91fff) AM_READWRITE(x68k_fm_r, x68k_fm_w)
-	AM_RANGE(0xe92000, 0xe92001) AM_DEVREADWRITE8(SOUND_OKIM6258, "okim6258", okim6258_status_r, okim6258_ctrl_w, 0x00ff)
-	AM_RANGE(0xe92002, 0xe92003) AM_DEVREADWRITE8(SOUND_OKIM6258, "okim6258", okim6258_status_r, okim6258_data_w, 0x00ff)
+	AM_RANGE(0xe92000, 0xe92001) AM_DEVREADWRITE8(SOUND, "okim6258", okim6258_status_r, okim6258_ctrl_w, 0x00ff)
+	AM_RANGE(0xe92002, 0xe92003) AM_DEVREADWRITE8(SOUND, "okim6258", okim6258_status_r, okim6258_data_w, 0x00ff)
 	AM_RANGE(0xe94000, 0xe95fff) AM_READWRITE(x68k_fdc_r, x68k_fdc_w)
 	AM_RANGE(0xe96000, 0xe97fff) AM_DEVREADWRITE(X68KHDC,"x68k_hdc",x68k_hdc_r, x68k_hdc_w)
 	AM_RANGE(0xe98000, 0xe99fff) AM_READWRITE(x68k_scc_r, x68k_scc_w)
