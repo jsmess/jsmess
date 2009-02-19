@@ -844,7 +844,8 @@ static WRITE8_DEVICE_HANDLER(COPS_via_out_b)
 
 static WRITE8_DEVICE_HANDLER(COPS_via_out_cb2)
 {
-	speaker_level_w(0, data);
+	const device_config *speaker = devtag_get_device(device->machine, SOUND, "speaker");
+	speaker_level_w(speaker, data);
 }
 
 static void COPS_via_irq_func(const device_config *device, int val)

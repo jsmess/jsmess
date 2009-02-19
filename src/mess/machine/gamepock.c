@@ -218,9 +218,10 @@ VIDEO_UPDATE( gamepock )
 /* This is called whenever the T0 pin switches state */
 int gamepock_io_callback( const device_config *device, int ioline, int state ) 
 {
+	const device_config *speaker = devtag_get_device(device->machine, SOUND, "speaker");
 	if ( ioline == UPD7810_TO ) 
 	{
-		speaker_level_w(0, state & 1 );
+		speaker_level_w(speaker, state & 1 );
 	}
 	return 0;
 }

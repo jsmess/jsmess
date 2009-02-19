@@ -1381,6 +1381,7 @@ bit 0: TRUCK */
 
 WRITE8_HANDLER ( kc85_4_pio_data_w )
 {
+	const device_config *speaker = devtag_get_device(space->machine, SOUND, "speaker");
 	kc85_pio_data[offset] = data;
 	z80pio_d_w(kc85_z80pio, offset, data);
 
@@ -1409,7 +1410,7 @@ WRITE8_HANDLER ( kc85_4_pio_data_w )
 
 			/* this might not be correct, the range might
 			be logarithmic and not linear! */
-			speaker_level_w(0, (speaker_level<<4));
+			speaker_level_w(speaker, (speaker_level<<4));
 		}
 		break;
 	}
@@ -1627,11 +1628,12 @@ bit 0: TRUCK */
 
 WRITE8_HANDLER ( kc85_3_pio_data_w )
 {
-   kc85_pio_data[offset] = data;
-   z80pio_d_w(kc85_z80pio, offset, data);
+	const device_config *speaker = devtag_get_device(space->machine, SOUND, "speaker");
+	kc85_pio_data[offset] = data;
+	z80pio_d_w(kc85_z80pio, offset, data);
 
-   switch (offset)
-   {
+	switch (offset)
+	{
 
 		case 0:
 		{
@@ -1654,10 +1656,10 @@ WRITE8_HANDLER ( kc85_3_pio_data_w )
 
 			/* this might not be correct, the range might
 			be logarithmic and not linear! */
-			speaker_level_w(0, (speaker_level<<4));
+			speaker_level_w(speaker, (speaker_level<<4));
 		}
 		break;
-   }
+	}
 }
 
 
