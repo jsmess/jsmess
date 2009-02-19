@@ -249,17 +249,19 @@ UINT8 pc_speaker_get_spk(void)
 }
 
 
-void pc_speaker_set_spkrdata(UINT8 data)
+void pc_speaker_set_spkrdata(running_machine *machine, UINT8 data)
 {
+	const device_config *speaker = devtag_get_device(machine, SOUND, "speaker");
 	pc_spkrdata = data ? 1 : 0;
-	speaker_level_w( 0, pc_speaker_get_spk() );
+	speaker_level_w( speaker, pc_speaker_get_spk() );
 }
 
 
-void pc_speaker_set_input(UINT8 data)
+void pc_speaker_set_input(running_machine *machine, UINT8 data)
 {
+	const device_config *speaker = devtag_get_device(machine, SOUND, "speaker");
 	pc_input = data ? 1 : 0;
-	speaker_level_w( 0, pc_speaker_get_spk() );
+	speaker_level_w( speaker, pc_speaker_get_spk() );
 }
 
 
@@ -283,7 +285,7 @@ static PIT8253_OUTPUT_CHANGED( ibm5150_pit8253_out1_changed )
 
 static PIT8253_OUTPUT_CHANGED( ibm5150_pit8253_out2_changed )
 {
-	pc_speaker_set_input( state );
+	pc_speaker_set_input( device->machine, state );
 }
 
 
@@ -745,7 +747,7 @@ static WRITE8_DEVICE_HANDLER ( ibm5150_ppi_portb_w )
 	pc_ppi.keyboard_clear = data & 0x80;
 	pc_ppi.keyb_clock = data & 0x40;
 	pit8253_gate_w( pc_devices.pit8253, 2, data & 1);
-	pc_speaker_set_spkrdata( data & 0x02 );
+	pc_speaker_set_spkrdata( device->machine, data & 0x02 );
 
 	cassette_change_state( devtag_get_device(device->machine, CASSETTE, "cassette"), ( data & 0x08 ) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 
@@ -900,7 +902,7 @@ static WRITE8_DEVICE_HANDLER( ibm5160_ppi_portb_w )
 	pc_ppi.keyboard_clear = data & 0x80;
 	pc_ppi.keyb_clock = data & 0x40;
 	pit8253_gate_w( pc_devices.pit8253, 2, data & 0x01 );
-	pc_speaker_set_spkrdata( data & 0x02 );
+	pc_speaker_set_spkrdata( device->machine, data & 0x02 );
 
 	pc_ppi.clock_signal = ( pc_ppi.keyb_clock ) ? 1 : 0;
 	pc_ppi.clock_callback( cpu_get_address_space( device->machine->cpu[0], ADDRESS_SPACE_PROGRAM ), 0, pc_ppi.clock_signal );
@@ -962,7 +964,7 @@ static WRITE8_DEVICE_HANDLER( pc_ppi_portb_w )
 	pc_ppi.keyboard_clear = data & 0x80;
 	pc_ppi.keyb_clock = data & 0x40;
 	pit8253_gate_w( pc_devices.pit8253, 2, data & 0x01 );
-	pc_speaker_set_spkrdata( data & 0x02 );
+	pc_speaker_set_spkrdata( device->machine, data & 0x02 );
 	pc_keyb_set_clock( pc_ppi.keyb_clock );
 
 	if ( pc_ppi.keyboard_clear )
@@ -987,7 +989,7 @@ static WRITE8_DEVICE_HANDLER ( pcjr_ppi_portb_w )
 	pc_ppi.portb = data;
 	pc_ppi.portc_switch_high = data & 0x08;
 	pit8253_gate_w( devtag_get_device(device->machine, PIT8253, "pit8253"), 2, data & 1);
-	pc_speaker_set_spkrdata( data & 0x02 );
+	pc_speaker_set_spkrdata( device->machine, data & 0x02 );
 
 	cassette_change_state( devtag_get_device(device->machine, CASSETTE, "cassette"), ( data & 0x08 ) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 }
@@ -1318,6 +1320,7 @@ MACHINE_START( pc )
 
 MACHINE_RESET( pc )
 {
+	const device_config *speaker = devtag_get_device(machine, SOUND, "speaker");
 	cpu_set_irq_callback(machine->cpu[0], pc_irq_callback);
 
 	pc_devices.pic8259_master = devtag_get_device(machine, PIC8259, "pic8259_master");
@@ -1326,7 +1329,7 @@ MACHINE_RESET( pc )
 	pc_devices.pit8253 = devtag_get_device(machine, PIT8253, "pit8253");
 	pc_mouse_set_serial_port( devtag_get_device(machine, INS8250, "ins8250_0") );
 	pc_hdc_set_dma8237_device( pc_devices.dma8237 );
-	speaker_level_w( 0, 0 );
+	speaker_level_w( speaker, 0 );
 }
 
 

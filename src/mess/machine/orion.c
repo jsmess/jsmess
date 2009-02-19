@@ -282,18 +282,20 @@ MACHINE_START( orionz80 )
 static UINT8 orion_speaker;
 WRITE8_HANDLER ( orionz80_sound_w )
 {	
+	const device_config *speaker = devtag_get_device(space->machine, SOUND, "speaker");
 	if (orion_speaker==0) {
 		orion_speaker = data;		
 	} else {
 		orion_speaker = 0 ;	
 	}
-	speaker_level_w(0,orion_speaker);
+	speaker_level_w(speaker,orion_speaker);
 		
 }
 
 static WRITE8_HANDLER ( orionz80_sound_fe_w )
 {	
-	speaker_level_w(0,(data>>4) & 0x01);
+	const device_config *speaker = devtag_get_device(space->machine, SOUND, "speaker");
+	speaker_level_w(speaker,(data>>4) & 0x01);
 }
 
 

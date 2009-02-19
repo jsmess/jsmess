@@ -25,8 +25,8 @@ extern const ppi8255_interface pc_ppi8255_interface;
 extern const ppi8255_interface pcjr_ppi8255_interface;
 
 UINT8 pc_speaker_get_spk(void);
-void pc_speaker_set_spkrdata(UINT8 data);
-void pc_speaker_set_input(UINT8 data);
+void pc_speaker_set_spkrdata(running_machine *machine, UINT8 data);
+void pc_speaker_set_input(running_machine *machine, UINT8 data);
 
 void mess_init_pc_common( running_machine *machine, UINT32 flags, void (*set_keyb_int_func)(running_machine *, int), void (*set_hdc_int_func)(int,int));
 
