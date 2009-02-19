@@ -264,11 +264,12 @@ static READ8_HANDLER( samcoupe_keyboard_r )
 
 static WRITE8_HANDLER( samcoupe_border_w )
 {
+	const device_config *speaker = devtag_get_device(space->machine, SOUND, "speaker");
 	coupe_asic *asic = space->machine->driver_data;
 	asic->border = data;
 
 	/* DAC output state */
-	speaker_level_w(0, (data >> 4) & 0x01);
+	speaker_level_w(speaker, (data >> 4) & 0x01);
 }
 
 
@@ -641,14 +642,6 @@ static void samcoupe_floppy_getinfo(const mess_device_class *devclass, UINT32 st
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:	info->p = (void *) floppyoptions_coupe; break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_NAME+0:			strcpy(info->s = device_temp_str(), "floppydisk0"); break;
-		case MESS_DEVINFO_STR_NAME+1:			strcpy(info->s = device_temp_str(), "floppydisk1"); break;
-		case MESS_DEVINFO_STR_SHORT_NAME+0:		strcpy(info->s = device_temp_str(), "flop0"); break;
-		case MESS_DEVINFO_STR_SHORT_NAME+1:		strcpy(info->s = device_temp_str(), "flop1"); break;
-		case MESS_DEVINFO_STR_DESCRIPTION+0:	strcpy(info->s = device_temp_str(), "Floppy #0"); break;
-		case MESS_DEVINFO_STR_DESCRIPTION+1:	strcpy(info->s = device_temp_str(), "Floppy #1"); break;
 
 		default:								floppy_device_getinfo(devclass, state, info); break;
 	}
