@@ -165,24 +165,26 @@ static const riot6532_interface aim65_riot_interface =
 static const via6522_interface aim65_system_via =
 {
 	DEVCB_NULL,
-	DEVCB_HANDLER(aim65_via0_b_r),
+	DEVCB_INPUT_PORT("switches"),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(aim65_via0_a_w),
-	DEVCB_HANDLER(aim65_via0_b_w),
+	DEVCB_HANDLER(aim65_printer_data_a),
+	DEVCB_HANDLER(aim65_printer_data_b),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_HANDLER(aim65_printer_on),
-	DEVCB_LINE(aim65_via_irq_func)
+	DEVCB_CPU_INPUT_LINE("main", M6502_IRQ_LINE)
 };
 
 /* user via interface */
 static const via6522_interface aim65_user_via =
 {
-	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
+	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	DEVCB_CPU_INPUT_LINE("main", M6502_IRQ_LINE)
 };
 
 /******************************************************************************

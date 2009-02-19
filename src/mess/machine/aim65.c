@@ -34,12 +34,6 @@ static UINT8 riot_port_a;
  Interrupt handling
 ******************************************************************************/
 
-
-void aim65_via_irq_func(const device_config *device, int state)
-{
-	cpu_set_input_line(device->machine->cpu[0], M6502_IRQ_LINE, state ? HOLD_LINE : CLEAR_LINE);
-}
-
 /* STEP/RUN
  *
  * Switch S2 (STEP/RUN) causes AIM 65 to operate either in the RUN mode or the
@@ -182,29 +176,6 @@ void aim65_riot_irq(const device_config *device, int state)
 	cpu_set_input_line(device->machine->cpu[0], M6502_IRQ_LINE, state ? HOLD_LINE : CLEAR_LINE);
 }
 
-
-
-/******************************************************************************
- 6522 VIA
-******************************************************************************/
-
-
-WRITE8_DEVICE_HANDLER( aim65_via0_a_w )
-{
-	 aim65_printer_data_a(data);
-}
-
-
-WRITE8_DEVICE_HANDLER( aim65_via0_b_w )
-{
-	aim65_printer_data_b(data);
-}
-
-
-READ8_DEVICE_HANDLER( aim65_via0_b_r )
-{
-	return input_port_read(device->machine, "switches");
-}
 
 
 /***************************************************************************
