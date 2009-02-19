@@ -388,6 +388,7 @@ blink w: 03b6 03
 
 static WRITE8_HANDLER(z88_port_w)
 {
+	const device_config *speaker = devtag_get_device(space->machine, SOUND, "speaker");
 	unsigned char port;
 
 	port = offset & 0x0ff;
@@ -456,7 +457,7 @@ static WRITE8_HANDLER(z88_port_w)
 			   /* speaker controlled by SBIT */
 			   if ((changed_bits & (1<<6))!=0)
 			   {
-				   speaker_level_w(0, (data>>6) & 0x01);
+				   speaker_level_w(speaker, (data>>6) & 0x01);
 			   }
 			}
 			else

@@ -171,6 +171,7 @@ int spectrum_PreviousFE = 0;
 
 WRITE8_HANDLER(spectrum_port_fe_w)
 {
+	const device_config *speaker = devtag_get_device(space->machine, SOUND, "speaker");
 	unsigned char Changed;
 
 	Changed = spectrum_PreviousFE^data;
@@ -185,7 +186,7 @@ WRITE8_HANDLER(spectrum_port_fe_w)
 	if ((Changed & (1<<4))!=0)
 	{
 		/* DAC output state */
-		speaker_level_w(0,(data>>4) & 0x01);
+		speaker_level_w(speaker,(data>>4) & 0x01);
 	}
 
 	if ((Changed & (1<<3))!=0)

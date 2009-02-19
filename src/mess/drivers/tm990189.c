@@ -342,7 +342,8 @@ static WRITE8_DEVICE_HANDLER( sys9901_shiftlight_w )
 
 static WRITE8_DEVICE_HANDLER( sys9901_spkrdrive_w )
 {
-	speaker_level_w(0, data);
+	const device_config *speaker = devtag_get_device(device->machine, SOUND, "speaker");
+	speaker_level_w(speaker, data);
 }
 
 static WRITE8_DEVICE_HANDLER( sys9901_tapewdata_w )
