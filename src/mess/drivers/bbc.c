@@ -16,9 +16,9 @@
 #include "machine/mc146818.h"
 #include "includes/bbc.h"
 #include "machine/upd7002.h"
+#include "machine/ctronics.h"
 #include "devices/basicdsk.h"
 #include "devices/cartslot.h"
-#include "devices/printer.h"
 #include "devices/cassette.h"
 #include "formats/uef_cas.h"
 #include "formats/csw_cas.h"
@@ -103,7 +103,8 @@ static ADDRESS_MAP_START(bbca_mem, ADDRESS_SPACE_PROGRAM, 8)
 
 																					/*    fe00-feff                 Shiela Address Page             */
 	AM_RANGE(0xfe00, 0xfe07) AM_READWRITE(BBC_6845_r    	, BBC_6845_w		)	/*    fe00-fe07  6845 CRTA      Video controller                */
-	AM_RANGE(0xfe08, 0xfe0f) AM_READWRITE(BBC_6850_r		, BBC_6850_w		)	/*    fe08-fe0f  6850 ACIA      Serial Controller               */
+	AM_RANGE(0xfe08, 0xfe08) AM_MIRROR(0x06) AM_DEVREADWRITE(ACIA6850, "acia6850", acia6850_stat_r, acia6850_ctrl_w)
+	AM_RANGE(0xfe09, 0xfe09) AM_MIRROR(0x06) AM_DEVREADWRITE(ACIA6850, "acia6850", acia6850_data_r, acia6850_data_w)
 	AM_RANGE(0xfe10, 0xfe17) AM_READWRITE(return8_FE		, BBC_SerialULA_w   )	/*    fe10-fe17  Serial ULA     Serial system chip              */
 	AM_RANGE(0xfe18, 0xfe1f) AM_NOP													/*    fe18-fe1f  INTOFF/STATID  1 ECONET Interrupt Off / ID No. */
 	AM_RANGE(0xfe20, 0xfe2f) AM_WRITE	 (              	  bbc_videoULA_w    )	/* R: fe20-fe2f  INTON          1 ECONET Interrupt On           */
@@ -136,7 +137,8 @@ static ADDRESS_MAP_START(bbcb_mem, ADDRESS_SPACE_PROGRAM, 8)
 
 																					/*    fe00-feff                 Shiela Address Page             */
 	AM_RANGE(0xfe00, 0xfe07) AM_READWRITE(BBC_6845_r    	, BBC_6845_w     	)	/*    fe00-fe07  6845 CRTC      Video controller                */
-	AM_RANGE(0xfe08, 0xfe0f) AM_READWRITE(BBC_6850_r		, BBC_6850_w		)	/*    fe08-fe0f  6850 ACIA      Serial Controller               */
+	AM_RANGE(0xfe08, 0xfe08) AM_MIRROR(0x06) AM_DEVREADWRITE(ACIA6850, "acia6850", acia6850_stat_r, acia6850_ctrl_w)
+	AM_RANGE(0xfe09, 0xfe09) AM_MIRROR(0x06) AM_DEVREADWRITE(ACIA6850, "acia6850", acia6850_data_r, acia6850_data_w)
 	AM_RANGE(0xfe10, 0xfe17) AM_READWRITE(return8_FE		, BBC_SerialULA_w   )	/*    fe10-fe17  Serial ULA     Serial system chip              */
 	AM_RANGE(0xfe18, 0xfe1f) AM_NOP													/*    fe18-fe1f  INTOFF/STATID  ECONET Interrupt Off / ID No.   */
 	AM_RANGE(0xfe20, 0xfe2f) AM_WRITE    (              	  bbc_videoULA_w    )	/* R: fe20-fe2f  INTON          ECONET Interrupt On             */
@@ -170,7 +172,8 @@ static ADDRESS_MAP_START(bbcbp_mem, ADDRESS_SPACE_PROGRAM, 8)
 
 																					/*    fe00-feff                 Shiela Address Page             */
 	AM_RANGE(0xfe00, 0xfe07) AM_READWRITE(BBC_6845_r		, BBC_6845_w		)	/*    fe00-fe07  6845 CRTC      Video controller                */
-	AM_RANGE(0xfe08, 0xfe0f) AM_READWRITE(BBC_6850_r		, BBC_6850_w		)	/*    fe08-fe0f  6850 ACIA      Serial Controller               */
+	AM_RANGE(0xfe08, 0xfe08) AM_MIRROR(0x06) AM_DEVREADWRITE(ACIA6850, "acia6850", acia6850_stat_r, acia6850_ctrl_w)
+	AM_RANGE(0xfe09, 0xfe09) AM_MIRROR(0x06) AM_DEVREADWRITE(ACIA6850, "acia6850", acia6850_data_r, acia6850_data_w)
 	AM_RANGE(0xfe10, 0xfe17) AM_READWRITE(return8_FE		, BBC_SerialULA_w   )	/*    fe10-fe17  Serial ULA     Serial system chip              */
 	AM_RANGE(0xfe18, 0xfe1f) AM_NOP													/*    fe18-fe1f  INTOFF/STATID  ECONET Interrupt Off / ID No.   */
 	AM_RANGE(0xfe20, 0xfe2f) AM_WRITE	 (bbc_videoULA_w						)	/* R: fe20-fe2f  INTON          ECONET Interrupt On             */
@@ -205,7 +208,8 @@ static ADDRESS_MAP_START(bbcbp128_mem, ADDRESS_SPACE_PROGRAM, 8)
 
 																					/*    fe00-feff                 Shiela Address Page             */
 	AM_RANGE(0xfe00, 0xfe07) AM_READWRITE(BBC_6845_r		, BBC_6845_w		)	/*    fe00-fe07  6845 CRTC      Video controller                */
-	AM_RANGE(0xfe08, 0xfe0f) AM_READWRITE(BBC_6850_r		, BBC_6850_w		)	/*    fe08-fe0f  6850 ACIA      Serial Controller               */
+	AM_RANGE(0xfe08, 0xfe08) AM_MIRROR(0x06) AM_DEVREADWRITE(ACIA6850, "acia6850", acia6850_stat_r, acia6850_ctrl_w)
+	AM_RANGE(0xfe09, 0xfe09) AM_MIRROR(0x06) AM_DEVREADWRITE(ACIA6850, "acia6850", acia6850_data_r, acia6850_data_w)
 	AM_RANGE(0xfe10, 0xfe17) AM_READWRITE(return8_FE		, BBC_SerialULA_w   )	/*    fe10-fe17  Serial ULA     Serial system chip              */
 	AM_RANGE(0xfe10, 0xfe17) AM_NOP													/*    fe10-fe17  Serial ULA     Serial system chip              */
 	AM_RANGE(0xfe18, 0xfe1f) AM_NOP													/*    fe18-fe1f  INTOFF/STATID  ECONET Interrupt Off / ID No.   */
@@ -269,7 +273,8 @@ static ADDRESS_MAP_START(bbcm_mem, ADDRESS_SPACE_PROGRAM, 8)
 
                                                                                           fe00-feff                 Shiela Address Page
     AM_RANGE(0xfe00, 0xfe07) AM_READWRITE(BBC_6845_r        , BBC_6845_w        )         fe00-fe07  6845 CRTC      Video controller
-    AM_RANGE(0xfe08, 0xfe0f) AM_READWRITE(BBC_6850_r        , BBC_6850_w        )         fe08-fe0f  6850 ACIA      Serial Controller
+	AM_RANGE(0xfe08, 0xfe08) AM_MIRROR(0x06) AM_DEVREADWRITE(ACIA6850, "acia6850", acia6850_stat_r, acia6850_ctrl_w)
+	AM_RANGE(0xfe09, 0xfe09) AM_MIRROR(0x06) AM_DEVREADWRITE(ACIA6850, "acia6850", acia6850_data_r, acia6850_data_w)
     AM_RANGE(0xfe10, 0xfe17) AM_NOP                                                       fe10-fe17  Serial ULA     Serial system chip
     AM_RANGE(0xfe18, 0xfe1f) M_DEVREADWRITE(UPD7002, "uPD7002",uPD7002_r, uPD7002_w )         fec0-fedf  uPD7002        Analogue to digital converter
     AM_RANGE(0xfe20, 0xfe23) AM_READWRITE(return8_FE        , bbc_videoULA_w        )         fe20-fe23  Video ULA      Video system chip
@@ -664,7 +669,7 @@ ROM_START(bbcm)
 
 	ROM_SYSTEM_BIOS( 0, "mos350", "Enhanced MOS 3.50" )
 	ROMX_LOAD("mos+3.50.rom",0x20000, 0x20000, CRC(141027b9) SHA1(85211b5bc7c7a269952d2b063b7ec0e1f0196803),ROM_BIOS(1))
-	
+
 	ROM_SYSTEM_BIOS( 1, "mos320", "Original MOS 3.20" )
 	ROMX_LOAD("mos3.20.rom",0x20000, 0x20000, CRC(0cfad2ce) SHA1(0275719aa7746dd3b627f95ccc4362b564063a5e),ROM_BIOS(2))
 
@@ -717,6 +722,33 @@ static const cassette_config bbc_cassette_config =
 	NULL,
 	CASSETTE_PLAY
 };
+
+
+static WRITE_LINE_DEVICE_HANDLER(bbcb_ack_w)
+{
+	via_ca1_w(device, 0, !state); /* ack seems to be inverted? */
+}
+
+static const centronics_interface bbcb_centronics_config =
+{
+	FALSE,
+	DEVCB_DEVICE_LINE(VIA6522, "via6522_1", bbcb_ack_w),
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+static ACIA6850_INTERFACE( bbc_acia6850_interface )
+{
+	0,
+	0,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_CPU_INPUT_LINE("main", M6502_IRQ_LINE)
+};
+
 
 static MACHINE_DRIVER_START( bbc_cartslot )
 	MDRV_CARTSLOT_ADD("cart1")
@@ -775,7 +807,7 @@ static MACHINE_DRIVER_START( bbca )
 
 	/* acia */
 	MDRV_ACIA6850_ADD("acia6850", bbc_acia6850_interface)
-	
+
 	/* devices */
 	MDRV_UPD7002_ADD("upd7002",BBC_uPD7002)
 	MDRV_VIA6522_ADD("via6522_0", 1000000, bbcb_system_via)
@@ -790,7 +822,9 @@ static MACHINE_DRIVER_START( bbcb )
 	MDRV_MACHINE_START( bbcb )
 	MDRV_MACHINE_RESET( bbcb )
 	MDRV_VIDEO_START( bbcb )
+
 	MDRV_VIA6522_ADD("via6522_1", 1000000, bbcb_user_via)
+	MDRV_CENTRONICS_ADD("centronics", bbcb_centronics_config)
 
 	MDRV_WD177X_ADD("wd177x", bbc_wd17xx_interface )
 
@@ -805,9 +839,11 @@ static MACHINE_DRIVER_START( bbcbp )
 	MDRV_MACHINE_START( bbcbp )
 	MDRV_MACHINE_RESET( bbcbp )
 	MDRV_VIDEO_START( bbcbp )
+
 	MDRV_VIA6522_ADD("via6522_1", 1000000, bbcb_user_via)
+	MDRV_CENTRONICS_ADD("centronics", bbcb_centronics_config)
 	MDRV_WD177X_ADD("wd177x", bbc_wd17xx_interface )
-	
+
 	MDRV_IMPORT_FROM(bbc_cartslot)
 MACHINE_DRIVER_END
 
@@ -819,10 +855,12 @@ static MACHINE_DRIVER_START( bbcbp128 )
 	MDRV_MACHINE_START( bbcbp )
 	MDRV_MACHINE_RESET( bbcbp )
 	MDRV_VIDEO_START( bbcbp )
-	
+
 	MDRV_VIA6522_ADD("via6522_1", 1000000, bbcb_user_via)
+	MDRV_CENTRONICS_ADD("centronics", bbcb_centronics_config)
+
 	MDRV_WD177X_ADD("wd177x", bbc_wd17xx_interface )
-	
+
 	MDRV_IMPORT_FROM(bbc_cartslot)
 MACHINE_DRIVER_END
 
@@ -867,13 +905,14 @@ static MACHINE_DRIVER_START( bbcm )
 
 	/* acia */
 	MDRV_ACIA6850_ADD("acia6850", bbc_acia6850_interface)
-	
+
 	/* devices */
 	MDRV_UPD7002_ADD("upd7002",BBC_uPD7002)
 	MDRV_VIA6522_ADD("via6522_0", 1000000, bbcb_system_via)
 	MDRV_VIA6522_ADD("via6522_1", 1000000, bbcb_user_via)
+	MDRV_CENTRONICS_ADD("centronics", bbcb_centronics_config)
 	MDRV_WD177X_ADD("wd177x", bbc_wd17xx_interface )
-	
+
 	MDRV_IMPORT_FROM(bbc_cartslot)
 MACHINE_DRIVER_END
 

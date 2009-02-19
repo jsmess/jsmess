@@ -19,6 +19,7 @@
 #include "machine/upd7002.h"
 #include "machine/i8271.h"
 #include "machine/mc146818.h"
+#include "machine/ctronics.h"
 #include "devices/basicdsk.h"
 #include "devices/cassette.h"
 
@@ -412,7 +413,7 @@ WRITE8_HANDLER ( bbcm_ACCCON_write )
 	/* if 1 the the ROM is paged in for reads but writes still go to I/O   */
 	if (ACCCON_TST)
 	{
-		memory_set_bankptr( space->machine, 8, memory_region(space->machine, "user1")+0x43c00); 
+		memory_set_bankptr( space->machine, 8, memory_region(space->machine, "user1")+0x43c00);
 		memory_install_read_handler(space, 0xFC00,0xFEFF,0,0,8);
 	}
 	else
@@ -584,7 +585,15 @@ long myo;
 
 		myo=offset-0x200;
 		if ((myo>=0x00) && (myo<=0x07)) return BBC_6845_r(space, myo-0x00);		/* Video Controller */
-		if ((myo>=0x08) && (myo<=0x0f)) return BBC_6850_r(space, myo-0x08);		/* Serial Controller */
+		if ((myo>=0x08) && (myo<=0x0f))
+		{
+			const device_config *acia = devtag_get_device(space->machine, ACIA6850, "acia6850");
+
+			if ((myo - 0x08) & 1)
+				return acia6850_stat_r(acia, 0);
+			else
+				return acia6850_data_r(acia, 0);
+		}
 		if ((myo>=0x10) && (myo<=0x17)) return 0xfe;						/* Serial System Chip */
 		if ((myo>=0x18) && (myo<=0x1f)) return uPD7002_r((device_config*)devtag_get_device(space->machine, UPD7002, "upd7002"), myo-0x18);			/* A to D converter */
 		if ((myo>=0x20) && (myo<=0x23)) return 0xfe;						/* VideoULA */
@@ -615,7 +624,15 @@ long myo;
 
 		myo=offset-0x200;
 		if ((myo>=0x00) && (myo<=0x07)) BBC_6845_w(space, myo-0x00,data);			/* Video Controller */
-		if ((myo>=0x08) && (myo<=0x0f)) BBC_6850_w(space, myo-0x08,data);			/* Serial Controller */
+		if ((myo>=0x08) && (myo<=0x0f))
+		{
+			const device_config *acia = devtag_get_device(space->machine, ACIA6850, "acia6850");
+
+			if ((myo - 0x08) & 1)
+				return acia6850_ctrl_w(acia, 0, data);
+			else
+				return acia6850_data_w(acia, 0, data);
+		}
 		if ((myo>=0x10) && (myo<=0x17)) BBC_SerialULA_w(space, myo-0x10,data);		/* Serial System Chip */
 		if ((myo>=0x18) && (myo<=0x1f)) uPD7002_w((device_config*)devtag_get_device(space->machine, UPD7002, "upd7002"),myo-0x18,data);			/* A to D converter */
 		if ((myo>=0x20) && (myo<=0x23)) bbc_videoULA_w(space, myo-0x20,data);			/* VideoULA */
@@ -762,10 +779,10 @@ static int column = 0;
 
 INTERRUPT_GEN( bbcb_keyscan )
 {
-	static const char *const colnames[] = { "COL0", "COL1", "COL2", "COL3", "COL4", 
+	static const char *const colnames[] = { "COL0", "COL1", "COL2", "COL3", "COL4",
 										"COL5", "COL6", "COL7", "COL8", "COL9" };
 	const device_config *via_0 = devtag_get_device(device->machine, VIA6522, "via6522_0");
-	
+
   	/* only do auto scan if keyboard is not enabled */
 	if (b3_keyboard == 1)
 	{
@@ -781,14 +798,14 @@ INTERRUPT_GEN( bbcb_keyscan )
 			if ((input_port_read(device->machine, colnames[column]) | 0x01) != 0xff)
 			{
 				via_ca2_w(via_0, 0, 1);
-			} 
-			else 
+			}
+			else
 			{
 				via_ca2_w(via_0, 0, 0);
 			}
 
-		} 
-		else 
+		}
+		else
 		{
 			via_ca2_w(via_0, 0, 0);
 		}
@@ -798,7 +815,7 @@ INTERRUPT_GEN( bbcb_keyscan )
 
 INTERRUPT_GEN( bbcm_keyscan )
 {
-	static const char *const colnames[] = { "COL0", "COL1", "COL2", "COL3", "COL4", 
+	static const char *const colnames[] = { "COL0", "COL1", "COL2", "COL3", "COL4",
 										"COL5", "COL6", "COL7", "COL8", "COL9" };
 	const device_config *via_0 = devtag_get_device(device->machine, VIA6522, "via6522_0");
 
@@ -836,7 +853,7 @@ static int bbc_keyboard(const address_space *space, int data)
 	int bit;
 	int row;
 	int res;
-	static const char *const colnames[] = { "COL0", "COL1", "COL2", "COL3", "COL4", 
+	static const char *const colnames[] = { "COL0", "COL1", "COL2", "COL3", "COL4",
 										"COL5", "COL6", "COL7", "COL8", "COL9" };
 	const device_config *via_0 = devtag_get_device(space->machine, VIA6522, "via6522_0");
 
@@ -845,26 +862,26 @@ static int bbc_keyboard(const address_space *space, int data)
 
 	bit = 0;
 
-	if (column < 10) 
+	if (column < 10)
 	{
 		res = input_port_read(space->machine, colnames[column]);
-	} 
-	else 
+	}
+	else
 	{
 		res = 0xff;
 	}
 
 	/* Normal keyboard result */
 	if ((res & (1<<row)) == 0)
-	{ 
-		bit = 1; 
+	{
+		bit = 1;
 	}
 
 	if ((res | 1) != 0xff)
 	{
 		via_ca2_w(via_0, 0, 1);
-	} 
-	else 
+	}
+	else
 	{
 		via_ca2_w(via_0, 0, 0);
 	}
@@ -1176,29 +1193,6 @@ static READ8_DEVICE_HANDLER( bbcb_via_system_read_cb2 )
 }
 
 
-/* this is wired as in input port so writing to this port would be bad */
-
-static WRITE8_DEVICE_HANDLER( bbcb_via_system_write_ca2 )
-{
-	//logerror("via_system_write_ca2: $%02X\n", data);
-}
-
-/* this is wired as in input port so writing to this port would be bad */
-
-static WRITE8_DEVICE_HANDLER( bbcb_via_system_write_cb2 )
-{
-	//logerror("via_system_write_cb2: $%02X\n", data);
-}
-
-
-
-static void bbc_via_system_irq(const device_config *device, int level)
-{
-//  logerror("SYSTEM via irq %d %d %d\n",via_system_irq,via_user_irq,level);
-	cpu_set_input_line(device->machine->cpu[0], M6502_IRQ_LINE, level);
-}
-
-
 const via6522_interface bbcb_system_via =
 {
 	DEVCB_HANDLER(bbcb_via_system_read_porta),
@@ -1209,10 +1203,11 @@ const via6522_interface bbcb_system_via =
 	DEVCB_HANDLER(bbcb_via_system_read_cb2),
 	DEVCB_HANDLER(bbcb_via_system_write_porta),
 	DEVCB_HANDLER(bbcb_via_system_write_portb),
-	DEVCB_NULL, DEVCB_NULL,
-	DEVCB_HANDLER(bbcb_via_system_write_ca2),
-	DEVCB_HANDLER(bbcb_via_system_write_cb2),
-	DEVCB_LINE(bbc_via_system_irq)
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_CPU_INPUT_LINE("main", M6502_IRQ_LINE)
 };
 
 
@@ -1225,85 +1220,32 @@ line when a printer is used. CA2 is buffered so that it has become an open
 collector output only. It usially acts as the printer strobe line.
 ***********************************************************************/
 
-/* this code just sends the output of the printer port to the errorlog
-file. I now need to look at the new printer code and see how I should
-connect this code up to that */
-
-static int bbc_printer_porta;
-static int bbc_printer_ca1;
-static int bbc_printer_ca2;
-
-/* USER VIA 6522 port A is buffered as an output through IC70 so
-reading from this port will always return 0xff */
-static READ8_DEVICE_HANDLER( bbcb_via_user_read_porta )
-{
-	return 0xff;
-}
-
 /* USER VIA 6522 port B is connected to the BBC user port */
 static READ8_DEVICE_HANDLER( bbcb_via_user_read_portb )
 {
 	return 0xff;
 }
 
-static READ8_DEVICE_HANDLER( bbcb_via_user_read_ca1 )
-{
-	return bbc_printer_ca1;
-}
-
-static READ8_DEVICE_HANDLER( bbcb_via_user_read_ca2 )
-{
-	return 1;
-}
-
-static WRITE8_DEVICE_HANDLER( bbcb_via_user_write_porta )
-{
-	bbc_printer_porta=data;
-}
-
 static WRITE8_DEVICE_HANDLER( bbcb_via_user_write_portb )
 {
-	bbc_userport=data;
+	bbc_userport = data;
 }
-
-static WRITE8_DEVICE_HANDLER( bbcb_via_user_write_ca2 )
-{
-	const device_config *via_1 = devtag_get_device(device->machine, VIA6522, "via6522_1");
-
-	/* write value to printer on rising edge of ca2 */
-	if ((bbc_printer_ca2==0) && (data==1))
-	{
-		logerror("print character $%02X\n",bbc_printer_porta);
-	}
-	bbc_printer_ca2=data;
-
-	/* this is a very bad way of returning an acknowledge
-	by just linking the strobe output into the acknowledge input */
-	bbc_printer_ca1=data;
-	via_ca1_w(via_1, 0,data);
-}
-
-static void bbc_via_user_irq(const device_config *device, int level)
-{
-	cpu_set_input_line(device->machine->cpu[0], M6502_IRQ_LINE, level);
-}
-
 
 const via6522_interface bbcb_user_via =
 {
-	DEVCB_HANDLER(bbcb_via_user_read_porta),//via_user_read_porta,
-	DEVCB_HANDLER(bbcb_via_user_read_portb),//via_user_read_portb,
-	DEVCB_HANDLER(bbcb_via_user_read_ca1),//via_user_read_ca1,
-	DEVCB_NULL,//via_user_read_cb1,
-	DEVCB_HANDLER(bbcb_via_user_read_ca2),//via_user_read_ca2,
-	DEVCB_NULL,//via_user_read_cb2,
-	DEVCB_HANDLER(bbcb_via_user_write_porta),//via_user_write_porta,
-	DEVCB_HANDLER(bbcb_via_user_write_portb),//via_user_write_portb,
+	DEVCB_NULL,	//via_user_read_porta,
+	DEVCB_HANDLER(bbcb_via_user_read_portb),
+	DEVCB_NULL,	//via_user_read_ca1,
+	DEVCB_NULL,	//via_user_read_cb1,
+	DEVCB_NULL,	//via_user_read_ca2,
+	DEVCB_NULL,	//via_user_read_cb2,
+	DEVCB_DEVICE_HANDLER(CENTRONICS, "centronics", centronics_data_w),
+	DEVCB_HANDLER(bbcb_via_user_write_portb),
 	DEVCB_NULL, //via_user_write_ca1
 	DEVCB_NULL, //via_user_write_cb1
-	DEVCB_HANDLER(bbcb_via_user_write_ca2),//via_user_write_ca2,
-	DEVCB_NULL,//via_user_write_cb2,
-	DEVCB_LINE(bbc_via_user_irq) //via_user_irq
+	DEVCB_DEVICE_LINE(CENTRONICS, "centronics", centronics_strobe_w),
+	DEVCB_NULL,	//via_user_write_cb2,
+	DEVCB_CPU_INPUT_LINE("main", M6502_IRQ_LINE)
 };
 
 
@@ -1338,73 +1280,6 @@ const uPD7002_interface BBC_uPD7002 =
 {
 	BBC_get_analogue_input,
 	BBC_uPD7002_EOC
-};
-
-
-/***************************************
-  BBC 6850 Serial Controller
-****************************************/
-
-WRITE8_HANDLER ( BBC_6850_w )
-{
-	const device_config *acia = devtag_get_device(space->machine, ACIA6850, "acia6850");
-
-	switch (offset&1)
-	{
-		case 0:
-			acia6850_ctrl_w(acia, 0, data);
-			break;
-		case 1:
-			acia6850_data_w(acia, 0, data);
-			break;
-	}
-
-	//logerror("6850 write to %02x = %02x\n",offset,data);
-
-}
-
-READ8_HANDLER (BBC_6850_r)
-{
-	const device_config *acia = devtag_get_device(space->machine, ACIA6850, "acia6850");
-	UINT8 retval=0;
-
-	switch (offset&1)
-	{
-		case 0:
-			retval = acia6850_stat_r(acia, 0);
-			break;
-		case 1:
-			retval = acia6850_data_r(acia, 0);
-			break;
-	}
-	//logerror("6850 read from %02x = %02x\n",offset,retval);
-	return retval;
-}
-
-
-
-static WRITE_LINE_DEVICE_HANDLER( serial_interrupt )
-{
-	cpu_set_input_line(device->machine->cpu[0], M6502_IRQ_LINE, state);
-}
-
-static UINT8 bbc_tx_pin;
-
-static WRITE_LINE_DEVICE_HANDLER( bbc_tx_w )
-{
-	bbc_tx_pin = state;
-}
-
-ACIA6850_INTERFACE( bbc_acia6850_interface )
-{
-	0,
-	0,
-	DEVCB_NULL,
-	DEVCB_LINE(bbc_tx_w), /*&bbc_tx_pin,*/
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_LINE(serial_interrupt),
 };
 
 
@@ -1771,7 +1646,7 @@ static WRITE8_HANDLER(bbc_wd177x_status_w)
 
 
 READ8_HANDLER ( bbc_wd1770_read )
-{	
+{
 	int retval=0xff;
 	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD177X, "wd177x");
 	switch (offset)
@@ -2276,7 +2151,7 @@ MACHINE_START( bbcm )
 	memory_configure_bank(machine, 5, 0, 16, memory_region(machine, "user1")+0x01000, 1<<14);
 
 	/* Set ROM/IO bank to point to rom */
-	memory_set_bankptr( machine, 8, memory_region(machine, "user1")+0x43c00); 
+	memory_set_bankptr( machine, 8, memory_region(machine, "user1")+0x43c00);
 	memory_install_read_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM),0xFC00,0xFEFF,0,0,8);
 }
 
@@ -2291,5 +2166,5 @@ MACHINE_RESET( bbcm )
 	bbcb_IC32_initialise();
 
 
-	previous_wd177x_int_state=1;    
+	previous_wd177x_int_state=1;
 }
