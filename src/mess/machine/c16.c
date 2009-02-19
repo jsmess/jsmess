@@ -493,8 +493,6 @@ MACHINE_RESET( c16 )
 	
 	c364_speech_init(machine);
 
-	devtag_reset(machine, SOUND_SID8580, "sid");
-
 	if (read_cfg1(machine) & 0x80)  /* SID card present */
 	{
 		memory_install_read8_handler(space, 0xfd40, 0xfd5f, 0, 0, sid6581_0_port_r);

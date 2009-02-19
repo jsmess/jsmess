@@ -28,7 +28,7 @@ struct _arcadia_sound
 INLINE arcadia_sound *get_token(const device_config *device)
 {
 	assert(device != NULL);
-	assert(device->type == SOUND_ARCADIA);
+	assert(sound_get_type(device) == SOUND_ARCADIA);
 	return (arcadia_sound *) device->token;
 }
 

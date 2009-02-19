@@ -962,7 +962,7 @@ READ8_HANDLER ( apple2_c03x_r )
 {
 	if (!offset)
 	{
-		const device_config *dac_device = devtag_get_device(space->machine, SOUND, "dac");
+		const device_config *dac_device = devtag_get_device(space->machine, SOUND, "a2dac");
 
 		if (a2_speaker_state == 0xFF)
 			a2_speaker_state = 0;
