@@ -715,12 +715,13 @@ static READ8_DEVICE_HANDLER( ppi_port_c_r )
 static WRITE8_DEVICE_HANDLER( ppi_port_c_w )
 {
 	// ADPCM / Joystick control
+	device_config *oki = (device_config*)devtag_get_device(device->machine, SOUND, "okim6258");
 	
 	ppi_port[2] = data;
 	x68k_sys.adpcm.pan = data & 0x03;
 	x68k_sys.adpcm.rate = data & 0x0c;
 	x68k_set_adpcm(device->machine);
-	okim6258_set_divider(0, (data >> 2) & 3);
+	okim6258_set_divider(oki, (data >> 2) & 3);
 
 	x68k_sys.joy.joy1_enable = data & 0x10;
 	x68k_sys.joy.joy2_enable = data & 0x20;
