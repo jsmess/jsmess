@@ -510,10 +510,11 @@ static UINT8 last_data;
 
 static WRITE8_HANDLER( super80_f0_w )
 {
+	const device_config *speaker = devtag_get_device(space->machine, SOUND, "speaker");
 	UINT8 bits = data ^ last_data;
 
 	if (bits & 0x20) set_led_status(2,(data & 32) ? 0 : 1);		/* bit 5 - LED - scroll lock led is used */
-	speaker_level_w(0, (data & 8) ? 0 : 1);				/* bit 3 - speaker */
+	speaker_level_w(speaker, (data & 8) ? 0 : 1);				/* bit 3 - speaker */
 	super80_mhz = (data & 4) ? 1 : 2;				/* bit 2 - video on/off */
 	if (bits & 2) cassette_motor( space->machine, data & 2 ? 1 : 0);	/* bit 1 - cassette motor */
 	if (bits & 1) cassette_output(cassette_device_image(space->machine), (data & 1) ? -1.0 : +1.0);	/* bit 0 - cass out */
@@ -523,10 +524,11 @@ static WRITE8_HANDLER( super80_f0_w )
 
 static WRITE8_HANDLER( super80r_f0_w )
 {
+	const device_config *speaker = devtag_get_device(space->machine, SOUND, "speaker");
 	UINT8 bits = data ^ last_data;
 
 	if (bits & 0x20) set_led_status(2,(data & 32) ? 0 : 1);		/* bit 5 - LED - scroll lock led is used */
-	speaker_level_w(0, (data & 8) ? 0 : 1);				/* bit 3 - speaker */
+	speaker_level_w(speaker, (data & 8) ? 0 : 1);				/* bit 3 - speaker */
 	if (bits & 2) cassette_motor( space->machine, data & 2 ? 1 : 0);	/* bit 1 - cassette motor */
 	if (bits & 1) cassette_output(cassette_device_image(space->machine), (data & 1) ? -1.0 : +1.0);	/* bit 0 - cass out */
 
@@ -535,11 +537,12 @@ static WRITE8_HANDLER( super80r_f0_w )
 
 static WRITE8_HANDLER( super80v_f0_w )
 {
+	const device_config *speaker = devtag_get_device(space->machine, SOUND, "speaker");
 	UINT8 bits = data ^ last_data;
 
 	if (bits & 0x20) set_led_status(2,(data & 32) ? 0 : 1);		/* bit 5 - LED - scroll lock led is used */
 	super80v_rom_pcg = data & 0x10;					/* bit 4 - bankswitch gfx rom or pcg */
-	speaker_level_w(0, (data & 8) ? 0 : 1);				/* bit 3 - speaker */
+	speaker_level_w(speaker, (data & 8) ? 0 : 1);				/* bit 3 - speaker */
 	super80v_vid_col = data & 4;					/* bit 2 - bankswitch video or colour ram */
 	if (bits & 2) cassette_motor( space->machine, data & 2 ? 1 : 0);	/* bit 1 - cassette motor */
 	if (bits & 1) cassette_output(cassette_device_image(space->machine), (data & 1) ? -1.0 : +1.0);	/* bit 0 - cass out */

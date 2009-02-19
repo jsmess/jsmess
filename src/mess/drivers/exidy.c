@@ -487,11 +487,12 @@ static WRITE8_HANDLER(exidy_fe_port_w)
 static WRITE8_HANDLER(exidy_ff_port_w)
 {
 	const device_config *printer = devtag_get_device(space->machine, CENTRONICS, "centronics");
+	const device_config *speaker = devtag_get_device(space->machine, SOUND, "speaker");
 	/* reading the config switch */
 	switch (input_port_read(space->machine, "CONFIG") & 0x06)
 	{
 		case 0: /* speaker */
-			speaker_level_w(0, (data) ? 1 : 0);
+			speaker_level_w(speaker, (data) ? 1 : 0);
 			break;
 
 		case 2: /* Centronics 7-bit printer */

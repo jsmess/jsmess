@@ -348,10 +348,11 @@ static WRITE8_DEVICE_HANDLER( pio_port_b_w )
 	 * 6	speaker
 	 * 7	network interrupt
 	 */
+	const device_config *speaker = devtag_get_device(device->machine, SOUND, "speaker");
 
 	cassette_output(cassette_device_image(device->machine), (data & 0x02) ? -1.0 : +1.0);
 
-	speaker_level_w(0, (data & 0x40) ? 1 : 0);
+	speaker_level_w(speaker, (data & 0x40) ? 1 : 0);
 };
 
 static const z80pio_interface mbee_z80pio_intf =
