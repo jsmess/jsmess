@@ -893,9 +893,9 @@ static WRITE16_HANDLER( x68k_fm_w )
 static READ16_HANDLER( x68k_fm_r )
 {
 	if(offset == 0x01)
-		return ym2151_r(devtag_get_device(space->machine, SOUND, "ym2151"), 0);
+		return ym2151_r(devtag_get_device(space->machine, SOUND, "ym2151"), 1);
 
-	return 0xff;
+	return 0xffff;
 }
 
 static WRITE8_DEVICE_HANDLER( x68k_ct_w )
