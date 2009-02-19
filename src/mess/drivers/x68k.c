@@ -884,7 +884,7 @@ static WRITE16_HANDLER( x68k_fm_w )
 	{
 	case 0x00:
 	case 0x01:
-		ym2151_w(devtag_get_device(space->machine, SOUND_YM2151, "ym2151"), offset, data);
+		ym2151_w(devtag_get_device(space->machine, SOUND, "ym2151"), offset, data);
 		break;
 	}
 }
@@ -892,7 +892,7 @@ static WRITE16_HANDLER( x68k_fm_w )
 static READ16_HANDLER( x68k_fm_r )
 {
 	if(offset == 0x01)
-		return ym2151_r(devtag_get_device(space->machine, SOUND_YM2151, "ym2151"), 0);
+		return ym2151_r(devtag_get_device(space->machine, SOUND, "ym2151"), 0);
 
 	return 0xff;
 }

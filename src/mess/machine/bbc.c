@@ -927,7 +927,7 @@ static WRITE8_DEVICE_HANDLER( bbcb_via_system_write_porta )
 	if (b0_sound==0)
 	{
  		//logerror("Doing an unsafe write to the sound chip %d \n",data);
-		sn76496_w(devtag_get_device(device->machine, SOUND_SN76489, "sn76489"), 0,via_system_porta);
+		sn76496_w(devtag_get_device(device->machine, SOUND, "sn76489"), 0,via_system_porta);
 	}
 	if (b3_keyboard==0)
 	{
@@ -1023,7 +1023,7 @@ static WRITE8_DEVICE_HANDLER( bbcb_via_system_write_portb )
 		case 0:
 			if (b0_sound==1) {
 				b0_sound=0;
-				sn76496_w(devtag_get_device(space->machine, SOUND_SN76489, "sn76489"), 0, via_system_porta);
+				sn76496_w(devtag_get_device(space->machine, SOUND, "sn76489"), 0, via_system_porta);
 			}
 			break;
 		case 1:

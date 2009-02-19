@@ -1048,7 +1048,7 @@ static UINT8 to7_get_mouse_signal( running_machine *machine )
 
 static void to7_game_sound_update ( running_machine *machine )
 {
-	dac_data_w( devtag_get_device(machine, SOUND_DAC, "dac"), to7_game_mute ? 0 : (to7_game_sound << 2) );
+	dac_data_w( devtag_get_device(machine, SOUND, "dac"), to7_game_mute ? 0 : (to7_game_sound << 2) );
 }
 
 

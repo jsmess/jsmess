@@ -861,7 +861,7 @@ static READ8_HANDLER( gssnd_r )
 			}
 			else
 			{
-				const device_config *es5503 = devtag_get_device(space->machine, SOUND_ES5503, "es5503");
+				const device_config *es5503 = devtag_get_device(space->machine, SOUND, "es5503");
 				sndglu_dummy_read = es5503_r(es5503, sndglu_addr);
 			}
 
@@ -901,7 +901,7 @@ static WRITE8_HANDLER( gssnd_w )
 			}
 			else
 			{
-				const device_config *es5503 = devtag_get_device(space->machine, SOUND_ES5503, "es5503");
+				const device_config *es5503 = devtag_get_device(space->machine, SOUND, "es5503");
 				es5503_w(es5503, sndglu_addr, data);
 			}
 

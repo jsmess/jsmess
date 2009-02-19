@@ -144,8 +144,8 @@ READ8_DEVICE_HANDLER(mockingboard_r)
 
 WRITE8_DEVICE_HANDLER(mockingboard_w)
 {
-	const device_config *ay8910_1 = devtag_get_device(device->machine, SOUND_AY8913, "ay8910.1");
-	const device_config *ay8910_2 = devtag_get_device(device->machine, SOUND_AY8913, "ay8910.2");
+	const device_config *ay8910_1 = devtag_get_device(device->machine, SOUND, "ay8910.1");
+	const device_config *ay8910_2 = devtag_get_device(device->machine, SOUND, "ay8910.2");
 	mockingboard_token *token = get_token(device);
 
 	if (LOG_MOCKINGBOARD)

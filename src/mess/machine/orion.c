@@ -587,13 +587,13 @@ READ8_HANDLER ( orionpro_io_r ) {
 		case 0x2b : return orion128_romdisk_r(space,3);
 	}
 	if (offset == 0xFFFD) {
-		return ay8910_r (devtag_get_device(space->machine, SOUND_AY8912, "ay8912"), 0);
+		return ay8910_r (devtag_get_device(space->machine, SOUND, "ay8912"), 0);
 	}
 	return 0xff;
 }
 
 WRITE8_HANDLER ( orionpro_io_w ) {
-	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD1793, "wd1793");
+	const device_config *fdc = devtag_get_device(space->machine, WD1793, "wd1793");
 		
 	switch (offset & 0xff) {		
 		case 0x04 : orionpro_ram0_segment = data; orionpro_bank_switch(space->machine); break;		

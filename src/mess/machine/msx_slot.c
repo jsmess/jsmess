@@ -341,7 +341,7 @@ static READ8_HANDLER (konami_scc_bank5)
 		return 0xff;
 	}
 	else {
-		return k051649_waveform_r (devtag_get_device(space->machine, SOUND_K051649, "k051649"), offset & 0x7f);
+		return k051649_waveform_r (devtag_get_device(space->machine, SOUND, "k051649"), offset & 0x7f);
 	}
 }
 
@@ -394,7 +394,7 @@ MSX_SLOT_WRITE(konami_scc)
 		}
 	}
 	else if (state->cart.scc.active && addr >= 0x9800 && addr < 0xa000) {
-		const device_config *k051649 = devtag_get_device(space->machine, SOUND_K051649, "k051649");
+		const device_config *k051649 = devtag_get_device(space->machine, SOUND, "k051649");
 		int offset = addr & 0xff;
 
 		if (offset < 0x80) {
@@ -1999,14 +1999,14 @@ static  READ8_HANDLER (soundcartridge_scc)
 	reg = offset & 0xff;
 
 	if (reg < 0x80) {
-		return k051649_waveform_r (devtag_get_device(space->machine, SOUND_K051649, "k051649"), reg);
+		return k051649_waveform_r (devtag_get_device(space->machine, SOUND, "k051649"), reg);
 	}
 	else if (reg < 0xa0) {
 		/* nothing */
 	}
 	else if (reg < 0xc0) {
 		/* read wave 5 */
-		return k051649_waveform_r (devtag_get_device(space->machine, SOUND_K051649, "k051649"), 0x80 + (reg & 0x1f));
+		return k051649_waveform_r (devtag_get_device(space->machine, SOUND, "k051649"), 0x80 + (reg & 0x1f));
 	}
 #if 0
 	else if (reg < 0xe0) {
@@ -2029,7 +2029,7 @@ static  READ8_HANDLER (soundcartridge_sccp)
 	reg = offset & 0xff;
 
 	if (reg < 0xa0) {
-		return k051649_waveform_r (devtag_get_device(space->machine, SOUND_K051649, "k051649"), reg);
+		return k051649_waveform_r (devtag_get_device(space->machine, SOUND, "k051649"), reg);
 	}
 #if 0
 	else if (reg >= 0xc0 && reg < 0xe0) {
@@ -2117,7 +2117,7 @@ MSX_SLOT_WRITE(soundcartridge)
 			}
 		}
 		else if (addr >= 0x9800 && state->cart.sccp.scc_active) {
-			const device_config *k051649 = devtag_get_device(space->machine, SOUND_K051649, "k051649");
+			const device_config *k051649 = devtag_get_device(space->machine, SOUND, "k051649");
 			int offset = addr & 0xff;
 
 			if (offset < 0x80) {
@@ -2158,7 +2158,7 @@ MSX_SLOT_WRITE(soundcartridge)
 			}
 		}
 		else if (addr >= 0xb800 && state->cart.sccp.sccp_active) {
-			const device_config *k051649 = devtag_get_device(space->machine, SOUND_K051649, "k051649");
+			const device_config *k051649 = devtag_get_device(space->machine, SOUND, "k051649");
 			int offset = addr & 0xff;
 
 			if (offset < 0xa0) {

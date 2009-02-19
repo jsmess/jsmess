@@ -670,7 +670,7 @@ READ8_HANDLER ( atari_serin_r )
 
 	if (atari_fdc.serin_count)
 	{
-		const device_config *pokey = devtag_get_device(space->machine, SOUND_POKEY, "pokey");
+		const device_config *pokey = devtag_get_device(space->machine, SOUND, "pokey");
 
 		data = atari_fdc.serin_buff[atari_fdc.serin_offs];
 		ser_delay = 2 * 40;

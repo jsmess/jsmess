@@ -568,7 +568,7 @@ WRITE8_HANDLER (msx_fmpac_w)
 {
 	if (msx1.opll_active)
 	{
-		const device_config *ym = devtag_get_device(space->machine, SOUND_YM2413, "ym2413");
+		const device_config *ym = devtag_get_device(space->machine, SOUND, "ym2413");
 
 		if (offset == 1)
 			ym2413_w (ym, 1, data);

@@ -725,9 +725,9 @@ static void nc_sound_update(running_machine *machine, int channel)
 	frequency = (int)(1000000.0f/((float)((period & 0x07fff)<<1) * 1.6276f));
 
 	/* set state */
-	beep_set_state(devtag_get_device(machine, SOUND_BEEP, beep_device), on);
+	beep_set_state(devtag_get_device(machine, SOUND, beep_device), on);
 	/* set frequency */
-	beep_set_frequency(devtag_get_device(machine, SOUND_BEEP, beep_device), frequency);
+	beep_set_frequency(devtag_get_device(machine, SOUND, beep_device), frequency);
 }
 
 static WRITE8_HANDLER(nc_sound_w)
