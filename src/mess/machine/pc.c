@@ -30,10 +30,7 @@
 
 #include "includes/pc_mouse.h"
 #include "machine/pckeybrd.h"
-
-#include "includes/pclpt.h"
-#include "machine/centroni.h"
-
+#include "machine/pc_lpt.h"
 #include "machine/pc_fdc.h"
 #include "machine/pc_hdc.h"
 #include "machine/nec765.h"
@@ -246,7 +243,7 @@ const struct pic8259_interface pcjr_pic8259_master_config =
 static UINT8 pc_spkrdata = 0;
 static UINT8 pc_input = 0;
 
-UINT8 pc_speaker_get_spk(void) 
+UINT8 pc_speaker_get_spk(void)
 {
 	return pc_spkrdata & pc_input;
 }
@@ -276,7 +273,7 @@ static PIT8253_OUTPUT_CHANGED( ibm5150_timer0_w )
 {
 	pic8259_set_irq_line(pc_devices.pic8259_master, 0, state);
 }
- 
+
 
 static PIT8253_OUTPUT_CHANGED( ibm5150_pit8253_out1_changed )
 {
@@ -393,49 +390,6 @@ const ins8250_interface ibm5150_com_interface[4]=
 		NULL
 	}
 };
-
-
-/**********************************************************
- *
- * LPT interface
- *
- **********************************************************/
-
-static const PC_LPT_CONFIG lpt_config[3]=
-{
-	{
-		1,
-		LPT_UNIDIRECTIONAL,
-		NULL
-	},
-	{
-		1,
-		LPT_UNIDIRECTIONAL,
-		NULL
-	},
-	{
-		1,
-		LPT_UNIDIRECTIONAL,
-		NULL
-	}
-};
-
-static const CENTRONICS_CONFIG cent_config[3]=
-{
-	{
-		PRINTER_IBM,
-		pc_lpt_handshake_in
-	},
-	{
-		PRINTER_IBM,
-		pc_lpt_handshake_in
-	},
-	{
-		PRINTER_IBM,
-		pc_lpt_handshake_in
-	}
-};
-
 
 
 /**********************************************************
@@ -1159,7 +1113,7 @@ static void pc_set_keyb_int(running_machine *machine, int state)
  *
  **********************************************************/
 
-void mess_init_pc_common(running_machine *machine, UINT32 flags, void (*set_keyb_int_func)(running_machine *, int), void (*set_hdc_int_func)(int,int)) 
+void mess_init_pc_common(running_machine *machine, UINT32 flags, void (*set_keyb_int_func)(running_machine *, int), void (*set_hdc_int_func)(int,int))
 {
 	if ( set_keyb_int_func != NULL )
 		init_pc_common(machine, flags, set_keyb_int_func);
@@ -1170,16 +1124,6 @@ void mess_init_pc_common(running_machine *machine, UINT32 flags, void (*set_keyb
 
 	/* FDC/HDC hardware */
 	pc_hdc_setup(machine, set_hdc_int_func);
-
-	pc_lpt_config(0, lpt_config);
-	centronics_config(machine, 0, cent_config);
-	pc_lpt_set_device(0, &CENTRONICS_PRINTER_DEVICE);
-	pc_lpt_config(1, lpt_config+1);
-	centronics_config(machine, 1, cent_config+1);
-	pc_lpt_set_device(1, &CENTRONICS_PRINTER_DEVICE);
-	pc_lpt_config(2, lpt_config+2);
-	centronics_config(machine, 2, cent_config+2);
-	pc_lpt_set_device(2, &CENTRONICS_PRINTER_DEVICE);
 
 	/* serial mouse */
 	pc_mouse_initialise(machine);
@@ -1292,9 +1236,6 @@ DRIVER_INIT( pc1512 )
 
 	memory_install_read16_handler( io_space, 0x3d0, 0x3df, 0, 0, pc1512_16le_r );
 	memory_install_write16_handler( io_space, 0x3d0, 0x3df, 0, 0, pc1512_16le_w );
-
-	memory_install_read16_handler( io_space, 0x278, 0x27b, 0, 0, pc16le_parallelport2_r );
-
 
 	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
 	mc146818_init(machine, MC146818_IGNORE_CENTURY);

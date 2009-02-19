@@ -25,6 +25,8 @@ System Driver Changes:
 
 - [APPLE1] Fixed character layout.  [rhester72]
 
+- [AT] Updated to use the new centronics interface.  [Dirk Best]
+
 - [ATARIST] Updated to use the new centronics interface.  [Dirk Best]
 
 - [ATOM] Rewrote printer interface.  [Dirk Best]
@@ -43,6 +45,8 @@ System Driver Changes:
   floppy image and no cart.  (bug #1760) [Fabio Priuli]
 
 - [GAMEPOCK] Fixed 128u3 regression.  (bug #1752) [Wilbert Pol]
+
+- [IP22] Updated to use the centronics interface.  [Dirk Best]
 
 - [MTX512] Connected CTC channels 0-2 to clock sources. (bug #781) [Curt Coder]
 
@@ -67,6 +71,8 @@ System Driver Changes:
 - [VTECH1] Updated to use the new centronics support.  [Dirk Best]
 
 - [X68000] Added better implementation of 1024x1024 graphic layer.  [Barry Rodewald]
+
+- [XT/PC] Updated to use the new centronics support.  [Dirk Best]
 
 - [ZX] Fixed access violation when mounting a .O tape file;
        Implemented cassette save (only .wav is supported);
@@ -115,6 +121,8 @@ Source Changes:
   CDP1864, CDP1871, MC68901, Z80DART, ZX8301, ZX8302 [Curt Coder]
 
 - New centronics printer interface.  [Dirk Best]
+
+- New PC-LPT device.  [Dirk Best]
 
 
 

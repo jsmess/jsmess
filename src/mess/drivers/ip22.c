@@ -44,12 +44,12 @@
 #include "machine/sgi.h"
 #include "machine/pckeybrd.h"
 #include "includes/pc_mouse.h"
+#include "machine/pc_lpt.h"
 #include "includes/at.h"
 #include "machine/8042kbdc.h"
 #include "machine/pit8253.h"
 #include "includes/ps2.h"
-#include "machine/pcshare.h"			
-#include "includes/pclpt.h"
+#include "machine/pcshare.h"
 #include "video/newport.h"
 #include "machine/wd33c93.h"
 #include "devices/harddriv.h"
@@ -183,17 +183,18 @@ static void int3_lower_local1_irq(UINT8 source_mask)
 
 static READ32_HANDLER( hpc3_pbus6_r )
 {
+	const device_config *lpt = devtag_get_device(space->machine, PC_LPT, "lpt_0");
 	UINT8 ret8;
 	running_machine *machine = space->machine;
 
 	switch( offset )
 	{
 	case 0x004/4:
-		ret8 = pc_parallelport0_r(space, 2) ^ 0x0d;
+		ret8 = pc_lpt_control_r(lpt, 0) ^ 0x0d;
 		verboselog( machine, 0, "Parallel Control Read: %02x\n", ret8 );
 		return ret8;
 	case 0x008/4:
-		ret8 = pc_parallelport0_r(space, 1) ^ 0x80;
+		ret8 = pc_lpt_status_r(lpt, 0) ^ 0x80;
 		verboselog( machine, 0, "Parallel Status Read: %02x\n", ret8 );
 		return ret8;
 	case 0x030/4:
@@ -257,6 +258,7 @@ static READ32_HANDLER( hpc3_pbus6_r )
 
 static WRITE32_HANDLER( hpc3_pbus6_w )
 {
+	const device_config *lpt = devtag_get_device(space->machine, PC_LPT, "lpt_0");
 	char cChar;
 	running_machine *machine = space->machine;
 
@@ -264,7 +266,7 @@ static WRITE32_HANDLER( hpc3_pbus6_w )
 	{
 	case 0x004/4:
 		verboselog( machine, 0, "Parallel Control Write: %08x\n", data );
-		pc_parallelport0_w(space, 2, data ^ 0x0d);
+		pc_lpt_control_w(lpt, 0, data ^ 0x0d);
 //      nIOC_ParCntl = data;
 		break;
 	case 0x030/4:
@@ -1065,7 +1067,7 @@ static READ32_HANDLER( hpc3_pbusdma_r )
 static WRITE32_HANDLER( hpc3_pbusdma_w )
 {
 	UINT32 channel = offset / (0x2000/4);
-	running_machine *machine = space->machine;	
+	running_machine *machine = space->machine;
 
 	switch( offset & 0x07ff )
 	{
@@ -1492,6 +1494,11 @@ static void ip22_harddisk_getinfo(const mess_device_class *devclass, UINT32 stat
 }
 #endif
 
+static const pc_lpt_interface ip22_lpt_config =
+{
+	DEVCB_NULL /* no idea if the lpt irq is connected and where */
+};
+
 static MACHINE_DRIVER_START( ip225015 )
 	MDRV_CPU_ADD( "main", R5000BE, 50000000*3 )
 	MDRV_CPU_CONFIG( config )
@@ -1516,6 +1523,8 @@ static MACHINE_DRIVER_START( ip225015 )
 
 	MDRV_VIDEO_START( newport )
 	MDRV_VIDEO_UPDATE( newport )
+
+	MDRV_PC_LPT_ADD("lpt_0", ip22_lpt_config)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 

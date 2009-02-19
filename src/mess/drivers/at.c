@@ -19,7 +19,6 @@
 #include "machine/mc146818.h"
 #include "machine/pic8259.h"
 #include "machine/i82439tx.h"
-#include "devices/printer.h"
 
 #include "machine/pit8253.h"
 #include "video/pc_vga.h"
@@ -34,7 +33,7 @@
 #include "machine/pc_fdc.h"
 #include "machine/pc_joy.h"
 #include "machine/pckeybrd.h"
-#include "includes/pclpt.h"
+#include "machine/pc_lpt.h"
 #include "audio/sblaster.h"
 #include "includes/pc_mouse.h"
 
@@ -137,17 +136,17 @@ static ADDRESS_MAP_START(at16_io, ADDRESS_SPACE_IO, 16)
 	AM_RANGE(0x01f0, 0x01f7) AM_READWRITE8(at_mfm_0_r,               at_mfm_0_w, 0xffff)
 	AM_RANGE(0x0200, 0x0207) AM_READWRITE8(pc_JOY_r,                 pc_JOY_w, 0xffff)
 	AM_RANGE(0x0220, 0x022f) AM_READWRITE8(soundblaster_r,           soundblaster_w, 0xffff)
-	AM_RANGE(0x0278, 0x027f) AM_READWRITE8(pc_parallelport2_r,       pc_parallelport2_w, 0xffff)
+	AM_RANGE(0x0278, 0x027f) AM_DEVREADWRITE8(PC_LPT, "lpt_2", pc_lpt_r, pc_lpt_w, 0x00ff)
 	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8(NS16450, "ns16450_3", ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8(NS16450, "ns16450_1", ins8250_r, ins8250_w, 0xffff)
 //	AM_RANGE(0x0320, 0x0323) AM_READWRITE8(pc_HDC1_r,                pc_HDC1_w, 0xffff)
 //	AM_RANGE(0x0324, 0x0327) AM_READWRITE8(pc_HDC2_r,                pc_HDC2_w, 0xffff)
-	AM_RANGE(0x0378, 0x037f) AM_READWRITE8(pc_parallelport1_r,       pc_parallelport1_w, 0xffff)
+	AM_RANGE(0x0378, 0x037f) AM_DEVREADWRITE8(PC_LPT, "lpt_1", pc_lpt_r, pc_lpt_w, 0x00ff)
 #ifdef ADLIB
 	AM_RANGE(0x0388, 0x0388) AM_DEVREADWRITE8(SOUND, "ym3812", ym3812_status_port_r,ym3812_control_port_w, 0xffff)
 	AM_RANGE(0x0389, 0x0389) AM_DEVWRITE8(SOUND, "ym3812", ym3812_write_port_w, 0xffff)
 #endif
-	AM_RANGE(0x03bc, 0x03bf) AM_READWRITE8(pc_parallelport0_r,       pc_parallelport0_w, 0xffff)
+	AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE8(PC_LPT, "lpt_0", pc_lpt_r, pc_lpt_w, 0x00ff)
 	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE8(NS16450, "ns16450_2", ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE8(pc_fdc_r,                 pc_fdc_w, 0xffff)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8(NS16450, "ns16450_0", ins8250_r, ins8250_w, 0xffff)
@@ -163,14 +162,14 @@ static ADDRESS_MAP_START(at386_io, ADDRESS_SPACE_IO, 32)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r,				at_page8_w, 0xffffffff)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8(PIC8259, "pic8259_slave", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8(DMA8237, "dma8237_2", at_dma8237_1_r, at_dma8237_1_w, 0xffffffff)
-	AM_RANGE(0x0278, 0x027f) AM_READWRITE(pc32le_parallelport2_r,	pc32le_parallelport2_w)
+	AM_RANGE(0x0278, 0x027f) AM_DEVREADWRITE8(PC_LPT, "lpt_2", pc_lpt_r, pc_lpt_w, 0x000000ff)
 	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8(NS16450, "ns16450_3", ins8250_r, ins8250_w, 0xffffffff)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8(NS16450, "ns16450_1", ins8250_r, ins8250_w, 0xffffffff)
 	AM_RANGE(0x0320, 0x0323) AM_READWRITE(pc32le_HDC1_r,			pc32le_HDC1_w)
 	AM_RANGE(0x0324, 0x0327) AM_READWRITE(pc32le_HDC2_r,			pc32le_HDC2_w)
-	AM_RANGE(0x0378, 0x037f) AM_READWRITE(pc32le_parallelport1_r,	pc32le_parallelport1_w)
+	AM_RANGE(0x0378, 0x037f) AM_DEVREADWRITE8(PC_LPT, "lpt_1", pc_lpt_r, pc_lpt_w, 0x000000ff)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE8(pc_fdc_r,				pc_fdc_w, 0xffffffff)
-	AM_RANGE(0x03bc, 0x03bf) AM_READWRITE(pc32le_parallelport0_r,	pc32le_parallelport0_w)
+	AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE8(PC_LPT, "lpt_0", pc_lpt_r, pc_lpt_w, 0x000000ff)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8(NS16450, "ns16450_0", ins8250_r, ins8250_w, 0xffffffff)
 ADDRESS_MAP_END
 
@@ -185,14 +184,14 @@ static ADDRESS_MAP_START(at586_io, ADDRESS_SPACE_IO, 32)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r,				at_page8_w, 0xffffffff)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8(PIC8259, "pic8259_slave", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8(DMA8237, "dma8237_2", at_dma8237_1_r, at_dma8237_1_w, 0xffffffff)
-	AM_RANGE(0x0278, 0x027f) AM_READWRITE(pc32le_parallelport2_r,		pc32le_parallelport2_w)
+	AM_RANGE(0x0278, 0x027f) AM_DEVREADWRITE8(PC_LPT, "lpt_2", pc_lpt_r, pc_lpt_w, 0x000000ff)
 	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8(NS16450, "ns16450_3", ins8250_r, ins8250_w, 0xffffffff)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8(NS16450, "ns16450_1", ins8250_r, ins8250_w, 0xffffffff)
 	AM_RANGE(0x0320, 0x0323) AM_READWRITE(pc32le_HDC1_r,				pc32le_HDC1_w)
 	AM_RANGE(0x0324, 0x0327) AM_READWRITE(pc32le_HDC2_r,				pc32le_HDC2_w)
-	AM_RANGE(0x0378, 0x037f) AM_READWRITE(pc32le_parallelport1_r,		pc32le_parallelport1_w)
+	AM_RANGE(0x0378, 0x037f) AM_DEVREADWRITE8(PC_LPT, "lpt_1", pc_lpt_r, pc_lpt_w, 0x000000ff)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE8(pc_fdc_r,				pc_fdc_w, 0xffffffff)
-	AM_RANGE(0x03bc, 0x03bf) AM_READWRITE(pc32le_parallelport0_r,		pc32le_parallelport0_w)
+	AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE8(PC_LPT, "lpt_0", pc_lpt_r, pc_lpt_w, 0x000000ff)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8(NS16450, "ns16450_0", ins8250_r, ins8250_w, 0xffffffff)
 	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE(PCI_BUS, "pcibus", pci_32le_r,				pci_32le_w)
 ADDRESS_MAP_END
@@ -402,6 +401,11 @@ static const ym3812_interface at_ym3812_interface =
 };
 #endif
 
+static const pc_lpt_interface at_lpt_config =
+{
+	DEVCB_CPU_INPUT_LINE("main", 0)
+};
+
 
 static MACHINE_DRIVER_START( ibm5170 )
 	/* basic machine hardware */
@@ -454,13 +458,13 @@ static MACHINE_DRIVER_START( ibm5170 )
 	MDRV_NVRAM_HANDLER( mc146818 )
 
 	/* printers */
-	MDRV_PRINTER_ADD("printer1")
-	MDRV_PRINTER_ADD("printer2")
-	MDRV_PRINTER_ADD("printer3")
+	MDRV_PC_LPT_ADD("lpt_0", at_lpt_config)
+	MDRV_PC_LPT_ADD("lpt_1", at_lpt_config)
+	MDRV_PC_LPT_ADD("lpt_2", at_lpt_config)
 
 	/* harddisk */
 	MDRV_IMPORT_FROM( pc_hdc )
-	
+
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
 MACHINE_DRIVER_END
 
@@ -512,13 +516,13 @@ static MACHINE_DRIVER_START( ibm5162 )
 	MDRV_NVRAM_HANDLER( mc146818 )
 
 	/* printers */
-	MDRV_PRINTER_ADD("printer1")
-	MDRV_PRINTER_ADD("printer2")
-	MDRV_PRINTER_ADD("printer3")
+	MDRV_PC_LPT_ADD("lpt_0", at_lpt_config)
+	MDRV_PC_LPT_ADD("lpt_1", at_lpt_config)
+	MDRV_PC_LPT_ADD("lpt_2", at_lpt_config)
 
 	/* harddisk */
 	MDRV_IMPORT_FROM( pc_hdc )
-	
+
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
 MACHINE_DRIVER_END
 
@@ -577,13 +581,13 @@ static MACHINE_DRIVER_START( ps2m30286 )
 	MDRV_NVRAM_HANDLER( mc146818 )
 
 	/* printers */
-	MDRV_PRINTER_ADD("printer1")
-	MDRV_PRINTER_ADD("printer2")
-	MDRV_PRINTER_ADD("printer3")
+	MDRV_PC_LPT_ADD("lpt_0", at_lpt_config)
+	MDRV_PC_LPT_ADD("lpt_1", at_lpt_config)
+	MDRV_PC_LPT_ADD("lpt_2", at_lpt_config)
 
 	/* harddisk */
 	MDRV_IMPORT_FROM( pc_hdc )
-	
+
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
 MACHINE_DRIVER_END
 
@@ -644,13 +648,13 @@ static MACHINE_DRIVER_START( atvga )
 	MDRV_NVRAM_HANDLER( mc146818 )
 
 	/* printers */
-	MDRV_PRINTER_ADD("printer1")
-	MDRV_PRINTER_ADD("printer2")
-	MDRV_PRINTER_ADD("printer3")
+	MDRV_PC_LPT_ADD("lpt_0", at_lpt_config)
+	MDRV_PC_LPT_ADD("lpt_1", at_lpt_config)
+	MDRV_PC_LPT_ADD("lpt_2", at_lpt_config)
 
 	/* harddisk */
 	MDRV_IMPORT_FROM( pc_hdc )
-	
+
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
 MACHINE_DRIVER_END
 
@@ -708,13 +712,13 @@ static MACHINE_DRIVER_START( at386 )
 	MDRV_NVRAM_HANDLER( mc146818 )
 
 	/* printers */
-	MDRV_PRINTER_ADD("printer1")
-	MDRV_PRINTER_ADD("printer2")
-	MDRV_PRINTER_ADD("printer3")
+	MDRV_PC_LPT_ADD("lpt_0", at_lpt_config)
+	MDRV_PC_LPT_ADD("lpt_1", at_lpt_config)
+	MDRV_PC_LPT_ADD("lpt_2", at_lpt_config)
 
 	/* harddisk */
 	MDRV_IMPORT_FROM( pc_hdc )
-	
+
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_not_connected_interface)
 MACHINE_DRIVER_END
 

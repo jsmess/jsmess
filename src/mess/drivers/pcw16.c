@@ -93,8 +93,7 @@ TODO:
 #include "includes/pcw16.h"
 
 /* Components */
-#include "machine/centroni.h"	/* centronics printer handshake simulation */
-#include "includes/pclpt.h"		/* PC-Parallel Port */
+#include "machine/pc_lpt.h"		/* PC-Parallel Port */
 #include "machine/pckeybrd.h"	/* PC-AT keyboard */
 #include "machine/pc_fdc.h"		/* change to superio later */
 #include "machine/ins8250.h"	/* pc com port */
@@ -105,7 +104,6 @@ TODO:
 /* Devices */
 #include "formats/pc_dsk.h"		/* pc disk images */
 #include "devices/mflopimg.h"
-#include "devices/printer.h"	/* printer device */
 
 
 // interrupt counter
@@ -1290,7 +1288,7 @@ static ADDRESS_MAP_START(pcw16_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x01f, 0x01f) AM_READWRITE(pcw16_superio_fdc_digital_input_register_r, pcw16_superio_fdc_datarate_w)
 	AM_RANGE(0x020, 0x027) AM_DEVREADWRITE(NS16550, "ns16550_1", ins8250_r, ins8250_w)
 	AM_RANGE(0x028, 0x02f) AM_DEVREADWRITE(NS16550, "ns16550_2", ins8250_r, ins8250_w)
-	AM_RANGE(0x038, 0x03a) AM_READWRITE(pc_parallelport0_r, pc_parallelport0_w)
+	AM_RANGE(0x038, 0x03a) AM_DEVREADWRITE(PC_LPT, "lpt", pc_lpt_r, pc_lpt_w)
 	/* anne asic */
 	AM_RANGE(0x0e0, 0x0ef) AM_WRITE(pcw16_palette_w)
 	AM_RANGE(0x0f0, 0x0f3) AM_READWRITE(pcw16_bankhw_r, pcw16_bankhw_w)
@@ -1333,19 +1331,6 @@ static void pcw16_reset(running_machine *machine)
 }
 
 
-static const PC_LPT_CONFIG lpt_config =
-{
-	1,
-	LPT_UNIDIRECTIONAL, // more one of these epp/ecp aware ports
-	NULL
-};
-
-static const CENTRONICS_CONFIG cent_config =
-{
-	PRINTER_CENTRONICS,
-	pc_lpt_handshake_in
-};
-
 static MACHINE_RESET( pcw16 )
 {
 	pcw16_system_status = 0;
@@ -1360,10 +1345,6 @@ static MACHINE_RESET( pcw16 )
 
 
 	pc_fdc_init(machine, &pcw16_fdc_interface);
-
-	pc_lpt_config(0, &lpt_config);
-	centronics_config(machine, 0, &cent_config);
-	pc_lpt_set_device(0, &CENTRONICS_PRINTER_DEVICE);
 
 	/* initialise mouse */
 	pc_mouse_initialise(machine);
@@ -1393,6 +1374,11 @@ static INPUT_PORTS_START(pcw16)
 	PORT_INCLUDE( at_keyboard )		/* IN4 - IN11 */
 INPUT_PORTS_END
 
+
+static const pc_lpt_interface pcw16_lpt_config =
+{
+	DEVCB_CPU_INPUT_LINE("main", 0)
+};
 
 
 static MACHINE_DRIVER_START( pcw16 )
@@ -1428,7 +1414,7 @@ static MACHINE_DRIVER_START( pcw16 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* printer */
-	/* MDRV_PRINTER_ADD("printer") */
+	MDRV_PC_LPT_ADD("lpt", pcw16_lpt_config)
 	MDRV_NEC765A_ADD("nec765", pc_fdc_nec765_connected_interface)
 MACHINE_DRIVER_END
 

@@ -522,7 +522,7 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/74145.o    \
 	$(MESS_MACHINE)/ins8250.o \
 	$(MESS_MACHINE)/pc_mouse.o \
-	$(MESS_MACHINE)/centroni.o \
+	$(MESS_MACHINE)/pc_lpt.o    \
 	$(MESS_MACHINE)/ctronics.o \
 	$(MAME_MACHINE)/pckeybrd.o \
 	$(MESS_MACHINE)/d88.o      \
@@ -538,7 +538,6 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_DEVICES)/z80bin.o	\
 	$(MESS_VIDEO)/cdp1864.o		\
 	$(MESS_VIDEO)/crtc6845.o	\
-	$(MESS_MACHINE)/pclpt.o    \
 	$(MESS_MACHINE)/z80dart.o	\
 	$(MESS_VIDEO)/msm6255.o	\
 	$(MESS_MACHINE)/8530scc.o		\

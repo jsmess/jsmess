@@ -1,9 +1,9 @@
 #include "driver.h"
 
 #include "machine/pit8253.h"
+#include "machine/pc_lpt.h"
 #include "machine/pcshare.h"
 #include "includes/amstr_pc.h"
-#include "includes/pclpt.h"
 #include "includes/pc.h"
 #include "video/pc_vga.h"
 #include "memconv.h"
@@ -199,25 +199,30 @@ WRITE8_HANDLER( pc1640_port60_w )
 	return data;
 }
 
- READ8_HANDLER( pc200_port378_r )
+READ8_HANDLER( pc200_port378_r )
 {
-	int data=pc_parallelport1_r(space, offset);
-	if (offset == 1) 
+	const device_config *lpt = devtag_get_device(space->machine, PC_LPT, "lpt_2");
+	UINT8 data = pc_lpt_r(lpt, offset);
+
+	if (offset == 1)
 		data = (data & ~7) | (input_port_read(space->machine, "DSW0") & 7);
-	if (offset == 2) 
+	if (offset == 2)
 		data = (data & ~0xe0) | (input_port_read(space->machine, "DSW0") & 0xc0);
+
 	return data;
 }
 
 
- READ8_HANDLER( pc1640_port378_r )
+READ8_HANDLER( pc1640_port378_r )
 {
-	int data=pc_parallelport1_r(space, offset);
-	if (offset == 1) 
+	 const device_config *lpt = devtag_get_device(space->machine, PC_LPT, "lpt_1");
+	 UINT8 data = pc_lpt_r(lpt, offset);
+
+	if (offset == 1)
 		data=(data & ~7) | (input_port_read(space->machine, "DSW0") & 7);
-	if (offset == 2) 
+	if (offset == 2)
 	{
-		switch (pc1640.dipstate) 
+		switch (pc1640.dipstate)
 		{
 		case 0:
 			data = (data&~0xe0) | (input_port_read(space->machine, "DSW0") & 0xe0);
