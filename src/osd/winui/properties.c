@@ -657,7 +657,7 @@ static char *GameInfoSound(UINT nIndex)
 		int clock,count;
 		device_type sound_type_;
 
-		sound_type_ = sound->type;
+		sound_type_ = sound_get_type(sound);
 		clock = sound->clock;
 
 		count = 1;
@@ -665,7 +665,7 @@ static char *GameInfoSound(UINT nIndex)
 
 		/* Matching chips at the same clock are aggregated */
 		while (sound != NULL
-			&& sound->type == sound_type_
+			&& sound_get_type(sound) == sound_type_
 			&& sound->clock == clock)
 		{
 			count++;
@@ -2568,9 +2568,6 @@ static void SetYM3812Enabled(HWND hWnd, int nIndex)
 #if HAS_YM3812
 				||  sound->type == SOUND_YM3812
 #endif
-#if HAS_YM3526
-				||  sound->type == SOUND_YM3526
-#endif
 #if HAS_YM2413
 				||  sound->type == SOUND_YM2413
 #endif
@@ -2590,7 +2587,6 @@ static void SetSamplesEnabled(HWND hWnd, int nIndex, BOOL bSoundEnabled)
 {
 	machine_config *config = NULL;
 #if (HAS_SAMPLES == 1) || (HAS_VLM5030 == 1)
-	int i;
 	BOOL enabled = FALSE;
 	HWND hCtrl;
 
@@ -2602,16 +2598,19 @@ static void SetSamplesEnabled(HWND hWnd, int nIndex, BOOL bSoundEnabled)
 	
 	if (hCtrl)
 	{
-		for (i = 0; i < MAX_SOUND; i++)
+		const device_config *sound;
+		for (sound = sound_first(config); sound != NULL; sound = sound_next(sound))
 		{
-			if (nIndex <= -1
-			||  config->sound[i].type == SOUND_SAMPLES
+			if (sound_get_type(sound) == SOUND_SAMPLES
 #if HAS_VLM5030
-			||  config->sound[i].type == SOUND_VLM5030
+				||  sound_get_type(sound) == SOUND_VLM5030
 #endif
-			)
+				)
+			{
 				enabled = TRUE;
+			}
 		}
+
 		enabled = enabled && bSoundEnabled;
 		EnableWindow(hCtrl, enabled);
 	}

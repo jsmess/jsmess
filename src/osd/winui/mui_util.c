@@ -411,14 +411,13 @@ static struct DriversInfo* GetDriversInfo(int driver_index)
 				const device_config *sound;
 				const char * const * samplenames = NULL;
 
-				for (sound = device_list_class_first(config->devicelist, DEVICE_CLASS_SOUND_CHIP); sound != NULL;
-					sound = device_list_class_next(sound, DEVICE_CLASS_SOUND_CHIP))
+				for (sound = sound_first(config); sound != NULL; sound = sound_next(sound))
 				{
 
 					{
 #if (HAS_SAMPLES)
-						if( config->sound[i].type == SOUND_SAMPLES )
-							samplenames = ((samples_interface *)config->sound[i].config)->samplenames;
+						if( sound_get_type(sound) == SOUND_SAMPLES )
+							samplenames = ((const samples_interface *)sound->static_config)->samplenames;
 #endif
 					}
 				}
