@@ -256,11 +256,12 @@ READ8_HANDLER ( pc8300_io_r )
 	UINT8 data = 0xff;
 	UINT8 offs = offset & 0xff;
 	static UINT8 speaker_state = 0;
+	const device_config *speaker = devtag_get_device(space->machine, SOUND, "speaker");
 
 	if (offs == 0xf5)
 	{
 		speaker_state ^= 1;
-		speaker_level_w(0, speaker_state);
+		speaker_level_w(speaker, speaker_state);
 	}
 	else
 	if (offs == 0xfe)
@@ -335,6 +336,7 @@ READ8_HANDLER ( pow3000_io_r )
 	UINT8 data = 0xff;
 	UINT8 offs = offset & 0xff;
 	static UINT8 speaker_state = 0;
+	const device_config *speaker = devtag_get_device(space->machine, SOUND, "speaker");
 
 	if (offs == 0x7e)
 	{
@@ -344,7 +346,7 @@ READ8_HANDLER ( pow3000_io_r )
 	if (offs == 0xf5)
 	{
 		speaker_state ^= 1;
-		speaker_level_w(0, speaker_state);
+		speaker_level_w(speaker, speaker_state);
 	}
 	else
 	if (offs == 0xfe)

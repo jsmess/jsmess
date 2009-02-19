@@ -521,6 +521,8 @@ READ8_HANDLER(vtech1_keyboard_r)
  ************************************************/
 WRITE8_HANDLER(vtech1_latch_w)
 {
+	const device_config *speaker = devtag_get_device(space->machine, SOUND, "speaker");
+
 	if (LOG_VTECH1_LATCH)
 		logerror("vtech1_latch_w $%02X\n", data);
 
@@ -533,7 +535,7 @@ WRITE8_HANDLER(vtech1_latch_w)
 
 	/* speaker data bits toggle? */
 	if ((vtech1_latch ^ data ) & 0x41)
-		speaker_level_w(0, (data & 1) | ((data >> 5) & 2));
+		speaker_level_w(speaker, (data & 1) | ((data >> 5) & 2));
 
 	vtech1_latch = data;
 }
