@@ -71,7 +71,8 @@ static WRITE8_DEVICE_HANDLER(mz80k_8255_portc_w)
 
 static PIT8253_OUTPUT_CHANGED( pit_out0_changed )
 {
-	speaker_level_w( 0, state ? 1 : 0 );
+	const device_config *speaker = devtag_get_device(device->machine, SOUND, "speaker");
+	speaker_level_w( speaker, state ? 1 : 0 );
 }
 
 

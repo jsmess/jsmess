@@ -111,7 +111,8 @@ MACHINE_RESET( mz700 )
 /* Timer 0 is the clock for the speaker output */
 static PIT8253_OUTPUT_CHANGED( pit_out0_changed )
 {
-	speaker_level_w( 0, state ? 1 : 0 );
+	const device_config *speaker = devtag_get_device(device->machine, SOUND, "speaker");
+	speaker_level_w( speaker, state ? 1 : 0 );
 }
 
 

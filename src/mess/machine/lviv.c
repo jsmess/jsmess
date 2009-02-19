@@ -86,9 +86,10 @@ static WRITE8_DEVICE_HANDLER ( lviv_ppi_0_portb_w )
 
 static WRITE8_DEVICE_HANDLER ( lviv_ppi_0_portc_w )	/* tape in/out, video memory on/off */
 {
+	const device_config *speaker = devtag_get_device(device->machine, SOUND, "speaker");
 	lviv_ppi_port_outputs[0][2] = data;
 	if (lviv_ppi_port_outputs[0][1]&0x80)
-		speaker_level_w(0, data&0x01);
+		speaker_level_w(speaker, data&0x01);
 	cassette_output(devtag_get_device(device->machine, CASSETTE, "cassette"), (data & 0x01) ? -1.0 : 1.0);
 	lviv_update_memory(device->machine);
 }
