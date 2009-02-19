@@ -14,7 +14,6 @@
 /* Components */
 #include "cpu/z80/z80.h"
 #include "machine/wd17xx.h"
-#include "sound/speaker.h"
 
 /* Devices */
 #include "devices/basicdsk.h"

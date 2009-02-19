@@ -135,6 +135,7 @@ READ8_HANDLER( primo_be_2_r )
 
 WRITE8_HANDLER( primo_ki_1_w )
 {
+	const device_config *speaker = devtag_get_device(space->machine, SOUND, "speaker");
 	// bit 7 - NMI generator enable/disable
 	primo_nmi = (data & 0x80) ? 1 : 0;
 
@@ -143,7 +144,7 @@ WRITE8_HANDLER( primo_ki_1_w )
 	// bit 5 - V.24 (2) / tape control (not emulated)
 
 	// bit 4 - speaker
-	speaker_level_w(0, (data&0x10)>>4);
+	speaker_level_w(speaker, (data&0x10)>>4);
 
 	// bit 3 - display buffer
 	if (data & 0x08)
@@ -270,9 +271,10 @@ MACHINE_RESET( primob )
 
 *******************************************************************************/
 
-static void primo_setup_pss (running_machine *machine,UINT8* snapshot_data, UINT32 snapshot_size)
+static void primo_setup_pss (running_machine *machine, UINT8* snapshot_data, UINT32 snapshot_size)
 {
 	int i;
+	const device_config *speaker = devtag_get_device(machine, SOUND, "speaker");
 
 	/* Z80 registers */
 
@@ -298,7 +300,7 @@ static void primo_setup_pss (running_machine *machine,UINT8* snapshot_data, UINT
 	primo_nmi = (snapshot_data[30] & 0x80) ? 1 : 0;
 
 	// KI-1 bit 4 - speaker
-	speaker_level_w(0, (snapshot_data[30]&0x10)>>4);
+	speaker_level_w(speaker, (snapshot_data[30]&0x10)>>4);
 
 
 	/* memory */

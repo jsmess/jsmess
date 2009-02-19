@@ -78,7 +78,8 @@ static TIMER_CALLBACK( led_refresh )
 /* The speaker is connected to output 6 of the 74145 */
 static TTL74145_OUTPUT_LINE(sym1_74145_output_6_w)
 {
-	speaker_level_w(0, state);
+	const device_config *speaker = devtag_get_device(device->machine, SOUND, "speaker");
+	speaker_level_w(speaker, state);
 }
 
 
