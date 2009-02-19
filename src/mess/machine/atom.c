@@ -72,7 +72,8 @@ const via6522_interface atom_6522_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE(CENTRONICS, "centronics", centronics_strobe_w), /* the CA2 output is connected to the STROBE signal on the centronics */
+	/* the CA2 output is connected to the STROBE signal on the centronics */
+	DEVCB_DEVICE_LINE(CENTRONICS, "centronics", centronics_strobe_w),
 	DEVCB_NULL,
 	DEVCB_CPU_INPUT_LINE("main", 0)
 };
@@ -86,7 +87,7 @@ const ppi8255_interface atom_8255_int =
 	DEVCB_HANDLER(atom_8255_portc_r),
 	DEVCB_HANDLER(atom_8255_porta_w),
 	DEVCB_HANDLER(atom_8255_portb_w),
-	DEVCB_HANDLER(atom_8255_portc_w),
+	DEVCB_DEVICE_HANDLER(SOUND, "speaker", atom_8255_portc_w),
 };
 
 static int previous_i8271_int_state = 0;
@@ -359,55 +360,10 @@ WRITE8_DEVICE_HANDLER ( atom_8255_portb_w )
 	atom_8255_portb = data;
 }
 
-WRITE8_DEVICE_HANDLER (atom_8255_portc_w)
+WRITE8_DEVICE_HANDLER(atom_8255_portc_w)
 {
-	const device_config *speaker = devtag_get_device(device->machine, SOUND, "speaker");
 	atom_8255_portc = data;
-	speaker_level_w(speaker, (data & 0x04) >> 2);
-}
-
-
-/* KT- I've assumed that the atom 8271 is linked in exactly the same way as on the bbc */
-READ8_HANDLER(atom_8271_r)
-{
-	device_config *i8271 = (device_config*)devtag_get_device(space->machine, I8271, "i8271");
-
-	switch (offset)
-	{
-		case 0:
-		case 1:
-		case 2:
-		case 3:
-			/* 8271 registers */
-			return i8271_r(i8271, offset);
-		case 4:
-			return i8271_data_r(i8271, offset);
-		default:
-			break;
-	}
-
-	return 0x0ff;
-}
-
-WRITE8_HANDLER(atom_8271_w)
-{
-	device_config *i8271 = (device_config*)devtag_get_device(space->machine, I8271, "i8271");
-
-	switch (offset)
-	{
-		case 0:
-		case 1:
-		case 2:
-		case 3:
-			/* 8271 registers */
-			i8271_w(i8271, offset, data);
-			return;
-		case 4:
-			i8271_data_w(i8271, offset, data);
-			return;
-		default:
-			break;
-	}
+	speaker_level_w(device, BIT(data, 2));
 }
 
 
