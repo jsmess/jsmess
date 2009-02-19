@@ -361,8 +361,9 @@ WRITE8_DEVICE_HANDLER ( atom_8255_portb_w )
 
 WRITE8_DEVICE_HANDLER (atom_8255_portc_w)
 {
+	const device_config *speaker = devtag_get_device(device->machine, SOUND, "speaker");
 	atom_8255_portc = data;
-	speaker_level_w(0, (data & 0x04) >> 2);
+	speaker_level_w(speaker, (data & 0x04) >> 2);
 }
 
 

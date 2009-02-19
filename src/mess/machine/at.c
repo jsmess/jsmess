@@ -89,17 +89,19 @@ static UINT8 at_speaker_get_spk(void)
 }
 
 
-static void at_speaker_set_spkrdata(UINT8 data)
+static void at_speaker_set_spkrdata(running_machine *machine, UINT8 data)
 {
+	const device_config *speaker = devtag_get_device(machine, SOUND, "speaker");
 	at_spkrdata = data ? 1 : 0;
-	speaker_level_w( 0, at_speaker_get_spk() );
+	speaker_level_w( speaker, at_speaker_get_spk() );
 }
 
 
-static void at_speaker_set_input(UINT8 data)
+static void at_speaker_set_input(running_machine *machine, UINT8 data)
 {
+	const device_config *speaker = devtag_get_device(machine, SOUND, "speaker");
 	at_speaker_input = data ? 1 : 0;
-	speaker_level_w( 0, at_speaker_get_spk() );
+	speaker_level_w( speaker, at_speaker_get_spk() );
 }
 
 
@@ -120,7 +122,7 @@ static PIT8253_OUTPUT_CHANGED( at_pit8254_out0_changed )
 
 static PIT8253_OUTPUT_CHANGED( at_pit8254_out2_changed )
 {
-	at_speaker_set_input( state ? 1 : 0 );
+	at_speaker_set_input( device->machine, state ? 1 : 0 );
 }
 
 
@@ -602,7 +604,7 @@ WRITE8_HANDLER(at_kbdc8042_w)
 	case 1:
 		at_kbdc8042.speaker = data;
 		pit8253_gate_w( at_devices.pit8254, 2, data & 1);
-		at_speaker_set_spkrdata( data & 0x02 );
+		at_speaker_set_spkrdata( space->machine, data & 0x02 );
 		break;
 
 	case 4:		/* A2 is wired to 8042 A0 */

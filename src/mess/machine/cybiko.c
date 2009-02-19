@@ -508,12 +508,13 @@ static READ8_HANDLER( cybiko_io_reg_r )
 static WRITE8_HANDLER( cybiko_io_reg_w )
 {
 	const device_config *rtc = devtag_get_device(space->machine, PCF8593, "rtc");
+	const device_config *speaker = devtag_get_device(space->machine, SOUND, "speaker");
 
 	_logerror( 2, ("cybiko_io_reg_w (%08X/%02X)\n", offset, data));
 	switch (offset)
 	{
 		// speaker
-		case H8S_IO_P1DR : speaker_level_w( 0, (data & H8S_P1_TIOCB1) ? 1 : 0); break;
+		case H8S_IO_P1DR : speaker_level_w( speaker, (data & H8S_P1_TIOCB1) ? 1 : 0); break;
 		// serial dataflash
 		case H8S_IO_P3DR :
 		{
