@@ -104,6 +104,7 @@ static WRITE8_HANDLER( ipc_port2_w )
 
     */
 
+	const device_config *speaker = devtag_get_device(space->machine, SOUND, "speaker");
 	ql_state *state = space->machine->driver_data;
 
 	int ipl = (BIT(data, 2) << 1) | BIT(data, 3);
@@ -133,7 +134,7 @@ static WRITE8_HANDLER( ipc_port2_w )
 		state->ipl = ipl;
 	}
 
-	speaker_level_w(0, BIT(data, 1));
+	speaker_level_w(speaker, BIT(data, 1));
 
 	state->ser2_cts = BIT(data, 4);
 	state->ser1_dtr = BIT(data, 5);
