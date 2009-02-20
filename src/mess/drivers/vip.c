@@ -787,8 +787,9 @@ SYSTEM_CONFIG_END
 
 static TIMER_CALLBACK( setup_beep )
 {
-	beep_set_state(0, 0);
-	beep_set_frequency( 0, 0 );
+	const device_config *speaker = devtag_get_device(machine, SOUND, "beep");
+	beep_set_state(speaker, 0);
+	beep_set_frequency( speaker, 0 );
 }
 
 static DRIVER_INIT( vip )
