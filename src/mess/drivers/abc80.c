@@ -114,18 +114,19 @@ static WRITE8_HANDLER( abc80_sound_w )
 		7  ENVSEL1  10 Monovippa, 11 VCO alt.pol.
 
 	*/
+	const device_config *sn76477 = devtag_get_device(space->machine, SOUND, "sn76477");
 
-	sn76477_enable_w(0, ~data & 0x01);
+	sn76477_enable_w(sn76477, ~data & 0x01);
 
-	sn76477_vco_voltage_w(0, (data & 0x02) ? 2.5 : 0);
-	sn76477_vco_w(0, (data & 0x04) ? 1 : 0);
+	sn76477_vco_voltage_w(sn76477, (data & 0x02) ? 2.5 : 0);
+	sn76477_vco_w(sn76477, (data & 0x04) ? 1 : 0);
 
-	sn76477_mixer_b_w(0, (data & 0x08) ? 1 : 0);
-	sn76477_mixer_a_w(0, (data & 0x10) ? 1 : 0);
-	sn76477_mixer_c_w(0, (data & 0x20) ? 1 : 0);
+	sn76477_mixer_b_w(sn76477, (data & 0x08) ? 1 : 0);
+	sn76477_mixer_a_w(sn76477, (data & 0x10) ? 1 : 0);
+	sn76477_mixer_c_w(sn76477, (data & 0x20) ? 1 : 0);
 
-	sn76477_envelope_2_w(0, (data & 0x40) ? 1 : 0);
-	sn76477_envelope_1_w(0, (data & 0x80) ? 1 : 0);
+	sn76477_envelope_2_w(sn76477, (data & 0x40) ? 1 : 0);
+	sn76477_envelope_1_w(sn76477, (data & 0x80) ? 1 : 0);
 }
 
 /* Keyboard HACK */
