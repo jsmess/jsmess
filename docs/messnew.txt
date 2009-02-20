@@ -80,6 +80,8 @@ System Driver Changes:
 
 - [VC4000] Various improvements.  [Robbbert]
 
+- [TMC600] Updated to use the new centronics support.  [Dirk Best]
+
 - [VTECH1] Updated to use the new centronics support.  [Dirk Best]
 
 - [X68000] Added better implementation of 1024x1024 graphic layer.  [Barry Rodewald]

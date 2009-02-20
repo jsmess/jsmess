@@ -80,7 +80,7 @@ Notes:
 */
 
 #include "driver.h"
-#include "devices/printer.h"
+#include "machine/ctronics.h"
 #include "devices/basicdsk.h"
 #include "devices/cassette.h"
 #include "devices/snapquik.h"
@@ -93,11 +93,6 @@ static const device_config *cassette_device_image(running_machine *machine)
 	return devtag_get_device(machine, CASSETTE, "cassette");
 }
 
-static const device_config *printer_device(running_machine *machine)
-{
-	return devtag_get_device(machine, PRINTER, "printer");
-}
-
 /* Read/Write Handlers */
 
 static WRITE8_HANDLER( keyboard_latch_w )
@@ -105,11 +100,6 @@ static WRITE8_HANDLER( keyboard_latch_w )
 	tmc600_state *state = space->machine->driver_data;
 
 	state->keylatch = data;
-}
-
-static WRITE8_HANDLER( printer_w )
-{
-	printer_output(printer_device(space->machine), data);
 }
 
 /* Memory Maps */
@@ -123,7 +113,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tmc600_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x03, 0x03) AM_WRITE(keyboard_latch_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(printer_w)
+	AM_RANGE(0x04, 0x04) AM_DEVWRITE(CENTRONICS, "centronics", centronics_data_w)
 	AM_RANGE(0x05, 0x05) AM_DEVWRITE(SOUND, CDP1869_TAG, tmc600_vismac_data_w)
 //  AM_RANGE(0x06, 0x06) AM_WRITE(floppy_w)
 	AM_RANGE(0x07, 0x07) AM_WRITE(tmc600_vismac_register_w)
@@ -342,7 +332,7 @@ static MACHINE_DRIVER_START( tmc600 )
 	MDRV_IMPORT_FROM(tmc600_video)
 
 	/* printer */
-	MDRV_PRINTER_ADD("printer")
+	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
 
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", tmc600_cassette_config )
