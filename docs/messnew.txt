@@ -43,6 +43,8 @@ System Driver Changes:
 
 - [EINSTEIN] Updated to use the new centronics interface.  [Dirk Best]
 
+- [EXIDY] Updated to use the new centronics support.  [Robbbert]
+
 - [FAMICOM] Fixed 0.129 regression; once again allows you to run with only a
   floppy image and no cart.  (bug #1760) [Fabio Priuli]
 
@@ -67,12 +69,16 @@ System Driver Changes:
 
 - [SORDM5] Updated to use the new centronics support.  [Dirk Best]
 
+- [SUPER80] Updated to use the new centronics support.  [Robbbert]
+
 - [SVI318] Updated to use the new centronics support.  [Dirk Best]
 
 - [THOMSON] Updated to use the new centronics support.  [Dirk Best]
 
 - [TI81, TI85, TI86] Added the new ROM_DEFAULT_BIOS feature to select the most
   recent rom versions.  [Hobie Troxell]
+
+- [VC4000] Various improvements.  [Robbbert]
 
 - [VTECH1] Updated to use the new centronics support.  [Dirk Best]
 
