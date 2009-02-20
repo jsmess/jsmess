@@ -329,8 +329,6 @@ DRIVER_INIT( p500 )
 
 MACHINE_RESET( cbmb )
 {
-	devtag_reset(machine, SOUND_SID6581, "sid6581");
-
 	cbm_drive_0_config (IEEE8ON ? IEEE : 0, 8);
 	cbm_drive_1_config (IEEE9ON ? IEEE : 0, 9);
 }
