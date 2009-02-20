@@ -192,7 +192,7 @@ static ADDRESS_MAP_START(c16_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x4000, 0x7fff) AM_WRITE( c16_write_4000)  /*configured in c16_common_init */
 	AM_RANGE(0x8000, 0xbfff) AM_WRITE( c16_write_8000)  /*configured in c16_common_init */
 	AM_RANGE(0xc000, 0xfcff) AM_WRITE( c16_write_c000)  /*configured in c16_common_init */
-	AM_RANGE(0xfd40, 0xfd5f) AM_READWRITE(sid6581_0_port_r, sid6581_0_port_w)	/* sidcard, eoroidpro ... */
+	AM_RANGE(0xfd40, 0xfd5f) AM_DEVREADWRITE(SOUND, "sid6581", sid6581_r, sid6581_w)	/* sidcard, eoroidpro ... */
 	AM_RANGE(0xfec0, 0xfedf) AM_READWRITE(c16_iec9_port_r, c16_iec9_port_w)		/*configured in c16_common_init */
 	AM_RANGE(0xfee0, 0xfeff) AM_READWRITE(c16_iec8_port_r, c16_iec8_port_w)		/*configured in c16_common_init */
 	AM_RANGE(0xff20, 0xff3d) AM_WRITE( c16_write_ff20)  /*configure in c16_common_init */
@@ -211,7 +211,7 @@ static ADDRESS_MAP_START(plus4_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xfd30, 0xfd3f) AM_READWRITE(c16_6529_port_r, c16_6529_port_w) /* 6529 keyboard matrix */
 	AM_RANGE(0xfdd0, 0xfddf) AM_WRITE( c16_select_roms) /* rom chips selection */
 #if 0
-	AM_RANGE(0xfd40, 0xfd5f) AM_READWRITE(sid6581_0_port_r, sid6581_0_port_w)	/* sidcard, eoroidpro ... */
+	AM_RANGE(0xfd40, 0xfd5f) AM_DEVREADWRITE(SOUND, "sid6581", sid6581_r, sid6581_w)	/* sidcard, eoroidpro ... */
 	AM_RANGE(0xfec0, 0xfedf) AM_READWRITE(c16_iec9_port_r, c16_iec9_port_w)		/*configured in c16_common_init */
 	AM_RANGE(0xfee0, 0xfeff) AM_READWRITE(c16_iec8_port_r, c16_iec8_port_w)		/*configured in c16_common_init */
 #endif
@@ -235,7 +235,7 @@ static ADDRESS_MAP_START(c364_map , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xfd30, 0xfd3f) AM_READWRITE(c16_6529_port_r, c16_6529_port_w) /* 6529 keyboard matrix */
 	AM_RANGE(0xfdd0, 0xfddf) AM_WRITE( c16_select_roms) /* rom chips selection */
 #if 0
-	AM_RANGE(0xfd40, 0xfd5f) AM_READWRITE(sid6581_0_port_r, sid6581_0_port_w)	/* sidcard, eoroidpro ... */
+	AM_RANGE(0xfd40, 0xfd5f) AM_DEVREADWRITE(SOUND, "sid6581", sid6581_r, sid6581_w)	/* sidcard, eoroidpro ... */
 	AM_RANGE(0xfec0, 0xfedf) AM_READWRITE(c16_iec9_port_r, c16_iec9_port_w)		/*configured in c16_common_init */
 	AM_RANGE(0xfee0, 0xfeff) AM_READWRITE(c16_iec8_port_r, c16_iec8_port_w)		/*configured in c16_common_init */
 #endif

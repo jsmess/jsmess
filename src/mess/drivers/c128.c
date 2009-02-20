@@ -251,7 +251,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( c128_z80_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x1000, 0x13ff) AM_READWRITE(c64_colorram_read, c64_colorram_write)
 	AM_RANGE(0xd000, 0xd3ff) AM_READWRITE(vic2_port_r, vic2_port_w)
-	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE(sid6581_0_port_r, sid6581_0_port_w)
+	AM_RANGE(0xd400, 0xd4ff) AM_DEVREADWRITE(SOUND, "sid6581", sid6581_r, sid6581_w)
 	AM_RANGE(0xd500, 0xd5ff) AM_READWRITE(c128_mmu8722_port_r, c128_mmu8722_port_w)
 	AM_RANGE(0xd600, 0xd7ff) AM_READWRITE(vdc8563_port_r, vdc8563_port_w)
 	AM_RANGE(0xdc00, 0xdcff) AM_DEVREADWRITE(CIA6526R1, "cia_0", cia_r, cia_w)

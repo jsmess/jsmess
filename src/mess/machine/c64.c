@@ -470,12 +470,13 @@ WRITE8_HANDLER( c64_write_io )
 	running_machine *machine = space->machine;
 	const device_config *cia_0 = devtag_get_device(space->machine, CIA6526R1, "cia_0");
 	const device_config *cia_1 = devtag_get_device(space->machine, CIA6526R1, "cia_1");
+	const device_config *sid = devtag_get_device(space->machine, SOUND, "sid6581");
 
 	c64_io_mirror[ offset ] = data;
 	if (offset < 0x400) {
 		vic2_port_w (space, offset & 0x3ff, data);
 	} else if (offset < 0x800) {
-		sid6581_0_port_w (space, offset & 0x3ff, data);
+		sid6581_w (sid, offset & 0x3ff, data);
 	} else if (offset < 0xc00)
 		c64_colorram[offset & 0x3ff] = data | 0xf0;
 	else if (offset < 0xd00)
@@ -516,12 +517,13 @@ READ8_HANDLER( c64_read_io )
 	running_machine *machine = space->machine;
 	const device_config *cia_0 = devtag_get_device(space->machine, CIA6526R1, "cia_0");
 	const device_config *cia_1 = devtag_get_device(space->machine, CIA6526R1, "cia_1");
+	const device_config *sid = devtag_get_device(space->machine, SOUND, "sid6581");
 
 	if (offset < 0x400)
 		return vic2_port_r (space, offset & 0x3ff);
 
 	else if (offset < 0x800)
-		return sid6581_0_port_r (space, offset & 0x3ff);
+		return sid6581_r (sid, offset & 0x3ff);
 
 	else if (offset < 0xc00)
 		return c64_colorram[offset & 0x3ff];

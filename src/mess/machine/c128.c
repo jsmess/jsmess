@@ -95,6 +95,7 @@ WRITE8_HANDLER( c128_write_d000 )
 	running_machine *machine = space->machine;
 	const device_config *cia_0 = devtag_get_device(space->machine, CIA6526R1, "cia_0");
 	const device_config *cia_1 = devtag_get_device(space->machine, CIA6526R1, "cia_1");
+	const device_config *sid = devtag_get_device(space->machine, SOUND, "sid6581");
 
 	UINT8 c64_port6510 = (UINT8) device_get_info_int(space->machine->cpu[0], CPUINFO_INT_M6510_PORT);
 
@@ -113,7 +114,7 @@ WRITE8_HANDLER( c128_write_d000 )
 			vic2_port_w (space, offset & 0x3ff, data);
 			break;
 		case 4:
-			sid6581_0_port_w (space, offset & 0x3f, data);
+			sid6581_w(sid, offset & 0x3f, data);
 			break;
 		case 5:
 			c128_mmu8722_port_w (space, offset & 0xff, data);
@@ -150,11 +151,12 @@ static READ8_HANDLER( c128_read_io )
 	running_machine *machine = space->machine;
 	const device_config *cia_0 = devtag_get_device(space->machine, CIA6526R1, "cia_0");
 	const device_config *cia_1 = devtag_get_device(space->machine, CIA6526R1, "cia_1");
+	const device_config *sid = devtag_get_device(space->machine, SOUND, "sid6581");
 
 	if (offset < 0x400)
 		return vic2_port_r (space, offset & 0x3ff);
 	else if (offset < 0x500)
-		return sid6581_0_port_r (space, offset & 0xff);
+		return sid6581_r (sid, offset & 0xff);
 	else if (offset < 0x600)
 		return c128_mmu8722_port_r (space, offset & 0xff);
 	else if (offset < 0x800)

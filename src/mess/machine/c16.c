@@ -490,15 +490,16 @@ DRIVER_INIT( c16v )
 MACHINE_RESET( c16 )
 {
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const device_config *sid = devtag_get_device(space->machine, SOUND, "sid6581");
 	
 	c364_speech_init(machine);
 
 	if (read_cfg1(machine) & 0x80)  /* SID card present */
 	{
-		memory_install_read8_handler(space, 0xfd40, 0xfd5f, 0, 0, sid6581_0_port_r);
-		memory_install_write8_handler(space,  0xfd40, 0xfd5f, 0, 0, sid6581_0_port_w);
-		memory_install_read8_handler(space, 0xfe80, 0xfe9f, 0, 0, sid6581_0_port_r);
-		memory_install_write8_handler(space,  0xfe80, 0xfe9f, 0, 0, sid6581_0_port_w);
+		memory_install_read8_device_handler(space, sid, 0xfd40, 0xfd5f, 0, 0, sid6581_r);
+		memory_install_write8_device_handler(space,  sid, 0xfd40, 0xfd5f, 0, 0, sid6581_w);
+		memory_install_read8_device_handler(space, sid, 0xfe80, 0xfe9f, 0, 0, sid6581_r);
+		memory_install_write8_device_handler(space,  sid, 0xfe80, 0xfe9f, 0, 0, sid6581_w);
 	}
 	else
 	{
