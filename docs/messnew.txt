@@ -39,6 +39,8 @@ System Driver Changes:
 
 - [COCO] Cleanups  [Nathan Woods]
 
+- [COMPIS] Updated to use the new centronics interface.  [Dirk Best]
+
 - [CPC family] Updated all drivers to use the mc6845 device.  [Wilbert Pol]
 
 - [EINSTEIN] Updated to use the new centronics interface.  [Dirk Best]

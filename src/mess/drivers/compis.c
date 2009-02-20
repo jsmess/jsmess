@@ -34,10 +34,10 @@
 #include "driver.h"
 #include "cpu/i86/i86.h"
 #include "machine/8255ppi.h"
+#include "machine/ctronics.h"
 #include "includes/compis.h"
 #include "video/i82720.h"
 #include "devices/mflopimg.h"
-#include "devices/printer.h"
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
 #include "machine/mm58274c.h"
@@ -45,7 +45,7 @@
 #include "formats/cpis_dsk.h"
 
 
-static ADDRESS_MAP_START( compis_mem , ADDRESS_SPACE_PROGRAM, 16)
+static ADDRESS_MAP_START( compis_mem , ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x00000, 0x3ffff) AM_RAM
 	AM_RANGE( 0x40000, 0x4ffff) AM_RAM
 	AM_RANGE( 0x50000, 0x5ffff) AM_RAM
@@ -55,11 +55,11 @@ static ADDRESS_MAP_START( compis_mem , ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE( 0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( compis_io, ADDRESS_SPACE_IO, 16)
-	AM_RANGE( 0x0000, 0x0007) AM_DEVREADWRITE(PPI8255, "ppi8255", compis_ppi_r, compis_ppi_w )	/* PPI 8255         */
-	AM_RANGE( 0x0080, 0x0087) AM_DEVREADWRITE(PIT8253, "pit8253", compis_pit_r, compis_pit_w )	/* PIT 8253         */
-	AM_RANGE( 0x0100, 0x011b) AM_READWRITE( compis_rtc_r, compis_rtc_w ) 	/* RTC 58174            */
-	AM_RANGE( 0x0280, 0x0283) AM_DEVREADWRITE(PIC8259, "pic8259_master", compis_osp_pic_r, compis_osp_pic_w ) /* PIC 8259 (80150/80130)  */
+static ADDRESS_MAP_START( compis_io, ADDRESS_SPACE_IO, 16 )
+	AM_RANGE( 0x0000, 0x0007) AM_DEVREADWRITE8(PPI8255, "ppi8255", ppi8255_r, ppi8255_w, 0xffff)
+	AM_RANGE( 0x0080, 0x0087) AM_DEVREADWRITE8(PIT8253, "pit8253", pit8253_r, pit8253_w, 0xffff)
+	AM_RANGE( 0x0100, 0x011b) AM_DEVREADWRITE8(MM58274C, "mm58274c", mm58274c_r, mm58274c_w, 0xffff)
+	AM_RANGE( 0x0280, 0x0283) AM_DEVREADWRITE8(PIC8259, "pic8259_master", pic8259_r, pic8259_w, 0xffff) /* 80150/80130 */
 //  AM_RANGE( 0x0288, 0x028e) AM_DEVREADWRITE(PIT8254, "pit8254", compis_osp_pit_r, compis_osp_pit_w ) /* PIT 8254 (80150/80130)  */
 	AM_RANGE( 0x0310, 0x031f) AM_READWRITE( compis_usart_r, compis_usart_w )	/* USART 8251 Keyboard      */
 	AM_RANGE( 0x0330, 0x033f) AM_READWRITE( compis_gdc_r, compis_gdc_w )	/* GDC 82720 PCS6:6     */
@@ -87,7 +87,7 @@ ADDRESS_MAP_END
 
 /* COMPIS Keyboard */
 
-/* 2008-05 FP: 
+/* 2008-05 FP:
 Small note about natural keyboard: currently,
 - Both "SShift" keys (left and right) are not mapped
 - Keypad '00' and '000' are not mapped
@@ -97,8 +97,8 @@ Small note about natural keyboard: currently,
 - "Compis S" is mapped to 'F6'
 - "Avbryt" is mapped to 'F7'
 - "Inpassa" is mapped to 'Insert'
-- "Sšk" is mapped to "Print Screen"
-- "UtplŒna"is mapped to 'Delete'
+- "Sï¿½k" is mapped to "Print Screen"
+- "Utplï¿½na"is mapped to 'Delete'
 - "Start / Stop" is mapped to 'Pause'
 - "TabL" is mapped to 'Page Up'
 - "TabR" is mapped to 'Page Down'
@@ -168,7 +168,7 @@ static INPUT_PORTS_START (compis)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Shift (Right)") PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SShift (Left)") PORT_CODE(KEYCODE_LALT)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL)	PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)		PORT_CHAR(' ') 
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)		PORT_CHAR(' ')
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RCONTROL)	PORT_CHAR(UCHAR_MAMEKEY(RCONTROL))
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SShift (Right)") PORT_CODE(KEYCODE_RALT)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("INPASSA") PORT_CODE(KEYCODE_INSERT) PORT_CHAR(UCHAR_MAMEKEY(INSERT))
@@ -269,14 +269,14 @@ static MACHINE_DRIVER_START( compis )
 	MDRV_VIDEO_UPDATE(compis_gdc)
 
 	/* printer */
-	MDRV_PRINTER_ADD("printer")
+	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
 
 	/* uart */
 	MDRV_MSM8251_ADD("uart", compis_usart_interface)
-	
+
 	/* rtc */
-	MDRV_MM58274C_ADD("mm58274c", compis_mm58274c_interface)	
-	
+	MDRV_MM58274C_ADD("mm58274c", compis_mm58274c_interface)
+
 	MDRV_NEC765A_ADD("nec765", compis_fdc_interface)
 MACHINE_DRIVER_END
 
