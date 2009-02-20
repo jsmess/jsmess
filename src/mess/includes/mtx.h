@@ -4,8 +4,8 @@
 
 *************************************************************************/
 
-#ifndef MTX_H_
-#define MTX_H_
+#ifndef __MTX_H__
+#define __MTX_H__
 
 #include "devices/snapquik.h"
 #include "machine/z80ctc.h"
@@ -37,7 +37,6 @@ WRITE8_HANDLER( mtx_cst_w );
 /* Printer */
 READ8_HANDLER( mtx_strobe_r );
 READ8_HANDLER( mtx_prt_r );
-WRITE8_HANDLER( mtx_prt_w );
 
 /* Keyboard */
 WRITE8_HANDLER( mtx_sense_w );
@@ -57,4 +56,4 @@ WRITE8_DEVICE_HANDLER( mtx_dart_data_w );
 WRITE8_DEVICE_HANDLER( mtx_dart_control_w );
 
 
-#endif /*MTX_H_*/
+#endif /* __MTX_H__ */

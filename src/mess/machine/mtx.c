@@ -7,25 +7,14 @@
 **************************************************************************/
 
 
-/* Core includes */
 #include "driver.h"
 #include "includes/mtx.h"
-
-/* Components */
 #include "cpu/z80/z80.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
 #include "video/tms9928a.h"
-
-/* Devices */
-#include "devices/printer.h"
+#include "machine/ctronics.h"
 #include "devices/snapquik.h"
-
-
-#define MTX_PRT_BUSY		1
-#define MTX_PRT_NOERROR		2
-#define MTX_PRT_EMPTY		4
-#define MTX_PRT_SELECTED	8
 
 
 
@@ -36,9 +25,6 @@
  *************************************/
 
 static UINT8 key_sense;
-
-static char mtx_prt_strobe = 0;
-static char mtx_prt_data = 0;
 
 
 
@@ -126,34 +112,34 @@ WRITE8_HANDLER( mtx_cst_w )
  *
  *************************************/
 
-static const device_config *mtx_printer_image(running_machine *machine)
-{
-	return devtag_get_device(machine, PRINTER, "printer");
-}
-
 READ8_HANDLER( mtx_strobe_r )
 {
-	if (mtx_prt_strobe == 0)
-		printer_output(mtx_printer_image(space->machine), mtx_prt_data);
+	const device_config *printer = devtag_get_device(space->machine, CENTRONICS, "centronics");
 
-	mtx_prt_strobe = 1;
+	/* set STROBE low */
+	centronics_strobe_w(printer, FALSE);
 
-	return 0;
+	return 0xff;
 }
 
 
 READ8_HANDLER( mtx_prt_r )
 {
-	mtx_prt_strobe = 0;
+	const device_config *printer = devtag_get_device(space->machine, CENTRONICS, "centronics");
+	UINT8 result = 0;
 
-	return MTX_PRT_NOERROR | (printer_is_ready(mtx_printer_image(space->machine))
-			? MTX_PRT_SELECTED : 0);
+	/* reset STROBE to high */
+	centronics_strobe_w(printer, TRUE);
+
+	/* fill in centronics printer status */
+	result |= centronics_busy_r(printer) << 0;
+	result |= centronics_fault_r(printer) << 1;
+	result |= !centronics_pe_r(printer) << 2;
+	result |= centronics_vcc_r(printer) << 3;
+
+	return result;
 }
 
-WRITE8_HANDLER( mtx_prt_w )
-{
-	mtx_prt_data = data;
-}
 
 
 

@@ -16,19 +16,14 @@
 **************************************************************************/
 
 
-/* Core includes */
 #include "driver.h"
 #include "includes/mtx.h"
-
-/* Components */
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "video/tms9928a.h"
 #include "sound/sn76496.h"
-
-/* Devices */
-#include "devices/printer.h"
+#include "machine/ctronics.h"
 #include "devices/snapquik.h"
 
 
@@ -64,7 +59,7 @@ static ADDRESS_MAP_START( mtx_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x01, 0x01) AM_READWRITE(TMS9928A_vram_r, TMS9928A_vram_w)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(TMS9928A_register_r, TMS9928A_register_w)
 	AM_RANGE(0x03, 0x03) AM_READWRITE(mtx_cst_r, mtx_cst_w)
-	AM_RANGE(0x04, 0x04) AM_READWRITE(mtx_prt_r, mtx_prt_w)
+	AM_RANGE(0x04, 0x04) AM_READ(mtx_prt_r) AM_DEVWRITE(CENTRONICS, "centronics", centronics_data_w)
 	AM_RANGE(0x05, 0x05) AM_READWRITE(mtx_key_lo_r, mtx_sense_w)
 	AM_RANGE(0x06, 0x06) AM_READ(mtx_key_hi_r)
 	AM_RANGE(0x06, 0x06) AM_DEVWRITE(SOUND, "sn76489a", sn76496_w)
@@ -273,7 +268,7 @@ static MACHINE_DRIVER_START( mtx512 )
 	MDRV_TIMER_ADD_PERIODIC("z80ctc_c1c2", ctc_c1_c2_tick, HZ(4000000/13))
 
 	/* printer */
-	MDRV_PRINTER_ADD("printer")
+	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
 
 	/* snapshot */
 	MDRV_SNAPSHOT_ADD(mtx, "mtb", 0.5)
