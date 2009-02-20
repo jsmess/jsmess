@@ -147,9 +147,9 @@ static MACHINE_DRIVER_START( n64 )
 
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD("dmadac.l", DMADAC, 0)
+	MDRV_SOUND_ADD("dac1", DMADAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
-	MDRV_SOUND_ADD("dmadac.r", DMADAC, 0)
+	MDRV_SOUND_ADD("dac2", DMADAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 
 	/* cartridge */
