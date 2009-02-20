@@ -178,7 +178,7 @@ READ8_DEVICE_HANDLER( pc_lpt_status_r )
 	UINT8 result = 0;
 
 	result |= centronics_fault_r(lpt->centronics) << 3;
-	result |= 1 << 4; /* select */
+	result |= centronics_vcc_r(lpt->centronics) << 4; /* SELECT is connected to VCC */
 	result |= !centronics_pe_r(lpt->centronics) << 5;
 	result |= centronics_ack_r(lpt->centronics) << 6;
 	result |= !centronics_busy_r(lpt->centronics) << 7;
