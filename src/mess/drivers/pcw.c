@@ -435,6 +435,7 @@ static WRITE8_HANDLER(pcw_vdu_video_control_register_w)
 static WRITE8_HANDLER(pcw_system_control_w)
 {
 	device_config *fdc = (device_config*)devtag_get_device(space->machine, NEC765A, "nec765");
+	const device_config *speaker = devtag_get_device(space->machine, SOUND, "beep");
 	LOG(("SYSTEM CONTROL: %d\n",data));
 
 	switch (data)
@@ -569,14 +570,14 @@ static WRITE8_HANDLER(pcw_system_control_w)
 		/* beep on */
 		case 11:
 		{
-			beep_set_state(0,1);
+			beep_set_state(speaker,1);
 		}
 		break;
 
 		/* beep off */
 		case 12:
 		{
-			beep_set_state(0,0);
+			beep_set_state(speaker,0);
 		}
 		break;
 
@@ -743,8 +744,9 @@ ADDRESS_MAP_END
 
 static TIMER_CALLBACK(setup_beep)
 {
-	beep_set_state(0, 0);
-	beep_set_frequency(0, 3750);
+	const device_config *speaker = devtag_get_device(machine, SOUND, "beep");
+	beep_set_state(speaker, 0);
+	beep_set_frequency(speaker, 3750);
 }
 
 

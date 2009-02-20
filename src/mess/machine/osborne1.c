@@ -342,6 +342,7 @@ static const pia6821_interface osborne1_video_pia_config =
 static TIMER_CALLBACK(osborne1_video_callback)
 {
 	const address_space* space = cpu_get_address_space(machine->cpu[0],ADDRESS_SPACE_PROGRAM);
+	const device_config *speaker = devtag_get_device(space->machine, SOUND, "beep");
 	int y = video_screen_get_vpos(machine->primary_screen);
 
 	/* Check for start of frame */
@@ -393,11 +394,11 @@ static TIMER_CALLBACK(osborne1_video_callback)
 
 	if ( ( y % 10 ) == 2 || ( y % 10 ) == 6 )
 	{
-		beep_set_state( 0, osborne1.beep );
+		beep_set_state( speaker, osborne1.beep );
 	}
 	else
 	{
-		beep_set_state( 0, 0 );
+		beep_set_state( speaker, 0 );
 	}
 
 	timer_adjust_oneshot(osborne1.video_timer, video_screen_get_time_until_pos(machine->primary_screen, y + 1, 0 ), 0);
@@ -470,8 +471,9 @@ DEVICE_IMAGE_LOAD( osborne1_floppy )
 
 static TIMER_CALLBACK( setup_beep )
 {
-	beep_set_state( 0, 0 );
-	beep_set_frequency( 0, 300 /* 60 * 240 / 2 */ );
+	const device_config *speaker = devtag_get_device(machine, SOUND, "beep");
+	beep_set_state( speaker, 0 );
+	beep_set_frequency( speaker, 300 /* 60 * 240 / 2 */ );
 }
 
 

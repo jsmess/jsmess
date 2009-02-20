@@ -114,8 +114,9 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( dc_console )
 {
+	const device_config *aica = devtag_get_device(machine, SOUND, "aica");
 	MACHINE_RESET_CALL(dc);
-	aica_set_ram_base(0, dc_sound_ram, 2*1024*1024);
+	aica_set_ram_base(aica, dc_sound_ram, 2*1024*1024);
 }
 
 static void aica_irq(const device_config *device, int irq)

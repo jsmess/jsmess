@@ -2,6 +2,8 @@
 
   $Id: pc8801.c,v 1.51 2007/01/19 03:28:56 npwoods Exp $
 
+	Note: These emulations take a long time to start. Be patient!
+
 ***************************************************************************/
 
 #include "driver.h"

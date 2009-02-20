@@ -296,6 +296,7 @@ static WRITE8_HANDLER( osi600_ctrl_w )
 
 static WRITE8_HANDLER( osi630_ctrl_w )
 {
+	const device_config *speaker = devtag_get_device(space->machine, SOUND, "beep");
 	/*
 
 		bit		description
@@ -311,12 +312,13 @@ static WRITE8_HANDLER( osi630_ctrl_w )
 
 	*/
 
-	beep_set_state(0, BIT(data, 1));
+	beep_set_state(speaker, BIT(data, 1));
 }
 
 static WRITE8_HANDLER( osi630_sound_w )
 {
-	if (data) beep_set_frequency(0, 49152/data);
+	const device_config *speaker = devtag_get_device(space->machine, SOUND, "beep");
+	if (data) beep_set_frequency(speaker, 49152/data);
 }
 
 /* Disk Drive */
@@ -834,8 +836,9 @@ ROM_END
 
 static TIMER_CALLBACK( setup_beep )
 {
-	beep_set_state(0, 0);
-	beep_set_frequency(0, 300);
+	const device_config *speaker = devtag_get_device(machine, SOUND, "beep");
+	beep_set_state(speaker, 0);
+	beep_set_frequency(speaker, 300);
 }
 
 static DRIVER_INIT( c1p )

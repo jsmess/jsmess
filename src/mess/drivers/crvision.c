@@ -362,8 +362,8 @@ static WRITE8_HANDLER( pia_portb_w )
         PB7     SN76489 data output
     */
 
-	const device_config *sn76496 = devtag_get_device(space->machine, SOUND, "sn76489a");
-	sn76496_w(sn76496, 0, data);
+	const device_config *sn76489 = devtag_get_device(space->machine, SOUND, "sn76489");
+	sn76496_w(sn76489, 0, data);
 
 	sn76489_ready = 0;
 

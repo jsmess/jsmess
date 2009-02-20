@@ -357,7 +357,8 @@ static CDP1802_EF_READ( studio2_ef_r )
 
 static CDP1802_Q_WRITE( studio2_q_w )
 {
-	beep_set_state(0, level);
+	const device_config *speaker = devtag_get_device(device->machine, SOUND, "beep");
+	beep_set_state(speaker, level);
 }
 
 static CDP1802_DMA_WRITE( studio2_dma_w )
@@ -651,8 +652,9 @@ ROM_END
 
 static TIMER_CALLBACK( setup_beep )
 {
-	beep_set_state(0, 0);
-	beep_set_frequency(0, 300);
+	const device_config *speaker = devtag_get_device(machine, SOUND, "beep");
+	beep_set_state(speaker, 0);
+	beep_set_frequency(speaker, 300);
 }
 
 static DRIVER_INIT( studio2 )

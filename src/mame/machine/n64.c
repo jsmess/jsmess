@@ -812,8 +812,8 @@ static void start_audio_dma(running_machine *machine)
 
 //  mame_printf_debug("DACDMA: %x for %x bytes\n", current->address, current->length);
 
-	dmadac[0] = devtag_get_device(machine, SOUND, "dac1");
-	dmadac[1] = devtag_get_device(machine, SOUND, "dac2");
+	dmadac[0] = devtag_get_device(machine, SOUND, "dmadac.l");
+	dmadac[1] = devtag_get_device(machine, SOUND, "dmadac.r");
     dmadac_transfer(&dmadac[0], 2, 2, 2, current->length/4, ram);
 
     ai_status |= 0x40000000;
@@ -897,6 +897,8 @@ WRITE32_HANDLER( n64_ai_reg_w )
 
         case 0x10/4:        // AI_DACRATE_REG
             ai_dacrate = data & 0x3fff;
+		dmadac[0] = devtag_get_device(space->machine, SOUND, "dmadac.l");
+		dmadac[1] = devtag_get_device(space->machine, SOUND, "dmadac.r");
             dmadac_set_frequency(&dmadac[0], 2, (double)DACRATE_NTSC / (double)(ai_dacrate+1));
             printf( "frequency: %f\n", (double)DACRATE_NTSC / (double)(ai_dacrate+1) );
             dmadac_enable(&dmadac[0], 2, 1);

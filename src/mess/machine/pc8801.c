@@ -179,38 +179,38 @@ static void pc8801_init_interrupt(running_machine *machine)
 
 WRITE8_HANDLER(pc88sr_outport_30)
 {
-  /* bit 1-5 not implemented yet */
-  pc88sr_disp_30(space, offset,data);
+	/* bit 1-5 not implemented yet */
+	pc88sr_disp_30(space, offset,data);
 }
 
 WRITE8_HANDLER(pc88sr_outport_40)
      /* bit 3,4,6 not implemented */
      /* bit 7 incorrect behavior */
 {
-  static int port_save;
+	const device_config *speaker = devtag_get_device(space->machine, SOUND, "beep");
+	static int port_save;
 
-  if((port_save&0x02) == 0x00 && (data&0x02) != 0x00) calender_strobe(space->machine);
-  if((port_save&0x04) == 0x00 && (data&0x04) != 0x00) calender_shift();
-  port_save=data;
+	if((port_save&0x02) == 0x00 && (data&0x02) != 0x00) calender_strobe(space->machine);
+	if((port_save&0x04) == 0x00 && (data&0x04) != 0x00) calender_shift();
+	port_save=data;
 
-  if((input_port_read(space->machine, "DSW1") & 0x40) == 0x00) 
-  {
-    data&=0x7f;
-  }
-  switch(data&0xa0) {
-  case 0x00:
-    beep_set_state(0, 0);
-    break;
-  case 0x20:
-    beep_set_frequency(0, 2400);
-    beep_set_state(0, 1);
-    break;
-  case 0x80:
-  case 0xa0:
-    beep_set_frequency(0, 0);
-    beep_set_state(0, 1);
-    break;
-  }
+	if((input_port_read(space->machine, "DSW1") & 0x40) == 0x00) data&=0x7f;
+
+	switch(data&0xa0)
+	{
+		case 0x00:
+			beep_set_state(speaker, 0);
+			break;
+		case 0x20:
+			beep_set_frequency(speaker, 2400);
+			beep_set_state(speaker, 1);
+			break;
+		case 0x80:
+		case 0xa0:
+			beep_set_frequency(speaker, 0);
+			beep_set_state(speaker, 1);
+			break;
+	}
 }
 
 READ8_HANDLER(pc88sr_inport_40)
@@ -693,25 +693,26 @@ static void fix_V1V2(void)
 
 static void pc88sr_ch_reset (running_machine *machine, int hireso)
 {
-  int a;
+	const device_config *speaker = devtag_get_device(machine, SOUND, "beep");
+	int a;
 
-  a=input_port_read(machine, "CFG");
-  is_Nbasic = ((a&0x01)==0x00);
-  is_V2mode = ((a&0x02)==0x00);
-  pc88sr_is_highspeed = ((a&0x04)!=0x00);
-  is_8MHz = ((a&0x08)!=0x00);
-  fix_V1V2();
-  pc8801_init_bank(machine, hireso);
-  pc8801_init_5fd(machine);
-  pc8801_init_interrupt(machine);
-  beep_set_state(0, 0);
-  beep_set_frequency(0, 2400);
-  pc88sr_init_fmsound();
+	a=input_port_read(machine, "CFG");
+	is_Nbasic = ((a&0x01)==0x00);
+	is_V2mode = ((a&0x02)==0x00);
+	pc88sr_is_highspeed = ((a&0x04)!=0x00);
+	is_8MHz = ((a&0x08)!=0x00);
+	fix_V1V2();
+	pc8801_init_bank(machine, hireso);
+	pc8801_init_5fd(machine);
+	pc8801_init_interrupt(machine);
+	beep_set_state(speaker, 0);
+	beep_set_frequency(speaker, 2400);
+	pc88sr_init_fmsound();
 }
 
 MACHINE_RESET( pc88srl )
 {
-  pc88sr_ch_reset(machine, 0);
+	pc88sr_ch_reset(machine, 0);
 }
 
 MACHINE_RESET( pc88srh )

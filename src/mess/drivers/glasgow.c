@@ -112,9 +112,10 @@ static WRITE16_HANDLER( write_lcd_flag )
 
 static WRITE16_HANDLER( write_lcd_flag_gg )
 {
+	const device_config *speaker = devtag_get_device(space->machine, SOUND, "beep");
 	UINT8 lcd_flag;
 	lcd_flag = data >> 8;
-	beep_set_state(0, lcd_flag & 1 ? 1 : 0);
+	beep_set_state(speaker, lcd_flag & 1 ? 1 : 0);
 	if (lcd_flag == 0) 
 		key_selector = 1;
 
@@ -179,7 +180,8 @@ static WRITE16_HANDLER( write_board_gg )
 
 static WRITE16_HANDLER( write_irq_flag )
 {
-	beep_set_state(0, data & 0x100);
+	const device_config *speaker = devtag_get_device(space->machine, SOUND, "beep");
+	beep_set_state(speaker, data & 0x100);
 	logerror("Write 0x800004 = %x \n", data);
 	irq_flag = 1;
 	beeper = data;
@@ -393,7 +395,8 @@ static WRITE32_HANDLER( write_board32 )
 
 static WRITE32_HANDLER ( write_beeper32 )
 {
-	beep_set_state(0, data & 0x01000000);
+	const device_config *speaker = devtag_get_device(space->machine, SOUND, "beep");
+	beep_set_state(speaker, data & 0x01000000);
 	logerror("Write 0x8000004 = %x \n", data);
 	irq_flag = 1;
 	beeper = data;
@@ -417,19 +420,21 @@ static TIMER_CALLBACK( update_nmi32 )
 
 static MACHINE_START( glasgow )
 {
+	const device_config *speaker = devtag_get_device(machine, SOUND, "beep");
 	key_selector = 0;
 	irq_flag = 0;
 	lcd_shift_counter = 3;
 	timer_pulse(machine, ATTOTIME_IN_HZ(50), NULL, 0, update_nmi);
-	beep_set_frequency(0, 44);
+	beep_set_frequency(speaker, 44);
 }
 
 
 static MACHINE_START( dallas32 )
 {
+	const device_config *speaker = devtag_get_device(machine, SOUND, "beep");
 	lcd_shift_counter = 3;
 	timer_pulse(machine, ATTOTIME_IN_HZ(50), NULL, 0, update_nmi32);
-	beep_set_frequency(0, 44);
+	beep_set_frequency(speaker, 44);
 }
 
 

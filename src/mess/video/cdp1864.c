@@ -238,6 +238,7 @@ static void cdp1864_init_palette(const device_config *device, const cdp1864_inte
 void cdp1864_aoe_w(const device_config *device, int level)
 {
 	cdp1864_t *cdp1864 = get_safe_token(device);
+	const device_config *speaker = devtag_get_device(device->machine, SOUND, "beep");
 
 	if (!level)
 	{
@@ -246,7 +247,7 @@ void cdp1864_aoe_w(const device_config *device, int level)
 
 	cdp1864->audio = level;
 
-	beep_set_state(0, level); // TODO: remove this
+	beep_set_state(speaker, level); // TODO: remove this
 }
 
 /*-------------------------------------------------
@@ -298,9 +299,10 @@ WRITE8_DEVICE_HANDLER( cdp1864_step_bgcolor_w )
 WRITE8_DEVICE_HANDLER( cdp1864_tone_latch_w )
 {
 	cdp1864_t *cdp1864 = get_safe_token(device);
+	const device_config *speaker = devtag_get_device(device->machine, SOUND, "beep");
 
 	cdp1864->latch = data;
-	beep_set_frequency(0, CDP1864_CLOCK / 8 / 4 / (data + 1) / 2); // TODO: remove this
+	beep_set_frequency(speaker, CDP1864_CLOCK / 8 / 4 / (data + 1) / 2); // TODO: remove this
 }
 
 /*-------------------------------------------------

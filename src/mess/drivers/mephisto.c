@@ -174,11 +174,10 @@ INPUT_PORTS_END
 
 static TIMER_CALLBACK( update_nmi )
 {
-
+	const device_config *speaker = devtag_get_device(machine, SOUND, "beep");
 	cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI,PULSE_LINE);
 	// dac_data_w(0,led_status&64?128:0);
-	beep_set_state(0,led_status&64?1:0);
-
+	beep_set_state(speaker,led_status&64?1:0);
 }
 
 static MACHINE_START( mephisto )

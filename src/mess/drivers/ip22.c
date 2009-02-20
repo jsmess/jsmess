@@ -1025,8 +1025,11 @@ static UINT32 nPBUS_DMA_DescPtr;
 static UINT32 nPBUS_DMA_NextPtr;
 static UINT32 nPBUS_DMA_WordsLeft;
 
+static const device_config *dmadac[1];
+
 static TIMER_CALLBACK(ip22_dma)
 {
+	dmadac[0] = devtag_get_device(machine, SOUND, "dmadac");
 	if( nPBUS_DMA_Active )
 	{
 		INT16 temp16;
@@ -1034,7 +1037,7 @@ static TIMER_CALLBACK(ip22_dma)
 //      verboselog(machine, 0, "nPBUS_DMA_CurPtr - 0x08000000/4 = %08x\n", (nPBUS_DMA_CurPtr - 0x08000000)/4 );
 		temp16 = ( ip22_mainram[(nPBUS_DMA_CurPtr - 0x08000000)/4] & 0xffff0000 ) >> 16;
 		temp16 = ( ( temp16 & 0xff00 ) >> 8 ) | ( ( temp16 & 0x00ff ) << 8 );
-		dmadac_transfer(0, 1, 1, 1, 1, &temp16);
+		dmadac_transfer(&dmadac[0], 1, 1, 1, 1, &temp16);
 		nPBUS_DMA_CurPtr += 4;
 		nPBUS_DMA_WordsLeft -= 4;
 
@@ -1159,6 +1162,7 @@ static TIMER_CALLBACK(ip22_timer)
 
 static MACHINE_RESET( ip225015 )
 {
+	dmadac[0] = devtag_get_device(machine, SOUND, "dmadac");
 	mc_init(machine);
 	nHPC3_enetr_nbdp = 0x80000000;
 	nHPC3_enetr_cbp = 0x80000000;
@@ -1173,8 +1177,8 @@ static MACHINE_RESET( ip225015 )
 
 	nPBUS_DMA_Active = 0;
 
-	dmadac_set_frequency(0, 1, 44100);
-	dmadac_enable(0, 1, 1);
+	dmadac_set_frequency(&dmadac[0], 1, 44100);
+	dmadac_enable(&dmadac[0], 1, 1);
 }
 
 static void dump_chain(const address_space *space, UINT32 ch_base)
