@@ -239,6 +239,32 @@ static ADDRESS_MAP_START(pc8_io, ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 
+static READ16_DEVICE_HANDLER( pc16_388_r )
+{
+	if ( ACCESSING_BITS_0_7 )
+	{
+		return 0xFF;
+	}
+	else
+	{
+		return ym3812_status_port_r( device, offset );
+	}
+}
+
+
+static WRITE16_DEVICE_HANDLER( pc16_388_w )
+{
+	if ( ACCESSING_BITS_0_7 )
+	{
+		ym3812_write_port_w( device, offset, data );
+	}
+	else
+	{
+		ym3812_control_port_w( device, offset, data );
+	}
+}
+
+
 static ADDRESS_MAP_START(pc16_io, ADDRESS_SPACE_IO, 16)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE8(DMA8237, "dma8237", dma8237_r, dma8237_w, 0xffff)
@@ -260,8 +286,7 @@ static ADDRESS_MAP_START(pc16_io, ADDRESS_SPACE_IO, 16)
 	AM_RANGE(0x0340, 0x0357) AM_READ(return16_FFFF) /* anonymous bios should not recogniced realtimeclock */
 	AM_RANGE(0x0378, 0x037f) AM_DEVREADWRITE8(PC_LPT, "lpt_1", pc_lpt_r, pc_lpt_w, 0x00ff)
 #ifdef ADLIB
-	AM_RANGE(0x0388, 0x0388) AM_DEVREADWRITE8(SOUND, "ym3812", ym3812_status_port_r,ym3812_control_port_w, 0xffff)
-	AM_RANGE(0x0389, 0x0389) AM_DEVWRITE8(SOUND, "ym3812", ym3812_write_port_w, 0xffff)
+	AM_RANGE(0x0388, 0x0389) AM_DEVREADWRITE(SOUND, "ym3812", pc16_388_r, pc16_388_w )
 #endif
 	AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE8(PC_LPT, "lpt_0", pc_lpt_r, pc_lpt_w, 0x00ff)
 	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE8(INS8250, "ins8250_2", ins8250_r, ins8250_w, 0xffff)
