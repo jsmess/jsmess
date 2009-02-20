@@ -13,8 +13,8 @@
 #include "machine/8255ppi.h"
 #include "machine/ins8250.h"
 #include "machine/wd17xx.h"
+#include "machine/ctronics.h"
 #include "devices/basicdsk.h"
-#include "devices/printer.h"
 #include "devices/cassette.h"
 #include "formats/svi_cas.h"
 #include "sound/dac.h"
@@ -43,9 +43,6 @@ typedef struct {
 	UINT8	bankHigh2_read_only;
 	/* keyboard */
 	UINT8	keyboard_row;
-	/* printer */
-	UINT8	prn_data;
-	UINT8	prn_strobe;
 	/* SVI-806 80 column card */
 	UINT8	svi806_present;
 	UINT8	svi806_ram_enabled;
@@ -189,7 +186,7 @@ static READ8_DEVICE_HANDLER ( svi318_ppi_port_a_r )
 static READ8_DEVICE_HANDLER ( svi318_ppi_port_b_r )
 {
 	int row;
-	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", 
+	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5",
 										"LINE6", "LINE7", "LINE8", "LINE9", "LINE10" };
 
 	row = svi.keyboard_row;
@@ -256,30 +253,6 @@ WRITE8_DEVICE_HANDLER( svi318_ppi_w )
 	ppi8255_w(device, offset + 2, data);
 }
 
-/* Printer port */
-
-static const device_config *printer_image(running_machine *machine)
-{
-	return devtag_get_device(machine, PRINTER, "printer");
-}
-
-static WRITE8_HANDLER( svi318_printer_w )
-{
-	if (!offset)
-		svi.prn_data = data;
-	else
-	{
-		if ( (svi.prn_strobe & 1) && !(data & 1) )
-			printer_output(printer_image(space->machine), svi.prn_data);
-
-		svi.prn_strobe = data;
-	}
-}
-
-static READ8_HANDLER( svi318_printer_r )
-{
-	return printer_is_ready(printer_image(space->machine)) ? 0xfe:0xff;		/* 0xfe if printer is ready to work */
-}
 
 /* PSG */
 
@@ -786,15 +759,17 @@ int svi318_cassette_present(running_machine *machine, int id)
 READ8_HANDLER( svi318_io_ext_r )
 {
 	UINT8 data = 0xff;
-	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD179X, "wd179x");
+	const device_config *fdc = devtag_get_device(space->machine, WD179X, "wd179x");
+	const device_config *printer = devtag_get_device(space->machine, CENTRONICS, "centronics");
 
 	if (svi.bankLow == SVI_CART) {
 		return 0xff;
 	}
 
-	switch( offset ) {
+	switch( offset )
+	{
 	case 0x12:
-		data = svi318_printer_r(space, 0);
+		data = 0xfe | centronics_busy_r(printer);
 		break;
 
 	case 0x20:
@@ -846,16 +821,21 @@ READ8_HANDLER( svi318_io_ext_r )
 
 WRITE8_HANDLER( svi318_io_ext_w )
 {
-	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD179X, "wd179x");
-	
+	const device_config *fdc = devtag_get_device(space->machine, WD179X, "wd179x");
+	const device_config *printer = devtag_get_device(space->machine, CENTRONICS, "centronics");
+
 	if (svi.bankLow == SVI_CART) {
 		return;
 	}
 
-	switch( offset ) {
+	switch( offset )
+	{
 	case 0x10:
+		centronics_data_w(printer, 0, data);
+		break;
+
 	case 0x11:
-		svi318_printer_w(space, offset & 1, data);
+		centronics_strobe_w(printer, BIT(data, 0));
 		break;
 
 	case 0x20:

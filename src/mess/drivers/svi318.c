@@ -17,8 +17,8 @@
 #include "video/tms9928a.h"
 #include "machine/8255ppi.h"
 #include "machine/wd17xx.h"
+#include "machine/ctronics.h"
 #include "devices/basicdsk.h"
-#include "devices/printer.h"
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
 #include "formats/svi_cas.h"
@@ -106,7 +106,7 @@ Small note about natural keyboard: currently,
 - "Stop" is mapped to 'End'
 - "Select" is mapped to 'F11'
 - "CLS/HM" is mapped to 'Home'
-TODO: How are multiple keys (Copy, Cut, Paste, CLS/HM) expected to 
+TODO: How are multiple keys (Copy, Cut, Paste, CLS/HM) expected to
 behave? Do they need multiple mapping in natural keyboard?
 */
 
@@ -312,12 +312,12 @@ static MACHINE_DRIVER_START( svi318 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	/* printer */
-	MDRV_PRINTER_ADD("printer")
+	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
 
 	MDRV_CASSETTE_ADD( "cassette", svi318_cassette_config )
-		
+
 	MDRV_WD179X_ADD("wd179x", svi_wd17xx_interface )
-	
+
 	MDRV_IMPORT_FROM( svi318_cartslot )
 MACHINE_DRIVER_END
 
@@ -391,12 +391,12 @@ static MACHINE_DRIVER_START( svi328_806 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	/* printer */
-	MDRV_PRINTER_ADD("printer")
+	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
 
 	MDRV_CASSETTE_ADD( "cassette", svi318_cassette_config )
-	
+
 	MDRV_WD179X_ADD("wd179x", svi_wd17xx_interface )
-	
+
 	MDRV_IMPORT_FROM( svi318_cartslot )
 MACHINE_DRIVER_END
 
