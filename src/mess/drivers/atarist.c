@@ -1310,8 +1310,8 @@ static const ay8910_interface ym2149_interface =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_MEMORY_HANDLER("main", PROGRAM, ym2149_port_a_w),
-	DEVCB_MEMORY_HANDLER("main", PROGRAM, ym2149_port_b_w)
+	DEVCB_MEMORY_HANDLER(M68000_TAG, PROGRAM, ym2149_port_a_w),
+	DEVCB_MEMORY_HANDLER(M68000_TAG, PROGRAM, ym2149_port_b_w)
 };
 
 /* Machine Drivers */
@@ -1694,8 +1694,8 @@ static const ay8910_interface stbook_ym2149_interface =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_MEMORY_HANDLER("main", PROGRAM, stbook_ym2149_port_a_w),
-	DEVCB_MEMORY_HANDLER("main", PROGRAM, ym2149_port_b_w),
+	DEVCB_MEMORY_HANDLER(M68000_TAG, PROGRAM, stbook_ym2149_port_a_w),
+	DEVCB_MEMORY_HANDLER(M68000_TAG, PROGRAM, ym2149_port_b_w),
 };
 
 static ACIA6850_INTERFACE( stbook_acia_ikbd_intf )
