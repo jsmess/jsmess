@@ -454,6 +454,7 @@ static MACHINE_DRIVER_START( ep64 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("custom", DAVE, 0)
+	MDRV_DEVICE_CONFIG( enterprise_dave_interface )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_WD1770_ADD("wd1770", enterp_wd1770_interface )
