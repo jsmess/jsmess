@@ -180,7 +180,7 @@ struct _gb_sound_t
 INLINE gb_sound_t *get_token(const device_config *device)
 {
 	assert(device != NULL);
-	assert(device->type == SOUND_GAMEBOY);
+	assert(sound_get_type(device) == SOUND_GAMEBOY);
 	return (gb_sound_t *) device->token;
 }
 
