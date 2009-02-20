@@ -123,6 +123,30 @@ static WRITE8_DEVICE_HANDLER(at_dma8237_1_w)
 	dma8237_w( device, offset / 2, data);
 }
 
+static READ16_DEVICE_HANDLER( at16_388_r )
+{
+	if ( ACCESSING_BITS_0_7 )
+	{
+		return 0xFF;
+	}
+	else
+	{
+		return ym3812_status_port_r( device, offset );
+	}
+}
+
+
+static WRITE16_DEVICE_HANDLER( at16_388_w )
+{
+	if ( ACCESSING_BITS_0_7 )
+	{
+		ym3812_write_port_w( device, offset, data );
+	}
+	else
+	{
+		ym3812_control_port_w( device, offset, data );
+	}
+}
 
 static ADDRESS_MAP_START(at16_io, ADDRESS_SPACE_IO, 16)
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8(DMA8237, "dma8237_1", dma8237_r, dma8237_w, 0xffff)
@@ -143,8 +167,7 @@ static ADDRESS_MAP_START(at16_io, ADDRESS_SPACE_IO, 16)
 //	AM_RANGE(0x0324, 0x0327) AM_READWRITE8(pc_HDC2_r,                pc_HDC2_w, 0xffff)
 	AM_RANGE(0x0378, 0x037f) AM_DEVREADWRITE8(PC_LPT, "lpt_1", pc_lpt_r, pc_lpt_w, 0x00ff)
 #ifdef ADLIB
-	AM_RANGE(0x0388, 0x0388) AM_DEVREADWRITE8(SOUND, "ym3812", ym3812_status_port_r,ym3812_control_port_w, 0xffff)
-	AM_RANGE(0x0389, 0x0389) AM_DEVWRITE8(SOUND, "ym3812", ym3812_write_port_w, 0xffff)
+	AM_RANGE(0x0388, 0x0389) AM_DEVREADWRITE(SOUND, "ym3812", at16_388_r, at16_388_w )
 #endif
 	AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE8(PC_LPT, "lpt_0", pc_lpt_r, pc_lpt_w, 0x00ff)
 	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE8(NS16450, "ns16450_2", ins8250_r, ins8250_w, 0xffff)
@@ -441,7 +464,7 @@ static MACHINE_DRIVER_START( ibm5170 )
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #ifdef ADLIB
-	MDRV_SOUND_ADD("ym3813", YM3812, ym3812_StdClock)
+	MDRV_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
 	MDRV_SOUND_CONFIG(at_ym3812_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #endif
@@ -508,6 +531,11 @@ static MACHINE_DRIVER_START( ibm5162 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+#ifdef ADLIB
+	MDRV_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
+	MDRV_SOUND_CONFIG(at_ym3812_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+#endif
 
 	MDRV_IMPORT_FROM( at_kbdc8042 )
 
