@@ -14,6 +14,7 @@
 #include "includes/mc68328.h"
 #include "sound/dac.h"
 #include "debugger.h"
+#include "palm.lh"
 
 static offs_t palm_dasm_override(const device_config *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 
@@ -193,6 +194,7 @@ static MACHINE_DRIVER_START( palm )
     MDRV_SCREEN_VISIBLE_AREA( 0, 159, 0, 219 )
     MDRV_PALETTE_LENGTH( 2 )
     MDRV_PALETTE_INIT( mc68328 )
+    MDRV_DEFAULT_LAYOUT(layout_palm)
 
     MDRV_VIDEO_START( mc68328 )
     MDRV_VIDEO_UPDATE( mc68328 )
