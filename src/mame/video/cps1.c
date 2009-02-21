@@ -1364,7 +1364,10 @@ static const struct CPS1config cps1_config_table[]=
 	{"pang3",    CPS_B_21_DEF, mapper_pang3 },	/* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */
 	{"pang3j",   CPS_B_21_DEF, mapper_pang3 },	/* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */
 	#ifdef MESS
+	{"sfach",    CPS_B_21_DEF, mapper_sfzch },
 	{"sfzch",    CPS_B_21_DEF, mapper_sfzch },
+	{"sfzbch",   CPS_B_21_DEF, mapper_sfzch },
+	{"wofch",    CPS_B_21_DEF, mapper_sfzch },
 	#endif
 
     /* CPS2 games */
