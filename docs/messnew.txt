@@ -43,6 +43,8 @@ System Driver Changes:
 
 - [CPC family] Updated all drivers to use the mc6845 device.  [Wilbert Pol]
 
+- {CPS CHANGER] Added "Tenchi Wo Kurau II". [Robbbert]
+
 - [EINSTEIN] Updated to use the new centronics interface.  [Dirk Best]
 
 - [EXIDY] Updated to use the new centronics support.  [Robbbert]
