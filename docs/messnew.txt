@@ -39,11 +39,13 @@ System Driver Changes:
 
 - [COCO] Cleanups  [Nathan Woods]
 
+- [COCO3] Fixed Composite Monochrome bit.  (bug #1767)  [Nathan Woods]
+
 - [COMPIS] Updated to use the new centronics interface.  [Dirk Best]
 
 - [CPC family] Updated all drivers to use the mc6845 device.  [Wilbert Pol]
 
-- {CPS CHANGER] Added "Tenchi Wo Kurau II". [Robbbert]
+- [CPS CHANGER] Added "Tenchi Wo Kurau II". [Robbbert]
 
 - [EINSTEIN] Updated to use the new centronics interface.  [Dirk Best]
 

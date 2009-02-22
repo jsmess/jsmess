@@ -141,7 +141,7 @@ static void color_batch(UINT32 *results, const UINT8 *indexes, int count)
 			UINT32 red   = ((c & 0xFF0000) >> 16);
 			UINT32 green = ((c & 0x00FF00) >>  8);
 			UINT32 blue  = ((c & 0x0000FF) >>  0);
-			c = (red + green + blue) / 3;
+			c = ((red + green + blue) / 3) * 0x010101;
 		}
 
 		results[i] = c;
