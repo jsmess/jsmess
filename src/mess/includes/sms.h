@@ -16,12 +16,12 @@
 #define CPU_ADDRESSABLE_SIZE			(0x10000)
 
 
-#define FLAG_GAMEGEAR			0x00010000
-#define FLAG_BIOS_0400			0x00020000
-#define FLAG_BIOS_2000			0x00040000
-#define FLAG_BIOS_FULL			0x00080000
-#define FLAG_FM				0x00100000
-#define FLAG_REGION_JAPAN		0x00200000
+#define FLAG_GAMEGEAR			0x00020000
+#define FLAG_BIOS_0400			0x00040000
+#define FLAG_BIOS_2000			0x00080000
+#define FLAG_BIOS_FULL			0x00100000
+#define FLAG_FM				0x00200000
+#define FLAG_REGION_JAPAN		0x00400000
 
 #define IS_GAMEGEAR			( space->machine->gamedrv->flags & FLAG_GAMEGEAR )
 #define HAS_BIOS_0400			( space->machine->gamedrv->flags & FLAG_BIOS_0400 )
