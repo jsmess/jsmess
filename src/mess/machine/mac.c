@@ -1722,9 +1722,12 @@ static READ8_DEVICE_HANDLER(mac_via_in_b)
 
 static WRITE8_DEVICE_HANDLER(mac_via_out_a)
 {
+	const device_config *sound = devtag_get_device(device->machine, SOUND, "custom");
+	const device_config *fdc = devtag_get_device(device->machine, APPLEFDC, "fdc");
+
 	set_scc_waitrequest((data & 0x80) >> 7);
 	mac_set_screen_buffer((data & 0x40) >> 6);
-	sony_set_sel_line((device_config*)devtag_get_device(device->machine, APPLEFDC, "fdc"),(data & 0x20) >> 5);
+	sony_set_sel_line(fdc,(data & 0x20) >> 5);
 	if (mac_model == MODEL_MAC_SE)	// on SE this selects which floppy drive (0 = upper, 1 = lower)
 	{
 		mac_drive_select = ((data & 0x10) >> 4);
@@ -1732,9 +1735,9 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_a)
 
 	if (mac_model < MODEL_MAC_SE)	// SE no longer has dual buffers
 	{
-		mac_set_sound_buffer(device->machine, (data & 0x08) >> 3);
+		mac_set_sound_buffer(sound, (data & 0x08) >> 3);
 	}
-	mac_set_volume(device->machine, data & 0x07);
+	mac_set_volume(sound, data & 0x07);
 
 	/* Early Mac models had VIA A4 control overlaying.  In the Mac SE (and
 	 * possibly later models), overlay was set on reset, but cleared on the
@@ -1745,9 +1748,10 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_a)
 
 static WRITE8_DEVICE_HANDLER(mac_via_out_b)
 {
+	const device_config *sound = devtag_get_device(device->machine, SOUND, "custom");
 	int new_rtc_rTCClk;
 
-	mac_enable_sound(device->machine, (data & 0x80) == 0);
+	mac_enable_sound(sound, (data & 0x80) == 0);
 
 	// SE and Classic have SCSI enable/disable here
 	if (mac_model >= MODEL_MAC_SE)
@@ -1883,7 +1887,7 @@ MACHINE_RESET(mac)
 	mac_set_screen_buffer(1);
 
 	/* setup sound */
-	mac_set_sound_buffer(machine, 0);
+	mac_set_sound_buffer(devtag_get_device(machine, SOUND, "custom"), 0);
 
 	if (has_adb())
 	{
@@ -1895,7 +1899,7 @@ MACHINE_RESET(mac)
 
 	if ((mac_model == MODEL_MAC_SE) || (mac_model == MODEL_MAC_CLASSIC))
 	{
-		mac_set_sound_buffer(machine, 1);
+		mac_set_sound_buffer(devtag_get_device(machine, SOUND, "custom"), 1);
 
 		// classic will fail RAM test and try to boot appletalk if RAM is not all zero
 		memset(mess_ram, 0, mess_ram_size);
@@ -2084,7 +2088,7 @@ static TIMER_CALLBACK(mac_scanline_tick)
 {
 	int scanline;
 
-	mac_sh_updatebuffer(machine);
+	mac_sh_updatebuffer(devtag_get_device(machine, SOUND, "custom"));
 
 	scanline = video_screen_get_vpos(machine->primary_screen);
 	if (scanline == MAC_V_VIS)

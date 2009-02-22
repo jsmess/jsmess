@@ -70,11 +70,11 @@ void mac_set_screen_buffer( int buffer );
 
 DEVICE_GET_INFO( mac_sound );
 
-void mac_enable_sound( running_machine *machine, int on );
-void mac_set_sound_buffer( running_machine *machine, int buffer );
-void mac_set_volume( running_machine *machine, int volume );
+void mac_enable_sound( const device_config *device, int on );
+void mac_set_sound_buffer( const device_config *device, int buffer );
+void mac_set_volume( const device_config *device, int volume );
 
-void mac_sh_updatebuffer(running_machine *machine);
+void mac_sh_updatebuffer(const device_config *device);
 
 
 #endif /* MAC_H_ */
