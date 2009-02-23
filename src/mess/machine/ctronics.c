@@ -6,12 +6,14 @@
 
 #include "driver.h"
 #include "ctronics.h"
+#include "devices/printer.h"
 
 
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
+static WRITE_LINE_DEVICE_HANDLER( centronics_printer_online );
 static TIMER_CALLBACK( ack_callback );
 static TIMER_CALLBACK( busy_callback );
 
@@ -68,6 +70,16 @@ const centronics_interface standard_centronics =
 
 
 /*****************************************************************************
+    PRINTER INTERFACE
+*****************************************************************************/
+
+static MACHINE_DRIVER_START( centronics )
+	MDRV_PRINTER_ADD("printer")
+	MDRV_PRINTER_ONLINE(centronics_printer_online)
+MACHINE_DRIVER_END
+
+
+/*****************************************************************************
     DEVICE INTERFACE
 *****************************************************************************/
 
@@ -75,6 +87,7 @@ static DEVICE_START( centronics )
 {
 	centronics_state *centronics = get_safe_token(device);
 	const centronics_interface *intf = device->static_config;
+	astring *tempstring = astring_alloc();
 
 	/* validate some basic stuff */
 	assert(device->static_config != NULL);
@@ -85,7 +98,7 @@ static DEVICE_START( centronics )
 	centronics->busy = TRUE;
 
 	/* get printer device */
-	centronics->printer = devtag_get_device(device->machine, PRINTER, device->tag);
+	centronics->printer = devtag_get_device(device->machine, PRINTER, device_build_tag(tempstring, device, "printer"));
 	assert(centronics->printer != NULL);
 
 	/* make sure it's running */
@@ -106,6 +119,8 @@ static DEVICE_START( centronics )
 	state_save_register_device_item(device, 0, centronics->busy);
 	state_save_register_device_item(device, 0, centronics->ack);
 	state_save_register_device_item(device, 0, centronics->data);
+
+	astring_free(tempstring);
 }
 
 static DEVICE_RESET( centronics )
@@ -129,11 +144,14 @@ DEVICE_GET_INFO( centronics )
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = 0;							break;
 		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_PERIPHERAL;		break;
 
+		/* --- the following bits of info are returned as pointers --- */
+		case DEVINFO_PTR_MACHINE_CONFIG:		info->machine_config = MACHINE_DRIVER_NAME(centronics);	break;
+
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:				info->set_info = DEVICE_SET_INFO_NAME( centronics );	break;
-		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME( centronics );			break;
+		case DEVINFO_FCT_SET_INFO:				info->set_info = DEVICE_SET_INFO_NAME(centronics);	break;
+		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(centronics);		break;
 		case DEVINFO_FCT_STOP:					/* Nothing */										break;
-		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME( centronics );			break;
+		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(centronics);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:					strcpy(info->s, "Centronics");			break;
@@ -156,8 +174,7 @@ DEVICE_GET_INFO( centronics )
 
 void centronics_printer_online(const device_config *device, int state)
 {
-	const device_config *c = devtag_get_device(device->machine, CENTRONICS, device->tag);
-	centronics_state *centronics = get_safe_token(c);
+	centronics_state *centronics = get_safe_token(device->owner);
 
 	/* when going online, set PE and FAULT high and BUSY low */
 	centronics->pe = state;

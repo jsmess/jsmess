@@ -8,7 +8,6 @@
 #define __CTRONICS_H__
 
 #include "devcb.h"
-#include "devices/printer.h"
 
 
 /***************************************************************************
@@ -57,9 +56,6 @@ READ_LINE_DEVICE_HANDLER( centronics_not_busy_r );
 READ_LINE_DEVICE_HANDLER( centronics_vcc_r );
 READ_LINE_DEVICE_HANDLER( centronics_fault_r );
 
-/* callback for the printer device */
-void centronics_printer_online(const device_config *device, int state);
-
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
@@ -68,13 +64,10 @@ void centronics_printer_online(const device_config *device, int state);
 #define CENTRONICS DEVICE_GET_INFO_NAME(centronics)
 
 #define MDRV_CENTRONICS_ADD(_tag, _intf) \
-	MDRV_PRINTER_ADD(_tag) \
-	MDRV_PRINTER_ONLINE(centronics_printer_online) \
 	MDRV_DEVICE_ADD(_tag, CENTRONICS, 0) \
 	MDRV_DEVICE_CONFIG(_intf)
 
 #define MDRV_CENTRONICS_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag, PRINTER) \
 	MDRV_DEVICE_REMOVE(_tag, CENTRONICS)
 
 

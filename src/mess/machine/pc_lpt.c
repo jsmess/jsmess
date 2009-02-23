@@ -6,6 +6,7 @@
 
 #include "driver.h"
 #include "pc_lpt.h"
+#include "machine/ctronics.h"
 
 
 /***************************************************************************
@@ -41,13 +42,17 @@ struct _pc_lpt_state
     CENTRONICS INTERFACE
 ***************************************************************************/
 
-const centronics_interface pc_centronics_config =
+static const centronics_interface pc_centronics_config =
 {
 	TRUE,
 	DEVCB_LINE(pc_lpt_ack_w),
 	DEVCB_NULL,
 	DEVCB_NULL
 };
+
+static MACHINE_DRIVER_START( pc_lpt )
+	MDRV_CENTRONICS_ADD("centronics", pc_centronics_config)
+MACHINE_DRIVER_END
 
 
 /*****************************************************************************
@@ -72,12 +77,13 @@ static DEVICE_START( pc_lpt )
 {
 	pc_lpt_state *lpt = get_safe_token(device);
 	const pc_lpt_interface *intf = device->static_config;
+	astring *tempstring = astring_alloc();
 
 	/* validate some basic stuff */
 	assert(device->static_config != NULL);
 
 	/* get centronics device */
-	lpt->centronics = devtag_get_device(device->machine, CENTRONICS, device->tag);
+	lpt->centronics = devtag_get_device(device->machine, CENTRONICS, device_build_tag(tempstring, device, "centronics"));
 	assert(lpt->centronics != NULL);
 
 	/* make sure it's running */
@@ -92,6 +98,13 @@ static DEVICE_START( pc_lpt )
 
 	/* register for state saving */
 	state_save_register_device_item(device, 0, lpt->ack);
+	state_save_register_device_item(device, 0, lpt->strobe);
+	state_save_register_device_item(device, 0, lpt->autofd);
+	state_save_register_device_item(device, 0, lpt->init);
+	state_save_register_device_item(device, 0, lpt->select);
+	state_save_register_device_item(device, 0, lpt->irq_enabled);
+
+	astring_free(tempstring);
 }
 
 static DEVICE_RESET( pc_lpt )
@@ -122,11 +135,14 @@ DEVICE_GET_INFO( pc_lpt )
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = 0;							break;
 		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_PERIPHERAL;		break;
 
+		/* --- the following bits of info are returned as pointers --- */
+		case DEVINFO_PTR_MACHINE_CONFIG:		info->machine_config = MACHINE_DRIVER_NAME(pc_lpt);	break;
+
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:				info->set_info = DEVICE_SET_INFO_NAME( pc_lpt );	break;
-		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME( pc_lpt );			break;
-		case DEVINFO_FCT_STOP:					/* Nothing */										break;
-		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME( pc_lpt );			break;
+		case DEVINFO_FCT_SET_INFO:				info->set_info = DEVICE_SET_INFO_NAME(pc_lpt);	break;
+		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(pc_lpt);		break;
+		case DEVINFO_FCT_STOP:					/* Nothing */									break;
+		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(pc_lpt);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:					strcpy(info->s, "PC-LPT");				break;
@@ -144,8 +160,7 @@ DEVICE_GET_INFO( pc_lpt )
 
 static WRITE_LINE_DEVICE_HANDLER( pc_lpt_ack_w )
 {
-	const device_config *lpt_device = devtag_get_device(device->machine, PC_LPT, device->tag);
-	pc_lpt_state *lpt = get_safe_token(lpt_device);
+	pc_lpt_state *lpt = get_safe_token(device->owner);
 
 	if (lpt->irq_enabled && lpt->ack == TRUE && state == FALSE)
 	{

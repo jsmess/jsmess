@@ -898,7 +898,7 @@ static MACHINE_DRIVER_START( bbcm )
 	MDRV_NVRAM_HANDLER( mc146818 )
 
 	/* printer */
-	MDRV_PRINTER_ADD("printer")
+	MDRV_CENTRONICS_ADD("centronics", bbcb_centronics_config)
 
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", bbc_cassette_config )
@@ -910,7 +910,6 @@ static MACHINE_DRIVER_START( bbcm )
 	MDRV_UPD7002_ADD("upd7002",BBC_uPD7002)
 	MDRV_VIA6522_ADD("via6522_0", 1000000, bbcb_system_via)
 	MDRV_VIA6522_ADD("via6522_1", 1000000, bbcb_user_via)
-	MDRV_CENTRONICS_ADD("centronics", bbcb_centronics_config)
 	MDRV_WD177X_ADD("wd177x", bbc_wd17xx_interface )
 
 	MDRV_IMPORT_FROM(bbc_cartslot)

@@ -8,14 +8,6 @@
 #define __PC_LPT_H__
 
 #include "devcb.h"
-#include "machine/ctronics.h"
-
-
-/***************************************************************************
-    CENTRONICS INTERFACE
-***************************************************************************/
-
-extern const centronics_interface pc_centronics_config;
 
 
 /***************************************************************************
@@ -52,12 +44,10 @@ WRITE8_DEVICE_HANDLER( pc_lpt_control_w );
 #define PC_LPT DEVICE_GET_INFO_NAME(pc_lpt)
 
 #define MDRV_PC_LPT_ADD(_tag, _intf) \
-	MDRV_CENTRONICS_ADD(_tag, pc_centronics_config) \
 	MDRV_DEVICE_ADD(_tag, PC_LPT, 0) \
 	MDRV_DEVICE_CONFIG(_intf)
 
 #define MDRV_PC_LPT_REMOVE(_tag) \
-	MDRV_CENTRONICS_REMOVE(_tag) \
 	MDRV_DEVICE_REMOVE(_tag, PC_LPT)
 
 
