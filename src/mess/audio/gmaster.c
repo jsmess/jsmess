@@ -13,18 +13,31 @@
 
 #include "includes/gmaster.h"
 
-static /*bool*/int level;
-static sound_stream *mixer_channel;
+typedef struct _gmaster_sound gmaster_sound;
+struct _gmaster_sound
+{
+	/*bool*/int level;
+	sound_stream *mixer_channel;
+};
 
+
+static gmaster_sound *get_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(sound_get_type(device) == SOUND_GMASTER);
+	return (gmaster_sound *) device->token;
+}
 
 
 int gmaster_io_callback(const device_config *device, int ioline, int state)
 {
+	gmaster_sound *token = get_token(device);
+
     switch (ioline)
 	{
 		case UPD7810_TO:
-			stream_update(mixer_channel);
-			level = state;
+			stream_update(token->mixer_channel);
+			token->level = state;
 			break;
 		default:
 			logerror("io changed %d %.2x\n",ioline, state);
@@ -40,11 +53,12 @@ int gmaster_io_callback(const device_config *device, int ioline, int state)
 static STREAM_UPDATE( gmaster_update )
 {
 	int i;
+	gmaster_sound *token = get_token(device);
 	stream_sample_t *buffer = outputs[0];
 
 	for (i = 0; i < samples; i++, buffer++)
 	{
-		*buffer = level?0x4000:0;
+		*buffer = token->level ? 0x4000 : 0;
 	}
 }
 
@@ -54,7 +68,8 @@ static STREAM_UPDATE( gmaster_update )
 
 static DEVICE_START( gmaster_sound )
 {
-	mixer_channel = stream_create(device, 0, 1, device->machine->sample_rate, 0, gmaster_update);
+	gmaster_sound *token = get_token(device);
+	token->mixer_channel = stream_create(device, 0, 1, device->machine->sample_rate, 0, gmaster_update);
 }
 
 
@@ -62,6 +77,9 @@ DEVICE_GET_INFO( gmaster_sound )
 {
 	switch (state)
 	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(gmaster_sound);			break;
+
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(gmaster_sound);	break;
 
