@@ -918,14 +918,14 @@ XL/XE 16kB OS roms
 
 	/* Telercas Oy */
 //	DRIVER(tmc1800)
-//0.129u4	DRIVER(tmc2000)
-//0.129u4	DRIVER(tmc2000e)
+	DRIVER(tmc2000)
+	DRIVER(tmc2000e)
 //	DRIVER(tmc600s1)
-//0.129u4	DRIVER(tmc600s2)
+	DRIVER(tmc600s2)
 
 	/* OSCOM Oy */
 //	DRIVER(osc1000b)
-//0.129u4	DRIVER(oscnano)
+	DRIVER(oscnano)
 
 	/* MIT */
 	DRIVER( tx0_64kw )	/* April 1956 MIT TX-0 (64kw RAM)					*/
