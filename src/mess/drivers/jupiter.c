@@ -242,8 +242,9 @@ static WRITE8_HANDLER( jupiter_vh_charram_w )
 	jupiter_charram[offset] = data;
 
 	/* decode character graphics again */
-	gfx_element_mark_dirty(space->machine->gfx[0], offset / 8);
-	gfx_element_mark_dirty(space->machine->gfx[1], offset / 8);
+	offset >>= 3;
+	gfx_element_mark_dirty(space->machine->gfx[0], offset);
+	gfx_element_mark_dirty(space->machine->gfx[1], offset);
 }
 
 
@@ -283,8 +284,8 @@ static VIDEO_UPDATE( jupiter )
 		int code = videoram[offs];
 		int sx, sy;
 
-		sy = (offs / 32) * 8;
-		sx = (offs % 32) * 8;
+		sy = (offs / 32) << 3;
+		sx = (offs % 32) << 3;
 
 		drawgfx(bitmap, ( code & 0x80 ) ? screen->machine->gfx[1] : screen->machine->gfx[0],
 			code & 0x7f, 0, 0,0, sx,sy, NULL, TRANSPARENCY_NONE, 0);
@@ -293,6 +294,10 @@ static VIDEO_UPDATE( jupiter )
 	return 0;
 }
 
+static DRIVER_INIT( jupiter )
+{
+	jupiter_charram = memory_region(machine, "main")+0x2c00;
+}
 
 static const cassette_config jupiter_cassette_config =
 {
@@ -344,4 +349,4 @@ ROM_START (jupiter)
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT      CONFIG    COMPANY   FULLNAME */
-COMP( 1981, jupiter,  0,		0,		jupiter,  jupiter,	0,		  0,		"Cantab",  "Jupiter Ace" , 0)
+COMP( 1981, jupiter,  0,	0,	jupiter,  jupiter,  jupiter,  0,	"Cantab",  "Jupiter Ace" , 0)
