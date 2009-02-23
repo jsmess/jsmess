@@ -36,7 +36,7 @@ static UINT8 key_sense;
 
 static void mtx_tms9929a_interrupt(running_machine *machine, int data)
 {
-	z80ctc_trg0_w( devtag_get_device(machine, Z80CTC, "z80ctc"), 0, data ? 0 : 1);
+	z80ctc_trg0_w(devtag_get_device(machine, Z80CTC, "z80ctc"), 0, data ? 0 : 1);
 }
 
 static const TMS9928a_interface tms9928a_interface =
@@ -112,30 +112,27 @@ WRITE8_HANDLER( mtx_cst_w )
  *
  *************************************/
 
-READ8_HANDLER( mtx_strobe_r )
+READ8_DEVICE_HANDLER( mtx_strobe_r )
 {
-	const device_config *printer = devtag_get_device(space->machine, CENTRONICS, "centronics");
-
 	/* set STROBE low */
-	centronics_strobe_w(printer, FALSE);
+	centronics_strobe_w(device, FALSE);
 
 	return 0xff;
 }
 
 
-READ8_HANDLER( mtx_prt_r )
+READ8_DEVICE_HANDLER( mtx_prt_r )
 {
-	const device_config *printer = devtag_get_device(space->machine, CENTRONICS, "centronics");
 	UINT8 result = 0;
 
 	/* reset STROBE to high */
-	centronics_strobe_w(printer, TRUE);
+	centronics_strobe_w(device, TRUE);
 
 	/* fill in centronics printer status */
-	result |= centronics_busy_r(printer) << 0;
-	result |= centronics_fault_r(printer) << 1;
-	result |= !centronics_pe_r(printer) << 2;
-	result |= centronics_vcc_r(printer) << 3;
+	result |= centronics_busy_r(device) << 0;
+	result |= centronics_fault_r(device) << 1;
+	result |= !centronics_pe_r(device) << 2;
+	result |= centronics_vcc_r(device) << 3;
 
 	return result;
 }
@@ -187,88 +184,6 @@ READ8_HANDLER( mtx_key_hi_r )
 }
 
 
-
-/*************************************
- *
- *  Z80 CTC
- *
- *************************************/
-
-static void mtx_ctc_interrupt(const device_config *device, int state)
-{
-//  logerror("mtx_ctc_interrupt: %02x\n", state);
-	cpu_set_input_line(device->machine->cpu[0], 0, state);
-}
-
-READ8_DEVICE_HANDLER( mtx_ctc_r )
-{
-	return z80ctc_r(device, offset);
-}
-
-WRITE8_DEVICE_HANDLER( mtx_ctc_w )
-{
-//  logerror("mtx_ctc_w: %02x\n", data);
-	if (offset < 3)
-		z80ctc_w(device, offset,data);
-}
-
-const z80ctc_interface mtx_ctc_intf =
-{
-	0,
-	mtx_ctc_interrupt,
-	0,
-	0,
-	0
-};
-
-
-
-/*************************************
- *
- *  Z80 Dart
- *
- *************************************/
-
-READ8_DEVICE_HANDLER( mtx_dart_data_r )
-{
-	return z80dart_d_r(device, offset);
-}
-
-READ8_DEVICE_HANDLER( mtx_dart_control_r )
-{
-	return z80dart_c_r(device, offset);
-}
-
-WRITE8_DEVICE_HANDLER( mtx_dart_data_w )
-{
-	z80dart_d_w(device, offset, data);
-}
-
-WRITE8_DEVICE_HANDLER( mtx_dart_control_w )
-{
-	z80dart_c_w(device, offset, data);
-}
-
-Z80DART_INTERFACE( mtx_dart_intf )
-{
-	0,
-	0,
-	0,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-};
 
 /*************************************
  *
@@ -353,10 +268,6 @@ DRIVER_INIT( rs128 )
 	/* install handlers for dart interface */
 	device = devtag_get_device(machine, Z80DART, "z80dart");
 	space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO);
-	memory_install_readwrite8_device_handler(space, device, 0x0c, 0x0d, 0, 0, mtx_dart_data_r, mtx_dart_data_w);
-	memory_install_readwrite8_device_handler(space, device, 0x0e, 0x0f, 0, 0, mtx_dart_control_r, mtx_dart_control_w);
-}
-
-MACHINE_RESET( rs128 )
-{
+	memory_install_readwrite8_device_handler(space, device, 0x0c, 0x0d, 0, 0, z80dart_d_r, z80dart_d_w);
+	memory_install_readwrite8_device_handler(space, device, 0x0e, 0x0f, 0, 0, z80dart_c_r, z80dart_c_w);
 }
