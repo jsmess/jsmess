@@ -147,7 +147,6 @@ The sorcerer has a UART device used by the serial interface and the cassette sys
 #include "devices/cassette.h"
 #include "devices/snapquik.h"
 #include "devices/cartslot.h"
-#include "devices/printer.h"
 #include "devices/z80bin.h"
 #include "machine/ay31015.h"
 
@@ -542,7 +541,7 @@ static READ8_HANDLER(exidy_fe_port_r)
      - tied high, allowing PARIN and PAROUT bios routines to run */
 
 	UINT8 data = 0xc0;
-	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", 
+	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7",
 										"LINE8", "LINE9", "LINE10", "LINE11", "LINE12", "LINE13", "LINE14", "LINE15" };
 
 	/* bit 5 - vsync (inverted) */
@@ -802,7 +801,7 @@ static MACHINE_DRIVER_START( exidy )
 
 	MDRV_CASSETTE_ADD( "cassette1", exidy_cassette_config )
 	MDRV_CASSETTE_ADD( "cassette2", exidy_cassette_config )
-	
+
 	MDRV_WD179X_ADD("wd179x", default_wd17xx_interface )
 
 	/* cartridge */

@@ -104,7 +104,6 @@ Some bugs left :
 #include "includes/msx.h"  /* MSX floppy device load */
 #include "devices/snapquik.h"
 #include "devices/cartslot.h"
-#include "devices/printer.h"
 #include "devices/cassette.h"
 #include "formats/tzx_cas.h"
 

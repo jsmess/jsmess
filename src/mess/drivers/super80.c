@@ -11,7 +11,7 @@
 #include "devices/z80bin.h"
 #include "sound/speaker.h"
 #include "machine/ctronics.h"
-#include "devices/printer.h"
+
 
 static UINT8 super80_mhz=2;	/* state of bit 2 of port F0 */
 static UINT16 vidpg=0xfe00;	/* Home position of video page being displayed */
@@ -88,7 +88,7 @@ static const UINT8 super80_comp_palette[16*3] =
 
 static void palette_set_colors_rgb(running_machine *machine, const UINT8 *colors)
 {
-	UINT8 r, b, g, color_count = 16; 
+	UINT8 r, b, g, color_count = 16;
 
 	while (color_count--)
 	{
@@ -102,7 +102,7 @@ static PALETTE_INIT( super80m )
 	int i;
 	machine->colortable = colortable_alloc(machine, 16);
 	palette_set_colors_rgb(machine, super80_rgb_palette);
-	
+
 	for( i = 0; i < 256; i++ )
 	{
 		colortable_entry_set_value(machine->colortable, i*2, i>>4);
@@ -190,7 +190,7 @@ static void mc6845_cursor_configure(void)
 	if (curs_type > 1) for (i = 0;i < ARRAY_LENGTH(mc6845_cursor);i++) mc6845_cursor[i]=0xff; // turn on full cursor
 
 	if (curs_type == 1) for (i = r10;i < r11;i++) mc6845_cursor[i]=0xff; // for each line that should show, turn on that scan line
-		
+
 	if (curs_type == 3) for (i = r11; i < r10;i++) mc6845_cursor[i]=0; // now take a bite out of the middle
 }
 
@@ -267,7 +267,7 @@ static VIDEO_UPDATE( super80m )
 			col = 15;		/* b&w */
 		else
 			col = 5;		/* green */
-	}		
+	}
 
 	/* display the picture */
 	for (y=0; y<16; y++)
@@ -1102,7 +1102,7 @@ static MACHINE_DRIVER_START( super80v )
 
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", super80_cassette_config )
-	
+
 	/* cartridge */
 	MDRV_IMPORT_FROM(super80_cartslot)
 MACHINE_DRIVER_END
