@@ -58,6 +58,8 @@ System Driver Changes:
 
 - [IP22] Updated to use the centronics interface.  [Dirk Best]
 
+- [MSX] Updated to use the centronics interface.  [Dirk Best]
+
 - [MTX512] Connected CTC channels 0-2 to clock sources. (bug #781) [Curt Coder]
 
 - [MTX512] Updated to use the new centronics interface.  [Dirk Best]

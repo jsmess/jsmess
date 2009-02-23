@@ -66,8 +66,10 @@ DEVICE_IMAGE_UNLOAD( msx_cart );
 void msx_vdp_interrupt(running_machine *machine, int i);
 
 /* I/O functions */
-WRITE8_HANDLER ( msx_printer_w );
-READ8_HANDLER ( msx_printer_r );
+READ8_DEVICE_HANDLER( msx_printer_status_r );
+WRITE8_DEVICE_HANDLER( msx_printer_strobe_w );
+WRITE8_DEVICE_HANDLER( msx_printer_data_w );
+
 WRITE8_HANDLER ( msx_psg_port_a_w );
 READ8_HANDLER ( msx_psg_port_a_r );
 WRITE8_HANDLER ( msx_psg_port_b_w );

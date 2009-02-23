@@ -78,7 +78,7 @@ Pioneer PX-7
 
 |---------------------------------------|
 |  CN1     CN2                          |
-|                                       |                                       
+|                                       |
 |                                       |
 |  IC33                                 |---------------------------------|
 |                                                      CN3                |
@@ -282,10 +282,10 @@ PCB Layouts missing
 #include "machine/wd17xx.h"
 #include "video/tms9928a.h"
 #include "video/v9938.h"
+#include "machine/ctronics.h"
 #include "includes/msx_slot.h"
 #include "includes/msx.h"
 #include "devices/basicdsk.h"
-#include "devices/printer.h"
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
 #include "formats/fmsx_cas.h"
@@ -323,7 +323,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START (readport, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x90, 0x91) AM_READ( msx_printer_r )
+	AM_RANGE( 0x90, 0x90) AM_DEVREAD(CENTRONICS, "centronics", msx_printer_status_r)
 	AM_RANGE( 0xa0, 0xa7) AM_DEVREAD( SOUND, "ay8910", ay8910_r )
 	AM_RANGE( 0xa8, 0xab) AM_DEVREAD( PPI8255, "ppi8255", ppi8255_r )
 	AM_RANGE( 0x98, 0x98) AM_READ( TMS9928A_vram_r )
@@ -335,7 +335,8 @@ static ADDRESS_MAP_START (writeport, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x77, 0x77) AM_WRITE( msx_90in1_w )
 	AM_RANGE( 0x7c, 0x7d) AM_WRITE( msx_fmpac_w )
-	AM_RANGE( 0x90, 0x91) AM_WRITE( msx_printer_w )
+	AM_RANGE( 0x90, 0x90) AM_DEVWRITE(CENTRONICS, "centronics", msx_printer_strobe_w)
+	AM_RANGE( 0x91, 0x91) AM_DEVWRITE(CENTRONICS, "centronics", msx_printer_data_w)
 	AM_RANGE( 0xa0, 0xa0) AM_DEVWRITE( SOUND, "ay8910", ay8910_address_w ) AM_MIRROR(0x06)
 	AM_RANGE( 0xa1, 0xa1) AM_DEVWRITE( SOUND, "ay8910", ay8910_data_w ) AM_MIRROR(0x06)
 	AM_RANGE( 0xa8, 0xab) AM_DEVWRITE( PPI8255, "ppi8255", ppi8255_w )
@@ -347,7 +348,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START (readport2, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x90, 0x91) AM_READ( msx_printer_r )
+	AM_RANGE( 0x90, 0x90) AM_DEVREAD(CENTRONICS, "centronics", msx_printer_status_r)
 	AM_RANGE( 0xa0, 0xa7) AM_DEVREAD( SOUND, "ay8910", ay8910_r )
 	AM_RANGE( 0xa8, 0xab) AM_DEVREAD( PPI8255, "ppi8255", ppi8255_r )
 	AM_RANGE( 0x98, 0x98) AM_READ( v9938_0_vram_r )
@@ -361,7 +362,8 @@ static ADDRESS_MAP_START (writeport2, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x77, 0x77) AM_WRITE( msx_90in1_w )
 	AM_RANGE( 0x7c, 0x7d) AM_WRITE( msx_fmpac_w )
-	AM_RANGE( 0x90, 0x91) AM_WRITE( msx_printer_w )
+	AM_RANGE( 0x90, 0x90) AM_DEVWRITE(CENTRONICS, "centronics", msx_printer_strobe_w)
+	AM_RANGE( 0x91, 0x91) AM_DEVWRITE(CENTRONICS, "centronics", msx_printer_data_w)
 	AM_RANGE( 0xa0, 0xa0) AM_DEVWRITE( SOUND, "ay8910", ay8910_address_w ) AM_MIRROR(0x06)
 	AM_RANGE( 0xa1, 0xa1) AM_DEVWRITE( SOUND, "ay8910", ay8910_data_w ) AM_MIRROR(0x06)
 	AM_RANGE( 0xa8, 0xab) AM_DEVWRITE( PPI8255, "ppi8255", ppi8255_w )
@@ -436,7 +438,7 @@ These keys corresponds to the following symbols
 
 	input_port	| msx	| msxuk	| msxjp	| msxkr	|hotbit	|expert	|
 	-------------------------------------------------------------
-	BACKSLASH2	|  \ |	|  \ |	|  ´ |	| won |	|  \ ^	|  { }	|
+	BACKSLASH2	|  \ |	|  \ |	|  ï¿½ |	| won |	|  \ ^	|  { }	|
 	-------------------------------------------------------------
 	TILDE		|  DK*	|  DK*	|  _	|  _	|  < >	|  / ?	|
 
@@ -1083,12 +1085,12 @@ static MACHINE_DRIVER_START( msx )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	/* printer */
-	MDRV_PRINTER_ADD("printer")
+	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
 
 	MDRV_CASSETTE_ADD( "cassette", msx_cassette_config )
-	
-	MDRV_WD179X_ADD("wd179x", msx_wd17xx_interface )	
-	
+
+	MDRV_WD179X_ADD("wd179x", msx_wd17xx_interface )
+
 	MDRV_IMPORT_FROM(msx_cartslot)
 MACHINE_DRIVER_END
 
@@ -1150,16 +1152,16 @@ static MACHINE_DRIVER_START( msx2 )
 	MDRV_NVRAM_HANDLER( msx2 )
 
 	/* printer */
-	MDRV_PRINTER_ADD("printer")
+	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
 
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", msx_cassette_config )
 
 	/* real time clock */
 	MDRV_TC8521_ADD("rtc", default_tc8521_interface)
-	
-	MDRV_WD179X_ADD("wd179x", msx_wd17xx_interface )	
-	
+
+	MDRV_WD179X_ADD("wd179x", msx_wd17xx_interface )
+
 	MDRV_IMPORT_FROM(msx_cartslot)
 MACHINE_DRIVER_END
 
@@ -2016,7 +2018,7 @@ MSX_LAYOUT_INIT (yis503ii)
 MSX_LAYOUT_END
 
 /* MSX - Yamaha YIS503IIR Russian */
-	
+
 ROM_START (y503iir)
 	ROM_REGION (0xe000, "main",0)
 	ROM_LOAD ("yis503iirbios.rom",  0x0000, 0x8000, CRC(225a4f9e) SHA1(5173ac403e26c462f904f85c9ef5e7b1e19253e7))
@@ -2025,16 +2027,16 @@ ROM_START (y503iir)
 ROM_END
 
 MSX_LAYOUT_INIT (y503iir)
-	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)	
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
 	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
-	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)	
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
 	MSX_LAYOUT_SLOT (3, 1, 1, 2, DISK_ROM2, 0x4000, 0x8000) /* National disk */
 	MSX_LAYOUT_SLOT (3, 2, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
 	MSX_LAYOUT_SLOT (3, 3, 1, 1, ROM, 0x2000, 0xc000)	/* Net */
 MSX_LAYOUT_END
 
 /* MSX - Yamaha YIS503IIR Estonian */
-	
+
 ROM_START (y503iir2)
 	ROM_REGION (0xe000, "main",0)
 	ROM_LOAD ("yis503ii2bios.rom",  0x0000, 0x8000, CRC(1548cee3) SHA1(42c7fff25b1bd90776ac0aea971241aedce8947d))
@@ -2043,9 +2045,9 @@ ROM_START (y503iir2)
 ROM_END
 
 MSX_LAYOUT_INIT (y503iir2)
-	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)	
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
 	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
-	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)	
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
 	MSX_LAYOUT_SLOT (3, 1, 1, 2, DISK_ROM2, 0x4000, 0x8000) /* National disk */
 	MSX_LAYOUT_SLOT (3, 2, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
 	MSX_LAYOUT_SLOT (3, 3, 1, 1, ROM, 0x2000, 0xc000)	/* Net */
@@ -3314,7 +3316,7 @@ ROM_START (cx7m128)
 	ROM_LOAD ("cx7mext.rom",   0x8000, 0x4000, CRC(66237ecf) SHA1(5c1f9c7fb655e43d38e5dd1fcc6b942b2ff68b02))
 	/* 0xc000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
 	ROM_FILL (0xc000, 0x14000, 0)
-	ROM_LOAD ("sfg05.rom", 0x20000, 0x8000, CRC(6c2545c9) SHA1(bc4b242647116f4886bb92e86421f97b1be51938))	
+	ROM_LOAD ("sfg05.rom", 0x20000, 0x8000, CRC(6c2545c9) SHA1(bc4b242647116f4886bb92e86421f97b1be51938))
 	ROM_LOAD ("yrm502.rom", 0x28000, 0x4000, CRC(51f7ddd1) SHA1(2a4b4a4657e3077df8a88f98210b76883d3702b1))
 ROM_END
 
@@ -3756,7 +3758,7 @@ MSX_DRIVER_LIST
 	MSX_DRIVER (phc70fd)
 	MSX_DRIVER (phc70fd2)
 	MSX_DRIVER (phc35j)
-	
+
 	MSX_DRIVER (tpc310)
 	MSX_DRIVER (hx23)
 	MSX_DRIVER (hx23f)
