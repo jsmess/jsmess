@@ -4,8 +4,8 @@
  *
  ****************************************************************************/
 
-#ifndef MSX_H_
-#define MSX_H_
+#ifndef __MSX_H__
+#define __MSX_H__
 
 #include "machine/wd17xx.h"
 
@@ -15,8 +15,6 @@ typedef struct {
 	/* PSG */
 	int psg_b;
 	int opll_active;
-	/* printer */
-	UINT8 prn_data, prn_strobe;
 	/* mouse */
 	UINT16 mouse[2];
 	int mouse_stat[2];
@@ -103,4 +101,4 @@ void msx_memory_set_carts (void);
 void msx_memory_reset (running_machine *machine);
 
 
-#endif /* MSX_H_ */
+#endif /* __MSX_H__ */
