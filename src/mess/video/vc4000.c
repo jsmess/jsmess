@@ -368,8 +368,8 @@ WRITE8_HANDLER(vc4000_video_w)
 		break;
 
 	case 0xc7:						// Soundregister
-		vc4000_video.reg.data[offset]=data;
-		vc4000_soundport_w(space->machine, 0, data);
+		vc4000_video.reg.data[offset] = data;
+		vc4000_soundport_w(devtag_get_device(space->machine, SOUND, "custom"), 0, data);
 		break;
 
 	case 0xc8:						// Digits 1 and 2
