@@ -1221,7 +1221,7 @@ READ8_HANDLER ( dgnalpha_psg_porta_read )
 
 WRITE8_HANDLER ( dgnalpha_psg_porta_write )
 {
-	const device_config *fdc = devtag_get_device(space->machine, WD179X, "wd179x");
+	const device_config *fdc = devtag_get_device(space->machine, WD179X, "wd2797");
 	/* Bits 0..3 are the drive select lines for the internal floppy interface */
 	/* Bit 4 is the motor on, in the real hardware these are inverted on their way to the drive */
 	/* Bits 5,6,7 are connected to /DDEN, ENP and 5/8 on the WD2797 */
@@ -1588,7 +1588,7 @@ static WRITE8_HANDLER( dragon64_pia1_pb_w )
 
 static WRITE8_HANDLER( dgnalpha_pia2_pa_w )
 {
-	const device_config *ay8910 = devtag_get_device(space->machine, SOUND, "ay8910");
+	const device_config *ay8912 = devtag_get_device(space->machine, SOUND, "ay8912");
 	int	bc_flags;		/* BCDDIR/BC1, as connected to PIA2 port a bits 0 and 1 */
 
 	/* If bit 2 of the pia2 ddra is 1 then this pin is an output so use it */
@@ -1609,13 +1609,13 @@ static WRITE8_HANDLER( dgnalpha_pia2_pa_w )
 		case 0x00	: 		/* Inactive, do nothing */
 			break;
 		case 0x01	: 		/* Write to selected port */
-			ay8910_data_w(ay8910, 0, pia_get_output_b(2));
+			ay8910_data_w(ay8912, 0, pia_get_output_b(2));
 			break;
 		case 0x02	: 		/* Read from selected port */
-			pia_set_input_b(2, ay8910_r(ay8910, 0));
+			pia_set_input_b(2, ay8910_r(ay8912, 0));
 			break;
 		case 0x03	:		/* Select port to write to */
-			ay8910_address_w(ay8910, 0, pia_get_output_b(2));
+			ay8910_address_w(ay8912, 0, pia_get_output_b(2));
 			break;
 	}
 }
@@ -1642,7 +1642,8 @@ static void dragon_page_rom(running_machine *machine, int romswitch)
 /* Dragon Alpha onboard FDC */
 /********************************************************************************************/
 
-static WD17XX_CALLBACK( dgnalpha_fdc_callback )
+//static 
+WD17XX_CALLBACK( dgnalpha_fdc_callback )
 {
 	/* The NMI line on the alphaAlpha is gated through IC16 (early PLD), and is gated by pia2 CA2  */
 	/* The DRQ line goes through pia2 cb1, in exactly the same way as DRQ from DragonDos does */
@@ -1678,7 +1679,7 @@ static WD17XX_CALLBACK( dgnalpha_fdc_callback )
 /* The Dragon Alpha hardware reverses the order of the WD2797 registers */
 READ8_HANDLER(wd2797_r)
 {
-	const device_config *fdc = devtag_get_device(space->machine, WD179X, "wd179x");
+	const device_config *fdc = devtag_get_device(space->machine, WD179X, "wd2797");
 	int result = 0;
 
 	switch(offset & 0x03)
@@ -1704,7 +1705,7 @@ READ8_HANDLER(wd2797_r)
 
 WRITE8_HANDLER(wd2797_w)
 {
-	const device_config *fdc = devtag_get_device(space->machine, WD179X, "wd179x");
+	const device_config *fdc = devtag_get_device(space->machine, WD179X, "wd2797");
     switch(offset & 0x3)
 	{
 		case 0:
@@ -2818,7 +2819,7 @@ MACHINE_START( dgnalpha )
 	dgnalpha_just_reset=1;
 }
 
-static const wd17xx_interface dgnalpha_wd17xx_interface = {
+const wd17xx_interface dgnalpha_wd17xx_interface = {
 	dgnalpha_fdc_callback,
 	NULL
 };

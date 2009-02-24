@@ -62,6 +62,7 @@ void coco3_vh_blink(void);
 
 
 /*----------- defined in machine/coco.c -----------*/
+extern const wd17xx_interface dgnalpha_wd17xx_interface;
 extern const sam6883_interface coco_sam_intf;
 extern const sam6883_interface coco3_sam_intf;
 extern UINT8 coco3_gimereg[16];
