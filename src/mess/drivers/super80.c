@@ -19,8 +19,12 @@ static UINT8 int_sw;		/* internal 1 MHz flipflop */
 
 static UINT8 current_palette;	/* for super80m and super80v */
 static UINT8 current_charset;	/* for super80m */
+static UINT8 irq_counter;
 
 static const device_config *super80_z80pio;
+static const device_config *super80_speaker;
+static const device_config *super80_cassette;
+static const device_config *super80_printer;
 
 /* the rest are for super80v */
 static UINT8 *pcgram;
@@ -348,9 +352,17 @@ static VIDEO_UPDATE( super80v )
 
 static UINT8 keylatch;
 
+/* Due to pio bug since 128u7, need to eat first interrupt after boot.
+	Only works for super80m and super80v. The irq doesn't work at all for the others at this time. */
 static void super80_pio_interrupt(const device_config *device, int state)
 {
-//128u7	cputag_set_input_line(device->machine, "main", 0, state );
+	if ((state) && (!irq_counter))
+		irq_counter++;
+	else
+	{
+		cputag_set_input_line(device->machine, "main", 0, state );
+		if (state) irq_counter=0;
+	}
 }
 
 static WRITE8_DEVICE_HANDLER( pio_port_a_w )
@@ -393,23 +405,18 @@ static const z80_daisy_chain super80_daisy_chain[] =
 
 /**************************** CASSETTE ROUTINES *****************************************************************/
 
-static const device_config *cassette_device_image(running_machine *machine)
-{
-	return devtag_get_device(machine, CASSETTE, "cassette");
-}
-
-static void cassette_motor( running_machine *machine, UINT8 data )
+static void super80_cassette_motor( running_machine *machine, UINT8 data )
 {
 	if (data)
-		cassette_change_state(cassette_device_image(machine), CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+		cassette_change_state(super80_cassette, CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 	else
-		cassette_change_state(cassette_device_image(machine), CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+		cassette_change_state(super80_cassette, CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 
 	/* does user want to hear the sound? */
 	if (input_port_read(machine, "CONFIG") & 8)
-		cassette_change_state(cassette_device_image(machine), CASSETTE_SPEAKER_ENABLED, CASSETTE_MASK_SPEAKER);
+		cassette_change_state(super80_cassette, CASSETTE_SPEAKER_ENABLED, CASSETTE_MASK_SPEAKER);
 	else
-		cassette_change_state(cassette_device_image(machine), CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
+		cassette_change_state(super80_cassette, CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
 }
 
 /********************************************* TIMER ************************************************/
@@ -432,7 +439,7 @@ static TIMER_CALLBACK( super80_timer )
 	UINT8 cass_ws=0;
 
 	cass_data[1]++;
-	cass_ws = (cassette_input(cassette_device_image(machine)) > +0.03) ? 4 : 0;
+	cass_ws = (cassette_input(super80_cassette) > +0.03) ? 4 : 0;
 
 	if (cass_ws != cass_data[0])
 	{
@@ -466,13 +473,12 @@ static READ8_HANDLER( super80v_11_r )
 
 static READ8_HANDLER( super80_dc_r )
 {
-	const device_config *printer = devtag_get_device(space->machine, CENTRONICS, "centronics");
 	UINT8 data=0x7f;
 
 	/* bit 7 = printer busy
 	0 = printer is not busy */
 
-	data |= centronics_busy_r(printer) << 7;
+	data |= centronics_busy_r(super80_printer) << 7;
 
 	return data;
 }
@@ -500,52 +506,48 @@ static WRITE8_HANDLER( super80v_11_w )
 static WRITE8_HANDLER( super80_dc_w )
 {
 	/* hardware strobe driven from port select, bit 7..0 = data */
-	const device_config *printer = devtag_get_device(space->machine, CENTRONICS, "centronics");
-	centronics_strobe_w(printer, 1);
-	centronics_data_w(printer, 0, data);
-	centronics_strobe_w(printer, 0);
+	centronics_strobe_w(super80_printer, 1);
+	centronics_data_w(super80_printer, 0, data);
+	centronics_strobe_w(super80_printer, 0);
 }
 
 static UINT8 last_data;
 
 static WRITE8_HANDLER( super80_f0_w )
 {
-	const device_config *speaker = devtag_get_device(space->machine, SOUND, "speaker");
 	UINT8 bits = data ^ last_data;
 
 	if (bits & 0x20) set_led_status(2,(data & 32) ? 0 : 1);		/* bit 5 - LED - scroll lock led is used */
-	speaker_level_w(speaker, (data & 8) ? 0 : 1);				/* bit 3 - speaker */
+	speaker_level_w(super80_speaker, (data & 8) ? 0 : 1);				/* bit 3 - speaker */
 	super80_mhz = (data & 4) ? 1 : 2;				/* bit 2 - video on/off */
-	if (bits & 2) cassette_motor( space->machine, data & 2 ? 1 : 0);	/* bit 1 - cassette motor */
-	if (bits & 1) cassette_output(cassette_device_image(space->machine), (data & 1) ? -1.0 : +1.0);	/* bit 0 - cass out */
+	if (bits & 2) super80_cassette_motor(space->machine, data & 2 ? 1 : 0);	/* bit 1 - cassette motor */
+	if (bits & 1) cassette_output(super80_cassette, (data & 1) ? -1.0 : +1.0);	/* bit 0 - cass out */
 
 	last_data = data;
 }
 
 static WRITE8_HANDLER( super80r_f0_w )
 {
-	const device_config *speaker = devtag_get_device(space->machine, SOUND, "speaker");
 	UINT8 bits = data ^ last_data;
 
 	if (bits & 0x20) set_led_status(2,(data & 32) ? 0 : 1);		/* bit 5 - LED - scroll lock led is used */
-	speaker_level_w(speaker, (data & 8) ? 0 : 1);				/* bit 3 - speaker */
-	if (bits & 2) cassette_motor( space->machine, data & 2 ? 1 : 0);	/* bit 1 - cassette motor */
-	if (bits & 1) cassette_output(cassette_device_image(space->machine), (data & 1) ? -1.0 : +1.0);	/* bit 0 - cass out */
+	speaker_level_w(super80_speaker, (data & 8) ? 0 : 1);				/* bit 3 - speaker */
+	if (bits & 2) super80_cassette_motor(space->machine, data & 2 ? 1 : 0);	/* bit 1 - cassette motor */
+	if (bits & 1) cassette_output(super80_cassette, (data & 1) ? -1.0 : +1.0);	/* bit 0 - cass out */
 
 	last_data = data;
 }
 
 static WRITE8_HANDLER( super80v_f0_w )
 {
-	const device_config *speaker = devtag_get_device(space->machine, SOUND, "speaker");
 	UINT8 bits = data ^ last_data;
 
 	if (bits & 0x20) set_led_status(2,(data & 32) ? 0 : 1);		/* bit 5 - LED - scroll lock led is used */
 	super80v_rom_pcg = data & 0x10;					/* bit 4 - bankswitch gfx rom or pcg */
-	speaker_level_w(speaker, (data & 8) ? 0 : 1);				/* bit 3 - speaker */
+	speaker_level_w(super80_speaker, (data & 8) ? 0 : 1);				/* bit 3 - speaker */
 	super80v_vid_col = data & 4;					/* bit 2 - bankswitch video or colour ram */
-	if (bits & 2) cassette_motor( space->machine, data & 2 ? 1 : 0);	/* bit 1 - cassette motor */
-	if (bits & 1) cassette_output(cassette_device_image(space->machine), (data & 1) ? -1.0 : +1.0);	/* bit 0 - cass out */
+	if (bits & 2) super80_cassette_motor(space->machine, data & 2 ? 1 : 0);	/* bit 1 - cassette motor */
+	if (bits & 1) cassette_output(super80_cassette, (data & 1) ? -1.0 : +1.0);	/* bit 0 - cass out */
 
 	last_data = data;
 }
@@ -979,9 +981,12 @@ static TIMER_CALLBACK( super80_reset )
 
 static MACHINE_RESET( super80 )
 {
-	super80_z80pio = devtag_get_device(machine, Z80PIO, "z80pio");
 	timer_set(machine, ATTOTIME_IN_USEC(10), NULL, 0, super80_reset);
 	memory_set_bank(machine, 1, 1);
+	super80_z80pio = devtag_get_device(machine, Z80PIO, "z80pio");
+	super80_speaker = devtag_get_device(machine, SOUND, "speaker");
+	super80_cassette = devtag_get_device(machine, CASSETTE, "cassette");
+	super80_printer = devtag_get_device(machine, CENTRONICS, "centronics");
 }
 
 static const cassette_config super80_cassette_config =
