@@ -242,6 +242,7 @@ static WRITE8_DEVICE_HANDLER( cbmb_cia_port_a_w )
 const cia6526_interface cbmb_cia =
 {
 	DEVCB_DEVICE_LINE(TPI6525, "tpi6525_0", tpi6525_irq2_level),
+	DEVCB_NULL,	/* pc_func */
 	60,
 
 	{

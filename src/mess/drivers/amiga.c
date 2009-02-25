@@ -219,6 +219,7 @@ static MACHINE_RESET( cdtv )
 static const cia6526_interface cia_0_ntsc_intf =
 {
 	DEVCB_LINE(amiga_cia_0_irq),									/* irq_func */
+	DEVCB_NULL,	/* pc_func */
 	60,													/* tod_clock */
 	{
 		{ DEVCB_HANDLER(amiga_cia_0_portA_r), DEVCB_HANDLER(amiga_cia_0_portA_w) },	/* port A */
@@ -229,6 +230,7 @@ static const cia6526_interface cia_0_ntsc_intf =
 static const cia6526_interface cia_0_pal_intf =
 {
 	DEVCB_LINE(amiga_cia_0_irq),									/* irq_func */
+	DEVCB_NULL,	/* pc_func */
 	50,													/* tod_clock */
 	{
 		{ DEVCB_HANDLER(amiga_cia_0_portA_r), DEVCB_HANDLER(amiga_cia_0_portA_w) },	/* port A */
@@ -239,6 +241,7 @@ static const cia6526_interface cia_0_pal_intf =
 static const cia6526_interface cia_1_intf =
 {
 	DEVCB_LINE(amiga_cia_1_irq),									/* irq_func */
+	DEVCB_NULL,	/* pc_func */
 	0,													/* tod_clock */
 	{
 		{ DEVCB_NULL, DEVCB_NULL },								/* port A */
@@ -249,6 +252,7 @@ static const cia6526_interface cia_1_intf =
 static const cia6526_interface cia_0_cdtv_intf =
 {
 	DEVCB_LINE(amiga_cia_0_irq),									/* irq_func */
+	DEVCB_NULL,	/* pc_func */
 	0,													/* tod_clock */
 	{
 		{ DEVCB_HANDLER(amiga_cia_0_cdtv_portA_r), DEVCB_HANDLER(amiga_cia_0_portA_w) },	/* port A */
@@ -259,6 +263,7 @@ static const cia6526_interface cia_0_cdtv_intf =
 static const cia6526_interface cia_1_cdtv_intf =
 {
 	DEVCB_LINE(amiga_cia_1_irq),									/* irq_func */
+	DEVCB_NULL,	/* pc_func */
 	0,													/* tod_clock */
 	{
 		{ DEVCB_NULL, DEVCB_NULL, },								/* port A */

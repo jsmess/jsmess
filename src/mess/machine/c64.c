@@ -12,7 +12,7 @@
     (program write some short test code into the vic sprite register)
  */
 
-/* 
+/*
 	2008-09-06: Tape status for C64 & C128 [FP & RZ]
 	- tape loading works
 	- tap files are supported
@@ -126,12 +126,12 @@ static void c64_nmi(running_machine *machine)
 				cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq);
 			}
 		}
-		
+
 		else
 		{
 			cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq);
 		}
-		
+
 		nmilevel = (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq;
 	}
 }
@@ -294,7 +294,7 @@ static READ8_DEVICE_HANDLER( c64_cia0_port_b_r )
 
 	if ( input_port_read(device->machine, "CTRLSEL") & 0x80 )
 		value &= c64_keyline[9];
-    else 
+    else
 		value &= c64_keyline[8];
 
     if (is_c128(device->machine))
@@ -421,6 +421,7 @@ static void c64_cia1_interrupt (const device_config *device, int level)
 const cia6526_interface c64_ntsc_cia0 =
 {
 	DEVCB_LINE(c64_cia0_interrupt),
+	DEVCB_NULL,	/* pc_func */
 	60,
 
 	{
@@ -432,6 +433,7 @@ const cia6526_interface c64_ntsc_cia0 =
 const cia6526_interface c64_pal_cia0 =
 {
 	DEVCB_LINE(c64_cia0_interrupt),
+	DEVCB_NULL,	/* pc_func */
 	50,
 
 	{
@@ -443,6 +445,7 @@ const cia6526_interface c64_pal_cia0 =
 const cia6526_interface c64_ntsc_cia1 =
 {
 	DEVCB_LINE(c64_cia1_interrupt),
+	DEVCB_NULL,	/* pc_func */
 	60,
 
 	{
@@ -454,6 +457,7 @@ const cia6526_interface c64_ntsc_cia1 =
 const cia6526_interface c64_pal_cia1 =
 {
 	DEVCB_LINE(c64_cia1_interrupt),
+	DEVCB_NULL,	/* pc_func */
 	50,
 
 	{
@@ -502,11 +506,11 @@ WRITE8_HANDLER( c64_write_io )
 
 WRITE8_HANDLER(c64_ioarea_w)
 {
-	if (c64_io_enabled) 
+	if (c64_io_enabled)
 	{
 		c64_write_io(space, offset, data);
-	} 
-	else 
+	}
+	else
 	{
 		c64_io_ram_w_ptr[offset] = data;
 	}
@@ -584,27 +588,27 @@ configuration is active (the -GAME line is shorted to ground), the
 ----------------------------------------------------------------------
  C000  RAM    RAM    RAM    RAM    RAM    RAM    RAM    RAM     -
 ----------------------------------------------------------------------
- B000	     	   	    	   	  	 	       
+ B000
        BASIC  RAM    RAM    RAM    RAM    BASIC  ROMH   ROMH    -
- A000	     	   	    	   	  	 	       
+ A000
 ----------------------------------------------------------------------
- 9000	     	   	    	   	  	 	       
+ 9000
        RAM    RAM    RAM    RAM    RAM    ROML   RAM    ROML   ROML(*
- 8000	     	   	    	   	  	 	       
+ 8000
 ----------------------------------------------------------------------
- 7000	     	   	    	   	  	 	       
-	     	   	    	   	  	 	       
- 6000	     	   	    	   	  	 	       
+ 7000
+
+ 6000
        RAM    RAM    RAM    RAM    RAM    RAM    RAM    RAM     -
- 5000	     	   	    	   	  	 	       
-	     	   	    	   	  	 	       
- 4000	     	   	    	   	  	 	       
+ 5000
+
+ 4000
 ----------------------------------------------------------------------
- 3000        	   	    	   	  	 	       
-	     	   	    	   	  	 	       
+ 3000
+
  2000  RAM    RAM    RAM    RAM    RAM    RAM    RAM    RAM     -
-	     	   	    	   	  	 	       
- 1000	     	   	    	   	  	 	       
+
+ 1000
 ----------------------------------------------------------------------
  0000  RAM    RAM    RAM    RAM    RAM    RAM    RAM    RAM    RAM
 ----------------------------------------------------------------------
@@ -643,7 +647,7 @@ configuration is active (the -GAME line is shorted to ground), the
 
             RAM         various ranges  Commodore 64's internal RAM.
 
-            -           1000-7FFF and   Open address space. 
+            -           1000-7FFF and   Open address space.
                         A000-CFFF       The Commodore 64's memory chips
                                         do not detect any memory accesses
                                         to this area except the VIC-II's
@@ -678,7 +682,7 @@ static void c64_bankswitch(running_machine *machine, int reset)
 	int data = (UINT8) device_get_info_int(machine->cpu[0], CPUINFO_INT_M6510_PORT) & 0x07;
 
 	/* If nothing has changed or reset = 0, don't do anything */
-	if ((data == old) && (exrom == c64_exrom) && (game == c64_game) && !reset) 
+	if ((data == old) && (exrom == c64_exrom) && (game == c64_game) && !reset)
 		return;
 
 	/* Are we in Ultimax mode? */
@@ -788,7 +792,7 @@ void c64_m6510_port_write(const device_config *device, UINT8 direction, UINT8 da
 	data = (c64_port_data & ~direction) | (data & direction);
 
 	/* resistors make P0,P1,P2 go high when respective line is changed to input */
-	if (!(direction & 0x04)) 
+	if (!(direction & 0x04))
 		data |= 0x04;
 
 	if (!(direction & 0x02))
@@ -801,7 +805,7 @@ void c64_m6510_port_write(const device_config *device, UINT8 direction, UINT8 da
 
 	if (c64_tape_on)
 	{
-		if (direction & 0x08) 
+		if (direction & 0x08)
 		{
 			cassette_output(devtag_get_device(device->machine, CASSETTE, "cassette"), (data & 0x08) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
 		}
@@ -846,12 +850,12 @@ UINT8 c64_m6510_port_read(const device_config *device, UINT8 direction)
 			data |=  0x10;
 	}
 
-	if (is_c65(device->machine)) 
+	if (is_c65(device->machine))
 	{
 		if (input_port_read(device->machine, "SPECIAL") & 0x20)		/* Check Caps Lock */
 			data &= ~0x40;
 
-		else 
+		else
 			data |=  0x40;
 	}
 
@@ -948,7 +952,7 @@ int c64_paddle_read (const device_config *device, int which)
 		temp = pot3; pot3 = pot4; pot4 = temp;
 	}
 
-	switch (cia0porta & 0xc0) 
+	switch (cia0porta & 0xc0)
 	{
 	case 0x40:
 		return which ? pot2 : pot1;
@@ -1024,7 +1028,7 @@ static void c64_common_driver_init (running_machine *machine)
 	device_set_info_fct(machine->cpu[0], CPUINFO_FCT_M6510_PORTREAD, (genf *) c64_m6510_port_read);
 	device_set_info_fct(machine->cpu[0], CPUINFO_FCT_M6510_PORTWRITE, (genf *) c64_m6510_port_write);
 
-	if (!ultimax) 
+	if (!ultimax)
 	{
 		UINT8 *mem = memory_region(machine, "main");
 		c64_basic    = mem + 0x10000;
@@ -1171,7 +1175,7 @@ INTERRUPT_GEN( c64_frame_interrupt )
 
 		/* Shift Lock is mapped on Left Shift */
 		if ((i == 1) && (input_port_read(device->machine, "SPECIAL") & 0x40) && !is_c128(device->machine))	// Fix Me! Currently, neither left Shift nor Shift Lock works in c128, but reading this in c128 produces a bug!
-			value &= ~0x80;			
+			value &= ~0x80;
 
 		c64_keyline[i] = value;
 	}
@@ -1183,7 +1187,7 @@ INTERRUPT_GEN( c64_frame_interrupt )
 		case 0x00:
 			value &= ~input_port_read(device->machine, "JOY1_1B");			/* Joy1 Directions + Button 1 */
 			break;
-		
+
 		case 0x01:
 			if (input_port_read(device->machine, "OTHER") & 0x40)			/* Paddle2 Button */
 				value &= ~0x08;
@@ -1197,11 +1201,11 @@ INTERRUPT_GEN( c64_frame_interrupt )
 			if (input_port_read(device->machine, "OTHER") & 0x01)			/* Mouse Button Right */
 				value &= ~0x01;
 			break;
-			
+
 		case 0x03:
 			value &= ~(input_port_read(device->machine, "JOY1_2B") & 0x1f);	/* Joy1 Directions + Button 1 */
 			break;
-		
+
 		case 0x04:
 /* was there any input on the lightpen? where is it mapped? */
 //			if (input_port_read(device->machine, "OTHER") & 0x04)			/* Lightpen Signal */
@@ -1225,7 +1229,7 @@ INTERRUPT_GEN( c64_frame_interrupt )
 		case 0x00:
 			value &= ~input_port_read(device->machine, "JOY2_1B");			/* Joy2 Directions + Button 1 */
 			break;
-		
+
 		case 0x10:
 			if (input_port_read(device->machine, "OTHER") & 0x10)			/* Paddle4 Button */
 				value &= ~0x08;
@@ -1239,7 +1243,7 @@ INTERRUPT_GEN( c64_frame_interrupt )
 			if (input_port_read(device->machine, "OTHER") & 0x01)			/* Mouse Button Right */
 				value &= ~0x01;
 			break;
-		
+
 		case 0x30:
 			value &= ~(input_port_read(device->machine, "JOY2_2B") & 0x1f);	/* Joy2 Directions + Button 1 */
 			break;
@@ -1261,7 +1265,7 @@ INTERRUPT_GEN( c64_frame_interrupt )
 	c64_keyline[9] = value;
 
 	/* C128 only : keypad input ports */
-	if (is_c128(device->machine)) 
+	if (is_c128(device->machine))
 	{
 		for (i = 0; i < 3; i++)
 		{
@@ -1272,7 +1276,7 @@ INTERRUPT_GEN( c64_frame_interrupt )
 	}
 
 	/* C65 only : function keys input ports */
-	if (is_c65(device->machine)) 
+	if (is_c65(device->machine))
 	{
 		value = 0xff;
 
@@ -1287,7 +1291,7 @@ INTERRUPT_GEN( c64_frame_interrupt )
 	timer_set(device->machine, attotime_zero, NULL, 0, lightpen_tick);
 
 	set_led_status (1, input_port_read(device->machine, "SPECIAL") & 0x40 ? 1 : 0);		/* Shift Lock */
-	set_led_status (0, input_port_read(device->machine, "CTRLSEL") & 0x80 ? 1 : 0);		/* Joystick Swap */ 
+	set_led_status (0, input_port_read(device->machine, "CTRLSEL") & 0x80 ? 1 : 0);		/* Joystick Swap */
 }
 
 
@@ -1298,7 +1302,7 @@ INTERRUPT_GEN( c64_frame_interrupt )
 ***********************************************/
 
 /* Info based on http://ist.uwaterloo.ca/~schepers/formats/CRT.TXT	    */
-/* Please refer to the webpage for the latest version and for a very 
+/* Please refer to the webpage for the latest version and for a very
    complete listing of various cart types and their bankswitch tricks 	*/
 /*
   Cartridge files were introduced in the CCS64  emulator,  written  by  Per
@@ -1323,8 +1327,8 @@ special hardware features it uses.
 	$0040-EOF :		Blocks of data
 
   Each block of data, called 'CHIP', can be of variable size. The first
-0x10 bytes of each CHIP block is the block header, and it contains various 
-informations on the block itself, as its size (both with and without the 
+0x10 bytes of each CHIP block is the block header, and it contains various
+informations on the block itself, as its size (both with and without the
 header), the loading address and an index to identify which memory bank
 the data must be loaded to.  FP ]
 
@@ -1441,21 +1445,21 @@ enum {
 	REAL_FC_I,			/* 29 - (3)									*/
 	ACTION_REPLAY_4,	/* 30 - Action Replay 4						*/
 	STARDOS,			/* 31 - StarDOS								*/
-	/* 
-	(1) Ocean type 1 includes Navy Seals, Robocop 2 & 3,  Shadow  of 
+	/*
+	(1) Ocean type 1 includes Navy Seals, Robocop 2 & 3,  Shadow  of
 	the Beast, Toki, Terminator 2 and more. Both 256 and 128 Kb images.
 	(2) Dinamic includes Narco Police and more.
-	(3) Type 29 is reserved for the real Final Cartridge I, the one 
+	(3) Type 29 is reserved for the real Final Cartridge I, the one
 	above (Type 13) will become Final Cartridge II.					*/
 	/****************************************
-	Vice also defines the following types: 
+	Vice also defines the following types:
 	#define CARTRIDGE_ACTION_REPLAY3    -29
 	#define CARTRIDGE_IEEE488           -11
 	#define CARTRIDGE_IDE64             -7
 	#define CARTRIDGE_RETRO_REPLAY      -5
 	#define CARTRIDGE_SUPER_SNAPSHOT    -4
 
-	Can we support these as well?			
+	Can we support these as well?
 	*****************************************/
 };
 
@@ -1512,14 +1516,14 @@ static DEVICE_IMAGE_LOAD(c64_cart)
 
 
 		/* Data in a .crt image are organized in blocks called 'CHIP':
-		   each 'CHIP' consists of a 0x10 header, which contains the 
-		   actual size of the block, the loading address and info on 
+		   each 'CHIP' consists of a 0x10 header, which contains the
+		   actual size of the block, the loading address and info on
 		   the bankswitch, followed by the actual data					*/
 		while (j < size)
 		{
 			unsigned short chip_size, chip_bank_index, chip_data_size;
 			unsigned char buffer[10];
-			
+
 			/* Start to parse the CHIP header */
 			/* First 4 bytes are the string 'CHIP' */
 			image_fread(image, buffer, 6);
@@ -1531,16 +1535,16 @@ static DEVICE_IMAGE_LOAD(c64_cart)
 			/* 0x08-0x09 chip type (ROM, RAM + no ROM, Flash ROM) */
 			image_fread(image, buffer + 6, 2);
 
-			/* 0x0a-0x0b is the bank number of the CHIP block */ 
+			/* 0x0a-0x0b is the bank number of the CHIP block */
 			/* We currently don't use this, but it is needed to support more cart types. */
 			image_fread(image, &chip_bank_index, 2);
 			chip_bank_index = BIG_ENDIANIZE_INT16(chip_bank_index);
 
-			/* 0x0c-0x0d is the loading address of the CHIP block */ 
+			/* 0x0c-0x0d is the loading address of the CHIP block */
 			image_fread(image, &address, 2);
 			address = BIG_ENDIANIZE_INT16(address);
 
-			/* 0x0e-0x0f is the data size of the CHIP block (without header) */ 
+			/* 0x0e-0x0f is the data size of the CHIP block (without header) */
 			image_fread(image, &chip_data_size, 2);
 			chip_data_size = BIG_ENDIANIZE_INT16(chip_data_size);
 
@@ -1571,7 +1575,7 @@ static DEVICE_IMAGE_LOAD(c64_cart)
 	}
 
 	/* We also support .80 files for c64 & .e0/.f0 for max */
-	else 
+	else
 	{
 		/* Assign loading address according to extension */
 		if (!mame_stricmp (filetype, "80"))
@@ -1600,7 +1604,7 @@ static DEVICE_IMAGE_LOAD(c64_cart)
 	}
 
 	/* If we load a .crt file, use EXROM & GAME from the header! */
-	if ((cbm_c64_exrom != -1) && (cbm_c64_game != -1)) 
+	if ((cbm_c64_exrom != -1) && (cbm_c64_game != -1))
 	{
 		c64_exrom = cbm_c64_exrom;
 		c64_game  = cbm_c64_game;
@@ -1613,12 +1617,12 @@ static DEVICE_IMAGE_LOAD(c64_cart)
 	memset(roml, 0, 0x2000);
 	memset(romh, 0, 0x2000);
 
-	for (i=0; (i < sizeof(c64_cbm_cart) / sizeof(c64_cbm_cart[0])) && (c64_cbm_cart[i].size != 0); i++) 
+	for (i=0; (i < sizeof(c64_cbm_cart) / sizeof(c64_cbm_cart[0])) && (c64_cbm_cart[i].size != 0); i++)
 	{
-		if (c64_cbm_cart[i].addr < 0xc000) 
+		if (c64_cbm_cart[i].addr < 0xc000)
 			memcpy(roml + c64_cbm_cart[i].addr - 0x8000, c64_cbm_cart[i].chip, c64_cbm_cart[i].size);
 
-		else 
+		else
 			memcpy(romh + c64_cbm_cart[i].addr - 0xe000, c64_cbm_cart[i].chip, c64_cbm_cart[i].size);
 	}
 
