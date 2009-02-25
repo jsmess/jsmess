@@ -1050,9 +1050,9 @@ static MACHINE_DRIVER_START( psxntsc )
 	/* basic machine hardware */
 	MDRV_CPU_ADD( "main", PSXCPU, XTAL_67_7376MHz )
 	MDRV_CPU_PROGRAM_MAP( psx_map, 0 )
-	MDRV_CPU_VBLANK_INT("main", psx_vblank)
+	MDRV_CPU_VBLANK_INT("screen", psx_vblank)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE( 60 )
 	MDRV_SCREEN_VBLANK_TIME(0)
 
@@ -1083,9 +1083,9 @@ static MACHINE_DRIVER_START( psxpal )
 	/* basic machine hardware */
 	MDRV_CPU_ADD( "main", PSXCPU, XTAL_67_7376MHz )
 	MDRV_CPU_PROGRAM_MAP( psx_map, 0 )
-	MDRV_CPU_VBLANK_INT("main", psx_vblank)
+	MDRV_CPU_VBLANK_INT("screen", psx_vblank)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE( 50 )
 	MDRV_SCREEN_VBLANK_TIME(0)
 

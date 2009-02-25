@@ -144,7 +144,7 @@ static MACHINE_DRIVER_START( dc )
 	MDRV_CPU_CONFIG(sh4cpu_config)
 	MDRV_CPU_PROGRAM_MAP(dc_map,0)
 	MDRV_CPU_IO_MAP(dc_port,0)
-	MDRV_CPU_VBLANK_INT("main", dc_dispatch_vblank)
+	MDRV_CPU_VBLANK_INT("screen", dc_dispatch_vblank)
 
 	MDRV_CPU_ADD("sound", ARM7, ((XTAL_33_8688MHz*2)/3)/8)	// AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
 	MDRV_CPU_PROGRAM_MAP(dc_audio_map, 0)
@@ -152,7 +152,7 @@ static MACHINE_DRIVER_START( dc )
 	MDRV_MACHINE_RESET( dc_console )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_RAW_PARAMS((524*857*59.94), 857, 0xa4, 640+0xa4, 524, 0x12, 480+0x12)
 	

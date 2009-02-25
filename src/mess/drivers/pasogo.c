@@ -486,7 +486,7 @@ static MACHINE_DRIVER_START( pasogo )
 	MDRV_CPU_ADD("main", I80188/*V30HL in vadem vg230*/, 10000000/*?*/)
 	MDRV_CPU_PROGRAM_MAP(pasogo_mem, 0)
 	MDRV_CPU_IO_MAP( pasogo_io, 0 )
-	MDRV_CPU_VBLANK_INT("main", pasogo_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", pasogo_interrupt)
 //	MDRV_CPU_CONFIG(i86_address_mask)
 	MDRV_MACHINE_RESET( pasogo )
 
@@ -494,7 +494,7 @@ static MACHINE_DRIVER_START( pasogo )
 
 	MDRV_PIC8259_ADD( "pic8259", pasogo_pic8259_config )
 
-	MDRV_SCREEN_ADD("main", LCD)
+	MDRV_SCREEN_ADD("screen", LCD)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_SIZE(640, 400)

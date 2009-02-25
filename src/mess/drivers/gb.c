@@ -552,9 +552,9 @@ static MACHINE_DRIVER_START( gameboy )
 	MDRV_CPU_ADD("main", LR35902, 4194304)			/* 4.194304 MHz */
 	MDRV_CPU_PROGRAM_MAP(gb_map, 0)
 	MDRV_CPU_CONFIG(dmg_cpu_reset)
-	MDRV_CPU_VBLANK_INT("main", gb_scanline_interrupt)	/* 1 dummy int each frame */
+	MDRV_CPU_VBLANK_INT("screen", gb_scanline_interrupt)	/* 1 dummy int each frame */
 
-	MDRV_SCREEN_ADD("main", LCD)
+	MDRV_SCREEN_ADD("screen", LCD)
 	MDRV_SCREEN_REFRESH_RATE(DMG_FRAMES_PER_SECOND)
 	MDRV_SCREEN_VBLANK_TIME(0)
 	MDRV_QUANTUM_TIME(HZ(60))
@@ -599,7 +599,7 @@ static MACHINE_DRIVER_START( supergb )
 
 	MDRV_DEFAULT_LAYOUT(layout_horizont)	/* runs on a TV, not an LCD */
 
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_SIZE(32*8, 28*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MDRV_PALETTE_LENGTH(32768)
@@ -643,10 +643,10 @@ static MACHINE_DRIVER_START( megaduck )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", LR35902, 4194304)			/* 4.194304 MHz */
 	MDRV_CPU_PROGRAM_MAP( megaduck_map, 0 )
-	MDRV_CPU_VBLANK_INT("main", gb_scanline_interrupt)	/* 1 int each scanline ! */
+	MDRV_CPU_VBLANK_INT("screen", gb_scanline_interrupt)	/* 1 int each scanline ! */
 	MDRV_CPU_CONFIG(megaduck_cpu_reset)
 
-	MDRV_SCREEN_ADD("main", LCD)
+	MDRV_SCREEN_ADD("screen", LCD)
 	MDRV_SCREEN_REFRESH_RATE(DMG_FRAMES_PER_SECOND)
 	MDRV_SCREEN_VBLANK_TIME(0)
 	MDRV_QUANTUM_TIME(HZ(60))

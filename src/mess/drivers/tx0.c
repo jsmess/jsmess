@@ -324,13 +324,13 @@ static MACHINE_DRIVER_START(tx0_64kw)
 	MDRV_CPU_CONFIG(tx0_reset_param)
 	MDRV_CPU_PROGRAM_MAP(tx0_64kw_map, 0)
 	/* dummy interrupt: handles input */
-	MDRV_CPU_VBLANK_INT("main", tx0_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", tx0_interrupt)
 
 	MDRV_MACHINE_START( tx0 )
 	MDRV_MACHINE_RESET( tx0 )
 
 	/* video hardware (includes the control panel and typewriter output) */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(refresh_rate)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

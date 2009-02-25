@@ -454,13 +454,13 @@ MACHINE_DRIVER_START( spectrum )
 	MDRV_CPU_ADD("main", Z80, 3500000)        /* 3.5 MHz */
 	MDRV_CPU_PROGRAM_MAP(spectrum_mem, 0)
 	MDRV_CPU_IO_MAP(spectrum_io, 0)
-	MDRV_CPU_VBLANK_INT("main", spec_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", spec_interrupt)
 	MDRV_QUANTUM_TIME(HZ(60))
 
 	MDRV_MACHINE_RESET( spectrum )
 
     /* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50.08)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

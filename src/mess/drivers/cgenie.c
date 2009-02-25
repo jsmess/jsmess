@@ -403,7 +403,7 @@ static MACHINE_DRIVER_START( cgenie )
 	MDRV_CPU_ADD("main", Z80, 2216800)        /* 2,2168 MHz */
 	MDRV_CPU_PROGRAM_MAP(cgenie_mem, 0)
 	MDRV_CPU_IO_MAP(cgenie_io, 0)
-	MDRV_CPU_VBLANK_INT("main", cgenie_frame_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", cgenie_frame_interrupt)
 	MDRV_CPU_PERIODIC_INT(cgenie_timer_interrupt, 40)
 	MDRV_QUANTUM_TIME(HZ(240))
 
@@ -411,7 +411,7 @@ static MACHINE_DRIVER_START( cgenie )
 	MDRV_MACHINE_RESET( cgenie )
 
     /* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

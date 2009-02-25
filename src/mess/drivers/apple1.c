@@ -223,7 +223,7 @@ static MACHINE_DRIVER_START( apple1 )
        slows it to 960 kHz. */
 	MDRV_CPU_ADD("main", M6502, 960000)        /* 1.023 MHz */
 	MDRV_CPU_PROGRAM_MAP(apple1_map, 0)
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	/* Video is blanked for 70 out of 262 scanlines per refresh cycle.
        Each scanline is composed of 65 character times, 40 of which

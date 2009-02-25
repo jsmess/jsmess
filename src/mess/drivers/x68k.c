@@ -2137,7 +2137,7 @@ static MACHINE_DRIVER_START( x68000 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M68000, 10000000)  /* 10 MHz */
 	MDRV_CPU_PROGRAM_MAP(x68k_map, 0)
-	MDRV_CPU_VBLANK_INT("main", x68k_vsync_irq)
+	MDRV_CPU_VBLANK_INT("screen", x68k_vsync_irq)
 	MDRV_QUANTUM_TIME(HZ(60))
 
 	MDRV_MACHINE_START( x68000 )
@@ -2157,7 +2157,7 @@ static MACHINE_DRIVER_START( x68000 )
 	MDRV_RP5C15_ADD( "rp5c15" , rtc_intf)
 
     /* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(55.45)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 //  MDRV_GFXDECODE(x68k)

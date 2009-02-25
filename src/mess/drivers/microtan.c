@@ -218,12 +218,12 @@ static MACHINE_DRIVER_START( microtan )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M6502, 750000)	// 750 kHz
 	MDRV_CPU_PROGRAM_MAP(microtan_map, 0)
-	MDRV_CPU_VBLANK_INT("main", microtan_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", microtan_interrupt)
 
 	MDRV_MACHINE_RESET(microtan)
 
     /* video hardware - include overscan */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

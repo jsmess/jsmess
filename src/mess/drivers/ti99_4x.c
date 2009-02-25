@@ -539,14 +539,14 @@ static MACHINE_DRIVER_START(ti99_4_60hz)
 	MDRV_CPU_ADD("main", TMS9900, 3000000)
 	MDRV_CPU_PROGRAM_MAP(memmap, 0)
 	MDRV_CPU_IO_MAP(readcru, writecru)
-	MDRV_CPU_VBLANK_INT("main", ti99_vblank_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", ti99_vblank_interrupt)
 
 	MDRV_MACHINE_START( ti99_4_60hz )
 	MDRV_MACHINE_RESET( ti99 )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(tms9928a)
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
@@ -591,14 +591,14 @@ static MACHINE_DRIVER_START(ti99_4_50hz)
 	MDRV_CPU_ADD("main", TMS9900, 3000000)
 	MDRV_CPU_PROGRAM_MAP(memmap, 0)
 	MDRV_CPU_IO_MAP(readcru, writecru)
-	MDRV_CPU_VBLANK_INT("main", ti99_vblank_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", ti99_vblank_interrupt)
 
 	MDRV_MACHINE_START( ti99_4_50hz )
 	MDRV_MACHINE_RESET( ti99 )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(tms9928a)
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
@@ -641,14 +641,14 @@ static MACHINE_DRIVER_START(ti99_4a_60hz)
 	MDRV_CPU_ADD("main", TMS9900, 3000000)
 	MDRV_CPU_PROGRAM_MAP(memmap, 0)
 	MDRV_CPU_IO_MAP(readcru, writecru)
-	MDRV_CPU_VBLANK_INT("main", ti99_vblank_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", ti99_vblank_interrupt)
 
 	MDRV_MACHINE_START( ti99_4a_60hz )
 	MDRV_MACHINE_RESET( ti99 )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(tms9928a)
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
@@ -693,14 +693,14 @@ static MACHINE_DRIVER_START(ti99_4a_50hz)
 	MDRV_CPU_ADD("main", TMS9900, 3000000)
 	MDRV_CPU_PROGRAM_MAP(memmap, 0)
 	MDRV_CPU_IO_MAP(readcru, writecru)
-	MDRV_CPU_VBLANK_INT("main", ti99_vblank_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", ti99_vblank_interrupt)
 
 	MDRV_MACHINE_START( ti99_4a_50hz )
 	MDRV_MACHINE_RESET( ti99 )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(tms9928a)
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
@@ -750,7 +750,7 @@ static MACHINE_DRIVER_START(ti99_4ev_60hz)
 	MDRV_MACHINE_RESET( ti99 )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)	/* or 50Hz */
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

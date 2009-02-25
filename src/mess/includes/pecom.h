@@ -1,7 +1,7 @@
 #ifndef __PECOM__
 #define __PECOM__
 
-#define SCREEN_TAG	"main"
+#define SCREEN_TAG	"screen"
 #define CDP1869_TAG	"cdp1869"
 
 #define PECOM_PAGE_RAM_SIZE	0x400

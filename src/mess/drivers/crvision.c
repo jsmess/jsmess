@@ -20,7 +20,7 @@
 #include "video/tms9928a.h"
 
 #define M6502_TAG	"m6502"
-#define SCREEN_TAG	"main" // TODO: change to "screen" when tms9928.c is integrated from MAME
+#define SCREEN_TAG	"screen"
 
 /* Memory Map */
 

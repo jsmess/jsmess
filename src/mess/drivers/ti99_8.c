@@ -430,14 +430,14 @@ static MACHINE_DRIVER_START(ti99_8_60hz)
 	MDRV_CPU_CONFIG(ti99_8_processor_config)
 	MDRV_CPU_PROGRAM_MAP(ti99_8_memmap, 0)
 	MDRV_CPU_IO_MAP(ti99_8_readcru, ti99_8_writecru)
-	MDRV_CPU_VBLANK_INT("main", ti99_vblank_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", ti99_vblank_interrupt)
 
 	MDRV_MACHINE_START( ti99_8_60hz )
 	MDRV_MACHINE_RESET( ti99 )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(tms9928a)
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
@@ -476,14 +476,14 @@ static MACHINE_DRIVER_START(ti99_8_50hz)
 	MDRV_CPU_CONFIG(ti99_8_processor_config)
 	MDRV_CPU_PROGRAM_MAP(ti99_8_memmap, 0)
 	MDRV_CPU_IO_MAP(ti99_8_readcru, ti99_8_writecru)
-	MDRV_CPU_VBLANK_INT("main", ti99_vblank_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", ti99_vblank_interrupt)
 
 	MDRV_MACHINE_START( ti99_8_50hz )
 	MDRV_MACHINE_RESET( ti99 )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(tms9928a)
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 

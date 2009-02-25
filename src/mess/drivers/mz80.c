@@ -174,7 +174,7 @@ static MACHINE_DRIVER_START( mz80k )
 	MDRV_PIT8253_ADD( "pit8253", mz80k_pit8253_config )
 
     /* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 
 	MDRV_VIDEO_START(mz80k)

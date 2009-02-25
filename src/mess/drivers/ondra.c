@@ -122,13 +122,13 @@ static MACHINE_DRIVER_START( ondra )
 	MDRV_CPU_ADD("main", Z80, 2000000)
 	MDRV_CPU_PROGRAM_MAP(ondra_mem, 0)
 	MDRV_CPU_IO_MAP(ondra_io, 0)
-	MDRV_CPU_VBLANK_INT("main", ondra_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", ondra_interrupt)
 	
 	MDRV_MACHINE_START( ondra )
 	MDRV_MACHINE_RESET( ondra )
 
     /* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

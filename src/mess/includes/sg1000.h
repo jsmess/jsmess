@@ -1,7 +1,7 @@
 #ifndef __SG1000__
 #define __SG1000__
 
-#define SCREEN_TAG		"main" // TODO change to "screen" once tms9928.c is integrated from MAME
+#define SCREEN_TAG		"screen"
 #define Z80_TAG			"z80"
 #define SN76489A_TAG	"sn76489a"
 #define NEC765_TAG		"nec765"

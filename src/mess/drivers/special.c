@@ -327,7 +327,7 @@ static MACHINE_DRIVER_START( special )
 	MDRV_PPI8255_ADD( "ppi8255", specialist_ppi8255_interface )
 
     /* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -355,7 +355,7 @@ static MACHINE_DRIVER_START( specialp )
     MDRV_CPU_MODIFY("main")
     MDRV_CPU_PROGRAM_MAP(specialp_mem, 0)
 
-    MDRV_SCREEN_MODIFY("main")
+    MDRV_SCREEN_MODIFY("screen")
     MDRV_VIDEO_START(specialp)
     MDRV_VIDEO_UPDATE(specialp)
 	MDRV_SCREEN_SIZE(512, 256)
@@ -371,7 +371,7 @@ static MACHINE_DRIVER_START( specimx )
   	MDRV_MACHINE_RESET ( specimx )
 
     /* video hardware */
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_PALETTE_LENGTH(16)
 	MDRV_PALETTE_INIT( specimx )
 
@@ -396,7 +396,7 @@ static MACHINE_DRIVER_START( erik )
 	MDRV_PPI8255_ADD( "ppi8255", specialist_ppi8255_interface )
 
     /* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

@@ -100,7 +100,7 @@ static MACHINE_DRIVER_START( orion128 )
 	MDRV_PPI8255_ADD( "ppi8255_2", radio86_ppi8255_interface_1 )
 
     /* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -142,7 +142,7 @@ static MACHINE_DRIVER_START( orionz80 )
     MDRV_CPU_ADD("main", Z80, 2500000)
     MDRV_CPU_PROGRAM_MAP(orionz80_mem, 0)
     MDRV_CPU_IO_MAP(orionz80_io, 0)
-    MDRV_CPU_VBLANK_INT("main",orionz80_interrupt)
+    MDRV_CPU_VBLANK_INT("screen",orionz80_interrupt)
 
     MDRV_MACHINE_START( orionz80 )
     MDRV_MACHINE_RESET( orionz80 )
@@ -152,7 +152,7 @@ static MACHINE_DRIVER_START( orionz80 )
 	MDRV_PPI8255_ADD( "ppi8255_2", radio86_ppi8255_interface_1 )
 
     /* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -202,7 +202,7 @@ static MACHINE_DRIVER_START( orionpro )
 	MDRV_PPI8255_ADD( "ppi8255_2", radio86_ppi8255_interface_1 )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

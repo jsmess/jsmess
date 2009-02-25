@@ -80,7 +80,7 @@ static MACHINE_DRIVER_START( bbcbc )
 	MDRV_CPU_PROGRAM_MAP( bbcbc_prg, 0 )
 	MDRV_CPU_IO_MAP( bbcbc_io, 0 )
 	MDRV_CPU_CONFIG(bbcbc_daisy_chain)
-	MDRV_CPU_VBLANK_INT("main", bbcbc_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", bbcbc_interrupt)
 
 	MDRV_MACHINE_START( bbcbc )
 	MDRV_MACHINE_RESET( bbcbc )
@@ -88,7 +88,7 @@ static MACHINE_DRIVER_START( bbcbc )
 	MDRV_Z80PIO_ADD( "z80pio", bbcbc_z80pio_intf )
 
 	MDRV_IMPORT_FROM( tms9928a )
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE( 50 )
 	
 	MDRV_CARTSLOT_ADD("cart")

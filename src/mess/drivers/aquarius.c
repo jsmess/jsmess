@@ -422,13 +422,13 @@ static MACHINE_DRIVER_START( aquarius )
 	MDRV_CPU_ADD("main", Z80, XTAL_3_579545MHz) // ???
 	MDRV_CPU_PROGRAM_MAP(aquarius_mem, 0)
 	MDRV_CPU_IO_MAP(aquarius_io, 0)
-	MDRV_CPU_VBLANK_INT("main", aquarius_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", aquarius_interrupt)
 
 	MDRV_MACHINE_START( aquarius )
 	MDRV_MACHINE_RESET( aquarius )
 
     /* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

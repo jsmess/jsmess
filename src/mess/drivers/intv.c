@@ -383,13 +383,13 @@ static MACHINE_DRIVER_START( intv )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", CP1610, XTAL_3_579545MHz/4)        /* Colorburst/4 */
 	MDRV_CPU_PROGRAM_MAP(intv_mem, 0)
-	MDRV_CPU_VBLANK_INT("main", intv_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", intv_interrupt)
 	MDRV_QUANTUM_TIME(HZ(60))
 
 	MDRV_MACHINE_RESET( intv )
 
     /* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(59.92)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -424,7 +424,7 @@ static MACHINE_DRIVER_START( intvkbd )
 
 	MDRV_CPU_ADD("keyboard", M6502, XTAL_3_579545MHz/2)	/* Colorburst/2 */
 	MDRV_CPU_PROGRAM_MAP(intv2_mem, 0)
-	MDRV_CPU_VBLANK_INT("main", intv_interrupt2)
+	MDRV_CPU_VBLANK_INT("screen", intv_interrupt2)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 

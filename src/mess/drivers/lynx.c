@@ -65,13 +65,13 @@ static MACHINE_DRIVER_START( lynx )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M65SC02, 4000000)        /* vti core, integrated in vlsi, stz, but not bbr bbs */
 	MDRV_CPU_PROGRAM_MAP(lynx_mem, 0)
-	MDRV_CPU_VBLANK_INT("main", lynx_frame_int)
+	MDRV_CPU_VBLANK_INT("screen", lynx_frame_int)
 	MDRV_QUANTUM_TIME(HZ(60))
 
 	MDRV_MACHINE_START( lynx )
 
     /* video hardware */
-	MDRV_SCREEN_ADD("main", LCD)
+	MDRV_SCREEN_ADD("screen", LCD)
 	MDRV_SCREEN_REFRESH_RATE(LCD_FRAMES_PER_SECOND)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

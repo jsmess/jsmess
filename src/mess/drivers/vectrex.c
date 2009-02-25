@@ -99,7 +99,7 @@ static MACHINE_DRIVER_START(vectrex)
 	MDRV_CPU_ADD("main", M6809, XTAL_6MHz / 4)
 	MDRV_CPU_PROGRAM_MAP(vectrex_map, 0)
 
-	MDRV_SCREEN_ADD("main", VECTOR)
+	MDRV_SCREEN_ADD("screen", VECTOR)
 	MDRV_SCREEN_REFRESH_RATE(60)
 
 	/* video hardware */

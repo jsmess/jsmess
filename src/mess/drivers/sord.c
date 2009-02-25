@@ -587,7 +587,7 @@ static MACHINE_DRIVER_START( sord_m5 )
 	MDRV_CPU_ADD("main", Z80, 3800000)
 	MDRV_CPU_PROGRAM_MAP(sord_m5_mem, 0)
 	MDRV_CPU_IO_MAP(sord_m5_io, 0)
-	MDRV_CPU_VBLANK_INT("main", sord_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", sord_interrupt)
 	MDRV_CPU_CONFIG( sord_m5_daisy_chain )
 	MDRV_QUANTUM_TIME(HZ(60))
 
@@ -600,7 +600,7 @@ static MACHINE_DRIVER_START( sord_m5 )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(tms9928a)
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 

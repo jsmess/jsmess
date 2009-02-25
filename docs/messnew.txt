@@ -147,6 +147,8 @@ Source Changes:
 
 - New PC-LPT device.  [Dirk Best]
 
+- Replaced all generic screen tags. [Curt Coder]
+
 
 
 0.129

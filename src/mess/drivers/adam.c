@@ -635,14 +635,14 @@ static MACHINE_DRIVER_START( adam )
 	//MDRV_CPU_ADD("adamnet", M6800, 4000000)       /* 4.0 MHz */
 	//MDRV_CPU_PROGRAM_MAP(master6801_mem, 0)
 
-	MDRV_CPU_VBLANK_INT("main", adam_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", adam_interrupt)
 
 	MDRV_MACHINE_START( adam )
 	MDRV_MACHINE_RESET( adam )
 
     /* video hardware */
 	MDRV_IMPORT_FROM(tms9928a)
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(50)
 
 	/* sound hardware */

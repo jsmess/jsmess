@@ -472,13 +472,13 @@ static MACHINE_DRIVER_START(pdp1)
 	MDRV_CPU_ADD("main", PDP1, 1000000/*the CPU core uses microsecond counts*/)
 	MDRV_CPU_CONFIG(pdp1_reset_param)
 	MDRV_CPU_PROGRAM_MAP(pdp1_map, 0)
-	MDRV_CPU_VBLANK_INT("main", pdp1_interrupt)	/* dummy interrupt: handles input */
+	MDRV_CPU_VBLANK_INT("screen", pdp1_interrupt)	/* dummy interrupt: handles input */
 
 	MDRV_MACHINE_START( pdp1 )
 	MDRV_MACHINE_RESET( pdp1 )
 
 	/* video hardware (includes the control panel and typewriter output) */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(refresh_rate)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

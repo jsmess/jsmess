@@ -550,12 +550,12 @@ static MACHINE_DRIVER_START( samcoupe )
 	MDRV_CPU_ADD("main", Z80, SAMCOUPE_XTAL_X1/4) /* 6 MHz */
 	MDRV_CPU_PROGRAM_MAP(samcoupe_mem, 0)
 	MDRV_CPU_IO_MAP(samcoupe_io, 0)
-	MDRV_CPU_VBLANK_INT("main", samcoupe_frame_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", samcoupe_frame_interrupt)
 
 	MDRV_MACHINE_RESET(samcoupe)
 
     /* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_RAW_PARAMS(SAMCOUPE_XTAL_X1/2, 768, 0, 512, 312, 0, 192) /* border area? */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_PALETTE_LENGTH(128)

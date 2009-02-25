@@ -159,7 +159,7 @@ static MACHINE_DRIVER_START( vector06 )
 //	MDRV_CPU_ADD("main", Z80, 3000000)
   	MDRV_CPU_PROGRAM_MAP(vector06_mem, 0)
   	MDRV_CPU_IO_MAP(vector06_io, 0)
-  	MDRV_CPU_VBLANK_INT("main", vector06_interrupt)
+  	MDRV_CPU_VBLANK_INT("screen", vector06_interrupt)
 
 	MDRV_MACHINE_START( vector06 )
   	MDRV_MACHINE_RESET( vector06 )
@@ -169,7 +169,7 @@ static MACHINE_DRIVER_START( vector06 )
 	MDRV_PPI8255_ADD( "ppi8255_2", vector06_ppi8255_2_interface )
 
     /* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
