@@ -257,11 +257,11 @@ static const gfx_layout mbee_charlayout =
 };
 
 static GFXDECODE_START( mbee )
-	GFXDECODE_ENTRY( "main", 0x11000, mbee_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "maincpu", 0x11000, mbee_charlayout, 0, 1 )
 GFXDECODE_END
 
 static GFXDECODE_START( mbeeic )
-	GFXDECODE_ENTRY( "main", 0x11000, mbee_charlayout, 0, 4096 )
+	GFXDECODE_ENTRY( "maincpu", 0x11000, mbee_charlayout, 0, 4096 )
 GFXDECODE_END
 
 static PALETTE_INIT( mbeeic )
@@ -387,7 +387,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mbee )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, XTAL_12MHz / 6)         /* 2 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz / 6)         /* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(mbee_mem, 0)
 	MDRV_CPU_IO_MAP(mbee_ports, 0)
 	MDRV_CPU_CONFIG(mbee_daisy_chain)
@@ -430,7 +430,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mbeeic )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 3375000)         /* 3.37500 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, 3375000)         /* 3.37500 MHz */
 	MDRV_CPU_PROGRAM_MAP(mbeeic_mem, 0)
 	MDRV_CPU_IO_MAP(mbeeic_ports, 0)
 	MDRV_CPU_CONFIG(mbee_daisy_chain)
@@ -475,13 +475,13 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mbee56 )
 	MDRV_IMPORT_FROM( mbeeic )
-	MDRV_CPU_MODIFY( "main" )
+	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP(mbee56_mem, 0)
 MACHINE_DRIVER_END
 
 static DRIVER_INIT( mbee )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(machine, "maincpu");
 	memory_configure_bank(machine, 1, 0, 2, &RAM[0x0000], 0x8000);
 	memory_configure_bank(machine, 2, 0, 2, &RAM[0x11000], 0x4000);
 	memory_configure_bank(machine, 3, 0, 2, &RAM[0x11800], 0x4000);
@@ -491,7 +491,7 @@ static DRIVER_INIT( mbee )
 
 static DRIVER_INIT( mbee56 )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(machine, "maincpu");
 	memory_configure_bank(machine, 1, 0, 2, &RAM[0x0000], 0xe000);
 	memory_configure_bank(machine, 2, 0, 2, &RAM[0x11000], 0x4000);
 	memory_configure_bank(machine, 3, 0, 2, &RAM[0x11800], 0x4000);
@@ -500,7 +500,7 @@ static DRIVER_INIT( mbee56 )
 }
 
 ROM_START( mbee )
-	ROM_REGION(0x18000,"main",0)
+	ROM_REGION(0x18000,"maincpu",0)
 	ROM_LOAD("bas510a.ic25",  0x8000, 0x1000, CRC(2ca47c36) SHA1(f36fd0afb3f1df26edc67919e78000b762b6cbcb) )
 	ROM_LOAD("bas510b.ic27",  0x9000, 0x1000, CRC(a07a0c51) SHA1(dcbdd9df78b4b6b2972de2e4050dabb8ae9c3f5a) )
 	ROM_LOAD("bas510c.ic28",  0xa000, 0x1000, CRC(906ac00f) SHA1(9b46458e5755e2c16cdb191a6a70df6de9fe0271) )
@@ -517,7 +517,7 @@ ROM_START( mbee )
 ROM_END
 
 ROM_START( mbeeic )
-	ROM_REGION(0x18000,"main",0)
+	ROM_REGION(0x18000,"maincpu",0)
 	ROM_LOAD("bas522a.rom",   0x8000, 0x2000, CRC(7896a696) SHA1(a158f7803296766160e1f258dfc46134735a9477))
 	ROM_LOAD("bas522b.rom",   0xa000, 0x2000, CRC(b21d9679) SHA1(332844433763331e9483409cd7da3f90ac58259d))
 	ROM_LOAD("edasm.rom",     0xc000, 0x2000, CRC(1af1b3a9) SHA1(d035a997c2dbbb3918b3395a3a5a1076aa203ee5))
@@ -531,7 +531,7 @@ ROM_START( mbeeic )
 ROM_END
 
 ROM_START( mbeepc85 )
-	ROM_REGION(0x18000,"main",0)
+	ROM_REGION(0x18000,"maincpu",0)
 	ROM_LOAD("bas522a.rom",   0x8000, 0x2000, CRC(7896a696) SHA1(a158f7803296766160e1f258dfc46134735a9477))
 	ROM_LOAD("bas522b.rom",   0xa000, 0x2000, CRC(b21d9679) SHA1(332844433763331e9483409cd7da3f90ac58259d))
 	ROM_LOAD("wbee12.rom",    0xc000, 0x2000, CRC(0fc21cb5) SHA1(33b3995988fc51ddef1568e160dfe699867adbd5))
@@ -544,7 +544,7 @@ ROM_START( mbeepc85 )
 ROM_END
 
 ROM_START( mbeepc )
-	ROM_REGION(0x18000,"main",0)
+	ROM_REGION(0x18000,"maincpu",0)
 	ROM_LOAD("bas522a.rom",   0x8000, 0x2000, CRC(7896a696) SHA1(a158f7803296766160e1f258dfc46134735a9477))
 	ROM_LOAD("bas522b.rom",   0xa000, 0x2000, CRC(b21d9679) SHA1(332844433763331e9483409cd7da3f90ac58259d))
 	/* This telcom rom is banked between its 2 halves, hooked to port 0A -  not emulated yet */
@@ -558,7 +558,7 @@ ROM_START( mbeepc )
 ROM_END
 
 ROM_START( mbee56 )
-	ROM_REGION(0x18000,"main",0)
+	ROM_REGION(0x18000,"maincpu",0)
 	ROM_LOAD("56kb.rom",      0xe000, 0x1000, CRC(28211224) SHA1(b6056339402a6b2677b0e6c57bd9b78a62d20e4f))
 	ROM_LOAD("charrom.bin",   0x11000, 0x1000, CRC(1f9fcee4) SHA1(e57ac94e03638075dde68a0a8c834a4f84ba47b0))
 	ROM_RELOAD( 0x17000, 0x1000 )
@@ -576,8 +576,8 @@ ROM_END
 
 static Z80BIN_EXECUTE( mbee )
 {
-	const device_config *cpu = cputag_get_cpu(machine, "main");
-	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
+	const device_config *cpu = cputag_get_cpu(machine, "maincpu");
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	memory_write_word_16le(space, 0xa6, execute_address);			/* fix the EXEC command */
 
@@ -594,8 +594,8 @@ static Z80BIN_EXECUTE( mbee )
 
 static QUICKLOAD_LOAD( mbee )
 {
-	const device_config *cpu = cputag_get_cpu(image->machine, "main");
-	const address_space *space = cputag_get_address_space(image->machine, "main", ADDRESS_SPACE_PROGRAM);
+	const device_config *cpu = cputag_get_cpu(image->machine, "maincpu");
+	const address_space *space = cputag_get_address_space(image->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT16 i, j;
 	UINT8 data, sw = input_port_read(image->machine, "CONFIG") & 1;	/* reading the dipswitch: 1 = autorun */
 

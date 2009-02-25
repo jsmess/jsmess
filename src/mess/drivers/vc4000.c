@@ -194,23 +194,23 @@ static DEVICE_IMAGE_LOAD( vc4000_cart )
 	if (size > 0x1000)	/* 6k rom + 1k ram - Chess2 only */
 	{
 		memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1000, 0x15ff, 0, 0, SMH_BANK1);	/* extra rom */
-		memory_set_bankptr(machine, 1, memory_region(machine, "main") + 0x1000);
+		memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0x1000);
 
 		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1800, 0x1bff, 0, 0, SMH_BANK3, SMH_BANK4);	/* ram */
-		memory_set_bankptr(machine, 3, memory_region(machine, "main") + 0x1800);
-		memory_set_bankptr(machine, 4, memory_region(machine, "main") + 0x1800);
+		memory_set_bankptr(machine, 3, memory_region(machine, "maincpu") + 0x1800);
+		memory_set_bankptr(machine, 4, memory_region(machine, "maincpu") + 0x1800);
 	}
 	else
 	if (size > 0x0800)	/* some 4k roms have 1k of mirrored ram */
 	{
 		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1000, 0x15ff, 0, 0x800, SMH_BANK1, SMH_BANK2); /* ram */
-		memory_set_bankptr(machine, 1, memory_region(machine, "main") + 0x1000);
-		memory_set_bankptr(machine, 2, memory_region(machine, "main") + 0x1000);
+		memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0x1000);
+		memory_set_bankptr(machine, 2, memory_region(machine, "maincpu") + 0x1000);
 	}
 		
 	if (size > 0)
 	{
-		image_fread(image, memory_region(machine, "main") + 0x0000, size);
+		image_fread(image, memory_region(machine, "maincpu") + 0x0000, size);
 	}
 
 	return INIT_PASS;
@@ -218,8 +218,8 @@ static DEVICE_IMAGE_LOAD( vc4000_cart )
 
 static MACHINE_DRIVER_START( vc4000 )
 	/* basic machine hardware */
-//	MDRV_CPU_ADD("main", S2650, 865000)        /* 3550000/4, 3580000/3, 4430000/3 */
-	MDRV_CPU_ADD("main", S2650, 3546875/4)
+//	MDRV_CPU_ADD("maincpu", S2650, 865000)        /* 3550000/4, 3580000/3, 4430000/3 */
+	MDRV_CPU_ADD("maincpu", S2650, 3546875/4)
 	MDRV_CPU_PROGRAM_MAP(vc4000_mem, 0)
 	MDRV_CPU_IO_MAP(vc4000_io, 0)
 	MDRV_CPU_PERIODIC_INT(vc4000_video_line, 312*53)	// GOLF needs this exact value
@@ -253,7 +253,7 @@ static MACHINE_DRIVER_START( vc4000 )
 MACHINE_DRIVER_END
 
 ROM_START(vc4000)
-	ROM_REGION(0x2000,"main", 0)
+	ROM_REGION(0x2000,"maincpu", 0)
 	ROM_FILL( 0x0000, 0x2000, 0xFF )
 ROM_END
 

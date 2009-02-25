@@ -136,7 +136,7 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START(votrpss)
     /* basic machine hardware */
-    MDRV_CPU_ADD("main", Z80, XTAL_8MHz/2)  /* 4.000 MHz, verified */
+    MDRV_CPU_ADD("maincpu", Z80, XTAL_8MHz/2)  /* 4.000 MHz, verified */
     MDRV_CPU_PROGRAM_MAP(z80_mem, 0)
     MDRV_CPU_IO_MAP(z80_io, 0)
     MDRV_QUANTUM_TIME(HZ(60))
@@ -163,7 +163,7 @@ MACHINE_DRIVER_END
 ******************************************************************************/
 
 ROM_START(votrpss)
-    ROM_REGION(0x10000, "main", 0)
+    ROM_REGION(0x10000, "maincpu", 0)
     /* old logo PSS, version 3.A (1982), selftest 3.0? (1982) */
     //ROM_LOAD("u-2.3.A.bin",   0x0000, 0x2000, NO_DUMP )) /* 3.A 1982 */
     //ROM_LOAD("u-3.3.A.bin",   0x2000, 0x2000, NO_DUMP )) /* 3.A 1982 */

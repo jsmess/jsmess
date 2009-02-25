@@ -148,7 +148,7 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( astrocde )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, ASTROCADE_CLOCK/4)        /* 1.789 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, ASTROCADE_CLOCK/4)        /* 1.789 MHz */
 	MDRV_CPU_PROGRAM_MAP(astrocade_mem, 0)
 	MDRV_CPU_IO_MAP(astrocade_io, 0)
 
@@ -180,13 +180,13 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( astrocde )
-    ROM_REGION( 0x10000, "main", 0 )
+    ROM_REGION( 0x10000, "maincpu", 0 )
     ROM_LOAD( "astro.bin",  0x0000, 0x2000, CRC(ebc77f3a) SHA1(b902c941997c9d150a560435bf517c6a28137ecc))
     ROM_CART_LOAD("cart", 0x2000, 0x2000, ROM_OPTIONAL)
 ROM_END
 
 ROM_START( astrocdw )
-    ROM_REGION( 0x10000, "main", 0 )
+    ROM_REGION( 0x10000, "maincpu", 0 )
     ROM_LOAD( "bioswhit.bin",  0x0000, 0x2000, CRC(6eb53e79) SHA1(d84341feec1a0a0e8aa6151b649bc3cf6ef69fbf))
     ROM_CART_LOAD("cart", 0x2000, 0x2000, ROM_OPTIONAL)
 ROM_END

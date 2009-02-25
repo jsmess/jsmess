@@ -1030,7 +1030,7 @@ static void c64_common_driver_init (running_machine *machine)
 
 	if (!ultimax)
 	{
-		UINT8 *mem = memory_region(machine, "main");
+		UINT8 *mem = memory_region(machine, "maincpu");
 		c64_basic    = mem + 0x10000;
 		c64_kernal   = mem + 0x12000;
 		c64_chargen  = mem + 0x14000;

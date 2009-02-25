@@ -888,7 +888,7 @@ static UINT8 c128_m6510_port_read(const device_config *device, UINT8 direction)
 static void c128_common_driver_init(running_machine *machine)
 {
 	UINT8 *gfx=memory_region(machine, "gfx1");
-	UINT8 *ram = memory_region(machine, "main");
+	UINT8 *ram = memory_region(machine, "maincpu");
 	int i;
 
 	/* configure the M6510 port */

@@ -53,8 +53,8 @@ MACHINE_RESET( pk8020 )
 	memory_install_write8_handler(space, 0xfe00, 0xfeff, 0, 0, SMH_BANK16);
 	memory_install_write8_handler(space, 0xff00, 0xffff, 0, 0, SMH_BANK17);
 
-	memory_set_bankptr(machine, 1, memory_region(machine,"main") + 0x10000);
-	memory_set_bankptr(machine, 2, memory_region(machine,"main") + 0x12000);
+	memory_set_bankptr(machine, 1, memory_region(machine,"maincpu") + 0x10000);
+	memory_set_bankptr(machine, 2, memory_region(machine,"maincpu") + 0x12000);
 
 	memory_set_bankptr(machine, 7, mess_ram + 0x4000);
 	memory_set_bankptr(machine, 8, mess_ram + 0x6000);

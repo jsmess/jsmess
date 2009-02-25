@@ -147,7 +147,7 @@ UINT8 c16_m7501_port_read(const device_config *device, UINT8 direction)
 
 static void c16_bankswitch (running_machine *machine)
 {
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(machine, "maincpu");
 	memory_set_bankptr (machine, 9, mess_ram);
 
 	switch (lowrom)
@@ -435,10 +435,10 @@ static void c16_common_driver_init (running_machine *machine)
 	device_set_info_fct(machine->cpu[0], CPUINFO_FCT_M6510_PORTREAD, (genf *) c16_m7501_port_read);
 	device_set_info_fct(machine->cpu[0], CPUINFO_FCT_M6510_PORTWRITE, (genf *) c16_m7501_port_write);
 
-	c16_select_roms (cputag_get_address_space(machine,"main",ADDRESS_SPACE_PROGRAM), 0, 0);
-	c16_switch_to_rom (cputag_get_address_space(machine,"main",ADDRESS_SPACE_PROGRAM), 0, 0);
+	c16_select_roms (cputag_get_address_space(machine,"maincpu",ADDRESS_SPACE_PROGRAM), 0, 0);
+	c16_switch_to_rom (cputag_get_address_space(machine,"maincpu",ADDRESS_SPACE_PROGRAM), 0, 0);
 
-	rom = memory_region(machine, "main");
+	rom = memory_region(machine, "maincpu");
 
 	c16_memory_10000 = rom + 0x10000;
 	c16_memory_14000 = rom + 0x14000;
@@ -645,7 +645,7 @@ INTERRUPT_GEN( c16_frame_interrupt )
 
 static DEVICE_IMAGE_LOAD(c16_cart)
 {
-	UINT8 *mem = memory_region(image->machine, "main");
+	UINT8 *mem = memory_region(image->machine, "maincpu");
 	int size = image_length (image), test;
 	const char *filetype;
 	int address = 0;

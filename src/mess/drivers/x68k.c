@@ -2094,7 +2094,7 @@ static MACHINE_START( x68000 )
 
 static DRIVER_INIT( x68000 )
 {
-	unsigned char* rom = memory_region(machine, "main");
+	unsigned char* rom = memory_region(machine, "maincpu");
 	unsigned char* user2 = memory_region(machine, "user2");
 	x68k_gvram = auto_malloc(0x200000);
 	memset(x68k_gvram,0,0x200000);
@@ -2135,7 +2135,7 @@ static DRIVER_INIT( x68000 )
 
 static MACHINE_DRIVER_START( x68000 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 10000000)  /* 10 MHz */
+	MDRV_CPU_ADD("maincpu", M68000, 10000000)  /* 10 MHz */
 	MDRV_CPU_PROGRAM_MAP(x68k_map, 0)
 	MDRV_CPU_VBLANK_INT("screen", x68k_vsync_irq)
 	MDRV_QUANTUM_TIME(HZ(60))
@@ -2205,7 +2205,7 @@ static SYSTEM_CONFIG_START(x68000)
 SYSTEM_CONFIG_END
 
 ROM_START( x68000 )
-	ROM_REGION16_BE(0x1000000, "main", 0)  // 16MB address space
+	ROM_REGION16_BE(0x1000000, "maincpu", 0)  // 16MB address space
 	ROM_DEFAULT_BIOS("ipl10")
 	ROM_LOAD( "cgrom.dat",  0xf00000, 0xc0000, CRC(9f3195f1) SHA1(8d72c5b4d63bb14c5dbdac495244d659aa1498b6) )
 	ROM_SYSTEM_BIOS(0, "ipl10",  "IPL-ROM V1.0 (87/05/07)")

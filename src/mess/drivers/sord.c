@@ -584,7 +584,7 @@ static const cassette_config sordm5_cassette_config =
 
 static MACHINE_DRIVER_START( sord_m5 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 3800000)
+	MDRV_CPU_ADD("maincpu", Z80, 3800000)
 	MDRV_CPU_PROGRAM_MAP(sord_m5_mem, 0)
 	MDRV_CPU_IO_MAP(sord_m5_io, 0)
 	MDRV_CPU_VBLANK_INT("screen", sord_interrupt)
@@ -624,7 +624,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( sord_m5_fd5 )
 	MDRV_IMPORT_FROM( sord_m5 )
 
-	MDRV_CPU_REPLACE("main", Z80, 3800000)
+	MDRV_CPU_REPLACE("maincpu", Z80, 3800000)
 	MDRV_CPU_IO_MAP(srdm5fd5_io, 0)
 
 	MDRV_CPU_ADD("floppy", Z80, 3800000)
@@ -645,7 +645,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START(sordm5)
-	ROM_REGION(0x010000, "main", 0)
+	ROM_REGION(0x010000, "maincpu", 0)
 	ROM_LOAD("sordint.rom",0x0000, 0x02000, CRC(78848d39) SHA1(ac042c4ae8272ad6abe09ae83492ef9a0026d0b2))
 	ROM_REGION(0x5000, "user1", 0)
 	ROM_CART_LOAD("cart", 0x0000, 0x5000, ROM_NOMIRROR)
@@ -653,7 +653,7 @@ ROM_END
 
 
 ROM_START(srdm5fd5)
-	ROM_REGION(0x10000, "main", 0)
+	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("sordint.rom",0x0000, 0x02000, CRC(78848d39) SHA1(ac042c4ae8272ad6abe09ae83492ef9a0026d0b2))
 	ROM_REGION(0x10000, "floppy", 0)
 	ROM_LOAD("sordfd5.rom",0x0000, 0x04000, NO_DUMP)

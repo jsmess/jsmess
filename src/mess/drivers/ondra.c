@@ -119,7 +119,7 @@ static const cassette_config ondra_cassette_config =
 /* Machine driver */
 static MACHINE_DRIVER_START( ondra )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 2000000)
+	MDRV_CPU_ADD("maincpu", Z80, 2000000)
 	MDRV_CPU_PROGRAM_MAP(ondra_mem, 0)
 	MDRV_CPU_IO_MAP(ondra_io, 0)
 	MDRV_CPU_VBLANK_INT("screen", ondra_interrupt)
@@ -155,27 +155,27 @@ SYSTEM_CONFIG_END
 /* ROM definition */
 
 ROM_START( ondrat )
-    ROM_REGION( 0x14000, "main", ROMREGION_ERASEFF )
+    ROM_REGION( 0x14000, "maincpu", ROMREGION_ERASEFF )
     ROM_LOAD( "tesla_a.rom", 0x10000, 0x0800, CRC(6d56b815) SHA1(7feb4071d5142e4c2f891747b75fa4d48ccad262) )
-    ROM_COPY( "main", 0x10000, 0x10800, 0x0800 )
-    ROM_COPY( "main", 0x10000, 0x11000, 0x0800 )
-    ROM_COPY( "main", 0x10000, 0x11800, 0x0800 )
+    ROM_COPY( "maincpu", 0x10000, 0x10800, 0x0800 )
+    ROM_COPY( "maincpu", 0x10000, 0x11000, 0x0800 )
+    ROM_COPY( "maincpu", 0x10000, 0x11800, 0x0800 )
 	ROM_LOAD( "tesla_b.rom", 0x12000, 0x0800, CRC(5f145eaa) SHA1(c1eac68b13fedc4d0d6f98b15e2a5397f0139dc3) )
-    ROM_COPY( "main", 0x10000, 0x12800, 0x0800 )
-    ROM_COPY( "main", 0x10000, 0x13000, 0x0800 )
-    ROM_COPY( "main", 0x10000, 0x13800, 0x0800 )
+    ROM_COPY( "maincpu", 0x10000, 0x12800, 0x0800 )
+    ROM_COPY( "maincpu", 0x10000, 0x13000, 0x0800 )
+    ROM_COPY( "maincpu", 0x10000, 0x13800, 0x0800 )
 ROM_END
 
 ROM_START( ondrav )
-    ROM_REGION( 0x14000, "main", ROMREGION_ERASEFF )
+    ROM_REGION( 0x14000, "maincpu", ROMREGION_ERASEFF )
     ROM_LOAD( "vili_a.rom", 0x10000, 0x0800, CRC(76932657) SHA1(1f3700f670f158e4bed256aed751e2c1331a28e8) )
-    ROM_COPY( "main", 0x10000, 0x10800, 0x0800 )
-    ROM_COPY( "main", 0x10000, 0x11000, 0x0800 )
-    ROM_COPY( "main", 0x10000, 0x11800, 0x0800 )
+    ROM_COPY( "maincpu", 0x10000, 0x10800, 0x0800 )
+    ROM_COPY( "maincpu", 0x10000, 0x11000, 0x0800 )
+    ROM_COPY( "maincpu", 0x10000, 0x11800, 0x0800 )
     ROM_LOAD( "vili_b.rom", 0x12000, 0x0800, CRC(03a6073f) SHA1(66f198e63f473e09350bcdbb10fe0cf440111bec) )
-    ROM_COPY( "main", 0x10000, 0x12800, 0x0800 )
-    ROM_COPY( "main", 0x10000, 0x13000, 0x0800 )
-    ROM_COPY( "main", 0x10000, 0x13800, 0x0800 )
+    ROM_COPY( "maincpu", 0x10000, 0x12800, 0x0800 )
+    ROM_COPY( "maincpu", 0x10000, 0x13000, 0x0800 )
+    ROM_COPY( "maincpu", 0x10000, 0x13800, 0x0800 )
 ROM_END
 
 /* Driver */

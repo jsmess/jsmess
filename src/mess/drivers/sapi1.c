@@ -83,7 +83,7 @@ INPUT_PORTS_END
 /* Machine driver */
 static MACHINE_DRIVER_START( sapi1 )
 	  /* basic machine hardware */
-	  MDRV_CPU_ADD("main", 8080, 2000000)
+	  MDRV_CPU_ADD("maincpu", 8080, 2000000)
 	  MDRV_CPU_PROGRAM_MAP(sapi1_mem, 0)
 	  MDRV_CPU_IO_MAP(sapi1_io, 0)
 
@@ -112,7 +112,7 @@ SYSTEM_CONFIG_END
 /* ROM definition */
 
 ROM_START( sapi1 )
-    ROM_REGION( 0x10000, "main", ROMREGION_ERASEFF )
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
     ROM_LOAD( "sapi1.rom", 0x0000, 0x1000, CRC(c6e85b01) SHA1(2a26668249c6161aef7215a1e2b92bfdf6fe3671) )
 ROM_END
 

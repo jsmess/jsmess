@@ -4,7 +4,7 @@
 /* ROMs */
 
 ROM_START( abc99 )
-	ROM_REGION( 0x1800, "main", 0 )
+	ROM_REGION( 0x1800, "maincpu", 0 )
 	ROM_LOAD( "10681909.bin", 0x0000, 0x1000, CRC(ffe32a71) SHA1(fa2ce8e0216a433f9bbad0bdd6e3dc0b540f03b7) )
 	ROM_LOAD( "10726864.bin", 0x1000, 0x0800, CRC(e33683ae) SHA1(0c1d9e320f82df05f4804992ef6f6f6cd20623f3) )
 ROM_END

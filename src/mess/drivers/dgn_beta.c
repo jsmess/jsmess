@@ -316,7 +316,7 @@ static PALETTE_INIT( dgnbeta )
 
 static MACHINE_DRIVER_START( dgnbeta )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809E, DGNBETA_CPU_SPEED_HZ)        /* 2 MHz */
+	MDRV_CPU_ADD("maincpu", M6809E, DGNBETA_CPU_SPEED_HZ)        /* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(dgnbeta_map,0)
 
 	/* both cpus in the beta share the same address/data busses */
@@ -344,7 +344,7 @@ static MACHINE_DRIVER_START( dgnbeta )
 MACHINE_DRIVER_END
 
 ROM_START(dgnbeta)
-	ROM_REGION(0x4000,"main",0)
+	ROM_REGION(0x4000,"maincpu",0)
     ROM_SYSTEM_BIOS( 0, "bootrom", "Dragon beta OS9 boot rom (1984)" )
 	ROMX_LOAD("beta_bt.rom"		,0x0000	,0x4000	,CRC(4c54c1de) SHA1(141d9fcd2d187c305dff83fce2902a30072aed76), ROM_BIOS(1))
     ROM_SYSTEM_BIOS( 1, "testrom", "Dragon beta test rom (1984?)" )

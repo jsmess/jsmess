@@ -350,7 +350,7 @@ WRITE8_HANDLER ( m6545_data_w )
 			break;
 		crt.screen_address_hi = data;
 		addr = 0x17000+((data & 32) << 6);
-		memcpy(mbee_pcgram, memory_region(space->machine, "main")+addr, 0x800);
+		memcpy(mbee_pcgram, memory_region(space->machine, "maincpu")+addr, 0x800);
 		for (i = 0; i < 128; i++)
 			gfx_element_mark_dirty(space->machine->gfx[0], i);
 		break;
@@ -446,14 +446,14 @@ static void mc6845_screen_configure(running_machine *machine)
 
 VIDEO_START( mbee )
 {
-	UINT8 *ram = memory_region(machine, "main");
+	UINT8 *ram = memory_region(machine, "maincpu");
 	videoram = ram+0x15000;
 	mbee_pcgram = ram+0x11000;
 }
 
 VIDEO_START( mbeeic )
 {
-	UINT8 *ram = memory_region(machine, "main");
+	UINT8 *ram = memory_region(machine, "maincpu");
 	videoram = ram+0x15000;
 	colorram = ram+0x15800;
 	mbee_pcgram = ram+0x11000;

@@ -320,7 +320,7 @@ static const tx0_reset_param_t tx0_reset_param =
 static MACHINE_DRIVER_START(tx0_64kw)
 	/* basic machine hardware */
 	/* TX0 CPU @ approx. 167 kHz (no master clock, but the memory cycle time is approximately 6usec) */
-	MDRV_CPU_ADD("main", TX0_64KW, 166667)
+	MDRV_CPU_ADD("maincpu", TX0_64KW, 166667)
 	MDRV_CPU_CONFIG(tx0_reset_param)
 	MDRV_CPU_PROGRAM_MAP(tx0_64kw_map, 0)
 	/* dummy interrupt: handles input */
@@ -352,7 +352,7 @@ static MACHINE_DRIVER_START(tx0_8kw)
 	/* basic machine hardware */
 	/* TX0 CPU @ approx. 167 kHz (no master clock, but the memory cycle time is
     approximately 6usec) */
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CONFIG(tx0_reset_param)
 	MDRV_CPU_PROGRAM_MAP(tx0_8kw_map, 0)
 	/*MDRV_CPU_PORTS(readport, writeport)*/
@@ -360,7 +360,7 @@ MACHINE_DRIVER_END
 
 ROM_START(tx0_64kw)
 	/*CPU memory space*/
-	ROM_REGION(0x10000 * sizeof(UINT32),"main",ROMREGION_ERASEFF)
+	ROM_REGION(0x10000 * sizeof(UINT32),"maincpu",ROMREGION_ERASEFF)
 		/* Note this computer has no ROM... */
 
 	ROM_REGION(tx0_fontdata_size, "gfx1", ROMREGION_ERASEFF)
@@ -369,7 +369,7 @@ ROM_END
 
 ROM_START(tx0_8kw)
 	/*CPU memory space*/
-	ROM_REGION(0x2000 * sizeof(UINT32),"main",ROMREGION_ERASEFF)
+	ROM_REGION(0x2000 * sizeof(UINT32),"maincpu",ROMREGION_ERASEFF)
 		/* Note this computer has no ROM... */
 
 	ROM_REGION(tx0_fontdata_size, "gfx1", ROMREGION_ERASEFF)

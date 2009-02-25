@@ -89,7 +89,7 @@ static WRITE8_HANDLER ( rset_callback )
 
 static WRITE8_HANDLER ( ckon_ckof_callback )
 {
-	const device_config *maincpu = cputag_get_cpu(space->machine, "main");
+	const device_config *maincpu = cputag_get_cpu(space->machine, "maincpu");
 	ti990_ckon_ckof_callback(maincpu, (offset & 0x1000) ? 1 : 0);
 }
 
@@ -218,7 +218,7 @@ ADDRESS_MAP_END
 static MACHINE_DRIVER_START(ti990_4)
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0(???) MHz */
-	MDRV_CPU_ADD("main", TMS9900, 3000000)
+	MDRV_CPU_ADD("maincpu", TMS9900, 3000000)
 	MDRV_CPU_PROGRAM_MAP(ti990_4_memmap, 0)
 	MDRV_CPU_IO_MAP(ti990_4_readcru, ti990_4_writecru)
 	MDRV_CPU_PERIODIC_INT(ti990_4_line_interrupt, 120/*or TIME_IN_HZ(100) in Europe*/)
@@ -270,7 +270,7 @@ MACHINE_DRIVER_END
 */
 ROM_START(ti990_4)
 	/*CPU memory space*/
-	ROM_REGION16_BE(0x10000, "main",0)
+	ROM_REGION16_BE(0x10000, "maincpu",0)
 
 #if 0
 	/* ROM set 945121-5: "733 ASR ROM loader with self test (prototyping)"

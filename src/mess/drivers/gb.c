@@ -549,7 +549,7 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( gameboy )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", LR35902, 4194304)			/* 4.194304 MHz */
+	MDRV_CPU_ADD("maincpu", LR35902, 4194304)			/* 4.194304 MHz */
 	MDRV_CPU_PROGRAM_MAP(gb_map, 0)
 	MDRV_CPU_CONFIG(dmg_cpu_reset)
 	MDRV_CPU_VBLANK_INT("screen", gb_scanline_interrupt)	/* 1 dummy int each frame */
@@ -589,10 +589,10 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( supergb )
 	MDRV_IMPORT_FROM(gameboy)
-	MDRV_CPU_REPLACE("main", LR35902, 4295454)	/* 4.295454 MHz */
+	MDRV_CPU_REPLACE("maincpu", LR35902, 4295454)	/* 4.295454 MHz */
 	MDRV_CPU_PROGRAM_MAP(sgb_map, 0)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CONFIG(sgb_cpu_reset)
 
 	MDRV_MACHINE_RESET( sgb )
@@ -611,7 +611,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( gbpocket )
 	MDRV_IMPORT_FROM(gameboy)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CONFIG(mgb_cpu_reset)
 	MDRV_MACHINE_RESET( gbpocket )
 	MDRV_PALETTE_INIT(gbp)
@@ -622,7 +622,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( gbcolor )
 	MDRV_IMPORT_FROM(gameboy)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP( gbc_map, 0 )
 	MDRV_CPU_CONFIG(cgb_cpu_reset)
 
@@ -641,7 +641,7 @@ SYSTEM_CONFIG_END
 
 static MACHINE_DRIVER_START( megaduck )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", LR35902, 4194304)			/* 4.194304 MHz */
+	MDRV_CPU_ADD("maincpu", LR35902, 4194304)			/* 4.194304 MHz */
 	MDRV_CPU_PROGRAM_MAP( megaduck_map, 0 )
 	MDRV_CPU_VBLANK_INT("screen", gb_scanline_interrupt)	/* 1 int each scanline ! */
 	MDRV_CPU_CONFIG(megaduck_cpu_reset)
@@ -682,28 +682,28 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( gameboy )
-	ROM_REGION( 0x0100, "main", 0 )
+	ROM_REGION( 0x0100, "maincpu", 0 )
 	ROM_LOAD( "dmg_boot.bin", 0x0000, 0x0100, CRC(59c8598e) SHA1(4ed31ec6b0b175bb109c0eb5fd3d193da823339f) )
 ROM_END
 
 ROM_START( supergb )
-	ROM_REGION( 0x10000, "main", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 /*  ROM_LOAD( "sgb_boot.bin", 0x0000, 0x0100, NO_DUMP ) */
 ROM_END
 
 ROM_START( gbpocket )
-	ROM_REGION( 0x10000, "main", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 /*  ROM_LOAD( "gbp_boot.bin", 0x0000, 0x0100, NO_DUMP ) */
 ROM_END
 
 ROM_START( gbcolor )
-	ROM_REGION( 0x10000, "main", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 /*  ROM_LOAD( "gbc_boot.bin", 0x0000, 0x0100, NO_DUMP ) */
 ROM_END
 
 
 ROM_START( megaduck )
-	ROM_REGION( 0x10000, "main", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 ROM_END
 
 /*    YEAR  NAME      PARENT   COMPAT   MACHINE   INPUT    INIT  CONFIG   COMPANY     FULLNAME */

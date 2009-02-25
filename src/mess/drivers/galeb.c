@@ -115,7 +115,7 @@ INPUT_PORTS_END
 /* Machine driver */
 static MACHINE_DRIVER_START( galeb )
     /* basic machine hardware */
-    MDRV_CPU_ADD("main", M6502, 1000000)
+    MDRV_CPU_ADD("maincpu", M6502, 1000000)
     MDRV_CPU_PROGRAM_MAP(galeb_mem, 0)
     MDRV_MACHINE_RESET( galeb )
 
@@ -142,7 +142,7 @@ MACHINE_DRIVER_END
 
 /* ROM definition */
 ROM_START( galeb )
-    ROM_REGION( 0x10000, "main", ROMREGION_ERASEFF )
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
     ROM_LOAD( "bas01.rom", 0xc000, 0x0800, CRC(9b19ed58) SHA1(ebfc27af8dbabfb233f9888e6a0a0dfc87ae1691) )
     ROM_LOAD( "bas02.rom", 0xc800, 0x0800, CRC(3f320a84) SHA1(4ea082b4269dca6152426b1f720c7508122d3cb7) )
     ROM_LOAD( "bas03.rom", 0xd000, 0x0800, CRC(f122ad10) SHA1(3c7c1dd67268230d179a00b0f8b35be80c2b7035) )

@@ -344,9 +344,9 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 	UINT8 *temp_buffer = auto_malloc(0x410000);
 	UINT8 valid_mode20, valid_mode21, valid_mode25;
 
-	memory_region_alloc(machine, "main", 0x1000000, 0);
+	memory_region_alloc(machine, "maincpu", 0x1000000, 0);
 
-	snes_ram = memory_region(machine, "main");
+	snes_ram = memory_region(machine, "maincpu");
 	memset( snes_ram, 0, 0x1000000 );
 
 	/* Check for a header (512 bytes) */

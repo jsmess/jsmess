@@ -214,9 +214,9 @@ static const UINT32 amask= 0xffff;
 
 static MACHINE_DRIVER_START( comquest )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6805, 4000000)		/* 4000000? */
-	/*MDRV_CPU_ADD("main", HD63705, 4000000)    instruction set looks like m6805/m6808 */
-	/*MDRV_CPU_ADD("main", M68705, 4000000) instruction set looks like m6805/m6808 */
+	MDRV_CPU_ADD("maincpu", M6805, 4000000)		/* 4000000? */
+	/*MDRV_CPU_ADD("maincpu", HD63705, 4000000)    instruction set looks like m6805/m6808 */
+	/*MDRV_CPU_ADD("maincpu", M68705, 4000000) instruction set looks like m6805/m6808 */
 
 /*
     8 bit bus, integrated io, serial io?,
@@ -266,9 +266,9 @@ static MACHINE_DRIVER_START( comquest )
 MACHINE_DRIVER_END
 
 ROM_START(comquest)
-//  ROM_REGION(0x10000,"main",0)
+//  ROM_REGION(0x10000,"maincpu",0)
 //  ROM_REGION(0x80000,"user1",0)
-	ROM_REGION(0x100000,"main",0)
+	ROM_REGION(0x100000,"maincpu",0)
 	ROM_LOAD("comquest.bin", 0x00000, 0x80000, CRC(2bf4b1a8) SHA1(8d1821cbde37cca2055b18df001438f7d138a8c1))
 /*
 000 +16kbyte graphics data? (first bytes: 80 0d 04 00 00 08 04 00 0f 02 04 01 00 10 04 01)

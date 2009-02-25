@@ -122,7 +122,7 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( sym1 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, SYM1_CLOCK)  /* 1 MHz */
+	MDRV_CPU_ADD("maincpu", M6502, SYM1_CLOCK)  /* 1 MHz */
 	MDRV_CPU_PROGRAM_MAP(sym1_map, 0)
 	MDRV_MACHINE_RESET(sym1)
 
@@ -150,7 +150,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( sym1 )
-	ROM_REGION(0x10000, "main", 0)
+	ROM_REGION(0x10000, "maincpu", 0)
 //  ROM_LOAD("basicv11", 0xc000, 0x2000, CRC(075b0bbd))
 	ROM_LOAD("sym1", 0x8000, 0x1000, CRC(7a4b1e12) SHA1(cebdf815105592658cfb7af262f2101d2aeab786) )
 ROM_END

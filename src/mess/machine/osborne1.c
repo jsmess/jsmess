@@ -196,7 +196,7 @@ WRITE8_HANDLER( osborne1_bankswitch_w )
 	}
 	if ( osborne1.bank2_enabled )
 	{
-		memory_set_bankptr(space->machine,1, memory_region(space->machine, "main") );
+		memory_set_bankptr(space->machine,1, memory_region(space->machine, "maincpu") );
 		memory_set_bankptr(space->machine,2, osborne1.empty_4K );
 		memory_set_bankptr(space->machine,3, osborne1.empty_4K );
 	}

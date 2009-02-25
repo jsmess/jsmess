@@ -471,7 +471,7 @@ static ADDRESS_MAP_START( pc8801fd_io , ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 ROM_START (pc88srl)
-	ROM_REGION(0x18000,"main",0)
+	ROM_REGION(0x18000,"maincpu",0)
 	ROM_LOAD ("n80.rom", 0x00000, 0x8000, CRC(27e1857d) SHA1(5b922ed9de07d2a729bdf1da7b57c50ddf08809a))
 	ROM_LOAD ("n88.rom", 0x08000, 0x8000, CRC(a0fc0473) SHA1(3b31fc68fa7f47b21c1a1cb027b86b9e87afbfff))
 	ROM_LOAD ("n88_0.rom", 0x10000, 0x2000, CRC(710a63ec) SHA1(d239c26ad7ac5efac6e947b0e9549b1534aa970d))
@@ -486,7 +486,7 @@ ROM_START (pc88srl)
 ROM_END
 
 ROM_START (pc88srh)
-	ROM_REGION(0x18000,"main",0)
+	ROM_REGION(0x18000,"maincpu",0)
 	ROM_LOAD ("n80.rom", 0x00000, 0x8000, CRC(27e1857d) SHA1(5b922ed9de07d2a729bdf1da7b57c50ddf08809a))
 	ROM_LOAD ("n88.rom", 0x08000, 0x8000, CRC(a0fc0473) SHA1(3b31fc68fa7f47b21c1a1cb027b86b9e87afbfff))
 	ROM_LOAD ("n88_0.rom", 0x10000, 0x2000, CRC(710a63ec) SHA1(d239c26ad7ac5efac6e947b0e9549b1534aa970d))
@@ -520,7 +520,7 @@ static MACHINE_DRIVER_START( pc88srl )
 	/* basic machine hardware */
 
 	/* main CPU */
-	MDRV_CPU_ADD("main", Z80, 4000000)        /* 4 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, 4000000)        /* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(pc8801_mem, 0)
 	MDRV_CPU_IO_MAP(pc88sr_io, 0)
 	MDRV_CPU_VBLANK_INT("screen", pc8801_interrupt)

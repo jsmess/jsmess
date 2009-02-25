@@ -156,7 +156,7 @@ static const struct pit8253_config mikrosha_pit8253_intf =
 
 static MACHINE_DRIVER_START( mikrosha )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", 8080, XTAL_16MHz / 9)
+	MDRV_CPU_ADD("maincpu", 8080, XTAL_16MHz / 9)
 	MDRV_CPU_PROGRAM_MAP(mikrosha_mem, 0)
 	MDRV_CPU_IO_MAP(mikrosha_io, 0)
 
@@ -195,7 +195,7 @@ MACHINE_DRIVER_END
 
 /* ROM definition */
 ROM_START( mikrosha )
-	ROM_REGION( 0x10000, "main", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "mikrosha.rom", 0xf800, 0x0800, CRC(86A83556) SHA1(94b1baad0a419145939a891ff51f4324e8e4ddd2))
 	ROM_REGION(0x0800, "gfx1",0)
 	ROM_LOAD ("mikrosha.fnt", 0x0000, 0x0800, CRC(B315DA1C) SHA1(b5bf9abc0fff75b1aba709a7f08b23d4a89bb04b))

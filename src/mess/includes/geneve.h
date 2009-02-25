@@ -13,7 +13,7 @@
 
 /* defines */
 
-/* offsets for "main" */
+/* offsets for "maincpu" */
 enum
 {
 	offset_rom_geneve = 0x0000,			/* boot ROM (16 kbytes) */

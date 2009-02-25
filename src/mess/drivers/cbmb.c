@@ -326,7 +326,7 @@ static PALETTE_INIT( cbm700 )
 
 
 static const mc6845_interface cbm600_crtc = {
-	"main",
+	"maincpu",
 	8 /*?*/,
 	NULL,
 	cbm600_update_row,
@@ -337,7 +337,7 @@ static const mc6845_interface cbm600_crtc = {
 };
 
 static const mc6845_interface cbm700_crtc = {
-	"main",
+	"maincpu",
 	9 /*?*/,
 	NULL,
 	cbm700_update_row,
@@ -384,7 +384,7 @@ static const tpi6525_interface cbmb_tpi_1_intf =
 static MACHINE_DRIVER_START( cbm600 )
 	MDRV_DRIVER_DATA(cbmb_state)
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6509, 7833600)        /* 7.8336 MHz */
+	MDRV_CPU_ADD("maincpu", M6509, 7833600)        /* 7.8336 MHz */
 	MDRV_CPU_PROGRAM_MAP(cbmb_readmem, cbmb_writemem)
 
 	MDRV_MACHINE_RESET( cbmb )
@@ -462,7 +462,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( p500 )
 	MDRV_DRIVER_DATA(cbmb_state)
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6509, VIC6567_CLOCK)        /* 7.8336 MHz */
+	MDRV_CPU_ADD("maincpu", M6509, VIC6567_CLOCK)        /* 7.8336 MHz */
 	MDRV_CPU_PROGRAM_MAP(p500_readmem, p500_writemem)
 	MDRV_CPU_PERIODIC_INT(vic2_raster_irq, VIC6567_HRETRACERATE)
 
@@ -505,7 +505,7 @@ MACHINE_DRIVER_END
 /* chargen: 8x16 chars for 8x8 size; 128 ascii, 128 ascii graphics; inversion logic in hardware */
 
 ROM_START( b500 )
-	ROM_REGION( 0x100000, "main", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "901243-01.u59",  0xf8000, 0x2000, CRC(22822706) SHA1(901bbf59d8b8682b481be8b2de99b406fffa4bab) )
 	ROM_LOAD( "901242-01a.u60", 0xfa000, 0x2000, CRC(ef13d595) SHA1(2fb72985d7d4ab69c5780179178828c931a9f5b0) )
 	ROM_LOAD( "901244-01.u61",  0xfe000, 0x2000, CRC(93414213) SHA1(a54a593dbb420ae1ac39b0acde9348160f7840ff) )
@@ -515,7 +515,7 @@ ROM_START( b500 )
 ROM_END
 
 ROM_START( b128 )
-	ROM_REGION( 0x100000, "main", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS( 0, "default", "BASIC 4.0 r" )
 	ROMX_LOAD( "901243-04a.u59", 0xf8000, 0x2000, CRC(b0dcb56d) SHA1(08d333208060ee2ce84d4532028d94f71c016b96), ROM_BIOS(1) )
 	ROMX_LOAD( "901242-04a.u60", 0xfa000, 0x2000, CRC(de04ea4f) SHA1(7c6de17d46a3343dc597d9b9519cf63037b31908), ROM_BIOS(1) )
@@ -530,7 +530,7 @@ ROM_START( b128 )
 ROM_END
 
 ROM_START( b256 )
-	ROM_REGION( 0x100000, "main", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "901241-03.u59", 0xf8000, 0x2000, CRC(5c1f3347) SHA1(2d46be2cd89594b718cdd0a86d51b6f628343f42) )
 	ROM_LOAD( "901240-03.u60", 0xfa000, 0x2000, CRC(72aa44e1) SHA1(0d7f77746290afba8d0abeb87c9caab9a3ad89ce) )
 	ROM_SYSTEM_BIOS( 0, "default", "BASIC 4.0 r" )
@@ -548,7 +548,7 @@ ROM_END
 
 
 ROM_START( cbm620hu )
-	ROM_REGION( 0x100000, "main", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "610.u60", 0xf8000, 0x4000, CRC(8eed0d7e) SHA1(9d06c5c3c012204eaaef8b24b1801759b62bf57e) )
 	ROM_LOAD( "kernhun.bin", 0xfe000, 0x2000, CRC(0ea8ca4d) SHA1(9977c9f1136ee9c04963e0b50ae0c056efa5663f) )
 
@@ -561,7 +561,7 @@ ROM_END
 /* chargen: 8x16 chars for 9x14 size */
 
 ROM_START( b128hp )
-	ROM_REGION( 0x100000, "main", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS( 0, "default", "BASIC 4.0 r" )
 	ROMX_LOAD( "901243-04a.u59", 0xf8000, 0x2000, CRC(b0dcb56d) SHA1(08d333208060ee2ce84d4532028d94f71c016b96), ROM_BIOS(1) )
 	ROMX_LOAD( "901242-04a.u60", 0xfa000, 0x2000, CRC(de04ea4f) SHA1(7c6de17d46a3343dc597d9b9519cf63037b31908), ROM_BIOS(1) )
@@ -576,7 +576,7 @@ ROM_START( b128hp )
 ROM_END
 
 ROM_START( b256hp )
-	ROM_REGION( 0x100000, "main", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "901241-03.u59", 0xf8000, 0x2000, CRC(5c1f3347) SHA1(2d46be2cd89594b718cdd0a86d51b6f628343f42) )
 	ROM_LOAD( "901240-03.u60", 0xfa000, 0x2000, CRC(72aa44e1) SHA1(0d7f77746290afba8d0abeb87c9caab9a3ad89ce) )
 	ROM_SYSTEM_BIOS( 0, "default", "BASIC 4.0 r" )
@@ -594,7 +594,7 @@ ROM_END
 
 /* BX-256HP - only ROM loading added */
 ROM_START( bx256hp )
-	ROM_REGION( 0x100000, "main", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "901241-03.u59", 0xf8000, 0x2000, CRC(5c1f3347) SHA1(2d46be2cd89594b718cdd0a86d51b6f628343f42) )
 	ROM_LOAD( "901240-03.u60", 0xfa000, 0x2000, CRC(72aa44e1) SHA1(0d7f77746290afba8d0abeb87c9caab9a3ad89ce) )
 	ROM_SYSTEM_BIOS( 0, "default", "BASIC 4.0 r" )
@@ -610,7 +610,7 @@ ROM_START( bx256hp )
 ROM_END
 
 ROM_START( cbm720se )
-	ROM_REGION( 0x100000, "main", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "901241-03.u59", 0xf8000, 0x2000, CRC(5c1f3347) SHA1(2d46be2cd89594b718cdd0a86d51b6f628343f42) )
 	ROM_LOAD( "901240-03.u60", 0xfa000, 0x2000, CRC(72aa44e1) SHA1(0d7f77746290afba8d0abeb87c9caab9a3ad89ce) )
 	ROM_LOAD( "swe-901244-03.u61", 0xfe000, 0x2000, CRC(87bc142b) SHA1(fa711f6082741b05a9c80744f5aee68dc8c1dcf4) )
@@ -620,7 +620,7 @@ ROM_START( cbm720se )
 ROM_END
 
 ROM_START( p500 )
-	ROM_REGION( 0x101000, "main", 0 )
+	ROM_REGION( 0x101000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS(0, "default", "BASIC 4.0 new" )
 	ROMX_LOAD( "901236-02.bin", 0xf8000, 0x2000, CRC(c62ab16f) SHA1(f50240407bade901144f7e9f489fa9c607834eca), ROM_BIOS(1) )
 	ROMX_LOAD( "901235-02.bin", 0xfa000, 0x2000, CRC(20b7df33) SHA1(1b9a55f12f8cf025754d8029cc5324b474c35841), ROM_BIOS(1) )

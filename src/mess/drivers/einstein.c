@@ -229,7 +229,7 @@ static int Einstein_scr_y = 0;
 static MC6845_UPDATE_ROW( einstein_6845_update_row )
 {
 	/* TODO: Verify implementation */
-	unsigned char *data = memory_region(device->machine, "main") + 0x012000;
+	unsigned char *data = memory_region(device->machine, "maincpu") + 0x012000;
 	unsigned char data_byte;
 	int char_code;
 	int i, x;
@@ -256,7 +256,7 @@ static MC6845_ON_DE_CHANGED( einstein_6845_display_enable_changed )
 }
 
 static const mc6845_interface einstein_crtc6845_interface = {
-	"main",
+	"maincpu",
 	8 /*?*/,
 	NULL,
 	einstein_6845_update_row,
@@ -800,7 +800,7 @@ static void einstein_page_rom(running_machine *machine)
 {
 	if (einstein_rom_enabled)
 	{
-		memory_set_bankptr(machine, 1, memory_region(machine, "main")+0x010000);
+		memory_set_bankptr(machine, 1, memory_region(machine, "maincpu")+0x010000);
 	}
 	else
 	{
@@ -1543,8 +1543,8 @@ static const ay8910_interface einstein_ay_interface =
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
-	DEVCB_MEMORY_HANDLER("main", PROGRAM, einstein_port_b_read),
-	DEVCB_MEMORY_HANDLER("main", PROGRAM, einstein_port_a_write),
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, einstein_port_b_read),
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, einstein_port_a_write),
 	DEVCB_NULL
 };
 
@@ -1580,7 +1580,7 @@ static const centronics_interface einstein_centronics_config =
 //  if (Einstein_DE)
 //  {
 //
-//      unsigned char *data = memory_region(machine, "main")+0x012000;
+//      unsigned char *data = memory_region(machine, "maincpu")+0x012000;
 //      unsigned char data_byte;
 //      int char_code;
 //
@@ -1659,7 +1659,7 @@ static VIDEO_UPDATE( einstein2 )
 
 static MACHINE_DRIVER_START( einstein )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, EINSTEIN_SYSTEM_CLOCK)
+	MDRV_CPU_ADD("maincpu", Z80, EINSTEIN_SYSTEM_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(einstein_mem, 0)
 	MDRV_CPU_IO_MAP(einstein_io, 0)
 	MDRV_CPU_CONFIG(einstein_daisy_chain)
@@ -1698,7 +1698,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( einstei2 )
 	MDRV_IMPORT_FROM( einstein )
 
-	MDRV_CPU_MODIFY( "main" )
+	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_IO_MAP(einstein2_io, 0)
 	MDRV_MACHINE_RESET( einstein2 )
 
@@ -1720,12 +1720,12 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START(einstein)
-	ROM_REGION(0x010000+0x02000, "main",0)
+	ROM_REGION(0x010000+0x02000, "maincpu",0)
 	ROM_LOAD("einstein.rom",0x10000, 0x02000, CRC(ec134953) SHA1(a02125d8ebcda48aa784adbb42a8b2d7ef3a4b77))
 ROM_END
 
 ROM_START(einstei2)
-	ROM_REGION(0x010000+0x02000+0x0800, "main",0)
+	ROM_REGION(0x010000+0x02000+0x0800, "maincpu",0)
 	ROM_LOAD("einstein.rom",0x10000, 0x02000, CRC(ec134953) SHA1(a02125d8ebcda48aa784adbb42a8b2d7ef3a4b77))
 	ROM_LOAD("charrom.rom",0x012000, 0x0800, NO_DUMP)
 ROM_END

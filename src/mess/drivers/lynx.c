@@ -63,7 +63,7 @@ static PALETTE_INIT( lynx )
 
 static MACHINE_DRIVER_START( lynx )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M65SC02, 4000000)        /* vti core, integrated in vlsi, stz, but not bbr bbs */
+	MDRV_CPU_ADD("maincpu", M65SC02, 4000000)        /* vti core, integrated in vlsi, stz, but not bbr bbs */
 	MDRV_CPU_PROGRAM_MAP(lynx_mem, 0)
 	MDRV_CPU_VBLANK_INT("screen", lynx_frame_int)
 	MDRV_QUANTUM_TIME(HZ(60))
@@ -116,7 +116,7 @@ MACHINE_DRIVER_END
 */
 
 ROM_START(lynx)
-	ROM_REGION(0x200,"main", 0)
+	ROM_REGION(0x200,"maincpu", 0)
 	ROM_SYSTEM_BIOS( 0, "default",   "rom save" )
 	ROMX_LOAD( "lynx.bin",  0x00000, 0x200, CRC(e1ffecb6) SHA1(de60f2263851bbe10e5801ef8f6c357a4bc077e6), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "a", "alternate rom save" )
@@ -128,7 +128,7 @@ ROM_START(lynx)
 ROM_END
 
 ROM_START(lynx2)
-	ROM_REGION(0x200,"main", 0)
+	ROM_REGION(0x200,"maincpu", 0)
 	ROM_LOAD("lynx2.bin", 0, 0x200, NO_DUMP)
 
 	ROM_REGION(0x100,"gfx1", ROMREGION_ERASE00)
@@ -140,7 +140,7 @@ ROM_END
 static QUICKLOAD_LOAD( lynx )
 {
 	UINT8 *data = NULL;
-	UINT8 *rom = memory_region(image->machine, "main");
+	UINT8 *rom = memory_region(image->machine, "maincpu");
 	UINT8 header[10]; // 80 08 dw Start dw Len B S 9 3
 	UINT16 start, length;
 	int i;
@@ -162,7 +162,7 @@ static QUICKLOAD_LOAD( lynx )
 		return INIT_FAIL;
 
 	for (i = 0; i < length; i++)
-		memory_write_byte(cputag_get_address_space(image->machine,"main",ADDRESS_SPACE_PROGRAM), start + i, data[i]);
+		memory_write_byte(cputag_get_address_space(image->machine,"maincpu",ADDRESS_SPACE_PROGRAM), start + i, data[i]);
 
 	rom[0x1fc] = start & 0xff;
 	rom[0x1fd] = start >> 8;

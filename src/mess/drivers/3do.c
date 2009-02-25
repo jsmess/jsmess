@@ -142,7 +142,7 @@ static MACHINE_RESET( 3do )
 
 static MACHINE_DRIVER_START( 3do )
 	/* Basic machine hardware */
-	MDRV_CPU_ADD( "main", ARM6, XTAL_50MHz/4 )
+	MDRV_CPU_ADD( "maincpu", ARM6, XTAL_50MHz/4 )
 	MDRV_CPU_PROGRAM_MAP( 3do_mem, 0 )
 
 	MDRV_MACHINE_RESET( 3do )
@@ -162,7 +162,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( 3do_pal )
 	/* Basic machine hardware */
-	MDRV_CPU_ADD("main", ARM6, XTAL_50MHz/4 )
+	MDRV_CPU_ADD("maincpu", ARM6, XTAL_50MHz/4 )
 	MDRV_CPU_PROGRAM_MAP( 3do_mem, 0 )
 
 	MDRV_MACHINE_RESET( 3do )

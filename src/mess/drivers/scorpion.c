@@ -213,7 +213,7 @@ static void scorpion_update_memory(running_machine *machine)
 			ROMSelection = ((spectrum_128_port_7ffd_data>>4) & 0x01) ? 1 : 0;
 		}			
 		memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
-		memory_set_bankptr(machine, 1, memory_region(machine, "main") + 0x010000 + (ROMSelection<<14));		
+		memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0x010000 + (ROMSelection<<14));		
 	}
 	
 	
@@ -227,7 +227,7 @@ static DIRECT_UPDATE_HANDLER( scorpion_direct )
 			ROMSelection = ((spectrum_128_port_7ffd_data>>4) & 0x01) ? 1 : 0;
 			betadisk_disable();
 			memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
-			memory_set_bankptr(space->machine, 1, memory_region(space->machine, "main") + 0x010000 + (ROMSelection<<14));
+			memory_set_bankptr(space->machine, 1, memory_region(space->machine, "maincpu") + 0x010000 + (ROMSelection<<14));
 		} 	
 	} else if (((pc & 0xff00) == 0x3d00) && (ROMSelection==1))
 	{
@@ -237,7 +237,7 @@ static DIRECT_UPDATE_HANDLER( scorpion_direct )
 	} 
 	if((address>=0x0000) && (address<=0x3fff)) {
 		memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
-		direct->raw = direct->decrypted =  memory_region(space->machine, "main") + 0x010000 + (ROMSelection<<14);
+		direct->raw = direct->decrypted =  memory_region(space->machine, "maincpu") + 0x010000 + (ROMSelection<<14);
 		memory_set_bankptr(space->machine, 1, direct->raw);
 		return ~0;
 	}
@@ -320,7 +320,7 @@ static MACHINE_RESET( scorpion )
 
 static MACHINE_DRIVER_START( scorpion )
 	MDRV_IMPORT_FROM( spectrum_128 )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(scorpion_io, 0)
 	MDRV_MACHINE_RESET( scorpion )
 	
@@ -336,7 +336,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START(scorpion)
-	ROM_REGION(0x020000, "main", 0)
+	ROM_REGION(0x020000, "maincpu", 0)
 	ROM_LOAD("scorp0.rom", 0x010000, 0x4000, CRC(0eb40a09) SHA1(477114ff0fe1388e0979df1423602b21248164e5) )
 	ROM_LOAD("scorp1.rom", 0x014000, 0x4000, CRC(9d513013) SHA1(367b5a102fb663beee8e7930b8c4acc219c1f7b3) )
 	ROM_LOAD("scorp2.rom", 0x018000, 0x4000, CRC(fd0d3ce1) SHA1(07783ee295274d8ff15d935bfd787c8ac1d54900) )

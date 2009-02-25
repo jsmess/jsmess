@@ -163,7 +163,7 @@ static const cassette_config galaxy_cassette_config =
 
 static MACHINE_DRIVER_START( galaxy )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, XTAL / 2)
+	MDRV_CPU_ADD("maincpu", Z80, XTAL / 2)
 	MDRV_CPU_PROGRAM_MAP(galaxy_mem, 0)
 	MDRV_CPU_VBLANK_INT("screen", galaxy_interrupt)
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -193,7 +193,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( galaxyp )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, XTAL / 2)
+	MDRV_CPU_ADD("maincpu", Z80, XTAL / 2)
 	MDRV_CPU_PROGRAM_MAP(galaxyp_mem, 0)
 	MDRV_CPU_IO_MAP(galaxyp_io, 0)
 	MDRV_CPU_VBLANK_INT("screen", galaxy_interrupt)
@@ -226,7 +226,7 @@ static MACHINE_DRIVER_START( galaxyp )
 MACHINE_DRIVER_END
 
 ROM_START (galaxy)
-	ROM_REGION (0x10000, "main", ROMREGION_ERASEFF)
+	ROM_REGION (0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD ("galrom1.bin", 0x0000, 0x1000, CRC(365f3e24) SHA1(ffc6bf2ec09eabdad76604a63f5dd697c30c4358))
 	ROM_LOAD_OPTIONAL ("galrom2.bin", 0x1000, 0x1000, CRC(5dc5a100) SHA1(5d5ab4313a2d0effe7572bb129193b64cab002c1))
 	ROM_REGION(0x0800, "gfx1",0)
@@ -234,7 +234,7 @@ ROM_START (galaxy)
 ROM_END
 
 ROM_START (galaxyp)
-	ROM_REGION (0x10000, "main", ROMREGION_ERASEFF)
+	ROM_REGION (0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD ("galrom1.bin", 0x0000, 0x1000, CRC(365f3e24) SHA1(ffc6bf2ec09eabdad76604a63f5dd697c30c4358))
 	ROM_LOAD ("galrom2.bin", 0x1000, 0x1000, CRC(5dc5a100) SHA1(5d5ab4313a2d0effe7572bb129193b64cab002c1))
 	ROM_LOAD ("galplus.bin", 0xe000, 0x1000, CRC(d4cfab14) SHA1(b507b9026844eeb757547679907394aa42055eee))

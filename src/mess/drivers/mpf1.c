@@ -450,7 +450,7 @@ static MACHINE_RESET( mpf1 )
 
 static MACHINE_DRIVER_START( mpf1 )
 	// basic machine hardware
-	MDRV_CPU_ADD("main", Z80, 3579500/2)	// 1.79 MHz
+	MDRV_CPU_ADD("maincpu", Z80, 3579500/2)	// 1.79 MHz
 	MDRV_CPU_PROGRAM_MAP(mpf1_map, 0)
 	MDRV_CPU_IO_MAP(mpf1_io_map, 0)
 
@@ -471,12 +471,12 @@ MACHINE_DRIVER_END
 /* ROMs */
 
 ROM_START( mpf1 )
-    ROM_REGION( 0x10000, "main", 0 )
+    ROM_REGION( 0x10000, "maincpu", 0 )
     ROM_LOAD( "mpf.u6", 0x0000, 0x1000, CRC(b60249ce) SHA1(78e0e8874d1497fabfdd6378266d041175e3797f) )
 ROM_END
 
 ROM_START( mpf1b )
-    ROM_REGION( 0x10000, "main", 0 )
+    ROM_REGION( 0x10000, "maincpu", 0 )
     ROM_LOAD( "c55167.u6", 0x0000, 0x1000, CRC(28b06dac) SHA1(99cfbab739d71a914c39302d384d77bddc4b705b) )
     ROM_LOAD( "basic.u7",  0x2000, 0x1000, CRC(d276ed6b) SHA1(a45fb98961be5e5396988498c6ed589a35398dcf) )
 ROM_END

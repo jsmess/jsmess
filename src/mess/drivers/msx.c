@@ -1009,10 +1009,10 @@ static const ay8910_interface msx_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_MEMORY_HANDLER("main", PROGRAM, msx_psg_port_a_r),
-	DEVCB_MEMORY_HANDLER("main", PROGRAM, msx_psg_port_b_r),
-	DEVCB_MEMORY_HANDLER("main", PROGRAM, msx_psg_port_a_w),
-	DEVCB_MEMORY_HANDLER("main", PROGRAM, msx_psg_port_b_w)
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, msx_psg_port_a_r),
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, msx_psg_port_b_r),
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, msx_psg_port_a_w),
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, msx_psg_port_b_w)
 };
 
 static VIDEO_START( msx2 )
@@ -1051,7 +1051,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( msx )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 3579545)		  /* 3.579545 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, 3579545)		  /* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
 	MDRV_CPU_VBLANK_INT("screen", msx_interrupt)
@@ -1110,7 +1110,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( msx2 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 3579545)		  /* 3.579545 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, 3579545)		  /* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem, writemem)
 	MDRV_CPU_IO_MAP(readport2,writeport2)
 	MDRV_CPU_VBLANK_INT_HACK(msx2_interrupt, 262)
@@ -1184,7 +1184,7 @@ MACHINE_DRIVER_END
 /* MSX */
 
 ROM_START (msx)
-	ROM_REGION (0x8000, "main", 0)
+	ROM_REGION (0x8000, "maincpu", 0)
 	ROM_LOAD ("msx.rom", 0x0000, 0x8000, CRC(8205795e) SHA1(829c00c3114f25b3dae5157c0a238b52a3ac37db))
 ROM_END
 
@@ -1198,7 +1198,7 @@ MSX_LAYOUT_END
 /* MSX - Al Alamiah AX-170 */
 
 ROM_START (ax170)
-	ROM_REGION (0x10000, "main", 0)
+	ROM_REGION (0x10000, "maincpu", 0)
 	ROM_LOAD ("ax170bios.rom", 0x0000, 0x8000, CRC(bd95c436) SHA1(5e094fca95ab8e91873ee372a3f1239b9a48a48d))
 	ROM_LOAD ("ax170arab.rom", 0x8000, 0x8000, CRC(339cd1aa) SHA1(0287b2ec897b9196788cd9f10c99e1487d7adbbb))
 ROM_END
@@ -1214,7 +1214,7 @@ MSX_LAYOUT_END
 /* MSX - Canon V-10 */
 
 ROM_START (canonv10)
-	ROM_REGION (0x8000, "main", 0)
+	ROM_REGION (0x8000, "maincpu", 0)
 	ROM_LOAD ("v10bios.rom", 0x0000, 0x8000, CRC(e9ccd789) SHA1(8963fc041975f31dc2ab1019cfdd4967999de53e))
 ROM_END
 
@@ -1227,7 +1227,7 @@ MSX_LAYOUT_END
 
 /* MSX - Canon V-20 */
 ROM_START (canonv20)
-	ROM_REGION (0x8000, "main", 0)
+	ROM_REGION (0x8000, "maincpu", 0)
 	ROM_LOAD ("v20bios.rom", 0x0000, 0x8000, CRC(e9ccd789) SHA1(8963fc041975f31dc2ab1019cfdd4967999de53e))
 ROM_END
 
@@ -1241,7 +1241,7 @@ MSX_LAYOUT_END
 /* MSX - Daewoo DPC-100 */
 
 ROM_START (dpc100)
-	ROM_REGION (0xc000, "main", 0)
+	ROM_REGION (0xc000, "maincpu", 0)
 	ROM_LOAD ("100bios.rom", 0x0000, 0x8000, CRC(3ab0cd3b) SHA1(171b587bd5a947a13f3114120b6e7baca3b57d78))
 	ROM_LOAD ("100han.rom", 0x8000, 0x4000, CRC(97478efb) SHA1(4421fa2504cbce18f7c84b5ea97f04e017007f07))
 ROM_END
@@ -1257,7 +1257,7 @@ MSX_LAYOUT_END
 /* MSX - Daewoo DPC-180 */
 
 ROM_START (dpc180)
-	ROM_REGION (0xc000, "main", 0)
+	ROM_REGION (0xc000, "maincpu", 0)
 	ROM_LOAD ("180bios.rom", 0x0000, 0x8000, CRC(3ab0cd3b) SHA1(171b587bd5a947a13f3114120b6e7baca3b57d78))
 	ROM_LOAD ("180han.rom", 0x8000, 0x4000, CRC(97478efb) SHA1(4421fa2504cbce18f7c84b5ea97f04e017007f07))
 ROM_END
@@ -1273,7 +1273,7 @@ MSX_LAYOUT_END
 /* MSX - Daewoo DPC-200 */
 
 ROM_START (dpc200)
-	ROM_REGION (0xc000, "main", 0)
+	ROM_REGION (0xc000, "maincpu", 0)
 	ROM_LOAD ("200bios.rom", 0x0000, 0x8000, CRC(3ab0cd3b) SHA1(171b587bd5a947a13f3114120b6e7baca3b57d78))
 	ROM_LOAD ("200han.rom", 0x8000, 0x4000, CRC(97478efb) SHA1(4421fa2504cbce18f7c84b5ea97f04e017007f07))
 ROM_END
@@ -1289,7 +1289,7 @@ MSX_LAYOUT_END
 /* MSX - Goldstar FC-200 */
 
 ROM_START (gsfc200)
-	ROM_REGION (0x8000, "main", 0)
+	ROM_REGION (0x8000, "maincpu", 0)
 	ROM_LOAD ("fc200bios.rom.u5a", 0x0000, 0x4000, CRC(61f473fb) SHA1(c425750bbb2ae1d278216b45029d303e37d8df2f))
 	ROM_LOAD ("fc200bios.rom.u5b", 0x4000, 0x4000, CRC(1a99b1a1) SHA1(e18f72271b64693a2a2bc226e1b9ebd0448e07c0))
 ROM_END
@@ -1304,7 +1304,7 @@ MSX_LAYOUT_END
 /* MSX - Gradiente Expert 1.0 */
 
 ROM_START (expert10)
-	ROM_REGION (0x8000, "main",0)
+	ROM_REGION (0x8000, "maincpu",0)
 	ROM_LOAD ("expbios.rom", 0x0000, 0x8000, CRC(07610d77) SHA1(ef3e010eb57e4476700a3bbff9d2119ab3acdf62))
 ROM_END
 
@@ -1317,7 +1317,7 @@ MSX_LAYOUT_END
 
 /* MSX - Gradiente Expert 1.1 */
 ROM_START (expert11)
-	ROM_REGION (0xc000, "main",0)
+	ROM_REGION (0xc000, "maincpu",0)
 	ROM_LOAD ("expbios11.rom", 0x0000, 0x8000, CRC(efb4b972) SHA1(d6720845928ee848cfa88a86accb067397685f02))
 ROM_END
 
@@ -1330,7 +1330,7 @@ MSX_LAYOUT_END
 
 /* MSX - Gradiente Expert 1.3 */
 ROM_START (expert13)
-	ROM_REGION (0x8000, "main",0)
+	ROM_REGION (0x8000, "maincpu",0)
 	ROM_LOAD ("expbios13.rom", 0x0000, 0x8000, CRC(5638bc38) SHA1(605f5af3f358c6811f54e0173bad908614a198c0))
 ROM_END
 
@@ -1343,7 +1343,7 @@ MSX_LAYOUT_END
 
 /* MSX - Gradiente Expert DDPlus */
 ROM_START (expertdp)
-	ROM_REGION (0xc000, "main",0)
+	ROM_REGION (0xc000, "maincpu",0)
 	ROM_LOAD ("eddpbios.rom", 0x0000, 0x8000, CRC(efb4b972) SHA1(d6720845928ee848cfa88a86accb067397685f02))
 	ROM_LOAD ("eddpdisk.rom", 0x8000, 0x4000, CRC(549f1d90) SHA1(f1525de4e0b60a6687156c2a96f8a8b2044b6c56))
 ROM_END
@@ -1359,7 +1359,7 @@ MSX_LAYOUT_END
 /* MSX - Gradiente Expert Plus */
 
 ROM_START (expertpl)
-	ROM_REGION (0xc000, "main",0)
+	ROM_REGION (0xc000, "maincpu",0)
 	ROM_LOAD ("exppbios.rom", 0x0000, 0x8000, CRC(efb4b972) SHA1(d6720845928ee848cfa88a86accb067397685f02))
 	ROM_LOAD ("exppdemo.rom", 0x8000, 0x4000, CRC(a9bbef64) SHA1(d4cea8c815f3eeabe0c6a1c845f902ec4318bf6b))
 ROM_END
@@ -1375,7 +1375,7 @@ MSX_LAYOUT_END
 /* MSX - JVC HC-7GB */
 
 ROM_START (jvchc7gb)
-	ROM_REGION (0x8000, "main", 0)
+	ROM_REGION (0x8000, "maincpu", 0)
 	ROM_LOAD ("hc7gbbios.rom", 0x0000, 0x8000, CRC(e9ccd789) SHA1(8963fc041975f31dc2ab1019cfdd4967999de53e))
 ROM_END
 
@@ -1389,7 +1389,7 @@ MSX_LAYOUT_END
 /* MSX - Mitsubishi ML-F80 */
 
 ROM_START (mlf80)
-	ROM_REGION (0x8000, "main", 0)
+	ROM_REGION (0x8000, "maincpu", 0)
 	ROM_LOAD ("mlf80bios.rom", 0x0000, 0x8000, CRC(e9ccd789) SHA1(8963fc041975f31dc2ab1019cfdd4967999de53e))
 ROM_END
 
@@ -1403,7 +1403,7 @@ MSX_LAYOUT_END
 /* MSX - Mitsubishi ML-FX1 */
 
 ROM_START (mlfx1)
-	ROM_REGION (0x8000, "main", 0)
+	ROM_REGION (0x8000, "maincpu", 0)
 	ROM_LOAD ("mlfx1bios.rom", 0x0000, 0x8000, CRC(62867dce) SHA1(0cbe0df4af45e8f531e9c761403ac9e71808f20c))
 ROM_END
 
@@ -1417,7 +1417,7 @@ MSX_LAYOUT_END
 /* MSX - National CF-1200 */
 
 ROM_START (cf1200)
-	ROM_REGION (0x8000, "main", 0)
+	ROM_REGION (0x8000, "maincpu", 0)
 	ROM_LOAD ("1200bios.rom", 0x0000, 0x8000, CRC(5ad03407) SHA1(c7a2c5baee6a9f0e1c6ee7d76944c0ab1886796c))
 ROM_END
 
@@ -1431,7 +1431,7 @@ MSX_LAYOUT_END
 /* MSX - National CF-2000 */
 
 ROM_START (cf2000)
-	ROM_REGION (0x8000, "main", 0)
+	ROM_REGION (0x8000, "maincpu", 0)
 	ROM_LOAD ("2000bios.rom", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821))
 ROM_END
 
@@ -1444,7 +1444,7 @@ MSX_LAYOUT_END
 
 /* MSX - National CF-2700 */
 ROM_START (cf2700)
-	ROM_REGION (0x8000, "main", 0)
+	ROM_REGION (0x8000, "maincpu", 0)
 	ROM_LOAD ("2700bios.rom.ic32", 0x0000, 0x8000, CRC(5ad03407) SHA1(c7a2c5baee6a9f0e1c6ee7d76944c0ab1886796c))
 ROM_END
 
@@ -1458,7 +1458,7 @@ MSX_LAYOUT_END
 /* MSX - National CF-3000 */
 
 ROM_START (cf3000)
-	ROM_REGION (0x8000, "main", 0)
+	ROM_REGION (0x8000, "maincpu", 0)
 	ROM_LOAD ("3000bios.rom", 0x0000, 0x8000, CRC(5ad03407) SHA1(c7a2c5baee6a9f0e1c6ee7d76944c0ab1886796c))
 ROM_END
 
@@ -1471,7 +1471,7 @@ MSX_LAYOUT_END
 
 /* MSX - National CF-3300 */
 ROM_START (cf3300)
-	ROM_REGION (0xc000, "main", 0)
+	ROM_REGION (0xc000, "maincpu", 0)
 	ROM_LOAD ("3300bios.rom", 0x0000, 0x8000, CRC(5ad03407) SHA1(c7a2c5baee6a9f0e1c6ee7d76944c0ab1886796c))
 	ROM_LOAD ("3300disk.rom", 0x8000, 0x4000, CRC(549f1d90) SHA1(f1525de4e0b60a6687156c2a96f8a8b2044b6c56))
 ROM_END
@@ -1487,7 +1487,7 @@ MSX_LAYOUT_END
 /* MSX - National FS-1300 */
 
 ROM_START (fs1300)
-	ROM_REGION (0x8000, "main", 0)
+	ROM_REGION (0x8000, "maincpu", 0)
 	ROM_LOAD ("1300bios.rom", 0x0000, 0x8000, CRC(5ad03407) SHA1(c7a2c5baee6a9f0e1c6ee7d76944c0ab1886796c))
 ROM_END
 
@@ -1500,7 +1500,7 @@ MSX_LAYOUT_END
 
 /* MSX - National FS-4000 */
 ROM_START (fs4000)
-	ROM_REGION (0x38000 ,"main", 0)
+	ROM_REGION (0x38000 ,"maincpu", 0)
 	ROM_LOAD ("4000bios.rom", 0x0000, 0x8000, CRC(071135e0) SHA1(df48902f5f12af8867ae1a87f255145f0e5e0774))
 	ROM_LOAD ("4000word.rom", 0x8000, 0x8000, CRC(950b6c87) SHA1(931d6318774bd495a32ec3dabf8d0edfc9913324))
 	ROM_LOAD ("4000kdr.rom", 0x10000, 0x8000, CRC(ebaa5a1e) SHA1(77bd67d5d10d459d343e79eafcd8e17eb0f209dd))
@@ -1520,7 +1520,7 @@ MSX_LAYOUT_END
 /* MSX - Philips NMS-801 */
 
 ROM_START (nms801)
-	ROM_REGION (0x8000, "main", 0)
+	ROM_REGION (0x8000, "maincpu", 0)
 	ROM_LOAD ("801bios.rom", 0x0000, 0x8000, CRC(fa089461) SHA1(21329398c0f350e330b353f45f21aa7ba338fc8d))
 ROM_END
 
@@ -1534,7 +1534,7 @@ MSX_LAYOUT_END
 /* MSX - Philips VG-8020-00 */
 
 ROM_START (vg802000)
-	ROM_REGION (0x8000, "main", 0)
+	ROM_REGION (0x8000, "maincpu", 0)
 	ROM_LOAD ("8020-00bios.rom", 0x0000, 0x8000, CRC(8205795e) SHA1(829c00c3114f25b3dae5157c0a238b52a3ac37db))
 ROM_END
 
@@ -1548,7 +1548,7 @@ MSX_LAYOUT_END
 /* MSX - Philips VG-8020-20 */
 
 ROM_START (vg802020)
-	ROM_REGION (0x8000, "main", 0)
+	ROM_REGION (0x8000, "maincpu", 0)
 	ROM_LOAD ("8020-20bios.rom", 0x0000, 0x8000, CRC(A317E6B4) SHA1(E998F0C441F4F1800EF44E42CD1659150206CF79))
 ROM_END
 
@@ -1562,7 +1562,7 @@ MSX_LAYOUT_END
 /* MSX - Pioneer PX-7 */
 
 ROM_START (piopx7)
-	ROM_REGION (0xc000, "main", 0)
+	ROM_REGION (0xc000, "maincpu", 0)
 	ROM_LOAD ("ym2301.ic12", 0x0000, 0x8000, CRC(e9ccd789) SHA1(8963fc041975f31dc2ab1019cfdd4967999de53e))
 	ROM_LOAD ("pd5031.ic13", 0x8000, 0x2000, CRC(91e0df72) SHA1(4f0102cdc27216fd9bcdb9663db728d2ccd8ca6d))
 	ROM_FILL( 0xa000, 0x2000, 0x6E )
@@ -1579,7 +1579,7 @@ MSX_LAYOUT_END
 /* MSX - Sanyo MPC-100 */
 
 ROM_START (mpc100)
-	ROM_REGION (0x8000, "main", 0)
+	ROM_REGION (0x8000, "maincpu", 0)
 	ROM_LOAD ("mpc100bios.rom", 0x0000, 0x8000, CRC(e9ccd789) SHA1(8963fc041975f31dc2ab1019cfdd4967999de53e))
 ROM_END
 
@@ -1593,7 +1593,7 @@ MSX_LAYOUT_END
 /* MSX - Sharp Epcom HotBit 1.1 */
 
 ROM_START (hotbit11)
-	ROM_REGION (0x8000, "main",0)
+	ROM_REGION (0x8000, "maincpu",0)
 	ROM_LOAD ("hotbit11.rom", 0x0000, 0x8000, CRC(b6942694) SHA1(663f8c512d04d213fa616b0db5eefe3774012a4b))
 ROM_END
 
@@ -1607,7 +1607,7 @@ MSX_LAYOUT_END
 /* MSX - Sharp Epcom HotBit 1.2 */
 
 ROM_START (hotbit12)
-	ROM_REGION (0x8000, "main",0)
+	ROM_REGION (0x8000, "maincpu",0)
 	ROM_LOAD ("hotbit12.rom", 0x0000, 0x8000, CRC(f59a4a0c) SHA1(9425815446d468058705bae545ffa13646744a87))
 ROM_END
 
@@ -1621,7 +1621,7 @@ MSX_LAYOUT_END
 /* MSX - Sharp Epcom HotBit 1.3b */
 
 ROM_START (hotbi13b)
-	ROM_REGION (0x8000, "main",0)
+	ROM_REGION (0x8000, "maincpu",0)
 	ROM_LOAD ("hotbit13b.rom", 0x0000, 0x8000, CRC(7a19820e) SHA1(e0c2bfb078562d15acabc5831020a2370ea87052))
 ROM_END
 
@@ -1635,7 +1635,7 @@ MSX_LAYOUT_END
 /* MSX - Sharp Epcom HotBit 1.3p */
 
 ROM_START (hotbi13p)
-	ROM_REGION (0x8000, "main",0)
+	ROM_REGION (0x8000, "maincpu",0)
 	ROM_LOAD ("hotbit13p.rom", 0x0000, 0x8000, CRC(150e239c) SHA1(942f9507d206cd8156f15601fe8032fcf0e3875b))
 ROM_END
 
@@ -1649,7 +1649,7 @@ MSX_LAYOUT_END
 /* MSX - Sony HB-10P */
 
 ROM_START (hb10p)
-	ROM_REGION (0x10000, "main", 0)
+	ROM_REGION (0x10000, "maincpu", 0)
 	ROM_LOAD ("10pbios.rom", 0x0000, 0x8000, CRC(0f488dd8) SHA1(5e7c8eab238712d1e18b0219c0f4d4dae180420d))
 ROM_END
 
@@ -1663,7 +1663,7 @@ MSX_LAYOUT_END
 /* MSX - Sony HB-20P */
 
 ROM_START (hb20p)
-	ROM_REGION (0x10000, "main", 0)
+	ROM_REGION (0x10000, "maincpu", 0)
 	ROM_LOAD ("20pbios.rom", 0x0000, 0x8000, CRC(21af423f) SHA1(365c93d7652c9f727221689bcc348652832a7b7a))
 ROM_END
 
@@ -1677,7 +1677,7 @@ MSX_LAYOUT_END
 /* MSX - Sony HB-201 */
 
 ROM_START (hb201)
-	ROM_REGION (0x10000, "main", 0)
+	ROM_REGION (0x10000, "maincpu", 0)
 	ROM_LOAD ("201bios.rom.ic9", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821))
 	ROM_LOAD ("201note.rom.ic8", 0x8000, 0x4000, CRC(74567244) SHA1(0f4f09f1a6ef7535b243afabfb44a3a0eb0498d9))
 	ROM_FILL( 0xc000, 0x4000, 0xff )
@@ -1694,7 +1694,7 @@ MSX_LAYOUT_END
 /* MSX - Sony HB-201P */
 
 ROM_START (hb201p)
-	ROM_REGION (0xc000, "main", 0)
+	ROM_REGION (0xc000, "maincpu", 0)
 	ROM_LOAD ("201pbios.rom.ic9", 0x0000, 0x8000, CRC(0f488dd8) SHA1(5e7c8eab238712d1e18b0219c0f4d4dae180420d))
 	ROM_LOAD ("201pnote.rom.ic8", 0x8000, 0x4000, CRC(1ff9b6ec) SHA1(e84d3ec7a595ee36b50e979683c84105c1871857))
 ROM_END
@@ -1710,7 +1710,7 @@ MSX_LAYOUT_END
 /* MSX - Sony HB-501P */
 
 ROM_START (hb501p)
-	ROM_REGION (0x8000, "main", 0)
+	ROM_REGION (0x8000, "maincpu", 0)
 	ROM_LOAD ("501pbios.rom", 0x0000, 0x8000, CRC(0f488dd8) SHA1(5e7c8eab238712d1e18b0219c0f4d4dae180420d))
 ROM_END
 
@@ -1724,7 +1724,7 @@ MSX_LAYOUT_END
 /* MSX - Sony HB-55D */
 
 ROM_START (hb55d)
-	ROM_REGION (0xc000, "main", 0)
+	ROM_REGION (0xc000, "maincpu", 0)
 	ROM_LOAD ("55dbios.rom", 0x0000, 0x8000, CRC(7e2b32dd) SHA1(38a645febd0e0fe86d594f27c2d14be995acc730))
 	ROM_LOAD ("55dnote.rom", 0x8000, 0x4000, CRC(8aae0494) SHA1(97ce59892573cac3c440efff6d74c8a1c29a5ad3))
 ROM_END
@@ -1740,7 +1740,7 @@ MSX_LAYOUT_END
 /* MSX - Sony HB-55P */
 
 ROM_START (hb55p)
-	ROM_REGION (0xc000, "main", 0)
+	ROM_REGION (0xc000, "maincpu", 0)
 	ROM_LOAD ("55pbios.ic42", 0x0000, 0x4000, CRC(24c198be) SHA1(7f8c94cb8913db32a696dec80ffc78e46693f1b7))
 	ROM_LOAD ("55pbios.ic43", 0x4000, 0x4000, CRC(e516e7e5) SHA1(05fedd4b9bfcf4949020c79d32c4c3f03a54fb62))
 	ROM_LOAD ("55pnote.ic44", 0x8000, 0x4000, CRC(492b12f8) SHA1(b262aedc71b445303f84efe5e865cbb71fd7d952))
@@ -1757,7 +1757,7 @@ MSX_LAYOUT_END
 /* MSX - Sony HB-75D */
 
 ROM_START (hb75d)
-	ROM_REGION (0xc000, "main", 0)
+	ROM_REGION (0xc000, "maincpu", 0)
 	ROM_LOAD ("75dbios.rom", 0x0000, 0x8000, CRC(7e2b32dd) SHA1(38a645febd0e0fe86d594f27c2d14be995acc730))
 	ROM_LOAD ("75dnote.rom", 0x8000, 0x4000, CRC(8aae0494) SHA1(97ce59892573cac3c440efff6d74c8a1c29a5ad3))
 ROM_END
@@ -1773,7 +1773,7 @@ MSX_LAYOUT_END
 /* MSX - Sony HB-75P */
 
 ROM_START (hb75p)
-	ROM_REGION (0xc000, "main", 0)
+	ROM_REGION (0xc000, "maincpu", 0)
 	ROM_LOAD ("75pbios.ic42", 0x0000, 0x4000, CRC(24c198be) SHA1(7f8c94cb8913db32a696dec80ffc78e46693f1b7))
 	ROM_LOAD ("75pbios.ic43", 0x4000, 0x4000, CRC(e516e7e5) SHA1(05fedd4b9bfcf4949020c79d32c4c3f03a54fb62))
 	ROM_LOAD ("75pnote.ic44", 0x8000, 0x4000, CRC(492b12f8) SHA1(b262aedc71b445303f84efe5e865cbb71fd7d952))
@@ -1790,7 +1790,7 @@ MSX_LAYOUT_END
 /* MSX - Spectravideo SVI-728 */
 
 ROM_START (svi728)
-	ROM_REGION (0xc000, "main", 0)
+	ROM_REGION (0xc000, "maincpu", 0)
 	ROM_LOAD ("728bios.rom", 0x0000, 0x8000, CRC(1ce9246c) SHA1(ea6a82cf8c6e65eb30b98755c8577cde8d9186c0))
 	ROM_LOAD ("707disk.rom", 0x8000, 0x4000, CRC(f9978853) SHA1(6aa856cc56eb98863c9da7a566571605682b5c6b))
 ROM_END
@@ -1806,7 +1806,7 @@ MSX_LAYOUT_END
 /* MSX - Spectravideo SVI-738 */
 
 ROM_START (svi738)
-	ROM_REGION (0x10000, "main", 0)
+	ROM_REGION (0x10000, "maincpu", 0)
 	ROM_LOAD ("738bios.rom", 0x0000, 0x8000, CRC(ad007d62) SHA1(c53b3f2c00f31683914f7452f3f4d94ae2929c0d))
 	ROM_LOAD ("738disk.rom", 0x8000, 0x4000, CRC(acd27a36) SHA1(99a40266bc296cef1d432cb0caa8df1a7e570be4))
 	ROM_LOAD ("738232c.rom", 0xc000, 0x2000, CRC(3353dcc6) SHA1(4e9384c9d137f0ab65ffc5a78f04cd8c9df6c8b7))
@@ -1825,7 +1825,7 @@ MSX_LAYOUT_END
 /* MSX - Spectravideo SVI-738 Swedish */
 
 ROM_START (svi738sw)
-	ROM_REGION (0x10000, "main", 0)
+	ROM_REGION (0x10000, "maincpu", 0)
 	ROM_LOAD ("738sebios.rom", 0x0000, 0x8000, CRC(c8ccdaa0) SHA1(87f4d0fa58cfe9cef818a3185df2735e6da6168c))
 	ROM_LOAD ("738sedisk.rom", 0x8000, 0x4000, CRC(fb884df4) SHA1(6d3a530ae822ec91f6444c681c9b08b9efadc7e7))
 	ROM_LOAD ("738se232c.rom", 0xc000, 0x2000, CRC(3353dcc6) SHA1(4e9384c9d137f0ab65ffc5a78f04cd8c9df6c8b7))
@@ -1845,7 +1845,7 @@ MSX_LAYOUT_END
 /* MSX - Talent DPC-200 */
 
 ROM_START (tadpc200)
-	ROM_REGION (0x8000, "main", 0)
+	ROM_REGION (0x8000, "maincpu", 0)
 	ROM_LOAD ("dpc200bios.rom", 0x0000, 0x8000, CRC(8205795e) SHA1(829c00c3114f25b3dae5157c0a238b52a3ac37db))
 ROM_END
 
@@ -1860,7 +1860,7 @@ MSX_LAYOUT_END
 /* MSX - Talent DPC-200A */
 
 ROM_START (tadpc20a)
-	ROM_REGION (0x8000, "main", 0)
+	ROM_REGION (0x8000, "maincpu", 0)
 	ROM_LOAD ("dpc200abios.rom", 0x0000, 0x8000, CRC(8205795e) SHA1(829c00c3114f25b3dae5157c0a238b52a3ac37db))
 ROM_END
 
@@ -1875,7 +1875,7 @@ MSX_LAYOUT_END
 /* The BIOS on the Toshiba HX-10 is inside a big 64pin Toshiba chip label TCX-1007 */
 
 ROM_START (hx10)
-	ROM_REGION (0x8000, "main",0)
+	ROM_REGION (0x8000, "maincpu",0)
 	ROM_LOAD ("tcx-1007.ic15", 0x0000, 0x8000, CRC(5486b711) SHA1(4dad9de7c28b452351cc12910849b51bd9a37ab3))
 ROM_END
 
@@ -1889,7 +1889,7 @@ MSX_LAYOUT_END
 /* MSX - Toshiba HX-10S */
 
 ROM_START (hx10s)
-	ROM_REGION (0x8000, "main",0)
+	ROM_REGION (0x8000, "maincpu",0)
 	ROM_LOAD ("hx10sbios.rom", 0x0000, 0x8000, CRC(5486b711) SHA1(4dad9de7c28b452351cc12910849b51bd9a37ab3))
 ROM_END
 
@@ -1903,7 +1903,7 @@ MSX_LAYOUT_END
 /* MSX - Toshiba HX-20 */
 
 ROM_START (hx20)
-	ROM_REGION (0x10000, "main",0)
+	ROM_REGION (0x10000, "maincpu",0)
 	ROM_LOAD ("hx20bios.rom", 0x0000, 0x8000, CRC(8205795e) SHA1(829c00c3114f25b3dae5157c0a238b52a3ac37db))
 	ROM_LOAD ("hx20word.rom", 0x8000, 0x8000, CRC(39b3e1c0) SHA1(9f7cfa932bd7dfd0d9ecaadc51655fb557c2e125))
 ROM_END
@@ -1920,7 +1920,7 @@ MSX_LAYOUT_END
 /* MSX - Yamaha CX5M */
 
 ROM_START (cx5m)
-	ROM_REGION (0x10000, "main",0)
+	ROM_REGION (0x10000, "maincpu",0)
 	ROM_LOAD ("cx5mbios.rom", 0x0000, 0x8000, CRC(e2242b53) SHA1(706dd67036baeec7127e4ccd8c8db8f6ce7d0e4c))
 	ROM_LOAD ("sfg05m.rom", 		0x8000, 0x8000, CRC(6c2545c9) SHA1(bc4b242647116f4886bb92e86421f97b1be51938))
 ROM_END
@@ -1936,7 +1936,7 @@ MSX_LAYOUT_END
 /* MSX - Yamaha CX5M-128 */
 
 ROM_START (cx5m128)
-	ROM_REGION (0x18000, "main",0)
+	ROM_REGION (0x18000, "maincpu",0)
 	ROM_LOAD ("cx5m128bios.rom", 0x0000, 0x8000, CRC(507b2caa) SHA1(0dde59e8d98fa524961cd37b0e100dbfb42cf576))
 	ROM_LOAD ("cx5m128ext.rom",  0x8000, 0x4000, CRC(feada82e) SHA1(48b0c2ff1f1e407cc44394219f7b3878efaa919f))
 	ROM_LOAD ("sfg05.rom", 		0xc000, 0x8000, CRC(2425c279) SHA1(d956167e234f60ad916120437120f86fc8c3c321))
@@ -1956,7 +1956,7 @@ MSX_LAYOUT_END
 /* MSX - Yamaha CX5MII */
 
 ROM_START (cx5m2)
-	ROM_REGION (0x14000, "main",0)
+	ROM_REGION (0x14000, "maincpu",0)
 	ROM_LOAD ("cx5m2bios.rom", 0x0000, 0x8000, CRC(507b2caa) SHA1(0dde59e8d98fa524961cd37b0e100dbfb42cf576))
 	ROM_LOAD ("cx5m2ext.rom",  0x8000, 0x4000, CRC(feada82e) SHA1(48b0c2ff1f1e407cc44394219f7b3878efaa919f))
 	ROM_LOAD ("sfg05.rom", 		 0xc000, 0x8000, CRC(2425c279) SHA1(d956167e234f60ad916120437120f86fc8c3c321))
@@ -1974,7 +1974,7 @@ MSX_LAYOUT_END
 /* MSX - Yamaha YIS303 */
 
 ROM_START (yis303)
-	ROM_REGION (0x14000, "main",0)
+	ROM_REGION (0x14000, "maincpu",0)
 	ROM_LOAD ("yis303bios.rom", 0x0000, 0x8000, CRC(e2242b53) SHA1(706dd67036baeec7127e4ccd8c8db8f6ce7d0e4c))
 	ROM_FILL( 0x8000, 0xc000, 0xff )
 ROM_END
@@ -1990,7 +1990,7 @@ MSX_LAYOUT_END
 /* MSX - Yamaha YIS503 */
 
 ROM_START (yis503)
-	ROM_REGION (0x10000, "main",0)
+	ROM_REGION (0x10000, "maincpu",0)
 	ROM_LOAD ("yis503bios.rom", 0x0000, 0x8000, CRC(e2242b53) SHA1(706dd67036baeec7127e4ccd8c8db8f6ce7d0e4c))
 	ROM_FILL( 0x8000, 0x8000, 0xff )
 ROM_END
@@ -2006,7 +2006,7 @@ MSX_LAYOUT_END
 /* MSX - Yamaha YIS503II */
 
 ROM_START (yis503ii)
-	ROM_REGION (0x8000, "main",0)
+	ROM_REGION (0x8000, "maincpu",0)
 	ROM_LOAD ("yis503iibios.rom", 0x0000, 0x8000, CRC(e2242b53) SHA1(706dd67036baeec7127e4ccd8c8db8f6ce7d0e4c))
 ROM_END
 
@@ -2020,7 +2020,7 @@ MSX_LAYOUT_END
 /* MSX - Yamaha YIS503IIR Russian */
 
 ROM_START (y503iir)
-	ROM_REGION (0xe000, "main",0)
+	ROM_REGION (0xe000, "maincpu",0)
 	ROM_LOAD ("yis503iirbios.rom",  0x0000, 0x8000, CRC(225a4f9e) SHA1(5173ac403e26c462f904f85c9ef5e7b1e19253e7))
 	ROM_LOAD ("yis503iirdisk.rom", 0x8000, 0x4000, CRC(9eb7e24d) SHA1(3a481c7b7e4f0406a55952bc5b9f8cf9d699376c))
 	ROM_LOAD ("yis503iirnet.rom",  0xc000, 0x2000, CRC(0731db3f) SHA1(264fbb2de69fdb03f87dc5413428f6aa19511a7f))
@@ -2038,7 +2038,7 @@ MSX_LAYOUT_END
 /* MSX - Yamaha YIS503IIR Estonian */
 
 ROM_START (y503iir2)
-	ROM_REGION (0xe000, "main",0)
+	ROM_REGION (0xe000, "maincpu",0)
 	ROM_LOAD ("yis503ii2bios.rom",  0x0000, 0x8000, CRC(1548cee3) SHA1(42c7fff25b1bd90776ac0aea971241aedce8947d))
 	ROM_LOAD ("yis503iirdisk.rom", 0x8000, 0x4000, CRC(9eb7e24d) SHA1(3a481c7b7e4f0406a55952bc5b9f8cf9d699376c))
 	ROM_LOAD ("yis503iirnet.rom",  0xc000, 0x2000, CRC(0731db3f) SHA1(264fbb2de69fdb03f87dc5413428f6aa19511a7f))
@@ -2056,7 +2056,7 @@ MSX_LAYOUT_END
 /* MSX - Yamaha YIS503M */
 
 ROM_START (yis503m)
-	ROM_REGION (0x10000, "main",0)
+	ROM_REGION (0x10000, "maincpu",0)
 	ROM_LOAD ("yis503mbios.rom", 0x0000, 0x8000, CRC(e2242b53) SHA1(706dd67036baeec7127e4ccd8c8db8f6ce7d0e4c))
 	ROM_LOAD ("sfg05.rom", 		   0x8000, 0x8000, CRC(6c2545c9) SHA1(bc4b242647116f4886bb92e86421f97b1be51938))
 ROM_END
@@ -2072,7 +2072,7 @@ MSX_LAYOUT_END
 /* MSX - Yashica YC-64 */
 
 ROM_START (yc64)
-	ROM_REGION (0x8000, "main",0)
+	ROM_REGION (0x8000, "maincpu",0)
 	ROM_LOAD ("yc64bios.rom", 0x0000, 0x8000, CRC(e9ccd789) SHA1(8963fc041975f31dc2ab1019cfdd4967999de53e))
 ROM_END
 
@@ -2088,7 +2088,7 @@ MSX_LAYOUT_END
 /* MSX2 */
 
 ROM_START (msx2)
-	ROM_REGION (0x20000, "main",0)
+	ROM_REGION (0x20000, "maincpu",0)
 	ROM_LOAD ("msx2.rom", 0x0000, 0x8000, CRC(f05ed518) SHA1(5e1a4bd6826b29302a1eb88c340477e7cbd0b50a))
 	ROM_LOAD ("msx2ext.rom", 0x8000, 0x4000, CRC(95db2959) SHA1(e7905d16d2ccd57a013c122dc432106cd59ef52c))
 	ROM_LOAD_OPTIONAL ("disk.rom", 0xc000, 0x4000, CRC(b7c58fad) SHA1(bc517b4a248c3a1338c5efc937b0128b6a783808))
@@ -2108,7 +2108,7 @@ MSX_LAYOUT_END
 /* MSX2 - Al Alamiah AX-350 */
 
 ROM_START (ax350)
-	ROM_REGION (0x44000, "main", 0)
+	ROM_REGION (0x44000, "maincpu", 0)
 	ROM_LOAD ("ax350bios.rom",  0x0000,  0x8000, CRC(ea306155) SHA1(35195ab67c289a0b470883464df66bc6ea5b00d3))
 	ROM_LOAD ("ax350ext.rom",   0x8000,  0x4000, CRC(7c7540b7) SHA1(ebb76f9061e875365023523607db610f2eda1d26))
 	/* 0x0c000 - 0x1ffff reserved for optional disk and fmpac roms from msx2 parent set */
@@ -2135,7 +2135,7 @@ MSX_LAYOUT_END
 /* MSX2 - Al Alamiah AX-370 */
 
 ROM_START (ax370)
-	ROM_REGION (0x44000, "main", 0)
+	ROM_REGION (0x44000, "maincpu", 0)
 	ROM_LOAD ("ax370bios.rom",  0x0000,  0x8000, CRC(ea306155) SHA1(35195ab67c289a0b470883464df66bc6ea5b00d3))
 	ROM_LOAD ("ax370ext.rom",   0x8000,  0x4000, CRC(7c7540b7) SHA1(ebb76f9061e875365023523607db610f2eda1d26))
 	/* 0x0c000 - 0x1ffff reserved for optional disk and fmpac roms from msx2 parent set */
@@ -2162,7 +2162,7 @@ MSX_LAYOUT_END
 /* MSX2 - Daewoo CPC-300 */
 
 ROM_START (cpc300)
-	ROM_REGION (0x30000, "main", 0)
+	ROM_REGION (0x30000, "maincpu", 0)
 	ROM_LOAD ("300bios.rom", 0x0000, 0x8000, CRC(53850907) SHA1(affa3c5cd8db79a1450ad8a7f405a425b251653d))
 	/* 0x0c000 - 0x1ffff reserved for optional disk and fmpac roms from msx2 parent set */
 	ROM_FILL (0xc000, 0x14000, 0)
@@ -2183,7 +2183,7 @@ MSX_LAYOUT_END
 /* MSX2 - Daewoo CPC-300E */
 
 ROM_START (cpc300e)
-	ROM_REGION (0x30000, "main", 0)
+	ROM_REGION (0x30000, "maincpu", 0)
 	ROM_LOAD ("300ebios.rom", 0x0000, 0x8000, CRC(53850907) SHA1(affa3c5cd8db79a1450ad8a7f405a425b251653d))
 	/* 0x0c000 - 0x1ffff reserved for optional disk and fmpac roms from msx2 parent set */
 	ROM_FILL (0xc000, 0x14000, 0)
@@ -2203,7 +2203,7 @@ MSX_LAYOUT_END
 
 /* MSX2 - Daewoo CPC-400 */
 ROM_START (cpc400)
-	ROM_REGION (0x50000, "main", 0)
+	ROM_REGION (0x50000, "maincpu", 0)
 	ROM_LOAD ("400bios.rom", 0x0000, 0x8000, CRC(53850907) SHA1(affa3c5cd8db79a1450ad8a7f405a425b251653d))
 	ROM_LOAD ("400disk.rom", 0x8000, 0x4000, CRC(5fa517df) SHA1(914f6ccb25d78621186001f2f5e2aaa2d628cd0c))
 	/* 0x0c000 - 0x1ffff reserved for optional disk and fmpac roms from msx2 parent set */
@@ -2228,7 +2228,7 @@ MSX_LAYOUT_END
 /* MSX2 - Daewoo CPC-400S */
 
 ROM_START (cpc400s)
-	ROM_REGION (0x50000, "main", 0)
+	ROM_REGION (0x50000, "maincpu", 0)
 	ROM_LOAD ("400sbios.rom", 0x0000, 0x8000, CRC(53850907) SHA1(affa3c5cd8db79a1450ad8a7f405a425b251653d))
 	ROM_LOAD ("400sdisk.rom", 0x8000, 0x4000, CRC(5fa517df) SHA1(914f6ccb25d78621186001f2f5e2aaa2d628cd0c))
 	/* 0x0c000 - 0x1ffff reserved for optional disk and fmpac roms from msx2 parent set */
@@ -2253,7 +2253,7 @@ MSX_LAYOUT_END
 /* MSX2 - Gradiente Expert 2.0 */
 
 ROM_START (expert20)
-	ROM_REGION (0x28000, "main", 0)
+	ROM_REGION (0x28000, "maincpu", 0)
 	ROM_LOAD ("exp20bios.rom", 0x0000, 0x8000, CRC(6BACDCE4) SHA1(9c43106dba3ae2829e9a11dffa9d000ed6d6454c))
 	ROM_LOAD ("exp20ext.rom",  0x8000, 0x4000, CRC(08CED880) SHA1(4f2a7e0172f0214f025f23845f6e053d0ffd28e8))
 	/* 0x0c000 - 0x1ffff reserved for optional disk and fmpac roms from msx2 parent set */
@@ -2277,7 +2277,7 @@ MSX_LAYOUT_END
 /* MSX2 - National FS-4500 */
 
 ROM_START (fs4500)
-	ROM_REGION (0x94000, "main",0)
+	ROM_REGION (0x94000, "maincpu",0)
 	ROM_LOAD ("4500bios.rom", 0x0000, 0x8000, CRC(9b3e7b97) SHA1(0081ea0d25bc5cd8d70b60ad8cfdc7307812c0fd))
 	ROM_LOAD ("4500ext.rom", 0x8000, 0x4000, CRC(4a48779c) SHA1(b8e30d604d319d511cbfbc61e5d8c38fbb9c5a33))
 	/* 0x0c000 - 0x1ffff reserved for optional disk and fmpac roms from msx2 parent set */
@@ -2312,7 +2312,7 @@ MSX_LAYOUT_END
 /* MSX2 - National FS-4600 */
 
 ROM_START (fs4600)
-	ROM_REGION (0x170000, "main",0)
+	ROM_REGION (0x170000, "maincpu",0)
 	ROM_LOAD ("4600bios.rom", 0x0000, 0x8000, CRC(9b3e7b97) SHA1(0081ea0d25bc5cd8d70b60ad8cfdc7307812c0fd))
 	ROM_LOAD ("4600ext.rom", 0x8000, 0x4000, CRC(43e7a7fc) SHA1(0fbd45ef3dd7bb82d4c31f1947884f411f1ca344))
 	ROM_LOAD ("4600disk.rom", 0xc000, 0x4000, CRC(ae4e65b7) SHA1(073feb8bb645d935e099afaf61e6f04f52adee42))
@@ -2345,7 +2345,7 @@ MSX_LAYOUT_END
 /* MSX2 - National FS-4700 */
 
 ROM_START (fs4700)
-	ROM_REGION (0x94000, "main",0)
+	ROM_REGION (0x94000, "maincpu",0)
 	ROM_LOAD ("4700bios.rom", 0x0000, 0x8000, CRC(9b3e7b97) SHA1(0081ea0d25bc5cd8d70b60ad8cfdc7307812c0fd))
 	ROM_LOAD ("4700ext.rom", 0x8000, 0x4000, CRC(4a48779c) SHA1(b8e30d604d319d511cbfbc61e5d8c38fbb9c5a33))
 	ROM_LOAD ("4700disk.rom", 0xc000, 0x4000, CRC(1e7d6512) SHA1(78cd7f847e77fd8cd51a647efb2725ba93f4c471))
@@ -2382,7 +2382,7 @@ MSX_LAYOUT_END
 /* MSX2 - National FS-5000 */
 
 ROM_START (fs5000)
-	ROM_REGION (0x50000, "main",0)
+	ROM_REGION (0x50000, "maincpu",0)
 	ROM_LOAD ("5000bios.rom", 0x0000, 0x8000, CRC(a44ea707) SHA1(59967765d6e9328909dee4dac1cbe4cf9d47d315))
 	ROM_LOAD ("5000ext.rom", 0x8000, 0x4000, CRC(43e7a7fc) SHA1(0fbd45ef3dd7bb82d4c31f1947884f411f1ca344))
 	ROM_LOAD ("5000disk.rom", 0xc000, 0x4000, CRC(ae4e65b7) SHA1(073feb8bb645d935e099afaf61e6f04f52adee42))
@@ -2412,7 +2412,7 @@ MSX_LAYOUT_END
 /* MSX2 - National FS-5500F1/F2*/
 
 ROM_START (fs5500)
-	ROM_REGION (0x50000, "main",0)
+	ROM_REGION (0x50000, "maincpu",0)
 	ROM_LOAD ("5500bios.rom", 0x0000, 0x8000, CRC(5bf38e13) SHA1(44e0dd215b2a9f0770dd76fb49187c05b083eed9))
 	ROM_LOAD ("5500ext.rom", 0x8000, 0x4000, CRC(3c42c367) SHA1(4be8371f3b03e70ddaca495958345f3c4f8e2d36))
 	ROM_LOAD ("5500disk.rom", 0xc000, 0x4000, CRC(1e7d6512) SHA1(78cd7f847e77fd8cd51a647efb2725ba93f4c471))
@@ -2442,7 +2442,7 @@ MSX_LAYOUT_END
 /* MSX2 - Panasonic FS-A1 */
 
 ROM_START (fsa1)
-	ROM_REGION (0x30000, "main",0)
+	ROM_REGION (0x30000, "maincpu",0)
 	ROM_LOAD ("a1bios.rom", 0x0000, 0x8000, CRC(9b3e7b97) SHA1(0081ea0d25bc5cd8d70b60ad8cfdc7307812c0fd))
 	ROM_LOAD ("a1ext.rom", 0x8000, 0x4000, CRC(43e7a7fc) SHA1(0fbd45ef3dd7bb82d4c31f1947884f411f1ca344))
 	/* 0x0c000 - 0x1ffff reserved for optional disk and fmpac roms from msx2 parent set */
@@ -2464,7 +2464,7 @@ MSX_LAYOUT_END
 /* MSX2 - Panasonic FS-A1 (a) */
 
 ROM_START (fsa1a)
-	ROM_REGION (0x30000, "main",0)
+	ROM_REGION (0x30000, "maincpu",0)
 	ROM_LOAD ("a1bios.rom", 0x0000, 0x8000, CRC(9b3e7b97) SHA1(0081ea0d25bc5cd8d70b60ad8cfdc7307812c0fd))
 	ROM_LOAD ("a1ext.rom", 0x8000, 0x4000, CRC(43e7a7fc) SHA1(0fbd45ef3dd7bb82d4c31f1947884f411f1ca344))
 	/* 0x0c000 - 0x1ffff reserved for optional disk and fmpac roms from msx2 parent set */
@@ -2486,7 +2486,7 @@ MSX_LAYOUT_END
 /* MSX2 - Panasonic FS-A1F */
 
 ROM_START (fsa1f)
-	ROM_REGION (0x50000, "main",0)
+	ROM_REGION (0x50000, "maincpu",0)
 	ROM_LOAD ("a1fbios.rom", 0x0000, 0x8000, CRC(9b3e7b97) SHA1(0081ea0d25bc5cd8d70b60ad8cfdc7307812c0fd))
 	ROM_LOAD ("a1fext.rom", 0x8000, 0x4000, CRC(43e7a7fc) SHA1(0fbd45ef3dd7bb82d4c31f1947884f411f1ca344))
 	ROM_LOAD ("a1fdisk.rom", 0xc000, 0x4000, CRC(e25cacca) SHA1(607cfca605eaf82e3efa33459d6583efb7ecc13b))
@@ -2513,7 +2513,7 @@ MSX_LAYOUT_END
 /* MSX2 - Panasonic FS-A1FM */
 
 ROM_START (fsa1fm)
-	ROM_REGION (0x180000, "main",0)
+	ROM_REGION (0x180000, "maincpu",0)
 	ROM_LOAD ("a1fmbios.rom", 0x0000, 0x8000, CRC(9b3e7b97) SHA1(0081ea0d25bc5cd8d70b60ad8cfdc7307812c0fd))
 	ROM_LOAD ("a1fmext.rom", 0x8000, 0x4000, CRC(ad295b5d) SHA1(d552319a19814494e3016de4b8f010e8f7b97e02))
 	ROM_LOAD ("a1fmdisk.rom", 0xc000, 0x4000, CRC(e25cacca) SHA1(607cfca605eaf82e3efa33459d6583efb7ecc13b))
@@ -2541,7 +2541,7 @@ MSX_LAYOUT_END
 /* MSX2 - Panasonic FS-A1MK2 */
 
 ROM_START (fsa1mk2)
-	ROM_REGION (0x34000, "main",0)
+	ROM_REGION (0x34000, "maincpu",0)
 	ROM_LOAD ("a1mkbios.rom", 0x0000, 0x8000, CRC(9b3e7b97) SHA1(0081ea0d25bc5cd8d70b60ad8cfdc7307812c0fd))
 	ROM_LOAD ("a1mk2ext.rom", 0x8000, 0x4000, CRC(43e7a7fc) SHA1(0fbd45ef3dd7bb82d4c31f1947884f411f1ca344))
 	/* 0x0c000 - 0x1ffff reserved for optional disk and fmpac roms from msx2 parent set */
@@ -2566,7 +2566,7 @@ MSX_LAYOUT_END
 /* MSX2 - Philips NMS-8220 - 2 possible sets (/00 /16) */
 
 ROM_START (nms8220)
-	ROM_REGION (0x20000, "main", 0)
+	ROM_REGION (0x20000, "maincpu", 0)
 	ROM_LOAD ("8220bios.rom.u14", 0x0000, 0x8000, BAD_DUMP CRC(6cdaf3a5) SHA1(6103b39f1e38d1aa2d84b1c3219c44f1abb5436e))
 	ROM_LOAD ("8220ext.rom.u14", 0x8000, 0x4000, BAD_DUMP CRC(06e4f5e6) SHA1(f5eb0a396097572589f2a6efeed045044e9425e4))
 	ROM_LOAD ("8220pen.rom.u13", 0xc000, 0x4000, CRC(3d38c53e) SHA1(cb754aed85b3e97a7d3c5894310df7ca18f89f41))
@@ -2587,7 +2587,7 @@ MSX_LAYOUT_END
 /* MSX2 - Philips NMS-8220 (a) */
 
 ROM_START (nms8220a)
-	ROM_REGION (0x20000, "main", 0)
+	ROM_REGION (0x20000, "maincpu", 0)
 	ROM_LOAD ("8220bios.rom.u14", 0x0000, 0x8000, BAD_DUMP CRC(6cdaf3a5) SHA1(6103b39f1e38d1aa2d84b1c3219c44f1abb5436e))
 	ROM_LOAD ("8220ext.rom.u14", 0x8000, 0x4000, BAD_DUMP CRC(06e4f5e6) SHA1(f5eb0a396097572589f2a6efeed045044e9425e4))
 	ROM_LOAD ("8220pena.rom.u13", 0xc000, 0x4000, CRC(17817b5a) SHA1(5df95d033ae70b107697b69470126ce1b7ae9eb5))
@@ -2608,7 +2608,7 @@ MSX_LAYOUT_END
 /* MSX2 - Philips NMS-8245 - 2 possible sets (/00 /16) */
 
 ROM_START (nms8245)
-	ROM_REGION (0x40000, "main", 0)
+	ROM_REGION (0x40000, "maincpu", 0)
 	/* 0x10000 - 0x1ffff reserved for optional fmpac rom from msx2 parent set */
 	ROM_FILL (0x10000, 0x10000, 0)
 	ROM_LOAD ("nms8245.u7", 0x20000, 0x20000, BAD_DUMP CRC(0c827d5f) SHA1(064e706cb1f12b99b329944ceeedc0efc3b2d9be))
@@ -2627,7 +2627,7 @@ MSX_LAYOUT_END
 /* MSX2 - Philips NMS-8245F */
 
 ROM_START (nms8245f)
-	ROM_REGION (0x40000, "main", 0)
+	ROM_REGION (0x40000, "maincpu", 0)
 	/* 0x10000 - 0x1ffff reserved for optional fmpac rom from msx2 parent set */
 	ROM_FILL (0x10000, 0x10000, 0)
 	ROM_LOAD ("nms8245.u7", 0x20000, 0x20000, BAD_DUMP CRC(0c827d5f) SHA1(064e706cb1f12b99b329944ceeedc0efc3b2d9be))
@@ -2647,7 +2647,7 @@ MSX_LAYOUT_END
 /* Labels taken from an NMS-8250/00 */
 
 ROM_START (nms8250)
-	ROM_REGION (0x20000, "main", 0)
+	ROM_REGION (0x20000, "maincpu", 0)
 	ROM_LOAD ("d23c256eac.ic119", 0x0000, 0x8000, CRC(6cdaf3a5) SHA1(6103b39f1e38d1aa2d84b1c3219c44f1abb5436e))
 	ROM_LOAD ("d23128ec.ic118", 0x8000, 0x4000, CRC(66237ecf) SHA1(5c1f9c7fb655e43d38e5dd1fcc6b942b2ff68b02))
 	ROM_LOAD ("jq00014.ic117", 0xc000, 0x04000, CRC(ca3307d3) SHA1(c3efedda7ab947a06d9345f7b8261076fa7ceeef))
@@ -2668,7 +2668,7 @@ MSX_LAYOUT_END
 /* MSX2 - Philips NMS-8255 */
 
 ROM_START (nms8255)
-	ROM_REGION (0x20000, "main", 0)
+	ROM_REGION (0x20000, "maincpu", 0)
 	ROM_LOAD ("8255bios.rom.ic119", 0x0000, 0x8000, CRC(6cdaf3a5) SHA1(6103b39f1e38d1aa2d84b1c3219c44f1abb5436e))
 	ROM_LOAD ("8255ext.rom.ic118", 0x8000, 0x4000, CRC(66237ecf) SHA1(5c1f9c7fb655e43d38e5dd1fcc6b942b2ff68b02))
 	ROM_LOAD ("8255disk.rom.ic117", 0xc000, 0x04000, CRC(ca3307d3) SHA1(c3efedda7ab947a06d9345f7b8261076fa7ceeef))
@@ -2689,7 +2689,7 @@ MSX_LAYOUT_END
 /* MSX2 - Philips NMS-8280 - 2 possible sets (/00 /16) */
 
 ROM_START (nms8280)
-	ROM_REGION (0x20000, "main", 0)
+	ROM_REGION (0x20000, "maincpu", 0)
 	ROM_LOAD ("8280bios.rom.ic119", 0x0000, 0x8000, CRC(6cdaf3a5) SHA1(6103b39f1e38d1aa2d84b1c3219c44f1abb5436e))
 	ROM_LOAD ("8280ext.rom.ic118", 0x8000, 0x4000, CRC(66237ecf) SHA1(5c1f9c7fb655e43d38e5dd1fcc6b942b2ff68b02))
 	ROM_LOAD ("8280disk.rom.ic117", 0xc000, 0x04000, CRC(ca3307d3) SHA1(c3efedda7ab947a06d9345f7b8261076fa7ceeef))
@@ -2710,7 +2710,7 @@ MSX_LAYOUT_END
 /* MSX2 - Philips NMS-8280G */
 
 ROM_START (nms8280g)
-	ROM_REGION (0x20000, "main", 0)
+	ROM_REGION (0x20000, "maincpu", 0)
 	ROM_LOAD ("8280gbios.rom.ic119", 0x0000, 0x8000, CRC(8fa060e2) SHA1(b17d9bea0eb16a1aa2d0ccbd7c9488da9f57698e))
 	ROM_LOAD ("8280gext.rom.ic118", 0x8000, 0x4000, CRC(41e36d03) SHA1(4ab7b2030d022f5486abaab22aaeaf8aa23e05f3))
 	ROM_LOAD ("8280gdisk.rom.ic117", 0xc000, 0x04000, CRC(d0beebb8) SHA1(d1001f93c87ff7fb389e418e33bf7bc81bdbb65f))
@@ -2731,7 +2731,7 @@ MSX_LAYOUT_END
 /* MSX2 - Philips VG-8230 (u11 - exp, u12 - basic, u13 - disk */
 
 ROM_START (vg8230)
-	ROM_REGION (0x20000, "main", 0)
+	ROM_REGION (0x20000, "maincpu", 0)
 	ROM_LOAD ("8230bios.rom.u12", 0x0000, 0x8000, CRC(b31c851d) SHA1(0de3c802057560560a03d7965fcc4cff69f8575c))
 	ROM_LOAD ("8230ext.rom.u11", 0x8000, 0x4000, CRC(8f84f783) SHA1(3288894e1be6af705871499b23c85732dbc40993))
 	ROM_LOAD ("8230disk.rom.u13", 0xc000, 0x4000, CRC(77c4e5bc) SHA1(849f93867ff7846b27f84d0be418569faf058ac2))
@@ -2752,7 +2752,7 @@ MSX_LAYOUT_END
 /* MSX2 - Philips VG-8235 3 psosible basic and ext roms (/00 /02 /19) */
 
 ROM_START (vg8235)
-	ROM_REGION (0x20000, "main", 0)
+	ROM_REGION (0x20000, "maincpu", 0)
 	ROM_LOAD ("8235bios.rom.u48", 0x0000, 0x8000, CRC(6cdaf3a5) SHA1(6103b39f1e38d1aa2d84b1c3219c44f1abb5436e))
 	ROM_LOAD ("8235ext.rom.u49", 0x8000, 0x4000, CRC(66237ecf) SHA1(5c1f9c7fb655e43d38e5dd1fcc6b942b2ff68b02))
 	ROM_LOAD ("8235disk.rom.u50", 0xc000, 0x4000, CRC(51daeb25) SHA1(8954e59aa79310c7b719ecf0cde1e82fb731dcd1))
@@ -2773,7 +2773,7 @@ MSX_LAYOUT_END
 /* MSX2 - Philips VG-8235F */
 
 ROM_START (vg8235f)
-	ROM_REGION (0x20000, "main", 0)
+	ROM_REGION (0x20000, "maincpu", 0)
 	ROM_LOAD ("8235fbios.rom.u48", 0x0000, 0x8000, CRC(c0577a50) SHA1(3926cdd91fa89657a811463e48cfbdb350676e51))
 	ROM_LOAD ("8235fext.rom.u49", 0x8000, 0x4000, CRC(e235d5c8) SHA1(792e6b2814ab783d06c7576c1e3ccd6a9bbac34a))
 	ROM_LOAD ("8235fdisk.rom.u50", 0xc000, 0x4000, CRC(77c4e5bc) SHA1(849f93867ff7846b27f84d0be418569faf058ac2))
@@ -2794,7 +2794,7 @@ MSX_LAYOUT_END
 /* MSX2 - Philips VG-8240 */
 
 ROM_START (vg8240)
-	ROM_REGION (0x20000, "main", 0)
+	ROM_REGION (0x20000, "maincpu", 0)
 	ROM_LOAD ("8240bios.rom", 0x0000, 0x8000, CRC(6cdaf3a5) SHA1(6103b39f1e38d1aa2d84b1c3219c44f1abb5436e))
 	ROM_LOAD ("8240ext.rom", 0x8000, 0x4000, CRC(66237ecf) SHA1(5c1f9c7fb655e43d38e5dd1fcc6b942b2ff68b02))
 	ROM_LOAD ("8240disk.rom", 0xc000, 0x4000, CRC(ca3307d3) SHA1(c3efedda7ab947a06d9345f7b8261076fa7ceeef))
@@ -2815,7 +2815,7 @@ MSX_LAYOUT_END
 /* MSX2 - Sanyo Wavy PHC-23 */
 
 ROM_START (phc23)
-	ROM_REGION (0x20000, "main",0)
+	ROM_REGION (0x20000, "maincpu",0)
 	ROM_LOAD ("23bios.rom", 0x0000, 0x8000, CRC(ba81b3dd) SHA1(4ce41fcc1a603411ec4e99556409c442078f0ecf))
 	ROM_LOAD ("23ext.rom", 0x8000, 0x4000, CRC(90ca25b5) SHA1(fd9fa78bac25aa3c0792425b21d14e364cf7eea4))
 	/* 0x0c000 - 0x1ffff reserved for optional disk and fmpac roms from msx2 parent set */
@@ -2833,7 +2833,7 @@ MSX_LAYOUT_END
 /* MSX2 - Sharp Epcom HotBit 2.0 */
 
 ROM_START (hotbit20)
-	ROM_REGION (0x28000, "main", 0)
+	ROM_REGION (0x28000, "maincpu", 0)
 	ROM_LOAD ("hb2bios.rom", 0x0000, 0x8000, CRC(0160e8c9) SHA1(d0cfc35f22b150a1cb10decae4841dfe63b78251))
 	ROM_LOAD ("hb2ext.rom",  0x8000, 0x4000, CRC(08ced880) SHA1(4f2a7e0172f0214f025f23845f6e053d0ffd28e8))
 	/* 0x0c000 - 0x1ffff reserved for optional disk and fmpac roms from msx2 parent set */
@@ -2856,7 +2856,7 @@ MSX_LAYOUT_END
 /* MSX2 - Sony HB-F1 */
 
 ROM_START (hbf1)
-	ROM_REGION (0x34000, "main",0)
+	ROM_REGION (0x34000, "maincpu",0)
 	ROM_LOAD ("f1bios.rom", 0x0000, 0x8000, CRC(9b3e7b97) SHA1(0081ea0d25bc5cd8d70b60ad8cfdc7307812c0fd))
 	ROM_LOAD ("f1ext.rom", 0x8000, 0x4000, CRC(4a48779c) SHA1(b8e30d604d319d511cbfbc61e5d8c38fbb9c5a33))
 	/* 0x0c000 - 0x1ffff reserved for optional disk and fmpac roms from msx2 parent set */
@@ -2880,7 +2880,7 @@ MSX_LAYOUT_END
 /* MSX2 - Sony HB-F1II */
 
 ROM_START (hbf12)
-	ROM_REGION (0x34000, "main",0)
+	ROM_REGION (0x34000, "maincpu",0)
 	ROM_LOAD ("f12bios.rom", 0x0000, 0x8000, CRC(9b3e7b97) SHA1(0081ea0d25bc5cd8d70b60ad8cfdc7307812c0fd))
 	ROM_LOAD ("f12ext.rom", 0x8000, 0x4000, CRC(43e7a7fc) SHA1(0fbd45ef3dd7bb82d4c31f1947884f411f1ca344))
 	/* 0x0c000 - 0x1ffff reserved for optional disk and fmpac roms from msx2 parent set */
@@ -2905,7 +2905,7 @@ MSX_LAYOUT_END
 /* MSX2 - Sony HB-F1XD */
 
 ROM_START (hbf1xd)
-	ROM_REGION (0x20000, "main",0)
+	ROM_REGION (0x20000, "maincpu",0)
 	ROM_LOAD ("f1xdbios.rom.ic27", 0x0000, 0x8000, BAD_DUMP CRC(ba81b3dd) SHA1(4ce41fcc1a603411ec4e99556409c442078f0ecf))
 	ROM_LOAD ("f1xdext.rom.ic27", 0x8000, 0x4000, BAD_DUMP CRC(43e7a7fc) SHA1(0fbd45ef3dd7bb82d4c31f1947884f411f1ca344))
 	ROM_LOAD ("f1xddisk.rom.ic27", 0xc000, 0x4000, BAD_DUMP CRC(54c73ad6) SHA1(12f2cc79b3d09723840bae774be48c0d721ec1c6))
@@ -2926,7 +2926,7 @@ MSX_LAYOUT_END
 /* MSX2 - Sony HB-F1XDMK2 */
 
 ROM_START (hbf1xdm2)
-	ROM_REGION (0x20000, "main",0)
+	ROM_REGION (0x20000, "maincpu",0)
 	ROM_LOAD ("f1m2bios.rom.ic27", 0x0000, 0x8000, BAD_DUMP CRC(ba81b3dd) SHA1(4ce41fcc1a603411ec4e99556409c442078f0ecf))
 	ROM_LOAD ("f1m2ext.rom.ic27", 0x8000, 0x4000, BAD_DUMP CRC(43e7a7fc) SHA1(0fbd45ef3dd7bb82d4c31f1947884f411f1ca344))
 	ROM_LOAD ("f1m2disk.rom.ic27", 0xc000, 0x4000, BAD_DUMP CRC(54c73ad6) SHA1(12f2cc79b3d09723840bae774be48c0d721ec1c6))
@@ -2947,7 +2947,7 @@ MSX_LAYOUT_END
 /* MSX2 - Sony HB-F500 */
 
 ROM_START (hbf500)
-	ROM_REGION (0x40000, "main", 0)
+	ROM_REGION (0x40000, "maincpu", 0)
 	ROM_LOAD ("f500bios.rom", 0x0000, 0x8000, CRC(9b3e7b97) SHA1(0081ea0d25bc5cd8d70b60ad8cfdc7307812c0fd))
 	ROM_LOAD ("f500ext.rom", 0x8000, 0x4000, CRC(4a48779c) SHA1(b8e30d604d319d511cbfbc61e5d8c38fbb9c5a33))
 	ROM_LOAD ("f500disk.rom", 0xc000, 0x4000, CRC(f7f5b0ea) SHA1(e93b8da1e8dddbb3742292b0e5e58731b90e9313))
@@ -2970,7 +2970,7 @@ MSX_LAYOUT_END
 /* MSX2 - Sony HB-F500P */
 
 ROM_START (hbf500p)
-	ROM_REGION (0x20000, "main", 0)
+	ROM_REGION (0x20000, "maincpu", 0)
 	ROM_LOAD ("500pbios.rom.ic41", 0x0000, 0x8000, CRC(b31c851d) SHA1(0de3c802057560560a03d7965fcc4cff69f8575c))
 	ROM_LOAD ("500pext.ic47", 0x8000, 0x8000, CRC(cdd4824a) SHA1(505031f1e8396a6e0cb11c1540e6e7f6999d1191))
 	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
@@ -2991,7 +2991,7 @@ MSX_LAYOUT_END
 /* MSX2 - Sony HB-F700D */
 
 ROM_START (hbf700d)
-	ROM_REGION (0x20000, "main", 0)
+	ROM_REGION (0x20000, "maincpu", 0)
 	ROM_LOAD ("700dbios.rom.ic5", 0x0000, 0x8000, CRC(e975aa79) SHA1(cef16eb95502ba6ab2265fcafcedde470a101541))
 	ROM_LOAD ("700dext.ic6", 0x8000, 0x8000, CRC(100cf756) SHA1(317722fa36c2ed31c07c5218b43490fd5badf1f8))
 	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
@@ -3011,7 +3011,7 @@ MSX_LAYOUT_END
 /* MSX2 - Sony HB-F700F */
 
 ROM_START (hbf700f)
-	ROM_REGION (0x20000, "main", 0)
+	ROM_REGION (0x20000, "maincpu", 0)
 	ROM_LOAD ("700fbios.ic5", 0x0000, 0x8000, CRC(440dae3c) SHA1(fedd9b682d056ddd1e9b3d281723e12f859b2e69))
 	ROM_LOAD ("700fext.ic6", 0x8000, 0x8000, CRC(7c8b07b1) SHA1(ecacb20ba0a9bbd25e8c0f128d64dd66f8cd8bee))
 	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
@@ -3031,7 +3031,7 @@ MSX_LAYOUT_END
 /* MSX2 - Sony HB-F700P */
 
 ROM_START (hbf700p)
-	ROM_REGION (0x20000, "main", 0)
+	ROM_REGION (0x20000, "maincpu", 0)
 	ROM_LOAD ("700pbios.rom.ic5", 0x0000, 0x8000, CRC(b31c851d) SHA1(0de3c802057560560a03d7965fcc4cff69f8575c))
 	ROM_LOAD ("700pext.ic6", 0x8000, 0x8000, CRC(63e1bffc) SHA1(496698a60432490dc1306c8cc1d4a6ded275261a))
 	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
@@ -3051,7 +3051,7 @@ MSX_LAYOUT_END
 /* MSX2 - Sony HB-F700S */
 
 ROM_START (hbf700s)
-	ROM_REGION (0x20000, "main", 0)
+	ROM_REGION (0x20000, "maincpu", 0)
 	ROM_LOAD ("700sbios.rom.ic5", 0x0000, 0x8000, CRC(c2b889a5) SHA1(4811956f878c3e03da46317f787cdc4bebc86f47))
 	ROM_LOAD ("700sext.ic6", 0x8000, 0x8000, CRC(28d1badf) SHA1(ae3ed88a2d7034178e08f7bdf5409f462bf67fc9))
 	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
@@ -3070,7 +3070,7 @@ MSX_LAYOUT_END
 
 /* MSX2 - Sony HB-F900 */
 ROM_START (hbf900)
-	ROM_REGION (0x44000, "main", 0)
+	ROM_REGION (0x44000, "maincpu", 0)
 	ROM_LOAD ("f900bios.rom", 0x0000, 0x8000, CRC(9b3e7b97) SHA1(0081ea0d25bc5cd8d70b60ad8cfdc7307812c0fd))
 	ROM_LOAD ("f900ext.rom", 0x8000, 0x4000, CRC(43e7a7fc) SHA1(0fbd45ef3dd7bb82d4c31f1947884f411f1ca344))
 	ROM_LOAD ("f900disk.rom", 0xc000, 0x4000, CRC(f83d0ea6) SHA1(fc760d1d7b16370abc7eea39955f230b95b37df6))
@@ -3094,7 +3094,7 @@ MSX_LAYOUT_END
 
 /* MSX2 - Sony HB-F900 (a) */
 ROM_START (hbf900a)
-	ROM_REGION (0x44000, "main", 0)
+	ROM_REGION (0x44000, "maincpu", 0)
 	ROM_LOAD ("f900bios.rom", 0x0000, 0x8000, CRC(9b3e7b97) SHA1(0081ea0d25bc5cd8d70b60ad8cfdc7307812c0fd))
 	ROM_LOAD ("f900ext.rom", 0x8000, 0x4000, CRC(43e7a7fc) SHA1(0fbd45ef3dd7bb82d4c31f1947884f411f1ca344))
 	ROM_LOAD ("f900disa.rom", 0xc000, 0x4000, CRC(54c73ad6) SHA1(12f2cc79b3d09723840bae774be48c0d721ec1c6))
@@ -3119,7 +3119,7 @@ MSX_LAYOUT_END
 /* MSX2 - Sony HB-F9P */
 
 ROM_START (hbf9p)
-	ROM_REGION (0x28000, "main", 0)
+	ROM_REGION (0x28000, "maincpu", 0)
 	ROM_LOAD ("f9pbios.rom.ic11", 0x0000, 0x8000, CRC(b31c851d) SHA1(0de3c802057560560a03d7965fcc4cff69f8575c))
 	ROM_LOAD ("f9pfirm1.ic12", 0x8000, 0x8000, CRC(524f67aa) SHA1(41a186afced50ca6312cb5b6c4adb684faca6232))
 	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
@@ -3142,7 +3142,7 @@ MSX_LAYOUT_END
 
 /* MSX2 - Sony HB-F9S */
 ROM_START (hbf9s)
-	ROM_REGION (0x28000, "main", 0)
+	ROM_REGION (0x28000, "maincpu", 0)
 	ROM_LOAD ("f9sbios.ic11", 0x0000, 0x8000, CRC(c2b889a5) SHA1(4811956f878c3e03da46317f787cdc4bebc86f47))
 	ROM_LOAD ("f9sfirm1.ic12", 0x8000, 0x8000, CRC(cf39620b) SHA1(1166a93d7185ba024bdf2bfa9a30e1c447fb6db1))
 	/* 0x10000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
@@ -3170,7 +3170,7 @@ MSX_LAYOUT_END
 
 /* MSX2 - Sony HB-G900AP */
 ROM_START (hbg900ap)
-	ROM_REGION (0x28000, "main", 0)
+	ROM_REGION (0x28000, "maincpu", 0)
 	ROM_LOAD ("g900bios.rom", 0x0000, 0x8000, CRC(b31c851d) SHA1(0de3c802057560560a03d7965fcc4cff69f8575c))
 	ROM_LOAD ("g900ext.rom", 0x8000, 0x4000, CRC(8f84f783) SHA1(3288894e1be6af705871499b23c85732dbc40993))
 	ROM_LOAD ("g900disk.rom", 0xc000, 0x4000, CRC(54c73ad6) SHA1(12f2cc79b3d09723840bae774be48c0d721ec1c6))
@@ -3196,7 +3196,7 @@ MSX_LAYOUT_END
 /* MSX2 - Sony HB-G900P - 3x 32KB ROMs */
 
 ROM_START (hbg900p)
-	ROM_REGION (0x28000, "main", 0)
+	ROM_REGION (0x28000, "maincpu", 0)
 	ROM_LOAD ("g900bios.rom", 0x0000, 0x8000, CRC(b31c851d) SHA1(0de3c802057560560a03d7965fcc4cff69f8575c))
 	ROM_LOAD ("g900ext.rom", 0x8000, 0x4000, CRC(8f84f783) SHA1(3288894e1be6af705871499b23c85732dbc40993))
 	ROM_LOAD ("g900disk.rom", 0xc000, 0x4000, CRC(54c73ad6) SHA1(12f2cc79b3d09723840bae774be48c0d721ec1c6))
@@ -3220,7 +3220,7 @@ MSX_LAYOUT_END
 
 /* MSX2 - Talent TPC-310 */
 ROM_START (tpc310)
-	ROM_REGION (0x2c000, "main", 0)
+	ROM_REGION (0x2c000, "maincpu", 0)
 	ROM_LOAD ("tpc310bios.rom",  0x0000, 0x8000, CRC(8cd3e845) SHA1(7bba23669b7abfb6a142f9e1735b847d6e4e8267))
 	ROM_LOAD ("tpc310ext.rom",   0x8000, 0x4000, CRC(094a9e7a) SHA1(39dfc46260f99b670916b1e55f67a5d4136e6e54))
 	ROM_LOAD ("dpf550disk.rom",  0xc000, 0x4000, CRC(347b1b44) SHA1(c1d83c559e1e6a6da961eafa55aab105681c634c))
@@ -3245,7 +3245,7 @@ MSX_LAYOUT_END
 /* MSX2 - Toshiba HX-23 */
 
 ROM_START (hx23)
-	ROM_REGION (0x30000, "main", 0)
+	ROM_REGION (0x30000, "maincpu", 0)
 	ROM_LOAD ("hx23bios.rom",  0x0000, 0x8000, CRC(6cdaf3a5) SHA1(6103b39f1e38d1aa2d84b1c3219c44f1abb5436e))
 	ROM_LOAD ("hx23ext.rom",   0x8000, 0x4000, CRC(06e4f5e6) SHA1(f5eb0a396097572589f2a6efeed045044e9425e4))
 	/* 0xc000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
@@ -3268,7 +3268,7 @@ MSX_LAYOUT_END
 /* MSX2 - Toshiba HX-23F */
 
 ROM_START (hx23f)
-	ROM_REGION (0x30000, "main", 0)
+	ROM_REGION (0x30000, "maincpu", 0)
 	ROM_LOAD ("hx23fbios.rom",  0x0000, 0x8000, CRC(6cdaf3a5) SHA1(6103b39f1e38d1aa2d84b1c3219c44f1abb5436e))
 	ROM_LOAD ("hx23fext.rom",   0x8000, 0x4000, CRC(06e4f5e6) SHA1(f5eb0a396097572589f2a6efeed045044e9425e4))
 	/* 0xc000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
@@ -3290,7 +3290,7 @@ MSX_LAYOUT_END
 /* MSX2 - Yamaha CX7M */
 
 ROM_START (cx7m)
-	ROM_REGION (0x28000, "main", 0)
+	ROM_REGION (0x28000, "maincpu", 0)
 	ROM_LOAD ("cx7mbios.rom",  0x0000, 0x8000, CRC(6cdaf3a5) SHA1(6103b39f1e38d1aa2d84b1c3219c44f1abb5436e))
 	ROM_LOAD ("cx7mext.rom",   0x8000, 0x4000, CRC(66237ecf) SHA1(5c1f9c7fb655e43d38e5dd1fcc6b942b2ff68b02))
 	/* 0xc000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
@@ -3311,7 +3311,7 @@ MSX_LAYOUT_END
 /* MSX2 - Yamaha CX7M-128 */
 
 ROM_START (cx7m128)
-	ROM_REGION (0x2c000, "main", 0)
+	ROM_REGION (0x2c000, "maincpu", 0)
 	ROM_LOAD ("cx7mbios.rom",  0x0000, 0x8000, CRC(6cdaf3a5) SHA1(6103b39f1e38d1aa2d84b1c3219c44f1abb5436e))
 	ROM_LOAD ("cx7mext.rom",   0x8000, 0x4000, CRC(66237ecf) SHA1(5c1f9c7fb655e43d38e5dd1fcc6b942b2ff68b02))
 	/* 0xc000 - 0x1ffff reserved for optional fmpac roms from msx2 parent set */
@@ -3336,7 +3336,7 @@ MSX_LAYOUT_END
 /* MSX2+ */
 
 ROM_START (msx2p)
-	ROM_REGION (0x48000, "main",0)
+	ROM_REGION (0x48000, "maincpu",0)
 	ROM_LOAD ("msx2p.rom", 0x0000, 0x8000, CRC(00870134) SHA1(e2fbd56e42da637609d23ae9df9efd1b4241b18a))
 	ROM_LOAD ("msx2pext.rom", 0x8000, 0x4000, CRC(b8ba44d3) SHA1(fe0254cbfc11405b79e7c86c7769bd6322b04995))
 	ROM_LOAD_OPTIONAL ("disk.rom", 0xc000, 0x4000, CRC(b7c58fad) SHA1(bc517b4a248c3a1338c5efc937b0128b6a783808))
@@ -3360,7 +3360,7 @@ MSX_LAYOUT_END
 /* MSX2+ - Panasonic FS-A1FX */
 
 ROM_START (fsa1fx)
-	ROM_REGION (0x50000, "main",0)
+	ROM_REGION (0x50000, "maincpu",0)
 	ROM_LOAD ("a1fxbios.rom", 0x0000, 0x8000, CRC(19771608) SHA1(e90f80a61d94c617850c415e12ad70ac41e66bb7))
 	ROM_LOAD ("a1fxext.rom", 0x8000, 0x4000, CRC(b8ba44d3) SHA1(fe0254cbfc11405b79e7c86c7769bd6322b04995))
 	ROM_LOAD ("a1fxdisk.rom", 0xc000, 0x4000, CRC(2bda0184) SHA1(2a0d228afde36ac7c5d3c2aac9c7c664dd071a8c))
@@ -3387,7 +3387,7 @@ MSX_LAYOUT_END
 /* MSX2+ - Panasonic FS-A1WSX */
 
 ROM_START (fsa1wsx)
-	ROM_REGION (0x270000, "main",0)
+	ROM_REGION (0x270000, "maincpu",0)
 	ROM_LOAD ("a1wsbios.rom", 0x0000, 0x8000, CRC(358ec547) SHA1(f4433752d3bf876bfefb363c749d4d2e08a218b6))
 	ROM_LOAD ("a1wsext.rom", 0x8000, 0x4000, CRC(b8ba44d3) SHA1(fe0254cbfc11405b79e7c86c7769bd6322b04995))
 	ROM_LOAD ("a1wsdisk.rom", 0xc000, 0x4000, CRC(ac7d92b4) SHA1(b7068e2aab02072852ca249596b7550ac632c4c2))
@@ -3417,7 +3417,7 @@ MSX_LAYOUT_END
 /* MSX2+ - Panasonic FS-A1WX */
 
 ROM_START (fsa1wx)
-	ROM_REGION (0x270000, "main",0)
+	ROM_REGION (0x270000, "maincpu",0)
 	ROM_LOAD ("a1wxbios.rom", 0x0000, 0x8000, CRC(19771608) SHA1(e90f80a61d94c617850c415e12ad70ac41e66bb7))
 	ROM_LOAD ("a1wxext.rom", 0x8000, 0x4000, CRC(b8ba44d3) SHA1(fe0254cbfc11405b79e7c86c7769bd6322b04995))
 	ROM_LOAD ("a1wxdisk.rom", 0xc000, 0x4000, CRC(2bda0184) SHA1(2a0d228afde36ac7c5d3c2aac9c7c664dd071a8c))
@@ -3446,7 +3446,7 @@ MSX_LAYOUT_END
 
 /* MSX2+ - Panasonic FS-A1WX (a) */
 ROM_START (fsa1wxa)
-	ROM_REGION (0x270000, "main",0)
+	ROM_REGION (0x270000, "maincpu",0)
 	ROM_LOAD ("a1wxbios.rom", 0x0000, 0x8000, CRC(19771608) SHA1(e90f80a61d94c617850c415e12ad70ac41e66bb7))
 	ROM_LOAD ("a1wxext.rom", 0x8000, 0x4000, CRC(b8ba44d3) SHA1(fe0254cbfc11405b79e7c86c7769bd6322b04995))
 	ROM_LOAD ("a1wxdisk.rom", 0xc000, 0x4000, CRC(2bda0184) SHA1(2a0d228afde36ac7c5d3c2aac9c7c664dd071a8c))
@@ -3476,7 +3476,7 @@ MSX_LAYOUT_END
 /* MSX2+ - Sanyo Wavy PHC-35J */
 
 ROM_START (phc35j)
-	ROM_REGION (0x48000, "main",0)
+	ROM_REGION (0x48000, "maincpu",0)
 	ROM_LOAD ("35jbios.rom", 0x0000, 0x8000, CRC(358ec547) SHA1(f4433752d3bf876bfefb363c749d4d2e08a218b6))
 	ROM_LOAD ("35jext.rom", 0x8000, 0x4000, CRC(b8ba44d3) SHA1(fe0254cbfc11405b79e7c86c7769bd6322b04995))
 	/* 0x0c000 - 0x1ffff reserved for optional disk and fmpac roms from msx2p parent set */
@@ -3499,7 +3499,7 @@ MSX_LAYOUT_END
 /* MSX2+ - Sanyo Wavy PHC-70FD1 */
 
 ROM_START (phc70fd)
-	ROM_REGION (0x50000, "main",0)
+	ROM_REGION (0x50000, "maincpu",0)
 	ROM_LOAD ("70fdbios.rom", 0x0000, 0x8000, CRC(19771608) SHA1(e90f80a61d94c617850c415e12ad70ac41e66bb7))
 	ROM_LOAD ("70fdext.rom", 0x8000, 0x4000, CRC(b8ba44d3) SHA1(fe0254cbfc11405b79e7c86c7769bd6322b04995))
 	ROM_LOAD ("70fddisk.rom", 0xc000, 0x4000, CRC(db7f1125) SHA1(9efa744be8355675e7bfdd3976bbbfaf85d62e1d))
@@ -3527,7 +3527,7 @@ MSX_LAYOUT_END
 
 /* MSX2+ - Sanyo Wavy PHC-70FD2 */
 ROM_START (phc70fd2)
-	ROM_REGION (0x70000, "main",0)
+	ROM_REGION (0x70000, "maincpu",0)
 	ROM_LOAD ("70f2bios.rom", 0x0000, 0x8000, CRC(19771608) SHA1(e90f80a61d94c617850c415e12ad70ac41e66bb7))
 	ROM_LOAD ("70f2ext.rom", 0x8000, 0x4000, CRC(b8ba44d3) SHA1(fe0254cbfc11405b79e7c86c7769bd6322b04995))
 	ROM_LOAD ("70f2disk.rom", 0xc000, 0x4000, CRC(db7f1125) SHA1(9efa744be8355675e7bfdd3976bbbfaf85d62e1d))
@@ -3556,7 +3556,7 @@ MSX_LAYOUT_END
 /* MSX2+ - Sony HB-F1XDJ */
 
 ROM_START (hbf1xdj)
-	ROM_REGION (0x170000, "main",0)
+	ROM_REGION (0x170000, "maincpu",0)
 	ROM_LOAD ("f1xjbios.rom", 0x0000, 0x8000, CRC(00870134) SHA1(e2fbd56e42da637609d23ae9df9efd1b4241b18a))
 	ROM_LOAD ("f1xjext.rom", 0x8000, 0x4000, CRC(b8ba44d3) SHA1(fe0254cbfc11405b79e7c86c7769bd6322b04995))
 	ROM_LOAD ("f1xjdisk.rom", 0xc000, 0x4000, CRC(a21f5266) SHA1(c1bb307a570ab833e3bfcc4a58a4f4e12dc1df0f))
@@ -3586,7 +3586,7 @@ MSX_LAYOUT_END
 /* MSX2+ - Sony HB-F1XV */
 
 ROM_START (hbf1xv)
-	ROM_REGION (0x170000, "main",0)
+	ROM_REGION (0x170000, "maincpu",0)
 	ROM_LOAD ("f1xvbios.rom", 0x0000, 0x8000, CRC(2c7ed27b) SHA1(174c9254f09d99361ff7607630248ff9d7d8d4d6))
 	ROM_LOAD ("f1xvext.rom", 0x8000, 0x4000, CRC(b8ba44d3) SHA1(fe0254cbfc11405b79e7c86c7769bd6322b04995))
 	ROM_LOAD ("f1xvdisk.rom", 0xc000, 0x4000, CRC(04e4e533) SHA1(5a4e7dbbfb759109c7d2a3b38bda9c60bf6ffef5))

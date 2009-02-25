@@ -142,7 +142,7 @@ MACHINE_START( dai )
 {
 	dai_tms5501 = devtag_get_device(machine, TMS5501, "tms5501");
 
-	memory_configure_bank(machine, 2, 0, 4, memory_region(machine, "main") + 0x010000, 0x1000);
+	memory_configure_bank(machine, 2, 0, 4, memory_region(machine, "maincpu") + 0x010000, 0x1000);
 }
 
 MACHINE_RESET( dai )

@@ -1234,7 +1234,7 @@ static void kc85_4_update_0x00000(running_machine *machine)
 	{
 		LOG(("no memory at ram0!\n"));
 
-//		memory_set_bankptr(machine, 1,memory_region(machine, "main") + 0x013000);
+//		memory_set_bankptr(machine, 1,memory_region(machine, "maincpu") + 0x013000);
 		/* ram is disabled */
 		memory_install_read8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_NOP);
 		memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_NOP);
@@ -1303,7 +1303,7 @@ static void kc85_4_update_0x0c000(running_machine *machine)
 		/* CAOS rom takes priority */
 		LOG(("CAOS rom 0x0c000\n"));
 
-		memory_set_bankptr(machine, 5,memory_region(machine, "main") + 0x012000);
+		memory_set_bankptr(machine, 5,memory_region(machine, "maincpu") + 0x012000);
 		rh = SMH_BANK5;
 	}
 	else if (kc85_pio_data[0] & (1<<7))
@@ -1311,7 +1311,7 @@ static void kc85_4_update_0x0c000(running_machine *machine)
 		/* BASIC takes next priority */
         	LOG(("BASIC rom 0x0c000\n"));
 
-        memory_set_bankptr(machine, 5, memory_region(machine, "main") + 0x010000);
+        memory_set_bankptr(machine, 5, memory_region(machine, "maincpu") + 0x010000);
 		rh = SMH_BANK5;
 	}
 	else
@@ -1345,7 +1345,7 @@ static void kc85_4_update_0x0e000(running_machine *machine)
 		/* enable CAOS rom in memory range 0x0e000-0x0ffff */
 		LOG(("CAOS rom 0x0e000\n"));
 		/* read will access the rom */
-		memory_set_bankptr(machine, 6,memory_region(machine, "main") + 0x013000);
+		memory_set_bankptr(machine, 6,memory_region(machine, "maincpu") + 0x013000);
 		rh = SMH_BANK6;
 	}
 	else
@@ -1461,7 +1461,7 @@ static void kc85_3_update_0x0c000(running_machine *machine)
 		/* BASIC takes next priority */
 		LOG(("BASIC rom 0x0c000\n"));
 
-		memory_set_bankptr(machine, 4, memory_region(machine, "main") + 0x010000);
+		memory_set_bankptr(machine, 4, memory_region(machine, "maincpu") + 0x010000);
 		rh = SMH_BANK4;
 	}
 	else
@@ -1484,7 +1484,7 @@ static void kc85_3_update_0x0e000(running_machine *machine)
 		/* enable CAOS rom in memory range 0x0e000-0x0ffff */
 		LOG(("CAOS rom 0x0e000\n"));
 
-		memory_set_bankptr(machine, 5,memory_region(machine, "main") + 0x012000);
+		memory_set_bankptr(machine, 5,memory_region(machine, "maincpu") + 0x012000);
         rh = SMH_BANK5;
 	}
 	else

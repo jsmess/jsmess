@@ -455,7 +455,7 @@ WRITE8_HANDLER ( mz700_bank_w )
     static int mz700_locked = 0;
 	static int vio_mode = 0;
 	static int vio_lock = 0;
-	UINT8 *mem = memory_region(space->machine, "main");
+	UINT8 *mem = memory_region(space->machine, "maincpu");
 
     switch (offset)
 	{
@@ -556,7 +556,7 @@ static UINT8 mz800_palette_bank;
         break;
 
 	default:
-		data = memory_region(space->machine, "main")[0x16000 + offset];
+		data = memory_region(space->machine, "maincpu")[0x16000 + offset];
         break;
     }
     return data;
@@ -565,7 +565,7 @@ static UINT8 mz800_palette_bank;
 /* port E0 - E9 */
 READ8_HANDLER( mz800_bank_r )
 {
-	UINT8 *mem = memory_region(space->machine, "main");
+	UINT8 *mem = memory_region(space->machine, "maincpu");
     UINT8 data = 0xff;
 
     switch (offset)
@@ -655,7 +655,7 @@ WRITE8_HANDLER( mz800_read_format_w )
  */
 WRITE8_HANDLER( mz800_display_mode_w )
 {
-	UINT8 *mem = memory_region(space->machine, "main");
+	UINT8 *mem = memory_region(space->machine, "maincpu");
 	LOG(1,"mz800_display_mode_w",("%02X\n", data),space->machine);
     mz800_display_mode = data;
 	if ((mz800_display_mode & 0x08) == 0)
@@ -683,7 +683,7 @@ WRITE8_HANDLER ( mz800_bank_w )
     static int mz800_locked = 0;
     static int vio_mode = 0;
     static int vio_lock = 0;
-    UINT8 *mem = memory_region(space->machine, "main");
+    UINT8 *mem = memory_region(space->machine, "maincpu");
 
     switch (offset)
     {
@@ -800,7 +800,7 @@ WRITE8_HANDLER( mz800_palette_w )
 
 DRIVER_INIT( mz800 )
 {
-	UINT8 *mem = memory_region(machine, "main");
+	UINT8 *mem = memory_region(machine, "maincpu");
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
 	videoram_size = 0x5000;

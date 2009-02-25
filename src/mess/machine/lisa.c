@@ -53,7 +53,7 @@
 static UINT8 *lisa_ram_ptr;
 static UINT8 *lisa_rom_ptr;
 
-/* offsets in "main" */
+/* offsets in "maincpu" */
 #define RAM_OFFSET 0x004000
 #define ROM_OFFSET 0x000000
 
@@ -1093,8 +1093,8 @@ NVRAM_HANDLER(lisa)
 
 DRIVER_INIT( lisa2 )
 {
-	lisa_ram_ptr = memory_region(machine, "main") + RAM_OFFSET;
-	lisa_rom_ptr = memory_region(machine, "main") + ROM_OFFSET;
+	lisa_ram_ptr = memory_region(machine, "maincpu") + RAM_OFFSET;
+	lisa_rom_ptr = memory_region(machine, "maincpu") + ROM_OFFSET;
 	lisa_model = lisa2;
 	lisa_features.has_fast_timers = 0;
 	lisa_features.floppy_hardware = sony_lisa2;
@@ -1106,8 +1106,8 @@ DRIVER_INIT( lisa2 )
 
 DRIVER_INIT( lisa210 )
 {
-	lisa_ram_ptr = memory_region(machine, "main") + RAM_OFFSET;
-	lisa_rom_ptr = memory_region(machine, "main") + ROM_OFFSET;
+	lisa_ram_ptr = memory_region(machine, "maincpu") + RAM_OFFSET;
+	lisa_rom_ptr = memory_region(machine, "maincpu") + ROM_OFFSET;
 	lisa_model = lisa210;
 	lisa_features.has_fast_timers = 1;
 	lisa_features.floppy_hardware = sony_lisa210;
@@ -1119,8 +1119,8 @@ DRIVER_INIT( lisa210 )
 
 DRIVER_INIT( mac_xl )
 {
-	lisa_ram_ptr = memory_region(machine, "main") + RAM_OFFSET;
-	lisa_rom_ptr = memory_region(machine, "main") + ROM_OFFSET;
+	lisa_ram_ptr = memory_region(machine, "maincpu") + RAM_OFFSET;
+	lisa_rom_ptr = memory_region(machine, "maincpu") + ROM_OFFSET;
 	lisa_model = mac_xl;
 	lisa_features.has_fast_timers = 1;
 	lisa_features.floppy_hardware = sony_lisa210;
@@ -1134,8 +1134,8 @@ MACHINE_RESET( lisa )
 {
 	mouse_timer = timer_alloc(machine, handle_mouse, NULL);
 
-	lisa_ram_ptr = memory_region(machine, "main") + RAM_OFFSET;
-	lisa_rom_ptr = memory_region(machine, "main") + ROM_OFFSET;
+	lisa_ram_ptr = memory_region(machine, "maincpu") + RAM_OFFSET;
+	lisa_rom_ptr = memory_region(machine, "maincpu") + ROM_OFFSET;
 
 	videoROM_ptr = memory_region(machine, "gfx1");
 

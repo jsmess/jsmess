@@ -330,7 +330,7 @@ static MACHINE_START( exidy )
 
 static MACHINE_RESET( exidyd )
 {
-	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* Initialize cassette interface */
 	cass_data.output.length = 0;
@@ -763,7 +763,7 @@ static const cassette_config exidy_cassette_config =
 
 static MACHINE_DRIVER_START( exidy )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 12638000/6)
+	MDRV_CPU_ADD("maincpu", Z80, 12638000/6)
 	MDRV_CPU_PROGRAM_MAP(exidy_mem, 0)
 	MDRV_CPU_IO_MAP(exidy_io, 0)
 
@@ -813,7 +813,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( exidyd )
 	MDRV_IMPORT_FROM( exidy )
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(exidyd_mem, 0)
 
 	MDRV_MACHINE_START( exidyd )
@@ -822,7 +822,7 @@ MACHINE_DRIVER_END
 
 static DRIVER_INIT( exidy )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(machine, "maincpu");
 	memory_configure_bank(machine, 1, 0, 2, &RAM[0x0000], 0xe000);
 }
 
@@ -833,7 +833,7 @@ static DRIVER_INIT( exidy )
 ***************************************************************************/
 
 ROM_START(exidy)
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("exmo1-1.dat", 0xe000, 0x0800, CRC(ac924f67) SHA1(72fcad6dd1ed5ec0527f967604401284d0e4b6a1) ) /* monitor roms */
 	ROM_LOAD("exmo1-2.dat", 0xe800, 0x0800, CRC(ead1d0f6) SHA1(c68bed7344091bca135e427b4793cc7d49ca01be) )
 	ROM_LOAD("exchr-1.dat", 0xf800, 0x0400, CRC(4a7e1cdd) SHA1(2bf07a59c506b6e0c01ec721fb7b747b20f5dced) ) /* char rom */
@@ -845,7 +845,7 @@ ROM_START(exidy)
 ROM_END
 
 ROM_START(exidyd)
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("exmo1-1.dat", 0xe000, 0x0800, CRC(ac924f67) SHA1(72fcad6dd1ed5ec0527f967604401284d0e4b6a1) ) /* monitor roms */
 	ROM_LOAD("exmo1-2.dat", 0xe800, 0x0800, CRC(ead1d0f6) SHA1(c68bed7344091bca135e427b4793cc7d49ca01be) )
 	ROM_LOAD("exchr-1.dat", 0xf800, 0x0400, CRC(4a7e1cdd) SHA1(2bf07a59c506b6e0c01ec721fb7b747b20f5dced) ) /* char rom */
@@ -857,7 +857,7 @@ ROM_END
 
 static Z80BIN_EXECUTE( exidy )
 {
-	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	if ((execute_address >= 0xc000) && (execute_address <= 0xdfff) && (memory_read_byte(space, 0xdffa) != 0xc3))
 		return;					/* can't run a program if the cartridge isn't in */
@@ -891,12 +891,12 @@ static Z80BIN_EXECUTE( exidy )
 		if ((execute_address != 0xc858) && autorun)
 			memory_write_word_16le(space, 0xf028, execute_address);
 
-		cpu_set_reg(cputag_get_cpu(machine, "main"), REG_GENPC, 0xf01f);
+		cpu_set_reg(cputag_get_cpu(machine, "maincpu"), REG_GENPC, 0xf01f);
 	}
 	else
 	{
 		if (autorun)
-			cpu_set_reg(cputag_get_cpu(machine, "main"), REG_GENPC, execute_address);
+			cpu_set_reg(cputag_get_cpu(machine, "maincpu"), REG_GENPC, execute_address);
 	}
 }
 

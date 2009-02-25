@@ -184,7 +184,7 @@ static const cassette_config dai_cassette_config =
 /* machine definition */
 static MACHINE_DRIVER_START( dai )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", 8080, 2000000)
+	MDRV_CPU_ADD("maincpu", 8080, 2000000)
 	MDRV_CPU_PROGRAM_MAP(dai_mem, 0)
 	MDRV_CPU_IO_MAP(dai_io, 0)
 	MDRV_QUANTUM_TIME(HZ(60))
@@ -228,7 +228,7 @@ MACHINE_DRIVER_END
 #define io_dai		io_NULL
 
 ROM_START(dai)
-	ROM_REGION(0x14000,"main",0)
+	ROM_REGION(0x14000,"maincpu",0)
 	ROM_LOAD("dai.bin", 0xc000, 0x2000, CRC(ca71a7d5) SHA1(6bbe2336c717354beab2ae201debeb4fd055bdcb))
 	ROM_LOAD("dai00.bin", 0x10000, 0x1000, CRC(fa7d39ac) SHA1(3d1824a1f273882f934249ef3cb1b38ef99de7b9))
 	ROM_LOAD("dai01.bin", 0x11000, 0x1000, CRC(cb5809f2) SHA1(523656f0a9d98888cd3e2bd66886c589e9ae75b4))

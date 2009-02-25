@@ -125,7 +125,7 @@ static ADDRESS_MAP_START( mz80k_io, ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 ROM_START (mz80k)
-	ROM_REGION(0x10000,"main",0)
+	ROM_REGION(0x10000,"maincpu",0)
 	ROM_SYSTEM_BIOS(0, "sp1002", "sp1002")
 	ROMX_LOAD("sp1002.rom",    0x0000, 0x1000, CRC(2223e677) SHA1(518ffbe2333582ab36e6d76d1e03879a246ffa1c), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "tc", "tc")
@@ -136,7 +136,7 @@ ROM_START (mz80k)
 ROM_END
 
 ROM_START (mz80kj)
-	ROM_REGION(0x10000,"main",0)
+	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD ("sp1002.rom",    0x0000, 0x1000, CRC(2223e677) SHA1(518ffbe2333582ab36e6d76d1e03879a246ffa1c))
 	// TC monitor not possible to be used on japanese version since chargen doesn't have upcase/lowecase, but japanese letters
 	ROM_LOAD ("mz80kfdif.rom", 0xf000, 0x0400, CRC(d36505e0) SHA1(1f60027e8739313962a37edbf98172df7062df49))
@@ -163,7 +163,7 @@ static MACHINE_DRIVER_START( mz80k )
 	/* basic machine hardware */
 
 	/* main CPU */
-	MDRV_CPU_ADD("main", Z80, 2000000)        /* 2 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, 2000000)        /* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(mz80k_mem, 0)
 	MDRV_CPU_IO_MAP(mz80k_io, 0)
 

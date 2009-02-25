@@ -32,7 +32,7 @@ ADDRESS_MAP_END
 
 static MACHINE_DRIVER_START( apple3 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, 2000000)        /* 2 MHz */
+	MDRV_CPU_ADD("maincpu", M6502, 2000000)        /* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(apple3_map, 0)
 	MDRV_CPU_PERIODIC_INT(apple3_interrupt, 192)
 	MDRV_QUANTUM_TIME(HZ(60))
@@ -145,7 +145,7 @@ static INPUT_PORTS_START( apple3 )
 INPUT_PORTS_END
 
 ROM_START(apple3)
-    ROM_REGION(0x1000,"main",0)
+    ROM_REGION(0x1000,"maincpu",0)
 	ROM_LOAD( "apple3.rom", 0x0000, 0x1000, CRC(55e8eec9) SHA1(579ee4cd2b208d62915a0aa482ddc2744ff5e967))
 ROM_END
 

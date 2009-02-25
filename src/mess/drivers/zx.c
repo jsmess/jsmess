@@ -341,11 +341,11 @@ static const gfx_layout zx_char_layout =
 /* Graphics Decode Information */
 
 static GFXDECODE_START( zx80 )
-	GFXDECODE_ENTRY( "main", 0x0e00, zx_char_layout, 0, 2 )
+	GFXDECODE_ENTRY( "maincpu", 0x0e00, zx_char_layout, 0, 2 )
 GFXDECODE_END
 
 static GFXDECODE_START( zx81 )
-	GFXDECODE_ENTRY( "main", 0x1e00, zx_char_layout, 0, 2 )
+	GFXDECODE_ENTRY( "maincpu", 0x1e00, zx_char_layout, 0, 2 )
 GFXDECODE_END
 
 static GFXDECODE_START( pc8300 )
@@ -410,7 +410,7 @@ static const cassette_config zx81_cassette_config =
 
 static MACHINE_DRIVER_START( zx80 )
 	// basic machine hardware
-	MDRV_CPU_ADD("main", Z80, ZX81_CPU_CLOCK)
+	MDRV_CPU_ADD("maincpu", Z80, ZX81_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(zx80_map, 0)
 	MDRV_CPU_IO_MAP(zx80_io_map, 0)
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -445,7 +445,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( zx81 )
 	MDRV_IMPORT_FROM(zx80)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(zx81_io_map, 0)
 
 	MDRV_GFXDECODE(zx81)
@@ -462,7 +462,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( pc8300 )
 	MDRV_IMPORT_FROM(zx81)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(pc8300_io_map, 0)
 
 	MDRV_MACHINE_RESET(pc8300)
@@ -479,7 +479,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( pow3000 )
 	MDRV_IMPORT_FROM(zx81)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(pow3000_io_map, 0)
 
 	MDRV_MACHINE_RESET(pow3000)
@@ -491,7 +491,7 @@ MACHINE_DRIVER_END
 /* ROMs */
 
 ROM_START(zx80)
-	ROM_REGION( 0x10000, "main",0 )
+	ROM_REGION( 0x10000, "maincpu",0 )
 	ROM_SYSTEM_BIOS(0, "default", "BASIC")
 	ROMX_LOAD( "zx80.rom",   0x0000, 0x1000, CRC(4c7fc597) SHA1(b6769a3197c77009e0933e038c15b43cf4c98c7a), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(1, "aszmic", "ASZMIC")
@@ -499,7 +499,7 @@ ROM_START(zx80)
 ROM_END
 
 ROM_START(zx81)
-	ROM_REGION( 0x10000, "main",0 )
+	ROM_REGION( 0x10000, "maincpu",0 )
 	ROM_SYSTEM_BIOS(0, "3rd", "3rd rev.")
 	ROMX_LOAD( "zx81b.rom",   0x0000, 0x2000, CRC(522c37b8) SHA1(c6d8e06cb936989f6e1cc7a56d1f092da854a515), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(1, "1st", "1st rev.")
@@ -513,12 +513,12 @@ ROM_START(zx81)
 ROM_END
 
 ROM_START(ts1000)
-	ROM_REGION( 0x10000, "main",0 )
+	ROM_REGION( 0x10000, "maincpu",0 )
 	ROM_LOAD( "zx81a.rom", 0x0000, 0x2000, CRC(4b1dd6eb) SHA1(7b143ee964e9ada89d1f9e88f0bd48d919184cfc) )
 ROM_END
 
 ROM_START(pc8300)
-	ROM_REGION( 0x10000, "main",0 )
+	ROM_REGION( 0x10000, "maincpu",0 )
 	ROM_LOAD( "8300_org.rom", 0x0000, 0x2000, CRC(a350f2b1) SHA1(6a9be484556cc27a9cd9d71085d2027c6243333f) )
 
 	ROM_REGION( 0x200, "gfx1", 0 )
@@ -526,7 +526,7 @@ ROM_START(pc8300)
 ROM_END
 
 ROM_START(pow3000)
-	ROM_REGION( 0x10000, "main",0 )
+	ROM_REGION( 0x10000, "maincpu",0 )
 	ROM_LOAD("pow3000.rom", 0x0000, 0x2000, CRC(8a49b2c3) SHA1(9b22daf2f3a991aa6a358ef95b091654c3ca1bdf) )
 
 	ROM_REGION( 0x200, "gfx1", 0 )
@@ -534,7 +534,7 @@ ROM_START(pow3000)
 ROM_END
 
 ROM_START(lambda)
-	ROM_REGION( 0x10000, "main",0 )
+	ROM_REGION( 0x10000, "maincpu",0 )
 	ROM_LOAD("lambda.rom", 0x0000, 0x2000, CRC(8a49b2c3) SHA1(9b22daf2f3a991aa6a358ef95b091654c3ca1bdf) )
 
 	ROM_REGION( 0x200, "gfx1", 0 )

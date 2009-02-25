@@ -28,7 +28,7 @@ static ADDRESS_MAP_START( mc10_mem, ADDRESS_SPACE_PROGRAM, 8 )
 //  AM_RANGE(0x4000, 0x8fff) AM_RAM /* RAM, 4k or 20k total */
 	AM_RANGE(0x9000, 0xbffe) AM_NOP /* unused */
 	AM_RANGE(0xbfff, 0xbfff) AM_READWRITE(mc10_bfff_r, mc10_bfff_w)
-	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("main", 0x0000) /* ROM */
+	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("maincpu", 0x0000) /* ROM */
 ADDRESS_MAP_END
 
 
@@ -215,7 +215,7 @@ static const cassette_config mc10_cassette_config =
 
 static MACHINE_DRIVER_START( mc10 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6803, XTAL_3_579545MHz)  /* 0,894886 MHz */
+	MDRV_CPU_ADD("maincpu", M6803, XTAL_3_579545MHz)  /* 0,894886 MHz */
 	MDRV_CPU_PROGRAM_MAP(mc10_mem, 0)
 	MDRV_CPU_IO_MAP(mc10_io, 0)
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -246,13 +246,13 @@ MACHINE_DRIVER_END
 
 
 ROM_START(mc10)
-	ROM_REGION(0x2000, "main", 0)
+	ROM_REGION(0x2000, "maincpu", 0)
 	ROM_LOAD("mc10.rom", 0x0000, 0x2000, CRC(11fda97e) SHA1(4afff2b4c120334481aab7b02c3552bf76f1bc43))
 ROM_END
 
 
 ROM_START(alice)
-	ROM_REGION(0x2000, "main", 0)
+	ROM_REGION(0x2000, "maincpu", 0)
 	ROM_LOAD("alice.rom", 0x0000, 0x2000, CRC(f876abe9) SHA1(c2166b91e6396a311f486832012aa43e0d2b19f8))
 ROM_END
 

@@ -384,10 +384,10 @@ static const ay8910_interface cgenie_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_MEMORY_HANDLER("main", PROGRAM, cgenie_psg_port_a_r),
-	DEVCB_MEMORY_HANDLER("main", PROGRAM, cgenie_psg_port_b_r),
-	DEVCB_MEMORY_HANDLER("main", PROGRAM, cgenie_psg_port_a_w),
-	DEVCB_MEMORY_HANDLER("main", PROGRAM, cgenie_psg_port_b_w)
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, cgenie_psg_port_a_r),
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, cgenie_psg_port_b_r),
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, cgenie_psg_port_a_w),
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, cgenie_psg_port_b_w)
 };
 
 
@@ -400,7 +400,7 @@ static const cassette_config cgenie_cassette_config =
 
 static MACHINE_DRIVER_START( cgenie )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 2216800)        /* 2,2168 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, 2216800)        /* 2,2168 MHz */
 	MDRV_CPU_PROGRAM_MAP(cgenie_mem, 0)
 	MDRV_CPU_IO_MAP(cgenie_io, 0)
 	MDRV_CPU_VBLANK_INT("screen", cgenie_frame_interrupt)
@@ -449,7 +449,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START (cgenie)
-	ROM_REGION(0x13000,"main",0)
+	ROM_REGION(0x13000,"maincpu",0)
 	ROM_LOAD ("cgenie.rom",  0x00000, 0x4000, CRC(d359ead7) SHA1(d8c2fc389ad38c45fba0ed556a7d91abac5463f4))
 	ROM_LOAD ("cgdos.rom",   0x10000, 0x2000, CRC(2a96cf74) SHA1(6dcac110f87897e1ee7521aefbb3d77a14815893))
 	ROM_CART_LOAD("cart", 0x12000, 0x1000, ROM_NOMIRROR | ROM_OPTIONAL)

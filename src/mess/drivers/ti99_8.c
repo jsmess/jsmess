@@ -426,7 +426,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START(ti99_8_60hz)
 	/* basic machine hardware */
 	/* TMS9995-MP9537 CPU @ 10.7 MHz */
-	MDRV_CPU_ADD("main", TMS9995, 10738635)
+	MDRV_CPU_ADD("maincpu", TMS9995, 10738635)
 	MDRV_CPU_CONFIG(ti99_8_processor_config)
 	MDRV_CPU_PROGRAM_MAP(ti99_8_memmap, 0)
 	MDRV_CPU_IO_MAP(ti99_8_readcru, ti99_8_writecru)
@@ -472,7 +472,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START(ti99_8_50hz)
 	/* basic machine hardware */
 	/* TMS9995-MP9537 CPU @ 10.7 MHz */
-	MDRV_CPU_ADD("main", TMS9995, 10738635)
+	MDRV_CPU_ADD("maincpu", TMS9995, 10738635)
 	MDRV_CPU_CONFIG(ti99_8_processor_config)
 	MDRV_CPU_PROGRAM_MAP(ti99_8_memmap, 0)
 	MDRV_CPU_IO_MAP(ti99_8_readcru, ti99_8_writecru)
@@ -519,7 +519,7 @@ MACHINE_DRIVER_END
 */
 ROM_START(ti99_8)
 	/*CPU memory space*/
-	ROM_REGION(region_cpu1_len_8,"main",0)
+	ROM_REGION(region_cpu1_len_8,"maincpu",0)
 	ROM_LOAD("998rom.bin", 0x0000, 0x8000, NO_DUMP)		/* system ROMs */
 
 	/*GROM memory space*/

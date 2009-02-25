@@ -53,13 +53,13 @@ static DEVICE_IMAGE_LOAD( apexc_cylinder )
 	if (apexc_cylinder.fd)
 	{	/* load RAM contents */
 
-		image_fread(apexc_cylinder.fd, memory_region(image->machine, "main"), /*0x8000*/0x1000);
+		image_fread(apexc_cylinder.fd, memory_region(image->machine, "maincpu"), /*0x8000*/0x1000);
 #ifdef LSB_FIRST
 		{	/* fix endianness */
 			UINT32 *RAM;
 			int i;
 
-			RAM = (UINT32 *) memory_region(image->machine, "main");
+			RAM = (UINT32 *) memory_region(image->machine, "maincpu");
 
 			for (i=0; i < /*0x2000*/0x0400; i++)
 				RAM[i] = BIG_ENDIANIZE_INT32(RAM[i]);
@@ -84,14 +84,14 @@ static DEVICE_IMAGE_UNLOAD( apexc_cylinder )
 			UINT32 *RAM;
 			int i;
 
-			RAM = (UINT32 *) memory_region(image->machine, "main");
+			RAM = (UINT32 *) memory_region(image->machine, "maincpu");
 
 			for (i=0; i < /*0x2000*/0x0400; i++)
 				RAM[i] = BIG_ENDIANIZE_INT32(RAM[i]);
 		}
 #endif
 		/* write */
-		image_fwrite(apexc_cylinder.fd, memory_region(image->machine, "main"), /*0x8000*/0x1000);
+		image_fwrite(apexc_cylinder.fd, memory_region(image->machine, "maincpu"), /*0x8000*/0x1000);
 	}
 }
 
@@ -797,7 +797,7 @@ static MACHINE_DRIVER_START(apexc)
 
 	/* basic machine hardware */
 	/* APEXC CPU @ 2.0 kHz (memory word clock frequency) */
-	MDRV_CPU_ADD("main", APEXC, 2000)
+	MDRV_CPU_ADD("maincpu", APEXC, 2000)
 	/*MDRV_CPU_CONFIG(NULL)*/
 	MDRV_CPU_PROGRAM_MAP(apexc_mem_map, 0)
 	MDRV_CPU_IO_MAP(apexc_io_map, 0)
@@ -826,7 +826,7 @@ MACHINE_DRIVER_END
 
 ROM_START(apexc)
 	/*CPU memory space*/
-	ROM_REGION32_BE(0x10000, "main", ROMREGION_ERASEFF)
+	ROM_REGION32_BE(0x10000, "maincpu", ROMREGION_ERASEFF)
 		/* Note this computer has no ROM... */
 
 	ROM_REGION(apexcfontdata_size, "gfx1", ROMREGION_ERASEFF)

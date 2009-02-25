@@ -408,8 +408,8 @@ static MACHINE_RESET( avigo )
 	memset(avigo_banked_opbase, 0, sizeof(avigo_banked_opbase));
 
 	/* initialise flash memory */
-	intelflash_init(machine, 0, FLASH_INTEL_E28F008SA, memory_region(machine, "main")+0x10000);
-	intelflash_init(machine, 1, FLASH_INTEL_E28F008SA, memory_region(machine, "main")+0x110000);
+	intelflash_init(machine, 0, FLASH_INTEL_E28F008SA, memory_region(machine, "maincpu")+0x10000);
+	intelflash_init(machine, 1, FLASH_INTEL_E28F008SA, memory_region(machine, "maincpu")+0x110000);
 	intelflash_init(machine, 2, FLASH_INTEL_E28F008SA, NULL);
 
 	stylus_marker_x = AVIGO_SCREEN_WIDTH>>1;
@@ -858,7 +858,7 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( avigo )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 4000000)
+	MDRV_CPU_ADD("maincpu", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(avigo_mem, 0)
 	MDRV_CPU_IO_MAP(avigo_io, 0)
 	MDRV_QUANTUM_TIME(HZ(60))
@@ -900,7 +900,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START(avigo)
-	ROM_REGION(0x210000, "main",0)
+	ROM_REGION(0x210000, "maincpu",0)
 	ROM_LOAD("avigo.rom", 0x010000, 0x0150000, CRC(160ee4a6) SHA1(4d09201a3876de16808bd92989f3d8d7182d72b3))
 ROM_END
 

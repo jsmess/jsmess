@@ -176,7 +176,7 @@ static const via6522_interface aim65_system_via =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_HANDLER(aim65_printer_on),
-	DEVCB_CPU_INPUT_LINE("main", M6502_IRQ_LINE)
+	DEVCB_CPU_INPUT_LINE("maincpu", M6502_IRQ_LINE)
 };
 
 /* user via interface */
@@ -184,7 +184,7 @@ static const via6522_interface aim65_user_via =
 {
 	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	DEVCB_CPU_INPUT_LINE("main", M6502_IRQ_LINE)
+	DEVCB_CPU_INPUT_LINE("maincpu", M6502_IRQ_LINE)
 };
 
 /******************************************************************************
@@ -193,7 +193,7 @@ static const via6522_interface aim65_user_via =
 
 static MACHINE_DRIVER_START( aim65 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, AIM65_CLOCK) /* 1 MHz */
+	MDRV_CPU_ADD("maincpu", M6502, AIM65_CLOCK) /* 1 MHz */
 	MDRV_CPU_PROGRAM_MAP(aim65_mem, 0)
 
 	MDRV_MACHINE_START(aim65)
@@ -233,7 +233,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( aim65 )
-	ROM_REGION(0x10000, "main", 0)
+	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_CART_LOAD("cart1", 0xb000, 0x1000, ROM_OPTIONAL)
 	ROM_CART_LOAD("cart2", 0xc000, 0x1000, ROM_OPTIONAL)
 	ROM_CART_LOAD("cart3", 0xd000, 0x1000, ROM_OPTIONAL)

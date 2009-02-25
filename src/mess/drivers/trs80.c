@@ -380,7 +380,7 @@ static const cassette_config trs80l2_cassette_config =
 
 static MACHINE_DRIVER_START( level1 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 1796000)        /* 1.796 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, 1796000)        /* 1.796 MHz */
 	MDRV_CPU_PROGRAM_MAP(mem_level1, 0)
 	MDRV_CPU_IO_MAP(io_level1, 0)
 	MDRV_CPU_VBLANK_INT("screen", trs80_frame_interrupt)
@@ -419,7 +419,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( model1 )
 	MDRV_IMPORT_FROM( level1 )
-	MDRV_CPU_MODIFY( "main" )
+	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP( mem_model1, 0 )
 	MDRV_CPU_IO_MAP( io_model1, 0 )
 
@@ -429,7 +429,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( model3 )
 	MDRV_IMPORT_FROM( level1 )
-	MDRV_CPU_MODIFY( "main" )
+	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP( mem_model3, 0 )
 	MDRV_CPU_IO_MAP( io_model3, 0 )
 	MDRV_CPU_VBLANK_INT_HACK(trs80_frame_interrupt, 2)
@@ -454,7 +454,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START(trs80)
-	ROM_REGION(0x10000, "main",0)
+	ROM_REGION(0x10000, "maincpu",0)
 	ROM_LOAD("level1.rom",  0x0000, 0x1000, CRC(70d06dff) SHA1(20d75478fbf42214381e05b14f57072f3970f765))
 
 	ROM_REGION(0x00c00, "gfx1",0)
@@ -462,7 +462,7 @@ ROM_START(trs80)
 ROM_END
 
 ROM_START(trs80l2)
-	ROM_REGION(0x10000, "main",0)
+	ROM_REGION(0x10000, "maincpu",0)
 	ROM_SYSTEM_BIOS(0, "level2", "Radio Shack Level II Basic")
 	ROMX_LOAD("trs80.z33",   0x0000, 0x1000, CRC(37c59db2) SHA1(e8f8f6a4460a6f6755873580be6ff70cebe14969), ROM_BIOS(1))
 	ROMX_LOAD("trs80.z34",   0x1000, 0x1000, CRC(05818718) SHA1(43c538ca77623af6417474ca5b95fb94205500c1), ROM_BIOS(1))
@@ -477,7 +477,7 @@ ROM_START(trs80l2)
 ROM_END
 
 ROM_START(radionic)
-	ROM_REGION(0x10000, "main",0)
+	ROM_REGION(0x10000, "maincpu",0)
 	ROM_LOAD("ep1.bin",0x0000, 0x1000, CRC(e8908f44) SHA1(7a5a60c3afbeb6b8434737dd302332179a7fca59))
 	ROM_LOAD("ep2.bin",0x1000, 0x1000, CRC(46e88fbf) SHA1(a3ca32757f269e09316e1e91ba1502774e2f5155))
 	ROM_LOAD("ep3.bin",0x2000, 0x1000, CRC(306e5d66) SHA1(1e1abcfb5b02d4567cf6a81ffc35318723442369))
@@ -491,7 +491,7 @@ ROM_START(radionic)
 ROM_END
 
 ROM_START(sys80)
-	ROM_REGION(0x10000, "main",0)
+	ROM_REGION(0x10000, "maincpu",0)
 	ROM_LOAD("sys80rom.1",  0x0000, 0x1000, CRC(8f5214de) SHA1(d8c052be5a2d0ec74433043684791d0554bf203b))
 	ROM_LOAD("sys80rom.2",  0x1000, 0x1000, CRC(46e88fbf) SHA1(a3ca32757f269e09316e1e91ba1502774e2f5155))
 	ROM_LOAD("trs80.zl2",  0x2000, 0x1000, CRC(306e5d66) SHA1(1e1abcfb5b02d4567cf6a81ffc35318723442369))
@@ -501,7 +501,7 @@ ROM_START(sys80)
 ROM_END
 
 ROM_START(lnw80)
-	ROM_REGION(0x10000, "main",0)
+	ROM_REGION(0x10000, "maincpu",0)
 	ROM_LOAD("lnw_a.bin",  0x0000, 0x0800, CRC(e09f7e91) SHA1(cd28e72efcfebde6cf1c7dbec4a4880a69e683da))
 	ROM_LOAD("lnw_a1.bin", 0x0800, 0x0800, CRC(ac297d99) SHA1(ccf31d3f9d02c3b68a0ee3be4984424df0e83ab0))
 	ROM_LOAD("lnw_b.bin",  0x1000, 0x0800, CRC(c4303568) SHA1(13e3d81c6f0de0e93956fa58c465b5368ea51682))
@@ -515,7 +515,7 @@ ROM_START(lnw80)
 ROM_END
 
 ROM_START(trs80m3)
-	ROM_REGION(0x10000, "main",0)
+	ROM_REGION(0x10000, "maincpu",0)
 	ROM_LOAD("trs80m3.rom", 0x0000, 0x3800, CRC(bddbf843) SHA1(04a1f062cf73c3931c038434e3f299482b6bf613))
 
 	ROM_REGION(0x00c00, "gfx1",0)
@@ -523,7 +523,7 @@ ROM_START(trs80m3)
 ROM_END
 
 ROM_START(trs80m4)
-	ROM_REGION(0x10000, "main",0)
+	ROM_REGION(0x10000, "maincpu",0)
 	ROM_LOAD("trs80m4.rom", 0x0000, 0x3800, CRC(1a92d54d) SHA1(752555fdd0ff23abc9f35c6e03d9d9b4c0e9677b))
 
 	ROM_REGION(0x00c00, "gfx1",0)
@@ -532,21 +532,21 @@ ROM_START(trs80m4)
 ROM_END
 
 ROM_START(ht1080z)
-	ROM_REGION(0x10000, "main",0)
+	ROM_REGION(0x10000, "maincpu",0)
 	ROM_LOAD("ht1080z.rom", 0x0000, 0x3000, CRC(2bfef8f7) SHA1(7a350925fd05c20a3c95118c1ae56040c621be8f))
 	ROM_REGION(0x00800, "gfx1",0)
 	ROM_LOAD("ht1080-1.chr", 0x0000, 0x0800, CRC(e8c59d4f) SHA1(a15f30a543e53d3e30927a2e5b766fcf80f0ae31))
 ROM_END
 
 ROM_START(ht1080z2)
-	ROM_REGION(0x10000, "main",0)
+	ROM_REGION(0x10000, "maincpu",0)
 	ROM_LOAD("ht1080z.rom", 0x0000, 0x3000, CRC(2bfef8f7) SHA1(7a350925fd05c20a3c95118c1ae56040c621be8f))
 	ROM_REGION(0x00800, "gfx1",0)
 	ROM_LOAD("ht1080-2.chr", 0x0000, 0x0800, CRC(6728f0ab) SHA1(1ba949f8596f1976546f99a3fdcd3beb7aded2c5))
 ROM_END
 
 ROM_START(ht108064)
-	ROM_REGION(0x10000, "main",0)
+	ROM_REGION(0x10000, "maincpu",0)
 	ROM_LOAD("ht1080z.64", 0x0000, 0x3000, CRC(48985a30) SHA1(e84cf3121f9e0bb9e1b01b095f7a9581dcfaaae4))
 	ROM_LOAD("ht1080z.ext", 0x3000, 0x0800, CRC(fc12bd28) SHA1(0da93a311f99ec7a1e77486afe800a937778e73b))
 	ROM_REGION(0x00800, "gfx1",0)

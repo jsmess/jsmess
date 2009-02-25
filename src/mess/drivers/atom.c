@@ -260,7 +260,7 @@ static const centronics_interface atom_centronics_config =
 /* machine definition */
 static MACHINE_DRIVER_START( atom )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M65C02, 1000000)        /* 0,894886 MHz */
+	MDRV_CPU_ADD("maincpu", M65C02, 1000000)        /* 0,894886 MHz */
 	MDRV_CPU_PROGRAM_MAP(atom_mem, 0)
 
 	MDRV_MACHINE_RESET( atom )
@@ -301,7 +301,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( atomeb )
 	MDRV_IMPORT_FROM( atom )
-	MDRV_CPU_MODIFY( "main" )
+	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP(atomeb_mem, 0 )
 
 	MDRV_MACHINE_RESET( atomeb )
@@ -309,7 +309,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START (atom)
-	ROM_REGION (0x10000, "main",0)
+	ROM_REGION (0x10000, "maincpu",0)
 	ROM_LOAD ("akernel.rom", 0xf000, 0x1000, CRC(c604db3d) SHA1(2621f27d652d4673e0a79aa669e729b8c3051ab6))
 	ROM_LOAD ("dosrom.rom", 0xe000, 0x1000, CRC(c431a9b7) SHA1(71ea0a4b8d9c3caf9718fc7cc279f4306a23b39c))
 	ROM_LOAD ("afloat.rom", 0xd000, 0x1000, CRC(81d86af7) SHA1(ebcde5b36cb3a3344567cbba4c7b9fde015f4802))
@@ -317,7 +317,7 @@ ROM_START (atom)
 ROM_END
 
 ROM_START (atomeb)
-	ROM_REGION (0x10000+0x09000, "main",0)
+	ROM_REGION (0x10000+0x09000, "maincpu",0)
 	ROM_LOAD ("akernel.rom", 0xf000, 0x1000, CRC(c604db3d) SHA1(2621f27d652d4673e0a79aa669e729b8c3051ab6))
 	ROM_LOAD ("dosrom.rom", 0xe000, 0x1000, CRC(c431a9b7) SHA1(71ea0a4b8d9c3caf9718fc7cc279f4306a23b39c))
 	ROM_LOAD ("afloat.rom", 0xd000, 0x1000, CRC(81d86af7) SHA1(ebcde5b36cb3a3344567cbba4c7b9fde015f4802))

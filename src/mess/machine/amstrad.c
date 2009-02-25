@@ -1315,7 +1315,7 @@ VIDEO_UPDATE( amstrad )
 
 const mc6845_interface mc6845_amstrad_intf =
 {
-	"main",						/* screen name */
+	"maincpu",						/* screen name */
 	16,							/* number of pixels per video memory address */
 	NULL,						/* begin_update */
 	amstrad_update_row,			/* update_row */
@@ -1328,7 +1328,7 @@ const mc6845_interface mc6845_amstrad_intf =
 
 const mc6845_interface mc6845_amstrad_plus_intf =
 {
-	"main",						/* screen name */
+	"maincpu",						/* screen name */
 	16,							/* number of pixels per video memory address */
 	NULL,						/* begin_update */
 	amstrad_plus_update_row,	/* update_row */
@@ -1442,7 +1442,7 @@ static void multiface_rethink_memory(running_machine *machine)
 	if (!multiface_hardware_enabled(machine))
 		return;
 
-	multiface_rom = &memory_region(machine, "main")[0x01C000];
+	multiface_rom = &memory_region(machine, "maincpu")[0x01C000];
 
 	if (
 		((multiface_flags & MULTIFACE_RAM_ROM_ENABLED)!=0) &&
@@ -1637,7 +1637,7 @@ static void amstrad_setLowerRom(running_machine *machine)
 	{
 		if ((gate_array.mrer & (1<<2)) == 0)
 		{
-			bank_base = &memory_region(machine, "main")[0x010000];
+			bank_base = &memory_region(machine, "maincpu")[0x010000];
 		}
 		else
 		{
@@ -1683,7 +1683,7 @@ static void amstrad_setLowerRom(running_machine *machine)
 			if ( asic.enabled )
 			{
 //				logerror("L-ROM: Lower ROM enabled, cart bank %i\n", asic.rmr2 & 0x07 );
-				bank_base = &memory_region(machine, "main")[0x4000 * ( asic.rmr2 & 0x07 )];
+				bank_base = &memory_region(machine, "maincpu")[0x4000 * ( asic.rmr2 & 0x07 )];
 				switch( asic.rmr2 & 0x18 )
 				{
 				case 0x00:
@@ -1710,8 +1710,8 @@ static void amstrad_setLowerRom(running_machine *machine)
 			}
 			else
 			{
-				memory_set_bankptr( machine, 1, memory_region( machine,"main" ) );
-				memory_set_bankptr( machine, 2, memory_region( machine,"main" ) + 0x2000 );
+				memory_set_bankptr( machine, 1, memory_region( machine,"maincpu" ) );
+				memory_set_bankptr( machine, 2, memory_region( machine,"maincpu" ) + 0x2000 );
 			}
 		}
 	}
@@ -3281,7 +3281,7 @@ static void amstrad_common_init(running_machine *machine)
 MACHINE_RESET( amstrad )
 {
 	int i;
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(machine, "maincpu");
 
 	amstrad_system_type = SYSTEM_CPC;
 
@@ -3309,7 +3309,7 @@ MACHINE_START( plus )
 MACHINE_RESET( plus )
 {
 	int i;
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(machine, "maincpu");
 
 	amstrad_system_type = SYSTEM_PLUS;
 
@@ -3349,7 +3349,7 @@ MACHINE_RESET( plus )
 MACHINE_RESET( gx4000 )
 {
 	int i;
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(machine, "maincpu");
 
 	amstrad_system_type = SYSTEM_GX4000;
 
@@ -3388,7 +3388,7 @@ MACHINE_RESET( gx4000 )
 MACHINE_RESET( kccomp )
 {
 	int i;
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(machine, "maincpu");
 
 	amstrad_system_type = SYSTEM_CPC;
 
@@ -3413,7 +3413,7 @@ MACHINE_RESET( kccomp )
 MACHINE_RESET( aleste )
 {
 	int i;
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(machine, "maincpu");
 
 	amstrad_system_type = SYSTEM_ALESTE;
 
@@ -3476,7 +3476,7 @@ DEVICE_IMAGE_LOAD(amstrad_plus_cartridge)
 	int ramblock;  // 16k RAM block chunk is to be loaded in to
 	int result;
 	unsigned int bytes_to_read;  // total bytes to read, as mame_feof doesn't react to EOF without trying to go past it.
-	unsigned char* mem = memory_region(image->machine, "main");
+	unsigned char* mem = memory_region(image->machine, "maincpu");
 
 	logerror("IMG: loading CPC+ cartridge file\n");
 	// load RIFF chunk

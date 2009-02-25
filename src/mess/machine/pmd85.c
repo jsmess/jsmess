@@ -39,7 +39,7 @@ static void pmd851_update_memory(running_machine *machine)
 	
 	if (pmd85_startup_mem_map)
 	{
-		UINT8 *mem = memory_region(machine, "main");
+		UINT8 *mem = memory_region(machine, "maincpu");
 
 		memory_install_write8_handler(space, 0x0000, 0x0fff, 0, 0, SMH_UNMAP);
 		memory_install_write8_handler(space, 0x1000, 0x1fff, 0, 0, SMH_NOP);
@@ -82,7 +82,7 @@ static void pmd852a_update_memory(running_machine *machine)
 
 	if (pmd85_startup_mem_map)
 	{
-		UINT8 *mem = memory_region(machine, "main");
+		UINT8 *mem = memory_region(machine, "maincpu");
 
 		memory_install_write8_handler(space, 0x0000, 0x0fff, 0, 0, SMH_UNMAP);
 		memory_install_write8_handler(space, 0x2000, 0x2fff, 0, 0, SMH_UNMAP);
@@ -116,7 +116,7 @@ static void pmd853_update_memory(running_machine *machine)
 {
 	if (pmd85_startup_mem_map)
 	{
-		UINT8 *mem = memory_region(machine, "main");
+		UINT8 *mem = memory_region(machine, "maincpu");
 
 		memory_set_bankptr(machine,  1, mem + 0x010000);
 		memory_set_bankptr(machine,  2, mem + 0x010000);
@@ -144,7 +144,7 @@ static void pmd853_update_memory(running_machine *machine)
 		memory_set_bankptr(machine,  5, mess_ram + 0x8000);
 		memory_set_bankptr(machine,  6, mess_ram + 0xa000);
 		memory_set_bankptr(machine,  7, mess_ram + 0xc000);
-		memory_set_bankptr(machine,  8, pmd853_memory_mapping ? memory_region(machine, "main") + 0x010000 : mess_ram + 0xe000);
+		memory_set_bankptr(machine,  8, pmd853_memory_mapping ? memory_region(machine, "maincpu") + 0x010000 : mess_ram + 0xe000);
 	}
 }
 
@@ -154,7 +154,7 @@ static void alfa_update_memory(running_machine *machine)
 
 	if (pmd85_startup_mem_map)
 	{
-		UINT8 *mem = memory_region(machine, "main");
+		UINT8 *mem = memory_region(machine, "maincpu");
 
 		memory_install_write8_handler(space, 0x0000, 0x0fff, 0, 0, SMH_UNMAP);
 		memory_install_write8_handler(space, 0x1000, 0x33ff, 0, 0, SMH_UNMAP);
@@ -186,7 +186,7 @@ static void mato_update_memory(running_machine *machine)
 
 	if (pmd85_startup_mem_map)
 	{
-		UINT8 *mem = memory_region(machine, "main");
+		UINT8 *mem = memory_region(machine, "maincpu");
 
 		memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
 
@@ -208,7 +208,7 @@ static void c2717_update_memory(running_machine *machine)
 {
 	const address_space* space = cpu_get_address_space(machine->cpu[0],ADDRESS_SPACE_PROGRAM);
 
-	UINT8 *mem = memory_region(machine, "main");
+	UINT8 *mem = memory_region(machine, "maincpu");
 	if (pmd85_startup_mem_map)
 	{
 		memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);

@@ -967,9 +967,9 @@ static void ted7360_draw_character (running_machine *machine, int ybegin, int ye
 	for (y = ybegin; y <= yend; y++)
 	{
 		if (INROM)
-			code = vic_dma_read_rom (cputag_get_address_space(machine,"main",ADDRESS_SPACE_PROGRAM), chargenaddr + ch * 8 + y);
+			code = vic_dma_read_rom (cputag_get_address_space(machine,"maincpu",ADDRESS_SPACE_PROGRAM), chargenaddr + ch * 8 + y);
 		else
-			code = vic_dma_read (cputag_get_address_space(machine,"main",ADDRESS_SPACE_PROGRAM), chargenaddr + ch * 8 + y);
+			code = vic_dma_read (cputag_get_address_space(machine,"maincpu",ADDRESS_SPACE_PROGRAM), chargenaddr + ch * 8 + y);
 		*BITMAP_ADDR16(ted7360_bitmap, y + yoff, 0 + xoff) = color[code >> 7];
 		*BITMAP_ADDR16(ted7360_bitmap, y + yoff, 1 + xoff) = color[(code >> 6) & 1];
 		*BITMAP_ADDR16(ted7360_bitmap, y + yoff, 2 + xoff) = color[(code >> 5) & 1];
@@ -989,9 +989,9 @@ static void ted7360_draw_character_multi (running_machine *machine, int ybegin, 
 	for (y = ybegin; y <= yend; y++)
 	{
 		if (INROM)
-			code = vic_dma_read_rom (cputag_get_address_space(machine,"main",ADDRESS_SPACE_PROGRAM), chargenaddr + ch * 8 + y);
+			code = vic_dma_read_rom (cputag_get_address_space(machine,"maincpu",ADDRESS_SPACE_PROGRAM), chargenaddr + ch * 8 + y);
 		else
-			code = vic_dma_read (cputag_get_address_space(machine,"main",ADDRESS_SPACE_PROGRAM), chargenaddr + ch * 8 + y);
+			code = vic_dma_read (cputag_get_address_space(machine,"maincpu",ADDRESS_SPACE_PROGRAM), chargenaddr + ch * 8 + y);
 		*BITMAP_ADDR16(ted7360_bitmap, y + yoff, 0 + xoff) =
 			*BITMAP_ADDR16(ted7360_bitmap, y + yoff, 1 + xoff) = multi[code >> 6];
 		*BITMAP_ADDR16(ted7360_bitmap, y + yoff, 2 + xoff) =
@@ -1010,7 +1010,7 @@ static void ted7360_draw_bitmap (running_machine *machine, int ybegin, int yend,
 
 	for (y = ybegin; y <= yend; y++)
 	{
-		code = vic_dma_read (cputag_get_address_space(machine,"main",ADDRESS_SPACE_PROGRAM), bitmapaddr + ch * 8 + y);
+		code = vic_dma_read (cputag_get_address_space(machine,"maincpu",ADDRESS_SPACE_PROGRAM), bitmapaddr + ch * 8 + y);
 		*BITMAP_ADDR16(ted7360_bitmap, y + yoff, 0 + xoff) = c16_bitmap[code >> 7];
 		*BITMAP_ADDR16(ted7360_bitmap, y + yoff, 1 + xoff) = c16_bitmap[(code >> 6) & 1];
 		*BITMAP_ADDR16(ted7360_bitmap, y + yoff, 2 + xoff) = c16_bitmap[(code >> 5) & 1];
@@ -1029,7 +1029,7 @@ static void ted7360_draw_bitmap_multi (running_machine *machine, int ybegin, int
 
 	for (y = ybegin; y <= yend; y++)
 	{
-		code = vic_dma_read (cputag_get_address_space(machine,"main",ADDRESS_SPACE_PROGRAM), bitmapaddr + ch * 8 + y);
+		code = vic_dma_read (cputag_get_address_space(machine,"maincpu",ADDRESS_SPACE_PROGRAM), bitmapaddr + ch * 8 + y);
 		*BITMAP_ADDR16(ted7360_bitmap, y + yoff, 0 + xoff) =
 			*BITMAP_ADDR16(ted7360_bitmap, y + yoff, 1 + xoff) = bitmapmulti[code >> 6];
 		*BITMAP_ADDR16(ted7360_bitmap, y + yoff, 2 + xoff) =
@@ -1118,8 +1118,8 @@ static void ted7360_drawlines (running_machine *machine, int first, int last)
 		{
 			if (HIRESON)
 			{
-				ch = vic_dma_read (cputag_get_address_space(machine,"main",ADDRESS_SPACE_PROGRAM), (videoaddr | 0x400) + offs);
-				attr = vic_dma_read (cputag_get_address_space(machine,"main",ADDRESS_SPACE_PROGRAM), ((videoaddr) + offs));
+				ch = vic_dma_read (cputag_get_address_space(machine,"maincpu",ADDRESS_SPACE_PROGRAM), (videoaddr | 0x400) + offs);
+				attr = vic_dma_read (cputag_get_address_space(machine,"maincpu",ADDRESS_SPACE_PROGRAM), ((videoaddr) + offs));
 				c1 = ((ch >> 4) & 0xf) | (attr << 4);
 				c2 = (ch & 0xf) | (attr & 0x70);
 				bitmapmulti[1] = c16_bitmap[1] = c1 & 0x7f;
@@ -1135,8 +1135,8 @@ static void ted7360_drawlines (running_machine *machine, int first, int last)
 			}
 			else
 			{
-				ch = vic_dma_read (cputag_get_address_space(machine,"main",ADDRESS_SPACE_PROGRAM), (videoaddr | 0x400) + offs);
-				attr = vic_dma_read (cputag_get_address_space(machine,"main",ADDRESS_SPACE_PROGRAM), ((videoaddr) + offs));
+				ch = vic_dma_read (cputag_get_address_space(machine,"maincpu",ADDRESS_SPACE_PROGRAM), (videoaddr | 0x400) + offs);
+				attr = vic_dma_read (cputag_get_address_space(machine,"maincpu",ADDRESS_SPACE_PROGRAM), ((videoaddr) + offs));
 				// levente harsfalvi's docu says cursor off in ecm and multicolor
 				if (ECMON)
 				{

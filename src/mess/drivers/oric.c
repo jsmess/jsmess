@@ -339,7 +339,7 @@ static const ay8910_interface oric_ay_interface =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_MEMORY_HANDLER("main", PROGRAM, oric_psg_porta_write),
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, oric_psg_porta_write),
 	DEVCB_NULL,
 };
 
@@ -361,7 +361,7 @@ static const centronics_interface oric_centronics_config =
 
 static MACHINE_DRIVER_START( oric )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, 1000000)
+	MDRV_CPU_ADD("maincpu", M6502, 1000000)
 	MDRV_CPU_PROGRAM_MAP(oric_mem, 0)
 	MDRV_QUANTUM_TIME(HZ(60))
 
@@ -404,7 +404,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( telstrat)
 	MDRV_IMPORT_FROM( oric )
-	MDRV_CPU_MODIFY( "main" )
+	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP( telestrat_mem, 0 )
 
 	MDRV_MACHINE_START( telestrat )
@@ -419,21 +419,21 @@ MACHINE_DRIVER_END
 
 
 ROM_START(oric1)
-	ROM_REGION(0x10000+0x04000+0x02000+0x0800,"main",0)
+	ROM_REGION(0x10000+0x04000+0x02000+0x0800,"maincpu",0)
 	ROM_LOAD ("basic10.rom", 0x10000, 0x4000, CRC(f18710b4) SHA1(333116e6884d85aaa4dfc7578a91cceeea66d016))
 	ROM_LOAD_OPTIONAL ("microdis.rom",0x014000, 0x02000, CRC(a9664a9c) SHA1(0d2ef6e67322f48f4b7e08d8bbe68827e2074561))
 	ROM_LOAD_OPTIONAL ("jasmin.rom", 0x016000, 0x800, CRC(37220e89) SHA1(70e59b8abd67092f050462abc6cb5271e4c15f01))
 ROM_END
 
 ROM_START(orica)
-	ROM_REGION(0x10000+0x04000+0x02000+0x0800,"main",0)
+	ROM_REGION(0x10000+0x04000+0x02000+0x0800,"maincpu",0)
 	ROM_LOAD ("basic11b.rom", 0x10000, 0x4000, CRC(c3a92bef) SHA1(9451a1a09d8f75944dbd6f91193fc360f1de80ac))
 	ROM_LOAD_OPTIONAL ("microdis.rom",0x014000, 0x02000, CRC(a9664a9c) SHA1(0d2ef6e67322f48f4b7e08d8bbe68827e2074561))
 	ROM_LOAD_OPTIONAL ("jasmin.rom", 0x016000, 0x800, CRC(37220e89) SHA1(70e59b8abd67092f050462abc6cb5271e4c15f01))
 ROM_END
 
 ROM_START(telstrat)
-	ROM_REGION(0x010000+(0x04000*4), "main",0)
+	ROM_REGION(0x010000+(0x04000*4), "maincpu",0)
 	ROM_LOAD ("telmatic.rom", 0x010000, 0x02000, CRC(94358dc6) SHA1(35f92a0477a88f5cf564971125047ffcfa02ec10))
 	ROM_LOAD ("teleass.rom", 0x014000, 0x04000, CRC(68b0fde6) SHA1(9e9af51dae3199cccf49ab3f0d47e2b9be4ba97d))
 	ROM_LOAD ("hyperbas.rom", 0x018000, 0x04000, CRC(1d96ab50) SHA1(f5f70a0eb59f8cd6c261e179ae78ef906f68ed63))
@@ -441,14 +441,14 @@ ROM_START(telstrat)
 ROM_END
 
 ROM_START(prav8d)
-    ROM_REGION( 0x10000+0x4000+0x0100+0x0200, "main", 0 )
+    ROM_REGION( 0x10000+0x4000+0x0100+0x0200, "maincpu", 0 )
     ROM_LOAD( "pravetzt.rom", 0x10000, 0x4000, CRC(58079502) SHA1(7afc276cb118adff72e4f16698f94bf3b2c64146) )
 	ROM_LOAD_OPTIONAL( "8ddoslo.rom", 0x014000, 0x0100, CRC(0c82f636) SHA1(b29d151a0dfa3c7cd50439b51d0a8f95559bc2b6) )
     ROM_LOAD_OPTIONAL( "8ddoshi.rom", 0x014100, 0x0200, CRC(66309641) SHA1(9c2e82b3c4d385ade6215fcb89f8b92e6fd2bf4b) )
 ROM_END
 
 ROM_START(prav8dd)
-    ROM_REGION( 0x10000+0x4000+0x0100+0x0200, "main", 0 )
+    ROM_REGION( 0x10000+0x4000+0x0100+0x0200, "maincpu", 0 )
 	ROM_SYSTEM_BIOS( 0, "default", "Disk ROM, 1989")
 	ROMX_LOAD( "8d.rom",       0x10000, 0x4000, CRC(b48973ef) SHA1(fd47c977fc215a3b577596a7483df53e8a1e9c83), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "radosoft", "RadoSoft Disk ROM, 1992")

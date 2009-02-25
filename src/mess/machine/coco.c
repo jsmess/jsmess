@@ -506,7 +506,7 @@ static int generic_pak_load(const device_config *image, int rambase_index, int r
 	pak_decodedtrailer trailer;
 	int trailer_load = 0;
 
-	ROM = memory_region(image->machine, "main");
+	ROM = memory_region(image->machine, "maincpu");
 	rambase = &mess_ram[rambase_index];
 	rombase = &ROM[rombase_index];
 	pakbase = &ROM[pakbase_index];
@@ -2724,7 +2724,7 @@ static void generic_init_machine(running_machine *machine, const machine_init_in
 	mux_sel2_timer = timer_alloc(machine, coco_update_sel2_timerproc, NULL);
 
 	/* setup ROM */
-	coco_rom = memory_region(machine, "main");
+	coco_rom = memory_region(machine, "maincpu");
 
 	/* setup default rom bank */
 	bas_rom_bank = coco_rom;

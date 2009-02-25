@@ -54,7 +54,7 @@ static const speaker_interface pokemini_speaker_interface =
 
 static MACHINE_DRIVER_START( pokemini )
 	/* basic machine hardware */
-	MDRV_CPU_ADD( "main", MINX, 4000000 )
+	MDRV_CPU_ADD( "maincpu", MINX, 4000000 )
 	MDRV_CPU_PROGRAM_MAP( pokemini_mem_map, 0 )
 
 	MDRV_QUANTUM_TIME(HZ(60))
@@ -98,7 +98,7 @@ static DRIVER_INIT( pokemini )
 }
 
 ROM_START( pokemini )
-	ROM_REGION( 0x200000, "main", 0 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "bios.min", 0x0000, 0x1000, CRC(aed3c14d) SHA1(daad4113713ed776fbd47727762bca81ba74915f) )
 ROM_END
 

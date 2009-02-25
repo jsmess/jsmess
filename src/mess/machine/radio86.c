@@ -30,7 +30,7 @@ void radio86_init_keyboard()
 DRIVER_INIT(radio86)
 {
 	/* set initialy ROM to be visible on first bank */
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(machine, "maincpu");
 	memset(RAM,0x0000,0x1000); // make frist page empty by default
   	memory_configure_bank(machine, 1, 1, 2, RAM, 0x0000);
 	memory_configure_bank(machine, 1, 0, 2, RAM, 0xf800);
@@ -197,7 +197,7 @@ WRITE8_HANDLER ( radio86_pagesel )
 
 static READ8_DEVICE_HANDLER (radio86_romdisk_porta_r )
 {
-	UINT8 *romdisk = memory_region(device->machine, "main") + 0x10000;	
+	UINT8 *romdisk = memory_region(device->machine, "maincpu") + 0x10000;	
 	if ((disk_sel & 0x0f) ==0) {
 		return romdisk[romdisk_msb*256+romdisk_lsb];	
 	} else {
@@ -245,7 +245,7 @@ const ppi8255_interface mikrosha_ppi8255_interface_2 =
 };
 
 const i8275_interface radio86_i8275_interface = {
-	"main",
+	"maincpu",
 	6,
 	0,
 	radio86_video_dma_request,
@@ -254,7 +254,7 @@ const i8275_interface radio86_i8275_interface = {
 };
 
 const i8275_interface mikrosha_i8275_interface = {
-	"main",
+	"maincpu",
 	6,
 	0,
 	radio86_video_dma_request,
@@ -263,7 +263,7 @@ const i8275_interface mikrosha_i8275_interface = {
 };
 
 const i8275_interface apogee_i8275_interface = {
-	"main",
+	"maincpu",
 	6,
 	0,
 	radio86_video_dma_request,
@@ -272,7 +272,7 @@ const i8275_interface apogee_i8275_interface = {
 };
 
 const i8275_interface partner_i8275_interface = {
-	"main",
+	"maincpu",
 	6,
 	1,
 	radio86_video_dma_request,

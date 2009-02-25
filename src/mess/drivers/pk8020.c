@@ -45,7 +45,7 @@ INPUT_PORTS_END
 /* Machine driver */
 static MACHINE_DRIVER_START( pk8020 )
   /* basic machine hardware */
-  MDRV_CPU_ADD("main", 8080, 2500000)
+  MDRV_CPU_ADD("maincpu", 8080, 2500000)
   MDRV_CPU_PROGRAM_MAP(pk8020_mem, 0)
   MDRV_CPU_IO_MAP(pk8020_io, 0)
 
@@ -68,7 +68,7 @@ MACHINE_DRIVER_END
 /* ROM definition */
 
 ROM_START( korvet )
-    ROM_REGION( 0x16000, "main", ROMREGION_ERASEFF )
+    ROM_REGION( 0x16000, "maincpu", ROMREGION_ERASEFF )
     ROM_LOAD( "korvet11.rom", 0x10000, 0x6000, CRC(81BDC2AF) SHA1(c3484c3f1f3d252475979283c073286b8661d2b9) )
 ROM_END
 

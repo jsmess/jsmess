@@ -87,7 +87,7 @@ static UINT8 romdisk_lsb;
 
 static READ8_DEVICE_HANDLER (vector06_romdisk_portb_r )
 {
-	UINT8 *romdisk = memory_region(device->machine, "main") + 0x18000;		
+	UINT8 *romdisk = memory_region(device->machine, "maincpu") + 0x18000;		
 	UINT16 addr = (romdisk_msb*256+romdisk_lsb) & 0x7fff;
 	return romdisk[addr];	
 }
@@ -160,7 +160,7 @@ static TIMER_CALLBACK(reset_check_callback)
 {
 	UINT8 val = input_port_read(machine, "RESET");
 	if ((val & 1)==1) {
-		memory_set_bankptr(machine, 1, memory_region(machine, "main") + 0x10000);
+		memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0x10000);
 		device_reset(machine->cpu[0]);
 	}
 	if ((val & 2)==2) {
@@ -219,7 +219,7 @@ MACHINE_RESET( vector06 )
 	memory_install_read8_handler (space, 0x8000, 0xffff, 0, 0, SMH_BANK3);
 	memory_install_write8_handler(space, 0x8000, 0xffff, 0, 0, SMH_BANK4);
 
-	memory_set_bankptr(machine, 1, memory_region(machine, "main") + 0x10000);
+	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0x10000);
 	memory_set_bankptr(machine, 2, mess_ram + 0x0000);
 	memory_set_bankptr(machine, 3, mess_ram + 0x8000);
 	memory_set_bankptr(machine, 4, mess_ram + 0x8000);

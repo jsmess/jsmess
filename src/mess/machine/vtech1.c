@@ -176,7 +176,7 @@ static const device_config *cassette_device_image(running_machine *machine)
 
 SNAPSHOT_LOAD(vtech1)
 {
-	const address_space *space = cputag_get_address_space(image->machine, "main", ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(image->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 i, header[24];
 	UINT16 start, end, size;
 	char pgmname[18];
@@ -222,7 +222,7 @@ SNAPSHOT_LOAD(vtech1)
 		memory_write_byte(space, 0x788e, start % 256); /* usr subroutine address */
 		memory_write_byte(space, 0x788f, start / 256);
 		image_message(image, " %s (M)\nsize=%04X : start=%04X : end=%04X",pgmname,size,start,end);
-		cpu_set_reg(cputag_get_cpu(image->machine, "main"), REG_GENPC, start);				/* start program */
+		cpu_set_reg(cputag_get_cpu(image->machine, "maincpu"), REG_GENPC, start);				/* start program */
 		break;
 
 	default:

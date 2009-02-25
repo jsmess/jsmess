@@ -365,7 +365,7 @@ static void pcw_update_mem(running_machine *machine, int block, int data)
 	{
 		unsigned char *FakeROM;
 
-		FakeROM = &memory_region(machine, "main")[0x010000];
+		FakeROM = &memory_region(machine, "maincpu")[0x010000];
 
 		memory_set_bankptr(machine, 1, FakeROM);
 	}
@@ -986,7 +986,7 @@ INPUT_PORTS_END
 /* PCW8256, PCW8512, PCW9256 */
 static MACHINE_DRIVER_START( pcw )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 4000000)       /* clock supplied to chip, but in reality it is 3.4 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, 4000000)       /* clock supplied to chip, but in reality it is 3.4 MHz */
 	MDRV_CPU_PROGRAM_MAP(pcw_map, 0)
 	MDRV_CPU_IO_MAP(pcw_io, 0)
 	MDRV_QUANTUM_TIME(HZ(60))
@@ -1018,7 +1018,7 @@ MACHINE_DRIVER_END
 /* PCW9512, PCW9512+, PCW10 */
 static MACHINE_DRIVER_START( pcw9512 )
 	MDRV_IMPORT_FROM( pcw )
-	MDRV_CPU_MODIFY( "main" )
+	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_IO_MAP(pcw9512_io, 0)
 MACHINE_DRIVER_END
 
@@ -1035,7 +1035,7 @@ is banked. */
 // for now all models use the same rom
 #define ROM_PCW(model)												\
 	ROM_START(model)												\
-		ROM_REGION(0x014000, "main",0)							\
+		ROM_REGION(0x014000, "maincpu",0)							\
 		ROM_LOAD("pcwboot.bin", 0x010000, 608, BAD_DUMP CRC(679b0287) SHA1(5dde974304e3376ace00850d6b4c8ec3b674199e))	\
 	ROM_END															\
 

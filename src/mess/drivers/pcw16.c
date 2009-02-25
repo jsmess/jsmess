@@ -430,7 +430,7 @@ static void pcw16_update_bank(running_machine *machine, int bank)
 		{
 			/* lower 4 banks are write protected. Use the rom
             loaded */
-			mem_ptr = &memory_region(machine, "main")[0x010000];
+			mem_ptr = &memory_region(machine, "maincpu")[0x010000];
 		}
 		else
 		{
@@ -1379,13 +1379,13 @@ INPUT_PORTS_END
 
 static const pc_lpt_interface pcw16_lpt_config =
 {
-	DEVCB_CPU_INPUT_LINE("main", 0)
+	DEVCB_CPU_INPUT_LINE("maincpu", 0)
 };
 
 
 static MACHINE_DRIVER_START( pcw16 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 16000000)
+	MDRV_CPU_ADD("maincpu", Z80, 16000000)
 	MDRV_CPU_PROGRAM_MAP(pcw16_map, 0)
 	MDRV_CPU_IO_MAP(pcw16_io, 0)
 	MDRV_QUANTUM_TIME(HZ(60))
@@ -1437,7 +1437,7 @@ static DRIVER_INIT( pcw16 )
 /* the lower 64k of the flash-file memory is write protected. This contains the boot
     rom. The boot rom is also on the OS rescue disc. Handy! */
 ROM_START(pcw16)
-	ROM_REGION((0x010000+524288), "main",0)
+	ROM_REGION((0x010000+524288), "maincpu",0)
 	ROM_LOAD("pcw045.sys",0x10000, 524288, CRC(c642f498) SHA1(8a5c05de92e7b2c5acdfb038217503ad363285b5))
 ROM_END
 

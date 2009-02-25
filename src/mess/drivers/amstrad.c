@@ -778,8 +778,8 @@ static const ay8910_interface ay8912_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_MEMORY_HANDLER("main", PROGRAM, amstrad_psg_porta_read),	/* portA read */
-	DEVCB_MEMORY_HANDLER("main", PROGRAM, amstrad_psg_porta_read),	/* portB read */
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, amstrad_psg_porta_read),	/* portA read */
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, amstrad_psg_porta_read),	/* portB read */
 	DEVCB_NULL,					/* portA write */
 	DEVCB_NULL					/* portB write */
 };
@@ -843,7 +843,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( amstrad )
 	/* Machine hardware */
-	MDRV_CPU_ADD("main", Z80, XTAL_16MHz / 4)
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
 	MDRV_CPU_PROGRAM_MAP(amstrad_mem, 0)
 	MDRV_CPU_IO_MAP(amstrad_io, 0)
 
@@ -898,7 +898,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( cpcplus )
 	/* Machine hardware */
-	MDRV_CPU_ADD("main", Z80, XTAL_40MHz / 10)
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_40MHz / 10)
 	MDRV_CPU_PROGRAM_MAP(amstrad_mem, 0)
 	MDRV_CPU_IO_MAP(amstrad_io, 0)
 
@@ -948,7 +948,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( gx4000 )
 	/* Machine hardware */
-	MDRV_CPU_ADD("main", Z80, XTAL_40MHz / 10)
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_40MHz / 10)
 	MDRV_CPU_PROGRAM_MAP(amstrad_mem, 0)
 	MDRV_CPU_IO_MAP(amstrad_io, 0)
 
@@ -1012,7 +1012,7 @@ MACHINE_DRIVER_END
 are banked. */
 ROM_START( cpc6128 )
 	/* this defines the total memory size - 64k ram, 16k OS, 16k BASIC, 16k DOS */
-	ROM_REGION(0x020000, "main", 0)
+	ROM_REGION(0x020000, "maincpu", 0)
 	/* load the os to offset 0x01000 from memory base */
 	ROM_LOAD("cpc6128.rom", 0x10000, 0x8000, CRC(9e827fe1) SHA1(5977adbad3f7c1e0e082cd02fe76a700d9860c30))
 	ROM_LOAD("cpcados.rom", 0x18000, 0x4000, CRC(1fe22ecd) SHA1(39102c8e9cb55fcc0b9b62098780ed4a3cb6a4bb))
@@ -1024,7 +1024,7 @@ ROM_END
 
 ROM_START( cpc6128f )
 	/* this defines the total memory size (128kb))- 64k ram, 16k OS, 16k BASIC, 16k DOS +16k*/
-	ROM_REGION(0x020000, "main", 0)
+	ROM_REGION(0x020000, "maincpu", 0)
 
 	/* load the os to offset 0x01000 from memory base */
 	ROM_LOAD("cpc6128f.rom", 0x10000, 0x8000, CRC(1574923b) SHA1(200d59076dfef36db061d6d7d21d80021cab1237))
@@ -1037,7 +1037,7 @@ ROM_END
 
 ROM_START( cpc6128s )
 	/* this defines the total memory size (128kb))- 64k ram, 16k OS, 16k BASIC, 16k DOS +16k*/
-	ROM_REGION(0x020000, "main", 0)
+	ROM_REGION(0x020000, "maincpu", 0)
 
 	/* load the os to offset 0x01000 from memory base */
 	ROM_LOAD("cpc6128s.rom", 0x10000, 0x8000, CRC(588b5540) SHA1(6765a91a42fed68a807325bf62a728e5ac5d622f))
@@ -1050,7 +1050,7 @@ ROM_END
 
 ROM_START( cpc464 )
 	/* this defines the total memory size - 64k ram, 16k OS, 16k BASIC, 16k DOS */
-	ROM_REGION(0x01c000, "main", 0)
+	ROM_REGION(0x01c000, "maincpu", 0)
 	/* load the os to offset 0x01000 from memory base */
 	ROM_LOAD("cpc464.rom",  0x10000, 0x8000, CRC(40852f25) SHA1(56d39c463da60968d93e58b4ba0e675829412a20))
 	ROM_LOAD("cpcados.rom", 0x18000, 0x4000, CRC(1fe22ecd) SHA1(39102c8e9cb55fcc0b9b62098780ed4a3cb6a4bb))
@@ -1059,7 +1059,7 @@ ROM_END
 
 ROM_START( cpc664 )
 	/* this defines the total memory size - 64k ram, 16k OS, 16k BASIC, 16k DOS */
-	ROM_REGION(0x01c000, "main", 0)
+	ROM_REGION(0x01c000, "maincpu", 0)
 	/* load the os to offset 0x01000 from memory base */
 	ROM_LOAD("cpc664.rom",  0x10000, 0x8000, CRC(9AB5A036) SHA1(073a7665527b5bd8a148747a3947dbd3328682c8))
 	ROM_LOAD("cpcados.rom", 0x18000, 0x4000, CRC(1fe22ecd) SHA1(39102c8e9cb55fcc0b9b62098780ed4a3cb6a4bb))
@@ -1067,7 +1067,7 @@ ROM_END
 
 
 ROM_START( kccomp )
-	ROM_REGION(0x018000, "main", 0)
+	ROM_REGION(0x018000, "maincpu", 0)
 	ROM_LOAD("kccos.rom",  0x10000, 0x4000, CRC(7f9ab3f7) SHA1(f828045e98e767f737fd93df0af03917f936ad08))
 	ROM_LOAD("kccbas.rom", 0x14000, 0x4000, CRC(ca6af63d) SHA1(d7d03755099d0aff501fa5fffc9c0b14c0825448))
 
@@ -1081,7 +1081,7 @@ ROM_END
 
 /* this system must have a cartridge installed to run */
 ROM_START(cpc6128p)
-	ROM_REGION(0x80000, "main", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x04000, "user1", ROMREGION_ERASEFF)
 ROM_END
 
@@ -1091,7 +1091,7 @@ ROM_END
 
 
 ROM_START( al520ex )
-	ROM_REGION(0x80000, "main", 0)
+	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("al512.bin", 0x10000, 0x10000, CRC(e8c2a9a1) SHA1(ad5827582cb19eaaae1b76e67df62d96da6ad96b))
 
 	ROM_REGION(0x20, "user2", 0)

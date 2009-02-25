@@ -163,12 +163,12 @@ gfx_layout nes_vram_charlayout =
 
 static const nes_interface nes_apu_interface =
 {
-	"main"
+	"maincpu"
 };
 
 
 ROM_START( nes )
-    ROM_REGION( 0x10000, "main",0 )  /* Main RAM + program banks */
+    ROM_REGION( 0x10000, "maincpu",0 )  /* Main RAM + program banks */
 	ROM_FILL( 0x0000, 0x10000, 0x00 )
     ROM_REGION( 0x2000,  "gfx1",0 )  /* VROM */
 	ROM_FILL( 0x0000, 0x2000, 0x00 )
@@ -179,7 +179,7 @@ ROM_START( nes )
 ROM_END
 
 ROM_START( nespal )
-    ROM_REGION( 0x10000, "main",0 )  /* Main RAM + program banks */
+    ROM_REGION( 0x10000, "maincpu",0 )  /* Main RAM + program banks */
 	ROM_FILL( 0x0000, 0x10000, 0x00 )
     ROM_REGION( 0x2000,  "gfx1",0 )  /* VROM */
 	ROM_FILL( 0x0000, 0x2000, 0x00 )
@@ -190,7 +190,7 @@ ROM_START( nespal )
 ROM_END
 
 ROM_START( famicom )
-    ROM_REGION( 0x10000, "main",0 )  /* Main RAM + program banks */
+    ROM_REGION( 0x10000, "maincpu",0 )  /* Main RAM + program banks */
     ROM_LOAD_OPTIONAL ("disksys.rom", 0xe000, 0x2000, CRC(5e607dcf) SHA1(57fe1bdee955bb48d357e463ccbf129496930b62))
 
     ROM_REGION( 0x2000,  "gfx1",0 )  /* VROM */
@@ -202,7 +202,7 @@ ROM_START( famicom )
 ROM_END
 
 ROM_START( famitwin )
-    ROM_REGION( 0x10000, "main",0 )  /* Main RAM + program banks */
+    ROM_REGION( 0x10000, "maincpu",0 )  /* Main RAM + program banks */
     ROM_LOAD_OPTIONAL ("disksyst.rom", 0xe000, 0x2000, CRC(4df24a6c) SHA1(e4e41472c454f928e53eb10e0509bf7d1146ecc1))
 
     ROM_REGION( 0x2000,  "gfx1",0 )  /* VROM */
@@ -215,7 +215,7 @@ ROM_END
 
 static MACHINE_DRIVER_START( nes )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", N2A03, NTSC_CLOCK)
+	MDRV_CPU_ADD("maincpu", N2A03, NTSC_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(nes_map, 0)
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60.098)
@@ -254,7 +254,7 @@ static MACHINE_DRIVER_START( nespal )
 	MDRV_IMPORT_FROM( nes )
 
 	/* basic machine hardware */
-	MDRV_CPU_REPLACE("main", N2A03, PAL_CLOCK)
+	MDRV_CPU_REPLACE("maincpu", N2A03, PAL_CLOCK)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")

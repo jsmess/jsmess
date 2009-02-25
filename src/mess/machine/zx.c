@@ -25,7 +25,7 @@ static UINT8 zx_tape_bit = 0x80;
 
 static WRITE8_HANDLER( zx_ram_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "main");	
+	UINT8 *RAM = memory_region(space->machine, "maincpu");	
 	RAM[offset + 0x4000] = data;
 
 	if (data & 0x40)
@@ -43,7 +43,7 @@ static WRITE8_HANDLER( zx_ram_w )
 /* I know this looks really pointless... but it has to be here */
 READ8_HANDLER( zx_ram_r )
 {
-	UINT8 *RAM = memory_region(space->machine, "main");	
+	UINT8 *RAM = memory_region(space->machine, "maincpu");	
 	return RAM[offset | 0xc000];
 }
 
@@ -52,13 +52,13 @@ DRIVER_INIT ( zx )
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
 	memory_install_readwrite8_handler(space, 0x4000, 0x4000 + mess_ram_size - 1, 0, 0, SMH_BANK1, zx_ram_w);
-	memory_set_bankptr(machine, 1, memory_region(machine, "main") + 0x4000);
+	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0x4000);
 }
 
 static DIRECT_UPDATE_HANDLER ( zx_setdirect )
 {
 	if (address & 0xc000)
-		zx_ula_r(space->machine, address, "main", 0);
+		zx_ula_r(space->machine, address, "maincpu", 0);
 	return address;
 }
 

@@ -253,7 +253,7 @@ void spectrum_plus3_update_memory(running_machine *machine)
 
 			/* rom 0 is editor, rom 1 is syntax, rom 2 is DOS, rom 3 is 48 BASIC */
 
-			ChosenROM = memory_region(machine, "main") + 0x010000 + (ROMSelection<<14);
+			ChosenROM = memory_region(machine, "maincpu") + 0x010000 + (ROMSelection<<14);
 
 			memory_set_bankptr(machine, 1, ChosenROM);
 			memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
@@ -363,7 +363,7 @@ static MACHINE_RESET( spectrum_plus3 )
 
 static MACHINE_DRIVER_START( spectrum_plus3 )
 	MDRV_IMPORT_FROM( spectrum_128 )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(spectrum_plus3_io, 0)
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(50.01)
@@ -380,7 +380,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START(specpl2a)
-	ROM_REGION(0x20000,"main",0)
+	ROM_REGION(0x20000,"maincpu",0)
 	ROM_LOAD("p2a41_0.rom",0x10000,0x4000, CRC(30c9f490) SHA1(62ec15a4af56cd1d206d0bd7011eac7c889a595d))
 	ROM_LOAD("p2a41_1.rom",0x14000,0x4000, CRC(a7916b3f) SHA1(1a7812c383a3701e90e88d1da086efb0c033ac72))
 	ROM_LOAD("p2a41_2.rom",0x18000,0x4000, CRC(c9a0b748) SHA1(8df145d10ff78f98138682ea15ebccb2874bf759))
@@ -389,7 +389,7 @@ ROM_START(specpl2a)
 ROM_END
 
 ROM_START(specpls3)
-	ROM_REGION(0x20000,"main",0)
+	ROM_REGION(0x20000,"maincpu",0)
 	ROM_SYSTEM_BIOS( 0, "en", "English v4.0" )
 	ROMX_LOAD("pl3-0.rom",0x10000,0x4000, CRC(17373da2) SHA1(e319ed08b4d53a5e421a75ea00ea02039ba6555b), ROM_BIOS(1))
 	ROMX_LOAD("pl3-1.rom",0x14000,0x4000, CRC(f1d1d99e) SHA1(c9969fc36095a59787554026a9adc3b87678c794), ROM_BIOS(1))
@@ -412,7 +412,7 @@ ROM_START(specpls3)
 ROM_END
 
 ROM_START(specpl3e)
-	ROM_REGION(0x20000,"main",0)
+	ROM_REGION(0x20000,"maincpu",0)
 	ROM_SYSTEM_BIOS( 0, "en", "English" )
 	ROMX_LOAD("roma-en.rom",0x10000,0x8000, CRC(2d533344) SHA1(5ff2dae32eb745d87e0b54c595d1d20a866f316f), ROM_BIOS(1))
 	ROMX_LOAD("romb-en.rom",0x18000,0x8000, CRC(ef8d5d92) SHA1(983aa53aa76e25a3af123c896016bacf6829b72b), ROM_BIOS(1))
@@ -423,7 +423,7 @@ ROM_START(specpl3e)
 ROM_END
 
 ROM_START(sp3e8bit)
-	ROM_REGION(0x20000,"main",0)
+	ROM_REGION(0x20000,"maincpu",0)
 	ROM_SYSTEM_BIOS( 0, "en", "English" )
 	ROMX_LOAD("3e8biten.rom",0x10000,0x10000, CRC(beee3bf6) SHA1(364ec903916282d5401901c5fb0cb93a142038b3), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "sp", "Spanish" )
@@ -432,7 +432,7 @@ ROM_START(sp3e8bit)
 ROM_END
 
 ROM_START(sp3ezcf)
-	ROM_REGION(0x20000,"main",0)
+	ROM_REGION(0x20000,"maincpu",0)
 	ROM_SYSTEM_BIOS( 0, "en", "English" )
 	ROMX_LOAD("3ezcfen.rom",0x10000,0x10000, CRC(43993f11) SHA1(27cbfbe8b5ef9eec6056026fa0b84fe158ba2f45), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "sp", "Spanish" )
@@ -441,7 +441,7 @@ ROM_START(sp3ezcf)
 ROM_END
 
 ROM_START(sp3eata)
-	ROM_REGION(0x20000,"main",0)
+	ROM_REGION(0x20000,"maincpu",0)
 	ROM_SYSTEM_BIOS( 0, "en", "English" )
 	ROMX_LOAD("3ezxaen.rom",0x10000,0x10000, CRC(dfb676dc) SHA1(37618bc66ae33dbf686be8a92867e4a9144b65dc), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "sp", "Spanish" )

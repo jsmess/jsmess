@@ -277,7 +277,7 @@ WRITE8_DEVICE_HANDLER( cbmb_change_font )
 static void cbmb_common_driver_init(running_machine *machine)
 {
 	cbmb_state *state = machine->driver_data;
-	cbmb_chargen=memory_region(machine, "main") + 0x100000;
+	cbmb_chargen=memory_region(machine, "maincpu") + 0x100000;
 	/*    memset(c64_memory, 0, 0xfd00); */
 
 	timer_pulse(machine, ATTOTIME_IN_MSEC(10), NULL, 0, cbmb_frame_interrupt);

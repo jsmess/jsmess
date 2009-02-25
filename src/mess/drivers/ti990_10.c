@@ -194,7 +194,7 @@ static const ti990_10reset_param reset_params =
 static MACHINE_DRIVER_START(ti990_10)
 	/* basic machine hardware */
 	/* TI990/10 CPU @ 4.0(???) MHz */
-	MDRV_CPU_ADD("main", TI990_10, 4000000)
+	MDRV_CPU_ADD("maincpu", TI990_10, 4000000)
 	MDRV_CPU_CONFIG(reset_params)
 	MDRV_CPU_PROGRAM_MAP(ti990_10_memmap, 0)
 	MDRV_CPU_IO_MAP(ti990_10_io, 0)
@@ -236,7 +236,7 @@ ROM_START(ti990_10)
 	/*CPU memory space*/
 #if 0
 
-	ROM_REGION16_BE(0x200000, "main",0)
+	ROM_REGION16_BE(0x200000, "maincpu",0)
 
 	/* TI990/10 : older boot ROMs for floppy-disk */
 	ROM_LOAD16_BYTE("975383.31", 0x1FFC00, 0x100, CRC(64fcd040))
@@ -246,7 +246,7 @@ ROM_START(ti990_10)
 
 #elif 1
 
-	ROM_REGION16_BE(0x200000, "main",0)
+	ROM_REGION16_BE(0x200000, "maincpu",0)
 
 	/* TI990/10 : newer "universal" boot ROMs  */
 	ROM_LOAD16_BYTE("975383.45", 0x1FFC00, 0x100, CRC(391943c7) SHA1(bbd4da60b221d146542a6b547ae1570024e41b8a))
@@ -256,7 +256,7 @@ ROM_START(ti990_10)
 
 #else
 
-	ROM_REGION16_BE(0x202000, "main",0)
+	ROM_REGION16_BE(0x202000, "maincpu",0)
 
 	/* TI990/12 ROMs - actually incompatible with TI990/10, but I just wanted to disassemble them. */
 	ROM_LOAD16_BYTE("ti2025-7", 0x1FFC00, 0x1000, CRC(4824f89c))
@@ -278,7 +278,7 @@ static DRIVER_INIT( ti990_10 )
 	/* load specific ti990/12 rom page */
 	const int page = 3;
 
-	memmove(memory_region(machine, "main")+0x1FFC00, memory_region(machine, "main")+0x1FFC00+(page*0x400), 0x400);
+	memmove(memory_region(machine, "maincpu")+0x1FFC00, memory_region(machine, "maincpu")+0x1FFC00+(page*0x400), 0x400);
 #endif
 	vdt911_init(machine);
 }

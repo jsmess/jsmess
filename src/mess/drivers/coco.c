@@ -64,7 +64,7 @@ static ADDRESS_MAP_START( coco_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xff90, 0xffbf) AM_NOP
 	AM_RANGE(0xffc0, 0xffdf) AM_DEVWRITE(SAM6883, "sam", sam6883_w)
 	AM_RANGE(0xffe0, 0xffef) AM_NOP
-	AM_RANGE(0xfff0, 0xffff) AM_ROM AM_REGION("main", 0x3ff0)
+	AM_RANGE(0xfff0, 0xffff) AM_ROM AM_REGION("maincpu", 0x3ff0)
 ADDRESS_MAP_END
 
 
@@ -91,7 +91,7 @@ static ADDRESS_MAP_START( dragon_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xff90, 0xffbf) AM_NOP
 	AM_RANGE(0xffc0, 0xffdf) AM_DEVWRITE(SAM6883, "sam", sam6883_w)
 	AM_RANGE(0xffe0, 0xffef) AM_NOP
-	AM_RANGE(0xfff0, 0xffff) AM_ROM AM_REGION("main", 0x3ff0)
+	AM_RANGE(0xfff0, 0xffff) AM_ROM AM_REGION("maincpu", 0x3ff0)
 ADDRESS_MAP_END
 
 
@@ -122,7 +122,7 @@ static ADDRESS_MAP_START( coco3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xffb0, 0xffbf) AM_READWRITE(SMH_BANK10,			coco3_palette_w)
 	AM_RANGE(0xffc0, 0xffdf) AM_DEVWRITE(SAM6883_GIME, "sam", sam6883_w)
 	AM_RANGE(0xffe0, 0xffef) AM_NOP
-	AM_RANGE(0xfff0, 0xffff) AM_ROM AM_REGION("main", 0x7ff0)
+	AM_RANGE(0xfff0, 0xffff) AM_ROM AM_REGION("maincpu", 0x7ff0)
 ADDRESS_MAP_END
 
 
@@ -151,7 +151,7 @@ static ADDRESS_MAP_START( d64_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xff90, 0xffbf) AM_NOP
 	AM_RANGE(0xffc0, 0xffdf) AM_DEVWRITE(SAM6883, "sam", sam6883_w)
 	AM_RANGE(0xffe0, 0xffef) AM_NOP
-	AM_RANGE(0xfff0, 0xffff) AM_ROM AM_REGION("main", 0x3ff0)
+	AM_RANGE(0xfff0, 0xffff) AM_ROM AM_REGION("maincpu", 0x3ff0)
 ADDRESS_MAP_END
 
 /*
@@ -187,7 +187,7 @@ static ADDRESS_MAP_START( d64_plus_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xffe0, 0xffe1) AM_NOP
 	AM_RANGE(0xffe2, 0xffe2) AM_READWRITE(plus_reg_r,plus_reg_w)	/* Dragon plus control / status reg */
 	AM_RANGE(0xffe3, 0xffef) AM_NOP
-	AM_RANGE(0xfff0, 0xffff) AM_ROM AM_REGION("main", 0x3ff0)
+	AM_RANGE(0xfff0, 0xffff) AM_ROM AM_REGION("maincpu", 0x3ff0)
 ADDRESS_MAP_END
 
 /*
@@ -648,9 +648,9 @@ static const ay8910_interface ay8912_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_MEMORY_HANDLER("main", PROGRAM, dgnalpha_psg_porta_read),	/* portA read */
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, dgnalpha_psg_porta_read),	/* portA read */
 	DEVCB_NULL,    					/* portB read */
-	DEVCB_MEMORY_HANDLER("main", PROGRAM, dgnalpha_psg_porta_write),	/* portA write */
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, dgnalpha_psg_porta_write),	/* portA write */
 	DEVCB_NULL						/* portB write */
 };
 
@@ -672,7 +672,7 @@ static const cassette_config coco_cassette_config =
 
 static MACHINE_DRIVER_START( dragon32 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 MHz */
+	MDRV_CPU_ADD("maincpu", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 MHz */
 	MDRV_CPU_PROGRAM_MAP(dragon_map, 0)
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(M6847_PAL_FRAMES_PER_SECOND)
@@ -708,7 +708,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dragon64 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 MHz */
+	MDRV_CPU_ADD("maincpu", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 MHz */
 	MDRV_CPU_PROGRAM_MAP(d64_map, 0)
 
 	MDRV_MACHINE_START( dragon64 )
@@ -748,7 +748,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( d64plus )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 MHz */
+	MDRV_CPU_ADD("maincpu", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 MHz */
 	MDRV_CPU_PROGRAM_MAP(d64_plus_map, 0)
 
 	MDRV_MACHINE_START( dragon64 )
@@ -788,7 +788,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dgnalpha )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 MHz */
+	MDRV_CPU_ADD("maincpu", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 MHz */
 	MDRV_CPU_PROGRAM_MAP(dgnalpha_map, 0)
 
 	MDRV_MACHINE_START( dgnalpha )
@@ -834,7 +834,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( tanodr64 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 MHz */
+	MDRV_CPU_ADD("maincpu", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 MHz */
 	MDRV_CPU_PROGRAM_MAP(d64_map, 0)
 
 	MDRV_MACHINE_START( tanodr64 )
@@ -874,7 +874,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 MHz */
+	MDRV_CPU_ADD("maincpu", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 MHz */
 	MDRV_CPU_PROGRAM_MAP(coco_map, 0)
 
 	MDRV_MACHINE_START( coco )
@@ -912,7 +912,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco2 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 MHz */
+	MDRV_CPU_ADD("maincpu", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 MHz */
 	MDRV_CPU_PROGRAM_MAP(coco_map, 0)
 
 	MDRV_MACHINE_START( coco2 )
@@ -950,7 +950,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco2b )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 MHz */
+	MDRV_CPU_ADD("maincpu", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 MHz */
 	MDRV_CPU_PROGRAM_MAP(coco_map, 0)
 
 	MDRV_MACHINE_START( coco2 )
@@ -988,7 +988,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco3 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 MHz */
+	MDRV_CPU_ADD("maincpu", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 MHz */
 	MDRV_CPU_PROGRAM_MAP(coco3_map, 0)
 
 	MDRV_MACHINE_START( coco3 )
@@ -1050,7 +1050,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coco3h )
 	MDRV_IMPORT_FROM( coco3 )
-	MDRV_CPU_REPLACE( "main", HD6309, COCO_CPU_SPEED_HZ)
+	MDRV_CPU_REPLACE( "maincpu", HD6309, COCO_CPU_SPEED_HZ)
 MACHINE_DRIVER_END
 
 /***************************************************************************
@@ -1060,7 +1060,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START(dragon32)
-	ROM_REGION(0xC000, "main",0)
+	ROM_REGION(0xC000, "maincpu",0)
 	ROM_LOAD(           "d32.rom",      0x0000,  0x4000, CRC(e3879310) SHA1(f2dab125673e653995a83bf6b793e3390ec7f65a))
 
 	ROM_REGION(0x4000,"cart",0)
@@ -1069,7 +1069,7 @@ ROM_START(dragon32)
 ROM_END
 
 ROM_START(dragon64)
-	ROM_REGION(0x10000,"main",0)
+	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD(           "d64_1.rom",    0x0000,  0x4000, CRC(60a4634c) SHA1(f119506eaa3b4b70b9aa0dd83761e8cbe043d042))
 	ROM_LOAD(           "d64_2.rom",    0x8000,  0x4000, CRC(17893a42) SHA1(e3c8986bb1d44269c4587b04f1ca27a70b0aaa2e))
 
@@ -1079,7 +1079,7 @@ ROM_START(dragon64)
 ROM_END
 
 ROM_START(d64plus)
-	ROM_REGION(0x10000,"main",0)
+	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD(           "d64_1.rom",    0x0000,  0x4000, CRC(60a4634c) SHA1(f119506eaa3b4b70b9aa0dd83761e8cbe043d042))
 	ROM_LOAD(           "d64_2.rom",    0x8000,  0x4000, CRC(17893a42) SHA1(e3c8986bb1d44269c4587b04f1ca27a70b0aaa2e))
 
@@ -1089,7 +1089,7 @@ ROM_START(d64plus)
 ROM_END
 
 ROM_START(tanodr64)
-	ROM_REGION(0x10000,"main",0)
+	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD(           "d64_1.rom",    0x0000,  0x4000, CRC(60a4634c) SHA1(f119506eaa3b4b70b9aa0dd83761e8cbe043d042))
 	ROM_LOAD(           "d64_2.rom",    0x8000,  0x4000, CRC(17893a42) SHA1(e3c8986bb1d44269c4587b04f1ca27a70b0aaa2e))
 
@@ -1099,7 +1099,7 @@ ROM_START(tanodr64)
 ROM_END
 
 ROM_START(dgnalpha)
-	ROM_REGION(0xC000,"main",1)
+	ROM_REGION(0xC000,"maincpu",1)
 	ROM_LOAD(           "alpha_bt.rom",    0x2000,  0x2000, CRC(c3dab585) SHA1(4a5851aa66eb426e9bb0bba196f1e02d48156068))
 	ROM_LOAD(           "alpha_ba.rom",    0x8000,  0x4000, CRC(84f68bf9) SHA1(1983b4fb398e3dd9668d424c666c5a0b3f1e2b69))
 
@@ -1110,7 +1110,7 @@ ROM_START(dgnalpha)
 ROM_END
 
 ROM_START(coco)
-	ROM_REGION(0x8000,"main",0)
+	ROM_REGION(0x8000,"maincpu",0)
 	ROM_LOAD(			"bas10.rom",	0x2000, 0x2000, CRC(00b50aaa) SHA1(1f08455cd48ce6a06132aea15c4778f264e19539))
 
 	ROM_REGION(0x4000,"cart",0)
@@ -1119,7 +1119,7 @@ ROM_START(coco)
 ROM_END
 
 ROM_START(cocoe)
-	ROM_REGION(0x8000,"main",0)
+	ROM_REGION(0x8000,"maincpu",0)
 	ROM_LOAD(			"bas11.rom",	0x2000, 0x2000, CRC(6270955a) SHA1(cecb7c24ff1e0ab5836e4a7a8eb1b8e01f1fded3))
 	ROM_LOAD(	        "extbas10.rom",	0x0000, 0x2000, CRC(6111a086) SHA1(8aa58f2eb3e8bcfd5470e3e35e2b359e9a72848e))
 
@@ -1129,7 +1129,7 @@ ROM_START(cocoe)
 ROM_END
 
 ROM_START(coco2)
-	ROM_REGION(0x8000,"main",0)
+	ROM_REGION(0x8000,"maincpu",0)
 	ROM_LOAD(			"bas12.rom",	0x2000, 0x2000, CRC(54368805) SHA1(0f14dc46c647510eb0b7bd3f53e33da07907d04f))
 	ROM_LOAD(      	"extbas11.rom",	0x0000, 0x2000, CRC(a82a6254) SHA1(ad927fb4f30746d820cb8b860ebb585e7f095dea))
 
@@ -1139,7 +1139,7 @@ ROM_START(coco2)
 ROM_END
 
 ROM_START(coco2b)
-	ROM_REGION(0x8000,"main",0)
+	ROM_REGION(0x8000,"maincpu",0)
 	ROM_LOAD(			"bas13.rom",	0x2000, 0x2000, CRC(d8f4d15e) SHA1(28b92bebe35fa4f026a084416d6ea3b1552b63d3))
 	ROM_LOAD(      	"extbas11.rom",	0x0000, 0x2000, CRC(a82a6254) SHA1(ad927fb4f30746d820cb8b860ebb585e7f095dea))
 
@@ -1149,7 +1149,7 @@ ROM_START(coco2b)
 ROM_END
 
 ROM_START(coco3)
-	ROM_REGION(0x8000,"main",0)
+	ROM_REGION(0x8000,"maincpu",0)
 	ROM_LOAD(			"coco3.rom",	0x0000, 0x8000, CRC(b4c88d6c) SHA1(e0d82953fb6fd03768604933df1ce8bc51fc427d))
 
 	ROM_REGION(0x8000,"cart",0)
@@ -1161,7 +1161,7 @@ ROM_START(coco3)
 ROM_END
 
 ROM_START(coco3p)
-	ROM_REGION(0x8000,"main",0)
+	ROM_REGION(0x8000,"maincpu",0)
 	ROM_LOAD(			"coco3p.rom",	0x0000, 0x8000, CRC(ff050d80) SHA1(631e383068b1f52a8f419f4114b69501b21cf379))
 
 	ROM_REGION(0x8000,"cart",0)
@@ -1173,7 +1173,7 @@ ROM_START(coco3p)
 ROM_END
 
 ROM_START(cp400)
-	ROM_REGION(0x8000,"main",0)
+	ROM_REGION(0x8000,"maincpu",0)
 	ROM_LOAD("cp400bas.rom",  0x0000, 0x4000, CRC(878396a5) SHA1(292c545da3c77978e043b00a3dbc317201d18c3b))
 
 	ROM_REGION(0x4000,"cart",0)

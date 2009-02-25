@@ -405,7 +405,7 @@ static READ8_HANDLER(apf_wd179x_data_r)
 static ADDRESS_MAP_START(apf_imagination_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x00000, 0x003ff) AM_RAM AM_BASE(&apf_video_ram) AM_MIRROR(0x1c00)
 	AM_RANGE( 0x02000, 0x03fff) AM_READWRITE(pia_0_r, pia_0_w)
-	AM_RANGE( 0x04000, 0x047ff) AM_ROM AM_REGION("main", 0x10000) AM_MIRROR(0x1800)
+	AM_RANGE( 0x04000, 0x047ff) AM_ROM AM_REGION("maincpu", 0x10000) AM_MIRROR(0x1800)
 	AM_RANGE( 0x06000, 0x063ff) AM_READWRITE(pia_1_r, pia_1_w)
 	AM_RANGE( 0x06400, 0x064ff) AM_READWRITE(serial_r, serial_w)
 	AM_RANGE( 0x06500, 0x06500) AM_READWRITE(apf_wd179x_status_r, apf_wd179x_command_w)
@@ -417,17 +417,17 @@ static ADDRESS_MAP_START(apf_imagination_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x07800, 0x07fff) AM_NOP
 	AM_RANGE( 0x08000, 0x09fff) AM_ROM
 	AM_RANGE( 0x0a000, 0x0dfff) AM_RAM
-	AM_RANGE( 0x0e000, 0x0e7ff) AM_ROM AM_REGION("main", 0x10000) AM_MIRROR(0x1800)
+	AM_RANGE( 0x0e000, 0x0e7ff) AM_ROM AM_REGION("maincpu", 0x10000) AM_MIRROR(0x1800)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(apf_m1000_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x00000, 0x003ff) AM_RAM AM_BASE(&apf_video_ram)  AM_MIRROR(0x1c00)
 	AM_RANGE( 0x02000, 0x03fff) AM_READWRITE(pia_0_r, pia_0_w)
-	AM_RANGE( 0x04000, 0x047ff) AM_ROM AM_REGION("main", 0x10000) AM_MIRROR(0x1800)
+	AM_RANGE( 0x04000, 0x047ff) AM_ROM AM_REGION("maincpu", 0x10000) AM_MIRROR(0x1800)
 	AM_RANGE( 0x06800, 0x077ff) AM_ROM
-	AM_RANGE( 0x08000, 0x09fff) AM_ROM AM_REGION("main", 0x8000)
+	AM_RANGE( 0x08000, 0x09fff) AM_ROM AM_REGION("maincpu", 0x8000)
 	AM_RANGE( 0x0a000, 0x0dfff) AM_RAM
-	AM_RANGE( 0x0e000, 0x0e7ff) AM_ROM AM_REGION("main", 0x10000) AM_MIRROR(0x1800)
+	AM_RANGE( 0x0e000, 0x0e7ff) AM_ROM AM_REGION("maincpu", 0x10000) AM_MIRROR(0x1800)
 ADDRESS_MAP_END
 
 /* The following input ports definitions are wrong and can't be debugged unless the driver
@@ -637,8 +637,8 @@ static const cassette_config apf_cassette_config =
 
 static MACHINE_DRIVER_START( apf_imagination )
 	/* basic machine hardware */
-	//	MDRV_CPU_ADD("main", M6800, 3750000)        /* 7.8336 MHz, only 6800p type used 1 MHz max*/
-	MDRV_CPU_ADD("main", M6800, 1000000 )        /* backgammon uses timing from vertical interrupt to switch between video modes during frame */
+	//	MDRV_CPU_ADD("maincpu", M6800, 3750000)        /* 7.8336 MHz, only 6800p type used 1 MHz max*/
+	MDRV_CPU_ADD("maincpu", M6800, 1000000 )        /* backgammon uses timing from vertical interrupt to switch between video modes during frame */
 	MDRV_CPU_PROGRAM_MAP(apf_imagination_map, 0)
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(M6847_NTSC_FRAMES_PER_SECOND)
@@ -665,7 +665,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( apf_m1000 )
 	MDRV_IMPORT_FROM( apf_imagination )
-	MDRV_CPU_MODIFY( "main" )
+	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP( apf_m1000_map, 0 )
 	MDRV_MACHINE_START( apf_m1000 )
 
@@ -681,14 +681,14 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START(apfimag)
-	ROM_REGION(0x10000+0x0800,"main",0)
+	ROM_REGION(0x10000+0x0800,"maincpu",0)
 	ROM_LOAD("apf_4000.rom",0x010000, 0x00800, CRC(2a331a33) SHA1(387b90882cd0b66c192d9cbaa3bec250f897e4f1))
 	ROM_LOAD("basic_68.rom",0x06800, 0x01000, CRC(ef049ab8) SHA1(c4c12aade95dd89a4750fe7f89d57256c93da068))
 	ROM_LOAD("basic_80.rom",0x08000, 0x02000, CRC(a4c69fae) SHA1(7f98aa482589bf7c5a26d338fec105e797ba43f6))
 ROM_END
 
 ROM_START(apfm1000)
-	ROM_REGION(0x10000+0x0800,"main",0)
+	ROM_REGION(0x10000+0x0800,"maincpu",0)
 	ROM_LOAD("apf_4000.rom",0x010000, 0x0800, CRC(2a331a33) SHA1(387b90882cd0b66c192d9cbaa3bec250f897e4f1))
 //	ROM_LOAD("apf-m1000rom.bin",0x010000, 0x0800, CRC(cc6ac840) SHA1(1110a234bcad99bd0894ad44c591389d16376ca4))
 	ROM_CART_LOAD("cart", 0x8000, 0x2000, ROM_OPTIONAL)

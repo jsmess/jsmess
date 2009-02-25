@@ -166,10 +166,10 @@ MACHINE_START( geneve )
 	add_exit_callback(machine, machine_stop_geneve);
 
 	/* set up RAM pointers */
-	ROM_ptr = memory_region(machine, "main") + offset_rom_geneve;
-	AROM_ptr = memory_region(machine, "main") + offset_altrom_geneve;
-	SRAM_ptr = memory_region(machine, "main") + offset_sram_geneve;
-	DRAM_ptr = memory_region(machine, "main") + offset_dram_geneve;
+	ROM_ptr = memory_region(machine, "maincpu") + offset_rom_geneve;
+	AROM_ptr = memory_region(machine, "maincpu") + offset_altrom_geneve;
+	SRAM_ptr = memory_region(machine, "maincpu") + offset_sram_geneve;
+	DRAM_ptr = memory_region(machine, "maincpu") + offset_dram_geneve;
 }
 
 MACHINE_RESET( geneve )
@@ -251,7 +251,7 @@ MACHINE_RESET( geneve )
 		ti99_usbsm_reset(machine, TRUE);
 
 	/* reset CPU */
-	cputag_reset(machine, "main");
+	cputag_reset(machine, "maincpu");
 }
 
 static void machine_stop_geneve(running_machine *machine)

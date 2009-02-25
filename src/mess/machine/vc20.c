@@ -478,7 +478,7 @@ int vic6560_dma_read_color (running_machine *machine, int offset)
 
 int vic6560_dma_read (running_machine *machine, int offset)
 {
-	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	/* should read real system bus between 0x9000 and 0xa000 */
 	return memory_read_byte(space, VIC6560ADDR2VC20ADDR (offset));
 }
@@ -519,7 +519,7 @@ WRITE8_HANDLER( vc20_6000_w )
 static void vc20_memory_init(running_machine *machine)
 {
 	static int inited = 0;
-	UINT8 *memory = memory_region (machine, "main");
+	UINT8 *memory = memory_region (machine, "maincpu");
 
 	if (inited) return;
 	/* power up values are random (more likely bit set)
@@ -639,11 +639,11 @@ MACHINE_RESET( vic20 )
 	via_ca1_w(via_0, 0, vc20_via0_read_ca1(via_0, 0));
 
 	/* Set up memory banks */
-	memory_set_bankptr (machine,  1, ( ( mess_ram_size >=  8 * 1024 ) ? mess_ram : memory_region(machine, "main") ) + 0x0400 );
-	memory_set_bankptr (machine,  2, vc20_rom_2000 ? vc20_rom_2000 : ( ( ( mess_ram_size >= 16 * 1024 ) ? mess_ram : memory_region(machine, "main") ) + 0x2000 ) );
-	memory_set_bankptr (machine,  3, vc20_rom_4000 ? vc20_rom_4000 : ( ( ( mess_ram_size >= 24 * 1024 ) ? mess_ram : memory_region(machine, "main") ) + 0x4000 ) );
-	memory_set_bankptr (machine,  4, vc20_rom_6000 ? vc20_rom_6000 : ( ( ( mess_ram_size >= 32 * 1024 ) ? mess_ram : memory_region(machine, "main") ) + 0x6000 ) );
-	memory_set_bankptr (machine,  5, vc20_rom_a000 ? vc20_rom_a000 : ( memory_region(machine, "main") + 0xa000 ) );
+	memory_set_bankptr (machine,  1, ( ( mess_ram_size >=  8 * 1024 ) ? mess_ram : memory_region(machine, "maincpu") ) + 0x0400 );
+	memory_set_bankptr (machine,  2, vc20_rom_2000 ? vc20_rom_2000 : ( ( ( mess_ram_size >= 16 * 1024 ) ? mess_ram : memory_region(machine, "maincpu") ) + 0x2000 ) );
+	memory_set_bankptr (machine,  3, vc20_rom_4000 ? vc20_rom_4000 : ( ( ( mess_ram_size >= 24 * 1024 ) ? mess_ram : memory_region(machine, "maincpu") ) + 0x4000 ) );
+	memory_set_bankptr (machine,  4, vc20_rom_6000 ? vc20_rom_6000 : ( ( ( mess_ram_size >= 32 * 1024 ) ? mess_ram : memory_region(machine, "maincpu") ) + 0x6000 ) );
+	memory_set_bankptr (machine,  5, vc20_rom_a000 ? vc20_rom_a000 : ( memory_region(machine, "maincpu") + 0xa000 ) );
 }
 
 

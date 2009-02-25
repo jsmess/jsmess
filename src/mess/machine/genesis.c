@@ -87,7 +87,7 @@ static int cart_type = STANDARD;
 static WRITE16_HANDLER( genesis_ssf2_bank_w )
 {
 	static int lastoffset = -1,lastdata = -1;
-	UINT8 *ROM = memory_region(space->machine, "main");
+	UINT8 *ROM = memory_region(space->machine, "maincpu");
 
 	if ((lastoffset != offset) || (lastdata != data)) {
 		lastoffset = offset; lastdata = data;
@@ -208,7 +208,7 @@ static WRITE16_HANDLER( g_l3alt_bank_w )
 	{
 		case 0:
 		{
-		UINT8 *ROM = memory_region(space->machine, "main");
+		UINT8 *ROM = memory_region(space->machine, "maincpu");
 		/* printf("%06x data %04x\n",activecpu_get_pc(), data); */
 		memcpy(&ROM[0x000000], &ROM[VIRGIN_COPY_GEN + (data&0xffff)*0x8000], 0x8000);
 		}
@@ -233,7 +233,7 @@ static WRITE16_HANDLER( realtec_400000_w )
 {
 	int bankdata = (data >> 9) & 0x7;
 
-	UINT8 *ROM = memory_region(space->machine, "main");
+	UINT8 *ROM = memory_region(space->machine, "maincpu");
 
 	realtek_old_bank_addr = realtek_bank_addr;
 	realtek_bank_addr = (realtek_bank_addr & 0x7) | bankdata<<3;
@@ -245,7 +245,7 @@ static WRITE16_HANDLER( realtec_400000_w )
 static WRITE16_HANDLER( realtec_404000_w )
 {
 	int bankdata = (data >> 8) & 0x3;
-	UINT8 *ROM = memory_region(space->machine, "main");
+	UINT8 *ROM = memory_region(space->machine, "maincpu");
 
 	realtek_old_bank_addr = realtek_bank_addr;
 	realtek_bank_addr = (realtek_bank_addr & 0xf8)|bankdata;
@@ -259,7 +259,7 @@ static WRITE16_HANDLER( realtec_404000_w )
 
 static WRITE16_HANDLER( g_chifi3_bank_w )
 {
-	UINT8 *ROM = memory_region(space->machine, "main");
+	UINT8 *ROM = memory_region(space->machine, "maincpu");
 
 	if (data==0xf100) // *hit player
 	{
@@ -360,14 +360,14 @@ static READ16_HANDLER( g_chifi3_prot_r )
 
 static WRITE16_HANDLER( s19in1_bank )
 {
-	UINT8 *ROM = memory_region(space->machine, "main");
+	UINT8 *ROM = memory_region(space->machine, "maincpu");
 	memcpy(ROM + 0x000000, ROM + 0x400000+((offset << 1)*0x10000), 0x80000);
 }
 
 // Kaiju? (Pokemon Stadium) handler from HazeMD
 static WRITE16_HANDLER( g_kaiju_bank_w )
 {
-	UINT8 *ROM = memory_region(space->machine, "main");
+	UINT8 *ROM = memory_region(space->machine, "maincpu");
 	memcpy(ROM + 0x000000, ROM + 0x400000+(data&0x7f)*0x8000, 0x8000);
 }
 
@@ -454,7 +454,7 @@ static READ16_HANDLER( kof99_0xA13000_r )
 static READ16_HANDLER( radica_bank_select )
 {
 	int bank = offset&0x3f;
-	UINT8 *ROM = memory_region(space->machine, "main");
+	UINT8 *ROM = memory_region(space->machine, "maincpu");
 	memcpy(ROM, ROM +  (bank*0x10000)+0x400000, 0x400000);
 	return 0;
 }
@@ -614,7 +614,7 @@ static void setup_megadriv_custom_mappers(running_machine *machine)
 	unsigned char *ROM;
 	UINT32 mirroraddr;
 
-	ROM = memory_region(machine, "main");
+	ROM = memory_region(machine, "maincpu");
 
 	if (cart_type == SSF2)
 	{
@@ -960,7 +960,7 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 	unsigned char fliptemp;
 #endif
 
-	rawROM = memory_region(image->machine, "main");
+	rawROM = memory_region(image->machine, "maincpu");
 	ROM = rawROM /*+ 512 */;
 
 	length = image_fread(image, rawROM + 0x2000, 0x600000);

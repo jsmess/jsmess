@@ -1927,7 +1927,7 @@ static ADDRESS_MAP_START( saturn_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x01000000, 0x01000003) AM_WRITE(minit_w)
 	AM_RANGE(0x01406f40, 0x01406f43) AM_WRITE(minit_w) // prikura seems to write here ..
 	AM_RANGE(0x01800000, 0x01800003) AM_WRITE(sinit_w)
-	AM_RANGE(0x02000000, 0x023fffff) AM_ROM AM_SHARE(7) AM_REGION("main", 0x80000)	// cartridge space
+	AM_RANGE(0x02000000, 0x023fffff) AM_ROM AM_SHARE(7) AM_REGION("maincpu", 0x80000)	// cartridge space
 	AM_RANGE(0x05800000, 0x0589ffff) AM_READWRITE(stvcd_r, stvcd_w)
 	/* Sound */
 	AM_RANGE(0x05a00000, 0x05a7ffff) AM_READWRITE(stv_sh2_soundram_r, stv_sh2_soundram_w)
@@ -2408,7 +2408,7 @@ static const scsp_interface saturn_scsp_interface =
 static MACHINE_DRIVER_START( saturn )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
+	MDRV_CPU_ADD("maincpu", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
 	MDRV_CPU_PROGRAM_MAP(saturn_mem, 0)
 	MDRV_CPU_VBLANK_INT("screen",stv_interrupt)
 	MDRV_CPU_CONFIG(sh2_conf_master)
@@ -2417,7 +2417,7 @@ static MACHINE_DRIVER_START( saturn )
 	MDRV_CPU_PROGRAM_MAP(saturn_mem, 0)
 	MDRV_CPU_CONFIG(sh2_conf_slave)
 
-	MDRV_CPU_ADD("audio", M68000, MASTER_CLOCK_352/5) //11.46 MHz
+	MDRV_CPU_ADD("audiocpu", M68000, MASTER_CLOCK_352/5) //11.46 MHz
 	MDRV_CPU_PROGRAM_MAP(sound_mem, 0)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -2453,7 +2453,7 @@ MACHINE_DRIVER_END
 
 /* Japanese Saturn */
 ROM_START(saturnjp)
-	ROM_REGION( 0x480000, "main", 0 ) /* SH2 code */
+	ROM_REGION( 0x480000, "maincpu", 0 ) /* SH2 code */
 	ROM_SYSTEM_BIOS(0, "101", "Japan v1.01 (941228)")
 	ROMX_LOAD("sega_101.bin", 0x00000000, 0x00080000, CRC(224b752c) SHA1(df94c5b4d47eb3cc404d88b33a8fda237eaf4720), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "1003", "Japan v1.003 (941012)")
@@ -2462,46 +2462,46 @@ ROM_START(saturnjp)
 	ROMX_LOAD("sega_100.bin", 0x00000000, 0x00080000, CRC(2aba43c2) SHA1(2b8cb4f87580683eb4d760e4ed210813d667f0a2), ROM_BIOS(3))
 	ROM_CART_LOAD("cart", 0x080000, 0x400000, ROM_NOMIRROR | ROM_FILL_FF | ROM_OPTIONAL)
 	ROM_REGION( 0x080000, "slave", 0 ) /* SH2 code */
-	ROM_COPY( "main",0,0,0x080000)
+	ROM_COPY( "maincpu",0,0,0x080000)
 ROM_END
 
 /* Overseas Saturn */
 ROM_START(saturn)
-	ROM_REGION( 0x480000, "main", 0 ) /* SH2 code */
+	ROM_REGION( 0x480000, "maincpu", 0 ) /* SH2 code */
 	ROM_SYSTEM_BIOS(0, "101a", "Overseas v1.01a (941115)")
 	ROMX_LOAD("sega_101a.bin", 0x00000000, 0x00080000, CRC(4afcf0fa) SHA1(faa8ea183a6d7bbe5d4e03bb1332519800d3fbc3), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "100a", "Overseas v1.00a (941115)")
 	ROMX_LOAD("sega_100a.bin", 0x00000000, 0x00080000, CRC(f90f0089) SHA1(3bb41feb82838ab9a35601ac666de5aacfd17a58), ROM_BIOS(2))
 	ROM_CART_LOAD("cart", 0x080000, 0x400000, ROM_NOMIRROR | ROM_FILL_FF | ROM_OPTIONAL)
 	ROM_REGION( 0x080000, "slave", 0 ) /* SH2 code */
-	ROM_COPY( "main",0,0,0x080000)
+	ROM_COPY( "maincpu",0,0,0x080000)
 ROM_END
 
 ROM_START(saturneu)
-	ROM_REGION( 0x480000, "main", 0 ) /* SH2 code */
+	ROM_REGION( 0x480000, "maincpu", 0 ) /* SH2 code */
 	ROM_SYSTEM_BIOS(0, "101a", "Overseas v1.01a (941115)")
 	ROMX_LOAD("sega_101a.bin", 0x00000000, 0x00080000, CRC(4afcf0fa) SHA1(faa8ea183a6d7bbe5d4e03bb1332519800d3fbc3), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "100a", "Overseas v1.00a (941115)")
 	ROMX_LOAD("sega_100a.bin", 0x00000000, 0x00080000, CRC(f90f0089) SHA1(3bb41feb82838ab9a35601ac666de5aacfd17a58), ROM_BIOS(2))
 	ROM_CART_LOAD("cart", 0x080000, 0x400000, ROM_NOMIRROR | ROM_FILL_FF | ROM_OPTIONAL)
 	ROM_REGION( 0x080000, "slave", 0 ) /* SH2 code */
-	ROM_COPY( "main",0,0,0x080000)
+	ROM_COPY( "maincpu",0,0,0x080000)
 ROM_END
 
 ROM_START(vsaturn)
-	ROM_REGION( 0x480000, "main", 0 ) /* SH2 code */
+	ROM_REGION( 0x480000, "maincpu", 0 ) /* SH2 code */
 	ROM_LOAD("vsaturn.bin", 0x00000000, 0x00080000, CRC(e4d61811) SHA1(4154e11959f3d5639b11d7902b3a393a99fb5776))
 	ROM_CART_LOAD("cart", 0x080000, 0x400000, ROM_NOMIRROR | ROM_FILL_FF | ROM_OPTIONAL)
 	ROM_REGION( 0x080000, "slave", 0 ) /* SH2 code */
-	ROM_COPY( "main",0,0,0x080000)
+	ROM_COPY( "maincpu",0,0,0x080000)
 ROM_END
 
 ROM_START(hisaturn)
-	ROM_REGION( 0x480000, "main", 0 ) /* SH2 code */
+	ROM_REGION( 0x480000, "maincpu", 0 ) /* SH2 code */
 	ROM_LOAD("hisaturn.bin", 0x00000000, 0x00080000, CRC(721e1b60) SHA1(49d8493008fa715ca0c94d99817a5439d6f2c796))
 	ROM_CART_LOAD("cart", 0x080000, 0x400000, ROM_NOMIRROR | ROM_FILL_FF | ROM_OPTIONAL)
 	ROM_REGION( 0x080000, "slave", 0 ) /* SH2 code */
-	ROM_COPY( "main",0,0,0x080000)
+	ROM_COPY( "maincpu",0,0,0x080000)
 ROM_END
 
 /***************************************************************************

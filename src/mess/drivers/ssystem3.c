@@ -318,7 +318,7 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( ssystem3 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, 1000000)
+	MDRV_CPU_ADD("maincpu", M6502, 1000000)
 	MDRV_CPU_PROGRAM_MAP(ssystem3_map, 0)
 	MDRV_QUANTUM_TIME(HZ(60))
 
@@ -346,7 +346,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START(ssystem3)
-	ROM_REGION(0x10000,"main",0)
+	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("ss3lrom", 0xc000, 0x1000, CRC(9ea46ed3) SHA1(34eef85b356efbea6ddac1d1705b104fc8e2731a) )
 //	ROM_RELOAD(0xe000, 0x1000)
 	ROM_LOAD("ss3hrom", 0xf000, 0x1000, CRC(52741e0b) SHA1(2a7b950f9810c5a14a1b9d5e6b2bd93da621662e) )

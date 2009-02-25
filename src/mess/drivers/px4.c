@@ -80,20 +80,20 @@ static void gapnit_interrupt(running_machine *machine)
 		if (px4->isr & INT0_7508)
 		{
 			px4->isr &= ~INT0_7508;
-			cputag_set_input_line_and_vector(machine, "main", 0, ASSERT_LINE, 0xf0);
+			cputag_set_input_line_and_vector(machine, "maincpu", 0, ASSERT_LINE, 0xf0);
 		}
 		else if (px4->isr & INT1_ART)
-			cputag_set_input_line_and_vector(machine, "main", 0, ASSERT_LINE, 0xf2);
+			cputag_set_input_line_and_vector(machine, "maincpu", 0, ASSERT_LINE, 0xf2);
 		else if (px4->isr & INT2_ICF)
-			cputag_set_input_line_and_vector(machine, "main", 0, ASSERT_LINE, 0xf4);
+			cputag_set_input_line_and_vector(machine, "maincpu", 0, ASSERT_LINE, 0xf4);
 		else if (px4->isr & INT3_OVF)
-			cputag_set_input_line_and_vector(machine, "main", 0, ASSERT_LINE, 0xf6);
+			cputag_set_input_line_and_vector(machine, "maincpu", 0, ASSERT_LINE, 0xf6);
 		else if (px4->isr & INT4_EXT)
-			cputag_set_input_line_and_vector(machine, "main", 0, ASSERT_LINE, 0xf8);
+			cputag_set_input_line_and_vector(machine, "maincpu", 0, ASSERT_LINE, 0xf8);
 	}
 	else
 	{
-		cputag_set_input_line(machine, "main", 0, CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
 	}
 }
 
@@ -833,7 +833,7 @@ static PALETTE_INIT( px4 )
 
 static MACHINE_DRIVER_START( px4 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, XTAL_7_3728MHz/2)	/* uPD70008 */
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_7_3728MHz/2)	/* uPD70008 */
 	MDRV_CPU_PROGRAM_MAP(px4_mem, 0)
 	MDRV_CPU_IO_MAP(px4_io, 0)
 

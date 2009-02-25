@@ -529,7 +529,7 @@ static ADDRESS_MAP_START(exelv_memmap, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x8000, 0xbfff) AM_NOP
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM										/* CPU RAM */
 	AM_RANGE(0xc800, 0xf7ff) AM_NOP
-	AM_RANGE(0xf800, 0xffff) AM_ROM AM_REGION("main",0x0000)		/* tms7020 internal ROM */
+	AM_RANGE(0xf800, 0xffff) AM_ROM AM_REGION("maincpu",0x0000)		/* tms7020 internal ROM */
 
 ADDRESS_MAP_END
 
@@ -561,7 +561,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START(exelv)
 	/* basic machine hardware */
 	/* TMS7020 CPU @ 4.91(?) MHz */
-	MDRV_CPU_ADD("main", TMS7000_EXL, 4910000)
+	MDRV_CPU_ADD("maincpu", TMS7000_EXL, 4910000)
 	MDRV_CPU_PROGRAM_MAP(exelv_memmap, 0)
 	MDRV_CPU_IO_MAP(exelv_portmap, 0)
 	MDRV_CPU_VBLANK_INT_HACK(exelv_hblank_interrupt, 363)
@@ -592,7 +592,7 @@ MACHINE_DRIVER_END
   ROM loading
 */
 ROM_START(exl100)
-	ROM_REGION(0x800, "main", 0)
+	ROM_REGION(0x800, "maincpu", 0)
 	ROM_LOAD("exl100in.bin", 0x0000, 0x0800, BAD_DUMP CRC(049109a3) SHA1(98a07297dcdacef41c793c197b6496dac1e8e744))		/* TMS7020 ROM, needs verification */
 
 	ROM_REGION(0x1000, "tms7040", 0)
@@ -604,7 +604,7 @@ ROM_END
 
 ROM_START(exeltel)
 	/*CPU memory space*/
-	ROM_REGION(0x1000, "main", 0)
+	ROM_REGION(0x1000, "maincpu", 0)
 	ROM_LOAD("exeltelin.bin", 0x0006, 0x0ffa, BAD_DUMP CRC(c12f24b5))		/* TMS7020 internal ROM */
 
 	ROM_REGION(0x1000, "tms7040", 0)

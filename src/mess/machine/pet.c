@@ -553,7 +553,7 @@ static TIMER_CALLBACK(pet_interrupt)
 {
 	static int level = 0;
 
-	pia_0_cb1_w(cputag_get_address_space(machine,"main",ADDRESS_SPACE_PROGRAM), 0, level);
+	pia_0_cb1_w(cputag_get_address_space(machine,"maincpu",ADDRESS_SPACE_PROGRAM), 0, level);
 	level = !level;
 }
 
@@ -563,7 +563,7 @@ static TIMER_CALLBACK( pet_tape1_timer )
 {
 //  cassette 1
 	UINT8 data = (cassette_input(devtag_get_device(machine, CASSETTE, "cassette1")) > +0.0) ? 1 : 0;
-	pia_0_ca1_w(cputag_get_address_space(machine,"main",ADDRESS_SPACE_PROGRAM), 0, data);
+	pia_0_ca1_w(cputag_get_address_space(machine,"maincpu",ADDRESS_SPACE_PROGRAM), 0, data);
 }
 
 /* NOT WORKING - Just placeholder */
@@ -651,7 +651,7 @@ DRIVER_INIT( pet40 )
 DRIVER_INIT( pet80 )
 {
 	pet_state *state = machine->driver_data;
-	pet_memory = memory_region(machine, "main");
+	pet_memory = memory_region(machine, "maincpu");
 
 	pet_common_driver_init(machine);
 	state->cbm8096 = 1;
@@ -710,12 +710,12 @@ MACHINE_RESET( pet )
 		{
 			memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xfff0, 0xfff0, 0, 0, SMH_NOP);
 		}
-		cbm8096_w(cputag_get_address_space(machine,"main",ADDRESS_SPACE_PROGRAM), 0, 0);
+		cbm8096_w(cputag_get_address_space(machine,"maincpu",ADDRESS_SPACE_PROGRAM), 0, 0);
 	}
 
 	cbm_drive_0_config (input_port_read(machine, "CFG") & 2 ? IEEE : 0, 8);
 	cbm_drive_1_config (input_port_read(machine, "CFG") & 1 ? IEEE : 0, 9);
-	device_reset(cputag_get_cpu(machine, "main"));
+	device_reset(cputag_get_cpu(machine, "maincpu"));
 }
 
 

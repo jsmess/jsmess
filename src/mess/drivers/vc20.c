@@ -254,7 +254,7 @@ static PALETTE_INIT( vc20 )
 
 static MACHINE_DRIVER_START( vic20 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, VIC6560_CLOCK)        /* 7.8336 MHz */
+	MDRV_CPU_ADD("maincpu", M6502, VIC6560_CLOCK)        /* 7.8336 MHz */
 	MDRV_CPU_PROGRAM_MAP(vc20_mem, 0)
 	MDRV_CPU_VBLANK_INT("screen", vic20_frame_interrupt)
 	MDRV_CPU_PERIODIC_INT(vic656x_raster_interrupt, VIC656X_HRETRACERATE)
@@ -319,7 +319,7 @@ static MACHINE_DRIVER_START( vic20i )
 	MDRV_QUANTUM_TIME(HZ(180000))
 #endif
 
-	MDRV_CPU_MODIFY( "main" )
+	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP( vc20i_mem, 0 )
 MACHINE_DRIVER_END
 
@@ -327,7 +327,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( vc20 )
 	MDRV_IMPORT_FROM( vic20 )
 
-	MDRV_CPU_REPLACE( "main", M6502, VIC6561_CLOCK )
+	MDRV_CPU_REPLACE( "maincpu", M6502, VIC6561_CLOCK )
 	MDRV_CPU_PROGRAM_MAP( vc20i_mem, 0 )
 
 	MDRV_SCREEN_MODIFY("screen")
@@ -356,7 +356,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( vic1001 )
-	ROM_REGION (0x10000, "main", 0 )
+	ROM_REGION (0x10000, "maincpu", 0 )
 	ROM_FILL( 0x0000, 0x8000, 0xff )
 	ROM_LOAD( "901460.02", 0x8000, 0x1000, CRC(fcfd8a4b) SHA1(dae61ac03065aa2904af5c123ce821855898c555) )
 	ROM_FILL( 0x9000, 0x3000, 0xff )
@@ -366,7 +366,7 @@ ROM_END
 
 
 ROM_START( vic20 )
-	ROM_REGION (0x10000, "main", 0 )
+	ROM_REGION (0x10000, "maincpu", 0 )
 	ROM_FILL( 0x0000, 0x8000, 0xff )
 	ROM_LOAD( "901460.03", 0x8000, 0x1000, CRC(83e032a6) SHA1(4fd85ab6647ee2ac7ba40f729323f2472d35b9b4) )
 	ROM_FILL( 0x9000, 0x3000, 0xff )
@@ -375,7 +375,7 @@ ROM_START( vic20 )
 ROM_END
 
 ROM_START( vic20pal )
-	ROM_REGION (0x10000, "main", 0 )
+	ROM_REGION (0x10000, "maincpu", 0 )
 	ROM_FILL( 0x0000, 0x8000, 0xff )
 	ROM_LOAD( "901460.03", 0x8000, 0x1000, CRC(83e032a6) SHA1(4fd85ab6647ee2ac7ba40f729323f2472d35b9b4) )
 	ROM_FILL( 0x9000, 0x3000, 0xff )
@@ -391,7 +391,7 @@ ROM_END
 ROM_START( vic20swe )
 	/* patched pal system for swedish/finish keyboard and chars */
 	/* but in rom? (maybe patched means in this case nec version) */
-	ROM_REGION (0x10000, "main", 0 )
+	ROM_REGION (0x10000, "maincpu", 0 )
 	ROM_FILL( 0x0000, 0x8000, 0xff )
 	ROM_LOAD( "nec22101.207", 0x8000, 0x1000, CRC(d808551d) SHA1(f403f0b0ce5922bd61bbd768bdd6f0b38e648c9f) )
 	ROM_FILL( 0x9000, 0x3000, 0xff )
@@ -401,7 +401,7 @@ ROM_END
 
 
 ROM_START( vic20i )
-	ROM_REGION (0x10000, "main", 0 )
+	ROM_REGION (0x10000, "maincpu", 0 )
 	ROM_FILL( 0x0000, 0x8000, 0xff )
 	ROM_LOAD( "901460.03", 0x8000, 0x1000, CRC(83e032a6) SHA1(4fd85ab6647ee2ac7ba40f729323f2472d35b9b4) )
 	ROM_FILL( 0x9000, 0x2000, 0xff )
@@ -413,7 +413,7 @@ ROM_START( vic20i )
 ROM_END
 
 ROM_START( vic20v )
-	ROM_REGION (0x10000, "main", 0 )
+	ROM_REGION (0x10000, "maincpu", 0 )
 	ROM_FILL( 0x0000, 0x8000, 0xff )
 	ROM_LOAD( "901460.03", 0x8000, 0x1000, CRC(83e032a6) SHA1(4fd85ab6647ee2ac7ba40f729323f2472d35b9b4) )
 	ROM_FILL( 0x9000, 0x3000, 0xff )
@@ -424,7 +424,7 @@ ROM_START( vic20v )
 ROM_END
 
 ROM_START( vic20plv )
-	ROM_REGION (0x10000, "main", 0 )
+	ROM_REGION (0x10000, "maincpu", 0 )
 	ROM_FILL( 0x0000, 0x8000, 0xff )
 	ROM_LOAD( "901460.03", 0x8000, 0x1000, CRC(83e032a6) SHA1(4fd85ab6647ee2ac7ba40f729323f2472d35b9b4) )
 	ROM_FILL( 0x9000, 0x3000, 0xff )

@@ -455,7 +455,7 @@ static const jaguar_cpu_config dsp_config =
 static MACHINE_DRIVER_START( jaguar )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68EC020, M68K_CLOCK/2)
+	MDRV_CPU_ADD("maincpu", M68EC020, M68K_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(jaguar_map,0)
 
 	MDRV_CPU_ADD("gpu", JAGUARGPU, JAGUAR_CLOCK/2)
@@ -504,7 +504,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( jaguar )
-	ROM_REGION( 0xe20000, "main", 0 )  /* 4MB for RAM at 0 */
+	ROM_REGION( 0xe20000, "maincpu", 0 )  /* 4MB for RAM at 0 */
 	ROM_LOAD16_WORD( "jagboot.rom",          0xe00000, 0x020000, CRC(fb731aaa) SHA1(f8991b0c385f4e5002fa2a7e2f5e61e8c5213356))
 	ROM_CART_LOAD("cart", 0x800000, 0x600000, ROM_NOMIRROR)
 ROM_END
@@ -528,7 +528,7 @@ static QUICKLOAD_LOAD( jaguar )
 {
 	offs_t quickload_begin = 0x4000;
 	quickload_size = MIN(quickload_size, 0x200000 - quickload_begin);
-	image_fread(image, &memory_region(image->machine, "main")[quickload_begin], quickload_size);
+	image_fread(image, &memory_region(image->machine, "maincpu")[quickload_begin], quickload_size);
 	cpu_set_reg(image->machine->cpu[0], REG_GENPC, quickload_begin);
 	return INIT_PASS;
 }

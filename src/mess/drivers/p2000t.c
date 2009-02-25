@@ -215,7 +215,7 @@ static INTERRUPT_GEN( p2000_interrupt )
 /* Machine definition */
 static MACHINE_DRIVER_START( p2000t )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 2500000)
+	MDRV_CPU_ADD("maincpu", Z80, 2500000)
 	MDRV_CPU_PROGRAM_MAP(p2000t_mem, 0)
 	MDRV_CPU_IO_MAP(p2000t_io, 0)
 	MDRV_CPU_VBLANK_INT("screen", p2000_interrupt)
@@ -233,7 +233,7 @@ MACHINE_DRIVER_END
 /* Machine definition */
 static MACHINE_DRIVER_START( p2000m )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 2500000)
+	MDRV_CPU_ADD("maincpu", Z80, 2500000)
 	MDRV_CPU_PROGRAM_MAP(p2000m_mem, 0)
 	MDRV_CPU_IO_MAP(p2000t_io, 0)
 	MDRV_CPU_VBLANK_INT("screen", p2000_interrupt)
@@ -261,7 +261,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START(p2000t)
-	ROM_REGION(0x10000, "main",0)
+	ROM_REGION(0x10000, "maincpu",0)
 	ROM_LOAD("p2000.rom", 0x0000, 0x1000, CRC(650784a3) SHA1(4dbb28adad30587f2ea536ba116898d459faccac))
 	ROM_LOAD("basic.rom", 0x1000, 0x4000, CRC(9d9d38f9) SHA1(fb5100436c99634a2592a10dff867f85bcff7aec))
 	ROM_REGION(0x01000, "gfx1",0)
@@ -269,7 +269,7 @@ ROM_START(p2000t)
 ROM_END
 
 ROM_START(p2000m)
-	ROM_REGION(0x10000, "main",0)
+	ROM_REGION(0x10000, "maincpu",0)
 	ROM_LOAD("p2000.rom", 0x0000, 0x1000, CRC(650784a3) SHA1(4dbb28adad30587f2ea536ba116898d459faccac))
 	ROM_LOAD("basic.rom", 0x1000, 0x4000, CRC(9d9d38f9) SHA1(fb5100436c99634a2592a10dff867f85bcff7aec))
 	ROM_REGION(0x01000, "gfx1",0)

@@ -129,7 +129,7 @@ INPUT_PORTS_END
 /* Machine driver */
 static MACHINE_DRIVER_START( irisha )
     /* basic machine hardware */
-    MDRV_CPU_ADD("main", 8080, XTAL_16MHz / 9)
+    MDRV_CPU_ADD("maincpu", 8080, XTAL_16MHz / 9)
     MDRV_CPU_PROGRAM_MAP(irisha_mem, 0)
    	MDRV_CPU_IO_MAP(irisha_io, 0)
 
@@ -161,7 +161,7 @@ MACHINE_DRIVER_END
 /* ROM definition */
 
 ROM_START( irisha )
-    ROM_REGION( 0x10000, "main", ROMREGION_ERASEFF )
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
     ROM_LOAD( "irisha.rom", 0x0000, 0x4000, BAD_DUMP CRC(B3CC0BB4) )
 ROM_END
 

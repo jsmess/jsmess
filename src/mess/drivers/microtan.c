@@ -216,7 +216,7 @@ static const ay8910_interface microtan_ay8910_interface =
 
 static MACHINE_DRIVER_START( microtan )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, 750000)	// 750 kHz
+	MDRV_CPU_ADD("maincpu", M6502, 750000)	// 750 kHz
 	MDRV_CPU_PROGRAM_MAP(microtan_map, 0)
 	MDRV_CPU_VBLANK_INT("screen", microtan_interrupt)
 
@@ -265,7 +265,7 @@ static MACHINE_DRIVER_START( microtan )
 MACHINE_DRIVER_END
 
 ROM_START( microtan )
-    ROM_REGION( 0x10000, "main", 0 )
+    ROM_REGION( 0x10000, "maincpu", 0 )
     ROM_LOAD( "tanex_j2.rom", 0xc000, 0x1000, CRC(3e09d384) SHA1(15a98941a672ff16242cc73f1dcf1d81fccd8910) )
     ROM_LOAD( "tanex_h2.rom", 0xd000, 0x1000, CRC(75105113) SHA1(c6fea4d65b7c52f43aa1589cace9467349a0f290) )
     ROM_LOAD( "tanex_d3.rom", 0xe000, 0x0800, CRC(ee6e8412) SHA1(7e1bca84bab79d94a4ab8554d23e2bc28ccd0384) )

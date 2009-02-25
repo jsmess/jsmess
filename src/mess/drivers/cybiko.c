@@ -222,17 +222,17 @@ INPUT_PORTS_END
 /////////
 
 ROM_START( cybikov1 )
-	ROM_REGION( 0x8000, "main", 0)
+	ROM_REGION( 0x8000, "maincpu", 0)
 	ROM_LOAD( "cyrom112.bin", 0, 0x8000, CRC(9E1F1A0F) SHA1(6FC08DE6B2C67D884EC78F748E4A4BAD27EE8045))
 ROM_END
 
 ROM_START( cybikov2 )
-	ROM_REGION( 0x8000, "main", 0)
+	ROM_REGION( 0x8000, "maincpu", 0)
 	ROM_LOAD( "cyrom117.bin", 0, 0x8000, CRC(268DA7BF) SHA1(135EAF9E3905E69582AABD9B06BC4DE0A66780D5))
 ROM_END
 
 ROM_START( cybikoxt )
-	ROM_REGION( 0x8000, "main", 0)
+	ROM_REGION( 0x8000, "maincpu", 0)
 	ROM_LOAD( "cyrom150.bin", 0, 0x8000, CRC(18B9B21F) SHA1(28868D6174EB198A6CEC6C3C70B6E494517229B9))
 ROM_END
 
@@ -261,7 +261,7 @@ SYSTEM_CONFIG_END
 
 static MACHINE_DRIVER_START( cybikov1 )
 	// cpu
-	//MDRV_CPU_ADD( "main", H8S2241, 11059200)
+	//MDRV_CPU_ADD( "maincpu", H8S2241, 11059200)
 	//MDRV_CPU_PROGRAM_MAP( cybikov1_mem, 0)
 	//MDRV_CPU_IO_MAP( cybikov1_io, 0)
 	// screen
@@ -294,7 +294,7 @@ static MACHINE_DRIVER_START( cybikov2 )
 	// import
 	MDRV_IMPORT_FROM( cybikov1)
 	// cpu
-	//MDRV_CPU_REPLACE( "main", H8S2246, 11059200)
+	//MDRV_CPU_REPLACE( "maincpu", H8S2246, 11059200)
 	//MDRV_CPU_PROGRAM_MAP( cybikov2_mem, 0)
 	//MDRV_CPU_IO_MAP( cybikov2_io, 0)
 	// machine
@@ -309,7 +309,7 @@ static MACHINE_DRIVER_START( cybikoxt )
 	// import
 	MDRV_IMPORT_FROM( cybikov1)
 	// cpu
-	//MDRV_CPU_REPLACE( "main", H8S2323, 18432000)
+	//MDRV_CPU_REPLACE( "maincpu", H8S2323, 18432000)
 	//MDRV_CPU_PROGRAM_MAP( cybikoxt_mem, 0)
 	//MDRV_CPU_IO_MAP( cybikoxt_io, 0)
 	// sound

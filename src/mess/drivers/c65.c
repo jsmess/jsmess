@@ -211,7 +211,7 @@ static const sid6581_interface c65_sound_interface =
 
 static MACHINE_DRIVER_START( c65 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M4510, 3500000)  /* or VIC6567_CLOCK, */
+	MDRV_CPU_ADD("maincpu", M4510, 3500000)  /* or VIC6567_CLOCK, */
 	MDRV_CPU_PROGRAM_MAP(c65_mem, 0)
 	MDRV_CPU_VBLANK_INT("screen", c64_frame_interrupt)
 	MDRV_CPU_PERIODIC_INT(vic3_raster_irq, VIC6567_HRETRACERATE)
@@ -277,7 +277,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( c65 )
-	ROM_REGION( 0x400000, "main", 0 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS( 0, "910111", "V0.9.910111" )
 	ROMX_LOAD( "910111.bin", 0x20000, 0x20000, CRC(c5d8d32e) SHA1(71c05f098eff29d306b0170e2c1cdeadb1a5f206), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "910523", "V0.9.910523" )
@@ -291,7 +291,7 @@ ROM_START( c65 )
 ROM_END
 
 ROM_START( c64dx )
-	ROM_REGION( 0x400000, "main", 0 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD( "910429.bin", 0x20000, 0x20000, CRC(b025805c) SHA1(c3b05665684f74adbe33052a2d10170a1063ee7d) )
 ROM_END
 

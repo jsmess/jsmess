@@ -179,7 +179,7 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( acrnsys1 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, 1008000)  /* 1.008 MHz */
+	MDRV_CPU_ADD("maincpu", M6502, 1008000)  /* 1.008 MHz */
 	MDRV_CPU_PROGRAM_MAP(acrnsys1_map, 0)
 
 	MDRV_MACHINE_RESET(acrnsys1)
@@ -200,11 +200,11 @@ MACHINE_DRIVER_END
 
 
 ROM_START( acrnsys1 )
-	ROM_REGION(0x10000, "main", 0)
+	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("acrnsys1.bin", 0xfe00, 0x0200, CRC(43dcfc16) SHA1(b987354c55beb5e2ced761970c3339b895a8c09d))
-	ROM_COPY("main", 0xfe00, 0xf800, 0x0200)
-	ROM_COPY("main", 0xfe00, 0xfa00, 0x0200)
-	ROM_COPY("main", 0xfe00, 0xfc00, 0x0200)
+	ROM_COPY("maincpu", 0xfe00, 0xf800, 0x0200)
+	ROM_COPY("maincpu", 0xfe00, 0xfa00, 0x0200)
+	ROM_COPY("maincpu", 0xfe00, 0xfc00, 0x0200)
 ROM_END
 
 

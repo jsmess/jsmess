@@ -182,7 +182,7 @@ static WRITE8_HANDLER( scrambler_w )
 
 	*/
 
-	UINT8 *ROM = memory_region(space->machine, "main") + 0xc000;
+	UINT8 *ROM = memory_region(space->machine, "maincpu") + 0xc000;
 	UINT16 addr;
 
 	scrambler = data;
@@ -388,7 +388,7 @@ static MACHINE_RESET( aquarius )
 static DEVICE_IMAGE_LOAD( aquarius_cart )
 {
 	int size = image_length(image);
-	UINT8 *ptr = memory_region(image->machine, "main") + 0xc000;
+	UINT8 *ptr = memory_region(image->machine, "maincpu") + 0xc000;
 
 	if (image_fread(image, ptr, size) != size)
 	{
@@ -419,7 +419,7 @@ static const cassette_config aquarius_cassette_config =
 
 static MACHINE_DRIVER_START( aquarius )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, XTAL_3_579545MHz) // ???
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz) // ???
 	MDRV_CPU_PROGRAM_MAP(aquarius_mem, 0)
 	MDRV_CPU_IO_MAP(aquarius_io, 0)
 	MDRV_CPU_VBLANK_INT("screen", aquarius_interrupt)
@@ -466,7 +466,7 @@ MACHINE_DRIVER_END
 /* ROMs */
 
 ROM_START( aquarius )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 //	ROM_LOAD( "aquarius.u2", 0x0000, 0x2000, CRC(5cfa5b42) SHA1(02c8ee11e911d1aa346812492d14284b6870cb3e) )
 	ROM_LOAD( "aq2.u2", 0x0000, 0x2000, CRC(a2d15bcf) SHA1(ca6ef55e9ead41453efbf5062d6a60285e9661a6) )
 	

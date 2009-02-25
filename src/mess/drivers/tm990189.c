@@ -755,7 +755,7 @@ static const tms9980areset_param reset_params =
 static MACHINE_DRIVER_START(tm990_189)
 	/* basic machine hardware */
 	/* TMS9980 CPU @ 2.0 MHz */
-	MDRV_CPU_ADD("main", TMS9980, 2000000)
+	MDRV_CPU_ADD("maincpu", TMS9980, 2000000)
 	MDRV_CPU_CONFIG(reset_params)
 	MDRV_CPU_PROGRAM_MAP(tm990_189_memmap, 0)
 	MDRV_CPU_IO_MAP(tm990_189_readcru, tm990_189_writecru)
@@ -803,7 +803,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START(tm990_189_v)
 	/* basic machine hardware */
 	/* TMS9980 CPU @ 2.0 MHz */
-	MDRV_CPU_ADD("main", TMS9980, 2000000)
+	MDRV_CPU_ADD("maincpu", TMS9980, 2000000)
 	MDRV_CPU_CONFIG(reset_params)
 	MDRV_CPU_PROGRAM_MAP(tm990_189_v_memmap, 0)
 	MDRV_CPU_IO_MAP(tm990_189_readcru, tm990_189_writecru)
@@ -845,7 +845,7 @@ MACHINE_DRIVER_END
 */
 ROM_START(990189)
 	/*CPU memory space*/
-	ROM_REGION(0x4000, "main",0)
+	ROM_REGION(0x4000, "maincpu",0)
 
 	/* extra ROM */
 	ROM_LOAD("990-469.u32", 0x0800, 0x0800, CRC(08df7edb) SHA1(fa9751fd2e3e5d7ae03819fc9c7099e2ddd9fb53))
@@ -858,7 +858,7 @@ ROM_END
 
 ROM_START(990189v)
 	/*CPU memory space*/
-	ROM_REGION(0x4000, "main",0)
+	ROM_REGION(0x4000, "maincpu",0)
 
 	/* extra ROM */
 	ROM_LOAD("990-469.u32", 0x0800, 0x0800, CRC(08df7edb) SHA1(fa9751fd2e3e5d7ae03819fc9c7099e2ddd9fb53))

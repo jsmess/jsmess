@@ -243,7 +243,7 @@ static const cassette_config primo_cassette_config =
 
 static MACHINE_DRIVER_START( primoa32 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD( "main", Z80, 2500000 )
+	MDRV_CPU_ADD( "maincpu", Z80, 2500000 )
 	MDRV_CPU_PROGRAM_MAP( primo32_mem, 0 )
 	MDRV_CPU_IO_MAP( primoa_port, 0 )
 	MDRV_CPU_VBLANK_INT("screen", primo_vblank_interrupt)
@@ -286,19 +286,19 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( primoa48 )
 	MDRV_IMPORT_FROM( primoa32 )
-	MDRV_CPU_MODIFY( "main" )
+	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP( primo48_mem, 0 )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( primoa64 )
 	MDRV_IMPORT_FROM( primoa32 )
-	MDRV_CPU_MODIFY( "main" )
+	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP( primo64_mem, 0 )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( primob32 )
 	MDRV_IMPORT_FROM( primoa32 )
-	MDRV_CPU_MODIFY( "main" )
+	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_IO_MAP( primob_port, 0 )
 
 	MDRV_MACHINE_RESET( primob )
@@ -306,7 +306,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( primob48 )
 	MDRV_IMPORT_FROM( primoa48 )
-	MDRV_CPU_MODIFY( "main" )
+	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_IO_MAP( primob_port, 0 )
 
 	MDRV_MACHINE_RESET( primob )
@@ -314,7 +314,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( primob64 )
 	MDRV_IMPORT_FROM( primoa64 )
-	MDRV_CPU_MODIFY( "main" )
+	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_IO_MAP( primob_port, 0 )
 
 	MDRV_MACHINE_RESET( primob )
@@ -322,14 +322,14 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( primoc64 )
 	MDRV_IMPORT_FROM( primoa64 )
-	MDRV_CPU_MODIFY( "main" )
+	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_IO_MAP( primob_port, 0 )
 
 	MDRV_MACHINE_RESET( primob )
 MACHINE_DRIVER_END
 
 ROM_START( primoa32 )
-	ROM_REGION( 0x1c000, "main", 0 )
+	ROM_REGION( 0x1c000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS(0, "ver1", "ver 1")
 	ROMX_LOAD( "a32_1.rom", 0x10000, 0x1000, CRC(4e91c1a4) SHA1(bf6e41b6b36a2556a50065e9acfd8cd57968f039), ROM_BIOS(1) )
 	ROMX_LOAD( "a32_2.rom", 0x11000, 0x1000, CRC(81a8a0fb) SHA1(df75bd7774969cabb062e50da6004f2efbde489e), ROM_BIOS(1) )
@@ -342,7 +342,7 @@ ROM_START( primoa32 )
 ROM_END
 
 ROM_START( primoa48 )
-	ROM_REGION( 0x1c000, "main", 0 )
+	ROM_REGION( 0x1c000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS(0, "ver1", "ver 1")
 	ROMX_LOAD( "a48_1.rom", 0x10000, 0x1000, CRC(7de6ad6f) SHA1(f2fd6fac4f9bc57c646efe40281758bb7c3f56e1), ROM_BIOS(1) )
 	ROMX_LOAD( "a48_2.rom", 0x11000, 0x1000, CRC(81a8a0fb) SHA1(df75bd7774969cabb062e50da6004f2efbde489e), ROM_BIOS(1) )
@@ -355,7 +355,7 @@ ROM_START( primoa48 )
 ROM_END
 
 ROM_START( primoa64 )
-	ROM_REGION( 0x1c000, "main", 0 )
+	ROM_REGION( 0x1c000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS(0, "ver1", "ver 1")
 	ROMX_LOAD( "a64_1.rom", 0x10000, 0x1000, CRC(6a7a9b9b) SHA1(e9ce16f90d9a799a26a9cef09d9ee6a6d7749484), ROM_BIOS(1) )
 	ROMX_LOAD( "a64_2.rom", 0x11000, 0x1000, CRC(81a8a0fb) SHA1(df75bd7774969cabb062e50da6004f2efbde489e), ROM_BIOS(1) )
@@ -368,7 +368,7 @@ ROM_START( primoa64 )
 ROM_END
 
 ROM_START( primob32 )
-	ROM_REGION( 0x1c000, "main", 0 )
+	ROM_REGION( 0x1c000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS(0, "ver1", "ver 1")
 	ROMX_LOAD( "b32.rom",   0x10000, 0x4000, CRC(f594d2bb) SHA1(b74961dba008a1a6f15a22ddbd1b89acd7e286c2), ROM_BIOS(1) )	
 	ROM_SYSTEM_BIOS(1, "ver2", "ver 2")
@@ -378,7 +378,7 @@ ROM_START( primob32 )
 ROM_END
 
 ROM_START( primob48 )
-	ROM_REGION( 0x1c000, "main", 0 )
+	ROM_REGION( 0x1c000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS(0, "ver1", "ver 1")
 	ROMX_LOAD( "b48.rom",   0x10000, 0x4000, CRC(df3d2a57) SHA1(ab9413aa9d7749d30a486da00bc8c6d178a2172c), ROM_BIOS(1) )	
 	ROM_SYSTEM_BIOS(1, "ver2", "ver 2")
@@ -388,7 +388,7 @@ ROM_START( primob48 )
 ROM_END
 
 ROM_START( primob64 )
-	ROM_REGION( 0x1c000, "main", 0 )
+	ROM_REGION( 0x1c000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS(0, "ver1", "ver 1")
 	ROMX_LOAD( "b64.rom",   0x10000, 0x4000, CRC(73305e4d) SHA1(c090c3430cdf19eed8363377b981e1c21a4ed169), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(1, "ver2", "ver 2")
@@ -400,7 +400,7 @@ ROM_START( primob64 )
 ROM_END
 
 ROM_START( primoc64 )
-	ROM_REGION( 0x1c000, "main", 0 )
+	ROM_REGION( 0x1c000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS(0, "ver1", "ver 1")
 	ROMX_LOAD( "c64_1.rom", 0x10000, 0x1000, CRC(c22290ea) SHA1(af5c73f6d0f7a987c4f082a5cb69e3f016127d57), ROM_BIOS(1) )
 	ROMX_LOAD( "c64_2.rom", 0x11000, 0x1000, CRC(0756b56e) SHA1(589dbdb7c43ca7ca29ed1e56e080adf8c069e407), ROM_BIOS(1) )

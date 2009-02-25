@@ -473,7 +473,7 @@ VIDEO_START( svi328_806 )
 
 VIDEO_UPDATE( svi328_806 )
 {
-	if (!strcmp(screen->tag, "main"))
+	if (!strcmp(screen->tag, "maincpu"))
 	{
 		VIDEO_UPDATE_CALL(tms9928a);
 	}
@@ -661,7 +661,7 @@ static void svi318_set_banks(running_machine *machine)
 
 	switch( svi.bankLow ) {
 	case SVI_INTERNAL:
-		svi.bankLow_ptr = memory_region(machine, "main");
+		svi.bankLow_ptr = memory_region(machine, "maincpu");
 		break;
 	case SVI_CART:
 		if ( pcart ) {

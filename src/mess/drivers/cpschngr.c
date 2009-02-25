@@ -34,7 +34,7 @@ void forogttn_dummy_function(running_machine *machine)
 	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x800048, 0x800049, 0, 0, forgottn_dial_1_reset_w);
 	memory_install_read16_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x800052, 0x800055, 0, 0, forgottn_dial_0_r);
 	memory_install_read16_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x80005a, 0x80005d, 0, 0, forgottn_dial_1_r);
-	cps1_hack_dsw_r(cputag_get_address_space(machine,"main",ADDRESS_SPACE_PROGRAM), 0, 0);
+	cps1_hack_dsw_r(cputag_get_address_space(machine,"maincpu",ADDRESS_SPACE_PROGRAM), 0, 0);
 	driver_init_sf2mdt(machine);
 }
 
@@ -104,7 +104,7 @@ INPUT_PORTS_END
 
 
 ROM_START( sfach )
-	ROM_REGION( CODE_SIZE, "main", 0 )      /* 68000 code */
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "sfach23",        0x000000, 0x80000, CRC(02a1a853) SHA1(d92b9e774844fdcc9d9946b3e892b021e672d876) )
 	ROM_LOAD16_WORD_SWAP( "sfza22",         0x080000, 0x80000, CRC(8d9b2480) SHA1(405305c1572908d00eab735f28676fbbadb4fac6) )
 	ROM_LOAD16_WORD_SWAP( "sfzch21",        0x100000, 0x80000, CRC(5435225d) SHA1(6b1156fd82d0710e244ede39faaae0847c598376) )
@@ -131,7 +131,7 @@ ROM_START( sfach )
 	ROM_REGION( 0x8000, "stars", 0 )
 	ROM_COPY( "gfx", 0x000000, 0x000000, 0x8000 )	/* stars */
 
-	ROM_REGION( 0x18000, "audio", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_REGION( 0x18000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
 	ROM_LOAD( "sfz09",         0x00000, 0x08000, CRC(c772628b) SHA1(ebc5b7c173caf1e151f733f23c1b20abec24e16d) )
 	ROM_CONTINUE(              0x10000, 0x08000 )
 
@@ -141,7 +141,7 @@ ROM_START( sfach )
 ROM_END
 
 ROM_START( sfzbch )
-	ROM_REGION( CODE_SIZE, "main", 0 )      /* 68000 code */
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "sfzbch23",       0x000000, 0x80000, CRC(53699f68) SHA1(d7f132faf8c31b5e79c32e6b0cce45377ec8d474) )
 	ROM_LOAD16_WORD_SWAP( "sfza22",         0x080000, 0x80000, CRC(8d9b2480) SHA1(405305c1572908d00eab735f28676fbbadb4fac6) )
 	ROM_LOAD16_WORD_SWAP( "sfzch21",        0x100000, 0x80000, CRC(5435225d) SHA1(6b1156fd82d0710e244ede39faaae0847c598376) )
@@ -168,7 +168,7 @@ ROM_START( sfzbch )
 	ROM_REGION( 0x8000, "stars", 0 )
 	ROM_COPY( "gfx", 0x000000, 0x000000, 0x8000 )	/* stars */
 
-	ROM_REGION( 0x18000, "audio", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_REGION( 0x18000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
 	ROM_LOAD( "sfz09",         0x00000, 0x08000, CRC(c772628b) SHA1(ebc5b7c173caf1e151f733f23c1b20abec24e16d) )
 	ROM_CONTINUE(              0x10000, 0x08000 )
 
@@ -178,7 +178,7 @@ ROM_START( sfzbch )
 ROM_END
 
 ROM_START( sfzch )
-	ROM_REGION( CODE_SIZE, "main",0 )      /* 68000 code */
+	ROM_REGION( CODE_SIZE, "maincpu",0 )      /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "sfzch23",        0x000000, 0x80000, CRC(1140743f) SHA1(10bcedb5cca266f2aa3ed99ede6f9a64fc877539))
 	ROM_LOAD16_WORD_SWAP( "sfza22",         0x080000, 0x80000, CRC(8d9b2480) SHA1(405305c1572908d00eab735f28676fbbadb4fac6))
 	ROM_LOAD16_WORD_SWAP( "sfzch21",        0x100000, 0x80000, CRC(5435225d) SHA1(6b1156fd82d0710e244ede39faaae0847c598376))
@@ -205,7 +205,7 @@ ROM_START( sfzch )
 	ROM_REGION( 0x8000, "stars", 0 )
 	ROM_COPY( "gfx", 0x000000, 0x000000, 0x8000 )
 
-	ROM_REGION( 0x28000, "audio",0 ) /* 64k for the audio CPU (+banks) */
+	ROM_REGION( 0x28000, "audiocpu",0 ) /* 64k for the audio CPU (+banks) */
 	ROM_LOAD( "sfz09",         0x00000, 0x08000, CRC(c772628b) SHA1(ebc5b7c173caf1e151f733f23c1b20abec24e16d))
 	ROM_CONTINUE(              0x10000, 0x08000 )
 
@@ -215,7 +215,7 @@ ROM_START( sfzch )
 ROM_END
 
 ROM_START( wofch )
-	ROM_REGION( CODE_SIZE, "main", 0 )      /* 68000 code */
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "wofch_23.rom",  0x000000, 0x80000, CRC(4e0b8dee) SHA1(d2fb716d62b7a259f46bbc74c1976a18d56696ea) )
 	ROM_LOAD16_WORD_SWAP( "wofch_22.rom",  0x080000, 0x80000, CRC(d0937a8d) SHA1(01d7be446e2e3ef8ca767f59c178240dfd52dd93) )
 
@@ -229,7 +229,7 @@ ROM_START( wofch )
 	ROMX_LOAD( "wofch_06.rom",   0x200004, 0x80000, CRC(cc9006c9) SHA1(cfcbec3a67052268a7739538aa28a6391fe5400e) , ROM_GROUPWORD | ROM_SKIP(6) )
 	ROMX_LOAD( "tk208.bin",      0x200006, 0x80000, CRC(d4a19a02) SHA1(ff396b1d33d9b4842140f2c6d085fe05748e3244) , ROM_GROUPWORD | ROM_SKIP(6) )
 
-	ROM_REGION( 0x28000, "audio", 0 ) /* QSound Z80 code */
+	ROM_REGION( 0x28000, "audiocpu", 0 ) /* QSound Z80 code */
 	ROM_LOAD( "tk2_qa.rom",     0x00000, 0x08000, CRC(c9183a0d) SHA1(d8b1d41c572f08581f8ab9eb878de77d6ea8615d) )
 	ROM_CONTINUE(               0x10000, 0x18000 )
 

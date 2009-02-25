@@ -810,7 +810,7 @@ static const kermit_config hp48_kermit_rs232_conf = { &hp48_rs232_start_recv_byt
    The G+ model has always revision R.
  */
 ROM_START ( hp48gx )
-	ROM_REGION( 0x80000, "main", 0 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_DEFAULT_BIOS("r")
 
 	/* in chronological order, from first revision, version r is default*/
@@ -845,7 +845,7 @@ ROM_END
  */
 
 ROM_START ( hp48sx )
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_DEFAULT_BIOS("j")
 
 	/* in chronological order, from first revision, version j is default*/
@@ -921,7 +921,7 @@ static MACHINE_DRIVER_START ( hp48_common )
 	MDRV_MACHINE_RESET ( hp48 )
 
 	/* cpu */
-	MDRV_CPU_ADD ( "main", SATURN, 3937007 ) /* almost 4 MHz */
+	MDRV_CPU_ADD ( "maincpu", SATURN, 3937007 ) /* almost 4 MHz */
 	MDRV_CPU_PROGRAM_MAP ( hp48, 0 )
 	MDRV_CPU_CONFIG( hp48_config )
  
@@ -929,7 +929,7 @@ static MACHINE_DRIVER_START ( hp48_common )
 	MDRV_NVRAM_HANDLER( generic_0fill )
 
 	/* video */
-	MDRV_SCREEN_ADD( "main", RASTER )
+	MDRV_SCREEN_ADD( "maincpu", RASTER )
 	MDRV_SCREEN_REFRESH_RATE( 64 )
 	MDRV_SCREEN_VBLANK_TIME(0)
 	MDRV_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
@@ -983,7 +983,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START ( hp48sx )
 	MDRV_IMPORT_FROM    ( hp48_common )
-	MDRV_CPU_REPLACE    ( "main", SATURN, 2000000 )
+	MDRV_CPU_REPLACE    ( "maincpu", SATURN, 2000000 )
 	MDRV_MACHINE_START  ( hp48sx )
 	MDRV_DEFAULT_LAYOUT ( layout_hp48sx )
 
@@ -997,7 +997,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START ( hp48s )
 	MDRV_IMPORT_FROM    ( hp48_common )
-	MDRV_CPU_REPLACE    ( "main", SATURN, 2000000 )
+	MDRV_CPU_REPLACE    ( "maincpu", SATURN, 2000000 )
 	MDRV_MACHINE_START  ( hp48s )
 	MDRV_DEFAULT_LAYOUT ( layout_hp48s )
 

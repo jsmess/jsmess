@@ -91,7 +91,7 @@ static ADDRESS_MAP_START( a310_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x03000000, 0x033fffff) AM_READWRITE(ioc_r, ioc_w)
 	AM_RANGE(0x03400000, 0x035fffff) AM_READWRITE(vidc_r, vidc_w)
 	AM_RANGE(0x03600000, 0x037fffff) AM_READWRITE(memc_r, memc_w)
-	AM_RANGE(0x03800000, 0x03ffffff) AM_ROM AM_REGION("main", 0) AM_WRITE(memc_page_w)
+	AM_RANGE(0x03800000, 0x03ffffff) AM_ROM AM_REGION("maincpu", 0) AM_WRITE(memc_page_w)
 ADDRESS_MAP_END
 
 
@@ -213,7 +213,7 @@ static const wd17xx_interface a310_wd17xx_interface = {
 
 static MACHINE_DRIVER_START( a310 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", ARM, 8000000)        /* 8 MHz */
+	MDRV_CPU_ADD("maincpu", ARM, 8000000)        /* 8 MHz */
 	MDRV_CPU_PROGRAM_MAP(a310_mem, 0)
 
 	MDRV_MACHINE_RESET( a310 )
@@ -239,7 +239,7 @@ static MACHINE_DRIVER_START( a310 )
 MACHINE_DRIVER_END
 
 ROM_START(a310)
-	ROM_REGION(0x800000, "main", 0)
+	ROM_REGION(0x800000, "maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "311", "RiscOS 3.11 (29 Sep 1992)")
 	ROMX_LOAD("ic24.rom", 0x000000, 0x80000, CRC(c1adde84) SHA1(12d060e0401dd0523d44453f947bdc55dd2c3240), ROM_BIOS(1))
 	ROMX_LOAD("ic25.rom", 0x080000, 0x80000, CRC(15d89664) SHA1(78f5d0e6f1e8ee603317807f53ff8fe65a3b3518), ROM_BIOS(1))

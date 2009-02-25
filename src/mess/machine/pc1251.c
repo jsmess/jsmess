@@ -92,8 +92,8 @@ int pc1251_reset(const device_config *device)
 /* currently enough to save the external ram */
 NVRAM_HANDLER( pc1251 )
 {
-	const device_config *main_cpu = cputag_get_cpu(machine, "main");
-	UINT8 *ram = memory_region(machine, "main") + 0x8000;
+	const device_config *main_cpu = cputag_get_cpu(machine, "maincpu");
+	UINT8 *ram = memory_region(machine, "maincpu") + 0x8000;
 	UINT8 *cpu = sc61860_internal_ram(main_cpu);
 
 	if (read_or_write)
@@ -132,7 +132,7 @@ DRIVER_INIT( pc1251 )
 	// 11 kb ram: program stored at 8000
 #if 1
 	memory_install_write8_handler(space, 0x8000, 0xc7ff, 0, 0, SMH_BANK1);
-	memory_set_bankptr(machine, 1, memory_region(machine, "main") + 0x8000);
+	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0x8000);
 #else
 	if ((input_port_read(machine, "DSW0") & 0xc0) == 0xc0)
 	{

@@ -667,8 +667,8 @@ static const pokey_interface atari_pokey_interface =
 		DEVCB_INPUT_PORT("analog_7")
 	},
 	DEVCB_NULL,
-	DEVCB_MEMORY_HANDLER("main", PROGRAM, atari_serin_r),
-	DEVCB_MEMORY_HANDLER("main", PROGRAM, atari_serout_w),
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, atari_serin_r),
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, atari_serout_w),
 	atari_interrupt_cb,
 };
 
@@ -697,7 +697,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( atari_common_nodac )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6510, FREQ_17_EXACT)
+	MDRV_CPU_ADD("maincpu", M6510, FREQ_17_EXACT)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -728,7 +728,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( a400 )
 	MDRV_IMPORT_FROM( atari_common )
 
-	MDRV_CPU_MODIFY( "main" )
+	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP(a400_mem, 0)
 	MDRV_CPU_VBLANK_INT_HACK(a400_interrupt, TOTAL_LINES_60HZ)
 
@@ -745,7 +745,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( a400pal )
 	MDRV_IMPORT_FROM( atari_common )
 
-	MDRV_CPU_MODIFY( "main" )
+	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP(a400_mem, 0)
 	MDRV_CPU_VBLANK_INT_HACK(a400_interrupt, TOTAL_LINES_50HZ)
 
@@ -762,7 +762,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( a800 )
 	MDRV_IMPORT_FROM( atari_common )
 
-	MDRV_CPU_MODIFY( "main" )
+	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP(a800_mem, 0)
 	MDRV_CPU_VBLANK_INT_HACK(a800_interrupt, TOTAL_LINES_60HZ)
 
@@ -779,7 +779,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( a800pal )
 	MDRV_IMPORT_FROM( atari_common )
 
-	MDRV_CPU_MODIFY( "main" )
+	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP(a800_mem, 0)
 	MDRV_CPU_VBLANK_INT_HACK(a800_interrupt, TOTAL_LINES_50HZ)
 
@@ -796,7 +796,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( a800xl )
 	MDRV_IMPORT_FROM( atari_common )
 
-	MDRV_CPU_MODIFY( "main" )
+	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP(a800xl_mem, 0)
 	MDRV_CPU_VBLANK_INT_HACK(a800xl_interrupt, TOTAL_LINES_60HZ)
 
@@ -813,7 +813,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( a5200 )
 	MDRV_IMPORT_FROM( atari_common_nodac )
 
-	MDRV_CPU_MODIFY( "main" )
+	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP(a5200_mem, 0)
 	MDRV_CPU_VBLANK_INT_HACK(a5200_interrupt, TOTAL_LINES_60HZ)
 
@@ -832,42 +832,42 @@ MACHINE_DRIVER_END
 
 
 ROM_START(a400)
-	ROM_REGION(0x14000,"main",0) /* 64K for the CPU + 2 * 8K for cartridges */
+	ROM_REGION(0x14000,"maincpu",0) /* 64K for the CPU + 2 * 8K for cartridges */
 	ROM_LOAD("floatpnt.rom", 0xd800, 0x0800, CRC(6a5d766e) SHA1(01a6044f7a81d409c938e7dfde0a1af5832229d2))
 	ROM_LOAD("atari400.rom", 0xe000, 0x2000, CRC(cb4db9af) SHA1(4e784f4e2530110366f7e5d257d0f050de4201b2))
 ROM_END
 
 ROM_START(a400pal)
-	ROM_REGION(0x14000,"main",0) /* 64K for the CPU + 2 * 8K for cartridges */
+	ROM_REGION(0x14000,"maincpu",0) /* 64K for the CPU + 2 * 8K for cartridges */
 	ROM_LOAD("floatpnt.rom", 0xd800, 0x0800, CRC(6a5d766e) SHA1(01a6044f7a81d409c938e7dfde0a1af5832229d2))
 	ROM_LOAD("atari400.rom", 0xe000, 0x2000, CRC(cb4db9af) SHA1(4e784f4e2530110366f7e5d257d0f050de4201b2))
 ROM_END
 
 ROM_START(a800)
-	ROM_REGION(0x14000,"main",0) /* 64K for the CPU + 2 * 8K for cartridges */
+	ROM_REGION(0x14000,"maincpu",0) /* 64K for the CPU + 2 * 8K for cartridges */
 	ROM_LOAD("floatpnt.rom", 0xd800, 0x0800, CRC(6a5d766e) SHA1(01a6044f7a81d409c938e7dfde0a1af5832229d2))
 	ROM_LOAD("atari800.rom", 0xe000, 0x2000, CRC(cb4db9af) SHA1(4e784f4e2530110366f7e5d257d0f050de4201b2))
 ROM_END
 
 ROM_START(a800pal)
-	ROM_REGION(0x14000,"main",0) /* 64K for the CPU + 2 * 8K for cartridges */
+	ROM_REGION(0x14000,"maincpu",0) /* 64K for the CPU + 2 * 8K for cartridges */
 	ROM_LOAD("floatpnt.rom", 0xd800, 0x0800, CRC(6a5d766e) SHA1(01a6044f7a81d409c938e7dfde0a1af5832229d2))
 	ROM_LOAD("atari800.rom", 0xe000, 0x2000, CRC(cb4db9af) SHA1(4e784f4e2530110366f7e5d257d0f050de4201b2))
 ROM_END
 
 ROM_START(a800xl)
-	ROM_REGION(0x18000,"main",0) /* 64K for the CPU + 16K + 2 * 8K for cartridges */
+	ROM_REGION(0x18000,"maincpu",0) /* 64K for the CPU + 16K + 2 * 8K for cartridges */
 	ROM_LOAD("basic.rom",   0x10000, 0x2000, CRC(7d684184) SHA1(3693c9cb9bf3b41bae1150f7a8264992468fc8c0))
 	ROM_LOAD("atarixl.rom", 0x14000, 0x4000, CRC(1f9cd270) SHA1(ae4f523ba08b6fd59f3cae515a2b2410bbd98f55))
 ROM_END
 
 ROM_START(a5200)
-	ROM_REGION(0x14000,"main",0) /* 64K for the CPU + 16K for cartridges */
+	ROM_REGION(0x14000,"maincpu",0) /* 64K for the CPU + 16K for cartridges */
 	ROM_LOAD("5200.rom", 0xf800, 0x0800, CRC(4248d3e3) SHA1(6ad7a1e8c9fad486fbec9498cb48bf5bc3adc530))
 ROM_END
 
 ROM_START(a5200a)
-	ROM_REGION(0x14000,"main",0) /* 64K for the CPU + 16K for cartridges */
+	ROM_REGION(0x14000,"maincpu",0) /* 64K for the CPU + 16K for cartridges */
 	ROM_LOAD("5200a.rom", 0xf800, 0x0800, CRC(c2ba2613) SHA1(1d2a3f00109d75d2d79fecb565775eb95b7d04d5))
 ROM_END
 

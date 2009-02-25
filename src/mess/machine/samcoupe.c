@@ -62,7 +62,7 @@ void samcoupe_update_memory(const address_space *space)
 {
 	coupe_asic *asic = space->machine->driver_data;
 	const int PAGE_MASK = ((mess_ram_size & 0xfffff) / 0x4000) - 1;
-	UINT8 *rom = memory_region(space->machine, "main");
+	UINT8 *rom = memory_region(space->machine, "maincpu");
 	UINT8 *memory;
 	int is_readonly;
 
@@ -132,7 +132,7 @@ void samcoupe_update_memory(const address_space *space)
 
 WRITE8_HANDLER( samcoupe_ext_mem_w )
 {
-	const address_space *space_program = cputag_get_address_space(space->machine, "main", ADDRESS_SPACE_PROGRAM);
+	const address_space *space_program = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	coupe_asic *asic = space->machine->driver_data;
 
 	if (offset & 1)

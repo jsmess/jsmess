@@ -81,7 +81,7 @@ static WRITE_LINE_DEVICE_HANDLER( pecom_prd_w )
 
 static CDP1869_INTERFACE( pecom_cdp1869_intf )
 {
-	"main",
+	"maincpu",
 	SCREEN_TAG,	
 	CDP1869_COLOR_CLK_PAL,
 	CDP1869_PAL,

@@ -14,7 +14,7 @@
 #define region_hsgpl "user3"
 #define region_speech_rom "tms5220"
 
-/* offsets for "main" */
+/* offsets for "maincpu" */
 enum
 {
 	offset_sram = 0x2000,		/* scratch RAM (256 bytes) */

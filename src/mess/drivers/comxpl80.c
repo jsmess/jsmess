@@ -197,7 +197,7 @@ static MACHINE_DRIVER_START( comxpl80 )
 
 	// basic system hardware
 
-	MDRV_CPU_ADD("main", M6805, 4000000) // CX005: some kind of MC6805/MC68HC05 clone
+	MDRV_CPU_ADD("maincpu", M6805, 4000000) // CX005: some kind of MC6805/MC68HC05 clone
 	MDRV_CPU_PROGRAM_MAP(pl80_map, 0)
 	MDRV_CPU_IO_MAP(pl80_io_map, 0)
 MACHINE_DRIVER_END
@@ -205,7 +205,7 @@ MACHINE_DRIVER_END
 /* ROMs */
 
 ROM_START( comxpl80 )
-	ROM_REGION( 0x1000, "main", 0 )
+	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "pl80.pt6",		0x0080, 0x0e00, CRC(ae059e5b) SHA1(f25812606b0082d32eb603d0a702a2187089d332) )
 
 	ROM_REGION( 0x6000, "gfx1", ROMREGION_ERASEFF ) // Plotter fonts

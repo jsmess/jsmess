@@ -121,7 +121,7 @@ static DEVICE_IMAGE_LOAD(n64_cart)
 
 static MACHINE_DRIVER_START( n64 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", R4600BE, 93750000)
+	MDRV_CPU_ADD("maincpu", R4600BE, 93750000)
 	MDRV_CPU_CONFIG(config)
 	MDRV_CPU_PROGRAM_MAP(n64_map, 0)
 	MDRV_CPU_VBLANK_INT("screen", n64_vblank)
@@ -160,7 +160,7 @@ static MACHINE_DRIVER_START( n64 )
 MACHINE_DRIVER_END
 
 ROM_START( n64)
-    ROM_REGION( 0x800000, "main", ROMREGION_ERASEFF )      /* dummy region for R4300 */
+    ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for R4300 */
     ROM_REGION32_BE( 0x800, "user1", 0 )
     ROM_LOAD( "pifdata.bin", 0x0000, 0x0800, CRC(5ec82be9) SHA1(9174eadc0f0ea2654c95fd941406ab46b9dc9bdd) )
     ROM_REGION32_BE( 0x4000000, "user2", ROMREGION_ERASEFF)

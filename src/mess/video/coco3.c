@@ -819,7 +819,7 @@ static void internal_video_start_coco3(running_machine *machine, m6847_type type
 	memory_set_bankptr(machine, 10, paletteram);
 
 	/* font */
-	rom = memory_region(machine, "main");
+	rom = memory_region(machine, "maincpu");
 	for (i = 0; i < 32; i++)
 	{
 		/* characters 0-31 are at $FA10 - $FB0F */

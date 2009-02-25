@@ -191,8 +191,8 @@ static DRIVER_INIT(tutor)
 {
 	tape_interrupt_timer = timer_alloc(machine, tape_interrupt_handler, NULL);
 
-	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, "main") + basic_base, 0);
-	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "main") + cartridge_base, 0);
+	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, "maincpu") + basic_base, 0);
+	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "maincpu") + cartridge_base, 0);
 	memory_set_bank(machine, 1, 0);
 }
 
@@ -265,13 +265,13 @@ static READ8_HANDLER(read_keyboard)
 
 static DEVICE_IMAGE_LOAD( tutor_cart )
 {
-	image_fread(image, memory_region(image->machine, "main") + cartridge_base, 0x6000);
+	image_fread(image, memory_region(image->machine, "maincpu") + cartridge_base, 0x6000);
 	return INIT_PASS;
 }
 
 static DEVICE_IMAGE_UNLOAD( tutor_cart )
 {
-	memset(memory_region(image->machine, "main") + cartridge_base, 0, 0x6000);
+	memset(memory_region(image->machine, "maincpu") + cartridge_base, 0, 0x6000);
 }
 
 /*
@@ -648,7 +648,7 @@ INPUT_PORTS_END
 static const struct tms9995reset_param tutor_processor_config =
 {
 #if 0
-	"main",/* region for processor RAM */
+	"maincpu",/* region for processor RAM */
 	0xf000,     /* offset : this area is unused in our region, and matches the processor address */
 	0xf0fc,		/* offset for the LOAD vector */
 	1,          /* use fast IDLE */
@@ -660,7 +660,7 @@ static const struct tms9995reset_param tutor_processor_config =
 static MACHINE_DRIVER_START(tutor)
 	/* basic machine hardware */
 	/* TMS9995 CPU @ 10.7 MHz */
-	MDRV_CPU_ADD("main", TMS9995, 10700000)
+	MDRV_CPU_ADD("maincpu", TMS9995, 10700000)
 	MDRV_CPU_CONFIG(tutor_processor_config)
 	MDRV_CPU_PROGRAM_MAP(tutor_memmap, 0)
 	MDRV_CPU_IO_MAP(tutor_io, 0)
@@ -697,7 +697,7 @@ MACHINE_DRIVER_END
 */
 ROM_START(tutor)
 	/*CPU memory space*/
-	ROM_REGION(0x14000,"main",0)
+	ROM_REGION(0x14000,"maincpu",0)
 	ROM_LOAD("tutor1.bin", 0x0000, 0x8000, CRC(702c38ba) SHA1(ce60607c3038895e31915d41bb5cf71cb8522d7a))      /* system ROM */
 	ROM_LOAD("tutor2.bin", 0x8000, 0x4000, CRC(05f228f5) SHA1(46a14a45f6f9e2c30663a2b87ce60c42768a78d0))      /* BASIC ROM */
 ROM_END

@@ -91,7 +91,7 @@ static const applefdc_interface lisa210_fdc_interface =
 /* Lisa1 and Lisa 2 machine */
 static MACHINE_DRIVER_START( lisa )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 5093760)        /* 20.37504 MHz / 4 */
+	MDRV_CPU_ADD("maincpu", M68000, 5093760)        /* 20.37504 MHz / 4 */
 	MDRV_CPU_PROGRAM_MAP(lisa_map, 0)
 	MDRV_CPU_VBLANK_INT("screen", lisa_interrupt)
 
@@ -283,7 +283,7 @@ INPUT_PORTS_END
 
 
 ROM_START( lisa2 )
-	ROM_REGION16_BE(0x204000,"main",0)	/* 68k rom and ram */
+	ROM_REGION16_BE(0x204000,"maincpu",0)	/* 68k rom and ram */
 	ROM_LOAD16_BYTE( "booth.hi", 0x000000, 0x2000, CRC(adfd4516) SHA1(97a89ce1218b8aa38f69f92f6f363f435c887914))
 	ROM_LOAD16_BYTE( "booth.lo", 0x000001, 0x2000, CRC(546d6603) SHA1(2a81e4d483f50ae8a2519621daeb7feb440a3e4d))
 
@@ -295,7 +295,7 @@ ROM_START( lisa2 )
 ROM_END
 
 ROM_START( lisa210 )
-	ROM_REGION16_BE(0x204000,"main", 0)	/* 68k rom and ram */
+	ROM_REGION16_BE(0x204000,"maincpu", 0)	/* 68k rom and ram */
 	ROM_LOAD16_BYTE( "booth.hi", 0x000000, 0x2000, CRC(adfd4516) SHA1(97a89ce1218b8aa38f69f92f6f363f435c887914))
 	ROM_LOAD16_BYTE( "booth.lo", 0x000001, 0x2000, CRC(546d6603) SHA1(2a81e4d483f50ae8a2519621daeb7feb440a3e4d))
 
@@ -312,7 +312,7 @@ ROM_START( lisa210 )
 ROM_END
 
 ROM_START( macxl )
-	ROM_REGION16_BE(0x204000,"main", 0)	/* 68k rom and ram */
+	ROM_REGION16_BE(0x204000,"maincpu", 0)	/* 68k rom and ram */
 	ROM_LOAD16_BYTE( "boot3a.hi", 0x000000, 0x2000, CRC(80add605) SHA1(82215688b778d8c712a8186235f7981e3dc4dd7f))
 	ROM_LOAD16_BYTE( "boot3a.lo", 0x000001, 0x2000, CRC(edf5222f) SHA1(b0388ee8dbbc51a2d628473dc29b65ce913fcd76))
 

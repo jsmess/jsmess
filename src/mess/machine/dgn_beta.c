@@ -1034,7 +1034,7 @@ static void dgnbeta_reset(running_machine *machine)
 {
 	device_config *fdc = (device_config*)devtag_get_device(machine, WD179X, "wd179x");
 
-	system_rom = memory_region(machine, "main");
+	system_rom = memory_region(machine, "maincpu");
 
 	/* Make sure CPU 1 is started out halted ! */
 	cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);

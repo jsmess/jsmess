@@ -229,8 +229,8 @@ static const gfx_layout jupiter_charlayout =
 
 
 static GFXDECODE_START( jupiter )
-	GFXDECODE_ENTRY( "main", 0x2c00, jupiter_charlayout, 0, 1 )
-	GFXDECODE_ENTRY( "main", 0x2c00, jupiter_charlayout, 2, 1 )
+	GFXDECODE_ENTRY( "maincpu", 0x2c00, jupiter_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "maincpu", 0x2c00, jupiter_charlayout, 2, 1 )
 GFXDECODE_END
 
 
@@ -296,7 +296,7 @@ static VIDEO_UPDATE( jupiter )
 
 static DRIVER_INIT( jupiter )
 {
-	jupiter_charram = memory_region(machine, "main")+0x2c00;
+	jupiter_charram = memory_region(machine, "maincpu")+0x2c00;
 }
 
 static const cassette_config jupiter_cassette_config =
@@ -309,7 +309,7 @@ static const cassette_config jupiter_cassette_config =
 /* machine definition */
 static MACHINE_DRIVER_START( jupiter )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, XTAL_6_5MHz/2)        /* 3.25 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_6_5MHz/2)        /* 3.25 MHz */
 	MDRV_CPU_PROGRAM_MAP(jupiter_mem, 0)
 	MDRV_CPU_IO_MAP(jupiter_io, 0)
 	MDRV_QUANTUM_TIME(HZ(60))
@@ -343,7 +343,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START (jupiter)
-	ROM_REGION (0x10000, "main",0)
+	ROM_REGION (0x10000, "maincpu",0)
 	ROM_LOAD ("jupiter.lo", 0x0000, 0x1000, CRC(dc8438a5) SHA1(8fa97eb71e5dd17c7d190c6587ee3840f839347c))
 	ROM_LOAD ("jupiter.hi", 0x1000, 0x1000, CRC(4009f636) SHA1(98c5d4bcd74bcf014268cf4c00b2007ea5cc21f3))
 ROM_END

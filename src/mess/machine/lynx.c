@@ -1803,7 +1803,7 @@ WRITE8_HANDLER( lynx_memory_config_w )
 static void lynx_reset(running_machine *machine)
 {
 	int i;
-	lynx_memory_config_w(cputag_get_address_space(machine,"main",ADDRESS_SPACE_PROGRAM), 0, 0);
+	lynx_memory_config_w(cputag_get_address_space(machine,"maincpu",ADDRESS_SPACE_PROGRAM), 0, 0);
 
 	cpu_set_input_line(machine->cpu[0], M65SC02_IRQ_LINE, CLEAR_LINE);
 
@@ -1848,9 +1848,9 @@ MACHINE_START( lynx )
 	state_save_register_global_pointer(machine, lynx_mem_fe00, lynx_mem_fe00_size);
 	state_save_register_postload(machine, lynx_postload, NULL);
 
-	memory_configure_bank(machine, 3, 0, 1, memory_region(machine, "main") + 0x0000, 0);
+	memory_configure_bank(machine, 3, 0, 1, memory_region(machine, "maincpu") + 0x0000, 0);
 	memory_configure_bank(machine, 3, 1, 1, lynx_mem_fe00, 0);
-	memory_configure_bank(machine, 4, 0, 1, memory_region(machine, "main") + 0x01fa, 0);
+	memory_configure_bank(machine, 4, 0, 1, memory_region(machine, "maincpu") + 0x01fa, 0);
 	memory_configure_bank(machine, 4, 1, 1, lynx_mem_fffa, 0);
 
 	memset(&suzy, 0, sizeof(suzy));

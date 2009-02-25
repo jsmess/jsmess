@@ -75,7 +75,7 @@ const via6522_interface atom_6522_interface =
 	/* the CA2 output is connected to the STROBE signal on the centronics */
 	DEVCB_DEVICE_LINE(CENTRONICS, "centronics", centronics_strobe_w),
 	DEVCB_NULL,
-	DEVCB_CPU_INPUT_LINE("main", 0)
+	DEVCB_CPU_INPUT_LINE("maincpu", 0)
 };
 
 
@@ -185,10 +185,10 @@ static DIRECT_UPDATE_HANDLER(atom_opbase_handler)
 	generator. I don't know if this is hardware, or random data because the
 	ram chips are not cleared at start-up. So at this time, these numbers
 	are poked into the memory to simulate it. When I have more details I will fix it */
-	memory_region(space->machine, "main")[0x08] = mame_rand(space->machine) & 0x0ff;
-	memory_region(space->machine, "main")[0x09] = mame_rand(space->machine) & 0x0ff;
-	memory_region(space->machine, "main")[0x0a] = mame_rand(space->machine) & 0x0ff;
-	memory_region(space->machine, "main")[0x0b] = mame_rand(space->machine) & 0x0ff;
+	memory_region(space->machine, "maincpu")[0x08] = mame_rand(space->machine) & 0x0ff;
+	memory_region(space->machine, "maincpu")[0x09] = mame_rand(space->machine) & 0x0ff;
+	memory_region(space->machine, "maincpu")[0x0a] = mame_rand(space->machine) & 0x0ff;
+	memory_region(space->machine, "maincpu")[0x0b] = mame_rand(space->machine) & 0x0ff;
 
 	return cpu_get_pc( space->cpu ) & 0x0ffff;
 }
@@ -376,7 +376,7 @@ static void atom_eprom_box_refresh(running_machine *machine)
     unsigned char *eprom_data;
 
 	/* get address of eprom data */
-	eprom_data = memory_region(machine, "main") + 0x010000 + (selected_eprom<<12);
+	eprom_data = memory_region(machine, "maincpu") + 0x010000 + (selected_eprom<<12);
 	/* set bank address */
 	memory_set_bankptr(machine, 1, eprom_data);
 }

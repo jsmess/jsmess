@@ -47,7 +47,7 @@ static PALETTE_INIT( electron )
 }
 
 static ADDRESS_MAP_START(electron_mem, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_REGION("main",  0x00000)	/* 32KB of RAM */
+	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_REGION("maincpu",  0x00000)	/* 32KB of RAM */
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(2)								/* Banked ROM pages */
 	AM_RANGE(0xc000, 0xfbff) AM_ROM AM_REGION("user1", 0x40000)	/* OS ROM */
 	AM_RANGE(0xfc00, 0xfcff) AM_READWRITE( electron_jim_r, electron_jim_w )			/* JIM pages */
@@ -146,7 +146,7 @@ INPUT_PORTS_END
 
 /* Electron Rom Load */
 ROM_START(electron)
-	ROM_REGION( 0x10000, "main", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_REGION( 0x44000, "user1", 0 ) /* OS Rom */
 	ROM_LOAD( "os.rom", 0x40000, 0x4000, CRC(bf63fb1f) SHA1(a48b8fa0cfb09140e808ac8a187316c605a0b32e) ) /* Os rom */
 	/* 00000 0 */
@@ -175,7 +175,7 @@ static const cassette_config electron_cassette_config =
 };
 
 static MACHINE_DRIVER_START( electron )
-	MDRV_CPU_ADD( "main", M6502, 2000000 )
+	MDRV_CPU_ADD( "maincpu", M6502, 2000000 )
 	MDRV_CPU_PROGRAM_MAP( electron_mem, 0 )
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE( 50.08 )

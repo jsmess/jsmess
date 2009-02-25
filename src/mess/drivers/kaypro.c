@@ -237,7 +237,7 @@ static PALETTE_INIT( kaypro )
 
 static MACHINE_DRIVER_START( kaypro )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 4000000)        /* 4 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, 4000000)        /* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(kaypro_mem, 0)
 	MDRV_CPU_IO_MAP(kaypro_io, 0)
 	MDRV_CPU_VBLANK_INT("screen", kaypro_interrupt)
@@ -262,7 +262,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START (kaypro)
-    ROM_REGION(0x10000,"main",ROMREGION_ERASEFF) /* 64K for the Z80 */
+    ROM_REGION(0x10000,"maincpu",ROMREGION_ERASEFF) /* 64K for the Z80 */
     /* totally empty :) */
 
     ROM_REGION(0x04000,"gfx1",0)  /* 4 * 4K font ram */

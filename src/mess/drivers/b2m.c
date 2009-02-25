@@ -166,7 +166,7 @@ INPUT_PORTS_END
 /* Machine driver */
 static MACHINE_DRIVER_START( b2m )
     /* basic machine hardware */
-    MDRV_CPU_ADD("main", 8080, 2000000)
+    MDRV_CPU_ADD("maincpu", 8080, 2000000)
     MDRV_CPU_PROGRAM_MAP(b2m_mem, 0) 
     MDRV_CPU_IO_MAP(b2m_io, 0)
     MDRV_CPU_VBLANK_INT("screen", b2m_vblank_interrupt)
@@ -210,7 +210,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( b2mrom )
     MDRV_IMPORT_FROM(b2m)
-    MDRV_CPU_MODIFY("main")        
+    MDRV_CPU_MODIFY("maincpu")        
   	MDRV_CPU_IO_MAP(b2m_rom_io, 0)
 MACHINE_DRIVER_END
  
@@ -234,12 +234,12 @@ MACHINE_DRIVER_END
 /* ROM definition */
 
 ROM_START( b2m )
-    ROM_REGION( 0x12000, "main", ROMREGION_ERASEFF )
+    ROM_REGION( 0x12000, "maincpu", ROMREGION_ERASEFF )
     ROM_LOAD( "b2m.rom", 0x10000, 0x2000, CRC(3f3214d6) SHA1(dd93e7fbabf14d1aed6777fe1ccfe0a3ca8fcaf2) )
 ROM_END
 
 ROM_START( b2mrom )
-    ROM_REGION( 0x22000, "main", ROMREGION_ERASEFF )
+    ROM_REGION( 0x22000, "maincpu", ROMREGION_ERASEFF )
     ROM_LOAD( "bios2.rom",  0x10000, 0x2000, CRC(c22a98b7) SHA1(7de91e653bf4b191ded62cf21532578268e4a2c1) )
     ROM_LOAD( "ramdos.sys", 0x12000, 0x60c0, CRC(91ed6df0) SHA1(4fd040f2647a6b7930c330c75560a035027d0606) )
 ROM_END

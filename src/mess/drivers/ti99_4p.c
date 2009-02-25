@@ -247,7 +247,7 @@ static const tms5220_interface ti99_4p_tms5220interface =
 static MACHINE_DRIVER_START(ti99_4p_60hz)
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0 MHz */
-	MDRV_CPU_ADD("main", TMS9900, 3000000)
+	MDRV_CPU_ADD("maincpu", TMS9900, 3000000)
 	MDRV_CPU_PROGRAM_MAP(memmap, 0)
 	MDRV_CPU_IO_MAP(readcru, writecru)
 	MDRV_CPU_VBLANK_INT_HACK(ti99_4ev_hblank_interrupt, 263)	/* 262.5 in 60Hz, 312.5 in 50Hz */
@@ -299,7 +299,7 @@ MACHINE_DRIVER_END
 
 ROM_START(ti99_4p)
 	/*CPU memory space*/
-	ROM_REGION16_BE(region_cpu1_len_4p, "main", 0)
+	ROM_REGION16_BE(region_cpu1_len_4p, "maincpu", 0)
 	ROM_LOAD16_BYTE("sgcpu_hb.bin", 0x0000, 0x8000, CRC(aa100730) SHA1(35e585b2dcd3f2a0005bebb15ede6c5b8c787366) ) /* system ROMs */
 	ROM_LOAD16_BYTE("sgcpu_lb.bin", 0x0001, 0x8000, CRC(2a5dc818) SHA1(dec141fe2eea0b930859cbe1ebd715ac29fa8ecb) ) /* system ROMs */
 

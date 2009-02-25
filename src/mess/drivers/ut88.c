@@ -166,7 +166,7 @@ static const cassette_config ut88_cassette_config =
 /* Machine driver */
 static MACHINE_DRIVER_START( ut88 )
 	/* basic machine hardware */
-    MDRV_CPU_ADD("main", 8080, 2000000)
+    MDRV_CPU_ADD("maincpu", 8080, 2000000)
     MDRV_CPU_PROGRAM_MAP(ut88_mem, 0)
     MDRV_CPU_IO_MAP(ut88_io, 0)
     MDRV_MACHINE_RESET( ut88 )
@@ -199,7 +199,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ut88mini )
 	/* basic machine hardware */
-    MDRV_CPU_ADD("main", 8080, 2000000)
+    MDRV_CPU_ADD("maincpu", 8080, 2000000)
     MDRV_CPU_PROGRAM_MAP(ut88mini_mem, 0)
     MDRV_CPU_IO_MAP(ut88mini_io, 0)
    	MDRV_MACHINE_START(ut88mini)
@@ -213,14 +213,14 @@ MACHINE_DRIVER_END
 
 /* ROM definition */
 ROM_START( ut88 )
-	ROM_REGION( 0x10000, "main", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "ut88.rom", 0xf800, 0x0800, CRC(f433202e) SHA1(a5808a4f68fb10eb7f17f2a05c3b8479fec0e05d) )
 	ROM_REGION(0x0800, "gfx1",0)
 	ROM_LOAD ("ut88.fnt", 0x0000, 0x0800, CRC(874b4d29) SHA1(357efbb295cd9e47fa97d4d03f4f1859a915b5c3) )
 ROM_END
 
 ROM_START( ut88mini )
-  ROM_REGION( 0x10200, "main", ROMREGION_ERASEFF )
+  ROM_REGION( 0x10200, "maincpu", ROMREGION_ERASEFF )
   ROM_LOAD( "ut88mini.rom", 0x0000, 0x0400, CRC(ce9213ee) SHA1(16b71b3051a800386d664dbcc5983b783475d0c6) )
   ROM_LOAD( "ut88key1.rom", 0x10000, 0x0100, CRC(ecfe42c7) SHA1(d7f10bbb05934150c1a258db1c8b4eb65771af59) )
   ROM_LOAD( "ut88key2.rom", 0x10100, 0x0100, CRC(96324d23) SHA1(9dca3f639fc29d87df56505b3dde668ef2849da3) )

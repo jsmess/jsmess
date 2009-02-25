@@ -1048,7 +1048,7 @@ static const psx_spu_interface psxspu_interface =
 
 static MACHINE_DRIVER_START( psxntsc )
 	/* basic machine hardware */
-	MDRV_CPU_ADD( "main", PSXCPU, XTAL_67_7376MHz )
+	MDRV_CPU_ADD( "maincpu", PSXCPU, XTAL_67_7376MHz )
 	MDRV_CPU_PROGRAM_MAP( psx_map, 0 )
 	MDRV_CPU_VBLANK_INT("screen", psx_vblank)
 
@@ -1081,7 +1081,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( psxpal )
 	/* basic machine hardware */
-	MDRV_CPU_ADD( "main", PSXCPU, XTAL_67_7376MHz )
+	MDRV_CPU_ADD( "maincpu", PSXCPU, XTAL_67_7376MHz )
 	MDRV_CPU_PROGRAM_MAP( psx_map, 0 )
 	MDRV_CPU_VBLANK_INT("screen", psx_vblank)
 

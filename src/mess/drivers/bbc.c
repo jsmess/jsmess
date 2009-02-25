@@ -487,7 +487,7 @@ INPUT_PORTS_END
 /* model B driver */
 
 ROM_START(bbca)
-	ROM_REGION(0x04000,"main",ROMREGION_ERASEFF) /* RAM */
+	ROM_REGION(0x04000,"maincpu",ROMREGION_ERASEFF) /* RAM */
 
 	ROM_REGION(0x14000,"user1",0) /* ROM */
 	ROM_LOAD("os12.rom",    0x10000,  0x4000, CRC(3c14fc70) SHA1(0d9bcaf6a393c9ce2359ed700ddb53c232c2c45d))
@@ -506,7 +506,7 @@ ROM_END
 
 
 ROM_START(bbcb)
-	ROM_REGION(0x08000,"main",ROMREGION_ERASEFF) /* RAM */
+	ROM_REGION(0x08000,"maincpu",ROMREGION_ERASEFF) /* RAM */
 
 	ROM_REGION(0x44000,"user1",0) /* ROM */
 
@@ -556,7 +556,7 @@ ROM_END
 
 #ifdef UNUSED_DEFINITION
 ROM_START(bbcbcsw)
-	ROM_REGION(0x08000,"main",ROMREGION_ERASEFF) /* RAM */
+	ROM_REGION(0x08000,"maincpu",ROMREGION_ERASEFF) /* RAM */
 
 	ROM_REGION(0x44000,"user1",0) /* ROM */
 
@@ -606,7 +606,7 @@ ROM_END
 #endif
 
 ROM_START(bbcbp)
-	ROM_REGION(0x10000,"main",ROMREGION_ERASEFF) /* ROM MEMORY */
+	ROM_REGION(0x10000,"maincpu",ROMREGION_ERASEFF) /* ROM MEMORY */
 
 	ROM_REGION(0x44000,"user1",0) /* ROM */
 	ROM_LOAD("bpos2.rom",   0x3c000, 0x4000, CRC(9f356396) SHA1(ea7d3a7e3ee1ecfaa1483af994048057362b01f2))  /* basic rom */
@@ -634,7 +634,7 @@ ROM_END
 
 
 ROM_START(bbcbp128)
-	ROM_REGION(0x10000,"main",ROMREGION_ERASEFF) /* ROM MEMORY */
+	ROM_REGION(0x10000,"maincpu",ROMREGION_ERASEFF) /* ROM MEMORY */
 
 	ROM_REGION(0x44000,"user1",0) /* ROM */
 	ROM_LOAD("bpos2.rom",   0x3c000, 0x4000, CRC(9f356396) SHA1(ea7d3a7e3ee1ecfaa1483af994048057362b01f2))  /* basic rom */
@@ -663,7 +663,7 @@ ROM_END
 
 /* BBC Master Rom Load */
 ROM_START(bbcm)
-	ROM_REGION(0x10000,"main",ROMREGION_ERASEFF) /* ROM MEMORY */
+	ROM_REGION(0x10000,"maincpu",ROMREGION_ERASEFF) /* ROM MEMORY */
 
 	ROM_REGION(0x44000,"user1",0) /* ROM */
 
@@ -746,7 +746,7 @@ static ACIA6850_INTERFACE( bbc_acia6850_interface )
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_CPU_INPUT_LINE("main", M6502_IRQ_LINE)
+	DEVCB_CPU_INPUT_LINE("maincpu", M6502_IRQ_LINE)
 };
 
 
@@ -774,7 +774,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( bbca )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, 2000000)        /* 2.00 MHz */
+	MDRV_CPU_ADD("maincpu", M6502, 2000000)        /* 2.00 MHz */
 	MDRV_CPU_PROGRAM_MAP( bbca_mem, 0 )
 	MDRV_CPU_VBLANK_INT("screen", bbcb_vsync)				/* screen refresh interrupts */
 	MDRV_CPU_PERIODIC_INT(bbcb_keyscan, 1000)		/* scan keyboard */
@@ -817,7 +817,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( bbcb )
 	MDRV_IMPORT_FROM( bbca )
-	MDRV_CPU_MODIFY( "main" )
+	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP( bbcb_mem, 0 )
 	MDRV_MACHINE_START( bbcb )
 	MDRV_MACHINE_RESET( bbcb )
@@ -834,7 +834,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( bbcbp )
 	MDRV_IMPORT_FROM( bbca )
-	MDRV_CPU_MODIFY( "main" )
+	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP( bbcbp_mem, 0 )
 	MDRV_MACHINE_START( bbcbp )
 	MDRV_MACHINE_RESET( bbcbp )
@@ -850,7 +850,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( bbcbp128 )
 	MDRV_IMPORT_FROM( bbca )
-	MDRV_CPU_MODIFY( "main" )
+	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP( bbcbp128_mem, 0 )
 	MDRV_MACHINE_START( bbcbp )
 	MDRV_MACHINE_RESET( bbcbp )
@@ -868,7 +868,7 @@ MACHINE_DRIVER_END
 /****BBC MASTER */
 static MACHINE_DRIVER_START( bbcm )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M65SC02, 2000000)        /* 2.00 MHz */
+	MDRV_CPU_ADD("maincpu", M65SC02, 2000000)        /* 2.00 MHz */
 	MDRV_CPU_PROGRAM_MAP( bbcm_mem, 0 )
 	MDRV_CPU_VBLANK_INT("screen", bbcb_vsync)				/* screen refresh interrupts */
 	MDRV_CPU_PERIODIC_INT(bbcm_keyscan, 1000)		/* scan keyboard */

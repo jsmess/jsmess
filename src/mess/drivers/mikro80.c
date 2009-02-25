@@ -140,7 +140,7 @@ static const cassette_config mikro80_cassette_config =
 
 static MACHINE_DRIVER_START( mikro80 )
     /* basic machine hardware */
-    MDRV_CPU_ADD("main",8080, 2000000)
+    MDRV_CPU_ADD("maincpu",8080, 2000000)
     MDRV_CPU_PROGRAM_MAP(mikro80_mem, 0)
     MDRV_CPU_IO_MAP(mikro80_io, 0)
     MDRV_MACHINE_RESET( mikro80 )
@@ -170,7 +170,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( radio99 )
     /* basic machine hardware */
     MDRV_IMPORT_FROM(mikro80)
-    MDRV_CPU_MODIFY("main")
+    MDRV_CPU_MODIFY("maincpu")
     MDRV_CPU_IO_MAP(radio99_io, 0)    
         
 	MDRV_SOUND_ADD("dac", DAC, 0)
@@ -181,14 +181,14 @@ MACHINE_DRIVER_END
 /* ROM definition */
 
 ROM_START( mikro80 )
-    ROM_REGION( 0x10000, "main", ROMREGION_ERASEFF )
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
     ROM_LOAD( "mikro80.rom", 0xf800, 0x0800, CRC(63a4b72a) SHA1(6bd3e396539a15e2ccffa7486cae06ef6ddd1d03))
 	ROM_REGION(0x0800, "gfx1",0)
 	ROM_LOAD ("mikro80.fnt", 0x0000, 0x0800, CRC(43eb72bb) SHA1(761319cc6747661b33e84aa449cec83800543b5b) )
 ROM_END
 
 ROM_START( radio99 )
-    ROM_REGION( 0x20000, "main", ROMREGION_ERASEFF )
+    ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "monrk88.bin", 0xf800, 0x0800, CRC(5415D847) SHA1(c8233c72548bc79846b9d998766a10df349c5bda))
 	ROM_REGION(0x0800, "gfx1",0)
 	ROM_LOAD ("mikro80.fnt", 0x0000, 0x0800, CRC(43eb72bb) SHA1(761319cc6747661b33e84aa449cec83800543b5b) )

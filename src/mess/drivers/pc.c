@@ -1331,12 +1331,12 @@ static const ym3812_interface pc_ym3812_interface =
 
 static const pc_lpt_interface pc_lpt_config =
 {
-	DEVCB_CPU_INPUT_LINE("main", 0)
+	DEVCB_CPU_INPUT_LINE("maincpu", 0)
 };
 
 
 #define MDRV_CPU_PC(mem, port, type, clock, vblankfunc)	\
-	MDRV_CPU_ADD("main", type, clock)				\
+	MDRV_CPU_ADD("maincpu", type, clock)				\
 	MDRV_CPU_PROGRAM_MAP(mem##_map, 0)			\
 	MDRV_CPU_IO_MAP(port##_io, 0)				\
 	MDRV_CPU_VBLANK_INT_HACK(vblankfunc, 4)					\
@@ -1345,7 +1345,7 @@ static const pc_lpt_interface pc_lpt_config =
 
 static MACHINE_DRIVER_START( pcmda )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", V20, 4772720)
+	MDRV_CPU_ADD("maincpu", V20, 4772720)
 	MDRV_CPU_PROGRAM_MAP(pc8_map, 0)
 	MDRV_CPU_IO_MAP(pc8_io, 0)
 	MDRV_CPU_VBLANK_INT_HACK(pc_frame_interrupt, 4)
@@ -1406,7 +1406,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pcherc )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", V20, 4772720)
+	MDRV_CPU_ADD("maincpu", V20, 4772720)
 	MDRV_CPU_PROGRAM_MAP(pc8_map, 0)
 	MDRV_CPU_IO_MAP(pc8_io, 0)
 	MDRV_CPU_VBLANK_INT_HACK(pc_frame_interrupt, 4)
@@ -1473,7 +1473,7 @@ static const cassette_config ibm5150_cassette_config =
 
 static MACHINE_DRIVER_START( ibm5150 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", I8088, XTAL_14_31818MHz/3)
+	MDRV_CPU_ADD("maincpu", I8088, XTAL_14_31818MHz/3)
 	MDRV_CPU_PROGRAM_MAP(pc8_map, 0)
 	MDRV_CPU_IO_MAP(pc8_io, 0)
 	MDRV_CPU_CONFIG(i86_address_mask)
@@ -2040,7 +2040,7 @@ MACHINE_DRIVER_END
 #endif
 
 ROM_START( ibm5150 )
-	ROM_REGION(0x100000,"main", 0)
+	ROM_REGION(0x100000,"maincpu", 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */
 //	ROM_LOAD("600963.u12", 0xc8000, 0x02000, CRC(f3daf85f) SHA1(3bd29538832d3084cbddeec92593988772755283))	/* Tandon/Western Digital Fixed Disk Adapter 600963-001__TYPE_5.U12.2764.bin - Meant for an IBM PC or XT which lacked bios support for HDDs */
 
@@ -2092,7 +2092,7 @@ ROM_END
 
 #ifdef UNUSED_DEFINITION
 ROM_START( ibmpca )
-	ROM_REGION(0x100000,"main",0)
+	ROM_REGION(0x100000,"maincpu",0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */
 	ROM_LOAD("basicc11.f6", 0xf6000, 0x2000, CRC(80d3cf5d) SHA1(64769b7a8b60ffeefa04e4afbec778069a2840c9))
 	ROM_LOAD("basicc11.f8", 0xf8000, 0x2000, CRC(673a4acc) SHA1(082ae803994048e225150f771794ca305f73d731))
@@ -2107,7 +2107,7 @@ ROM_END
 #endif
 
 ROM_START( bondwell )
-	ROM_REGION(0x100000,"main", 0)
+	ROM_REGION(0x100000,"maincpu", 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */ // taken from other machine
 	ROM_LOAD("bondwell.bin", 0xfe000, 0x2000, CRC(d435a405) SHA1(a57c705d1144c7b61940b6f5c05d785c272fc9bb))
 
@@ -2122,7 +2122,7 @@ ROM_END
 
 
 ROM_START( pcmda )
-	ROM_REGION(0x100000,"main", 0)
+	ROM_REGION(0x100000,"maincpu", 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */
 	ROM_LOAD("pcxt.rom",    0xfe000, 0x02000, CRC(031aafad) SHA1(a641b505bbac97b8775f91fe9b83d9afdf4d038f))
 
@@ -2137,7 +2137,7 @@ ROM_END
 
 
 ROM_START( pcherc )
-	ROM_REGION(0x100000,"main", 0)
+	ROM_REGION(0x100000,"maincpu", 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */
 	ROM_LOAD("pcxt.rom",    0xfe000, 0x02000, CRC(031aafad) SHA1(a641b505bbac97b8775f91fe9b83d9afdf4d038f))
 	ROM_REGION(0x1000,"gfx1", 0)
@@ -2150,7 +2150,7 @@ ROM_END
 
 
 ROM_START( pc )
-	ROM_REGION(0x100000,"main", 0)
+	ROM_REGION(0x100000,"maincpu", 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */
 //	ROM_LOAD("xthdd.rom",  0xc8000, 0x02000, CRC(a96317da))
 	ROM_LOAD("pcxt.rom",    0xfe000, 0x02000, CRC(031aafad) SHA1(a641b505bbac97b8775f91fe9b83d9afdf4d038f))
@@ -2166,7 +2166,7 @@ ROM_END
 
 
 ROM_START( europc )
-	ROM_REGION(0x100000,"main", 0)
+	ROM_REGION(0x100000,"maincpu", 0)
 	// hdd bios integrated!
 	ROM_LOAD("50145", 0xf8000, 0x8000, CRC(1775a11d) SHA1(54430d4d0462860860397487c9c109e6f70db8e3)) // V2.07
 	ROM_REGION(0x08100,"gfx1", 0)
@@ -2175,7 +2175,7 @@ ROM_END
 
 
 ROM_START( ibmpcjr )
-	ROM_REGION(0x100000,"main", 0)
+	ROM_REGION(0x100000,"maincpu", 0)
 	ROM_LOAD("bios.rom", 0xf0000, 0x10000,CRC(31e3a7aa) SHA1(1f5f7013f18c08ff50d7942e76c4fbd782412414))
 
 	ROM_REGION(0x08100,"gfx1", 0)
@@ -2184,7 +2184,7 @@ ROM_END
 
 #ifdef UNUSED_DEFINITION
 ROM_START( t1000 )
-	ROM_REGION(0x100000,"main", 0)
+	ROM_REGION(0x100000,"maincpu", 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */	// not sure about this one
 	// partlist says it has 1 128kbyte rom
 	ROM_LOAD("t1000hx.e0", 0xe0000, 0x10000, CRC(61dbf242) SHA1(555b58d8aa8e0b0839259621c44b832d993beaef))	// not sure about this one
@@ -2198,7 +2198,7 @@ ROM_START( t1000 )
 ROM_END
 
 ROM_START( t1000a )
-	ROM_REGION(0x100000,"main", 0)
+	ROM_REGION(0x100000,"maincpu", 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */	// not sure about this one
 	// partlist says it has 1 128kbyte rom
 	ROM_LOAD("t1000hx.e0", 0xe0000, 0x10000, CRC(61dbf242) SHA1(555b58d8aa8e0b0839259621c44b832d993beaef))	// not sure about this one
@@ -2209,7 +2209,7 @@ ROM_START( t1000a )
 ROM_END
 
 ROM_START( t1000ex )
-	ROM_REGION(0x100000,"main", 0)
+	ROM_REGION(0x100000,"maincpu", 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */	// not sure about this one
 	// partlist says it has 1 128kbyte rom
 	ROM_LOAD("t1000hx.e0", 0xe0000, 0x10000, CRC(61dbf242) SHA1(555b58d8aa8e0b0839259621c44b832d993beaef))	// not sure about this one
@@ -2221,7 +2221,7 @@ ROM_END
 #endif
 
 ROM_START( t1000hx )
-	ROM_REGION(0x100000,"main", 0)
+	ROM_REGION(0x100000,"maincpu", 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */
 	// partlist says it has 1 128kbyte rom
 	ROM_LOAD("t1000hx.e0", 0xe0000, 0x10000, CRC(61dbf242) SHA1(555b58d8aa8e0b0839259621c44b832d993beaef))
@@ -2233,7 +2233,7 @@ ROM_END
 
 #ifdef UNUSED_DEFINITION
 ROM_START( t1000sl )
-	ROM_REGION(0x100000,"main", 0)
+	ROM_REGION(0x100000,"maincpu", 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */	// not sure about this one
 	// partlist says it has 1 128kbyte rom
 	ROM_LOAD("t1000hx.e0", 0xe0000, 0x10000, CRC(61dbf242) SHA1(555b58d8aa8e0b0839259621c44b832d993beaef))	// not sure about this one
@@ -2251,7 +2251,7 @@ ROM_START( t1000sl )
 ROM_END
 
 ROM_START( t1000sl2 )
-	ROM_REGION(0x100000,"main", 0)
+	ROM_REGION(0x100000,"maincpu", 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */	// not sure about this one
 	// partlist says it has 1 128kbyte rom
 	ROM_LOAD("t1000hx.e0", 0xe0000, 0x10000, CRC(61dbf242) SHA1(555b58d8aa8e0b0839259621c44b832d993beaef))	// not sure about this one
@@ -2263,7 +2263,7 @@ ROM_END
 #endif
 
 ROM_START( t1000sx )
-	ROM_REGION(0x100000,"main", 0)
+	ROM_REGION(0x100000,"maincpu", 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */	// not sure about this one
 	// partlist says it has 1 128kbyte rom
 	ROM_LOAD("t1000hx.e0", 0xe0000, 0x10000, CRC(61dbf242) SHA1(555b58d8aa8e0b0839259621c44b832d993beaef))	// not sure about this one
@@ -2275,7 +2275,7 @@ ROM_END
 
 #ifdef UNUSED_DEFINITION
 ROM_START( t1000rl )
-	ROM_REGION(0x100000,"main", 0)
+	ROM_REGION(0x100000,"maincpu", 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */	// not sure about this one
 	// partlist says it has 1 128kbyte rom
 	ROM_LOAD("t1000hx.e0", 0xe0000, 0x10000, CRC(61dbf242) SHA1(555b58d8aa8e0b0839259621c44b832d993beaef))	// not sure about this one
@@ -2290,7 +2290,7 @@ ROM_END
 #endif
 
 ROM_START( ibm5160 )
-	ROM_REGION16_LE(0x100000,"main", 0)
+	ROM_REGION16_LE(0x100000,"maincpu", 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */
 //	ROM_LOAD("600963.u12", 0xc8000, 0x02000, CRC(f3daf85f) SHA1(3bd29538832d3084cbddeec92593988772755283))  /* Tandon/Western Digital Fixed Disk Adapter 600963-001__TYPE_5.U12.2764.bin */
 
@@ -2411,7 +2411,7 @@ ROM_END
 
 
 ROM_START( xtvga )
-	ROM_REGION(0x100000,"main", 0)
+	ROM_REGION(0x100000,"maincpu", 0)
 	ROM_LOAD("et4000.bin", 0xc0000, 0x8000, CRC(f01e4be0) SHA1(95d75ff41bcb765e50bd87a8da01835fd0aa01d5)) // from unknown revision/model of Tseng ET4000 Video card
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */
 	ROM_LOAD("pcxt.rom",    0xfe000, 0x02000, CRC(031aafad) SHA1(a641b505bbac97b8775f91fe9b83d9afdf4d038f))
@@ -2419,8 +2419,8 @@ ROM_END
 
 
 ROM_START( pc200 )
-//    ROM_REGION(0x100000,"main", 0)
-	ROM_REGION16_LE(0x100000,"main", 0)
+//    ROM_REGION(0x100000,"maincpu", 0)
+	ROM_REGION16_LE(0x100000,"maincpu", 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */
 	// special bios at 0xe0000 !?
 	ROM_LOAD16_BYTE("pc20v2.0", 0xfc001, 0x2000, CRC(41302eb8) SHA1(8b4b2afea543b96b45d6a30365281decc15f2932)) // v2
@@ -2432,8 +2432,8 @@ ROM_END
 
 
 ROM_START( pc20 )
-//    ROM_REGION(0x100000,"main", 0)
-	ROM_REGION16_LE(0x100000,"main", 0)
+//    ROM_REGION(0x100000,"maincpu", 0)
+	ROM_REGION16_LE(0x100000,"maincpu", 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */
 
 	// special bios at 0xe0000 !?
@@ -2449,8 +2449,8 @@ ROM_END
 
 
 ROM_START( ppc512 )
-//    ROM_REGION(0x100000,"main", 0)
-	ROM_REGION16_LE(0x100000,"main", 0)
+//    ROM_REGION(0x100000,"maincpu", 0)
+	ROM_REGION16_LE(0x100000,"maincpu", 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */
 	// special bios at 0xe0000 !?
 	ROM_LOAD16_BYTE("40107.v1", 0xfc001, 0x2000, CRC(4e37e769) SHA1(88be3d3375ec3b0a7041dbcea225b197e50d4bfe)) // v1.9
@@ -2462,8 +2462,8 @@ ROM_END
 
 
 ROM_START( ppc640 )
-//    ROM_REGION(0x100000,"main", 0)
-	ROM_REGION16_LE(0x100000,"main", 0)
+//    ROM_REGION(0x100000,"maincpu", 0)
+	ROM_REGION16_LE(0x100000,"maincpu", 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */
 	// special bios at 0xe0000 !?
 	ROM_LOAD16_BYTE("40107.v2", 0xfc001, 0x2000, CRC(0785b63e) SHA1(4dbde6b9e9500298bb6241a8daefd85927f1ad28)) // v2.1
@@ -2475,8 +2475,8 @@ ROM_END
 
 
 ROM_START( pc1512 )
-//    ROM_REGION(0x100000,"main", 0)
-	ROM_REGION16_LE(0x100000,"main", 0)
+//    ROM_REGION(0x100000,"maincpu", 0)
+	ROM_REGION16_LE(0x100000,"maincpu", 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */
 	ROM_LOAD16_BYTE("40044.v1", 0xfc001, 0x2000, CRC(668fcc94) SHA1(74002f5cc542df442eec9e2e7a18db3598d8c482)) // v1
 	ROM_LOAD16_BYTE("40043.v1", 0xfc000, 0x2000, CRC(f72f1582) SHA1(7781d4717917262805d514b331ba113b1e05a247)) // v1
@@ -2486,8 +2486,8 @@ ROM_END
 
 
 ROM_START( pc1512v2 )
-//    ROM_REGION(0x100000,"main", 0)
-	ROM_REGION16_LE(0x100000,"main", 0)
+//    ROM_REGION(0x100000,"maincpu", 0)
+	ROM_REGION16_LE(0x100000,"maincpu", 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */
 	ROM_LOAD16_BYTE("40043.v2", 0xfc001, 0x2000, CRC(d2d4d2de) SHA1(c376fd1ad23025081ae16c7949e88eea7f56e1bb)) // v2
 	ROM_LOAD16_BYTE("40044.v2", 0xfc000, 0x2000, CRC(1aec54fa) SHA1(b12fd73cfc35a240ed6da4dcc4b6c9910be611e0)) // v2
@@ -2497,8 +2497,8 @@ ROM_END
 
 
 ROM_START( pc1640 )
-//    ROM_REGION(0x100000,"main", 0)
-	ROM_REGION16_LE(0x100000,"main", 0)
+//    ROM_REGION(0x100000,"maincpu", 0)
+	ROM_REGION16_LE(0x100000,"maincpu", 0)
 	ROM_LOAD("40100", 0xc0000, 0x8000, CRC(d2d1f1ae) SHA1(98302006ee38a17c09bd75504cc18c0649174e33)) /* Internal Graphics Adapter ROM */
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */
 
@@ -2519,7 +2519,7 @@ ROM_END
 
 
 ROM_START( dgone )
-	ROM_REGION(0x100000,"main", 0)
+	ROM_REGION(0x100000,"maincpu", 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */
 	ROM_LOAD( "dgone.bin",  0xf8000, 0x08000, CRC(2c38c86e) SHA1(c0f85a000d1d13cd354965689e925d677822549e))
 

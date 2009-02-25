@@ -165,7 +165,7 @@ static const z80_daisy_chain osborne1_daisy_chain[] =
 
 
 static MACHINE_DRIVER_START( osborne1 )
-	MDRV_CPU_ADD( "main", Z80, MAIN_CLOCK/4 )
+	MDRV_CPU_ADD( "maincpu", Z80, MAIN_CLOCK/4 )
 	MDRV_CPU_PROGRAM_MAP( osborne1_mem, 0 )
 	MDRV_CPU_IO_MAP( osborne1_io, 0 )
 	MDRV_CPU_CONFIG( osborne1_daisy_chain )
@@ -192,7 +192,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( osborne1 )
-	ROM_REGION(0x1000, "main", 0)
+	ROM_REGION(0x1000, "maincpu", 0)
 	ROM_SYSTEM_BIOS( 0, "ver144", "BIOS version 1.44" )
 	ROMX_LOAD( "osb144.bin", 0x0000, 0x1000, CRC(c0596b14) SHA1(ee6a9cc9be3ddc5949d3379351c1d58a175ce9ac), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "verA", "BIOS version A" )

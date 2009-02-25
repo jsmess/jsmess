@@ -234,7 +234,7 @@ static const mm58274c_interface compis_mm58274c_interface =
 
 static MACHINE_DRIVER_START( compis )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", I80186, 8000000)	/* 8 MHz */
+	MDRV_CPU_ADD("maincpu", I80186, 8000000)	/* 8 MHz */
 	MDRV_CPU_PROGRAM_MAP(compis_mem, 0)
 	MDRV_CPU_IO_MAP(compis_io, 0)
 	MDRV_CPU_VBLANK_INT("screen", compis_vblank_int)
@@ -287,7 +287,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START (compis)
-     ROM_REGION (0x100000, "main", 0)
+     ROM_REGION (0x100000, "maincpu", 0)
      ROM_LOAD ("compis.rom", 0xf0000, 0x10000, CRC(89877688) SHA1(7daa1762f24e05472eafc025879da90fe61d0225))
 ROM_END
 

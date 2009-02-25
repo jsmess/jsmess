@@ -257,10 +257,10 @@ static const ay8910_interface svi318_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_MEMORY_HANDLER("main", PROGRAM, svi318_psg_port_a_r),
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, svi318_psg_port_a_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_MEMORY_HANDLER("main", PROGRAM, svi318_psg_port_b_w)
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, svi318_psg_port_b_w)
 };
 
 static const cassette_config svi318_cassette_config =
@@ -281,7 +281,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( svi318 )
 	/* Basic machine hardware */
-	MDRV_CPU_ADD( "main", Z80, 3579545 )	/* 3.579545 MHz */
+	MDRV_CPU_ADD( "maincpu", Z80, 3579545 )	/* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP( svi318_mem, 0 )
 	MDRV_CPU_IO_MAP( svi318_io, 0 )
 	MDRV_CPU_VBLANK_INT("screen", svi318_interrupt)
@@ -345,7 +345,7 @@ static const mc6845_interface svi806_crtc6845_interface =
 
 static MACHINE_DRIVER_START( svi328_806 )
 	/* Basic machine hardware */
-	MDRV_CPU_ADD( "main", Z80, 3579545 )	/* 3.579545 MHz */
+	MDRV_CPU_ADD( "maincpu", Z80, 3579545 )	/* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP( svi328_806_mem, 0 )
 	MDRV_CPU_IO_MAP( svi328_806_io, 0 )
 	MDRV_CPU_VBLANK_INT("screen", svi318_interrupt)
@@ -416,7 +416,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( svi318 )
-	ROM_REGION(0x10000, "main", 0)
+	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "111", "SV BASIC v1.11")
 	ROMX_LOAD("svi111.rom", 0x0000, 0x8000, CRC(bc433df6) SHA1(10349ce675f6d6d47f0976e39cb7188eba858d89), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "110", "SV BASIC v1.1")
@@ -426,7 +426,7 @@ ROM_START( svi318 )
 ROM_END
 
 ROM_START( svi318n  )
-	ROM_REGION(0x10000, "main", 0)
+	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "111", "SV BASIC v1.11")
 	ROMX_LOAD("svi111.rom", 0x0000, 0x8000, CRC(bc433df6) SHA1(10349ce675f6d6d47f0976e39cb7188eba858d89), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "110", "SV BASIC v1.1")
@@ -436,7 +436,7 @@ ROM_START( svi318n  )
 ROM_END
 
 ROM_START( svi328 )
-	ROM_REGION(0x10000, "main", 0)
+	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "111", "SV BASIC v1.11")
 	ROMX_LOAD("svi111.rom", 0x0000, 0x8000, CRC(bc433df6) SHA1(10349ce675f6d6d47f0976e39cb7188eba858d89), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "110", "SV BASIC v1.1")
@@ -446,7 +446,7 @@ ROM_START( svi328 )
 ROM_END
 
 ROM_START( svi328n )
-	ROM_REGION(0x10000, "main", 0)
+	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "111", "SV BASIC v1.11")
 	ROMX_LOAD("svi111.rom", 0x0000, 0x8000, CRC(bc433df6) SHA1(10349ce675f6d6d47f0976e39cb7188eba858d89), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "110", "SV BASIC v1.1")
@@ -456,7 +456,7 @@ ROM_START( svi328n )
 ROM_END
 
 ROM_START( sv328p80 )
-	ROM_REGION (0x10000, "main",0)
+	ROM_REGION (0x10000, "maincpu",0)
 	ROM_LOAD ("svi111.rom", 0x0000, 0x8000, CRC(bc433df6) SHA1(10349ce675f6d6d47f0976e39cb7188eba858d89))
 	ROM_REGION( 0x1000, "gfx1", 0)
 	ROM_SYSTEM_BIOS(0, "english", "English Character Set")
@@ -466,7 +466,7 @@ ROM_START( sv328p80 )
 ROM_END
 
 ROM_START( sv328n80 )
-	ROM_REGION (0x10000, "main",0)
+	ROM_REGION (0x10000, "maincpu",0)
 	ROM_LOAD ("svi111.rom", 0x0000, 0x8000, CRC(bc433df6) SHA1(10349ce675f6d6d47f0976e39cb7188eba858d89))
 	ROM_REGION( 0x1000, "gfx1", 0)
 	ROM_SYSTEM_BIOS(0, "english", "English Character Set")

@@ -143,8 +143,8 @@ int pc1403_reset(const device_config *device)
 /* currently enough to save the external ram */
 NVRAM_HANDLER( pc1403 )
 {
-	const device_config *main_cpu = cputag_get_cpu(machine, "main");
-	UINT8 *ram = memory_region(machine, "main") + 0x8000;
+	const device_config *main_cpu = cputag_get_cpu(machine, "maincpu");
+	UINT8 *ram = memory_region(machine, "maincpu") + 0x8000;
 	UINT8 *cpu = sc61860_internal_ram(main_cpu);
 
 	if (read_or_write)

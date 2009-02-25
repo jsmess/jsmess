@@ -236,7 +236,7 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( channelf )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", F8, 3579545/2)        /* Colorburst/2 */
+	MDRV_CPU_ADD("maincpu", F8, 3579545/2)        /* Colorburst/2 */
 	MDRV_CPU_PROGRAM_MAP(channelf_map, 0)
 	MDRV_CPU_IO_MAP(channelf_io, 0)
 	MDRV_QUANTUM_TIME(HZ(60))
@@ -264,7 +264,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( sabavdpl )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", F8, MASTER_CLOCK_PAL)        /* PAL speed */
+	MDRV_CPU_ADD("maincpu", F8, MASTER_CLOCK_PAL)        /* PAL speed */
 	MDRV_CPU_PROGRAM_MAP(channelf_map, 0)
 	MDRV_CPU_IO_MAP(channelf_io, 0)
 	MDRV_QUANTUM_TIME(HZ(50))
@@ -293,7 +293,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( channlf2 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", F8, 3579545/2)        /* Colorburst / 2 */
+	MDRV_CPU_ADD("maincpu", F8, 3579545/2)        /* Colorburst / 2 */
 	MDRV_CPU_PROGRAM_MAP(channelf_map, 0)
 	MDRV_CPU_IO_MAP(channelf_io, 0)
 	MDRV_QUANTUM_TIME(HZ(60))
@@ -322,7 +322,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( sabavpl2 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", F8, MASTER_CLOCK_PAL)        /* PAL speed */
+	MDRV_CPU_ADD("maincpu", F8, MASTER_CLOCK_PAL)        /* PAL speed */
 	MDRV_CPU_PROGRAM_MAP(channelf_map, 0)
 	MDRV_CPU_IO_MAP(channelf_io, 0)
 	MDRV_QUANTUM_TIME(HZ(50))
@@ -349,7 +349,7 @@ static MACHINE_DRIVER_START( sabavpl2 )
 MACHINE_DRIVER_END
 
 ROM_START( channelf )
-	ROM_REGION(0x10000,"main",0)
+	ROM_REGION(0x10000,"maincpu",0)
 	ROM_SYSTEM_BIOS( 0, "sl90025", "Luxor Video Entertainment System" )
 	ROMX_LOAD("sl90025.rom",  0x0000, 0x0400, CRC(015c1e38) SHA1(759e2ed31fbde4a2d8daf8b9f3e0dffebc90dae2), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "sl31253", "Channel F" )

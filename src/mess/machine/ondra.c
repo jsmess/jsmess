@@ -46,7 +46,7 @@ static READ8_HANDLER( ondra_keyboard_r )
 
 static void ondra_update_banks(running_machine *machine)
 {
-	UINT8 *mem = memory_region(machine, "main");
+	UINT8 *mem = memory_region(machine, "maincpu");
 	if (ondra_bank1_status==0) {
 		memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
 		memory_set_bankptr(machine, 1, mem + 0x010000);

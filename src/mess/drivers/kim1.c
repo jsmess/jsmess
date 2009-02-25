@@ -324,7 +324,7 @@ static const cassette_config kim1_cassette_config =
 
 static MACHINE_DRIVER_START( kim1 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, 1000000)        /* 1 MHz */
+	MDRV_CPU_ADD("maincpu", M6502, 1000000)        /* 1 MHz */
 	MDRV_CPU_PROGRAM_MAP(kim1_map, 0)
 	MDRV_QUANTUM_TIME(HZ(60))
 
@@ -348,7 +348,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START(kim1)
-	ROM_REGION(0x10000,"main",0)
+	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("6530-003.bin",    0x1800, 0x0400, CRC(a2a56502) SHA1(60b6e48f35fe4899e29166641bac3e81e3b9d220))
 	ROM_LOAD("6530-002.bin",    0x1c00, 0x0400, CRC(2b08e923) SHA1(054f7f6989af3a59462ffb0372b6f56f307b5362))
 ROM_END

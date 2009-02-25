@@ -137,7 +137,7 @@ static MACHINE_DRIVER_START( pecom64 )
 	MDRV_DRIVER_DATA(pecom_state)
 	
     /* basic machine hardware */ 
-	MDRV_CPU_ADD("main", CDP1802, CDP1869_DOT_CLK_PAL/3)
+	MDRV_CPU_ADD("maincpu", CDP1802, CDP1869_DOT_CLK_PAL/3)
 	MDRV_CPU_PROGRAM_MAP(pecom64_mem, 0)
   	MDRV_CPU_IO_MAP(pecom64_io, 0)
   	MDRV_CPU_CONFIG(pecom64_cdp1802_config)
@@ -154,7 +154,7 @@ MACHINE_DRIVER_END
 
 /* ROM definition */
 ROM_START( pecom64 )
-	  ROM_REGION( 0x10000, "main", ROMREGION_ERASEFF )
+	  ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	  ROM_SYSTEM_BIOS(0, "ver4", "version 4")
 	  ROMX_LOAD( "pecom64-1.bin", 0x8000, 0x4000, CRC(9a433b47) SHA1(dadb8c399e0a25a2693e10e42a2d7fc2ea9ad427), ROM_BIOS(1) )
 	  ROMX_LOAD( "pecom64-2.bin", 0xc000, 0x4000, CRC(2116cadc) SHA1(03f11055cd221d438a40a41874af8fba0fa116d9), ROM_BIOS(1) )

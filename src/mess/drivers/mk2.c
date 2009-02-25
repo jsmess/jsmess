@@ -170,7 +170,7 @@ static const miot6530_interface mk2_miot6530_interface =
 
 static MACHINE_DRIVER_START( mk2 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, 1000000)        /* 6504 */
+	MDRV_CPU_ADD("maincpu", M6502, 1000000)        /* 6504 */
 	MDRV_CPU_PROGRAM_MAP(mk2_mem, 0)
 	MDRV_QUANTUM_TIME(HZ(60))
 
@@ -190,7 +190,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START(mk2)
-	ROM_REGION(0x10000,"main",0)
+	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("024_1879", 0x0c00, 0x0400, CRC(4f28c443) SHA1(e33f8b7f38e54d7a6e0f0763f2328cc12cb0eade))
 	ROM_LOAD("005_2179", 0x1000, 0x1000, CRC(6f10991b) SHA1(90cdc5a15d9ad813ad20410f21081c6e3e481812)) // chess mate 7.5
 ROM_END

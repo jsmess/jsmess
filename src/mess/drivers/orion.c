@@ -88,7 +88,7 @@ static const cassette_config orion_cassette_config =
 
 /* Machine driver */
 static MACHINE_DRIVER_START( orion128 )
-    MDRV_CPU_ADD("main", 8080, 2000000)
+    MDRV_CPU_ADD("maincpu", 8080, 2000000)
     MDRV_CPU_PROGRAM_MAP(orion128_mem, 0)
     MDRV_CPU_IO_MAP(orion128_io, 0)
 
@@ -139,7 +139,7 @@ static const ay8910_interface orionz80_ay_interface =
 };
 
 static MACHINE_DRIVER_START( orionz80 )
-    MDRV_CPU_ADD("main", Z80, 2500000)
+    MDRV_CPU_ADD("maincpu", Z80, 2500000)
     MDRV_CPU_PROGRAM_MAP(orionz80_mem, 0)
     MDRV_CPU_IO_MAP(orionz80_io, 0)
     MDRV_CPU_VBLANK_INT("screen",orionz80_interrupt)
@@ -190,7 +190,7 @@ static MACHINE_DRIVER_START( orionz80ms )
 MACHINE_DRIVER_END	
 
 static MACHINE_DRIVER_START( orionpro )
-    MDRV_CPU_ADD("main", Z80, 5000000)
+    MDRV_CPU_ADD("maincpu", Z80, 5000000)
     MDRV_CPU_PROGRAM_MAP(orionpro_mem, 0)
     MDRV_CPU_IO_MAP(orionpro_io, 0)
 
@@ -268,7 +268,7 @@ SYSTEM_CONFIG_END
 /* ROM definition */
 
 ROM_START( orion128 )
-    ROM_REGION( 0x30000, "main", ROMREGION_ERASEFF )
+    ROM_REGION( 0x30000, "maincpu", ROMREGION_ERASEFF )
     ROM_SYSTEM_BIOS( 0, "m2rk", "Version 3.2 rk" )
     ROMX_LOAD( "m2rk.bin",    0x0f800, 0x0800, CRC(2025c234) SHA1(caf86918629be951fe698cddcdf4589f07e2fb96), ROM_BIOS(1) )
     ROM_SYSTEM_BIOS( 1, "m2_2rk", "Version 3.2.2 rk" )
@@ -277,13 +277,13 @@ ROM_START( orion128 )
 ROM_END
 
 ROM_START( orionms )
-    ROM_REGION( 0x30000, "main", ROMREGION_ERASEFF )
+    ROM_REGION( 0x30000, "maincpu", ROMREGION_ERASEFF )
     ROM_LOAD( "ms7007.bin",   0x0f800, 0x0800, CRC(c6174ba3) SHA1(8f9a42c3e09684718fe4121a8408e7860129d26f) )
     ROM_CART_LOAD("cart", 0x10000, 0x10000, ROM_FILL_FF | ROM_OPTIONAL)
 ROM_END
 
 ROM_START( orionz80 )
-    ROM_REGION( 0x30000, "main", ROMREGION_ERASEFF )
+    ROM_REGION( 0x30000, "maincpu", ROMREGION_ERASEFF )
     ROM_SYSTEM_BIOS( 0, "m31", "Version 3.1" )
     ROMX_LOAD( "m31.bin",     0x0f800, 0x0800, CRC(007c6dc6) SHA1(338ff95497c820338f7f79c75f65bc540a5541c4), ROM_BIOS(1) )
     ROM_SYSTEM_BIOS( 1, "m32zrk", "Version 3.2 zrk" )
@@ -298,13 +298,13 @@ ROM_START( orionz80 )
 ROM_END
 
 ROM_START( orionide )
-    ROM_REGION( 0x30000, "main", ROMREGION_ERASEFF )
+    ROM_REGION( 0x30000, "maincpu", ROMREGION_ERASEFF )
     ROM_LOAD( "m35zrkh.bin", 0x0f800, 0x0800, CRC(b7745f28) SHA1(c3bd3e662db7ec56ecbab54bf6b3a4c26200d0bb) )
     ROM_CART_LOAD("cart", 0x10000, 0x10000, ROM_FILL_FF | ROM_OPTIONAL)
 ROM_END
 
 ROM_START( orionzms )
-    ROM_REGION( 0x30000, "main", ROMREGION_ERASEFF )
+    ROM_REGION( 0x30000, "maincpu", ROMREGION_ERASEFF )
     ROM_SYSTEM_BIOS( 0, "m32zms", "Version 3.2 zms" )
     ROMX_LOAD( "m32zms.bin",  0x0f800, 0x0800, CRC(44cfd2ae) SHA1(84d53fbc249938c56be76ee4e6ab297f0461835b), ROM_BIOS(1) )
     ROM_SYSTEM_BIOS( 1, "m34zms", "Version 3.4 zms" )
@@ -315,13 +315,13 @@ ROM_START( orionzms )
 ROM_END
 
 ROM_START( orionidm )
-    ROM_REGION( 0x30000, "main", ROMREGION_ERASEFF )
+    ROM_REGION( 0x30000, "maincpu", ROMREGION_ERASEFF )
     ROM_LOAD( "m35zmsh.bin", 0x0f800, 0x0800, CRC(01e66df4) SHA1(8c785a3c32fe3eacda73ec79157b41a6e4b63ba8) )
     ROM_CART_LOAD("cart", 0x10000, 0x10000, ROM_FILL_FF | ROM_OPTIONAL)
 ROM_END
 
 ROM_START( orionpro )
-	ROM_REGION( 0x32000, "main", ROMREGION_ERASEFF )
+	ROM_REGION( 0x32000, "maincpu", ROMREGION_ERASEFF )
     ROM_CART_LOAD("cart",   0x10000, 0x10000, ROM_FILL_FF | ROM_OPTIONAL)
 	ROM_SYSTEM_BIOS( 0, "ver21", "Version 2.1" )
     ROMX_LOAD( "rom1-210.bin", 0x20000, 0x2000,  CRC(8e1a0c78) SHA1(61c8a5ed596ce7e3fd32da920dcc80dc5375b421), ROM_BIOS(1) )

@@ -282,7 +282,7 @@ static const cassette_config radio86_cassette_config =
 /* Machine driver */
 static MACHINE_DRIVER_START( radio86 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main",8080, XTAL_16MHz / 9)
+	MDRV_CPU_ADD("maincpu",8080, XTAL_16MHz / 9)
 	MDRV_CPU_PROGRAM_MAP(radio86_mem, 0)
 	MDRV_CPU_IO_MAP(radio86_io, 0)
 	MDRV_MACHINE_RESET( radio86 )
@@ -316,14 +316,14 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( radio16 )
   	/* basic machine hardware */
   	MDRV_IMPORT_FROM(radio86)
-  	MDRV_CPU_MODIFY("main")
+  	MDRV_CPU_MODIFY("maincpu")
   	MDRV_CPU_PROGRAM_MAP(radio86_16_mem, 0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( radiorom )
   	/* basic machine hardware */
   	MDRV_IMPORT_FROM(radio86)
-  	MDRV_CPU_MODIFY("main")
+  	MDRV_CPU_MODIFY("maincpu")
   	MDRV_CPU_PROGRAM_MAP(radio86rom_mem, 0)
     
 	MDRV_PPI8255_ADD( "ppi8255_2", radio86_ppi8255_interface_2 )
@@ -332,7 +332,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( radioram )
   	/* basic machine hardware */
   	MDRV_IMPORT_FROM(radio86)
-  	MDRV_CPU_MODIFY("main")
+  	MDRV_CPU_MODIFY("maincpu")
   	MDRV_CPU_PROGRAM_MAP(radio86ram_mem, 0)
 
 	MDRV_PPI8255_ADD( "ppi8255_2", radio86_ppi8255_interface_2 )
@@ -341,7 +341,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( rk7007 )
   	/* basic machine hardware */
   	MDRV_IMPORT_FROM(radio86)
-  	MDRV_CPU_MODIFY("main")
+  	MDRV_CPU_MODIFY("maincpu")
   	MDRV_CPU_IO_MAP(rk7007_io, 0)
 
 	MDRV_PPI8255_ADD( "ms7007", rk7007_ppi8255_interface )
@@ -350,7 +350,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( rk700716 )
   	/* basic machine hardware */
   	MDRV_IMPORT_FROM(radio16)
-  	MDRV_CPU_MODIFY("main")
+  	MDRV_CPU_MODIFY("maincpu")
   	MDRV_CPU_IO_MAP(rk7007_io, 0)
     
 	MDRV_PPI8255_ADD( "ms7007", rk7007_ppi8255_interface )    
@@ -359,47 +359,47 @@ MACHINE_DRIVER_END
 
 /* ROM definition */
 ROM_START( radio86 )
-	ROM_REGION( 0x10000, "main", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "bios.rom", 0xf800, 0x0800, CRC(bf1ceea5) SHA1(8f3d472203e550e9854dd79e1f44628635581ed0))
-	ROM_COPY( "main", 0xf800, 0xf000, 0x0800 )
+	ROM_COPY( "maincpu", 0xf800, 0xf000, 0x0800 )
 	ROM_REGION(0x0800, "gfx1",0)
 	ROM_LOAD ("radio86.fnt", 0x0000, 0x0400, CRC(7666bd5e) SHA1(8652787603bee9b4da204745e3b2aa07a4783dfc))
 ROM_END
 
 ROM_START( radio4k )
-	ROM_REGION( 0x10000, "main", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "bios4k.rom", 0xf000, 0x1000, CRC(2ac9d864) SHA1(296716c6cddc9dd31d500ba421aa807c45757cfd))
 	ROM_REGION(0x0800, "gfx1",0)
 	ROM_LOAD ("radio86.fnt", 0x0000, 0x0400, CRC(7666bd5e) SHA1(8652787603bee9b4da204745e3b2aa07a4783dfc))
 ROM_END
 
 ROM_START( spektr01 )
-	ROM_REGION( 0x10000, "main", ROMREGION_ERASEFF )	
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )	
 	ROM_LOAD( "spektr001.rom", 0xf800, 0x0800, CRC(5a38e6d5) SHA1(799c3bbe2a9f08f3aba55379cc093329048350ff))
-	ROM_COPY( "main", 0xf800, 0xf000, 0x0800 )
+	ROM_COPY( "maincpu", 0xf800, 0xf000, 0x0800 )
 	ROM_REGION(0x0800, "gfx1",0)
 	ROM_LOAD ("radio86.fnt", 0x0000, 0x0400, CRC(7666bd5e) SHA1(8652787603bee9b4da204745e3b2aa07a4783dfc))
 ROM_END
 
 ROM_START( radio16 )
-	ROM_REGION( 0x10000, "main", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "rk86.16k", 0xf800, 0x0800, CRC(fd8a4caf) SHA1(90d6af571049a7c8748eac03541e921eac3f70c5))
-	ROM_COPY( "main", 0xf800, 0xf000, 0x0800 )
+	ROM_COPY( "maincpu", 0xf800, 0xf000, 0x0800 )
 	ROM_REGION(0x0800, "gfx1",0)
 	ROM_LOAD ("radio86.fnt", 0x0000, 0x0400, CRC(7666bd5e) SHA1(8652787603bee9b4da204745e3b2aa07a4783dfc))
 ROM_END
 
 ROM_START( radiorom )
-	ROM_REGION( 0x18000, "main", ROMREGION_ERASEFF )
+	ROM_REGION( 0x18000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "radiorom.rom", 0xf800, 0x0800, CRC(B5CDEAB7) SHA1(1c80d72082f2fb2190b575726cb82d86ae0ee7d8))
-	ROM_COPY( "main", 0xf800, 0xf000, 0x0800 )
+	ROM_COPY( "maincpu", 0xf800, 0xf000, 0x0800 )
 	ROM_LOAD( "romdisk.rk", 0x10000, 0x8000, CRC(6B16FC04) SHA1(8c09322ae184f4d900f1032d20b5cf3eb2f1a24b))
 	ROM_REGION(0x0800, "gfx1",0)
 	ROM_LOAD ("radio86.fnt", 0x0000, 0x0400, CRC(7666bd5e) SHA1(8652787603bee9b4da204745e3b2aa07a4783dfc))
 ROM_END
 
 ROM_START( radioram )
-	ROM_REGION( 0x20000, "main", ROMREGION_ERASEFF )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "r86-1.bin", 0xf800, 0x0800, CRC(7E7AB7CB) SHA1(fedb00b6b8fbe1167faba3e4611b483f800e6934))
 	ROM_LOAD( "r86-2.bin", 0xe000, 0x0800, CRC(955F0616) SHA1(d2b9f960558bdcb60074091fc79d1ad56c313586))
 	ROM_LOAD( "romdisk.bin", 0x10000, 0x10000, CRC(43C0279B) SHA1(bc1dfd9bdbce39460616e2158f5d96279d0af3cf))
@@ -408,17 +408,17 @@ ROM_START( radioram )
 ROM_END
 
 ROM_START( rk7007 )
-	ROM_REGION( 0x10000, "main", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "ms7007.rom", 0xf800, 0x0800, CRC(002811DC) SHA1(4529eb72198c49af77fbcd7833bcd06a1cf9b1ac))
-	ROM_COPY( "main", 0xf800, 0xf000, 0x0800 )
+	ROM_COPY( "maincpu", 0xf800, 0xf000, 0x0800 )
 	ROM_REGION(0x0800, "gfx1",0)
 	ROM_LOAD ("radio86.fnt", 0x0000, 0x0400, CRC(7666bd5e) SHA1(8652787603bee9b4da204745e3b2aa07a4783dfc))
 ROM_END
 
 ROM_START( rk700716 )
-	ROM_REGION( 0x10000, "main", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "ms7007.16k", 0xf800, 0x0800, CRC(5268D7B6) SHA1(efd69d8456b8cf8b37f33237153c659725608528))
-	ROM_COPY( "main", 0xf800, 0xf000, 0x0800 )
+	ROM_COPY( "maincpu", 0xf800, 0xf000, 0x0800 )
 	ROM_REGION(0x0800, "gfx1",0)
 	ROM_LOAD ("radio86.fnt", 0x0000, 0x0400, CRC(7666bd5e) SHA1(8652787603bee9b4da204745e3b2aa07a4783dfc))
 ROM_END

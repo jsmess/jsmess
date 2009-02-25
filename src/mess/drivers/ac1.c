@@ -96,7 +96,7 @@ INPUT_PORTS_END
 /* Machine driver */
 static MACHINE_DRIVER_START( ac1 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, XTAL_8MHz / 4)
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_8MHz / 4)
 	MDRV_CPU_PROGRAM_MAP(ac1_mem, 0)
 	MDRV_CPU_IO_MAP(ac1_io, 0)
 	MDRV_MACHINE_RESET( ac1 )
@@ -129,7 +129,7 @@ MACHINE_DRIVER_END
 	
 /* ROM definition */
 ROM_START( ac1 )
-	ROM_REGION( 0x10000, "main", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "mon_v31_16.bin",  0x0000, 0x0800, CRC(1ba65e4d) SHA1(3382b8d03f31166a56aea49fd1ec1e82a7108300))
 	ROM_LOAD( "minibasic.bin",   0x0800, 0x0800, CRC(06782639) SHA1(3fd57b3ae3f538374b0d794d8aa15d06bcaaddd8))
 	ROM_REGION(0x0800, "gfx1",0)
@@ -138,7 +138,7 @@ ROM_START( ac1 )
 ROM_END
 
 ROM_START( ac1_32 )
-	ROM_REGION( 0x10000, "main", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "mon_v31_32.bin",  0x0000, 0x0800, CRC(bea78b1a) SHA1(8a3e2ac2033aa0bb016be742cfea7e4b09c0813b))
 	ROM_LOAD( "minibasic.bin",   0x0800, 0x0800, CRC(06782639) SHA1(3fd57b3ae3f538374b0d794d8aa15d06bcaaddd8))
 	ROM_REGION(0x0800, "gfx1",0)

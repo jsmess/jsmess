@@ -302,7 +302,7 @@ static WRITE8_HANDLER(ex800_gate7a_w)
 
 
 static ADDRESS_MAP_START( ex800_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("main", 0)
+	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x8000, 0xbfff) AM_RAM /* external RAM */
 	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x1800) AM_READWRITE(ex800_devsel_r, ex800_devsel_w)
 	AM_RANGE(0xe000, 0xe7ff) AM_READWRITE(ex800_gate5a_r, ex800_gate5a_w)
@@ -420,7 +420,7 @@ static const UPD7810_CONFIG ex800_cpu_config =
 
 static MACHINE_DRIVER_START(ex800)
     /* basic machine hardware */
-    MDRV_CPU_ADD("main", UPD7810, 12000000)  /* 12 MHz? */
+    MDRV_CPU_ADD("maincpu", UPD7810, 12000000)  /* 12 MHz? */
     MDRV_CPU_CONFIG(ex800_cpu_config)
     MDRV_CPU_PROGRAM_MAP(ex800_mem, 0)
 	MDRV_CPU_IO_MAP(ex800_io, 0)
@@ -443,7 +443,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( ex800 )
-    ROM_REGION(0x8000, "main", 0)
+    ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD("w8_pe9.9b", 0x0000, 0x8000, CRC(6dd41e9b) SHA1(8e30ead727b9317154742efd881206e9f9bbf95b))
 ROM_END
 

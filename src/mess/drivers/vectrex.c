@@ -90,13 +90,13 @@ static const ay8910_interface vectrex_ay8910_interface =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_INPUT_PORT("BUTTONS"),
 	DEVCB_NULL,
-	DEVCB_MEMORY_HANDLER("main", PROGRAM, vectrex_psg_port_w),
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, vectrex_psg_port_w),
 	DEVCB_NULL
 };
 
 static MACHINE_DRIVER_START(vectrex)
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809, XTAL_6MHz / 4)
+	MDRV_CPU_ADD("maincpu", M6809, XTAL_6MHz / 4)
 	MDRV_CPU_PROGRAM_MAP(vectrex_map, 0)
 
 	MDRV_SCREEN_ADD("screen", VECTOR)
@@ -129,7 +129,7 @@ static MACHINE_DRIVER_START(vectrex)
 MACHINE_DRIVER_END
 
 ROM_START(vectrex)
-	ROM_REGION(0x10000,"main", 0)
+	ROM_REGION(0x10000,"maincpu", 0)
 	ROM_LOAD("system.img", 0xe000, 0x2000, CRC(ba13fb57) SHA1(65d07426b520ddd3115d40f255511e0fd2e20ae7))
 ROM_END
 
@@ -199,7 +199,7 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START(raaspec)
 	MDRV_IMPORT_FROM(vectrex)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(raaspec_map, 0)
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
@@ -213,7 +213,7 @@ static MACHINE_DRIVER_START(raaspec)
 MACHINE_DRIVER_END
 
 ROM_START(raaspec)
-	ROM_REGION(0x10000,"main", 0)
+	ROM_REGION(0x10000,"maincpu", 0)
 	ROM_LOAD("spectrum.bin", 0x0000, 0x8000, CRC(20af7f3f) SHA1(7ce85db8dd32687ad7629631ae113820371faf7c))
 	ROM_LOAD("system.img", 0xe000, 0x2000, CRC(ba13fb57) SHA1(65d07426b520ddd3115d40f255511e0fd2e20ae7))
 ROM_END

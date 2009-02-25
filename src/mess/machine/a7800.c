@@ -77,7 +77,7 @@ const riot6532_interface a7800_r6532_interface =
 static void a7800_driver_init(running_machine *machine, int ispal, int lines)
 {
 	const address_space* space = cpu_get_address_space(machine->cpu[0],ADDRESS_SPACE_PROGRAM);
-	ROM = memory_region(machine, "main");
+	ROM = memory_region(machine, "maincpu");
 	a7800_ispal = ispal;
 	a7800_lines = lines;
 
@@ -118,7 +118,7 @@ MACHINE_RESET( a7800 )
 	maria_flag = 0;
 
 	/* set banks to default states */
-	memory = memory_region(machine, "main");
+	memory = memory_region(machine, "maincpu");
 	memory_set_bankptr(machine,  1, memory + 0x4000 );
 	memory_set_bankptr(machine,  2, memory + 0x8000 );
 	memory_set_bankptr(machine,  3, memory + 0xA000 );
@@ -202,7 +202,7 @@ DEVICE_START( a7800_cart )
 {
 	UINT8	*memory;
 
-	memory = memory_region(device->machine, "main");
+	memory = memory_region(device->machine, "maincpu");
 	a7800_bios_bkup = NULL;
 	a7800_cart_bkup = NULL;
 
@@ -225,7 +225,7 @@ DEVICE_IMAGE_LOAD( a7800_cart )
 	unsigned char header[128];
 	UINT8 *memory;
 
-	memory = memory_region(image->machine, "main");
+	memory = memory_region(image->machine, "maincpu");
 
 	/* Load and decode the header */
 	image_fread( image, header, 128 );
@@ -340,7 +340,7 @@ WRITE8_HANDLER( a7800_RAM0_w )
 
 WRITE8_HANDLER( a7800_cart_w )
 {
-	UINT8 *memory = memory_region(space->machine, "main");
+	UINT8 *memory = memory_region(space->machine, "maincpu");
 
 	if(offset < 0x4000)
 	{

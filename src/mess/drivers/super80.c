@@ -245,7 +245,7 @@ static VIDEO_UPDATE( super80 )
 		for (x=0; x<32; x++)
 		{
 			if (screen_on)
-				code = memory_read_byte(cputag_get_address_space(screen->machine,"main",ADDRESS_SPACE_PROGRAM), vidpg + x + (y<<5));
+				code = memory_read_byte(cputag_get_address_space(screen->machine,"maincpu",ADDRESS_SPACE_PROGRAM), vidpg + x + (y<<5));
 
 			drawgfx(bitmap, screen->machine->gfx[0], code & mask, 0, 0, 0, x*8, y*10,
 				cliprect, TRANSPARENCY_NONE, 0);
@@ -280,9 +280,9 @@ static VIDEO_UPDATE( super80m )
 		{
 			if (screen_on)
 			{
-				code = memory_read_byte(cputag_get_address_space(screen->machine,"main",ADDRESS_SPACE_PROGRAM), vidpg + x + (y<<5));		/* get character to display */
+				code = memory_read_byte(cputag_get_address_space(screen->machine,"maincpu",ADDRESS_SPACE_PROGRAM), vidpg + x + (y<<5));		/* get character to display */
 
-				if (!(options & 0x40)) col = memory_read_byte(cputag_get_address_space(screen->machine,"main",ADDRESS_SPACE_PROGRAM), 0xfe00 + x + (y<<5));	/* byte of colour to display */
+				if (!(options & 0x40)) col = memory_read_byte(cputag_get_address_space(screen->machine,"maincpu",ADDRESS_SPACE_PROGRAM), 0xfe00 + x + (y<<5));	/* byte of colour to display */
 			}
 
 			drawgfx(bitmap, screen->machine->gfx[cgen], code, col, 0, 0, x*8, y*10,
@@ -360,7 +360,7 @@ static void super80_pio_interrupt(const device_config *device, int state)
 		irq_counter++;
 	else
 	{
-		cputag_set_input_line(device->machine, "main", 0, state );
+		cputag_set_input_line(device->machine, "maincpu", 0, state );
 		if (state) irq_counter=0;
 	}
 }
@@ -938,7 +938,7 @@ static GFXDECODE_START( super80m )
 GFXDECODE_END
 
 static GFXDECODE_START( super80v )
-	GFXDECODE_ENTRY( "main", 0xf000, super80v_charlayout, 0, 256 )
+	GFXDECODE_ENTRY( "maincpu", 0xf000, super80v_charlayout, 0, 256 )
 GFXDECODE_END
 
 /**************************** BASIC MACHINE CONSTRUCTION ***********************************************************/
@@ -999,7 +999,7 @@ static const cassette_config super80_cassette_config =
 
 static DEVICE_IMAGE_LOAD( super80_cart )
 {
-	image_fread(image, memory_region(image->machine, "main") + 0xc000, 0x3000);
+	image_fread(image, memory_region(image->machine, "maincpu") + 0xc000, 0x3000);
 
 	return INIT_PASS;
 }
@@ -1013,7 +1013,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( super80 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK/6)		/* 2 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)		/* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(super80_map, 0)
 	MDRV_CPU_IO_MAP(super80_io, 0)
 	MDRV_CPU_CONFIG(super80_daisy_chain)
@@ -1059,7 +1059,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( super80m )
 	MDRV_IMPORT_FROM(super80)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(super80m_map, 0)
 
 	MDRV_GFXDECODE(super80m)
@@ -1071,7 +1071,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( super80v )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK/6)		/* 2 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)		/* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(super80v_map, 0)
 	MDRV_CPU_IO_MAP(super80v_io, 0)
 	MDRV_CPU_CONFIG(super80_daisy_chain)
@@ -1114,13 +1114,13 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( super80r )
 	MDRV_IMPORT_FROM(super80v)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(super80r_io, 0)
 MACHINE_DRIVER_END
 
 static void driver_init_common( running_machine *machine )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(machine, "maincpu");
 	memory_configure_bank(machine, 1, 0, 2, &RAM[0x0000], 0xc000);
 	timer_pulse(machine, ATTOTIME_IN_HZ(200000),NULL,0,super80_timer);	/* timer for keyboard and cassette */
 }
@@ -1141,9 +1141,9 @@ static DRIVER_INIT( super80d )
 
 static DRIVER_INIT( super80v )
 {
-	pcgram = memory_region(machine, "main")+0xf000;
-	videoram = memory_region(machine, "main")+0x18000;
-	colorram = memory_region(machine, "main")+0x1C000;
+	pcgram = memory_region(machine, "maincpu")+0xf000;
+	videoram = memory_region(machine, "maincpu")+0x18000;
+	colorram = memory_region(machine, "maincpu")+0x1C000;
 	driver_init_common(machine);
 }
 
@@ -1151,7 +1151,7 @@ static DRIVER_INIT( super80v )
 /**************************** ROMS *****************************************************************/
 
 ROM_START( super80 )
-	ROM_REGION(0x10000, "main", 0)
+	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("super80.u26",   0xc000, 0x1000, CRC(6a6a9664) SHA1(2c4fcd943aa9bf7419d58fbc0e28ffb89ef22e0b) )
 	ROM_LOAD("super80.u33",   0xd000, 0x1000, CRC(cf8020a8) SHA1(2179a61f80372cd49e122ad3364773451531ae85) )
 	ROM_LOAD("super80.u42",   0xe000, 0x1000, CRC(a1c6cb75) SHA1(d644ca3b399c1a8902f365c6095e0bbdcea6733b) )
@@ -1161,7 +1161,7 @@ ROM_START( super80 )
 ROM_END
 
 ROM_START( super80d )
-	ROM_REGION(0x10000, "main", 0)
+	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "super80d", "V2.2")
 	ROMX_LOAD("super80d.u26", 0xc000, 0x1000, CRC(cebd2613) SHA1(87b94cc101a5948ce590211c68272e27f4cbe95a), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "super80f", "MDS (original)")
@@ -1177,7 +1177,7 @@ ROM_START( super80d )
 ROM_END
 
 ROM_START( super80e )
-	ROM_REGION(0x10000, "main", 0)
+	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("super80e.u26",  0xc000, 0x1000, CRC(bdc668f8) SHA1(3ae30b3cab599fca77d5e461f3ec1acf404caf07) )
 	ROM_LOAD("super80.u33",	  0xd000, 0x1000, CRC(cf8020a8) SHA1(2179a61f80372cd49e122ad3364773451531ae85) )
 	ROM_LOAD("super80.u42",	  0xe000, 0x1000, CRC(a1c6cb75) SHA1(d644ca3b399c1a8902f365c6095e0bbdcea6733b) )
@@ -1187,7 +1187,7 @@ ROM_START( super80e )
 ROM_END
 
 ROM_START( super80m )
-	ROM_REGION(0x10000, "main", 0)
+	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("s80-8r0.u26",	  0xc000, 0x1000, CRC(48d410d8) SHA1(750d984abc013a3344628300288f6d1ba140a95f) )
 	ROM_LOAD("s80-8r0.u33",   0xd000, 0x1000, CRC(9765793e) SHA1(4951b127888c1f3153004cc9fb386099b408f52c) )
 	ROM_LOAD("s80-8r0.u42",   0xe000, 0x1000, CRC(5f65d94b) SHA1(fe26b54dec14e1c4911d996c9ebd084a38dcb691) )
@@ -1201,7 +1201,7 @@ ROM_START( super80m )
 ROM_END
 
 ROM_START( super80r )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS(0, "super80r", "MCE (original)")
 	ROMX_LOAD("super80r.u26", 0xc000, 0x1000, CRC(01bb6406) SHA1(8e275ecf5141b93f86e45ff8a735b965ea3e8d44), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "super80s", "MCE (upgraded)")
@@ -1213,7 +1213,7 @@ ROM_START( super80r )
 ROM_END
 
 ROM_START( super80v )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD("s80-v37v.u26",  0xc000, 0x1000, CRC(01e0c0dd) SHA1(ef66af9c44c651c65a21d5bda939ffa100078c08) )
 	ROM_LOAD("s80-v37.u33",   0xd000, 0x1000, CRC(812ad777) SHA1(04f355bea3470a7d9ea23bb2811f6af7d81dc400) )
 	ROM_LOAD("s80-v37.u42",   0xe000, 0x1000, CRC(e02e736e) SHA1(57b0264c805da99234ab5e8e028fca456851a4f9) )

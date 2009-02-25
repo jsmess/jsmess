@@ -283,7 +283,7 @@ static Z80DART_INTERFACE( mtx_dart_intf )
 
 static MACHINE_DRIVER_START( mtx512 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, MTX_SYSTEM_CLOCK)
+	MDRV_CPU_ADD("maincpu", Z80, MTX_SYSTEM_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(mtx_mem, 0)
 	MDRV_CPU_IO_MAP(mtx_io, 0)
 	MDRV_CPU_VBLANK_INT("screen", mtx_interrupt)

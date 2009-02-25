@@ -359,7 +359,7 @@ static void nc_refresh_memory_bank_config(running_machine *machine, int bank)
 
 			mem_bank = mem_bank & nc_membank_rom_mask;
 
-			addr = (memory_region(machine, "main")+0x010000) + (mem_bank<<14);
+			addr = (memory_region(machine, "maincpu")+0x010000) + (mem_bank<<14);
 
 			memory_set_bankptr(machine, bank+1, addr);
 
@@ -1627,7 +1627,7 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( nc100 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, /*6000000*/ 4606000)        /* Russell Marks says this is more accurate */
+	MDRV_CPU_ADD("maincpu", Z80, /*6000000*/ 4606000)        /* Russell Marks says this is more accurate */
 	MDRV_CPU_PROGRAM_MAP(nc_map, 0)
 	MDRV_CPU_IO_MAP(nc100_io, 0)
 	MDRV_QUANTUM_TIME(HZ(60))
@@ -1677,7 +1677,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( nc200 )
 	MDRV_IMPORT_FROM( nc100 )
 
-	MDRV_CPU_MODIFY( "main" )
+	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_IO_MAP(nc200_io, 0)
 
 	MDRV_MACHINE_START( nc200 )
@@ -1712,7 +1712,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START(nc100)
-	ROM_REGION(((64*1024)+(256*1024)), "main",0)
+	ROM_REGION(((64*1024)+(256*1024)), "maincpu",0)
 	ROM_SYSTEM_BIOS(0, "106", "ROM v1.06")
     ROMX_LOAD("nc100a.rom", 0x010000, 0x040000, CRC(849884f9) SHA1(ff030dd334ca867d620ee4a94b142ef0d93b69b6), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "100", "ROM v1.00")
@@ -1720,7 +1720,7 @@ ROM_START(nc100)
 ROM_END
 
 ROM_START(nc200)
-        ROM_REGION(((64*1024)+(512*1024)), "main",0)
+        ROM_REGION(((64*1024)+(512*1024)), "maincpu",0)
         ROM_LOAD("nc200.rom", 0x010000, 0x080000, CRC(bb8180e7) SHA1(fb5c93b0a3e199202c6a12548d2617f7a09bae47))
 ROM_END
 

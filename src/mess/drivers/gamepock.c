@@ -58,7 +58,7 @@ static DEVICE_IMAGE_LOAD(gamepock_cart) {
 }
 
 static MACHINE_DRIVER_START( gamepock )
-	MDRV_CPU_ADD("main", UPD78C06, XTAL_6MHz)	/* uPD78C06AG */
+	MDRV_CPU_ADD("maincpu", UPD78C06, XTAL_6MHz)	/* uPD78C06AG */
 	MDRV_CPU_PROGRAM_MAP( gamepock_mem, 0 )
 	MDRV_CPU_IO_MAP( gamepock_io, 0 )
 	MDRV_CPU_CONFIG( gamepock_cpu_config )
@@ -90,7 +90,7 @@ static MACHINE_DRIVER_START( gamepock )
 MACHINE_DRIVER_END
 
 ROM_START( gamepock )
-	ROM_REGION( 0x1000, "main", ROMREGION_ERASEFF )
+	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "egpcboot.bin", 0x0000, 0x1000, CRC(ee1ea65d) SHA1(9c7731b5ead721d2cc7f7e2655c5fed9e56db8b0) )
 	ROM_REGION( 0x8000, "user1", ROMREGION_ERASEFF )
 ROM_END

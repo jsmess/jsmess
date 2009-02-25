@@ -766,12 +766,12 @@ static READ8_HANDLER(modeSS_r)
 		switch ( modeSS_byte & 0x1C ) {
 		case 0x00:
 			bank_base[1] = extra_RAM + 2 * 0x800;
-			bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(space->machine, "main") + 0x1800 : memory_region(space->machine, "user1");
+			bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(space->machine, "maincpu") + 0x1800 : memory_region(space->machine, "user1");
 			modeSS_high_ram_enabled = 0;
 			break;
 		case 0x04:
 			bank_base[1] = extra_RAM;
-			bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(space->machine, "main") + 0x1800 : memory_region(space->machine, "user1");
+			bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(space->machine, "maincpu") + 0x1800 : memory_region(space->machine, "user1");
 			modeSS_high_ram_enabled = 0;
 			break;
 		case 0x08:
@@ -786,12 +786,12 @@ static READ8_HANDLER(modeSS_r)
 			break;
 		case 0x10:
 			bank_base[1] = extra_RAM + 2 * 0x800;
-			bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(space->machine, "main") + 0x1800 : memory_region(space->machine, "user1");
+			bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(space->machine, "maincpu") + 0x1800 : memory_region(space->machine, "user1");
 			modeSS_high_ram_enabled = 0;
 			break;
 		case 0x14:
 			bank_base[1] = extra_RAM + 0x800;
-			bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(space->machine, "main") + 0x1800 : memory_region(space->machine, "user1");
+			bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(space->machine, "maincpu") + 0x1800 : memory_region(space->machine, "user1");
 			modeSS_high_ram_enabled = 0;
 			break;
 		case 0x18:
@@ -1982,7 +1982,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( a2600 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, MASTER_CLOCK_NTSC / 3)	/* actually M6507 */
+	MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK_NTSC / 3)	/* actually M6507 */
 	MDRV_CPU_PROGRAM_MAP(a2600_mem, 0)
 
 	MDRV_MACHINE_START(a2600)
@@ -2014,7 +2014,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( a2600p )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, MASTER_CLOCK_PAL / 3)    /* actually M6507 */
+	MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK_PAL / 3)    /* actually M6507 */
 	MDRV_CPU_PROGRAM_MAP(a2600_mem, 0)
 
 	MDRV_MACHINE_START(a2600p)
@@ -2045,7 +2045,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( a2600 )
-	ROM_REGION( 0x2000, "main", 0 )
+	ROM_REGION( 0x2000, "maincpu", 0 )
 	ROM_FILL( 0x0000, 0x2000, 0xFF )
 	ROM_REGION( 0x80000, "user1", 0 )
 	ROM_FILL( 0x00000, 0x80000, 0xFF )

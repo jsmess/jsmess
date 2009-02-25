@@ -149,7 +149,7 @@ Source Changes:
 
 - New PC-LPT device.  [Dirk Best]
 
-- Replaced all generic screen tags. [Curt Coder]
+- Replaced all generic tags. [Curt Coder]
 
 - Added /PC pin output support to the CIA emulation.  [Dirk Best]
 

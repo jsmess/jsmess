@@ -252,7 +252,7 @@ static PALETTE_INIT(a7800p)
 
 static MACHINE_DRIVER_START( a7800_ntsc )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, A7800_NTSC_Y1/8)	/* 1.79 MHz (switches to 1.19 MHz on TIA or RIOT access) */
+	MDRV_CPU_ADD("maincpu", M6502, A7800_NTSC_Y1/8)	/* 1.79 MHz (switches to 1.19 MHz on TIA or RIOT access) */
 	MDRV_CPU_PROGRAM_MAP(a7800_mem, 0)
 	MDRV_CPU_VBLANK_INT_HACK(a7800_interrupt, 262)
 
@@ -294,7 +294,7 @@ static MACHINE_DRIVER_START( a7800_pal )
 	MDRV_IMPORT_FROM( a7800_ntsc )
 
 	/* basic machine hardware */
-	MDRV_CPU_REPLACE("main", M6502, CLK_PAL)
+	MDRV_CPU_REPLACE("maincpu", M6502, CLK_PAL)
 	MDRV_CPU_VBLANK_INT_HACK(a7800_interrupt, 312)
 
 	MDRV_SCREEN_MODIFY( "screen" )
@@ -318,7 +318,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( a7800 )
-    ROM_REGION(0x30000, "main", 0)
+    ROM_REGION(0x30000, "maincpu", 0)
 	ROM_FILL(0x0000, 0x30000, 0xff)
     ROM_SYSTEM_BIOS( 0, "a7800", "Atari 7800" )
     ROMX_LOAD("7800.u7", 0xf000, 0x1000, CRC(5d13730c) SHA1(d9d134bb6b36907c615a594cc7688f7bfcef5b43), ROM_BIOS(1))
@@ -327,7 +327,7 @@ ROM_START( a7800 )
 ROM_END
 
 ROM_START( a7800p )
-    ROM_REGION(0x30000, "main", 0)
+    ROM_REGION(0x30000, "maincpu", 0)
 	ROM_FILL(0x0000, 0x30000, 0xff)
     ROM_LOAD("7800pal.rom", 0xc000, 0x4000, CRC(d5b61170) SHA1(5a140136a16d1d83e4ff32a19409ca376a8df874))
 ROM_END

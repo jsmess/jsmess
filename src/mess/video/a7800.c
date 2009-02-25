@@ -339,7 +339,7 @@ static void maria_draw_scanline(running_machine *machine)
 INTERRUPT_GEN( a7800_interrupt )
 {
 	int frame_scanline;
-	UINT8 *ROM = memory_region(device->machine, "main");
+	UINT8 *ROM = memory_region(device->machine, "maincpu");
 	const address_space* space = cpu_get_address_space(device->machine->cpu[0],ADDRESS_SPACE_PROGRAM);
 	
 	maria_scanline++;
@@ -459,7 +459,7 @@ VIDEO_UPDATE( a7800 )
 
  READ8_HANDLER( a7800_MARIA_r )
 {
-	UINT8 *ROM = memory_region(space->machine, "main");
+	UINT8 *ROM = memory_region(space->machine, "maincpu");
 	switch (offset)
 	{
 		case 0x08:
@@ -473,7 +473,7 @@ VIDEO_UPDATE( a7800 )
 
 WRITE8_HANDLER( a7800_MARIA_w )
 {
-	UINT8 *ROM = memory_region(space->machine, "main");
+	UINT8 *ROM = memory_region(space->machine, "maincpu");
 	switch (offset)
 	{
 		case 0x00:

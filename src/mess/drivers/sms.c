@@ -326,7 +326,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START(sms1ntsc)
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, XTAL_53_693175MHz/15)
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_53_693175MHz/15)
 	MDRV_CPU_PROGRAM_MAP(sms_mem, 0)
 	MDRV_CPU_IO_MAP(sms_io, 0)
 
@@ -398,7 +398,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START(sms1pal)
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK_PAL/15)
+	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK_PAL/15)
 	MDRV_CPU_PROGRAM_MAP(sms_mem, 0)
 	MDRV_CPU_IO_MAP(sms_io, 0)
 
@@ -457,7 +457,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START(gamegear)
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, XTAL_53_693175MHz/15)
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_53_693175MHz/15)
 	MDRV_CPU_PROGRAM_MAP(sms_mem, 0)
 	MDRV_CPU_IO_MAP(gg_io, 0)
 
@@ -490,7 +490,7 @@ static MACHINE_DRIVER_START(gamegear)
 MACHINE_DRIVER_END
 
 ROM_START(sms1)
-	ROM_REGION(0x4000, "main", 0)
+	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_FILL(0x0000,0x4000,0xFF)
 	ROM_REGION(0x20000, "user1", 0)
 	ROM_SYSTEM_BIOS( 0, "bios13", "US/European BIOS v1.3 (1986)" )
@@ -506,7 +506,7 @@ ROM_START(sms1)
 ROM_END
 
 ROM_START(sms)
-	ROM_REGION(0x4000, "main", 0)
+	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_FILL(0x0000,0x4000,0xFF)
 	ROM_REGION(0x20000, "user1", 0)
 	ROM_SYSTEM_BIOS( 0, "alexkidd", "US/European BIOS with Alex Kidd in Miracle World (1990)" )
@@ -514,7 +514,7 @@ ROM_START(sms)
 ROM_END
 
 ROM_START(smssdisp)
-	ROM_REGION(0x4000, "main", 0)
+	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_FILL(0x0000,0x4000,0xFF)
 	ROM_REGION(0x4000, "user1", 0)
 	ROM_FILL(0x0000,0x4000,0xFF)
@@ -523,7 +523,7 @@ ROM_START(smssdisp)
 ROM_END
 
 ROM_START(sms1pal)
-	ROM_REGION(0x4000, "main", 0)
+	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_FILL(0x0000,0x4000,0xFF)
 	ROM_REGION(0x20000, "user1", 0)
     ROM_SYSTEM_BIOS( 0, "bios13", "US/European BIOS v1.3 (1986)" )
@@ -537,7 +537,7 @@ ROM_START(sms1pal)
 ROM_END
 
 ROM_START(smspal)
-	ROM_REGION(0x4000, "main", 0)
+	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_FILL(0x0000,0x4000,0xFF)
 	ROM_REGION(0x40000, "user1", 0)
 	ROM_SYSTEM_BIOS( 0, "alexkidd", "US/European BIOS with Alex Kidd in Miracle World (1990)" )
@@ -547,12 +547,12 @@ ROM_START(smspal)
 ROM_END
 
 ROM_START(sg1000m3)
-	ROM_REGION(0x4000, "main", 0)
+	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_FILL(0x0000,0x4000,0x00)
 ROM_END
 
 ROM_START(smsj)
-	ROM_REGION(0x4000, "main", 0)
+	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_FILL(0x0000,0x4000,0xFF)
 	ROM_REGION(0x4000, "user1", 0)
     ROM_SYSTEM_BIOS( 0, "jbios21", "Japanese BIOS v2.1 (1987)" )
@@ -560,7 +560,7 @@ ROM_START(smsj)
 ROM_END
 
 ROM_START(sms2kr)
-	ROM_REGION(0x4000, "main", 0)
+	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_FILL(0x0000,0x4000,0xFF)
 	ROM_REGION(0x20000, "user1", 0)
 	ROM_SYSTEM_BIOS( 0, "akbioskr", "Samsung Gam*Boy II with Alex Kidd in Miracle World (1990)" )
@@ -568,7 +568,7 @@ ROM_START(sms2kr)
 ROM_END
 
 ROM_START(gamegear)
-	ROM_REGION(0x4000, "main",0)
+	ROM_REGION(0x4000, "maincpu",0)
 	ROM_FILL(0x0000,0x4000,0x00)
 	ROM_REGION(0x0400, "user1", 0)
 	ROM_SYSTEM_BIOS( 0, "none", "No BIOS" ) /* gamegear */

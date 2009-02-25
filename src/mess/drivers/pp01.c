@@ -40,7 +40,7 @@ INPUT_PORTS_END
 /* Machine driver */
 static MACHINE_DRIVER_START( pp01 )
 	  /* basic machine hardware */
-	  MDRV_CPU_ADD("main", 8080, 2000000)
+	  MDRV_CPU_ADD("maincpu", 8080, 2000000)
 	  MDRV_CPU_PROGRAM_MAP(pp01_mem, 0)
 	  MDRV_CPU_IO_MAP(pp01_io, 0)
 
@@ -68,7 +68,7 @@ SYSTEM_CONFIG_END
 /* ROM definition */
 
 ROM_START( pp01 )
-    ROM_REGION( 0x14000, "main", ROMREGION_ERASEFF )
+    ROM_REGION( 0x14000, "maincpu", ROMREGION_ERASEFF )
     ROM_LOAD( "pp01.rom", 0x10000, 0x4000, CRC(d6ee4dd6) SHA1(acc162975f255bc8de5ca0fd8da11d1d7bd7fbfc) )
 ROM_END
 

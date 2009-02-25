@@ -657,10 +657,10 @@ void bbcbp_setvideoshadow(running_machine *machine, int vdusel)
 {
 	if (vdusel)
 	{
-		BBC_Video_RAM= memory_region(machine, "main")+0x8000;
+		BBC_Video_RAM= memory_region(machine, "maincpu")+0x8000;
 		vidmem_RAM=(bbc_vidmem)+0x8000;
 	} else {
-		BBC_Video_RAM= memory_region(machine, "main");
+		BBC_Video_RAM= memory_region(machine, "maincpu");
 		vidmem_RAM=bbc_vidmem;
 	}
 }
@@ -677,7 +677,7 @@ VIDEO_START( bbca )
 	m6845_config(&BBC6845);
 	saa505x_config(&BBCsaa5050);
 
-	BBC_Video_RAM= memory_region(machine, "main");
+	BBC_Video_RAM= memory_region(machine, "maincpu");
 	vidmem_RAM=bbc_vidmem;
 	draw_function=*BBC_draw_hi_res;
 }
@@ -689,7 +689,7 @@ VIDEO_START( bbcb )
 	m6845_config(&BBC6845);
 	saa505x_config(&BBCsaa5050);
 
-	BBC_Video_RAM= memory_region(machine, "main");
+	BBC_Video_RAM= memory_region(machine, "maincpu");
 	vidmem_RAM=bbc_vidmem;
 	draw_function=*BBC_draw_hi_res;
 }
@@ -703,7 +703,7 @@ VIDEO_START( bbcbp )
 	m6845_config(&BBC6845);
 	saa505x_config(&BBCsaa5050);
 
-	BBC_Video_RAM= memory_region(machine, "main");
+	BBC_Video_RAM= memory_region(machine, "maincpu");
 	vidmem_RAM=bbc_vidmem;
 	draw_function=*BBC_draw_hi_res;
 }
@@ -716,7 +716,7 @@ VIDEO_START( bbcm )
 	m6845_config(&BBC6845);
 	saa505x_config(&BBCsaa5050);
 
-	BBC_Video_RAM= memory_region(machine, "main");
+	BBC_Video_RAM= memory_region(machine, "maincpu");
 	vidmem_RAM=bbc_vidmem;
 	draw_function=*BBC_draw_hi_res;
 }

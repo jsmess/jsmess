@@ -97,7 +97,7 @@ MACHINE_RESET( cgenie )
 {
 	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
 	const device_config *ay8910 = devtag_get_device(machine, SOUND, "ay8910");
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	/* reset the AY8910 to be quiet, since the cgenie BIOS doesn't */
 	AYWriteReg(0, 0, 0);
@@ -150,7 +150,7 @@ MACHINE_RESET( cgenie )
 		memory_install_read8_handler(space, 0xc000, 0xdfff, 0, 0, SMH_NOP);
 		memory_install_write8_handler(space, 0xc000, 0xdfff, 0, 0, SMH_NOP);
 		logerror("cgenie DOS disabled\n");
-		memset(&memory_region(machine, "main")[0x0c000], 0x00, 0x2000);
+		memset(&memory_region(machine, "maincpu")[0x0c000], 0x00, 0x2000);
 	}
 
 	/* copy EXT ROM, if enabled or wipe out that memory area */
@@ -159,15 +159,15 @@ MACHINE_RESET( cgenie )
 		memory_install_read8_handler(space, 0xe000, 0xefff, 0, 0, SMH_ROM);
 		memory_install_write8_handler(space, 0xe000, 0xefff, 0, 0, SMH_ROM);
 		logerror("cgenie EXT enabled\n");
-		memcpy(&memory_region(machine, "main")[0x0e000],
-			   &memory_region(machine, "main")[0x12000], 0x1000);
+		memcpy(&memory_region(machine, "maincpu")[0x0e000],
+			   &memory_region(machine, "maincpu")[0x12000], 0x1000);
 	}
 	else
 	{
 		memory_install_read8_handler(space, 0xe000, 0xefff, 0, 0, SMH_NOP);
 		memory_install_write8_handler(space, 0xe000, 0xefff, 0, 0, SMH_NOP);
 		logerror("cgenie EXT disabled\n");
-		memset(&memory_region(machine, "main")[0x0e000], 0x00, 0x1000);
+		memset(&memory_region(machine, "maincpu")[0x0e000], 0x00, 0x1000);
 	}
 
 	cass_level = 0;
@@ -257,7 +257,7 @@ DEVICE_IMAGE_LOAD( cgenie_floppy )
 				spt = pd_list[i].SPT / heads;
 				dir_sector = pd_list[i].DDSL * pd_list[i].GATM * pd_list[i].GPL + pd_list[i].SPT;
 				dir_length = pd_list[i].DDGA * pd_list[i].GPL;
-				memcpy(memory_region(image->machine, "main") + 0x5A71 + image_index_in_device(image) * sizeof(PDRIVE), &pd_list[i], sizeof(PDRIVE));
+				memcpy(memory_region(image->machine, "maincpu") + 0x5A71 + image_index_in_device(image) * sizeof(PDRIVE), &pd_list[i], sizeof(PDRIVE));
 				break;
 			}
 		}

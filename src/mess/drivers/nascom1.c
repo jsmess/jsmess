@@ -276,7 +276,7 @@ static const z80pio_interface nascom1_z80pio_intf =
 
 static MACHINE_DRIVER_START( nascom1 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, XTAL_16MHz/8)
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_16MHz/8)
 	MDRV_CPU_PROGRAM_MAP(nascom1_mem, 0)
 	MDRV_CPU_IO_MAP(nascom1_io, 0)
 
@@ -308,7 +308,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( nascom2 )
 	MDRV_IMPORT_FROM(nascom1)
-	MDRV_CPU_REPLACE("main", Z80, XTAL_16MHz/8)
+	MDRV_CPU_REPLACE("maincpu", Z80, XTAL_16MHz/8)
 	MDRV_CPU_IO_MAP(nascom2_io, 0)
 
 	/* video hardware */
@@ -330,7 +330,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START(nascom1)
-	ROM_REGION(0x10000, "main",0)
+	ROM_REGION(0x10000, "maincpu",0)
 	ROM_SYSTEM_BIOS(0, "T4", "NasBug T4")
 	ROMX_LOAD("nasbugt4.rom", 0x0000, 0x0800, CRC(f391df68) SHA1(00218652927afc6360c57e77d6a4fd32d4e34566), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "T1", "NasBug T1")
@@ -343,7 +343,7 @@ ROM_END
 
 
 ROM_START(nascom2)
-	ROM_REGION(0x10000, "main",0)
+	ROM_REGION(0x10000, "maincpu",0)
 	ROM_SYSTEM_BIOS( 0, "NS3", "NasSys 3")
 	ROMX_LOAD("nassys3.rom", 0x0000, 0x0800, CRC(3da17373) SHA1(5fbda15765f04e4cd08cf95c8d82ce217889f240), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "NS1", "NasSys 1")

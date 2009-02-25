@@ -155,8 +155,8 @@ static void vector_floppy_getinfo(const mess_device_class *devclass, UINT32 stat
 /* Machine driver */
 static MACHINE_DRIVER_START( vector06 )
   /* basic machine hardware */
-  	MDRV_CPU_ADD("main", 8080, 3000000)
-//	MDRV_CPU_ADD("main", Z80, 3000000)
+  	MDRV_CPU_ADD("maincpu", 8080, 3000000)
+//	MDRV_CPU_ADD("maincpu", Z80, 3000000)
   	MDRV_CPU_PROGRAM_MAP(vector06_mem, 0)
   	MDRV_CPU_IO_MAP(vector06_io, 0)
   	MDRV_CPU_VBLANK_INT("screen", vector06_interrupt)
@@ -198,7 +198,7 @@ MACHINE_DRIVER_END
 /* ROM definition */
 
 ROM_START( vector06 )
-    ROM_REGION( 0x20000, "main", ROMREGION_ERASEFF )
+    ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
     ROM_SYSTEM_BIOS(0, "unboot32k", "Universal Boot 32K")
     ROMX_LOAD( "unboot32k.rt", 0x10000, 0x8000, CRC(28c9b5cd) SHA1(8cd7fb658896a7066ae93b10eaafa0f12139ad81), ROM_BIOS(1))
     ROM_SYSTEM_BIOS(1, "unboot2k", "Universal Boot 2K")

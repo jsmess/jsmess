@@ -90,7 +90,7 @@ static PALETTE_INIT( gamecom )
 
 static MACHINE_DRIVER_START( gamecom )
 	/* basic machine hardware */
-	MDRV_CPU_ADD( "main", SM8500, XTAL_11_0592MHz/2 )   /* actually it's an sm8521 microcontroller containing an sm8500 cpu */
+	MDRV_CPU_ADD( "maincpu", SM8500, XTAL_11_0592MHz/2 )   /* actually it's an sm8521 microcontroller containing an sm8500 cpu */
 	MDRV_CPU_PROGRAM_MAP( gamecom_mem_map, 0 )
 	MDRV_CPU_CONFIG( gamecom_cpu_config )
 
@@ -131,7 +131,7 @@ static MACHINE_DRIVER_START( gamecom )
 MACHINE_DRIVER_END
 
 ROM_START( gamecom )
-	ROM_REGION( 0x2000, "main", 0 )
+	ROM_REGION( 0x2000, "maincpu", 0 )
 	ROM_LOAD( "internal.bin", 0x1000,  0x1000, CRC(a0cec361) SHA1(03368237e8fed4a8724f3b4a1596cf4b17c96d33) )
 	ROM_REGION( 0x40000, "user1", 0 )
 	ROM_LOAD( "external.bin", 0x00000, 0x40000, CRC(e235a589) SHA1(97f782e72d738f4d7b861363266bf46b438d9b50) )

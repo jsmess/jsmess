@@ -30,7 +30,7 @@ static READ8_HANDLER( gmaster_io_r )
 {
     UINT8 data=0;
     if (gmaster.ports[2]&1) {
-	data=memory_region(space->machine, "main")[0x4000+offset];
+	data=memory_region(space->machine, "maincpu")[0x4000+offset];
 	logerror("%.4x external memory %.4x read %.2x\n",(int)cpu_get_reg(space->cpu, CPUINFO_INT_PC), 0x4000+offset,data);
     } else {
 	switch (offset) {
@@ -52,7 +52,7 @@ static READ8_HANDLER( gmaster_io_r )
 static WRITE8_HANDLER( gmaster_io_w )
 {
     if (gmaster.ports[2]&1) {
-	memory_region(space->machine, "main")[0x4000+offset]=data;
+	memory_region(space->machine, "maincpu")[0x4000+offset]=data;
 	logerror("%.4x external memory %.4x written %.2x\n",(int)cpu_get_reg(space->cpu, CPUINFO_INT_PC), 0x4000+offset, data);
     } else {
 	switch (offset) {
@@ -210,7 +210,7 @@ static const UPD7810_CONFIG config={
 };
 
 static MACHINE_DRIVER_START( gmaster )
-	MDRV_CPU_ADD("main", UPD7810, MAIN_XTAL/2/*?*/)
+	MDRV_CPU_ADD("maincpu", UPD7810, MAIN_XTAL/2/*?*/)
 	MDRV_CPU_PROGRAM_MAP(gmaster_mem, 0)
 	MDRV_CPU_IO_MAP( gmaster_io, 0 )
 	MDRV_CPU_CONFIG( config )
@@ -235,7 +235,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START(gmaster)
-	ROM_REGION(0x10000,"main", 0)
+	ROM_REGION(0x10000,"maincpu", 0)
      ROM_LOAD("gmaster.bin", 0x0000, 0x1000, CRC(05cc45e5) SHA1(05d73638dea9657ccc2791c0202d9074a4782c1e) )
 //     ROM_CART_LOAD(0, "bin", 0x8000, 0x7f00, 0)
      ROM_CART_LOAD("cart", 0x8000, 0x8000, 0)
@@ -251,7 +251,7 @@ static DRIVER_INIT( gmaster )
 static int gmaster_load_rom(running_machine *machine, int id)
 {
 	FILE *cartfile;
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(machine, "maincpu");
 	int size;
 
 	if (device_filename(IO_CARTSLOT, id) == NULL)

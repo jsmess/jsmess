@@ -182,7 +182,7 @@ static READ8_HANDLER( samcoupe_lmpr_r )
 
 static WRITE8_HANDLER( samcoupe_lmpr_w )
 {
-	const address_space *space_program = cputag_get_address_space(space->machine, "main", ADDRESS_SPACE_PROGRAM);
+	const address_space *space_program = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	coupe_asic *asic = space->machine->driver_data;
 
 	asic->lmpr = data;
@@ -199,7 +199,7 @@ static READ8_HANDLER( samcoupe_hmpr_r )
 
 static WRITE8_HANDLER( samcoupe_hmpr_w )
 {
-	const address_space *space_program = cputag_get_address_space(space->machine, "main", ADDRESS_SPACE_PROGRAM);
+	const address_space *space_program = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	coupe_asic *asic = space->machine->driver_data;
 
 	asic->hmpr = data;
@@ -216,7 +216,7 @@ static READ8_HANDLER( samcoupe_vmpr_r )
 
 static WRITE8_HANDLER( samcoupe_vmpr_w )
 {
-	const address_space *space_program = cputag_get_address_space(space->machine, "main", ADDRESS_SPACE_PROGRAM);
+	const address_space *space_program = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	coupe_asic *asic = space->machine->driver_data;
 
 	asic->vmpr = data;
@@ -364,7 +364,7 @@ static TIMER_CALLBACK( irq_off )
 	coupe_asic *asic = machine->driver_data;
 
 	/* clear interrupt */
-	cputag_set_input_line(machine, "main", 0, CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
 
 	/* adjust STATUS register */
 	asic->status |= param;
@@ -547,7 +547,7 @@ static PALETTE_INIT( samcoupe )
 
 static MACHINE_DRIVER_START( samcoupe )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, SAMCOUPE_XTAL_X1/4) /* 6 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, SAMCOUPE_XTAL_X1/4) /* 6 MHz */
 	MDRV_CPU_PROGRAM_MAP(samcoupe_mem, 0)
 	MDRV_CPU_IO_MAP(samcoupe_io, 0)
 	MDRV_CPU_VBLANK_INT("screen", samcoupe_frame_interrupt)
@@ -593,7 +593,7 @@ MACHINE_DRIVER_END
     and in the second half, the case of the "plc" in the company string differs.
 */
 ROM_START( samcoupe )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS( 0,  "31",  "v3.1" )
 	ROMX_LOAD( "rom31.z5",  0x0000, 0x8000, CRC(0b7e3585) SHA1(c86601633fb61a8c517f7657aad9af4e6870f2ee), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1,  "30",  "v3.0" )

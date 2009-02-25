@@ -911,7 +911,7 @@ static void setup_cart_banks( void ) {
 }
 
 static void setup_banks( running_machine *machine ) {
-	UINT8 *mem = memory_region(machine, "main");
+	UINT8 *mem = memory_region(machine, "maincpu");
 	sms_banking_bios[1] = sms_banking_cart[1] = sms_banking_none[1] = mem;
 	sms_banking_bios[2] = sms_banking_cart[2] = sms_banking_none[2] = mem;
 	sms_banking_bios[3] = sms_banking_cart[3] = sms_banking_none[3] = mem;

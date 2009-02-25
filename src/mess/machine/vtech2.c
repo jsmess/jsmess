@@ -106,7 +106,7 @@ DRIVER_INIT(laser)
         gfx[i] = i;
 
 	laser_latch = -1;
-    mem = memory_region(machine, "main");
+    mem = memory_region(machine, "maincpu");
 
 	for (i = 0; i < sizeof(laser_bank) / sizeof(laser_bank[0]); i++)
 		laser_bank[i] = -1;
@@ -124,7 +124,7 @@ static void laser_machine_init(running_machine *machine, int bank_mask, int vide
 	logerror("laser_machine_init(): bank mask $%04X, video %d [$%05X]\n", laser_bank_mask, laser_video_bank, laser_video_bank * 0x04000);
 
 	for (i = 0; i < sizeof(laser_bank) / sizeof(laser_bank[0]); i++)
-		laser_bank_select_w(cputag_get_address_space(machine,"main",ADDRESS_SPACE_PROGRAM), i, 0);
+		laser_bank_select_w(cputag_get_address_space(machine,"maincpu",ADDRESS_SPACE_PROGRAM), i, 0);
 }
 
 MACHINE_RESET( laser350 )

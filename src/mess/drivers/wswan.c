@@ -129,7 +129,7 @@ static PALETTE_INIT( wscolor ) {
 
 static MACHINE_DRIVER_START( wswan )
 	/* Basic machine hardware */
-	MDRV_CPU_ADD("main", V30MZ, 3072000)
+	MDRV_CPU_ADD("maincpu", V30MZ, 3072000)
 	MDRV_CPU_PROGRAM_MAP(wswan_mem, 0)
 	MDRV_CPU_IO_MAP(wswan_io, 0)
 
@@ -169,7 +169,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( wscolor )
 	MDRV_IMPORT_FROM(wswan)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(wscolor_mem, 0)
 	MDRV_MACHINE_START( wscolor )
 	MDRV_PALETTE_LENGTH(4096)
@@ -183,12 +183,12 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( wswan )
-	ROM_REGION( 0x100000, "main", ROMREGION_ERASEFF )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 //  ROM_LOAD_OPTIONAL( "ws_bios.bin", 0x0000, 0x0001, NO_DUMP )
 ROM_END
 
 ROM_START( wscolor )
-	ROM_REGION( 0x100000, "main", ROMREGION_ERASEFF )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 //  ROM_LOAD_OPTIONAL( "wsc_bios.bin", 0x0000, 0x0001, NO_DUMP )
 ROM_END
 
