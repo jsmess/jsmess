@@ -29,6 +29,7 @@ would commence ($C00000).
 #include "machine/amigacd.h"
 #include "machine/amigacrt.h"
 #include "machine/msm6242.h"
+#include "machine/ctronics.h"
 #include "sound/cdda.h"
 
 /* Devices */
@@ -56,6 +57,40 @@ static WRITE16_HANDLER( amiga_clock_w )
 	const device_config *rtc = devtag_get_device(space->machine, MSM6242, "rtc");
 	msm6242_w(rtc, offset / 2, data);
 }
+
+
+/***************************************************************************
+    CENTRONICS PORT
+***************************************************************************/
+
+static WRITE_LINE_DEVICE_HANDLER( amiga_centronics_ack_w )
+{
+	if (state == FALSE)
+		cia_issue_index(device);
+}
+
+static READ8_DEVICE_HANDLER( amiga_cia_1_porta_r )
+{
+	UINT8 result = 0;
+
+	/* centronics status is stored in PA0 to PA2 */
+	result |= centronics_busy_r(device) << 0;
+	result |= !centronics_pe_r(device) << 1;
+	result |= centronics_vcc_r(device) << 2;
+
+	/* PA3 to PA7 store the serial line status (not emulated) */
+
+	return result;
+}
+
+static const centronics_interface amiga_centronics_config =
+{
+	FALSE,
+	DEVCB_DEVICE_LINE(CIA8520, "cia_0", amiga_centronics_ack_w),
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
 
 /***************************************************************************
   Address maps
@@ -215,26 +250,25 @@ static MACHINE_RESET( cdtv )
 	MACHINE_RESET_CALL( amigacd );
 }
 
-
 static const cia6526_interface cia_0_ntsc_intf =
 {
 	DEVCB_LINE(amiga_cia_0_irq),									/* irq_func */
-	DEVCB_NULL,	/* pc_func */
+	DEVCB_DEVICE_LINE(CENTRONICS, "centronics", centronics_strobe_w),	/* pc_func */
 	60,													/* tod_clock */
 	{
-		{ DEVCB_HANDLER(amiga_cia_0_portA_r), DEVCB_HANDLER(amiga_cia_0_portA_w) },	/* port A */
-		{ DEVCB_NULL, DEVCB_NULL }									/* port B */
+		{ DEVCB_HANDLER(amiga_cia_0_portA_r), DEVCB_HANDLER(amiga_cia_0_portA_w) },			/* port A */
+		{ DEVCB_NULL, DEVCB_DEVICE_HANDLER(CENTRONICS, "centronics", centronics_data_w) }	/* port B */
 	}
 };
 
 static const cia6526_interface cia_0_pal_intf =
 {
 	DEVCB_LINE(amiga_cia_0_irq),									/* irq_func */
-	DEVCB_NULL,	/* pc_func */
+	DEVCB_DEVICE_LINE(CENTRONICS, "centronics", centronics_strobe_w),	/* pc_func */
 	50,													/* tod_clock */
 	{
-		{ DEVCB_HANDLER(amiga_cia_0_portA_r), DEVCB_HANDLER(amiga_cia_0_portA_w) },	/* port A */
-		{ DEVCB_NULL, DEVCB_NULL }									/* port B */
+		{ DEVCB_HANDLER(amiga_cia_0_portA_r), DEVCB_HANDLER(amiga_cia_0_portA_w) },			/* port A */
+		{ DEVCB_NULL, DEVCB_DEVICE_HANDLER(CENTRONICS, "centronics", centronics_data_w) }	/* port B */
 	}
 };
 
@@ -244,7 +278,7 @@ static const cia6526_interface cia_1_intf =
 	DEVCB_NULL,	/* pc_func */
 	0,													/* tod_clock */
 	{
-		{ DEVCB_NULL, DEVCB_NULL },								/* port A */
+		{ DEVCB_DEVICE_HANDLER(CENTRONICS, "centronics", amiga_cia_1_porta_r), DEVCB_NULL },	/* port A */
 		{ DEVCB_NULL, DEVCB_HANDLER(amiga_fdc_control_w) }					/* port B */
 	}
 };
@@ -252,11 +286,11 @@ static const cia6526_interface cia_1_intf =
 static const cia6526_interface cia_0_cdtv_intf =
 {
 	DEVCB_LINE(amiga_cia_0_irq),									/* irq_func */
-	DEVCB_NULL,	/* pc_func */
+	DEVCB_DEVICE_LINE(CENTRONICS, "centronics", centronics_strobe_w),	/* pc_func */
 	0,													/* tod_clock */
 	{
 		{ DEVCB_HANDLER(amiga_cia_0_cdtv_portA_r), DEVCB_HANDLER(amiga_cia_0_portA_w) },	/* port A */
-		{ DEVCB_NULL, DEVCB_NULL }									/* port B */
+		{ DEVCB_NULL, DEVCB_DEVICE_HANDLER(CENTRONICS, "centronics", centronics_data_w) }	/* port B */
 	}
 };
 
@@ -266,7 +300,7 @@ static const cia6526_interface cia_1_cdtv_intf =
 	DEVCB_NULL,	/* pc_func */
 	0,													/* tod_clock */
 	{
-		{ DEVCB_NULL, DEVCB_NULL, },								/* port A */
+		{ DEVCB_DEVICE_HANDLER(CENTRONICS, "centronics", amiga_cia_1_porta_r), DEVCB_NULL, },	/* port A */
 		{ DEVCB_NULL, DEVCB_NULL }					/* port B */
 	}
 };
@@ -315,6 +349,7 @@ static MACHINE_DRIVER_START( ntsc )
 
 	/* devices */
 	MDRV_MSM6242_ADD("rtc")
+	MDRV_CENTRONICS_ADD("centronics", amiga_centronics_config)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")

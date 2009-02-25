@@ -20,6 +20,8 @@ New System Drivers Supported (in no particular order):
 System Driver Changes:
 ----------------------
 
+- [AMIGA] Added centronics printer support.  [Dirk Best]
+
 - [AMSTRAD] Updated to use the new centronics interface, connected
   data bit 8 for the CPC Plus machines.  [Dirk Best]
 
@@ -148,6 +150,8 @@ Source Changes:
 - New PC-LPT device.  [Dirk Best]
 
 - Replaced all generic screen tags. [Curt Coder]
+
+- Added /PC pin output support to the CIA emulation.  [Dirk Best]
 
 
 

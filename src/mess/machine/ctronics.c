@@ -96,6 +96,7 @@ static DEVICE_START( centronics )
 	centronics->pe = FALSE;
 	centronics->fault = FALSE;
 	centronics->busy = TRUE;
+	centronics->strobe = TRUE;
 
 	/* get printer device */
 	centronics->printer = devtag_get_device(device->machine, PRINTER, device_build_tag(tempstring, device, "printer"));
