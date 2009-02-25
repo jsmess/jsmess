@@ -6,8 +6,8 @@
  *  Frank Palazzolo
  *  Sean Riddle
  *
- *  Fredric "e5frog" Blaoholtz, added support large cartridges 
- *    also spanning from $3000 to $FFFF. Added clones             
+ *  Fredric "e5frog" Blaoholtz, added support large cartridges
+ *    also spanning from $3000 to $FFFF. Added clones
  *
  ******************************************************************/
 
@@ -23,7 +23,7 @@
 
 #define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
-#define MASTER_CLOCK_PAL	4433619/2*0.9
+#define MASTER_CLOCK_PAL	2000000  /* PAL unit has a separate crystal at 4.000 MHz */
 #define PAL_VBLANK_TIME     4623
 
 
@@ -258,7 +258,7 @@ static MACHINE_DRIVER_START( channelf )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("custom", CHANNELF, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	
+
 	MDRV_CARTSLOT_ADD("cart")
 MACHINE_DRIVER_END
 
@@ -286,7 +286,7 @@ static MACHINE_DRIVER_START( sabavdpl )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("custom", CHANNELF, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	
+
 	MDRV_CARTSLOT_ADD("cart")
 MACHINE_DRIVER_END
 
@@ -315,7 +315,7 @@ static MACHINE_DRIVER_START( channlf2 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("custom", CHANNELF, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	
+
 	MDRV_CARTSLOT_ADD("cart")
 MACHINE_DRIVER_END
 
@@ -344,7 +344,7 @@ static MACHINE_DRIVER_START( sabavpl2 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("custom", CHANNELF, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	
+
 	MDRV_CARTSLOT_ADD("cart")
 MACHINE_DRIVER_END
 

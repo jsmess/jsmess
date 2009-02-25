@@ -35,7 +35,8 @@ System Driver Changes:
 
 - [BW2] Updated to use the new centronics interface.  [Dirk Best]
 
-- [CHANNELF] Added support for "new" sound.  [Fredric QJ Blåholtz]
+- [CHANNELF] Added support for "new" sound, fixed PAL clock.  [Fredric QJ
+  Blåholtz]
 
 - [COCO] Cleanups  [Nathan Woods]
 
