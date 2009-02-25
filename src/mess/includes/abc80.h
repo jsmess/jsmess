@@ -44,7 +44,7 @@
 
 #define ABC80_CHAR_CURSOR		0x80
 
-#define SCREEN_TAG	"main"
+#define SCREEN_TAG	"screen"
 #define Z80_TAG		"ab67"
 #define Z80PIO_TAG	"cd67"
 

@@ -654,10 +654,10 @@ static MACHINE_START( osi600 )
 {
 	osi_state *state = machine->driver_data;
 
-	const address_space *program = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
+	const address_space *program = cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM);
 
 	/* configure RAM banking */
-	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, "main"), 0);
+	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, M6502_TAG), 0);
 	memory_set_bank(machine, 1, 0);
 
 	switch (mess_ram_size)
@@ -681,10 +681,10 @@ static MACHINE_START( c1p )
 {
 	osi_state *state = machine->driver_data;
 
-	const address_space *program = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
+	const address_space *program = cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM);
 
 	/* configure RAM banking */
-	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, "main"), 0);
+	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, M6502_TAG), 0);
 	memory_set_bank(machine, 1, 0);
 
 	switch (mess_ram_size)
@@ -724,7 +724,7 @@ static MACHINE_DRIVER_START( osi600 )
 	MDRV_DRIVER_DATA(osi_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, X1/4) // .98304 MHz
+	MDRV_CPU_ADD(M6502_TAG, M6502, X1/4) // .98304 MHz
 	MDRV_CPU_PROGRAM_MAP(osi600_mem, 0)
 
 	MDRV_MACHINE_START(osi600)
@@ -749,7 +749,7 @@ static MACHINE_DRIVER_START( uk101 )
 	MDRV_DRIVER_DATA(osi_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, UK101_X1/8) // 1 MHz
+	MDRV_CPU_ADD(M6502_TAG, M6502, UK101_X1/8) // 1 MHz
 	MDRV_CPU_PROGRAM_MAP(uk101_mem, 0)
 
 	MDRV_MACHINE_START(osi600)
@@ -768,7 +768,7 @@ static MACHINE_DRIVER_START( c1p )
 	MDRV_DRIVER_DATA(osi_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, X1/4) // .98304 MHz
+	MDRV_CPU_ADD(M6502_TAG, M6502, X1/4) // .98304 MHz
 	MDRV_CPU_PROGRAM_MAP(c1p_mem, 0)
 
 	MDRV_MACHINE_START(c1p)
@@ -794,7 +794,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( c1pmf )
 	MDRV_IMPORT_FROM(c1p)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY(M6502_TAG)
 	MDRV_CPU_PROGRAM_MAP(c1pmf_mem, 0)
 
 	MDRV_MACHINE_START(c1pmf)
@@ -806,7 +806,7 @@ MACHINE_DRIVER_END
 /* ROMs */
 
 ROM_START( sb2m600b )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, M6502_TAG, 0 )
 	ROM_LOAD( "basus01.u9",  0xa000, 0x0800, CRC(f4f5dec0) SHA1(b41bf24b4470b6e969d32fe48d604637276f846e) )
 	ROM_LOAD( "basus02.u10", 0xa800, 0x0800, CRC(0039ef6a) SHA1(1397f0dc170c16c8e0c7d02e63099e986e86385b) )
 	ROM_LOAD( "basus03.u11", 0xb000, 0x0800, CRC(ca25f8c1) SHA1(f5e8ee93a5e0656657d0cc60ef44e8a24b8b0a80) )
@@ -821,7 +821,7 @@ ROM_END
 #define rom_c1pmf rom_sb2m600b
 
 ROM_START( uk101 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, M6502_TAG, 0 )
 	ROM_LOAD( "basuk01.ic9",   0xa000, 0x0800, CRC(9d3caa92) SHA1(b2c3d1af0c4f3cead1dbd44aaf5a11680880f772) )
 	ROM_LOAD( "basus02.ic10",  0xa800, 0x0800, CRC(0039ef6a) SHA1(1397f0dc170c16c8e0c7d02e63099e986e86385b) )
 	ROM_LOAD( "basuk03.ic11",  0xb000, 0x0800, CRC(0d011242) SHA1(54bd33522a5d1991086eeeff3a4f73c026be45b6) )

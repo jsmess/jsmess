@@ -1,7 +1,7 @@
 #ifndef __ATARI_ST__
 #define __ATARI_ST__
 
-#define SCREEN_TAG	"main"
+#define SCREEN_TAG	"screen"
 #define M68000_TAG	"m68000"
 #define HD6301_TAG	"hd6301"
 #define COP888_TAG	"u703"

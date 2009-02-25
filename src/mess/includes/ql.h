@@ -1,7 +1,7 @@
 #ifndef __QL__
 #define __QL__
 
-#define SCREEN_TAG	"main"
+#define SCREEN_TAG	"screen"
 
 #define M68008_TAG	"ic18"
 #define I8749_TAG	"ic24"

@@ -19,6 +19,9 @@
 #include "sound/sn76496.h"
 #include "video/tms9928a.h"
 
+#define M6502_TAG	"m6502"
+#define SCREEN_TAG	"main" // TODO: change to "screen" when tms9928.c is integrated from MAME
+
 /* Memory Map */
 
 static ADDRESS_MAP_START( crvision_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -420,7 +423,7 @@ static DEVICE_IMAGE_LOAD( crvision_cart )
 {
 	int size = image_length(image);
 	running_machine *machine = image->machine;
-	UINT8 *mem = memory_region(machine, "main");
+	UINT8 *mem = memory_region(machine, M6502_TAG);
 
 	switch (size)
 	{
@@ -485,16 +488,16 @@ static DEVICE_IMAGE_LOAD( crvision_cart )
 
 static MACHINE_DRIVER_START( crvision )
 	// basic machine hardware
-	MDRV_CPU_ADD("main", M6502, 2000000)
+	MDRV_CPU_ADD(M6502_TAG, M6502, 2000000)
 	MDRV_CPU_PROGRAM_MAP(crvision_map, 0)
-	MDRV_CPU_VBLANK_INT("main", crvision_int)
+	MDRV_CPU_VBLANK_INT(SCREEN_TAG, crvision_int)
 
 	MDRV_MACHINE_START( crvision )
 	MDRV_MACHINE_RESET( crvision )
 
     // video hardware
 	MDRV_IMPORT_FROM(tms9928a)
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY(SCREEN_TAG)
 	MDRV_SCREEN_REFRESH_RATE(10738635.0/2/342/262)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
@@ -515,7 +518,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( fnvision )
 	MDRV_IMPORT_FROM( crvision )
 	MDRV_MACHINE_START( fnvision )
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY(SCREEN_TAG)
 	MDRV_SCREEN_REFRESH_RATE(10738635.0/2/342/313)
 
 	MDRV_CASSETTE_REMOVE( "cassette" )
@@ -524,12 +527,12 @@ MACHINE_DRIVER_END
 /* ROMs */
 
 ROM_START( crvision )
-    ROM_REGION( 0x10000, "main", 0 )
+    ROM_REGION( 0x10000, M6502_TAG, 0 )
     ROM_LOAD( "crvision.rom", 0xc000, 0x0800, CRC(c3c590c6) SHA1(5ac620c529e4965efb5560fe824854a44c983757) )
 ROM_END
 
 ROM_START( fnvision )
-    ROM_REGION( 0x10000, "main", 0 )
+    ROM_REGION( 0x10000, M6502_TAG, 0 )
     ROM_LOAD( "funboot.rom", 0xc000, 0x0800, CRC(05602697) SHA1(c280b20c8074ba9abb4be4338b538361dfae517f) )
 ROM_END
 

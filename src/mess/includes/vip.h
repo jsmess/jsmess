@@ -1,7 +1,7 @@
 #ifndef __VIP__
 #define __VIP__
 
-#define SCREEN_TAG "main"
+#define SCREEN_TAG	"screen"
 
 #define CDP1802_TAG "u1"
 #define CDP1861_TAG "u2"

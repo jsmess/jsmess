@@ -1,7 +1,7 @@
 #ifndef __NEWBRAIN__
 #define __NEWBRAIN__
 
-#define SCREEN_TAG			"main"
+#define SCREEN_TAG			"screen"
 #define Z80_TAG				"409"
 #define COP420_TAG			"419"
 #define MC6850_TAG			"459"

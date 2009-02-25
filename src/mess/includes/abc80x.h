@@ -24,7 +24,7 @@
 #define ABC806_ATTR_RAM_SIZE	0x800
 #define ABC806_VIDEO_RAM_SIZE	0x20000
 
-#define SCREEN_TAG	"main"
+#define SCREEN_TAG	"screen"
 #define Z80_TAG		"z80"
 #define E0516_TAG	"j13"
 #define MC6845_TAG	"b12"

@@ -3,7 +3,7 @@
 
 #include "cpu/cdp1802/cdp1802.h"
 
-#define SCREEN_TAG "main"
+#define SCREEN_TAG	"screen"
 #define CDP1802_TAG "cdp1802"
 #define CDP1861_TAG "cdp1861"
 #define CDP1864_TAG "cdp1864"

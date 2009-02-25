@@ -1,7 +1,7 @@
 #ifndef __BW2__
 #define __BW2__
 
-#define SCREEN_TAG	"main"
+#define SCREEN_TAG	"screen"
 #define Z80_TAG		"ic1"
 #define PPI8255_TAG	"ic4"
 #define WD2797_TAG	"ic5"

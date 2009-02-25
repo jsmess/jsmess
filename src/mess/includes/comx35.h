@@ -4,7 +4,7 @@
 #include "devices/snapquik.h"
 #include "machine/wd17xx.h"
 
-#define SCREEN_TAG			"main"
+#define SCREEN_TAG			"screen"
 #define MC6845_SCREEN_TAG	"mc6845"
 
 #define CDP1870_TAG "u1"

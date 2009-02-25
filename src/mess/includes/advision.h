@@ -7,7 +7,9 @@
 #ifndef __ADVISION__
 #define __ADVISION__
 
-#define SCREEN_TAG "main"
+#define SCREEN_TAG	"screen"
+#define I8048_TAG	"i8048"
+#define COP411_TAG	"cop411"
 
 typedef struct _advision_state advision_state;
 struct _advision_state

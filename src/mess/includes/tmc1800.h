@@ -1,7 +1,7 @@
 #ifndef __TMC1800__
 #define __TMC1800__
 
-#define SCREEN_TAG "main"
+#define SCREEN_TAG	"screen"
 
 #define CDP1802_TAG "cdp1802"
 #define CDP1861_TAG "cdp1861"
