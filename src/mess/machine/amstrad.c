@@ -1315,7 +1315,7 @@ VIDEO_UPDATE( amstrad )
 
 const mc6845_interface mc6845_amstrad_intf =
 {
-	"maincpu",						/* screen name */
+	"screen",					/* screen name */
 	16,							/* number of pixels per video memory address */
 	NULL,						/* begin_update */
 	amstrad_update_row,			/* update_row */
@@ -1328,7 +1328,7 @@ const mc6845_interface mc6845_amstrad_intf =
 
 const mc6845_interface mc6845_amstrad_plus_intf =
 {
-	"maincpu",						/* screen name */
+	"screen",					/* screen name */
 	16,							/* number of pixels per video memory address */
 	NULL,						/* begin_update */
 	amstrad_plus_update_row,	/* update_row */
