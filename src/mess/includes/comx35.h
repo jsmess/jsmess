@@ -5,13 +5,16 @@
 #include "machine/wd17xx.h"
 
 #define SCREEN_TAG			"screen"
-#define MC6845_SCREEN_TAG	"mc6845"
+#define MC6845_SCREEN_TAG	"screen80"
 
-#define CDP1870_TAG "u1"
-#define CDP1869_TAG	"u2"
-#define CDP1802_TAG "u3"
-#define CDP1871_TAG	"u4"
-#define MC6845_TAG	"mc6845"
+#define CDP1870_TAG			"u1"
+#define CDP1869_TAG			"u2"
+#define CDP1802_TAG			"u3"
+#define CDP1871_TAG			"u4"
+#define MC6845_TAG			"mc6845"
+#define WD1770_TAG			"wd1770"
+
+#define CASSETTE_TAG		"cassette"
 
 #define COMX35_PAGERAM_SIZE 0x400
 #define COMX35_CHARRAM_SIZE 0x800
@@ -90,7 +93,7 @@ QUICKLOAD_LOAD( comx35 );
 WRITE8_HANDLER( comx35_videoram_w );
 READ8_HANDLER( comx35_videoram_r );
 
-MACHINE_DRIVER_EXTERN( comx35p_video );
-MACHINE_DRIVER_EXTERN( comx35n_video );
+MACHINE_DRIVER_EXTERN( comx35_pal_video );
+MACHINE_DRIVER_EXTERN( comx35_ntsc_video );
 
 #endif

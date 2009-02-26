@@ -25,7 +25,7 @@
 
 static const device_config *cassette_device_image(running_machine *machine)
 {
-	return devtag_get_device(machine, CASSETTE, "cassette");
+	return devtag_get_device(machine, CASSETTE, CASSETTE_TAG);
 }
 
 /* Memory Maps */
@@ -186,7 +186,7 @@ static INPUT_PORTS_START( comx35 )
 	COMX35_DEVICES
 
 	PORT_START("SLOT3")
-	PORT_CONFNAME( 0x0f, 0x06, "Expansion Box Slot 3")
+	PORT_CONFNAME( 0x0f, 0x07, "Expansion Box Slot 3")
 	COMX35_DEVICES
 
 	PORT_START("SLOT4")
@@ -366,11 +366,10 @@ static const cassette_config comx35_cassette_config =
 	CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED
 };
 
-static MACHINE_DRIVER_START( comx35p )
+static MACHINE_DRIVER_START( comx35_pal )
 	MDRV_DRIVER_DATA(comx35_state)
 
-	// basic system hardware
-
+	/* basic system hardware */
 	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, CDP1869_CPU_CLK_PAL)
 	MDRV_CPU_PROGRAM_MAP(comx35_map, 0)
 	MDRV_CPU_IO_MAP(comx35_io_map, 0)
@@ -379,31 +378,21 @@ static MACHINE_DRIVER_START( comx35p )
 	MDRV_MACHINE_START(comx35p)
 	MDRV_MACHINE_RESET(comx35)
 
-	// keyboard encoder
+	/* sound and video hardware */
+	MDRV_IMPORT_FROM(comx35_pal_video)
+
+	/* peripheral hardware */
 	MDRV_CDP1871_ADD(CDP1871_TAG, comx35_cdp1871_intf, CDP1869_CPU_CLK_PAL / 8)
-	
-	// sound and video hardware
-
-	MDRV_IMPORT_FROM(comx35p_video)
-
-	// printer
-
-	MDRV_PRINTER_ADD("printer")
-
-	// quickload
-
+	MDRV_WD1770_ADD(WD1770_TAG, comx35_wd17xx_interface )	
 	MDRV_QUICKLOAD_ADD(comx35, "comx", 0)
-
-	MDRV_CASSETTE_ADD( "cassette", comx35_cassette_config )
-
-	MDRV_WD1770_ADD("wd1770", comx35_wd17xx_interface )	
+	MDRV_CASSETTE_ADD(CASSETTE_TAG, comx35_cassette_config)
+	MDRV_PRINTER_ADD("printer")
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( comx35n )
+static MACHINE_DRIVER_START( comx35_ntsc )
 	MDRV_DRIVER_DATA(comx35_state)
 
-	// basic system hardware
-
+	/* basic system hardware */
 	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, CDP1869_CPU_CLK_NTSC)
 	MDRV_CPU_PROGRAM_MAP(comx35_map, 0)
 	MDRV_CPU_IO_MAP(comx35_io_map, 0)
@@ -412,22 +401,15 @@ static MACHINE_DRIVER_START( comx35n )
 	MDRV_MACHINE_START(comx35n)
 	MDRV_MACHINE_RESET(comx35)
 
-	// keyboard encoder
+	/* sound and video hardware */
+	MDRV_IMPORT_FROM(comx35_ntsc_video)
+
+	/* peripheral hardware */
 	MDRV_CDP1871_ADD(CDP1871_TAG, comx35_cdp1871_intf, CDP1869_CPU_CLK_NTSC / 8)
-
-	// sound and video hardware
-
-	MDRV_IMPORT_FROM(comx35n_video)
-
-	// printer
-
-	MDRV_PRINTER_ADD("printer")
-
-	// quickload
-
+	MDRV_WD1770_ADD(WD1770_TAG, comx35_wd17xx_interface )	
 	MDRV_QUICKLOAD_ADD(comx35, "comx", 0)
-
-	MDRV_CASSETTE_ADD( "cassette", comx35_cassette_config )
+	MDRV_CASSETTE_ADD(CASSETTE_TAG, comx35_cassette_config)
+	MDRV_PRINTER_ADD("printer")
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -499,5 +481,5 @@ SYSTEM_CONFIG_END
 /* System Drivers */
 
 //    YEAR  NAME		PARENT  COMPAT	MACHINE		INPUT     INIT	CONFIG    COMPANY						FULLNAME			FLAGS
-COMP( 1983, comx35p,	0,		0,		comx35p,	comx35,   0, 	comx35,   "Comx World Operations Ltd",	"COMX 35 (PAL)",	GAME_IMPERFECT_SOUND )
-COMP( 1983, comx35n,	comx35p,0,		comx35n,	comx35,   0, 	comx35,   "Comx World Operations Ltd",	"COMX 35 (NTSC)",	GAME_IMPERFECT_SOUND )
+COMP( 1983, comx35p,	0,		0,		comx35_pal,	comx35,   0, 	comx35,   "Comx World Operations Ltd",	"COMX 35 (PAL)",	GAME_IMPERFECT_SOUND )
+COMP( 1983, comx35n,	comx35p,0,		comx35_ntsc,comx35,   0, 	comx35,   "Comx World Operations Ltd",	"COMX 35 (NTSC)",	GAME_IMPERFECT_SOUND )
