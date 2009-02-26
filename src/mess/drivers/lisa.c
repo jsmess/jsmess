@@ -95,7 +95,7 @@ static MACHINE_DRIVER_START( lisa )
 	MDRV_CPU_PROGRAM_MAP(lisa_map, 0)
 	MDRV_CPU_VBLANK_INT("screen", lisa_interrupt)
 
-	MDRV_CPU_ADD("fdc", M6502, 2000000)        /* 16.000 MHz / 8 in when DIS asserted, 16.000 MHz / 9 otherwise (?) */
+	MDRV_CPU_ADD("fdccpu", M6502, 2000000)        /* 16.000 MHz / 8 in when DIS asserted, 16.000 MHz / 9 otherwise (?) */
 	MDRV_CPU_PROGRAM_MAP(lisa_fdc_map, 0)
 
 	MDRV_QUANTUM_TIME(HZ(60))
@@ -133,7 +133,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( lisa210 )
 	MDRV_IMPORT_FROM( lisa )
-	MDRV_CPU_MODIFY( "fdc" )
+	MDRV_CPU_MODIFY( "fdccpu" )
 	MDRV_CPU_PROGRAM_MAP(lisa210_fdc_map, 0)
 
 	/* Lisa 2/10 and MacXL had a slightly different FDC interface */	
@@ -287,7 +287,7 @@ ROM_START( lisa2 )
 	ROM_LOAD16_BYTE( "booth.hi", 0x000000, 0x2000, CRC(adfd4516) SHA1(97a89ce1218b8aa38f69f92f6f363f435c887914))
 	ROM_LOAD16_BYTE( "booth.lo", 0x000001, 0x2000, CRC(546d6603) SHA1(2a81e4d483f50ae8a2519621daeb7feb440a3e4d))
 
-	ROM_REGION(0x2000,"fdc",0)		/* 6504 RAM and ROM */
+	ROM_REGION(0x2000,"fdccpu",0)		/* 6504 RAM and ROM */
 	ROM_LOAD( "ioa8.rom", 0x1000, 0x1000, CRC(bc6364f1) SHA1(f3164923330a51366a06d9d8a4a01ec7b0d3a8aa))
 
 	ROM_REGION(0x100,"gfx1",0)		/* video ROM (includes S/N) */
@@ -300,10 +300,10 @@ ROM_START( lisa210 )
 	ROM_LOAD16_BYTE( "booth.lo", 0x000001, 0x2000, CRC(546d6603) SHA1(2a81e4d483f50ae8a2519621daeb7feb440a3e4d))
 
 #if 1
-	ROM_REGION(0x2000,"fdc", 0)		/* 6504 RAM and ROM */
+	ROM_REGION(0x2000,"fdccpu", 0)		/* 6504 RAM and ROM */
 	ROM_LOAD( "io88.rom", 0x1000, 0x1000, CRC(e343fe74) SHA1(a0e484ead2d2315fca261f39fff2f211ff61b0ef))
 #else
-	ROM_REGION(0x2000,"fdc", 0)		/* 6504 RAM and ROM */
+	ROM_REGION(0x2000,"fdccpu", 0)		/* 6504 RAM and ROM */
 	ROM_LOAD( "io88800k.rom", 0x1000, 0x1000, CRC(8c67959a))
 #endif
 
@@ -317,10 +317,10 @@ ROM_START( macxl )
 	ROM_LOAD16_BYTE( "boot3a.lo", 0x000001, 0x2000, CRC(edf5222f) SHA1(b0388ee8dbbc51a2d628473dc29b65ce913fcd76))
 
 #if 1
-	ROM_REGION(0x2000,"fdc", 0)		/* 6504 RAM and ROM */
+	ROM_REGION(0x2000,"fdccpu", 0)		/* 6504 RAM and ROM */
 	ROM_LOAD( "io88.rom", 0x1000, 0x1000, CRC(e343fe74) SHA1(a0e484ead2d2315fca261f39fff2f211ff61b0ef))
 #else
-	ROM_REGION(0x2000,"fdc", 0)		/* 6504 RAM and ROM */
+	ROM_REGION(0x2000,"fdccpu", 0)		/* 6504 RAM and ROM */
 	ROM_LOAD( "io88800k.rom", 0x1000, 0x1000, CRC(8c67959a))
 #endif
 

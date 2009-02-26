@@ -1069,11 +1069,11 @@ static MACHINE_DRIVER_START( psxntsc )
 	MDRV_VIDEO_UPDATE( psx )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MDRV_SOUND_ADD( "psxspu", PSXSPU, 0 )
 	MDRV_SOUND_CONFIG( psxspu_interface )
-	MDRV_SOUND_ROUTE( 0, "left", 1.00 )
-	MDRV_SOUND_ROUTE( 1, "right", 1.00 )
+	MDRV_SOUND_ROUTE( 0, "lspeaker", 1.00 )
+	MDRV_SOUND_ROUTE( 1, "rspeaker", 1.00 )
 
 	/* quickload */
 	MDRV_QUICKLOAD_ADD(psx_exe_load, "cpe,exe,psf,psx", 0)
@@ -1102,11 +1102,11 @@ static MACHINE_DRIVER_START( psxpal )
 	MDRV_VIDEO_UPDATE( psx )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MDRV_SOUND_ADD( "psxspu", PSXSPU, 0 )
 	MDRV_SOUND_CONFIG( psxspu_interface )
-	MDRV_SOUND_ROUTE( 0, "left", 1.00 )
-	MDRV_SOUND_ROUTE( 1, "right", 1.00 )
+	MDRV_SOUND_ROUTE( 0, "lspeaker", 1.00 )
+	MDRV_SOUND_ROUTE( 1, "rspeaker", 1.00 )
 
 	/* quickload */
 	MDRV_QUICKLOAD_ADD(psx_exe_load, "cpe,exe,psf,psx", 0)

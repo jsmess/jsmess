@@ -501,10 +501,10 @@ static MACHINE_DRIVER_START( svision )
 	MDRV_DEFAULT_LAYOUT(layout_svision)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MDRV_SOUND_ADD("custom", SVISION, 0)
-	MDRV_SOUND_ROUTE(0, "left", 0.50)
-	MDRV_SOUND_ROUTE(1, "right", 0.50)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.50)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.50)
 	
 	/* cartridge */
 	MDRV_CARTSLOT_ADD("cart")

@@ -179,7 +179,7 @@ static MACHINE_DRIVER_START( palm )
     /* basic machine hardware */
     MDRV_CPU_ADD( "maincpu", M68000, 32768*506 )        /* 16.580608 MHz */
     MDRV_CPU_PROGRAM_MAP( palm_map, 0 )
-    MDRV_SCREEN_ADD( "maincpu", RASTER )
+    MDRV_SCREEN_ADD( "screen", RASTER )
     MDRV_SCREEN_REFRESH_RATE( 60 )
     MDRV_SCREEN_VBLANK_TIME( ATTOSECONDS_IN_USEC(1260) )
     MDRV_QUANTUM_TIME( HZ(60) )

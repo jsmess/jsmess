@@ -170,11 +170,11 @@ static MACHINE_DRIVER_START( apple2gs )
 
 	MDRV_SOUND_REPLACE("a2dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MDRV_SOUND_ADD("es5503", ES5503, APPLE2GS_7M)
 	MDRV_SOUND_CONFIG(apple2gs_es5503_interface)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	/* replace the old-style FDC with an IWM */
 	MDRV_APPLEFDC_REMOVE("fdc")

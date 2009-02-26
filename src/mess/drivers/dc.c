@@ -159,11 +159,11 @@ static MACHINE_DRIVER_START( dc )
 	MDRV_VIDEO_START(dc)
 	MDRV_VIDEO_UPDATE(dc)
 
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MDRV_SOUND_ADD("aica", AICA, 0)
 	MDRV_SOUND_CONFIG(dc_aica_interface)
-	MDRV_SOUND_ROUTE(0, "left", 2.0)
-	MDRV_SOUND_ROUTE(0, "right", 2.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 2.0)
+	MDRV_SOUND_ROUTE(0, "rspeaker", 2.0)
 MACHINE_DRIVER_END
 
 ROM_START(dc)

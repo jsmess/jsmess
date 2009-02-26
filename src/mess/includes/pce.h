@@ -11,6 +11,7 @@
 
 #include "sound/msm5205.h"
 
+#define C6280_TAG			"c6280"
 
 #define PCE_HEADER_SIZE		512
 
