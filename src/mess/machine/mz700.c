@@ -39,28 +39,23 @@
 		} \
 	} while (0)
 
-typedef UINT32 data_t;
 
-static emu_timer *ne556_timer[2] = {NULL,};	  /* NE556 timer */
-static UINT8 ne556_out[2] = {0,};		/* NE556 current output status */
-
-static READ8_DEVICE_HANDLER ( pio_port_a_r );
 static READ8_DEVICE_HANDLER ( pio_port_b_r );
 static READ8_DEVICE_HANDLER ( pio_port_c_r );
 static WRITE8_DEVICE_HANDLER ( pio_port_a_w );
-static WRITE8_DEVICE_HANDLER ( pio_port_b_w );
 static WRITE8_DEVICE_HANDLER ( pio_port_c_w );
 
-const ppi8255_interface mz700_ppi8255_interface = {
-	DEVCB_HANDLER(pio_port_a_r),
-	DEVCB_HANDLER(pio_port_b_r),
+const ppi8255_interface mz700_ppi8255_interface =
+{
+	DEVCB_NULL,
+	DEVCB_DEVICE_HANDLER(TTL74145, "ls145", pio_port_b_r),
 	DEVCB_HANDLER(pio_port_c_r),
-	DEVCB_HANDLER(pio_port_a_w),
-	DEVCB_HANDLER(pio_port_b_w),
+	DEVCB_DEVICE_HANDLER(TTL74145, "ls145", pio_port_a_w),
+	DEVCB_NULL,
 	DEVCB_HANDLER(pio_port_c_w)
 };
 
-static int pio_port_a_output;
+
 static int pio_port_c_output;
 
 static PIT8253_OUTPUT_CHANGED( pit_out0_changed );
@@ -77,12 +72,6 @@ const struct pit8253_config mz700_pit8253_config =
 	}
 };
 
-static TIMER_CALLBACK(ne556_callback)
-{
-	/* toggle the NE556 output signal */
-	ne556_out[param] ^= 1;
-}
-
 
 DRIVER_INIT( mz700 )
 {
@@ -92,18 +81,6 @@ DRIVER_INIT( mz700 )
 
 	mz700_bank_w(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 4, 0);
 }
-
-
-MACHINE_RESET( mz700 )
-{
-	ne556_timer[0] = timer_alloc(machine, ne556_callback, NULL);
-	timer_adjust_periodic(ne556_timer[0], ATTOTIME_IN_HZ(1.5), 0, ATTOTIME_IN_HZ(1.5));
-	/*timer_pulse(machine, ATTOTIME_IN_HZ(1.5), NULL, 0, ne556_callback)*/
-	ne556_timer[1] = timer_alloc(machine, ne556_callback, NULL);
-	timer_adjust_periodic(ne556_timer[1], ATTOTIME_IN_HZ(34.5), 1, ATTOTIME_IN_HZ(34.5));
-	/*timer_pulse(machine, ATTOTIME_IN_HZ(34.5), NULL, 1, ne556_callback)*/
-}
-
 
 
 /************************ PIT ************************************************/
@@ -133,93 +110,71 @@ static PIT8253_OUTPUT_CHANGED( pit_irq_2 )
 
 /************************ PIO ************************************************/
 
-static READ8_DEVICE_HANDLER( pio_port_a_r )
-{
-	UINT8 data = pio_port_a_output;
-	LOG(2,"mz700_pio_port_a_r",("%02X\n", data),device->machine);
-	return data;
-}
-
-
 static READ8_DEVICE_HANDLER( pio_port_b_r )
 {
-	const device_config *ls145 = devtag_get_device(device->machine, TTL74145, "ls145");
-	int key_line = ttl74145_r(ls145, 0, 0);
-	UINT8 data = 0xff;
+	int key_line = ttl74145_r(device, 0, 0);
 
-	if (BIT(key_line, 0)) data = input_port_read(device->machine, "ROW0");
-	if (BIT(key_line, 1)) data = input_port_read(device->machine, "ROW1");
-	if (BIT(key_line, 2)) data = input_port_read(device->machine, "ROW2");
-	if (BIT(key_line, 3)) data = input_port_read(device->machine, "ROW3");
-	if (BIT(key_line, 4)) data = input_port_read(device->machine, "ROW4");
-	if (BIT(key_line, 5)) data = input_port_read(device->machine, "ROW5");
-	if (BIT(key_line, 6)) data = input_port_read(device->machine, "ROW6");
-	if (BIT(key_line, 7)) data = input_port_read(device->machine, "ROW7");
-	if (BIT(key_line, 8)) data = input_port_read(device->machine, "ROW8");
-	if (BIT(key_line, 9)) data = input_port_read(device->machine, "ROW9");
+	switch (key_line)
+	{
+	case 1 << 0: return input_port_read(device->machine, "ROW0");
+	case 1 << 1: return input_port_read(device->machine, "ROW1");
+	case 1 << 2: return input_port_read(device->machine, "ROW2");
+	case 1 << 3: return input_port_read(device->machine, "ROW3");
+	case 1 << 4: return input_port_read(device->machine, "ROW4");
+	case 1 << 5: return input_port_read(device->machine, "ROW5");
+	case 1 << 6: return input_port_read(device->machine, "ROW6");
+	case 1 << 7: return input_port_read(device->machine, "ROW7");
+	case 1 << 8: return input_port_read(device->machine, "ROW8");
+	case 1 << 9: return input_port_read(device->machine, "ROW9");
+	}
 
-    return data;
+	/* should never reach this */
+    return 0xff;
 }
 
-static READ8_DEVICE_HANDLER (pio_port_c_r )
+/*
+ * bit 7 in     vertical blank
+ * bit 6 in     NE556 output
+ * bit 5 in     tape data (RDATA)
+ * bit 4 in     motor (1 = on)
+ */
+static READ8_DEVICE_HANDLER( pio_port_c_r )
 {
+	const device_config *cas = devtag_get_device(device->machine, CASSETTE, "cassette");
+	mz700_state *mz700 = device->machine->driver_data;
 	UINT8 data = pio_port_c_output & 0x0f;
 
-    /*
-     * bit 7 in     vertical blank
-     * bit 6 in     NE556 output
-     * bit 5 in     tape data (RDATA)
-     * bit 4 in     motor (1 = on)
-     */
-
 	/* note: this is actually connected to Q output of the motor-control flip-flop (see below) */
-	if ((cassette_get_state(devtag_get_device(device->machine, CASSETTE, "cassette")) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
+	if ((cassette_get_state(cas) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
 		data |= 0x10;
 
-	if (cassette_input(devtag_get_device(device->machine, CASSETTE, "cassette")) > 0.0038)
+	if (cassette_input(cas) > 0.0038)
 		data |= 0x20;       /* set the RDATA status */
 
-	if (ne556_out[0])
-		data |= 0x40;           /* set the 556OUT status */
-
-	data |= input_port_read(device->machine, "STATUS");   /* get VBLANK in bit 7 */
+	data |= mz700->cursor_timer << 6;
+	data |= video_screen_get_vblank(device->machine->primary_screen) << 7;
 
 	LOG(2,"mz700_pio_port_c_r",("%02X\n", data),device->machine);
 
 	return data;
 }
 
-static WRITE8_DEVICE_HANDLER (pio_port_a_w )
+
+static WRITE8_DEVICE_HANDLER( pio_port_a_w )
 {
-	const device_config *ls145 = devtag_get_device(device->machine, TTL74145, "ls145");
+	const device_config *timer = devtag_get_device(device->machine, TIMER, "cursor");
 
 	LOG(2,"mz700_pio_port_a_w",("%02X\n", data),device->machine);
 
-	/* the ls145 is connected to pa0-pa3 */
-	ttl74145_w(ls145, 0, data & 0x07);
+	/* the ls145 is connected to PA0-PA3 */
+	ttl74145_w(device, 0, data & 0x07);
 
-	pio_port_a_output = data;
+	/* ne556 reset is connected to PA7 */
+	timer_device_enable(timer, BIT(data, 7));
 }
 
-static WRITE8_DEVICE_HANDLER ( pio_port_b_w )
-{
-	/*
-	 * bit 7	NE556 reset
-	 * bit 6	unused
-	 * bit 5	unused
-	 * bit 4	unused
-	 * bit 3	demux LS145 D
-	 * bit 2	demux LS145 C
-	 * bit 1	demux LS145 B
-	 * bit 0	demux LS145 A
-     */
-	LOG(2,"mz700_pio_port_b_w",("%02X\n", data),device->machine);
 
-	/* enable/disable NE556 cursor flash timer */
-    timer_enable(ne556_timer[0], (data & 0x80) ? 0 : 1);
-}
-
-static WRITE8_DEVICE_HANDLER ( pio_port_c_w )
+static WRITE8_DEVICE_HANDLER( pio_port_c_w )
 {
     /*
      * bit 3 out    motor control (0 = on)
@@ -256,54 +211,20 @@ static WRITE8_DEVICE_HANDLER ( pio_port_c_w )
 
 /************************ MMIO ***********************************************/
 
-READ8_HANDLER ( mz700_mmio_r )
+READ8_HANDLER( mz700_e008_r )
 {
-	const device_config *screen = video_screen_first(space->machine->config);
-	const rectangle *visarea = video_screen_get_visible_area(screen);
-	UINT8 data = 0x7e;
+	mz700_state *mz700 = space->machine->driver_data;
+	UINT8 data = 0;
 
-	switch (offset & 15)
-	{
-	/* the first four ports are connected to a 8255 PPI */
-    case 0: case 1: case 2: case 3:
-		data = ppi8255_r((device_config*)devtag_get_device(space->machine, PPI8255, "ppi8255"), offset & 3);
-		break;
+	data |= mz700->other_timer;
+	data |= input_port_read(space->machine, "JOY");	/* get joystick ports */
+	data |= video_screen_get_hblank(space->machine->primary_screen);
 
-	case 4: case 5: case 6: case 7:
-		data = pit8253_r((device_config*)devtag_get_device(space->machine, PIT8253, "pit8253"), offset & 3);
-        break;
+	LOG(1, "mz700_e008_r", ("%02X\n", data), space->machine);
 
-	case 8:
-		data = ne556_out[1] ? 0x01 : 0x00;
-		data |= input_port_read(space->machine, "JOY");	/* get joystick ports */
-		if (video_screen_get_hpos(space->machine->primary_screen) >= visarea->max_x - 32)
-			data |= 0x80;
-		LOG(1,"mz700_e008_r",("%02X\n", data),space->machine);
-        break;
-    }
-    return data;
+	return data;
 }
 
-WRITE8_HANDLER ( mz700_mmio_w )
-{
-	switch (offset & 15)
-	{
-	/* the first four ports are connected to a 8255 PPI */
-    case 0: case 1: case 2: case 3:
-		ppi8255_w((device_config*)devtag_get_device(space->machine, PPI8255, "ppi8255"), offset & 3, data);
-        break;
-
-	/* the next four ports are connected to a 8253 PIT */
-    case 4: case 5: case 6: case 7:
-		pit8253_w((device_config*)devtag_get_device(space->machine, PIT8253, "pit8253"), offset & 3, data);
-		break;
-
-	case 8:
-		LOG(1,"mz700_e008_w",("%02X\n", data),space->machine);
-		pit8253_gate_w((device_config*)devtag_get_device(space->machine, PIT8253, "pit8253"), 0, data & 1);
-        break;
-	}
-}
 
 /************************ BANK ***********************************************/
 
@@ -442,11 +363,16 @@ static void bank8_RAM(running_machine *machine, UINT8 *mem)
 	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xE000, 0xFFFF, 0, 0, SMH_BANK8);
 }
 
-static void bank8_VIO(running_machine *machine, UINT8 *mem)
+static void bank8_VIO(const address_space *space, UINT8 *mem)
 {
-	memory_set_bankptr(machine, 8, &mem[0x16000]);
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xE000, 0xFFFF, 0, 0, mz700_mmio_r);
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xE000, 0xFFFF, 0, 0, mz700_mmio_w);
+	const device_config *pit = devtag_get_device(space->machine, PIT8253, "pit8253");
+	const device_config *ppi = devtag_get_device(space->machine, PPI8255, "ppi8255");
+
+	memory_set_bankptr(space->machine, 8, &mem[0x16000]);
+	memory_install_readwrite8_device_handler(space, ppi, 0xe000, 0xfff3, 0, 0x1ff0, ppi8255_r, ppi8255_w);
+	memory_install_readwrite8_device_handler(space, pit, 0xe004, 0xfff7, 0, 0x1ff0, pit8253_r, pit8253_w);
+	memory_install_read8_handler(space, 0xe008, 0xfff8, 0, 0x1ff0, mz700_e008_r);
+	memory_install_write8_device_handler(space, pit, 0xe008, 0xfff8, 0, 0x1ff0, pit8253_gate_w);
 }
 
 
@@ -484,7 +410,7 @@ WRITE8_HANDLER ( mz700_bank_w )
 		LOG(1,"mz700_bank_w",("3: D000-FFFF videoram, memory mapped io\n"),space->machine);
 		bank6_VIO(space->machine, mem);
 		bank7_VIO(space->machine, mem);
-		bank8_VIO(space->machine, mem);
+		bank8_VIO(space, mem);
 		mz700_locked = 0;
 		vio_mode = 3;
         break;
@@ -494,7 +420,7 @@ WRITE8_HANDLER ( mz700_bank_w )
 		bank1_ROM(space->machine, mem);
 		bank6_VIO(space->machine, mem);
 		bank7_VIO(space->machine, mem);
-		bank8_VIO(space->machine, mem);
+		bank8_VIO(space, mem);
         mz700_locked = 0;
 		vio_mode = 3;
         break;
@@ -532,33 +458,10 @@ static UINT8 mz800_palette[4];
 static UINT8 mz800_palette_bank;
 
 /* port CE */
- READ8_HANDLER( mz800_crtc_r )
+READ8_HANDLER( mz800_crtc_r )
 {
 	UINT8 data = 0x00;
 	LOG(1,"mz800_crtc_r",("%02X\n",data),space->machine);
-    return data;
-}
-
-/* port D0 - D7 / memory E000 - FFFF */
- READ8_HANDLER( mz800_mmio_r )
-{
-	UINT8 data = 0x7e;
-
-	switch (offset & 15)
-	{
-	/* the first four ports are connected to a 8255 PPI */
-    case 0: case 1: case 2: case 3:
-		data = ppi8255_r((device_config*)devtag_get_device(space->machine, PPI8255, "ppi8255"), offset & 3);
-		break;
-
-	case 4: case 5: case 6: case 7:
-		data = pit8253_r((device_config*)devtag_get_device(space->machine, PIT8253, "pit8253"), offset & 3);
-        break;
-
-	default:
-		data = memory_region(space->machine, "maincpu")[0x16000 + offset];
-        break;
-    }
     return data;
 }
 
@@ -670,13 +573,6 @@ WRITE8_HANDLER( mz800_scroll_border_w )
 	LOG(1,"mz800_scroll_border_w",("%02X\n", data),space->machine);
 }
 
-/* port D0-D7 */
-WRITE8_HANDLER( mz800_mmio_w )
-{
-	/* just wrap to the mz700 handler */
-    mz700_mmio_w(space, offset,data);
-}
-
 /* port E0-E9 */
 WRITE8_HANDLER ( mz800_bank_w )
 {
@@ -712,7 +608,7 @@ WRITE8_HANDLER ( mz800_bank_w )
 		LOG(1,"mz800_bank_w",("3: D000-FFFF videoram, memory mapped io\n"),space->machine);
 		bank6_VIO(space->machine, mem);
 		bank7_VIO(space->machine, mem);
-		bank8_VIO(space->machine, mem);
+		bank8_VIO(space, mem);
         mz800_locked = 0;
         vio_mode = 3;
         break;
@@ -722,7 +618,7 @@ WRITE8_HANDLER ( mz800_bank_w )
         bank1_ROM(space->machine, mem);
 		bank6_VIO(space->machine, mem);
 		bank7_VIO(space->machine, mem);
-		bank8_VIO(space->machine, mem);
+		bank8_VIO(space, mem);
         mz800_locked = 0;
         vio_mode = 3;
         break;
@@ -751,7 +647,7 @@ WRITE8_HANDLER ( mz800_bank_w )
 		{
 			bank6_VIO(space->machine, mem);
 			bank7_VIO(space->machine, mem);
-			bank8_VIO(space->machine, mem);
+			bank8_VIO(space, mem);
 		}
 		else
 		{
@@ -818,5 +714,3 @@ DRIVER_INIT( mz800 )
 	mz800_bank_r(space, 1);
 	mz800_bank_w(space, 4, 0);
 }
-
-

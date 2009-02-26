@@ -13,6 +13,16 @@
 #define MZ700_H_
 
 #include "machine/8255ppi.h"
+#include "machine/pit8253.h"
+
+
+typedef struct _mz700_state mz700_state;
+struct _mz700_state
+{
+	int cursor_timer;
+	int other_timer;
+};
+
 
 /*----------- defined in machine/mz700.c -----------*/
 
@@ -20,14 +30,10 @@ extern const struct pit8253_config mz700_pit8253_config;
 extern const ppi8255_interface mz700_ppi8255_interface;
 
 DRIVER_INIT( mz700 );
-MACHINE_RESET( mz700 );
 
-READ8_HANDLER( mz700_mmio_r );
-WRITE8_HANDLER( mz700_mmio_w );
 WRITE8_HANDLER( mz700_bank_w );
 
 READ8_HANDLER( mz800_crtc_r );
-READ8_HANDLER( mz800_mmio_r );
 READ8_HANDLER( mz800_bank_r );
 READ8_HANDLER( mz800_ramdisk_r );
 
@@ -35,7 +41,6 @@ WRITE8_HANDLER( mz800_write_format_w );
 WRITE8_HANDLER( mz800_read_format_w );
 WRITE8_HANDLER( mz800_display_mode_w );
 WRITE8_HANDLER( mz800_scroll_border_w );
-WRITE8_HANDLER( mz800_mmio_w );
 WRITE8_HANDLER( mz800_bank_w );
 WRITE8_HANDLER( mz800_ramdisk_w );
 WRITE8_HANDLER( mz800_ramaddr_w );

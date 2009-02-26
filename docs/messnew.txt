@@ -63,6 +63,9 @@ System Driver Changes:
 
 - [MTX512] Updated to use the new centronics interface.  [Dirk Best]
 
+- [MZ700] Updated to use raw video parameters, fixed cursor blinking,
+  various cleanups.  [Dirk Best]
+
 - [NC100/NC200] Updated to use the new centronics interface and fixed
   printing.  [Dirk Best]
 
