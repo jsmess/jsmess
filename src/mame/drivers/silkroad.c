@@ -146,7 +146,7 @@ static WRITE32_DEVICE_HANDLER(silk_6295_bank_w)
 	{
 		int bank = (data & 0x3000000) >> 24;
 		if(bank < 3)
-			okim6295_set_bank_base(device, 0x40000 * (bank));
+			okim6295_set_bank_base(devtag_get_device(device->machine, SOUND, "oki1"), 0x40000 * (bank));
 	}
 }
 
@@ -168,9 +168,9 @@ static ADDRESS_MAP_START( cpu_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x808000, 0x80bfff) AM_RAM_WRITE(silkroad_fgram3_w) AM_BASE(&silkroad_vidram3) // higher layer
 	AM_RANGE(0xc00000, 0xc00003) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xc00004, 0xc00007) AM_READ_PORT("DSW")
-	AM_RANGE(0xC00024, 0xC00027) AM_DEVREAD8(SOUND, "oki1", okim6295_r, 0x00ff0000)
-	AM_RANGE(0xC00028, 0xC0002f) AM_DEVREAD8(SOUND, "ym", ym2151_r, 0x00ff0000)
-	AM_RANGE(0xC00030, 0xC00033) AM_DEVREAD8(SOUND, "oki2", okim6295_r, 0x00ff0000)
+	AM_RANGE(0xc00024, 0xc00027) AM_DEVREADWRITE8(SOUND, "oki1", okim6295_r, okim6295_w, 0x00ff0000)
+	AM_RANGE(0xc00028, 0xc0002f) AM_DEVREADWRITE8(SOUND, "ym", ym2151_r, ym2151_w, 0x00ff0000)
+	AM_RANGE(0xc00030, 0xc00033) AM_DEVREADWRITE8(SOUND, "oki2", okim6295_r, okim6295_w, 0x00ff0000)
 	AM_RANGE(0xc00034, 0xc00037) AM_DEVWRITE(SOUND, "oki1", silk_6295_bank_w)
 	AM_RANGE(0xc00038, 0xc0003b) AM_WRITE(silk_coin_counter_w)
 	AM_RANGE(0xc0010c, 0xc00123) AM_WRITE(SMH_RAM) AM_BASE(&silkroad_regs)
@@ -288,12 +288,12 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( silkroad )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68EC020, 16000000)
+	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)
 	MDRV_CPU_PROGRAM_MAP(cpu_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -307,21 +307,21 @@ static MACHINE_DRIVER_START( silkroad )
 	MDRV_VIDEO_UPDATE(silkroad)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ym", YM2151, 3579545)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MDRV_SOUND_ADD("oki1", OKIM6295, 1056000)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.45)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.45)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.45)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.45)
 
 	MDRV_SOUND_ADD("oki2", OKIM6295, 2112000)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.45)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.45)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.45)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.45)
 MACHINE_DRIVER_END
 
 
@@ -356,7 +356,7 @@ static DRIVER_INIT( silkroad )
 }
 
 ROM_START( silkroad )
-	ROM_REGION( 0x200000, "main", 0 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD32_WORD_SWAP( "rom02.bin", 0x000000, 0x100000, CRC(4e5200fc) SHA1(4d4cab03a6ec4ad825001e1e92193940646141e5) )
 	ROM_LOAD32_WORD_SWAP( "rom03.bin", 0x000002, 0x100000, CRC(73ccc78c) SHA1(2ac17aa8d7dac8636d29a4e4228a556334b51f1a) )
 

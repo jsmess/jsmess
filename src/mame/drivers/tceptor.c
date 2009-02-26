@@ -380,11 +380,11 @@ static MACHINE_RESET( tceptor )
 static MACHINE_DRIVER_START( tceptor )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809, 49152000/32)
+	MDRV_CPU_ADD("maincpu", M6809, 49152000/32)
 	MDRV_CPU_PROGRAM_MAP(m6809_map,0)
 	MDRV_CPU_VBLANK_INT("2d", m6809_vb_interrupt)
 
-	MDRV_CPU_ADD("audio", M65C02, 49152000/24)
+	MDRV_CPU_ADD("audiocpu", M65C02, 49152000/24)
 	MDRV_CPU_PROGRAM_MAP(m6502_a_map,0)
 
 	MDRV_CPU_ADD("audio2", M65C02, 49152000/24)
@@ -439,20 +439,20 @@ static MACHINE_DRIVER_START( tceptor )
 	MDRV_VIDEO_EOF(tceptor)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ym", YM2151, 14318180/4)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MDRV_SOUND_ADD("namco", NAMCO_CUS30, 49152000/2048)
 	MDRV_SOUND_CONFIG(namco_config)
-	MDRV_SOUND_ROUTE(0, "left", 0.40)
-	MDRV_SOUND_ROUTE(1, "right", 0.40)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.40)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.40)
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.40)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.40)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_DRIVER_END
 
 
@@ -463,10 +463,10 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( tceptor )
-	ROM_REGION( 0x10000, "main", 0 )			// 68A09EP
+	ROM_REGION( 0x10000, "maincpu", 0 )			// 68A09EP
 	ROM_LOAD( "tc1-1.10f",  0x08000, 0x08000, CRC(4c6b063e) SHA1(d9701657186f8051391084f51a720037f9f418b1) )
 
-	ROM_REGION( 0x10000, "audio", 0 )			// RC65C02
+	ROM_REGION( 0x10000, "audiocpu", 0 )			// RC65C02
 	ROM_LOAD( "tc1-21.1m",  0x08000, 0x08000, CRC(2d0b2fa8) SHA1(16ecd70954e52a8661642b15a5cf1db51783e444) )
 
 	ROM_REGION( 0x10000, "audio2", 0 )			// RC65C02
@@ -519,10 +519,10 @@ ROM_START( tceptor )
 ROM_END
 
 ROM_START( tceptor2 )
-	ROM_REGION( 0x10000, "main", 0 )			// 68A09EP
+	ROM_REGION( 0x10000, "maincpu", 0 )			// 68A09EP
 	ROM_LOAD( "tc2-1.10f",  0x08000, 0x08000, CRC(f953f153) SHA1(f4cd0a133d23b4bf3c24c70c28c4ecf8ad4daf6f) )
 
-	ROM_REGION( 0x10000, "audio", 0 )			// RC65C02
+	ROM_REGION( 0x10000, "audiocpu", 0 )			// RC65C02
 	ROM_LOAD( "tc1-21.1m",  0x08000, 0x08000, CRC(2d0b2fa8) SHA1(16ecd70954e52a8661642b15a5cf1db51783e444) )
 
 	ROM_REGION( 0x10000, "audio2", 0 )			// RC65C02

@@ -412,10 +412,20 @@ static WRITE8_HANDLER( qsound_banksw_w )
 *
 ********************************************************************/
 
+#ifndef MESS
 static const eeprom_interface qsound_eeprom_interface =
 {
 	7,		/* address bits */
 	8,		/* data bits */
+	"0110",	/*  read command */
+	"0101",	/* write command */
+	"0111"	/* erase command */
+};
+
+static const eeprom_interface pang3_eeprom_interface =
+{
+	6,		/* address bits */
+	16,		/* data bits */
 	"0110",	/*  read command */
 	"0101",	/* write command */
 	"0111"	/* erase command */
@@ -433,16 +443,6 @@ static NVRAM_HANDLER( qsound )
 			eeprom_load(file);
 	}
 }
-
-#ifndef MESS
-static const eeprom_interface pang3_eeprom_interface =
-{
-	6,		/* address bits */
-	16,		/* data bits */
-	"0110",	/*  read command */
-	"0101",	/* write command */
-	"0111"	/* erase command */
-};
 
 static NVRAM_HANDLER( pang3 )
 {
@@ -2793,12 +2793,21 @@ static MACHINE_DRIVER_START( cps1_10MHz )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
 
+#ifndef MESS
 static MACHINE_DRIVER_START( cps1_12MHz )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(cps1_10MHz)
 
 	MDRV_CPU_REPLACE("maincpu", M68000, 12000000)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( pang3 )
+
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(cps1_12MHz)
+
+	MDRV_NVRAM_HANDLER(pang3)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( qsound )
@@ -2818,23 +2827,14 @@ static MACHINE_DRIVER_START( qsound )
 
 	/* sound hardware */
 	MDRV_SPEAKER_REMOVE("mono")
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_REMOVE("2151")
 	MDRV_SOUND_REMOVE("oki")
 
 	MDRV_SOUND_ADD("qsound", QSOUND, QSOUND_CLOCK)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
-MACHINE_DRIVER_END
-
-#ifndef MESS
-static MACHINE_DRIVER_START( pang3 )
-
-	/* basic machine hardware */
-	MDRV_IMPORT_FROM(cps1_12MHz)
-
-	MDRV_NVRAM_HANDLER(pang3)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 /* bootlegs with PIC */
@@ -8261,11 +8261,6 @@ ROM_START( rockmanj )
 	ROM_LOAD( "c632.ic1",     0x0000, 0x0117, CRC(0fbd9270) SHA1(d7e737b20c44d41e29ca94be56114b31934dde81) )
 ROM_END
 
-static DRIVER_INIT( wof )
-{
-	wof_decode(machine);
-	DRIVER_INIT_CALL(cps1);
-}
 
 #ifndef MESS
 
@@ -8296,6 +8291,12 @@ static DRIVER_INIT( sf2hack )
 	/* some SF2 hacks have some inputs wired to the LSB instead of MSB */
 	memory_install_read16_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x800018, 0x80001f, 0, 0, cps1_hack_dsw_r);
 
+	DRIVER_INIT_CALL(cps1);
+}
+
+static DRIVER_INIT( wof )
+{
+	wof_decode(machine);
 	DRIVER_INIT_CALL(cps1);
 }
 

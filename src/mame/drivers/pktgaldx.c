@@ -343,12 +343,12 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( pktgaldx )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 14000000)
+	MDRV_CPU_ADD("maincpu", M68000, 14000000)
 	MDRV_CPU_PROGRAM_MAP(pktgaldx_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(58)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -362,28 +362,28 @@ static MACHINE_DRIVER_START( pktgaldx )
 	MDRV_VIDEO_UPDATE(pktgaldx)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("oki1", OKIM6295, 32220000/32)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.75)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.75)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 
 	MDRV_SOUND_ADD("oki2", OKIM6295, 32220000/16)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.60)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.60)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( pktgaldb )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 16000000)
+	MDRV_CPU_ADD("maincpu", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(pktgaldb_readmem,pktgaldb_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(58)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -401,7 +401,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( pktgaldx )
-	ROM_REGION( 0x80000, "main", 0 ) /* DE102 code (encrypted) */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* DE102 code (encrypted) */
 	ROM_LOAD16_WORD_SWAP( "ke00-2.12a",    0x00000, 0x80000, CRC(b04baf3a) SHA1(680d1b4ab4b6edef36cd96a60539fb7c2dac9637) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
@@ -419,7 +419,7 @@ ROM_START( pktgaldx )
 ROM_END
 
 ROM_START( pktgaldj )
-	ROM_REGION( 0x80000, "main", 0 ) /* DE102 code (encrypted) */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* DE102 code (encrypted) */
 	ROM_LOAD16_WORD_SWAP( "kg00-2.12a",    0x00000, 0x80000, CRC(62dc4137) SHA1(23887dc3f6e7c4cdcb1bf4f4c87fe3cbe8cdbe69) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
@@ -437,7 +437,7 @@ ROM_START( pktgaldj )
 ROM_END
 
 ROM_START( pktgaldb )
-	ROM_REGION( 0x100000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE ("4.bin", 0x00000, 0x80000, CRC(67ce30aa) SHA1(c5228ed19eebbfb6d5f7cbfcb99734d9fcd5aba3) )
 	ROM_LOAD16_BYTE( "5.bin", 0x00001, 0x80000, CRC(64cb4c33) SHA1(02f988f558113dd9a77079dee59e23583394fa98) )
 
@@ -462,7 +462,7 @@ ROM_END
 static DRIVER_INIT( pktgaldx )
 {
 	deco56_decrypt_gfx(machine, "gfx1");
-	deco102_decrypt_cpu(machine, "main", 0x42ba, 0x00, 0x00);
+	deco102_decrypt_cpu(machine, "maincpu", 0x42ba, 0x00, 0x00);
 }
 
 GAME( 1992, pktgaldx, 0,        pktgaldx, pktgaldx, pktgaldx,  ROT0, "Data East Corporation", "Pocket Gal Deluxe (Euro v3.00)", 0 )

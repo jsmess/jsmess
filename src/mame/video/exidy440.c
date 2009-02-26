@@ -366,7 +366,7 @@ static void draw_sprites(const device_config *screen, bitmap_t *bitmap, const re
 					int pen;
 
 					/* left pixel */
-					if (left && HBEND >= 0 && currx < HBSTART)
+					if (left && currx >= HBEND && currx < HBSTART)
 					{
 						/* combine with the background */
 						pen = left | old[0];
@@ -379,7 +379,7 @@ static void draw_sprites(const device_config *screen, bitmap_t *bitmap, const re
 					currx++;
 
 					/* right pixel */
-					if (right && HBEND >= 0 && currx < HBSTART)
+					if (right && currx >= HBEND && currx < HBSTART)
 					{
 						/* combine with the background */
 						pen = right | old[1];
@@ -489,7 +489,7 @@ MACHINE_DRIVER_START( exidy440_video )
 	MDRV_VIDEO_UPDATE(exidy440)
 	MDRV_PALETTE_LENGTH(256)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 MACHINE_DRIVER_END
@@ -500,6 +500,6 @@ MACHINE_DRIVER_START( topsecex_video )
 	MDRV_VIDEO_START(topsecex)
 	MDRV_VIDEO_UPDATE(topsecex)
 
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, TOPSECEX_VBSTART)
 MACHINE_DRIVER_END

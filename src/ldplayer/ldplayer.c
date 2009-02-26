@@ -561,23 +561,23 @@ static MACHINE_DRIVER_START( ldplayer_core )
 	MDRV_MACHINE_RESET(ldplayer)
 
 	/* audio hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ldsound", LASERDISC, 0)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( ldplayer_ntsc )
 	MDRV_IMPORT_FROM(ldplayer_core)
-	MDRV_LASERDISC_SCREEN_ADD_NTSC("main", BITMAP_FORMAT_RGB32)
+	MDRV_LASERDISC_SCREEN_ADD_NTSC("screen", BITMAP_FORMAT_RGB32)
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( ldv1000 )
 	MDRV_IMPORT_FROM(ldplayer_ntsc)
-	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, "main", "ldsound")
+	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, "screen", "ldsound")
 	MDRV_LASERDISC_GET_DISC(get_disc)
 MACHINE_DRIVER_END
 
@@ -586,7 +586,7 @@ static MACHINE_DRIVER_START( pr8210 )
 	MDRV_IMPORT_FROM(ldplayer_ntsc)
 	MDRV_MACHINE_START(pr8210)
 	MDRV_MACHINE_RESET(pr8210)
-	MDRV_LASERDISC_ADD("laserdisc", PIONEER_PR8210, "main", "ldsound")
+	MDRV_LASERDISC_ADD("laserdisc", PIONEER_PR8210, "screen", "ldsound")
 	MDRV_LASERDISC_GET_DISC(get_disc)
 MACHINE_DRIVER_END
 

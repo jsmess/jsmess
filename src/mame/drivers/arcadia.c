@@ -282,7 +282,7 @@ static const cia6526_interface cia_1_intf =
 static MACHINE_DRIVER_START( arcadia )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, AMIGA_68000_NTSC_CLOCK)
+	MDRV_CPU_ADD("maincpu", M68000, AMIGA_68000_NTSC_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(amiga_map,0)
 
 	MDRV_MACHINE_RESET(amiga)
@@ -291,7 +291,7 @@ static MACHINE_DRIVER_START( arcadia )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(59.997)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -304,13 +304,13 @@ static MACHINE_DRIVER_START( arcadia )
 	MDRV_VIDEO_UPDATE(amiga)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("amiga", AMIGA, 3579545)
-	MDRV_SOUND_ROUTE(0, "left", 0.50)
-	MDRV_SOUND_ROUTE(1, "right", 0.50)
-	MDRV_SOUND_ROUTE(2, "right", 0.50)
-	MDRV_SOUND_ROUTE(3, "left", 0.50)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.50)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.50)
+	MDRV_SOUND_ROUTE(2, "rspeaker", 0.50)
+	MDRV_SOUND_ROUTE(3, "lspeaker", 0.50)
 
 	/* cia */
 	MDRV_CIA8520_ADD("cia_0", AMIGA_68000_NTSC_CLOCK / 10, cia_0_intf)

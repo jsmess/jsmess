@@ -1,7 +1,4 @@
-﻿NOTE - AS A PART OF THE 0.129u4 UPDATE, SOME DRIVERS HAVE BEEN TEMPORARILY
-REMOVED
-
-0.129.1
+﻿0.129.1
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
@@ -19,7 +16,6 @@ New System Drivers Supported (in no particular order):
 
 System Driver Changes:
 ----------------------
-
 - [AMIGA] Added centronics printer support.  [Dirk Best]
 
 - [AMSTRAD] Updated to use the new centronics interface, connected
@@ -121,7 +117,7 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-- The core is based on MAME 0.129u4.  This incorporates all features of the
+- The core is based on MAME 0.129u5.  This incorporates all features of the
   update to this core.  [MAME team]
 
 - Made major changes to allow Cartridge slots to encapsulate hardware as

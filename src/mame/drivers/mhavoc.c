@@ -192,8 +192,6 @@
 #include "sound/pokey.h"
 #include "mhavoc.h"
 
-static UINT8 speech_write_buffer;
-
 /*************************************
  *
  *  Alpha One: dual POKEY?
@@ -225,24 +223,6 @@ static WRITE8_HANDLER( dual_pokey_w )
 		pokey_w(devtag_get_device(space->machine, SOUND, "pokey2"), pokey_reg, data);
 }
 
-
-/*************************************
- *
- *  Speech access
- *
- *************************************/
-
-static WRITE8_HANDLER( speech_data_w )
-{
-	speech_write_buffer = data;
-}
-
-
-static WRITE8_HANDLER( speech_strobe_w )
-{
-	const device_config *tms = devtag_get_device(space->machine, SOUND, "tms");
-	tms5220_data_w(tms, 0, speech_write_buffer);
-}
 
 /*************************************
  *
@@ -504,7 +484,7 @@ static MACHINE_DRIVER_START( mhavoc )
 	MDRV_NVRAM_HANDLER(generic_1fill)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", VECTOR)
+	MDRV_SCREEN_ADD("screen", VECTOR)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_SIZE(400, 300)
 	MDRV_SCREEN_VISIBLE_AREA(0, 300, 0, 260)
@@ -546,7 +526,7 @@ static MACHINE_DRIVER_START( alphaone )
 	MDRV_CPU_PROGRAM_MAP(alphaone_map, 0)
 	MDRV_CPU_REMOVE("gamma")
 
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 580, 0, 500)
 
 	/* sound hardware */
@@ -750,22 +730,6 @@ ROM_START( alphaona )
 	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "136002-125.6c",	 0x0000, 0x0100, BAD_DUMP CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 ROM_END
-
-
-
-/*************************************
- *
- *  Driver-specific init
- *
- *************************************/
-
-static DRIVER_INIT( mhavocrv )
-{
-	/* install the speech support that was only optionally stuffed for use */
-	/* in the Return to Vax hack */
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x5800, 0x5800, 0, 0, speech_data_w);
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x5900, 0x5900, 0, 0, speech_strobe_w);
-}
 
 
 

@@ -213,20 +213,20 @@ static ADDRESS_MAP_START( liberatr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0001, 0x0001) AM_RAM AM_BASE(&liberatr_y)
 	AM_RANGE(0x0002, 0x0002) AM_READWRITE(liberatr_bitmap_xy_r, liberatr_bitmap_xy_w)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(liberatr_bitmap_w) AM_BASE(&liberatr_bitmapram) 	/* overlapping for my convenience */
-	AM_RANGE(0x4000, 0x403f) AM_READ(atari_vg_earom_r)
+	AM_RANGE(0x4000, 0x403f) AM_DEVREAD(ATARIVGEAROM, "earom", atari_vg_earom_r)
 	AM_RANGE(0x5000, 0x5000) AM_READ(liberatr_input_port_0_r)
 	AM_RANGE(0x5001, 0x5001) AM_READ_PORT("IN1")
 	AM_RANGE(0x6000, 0x600f) AM_WRITE(SMH_RAM) AM_BASE(&liberatr_base_ram)
 	AM_RANGE(0x6200, 0x621f) AM_WRITE(SMH_RAM) AM_BASE(&liberatr_colorram)
 	AM_RANGE(0x6400, 0x6400) AM_WRITENOP
-	AM_RANGE(0x6600, 0x6600) AM_WRITE(atari_vg_earom_ctrl_w)
+	AM_RANGE(0x6600, 0x6600) AM_DEVWRITE(ATARIVGEAROM, "earom", atari_vg_earom_ctrl_w)
 	AM_RANGE(0x6800, 0x6800) AM_WRITE(SMH_RAM) AM_BASE(&liberatr_planet_frame)
 	AM_RANGE(0x6a00, 0x6a00) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x6c00, 0x6c01) AM_WRITE(liberatr_led_w)
 	AM_RANGE(0x6c04, 0x6c04) AM_WRITE(liberatr_trackball_reset_w)
 	AM_RANGE(0x6c05, 0x6c06) AM_WRITE(liberatr_coin_counter_w)
 	AM_RANGE(0x6c07, 0x6c07) AM_WRITE(SMH_RAM) AM_BASE(&liberatr_planet_select)
-	AM_RANGE(0x6e00, 0x6e3f) AM_WRITE(atari_vg_earom_w)
+	AM_RANGE(0x6e00, 0x6e3f) AM_DEVWRITE(ATARIVGEAROM, "earom", atari_vg_earom_w)
 	AM_RANGE(0x7000, 0x701f) AM_DEVREADWRITE(SOUND, "pokey2", pokey_r, pokey_w)
 	AM_RANGE(0x7800, 0x781f) AM_DEVREADWRITE(SOUND, "pokey1", pokey_r, pokey_w)
 	AM_RANGE(0x8000, 0xefff) AM_ROM
@@ -251,15 +251,15 @@ static ADDRESS_MAP_START( liberat2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x400f) AM_WRITE(SMH_RAM) AM_BASE(&liberatr_base_ram)
 	AM_RANGE(0x4200, 0x421f) AM_WRITE(SMH_RAM) AM_BASE(&liberatr_colorram)
 	AM_RANGE(0x4400, 0x4400) AM_WRITENOP
-	AM_RANGE(0x4600, 0x4600) AM_WRITE(atari_vg_earom_ctrl_w)
-	AM_RANGE(0x4800, 0x483f) AM_READ(atari_vg_earom_r)
+	AM_RANGE(0x4600, 0x4600) AM_DEVWRITE(ATARIVGEAROM, "earom", atari_vg_earom_ctrl_w)
+	AM_RANGE(0x4800, 0x483f) AM_DEVREAD(ATARIVGEAROM, "earom", atari_vg_earom_r)
 	AM_RANGE(0x4800, 0x4800) AM_WRITE(SMH_RAM) AM_BASE(&liberatr_planet_frame)
 	AM_RANGE(0x4a00, 0x4a00) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x4c00, 0x4c01) AM_WRITE(liberatr_led_w)
 	AM_RANGE(0x4c04, 0x4c04) AM_WRITE(liberatr_trackball_reset_w)
 	AM_RANGE(0x4c05, 0x4c06) AM_WRITE(liberatr_coin_counter_w)
 	AM_RANGE(0x4c07, 0x4c07) AM_WRITE(SMH_RAM) AM_BASE(&liberatr_planet_select)
-	AM_RANGE(0x4e00, 0x4e3f) AM_WRITE(atari_vg_earom_w)
+	AM_RANGE(0x4e00, 0x4e3f) AM_DEVWRITE(ATARIVGEAROM, "earom", atari_vg_earom_w)
 	AM_RANGE(0x5000, 0x501f) AM_DEVREADWRITE(SOUND, "pokey2", pokey_r, pokey_w)
 	AM_RANGE(0x5800, 0x581f) AM_DEVREADWRITE(SOUND, "pokey1", pokey_r, pokey_w)
 	//AM_RANGE(0x6000, 0x601f) AM_WRITE(pokey1_w) /* bug ??? */
@@ -383,14 +383,14 @@ static const pokey_interface pokey_interface_2 =
 static MACHINE_DRIVER_START( liberatr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, MASTER_CLOCK/16) /* 1.25Mhz divided from 20Mhz master clock */
+	MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK/16) /* 1.25Mhz divided from 20Mhz master clock */
 	MDRV_CPU_PROGRAM_MAP(liberatr_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
 
-	MDRV_NVRAM_HANDLER(atari_vg)
+	MDRV_ATARIVGEAROM_ADD("earom")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -417,7 +417,7 @@ static MACHINE_DRIVER_START( liberat2 )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(liberatr)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(liberat2_map,0)
 MACHINE_DRIVER_END
 
@@ -430,7 +430,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( liberatr )
-	ROM_REGION( 0x10000, "main", 0 )	/* 64k for code and data  */
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* 64k for code and data  */
 	ROM_LOAD( "136012.206",   0x8000, 0x1000, CRC(1a0cb4a0) SHA1(595828a07af729a84aab4e0b51e873046b56b419) )
 	ROM_LOAD( "136012.205",   0x9000, 0x1000, CRC(2f071920) SHA1(8764f3e78451c4968bffb7c7f72d1ed862f4b185) )
 	ROM_LOAD( "136012.204",   0xa000, 0x1000, CRC(bcc91827) SHA1(3bfbe1f1db58437ccd204a857e58695f56819649) )
@@ -461,7 +461,7 @@ ROM_END
 
 
 ROM_START( liberat2 )
-	ROM_REGION( 0x10000, "main", 0 )	/* 64k for code and data  */
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* 64k for code and data  */
 	ROM_LOAD( "l6.bin",       0x6000, 0x1000, CRC(78093d06) SHA1(0f6ca01e27b32aae384a6ab67a6f14eedd3f1d9c) )
 	ROM_LOAD( "l5.bin",       0x7000, 0x1000, CRC(988db636) SHA1(8fdd07b397d4bef108aafb10c06c2fd53fc1f99a) )
 	ROM_LOAD( "l4.bin",       0x8000, 0x1000, CRC(ec114540) SHA1(eb35510b59f5e9624c3d94fb16dacb4968349030) )

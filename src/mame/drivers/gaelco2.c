@@ -166,14 +166,14 @@ static const gaelcosnd_interface maniacsq_snd_interface =
 
 static MACHINE_DRIVER_START( maniacsq )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 26000000/2)		/* 13 MHz? */
+	MDRV_CPU_ADD("maincpu", M68000, 26000000/2)		/* 13 MHz? */
 	MDRV_CPU_PROGRAM_MAP(maniacsq_readmem, maniacsq_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(59.1)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -188,17 +188,17 @@ static MACHINE_DRIVER_START( maniacsq )
 	MDRV_VIDEO_UPDATE(gaelco2)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("gaelco", GAELCO_GAE1, 0)
 	MDRV_SOUND_CONFIG(maniacsq_snd_interface)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 
 ROM_START( maniacsq )
-	ROM_REGION( 0x040000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x040000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "d8-d15.1m",	0x000000, 0x020000, CRC(9121d1b6) SHA1(ad8f0d996b6d42fc0c6645466608e82ca96e0b66) )
 	ROM_LOAD16_BYTE( "d0-d7.1m",	0x000001, 0x020000, CRC(a95cfd2a) SHA1(b5bad76f12d2a1f6bf6b35482f2f933ceb00e552) )
 
@@ -294,7 +294,7 @@ static const gaelcosnd_interface bang_snd_interface =
 
 static MACHINE_DRIVER_START( bang )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 30000000/2)			/* 15 MHz */
+	MDRV_CPU_ADD("maincpu", M68000, 30000000/2)			/* 15 MHz */
 	MDRV_CPU_PROGRAM_MAP(bang_readmem, bang_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(bang_interrupt, 6)
 
@@ -303,7 +303,7 @@ static MACHINE_DRIVER_START( bang )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(59.1)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -318,17 +318,17 @@ static MACHINE_DRIVER_START( bang )
 	MDRV_VIDEO_UPDATE(gaelco2)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("gaelco", GAELCO_CG1V, 0)
 	MDRV_SOUND_CONFIG(bang_snd_interface)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 
 ROM_START( bang )
-	ROM_REGION( 0x100000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "bang.u53",	0x000000, 0x080000, CRC(014bb939) SHA1(bb245acf7a3bd4a56b3559518bcb8d0ae39dbaf4) )
 	ROM_LOAD16_BYTE( "bang.u55",	0x000001, 0x080000, CRC(582f8b1e) SHA1(c9b0d4c1dee71cdb2c01d49f20ffde32eddc9583) )
 
@@ -357,7 +357,7 @@ ROM_END
 
 
 ROM_START( bangj )
-	ROM_REGION( 0x100000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "bang-a.u53",	0x000000, 0x080000, CRC(5ee514e9) SHA1(b78b507d18de41be58049f5c597acd107ec1273f) )
 	ROM_LOAD16_BYTE( "bang-a.u55",	0x000001, 0x080000, CRC(b90223ab) SHA1(7c097754a710169f41c574c3cc1a6346824853c4) )
 
@@ -498,14 +498,14 @@ static const gaelcosnd_interface alighunt_snd_interface =
 
 static MACHINE_DRIVER_START( alighunt )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 24000000/2)			/* 12 MHz */
+	MDRV_CPU_ADD("maincpu", M68000, 24000000/2)			/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(alighunt_readmem, alighunt_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(59.1)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -520,12 +520,12 @@ static MACHINE_DRIVER_START( alighunt )
 	MDRV_VIDEO_UPDATE(gaelco2)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("gaelco", GAELCO_GAE1, 0)
 	MDRV_SOUND_CONFIG(alighunt_snd_interface)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 
@@ -566,7 +566,7 @@ REF: 940411
 
 
 ROM_START( aligator )
-	ROM_REGION( 0x100000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE(	"u45",	0x000000, 0x080000, CRC(61c47c56) SHA1(6dd3fc6fdab252e0fb43c0793eef70203c888d7f) )
 	ROM_LOAD16_BYTE(	"u44",	0x000001, 0x080000, CRC(f0be007a) SHA1(2112b2e5f020028b50c8f2c72c83c9fee7a78224) )
 
@@ -582,7 +582,7 @@ ROM_START( aligator )
 ROM_END
 
 ROM_START( aligatun )
-	ROM_REGION( 0x100000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE(	"ahntu45n.040",	0x000000, 0x080000, CRC(fc02cb2d) SHA1(700aa60ec0d2bb705b1335de63daae678dcb8570) )
 	ROM_LOAD16_BYTE(	"ahntu44n.040",	0x000001, 0x080000, CRC(7fbea3a3) SHA1(89efa5b7908c2f010a3097954dbccd9cb7adc50c) )
 
@@ -750,9 +750,9 @@ static const gaelcosnd_interface touchgo_snd_interface =
 
 static MACHINE_DRIVER_START( touchgo )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 32000000/2)			/* 16 MHz */
+	MDRV_CPU_ADD("maincpu", M68000, 32000000/2)			/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(touchgo_readmem, touchgo_writemem)
-	MDRV_CPU_VBLANK_INT("left", irq6_line_hold)
+	MDRV_CPU_VBLANK_INT("lscreen", irq6_line_hold)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
@@ -760,14 +760,14 @@ static MACHINE_DRIVER_START( touchgo )
 	MDRV_PALETTE_LENGTH(4096*16 - 16)	/* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 	MDRV_DEFAULT_LAYOUT(layout_dualhsxs)
 
-	MDRV_SCREEN_ADD("left", RASTER)
+	MDRV_SCREEN_ADD("lscreen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_REFRESH_RATE(59.1)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_SIZE(64*16, 32*16)
 	MDRV_SCREEN_VISIBLE_AREA(0, 480-1, 16, 256-1)
 
-	MDRV_SCREEN_ADD("right", RASTER)
+	MDRV_SCREEN_ADD("rscreen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_REFRESH_RATE(59.1)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
@@ -781,11 +781,11 @@ static MACHINE_DRIVER_START( touchgo )
 	/* sound hardware */
 	/* the chip is stereo, but the game sound is mono because the right channel
        output is for cabinet 1 and the left channel output is for cabinet 2 */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MDRV_SOUND_ADD("gaelco", GAELCO_GAE1, 0)
 	MDRV_SOUND_CONFIG(touchgo_snd_interface)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 /*
@@ -832,7 +832,7 @@ REF: 950510-1
 
 
 ROM_START( touchgo ) /* REF: 950906 */
-	ROM_REGION( 0x100000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "tg_56", 0x000000, 0x080000, CRC(8ab065f3) SHA1(7664abd7e5f66ffca4a2865bba56ac36bd04f4e9) )
 	ROM_LOAD16_BYTE( "tg_57", 0x000001, 0x080000, CRC(0dfd3f65) SHA1(afb2ce8988c84f211ac71b84928ce4c421de7fee) )
 
@@ -848,7 +848,7 @@ ROM_START( touchgo ) /* REF: 950906 */
 ROM_END
 
 ROM_START( touchgon ) /* REF 950906, no plug-in daughterboard, Non North America Notice */
-	ROM_REGION( 0x100000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "tg56.bin", 0x000000, 0x080000, CRC(fd3b4642) SHA1(3cab42aecad5ee641711763c6047b56784c2bcf3) )
 	ROM_LOAD16_BYTE( "tg57.bin", 0x000001, 0x080000, CRC(ee891835) SHA1(9f8c60e5e3696b70f756c3521e10313005053cc7) )
 
@@ -864,7 +864,7 @@ ROM_START( touchgon ) /* REF 950906, no plug-in daughterboard, Non North America
 ROM_END
 
 ROM_START( touchgoe ) /* REF: 950510-1 */
-	ROM_REGION( 0x100000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "tg56", 0x000000, 0x080000, CRC(6d0f5c65) SHA1(00db7a7da3ec1676169aa78fe4f08a7746c3accf) )
 	ROM_LOAD16_BYTE( "tg57", 0x000001, 0x080000, CRC(845787b5) SHA1(27c9910cd9f38328326ecb5cd093dfeb6d4f6244) )
 
@@ -954,16 +954,16 @@ static const gaelcosnd_interface snowboar_snd_interface =
 
 static MACHINE_DRIVER_START( snowboar )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 30000000/2)			/* 15 MHz */
+	MDRV_CPU_ADD("maincpu", M68000, 30000000/2)			/* 15 MHz */
 	MDRV_CPU_PROGRAM_MAP(snowboar_readmem, snowboar_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	MDRV_NVRAM_HANDLER(gaelco2)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(59.1)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -978,12 +978,12 @@ static MACHINE_DRIVER_START( snowboar )
 	MDRV_VIDEO_UPDATE(gaelco2)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("gaelco", GAELCO_CG1V, 0)
 	MDRV_SOUND_CONFIG(snowboar_snd_interface)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 
@@ -1023,7 +1023,7 @@ REF: 960419/1
 */
 
 ROM_START( snowboar )
-	ROM_REGION( 0x100000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE(	"sb53",	0x000000, 0x080000, CRC(e4eaefd4) SHA1(c7de2ae3a4a919fbe16d4997e3f9e2303b8c96b1) )
 	ROM_LOAD16_BYTE(	"sb55",	0x000001, 0x080000, CRC(e2476994) SHA1(2ad18652a1fc6ac058c8399373fb77e7a81d5bbd) )
 
@@ -1039,7 +1039,7 @@ ROM_START( snowboar )
 ROM_END
 
 ROM_START( snowbalt )
-	ROM_REGION( 0x100000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE(	"sb.53",	0x000000, 0x080000, CRC(4742749e) SHA1(933e39893ab74895ae4a99a932f8245a03ea0b5d) )
 	ROM_LOAD16_BYTE(	"sb.55",	0x000001, 0x080000, CRC(6ddc431f) SHA1(8801c0cf1711bb956447ba1e631db28bd075caea) )
 
@@ -1206,9 +1206,9 @@ static const gaelcosnd_interface wrally2_snd_interface =
 
 static MACHINE_DRIVER_START( wrally2 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 26000000/2)			/* 13 MHz */
+	MDRV_CPU_ADD("maincpu", M68000, 26000000/2)			/* 13 MHz */
 	MDRV_CPU_PROGRAM_MAP(wrally2_readmem, wrally2_writemem)
-	MDRV_CPU_VBLANK_INT("left", irq6_line_hold)
+	MDRV_CPU_VBLANK_INT("lscreen", irq6_line_hold)
 
 	MDRV_NVRAM_HANDLER(gaelco2)
 
@@ -1218,14 +1218,14 @@ static MACHINE_DRIVER_START( wrally2 )
 	MDRV_PALETTE_LENGTH(4096*16 - 16)	/* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 	MDRV_DEFAULT_LAYOUT(layout_dualhsxs)
 
-	MDRV_SCREEN_ADD("left", RASTER)
+	MDRV_SCREEN_ADD("lscreen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_REFRESH_RATE(59.1)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_SIZE(384, 32*16)
 	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 16, 256-1)
 
-	MDRV_SCREEN_ADD("right", RASTER)
+	MDRV_SCREEN_ADD("rscreen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_REFRESH_RATE(59.1)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
@@ -1240,11 +1240,11 @@ static MACHINE_DRIVER_START( wrally2 )
 	/* sound hardware */
 	/* the chip is stereo, but the game sound is mono because the right channel
        output is for cabinet 1 and the left channel output is for cabinet 2 */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MDRV_SOUND_ADD("gaelco", GAELCO_GAE1, 0)
 	MDRV_SOUND_CONFIG(wrally2_snd_interface)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 /*
@@ -1349,7 +1349,7 @@ TLC569 (IC2 and IC7) is a 8-bit serial ADC
 */
 
 ROM_START( wrally2 )
-	ROM_REGION( 0x100000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "wr2.64",	0x000000, 0x080000, CRC(4cdf4e1e) SHA1(a3b3ff4a70336b61c7bba5d518527bf4bd901867) )
 	ROM_LOAD16_BYTE( "wr2.63",	0x000001, 0x080000, CRC(94887c9f) SHA1(ad09f1fbeff4c3ba47f72346d261b22fa6a51457) )
 
@@ -1373,7 +1373,56 @@ ROM_START( wrally2 )
 	ROM_FILL(				0x0900000, 0x0100000, 0x0 )			/* Empty */
 ROM_END
 
+/*
+CPU 1x MC68HC000FN12 (main)(u18)
+1x CG-1V-149 (u42)(sound/gfx? maybe the same as Gaelco)
+1x DALLAS DS5002FP (not dumped)(u44)
+1x TDA1543 (sound)(u20)
+1x LM358N (sound)(u7)
+1x TDA2003 (sound)(u1)
+1x oscillator 34.000 MHz (xtal1)
+1x oscillator 11.0592 MHz (xtal2)
+ROMs    2x AM27C010 (u39,u40)
+4x NM27C040Q (u50,u52,u53,u54)
+1x M27C801 (u51)
 
+6x RAM CY7C199 (u22,u23,u26,u27,u55,u56)
+2x RAM KM428C256TR (u37,u41)
+1x RAM GM76C256CLLFW70 (u47)(close to Dallas)
+
+1x PALCE16V8H (u28)(read protected -> extracted with CmD's PALdumper - it's registered)
+1x PALCE16V8H (u29)(read protected -> extracted with CmD's PALdumper)
+Note    1x 28x2 edge connector
+1x 2 legs connector (jp1)
+1x 4 legs connector (jp2)
+1x 12 legs connector (jp3)
+1x 5 legs connector (jp4)
+1x RS232 connector
+1x trimmer (volume)
+1x battery 3V (bt1)
+
+Title is uncertain. A string at 27e00 says: "Play 2000 v5.01 (c) 1999", but
+there are also some gfxs that says "Gran Tesoro" all over the place.
+I don't know what's the correct title for this one...
+
+*/
+
+ROM_START( grtesoro )
+	/*at least 1.u40 is bad, on every 0x40 bytes the first four are always 0xff.*/
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 code */
+	ROM_LOAD16_BYTE( "2.u39",	0x000000, 0x020000, BAD_DUMP CRC(9939299e) SHA1(55303a2adf199f4b5a60f57be7480b0e119f8624) )
+	ROM_LOAD16_BYTE( "1.u40",	0x000001, 0x020000, BAD_DUMP CRC(311c2f94) SHA1(963d6b5f479598145146fcb8b7c6ce77fbc92b07) )
+
+	ROM_REGION( 0x0300000, "gfx1", 0 ) /* GFX + Sound */
+	ROM_LOAD( "3.u54",	0x0000000, 0x0080000, CRC(085008ed) SHA1(06eb4f972d79eab13b1b3b6829ef280e079abdb6) )
+	ROM_LOAD( "4.u53",	0x0080000, 0x0080000, CRC(94dc37a7) SHA1(28f9832b61541b292682a6e2d2264abccd138a2e) )
+	ROM_LOAD( "5.u52",	0x0100000, 0x0080000, CRC(19b939f4) SHA1(7281709aa3ab1decb84bf7ab10492fb6ec197c80) )
+	ROM_LOAD( "6.u51",	0x0180000, 0x0100000, CRC(6dafc11c) SHA1(2aa3d6318418578433b3060bda6e27adf794dea4) )
+	ROM_LOAD( "7.u50",  0x0280000, 0x0080000, CRC(e80c6d39) SHA1(b3ae5d66c48c2ba6665a181e311b0c834384258a) )
+
+	ROM_REGION( 0x0600, "plds", 0 )
+	ROM_LOAD( "palce16v8h.u29",  0x0000, 0x0117, BAD_DUMP CRC(4a0a6f39) SHA1(57351e471649391c9abf110828fe2f128fe84eee) )
+ROM_END
 
 GAME( 1994, aligator, 0,        alighunt, alighunt, alighunt, ROT0, "Gaelco", "Alligator Hunt", GAME_UNEMULATED_PROTECTION )
 GAME( 1994, aligatun, aligator, alighunt, alighunt, alighunt, ROT0, "Gaelco", "Alligator Hunt (unprotected)", 0 )
@@ -1386,3 +1435,4 @@ GAME( 1996, snowboar, 0,        snowboar, snowboar, snowboar, ROT0, "Gaelco", "S
 GAME( 1996, snowbalt, snowboar, snowboar, snowboar, 0,        ROT0, "Gaelco", "Snow Board Championship (Version 2.1)", GAME_UNEMULATED_PROTECTION )
 GAME( 1998, bang,     0,        bang,     bang,     bang,     ROT0, "Gaelco", "Bang!", 0 )
 GAME( 1998, bangj,    bang,     bang,     bang,     bang,     ROT0, "Gaelco", "Gun Gabacho (Japan)", 0 )
+GAME( 1999, grtesoro, 0,        maniacsq, maniacsq, 0,        ROT0, "Nova Desitec", "Gran Tesoro? / Play 2000 (v5.01) (Italy)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )

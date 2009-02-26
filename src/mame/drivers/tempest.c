@@ -285,7 +285,7 @@ Version 1 for Tempest Analog Vector-Generator PCB Assembly A037383-01 or A037383
 #include "machine/atari_vg.h"
 #include "sound/pokey.h"
 
-#define MASTER_CLOCK (12096000)
+#define MASTER_CLOCK (XTAL_12_096MHz)
 #define CLOCK_3KHZ  (MASTER_CLOCK / 4096)
 
 #define TEMPEST_KNOB_P1_TAG	("KNOBP1")
@@ -295,6 +295,11 @@ Version 1 for Tempest Analog Vector-Generator PCB Assembly A037383-01 or A037383
 
 
 static UINT8 tempest_player_select;
+
+static MACHINE_START( tempest )
+{
+	state_save_register_global(machine, tempest_player_select);
+}
 
 /*************************************
  *
@@ -385,18 +390,18 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0c00, 0x0c00) AM_READ_PORT("IN0")
 	AM_RANGE(0x0d00, 0x0d00) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0e00, 0x0e00) AM_READ_PORT("DSW2")
-	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION("main", 0x2000)
+	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION("maincpu", 0x2000)
 	AM_RANGE(0x3000, 0x3fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(tempest_coin_w)
 	AM_RANGE(0x4800, 0x4800) AM_WRITE(avgdvg_go_w)
 	AM_RANGE(0x5000, 0x5000) AM_WRITE(wdclr_w)
 	AM_RANGE(0x5800, 0x5800) AM_WRITE(avgdvg_reset_w)
-	AM_RANGE(0x6000, 0x603f) AM_WRITE(atari_vg_earom_w)
-	AM_RANGE(0x6040, 0x6040) AM_READWRITE(mb_status_r, atari_vg_earom_ctrl_w)
-	AM_RANGE(0x6050, 0x6050) AM_READ(atari_vg_earom_r)
-	AM_RANGE(0x6060, 0x6060) AM_READ(mb_lo_r)
-	AM_RANGE(0x6070, 0x6070) AM_READ(mb_hi_r)
-	AM_RANGE(0x6080, 0x609f) AM_WRITE(mb_go_w)
+	AM_RANGE(0x6000, 0x603f) AM_DEVWRITE(ATARIVGEAROM, "earom", atari_vg_earom_w)
+	AM_RANGE(0x6040, 0x6040) AM_DEVREAD(MATHBOX, "mathbox", mathbox_status_r) AM_DEVWRITE(ATARIVGEAROM, "earom", atari_vg_earom_ctrl_w)
+	AM_RANGE(0x6050, 0x6050) AM_DEVREAD(ATARIVGEAROM, "earom", atari_vg_earom_r)
+	AM_RANGE(0x6060, 0x6060) AM_DEVREAD(MATHBOX, "mathbox", mathbox_lo_r)
+	AM_RANGE(0x6070, 0x6070) AM_DEVREAD(MATHBOX, "mathbox", mathbox_hi_r)
+	AM_RANGE(0x6080, 0x609f) AM_DEVWRITE(MATHBOX, "mathbox", mathbox_go_w)
 	AM_RANGE(0x60c0, 0x60cf) AM_DEVREADWRITE(SOUND, "pokey1", pokey_r, pokey_w)
 	AM_RANGE(0x60d0, 0x60df) AM_DEVREADWRITE(SOUND, "pokey2", pokey_r, pokey_w)
 	AM_RANGE(0x60e0, 0x60e0) AM_WRITE(tempest_led_w)
@@ -568,14 +573,17 @@ static const pokey_interface pokey_interface_2 =
 static MACHINE_DRIVER_START( tempest )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, MASTER_CLOCK / 8)
+	MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 8)
 	MDRV_CPU_PROGRAM_MAP(main_map, 0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_assert, (double)MASTER_CLOCK / 4096 / 12)
 	MDRV_WATCHDOG_TIME_INIT(HZ(CLOCK_3KHZ / 256))
-	MDRV_NVRAM_HANDLER(atari_vg)
+
+	MDRV_ATARIVGEAROM_ADD("earom")
+
+	MDRV_MACHINE_START(tempest)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", VECTOR)
+	MDRV_SCREEN_ADD("screen", VECTOR)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_SIZE(400, 300)
 	MDRV_SCREEN_VISIBLE_AREA(0, 580, 0, 570)
@@ -583,14 +591,17 @@ static MACHINE_DRIVER_START( tempest )
 	MDRV_VIDEO_START(avg_tempest)
 	MDRV_VIDEO_UPDATE(vector)
 
+	/* Drivers */
+	MDRV_MATHBOX_ADD("mathbox")
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("pokey1", POKEY, 12096000/8)
+	MDRV_SOUND_ADD("pokey1", POKEY, MASTER_CLOCK / 8)
 	MDRV_SOUND_CONFIG(pokey_interface_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("pokey2", POKEY, 12096000/8)
+	MDRV_SOUND_ADD("pokey2", POKEY, MASTER_CLOCK / 8)
 	MDRV_SOUND_CONFIG(pokey_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -604,7 +615,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( tempest ) /* rev 3 */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	/* Roms are for Tempest Analog Vector-Generator PCB Assembly A037383-01 or A037383-02 */
 	ROM_LOAD( "136002-113.d1",   0x9000, 0x0800, CRC(65d61fe7) SHA1(38a1e8a8f65b7887cf3e190269fe4ce2c6f818aa) )
 	ROM_LOAD( "136002-114.e1",   0x9800, 0x0800, CRC(11077375) SHA1(ed8ff0ca969da6672a7683b93d4fcf2935a0d903) )
@@ -640,7 +651,7 @@ ROM_END
 
 
 ROM_START( tempest1 ) /* rev 1 */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	/* Roms are for Tempest Analog Vector-Generator PCB Assembly A037383-01 or A037383-02 */
 	ROM_LOAD( "136002-113.d1",   0x9000, 0x0800, CRC(65d61fe7) SHA1(38a1e8a8f65b7887cf3e190269fe4ce2c6f818aa) )
 	ROM_LOAD( "136002-114.e1",   0x9800, 0x0800, CRC(11077375) SHA1(ed8ff0ca969da6672a7683b93d4fcf2935a0d903) )
@@ -676,7 +687,7 @@ ROM_END
 
 
 ROM_START( tempest2 ) /* rev 2 */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	/* Roms are for Tempest Analog Vector-Generator PCB Assembly A037383-01 or A037383-02 */
 	ROM_LOAD( "136002-113.d1",   0x9000, 0x0800, CRC(65d61fe7) SHA1(38a1e8a8f65b7887cf3e190269fe4ce2c6f818aa) )
 	ROM_LOAD( "136002-114.e1",   0x9800, 0x0800, CRC(11077375) SHA1(ed8ff0ca969da6672a7683b93d4fcf2935a0d903) )
@@ -712,7 +723,7 @@ ROM_END
 
 
 ROM_START( tempest3 ) /* rev 2 */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	/* Roms are for Tempest Analog Vector-Generator PCB Assembly A037383-03 or A037383-04 */
 	ROM_LOAD( "136002-237.p1",  0x9000, 0x1000, CRC(1d0cc503) SHA1(7bef95db9b1102d6b1166bda0ccb276ef4cc3764) )
 	ROM_LOAD( "136002-136.lm1", 0xa000, 0x1000, CRC(c88e3524) SHA1(89144baf1efc703b2336774793ce345b37829ee7) )
@@ -742,7 +753,7 @@ ROM_END
 
 
 ROM_START( temptube )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	/* Roms are for Tempest Analog Vector-Generator PCB Assembly A037383-01 or A037383-02 */
 	ROM_LOAD( "136002-113.d1",   0x9000, 0x0800, CRC(65d61fe7) SHA1(38a1e8a8f65b7887cf3e190269fe4ce2c6f818aa) )
 	ROM_LOAD( "136002-114.e1",   0x9800, 0x0800, CRC(11077375) SHA1(ed8ff0ca969da6672a7683b93d4fcf2935a0d903) )
@@ -783,8 +794,8 @@ ROM_END
  *
  *************************************/
 
-GAME( 1980, tempest,  0,       tempest, tempest, 0, ROT270, "Atari", "Tempest (rev 3)", 0 )
-GAME( 1980, tempest1, tempest, tempest, tempest, 0, ROT270, "Atari", "Tempest (rev 1)", 0 )
-GAME( 1980, tempest2, tempest, tempest, tempest, 0, ROT270, "Atari", "Tempest (rev 2)", 0 )
-GAME( 1980, tempest3, tempest, tempest, tempest, 0, ROT270, "Atari", "Tempest (rev 2, Revised Hardware)", 0 )
-GAME( 1980, temptube, tempest, tempest, tempest, 0, ROT270, "hack",  "Tempest Tubes", 0 )
+GAME( 1980, tempest,  0,       tempest, tempest, 0, ROT270, "Atari", "Tempest (rev 3)", GAME_SUPPORTS_SAVE )
+GAME( 1980, tempest1, tempest, tempest, tempest, 0, ROT270, "Atari", "Tempest (rev 1)", GAME_SUPPORTS_SAVE)
+GAME( 1980, tempest2, tempest, tempest, tempest, 0, ROT270, "Atari", "Tempest (rev 2)", GAME_SUPPORTS_SAVE )
+GAME( 1980, tempest3, tempest, tempest, tempest, 0, ROT270, "Atari", "Tempest (rev 2, Revised Hardware)", GAME_SUPPORTS_SAVE )
+GAME( 1980, temptube, tempest, tempest, tempest, 0, ROT270, "hack",  "Tempest Tubes", GAME_SUPPORTS_SAVE )

@@ -718,7 +718,7 @@ static const ym2151_interface ym2151_config =
 static MACHINE_DRIVER_START( hyprduel )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000,20000000/2)		/* 10MHz */
+	MDRV_CPU_ADD("maincpu", M68000,20000000/2)		/* 10MHz */
 	MDRV_CPU_PROGRAM_MAP(hyprduel_readmem,hyprduel_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(hyprduel_interrupt,RASTER_LINES)
 
@@ -728,7 +728,7 @@ static MACHINE_DRIVER_START( hyprduel )
 	MDRV_MACHINE_RESET(hyprduel)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -742,24 +742,24 @@ static MACHINE_DRIVER_START( hyprduel )
 	MDRV_VIDEO_UPDATE(hyprduel)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ym", YM2151, 4000000)
 	MDRV_SOUND_CONFIG(ym2151_config)
-	MDRV_SOUND_ROUTE(0, "left", 0.80)
-	MDRV_SOUND_ROUTE(1, "right", 0.80)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.80)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 4000000/16/16*132)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.57)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.57)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.57)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.57)
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( magerror )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000,20000000/2)		/* 10MHz */
+	MDRV_CPU_ADD("maincpu", M68000,20000000/2)		/* 10MHz */
 	MDRV_CPU_PROGRAM_MAP(magerror_readmem,magerror_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(hyprduel_interrupt,RASTER_LINES)
 
@@ -769,7 +769,7 @@ static MACHINE_DRIVER_START( magerror )
 	MDRV_MACHINE_RESET(hyprduel)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -783,16 +783,16 @@ static MACHINE_DRIVER_START( magerror )
 	MDRV_VIDEO_UPDATE(hyprduel)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ym", YM2413, 3579545)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.57)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.57)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.57)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.57)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 4000000/16/16*132)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.57)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.57)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.57)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.57)
 MACHINE_DRIVER_END
 
 /***************************************************************************
@@ -832,7 +832,7 @@ static DRIVER_INIT( hyprduel )
 
 
 ROM_START( hyprduel )
-	ROM_REGION( 0x80000, "main", 0 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "24.u24", 0x000000, 0x40000, CRC(c7402722) SHA1(e385676cdcee65a3ddf07791d82a1fe83ba1b3e2) ) /* Also silk screened as position 10 */
 	ROM_LOAD16_BYTE( "23.u23", 0x000001, 0x40000, CRC(d8297c2b) SHA1(2e23c5b1784d0a465c0c0dc3ca28505689a8b16c) ) /* Also silk screened as position  9 */
 
@@ -847,7 +847,7 @@ ROM_START( hyprduel )
 ROM_END
 
 ROM_START( hyprdelj )
-	ROM_REGION( 0x80000, "main", 0 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "24a.u24", 0x000000, 0x40000, CRC(2458f91d) SHA1(c75c7bccc84738e29b35667793491a1213aea1da) ) /* Also silk screened as position 10 */
 	ROM_LOAD16_BYTE( "23a.u23", 0x000001, 0x40000, CRC(98aedfca) SHA1(42028e57ac79473cde683be2100b953ff3b2b345) ) /* Also silk screened as position  9 */
 
@@ -862,7 +862,7 @@ ROM_START( hyprdelj )
 ROM_END
 
 ROM_START( magerror )
-	ROM_REGION( 0x80000, "main", 0 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "24.u24", 0x000000, 0x40000, CRC(5e78027f) SHA1(053374942bc545a92cc6f6ab6784c4626e4ec9e1) ) /* Also silk screened as position 10 */
 	ROM_LOAD16_BYTE( "23.u23", 0x000001, 0x40000, CRC(7271ec70) SHA1(bd7666390b70821f90ba976a3afe3194fb119478) ) /* Also silk screened as position  9 */
 

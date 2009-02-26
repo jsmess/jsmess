@@ -160,7 +160,18 @@ static INPUT_PORTS_START( galaxia )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static const gfx_layout tiles8x8_layout =
+static const gfx_layout tiles8x8x1_layout =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	1,
+	{ RGN_FRAC(0,1) },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8
+};
+
+static const gfx_layout tiles8x8x2_layout =
 {
 	8,8,
 	RGN_FRAC(1,2),
@@ -172,7 +183,11 @@ static const gfx_layout tiles8x8_layout =
 };
 
 static GFXDECODE_START( galaxia )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x2_layout, 0, 16 )
+GFXDECODE_END
+
+static GFXDECODE_START( astrowar )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x1_layout, 0, 16 )
 GFXDECODE_END
 
 
@@ -183,13 +198,13 @@ static INTERRUPT_GEN( galaxia_interrupt )
 
 static MACHINE_DRIVER_START( galaxia )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", S2650,2000000)		 /* ? MHz */
+	MDRV_CPU_ADD("maincpu", S2650,2000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(mem_map, 0)
 	MDRV_CPU_IO_MAP(io_map, 0)
-	MDRV_CPU_VBLANK_INT("main", galaxia_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", galaxia_interrupt)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -203,9 +218,13 @@ static MACHINE_DRIVER_START( galaxia )
 	MDRV_VIDEO_UPDATE(galaxia)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( astrowar )
+	MDRV_IMPORT_FROM( galaxia )
+	MDRV_GFXDECODE(astrowar)
+MACHINE_DRIVER_END
 
 ROM_START( galaxia )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "08h.bin", 0x00000, 0x0400, CRC(f3b4ffde) SHA1(15b004e7821bfc145158b1e9435f061c524f6b86) )
 	ROM_LOAD( "10h.bin", 0x00400, 0x0400, CRC(6d07fdd4) SHA1(d7d4b345a055275d59951788569db370bccd5195) )
 	ROM_LOAD( "11h.bin", 0x00800, 0x0400, CRC(1520eb3d) SHA1(3683174da701e1124af0f9c2ee4a9a84f3fea33a) )
@@ -227,7 +246,7 @@ ROM_END
 
 
 ROM_START( astrowar )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "astro8h.rom",  0x00000, 0x0400, CRC(b0ec246c) SHA1(f9123b5e317938655f5e8b3f8a5810d0b2b7c7af) )
 	ROM_LOAD( "astro10h.rom", 0x00400, 0x0400, CRC(090d360f) SHA1(528ddcdc30a5a291bd8850ff6f134fcc19af562f) )
 	ROM_LOAD( "astro11h.rom", 0x00800, 0x0400, CRC(72ab1378) SHA1(50743c64c4775076aa6f1d8ab2e05c14884bf0ba) )
@@ -254,4 +273,4 @@ static DRIVER_INIT(galaxia)
 }
 
 GAME( 1979, galaxia, 0, galaxia, galaxia, galaxia, ROT90, "Zaccaria", "Galaxia", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1980, astrowar, 0, galaxia, galaxia, galaxia, ROT90, "Zaccaria", "Astro Wars", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1980, astrowar, 0, astrowar, galaxia, galaxia, ROT90, "Zaccaria", "Astro Wars", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_WRONG_COLORS )

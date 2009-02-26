@@ -2540,14 +2540,14 @@ static const sh2_cpu_core sh2_conf_cps3 = {
 
 static MACHINE_DRIVER_START( cps3 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", SH2, 6250000*4) // external clock is 6.25 Mhz, it sets the intenral multiplier to 4x (this should probably be handled in the core..)
+	MDRV_CPU_ADD("maincpu", SH2, 6250000*4) // external clock is 6.25 Mhz, it sets the intenral multiplier to 4x (this should probably be handled in the core..)
 	MDRV_CPU_PROGRAM_MAP(cps3_map,0)
-	MDRV_CPU_VBLANK_INT("main", cps3_vbl_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", cps3_vbl_interrupt)
 	MDRV_CPU_PERIODIC_INT(cps3_other_interrupt,80) /* ?source? */
 	MDRV_CPU_CONFIG(sh2_conf_cps3)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_RAW_PARAMS(XTAL_60MHz/8, 486, 0, 384, 259, 0, 224)
 /*
@@ -2570,11 +2570,11 @@ static MACHINE_DRIVER_START( cps3 )
 	MDRV_VIDEO_UPDATE(cps3)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("cps3", CPS3, MASTER_CLOCK / 3)
-	MDRV_SOUND_ROUTE(1, "left", 1.0)
-	MDRV_SOUND_ROUTE(0, "right", 1.0)
+	MDRV_SOUND_ROUTE(1, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(0, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 

@@ -193,7 +193,7 @@ static const ym2151_interface adpcm_ym2151_interface =
 ****************************************************************************/
 
 MACHINE_DRIVER_START( williams_cvsd_sound )
-	MDRV_CPU_ADD("cvsd", M6809E, CVSD_MASTER_CLOCK)
+	MDRV_CPU_ADD("cvsdcpu", M6809E, CVSD_MASTER_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(williams_cvsd_map,0)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -211,30 +211,30 @@ MACHINE_DRIVER_END
 
 
 MACHINE_DRIVER_START( williams_narc_sound )
-	MDRV_CPU_ADD("narc1", M6809E, NARC_MASTER_CLOCK)
+	MDRV_CPU_ADD("narc1cpu", M6809E, NARC_MASTER_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(williams_narc_master_map,0)
 
-	MDRV_CPU_ADD("narc2", M6809E, NARC_MASTER_CLOCK)
+	MDRV_CPU_ADD("narc2cpu", M6809E, NARC_MASTER_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(williams_narc_slave_map,0)
 
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ym", YM2151, NARC_FM_CLOCK)
 	MDRV_SOUND_CONFIG(adpcm_ym2151_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.10)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.10)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
 
 	MDRV_SOUND_ADD("dac1", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.50)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.50)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
 	MDRV_SOUND_ADD("dac2", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.50)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.50)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
 	MDRV_SOUND_ADD("cvsd", HC55516, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.60)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.60)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
 MACHINE_DRIVER_END
 
 
@@ -268,7 +268,7 @@ void williams_cvsd_init(running_machine *machine, int pianum)
 	int bank;
 
 	/* configure the CPU */
-	sound_cpu = cputag_get_cpu(machine, "cvsd");
+	sound_cpu = cputag_get_cpu(machine, "cvsdcpu");
 	soundalt_cpu = NULL;
 
 	/* configure the PIA */
@@ -276,7 +276,7 @@ void williams_cvsd_init(running_machine *machine, int pianum)
 	pia_config(machine, pianum, &cvsd_pia_intf);
 
 	/* configure master CPU banks */
-	ROM = memory_region(machine, "cvsd");
+	ROM = memory_region(machine, "cvsdcpu");
 	for (bank = 0; bank < 16; bank++)
 	{
 		/*
@@ -304,11 +304,11 @@ void williams_narc_init(running_machine *machine)
 	int bank;
 
 	/* configure the CPU */
-	sound_cpu = cputag_get_cpu(machine, "narc1");
-	soundalt_cpu = cputag_get_cpu(machine, "narc2");
+	sound_cpu = cputag_get_cpu(machine, "narc1cpu");
+	soundalt_cpu = cputag_get_cpu(machine, "narc2cpu");
 
 	/* configure master CPU banks */
-	ROM = memory_region(machine, "narc1");
+	ROM = memory_region(machine, "narc1cpu");
 	for (bank = 0; bank < 16; bank++)
 	{
 		/*
@@ -322,7 +322,7 @@ void williams_narc_init(running_machine *machine)
 	memory_set_bankptr(machine, 6, &ROM[0x10000 + 0x4000 + 0x8000 + 0x10000 + 0x20000 * 3]);
 
 	/* configure slave CPU banks */
-	ROM = memory_region(machine, "narc2");
+	ROM = memory_region(machine, "narc2cpu");
 	for (bank = 0; bank < 16; bank++)
 	{
 		/*

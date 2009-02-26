@@ -141,11 +141,11 @@ ADDRESS_MAP_END
 
 static MACHINE_DRIVER_START( magictg )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", R4600BE, 10000000)  // ?? what cpu?
+	MDRV_CPU_ADD("maincpu", R4600BE, 10000000)  // ?? what cpu?
 	MDRV_CPU_CONFIG(config)
 	MDRV_CPU_PROGRAM_MAP(magictg_map, 0)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -221,6 +221,6 @@ ROM_START( magictga )
 	#endif
 ROM_END
 
-GAME( 199?, magictg,  0,        magictg, magictg, 0, ROT0, "Acclaim", "Magic the Gathering: Armageddon (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 199?, magictga, magictg,  magictg, magictg, 0, ROT0, "Acclaim", "Magic the Gathering: Armageddon (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1997, magictg,  0,        magictg, magictg, 0, ROT0, "Acclaim", "Magic the Gathering: Armageddon (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1997, magictga, magictg,  magictg, magictg, 0, ROT0, "Acclaim", "Magic the Gathering: Armageddon (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
 

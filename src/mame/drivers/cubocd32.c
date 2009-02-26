@@ -234,7 +234,7 @@ static const cia6526_interface cia_1_intf =
 static MACHINE_DRIVER_START( cd32 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68EC020, AMIGA_68EC020_PAL_CLOCK) /* 14.3 Mhz */
+	MDRV_CPU_ADD("maincpu", M68EC020, AMIGA_68EC020_PAL_CLOCK) /* 14.3 Mhz */
 	MDRV_CPU_PROGRAM_MAP(cd32_map,0)
 
 	MDRV_MACHINE_RESET(amiga)
@@ -243,7 +243,7 @@ static MACHINE_DRIVER_START( cd32 )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(59.997)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -257,17 +257,17 @@ static MACHINE_DRIVER_START( cd32 )
 	MDRV_VIDEO_UPDATE(amiga)
 
 	/* sound hardware */
-    MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+    MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
     MDRV_SOUND_ADD("amiga", AMIGA, 3579545)
-    MDRV_SOUND_ROUTE(0, "left", 0.25)
-    MDRV_SOUND_ROUTE(1, "right", 0.25)
-    MDRV_SOUND_ROUTE(2, "right", 0.25)
-    MDRV_SOUND_ROUTE(3, "left", 0.25)
+    MDRV_SOUND_ROUTE(0, "lspeaker", 0.25)
+    MDRV_SOUND_ROUTE(1, "rspeaker", 0.25)
+    MDRV_SOUND_ROUTE(2, "rspeaker", 0.25)
+    MDRV_SOUND_ROUTE(3, "lspeaker", 0.25)
 
     MDRV_SOUND_ADD( "cdda", CDDA, 0 )
-	MDRV_SOUND_ROUTE( 0, "left", 0.50 )
-	MDRV_SOUND_ROUTE( 1, "right", 0.50 )
+	MDRV_SOUND_ROUTE( 0, "lspeaker", 0.50 )
+	MDRV_SOUND_ROUTE( 1, "rspeaker", 0.50 )
 
 	/* cia */
 	MDRV_CIA8520_ADD("cia_0", AMIGA_68EC020_PAL_CLOCK / 10, cia_0_intf)

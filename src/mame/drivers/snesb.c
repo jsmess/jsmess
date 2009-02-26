@@ -543,11 +543,11 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( kinstb )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", G65816, 3580000)	/* 2.68Mhz, also 3.58Mhz */
+	MDRV_CPU_ADD("maincpu", G65816, 3580000)	/* 2.68Mhz, also 3.58Mhz */
 	MDRV_CPU_PROGRAM_MAP(snesb_map, 0)
 
 	/* audio CPU */
-	MDRV_CPU_ADD("sound", SPC700, 2048000/2)	/* 2.048 Mhz, but internal divider */
+	MDRV_CPU_ADD("soundcpu", SPC700, 2048000/2)	/* 2.048 Mhz, but internal divider */
 	MDRV_CPU_PROGRAM_MAP(spc_mem, 0)
 
 	MDRV_QUANTUM_TIME(HZ(36000))
@@ -559,16 +559,16 @@ static MACHINE_DRIVER_START( kinstb )
 	MDRV_VIDEO_UPDATE( snes )
 
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_RAW_PARAMS(DOTCLK_NTSC, SNES_HTOTAL, 0, SNES_SCR_WIDTH, SNES_VTOTAL_NTSC, 0, SNES_SCR_HEIGHT_NTSC)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("snes", SNES, 0)
-	MDRV_SOUND_ROUTE(0, "left", 1.00)
-	MDRV_SOUND_ROUTE(1, "right", 1.00)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.00)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.00)
 MACHINE_DRIVER_END
 
 static DRIVER_INIT(kinstb)

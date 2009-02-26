@@ -256,6 +256,7 @@ CPUS += I8X41
 # only for MAME and so aren't included
 #-------------------------------------------------
 
+#SOUNDS += CUSTOM
 #SOUNDS += SAMPLES
 SOUNDS += DAC
 SOUNDS += DMADAC
@@ -301,8 +302,8 @@ SOUNDS += ASTROCADE
 #SOUNDS += TMC0281
 #SOUNDS += CD2802
 #SOUNDS += M58817
-#SOUNDS += TMC0285
-#SOUNDS += TMS5200
+SOUNDS += TMC0285
+SOUNDS += TMS5200
 SOUNDS += TMS5220
 #SOUNDS += VLM5030
 #SOUNDS += ADPCM
@@ -352,8 +353,6 @@ SOUNDS += SID6581
 SOUNDS += SID8580
 SOUNDS += SP0256
 #SOUNDS += DIGITALKER
-SOUNDS += TMS5200
-SOUNDS += TMC0285
 
 
 #-------------------------------------------------

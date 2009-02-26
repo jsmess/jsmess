@@ -239,9 +239,8 @@ static READ8_DEVICE_HANDLER( input_mux_r )
 		case 0x10: return input_port_read(device->machine, "PL1_3");
 		case 0x20: return input_port_read(device->machine, "PL2_3");
 	}
-//  printf("%04x\n",mux_data);
 
-	return 0xff;
+	return input_port_read(device->machine, "IN_NOMUX");
 }
 
 static READ8_DEVICE_HANDLER( input_system_r )
@@ -344,7 +343,7 @@ static WRITE8_HANDLER( slave_com_w )
  *************************************/
 
 static ADDRESS_MAP_START( cpu0_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 ADDRESS_MAP_END
 
@@ -363,7 +362,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_WRITENOP
+	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_WRITENOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu1_io, ADDRESS_SPACE_IO, 8 )
@@ -511,7 +510,57 @@ static INPUT_PORTS_START( jangou )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN_NOMUX")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( macha )
+	PORT_START("PL1_1")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("PL1_2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("PL2_1")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("PL2_2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("PL1_3")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("PL2_3")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN_NOMUX")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("1P A") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("1P B") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("1P C") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	/*The "unknown" bits for this port might be actually unused*/
+	PORT_START("SYSTEM")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Analyzer")
+	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( cntrygrl )
 	PORT_START("PL1_1")
@@ -591,6 +640,9 @@ static INPUT_PORTS_START( cntrygrl )
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x00, "1 Coin / 10 Credits"  )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // blitter busy flag
+
+	PORT_START("IN_NOMUX")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( jngolady )
@@ -641,7 +693,7 @@ static MACHINE_DRIVER_START( jangou )
 	MDRV_CPU_ADD("cpu0", Z80, MASTER_CLOCK / 8)
 	MDRV_CPU_PROGRAM_MAP(0, cpu0_map)
 	MDRV_CPU_IO_MAP(0, cpu0_io)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("cpu1", Z80, MASTER_CLOCK / 8)
 	MDRV_CPU_PROGRAM_MAP(0, cpu1_map)
@@ -650,7 +702,7 @@ static MACHINE_DRIVER_START( jangou )
 	/* video hardware */
 	MDRV_PALETTE_INIT(jangou)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -731,7 +783,7 @@ ROM_START( jangou )
 	ROM_LOAD( "jg07.bin", 0x04000, 0x02000, CRC(4b30d1fc) SHA1(6f240aa4b7a343f180446581fe95cf7da0fba57b) )
 	ROM_LOAD( "jg08.bin", 0x06000, 0x02000, CRC(bb078813) SHA1(a3b7df84629337c83307f49f52338aa983e531ba) )
 
-	ROM_REGION( 0x4000, "cpu1", 0 )
+	ROM_REGION( 0x10000, "cpu1", 0 )
 	ROM_LOAD( "jg03.bin", 0x00000, 0x02000, CRC(5a113e90) SHA1(7d9ae481680fc640e03f6836f60bccb933bbef31) )
 	ROM_LOAD( "jg04.bin", 0x02000, 0x02000, CRC(accd3ab5) SHA1(46a502801da7a56d73a984614f10b20897e340e8) )
 
@@ -741,6 +793,65 @@ ROM_START( jangou )
 
 	ROM_REGION( 0x20, "proms", 0 )
 	ROM_LOAD( "jg3_g.bin", 0x00, 0x20,  CRC(d389549d) SHA1(763486052b34f8a38247820109b114118a9f829f) )
+ROM_END
+
+/*
+
+Monoshiri Quiz Osyaberi Macha (c)1983 Logitec
+Same board as jangou
+
+CPU: Z80x2
+Sound: AY-3-8910, HC55536
+XTAL: 20.000MHz
+
+all EPROMs are 2764
+
+POM1.9D -- Programs
+POM2.9E |
+POM3.9F |
+POM4.9G |
+POM5.9H /
+
+POM6.9L -- Programs
+POM7.9M |
+POM8.9N |
+POM9.9P /
+
+POM10.5N -- Graphics
+POM11.5M |
+POM12.BIN|
+POM13.BIN /
+(12 and 13 is on small daughter board plugged into the socket 5L)
+
+IC3G.BIN - Color PROM
+
+RAM: HM6116LP-3 (16KbitSRAM location 9C, next to POM1)
+     M5K4164NP-15 (64KbitDRAM location 4E, 4F, 4G, 4H)
+
+*/
+
+ROM_START( macha )
+	ROM_REGION( 0x10000, "cpu0", 0 )
+	ROM_LOAD( "pom1.9d", 0x00000, 0x02000, CRC(fbe28b4e) SHA1(2617f8c107b64aa540158a772a725eb68982e095) )
+	ROM_LOAD( "pom2.9e", 0x02000, 0x02000, CRC(16a8d176) SHA1(30fe65d3a1744afc70c25c29119db3f5e7126601) )
+	ROM_LOAD( "pom3.9f", 0x04000, 0x02000, CRC(c31eeb04) SHA1(65d4873fcaff677f03721139dc80b2fe5108c633) )
+	ROM_LOAD( "pom4.9g", 0x06000, 0x02000, CRC(bdb0dd0e) SHA1(d8039fb9996e8707a0c5ca0760d4d6792bbe7270) )
+	ROM_LOAD( "pom5.9h", 0x08000, 0x02000, CRC(db6d86e8) SHA1(e9c0f52abd504f39187d0fb7de5b7fffc795204c) )
+
+	ROM_REGION( 0x10000, "cpu1", 0 )
+	ROM_LOAD( "pom9.9p", 0x00000, 0x02000, CRC(f4d4e0a8) SHA1(914fe35d4434b826ca3b0a230b87017b033dd512) )
+	ROM_LOAD( "pom8.9n", 0x02000, 0x02000, CRC(8be49178) SHA1(2233d964a25ef61063b97891f6ad46d6eb10b0c6) )
+	ROM_LOAD( "pom7.9m", 0x04000, 0x02000, CRC(48a89180) SHA1(36e916583cc89090880111320537b545620d95fd) )
+	ROM_LOAD( "pom6.9l", 0x06000, 0x02000, CRC(7dbafffe) SHA1(2f0c5a340625df30029874ca447f0662ea354547) )
+
+	ROM_REGION( 0x10000, "gfx", 0 )
+	ROM_LOAD( "pom10.5n",  0x00000, 0x02000, CRC(5e387db0) SHA1(72fd6d3ae722260cb50d1040faa128f3e5427402) )
+	ROM_LOAD( "pom11.5m",  0x02000, 0x02000, CRC(17b54f4e) SHA1(5ecbebc063b5eb888ec1dbf210f54fa3a774ab70) )
+	ROM_LOAD( "pom12.bin", 0x04000, 0x02000, CRC(5f1b73ca) SHA1(b8ce01a3975505a2a6b4d4c688b6c7ae4f6df07d) )
+	ROM_LOAD( "pom13.bin", 0x06000, 0x02000, CRC(91c489f2) SHA1(a4d2fcebdbdea73ca03722104732e7c6efda5d4d) )
+
+	ROM_REGION( 0x20, "proms", 0 )
+	ROM_LOAD( "ic3g.bin", 0x00, 0x20,  CRC(d5243aa5) SHA1(d70d5dcb1a3241bec16589ed2eb1cc0054c9ed8e) )
 ROM_END
 
 /*
@@ -893,11 +1004,12 @@ static DRIVER_INIT (luckygrl)
 }
 
 
-GAME( 1983, jangou,    0,    jangou,   jangou,    0,        ROT0, "Nichibutsu",   "Jangou [BET] (Japan)", GAME_NO_COCKTAIL )
-GAME( 1984, jngolady,  0,    jngolady, jngolady,  jngolady, ROT0, "Nichibutsu",   "Jangou Lady (Japan)", GAME_NO_COCKTAIL )
-GAME( 1984, cntrygrl,  0,    cntrygrl, cntrygrl,  0,        ROT0, "Royal Denshi", "Country Girl (Japan)",  GAME_NO_COCKTAIL )
+GAME( 1983, jangou,     0,    jangou,   jangou,    0,        ROT0, "Nichibutsu",   "Jangou [BET] (Japan)", GAME_NO_COCKTAIL )
+GAME( 1983, macha,      0,    jangou,   macha,     0,        ROT0, "Logitec",   "Monoshiri Quiz Osyaberi Macha (Japan)", GAME_NO_COCKTAIL )
+GAME( 1984, jngolady,   0,    jngolady, jngolady,  jngolady, ROT0, "Nichibutsu",   "Jangou Lady (Japan)", GAME_NO_COCKTAIL )
+GAME( 1984, cntrygrl,   0,    cntrygrl, cntrygrl,  0,        ROT0, "Royal Denshi", "Country Girl (Japan)",  GAME_NO_COCKTAIL )
 /* The following might not run there... */
-GAME( 1984?,luckygrl,  0,    cntrygrl, cntrygrl,  luckygrl, ROT0, "Wing", 		  "Lucky Girl? (Wing)", GAME_NOT_WORKING )
+GAME( 1984?,luckygrl,   0,    cntrygrl, cntrygrl,  luckygrl, ROT0, "Wing", 		  "Lucky Girl? (Wing)", GAME_NOT_WORKING )
 
 /*
 Some other games that might run on this HW:
@@ -908,5 +1020,4 @@ Some other games that might run on this HW:
     Hana Puter
     Royal Card
     Fruits Bunny (clone of Country Girl)
-    Monoshiri Quiz Osyaberi Macha (Logitec, same board as jangou)
 */

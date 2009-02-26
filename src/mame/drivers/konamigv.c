@@ -347,15 +347,15 @@ static const psx_spu_interface konamigv_psxspu_interface =
 
 static MACHINE_DRIVER_START( konamigv )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main",  PSXCPU, XTAL_67_7376MHz )
+	MDRV_CPU_ADD("maincpu",  PSXCPU, XTAL_67_7376MHz )
 	MDRV_CPU_PROGRAM_MAP( konamigv_map, 0 )
-	MDRV_CPU_VBLANK_INT("main", psx_vblank)
+	MDRV_CPU_VBLANK_INT("screen", psx_vblank)
 
 	MDRV_MACHINE_RESET( konamigv )
 	MDRV_NVRAM_HANDLER(konamigv_93C46)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE( 60 )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC( 0 ))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -369,16 +369,16 @@ static MACHINE_DRIVER_START( konamigv )
 	MDRV_VIDEO_UPDATE( psx )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD( "spu", PSXSPU, 0 )
 	MDRV_SOUND_CONFIG( konamigv_psxspu_interface )
-	MDRV_SOUND_ROUTE( 0, "left", 0.75 )
-	MDRV_SOUND_ROUTE( 1, "right", 0.75 )
+	MDRV_SOUND_ROUTE( 0, "lspeaker", 0.75 )
+	MDRV_SOUND_ROUTE( 1, "rspeaker", 0.75 )
 
 	MDRV_SOUND_ADD( "cdda", CDDA, 0 )
-	MDRV_SOUND_ROUTE( 0, "left", 1.0 )
-	MDRV_SOUND_ROUTE( 1, "right", 1.0 )
+	MDRV_SOUND_ROUTE( 0, "lspeaker", 1.0 )
+	MDRV_SOUND_ROUTE( 1, "rspeaker", 1.0 )
 MACHINE_DRIVER_END
 
 static INPUT_PORTS_START( konamigv )

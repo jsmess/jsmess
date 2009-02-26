@@ -2784,15 +2784,15 @@ static DRIVER_INIT( salarymc )
 
 static MACHINE_DRIVER_START( konami573 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main",  PSXCPU, XTAL_67_7376MHz )
+	MDRV_CPU_ADD("maincpu",  PSXCPU, XTAL_67_7376MHz )
 	MDRV_CPU_PROGRAM_MAP( konami573_map, 0 )
-	MDRV_CPU_VBLANK_INT("main", sys573_vblank)
+	MDRV_CPU_VBLANK_INT("screen", sys573_vblank)
 
 	MDRV_MACHINE_RESET( konami573 )
 	MDRV_NVRAM_HANDLER( konami573 )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE( 60 )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC( 0 ))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -2806,16 +2806,16 @@ static MACHINE_DRIVER_START( konami573 )
 	MDRV_VIDEO_UPDATE( psx )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD( "spu", PSXSPU, 0 )
 	MDRV_SOUND_CONFIG( konami573_psxspu_interface )
-	MDRV_SOUND_ROUTE( 0, "left", 1.0 )
-	MDRV_SOUND_ROUTE( 1, "right", 1.0 )
+	MDRV_SOUND_ROUTE( 0, "lspeaker", 1.0 )
+	MDRV_SOUND_ROUTE( 1, "rspeaker", 1.0 )
 
 	MDRV_SOUND_ADD( "cdda", CDDA, 0 )
-	MDRV_SOUND_ROUTE( 0, "left", 1.0 )
-	MDRV_SOUND_ROUTE( 1, "right", 1.0 )
+	MDRV_SOUND_ROUTE( 0, "lspeaker", 1.0 )
+	MDRV_SOUND_ROUTE( 1, "rspeaker", 1.0 )
 
 	MDRV_M48T58_ADD( "m48t58" )
 MACHINE_DRIVER_END

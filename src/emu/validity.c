@@ -162,14 +162,18 @@ INLINE int validate_tag(const game_driver *driver, const char *object, const cha
 	const char *begin = strrchr(tag, ':');
 	const char *p;
 	int error = FALSE;
-	
+
 	/* some common names that are now deprecated */
 	if (strcmp(tag, "main") == 0 ||
 		strcmp(tag, "audio") == 0 ||
-		strcmp(tag, "sound") == 0)
+		strcmp(tag, "sound") == 0 ||
+		strcmp(tag, "left") == 0 ||
+		strcmp(tag, "right") == 0)
 	{
+#ifndef MESS
 		mame_printf_error("%s: %s has invalid generic tag '%s'\n", driver->source_file, driver->name, tag);
 		error = TRUE;
+#endif /* MESS */
 	}
 
 	for (p = tag; *p != 0; p++)
@@ -679,18 +683,7 @@ static int validate_roms(int drivnum, const machine_config *config, region_info 
 						break;
 					}
 
-				/* if this is a bios rom, make sure it has the same flags as the last system bios entry */
-/*              bios_flags = ROM_GETBIOSFLAGS(romp);
-                if (bios_flags != 0)
-                {
-                    if (bios_flags != last_bios)
-                    {
-                        mame_printf_error("%s: %s has bios rom name %s without preceding matching system bios definition\n", driver->source_file, driver->name, last_name);
-                        error = TRUE;
-                    }
-                }*/
-
-				/* make sure the has is valid */
+				/* make sure the hash is valid */
 				hash = ROM_GETHASHDATA(romp);
 				if (!hash_verify_string(hash))
 				{
@@ -1552,9 +1545,20 @@ static int validate_devices(int drivnum, const machine_config *config)
 	for (device = device_list_first(config->devicelist, DEVICE_TYPE_WILDCARD); device != NULL; device = device_list_next(device, DEVICE_TYPE_WILDCARD))
 	{
 		device_validity_check_func validity_check = (device_validity_check_func) device_get_info_fct(device, DEVINFO_FCT_VALIDITY_CHECK);
+		const device_config *scandevice;
 
 		/* validate the device tag */
 		error |= validate_tag(driver, device_get_info_string(device, DEVINFO_STR_NAME), device->tag);
+
+		/* look for duplicates */
+		for (scandevice = device_list_first(config->devicelist, DEVICE_TYPE_WILDCARD); scandevice != device; scandevice = device_list_next(scandevice, DEVICE_TYPE_WILDCARD))
+			if (strcmp(scandevice->tag, device->tag) == 0)
+			{
+#ifndef MESS
+				mame_printf_warning("%s: %s has multiple devices with the tag '%s'\n", driver->source_file, driver->name, device->tag);
+				break;
+#endif /* MESS */
+			}
 
 		/* call the device-specific validity check */
 		if (validity_check != NULL && (*validity_check)(driver, device))

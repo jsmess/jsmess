@@ -350,6 +350,7 @@ DRVLIBS = \
 	$(MAMEOBJ)/jpm.a \
 	$(MAMEOBJ)/kaneko.a \
 	$(MAMEOBJ)/konami.a \
+	$(MAMEOBJ)/maygay.a \
 	$(MAMEOBJ)/meadows.a \
 	$(MAMEOBJ)/merit.a \
 	$(MAMEOBJ)/metro.a \
@@ -554,15 +555,18 @@ $(MAMEOBJ)/atlus.a: \
 	$(DRIVERS)/powerins.o $(VIDEO)/powerins.o \
 
 $(MAMEOBJ)/barcrest.a: \
+	$(VIDEO)/awpvid.o \
 	$(MACHINE)/meters.o \
 	$(DRIVERS)/mpu4.o \
 	$(DRIVERS)/mpu5.o \
 	$(MACHINE)/steppers.o \
 
 $(MAMEOBJ)/bfm.a: \
+	$(DRIVERS)/bfm_sc1.o \
+	$(DRIVERS)/bfmsys85.o \
 	$(DRIVERS)/bfcobra.o \
 	$(DRIVERS)/bfm_sc2.o $(VIDEO)/bfm_adr2.o \
-	$(MACHINE)/bfm_bd1.o $(VIDEO)/bfm_dm01.o $(VIDEO)/awpvid.o\
+	$(MACHINE)/bfm_bd1.o $(VIDEO)/bfm_dm01.o \
 
 $(MAMEOBJ)/bmc.a: \
 	$(DRIVERS)/bmcbowl.o \
@@ -835,6 +839,7 @@ $(MAMEOBJ)/kaneko.a: \
 	$(DRIVERS)/galpanic.o $(VIDEO)/galpanic.o \
 	$(DRIVERS)/galpani2.o $(VIDEO)/galpani2.o \
 	$(DRIVERS)/galpani3.o \
+	$(DRIVERS)/hvyunit.o \
 	$(DRIVERS)/jchan.o \
 	$(DRIVERS)/kaneko16.o $(MACHINE)/kaneko16.o $(VIDEO)/kaneko16.o \
 	$(DRIVERS)/expro02.o \
@@ -930,6 +935,10 @@ $(MAMEOBJ)/konami.a: \
 	$(DRIVERS)/zr107.o \
 	$(MACHINE)/konamiic.o $(VIDEO)/konamiic.o \
 
+$(MAMEOBJ)/maygay.a: \
+	$(DRIVERS)/maygay1b.o \
+	$(DRIVERS)/maygayv1.o \
+
 $(MAMEOBJ)/meadows.a: \
 	$(DRIVERS)/lazercmd.o $(VIDEO)/lazercmd.o \
 	$(DRIVERS)/meadows.o $(AUDIO)/meadows.o $(VIDEO)/meadows.o \
@@ -950,7 +959,7 @@ $(MAMEOBJ)/midcoin.a: \
 
 $(MAMEOBJ)/midw8080.a: \
 	$(DRIVERS)/8080bw.o $(AUDIO)/8080bw.o $(VIDEO)/8080bw.o \
-	$(DRIVERS)/m79amb.o \
+	$(DRIVERS)/m79amb.o $(AUDIO)/m79amb.o \
 	$(DRIVERS)/mw8080bw.o $(MACHINE)/mw8080bw.o $(AUDIO)/mw8080bw.o $(VIDEO)/mw8080bw.o \
 	$(DRIVERS)/rotaryf.o \
 	$(DRIVERS)/sspeedr.o $(VIDEO)/sspeedr.o \
@@ -991,6 +1000,7 @@ $(MAMEOBJ)/namco.a: \
 	$(DRIVERS)/galaxian.o $(AUDIO)/galaxian.o $(VIDEO)/galaxian.o \
 	$(DRIVERS)/galaxold.o $(MACHINE)/galaxold.o $(VIDEO)/galaxold.o \
 	$(DRIVERS)/gaplus.o $(MACHINE)/gaplus.o $(VIDEO)/gaplus.o \
+	$(DRIVERS)/kungfur.o \
 	$(DRIVERS)/mappy.o $(VIDEO)/mappy.o \
 	$(DRIVERS)/namcofl.o $(VIDEO)/namcofl.o \
 	$(DRIVERS)/namcoic.o \
@@ -1390,6 +1400,7 @@ $(MAMEOBJ)/taito.a: \
 	$(VIDEO)/taitoic.o \
 
 $(MAMEOBJ)/tatsumi.a: \
+	$(DRIVERS)/kingdrby.o \
 	$(DRIVERS)/tx1.o $(MACHINE)/tx1.o $(AUDIO)/tx1.o $(VIDEO)/tx1.o \
 	$(DRIVERS)/lockon.o $(VIDEO)/lockon.o \
 	$(DRIVERS)/tatsumi.o $(MACHINE)/tatsumi.o $(VIDEO)/tatsumi.o \
@@ -1685,6 +1696,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/hikaru.o \
 	$(DRIVERS)/cb2001.o \
 	$(DRIVERS)/sfbonus.o \
+	$(DRIVERS)/multfish.o \
 
 #-------------------------------------------------
 # layout dependencies
@@ -1710,6 +1722,8 @@ $(DRIVERS)/avalnche.o:	$(LAYOUT)/avalnche.lh
 $(DRIVERS)/highvdeo.o:	$(LAYOUT)/fashion.lh
 
 $(DRIVERS)/bzone.o:		$(LAYOUT)/bzone.lh
+
+$(DRIVERS)/bfm_sc1.o:	$(LAYOUT)/bfm_sc1.lh
 
 $(DRIVERS)/bfm_sc2.o:	$(LAYOUT)/bfm_sc2.lh \
 						$(LAYOUT)/awpdmd.lh \
@@ -1763,7 +1777,8 @@ $(DRIVERS)/magic10.o:	$(LAYOUT)/sgsafari.lh
 $(DRIVERS)/maxaflex.o:	$(LAYOUT)/maxaflex.lh
 
 $(DRIVERS)/mpu4.o:		$(LAYOUT)/mpu4.lh \
-						$(LAYOUT)/connect4.lh
+						$(LAYOUT)/connect4.lh \
+						$(LAYOUT)/gamball.lh
 
 $(DRIVERS)/mw8080bw.o:	$(LAYOUT)/clowns.lh \
 						$(LAYOUT)/invaders.lh \

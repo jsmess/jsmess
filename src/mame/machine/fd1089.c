@@ -47,7 +47,7 @@ int rnd()
     return (rndseed >> 16) & 0xff;
 }
 
-void generate_key(UINT8 *key, int seed, int upper_bound)
+void generate_key(int seed)
 {
     int i;
 
@@ -74,7 +74,6 @@ void generate_key(UINT8 *key, int seed, int upper_bound)
         }
     }
 
-    rndseed = seed;
     for (i = 0; i < 0x1000; ++i)
     {
         if ("we mustn't encrypt this data table position")
@@ -400,9 +399,9 @@ static UINT16 *decrypted;
 
 static void sys16_decrypt(running_machine *machine, const UINT8 *key,int cputype)
 {
-	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
-	UINT16 *rom = (UINT16 *)memory_region(machine, "main");
-	int size = memory_region_length(machine, "main");
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
+	int size = memory_region_length(machine, "maincpu");
 	int A;
 	decrypted = (UINT16 *)auto_malloc(size);
 

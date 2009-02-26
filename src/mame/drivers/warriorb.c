@@ -169,7 +169,7 @@ static INT32 banknum;
 
 static void reset_sound_region(running_machine *machine)
 {
-	memory_set_bankptr(machine,  10, memory_region(machine, "audio") + (banknum * 0x4000) + 0x10000 );
+	memory_set_bankptr(machine,  10, memory_region(machine, "audiocpu") + (banknum * 0x4000) + 0x10000 );
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
@@ -447,11 +447,11 @@ static DEVICE_GET_INFO( subwoofer )
 static MACHINE_DRIVER_START( darius2d )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 12000000)	/* 12 MHz ??? (Might well be 16!) */
+	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz ??? (Might well be 16!) */
 	MDRV_CPU_PROGRAM_MAP(darius2d_map,0)
-	MDRV_CPU_VBLANK_INT("left", irq4_line_hold)
+	MDRV_CPU_VBLANK_INT("lscreen", irq4_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80,16000000/4)	/* 4 MHz ? */
+	MDRV_CPU_ADD("audiocpu", Z80,16000000/4)	/* 4 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(z80_sound_map,0)
 
 	MDRV_MACHINE_START( warriorb )
@@ -462,14 +462,14 @@ static MACHINE_DRIVER_START( darius2d )
 	MDRV_PALETTE_LENGTH(4096*2)
 	MDRV_DEFAULT_LAYOUT(layout_dualhsxs)
 
-	MDRV_SCREEN_ADD("left", RASTER)
+	MDRV_SCREEN_ADD("lscreen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 3*8, 32*8-1)
 
-	MDRV_SCREEN_ADD("right", RASTER)
+	MDRV_SCREEN_ADD("rscreen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -480,36 +480,36 @@ static MACHINE_DRIVER_START( darius2d )
 	MDRV_VIDEO_UPDATE(warriorb)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ym", YM2610, 16000000/2)
 	MDRV_SOUND_CONFIG(ym2610_config)
-	MDRV_SOUND_ROUTE(0, "left",  0.25)
-	MDRV_SOUND_ROUTE(0, "right", 0.25)
+	MDRV_SOUND_ROUTE(0, "lspeaker",  0.25)
+	MDRV_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MDRV_SOUND_ROUTE(1, "2610.1.l", 1.0)
 	MDRV_SOUND_ROUTE(1, "2610.1.r", 1.0)
 	MDRV_SOUND_ROUTE(2, "2610.2.l", 1.0)
 	MDRV_SOUND_ROUTE(2, "2610.2.r", 1.0)
 
 	MDRV_SOUND_ADD("2610.1.l", FILTER_VOLUME, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ADD("2610.1.r", FILTER_VOLUME, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 	MDRV_SOUND_ADD("2610.2.l", FILTER_VOLUME, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ADD("2610.2.r", FILTER_VOLUME, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( warriorb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 16000000)	/* 16 MHz ? */
+	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(warriorb_map,0)
-	MDRV_CPU_VBLANK_INT("left", irq4_line_hold)
+	MDRV_CPU_VBLANK_INT("lscreen", irq4_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80,16000000/4)	/* 4 MHz ? */
+	MDRV_CPU_ADD("audiocpu", Z80,16000000/4)	/* 4 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(z80_sound_map,0)
 
 	MDRV_MACHINE_START( warriorb )
@@ -520,14 +520,14 @@ static MACHINE_DRIVER_START( warriorb )
 	MDRV_PALETTE_LENGTH(4096*2)
 	MDRV_DEFAULT_LAYOUT(layout_dualhsxs)
 
-	MDRV_SCREEN_ADD("left", RASTER)
+	MDRV_SCREEN_ADD("lscreen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
 
-	MDRV_SCREEN_ADD("right", RASTER)
+	MDRV_SCREEN_ADD("rscreen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -538,25 +538,25 @@ static MACHINE_DRIVER_START( warriorb )
 	MDRV_VIDEO_UPDATE(warriorb)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ym", YM2610, 16000000/2)
 	MDRV_SOUND_CONFIG(ym2610_config)
-	MDRV_SOUND_ROUTE(0, "left",  0.25)
-	MDRV_SOUND_ROUTE(0, "right", 0.25)
+	MDRV_SOUND_ROUTE(0, "lspeaker",  0.25)
+	MDRV_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MDRV_SOUND_ROUTE(1, "2610.1.l", 1.0)
 	MDRV_SOUND_ROUTE(1, "2610.1.r", 1.0)
 	MDRV_SOUND_ROUTE(2, "2610.2.l", 1.0)
 	MDRV_SOUND_ROUTE(2, "2610.2.r", 1.0)
 
 	MDRV_SOUND_ADD("2610.1.l", FILTER_VOLUME, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ADD("2610.1.r", FILTER_VOLUME, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 	MDRV_SOUND_ADD("2610.2.l", FILTER_VOLUME, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ADD("2610.2.r", FILTER_VOLUME, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 
@@ -565,7 +565,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( darius2d )
-	ROM_REGION( 0x100000, "main", 0 )	/* 512K for 68000 code */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 512K for 68000 code */
 	ROM_LOAD16_BYTE( "c07_20-2.74", 0x00000, 0x20000, CRC(a0f345b8) SHA1(1ce46e9707ec9ad51b26acf613eedc0536d227ae) )
 	ROM_LOAD16_BYTE( "c07_19-2.73", 0x00001, 0x20000, CRC(925412c6) SHA1(7f1f62b7b2261c440dccd512ebd3faea141b7c83) )
 	ROM_LOAD16_BYTE( "c07_21-2.76", 0x40000, 0x20000, CRC(bdd60e37) SHA1(777d3f67deba7df0da9d2605b2e2198f4bf47ebc) )
@@ -573,7 +573,7 @@ ROM_START( darius2d )
 
 	ROM_LOAD16_WORD_SWAP( "c07-09.75",   0x80000, 0x80000, CRC(cc69c2ce) SHA1(47883b9e14d8b6dd74db221bff396477231938f2) )	/* data rom */
 
-	ROM_REGION( 0x2c000, "audio", 0 )	/* sound cpu */
+	ROM_REGION( 0x2c000, "audiocpu", 0 )	/* sound cpu */
 	ROM_LOAD( "c07-17.69", 0x00000, 0x04000, CRC(ae16c905) SHA1(70ba5aacd8a8e00b94719e3955abad8827c67aa8) )
 	ROM_CONTINUE(          0x10000, 0x1c000 ) /* banked stuff */
 
@@ -611,7 +611,7 @@ ROM_START( darius2d )
 ROM_END
 
 ROM_START( drius2do )
-	ROM_REGION( 0x100000, "main", 0 )	/* 512K for 68000 code */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 512K for 68000 code */
 	ROM_LOAD16_BYTE( "c07_20-1.74", 0x00000, 0x20000, CRC(48b0804a) SHA1(932fb2cd55e6bfef84cf3cfaf3e75b4297a92b34) )
 	ROM_LOAD16_BYTE( "c07_19-1.73", 0x00001, 0x20000, CRC(1f9a4f83) SHA1(d02caef350bdcac0ff771b5c92bb4e7435e0c9fa) )
 	ROM_LOAD16_BYTE( "c07_21-1.76", 0x40000, 0x20000, CRC(b491b0ca) SHA1(dd7aa196c6002abc8e2f885f3f997f2279e59769) )
@@ -619,7 +619,7 @@ ROM_START( drius2do )
 
 	ROM_LOAD16_WORD_SWAP( "c07-09.75",   0x80000, 0x80000, CRC(cc69c2ce) SHA1(47883b9e14d8b6dd74db221bff396477231938f2) )	/* data rom */
 
-	ROM_REGION( 0x2c000, "audio", 0 )	/* sound cpu */
+	ROM_REGION( 0x2c000, "audiocpu", 0 )	/* sound cpu */
 	ROM_LOAD( "c07-17.69", 0x00000, 0x04000, CRC(ae16c905) SHA1(70ba5aacd8a8e00b94719e3955abad8827c67aa8) )
 	ROM_CONTINUE(          0x10000, 0x1c000 ) /* banked stuff */
 
@@ -653,7 +653,7 @@ ROM_START( drius2do )
 ROM_END
 
 ROM_START( warriorb )
-	ROM_REGION( 0x200000, "main", 0 )	/* 1024K for 68000 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )	/* 1024K for 68000 code */
 	ROM_LOAD16_BYTE( "d24_20-1.74", 0x000000, 0x40000, CRC(4452dc25) SHA1(bbb4fbc25a3f263ce2716698cacaca201cb9591b) )
 	ROM_LOAD16_BYTE( "d24_19-1.73", 0x000001, 0x40000, CRC(15c16016) SHA1(5b28834d8d5296c562c90a861c6ccdd46cc3c204) )
 	ROM_LOAD16_BYTE( "d24_21-1.76", 0x080000, 0x40000, CRC(783ef8e1) SHA1(28a43d5231031b2ff3e437c3b6b8604f0d2b521b) )
@@ -662,7 +662,7 @@ ROM_START( warriorb )
 	ROM_LOAD16_WORD_SWAP( "d24-09.75",   0x100000, 0x100000, CRC(ece5cc59) SHA1(337db41d5a74fa4202b1be1a672a068ec3b205a8) )	/* data rom */
 	/* Note: Raine wrongly doubles up d24-09 as delta-t samples */
 
-	ROM_REGION( 0x2c000, "audio", 0 )	/* sound cpu */
+	ROM_REGION( 0x2c000, "audiocpu", 0 )	/* sound cpu */
 	ROM_LOAD( "d24_17.69",  0x00000, 0x04000, CRC(e41e4aae) SHA1(9bf40b6e8aa5c6ec62c5d21edbb2214f6550c94f) )
 	ROM_CONTINUE(           0x10000, 0x1c000 ) /* banked stuff */
 

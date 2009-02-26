@@ -250,4 +250,3 @@ ROM_END
 CONS( 1995, sfach,    sfzch,    0,	cps1_10MHz, sfzch,    cps1,     NULL,   "Capcom", "CPS Changer - Street Fighter Alpha - Warriors' Dreams (Publicity US 950727)", 0 )
 CONS( 1995, sfzch,    0,        0,	cps1_10MHz, sfzch,    cps1,     NULL,   "Capcom", "CPS Changer - Street Fighter Zero (Japan 951020)", 0 )
 CONS( 1995, sfzbch,   sfzch,    0,	cps1_10MHz, sfzch,    cps1,     NULL,   "Hack",   "CPS Changer - Street Fighter Alpha (Brazil 950727)", 0 )
-CONS( 1995, wofch,    0,        0,	qsound,     sfzch,    wof,      NULL,   "Capcom", "CPS Changer - Tenchi Wo Kurau II (Japan 921031)", 0 )

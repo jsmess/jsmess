@@ -9,8 +9,7 @@
 
      -- the main CPU is a 68340, which is a 32-bit 680xx variant with modified opcodes etc.
 
-     -- should there be a bios using an 8-bit cpu like MPU4, or is the 68340 the only CPU?
-
+     -- Much of the communication is done via a 68681 DUART.
 */
 
 #include "driver.h"
@@ -24,22 +23,22 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START(  mpu5 )
 INPUT_PORTS_END
 
-VIDEO_START(mpu5)
+static VIDEO_START(mpu5)
 {
 
 }
 
-VIDEO_UPDATE(mpu5)
+static VIDEO_UPDATE(mpu5)
 {
 	return 0;
 }
 
 static MACHINE_DRIVER_START( mpu5 )
-	MDRV_CPU_ADD("main", M68EC020, 16000000)	 // ?
+	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)	 // ?
 	MDRV_CPU_PROGRAM_MAP(mpu5_map,0)
 
 	/* actually non-video? */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -51,12 +50,12 @@ static MACHINE_DRIVER_START( mpu5 )
 	MDRV_VIDEO_START(mpu5)
 	MDRV_VIDEO_UPDATE(mpu5)
 
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	/* unknown sound */
 MACHINE_DRIVER_END
 
 ROM_START( m_honmon )
-	ROM_REGION( 0x300000, "main", 0 ) /* Code */
+	ROM_REGION( 0x300000, "maincpu", 0 ) /* Code */
 	ROM_LOAD16_BYTE( "hmo_23s.p1", 0x000000, 0x80000, CRC(b3a44b47) SHA1(f54399bb1cc01fd4d615bd2c1a539c132b99d811) )
 	ROM_LOAD16_BYTE( "hmo_23l.p2", 0x000001, 0x80000, CRC(09e116f7) SHA1(0d94b957f4bb3ef6aa10511c69e51d5400698622) )
 	ROM_LOAD16_BYTE( "hmo_23l.p3", 0x100000, 0x80000, CRC(072b4af0) SHA1(799280cd27e53e167f28c5ad71868e8cd29b0200) )

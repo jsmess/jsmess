@@ -90,7 +90,7 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0400, 0x07ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x3000, 0x3007) AM_READ(runaway_input_r)
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("4000")
-	AM_RANGE(0x5000, 0x5000) AM_READ(atari_vg_earom_r)
+	AM_RANGE(0x5000, 0x5000) AM_DEVREAD(ATARIVGEAROM, "earom", atari_vg_earom_r)
 	AM_RANGE(0x6000, 0x600f) AM_DEVREAD(SOUND, "pokey1", pokey_r)
 	AM_RANGE(0x7000, 0x700f) AM_DEVREAD(SOUND, "pokey2", pokey_r)
 	AM_RANGE(0x8000, 0xcfff) AM_READ(SMH_ROM)
@@ -103,8 +103,8 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0400, 0x07bf) AM_WRITE(runaway_video_ram_w) AM_BASE(&runaway_video_ram)
 	AM_RANGE(0x07c0, 0x07ff) AM_WRITE(SMH_RAM) AM_BASE(&runaway_sprite_ram)
 	AM_RANGE(0x1000, 0x1000) AM_WRITE(runaway_irq_ack_w)
-	AM_RANGE(0x1400, 0x143F) AM_WRITE(atari_vg_earom_w)
-	AM_RANGE(0x1800, 0x1800) AM_WRITE(atari_vg_earom_ctrl_w)
+	AM_RANGE(0x1400, 0x143F) AM_DEVWRITE(ATARIVGEAROM, "earom", atari_vg_earom_w)
+	AM_RANGE(0x1800, 0x1800) AM_DEVWRITE(ATARIVGEAROM, "earom", atari_vg_earom_ctrl_w)
 	AM_RANGE(0x1c00, 0x1c0f) AM_WRITE(runaway_paletteram_w)
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(SMH_NOP) /* coin counter? */
 	AM_RANGE(0x2001, 0x2001) AM_WRITE(SMH_NOP) /* coin counter? */
@@ -362,14 +362,15 @@ static const pokey_interface pokey_interface_2 =
 static MACHINE_DRIVER_START( runaway )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, 12096000 / 8) /* ? */
+	MDRV_CPU_ADD("maincpu", M6502, 12096000 / 8) /* ? */
 	MDRV_CPU_PROGRAM_MAP(readmem, writemem)
 
 	MDRV_MACHINE_RESET(runaway)
-	MDRV_NVRAM_HANDLER(atari_vg)
+
+	MDRV_ATARIVGEAROM_ADD("earom")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 263)
@@ -409,7 +410,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( runaway )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "choo8000.d1", 0x8000, 0x1000, CRC(35794abe) SHA1(5ce872bda8bb2ed4888ba8b47ecd1afbe24b22eb) )
 	ROM_LOAD( "choo9000.d1", 0x9000, 0x1000, CRC(0d63756d) SHA1(2549a57ca106635f5c53ea1b03f5a0d6e901ab47) )
 	ROM_LOAD( "chooa000.e1", 0xa000, 0x1000, CRC(e6806b6b) SHA1(c260eaa35cbc46f0c0fd4006ec6d04315c3bb851) )
@@ -425,7 +426,7 @@ ROM_END
 
 
 ROM_START( qwak )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "qwak8000.bin", 0x8000, 0x1000, CRC(4d002d8a) SHA1(8621e7ec1ab3cb8d003858227e858354cd79dbf1) )
 	ROM_LOAD( "qwak9000.bin", 0x9000, 0x1000, CRC(e0c78fd7) SHA1(f5f397950971d12a7ae47fc64aa8f5751463b8a5) )
 	ROM_LOAD( "qwaka000.bin", 0xa000, 0x1000, CRC(e5770fc9) SHA1(c9556e9c2f7b6c37755ac9f10d95027118317b4a) )

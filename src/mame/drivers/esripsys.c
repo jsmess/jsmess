@@ -554,7 +554,7 @@ static READ8_HANDLER( tms5220_r )
 	if (offset == 0)
 	{
 		/* TMS5220 core returns status bits in D7-D6 */
-		const device_config *tms = devtag_get_device(space->machine, SOUND, "tms");
+		const device_config *tms = devtag_get_device(space->machine, SOUND, "tms5220nl");
 		UINT8 status = tms5220_status_r(tms, 0);
 
 		status = ((status & 0x80) >> 5) | ((status & 0x40) >> 5) | ((status & 0x20) >> 5);
@@ -567,7 +567,7 @@ static READ8_HANDLER( tms5220_r )
 /* TODO: Implement correctly using the state PROM */
 static WRITE8_HANDLER( tms5220_w )
 {
-	const device_config *tms = devtag_get_device(space->machine, SOUND, "tms");
+	const device_config *tms = devtag_get_device(space->machine, SOUND, "tms5220nl");
 	if (offset == 0)
 	{
 		tms_data = data;
@@ -737,7 +737,7 @@ static const esrip_config rip_config =
 static MACHINE_DRIVER_START( esripsys )
 	MDRV_CPU_ADD("game_cpu", M6809E, XTAL_8MHz)
 	MDRV_CPU_PROGRAM_MAP(game_cpu_map, 0)
-	MDRV_CPU_VBLANK_INT("main", esripsys_vblank_irq)
+	MDRV_CPU_VBLANK_INT("screen", esripsys_vblank_irq)
 
 	MDRV_CPU_ADD("frame_cpu", M6809E, XTAL_8MHz)
 	MDRV_CPU_PROGRAM_MAP(frame_cpu_map, 0)
@@ -752,7 +752,7 @@ static MACHINE_DRIVER_START( esripsys )
 	MDRV_NVRAM_HANDLER(esripsys)
 
 	/* Video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_RAW_PARAMS(ESRIPSYS_PIXEL_CLOCK, ESRIPSYS_HTOTAL, ESRIPSYS_HBLANK_END, ESRIPSYS_HBLANK_START, ESRIPSYS_VTOTAL, ESRIPSYS_VBLANK_END, ESRIPSYS_VBLANK_START)
 

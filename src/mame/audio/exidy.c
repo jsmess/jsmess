@@ -388,7 +388,7 @@ static DEVICE_START( common_sh_start )
     sh6840_register_state_globals(device->machine);
 }
 
-DEVICE_START( exidy_sound )
+static DEVICE_START( exidy_sound )
 {
 	/* indicate no additional hardware */
 	has_sh8253  = FALSE;
@@ -794,7 +794,7 @@ ADDRESS_MAP_END
 
 MACHINE_DRIVER_START( venture_audio )
 
-	MDRV_CPU_ADD("audio", M6502, 3579545/4)
+	MDRV_CPU_ADD("audiocpu", M6502, 3579545/4)
 	MDRV_CPU_PROGRAM_MAP(venture_audio_map,0)
 
 	MDRV_RIOT6532_ADD("riot", SH6532_CLOCK, r6532_interface)
@@ -855,7 +855,7 @@ ADDRESS_MAP_END
 
 MACHINE_DRIVER_START( mtrap_cvsd_audio )
 
-	MDRV_CPU_ADD("cvsd", Z80, CVSD_Z80_CLOCK)
+	MDRV_CPU_ADD("cvsdcpu", Z80, CVSD_Z80_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(cvsd_map,0)
 	MDRV_CPU_IO_MAP(cvsd_iomap,0)
 
@@ -1005,7 +1005,7 @@ ADDRESS_MAP_END
 
 MACHINE_DRIVER_START( victory_audio )
 
-	MDRV_CPU_ADD("audio", M6502, VICTORY_AUDIO_CPU_CLOCK)
+	MDRV_CPU_ADD("audiocpu", M6502, VICTORY_AUDIO_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(victory_audio_map,0)
 
 	MDRV_RIOT6532_ADD("riot", SH6532_CLOCK, r6532_interface)

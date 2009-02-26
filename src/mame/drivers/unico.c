@@ -654,14 +654,14 @@ static NVRAM_HANDLER( zeropnt2 )
 static MACHINE_DRIVER_START( burglarx )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 16000000)
+	MDRV_CPU_ADD("maincpu", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(readmem_burglarx,writemem_burglarx)
-	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
 	MDRV_MACHINE_RESET(unico)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -675,16 +675,16 @@ static MACHINE_DRIVER_START( burglarx )
 	MDRV_VIDEO_UPDATE(unico)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ym", YM3812, 3579545) /* 14.31818MHz OSC divided by 4 */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.40)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.40)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.80)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.80)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 MACHINE_DRIVER_END
 
 
@@ -701,14 +701,14 @@ static MACHINE_RESET( zeropt )
 static MACHINE_DRIVER_START( zeropnt )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 16000000)
+	MDRV_CPU_ADD("maincpu", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(readmem_zeropnt,writemem_zeropnt)
-	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
 	MDRV_MACHINE_RESET(zeropt)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -722,16 +722,16 @@ static MACHINE_DRIVER_START( zeropnt )
 	MDRV_VIDEO_UPDATE(unico)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ym", YM3812, 3579545) /* 14.31818MHz OSC divided by 4 */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.40)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.40)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.80)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.80)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 MACHINE_DRIVER_END
 
 
@@ -743,16 +743,16 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( zeropnt2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68EC020, 16000000)
+	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)
 	MDRV_CPU_PROGRAM_MAP(readmem_zeropnt2,writemem_zeropnt2)
-	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
 	MDRV_MACHINE_RESET(zeropt)
 
 	MDRV_NVRAM_HANDLER(zeropnt2)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -766,19 +766,19 @@ static MACHINE_DRIVER_START( zeropnt2 )
 	MDRV_VIDEO_UPDATE(zeropnt2)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ym", YM2151, 3579545)
-	MDRV_SOUND_ROUTE(0, "left", 0.70)
-	MDRV_SOUND_ROUTE(1, "right", 0.70)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.70)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.70)
 
 	MDRV_SOUND_ADD("oki1", OKIM6295, 1056000)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.40)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 
 	MDRV_SOUND_ADD("oki2", OKIM6295, 3960000)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.20)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.20)
 MACHINE_DRIVER_END
 
 
@@ -805,7 +805,7 @@ by Unico
 
 ROM_START( burglarx )
 
-	ROM_REGION( 0x100000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "bx-rom2.pgm", 0x000000, 0x080000, CRC(f81120c8) SHA1(f0240cf9aceb755e3c920bc3bcae0a9de29fd8c1) )
 	ROM_LOAD16_BYTE( "bx-rom3.pgm", 0x000001, 0x080000, CRC(080b4e82) SHA1(7eb08a7ea7684297e879123ae7ddc88d7fc1b87b) )
 
@@ -871,7 +871,7 @@ zpscrz08.BIN  -/
 ***************************************************************************/
 
 ROM_START( zeropnt )
-	ROM_REGION( 0x100000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "zero_2.bin", 0x000000, 0x080000, CRC(1e599509) SHA1(5a562a3c85700126b95fbdf21ef8c0ddd35d9037) )
 	ROM_LOAD16_BYTE( "zero_3.bin", 0x000001, 0x080000, CRC(588aeef7) SHA1(0dfa22c9e7b1fe493c16160b1ac76fa4d3bb2e68) )
 
@@ -894,7 +894,7 @@ ROM_END
 
 
 ROM_START( zeropnta )
-	ROM_REGION( 0x100000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "zpa2.bin", 0x000000, 0x080000, CRC(285fbca3) SHA1(61f8d48388a666ed9300c0688fbf844e316b8892) )
 	ROM_LOAD16_BYTE( "zpa3.bin", 0x000001, 0x080000, CRC(ad7b3129) SHA1(d814b5d9336d011386aa0b316b11225e5ea799fc) )
 
@@ -1078,7 +1078,7 @@ BrianT
 ***************************************************************************/
 
 ROM_START( zeropnt2 )
-	ROM_REGION( 0x200000, "main", 0 )		/* 68020 Code */
+	ROM_REGION( 0x200000, "maincpu", 0 )		/* 68020 Code */
 	ROM_LOAD32_WORD_SWAP( "d16-d31.4", 0x000000, 0x100000, CRC(48314fdb) SHA1(a5bdb6a3f520587ff5e73438dc414cfdff34167b) )
 	ROM_LOAD32_WORD_SWAP( "d0-d15.3",  0x000002, 0x100000, CRC(5ec4151e) SHA1(f7c857bdb6a92f76f09a089b37def7e6cf24b65a) )
 

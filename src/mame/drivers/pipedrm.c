@@ -124,11 +124,11 @@ static UINT8 sound_command;
 static MACHINE_RESET( pipedrm )
 {
 	/* initialize main Z80 bank */
-	memory_configure_bank(machine, 1, 0, 8, memory_region(machine, "main") + 0x10000, 0x2000);
+	memory_configure_bank(machine, 1, 0, 8, memory_region(machine, "maincpu") + 0x10000, 0x2000);
 	memory_set_bank(machine, 1, 0);
 
 	/* initialize sound bank */
-	memory_configure_bank(machine, 2, 0, 2, memory_region(machine, "audio") + 0x10000, 0x8000);
+	memory_configure_bank(machine, 2, 0, 2, memory_region(machine, "audiocpu") + 0x10000, 0x8000);
 	memory_set_bank(machine, 2, 0);
 	/* state save */
 	state_save_register_global(machine, pending_command);
@@ -549,19 +549,19 @@ static const ym2610_interface ym2610_config =
 static MACHINE_DRIVER_START( pipedrm )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,12000000/2)
+	MDRV_CPU_ADD("maincpu", Z80,12000000/2)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_portmap,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80,14318000/4)
+	MDRV_CPU_ADD("audiocpu", Z80,14318000/4)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_portmap,0)
 
 	MDRV_MACHINE_RESET(pipedrm)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -588,19 +588,19 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( hatris )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,12000000/2)
+	MDRV_CPU_ADD("maincpu", Z80,12000000/2)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_portmap,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80,14318000/4)
+	MDRV_CPU_ADD("audiocpu", Z80,14318000/4)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(hatris_sound_portmap,0)
 
 	MDRV_MACHINE_RESET(pipedrm)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -632,11 +632,45 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( pipedrm )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "y1.u129",	0x00000, 0x08000, CRC(9b4d84a2) SHA1(82c26cf52b37ca3bcc10a534759e7bb52b1daa2d) )
+	ROM_LOAD( "yb.u110",	0x10000, 0x10000, CRC(7416554a) SHA1(612aff94da3ec282e200c07eae9af26a28e071bd) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )
+	ROM_LOAD( "4",	0x00000, 0x08000, CRC(497fad4c) SHA1(f151543a0c4a1d6d5d2de5e1dc12fd59dabcf1a8) )
+	ROM_LOAD( "3",	0x10000, 0x10000, CRC(4800322a) SHA1(a616c497ac18351b68b8307050a2a62c717a7873) )
+
+	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD( "s73",    0x000000, 0x80000, CRC(63f4e10c) SHA1(ba935490578887080d8b16508fa6191236a8fea6) )
+	ROM_LOAD( "s72",    0x080000, 0x80000, CRC(4e669e97) SHA1(1de8a8cd8f8f69fa86b8fe2c73c6997e7a89c706) )
+
+	ROM_REGION( 0x100000, "gfx2", ROMREGION_DISPOSE )
+	ROM_LOAD( "s71",    0x000000, 0x80000, CRC(431485ee) SHA1(70a2ba5338598db9fcd9ef2be46e5cc2fd9510ee) )
+	ROM_COPY( "gfx1", 0x080000, 0x080000, 0x80000 )
+
+	ROM_REGION( 0x080000, "gfx3", ROMREGION_DISPOSE )
+	ROM_LOAD16_BYTE( "a30", 0x00000, 0x40000, CRC(50bc5e98) SHA1(b351af780d04e67a560935a9eeaedf597ac5bb1f) )
+	ROM_LOAD16_BYTE( "a29", 0x00001, 0x40000, CRC(a240a448) SHA1(d64169258e91eb09e8685bcdd96b16bf56e82ef1) )
+
+	ROM_REGION( 0x80000, "ym", 0 )
+	ROM_LOAD( "g71",     0x00000, 0x80000, CRC(488e2fd1) SHA1(8ef8ceb2bd36a245138802f51babf62f17c30942) )
+
+	ROM_REGION( 0x80000, "ym.deltat", 0 )
+	ROM_LOAD( "g72",     0x00000, 0x80000, CRC(dc3d14be) SHA1(4220f3fd13487dd861ac84b1b0d3e92125b3cc19) )
+
+	ROM_REGION( 0x0800, "plds", ROMREGION_DISPOSE )
+	ROM_LOAD( "palce16v8h.114", 0x0000, 0x0117, CRC(1f3a3816) SHA1(2b4d84ab98036b8861961f610b1b1ec23a653ef7) )
+	ROM_LOAD( "gal16v8a.115",   0x0200, 0x0117, CRC(2b32e239) SHA1(a3b9e45a1ce15ea4cc5754b2bf89cbaa416e814a) )
+	ROM_LOAD( "gal16v8a.116",   0x0400, 0x0117, CRC(3674f043) SHA1(06c88f65877a6575149bdd4f7cea64cd310227bd) )
+	ROM_LOAD( "gal16v8a.127",   0x0600, 0x0117, CRC(7115d95c) SHA1(23044039373b5a2face63d72c3fc6bf7f0c8a475) )
+ROM_END
+
+ROM_START( pipedrmu )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "01.u12",	0x00000, 0x08000, CRC(9fe261fb) SHA1(57beeeade8809be0a71086f55b14b1676c0b3759) )
 	ROM_LOAD( "02.u11",	0x10000, 0x10000, CRC(c8209b67) SHA1(cca7356d75e8091b07e3328aef523ff452abbcd8) )
 
-	ROM_REGION( 0x20000, "audio", 0 )
+	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "4",	0x00000, 0x08000, CRC(497fad4c) SHA1(f151543a0c4a1d6d5d2de5e1dc12fd59dabcf1a8) )
 	ROM_LOAD( "3",	0x10000, 0x10000, CRC(4800322a) SHA1(a616c497ac18351b68b8307050a2a62c717a7873) )
 
@@ -667,11 +701,11 @@ ROM_END
 
 
 ROM_START( pipedrmj )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "1",	0x00000, 0x08000, CRC(dbfac46b) SHA1(98ddfaed61de28b238964445572eb398b9dd03c7) )
 	ROM_LOAD( "2",	0x10000, 0x10000, CRC(b7adb99a) SHA1(fdab2b99e86aa0b6b17ec95556222e5211ba55e9) )
 
-	ROM_REGION( 0x20000, "audio", 0 )
+	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "4",	0x00000, 0x08000, CRC(497fad4c) SHA1(f151543a0c4a1d6d5d2de5e1dc12fd59dabcf1a8) )
 	ROM_LOAD( "3",	0x10000, 0x10000, CRC(4800322a) SHA1(a616c497ac18351b68b8307050a2a62c717a7873) )
 
@@ -702,10 +736,10 @@ ROM_END
 
 
 ROM_START( hatris )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "2-ic79.bin",	0x00000, 0x08000, CRC(bbcaddbf) SHA1(7f01493dadfed87112644a8ef77ae58fa273980d) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "1-ic81.bin",	0x00000, 0x08000, CRC(db25e166) SHA1(3538963d092967311d0a216b1e33ea39389b0d87) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
@@ -754,6 +788,7 @@ static DRIVER_INIT( hatris )
  *
  *************************************/
 
-GAME( 1990, pipedrm,  0,       pipedrm, pipedrm, pipedrm, ROT0, "Video System Co.", "Pipe Dream (US)", GAME_SUPPORTS_SAVE )
+GAME( 1990, pipedrm,  0,       pipedrm, pipedrm, pipedrm, ROT0, "Video System Co.", "Pipe Dream (World)", GAME_SUPPORTS_SAVE )
+GAME( 1990, pipedrmu, pipedrm, pipedrm, pipedrm, pipedrm, ROT0, "Video System Co.", "Pipe Dream (US)", GAME_SUPPORTS_SAVE )
 GAME( 1990, pipedrmj, pipedrm, pipedrm, pipedrm, pipedrm, ROT0, "Video System Co.", "Pipe Dream (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1990, hatris,   0,       hatris,  hatris,  hatris,  ROT0, "Video System Co.", "Hatris (Japan)", GAME_SUPPORTS_SAVE )

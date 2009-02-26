@@ -176,9 +176,8 @@ TODO:
       - MPU4 Master clock value taken from schematic, but 68k value is not.
       - Deal 'Em lockouts vary on certain cabinets (normally connected to AUX2, but not there?)
       - Deal 'Em has bad tiles (apostrophe, logo, bottom corner), black should actually be transparent
-      - to give black on green.
+        to give black on green.
 ***********************************************************************************************************/
-
 /* MPU4 Video */
 #include "cpu/m68000/m68000.h"
 #include "machine/6850acia.h"
@@ -1494,7 +1493,7 @@ static ADDRESS_MAP_START( mpu4_6809_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x40FF) AM_RAM /* it actually runs code from here... */
 
 	AM_RANGE(0xBE00, 0xBFFF) AM_RAM /* 00 written on startup */
-	AM_RANGE(0xC000, 0xFFFF) AM_ROM	AM_REGION("main",0)  /* 64k EPROM on board, only this region read */
+	AM_RANGE(0xC000, 0xFFFF) AM_ROM	AM_REGION("maincpu",0)  /* 64k EPROM on board, only this region read */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vp_68k_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -1647,7 +1646,7 @@ static MC6845_ON_VSYNC_CHANGED( dealem_vsync_changed )
 
 static const mc6845_interface hd6845_intf =
 {
-	"main",						/* screen we are acting on */
+	"screen",					/* screen we are acting on */
 	8,							/* number of pixels per video memory address */
 	NULL,						/* before pixel update callback */
 	NULL,						/* row update callback */
@@ -1681,14 +1680,14 @@ ADDRESS_MAP_END
 
 
 static MACHINE_DRIVER_START( mpu4_vid )
-	MDRV_CPU_ADD("main", M6809, MPU4_MASTER_CLOCK/4 )
+	MDRV_CPU_ADD("maincpu", M6809, MPU4_MASTER_CLOCK/4 )
 	MDRV_CPU_PROGRAM_MAP(mpu4_6809_map,0)
 	MDRV_TIMER_ADD_PERIODIC("50hz",gen_50hz, HZ(100))
 
 	MDRV_NVRAM_HANDLER(generic_0fill)				/* confirm */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 64*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 63*8-1, 0*8, 37*8-1)
@@ -1696,7 +1695,7 @@ static MACHINE_DRIVER_START( mpu4_vid )
 
 	MDRV_CPU_ADD("video", M68000, VIDEO_MASTER_CLOCK )
 	MDRV_CPU_PROGRAM_MAP(mpu4_68k_map,0)
-	MDRV_CPU_VBLANK_INT("main", mpu4_vid_irq)
+	MDRV_CPU_VBLANK_INT("screen", mpu4_vid_irq)
 
 	MDRV_QUANTUM_TIME(HZ(960))
 
@@ -1712,10 +1711,10 @@ static MACHINE_DRIVER_START( mpu4_vid )
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")/* Present on all video cards */
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")/* Present on all video cards */
 	MDRV_SOUND_ADD("saa", SAA1099, 8000000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.00)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.00)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
 
 	/* ACIAs */
 	MDRV_ACIA6850_ADD("acia6850_0", m6809_acia_if)
@@ -1733,7 +1732,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( dealem )
 	MDRV_MACHINE_START(mpu4mod2)							/* main mpu4 board initialisation */
 	MDRV_MACHINE_RESET(mpu4_vid)
-	MDRV_CPU_ADD("main", M6809, MPU4_MASTER_CLOCK/4)
+	MDRV_CPU_ADD("maincpu", M6809, MPU4_MASTER_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(dealem_memmap,0)
 
 	MDRV_TIMER_ADD_PERIODIC("50hz",gen_50hz, HZ(100))
@@ -1746,7 +1745,7 @@ static MACHINE_DRIVER_START( dealem )
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE((54+1)*8, (32+1)*8)					/* Taken from 6845 init, registers 00 & 04. Normally programmed with (value-1) */
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 31*8-1)		/* Taken from 6845 init, registers 01 & 06 */
@@ -1803,7 +1802,7 @@ static DRIVER_INIT (mating)
 
 
 ROM_START( dealem )
-	ROM_REGION( 0x10000, "main", ROMREGION_ERASE00  )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
 	ROM_LOAD( "zenndlem.u6",	0x8000, 0x8000,  CRC(571e5c05) SHA1(89b4c331407a04eae34bb187b036791e0a671533) )
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
@@ -1826,12 +1825,12 @@ ROM_END
 	ROM_LOAD("vid.p1",  0x00000, 0x10000,  CRC(e996bc18) SHA1(49798165640627eb31024319353da04380787b10))
 
 ROM_START( bctvidbs )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	VID_BIOS
 ROM_END
 
 ROM_START( crmaze )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	VID_BIOS
 
 	ROM_REGION( 0x800000, "video", 0 )
@@ -1848,7 +1847,7 @@ ROM_START( crmaze )
 ROM_END
 
 ROM_START( crmazea )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	VID_BIOS
 
 	ROM_REGION( 0x800000, "video", 0 )
@@ -1865,7 +1864,7 @@ ROM_START( crmazea )
 ROM_END
 
 ROM_START( crmazeb )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	VID_BIOS
 
 	ROM_REGION( 0x800000, "video", 0 )
@@ -1882,7 +1881,7 @@ ROM_START( crmazeb )
 ROM_END
 
 ROM_START( turnover )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	VID_BIOS
 
 	ROM_REGION( 0x800000, "video", 0 )
@@ -1905,7 +1904,7 @@ ROM_START( turnover )
 ROM_END
 
 ROM_START( skiltrek )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	VID_BIOS
 
 	ROM_REGION( 0x800000, "video", 0 )
@@ -1926,7 +1925,7 @@ ROM_START( skiltrek )
 ROM_END
 
 ROM_START( timemchn )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	VID_BIOS
 
 	ROM_REGION( 0x800000, "video", 0 )
@@ -1947,7 +1946,7 @@ ROM_START( timemchn )
 ROM_END
 
 ROM_START( mating )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	VID_BIOS
 
 	ROM_REGION( 0x800000, "video", 0 )
@@ -1971,7 +1970,7 @@ ROM_START( mating )
 ROM_END
 
 ROM_START( matinga )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	VID_BIOS
 
 	ROM_REGION( 0x800000, "video", 0 )
@@ -1996,7 +1995,7 @@ ROM_END
 
 /* Vegas Poker Protoype dumped by HIGHWAYMAN */
 ROM_START( vgpoker )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("comms-v2.0.bin",  0x00000, 0x10000,  CRC(1717581f) SHA1(40f8cae39a2ab0c89d2bbfd8a37725aaae229c96))
 
 	ROM_REGION( 0x800000, "video", 0 )
@@ -2011,23 +2010,23 @@ ROM_START( vgpoker )
 ROM_END
 
 ROM_START( connect4 )
-	ROM_REGION( 0x10000, "main", ROMREGION_ERASE00  )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
 	ROM_LOAD( "connect4.p2",  0x8000, 0x4000,  CRC(6090633c) SHA1(0cd2725a235bf93cfe94f2ca648d5fccb87b8e5c) )
 	ROM_LOAD( "connect4.p1",  0xC000, 0x4000,  CRC(b1af50c0) SHA1(7c9645ea378f0857b849ca24a239d9114f62da7f) )
 ROM_END
 
 ROM_START( mpu4utst )
-	ROM_REGION( 0x10000, "main", ROMREGION_ERASE00  )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
 	ROM_LOAD( "ut4.p1",  0xC000, 0x4000,  CRC(086dc325) SHA1(923caeb61347ac9d3e6bcec45998ddf04b2c8ffd))
 ROM_END
 
 ROM_START( mpu4tst2 )
-	ROM_REGION( 0x10000, "main", ROMREGION_ERASE00  )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
 	ROM_LOAD( "ut2.p1",  0xE000, 0x2000,  CRC(f7fb6575) SHA1(f7961cbd0801b9561d8cd2d23081043d733e1902))
 ROM_END
 
 ROM_START( mpu4met0 )
-	ROM_REGION( 0x10000, "main", ROMREGION_ERASE00  )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
 	ROM_LOAD( "meter-zero.p1",  0x8000, 0x8000,  CRC(e74297e5) SHA1(49a2cc85eda14199975ec37a794b685c839d3ab9))
 ROM_END
 
@@ -2055,7 +2054,7 @@ GAME( 199?, mating,  bctvidbs,mpu4_vid, mpu4,     mating,ROT0,   "Barcrest", 		"
 GAME( 199?, matinga, mating,  mpu4_vid, mpu4,     mating,ROT0,   "Barcrest", 		"The Mating Game (Standard)",										GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 199?, vgpoker, 0,		  vgpoker,	mpu4,     0,	 ROT0,   "BwB",				"Vegas Poker (Prototype)",											GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAMEL(1989?,connect4,0,       mpu4mod2, connect4, connect4, ROT0,"Dolbeck Systems", "Connect 4",														GAME_IMPERFECT_GRAPHICS,layout_connect4 )
+GAMEL(1989?,connect4,0,       mpu4mod2, connect4, connect4, ROT0,"Dolbeck Systems", "Connect 4",														GAME_IMPERFECT_GRAPHICS|GAME_REQUIRES_ARTWORK,layout_connect4 )
 GAME( 198?, mpu4utst,0,		  mpu4mod2, mpu4,			 0,	ROT0,"Barcrest", 		"MPU4 Unit Test (Program 4)",										0 )
 GAME( 198?, mpu4tst2,0,		  mpu4mod2, mpu4,			 0,	ROT0,"Barcrest", 		"MPU4 Unit Test (Program 2)",										0 )
 GAME( 198?, mpu4met0,0,		  mpu4mod2, mpu4,			 0, ROT0,"Barcrest", 		"MPU4 Meter Clear ROM",												0 )
