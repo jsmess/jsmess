@@ -33,37 +33,37 @@ static emu_timer *led_update;
 ******************************************************************************/
 
 
-static TTL74145_OUTPUT_LINE(sym1_74145_output_0_w)
+static WRITE_LINE_DEVICE_HANDLER( sym1_74145_output_0_w )
 {
 	if (state) timer_adjust_oneshot(led_update, LED_REFRESH_DELAY, 0);
 }
 
 
-static TTL74145_OUTPUT_LINE(sym1_74145_output_1_w)
+static WRITE_LINE_DEVICE_HANDLER( sym1_74145_output_1_w )
 {
 	if (state) timer_adjust_oneshot(led_update, LED_REFRESH_DELAY, 1);
 }
 
 
-static TTL74145_OUTPUT_LINE(sym1_74145_output_2_w)
+static WRITE_LINE_DEVICE_HANDLER( sym1_74145_output_2_w )
 {
 	if (state) timer_adjust_oneshot(led_update, LED_REFRESH_DELAY, 2);
 }
 
 
-static TTL74145_OUTPUT_LINE(sym1_74145_output_3_w)
+static WRITE_LINE_DEVICE_HANDLER( sym1_74145_output_3_w )
 {
 	if (state) timer_adjust_oneshot(led_update, LED_REFRESH_DELAY, 3);
 }
 
 
-static TTL74145_OUTPUT_LINE(sym1_74145_output_4_w)
+static WRITE_LINE_DEVICE_HANDLER( sym1_74145_output_4_w )
 {
 	if (state) timer_adjust_oneshot(led_update, LED_REFRESH_DELAY, 4);
 }
 
 
-static TTL74145_OUTPUT_LINE(sym1_74145_output_5_w)
+static WRITE_LINE_DEVICE_HANDLER( sym1_74145_output_5_w )
 {
 	if (state) timer_adjust_oneshot(led_update, LED_REFRESH_DELAY, 5);
 }
@@ -72,14 +72,6 @@ static TTL74145_OUTPUT_LINE(sym1_74145_output_5_w)
 static TIMER_CALLBACK( led_refresh )
 {
 	output_set_digit_value(param, riot_port_a);
-}
-
-
-/* The speaker is connected to output 6 of the 74145 */
-static TTL74145_OUTPUT_LINE(sym1_74145_output_6_w)
-{
-	const device_config *speaker = devtag_get_device(device->machine, SOUND, "speaker");
-	speaker_level_w(speaker, state);
 }
 
 
@@ -138,7 +130,7 @@ static void sym1_riot_b_w(const device_config *device, UINT8 newdata, UINT8 data
 	riot_port_b = data;
 
 	/* first 4 pins are connected to the 74145 */
-	ttl74145_w( (device_config*)devtag_get_device(device->machine, TTL74145, "ttl74145"), 0, data & 0x0f);
+	ttl74145_w(devtag_get_device(device->machine, TTL74145, "ttl74145"), 0, data & 0x0f);
 }
 
 
@@ -153,16 +145,16 @@ const riot6532_interface sym1_r6532_interface =
 
 const ttl74145_interface sym1_ttl74145_intf =
 {
-	sym1_74145_output_0_w,  /* connected to DS0 */
-	sym1_74145_output_1_w,  /* connected to DS1 */
-	sym1_74145_output_2_w,  /* connected to DS2 */
-	sym1_74145_output_3_w,  /* connected to DS3 */
-	sym1_74145_output_4_w,  /* connected to DS4 */
-	sym1_74145_output_5_w,  /* connected to DS5 */
-	sym1_74145_output_6_w,  /* connected to the speaker */
-	NULL,                   /* not connected */
-	NULL,                   /* not connected */
-	NULL                    /* not connected */
+	DEVCB_LINE(sym1_74145_output_0_w),  /* connected to DS0 */
+	DEVCB_LINE(sym1_74145_output_1_w),  /* connected to DS1 */
+	DEVCB_LINE(sym1_74145_output_2_w),  /* connected to DS2 */
+	DEVCB_LINE(sym1_74145_output_3_w),  /* connected to DS3 */
+	DEVCB_LINE(sym1_74145_output_4_w),  /* connected to DS4 */
+	DEVCB_LINE(sym1_74145_output_5_w),  /* connected to DS5 */
+	DEVCB_DEVICE_LINE(SOUND, "speaker", speaker_level_w),
+	DEVCB_NULL,	/* not connected */
+	DEVCB_NULL,	/* not connected */
+	DEVCB_NULL	/* not connected */
 };
 
 

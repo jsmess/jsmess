@@ -313,7 +313,7 @@ static MACHINE_DRIVER_START( mz700 )
 	/* devices */
 	MDRV_PIT8253_ADD("pit8253", mz700_pit8253_config)
 	MDRV_PPI8255_ADD("ppi8255", mz700_ppi8255_interface)
-	MDRV_TTL74145_ADD("ls145")
+	MDRV_TTL74145_ADD("ls145", default_ttl74145)
 
 	MDRV_CASSETTE_ADD( "cassette", mz700_cassette_config )
 MACHINE_DRIVER_END

@@ -8,89 +8,60 @@
 
 ******************************************************************************/
 
-/* Core includes */
 #include "driver.h"
 #include "cpu/m6502/m6502.h"
-
-/* Components */
 #include "machine/ins8154.h"
 #include "machine/74145.h"
-
-/* Layout */
 #include "acrnsys1.lh"
 
 
-static UINT8 key_digit;
-
+/***************************************************************************
+    KEYBOARD HANDLING
+***************************************************************************/
 
 static READ8_DEVICE_HANDLER( ins8154_b1_port_a_r )
 {
-	UINT8 data;
-	static const char *const keynames[] = { "keyboard_0", "keyboard_1", "keyboard_2", "keyboard_3",
-										"keyboard_4", "keyboard_5", "keyboard_6", "keyboard_7" };
+	const device_config *ttl74145 = devtag_get_device(device->machine, TTL74145, "ic8_7445");
+	UINT8 key_line = ttl74145_r(ttl74145, 0, 0);
 
-	data = input_port_read(device->machine, keynames[key_digit]);
-	logerror("Reading %02x from row %d\n", data, key_digit);
-	return data;
+	switch (key_line)
+	{
+	case 1 << 0: return input_port_read(device->machine, "keyboard_0");
+	case 1 << 1: return input_port_read(device->machine, "keyboard_1");
+	case 1 << 2: return input_port_read(device->machine, "keyboard_2");
+	case 1 << 3: return input_port_read(device->machine, "keyboard_3");
+	case 1 << 4: return input_port_read(device->machine, "keyboard_4");
+	case 1 << 5: return input_port_read(device->machine, "keyboard_5");
+	case 1 << 6: return input_port_read(device->machine, "keyboard_6");
+	case 1 << 7: return input_port_read(device->machine, "keyboard_7");
+	}
+
+	/* should never reach this */
+	return 0xff;
 }
 
 static WRITE8_DEVICE_HANDLER( ins8154_b1_port_a_w )
 {
-	ttl74145_w((device_config*)devtag_get_device(device->machine, TTL74145, "ttl74145"), 0, data & 0x07);
+	ttl74145_w(devtag_get_device(device->machine, TTL74145, "ic8_7445"), 0, data & 0x07);
 }
+
+
+/***************************************************************************
+    LED DISPLAY
+***************************************************************************/
 
 static WRITE8_DEVICE_HANDLER( acrnsys1_led_segment_w )
 {
-	logerror("led %d segment data: %02x\n", key_digit, data);
+	const device_config *ttl74145 = devtag_get_device(device->machine, TTL74145, "ic8_7445");
+	UINT8 key_line = ttl74145_r(ttl74145, 0, 0);
 
-	output_set_digit_value(key_digit + 0, data);
-}
-
-static const ins8154_interface ins8154_b1 =
-{
-	ins8154_b1_port_a_r,
-	NULL,
-	ins8154_b1_port_a_w,
-	acrnsys1_led_segment_w,
-	NULL
-};
-
-static TTL74145_OUTPUT_LINE ( acrnsys1_7445_output_0_w ) { if (state) key_digit = 0; }
-static TTL74145_OUTPUT_LINE ( acrnsys1_7445_output_1_w ) { if (state) key_digit = 1; }
-static TTL74145_OUTPUT_LINE ( acrnsys1_7445_output_2_w ) { if (state) key_digit = 2; }
-static TTL74145_OUTPUT_LINE ( acrnsys1_7445_output_3_w ) { if (state) key_digit = 3; }
-static TTL74145_OUTPUT_LINE ( acrnsys1_7445_output_4_w ) { if (state) key_digit = 4; }
-static TTL74145_OUTPUT_LINE ( acrnsys1_7445_output_5_w ) { if (state) key_digit = 5; }
-static TTL74145_OUTPUT_LINE ( acrnsys1_7445_output_6_w ) { if (state) key_digit = 6; }
-static TTL74145_OUTPUT_LINE ( acrnsys1_7445_output_7_w ) { if (state) key_digit = 7; }
-
-static const ttl74145_interface ic8_7445 =
-{
-	acrnsys1_7445_output_0_w,  /* digit and keyboard column 0 */
-	acrnsys1_7445_output_1_w,  /* digit and keyboard column 1 */
-	acrnsys1_7445_output_2_w,  /* digit and keyboard column 2 */
-	acrnsys1_7445_output_3_w,  /* digit and keyboard column 3 */
-	acrnsys1_7445_output_4_w,  /* digit and keyboard column 4 */
-	acrnsys1_7445_output_5_w,  /* digit and keyboard column 5 */
-	acrnsys1_7445_output_6_w,  /* digit and keyboard column 6 */
-	acrnsys1_7445_output_7_w,  /* digit and keyboard column 7 */
-	NULL,  /* not connected */
-	NULL,  /* not connected */
-};
-
-static DRIVER_INIT( acrnsys1 )
-{
-}
-
-static MACHINE_RESET( acrnsys1 )
-{
+	output_set_digit_value(key_line, data);
 }
 
 
-/******************************************************************************
- Memory Maps
-******************************************************************************/
-
+/***************************************************************************
+    ADDRESS MAPS
+***************************************************************************/
 
 static ADDRESS_MAP_START( acrnsys1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
@@ -100,11 +71,9 @@ static ADDRESS_MAP_START( acrnsys1_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-
-/******************************************************************************
- Input Ports
-******************************************************************************/
-
+/***************************************************************************
+    INPUT PORTS
+***************************************************************************/
 
 static INPUT_PORTS_START( acrnsys1 )
 	PORT_START("keyboard_0")
@@ -171,33 +140,35 @@ static INPUT_PORTS_START( acrnsys1 )
 INPUT_PORTS_END
 
 
+/***************************************************************************
+    MACHINE DRIVERS
+***************************************************************************/
 
-/******************************************************************************
- Machine Drivers
-******************************************************************************/
-
+static const ins8154_interface ins8154_b1 =
+{
+	ins8154_b1_port_a_r,
+	NULL,
+	ins8154_b1_port_a_w,
+	acrnsys1_led_segment_w,
+	NULL
+};
 
 static MACHINE_DRIVER_START( acrnsys1 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 1008000)  /* 1.008 MHz */
 	MDRV_CPU_PROGRAM_MAP(acrnsys1_map, 0)
 
-	MDRV_MACHINE_RESET(acrnsys1)
-
 	MDRV_DEFAULT_LAYOUT(layout_acrnsys1)
 
 	/* devices */
 	MDRV_INS8154_ADD("b1", ins8154_b1)
-	MDRV_TTL74145_ADD("ttl74145")
-	MDRV_TTL74145_CONFIG(ic8_7445)
+	MDRV_TTL74145_ADD("ic8_7445", default_ttl74145)
 MACHINE_DRIVER_END
 
 
-
-/******************************************************************************
- ROM Definitions
-******************************************************************************/
-
+/***************************************************************************
+    ROM DEFINITIONS
+***************************************************************************/
 
 ROM_START( acrnsys1 )
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -208,21 +179,9 @@ ROM_START( acrnsys1 )
 ROM_END
 
 
+/***************************************************************************
+    GAME DRIVERS
+***************************************************************************/
 
-/******************************************************************************
- System Config
-******************************************************************************/
-
-
-static SYSTEM_CONFIG_START( acrnsys1 )
-SYSTEM_CONFIG_END
-
-
-
-/******************************************************************************
- Drivers
-******************************************************************************/
-
-
-/*    YEAR  NAME      PARENT COMPAT MACHINE   INPUT     INIT        CONFIG    COMPANY  FULLNAME    FLAGS */
-COMP( 1978, acrnsys1, 0,     0,     acrnsys1, acrnsys1, acrnsys1,   acrnsys1, "Acorn", "System 1", GAME_NOT_WORKING )
+/*    YEAR  NAME      PARENT COMPAT MACHINE   INPUT     INIT  CONFIG  COMPANY  FULLNAME    FLAGS */
+COMP( 1978, acrnsys1, 0,     0,     acrnsys1, acrnsys1, 0,    0,      "Acorn", "System 1", GAME_NOT_WORKING )

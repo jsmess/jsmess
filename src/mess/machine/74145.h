@@ -1,43 +1,34 @@
-/*****************************************************************************
- *
- * machine/74145.h
- *
- ****************************************************************************/
+/***************************************************************************
+
+    TTL74145
+
+    BCD-to-Decimal decoder
+
+***************************************************************************/
 
 #ifndef __TTL74145_H__
 #define __TTL74145_H__
 
-
-/***************************************************************************
-    MACROS
-***************************************************************************/
-
-#define TTL74145		DEVICE_GET_INFO_NAME(ttl74145)
+#include "devcb.h"
 
 
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef void (*ttl74145_output_line_func)(const device_config *device, int state);
-#define TTL74145_OUTPUT_LINE(name)	void name(const device_config *device, int state )
-
-
-/* interface */
 typedef struct _ttl74145_interface ttl74145_interface;
 struct _ttl74145_interface
 {
-	/* outputs */
-	ttl74145_output_line_func output_line_0;
-	ttl74145_output_line_func output_line_1;
-	ttl74145_output_line_func output_line_2;
-	ttl74145_output_line_func output_line_3;
-	ttl74145_output_line_func output_line_4;
-	ttl74145_output_line_func output_line_5;
-	ttl74145_output_line_func output_line_6;
-	ttl74145_output_line_func output_line_7;
-	ttl74145_output_line_func output_line_8;
-	ttl74145_output_line_func output_line_9;
+	devcb_write_line output_line_0;
+	devcb_write_line output_line_1;
+	devcb_write_line output_line_2;
+	devcb_write_line output_line_3;
+	devcb_write_line output_line_4;
+	devcb_write_line output_line_5;
+	devcb_write_line output_line_6;
+	devcb_write_line output_line_7;
+	devcb_write_line output_line_8;
+	devcb_write_line output_line_9;
 };
 
 
@@ -57,11 +48,18 @@ READ16_DEVICE_HANDLER( ttl74145_r );
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_TTL74145_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, TTL74145, 0)
+#define TTL74145	DEVICE_GET_INFO_NAME(ttl74145)
 
-#define MDRV_TTL74145_CONFIG(_intrf) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MDRV_TTL74145_ADD(_tag, _intf) \
+	MDRV_DEVICE_ADD(_tag, TTL74145, 0) \
+	MDRV_DEVICE_CONFIG(_intf)
+
+
+/***************************************************************************
+    DEFAULT INTERFACES
+***************************************************************************/
+
+extern const ttl74145_interface default_ttl74145;
 
 
 #endif /* __TTL74145_H__ */

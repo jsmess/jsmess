@@ -53,8 +53,38 @@
 typedef struct _ttl74145_t ttl74145_t;
 struct _ttl74145_t
 {
+	devcb_resolved_write_line output_line_0;
+	devcb_resolved_write_line output_line_1;
+	devcb_resolved_write_line output_line_2;
+	devcb_resolved_write_line output_line_3;
+	devcb_resolved_write_line output_line_4;
+	devcb_resolved_write_line output_line_5;
+	devcb_resolved_write_line output_line_6;
+	devcb_resolved_write_line output_line_7;
+	devcb_resolved_write_line output_line_8;
+	devcb_resolved_write_line output_line_9;
+
 	/* decoded number */
 	int number;
+};
+
+
+/*****************************************************************************
+    GLOBAL VARIABLES
+*****************************************************************************/
+
+const ttl74145_interface default_ttl74145 =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 
@@ -66,6 +96,7 @@ INLINE ttl74145_t *get_safe_token(const device_config *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
+	assert(device->type == TTL74145);
 
 	return (ttl74145_t *)device->token;
 }
@@ -81,21 +112,16 @@ WRITE8_DEVICE_HANDLER( ttl74145_w )
 	/* call output callbacks if the number changed */
 	if (new_number != ttl74145->number)
 	{
-		const ttl74145_interface *i = device->static_config;
-
-		if (i != NULL)
-		{
-			if (i->output_line_0) i->output_line_0(device, new_number == 0);
-			if (i->output_line_1) i->output_line_1(device, new_number == 1);
-			if (i->output_line_2) i->output_line_2(device, new_number == 2);
-			if (i->output_line_3) i->output_line_3(device, new_number == 3);
-			if (i->output_line_4) i->output_line_4(device, new_number == 4);
-			if (i->output_line_5) i->output_line_5(device, new_number == 5);
-			if (i->output_line_6) i->output_line_6(device, new_number == 6);
-			if (i->output_line_7) i->output_line_7(device, new_number == 7);
-			if (i->output_line_8) i->output_line_8(device, new_number == 8);
-			if (i->output_line_9) i->output_line_9(device, new_number == 9);
-		}
+		devcb_call_write_line(&ttl74145->output_line_0, new_number == 0);
+		devcb_call_write_line(&ttl74145->output_line_1, new_number == 1);
+		devcb_call_write_line(&ttl74145->output_line_2, new_number == 2);
+		devcb_call_write_line(&ttl74145->output_line_3, new_number == 3);
+		devcb_call_write_line(&ttl74145->output_line_4, new_number == 4);
+		devcb_call_write_line(&ttl74145->output_line_5, new_number == 5);
+		devcb_call_write_line(&ttl74145->output_line_6, new_number == 6);
+		devcb_call_write_line(&ttl74145->output_line_7, new_number == 7);
+		devcb_call_write_line(&ttl74145->output_line_8, new_number == 8);
+		devcb_call_write_line(&ttl74145->output_line_9, new_number == 9);
 	}
 
 	/* update state */
@@ -117,14 +143,26 @@ READ16_DEVICE_HANDLER( ttl74145_r )
 
 static DEVICE_START( ttl74145 )
 {
+	const ttl74145_interface *intf = device->static_config;
 	ttl74145_t *ttl74145 = get_safe_token(device);
 
 	/* validate arguments */
-	assert(device != NULL);
-	assert(device->tag != NULL);
+	assert(device->static_config != NULL);
 
 	/* initialize with 0 */
 	ttl74145->number = 0;
+
+	/* resolve callbacks */
+	devcb_resolve_write_line(&ttl74145->output_line_0, &intf->output_line_0, device);
+	devcb_resolve_write_line(&ttl74145->output_line_1, &intf->output_line_1, device);
+	devcb_resolve_write_line(&ttl74145->output_line_2, &intf->output_line_2, device);
+	devcb_resolve_write_line(&ttl74145->output_line_3, &intf->output_line_3, device);
+	devcb_resolve_write_line(&ttl74145->output_line_4, &intf->output_line_4, device);
+	devcb_resolve_write_line(&ttl74145->output_line_5, &intf->output_line_5, device);
+	devcb_resolve_write_line(&ttl74145->output_line_6, &intf->output_line_6, device);
+	devcb_resolve_write_line(&ttl74145->output_line_7, &intf->output_line_7, device);
+	devcb_resolve_write_line(&ttl74145->output_line_8, &intf->output_line_8, device);
+	devcb_resolve_write_line(&ttl74145->output_line_9, &intf->output_line_9, device);
 
 	/* register for state saving */
 	state_save_register_item(device->machine, "ttl74145", device->tag, 0, ttl74145->number);
@@ -165,7 +203,7 @@ DEVICE_GET_INFO( ttl74145 )
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:					strcpy(info->s, "TTL74145");				break;
 		case DEVINFO_STR_FAMILY:				strcpy(info->s, "TTL74145");				break;
-		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.1");						break;
+		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.2");						break;
 		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);					break;
 		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright MESS Team");		break;
 	}

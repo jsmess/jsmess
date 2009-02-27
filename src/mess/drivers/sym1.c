@@ -135,8 +135,7 @@ static MACHINE_DRIVER_START( sym1 )
 
 	/* devices */
 	MDRV_RIOT6532_ADD("riot", SYM1_CLOCK, sym1_r6532_interface)
-	MDRV_TTL74145_ADD("ttl74145")
-	MDRV_TTL74145_CONFIG(sym1_ttl74145_intf)
+	MDRV_TTL74145_ADD("ttl74145", sym1_ttl74145_intf)
 	MDRV_VIA6522_ADD("via6522_0", 0, sym1_via0)
 	MDRV_VIA6522_ADD("via6522_1", 0, sym1_via1)
 	MDRV_VIA6522_ADD("via6522_2", 0, sym1_via2)
