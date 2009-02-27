@@ -245,7 +245,7 @@ const ppi8255_interface mikrosha_ppi8255_interface_2 =
 };
 
 const i8275_interface radio86_i8275_interface = {
-	"maincpu",
+	"screen",
 	6,
 	0,
 	radio86_video_dma_request,
@@ -254,7 +254,7 @@ const i8275_interface radio86_i8275_interface = {
 };
 
 const i8275_interface mikrosha_i8275_interface = {
-	"maincpu",
+	"screen",
 	6,
 	0,
 	radio86_video_dma_request,
@@ -263,7 +263,7 @@ const i8275_interface mikrosha_i8275_interface = {
 };
 
 const i8275_interface apogee_i8275_interface = {
-	"maincpu",
+	"screen",
 	6,
 	0,
 	radio86_video_dma_request,
@@ -272,7 +272,7 @@ const i8275_interface apogee_i8275_interface = {
 };
 
 const i8275_interface partner_i8275_interface = {
-	"maincpu",
+	"screen",
 	6,
 	1,
 	radio86_video_dma_request,
