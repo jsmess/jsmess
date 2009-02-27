@@ -256,7 +256,7 @@ static MC6845_ON_DE_CHANGED( einstein_6845_display_enable_changed )
 }
 
 static const mc6845_interface einstein_crtc6845_interface = {
-	"maincpu",
+	"screen",
 	8 /*?*/,
 	NULL,
 	einstein_6845_update_row,

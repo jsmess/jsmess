@@ -600,7 +600,7 @@ static GFXDECODE_START( superpet )
 GFXDECODE_END
 
 static const mc6845_interface crtc_pet40 = {
-	"maincpu",
+	"screen",
 	8,
 	NULL,
 	pet40_update_row,
@@ -611,7 +611,7 @@ static const mc6845_interface crtc_pet40 = {
 };
 
 static const mc6845_interface crtc_pet80 = {
-	"maincpu",
+	"screen",
 	16,
 	NULL,
 	pet80_update_row,

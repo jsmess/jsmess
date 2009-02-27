@@ -326,7 +326,7 @@ static PALETTE_INIT( cbm700 )
 
 
 static const mc6845_interface cbm600_crtc = {
-	"maincpu",
+	"screen",
 	8 /*?*/,
 	NULL,
 	cbm600_update_row,
@@ -337,7 +337,7 @@ static const mc6845_interface cbm600_crtc = {
 };
 
 static const mc6845_interface cbm700_crtc = {
-	"maincpu",
+	"screen",
 	9 /*?*/,
 	NULL,
 	cbm700_update_row,
