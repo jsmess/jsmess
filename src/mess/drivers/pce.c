@@ -151,6 +151,11 @@ static void pce_partialhash(char *dest, const unsigned char *data,
 	}
 }
 
+static const c6280_interface c6280_config =
+{
+	"maincpu"
+};
+
 
 static MACHINE_DRIVER_START( pce_cartslot )
 	MDRV_CARTSLOT_ADD("cart")
@@ -186,8 +191,9 @@ static MACHINE_DRIVER_START( pce )
 	MDRV_NVRAM_HANDLER( pce )
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MDRV_SOUND_ADD(C6280_TAG, C6280, MAIN_CLOCK/6)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.00)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.00)
+	MDRV_SOUND_CONFIG(c6280_config)
+	MDRV_SOUND_ROUTE( 0, "lspeaker", 1.00 )
+	MDRV_SOUND_ROUTE( 1, "rspeaker", 1.00 )
 
 	MDRV_SOUND_ADD( "msm5205", MSM5205, PCE_CD_CLOCK / 6 )
 	MDRV_SOUND_CONFIG( pce_cd_msm5205_interface )
