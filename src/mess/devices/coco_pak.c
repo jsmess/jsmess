@@ -60,12 +60,17 @@ static DEVICE_START(coco_pak)
 static DEVICE_RESET(coco_pak)
 {
 	coco_pak_pcb_t *pak_pcb = get_token(device);
+	cococart_line_value cart_line;
+	
+	cart_line = input_port_read_safe(device->machine, "CARTAUTO", 0x01)
+		? COCOCART_LINE_VALUE_Q
+		: COCOCART_LINE_VALUE_CLEAR;
 
 	/* normal CoCo PAKs tie their CART line to Q - the system clock */
 	device_set_info_int(
 		pak_pcb->cococart,
 		COCOCARTINFO_INT_LINE_CART,
-		COCOCART_LINE_VALUE_Q);
+		cart_line);
 }
 
 

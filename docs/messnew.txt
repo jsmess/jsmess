@@ -38,6 +38,8 @@ System Driver Changes:
 
 - [COCO] Cleanups  [Nathan Woods]
 
+- [COCO] Fixed "Cartridge Auto-Start" setting.  (bug #1772) [Nathan Woods]
+
 - [COCO3] Fixed Composite Monochrome bit.  (bug #1767)  [Nathan Woods]
 
 - [COMPIS] Updated to use the new centronics interface.  [Dirk Best]
