@@ -30,10 +30,10 @@ static gmaster_sound *get_token(const device_config *device)
 
 
 int gmaster_io_callback(const device_config *device, int ioline, int state)
-{
-	gmaster_sound *token = get_token(device);
+{	/* comes across with cpu device - need to use sound device */
+	gmaster_sound *token = get_token((device_config*)devtag_get_device(device->machine, SOUND, "custom"));
 
-    switch (ioline)
+	switch (ioline)
 	{
 		case UPD7810_TO:
 			stream_update(token->mixer_channel);
@@ -42,8 +42,8 @@ int gmaster_io_callback(const device_config *device, int ioline, int state)
 		default:
 			logerror("io changed %d %.2x\n",ioline, state);
 			break;
-    }
-    return 0;
+	}
+	return 0;
 }
 
 
