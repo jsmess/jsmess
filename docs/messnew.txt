@@ -40,6 +40,9 @@ System Driver Changes:
 
 - [COCO] Fixed "Cartridge Auto-Start" setting.  (bug #1772) [Nathan Woods]
 
+- [COCO] Added "unwired" (i.e. - can't connect to anything) support for the
+  RS-232 PAK.  This is merely a curiosity for now.  (bug #1772) [Nathan Woods]
+
 - [COCO3] Fixed Composite Monochrome bit.  (bug #1767)  [Nathan Woods]
 
 - [COMPIS] Updated to use the new centronics interface.  [Dirk Best]

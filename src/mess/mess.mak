@@ -687,6 +687,7 @@ $(MESSOBJ)/coco.a:   \
 	$(MESS_DEVICES)/cococart.o	\
 	$(MESS_DEVICES)/coco_fdc.o	\
 	$(MESS_DEVICES)/coco_pak.o	\
+	$(MESS_DEVICES)/coco_232.o	\
 	$(MESS_DEVICES)/orch90.o	\
 
 $(MESSOBJ)/mc10.a:	\

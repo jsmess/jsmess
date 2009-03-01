@@ -518,4 +518,7 @@
   <hash crc32="7f0edf28" sha1="6ca61e29c136ec8201492ca7f9eb050912f3582d" name="Extended ADOS">
     <pcb>coco_fdc</pcb>
   </hash>
+  <hash crc32="d990e1f9" name="RS-232 Pak">
+    <pcb>rs232</pcb>
+  </hash>
 </hashfile>
