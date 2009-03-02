@@ -831,7 +831,7 @@ static const cassette_config amstrad_cassette_config =
 {
 	cdt_cassette_formats,
 	NULL,
-	CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED
+	CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED
 };
 
 static MACHINE_DRIVER_START( cpcplus_cartslot )
