@@ -659,7 +659,7 @@ static MACHINE_DRIVER_START( coco_sound )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MDRV_SOUND_ADD("cassette", WAVE, 0)
+	MDRV_SOUND_WAVE_ADD("wave", "cassette")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
 
@@ -694,7 +694,7 @@ static MACHINE_DRIVER_START( dragon32 )
 	MDRV_PRINTER_ADD("printer")
 
 	/* snapshot/quickload */
-	MDRV_SNAPSHOT_ADD(coco_pak, "pak", 0)
+	MDRV_SNAPSHOT_ADD("snapshot", coco_pak, "pak", 0)
 
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
 	
@@ -730,7 +730,7 @@ static MACHINE_DRIVER_START( dragon64 )
 	MDRV_PRINTER_ADD("printer")
 
 	/* snapshot/quickload */
-	MDRV_SNAPSHOT_ADD(coco_pak, "pak", 0)
+	MDRV_SNAPSHOT_ADD("snapshot", coco_pak, "pak", 0)
 
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
@@ -770,7 +770,7 @@ static MACHINE_DRIVER_START( d64plus )
 	MDRV_PRINTER_ADD("printer")
 
 	/* snapshot/quickload */
-	MDRV_SNAPSHOT_ADD(coco_pak, "pak", 0)
+	MDRV_SNAPSHOT_ADD("snapshot", coco_pak, "pak", 0)
 
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
@@ -816,7 +816,7 @@ static MACHINE_DRIVER_START( dgnalpha )
 	MDRV_PRINTER_ADD("printer")
 
 	/* snapshot/quickload */
-	MDRV_SNAPSHOT_ADD(coco_pak, "pak", 0)
+	MDRV_SNAPSHOT_ADD("snapshot", coco_pak, "pak", 0)
 
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
@@ -856,7 +856,7 @@ static MACHINE_DRIVER_START( tanodr64 )
 	MDRV_PRINTER_ADD("printer")
 
 	/* snapshot/quickload */
-	MDRV_SNAPSHOT_ADD(coco_pak, "pak", 0)
+	MDRV_SNAPSHOT_ADD("snapshot", coco_pak, "pak", 0)
 
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
@@ -896,8 +896,8 @@ static MACHINE_DRIVER_START( coco )
 	MDRV_BITBANGER_ADD("bitbanger", coco_bitbanger_config)
 
 	/* snapshot/quickload */
-	MDRV_SNAPSHOT_ADD(coco_pak, "pak", 0)
-	MDRV_QUICKLOAD_ADD(coco, "bin", 0.5)
+	MDRV_SNAPSHOT_ADD("snapshot", coco_pak, "pak", 0)
+	MDRV_QUICKLOAD_ADD("quickload", coco, "bin", 0.5)
 
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
@@ -934,8 +934,8 @@ static MACHINE_DRIVER_START( coco2 )
 	MDRV_BITBANGER_ADD("bitbanger", coco_bitbanger_config)
 
 	/* snapshot/quickload */
-	MDRV_SNAPSHOT_ADD(coco_pak, "pak", 0)
-	MDRV_QUICKLOAD_ADD(coco, "bin", 0.5)
+	MDRV_SNAPSHOT_ADD("snapshot", coco_pak, "pak", 0)
+	MDRV_QUICKLOAD_ADD("quickload", coco, "bin", 0.5)
 
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
@@ -972,8 +972,8 @@ static MACHINE_DRIVER_START( coco2b )
 	MDRV_BITBANGER_ADD("bitbanger", coco_bitbanger_config)
 
 	/* snapshot/quickload */
-	MDRV_SNAPSHOT_ADD(coco_pak, "pak", 0)
-	MDRV_QUICKLOAD_ADD(coco, "bin", 0.5)
+	MDRV_SNAPSHOT_ADD("snapshot", coco_pak, "pak", 0)
+	MDRV_QUICKLOAD_ADD("quickload", coco, "bin", 0.5)
 
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
@@ -1019,8 +1019,8 @@ static MACHINE_DRIVER_START( coco3 )
 	MDRV_BITBANGER_ADD("bitbanger", coco_bitbanger_config)
 
 	/* snapshot/quickload */
-	MDRV_SNAPSHOT_ADD(coco3_pak, "pak", 0)
-	MDRV_QUICKLOAD_ADD(coco, "bin", 0.5)
+	MDRV_SNAPSHOT_ADD("snapshot", coco3_pak, "pak", 0)
+	MDRV_QUICKLOAD_ADD("quickload", coco, "bin", 0.5)
 
 	/* devices */
 	MDRV_COCO_VHD_ADD("vhd")

@@ -286,7 +286,7 @@ static MACHINE_DRIVER_START( atom )
 	MDRV_CENTRONICS_ADD("centronics", atom_centronics_config)
 
 	/* quickload */
-	MDRV_QUICKLOAD_ADD(atom, "atm", 0)
+	MDRV_QUICKLOAD_ADD("quickload", atom, "atm", 0)
 
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )

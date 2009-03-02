@@ -182,7 +182,7 @@ static MACHINE_DRIVER_START( vector06 )
   	MDRV_VIDEO_UPDATE(vector06)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("cassette", WAVE, 0)
+	MDRV_SOUND_WAVE_ADD("wave", "cassette")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MDRV_CASSETTE_ADD( "cassette", vector_cassette_config )

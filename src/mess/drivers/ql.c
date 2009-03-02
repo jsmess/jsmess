@@ -648,7 +648,7 @@ static MACHINE_DRIVER_START( ql )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* quickload */
-	MDRV_QUICKLOAD_ADD(ql, "bas", 0)
+	MDRV_QUICKLOAD_ADD("quickload", ql, "bas", 0)
 
 	/* cartridge */
 	MDRV_CARTSLOT_ADD("cart")

@@ -407,10 +407,10 @@ static MACHINE_DRIVER_START( level1 )
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_CONFIG(trs80_speaker_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MDRV_SOUND_ADD("cassette", WAVE, 0)
+	MDRV_SOUND_WAVE_ADD("wave", "cassette")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	/* devices */
-	MDRV_QUICKLOAD_ADD(trs80_cmd, "cmd", 0.5)
+	MDRV_QUICKLOAD_ADD("quickload", trs80_cmd, "cmd", 0.5)
 
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
 	

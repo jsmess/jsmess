@@ -142,7 +142,7 @@ static MACHINE_DRIVER_START( ondra )
     
 	// sound hardware	
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("cassette", WAVE, 0)
+	MDRV_SOUND_WAVE_ADD("wave", "cassette")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	
 	MDRV_CASSETTE_ADD( "cassette", ondra_cassette_config )    

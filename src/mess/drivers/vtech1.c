@@ -332,7 +332,7 @@ static MACHINE_DRIVER_START(laser110)
 
     /* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("cassette", WAVE, 0)
+	MDRV_SOUND_WAVE_ADD("wave", "cassette")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_CONFIG(vtech1_speaker_interface)
@@ -342,8 +342,8 @@ static MACHINE_DRIVER_START(laser110)
 	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
 
 	/* snapshot/quickload */
-	MDRV_SNAPSHOT_ADD(vtech1, "vz", 1.5)
-	MDRV_Z80BIN_QUICKLOAD_ADD(vtech1, 1.5)
+	MDRV_SNAPSHOT_ADD("snapshot", vtech1, "vz", 1.5)
+	MDRV_Z80BIN_QUICKLOAD_ADD("quickload", vtech1, 1.5)
 
 	MDRV_CASSETTE_ADD( "cassette", laser_cassette_config )
 

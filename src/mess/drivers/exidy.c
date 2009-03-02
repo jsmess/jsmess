@@ -784,9 +784,9 @@ static MACHINE_DRIVER_START( exidy )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("cassette1", WAVE, 0)
+	MDRV_SOUND_WAVE_ADD("wave.1", "cassette1")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)	// cass1 speaker
-	MDRV_SOUND_ADD("cassette2", WAVE, 1)
+	MDRV_SOUND_WAVE_ADD("wave.2", "cassette2")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)	// cass2 speaker
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)	// speaker on parallel port
@@ -797,7 +797,7 @@ static MACHINE_DRIVER_START( exidy )
 	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
 
 	/* quickload */
-	MDRV_Z80BIN_QUICKLOAD_ADD(exidy, 2)
+	MDRV_Z80BIN_QUICKLOAD_ADD("quickload", exidy, 2)
 
 	MDRV_CASSETTE_ADD( "cassette1", exidy_cassette_config )
 	MDRV_CASSETTE_ADD( "cassette2", exidy_cassette_config )

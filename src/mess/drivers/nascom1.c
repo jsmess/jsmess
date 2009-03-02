@@ -300,7 +300,7 @@ static MACHINE_DRIVER_START( nascom1 )
 	MDRV_Z80PIO_ADD( "z80pio", nascom1_z80pio_intf )
 
 	/* devices */
-	MDRV_SNAPSHOT_ADD(nascom1, "nas", 0.5)
+	MDRV_SNAPSHOT_ADD("snapshot", nascom1, "nas", 0.5)
 
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
 MACHINE_DRIVER_END

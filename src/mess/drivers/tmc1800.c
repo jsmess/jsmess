@@ -891,7 +891,7 @@ static MACHINE_DRIVER_START( tmc1800 )
 
 	// quickload
 
-	MDRV_QUICKLOAD_ADD(tmc1800, "bin", 0)
+	MDRV_QUICKLOAD_ADD("quickload", tmc1800, "bin", 0)
 
 	MDRV_CASSETTE_ADD( "cassette", tmc1800_cassette_config )
 MACHINE_DRIVER_END
@@ -922,7 +922,7 @@ static MACHINE_DRIVER_START( osc1000b )
 
 	// quickload
 
-	MDRV_QUICKLOAD_ADD(tmc1800, "bin", 0)
+	MDRV_QUICKLOAD_ADD("quickload", tmc1800, "bin", 0)
 
 	MDRV_CASSETTE_ADD( "cassette", tmc1800_cassette_config )
 MACHINE_DRIVER_END
@@ -953,7 +953,7 @@ static MACHINE_DRIVER_START( tmc2000 )
 
 	// quickload
 
-	MDRV_QUICKLOAD_ADD(tmc1800, "bin", 0)
+	MDRV_QUICKLOAD_ADD("quickload", tmc1800, "bin", 0)
 
 	MDRV_CASSETTE_ADD( "cassette", tmc1800_cassette_config )
 MACHINE_DRIVER_END
@@ -984,7 +984,7 @@ static MACHINE_DRIVER_START( oscnano )
 
 	// quickload
 
-	MDRV_QUICKLOAD_ADD(tmc1800, "bin", 0)
+	MDRV_QUICKLOAD_ADD("quickload", tmc1800, "bin", 0)
 
 	MDRV_CASSETTE_ADD( "cassette", tmc1800_cassette_config )
 MACHINE_DRIVER_END

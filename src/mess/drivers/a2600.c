@@ -1810,6 +1810,9 @@ static MACHINE_RESET( a2600 )
 
 		memory_set_bankptr(machine,9, extra_RAM);
 	}
+
+	/* Banks may have changed, reset the cpu so it uses the correct reset vector */
+	device_reset( machine->cpu[0] );
 }
 
 
@@ -2002,7 +2005,7 @@ static MACHINE_DRIVER_START( a2600 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("tia", TIA, MASTER_CLOCK_NTSC/114)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
-	MDRV_SOUND_ADD("cassette", WAVE, 0)
+	MDRV_SOUND_WAVE_ADD("wave", "cassette")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	/* devices */
@@ -2034,7 +2037,7 @@ static MACHINE_DRIVER_START( a2600p )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("tia", TIA, MASTER_CLOCK_PAL/114)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
-	MDRV_SOUND_ADD("cassette", WAVE, 0)
+	MDRV_SOUND_WAVE_ADD("wave", "cassette")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	/* devices */

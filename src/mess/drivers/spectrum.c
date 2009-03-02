@@ -475,14 +475,14 @@ MACHINE_DRIVER_START( spectrum )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("cassette", WAVE, 0)
+	MDRV_SOUND_WAVE_ADD("wave", "cassette")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
-	MDRV_SNAPSHOT_ADD(spectrum, "sna,z80,sp", 0)
-	MDRV_QUICKLOAD_ADD(spectrum, "scr", 0)
+	MDRV_SNAPSHOT_ADD("snapshot", spectrum, "sna,z80,sp", 0)
+	MDRV_QUICKLOAD_ADD("quickload", spectrum, "scr", 0)
 	MDRV_CASSETTE_ADD( "cassette", spectrum_cassette_config )
 	
 	/* cartridge */

@@ -452,13 +452,13 @@ static MACHINE_DRIVER_START( lviv )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("cassette", WAVE, 0)
+	MDRV_SOUND_WAVE_ADD("wave", "cassette")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* snapshot */
-	MDRV_SNAPSHOT_ADD(lviv, "sav", 0)
+	MDRV_SNAPSHOT_ADD("snapshot", lviv, "sav", 0)
 
 	MDRV_CASSETTE_ADD( "cassette", lviv_cassette_config )
 MACHINE_DRIVER_END

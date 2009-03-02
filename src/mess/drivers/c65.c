@@ -237,7 +237,7 @@ static MACHINE_DRIVER_START( c65 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 
 	/* quickload */
-	MDRV_QUICKLOAD_ADD(cbm_c65, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
+	MDRV_QUICKLOAD_ADD("quickload", cbm_c65, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	/* cia */
 	MDRV_CIA6526_ADD("cia_0", CIA6526R1, 3500000, c64_ntsc_cia0)

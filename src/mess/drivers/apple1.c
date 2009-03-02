@@ -248,7 +248,7 @@ static MACHINE_DRIVER_START( apple1 )
 	MDRV_VIDEO_UPDATE(apple1)
 
 	/* snapshot */
-	MDRV_SNAPSHOT_ADD(apple1, "snp", 0)
+	MDRV_SNAPSHOT_ADD("snapshot", apple1, "snp", 0)
 
 	MDRV_CASSETTE_ADD( "cassette", apple1_cassette_config )
 MACHINE_DRIVER_END

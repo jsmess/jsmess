@@ -90,7 +90,7 @@ static MACHINE_DRIVER_START( lynx )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
-	MDRV_QUICKLOAD_ADD(lynx, "o,lnx", 0)
+	MDRV_QUICKLOAD_ADD("quickload", lynx, "o,lnx", 0)
 	
 	MDRV_IMPORT_FROM(lynx_cartslot)
 MACHINE_DRIVER_END
@@ -167,7 +167,7 @@ static QUICKLOAD_LOAD( lynx )
 	rom[0x1fc] = start & 0xff;
 	rom[0x1fd] = start >> 8;
 
-	lynx_crc_keyword(devtag_get_device(image->machine, QUICKLOAD, TAG_QUICKLOAD)); 
+	lynx_crc_keyword(devtag_get_device(image->machine, QUICKLOAD, "quickload")); 
 
 	return INIT_PASS;
 }

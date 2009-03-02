@@ -1076,7 +1076,7 @@ static MACHINE_DRIVER_START( psxntsc )
 	MDRV_SOUND_ROUTE( 1, "rspeaker", 1.00 )
 
 	/* quickload */
-	MDRV_QUICKLOAD_ADD(psx_exe_load, "cpe,exe,psf,psx", 0)
+	MDRV_QUICKLOAD_ADD("quickload", psx_exe_load, "cpe,exe,psf,psx", 0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( psxpal )
@@ -1109,7 +1109,7 @@ static MACHINE_DRIVER_START( psxpal )
 	MDRV_SOUND_ROUTE( 1, "rspeaker", 1.00 )
 
 	/* quickload */
-	MDRV_QUICKLOAD_ADD(psx_exe_load, "cpe,exe,psf,psx", 0)
+	MDRV_QUICKLOAD_ADD("quickload", psx_exe_load, "cpe,exe,psf,psx", 0)
 MACHINE_DRIVER_END
 
 ROM_START( psj )

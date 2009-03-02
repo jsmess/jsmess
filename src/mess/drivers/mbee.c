@@ -412,14 +412,14 @@ static MACHINE_DRIVER_START( mbee )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("cassette", WAVE, 0)
+	MDRV_SOUND_WAVE_ADD("wave", "cassette")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
-	MDRV_QUICKLOAD_ADD(mbee, "mwb,com", 2)
-	MDRV_Z80BIN_QUICKLOAD_ADD(mbee, 2)
+	MDRV_QUICKLOAD_ADD("quickload", mbee, "mwb,com", 2)
+	MDRV_Z80BIN_QUICKLOAD_ADD("quickload2", mbee, 2)
 
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
 	
@@ -455,14 +455,14 @@ static MACHINE_DRIVER_START( mbeeic )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("cassette", WAVE, 0)
+	MDRV_SOUND_WAVE_ADD("wave", "cassette")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
-	MDRV_QUICKLOAD_ADD(mbee, "mwb,com", 2)
-	MDRV_Z80BIN_QUICKLOAD_ADD(mbee, 2)
+	MDRV_QUICKLOAD_ADD("quickload", mbee, "mwb,com", 2)
+	MDRV_Z80BIN_QUICKLOAD_ADD("quickload2", mbee, 2)
 
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
 	

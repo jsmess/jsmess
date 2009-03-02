@@ -552,9 +552,9 @@ static MACHINE_DRIVER_START(ti99_4_60hz)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("cassette1", WAVE, 0)
+	MDRV_SOUND_WAVE_ADD("wave.1", "cassette1")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
-	MDRV_SOUND_ADD("cassette2", WAVE, 0)
+	MDRV_SOUND_WAVE_ADD("wave.2", "cassette2")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 	MDRV_SOUND_ADD("sn76496", SN76496, 3579545)	/* 3.579545 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
@@ -609,7 +609,7 @@ static MACHINE_DRIVER_START(ti99_4_50hz)
 	MDRV_SOUND_ADD("tms5220", TMS5220, 680000L)
 	MDRV_SOUND_CONFIG(ti99_4x_tms5220interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MDRV_SOUND_ADD("cassette1", WAVE, 0)
+	MDRV_SOUND_WAVE_ADD("wave.1", "cassette1")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	/* devices */
@@ -659,7 +659,7 @@ static MACHINE_DRIVER_START(ti99_4a_60hz)
 	MDRV_SOUND_ADD("tms5220", TMS5220, 680000L)
 	MDRV_SOUND_CONFIG(ti99_4x_tms5220interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MDRV_SOUND_ADD("cassette1", WAVE, 0)
+	MDRV_SOUND_WAVE_ADD("wave.1", "cassette1")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	/* devices */
@@ -711,7 +711,7 @@ static MACHINE_DRIVER_START(ti99_4a_50hz)
 	MDRV_SOUND_ADD("tms5220", TMS5220, 680000L)
 	MDRV_SOUND_CONFIG(ti99_4x_tms5220interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MDRV_SOUND_ADD("cassette1", WAVE, 0)
+	MDRV_SOUND_WAVE_ADD("wave.1", "cassette1")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	/* devices */
@@ -770,7 +770,7 @@ static MACHINE_DRIVER_START(ti99_4ev_60hz)
 	MDRV_SOUND_ADD("tms5220", TMS5220, 680000L)
 	MDRV_SOUND_CONFIG(ti99_4x_tms5220interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MDRV_SOUND_ADD("cassette1", WAVE, 0)
+	MDRV_SOUND_WAVE_ADD("wave.1", "cassette1")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	/* devices */

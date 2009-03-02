@@ -242,7 +242,7 @@ static MACHINE_DRIVER_START( vc4000 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* quickload */
-	MDRV_QUICKLOAD_ADD(vc4000, "tvc", 0)
+	MDRV_QUICKLOAD_ADD("quickload", vc4000, "tvc", 0)
 
 	/* cartridge */
 	MDRV_CARTSLOT_ADD("cart")

@@ -500,7 +500,7 @@ static MACHINE_DRIVER_START( c64 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* quickload */
-	MDRV_QUICKLOAD_ADD(cbm_c64, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
+	MDRV_QUICKLOAD_ADD("quikcload", cbm_c64, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", cbm_cassette_config )
@@ -540,7 +540,7 @@ static MACHINE_DRIVER_START( c64pal )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* quickload */
-	MDRV_QUICKLOAD_ADD(cbm_c64, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
+	MDRV_QUICKLOAD_ADD("quickload", cbm_c64, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", cbm_cassette_config )
@@ -576,7 +576,7 @@ static MACHINE_DRIVER_START( c64gs )
 	MDRV_IMPORT_FROM( c64pal )
 	MDRV_SOUND_REMOVE( "dac" )
 	MDRV_CASSETTE_REMOVE( "cassette" )
-	MDRV_QUICKLOAD_REMOVE
+	MDRV_QUICKLOAD_REMOVE( "quickload" )
 MACHINE_DRIVER_END
 
 

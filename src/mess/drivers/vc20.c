@@ -282,7 +282,7 @@ static MACHINE_DRIVER_START( vic20 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MDRV_QUICKLOAD_ADD(cbm_vc20, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
+	MDRV_QUICKLOAD_ADD("quickload", cbm_vc20, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", cbm_cassette_config )

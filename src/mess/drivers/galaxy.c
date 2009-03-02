@@ -182,10 +182,10 @@ static MACHINE_DRIVER_START( galaxy )
 	MDRV_VIDEO_UPDATE( galaxy )
 
 	/* snapshot */
-	MDRV_SNAPSHOT_ADD(galaxy, "gal", 0)
+	MDRV_SNAPSHOT_ADD("snapshot", galaxy, "gal", 0)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("cassette", WAVE, 0)
+	MDRV_SOUND_WAVE_ADD("wave", "cassette")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_CASSETTE_ADD( "cassette", galaxy_cassette_config )
@@ -213,13 +213,13 @@ static MACHINE_DRIVER_START( galaxyp )
 	MDRV_VIDEO_UPDATE( galaxy )
 	
 	/* snapshot */
-	MDRV_SNAPSHOT_ADD(galaxy, "gal", 0)
+	MDRV_SNAPSHOT_ADD("snapshot", galaxy, "gal", 0)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("ay8910", AY8910, XTAL/4)
 	MDRV_SOUND_CONFIG(galaxy_ay_interface)
-	MDRV_SOUND_ADD("cassette", WAVE, 0)
+	MDRV_SOUND_WAVE_ADD("wave", "cassette")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_CASSETTE_ADD( "cassette", galaxy_cassette_config )

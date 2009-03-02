@@ -700,7 +700,7 @@ static MACHINE_DRIVER_START( super80 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("cassette", WAVE, 0)
+	MDRV_SOUND_WAVE_ADD("wave", "cassette")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -709,7 +709,7 @@ static MACHINE_DRIVER_START( super80 )
 	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
 
 	/* quickload */
-	MDRV_Z80BIN_QUICKLOAD_ADD(default, 1)
+	MDRV_Z80BIN_QUICKLOAD_ADD("quickload", default, 1)
 
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", super80_cassette_config )
@@ -760,7 +760,7 @@ static MACHINE_DRIVER_START( super80v )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("cassette", WAVE, 0)
+	MDRV_SOUND_WAVE_ADD("wave", "cassette")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -769,7 +769,7 @@ static MACHINE_DRIVER_START( super80v )
 	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
 
 	/* quickload */
-	MDRV_Z80BIN_QUICKLOAD_ADD(default, 1)
+	MDRV_Z80BIN_QUICKLOAD_ADD("quickload", default, 1)
 
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", super80_cassette_config )

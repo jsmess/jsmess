@@ -178,7 +178,7 @@ static MACHINE_DRIVER_START( bk0010 )
     MDRV_VIDEO_UPDATE(bk0010)
 
  	MDRV_SPEAKER_STANDARD_MONO("mono")
-   	MDRV_SOUND_ADD("cassette", WAVE, 0)
+   	MDRV_SOUND_WAVE_ADD("wave", "cassette")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_CASSETTE_ADD( "cassette", bk0010_cassette_config )
@@ -205,7 +205,7 @@ static MACHINE_DRIVER_START( bk0010fd )
     MDRV_VIDEO_UPDATE(bk0010)
 
  	MDRV_SPEAKER_STANDARD_MONO("mono")
-   	MDRV_SOUND_ADD("cassette", WAVE, 0)
+   	MDRV_SOUND_WAVE_ADD("wave", "cassette")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_CASSETTE_ADD( "cassette", bk0010_cassette_config )

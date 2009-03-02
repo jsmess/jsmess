@@ -434,7 +434,7 @@ static MACHINE_DRIVER_START( c16 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MDRV_QUICKLOAD_ADD(cbm_c16, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
+	MDRV_QUICKLOAD_ADD("quikcload", cbm_c16, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", cbm_cassette_config )

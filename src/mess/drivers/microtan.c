@@ -240,7 +240,7 @@ static MACHINE_DRIVER_START( microtan )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MDRV_SOUND_ADD("cassette", WAVE, 0)
+	MDRV_SOUND_WAVE_ADD("wave", "cassette")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MDRV_SOUND_ADD("ay8910.1", AY8910, 1000000)
 	MDRV_SOUND_CONFIG(microtan_ay8910_interface)
@@ -250,8 +250,8 @@ static MACHINE_DRIVER_START( microtan )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* snapshot/quickload */
-	MDRV_SNAPSHOT_ADD(microtan, "m65", 0.5)
-	MDRV_QUICKLOAD_ADD(microtan_hexfile, "hex", 0.5)
+	MDRV_SNAPSHOT_ADD("snapshot", microtan, "m65", 0.5)
+	MDRV_QUICKLOAD_ADD("quickload", microtan_hexfile, "hex", 0.5)
 
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )

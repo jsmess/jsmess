@@ -698,7 +698,7 @@ static MACHINE_DRIVER_START( vip )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MDRV_QUICKLOAD_ADD(vip, "bin,c8,c8x", 0)
+	MDRV_QUICKLOAD_ADD("quickload", vip, "bin,c8,c8x", 0)
 
 	MDRV_CASSETTE_ADD( "cassette", vip_cassette_config )
 MACHINE_DRIVER_END

@@ -308,7 +308,7 @@ static MACHINE_DRIVER_START( mtx512 )
 	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
 
 	/* snapshot */
-	MDRV_SNAPSHOT_ADD(mtx, "mtb", 0.5)
+	MDRV_SNAPSHOT_ADD("snapshot", mtx, "mtb", 0.5)
 MACHINE_DRIVER_END
 
 

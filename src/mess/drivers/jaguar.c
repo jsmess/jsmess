@@ -487,7 +487,7 @@ static MACHINE_DRIVER_START( jaguar )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	/* quickload */
-	MDRV_QUICKLOAD_ADD(jaguar, "bin", 0)
+	MDRV_QUICKLOAD_ADD("quickload", jaguar, "bin", 0)
 
 	/* cartridge */
 	MDRV_CARTSLOT_ADD("cart")
