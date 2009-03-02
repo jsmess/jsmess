@@ -37,9 +37,6 @@ enum
 #define QUICKLOAD_LOAD_NAME(name)	quickload_load_##name
 #define QUICKLOAD_LOAD(name)		int QUICKLOAD_LOAD_NAME(name)(const device_config *image, const char *file_type, int quickload_size)
 
-#define TAG_SNAPSHOT	"snapshot"
-#define TAG_QUICKLOAD	"quickload"
-
 
 
 /***************************************************************************
@@ -63,8 +60,8 @@ struct _snapquick_config
     SNAPSHOT DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_SNAPSHOT_ADD(_load, _file_extensions, _delay)	\
-	MDRV_DEVICE_ADD(TAG_SNAPSHOT, SNAPSHOT, 0) \
+#define MDRV_SNAPSHOT_ADD(_tag, _load, _file_extensions, _delay)	\
+	MDRV_DEVICE_ADD(_tag, SNAPSHOT, 0) \
 	MDRV_DEVICE_CONFIG_DATAPTR(snapquick_config, load, SNAPSHOT_LOAD_NAME(_load))	\
 	MDRV_DEVICE_CONFIG_DATAPTR(snapquick_config, file_extensions, _file_extensions) \
 	MDRV_DEVICE_CONFIG_DATA64(snapquick_config, delay_seconds, (seconds_t) (_delay)) \
@@ -76,15 +73,15 @@ struct _snapquick_config
     QUICKLOAD DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_QUICKLOAD_ADD(_load, _file_extensions, _delay)	\
-	MDRV_DEVICE_ADD(TAG_QUICKLOAD, QUICKLOAD, 0) \
+#define MDRV_QUICKLOAD_ADD(_tag, _load, _file_extensions, _delay)	\
+	MDRV_DEVICE_ADD(_tag, QUICKLOAD, 0) \
 	MDRV_DEVICE_CONFIG_DATAPTR(snapquick_config, load, QUICKLOAD_LOAD_NAME(_load))	\
 	MDRV_DEVICE_CONFIG_DATAPTR(snapquick_config, file_extensions, _file_extensions) \
 	MDRV_DEVICE_CONFIG_DATA64(snapquick_config, delay_seconds, (seconds_t) (_delay)) \
 	MDRV_DEVICE_CONFIG_DATA64(snapquick_config, delay_attoseconds, (attoseconds_t) (((_delay) - (int)(_delay)) * ATTOSECONDS_PER_SECOND)) \
 
-#define MDRV_QUICKLOAD_REMOVE \
-	MDRV_DEVICE_REMOVE(TAG_QUICKLOAD, QUICKLOAD)
+#define MDRV_QUICKLOAD_REMOVE(_tag) \
+	MDRV_DEVICE_REMOVE(_tag, QUICKLOAD)
 
 
 
