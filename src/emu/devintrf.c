@@ -106,9 +106,7 @@ device_config *device_list_add(device_config **listheadptr, const device_config 
 	for (devptr = listheadptr; *devptr != NULL; devptr = &(*devptr)->next)
 		if (strcmp(tag, (*devptr)->tag) == 0)
 		{
-#ifndef MESS
 			fatalerror("Attempted to add duplicate device: type=%s tag=%s\n", device_get_name(*devptr), tag);
-#endif /* MESS */
 		}
 
 	/* get the size of the inline config */

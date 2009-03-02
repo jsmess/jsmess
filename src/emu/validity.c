@@ -170,10 +170,8 @@ INLINE int validate_tag(const game_driver *driver, const char *object, const cha
 		strcmp(tag, "left") == 0 ||
 		strcmp(tag, "right") == 0)
 	{
-#ifndef MESS
 		mame_printf_error("%s: %s has invalid generic tag '%s'\n", driver->source_file, driver->name, tag);
 		error = TRUE;
-#endif /* MESS */
 	}
 
 	for (p = tag; *p != 0; p++)
