@@ -260,7 +260,7 @@ static const centronics_interface atom_centronics_config =
 /* machine definition */
 static MACHINE_DRIVER_START( atom )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M65C02, 1000000)        /* 0,894886 MHz */
+	MDRV_CPU_ADD("maincpu", M65C02, X2 / 4)
 	MDRV_CPU_PROGRAM_MAP(atom_mem, 0)
 
 	MDRV_MACHINE_RESET( atom )
@@ -292,7 +292,7 @@ static MACHINE_DRIVER_START( atom )
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
 
 	/* via */
-	MDRV_VIA6522_ADD("via6522_0", 1000000, atom_6522_interface)
+	MDRV_VIA6522_ADD("via6522_0", X2 / 4, atom_6522_interface)
 
 	/* i8271 */
 	MDRV_I8271_ADD("i8271", atom_8271_interface)

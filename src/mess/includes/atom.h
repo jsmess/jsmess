@@ -12,6 +12,15 @@
 #include "machine/8255ppi.h"
 #include "machine/i8271.h"
 
+/* Motherboard crystals
+  
+Source: http://acorn.chriswhy.co.uk/docs/Acorn/Manuals/Acorn_AtomTechnicalManual.pdf
+
+*/
+
+#define X1	XTAL_3_579545MHz	// MC6847 Clock
+#define X2	XTAL_4MHz		// CPU Clock - a divider reduces it to 1MHz
+
 /*----------- defined in machine/atom.c -----------*/
 
 extern UINT8 atom_8255_porta;
