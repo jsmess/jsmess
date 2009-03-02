@@ -870,7 +870,7 @@ static MACHINE_DRIVER_START( amstrad )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("cassette", WAVE, 0)
+	MDRV_SOUND_WAVE_ADD("wave", "cassette")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MDRV_SOUND_ADD("ay", AY8912, XTAL_16MHz / 16)
 	MDRV_SOUND_CONFIG(ay8912_interface)
@@ -880,7 +880,7 @@ static MACHINE_DRIVER_START( amstrad )
 	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
 
 	/* snapshot */
-	MDRV_SNAPSHOT_ADD(amstrad, "sna", 0)
+	MDRV_SNAPSHOT_ADD("snapshot", amstrad, "sna", 0)
 
 	MDRV_CASSETTE_ADD( "cassette", amstrad_cassette_config )
 
@@ -926,7 +926,7 @@ static MACHINE_DRIVER_START( cpcplus )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("cassette", WAVE, 0)
+	MDRV_SOUND_WAVE_ADD("wave", "cassette")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MDRV_SOUND_ADD("ay", AY8912, XTAL_40MHz / 40)
 	MDRV_SOUND_CONFIG(ay8912_interface)
@@ -936,7 +936,7 @@ static MACHINE_DRIVER_START( cpcplus )
 	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
 
 	/* snapshot */
-	MDRV_SNAPSHOT_ADD(amstrad, "sna", 0)
+	MDRV_SNAPSHOT_ADD("snapshot", amstrad, "sna", 0)
 
 	MDRV_CASSETTE_ADD( "cassette", amstrad_cassette_config )
 
