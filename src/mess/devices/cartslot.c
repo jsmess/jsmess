@@ -263,7 +263,7 @@ static DEVICE_IMAGE_LOAD( cartslot )
 		return (*config->device_load)(image);
 
 	/* try opening this as if it were a multicart */
-	multicart_open(image_filename(image), MULTICART_FLAGS_DONT_LOAD_RESOURCES, &cart->mc);
+	multicart_open(image_filename(image), MULTICART_FLAGS_LOAD_RESOURCES, &cart->mc);
 	if (cart->mc == NULL)
 	{
 		/* otherwise try the normal route */
