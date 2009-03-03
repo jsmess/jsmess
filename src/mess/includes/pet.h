@@ -8,6 +8,7 @@
 #define PET_H_
 
 #include "video/mc6845.h"
+#include "machine/6821new.h"
 #include "machine/6522via.h"
 #include "devices/cartslot.h"
 
@@ -35,6 +36,9 @@ MC6845_ON_DE_CHANGED( pet_display_enable_changed );
 
 extern int pet_font;
 extern const via6522_interface pet_via;
+extern const pia6821_interface pet_pia0;
+extern const pia6821_interface petb_pia0;
+extern const pia6821_interface pet_pia1;
 
 extern UINT8 *pet_memory;
 extern UINT8 *pet_videoram;
@@ -46,8 +50,6 @@ extern WRITE8_HANDLER(superpet_w);
 
 DRIVER_INIT( pet2001 );
 DRIVER_INIT( pet );
-DRIVER_INIT( petb );
-DRIVER_INIT( pet40 );
 DRIVER_INIT( pet80 );
 DRIVER_INIT( superpet );
 MACHINE_RESET( pet );

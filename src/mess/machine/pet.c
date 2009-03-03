@@ -9,7 +9,7 @@
 #include "cpu/m6809/m6809.h"
 
 #include "includes/cbm.h"
-#include "machine/6821pia.h"
+#include "machine/6821new.h"
 #include "machine/6522via.h"
 #include "includes/cbmserb.h"
 #include "includes/cbmieeeb.h"
@@ -74,29 +74,29 @@ static WRITE8_HANDLER( pet_mc6845_address_w )
   cb1 video sync in
   cb2 cassette 1 motor out
 */
-static READ8_HANDLER ( pet_pia0_port_a_read )
+static READ8_DEVICE_HANDLER ( pet_pia0_port_a_read )
 {
 	int data = 0xf0 | pet_keyline_select;
 
-	if ((cassette_get_state(devtag_get_device(space->machine, CASSETTE, "cassette1")) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
+	if ((cassette_get_state(devtag_get_device(device->machine, CASSETTE, "cassette1")) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
 		data &= ~0x10;
 
-	if ((cassette_get_state(devtag_get_device(space->machine, CASSETTE, "cassette2")) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
+	if ((cassette_get_state(devtag_get_device(device->machine, CASSETTE, "cassette2")) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
 		data &= ~0x20;
 
-	if (!cbm_ieee_eoi_r(space->machine))
+	if (!cbm_ieee_eoi_r(device->machine))
 		data &= ~0x40;
 
 	return data;
 }
 
-static WRITE8_HANDLER ( pet_pia0_port_a_write )
+static WRITE8_DEVICE_HANDLER ( pet_pia0_port_a_write )
 {
 	pet_keyline_select = data & 0x0f;
 }
 
 /* Keyboard reading/handling for regular keyboard */
-static  READ8_HANDLER ( pet_pia0_port_b_read )
+static  READ8_DEVICE_HANDLER ( pet_pia0_port_b_read )
 {
 	UINT8 data = 0xff;
 	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4",
@@ -104,36 +104,36 @@ static  READ8_HANDLER ( pet_pia0_port_b_read )
 
 	if (pet_keyline_select < 10)
 	{
-		data = input_port_read(space->machine, keynames[pet_keyline_select]);
+		data = input_port_read(device->machine, keynames[pet_keyline_select]);
 		/* Check for left-shift lock */
-		if ((pet_keyline_select == 8) && (input_port_read(space->machine, "SPECIAL") & 0x80))
+		if ((pet_keyline_select == 8) && (input_port_read(device->machine, "SPECIAL") & 0x80))
 			data &= 0xfe;
 	}
 	return data;
 }
 
 /* Keyboard handling for business keyboard */
-static READ8_HANDLER( petb_pia0_port_b_read )
+static READ8_DEVICE_HANDLER( petb_pia0_port_b_read )
 {
 	UINT8 data = 0xff;
-	pet_state *state = space->machine->driver_data;
+	pet_state *state = device->machine->driver_data;
 	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4",
 										"ROW5", "ROW6", "ROW7", "ROW8", "ROW9" };
 
 	if (pet_keyline_select < 10)
 	{
-		data = input_port_read(space->machine, keynames[pet_keyline_select]);
+		data = input_port_read(device->machine, keynames[pet_keyline_select]);
 		/* Check for left-shift lock */
 		/* 2008-05 FP: For some reason, superpet read it in the opposite way!! */
 		/* While waiting for confirmation from docs, we add a workaround here. */
 		if (state->superpet)
 		{
-			if ((pet_keyline_select == 6) && !(input_port_read(space->machine, "SPECIAL") & 0x80))
+			if ((pet_keyline_select == 6) && !(input_port_read(device->machine, "SPECIAL") & 0x80))
 				data &= 0xfe;
 		}
 		else
 		{
-			if ((pet_keyline_select == 6) && (input_port_read(space->machine, "SPECIAL") & 0x80))
+			if ((pet_keyline_select == 6) && (input_port_read(device->machine, "SPECIAL") & 0x80))
 				data &= 0xfe;
 		}
 	}
@@ -141,41 +141,43 @@ static READ8_HANDLER( petb_pia0_port_b_read )
 }
 
 /* NOT WORKING - Just placeholder */
-static READ8_HANDLER( pet_pia0_ca1_in )
+static READ8_DEVICE_HANDLER( pet_pia0_ca1_in )
 {
 	// cassette 1 read
-	return (cassette_input(devtag_get_device(space->machine, CASSETTE, "cassette1")) > +0.0) ? 1 : 0;
+	return (cassette_input(devtag_get_device(device->machine, CASSETTE, "cassette1")) > +0.0) ? 1 : 0;
 }
 
 
-static WRITE8_HANDLER( pet_pia0_ca2_out )
+static WRITE8_DEVICE_HANDLER( pet_pia0_ca2_out )
 {
-	cbm_ieee_eoi_w(space->machine, 0, data);
+	cbm_ieee_eoi_w(device->machine, 0, data);
 }
 
-static WRITE8_HANDLER( pet_pia0_cb2_out )
+static WRITE8_DEVICE_HANDLER( pet_pia0_cb2_out )
 {
 	if (!data)
 	{
-		cassette_change_state(devtag_get_device(space->machine, CASSETTE, "cassette1"),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+		cassette_change_state(devtag_get_device(device->machine, CASSETTE, "cassette1"),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
 		timer_adjust_periodic(datasette1_timer, attotime_zero, 0, ATTOTIME_IN_HZ(48000));	// I put 48000 because I was given some .wav with this freq
 	}
 	else
 	{
-		cassette_change_state(devtag_get_device(space->machine, CASSETTE, "cassette1"),CASSETTE_MOTOR_DISABLED ,CASSETTE_MASK_MOTOR);
+		cassette_change_state(devtag_get_device(device->machine, CASSETTE, "cassette1"),CASSETTE_MOTOR_DISABLED ,CASSETTE_MASK_MOTOR);
 		timer_reset(datasette1_timer, attotime_never);
 	}
 }
 
 
-static void pet_irq (running_machine *machine, int level)
+static WRITE_LINE_DEVICE_HANDLER( pet_irq )
 {
+	int level = state ? 1 : 0;
 	static int old_level = 0;
-	pet_state *state = machine->driver_data;
+	running_machine *machine = device->machine;
+	pet_state *driver_state = machine->driver_data;
 	if (level != old_level)
 	{
 		DBG_LOG (3, "mos6502", ("irq %s\n", level ? "start" : "end"));
-		if (state->superpet)
+		if (driver_state->superpet)
 			cpu_set_input_line(machine->cpu[1], M6809_IRQ_LINE, level);
 		cpu_set_input_line(machine->cpu[0], M6502_IRQ_LINE, level);
 		old_level = level;
@@ -190,80 +192,82 @@ static void pet_irq (running_machine *machine, int level)
   cb1 srq in
   cb2 dav out
  */
-static READ8_HANDLER ( pet_pia1_port_a_read )
+static READ8_DEVICE_HANDLER ( pet_pia1_port_a_read )
 {
-	return cbm_ieee_data_r(space->machine);
+	return cbm_ieee_data_r(device->machine);
 }
 
-static WRITE8_HANDLER ( pet_pia1_port_b_write )
+static WRITE8_DEVICE_HANDLER ( pet_pia1_port_b_write )
 {
-	cbm_ieee_data_w(space->machine, 0, data);
+	cbm_ieee_data_w(device->machine, 0, data);
 }
 
-static READ8_HANDLER ( pet_pia1_ca1_read )
+static READ8_DEVICE_HANDLER ( pet_pia1_ca1_read )
 {
-	return cbm_ieee_atn_r(space->machine);
+	return cbm_ieee_atn_r(device->machine);
 }
 
-static WRITE8_HANDLER ( pet_pia1_ca2_write )
+static WRITE8_DEVICE_HANDLER ( pet_pia1_ca2_write )
 {
-	cbm_ieee_ndac_w(space->machine, 0, data);
+	cbm_ieee_ndac_w(device->machine, 0, data);
 }
 
-static WRITE8_HANDLER ( pet_pia1_cb2_write )
+static WRITE8_DEVICE_HANDLER ( pet_pia1_cb2_write )
 {
-	cbm_ieee_dav_w(space->machine, 0, data);
+	cbm_ieee_dav_w(device->machine, 0, data);
 }
 
-static READ8_HANDLER ( pet_pia1_cb1_read )
+static READ8_DEVICE_HANDLER ( pet_pia1_cb1_read )
 {
-	return cbm_ieee_srq_r(space->machine);
+	return cbm_ieee_srq_r(device->machine);
 }
 
-static const pia6821_interface pet_pia0 =
+const pia6821_interface pet_pia0 =
 {
-	pet_pia0_port_a_read,		/* in_a_func */
-	pet_pia0_port_b_read,		/* in_b_func */
-	pet_pia0_ca1_in,			/* in_ca1_func */
-	NULL,						/* in_cb1_func */
-	NULL,						/* in_ca2_func */
-	NULL,						/* in_cb2_func */
-	pet_pia0_port_a_write,		/* out_a_func */
-	NULL,						/* out_b_func */
-	pet_pia0_ca2_out,			/* out_ca2_func */
-	pet_pia0_cb2_out,			/* out_cb2_func */
-	NULL,						/* irq_a_func */
-	pet_irq						/* irq_b_func */
+	DEVCB_HANDLER(pet_pia0_port_a_read),		/* in_a_func */
+	DEVCB_HANDLER(pet_pia0_port_b_read),		/* in_b_func */
+	DEVCB_HANDLER(pet_pia0_ca1_in),			/* in_ca1_func */
+	DEVCB_NULL,						/* in_cb1_func */
+	DEVCB_NULL,						/* in_ca2_func */
+	DEVCB_NULL,						/* in_cb2_func */
+	DEVCB_HANDLER(pet_pia0_port_a_write),		/* out_a_func */
+	DEVCB_NULL,						/* out_b_func */
+	DEVCB_HANDLER(pet_pia0_ca2_out),			/* out_ca2_func */
+	DEVCB_HANDLER(pet_pia0_cb2_out),			/* out_cb2_func */
+	DEVCB_NULL,						/* irq_a_func */
+	DEVCB_LINE(pet_irq)						/* irq_b_func */
 };
 
-static const pia6821_interface petb_pia0 =
+const pia6821_interface petb_pia0 =
 {
-	pet_pia0_port_a_read,		/* in_a_func */
-	petb_pia0_port_b_read,		/* in_b_func */
-	pet_pia0_ca1_in,			/* in_ca1_func */
-	NULL,						/* in_cb1_func */
-	NULL,						/* in_ca2_func */
-	NULL,						/* in_cb2_func */
-	pet_pia0_port_a_write,		/* out_a_func */
-	NULL,						/* out_b_func */
-	pet_pia0_ca2_out,			/* out_ca2_func */
-	pet_pia0_cb2_out,			/* out_cb2_func */
-	NULL,						/* irq_a_func */
-	pet_irq						/* irq_b_func */
+	DEVCB_HANDLER(pet_pia0_port_a_read),		/* in_a_func */
+	DEVCB_HANDLER(petb_pia0_port_b_read),		/* in_b_func */
+	DEVCB_HANDLER(pet_pia0_ca1_in),			/* in_ca1_func */
+	DEVCB_NULL,						/* in_cb1_func */
+	DEVCB_NULL,						/* in_ca2_func */
+	DEVCB_NULL,						/* in_cb2_func */
+	DEVCB_HANDLER(pet_pia0_port_a_write),		/* out_a_func */
+	DEVCB_NULL,						/* out_b_func */
+	DEVCB_HANDLER(pet_pia0_ca2_out),			/* out_ca2_func */
+	DEVCB_HANDLER(pet_pia0_cb2_out),			/* out_cb2_func */
+	DEVCB_NULL,						/* irq_a_func */
+	DEVCB_LINE(pet_irq)						/* irq_b_func */
 };
 
-static const pia6821_interface pet_pia1 =
+const pia6821_interface pet_pia1 =
 {
-	pet_pia1_port_a_read,		/* in_a_func */
-	NULL,						/* in_b_func */
-    pet_pia1_ca1_read,			/* in_ca1_func */
-    pet_pia1_cb1_read,			/* in_cb1_func */
-	NULL,						/* in_ca2_func */
-	NULL,						/* in_cb2_func */
-	NULL,						/* out_a_func */
-    pet_pia1_port_b_write,		/* out_b_func */
-    pet_pia1_ca2_write,			/* out_ca2_func */
-    pet_pia1_cb2_write,			/* out_cb2_func */
+	DEVCB_HANDLER(pet_pia1_port_a_read),		/* in_a_func */
+	DEVCB_NULL,						/* in_b_func */
+    DEVCB_HANDLER(pet_pia1_ca1_read),			/* in_ca1_func */
+    DEVCB_HANDLER(pet_pia1_cb1_read),			/* in_cb1_func */
+	DEVCB_NULL,						/* in_ca2_func */
+	DEVCB_NULL,						/* in_cb2_func */
+	DEVCB_NULL,						/* out_a_func */
+    DEVCB_HANDLER(pet_pia1_port_b_write),		/* out_b_func */
+    DEVCB_HANDLER(pet_pia1_ca2_write),			/* out_ca2_func */
+    DEVCB_HANDLER(pet_pia1_cb2_write),			/* out_cb2_func */
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static WRITE8_DEVICE_HANDLER( pet_address_line_11 )
@@ -353,11 +357,13 @@ static struct {
 static WRITE8_HANDLER(cbm8096_io_w)
 {
 	const device_config *via_0 = devtag_get_device(space->machine, VIA6522, "via6522_0");
+	const device_config *pia_0 = devtag_get_device(space->machine, PIA6821, "pia_0");
+	const device_config *pia_1 = devtag_get_device(space->machine, PIA6821, "pia_1");
 
 	if (offset < 0x10) ;
-	else if (offset < 0x14) pia_0_w(space, offset & 3, data);
+	else if (offset < 0x14) pia_w(pia_0, offset & 3, data);
 	else if (offset < 0x20) ;
-	else if (offset < 0x24) pia_1_w(space, offset & 3, data);
+	else if (offset < 0x24) pia_w(pia_1, offset & 3, data);
 	else if (offset < 0x40) ;
 	else if (offset < 0x50) via_w(via_0, offset & 0xf, data);
 	else if (offset < 0x80) ;
@@ -368,12 +374,14 @@ static WRITE8_HANDLER(cbm8096_io_w)
 static READ8_HANDLER(cbm8096_io_r)
 {
 	const device_config *via_0 = devtag_get_device(space->machine, VIA6522, "via6522_0");
+	const device_config *pia_0 = devtag_get_device(space->machine, PIA6821, "pia_0");
+	const device_config *pia_1 = devtag_get_device(space->machine, PIA6821, "pia_1");
 
 	int data = 0xff;
 	if (offset < 0x10) ;
-	else if (offset < 0x14) data = pia_0_r(space, offset & 3);
+	else if (offset < 0x14) data = pia_r(pia_0, offset & 3);
 	else if (offset < 0x20) ;
-	else if (offset < 0x24) data = pia_1_r(space, offset & 3);
+	else if (offset < 0x24) data = pia_r(pia_1, offset & 3);
 	else if (offset < 0x40) ;
 	else if (offset < 0x50) data = via_r(via_0, offset & 0xf);
 	else if (offset < 0x80) ;
@@ -551,9 +559,10 @@ WRITE8_HANDLER(superpet_w)
 
 static TIMER_CALLBACK(pet_interrupt)
 {
+	const device_config *pia_0 = devtag_get_device(machine, PIA6821, "pia_0");
 	static int level = 0;
 
-	pia_0_cb1_w(cputag_get_address_space(machine,"maincpu",ADDRESS_SPACE_PROGRAM), 0, level);
+	pia_cb1_w(pia_0, 0, level);
 	level = !level;
 }
 
@@ -561,9 +570,10 @@ static TIMER_CALLBACK(pet_interrupt)
 /* NOT WORKING - Just placeholder */
 static TIMER_CALLBACK( pet_tape1_timer )
 {
+	const device_config *pia_0 = devtag_get_device(machine, PIA6821, "pia_0");
 //  cassette 1
 	UINT8 data = (cassette_input(devtag_get_device(machine, CASSETTE, "cassette1")) > +0.0) ? 1 : 0;
-	pia_0_ca1_w(cputag_get_address_space(machine,"maincpu",ADDRESS_SPACE_PROGRAM), 0, data);
+	pia_ca1_w(pia_0, 0, data);
 }
 
 /* NOT WORKING - Just placeholder */
@@ -608,8 +618,6 @@ static void pet_common_driver_init(running_machine *machine)
 	datasette1_timer = timer_alloc(machine, pet_tape1_timer, NULL);
 	datasette2_timer = timer_alloc(machine, pet_tape2_timer, NULL);
 
-	pia_config(machine, 1, &pet_pia1);
-
 	cbm_ieee_open();
 }
 
@@ -620,7 +628,6 @@ DRIVER_INIT( pet2001 )
 	pet_memory = mess_ram;
 	pet_common_driver_init(machine);
 	state->pet_basic1 = 1;
-	pia_config(machine, 0, &pet_pia0);
 	pet_vh_init(machine);
 }
 
@@ -628,23 +635,6 @@ DRIVER_INIT( pet )
 {
 	pet_memory = mess_ram;
 	pet_common_driver_init(machine);
-	pia_config(machine, 0, &pet_pia0);
-	pet_vh_init(machine);
-}
-
-DRIVER_INIT( petb )
-{
-	pet_memory = mess_ram;
-	pet_common_driver_init(machine);
-	pia_config(machine, 0, &petb_pia0);
-	pet_vh_init(machine);
-}
-
-DRIVER_INIT( pet40 )
-{
-	pet_memory = mess_ram;
-	pet_common_driver_init(machine);
-	pia_config(machine, 0, &pet_pia0);
 	pet_vh_init(machine);
 }
 
@@ -655,7 +645,6 @@ DRIVER_INIT( pet80 )
 
 	pet_common_driver_init(machine);
 	state->cbm8096 = 1;
-	pia_config(machine, 0, &petb_pia0);
 	videoram = &pet_memory[0x8000];
 	videoram_size = 0x800;
 	pet80_vh_init(machine);
@@ -668,7 +657,6 @@ DRIVER_INIT( superpet )
 	pet_memory = mess_ram;
 	pet_common_driver_init(machine);
 	state->superpet = 1;
-	pia_config(machine, 0, &petb_pia0);
 
 	superpet_memory = auto_malloc(0x10000);
 
@@ -681,7 +669,6 @@ DRIVER_INIT( superpet )
 MACHINE_RESET( pet )
 {
 	pet_state *state = machine->driver_data;
-	pia_reset();
 
 	if (state->superpet)
 	{
