@@ -15,7 +15,7 @@
 #include "cpu/m6502/m6502.h"
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
-#include "machine/6821pia.h"
+#include "machine/6821new.h"
 #include "sound/sn76496.h"
 #include "video/tms9928a.h"
 
@@ -26,7 +26,7 @@
 
 static ADDRESS_MAP_START( crvision_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_MIRROR(0x0c00)
-	AM_RANGE(0x1000, 0x1003) AM_READWRITE(pia_0_r, pia_0_w)
+	AM_RANGE(0x1000, 0x1003) AM_DEVREADWRITE(PIA6821, "pia", pia_r, pia_w)
 	AM_RANGE(0x2000, 0x2000) AM_READ(TMS9928A_vram_r)
 	AM_RANGE(0x2001, 0x2001) AM_READ(TMS9928A_register_r)
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(TMS9928A_vram_w)
@@ -231,7 +231,7 @@ static const TMS9928a_interface tms9929_intf =
 
 static int keylatch;
 
-static WRITE8_HANDLER( pia_porta_w )
+static WRITE8_DEVICE_HANDLER( crvision_pia_porta_w )
 {
 	/*
         Signal  Description
@@ -277,7 +277,7 @@ static UINT8 read_keyboard(running_machine *machine, int pa)
 	return 0xff;
 }
 
-static READ8_HANDLER( pia_porta_r )
+static READ8_DEVICE_HANDLER( crvision_pia_porta_r )
 {
 	/*
         PA0     Keyboard raster player 1 output
@@ -293,7 +293,7 @@ static READ8_HANDLER( pia_porta_r )
 	return 0xff;
 }
 
-static READ8_HANDLER( pia_portb_r )
+static READ8_DEVICE_HANDLER( crvision_pia_portb_r )
 {
 	/*
         Signal  Description
@@ -310,37 +310,37 @@ static READ8_HANDLER( pia_portb_r )
 
 	if (keylatch & 0x01)
 	{
-		return read_keyboard(space->machine, 0);
+		return read_keyboard(device->machine, 0);
 	}
 	else if (keylatch & 0x02)
 	{
-		return read_keyboard(space->machine, 1);
+		return read_keyboard(device->machine, 1);
 	}
 	else if (keylatch & 0x04)
 	{
-		return read_keyboard(space->machine, 2);
+		return read_keyboard(device->machine, 2);
 	}
 	else if (keylatch & 0x08)
 	{
-		return read_keyboard(space->machine, 3);
+		return read_keyboard(device->machine, 3);
 	}
 
 	return 0xff;
 }
 
-static READ8_HANDLER( pia_ca1_r )
+static READ8_DEVICE_HANDLER( crvision_pia_ca1_r )
 {
 	return 1;
 }
 
-static READ8_HANDLER( pia_ca2_r )
+static READ8_DEVICE_HANDLER( crvision_pia_ca2_r )
 {
 	return 1;
 }
 
 static int sn76489_ready;
 
-static READ8_HANDLER( pia_cb1_r )
+static READ8_DEVICE_HANDLER( crvision_pia_cb1_r )
 {
 	return sn76489_ready;
 }
@@ -350,7 +350,7 @@ static TIMER_CALLBACK(sn76489_set_ready)
 	sn76489_ready = 1;
 }
 
-static WRITE8_HANDLER( pia_portb_w )
+static WRITE8_DEVICE_HANDLER( crvision_pia_portb_w )
 {
 	/*
         Signal  Description
@@ -365,34 +365,34 @@ static WRITE8_HANDLER( pia_portb_w )
         PB7     SN76489 data output
     */
 
-	const device_config *sn76489 = devtag_get_device(space->machine, SOUND, "sn76489");
+	const device_config *sn76489 = devtag_get_device(device->machine, SOUND, "sn76489");
 	sn76496_w(sn76489, 0, data);
 
 	sn76489_ready = 0;
 
 	// wait 32 cycles of 2 MHz to synchronize CPU and SN76489
-	timer_set(space->machine, ATTOTIME_IN_USEC(16), NULL, 0, sn76489_set_ready);
+	timer_set(device->machine, ATTOTIME_IN_USEC(16), NULL, 0, sn76489_set_ready);
 }
 
-static WRITE8_HANDLER( pia_cb2_w )
+static WRITE8_DEVICE_HANDLER( crvision_pia_cb2_w )
 {
 	sn76489_ready = data & 0x01;
 }
 
 static const pia6821_interface crvision_pia_intf =
 {
-	pia_porta_r,	// input A
-	pia_portb_r,	// input B
-	pia_ca1_r,		// input CA1 (+5V)
-	pia_cb1_r,		// input CB1 (SN76489 pin READY )
-	pia_ca2_r,		// input CA2 (+5V)
-	0,				// input CB2
-	pia_porta_w,	// output A
-	pia_portb_w,	// output B (SN76489 pins D0-D7)
-	0,				// output CA2
-	pia_cb2_w,		// output CB2 (SN76489 pin CE_)
-	0,				// irq A
-	0				// irq B
+	DEVCB_HANDLER(crvision_pia_porta_r),	// input A
+	DEVCB_HANDLER(crvision_pia_portb_r),	// input B
+	DEVCB_HANDLER(crvision_pia_ca1_r),		// input CA1 (+5V)
+	DEVCB_HANDLER(crvision_pia_cb1_r),		// input CB1 (SN76489 pin READY )
+	DEVCB_HANDLER(crvision_pia_ca2_r),		// input CA2 (+5V)
+	DEVCB_NULL,								// input CB2
+	DEVCB_HANDLER(crvision_pia_porta_w),	// output A
+	DEVCB_HANDLER(crvision_pia_portb_w),	// output B (SN76489 pins D0-D7)
+	DEVCB_NULL,								// output CA2
+	DEVCB_HANDLER(crvision_pia_cb2_w),		// output CB2 (SN76489 pin CE_)
+	DEVCB_NULL,								// irq A
+	DEVCB_NULL								// irq B
 };
 
 static MACHINE_START( crvision )
@@ -401,7 +401,6 @@ static MACHINE_START( crvision )
 	state_save_register_global(machine, sn76489_ready);
 
 	TMS9928A_configure(&tms9918_intf);
-	pia_config(machine, 0, &crvision_pia_intf);
 }
 
 static MACHINE_START( fnvision )
@@ -410,12 +409,6 @@ static MACHINE_START( fnvision )
 	state_save_register_global(machine, sn76489_ready);
 
 	TMS9928A_configure(&tms9929_intf);
-	pia_config(machine, 0, &crvision_pia_intf);
-}
-
-static MACHINE_RESET( crvision )
-{
-	pia_reset();
 }
 
 
@@ -493,13 +486,14 @@ static MACHINE_DRIVER_START( crvision )
 	MDRV_CPU_VBLANK_INT(SCREEN_TAG, crvision_int)
 
 	MDRV_MACHINE_START( crvision )
-	MDRV_MACHINE_RESET( crvision )
 
     // video hardware
 	MDRV_IMPORT_FROM(tms9928a)
 	MDRV_SCREEN_MODIFY(SCREEN_TAG)
 	MDRV_SCREEN_REFRESH_RATE(10738635.0/2/342/262)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+
+	MDRV_PIA6821_ADD( "pia", crvision_pia_intf )
 
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
