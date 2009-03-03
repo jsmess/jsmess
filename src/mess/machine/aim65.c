@@ -9,7 +9,7 @@
 #include "includes/aim65.h"
 
 /* Peripheral chips */
-#include "machine/6821pia.h"
+#include "machine/6821new.h"
 #include "machine/6522via.h"
 
 /* DL1416A display chip */
@@ -81,35 +81,18 @@ static void aim65_pia(running_machine *machine)
 }
 
 
-static WRITE8_HANDLER( aim65_pia_a_w )
+WRITE8_DEVICE_HANDLER(aim65_pia_a_w)
 {
 	pia_a = data;
-	aim65_pia(space->machine);
+	aim65_pia(device->machine);
 }
 
 
-static WRITE8_HANDLER( aim65_pia_b_w )
+WRITE8_DEVICE_HANDLER(aim65_pia_b_w)
 {
 	pia_b = data;
-	aim65_pia(space->machine);
+	aim65_pia(device->machine);
 }
-
-
-static const pia6821_interface pia =
-{
-	NULL, // read8_machine_func in_a_func,
-	NULL, // read8_machine_func in_b_func,
-	NULL, // read8_machine_func in_ca1_func,
-	NULL, // read8_machine_func in_cb1_func,
-	NULL, // read8_machine_func in_ca2_func,
-	NULL, // read8_machine_func in_cb2_func,
-	aim65_pia_a_w,
-	aim65_pia_b_w,
-	NULL, // write8_machine_func out_ca2_func,
-	NULL, // write8_machine_func out_cb2_func,
-	NULL, // void (*irq_a_func)(int state),
-	NULL, // void (*irq_b_func)(int state),
-};
 
 
 void aim65_update_ds1(const device_config *device, int digit, int data)
@@ -193,8 +176,6 @@ MACHINE_START( aim65 )
 
 	if (mess_ram_size < 4 * 1024)
 		memory_install_readwrite8_handler(space, mess_ram_size, 0x0fff, 0, 0, SMH_NOP, SMH_NOP);
-
-	pia_config(machine, 0, &pia);
 
 	via_cb1_w(via_0, 1, 1);
 	via_ca1_w(via_0, 1, 0);

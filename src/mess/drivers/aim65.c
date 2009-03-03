@@ -12,29 +12,20 @@ ToDo:
 
 ******************************************************************************/
 
-/* Core includes */
 #include "driver.h"
-#include "cpu/m6502/m6502.h"
 #include "includes/aim65.h"
-
-/* peripheral chips */
+#include "cpu/m6502/m6502.h"
 #include "video/dl1416.h"
 #include "machine/6522via.h"
 #include "machine/6532riot.h"
-#include "machine/6821pia.h"
-
-/* cartridge device */
+#include "machine/6821new.h"
 #include "devices/cartslot.h"
-
-/* Layout */
 #include "aim65.lh"
 
 
-
-/******************************************************************************
- Memory Maps
-******************************************************************************/
-
+/***************************************************************************
+    ADDRESS MAPS
+***************************************************************************/
 
 /* Note: RAM is mapped dynamically in machine/aim65.c */
 static ADDRESS_MAP_START( aim65_mem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -44,18 +35,16 @@ static ADDRESS_MAP_START( aim65_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0xa480, 0xa497 ) AM_DEVREADWRITE(RIOT6532, "riot", riot6532_r, riot6532_w)
 	AM_RANGE( 0xa498, 0xa7ff ) AM_NOP /* Not available */
 	AM_RANGE( 0xa800, 0xa80f ) AM_MIRROR(0x3f0) AM_DEVREADWRITE(VIA6522, "via6522_0", via_r, via_w)
-	AM_RANGE( 0xac00, 0xac03 ) AM_READWRITE(pia_0_r, pia_0_w)
+	AM_RANGE( 0xac00, 0xac03 ) AM_DEVREADWRITE(PIA6821, "pia6821", pia_r, pia_w)
 	AM_RANGE( 0xac04, 0xac43 ) AM_RAM /* PIA RAM */
 	AM_RANGE( 0xac44, 0xafff ) AM_NOP /* Not available */
 	AM_RANGE( 0xb000, 0xffff ) AM_ROM /* 5 ROM sockets */
 ADDRESS_MAP_END
 
 
-
-/******************************************************************************
- Input Ports
-******************************************************************************/
-
+/***************************************************************************
+    INPUT PORTS
+***************************************************************************/
 
 static INPUT_PORTS_START( aim65 )
 	PORT_START("keyboard_0")
@@ -146,12 +135,10 @@ static INPUT_PORTS_START( aim65 )
 INPUT_PORTS_END
 
 
+/***************************************************************************
+    DEVICE INTERFACES
+***************************************************************************/
 
-/******************************************************************************
- Device interfaces
-******************************************************************************/
-
-/* riot interface */
 static const riot6532_interface aim65_riot_interface =
 {
 	NULL,
@@ -187,9 +174,17 @@ static const via6522_interface aim65_user_via =
 	DEVCB_CPU_INPUT_LINE("maincpu", M6502_IRQ_LINE)
 };
 
-/******************************************************************************
- Machine Drivers
-******************************************************************************/
+static const pia6821_interface aim65_pia_config =
+{
+	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	DEVCB_HANDLER(aim65_pia_a_w), DEVCB_HANDLER(aim65_pia_b_w),
+	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
+};
+
+
+/***************************************************************************
+    MACHINE DRIVERS
+***************************************************************************/
 
 static MACHINE_DRIVER_START( aim65 )
 	/* basic machine hardware */
@@ -213,6 +208,7 @@ static MACHINE_DRIVER_START( aim65 )
 	MDRV_RIOT6532_ADD("riot", AIM65_CLOCK, aim65_riot_interface)
 	MDRV_VIA6522_ADD("via6522_0", 0, aim65_system_via)
 	MDRV_VIA6522_ADD("via6522_1", 0, aim65_user_via)
+	MDRV_PIA6821_ADD("pia6821", aim65_pia_config)
 
 	MDRV_CARTSLOT_ADD("cart1")
 	MDRV_CARTSLOT_EXTENSION_LIST("z26")
@@ -226,11 +222,9 @@ static MACHINE_DRIVER_START( aim65 )
 MACHINE_DRIVER_END
 
 
-
-/******************************************************************************
- ROM Definitions
-******************************************************************************/
-
+/***************************************************************************
+    ROM DEFINITIONS
+***************************************************************************/
 
 ROM_START( aim65 )
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -265,11 +259,9 @@ ROM_END
  */
 
 
-
-/******************************************************************************
- System Config
-******************************************************************************/
-
+/***************************************************************************
+    SYSTEM CONFIG
+***************************************************************************/
 
 static SYSTEM_CONFIG_START( aim65 )
 	CONFIG_RAM_DEFAULT(4 * 1024) /* 4KB RAM */
@@ -279,11 +271,9 @@ static SYSTEM_CONFIG_START( aim65 )
 SYSTEM_CONFIG_END
 
 
-
-/******************************************************************************
- Drivers
-******************************************************************************/
-
+/***************************************************************************
+    GAME DRIVERS
+***************************************************************************/
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   INIT    CONFIG  COMPANY     FULLNAME  FLAGS */
 COMP(1977,  aim65,  0,      0,      aim65,   aim65,  0,      aim65,  "Rockwell", "AIM 65", 0)
