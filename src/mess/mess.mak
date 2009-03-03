@@ -985,7 +985,7 @@ $(MESSOBJ)/nascom1.a:  \
 
 $(MESSOBJ)/cpschngr.a: \
 	$(MESS_DRIVERS)/cpschngr.o \
-	$(MAME_VIDEO)/cps1.o \
+	$(MESS_VIDEO)/cpschngr.o \
 	$(MAME_MACHINE)/kabuki.o \
 
 $(MESSOBJ)/memotech.a:	   \
