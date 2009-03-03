@@ -324,7 +324,7 @@ static const cassette_config mz700_cassette_config =
 {
 	mz700_cassette_formats,
 	NULL,
-	CASSETTE_PLAY
+	CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED
 };
 
 
