@@ -68,7 +68,10 @@
 #include "cpu/z80/z80.h"
 #include "machine/8255ppi.h"
 #include "machine/pit8253.h"
+#include "machine/z80pio.h"
 #include "machine/74145.h"
+#include "machine/ctronics.h"
+#include "sound/sn76496.h"
 #include "sound/speaker.h"
 #include "sound/wave.h"
 #include "devices/cassette.h"
@@ -81,14 +84,14 @@
 
 static TIMER_DEVICE_CALLBACK( ne556_cursor_callback )
 {
-	mz700_state *mz700 = timer->machine->driver_data;
-	mz700->cursor_timer ^= 1;
+	mz_state *mz = timer->machine->driver_data;
+	mz->cursor_timer ^= 1;
 }
 
 static TIMER_DEVICE_CALLBACK( ne556_other_callback )
 {
-	mz700_state *mz700 = timer->machine->driver_data;
-	mz700->other_timer ^= 1;
+	mz_state *mz = timer->machine->driver_data;
+	mz->other_timer ^= 1;
 }
 
 
@@ -96,41 +99,45 @@ static TIMER_DEVICE_CALLBACK( ne556_other_callback )
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START( mz700_mem, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK(1)
-	AM_RANGE(0x1000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAMBANK(6)
-	AM_RANGE(0xd800, 0xdfff) AM_RAMBANK(7)
-	AM_RANGE(0xe000, 0xffff) AM_RAMBANK(8)
+static ADDRESS_MAP_START( mz700_mem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(mz700_io, ADDRESS_SPACE_IO, 8)
-	AM_RANGE(0xe0, 0xe6) AM_WRITE(mz700_bank_w)
+static ADDRESS_MAP_START( mz700_io, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0xe0, 0xe0) AM_WRITE(mz700_bank_0_w)
+	AM_RANGE(0xe1, 0xe1) AM_WRITE(mz_bank_1_w)
+	AM_RANGE(0xe2, 0xe2) AM_WRITE(mz_bank_2_w)
+	AM_RANGE(0xe3, 0xe3) AM_WRITE(mz_bank_3_w)
+	AM_RANGE(0xe4, 0xe4) AM_WRITE(mz_bank_4_w)
+	AM_RANGE(0xe5, 0xe5) AM_WRITE(mz_bank_5_w)
+	AM_RANGE(0xe6, 0xe6) AM_WRITE(mz_bank_6_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(mz800_mem, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK(1)
-	AM_RANGE(0x1000, 0x1fff) AM_RAMBANK(2)
-	AM_RANGE(0x2000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0x9fff) AM_RAMBANK(3)
-	AM_RANGE(0xa000, 0xbfff) AM_RAMBANK(4)
-	AM_RANGE(0xc000, 0xcfff) AM_RAMBANK(5)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAMBANK(6)
-	AM_RANGE(0xd800, 0xdfff) AM_RAMBANK(7)
-	AM_RANGE(0xe000, 0xffff) AM_RAMBANK(8)
+static ADDRESS_MAP_START( mz800_mem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(mz800_io, ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( mz800_io, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xcc, 0xcc) AM_WRITE( mz800_write_format_w )
 	AM_RANGE(0xcd, 0xcd) AM_WRITE( mz800_read_format_w )
 	AM_RANGE(0xce, 0xce) AM_READWRITE( mz800_crtc_r, mz800_display_mode_w )
 	AM_RANGE(0xcf, 0xcf) AM_WRITE( mz800_scroll_border_w )
 	AM_RANGE(0xd0, 0xd3) AM_DEVREADWRITE(PPI8255, "ppi8255", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xd4, 0xd7) AM_DEVREADWRITE(PIT8253, "pit8253", pit8253_r, pit8253_w)
-	AM_RANGE(0xe0, 0xe9) AM_READWRITE( mz800_bank_r, mz800_bank_w )
+	AM_RANGE(0xe0, 0xe0) AM_READWRITE(mz800_bank_0_r, mz800_bank_0_w)
+	AM_RANGE(0xe1, 0xe1) AM_READWRITE(mz800_bank_1_r, mz_bank_1_w)
+	AM_RANGE(0xe2, 0xe2) AM_WRITE(mz_bank_2_w)
+	AM_RANGE(0xe3, 0xe3) AM_WRITE(mz_bank_3_w)
+	AM_RANGE(0xe4, 0xe4) AM_WRITE(mz_bank_4_w)
+	AM_RANGE(0xe5, 0xe5) AM_WRITE(mz_bank_5_w)
+	AM_RANGE(0xe6, 0xe6) AM_WRITE(mz_bank_6_w)
 	AM_RANGE(0xea, 0xea) AM_READWRITE( mz800_ramdisk_r, mz800_ramdisk_w )
 	AM_RANGE(0xeb, 0xeb) AM_WRITE( mz800_ramaddr_w )
-	AM_RANGE(0xf0, 0xf0) AM_WRITE( mz800_palette_w )
+	AM_RANGE(0xf0, 0xf0) AM_READ_PORT("atari_joy1") AM_WRITE(mz800_palette_w)
+	AM_RANGE(0xf1, 0xf1) AM_READ_PORT("atari_joy2")
+	AM_RANGE(0xf2, 0xf2) AM_DEVWRITE(SOUND, "sn76489n", sn76496_w)
+	AM_RANGE(0xfc, 0xfd) AM_DEVREADWRITE(Z80PIO, "z80pio", z80pio_c_r, z80pio_c_w)
+	AM_RANGE(0xfe, 0xff) AM_DEVREADWRITE(Z80PIO, "z80pio", z80pio_d_r, z80pio_d_w)
 ADDRESS_MAP_END
 
 
@@ -247,6 +254,43 @@ static INPUT_PORTS_START( mz700 )
 	PORT_BIT(0x10, 0x00, IPT_JOYSTICK_RIGHT)	PORT_8WAY
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( mz800 )
+	PORT_INCLUDE(mz700)
+
+	PORT_MODIFY("JOY")
+	PORT_BIT(0x1f, 0x00, IPT_UNUSED)
+
+	PORT_START("atari_joy1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1)        PORT_PLAYER(1)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2)        PORT_PLAYER(1)
+
+	PORT_START("atari_joy2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1)        PORT_PLAYER(2)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2)        PORT_PLAYER(2)
+
+	PORT_START("system_settings")
+	PORT_DIPNAME(0x01, 0x00, "Mode selection")
+	PORT_DIPLOCATION("SW:4")
+	PORT_DIPSETTING(0x01, "MZ-700")
+	PORT_DIPSETTING(0x00, "MZ-800")
+	PORT_DIPNAME(0x06, 0x06, "Printer selection")
+	PORT_DIPLOCATION("SW:3,2")
+	PORT_DIPSETTING(0x06, "MZ printer")
+	PORT_DIPSETTING(0x00, "Centronics printer")
+	PORT_DIPNAME(0x08, 0x08, "Cassette polarity")
+	PORT_DIPLOCATION("SW:1")
+	PORT_DIPSETTING(0x08, DEF_STR(Unknown))
+	PORT_DIPSETTING(0x00, DEF_STR(Unknown))
+INPUT_PORTS_END
+
 
 /***************************************************************************
     GFX LAYOUT
@@ -264,7 +308,11 @@ static const gfx_layout char_layout =
 };
 
 static GFXDECODE_START( mz700 )
-	GFXDECODE_ENTRY( "gfx1", 0, char_layout, 0, 256 )
+	GFXDECODE_ENTRY("cgrom", 0, char_layout, 0, 256)
+GFXDECODE_END
+
+static GFXDECODE_START( mz800 )
+	GFXDECODE_ENTRY(NULL, 0, char_layout, 0, 256)
 GFXDECODE_END
 
 
@@ -286,6 +334,8 @@ static MACHINE_DRIVER_START( mz700 )
 	MDRV_CPU_PROGRAM_MAP(mz700_mem, 0)
 	MDRV_CPU_IO_MAP(mz700_io, 0)
 
+	MDRV_MACHINE_START(mz700)
+
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -304,7 +354,7 @@ static MACHINE_DRIVER_START( mz700 )
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_DRIVER_DATA(mz700_state)
+	MDRV_DRIVER_DATA(mz_state)
 
 	/* ne556 timers */
 	MDRV_TIMER_ADD_PERIODIC("cursor", ne556_cursor_callback, HZ(1.5))
@@ -326,6 +376,19 @@ static MACHINE_DRIVER_START( mz800 )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mz800_mem, 0)
 	MDRV_CPU_IO_MAP(mz800_io, 0)
+
+	MDRV_GFXDECODE(mz800)
+	MDRV_VIDEO_START(mz800)
+	MDRV_VIDEO_UPDATE(mz800)
+
+	MDRV_SOUND_ADD("sn76489n", SN76489, XTAL_17_73447MHz/5)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	/* devices */
+	MDRV_DEVICE_REMOVE("pit8253", PIT8253)
+	MDRV_PIT8253_ADD("pit8253", mz800_pit8253_config)
+	MDRV_Z80PIO_ADD("z80pio", mz800_z80pio_config)
+	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
 MACHINE_DRIVER_END
 
 
@@ -334,27 +397,32 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( mz700 )
-	ROM_REGION(0x18000, "maincpu", 0)
-	ROM_LOAD("1z-013a.rom", 0x10000, 0x1000, CRC(4c6c6b7b) SHA1(ef8f7399e86c1dc638a5cb83efdb73369c2b5735))
-	ROM_REGION(0x1000, "gfx1", 0)
+	ROM_REGION(0x1000, "monitor", 0)
+	ROM_LOAD("1z-013a.rom", 0x0000, 0x1000, CRC(4c6c6b7b) SHA1(ef8f7399e86c1dc638a5cb83efdb73369c2b5735))
+	ROM_REGION(0x1000, "cgrom", 0)
 	ROM_LOAD("mz700fon.int", 0x0000, 0x1000, CRC(42b9e8fb) SHA1(5128ad179a702f8e0bd9910a58bad8fbe4c20167))
 ROM_END
 
 ROM_START( mz700j )
-	ROM_REGION(0x18000, "maincpu", 0)
-	ROM_LOAD("1z-013a.rom", 0x10000, 0x1000, CRC(4c6c6b7b) SHA1(ef8f7399e86c1dc638a5cb83efdb73369c2b5735))
-	ROM_REGION(0x1000, "gfx1", 0)
+	ROM_REGION(0x1000, "monitor", 0)
+	ROM_LOAD("1z-013a.rom", 0x0000, 0x1000, CRC(4c6c6b7b) SHA1(ef8f7399e86c1dc638a5cb83efdb73369c2b5735))
+	ROM_REGION(0x1000, "cgrom", 0)
 	ROM_LOAD("mz700fon.jap", 0x0000, 0x1000, CRC(425eedf5) SHA1(bd2cc750f2d2f63e50a59786668509e81a276e32))
 ROM_END
 
 ROM_START( mz800 )
-	ROM_REGION(0x18000, "maincpu", 0)
-	ROM_LOAD("mz800h.rom",  0x10000, 0x2000, BAD_DUMP CRC(0c281675) SHA1(0adb6201f114f96f06a50de07d1c1ca2bcb4cf43))
-	ROM_REGION(0x10000, "user1", ROMREGION_ERASEFF)
-	/* RAMDISK */
-    ROM_REGION(0x1000, "gfx1", 0)
-	ROM_LOAD("mz700fon.int", 0x0000, 0x1000, CRC(42b9e8fb) SHA1(5128ad179a702f8e0bd9910a58bad8fbe4c20167))
+	ROM_REGION(0x4000, "monitor", 0)
+	ROM_LOAD("mz800.rom", 0x0000, 0x4000, CRC(600d17e1) SHA1(950ce4b51429916f8036e41ba6130fac149b36e4))
 ROM_END
+
+
+/***************************************************************************
+    SYSTEM CONFIGS
+***************************************************************************/
+
+static SYSTEM_CONFIG_START( mz700 )
+	CONFIG_RAM_DEFAULT(64 * 1024) /* 64KB RAM */
+SYSTEM_CONFIG_END
 
 
 /***************************************************************************
@@ -362,6 +430,6 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT    CONFIG  COMPANY      FULLNAME */
-COMP( 1982, mz700,	  0,		0,		mz700,	  mz700,	mz700,	0,		"Sharp",     "MZ-700", 0 )
-COMP( 1982, mz700j,   mz700,	0,		mz700,	  mz700,	mz700,	0,		"Sharp",     "MZ-700 (Japan)", 0 )
-COMP( 1982, mz800,	  mz700,	0,		mz800,	  mz700,	mz800,	0,		"Sharp",     "MZ-800", GAME_NOT_WORKING )
+COMP( 1982, mz700,	  0,		0,		mz700,	  mz700,	mz700,	mz700,	"Sharp",     "MZ-700", 0 )
+COMP( 1982, mz700j,   mz700,	0,		mz700,	  mz700,	mz700,	mz700,	"Sharp",     "MZ-700 (Japan)", 0 )
+COMP( 1982, mz800,	  0,		0,		mz800,	  mz800,	mz800,	mz700,	"Sharp",     "MZ-800", GAME_NOT_WORKING )
