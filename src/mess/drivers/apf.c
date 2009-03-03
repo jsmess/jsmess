@@ -18,7 +18,7 @@ todo for apf m1000:
 #include "video/m6847.h"
 #include "includes/apf.h"
 
-#include "machine/6821pia.h"
+#include "machine/6821new.h"
 #include "machine/wd17xx.h"
 #include "devices/basicdsk.h"
 #include "devices/cassette.h"
@@ -49,55 +49,55 @@ text screen in the superior part of the graphical screen.
 static unsigned char keyboard_data;
 static unsigned char pad_data;
 
-static  READ8_HANDLER(apf_m1000_pia_in_a_func)
+static  READ8_DEVICE_HANDLER(apf_m1000_pia_in_a_func)
 {
 
   UINT8 data=~0;
   if (!(pad_data & 0x08))
-    data &= input_port_read(space->machine, "joy3");
+    data &= input_port_read(device->machine, "joy3");
   if (!(pad_data & 0x04))
-    data &= input_port_read(space->machine, "joy2");
+    data &= input_port_read(device->machine, "joy2");
   if (!(pad_data & 0x02))
-    data &= input_port_read(space->machine, "joy1");
+    data &= input_port_read(device->machine, "joy1");
   if (!(pad_data & 0x01))
-    data &= input_port_read(space->machine, "joy0");
+    data &= input_port_read(device->machine, "joy0");
 
 	return data;
 }
 
-static  READ8_HANDLER(apf_m1000_pia_in_b_func)
+static  READ8_DEVICE_HANDLER(apf_m1000_pia_in_b_func)
 {
 	return 0x0ff;
 }
 
-static  READ8_HANDLER(apf_m1000_pia_in_ca1_func)
+static  READ8_DEVICE_HANDLER(apf_m1000_pia_in_ca1_func)
 {
 	return 0;
 }
 
-static  READ8_HANDLER(apf_m1000_pia_in_cb1_func)
+static  READ8_DEVICE_HANDLER(apf_m1000_pia_in_cb1_func)
 {
 	return 0x00;
 }
 
-static  READ8_HANDLER(apf_m1000_pia_in_ca2_func)
+static  READ8_DEVICE_HANDLER(apf_m1000_pia_in_ca2_func)
 {
 	return 0;
 }
 
-static  READ8_HANDLER(apf_m1000_pia_in_cb2_func)
+static  READ8_DEVICE_HANDLER(apf_m1000_pia_in_cb2_func)
 {
 	return 0x00;
 }
 
 
-static WRITE8_HANDLER(apf_m1000_pia_out_a_func)
+static WRITE8_DEVICE_HANDLER(apf_m1000_pia_out_a_func)
 {
 }
 
 static unsigned char previous_mode;
 
-static WRITE8_HANDLER(apf_m1000_pia_out_b_func)
+static WRITE8_DEVICE_HANDLER(apf_m1000_pia_out_b_func)
 {
 	pad_data = data;
 
@@ -126,13 +126,13 @@ static WRITE8_HANDLER(apf_m1000_pia_out_b_func)
 	}
 }
 
-static WRITE8_HANDLER(apf_m1000_pia_out_ca2_func)
+static WRITE8_DEVICE_HANDLER(apf_m1000_pia_out_ca2_func)
 {
 }
 
-static WRITE8_HANDLER(apf_m1000_pia_out_cb2_func)
+static WRITE8_DEVICE_HANDLER(apf_m1000_pia_out_cb2_func)
 {
-	const device_config *speaker = devtag_get_device(space->machine, SOUND, "speaker");
+	const device_config *speaker = devtag_get_device(device->machine, SOUND, "speaker");
 	speaker_level_w(speaker, data);
 }
 
@@ -149,7 +149,7 @@ void apf_update_ints(running_machine *machine)
 	cpu_set_input_line(machine->cpu[0], 0, apf_ints ? HOLD_LINE : CLEAR_LINE);
 }
 
-static void	apf_m1000_irq_a_func(running_machine *machine, int state)
+static WRITE_LINE_DEVICE_HANDLER( apf_m1000_irq_a_func )
 {
 	if (state)
 	{
@@ -160,11 +160,11 @@ static void	apf_m1000_irq_a_func(running_machine *machine, int state)
 		apf_ints&=~1;
 	}
 
-	apf_update_ints(machine);
+	apf_update_ints(device->machine);
 }
 
 
-static void	apf_m1000_irq_b_func(running_machine *machine, int state)
+static WRITE_LINE_DEVICE_HANDLER( apf_m1000_irq_b_func )
 {
 	//logerror("pia 0 irq b %d\n",state);
 
@@ -177,70 +177,70 @@ static void	apf_m1000_irq_b_func(running_machine *machine, int state)
 		apf_ints&=~2;
 	}
 
-	apf_update_ints(machine);
+	apf_update_ints(device->machine);
 
 }
 
 static const pia6821_interface apf_m1000_pia_interface=
 {
-	apf_m1000_pia_in_a_func,
-	apf_m1000_pia_in_b_func,
-	apf_m1000_pia_in_ca1_func,
-	apf_m1000_pia_in_cb1_func,
-	apf_m1000_pia_in_ca2_func,
-	apf_m1000_pia_in_cb2_func,
-	apf_m1000_pia_out_a_func,
-	apf_m1000_pia_out_b_func,
-	apf_m1000_pia_out_ca2_func,
-	apf_m1000_pia_out_cb2_func,
-	apf_m1000_irq_a_func,
-	apf_m1000_irq_b_func
+	DEVCB_HANDLER(apf_m1000_pia_in_a_func),
+	DEVCB_HANDLER(apf_m1000_pia_in_b_func),
+	DEVCB_HANDLER(apf_m1000_pia_in_ca1_func),
+	DEVCB_HANDLER(apf_m1000_pia_in_cb1_func),
+	DEVCB_HANDLER(apf_m1000_pia_in_ca2_func),
+	DEVCB_HANDLER(apf_m1000_pia_in_cb2_func),
+	DEVCB_HANDLER(apf_m1000_pia_out_a_func),
+	DEVCB_HANDLER(apf_m1000_pia_out_b_func),
+	DEVCB_HANDLER(apf_m1000_pia_out_ca2_func),
+	DEVCB_HANDLER(apf_m1000_pia_out_cb2_func),
+	DEVCB_LINE(apf_m1000_irq_a_func),
+	DEVCB_LINE(apf_m1000_irq_b_func)
 };
 
 
-static  READ8_HANDLER(apf_imagination_pia_in_a_func)
+static  READ8_DEVICE_HANDLER(apf_imagination_pia_in_a_func)
 {
 	return keyboard_data;
 }
 
-static READ8_HANDLER(apf_imagination_pia_in_b_func)
+static READ8_DEVICE_HANDLER(apf_imagination_pia_in_b_func)
 {
 	unsigned char data;
 
 	data = 0x000;
 
-	if (cassette_input(devtag_get_device(space->machine, CASSETTE, "cassette")) > 0.0038)
+	if (cassette_input(devtag_get_device(device->machine, CASSETTE, "cassette")) > 0.0038)
 		data =(1<<7);
 
 	return data;
 }
 
-static  READ8_HANDLER(apf_imagination_pia_in_ca1_func)
+static  READ8_DEVICE_HANDLER(apf_imagination_pia_in_ca1_func)
 {
 	return 0x00;
 }
 
-static  READ8_HANDLER(apf_imagination_pia_in_cb1_func)
+static  READ8_DEVICE_HANDLER(apf_imagination_pia_in_cb1_func)
 {
 	return 0x00;
 }
 
-static  READ8_HANDLER(apf_imagination_pia_in_ca2_func)
+static  READ8_DEVICE_HANDLER(apf_imagination_pia_in_ca2_func)
 {
 	return 0x00;
 }
 
-static  READ8_HANDLER(apf_imagination_pia_in_cb2_func)
+static  READ8_DEVICE_HANDLER(apf_imagination_pia_in_cb2_func)
 {
 	return 0x00;
 }
 
 
-static WRITE8_HANDLER(apf_imagination_pia_out_a_func)
+static WRITE8_DEVICE_HANDLER(apf_imagination_pia_out_a_func)
 {
 }
 
-static WRITE8_HANDLER(apf_imagination_pia_out_b_func)
+static WRITE8_DEVICE_HANDLER(apf_imagination_pia_out_b_func)
 {
 	/* bits 2..0 = keyboard line */
 	/* bit 3 = ??? */
@@ -253,27 +253,27 @@ static WRITE8_HANDLER(apf_imagination_pia_out_b_func)
 	static const char *const keynames[] = { "key0", "key1", "key2", "key3", "key4", "key5", "key6", "key7" };
 
 	keyboard_line = data & 0x07;
-	keyboard_data = input_port_read(space->machine, keynames[keyboard_line]);
+	keyboard_data = input_port_read(device->machine, keynames[keyboard_line]);
 
 	/* bit 4: cassette motor control */
-	cassette_change_state(devtag_get_device(space->machine, CASSETTE, "cassette"),
+	cassette_change_state(devtag_get_device(device->machine, CASSETTE, "cassette"),
 		(data & 0x10) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,
 		CASSETTE_MASK_MOTOR);
 
 	/* bit 6: cassette write */
-	cassette_output(devtag_get_device(space->machine, CASSETTE, "cassette"),
+	cassette_output(devtag_get_device(device->machine, CASSETTE, "cassette"),
 		(data & 0x40) ? -1.0 : 1.0);
 }
 
-static WRITE8_HANDLER(apf_imagination_pia_out_ca2_func)
+static WRITE8_DEVICE_HANDLER(apf_imagination_pia_out_ca2_func)
 {
 }
 
-static WRITE8_HANDLER(apf_imagination_pia_out_cb2_func)
+static WRITE8_DEVICE_HANDLER(apf_imagination_pia_out_cb2_func)
 {
 }
 
-static void	apf_imagination_irq_a_func(running_machine *machine, int state)
+static WRITE_LINE_DEVICE_HANDLER( apf_imagination_irq_a_func )
 {
 	if (state)
 	{
@@ -284,11 +284,11 @@ static void	apf_imagination_irq_a_func(running_machine *machine, int state)
 		apf_ints&=~4;
 	}
 
-	apf_update_ints(machine);
+	apf_update_ints(device->machine);
 
 }
 
-static void	apf_imagination_irq_b_func(running_machine *machine, int state)
+static WRITE_LINE_DEVICE_HANDLER( apf_imagination_irq_b_func )
 {
 	if (state)
 	{
@@ -299,43 +299,30 @@ static void	apf_imagination_irq_b_func(running_machine *machine, int state)
 		apf_ints&=~8;
 	}
 
-	apf_update_ints(machine);
+	apf_update_ints(device->machine);
 
 }
 
 static const pia6821_interface apf_imagination_pia_interface=
 {
-	apf_imagination_pia_in_a_func,
-	apf_imagination_pia_in_b_func,
-	apf_imagination_pia_in_ca1_func,
-	apf_imagination_pia_in_cb1_func,
-	apf_imagination_pia_in_ca2_func,
-	apf_imagination_pia_in_cb2_func,
-	apf_imagination_pia_out_a_func,
-	apf_imagination_pia_out_b_func,
-	apf_imagination_pia_out_ca2_func,
-	apf_imagination_pia_out_cb2_func,
-	apf_imagination_irq_a_func,
-	apf_imagination_irq_b_func
+	DEVCB_HANDLER(apf_imagination_pia_in_a_func),
+	DEVCB_HANDLER(apf_imagination_pia_in_b_func),
+	DEVCB_HANDLER(apf_imagination_pia_in_ca1_func),
+	DEVCB_HANDLER(apf_imagination_pia_in_cb1_func),
+	DEVCB_HANDLER(apf_imagination_pia_in_ca2_func),
+	DEVCB_HANDLER(apf_imagination_pia_in_cb2_func),
+	DEVCB_HANDLER(apf_imagination_pia_out_a_func),
+	DEVCB_HANDLER(apf_imagination_pia_out_b_func),
+	DEVCB_HANDLER(apf_imagination_pia_out_ca2_func),
+	DEVCB_HANDLER(apf_imagination_pia_out_cb2_func),
+	DEVCB_LINE(apf_imagination_irq_a_func),
+	DEVCB_LINE(apf_imagination_irq_b_func)
 };
 
 
-static void apf_common_init(running_machine *machine)
-{
-	apf_ints = 0;
-	pia_config(machine, 0,&apf_m1000_pia_interface);
-	pia_reset();
-}
-
 static MACHINE_START( apf_imagination )
 {
-	pia_config(machine, 1,&apf_imagination_pia_interface);
-	apf_common_init(machine);
-}
-
-static MACHINE_START( apf_m1000 )
-{
-	apf_common_init(machine);
+	apf_ints = 0;
 }
 
 static WRITE8_HANDLER(apf_dischw_w)
@@ -404,9 +391,9 @@ static READ8_HANDLER(apf_wd179x_data_r)
 
 static ADDRESS_MAP_START(apf_imagination_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x00000, 0x003ff) AM_RAM AM_BASE(&apf_video_ram) AM_MIRROR(0x1c00)
-	AM_RANGE( 0x02000, 0x03fff) AM_READWRITE(pia_0_r, pia_0_w)
+	AM_RANGE( 0x02000, 0x03fff) AM_DEVREADWRITE(PIA6821, "pia_0", pia_r, pia_w)
 	AM_RANGE( 0x04000, 0x047ff) AM_ROM AM_REGION("maincpu", 0x10000) AM_MIRROR(0x1800)
-	AM_RANGE( 0x06000, 0x063ff) AM_READWRITE(pia_1_r, pia_1_w)
+	AM_RANGE( 0x06000, 0x063ff) AM_DEVREADWRITE(PIA6821, "pia_1", pia_r, pia_w)
 	AM_RANGE( 0x06400, 0x064ff) AM_READWRITE(serial_r, serial_w)
 	AM_RANGE( 0x06500, 0x06500) AM_READWRITE(apf_wd179x_status_r, apf_wd179x_command_w)
 	AM_RANGE( 0x06501, 0x06501) AM_READWRITE(apf_wd179x_track_r, apf_wd179x_track_w)
@@ -422,7 +409,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(apf_m1000_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x00000, 0x003ff) AM_RAM AM_BASE(&apf_video_ram)  AM_MIRROR(0x1c00)
-	AM_RANGE( 0x02000, 0x03fff) AM_READWRITE(pia_0_r, pia_0_w)
+	AM_RANGE( 0x02000, 0x03fff) AM_DEVREADWRITE(PIA6821, "pia_0", pia_r, pia_w)
 	AM_RANGE( 0x04000, 0x047ff) AM_ROM AM_REGION("maincpu", 0x10000) AM_MIRROR(0x1800)
 	AM_RANGE( 0x06800, 0x077ff) AM_ROM
 	AM_RANGE( 0x08000, 0x09fff) AM_ROM AM_REGION("maincpu", 0x8000)
@@ -653,6 +640,9 @@ static MACHINE_DRIVER_START( apf_imagination )
 	MDRV_SCREEN_SIZE(320, 25+192+26)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
 
+	MDRV_PIA6821_ADD( "pia_0", apf_m1000_pia_interface )
+	MDRV_PIA6821_ADD( "pia_1", apf_imagination_pia_interface )
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
@@ -667,7 +657,8 @@ static MACHINE_DRIVER_START( apf_m1000 )
 	MDRV_IMPORT_FROM( apf_imagination )
 	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP( apf_m1000_map, 0 )
-	MDRV_MACHINE_START( apf_m1000 )
+
+	MDRV_PIA6821_REMOVE( "pia_1" )
 
 	MDRV_CASSETTE_REMOVE( "cassette" )
 	MDRV_CARTSLOT_ADD("cart")
