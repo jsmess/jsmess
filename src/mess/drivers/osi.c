@@ -180,7 +180,7 @@ Notes:
 #include "cpu/m6502/m6502.h"
 #include "includes/osi.h"
 #include "machine/6850acia.h"
-#include "machine/6821pia.h"
+#include "machine/6821new.h"
 #include "sound/discrete.h"
 #include "sound/beep.h"
 #include "devices/basicdsk.h"
@@ -364,7 +364,7 @@ static void osi470_index_callback(const device_config *controller, const device_
 	driver_state->fdc_index = state;
 }
 
-static READ8_HANDLER( osi470_pia_a_r )
+static READ8_DEVICE_HANDLER( osi470_pia_a_r )
 {
 
 	/*
@@ -382,12 +382,12 @@ static READ8_HANDLER( osi470_pia_a_r )
 
 	*/
 
-	osi_state *state = space->machine->driver_data;
+	osi_state *state = device->machine->driver_data;
 
 	return (state->fdc_index << 7);
 }
 
-static WRITE8_HANDLER( osi470_pia_a_w )
+static WRITE8_DEVICE_HANDLER( osi470_pia_a_w )
 {
 	/*
 
@@ -405,7 +405,7 @@ static WRITE8_HANDLER( osi470_pia_a_w )
 	*/
 }
 
-static WRITE8_HANDLER( osi470_pia_b_w )
+static WRITE8_DEVICE_HANDLER( osi470_pia_b_w )
 {
 	/*
 
@@ -423,24 +423,40 @@ static WRITE8_HANDLER( osi470_pia_b_w )
 	*/
 }
 
-static WRITE8_HANDLER( osi470_pia_cb2_w )
+static WRITE8_DEVICE_HANDLER( osi470_pia_cb2_w )
 {
 }
 
 static const pia6821_interface osi470_pia_intf =
 {
-	osi470_pia_a_r,
-	NULL, // read8_machine_func in_b_func,
-	NULL, // read8_machine_func in_ca1_func,
-	NULL, // read8_machine_func in_cb1_func,
-	NULL, // read8_machine_func in_ca2_func,
-	NULL, // read8_machine_func in_cb2_func,
-	osi470_pia_a_w,
-	osi470_pia_b_w,
-	NULL, // write8_machine_func out_ca2_func,
-	osi470_pia_cb2_w,
-	NULL, // void (*irq_a_func)(int state),
-	NULL, // void (*irq_b_func)(int state),
+	DEVCB_HANDLER(osi470_pia_a_r),
+	DEVCB_NULL, // read8_machine_func in_b_func,
+	DEVCB_NULL, // read8_machine_func in_ca1_func,
+	DEVCB_NULL, // read8_machine_func in_cb1_func,
+	DEVCB_NULL, // read8_machine_func in_ca2_func,
+	DEVCB_NULL, // read8_machine_func in_cb2_func,
+	DEVCB_HANDLER(osi470_pia_a_w),
+	DEVCB_HANDLER(osi470_pia_b_w),
+	DEVCB_NULL, // write8_machine_func out_ca2_func,
+	DEVCB_HANDLER(osi470_pia_cb2_w),
+	DEVCB_NULL, // void (*irq_a_func)(int state),
+	DEVCB_NULL, // void (*irq_b_func)(int state),
+};
+
+static const pia6821_interface pia_dummy_intf =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 /* Memory Maps */
@@ -468,9 +484,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( c1p_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x4fff) AM_RAMBANK(1)
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
-	AM_RANGE(0xc704, 0xc707) AM_READWRITE(pia_1_r, pia_1_w)
-	AM_RANGE(0xc708, 0xc70b) AM_READWRITE(pia_2_r, pia_2_w)
-	AM_RANGE(0xc70c, 0xc70f) AM_READWRITE(pia_3_r, pia_3_w)
+	AM_RANGE(0xc704, 0xc707) AM_DEVREADWRITE(PIA6821, "pia_1", pia_r, pia_w)
+	AM_RANGE(0xc708, 0xc70b) AM_DEVREADWRITE(PIA6821, "pia_2", pia_r, pia_w)
+	AM_RANGE(0xc70c, 0xc70f) AM_DEVREADWRITE(PIA6821, "pia_3", pia_r, pia_w)
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_BASE_MEMBER(osi_state, video_ram)
 	AM_RANGE(0xd400, 0xd7ff) AM_RAM AM_BASE_MEMBER(osi_state, color_ram)
 	AM_RANGE(0xd800, 0xd800) AM_WRITE(osi600_ctrl_w)
@@ -485,12 +501,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( c1pmf_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x4fff) AM_RAMBANK(1)
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc003) AM_READWRITE(pia_0_r, pia_0_w) // FDC
+	AM_RANGE(0xc000, 0xc003) AM_DEVREADWRITE(PIA6821, "pia_0", pia_r, pia_w) // FDC
 	AM_RANGE(0xc010, 0xc010) AM_DEVREADWRITE(ACIA6850, "acia_1", acia6850_stat_r, acia6850_ctrl_w)
 	AM_RANGE(0xc011, 0xc011) AM_DEVREADWRITE(ACIA6850, "acia_1", acia6850_data_r, acia6850_data_w)
-	AM_RANGE(0xc704, 0xc707) AM_READWRITE(pia_1_r, pia_1_w)
-	AM_RANGE(0xc708, 0xc70b) AM_READWRITE(pia_2_r, pia_2_w)
-	AM_RANGE(0xc70c, 0xc70f) AM_READWRITE(pia_3_r, pia_3_w)
+	AM_RANGE(0xc704, 0xc707) AM_DEVREADWRITE(PIA6821, "pia_1", pia_r, pia_w)
+	AM_RANGE(0xc708, 0xc70b) AM_DEVREADWRITE(PIA6821, "pia_2", pia_r, pia_w)
+	AM_RANGE(0xc70c, 0xc70f) AM_DEVREADWRITE(PIA6821, "pia_3", pia_r, pia_w)
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_BASE_MEMBER(osi_state, video_ram)
 	AM_RANGE(0xd400, 0xd7ff) AM_RAM AM_BASE_MEMBER(osi_state, color_ram)
 	AM_RANGE(0xd800, 0xd800) AM_WRITE(osi600_ctrl_w)
@@ -711,9 +727,6 @@ static MACHINE_START( c1pmf )
 {
 	MACHINE_START_CALL(c1p);
 
-	/* configure floppy PIA */
-	pia_config(machine, 0, &osi470_pia_intf);
-
 	/* set floppy index hole callback */
 	floppy_drive_set_index_pulse_callback(image_from_devtype_and_index(machine, IO_FLOPPY, 0), osi470_index_callback);
 }
@@ -784,6 +797,10 @@ static MACHINE_DRIVER_START( c1p )
 	MDRV_SOUND_ADD("beep", BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
+	MDRV_PIA6821_ADD( "pia_1", pia_dummy_intf )
+	MDRV_PIA6821_ADD( "pia_2", pia_dummy_intf )
+	MDRV_PIA6821_ADD( "pia_3", pia_dummy_intf )
+
 	/* cassette ACIA */
 	MDRV_ACIA6850_ADD("acia_0", osi600_acia_intf)
 
@@ -798,6 +815,8 @@ static MACHINE_DRIVER_START( c1pmf )
 	MDRV_CPU_PROGRAM_MAP(c1pmf_mem, 0)
 
 	MDRV_MACHINE_START(c1pmf)
+
+	MDRV_PIA6821_ADD( "pia_0", osi470_pia_intf )
 
 	/* floppy ACIA */
 	MDRV_ACIA6850_ADD("acia_1", osi470_acia_intf)
