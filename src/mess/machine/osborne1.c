@@ -16,7 +16,7 @@ be written to RAM if RAM was switched in.
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "machine/6821pia.h"
+#include "machine/6821new.h"
 #include "machine/6850acia.h"
 #include "machine/wd17xx.h"
 #include "devices/basicdsk.h"
@@ -74,7 +74,10 @@ WRITE8_HANDLER( osborne1_1000_w )
 READ8_HANDLER( osborne1_2000_r )
 {
 	UINT8	data = 0xFF;
-	device_config *fdc = (device_config*)devtag_get_device(space->machine, MB8877, "mb8877");
+	const device_config *fdc = devtag_get_device(space->machine, MB8877, "mb8877");
+	const device_config *pia_0 = devtag_get_device(space->machine, PIA6821, "pia_0" );
+	const device_config *pia_1 = devtag_get_device(space->machine, PIA6821, "pia_1" );
+
 	/* Check whether regular RAM is enabled */
 	if ( ! osborne1.bank2_enabled )
 	{
@@ -106,12 +109,12 @@ READ8_HANDLER( osborne1_2000_r )
 			if ( offset & 0x80 )	data &= input_port_read(space->machine, "ROW7");
 			break;
 		case 0x900:	/* IEEE488 PIA */
-			data = pia_0_r( space, offset & 0x03 );
+			data = pia_r( pia_0, offset & 0x03 );
 			break;
 		case 0xA00:	/* Serial */
 			break;
 		case 0xC00:	/* Video PIA */
-			data = pia_1_r( space, offset & 0x03 );
+			data = pia_r( pia_1, offset & 0x03 );
 			break;
 		}
 	}
@@ -121,7 +124,10 @@ READ8_HANDLER( osborne1_2000_r )
 
 WRITE8_HANDLER( osborne1_2000_w )
 {
-	device_config *fdc = (device_config*)devtag_get_device(space->machine, MB8877, "mb8877");
+	const device_config *fdc = devtag_get_device(space->machine, MB8877, "mb8877");
+	const device_config *pia_0 = devtag_get_device(space->machine, PIA6821, "pia_0" );
+	const device_config *pia_1 = devtag_get_device(space->machine, PIA6821, "pia_1" );
+
 	/* Check whether regular RAM is enabled */
 	if ( ! osborne1.bank2_enabled )
 	{
@@ -140,12 +146,12 @@ WRITE8_HANDLER( osborne1_2000_w )
 			wd17xx_w( fdc, offset, data );
 			break;
 		case 0x900:	/* IEEE488 PIA */
-			pia_0_w( space, offset & 0x03, data );
+			pia_w( pia_0, offset & 0x03, data );
 			break;
 		case 0xA00:	/* Serial */
 			break;
 		case 0xC00:	/* Video PIA */
-			pia_1_w( space, offset & 0x03, data );
+			pia_w( pia_1, offset & 0x03, data );
 			break;
 		}
 	}
@@ -246,38 +252,39 @@ static void osborne1_update_irq_state(running_machine *machine)
 }
 
 
-static void ieee_pia_irq_a_func(running_machine *machine, int state)
+static WRITE_LINE_DEVICE_HANDLER( ieee_pia_irq_a_func )
 {
 	osborne1.pia_0_irq_state = state;
-	osborne1_update_irq_state(machine);
+	osborne1_update_irq_state(device->machine);
 }
 
 
-static const pia6821_interface osborne1_ieee_pia_config =
+const pia6821_interface osborne1_ieee_pia_config =
 {
-	NULL,	/* in_a_func */
-	NULL,	/* in_b_func */
-	NULL,	/* in_ca1_func */
-	NULL,	/* in_cb1_func */
-	NULL,	/* in_ca2_func */
-	NULL,	/* in_cb2_func */
-	NULL,	/* out_a_func */
-	NULL,	/* out_b_func */
-	NULL,	/* out_ca2_func */
-	NULL,	/* out_cb2_func */
-	ieee_pia_irq_a_func,	/* irq_a_func */
-	NULL	/* irq_b_func */
+	DEVCB_NULL,							/* in_a_func */
+	DEVCB_NULL,							/* in_b_func */
+	DEVCB_NULL,							/* in_ca1_func */
+	DEVCB_NULL,							/* in_cb1_func */
+	DEVCB_NULL,							/* in_ca2_func */
+	DEVCB_NULL,							/* in_cb2_func */
+	DEVCB_NULL,							/* out_a_func */
+	DEVCB_NULL,							/* out_b_func */
+	DEVCB_NULL,							/* out_ca2_func */
+	DEVCB_NULL,							/* out_cb2_func */
+	DEVCB_LINE(ieee_pia_irq_a_func),	/* irq_a_func */
+	DEVCB_NULL							/* irq_b_func */
 };
 
 
-static WRITE8_HANDLER( video_pia_out_cb2_dummy )
+static WRITE8_DEVICE_HANDLER( video_pia_out_cb2_dummy )
 {
 }
 
 
-static WRITE8_HANDLER( video_pia_port_a_w )
+static WRITE8_DEVICE_HANDLER( video_pia_port_a_w )
 {
-	device_config *fdc = (device_config*)devtag_get_device(space->machine, MB8877, "mb8877");
+	const device_config *fdc = devtag_get_device(device->machine, MB8877, "mb8877");
+
 	osborne1.new_start_x = data >> 1;
 	wd17xx_set_density(fdc, ( data & 0x01 ) ? DEN_FM_LO : DEN_FM_HI );
 
@@ -285,9 +292,10 @@ static WRITE8_HANDLER( video_pia_port_a_w )
 }
 
 
-static WRITE8_HANDLER( video_pia_port_b_w )
+static WRITE8_DEVICE_HANDLER( video_pia_port_b_w )
 {
-	device_config *fdc = (device_config*)devtag_get_device(space->machine, MB8877, "mb8877");
+	const device_config *fdc = devtag_get_device(device->machine, MB8877, "mb8877");
+
 	osborne1.new_start_y = data & 0x1F;
 	osborne1.beep = ( data & 0x20 ) ? 1 : 0;
 	if ( data & 0x40 )
@@ -302,27 +310,27 @@ static WRITE8_HANDLER( video_pia_port_b_w )
 }
 
 
-static void video_pia_irq_a_func(running_machine *machine, int state)
+static WRITE_LINE_DEVICE_HANDLER( video_pia_irq_a_func )
 {
 	osborne1.pia_1_irq_state = state;
-	osborne1_update_irq_state(machine);
+	osborne1_update_irq_state(device->machine);
 }
 
 
-static const pia6821_interface osborne1_video_pia_config =
+const pia6821_interface osborne1_video_pia_config =
 {
-	NULL,	/* in_a_func */
-	NULL,	/* in_b_func */
-	NULL,	/* in_ca1_func */
-	NULL,	/* in_cb1_func */
-	NULL,	/* in_ca2_func */
-	NULL,	/* in_cb2_func */
-	video_pia_port_a_w,	/* out_a_func */
-	video_pia_port_b_w,	/* out_b_func */
-	NULL,	/* out_ca2_func */
-	video_pia_out_cb2_dummy,	/* out_cb2_func */
-	video_pia_irq_a_func,	/* irq_a_func */
-	NULL	/* irq_b_func */
+	DEVCB_NULL,								/* in_a_func */
+	DEVCB_NULL,								/* in_b_func */
+	DEVCB_NULL,								/* in_ca1_func */
+	DEVCB_NULL,								/* in_cb1_func */
+	DEVCB_NULL,								/* in_ca2_func */
+	DEVCB_NULL,								/* in_cb2_func */
+	DEVCB_HANDLER(video_pia_port_a_w),		/* out_a_func */
+	DEVCB_HANDLER(video_pia_port_b_w),		/* out_b_func */
+	DEVCB_NULL,								/* out_ca2_func */
+	DEVCB_HANDLER(video_pia_out_cb2_dummy),	/* out_cb2_func */
+	DEVCB_LINE(video_pia_irq_a_func),		/* irq_a_func */
+	DEVCB_NULL								/* irq_b_func */
 };
 
 
@@ -343,6 +351,7 @@ static TIMER_CALLBACK(osborne1_video_callback)
 {
 	const address_space* space = cpu_get_address_space(machine->cpu[0],ADDRESS_SPACE_PROGRAM);
 	const device_config *speaker = devtag_get_device(space->machine, SOUND, "beep");
+	const device_config *pia_1 = devtag_get_device(space->machine, PIA6821, "pia_1");
 	int y = video_screen_get_vpos(machine->primary_screen);
 
 	/* Check for start of frame */
@@ -351,12 +360,12 @@ static TIMER_CALLBACK(osborne1_video_callback)
 		/* Clear CA1 on video PIA */
 		osborne1.start_y = ( osborne1.new_start_y - 1 ) & 0x1F;
 		osborne1.charline = 0;
-		pia_1_ca1_w( space, 0, 0 );
+		pia_ca1_w( pia_1, 0, 0 );
 	}
 	if ( y == 240 )
 	{
 		/* Set CA1 on video PIA */
-		pia_1_ca1_w( space, 0, 0xFF );
+		pia_ca1_w( pia_1, 0, 0xFF );
 	}
 	if ( y < 240 )
 	{
@@ -469,11 +478,14 @@ DEVICE_IMAGE_LOAD( osborne1_floppy )
 }
 
 
-static TIMER_CALLBACK( setup_beep )
+static TIMER_CALLBACK( setup_osborne1 )
 {
 	const device_config *speaker = devtag_get_device(machine, SOUND, "beep");
+	const device_config *pia_1 = devtag_get_device(machine, PIA6821, "pia_1");
+
 	beep_set_state( speaker, 0 );
 	beep_set_frequency( speaker, 300 /* 60 * 240 / 2 */ );
+	pia_ca1_w( pia_1, 0, 0 );
 }
 
 
@@ -495,9 +507,8 @@ MACHINE_RESET( osborne1 )
 
 	osborne1.video_timer = timer_alloc(machine,  osborne1_video_callback , NULL);
 	timer_adjust_oneshot(osborne1.video_timer, video_screen_get_time_until_pos(machine->primary_screen, 1, 0 ), 0);
-	pia_1_ca1_w( space, 0, 0 );
 
-	timer_set(machine,  attotime_zero, NULL, 0, setup_beep );
+	timer_set(machine,  attotime_zero, NULL, 0, setup_osborne1 );
 
 	memory_set_direct_update_handler( space, osborne1_opbase );
 }
@@ -509,10 +520,6 @@ DRIVER_INIT( osborne1 )
 
 	osborne1.empty_4K = auto_malloc( 0x1000 );
 	memset( osborne1.empty_4K, 0xFF, 0x1000 );
-
-	/* configure the 6821 PIAs */
-	pia_config(machine, 0, &osborne1_ieee_pia_config );
-	pia_config(machine, 1, &osborne1_video_pia_config );
 
 	/* Configure the 6850 ACIA */
 //	acia6850_config( 0, &osborne1_6850_config );

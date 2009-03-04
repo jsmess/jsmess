@@ -40,6 +40,7 @@ TODO:
 #include "sound/beep.h"
 #include "devices/basicdsk.h"
 #include "machine/wd17xx.h"
+#include "machine/6821new.h"
 #include "includes/osborne1.h"
 
 
@@ -186,6 +187,9 @@ static MACHINE_DRIVER_START( osborne1 )
 	MDRV_SOUND_ADD( "beep", BEEP, 0 )
 	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 	
+	MDRV_PIA6821_ADD( "pia_0", osborne1_ieee_pia_config )
+	MDRV_PIA6821_ADD( "pia_1", osborne1_video_pia_config )
+
 	MDRV_MB8877_ADD("mb8877", default_wd17xx_interface )
 	
 MACHINE_DRIVER_END

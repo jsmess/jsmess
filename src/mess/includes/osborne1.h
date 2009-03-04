@@ -7,8 +7,12 @@
 #ifndef OSBORNE1_H_
 #define OSBORNE1_H_
 
+#include "machine/6821new.h"
 
 /*----------- defined in machine/osborne1.c -----------*/
+
+extern const pia6821_interface osborne1_ieee_pia_config;
+extern const pia6821_interface osborne1_video_pia_config;
 
 WRITE8_HANDLER( osborne1_0000_w );
 WRITE8_HANDLER( osborne1_1000_w );
