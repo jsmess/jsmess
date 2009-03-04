@@ -1781,9 +1781,7 @@ static WRITE8_DEVICE_HANDLER( dgnalpha_pia2_pa_w )
 			ay8910_data_w(ay8912, 0, pianew_get_output_b(device));
 			break;
 		case 0x02	: 		/* Read from selected port */
-			/* TODO FIXME 6821pia devicification
-			pianew_set_input_b(device, ay8910_r(ay8912, 0));
-			*/
+			pia_portb_w(device, 0, ay8910_r(ay8912, 0));
 			break;
 		case 0x03	:		/* Select port to write to */
 			ay8910_address_w(ay8912, 0, pianew_get_output_b(device));
