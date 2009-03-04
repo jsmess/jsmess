@@ -84,7 +84,7 @@ easier to manage.
 #include "driver.h"
 #include "debug/debugcpu.h"
 #include "cpu/m6809/m6809.h"
-#include "machine/6821pia.h"
+#include "machine/6821new.h"
 #include "includes/coco.h"
 #include "includes/cococart.h"
 #include "machine/6883sam.h"
@@ -124,29 +124,29 @@ static emu_timer *mux_sel1_timer;
 static emu_timer *mux_sel2_timer;
 static UINT8 mux_sel1, mux_sel2;
 
-static WRITE8_HANDLER ( d_pia1_pb_w );
-static WRITE8_HANDLER ( d_pia1_pa_w );
-static READ8_HANDLER ( d_pia1_pa_r );
-static WRITE8_HANDLER ( d_pia0_pa_w );
-static WRITE8_HANDLER ( d_pia0_pb_w );
-static WRITE8_HANDLER ( d_pia1_cb2_w);
-static WRITE8_HANDLER ( d_pia0_cb2_w);
-static WRITE8_HANDLER ( d_pia1_ca2_w);
-static WRITE8_HANDLER ( d_pia0_ca2_w);
-static void d_pia0_irq_a(running_machine *machine, int state);
-static void d_pia0_irq_b(running_machine *machine, int state);
-static void d_pia1_firq_a(running_machine *machine, int state);
-static void d_pia1_firq_b(running_machine *machine, int state);
+static WRITE8_DEVICE_HANDLER ( d_pia1_pb_w );
+static WRITE8_DEVICE_HANDLER ( d_pia1_pa_w );
+static READ8_DEVICE_HANDLER ( d_pia1_pa_r );
+static WRITE8_DEVICE_HANDLER ( d_pia0_pa_w );
+static WRITE8_DEVICE_HANDLER ( d_pia0_pb_w );
+static WRITE8_DEVICE_HANDLER ( d_pia1_cb2_w);
+static WRITE8_DEVICE_HANDLER ( d_pia0_cb2_w);
+static WRITE8_DEVICE_HANDLER ( d_pia1_ca2_w);
+static WRITE8_DEVICE_HANDLER ( d_pia0_ca2_w);
+static WRITE_LINE_DEVICE_HANDLER( d_pia0_irq_a );
+static WRITE_LINE_DEVICE_HANDLER( d_pia0_irq_b );
+static WRITE_LINE_DEVICE_HANDLER( d_pia1_firq_a );
+static WRITE_LINE_DEVICE_HANDLER( d_pia1_firq_b );
 static SAM6883_SET_PAGE_ONE_MODE( d_sam_set_pageonemode );
 static SAM6883_SET_MPU_RATE( d_sam_set_mpurate );
 static SAM6883_SET_MEMORY_SIZE( d_sam_set_memorysize);
 static SAM6883_SET_MAP_TYPE( d_sam_set_maptype );
 
 /* CoCo 1 specific */
-static READ8_HANDLER ( d_pia1_pb_r_coco );
+static READ8_DEVICE_HANDLER ( d_pia1_pb_r_coco );
 
 /* CoCo 2 specific */
-static READ8_HANDLER ( d_pia1_pb_r_coco2 );
+static READ8_DEVICE_HANDLER ( d_pia1_pb_r_coco2 );
 
 /* CoCo 3 specific */
 UINT8 coco3_gimereg[16];
@@ -155,27 +155,27 @@ static UINT8 coco3_mmu[16];
 static UINT8 coco3_interupt_line;
 static UINT8 gime_firq, gime_irq;
 
-static void coco3_pia0_irq_a(running_machine *machine, int state);
-static void coco3_pia0_irq_b(running_machine *machine, int state);
-static void coco3_pia1_firq_a(running_machine *machine, int state);
-static void coco3_pia1_firq_b(running_machine *machine, int state);
+static WRITE_LINE_DEVICE_HANDLER( coco3_pia0_irq_a );
+static WRITE_LINE_DEVICE_HANDLER( coco3_pia0_irq_b );
+static WRITE_LINE_DEVICE_HANDLER( coco3_pia1_firq_a );
+static WRITE_LINE_DEVICE_HANDLER( coco3_pia1_firq_b );
 
 static SAM6883_SET_MAP_TYPE( coco3_sam_set_maptype );
 static SAM6883_GET_RAMBASE( coco3_sam_get_rambase );
 
 /* Dragon 32 specific */
-static READ8_HANDLER ( d_pia1_pb_r_dragon32 );
+static READ8_DEVICE_HANDLER ( d_pia1_pb_r_dragon32 );
 
 /* Dragon 64 / 64 Plus / Tano (Alpha) specific */
-static WRITE8_HANDLER ( dragon64_pia1_pb_w );
+static WRITE8_DEVICE_HANDLER ( dragon64_pia1_pb_w );
 
 /* Dragon 64 / Alpha shared */
 static void dragon_page_rom(running_machine *machine, int romswitch);
 
 /* Dragon Alpha specific */
-static WRITE8_HANDLER ( dgnalpha_pia2_pa_w );
-static void d_pia2_firq_a(running_machine *machine, int state);
-static void d_pia2_firq_b(running_machine *machine, int state);
+static WRITE8_DEVICE_HANDLER ( dgnalpha_pia2_pa_w );
+static WRITE_LINE_DEVICE_HANDLER( d_pia2_firq_a );
+static WRITE_LINE_DEVICE_HANDLER( d_pia2_firq_b );
 static int dgnalpha_just_reset;		/* Reset flag used to ignore first NMI after reset */
 
 /* Dragon Plus specific */
@@ -260,113 +260,269 @@ const struct coco3_video_vars coco3_vidvars =
 
 /* ----------------------------------------------------------------------- */
 
-static const pia6821_interface coco_pia_intf[] =
+const pia6821_interface coco_pia_intf[] =
 {
 	/* PIA 0 */
 	{
-		/*inputs : A/B,CA/B1,CA/B2 */ 0, 0, 0, 0, 0, 0,
-		/*outputs: A/B,CA/B2	   */ d_pia0_pa_w, d_pia0_pb_w, d_pia0_ca2_w, d_pia0_cb2_w,
-		/*irqs	 : A/B			   */ d_pia0_irq_a, d_pia0_irq_b
+		/*inputs : A/B,CA/B1,CA/B2 */
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		/*outputs: A/B,CA/B2	   */
+		DEVCB_HANDLER(d_pia0_pa_w),
+		DEVCB_HANDLER(d_pia0_pb_w),
+		DEVCB_HANDLER(d_pia0_ca2_w),
+		DEVCB_HANDLER(d_pia0_cb2_w),
+		/*irqs	 : A/B			   */
+		DEVCB_LINE(d_pia0_irq_a),
+		DEVCB_LINE(d_pia0_irq_b)
 	},
 
 	/* PIA 1 */
 	{
-		/*inputs : A/B,CA/B1,CA/B2 */ d_pia1_pa_r, d_pia1_pb_r_coco, 0, 0, 0, 0,
-		/*outputs: A/B,CA/B2	   */ d_pia1_pa_w, d_pia1_pb_w, d_pia1_ca2_w, d_pia1_cb2_w,
-		/*irqs	 : A/B			   */ d_pia1_firq_a, d_pia1_firq_b
+		/*inputs : A/B,CA/B1,CA/B2 */
+		DEVCB_HANDLER(d_pia1_pa_r),
+		DEVCB_HANDLER(d_pia1_pb_r_coco),
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		/*outputs: A/B,CA/B2	   */
+		DEVCB_HANDLER(d_pia1_pa_w),
+		DEVCB_HANDLER(d_pia1_pb_w),
+		DEVCB_HANDLER(d_pia1_ca2_w),
+		DEVCB_HANDLER(d_pia1_cb2_w),
+		/*irqs	 : A/B			   */
+		DEVCB_LINE(d_pia1_firq_a),
+		DEVCB_LINE(d_pia1_firq_b)
 	}
 };
 
-static const pia6821_interface coco2_pia_intf[] =
+const pia6821_interface coco2_pia_intf[] =
 {
 	/* PIA 0 */
 	{
-		/*inputs : A/B,CA/B1,CA/B2 */ 0, 0, 0, 0, 0, 0,
-		/*outputs: A/B,CA/B2	   */ d_pia0_pa_w, d_pia0_pb_w, d_pia0_ca2_w, d_pia0_cb2_w,
-		/*irqs	 : A/B			   */ d_pia0_irq_a, d_pia0_irq_b
+		/*inputs : A/B,CA/B1,CA/B2 */
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		/*outputs: A/B,CA/B2	   */
+		DEVCB_HANDLER(d_pia0_pa_w),
+		DEVCB_HANDLER(d_pia0_pb_w),
+		DEVCB_HANDLER(d_pia0_ca2_w),
+		DEVCB_HANDLER(d_pia0_cb2_w),
+		/*irqs	 : A/B			   */
+		DEVCB_LINE(d_pia0_irq_a),
+		DEVCB_LINE(d_pia0_irq_b)
 	},
 
 	/* PIA 1 */
 	{
-		/*inputs : A/B,CA/B1,CA/B2 */ d_pia1_pa_r, d_pia1_pb_r_coco2, 0, 0, 0, 0,
-		/*outputs: A/B,CA/B2	   */ d_pia1_pa_w, d_pia1_pb_w, d_pia1_ca2_w, d_pia1_cb2_w,
-		/*irqs	 : A/B			   */ d_pia1_firq_a, d_pia1_firq_b
+		/*inputs : A/B,CA/B1,CA/B2 */
+		DEVCB_HANDLER(d_pia1_pa_r),
+		DEVCB_HANDLER(d_pia1_pb_r_coco2),
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		/*outputs: A/B,CA/B2	   */
+		DEVCB_HANDLER(d_pia1_pa_w),
+		DEVCB_HANDLER(d_pia1_pb_w),
+		DEVCB_HANDLER(d_pia1_ca2_w),
+		DEVCB_HANDLER(d_pia1_cb2_w),
+		/*irqs	 : A/B			   */
+		DEVCB_LINE(d_pia1_firq_a),
+		DEVCB_LINE(d_pia1_firq_b)
 	}
 };
 
-static const pia6821_interface coco3_pia_intf[] =
+const pia6821_interface coco3_pia_intf[] =
 {
 	/* PIA 0 */
 	{
-		/*inputs : A/B,CA/B1,CA/B2 */ 0, 0, 0, 0, 0, 0,
-		/*outputs: A/B,CA/B2	   */ d_pia0_pa_w, d_pia0_pb_w, d_pia0_ca2_w, d_pia0_cb2_w,
-		/*irqs	 : A/B			   */ coco3_pia0_irq_a, coco3_pia0_irq_b
+		/*inputs : A/B,CA/B1,CA/B2 */
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		/*outputs: A/B,CA/B2	   */
+		DEVCB_HANDLER(d_pia0_pa_w),
+		DEVCB_HANDLER(d_pia0_pb_w),
+		DEVCB_HANDLER(d_pia0_ca2_w),
+		DEVCB_HANDLER(d_pia0_cb2_w),
+		/*irqs	 : A/B			   */
+		DEVCB_LINE(coco3_pia0_irq_a),
+		DEVCB_LINE(coco3_pia0_irq_b)
 	},
 
 	/* PIA 1 */
 	{
-		/*inputs : A/B,CA/B1,CA/B2 */ d_pia1_pa_r, d_pia1_pb_r_coco2, 0, 0, 0, 0,
-		/*outputs: A/B,CA/B2	   */ d_pia1_pa_w, d_pia1_pb_w, d_pia1_ca2_w, d_pia1_cb2_w,
-		/*irqs	 : A/B			   */ coco3_pia1_firq_a, coco3_pia1_firq_b
+		/*inputs : A/B,CA/B1,CA/B2 */
+		DEVCB_HANDLER(d_pia1_pa_r),
+		DEVCB_HANDLER(d_pia1_pb_r_coco2),
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		/*outputs: A/B,CA/B2	   */
+		DEVCB_HANDLER(d_pia1_pa_w),
+		DEVCB_HANDLER(d_pia1_pb_w),
+		DEVCB_HANDLER(d_pia1_ca2_w),
+		DEVCB_HANDLER(d_pia1_cb2_w),
+		/*irqs	 : A/B			   */
+		DEVCB_LINE(coco3_pia1_firq_a),
+		DEVCB_LINE(coco3_pia1_firq_b)
 	}
 };
 
-static const pia6821_interface dragon32_pia_intf[] =
+const pia6821_interface dragon32_pia_intf[] =
 {
 	/* PIA 0 */
 	{
-		/*inputs : A/B,CA/B1,CA/B2 */ 0, 0, 0, 0, 0, 0,
-		/*outputs: A/B,CA/B2	   */ d_pia0_pa_w, d_pia0_pb_w, d_pia0_ca2_w, d_pia0_cb2_w,
-		/*irqs	 : A/B			   */ d_pia0_irq_a, d_pia0_irq_b
+		/*inputs : A/B,CA/B1,CA/B2 */
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		/*outputs: A/B,CA/B2	   */
+		DEVCB_HANDLER(d_pia0_pa_w),
+		DEVCB_HANDLER(d_pia0_pb_w),
+		DEVCB_HANDLER(d_pia0_ca2_w),
+		DEVCB_HANDLER(d_pia0_cb2_w),
+		/*irqs	 : A/B			   */
+		DEVCB_LINE(d_pia0_irq_a),
+		DEVCB_LINE(d_pia0_irq_b)
 	},
 
 	/* PIA 1 */
 	{
-		/*inputs : A/B,CA/B1,CA/B2 */ d_pia1_pa_r, d_pia1_pb_r_dragon32, 0, 0, 0, 0,
-		/*outputs: A/B,CA/B2	   */ d_pia1_pa_w, d_pia1_pb_w, d_pia1_ca2_w, d_pia1_cb2_w,
-		/*irqs	 : A/B			   */ d_pia1_firq_a, d_pia1_firq_b
+		/*inputs : A/B,CA/B1,CA/B2 */
+		DEVCB_HANDLER(d_pia1_pa_r),
+		DEVCB_HANDLER(d_pia1_pb_r_dragon32),
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		/*outputs: A/B,CA/B2	   */
+		DEVCB_HANDLER(d_pia1_pa_w),
+		DEVCB_HANDLER(d_pia1_pb_w),
+		DEVCB_HANDLER(d_pia1_ca2_w),
+		DEVCB_HANDLER(d_pia1_cb2_w),
+		/*irqs	 : A/B			   */
+		DEVCB_LINE(d_pia1_firq_a),
+		DEVCB_LINE(d_pia1_firq_b)
 	}
 };
 
-static const pia6821_interface dragon64_pia_intf[] =
+const pia6821_interface dragon64_pia_intf[] =
 {
 	/* PIA 0 */
 	{
-		/*inputs : A/B,CA/B1,CA/B2 */ 0, 0, 0, 0, 0, 0,
-		/*outputs: A/B,CA/B2	   */ d_pia0_pa_w, d_pia0_pb_w, d_pia0_ca2_w, d_pia0_cb2_w,
-		/*irqs	 : A/B			   */ d_pia0_irq_a, d_pia0_irq_b
+		/*inputs : A/B,CA/B1,CA/B2 */
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		/*outputs: A/B,CA/B2	   */
+		DEVCB_HANDLER(d_pia0_pa_w),
+		DEVCB_HANDLER(d_pia0_pb_w),
+		DEVCB_HANDLER(d_pia0_ca2_w),
+		DEVCB_HANDLER(d_pia0_cb2_w),
+		/*irqs	 : A/B			   */
+		DEVCB_LINE(d_pia0_irq_a),
+		DEVCB_LINE(d_pia0_irq_b)
 	},
 
 	/* PIA 1 */
 	{
-		/*inputs : A/B,CA/B1,CA/B2 */ d_pia1_pa_r, d_pia1_pb_r_coco, 0, 0, 0, 0,
-		/*outputs: A/B,CA/B2	   */ d_pia1_pa_w, dragon64_pia1_pb_w, d_pia1_ca2_w, d_pia1_cb2_w,
-		/*irqs	 : A/B			   */ d_pia1_firq_a, d_pia1_firq_b
+		/*inputs : A/B,CA/B1,CA/B2 */
+		DEVCB_HANDLER(d_pia1_pa_r),
+		DEVCB_HANDLER(d_pia1_pb_r_coco),
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		/*outputs: A/B,CA/B2	   */
+		DEVCB_HANDLER(d_pia1_pa_w),
+		DEVCB_HANDLER(dragon64_pia1_pb_w),
+		DEVCB_HANDLER(d_pia1_ca2_w),
+		DEVCB_HANDLER(d_pia1_cb2_w),
+		/*irqs	 : A/B			   */
+		DEVCB_LINE(d_pia1_firq_a),
+		DEVCB_LINE(d_pia1_firq_b)
 	}
 };
 
-static const pia6821_interface dgnalpha_pia_intf[] =
+const pia6821_interface dgnalpha_pia_intf[] =
 {
 	/* PIA 0 and 1 as Dragon 64 */
 	/* PIA 0 */
 	{
-		/*inputs : A/B,CA/B1,CA/B2 */ 0, 0, 0, 0, 0, 0,
-		/*outputs: A/B,CA/B2	   */ d_pia0_pa_w, d_pia0_pb_w, d_pia0_ca2_w, d_pia0_cb2_w,
-		/*irqs	 : A/B			   */ d_pia0_irq_a, d_pia0_irq_b
+		/*inputs : A/B,CA/B1,CA/B2 */
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		/*outputs: A/B,CA/B2	   */
+		DEVCB_HANDLER(d_pia0_pa_w),
+		DEVCB_HANDLER(d_pia0_pb_w),
+		DEVCB_HANDLER(d_pia0_ca2_w),
+		DEVCB_HANDLER(d_pia0_cb2_w),
+		/*irqs	 : A/B			   */
+		DEVCB_LINE(d_pia0_irq_a),
+		DEVCB_LINE(d_pia0_irq_b)
 	},
 
 	/* PIA 1 */
 	{
-		/*inputs : A/B,CA/B1,CA/B2 */ d_pia1_pa_r, d_pia1_pb_r_coco, 0, 0, 0, 0,
-		/*outputs: A/B,CA/B2	   */ d_pia1_pa_w, d_pia1_pb_w, d_pia1_ca2_w, d_pia1_cb2_w,
-		/*irqs	 : A/B			   */ d_pia1_firq_a, d_pia1_firq_b
+		/*inputs : A/B,CA/B1,CA/B2 */
+		DEVCB_HANDLER(d_pia1_pa_r),
+		DEVCB_HANDLER(d_pia1_pb_r_coco),
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		/*outputs: A/B,CA/B2	   */
+		DEVCB_HANDLER(d_pia1_pa_w),
+		DEVCB_HANDLER(d_pia1_pb_w),
+		DEVCB_HANDLER(d_pia1_ca2_w),
+		DEVCB_HANDLER(d_pia1_cb2_w),
+		/*irqs	 : A/B			   */
+		DEVCB_LINE(d_pia1_firq_a),
+		DEVCB_LINE(d_pia1_firq_b)
 	},
 
 	/* PIA 2 */
 	{
-		/*inputs : A/B,CA/B1,CA/B2 */ 0, 0, 0, 0, 0, 0,
-		/*outputs: A/B,CA/B2	   */ dgnalpha_pia2_pa_w, 0, 0, 0,
-		/*irqs	 : A/B	   		   */ d_pia2_firq_a, d_pia2_firq_b
+		/*inputs : A/B,CA/B1,CA/B2 */
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		/*outputs: A/B,CA/B2	   */
+		DEVCB_HANDLER(dgnalpha_pia2_pa_w),
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		/*irqs	 : A/B	   		   */
+		DEVCB_LINE(d_pia2_firq_a),
+		DEVCB_LINE(d_pia2_firq_b)
 	}
 
 };
@@ -449,6 +605,9 @@ static int load_pak_into_region(const device_config *image, int *pakbase, int *p
 static void pak_load_trailer(running_machine *machine, const pak_decodedtrailer *trailer)
 {
 	const device_config *sam = devtag_get_device(machine, SAM6883, "sam");
+	const device_config *pia_0 = devtag_get_device(machine, PIA6821, "pia_0");
+	const device_config *pia_1 = devtag_get_device(machine, PIA6821, "pia_1");
+
 	cpu_set_reg(machine->cpu[0], M6809_PC, trailer->reg_pc);
 	cpu_set_reg(machine->cpu[0], M6809_X, trailer->reg_x);
 	cpu_set_reg(machine->cpu[0], M6809_Y, trailer->reg_y);
@@ -465,24 +624,24 @@ static void pak_load_trailer(running_machine *machine, const pak_decodedtrailer 
 	 * startup. I wish I had a better solution
 	 */
 
-	pia_write(0, 1, 0x00);
-	pia_write(0, 3, 0x00);
-	pia_write(0, 0, 0x00);
-	pia_write(0, 2, 0xff);
-	pia_write(1, 1, 0x00);
-	pia_write(1, 3, 0x00);
-	pia_write(1, 0, 0xfe);
-	pia_write(1, 2, 0xf8);
+	pia_w(pia_0, 1, 0x00);
+	pia_w(pia_0, 3, 0x00);
+	pia_w(pia_0, 0, 0x00);
+	pia_w(pia_0, 2, 0xff);
+	pia_w(pia_1, 1, 0x00);
+	pia_w(pia_1, 3, 0x00);
+	pia_w(pia_1, 0, 0xfe);
+	pia_w(pia_1, 2, 0xf8);
 
-	pia_write(0, 1, trailer->pia[1]);
-	pia_write(0, 0, trailer->pia[0]);
-	pia_write(0, 3, trailer->pia[3]);
-	pia_write(0, 2, trailer->pia[2]);
+	pia_w(pia_0, 1, trailer->pia[1]);
+	pia_w(pia_0, 0, trailer->pia[0]);
+	pia_w(pia_0, 3, trailer->pia[3]);
+	pia_w(pia_0, 2, trailer->pia[2]);
 
-	pia_write(1, 1, trailer->pia[5]);
-	pia_write(1, 0, trailer->pia[4]);
-	pia_write(1, 3, trailer->pia[7]);
-	pia_write(1, 2, trailer->pia[6]);
+	pia_w(pia_1, 1, trailer->pia[5]);
+	pia_w(pia_1, 0, trailer->pia[4]);
+	pia_w(pia_1, 3, trailer->pia[7]);
+	pia_w(pia_1, 2, trailer->pia[6]);
 
 	/* For some reason, specifying use of high ram seems to screw things up;
 	 * I'm not sure whether it is because I'm using the wrong method to get
@@ -756,8 +915,9 @@ enum
 
 static void d_recalc_irq(running_machine *machine)
 {
-	UINT8 pia0_irq_a = pia_get_irq_a(0);
-	UINT8 pia0_irq_b = pia_get_irq_b(0);
+	const device_config *pia_0 = devtag_get_device( machine, PIA6821, "pia_0" );
+	UINT8 pia0_irq_a = pianew_get_irq_a(pia_0);
+	UINT8 pia0_irq_b = pianew_get_irq_b(pia_0);
 
 	if (pia0_irq_a || pia0_irq_b)
 		cpu_set_input_line(machine->cpu[0], M6809_IRQ_LINE, ASSERT_LINE);
@@ -767,10 +927,12 @@ static void d_recalc_irq(running_machine *machine)
 
 static void d_recalc_firq(running_machine *machine)
 {
-	UINT8 pia1_firq_a = pia_get_irq_a(1);
-	UINT8 pia1_firq_b = pia_get_irq_b(1);
-	UINT8 pia2_firq_a = pia_get_irq_a(2);
-	UINT8 pia2_firq_b = pia_get_irq_b(2);
+	const device_config *pia_1 = devtag_get_device( machine, PIA6821, "pia_1" );
+	const device_config *pia_2 = devtag_get_device( machine, PIA6821, "pia_2" );
+	UINT8 pia1_firq_a = pianew_get_irq_a(pia_1);
+	UINT8 pia1_firq_b = pianew_get_irq_b(pia_1);
+	UINT8 pia2_firq_a = pianew_get_irq_a(pia_2);
+	UINT8 pia2_firq_b = pianew_get_irq_b(pia_2);
 
 	if (pia1_firq_a || pia1_firq_b || pia2_firq_a || pia2_firq_b)
 		cpu_set_input_line(machine->cpu[0], M6809_FIRQ_LINE, ASSERT_LINE);
@@ -794,55 +956,55 @@ static void coco3_recalc_firq(running_machine *machine)
 		d_recalc_firq(machine);
 }
 
-static void d_pia0_irq_a(running_machine *machine, int state)
+static WRITE_LINE_DEVICE_HANDLER( d_pia0_irq_a )
 {
-	d_recalc_irq(machine);
+	d_recalc_irq(device->machine);
 }
 
-static void d_pia0_irq_b(running_machine *machine, int state)
+static WRITE_LINE_DEVICE_HANDLER( d_pia0_irq_b )
 {
-	d_recalc_irq(machine);
+	d_recalc_irq(device->machine);
 }
 
-static void d_pia1_firq_a(running_machine *machine, int state)
+static WRITE_LINE_DEVICE_HANDLER( d_pia1_firq_a )
 {
-	d_recalc_firq(machine);
+	d_recalc_firq(device->machine);
 }
 
-static void d_pia1_firq_b(running_machine *machine, int state)
+static WRITE_LINE_DEVICE_HANDLER( d_pia1_firq_b )
 {
-	d_recalc_firq(machine);
+	d_recalc_firq(device->machine);
 }
 
 /* Dragon Alpha second PIA IRQ lines also cause FIRQ */
-static void d_pia2_firq_a(running_machine *machine, int state)
+static WRITE_LINE_DEVICE_HANDLER( d_pia2_firq_a )
 {
-	d_recalc_firq(machine);
+	d_recalc_firq(device->machine);
 }
 
-static void d_pia2_firq_b(running_machine *machine, int state)
+static WRITE_LINE_DEVICE_HANDLER( d_pia2_firq_b )
 {
-	d_recalc_firq(machine);
+	d_recalc_firq(device->machine);
 }
 
-static void coco3_pia0_irq_a(running_machine *machine, int state)
+static WRITE_LINE_DEVICE_HANDLER( coco3_pia0_irq_a )
 {
-	coco3_recalc_irq(machine);
+	coco3_recalc_irq(device->machine);
 }
 
-static void coco3_pia0_irq_b(running_machine *machine, int state)
+static WRITE_LINE_DEVICE_HANDLER( coco3_pia0_irq_b )
 {
-	coco3_recalc_irq(machine);
+	coco3_recalc_irq(device->machine);
 }
 
-static void coco3_pia1_firq_a(running_machine *machine, int state)
+static WRITE_LINE_DEVICE_HANDLER( coco3_pia1_firq_a )
 {
-	coco3_recalc_firq(machine);
+	coco3_recalc_firq(device->machine);
 }
 
-static void coco3_pia1_firq_b(running_machine *machine, int state)
+static WRITE_LINE_DEVICE_HANDLER( coco3_pia1_firq_b )
 {
-	coco3_recalc_firq(machine);
+	coco3_recalc_firq(device->machine);
 }
 
 static void coco3_raise_interrupt(running_machine *machine, UINT8 mask, int state)
@@ -881,9 +1043,9 @@ static void coco3_raise_interrupt(running_machine *machine, UINT8 mask, int stat
 
 void coco3_horizontal_sync_callback(running_machine *machine,int data)
 {
-	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	const device_config *pia_0 = devtag_get_device( machine, PIA6821, "pia_0" );
 
-	pia_0_ca1_w(space, 0, data);
+	pia_ca1_w(pia_0, 0, data);
 	coco3_raise_interrupt(machine, COCO3_INT_HBORD, data);
 }
 
@@ -891,9 +1053,9 @@ void coco3_horizontal_sync_callback(running_machine *machine,int data)
 
 void coco3_field_sync_callback(running_machine *machine,int data)
 {
-	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	const device_config *pia_0 = devtag_get_device( machine, PIA6821, "pia_0" );
 
-	pia_0_cb1_w(space, 0, data);
+	pia_cb1_w(pia_0, 0, data);
 }
 
 void coco3_gime_field_sync_callback(running_machine *machine)
@@ -1135,10 +1297,12 @@ static const device_config *cococart_device(running_machine *machine)
 	return state->cococart_device;
 }
 
-static int get_soundmux_status(void)
+static int get_soundmux_status(running_machine *machine)
 {
+	const device_config *pia_1 = devtag_get_device( machine, PIA6821, "pia_1" );
+
 	int soundmux_status = 0;
-	if (pia_get_output_cb2(1))
+	if (pianew_get_output_cb2(pia_1))
 		soundmux_status |= SOUNDMUX_STATUS_ENABLE;
 	if (mux_sel1)
 		soundmux_status |= SOUNDMUX_STATUS_SEL1;
@@ -1155,7 +1319,7 @@ static void soundmux_update(running_machine *machine)
 	 * switch on or off.
 	 */
 	cassette_state new_state;
-	int soundmux_status = get_soundmux_status();
+	int soundmux_status = get_soundmux_status(machine);
 
 	switch(soundmux_status) {
 	case SOUNDMUX_STATUS_ENABLE | SOUNDMUX_STATUS_SEL1:
@@ -1181,13 +1345,14 @@ static void soundmux_update(running_machine *machine)
 static void coco_sound_update(running_machine *machine)
 {
 	const device_config *dac_device = devtag_get_device(machine, SOUND, "dac");
+	const device_config *pia_1 = devtag_get_device( machine, PIA6821, "pia_1" );
 
 	/* Call this function whenever you need to update the sound. It will
 	 * automatically mute any devices that are switched out.
 	 */
-	UINT8 dac = pia_get_output_a(1) & 0xFC;
-	UINT8 pia1_pb1 = (pia_get_output_b(1) & 0x02) ? 0x80 : 0x00;
-	int soundmux_status = get_soundmux_status();
+	UINT8 dac = pianew_get_output_a(pia_1) & 0xFC;
+	UINT8 pia1_pb1 = (pianew_get_output_b(pia_1) & 0x02) ? 0x80 : 0x00;
+	int soundmux_status = get_soundmux_status(machine);
 
 	switch(soundmux_status)
 	{
@@ -1253,7 +1418,7 @@ WRITE8_HANDLER ( dgnalpha_psg_porta_write )
   PIA0 CB2		- SEL2 (Used by sound mux and joystick)
 ***************************************************************************/
 
-static WRITE8_HANDLER ( d_pia0_ca2_w )
+static WRITE8_DEVICE_HANDLER ( d_pia0_ca2_w )
 {
 	timer_adjust_oneshot(mux_sel1_timer, JOYSTICK_MUX_DELAY, data);
 }
@@ -1265,7 +1430,7 @@ static TIMER_CALLBACK(coco_update_sel1_timerproc)
 	soundmux_update(machine);
 }
 
-static WRITE8_HANDLER ( d_pia0_cb2_w )
+static WRITE8_DEVICE_HANDLER ( d_pia0_cb2_w )
 {
 	timer_adjust_oneshot(mux_sel2_timer, JOYSTICK_MUX_DELAY, data);
 }
@@ -1294,15 +1459,17 @@ static attotime get_relative_time(running_machine *machine, attotime absolute_ti
 
 static UINT8 coco_update_keyboard(running_machine *machine)
 {
+	const device_config *pia_0 = devtag_get_device( machine, PIA6821, "pia_0" );
+	const device_config *pia_1 = devtag_get_device( machine, PIA6821, "pia_1" );
 	UINT8 porta = 0x7F, port_za = 0x7f;
 	int joyval;
 	static const int joy_rat_table[] = {15, 24, 42, 33 };
 	static const int dclg_table[] = {0, 14, 30, 49 };
 	attotime dclg_time = attotime_zero;
 	UINT8 pia0_pb;
-	UINT8 dac = pia_get_output_a(1) & 0xFC;
+	UINT8 dac = pianew_get_output_a(pia_1) & 0xFC;
 	int joystick_axis, joystick;
-	pia0_pb = pia_get_output_b(0);
+	pia0_pb = pianew_get_output_b(pia_0);
 	joystick_axis = mux_sel1;
 	joystick = mux_sel2;
 
@@ -1315,13 +1482,13 @@ static UINT8 coco_update_keyboard(running_machine *machine)
 	if ((input_port_read(machine, "row5") | pia0_pb) != 0xff) porta &= ~0x20;
 	if ((input_port_read(machine, "row6") | pia0_pb) != 0xff) porta &= ~0x40;
 
-	if ((input_port_read(machine, "row0") | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x01;
-	if ((input_port_read(machine, "row1") | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x02;
-	if ((input_port_read(machine, "row2") | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x04;
-	if ((input_port_read(machine, "row3") | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x08;
-	if ((input_port_read(machine, "row4") | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x10;
-	if ((input_port_read(machine, "row5") | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x20;
-	if ((input_port_read(machine, "row6") | pia_get_port_b_z_mask(0)) != 0xff) port_za &= ~0x40;
+	if ((input_port_read(machine, "row0") | pianew_get_port_b_z_mask(pia_0)) != 0xff) port_za &= ~0x01;
+	if ((input_port_read(machine, "row1") | pianew_get_port_b_z_mask(pia_0)) != 0xff) port_za &= ~0x02;
+	if ((input_port_read(machine, "row2") | pianew_get_port_b_z_mask(pia_0)) != 0xff) port_za &= ~0x04;
+	if ((input_port_read(machine, "row3") | pianew_get_port_b_z_mask(pia_0)) != 0xff) port_za &= ~0x08;
+	if ((input_port_read(machine, "row4") | pianew_get_port_b_z_mask(pia_0)) != 0xff) port_za &= ~0x10;
+	if ((input_port_read(machine, "row5") | pianew_get_port_b_z_mask(pia_0)) != 0xff) port_za &= ~0x20;
+	if ((input_port_read(machine, "row6") | pianew_get_port_b_z_mask(pia_0)) != 0xff) port_za &= ~0x40;
 
 	switch(get_input_device(machine, joystick ? INPUTPORT_LEFT_JOYSTICK : INPUTPORT_RIGHT_JOYSTICK))
 	{
@@ -1392,7 +1559,7 @@ static UINT8 coco_update_keyboard(running_machine *machine)
 	porta &= ~input_port_read_safe(machine, "joystick_buttons", 0);
 	port_za &= ~input_port_read_safe(machine, "joystick_buttons", 0);
 
-	pia_set_input_a(0, porta, port_za);
+	pianew_set_input_a(pia_0, porta, port_za);
 	return porta;
 }
 
@@ -1410,14 +1577,14 @@ static UINT8 coco3_update_keyboard(running_machine *machine)
 
 
 /* three functions that update the keyboard in varying ways */
-static WRITE8_HANDLER ( d_pia0_pb_w )					{ (*update_keyboard)(space->machine); }
+static WRITE8_DEVICE_HANDLER ( d_pia0_pb_w )					{ (*update_keyboard)(device->machine); }
 INPUT_CHANGED(coco_keyboard_changed)					{ (*update_keyboard)(field->port->machine); }
 static TIMER_CALLBACK(coco_update_keyboard_timerproc)	{ (*update_keyboard)(machine); }
 
-static WRITE8_HANDLER ( d_pia0_pa_w )
+static WRITE8_DEVICE_HANDLER ( d_pia0_pa_w )
 {
-	if (get_input_device(space->machine, INPUTPORT_RIGHT_JOYSTICK) == INPUTDEVICE_HIRES_CC3MAX_INTERFACE)
-		coco_hiresjoy_w(space->machine, data & 0x04);
+	if (get_input_device(device->machine, INPUTPORT_RIGHT_JOYSTICK) == INPUTDEVICE_HIRES_CC3MAX_INTERFACE)
+		coco_hiresjoy_w(device->machine, data & 0x04);
 }
 
 
@@ -1442,9 +1609,9 @@ static WRITE8_HANDLER ( d_pia0_pa_w )
   PIA1 CB2		- SNDEN (Sound Enable)
 ***************************************************************************/
 
-static WRITE8_HANDLER ( d_pia1_cb2_w )
+static WRITE8_DEVICE_HANDLER ( d_pia1_cb2_w )
 {
-	soundmux_update(space->machine);
+	soundmux_update(device->machine);
 }
 
 /* Printer output functions used by d_pia1_pa_w */
@@ -1459,14 +1626,16 @@ static void printer_out_coco(running_machine *machine, int data)
 /* Printer output for the Dragon, output to Paralel port */
 static void printer_out_dragon(running_machine *machine, int data)
 {
+	const device_config *pia_0 = devtag_get_device( machine, PIA6821, "pia_0" );
+
 	/* If strobe bit is high send data from pia0 port b to dragon parallel printer */
 	if (data & 0x02)
 	{
-		printer_output(printer_image(machine), pia_get_output_b(0));
+		printer_output(printer_image(machine), pianew_get_output_b(pia_0));
 	}
 }
 
-static WRITE8_HANDLER ( d_pia1_pa_w )
+static WRITE8_DEVICE_HANDLER ( d_pia1_pa_w )
 {
 	/*
 	 *	This port appears at $FF20
@@ -1475,12 +1644,12 @@ static WRITE8_HANDLER ( d_pia1_pa_w )
 	 *  7-2:	DAC to speaker or cassette
 	 *    1:	Serial out (CoCo), Printer strobe (Dragon)
 	 */
-	UINT8 dac = pia_get_output_a(1) & 0xFC;
+	UINT8 dac = pianew_get_output_a(device) & 0xFC;
 	static int dclg_previous_bit;
 
-	coco_sound_update(space->machine);
+	coco_sound_update(device->machine);
 
-	if (get_input_device(space->machine, INPUTPORT_SERIAL) == INPUTDEVICE_DIECOM_LIGHTGUN)
+	if (get_input_device(device->machine, INPUTPORT_SERIAL) == INPUTDEVICE_DIECOM_LIGHTGUN)
 	{
 		int dclg_this_bit = ((data & 2) >> 1);
 
@@ -1523,17 +1692,17 @@ static WRITE8_HANDLER ( d_pia1_pa_w )
 	}
 	else
 	{
-		cassette_output(cassette_device_image(space->machine), ((int) dac - 0x80) / 128.0);
+		cassette_output(cassette_device_image(device->machine), ((int) dac - 0x80) / 128.0);
 	}
 
-	(*update_keyboard)(space->machine);
+	(*update_keyboard)(device->machine);
 
-	if (get_input_device(space->machine, INPUTPORT_RIGHT_JOYSTICK) == INPUTDEVICE_HIRES_INTERFACE)
-		coco_hiresjoy_w(space->machine, dac >= 0x80);
+	if (get_input_device(device->machine, INPUTPORT_RIGHT_JOYSTICK) == INPUTDEVICE_HIRES_INTERFACE)
+		coco_hiresjoy_w(device->machine, dac >= 0x80);
 
 	/* Handle printer output, serial for CoCos, Paralell for Dragons */
 
-	printer_out(space->machine, data);
+	printer_out(device->machine, data);
 }
 
 /*
@@ -1544,7 +1713,7 @@ static WRITE8_HANDLER ( d_pia1_pa_w )
  * semigraphics modes
  */
 
-static WRITE8_HANDLER( d_pia1_pb_w )
+static WRITE8_DEVICE_HANDLER( d_pia1_pb_w )
 {
 	m6847_video_changed();
 
@@ -1554,16 +1723,16 @@ static WRITE8_HANDLER( d_pia1_pb_w )
 	 *
 	 * Source:  Page 31 of the Tandy Color Computer Serice Manual
 	 */
-	coco_sound_update(space->machine);
+	coco_sound_update(device->machine);
 }
 
-static WRITE8_HANDLER( dragon64_pia1_pb_w )
+static WRITE8_DEVICE_HANDLER( dragon64_pia1_pb_w )
 {
 	int ddr;
 
-	d_pia1_pb_w(space, 0, data);
+	d_pia1_pb_w(device, 0, data);
 
-	ddr = ~pia_get_port_b_z_mask(1);
+	ddr = ~pianew_get_port_b_z_mask(device);
 
 	/* If bit 2 of the pia1 ddrb is 1 then this pin is an output so use it */
 	/* to control the paging of the 32k and 64k basic roms */
@@ -1571,7 +1740,7 @@ static WRITE8_HANDLER( dragon64_pia1_pb_w )
 	/* always be high (enabling 32k basic rom) */
 	if (ddr & 0x04)
 	{
-		dragon_page_rom(space->machine, data & 0x04);
+		dragon_page_rom(device->machine, data & 0x04);
 	}
 }
 
@@ -1586,9 +1755,9 @@ static WRITE8_HANDLER( dragon64_pia1_pb_w )
 	CB1				DRQ from WD2797 disk controler.
 ***************************************************************************/
 
-static WRITE8_HANDLER( dgnalpha_pia2_pa_w )
+static WRITE8_DEVICE_HANDLER( dgnalpha_pia2_pa_w )
 {
-	const device_config *ay8912 = devtag_get_device(space->machine, SOUND, "ay8912");
+	const device_config *ay8912 = devtag_get_device(device->machine, SOUND, "ay8912");
 	int	bc_flags;		/* BCDDIR/BC1, as connected to PIA2 port a bits 0 and 1 */
 
 	/* If bit 2 of the pia2 ddra is 1 then this pin is an output so use it */
@@ -1597,7 +1766,7 @@ static WRITE8_HANDLER( dgnalpha_pia2_pa_w )
 	/* always be high (enabling boot rom) */
 	/* PIA FIXME if (pia_get_ddr_a(2) & 0x04) */
 	{
-		dragon_page_rom(space->machine, data & 0x04);	/* bit 2 controls boot or basic rom */
+		dragon_page_rom(device->machine, data & 0x04);	/* bit 2 controls boot or basic rom */
 	}
 
 	/* Bits 0 and 1 for pia2 port a control the BCDIR and BC1 lines of the */
@@ -1609,13 +1778,15 @@ static WRITE8_HANDLER( dgnalpha_pia2_pa_w )
 		case 0x00	: 		/* Inactive, do nothing */
 			break;
 		case 0x01	: 		/* Write to selected port */
-			ay8910_data_w(ay8912, 0, pia_get_output_b(2));
+			ay8910_data_w(ay8912, 0, pianew_get_output_b(device));
 			break;
 		case 0x02	: 		/* Read from selected port */
-			pia_set_input_b(2, ay8910_r(ay8912, 0));
+			/* TODO FIXME 6821pia devicification
+			pianew_set_input_b(device, ay8910_r(ay8912, 0));
+			*/
 			break;
 		case 0x03	:		/* Select port to write to */
-			ay8910_address_w(ay8912, 0, pia_get_output_b(2));
+			ay8910_address_w(ay8912, 0, pianew_get_output_b(device));
 			break;
 	}
 }
@@ -1648,8 +1819,7 @@ WD17XX_CALLBACK( dgnalpha_fdc_callback )
 	/* The NMI line on the alphaAlpha is gated through IC16 (early PLD), and is gated by pia2 CA2  */
 	/* The DRQ line goes through pia2 cb1, in exactly the same way as DRQ from DragonDos does */
 	/* for pia1 cb1 */
-
-	const address_space *space = cpu_get_address_space( device->machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	const device_config *pia_2 = devtag_get_device( device->machine, PIA6821, "pia_2" );
 
 	switch(state)
 	{
@@ -1663,15 +1833,15 @@ WD17XX_CALLBACK( dgnalpha_fdc_callback )
 			}
 			else
 			{
-				if (pia_get_output_ca2_z(2))
+				if (pianew_get_output_ca2_z(pia_2))
 					cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_NMI, ASSERT_LINE);
 			}
 			break;
 		case WD17XX_DRQ_CLR:
-			pia_2_cb1_w(space, 0, CARTLINE_CLEAR);
+			pia_cb1_w(pia_2, 0, CARTLINE_CLEAR);
 			break;
 		case WD17XX_DRQ_SET:
-			pia_2_cb1_w(space, 0, CARTLINE_ASSERTED);
+			pia_cb1_w(pia_2, 0, CARTLINE_ASSERTED);
 			break;
 	}
 }
@@ -1735,25 +1905,27 @@ WRITE8_HANDLER(alpha_modem_w)
 {
 }
 
-static WRITE8_HANDLER ( d_pia1_ca2_w )
+static WRITE8_DEVICE_HANDLER ( d_pia1_ca2_w )
 {
 	cassette_change_state(
-		cassette_device_image(space->machine),
+		cassette_device_image(device->machine),
 		data ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,
 		CASSETTE_MASK_MOTOR);
 }
 
 
 
-static READ8_HANDLER ( d_pia1_pa_r )
+static READ8_DEVICE_HANDLER ( d_pia1_pa_r )
 {
-	return (cassette_input(cassette_device_image(space->machine)) >= 0) ? 1 : 0;
+	return (cassette_input(cassette_device_image(device->machine)) >= 0) ? 1 : 0;
 }
 
 
 
-static READ8_HANDLER ( d_pia1_pb_r_coco )
+static READ8_DEVICE_HANDLER ( d_pia1_pb_r_coco )
 {
+	const device_config *pia_0 = devtag_get_device( device->machine, PIA6821, "pia_0" );
+
 	/* This handles the reading of the memory sense switch (pb2) for the CoCo 1,
 	 * and serial-in (pb0). Serial-in not yet implemented. */
 	int result;
@@ -1766,7 +1938,7 @@ static READ8_HANDLER ( d_pia1_pb_r_coco )
 	   the full 64K, as this uses Color Basic 1.2, which can configure 64K rams */
 
 	if (mess_ram_size > 0x8000)		/* 1 bank of 64K rams */
-		result = (pia_get_output_b(0) & 0x80) >> 5;
+		result = (pianew_get_output_b(pia_0) & 0x80) >> 5;
 	else if (mess_ram_size >= 0x4000)	/* 1 or 2 banks of 16K rams */
 		result = 0x04;
 	else
@@ -1775,7 +1947,7 @@ static READ8_HANDLER ( d_pia1_pb_r_coco )
 	return result;
 }
 
-static READ8_HANDLER ( d_pia1_pb_r_dragon32 )
+static READ8_DEVICE_HANDLER ( d_pia1_pb_r_dragon32 )
 {
 	/* This handles the reading of the memory sense switch (pb2) for the Dragon 32,
 	 * and pb0, is the printer /busy line. */
@@ -1794,8 +1966,10 @@ static READ8_HANDLER ( d_pia1_pb_r_dragon32 )
 	return result;
 }
 
-static READ8_HANDLER ( d_pia1_pb_r_coco2 )
+static READ8_DEVICE_HANDLER ( d_pia1_pb_r_coco2 )
 {
+	const device_config *pia_0 = devtag_get_device( device->machine, PIA6821, "pia_0" );
+
 	/* This handles the reading of the memory sense switch (pb2) for the CoCo 2 and 3,
 	 * and serial-in (pb0). Serial-in not yet implemented.
 	 */
@@ -1806,7 +1980,7 @@ static READ8_HANDLER ( d_pia1_pb_r_coco2 )
 	else if (mess_ram_size <= 0x4000)
 		result = 0x04;					/* 16K: wire pia1_pb2 high */
 	else
-		result = (pia_get_output_b(0) & 0x40) >> 4;		/* 32/64K: wire output of pia0_pb6 to input pia1_pb2  */
+		result = (pianew_get_output_b(pia_0) & 0x40) >> 4;		/* 32/64K: wire output of pia0_pb6 to input pia1_pb2  */
 	return result;
 }
 
@@ -2624,8 +2798,9 @@ static SAM6883_SET_MAP_TYPE( coco3_sam_set_maptype )
 
 void coco_cart_w(const device_config *device, int data)
 {
-	const address_space *space = cpu_get_address_space( device->machine->cpu[0], ADDRESS_SPACE_PROGRAM );
-	pia_1_cb1_w(space, 0, data ? ASSERT_LINE : CLEAR_LINE);
+	const device_config *pia_1 = devtag_get_device( device->machine, PIA6821, "pia_1" );
+
+	pia_cb1_w(pia_1, 0, data ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -2669,10 +2844,10 @@ void coco_nmi_w(const device_config *device, int data)
 	also call twiddle Q lines, if necessary
 -------------------------------------------------*/
 
-WRITE8_HANDLER(coco_pia_1_w)
+WRITE8_DEVICE_HANDLER(coco_pia_1_w)
 {
-	pia_1_w(space, offset, data);
-	coco_cartridge_twiddle_q_lines(cococart_device(space->machine));
+	pia_w(device, offset, data);
+	coco_cartridge_twiddle_q_lines(cococart_device(device->machine));
 }
 
 
@@ -2683,8 +2858,6 @@ WRITE8_HANDLER(coco_pia_1_w)
 typedef struct _machine_init_interface machine_init_interface;
 struct _machine_init_interface
 {
-	const pia6821_interface *piaintf;			/* PIA initializer */
-	int	piaintf_count;							/* PIA count */
 	timer_fired_func recalc_interrupts_;			/* recalculate inturrupts callback */
 	void (*printer_out_)(running_machine *machine, int data);				/* printer output callback */
 };
@@ -2699,7 +2872,6 @@ struct _machine_init_interface
 static void generic_init_machine(running_machine *machine, const machine_init_interface *init)
 {
 	coco_state *state = (coco_state *) machine->driver_data;
-	int i;
 
 	/* locate devices */
 	state->cococart_device = devtag_get_device(machine, DEVICE_TYPE_WILDCARD, "coco_cartslot");
@@ -2735,11 +2907,6 @@ static void generic_init_machine(running_machine *machine, const machine_init_in
 	/* setup printer output callback */
 	printer_out = init->printer_out_;
 
-	/* setup PIAs */
-	for (i = 0; i < init->piaintf_count; i++)
-		pia_config(machine, i, &init->piaintf[i]);
-	pia_reset();
-
 	debug_cpu_set_dasm_override(machine->cpu[0], coco_dasm_override);
 
 	state_save_register_global(machine, mux_sel1);
@@ -2765,8 +2932,6 @@ MACHINE_START( dragon32 )
 
 	/* Setup machine initialization */
 	memset(&init, 0, sizeof(init));
-	init.piaintf			= dragon32_pia_intf;
-	init.piaintf_count		= ARRAY_LENGTH(dragon32_pia_intf);
 	init.recalc_interrupts_	= d_recalc_interrupts;
 	init.printer_out_		= printer_out_dragon;
 
@@ -2779,8 +2944,6 @@ MACHINE_START( dragon64 )
 
 	/* Setup machine initialization */
 	memset(&init, 0, sizeof(init));
-	init.piaintf			= dragon64_pia_intf;
-	init.piaintf_count		= ARRAY_LENGTH(dragon64_pia_intf);
 	init.recalc_interrupts_	= d_recalc_interrupts;
 	init.printer_out_		= printer_out_dragon;
 
@@ -2793,8 +2956,6 @@ MACHINE_START( tanodr64 )
 
 	/* Setup machine initialization */
 	memset(&init, 0, sizeof(init));
-	init.piaintf			= dragon64_pia_intf;
-	init.piaintf_count		= ARRAY_LENGTH(dragon64_pia_intf);
 	init.recalc_interrupts_	= d_recalc_interrupts;
 	init.printer_out_		= printer_out_dragon;
 
@@ -2807,8 +2968,6 @@ MACHINE_START( dgnalpha )
 
 	/* Setup machine initialization */
 	memset(&init, 0, sizeof(init));
-	init.piaintf			= dgnalpha_pia_intf;
-	init.piaintf_count		= ARRAY_LENGTH(dgnalpha_pia_intf);
 	init.recalc_interrupts_	= d_recalc_interrupts;
 	init.printer_out_		= printer_out_dragon;
 
@@ -2831,8 +2990,6 @@ MACHINE_START( coco )
 
 	/* Setup machine initialization */
 	memset(&init, 0, sizeof(init));
-	init.piaintf			= coco_pia_intf;
-	init.piaintf_count		= ARRAY_LENGTH(coco_pia_intf);
 	init.recalc_interrupts_	= d_recalc_interrupts;
 	init.printer_out_		= printer_out_coco;
 
@@ -2845,8 +3002,6 @@ MACHINE_START( coco2 )
 
 	/* Setup machine initialization */
 	memset(&init, 0, sizeof(init));
-	init.piaintf			= coco2_pia_intf;
-	init.piaintf_count		= ARRAY_LENGTH(coco2_pia_intf);
 	init.recalc_interrupts_	= d_recalc_interrupts;
 	init.printer_out_		= printer_out_coco;
 
@@ -2896,8 +3051,6 @@ MACHINE_START( coco3 )
 
 	/* Setup machine initialization */
 	memset(&init, 0, sizeof(init));
-	init.piaintf			= coco3_pia_intf;
-	init.piaintf_count		= ARRAY_LENGTH(coco3_pia_intf);
 	init.recalc_interrupts_	= coco3_recalc_interrupts;
 	init.printer_out_		= printer_out_coco;
 	

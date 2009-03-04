@@ -17,7 +17,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "machine/6821pia.h"
+#include "machine/6821new.h"
 #include "machine/6883sam.h"
 #include "video/m6847.h"
 #include "includes/coco.h"
@@ -29,10 +29,12 @@
  *
  *************************************/
 
+static const device_config *pia_1;
+
 ATTR_CONST UINT8 coco_get_attributes(UINT8 c)
 {
 	UINT8 result = 0x00;
-	UINT8 pia1_pb = pia_get_output_b(1);
+	UINT8 pia1_pb = pianew_get_output_b(pia_1);
 
 	if (c & 0x40)		result |= M6847_INV;
 	if (c & 0x80)		result |= M6847_AS;
@@ -48,18 +50,18 @@ ATTR_CONST UINT8 coco_get_attributes(UINT8 c)
 
 static void coco_horizontal_sync_callback(running_machine *machine, int data)
 {
-	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	const device_config *pia_0 = devtag_get_device( machine, PIA6821, "pia_0" );
 
-	pia_0_ca1_w(space, 0, data);
+	pia_ca1_w(pia_0, 0, data);
 }
 
 
 
 static void coco_field_sync_callback(running_machine *machine, int data)
 {
-	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	const device_config *pia_0 = devtag_get_device( machine, PIA6821, "pia_0" );
 
-	pia_0_cb1_w(space, 0, data);
+	pia_cb1_w(pia_0, 0, data);
 }
 
 static const UINT8 *get_video_ram_coco(running_machine *machine,int scanline)
@@ -71,6 +73,8 @@ static const UINT8 *get_video_ram_coco(running_machine *machine,int scanline)
 static void internal_video_start_coco(running_machine *machine, m6847_type type)
 {
 	m6847_config cfg;
+
+	pia_1 = devtag_get_device( machine, PIA6821, "pia_1" );
 
 	memset(&cfg, 0, sizeof(cfg));
 	cfg.type = type;

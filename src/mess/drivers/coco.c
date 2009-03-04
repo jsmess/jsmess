@@ -14,7 +14,7 @@
 #include "cpu/m6809/m6809.h"
 #include "cpu/hd6309/hd6309.h"
 #include "sound/wave.h"
-#include "machine/6821pia.h"
+#include "machine/6821new.h"
 #include "video/m6847.h"
 #include "machine/msm6242.h"
 #include "machine/ds1315.h"
@@ -58,8 +58,8 @@ static ADDRESS_MAP_START( coco_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xD000, 0xDFFF) AM_RAMBANK(14)
 	AM_RANGE(0xE000, 0xEFFF) AM_RAMBANK(15)
 	AM_RANGE(0xF000, 0xFEFF) AM_RAMBANK(16)
-	AM_RANGE(0xff00, 0xff1f) AM_READWRITE(pia_0_r,			pia_0_w)
-	AM_RANGE(0xff20, 0xff3f) AM_READWRITE(pia_1_r,			coco_pia_1_w)
+	AM_RANGE(0xff00, 0xff1f) AM_DEVREADWRITE(PIA6821, "pia_0", pia_r, pia_w)
+	AM_RANGE(0xff20, 0xff3f) AM_DEVREADWRITE(PIA6821, "pia_1", pia_r, coco_pia_1_w)
 	AM_RANGE(0xff40, 0xff7f) AM_DEVREADWRITE(COCO_CARTRIDGE, "coco_cartslot", coco_cartridge_r, coco_cartridge_w)
 	AM_RANGE(0xff90, 0xffbf) AM_NOP
 	AM_RANGE(0xffc0, 0xffdf) AM_DEVWRITE(SAM6883, "sam", sam6883_w)
@@ -85,8 +85,8 @@ static ADDRESS_MAP_START( dragon_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xD000, 0xDFFF) AM_RAMBANK(14)
 	AM_RANGE(0xE000, 0xEFFF) AM_RAMBANK(15)
 	AM_RANGE(0xF000, 0xFEFF) AM_RAMBANK(16)
-	AM_RANGE(0xff00, 0xff1f) AM_READWRITE(pia_0_r,			pia_0_w)
-	AM_RANGE(0xff20, 0xff3f) AM_READWRITE(pia_1_r,			coco_pia_1_w)
+	AM_RANGE(0xff00, 0xff1f) AM_DEVREADWRITE(PIA6821, "pia_0", pia_r, pia_w)
+	AM_RANGE(0xff20, 0xff3f) AM_DEVREADWRITE(PIA6821, "pia_1", pia_r, coco_pia_1_w)
 	AM_RANGE(0xff40, 0xff7f) AM_DEVREADWRITE(DRAGON_CARTRIDGE, "coco_cartslot", coco_cartridge_r, coco_cartridge_w)
 	AM_RANGE(0xff90, 0xffbf) AM_NOP
 	AM_RANGE(0xffc0, 0xffdf) AM_DEVWRITE(SAM6883, "sam", sam6883_w)
@@ -113,8 +113,8 @@ static ADDRESS_MAP_START( coco3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xdfff) AM_RAMBANK(7)
 	AM_RANGE(0xe000, 0xfdff) AM_RAMBANK(8)
 	AM_RANGE(0xfe00, 0xfeff) AM_RAMBANK(9)
-	AM_RANGE(0xff00, 0xff1f) AM_READWRITE(pia_0_r,				pia_0_w)
-	AM_RANGE(0xff20, 0xff3f) AM_READWRITE(pia_1_r,				coco_pia_1_w)
+	AM_RANGE(0xff00, 0xff1f) AM_DEVREADWRITE(PIA6821, "pia_0", pia_r, pia_w)
+	AM_RANGE(0xff20, 0xff3f) AM_DEVREADWRITE(PIA6821, "pia_1", pia_r, coco_pia_1_w)
 	AM_RANGE(0xff40, 0xff7f) AM_DEVREADWRITE(COCO_CARTRIDGE, "coco_cartslot", coco_cartridge_r, coco_cartridge_w)
 	AM_RANGE(0xff80, 0xff85) AM_DEVREADWRITE(COCO_VHD, "vhd", coco_vhd_io_r, coco_vhd_io_w)
 	AM_RANGE(0xff90, 0xff9f) AM_READWRITE(coco3_gime_r,			coco3_gime_w)
@@ -144,9 +144,9 @@ static ADDRESS_MAP_START( d64_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xD000, 0xDFFF) AM_RAMBANK(14)
 	AM_RANGE(0xE000, 0xEFFF) AM_RAMBANK(15)
 	AM_RANGE(0xF000, 0xFEFF) AM_RAMBANK(16)
-	AM_RANGE(0xff00, 0xff03) AM_READWRITE(pia_0_r,				pia_0_w)		AM_MIRROR(0x0018)
+	AM_RANGE(0xff00, 0xff03) AM_DEVREADWRITE(PIA6821, "pia_0", pia_r, pia_w)		AM_MIRROR(0x0018)
 	AM_RANGE(0xff04, 0xff07) AM_DEVREADWRITE(ACIA6551, "acia", acia_6551_r,			acia_6551_w)	AM_MIRROR(0x0018)
-	AM_RANGE(0xff20, 0xff3f) AM_READWRITE(pia_1_r,				coco_pia_1_w)
+	AM_RANGE(0xff20, 0xff3f) AM_DEVREADWRITE(PIA6821, "pia_1", pia_r, coco_pia_1_w)
 	AM_RANGE(0xff40, 0xff7f) AM_DEVREADWRITE(DRAGON_CARTRIDGE, "coco_cartslot", coco_cartridge_r, coco_cartridge_w)
 	AM_RANGE(0xff90, 0xffbf) AM_NOP
 	AM_RANGE(0xffc0, 0xffdf) AM_DEVWRITE(SAM6883, "sam", sam6883_w)
@@ -178,9 +178,9 @@ static ADDRESS_MAP_START( d64_plus_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xD000, 0xDFFF) AM_RAMBANK(14)
 	AM_RANGE(0xE000, 0xEFFF) AM_RAMBANK(15)
 	AM_RANGE(0xF000, 0xFEFF) AM_RAMBANK(16)
-	AM_RANGE(0xff00, 0xff03) AM_READWRITE(pia_0_r,pia_0_w)		AM_MIRROR(0x0018)
+	AM_RANGE(0xff00, 0xff03) AM_DEVREADWRITE(PIA6821, "pia_0", pia_r,pia_w)		AM_MIRROR(0x0018)
 	AM_RANGE(0xff04, 0xff07) AM_DEVREADWRITE(ACIA6551, "acia", acia_6551_r,acia_6551_w)	AM_MIRROR(0x0018)
-	AM_RANGE(0xff20, 0xff3f) AM_READWRITE(pia_1_r, coco_pia_1_w)
+	AM_RANGE(0xff20, 0xff3f) AM_DEVREADWRITE(PIA6821, "pia_1", pia_r, coco_pia_1_w)
 	AM_RANGE(0xff40, 0xff7f) AM_DEVREADWRITE(DRAGON_CARTRIDGE, "coco_cartslot", coco_cartridge_r, coco_cartridge_w)
 	AM_RANGE(0xff90, 0xffbf) AM_NOP
 	AM_RANGE(0xffc0, 0xffdf) AM_DEVWRITE(SAM6883, "sam", sam6883_w)
@@ -256,10 +256,10 @@ static ADDRESS_MAP_START( dgnalpha_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xD000, 0xDFFF) AM_RAMBANK(14)
 	AM_RANGE(0xE000, 0xEFFF) AM_RAMBANK(15)
 	AM_RANGE(0xF000, 0xFEFF) AM_RAMBANK(16)
-	AM_RANGE(0xff00, 0xff03) AM_READWRITE(pia_0_r,			pia_0_w)
+	AM_RANGE(0xff00, 0xff03) AM_DEVREADWRITE(PIA6821, "pia_0", pia_r, pia_w)
 	AM_RANGE(0xff04, 0xff07) AM_DEVREADWRITE(ACIA6551, "acia", acia_6551_r,		acia_6551_w)
-	AM_RANGE(0xff20, 0xff23) AM_READWRITE(pia_1_r,			coco_pia_1_w)
-	AM_RANGE(0xff24, 0xff27) AM_READWRITE(pia_2_r,			pia_2_w) 	/* Third PIA on Dragon Alpha */
+	AM_RANGE(0xff20, 0xff23) AM_DEVREADWRITE(PIA6821, "pia_1", pia_r, coco_pia_1_w)
+	AM_RANGE(0xff24, 0xff27) AM_DEVREADWRITE(PIA6821, "pia_2", pia_r, pia_w) 	/* Third PIA on Dragon Alpha */
 	AM_RANGE(0Xff28, 0xff2b) AM_READWRITE(alpha_modem_r,	alpha_modem_w)	/* Modem, dummy to stop eror log ! */
 	AM_RANGE(0xff2c, 0xff2f) AM_READWRITE(wd2797_r,			wd2797_w)	/* Alpha onboard disk interface */
 	AM_RANGE(0xff40, 0xff7f) AM_DEVREADWRITE(DRAGON_CARTRIDGE, "coco_cartslot", coco_cartridge_r, coco_cartridge_w)
@@ -698,6 +698,9 @@ static MACHINE_DRIVER_START( dragon32 )
 
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
 	
+	MDRV_PIA6821_ADD( "pia_0", dragon32_pia_intf[0] )
+	MDRV_PIA6821_ADD( "pia_1", dragon32_pia_intf[1] )
+
 	MDRV_SAM6883_ADD("sam", coco_sam_intf)
 	
 	MDRV_DRAGON_CARTRIDGE_ADD("coco_cartslot")
@@ -738,6 +741,9 @@ static MACHINE_DRIVER_START( dragon64 )
 	/* acia */
 	MDRV_ACIA6551_ADD("acia")
 	
+	MDRV_PIA6821_ADD( "pia_0", dragon64_pia_intf[0] )
+	MDRV_PIA6821_ADD( "pia_1", dragon64_pia_intf[1] )
+
 	MDRV_SAM6883_ADD("sam", coco_sam_intf)
 	
 	MDRV_DRAGON_CARTRIDGE_ADD("coco_cartslot")
@@ -778,6 +784,9 @@ static MACHINE_DRIVER_START( d64plus )
 	/* acia */
 	MDRV_ACIA6551_ADD("acia")
 	
+	MDRV_PIA6821_ADD( "pia_0", dragon64_pia_intf[0] )
+	MDRV_PIA6821_ADD( "pia_1", dragon64_pia_intf[1] )
+
 	MDRV_SAM6883_ADD("sam", coco_sam_intf)
 	
 	MDRV_DRAGON_CARTRIDGE_ADD("coco_cartslot")
@@ -824,6 +833,10 @@ static MACHINE_DRIVER_START( dgnalpha )
 	/* acia */
 	MDRV_ACIA6551_ADD("acia")
 	
+	MDRV_PIA6821_ADD( "pia_0", dgnalpha_pia_intf[0] )
+	MDRV_PIA6821_ADD( "pia_1", dgnalpha_pia_intf[1] )
+	MDRV_PIA6821_ADD( "pia_2", dgnalpha_pia_intf[2] )
+
 	MDRV_SAM6883_ADD("sam", coco_sam_intf)
 	
 	MDRV_DRAGON_CARTRIDGE_ADD("coco_cartslot")
@@ -864,6 +877,9 @@ static MACHINE_DRIVER_START( tanodr64 )
 	/* acia */
 	MDRV_ACIA6551_ADD("acia")
 	
+	MDRV_PIA6821_ADD( "pia_0", dragon64_pia_intf[0] )
+	MDRV_PIA6821_ADD( "pia_1", dragon64_pia_intf[1] )
+
 	MDRV_SAM6883_ADD("sam", coco_sam_intf)
 	
 	MDRV_DRAGON_CARTRIDGE_ADD("coco_cartslot")
@@ -902,6 +918,9 @@ static MACHINE_DRIVER_START( coco )
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
 	
+	MDRV_PIA6821_ADD( "pia_0", coco_pia_intf[0] )
+	MDRV_PIA6821_ADD( "pia_1", coco_pia_intf[1] )
+
 	MDRV_SAM6883_ADD("sam", coco_sam_intf)
 	
 	MDRV_COCO_CARTRIDGE_ADD("coco_cartslot")
@@ -940,6 +959,9 @@ static MACHINE_DRIVER_START( coco2 )
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
 	
+	MDRV_PIA6821_ADD( "pia_0", coco2_pia_intf[0] )
+	MDRV_PIA6821_ADD( "pia_1", coco2_pia_intf[1] )
+
 	MDRV_SAM6883_ADD("sam", coco_sam_intf)
 	
 	MDRV_COCO_CARTRIDGE_ADD("coco_cartslot")
@@ -978,6 +1000,9 @@ static MACHINE_DRIVER_START( coco2b )
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
 	
+	MDRV_PIA6821_ADD( "pia_0", coco2_pia_intf[0] )
+	MDRV_PIA6821_ADD( "pia_1", coco2_pia_intf[1] )
+
 	MDRV_SAM6883_ADD("sam", coco_sam_intf)
 	
 	MDRV_COCO_CARTRIDGE_ADD("coco_cartslot")
@@ -1011,6 +1036,9 @@ static MACHINE_DRIVER_START( coco3 )
 	MDRV_SCREEN_REFRESH_RATE(M6847_NTSC_FRAMES_PER_SECOND)
 	MDRV_SCREEN_SIZE(640, 25+192+26)
 	MDRV_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
+
+	MDRV_PIA6821_ADD( "pia_0", coco3_pia_intf[0] )
+	MDRV_PIA6821_ADD( "pia_1", coco3_pia_intf[1] )
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM( coco_sound )

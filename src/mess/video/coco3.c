@@ -28,7 +28,6 @@
 #include <math.h>
 
 #include "driver.h"
-#include "machine/6821pia.h"
 #include "machine/6883sam.h"
 #include "video/m6847.h"
 #include "includes/coco.h"
