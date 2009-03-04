@@ -12,7 +12,7 @@
 void wof_decode(running_machine *machine);
 
 
-/*----------- defined in video/cps1.c -----------*/
+/*----------- defined in video/cpschngr.c -----------*/
 
 
 extern UINT16 *cps1_gfxram;     /* Video RAM */
