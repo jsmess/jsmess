@@ -303,6 +303,9 @@ static DEVICE_SET_INFO(general_cartridge)
 			break;
 
 		case COCOCARTINFO_INT_LINE_HALT:
+			/* HACK */
+			get_token(device)->halt_line.delay = cpu_clocks_to_attotime(device->machine->cpu[0], 7);
+			
 			set_line_timer(device, &get_token(device)->halt_line, (cococart_line_value) info->i);
 			break;
 	}
