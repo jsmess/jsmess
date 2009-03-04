@@ -8,6 +8,7 @@
 #define DGN_BETA_H_
 
 #include "machine/wd17xx.h"
+#include "machine/6821new.h"
 
 #define DGNBETA_CPU_SPEED_HZ		2000000	/* 2MHz */
 #define DGNBETA_FRAMES_PER_SECOND	50
@@ -65,6 +66,8 @@ typedef enum
 /*----------- defined in machine/dgn_beta.c -----------*/
 
 extern const wd17xx_interface dgnbeta_wd17xx_interface;
+extern const pia6821_interface dgnbeta_pia_intf[];
+
 MACHINE_START( dgnbeta );
 
 // Page IO at FE00
