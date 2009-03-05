@@ -12,7 +12,7 @@
 #include "includes/atari.h"
 #include "devices/cartslot.h"
 #include "sound/pokey.h"
-#include "machine/6821pia.h"
+#include "machine/6821new.h"
 #include "video/gtia.h"
 #include "sound/dac.h"
 
@@ -212,7 +212,7 @@ static ADDRESS_MAP_START(a400_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE(atari_gtia_r, atari_gtia_w)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
 	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE(SOUND, "pokey", pokey_r, pokey_w)
-	AM_RANGE(0xd300, 0xd3ff) AM_READWRITE(pia_0_alt_r, pia_0_alt_w)
+	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE(PIA6821, "pia", pia_alt_r, pia_alt_w)
 	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE(atari_antic_r, atari_antic_w)
 	AM_RANGE(0xd500, 0xd7ff) AM_NOP
 	AM_RANGE(0xd800, 0xffff) AM_ROM
@@ -226,7 +226,7 @@ static ADDRESS_MAP_START(a800_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE(atari_gtia_r, atari_gtia_w)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
 	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE(SOUND, "pokey", pokey_r, pokey_w)
-	AM_RANGE(0xd300, 0xd3ff) AM_READWRITE(pia_0_alt_r, pia_0_alt_w)
+	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE(PIA6821, "pia", pia_alt_r, pia_alt_w)
 	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE(atari_antic_r, atari_antic_w)
 	AM_RANGE(0xd500, 0xd7ff) AM_NOP
 	AM_RANGE(0xd800, 0xffff) AM_ROM
@@ -242,7 +242,7 @@ static ADDRESS_MAP_START(a800xl_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE(atari_gtia_r, atari_gtia_w)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
 	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE(SOUND, "pokey", pokey_r, pokey_w)
-	AM_RANGE(0xd300, 0xd3ff) AM_READWRITE(pia_0_alt_r, pia_0_alt_w)
+	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE(PIA6821, "pia", pia_alt_r, pia_alt_w)
 	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE(atari_antic_r, atari_antic_w)
 	AM_RANGE(0xd500, 0xd7ff) AM_NOP
 	AM_RANGE(0xd800, 0xffff) AM_READWRITE(SMH_BANK4, SMH_BANK4)
@@ -673,6 +673,23 @@ static const pokey_interface atari_pokey_interface =
 };
 
 
+static const pia6821_interface pia_dummy_intf =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+
 static MACHINE_DRIVER_START( a400_cartslot )
 	MDRV_CARTSLOT_ADD("cart1")
 	MDRV_CARTSLOT_EXTENSION_LIST("rom,bin")
@@ -709,6 +726,8 @@ static MACHINE_DRIVER_START( atari_common_nodac )
 
 	MDRV_VIDEO_START(atari)
 	MDRV_VIDEO_UPDATE(atari)
+
+	MDRV_PIA6821_ADD( "pia", pia_dummy_intf )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

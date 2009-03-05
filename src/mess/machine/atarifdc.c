@@ -14,7 +14,7 @@
 #include "cpu/m6502/m6502.h"
 #include "includes/atari.h"
 #include "sound/pokey.h"
-#include "machine/6821pia.h"
+#include "machine/6821new.h"
 #include "image.h"
 
 #define VERBOSE_SERIAL	0
@@ -695,6 +695,8 @@ READ8_HANDLER ( atari_serin_r )
 
 WRITE8_HANDLER ( atari_serout_w )
 {
+	const device_config *pia = devtag_get_device( space->machine, PIA6821, "pia" );
+
 	/* ignore serial commands if no floppy image is specified */
 	if( !drv[0].image )
 		return;
@@ -712,7 +714,7 @@ WRITE8_HANDLER ( atari_serout_w )
 			/* exclusive or written checksum with calculated */
 			atari_fdc.serout_chksum ^= data;
 			/* if the attention line is high, this should be data */
-			if (pia_get_irq_b(0))
+			if (pianew_get_irq_b(pia))
 				a800_serial_write(space->machine);
 		}
 		else

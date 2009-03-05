@@ -44,10 +44,9 @@
 
 ***************************************************************************/
 
-#include <stdarg.h>
 #include "driver.h"
 #include "includes/apple1.h"
-#include "machine/6821pia.h"
+#include "machine/6821new.h"
 #include "cpu/m6502/m6502.h"
 #include "image.h"
 #include "devices/cassette.h"
@@ -55,9 +54,9 @@
 static TIMER_CALLBACK(apple1_kbd_poll);
 static TIMER_CALLBACK(apple1_kbd_strobe_end);
 
-static READ8_HANDLER( apple1_pia0_kbdin );
-static WRITE8_HANDLER( apple1_pia0_dspout );
-static WRITE8_HANDLER( apple1_pia0_dsp_write_signal );
+static READ8_DEVICE_HANDLER( apple1_pia0_kbdin );
+static WRITE8_DEVICE_HANDLER( apple1_pia0_dspout );
+static WRITE8_DEVICE_HANDLER( apple1_pia0_dsp_write_signal );
 
 static TIMER_CALLBACK(apple1_dsp_ready_start);
 static TIMER_CALLBACK(apple1_dsp_ready_end);
@@ -71,20 +70,20 @@ static TIMER_CALLBACK(apple1_dsp_ready_end);
    rather than updating them when they are read; thus they don't need
    handler functions. */
 
-static const pia6821_interface apple1_pia0 =
+const pia6821_interface apple1_pia0 =
 {
-	apple1_pia0_kbdin,				/* Port A input (keyboard) */
-	0,								/* Port B input (display status) */
-	0,								/* CA1 input (key pressed) */
-	0,								/* CB1 input (display ready) */
-	0,								/* CA2 not used as input */
-	0,								/* CB2 not used as input */
-	0,								/* Port A not used as output */
-	apple1_pia0_dspout,				/* Port B output (display) */
-	0,								/* CA2 not used as output */
-	apple1_pia0_dsp_write_signal,	/* CB2 output (display write) */
-	0,								/* IRQA not connected */
-	0								/* IRQB not connected */
+	DEVCB_HANDLER(apple1_pia0_kbdin),				/* Port A input (keyboard) */
+	DEVCB_NULL,										/* Port B input (display status) */
+	DEVCB_NULL,										/* CA1 input (key pressed) */
+	DEVCB_NULL,										/* CB1 input (display ready) */
+	DEVCB_NULL,										/* CA2 not used as input */
+	DEVCB_NULL,										/* CB2 not used as input */
+	DEVCB_NULL,										/* Port A not used as output */
+	DEVCB_HANDLER(apple1_pia0_dspout),				/* Port B output (display) */
+	DEVCB_NULL,										/* CA2 not used as output */
+	DEVCB_HANDLER(apple1_pia0_dsp_write_signal),	/* CB2 output (display write) */
+	DEVCB_NULL,										/* IRQA not connected */
+	DEVCB_NULL										/* IRQB not connected */
 };
 
 /* Use the same keyboard mapping as on a modern keyboard.  This is not
@@ -153,8 +152,6 @@ DRIVER_INIT( apple1 )
 								  0x0000, mess_ram_size - 1, 0, 0, SMH_BANK1);
 	memory_set_bankptr(machine,1, mess_ram);
 
-	pia_config(machine, 0, &apple1_pia0);
-
 	/* Poll the keyboard input ports periodically.  These include both
 	   ordinary keys and the RESET and CLEAR SCREEN pushbutton
 	   switches.  We can't handle these switches in a VBLANK_INT or
@@ -175,8 +172,7 @@ DRIVER_INIT( apple1 )
 
 MACHINE_RESET( apple1 )
 {
-	/* Reset the PIA and the display hardware. */
-	pia_reset();
+	/* Reset the display hardware. */
 	apple1_vh_dsp_clr();
 }
 
@@ -289,6 +285,7 @@ static TIMER_CALLBACK(apple1_kbd_poll)
 	int port, bit;
 	int key_pressed;
 	UINT32 shiftkeys, ctrlkeys;
+	const device_config *pia = devtag_get_device( machine, PIA6821, "pia" );
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3" };
 
 	/* This holds the values of all the input ports for ordinary keys
@@ -306,7 +303,7 @@ static TIMER_CALLBACK(apple1_kbd_poll)
 			reset_flag = 1;
 			/* using PULSE_LINE does not allow us to press and hold key */
 			cpu_set_input_line(machine->cpu[0], INPUT_LINE_RESET, ASSERT_LINE);
-			pia_reset();
+			device_reset( pia );
 		}
 	}
 	else if (reset_flag) {
@@ -339,7 +336,7 @@ static TIMER_CALLBACK(apple1_kbd_poll)
 	key_pressed = 0;
 
 	/* The keyboard strobe line should always be low when a scan starts. */
-	pia_set_input_ca1(0, 0);
+	pia_ca1_w(pia, 0, 0);
 
 	shiftkeys = input_port_read(machine, "KEY4") & 0x0003;
 	ctrlkeys = input_port_read(machine, "KEY4") & 0x000c;
@@ -373,35 +370,37 @@ static TIMER_CALLBACK(apple1_kbd_poll)
 	{
 		/* The keyboard will pulse its strobe line when a key is
 		   pressed.  A 10-usec pulse is typical. */
-		pia_set_input_ca1(0, 1);
+		pia_ca1_w(pia, 0, 1);
 		timer_set(machine, ATTOTIME_IN_USEC(10), NULL, 0, apple1_kbd_strobe_end);
 	}
 }
 
 static TIMER_CALLBACK(apple1_kbd_strobe_end)
 {
+	const device_config *pia = devtag_get_device( machine, PIA6821, "pia" );
+
 	/* End of the keyboard strobe pulse. */
-	pia_set_input_ca1(0, 0);
+	pia_ca1_w(pia, 0, 0);
 }
 
 
 /*****************************************************************************
 **	READ/WRITE HANDLERS
 *****************************************************************************/
-static READ8_HANDLER( apple1_pia0_kbdin )
+static READ8_DEVICE_HANDLER( apple1_pia0_kbdin )
 {
 	/* Bit 7 of the keyboard input is permanently wired high.  This is
 	   what the ROM Monitor software expects. */
 	return apple1_kbd_data | 0x80;
 }
 
-static WRITE8_HANDLER( apple1_pia0_dspout )
+static WRITE8_DEVICE_HANDLER( apple1_pia0_dspout )
 {
 	/* Send an ASCII character to the video hardware. */
 	apple1_vh_dsp_w(data);
 }
 
-static WRITE8_HANDLER( apple1_pia0_dsp_write_signal )
+static WRITE8_DEVICE_HANDLER( apple1_pia0_dsp_write_signal )
 {
 	/* PIA output CB2 is inverted to become the DA signal, used to
 	   signal a display write to the video hardware. */
@@ -409,7 +408,7 @@ static WRITE8_HANDLER( apple1_pia0_dsp_write_signal )
 	/* DA is directly connected to PIA input PB7, so the processor can
 	   read bit 7 of port B to test whether the display has completed
 	   a write. */
-	pia_set_input_b(0, (!data) << 7);
+	pia_portb_w(device, 0, (!data) << 7);
 
 	/* Once DA is asserted, the display will wait until it can perform
 	   the write, when the cursor position is about to be refreshed.
@@ -417,24 +416,28 @@ static WRITE8_HANDLER( apple1_pia0_dsp_write_signal )
 	   write.  Thus the write delay depends on the cursor position and
 	   where the display is in the refresh cycle. */
 	if (!data)
-		timer_set(space->machine, apple1_vh_dsp_time_to_ready(space->machine), NULL, 0, apple1_dsp_ready_start);
+		timer_set(device->machine, apple1_vh_dsp_time_to_ready(device->machine), NULL, 0, apple1_dsp_ready_start);
 }
 
 static TIMER_CALLBACK(apple1_dsp_ready_start)
 {
+	const device_config *pia = devtag_get_device( machine, PIA6821, "pia" );
+
 	/* When the display asserts \RDA to signal it is ready, it
 	   triggers a 74123 one-shot to send a 3.5-usec low pulse to PIA
 	   input CB1.  The end of this pulse will tell the PIA that the
 	   display is ready for another write. */
-	pia_set_input_cb1(0, 0);
+	pia_cb1_w(pia, 0, 0);
 	timer_set(machine, ATTOTIME_IN_NSEC(3500), NULL, 0, apple1_dsp_ready_end);
 }
 
 static TIMER_CALLBACK(apple1_dsp_ready_end)
 {
+	const device_config *pia = devtag_get_device( machine, PIA6821, "pia" );
+
 	/* The one-shot pulse has ended; return CB1 to high, so we can do
 	   another display write. */
-	pia_set_input_cb1(0, 1);
+	pia_cb1_w(pia, 0, 1);
 }
 
 

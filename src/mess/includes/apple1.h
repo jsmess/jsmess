@@ -8,9 +8,12 @@
 #define APPLE1_H_
 
 #include "devices/snapquik.h"
+#include "machine/6821new.h"
 
 
 /*----------- defined in machine/apple1.c -----------*/
+
+extern const pia6821_interface apple1_pia0;
 
 DRIVER_INIT( apple1 );
 MACHINE_RESET( apple1 );
