@@ -2096,8 +2096,8 @@ static DRIVER_INIT( x68000 )
 {
 	unsigned char* rom = memory_region(machine, "maincpu");
 	unsigned char* user2 = memory_region(machine, "user2");
-	x68k_gvram = auto_malloc(0x200000);
-	memset(x68k_gvram,0,0x200000);
+	x68k_gvram = auto_malloc(0x080000);
+	memset(x68k_gvram,0,0x080000);
 	x68k_tvram = auto_malloc(0x080000);
 	memset(x68k_tvram,0,0x80000);
 	sram = auto_malloc(0x4000);
