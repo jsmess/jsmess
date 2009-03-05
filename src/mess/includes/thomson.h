@@ -11,7 +11,7 @@
 
 #include "driver.h"
 #include "cpu/m6809/m6809.h"
-#include "machine/6821pia.h"
+#include "machine/6821new.h"
 #include "machine/mc6846.h"
 #include "machine/6850acia.h"
 #include "machine/6551.h"
@@ -35,10 +35,10 @@
 /*************************** common ********************************/
 
 /* 6821 PIAs */
-#define THOM_PIA_SYS    0  /* system PIA */
-#define THOM_PIA_GAME   1  /* music & game PIA (joypad + sound) */
-#define THOM_PIA_IO     2  /* CC 90-232 I/O extension (parallel & RS-232) */
-#define THOM_PIA_MODEM  3  /* MD 90-120 MODEM extension */
+#define THOM_PIA_SYS    "pia_0"  /* system PIA */
+#define THOM_PIA_GAME   "pia_1"  /* music & game PIA (joypad + sound) */
+#define THOM_PIA_IO     "pia_2"  /* CC 90-232 I/O extension (parallel & RS-232) */
+#define THOM_PIA_MODEM  "pia_3"  /* MD 90-120 MODEM extension */
 
 /* sound ports */
 #define THOM_SOUND_BUZ    0 /* 1-bit buzzer */
@@ -61,6 +61,20 @@
 extern DEVICE_START( thom_serial );
 extern DEVICE_IMAGE_LOAD( thom_serial );
 extern DEVICE_IMAGE_UNLOAD( thom_serial );
+
+extern const pia6821_interface to7_pia6821_sys;
+extern const pia6821_interface to7_pia6821_io;
+extern const pia6821_interface to7_pia6821_modem;
+extern const pia6821_interface to7_pia6821_game;
+extern const pia6821_interface to770_pia6821_sys;
+extern const pia6821_interface mo5_pia6821_sys;
+extern const pia6821_interface to9_pia6821_sys;
+extern const pia6821_interface to8_pia6821_sys;
+extern const pia6821_interface to9p_pia6821_sys;
+extern const pia6821_interface mo6_pia6821_game;
+extern const pia6821_interface mo6_pia6821_sys;
+extern const pia6821_interface mo5nr_pia6821_sys;
+extern const pia6821_interface mo5nr_pia6821_game;
 
 /***************************** TO7 / T9000 *************************/
 
