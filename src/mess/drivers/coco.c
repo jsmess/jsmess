@@ -698,8 +698,8 @@ static MACHINE_DRIVER_START( dragon32 )
 
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
 	
-	MDRV_PIA6821_ADD( "pia_0", dragon32_pia_intf[0] )
-	MDRV_PIA6821_ADD( "pia_1", dragon32_pia_intf[1] )
+	MDRV_PIA6821_ADD( "pia_0", dragon32_pia_intf_0 )
+	MDRV_PIA6821_ADD( "pia_1", dragon32_pia_intf_1 )
 
 	MDRV_SAM6883_ADD("sam", coco_sam_intf)
 	
@@ -741,8 +741,8 @@ static MACHINE_DRIVER_START( dragon64 )
 	/* acia */
 	MDRV_ACIA6551_ADD("acia")
 	
-	MDRV_PIA6821_ADD( "pia_0", dragon64_pia_intf[0] )
-	MDRV_PIA6821_ADD( "pia_1", dragon64_pia_intf[1] )
+	MDRV_PIA6821_ADD( "pia_0", dragon64_pia_intf_0 )
+	MDRV_PIA6821_ADD( "pia_1", dragon64_pia_intf_1 )
 
 	MDRV_SAM6883_ADD("sam", coco_sam_intf)
 	
@@ -784,8 +784,8 @@ static MACHINE_DRIVER_START( d64plus )
 	/* acia */
 	MDRV_ACIA6551_ADD("acia")
 	
-	MDRV_PIA6821_ADD( "pia_0", dragon64_pia_intf[0] )
-	MDRV_PIA6821_ADD( "pia_1", dragon64_pia_intf[1] )
+	MDRV_PIA6821_ADD( "pia_0", dragon64_pia_intf_0 )
+	MDRV_PIA6821_ADD( "pia_1", dragon64_pia_intf_1 )
 
 	MDRV_SAM6883_ADD("sam", coco_sam_intf)
 	
@@ -833,9 +833,9 @@ static MACHINE_DRIVER_START( dgnalpha )
 	/* acia */
 	MDRV_ACIA6551_ADD("acia")
 	
-	MDRV_PIA6821_ADD( "pia_0", dgnalpha_pia_intf[0] )
-	MDRV_PIA6821_ADD( "pia_1", dgnalpha_pia_intf[1] )
-	MDRV_PIA6821_ADD( "pia_2", dgnalpha_pia_intf[2] )
+	MDRV_PIA6821_ADD( "pia_0", dgnalpha_pia_intf_0 )
+	MDRV_PIA6821_ADD( "pia_1", dgnalpha_pia_intf_1 )
+	MDRV_PIA6821_ADD( "pia_2", dgnalpha_pia_intf_2 )
 
 	MDRV_SAM6883_ADD("sam", coco_sam_intf)
 	
@@ -877,8 +877,8 @@ static MACHINE_DRIVER_START( tanodr64 )
 	/* acia */
 	MDRV_ACIA6551_ADD("acia")
 	
-	MDRV_PIA6821_ADD( "pia_0", dragon64_pia_intf[0] )
-	MDRV_PIA6821_ADD( "pia_1", dragon64_pia_intf[1] )
+	MDRV_PIA6821_ADD( "pia_0", dragon64_pia_intf_0 )
+	MDRV_PIA6821_ADD( "pia_1", dragon64_pia_intf_1 )
 
 	MDRV_SAM6883_ADD("sam", coco_sam_intf)
 	
@@ -918,8 +918,8 @@ static MACHINE_DRIVER_START( coco )
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
 	
-	MDRV_PIA6821_ADD( "pia_0", coco_pia_intf[0] )
-	MDRV_PIA6821_ADD( "pia_1", coco_pia_intf[1] )
+	MDRV_PIA6821_ADD( "pia_0", coco_pia_intf_0 )
+	MDRV_PIA6821_ADD( "pia_1", coco_pia_intf_1 )
 
 	MDRV_SAM6883_ADD("sam", coco_sam_intf)
 	
@@ -959,8 +959,8 @@ static MACHINE_DRIVER_START( coco2 )
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
 	
-	MDRV_PIA6821_ADD( "pia_0", coco2_pia_intf[0] )
-	MDRV_PIA6821_ADD( "pia_1", coco2_pia_intf[1] )
+	MDRV_PIA6821_ADD( "pia_0", coco2_pia_intf_0 )
+	MDRV_PIA6821_ADD( "pia_1", coco2_pia_intf_1 )
 
 	MDRV_SAM6883_ADD("sam", coco_sam_intf)
 	
@@ -1000,8 +1000,8 @@ static MACHINE_DRIVER_START( coco2b )
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
 	
-	MDRV_PIA6821_ADD( "pia_0", coco2_pia_intf[0] )
-	MDRV_PIA6821_ADD( "pia_1", coco2_pia_intf[1] )
+	MDRV_PIA6821_ADD( "pia_0", coco2_pia_intf_0 )
+	MDRV_PIA6821_ADD( "pia_1", coco2_pia_intf_1 )
 
 	MDRV_SAM6883_ADD("sam", coco_sam_intf)
 	
@@ -1037,8 +1037,8 @@ static MACHINE_DRIVER_START( coco3 )
 	MDRV_SCREEN_SIZE(640, 25+192+26)
 	MDRV_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
 
-	MDRV_PIA6821_ADD( "pia_0", coco3_pia_intf[0] )
-	MDRV_PIA6821_ADD( "pia_1", coco3_pia_intf[1] )
+	MDRV_PIA6821_ADD( "pia_0", coco3_pia_intf_0 )
+	MDRV_PIA6821_ADD( "pia_1", coco3_pia_intf_1 )
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM( coco_sound )

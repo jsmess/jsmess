@@ -260,271 +260,265 @@ const struct coco3_video_vars coco3_vidvars =
 
 /* ----------------------------------------------------------------------- */
 
-const pia6821_interface coco_pia_intf[] =
+/* PIA 0 */
+const pia6821_interface coco_pia_intf_0 =
 {
-	/* PIA 0 */
-	{
-		/*inputs : A/B,CA/B1,CA/B2 */
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		/*outputs: A/B,CA/B2	   */
-		DEVCB_HANDLER(d_pia0_pa_w),
-		DEVCB_HANDLER(d_pia0_pb_w),
-		DEVCB_HANDLER(d_pia0_ca2_w),
-		DEVCB_HANDLER(d_pia0_cb2_w),
-		/*irqs	 : A/B			   */
-		DEVCB_LINE(d_pia0_irq_a),
-		DEVCB_LINE(d_pia0_irq_b)
-	},
-
-	/* PIA 1 */
-	{
-		/*inputs : A/B,CA/B1,CA/B2 */
-		DEVCB_HANDLER(d_pia1_pa_r),
-		DEVCB_HANDLER(d_pia1_pb_r_coco),
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		/*outputs: A/B,CA/B2	   */
-		DEVCB_HANDLER(d_pia1_pa_w),
-		DEVCB_HANDLER(d_pia1_pb_w),
-		DEVCB_HANDLER(d_pia1_ca2_w),
-		DEVCB_HANDLER(d_pia1_cb2_w),
-		/*irqs	 : A/B			   */
-		DEVCB_LINE(d_pia1_firq_a),
-		DEVCB_LINE(d_pia1_firq_b)
-	}
+	/*inputs : A/B,CA/B1,CA/B2 */
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	/*outputs: A/B,CA/B2	   */
+	DEVCB_HANDLER(d_pia0_pa_w),
+	DEVCB_HANDLER(d_pia0_pb_w),
+	DEVCB_HANDLER(d_pia0_ca2_w),
+	DEVCB_HANDLER(d_pia0_cb2_w),
+	/*irqs	 : A/B			   */
+	DEVCB_LINE(d_pia0_irq_a),
+	DEVCB_LINE(d_pia0_irq_b)
 };
 
-const pia6821_interface coco2_pia_intf[] =
+/* PIA 1 */
+const pia6821_interface coco_pia_intf_1 =
 {
-	/* PIA 0 */
-	{
-		/*inputs : A/B,CA/B1,CA/B2 */
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		/*outputs: A/B,CA/B2	   */
-		DEVCB_HANDLER(d_pia0_pa_w),
-		DEVCB_HANDLER(d_pia0_pb_w),
-		DEVCB_HANDLER(d_pia0_ca2_w),
-		DEVCB_HANDLER(d_pia0_cb2_w),
-		/*irqs	 : A/B			   */
-		DEVCB_LINE(d_pia0_irq_a),
-		DEVCB_LINE(d_pia0_irq_b)
-	},
-
-	/* PIA 1 */
-	{
-		/*inputs : A/B,CA/B1,CA/B2 */
-		DEVCB_HANDLER(d_pia1_pa_r),
-		DEVCB_HANDLER(d_pia1_pb_r_coco2),
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		/*outputs: A/B,CA/B2	   */
-		DEVCB_HANDLER(d_pia1_pa_w),
-		DEVCB_HANDLER(d_pia1_pb_w),
-		DEVCB_HANDLER(d_pia1_ca2_w),
-		DEVCB_HANDLER(d_pia1_cb2_w),
-		/*irqs	 : A/B			   */
-		DEVCB_LINE(d_pia1_firq_a),
-		DEVCB_LINE(d_pia1_firq_b)
-	}
+	/*inputs : A/B,CA/B1,CA/B2 */
+	DEVCB_HANDLER(d_pia1_pa_r),
+	DEVCB_HANDLER(d_pia1_pb_r_coco),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	/*outputs: A/B,CA/B2	   */
+	DEVCB_HANDLER(d_pia1_pa_w),
+	DEVCB_HANDLER(d_pia1_pb_w),
+	DEVCB_HANDLER(d_pia1_ca2_w),
+	DEVCB_HANDLER(d_pia1_cb2_w),
+	/*irqs	 : A/B			   */
+	DEVCB_LINE(d_pia1_firq_a),
+	DEVCB_LINE(d_pia1_firq_b)
 };
 
-const pia6821_interface coco3_pia_intf[] =
+/* PIA 0 */
+const pia6821_interface coco2_pia_intf_0 =
 {
-	/* PIA 0 */
-	{
-		/*inputs : A/B,CA/B1,CA/B2 */
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		/*outputs: A/B,CA/B2	   */
-		DEVCB_HANDLER(d_pia0_pa_w),
-		DEVCB_HANDLER(d_pia0_pb_w),
-		DEVCB_HANDLER(d_pia0_ca2_w),
-		DEVCB_HANDLER(d_pia0_cb2_w),
-		/*irqs	 : A/B			   */
-		DEVCB_LINE(coco3_pia0_irq_a),
-		DEVCB_LINE(coco3_pia0_irq_b)
-	},
-
-	/* PIA 1 */
-	{
-		/*inputs : A/B,CA/B1,CA/B2 */
-		DEVCB_HANDLER(d_pia1_pa_r),
-		DEVCB_HANDLER(d_pia1_pb_r_coco2),
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		/*outputs: A/B,CA/B2	   */
-		DEVCB_HANDLER(d_pia1_pa_w),
-		DEVCB_HANDLER(d_pia1_pb_w),
-		DEVCB_HANDLER(d_pia1_ca2_w),
-		DEVCB_HANDLER(d_pia1_cb2_w),
-		/*irqs	 : A/B			   */
-		DEVCB_LINE(coco3_pia1_firq_a),
-		DEVCB_LINE(coco3_pia1_firq_b)
-	}
+	/*inputs : A/B,CA/B1,CA/B2 */
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	/*outputs: A/B,CA/B2	   */
+	DEVCB_HANDLER(d_pia0_pa_w),
+	DEVCB_HANDLER(d_pia0_pb_w),
+	DEVCB_HANDLER(d_pia0_ca2_w),
+	DEVCB_HANDLER(d_pia0_cb2_w),
+	/*irqs	 : A/B			   */
+	DEVCB_LINE(d_pia0_irq_a),
+	DEVCB_LINE(d_pia0_irq_b)
 };
 
-const pia6821_interface dragon32_pia_intf[] =
+/* PIA 1 */
+const pia6821_interface coco2_pia_intf_1 =
 {
-	/* PIA 0 */
-	{
-		/*inputs : A/B,CA/B1,CA/B2 */
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		/*outputs: A/B,CA/B2	   */
-		DEVCB_HANDLER(d_pia0_pa_w),
-		DEVCB_HANDLER(d_pia0_pb_w),
-		DEVCB_HANDLER(d_pia0_ca2_w),
-		DEVCB_HANDLER(d_pia0_cb2_w),
-		/*irqs	 : A/B			   */
-		DEVCB_LINE(d_pia0_irq_a),
-		DEVCB_LINE(d_pia0_irq_b)
-	},
-
-	/* PIA 1 */
-	{
-		/*inputs : A/B,CA/B1,CA/B2 */
-		DEVCB_HANDLER(d_pia1_pa_r),
-		DEVCB_HANDLER(d_pia1_pb_r_dragon32),
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		/*outputs: A/B,CA/B2	   */
-		DEVCB_HANDLER(d_pia1_pa_w),
-		DEVCB_HANDLER(d_pia1_pb_w),
-		DEVCB_HANDLER(d_pia1_ca2_w),
-		DEVCB_HANDLER(d_pia1_cb2_w),
-		/*irqs	 : A/B			   */
-		DEVCB_LINE(d_pia1_firq_a),
-		DEVCB_LINE(d_pia1_firq_b)
-	}
+	/*inputs : A/B,CA/B1,CA/B2 */
+	DEVCB_HANDLER(d_pia1_pa_r),
+	DEVCB_HANDLER(d_pia1_pb_r_coco2),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	/*outputs: A/B,CA/B2	   */
+	DEVCB_HANDLER(d_pia1_pa_w),
+	DEVCB_HANDLER(d_pia1_pb_w),
+	DEVCB_HANDLER(d_pia1_ca2_w),
+	DEVCB_HANDLER(d_pia1_cb2_w),
+	/*irqs	 : A/B			   */
+	DEVCB_LINE(d_pia1_firq_a),
+	DEVCB_LINE(d_pia1_firq_b)
 };
 
-const pia6821_interface dragon64_pia_intf[] =
+/* PIA 0 */
+const pia6821_interface coco3_pia_intf_0 =
 {
-	/* PIA 0 */
-	{
-		/*inputs : A/B,CA/B1,CA/B2 */
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		/*outputs: A/B,CA/B2	   */
-		DEVCB_HANDLER(d_pia0_pa_w),
-		DEVCB_HANDLER(d_pia0_pb_w),
-		DEVCB_HANDLER(d_pia0_ca2_w),
-		DEVCB_HANDLER(d_pia0_cb2_w),
-		/*irqs	 : A/B			   */
-		DEVCB_LINE(d_pia0_irq_a),
-		DEVCB_LINE(d_pia0_irq_b)
-	},
-
-	/* PIA 1 */
-	{
-		/*inputs : A/B,CA/B1,CA/B2 */
-		DEVCB_HANDLER(d_pia1_pa_r),
-		DEVCB_HANDLER(d_pia1_pb_r_coco),
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		/*outputs: A/B,CA/B2	   */
-		DEVCB_HANDLER(d_pia1_pa_w),
-		DEVCB_HANDLER(dragon64_pia1_pb_w),
-		DEVCB_HANDLER(d_pia1_ca2_w),
-		DEVCB_HANDLER(d_pia1_cb2_w),
-		/*irqs	 : A/B			   */
-		DEVCB_LINE(d_pia1_firq_a),
-		DEVCB_LINE(d_pia1_firq_b)
-	}
+	/*inputs : A/B,CA/B1,CA/B2 */
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	/*outputs: A/B,CA/B2	   */
+	DEVCB_HANDLER(d_pia0_pa_w),
+	DEVCB_HANDLER(d_pia0_pb_w),
+	DEVCB_HANDLER(d_pia0_ca2_w),
+	DEVCB_HANDLER(d_pia0_cb2_w),
+	/*irqs	 : A/B			   */
+	DEVCB_LINE(coco3_pia0_irq_a),
+	DEVCB_LINE(coco3_pia0_irq_b)
 };
 
-const pia6821_interface dgnalpha_pia_intf[] =
+/* PIA 1 */
+const pia6821_interface coco3_pia_intf_1 =
 {
-	/* PIA 0 and 1 as Dragon 64 */
-	/* PIA 0 */
-	{
-		/*inputs : A/B,CA/B1,CA/B2 */
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		/*outputs: A/B,CA/B2	   */
-		DEVCB_HANDLER(d_pia0_pa_w),
-		DEVCB_HANDLER(d_pia0_pb_w),
-		DEVCB_HANDLER(d_pia0_ca2_w),
-		DEVCB_HANDLER(d_pia0_cb2_w),
-		/*irqs	 : A/B			   */
-		DEVCB_LINE(d_pia0_irq_a),
-		DEVCB_LINE(d_pia0_irq_b)
-	},
+	/*inputs : A/B,CA/B1,CA/B2 */
+	DEVCB_HANDLER(d_pia1_pa_r),
+	DEVCB_HANDLER(d_pia1_pb_r_coco2),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	/*outputs: A/B,CA/B2	   */
+	DEVCB_HANDLER(d_pia1_pa_w),
+	DEVCB_HANDLER(d_pia1_pb_w),
+	DEVCB_HANDLER(d_pia1_ca2_w),
+	DEVCB_HANDLER(d_pia1_cb2_w),
+	/*irqs	 : A/B			   */
+	DEVCB_LINE(coco3_pia1_firq_a),
+	DEVCB_LINE(coco3_pia1_firq_b)
+};
 
-	/* PIA 1 */
-	{
-		/*inputs : A/B,CA/B1,CA/B2 */
-		DEVCB_HANDLER(d_pia1_pa_r),
-		DEVCB_HANDLER(d_pia1_pb_r_coco),
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		/*outputs: A/B,CA/B2	   */
-		DEVCB_HANDLER(d_pia1_pa_w),
-		DEVCB_HANDLER(d_pia1_pb_w),
-		DEVCB_HANDLER(d_pia1_ca2_w),
-		DEVCB_HANDLER(d_pia1_cb2_w),
-		/*irqs	 : A/B			   */
-		DEVCB_LINE(d_pia1_firq_a),
-		DEVCB_LINE(d_pia1_firq_b)
-	},
+/* PIA 0 */
+const pia6821_interface dragon32_pia_intf_0 =
+{
+	/*inputs : A/B,CA/B1,CA/B2 */
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	/*outputs: A/B,CA/B2	   */
+	DEVCB_HANDLER(d_pia0_pa_w),
+	DEVCB_HANDLER(d_pia0_pb_w),
+	DEVCB_HANDLER(d_pia0_ca2_w),
+	DEVCB_HANDLER(d_pia0_cb2_w),
+	/*irqs	 : A/B			   */
+	DEVCB_LINE(d_pia0_irq_a),
+	DEVCB_LINE(d_pia0_irq_b)
+};
 
-	/* PIA 2 */
-	{
-		/*inputs : A/B,CA/B1,CA/B2 */
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		/*outputs: A/B,CA/B2	   */
-		DEVCB_HANDLER(dgnalpha_pia2_pa_w),
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		/*irqs	 : A/B	   		   */
-		DEVCB_LINE(d_pia2_firq_a),
-		DEVCB_LINE(d_pia2_firq_b)
-	}
+/* PIA 1 */
+const pia6821_interface dragon32_pia_intf_1 =
+{
+	/*inputs : A/B,CA/B1,CA/B2 */
+	DEVCB_HANDLER(d_pia1_pa_r),
+	DEVCB_HANDLER(d_pia1_pb_r_dragon32),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	/*outputs: A/B,CA/B2	   */
+	DEVCB_HANDLER(d_pia1_pa_w),
+	DEVCB_HANDLER(d_pia1_pb_w),
+	DEVCB_HANDLER(d_pia1_ca2_w),
+	DEVCB_HANDLER(d_pia1_cb2_w),
+	/*irqs	 : A/B			   */
+	DEVCB_LINE(d_pia1_firq_a),
+	DEVCB_LINE(d_pia1_firq_b)
+};
 
+/* PIA 0 */
+const pia6821_interface dragon64_pia_intf_0 =
+{
+	/*inputs : A/B,CA/B1,CA/B2 */
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	/*outputs: A/B,CA/B2	   */
+	DEVCB_HANDLER(d_pia0_pa_w),
+	DEVCB_HANDLER(d_pia0_pb_w),
+	DEVCB_HANDLER(d_pia0_ca2_w),
+	DEVCB_HANDLER(d_pia0_cb2_w),
+	/*irqs	 : A/B			   */
+	DEVCB_LINE(d_pia0_irq_a),
+	DEVCB_LINE(d_pia0_irq_b)
+};
+
+/* PIA 1 */
+const pia6821_interface dragon64_pia_intf_1 =
+{
+	/*inputs : A/B,CA/B1,CA/B2 */
+	DEVCB_HANDLER(d_pia1_pa_r),
+	DEVCB_HANDLER(d_pia1_pb_r_coco),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	/*outputs: A/B,CA/B2	   */
+	DEVCB_HANDLER(d_pia1_pa_w),
+	DEVCB_HANDLER(dragon64_pia1_pb_w),
+	DEVCB_HANDLER(d_pia1_ca2_w),
+	DEVCB_HANDLER(d_pia1_cb2_w),
+	/*irqs	 : A/B			   */
+	DEVCB_LINE(d_pia1_firq_a),
+	DEVCB_LINE(d_pia1_firq_b)
+};
+
+/* PIA 0 and 1 as Dragon 64 */
+/* PIA 0 */
+const pia6821_interface dgnalpha_pia_intf_0 =
+{
+	/*inputs : A/B,CA/B1,CA/B2 */
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	/*outputs: A/B,CA/B2	   */
+	DEVCB_HANDLER(d_pia0_pa_w),
+	DEVCB_HANDLER(d_pia0_pb_w),
+	DEVCB_HANDLER(d_pia0_ca2_w),
+	DEVCB_HANDLER(d_pia0_cb2_w),
+	/*irqs	 : A/B			   */
+	DEVCB_LINE(d_pia0_irq_a),
+	DEVCB_LINE(d_pia0_irq_b)
+};
+
+/* PIA 1 */
+const pia6821_interface dgnalpha_pia_intf_1 =
+{
+	/*inputs : A/B,CA/B1,CA/B2 */
+	DEVCB_HANDLER(d_pia1_pa_r),
+	DEVCB_HANDLER(d_pia1_pb_r_coco),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	/*outputs: A/B,CA/B2	   */
+	DEVCB_HANDLER(d_pia1_pa_w),
+	DEVCB_HANDLER(d_pia1_pb_w),
+	DEVCB_HANDLER(d_pia1_ca2_w),
+	DEVCB_HANDLER(d_pia1_cb2_w),
+	/*irqs	 : A/B			   */
+	DEVCB_LINE(d_pia1_firq_a),
+	DEVCB_LINE(d_pia1_firq_b)
+};
+
+/* PIA 2 */
+const pia6821_interface dgnalpha_pia_intf_2 =
+{
+	/*inputs : A/B,CA/B1,CA/B2 */
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	/*outputs: A/B,CA/B2	   */
+	DEVCB_HANDLER(dgnalpha_pia2_pa_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	/*irqs	 : A/B	   		   */
+	DEVCB_LINE(d_pia2_firq_a),
+	DEVCB_LINE(d_pia2_firq_b)
 };
 
 const sam6883_interface coco_sam_intf =
@@ -931,8 +925,8 @@ static void d_recalc_firq(running_machine *machine)
 	const device_config *pia_2 = devtag_get_device( machine, PIA6821, "pia_2" );
 	UINT8 pia1_firq_a = pianew_get_irq_a(pia_1);
 	UINT8 pia1_firq_b = pianew_get_irq_b(pia_1);
-	UINT8 pia2_firq_a = pianew_get_irq_a(pia_2);
-	UINT8 pia2_firq_b = pianew_get_irq_b(pia_2);
+	UINT8 pia2_firq_a = (pia_2 != NULL) ? pianew_get_irq_a(pia_2) : 0x00;
+	UINT8 pia2_firq_b = (pia_2 != NULL) ? pianew_get_irq_b(pia_2) : 0x00;
 
 	if (pia1_firq_a || pia1_firq_b || pia2_firq_a || pia2_firq_b)
 		cpu_set_input_line(machine->cpu[0], M6809_FIRQ_LINE, ASSERT_LINE);

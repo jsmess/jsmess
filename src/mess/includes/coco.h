@@ -64,12 +64,19 @@ void coco3_vh_blink(void);
 
 /*----------- defined in machine/coco.c -----------*/
 extern const wd17xx_interface dgnalpha_wd17xx_interface;
-extern const pia6821_interface coco_pia_intf[];
-extern const pia6821_interface coco2_pia_intf[];
-extern const pia6821_interface coco3_pia_intf[];
-extern const pia6821_interface dragon32_pia_intf[];
-extern const pia6821_interface dragon64_pia_intf[];
-extern const pia6821_interface dgnalpha_pia_intf[];
+extern const pia6821_interface coco_pia_intf_0;
+extern const pia6821_interface coco_pia_intf_1;
+extern const pia6821_interface coco2_pia_intf_0;
+extern const pia6821_interface coco2_pia_intf_1;
+extern const pia6821_interface coco3_pia_intf_0;
+extern const pia6821_interface coco3_pia_intf_1;
+extern const pia6821_interface dragon32_pia_intf_0;
+extern const pia6821_interface dragon32_pia_intf_1;
+extern const pia6821_interface dragon64_pia_intf_0;
+extern const pia6821_interface dragon64_pia_intf_1;
+extern const pia6821_interface dgnalpha_pia_intf_0;
+extern const pia6821_interface dgnalpha_pia_intf_1;
+extern const pia6821_interface dgnalpha_pia_intf_2;
 extern const sam6883_interface coco_sam_intf;
 extern const sam6883_interface coco3_sam_intf;
 extern UINT8 coco3_gimereg[16];

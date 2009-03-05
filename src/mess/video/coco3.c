@@ -833,6 +833,12 @@ static void internal_video_start_coco3(running_machine *machine, m6847_type type
 	/* GIME field sync timer */
 	video->gime_fs_timer = timer_alloc(machine, gime_fs, NULL);
 
+	/* VILE HACK */
+	{
+		extern const device_config *coco_pia_1;
+		coco_pia_1 = devtag_get_device( machine, PIA6821, "pia_1" );
+	}
+
 	/* initialize the CoCo video code */
 	memset(&cfg, 0, sizeof(cfg));
 	cfg.type = type;

@@ -29,12 +29,13 @@
  *
  *************************************/
 
-static const device_config *pia_1;
+/* GROSS HACK - PLEASE DEVICEIZE THE M6847 CODE */
+const device_config *coco_pia_1;
 
 ATTR_CONST UINT8 coco_get_attributes(UINT8 c)
 {
 	UINT8 result = 0x00;
-	UINT8 pia1_pb = pianew_get_output_b(pia_1);
+	UINT8 pia1_pb = pianew_get_output_b(coco_pia_1);
 
 	if (c & 0x40)		result |= M6847_INV;
 	if (c & 0x80)		result |= M6847_AS;
@@ -66,7 +67,7 @@ static void coco_field_sync_callback(running_machine *machine, int data)
 
 static const UINT8 *get_video_ram_coco(running_machine *machine,int scanline)
 {
-	device_config *sam = (device_config*)devtag_get_device(machine, SAM6883, "sam");
+	const device_config *sam = devtag_get_device(machine, SAM6883, "sam");
 	return sam_m6847_get_video_ram(sam,scanline);
 }
 
@@ -74,7 +75,7 @@ static void internal_video_start_coco(running_machine *machine, m6847_type type)
 {
 	m6847_config cfg;
 
-	pia_1 = devtag_get_device( machine, PIA6821, "pia_1" );
+	coco_pia_1 = devtag_get_device( machine, PIA6821, "pia_1" );
 
 	memset(&cfg, 0, sizeof(cfg));
 	cfg.type = type;
