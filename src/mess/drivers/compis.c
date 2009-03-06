@@ -97,8 +97,8 @@ Small note about natural keyboard: currently,
 - "Compis S" is mapped to 'F6'
 - "Avbryt" is mapped to 'F7'
 - "Inpassa" is mapped to 'Insert'
-- "S�k" is mapped to "Print Screen"
-- "Utpl�na"is mapped to 'Delete'
+- "S?k" is mapped to "Print Screen"
+- "Utpl?na"is mapped to 'Delete'
 - "Start / Stop" is mapped to 'Pause'
 - "TabL" is mapped to 'Page Up'
 - "TabR" is mapped to 'Page Down'
@@ -311,4 +311,4 @@ static SYSTEM_CONFIG_START(compis)
 SYSTEM_CONFIG_END
 
 /*   YEAR   NAME        PARENT  COMPAT MACHINE  INPUT   INIT    CONFIG  COMPANY     FULLNAME */
-COMP(1985,	compis,		0,		0,     compis,	compis,	compis,	compis,	"Telenova", "Compis" , 0)
+COMP(1985,	compis,		0,		0,     compis,	compis,	compis,	compis,	"Telenova", "Compis" , GAME_NOT_WORKING)

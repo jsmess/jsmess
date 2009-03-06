@@ -541,4 +541,4 @@ static QUICKLOAD_LOAD( jaguar )
  *************************************/
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT      CONFIG    COMPANY     FULLNAME */
-CONS(1993,	jaguar,   0,        0,		jaguar,   jaguar,   jaguar,   0,	"Atari",	"Atari Jaguar", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND)
+CONS(1993,	jaguar,   0,        0,		jaguar,   jaguar,   jaguar,   0,	"Atari",	"Atari Jaguar", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING)
