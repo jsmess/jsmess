@@ -174,25 +174,6 @@ static TIMER_CALLBACK(atom_timer_callback)
 	}
 }
 
-
-static DIRECT_UPDATE_HANDLER(atom_opbase_handler)
-{
-	/* clear op base override */
-	memory_set_direct_update_handler(space, NULL);
-
-	/* this is temporary */
-	/* Kees van Oss mentions that address 8-b are used for the random number
-	generator. I don't know if this is hardware, or random data because the
-	ram chips are not cleared at start-up. So at this time, these numbers
-	are poked into the memory to simulate it. When I have more details I will fix it */
-	memory_region(space->machine, "maincpu")[0x08] = mame_rand(space->machine) & 0x0ff;
-	memory_region(space->machine, "maincpu")[0x09] = mame_rand(space->machine) & 0x0ff;
-	memory_region(space->machine, "maincpu")[0x0a] = mame_rand(space->machine) & 0x0ff;
-	memory_region(space->machine, "maincpu")[0x0b] = mame_rand(space->machine) & 0x0ff;
-
-	return cpu_get_pc( space->cpu ) & 0x0ffff;
-}
-
 MACHINE_RESET( atom )
 {
 	atom_8255_porta = 0xff;
@@ -202,7 +183,15 @@ MACHINE_RESET( atom )
 	timer_state = 0;
 	timer_pulse(machine, ATTOTIME_IN_HZ(2400*2), NULL, 0, atom_timer_callback);
 
-	memory_set_direct_update_handler(cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM ),atom_opbase_handler);
+	/* this is temporary */
+	/* Kees van Oss mentions that address 8-b are used for the random number
+	generator. I don't know if this is hardware, or random data because the
+	ram chips are not cleared at start-up. So at this time, these numbers
+	are poked into the memory to simulate it. When I have more details I will fix it */
+	memory_region(machine, "maincpu")[0x08] = mame_rand(machine) & 0x0ff;
+	memory_region(machine, "maincpu")[0x09] = mame_rand(machine) & 0x0ff;
+	memory_region(machine, "maincpu")[0x0a] = mame_rand(machine) & 0x0ff;
+	memory_region(machine, "maincpu")[0x0b] = mame_rand(machine) & 0x0ff;
 }
 
 struct atm

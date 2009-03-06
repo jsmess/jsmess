@@ -358,5 +358,5 @@ static SYSTEM_CONFIG_START(atom)
 SYSTEM_CONFIG_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT      CONFIG   COMPANY   FULLNAME */
-COMP( 1979, atom,     0,        0,		atom,     atom,     0,        atom,    "Acorn",  "Atom" , GAME_NOT_WORKING)
-COMP( 1979, atomeb,   atom,     0,		atomeb,   atom,     0,        atom,    "Acorn",  "Atom with Eprom Box" , GAME_NOT_WORKING)
+COMP( 1979, atom,     0,        0,		atom,     atom,     0,        atom,    "Acorn",  "Atom" , 0)
+COMP( 1979, atomeb,   atom,     0,		atomeb,   atom,     0,        atom,    "Acorn",  "Atom with Eprom Box" , 0)
