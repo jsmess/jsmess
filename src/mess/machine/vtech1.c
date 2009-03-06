@@ -59,7 +59,7 @@ Todo:
 
 int vtech1_latch = -1;
 
-#define TRKSIZE_VZ	0x9a0	/* arbitrary (actually from analyzing format) */
+#define TRKSIZE_VZ	0x9b0	/* arbitrary (actually from analyzing format) */
 #define TRKSIZE_FM	3172	/* size of a standard FM mode track */
 
 static UINT8 vtech1_track_x2[2] = {80, 80};

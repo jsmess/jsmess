@@ -38,7 +38,7 @@ as track map, with one bit for each sector used.
 */
 
 #define DATA_SIZE	(126)
-#define SECTOR_SIZE	(0x9a)
+#define SECTOR_SIZE	(0x9b)
 #define MAX_DIRENTS	(15*8)
 
 /* vzdos directry entry */
@@ -185,10 +185,10 @@ static imgtoolerr_t vzdos_get_dirent(imgtool_image *img, int index, vzdos_dirent
 
 	/* check values */
 	if (ent->start_track > 39)
-		return IMGTOOLERR_CORRUPTIMAGE;
+		return IMGTOOLERR_CORRUPTFILE;
 
 	if (ent->start_sector > 15)
-		return IMGTOOLERR_CORRUPTIMAGE;
+		return IMGTOOLERR_CORRUPTFILE;
 
 	return IMGTOOLERR_SUCCESS;
 }
@@ -412,16 +412,20 @@ static imgtoolerr_t vzdos_diskimage_nextenum(imgtool_directory *enumeration, img
 	} else {
 
 		const char *type;
-		int /*ret,*/ len;
+		int ret, len;
 		vzdos_dirent dirent;
 
-		/*ret = */vzdos_get_dirent(imgtool_directory_image(enumeration), iter->index - 1, &dirent);
+		ret = vzdos_get_dirent(imgtool_directory_image(enumeration), iter->index - 1, &dirent);
 
-		if (dirent.ftype == 0x00) {
+		if (ret == IMGTOOLERR_FILENOTFOUND)
+		{
 			iter->eof = 1;
 			ent->eof = 1;
 			return IMGTOOLERR_SUCCESS;
 		}
+
+		if (ret == IMGTOOLERR_CORRUPTFILE)
+			ent->corrupt = 1;
 
 		/* kill trailing spaces */
 		for (len = 7; len > 0; len--) {
@@ -433,17 +437,20 @@ static imgtoolerr_t vzdos_diskimage_nextenum(imgtool_directory *enumeration, img
 		memcpy(ent->filename, &dirent.fname, len + 1);
 		ent->filesize = dirent.end_address - dirent.start_address;
 
-		switch (dirent.ftype) {
-			case 'T': type = "Basic";      break;
-			case 'B': type = "Binary";     break;
-			case 'D': type = "Data";       break;
-			case 'F': type = "Quickwrite"; break;
-			case 'A': type = "Assembler";  break;
-			case 'S': type = "Diskops";    break;
-			case 'W': type = "Wordpro";    break;
-			default: type = "Unknown";
+		switch (dirent.ftype)
+		{
+		case 0x01: type = "Deleted";    break;
+		case 'T':  type = "Basic";      break;
+		case 'B':  type = "Binary";     break;
+		case 'D':  type = "Data";       break;
+		case 'F':  type = "Quickwrite"; break;
+		case 'A':  type = "Assembler";  break;
+		case 'S':  type = "Diskops";    break;
+		case 'W':  type = "Wordpro";    break;
+		default:   type = "Unknown";
 		}
-		snprintf(ent->attr, sizeof(ent->attr) / sizeof(ent->attr[0]), "%s", type);
+
+		snprintf(ent->attr, ARRAY_LENGTH(ent->attr), "%s", type);
 
 		iter->index++;
 	}

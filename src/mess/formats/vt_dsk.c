@@ -14,7 +14,7 @@
 static FLOPPY_IDENTIFY(vz_identify)
 {
 	UINT64 size = floppy_image_size(floppy);
-	*vote = ((size == 98560) || (size == 99200)) ? 100 : 0;
+	*vote = ((size == 98560) || (size == 99200) || (size == 99184)) ? 100 : 0;
 	return FLOPPY_ERROR_SUCCESS;
 }
 
