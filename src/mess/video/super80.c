@@ -119,13 +119,7 @@ WRITE8_HANDLER( super80v_high_w )
 		videoram[offset+0x800] = data;
 
 		if (super80v_rom_pcg)
-		{
-			int chr = 0x80 + (offset>>4);
 			pcgram[0x800+offset] = data;
-
-			/* decode character graphics again */
-			gfx_element_mark_dirty(space->machine->gfx[0], chr);
-		}
 	}
 }
 
@@ -213,8 +207,7 @@ VIDEO_UPDATE( super80 )
 			if (screen_on)
 				code = memory_read_byte(cputag_get_address_space(screen->machine,"maincpu",ADDRESS_SPACE_PROGRAM), vidpg | x | (y<<5));
 
-			drawgfx(bitmap, screen->machine->gfx[0], code & mask, 0, 0, 0, x*8, y*10,
-				cliprect, TRANSPARENCY_NONE, 0);
+			drawgfx(bitmap, screen->machine->gfx[0], code & mask, 0, 0, 0, x*8, y*10, cliprect, TRANSPARENCY_NONE, 0);
 		}
 	}
 
@@ -251,8 +244,7 @@ VIDEO_UPDATE( super80m )
 				if (!(options & 0x40)) col = memory_read_byte(cputag_get_address_space(screen->machine,"maincpu",ADDRESS_SPACE_PROGRAM), 0xfe00 | x | (y<<5));	/* byte of colour to display */
 			}
 
-			drawgfx(bitmap, screen->machine->gfx[cgen], code, col, 0, 0, x*8, y*10,
-				cliprect, TRANSPARENCY_NONE, 0);
+			drawgfx(bitmap, screen->machine->gfx[cgen], code, col, 0, 0, x*8, y*10,	cliprect, TRANSPARENCY_NONE, 0);
 		}
 	}
 
@@ -261,57 +253,63 @@ VIDEO_UPDATE( super80m )
 
 VIDEO_UPDATE( super80v )
 {
+	UINT8 y,z,chr,col,gfx,fg,bg;
+	UINT16 mem,sy=0,sx=0,x;
 	static UINT8 framecnt=0;
-	UINT16 i, bytes = mc6845_reg[1]*mc6845_reg[6];
 	UINT8 speed = mc6845_reg[10]&0x20, flash = mc6845_reg[10]&0x40;				// cursor modes
 	UINT16 cursor = (mc6845_reg[14]<<8) | mc6845_reg[15];					// get cursor position
 	UINT16 screen_home = (mc6845_reg[12]<<8) | mc6845_reg[13];				// screen home offset (usually zero)
 	UINT8 options=input_port_read(screen->machine, "CONFIG");
 	framecnt++;
 
-	/* Get the graphics of the character under the cursor, xor with the visible cursor scan lines,
-	   and store as character number 256. If inverse mode, drop bit 7 of character before xoring */
-	if (!super80v_rom_pcg)
-		for ( i = 0; i < ARRAY_LENGTH(mc6845_cursor); i++)
-			pcgram[0x1000+i] = pcgram[(videoram[cursor]&0x7f)*16+i] ^ mc6845_cursor[i];
-	else
-		for ( i = 0; i < ARRAY_LENGTH(mc6845_cursor); i++)
-			pcgram[0x1000+i] = pcgram[(videoram[cursor])*16 + i] ^ mc6845_cursor[i];
-
-	gfx_element_mark_dirty(screen->machine->gfx[0],256);			// and into machine graphics
-
-	for( i = 0; i < bytes; i++ )
+	for (y = 0; y < mc6845_reg[6]; y++)							// for each row of chars
 	{
-		int mem = (i + screen_home) & 0xfff;
-		int sy = (i / mc6845_reg[1]) * (mc6845_reg[9] + 1);
-		int sx = (i % mc6845_reg[1]) * 7;
-		int chr = videoram[mem];
-
-		/* get colour or b&w */
-		int col = 5;					/* green */
-		if ((options & 0x60) == 0x60) col = 15;		/* b&w */
-		if (!(options & 0x40)) col = colorram[mem];			// read a byte of colour
-
-		if ((!super80v_rom_pcg) && (chr > 0x7f))			// is it a high chr in inverse mode
+		for (z = 0; z < mc6845_reg[9]+1; z++)						// for each scanline
 		{
-			col = BITSWAP8(col,3,2,1,0,7,6,5,4);			// swap nibbles
-			chr &= 0x7f;						// and drop bit 7
+			UINT16  *p = BITMAP_ADDR16(bitmap, sy++, 0);
+
+			for (x = sx; x < sx + mc6845_reg[1]; x++)				// for each character
+			{
+				UINT8 inv=0;
+				mem = (x + screen_home) & 0xfff;
+				chr = videoram[mem];
+
+				/* get colour or b&w */
+				col = 5;					/* green */
+				if ((options & 0x60) == 0x60) col = 15;		/* b&w */
+				if (!(options & 0x40)) col = colorram[mem];			// read a byte of colour
+
+				/* if inverse mode, replace any pcgram chrs with inverse chrs */
+				if ((!super80v_rom_pcg) && (chr & 0x80))			// is it a high chr in inverse mode
+				{
+					inv = 0xff;						// invert the chr
+					chr &= 0x7f;						// and drop bit 7
+				}
+
+				/* process cursor */
+				if ((((!flash) && (!speed)) ||					// (5,6)=(0,0) = cursor on always
+					((flash) && (speed) && (framecnt & 0x10)) ||		// (5,6)=(1,1) = cycle per 32 frames
+					((flash) && (!speed) && (framecnt & 8))) &&		// (5,6)=(0,1) = cycle per 16 frames
+					(x == cursor))						// displaying at cursor position?
+						inv ^= mc6845_cursor[z];				// cursor scan row
+
+				/* get pattern of pixels for that character scanline */
+				gfx = pcgram[(chr<<4) | z] ^ inv;
+				fg = ((col & 0x0f) << 1) + 1;
+				bg = ((col & 0xf0) >> 3) + 1;
+
+				/* Display a scanline of a character (7 pixels) */
+				*p = ( gfx & 0x80 ) ? fg : bg; p++;
+				*p = ( gfx & 0x40 ) ? fg : bg; p++;
+				*p = ( gfx & 0x20 ) ? fg : bg; p++;
+				*p = ( gfx & 0x10 ) ? fg : bg; p++;
+				*p = ( gfx & 0x08 ) ? fg : bg; p++;
+				*p = ( gfx & 0x04 ) ? fg : bg; p++;
+				*p = ( gfx & 0x02 ) ? fg : bg; p++;
+			}
 		}
-
-		/* if cursor is on and we are at cursor position, show it */
-		/* NOTE: flash rates obtained from real hardware */
-
-		if ((((!flash) && (!speed)) ||					// (5,6)=(0,0) = cursor on always
-			((flash) && (speed) && (framecnt & 0x10)) ||		// (5,6)=(1,1) = cycle per 32 frames
-			((flash) && (!speed) && (framecnt & 8))) &&		// (5,6)=(0,1) = cycle per 16 frames
-			(i == cursor))						// displaying at cursor position?
-				chr = 256;					// 256 = cursor character
-
-		drawgfx( bitmap, screen->machine->gfx[0],chr,col,0,0,sx,sy,
-			cliprect,TRANSPARENCY_NONE,0);	// put character on the screen
-
+		sx+=mc6845_reg[1];
 	}
-
 	return 0;
 }
 
