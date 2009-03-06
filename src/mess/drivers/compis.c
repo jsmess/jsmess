@@ -97,8 +97,8 @@ Small note about natural keyboard: currently,
 - "Compis S" is mapped to 'F6'
 - "Avbryt" is mapped to 'F7'
 - "Inpassa" is mapped to 'Insert'
-- "S?k" is mapped to "Print Screen"
-- "Utpl?na"is mapped to 'Delete'
+- "Sök" is mapped to "Print Screen"
+- "Utplåna"is mapped to 'Delete'
 - "Start / Stop" is mapped to 'Pause'
 - "TabL" is mapped to 'Page Up'
 - "TabR" is mapped to 'Page Down'
