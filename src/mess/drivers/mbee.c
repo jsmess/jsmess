@@ -242,6 +242,7 @@ static INPUT_PORTS_START( mbee )
 //	PORT_CONFSETTING(    0x00, DEF_STR(Off))
 INPUT_PORTS_END
 
+/* GFX not used by video update - for documentation only */
 static const gfx_layout mbee_charlayout =
 {
     8,16,                   /* 8 x 16 characters */
@@ -261,7 +262,7 @@ static GFXDECODE_START( mbee )
 GFXDECODE_END
 
 static GFXDECODE_START( mbeeic )
-	GFXDECODE_ENTRY( "maincpu", 0x11000, mbee_charlayout, 0, 4096 )
+	GFXDECODE_ENTRY( "maincpu", 0x11000, mbee_charlayout, 0, 48 )
 GFXDECODE_END
 
 static PALETTE_INIT( mbeeic )
@@ -270,39 +271,25 @@ static PALETTE_INIT( mbeeic )
 	UINT8 r, b, g, k; 
 	UINT8 level[] = { 0, 0x80, 0xff, 0xff };	/* off, half, full intensity */
 
-	/* space for colortable (64 background and 32 foreground) */
-	machine->colortable = colortable_alloc(machine, 96);
-
-	/* set up background colortable */
+	/* set up background palette (00-63) */
 	for (i = 0; i < 64; i++)
 	{
 		r = level[((i>>0)&1)|((i>>2)&2)];
 		g = level[((i>>1)&1)|((i>>3)&2)];
 		b = level[((i>>2)&1)|((i>>4)&2)];
-		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 	}
 
-	/* set up foreground colortable by reading the prom */
+	/* set up foreground palette (64-95) by reading the prom */
 	for (i = 0; i < 32; i++)
 	{
 		k = color_prom[i];
 		r = level[((k>>2)&1)|((k>>4)&2)];
 		g = level[((k>>1)&1)|((k>>3)&2)];
 		b = level[((k>>0)&1)|((k>>2)&2)];
-		colortable_palette_set_color(machine->colortable, i|64, MAKE_RGB(r, g, b));
+		palette_set_color(machine, i|64, MAKE_RGB(r, g, b));
 	}
-
-	/* set up background palette */
-	for (i = 0; i < 64; i++)
-		for (r = 0; r < 32; r++)
-			colortable_entry_set_value(machine->colortable, ((i<<5)|r)<<1, i);
-
-	/* set up foreground palette */
-	for (i = 0; i < 64; i++)
-		for (r = 0; r < 32; r++)
-			colortable_entry_set_value(machine->colortable, (((i<<5)|r)<<1)|1, r|64);
 }
-
 
 static int mbee_vsync;
 
@@ -402,8 +389,8 @@ static MACHINE_DRIVER_START( mbee )
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(250)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 16*16)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0, 16*16-1)
+	MDRV_SCREEN_SIZE(64*8, 19*16)			/* need at least 17 lines for NET */
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0, 19*16-1)
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(black_and_white)
 
@@ -447,7 +434,7 @@ static MACHINE_DRIVER_START( mbeeic )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(70*8, 310)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 70*8-1, 0, 19*16-1)
-	MDRV_PALETTE_LENGTH(0x1000)
+	MDRV_PALETTE_LENGTH(96)
 	MDRV_PALETTE_INIT(mbeeic)
 
 	MDRV_VIDEO_START(mbeeic)

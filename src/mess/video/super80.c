@@ -290,7 +290,7 @@ VIDEO_UPDATE( super80v )
 				if ((((!flash) && (!speed)) ||					// (5,6)=(0,0) = cursor on always
 					((flash) && (speed) && (framecnt & 0x10)) ||		// (5,6)=(1,1) = cycle per 32 frames
 					((flash) && (!speed) && (framecnt & 8))) &&		// (5,6)=(0,1) = cycle per 16 frames
-					(x == cursor))						// displaying at cursor position?
+					(mem == cursor))						// displaying at cursor position?
 						inv ^= mc6845_cursor[z];				// cursor scan row
 
 				/* get pattern of pixels for that character scanline */
