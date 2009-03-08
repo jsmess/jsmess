@@ -348,13 +348,11 @@
 	</hash>
 	<hash crc32="aa140c9c" sha1="db3c0686715373242911f8471a1e91673811d62a" name="Excellent Dizzy Collection, The (E) [S]">
 		<status>GoodGG Verified Image</status>
-		<extrainfo>GGSMS</extrainfo>
-
+		<extrainfo>GGSMS,CODEMASTERS</extrainfo>
 	</hash>
 	<hash crc32="8813514b" sha1="09a2acf3ed90101be2629384c5c702f6a5408035" name="Excellent Dizzy Collection, The (Prototype) [S]">
 		<status>GoodGG Verified Image</status>
-		<extrainfo>GGSMS</extrainfo>
-
+		<extrainfo>GGSMS,CODEMASTERS</extrainfo>
 	</hash>
 	<hash crc32="d0a93e00" sha1="b5a1985d671e8b9e0eed7922e6db695011071e99" name="F-1 (E)">
 		<status>GoodGG Verified Image</status>
@@ -370,8 +368,7 @@
 	</hash>
 	<hash crc32="c888222b" sha1="b6a13d51c72b576738f0d7e8e328db2ffeb0b38c" name="Fantastic Dizzy (U) [S]">
 		<status>GoodGG Verified Image</status>
-		<extrainfo>GGSMS</extrainfo>
-
+		<extrainfo>GGSMS,CODEMASTERS</extrainfo>
 	</hash>
 	<hash crc32="d69097e8" sha1="5951d500d6f53b0537f045adb85d94068a838f32" name="Fantasy Zone Gear (JU)">
 		<status>GoodGG Verified Image</status>
@@ -551,8 +548,7 @@
 		<status>GoodGG Verified Image</status>
 	</hash>
 	<hash crc32="76c5bdfb" sha1="2b3bb8fd76fe706d7e564b372d2d71dfce53cb1b" name="Jang Pung II (K) [S]">
-		<extrainfo>GGSMS</extrainfo>
-
+		<extrainfo>GGSMS,CODEMASTERS</extrainfo>
 	</hash>
 	<hash crc32="d7820c21" sha1="28ef5cc2689a1f3bc3bd1b24c3e4132a423fc274" name="Jeopardy! (U)">
 		<status>GoodGG Verified Image</status>
