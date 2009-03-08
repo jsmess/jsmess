@@ -323,9 +323,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(pasogo_io, ADDRESS_SPACE_IO, 8)
 //	ADDRESS_MAP_GLOBAL_MASK(0xfFFF)
-	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE(PIC8259, "pic8259", pic8259_r, pic8259_w)
+	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE("pic8259", pic8259_r, pic8259_w)
 	AM_RANGE(0x26, 0x27) AM_READWRITE(vg230_io_r, vg230_io_w )
-	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE(PIT8254, "pit8254", pit8253_r, pit8253_w)
+	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE("pit8254", pit8253_r, pit8253_w)
 	AM_RANGE(0x6c, 0x6f) AM_READWRITE(ems_r, ems_w )
 ADDRESS_MAP_END
 
@@ -425,7 +425,7 @@ static INTERRUPT_GEN( pasogo_interrupt )
 
 static IRQ_CALLBACK(pasogo_irq_callback)
 {
-	return pic8259_acknowledge( (device_config*)devtag_get_device(device->machine, PIC8259, "pic8259"));
+	return pic8259_acknowledge( devtag_get_device(device->machine, "pic8259"));
 }
 
 static MACHINE_RESET( pasogo )
@@ -437,7 +437,7 @@ static MACHINE_RESET( pasogo )
 
 static PIT8253_OUTPUT_CHANGED( pc_timer0_w )
 {
-	pic8259_set_irq_line((device_config*)devtag_get_device(device->machine, PIC8259, "pic8259"), 0, state);
+	pic8259_set_irq_line(devtag_get_device(device->machine, "pic8259"), 0, state);
 }
 
 static const struct pit8253_config pc_pit8254_config =

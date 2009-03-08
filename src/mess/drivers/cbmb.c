@@ -131,14 +131,14 @@ static ADDRESS_MAP_START( cbmb_readmem , ADDRESS_SPACE_PROGRAM, 8)
 	/*  {0xfc000, 0xfcfff, SMH_ROM }, */
 	AM_RANGE(0xfd000, 0xfd7ff) AM_READ( SMH_ROM )
 //  AM_RANGE(0xfd800, 0xfd8ff)
-	AM_RANGE(0xfd801, 0xfd801) AM_MIRROR( 0xfe ) AM_DEVREAD(MC6845, "crtc", mc6845_register_r)
+	AM_RANGE(0xfd801, 0xfd801) AM_MIRROR( 0xfe ) AM_DEVREAD("crtc", mc6845_register_r)
 	/* disk units */
-	AM_RANGE(0xfda00, 0xfdaff) AM_DEVREAD(SOUND, "sid6581", sid6581_r)
+	AM_RANGE(0xfda00, 0xfdaff) AM_DEVREAD("sid6581", sid6581_r)
 	/* db00 coprocessor */
-	AM_RANGE(0xfdc00, 0xfdcff) AM_DEVREAD( CIA6526R1, "cia", cia_r )
+	AM_RANGE(0xfdc00, 0xfdcff) AM_DEVREAD("cia", cia_r )
 	/* dd00 acia */
-	AM_RANGE(0xfde00, 0xfdeff) AM_DEVREAD(TPI6525, "tpi6525_0", tpi6525_r)
-	AM_RANGE(0xfdf00, 0xfdfff) AM_DEVREAD(TPI6525, "tpi6525_1", tpi6525_r)
+	AM_RANGE(0xfde00, 0xfdeff) AM_DEVREAD("tpi6525_0", tpi6525_r)
+	AM_RANGE(0xfdf00, 0xfdfff) AM_DEVREAD("tpi6525_1", tpi6525_r)
 	AM_RANGE(0xfe000, 0xfffff) AM_READ( SMH_ROM )
 ADDRESS_MAP_END
 
@@ -153,15 +153,15 @@ static ADDRESS_MAP_START( cbmb_writemem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xf6000, 0xf7fff) AM_WRITE( SMH_ROM )
 	AM_RANGE(0xf8000, 0xfbfff) AM_WRITE( SMH_ROM) AM_BASE( &cbmb_basic )
 	AM_RANGE(0xfd000, 0xfd7ff) AM_WRITE( SMH_RAM) AM_BASE( &videoram) AM_SIZE(&videoram_size ) /* VIDEORAM */
-	AM_RANGE(0xfd800, 0xfd800) AM_MIRROR( 0xfe ) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
-	AM_RANGE(0xfd801, 0xfd801) AM_MIRROR( 0xfe ) AM_DEVWRITE(MC6845, "crtc", mc6845_register_w)
+	AM_RANGE(0xfd800, 0xfd800) AM_MIRROR( 0xfe ) AM_DEVWRITE("crtc", mc6845_address_w)
+	AM_RANGE(0xfd801, 0xfd801) AM_MIRROR( 0xfe ) AM_DEVWRITE("crtc", mc6845_register_w)
 	/* disk units */
-	AM_RANGE(0xfda00, 0xfdaff) AM_DEVWRITE(SOUND, "sid6581", sid6581_w)
+	AM_RANGE(0xfda00, 0xfdaff) AM_DEVWRITE("sid6581", sid6581_w)
 	/* db00 coprocessor */
-	AM_RANGE(0xfdc00, 0xfdcff) AM_DEVWRITE( CIA6526R1, "cia", cia_w)
+	AM_RANGE(0xfdc00, 0xfdcff) AM_DEVWRITE("cia", cia_w)
 	/* dd00 acia */
-	AM_RANGE(0xfde00, 0xfdeff) AM_DEVWRITE(TPI6525, "tpi6525_0", tpi6525_w)
-	AM_RANGE(0xfdf00, 0xfdfff) AM_DEVWRITE(TPI6525, "tpi6525_1", tpi6525_w)
+	AM_RANGE(0xfde00, 0xfdeff) AM_DEVWRITE("tpi6525_0", tpi6525_w)
+	AM_RANGE(0xfdf00, 0xfdfff) AM_DEVWRITE("tpi6525_1", tpi6525_w)
 	AM_RANGE(0xfe000, 0xfffff) AM_WRITE( SMH_ROM) AM_BASE( &cbmb_kernal )
 ADDRESS_MAP_END
 
@@ -180,12 +180,12 @@ static ADDRESS_MAP_START( p500_readmem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xfd400, 0xfd7ff) AM_READ( SMH_RAM ) /* colorram */
 	AM_RANGE(0xfd800, 0xfd8ff) AM_READ( vic2_port_r )
 	/* disk units */
-	AM_RANGE(0xfda00, 0xfdaff) AM_DEVREAD(SOUND, "sid6581", sid6581_r)
+	AM_RANGE(0xfda00, 0xfdaff) AM_DEVREAD("sid6581", sid6581_r)
 	/* db00 coprocessor */
-	AM_RANGE(0xfdc00, 0xfdcff) AM_DEVREAD( CIA6526R1, "cia", cia_r )
+	AM_RANGE(0xfdc00, 0xfdcff) AM_DEVREAD("cia", cia_r )
 	/* dd00 acia */
-	AM_RANGE(0xfde00, 0xfdeff) AM_DEVREAD(TPI6525, "tpi6525_0", tpi6525_r)
-	AM_RANGE(0xfdf00, 0xfdfff) AM_DEVREAD(TPI6525, "tpi6525_1", tpi6525_r)
+	AM_RANGE(0xfde00, 0xfdeff) AM_DEVREAD("tpi6525_0", tpi6525_r)
+	AM_RANGE(0xfdf00, 0xfdfff) AM_DEVREAD("tpi6525_1", tpi6525_r)
 	AM_RANGE(0xfe000, 0xfffff) AM_READ( SMH_ROM )
 ADDRESS_MAP_END
 
@@ -204,12 +204,12 @@ static ADDRESS_MAP_START( p500_writemem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xfd400, 0xfd7ff) AM_WRITE( cbmb_colorram_w) AM_BASE( &cbmb_colorram )
 	AM_RANGE(0xfd800, 0xfd8ff) AM_WRITE( vic2_port_w )
 	/* disk units */
-	AM_RANGE(0xfda00, 0xfdaff) AM_DEVWRITE(SOUND, "sid6581", sid6581_w)
+	AM_RANGE(0xfda00, 0xfdaff) AM_DEVWRITE("sid6581", sid6581_w)
 	/* db00 coprocessor */
-	AM_RANGE(0xfdc00, 0xfdcff) AM_DEVWRITE( CIA6526R1, "cia", cia_w)
+	AM_RANGE(0xfdc00, 0xfdcff) AM_DEVWRITE("cia", cia_w)
 	/* dd00 acia */
-	AM_RANGE(0xfde00, 0xfdeff) AM_DEVWRITE(TPI6525, "tpi6525_0", tpi6525_w)
-	AM_RANGE(0xfdf00, 0xfdfff) AM_DEVWRITE(TPI6525, "tpi6525_1", tpi6525_w)
+	AM_RANGE(0xfde00, 0xfdeff) AM_DEVWRITE("tpi6525_0", tpi6525_w)
+	AM_RANGE(0xfdf00, 0xfdfff) AM_DEVWRITE("tpi6525_1", tpi6525_w)
 	AM_RANGE(0xfe000, 0xfffff) AM_WRITE( SMH_ROM) AM_BASE( &cbmb_kernal )
 ADDRESS_MAP_END
 
@@ -438,7 +438,7 @@ static MACHINE_DRIVER_START( cbm700 )
 	MDRV_SCREEN_VISIBLE_AREA(0, 720 - 1, 0, 350 - 1)
 	MDRV_GFXDECODE( cbm700 )
 
-	MDRV_MC6845_REMOVE("crtc", MC6845)
+	MDRV_MC6845_REMOVE("crtc")
 	MDRV_MC6845_ADD("crtc", MC6845, XTAL_18MHz / 8 /*? I do not know if this is correct, please verify */, cbm700_crtc)
 
 	MDRV_VIDEO_START( cbm700 )

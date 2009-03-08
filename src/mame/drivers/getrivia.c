@@ -151,7 +151,7 @@ static WRITE8_DEVICE_HANDLER( sound_w )
 	interrupt_enable_w(space, 0, data & 0x40);
 
 	/* bit 7 goes directly to the sound amplifier */
-	dac_data_w(devtag_get_device(device->machine, SOUND, "dac"), ((data & 0x80) >> 7) * 255);
+	dac_data_w(devtag_get_device(device->machine, "dac"), ((data & 0x80) >> 7) * 255);
 }
 
 static WRITE8_DEVICE_HANDLER( sound2_w )
@@ -168,7 +168,7 @@ static WRITE8_DEVICE_HANDLER( sound2_w )
 	set_led_status(12,data & 0x20);
 
 	/* bit 7 goes directly to the sound amplifier */
-	dac_data_w(devtag_get_device(device->machine, SOUND, "dac"), ((data & 0x80) >> 7) * 255);
+	dac_data_w(devtag_get_device(device->machine, "dac"), ((data & 0x80) >> 7) * 255);
 }
 
 static WRITE8_DEVICE_HANDLER( lamps2_w )
@@ -233,8 +233,8 @@ static ADDRESS_MAP_START( getrivia_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK(1)
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x600f, 0x600f) AM_WRITE(banksel_5_1_w)
 	AM_RANGE(0x6017, 0x6017) AM_WRITE(banksel_4_1_w)
 	AM_RANGE(0x601b, 0x601b) AM_WRITE(banksel_3_1_w)
@@ -259,8 +259,8 @@ static ADDRESS_MAP_START( gselect_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4401, 0x4401) AM_WRITE(banksel_1_2_w)
 	AM_RANGE(0x4402, 0x4402) AM_WRITE(banksel_2_1_w)
 	AM_RANGE(0x4403, 0x4403) AM_WRITE(banksel_2_2_w)
-	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x8000, 0x8002) AM_WRITE(SMH_RAM) AM_BASE(&drawctrl)
 	AM_RANGE(0xc000, 0xffff) AM_RAM_WRITE(getrivia_bitmap_w) AM_BASE(&videoram)
 ADDRESS_MAP_END
@@ -270,8 +270,8 @@ static ADDRESS_MAP_START( amuse_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK(1)
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x606f, 0x606f) AM_WRITE(banksel_5_1_w)
 	AM_RANGE(0x6077, 0x6077) AM_WRITE(banksel_4_1_w)
 	AM_RANGE(0x607b, 0x607b) AM_WRITE(banksel_3_1_w)
@@ -286,8 +286,8 @@ static ADDRESS_MAP_START( gepoker_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK(1)
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x60ef, 0x60ef) AM_WRITE(banksel_3_1_w)
 	AM_RANGE(0x60f7, 0x60f7) AM_WRITE(banksel_2_2_w)
 	AM_RANGE(0x60fb, 0x60fb) AM_WRITE(banksel_2_1_w)
@@ -547,6 +547,14 @@ ROM_START( jokpoker )
 	ROM_LOAD( "m075.2", 0x01000, 0x1000, CRC(bd129fc2) SHA1(2e05ba34922c16d127be32941447013efea05bcd) )
 	ROM_LOAD( "m075.3", 0x02000, 0x1000, CRC(45725bc9) SHA1(9e6dcbec955ef8190f2307ddb367b24b7f34338d) )
 ROM_END
+
+ROM_START( jokpokera )
+	ROM_REGION( 0x24000, "cpu", 0 )
+	ROM_LOAD( "jpbiwr930-1.bin", 0x00000, 0x2000, CRC(d0f4fec5) SHA1(5fcc72522df66464759d5ba3d5209bc7a3a80002) )  /* rom board UMV-7C */
+	ROM_LOAD( "jpbiwr930-2.bin", 0x02000, 0x2000, CRC(824d1aee) SHA1(6eebde351c3b5bbed3796846d8d651b41ed6f84a) )
+ROM_END
+
+
 
 /***************************************************
 Rom board is UVM-1B
@@ -837,6 +845,7 @@ static DRIVER_INIT( setbank )
 }
 
 GAME( 1982, jokpoker, 0,        gselect,  gselect,  setbank, ROT0, "Greyhound Electronics", "Joker Poker (Version 16.03B)",            GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1983, jokpokera,jokpoker, gselect,  gselect,  setbank, ROT0, "Greyhound Electronics", "Joker Poker (Version 16.03BI)",            GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
 GAME( 1982, superbwl, 0,        gselect,  gselect,  setbank, ROT0, "Greyhound Electronics", "Super Bowl (Version 16.03B)",             GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 
 GAME( 1982, gs4002,   0,        gselect,  gselect,  0,       ROT0, "Greyhound Electronics", "Selection (Version 40.02TMB, set 1)",     GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )

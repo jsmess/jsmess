@@ -311,7 +311,7 @@ static WD17XX_CALLBACK( bw2_wd17xx_callback )
 static READ8_HANDLER( bw2_wd2797_r )
 {
 	UINT8 result = 0xff;
-	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD179X, "wd179x");
+	const device_config *fdc = devtag_get_device(space->machine, "wd179x");
 
 	switch (offset & 0x03)
 	{
@@ -334,7 +334,7 @@ static READ8_HANDLER( bw2_wd2797_r )
 
 static WRITE8_HANDLER( bw2_wd2797_w )
 {
-	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD179X, "wd179x");
+	const device_config *fdc = devtag_get_device(space->machine, "wd179x");
 	switch (offset & 0x3)
 	{
 		case 0:
@@ -372,7 +372,7 @@ static WRITE8_HANDLER( bw2_wd2797_w )
 
 static WRITE8_DEVICE_HANDLER( bw2_ppi8255_a_w )
 {
-	device_config *fdc = (device_config*)devtag_get_device(device->machine, WD179X, "wd179x");
+	const device_config *fdc = devtag_get_device(device->machine, "wd179x");
 	/*
 
 		PA0     KB0 Keyboard line select 0
@@ -575,14 +575,14 @@ static DRIVER_INIT( bw2 )
 static MACHINE_START( bw2 )
 {
 	bw2_state *state = machine->driver_data;
-	device_config *fdc = (device_config*)devtag_get_device(machine, WD179X, "wd179x");
+	const device_config *fdc = devtag_get_device(machine, "wd179x");
 
 	wd17xx_set_density(fdc,DEN_MFM_LO);
 
 	/* find devices */
-	state->msm8251 = devtag_get_device(machine, MSM8251, MSM8251_TAG);
-	state->msm6255 = devtag_get_device(machine, MSM6255, MSM6255_TAG);
-	state->centronics = devtag_get_device(machine, CENTRONICS, CENTRONICS_TAG);
+	state->msm8251 = devtag_get_device(machine, MSM8251_TAG);
+	state->msm6255 = devtag_get_device(machine, MSM6255_TAG);
+	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
 
 	/* register for state saving */
 	state_save_register_global(machine, state->keyboard_row);
@@ -637,13 +637,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bw2_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x00, 0x03 ) AM_DEVREADWRITE( PPI8255, PPI8255_TAG, ppi8255_r, ppi8255_w )
-	AM_RANGE( 0x10, 0x13 ) AM_DEVREADWRITE( PIT8253, PIT8253_TAG, pit8253_r, pit8253_w )
-	AM_RANGE( 0x20, 0x21 ) AM_DEVREADWRITE( MSM6255, MSM6255_TAG, msm6255_register_r, msm6255_register_w )
+	AM_RANGE( 0x00, 0x03 ) AM_DEVREADWRITE(PPI8255_TAG, ppi8255_r, ppi8255_w )
+	AM_RANGE( 0x10, 0x13 ) AM_DEVREADWRITE(PIT8253_TAG, pit8253_r, pit8253_w )
+	AM_RANGE( 0x20, 0x21 ) AM_DEVREADWRITE(MSM6255_TAG, msm6255_register_r, msm6255_register_w )
 //	AM_RANGE( 0x30, 0x3f ) SLOT
-	AM_RANGE( 0x40, 0x40 ) AM_DEVREADWRITE( MSM8251, MSM8251_TAG, msm8251_data_r, msm8251_data_w )
-	AM_RANGE( 0x41, 0x41 ) AM_DEVREADWRITE( MSM8251, MSM8251_TAG, msm8251_status_r, msm8251_control_w )
-	AM_RANGE( 0x50, 0x50 ) AM_DEVWRITE(CENTRONICS, CENTRONICS_TAG, centronics_data_w)
+	AM_RANGE( 0x40, 0x40 ) AM_DEVREADWRITE( MSM8251_TAG, msm8251_data_r, msm8251_data_w )
+	AM_RANGE( 0x41, 0x41 ) AM_DEVREADWRITE( MSM8251_TAG, msm8251_status_r, msm8251_control_w )
+	AM_RANGE( 0x50, 0x50 ) AM_DEVWRITE(CENTRONICS_TAG, centronics_data_w)
 	AM_RANGE( 0x60, 0x63 ) AM_READWRITE( bw2_wd2797_r, bw2_wd2797_w )
 //	AM_RANGE( 0x70, 0x7f ) MODEMSEL
 ADDRESS_MAP_END

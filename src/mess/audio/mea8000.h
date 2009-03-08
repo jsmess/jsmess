@@ -29,7 +29,7 @@ struct _mea8000_interface
   MDRV_DEVICE_CONFIG(_intrf)
 
 #define MDRV_MEA8000_REMOVE(_tag)		\
-  MDRV_DEVICE_REMOVE(_tag, MEA8000)
+  MDRV_DEVICE_REMOVE(_tag)
 
 
 /* ---------- functions ------------ */

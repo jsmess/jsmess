@@ -21,7 +21,7 @@
 
 static READ8_DEVICE_HANDLER( ins8154_b1_port_a_r )
 {
-	const device_config *ttl74145 = devtag_get_device(device->machine, TTL74145, "ic8_7445");
+	const device_config *ttl74145 = devtag_get_device(device->machine, "ic8_7445");
 	UINT8 key_line = ttl74145_r(ttl74145, 0, 0);
 
 	switch (key_line)
@@ -42,7 +42,7 @@ static READ8_DEVICE_HANDLER( ins8154_b1_port_a_r )
 
 static WRITE8_DEVICE_HANDLER( ins8154_b1_port_a_w )
 {
-	ttl74145_w(devtag_get_device(device->machine, TTL74145, "ic8_7445"), 0, data & 0x07);
+	ttl74145_w(devtag_get_device(device->machine, "ic8_7445"), 0, data & 0x07);
 }
 
 
@@ -52,7 +52,7 @@ static WRITE8_DEVICE_HANDLER( ins8154_b1_port_a_w )
 
 static WRITE8_DEVICE_HANDLER( acrnsys1_led_segment_w )
 {
-	const device_config *ttl74145 = devtag_get_device(device->machine, TTL74145, "ic8_7445");
+	const device_config *ttl74145 = devtag_get_device(device->machine, "ic8_7445");
 	UINT8 key_line = ttl74145_r(ttl74145, 0, 0);
 
 	output_set_digit_value(key_line, data);
@@ -65,7 +65,7 @@ static WRITE8_DEVICE_HANDLER( acrnsys1_led_segment_w )
 
 static ADDRESS_MAP_START( acrnsys1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0e00, 0x0e7f) AM_MIRROR(0x100) AM_DEVREADWRITE(INS8154, "b1", ins8154_r, ins8154_w)
+	AM_RANGE(0x0e00, 0x0e7f) AM_MIRROR(0x100) AM_DEVREADWRITE("b1", ins8154_r, ins8154_w)
 	AM_RANGE(0x0e80, 0x0eff) AM_MIRROR(0x100) AM_RAM
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END

@@ -86,13 +86,13 @@ Hardware:   PPIA 8255
 
 static ADDRESS_MAP_START( atom_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x09ff) AM_RAM
-	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE(I8271, "i8271", i8271_r, i8271_w)
-	AM_RANGE(0x0a04, 0x0a04) AM_DEVREADWRITE(I8271, "i8271", i8271_data_r, i8271_data_w)
+	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("i8271", i8271_r, i8271_w)
+	AM_RANGE(0x0a04, 0x0a04) AM_DEVREADWRITE("i8271", i8271_data_r, i8271_data_w)
 	AM_RANGE(0x0a05, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0x97ff) AM_RAM AM_BASE(&videoram) /* VDG 6847 */
 	AM_RANGE(0x9800, 0x9fff) AM_RAM
-	AM_RANGE(0xb000, 0xb003) AM_DEVREADWRITE(PPI8255, "ppi8255", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xb800, 0xbbff) AM_DEVREADWRITE(VIA6522, "via6522_0", via_r, via_w)
+	AM_RANGE(0xb000, 0xb003) AM_DEVREADWRITE("ppi8255", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xb800, 0xbbff) AM_DEVREADWRITE("via6522_0", via_r, via_w)
 	AM_RANGE(0xc000, 0xcfff) AM_ROM
 	AM_RANGE(0xd000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xefff) AM_ROM
@@ -102,14 +102,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( atomeb_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x09ff) AM_RAM
-	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE(I8271, "i8271", i8271_r, i8271_w)
-	AM_RANGE(0x0a04, 0x0a04) AM_DEVREADWRITE(I8271, "i8271", i8271_data_r, i8271_data_w)
+	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("i8271", i8271_r, i8271_w)
+	AM_RANGE(0x0a04, 0x0a04) AM_DEVREADWRITE("i8271", i8271_data_r, i8271_data_w)
 	AM_RANGE(0x0a05, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0x97ff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size) /* VDG 6847 */
 	AM_RANGE(0x9800, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xafff) AM_READ(SMH_BANK1)	/* eprom data from eprom box */
-	AM_RANGE(0xb000, 0xb003) AM_DEVREADWRITE(PPI8255, "ppi8255", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xb800, 0xbbff) AM_DEVREADWRITE(VIA6522, "via6522_0", via_r, via_w)
+	AM_RANGE(0xb000, 0xb003) AM_DEVREADWRITE("ppi8255", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xb800, 0xbbff) AM_DEVREADWRITE("via6522_0", via_r, via_w)
 	AM_RANGE(0xbfff, 0xbfff) AM_READWRITE(atom_eprom_box_r, atom_eprom_box_w)
 	AM_RANGE(0xc000, 0xcfff) AM_ROM
 	AM_RANGE(0xd000, 0xdfff) AM_ROM
@@ -251,7 +251,7 @@ INPUT_PORTS_END
 static const centronics_interface atom_centronics_config =
 {
 	FALSE,
-	DEVCB_DEVICE_HANDLER(VIA6522, "via6522_0", via_ca1_w),
+	DEVCB_DEVICE_HANDLER("via6522_0", via_ca1_w),
 	DEVCB_NULL,
 	DEVCB_NULL
 };

@@ -70,7 +70,7 @@ static READ8_DEVICE_HANDLER (specialist_8255_portb_r )
 	dat = (dat  << 2) ^0xff;	
 	if (input_port_read(device->machine, "LINE12")!=0xff) dat ^= 0x02;
 		
-	level = cassette_input(devtag_get_device(device->machine, CASSETTE, "cassette"));	 									 					
+	level = cassette_input(devtag_get_device(device->machine, "cassette"));	 									 					
 	if (level >=  0) { 
 			dat ^= 0x01;
  	}		
@@ -97,11 +97,11 @@ static WRITE8_DEVICE_HANDLER (specialist_8255_portb_w )
 }
 static WRITE8_DEVICE_HANDLER (specialist_8255_portc_w )
 {		
-	const device_config *dac_device = devtag_get_device(device->machine, SOUND, "dac");
+	const device_config *dac_device = devtag_get_device(device->machine, "dac");
 
 	specialist_8255_portc = data;
 	
-	cassette_output(devtag_get_device(device->machine, CASSETTE, "cassette"),data & 0x80 ? 1 : -1);	
+	cassette_output(devtag_get_device(device->machine, "cassette"),data & 0x80 ? 1 : -1);	
 
 	dac_data_w(dac_device, data & 0x20); //beeper
 	
@@ -131,12 +131,12 @@ MACHINE_RESET( special )
 
 READ8_HANDLER( specialist_keyboard_r )
 {	
-	return ppi8255_r((device_config*)devtag_get_device(space->machine, PPI8255, "ppi8255"), (offset & 3));
+	return ppi8255_r((device_config*)devtag_get_device(space->machine, "ppi8255"), (offset & 3));
 }
 
 WRITE8_HANDLER( specialist_keyboard_w )
 {	
-	ppi8255_w((device_config*)devtag_get_device(space->machine, PPI8255, "ppi8255"), (offset & 3) , data );
+	ppi8255_w((device_config*)devtag_get_device(space->machine, "ppi8255"), (offset & 3) , data );
 }
 
 
@@ -248,12 +248,12 @@ const struct pit8253_config specimx_pit8253_intf =
 
 MACHINE_START( specimx )
 {
-	device_config *fdc = (device_config*)devtag_get_device(machine, WD1793, "wd1793");
+	const device_config *fdc = devtag_get_device(machine, "wd1793");
 	wd17xx_set_density (fdc,DEN_FM_HI);
 }
 
 static TIMER_CALLBACK( setup_pit8253_gates ) {
-	device_config *pit8253 = (device_config*)devtag_get_device(machine, PIT8253, "pit8253");
+	device_config *pit8253 = (device_config*)devtag_get_device(machine, "pit8253");
 
 	pit8253_gate_w(pit8253, 0, 0);
 	pit8253_gate_w(pit8253, 1, 0);
@@ -274,7 +274,7 @@ READ8_HANDLER ( specimx_disk_ctrl_r )
 
 WRITE8_HANDLER( specimx_disk_ctrl_w )
 {	
-	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD1793, "wd1793");
+	const device_config *fdc = devtag_get_device(space->machine, "wd1793");
 
 	switch(offset) {  				
 		case 2 :						
@@ -440,7 +440,7 @@ READ8_HANDLER ( erik_disk_reg_r ) {
 }
 
 WRITE8_HANDLER( erik_disk_reg_w ) {
-	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD1793, "wd1793");
+	const device_config *fdc = devtag_get_device(space->machine, "wd1793");
 	
 	wd17xx_set_side (fdc,data & 1);	
 	wd17xx_set_drive(fdc,(data >> 1) & 1);

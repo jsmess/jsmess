@@ -86,7 +86,7 @@
 
 static const device_config *cassette_device_image(running_machine *machine)
 {
-	return devtag_get_device(machine, CASSETTE, "cassette");
+	return devtag_get_device(machine, "cassette");
 }
 
 /* Discrete Sound */
@@ -178,7 +178,7 @@ static void scan_keyboard(running_machine *machine)
 	{
 		if (keycode != keylatch)
 		{
-			const device_config *z80dart = devtag_get_device(machine, Z80DART, Z80DART_TAG);
+			const device_config *z80dart = devtag_get_device(machine, Z80DART_TAG);
 
 			z80dart_dcdb_w(z80dart, 0);
 			z80dart_receive_data(z80dart, Z80DART_CH_B, keycode);
@@ -190,7 +190,7 @@ static void scan_keyboard(running_machine *machine)
 	{
 		if (keylatch)
 		{
-			const device_config *z80dart = devtag_get_device(machine, Z80DART, Z80DART_TAG);
+			const device_config *z80dart = devtag_get_device(machine, Z80DART_TAG);
 
 			z80dart_dcdb_w(z80dart, 1);
 			z80dart_receive_data(z80dart, Z80DART_CH_B, 0);
@@ -451,7 +451,7 @@ static WRITE8_DEVICE_HANDLER( sio2_w )
 
 static READ8_HANDLER( abc800_pling_r )
 {
-	const device_config *discrete = devtag_get_device(space->machine, SOUND, "discrete");
+	const device_config *discrete = devtag_get_device(space->machine, "discrete");
 	abc800_state *state = space->machine->driver_data;
 
 	state->pling = !state->pling;
@@ -463,7 +463,7 @@ static READ8_HANDLER( abc800_pling_r )
 
 static READ8_HANDLER( abc802_pling_r )
 {
-	const device_config *discrete = devtag_get_device(space->machine, SOUND, "discrete");
+	const device_config *discrete = devtag_get_device(space->machine, "discrete");
 	abc802_state *state = space->machine->driver_data;
 
 	state->pling = !state->pling;
@@ -492,12 +492,12 @@ static ADDRESS_MAP_START( abc800m_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x05, 0x05) AM_MIRROR(0x18) AM_READ(abc800_pling_r)
 	AM_RANGE(0x06, 0x06) AM_MIRROR(0x18) AM_WRITE(abc800_hrs_w)
 	AM_RANGE(0x07, 0x07) AM_MIRROR(0x18) AM_READWRITE(abcbus_reset_r, abc800_hrc_w)
-	AM_RANGE(0x20, 0x23) AM_MIRROR(0x0c) AM_DEVREADWRITE(Z80DART, Z80DART_TAG, z80dart_alt_r, z80dart_alt_w)
-	AM_RANGE(0x31, 0x31) AM_MIRROR(0x06) AM_DEVREAD(MC6845, MC6845_TAG, mc6845_register_r)
-	AM_RANGE(0x38, 0x38) AM_MIRROR(0x06) AM_DEVWRITE(MC6845, MC6845_TAG, mc6845_address_w)
-	AM_RANGE(0x39, 0x39) AM_MIRROR(0x06) AM_DEVWRITE(MC6845, MC6845_TAG, mc6845_register_w)
-	AM_RANGE(0x40, 0x43) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80SIO, Z80SIO_TAG, sio2_r, sio2_w)
-	AM_RANGE(0x60, 0x63) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80CTC, Z80CTC_TAG, z80ctc_r, z80ctc_w)
+	AM_RANGE(0x20, 0x23) AM_MIRROR(0x0c) AM_DEVREADWRITE(Z80DART_TAG, z80dart_alt_r, z80dart_alt_w)
+	AM_RANGE(0x31, 0x31) AM_MIRROR(0x06) AM_DEVREAD(MC6845_TAG, mc6845_register_r)
+	AM_RANGE(0x38, 0x38) AM_MIRROR(0x06) AM_DEVWRITE(MC6845_TAG, mc6845_address_w)
+	AM_RANGE(0x39, 0x39) AM_MIRROR(0x06) AM_DEVWRITE(MC6845_TAG, mc6845_register_w)
+	AM_RANGE(0x40, 0x43) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80SIO_TAG, sio2_r, sio2_w)
+	AM_RANGE(0x60, 0x63) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_r, z80ctc_w)
 ADDRESS_MAP_END
 
 // ABC 800C
@@ -517,9 +517,9 @@ static ADDRESS_MAP_START( abc800c_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x05, 0x05) AM_MIRROR(0x18) AM_READ(abc800_pling_r)
 	AM_RANGE(0x06, 0x06) AM_MIRROR(0x18) AM_WRITE(abc800_hrs_w)
 	AM_RANGE(0x07, 0x07) AM_MIRROR(0x18) AM_READWRITE(abcbus_reset_r, abc800_hrc_w)
-	AM_RANGE(0x20, 0x23) AM_MIRROR(0x0c) AM_DEVREADWRITE(Z80DART, Z80DART_TAG, z80dart_alt_r, z80dart_alt_w)
-	AM_RANGE(0x40, 0x43) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80SIO, Z80SIO_TAG, sio2_r, sio2_w)
-	AM_RANGE(0x60, 0x63) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80CTC, Z80CTC_TAG, z80ctc_r, z80ctc_w)
+	AM_RANGE(0x20, 0x23) AM_MIRROR(0x0c) AM_DEVREADWRITE(Z80DART_TAG, z80dart_alt_r, z80dart_alt_w)
+	AM_RANGE(0x40, 0x43) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80SIO_TAG, sio2_r, sio2_w)
+	AM_RANGE(0x60, 0x63) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_r, z80ctc_w)
 ADDRESS_MAP_END
 
 // ABC 802
@@ -536,12 +536,12 @@ static ADDRESS_MAP_START( abc802_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x08) AM_WRITE(abcbus_channel_w)
 	AM_RANGE(0x05, 0x05) AM_MIRROR(0x08) AM_READ(abc802_pling_r)
 	AM_RANGE(0x07, 0x07) AM_MIRROR(0x08) AM_READ(abcbus_reset_r)
-	AM_RANGE(0x20, 0x23) AM_MIRROR(0x0c) AM_DEVREADWRITE(Z80DART, Z80DART_TAG, z80dart_alt_r, z80dart_alt_w)
-	AM_RANGE(0x31, 0x31) AM_MIRROR(0x06) AM_DEVREAD(MC6845, MC6845_TAG, mc6845_register_r)
-	AM_RANGE(0x38, 0x38) AM_MIRROR(0x06) AM_DEVWRITE(MC6845, MC6845_TAG, mc6845_address_w)
-	AM_RANGE(0x39, 0x39) AM_MIRROR(0x06) AM_DEVWRITE(MC6845, MC6845_TAG, mc6845_register_w)
-	AM_RANGE(0x40, 0x43) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80SIO, Z80SIO_TAG, sio2_r, sio2_w)
-	AM_RANGE(0x60, 0x63) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80CTC, Z80CTC_TAG, z80ctc_r, z80ctc_w)
+	AM_RANGE(0x20, 0x23) AM_MIRROR(0x0c) AM_DEVREADWRITE(Z80DART_TAG, z80dart_alt_r, z80dart_alt_w)
+	AM_RANGE(0x31, 0x31) AM_MIRROR(0x06) AM_DEVREAD(MC6845_TAG, mc6845_register_r)
+	AM_RANGE(0x38, 0x38) AM_MIRROR(0x06) AM_DEVWRITE(MC6845_TAG, mc6845_address_w)
+	AM_RANGE(0x39, 0x39) AM_MIRROR(0x06) AM_DEVWRITE(MC6845_TAG, mc6845_register_w)
+	AM_RANGE(0x40, 0x43) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80SIO_TAG, sio2_r, sio2_w)
+	AM_RANGE(0x60, 0x63) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_r, z80ctc_w)
 ADDRESS_MAP_END
 
 // ABC 806
@@ -571,16 +571,16 @@ static ADDRESS_MAP_START( abc806_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0xff18) AM_WRITE(abcbus_channel_w)
 	AM_RANGE(0x06, 0x06) AM_MIRROR(0xff18) AM_WRITE(abc806_hrs_w)
 	AM_RANGE(0x07, 0x07) AM_MIRROR(0xff18) AM_MASK(0xff00) AM_READWRITE(abcbus_reset_r, abc806_hrc_w)
-	AM_RANGE(0x20, 0x23) AM_MIRROR(0xff0c) AM_DEVREADWRITE(Z80DART, Z80DART_TAG, z80dart_alt_r, z80dart_alt_w)
-	AM_RANGE(0x31, 0x31) AM_MIRROR(0xff06) AM_DEVREAD(MC6845, MC6845_TAG, mc6845_register_r)
+	AM_RANGE(0x20, 0x23) AM_MIRROR(0xff0c) AM_DEVREADWRITE(Z80DART_TAG, z80dart_alt_r, z80dart_alt_w)
+	AM_RANGE(0x31, 0x31) AM_MIRROR(0xff06) AM_DEVREAD(MC6845_TAG, mc6845_register_r)
 	AM_RANGE(0x34, 0x34) AM_MIRROR(0xff00) AM_MASK(0xff00) AM_READWRITE(abc806_mai_r, abc806_mao_w)
 	AM_RANGE(0x35, 0x35) AM_MIRROR(0xff00) AM_READWRITE(abc806_ami_r, abc806_amo_w)
 	AM_RANGE(0x36, 0x36) AM_MIRROR(0xff00) AM_READWRITE(abc806_sti_r, abc806_sto_w)
 	AM_RANGE(0x37, 0x37) AM_MIRROR(0xff00) AM_MASK(0xff00) AM_READWRITE(abc806_cli_r, abc806_sso_w)
-	AM_RANGE(0x38, 0x38) AM_MIRROR(0xff06) AM_DEVWRITE(MC6845, MC6845_TAG, mc6845_address_w)
-	AM_RANGE(0x39, 0x39) AM_MIRROR(0xff06) AM_DEVWRITE(MC6845, MC6845_TAG, mc6845_register_w)
-	AM_RANGE(0x40, 0x43) AM_MIRROR(0xff1c) AM_DEVREADWRITE(Z80SIO, Z80SIO_TAG, sio2_r, sio2_w)
-	AM_RANGE(0x60, 0x63) AM_MIRROR(0xff1c) AM_DEVREADWRITE(Z80CTC, Z80CTC_TAG, z80ctc_r, z80ctc_w)
+	AM_RANGE(0x38, 0x38) AM_MIRROR(0xff06) AM_DEVWRITE(MC6845_TAG, mc6845_address_w)
+	AM_RANGE(0x39, 0x39) AM_MIRROR(0xff06) AM_DEVWRITE(MC6845_TAG, mc6845_register_w)
+	AM_RANGE(0x40, 0x43) AM_MIRROR(0xff1c) AM_DEVREADWRITE(Z80SIO_TAG, sio2_r, sio2_w)
+	AM_RANGE(0x60, 0x63) AM_MIRROR(0xff1c) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_r, z80ctc_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -723,7 +723,7 @@ static WRITE_LINE_DEVICE_HANDLER( abc800_abc77_txd_w )
 
 static WRITE_LINE_DEVICE_HANDLER( abc77_clock_w )
 {
-	const device_config *z80dart = devtag_get_device(device->machine, Z80DART, Z80DART_TAG);
+	const device_config *z80dart = devtag_get_device(device->machine, Z80DART_TAG);
 
 	/* connected to DART channel B clock */
 	z80dart_rxtxcb_w(z80dart, state);
@@ -731,7 +731,7 @@ static WRITE_LINE_DEVICE_HANDLER( abc77_clock_w )
 
 static WRITE_LINE_DEVICE_HANDLER( abc77_keydown_w )
 {
-	const device_config *z80dart = devtag_get_device(device->machine, Z80DART, Z80DART_TAG);
+	const device_config *z80dart = devtag_get_device(device->machine, Z80DART_TAG);
 
 	/* connected to DART channel B DCD */
 	z80dart_dcdb_w(z80dart, state);
@@ -776,7 +776,7 @@ static ABC77_INTERFACE( abc806_abc77_intf )
 
 static TIMER_DEVICE_CALLBACK( ctc_tick )
 {
-	const device_config *z80ctc = devtag_get_device(timer->machine, Z80CTC, Z80CTC_TAG);
+	const device_config *z80ctc = devtag_get_device(timer->machine, Z80CTC_TAG);
 
 	z80ctc_trg_w(z80ctc, 0, 1);
 	z80ctc_trg_w(z80ctc, 0, 0);
@@ -795,7 +795,7 @@ static void ctc_interrupt(const device_config *device, int state)
 
 static WRITE8_DEVICE_HANDLER( ctc_z0_w )
 {
-	//const device_config *z80sio = devtag_get_device(device->machine, Z80SIO, Z80SIO_TAG);
+	//const device_config *z80sio = devtag_get_device(device->machine, Z80SIO_TAG);
 
 	UINT8 sb = input_port_read(device->machine, "SB");
 
@@ -817,7 +817,7 @@ static WRITE8_DEVICE_HANDLER( ctc_z0_w )
 
 static WRITE8_DEVICE_HANDLER( ctc_z1_w )
 {
-	//const device_config *z80sio = devtag_get_device(device->machine, Z80SIO, Z80SIO_TAG);
+	//const device_config *z80sio = devtag_get_device(device->machine, Z80SIO_TAG);
 
 	UINT8 sb = input_port_read(device->machine, "SB");
 
@@ -837,7 +837,7 @@ static WRITE8_DEVICE_HANDLER( ctc_z1_w )
 
 static WRITE8_DEVICE_HANDLER( ctc_z2_w )
 {
-	const device_config *z80dart = devtag_get_device(device->machine, Z80DART, Z80DART_TAG);
+	const device_config *z80dart = devtag_get_device(device->machine, Z80DART_TAG);
 
 	/* connected to DART channel A clock inputs */
 	z80dart_rxca_w(z80dart, data);
@@ -920,7 +920,7 @@ static Z80DART_INTERFACE( abc800_dart_intf )
 	DEVCB_NULL,
 
 	DEVCB_LINE(abc800_dart_rxdb_r),
-	DEVCB_NULL, /* DEVCB_DEVICE_LINE(ABC77, ABC77_TAG, abc77_rxd_w), */
+	DEVCB_NULL, /* DEVCB_DEVICE_LINE(ABC77_TAG, abc77_rxd_w), */
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -967,7 +967,7 @@ static Z80DART_INTERFACE( abc802_dart_intf )
 	DEVCB_NULL,
 
 	DEVCB_LINE(abc802_dart_rxdb_r),
-	DEVCB_NULL, /* DEVCB_DEVICE_LINE(ABC77, ABC77_TAG, abc77_rxd_w), */
+	DEVCB_NULL, /* DEVCB_DEVICE_LINE(ABC77_TAG, abc77_rxd_w), */
 	DEVCB_LINE(abc802_dart_dtrb_r),
 	DEVCB_LINE(abc802_dart_rtsb_r),
 	DEVCB_NULL,
@@ -1005,7 +1005,7 @@ static Z80DART_INTERFACE( abc806_dart_intf )
 	DEVCB_NULL,
 
 	DEVCB_LINE(abc806_dart_rxdb_r),
-	DEVCB_NULL, /* DEVCB_DEVICE_LINE(ABC77, ABC77_TAG, abc77_rxd_w), */
+	DEVCB_NULL, /* DEVCB_DEVICE_LINE(ABC77_TAG, abc77_rxd_w), */
 	DEVCB_LINE(abc806_dart_dtrb_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -1017,9 +1017,9 @@ static Z80DART_INTERFACE( abc806_dart_intf )
 
 static const z80_daisy_chain abc800_daisy_chain[] =
 {
-	{ Z80CTC, Z80CTC_TAG },
-	{ Z80SIO, Z80SIO_TAG },
-	{ Z80DART, Z80DART_TAG },
+	{ Z80CTC_TAG },
+	{ Z80SIO_TAG },
+	{ Z80DART_TAG },
 	{ NULL }
 };
 
@@ -1039,10 +1039,10 @@ static MACHINE_START( abc800 )
 
 	/* find devices */
 
-	state->z80ctc = devtag_get_device(machine, Z80CTC, Z80CTC_TAG);
-	state->z80dart = devtag_get_device(machine, Z80DART, Z80DART_TAG);
-	state->z80sio = devtag_get_device(machine, Z80SIO, Z80SIO_TAG);
-	//state->abc77 = devtag_get_device(machine, ABC77, ABC77_TAG);
+	state->z80ctc = devtag_get_device(machine, Z80CTC_TAG);
+	state->z80dart = devtag_get_device(machine, Z80DART_TAG);
+	state->z80sio = devtag_get_device(machine, Z80SIO_TAG);
+	//state->abc77 = devtag_get_device(machine, ABC77_TAG);
 
 	/* initialize the ABC BUS */
 
@@ -1074,10 +1074,10 @@ static MACHINE_START( abc802 )
 
 	/* find devices */
 
-	state->z80ctc = devtag_get_device(machine, Z80CTC, Z80CTC_TAG);
-	state->z80dart = devtag_get_device(machine, Z80DART, Z80DART_TAG);
-	state->z80sio = devtag_get_device(machine, Z80SIO, Z80SIO_TAG);
-//	state->abc77 = devtag_get_device(machine, ABC77, ABC77_TAG);
+	state->z80ctc = devtag_get_device(machine, Z80CTC_TAG);
+	state->z80dart = devtag_get_device(machine, Z80DART_TAG);
+	state->z80sio = devtag_get_device(machine, Z80SIO_TAG);
+//	state->abc77 = devtag_get_device(machine, ABC77_TAG);
 
 	/* initialize the ABC BUS */
 
@@ -1127,11 +1127,11 @@ static MACHINE_START( abc806 )
 
 	/* find devices */
 
-	state->z80ctc = devtag_get_device(machine, Z80CTC, Z80CTC_TAG);
-	state->z80dart = devtag_get_device(machine, Z80DART, Z80DART_TAG);
-	state->z80sio = devtag_get_device(machine, Z80SIO, Z80SIO_TAG);
-	state->e0516 = devtag_get_device(machine, E0516, E0516_TAG);
-	//state->abc77 = devtag_get_device(machine, ABC77, ABC77_TAG);
+	state->z80ctc = devtag_get_device(machine, Z80CTC_TAG);
+	state->z80dart = devtag_get_device(machine, Z80DART_TAG);
+	state->z80sio = devtag_get_device(machine, Z80SIO_TAG);
+	state->e0516 = devtag_get_device(machine, E0516_TAG);
+	//state->abc77 = devtag_get_device(machine, ABC77_TAG);
 
 	/* initialize the ABC BUS */
 

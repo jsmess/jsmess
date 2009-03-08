@@ -580,14 +580,14 @@ long myo;
 
 	if ((offset>=0x200) && (offset<=0x2ff)) /* SHEILA */
 	{
-		const device_config *via_0 = devtag_get_device(space->machine, VIA6522, "via6522_0");
-		const device_config *via_1 = devtag_get_device(space->machine, VIA6522, "via6522_1");
+		const device_config *via_0 = devtag_get_device(space->machine, "via6522_0");
+		const device_config *via_1 = devtag_get_device(space->machine, "via6522_1");
 
 		myo=offset-0x200;
 		if ((myo>=0x00) && (myo<=0x07)) return BBC_6845_r(space, myo-0x00);		/* Video Controller */
 		if ((myo>=0x08) && (myo<=0x0f))
 		{
-			const device_config *acia = devtag_get_device(space->machine, ACIA6850, "acia6850");
+			const device_config *acia = devtag_get_device(space->machine, "acia6850");
 
 			if ((myo - 0x08) & 1)
 				return acia6850_stat_r(acia, 0);
@@ -595,7 +595,7 @@ long myo;
 				return acia6850_data_r(acia, 0);
 		}
 		if ((myo>=0x10) && (myo<=0x17)) return 0xfe;						/* Serial System Chip */
-		if ((myo>=0x18) && (myo<=0x1f)) return uPD7002_r((device_config*)devtag_get_device(space->machine, UPD7002, "upd7002"), myo-0x18);			/* A to D converter */
+		if ((myo>=0x18) && (myo<=0x1f)) return uPD7002_r((device_config*)devtag_get_device(space->machine, "upd7002"), myo-0x18);			/* A to D converter */
 		if ((myo>=0x20) && (myo<=0x23)) return 0xfe;						/* VideoULA */
 		if ((myo>=0x24) && (myo<=0x27)) return bbcm_wd1770l_read(space, myo-0x24); /* 1770 */
 		if ((myo>=0x28) && (myo<=0x2f)) return bbcm_wd1770_read(space, myo-0x28);  /* disc control latch */
@@ -619,14 +619,14 @@ long myo;
 
 	if ((offset>=0x200) && (offset<=0x2ff)) /* SHEILA */
 	{
-		const device_config *via_0 = devtag_get_device(space->machine, VIA6522, "via6522_0");
-		const device_config *via_1 = devtag_get_device(space->machine, VIA6522, "via6522_1");
+		const device_config *via_0 = devtag_get_device(space->machine, "via6522_0");
+		const device_config *via_1 = devtag_get_device(space->machine, "via6522_1");
 
 		myo=offset-0x200;
 		if ((myo>=0x00) && (myo<=0x07)) BBC_6845_w(space, myo-0x00,data);			/* Video Controller */
 		if ((myo>=0x08) && (myo<=0x0f))
 		{
-			const device_config *acia = devtag_get_device(space->machine, ACIA6850, "acia6850");
+			const device_config *acia = devtag_get_device(space->machine, "acia6850");
 
 			if ((myo - 0x08) & 1)
 				return acia6850_ctrl_w(acia, 0, data);
@@ -634,7 +634,7 @@ long myo;
 				return acia6850_data_w(acia, 0, data);
 		}
 		if ((myo>=0x10) && (myo<=0x17)) BBC_SerialULA_w(space, myo-0x10,data);		/* Serial System Chip */
-		if ((myo>=0x18) && (myo<=0x1f)) uPD7002_w((device_config*)devtag_get_device(space->machine, UPD7002, "upd7002"),myo-0x18,data);			/* A to D converter */
+		if ((myo>=0x18) && (myo<=0x1f)) uPD7002_w((device_config*)devtag_get_device(space->machine, "upd7002"),myo-0x18,data);			/* A to D converter */
 		if ((myo>=0x20) && (myo<=0x23)) bbc_videoULA_w(space, myo-0x20,data);			/* VideoULA */
 		if ((myo>=0x24) && (myo<=0x27)) bbcm_wd1770l_write(space, myo-0x24,data); 	/* 1770 */
 		if ((myo>=0x28) && (myo<=0x2f)) bbcm_wd1770_write(space, myo-0x28,data);  	/* disc control latch */
@@ -781,7 +781,7 @@ INTERRUPT_GEN( bbcb_keyscan )
 {
 	static const char *const colnames[] = { "COL0", "COL1", "COL2", "COL3", "COL4",
 										"COL5", "COL6", "COL7", "COL8", "COL9" };
-	const device_config *via_0 = devtag_get_device(device->machine, VIA6522, "via6522_0");
+	const device_config *via_0 = devtag_get_device(device->machine, "via6522_0");
 
   	/* only do auto scan if keyboard is not enabled */
 	if (b3_keyboard == 1)
@@ -817,7 +817,7 @@ INTERRUPT_GEN( bbcm_keyscan )
 {
 	static const char *const colnames[] = { "COL0", "COL1", "COL2", "COL3", "COL4",
 										"COL5", "COL6", "COL7", "COL8", "COL9" };
-	const device_config *via_0 = devtag_get_device(device->machine, VIA6522, "via6522_0");
+	const device_config *via_0 = devtag_get_device(device->machine, "via6522_0");
 
   	/* only do auto scan if keyboard is not enabled */
 	if (b3_keyboard == 1)
@@ -855,7 +855,7 @@ static int bbc_keyboard(const address_space *space, int data)
 	int res;
 	static const char *const colnames[] = { "COL0", "COL1", "COL2", "COL3", "COL4",
 										"COL5", "COL6", "COL7", "COL8", "COL9" };
-	const device_config *via_0 = devtag_get_device(space->machine, VIA6522, "via6522_0");
+	const device_config *via_0 = devtag_get_device(space->machine, "via6522_0");
 
 	column = data & 0x0f;
 	row = (data>>4) & 0x07;
@@ -944,7 +944,7 @@ static WRITE8_DEVICE_HANDLER( bbcb_via_system_write_porta )
 	if (b0_sound==0)
 	{
  		//logerror("Doing an unsafe write to the sound chip %d \n",data);
-		sn76496_w(devtag_get_device(device->machine, SOUND, "sn76489"), 0,via_system_porta);
+		sn76496_w(devtag_get_device(device->machine, "sn76489"), 0,via_system_porta);
 	}
 	if (b3_keyboard==0)
 	{
@@ -1040,7 +1040,7 @@ static WRITE8_DEVICE_HANDLER( bbcb_via_system_write_portb )
 		case 0:
 			if (b0_sound==1) {
 				b0_sound=0;
-				sn76496_w(devtag_get_device(space->machine, SOUND, "sn76489"), 0, via_system_porta);
+				sn76496_w(devtag_get_device(space->machine, "sn76489"), 0, via_system_porta);
 			}
 			break;
 		case 1:
@@ -1175,7 +1175,7 @@ static READ8_DEVICE_HANDLER( bbcb_via_system_read_ca1 )
 /* joystick EOC */
 static READ8_DEVICE_HANDLER( bbcb_via_system_read_cb1 )
 {
-	return uPD7002_EOC_r((device_config*)devtag_get_device(device->machine, UPD7002, "upd7002"),0);
+	return uPD7002_EOC_r((device_config*)devtag_get_device(device->machine, "upd7002"),0);
 }
 
 
@@ -1239,11 +1239,11 @@ const via6522_interface bbcb_user_via =
 	DEVCB_NULL,	//via_user_read_cb1,
 	DEVCB_NULL,	//via_user_read_ca2,
 	DEVCB_NULL,	//via_user_read_cb2,
-	DEVCB_DEVICE_HANDLER(CENTRONICS, "centronics", centronics_data_w),
+	DEVCB_DEVICE_HANDLER("centronics", centronics_data_w),
 	DEVCB_HANDLER(bbcb_via_user_write_portb),
 	DEVCB_NULL, //via_user_write_ca1
 	DEVCB_NULL, //via_user_write_cb1
-	DEVCB_DEVICE_LINE(CENTRONICS, "centronics", centronics_strobe_w),
+	DEVCB_DEVICE_LINE("centronics", centronics_strobe_w),
 	DEVCB_NULL,	//via_user_write_cb2,
 	DEVCB_CPU_INPUT_LINE("maincpu", M6502_IRQ_LINE)
 };
@@ -1272,7 +1272,7 @@ static UPD7002_GET_ANALOGUE(BBC_get_analogue_input)
 
 static UPD7002_EOC(BBC_uPD7002_EOC)
 {
-	const device_config *via_0 = devtag_get_device(device->machine, VIA6522, "via6522_0");
+	const device_config *via_0 = devtag_get_device(device->machine, "via6522_0");
 	via_cb1_w(via_0, 0,data);
 }
 
@@ -1304,7 +1304,7 @@ static void MC6850_Receive_Clock(running_machine *machine, int new_clock)
 {
 	if (!mc6850_clock && new_clock)
 	{
-		const device_config *acia = devtag_get_device(machine, ACIA6850, "acia6850");
+		const device_config *acia = devtag_get_device(machine, "acia6850");
 		acia6850_tx_clock_in(acia);
 	}
 	mc6850_clock = new_clock;
@@ -1314,7 +1314,7 @@ static TIMER_CALLBACK(bbc_tape_timer_cb)
 {
 
 	double dev_val;
-	dev_val=cassette_input(devtag_get_device(machine, CASSETTE, "cassette"));
+	dev_val=cassette_input(devtag_get_device(machine, "cassette"));
 
 	// look for rising edges on the cassette wave
 	if (((dev_val>=0.0) && (last_dev_val<0.0)) || ((dev_val<0.0) && (last_dev_val>=0.0)))
@@ -1373,10 +1373,10 @@ static void BBC_Cassette_motor(running_machine *machine, unsigned char status)
 {
 	if (status)
 	{
-		cassette_change_state(devtag_get_device(machine, CASSETTE, "cassette"),CASSETTE_MOTOR_ENABLED ,CASSETTE_MASK_MOTOR);
+		cassette_change_state(devtag_get_device(machine, "cassette"),CASSETTE_MOTOR_ENABLED ,CASSETTE_MASK_MOTOR);
 		timer_adjust_periodic(bbc_tape_timer, attotime_zero, 0, ATTOTIME_IN_HZ(44100));
 	} else {
-		cassette_change_state(devtag_get_device(machine, CASSETTE, "cassette"),CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+		cassette_change_state(devtag_get_device(machine, "cassette"),CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 		timer_reset(bbc_tape_timer, attotime_never);
 		len0=0;
 		len1=0;
@@ -1453,7 +1453,7 @@ const i8271_interface bbc_i8271_interface=
 static READ8_HANDLER( bbc_i8271_read )
 {
 	int ret;
-	device_config *i8271 = (device_config*)devtag_get_device(space->machine, I8271, "i8271");
+	device_config *i8271 = (device_config*)devtag_get_device(space->machine, "i8271");
 	ret=0x0ff;
 	logerror("i8271 read %d  ",offset);
 	switch (offset)
@@ -1479,7 +1479,7 @@ static READ8_HANDLER( bbc_i8271_read )
 
 static WRITE8_HANDLER( bbc_i8271_write )
 {
-	device_config *i8271 = (device_config*)devtag_get_device(space->machine, I8271, "i8271");
+	device_config *i8271 = (device_config*)devtag_get_device(space->machine, "i8271");
 	logerror("i8271 write  %d  %d\n",offset,data);
 
 	switch (offset)
@@ -1617,7 +1617,7 @@ const wd17xx_interface bbc_wd17xx_interface = {
 
 static WRITE8_HANDLER(bbc_wd177x_status_w)
 {
-	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD177X, "wd177x");
+	const device_config *fdc = devtag_get_device(space->machine, "wd177x");
 	drive_control = data;
 
 	/* set drive */
@@ -1648,7 +1648,7 @@ static WRITE8_HANDLER(bbc_wd177x_status_w)
 READ8_HANDLER ( bbc_wd1770_read )
 {
 	int retval=0xff;
-	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD177X, "wd177x");
+	const device_config *fdc = devtag_get_device(space->machine, "wd177x");
 	switch (offset)
 	{
 	case 4:
@@ -1673,7 +1673,7 @@ READ8_HANDLER ( bbc_wd1770_read )
 
 WRITE8_HANDLER ( bbc_wd1770_write )
 {
-	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD177X, "wd177x");
+	const device_config *fdc = devtag_get_device(space->machine, "wd177x");
 	logerror("wd177x write: $%02X  $%02X\n", offset,data);
 	switch (offset)
 	{
@@ -1737,7 +1737,7 @@ static int opusbank;
 
 static WRITE8_HANDLER( bbc_opus_status_w )
 {
-	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD177X, "wd177x");
+	const device_config *fdc = devtag_get_device(space->machine, "wd177x");
 	drive_control = data;
 
 	/* set drive */
@@ -1765,7 +1765,7 @@ static WRITE8_HANDLER( bbc_opus_status_w )
 
 READ8_HANDLER( bbc_opus_read )
 {
-	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD177X, "wd177x");
+	const device_config *fdc = devtag_get_device(space->machine, "wd177x");
 	logerror("wd177x read: $%02X\n", offset);
 
 	if (bbc_DFSType==6)
@@ -1793,7 +1793,7 @@ READ8_HANDLER( bbc_opus_read )
 
 WRITE8_HANDLER (bbc_opus_write)
 {
-	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD177X, "wd177x");
+	const device_config *fdc = devtag_get_device(space->machine, "wd177x");
 	logerror("wd177x write: $%02X  $%02X\n", offset,data);
 
 	if (bbc_DFSType==6)
@@ -1839,7 +1839,7 @@ BBC MASTER DISC SUPPORT
 READ8_HANDLER ( bbcm_wd1770_read )
 {
 	int retval=0xff;
-	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD177X, "wd177x");
+	const device_config *fdc = devtag_get_device(space->machine, "wd177x");
 	switch (offset)
 	{
 	case 0:
@@ -1863,7 +1863,7 @@ READ8_HANDLER ( bbcm_wd1770_read )
 
 WRITE8_HANDLER ( bbcm_wd1770_write )
 {
-	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD177X, "wd177x");
+	const device_config *fdc = devtag_get_device(space->machine, "wd177x");
 	//logerror("wd177x write: $%02X  $%02X\n", offset,data);
 	switch (offset)
 	{
@@ -1892,7 +1892,7 @@ READ8_HANDLER ( bbcm_wd1770l_read )
 
 WRITE8_HANDLER ( bbcm_wd1770l_write )
 {
-	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD177X, "wd177x");
+	const device_config *fdc = devtag_get_device(space->machine, "wd177x");
 	drive_control = data;
 
 	/* set drive */

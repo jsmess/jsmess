@@ -278,7 +278,7 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x0300000, 0x0307fff) AM_READ(SMH_RAM) AM_MIRROR(0xff000000)
 	AM_RANGE(0x0400000, 0x0400003) AM_READ_PORT("INPUTS") AM_MIRROR(0xff000000)
 	AM_RANGE(0x0440000, 0x044001f) AM_READ(test3_r)	AM_MIRROR(0xff000000)
-	AM_RANGE(0x0600004, 0x0600007) AM_DEVREAD8(SOUND, "ymz", ymz280b_r, 0xff000000) AM_MIRROR(0xff000000)
+	AM_RANGE(0x0600004, 0x0600007) AM_DEVREAD8("ymz", ymz280b_r, 0xff000000) AM_MIRROR(0xff000000)
 	AM_RANGE(0x070f000, 0x070ffff) AM_READ(stadhr96_prot_146_r) AM_MIRROR(0xff000000)
 ADDRESS_MAP_END
 
@@ -292,7 +292,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x0300000, 0x0307fff) AM_WRITE(avengrs_palette_w) AM_BASE(&paletteram32) AM_MIRROR(0xff000000)
 	AM_RANGE(0x044001c, 0x044001f) AM_WRITE(SMH_NOP) AM_MIRROR(0xff000000)
 	AM_RANGE(0x0500000, 0x0500003) AM_WRITE(avengrs_eprom_w) AM_MIRROR(0xff000000)
-	AM_RANGE(0x0600000, 0x0600007) AM_DEVWRITE8(SOUND, "ymz", ymz280b_w, 0xff000000) AM_MIRROR(0xff000000)
+	AM_RANGE(0x0600000, 0x0600007) AM_DEVWRITE8("ymz", ymz280b_w, 0xff000000) AM_MIRROR(0xff000000)
 //  AM_RANGE(0x070f000, 0x070ffff) AM_READ(stadhr96_prot_146_w) AM_BASE(&deco32_prot_ram)
 ADDRESS_MAP_END
 
@@ -719,13 +719,11 @@ static READ32_HANDLER( avengrgs_speedup_r )
 static DRIVER_INIT( avengrgs )
 {
 	// init options
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
+	sh2drc_set_options(machine->cpu[0], SH2DRC_FASTEST_OPTIONS);
 
 	// set up speed cheat
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, 0);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x3234);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, 1);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x32dc);
+	sh2drc_add_pcflush(machine->cpu[0], 0x3234);
+	sh2drc_add_pcflush(machine->cpu[0], 0x32dc);
 
 	mainCpuIsArm=0;
 	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x01089a0, 0x01089a3, 0, 0, avengrgs_speedup_r );

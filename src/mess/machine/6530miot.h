@@ -36,7 +36,7 @@ struct _miot6530_interface
 	MDRV_DEVICE_CONFIG(_intrf)
 
 #define MDRV_MIOT6530_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag, MIOT6530)
+	MDRV_DEVICE_REMOVE(_tag)
 
 
 

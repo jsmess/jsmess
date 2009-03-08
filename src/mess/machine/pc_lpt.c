@@ -83,7 +83,7 @@ static DEVICE_START( pc_lpt )
 	assert(device->static_config != NULL);
 
 	/* get centronics device */
-	lpt->centronics = devtag_get_device(device->machine, CENTRONICS, device_build_tag(tempstring, device, "centronics"));
+	lpt->centronics = devtag_get_device(device->machine, device_build_tag(tempstring, device, "centronics"));
 	assert(lpt->centronics != NULL);
 
 	/* make sure it's running */

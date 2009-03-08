@@ -217,9 +217,9 @@ static UINT8 gfx_rom_ctrl_data;
  *
  *************************************/
 
-static WRITE8_HANDLER( flipscreen_w );
-static WRITE8_HANDLER( gfx_rom_intf_w );
-static READ8_HANDLER( gfx_rom_r );
+static WRITE_LINE_DEVICE_HANDLER( flipscreen_w );
+static WRITE8_DEVICE_HANDLER( gfx_rom_intf_w );
+static READ8_DEVICE_HANDLER( gfx_rom_r );
 
 
 
@@ -229,25 +229,28 @@ static READ8_HANDLER( gfx_rom_r );
  *
  *************************************/
 
-static void main_cpu_irq(running_machine *machine, int state)
+static WRITE_LINE_DEVICE_HANDLER( main_cpu_irq )
 {
-	int combined_state = pia_get_irq_a(1) | pia_get_irq_b(1) |
-						 					pia_get_irq_b(2) |
-						 pia_get_irq_a(3) | pia_get_irq_b(3);
+	const device_config *pia1 = devtag_get_device(device->machine, "pia1");
+	const device_config *pia2 = devtag_get_device(device->machine, "pia2");
+	const device_config *pia3 = devtag_get_device(device->machine, "pia3");
+	int combined_state = pia6821_get_irq_a(pia1) | pia6821_get_irq_b(pia1) |
+						 					      pia6821_get_irq_b(pia2) |
+						 pia6821_get_irq_a(pia3) | pia6821_get_irq_b(pia3);
 
-	cpu_set_input_line(machine->cpu[0], M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[0], M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-static void main_cpu_firq(running_machine *machine, int state)
+static WRITE_LINE_DEVICE_HANDLER( main_cpu_firq )
 {
-	cpu_set_input_line(machine->cpu[0], M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[0], M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-static void audio_cpu_irq(running_machine *machine, int state)
+static WRITE_LINE_DEVICE_HANDLER( audio_cpu_irq )
 {
-	cpu_set_input_line(machine->cpu[1], M6800_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[1], M6800_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -260,25 +263,33 @@ static void audio_cpu_irq(running_machine *machine, int state)
 
 static const pia6821_interface pia_1_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ input_port_0_r, input_port_1_r, 0, 0, 0, 0,
-	/*outputs: A/B,CA/B2       */ 0, 0, 0, 0,
-	/*irqs   : A/B             */ main_cpu_irq, main_cpu_irq
+	DEVCB_INPUT_PORT("IN0"),		/* port A in */
+	DEVCB_INPUT_PORT("IN1"),		/* port B in */
+	DEVCB_NULL,		/* line CA1 in */
+	DEVCB_NULL,		/* line CB1 in */
+	DEVCB_NULL,		/* line CA2 in */
+	DEVCB_NULL,		/* line CB2 in */
+	DEVCB_NULL,		/* port A out */
+	DEVCB_NULL,		/* port B out */
+	DEVCB_NULL,		/* line CA2 out */
+	DEVCB_NULL,		/* port CB2 out */
+	DEVCB_LINE(main_cpu_irq),		/* IRQA */
+	DEVCB_LINE(main_cpu_irq)		/* IRQB */
 };
-
 
 static INTERRUPT_GEN( update_pia_1 )
 {
-	const address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	const device_config *pia1 = devtag_get_device(device->machine, "pia1");
 	/* update the different PIA pins from the input ports */
 
 	/* CA1 - copy of PA1 (COIN1) */
-	pia_1_ca1_w(space, 0, input_port_read(device->machine, "IN0") & 0x02);
+	pia6821_ca1_w(pia1, 0, input_port_read(device->machine, "IN0") & 0x02);
 
 	/* CA2 - copy of PA0 (SERVICE1) */
-	pia_1_ca2_w(space, 0, input_port_read(device->machine, "IN0") & 0x01);
+	pia6821_ca2_w(pia1, 0, input_port_read(device->machine, "IN0") & 0x01);
 
 	/* CB1 - (crosshatch) */
-	pia_1_cb1_w(space, 0, input_port_read(device->machine, "XHATCH"));
+	pia6821_cb1_w(pia1, 0, input_port_read(device->machine, "XHATCH"));
 
 	/* CB2 - NOT CONNECTED */
 }
@@ -293,9 +304,18 @@ static INTERRUPT_GEN( update_pia_1 )
 
 static const pia6821_interface pia_2_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ gfx_rom_r, 0, 0, 0, 0, 0,
-	/*outputs: A/B,CA/B2       */ 0, gfx_rom_intf_w, 0, flipscreen_w,
-	/*irqs   : A/B             */ main_cpu_firq, main_cpu_irq
+	DEVCB_HANDLER(gfx_rom_r),		/* port A in */
+	DEVCB_NULL,		/* port B in */
+	DEVCB_NULL,		/* line CA1 in */
+	DEVCB_NULL,		/* line CB1 in */
+	DEVCB_NULL,		/* line CA2 in */
+	DEVCB_NULL,		/* line CB2 in */
+	DEVCB_NULL,		/* port A out */
+	DEVCB_HANDLER(gfx_rom_intf_w),		/* port B out */
+	DEVCB_NULL,		/* line CA2 out */
+	DEVCB_LINE(flipscreen_w),		/* port CB2 out */
+	DEVCB_LINE(main_cpu_firq),		/* IRQA */
+	DEVCB_LINE(main_cpu_irq)		/* IRQB */
 };
 
 
@@ -308,9 +328,18 @@ static const pia6821_interface pia_2_intf =
 
 static const pia6821_interface pia_3_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ 0, 0, 0, 0, 0, 0,
-	/*outputs: A/B,CA/B2       */ spiders_audio_ctrl_w, spiders_audio_command_w, 0, 0,
-	/*irqs   : A/B             */ main_cpu_irq, main_cpu_irq
+	DEVCB_NULL,		/* port A in */
+	DEVCB_NULL,		/* port B in */
+	DEVCB_NULL,		/* line CA1 in */
+	DEVCB_NULL,		/* line CB1 in */
+	DEVCB_NULL,		/* line CA2 in */
+	DEVCB_NULL,		/* line CB2 in */
+	DEVCB_DEVICE_HANDLER("discrete", spiders_audio_ctrl_w),		/* port A out */
+	DEVCB_DEVICE_HANDLER("pia4", spiders_audio_command_w),		/* port B out */
+	DEVCB_NULL,		/* line CA2 out */
+	DEVCB_NULL,		/* port CB2 out */
+	DEVCB_LINE(main_cpu_irq),		/* IRQA */
+	DEVCB_LINE(main_cpu_irq)		/* IRQB */
 };
 
 
@@ -323,9 +352,18 @@ static const pia6821_interface pia_3_intf =
 
 static const pia6821_interface pia_4_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ 0, 0, 0, 0, 0, 0,
-	/*outputs: A/B,CA/B2       */ spiders_audio_a_w, spiders_audio_b_w, 0, 0,
-	/*irqs   : A/B             */ audio_cpu_irq, 0
+	DEVCB_NULL,		/* port A in */
+	DEVCB_NULL,		/* port B in */
+	DEVCB_NULL,		/* line CA1 in */
+	DEVCB_NULL,		/* line CB1 in */
+	DEVCB_NULL,		/* line CA2 in */
+	DEVCB_NULL,		/* line CB2 in */
+	DEVCB_DEVICE_HANDLER("discrete", spiders_audio_a_w),		/* port A out */
+	DEVCB_DEVICE_HANDLER("discrete", spiders_audio_b_w),		/* port B out */
+	DEVCB_NULL,		/* line CA2 out */
+	DEVCB_NULL,		/* port CB2 out */
+	DEVCB_LINE(audio_cpu_irq),		/* IRQA */
+	DEVCB_NULL		/* IRQB */
 };
 
 
@@ -344,8 +382,8 @@ static const pia6821_interface pia_4_intf =
 
 static WRITE8_DEVICE_HANDLER( ic60_74123_output_changed)
 {
-	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	pia_2_ca1_w(space, 0, data);
+	const device_config *pia2 = devtag_get_device(device->machine, "pia2");
+	pia6821_ca1_w(pia2, 0, data);
 }
 
 
@@ -370,30 +408,12 @@ static const ttl74123_config ic60_intf =
 
 static MACHINE_START( spiders )
 {
-	pia_config(machine, 1, &pia_1_intf);
-	pia_config(machine, 2, &pia_2_intf);
-	pia_config(machine, 3, &pia_3_intf);
-	pia_config(machine, 4, &pia_4_intf);
-
 	/* setup for save states */
 	state_save_register_global(machine, flipscreen);
 	state_save_register_global(machine, gfx_rom_address);
 	state_save_register_global(machine, gfx_rom_ctrl_mode);
 	state_save_register_global(machine, gfx_rom_ctrl_latch);
 	state_save_register_global(machine, gfx_rom_ctrl_data);
-}
-
-
-
-/*************************************
- *
- *  Machine reset
- *
- *************************************/
-
-static MACHINE_RESET( spiders )
-{
-	pia_reset();
 }
 
 
@@ -407,9 +427,9 @@ static MACHINE_RESET( spiders )
 #define NUM_PENS	(8)
 
 
-static WRITE8_HANDLER( flipscreen_w )
+static WRITE_LINE_DEVICE_HANDLER( flipscreen_w )
 {
-	flipscreen = data;
+	flipscreen = state;
 }
 
 
@@ -489,7 +509,7 @@ static MC6845_UPDATE_ROW( update_row )
 
 static MC6845_ON_DE_CHANGED( display_enable_changed )
 {
-	ttl74123_a_w(devtag_get_device(device->machine, TTL74123, "ic60"), 0, display_enabled);
+	ttl74123_a_w(devtag_get_device(device->machine, "ic60"), 0, display_enabled);
 }
 
 
@@ -508,7 +528,7 @@ static const mc6845_interface mc6845_intf =
 
 static VIDEO_UPDATE( spiders )
 {
-	const device_config *mc6845 = device_list_find_by_tag(screen->machine->config->devicelist, MC6845, "crtc");
+	const device_config *mc6845 = devtag_get_device(screen->machine, "crtc");
 	mc6845_update(mc6845, bitmap, cliprect);
 
 	return 0;
@@ -523,7 +543,7 @@ static VIDEO_UPDATE( spiders )
  *
  *************************************/
 
-static WRITE8_HANDLER( gfx_rom_intf_w )
+static WRITE8_DEVICE_HANDLER( gfx_rom_intf_w )
 {
 	gfx_rom_ctrl_mode  = ( data >> 7) & 0x01;
 	gfx_rom_ctrl_latch = ( data >> 4) & 0x03;
@@ -531,13 +551,13 @@ static WRITE8_HANDLER( gfx_rom_intf_w )
 }
 
 
-static READ8_HANDLER( gfx_rom_r )
+static READ8_DEVICE_HANDLER( gfx_rom_r )
 {
 	UINT8 ret;
 
 	if (gfx_rom_ctrl_mode)
 	{
-		UINT8 *rom = memory_region(space->machine, "gfx1");
+		UINT8 *rom = memory_region(device->machine, "gfx1");
 
 		ret = rom[gfx_rom_address];
 
@@ -564,12 +584,12 @@ static READ8_HANDLER( gfx_rom_r )
 
 static ADDRESS_MAP_START( spiders_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_BASE(&spiders_ram)
-	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
-	AM_RANGE(0xc001, 0xc001) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
+	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE("crtc", mc6845_address_w)
+	AM_RANGE(0xc001, 0xc001) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0xc020, 0xc027) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0xc044, 0xc047) AM_READWRITE(pia_1_r, pia_1_w)
-	AM_RANGE(0xc048, 0xc04b) AM_READWRITE(pia_2_alt_r, pia_2_alt_w)
-	AM_RANGE(0xc050, 0xc053) AM_READWRITE(pia_3_r, pia_3_w)
+	AM_RANGE(0xc044, 0xc047) AM_DEVREADWRITE("pia1", pia6821_r, pia6821_w)
+	AM_RANGE(0xc048, 0xc04b) AM_DEVREADWRITE("pia2", pia6821_alt_r, pia6821_alt_w)
+	AM_RANGE(0xc050, 0xc053) AM_DEVREADWRITE("pia3", pia6821_r, pia6821_w)
 	AM_RANGE(0xc060, 0xc060) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc080, 0xc080) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc0a0, 0xc0a0) AM_READ_PORT("DSW3")
@@ -579,7 +599,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spiders_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x0080, 0x0083) AM_READWRITE(pia_4_r, pia_4_w)
+	AM_RANGE(0x0080, 0x0083) AM_DEVREADWRITE("pia4", pia6821_r, pia6821_w)
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -694,7 +714,6 @@ static MACHINE_DRIVER_START( spiders )
 	MDRV_CPU_PROGRAM_MAP(spiders_audio_map,0)
 
 	MDRV_MACHINE_START(spiders)
-	MDRV_MACHINE_RESET(spiders)
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
@@ -707,6 +726,11 @@ static MACHINE_DRIVER_START( spiders )
 	MDRV_MC6845_ADD("crtc", MC6845, CRTC_CLOCK, mc6845_intf)
 
 	/* 74LS123 */
+
+	MDRV_PIA6821_ADD("pia1", pia_1_intf)
+	MDRV_PIA6821_ADD("pia2", pia_2_intf)
+	MDRV_PIA6821_ADD("pia3", pia_3_intf)
+	MDRV_PIA6821_ADD("pia4", pia_4_intf)
 
 	MDRV_TTL74123_ADD("ic60", ic60_intf)
 

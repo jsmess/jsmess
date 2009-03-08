@@ -7,10 +7,9 @@ driver by Andrew Gardner, Angelo Salese & Roberto Fresca
 TODO:
 - remaining video issues, priorities, sprites etc.;
 - inputs;
-- colors (probably needs a color prom);
+- Understand how tilemap color offsets really works;
 - Discrete sound part? There's a Rossini's "William Tell" bgm on the Chinese bootlegs,
   I think it's tied with ay8910 port B.
-- add backup ram emulation;
 - unknown memories;
 - Garbage on the window tilemap if you win, it could be a BTANB (masked by the color prom).
 - the name "King Derby" is a raw guess, there's a chance that it uses a different name
@@ -94,28 +93,31 @@ xxxx ---- basic color?
 static TILE_GET_INFO( get_sc0_tile_info )
 {
 	int tile = kingdrby_vram[tile_index] | kingdrby_attr[tile_index]<<8;
-	int color = (kingdrby_attr[tile_index] & 0x6)>>1;
+	int color = (kingdrby_attr[tile_index] & 0x06)>>1;
 
 	tile&=0x1ff;
 
 	SET_TILE_INFO(
 			1,
 			tile,
-			color,
+			color|0x40,
 			0);
 }
 
 static TILE_GET_INFO( get_sc1_tile_info )
 {
 	int tile = kingdrby_vram[tile_index] | kingdrby_attr[tile_index]<<8;
-	int color = (kingdrby_attr[tile_index] & 0x6)>>1;
+	int color = (kingdrby_attr[tile_index] & 0x06)>>1;
 
 	tile&=0x1ff;
+	//original 0xc
+	//0x13
+	//
 
 	SET_TILE_INFO(
 			1,
 			tile,
-			color,
+			color|0x40,
 			0);
 
 	tileinfo->category = (kingdrby_attr[tile_index] & 0x08)>>3;
@@ -353,12 +355,12 @@ static ADDRESS_MAP_START( slave_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3000, 0x3fff) AM_ROM //sound rom tested for the post check
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size) //backup ram
-	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)	/* I/O Ports */
-	AM_RANGE(0x6000, 0x6003) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)	/* I/O Ports */
+	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)	/* I/O Ports */
+	AM_RANGE(0x6000, 0x6003) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)	/* I/O Ports */
 	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x7400, 0x74ff) AM_RAM AM_BASE(&spriteram)
-	AM_RANGE(0x7600, 0x7600) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
-	AM_RANGE(0x7601, 0x7601) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
+	AM_RANGE(0x7600, 0x7600) AM_DEVWRITE("crtc", mc6845_address_w)
+	AM_RANGE(0x7601, 0x7601) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x7801, 0x780f) AM_WRITE(led_array_w)
 	AM_RANGE(0x7a00, 0x7a00) AM_RAM //buffer for the key matrix
 	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("DSW")
@@ -376,8 +378,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_DEVREAD(SOUND, "ay", ay8910_r)
-	AM_RANGE(0x40, 0x41) AM_DEVWRITE(SOUND, "ay", ay8910_data_address_w)
+	AM_RANGE(0x40, 0x40) AM_DEVREAD("ay", ay8910_r)
+	AM_RANGE(0x40, 0x41) AM_DEVWRITE("ay", ay8910_data_address_w)
 ADDRESS_MAP_END
 
 /*************************************
@@ -587,8 +589,8 @@ static const gfx_layout layout8x8x2 =
 	RGN_FRAC(1,2),
 	2,
 	{
-		RGN_FRAC(0,2),
-		RGN_FRAC(1,2)
+		RGN_FRAC(1,2),
+		RGN_FRAC(0,2)
 	},
 	{ STEP8(0,1) },
 	{ STEP8(0,8) },
@@ -601,8 +603,8 @@ static const gfx_layout layout16x16x2 =
 	RGN_FRAC(1,2),
 	2,
 	{
-		RGN_FRAC(0,2),
-		RGN_FRAC(1,2)
+		RGN_FRAC(1,2),
+		RGN_FRAC(0,2)
 	},
 	{ 0,1,2,3,4,5,6,7,16*8+0,16*8+1,16*8+2,16*8+3,16*8+4,16*8+5,16*8+6,16*8+7 },
 	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8,8*8,9*8,10*8,11*8,12*8,13*8,14*8,15*8  },
@@ -610,8 +612,8 @@ static const gfx_layout layout16x16x2 =
 };
 
 static GFXDECODE_START( kingdrby )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, layout16x16x2, 0, 0x10 )
-	GFXDECODE_ENTRY( "gfx2", 0x0000, layout8x8x2,   0, 0x80 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, layout16x16x2, 0x080, 0x10 )
+	GFXDECODE_ENTRY( "gfx2", 0x0000, layout8x8x2,   0x000, 0x80 )
 GFXDECODE_END
 
 /**********************************************************************************************************
@@ -653,7 +655,6 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL /* discrete write? */
 };
 
-/* mame default palette doesn't suit well with this game, so we add a dummy color_prom initialization.*/
 static PALETTE_INIT(kingdrby)
 {
 	int	bit0, bit1, bit2 , r, g, b;
@@ -661,18 +662,18 @@ static PALETTE_INIT(kingdrby)
 
 	for (i = 0; i < 0x200; ++i)
 	{
-		bit0 = (color_prom[0] >> 0) & 0x01;
-		bit1 = (color_prom[0] >> 1) & 0x01;
-		bit2 = (color_prom[0] >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = (color_prom[0] >> 3) & 0x01;
-		bit1 = (color_prom[0] >> 4) & 0x01;
-		bit2 = (color_prom[0] >> 5) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 		bit0 = 0;
-		bit1 = (color_prom[0] >> 6) & 0x01;
-		bit2 = (color_prom[0] >> 7) & 0x01;
+		bit1 = (color_prom[0] >> 1) & 0x01;
+		bit2 = (color_prom[0] >> 0) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (color_prom[0] >> 4) & 0x01;
+		bit1 = (color_prom[0] >> 3) & 0x01;
+		bit2 = (color_prom[0] >> 2) & 0x01;
+		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (color_prom[0] >> 7) & 0x01;
+		bit1 = (color_prom[0] >> 6) & 0x01;
+		bit2 = (color_prom[0] >> 5) & 0x01;
+		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 		color_prom++;
@@ -759,7 +760,7 @@ ROM_START( kingdrby )
 
 	/* color proms */
 	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD( "prom.x", 0x0000, 0x0200, NO_DUMP )
+	ROM_LOAD( "147.f8",  0x000, 0x200, CRC(9245c4af) SHA1(813d628ac55913542a4deabe6ac0a4f9db09cf19) )
 ROM_END
 
-GAME( 1981, kingdrby,  0,      kingdrby,   kingdrby,   0,       ROT0,   "Tazmi",    "King Derby",   GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )
+GAME( 1981, kingdrby,  0,      kingdrby,   kingdrby,   0,       ROT0,   "Tazmi",    "King Derby",   GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS| GAME_IMPERFECT_SOUND )

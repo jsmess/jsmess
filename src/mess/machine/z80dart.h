@@ -51,7 +51,7 @@
 	MDRV_DEVICE_CONFIG(_config)
 
 #define MDRV_Z80DART_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag, Z80DART)
+	MDRV_DEVICE_REMOVE(_tag)
 
 #define Z80DART_INTERFACE(_name) \
 	const z80dart_interface (_name) =

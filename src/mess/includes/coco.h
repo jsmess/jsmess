@@ -12,7 +12,7 @@
 #include "devices/snapquik.h"
 #include "machine/wd17xx.h"
 #include "machine/6883sam.h"
-#include "machine/6821new.h"
+#include "machine/6821pia.h"
 
 
 /***************************************************************************
@@ -36,6 +36,11 @@ struct _coco_state
 	const device_config *cassette_device;
 	const device_config *bitbanger_device;
 	const device_config *printer_device;
+	const device_config *dac;
+	const device_config *sam;
+	const device_config *pia_0;
+	const device_config *pia_1;
+	const device_config *pia_2;
 };
 
 
@@ -45,7 +50,7 @@ struct _coco_state
 
 /*----------- defined in video/coco.c -----------*/
 
-ATTR_CONST UINT8 coco_get_attributes(UINT8 c);
+ATTR_CONST UINT8 coco_get_attributes(running_machine *machine, UINT8 c);
 
 VIDEO_START( dragon );
 VIDEO_START( coco );
@@ -152,6 +157,5 @@ struct coco3_video_vars
 };
 
 extern const struct coco3_video_vars coco3_vidvars;
-
 
 #endif /* __COCO_H__ */

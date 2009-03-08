@@ -185,7 +185,7 @@ static ADDRESS_MAP_START( konamigv_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x1f801008, 0x1f80100b) AM_RAM /* ?? */
 	AM_RANGE(0x1f80100c, 0x1f80102f) AM_WRITENOP
 	AM_RANGE(0x1f801010, 0x1f801013) AM_READNOP
-	AM_RANGE(0x1f801014, 0x1f801017) AM_DEVREAD(SOUND, "spu", psx_spu_delay_r)
+	AM_RANGE(0x1f801014, 0x1f801017) AM_DEVREAD("spu", psx_spu_delay_r)
 	AM_RANGE(0x1f801040, 0x1f80105f) AM_READWRITE(psx_sio_r, psx_sio_w)
 	AM_RANGE(0x1f801060, 0x1f80106f) AM_WRITENOP
 	AM_RANGE(0x1f801070, 0x1f801077) AM_READWRITE(psx_irq_r, psx_irq_w)
@@ -193,7 +193,7 @@ static ADDRESS_MAP_START( konamigv_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x1f801100, 0x1f80112f) AM_READWRITE(psx_counter_r, psx_counter_w)
 	AM_RANGE(0x1f801810, 0x1f801817) AM_READWRITE(psx_gpu_r, psx_gpu_w)
 	AM_RANGE(0x1f801820, 0x1f801827) AM_READWRITE(psx_mdec_r, psx_mdec_w)
-	AM_RANGE(0x1f801c00, 0x1f801dff) AM_DEVREADWRITE(SOUND, "spu", psx_spu_r, psx_spu_w)
+	AM_RANGE(0x1f801c00, 0x1f801dff) AM_DEVREADWRITE("spu", psx_spu_r, psx_spu_w)
 	AM_RANGE(0x1f802020, 0x1f802033) AM_RAM /* ?? */
 	AM_RANGE(0x1f802040, 0x1f802043) AM_WRITENOP
 	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_SHARE(2) AM_REGION("user1", 0) /* bios */
@@ -322,7 +322,7 @@ static MACHINE_RESET( konamigv )
 	psx_machine_init(machine);
 
 	/* also hook up CDDA audio to the CD-ROM drive */
-	cdda_set_cdrom(devtag_get_device(machine, SOUND, "cdda"), am53cf96_get_device(SCSI_ID_4));
+	cdda_set_cdrom(devtag_get_device(machine, "cdda"), am53cf96_get_device(SCSI_ID_4));
 
 	state_save_register_global_array(machine, sector_buffer);
 	state_save_register_global(machine, flash_address);
@@ -722,11 +722,11 @@ static DRIVER_INIT( kdeadeye )
 {
 	intelflash_init( machine, 0, FLASH_SHARP_LH28F400, NULL );
 
-	memory_install_read32_handler     ( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f680080, 0x1f680083, 0, 0, input_port_read_handler32(machine->portconfig, "GUNX1") );
-	memory_install_read32_handler     ( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f680090, 0x1f680093, 0, 0, input_port_read_handler32(machine->portconfig, "GUNY1") );
-	memory_install_read32_handler     ( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f6800a0, 0x1f6800a3, 0, 0, input_port_read_handler32(machine->portconfig, "GUNX2") );
-	memory_install_read32_handler     ( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f6800b0, 0x1f6800b3, 0, 0, input_port_read_handler32(machine->portconfig, "GUNY2") );
-	memory_install_read32_handler     ( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f6800c0, 0x1f6800c3, 0, 0, input_port_read_handler32(machine->portconfig, "BUTTONS") );
+	memory_install_read_port_handler  ( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f680080, 0x1f680083, 0, 0, "GUNX1" );
+	memory_install_read_port_handler  ( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f680090, 0x1f680093, 0, 0, "GUNY1" );
+	memory_install_read_port_handler  ( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f6800a0, 0x1f6800a3, 0, 0, "GUNX2" );
+	memory_install_read_port_handler  ( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f6800b0, 0x1f6800b3, 0, 0, "GUNY2" );
+	memory_install_read_port_handler  ( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f6800c0, 0x1f6800c3, 0, 0, "BUTTONS" );
 	memory_install_write32_handler    ( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f6800e0, 0x1f6800e3, 0, 0, kdeadeye_0_w );
 	memory_install_readwrite32_handler( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f380000, 0x1f3fffff, 0, 0, btcflash_r, btcflash_w );
 

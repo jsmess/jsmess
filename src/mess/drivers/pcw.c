@@ -434,8 +434,8 @@ static WRITE8_HANDLER(pcw_vdu_video_control_register_w)
 
 static WRITE8_HANDLER(pcw_system_control_w)
 {
-	device_config *fdc = (device_config*)devtag_get_device(space->machine, NEC765A, "nec765");
-	const device_config *speaker = devtag_get_device(space->machine, SOUND, "beep");
+	const device_config *fdc = devtag_get_device(space->machine, "nec765");
+	const device_config *speaker = devtag_get_device(space->machine, "beep");
 	LOG(("SYSTEM CONTROL: %d\n",data));
 
 	switch (data)
@@ -655,7 +655,7 @@ static WRITE8_HANDLER(pcw_expansion_w)
 
 static READ8_HANDLER(pcw_fdc_r)
 {
-	device_config *fdc = (device_config*)devtag_get_device(space->machine, NEC765A, "nec765");
+	const device_config *fdc = devtag_get_device(space->machine, "nec765");
 	/* from Jacob Nevins docs. FDC I/O is not fully decoded */
 	if (offset & 1)
 	{
@@ -667,7 +667,7 @@ static READ8_HANDLER(pcw_fdc_r)
 
 static WRITE8_HANDLER(pcw_fdc_w)
 {
-	device_config *fdc = (device_config*)devtag_get_device(space->machine, NEC765A, "nec765");
+	const device_config *fdc = devtag_get_device(space->machine, "nec765");
 	/* from Jacob Nevins docs. FDC I/O is not fully decoded */
 	if (offset & 1)
 	{
@@ -744,7 +744,7 @@ ADDRESS_MAP_END
 
 static TIMER_CALLBACK(setup_beep)
 {
-	const device_config *speaker = devtag_get_device(machine, SOUND, "beep");
+	const device_config *speaker = devtag_get_device(machine, "beep");
 	beep_set_state(speaker, 0);
 	beep_set_frequency(speaker, 3750);
 }

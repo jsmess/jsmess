@@ -14,7 +14,7 @@
 #include "cpu/m6502/m6502.h"
 #include "includes/atari.h"
 #include "sound/pokey.h"
-#include "machine/6821new.h"
+#include "machine/6821pia.h"
 #include "image.h"
 
 #define VERBOSE_SERIAL	0
@@ -389,7 +389,7 @@ static void add_serout(int expect_data)
 
 static void clr_serin(running_machine *machine, int ser_delay)
 {
-	const device_config *pokey = devtag_get_device(machine, SOUND, "pokey");
+	const device_config *pokey = devtag_get_device(machine, "pokey");
 	atari_fdc.serin_chksum = 0;
 	atari_fdc.serin_offs = 0;
 	atari_fdc.serin_count = 0;
@@ -670,7 +670,7 @@ READ8_HANDLER ( atari_serin_r )
 
 	if (atari_fdc.serin_count)
 	{
-		const device_config *pokey = devtag_get_device(space->machine, SOUND, "pokey");
+		const device_config *pokey = devtag_get_device(space->machine, "pokey");
 
 		data = atari_fdc.serin_buff[atari_fdc.serin_offs];
 		ser_delay = 2 * 40;
@@ -695,7 +695,7 @@ READ8_HANDLER ( atari_serin_r )
 
 WRITE8_HANDLER ( atari_serout_w )
 {
-	const device_config *pia = devtag_get_device( space->machine, PIA6821, "pia" );
+	const device_config *pia = devtag_get_device( space->machine, "pia" );
 
 	/* ignore serial commands if no floppy image is specified */
 	if( !drv[0].image )
@@ -714,7 +714,7 @@ WRITE8_HANDLER ( atari_serout_w )
 			/* exclusive or written checksum with calculated */
 			atari_fdc.serout_chksum ^= data;
 			/* if the attention line is high, this should be data */
-			if (pianew_get_irq_b(pia))
+			if (pia6821_get_irq_b(pia))
 				a800_serial_write(space->machine);
 		}
 		else
@@ -726,15 +726,15 @@ WRITE8_HANDLER ( atari_serout_w )
 
 
 
-WRITE8_HANDLER(atari_pia_cb2_w)
+WRITE_LINE_DEVICE_HANDLER(atari_pia_cb2_w)
 {
-	if (!data)
+	if (!state)
 	{
 		clr_serout(4); /* expect 4 command bytes + checksum */
 	}
 	else
 	{
 		atari_fdc.serin_delay = 0;
-		a800_serial_command(space->machine);
+		a800_serial_command(device->machine);
 	}
 }

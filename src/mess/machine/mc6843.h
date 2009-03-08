@@ -26,7 +26,7 @@ struct _mc6843_interface
   MDRV_DEVICE_CONFIG(_intrf)
 
 #define MDRV_MC6843_REMOVE(_tag)		\
-  MDRV_DEVICE_REMOVE(_tag, MC6843)
+  MDRV_DEVICE_REMOVE(_tag)
 
 
 /* ---------- functions ------------ */

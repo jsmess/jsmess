@@ -124,20 +124,22 @@ Notes (couriersud)
  *
  *************************************/
 
-#define DEBUG		(1)
+#define DEBUG		(0)
+
+#define LOG(x) do { if (DEBUG) printf x; } while (0)
 
 static WRITE8_DEVICE_HANDLER(ic8j1_output_changed)
 {
-	printf("ic8j1: %d %d\n", data, video_screen_get_vpos(device->machine->primary_screen));
+	LOG(("ic8j1: %d %d\n", data, video_screen_get_vpos(device->machine->primary_screen)));
 	cpu_set_input_line(device->machine->cpu[0], 0, !data ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER(ic8j2_output_changed)
 {
 	/* written from /Q to A with slight delight */
-	printf("ic8j2: %d\n", data);
+	LOG(("ic8j2: %d\n", data));
 	ttl74123_a_w(device, 0, data);
-	ttl74123_a_w(devtag_get_device(device->machine, TTL74123, "ic8j1"), 0, data);
+	ttl74123_a_w(devtag_get_device(device->machine, "ic8j1"), 0, data);
 }
 
 static const ttl74123_config ic8j1_intf =
@@ -222,7 +224,7 @@ static MACHINE_RESET( irem )
 
 static WRITE8_HANDLER( m10_ctrl_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(space->machine, "samples");
 	m10_state *state = space->machine->driver_data;
 
 #if DEBUG
@@ -370,7 +372,7 @@ static WRITE8_HANDLER( m10_a500_w )
 static WRITE8_HANDLER( m11_a100_w )
 {
 	static int last = 0x00;
-	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(space->machine, "samples");
 	int raising_bits = data & ~last;
 	//int falling_bits = ~data & last;
 
@@ -405,7 +407,7 @@ static WRITE8_HANDLER( m11_a100_w )
 static WRITE8_HANDLER( m15_a100_w )
 {
 	static int last = 0x00;
-	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(space->machine, "samples");
 	//int raising_bits = data & ~last;
 	int falling_bits = ~data & last;
 
@@ -463,20 +465,20 @@ static WRITE8_HANDLER( m15_a100_w )
 
 static READ8_HANDLER( m10_a700_r )
 {
-   	//printf("rd:%d\n",video_screen_get_vpos(space->machine->primary_screen));
-	printf("clear\n");
-	ttl74123_clear_w(devtag_get_device(space->machine, TTL74123, "ic8j1"), 0, 0);
-	ttl74123_clear_w(devtag_get_device(space->machine, TTL74123, "ic8j1"), 0, 1);
+   	//LOG(("rd:%d\n",video_screen_get_vpos(space->machine->primary_screen)));
+	LOG(("clear\n"));
+	ttl74123_clear_w(devtag_get_device(space->machine, "ic8j1"), 0, 0);
+	ttl74123_clear_w(devtag_get_device(space->machine, "ic8j1"), 0, 1);
 	return 0x00;
 }
 
 static READ8_HANDLER( m11_a700_r )
 {
-   	//printf("rd:%d\n",video_screen_get_vpos(space->machine->primary_screen));
+   	//LOG(("rd:%d\n",video_screen_get_vpos(space->machine->primary_screen)));
 	//cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
-	printf("clear\n");
-	ttl74123_clear_w(devtag_get_device(space->machine, TTL74123, "ic8j1"), 0, 0);
-	ttl74123_clear_w(devtag_get_device(space->machine, TTL74123, "ic8j1"), 0, 1);
+	LOG(("clear\n"));
+	ttl74123_clear_w(devtag_get_device(space->machine, "ic8j1"), 0, 0);
+	ttl74123_clear_w(devtag_get_device(space->machine, "ic8j1"), 0, 1);
 	return 0x00;
 }
 
@@ -540,7 +542,7 @@ static ADDRESS_MAP_START( m10_main, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0x2fff) AM_READ(SMH_ROM) AM_BASE_MEMBER(m10_state, rom)
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(m10_colorram_w) AM_BASE(&colorram) /* foreground colour  */
-	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_BASE_MEMBER(m10_state, chargen) /* background ????? */
+	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE(m10_chargen_w) AM_BASE_MEMBER(m10_state, chargen) /* background ????? */
 	AM_RANGE(0xa200, 0xa200) AM_READ_PORT("DSW")
 	AM_RANGE(0xa300, 0xa300) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xa400, 0xa400) AM_WRITE(m10_ctrl_w)	/* line at bottom of screen?, sound, flip screen */

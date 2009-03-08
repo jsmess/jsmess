@@ -147,6 +147,7 @@
 #include "mw8080bw.h"
 #include "machine/mb14241.h"
 
+#include "280zzzap.lh"
 #include "clowns.lh"
 #include "invaders.lh"
 #include "invad2ct.lh"
@@ -611,7 +612,7 @@ static CUSTOM_INPUT( tornbase_score_input_r )
 
 static WRITE8_HANDLER( tornbase_io_w )
 {
-	if (offset & 0x01)  tornbase_audio_w(devtag_get_device(space->machine, SOUND, "discrete"), 0, data);
+	if (offset & 0x01)  tornbase_audio_w(devtag_get_device(space->machine, "discrete"), 0, data);
 
 	if (offset & 0x02)  mb14241_0_shift_count_w(space, 0, data);
 
@@ -859,14 +860,14 @@ static UINT8 maze_tone_timing_state;
 
 static STATE_POSTLOAD( maze_update_discrete )
 {
-	maze_write_discrete(devtag_get_device(machine, SOUND, "discrete"), maze_tone_timing_state);
+	maze_write_discrete(devtag_get_device(machine, "discrete"), maze_tone_timing_state);
 }
 
 
 static TIMER_CALLBACK( maze_tone_timing_timer_callback )
 {
 	maze_tone_timing_state = !maze_tone_timing_state;
-	maze_write_discrete(devtag_get_device(machine, SOUND, "discrete"), maze_tone_timing_state);
+	maze_write_discrete(devtag_get_device(machine, "discrete"), maze_tone_timing_state);
 }
 
 
@@ -980,10 +981,10 @@ static ADDRESS_MAP_START( boothill_io_map, ADDRESS_SPACE_IO, 8 )
 
 	AM_RANGE(0x01, 0x01) AM_WRITE(mw8080bw_reversable_shift_count_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(mb14241_0_shift_data_w)
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE(SOUND, "discrete", boothill_audio_w)
+	AM_RANGE(0x03, 0x03) AM_DEVWRITE("discrete", boothill_audio_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x05, 0x05) AM_DEVWRITE(SOUND, "discrete", midway_tone_generator_lo_w)
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE(SOUND, "discrete", midway_tone_generator_hi_w)
+	AM_RANGE(0x05, 0x05) AM_DEVWRITE("discrete", midway_tone_generator_lo_w)
+	AM_RANGE(0x06, 0x06) AM_DEVWRITE("discrete", midway_tone_generator_hi_w)
 ADDRESS_MAP_END
 
 
@@ -1055,7 +1056,7 @@ MACHINE_DRIVER_END
 
 static WRITE8_HANDLER( checkmat_io_w )
 {
-	if (offset & 0x01)  checkmat_audio_w(devtag_get_device(space->machine, SOUND, "discrete"), 0, data);
+	if (offset & 0x01)  checkmat_audio_w(devtag_get_device(space->machine, "discrete"), 0, data);
 
 	if (offset & 0x02)  watchdog_reset_w(space, 0, data);
 }
@@ -1212,11 +1213,11 @@ static ADDRESS_MAP_START( desertgu_io_map, ADDRESS_SPACE_IO, 8 )
 
 	AM_RANGE(0x01, 0x01) AM_WRITE(mb14241_0_shift_count_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(mb14241_0_shift_data_w)
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE(SOUND, "discrete", desertgu_audio_1_w)
+	AM_RANGE(0x03, 0x03) AM_DEVWRITE("discrete", desertgu_audio_1_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x05, 0x05) AM_DEVWRITE(SOUND, "discrete", midway_tone_generator_lo_w)
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE(SOUND, "discrete", midway_tone_generator_hi_w)
-	AM_RANGE(0x07, 0x07) AM_DEVWRITE(SOUND, "discrete", desertgu_audio_2_w)
+	AM_RANGE(0x05, 0x05) AM_DEVWRITE("discrete", midway_tone_generator_lo_w)
+	AM_RANGE(0x06, 0x06) AM_DEVWRITE("discrete", midway_tone_generator_hi_w)
+	AM_RANGE(0x07, 0x07) AM_DEVWRITE("discrete", desertgu_audio_2_w)
 ADDRESS_MAP_END
 
 
@@ -1332,10 +1333,10 @@ static ADDRESS_MAP_START( dplay_io_map, ADDRESS_SPACE_IO, 8 )
 
 	AM_RANGE(0x01, 0x01) AM_WRITE(mb14241_0_shift_count_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(mb14241_0_shift_data_w)
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE(SOUND, "discrete", dplay_audio_w)
+	AM_RANGE(0x03, 0x03) AM_DEVWRITE("discrete", dplay_audio_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x05, 0x05) AM_DEVWRITE(SOUND, "discrete", midway_tone_generator_lo_w)
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE(SOUND, "discrete", midway_tone_generator_hi_w)
+	AM_RANGE(0x05, 0x05) AM_DEVWRITE("discrete", midway_tone_generator_lo_w)
+	AM_RANGE(0x06, 0x06) AM_DEVWRITE("discrete", midway_tone_generator_hi_w)
 ADDRESS_MAP_END
 
 
@@ -1720,9 +1721,9 @@ static ADDRESS_MAP_START( clowns_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x02, 0x02) AM_WRITE(mb14241_0_shift_data_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(clowns_audio_1_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x05, 0x05) AM_DEVWRITE(SOUND, "discrete", midway_tone_generator_lo_w)
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE(SOUND, "discrete", midway_tone_generator_hi_w)
-	AM_RANGE(0x07, 0x07) AM_DEVWRITE(SOUND, "discrete", clowns_audio_2_w)
+	AM_RANGE(0x05, 0x05) AM_DEVWRITE("discrete", midway_tone_generator_lo_w)
+	AM_RANGE(0x06, 0x06) AM_DEVWRITE("discrete", midway_tone_generator_hi_w)
+	AM_RANGE(0x07, 0x07) AM_DEVWRITE("discrete", clowns_audio_2_w)
 ADDRESS_MAP_END
 
 
@@ -1933,8 +1934,8 @@ static ADDRESS_MAP_START( dogpatch_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x02, 0x02) AM_WRITE(mb14241_0_shift_data_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(dogpatch_audio_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x05, 0x05) AM_DEVWRITE(SOUND, "discrete", midway_tone_generator_lo_w)
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE(SOUND, "discrete", midway_tone_generator_hi_w)
+	AM_RANGE(0x05, 0x05) AM_DEVWRITE("discrete", midway_tone_generator_lo_w)
+	AM_RANGE(0x06, 0x06) AM_DEVWRITE("discrete", midway_tone_generator_hi_w)
 ADDRESS_MAP_END
 
 
@@ -2065,13 +2066,13 @@ static WRITE8_HANDLER( spcenctr_io_w )
 		watchdog_reset_w(space, 0, data);		/*  -  -  -  -  -  0  1  0 */
 
 	else if ((offset & 0x5f) == 0x01)
-		spcenctr_audio_1_w(devtag_get_device(space->machine, SOUND, "discrete"), 0, data);	/*  -  0  -  0  0  0  0  1 */
+		spcenctr_audio_1_w(devtag_get_device(space->machine, "discrete"), 0, data);	/*  -  0  -  0  0  0  0  1 */
 
 	else if ((offset & 0x5f) == 0x09)
-		spcenctr_audio_2_w(devtag_get_device(space->machine, SOUND, "discrete"), 0, data);	/*  -  0  -  0  1  0  0  1 */
+		spcenctr_audio_2_w(devtag_get_device(space->machine, "discrete"), 0, data);	/*  -  0  -  0  1  0  0  1 */
 
 	else if ((offset & 0x5f) == 0x11)
-		spcenctr_audio_3_w(devtag_get_device(space->machine, SOUND, "discrete"), 0, data);	/*  -  0  -  1  0  0  0  1 */
+		spcenctr_audio_3_w(devtag_get_device(space->machine, "discrete"), 0, data);	/*  -  0  -  1  0  0  0  1 */
 
 	else if ((offset & 0x07) == 0x03)
 	{											/*  -  -  -  -  -  0  1  1 */
@@ -2343,7 +2344,7 @@ static ADDRESS_MAP_START( bowler_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x01, 0x01) AM_WRITE(mb14241_0_shift_count_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(mb14241_0_shift_data_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x05, 0x05) AM_DEVWRITE(SOUND, "discrete", bowler_audio_1_w)
+	AM_RANGE(0x05, 0x05) AM_DEVWRITE("discrete", bowler_audio_1_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE(bowler_audio_2_w)
 	AM_RANGE(0x07, 0x07) AM_WRITE(bowler_lights_1_w)
 	AM_RANGE(0x08, 0x08) AM_WRITE(bowler_audio_3_w)
@@ -2539,9 +2540,9 @@ static ADDRESS_MAP_START( invaders_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x03, 0x03) AM_MIRROR(0x04) AM_READ(mb14241_0_shift_result_r)
 
 	AM_RANGE(0x02, 0x02) AM_WRITE(mb14241_0_shift_count_w)
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE(SOUND, "discrete", invaders_audio_1_w)
+	AM_RANGE(0x03, 0x03) AM_DEVWRITE("discrete", invaders_audio_1_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(mb14241_0_shift_data_w)
-	AM_RANGE(0x05, 0x05) AM_DEVWRITE(SOUND, "discrete", invaders_audio_2_w)
+	AM_RANGE(0x05, 0x05) AM_DEVWRITE("discrete", invaders_audio_2_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
 
@@ -2668,7 +2669,7 @@ static ADDRESS_MAP_START( blueshrk_io_map, ADDRESS_SPACE_IO, 8 )
 
 	AM_RANGE(0x01, 0x01) AM_WRITE(mb14241_0_shift_count_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(mb14241_0_shift_data_w)
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE(SOUND, "discrete", blueshrk_audio_w)
+	AM_RANGE(0x03, 0x03) AM_DEVWRITE("discrete", blueshrk_audio_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
 
@@ -2744,13 +2745,13 @@ static ADDRESS_MAP_START( invad2ct_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x02, 0x02) AM_MIRROR(0x04) AM_READ_PORT("IN2")
 	AM_RANGE(0x03, 0x03) AM_MIRROR(0x04) AM_READ(mb14241_0_shift_result_r)
 
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE(SOUND, "discrete", invad2ct_audio_3_w)
+	AM_RANGE(0x01, 0x01) AM_DEVWRITE("discrete", invad2ct_audio_3_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(mb14241_0_shift_count_w)
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE(SOUND, "discrete", invad2ct_audio_1_w)
+	AM_RANGE(0x03, 0x03) AM_DEVWRITE("discrete", invad2ct_audio_1_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(mb14241_0_shift_data_w)
-	AM_RANGE(0x05, 0x05) AM_DEVWRITE(SOUND, "discrete", invad2ct_audio_2_w)
+	AM_RANGE(0x05, 0x05) AM_DEVWRITE("discrete", invad2ct_audio_2_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x07, 0x07) AM_DEVWRITE(SOUND, "discrete", invad2ct_audio_4_w)
+	AM_RANGE(0x07, 0x07) AM_DEVWRITE("discrete", invad2ct_audio_4_w)
 ADDRESS_MAP_END
 
 
@@ -3063,14 +3064,14 @@ ROM_END
 /* 597 */ GAMEL(1975, gunfight, 0,        gunfight, gunfight, 0, ROT0,   "Midway", "Gun Fight", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE , layout_hoffff20 )
 /* 604 Gun Fight (cocktail, dump does not exist) */
 /* 605 */ GAME( 1976, tornbase, 0,        tornbase, tornbase, 0, ROT0,   "Midway / Taito", "Tornado Baseball / Ball Park", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
-/* 610 */ GAME( 1976, 280zzzap, 0,        zzzap,    zzzap,    0, ROT0,   "Midway", "Datsun 280 Zzzap", GAME_NO_SOUND | GAME_SUPPORTS_SAVE  )
+/* 610 */ GAMEL(1976, 280zzzap, 0,        zzzap,    zzzap,    0, ROT0,   "Midway", "Datsun 280 Zzzap", GAME_NO_SOUND | GAME_SUPPORTS_SAVE , layout_280zzzap )
 /* 611 */ GAMEL(1976, maze,     0,        maze,     maze,     0, ROT0,   "Midway", "Amazing Maze", GAME_SUPPORTS_SAVE , layout_ho4f893d )
 /* 612 */ GAME( 1977, boothill, 0,        boothill, boothill, 0, ROT0,   "Midway", "Boot Hill" , GAME_SUPPORTS_SAVE  )
 /* 615 */ GAME( 1977, checkmat, 0,        checkmat, checkmat, 0, ROT0,   "Midway", "Checkmate", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
 /* 618 */ GAME( 1977, desertgu, 0,        desertgu, desertgu, 0, ROT0,   "Midway", "Desert Gun", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
 /* 618 */ GAME( 1977, roadrunm, desertgu, desertgu, desertgu, 0, ROT0,   "Midway", "Road Runner (Midway)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 /* 619 */ GAME( 1977, dplay,    0,        dplay,    dplay,    0, ROT0,   "Midway", "Double Play", GAME_SUPPORTS_SAVE  )
-/* 622 */ GAME( 1977, lagunar,  0,        zzzap,    lagunar,  0, ROT90,  "Midway", "Laguna Racer", GAME_NO_SOUND | GAME_SUPPORTS_SAVE  )
+/* 622 */ GAMEL(1977, lagunar,  0,        zzzap,    lagunar,  0, ROT90,  "Midway", "Laguna Racer", GAME_NO_SOUND | GAME_SUPPORTS_SAVE , layout_280zzzap )
 /* 623 */ GAME( 1977, gmissile, 0,        gmissile, gmissile, 0, ROT0,   "Taito / Midway", "Missile X / Guided Missile", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
 /* 626 */ GAME( 1977, m4,       0,        m4,       m4,       0, ROT0,   "Midway", "M-4", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
 /* 630 */ GAMEL(1978, clowns,   0,        clowns,   clowns,   0, ROT0,   "Midway", "Clowns (rev. 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE , layout_clowns )

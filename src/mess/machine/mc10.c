@@ -88,7 +88,7 @@ READ8_HANDLER ( mc10_bfff_r )
 
 WRITE8_HANDLER ( mc10_bfff_w )
 {
-	const device_config *dac_device = devtag_get_device(space->machine, SOUND, "dac");
+	const device_config *dac_device = devtag_get_device(space->machine, "dac");
 
 	/*   BIT 2 GM2 6847 CONTROL & INT/EXT CONTROL
      *   BIT 3 GM1 6847 CONTROL
@@ -137,7 +137,7 @@ READ8_HANDLER ( mc10_port2_r )
      *   BIT 4 CASSETTE TAPE INPUT
      */
 
-	const device_config *img = devtag_get_device(space->machine, CASSETTE, "cassette");
+	const device_config *img = devtag_get_device(space->machine, "cassette");
 	int val = 0xed;
 
 	if ((input_port_read(space->machine, "LINE6") | mc10_keyboard_strobe) == 0xff)
@@ -152,7 +152,7 @@ READ8_HANDLER ( mc10_port2_r )
 
 WRITE8_HANDLER ( mc10_port2_w )
 {
-	const device_config *img = devtag_get_device(space->machine, CASSETTE, "cassette");
+	const device_config *img = devtag_get_device(space->machine, "cassette");
 
 	/*   BIT 0 PRINTER OUTFUT & CASS OUTPUT
      */
@@ -167,7 +167,7 @@ WRITE8_HANDLER ( mc10_port2_w )
 *****************************************************************************/
 
 
-static ATTR_CONST UINT8 mc10_get_attributes(UINT8 c)
+static ATTR_CONST UINT8 mc10_get_attributes(running_machine *machine, UINT8 c)
 {
 	UINT8 result = 0x00;
 	if (c & 0x40)			result |= M6847_INV;

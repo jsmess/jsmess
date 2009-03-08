@@ -10,7 +10,7 @@
 #include "devices/thomflop.h"
 #include "formats/thom_dsk.h"
 #include "includes/thomson.h"
-#include "machine/6821new.h"
+#include "machine/6821pia.h"
 #include "machine/ctronics.h"
 
 #define VERBOSE       0
@@ -39,7 +39,7 @@
 /********************* common cassette code ***************************/
 
 INLINE const device_config* thom_cassette_img( running_machine *machine )
-{ return devtag_get_device(machine, CASSETTE, "cassette"); }
+{ return devtag_get_device(machine, "cassette"); }
 
 /*-------------- TO7 ------------*/
 
@@ -378,9 +378,7 @@ static struct serial_connection to7_io_line;
 
 DEVICE_START( thom_serial )
 {
-	const device_config *acia = device_list_find_by_tag(device->machine->config->devicelist,
-		ACIA6551,
-		"acia");
+	const device_config *acia = devtag_get_device(device->machine, "acia");
 	int idx = image_index_in_device(device);
 
 	DEVICE_START_CALL(serial_device);
@@ -574,7 +572,7 @@ static WRITE8_DEVICE_HANDLER ( to7_timer_port_out )
 
 static WRITE8_DEVICE_HANDLER ( to7_timer_cp2_out )
 {
-	dac_data_w( devtag_get_device(device->machine, SOUND, "buzzer"), data ? 0x80 : 0); /* 1-bit buzzer */
+	dac_data_w( devtag_get_device(device->machine, "buzzer"), data ? 0x80 : 0); /* 1-bit buzzer */
 }
 
 
@@ -617,14 +615,14 @@ static UINT8 to7_lightpen;
 
 static void to7_lightpen_cb ( running_machine *machine, int step )
 {
-	const device_config *sys_pia = devtag_get_device( machine, PIA6821, THOM_PIA_SYS );
+	const device_config *sys_pia = devtag_get_device( machine, THOM_PIA_SYS );
 
 	if ( ! to7_lightpen )
 		return;
 
 	LOG_VIDEO(( "%f to7_lightpen_cb: step=%i\n", attotime_to_double(timer_get_time(machine)), step ));
-	pia_cb1_w( sys_pia, 0, 1 );
-	pia_cb1_w( sys_pia, 0, 0 );
+	pia6821_cb1_w( sys_pia, 0, 1 );
+	pia6821_cb1_w( sys_pia, 0, 0 );
 	to7_lightpen_step = step;
 }
 
@@ -636,11 +634,11 @@ static void to7_lightpen_cb ( running_machine *machine, int step )
 
 static void to7_set_init ( running_machine *machine, int init )
 {
-	const device_config *sys_pia = devtag_get_device( machine, PIA6821, THOM_PIA_SYS );
+	const device_config *sys_pia = devtag_get_device( machine, THOM_PIA_SYS );
 	/* INIT signal wired to system PIA 6821 */
 
 	LOG_VIDEO(( "%f to7_set_init: init=%i\n", attotime_to_double(timer_get_time(machine)), init ));
-	pia_ca1_w( sys_pia, 0, init );
+	pia6821_ca1_w( sys_pia, 0, init );
 }
 
 
@@ -677,7 +675,7 @@ static READ8_DEVICE_HANDLER ( to7_sys_porta_in )
 	else
 	{
 		/* keyboard  */
-		int keyline = pianew_get_output_b( device );
+		int keyline = pia6821_get_output_b( device );
 		UINT8 val = 0xff;
 		int i;
 		static const char *const keynames[] = { "keyboard_0", "keyboard_1", "keyboard_2", "keyboard_3",
@@ -746,7 +744,7 @@ typedef enum
 */
 static to7_io_dev to7_io_mode( running_machine *machine )
 {
-	const device_config *centronics = devtag_get_device(machine, CENTRONICS, "centronics");
+	const device_config *centronics = devtag_get_device(machine, "centronics");
 
 	if (centronics_pe_r(centronics) == TRUE)
 		return TO7_IO_CENTRONICS;
@@ -759,9 +757,9 @@ static to7_io_dev to7_io_mode( running_machine *machine )
 
 static WRITE_LINE_DEVICE_HANDLER( to7_io_ack )
 {
-	const device_config *io_pia = devtag_get_device( device->machine, PIA6821, THOM_PIA_IO );
+	const device_config *io_pia = devtag_get_device( device->machine, THOM_PIA_IO );
 
-	pia_cb1_w( io_pia, 0, state);
+	pia6821_cb1_w( io_pia, 0, state);
 	//LOG_IO (( "%f to7_io_ack: CENTRONICS new state $%02X (ack=%i)\n", attotime_to_double(timer_get_time(machine)), data, ack ));
 }
 
@@ -786,7 +784,7 @@ static WRITE8_DEVICE_HANDLER ( to7_io_porta_out )
 
 static READ8_DEVICE_HANDLER( to7_io_porta_in )
 {
-	const device_config *printer = devtag_get_device(device->machine, CENTRONICS, "centronics");
+	const device_config *printer = devtag_get_device(device->machine, "centronics");
 	int cts = 1;
 	int dsr = ( to7_io_line.input_state & SERIAL_STATE_DSR ) ? 0 : 1;
 	int rd  = get_in_data_bit( to7_io_line.input_state );
@@ -805,7 +803,7 @@ static READ8_DEVICE_HANDLER( to7_io_porta_in )
 
 static WRITE8_DEVICE_HANDLER( to7_io_portb_out )
 {
-	const device_config *printer = devtag_get_device(device->machine, CENTRONICS, "centronics");
+	const device_config *printer = devtag_get_device(device->machine, "centronics");
 
 	LOG_IO(( "$%04x %f to7_io_portb_out: CENTRONICS set data=$%02X\n", cpu_get_previouspc( device->machine->cpu[0] ), attotime_to_double(timer_get_time(device->machine)), data ));
 
@@ -817,7 +815,7 @@ static WRITE8_DEVICE_HANDLER( to7_io_portb_out )
 
 static WRITE8_DEVICE_HANDLER( to7_io_cb2_out )
 {
-	const device_config *printer = devtag_get_device(device->machine, CENTRONICS, "centronics");
+	const device_config *printer = devtag_get_device(device->machine, "centronics");
 
 	LOG_IO(( "$%04x %f to7_io_cb2_out: CENTRONICS set strobe=%i\n", cpu_get_previouspc( device->machine->cpu[0] ), attotime_to_double(timer_get_time(device->machine)), data ));
 
@@ -865,11 +863,11 @@ const centronics_interface to7_centronics_config =
 
 static void to7_io_reset( running_machine *machine )
 {
-	const device_config *io_pia = devtag_get_device( machine, PIA6821, THOM_PIA_IO );
+	const device_config *io_pia = devtag_get_device( machine, THOM_PIA_IO );
 
 	LOG (( "to7_io_reset called\n" ));
 
-	pianew_set_port_a_z_mask( io_pia, 0x03 );
+	pia6821_set_port_a_z_mask( io_pia, 0x03 );
 	to7_io_line.input_state = SERIAL_STATE_CTS;
 	to7_io_line.State &= ~SERIAL_STATE_DTR;
 	to7_io_line.State |=  SERIAL_STATE_RTS;  /* always ready to send */
@@ -993,12 +991,12 @@ READ8_HANDLER ( to7_modem_mea8000_r )
 {
 	if ( input_port_read(space->machine, "mconfig") & 1 )
 	{
-		const device_config* device = devtag_get_device(space->machine, MEA8000, "mea8000" );
+		const device_config* device = devtag_get_device(space->machine, "mea8000" );
 		return mea8000_r( device, offset );
 	}
 	else
 	{
-		const device_config* device = devtag_get_device(space->machine, ACIA6850, "acia6850" );
+		const device_config* device = devtag_get_device(space->machine, "acia6850" );
 		switch (offset) {
 		case 0: return acia6850_stat_r( device, offset );
 		case 1: return acia6850_data_r( device, offset );
@@ -1013,12 +1011,12 @@ WRITE8_HANDLER ( to7_modem_mea8000_w )
 {
 	if ( input_port_read(space->machine, "mconfig") & 1 )
 	{
-		const device_config* device = devtag_get_device(space->machine, MEA8000, "mea8000" );
+		const device_config* device = devtag_get_device(space->machine, "mea8000" );
 		mea8000_w( device, offset, data );
 	}
 	else
 	{
-		const device_config* device = devtag_get_device(space->machine, ACIA6850, "acia6850" );
+		const device_config* device = devtag_get_device(space->machine, "acia6850" );
 		switch (offset) {
 		case 0: acia6850_ctrl_w( device, offset, data );
 		case 1: acia6850_data_w( device, offset, data );
@@ -1076,7 +1074,7 @@ static UINT8 to7_get_mouse_signal( running_machine *machine )
 
 static void to7_game_sound_update ( running_machine *machine )
 {
-	dac_data_w( devtag_get_device(machine, SOUND, "dac"), to7_game_mute ? 0 : (to7_game_sound << 2) );
+	dac_data_w( devtag_get_device(machine, "dac"), to7_game_mute ? 0 : (to7_game_sound << 2) );
 }
 
 
@@ -1187,23 +1185,23 @@ const pia6821_interface to7_pia6821_game =
 /* this should be called periodically */
 static TIMER_CALLBACK(to7_game_update_cb)
 {
-	const device_config *game_pia = devtag_get_device( machine, PIA6821, THOM_PIA_GAME );
+	const device_config *game_pia = devtag_get_device( machine, THOM_PIA_GAME );
 
 	if ( input_port_read(machine, "config") & 1 )
 	{
 		/* mouse */
 		UINT8 mouse = to7_get_mouse_signal(machine);
-		pia_ca1_w( game_pia, 0, (mouse & 1) ? 1 : 0 ); /* XA */
-		pia_ca2_w( game_pia, 0, (mouse & 2) ? 1 : 0 ); /* YA */
+		pia6821_ca1_w( game_pia, 0, (mouse & 1) ? 1 : 0 ); /* XA */
+		pia6821_ca2_w( game_pia, 0, (mouse & 2) ? 1 : 0 ); /* YA */
 	}
 	else
 	{
 		/* joystick */
 		UINT8 in = input_port_read(machine, "game_port_buttons");
-		pia_cb2_w( game_pia, 0, (in & 0x80) ? 1 : 0 ); /* P2 action A */
-		pia_ca2_w( game_pia, 0, (in & 0x40) ? 1 : 0 ); /* P1 action A */
-		pia_cb1_w( game_pia, 0, (in & 0x08) ? 1 : 0 ); /* P2 action B */
-		pia_ca1_w( game_pia, 0, (in & 0x04) ? 1 : 0 ); /* P1 action B */
+		pia6821_cb2_w( game_pia, 0, (in & 0x80) ? 1 : 0 ); /* P2 action A */
+		pia6821_ca2_w( game_pia, 0, (in & 0x40) ? 1 : 0 ); /* P1 action A */
+		pia6821_cb1_w( game_pia, 0, (in & 0x08) ? 1 : 0 ); /* P2 action B */
+		pia6821_ca1_w( game_pia, 0, (in & 0x04) ? 1 : 0 ); /* P1 action B */
 		/* TODO:
 		   it seems that CM 90-112 behaves differently
 		   - ca1 is P1 action A, i.e., in & 0x40
@@ -1231,10 +1229,10 @@ static void to7_game_init ( running_machine *machine )
 
 static void to7_game_reset ( running_machine *machine )
 {
-	const device_config *game_pia = devtag_get_device( machine, PIA6821, THOM_PIA_GAME );
+	const device_config *game_pia = devtag_get_device( machine, THOM_PIA_GAME );
 
 	LOG (( "to7_game_reset called\n" ));
-	pia_ca1_w( game_pia, 0, 0 );
+	pia6821_ca1_w( game_pia, 0, 0 );
 	to7_game_sound = 0;
 	to7_game_mute = 0;
 	to7_game_sound_update( machine );
@@ -1499,7 +1497,7 @@ static void to7_midi_init( running_machine *machine )
 
 MACHINE_RESET ( to7 )
 {
-	const device_config *sys_pia = devtag_get_device( machine, PIA6821, THOM_PIA_SYS );
+	const device_config *sys_pia = devtag_get_device( machine, THOM_PIA_SYS );
 
 	LOG (( "to7: machine reset called\n" ));
 
@@ -1517,7 +1515,7 @@ MACHINE_RESET ( to7 )
 	thom_set_lightpen_callback( machine, 3, to7_lightpen_cb );
 	thom_set_mode_point( machine, 0 );
 	thom_set_border_color( machine, 0 );
-	pia_cb1_w( sys_pia, 0, 0 );
+	pia6821_cb1_w( sys_pia, 0, 0 );
 
 	/* memory */
 	to7_update_cart_bank(machine);
@@ -1600,7 +1598,7 @@ static READ8_DEVICE_HANDLER ( to770_sys_porta_in )
 	/* keyboard */
 	static const char *const keynames[] = { "keyboard_0", "keyboard_1", "keyboard_2", "keyboard_3",
 										"keyboard_4", "keyboard_5", "keyboard_6", "keyboard_7" };
-	int keyline = pianew_get_output_b( device ) & 7;
+	int keyline = pia6821_get_output_b( device ) & 7;
 
 	return input_port_read(device->machine, keynames[7 - keyline]);
 }
@@ -1609,9 +1607,9 @@ static READ8_DEVICE_HANDLER ( to770_sys_porta_in )
 
 static void to770_update_ram_bank(running_machine *machine)
 {
-	const device_config *sys_pia = devtag_get_device( machine, PIA6821, THOM_PIA_SYS );
+	const device_config *sys_pia = devtag_get_device( machine, THOM_PIA_SYS );
 	const address_space* space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	UINT8 portb = pianew_get_port_b_z_mask( sys_pia );
+	UINT8 portb = pia6821_get_port_b_z_mask( sys_pia );
 	static int old_bank = -1;
 	int bank;
 
@@ -1753,7 +1751,7 @@ WRITE8_HANDLER ( to770_gatearray_w )
 
 MACHINE_RESET( to770 )
 {
-	const device_config *sys_pia = devtag_get_device( machine, PIA6821, THOM_PIA_SYS );
+	const device_config *sys_pia = devtag_get_device( machine, THOM_PIA_SYS );
 
 	LOG (( "to770: machine reset called\n" ));
 
@@ -1771,7 +1769,7 @@ MACHINE_RESET( to770 )
 	thom_set_lightpen_callback( machine, 3, to7_lightpen_cb );
 	thom_set_mode_point( machine, 0 );
 	thom_set_border_color( machine, 8 );
-	pia_cb1_w( sys_pia, 0, 0 );
+	pia6821_cb1_w( sys_pia, 0, 0 );
 
 	/* memory */
 	to7_update_cart_bank(machine);
@@ -1832,14 +1830,14 @@ MACHINE_START ( to770 )
 
 static void mo5_lightpen_cb ( running_machine *machine, int step )
 {
-	const device_config *sys_pia = devtag_get_device( machine, PIA6821, THOM_PIA_SYS );
+	const device_config *sys_pia = devtag_get_device( machine, THOM_PIA_SYS );
 
 	/* MO5 signals ca1 (TO7 signals cb1) */
 	if ( ! to7_lightpen )
 		return;
 
-	pia_ca1_w( sys_pia, 0, 1 );
-	pia_ca1_w( sys_pia, 0, 0 );
+	pia6821_ca1_w( sys_pia, 0, 1 );
+	pia6821_ca1_w( sys_pia, 0, 0 );
 	to7_lightpen_step = step;
 }
 
@@ -1858,11 +1856,11 @@ static emu_timer* mo5_periodic_timer;
 
 static TIMER_CALLBACK(mo5_periodic_cb)
 {
-	const device_config *sys_pia = devtag_get_device( machine, PIA6821, THOM_PIA_SYS );
+	const device_config *sys_pia = devtag_get_device( machine, THOM_PIA_SYS );
 
 	/* pulse */
-	pia_cb1_w( sys_pia, 0, 1 );
-	pia_cb1_w( sys_pia, 0, 0 );
+	pia6821_cb1_w( sys_pia, 0, 1 );
+	pia6821_cb1_w( sys_pia, 0, 0 );
 }
 
 
@@ -1900,14 +1898,14 @@ static READ8_DEVICE_HANDLER ( mo5_sys_porta_in )
 
 static WRITE8_DEVICE_HANDLER ( mo5_sys_portb_out )
 {
-	dac_data_w( devtag_get_device(device->machine, SOUND, "buzzer"), (data & 1) ? 0x80 : 0); /* 1-bit buzzer */
+	dac_data_w( devtag_get_device(device->machine, "buzzer"), (data & 1) ? 0x80 : 0); /* 1-bit buzzer */
 }
 
 
 
 static READ8_DEVICE_HANDLER ( mo5_sys_portb_in )
 {
-	UINT8 portb = pianew_get_output_b( device );
+	UINT8 portb = pia6821_get_output_b( device );
 	int col = (portb >> 1) & 7;       /* key column */
 	int lin = 7 - ((portb >> 4) & 7); /* key line */
 	static const char *const keynames[] = { "keyboard_0", "keyboard_1", "keyboard_2", "keyboard_3",
@@ -2119,13 +2117,13 @@ WRITE8_HANDLER ( mo5_ext_w )
 
 MACHINE_RESET( mo5 )
 {
-	const device_config *sys_pia = devtag_get_device( machine, PIA6821, THOM_PIA_SYS );
+	const device_config *sys_pia = devtag_get_device( machine, THOM_PIA_SYS );
 
 	LOG (( "mo5: machine reset called\n" ));
 
 	/* subsystems */
 	thom_irq_reset(machine);
-	pianew_set_port_a_z_mask( sys_pia, 0x5f );
+	pia6821_set_port_a_z_mask( sys_pia, 0x5f );
 	to7_game_reset(machine);
 	to7_floppy_reset(machine);
 	to7_io_reset(machine);
@@ -2138,7 +2136,7 @@ MACHINE_RESET( mo5 )
 	thom_set_lightpen_callback( machine, 3, mo5_lightpen_cb );
 	thom_set_mode_point( machine, 0 );
 	thom_set_border_color( machine, 0 );
-	pia_ca1_w( sys_pia, 0, 0 );
+	pia6821_ca1_w( sys_pia, 0, 0 );
 
 	/* memory */
 	mo5_update_cart_bank(machine);
@@ -2395,7 +2393,7 @@ static void to9_update_cart_bank(running_machine *machine)
 	const address_space* space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	static int old_bank = -1;
 	int bank = 0;
-	int slot = ( mc6846_get_output_port(devtag_get_device(machine, MC6846, "mc6846")) >> 4 ) & 3; /* bits 4-5: ROM bank */
+	int slot = ( mc6846_get_output_port(devtag_get_device(machine, "mc6846")) >> 4 ) & 3; /* bits 4-5: ROM bank */
 
 	/* reset cartridge read handler */
 	memory_install_read8_handler( space, 0x0000, 0x0003, 0, 0, (read8_space_func)(STATIC_BANK1 + THOM_CART_BANK - 1) );
@@ -2448,7 +2446,7 @@ static STATE_POSTLOAD( to9_update_cart_bank_postload )
 /* write signal to 0000-1fff generates a bank switch */
 WRITE8_HANDLER ( to9_cartridge_w )
 {
-	int slot = ( mc6846_get_output_port(devtag_get_device(space->machine, MC6846, "mc6846")) >> 4 ) & 3; /* bits 4-5: ROM bank */
+	int slot = ( mc6846_get_output_port(devtag_get_device(space->machine, "mc6846")) >> 4 ) & 3; /* bits 4-5: ROM bank */
 
 	if ( offset >= 0x2000 )
 		return;
@@ -2476,11 +2474,11 @@ READ8_HANDLER ( to9_cartridge_r )
 
 static void to9_update_ram_bank (running_machine *machine)
 {
-	const device_config *sys_pia = devtag_get_device( machine, PIA6821, THOM_PIA_SYS );
+	const device_config *sys_pia = devtag_get_device( machine, THOM_PIA_SYS );
 	const address_space* space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	static int old_bank = -1;
-	UINT8 port = mc6846_get_output_port(devtag_get_device(machine, MC6846, "mc6846"));
-	UINT8 portb = pianew_get_port_b_z_mask( sys_pia );
+	UINT8 port = mc6846_get_output_port(devtag_get_device(machine, "mc6846"));
+	UINT8 portb = pia6821_get_port_b_z_mask( sys_pia );
 	UINT8 disk = ((port >> 2) & 1) | ((port >> 5) & 2); /* bits 6,2: RAM bank */
 	int bank;
 
@@ -3010,7 +3008,7 @@ static READ8_DEVICE_HANDLER ( to9_sys_porta_in )
 
 static WRITE8_DEVICE_HANDLER ( to9_sys_porta_out )
 {
-	const device_config *printer = devtag_get_device(device->machine, CENTRONICS, "centronics");
+	const device_config *printer = devtag_get_device(device->machine, "centronics");
 	centronics_data_w(printer, 0, data & 0xfe);
 }
 
@@ -3018,7 +3016,7 @@ static WRITE8_DEVICE_HANDLER ( to9_sys_porta_out )
 
 static WRITE8_DEVICE_HANDLER ( to9_sys_portb_out )
 {
-	const device_config *printer = devtag_get_device(device->machine, CENTRONICS, "centronics");
+	const device_config *printer = devtag_get_device(device->machine, "centronics");
 
 	centronics_d0_w(printer, BIT(data, 0));
 	centronics_strobe_w(printer, BIT(data, 1));
@@ -3079,13 +3077,13 @@ const mc6846_interface to9_timer =
 
 MACHINE_RESET ( to9 )
 {
-	const device_config *sys_pia = devtag_get_device( machine, PIA6821, THOM_PIA_SYS );
+	const device_config *sys_pia = devtag_get_device( machine, THOM_PIA_SYS );
 
 	LOG (( "to9: machine reset called\n" ));
 
 	/* subsystems */
 	thom_irq_reset(machine);
-	pianew_set_port_a_z_mask( sys_pia, 0xfe );
+	pia6821_set_port_a_z_mask( sys_pia, 0xfe );
 	to7_game_reset(machine);
 	to9_floppy_reset(machine);
 	to9_kbd_reset(machine);
@@ -3097,7 +3095,7 @@ MACHINE_RESET ( to9 )
 	thom_set_lightpen_callback( machine, 3, to7_lightpen_cb );
 	thom_set_border_color( machine, 8 );
 	thom_set_mode_point( machine, 0 );
-	pia_cb1_w( sys_pia, 0, 0 );
+	pia6821_cb1_w( sys_pia, 0, 0 );
 
 	/* memory */
 	to9_soft_bank = 0;
@@ -3324,8 +3322,8 @@ static void to8_kbd_timer_func(running_machine *machine)
 		   (helps avoiding CPU lock)
 		*/
 		if ( ! to8_kbd_ack )
-			mc6846_set_input_cp1( devtag_get_device(machine, MC6846, "mc6846"), 0 );
-		mc6846_set_input_cp1( devtag_get_device(machine, MC6846, "mc6846"), 1 );
+			mc6846_set_input_cp1( devtag_get_device(machine, "mc6846"), 0 );
+		mc6846_set_input_cp1( devtag_get_device(machine, "mc6846"), 1 );
 
 		if ( k == -1 )
 			d = TO8_KBD_POLL_PERIOD;
@@ -3344,27 +3342,27 @@ static void to8_kbd_timer_func(running_machine *machine)
 		to8_kbd_last_key = 0xff;
 		to8_kbd_key_count = 0;
 		to8_kbd_step = 0;
-		mc6846_set_input_cp1( devtag_get_device(machine, MC6846, "mc6846"), 1 );
+		mc6846_set_input_cp1( devtag_get_device(machine, "mc6846"), 1 );
 		d = TO8_KBD_POLL_PERIOD;
 	}
 	else if ( to8_kbd_step == 1 )
 	{
 		/* schedule timeout waiting for ack to go down */
-		mc6846_set_input_cp1( devtag_get_device(machine, MC6846, "mc6846"), 0 );
+		mc6846_set_input_cp1( devtag_get_device(machine, "mc6846"), 0 );
 		to8_kbd_step = 255;
 		d = TO8_KBD_TIMEOUT;
 	}
 	else if ( to8_kbd_step == 117 )
 	{
 		/* schedule timeout  waiting for ack to go up */
-		mc6846_set_input_cp1( devtag_get_device(machine, MC6846, "mc6846"), 0 );
+		mc6846_set_input_cp1( devtag_get_device(machine, "mc6846"), 0 );
 		to8_kbd_step = 255;
 		d = TO8_KBD_TIMEOUT;
 	}
 	else if ( to8_kbd_step & 1 )
 	{
 		/* send silence between bits */
-		mc6846_set_input_cp1( devtag_get_device(machine, MC6846, "mc6846"), 0 );
+		mc6846_set_input_cp1( devtag_get_device(machine, "mc6846"), 0 );
 		d = ATTOTIME_IN_USEC( 100 );
 		to8_kbd_step++;
 	}
@@ -3373,7 +3371,7 @@ static void to8_kbd_timer_func(running_machine *machine)
 		/* send bit */
 		int bpos = 8 - ( (to8_kbd_step - 100) / 2);
 		int bit = (to8_kbd_data >> bpos) & 1;
-		mc6846_set_input_cp1( devtag_get_device(machine, MC6846, "mc6846"), 1 );
+		mc6846_set_input_cp1( devtag_get_device(machine, "mc6846"), 1 );
 		d = ATTOTIME_IN_USEC( bit ? 56 : 38 );
 		to8_kbd_step++;
 	}
@@ -3526,7 +3524,7 @@ static STATE_POSTLOAD( to8_update_floppy_bank_postload )
 
 static void to8_update_ram_bank (running_machine *machine)
 {
-	const device_config *sys_pia = devtag_get_device( machine, PIA6821, THOM_PIA_SYS );
+	const device_config *sys_pia = devtag_get_device( machine, THOM_PIA_SYS );
 	const address_space* space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	UINT8 bank = 0;
 
@@ -3538,7 +3536,7 @@ static void to8_update_ram_bank (running_machine *machine)
 	}
 	else
 	{
-		UINT8 portb = pianew_get_port_b_z_mask( sys_pia );
+		UINT8 portb = pia6821_get_port_b_z_mask( sys_pia );
 
 		switch ( portb & 0xf8 )
 		{
@@ -3945,7 +3943,7 @@ static READ8_DEVICE_HANDLER ( to8_sys_porta_in )
 
 static WRITE8_DEVICE_HANDLER ( to8_sys_portb_out )
 {
-	const device_config *printer = devtag_get_device(device->machine, CENTRONICS, "centronics");
+	const device_config *printer = devtag_get_device(device->machine, "centronics");
 
 	centronics_d0_w(printer, BIT(data, 0));
 	centronics_strobe_w(printer, BIT(data, 1));
@@ -3982,7 +3980,7 @@ const pia6821_interface to8_pia6821_sys =
 
 static READ8_DEVICE_HANDLER ( to8_timer_port_in )
 {
-	const device_config *printer = devtag_get_device(device->machine, CENTRONICS, "centronics");
+	const device_config *printer = devtag_get_device(device->machine, "centronics");
 	int lightpen = (input_port_read(device->machine, "lightpen_button") & 1) ? 2 : 0;
 	int cass = to7_get_cassette(device->machine) ? 0x80 : 0;
 	int dtr = centronics_busy_r(printer) << 6;
@@ -4047,12 +4045,12 @@ static void to8_lightpen_cb ( running_machine *machine, int step )
 
 MACHINE_RESET ( to8 )
 {
-	const device_config *sys_pia = devtag_get_device( machine, PIA6821, THOM_PIA_SYS );
+	const device_config *sys_pia = devtag_get_device( machine, THOM_PIA_SYS );
 	LOG (( "to8: machine reset called\n" ));
 
 	/* subsystems */
 	thom_irq_reset(machine);
-	pianew_set_port_a_z_mask( sys_pia, 0xfe );
+	pia6821_set_port_a_z_mask( sys_pia, 0xfe );
 	to7_game_reset(machine);
 	to8_floppy_reset(machine);
 	to8_kbd_reset(machine);
@@ -4073,7 +4071,7 @@ MACHINE_RESET ( to8 )
 	thom_set_lightpen_callback( machine, 4, to8_lightpen_cb );
 	thom_set_border_color( machine, 0 );
 	thom_set_mode_point( machine, 0 );
-	pia_cb1_w( sys_pia, 0, 0 );
+	pia6821_cb1_w( sys_pia, 0, 0 );
 
 	/* memory */
 	to8_cart_vpage = 0;
@@ -4178,7 +4176,7 @@ const pia6821_interface to9p_pia6821_sys =
 
 static READ8_DEVICE_HANDLER ( to9p_timer_port_in )
 {
-	const device_config *printer = devtag_get_device(device->machine, CENTRONICS, "centronics");
+	const device_config *printer = devtag_get_device(device->machine, "centronics");
 	int lightpen = (input_port_read(device->machine, "lightpen_button") & 1) ? 2 : 0;
 	int cass = to7_get_cassette(device->machine) ? 0x80 : 0;
 	int dtr = centronics_busy_r(printer) << 6;
@@ -4214,12 +4212,12 @@ const mc6846_interface to9p_timer =
 
 MACHINE_RESET ( to9p )
 {
-	const device_config *sys_pia = devtag_get_device( machine, PIA6821, THOM_PIA_SYS );
+	const device_config *sys_pia = devtag_get_device( machine, THOM_PIA_SYS );
 	LOG (( "to9p: machine reset called\n" ));
 
 	/* subsystems */
 	thom_irq_reset(machine);
-	pianew_set_port_a_z_mask( sys_pia, 0xfe );
+	pia6821_set_port_a_z_mask( sys_pia, 0xfe );
 	to7_game_reset(machine);
 	to8_floppy_reset(machine);
 	to9_kbd_reset(machine);
@@ -4240,7 +4238,7 @@ MACHINE_RESET ( to9p )
 	thom_set_lightpen_callback( machine, 4, to8_lightpen_cb );
 	thom_set_border_color( machine, 0 );
 	thom_set_mode_point( machine, 0 );
-	pia_cb1_w( sys_pia, 0, 0 );
+	pia6821_cb1_w( sys_pia, 0, 0 );
 
 	/* memory */
 	to8_cart_vpage = 0;
@@ -4347,9 +4345,9 @@ static STATE_POSTLOAD( mo6_update_ram_bank_postload )
 
 static void mo6_update_cart_bank (running_machine *machine)
 {
-	const device_config *sys_pia = devtag_get_device( machine, PIA6821, THOM_PIA_SYS );
+	const device_config *sys_pia = devtag_get_device( machine, THOM_PIA_SYS );
 	const address_space* space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	int b = (pianew_get_output_a( sys_pia ) >> 5) & 1;
+	int b = (pia6821_get_output_a( sys_pia ) >> 5) & 1;
 	static int old_bank = -1;
 	int bank = 0;
 
@@ -4471,8 +4469,8 @@ WRITE8_HANDLER ( mo6_ext_w )
 
 static WRITE_LINE_DEVICE_HANDLER( mo6_centronics_busy )
 {
-	const device_config *game_pia = devtag_get_device( device->machine, PIA6821, THOM_PIA_GAME );
-	pia_cb1_w(game_pia, 0, state);
+	const device_config *game_pia = devtag_get_device( device->machine, THOM_PIA_GAME );
+	pia6821_cb1_w(game_pia, 0, state);
 }
 
 
@@ -4487,7 +4485,7 @@ const centronics_interface mo6_centronics_config =
 
 static WRITE8_DEVICE_HANDLER ( mo6_game_porta_out )
 {
-	const device_config *printer = devtag_get_device(device->machine, CENTRONICS, "centronics");
+	const device_config *printer = devtag_get_device(device->machine, "centronics");
 
 	LOG (( "$%04x %f mo6_game_porta_out: CENTRONICS set data=$%02X\n", cpu_get_previouspc( device->machine->cpu[0] ), attotime_to_double(timer_get_time(device->machine)), data ));
 
@@ -4499,7 +4497,7 @@ static WRITE8_DEVICE_HANDLER ( mo6_game_porta_out )
 
 static WRITE8_DEVICE_HANDLER ( mo6_game_cb2_out )
 {
-	const device_config *printer = devtag_get_device(device->machine, CENTRONICS, "centronics");
+	const device_config *printer = devtag_get_device(device->machine, "centronics");
 
 	LOG (( "$%04x %f mo6_game_cb2_out: CENTRONICS set strobe=%i\n", cpu_get_previouspc( device->machine->cpu[0] ), attotime_to_double(timer_get_time(device->machine)), data ));
 
@@ -4529,21 +4527,21 @@ const pia6821_interface mo6_pia6821_game =
 
 static TIMER_CALLBACK(mo6_game_update_cb)
 {
-	const device_config *game_pia = devtag_get_device( machine, PIA6821, THOM_PIA_GAME );
+	const device_config *game_pia = devtag_get_device( machine, THOM_PIA_GAME );
 
 	/* unlike the TO8, CB1 & CB2 are not connected to buttons */
 	if ( input_port_read(machine, "config") & 1 )
 	{
 		UINT8 mouse = to7_get_mouse_signal(machine);
-		pia_ca1_w( game_pia, 0, mouse & 1 ); /* XA */
-		pia_ca2_w( game_pia, 0, mouse & 2 ); /* YA */
+		pia6821_ca1_w( game_pia, 0, mouse & 1 ); /* XA */
+		pia6821_ca2_w( game_pia, 0, mouse & 2 ); /* YA */
 	}
 	else
 	{
 		/* joystick */
 		UINT8 in = input_port_read(machine, "game_port_buttons");
-		pia_ca1_w( game_pia, 0, in & 0x04 ); /* P1 action B */
-		pia_ca2_w( game_pia, 0, in & 0x40 ); /* P1 action A */
+		pia6821_ca1_w( game_pia, 0, in & 0x04 ); /* P1 action B */
+		pia6821_ca2_w( game_pia, 0, in & 0x40 ); /* P1 action A */
 	}
 }
 
@@ -4562,9 +4560,9 @@ static void mo6_game_init ( running_machine *machine )
 
 static void mo6_game_reset ( running_machine *machine )
 {
-	const device_config *game_pia = devtag_get_device( machine, PIA6821, THOM_PIA_GAME );
+	const device_config *game_pia = devtag_get_device( machine, THOM_PIA_GAME );
 	LOG (( "mo6_game_reset called\n" ));
-	pia_ca1_w( game_pia, 0, 0 );
+	pia6821_ca1_w( game_pia, 0, 0 );
 	to7_game_sound = 0;
 	to7_game_mute = 0;
 	to7_game_sound_update(machine);
@@ -4590,8 +4588,8 @@ static READ8_DEVICE_HANDLER ( mo6_sys_porta_in )
 static READ8_DEVICE_HANDLER ( mo6_sys_portb_in )
 {
 	/* keyboard: 9 lines of 8 keys */
-	UINT8 porta = pianew_get_output_a( device );
-	UINT8 portb = pianew_get_output_b( device );
+	UINT8 porta = pia6821_get_output_a( device );
+	UINT8 portb = pia6821_get_output_b( device );
 	int col = (portb >> 4) & 7;    /* B bits 4-6: kbd column */
 	int lin = (portb >> 1) & 7;    /* B bits 1-3: kbd line */
 	static const char *const keynames[] = { "keyboard_0", "keyboard_1", "keyboard_2", "keyboard_3", "keyboard_4",
@@ -4621,7 +4619,7 @@ static WRITE8_DEVICE_HANDLER ( mo6_sys_porta_out )
 
 static WRITE8_DEVICE_HANDLER ( mo6_sys_portb_out )
 {
-	dac_data_w( devtag_get_device(device->machine, SOUND, "buzzer"), (data & 1) ? 0x80 : 0); /* bit 0: buzzer */
+	dac_data_w( devtag_get_device(device->machine, "buzzer"), (data & 1) ? 0x80 : 0); /* bit 0: buzzer */
 }
 
 
@@ -4829,12 +4827,12 @@ WRITE8_HANDLER ( mo6_vreg_w )
 
 MACHINE_RESET ( mo6 )
 {
-	const device_config *sys_pia = devtag_get_device( machine, PIA6821, THOM_PIA_SYS );
+	const device_config *sys_pia = devtag_get_device( machine, THOM_PIA_SYS );
 	LOG (( "mo6: machine reset called\n" ));
 
 	/* subsystems */
 	thom_irq_reset(machine);
-	pianew_set_port_a_z_mask( sys_pia, 0x75 );
+	pia6821_set_port_a_z_mask( sys_pia, 0x75 );
 	mo6_game_reset(machine);
 	to7_floppy_reset(machine);
 	to7_modem_reset(machine);
@@ -4854,7 +4852,7 @@ MACHINE_RESET ( mo6 )
 	thom_set_lightpen_callback( machine, 3, to8_lightpen_cb );
 	thom_set_border_color( machine, 0 );
 	thom_set_mode_point( machine, 0 );
-	pia_ca1_w( sys_pia, 0, 0 );
+	pia6821_ca1_w( sys_pia, 0, 0 );
 
 	/* memory */
 	to8_cart_vpage = 0;
@@ -4963,7 +4961,7 @@ WRITE8_HANDLER ( mo5nr_net_w )
 
 READ8_HANDLER( mo5nr_prn_r )
 {
-	const device_config *printer = devtag_get_device(space->machine, CENTRONICS, "centronics");
+	const device_config *printer = devtag_get_device(space->machine, "centronics");
 	UINT8 result = 0;
 
 	result |= !centronics_busy_r(printer) << 7;
@@ -4974,7 +4972,7 @@ READ8_HANDLER( mo5nr_prn_r )
 
 WRITE8_HANDLER( mo5nr_prn_w )
 {
-	const device_config *printer = devtag_get_device(space->machine, CENTRONICS, "centronics");
+	const device_config *printer = devtag_get_device(space->machine, "centronics");
 
 	/* TODO: understand other bits */
 	centronics_strobe_w(printer, BIT(data, 3));
@@ -4989,7 +4987,7 @@ WRITE8_HANDLER( mo5nr_prn_w )
 static READ8_DEVICE_HANDLER ( mo5nr_sys_portb_in )
 {
 	/* keyboard: only 8 lines of 8 keys (MO6 has 9 lines) */
-	UINT8 portb = pianew_get_output_b( device );
+	UINT8 portb = pia6821_get_output_b( device );
 	int col = (portb >> 4) & 7;    /* B bits 4-6: kbd column */
 	int lin = (portb >> 1) & 7;    /* B bits 1-3: kbd line */
 	static const char *const keynames[] = { "keyboard_0", "keyboard_1", "keyboard_2", "keyboard_3",
@@ -5069,9 +5067,9 @@ static void mo5nr_game_init ( running_machine* machine )
 
 static void mo5nr_game_reset ( running_machine* machine )
 {
-	const device_config *game_pia = devtag_get_device( machine, PIA6821, THOM_PIA_GAME );
+	const device_config *game_pia = devtag_get_device( machine, THOM_PIA_GAME );
 	LOG (( "mo5nr_game_reset called\n" ));
-	pia_ca1_w( game_pia, 0, 0 );
+	pia6821_ca1_w( game_pia, 0, 0 );
 	to7_game_sound = 0;
 	to7_game_mute = 0;
 	to7_game_sound_update(machine);
@@ -5085,12 +5083,12 @@ static void mo5nr_game_reset ( running_machine* machine )
 
 MACHINE_RESET ( mo5nr )
 {
-	const device_config *sys_pia = devtag_get_device( machine, PIA6821, THOM_PIA_SYS );
+	const device_config *sys_pia = devtag_get_device( machine, THOM_PIA_SYS );
 	LOG (( "mo5nr: machine reset called\n" ));
 
 	/* subsystems */
 	thom_irq_reset(machine);
-	pianew_set_port_a_z_mask( sys_pia, 0x65 );
+	pia6821_set_port_a_z_mask( sys_pia, 0x65 );
 	mo5nr_game_reset(machine);
 	to7_floppy_reset(machine);
 	to7_modem_reset(machine);
@@ -5110,7 +5108,7 @@ MACHINE_RESET ( mo5nr )
 	thom_set_lightpen_callback( machine, 3, to8_lightpen_cb );
 	thom_set_border_color( machine, 0 );
 	thom_set_mode_point( machine, 0 );
-	pia_ca1_w( sys_pia, 0, 0 );
+	pia6821_ca1_w( sys_pia, 0, 0 );
 
 	/* memory */
 	to8_cart_vpage = 0;

@@ -160,7 +160,7 @@ static int get_register_string_max_width(const device_config *device, void *base
 INLINE cpu_class_data *get_class_data(const device_config *device)
 {
 	assert(device != NULL);
-	assert(device->class == DEVICE_CLASS_CPU_CHIP);
+	assert(device->devclass == DEVICE_CLASS_CPU_CHIP);
 	assert(device->token != NULL);
 	return (cpu_class_data *)cpu_get_class_header(device) - 1;
 }
@@ -588,7 +588,7 @@ static DEVICE_RESET( cpu )
 
 		/* new style - use screen tag directly */
 		if (config->vblank_interrupt_screen != NULL)
-			screen = devtag_get_device(device->machine, VIDEO_SCREEN, config->vblank_interrupt_screen);
+			screen = devtag_get_device(device->machine, config->vblank_interrupt_screen);
 
 		/* old style 'hack' setup - use screen #0 */
 		else

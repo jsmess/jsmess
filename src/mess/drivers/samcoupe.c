@@ -82,7 +82,7 @@ Note on the bioses:
 
 static READ8_HANDLER( samcoupe_disk_r )
 {
-	const device_config *fdc = devtag_get_device(space->machine, WD1772, "wd1772");
+	const device_config *fdc = devtag_get_device(space->machine, "wd1772");
 
 	/* drive and side is encoded into bit 5 and 3 */
 	wd17xx_set_drive(fdc, (offset >> 4) & 1);
@@ -103,7 +103,7 @@ static READ8_HANDLER( samcoupe_disk_r )
 
 static WRITE8_HANDLER( samcoupe_disk_w )
 {
-	const device_config *fdc = devtag_get_device(space->machine, WD1772, "wd1772");
+	const device_config *fdc = devtag_get_device(space->machine, "wd1772");
 
 	/* drive and side is encoded into bit 5 and 3 */
 	wd17xx_set_drive(fdc, (offset >> 4) & 1);
@@ -264,7 +264,7 @@ static READ8_HANDLER( samcoupe_keyboard_r )
 
 static WRITE8_HANDLER( samcoupe_border_w )
 {
-	const device_config *speaker = devtag_get_device(space->machine, SOUND, "speaker");
+	const device_config *speaker = devtag_get_device(space->machine, "speaker");
 	coupe_asic *asic = space->machine->driver_data;
 	asic->border = data;
 
@@ -291,28 +291,28 @@ static READ8_HANDLER( samcoupe_attributes_r )
 
 static READ8_HANDLER( samcoupe_lpt1_busy_r )
 {
-	const device_config *printer = devtag_get_device(space->machine, CENTRONICS, "lpt1");
+	const device_config *printer = devtag_get_device(space->machine, "lpt1");
 	return centronics_busy_r(printer);
 }
 
 
 static WRITE8_HANDLER( samcoupe_lpt1_strobe_w )
 {
-	const device_config *printer = devtag_get_device(space->machine, CENTRONICS, "lpt1");
+	const device_config *printer = devtag_get_device(space->machine, "lpt1");
 	centronics_strobe_w(printer, data);
 }
 
 
 static READ8_HANDLER( samcoupe_lpt2_busy_r )
 {
-	const device_config *printer = devtag_get_device(space->machine, CENTRONICS, "lpt2");
+	const device_config *printer = devtag_get_device(space->machine, "lpt2");
 	return centronics_busy_r(printer);
 }
 
 
 static WRITE8_HANDLER( samcoupe_lpt2_strobe_w )
 {
-	const device_config *printer = devtag_get_device(space->machine, CENTRONICS, "lpt2");
+	const device_config *printer = devtag_get_device(space->machine, "lpt2");
 	centronics_strobe_w(printer, data);
 }
 
@@ -335,9 +335,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( samcoupe_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_WRITE(samcoupe_ext_mem_w)
 	AM_RANGE(0xe0, 0xe7) AM_MIRROR(0xff10) AM_MASK(0xffff) AM_READWRITE(samcoupe_disk_r, samcoupe_disk_w)
-	AM_RANGE(0xe8, 0xe8) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_DEVWRITE(CENTRONICS, "lpt1", centronics_data_w)
+	AM_RANGE(0xe8, 0xe8) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_DEVWRITE("lpt1", centronics_data_w)
 	AM_RANGE(0xe9, 0xe9) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(samcoupe_lpt1_busy_r, samcoupe_lpt1_strobe_w)
-	AM_RANGE(0xea, 0xea) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_DEVWRITE(CENTRONICS, "lpt2", centronics_data_w)
+	AM_RANGE(0xea, 0xea) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_DEVWRITE("lpt2", centronics_data_w)
 	AM_RANGE(0xeb, 0xeb) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(samcoupe_lpt2_busy_r, samcoupe_lpt2_strobe_w)
 	AM_RANGE(0xf8, 0xf8) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(samcoupe_pen_r, samcoupe_clut_w)
 	AM_RANGE(0xf9, 0xf9) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(samcoupe_status_r, samcoupe_line_int_w)
@@ -347,8 +347,8 @@ static ADDRESS_MAP_START( samcoupe_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xfd, 0xfd) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(samcoupe_midi_r, samcoupe_midi_w)
 	AM_RANGE(0xfe, 0xfe) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(samcoupe_keyboard_r, samcoupe_border_w)
 	AM_RANGE(0xff, 0xff) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READ(samcoupe_attributes_r)
-	AM_RANGE(0xff, 0xff) AM_MIRROR(0xfe00) AM_MASK(0xffff) AM_DEVWRITE(SOUND, "saa1099", saa1099_data_w)
-	AM_RANGE(0x1ff, 0x1ff) AM_MIRROR(0xfe00) AM_MASK(0xffff) AM_DEVWRITE(SOUND, "saa1099", saa1099_control_w)
+	AM_RANGE(0xff, 0xff) AM_MIRROR(0xfe00) AM_MASK(0xffff) AM_DEVWRITE("saa1099", saa1099_data_w)
+	AM_RANGE(0x1ff, 0x1ff) AM_MIRROR(0xfe00) AM_MASK(0xffff) AM_DEVWRITE("saa1099", saa1099_control_w)
 ADDRESS_MAP_END
 
 

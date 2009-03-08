@@ -44,7 +44,7 @@ MOS MPS 6332 005 2179
 static ADDRESS_MAP_START(mk2_mem , ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0x1FFF) // m6504
 	AM_RANGE( 0x0000, 0x01ff) AM_RAM // 2 2111, should be mirrored
-	AM_RANGE( 0x0b00, 0x0b0f) AM_DEVREADWRITE(MIOT6530, "miot", miot6530_r, miot6530_w)
+	AM_RANGE( 0x0b00, 0x0b0f) AM_DEVREADWRITE("miot", miot6530_r, miot6530_w)
 	AM_RANGE( 0x0b80, 0x0bbf) AM_RAM // rriot ram
 	AM_RANGE( 0x0c00, 0x0fff) AM_ROM // rriot rom
 	AM_RANGE( 0x1000, 0x1fff) AM_ROM
@@ -149,7 +149,7 @@ static UINT8 mk2_read_b(const device_config *device, UINT8 olddata)
 
 static void mk2_write_b(const device_config *device, UINT8 newdata, UINT8 olddata)
 {
-	const device_config *dac_device = devtag_get_device(device->machine, SOUND, "dac");
+	const device_config *dac_device = devtag_get_device(device->machine, "dac");
 
 	if ((newdata&0x06)==0x06)
 		dac_data_w(dac_device,newdata&1?80:0);

@@ -22,7 +22,7 @@ static emu_timer *kbd_timer;
 static void kbd_sendscancode( running_machine *machine, UINT8 scancode )
 {
 	int j;
-	const device_config *cia = devtag_get_device(machine, CIA8520, "cia_0");
+	const device_config *cia = devtag_get_device(machine, "cia_0");
 
 	/* send over to the cia A */
 	for( j = 0; j < 8; j++ )

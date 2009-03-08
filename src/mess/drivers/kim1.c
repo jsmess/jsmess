@@ -96,8 +96,8 @@ static UINT8		kim1_led_time[6];
 
 static ADDRESS_MAP_START ( kim1_map , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0xe000) AM_RAM
-	AM_RANGE(0x1700, 0x173f) AM_MIRROR(0xe000) AM_DEVREADWRITE( MIOT6530, "miot_u3", miot6530_r, miot6530_w )
-	AM_RANGE(0x1740, 0x177f) AM_MIRROR(0xe000) AM_DEVREADWRITE( MIOT6530, "miot_u2", miot6530_r, miot6530_w )
+	AM_RANGE(0x1700, 0x173f) AM_MIRROR(0xe000) AM_DEVREADWRITE("miot_u3", miot6530_r, miot6530_w )
+	AM_RANGE(0x1740, 0x177f) AM_MIRROR(0xe000) AM_DEVREADWRITE("miot_u2", miot6530_r, miot6530_w )
 	AM_RANGE(0x1780, 0x17bf) AM_MIRROR(0xe000) AM_RAM
 	AM_RANGE(0x17c0, 0x17ff) AM_MIRROR(0xe000) AM_RAM
 	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0xe000) AM_ROM
@@ -208,7 +208,7 @@ static void kim1_u2_write_b(const device_config *device, UINT8 newdata, UINT8 ol
 	if ( newdata & 0x20 )
 	{
 		/* cassette write/speaker update */
-		cassette_output( devtag_get_device(device->machine, CASSETTE, "cassette"), ( newdata & 0x80 ) ? -1.0 : 1.0 );
+		cassette_output( devtag_get_device(device->machine, "cassette"), ( newdata & 0x80 ) ? -1.0 : 1.0 );
 	}
 
 	/* Set IRQ when bit 7 is cleared */
@@ -257,7 +257,7 @@ static const miot6530_interface kim1_u3_miot6530_interface =
 
 static TIMER_CALLBACK( kim1_cassette_input )
 {
-	double tap_val = cassette_input( devtag_get_device(machine, CASSETTE, "cassette") );
+	double tap_val = cassette_input( devtag_get_device(machine, "cassette") );
 
 	if ( tap_val <= 0 )
 	{

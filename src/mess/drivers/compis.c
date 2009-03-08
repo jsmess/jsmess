@@ -56,11 +56,11 @@ static ADDRESS_MAP_START( compis_mem , ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( compis_io, ADDRESS_SPACE_IO, 16 )
-	AM_RANGE( 0x0000, 0x0007) AM_DEVREADWRITE8(PPI8255, "ppi8255", ppi8255_r, ppi8255_w, 0xffff)
-	AM_RANGE( 0x0080, 0x0087) AM_DEVREADWRITE8(PIT8253, "pit8253", pit8253_r, pit8253_w, 0xffff)
-	AM_RANGE( 0x0100, 0x011b) AM_DEVREADWRITE8(MM58274C, "mm58274c", mm58274c_r, mm58274c_w, 0xffff)
-	AM_RANGE( 0x0280, 0x0283) AM_DEVREADWRITE8(PIC8259, "pic8259_master", pic8259_r, pic8259_w, 0xffff) /* 80150/80130 */
-//  AM_RANGE( 0x0288, 0x028e) AM_DEVREADWRITE(PIT8254, "pit8254", compis_osp_pit_r, compis_osp_pit_w ) /* PIT 8254 (80150/80130)  */
+	AM_RANGE( 0x0000, 0x0007) AM_DEVREADWRITE8("ppi8255", ppi8255_r, ppi8255_w, 0xffff)
+	AM_RANGE( 0x0080, 0x0087) AM_DEVREADWRITE8("pit8253", pit8253_r, pit8253_w, 0xffff)
+	AM_RANGE( 0x0100, 0x011b) AM_DEVREADWRITE8("mm58274c", mm58274c_r, mm58274c_w, 0xffff)
+	AM_RANGE( 0x0280, 0x0283) AM_DEVREADWRITE8("pic8259_master", pic8259_r, pic8259_w, 0xffff) /* 80150/80130 */
+//  AM_RANGE( 0x0288, 0x028e) AM_DEVREADWRITE("pit8254", compis_osp_pit_r, compis_osp_pit_w ) /* PIT 8254 (80150/80130)  */
 	AM_RANGE( 0x0310, 0x031f) AM_READWRITE( compis_usart_r, compis_usart_w )	/* USART 8251 Keyboard      */
 	AM_RANGE( 0x0330, 0x033f) AM_READWRITE( compis_gdc_r, compis_gdc_w )	/* GDC 82720 PCS6:6     */
 	AM_RANGE( 0x0340, 0x0343) AM_READWRITE( compis_fdc_r, compis_fdc_w )	/* iSBX0 (J8) FDC 8272      */

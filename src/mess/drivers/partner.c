@@ -32,10 +32,10 @@ static ADDRESS_MAP_START(partner_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0xc000, 0xc7ff ) AM_RAMBANK(8)
 	AM_RANGE( 0xc800, 0xcfff ) AM_RAMBANK(9)
 	AM_RANGE( 0xd000, 0xd7ff ) AM_RAMBANK(10)
-	AM_RANGE( 0xd800, 0xd8ff ) AM_DEVREADWRITE(I8275, "i8275", i8275_r, i8275_w)  // video
-	AM_RANGE( 0xd900, 0xd9ff ) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE( 0xd800, 0xd8ff ) AM_DEVREADWRITE("i8275", i8275_r, i8275_w)  // video
+	AM_RANGE( 0xd900, 0xd9ff ) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE( 0xda00, 0xdaff ) AM_WRITE(partner_mem_page_w)
-	AM_RANGE( 0xdb00, 0xdbff ) AM_DEVWRITE(DMA8257, "dma8257", dma8257_w)	 // DMA
+	AM_RANGE( 0xdb00, 0xdbff ) AM_DEVWRITE("dma8257", dma8257_w)	 // DMA
 	AM_RANGE( 0xdc00, 0xddff ) AM_RAMBANK(11)
 	AM_RANGE( 0xde00, 0xdeff ) AM_WRITE(partner_win_memory_page_w)
 	AM_RANGE( 0xe000, 0xe7ff ) AM_RAMBANK(12)

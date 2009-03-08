@@ -92,8 +92,8 @@ static struct i186_state
 } i186;
 
 static struct {
-	device_config	*pic8259_master;
-	device_config	*pic8259_slave;
+	const device_config	*pic8259_master;
+	const device_config	*pic8259_slave;
 } compis_devices;
 
 /* Keyboard */
@@ -278,7 +278,7 @@ static void compis_keyb_init(void)
 /*-------------------------------------------------------------------------*/
 static void compis_fdc_reset(running_machine *machine)
 {
-	device_config *fdc = (device_config*)devtag_get_device(machine, NEC765A, "nec765");
+	const device_config *fdc = devtag_get_device(machine, "nec765");
 
 	nec765_reset(fdc, 0);
 
@@ -288,7 +288,7 @@ static void compis_fdc_reset(running_machine *machine)
 
 static void compis_fdc_tc(running_machine *machine, int state)
 {
-	device_config *fdc = (device_config*)devtag_get_device(machine, NEC765A, "nec765");
+	const device_config *fdc = devtag_get_device(machine, "nec765");
 	/* Terminal count if iSBX-218A has DMA enabled */
   	if (input_port_read(machine, "DSW1"))
 	{
@@ -324,7 +324,7 @@ const nec765_interface compis_fdc_interface =
 
 READ16_HANDLER (compis_fdc_dack_r)
 {
-	device_config *fdc = (device_config*)devtag_get_device(space->machine, NEC765A, "nec765");
+	const device_config *fdc = devtag_get_device(space->machine, "nec765");
 	UINT16 data;
 	data = 0xffff;
 	/* DMA acknowledge if iSBX-218A has DMA enabled */
@@ -338,7 +338,7 @@ READ16_HANDLER (compis_fdc_dack_r)
 
 WRITE16_HANDLER (compis_fdc_w)
 {
-	device_config *fdc = (device_config*)devtag_get_device(space->machine, NEC765A, "nec765");
+	const device_config *fdc = devtag_get_device(space->machine, "nec765");
 	switch(offset)
 	{
 		case 2:
@@ -352,7 +352,7 @@ WRITE16_HANDLER (compis_fdc_w)
 
 READ16_HANDLER (compis_fdc_r)
 {
-	device_config *fdc = (device_config*)devtag_get_device(space->machine, NEC765A, "nec765");
+	const device_config *fdc = devtag_get_device(space->machine, "nec765");
 	UINT16 data;
 	data = 0xffff;
 	switch(offset)
@@ -423,11 +423,11 @@ static WRITE8_DEVICE_HANDLER( compis_ppi_port_c_w )
 const ppi8255_interface compis_ppi_interface =
 {
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER(CENTRONICS, "centronics", compis_ppi_port_b_r),
+	DEVCB_DEVICE_HANDLER("centronics", compis_ppi_port_b_r),
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER(CENTRONICS, "centronics", centronics_data_w),
+	DEVCB_DEVICE_HANDLER("centronics", centronics_data_w),
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER(CENTRONICS, "centronics", compis_ppi_port_c_w)
+	DEVCB_DEVICE_HANDLER("centronics", compis_ppi_port_c_w)
 };
 
 
@@ -494,13 +494,13 @@ const msm8251_interface compis_usart_interface=
 
 READ16_HANDLER ( compis_usart_r )
 {
-	const device_config *uart = devtag_get_device(space->machine, MSM8251, "uart");
+	const device_config *uart = devtag_get_device(space->machine, "uart");
 	return msm8251_data_r(uart, offset);
 }
 
 WRITE16_HANDLER ( compis_usart_w )
 {
-	const device_config *uart = devtag_get_device(space->machine, MSM8251, "uart");
+	const device_config *uart = devtag_get_device(space->machine, "uart");
 	switch (offset)
 	{
 		case 0x00:
@@ -1493,8 +1493,8 @@ MACHINE_RESET( compis )
 	/* OSP PIC 8259 */
 	cpu_set_irq_callback(machine->cpu[0], compis_irq_callback);
 
-	compis_devices.pic8259_master = (device_config*)devtag_get_device(machine, PIC8259, "pic8259_master");
-	compis_devices.pic8259_slave = (device_config*)devtag_get_device(machine, PIC8259, "pic8259_slave");
+	compis_devices.pic8259_master = devtag_get_device(machine, "pic8259_master");
+	compis_devices.pic8259_slave = devtag_get_device(machine, "pic8259_slave");
 }
 
 /*-------------------------------------------------------------------------*/

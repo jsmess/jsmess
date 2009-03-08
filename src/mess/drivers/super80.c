@@ -90,7 +90,7 @@ static const z80pio_interface super80_pio_intf =
 
 static const z80_daisy_chain super80_daisy_chain[] =
 {
-	{ Z80PIO, "z80pio" },
+	{ "z80pio" },
 	{ NULL }
 };
 
@@ -649,10 +649,10 @@ static MACHINE_RESET( super80 )
 {
 	timer_set(machine, ATTOTIME_IN_USEC(10), NULL, 0, super80_reset);
 	memory_set_bank(machine, 1, 1);
-	super80_z80pio = devtag_get_device(machine, Z80PIO, "z80pio");
-	super80_speaker = devtag_get_device(machine, SOUND, "speaker");
-	super80_cassette = devtag_get_device(machine, CASSETTE, "cassette");
-	super80_printer = devtag_get_device(machine, CENTRONICS, "centronics");
+	super80_z80pio = devtag_get_device(machine, "z80pio");
+	super80_speaker = devtag_get_device(machine, "speaker");
+	super80_cassette = devtag_get_device(machine, "cassette");
+	super80_printer = devtag_get_device(machine, "centronics");
 }
 
 static const cassette_config super80_cassette_config =

@@ -40,7 +40,7 @@ documentation still exists.
 
 #include "driver.h"
 #include "cpu/m6809/m6809.h"
-#include "machine/6821new.h"
+#include "machine/6821pia.h"
 #include "includes/coco.h"
 #include "includes/dgn_beta.h"
 #include "devices/basicdsk.h"
@@ -152,13 +152,13 @@ static ADDRESS_MAP_START( dgnbeta_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xE000, 0xEFFF) 	AM_READWRITE(SMH_BANK15	,SMH_BANK15)
 	AM_RANGE(0xF000, 0xFBFF) 	AM_READWRITE(SMH_BANK16	,SMH_BANK16)
 	AM_RANGE(0xfC00, 0xfC1F)	AM_READWRITE(SMH_NOP		,SMH_NOP)
-	AM_RANGE(0xFC20, 0xFC23)	AM_DEVREADWRITE(PIA6821, "pia_0", pia_r, pia_w)
-	AM_RANGE(0xFC24, 0xFC27)	AM_DEVREADWRITE(PIA6821, "pia_1", pia_r, pia_w)
+	AM_RANGE(0xFC20, 0xFC23)	AM_DEVREADWRITE("pia_0", pia6821_r, pia6821_w)
+	AM_RANGE(0xFC24, 0xFC27)	AM_DEVREADWRITE("pia_1", pia6821_r, pia6821_w)
 	AM_RANGE(0xFC28, 0xfC7F)	AM_READWRITE(SMH_NOP		,SMH_NOP)
 	AM_RANGE(0xfc80, 0xfc81)	AM_READWRITE(dgnbeta_6845_r	,dgnbeta_6845_w)
 	AM_RANGE(0xfc82, 0xfC9F)	AM_READWRITE(SMH_NOP		,SMH_NOP)
 	AM_RANGE(0xFCA0, 0xFCA3)	AM_READWRITE(SMH_NOP		,dgnbeta_colour_ram_w)		/* 4x4bit colour ram for graphics modes */
-	AM_RANGE(0xFCC0, 0xFCC3)	AM_DEVREADWRITE(PIA6821, "pia_2", pia_r, pia_w)
+	AM_RANGE(0xFCC0, 0xFCC3)	AM_DEVREADWRITE("pia_2", pia6821_r, pia6821_w)
 	AM_RANGE(0xfcC4, 0xfcdf)	AM_READWRITE(SMH_NOP		,SMH_NOP)
 	AM_RANGE(0xfce0, 0xfce3)	AM_READWRITE(dgnbeta_wd2797_r	,dgnbeta_wd2797_w)	/* Onboard disk interface */
 	AM_RANGE(0xfce4, 0xfdff)	AM_READWRITE(SMH_NOP		,SMH_NOP)

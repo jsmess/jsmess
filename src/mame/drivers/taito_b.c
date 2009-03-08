@@ -968,14 +968,14 @@ static ADDRESS_MAP_START( masterw_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK1)
 	AM_RANGE(0x8000, 0x8fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x9000, 0x9001) AM_DEVREAD(SOUND, "ym", ym2203_r)
+	AM_RANGE(0x9000, 0x9001) AM_DEVREAD("ym", ym2203_r)
 	AM_RANGE(0xa001, 0xa001) AM_READ(taitosound_slave_comm_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( masterw_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x9000, 0x9001) AM_DEVWRITE(SOUND, "ym", ym2203_w)
+	AM_RANGE(0x9000, 0x9001) AM_DEVWRITE("ym", ym2203_w)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xa001, 0xa001) AM_WRITE(taitosound_slave_comm_w)
 ADDRESS_MAP_END
@@ -984,7 +984,7 @@ static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK1)
 	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe000, 0xe003) AM_DEVREAD(SOUND, "ym", ym2610_r)
+	AM_RANGE(0xe000, 0xe003) AM_DEVREAD("ym", ym2610_r)
 	AM_RANGE(0xe200, 0xe200) AM_READ(SMH_NOP)
 	AM_RANGE(0xe201, 0xe201) AM_READ(taitosound_slave_comm_r)
 	AM_RANGE(0xea00, 0xea00) AM_READ(SMH_NOP)
@@ -993,7 +993,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe000, 0xe003) AM_DEVWRITE(SOUND, "ym", ym2610_w)
+	AM_RANGE(0xe000, 0xe003) AM_DEVWRITE("ym", ym2610_w)
 	AM_RANGE(0xe200, 0xe200) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xe201, 0xe201) AM_WRITE(taitosound_slave_comm_w)
 	AM_RANGE(0xe400, 0xe403) AM_WRITE(SMH_NOP) /* pan */
@@ -1007,16 +1007,16 @@ static ADDRESS_MAP_START( viofight_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK1)
 	AM_RANGE(0x8000, 0x8fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x9000, 0x9001) AM_DEVREAD(SOUND, "ym", ym2203_r)
-	AM_RANGE(0xb000, 0xb000) AM_DEVREAD(SOUND, "oki", okim6295_r)
+	AM_RANGE(0x9000, 0x9001) AM_DEVREAD("ym", ym2203_r)
+	AM_RANGE(0xb000, 0xb000) AM_DEVREAD("oki", okim6295_r)
 	AM_RANGE(0xa001, 0xa001) AM_READ(taitosound_slave_comm_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( viofight_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x9000, 0x9001) AM_DEVWRITE(SOUND, "ym", ym2203_w)
-	AM_RANGE(0xb000, 0xb001) AM_DEVWRITE(SOUND, "oki", okim6295_w)		/* yes, both addresses for the same chip */
+	AM_RANGE(0x9000, 0x9001) AM_DEVWRITE("ym", ym2203_w)
+	AM_RANGE(0xb000, 0xb001) AM_DEVWRITE("oki", okim6295_w)		/* yes, both addresses for the same chip */
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xa001, 0xa001) AM_WRITE(taitosound_slave_comm_w)
 ADDRESS_MAP_END
@@ -2384,7 +2384,7 @@ static void mb87078_gain_changed(running_machine *machine, int channel, int perc
 {
 	if (channel==1)
 	{
-		const device_config *ym = devtag_get_device(machine, SOUND, "ym");
+		const device_config *ym = devtag_get_device(machine, "ym");
 		sound_set_output_gain(ym, 0, percent / 100.0);
 		sound_set_output_gain(ym, 1, percent / 100.0);
 		sound_set_output_gain(ym, 2, percent / 100.0);
@@ -3632,6 +3632,31 @@ ROM_START( viofighu )
 	ROM_LOAD( "pal16l8b-c16-09.ic35", 0x0200, 0x0104, CRC(0965baab) SHA1(3f704cd42d5277e9ba0b0680a2722488fc4cc630) )
 ROM_END
 
+ROM_START( viofighj )
+	ROM_REGION( 0x080000, "maincpu", 0 )     /* 1M for 68000 code */
+	ROM_LOAD16_BYTE( "c16-11.42", 0x00000, 0x10000, CRC(23dbd388) SHA1(488f928826d16b201dcc4b491b09955d0af91f19) )
+	ROM_LOAD16_BYTE( "c16-10.23", 0x00001, 0x10000, CRC(329d2e46) SHA1(044e8a283e3bdd3d64dbeb9b6982088e967b10ff) )
+	ROM_LOAD16_BYTE( "c16-07.41", 0x40000, 0x20000, CRC(64d1d059) SHA1(643ac7fa5076147b24810a8e1b925dfe09f75864) )
+	ROM_LOAD16_BYTE( "c16-06.22", 0x40001, 0x20000, CRC(043761d8) SHA1(4587cadd73b628b4b9ac5c537cec20f90fb4959d) )
+
+	ROM_REGION( 0x1c000, "audiocpu", 0 )     /* 128k for Z80 code */
+	ROM_LOAD(  "c16-12.32", 0x00000, 0x04000, CRC(6fb028c7) SHA1(a808d82e872914f994652e95dca3fcad00ba02fc) )
+	ROM_CONTINUE(            0x10000, 0x0c000 ) /* banked stuff */
+
+	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD( "c16-01.1", 0x000000, 0x080000, CRC(7059ce83) SHA1(1e6825ab944254cd4ba6574762172245b3352319) )
+	ROM_LOAD( "c16-02.2", 0x080000, 0x080000, CRC(b458e905) SHA1(b712cbf4a4015e1fc2243871fe753e230f0172c2) )
+	ROM_LOAD( "c16-03.3", 0x100000, 0x080000, CRC(515a9431) SHA1(836be28614326d093be8841617cca83cef8d55cc) )
+	ROM_LOAD( "c16-04.4", 0x180000, 0x080000, CRC(ebf285e2) SHA1(0f806e42778e28e9687d85b2601ee08dd786869b) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "c16-05.47", 0x000000, 0x80000, CRC(a49d064a) SHA1(f9ed675cfaae69b68c99c7dce7c2a457b5b5c293) )
+
+	ROM_REGION( 0x00400, "plds", ROMREGION_DISPOSE )
+	ROM_LOAD( "pal16l8b-c16-08.ic34", 0x0000, 0x0104, CRC(9456d278) SHA1(cd5986f260aac0ae1df1cea6dbd1dbee82536105) )
+	ROM_LOAD( "pal16l8b-c16-09.ic35", 0x0200, 0x0104, CRC(0965baab) SHA1(3f704cd42d5277e9ba0b0680a2722488fc4cc630) )
+ROM_END
+
 ROM_START( masterw )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
 	ROM_LOAD16_BYTE( "b72_06.33", 0x00000, 0x20000, CRC(ae848eff) SHA1(8715e64c5e03097aff5bf1a27e3809619a7731f0) )
@@ -3834,6 +3859,7 @@ GAME( 1989, tetrist,  tetris,  tetrist,  tetrist,  taito_b, ROT0,   "Sega", "Tet
 GAME( 1989, tetrista, tetris,  tetrista, tetrist,  taito_b, ROT0,   "Sega", "Tetris (Japan, B-System, YM2203)", GAME_SUPPORTS_SAVE )
 GAME( 1989, viofight, 0,       viofight, viofight, taito_b, ROT0,   "Taito Corporation Japan", "Violence Fight (World)", GAME_SUPPORTS_SAVE )
 GAME( 1989, viofighu, viofight,viofight, viofight, taito_b, ROT0,   "Taito America Corporation", "Violence Fight (US)", GAME_SUPPORTS_SAVE )
+GAME( 1989, viofighj, viofight,viofight, viofight, taito_b, ROT0,   "Taito Corporation", "Violence Fight (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1990, ashura,   0,       ashura,   ashura,   taito_b, ROT270, "Taito Corporation", "Ashura Blaster (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1990, ashurau,  ashura,  ashura,   ashurau,  taito_b, ROT270, "Taito America Corporation", "Ashura Blaster (US)", GAME_SUPPORTS_SAVE )
 GAME( 1990, hitice,   0,       hitice,   hitice,   taito_b, ROT0,   "Williams", "Hit the Ice (US)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

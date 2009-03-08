@@ -306,7 +306,7 @@ static DEVICE_START( zx8301 )
 	zx8301->cpu = cputag_get_cpu(device->machine, intf->cpu_tag);
 
 	/* get the screen device */
-	zx8301->screen = devtag_get_device(device->machine, VIDEO_SCREEN, intf->screen_tag);
+	zx8301->screen = devtag_get_device(device->machine, intf->screen_tag);
 	assert(zx8301->screen != NULL);
 
 	/* create the timers */

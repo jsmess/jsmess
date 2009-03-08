@@ -791,7 +791,7 @@ static STATE_POSTLOAD( coco3_video_postload )
 
 static const UINT8 *get_video_ram_coco3(running_machine *machine,int scanline)
 {
-	device_config *sam = (device_config*)devtag_get_device(machine, SAM6883_GIME, "sam");
+	const device_config *sam = devtag_get_device(machine, "sam");
 	return sam_m6847_get_video_ram(sam,scanline);
 }
 
@@ -832,12 +832,6 @@ static void internal_video_start_coco3(running_machine *machine, m6847_type type
 
 	/* GIME field sync timer */
 	video->gime_fs_timer = timer_alloc(machine, gime_fs, NULL);
-
-	/* VILE HACK */
-	{
-		extern const device_config *coco_pia_1;
-		coco_pia_1 = devtag_get_device( machine, PIA6821, "pia_1" );
-	}
 
 	/* initialize the CoCo video code */
 	memset(&cfg, 0, sizeof(cfg));

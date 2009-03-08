@@ -337,24 +337,25 @@ static READ8_HANDLER( konami_ay8910_r )
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	UINT8 result = 0xff;
-	if (offset & 0x20) result &= ay8910_r(devtag_get_device(space->machine, SOUND, "8910.0"), 0);
-	if (offset & 0x80) result &= ay8910_r(devtag_get_device(space->machine, SOUND, "8910.1"), 0);
+	if (offset & 0x20) result &= ay8910_r(devtag_get_device(space->machine, "8910.1"), 0);
+	if (offset & 0x80) result &= ay8910_r(devtag_get_device(space->machine, "8910.0"), 0);
 	return result;
 }
 
 
 static WRITE8_HANDLER( konami_ay8910_w )
 {
+	/* AV 4,5 ==> AY8910 #2 */
 	/* the decoding here is very simplistic, and you can address two simultaneously */
 	if (offset & 0x10)
-		ay8910_address_w(devtag_get_device(space->machine, SOUND, "8910.0"), 0, data);
+		ay8910_address_w(devtag_get_device(space->machine, "8910.1"), 0, data);
 	else if (offset & 0x20)
-		ay8910_data_w(devtag_get_device(space->machine, SOUND, "8910.0"), 0, data);
-
+		ay8910_data_w(devtag_get_device(space->machine, "8910.1"), 0, data);
+	/* AV6,7 ==> AY8910 #1 */
 	if (offset & 0x40)
-		ay8910_address_w(devtag_get_device(space->machine, SOUND, "8910.1"), 0, data);
+		ay8910_address_w(devtag_get_device(space->machine, "8910.0"), 0, data);
 	else if (offset & 0x80)
-		ay8910_data_w(devtag_get_device(space->machine, SOUND, "8910.1"), 0, data);
+		ay8910_data_w(devtag_get_device(space->machine, "8910.0"), 0, data);
 }
 
 
@@ -410,20 +411,22 @@ static READ8_DEVICE_HANDLER( konami_sound_timer_r )
 
 static WRITE8_HANDLER( konami_sound_filter_w )
 {
-	const device_config *discrete = devtag_get_device(space->machine, SOUND, "konami");
+	const device_config *discrete = devtag_get_device(space->machine, "konami");
 	static const char *ayname[2] = { "8910.0", "8910.1" };
 	int which, chan;
 
 	/* the offset is used as data, 6 channels * 2 bits each */
+	/* AV0 .. AV5 ==> AY8910 #2 */
+	/* AV6 .. AV11 ==> AY8910 #1 */
 	for (which = 0; which < 2; which++)
-		if (devtag_get_device(space->machine, SOUND, ayname[which]) != NULL)
+		if (devtag_get_device(space->machine, ayname[which]) != NULL)
 			for (chan = 0; chan < 3; chan++)
 			{
 				UINT8 bits = (offset >> (2 * chan + 6 * (1 - which))) & 3;
 
 				/* low bit goes to 0.22uF capacitor = 220000pF  */
 				/* high bit goes to 0.047uF capacitor = 47000pF */
-				discrete_sound_w(discrete, NODE(3 * (1-which) + chan + 11), bits);
+				discrete_sound_w(discrete, NODE(3 * which + chan + 11), bits);
 			}
 }
 
@@ -473,8 +476,8 @@ static READ8_HANDLER( theend_ppi8255_r )
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	UINT8 result = 0xff;
-	if (offset & 0x0100) result &= ppi8255_r(devtag_get_device(space->machine, PPI8255, "ppi8255_0"), offset & 3);
-	if (offset & 0x0200) result &= ppi8255_r(devtag_get_device(space->machine, PPI8255, "ppi8255_1"), offset & 3);
+	if (offset & 0x0100) result &= ppi8255_r(devtag_get_device(space->machine, "ppi8255_0"), offset & 3);
+	if (offset & 0x0200) result &= ppi8255_r(devtag_get_device(space->machine, "ppi8255_1"), offset & 3);
 	return result;
 }
 
@@ -482,8 +485,8 @@ static READ8_HANDLER( theend_ppi8255_r )
 static WRITE8_HANDLER( theend_ppi8255_w )
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
-	if (offset & 0x0100) ppi8255_w(devtag_get_device(space->machine, PPI8255, "ppi8255_0"), offset & 3, data);
-	if (offset & 0x0200) ppi8255_w(devtag_get_device(space->machine, PPI8255, "ppi8255_1"), offset & 3, data);
+	if (offset & 0x0100) ppi8255_w(devtag_get_device(space->machine, "ppi8255_0"), offset & 3, data);
+	if (offset & 0x0200) ppi8255_w(devtag_get_device(space->machine, "ppi8255_1"), offset & 3, data);
 }
 
 
@@ -594,7 +597,7 @@ static READ8_HANDLER( sfx_sample_io_r )
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	UINT8 result = 0xff;
-	if (offset & 0x04) result &= ppi8255_r(devtag_get_device(space->machine, PPI8255, "ppi8255_2"), offset & 3);
+	if (offset & 0x04) result &= ppi8255_r(devtag_get_device(space->machine, "ppi8255_2"), offset & 3);
 	return result;
 }
 
@@ -602,8 +605,8 @@ static READ8_HANDLER( sfx_sample_io_r )
 static WRITE8_HANDLER( sfx_sample_io_w )
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
-	if (offset & 0x04) ppi8255_w(devtag_get_device(space->machine, PPI8255, "ppi8255_2"), offset & 3, data);
-	if (offset & 0x10) dac_signed_data_w(devtag_get_device(space->machine, SOUND, "dac"), data);
+	if (offset & 0x04) ppi8255_w(devtag_get_device(space->machine, "ppi8255_2"), offset & 3, data);
+	if (offset & 0x10) dac_signed_data_w(devtag_get_device(space->machine, "dac"), data);
 }
 
 
@@ -641,8 +644,8 @@ static READ8_HANDLER( frogger_ppi8255_r )
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	UINT8 result = 0xff;
-	if (offset & 0x1000) result &= ppi8255_r(devtag_get_device(space->machine, PPI8255, "ppi8255_1"), (offset >> 1) & 3);
-	if (offset & 0x2000) result &= ppi8255_r(devtag_get_device(space->machine, PPI8255, "ppi8255_0"), (offset >> 1) & 3);
+	if (offset & 0x1000) result &= ppi8255_r(devtag_get_device(space->machine, "ppi8255_1"), (offset >> 1) & 3);
+	if (offset & 0x2000) result &= ppi8255_r(devtag_get_device(space->machine, "ppi8255_0"), (offset >> 1) & 3);
 	return result;
 }
 
@@ -650,8 +653,8 @@ static READ8_HANDLER( frogger_ppi8255_r )
 static WRITE8_HANDLER( frogger_ppi8255_w )
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
-	if (offset & 0x1000) ppi8255_w(devtag_get_device(space->machine, PPI8255, "ppi8255_1"), (offset >> 1) & 3, data);
-	if (offset & 0x2000) ppi8255_w(devtag_get_device(space->machine, PPI8255, "ppi8255_0"), (offset >> 1) & 3, data);
+	if (offset & 0x1000) ppi8255_w(devtag_get_device(space->machine, "ppi8255_1"), (offset >> 1) & 3, data);
+	if (offset & 0x2000) ppi8255_w(devtag_get_device(space->machine, "ppi8255_0"), (offset >> 1) & 3, data);
 }
 
 
@@ -659,7 +662,7 @@ static READ8_HANDLER( frogger_ay8910_r )
 {
 	/* the decoding here is very simplistic */
 	UINT8 result = 0xff;
-	if (offset & 0x40) result &= ay8910_r(devtag_get_device(space->machine, SOUND, "8910.0"), 0);
+	if (offset & 0x40) result &= ay8910_r(devtag_get_device(space->machine, "8910.0"), 0);
 	return result;
 }
 
@@ -667,10 +670,11 @@ static READ8_HANDLER( frogger_ay8910_r )
 static WRITE8_HANDLER( frogger_ay8910_w )
 {
 	/* the decoding here is very simplistic */
+	/* AV6,7 ==> AY8910 #1 */
 	if (offset & 0x40)
-		ay8910_data_w(devtag_get_device(space->machine, SOUND, "8910.0"), 0, data);
+		ay8910_data_w(devtag_get_device(space->machine, "8910.0"), 0, data);
 	else if (offset & 0x80)
-		ay8910_address_w(devtag_get_device(space->machine, SOUND, "8910.0"), 0, data);
+		ay8910_address_w(devtag_get_device(space->machine, "8910.0"), 0, data);
 }
 
 
@@ -699,8 +703,8 @@ static READ8_HANDLER( frogf_ppi8255_r )
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	UINT8 result = 0xff;
-	if (offset & 0x1000) result &= ppi8255_r(devtag_get_device(space->machine, PPI8255, "ppi8255_0"), (offset >> 3) & 3);
-	if (offset & 0x2000) result &= ppi8255_r(devtag_get_device(space->machine, PPI8255, "ppi8255_1"), (offset >> 3) & 3);
+	if (offset & 0x1000) result &= ppi8255_r(devtag_get_device(space->machine, "ppi8255_0"), (offset >> 3) & 3);
+	if (offset & 0x2000) result &= ppi8255_r(devtag_get_device(space->machine, "ppi8255_1"), (offset >> 3) & 3);
 	return result;
 }
 
@@ -708,8 +712,8 @@ static READ8_HANDLER( frogf_ppi8255_r )
 static WRITE8_HANDLER( frogf_ppi8255_w )
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
-	if (offset & 0x1000) ppi8255_w(devtag_get_device(space->machine, PPI8255, "ppi8255_0"), (offset >> 3) & 3, data);
-	if (offset & 0x2000) ppi8255_w(devtag_get_device(space->machine, PPI8255, "ppi8255_1"), (offset >> 3) & 3, data);
+	if (offset & 0x1000) ppi8255_w(devtag_get_device(space->machine, "ppi8255_0"), (offset >> 3) & 3, data);
+	if (offset & 0x2000) ppi8255_w(devtag_get_device(space->machine, "ppi8255_1"), (offset >> 3) & 3, data);
 }
 
 
@@ -720,10 +724,10 @@ static WRITE8_HANDLER( frogf_ppi8255_w )
  *
  *************************************/
 
-static READ8_HANDLER( turtles_ppi8255_0_r ) { return ppi8255_r(devtag_get_device(space->machine, PPI8255, "ppi8255_0"), (offset >> 4) & 3); }
-static READ8_HANDLER( turtles_ppi8255_1_r ) { return ppi8255_r(devtag_get_device(space->machine, PPI8255, "ppi8255_1"), (offset >> 4) & 3); }
-static WRITE8_HANDLER( turtles_ppi8255_0_w ) { ppi8255_w(devtag_get_device(space->machine, PPI8255, "ppi8255_0"), (offset >> 4) & 3, data); }
-static WRITE8_HANDLER( turtles_ppi8255_1_w ) { ppi8255_w(devtag_get_device(space->machine, PPI8255, "ppi8255_1"), (offset >> 4) & 3, data); }
+static READ8_HANDLER( turtles_ppi8255_0_r ) { return ppi8255_r(devtag_get_device(space->machine, "ppi8255_0"), (offset >> 4) & 3); }
+static READ8_HANDLER( turtles_ppi8255_1_r ) { return ppi8255_r(devtag_get_device(space->machine, "ppi8255_1"), (offset >> 4) & 3); }
+static WRITE8_HANDLER( turtles_ppi8255_0_w ) { ppi8255_w(devtag_get_device(space->machine, "ppi8255_0"), (offset >> 4) & 3, data); }
+static WRITE8_HANDLER( turtles_ppi8255_1_w ) { ppi8255_w(devtag_get_device(space->machine, "ppi8255_1"), (offset >> 4) & 3, data); }
 
 
 
@@ -737,9 +741,9 @@ static READ8_HANDLER( scorpion_ay8910_r )
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	UINT8 result = 0xff;
-	if (offset & 0x08) result &= ay8910_r(devtag_get_device(space->machine, SOUND, "8910.2"), 0);
-	if (offset & 0x20) result &= ay8910_r(devtag_get_device(space->machine, SOUND, "8910.0"), 0);
-	if (offset & 0x80) result &= ay8910_r(devtag_get_device(space->machine, SOUND, "8910.1"), 0);
+	if (offset & 0x08) result &= ay8910_r(devtag_get_device(space->machine, "8910.2"), 0);
+	if (offset & 0x20) result &= ay8910_r(devtag_get_device(space->machine, "8910.0"), 0);
+	if (offset & 0x80) result &= ay8910_r(devtag_get_device(space->machine, "8910.1"), 0);
 	return result;
 }
 
@@ -747,12 +751,12 @@ static READ8_HANDLER( scorpion_ay8910_r )
 static WRITE8_HANDLER( scorpion_ay8910_w )
 {
 	/* the decoding here is very simplistic, and you can address all six simultaneously */
-	if (offset & 0x04) ay8910_address_w(devtag_get_device(space->machine, SOUND, "8910.2"), 0, data);
-	if (offset & 0x08) ay8910_data_w(devtag_get_device(space->machine, SOUND, "8910.2"), 0, data);
-	if (offset & 0x10) ay8910_address_w(devtag_get_device(space->machine, SOUND, "8910.0"), 0, data);
-	if (offset & 0x20) ay8910_data_w(devtag_get_device(space->machine, SOUND, "8910.0"), 0, data);
-	if (offset & 0x40) ay8910_address_w(devtag_get_device(space->machine, SOUND, "8910.1"), 0, data);
-	if (offset & 0x80) ay8910_data_w(devtag_get_device(space->machine, SOUND, "8910.1"), 0, data);
+	if (offset & 0x04) ay8910_address_w(devtag_get_device(space->machine, "8910.2"), 0, data);
+	if (offset & 0x08) ay8910_data_w(devtag_get_device(space->machine, "8910.2"), 0, data);
+	if (offset & 0x10) ay8910_address_w(devtag_get_device(space->machine, "8910.0"), 0, data);
+	if (offset & 0x20) ay8910_data_w(devtag_get_device(space->machine, "8910.0"), 0, data);
+	if (offset & 0x40) ay8910_address_w(devtag_get_device(space->machine, "8910.1"), 0, data);
+	if (offset & 0x80) ay8910_data_w(devtag_get_device(space->machine, "8910.1"), 0, data);
 }
 
 
@@ -787,7 +791,7 @@ static WRITE8_DEVICE_HANDLER( scorpion_protection_w )
 
 static READ8_HANDLER( scorpion_digitalker_intr_r )
 {
-	const device_config *digitalker = devtag_get_device(space->machine, SOUND, "digitalker");
+	const device_config *digitalker = devtag_get_device(space->machine, "digitalker");
 	return digitalker_0_intr_r(digitalker);
 }
 
@@ -867,7 +871,7 @@ static WRITE8_HANDLER( zigzag_ay8910_w )
 			/* bit 0 = WRITE */
 			/* bit 1 = C/D */
 			if ((offset & 1) != 0)
-				ay8910_data_address_w(devtag_get_device(space->machine, SOUND, "ay"), offset >> 1, zigzag_ay8910_latch);
+				ay8910_data_address_w(devtag_get_device(space->machine, "ay"), offset >> 1, zigzag_ay8910_latch);
 			break;
 
 		case 0x100:
@@ -959,21 +963,21 @@ static WRITE8_HANDLER( mshuttle_ay8910_cs_w )
 static WRITE8_HANDLER( mshuttle_ay8910_control_w )
 {
 	if (!mshuttle_ay8910_cs)
-		ay8910_address_w(devtag_get_device(space->machine, SOUND, "ay"), offset, data);
+		ay8910_address_w(devtag_get_device(space->machine, "ay"), offset, data);
 }
 
 
 static WRITE8_HANDLER( mshuttle_ay8910_data_w )
 {
 	if (!mshuttle_ay8910_cs)
-		ay8910_data_w(devtag_get_device(space->machine, SOUND, "ay"), offset, data);
+		ay8910_data_w(devtag_get_device(space->machine, "ay"), offset, data);
 }
 
 
 static READ8_HANDLER( mshuttle_ay8910_data_r )
 {
 	if (!mshuttle_ay8910_cs)
-		return ay8910_r(devtag_get_device(space->machine, SOUND, "ay"), offset);
+		return ay8910_r(devtag_get_device(space->machine, "ay"), offset);
 	return 0xff;
 }
 
@@ -1259,8 +1263,8 @@ static ADDRESS_MAP_START( scobra_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x4000) AM_RAM
 	AM_RANGE(0x8800, 0x8bff) AM_MIRROR(0x4400) AM_RAM_WRITE(galaxian_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x9000, 0x90ff) AM_MIRROR(0x4700) AM_RAM_WRITE(galaxian_objram_w) AM_BASE(&spriteram)
-	AM_RANGE(0x9800, 0x9803) AM_MIRROR(0x47fc) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xa000, 0xa003) AM_MIRROR(0x47fc) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x9800, 0x9803) AM_MIRROR(0x47fc) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xa000, 0xa003) AM_MIRROR(0x47fc) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xa801, 0xa801) AM_MIRROR(0x47f8) AM_WRITE(irq_enable_w)
 	AM_RANGE(0xa802, 0xa802) AM_MIRROR(0x47f8) AM_WRITE(coin_count_0_w)
 	AM_RANGE(0xa803, 0xa803) AM_MIRROR(0x47f8) AM_WRITE(scramble_background_enable_w)
@@ -1346,8 +1350,8 @@ static ADDRESS_MAP_START( jumpbug_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0x0400) AM_RAM_WRITE(galaxian_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x5000, 0x50ff) AM_MIRROR(0x0700) AM_RAM_WRITE(galaxian_objram_w) AM_BASE(&spriteram)
-	AM_RANGE(0x5800, 0x5800) AM_MIRROR(0x00ff) AM_DEVWRITE(SOUND, "ay", ay8910_data_w)
-	AM_RANGE(0x5900, 0x5900) AM_MIRROR(0x00ff) AM_DEVWRITE(SOUND, "ay", ay8910_address_w)
+	AM_RANGE(0x5800, 0x5800) AM_MIRROR(0x00ff) AM_DEVWRITE("ay", ay8910_data_w)
+	AM_RANGE(0x5900, 0x5900) AM_MIRROR(0x00ff) AM_DEVWRITE("ay", ay8910_address_w)
 	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x07ff) AM_READ_PORT("IN0")
 	AM_RANGE(0x6002, 0x6006) AM_MIRROR(0x07f8) AM_WRITE(galaxian_gfxbank_w)
 	AM_RANGE(0x6800, 0x6800) AM_MIRROR(0x07ff) AM_READ_PORT("IN1")
@@ -1452,8 +1456,8 @@ static ADDRESS_MAP_START( checkman_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x03, 0x03) AM_READ(soundlatch_r)
-	AM_RANGE(0x04, 0x05) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
-	AM_RANGE(0x06, 0x06) AM_DEVREAD(SOUND, "ay", ay8910_r)
+	AM_RANGE(0x04, 0x05) AM_DEVWRITE("ay", ay8910_address_data_w)
+	AM_RANGE(0x06, 0x06) AM_DEVREAD("ay", ay8910_r)
 ADDRESS_MAP_END
 
 
@@ -1462,8 +1466,8 @@ static ADDRESS_MAP_START( checkmaj_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
-	AM_RANGE(0xa002, 0xa002) AM_DEVREAD(SOUND, "ay", ay8910_r)
+	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("ay", ay8910_address_data_w)
+	AM_RANGE(0xa002, 0xa002) AM_DEVREAD("ay", ay8910_r)
 ADDRESS_MAP_END
 
 
@@ -1478,7 +1482,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( kingball_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff) AM_READ(soundlatch_r) AM_DEVWRITE(SOUND, "dac", kingball_dac_w)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff) AM_READ(soundlatch_r) AM_DEVWRITE("dac", kingball_dac_w)
 ADDRESS_MAP_END
 
 
@@ -1569,8 +1573,8 @@ static const ay8910_interface konami_ay8910_interface_1 =
 {
 	AY8910_DISCRETE_OUTPUT,
 	{RES_K(5.1), RES_K(5.1), RES_K(5.1)},
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_MEMORY_HANDLER("audiocpu", PROGRAM, soundlatch_r),
+	DEVCB_HANDLER(konami_sound_timer_r),
 	DEVCB_NULL,
 	DEVCB_NULL
 };
@@ -1579,8 +1583,8 @@ static const ay8910_interface konami_ay8910_interface_2 =
 {
 	AY8910_DISCRETE_OUTPUT,
 	{RES_K(5.1), RES_K(5.1), RES_K(5.1)},
-	DEVCB_MEMORY_HANDLER("audiocpu", PROGRAM, soundlatch_r),
-	DEVCB_HANDLER(konami_sound_timer_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
 };
@@ -1621,8 +1625,8 @@ static const ay8910_interface scorpion_ay8910_interface =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER(SOUND, "digitalker", digitalker_data_w),
-	DEVCB_DEVICE_HANDLER(SOUND, "digitalker", scorpion_digitalker_control_w)
+	DEVCB_DEVICE_HANDLER("digitalker", digitalker_data_w),
+	DEVCB_DEVICE_HANDLER("digitalker", scorpion_digitalker_control_w)
 };
 
 static const ay8910_interface checkmaj_ay8910_interface =
@@ -1642,7 +1646,7 @@ static const discrete_mixer_desc konami_sound_mixer_desc =
 		{0,0,0,0,0,0},  /* no node capacitors      */
 		0, RES_K(2.2),
 		0,
-		CAP_U(0.15),
+		0, /* modelled separately */
 		0, 1};
 
 static DISCRETE_SOUND_START( konami_sound )
@@ -1677,7 +1681,10 @@ static DISCRETE_SOUND_START( konami_sound )
 	/* This is handled with sound_global_enable but    */
 	/* belongs here.                                   */
 
-	DISCRETE_OUTPUT(NODE_30, 12.0 )
+	/* Input impedance of a M51516L is typically 30k (datasheet) */
+	DISCRETE_CRFILTER(NODE_40,1,NODE_30,RES_K(30),CAP_U(0.15))
+
+	DISCRETE_OUTPUT(NODE_40, 10.0 )
 
 DISCRETE_SOUND_END
 
@@ -1745,9 +1752,9 @@ static MACHINE_DRIVER_START( konami_sound_1x_ay8910 )
 	/* sound hardware */
 	MDRV_SOUND_ADD("8910.0", AY8910, KONAMI_SOUND_CLOCK/8)
 	MDRV_SOUND_CONFIG(frogger_ay8910_interface)
-	MDRV_SOUND_ROUTE_EX(0, "konami", 1.0, 3)
-	MDRV_SOUND_ROUTE_EX(1, "konami", 1.0, 4)
-	MDRV_SOUND_ROUTE_EX(2, "konami", 1.0, 5)
+	MDRV_SOUND_ROUTE_EX(0, "konami", 1.0, 0)
+	MDRV_SOUND_ROUTE_EX(1, "konami", 1.0, 1)
+	MDRV_SOUND_ROUTE_EX(2, "konami", 1.0, 2)
 
 	MDRV_SOUND_ADD("konami", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(konami_sound)
@@ -2728,10 +2735,10 @@ static DRIVER_INIT( explorer )
 
 	/* I/O appears to be direct, not via PPIs */
 	memory_install_readwrite8_handler(space, 0x8000, 0xffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
-	memory_install_read8_handler(space, 0x8000, 0x8000, 0, 0xffc, input_port_read_handler8(machine->portconfig, "IN0"));
-	memory_install_read8_handler(space, 0x8001, 0x8001, 0, 0xffc, input_port_read_handler8(machine->portconfig, "IN1"));
-	memory_install_read8_handler(space, 0x8002, 0x8002, 0, 0xffc, input_port_read_handler8(machine->portconfig, "IN2"));
-	memory_install_read8_handler(space, 0x8003, 0x8003, 0, 0xffc, input_port_read_handler8(machine->portconfig, "IN3"));
+	memory_install_read_port_handler(space, 0x8000, 0x8000, 0, 0xffc, "IN0");
+	memory_install_read_port_handler(space, 0x8001, 0x8001, 0, 0xffc, "IN1");
+	memory_install_read_port_handler(space, 0x8002, 0x8002, 0, 0xffc, "IN2");
+	memory_install_read_port_handler(space, 0x8003, 0x8003, 0, 0xffc, "IN3");
 	memory_install_write8_handler(space, 0x8000, 0x8000, 0, 0xfff, soundlatch_w);
 	memory_install_write8_handler(space, 0x9000, 0x9000, 0, 0xfff, explorer_sound_control_w);
 }

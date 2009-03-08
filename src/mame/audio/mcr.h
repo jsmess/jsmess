@@ -68,5 +68,4 @@ MACHINE_DRIVER_EXTERN( chip_squeak_deluxe );
 MACHINE_DRIVER_EXTERN( chip_squeak_deluxe_stereo );
 MACHINE_DRIVER_EXTERN( sounds_good );
 MACHINE_DRIVER_EXTERN( turbo_chip_squeak );
-MACHINE_DRIVER_EXTERN( turbo_chip_squeak_plus_sounds_good );
 MACHINE_DRIVER_EXTERN( squawk_n_talk );

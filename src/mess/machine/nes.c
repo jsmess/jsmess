@@ -66,7 +66,7 @@ static void nes_machine_stop(running_machine *machine);
 
 static const device_config *cartslot_image(running_machine *machine)
 {
-	return devtag_get_device(machine, CARTSLOT, "cart");
+	return devtag_get_device(machine, "cart");
 }
 
 static void init_nes_core (running_machine *machine)

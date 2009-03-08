@@ -81,7 +81,7 @@ const wd17xx_interface mbee_wd17xx_interface = { mbee_fdc_callback, NULL };
 
 WRITE8_HANDLER ( mbee_fdc_motor_w )
 {
-	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD179X, "wd179x");
+	const device_config *fdc = devtag_get_device(space->machine, "wd179x");
 	logerror("mbee fdc_motor_w $%02X\n", data);
 	/* Controller latch bits
 	 * 0-1	driver select

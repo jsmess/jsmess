@@ -243,8 +243,8 @@ static ADDRESS_MAP_START(a600xl_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xc000, 0xcfff) AM_ROM /* OS */
 	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE(atari_gtia_r, atari_gtia_w)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
-	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE(SOUND, "pokey", pokey_r, pokey_w)
-    AM_RANGE(0xd300, 0xd3ff) AM_READWRITE(pia_0_alt_r, pia_0_alt_w)
+	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE("pokey", pokey_r, pokey_w)
+    AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE("pia", pia6821_alt_r, pia6821_alt_w)
 	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE(atari_antic_r, atari_antic_w)
 	AM_RANGE(0xd500, 0xd7ff) AM_NOP
 	AM_RANGE(0xd800, 0xffff) AM_ROM /* OS */
@@ -436,6 +436,8 @@ static MACHINE_DRIVER_START( a600xl )
 	MDRV_CPU_ADD("mcu", M68705, 3579545)
 	MDRV_CPU_PROGRAM_MAP(mcu_mem,0)
 
+	MDRV_PIA6821_ADD("pia", a600xl_pia_interface)
+
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -444,7 +446,7 @@ static MACHINE_DRIVER_START( a600xl )
 	MDRV_SCREEN_REFRESH_RATE(FRAME_RATE_60HZ)
 	MDRV_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_60HZ)
 
-	MDRV_PALETTE_LENGTH(sizeof(atari_palette) / sizeof(atari_palette[0]))
+	MDRV_PALETTE_LENGTH(ARRAY_LENGTH(atari_palette))
 	MDRV_PALETTE_INIT(atari)
 	MDRV_DEFAULT_LAYOUT(layout_maxaflex)
 

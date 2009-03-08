@@ -546,14 +546,23 @@ static const rectangle *visarea;
  *
  *************************************/
 
-static WRITE8_HANDLER( pia_porta_out );
+static WRITE8_DEVICE_HANDLER( pia_porta_out );
 static WRITE8_HANDLER( pia_portb_out );
 
 static const pia6821_interface pia_interface =
 {
-	0, ticket_dispenser_r, 0, 0, 0, 0,		/* PIA inputs: A, B, CA1, CB1, CA2, CB2 */
-	pia_porta_out, pia_portb_out, 0, 0,		/* PIA outputs: A, B, CA2, CB2 */
-	0, 0									/* PIA IRQs: A, B */
+	DEVCB_NULL,		/* port A in */
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, ticket_dispenser_r),	/* port B in */
+	DEVCB_NULL,		/* line CA1 in */
+	DEVCB_NULL,		/* line CB1 in */
+	DEVCB_NULL,		/* line CA2 in */
+	DEVCB_NULL,		/* line CB2 in */
+	DEVCB_HANDLER(pia_porta_out),		/* port A out */
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, pia_portb_out),		/* port B out */
+	DEVCB_NULL,		/* line CA2 out */
+	DEVCB_NULL,		/* port CB2 out */
+	DEVCB_NULL,		/* IRQA */
+	DEVCB_NULL		/* IRQB */
 };
 
 
@@ -654,15 +663,8 @@ static void generate_sound_irq(const device_config *device, int state)
 static TIMER_CALLBACK( behind_the_beam_update );
 
 
-static MACHINE_START( itech8 )
-{
-	pia_config(machine, 0, &pia_interface);
-}
-
 static MACHINE_START( sstrike )
 {
-	MACHINE_START_CALL(itech8);
-
 	/* we need to update behind the beam as well */
 	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 32, behind_the_beam_update);
 }
@@ -677,9 +679,6 @@ static MACHINE_RESET( itech8 )
 		memory_set_bankptr(machine, 1, &memory_region(machine, "maincpu")[0x4000]);
 		device_reset(machine->cpu[0]);
 	}
-
-	/* reset the PIA (if used) */
-	pia_reset();
 
 	/* reset the ticket dispenser */
 	ticket_dispenser_init(machine, 200, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
@@ -764,7 +763,7 @@ static CUSTOM_INPUT( special_r )
  *
  *************************************/
 
-static WRITE8_HANDLER( pia_porta_out )
+static WRITE8_DEVICE_HANDLER( pia_porta_out )
 {
 	logerror("PIA port A write = %02x\n", data);
 	pia_porta_data = data;
@@ -968,9 +967,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound2203_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0000) AM_WRITENOP
 	AM_RANGE(0x1000, 0x1000) AM_READ(sound_data_r)
-	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x0002) AM_DEVREADWRITE(SOUND, "ym", ym2203_r, ym2203_w)
+	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x0002) AM_DEVREADWRITE("ym", ym2203_r, ym2203_w)
 	AM_RANGE(0x3000, 0x37ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_DEVREADWRITE(SOUND, "oki", okim6295_r, okim6295_w)
+	AM_RANGE(0x4000, 0x4000) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -979,7 +978,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound2608b_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0x1000) AM_WRITENOP
 	AM_RANGE(0x2000, 0x2000) AM_READ(sound_data_r)
-	AM_RANGE(0x4000, 0x4003) AM_DEVREADWRITE(SOUND, "ym", ym2608_r, ym2608_w)
+	AM_RANGE(0x4000, 0x4003) AM_DEVREADWRITE("ym", ym2608_r, ym2608_w)
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -989,10 +988,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound3812_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0000) AM_WRITENOP
 	AM_RANGE(0x1000, 0x1000) AM_READ(sound_data_r)
-	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE(SOUND, "ym", ym3812_r, ym3812_w)
+	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ym", ym3812_r, ym3812_w)
 	AM_RANGE(0x3000, 0x37ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_DEVREADWRITE(SOUND, "oki", okim6295_r, okim6295_w)
-	AM_RANGE(0x5000, 0x5003) AM_READWRITE(pia_0_r, pia_0_w)
+	AM_RANGE(0x4000, 0x4000) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
+	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("pia", pia6821_r, pia6821_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -1001,10 +1000,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound3812_external_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0000) AM_WRITENOP
 	AM_RANGE(0x1000, 0x1000) AM_READ(sound_data_r)
-	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE(SOUND, "ym", ym3812_r, ym3812_w)
+	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ym", ym3812_r, ym3812_w)
 	AM_RANGE(0x3000, 0x37ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_DEVREADWRITE(SOUND, "oki", okim6295_r, okim6295_w)
-	AM_RANGE(0x5000, 0x500f) AM_DEVREADWRITE(VIA6522, "via6522_0", via_r, via_w)
+	AM_RANGE(0x4000, 0x4000) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
+	AM_RANGE(0x5000, 0x500f) AM_DEVREADWRITE("via6522_0", via_r, via_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -1728,7 +1727,6 @@ static MACHINE_DRIVER_START( itech8_core_lo )
 	MDRV_CPU_PROGRAM_MAP(tmslo_map,0)
 	MDRV_CPU_VBLANK_INT("screen", generate_nmi)
 
-	MDRV_MACHINE_START(itech8)
 	MDRV_MACHINE_RESET(itech8)
 	MDRV_NVRAM_HANDLER(itech8)
 
@@ -1796,6 +1794,8 @@ static MACHINE_DRIVER_START( itech8_sound_ym3812 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("soundcpu", M6809, CLOCK_8MHz/4)
 	MDRV_CPU_PROGRAM_MAP(sound3812_map,0)
+
+	MDRV_PIA6821_ADD("pia", pia_interface)
 
 	/* sound hardware */
 	MDRV_SOUND_ADD("ym", YM3812, CLOCK_8MHz/2)
@@ -2713,11 +2713,11 @@ static DRIVER_INIT( neckneck )
 static DRIVER_INIT( rimrockn )
 {
 	/* additional input ports */
-	memory_install_read8_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0161, 0x0161, 0, 0, input_port_read_handler8(machine->portconfig, "161"));
-	memory_install_read8_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0162, 0x0162, 0, 0, input_port_read_handler8(machine->portconfig, "162"));
-	memory_install_read8_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0163, 0x0163, 0, 0, input_port_read_handler8(machine->portconfig, "163"));
-	memory_install_read8_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0164, 0x0164, 0, 0, input_port_read_handler8(machine->portconfig, "164"));
-	memory_install_read8_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0165, 0x0165, 0, 0, input_port_read_handler8(machine->portconfig, "165"));
+	memory_install_read_port_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0161, 0x0161, 0, 0, "161");
+	memory_install_read_port_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0162, 0x0162, 0, 0, "162");
+	memory_install_read_port_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0163, 0x0163, 0, 0, "163");
+	memory_install_read_port_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0164, 0x0164, 0, 0, "164");
+	memory_install_read_port_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0165, 0x0165, 0, 0, "165");
 
 	/* different banking mechanism (disable the old one) */
 	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x01a0, 0x01a0, 0, 0, rimrockn_bank_w);

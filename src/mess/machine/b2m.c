@@ -160,7 +160,7 @@ static void b2m_set_bank(running_machine *machine,int bank)
 
 static PIT8253_OUTPUT_CHANGED(bm2_pit_out0)
 {
-	pic8259_set_irq_line((device_config*)devtag_get_device(device->machine, PIC8259, "pic8259"),1,state);		
+	pic8259_set_irq_line((device_config*)devtag_get_device(device->machine, "pic8259"),1,state);		
 }
 
 
@@ -233,7 +233,7 @@ static WRITE8_DEVICE_HANDLER (b2m_ext_8255_portc_w )
 {		
 	UINT8 drive = ((data >> 1) & 1) ^ 1;
 	UINT8 side  = (data  & 1) ^ 1;	
-	device_config *fdc = (device_config*)devtag_get_device(device->machine, WD1793, "wd1793");
+	const device_config *fdc = devtag_get_device(device->machine, "wd1793");
 	
 	if (b2m_drive!=drive) {
 		wd17xx_set_drive(fdc,drive);
@@ -329,12 +329,12 @@ READ8_HANDLER ( b2m_localmachine_r )
 
 MACHINE_START(b2m)
 {
-	wd17xx_set_pause_time((device_config*)devtag_get_device(machine, WD1793, "wd1793"),10);
+	wd17xx_set_pause_time((device_config*)devtag_get_device(machine, "wd1793"),10);
 }
 
 static IRQ_CALLBACK(b2m_irq_callback)
 {	
-	return pic8259_acknowledge((device_config*)devtag_get_device(device->machine, PIC8259, "pic8259"));
+	return pic8259_acknowledge((device_config*)devtag_get_device(device->machine, "pic8259"));
 } 
 
 
@@ -346,7 +346,7 @@ INTERRUPT_GEN (b2m_vblank_interrupt)
 {	
 	vblank_state++;
 	if (vblank_state>1) vblank_state=0;
-	pic8259_set_irq_line((device_config*)devtag_get_device(device->machine, PIC8259, "pic8259"),0,vblank_state);		
+	pic8259_set_irq_line((device_config*)devtag_get_device(device->machine, "pic8259"),0,vblank_state);		
 }
 
 MACHINE_RESET(b2m)

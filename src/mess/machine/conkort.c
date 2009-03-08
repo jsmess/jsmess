@@ -155,13 +155,13 @@ INLINE fast_t *get_safe_token_fast(const device_config *device)
 
 INLINE slow_t *get_safe_token_machine_slow(running_machine *machine)
 {
-   	const device_config *device = devtag_get_device(machine, LUXOR_55_10828, CONKORT_TAG);
+   	const device_config *device = devtag_get_device(machine, CONKORT_TAG);
 	return get_safe_token_slow(device);
 }
 
 INLINE fast_t *get_safe_token_machine_fast(running_machine *machine)
 {
-   	const device_config *device = devtag_get_device(machine, LUXOR_55_21046, CONKORT_TAG);
+   	const device_config *device = devtag_get_device(machine, CONKORT_TAG);
 	return get_safe_token_fast(device);
 }
 
@@ -433,8 +433,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slow_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x7c, 0x7f) AM_DEVREADWRITE(Z80PIO, Z80PIO_TAG, z80pio_alt_r, z80pio_alt_w)
-	AM_RANGE(0xbc, 0xbf) AM_DEVREADWRITE(WD179X, WD1791_TAG, wd17xx_r, wd17xx_w)
+	AM_RANGE(0x7c, 0x7f) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_alt_r, z80pio_alt_w)
+	AM_RANGE(0xbc, 0xbf) AM_DEVREADWRITE(WD1791_TAG, wd17xx_r, wd17xx_w)
 	AM_RANGE(0xdf, 0xdf) AM_WRITE(slow_status_w)
 	AM_RANGE(0xef, 0xef) AM_WRITE(slow_ctrl_w)
 ADDRESS_MAP_END
@@ -454,9 +454,9 @@ static ADDRESS_MAP_START( fast_io_map, ADDRESS_SPACE_IO, 8 )
 //	AM_RANGE(0x3f, 0x3f) AM_WRITE()
 //	AM_RANGE(0x4f, 0x4f) AM_WRITE()
 	AM_RANGE(0x5d, 0x5d) AM_READ(fast_ctrl_r)
-	AM_RANGE(0x68, 0x6b) AM_DEVREAD(WD1793, SAB1793_TAG, wd17xx_r)
-	AM_RANGE(0x78, 0x7b) AM_DEVWRITE(WD1793, SAB1793_TAG, wd17xx_w)
-	AM_RANGE(0x87, 0x87) AM_DEVREADWRITE(Z80DMA, Z80DMA_TAG, z80dma_r, z80dma_w)
+	AM_RANGE(0x68, 0x6b) AM_DEVREAD(SAB1793_TAG, wd17xx_r)
+	AM_RANGE(0x78, 0x7b) AM_DEVWRITE(SAB1793_TAG, wd17xx_w)
+	AM_RANGE(0x87, 0x87) AM_DEVREADWRITE(Z80DMA_TAG, z80dma_r, z80dma_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -594,7 +594,7 @@ static const z80pio_interface conkort_pio_intf =
 
 static const z80_daisy_chain slow_daisy_chain[] =
 {
-	{ Z80PIO, Z80PIO_TAG },
+	{ Z80PIO_TAG },
 	{ NULL }
 };
 
@@ -706,7 +706,7 @@ static const z80dma_interface dma_intf =
 
 static const z80_daisy_chain fast_daisy_chain[] =
 {
-	{ Z80DMA, Z80DMA_TAG },
+	{ Z80DMA_TAG },
 	{ NULL }
 };
 
@@ -850,9 +850,9 @@ static DEVICE_START( luxor_55_10828 )
 
 	/* find devices */
 	astring_printf(tempstring, "%s:%s", device->tag, Z80PIO_TAG);
-	conkort->z80pio = devtag_get_device(device->machine, Z80PIO, astring_c(tempstring));
+	conkort->z80pio = devtag_get_device(device->machine, astring_c(tempstring));
 	astring_printf(tempstring, "%s:%s", device->tag, WD1791_TAG);
-	conkort->wd1791 = devtag_get_device(device->machine, Z80DMA, astring_c(tempstring));
+	conkort->wd1791 = devtag_get_device(device->machine, astring_c(tempstring));
 
 	/* register for state saving */
 	state_save_register_device_item(device, 0, conkort->status);
@@ -935,9 +935,9 @@ static DEVICE_START( luxor_55_21046 )
 
 	/* find devices */
 	astring_printf(tempstring, "%s:%s", device->tag, Z80DMA_TAG);
-	conkort->z80dma = devtag_get_device(device->machine, Z80DMA, astring_c(tempstring));
+	conkort->z80dma = devtag_get_device(device->machine, astring_c(tempstring));
 	astring_printf(tempstring, "%s:%s", device->tag, SAB1793_TAG);
-	conkort->wd1793 = devtag_get_device(device->machine, Z80DMA, astring_c(tempstring));
+	conkort->wd1793 = devtag_get_device(device->machine, astring_c(tempstring));
 
 	/* register for state saving */
 	state_save_register_device_item(device, 0, conkort->status);

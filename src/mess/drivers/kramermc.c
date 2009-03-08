@@ -31,7 +31,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kramermc_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xfc, 0x0ff) AM_DEVREADWRITE(Z80PIO, "z80pio", z80pio_r, z80pio_w)
+	AM_RANGE(0xfc, 0x0ff) AM_DEVREADWRITE("z80pio", z80pio_r, z80pio_w)
 ADDRESS_MAP_END
 
 /* Input ports */

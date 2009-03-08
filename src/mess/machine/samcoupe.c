@@ -150,14 +150,14 @@ WRITE8_HANDLER( samcoupe_ext_mem_w )
 
 static READ8_HANDLER( samcoupe_rtc_r )
 {
-	const device_config *rtc = devtag_get_device(space->machine, MSM6242, "sambus_clock");
+	const device_config *rtc = devtag_get_device(space->machine, "sambus_clock");
 	return msm6242_r(rtc, offset >> 12);
 }
 
 
 static WRITE8_HANDLER( samcoupe_rtc_w )
 {
-	const device_config *rtc = devtag_get_device(space->machine, MSM6242, "sambus_clock");
+	const device_config *rtc = devtag_get_device(space->machine, "sambus_clock");
 	msm6242_w(rtc, offset >> 12, data);
 }
 

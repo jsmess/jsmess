@@ -124,44 +124,44 @@ command, or FDC encounters a Data Mark when executing a read deleted data comman
 	MDRV_DEVICE_CONFIG(_intrf)
 
 #define MDRV_NEC765A_MODIFY(_tag, _intrf) \
-  MDRV_DEVICE_MODIFY(_tag, NEC765A)	      \
+  MDRV_DEVICE_MODIFY(_tag)	      \
   MDRV_DEVICE_CONFIG(_intrf)
 
 #define MDRV_NEC765A_REMOVE(_tag)		\
-  MDRV_DEVICE_REMOVE(_tag, NEC765A)
+  MDRV_DEVICE_REMOVE(_tag)
 
 #define MDRV_NEC765B_ADD(_tag, _intrf) \
 	MDRV_DEVICE_ADD(_tag, NEC765B, 0) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
 #define MDRV_NEC765B_MODIFY(_tag, _intrf) \
-  MDRV_DEVICE_MODIFY(_tag, NEC765B)	      \
+  MDRV_DEVICE_MODIFY(_tag)	      \
   MDRV_DEVICE_CONFIG(_intrf)
 
 #define MDRV_NEC765B_REMOVE(_tag)		\
-  MDRV_DEVICE_REMOVE(_tag, NEC765B)
+  MDRV_DEVICE_REMOVE(_tag)
 
 #define MDRV_SMC37C78_ADD(_tag, _intrf) \
 	MDRV_DEVICE_ADD(_tag, SMC37C78, 0) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
 #define MDRV_SMC37C78_MODIFY(_tag, _intrf) \
-  MDRV_DEVICE_MODIFY(_tag, SMC37C78)	      \
+  MDRV_DEVICE_MODIFY(_tag)	      \
   MDRV_DEVICE_CONFIG(_intrf)
 
 #define MDRV_SMC37C78_REMOVE(_tag)		\
-  MDRV_DEVICE_REMOVE(_tag, SMC37C78)
+  MDRV_DEVICE_REMOVE(_tag)
 
 #define MDRV_NEC72065_ADD(_tag, _intrf) \
 	MDRV_DEVICE_ADD(_tag, NEC72065, 0) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
 #define MDRV_NEC72065_MODIFY(_tag, _intrf) \
-  MDRV_DEVICE_MODIFY(_tag, NEC72065)	      \
+  MDRV_DEVICE_MODIFY(_tag)	      \
   MDRV_DEVICE_CONFIG(_intrf)
 
 #define MDRV_NEC72065_REMOVE(_tag)		\
-  MDRV_DEVICE_REMOVE(_tag, NEC72065)
+  MDRV_DEVICE_REMOVE(_tag)
 
 #endif /* NEC765_H */
 

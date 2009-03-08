@@ -17,7 +17,7 @@ VIDEO_START( cbmb_crtc )
 
 VIDEO_UPDATE( cbmb_crtc )
 {
-	const device_config *mc6845 = devtag_get_device(screen->machine, MC6845, "crtc");
+	const device_config *mc6845 = devtag_get_device(screen->machine, "crtc");
 	mc6845_update(mc6845, bitmap, cliprect);
 	return 0;
 }

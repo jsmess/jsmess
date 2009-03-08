@@ -861,7 +861,7 @@ static READ8_HANDLER( gssnd_r )
 			}
 			else
 			{
-				const device_config *es5503 = devtag_get_device(space->machine, SOUND, "es5503");
+				const device_config *es5503 = devtag_get_device(space->machine, "es5503");
 				sndglu_dummy_read = es5503_r(es5503, sndglu_addr);
 			}
 
@@ -901,7 +901,7 @@ static WRITE8_HANDLER( gssnd_w )
 			}
 			else
 			{
-				const device_config *es5503 = devtag_get_device(space->machine, SOUND, "es5503");
+				const device_config *es5503 = devtag_get_device(space->machine, "es5503");
 				es5503_w(es5503, sndglu_addr, data);
 			}
 
@@ -1043,7 +1043,7 @@ static READ8_HANDLER( apple2gs_c0xx_r )
 		case 0x39:	/* C039 - SCCAREG */
 		case 0x3A:	/* C03A - SCCBDATA */
 		case 0x3B:	/* C03B - SCCADATA */
-			scc = devtag_get_device(space->machine, SCC8530, "scc");
+			scc = devtag_get_device(space->machine, "scc");
 			result = scc_r(scc, offset & 0x03);
 			break;
 
@@ -1183,7 +1183,7 @@ static WRITE8_HANDLER( apple2gs_c0xx_w )
 		case 0x39:	/* C039 - SCCAREG */
 		case 0x3A:	/* C03A - SCCBDATA */
 		case 0x3B:	/* C03B - SCCADATA */
-			scc = devtag_get_device(space->machine, SCC8530, "scc");
+			scc = devtag_get_device(space->machine, "scc");
 			scc_w(scc, offset & 0x03, data);
 			break;
 

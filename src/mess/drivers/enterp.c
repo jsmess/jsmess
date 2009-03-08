@@ -224,7 +224,7 @@ static READ8_HANDLER( exdos_card_r )
 */
 static WRITE8_HANDLER( exdos_card_w )
 {
-	const device_config *fdc = devtag_get_device(space->machine, WD1770, "wd1770");
+	const device_config *fdc = devtag_get_device(space->machine, "wd1770");
 
 	/* drive */
 	if (BIT(data, 0)) wd17xx_set_drive(fdc, 0);
@@ -239,7 +239,7 @@ static WRITE8_HANDLER( exdos_card_w )
 
 static DEVICE_IMAGE_LOAD( enterprise_floppy )
 {
-	const device_config *fdc = devtag_get_device(image->machine, WD1770, "wd1770");
+	const device_config *fdc = devtag_get_device(image->machine, "wd1770");
 
 	wd17xx_set_density(fdc, DEN_FM_HI);
 
@@ -265,10 +265,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( enterprise_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_MIRROR(0x04) AM_DEVREADWRITE(WD1770, "wd1770", wd17xx_r, wd17xx_w)
+	AM_RANGE(0x10, 0x13) AM_MIRROR(0x04) AM_DEVREADWRITE("wd1770", wd17xx_r, wd17xx_w)
 	AM_RANGE(0x18, 0x18) AM_MIRROR(0x04) AM_READWRITE(exdos_card_r, exdos_card_w)
 	AM_RANGE(0x80, 0x8f) AM_WRITE(Nick_reg_w)
-	AM_RANGE(0xa0, 0xbf) AM_DEVREADWRITE(SOUND, "custom", dave_reg_r, dave_reg_w)
+	AM_RANGE(0xa0, 0xbf) AM_DEVREADWRITE("custom", dave_reg_r, dave_reg_w)
 ADDRESS_MAP_END
 
 

@@ -827,13 +827,13 @@ static ADDRESS_MAP_START( st_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8604, 0xff8605) AM_READWRITE(atarist_fdc_data_r, atarist_fdc_data_w)
 	AM_RANGE(0xff8606, 0xff8607) AM_READWRITE(atarist_fdc_dma_status_r, atarist_fdc_dma_mode_w)
 	AM_RANGE(0xff8608, 0xff860d) AM_READWRITE(atarist_fdc_dma_base_r, atarist_fdc_dma_base_w)
-	AM_RANGE(0xff8800, 0xff8801) AM_DEVREADWRITE8(SOUND, "ym2149", ay8910_r, ay8910_data_w, 0xff00)
-	AM_RANGE(0xff8802, 0xff8803) AM_DEVWRITE8(SOUND, "ym2149", ay8910_data_w, 0xff00)
-	AM_RANGE(0xfffa00, 0xfffa2f) AM_DEVREADWRITE8(MC68901, MC68901_TAG, mc68901_register_r, mc68901_register_w, 0xff)
-	AM_RANGE(0xfffc00, 0xfffc01) AM_DEVREADWRITE8(ACIA6850, "acia_0", acia6850_stat_r, acia6850_ctrl_w, 0xff00)
-	AM_RANGE(0xfffc02, 0xfffc03) AM_DEVREADWRITE8(ACIA6850, "acia_0", acia6850_data_r, acia6850_data_w, 0xff00)
-	AM_RANGE(0xfffc04, 0xfffc05) AM_DEVREADWRITE8(ACIA6850, "acia_1", acia6850_stat_r, acia6850_ctrl_w, 0xff00)
-	AM_RANGE(0xfffc06, 0xfffc07) AM_DEVREADWRITE8(ACIA6850, "acia_1", acia6850_data_r, acia6850_data_w, 0xff00)
+	AM_RANGE(0xff8800, 0xff8801) AM_DEVREADWRITE8("ym2149", ay8910_r, ay8910_data_w, 0xff00)
+	AM_RANGE(0xff8802, 0xff8803) AM_DEVWRITE8("ym2149", ay8910_data_w, 0xff00)
+	AM_RANGE(0xfffa00, 0xfffa2f) AM_DEVREADWRITE8(MC68901_TAG, mc68901_register_r, mc68901_register_w, 0xff)
+	AM_RANGE(0xfffc00, 0xfffc01) AM_DEVREADWRITE8("acia_0", acia6850_stat_r, acia6850_ctrl_w, 0xff00)
+	AM_RANGE(0xfffc02, 0xfffc03) AM_DEVREADWRITE8("acia_0", acia6850_data_r, acia6850_data_w, 0xff00)
+	AM_RANGE(0xfffc04, 0xfffc05) AM_DEVREADWRITE8("acia_1", acia6850_stat_r, acia6850_ctrl_w, 0xff00)
+	AM_RANGE(0xfffc06, 0xfffc07) AM_DEVREADWRITE8("acia_1", acia6850_data_r, acia6850_data_w, 0xff00)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( megast_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -852,8 +852,8 @@ static ADDRESS_MAP_START( megast_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8604, 0xff8605) AM_READWRITE(atarist_fdc_data_r, atarist_fdc_data_w)
 	AM_RANGE(0xff8606, 0xff8607) AM_READWRITE(atarist_fdc_dma_status_r, atarist_fdc_dma_mode_w)
 	AM_RANGE(0xff8608, 0xff860d) AM_READWRITE(atarist_fdc_dma_base_r, atarist_fdc_dma_base_w)
-	AM_RANGE(0xff8800, 0xff8801) AM_DEVREADWRITE8(SOUND, "ym2149", ay8910_r, ay8910_data_w, 0xff00)
-	AM_RANGE(0xff8802, 0xff8803) AM_DEVWRITE8(SOUND, "ym2149", ay8910_data_w, 0xff00)
+	AM_RANGE(0xff8800, 0xff8801) AM_DEVREADWRITE8("ym2149", ay8910_r, ay8910_data_w, 0xff00)
+	AM_RANGE(0xff8802, 0xff8803) AM_DEVWRITE8("ym2149", ay8910_data_w, 0xff00)
 	AM_RANGE(0xff8a00, 0xff8a1f) AM_READWRITE(atarist_blitter_halftone_r, atarist_blitter_halftone_w)
 	AM_RANGE(0xff8a20, 0xff8a21) AM_READWRITE(atarist_blitter_src_inc_x_r, atarist_blitter_src_inc_x_w)
 	AM_RANGE(0xff8a22, 0xff8a23) AM_READWRITE(atarist_blitter_src_inc_y_r, atarist_blitter_src_inc_y_w)
@@ -866,13 +866,13 @@ static ADDRESS_MAP_START( megast_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8a38, 0xff8a39) AM_READWRITE(atarist_blitter_count_y_r, atarist_blitter_count_y_w)
 	AM_RANGE(0xff8a3a, 0xff8a3b) AM_READWRITE(atarist_blitter_op_r, atarist_blitter_op_w)
 	AM_RANGE(0xff8a3c, 0xff8a3d) AM_READWRITE(atarist_blitter_ctrl_r, atarist_blitter_ctrl_w)
-	AM_RANGE(0xfffa00, 0xfffa3f) AM_DEVREADWRITE8(MC68901, MC68901_TAG, mc68901_register_r, mc68901_register_w, 0xff)
+	AM_RANGE(0xfffa00, 0xfffa3f) AM_DEVREADWRITE8(MC68901_TAG, mc68901_register_r, mc68901_register_w, 0xff)
 //  AM_RANGE(0xfffa40, 0xfffa57) AM_READWRITE(megast_fpu_r, megast_fpu_w)
-	AM_RANGE(0xfffc00, 0xfffc01) AM_DEVREADWRITE8(ACIA6850, "acia_0", acia6850_stat_r, acia6850_ctrl_w, 0xff00)
-	AM_RANGE(0xfffc02, 0xfffc03) AM_DEVREADWRITE8(ACIA6850, "acia_0", acia6850_data_r, acia6850_data_w, 0xff00)
-	AM_RANGE(0xfffc04, 0xfffc05) AM_DEVREADWRITE8(ACIA6850, "acia_1", acia6850_stat_r, acia6850_ctrl_w, 0xff00)
-	AM_RANGE(0xfffc06, 0xfffc07) AM_DEVREADWRITE8(ACIA6850, "acia_1", acia6850_data_r, acia6850_data_w, 0xff00)
-	AM_RANGE(0xfffc20, 0xfffc3f) AM_DEVREADWRITE(RP5C15, "rp5c15", rp5c15_r, rp5c15_w)
+	AM_RANGE(0xfffc00, 0xfffc01) AM_DEVREADWRITE8("acia_0", acia6850_stat_r, acia6850_ctrl_w, 0xff00)
+	AM_RANGE(0xfffc02, 0xfffc03) AM_DEVREADWRITE8("acia_0", acia6850_data_r, acia6850_data_w, 0xff00)
+	AM_RANGE(0xfffc04, 0xfffc05) AM_DEVREADWRITE8("acia_1", acia6850_stat_r, acia6850_ctrl_w, 0xff00)
+	AM_RANGE(0xfffc06, 0xfffc07) AM_DEVREADWRITE8("acia_1", acia6850_data_r, acia6850_data_w, 0xff00)
+	AM_RANGE(0xfffc20, 0xfffc3f) AM_DEVREADWRITE("rp5c15", rp5c15_r, rp5c15_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ste_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -894,8 +894,8 @@ static ADDRESS_MAP_START( ste_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8604, 0xff8605) AM_READWRITE(atarist_fdc_data_r, atarist_fdc_data_w)
 	AM_RANGE(0xff8606, 0xff8607) AM_READWRITE(atarist_fdc_dma_status_r, atarist_fdc_dma_mode_w)
 	AM_RANGE(0xff8608, 0xff860d) AM_READWRITE(atarist_fdc_dma_base_r, atarist_fdc_dma_base_w)
-	AM_RANGE(0xff8800, 0xff8801) AM_DEVREADWRITE8(SOUND, "ym2149", ay8910_r, ay8910_data_w, 0xff00)
-	AM_RANGE(0xff8802, 0xff8803) AM_DEVWRITE8(SOUND, "ym2149", ay8910_data_w, 0xff00)
+	AM_RANGE(0xff8800, 0xff8801) AM_DEVREADWRITE8("ym2149", ay8910_r, ay8910_data_w, 0xff00)
+	AM_RANGE(0xff8802, 0xff8803) AM_DEVWRITE8("ym2149", ay8910_data_w, 0xff00)
 	AM_RANGE(0xff8900, 0xff8901) AM_READWRITE(atariste_sound_dma_control_r, atariste_sound_dma_control_w)
 	AM_RANGE(0xff8902, 0xff8907) AM_READWRITE(atariste_sound_dma_base_r, atariste_sound_dma_base_w)
 	AM_RANGE(0xff8908, 0xff890d) AM_READ(atariste_sound_dma_counter_r)
@@ -923,11 +923,11 @@ static ADDRESS_MAP_START( ste_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff9216, 0xff9217) AM_READ_PORT("PADDLE1Y")
 	AM_RANGE(0xff9220, 0xff9221) AM_READ_PORT("GUNX")
 	AM_RANGE(0xff9222, 0xff9223) AM_READ_PORT("GUNY")
-	AM_RANGE(0xfffa00, 0xfffa2f) AM_DEVREADWRITE8(MC68901, MC68901_TAG, mc68901_register_r, mc68901_register_w, 0xff)
-	AM_RANGE(0xfffc00, 0xfffc01) AM_DEVREADWRITE8(ACIA6850, "acia_0", acia6850_stat_r, acia6850_ctrl_w, 0xff00)
-	AM_RANGE(0xfffc02, 0xfffc03) AM_DEVREADWRITE8(ACIA6850, "acia_0", acia6850_data_r, acia6850_data_w, 0xff00)
-	AM_RANGE(0xfffc04, 0xfffc05) AM_DEVREADWRITE8(ACIA6850, "acia_1", acia6850_stat_r, acia6850_ctrl_w, 0xff00)
-	AM_RANGE(0xfffc06, 0xfffc07) AM_DEVREADWRITE8(ACIA6850, "acia_1", acia6850_data_r, acia6850_data_w, 0xff00)
+	AM_RANGE(0xfffa00, 0xfffa2f) AM_DEVREADWRITE8(MC68901_TAG, mc68901_register_r, mc68901_register_w, 0xff)
+	AM_RANGE(0xfffc00, 0xfffc01) AM_DEVREADWRITE8("acia_0", acia6850_stat_r, acia6850_ctrl_w, 0xff00)
+	AM_RANGE(0xfffc02, 0xfffc03) AM_DEVREADWRITE8("acia_0", acia6850_data_r, acia6850_data_w, 0xff00)
+	AM_RANGE(0xfffc04, 0xfffc05) AM_DEVREADWRITE8("acia_1", acia6850_stat_r, acia6850_ctrl_w, 0xff00)
+	AM_RANGE(0xfffc06, 0xfffc07) AM_DEVREADWRITE8("acia_1", acia6850_data_r, acia6850_data_w, 0xff00)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( megaste_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -949,8 +949,8 @@ static ADDRESS_MAP_START( megaste_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8604, 0xff8605) AM_READWRITE(atarist_fdc_data_r, atarist_fdc_data_w)
 	AM_RANGE(0xff8606, 0xff8607) AM_READWRITE(atarist_fdc_dma_status_r, atarist_fdc_dma_mode_w)
 	AM_RANGE(0xff8608, 0xff860d) AM_READWRITE(atarist_fdc_dma_base_r, atarist_fdc_dma_base_w)
-	AM_RANGE(0xff8800, 0xff8801) AM_DEVREADWRITE8(SOUND, "ym2149", ay8910_r, ay8910_data_w, 0xff00)
-	AM_RANGE(0xff8802, 0xff8803) AM_DEVWRITE8(SOUND, "ym2149", ay8910_data_w, 0xff00)
+	AM_RANGE(0xff8800, 0xff8801) AM_DEVREADWRITE8("ym2149", ay8910_r, ay8910_data_w, 0xff00)
+	AM_RANGE(0xff8802, 0xff8803) AM_DEVWRITE8("ym2149", ay8910_data_w, 0xff00)
 	AM_RANGE(0xff8900, 0xff8901) AM_READWRITE(atariste_sound_dma_control_r, atariste_sound_dma_control_w)
 	AM_RANGE(0xff8902, 0xff8907) AM_READWRITE(atariste_sound_dma_base_r, atariste_sound_dma_base_w)
 	AM_RANGE(0xff8908, 0xff890d) AM_READ(atariste_sound_dma_counter_r)
@@ -971,14 +971,14 @@ static ADDRESS_MAP_START( megaste_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8a3a, 0xff8a3b) AM_READWRITE(atarist_blitter_op_r, atarist_blitter_op_w)
 	AM_RANGE(0xff8a3c, 0xff8a3d) AM_READWRITE(atarist_blitter_ctrl_r, atarist_blitter_ctrl_w)
 	AM_RANGE(0xff8e20, 0xff8e21) AM_READWRITE(megaste_cache_r, megaste_cache_w)
-	AM_RANGE(0xfffa00, 0xfffa3f) AM_DEVREADWRITE8(MC68901, MC68901_TAG, mc68901_register_r, mc68901_register_w, 0xff)
+	AM_RANGE(0xfffa00, 0xfffa3f) AM_DEVREADWRITE8(MC68901_TAG, mc68901_register_r, mc68901_register_w, 0xff)
 //  AM_RANGE(0xfffa40, 0xfffa5f) AM_READWRITE(megast_fpu_r, megast_fpu_w)
-	AM_RANGE(0xff8c80, 0xff8c87) AM_DEVREADWRITE8(SCC8530, "scc", scc_r, scc_w, 0xff00)
-	AM_RANGE(0xfffc00, 0xfffc01) AM_DEVREADWRITE8(ACIA6850, "acia_0", acia6850_stat_r, acia6850_ctrl_w, 0xff00)
-	AM_RANGE(0xfffc02, 0xfffc03) AM_DEVREADWRITE8(ACIA6850, "acia_0", acia6850_data_r, acia6850_data_w, 0xff00)
-	AM_RANGE(0xfffc04, 0xfffc05) AM_DEVREADWRITE8(ACIA6850, "acia_1", acia6850_stat_r, acia6850_ctrl_w, 0xff00)
-	AM_RANGE(0xfffc06, 0xfffc07) AM_DEVREADWRITE8(ACIA6850, "acia_1", acia6850_data_r, acia6850_data_w, 0xff00)
-	AM_RANGE(0xfffc20, 0xfffc3f) AM_DEVREADWRITE(RP5C15, "rp5c15", rp5c15_r, rp5c15_w)
+	AM_RANGE(0xff8c80, 0xff8c87) AM_DEVREADWRITE8("scc", scc_r, scc_w, 0xff00)
+	AM_RANGE(0xfffc00, 0xfffc01) AM_DEVREADWRITE8("acia_0", acia6850_stat_r, acia6850_ctrl_w, 0xff00)
+	AM_RANGE(0xfffc02, 0xfffc03) AM_DEVREADWRITE8("acia_0", acia6850_data_r, acia6850_data_w, 0xff00)
+	AM_RANGE(0xfffc04, 0xfffc05) AM_DEVREADWRITE8("acia_1", acia6850_stat_r, acia6850_ctrl_w, 0xff00)
+	AM_RANGE(0xfffc06, 0xfffc07) AM_DEVREADWRITE8("acia_1", acia6850_data_r, acia6850_data_w, 0xff00)
+	AM_RANGE(0xfffc20, 0xfffc3f) AM_DEVREADWRITE("rp5c15", rp5c15_r, rp5c15_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( stbook_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -1004,8 +1004,8 @@ static ADDRESS_MAP_START( stbook_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8604, 0xff8605) AM_READWRITE(atarist_fdc_data_r, atarist_fdc_data_w)
 	AM_RANGE(0xff8606, 0xff8607) AM_READWRITE(atarist_fdc_dma_status_r, atarist_fdc_dma_mode_w)
 	AM_RANGE(0xff8608, 0xff860d) AM_READWRITE(atarist_fdc_dma_base_r, atarist_fdc_dma_base_w)
-	AM_RANGE(0xff8800, 0xff8801) AM_DEVREADWRITE8(SOUND, YM3439_TAG, ay8910_r, ay8910_data_w, 0xff00)
-	AM_RANGE(0xff8802, 0xff8803) AM_DEVWRITE8(SOUND, YM3439_TAG, ay8910_data_w, 0xff00)
+	AM_RANGE(0xff8800, 0xff8801) AM_DEVREADWRITE8(YM3439_TAG, ay8910_r, ay8910_data_w, 0xff00)
+	AM_RANGE(0xff8802, 0xff8803) AM_DEVWRITE8(YM3439_TAG, ay8910_data_w, 0xff00)
 	AM_RANGE(0xff8900, 0xff8901) AM_READWRITE(atariste_sound_dma_control_r, atariste_sound_dma_control_w)
 	AM_RANGE(0xff8902, 0xff8907) AM_READWRITE(atariste_sound_dma_base_r, atariste_sound_dma_base_w)
 	AM_RANGE(0xff8908, 0xff890d) AM_READ(atariste_sound_dma_counter_r)
@@ -1029,11 +1029,11 @@ static ADDRESS_MAP_START( stbook_map, ADDRESS_SPACE_PROGRAM, 16 )
 /*  AM_RANGE(0xff9202, 0xff9203) AM_READWRITE(stbook_lcd_contrast_r, stbook_lcd_contrast_w)
     AM_RANGE(0xff9210, 0xff9211) AM_READWRITE(stbook_power_r, stbook_power_w)
     AM_RANGE(0xff9214, 0xff9215) AM_READWRITE(stbook_reference_r, stbook_reference_w)*/
-	AM_RANGE(0xfffa00, 0xfffa2f) AM_DEVREADWRITE8(MC68901, MC68901_TAG, mc68901_register_r, mc68901_register_w, 0xff)
-	AM_RANGE(0xfffc00, 0xfffc01) AM_DEVREADWRITE8(ACIA6850, "acia_0", acia6850_stat_r, acia6850_ctrl_w, 0xff00)
-	AM_RANGE(0xfffc02, 0xfffc03) AM_DEVREADWRITE8(ACIA6850, "acia_0", acia6850_data_r, acia6850_data_w, 0xff00)
-	AM_RANGE(0xfffc04, 0xfffc05) AM_DEVREADWRITE8(ACIA6850, "acia_1", acia6850_stat_r, acia6850_ctrl_w, 0xff00)
-	AM_RANGE(0xfffc06, 0xfffc07) AM_DEVREADWRITE8(ACIA6850, "acia_1", acia6850_data_r, acia6850_data_w, 0xff00)
+	AM_RANGE(0xfffa00, 0xfffa2f) AM_DEVREADWRITE8(MC68901_TAG, mc68901_register_r, mc68901_register_w, 0xff)
+	AM_RANGE(0xfffc00, 0xfffc01) AM_DEVREADWRITE8("acia_0", acia6850_stat_r, acia6850_ctrl_w, 0xff00)
+	AM_RANGE(0xfffc02, 0xfffc03) AM_DEVREADWRITE8("acia_0", acia6850_data_r, acia6850_data_w, 0xff00)
+	AM_RANGE(0xfffc04, 0xfffc05) AM_DEVREADWRITE8("acia_1", acia6850_stat_r, acia6850_ctrl_w, 0xff00)
+	AM_RANGE(0xfffc06, 0xfffc07) AM_DEVREADWRITE8("acia_1", acia6850_data_r, acia6850_data_w, 0xff00)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -1428,14 +1428,14 @@ static MC68901_INTERFACE( mfp_intf )
 	Y1,													/* timer clock */
 	0,													/* receive clock */
 	0,													/* transmit clock */
-	DEVCB_DEVICE_HANDLER(MC68901, MC68901_TAG, mfp_gpio_r),	/* GPIO read */
+	DEVCB_DEVICE_HANDLER(MC68901_TAG, mfp_gpio_r),	/* GPIO read */
 	DEVCB_NULL,											/* GPIO write */
 	DEVCB_NULL,											/* serial input */
 	DEVCB_NULL,											/* serial output */
 	DEVCB_NULL,											/* TAO */
 	DEVCB_NULL,											/* TBO */
 	DEVCB_NULL,											/* TCO */
-	DEVCB_DEVICE_HANDLER(MC68901, MC68901_TAG, mfp_tdo_w),	/* TDO */
+	DEVCB_DEVICE_HANDLER(MC68901_TAG, mfp_tdo_w),	/* TDO */
 	DEVCB_CPU_INPUT_LINE(M68000_TAG, M68K_IRQ_6)		/* interrupt */
 };
 
@@ -1518,9 +1518,9 @@ static MACHINE_START( atarist )
 	cpu_set_irq_callback(cputag_get_cpu(machine, M68000_TAG), atarist_int_ack);
 
 	/* find devices */
-	state->mc68901 = devtag_get_device(machine, MC68901, MC68901_TAG);
- 	state->wd1772 = devtag_get_device(machine, WD1772, WD1772_TAG);
- 	state->centronics = devtag_get_device(machine, CENTRONICS, CENTRONICS_TAG);
+	state->mc68901 = devtag_get_device(machine, MC68901_TAG);
+ 	state->wd1772 = devtag_get_device(machine, WD1772_TAG);
+ 	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
 
 	/* register for state saving */
 	atarist_state_save(machine);
@@ -1569,14 +1569,14 @@ static MC68901_INTERFACE( atariste_mfp_intf )
 	Y1,													/* timer clock */
 	0,													/* receive clock */
 	0,													/* transmit clock */
-	DEVCB_DEVICE_HANDLER(MC68901, MC68901_TAG, atariste_mfp_gpio_r),	/* GPIO read */
+	DEVCB_DEVICE_HANDLER(MC68901_TAG, atariste_mfp_gpio_r),	/* GPIO read */
 	DEVCB_NULL,											/* GPIO write */
 	DEVCB_NULL,											/* serial input */
 	DEVCB_NULL,											/* serial output */
 	DEVCB_NULL,											/* TAO */
 	DEVCB_NULL,											/* TBO */
 	DEVCB_NULL,											/* TCO */
-	DEVCB_DEVICE_HANDLER(MC68901, MC68901_TAG, mfp_tdo_w),	/* TDO */
+	DEVCB_DEVICE_HANDLER(MC68901_TAG, mfp_tdo_w),	/* TDO */
 	DEVCB_CPU_INPUT_LINE(M68000_TAG, M68K_IRQ_6)		/* interrupt */
 };
 
@@ -1616,10 +1616,10 @@ static MACHINE_START( atariste )
 	state->microwire_timer = timer_alloc(machine, atariste_microwire_tick, NULL);
 
 	/* find devices */
-	state->mc68901 = devtag_get_device(machine, MC68901, MC68901_TAG);
- 	state->wd1772 = devtag_get_device(machine, WD1772, WD1772_TAG);
-	state->lmc1992 = devtag_get_device(machine, LMC1992, LMC1992_TAG);
-	state->centronics = devtag_get_device(machine, CENTRONICS, CENTRONICS_TAG);
+	state->mc68901 = devtag_get_device(machine, MC68901_TAG);
+ 	state->wd1772 = devtag_get_device(machine, WD1772_TAG);
+	state->lmc1992 = devtag_get_device(machine, LMC1992_TAG);
+	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
 
 	/* register for state saving */
 	atariste_state_save(machine);
@@ -1742,14 +1742,14 @@ static MC68901_INTERFACE( stbook_mfp_intf )
 	Y1,													/* timer clock */
 	0,													/* receive clock */
 	0,													/* transmit clock */
-	DEVCB_DEVICE_HANDLER(MC68901, MC68901_TAG, stbook_mfp_gpio_r),	/* GPIO read */
+	DEVCB_DEVICE_HANDLER(MC68901_TAG, stbook_mfp_gpio_r),	/* GPIO read */
 	DEVCB_NULL,											/* GPIO write */
 	DEVCB_NULL,											/* serial input */
 	DEVCB_NULL,											/* serial output */
 	DEVCB_NULL,											/* TAO */
 	DEVCB_NULL,											/* TBO */
 	DEVCB_NULL,											/* TCO */
-	DEVCB_DEVICE_HANDLER(MC68901, MC68901_TAG, mfp_tdo_w),	/* TDO */
+	DEVCB_DEVICE_HANDLER(MC68901_TAG, mfp_tdo_w),	/* TDO */
 	DEVCB_CPU_INPUT_LINE(M68000_TAG, M68K_IRQ_6)		/* interrupt */
 };
 
@@ -1764,9 +1764,9 @@ static MACHINE_START( stbook )
 	cpu_set_irq_callback(cputag_get_cpu(machine, M68000_TAG), atarist_int_ack);
 
 	/* find devices */
-	state->mc68901 = devtag_get_device(machine, MC68901, MC68901_TAG);
- 	state->wd1772 = devtag_get_device(machine, WD1772, WD1772_TAG);
- 	state->centronics = devtag_get_device(machine, CENTRONICS, CENTRONICS_TAG);
+	state->mc68901 = devtag_get_device(machine, MC68901_TAG);
+ 	state->wd1772 = devtag_get_device(machine, WD1772_TAG);
+ 	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
 
 	/* register for state saving */
 	atariste_state_save(machine);

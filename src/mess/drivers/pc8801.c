@@ -419,7 +419,7 @@ static ADDRESS_MAP_START( pc88sr_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x32, 0x32) AM_READWRITE( pc88sr_inport_32, pc88sr_outport_32 )
 	AM_RANGE(0x34, 0x35) AM_WRITE( pc88sr_ALU )
 	AM_RANGE(0x40, 0x40) AM_READWRITE( pc88sr_inport_40, pc88sr_outport_40 )
-	AM_RANGE(0x44, 0x45) AM_DEVREAD( SOUND, "ym2203", ym2203_r )
+	AM_RANGE(0x44, 0x45) AM_DEVREAD( "ym2203", ym2203_r )
 	AM_RANGE(0x46, 0x47) AM_NOP										/* OPNA extra port (not yet) */
 	AM_RANGE(0x50, 0x51) AM_READWRITE( pc8801_crtc_read, pc8801_crtc_write )
 	AM_RANGE(0x52, 0x5b) AM_WRITE( pc8801_palette_out )
@@ -450,7 +450,7 @@ static ADDRESS_MAP_START( pc88sr_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0xf3, 0xf3) AM_NOP 									/* DMA floppy (unknown -- not yet) */
 	AM_RANGE(0xf4, 0xf7) AM_NOP										/* DMA 5'floppy (may be not released) */
 	AM_RANGE(0xf8, 0xfb) AM_NOP 									/* DMA 8'floppy (unknown -- not yet) */
-	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE( PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w )
+	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w )
 ADDRESS_MAP_END
 
 static INTERRUPT_GEN( pc8801fd_interrupt )
@@ -465,9 +465,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pc8801fd_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf8, 0xf8) AM_READ( pc8801fd_nec765_tc )
-	AM_RANGE(0xfa, 0xfa) AM_DEVREAD(NEC765A, "nec765", nec765_status_r )
-	AM_RANGE(0xfb, 0xfb) AM_DEVREADWRITE(NEC765A, "nec765", nec765_data_r, nec765_data_w )
-	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE( PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w )
+	AM_RANGE(0xfa, 0xfa) AM_DEVREAD("nec765", nec765_status_r )
+	AM_RANGE(0xfb, 0xfb) AM_DEVREADWRITE("nec765", nec765_data_r, nec765_data_w )
+	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w )
 ADDRESS_MAP_END
 
 ROM_START (pc88srl)

@@ -37,7 +37,7 @@ struct _sst39vfx_config
 	MDRV_DEVICE_CONFIG_DATA32(sst39vfx_config, cpu_endianess, _cpu_endianess)
 
 #define MDRV_SST39VF020_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag, SST39VF020)	
+	MDRV_DEVICE_REMOVE(_tag)	
 	
 #define SST39VF400A		DEVICE_GET_INFO_NAME(sst39vf400a)
 
@@ -47,7 +47,7 @@ struct _sst39vfx_config
 	MDRV_DEVICE_CONFIG_DATA32(sst39vfx_config, cpu_endianess, _cpu_endianess)
 
 #define MDRV_SST39VF400A_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag, SST39VF400A)
+	MDRV_DEVICE_REMOVE(_tag)
 
 /***************************************************************************
     FUNCTION PROTOTYPES

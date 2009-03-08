@@ -48,7 +48,7 @@ WRITE8_DEVICE_HANDLER( pc_lpt_control_w );
 	MDRV_DEVICE_CONFIG(_intf)
 
 #define MDRV_PC_LPT_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag, PC_LPT)
+	MDRV_DEVICE_REMOVE(_tag)
 
 
 #endif /* __PC_LPT__ */

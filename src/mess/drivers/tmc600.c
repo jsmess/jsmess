@@ -90,7 +90,7 @@ Notes:
 
 static const device_config *cassette_device_image(running_machine *machine)
 {
-	return devtag_get_device(machine, CASSETTE, "cassette");
+	return devtag_get_device(machine, "cassette");
 }
 
 /* Read/Write Handlers */
@@ -107,14 +107,14 @@ static WRITE8_HANDLER( keyboard_latch_w )
 static ADDRESS_MAP_START( tmc600_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x4fff) AM_ROM
 	AM_RANGE(0x6000, 0xbfff) AM_RAMBANK(1)
-	AM_RANGE(0xf400, 0xf7ff) AM_DEVREADWRITE(SOUND, CDP1869_TAG, cdp1869_charram_r, cdp1869_charram_w)
-	AM_RANGE(0xf800, 0xffff) AM_DEVREADWRITE(SOUND, CDP1869_TAG, cdp1869_pageram_r, cdp1869_pageram_w)
+	AM_RANGE(0xf400, 0xf7ff) AM_DEVREADWRITE(CDP1869_TAG, cdp1869_charram_r, cdp1869_charram_w)
+	AM_RANGE(0xf800, 0xffff) AM_DEVREADWRITE(CDP1869_TAG, cdp1869_pageram_r, cdp1869_pageram_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tmc600_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x03, 0x03) AM_WRITE(keyboard_latch_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE(CENTRONICS, "centronics", centronics_data_w)
-	AM_RANGE(0x05, 0x05) AM_DEVWRITE(SOUND, CDP1869_TAG, tmc600_vismac_data_w)
+	AM_RANGE(0x04, 0x04) AM_DEVWRITE("centronics", centronics_data_w)
+	AM_RANGE(0x05, 0x05) AM_DEVWRITE(CDP1869_TAG, tmc600_vismac_data_w)
 //  AM_RANGE(0x06, 0x06) AM_WRITE(floppy_w)
 	AM_RANGE(0x07, 0x07) AM_WRITE(tmc600_vismac_register_w)
 ADDRESS_MAP_END

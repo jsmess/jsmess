@@ -23,6 +23,8 @@
 #include "sound/2151intf.h"
 #include "sound/segapcm.h"
 
+#include "outrun.lh"
+
 
 #define MASTER_CLOCK   		(50000000)
 #define SOUND_CLOCK    		(16000000)
@@ -370,7 +372,7 @@ static READ16_HANDLER( outrun_custom_io_r )
 	switch (offset & 0x70/2)
 	{
 		case 0x00/2:
-			return ppi8255_r(devtag_get_device(space->machine, PPI8255, "ppi8255"), offset & 3);
+			return ppi8255_r(devtag_get_device(space->machine, "ppi8255"), offset & 3);
 
 		case 0x10/2:
 		{
@@ -400,7 +402,7 @@ static WRITE16_HANDLER( outrun_custom_io_w )
 	{
 		case 0x00/2:
 			if (ACCESSING_BITS_0_7)
-				ppi8255_w(devtag_get_device(space->machine, PPI8255, "ppi8255"), offset & 3, data);
+				ppi8255_w(devtag_get_device(space->machine, "ppi8255"), offset & 3, data);
 			return;
 
 		case 0x20/2:
@@ -544,14 +546,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf0ff) AM_MIRROR(0x0700) AM_DEVREADWRITE(SOUND, "pcm", sega_pcm_r, sega_pcm_w)
+	AM_RANGE(0xf000, 0xf0ff) AM_MIRROR(0x0700) AM_DEVREADWRITE("pcm", sega_pcm_r, sega_pcm_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
+	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_READ(sound_data_r)
 ADDRESS_MAP_END
 
@@ -1811,16 +1813,16 @@ static DRIVER_INIT( shangon3 )
  *
  *************************************/
 
-GAME( 1986, outrun,   0,        outrun,   outrun,   outrun,   ROT0, "Sega",    "Out Run (sitdown/upright, Rev B)", 0 ) /* Upright/Sitdown determined by dipswitch settings */
-GAME( 1986, outrun2,  outrun,   outrun,   outrun,   outrun,   ROT0, "Sega",    "Out Run (sitdown/upright, Rev A)", 0 ) /* Upright/Sitdown determined by dipswitch settings */
-GAME( 1986, outrun1,  outrun,   outrundx, outrundx, outrun,   ROT0, "Sega",    "Out Run (deluxe sitdown)", 0 )
-GAME( 1986, outrunb,  outrun,   outrun,   outrun,   outrunb,  ROT0, "bootleg", "Out Run (bootleg)", 0 )
+GAMEL(1986, outrun,   0,        outrun,   outrun,   outrun,   ROT0, "Sega",    "Out Run (sitdown/upright, Rev B)", 0, layout_outrun ) /* Upright/Sitdown determined by dipswitch settings */
+GAMEL(1986, outrun2,  outrun,   outrun,   outrun,   outrun,   ROT0, "Sega",    "Out Run (sitdown/upright, Rev A)", 0, layout_outrun ) /* Upright/Sitdown determined by dipswitch settings */
+GAMEL(1986, outrun1,  outrun,   outrundx, outrundx, outrun,   ROT0, "Sega",    "Out Run (deluxe sitdown)", 0, layout_outrun )
+GAMEL(1986, outrunb,  outrun,   outrun,   outrun,   outrunb,  ROT0, "bootleg", "Out Run (bootleg)", 0, layout_outrun )
 GAME( 1987, shangon,  0,        shangon,  shangon,  shangon,  ROT0, "Sega",    "Super Hang-On (sitdown/upright, unprotected)", 0 )
 GAME( 1987, shangon3, shangon,  shangon,  shangon,  shangon3, ROT0, "Sega",    "Super Hang-On (sitdown/upright, FD1089B 317-0034)", 0 )
 GAME( 1987, shangon2, shangon,  shangon,  shangon,  shangon3, ROT0, "Sega",    "Super Hang-On (mini ride-on, Rev A, FD1089B 317-0034)", 0 )
 GAME( 1987, shangon1, shangon,  shangon,  shangon,  shangon3, ROT0, "Sega",    "Super Hang-On (mini ride-on?, FD1089B 317-0034)", GAME_NOT_WORKING ) /* bad program rom */
 GAME( 1991, shangnle, shangon,  shangon,  shangon,  shangon,  ROT0, "Sega",    "Limited Edition Hang-On", 0 )
-GAME( 1989, toutrun,  0,        outrun,   toutrun1, outrun,   ROT0, "Sega",    "Turbo Out Run (cockpit, FD1094 317-0109)", 0 )
-GAME( 1989, toutrun2, toutrun,  outrun,   toutrun1, outrun,   ROT0, "Sega",    "Turbo Out Run (upright, FD1094 317-unknown)", 0 )
-GAME( 1989, toutrun1, toutrun,  outrun,   toutrun1, outrun,   ROT0, "Sega",    "Turbo Out Run (cockpit, FD1094 317-unknown)", GAME_NOT_WORKING ) /* FD1094 CPU not decrypted */
-GAME( 1989, toutrunu, toutrun,  outrun,   toutrun,  outrun,   ROT0, "Sega",    "Turbo Out Run (Out Run upgrade, FD1094 317-0118)" , 0 )
+GAMEL(1989, toutrun,  0,        outrun,   toutrun1, outrun,   ROT0, "Sega",    "Turbo Out Run (cockpit, FD1094 317-0109)", 0, layout_outrun )
+GAMEL(1989, toutrun2, toutrun,  outrun,   toutrun1, outrun,   ROT0, "Sega",    "Turbo Out Run (upright, FD1094 317-unknown)", 0, layout_outrun )
+GAMEL(1989, toutrun1, toutrun,  outrun,   toutrun1, outrun,   ROT0, "Sega",    "Turbo Out Run (cockpit, FD1094 317-unknown)", GAME_NOT_WORKING, layout_outrun ) /* FD1094 CPU not decrypted */
+GAMEL(1989, toutrunu, toutrun,  outrun,   toutrun,  outrun,   ROT0, "Sega",    "Turbo Out Run (Out Run upgrade, FD1094 317-0118)" , 0, layout_outrun )

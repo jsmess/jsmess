@@ -488,7 +488,7 @@ static ADDRESS_MAP_START( ps3v1_readmem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x03050000, 0x030501ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x0305ffdc, 0x0305ffdf) AM_READ(SMH_NOP) // also writes to this address - might be vblank reads?
 	AM_RANGE(0x0305ffe0, 0x0305ffff) AM_READ(SMH_RAM) //  video registers
-	AM_RANGE(0x05000000, 0x05000003) AM_DEVREAD8(SOUND, "ymf", ymf278b_r, 0xffffffff) // read YMF status
+	AM_RANGE(0x05000000, 0x05000003) AM_DEVREAD8("ymf", ymf278b_r, 0xffffffff) // read YMF status
 	AM_RANGE(0x05800000, 0x05800003) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x05800004, 0x05800007) AM_READ(psh_eeprom_r)
 	AM_RANGE(0x06000000, 0x060fffff) AM_READ(SMH_RAM) // main RAM (1 meg)
@@ -509,7 +509,7 @@ static ADDRESS_MAP_START( ps3v1_writemem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x03050000, 0x030501ff) AM_WRITE(SMH_RAM) AM_BASE(&psikyosh_zoomram) // a gradient sometimes ...
 	AM_RANGE(0x0305ffdc, 0x0305ffdf) AM_WRITE(psikyosh_irqctrl_w)
 	AM_RANGE(0x0305ffe0, 0x0305ffff) AM_WRITE(psikyosh_vidregs_w) AM_BASE(&psikyosh_vidregs) //  video registers
-	AM_RANGE(0x05000000, 0x05000007) AM_DEVWRITE8(SOUND, "ymf", ymf278b_w, 0xffffffff)
+	AM_RANGE(0x05000000, 0x05000007) AM_DEVWRITE8("ymf", ymf278b_w, 0xffffffff)
 	AM_RANGE(0x05800004, 0x05800007) AM_WRITE(psh_eeprom_w)
 	AM_RANGE(0x06000000, 0x060fffff) AM_WRITE(SMH_RAM) AM_BASE(&psh_ram) // work RAM
 ADDRESS_MAP_END
@@ -518,7 +518,7 @@ static ADDRESS_MAP_START( ps5_readmem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x000fffff) AM_READ(SMH_ROM) // program ROM (1 meg)
 	AM_RANGE(0x03000000, 0x03000003) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x03000004, 0x03000007) AM_READ_PORT("JP4")
-	AM_RANGE(0x03100000, 0x03100003) AM_DEVREAD8(SOUND, "ymf", ymf278b_r, 0xffffffff)
+	AM_RANGE(0x03100000, 0x03100003) AM_DEVREAD8("ymf", ymf278b_r, 0xffffffff)
 	AM_RANGE(0x04000000, 0x04003fff) AM_READ(SMH_RAM)	// sprites
 	AM_RANGE(0x04004000, 0x0400ffff) AM_READ(SMH_RAM)
 	AM_RANGE(0x04040000, 0x04044fff) AM_READ(SMH_RAM)
@@ -537,7 +537,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ps5_writemem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x000fffff) AM_WRITE(SMH_ROM)	// program ROM (1 meg)
 	AM_RANGE(0x03000004, 0x03000007) AM_WRITE(psh_eeprom_w)
-	AM_RANGE(0x03100000, 0x03100007) AM_DEVWRITE8(SOUND, "ymf", ymf278b_w, 0xffffffff)
+	AM_RANGE(0x03100000, 0x03100007) AM_DEVWRITE8("ymf", ymf278b_w, 0xffffffff)
 	AM_RANGE(0x04000000, 0x04003fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram32) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x04004000, 0x0400ffff) AM_WRITE(SMH_RAM) AM_BASE(&psikyosh_bgram) // backgrounds
 	AM_RANGE(0x04040000, 0x04044fff) AM_WRITE(paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w) AM_BASE(&paletteram32)
@@ -1098,13 +1098,13 @@ ROM_END
 
 static DRIVER_INIT( soldivid )
 {
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
+	sh2drc_set_options(machine->cpu[0], SH2DRC_FASTEST_OPTIONS);
 	use_factory_eeprom=eeprom_0;
 }
 
 static DRIVER_INIT( s1945ii )
 {
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
+	sh2drc_set_options(machine->cpu[0], SH2DRC_FASTEST_OPTIONS);
 	use_factory_eeprom=eeprom_DEFAULT;
 }
 
@@ -1112,13 +1112,13 @@ static DRIVER_INIT( daraku )
 {
 	UINT8 *RAM = memory_region(machine, "maincpu");
 	memory_set_bankptr(machine, 1,&RAM[0x100000]);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
+	sh2drc_set_options(machine->cpu[0], SH2DRC_FASTEST_OPTIONS);
 	use_factory_eeprom=eeprom_DARAKU;
 }
 
 static DRIVER_INIT( sbomberb )
 {
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
+	sh2drc_set_options(machine->cpu[0], SH2DRC_FASTEST_OPTIONS);
 	use_factory_eeprom=eeprom_DEFAULT;
 }
 
@@ -1126,7 +1126,7 @@ static DRIVER_INIT( gunbird2 )
 {
 	UINT8 *RAM = memory_region(machine, "maincpu");
 	memory_set_bankptr(machine, 1,&RAM[0x100000]);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
+	sh2drc_set_options(machine->cpu[0], SH2DRC_FASTEST_OPTIONS);
 	use_factory_eeprom=eeprom_DEFAULT;
 }
 
@@ -1134,31 +1134,31 @@ static DRIVER_INIT( s1945iii )
 {
 	UINT8 *RAM = memory_region(machine, "maincpu");
 	memory_set_bankptr(machine, 1,&RAM[0x100000]);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
+	sh2drc_set_options(machine->cpu[0], SH2DRC_FASTEST_OPTIONS);
 	use_factory_eeprom=eeprom_S1945III;
 }
 
 static DRIVER_INIT( dragnblz )
 {
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
+	sh2drc_set_options(machine->cpu[0], SH2DRC_FASTEST_OPTIONS);
 	use_factory_eeprom=eeprom_DRAGNBLZ;
 }
 
 static DRIVER_INIT( gnbarich )
 {
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
+	sh2drc_set_options(machine->cpu[0], SH2DRC_FASTEST_OPTIONS);
 	use_factory_eeprom=eeprom_GNBARICH;
 }
 
 static DRIVER_INIT( tgm2 )
 {
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
+	sh2drc_set_options(machine->cpu[0], SH2DRC_FASTEST_OPTIONS);
 	use_factory_eeprom=eeprom_USER1;
 }
 
 static DRIVER_INIT( mjgtaste )
 {
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
+	sh2drc_set_options(machine->cpu[0], SH2DRC_FASTEST_OPTIONS);
 	use_factory_eeprom=eeprom_MJGTASTE;
 	/* needs to install mahjong controls too (can select joystick in test mode tho) */
 }

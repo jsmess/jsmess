@@ -167,7 +167,7 @@ static QUICKLOAD_LOAD( lynx )
 	rom[0x1fc] = start & 0xff;
 	rom[0x1fd] = start >> 8;
 
-	lynx_crc_keyword(devtag_get_device(image->machine, QUICKLOAD, "quickload")); 
+	lynx_crc_keyword(devtag_get_device(image->machine, "quickload")); 
 
 	return INIT_PASS;
 }

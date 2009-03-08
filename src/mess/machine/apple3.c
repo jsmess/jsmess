@@ -118,12 +118,8 @@ static void apple3_profile_w(offs_t offset, UINT8 data)
 
 static READ8_HANDLER( apple3_c0xx_r )
 {
-	const device_config *acia = device_list_find_by_tag(space->machine->config->devicelist,
-		ACIA6551,
-		"acia");
-	const device_config *fdc = device_list_find_by_tag(space->machine->config->devicelist,
-		APPLEFDC,
-		"fdc");
+	const device_config *acia = devtag_get_device(space->machine, "acia");
+	const device_config *fdc = devtag_get_device(space->machine, "fdc");
 	UINT8 result = 0xFF;
 
 	switch(offset)
@@ -178,7 +174,7 @@ static READ8_HANDLER( apple3_c0xx_r )
 				apple3_flags |= VAR_EXTA0 << ((offset - 0xD0) / 2);
 			else
 				apple3_flags &= ~(VAR_EXTA0 << ((offset - 0xD0) / 2));
-			apple3_update_drives((device_config*)devtag_get_device(space->machine, APPLEFDC, "fdc"));
+			apple3_update_drives((device_config*)devtag_get_device(space->machine, "fdc"));
 			result = 0x00;
 			break;
 
@@ -207,12 +203,8 @@ static READ8_HANDLER( apple3_c0xx_r )
 
 static WRITE8_HANDLER( apple3_c0xx_w )
 {
-	const device_config *acia = device_list_find_by_tag(space->machine->config->devicelist,
-		ACIA6551,
-		"acia");
-	const device_config *fdc = device_list_find_by_tag(space->machine->config->devicelist,
-		APPLEFDC,
-		"fdc");
+	const device_config *acia = devtag_get_device(space->machine, "acia");
+	const device_config *fdc = devtag_get_device(space->machine, "fdc");
 	switch(offset)
 	{
 		case 0x10: case 0x11: case 0x12: case 0x13:
@@ -246,7 +238,7 @@ static WRITE8_HANDLER( apple3_c0xx_w )
 				apple3_flags |= VAR_EXTA0 << ((offset - 0xD0) / 2);
 			else
 				apple3_flags &= ~(VAR_EXTA0 << ((offset - 0xD0) / 2));
-			apple3_update_drives((device_config*)devtag_get_device(space->machine, APPLEFDC, "fdc"));
+			apple3_update_drives((device_config*)devtag_get_device(space->machine, "fdc"));
 			break;
 
 		case 0xDB:
@@ -271,7 +263,7 @@ static WRITE8_HANDLER( apple3_c0xx_w )
 
 INTERRUPT_GEN( apple3_interrupt )
 {
-	const device_config *via_1 = devtag_get_device(device->machine, VIA6522, "via6522_1");
+	const device_config *via_1 = devtag_get_device(device->machine, "via6522_1");
 
 	via_ca2_w(via_1, 0, (AY3600_keydata_strobe_r() & 0x80) ? 1 : 0);
 	via_cb1_w(via_1, 0, video_screen_get_vblank(device->machine->primary_screen));
@@ -467,8 +459,8 @@ static void apple3_update_memory(running_machine *machine)
 
 	/* reinstall VIA handlers */
 	{
-		const device_config *via_0 = devtag_get_device(space->machine, VIA6522, "via6522_0");
-		const device_config *via_1 = devtag_get_device(space->machine, VIA6522, "via6522_1");
+		const device_config *via_0 = devtag_get_device(space->machine, "via6522_0");
+		const device_config *via_1 = devtag_get_device(space->machine, "via6522_1");
 		memory_install_read8_device_handler(space, via_0, 0xFFD0, 0xFFDF, 0, 0, via_r);
 		memory_install_write8_device_handler(space, via_0, 0xFFD0, 0xFFDF, 0, 0, via_w);
 		memory_install_read8_device_handler(space, via_1, 0xFFE0, 0xFFEF, 0, 0, via_r);
@@ -725,7 +717,7 @@ DRIVER_INIT( apple3 )
 	memory_region(machine, "maincpu")[0x0685] = 0x00;
 
 	apple3_enable_mask = 0;
-	apple3_update_drives((device_config*)devtag_get_device(machine, APPLEFDC, "fdc"));
+	apple3_update_drives((device_config*)devtag_get_device(machine, "fdc"));
 
 	AY3600_init(machine);
 

@@ -501,10 +501,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM AM_BASE(&audio_rambase)
-	AM_RANGE(0x2000, 0x3fff) AM_DEVWRITE(SOUND, "ay1", ay8910_data_w)
-	AM_RANGE(0x4000, 0x5fff) AM_DEVWRITE(SOUND, "ay1", ay8910_address_w)
-	AM_RANGE(0x6000, 0x7fff) AM_DEVWRITE(SOUND, "ay2", ay8910_data_w)
-	AM_RANGE(0x8000, 0x9fff) AM_DEVWRITE(SOUND, "ay2", ay8910_address_w)
+	AM_RANGE(0x2000, 0x3fff) AM_DEVWRITE("ay1", ay8910_data_w)
+	AM_RANGE(0x4000, 0x5fff) AM_DEVWRITE("ay1", ay8910_address_w)
+	AM_RANGE(0x6000, 0x7fff) AM_DEVWRITE("ay2", ay8910_data_w)
+	AM_RANGE(0x8000, 0x9fff) AM_DEVWRITE("ay2", ay8910_address_w)
 	AM_RANGE(0xa000, 0xbfff) AM_READ(audio_command_r)
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(audio_nmi_enable_w)
 	AM_RANGE(0xe000, 0xefff) AM_MIRROR(0x1000) AM_ROM
@@ -512,10 +512,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( disco_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x4000, 0x4fff) AM_DEVWRITE(SOUND, "ay1", ay8910_data_w)
-	AM_RANGE(0x5000, 0x5fff) AM_DEVWRITE(SOUND, "ay1", ay8910_address_w)
-	AM_RANGE(0x6000, 0x6fff) AM_DEVWRITE(SOUND, "ay2", ay8910_data_w)
-	AM_RANGE(0x7000, 0x7fff) AM_DEVWRITE(SOUND, "ay2", ay8910_address_w)
+	AM_RANGE(0x4000, 0x4fff) AM_DEVWRITE("ay1", ay8910_data_w)
+	AM_RANGE(0x5000, 0x5fff) AM_DEVWRITE("ay1", ay8910_address_w)
+	AM_RANGE(0x6000, 0x6fff) AM_DEVWRITE("ay2", ay8910_data_w)
+	AM_RANGE(0x7000, 0x7fff) AM_DEVWRITE("ay2", ay8910_address_w)
 	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(soundlatch_r, SMH_NOP) /* ack ? */
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -1341,8 +1341,34 @@ static const discrete_mixer_desc btime_sound_mixer_desc =
 		0,		/* Modelled separately */
 		0, 1};
 
+/* R49 has 4.7k in schematics, but listed as 47k in bill of material
+ * 47k gives proper low pass filtering
+ */
+#define BTIME_R49	RES_K(47)
+
+/* The input divider R51 R50 is not independant of R52, which
+ * also depends on ay internal resistance.
+ * FIXME: Develop proper model when I am retired.
+ *
+ * With R51 being 1K, the gain is way to high (23.5). Therefore R51
+ * is set to 5k, but this is a hack. With the modification,
+ * sound levels are in line with observations.
+ * FIXME: Verify R51,R50,R52 and R49 on real pcb
+ *
+ * http://www.coinopvideogames.com/videogames01.php
+ * There are two recordings from 1982 where the filtered sound is way louder
+ * than the music. There is a later recording
+ * http://www.coinopvideogames.com/videogames03.php
+ * in which the filtered sounds have volumes closer to the music.
+ *
+ */
+
+#define BTIME_R52	RES_K(1)
+#define BTIME_R51	RES_K(5) 	/* schematics 1k */
+#define BTIME_R50	RES_K(10)
+
 static const discrete_op_amp_filt_info btime_opamp_desc =
-	{RES_K(1), 0, RES_K(10), 0, RES_K(4.7), CAP_U(0.068), CAP_U(0.068), 0, 0, 5.0, -5.0};
+	{BTIME_R51, 0, BTIME_R50, 0, BTIME_R49, CAP_U(0.068), CAP_U(0.068), 0, 0, 5.0, -5.0};
 
 static DISCRETE_SOUND_START( btime_sound )
 
@@ -1364,11 +1390,21 @@ static DISCRETE_SOUND_START( btime_sound )
 
 	DISCRETE_MIXER2(NODE_40, 1, NODE_22, NODE_30, &btime_sound_mixer_desc)
 	DISCRETE_CRFILTER(NODE_41, 1, NODE_40, RES_K(10), CAP_U(10))
-	/* Amplifier not modelled */
-	/* Assuming a 4 Ohm impedance speaker */
-	DISCRETE_CRFILTER(NODE_42, 1, NODE_41, 3.0, CAP_U(100))
 
-	DISCRETE_OUTPUT(NODE_42, 32767.0 / 5. * 20.0)
+	/* Amplifier is upc1181H3
+     *
+     * http://www.mydarc.de/dj7oh/fad/ics/upc1181/upc1181.htm
+     *
+     * A linear frequency response is mentioned as well as a lower
+     * edge frequency determined by cap on pin3, however no formula given.
+     *
+     * not modelled here
+     */
+
+	/* Assuming a 4 Ohm impedance speaker */
+	DISCRETE_CRFILTER(NODE_43, 1, NODE_41, 3.0, CAP_U(100))
+
+	DISCRETE_OUTPUT(NODE_43, 32767.0 / 5. * 35.0)
 
 DISCRETE_SOUND_END
 

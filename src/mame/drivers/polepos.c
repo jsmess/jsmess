@@ -299,7 +299,7 @@ static WRITE8_HANDLER( polepos_latch_w )
 			break;
 
 		case 0x02:	/* CLSON */
-			polepos_sound_enable(devtag_get_device(space->machine, SOUND, "namco"),bit);
+			polepos_sound_enable(devtag_get_device(space->machine, "namco"),bit);
 			if (!bit)
 			{
 				polepos_engine_sound_lsb_w(space,0,0);
@@ -409,7 +409,7 @@ static ADDRESS_MAP_START( z80_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0x8000, 0x83ff) AM_READ(SMH_RAM)						/* Sound Memory */
 	AM_RANGE(0x8000, 0x83bf) AM_WRITE(SMH_RAM)						/* Sound Memory */
-	AM_RANGE(0x83c0, 0x83ff) AM_DEVWRITE(SOUND, "namco", polepos_sound_w) AM_BASE(&polepos_soundregs)/* Sound data */
+	AM_RANGE(0x83c0, 0x83ff) AM_DEVWRITE("namco", polepos_sound_w) AM_BASE(&polepos_soundregs)/* Sound data */
 
 	AM_RANGE(0x9000, 0x90ff) AM_READWRITE(namco_06xx_0_data_r, namco_06xx_0_data_w)
 	AM_RANGE(0x9100, 0x9100) AM_READWRITE(namco_06xx_0_ctrl_r, namco_06xx_0_ctrl_w)
@@ -1738,9 +1738,9 @@ static DRIVER_INIT( topracra )
 	polepos_gear_bit = 0x20;
 
 	/* extra direct mapped inputs read */
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x02, 0x02, 0, 0, input_port_read_handler8(machine->portconfig, "STEER"));
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x03, 0x03, 0, 0, input_port_read_handler8(machine->portconfig, "IN0"));
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x04, 0x04, 0, 0, input_port_read_handler8(machine->portconfig, "DSWA"));
+	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x02, 0x02, 0, 0, "STEER");
+	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x03, 0x03, 0, 0, "IN0");
+	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x04, 0x04, 0, 0, "DSWA");
 
 }
 

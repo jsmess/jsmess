@@ -473,8 +473,8 @@ static WRITE8_HANDLER(c65_ram_expansion_w)
 static WRITE8_HANDLER ( c65_write_io )
 {
 	running_machine *machine = space->machine;
-	const device_config *sid_0 = devtag_get_device(space->machine, SOUND, "sid_r");
-	const device_config *sid_1 = devtag_get_device(space->machine, SOUND, "sid_l");
+	const device_config *sid_0 = devtag_get_device(space->machine, "sid_r");
+	const device_config *sid_1 = devtag_get_device(space->machine, "sid_l");
 
 	switch(offset&0xf00) {
 	case 0x000:
@@ -513,8 +513,8 @@ static WRITE8_HANDLER ( c65_write_io )
 static WRITE8_HANDLER ( c65_write_io_dc00 )
 {
 	running_machine *machine = space->machine;
-	const device_config *cia_0 = devtag_get_device(space->machine, CIA6526R1, "cia_0");
-	const device_config *cia_1 = devtag_get_device(space->machine, CIA6526R1, "cia_1");
+	const device_config *cia_0 = devtag_get_device(space->machine, "cia_0");
+	const device_config *cia_1 = devtag_get_device(space->machine, "cia_1");
 
 	switch(offset&0xf00) {
 	case 0x000:
@@ -533,8 +533,8 @@ static WRITE8_HANDLER ( c65_write_io_dc00 )
 static READ8_HANDLER ( c65_read_io )
 {
 	running_machine *machine = space->machine;
-	const device_config *sid_0 = devtag_get_device(space->machine, SOUND, "sid_r");
-	const device_config *sid_1 = devtag_get_device(space->machine, SOUND, "sid_l");
+	const device_config *sid_0 = devtag_get_device(space->machine, "sid_r");
+	const device_config *sid_1 = devtag_get_device(space->machine, "sid_l");
 
 	switch(offset&0xf00) {
 	case 0x000:
@@ -572,8 +572,8 @@ static READ8_HANDLER ( c65_read_io )
 static READ8_HANDLER ( c65_read_io_dc00 )
 {
 	running_machine *machine = space->machine;
-	const device_config *cia_0 = devtag_get_device(space->machine, CIA6526R1, "cia_0");
-	const device_config *cia_1 = devtag_get_device(space->machine, CIA6526R1, "cia_1");
+	const device_config *cia_0 = devtag_get_device(space->machine, "cia_0");
+	const device_config *cia_1 = devtag_get_device(space->machine, "cia_1");
 
 	switch(offset&0x300) {
 	case 0x000:

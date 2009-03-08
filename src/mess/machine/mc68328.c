@@ -262,21 +262,21 @@ static void mc68328_timer_compare_event(const device_config *device, UINT32 inde
 
 static TIMER_CALLBACK( mc68328_timer1_hit )
 {
-    const device_config *device = device_list_find_by_tag(machine->config->devicelist, MC68328, MC68328_TAG);
+    const device_config *device = devtag_get_device(machine, MC68328_TAG);
 
     mc68328_timer_compare_event(device, 0);
 }
 
 static TIMER_CALLBACK( mc68328_timer2_hit )
 {
-    const device_config *device = device_list_find_by_tag(machine->config->devicelist, MC68328, MC68328_TAG);
+    const device_config *device = devtag_get_device(machine, MC68328_TAG);
 
     mc68328_timer_compare_event(device, 1);
 }
 
 static TIMER_CALLBACK( mc68328_pwm_transition )
 {
-    const device_config *device = device_list_find_by_tag(machine->config->devicelist, MC68328, MC68328_TAG);
+    const device_config *device = devtag_get_device(machine, MC68328_TAG);
     mc68328_t* mc68328 = mc68328_get_safe_token( device );
 
     if(mc68328->regs.pwmw >= mc68328->regs.pwmp || mc68328->regs.pwmw == 0 || mc68328->regs.pwmp == 0)
@@ -324,7 +324,7 @@ static TIMER_CALLBACK( mc68328_pwm_transition )
 
 static TIMER_CALLBACK( mc68328_rtc_tick )
 {
-    const device_config *device = device_list_find_by_tag(machine->config->devicelist, MC68328, MC68328_TAG);
+    const device_config *device = devtag_get_device(machine, MC68328_TAG);
     mc68328_t* mc68328 = mc68328_get_safe_token( device );
 
     if(mc68328->regs.rtcctl & RTCCTL_ENABLE)

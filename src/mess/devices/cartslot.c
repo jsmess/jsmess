@@ -240,7 +240,6 @@ static DEVICE_START( cartslot )
 	/* find the PCB (if there is one) */
 	cart->pcb_device = devtag_get_device(
 		device->machine,
-		DEVICE_TYPE_WILDCARD,
 		device_build_tag(tempstring, device, TAG_PCB));
 
 done:

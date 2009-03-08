@@ -551,7 +551,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( driversnd_dsp_io_map, ADDRESS_SPACE_IO, 16 )
-	AM_RANGE(0, 0) AM_READ(hdsnddsp_rom_r) AM_DEVWRITE(SOUND, "dac", hdsnddsp_dac_w)
+	AM_RANGE(0, 0) AM_READ(hdsnddsp_rom_r) AM_DEVWRITE("dac", hdsnddsp_dac_w)
 	AM_RANGE(1, 1) AM_READ(hdsnddsp_comram_r)
 	AM_RANGE(2, 2) AM_READ(hdsnddsp_compare_r)
 	AM_RANGE(1, 2) AM_WRITENOP
@@ -3710,7 +3710,10 @@ static READ32_HANDLER( rddsp32_speedup_r )
 		int cycles_to_burn = 17 * 4 * (0x2bc - r1 - 2);
 		if (cycles_to_burn > 20 * 4)
 		{
-			cpu_eat_cycles(space->cpu, cycles_to_burn);
+			int icount_remaining = *cpu_get_icount_ptr(space->cpu);
+			if (cycles_to_burn > icount_remaining)
+				cycles_to_burn = icount_remaining;
+			cpu_adjust_icount(space->cpu, -cycles_to_burn);
 			memory_write_word(space, r14 - 0x14, r1 + cycles_to_burn / 17);
 		}
 		msp_speedup_count[0]++;

@@ -70,7 +70,7 @@ struct _ay31015_config
     MDRV_DEVICE_CONFIG(_config)
 
 #define MDRV_AY31015_REMOVE(_tag)		\
-    MDRV_DEVICE_REMOVE(_tag, AY31015)
+    MDRV_DEVICE_REMOVE(_tag)
 
 
 /***************************************************************************

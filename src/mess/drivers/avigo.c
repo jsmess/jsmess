@@ -764,7 +764,7 @@ static  READ8_HANDLER(avigo_ad_data_r)
 
 static WRITE8_HANDLER(avigo_speaker_w)
 {
-	const device_config *speaker = devtag_get_device(space->machine, SOUND, "speaker");
+	const device_config *speaker = devtag_get_device(space->machine, "speaker");
 	UINT8 previous_speaker;
 
 	previous_speaker = avigo_speaker_data;
@@ -812,12 +812,12 @@ static ADDRESS_MAP_START( avigo_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x008, 0x008) AM_READWRITE( avigo_ram_bank_h_r, avigo_ram_bank_h_w )
 	AM_RANGE(0x009, 0x009) AM_READWRITE( avigo_ad_control_status_r, avigo_ad_control_status_w )
 	AM_RANGE(0x00a, 0x00f) AM_READ( avigo_unmapped_r)
-	AM_RANGE(0x010, 0x01f) AM_DEVREADWRITE( TC8521, "rtc", tc8521_r, tc8521_w )
+	AM_RANGE(0x010, 0x01f) AM_DEVREADWRITE("rtc", tc8521_r, tc8521_w )
 	AM_RANGE(0x020, 0x02c) AM_READ( avigo_unmapped_r)
 	AM_RANGE(0x028, 0x028) AM_WRITE( avigo_speaker_w)
 	AM_RANGE(0x02d, 0x02d) AM_READ( avigo_ad_data_r)
 	AM_RANGE(0x02e, 0x02f) AM_READ( avigo_unmapped_r)
-	AM_RANGE(0x030, 0x037) AM_DEVREADWRITE( NS16550, "ns16550", ins8250_r, ins8250_w )
+	AM_RANGE(0x030, 0x037) AM_DEVREADWRITE("ns16550", ins8250_r, ins8250_w )
 	AM_RANGE(0x038, 0x0ff) AM_READ( avigo_unmapped_r)
 ADDRESS_MAP_END
 

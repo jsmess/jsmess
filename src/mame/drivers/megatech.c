@@ -309,7 +309,7 @@ static void megatech_set_genz80_as_sms_standard_ports(running_machine *machine)
 	/* INIT THE PORTS *********************************************************************************************/
 
 	const address_space *io = cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_IO);
-	const device_config *sn = devtag_get_device(machine, SOUND, "sn");
+	const device_config *sn = devtag_get_device(machine, "sn");
 
 	memory_install_readwrite8_handler(io, 0x0000, 0xffff, 0, 0, z80_unmapped_port_r, z80_unmapped_port_w);
 
@@ -367,7 +367,7 @@ static void megatech_select_game(running_machine *machine, int gameno)
 	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
 	cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, ASSERT_LINE);
 	cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
-	devtag_reset(machine, SOUND, "ym");
+	devtag_reset(machine, "ym");
 
 	sprintf(tempname, "game%d", gameno);
 	game_region = memory_region(machine, tempname);
@@ -533,7 +533,7 @@ static ADDRESS_MAP_START( megatech_bios_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6800, 0x6800) AM_READ_PORT("BIOS_IN0")
 	AM_RANGE(0x6801, 0x6801) AM_READ_PORT("BIOS_IN1")
 	AM_RANGE(0x6802, 0x6807) AM_READWRITE(bios_ctrl_r, bios_ctrl_w)
-//  AM_RANGE(0x6805, 0x6805) AM_READ(input_port_8_r)
+//  AM_RANGE(0x6805, 0x6805) AM_READ_PORT("???")
  	AM_RANGE(0x7000, 0x77ff) AM_ROM // from bios rom (0x7000-0x77ff populated in ROM)
 	//AM_RANGE(0x7800, 0x7fff) AM_RAM // ?
 	AM_RANGE(0x8000, 0x9fff) AM_READ(megatech_instr_r) // window into 68k address space, reads instr rom and writes to reset banks on z80 carts?
@@ -587,8 +587,8 @@ static VIDEO_START(mtnew)
 //attotime_never
 static VIDEO_UPDATE(mtnew)
 {
-	const device_config *megadriv_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "megadriv");
-	const device_config *menu_screen     = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "menu");
+	const device_config *megadriv_screen = devtag_get_device(screen->machine, "megadriv");
+	const device_config *menu_screen     = devtag_get_device(screen->machine, "menu");
 
 	if (screen == megadriv_screen)
 	{

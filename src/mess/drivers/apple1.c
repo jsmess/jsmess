@@ -69,7 +69,7 @@ $F000-$FFFF:    ROM address space
 
 #include "driver.h"
 #include "cpu/m6502/m6502.h"
-#include "machine/6821new.h"
+#include "machine/6821pia.h"
 #include "includes/apple1.h"
 #include "devices/snapquik.h"
 #include "devices/cassette.h"
@@ -93,7 +93,7 @@ static ADDRESS_MAP_START( apple1_map, ADDRESS_SPACE_PROGRAM, 8 )
        and PIA registers are addressed with address bits 0-1.  All
        other address bits are ignored.  Thus $D010-$D013 is mirrored
        at all $Dxxx addresses with bit 4 high. */
-	AM_RANGE(0xd010, 0xd013) AM_MIRROR(0x0fec) AM_DEVREADWRITE(PIA6821, "pia", pia_r, pia_w)
+	AM_RANGE(0xd010, 0xd013) AM_MIRROR(0x0fec) AM_DEVREADWRITE("pia", pia6821_r, pia6821_w)
 	/* $Dxxx addresses with bit 4 low are NOPs. */
 	AM_RANGE(0xd000, 0xd00f) AM_NOP AM_MIRROR(0xfe0)
 

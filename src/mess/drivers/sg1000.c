@@ -80,7 +80,7 @@ Notes:
 
 static const device_config *cassette_device_image(running_machine *machine)
 {
-	return devtag_get_device(machine, CASSETTE, "cassette");
+	return devtag_get_device(machine, "cassette");
 }
 
 /* Terebi Oekaki (TV Draw) */
@@ -146,7 +146,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sg1000_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE(SOUND, SN76489A_TAG, sn76496_w)
+	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE(SN76489A_TAG, sn76496_w)
 	AM_RANGE(0xbe, 0xbe) AM_READWRITE(TMS9928A_vram_r, TMS9928A_vram_w)
 	AM_RANGE(0xbf, 0xbf) AM_READWRITE(TMS9928A_register_r, TMS9928A_register_w)
 	AM_RANGE(0xdc, 0xdc) AM_READ_PORT("PA7")
@@ -165,16 +165,16 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sc3000_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE(SOUND, SN76489A_TAG, sn76496_w)
+	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE(SN76489A_TAG, sn76496_w)
 	AM_RANGE(0xbe, 0xbe) AM_READWRITE(TMS9928A_vram_r, TMS9928A_vram_w)
 	AM_RANGE(0xbf, 0xbf) AM_READWRITE(TMS9928A_register_r, TMS9928A_register_w)
-	AM_RANGE(0xdc, 0xdf) AM_DEVREADWRITE(PPI8255, "ppi8255", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xdc, 0xdf) AM_DEVREADWRITE("ppi8255", ppi8255_r, ppi8255_w)
 ADDRESS_MAP_END
 
 /* This is how the I/O ports are really mapped, but MAME does not support overlapping ranges
 static ADDRESS_MAP_START( sc3000_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xdf) AM_DEVREADWRITE(PPI8255, "ppi8255", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0xdf) AM_DEVREADWRITE("ppi8255", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x7f) AM_WRITE(sn76496_0_w)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xae) AM_READWRITE(TMS9928A_vram_r, TMS9928A_vram_w)
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0xae) AM_READWRITE(TMS9928A_register_r, TMS9928A_register_w)
@@ -191,15 +191,15 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sf7000_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE(SOUND, SN76489A_TAG, sn76496_w)
+	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE(SN76489A_TAG, sn76496_w)
 	AM_RANGE(0xbe, 0xbe) AM_READWRITE(TMS9928A_vram_r, TMS9928A_vram_w)
 	AM_RANGE(0xbf, 0xbf) AM_READWRITE(TMS9928A_register_r, TMS9928A_register_w)
-	AM_RANGE(0xdc, 0xdf) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xe0, 0xe0) AM_DEVREAD(NEC765A, NEC765_TAG, nec765_status_r)
-	AM_RANGE(0xe1, 0xe1) AM_DEVREADWRITE(NEC765A, NEC765_TAG, nec765_data_r, nec765_data_w)
-	AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xe8, 0xe8) AM_DEVREADWRITE(MSM8251, "uart", msm8251_data_r, msm8251_data_w)
-	AM_RANGE(0xe9, 0xe9) AM_DEVREADWRITE(MSM8251, "uart", msm8251_status_r, msm8251_control_w)
+	AM_RANGE(0xdc, 0xdf) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xe0, 0xe0) AM_DEVREAD(NEC765_TAG, nec765_status_r)
+	AM_RANGE(0xe1, 0xe1) AM_DEVREADWRITE(NEC765_TAG, nec765_data_r, nec765_data_w)
+	AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xe8, 0xe8) AM_DEVREADWRITE("uart", msm8251_data_r, msm8251_data_w)
+	AM_RANGE(0xe9, 0xe9) AM_DEVREADWRITE("uart", msm8251_status_r, msm8251_control_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -609,7 +609,7 @@ static READ8_DEVICE_HANDLER( sf7000_ppi8255_a_r )
         PA7
     */
 
-	const device_config *printer = devtag_get_device(device->machine, CENTRONICS, "centronics");
+	const device_config *printer = devtag_get_device(device->machine, "centronics");
 	sg1000_state *state = device->machine->driver_data;
 	UINT8 result = 0;
 
@@ -622,8 +622,8 @@ static READ8_DEVICE_HANDLER( sf7000_ppi8255_a_r )
 
 static WRITE8_DEVICE_HANDLER( sf7000_ppi8255_c_w )
 {
-	const device_config *fdc = devtag_get_device(device->machine, NEC765A, NEC765_TAG);
-	const device_config *printer = devtag_get_device(device->machine, CENTRONICS, "centronics");
+	const device_config *fdc = devtag_get_device(device->machine, NEC765_TAG);
+	const device_config *printer = devtag_get_device(device->machine, "centronics");
 	/*
         Signal  Description
 
@@ -672,7 +672,7 @@ static const ppi8255_interface sf7000_ppi8255_intf[2] =
 		DEVCB_NULL,								// Port B read
 		DEVCB_NULL,								// Port C read
 		DEVCB_NULL,								// Port A write
-		DEVCB_DEVICE_HANDLER(CENTRONICS, "centronics", centronics_data_w),	// Port B write
+		DEVCB_DEVICE_HANDLER("centronics", centronics_data_w),	// Port B write
 		DEVCB_HANDLER(sf7000_ppi8255_c_w)		// Port C write
 	}
 };

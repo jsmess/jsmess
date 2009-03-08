@@ -130,7 +130,7 @@ static void sym1_riot_b_w(const device_config *device, UINT8 newdata, UINT8 data
 	riot_port_b = data;
 
 	/* first 4 pins are connected to the 74145 */
-	ttl74145_w(devtag_get_device(device->machine, TTL74145, "ttl74145"), 0, data & 0x0f);
+	ttl74145_w(devtag_get_device(device->machine, "ttl74145"), 0, data & 0x0f);
 }
 
 
@@ -151,7 +151,7 @@ const ttl74145_interface sym1_ttl74145_intf =
 	DEVCB_LINE(sym1_74145_output_3_w),  /* connected to DS3 */
 	DEVCB_LINE(sym1_74145_output_4_w),  /* connected to DS4 */
 	DEVCB_LINE(sym1_74145_output_5_w),  /* connected to DS5 */
-	DEVCB_DEVICE_LINE(SOUND, "speaker", speaker_level_w),
+	DEVCB_DEVICE_LINE("speaker", speaker_level_w),
 	DEVCB_NULL,	/* not connected */
 	DEVCB_NULL,	/* not connected */
 	DEVCB_NULL	/* not connected */

@@ -571,7 +571,7 @@ static void keyboard_init(void)
 static TIMER_CALLBACK(kbd_clock)
 {
 	int i;
-	const device_config *via_0 = devtag_get_device(machine, VIA6522, "via6522_0");
+	const device_config *via_0 = devtag_get_device(machine, "via6522_0");
 
 	if (kbd_comm == TRUE)
 	{
@@ -890,7 +890,7 @@ void mac_scc_ack(const device_config *device)
 
 void mac_scc_mouse_irq(running_machine *machine, int x, int y)
 {
-	const device_config *scc = devtag_get_device(machine, SCC8530, "scc");
+	const device_config *scc = devtag_get_device(machine, "scc");
 	static int last_was_x = 0;
 
 	if (x && y)
@@ -918,7 +918,7 @@ void mac_scc_mouse_irq(running_machine *machine, int x, int y)
 
 READ16_HANDLER ( mac_scc_r )
 {
-	const device_config *scc = devtag_get_device(space->machine, SCC8530, "scc");
+	const device_config *scc = devtag_get_device(space->machine, "scc");
 	UINT16 result;
 
 	result = scc_r(scc, offset);
@@ -929,13 +929,13 @@ READ16_HANDLER ( mac_scc_r )
 
 WRITE16_HANDLER ( mac_scc_w )
 {
-	const device_config *scc = devtag_get_device(space->machine, SCC8530, "scc");
+	const device_config *scc = devtag_get_device(space->machine, "scc");
 	scc_w(scc, offset, (UINT8) data);
 }
 
 WRITE16_HANDLER ( mac_scc_2_w )
 {
-	const device_config *scc = devtag_get_device(space->machine, SCC8530, "scc");
+	const device_config *scc = devtag_get_device(space->machine, "scc");
 	UINT8 wdata = data>>8;
 
 	scc_w(scc, offset, wdata);
@@ -1286,9 +1286,7 @@ READ16_HANDLER ( mac_iwm_r )
 	 */
 
 	UINT16 result = 0;
-	const device_config *fdc = device_list_find_by_tag(space->machine->config->devicelist,
-		IWM,
-		"fdc");
+	const device_config *fdc = devtag_get_device(space->machine, "fdc");
 
 	if (LOG_MAC_IWM)
 		logerror("mac_iwm_r: offset=0x%08x\n", offset);
@@ -1299,9 +1297,7 @@ READ16_HANDLER ( mac_iwm_r )
 
 WRITE16_HANDLER ( mac_iwm_w )
 {
-	const device_config *fdc = device_list_find_by_tag(space->machine->config->devicelist,
-		IWM,
-		"fdc");
+	const device_config *fdc = devtag_get_device(space->machine, "fdc");
 
 	if (LOG_MAC_IWM)
 		logerror("mac_iwm_w: offset=0x%08x data=0x%04x\n", offset, data);
@@ -1512,7 +1508,7 @@ static void mac_adb_talk(running_machine *machine)
 
 static TIMER_CALLBACK(mac_adb_tick)
 {
-	const device_config *via_0 = devtag_get_device(machine, VIA6522, "via6522_0");
+	const device_config *via_0 = devtag_get_device(machine, "via6522_0");
 
 	// do one clock transition on CB1 to advance the VIA shifter
 	adb_extclock ^= 1;
@@ -1722,8 +1718,8 @@ static READ8_DEVICE_HANDLER(mac_via_in_b)
 
 static WRITE8_DEVICE_HANDLER(mac_via_out_a)
 {
-	const device_config *sound = devtag_get_device(device->machine, SOUND, "custom");
-	const device_config *fdc = devtag_get_device(device->machine, APPLEFDC, "fdc");
+	const device_config *sound = devtag_get_device(device->machine, "custom");
+	const device_config *fdc = devtag_get_device(device->machine, "fdc");
 
 	set_scc_waitrequest((data & 0x80) >> 7);
 	mac_set_screen_buffer((data & 0x40) >> 6);
@@ -1748,7 +1744,7 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_a)
 
 static WRITE8_DEVICE_HANDLER(mac_via_out_b)
 {
-	const device_config *sound = devtag_get_device(device->machine, SOUND, "custom");
+	const device_config *sound = devtag_get_device(device->machine, "custom");
 	int new_rtc_rTCClk;
 
 	mac_enable_sound(sound, (data & 0x80) == 0);
@@ -1781,7 +1777,7 @@ static void mac_via_irq(const device_config *device, int state)
 READ16_HANDLER ( mac_via_r )
 {
 	UINT16 data;
-	const device_config *via_0 = devtag_get_device(space->machine, VIA6522, "via6522_0");
+	const device_config *via_0 = devtag_get_device(space->machine, "via6522_0");
 
 	offset >>= 8;
 	offset &= 0x0f;
@@ -1795,7 +1791,7 @@ READ16_HANDLER ( mac_via_r )
 
 WRITE16_HANDLER ( mac_via_w )
 {
-	const device_config *via_0 = devtag_get_device(space->machine, VIA6522, "via6522_0");
+	const device_config *via_0 = devtag_get_device(space->machine, "via6522_0");
 
 	offset >>= 8;
 	offset &= 0x0f;
@@ -1818,7 +1814,7 @@ static void mac_via2_irq(const device_config *device, int state)
 READ16_HANDLER ( mac_via2_r )
 {
 	int data;
-	const device_config *via_1 = devtag_get_device(space->machine, VIA6522, "via6522_1");
+	const device_config *via_1 = devtag_get_device(space->machine, "via6522_1");
 
 	offset >>= 8;
 	offset &= 0x0f;
@@ -1832,7 +1828,7 @@ READ16_HANDLER ( mac_via2_r )
 
 WRITE16_HANDLER ( mac_via2_w )
 {
-	const device_config *via_1 = devtag_get_device(space->machine, VIA6522, "via6522_1");
+	const device_config *via_1 = devtag_get_device(space->machine, "via6522_1");
 
 	offset >>= 8;
 	offset &= 0x0f;
@@ -1887,7 +1883,7 @@ MACHINE_RESET(mac)
 	mac_set_screen_buffer(1);
 
 	/* setup sound */
-	mac_set_sound_buffer(devtag_get_device(machine, SOUND, "custom"), 0);
+	mac_set_sound_buffer(devtag_get_device(machine, "custom"), 0);
 
 	if (has_adb())
 	{
@@ -1899,7 +1895,7 @@ MACHINE_RESET(mac)
 
 	if ((mac_model == MODEL_MAC_SE) || (mac_model == MODEL_MAC_CLASSIC))
 	{
-		mac_set_sound_buffer(devtag_get_device(machine, SOUND, "custom"), 1);
+		mac_set_sound_buffer(devtag_get_device(machine, "custom"), 1);
 
 		// classic will fail RAM test and try to boot appletalk if RAM is not all zero
 		memset(mess_ram, 0, mess_ram_size);
@@ -2042,7 +2038,7 @@ DRIVER_INIT(maclc)
 static void mac_vblank_irq(running_machine *machine)
 {
 	static int irq_count = 0, ca1_data = 0, ca2_data = 0;
-	const device_config *via_0 = devtag_get_device(machine, VIA6522, "via6522_0");
+	const device_config *via_0 = devtag_get_device(machine, "via6522_0");
 
 	/* handle ADB keyboard/mouse */
 	if (has_adb())
@@ -2088,7 +2084,7 @@ static TIMER_CALLBACK(mac_scanline_tick)
 {
 	int scanline;
 
-	mac_sh_updatebuffer(devtag_get_device(machine, SOUND, "custom"));
+	mac_sh_updatebuffer(devtag_get_device(machine, "custom"));
 
 	scanline = video_screen_get_vpos(machine->primary_screen);
 	if (scanline == MAC_V_VIS)

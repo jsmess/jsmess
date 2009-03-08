@@ -15,7 +15,7 @@
 #include "cpu/m6502/m6502.h"
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
-#include "machine/6821new.h"
+#include "machine/6821pia.h"
 #include "sound/sn76496.h"
 #include "video/tms9928a.h"
 
@@ -26,7 +26,7 @@
 
 static ADDRESS_MAP_START( crvision_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_MIRROR(0x0c00)
-	AM_RANGE(0x1000, 0x1003) AM_DEVREADWRITE(PIA6821, "pia", pia_r, pia_w)
+	AM_RANGE(0x1000, 0x1003) AM_DEVREADWRITE("pia", pia6821_r, pia6821_w)
 	AM_RANGE(0x2000, 0x2000) AM_READ(TMS9928A_vram_r)
 	AM_RANGE(0x2001, 0x2001) AM_READ(TMS9928A_register_r)
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(TMS9928A_vram_w)
@@ -365,7 +365,7 @@ static WRITE8_DEVICE_HANDLER( crvision_pia_portb_w )
         PB7     SN76489 data output
     */
 
-	const device_config *sn76489 = devtag_get_device(device->machine, SOUND, "sn76489");
+	const device_config *sn76489 = devtag_get_device(device->machine, "sn76489");
 	sn76496_w(sn76489, 0, data);
 
 	sn76489_ready = 0;

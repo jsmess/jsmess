@@ -357,13 +357,13 @@ static WRITE8_HANDLER(tutor_mapper_w)
 static TIMER_CALLBACK(tape_interrupt_handler)
 {
 	//assert(tape_interrupt_enable);
-	cpu_set_input_line(machine->cpu[0], 1, (cassette_input(devtag_get_device(machine, CASSETTE, "cassette")) > 0.0) ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 1, (cassette_input(devtag_get_device(machine, "cassette")) > 0.0) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /* CRU handler */
 static  READ8_HANDLER(tutor_cassette_r)
 {
-	return (cassette_input(devtag_get_device(space->machine, CASSETTE, "cassette")) > 0.0) ? 1 : 0;
+	return (cassette_input(devtag_get_device(space->machine, "cassette")) > 0.0) ? 1 : 0;
 }
 
 /* memory handler */
@@ -380,7 +380,7 @@ static WRITE8_HANDLER(tutor_cassette_w)
 		{
 		case 0:
 			/* data out */
-			cassette_output(devtag_get_device(space->machine, CASSETTE, "cassette"), (data) ? +1.0 : -1.0);
+			cassette_output(devtag_get_device(space->machine, "cassette"), (data) ? +1.0 : -1.0);
 			break;
 		case 1:
 			/* interrupt control??? */
@@ -510,7 +510,7 @@ static ADDRESS_MAP_START(tutor_memmap, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xe000, 0xe000) AM_READWRITE(TMS9928A_vram_r, TMS9928A_vram_w)	/*VDP data*/
 	AM_RANGE(0xe002, 0xe002) AM_READWRITE(TMS9928A_register_r, TMS9928A_register_w)/*VDP status*/
 	AM_RANGE(0xe100, 0xe1ff) AM_READWRITE(tutor_mapper_r, tutor_mapper_w)	/*cartridge mapper*/
-	AM_RANGE(0xe200, 0xe200) AM_DEVWRITE(SOUND, "sn76489a", sn76496_w)	/*sound chip*/
+	AM_RANGE(0xe200, 0xe200) AM_DEVWRITE("sn76489a", sn76496_w)	/*sound chip*/
 	AM_RANGE(0xe800, 0xe8ff) AM_READWRITE(tutor_printer_r, tutor_printer_w)	/*printer*/
 	AM_RANGE(0xee00, 0xeeff) AM_READWRITE(SMH_NOP, tutor_cassette_w)		/*cassette interface*/
 

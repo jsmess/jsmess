@@ -60,7 +60,7 @@ static const UINT8 vtech1_palette[] =
 };
 
 
-static ATTR_CONST UINT8 vtech1_get_attributes(UINT8 c)
+static ATTR_CONST UINT8 vtech1_get_attributes(running_machine *machine, UINT8 c)
 {
 	UINT8 result = 0x00;
 	if (c & 0x40)				result |= M6847_INV;

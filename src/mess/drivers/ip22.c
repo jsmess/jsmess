@@ -183,7 +183,7 @@ static void int3_lower_local1_irq(UINT8 source_mask)
 
 static READ32_HANDLER( hpc3_pbus6_r )
 {
-	const device_config *lpt = devtag_get_device(space->machine, PC_LPT, "lpt_0");
+	const device_config *lpt = devtag_get_device(space->machine, "lpt_0");
 	UINT8 ret8;
 	running_machine *machine = space->machine;
 
@@ -234,19 +234,19 @@ static READ32_HANDLER( hpc3_pbus6_r )
 //      mame_printf_info("INT3: r @ %x mask %08x (PC=%x)\n", offset*4, mem_mask, activecpu_get_pc());
 		return int3_regs[offset-0x80/4];
 	case 0xb0/4:
-		ret8 = pit8253_r((device_config*)devtag_get_device(machine, PIT8254, "pit8254"), 0);
+		ret8 = pit8253_r(devtag_get_device(machine, "pit8254"), 0);
 		verboselog( machine, 0, "HPC PBUS6 IOC4 Timer Counter 0 Register Read: 0x%02x (%08x)\n", ret8, mem_mask );
 		return ret8;
 	case 0xb4/4:
-		ret8 = pit8253_r((device_config*)devtag_get_device(machine, PIT8254, "pit8254"), 1);
+		ret8 = pit8253_r(devtag_get_device(machine, "pit8254"), 1);
 		verboselog( machine, 0, "HPC PBUS6 IOC4 Timer Counter 1 Register Read: 0x%02x (%08x)\n", ret8, mem_mask );
 		return ret8;
 	case 0xb8/4:
-		ret8 = pit8253_r((device_config*)devtag_get_device(machine, PIT8254, "pit8254"), 2);
+		ret8 = pit8253_r(devtag_get_device(machine, "pit8254"), 2);
 		verboselog( machine, 0, "HPC PBUS6 IOC4 Timer Counter 2 Register Read: 0x%02x (%08x)\n", ret8, mem_mask );
 		return ret8;
 	case 0xbc/4:
-		ret8 = pit8253_r((device_config*)devtag_get_device(machine, PIT8254, "pit8254"), 3);
+		ret8 = pit8253_r(devtag_get_device(machine, "pit8254"), 3);
 		verboselog( machine, 0, "HPC PBUS6 IOC4 Timer Control Word Register Read: 0x%02x (%08x)\n", ret8, mem_mask );
 		return ret8;
 	default:
@@ -258,7 +258,7 @@ static READ32_HANDLER( hpc3_pbus6_r )
 
 static WRITE32_HANDLER( hpc3_pbus6_w )
 {
-	const device_config *lpt = devtag_get_device(space->machine, PC_LPT, "lpt_0");
+	const device_config *lpt = devtag_get_device(space->machine, "lpt_0");
 	char cChar;
 	running_machine *machine = space->machine;
 
@@ -340,19 +340,19 @@ static WRITE32_HANDLER( hpc3_pbus6_w )
 		break;
 	case 0xb0/4:
 		verboselog( machine, 0, "HPC PBUS6 IOC4 Timer Counter 0 Register Write: 0x%08x (%08x)\n", data, mem_mask );
-		pit8253_w((device_config*)devtag_get_device(machine, PIT8254, "pit8254"), 0, data & 0x000000ff);
+		pit8253_w(devtag_get_device(machine, "pit8254"), 0, data & 0x000000ff);
 		return;
 	case 0xb4/4:
 		verboselog( machine, 0, "HPC PBUS6 IOC4 Timer Counter 1 Register Write: 0x%08x (%08x)\n", data, mem_mask );
-		pit8253_w((device_config*)devtag_get_device(machine, PIT8254, "pit8254"), 1, data & 0x000000ff);
+		pit8253_w(devtag_get_device(machine, "pit8254"), 1, data & 0x000000ff);
 		return;
 	case 0xb8/4:
 		verboselog( machine, 0, "HPC PBUS6 IOC4 Timer Counter 2 Register Write: 0x%08x (%08x)\n", data, mem_mask );
-		pit8253_w((device_config*)devtag_get_device(machine, PIT8254, "pit8254"), 2, data & 0x000000ff);
+		pit8253_w(devtag_get_device(machine, "pit8254"), 2, data & 0x000000ff);
 		return;
 	case 0xbc/4:
 		verboselog( machine, 0, "HPC PBUS6 IOC4 Timer Control Word Register Write: 0x%08x (%08x)\n", data, mem_mask );
-		pit8253_w((device_config*)devtag_get_device(machine, PIT8254, "pit8254"), 3, data & 0x000000ff);
+		pit8253_w(devtag_get_device(machine, "pit8254"), 3, data & 0x000000ff);
 		return;
 	default:
 		verboselog( machine, 0, "Unknown HPC PBUS6 Write: 0x%08x: 0x%08x (%08x)\n", 0x1fbd9800 + ( offset << 2 ), data, mem_mask );
@@ -1029,7 +1029,7 @@ static const device_config *dmadac[1];
 
 static TIMER_CALLBACK(ip22_dma)
 {
-	dmadac[0] = devtag_get_device(machine, SOUND, "dmadac");
+	dmadac[0] = devtag_get_device(machine, "dmadac");
 	if( nPBUS_DMA_Active )
 	{
 		INT16 temp16;
@@ -1162,7 +1162,7 @@ static TIMER_CALLBACK(ip22_timer)
 
 static MACHINE_RESET( ip225015 )
 {
-	dmadac[0] = devtag_get_device(machine, SOUND, "dmadac");
+	dmadac[0] = devtag_get_device(machine, "dmadac");
 	mc_init(machine);
 	nHPC3_enetr_nbdp = 0x80000000;
 	nHPC3_enetr_cbp = 0x80000000;
@@ -1370,7 +1370,7 @@ static void ip225015_exit(running_machine *machine)
 }
 
 static int ip22_get_out2(running_machine *machine) {
-	return pit8253_get_output((device_config*)devtag_get_device(machine, PIT8254, "pit8254"), 2 );
+	return pit8253_get_output(devtag_get_device(machine, "pit8254"), 2 );
 }
 
 static MACHINE_START( ip22 )

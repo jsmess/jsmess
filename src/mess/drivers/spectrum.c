@@ -171,7 +171,7 @@ int spectrum_PreviousFE = 0;
 
 WRITE8_HANDLER(spectrum_port_fe_w)
 {
-	const device_config *speaker = devtag_get_device(space->machine, SOUND, "speaker");
+	const device_config *speaker = devtag_get_device(space->machine, "speaker");
 	unsigned char Changed;
 
 	Changed = spectrum_PreviousFE^data;
@@ -192,7 +192,7 @@ WRITE8_HANDLER(spectrum_port_fe_w)
 	if ((Changed & (1<<3))!=0)
 	{
 		/* write cassette data */
-		cassette_output(devtag_get_device(space->machine, CASSETTE, "cassette"), (data & (1<<3)) ? -1.0 : +1.0);
+		cassette_output(devtag_get_device(space->machine, "cassette"), (data & (1<<3)) ? -1.0 : +1.0);
 	}
 
 	spectrum_PreviousFE = data;
@@ -262,7 +262,7 @@ READ8_HANDLER(spectrum_port_fe_r)
 	data |= (0xe0); /* Set bits 5-7 - as reset above */
 
 	/* cassette input from wav */
-	if (cassette_input(devtag_get_device(space->machine, CASSETTE, "cassette")) > 0.0038 )
+	if (cassette_input(devtag_get_device(space->machine, "cassette")) > 0.0038 )
 	{
 		data &= ~0x40;
 	}

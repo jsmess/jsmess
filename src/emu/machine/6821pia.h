@@ -3,12 +3,12 @@
     Motorola 6821 PIA interface and emulation
 
     Notes:
-        * pia_get_port_b_z_mask() gives the caller the bitmask
+        * pia6821_get_port_b_z_mask() gives the caller the bitmask
           that show which bits are high-impendance when
           reading port B, thus neither 0 or 1.
-          pia_get_output_cb2_z() returns the same
+          pia6821_get_output_cb2_z() returns the same
           information for the CB2 pin
-        * pia_set_port_a_z_mask allows the input callback to
+        * pia6821_set_port_a_z_mask allows the input callback to
           indicate which port A bits are disconnected.
           For these bit, the read operation will return the
           output buffer's contents
@@ -18,269 +18,114 @@
 
 **********************************************************************/
 
-#ifndef PIA_6821
-#define PIA_6821
+#ifndef __6821NEW_H__
+#define __6821NEW_H__
+
+#include "driver.h"
+#include "devcb.h"
 
 
-#define MAX_PIA 8
+/***************************************************************************
+    CONSTANTS
+***************************************************************************/
 
+#define PIA6821		DEVICE_GET_INFO_NAME(pia6821)
+#define PIA6822		DEVICE_GET_INFO_NAME(pia6822)
+
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
 
 /*------------- PIA interface structure -----------------*/
 
 typedef struct _pia6821_interface pia6821_interface;
 struct _pia6821_interface
 {
-	read8_space_func in_a_func;
-	read8_space_func in_b_func;
-	read8_space_func in_ca1_func;
-	read8_space_func in_cb1_func;
-	read8_space_func in_ca2_func;
-	read8_space_func in_cb2_func;
-	write8_space_func out_a_func;
-	write8_space_func out_b_func;
-	write8_space_func out_ca2_func;
-	write8_space_func out_cb2_func;
-	void (*irq_a_func)(running_machine *machine, int state);
-	void (*irq_b_func)(running_machine *machine, int state);
+	devcb_read8 in_a_func;
+	devcb_read8 in_b_func;
+	devcb_read_line in_ca1_func;
+	devcb_read_line in_cb1_func;
+	devcb_read_line in_ca2_func;
+	devcb_read_line in_cb2_func;
+	devcb_write8 out_a_func;
+	devcb_write8 out_b_func;
+	devcb_write_line out_ca2_func;
+	devcb_write_line out_cb2_func;
+	devcb_write_line irq_a_func;
+	devcb_write_line irq_b_func;
 };
 
 
+/***************************************************************************
+    PROTOTYPES
+***************************************************************************/
 
-/*------------------ Configuration -----------------------*/
+DEVICE_GET_INFO( pia6821 );
+DEVICE_GET_INFO( pia6822 );
 
-void pia_config(running_machine *machine, int which, const pia6821_interface *intf);
+READ8_DEVICE_HANDLER( pia6821_r );
+WRITE8_DEVICE_HANDLER( pia6821_w );
 
+READ8_DEVICE_HANDLER( pia6821_alt_r );
+WRITE8_DEVICE_HANDLER( pia6821_alt_w );
 
+UINT8 pia6821_get_port_b_z_mask(const device_config *device);  /* see first note */
+void pia6821_set_port_a_z_mask(const device_config *device, UINT8 data);  /* see second note */
 
-/*----------------------- Reset --------------------------*/
+READ8_DEVICE_HANDLER( pia6821_porta_r );
+WRITE8_DEVICE_HANDLER( pia6821_porta_w );
+void pia6821_set_input_a(const device_config *device, UINT8 data, UINT8 z_mask);
+UINT8 pia6821_get_output_a(const device_config *device);
 
-void pia_reset(void);
+READ8_DEVICE_HANDLER( pia6821_ca1_r );
+WRITE8_DEVICE_HANDLER( pia6821_ca1_w );
 
+READ8_DEVICE_HANDLER( pia6821_ca2_r );
+WRITE8_DEVICE_HANDLER( pia6821_ca2_w );
+int pia6821_get_output_ca2(const device_config *device);
+int pia6821_get_output_ca2_z(const device_config *device);
 
+READ8_DEVICE_HANDLER( pia6821_portb_r );
+WRITE8_DEVICE_HANDLER( pia6821_portb_w );
+UINT8 pia6821_get_output_b(const device_config *device);
 
-/*-------------- CPU interface for PIA read --------------*/
+READ8_DEVICE_HANDLER( pia6821_cb1_r );
+WRITE8_DEVICE_HANDLER( pia6821_cb1_w );
 
-UINT8 pia_read(int which, offs_t offset);
-UINT8 pia_alt_read(int which, offs_t offset);
-UINT8 pia_get_port_b_z_mask(int which);  /* see first note */
+READ8_DEVICE_HANDLER( pia6821_cb2_r );
+WRITE8_DEVICE_HANDLER( pia6821_cb2_w );
+int pia6821_get_output_cb2(const device_config *device);
+int pia6821_get_output_cb2_z(const device_config *device);
 
+int pia6821_get_irq_a(const device_config *device);
+int pia6821_get_irq_b(const device_config *device);
 
 
-/*------------- CPU interface for PIA write --------------*/
+/***************************************************************************
+    DEVICE CONFIGURATION MACROS
+***************************************************************************/
 
-void pia_write(int which, offs_t offset, UINT8 data);
-void pia_alt_write(int which, offs_t offset, UINT8 data);
-void pia_set_port_a_z_mask(int which, UINT8 data);  /* see second note */
+#define MDRV_PIA6821_ADD(_tag, _intrf) \
+	MDRV_DEVICE_ADD(_tag, PIA6821, 0) \
+	MDRV_DEVICE_CONFIG(_intrf)
 
+#define MDRV_PIA6821_MODIFY(_tag, _intrf) \
+	MDRV_DEVICE_MODIFY(_tag) \
+	MDRV_DEVICE_CONFIG(_intrf)
 
+#define MDRV_PIA6821_REMOVE(_tag) \
+	MDRV_DEVICE_REMOVE(_tag)
 
-/*------------- Device interface for port A --------------*/
+#define MDRV_PIA6822_ADD(_tag, _intrf) \
+	MDRV_DEVICE_ADD(_tag, PIA6822, 0) \
+	MDRV_DEVICE_CONFIG(_intrf)
 
-UINT8 pia_get_input_a(int which);
-void pia_set_input_a(int which, UINT8 data, UINT8 z_mask);
-UINT8 pia_get_output_a(int which);
+#define MDRV_PIA6822_MODIFY(_tag, _intrf) \
+	MDRV_DEVICE_MODIFY(_tag) \
+	MDRV_DEVICE_CONFIG(_intrf)
 
+#define MDRV_PIA6822_REMOVE(_tag) \
+	MDRV_DEVICE_REMOVE(_tag)
 
-
-/*----------- Device interface for the CA1 pin -----------*/
-
-int pia_get_input_ca1(int which);
-void pia_set_input_ca1(int which, int data);
-
-
-
-/*----------- Device interface for the CA2 pin -----------*/
-
-int pia_get_input_ca2(int which);
-void pia_set_input_ca2(int which, int data);
-int pia_get_output_ca2(int which);
-int pia_get_output_ca2_z(int which);
-
-
-
-/*------------- Device interface for port B --------------*/
-
-UINT8 pia_get_input_b(int which);
-void pia_set_input_b(int which, UINT8 data);
-UINT8 pia_get_output_b(int which);
-
-
-
-/*----------- Device interface for the CB1 pin -----------*/
-
-int pia_get_input_cb1(int which);
-void pia_set_input_cb1(int which, int data);
-
-
-
-/*----------- Device interface for the CB2 pin -----------*/
-
-int pia_get_input_cb2(int which);
-void pia_set_input_cb2(int which, int data);
-int pia_get_output_cb2(int which);
-int pia_get_output_cb2_z(int which);  /* see first note */
-
-
-
-/*-- Convinience interface for retrieving the IRQ state --*/
-
-int pia_get_irq_a(int which);
-int pia_get_irq_b(int which);
-
-
-
-/*---------- Standard 8-bit CPU interfaces, D0-D7 --------*/
-
-READ8_HANDLER( pia_0_r );
-READ8_HANDLER( pia_1_r );
-READ8_HANDLER( pia_2_r );
-READ8_HANDLER( pia_3_r );
-READ8_HANDLER( pia_4_r );
-READ8_HANDLER( pia_5_r );
-READ8_HANDLER( pia_6_r );
-READ8_HANDLER( pia_7_r );
-
-WRITE8_HANDLER( pia_0_w );
-WRITE8_HANDLER( pia_1_w );
-WRITE8_HANDLER( pia_2_w );
-WRITE8_HANDLER( pia_3_w );
-WRITE8_HANDLER( pia_4_w );
-WRITE8_HANDLER( pia_5_w );
-WRITE8_HANDLER( pia_6_w );
-WRITE8_HANDLER( pia_7_w );
-
-READ8_HANDLER( pia_0_alt_r );
-READ8_HANDLER( pia_1_alt_r );
-READ8_HANDLER( pia_2_alt_r );
-READ8_HANDLER( pia_3_alt_r );
-READ8_HANDLER( pia_4_alt_r );
-READ8_HANDLER( pia_5_alt_r );
-READ8_HANDLER( pia_6_alt_r );
-READ8_HANDLER( pia_7_alt_r );
-
-WRITE8_HANDLER( pia_0_alt_w );
-WRITE8_HANDLER( pia_1_alt_w );
-WRITE8_HANDLER( pia_2_alt_w );
-WRITE8_HANDLER( pia_3_alt_w );
-WRITE8_HANDLER( pia_4_alt_w );
-WRITE8_HANDLER( pia_5_alt_w );
-WRITE8_HANDLER( pia_6_alt_w );
-WRITE8_HANDLER( pia_7_alt_w );
-
-
-
-/*--------------- 8-bit A/B port interfaces -------------*/
-
-WRITE8_HANDLER( pia_0_porta_w );
-WRITE8_HANDLER( pia_1_porta_w );
-WRITE8_HANDLER( pia_2_porta_w );
-WRITE8_HANDLER( pia_3_porta_w );
-WRITE8_HANDLER( pia_4_porta_w );
-WRITE8_HANDLER( pia_5_porta_w );
-WRITE8_HANDLER( pia_6_porta_w );
-WRITE8_HANDLER( pia_7_porta_w );
-
-WRITE8_HANDLER( pia_0_portb_w );
-WRITE8_HANDLER( pia_1_portb_w );
-WRITE8_HANDLER( pia_2_portb_w );
-WRITE8_HANDLER( pia_3_portb_w );
-WRITE8_HANDLER( pia_4_portb_w );
-WRITE8_HANDLER( pia_5_portb_w );
-WRITE8_HANDLER( pia_6_portb_w );
-WRITE8_HANDLER( pia_7_portb_w );
-
-READ8_HANDLER( pia_0_porta_r );
-READ8_HANDLER( pia_1_porta_r );
-READ8_HANDLER( pia_2_porta_r );
-READ8_HANDLER( pia_3_porta_r );
-READ8_HANDLER( pia_4_porta_r );
-READ8_HANDLER( pia_5_porta_r );
-READ8_HANDLER( pia_6_porta_r );
-READ8_HANDLER( pia_7_porta_r );
-
-READ8_HANDLER( pia_0_portb_r );
-READ8_HANDLER( pia_1_portb_r );
-READ8_HANDLER( pia_2_portb_r );
-READ8_HANDLER( pia_3_portb_r );
-READ8_HANDLER( pia_4_portb_r );
-READ8_HANDLER( pia_5_portb_r );
-READ8_HANDLER( pia_6_portb_r );
-READ8_HANDLER( pia_7_portb_r );
-
-
-
-/*--------- 1-bit CA1/CA2/CB1/CB2 port interfaces -------*/
-
-WRITE8_HANDLER( pia_0_ca1_w );
-WRITE8_HANDLER( pia_1_ca1_w );
-WRITE8_HANDLER( pia_2_ca1_w );
-WRITE8_HANDLER( pia_3_ca1_w );
-WRITE8_HANDLER( pia_4_ca1_w );
-WRITE8_HANDLER( pia_5_ca1_w );
-WRITE8_HANDLER( pia_6_ca1_w );
-WRITE8_HANDLER( pia_7_ca1_w );
-
-WRITE8_HANDLER( pia_0_ca2_w );
-WRITE8_HANDLER( pia_1_ca2_w );
-WRITE8_HANDLER( pia_2_ca2_w );
-WRITE8_HANDLER( pia_3_ca2_w );
-WRITE8_HANDLER( pia_4_ca2_w );
-WRITE8_HANDLER( pia_5_ca2_w );
-WRITE8_HANDLER( pia_6_ca2_w );
-WRITE8_HANDLER( pia_7_ca2_w );
-
-WRITE8_HANDLER( pia_0_cb1_w );
-WRITE8_HANDLER( pia_1_cb1_w );
-WRITE8_HANDLER( pia_2_cb1_w );
-WRITE8_HANDLER( pia_3_cb1_w );
-WRITE8_HANDLER( pia_4_cb1_w );
-WRITE8_HANDLER( pia_5_cb1_w );
-WRITE8_HANDLER( pia_6_cb1_w );
-WRITE8_HANDLER( pia_7_cb1_w );
-
-WRITE8_HANDLER( pia_0_cb2_w );
-WRITE8_HANDLER( pia_1_cb2_w );
-WRITE8_HANDLER( pia_2_cb2_w );
-WRITE8_HANDLER( pia_3_cb2_w );
-WRITE8_HANDLER( pia_4_cb2_w );
-WRITE8_HANDLER( pia_5_cb2_w );
-WRITE8_HANDLER( pia_6_cb2_w );
-WRITE8_HANDLER( pia_7_cb2_w );
-
-READ8_HANDLER( pia_0_ca1_r );
-READ8_HANDLER( pia_1_ca1_r );
-READ8_HANDLER( pia_2_ca1_r );
-READ8_HANDLER( pia_3_ca1_r );
-READ8_HANDLER( pia_4_ca1_r );
-READ8_HANDLER( pia_5_ca1_r );
-READ8_HANDLER( pia_6_ca1_r );
-READ8_HANDLER( pia_7_ca1_r );
-
-READ8_HANDLER( pia_0_ca2_r );
-READ8_HANDLER( pia_1_ca2_r );
-READ8_HANDLER( pia_2_ca2_r );
-READ8_HANDLER( pia_3_ca2_r );
-READ8_HANDLER( pia_4_ca2_r );
-READ8_HANDLER( pia_5_ca2_r );
-READ8_HANDLER( pia_6_ca2_r );
-READ8_HANDLER( pia_7_ca2_r );
-
-READ8_HANDLER( pia_0_cb1_r );
-READ8_HANDLER( pia_1_cb1_r );
-READ8_HANDLER( pia_2_cb1_r );
-READ8_HANDLER( pia_3_cb1_r );
-READ8_HANDLER( pia_4_cb1_r );
-READ8_HANDLER( pia_5_cb1_r );
-READ8_HANDLER( pia_6_cb1_r );
-READ8_HANDLER( pia_7_cb1_r );
-
-READ8_HANDLER( pia_0_cb2_r );
-READ8_HANDLER( pia_1_cb2_r );
-READ8_HANDLER( pia_2_cb2_r );
-READ8_HANDLER( pia_3_cb2_r );
-READ8_HANDLER( pia_4_cb2_r );
-READ8_HANDLER( pia_5_cb2_r );
-READ8_HANDLER( pia_6_cb2_r );
-READ8_HANDLER( pia_7_cb2_r );
-
-#endif
+#endif /* __6821NEW_H__ */

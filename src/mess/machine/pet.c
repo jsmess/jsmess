@@ -9,7 +9,7 @@
 #include "cpu/m6809/m6809.h"
 
 #include "includes/cbm.h"
-#include "machine/6821new.h"
+#include "machine/6821pia.h"
 #include "machine/6522via.h"
 #include "includes/cbmserb.h"
 #include "includes/cbmieeeb.h"
@@ -44,19 +44,19 @@ static emu_timer *datasette2_timer;
 
 static READ8_HANDLER( pet_mc6845_register_r )
 {
-	device_config *devconf = (device_config *) devtag_get_device(space->machine, MC6845, "crtc");
+	const device_config *devconf = devtag_get_device(space->machine, "crtc");
 	return mc6845_register_r(devconf, offset);
 }
 
 static WRITE8_HANDLER( pet_mc6845_register_w )
 {
-	device_config *devconf = (device_config *) devtag_get_device(space->machine, MC6845, "crtc");
+	const device_config *devconf = devtag_get_device(space->machine, "crtc");
 	mc6845_register_w(devconf, offset, data);
 }
 
 static WRITE8_HANDLER( pet_mc6845_address_w )
 {
-	device_config *devconf = (device_config *) devtag_get_device(space->machine, MC6845, "crtc");
+	const device_config *devconf = devtag_get_device(space->machine, "crtc");
 	mc6845_address_w(devconf, offset, data);
 }
 
@@ -78,10 +78,10 @@ static READ8_DEVICE_HANDLER ( pet_pia0_port_a_read )
 {
 	int data = 0xf0 | pet_keyline_select;
 
-	if ((cassette_get_state(devtag_get_device(device->machine, CASSETTE, "cassette1")) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
+	if ((cassette_get_state(devtag_get_device(device->machine, "cassette1")) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
 		data &= ~0x10;
 
-	if ((cassette_get_state(devtag_get_device(device->machine, CASSETTE, "cassette2")) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
+	if ((cassette_get_state(devtag_get_device(device->machine, "cassette2")) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
 		data &= ~0x20;
 
 	if (!cbm_ieee_eoi_r(device->machine))
@@ -144,7 +144,7 @@ static READ8_DEVICE_HANDLER( petb_pia0_port_b_read )
 static READ8_DEVICE_HANDLER( pet_pia0_ca1_in )
 {
 	// cassette 1 read
-	return (cassette_input(devtag_get_device(device->machine, CASSETTE, "cassette1")) > +0.0) ? 1 : 0;
+	return (cassette_input(devtag_get_device(device->machine, "cassette1")) > +0.0) ? 1 : 0;
 }
 
 
@@ -157,12 +157,12 @@ static WRITE8_DEVICE_HANDLER( pet_pia0_cb2_out )
 {
 	if (!data)
 	{
-		cassette_change_state(devtag_get_device(device->machine, CASSETTE, "cassette1"),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+		cassette_change_state(devtag_get_device(device->machine, "cassette1"),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
 		timer_adjust_periodic(datasette1_timer, attotime_zero, 0, ATTOTIME_IN_HZ(48000));	// I put 48000 because I was given some .wav with this freq
 	}
 	else
 	{
-		cassette_change_state(devtag_get_device(device->machine, CASSETTE, "cassette1"),CASSETTE_MOTOR_DISABLED ,CASSETTE_MASK_MOTOR);
+		cassette_change_state(devtag_get_device(device->machine, "cassette1"),CASSETTE_MOTOR_DISABLED ,CASSETTE_MASK_MOTOR);
 		timer_reset(datasette1_timer, attotime_never);
 	}
 }
@@ -305,12 +305,12 @@ static READ8_DEVICE_HANDLER( pet_via_port_b_r )
 
 	if (!(data & 0x10))
 	{
-		cassette_change_state(devtag_get_device(device->machine, CASSETTE, "cassette2"),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+		cassette_change_state(devtag_get_device(device->machine, "cassette2"),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
 		timer_adjust_periodic(datasette2_timer, attotime_zero, 0, ATTOTIME_IN_HZ(48000));	// I put 48000 because I was given some .wav with this freq
 	}
 	else
 	{
-		cassette_change_state(devtag_get_device(device->machine, CASSETTE, "cassette2"),CASSETTE_MOTOR_DISABLED ,CASSETTE_MASK_MOTOR);
+		cassette_change_state(devtag_get_device(device->machine, "cassette2"),CASSETTE_MOTOR_DISABLED ,CASSETTE_MASK_MOTOR);
 		timer_reset(datasette2_timer, attotime_never);
 	}
 
@@ -325,7 +325,7 @@ static READ8_DEVICE_HANDLER( pet_via_port_b_r )
 static READ8_DEVICE_HANDLER( pet_via_cb1_r )
 {
 	// cassette 2 read
-	return (cassette_input(devtag_get_device(device->machine, CASSETTE, "cassette2")) > +0.0) ? 1 : 0;
+	return (cassette_input(devtag_get_device(device->machine, "cassette2")) > +0.0) ? 1 : 0;
 }
 
 
@@ -356,14 +356,14 @@ static struct {
 
 static WRITE8_HANDLER(cbm8096_io_w)
 {
-	const device_config *via_0 = devtag_get_device(space->machine, VIA6522, "via6522_0");
-	const device_config *pia_0 = devtag_get_device(space->machine, PIA6821, "pia_0");
-	const device_config *pia_1 = devtag_get_device(space->machine, PIA6821, "pia_1");
+	const device_config *via_0 = devtag_get_device(space->machine, "via6522_0");
+	const device_config *pia_0 = devtag_get_device(space->machine, "pia_0");
+	const device_config *pia_1 = devtag_get_device(space->machine, "pia_1");
 
 	if (offset < 0x10) ;
-	else if (offset < 0x14) pia_w(pia_0, offset & 3, data);
+	else if (offset < 0x14) pia6821_w(pia_0, offset & 3, data);
 	else if (offset < 0x20) ;
-	else if (offset < 0x24) pia_w(pia_1, offset & 3, data);
+	else if (offset < 0x24) pia6821_w(pia_1, offset & 3, data);
 	else if (offset < 0x40) ;
 	else if (offset < 0x50) via_w(via_0, offset & 0xf, data);
 	else if (offset < 0x80) ;
@@ -373,15 +373,15 @@ static WRITE8_HANDLER(cbm8096_io_w)
 
 static READ8_HANDLER(cbm8096_io_r)
 {
-	const device_config *via_0 = devtag_get_device(space->machine, VIA6522, "via6522_0");
-	const device_config *pia_0 = devtag_get_device(space->machine, PIA6821, "pia_0");
-	const device_config *pia_1 = devtag_get_device(space->machine, PIA6821, "pia_1");
+	const device_config *via_0 = devtag_get_device(space->machine, "via6522_0");
+	const device_config *pia_0 = devtag_get_device(space->machine, "pia_0");
+	const device_config *pia_1 = devtag_get_device(space->machine, "pia_1");
 
 	int data = 0xff;
 	if (offset < 0x10) ;
-	else if (offset < 0x14) data = pia_r(pia_0, offset & 3);
+	else if (offset < 0x14) data = pia6821_r(pia_0, offset & 3);
 	else if (offset < 0x20) ;
-	else if (offset < 0x24) data = pia_r(pia_1, offset & 3);
+	else if (offset < 0x24) data = pia6821_r(pia_1, offset & 3);
 	else if (offset < 0x40) ;
 	else if (offset < 0x50) data = via_r(via_0, offset & 0xf);
 	else if (offset < 0x80) ;
@@ -559,10 +559,10 @@ WRITE8_HANDLER(superpet_w)
 
 static TIMER_CALLBACK(pet_interrupt)
 {
-	const device_config *pia_0 = devtag_get_device(machine, PIA6821, "pia_0");
+	const device_config *pia_0 = devtag_get_device(machine, "pia_0");
 	static int level = 0;
 
-	pia_cb1_w(pia_0, 0, level);
+	pia6821_cb1_w(pia_0, 0, level);
 	level = !level;
 }
 
@@ -570,18 +570,18 @@ static TIMER_CALLBACK(pet_interrupt)
 /* NOT WORKING - Just placeholder */
 static TIMER_CALLBACK( pet_tape1_timer )
 {
-	const device_config *pia_0 = devtag_get_device(machine, PIA6821, "pia_0");
+	const device_config *pia_0 = devtag_get_device(machine, "pia_0");
 //  cassette 1
-	UINT8 data = (cassette_input(devtag_get_device(machine, CASSETTE, "cassette1")) > +0.0) ? 1 : 0;
-	pia_ca1_w(pia_0, 0, data);
+	UINT8 data = (cassette_input(devtag_get_device(machine, "cassette1")) > +0.0) ? 1 : 0;
+	pia6821_ca1_w(pia_0, 0, data);
 }
 
 /* NOT WORKING - Just placeholder */
 static TIMER_CALLBACK( pet_tape2_timer )
 {
-	const device_config *via_0 = devtag_get_device(machine, VIA6522, "via6522_0");
+	const device_config *via_0 = devtag_get_device(machine, "via6522_0");
 //  cassette 2
-	UINT8 data = (cassette_input(devtag_get_device(machine, CASSETTE, "cassette2")) > +0.0) ? 1 : 0;
+	UINT8 data = (cassette_input(devtag_get_device(machine, "cassette2")) > +0.0) ? 1 : 0;
 	via_cb1_w(via_0, 0, data);
 }
 

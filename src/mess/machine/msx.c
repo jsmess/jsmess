@@ -325,7 +325,7 @@ MACHINE_START( msx )
 
 MACHINE_START( msx2 )
 {
-	device_config *fdc = (device_config*)devtag_get_device(machine, WD179X, "wd179x");
+	const device_config *fdc = devtag_get_device(machine, "wd179x");
 	wd17xx_set_density (fdc,DEN_FM_HI);
 	msx1.dsk_stat = 0x7f;
 }
@@ -434,7 +434,7 @@ INTERRUPT_GEN( msx_interrupt )
 
 static const device_config *cassette_device_image(running_machine *machine)
 {
-	return devtag_get_device(machine, CASSETTE, "cassette");
+	return devtag_get_device(machine, "cassette");
 }
 
 READ8_HANDLER ( msx_psg_port_a_r )
@@ -534,7 +534,7 @@ WRITE8_DEVICE_HANDLER( msx_printer_data_w )
 	if (input_port_read(device->machine, "DSW") & 0x80)
 	{
 		/* SIMPL emulation */
-		dac_signed_data_w(devtag_get_device(device->machine, SOUND, "dac"), data);
+		dac_signed_data_w(devtag_get_device(device->machine, "dac"), data);
 	}
 	else
 	{
@@ -558,7 +558,7 @@ WRITE8_HANDLER (msx_fmpac_w)
 {
 	if (msx1.opll_active)
 	{
-		const device_config *ym = devtag_get_device(space->machine, SOUND, "ym2413");
+		const device_config *ym = devtag_get_device(space->machine, "ym2413");
 
 		if (offset == 1)
 			ym2413_w (ym, 1, data);
@@ -578,19 +578,19 @@ WRITE8_HANDLER (msx_rtc_latch_w)
 
 WRITE8_HANDLER (msx_rtc_reg_w)
 {
-	const device_config *rtc = devtag_get_device(space->machine, TC8521, "rtc");
+	const device_config *rtc = devtag_get_device(space->machine, "rtc");
 	tc8521_w(rtc, msx1.rtc_latch, data);
 }
 
 READ8_HANDLER (msx_rtc_reg_r)
 {
-	const device_config *rtc = devtag_get_device(space->machine, TC8521, "rtc");
+	const device_config *rtc = devtag_get_device(space->machine, "rtc");
 	return tc8521_r(rtc, msx1.rtc_latch);
 }
 
 NVRAM_HANDLER( msx2 )
 {
-	const device_config *rtc = devtag_get_device(machine, TC8521, "rtc");
+	const device_config *rtc = devtag_get_device(machine, "rtc");
 	if (file)
 	{
 		if (read_or_write)
@@ -696,7 +696,7 @@ static WRITE8_DEVICE_HANDLER ( msx_ppi_port_c_w )
 
 	/* key click */
 	if ( (old_val ^ data) & 0x80)
-		dac_signed_data_w (devtag_get_device(device->machine, SOUND, "dac"), (data & 0x80 ? 0x7f : 0));
+		dac_signed_data_w (devtag_get_device(device->machine, "dac"), (data & 0x80 ? 0x7f : 0));
 
 	/* cassette motor on/off */
 	if ( (old_val ^ data) & 0x10)

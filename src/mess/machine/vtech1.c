@@ -166,7 +166,7 @@ WRITE8_HANDLER (vtech1_memory_bank_w)
 
 static const device_config *cassette_device_image(running_machine *machine)
 {
-	return devtag_get_device(machine, CASSETTE, "cassette");
+	return devtag_get_device(machine, "cassette");
 }
 
 
@@ -521,7 +521,7 @@ READ8_HANDLER(vtech1_keyboard_r)
  ************************************************/
 WRITE8_HANDLER(vtech1_latch_w)
 {
-	const device_config *speaker = devtag_get_device(space->machine, SOUND, "speaker");
+	const device_config *speaker = devtag_get_device(space->machine, "speaker");
 
 	if (LOG_VTECH1_LATCH)
 		logerror("vtech1_latch_w $%02X\n", data);
@@ -553,7 +553,7 @@ status input (bit 0).
 
 READ8_HANDLER( vtech1_printer_r )
 {
-	const device_config *printer = devtag_get_device(space->machine, CENTRONICS, "centronics");
+	const device_config *printer = devtag_get_device(space->machine, "centronics");
 	UINT8 result = 0xff;
 
 	result &= ~(!centronics_busy_r(printer));
@@ -564,7 +564,7 @@ READ8_HANDLER( vtech1_printer_r )
 /* TODO: figure out how this really works */
 WRITE8_HANDLER( vtech1_strobe_w )
 {
-	const device_config *printer = devtag_get_device(space->machine, CENTRONICS, "centronics");
+	const device_config *printer = devtag_get_device(space->machine, "centronics");
 	centronics_strobe_w(printer, TRUE);
 	centronics_strobe_w(printer, FALSE);
 }

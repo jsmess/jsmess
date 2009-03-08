@@ -80,10 +80,10 @@ static ADDRESS_MAP_START( dai_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0xf000, 0xf7ff) AM_WRITE( dai_stack_interrupt_circuit_w )
 	AM_RANGE( 0xf800, 0xf8ff) AM_RAM
 	AM_RANGE( 0xfb00, 0xfbff) AM_READWRITE( amd9511_r, amd9511_w )
-	AM_RANGE( 0xfc00, 0xfcff) AM_DEVREADWRITE( PIT8253, "pit8253", pit8253_r, pit8253_w )
+	AM_RANGE( 0xfc00, 0xfcff) AM_DEVREADWRITE("pit8253", pit8253_r, pit8253_w )
 	AM_RANGE( 0xfd00, 0xfdff) AM_READWRITE( dai_io_discrete_devices_r, dai_io_discrete_devices_w )
-	AM_RANGE( 0xfe00, 0xfeff) AM_DEVREADWRITE( PPI8255, "ppi8255", ppi8255_r, ppi8255_w )
-	AM_RANGE( 0xff00, 0xffff) AM_DEVREADWRITE( TMS5501, "tms5501", tms5501_r, tms5501_w )
+	AM_RANGE( 0xfe00, 0xfeff) AM_DEVREADWRITE("ppi8255", ppi8255_r, ppi8255_w )
+	AM_RANGE( 0xff00, 0xffff) AM_DEVREADWRITE("tms5501", tms5501_r, tms5501_w )
 ADDRESS_MAP_END
 
 

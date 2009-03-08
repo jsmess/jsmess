@@ -36,8 +36,8 @@
 #include "formats/pc_dsk.h"
 
 
-static READ8_HANDLER(at_dma8237_1_r)  { return dma8237_r((device_config*)devtag_get_device(space->machine, DMA8237, "dma8237_2"), offset / 2); }
-static WRITE8_HANDLER(at_dma8237_1_w) { dma8237_w((device_config*)devtag_get_device(space->machine, DMA8237, "dma8237_2"), offset / 2, data); }
+static READ8_HANDLER(at_dma8237_1_r)  { return dma8237_r(devtag_get_device(space->machine, "dma8237_2"), offset / 2); }
+static WRITE8_HANDLER(at_dma8237_1_w) { dma8237_w(devtag_get_device(space->machine, "dma8237_2"), offset / 2, data); }
 
 static READ64_HANDLER( bebox_dma8237_1_r )
 {
@@ -57,22 +57,22 @@ static ADDRESS_MAP_START( bebox_mem, ADDRESS_SPACE_PROGRAM, 64 )
 	AM_RANGE(0x7FFFF3F0, 0x7FFFF3F7) AM_READWRITE( bebox_crossproc_interrupts_r, bebox_crossproc_interrupts_w )
 	AM_RANGE(0x7FFFF4F0, 0x7FFFF4F7) AM_WRITE( bebox_processor_resets_w )
 
-	AM_RANGE(0x80000000, 0x8000001F) AM_DEVREADWRITE8( DMA8237, "dma8237_1", dma8237_r, dma8237_w, U64(0xffffffffffffffff) )
-	AM_RANGE(0x80000020, 0x8000003F) AM_DEVREADWRITE8( PIC8259, "pic8259_master", pic8259_r, pic8259_w, U64(0xffffffffffffffff) )
-	AM_RANGE(0x80000040, 0x8000005f) AM_DEVREADWRITE8( PIT8254, "pit8254", pit8253_r, pit8253_w, U64(0xffffffffffffffff) )
+	AM_RANGE(0x80000000, 0x8000001F) AM_DEVREADWRITE8( "dma8237_1", dma8237_r, dma8237_w, U64(0xffffffffffffffff) )
+	AM_RANGE(0x80000020, 0x8000003F) AM_DEVREADWRITE8( "pic8259_master", pic8259_r, pic8259_w, U64(0xffffffffffffffff) )
+	AM_RANGE(0x80000040, 0x8000005f) AM_DEVREADWRITE8( "pit8254", pit8253_r, pit8253_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0x80000060, 0x8000006F) AM_READWRITE( kbdc8042_64be_r, kbdc8042_64be_w )
 	AM_RANGE(0x80000070, 0x8000007F) AM_READWRITE( mc146818_port64be_r, mc146818_port64be_w )
 	AM_RANGE(0x80000080, 0x8000009F) AM_READWRITE( bebox_page_r, bebox_page_w)
-	AM_RANGE(0x800000A0, 0x800000BF) AM_DEVREADWRITE8( PIC8259, "pic8259_slave", pic8259_r, pic8259_w, U64(0xffffffffffffffff) )
+	AM_RANGE(0x800000A0, 0x800000BF) AM_DEVREADWRITE8( "pic8259_slave", pic8259_r, pic8259_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0x800000C0, 0x800000DF) AM_READWRITE( bebox_dma8237_1_r, bebox_dma8237_1_w)
 	AM_RANGE(0x800001F0, 0x800001F7) AM_READWRITE( bebox_800001F0_r, bebox_800001F0_w )
-	AM_RANGE(0x800002F8, 0x800002FF) AM_DEVREADWRITE8( NS16550, "ns16550_1", ins8250_r, ins8250_w, U64(0xffffffffffffffff) )
-	AM_RANGE(0x80000380, 0x80000387) AM_DEVREADWRITE8( NS16550, "ns16550_2", ins8250_r, ins8250_w, U64(0xffffffffffffffff) )
-	AM_RANGE(0x80000388, 0x8000038F) AM_DEVREADWRITE8( NS16550, "ns16550_3", ins8250_r, ins8250_w, U64(0xffffffffffffffff) )
+	AM_RANGE(0x800002F8, 0x800002FF) AM_DEVREADWRITE8( "ns16550_1", ins8250_r, ins8250_w, U64(0xffffffffffffffff) )
+	AM_RANGE(0x80000380, 0x80000387) AM_DEVREADWRITE8( "ns16550_2", ins8250_r, ins8250_w, U64(0xffffffffffffffff) )
+	AM_RANGE(0x80000388, 0x8000038F) AM_DEVREADWRITE8( "ns16550_3", ins8250_r, ins8250_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0x800003F0, 0x800003F7) AM_READWRITE( bebox_800003F0_r, bebox_800003F0_w )
-	AM_RANGE(0x800003F8, 0x800003FF) AM_DEVREADWRITE8( NS16550, "ns16550_0", ins8250_r, ins8250_w, U64(0xffffffffffffffff) )
+	AM_RANGE(0x800003F8, 0x800003FF) AM_DEVREADWRITE8( "ns16550_0", ins8250_r, ins8250_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0x80000480, 0x8000048F) AM_READWRITE( bebox_80000480_r, bebox_80000480_w )
-	AM_RANGE(0x80000CF8, 0x80000CFF) AM_DEVREADWRITE( PCI_BUS, "pcibus", pci_64be_r, pci_64be_w )
+	AM_RANGE(0x80000CF8, 0x80000CFF) AM_DEVREADWRITE("pcibus", pci_64be_r, pci_64be_w )
 	AM_RANGE(0x800042E8, 0x800042EF) AM_WRITE( cirrus_64be_42E8_w )
 
 	AM_RANGE(0xBFFFFFF0, 0xBFFFFFFF) AM_READ( bebox_interrupt_ack_r )
@@ -129,9 +129,9 @@ static MACHINE_DRIVER_START( bebox )
 
 	/* pci */
 	MDRV_PCI_BUS_ADD("pcibus", 0)
-	MDRV_PCI_BUS_DEVICE(1, NULL, NULL, mpc105_pci_read, mpc105_pci_write)
-	MDRV_PCI_BUS_DEVICE(1, NULL, NULL, cirrus5430_pci_read, cirrus5430_pci_write)
-	/*MDRV_PCI_BUS_DEVICE(12, NULL, NULL, scsi53c810_pci_read, scsi53c810_pci_write)*/
+	MDRV_PCI_BUS_DEVICE(1, NULL, mpc105_pci_read, mpc105_pci_write)
+	MDRV_PCI_BUS_DEVICE(1, NULL, cirrus5430_pci_read, cirrus5430_pci_write)
+	/*MDRV_PCI_BUS_DEVICE(12, NULL, scsi53c810_pci_read, scsi53c810_pci_write)*/
 
 	MDRV_SMC37C78_ADD("smc37c78", pc_fdc_nec765_connected_interface)
 MACHINE_DRIVER_END

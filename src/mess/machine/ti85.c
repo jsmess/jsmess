@@ -419,7 +419,7 @@ WRITE8_HANDLER ( ti85_port_0006_w )
 
 WRITE8_HANDLER ( ti85_port_0007_w )
 {
-	const device_config *speaker = devtag_get_device(space->machine, SOUND, "speaker");
+	const device_config *speaker = devtag_get_device(space->machine, "speaker");
 	speaker_level_w(speaker,( (data>>2)|(data>>3) )&0x01 );
         ti85_red_out=(data>>2)&0x01;
         ti85_white_out=(data>>3)&0x01;

@@ -384,7 +384,7 @@ static DEVICE_START( msm6255 )
 	assert(msm6255->intf->char_ram_r != NULL);	
 
 	/* get the screen */
-	msm6255->screen = devtag_get_device(device->machine, VIDEO_SCREEN, msm6255->intf->screen_tag);
+	msm6255->screen = devtag_get_device(device->machine, msm6255->intf->screen_tag);
 	assert(msm6255->screen != NULL);
 
 	/* register for state saving */

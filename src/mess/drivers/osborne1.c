@@ -40,7 +40,7 @@ TODO:
 #include "sound/beep.h"
 #include "devices/basicdsk.h"
 #include "machine/wd17xx.h"
-#include "machine/6821new.h"
+#include "machine/6821pia.h"
 #include "includes/osborne1.h"
 
 
@@ -160,7 +160,7 @@ static PALETTE_INIT( osborne1 )
 static const z80_daisy_chain osborne1_daisy_chain[] =
 {
 /*	{ osborne1_z80_reset, osborne1_z80_irq_state, osborne1_z80_irq_ack, osborne1_z80_irq_reti, 0 }, */
-	{ OSBORNE1_DAISY, "osborne1_daisy" },
+	{ "osborne1_daisy" },
 	{ NULL }
 };
 

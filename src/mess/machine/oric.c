@@ -172,7 +172,7 @@ static READ8_DEVICE_HANDLER ( oric_via_in_a_func )
 		/* if psg is in read register state return reg data */
 		if (oric_psg_control==0x01)
 		{
-			return ay8910_r(devtag_get_device(space->machine, SOUND, "ay8912"), 0);
+			return ay8910_r(devtag_get_device(space->machine, "ay8912"), 0);
 		}
 
 		/* return high-impedance */
@@ -215,14 +215,14 @@ static void oric_psg_connection_refresh(running_machine *machine)
 			/* write register data */
 			case 2:
 			{
-				const device_config *ay8912 = devtag_get_device(machine, SOUND, "ay8912");
+				const device_config *ay8912 = devtag_get_device(machine, "ay8912");
 				ay8910_data_w(ay8912, 0, oric_via_port_a_data);
 			}
 			break;
 			/* write register index */
 			case 3:
 			{
-				const device_config *ay8912 = devtag_get_device(machine, SOUND, "ay8912");
+				const device_config *ay8912 = devtag_get_device(machine, "ay8912");
 				ay8910_address_w(ay8912, 0, oric_via_port_a_data);
 			}
 			break;
@@ -245,7 +245,7 @@ static WRITE8_DEVICE_HANDLER ( oric_via_out_a_func )
 	if (oric_psg_control==0)
 	{
 		/* if psg not selected, write to printer */
-		const device_config *printer = devtag_get_device(device->machine, CENTRONICS, "centronics");
+		const device_config *printer = devtag_get_device(device->machine, "centronics");
 		centronics_data_w(printer, 0, data);
 	}
 }
@@ -274,7 +274,7 @@ PB7
 
 static const device_config *cassette_device_image(running_machine *machine)
 {
-	return devtag_get_device(machine, CASSETTE, "cassette");
+	return devtag_get_device(machine, "cassette");
 }
 
 /* not called yet - this will update the via with the state of the tape data.
@@ -283,7 +283,7 @@ static TIMER_CALLBACK(oric_refresh_tape)
 {
 	int data;
 	int input_port_9;
-	const device_config *via_0 = devtag_get_device(machine, VIA6522, "via6522_0");
+	const device_config *via_0 = devtag_get_device(machine, "via6522_0");
 
 	data = 0;
 
@@ -309,7 +309,7 @@ static TIMER_CALLBACK(oric_refresh_tape)
 static unsigned char previous_portb_data = 0;
 static WRITE8_DEVICE_HANDLER ( oric_via_out_b_func )
 {
-	const device_config *printer = devtag_get_device(device->machine, CENTRONICS, "centronics");
+	const device_config *printer = devtag_get_device(device->machine, "centronics");
 
 	/* KEYBOARD */
 	oric_keyboard_line = data & 0x07;
@@ -463,9 +463,7 @@ CALL &320 to start, or use BOBY rom.
 
 static void oric_install_apple2_interface(running_machine *machine)
 {
-	const device_config *fdc = device_list_find_by_tag(machine->config->devicelist,
-		APPLEFDC,
-		"fdc");
+	const device_config *fdc = devtag_get_device(machine, "fdc");
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
 	memory_install_read8_handler(space, 0x0300, 0x030f, 0, 0, oric_IO_r);
@@ -559,9 +557,7 @@ static WRITE8_HANDLER(apple2_v2_interface_w)
 /* APPLE 2 INTERFACE V2 */
 static void oric_install_apple2_v2_interface(running_machine *machine)
 {
-	const device_config *fdc = device_list_find_by_tag(machine->config->devicelist,
-		APPLEFDC,
-		"fdc");
+	const device_config *fdc = devtag_get_device(machine, "fdc");
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
 	memory_install_read8_handler(space, 0x0300, 0x030f, 0, 0, oric_IO_r);
@@ -695,8 +691,8 @@ static WD17XX_CALLBACK( oric_jasmin_wd179x_callback )
 
 static READ8_HANDLER (oric_jasmin_r)
 {
-	const device_config *via_0 = devtag_get_device(space->machine, VIA6522, "via6522_0");
-	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD179X, "wd179x");
+	const device_config *via_0 = devtag_get_device(space->machine, "via6522_0");
+	const device_config *fdc = devtag_get_device(space->machine, "wd179x");
 	unsigned char data = 0x0ff;
 
 	switch (offset & 0x0f)
@@ -726,8 +722,8 @@ static READ8_HANDLER (oric_jasmin_r)
 
 static WRITE8_HANDLER(oric_jasmin_w)
 {
-	const device_config *via_0 = devtag_get_device(space->machine, VIA6522, "via6522_0");
-	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD179X, "wd179x");
+	const device_config *via_0 = devtag_get_device(space->machine, "via6522_0");
+	const device_config *fdc = devtag_get_device(space->machine, "wd179x");
 	switch (offset & 0x0f)
 	{
 		/* microdisc floppy disc interface */
@@ -933,7 +929,7 @@ static void	oric_microdisc_set_mem_0x0c000(running_machine *machine)
 READ8_HANDLER (oric_microdisc_r)
 {
 	unsigned char data = 0x0ff;
-	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD179X, "wd179x");
+	const device_config *fdc = devtag_get_device(space->machine, "wd179x");
 
 	switch (offset & 0x0ff)
 	{
@@ -961,7 +957,7 @@ READ8_HANDLER (oric_microdisc_r)
 
 		default:
 			{
-				const device_config *via_0 = devtag_get_device(space->machine, VIA6522, "via6522_0");
+				const device_config *via_0 = devtag_get_device(space->machine, "via6522_0");
 				data = via_r(via_0, offset & 0x0f);
 			}
 			break;
@@ -973,7 +969,7 @@ READ8_HANDLER (oric_microdisc_r)
 
 WRITE8_HANDLER(oric_microdisc_w)
 {
-	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD179X, "wd179x");
+	const device_config *fdc = devtag_get_device(space->machine, "wd179x");
 	switch (offset & 0x0ff)
 	{
 		/* microdisc floppy disc interface */
@@ -1021,7 +1017,7 @@ WRITE8_HANDLER(oric_microdisc_w)
 
 		default:
 			{
-				const device_config *via_0 = devtag_get_device(space->machine, VIA6522, "via6522_0");
+				const device_config *via_0 = devtag_get_device(space->machine, "via6522_0");
 				via_w(via_0, offset & 0x0f, data);
 			}
 			break;
@@ -1181,7 +1177,7 @@ MACHINE_RESET( oric )
 
 READ8_HANDLER ( oric_IO_r )
 {
-	const device_config *via_0 = devtag_get_device(space->machine, VIA6522, "via6522_0");
+	const device_config *via_0 = devtag_get_device(space->machine, "via6522_0");
 #if 0
 	switch (input_port_read(machine, "FLOPPY") & 0x07)
 	{
@@ -1221,7 +1217,7 @@ READ8_HANDLER ( oric_IO_r )
 
 WRITE8_HANDLER ( oric_IO_w )
 {
-	const device_config *via_0 = devtag_get_device(space->machine, VIA6522, "via6522_0");
+	const device_config *via_0 = devtag_get_device(space->machine, "via6522_0");
 #if 0
 	switch (input_port_read(machine, "FLOPPY") & 0x07)
 	{

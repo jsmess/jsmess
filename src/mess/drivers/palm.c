@@ -28,7 +28,7 @@ static UINT16 spim_data;
 static INPUT_CHANGED( pen_check )
 {
     UINT8 button = input_port_read(field->port->machine, "PENB");
-    const device_config *mc68328_device = device_list_find_by_tag(field->port->machine->config->devicelist, MC68328, "dragonball");
+    const device_config *mc68328_device = devtag_get_device(field->port->machine, "dragonball");
     if(button)
     {
         mc68328_set_penirq_line(mc68328_device, 1);
@@ -42,7 +42,7 @@ static INPUT_CHANGED( pen_check )
 static INPUT_CHANGED( button_check )
 {
     UINT8 button_state = input_port_read(field->port->machine, "PORTD");
-    const device_config *mc68328_device = device_list_find_by_tag(field->port->machine->config->devicelist, MC68328, "dragonball");
+    const device_config *mc68328_device = devtag_get_device(field->port->machine, "dragonball");
 
     mc68328_set_port_d_lines(mc68328_device, button_state, (int)(FPTR)param);
 }
@@ -117,7 +117,7 @@ static MACHINE_RESET( palm )
 
 static ADDRESS_MAP_START(palm_map, ADDRESS_SPACE_PROGRAM, 16)
     AM_RANGE(0xc00000, 0xe07fff) AM_ROM AM_REGION("bios", 0)
-    AM_RANGE(0xfff000, 0xffffff) AM_DEVREADWRITE(MC68328, MC68328_TAG, mc68328_r, mc68328_w)
+    AM_RANGE(0xfff000, 0xffffff) AM_DEVREADWRITE(MC68328_TAG, mc68328_r, mc68328_w)
 ADDRESS_MAP_END
 
 
@@ -127,7 +127,7 @@ ADDRESS_MAP_END
 
 static WRITE8_DEVICE_HANDLER( palm_dac_transition )
 {
-    dac_data_w( devtag_get_device(device->machine, SOUND, "dac"), 0x7f * data );
+    dac_data_w( devtag_get_device(device->machine, "dac"), 0x7f * data );
 }
 
 

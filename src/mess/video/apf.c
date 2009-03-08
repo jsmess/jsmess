@@ -10,7 +10,7 @@ UINT8 *apf_video_ram;
 UINT8 apf_m6847_attr;
 static UINT8 apf_chars[0x20], apf_video[0x20];
 
-static ATTR_CONST UINT8 apf_get_attributes(UINT8 c)
+static ATTR_CONST UINT8 apf_get_attributes(running_machine *machine, UINT8 c)
 {
 
 	/* this seems to be the same so far, as it gives the same result as vapf */

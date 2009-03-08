@@ -62,9 +62,9 @@
 static const device_config *cassette_device_image(running_machine *machine, int index)
 {
 	if ( index )
-		return devtag_get_device(machine, CASSETTE, "cassette2");
+		return devtag_get_device(machine, "cassette2");
 	else
-		return devtag_get_device(machine, CASSETTE, "cassette1");
+		return devtag_get_device(machine, "cassette1");
 }
 
 static void check_interrupt(running_machine *machine)
@@ -1118,9 +1118,9 @@ static ADDRESS_MAP_START( newbrain_ei_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x15, 0x15) AM_MIRROR(0xff00) AM_READ(ei_st1_r)
 	AM_RANGE(0x16, 0x16) AM_MIRROR(0xff00) AM_READ(ei_st2_r)
 	AM_RANGE(0x17, 0x17) AM_MIRROR(0xff00) AM_READWRITE(ei_usbs_r, ei_usbs_w)
-	AM_RANGE(0x18, 0x18) AM_MIRROR(0xff00) AM_DEVREADWRITE(ACIA6850, MC6850_TAG, acia6850_stat_r, acia6850_ctrl_w)
-	AM_RANGE(0x19, 0x19) AM_MIRROR(0xff00) AM_DEVREADWRITE(ACIA6850, MC6850_TAG, acia6850_data_r, acia6850_data_w)
-	AM_RANGE(0x1c, 0x1f) AM_MIRROR(0xff00) AM_DEVREADWRITE(Z80CTC, Z80CTC_TAG, z80ctc_r, z80ctc_w)
+	AM_RANGE(0x18, 0x18) AM_MIRROR(0xff00) AM_DEVREADWRITE(MC6850_TAG, acia6850_stat_r, acia6850_ctrl_w)
+	AM_RANGE(0x19, 0x19) AM_MIRROR(0xff00) AM_DEVREADWRITE(MC6850_TAG, acia6850_data_r, acia6850_data_w)
+	AM_RANGE(0x1c, 0x1f) AM_MIRROR(0xff00) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_r, z80ctc_w)
 	AM_RANGE(0xff, 0xff) AM_MIRROR(0xff00) AM_MASK(0xff00) AM_WRITE(ei_paging_w)
 ADDRESS_MAP_END
 
@@ -1155,8 +1155,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( newbrain_fdc_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREAD(NEC765A, NEC765_TAG, nec765_status_r)
-	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(NEC765A, NEC765_TAG, nec765_data_r, nec765_data_w)
+	AM_RANGE(0x00, 0x00) AM_DEVREAD(NEC765_TAG, nec765_status_r)
+	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(NEC765_TAG, nec765_data_r, nec765_data_w)
 	AM_RANGE(0x20, 0x20) AM_WRITE(fdc_auxiliary_w)
 	AM_RANGE(0x40, 0x40) AM_READ(fdc_control_r)
 ADDRESS_MAP_END
@@ -1441,9 +1441,9 @@ static MACHINE_START( newbrain_eim )
 	state->eim_ram = auto_malloc(NEWBRAIN_EIM_RAM_SIZE);
 
 	/* find devices */
-	state->z80ctc = devtag_get_device(machine, Z80CTC, Z80CTC_TAG);
-	state->mc6850 = devtag_get_device(machine, ACIA6850, MC6850_TAG);
-	state->nec765 = devtag_get_device(machine, NEC765A, NEC765_TAG);
+	state->z80ctc = devtag_get_device(machine, Z80CTC_TAG);
+	state->mc6850 = devtag_get_device(machine, MC6850_TAG);
+	state->nec765 = devtag_get_device(machine, NEC765_TAG);
 
 	/* register for state saving */
 	state_save_register_global_pointer(machine, state->eim_ram, NEWBRAIN_EIM_RAM_SIZE);

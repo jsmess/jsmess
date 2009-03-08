@@ -138,7 +138,7 @@ static MACHINE_RESET( oscnano );
 
 static const device_config *cassette_device_image(running_machine *machine)
 {
-	return devtag_get_device(machine, CASSETTE, "cassette");
+	return devtag_get_device(machine, "cassette");
 }
 
 /* Read/Write Handlers */
@@ -260,7 +260,7 @@ static ADDRESS_MAP_START( tmc1800_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tmc1800_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(CDP1861, CDP1861_TAG, cdp1861_dispon_r, cdp1861_dispoff_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(CDP1861_TAG, cdp1861_dispon_r, cdp1861_dispoff_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(tmc1800_keylatch_w)
 ADDRESS_MAP_END
 
@@ -285,9 +285,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tmc2000_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(CDP1864, CDP1864_TAG, cdp1864_dispon_r, cdp1864_step_bgcolor_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(CDP1864_TAG, cdp1864_dispon_r, cdp1864_step_bgcolor_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(tmc2000_keylatch_w)
-	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE(CDP1864, CDP1864_TAG, cdp1864_dispoff_r, tmc2000_bankswitch_w)
+	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE(CDP1864_TAG, cdp1864_dispoff_r, tmc2000_bankswitch_w)
 ADDRESS_MAP_END
 
 // OSCOM Nano
@@ -298,9 +298,9 @@ static ADDRESS_MAP_START( oscnano_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( oscnano_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(CDP1864, CDP1864_TAG, cdp1864_dispon_r, cdp1864_step_bgcolor_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(CDP1864_TAG, cdp1864_dispon_r, cdp1864_step_bgcolor_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(oscnano_keylatch_w)
-	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE(CDP1864, CDP1864_TAG, cdp1864_dispoff_r, oscnano_bankswitch_w)
+	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE(CDP1864_TAG, cdp1864_dispoff_r, oscnano_bankswitch_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -718,7 +718,7 @@ static MACHINE_START( tmc1800 )
 
 	/* find devices */
 
-	state->cdp1861 = devtag_get_device(machine, CDP1861, CDP1861_TAG);
+	state->cdp1861 = devtag_get_device(machine, CDP1861_TAG);
 
 	/* register for state saving */
 
@@ -780,7 +780,7 @@ static MACHINE_START( tmc2000 )
 
 	/* find devices */
 
-	state->cdp1864 = devtag_get_device(machine, CDP1864, CDP1864_TAG);
+	state->cdp1864 = devtag_get_device(machine, CDP1864_TAG);
 
 	/* register for state saving */
 
@@ -831,7 +831,7 @@ static MACHINE_START( oscnano )
 
 	/* find devices */
 
-	state->cdp1864 = devtag_get_device(machine, CDP1864, CDP1864_TAG);
+	state->cdp1864 = devtag_get_device(machine, CDP1864_TAG);
 
 	/* register for state saving */
 
@@ -1061,7 +1061,7 @@ SYSTEM_CONFIG_END
 
 static TIMER_CALLBACK(setup_beep)
 {
-	const device_config *speaker = devtag_get_device(machine, SOUND, "beep");
+	const device_config *speaker = devtag_get_device(machine, "beep");
 	beep_set_state(speaker, 0);
 	beep_set_frequency( speaker, 0 );
 }

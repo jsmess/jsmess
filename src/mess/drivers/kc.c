@@ -60,7 +60,7 @@ static READ8_HANDLER(kc85_4_port_r)
 		case 0x08d:
 		case 0x08e:
 		case 0x08f:
-			return kc85_ctc_r(devtag_get_device(space->machine, Z80CTC, "z80ctc"), port&3);
+			return kc85_ctc_r(devtag_get_device(space->machine, "z80ctc"), port&3);
 
 	}
 
@@ -104,7 +104,7 @@ static WRITE8_HANDLER(kc85_4_port_w)
 		case 0x08d:
 		case 0x08e:
 		case 0x08f:
-			kc85_ctc_w(devtag_get_device(space->machine, Z80CTC, "z80ctc"), port&3, data);
+			kc85_ctc_w(devtag_get_device(space->machine, "z80ctc"), port&3, data);
 			return;
 	}
 
@@ -156,7 +156,7 @@ static READ8_HANDLER(kc85_3_port_r)
 		case 0x08d:
 		case 0x08e:
 		case 0x08f:
-			return kc85_ctc_r(devtag_get_device(space->machine, Z80CTC, "z80ctc"), port&3);
+			return kc85_ctc_r(devtag_get_device(space->machine, "z80ctc"), port&3);
 	}
 
 	logerror("unhandled port r: %04x\n",offset);
@@ -189,7 +189,7 @@ static WRITE8_HANDLER(kc85_3_port_w)
 		case 0x08d:
 		case 0x08e:
 		case 0x08f:
-			kc85_ctc_w(devtag_get_device(space->machine, Z80CTC, "z80ctc"), port&3, data);
+			kc85_ctc_w(devtag_get_device(space->machine, "z80ctc"), port&3, data);
 			return;
 	}
 
@@ -309,8 +309,8 @@ INPUT_PORTS_END
 
 static const z80_daisy_chain kc85_daisy_chain[] =
 {
-	{ Z80PIO, "z80pio" },
-	{ Z80CTC, "z80ctc" },
+	{ "z80pio" },
+	{ "z80ctc" },
 	{ NULL }
 };
 
@@ -333,13 +333,13 @@ static ADDRESS_MAP_START(kc85_disc_hw_mem, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(kc85_disc_hw_io, ADDRESS_SPACE_IO, 8)
-	AM_RANGE(0x0f0, 0x0f0) AM_DEVREAD( NEC765A, "nec765", nec765_status_r)
-	AM_RANGE(0x0f1, 0x0f1) AM_DEVREADWRITE( NEC765A, "nec765", nec765_data_r, nec765_data_w)
-	AM_RANGE(0x0f2, 0x0f3) AM_DEVREADWRITE( NEC765A, "nec765", nec765_dack_r, nec765_dack_w)
+	AM_RANGE(0x0f0, 0x0f0) AM_DEVREAD("nec765", nec765_status_r)
+	AM_RANGE(0x0f1, 0x0f1) AM_DEVREADWRITE("nec765", nec765_data_r, nec765_data_w)
+	AM_RANGE(0x0f2, 0x0f3) AM_DEVREADWRITE("nec765", nec765_dack_r, nec765_dack_w)
 	AM_RANGE(0x0f4, 0x0f5) AM_READ(kc85_disc_hw_input_gate_r)
 	/*{0x0f6, 0x0f7, SMH_NOP},*/		/* for controller */
 	AM_RANGE(0x0f8, 0x0f9) AM_WRITE( kc85_disc_hw_terminal_count_w) /* terminal count */
-	AM_RANGE(0x0fc, 0x0ff) AM_DEVREADWRITE(Z80CTC, "z80ctc_1", kc85_disk_hw_ctc_r, kc85_disk_hw_ctc_w)
+	AM_RANGE(0x0fc, 0x0ff) AM_DEVREADWRITE("z80ctc_1", kc85_disk_hw_ctc_r, kc85_disk_hw_ctc_w)
 ADDRESS_MAP_END
 
 static MACHINE_DRIVER_START( cpu_kc_disc )

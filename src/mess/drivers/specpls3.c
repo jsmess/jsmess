@@ -186,16 +186,16 @@ static const int spectrum_plus3_memory_selections[]=
 
 static WRITE8_HANDLER(spectrum_plus3_port_3ffd_w)
 {
-		if (~input_port_read(space->machine, "CONFIG") & 0x20)
-				nec765_data_w((device_config*)devtag_get_device(space->machine, NEC765A, "nec765"), 0,data);
+	if (~input_port_read(space->machine, "CONFIG") & 0x20)
+		nec765_data_w(devtag_get_device(space->machine, "nec765"), 0,data);
 }
 
 static  READ8_HANDLER(spectrum_plus3_port_3ffd_r)
 {
-		if (input_port_read(space->machine, "CONFIG") & 0x20)
-				return 0xff;
-		else
-				return nec765_data_r((device_config*)devtag_get_device(space->machine, NEC765A, "nec765"), 0);
+	if (input_port_read(space->machine, "CONFIG") & 0x20)
+		return 0xff;
+	else
+		return nec765_data_r(devtag_get_device(space->machine, "nec765"), 0);
 }
 
 
@@ -204,7 +204,7 @@ static  READ8_HANDLER(spectrum_plus3_port_2ffd_r)
 		if (input_port_read(space->machine, "CONFIG") & 0x20)
 				return 0xff;
 		else
-				return nec765_status_r((device_config*)devtag_get_device(space->machine, NEC765A, "nec765"), 0);
+				return nec765_status_r(devtag_get_device(space->machine, "nec765"), 0);
 }
 
 
@@ -339,8 +339,8 @@ static ADDRESS_MAP_START (spectrum_plus3_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_MIRROR(0xfffe) AM_MASK(0xffff) 
 	AM_RANGE(0x001f, 0x001f) AM_READ(spectrum_port_1f_r) AM_MIRROR(0xff00)
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(spectrum_plus3_port_7ffd_w) AM_MIRROR(0x3ffd)
-	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE(SOUND, "ay8912", ay8910_data_w) AM_MIRROR(0x3ffd)
-	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE(SOUND, "ay8912", ay8910_r, ay8910_address_w) AM_MIRROR(0x3ffd)
+	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay8912", ay8910_data_w) AM_MIRROR(0x3ffd)
+	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE("ay8912", ay8910_r, ay8910_address_w) AM_MIRROR(0x3ffd)
 	AM_RANGE(0x1000, 0x1000) AM_WRITE(spectrum_plus3_port_1ffd_w) AM_MIRROR(0x0ffd)
 	AM_RANGE(0x2000, 0x2000) AM_READ(spectrum_plus3_port_2ffd_r) AM_MIRROR(0x0ffd)
 	AM_RANGE(0x3000, 0x3000) AM_READWRITE(spectrum_plus3_port_3ffd_r,spectrum_plus3_port_3ffd_w) AM_MIRROR(0x0ffd)

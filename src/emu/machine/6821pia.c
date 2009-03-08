@@ -4,27 +4,28 @@
 
 **********************************************************************/
 
-#include "driver.h"
 #include "6821pia.h"
 
 
-#define VERBOSE 0
-
-#define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
-
-
-
-/*************************************
- *
- *  Internal PIA data structure
- *
- *************************************/
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
 
 typedef struct _pia6821 pia6821;
 struct _pia6821
 {
-	running_machine *machine;
-	const pia6821_interface *intf;
+	devcb_resolved_read8 in_a_func;
+	devcb_resolved_read8 in_b_func;
+	devcb_resolved_read_line in_ca1_func;
+	devcb_resolved_read_line in_cb1_func;
+	devcb_resolved_read_line in_ca2_func;
+	devcb_resolved_read_line in_cb2_func;
+	devcb_resolved_write8 out_a_func;
+	devcb_resolved_write8 out_b_func;
+	devcb_resolved_write_line out_ca2_func;
+	devcb_resolved_write_line out_cb2_func;
+	devcb_resolved_write_line irq_a_func;
+	devcb_resolved_write_line irq_b_func;
 
 	UINT8 in_a;
 	UINT8 in_ca1;
@@ -71,12 +72,13 @@ struct _pia6821
 };
 
 
+/***************************************************************************
+    MACROS
+***************************************************************************/
 
-/*************************************
- *
- *  Convenince macros and defines
- *
- *************************************/
+#define VERBOSE 0
+
+#define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
 #define PIA_IRQ1				(0x80)
 #define PIA_IRQ2				(0x40)
@@ -97,122 +99,161 @@ struct _pia6821
 #define C2_INPUT(c)				(!(((c) >> 5) & 0x01))
 
 
+/***************************************************************************
+    PROTOTYPES
+***************************************************************************/
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
 
-/*************************************
- *
- *  Static variables
- *
- *************************************/
-
-static pia6821 pias[MAX_PIA];
-
-
-
-/*************************************
- *
- *  Configuration
- *
- *************************************/
-
-void pia_config(running_machine *machine, int which, const pia6821_interface *intf)
+INLINE pia6821 *get_token(const device_config *device)
 {
-	pia6821 *p;
-
-	assert_always(mame_get_phase(machine) == MAME_PHASE_INIT, "Can only call pia_config at init time!");
-	assert_always((which >= 0) && (which < MAX_PIA), "pia_config called on an invalid PIA!");
-	assert_always(intf, "pia_config called with an invalid interface!");
-
-	p = &pias[which];
-	memset(p, 0, sizeof(pias[0]));
-
-	p->machine = machine;
-	p->intf = intf;
-
-	state_save_register_item(machine, "6821pia", NULL, which, p->in_a);
-	state_save_register_item(machine, "6821pia", NULL, which, p->in_ca1);
-	state_save_register_item(machine, "6821pia", NULL, which, p->in_ca2);
-	state_save_register_item(machine, "6821pia", NULL, which, p->out_a);
-	state_save_register_item(machine, "6821pia", NULL, which, p->out_ca2);
-	state_save_register_item(machine, "6821pia", NULL, which, p->port_a_z_mask);
-	state_save_register_item(machine, "6821pia", NULL, which, p->ddr_a);
-	state_save_register_item(machine, "6821pia", NULL, which, p->ctl_a);
-	state_save_register_item(machine, "6821pia", NULL, which, p->irq_a1);
-	state_save_register_item(machine, "6821pia", NULL, which, p->irq_a2);
-	state_save_register_item(machine, "6821pia", NULL, which, p->irq_a_state);
-	state_save_register_item(machine, "6821pia", NULL, which, p->in_b);
-	state_save_register_item(machine, "6821pia", NULL, which, p->in_cb1);
-	state_save_register_item(machine, "6821pia", NULL, which, p->in_cb2);
-	state_save_register_item(machine, "6821pia", NULL, which, p->out_b);
-	state_save_register_item(machine, "6821pia", NULL, which, p->out_cb2);
-	state_save_register_item(machine, "6821pia", NULL, which, p->last_out_cb2_z);
-	state_save_register_item(machine, "6821pia", NULL, which, p->ddr_b);
-	state_save_register_item(machine, "6821pia", NULL, which, p->ctl_b);
-	state_save_register_item(machine, "6821pia", NULL, which, p->irq_b1);
-	state_save_register_item(machine, "6821pia", NULL, which, p->irq_b2);
-	state_save_register_item(machine, "6821pia", NULL, which, p->irq_b_state);
-	state_save_register_item(machine, "6821pia", NULL, which, p->in_a_pushed);
-	state_save_register_item(machine, "6821pia", NULL, which, p->out_a_needs_pulled);
-	state_save_register_item(machine, "6821pia", NULL, which, p->in_ca1_pushed);
-	state_save_register_item(machine, "6821pia", NULL, which, p->in_ca2_pushed);
-	state_save_register_item(machine, "6821pia", NULL, which, p->out_ca2_needs_pulled);
-	state_save_register_item(machine, "6821pia", NULL, which, p->in_b_pushed);
-	state_save_register_item(machine, "6821pia", NULL, which, p->out_b_needs_pulled);
-	state_save_register_item(machine, "6821pia", NULL, which, p->in_cb1_pushed);
-	state_save_register_item(machine, "6821pia", NULL, which, p->in_cb2_pushed);
-	state_save_register_item(machine, "6821pia", NULL, which, p->out_cb2_needs_pulled);
+	assert(device != NULL);
+	assert((device->type == PIA6821) || (device->type == PIA6822));
+	return (pia6821 *) device->token;
 }
 
 
-
-/*************************************
- *
- *  Reset
- *
- *************************************/
-
-void pia_reset(void)
+INLINE const pia6821_interface *get_interface(const device_config *device)
 {
-	int i;
-
-	/* zap each structure, preserving the interface and swizzle */
-	for (i = 0; i < MAX_PIA; i++)
-	{
-		running_machine *machine = pias[i].machine;
-		const pia6821_interface *intf = pias[i].intf;
-
-		if (intf == NULL)  continue;
-
-		memset(&pias[i], 0, sizeof(pias[i]));
-
-		pias[i].machine = machine;
-		pias[i].intf = intf;
-
-		/*
-         * set default read values.
-         *
-         * ports A,CA1,CA2 default to 1
-         * ports B,CB1,CB2 are three-state and undefined (set to 0)
-         */
-		pias[i].in_a = 0xff;
-		pias[i].in_ca1 = TRUE;
-		pias[i].in_ca2 = TRUE;
-
-		/* clear the IRQs */
-		if (intf->irq_a_func) (*intf->irq_a_func)(machine, FALSE);
-		if (intf->irq_b_func) (*intf->irq_b_func)(machine, FALSE);
-	}
+	assert(device != NULL);
+	assert((device->type == PIA6821) || (device->type == PIA6822));
+	return (const pia6821_interface *) device->static_config;
 }
 
 
+/***************************************************************************
+    IMPLEMENTATION
+***************************************************************************/
 
-/*************************************
- *
- *  External interrupt check
- *
- *************************************/
+/*-------------------------------------------------
+    DEVICE_START( pia )
+-------------------------------------------------*/
 
-static void update_interrupts(running_machine *machine, pia6821 *p)
+static DEVICE_START( pia )
 {
+	pia6821 *p = get_token(device);
+	const pia6821_interface *intf = get_interface(device);
+
+	/* clear structure */
+	memset(p, 0, sizeof(*p));
+
+	/* resolve callbacks */
+	devcb_resolve_read8(&p->in_a_func, &intf->in_a_func, device);
+	devcb_resolve_read8(&p->in_b_func, &intf->in_b_func, device);
+	devcb_resolve_read_line(&p->in_ca1_func, &intf->in_ca1_func, device);
+	devcb_resolve_read_line(&p->in_cb1_func, &intf->in_cb1_func, device);
+	devcb_resolve_read_line(&p->in_ca2_func, &intf->in_ca2_func, device);
+	devcb_resolve_read_line(&p->in_cb2_func, &intf->in_cb2_func, device);
+	devcb_resolve_write8(&p->out_a_func, &intf->out_a_func, device);
+	devcb_resolve_write8(&p->out_b_func, &intf->out_b_func, device);
+	devcb_resolve_write_line(&p->out_ca2_func, &intf->out_ca2_func, device);
+	devcb_resolve_write_line(&p->out_cb2_func, &intf->out_cb2_func, device);
+	devcb_resolve_write_line(&p->irq_a_func, &intf->irq_a_func, device);
+	devcb_resolve_write_line(&p->irq_b_func, &intf->irq_b_func, device);
+
+	state_save_register_device_item(device, 0, p->in_a);
+	state_save_register_device_item(device, 0, p->in_ca1);
+	state_save_register_device_item(device, 0, p->in_ca2);
+	state_save_register_device_item(device, 0, p->out_a);
+	state_save_register_device_item(device, 0, p->out_ca2);
+	state_save_register_device_item(device, 0, p->port_a_z_mask);
+	state_save_register_device_item(device, 0, p->ddr_a);
+	state_save_register_device_item(device, 0, p->ctl_a);
+	state_save_register_device_item(device, 0, p->irq_a1);
+	state_save_register_device_item(device, 0, p->irq_a2);
+	state_save_register_device_item(device, 0, p->irq_a_state);
+	state_save_register_device_item(device, 0, p->in_b);
+	state_save_register_device_item(device, 0, p->in_cb1);
+	state_save_register_device_item(device, 0, p->in_cb2);
+	state_save_register_device_item(device, 0, p->out_b);
+	state_save_register_device_item(device, 0, p->out_cb2);
+	state_save_register_device_item(device, 0, p->last_out_cb2_z);
+	state_save_register_device_item(device, 0, p->ddr_b);
+	state_save_register_device_item(device, 0, p->ctl_b);
+	state_save_register_device_item(device, 0, p->irq_b1);
+	state_save_register_device_item(device, 0, p->irq_b2);
+	state_save_register_device_item(device, 0, p->irq_b_state);
+	state_save_register_device_item(device, 0, p->in_a_pushed);
+	state_save_register_device_item(device, 0, p->out_a_needs_pulled);
+	state_save_register_device_item(device, 0, p->in_ca1_pushed);
+	state_save_register_device_item(device, 0, p->in_ca2_pushed);
+	state_save_register_device_item(device, 0, p->out_ca2_needs_pulled);
+	state_save_register_device_item(device, 0, p->in_b_pushed);
+	state_save_register_device_item(device, 0, p->out_b_needs_pulled);
+	state_save_register_device_item(device, 0, p->in_cb1_pushed);
+	state_save_register_device_item(device, 0, p->in_cb2_pushed);
+	state_save_register_device_item(device, 0, p->out_cb2_needs_pulled);
+}
+
+
+/*-------------------------------------------------
+    DEVICE_RESET( pia )
+-------------------------------------------------*/
+
+static DEVICE_RESET( pia )
+{
+	pia6821 *p = get_token(device);
+
+	/*
+     * set default read values.
+     *
+     * ports A,CA1,CA2 default to 1
+     * ports B,CB1,CB2 are three-state and undefined (set to 0)
+     */
+	p->in_a = 0xff;
+	p->in_ca1 = TRUE;
+	p->in_ca2 = TRUE;
+	p->out_a = 0;
+	p->out_ca2 = 0;
+	p->port_a_z_mask = 0;
+	p->ddr_a = 0;
+	p->ctl_a = 0;
+	p->irq_a1 = 0;
+	p->irq_a2 = 0;
+	p->irq_a_state = 0;
+	p->in_b = 0;
+	p->in_cb1 = 0;
+	p->in_cb2 = 0;
+	p->out_b = 0;
+	p->out_cb2 = 0;
+	p->last_out_cb2_z = 0;
+	p->ddr_b = 0;
+	p->ctl_b = 0;
+	p->irq_b1 = 0;
+	p->irq_b2 = 0;
+	p->irq_b_state = 0;
+	p->in_a_pushed = 0;
+	p->out_a_needs_pulled = 0;
+	p->in_ca1_pushed = 0;
+	p->in_ca2_pushed = 0;
+	p->out_ca2_needs_pulled = 0;
+	p->in_b_pushed = 0;
+	p->out_b_needs_pulled = 0;
+	p->in_cb1_pushed = 0;
+	p->in_cb2_pushed = 0;
+	p->out_cb2_needs_pulled = 0;
+	p->logged_port_a_not_connected = 0;
+	p->logged_port_b_not_connected = 0;
+	p->logged_ca1_not_connected = 0;
+	p->logged_ca2_not_connected = 0;
+	p->logged_cb1_not_connected = 0;
+	p->logged_cb2_not_connected = 0;
+
+
+	/* clear the IRQs */
+	devcb_call_write_line(&p->irq_a_func, FALSE);
+	devcb_call_write_line(&p->irq_b_func, FALSE);
+}
+
+
+/*-------------------------------------------------
+    update_interrupts
+-------------------------------------------------*/
+
+static void update_interrupts(const device_config *device)
+{
+	pia6821 *p = get_token(device);
 	int new_state;
 
 	/* start with IRQ A */
@@ -221,8 +262,7 @@ static void update_interrupts(running_machine *machine, pia6821 *p)
 	if (new_state != p->irq_a_state)
 	{
 		p->irq_a_state = new_state;
-
-		if (p->intf->irq_a_func) (p->intf->irq_a_func)(machine, p->irq_a_state);
+		devcb_call_write_line(&p->irq_a_func, p->irq_a_state);
 	}
 
 	/* then do IRQ B */
@@ -231,30 +271,24 @@ static void update_interrupts(running_machine *machine, pia6821 *p)
 	if (new_state != p->irq_b_state)
 	{
 		p->irq_b_state = new_state;
-
-		if (p->intf->irq_b_func) (p->intf->irq_b_func)(machine, p->irq_b_state);
+		devcb_call_write_line(&p->irq_b_func, p->irq_b_state);
 	}
 }
 
 
+/*-------------------------------------------------
+    get_in_a_value
+-------------------------------------------------*/
 
-/*************************************
- *
- *  Port A/B input pins
- *
- *************************************/
-
-static UINT8 get_in_a_value(running_machine *machine, int which)
+static UINT8 get_in_a_value(const device_config *device)
 {
-	/* temporary hack until this is converted to a device */
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	pia6821 *p = &pias[which];
+	pia6821 *p = get_token(device);
 	UINT8 port_a_data = 0;
 	UINT8 ret;
 
 	/* update the input */
-	if (p->intf->in_a_func)
-		port_a_data = p->intf->in_a_func(space, 0);
+	if (p->in_a_func.read != NULL)
+		port_a_data = devcb_call_read8(&p->in_a_func, 0);
 	else
 	{
 		if (p->in_a_pushed)
@@ -266,7 +300,7 @@ static UINT8 get_in_a_value(running_machine *machine, int which)
 
 			if (!p->logged_port_a_not_connected && (p->ddr_a != 0xff))
 			{
-				logerror("PIA #%d: Warning! No port A read handler. Assuming pins 0x%02X not connected\n", which, p->ddr_a ^ 0xff);
+				logerror("PIA #%s: Warning! No port A read handler. Assuming pins 0x%02X not connected\n", device->tag, p->ddr_a ^ 0xff);
 				p->logged_port_a_not_connected = TRUE;
 			}
 		}
@@ -283,11 +317,13 @@ static UINT8 get_in_a_value(running_machine *machine, int which)
 }
 
 
-static UINT8 get_in_b_value(running_machine *machine, int which)
+/*-------------------------------------------------
+    get_in_b_value
+-------------------------------------------------*/
+
+static UINT8 get_in_b_value(const device_config *device)
 {
-	/* temporary hack until this is converted to a device */
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	pia6821 *p = &pias[which];
+	pia6821 *p = get_token(device);
 	UINT8 ret;
 
 	if (p->ddr_b == 0xff)
@@ -298,8 +334,8 @@ static UINT8 get_in_b_value(running_machine *machine, int which)
 		UINT8 port_b_data;
 
 		/* update the input */
-		if (p->intf->in_b_func)
-			port_b_data = p->intf->in_b_func(space, 0);
+		if (p->in_b_func.read != NULL)
+			port_b_data = devcb_call_read8(&p->in_b_func, 0);
 		else
 		{
 			if (p->in_b_pushed)
@@ -308,7 +344,7 @@ static UINT8 get_in_b_value(running_machine *machine, int which)
 			{
 				if (!p->logged_port_b_not_connected && (p->ddr_b != 0xff))
 				{
-					logerror("PIA #%d: Error! No port B read handler. Three-state pins 0x%02X are undefined\n", which, p->ddr_b ^ 0xff);
+					logerror("PIA #%s: Error! No port B read handler. Three-state pins 0x%02X are undefined\n", device->tag, p->ddr_b ^ 0xff);
 					p->logged_port_b_not_connected = TRUE;
 				}
 
@@ -325,63 +361,58 @@ static UINT8 get_in_b_value(running_machine *machine, int which)
 }
 
 
+/*-------------------------------------------------
+    get_out_a_value
+-------------------------------------------------*/
 
-/*************************************
- *
- *  Port A/B output pins
- *
- *************************************/
-
-static UINT8 get_out_a_value(running_machine *machine, int which)
+static UINT8 get_out_a_value(const device_config *device)
 {
+	pia6821 *p = get_token(device);
 	UINT8 ret;
-	pia6821 *p = &pias[which];
 
 	if (p->ddr_a == 0xff)
 		/* all output */
 		ret = p->out_a;
 	else
 		/* input pins don't change */
-		ret = (p->out_a & p->ddr_a) | (get_in_a_value(machine, which) & ~p->ddr_a);
+		ret = (p->out_a & p->ddr_a) | (get_in_a_value(device) & ~p->ddr_a);
 
 	return ret;
 }
 
 
-static UINT8 get_out_b_value(int which)
+/*-------------------------------------------------
+    get_out_b_value
+-------------------------------------------------*/
+
+static UINT8 get_out_b_value(const device_config *device)
 {
-	pia6821 *p = &pias[which];
+	pia6821 *p = get_token(device);
 
 	/* input pins are high-impedance - we just send them as zeros for backwards compatibility */
 	return p->out_b & p->ddr_b;
 }
 
 
+/*-------------------------------------------------
+    set_out_ca2
+-------------------------------------------------*/
 
-/*************************************
- *
- *  Sets C2 state value and call
- *  callbacks if changed
- *
- *************************************/
-
-static void set_out_ca2(running_machine *machine, int which, int data)
+static void set_out_ca2(const device_config *device, int data)
 {
-	/* temporary hack until this is converted to a device */
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	pia6821 *p = &pias[which];
+	pia6821 *p = get_token(device);
 
 	if (data != p->out_ca2)
 	{
 		p->out_ca2 = data;
 
 		/* send to output function */
-		if (p->intf->out_ca2_func)
-			p->intf->out_ca2_func(space, 0, p->out_ca2);
+		if (p->out_ca2_func.write)
+			devcb_call_write_line(&p->out_ca2_func, p->out_ca2);
 		else
 		{
 			if (p->out_ca2_needs_pulled)
-				logerror("PIA #%d: Warning! No port CA2 write handler. Previous value has been lost!\n", which);
+				logerror("PIA #%s: Warning! No port CA2 write handler. Previous value has been lost!\n", device->tag);
 
 			p->out_ca2_needs_pulled = TRUE;
 		}
@@ -389,13 +420,15 @@ static void set_out_ca2(running_machine *machine, int which, int data)
 }
 
 
-static void set_out_cb2(running_machine *machine, int which, int data)
-{
-	/* temporary hack until this is converted to a device */
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	pia6821 *p = &pias[which];
+/*-------------------------------------------------
+    set_out_cb2
+-------------------------------------------------*/
 
-	int z = pia_get_output_cb2_z(which);
+static void set_out_cb2(const device_config *device, int data)
+{
+	pia6821 *p = get_token(device);
+
+	int z = pia6821_get_output_cb2_z(device);
 
 	if ((data != p->out_cb2) || (z != p->last_out_cb2_z))
 	{
@@ -403,12 +436,12 @@ static void set_out_cb2(running_machine *machine, int which, int data)
 		p->last_out_cb2_z = z;
 
 		/* send to output function */
-		if (p->intf->out_cb2_func)
-			p->intf->out_cb2_func(space, 0, p->out_cb2);
+		if (p->out_cb2_func.write)
+			devcb_call_write_line(&p->out_cb2_func, p->out_cb2);
 		else
 		{
 			if (p->out_cb2_needs_pulled)
-				logerror("PIA #%d: Warning! No port CB2 write handler. Previous value has been lost!\n", which);
+				logerror("PIA #%s: Warning! No port CB2 write handler. Previous value has been lost!\n", device->tag);
 
 			p->out_cb2_needs_pulled = TRUE;
 		}
@@ -416,110 +449,121 @@ static void set_out_cb2(running_machine *machine, int which, int data)
 }
 
 
+/*-------------------------------------------------
+    port_a_r
+-------------------------------------------------*/
 
-/*************************************
- *
- *  CPU interface for reading from the PIA
- *
- *************************************/
-
-static UINT8 port_a_r(running_machine *machine, int which)
+static UINT8 port_a_r(const device_config *device)
 {
-	pia6821 *p = &pias[which];
+	pia6821 *p = get_token(device);
 
-	UINT8 ret = get_in_a_value(machine, which);
+	UINT8 ret = get_in_a_value(device);
 
 	/* IRQ flags implicitly cleared by a read */
 	p->irq_a1 = FALSE;
 	p->irq_a2 = FALSE;
-	update_interrupts(machine, p);
+	update_interrupts(device);
 
 	/* CA2 is configured as output and in read strobe mode */
 	if (C2_OUTPUT(p->ctl_a) && C2_STROBE_MODE(p->ctl_a))
 	{
 		/* this will cause a transition low */
-		set_out_ca2(machine, which, FALSE);
+		set_out_ca2(device, FALSE);
 
 		/* if the CA2 strobe is cleared by the E, reset it right away */
 		if (STROBE_E_RESET(p->ctl_a))
-			set_out_ca2(machine, which, TRUE);
+			set_out_ca2(device, TRUE);
 	}
 
-	LOG(("PIA #%d: port A read = %02X\n", which, ret));
+	LOG(("PIA #%s: port A read = %02X\n", device->tag, ret));
 
 	return ret;
 }
 
 
-static UINT8 ddr_a_r(running_machine *machine, int which)
+/*-------------------------------------------------
+    ddr_a_r
+-------------------------------------------------*/
+
+static UINT8 ddr_a_r(const device_config *device)
 {
-	pia6821 *p = &pias[which];
+	pia6821 *p = get_token(device);
 
 	UINT8 ret = p->ddr_a;
 
-	LOG(("PIA #%d: DDR A read = %02X\n", which, ret));
+	LOG(("PIA #%s: DDR A read = %02X\n", device->tag, ret));
 
 	return ret;
 }
 
 
-static UINT8 port_b_r(running_machine *machine, int which)
-{
-	pia6821 *p = &pias[which];
+/*-------------------------------------------------
+    port_b_r
+-------------------------------------------------*/
 
-	UINT8 ret = get_in_b_value(machine, which);
+static UINT8 port_b_r(const device_config *device)
+{
+	pia6821 *p = get_token(device);
+
+	UINT8 ret = get_in_b_value(device);
 
 	/* This read will implicitly clear the IRQ B1 flag.  If CB2 is in write-strobe
        mode with CB1 restore, and a CB1 active transition set the flag,
        clearing it will cause CB2 to go high again.  Note that this is different
        from what happens with port A. */
 	if (p->irq_b1 && C2_STROBE_MODE(p->ctl_b) && STROBE_C1_RESET(p->ctl_b))
-		set_out_cb2(machine, which, TRUE);
+		set_out_cb2(device, TRUE);
 
 	/* IRQ flags implicitly cleared by a read */
 	p->irq_b1 = FALSE;
 	p->irq_b2 = FALSE;
-	update_interrupts(machine, p);
+	update_interrupts(device);
 
-	LOG(("PIA #%d: port B read = %02X\n", which, ret));
+	LOG(("PIA #%s: port B read = %02X\n", device->tag, ret));
 
 	return ret;
 }
 
 
-static UINT8 ddr_b_r(running_machine *machine, int which)
+/*-------------------------------------------------
+    ddr_b_r
+-------------------------------------------------*/
+
+static UINT8 ddr_b_r(const device_config *device)
 {
-	pia6821 *p = &pias[which];
+	pia6821 *p = get_token(device);
 
 	UINT8 ret = p->ddr_b;
 
-	LOG(("PIA #%d: DDR B read = %02X\n", which, ret));
+	LOG(("PIA #%s: DDR B read = %02X\n", device->tag, ret));
 
 	return ret;
 }
 
 
-static UINT8 control_a_r(running_machine *machine, int which)
+/*-------------------------------------------------
+    control_a_r
+-------------------------------------------------*/
+
+static UINT8 control_a_r(const device_config *device)
 {
-	/* temporary hack until this is converted to a device */
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	pia6821 *p = &pias[which];
+	pia6821 *p = get_token(device);
 	UINT8 ret;
 
 	/* update CA1 & CA2 if callback exists, these in turn may update IRQ's */
-	if (p->intf->in_ca1_func)
-		pia_set_input_ca1(which, p->intf->in_ca1_func(space, 0));
+	if (p->in_ca1_func.read != NULL)
+		pia6821_ca1_w(device, 0, devcb_call_read_line(&p->in_ca1_func));
 	else if (!p->logged_ca1_not_connected && (!p->in_ca1_pushed))
 	{
-		logerror("PIA #%d: Warning! No CA1 read handler. Assuming pin not connected\n", which);
+		logerror("PIA #%s: Warning! No CA1 read handler. Assuming pin not connected\n", device->tag);
 		p->logged_ca1_not_connected = TRUE;
 	}
 
-	if (p->intf->in_ca2_func)
-		pia_set_input_ca2(which, p->intf->in_ca2_func(space, 0));
+	if (p->in_ca2_func.read != NULL)
+		pia6821_ca2_w(device, 0, devcb_call_read_line(&p->in_ca2_func));
 	else if ( !p->logged_ca2_not_connected && C2_INPUT(p->ctl_a) && !p->in_ca2_pushed)
 	{
-		logerror("PIA #%d: Warning! No CA2 read handler. Assuming pin not connected\n", which);
+		logerror("PIA #%s: Warning! No CA2 read handler. Assuming pin not connected\n", device->tag);
 		p->logged_ca2_not_connected = TRUE;
 	}
 
@@ -533,33 +577,35 @@ static UINT8 control_a_r(running_machine *machine, int which)
 	if (p->irq_a2 && C2_INPUT(p->ctl_a))
 		ret |= PIA_IRQ2;
 
-	LOG(("PIA #%d: control A read = %02X\n", which, ret));
+	LOG(("PIA #%s: control A read = %02X\n", device->tag, ret));
 
 	return ret;
 }
 
 
-static UINT8 control_b_r(running_machine *machine, int which)
+/*-------------------------------------------------
+    control_b_r
+-------------------------------------------------*/
+
+static UINT8 control_b_r(const device_config *device)
 {
-	/* temporary hack until this is converted to a device */
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	pia6821 *p = &pias[which];
+	pia6821 *p = get_token(device);
 	UINT8 ret;
 
 	/* update CB1 & CB2 if callback exists, these in turn may update IRQ's */
-	if (p->intf->in_cb1_func)
-		pia_set_input_cb1(which, p->intf->in_cb1_func(space, 0));
+	if (p->in_cb1_func.read != NULL)
+		pia6821_cb1_w(device, 0, devcb_call_read_line(&p->in_cb1_func));
 	else if (!p->logged_cb1_not_connected && !p->in_cb1_pushed)
 	{
-		logerror("PIA #%d: Error! no CB1 read handler. Three-state pin is undefined\n", which);
+		logerror("PIA #%s: Error! no CB1 read handler. Three-state pin is undefined\n", device->tag);
 		p->logged_cb1_not_connected = TRUE;
 	}
 
-	if (p->intf->in_cb2_func)
-		pia_set_input_cb2(which, p->intf->in_cb2_func(space, 0));
+	if (p->in_cb2_func.read != NULL)
+		pia6821_cb2_w(device, 0, devcb_call_read_line(&p->in_cb2_func));
 	else if (!p->logged_cb2_not_connected && C2_INPUT(p->ctl_b) && !p->in_cb2_pushed)
 	{
-		logerror("PIA #%d: Error! No CB2 read handler. Three-state pin is undefined\n", which);
+		logerror("PIA #%s: Error! No CB2 read handler. Three-state pin is undefined\n", device->tag);
 		p->logged_cb2_not_connected = TRUE;
 	}
 
@@ -573,15 +619,19 @@ static UINT8 control_b_r(running_machine *machine, int which)
 	if (p->irq_b2 && C2_INPUT(p->ctl_b))
 		ret |= PIA_IRQ2;
 
-	LOG(("PIA #%d: control B read = %02X\n", which, ret));
+	LOG(("PIA #%s: control B read = %02X\n", device->tag, ret));
 
 	return ret;
 }
 
 
-UINT8 pia_read(int which, offs_t offset)
+/*-------------------------------------------------
+    pia6821_r
+-------------------------------------------------*/
+
+READ8_DEVICE_HANDLER( pia6821_r )
 {
-	pia6821 *p = &pias[which];
+	pia6821 *p = get_token(device);
 	UINT8 ret;
 
 	switch (offset & 0x03)
@@ -589,24 +639,24 @@ UINT8 pia_read(int which, offs_t offset)
 		default: /* impossible */
 		case 0x00:
 			if (OUTPUT_SELECTED(p->ctl_a))
-				ret = port_a_r(p->machine, which);
+				ret = port_a_r(device);
 			else
-				ret = ddr_a_r(p->machine, which);
+				ret = ddr_a_r(device);
 			break;
 
 		case 0x01:
-			ret = control_a_r(p->machine, which);
+			ret = control_a_r(device);
 			break;
 
 		case 0x02:
 			if (OUTPUT_SELECTED(p->ctl_b))
-				ret = port_b_r(p->machine, which);
+				ret = port_b_r(device);
 			else
-				ret = ddr_b_r(p->machine, which);
+				ret = ddr_b_r(device);
 			break;
 
 		case 0x03:
-			ret = control_b_r(p->machine, which);
+			ret = control_b_r(device);
 			break;
 	}
 
@@ -614,156 +664,180 @@ UINT8 pia_read(int which, offs_t offset)
 }
 
 
-UINT8 pia_alt_read(int which, offs_t offset)
+/*-------------------------------------------------
+    pia6821_alt_r
+-------------------------------------------------*/
+
+READ8_DEVICE_HANDLER( pia6821_alt_r )
 {
-	return pia_read(which, ((offset << 1) & 0x02) | ((offset >> 1) & 0x01));
+	return pia6821_r(device, ((offset << 1) & 0x02) | ((offset >> 1) & 0x01));
 }
 
 
-UINT8 pia_get_port_b_z_mask(int which)
-{
-	pia6821 *p = &pias[which];
+/*-------------------------------------------------
+    pia6821_get_port_b_z_mask
+-------------------------------------------------*/
 
+UINT8 pia6821_get_port_b_z_mask(const device_config *device)
+{
+	pia6821 *p = get_token(device);
 	return ~p->ddr_b;
 }
 
 
+/*-------------------------------------------------
+    send_to_out_a_func
+-------------------------------------------------*/
 
-/*************************************
- *
- *  CPU interface for writing to the PIA
- *
- *************************************/
-
-static void send_to_out_a_func(running_machine *machine, int which, const char* message)
+static void send_to_out_a_func(const device_config *device, const char* message)
 {
-	/* temporary hack until this is converted to a device */
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	pia6821 *p = &pias[which];
+	pia6821 *p = get_token(device);
 
 	/* input pins are pulled high */
-	UINT8 data = get_out_a_value(machine, which);
+	UINT8 data = get_out_a_value(device);
 
-	LOG(("PIA #%d: %s = %02X\n", which, message, data));
+	LOG(("PIA #%s: %s = %02X\n", device->tag, message, data));
 
-	if (p->intf->out_a_func)
-		p->intf->out_a_func(space, 0, data);
+	if (p->out_a_func.write != NULL)
+		devcb_call_write8(&p->out_a_func, 0, data);
 	else
 	{
 		if (p->out_a_needs_pulled)
-			logerror("PIA #%d: Warning! No port A write handler. Previous value has been lost!\n", which);
+			logerror("PIA #%s: Warning! No port A write handler. Previous value has been lost!\n", device->tag);
 
 		p->out_a_needs_pulled = TRUE;
 	}
 }
 
 
-static void send_to_out_b_func(running_machine *machine, int which, const char* message)
+/*-------------------------------------------------
+    send_to_out_b_func
+-------------------------------------------------*/
+
+static void send_to_out_b_func(const device_config *device, const char* message)
 {
-	/* temporary hack until this is converted to a device */
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	pia6821 *p = &pias[which];
+	pia6821 *p = get_token(device);
 
 	/* input pins are high-impedance - we just send them as zeros for backwards compatibility */
-	UINT8 data = get_out_b_value(which);
+	UINT8 data = get_out_b_value(device);
 
-	LOG(("PIA #%d: %s = %02X\n", which, message, data));
+	LOG(("PIA #%s: %s = %02X\n", device->tag, message, data));
 
-	if (p->intf->out_b_func)
-		p->intf->out_b_func(space, 0, data);
+	if (p->out_b_func.write != NULL)
+		devcb_call_write8(&p->out_b_func, 0, data);
 	else
 	{
 		if (p->out_b_needs_pulled)
-			logerror("PIA #%d: Warning! No port B write handler. Previous value has been lost!\n", which);
+			logerror("PIA #%s: Warning! No port B write handler. Previous value has been lost!\n", device->tag);
 
 		p->out_b_needs_pulled = TRUE;
 	}
 }
 
 
-static void port_a_w(running_machine *machine, int which, UINT8 data)
+/*-------------------------------------------------
+    port_a_w
+-------------------------------------------------*/
+
+static void port_a_w(const device_config *device, UINT8 data)
 {
-	pia6821 *p = &pias[which];
+	pia6821 *p = get_token(device);
 
 	/* buffer the output value */
 	p->out_a = data;
 
-	send_to_out_a_func(machine, which, "port A write");
+	send_to_out_a_func(device, "port A write");
 }
 
 
-static void ddr_a_w(running_machine *machine, int which, UINT8 data)
+/*-------------------------------------------------
+    ddr_a_w
+-------------------------------------------------*/
+
+static void ddr_a_w(const device_config *device, UINT8 data)
 {
-	pia6821 *p = &pias[which];
+	pia6821 *p = get_token(device);
 
 	if (data == 0x00)
-		LOG(("PIA #%d: DDR A write = %02X (input mode)\n", which, data));
+		LOG(("PIA #%s: DDR A write = %02X (input mode)\n", device->tag, data));
 	else if (data == 0xff)
-		LOG(("PIA #%d: DDR A write = %02X (output mode)\n", which, data));
+		LOG(("PIA #%s: DDR A write = %02X (output mode)\n", device->tag, data));
 	else
-		LOG(("PIA #%d: DDR A write = %02X (mixed mode)\n", which, data));
+		LOG(("PIA #%s: DDR A write = %02X (mixed mode)\n", device->tag, data));
 
 	if (p->ddr_a != data)
 	{
 		/* DDR changed, call the callback again */
 		p->ddr_a = data;
 		p->logged_port_a_not_connected = FALSE;
-		send_to_out_a_func(machine, which, "port A write due to DDR change");
+		send_to_out_a_func(device, "port A write due to DDR change");
 	}
 }
 
 
-static void port_b_w(running_machine *machine, int which, UINT8 data)
+/*-------------------------------------------------
+    port_b_w
+-------------------------------------------------*/
+
+static void port_b_w(const device_config *device, UINT8 data)
 {
-	pia6821 *p = &pias[which];
+	pia6821 *p = get_token(device);
 
 	/* buffer the output value */
 	p->out_b = data;
 
-	send_to_out_b_func(machine, which, "port B write");
+	send_to_out_b_func(device, "port B write");
 
 	/* CB2 in write strobe mode */
 	if (C2_STROBE_MODE(p->ctl_b))
 	{
 		/* this will cause a transition low */
-		set_out_cb2(machine, which, FALSE);
+		set_out_cb2(device, FALSE);
 
 		/* if the CB2 strobe is cleared by the E, reset it right away */
 		if (STROBE_E_RESET(p->ctl_b))
-			set_out_cb2(machine, which, TRUE);
+			set_out_cb2(device, TRUE);
 	}
 }
 
 
-static void ddr_b_w(running_machine *machine, int which, UINT8 data)
+/*-------------------------------------------------
+    ddr_b_w
+-------------------------------------------------*/
+
+static void ddr_b_w(const device_config *device, UINT8 data)
 {
-	pia6821 *p = &pias[which];
+	pia6821 *p = get_token(device);
 
 	if (data == 0x00)
-		LOG(("PIA #%d: DDR B write = %02X (input mode)\n", which, data));
+		LOG(("PIA #%s: DDR B write = %02X (input mode)\n", device->tag, data));
 	else if (data == 0xff)
-		LOG(("PIA #%d: DDR B write = %02X (output mode)\n", which, data));
+		LOG(("PIA #%s: DDR B write = %02X (output mode)\n", device->tag, data));
 	else
-		LOG(("PIA #%d: DDR B write = %02X (mixed mode)\n", which, data));
+		LOG(("PIA #%s: DDR B write = %02X (mixed mode)\n", device->tag, data));
 
 	if (p->ddr_b != data)
 	{
 		/* DDR changed, call the callback again */
 		p->ddr_b = data;
 		p->logged_port_b_not_connected = FALSE;
-		send_to_out_b_func(machine, which, "port B write due to DDR change");
+		send_to_out_b_func(device, "port B write due to DDR change");
 	}
 }
 
 
-static void control_a_w(running_machine *machine, int which, UINT8 data)
+/*-------------------------------------------------
+    control_a_w
+-------------------------------------------------*/
+
+static void control_a_w(const device_config *device, UINT8 data)
 {
-	pia6821 *p = &pias[which];
+	pia6821 *p = get_token(device);
 
 	/* bit 7 and 6 are read only */
 	data &= 0x3f;
 
-	LOG(("PIA #%d: control A write = %02X\n", which, data));
+	LOG(("PIA #%s: control A write = %02X\n", device->tag, data));
 
 	/* update the control register */
 	p->ctl_a = data;
@@ -780,23 +854,27 @@ static void control_a_w(running_machine *machine, int which, UINT8 data)
 			/* strobe mode - output is always high unless strobed */
 			temp = TRUE;
 
-		set_out_ca2(machine, which, temp);
+		set_out_ca2(device, temp);
 	}
 
 	/* update externals */
-	update_interrupts(machine, p);
+	update_interrupts(device);
 }
 
 
-static void control_b_w(running_machine *machine, int which, UINT8 data)
+/*-------------------------------------------------
+    control_b_w
+-------------------------------------------------*/
+
+static void control_b_w(const device_config *device, UINT8 data)
 {
-	pia6821 *p = &pias[which];
+	pia6821 *p = get_token(device);
 	int temp;
 
 	/* bit 7 and 6 are read only */
 	data &= 0x3f;
 
-	LOG(("PIA #%d: control B write = %02X\n", which, data));
+	LOG(("PIA #%s: control B write = %02X\n", device->tag, data));
 
 	/* update the control register */
 	p->ctl_b = data;
@@ -808,81 +886,94 @@ static void control_b_w(running_machine *machine, int which, UINT8 data)
 		/* strobe mode - output is always high unless strobed */
 		temp = TRUE;
 
-	set_out_cb2(machine, which, temp);
+	set_out_cb2(device, temp);
 
 	/* update externals */
-	update_interrupts(machine, p);
+	update_interrupts(device);
 }
 
 
-void pia_write(int which, offs_t offset, UINT8 data)
+/*-------------------------------------------------
+    pia6821_w
+-------------------------------------------------*/
+
+WRITE8_DEVICE_HANDLER( pia6821_w )
 {
-	pia6821 *p = &pias[which];
+	pia6821 *p = get_token(device);
 
 	switch (offset & 0x03)
 	{
 		default: /* impossible */
 		case 0x00:
 			if (OUTPUT_SELECTED(p->ctl_a))
-				port_a_w(p->machine, which, data);
+				port_a_w(device, data);
 			else
-				ddr_a_w(p->machine, which, data);
+				ddr_a_w(device, data);
 			break;
 
 		case 0x01:
-			control_a_w(p->machine, which, data);
+			control_a_w(device, data);
 			break;
 
 		case 0x02:
 			if (OUTPUT_SELECTED(p->ctl_b))
-				port_b_w(p->machine, which, data);
+				port_b_w(device, data);
 			else
-				ddr_b_w(p->machine, which, data);
+				ddr_b_w(device, data);
 			break;
 
 		case 0x03:
-			control_b_w(p->machine, which, data);
+			control_b_w(device, data);
 			break;
 	}
 }
 
 
-void pia_alt_write(int which, offs_t offset, UINT8 data)
+/*-------------------------------------------------
+    pia6821_alt_w
+-------------------------------------------------*/
+
+WRITE8_DEVICE_HANDLER( pia6821_alt_w )
 {
-	pia_write(which, ((offset << 1) & 0x02) | ((offset >> 1) & 0x01), data);
+	pia6821_w(device, ((offset << 1) & 0x02) | ((offset >> 1) & 0x01), data);
 }
 
 
-void pia_set_port_a_z_mask(int which, UINT8 data)
+/*-------------------------------------------------
+    pia6821_set_port_a_z_mask
+-------------------------------------------------*/
+
+void pia6821_set_port_a_z_mask(const device_config *device, UINT8 data)
 {
-	pia6821 *p = &pias[which];
+	pia6821 *p = get_token(device);
 
 	p->port_a_z_mask = data;
 }
 
 
+/*-------------------------------------------------
+    pia6821_porta_r
+-------------------------------------------------*/
 
-/*************************************
- *
- *  Device interface to port A
- *
- *************************************/
-
-UINT8 pia_get_input_a(int which)
+READ8_DEVICE_HANDLER( pia6821_porta_r )
 {
-	pia6821 *p = &pias[which];
+	pia6821 *p = get_token(device);
 
 	return p->in_a;
 }
 
 
-void pia_set_input_a(int which, UINT8 data, UINT8 z_mask)
+/*-------------------------------------------------
+    pia6821_set_input_a
+-------------------------------------------------*/
+
+void pia6821_set_input_a(const device_config *device, UINT8 data, UINT8 z_mask)
 {
-	pia6821 *p = &pias[which];
+	pia6821 *p = get_token(device);
 
-	assert_always(p->intf->in_a_func == NULL, "pia_set_input_a() called when in_a_func implemented");
+	assert_always(p->in_a_func.read == NULL, "pia6821_porta_w() called when in_a_func implemented");
 
-	LOG(("PIA #%d: set input port A = %02X\n", which, data));
+	LOG(("PIA #%s: set input port A = %02X\n", device->tag, data));
 
 	p->in_a = data;
 	p->port_a_z_mask = z_mask;
@@ -890,55 +981,70 @@ void pia_set_input_a(int which, UINT8 data, UINT8 z_mask)
 }
 
 
-UINT8 pia_get_output_a(int which)
+/*-------------------------------------------------
+    pia6821_porta_w
+-------------------------------------------------*/
+
+WRITE8_DEVICE_HANDLER( pia6821_porta_w )
 {
-	pia6821 *p = &pias[which];
-
-	p->out_a_needs_pulled = FALSE;
-
-	return get_out_a_value(p->machine, which);
+	pia6821_set_input_a(device, data, 0);
 }
 
 
+/*-------------------------------------------------
+    pia6821_get_output_a
+-------------------------------------------------*/
 
-/*************************************
- *
- *  Device interface to the CA1 pin
- *
- *************************************/
-
-int pia_get_input_ca1(int which)
+UINT8 pia6821_get_output_a(const device_config *device)
 {
-	pia6821 *p = &pias[which];
+	pia6821 *p = get_token(device);
+
+	p->out_a_needs_pulled = FALSE;
+
+	return get_out_a_value(device);
+}
+
+
+/*-------------------------------------------------
+    pia6821_ca1_r
+-------------------------------------------------*/
+
+READ8_DEVICE_HANDLER( pia6821_ca1_r )
+{
+	pia6821 *p = get_token(device);
 
 	return p->in_ca1;
 }
 
 
-void pia_set_input_ca1(int which, int data)
+/*-------------------------------------------------
+    pia6821_ca1_w
+-------------------------------------------------*/
+
+WRITE8_DEVICE_HANDLER( pia6821_ca1_w )
 {
-	pia6821 *p = &pias[which];
+	pia6821 *p = get_token(device);
 
 	/* limit the data to 0 or 1 */
 	data = data ? TRUE : FALSE;
 
-	LOG(("PIA #%d: set input CA1 = %d\n", which, data));
+	LOG(("PIA #%s: set input CA1 = %d\n", device->tag, data));
 
 	/* the new state has caused a transition */
 	if ((p->in_ca1 != data) &&
 		((data && C1_LOW_TO_HIGH(p->ctl_a)) || (!data && C1_HIGH_TO_LOW(p->ctl_a))))
 	{
-		LOG(("PIA #%d: CA1 triggering\n", which));
+		LOG(("PIA #%s: CA1 triggering\n", device->tag));
 
 		/* mark the IRQ */
 		p->irq_a1 = TRUE;
 
 		/* update externals */
-		update_interrupts(p->machine, p);
+		update_interrupts(device);
 
 		/* CA2 is configured as output and in read strobe mode and cleared by a CA1 transition */
 		if (C2_OUTPUT(p->ctl_a) && C2_STROBE_MODE(p->ctl_a) && STROBE_C1_RESET(p->ctl_a))
-			set_out_ca2(p->machine, which, TRUE);
+			set_out_ca2(device, TRUE);
 	}
 
 	/* set the new value for CA1 */
@@ -947,42 +1053,43 @@ void pia_set_input_ca1(int which, int data)
 }
 
 
+/*-------------------------------------------------
+    pia6821_ca2_r
+-------------------------------------------------*/
 
-/*************************************
- *
- *  Device interface to the CA2 pin
- *
- *************************************/
-
-int pia_get_input_ca2(int which)
+READ8_DEVICE_HANDLER( pia6821_ca2_r )
 {
-	pia6821 *p = &pias[which];
+	pia6821 *p = get_token(device);
 
 	return p->in_ca2;
 }
 
 
-void pia_set_input_ca2(int which, int data)
+/*-------------------------------------------------
+    pia6821_ca2_w
+-------------------------------------------------*/
+
+WRITE8_DEVICE_HANDLER( pia6821_ca2_w )
 {
-	pia6821 *p = &pias[which];
+	pia6821 *p = get_token(device);
 
 	/* limit the data to 0 or 1 */
 	data = data ? 1 : 0;
 
-	LOG(("PIA #%d: set input CA2 = %d\n", which, data));
+	LOG(("PIA #%s: set input CA2 = %d\n", device->tag, data));
 
 	/* if input mode and the new state has caused a transition */
 	if (C2_INPUT(p->ctl_a) &&
 		(p->in_ca2 != data) &&
 		((data && C2_LOW_TO_HIGH(p->ctl_a)) || (!data && C2_HIGH_TO_LOW(p->ctl_a))))
 	{
-		LOG(("PIA #%d: CA2 triggering\n", which));
+		LOG(("PIA #%s: CA2 triggering\n", device->tag));
 
 		/* mark the IRQ */
 		p->irq_a2 = TRUE;
 
 		/* update externals */
-		update_interrupts(p->machine, p);
+		update_interrupts(device);
 	}
 
 	/* set the new value for CA2 */
@@ -991,20 +1098,29 @@ void pia_set_input_ca2(int which, int data)
 }
 
 
-int pia_get_output_ca2(int which)
+/*-------------------------------------------------
+    pia6821_get_output_ca2
+-------------------------------------------------*/
+
+int pia6821_get_output_ca2(const device_config *device)
 {
-	pia6821 *p = &pias[which];
+	pia6821 *p = get_token(device);
 
 	p->out_ca2_needs_pulled = FALSE;
 
 	return p->out_ca2;
 }
 
-// Version of pia_get_output_ca2, which takes account of internal
-// pullup resistor
-int pia_get_output_ca2_z(int which)
+
+/*-------------------------------------------------
+    pia6821_get_output_ca2_z - version of
+    pia6821_get_output_ca2, which takes account of internal
+    pullup resistor
+-------------------------------------------------*/
+
+int pia6821_get_output_ca2_z(const device_config *device)
 {
-	pia6821 *p = &pias[which];
+	pia6821 *p = get_token(device);
 
 	p->out_ca2_needs_pulled = FALSE;
 
@@ -1015,79 +1131,85 @@ int pia_get_output_ca2_z(int which)
 }
 
 
-/*************************************
- *
- *  Device interface to port B
- *
- *************************************/
+/*-------------------------------------------------
+    pia6821_portb_r
+-------------------------------------------------*/
 
-UINT8 pia_get_input_b(int which)
+READ8_DEVICE_HANDLER( pia6821_portb_r )
 {
-	pia6821 *p = &pias[which];
+	pia6821 *p = get_token(device);
 
 	return p->in_b;
 }
 
 
-void pia_set_input_b(int which, UINT8 data)
+/*-------------------------------------------------
+    pia6821_portb_w
+-------------------------------------------------*/
+
+WRITE8_DEVICE_HANDLER( pia6821_portb_w )
 {
-	pia6821 *p = &pias[which];
+	pia6821 *p = get_token(device);
 
-	assert_always(p->intf->in_b_func == NULL, "pia_set_input_b() called when in_b_func implemented");
+	assert_always(p->in_b_func.read == NULL, "pia_set_input_b() called when in_b_func implemented");
 
-	LOG(("PIA #%d: set input port B = %02X\n", which, data));
+	LOG(("PIA #%s: set input port B = %02X\n", device->tag, data));
 
 	p->in_b = data;
 	p->in_b_pushed = TRUE;
 }
 
 
+/*-------------------------------------------------
+    pia6821_get_output_b
+-------------------------------------------------*/
 
-UINT8 pia_get_output_b(int which)
+UINT8 pia6821_get_output_b(const device_config *device)
 {
-	pia6821 *p = &pias[which];
+	pia6821 *p = get_token(device);
 
 	p->out_b_needs_pulled = FALSE;
 
-	return get_out_b_value(which);
+	return get_out_b_value(device);
 }
 
 
+/*-------------------------------------------------
+    pia6821_cb1_r
+-------------------------------------------------*/
 
-/*************************************
- *
- *  Device interface to the CB1 pin
- *
- *************************************/
-
-int pia_get_input_cb1(int which)
+READ8_DEVICE_HANDLER( pia6821_cb1_r )
 {
-	pia6821 *p = &pias[which];
+	pia6821 *p = get_token(device);
 
 	return p->in_cb1;
 }
 
 
-void pia_set_input_cb1(int which, int data)
+/*-------------------------------------------------
+    pia6821_cb1_w
+-------------------------------------------------*/
+
+WRITE8_DEVICE_HANDLER( pia6821_cb1_w )
 {
-	pia6821 *p = &pias[which];
+	pia6821 *p = get_token(device);
 
 	/* limit the data to 0 or 1 */
 	data = data ? 1 : 0;
 
-	LOG(("PIA #%d: set input CB1 = %d\n", which, data));
+	LOG(("PIA #%s: set input CB1 = %d\n", device->tag, data));
 
 	/* the new state has caused a transition */
 	if ((p->in_cb1 != data) &&
 		((data && C1_LOW_TO_HIGH(p->ctl_b)) || (!data && C1_HIGH_TO_LOW(p->ctl_b))))
 	{
-		LOG(("PIA #%d: CB1 triggering\n", which));
+		LOG(("PIA #%s: CB1 triggering\n", device->tag));
 
 		/* mark the IRQ */
 		p->irq_b1 = 1;
 
 		/* update externals */
-		update_interrupts(p->machine, p);
+		update_interrupts(device);
 
 		/* If CB2 is configured as a write-strobe output which is reset by a CB1
            transition, this reset will only happen when a read from port B implicitly
@@ -1101,42 +1223,43 @@ void pia_set_input_cb1(int which, int data)
 }
 
 
+/*-------------------------------------------------
+    pia6821_cb2_r
+-------------------------------------------------*/
 
-/*************************************
- *
- *  Device interface to the CB2 pin
- *
- *************************************/
-
-int pia_get_input_cb2(int which)
+READ8_DEVICE_HANDLER( pia6821_cb2_r )
 {
-	pia6821 *p = &pias[which];
+	pia6821 *p = get_token(device);
 
 	return p->in_cb2;
 }
 
 
-void pia_set_input_cb2(int which, int data)
+/*-------------------------------------------------
+    pia6821_cb2_w
+-------------------------------------------------*/
+
+WRITE8_DEVICE_HANDLER( pia6821_cb2_w )
 {
-	pia6821 *p = &pias[which];
+	pia6821 *p = get_token(device);
 
 	/* limit the data to 0 or 1 */
 	data = data ? 1 : 0;
 
-	LOG(("PIA #%d: set input CB2 = %d\n", which, data));
+	LOG(("PIA #%s: set input CB2 = %d\n", device->tag, data));
 
 	/* if input mode and the new state has caused a transition */
 	if (C2_INPUT(p->ctl_b) &&
 		(p->in_cb2 != data) &&
 		((data && C2_LOW_TO_HIGH(p->ctl_b)) || (!data && C2_HIGH_TO_LOW(p->ctl_b))))
 	{
-		LOG(("PIA #%d: CB2 triggering\n", which));
+		LOG(("PIA #%s: CB2 triggering\n", device->tag));
 
 		/* mark the IRQ */
 		p->irq_b2 = 1;
 
 		/* update externals */
-		update_interrupts(p->machine, p);
+		update_interrupts(device);
 	}
 
 	/* set the new value for CA2 */
@@ -1145,9 +1268,13 @@ void pia_set_input_cb2(int which, int data)
 }
 
 
-int pia_get_output_cb2(int which)
+/*-------------------------------------------------
+    pia6821_get_output_cb2
+-------------------------------------------------*/
+
+int pia6821_get_output_cb2(const device_config *device)
 {
-	pia6821 *p = &pias[which];
+	pia6821 *p = get_token(device);
 
 	p->out_cb2_needs_pulled = FALSE;
 
@@ -1155,189 +1282,92 @@ int pia_get_output_cb2(int which)
 }
 
 
-int pia_get_output_cb2_z(int which)
+/*-------------------------------------------------
+    pia6821_get_output_cb2_z
+-------------------------------------------------*/
+
+int pia6821_get_output_cb2_z(const device_config *device)
 {
-	pia6821 *p = &pias[which];
+	pia6821 *p = get_token(device);
 
 	return !C2_OUTPUT(p->ctl_b);
 }
 
 
+/*-------------------------------------------------
+    pia6821_get_irq_a
+-------------------------------------------------*/
 
-/*************************************
- *
- *  Convinience interface for
- *  retrieving the IRQ state
- *
- *************************************/
-
-int pia_get_irq_a(int which)
+int pia6821_get_irq_a(const device_config *device)
 {
-	pia6821 *p = &pias[which];
+	pia6821 *p = get_token(device);
 
 	return p->irq_a_state;
 }
 
 
-int pia_get_irq_b(int which)
+/*-------------------------------------------------
+    pia6821_get_irq_b
+-------------------------------------------------*/
+
+int pia6821_get_irq_b(const device_config *device)
 {
-	pia6821 *p = &pias[which];
+	pia6821 *p = get_token(device);
 
 	return p->irq_b_state;
 }
 
 
+/*-------------------------------------------------
+    DEVICE_SET_INFO( pia )
+-------------------------------------------------*/
 
-/*************************************
- *
- *  Memory handlers
- *
- *************************************/
+static DEVICE_SET_INFO( pia )
+{
+	switch(state)
+	{
+	}
+}
 
-READ8_HANDLER( pia_0_r ) { return pia_read(0, offset); }
-READ8_HANDLER( pia_1_r ) { return pia_read(1, offset); }
-READ8_HANDLER( pia_2_r ) { return pia_read(2, offset); }
-READ8_HANDLER( pia_3_r ) { return pia_read(3, offset); }
-READ8_HANDLER( pia_4_r ) { return pia_read(4, offset); }
-READ8_HANDLER( pia_5_r ) { return pia_read(5, offset); }
-READ8_HANDLER( pia_6_r ) { return pia_read(6, offset); }
-READ8_HANDLER( pia_7_r ) { return pia_read(7, offset); }
 
-WRITE8_HANDLER( pia_0_w ) { pia_write(0, offset, data); }
-WRITE8_HANDLER( pia_1_w ) { pia_write(1, offset, data); }
-WRITE8_HANDLER( pia_2_w ) { pia_write(2, offset, data); }
-WRITE8_HANDLER( pia_3_w ) { pia_write(3, offset, data); }
-WRITE8_HANDLER( pia_4_w ) { pia_write(4, offset, data); }
-WRITE8_HANDLER( pia_5_w ) { pia_write(5, offset, data); }
-WRITE8_HANDLER( pia_6_w ) { pia_write(6, offset, data); }
-WRITE8_HANDLER( pia_7_w ) { pia_write(7, offset, data); }
+/*-------------------------------------------------
+    DEVICE_GET_INFO( pia6821 )
+-------------------------------------------------*/
 
-READ8_HANDLER( pia_0_alt_r ) { return pia_alt_read(0, offset); }
-READ8_HANDLER( pia_1_alt_r ) { return pia_alt_read(1, offset); }
-READ8_HANDLER( pia_2_alt_r ) { return pia_alt_read(2, offset); }
-READ8_HANDLER( pia_3_alt_r ) { return pia_alt_read(3, offset); }
-READ8_HANDLER( pia_4_alt_r ) { return pia_alt_read(4, offset); }
-READ8_HANDLER( pia_5_alt_r ) { return pia_alt_read(5, offset); }
-READ8_HANDLER( pia_6_alt_r ) { return pia_alt_read(6, offset); }
-READ8_HANDLER( pia_7_alt_r ) { return pia_alt_read(7, offset); }
+DEVICE_GET_INFO(pia6821)
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(pia6821);					break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
+		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
-WRITE8_HANDLER( pia_0_alt_w ) { pia_alt_write(0, offset, data); }
-WRITE8_HANDLER( pia_1_alt_w ) { pia_alt_write(1, offset, data); }
-WRITE8_HANDLER( pia_2_alt_w ) { pia_alt_write(2, offset, data); }
-WRITE8_HANDLER( pia_3_alt_w ) { pia_alt_write(3, offset, data); }
-WRITE8_HANDLER( pia_4_alt_w ) { pia_alt_write(4, offset, data); }
-WRITE8_HANDLER( pia_5_alt_w ) { pia_alt_write(5, offset, data); }
-WRITE8_HANDLER( pia_6_alt_w ) { pia_alt_write(6, offset, data); }
-WRITE8_HANDLER( pia_7_alt_w ) { pia_alt_write(7, offset, data); }
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(pia); break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(pia);		break;
+		case DEVINFO_FCT_STOP:							/* Nothing */								break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(pia);		break;
 
-/******************* 8-bit A/B port interfaces *******************/
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "6821 PIA");				break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "6821 PIA");				break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");						break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);					break;
+		case DEVINFO_STR_CREDITS:						/* Nothing */								break;
+	}
+}
 
-WRITE8_HANDLER( pia_0_porta_w ) { pia_set_input_a(0, data, 0); }
-WRITE8_HANDLER( pia_1_porta_w ) { pia_set_input_a(1, data, 0); }
-WRITE8_HANDLER( pia_2_porta_w ) { pia_set_input_a(2, data, 0); }
-WRITE8_HANDLER( pia_3_porta_w ) { pia_set_input_a(3, data, 0); }
-WRITE8_HANDLER( pia_4_porta_w ) { pia_set_input_a(4, data, 0); }
-WRITE8_HANDLER( pia_5_porta_w ) { pia_set_input_a(5, data, 0); }
-WRITE8_HANDLER( pia_6_porta_w ) { pia_set_input_a(6, data, 0); }
-WRITE8_HANDLER( pia_7_porta_w ) { pia_set_input_a(7, data, 0); }
 
-WRITE8_HANDLER( pia_0_portb_w ) { pia_set_input_b(0, data); }
-WRITE8_HANDLER( pia_1_portb_w ) { pia_set_input_b(1, data); }
-WRITE8_HANDLER( pia_2_portb_w ) { pia_set_input_b(2, data); }
-WRITE8_HANDLER( pia_3_portb_w ) { pia_set_input_b(3, data); }
-WRITE8_HANDLER( pia_4_portb_w ) { pia_set_input_b(4, data); }
-WRITE8_HANDLER( pia_5_portb_w ) { pia_set_input_b(5, data); }
-WRITE8_HANDLER( pia_6_portb_w ) { pia_set_input_b(6, data); }
-WRITE8_HANDLER( pia_7_portb_w ) { pia_set_input_b(7, data); }
+/*-------------------------------------------------
+    DEVICE_GET_INFO( pia6822 )
+-------------------------------------------------*/
 
-READ8_HANDLER( pia_0_porta_r ) { return pia_get_input_a(0); }
-READ8_HANDLER( pia_1_porta_r ) { return pia_get_input_a(1); }
-READ8_HANDLER( pia_2_porta_r ) { return pia_get_input_a(2); }
-READ8_HANDLER( pia_3_porta_r ) { return pia_get_input_a(3); }
-READ8_HANDLER( pia_4_porta_r ) { return pia_get_input_a(4); }
-READ8_HANDLER( pia_5_porta_r ) { return pia_get_input_a(5); }
-READ8_HANDLER( pia_6_porta_r ) { return pia_get_input_a(6); }
-READ8_HANDLER( pia_7_porta_r ) { return pia_get_input_a(7); }
-
-READ8_HANDLER( pia_0_portb_r ) { return pia_get_input_b(0); }
-READ8_HANDLER( pia_1_portb_r ) { return pia_get_input_b(1); }
-READ8_HANDLER( pia_2_portb_r ) { return pia_get_input_b(2); }
-READ8_HANDLER( pia_3_portb_r ) { return pia_get_input_b(3); }
-READ8_HANDLER( pia_4_portb_r ) { return pia_get_input_b(4); }
-READ8_HANDLER( pia_5_portb_r ) { return pia_get_input_b(5); }
-READ8_HANDLER( pia_6_portb_r ) { return pia_get_input_b(6); }
-READ8_HANDLER( pia_7_portb_r ) { return pia_get_input_b(7); }
-
-/******************* 1-bit CA1/CA2/CB1/CB2 port interfaces *******************/
-
-WRITE8_HANDLER( pia_0_ca1_w ) { pia_set_input_ca1(0, data); }
-WRITE8_HANDLER( pia_1_ca1_w ) { pia_set_input_ca1(1, data); }
-WRITE8_HANDLER( pia_2_ca1_w ) { pia_set_input_ca1(2, data); }
-WRITE8_HANDLER( pia_3_ca1_w ) { pia_set_input_ca1(3, data); }
-WRITE8_HANDLER( pia_4_ca1_w ) { pia_set_input_ca1(4, data); }
-WRITE8_HANDLER( pia_5_ca1_w ) { pia_set_input_ca1(5, data); }
-WRITE8_HANDLER( pia_6_ca1_w ) { pia_set_input_ca1(6, data); }
-WRITE8_HANDLER( pia_7_ca1_w ) { pia_set_input_ca1(7, data); }
-
-WRITE8_HANDLER( pia_0_ca2_w ) { pia_set_input_ca2(0, data); }
-WRITE8_HANDLER( pia_1_ca2_w ) { pia_set_input_ca2(1, data); }
-WRITE8_HANDLER( pia_2_ca2_w ) { pia_set_input_ca2(2, data); }
-WRITE8_HANDLER( pia_3_ca2_w ) { pia_set_input_ca2(3, data); }
-WRITE8_HANDLER( pia_4_ca2_w ) { pia_set_input_ca2(4, data); }
-WRITE8_HANDLER( pia_5_ca2_w ) { pia_set_input_ca2(5, data); }
-WRITE8_HANDLER( pia_6_ca2_w ) { pia_set_input_ca2(6, data); }
-WRITE8_HANDLER( pia_7_ca2_w ) { pia_set_input_ca2(7, data); }
-
-WRITE8_HANDLER( pia_0_cb1_w ) { pia_set_input_cb1(0, data); }
-WRITE8_HANDLER( pia_1_cb1_w ) { pia_set_input_cb1(1, data); }
-WRITE8_HANDLER( pia_2_cb1_w ) { pia_set_input_cb1(2, data); }
-WRITE8_HANDLER( pia_3_cb1_w ) { pia_set_input_cb1(3, data); }
-WRITE8_HANDLER( pia_4_cb1_w ) { pia_set_input_cb1(4, data); }
-WRITE8_HANDLER( pia_5_cb1_w ) { pia_set_input_cb1(5, data); }
-WRITE8_HANDLER( pia_6_cb1_w ) { pia_set_input_cb1(6, data); }
-WRITE8_HANDLER( pia_7_cb1_w ) { pia_set_input_cb1(7, data); }
-
-WRITE8_HANDLER( pia_0_cb2_w ) { pia_set_input_cb2(0, data); }
-WRITE8_HANDLER( pia_1_cb2_w ) { pia_set_input_cb2(1, data); }
-WRITE8_HANDLER( pia_2_cb2_w ) { pia_set_input_cb2(2, data); }
-WRITE8_HANDLER( pia_3_cb2_w ) { pia_set_input_cb2(3, data); }
-WRITE8_HANDLER( pia_4_cb2_w ) { pia_set_input_cb2(4, data); }
-WRITE8_HANDLER( pia_5_cb2_w ) { pia_set_input_cb2(5, data); }
-WRITE8_HANDLER( pia_6_cb2_w ) { pia_set_input_cb2(6, data); }
-WRITE8_HANDLER( pia_7_cb2_w ) { pia_set_input_cb2(7, data); }
-
-READ8_HANDLER( pia_0_ca1_r ) { return pia_get_input_ca1(0); }
-READ8_HANDLER( pia_1_ca1_r ) { return pia_get_input_ca1(1); }
-READ8_HANDLER( pia_2_ca1_r ) { return pia_get_input_ca1(2); }
-READ8_HANDLER( pia_3_ca1_r ) { return pia_get_input_ca1(3); }
-READ8_HANDLER( pia_4_ca1_r ) { return pia_get_input_ca1(4); }
-READ8_HANDLER( pia_5_ca1_r ) { return pia_get_input_ca1(5); }
-READ8_HANDLER( pia_6_ca1_r ) { return pia_get_input_ca1(6); }
-READ8_HANDLER( pia_7_ca1_r ) { return pia_get_input_ca1(7); }
-
-READ8_HANDLER( pia_0_ca2_r ) { return pia_get_input_ca2(0); }
-READ8_HANDLER( pia_1_ca2_r ) { return pia_get_input_ca2(1); }
-READ8_HANDLER( pia_2_ca2_r ) { return pia_get_input_ca2(2); }
-READ8_HANDLER( pia_3_ca2_r ) { return pia_get_input_ca2(3); }
-READ8_HANDLER( pia_4_ca2_r ) { return pia_get_input_ca2(4); }
-READ8_HANDLER( pia_5_ca2_r ) { return pia_get_input_ca2(5); }
-READ8_HANDLER( pia_6_ca2_r ) { return pia_get_input_ca2(6); }
-READ8_HANDLER( pia_7_ca2_r ) { return pia_get_input_ca2(7); }
-
-READ8_HANDLER( pia_0_cb1_r ) { return pia_get_input_cb1(0); }
-READ8_HANDLER( pia_1_cb1_r ) { return pia_get_input_cb1(1); }
-READ8_HANDLER( pia_2_cb1_r ) { return pia_get_input_cb1(2); }
-READ8_HANDLER( pia_3_cb1_r ) { return pia_get_input_cb1(3); }
-READ8_HANDLER( pia_4_cb1_r ) { return pia_get_input_cb1(4); }
-READ8_HANDLER( pia_5_cb1_r ) { return pia_get_input_cb1(5); }
-READ8_HANDLER( pia_6_cb1_r ) { return pia_get_input_cb1(6); }
-READ8_HANDLER( pia_7_cb1_r ) { return pia_get_input_cb1(7); }
-
-READ8_HANDLER( pia_0_cb2_r ) { return pia_get_input_cb2(0); }
-READ8_HANDLER( pia_1_cb2_r ) { return pia_get_input_cb2(1); }
-READ8_HANDLER( pia_2_cb2_r ) { return pia_get_input_cb2(2); }
-READ8_HANDLER( pia_3_cb2_r ) { return pia_get_input_cb2(3); }
-READ8_HANDLER( pia_4_cb2_r ) { return pia_get_input_cb2(4); }
-READ8_HANDLER( pia_5_cb2_r ) { return pia_get_input_cb2(5); }
-READ8_HANDLER( pia_6_cb2_r ) { return pia_get_input_cb2(6); }
-READ8_HANDLER( pia_7_cb2_r ) { return pia_get_input_cb2(7); }
+DEVICE_GET_INFO(pia6822)
+{
+	switch (state)
+	{
+		case DEVINFO_STR_NAME:							strcpy(info->s, "6822 PIA");				break;
+		default: 										DEVICE_GET_INFO_CALL(pia6821);				break;
+	}
+}

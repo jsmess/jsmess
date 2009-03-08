@@ -125,7 +125,7 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-- The core is based on MAME 0.129u5.  This incorporates all features of the
+- The core is based on MAME 0.129u6.  This incorporates all features of the
   update to this core.  [MAME team]
 
 - Made major changes to allow Cartridge slots to encapsulate hardware as

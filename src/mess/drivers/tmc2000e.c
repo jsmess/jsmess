@@ -41,7 +41,7 @@
 
 static const device_config *cassette_device_image(running_machine *machine)
 {
-	return devtag_get_device(machine, CASSETTE, "cassette");
+	return devtag_get_device(machine, "cassette");
 }
 
 /* Read/Write Handlers */
@@ -98,8 +98,8 @@ static ADDRESS_MAP_START( tmc2000e_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tmc2000e_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE(CDP1864, CDP1864_TAG, cdp1864_tone_latch_w)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE(CDP1864, CDP1864_TAG, cdp1864_step_bgcolor_w)
+	AM_RANGE(0x01, 0x01) AM_DEVWRITE(CDP1864_TAG, cdp1864_tone_latch_w)
+	AM_RANGE(0x02, 0x02) AM_DEVWRITE(CDP1864_TAG, cdp1864_step_bgcolor_w)
 	AM_RANGE(0x03, 0x03) AM_READWRITE(ascii_keyboard_r, keyboard_latch_w)
 	AM_RANGE(0x04, 0x04) AM_READWRITE(io_r, io_w)
 	AM_RANGE(0x05, 0x05) AM_READWRITE(vismac_r, vismac_w)
@@ -257,7 +257,7 @@ static MACHINE_START( tmc2000e )
 
 	/* find devices */
 
-	state->cdp1864 = devtag_get_device(machine, CDP1864, CDP1864_TAG);
+	state->cdp1864 = devtag_get_device(machine, CDP1864_TAG);
 
 	/* register for state saving */
 
@@ -362,7 +362,7 @@ SYSTEM_CONFIG_END
 
 static TIMER_CALLBACK(setup_beep)
 {
-	const device_config *speaker = devtag_get_device(machine, SOUND, "beep");
+	const device_config *speaker = devtag_get_device(machine, "beep");
 	beep_set_state(speaker, 0);
 	beep_set_frequency( speaker, 0 );
 }

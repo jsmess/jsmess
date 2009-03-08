@@ -302,6 +302,8 @@ Stadium Cross EPR15093  EPR15094  EPR15018  EPR15019  EPR15192  EPR15020  EPR150
 #include "sound/rf5c68.h"
 #include "sound/multipcm.h"
 
+#include "radr.lh"
+
 
 
 /*************************************
@@ -1234,16 +1236,16 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( system32_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM AM_REGION("soundcpu", 0x100000)
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK(1)
-	AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0x0ff0) AM_DEVWRITE(SOUND, "rf", rf5c68_w)
-	AM_RANGE(0xd000, 0xdfff) AM_DEVREADWRITE(SOUND, "rf", rf5c68_mem_r, rf5c68_mem_w)
+	AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0x0ff0) AM_DEVWRITE("rf", rf5c68_w)
+	AM_RANGE(0xd000, 0xdfff) AM_DEVREADWRITE("rf", rf5c68_mem_r, rf5c68_mem_w)
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_BASE(&z80_shared_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( system32_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x83) AM_MIRROR(0x0c) AM_DEVREADWRITE(SOUND, "ym1", ym3438_r, ym3438_w)
-	AM_RANGE(0x90, 0x93) AM_MIRROR(0x0c) AM_DEVREADWRITE(SOUND, "ym2", ym3438_r, ym3438_w)
+	AM_RANGE(0x80, 0x83) AM_MIRROR(0x0c) AM_DEVREADWRITE("ym1", ym3438_r, ym3438_w)
+	AM_RANGE(0x90, 0x93) AM_MIRROR(0x0c) AM_DEVREADWRITE("ym2", ym3438_r, ym3438_w)
 	AM_RANGE(0xa0, 0xaf) AM_WRITE(sound_bank_lo_w)
 	AM_RANGE(0xb0, 0xbf) AM_WRITE(sound_bank_hi_w)
 	AM_RANGE(0xc0, 0xcf) AM_WRITE(sound_int_control_lo_w)
@@ -1255,16 +1257,16 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( multi32_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM AM_REGION("soundcpu", 0x100000)
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK(1)
-	AM_RANGE(0xc000, 0xdfff) AM_DEVREADWRITE(SOUND, "sega", multipcm_r, multipcm_w)
+	AM_RANGE(0xc000, 0xdfff) AM_DEVREADWRITE("sega", multipcm_r, multipcm_w)
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_BASE(&z80_shared_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( multi32_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x83) AM_MIRROR(0x0c) AM_DEVREADWRITE(SOUND, "ym", ym3438_r, ym3438_w)
+	AM_RANGE(0x80, 0x83) AM_MIRROR(0x0c) AM_DEVREADWRITE("ym", ym3438_r, ym3438_w)
 	AM_RANGE(0xa0, 0xaf) AM_WRITE(sound_bank_lo_w)
-	AM_RANGE(0xb0, 0xbf) AM_DEVWRITE(SOUND, "sega", multipcm_bank_w)
+	AM_RANGE(0xb0, 0xbf) AM_DEVWRITE("sega", multipcm_bank_w)
 	AM_RANGE(0xc0, 0xcf) AM_WRITE(sound_int_control_lo_w)
 	AM_RANGE(0xd0, 0xd3) AM_MIRROR(0x04) AM_WRITE(sound_int_control_hi_w)
 	AM_RANGE(0xf1, 0xf1) AM_READWRITE(sound_dummy_r, sound_dummy_w)
@@ -3938,7 +3940,7 @@ static DRIVER_INIT( radr )
 
 static DRIVER_INIT( scross )
 {
-	const device_config *multipcm = devtag_get_device(machine, SOUND, "sega");
+	const device_config *multipcm = devtag_get_device(machine, "sega");
 	segas32_common_init(analog_custom_io_r, analog_custom_io_w, NULL);
 	memory_install_write8_device_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), multipcm, 0xb0, 0xbf, 0, 0, scross_bank_w);
 }
@@ -4018,10 +4020,10 @@ GAME( 1994, jpark,    0,        system32,     jpark,    jpark,    ROT0, "Sega", 
 GAME( 1994, kokoroj2, 0,        system32,     radr,     radr,     ROT0, "Sega",   "Kokoroji 2", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING) // uses an Audio CD
 GAME( 1991, radm,     0,        system32,     radm,     radm,     ROT0, "Sega",   "Rad Mobile (World)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1991, radmu,    radm,     system32,     radm,     radm,     ROT0, "Sega",   "Rad Mobile (US)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, radr,     0,        system32,     radr,     radr,     ROT0, "Sega",   "Rad Rally (World)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, radru,    radr,     system32,     radr,     radr,     ROT0, "Sega",   "Rad Rally (US)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1995, slipstrm, 0,        system32,     slipstrm, slipstrm, ROT0, "Capcom", "Slipstream (950515 BRAZIL)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1995, slipstrh, slipstrm, system32,     slipstrm, slipstrm, ROT0, "Capcom", "Slipstream (950515 HISPANIC)", GAME_IMPERFECT_GRAPHICS )
+GAMEL(1991, radr,     0,        system32,     radr,     radr,     ROT0, "Sega",   "Rad Rally (World)", GAME_IMPERFECT_GRAPHICS, layout_radr )
+GAMEL(1991, radru,    radr,     system32,     radr,     radr,     ROT0, "Sega",   "Rad Rally (US)", GAME_IMPERFECT_GRAPHICS, layout_radr )
+GAMEL(1995, slipstrm, 0,        system32,     slipstrm, slipstrm, ROT0, "Capcom", "Slipstream (950515 BRAZIL)", GAME_IMPERFECT_GRAPHICS, layout_radr )
+GAMEL(1995, slipstrh, slipstrm, system32,     slipstrm, slipstrm, ROT0, "Capcom", "Slipstream (950515 HISPANIC)", GAME_IMPERFECT_GRAPHICS, layout_radr )
 GAME( 1992, sonic,    0,        system32,     sonic,    sonic,    ROT0, "Sega",   "SegaSonic The Hedgehog (Japan, rev. C)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1992, sonicp,   sonic,    system32,     sonic,    sonicp,   ROT0, "Sega",   "SegaSonic The Hedgehog (Japan, prototype)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1991, spidman,  0,        system32,     spidman,  spidman,  ROT0, "Sega",   "Spider-Man: The Videogame (World)", GAME_IMPERFECT_GRAPHICS )

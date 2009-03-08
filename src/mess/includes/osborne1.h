@@ -7,7 +7,7 @@
 #ifndef OSBORNE1_H_
 #define OSBORNE1_H_
 
-#include "machine/6821new.h"
+#include "machine/6821pia.h"
 
 /*----------- defined in machine/osborne1.c -----------*/
 

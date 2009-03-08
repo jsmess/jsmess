@@ -503,7 +503,7 @@ static DEVICE_START( i8275 )
 
 	// get the screen device
 
-	i8275->screen = devtag_get_device(device->machine, VIDEO_SCREEN, i8275->intf->screen_tag);
+	i8275->screen = devtag_get_device(device->machine, i8275->intf->screen_tag);
 	assert(i8275->screen != NULL);
 
 	// register for state saving

@@ -1845,7 +1845,7 @@ static READ32_HANDLER( stv_sh2_soundram_r )
 
 static READ32_HANDLER( stv_scsp_regs_r32 )
 {
-	const device_config *scsp = devtag_get_device(space->machine, SOUND, "scsp");
+	const device_config *scsp = devtag_get_device(space->machine, "scsp");
 
 	offset <<= 1;
 	return (scsp_r(scsp, offset+1, 0xffff) | (scsp_r(scsp, offset, 0xffff)<<16));
@@ -1853,7 +1853,7 @@ static READ32_HANDLER( stv_scsp_regs_r32 )
 
 static WRITE32_HANDLER( stv_scsp_regs_w32 )
 {
-	const device_config *scsp = devtag_get_device(space->machine, SOUND, "scsp");
+	const device_config *scsp = devtag_get_device(space->machine, "scsp");
 
 	offset <<= 1;
 	scsp_w(scsp, offset, data>>16, mem_mask >> 16);
@@ -1867,14 +1867,14 @@ static WRITE32_HANDLER( minit_w )
 	logerror("cpu %s (PC=%08X) MINIT write = %08x\n", space->cpu->tag, cpu_get_pc(space->cpu),data);
 	cpuexec_boost_interleave(space->machine, minit_boost_timeslice, ATTOTIME_IN_USEC(minit_boost));
 	cpuexec_trigger(space->machine, 1000);
-	device_set_info_int(space->machine->cpu[1], CPUINFO_INT_SH2_FRT_INPUT, PULSE_LINE);
+	sh2_set_frt_input(space->machine->cpu[1], PULSE_LINE);
 }
 
 static WRITE32_HANDLER( sinit_w )
 {
 	logerror("cpu %s (PC=%08X) SINIT write = %08x\n", space->cpu->tag, cpu_get_pc(space->cpu),data);
 	cpuexec_boost_interleave(space->machine, sinit_boost_timeslice, ATTOTIME_IN_USEC(sinit_boost));
-	device_set_info_int(space->machine->cpu[0], CPUINFO_INT_SH2_FRT_INPUT, PULSE_LINE);
+	sh2_set_frt_input(space->machine->cpu[0], PULSE_LINE);
 }
 
 static UINT32 backup[64*1024/4];
@@ -1951,7 +1951,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_BASE(&sound_ram)
-	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE(SOUND, "scsp", scsp_r, scsp_w)
+	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("scsp", scsp_r, scsp_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( saturn )
@@ -2190,8 +2190,8 @@ static void saturn_init_driver(running_machine *machine, int rgn)
 	saturn_region = rgn;
 
 	// set compatible options
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
+	sh2drc_set_options(machine->cpu[0], SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
+	sh2drc_set_options(machine->cpu[1], SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
 
 	/* get the current date/time from the core */
 	mame_get_current_datetime(machine, &systime);
@@ -2238,7 +2238,7 @@ static int scsp_last_line = 0;
 
 static MACHINE_START( saturn )
 {
-	scsp_set_ram_base(devtag_get_device(machine, SOUND, "scsp"), sound_ram);
+	scsp_set_ram_base(devtag_get_device(machine, "scsp"), sound_ram);
 
 	// save states
 	state_save_register_global_pointer(machine, smpc_ram, 0x80);

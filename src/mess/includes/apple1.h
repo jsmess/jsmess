@@ -8,7 +8,7 @@
 #define APPLE1_H_
 
 #include "devices/snapquik.h"
-#include "machine/6821new.h"
+#include "machine/6821pia.h"
 
 
 /*----------- defined in machine/apple1.c -----------*/

@@ -238,6 +238,9 @@ Stephh's notes (based on the game M68000 code and some tests) :
 #include "sound/2151intf.h"
 #include "sound/msm5205.h"
 
+#include "topspeed.lh"
+
+
 WRITE16_HANDLER( rainbow_spritectrl_w );
 WRITE16_HANDLER( rastan_spriteflip_w );
 
@@ -507,19 +510,19 @@ static ADDRESS_MAP_START( z80_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK10)
 	AM_RANGE(0x8000, 0x8fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x9000, 0x9001) AM_DEVREAD(SOUND, "ym", ym2151_r)
+	AM_RANGE(0x9000, 0x9001) AM_DEVREAD("ym", ym2151_r)
 	AM_RANGE(0xa001, 0xa001) AM_READ(taitosound_slave_comm_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x9000, 0x9001) AM_DEVWRITE(SOUND, "ym", ym2151_w)
+	AM_RANGE(0x9000, 0x9001) AM_DEVWRITE("ym", ym2151_w)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xa001, 0xa001) AM_WRITE(taitosound_slave_comm_w)
-	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE(SOUND, "msm", topspeed_msm5205_address_w)
+	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE("msm", topspeed_msm5205_address_w)
 //  AM_RANGE(0xb400, 0xb400) // msm5205 start? doesn't seem to work right
-	AM_RANGE(0xb800, 0xb800) AM_DEVWRITE(SOUND, "msm", topspeed_msm5205_stop_w)
+	AM_RANGE(0xb800, 0xb800) AM_DEVWRITE("msm", topspeed_msm5205_stop_w)
 //  AM_RANGE(0xc000, 0xc000) // ??
 //  AM_RANGE(0xc400, 0xc400) // ??
 //  AM_RANGE(0xc800, 0xc800) // ??
@@ -882,7 +885,7 @@ static DRIVER_INIT( topspeed )
 	cpua_ctrl = 0xff;
 }
 
-GAME( 1987, topspeed, 0,        topspeed, topspeed, topspeed, ROT0, "Taito Corporation Japan", "Top Speed (World)", 0 )
-GAME( 1987, topspedu, topspeed, topspeed, fullthrl, topspeed, ROT0, "Taito America Corporation (Romstar license)", "Top Speed (US)", 0 )
-GAME( 1987, fullthrl, topspeed, topspeed, fullthrl, topspeed, ROT0, "Taito Corporation", "Full Throttle (Japan)", 0 )
+GAMEL( 1987, topspeed, 0,        topspeed, topspeed, topspeed, ROT0, "Taito Corporation Japan", "Top Speed (World)", 0, layout_topspeed )
+GAMEL( 1987, topspedu, topspeed, topspeed, fullthrl, topspeed, ROT0, "Taito America Corporation (Romstar license)", "Top Speed (US)", 0, layout_topspeed )
+GAMEL( 1987, fullthrl, topspeed, topspeed, fullthrl, topspeed, ROT0, "Taito Corporation", "Full Throttle (Japan)", 0, layout_topspeed )
 

@@ -220,7 +220,7 @@ static ADDRESS_MAP_START( studio2_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( studio2_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x01, 0x01) AM_DEVREAD(CDP1861, CDP1861_TAG, cdp1861_dispon_r)
+	AM_RANGE(0x01, 0x01) AM_DEVREAD(CDP1861_TAG, cdp1861_dispon_r)
 	AM_RANGE(0x02, 0x02) AM_WRITE(keylatch_w)
 ADDRESS_MAP_END
 
@@ -230,7 +230,7 @@ static ADDRESS_MAP_START( visicom_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( visicom_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(CDP1861, CDP1861_TAG, cdp1861_dispon_r, cdp1861_dispoff_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(CDP1861_TAG, cdp1861_dispon_r, cdp1861_dispoff_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(keylatch_w)
 ADDRESS_MAP_END
 
@@ -242,9 +242,9 @@ static ADDRESS_MAP_START( mpt02_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mpt02_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(CDP1864, CDP1864_TAG, cdp1864_dispon_r, cdp1864_step_bgcolor_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(CDP1864_TAG, cdp1864_dispon_r, cdp1864_step_bgcolor_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(keylatch_w)
-	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE(CDP1864, CDP1864_TAG, cdp1864_dispoff_r, cdp1864_tone_latch_w)
+	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE(CDP1864_TAG, cdp1864_dispoff_r, cdp1864_tone_latch_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -357,7 +357,7 @@ static CDP1802_EF_READ( studio2_ef_r )
 
 static CDP1802_Q_WRITE( studio2_q_w )
 {
-	const device_config *speaker = devtag_get_device(device->machine, SOUND, "beep");
+	const device_config *speaker = devtag_get_device(device->machine, "beep");
 	beep_set_state(speaker, level);
 }
 
@@ -429,7 +429,7 @@ static MACHINE_START( studio2 )
 	studio2_state *state = machine->driver_data;
 
 	/* find devices */
-	state->cdp1861 = devtag_get_device(machine, CDP1861, CDP1861_TAG);
+	state->cdp1861 = devtag_get_device(machine, CDP1861_TAG);
 
 	/* register for state saving */
 	state_save_register_global(machine, state->cdp1802_mode);
@@ -454,7 +454,7 @@ static MACHINE_START( mpt02 )
 	studio2_state *state = machine->driver_data;
 
 	/* find devices */
-	state->cdp1864 = devtag_get_device(machine, CDP1864, CDP1864_TAG);
+	state->cdp1864 = devtag_get_device(machine, CDP1864_TAG);
 	
 	/* register for state saving */
 	state_save_register_global(machine, state->cdp1802_mode);
@@ -652,7 +652,7 @@ ROM_END
 
 static TIMER_CALLBACK( setup_beep )
 {
-	const device_config *speaker = devtag_get_device(machine, SOUND, "beep");
+	const device_config *speaker = devtag_get_device(machine, "beep");
 	beep_set_state(speaker, 0);
 	beep_set_frequency(speaker, 300);
 }

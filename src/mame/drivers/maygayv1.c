@@ -205,7 +205,7 @@ static struct
 	UINT8	*line_buf;	// there's actually two
 } i82716;
 
-WRITE16_HANDLER( i82716_w )
+static WRITE16_HANDLER( i82716_w )
 {
 	// Accessing register window?
 	if ((VREG(RWBA) & 0xfff0) == (offset & 0xfff0))
@@ -223,7 +223,7 @@ WRITE16_HANDLER( i82716_w )
 	}
 }
 
-READ16_HANDLER( i82716_r )
+static READ16_HANDLER( i82716_r )
 {
 	// Accessing register window?
 	if ((VREG(RWBA) & ~0xf) == (offset & ~0xf))
@@ -430,17 +430,6 @@ static VIDEO_EOF( maygayv1 )
 */
 
 
-static READ16_HANDLER( pia_lsb_r )
-{
-	return pia_read(0, offset);
-}
-
-static WRITE16_HANDLER( pia_lsb_w )
-{
-	pia_write(0, offset, data >> 8);
-}
-
-
 
 static WRITE16_HANDLER( write_odd )
 {
@@ -453,7 +442,7 @@ static READ16_HANDLER( read_odd )
 }
 
 
-struct _i8279_state
+static struct _i8279_state
 {
 	UINT8	command;
 	UINT8	mode;
@@ -653,12 +642,12 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x080000, 0x083fff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM AM_REGION("maincpu", 0x80000)
 	AM_RANGE(0x820000, 0x820003) AM_READWRITE(maygay_8279_r, maygay_8279_w)
-	AM_RANGE(0x800000, 0x800003) AM_DEVWRITE8( SOUND, "ym", ym2413_w, 0xff00 )
+	AM_RANGE(0x800000, 0x800003) AM_DEVWRITE8( "ym", ym2413_w, 0xff00 )
 	AM_RANGE(0x860000, 0x86000d) AM_READWRITE(read_odd, write_odd)
 	AM_RANGE(0x86000e, 0x86000f) AM_WRITE(vsync_int_ctrl)
 	AM_RANGE(0x880000, 0x89ffff) AM_READWRITE(i82716_r, i82716_w)
-	AM_RANGE(0x8a0000, 0x8a001f) AM_DEVREADWRITE8( DUART68681, "duart68681", duart68681_r, duart68681_w, 0xff)
-	AM_RANGE(0x8c0000, 0x8c000f) AM_READWRITE(pia_lsb_r, pia_lsb_w)
+	AM_RANGE(0x8a0000, 0x8a001f) AM_DEVREADWRITE8( "duart68681", duart68681_r, duart68681_w, 0xff)
+	AM_RANGE(0x8c0000, 0x8c000f) AM_DEVREADWRITE8("pia", pia6821_r, pia6821_w, 0xff)
 ADDRESS_MAP_END
 
 
@@ -939,13 +928,13 @@ static void data_from_i8031(const device_config *device, int data)
 	duart68681_rx_data(maygayv1_devices.duart68681, 0, data);
 }
 
-static READ8_HANDLER( b_read )
+static READ8_DEVICE_HANDLER( b_read )
 {
 	// Meters - upper nibble?
 	return 0xff;
 }
 
-static WRITE8_HANDLER( b_writ )
+static WRITE8_DEVICE_HANDLER( b_writ )
 {
 	logerror("B WRITE %x\n",data);
 }
@@ -954,9 +943,18 @@ static WRITE8_HANDLER( b_writ )
 /* U25 ST 2 9148 EF68B21P */
 static const pia6821_interface pia_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ b_read, b_read, 0, 0, 0, 0,
-	/*outputs: A/B,CA/B2       */ b_writ, b_writ, 0, 0,
-	/*irqs   : A/B             */ 0, 0
+	DEVCB_HANDLER(b_read),		/* port A in */
+	DEVCB_HANDLER(b_read),		/* port B in */
+	DEVCB_NULL,		/* line CA1 in */
+	DEVCB_NULL,		/* line CB1 in */
+	DEVCB_NULL,		/* line CA2 in */
+	DEVCB_NULL,		/* line CB2 in */
+	DEVCB_HANDLER(b_writ),		/* port A out */
+	DEVCB_HANDLER(b_writ),		/* port B out */
+	DEVCB_NULL,		/* line CA2 out */
+	DEVCB_NULL,		/* port CB2 out */
+	DEVCB_NULL,		/* IRQA */
+	DEVCB_NULL		/* IRQB */
 };
 
 
@@ -964,8 +962,6 @@ static MACHINE_START( maygayv1 )
 {
 	i82716.dram = auto_malloc(0x80000);   // ???
 	i82716.line_buf = auto_malloc(512);
-
-	pia_config(machine, 0, &pia_intf);
 
 	state_save_register_global_pointer(machine, i82716.dram, 0x40000);
 
@@ -978,7 +974,7 @@ static MACHINE_START( maygayv1 )
 static MACHINE_RESET( maygayv1 )
 {
 	// ?
-	maygayv1_devices.duart68681 = device_list_find_by_tag( machine->config->devicelist, DUART68681, "duart68681" );
+	maygayv1_devices.duart68681 = devtag_get_device( machine, "duart68681" );
 	memset(i82716.dram, 0, 0x40000);
 	i82716.r[RWBA] = 0x0200;
 }
@@ -1000,6 +996,8 @@ static MACHINE_DRIVER_START( maygayv1 )
 	MDRV_CPU_PROGRAM_MAP(sound_prg, 0)
 	MDRV_CPU_DATA_MAP(sound_data, 0)
 	MDRV_CPU_IO_MAP(sound_io, 0)
+
+	MDRV_PIA6821_ADD("pia", pia_intf)
 
 	MDRV_MACHINE_START(maygayv1)
 	MDRV_MACHINE_RESET(maygayv1)

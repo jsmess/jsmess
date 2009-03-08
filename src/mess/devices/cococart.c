@@ -27,7 +27,7 @@ typedef struct _coco_cartridge_line coco_cartridge_line;
 struct _coco_cartridge_line
 {
 	emu_timer					*timer;
-	attotime					delay;
+	UINT32						delay;	/* in clock cycles */
 	cococart_line_value			value;
 	int							line;
 	int							q_count;
@@ -90,7 +90,7 @@ static DEVICE_START(coco_cartridge)
 	memset(cococart, 0, sizeof(*cococart));
 
 	/* access the PCB, and get the read/write handlers */
-	cartslot = devtag_get_device(device->machine, CARTSLOT, device_build_tag(tempstring, device, CARTSLOT_TAG));
+	cartslot = devtag_get_device(device->machine, device_build_tag(tempstring, device, CARTSLOT_TAG));
 	if (cartslot != NULL)
 	{
 		cococart->pcb = cartslot_get_pcb(cartslot);
@@ -106,13 +106,13 @@ static DEVICE_START(coco_cartridge)
 
 	/* finish setup */
 	cococart->cart_line.timer		= timer_alloc(device->machine, cart_timer_callback, (void *) device);
-	cococart->cart_line.delay		= attotime_zero;
+	cococart->cart_line.delay		= 0;
 	cococart->cart_line.callback	= config->cart_callback;
 	cococart->nmi_line.timer		= timer_alloc(device->machine, nmi_timer_callback, (void *) device);
-	cococart->nmi_line.delay		= attotime_zero;
+	cococart->nmi_line.delay		= 0;
 	cococart->nmi_line.callback		= config->nmi_callback;
 	cococart->halt_line.timer		= timer_alloc(device->machine, halt_timer_callback, (void *) device);
-	cococart->halt_line.delay		= cpu_clocks_to_attotime(device->machine->cpu[0], 7);
+	cococart->halt_line.delay		= 7;
 	cococart->halt_line.callback	= config->halt_callback;
 
 	astring_free(tempstring);
@@ -253,7 +253,12 @@ static TIMER_CALLBACK( halt_timer_callback )
 
 static void set_line_timer(const device_config *device, coco_cartridge_line *line, cococart_line_value value)
 {
-	timer_adjust_oneshot(line->timer, line->delay, (int) value);
+	/* calculate delay; it isn't clear why we have to do this every single time */
+	attotime delay = (line->delay != 0)
+		? cpu_clocks_to_attotime(device->machine->cpu[0], line->delay)
+		: attotime_zero;
+
+	timer_adjust_oneshot(line->timer, delay, (int) value);
 }
 
 
@@ -303,9 +308,6 @@ static DEVICE_SET_INFO(general_cartridge)
 			break;
 
 		case COCOCARTINFO_INT_LINE_HALT:
-			/* HACK */
-			get_token(device)->halt_line.delay = cpu_clocks_to_attotime(device->machine->cpu[0], 7);
-			
 			set_line_timer(device, &get_token(device)->halt_line, (cococart_line_value) info->i);
 			break;
 	}

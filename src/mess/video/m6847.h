@@ -53,7 +53,7 @@ struct _m6847_config
 	/* callbacks */
 	void (*horizontal_sync_callback)(running_machine *machine, int line);
 	void (*field_sync_callback)(running_machine *machine,int line);
-	UINT8 (*get_attributes)(UINT8 video_byte) ATTR_CONST;
+	UINT8 (*get_attributes)(running_machine *machine, UINT8 video_byte) ATTR_CONST;
 	const UINT8 *(*get_video_ram)(running_machine *machine, int scanline);
 
 	/* needed for the CoCo 3 */

@@ -116,10 +116,10 @@ DEVICE_IMAGE_LOAD( ti99_4_rs232 )
 		return INIT_FAIL;
 	
 	if (id==0) {
-		tms9902 = devtag_get_device(image->machine, TMS9902, "tms9902_0");
+		tms9902 = devtag_get_device(image->machine, "tms9902_0");
 	}
 	if (id==1) {
-		tms9902 = devtag_get_device(image->machine, TMS9902, "tms9902_1");
+		tms9902 = devtag_get_device(image->machine, "tms9902_1");
 	}
 	
 	rs232_fp = image;
@@ -251,12 +251,12 @@ static int rs232_cru_r(running_machine *machine, int offset)
 
 	case 1:
 		/* first 9902 */
-		reply = tms9902_cru_r(devtag_get_device(machine, TMS9902, "tms9902_0"), offset);
+		reply = tms9902_cru_r(devtag_get_device(machine, "tms9902_0"), offset);
 		break;
 
 	case 2:
 		/* second 9902 */
-		reply = tms9902_cru_r(devtag_get_device(machine, TMS9902, "tms9902_1"), offset);
+		reply = tms9902_cru_r(devtag_get_device(machine, "tms9902_1"), offset);
 		break;
 
 	default:
@@ -352,12 +352,12 @@ static void rs232_cru_w(running_machine *machine, int offset, int data)
 
 	case 1:
 		/* first 9902 */
-		tms9902_cru_w(devtag_get_device(machine, TMS9902, "tms9902_0"), offset, data);
+		tms9902_cru_w(devtag_get_device(machine, "tms9902_0"), offset, data);
 		break;
 
 	case 2:
 		/* second 9902 */
-		tms9902_cru_w(devtag_get_device(machine, TMS9902, "tms9902_1"), offset, data);
+		tms9902_cru_w(devtag_get_device(machine, "tms9902_1"), offset, data);
 		break;
 
 	default:

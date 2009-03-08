@@ -37,11 +37,11 @@ struct _mc6846_interface
   MDRV_DEVICE_CONFIG(_intrf)
 
 #define MDRV_MC6846_MODIFY(_tag, _intrf) \
-  MDRV_DEVICE_MODIFY(_tag, MC6846)	      \
+  MDRV_DEVICE_MODIFY(_tag)	      \
   MDRV_DEVICE_CONFIG(_intrf)
 
 #define MDRV_MC6846_REMOVE(_tag)		\
-  MDRV_DEVICE_REMOVE(_tag, MC6846)
+  MDRV_DEVICE_REMOVE(_tag)
 
 
 /* ---------- functions ------------ */

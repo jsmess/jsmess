@@ -21,7 +21,7 @@ DRIVER_INIT(ondra)
 
 static const device_config *cassette_device_image(running_machine *machine)
 {
-	return devtag_get_device(machine, CASSETTE, "cassette");
+	return devtag_get_device(machine, "cassette");
 }
 
 static UINT8 ondra_bank1_status;

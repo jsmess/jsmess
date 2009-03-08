@@ -200,7 +200,7 @@ static TIMER_CALLBACK(wswan_rtc_callback)
 
 static void wswan_machine_stop( running_machine *machine ) {
 	if ( eeprom.size ) {
-		image_battery_save( devtag_get_device(machine, CARTSLOT, "cart"), eeprom.data, eeprom.size );
+		image_battery_save( devtag_get_device(machine, "cart"), eeprom.data, eeprom.size );
 	}
 }
 

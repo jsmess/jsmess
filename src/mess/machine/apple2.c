@@ -962,7 +962,7 @@ READ8_HANDLER ( apple2_c03x_r )
 {
 	if (!offset)
 	{
-		const device_config *dac_device = devtag_get_device(space->machine, SOUND, "a2dac");
+		const device_config *dac_device = devtag_get_device(space->machine, "a2dac");
 
 		if (a2_speaker_state == 0xFF)
 			a2_speaker_state = 0;
@@ -1235,7 +1235,7 @@ void apple2_iwm_setdiskreg(running_machine *machine, UINT8 data)
 {
 	apple2_fdc_diskreg = data & 0xC0;
 	if (apple2_fdc_has_35(machine))
-		sony_set_sel_line( (device_config*)devtag_get_device(machine, APPLEFDC, "fdc"),apple2_fdc_diskreg & 0x80);
+		sony_set_sel_line( (device_config*)devtag_get_device(machine, "fdc"),apple2_fdc_diskreg & 0x80);
 }
 
 

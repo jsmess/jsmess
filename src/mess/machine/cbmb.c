@@ -241,7 +241,7 @@ static WRITE8_DEVICE_HANDLER( cbmb_cia_port_a_w )
 
 const cia6526_interface cbmb_cia =
 {
-	DEVCB_DEVICE_LINE(TPI6525, "tpi6525_0", tpi6525_irq2_level),
+	DEVCB_DEVICE_LINE("tpi6525_0", tpi6525_irq2_level),
 	DEVCB_NULL,	/* pc_func */
 	60,
 
@@ -338,7 +338,7 @@ MACHINE_RESET( cbmb )
 static TIMER_CALLBACK(cbmb_frame_interrupt)
 {
 	static int level = 0;
-	const device_config *tpi_0 = devtag_get_device(machine, TPI6525, "tpi6525_0");
+	const device_config *tpi_0 = devtag_get_device(machine, "tpi6525_0");
 
 #if 0
 	int controller1 = input_port_read(machine, "CTRLSEL") & 0x07;

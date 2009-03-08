@@ -87,6 +87,8 @@ Dip locations and factory settings verified from dip listing
 #include "sound/msm5232.h"
 #include "includes/buggychl.h"
 
+#include "buggychl.lh"
+
 
 static WRITE8_HANDLER( bankswitch_w )
 {
@@ -188,9 +190,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x4000, 0x47ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x4800, 0x4801) AM_DEVWRITE(SOUND, "ay1", ay8910_address_data_w)
-	AM_RANGE(0x4802, 0x4803) AM_DEVWRITE(SOUND, "ay2", ay8910_address_data_w)
-	AM_RANGE(0x4810, 0x481d) AM_DEVWRITE(SOUND, "msm", msm5232_w)
+	AM_RANGE(0x4800, 0x4801) AM_DEVWRITE("ay1", ay8910_address_data_w)
+	AM_RANGE(0x4802, 0x4803) AM_DEVWRITE("ay2", ay8910_address_data_w)
+	AM_RANGE(0x4810, 0x481d) AM_DEVWRITE("msm", msm5232_w)
 	AM_RANGE(0x4820, 0x4820) AM_WRITE(SMH_RAM)	/* VOL/BAL   for the 7630 on the MSM5232 output */
 	AM_RANGE(0x4830, 0x4830) AM_WRITE(SMH_RAM)	/* TRBL/BASS for the 7630 on the MSM5232 output  */
 //  AM_RANGE(0x5000, 0x5000) AM_WRITE(SMH_RAM)  /* to main cpu */
@@ -525,5 +527,5 @@ ROM_START( buggycht )
 ROM_END
 
 
-GAME( 1984, buggychl, 0,        buggychl, buggychl, 0, ROT270, "Taito Corporation", "Buggy Challenge", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1984, buggycht, buggychl, buggychl, buggychl, 0, ROT270, "Taito Corporation (Tecfri license)", "Buggy Challenge (Tecfri)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAMEL( 1984, buggychl, 0,        buggychl, buggychl, 0, ROT270, "Taito Corporation", "Buggy Challenge", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS, layout_buggychl )
+GAMEL( 1984, buggycht, buggychl, buggychl, buggychl, 0, ROT270, "Taito Corporation (Tecfri license)", "Buggy Challenge (Tecfri)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS, layout_buggychl )

@@ -51,9 +51,9 @@ static READ8_DEVICE_HANDLER(mz80k_8255_portc_r)
 	UINT8 val = 0;
 	val |= mz80k_vertical ? 0x80 : 0x00;
 	val |= (mz80k_cursor_cnt > 31) ? 0x40 : 0x00;
-    val |= (cassette_get_state(devtag_get_device(device->machine, CASSETTE, "cassette")) & CASSETTE_MASK_UISTATE)== CASSETTE_PLAY ? 0x10 : 0x00;
+    val |= (cassette_get_state(devtag_get_device(device->machine, "cassette")) & CASSETTE_MASK_UISTATE)== CASSETTE_PLAY ? 0x10 : 0x00;
 
-    if (cassette_input(devtag_get_device(device->machine, CASSETTE, "cassette")) > 0.00)
+    if (cassette_input(devtag_get_device(device->machine, "cassette")) > 0.00)
         val |= 0x20;
 
 	return val;
@@ -71,7 +71,7 @@ static WRITE8_DEVICE_HANDLER(mz80k_8255_portc_w)
 
 static PIT8253_OUTPUT_CHANGED( pit_out0_changed )
 {
-	const device_config *speaker = devtag_get_device(device->machine, SOUND, "speaker");
+	const device_config *speaker = devtag_get_device(device->machine, "speaker");
 	speaker_level_w( speaker, state ? 1 : 0 );
 }
 

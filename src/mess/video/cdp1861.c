@@ -247,7 +247,7 @@ static DEVICE_START( cdp1861 )
 	cdp1861->cpu = cputag_get_cpu(device->machine, intf->cpu_tag);
 
 	/* get the screen device */
-	cdp1861->screen = devtag_get_device(device->machine, VIDEO_SCREEN, intf->screen_tag);
+	cdp1861->screen = devtag_get_device(device->machine, intf->screen_tag);
 	assert(cdp1861->screen != NULL);
 
 	/* allocate the temporary bitmap */

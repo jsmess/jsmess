@@ -550,7 +550,7 @@ static void amstrad_plus_dma_parse(running_machine *machine, int channel)
 	{
 	case 0x0000:  // Load PSG register
 		{
-			const device_config *ay8910 = devtag_get_device(machine, SOUND, "ay");
+			const device_config *ay8910 = devtag_get_device(machine, "ay");
 			ay8910_address_w(ay8910, 0, (command & 0x0f00) >> 8);
 			ay8910_data_w(ay8910, 0, command & 0x00ff);
 			ay8910_address_w(ay8910, 0, prev_reg);
@@ -1307,7 +1307,7 @@ VIDEO_START( amstrad )
 
 VIDEO_UPDATE( amstrad )
 {
-	const device_config *mc6845 = (device_config *) devtag_get_device( screen->machine, MC6845, "mc6845" );
+	const device_config *mc6845 = devtag_get_device(screen->machine, "mc6845" );
 	mc6845_update( mc6845, bitmap, cliprect );
 	return 0;
 }
@@ -2287,8 +2287,8 @@ Expansion Peripherals Read/Write -   -   -   -   -   0   -   -   -   -   -   -  
 
 READ8_HANDLER ( amstrad_cpc_io_r )
 {
-	const device_config *fdc = (device_config*)devtag_get_device( space->machine, NEC765A, "nec765");
-	const device_config *mc6845 = (device_config *) devtag_get_device( space->machine, MC6845, "mc6845" );
+	const device_config *fdc = devtag_get_device(space->machine, "nec765");
+	const device_config *mc6845 = devtag_get_device(space->machine, "mc6845" );
 
 	unsigned char data = 0xFF;
 	unsigned int r1r0 = (unsigned int)((offset & 0x0300) >> 8);
@@ -2346,7 +2346,7 @@ b9 b8 | PPI Function Read/Write status
 	if ((offset & (1<<11)) == 0)
 	{
 		if (r1r0 < 0x03 )
-			data = ppi8255_r((device_config*)devtag_get_device( space->machine, PPI8255, "ppi8255" ), r1r0);
+			data = ppi8255_r(devtag_get_device(space->machine, "ppi8255" ), r1r0);
 	}
 
 /* if b10 = 0 : Expansion Peripherals Read selected
@@ -2423,8 +2423,8 @@ static void amstrad_plus_seqcheck(int data)
 /* Offset handler for write */
 WRITE8_HANDLER ( amstrad_cpc_io_w )
 {
-	device_config *fdc = (device_config*)devtag_get_device( space->machine, NEC765A, "nec765");
-	device_config *mc6845 = (device_config *) devtag_get_device( space->machine, MC6845, "mc6845" );
+	const device_config *fdc = devtag_get_device(space->machine, "nec765");
+	const device_config *mc6845 = devtag_get_device(space->machine, "mc6845");
 
 	static int printer_bit8_selected = FALSE;
 
@@ -2468,7 +2468,7 @@ WRITE8_HANDLER ( amstrad_cpc_io_w )
 			/* printer port bit 8 */
 			if (printer_bit8_selected && amstrad_system_type == SYSTEM_PLUS)
 			{
-				const device_config *printer = devtag_get_device(space->machine, CENTRONICS, "centronics");
+				const device_config *printer = devtag_get_device(space->machine, "centronics");
 				centronics_d7_w(printer, BIT(data, 3));
 				printer_bit8_selected = FALSE;
 			}
@@ -2492,7 +2492,7 @@ WRITE8_HANDLER ( amstrad_cpc_io_w )
 	{
 		if ((offset & (1<<12)) == 0)
 		{
-			const device_config *printer = devtag_get_device(space->machine, CENTRONICS, "centronics");
+			const device_config *printer = devtag_get_device(space->machine, "centronics");
 
 			/* CPC has a 7-bit data port, bit 8 is the STROBE signal */
 			centronics_data_w(printer, 0, data & 0x7f);
@@ -2511,7 +2511,7 @@ WRITE8_HANDLER ( amstrad_cpc_io_w )
 	{
 		unsigned int Index = ((offset & 0x0300) >> 8);
 
-		ppi8255_w((device_config*)devtag_get_device( space->machine, PPI8255, "ppi8255" ), Index, data);
+		ppi8255_w(devtag_get_device(space->machine, "ppi8255" ), Index, data);
 	}
 
 	/* if b10 = 0 : Expansion Peripherals Write selected */
@@ -2585,8 +2585,8 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 static void amstrad_handle_snapshot(running_machine *machine, unsigned char *pSnapshot)
 {
 	const address_space* space = cpu_get_address_space(machine->cpu[0],ADDRESS_SPACE_PROGRAM);
-	const device_config *mc6845 = devtag_get_device( space->machine, MC6845, "mc6845" );
-	const device_config *ay8910 = devtag_get_device(machine, SOUND, "ay");
+	const device_config *mc6845 = devtag_get_device(space->machine, "mc6845" );
+	const device_config *ay8910 = devtag_get_device(machine, "ay");
 	int RegData;
 	int i;
 
@@ -2684,11 +2684,11 @@ static void amstrad_handle_snapshot(running_machine *machine, unsigned char *pSn
 	gate_array.upper_bank = pSnapshot[0x055];
 
 	/* PPI */
-	ppi8255_w(devtag_get_device(machine, PPI8255, "ppi8255"),3,pSnapshot[0x059] & 0x0ff);
+	ppi8255_w(devtag_get_device(machine, "ppi8255"),3,pSnapshot[0x059] & 0x0ff);
 
-	ppi8255_w(devtag_get_device(machine, PPI8255, "ppi8255"),0,pSnapshot[0x056] & 0x0ff);
-	ppi8255_w(devtag_get_device(machine, PPI8255, "ppi8255"),1,pSnapshot[0x057] & 0x0ff);
-	ppi8255_w(devtag_get_device(machine, PPI8255, "ppi8255"),2,pSnapshot[0x058] & 0x0ff);
+	ppi8255_w(devtag_get_device(machine, "ppi8255"),0,pSnapshot[0x056] & 0x0ff);
+	ppi8255_w(devtag_get_device(machine, "ppi8255"),1,pSnapshot[0x057] & 0x0ff);
+	ppi8255_w(devtag_get_device(machine, "ppi8255"),2,pSnapshot[0x058] & 0x0ff);
 
 	/* PSG */
 	for (i=0; i<16; i++)
@@ -2855,7 +2855,7 @@ static unsigned char amstrad_Psg_FunctionSelected;
 static void update_psg(running_machine *machine)
 {
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	const device_config *ay8910 = devtag_get_device(machine, SOUND, "ay");
+	const device_config *ay8910 = devtag_get_device(machine, "ay");
 	
 	if(aleste_mode & 0x20)  // RTC selected
 	{
@@ -2946,14 +2946,14 @@ READ8_DEVICE_HANDLER (amstrad_ppi_portb_r)
 /* Set b7 with cassette tape input */
 	if(amstrad_system_type != SYSTEM_GX4000)
 	{
-		if (cassette_input(devtag_get_device( device->machine, CASSETTE, "cassette" )) > 0.03) {
+		if (cassette_input(devtag_get_device(device->machine, "cassette" )) > 0.03) {
 			data |= (1<<7);
 		}
 	}
 /* Set b6 with Parallel/Printer port ready */
 	if(amstrad_system_type != SYSTEM_GX4000)
 	{
-		const device_config *printer = devtag_get_device(device->machine, CENTRONICS, "centronics");
+		const device_config *printer = devtag_get_device(device->machine, "centronics");
 		data |= centronics_busy_r(printer) << 6;
 	}
 /* Set b4-b1 50Hz/60Hz state and manufacturer name defined by links on PCB */
@@ -3012,7 +3012,7 @@ WRITE8_DEVICE_HANDLER ( amstrad_ppi_portc_w )
 	if(amstrad_system_type != SYSTEM_GX4000)
 	{
 		if ((changed_data & 0x20) != 0) {
-			cassette_output(devtag_get_device( device->machine, CASSETTE, "cassette" ),
+			cassette_output(devtag_get_device(device->machine, "cassette" ),
 				((data & 0x20) ? -1.0 : +1.0));
 		}
 	}
@@ -3020,8 +3020,9 @@ WRITE8_DEVICE_HANDLER ( amstrad_ppi_portc_w )
 	/* b4 Cassette Motor Control */
 	if(amstrad_system_type != SYSTEM_GX4000)
 	{
-		if ((changed_data & 0x10) != 0) {
-			cassette_change_state(devtag_get_device( device->machine, CASSETTE, "cassette" ),
+		if ((changed_data & 0x10) != 0)
+		{
+			cassette_change_state(devtag_get_device(device->machine, "cassette" ),
 				((data & 0x10) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED),
 				CASSETTE_MASK_MOTOR);
 		}

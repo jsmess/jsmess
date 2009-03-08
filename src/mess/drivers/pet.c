@@ -384,7 +384,7 @@ normal keyboards?
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6502/m6502.h"
 
-#include "machine/6821new.h"
+#include "machine/6821pia.h"
 #include "machine/6522via.h"
 #include "includes/pet.h"
 #include "machine/cbmipt.h"
@@ -405,9 +405,9 @@ normal keyboards?
 static ADDRESS_MAP_START(pet_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x0c00) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size )
 	AM_RANGE(0xa000, 0xe7ff) AM_ROM
-	AM_RANGE(0xe810, 0xe813) AM_DEVREADWRITE(PIA6821, "pia_0", pia_r, pia_w)
-	AM_RANGE(0xe820, 0xe823) AM_DEVREADWRITE(PIA6821, "pia_1", pia_r, pia_w)
-	AM_RANGE(0xe840, 0xe84f) AM_DEVREADWRITE(VIA6522, "via6522_0", via_r, via_w)
+	AM_RANGE(0xe810, 0xe813) AM_DEVREADWRITE("pia_0", pia6821_r, pia6821_w)
+	AM_RANGE(0xe820, 0xe823) AM_DEVREADWRITE("pia_1", pia6821_r, pia6821_w)
+	AM_RANGE(0xe840, 0xe84f) AM_DEVREADWRITE("via6522_0", via_r, via_w)
 /*  AM_RANGE(0xe900, 0xe91f) AM_READ(cbm_ieee_state)    // for debugging */
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -415,11 +415,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pet40_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x0c00) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size )
 	AM_RANGE(0xa000, 0xe7ff) AM_ROM
-	AM_RANGE(0xe810, 0xe813) AM_DEVREADWRITE(PIA6821, "pia_0", pia_r, pia_w)
-	AM_RANGE(0xe820, 0xe823) AM_DEVREADWRITE(PIA6821, "pia_1", pia_r, pia_w)
-	AM_RANGE(0xe840, 0xe84f) AM_DEVREADWRITE(VIA6522, "via6522_0", via_r, via_w)
-	AM_RANGE(0xe880, 0xe880) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
-	AM_RANGE(0xe881, 0xe881) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
+	AM_RANGE(0xe810, 0xe813) AM_DEVREADWRITE("pia_0", pia6821_r, pia6821_w)
+	AM_RANGE(0xe820, 0xe823) AM_DEVREADWRITE("pia_1", pia6821_r, pia6821_w)
+	AM_RANGE(0xe840, 0xe84f) AM_DEVREADWRITE("via6522_0", via_r, via_w)
+	AM_RANGE(0xe880, 0xe880) AM_DEVWRITE("crtc", mc6845_address_w)
+	AM_RANGE(0xe881, 0xe881) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -432,11 +432,11 @@ static ADDRESS_MAP_START( pet80_mem , ADDRESS_SPACE_PROGRAM, 8)
 #if 1
 	AM_RANGE(0xe800, 0xefff) AM_RAMBANK(7)
 #else
-	AM_RANGE(0xe810, 0xe813) AM_DEVREADWRITE(PIA6821, "pia_0", pia_r, pia_w)
-	AM_RANGE(0xe820, 0xe823) AM_DEVREADWRITE(PIA6821, "pia_1", pia_r, pia_w)
-	AM_RANGE(0xe840, 0xe84f) AM_DEVREADWRITE(VIA6522, "via6522_0", via_r, via_w)
-	AM_RANGE(0xe880, 0xe880) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
-	AM_RANGE(0xe881, 0xe881) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
+	AM_RANGE(0xe810, 0xe813) AM_DEVREADWRITE("pia_0", pia6821_r, pia6821_w)
+	AM_RANGE(0xe820, 0xe823) AM_DEVREADWRITE("pia_1", pia6821_r, pia6821_w)
+	AM_RANGE(0xe840, 0xe84f) AM_DEVREADWRITE("via6522_0", via_r, via_w)
+	AM_RANGE(0xe880, 0xe880) AM_DEVWRITE("crtc", mc6845_address_w)
+	AM_RANGE(0xe881, 0xe881) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
 #endif
 	AM_RANGE(0xf000, 0xffff) AM_READ(SMH_BANK8)
 	AM_RANGE(0xf000, 0xffef) AM_WRITE(SMH_BANK8)
@@ -463,11 +463,11 @@ static ADDRESS_MAP_START( superpet_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_SHARE(1) AM_BASE(&pet_memory)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE(2) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0xa000, 0xe7ff) AM_ROM
-	AM_RANGE(0xe810, 0xe813) AM_DEVREADWRITE(PIA6821, "pia_0", pia_r, pia_w)
-	AM_RANGE(0xe820, 0xe823) AM_DEVREADWRITE(PIA6821, "pia_1", pia_r, pia_w)
-	AM_RANGE(0xe840, 0xe84f) AM_DEVREADWRITE(VIA6522, "via6522_0", via_r, via_w)
-	AM_RANGE(0xe880, 0xe880) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
-	AM_RANGE(0xe881, 0xe881) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
+	AM_RANGE(0xe810, 0xe813) AM_DEVREADWRITE("pia_0", pia6821_r, pia6821_w)
+	AM_RANGE(0xe820, 0xe823) AM_DEVREADWRITE("pia_1", pia6821_r, pia6821_w)
+	AM_RANGE(0xe840, 0xe84f) AM_DEVREADWRITE("via6522_0", via_r, via_w)
+	AM_RANGE(0xe880, 0xe880) AM_DEVWRITE("crtc", mc6845_address_w)
+	AM_RANGE(0xe881, 0xe881) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
 	/* 0xefe0, 0xefe3, mos 6702 */
 	/* 0xeff0, 0xeff3, acia6551 */
 	AM_RANGE(0xeff8, 0xefff) AM_READWRITE(superpet_r, superpet_w)
@@ -479,11 +479,11 @@ static ADDRESS_MAP_START( superpet_m6809_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE(2)	/* same memory as m6502 */
     AM_RANGE(0x9000, 0x9fff) AM_RAMBANK(1)	/* 64 kbyte ram turned in */
 	AM_RANGE(0xa000, 0xe7ff) AM_ROM
-	AM_RANGE(0xe810, 0xe813) AM_DEVREADWRITE(PIA6821, "pia_0", pia_r, pia_w)
-	AM_RANGE(0xe820, 0xe823) AM_DEVREADWRITE(PIA6821, "pia_1", pia_r, pia_w)
-	AM_RANGE(0xe840, 0xe84f) AM_DEVREADWRITE(VIA6522, "via6522_0", via_r, via_w)
-	AM_RANGE(0xe880, 0xe880) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
-	AM_RANGE(0xe881, 0xe881) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
+	AM_RANGE(0xe810, 0xe813) AM_DEVREADWRITE("pia_0", pia6821_r, pia6821_w)
+	AM_RANGE(0xe820, 0xe823) AM_DEVREADWRITE("pia_1", pia6821_r, pia6821_w)
+	AM_RANGE(0xe840, 0xe84f) AM_DEVREADWRITE("via6522_0", via_r, via_w)
+	AM_RANGE(0xe880, 0xe880) AM_DEVWRITE("crtc", mc6845_address_w)
+	AM_RANGE(0xe881, 0xe881) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0xeff8, 0xefff) AM_READWRITE(superpet_r, superpet_w)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -636,7 +636,7 @@ static VIDEO_START( pet_crtc )
 
 static VIDEO_UPDATE( pet_crtc )
 {
-	const device_config *mc6845 = devtag_get_device(screen->machine, MC6845, "crtc");
+	const device_config *mc6845 = devtag_get_device(screen->machine, "crtc");
 	mc6845_update(mc6845, bitmap, cliprect);
 	return 0;
 }

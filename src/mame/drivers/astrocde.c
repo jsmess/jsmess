@@ -206,7 +206,7 @@ static WRITE8_HANDLER( seawolf2_lamps_w )
 
 static WRITE8_HANDLER( seawolf2_sound_1_w )  // Port 40
 {
-	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(space->machine, "samples");
 	UINT8 rising_bits = data & ~port_1_last;
 	port_1_last = data;
 
@@ -221,7 +221,7 @@ static WRITE8_HANDLER( seawolf2_sound_1_w )  // Port 40
 
 static WRITE8_HANDLER( seawolf2_sound_2_w )  // Port 41
 {
-	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(space->machine, "samples");
 	UINT8 rising_bits = data & ~port_2_last;
 	port_2_last = data;
 
@@ -336,8 +336,8 @@ static READ8_HANDLER( gorf_io_1_r )
 		case 4: astrocade_sparkle[2] = data;	break;
 		case 5: astrocade_sparkle[3] = data;	break;
 		case 6:
-			sound_set_output_gain(devtag_get_device(space->machine, SOUND, "astrocade1"), 0, data ? 0.0 : 1.0);
-			sound_set_output_gain(devtag_get_device(space->machine, SOUND, "samples"), 0, data ? 1.0 : 0.0);
+			sound_set_output_gain(devtag_get_device(space->machine, "astrocade1"), 0, data ? 0.0 : 1.0);
+			sound_set_output_gain(devtag_get_device(space->machine, "samples"), 0, data ? 1.0 : 0.0);
 			break;
 		case 7:	mame_printf_debug("io_1:%d\n", data); break;
 	}
@@ -504,7 +504,7 @@ static void ctc_interrupt(const device_config *device, int state)
 }
 
 
-static z80ctc_interface ctc_intf =
+static const z80ctc_interface ctc_intf =
 {
 	0,              	/* timer disables */
 	ctc_interrupt,  	/* interrupt handler */
@@ -681,7 +681,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( port_map_stereo_pattern, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0000, 0x0019) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(astrocade_data_chip_register_r, astrocade_data_chip_register_w)
-	AM_RANGE(0x0050, 0x0058) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_DEVWRITE(SOUND, "astrocade2", astrocade_sound_w)
+	AM_RANGE(0x0050, 0x0058) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_DEVWRITE("astrocade2", astrocade_sound_w)
 	AM_RANGE(0x0078, 0x007e) AM_MIRROR(0xff00) AM_WRITE(astrocade_pattern_board_w)
 	AM_RANGE(0xa55b, 0xa55b) AM_WRITE(protected_ram_enable_w)
 ADDRESS_MAP_END
@@ -689,7 +689,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( port_map_16col_pattern, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0000, 0x0019) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(astrocade_data_chip_register_r, astrocade_data_chip_register_w)
-	AM_RANGE(0x0050, 0x0058) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_DEVWRITE(SOUND, "astrocade2", astrocade_sound_w)
+	AM_RANGE(0x0050, 0x0058) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_DEVWRITE("astrocade2", astrocade_sound_w)
 	AM_RANGE(0x0078, 0x007e) AM_MIRROR(0xff00) AM_WRITE(astrocade_pattern_board_w)
 	AM_RANGE(0x00bf, 0x00bf) AM_MIRROR(0xff00) AM_WRITE(profpac_page_select_w)
 	AM_RANGE(0x00c3, 0x00c3) AM_MIRROR(0xff00) AM_READ(profpac_intercept_r)
@@ -712,11 +712,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tenpin_sub_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x90, 0x93) AM_DEVREADWRITE(Z80CTC, "ctc", z80ctc_r, z80ctc_w)
+	AM_RANGE(0x90, 0x93) AM_DEVREADWRITE("ctc", z80ctc_r, z80ctc_w)
 	AM_RANGE(0x97, 0x97) AM_READ(soundlatch_r)
-	AM_RANGE(0x98, 0x98) AM_DEVWRITE(SOUND, "ay", ay8910_address_w)
-	AM_RANGE(0x98, 0x98) AM_DEVREAD(SOUND, "ay", ay8910_r)
-	AM_RANGE(0x9a, 0x9a) AM_DEVWRITE(SOUND, "ay", ay8910_data_w)
+	AM_RANGE(0x98, 0x98) AM_DEVWRITE("ay", ay8910_address_w)
+	AM_RANGE(0x98, 0x98) AM_DEVREAD("ay", ay8910_r)
+	AM_RANGE(0x9a, 0x9a) AM_DEVWRITE("ay", ay8910_data_w)
 ADDRESS_MAP_END
 
 
@@ -1243,7 +1243,7 @@ static const samples_interface gorf_samples_interface =
 
 static const z80_daisy_chain tenpin_daisy_chain[] =
 {
-	{ Z80CTC, "ctc" },
+	{ "ctc" },
 	{ NULL }
 };
 
@@ -1741,8 +1741,8 @@ static DRIVER_INIT( demndrgn )
 
 	astrocade_video_config = 0x00;
 	memory_install_read8_handler(iospace, 0x14, 0x14, 0x1fff, 0xff00, demndrgn_io_r);
-	memory_install_read8_handler(iospace, 0x1c, 0x1c, 0x0000, 0xff00, input_port_read_handler8(machine->portconfig, "FIREX"));
-	memory_install_read8_handler(iospace, 0x1d, 0x1d, 0x0000, 0xff00, input_port_read_handler8(machine->portconfig, "FIREY"));
+	memory_install_read_port_handler(iospace, 0x1c, 0x1c, 0x0000, 0xff00, "FIREX");
+	memory_install_read_port_handler(iospace, 0x1d, 0x1d, 0x0000, 0xff00, "FIREY");
 	memory_install_write8_handler(iospace, 0x97, 0x97, 0x0000, 0xff00, demndrgn_sound_w);
 
 	/* reset banking */
@@ -1756,11 +1756,11 @@ static DRIVER_INIT( tenpindx )
 	const address_space *iospace = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO);
 
 	astrocade_video_config = 0x00;
-	memory_install_read8_handler(iospace, 0x60, 0x60, 0x0000, 0xff00, input_port_read_handler8(machine->portconfig, "P60"));
-	memory_install_read8_handler(iospace, 0x61, 0x61, 0x0000, 0xff00, input_port_read_handler8(machine->portconfig, "P61"));
-	memory_install_read8_handler(iospace, 0x62, 0x62, 0x0000, 0xff00, input_port_read_handler8(machine->portconfig, "P62"));
-	memory_install_read8_handler(iospace, 0x63, 0x63, 0x0000, 0xff00, input_port_read_handler8(machine->portconfig, "P63"));
-	memory_install_read8_handler(iospace, 0x64, 0x64, 0x0000, 0xff00, input_port_read_handler8(machine->portconfig, "P64"));
+	memory_install_read_port_handler(iospace, 0x60, 0x60, 0x0000, 0xff00, "P60");
+	memory_install_read_port_handler(iospace, 0x61, 0x61, 0x0000, 0xff00, "P61");
+	memory_install_read_port_handler(iospace, 0x62, 0x62, 0x0000, 0xff00, "P62");
+	memory_install_read_port_handler(iospace, 0x63, 0x63, 0x0000, 0xff00, "P63");
+	memory_install_read_port_handler(iospace, 0x64, 0x64, 0x0000, 0xff00, "P64");
 	memory_install_write8_handler(iospace, 0x65, 0x66, 0x0000, 0xff00, tenpindx_lamp_w);
 	memory_install_write8_handler(iospace, 0x67, 0x67, 0x0000, 0xff00, tenpindx_counter_w);
 	memory_install_write8_handler(iospace, 0x68, 0x68, 0x0000, 0xff00, tenpindx_lights_w);

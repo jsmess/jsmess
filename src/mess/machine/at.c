@@ -91,7 +91,7 @@ static UINT8 at_speaker_get_spk(void)
 
 static void at_speaker_set_spkrdata(running_machine *machine, UINT8 data)
 {
-	const device_config *speaker = devtag_get_device(machine, SOUND, "speaker");
+	const device_config *speaker = devtag_get_device(machine, "speaker");
 	at_spkrdata = data ? 1 : 0;
 	speaker_level_w( speaker, at_speaker_get_spk() );
 }
@@ -99,7 +99,7 @@ static void at_speaker_set_spkrdata(running_machine *machine, UINT8 data)
 
 static void at_speaker_set_input(running_machine *machine, UINT8 data)
 {
-	const device_config *speaker = devtag_get_device(machine, SOUND, "speaker");
+	const device_config *speaker = devtag_get_device(machine, "speaker");
 	at_speaker_input = data ? 1 : 0;
 	speaker_level_w( speaker, at_speaker_get_spk() );
 }
@@ -407,7 +407,7 @@ static void at_fdc_dma_drq(running_machine *machine, int state, int read_)
 
 static device_config * at_get_device(running_machine *machine )
 {
-	return (device_config*)devtag_get_device(machine, NEC765A, "nec765");
+	return (device_config*)devtag_get_device(machine, "nec765");
 }
 
 static const struct pc_fdc_interface fdc_interface =
@@ -702,6 +702,8 @@ static void at_map_vga_memory(running_machine *machine, offs_t begin, offs_t end
 
 
 
+static READ8_HANDLER( input_port_0_r ) { return input_port_read(space->machine, "IN0"); }
+
 static const struct pc_vga_interface vga_interface =
 {
 	1,
@@ -767,11 +769,11 @@ MACHINE_START( at )
 
 MACHINE_RESET( at )
 {
-	at_devices.pic8259_master = devtag_get_device(machine, PIC8259, "pic8259_master");
-	at_devices.pic8259_slave = devtag_get_device(machine, PIC8259, "pic8259_slave");
-	at_devices.dma8237_1 = devtag_get_device(machine, DMA8237, "dma8237_1");
-	at_devices.dma8237_2 = devtag_get_device(machine, DMA8237, "dma8237_2");
-	at_devices.pit8254 = devtag_get_device(machine, PIT8254, "pit8254");
-	pc_mouse_set_serial_port( devtag_get_device(machine, NS16450, "ns16450_0") );
+	at_devices.pic8259_master = devtag_get_device(machine, "pic8259_master");
+	at_devices.pic8259_slave = devtag_get_device(machine, "pic8259_slave");
+	at_devices.dma8237_1 = devtag_get_device(machine, "dma8237_1");
+	at_devices.dma8237_2 = devtag_get_device(machine, "dma8237_2");
+	at_devices.pit8254 = devtag_get_device(machine, "pit8254");
+	pc_mouse_set_serial_port( devtag_get_device(machine, "ns16450_0") );
 }
 

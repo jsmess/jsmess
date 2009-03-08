@@ -138,7 +138,7 @@ static DEVICE_START( cdp1862 )
 	assert(cdp1862->intf != NULL);
 
 	/* get the screen device */
-	cdp1862->screen = devtag_get_device(device->machine, VIDEO_SCREEN, cdp1862->intf->screen_tag);
+	cdp1862->screen = devtag_get_device(device->machine, cdp1862->intf->screen_tag);
 	assert(cdp1862->screen != NULL);
 
 	/* allocate the temporary bitmap */

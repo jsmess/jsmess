@@ -135,12 +135,12 @@ UINT8 c16_m7501_port_read(const device_config *device, UINT8 direction)
 
 //	data &= ~0x20; // port bit not in pinout
 
-	if (cassette_input(devtag_get_device(device->machine, CASSETTE, "cassette")) > +0.0)
+	if (cassette_input(devtag_get_device(device->machine, "cassette")) > +0.0)
 		data |=  0x10;
 	else
 		data &= ~0x10;
 
-	cassette_change_state(devtag_get_device(device->machine, CASSETTE, "cassette"), (c16_port7501 & 0x08) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+	cassette_change_state(devtag_get_device(device->machine, "cassette"), (c16_port7501 & 0x08) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 
 	return data;
 }
@@ -303,7 +303,7 @@ READ8_HANDLER(plus4_6529_port_r)
 {
 	int data = 0x00;
 
-	if (!((cassette_get_state(devtag_get_device(space->machine, CASSETTE, "cassette")) & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY))
+	if (!((cassette_get_state(devtag_get_device(space->machine, "cassette")) & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY))
 		data |= 0x04;
 	return data;
 }
@@ -312,7 +312,7 @@ READ8_HANDLER(c16_fd1x_r)
 {
 	int data = 0x00;
 
-	if (!((cassette_get_state(devtag_get_device(space->machine, CASSETTE, "cassette")) & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY))
+	if (!((cassette_get_state(devtag_get_device(space->machine, "cassette")) & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY))
 		data |= 0x04;
 	return data;
 }
@@ -490,7 +490,7 @@ DRIVER_INIT( c16v )
 MACHINE_RESET( c16 )
 {
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	const device_config *sid = devtag_get_device(space->machine, SOUND, "sid6581");
+	const device_config *sid = devtag_get_device(space->machine, "sid6581");
 	
 	c364_speech_init(machine);
 
@@ -538,7 +538,7 @@ MACHINE_RESET( c16 )
 
 	if (has_c1551 || has_iec8)		/* IEC8 on || C1551 */
 	{
-		const device_config *tpi = devtag_get_device(machine, TPI6525, "tpi6535_tpi_2");
+		const device_config *tpi = devtag_get_device(machine, "tpi6535_tpi_2");
 		memory_install_write8_device_handler(space, tpi, 0xfee0, 0xfeff, 0, 0, tpi6525_w);
 		memory_install_read8_device_handler(space, tpi, 0xfee0, 0xfeff, 0, 0, tpi6525_r);
 	}
@@ -549,7 +549,7 @@ MACHINE_RESET( c16 )
 	}
 	if (has_iec9)					/* IEC9 on */
 	{
-		const device_config *tpi = devtag_get_device(machine, TPI6525, "tpi6535_tpi_3");
+		const device_config *tpi = devtag_get_device(machine, "tpi6535_tpi_3");
 		memory_install_write8_device_handler(space, tpi, 0xfec0, 0xfedf, 0, 0, tpi6525_w);
 		memory_install_read8_device_handler(space, tpi, 0xfec0, 0xfedf, 0, 0, tpi6525_r);
 	}

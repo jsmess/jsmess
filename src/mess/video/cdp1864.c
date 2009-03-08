@@ -238,7 +238,7 @@ static void cdp1864_init_palette(const device_config *device, const cdp1864_inte
 void cdp1864_aoe_w(const device_config *device, int level)
 {
 	cdp1864_t *cdp1864 = get_safe_token(device);
-	const device_config *speaker = devtag_get_device(device->machine, SOUND, "beep");
+	const device_config *speaker = devtag_get_device(device->machine, "beep");
 
 	if (!level)
 	{
@@ -299,7 +299,7 @@ WRITE8_DEVICE_HANDLER( cdp1864_step_bgcolor_w )
 WRITE8_DEVICE_HANDLER( cdp1864_tone_latch_w )
 {
 	cdp1864_t *cdp1864 = get_safe_token(device);
-	const device_config *speaker = devtag_get_device(device->machine, SOUND, "beep");
+	const device_config *speaker = devtag_get_device(device->machine, "beep");
 
 	cdp1864->latch = data;
 	beep_set_frequency(speaker, CDP1864_CLOCK / 8 / 4 / (data + 1) / 2); // TODO: remove this
@@ -426,7 +426,7 @@ static DEVICE_START( cdp1864 )
 	cdp1864->cpu = cputag_get_cpu(device->machine, intf->cpu_tag);
 
 	/* get the screen device */
-	cdp1864->screen = devtag_get_device(device->machine, VIDEO_SCREEN, intf->screen_tag);
+	cdp1864->screen = devtag_get_device(device->machine, intf->screen_tag);
 	assert(cdp1864->screen != NULL);
 
 	/* allocate the temporary bitmap */

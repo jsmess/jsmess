@@ -60,7 +60,7 @@ static DEVICE_START(coco_rs232)
 	memset(pak_pcb, 0, sizeof(*pak_pcb));
 	pak_pcb->cococart = device->owner->owner;
 	pak_pcb->cart = device->owner;
-	pak_pcb->uart = devtag_get_device(device->machine, ACIA6551, device_build_tag(tempstring, device, UART_TAG));
+	pak_pcb->uart = devtag_get_device(device->machine, device_build_tag(tempstring, device, UART_TAG));
 
 	astring_free(tempstring);
 }

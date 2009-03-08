@@ -100,15 +100,15 @@ static READ8_HANDLER( bishjan_videoram_2_hi_r )	{	return bishjan_videoram_2_hi[o
 
 // 16-bit handlers for an 8-bit chip
 
-WRITE8TO16BE_MSB( bishjan_byte_lo_msb,            bishjan_byte_lo_w );
+static WRITE8TO16BE_MSB( bishjan_byte_lo_msb,            bishjan_byte_lo_w );
 
-READWRITE8TO16BE( bishjan_videoram_1_lo_word,    bishjan_videoram_1_lo_r, bishjan_videoram_1_lo_w );
-READWRITE8TO16BE( bishjan_videoram_1_hi_word,    bishjan_videoram_1_hi_r, bishjan_videoram_1_hi_w );
-WRITE8TO16BE    ( bishjan_videoram_1_hi_lo_word, bishjan_videoram_1_hi_lo_w );
+static READ8TO16BE( bishjan_videoram_1_lo_word,    bishjan_videoram_1_lo_r );
+static READ8TO16BE( bishjan_videoram_1_hi_word,    bishjan_videoram_1_hi_r );
+static WRITE8TO16BE    ( bishjan_videoram_1_hi_lo_word, bishjan_videoram_1_hi_lo_w );
 
-READWRITE8TO16BE( bishjan_videoram_2_lo_word,    bishjan_videoram_2_lo_r, bishjan_videoram_2_lo_w );
-READWRITE8TO16BE( bishjan_videoram_2_hi_word,    bishjan_videoram_2_hi_r, bishjan_videoram_2_hi_w );
-WRITE8TO16BE    ( bishjan_videoram_2_hi_lo_word, bishjan_videoram_2_hi_lo_w );
+static READ8TO16BE( bishjan_videoram_2_lo_word,    bishjan_videoram_2_lo_r );
+static READ8TO16BE( bishjan_videoram_2_hi_word,    bishjan_videoram_2_hi_r );
+static WRITE8TO16BE    ( bishjan_videoram_2_hi_lo_word, bishjan_videoram_2_hi_lo_w );
 
 
 /***************************************************************************
@@ -163,15 +163,19 @@ static WRITE8_HANDLER( bishjan_scrollram_2_hi_lo_w )
 
 // 16-bit handlers for an 8-bit chip
 
-WRITE8TO16BE( bishjan_scroll_word, bishjan_scroll_w );
+static WRITE8TO16BE( bishjan_scroll_word, bishjan_scroll_w );
 
-READWRITE8TO16BE( bishjan_scrollram_1_lo_word,    bishjan_scrollram_1_lo_r, bishjan_scrollram_1_lo_w );
-READWRITE8TO16BE( bishjan_scrollram_1_hi_word,    bishjan_scrollram_1_hi_r, bishjan_scrollram_1_hi_w );
-WRITE8TO16BE    ( bishjan_scrollram_1_hi_lo_word, bishjan_scrollram_1_hi_lo_w );
+static READ8TO16BE( bishjan_scrollram_1_lo_word,    bishjan_scrollram_1_lo_r );
+static WRITE8TO16BE( bishjan_scrollram_1_lo_word,   bishjan_scrollram_1_lo_w );
+static READ8TO16BE( bishjan_scrollram_1_hi_word,    bishjan_scrollram_1_hi_r );
+static WRITE8TO16BE( bishjan_scrollram_1_hi_word,    bishjan_scrollram_1_hi_w );
+static WRITE8TO16BE    ( bishjan_scrollram_1_hi_lo_word, bishjan_scrollram_1_hi_lo_w );
 
-READWRITE8TO16BE( bishjan_scrollram_2_lo_word,    bishjan_scrollram_2_lo_r, bishjan_scrollram_2_lo_w );
-READWRITE8TO16BE( bishjan_scrollram_2_hi_word,    bishjan_scrollram_2_hi_r, bishjan_scrollram_2_hi_w );
-WRITE8TO16BE    ( bishjan_scrollram_2_hi_lo_word, bishjan_scrollram_2_hi_lo_w );
+static READ8TO16BE( bishjan_scrollram_2_lo_word,    bishjan_scrollram_2_lo_r );
+static WRITE8TO16BE( bishjan_scrollram_2_lo_word,    bishjan_scrollram_2_lo_w );
+static READ8TO16BE( bishjan_scrollram_2_hi_word,    bishjan_scrollram_2_hi_r );
+static WRITE8TO16BE( bishjan_scrollram_2_hi_word,    bishjan_scrollram_2_hi_w );
+static WRITE8TO16BE    ( bishjan_scrollram_2_hi_lo_word, bishjan_scrollram_2_hi_lo_w );
 
 
 /***************************************************************************
@@ -187,7 +191,7 @@ static WRITE8_HANDLER( bishjan_disable_w )
 
 // 16-bit handlers for an 8-bit chip
 
-WRITE8TO16BE_LSB( bishjan_disable_lsb, bishjan_disable_w );
+static WRITE8TO16BE_LSB( bishjan_disable_lsb, bishjan_disable_w );
 
 
 /***************************************************************************
@@ -298,7 +302,7 @@ static WRITE8_HANDLER(colordac_w)
 
 // 16-bit handlers for an 8-bit chip
 
-WRITE8TO16BE( colordac_word, colordac_w );
+static WRITE8TO16BE( colordac_word, colordac_w );
 
 
 /***************************************************************************
@@ -511,8 +515,8 @@ static ADDRESS_MAP_START( saklove_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( saklove_io, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x0020, 0x0020) AM_DEVREADWRITE( SOUND, "oki", okim6295_r, okim6295_w )
-	AM_RANGE(0x0040, 0x0041) AM_DEVWRITE( SOUND, "ym", ym3812_w )
+	AM_RANGE(0x0020, 0x0020) AM_DEVREADWRITE( "oki", okim6295_r, okim6295_w )
+	AM_RANGE(0x0040, 0x0041) AM_DEVWRITE( "ym", ym3812_w )
 
 	AM_RANGE(0x0060, 0x0062) AM_WRITE( colordac_w )
 
@@ -530,7 +534,7 @@ static ADDRESS_MAP_START( saklove_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0307, 0x0307) AM_READ ( saklove_dsw_r )
 	AM_RANGE(0x0308, 0x0308) AM_WRITE( saklove_dsw_mask_w )
 
-	AM_RANGE(0x0312, 0x0312) AM_READ( saklove_vblank_r ) AM_DEVWRITE( SOUND, "oki", saklove_oki_bank_w )
+	AM_RANGE(0x0312, 0x0312) AM_READ( saklove_vblank_r ) AM_DEVWRITE( "oki", saklove_oki_bank_w )
 
 	// Peripheral Control Block
 	AM_RANGE(0xff00, 0xffff) AM_READWRITE( am188em_regs_r, am188em_regs_w ) AM_BASE( &am188em_regs )

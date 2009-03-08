@@ -1056,7 +1056,7 @@ static READ8_HANDLER(pcw16_timer_interrupt_counter_r)
 
 static WRITE8_HANDLER(pcw16_system_control_w)
 {
-	const device_config *speaker = devtag_get_device(space->machine, SOUND, "beep");
+	const device_config *speaker = devtag_get_device(space->machine, "beep");
 	//logerror("0x0f8: function: %d\n",data);
 
 	/* lower 4 bits define function code */
@@ -1204,7 +1204,7 @@ static void	pcw16_fdc_interrupt(running_machine *machine, int state)
 
 static device_config * pcw16_get_device(running_machine *machine )
 {
-	return (device_config*)devtag_get_device(machine, NEC765A, "nec765");
+	return (device_config*)devtag_get_device(machine, "nec765");
 }
 
 static const struct pc_fdc_interface pcw16_fdc_interface=
@@ -1287,9 +1287,9 @@ static ADDRESS_MAP_START(pcw16_io, ADDRESS_SPACE_IO, 8)
     AM_RANGE(0x01c, 0x01c) AM_READ(pcw16_superio_fdc_main_status_register_r)
 	AM_RANGE(0x01d, 0x01d) AM_READWRITE(pcw16_superio_fdc_data_r, pcw16_superio_fdc_data_w)
 	AM_RANGE(0x01f, 0x01f) AM_READWRITE(pcw16_superio_fdc_digital_input_register_r, pcw16_superio_fdc_datarate_w)
-	AM_RANGE(0x020, 0x027) AM_DEVREADWRITE(NS16550, "ns16550_1", ins8250_r, ins8250_w)
-	AM_RANGE(0x028, 0x02f) AM_DEVREADWRITE(NS16550, "ns16550_2", ins8250_r, ins8250_w)
-	AM_RANGE(0x038, 0x03a) AM_DEVREADWRITE(PC_LPT, "lpt", pc_lpt_r, pc_lpt_w)
+	AM_RANGE(0x020, 0x027) AM_DEVREADWRITE("ns16550_1", ins8250_r, ins8250_w)
+	AM_RANGE(0x028, 0x02f) AM_DEVREADWRITE("ns16550_2", ins8250_r, ins8250_w)
+	AM_RANGE(0x038, 0x03a) AM_DEVREADWRITE("lpt", pc_lpt_r, pc_lpt_w)
 	/* anne asic */
 	AM_RANGE(0x0e0, 0x0ef) AM_WRITE(pcw16_palette_w)
 	AM_RANGE(0x0f0, 0x0f3) AM_READWRITE(pcw16_bankhw_r, pcw16_bankhw_w)
@@ -1334,7 +1334,7 @@ static void pcw16_reset(running_machine *machine)
 
 static MACHINE_RESET( pcw16 )
 {
-	const device_config *speaker = devtag_get_device(machine, SOUND, "beep");
+	const device_config *speaker = devtag_get_device(machine, "beep");
 	pcw16_system_status = 0;
 	pcw16_interrupt_counter = 0;
 
@@ -1350,7 +1350,7 @@ static MACHINE_RESET( pcw16 )
 
 	/* initialise mouse */
 	pc_mouse_initialise(machine);
-	pc_mouse_set_serial_port( devtag_get_device(machine, NS16550, "ns16550_0") );
+	pc_mouse_set_serial_port( devtag_get_device(machine, "ns16550_0") );
 
 	/* initialise keyboard */
 	at_keyboard_init(machine, AT_KEYBOARD_TYPE_AT);

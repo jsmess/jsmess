@@ -780,8 +780,8 @@ static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2E00, 0x2E00) AM_READ(irqlatch_r)  // irq latch
 
 	AM_RANGE(0x3001, 0x3001) AM_READ(soundlatch_r)
-	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE(SOUND, "ay", ay8910_data_w)
-	AM_RANGE(0x3101, 0x3201) AM_DEVWRITE(SOUND, "ay", ay8910_address_w)
+	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE("ay", ay8910_data_w)
+	AM_RANGE(0x3101, 0x3201) AM_DEVWRITE("ay", ay8910_address_w)
 
 	AM_RANGE(0x3406, 0x3406) AM_READWRITE(aciastat_r,aciactrl_w)  // MC6850 status register
 	AM_RANGE(0x3407, 0x3407) AM_READWRITE(aciadata_r,aciadata_w)  // MC6850 data register
@@ -825,8 +825,8 @@ static ADDRESS_MAP_START( memmap_adder2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2E00, 0x2E00) AM_READ(irqlatch_r)  // irq latch
 
 	AM_RANGE(0x3001, 0x3001) AM_READ(soundlatch_r)
-	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE(SOUND, "ay", ay8910_data_w)
-	AM_RANGE(0x3101, 0x3201) AM_DEVWRITE(SOUND, "ay", ay8910_address_w)
+	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE("ay", ay8910_data_w)
+	AM_RANGE(0x3101, 0x3201) AM_DEVWRITE("ay", ay8910_address_w)
 
 	AM_RANGE(0x3406, 0x3406) AM_READWRITE(aciastat_r,aciactrl_w)  // MC6850 status register
 	AM_RANGE(0x3407, 0x3407) AM_READWRITE(aciadata_r,aciadata_w)  // MC6850 data register
@@ -874,8 +874,8 @@ static ADDRESS_MAP_START( sc1_nec_uk, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2E00, 0x2E00) AM_READ(irqlatch_r)	  // irq latch
 
 	AM_RANGE(0x3001, 0x3001) AM_READ(soundlatch_r)
-	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE(SOUND, "ay", ay8910_data_w)
-	AM_RANGE(0x3101, 0x3201) AM_DEVWRITE(SOUND, "ay", ay8910_address_w)
+	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE("ay", ay8910_data_w)
+	AM_RANGE(0x3101, 0x3201) AM_DEVWRITE("ay", ay8910_address_w)
 
 	AM_RANGE(0x3406, 0x3406) AM_READWRITE(aciastat_r,aciactrl_w)  // MC6850 status register
 	AM_RANGE(0x3407, 0x3407) AM_READWRITE(aciadata_r,aciadata_w)  // MC6850 data register
@@ -886,8 +886,8 @@ static ADDRESS_MAP_START( sc1_nec_uk, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0x3600, 0x3600) AM_WRITE(bankswitch_w) // write bank
 
-	AM_RANGE(0x3801, 0x3801) AM_DEVREAD(SOUND, "upd", nec_r)
-	AM_RANGE(0x3800, 0x39FF) AM_DEVWRITE(SOUND, "upd", nec_latch_w)
+	AM_RANGE(0x3801, 0x3801) AM_DEVREAD("upd", nec_r)
+	AM_RANGE(0x3800, 0x39FF) AM_DEVWRITE("upd", nec_latch_w)
 
 	AM_RANGE(0x4000, 0x5FFF) AM_ROM							// 8k  ROM
 	AM_RANGE(0x6000, 0x7FFF) AM_READ(SMH_BANK1)				// 8k  paged ROM (4 pages)
@@ -1012,7 +1012,7 @@ INPUT_PORTS_END
 
 // input ports for scorpion1 board ////////////////////////////////////////
 
-INPUT_PORTS_START( clatt )
+static INPUT_PORTS_START( clatt )
 	PORT_START("STROBE0")
     PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(3) PORT_NAME("10p")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(3) PORT_NAME("20p")
@@ -1124,7 +1124,7 @@ INPUT_PORTS_START( clatt )
 
 INPUT_PORTS_END
 
-INPUT_PORTS_START( toppoker )
+static INPUT_PORTS_START( toppoker )
 	PORT_START("STROBE0")
     PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(3) PORT_NAME("Fl 5.00")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(3) PORT_NAME("Fl 2.50")
@@ -1359,7 +1359,7 @@ static void sc1_common_init(running_machine *machine, int reels, int decrypt)
 	}
 }
 
-DRIVER_INIT(toppoker)
+static DRIVER_INIT(toppoker)
 {
 	sc1_common_init(machine,3,1);
 	adder2_decode_char_roms(machine);	// decode GFX roms
@@ -1368,7 +1368,7 @@ DRIVER_INIT(toppoker)
 	BFM_BD1_init(0);
 }
 
-DRIVER_INIT(lotse)
+static DRIVER_INIT(lotse)
 {
 	sc1_common_init(machine,6,1);
 	Mechmtr_init(8);
@@ -1379,7 +1379,7 @@ DRIVER_INIT(lotse)
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-DRIVER_INIT(rou029)
+static DRIVER_INIT(rou029)
 {
 	sc1_common_init(machine,6,0);
 	Mechmtr_init(8);
@@ -1389,7 +1389,7 @@ DRIVER_INIT(rou029)
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-DRIVER_INIT(clatt)
+static DRIVER_INIT(clatt)
 {
 	sc1_common_init(machine,6,1);
 	Mechmtr_init(8);

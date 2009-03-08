@@ -458,7 +458,7 @@ static WRITE8_HANDLER( px4_artmr_w )
 /* io status register */
 static READ8_HANDLER( px4_iostr_r )
 {
-	const device_config *printer = devtag_get_device(space->machine, CENTRONICS, "centronics");
+	const device_config *printer = devtag_get_device(space->machine, "centronics");
 	int result = 0;
 
 	logerror("%s: px4_iostr_r\n", cpuexec_describe_context(space->machine));
@@ -488,7 +488,7 @@ static WRITE8_HANDLER( px4_swr_w )
 /* io control register */
 static WRITE8_HANDLER( px4_ioctlr_w )
 {
-	const device_config *printer = devtag_get_device(space->machine, CENTRONICS, "centronics");
+	const device_config *printer = devtag_get_device(space->machine, "centronics");
 
 	logerror("%s: px4_ioctlr_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
 
@@ -656,7 +656,7 @@ static ADDRESS_MAP_START( px4_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x14, 0x14) AM_READWRITE(px4_artdir_r, px4_artdor_w)
 	AM_RANGE(0x15, 0x15) AM_READWRITE(px4_artsr_r, px4_artmr_w)
 	AM_RANGE(0x16, 0x16) AM_READWRITE(px4_iostr_r, px4_artcr_w)
-	AM_RANGE(0x17, 0x17) AM_DEVWRITE(CENTRONICS, "centronics", centronics_data_w)
+	AM_RANGE(0x17, 0x17) AM_DEVWRITE("centronics", centronics_data_w)
 	AM_RANGE(0x18, 0x18) AM_WRITE(px4_swr_w)
 	AM_RANGE(0x19, 0x19) AM_WRITE(px4_ioctlr_w)
 	AM_RANGE(0x1a, 0x1f) AM_NOP

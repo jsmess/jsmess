@@ -21,7 +21,7 @@
 	MDRV_DEVICE_CONFIG(_intrf)
 
 #define MDRV_TC8521_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag, TC8521)
+	MDRV_DEVICE_REMOVE(_tag)
 
 
 

@@ -155,13 +155,16 @@ void SCSPDSP_Step(struct _SCSPDSP *DSP)
 		}
 #endif
 		//INPUTS RW
-		assert(IRA<0x32);
+// colmns97 hits this
+//      assert(IRA<0x32);
 		if(IRA<=0x1f)
 			INPUTS=DSP->MEMS[IRA];
 		else if(IRA<=0x2F)
 			INPUTS=DSP->MIXS[IRA-0x20]<<4;	//MIXS is 20 bit
 		else if(IRA<=0x31)
 			INPUTS=0;
+		else
+			return;
 
 		INPUTS<<=8;
 		INPUTS>>=8;

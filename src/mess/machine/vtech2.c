@@ -198,7 +198,7 @@ WRITE8_HANDLER( laser_bank_select_w )
 
 static const device_config *vtech2_cassette_image(running_machine *machine)
 {
-	return devtag_get_device(machine, CASSETTE, "cassette");
+	return devtag_get_device(machine, "cassette");
 }
 
 /*************************************************
@@ -303,7 +303,7 @@ static int mra_bank(running_machine *machine, int bank, int offs)
  ************************************************/
 static void mwa_bank(running_machine *machine, int bank, int offs, int data)
 {
-	const device_config *speaker = devtag_get_device(machine, SOUND, "speaker");
+	const device_config *speaker = devtag_get_device(machine, "speaker");
 	offs += 0x4000 * laser_bank[bank];
     switch (laser_bank[bank])
     {

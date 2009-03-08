@@ -68,7 +68,7 @@ READ_LINE_DEVICE_HANDLER( centronics_fault_r );
 	MDRV_DEVICE_CONFIG(_intf)
 
 #define MDRV_CENTRONICS_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag, CENTRONICS)
+	MDRV_DEVICE_REMOVE(_tag)
 
 
 /***************************************************************************

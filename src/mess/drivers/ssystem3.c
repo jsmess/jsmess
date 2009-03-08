@@ -216,7 +216,7 @@ static READ8_DEVICE_HANDLER(ssystem3_via_read_b)
 
 static WRITE8_DEVICE_HANDLER(ssystem3_via_write_b)
 {
-	const device_config *via_0 = devtag_get_device(device->machine, VIA6522, "via6522_0");
+	const device_config *via_0 = devtag_get_device(device->machine, "via6522_0");
 	UINT8 d;
 
 	ssystem3_playfield_write(device->machine, data&1, data&8);
@@ -259,7 +259,7 @@ static ADDRESS_MAP_START( ssystem3_map , ADDRESS_SPACE_PROGRAM, 8)
   probably zusatzgerät memory (battery powered ram 256x4? at 0x4000)
   $40ff low nibble ram if playfield module (else init with normal playfield)
  */
-	AM_RANGE( 0x6000, 0x600f) AM_DEVREADWRITE(VIA6522, "via6522_0", via_r, via_w)
+	AM_RANGE( 0x6000, 0x600f) AM_DEVREADWRITE("via6522_0", via_r, via_w)
 #if 1
 	AM_RANGE( 0xc000, 0xdfff) AM_ROM
 	AM_RANGE( 0xf000, 0xffff) AM_ROM

@@ -93,7 +93,7 @@ Notes:
 
 static const device_config *cassette_device_image(running_machine *machine)
 {
-	return devtag_get_device(machine, CASSETTE, "cassette");
+	return devtag_get_device(machine, "cassette");
 }
 
 /* Read/Write Handlers */
@@ -114,7 +114,7 @@ static WRITE8_HANDLER( abc80_sound_w )
 		7  ENVSEL1  10 Monovippa, 11 VCO alt.pol.
 
 	*/
-	const device_config *sn76477 = devtag_get_device(space->machine, SOUND, "sn76477");
+	const device_config *sn76477 = devtag_get_device(space->machine, "sn76477");
 
 	sn76477_enable_w(sn76477, ~data & 0x01);
 
@@ -251,7 +251,7 @@ static ADDRESS_MAP_START( abc80_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x01, 0x01) AM_WRITE(abcbus_channel_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE(abc80_sound_w)
 	AM_RANGE(0x07, 0x07) AM_READ(abcbus_reset_r)
-	AM_RANGE(0x10, 0x13) AM_MIRROR(0x04) AM_DEVREADWRITE(Z80PIO, Z80PIO_TAG, z80pio_alt_r, z80pio_alt_w)
+	AM_RANGE(0x10, 0x13) AM_MIRROR(0x04) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_alt_r, z80pio_alt_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -468,7 +468,7 @@ static const z80pio_interface abc80_pio_intf =
 
 static const z80_daisy_chain abc80_daisy_chain[] =
 {
-	{ Z80PIO, Z80PIO_TAG },
+	{ Z80PIO_TAG },
 	{ NULL }
 };
 
@@ -504,7 +504,7 @@ static MACHINE_START( abc80 )
 
 	/* find devices */
 
-	state->z80pio = devtag_get_device(machine, Z80PIO, Z80PIO_TAG);
+	state->z80pio = devtag_get_device(machine, Z80PIO_TAG);
 
 	/* initialize the ABC BUS */
 

@@ -9,7 +9,7 @@ How to calibrate the guns:
   - after you've shot the target press 9 again to move onto the next one
   - once you get back to the start again press f2 to exit.
 
-How to calibrate the steering in DirtFox:
+How to calibrate the steering in Dirt Fox and Final Lap 2/3:
   - hold 9, press f2
   - verify that controls are set to zero then press f2 to exit.
 
@@ -29,7 +29,6 @@ known issues:
     - sprite size bit is bogus during splash screen
 
     Final Lap 3:
-    - bad steering
     - uses unaligned 32x32 sprites, which aren't handled correctly in video/namcos2.c yet
 
     Four Trax
@@ -456,6 +455,8 @@ $a00000 checks have been seen on the Final Lap boards.
 #include "sound/2151intf.h"
 #include "sound/c140.h"
 
+#include "finallap.lh"
+
 
 /*************************************************************/
 /* 68000/6809/63705 Shared memory area - DUAL PORT Memory    */
@@ -710,8 +711,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(BANKED_SOUND_ROM_R) /* banked */
-	AM_RANGE(0x4000, 0x4001) AM_DEVREAD(SOUND, "ym", ym2151_r)
-	AM_RANGE(0x5000, 0x6fff) AM_DEVREAD(SOUND, "c140", c140_r)
+	AM_RANGE(0x4000, 0x4001) AM_DEVREAD("ym", ym2151_r)
+	AM_RANGE(0x5000, 0x6fff) AM_DEVREAD("c140", c140_r)
 	AM_RANGE(0x7000, 0x77ff) AM_READ(namcos2_dpram_byte_r)
 	AM_RANGE(0x7800, 0x7fff) AM_READ(namcos2_dpram_byte_r) /* mirror */
 	AM_RANGE(0x8000, 0x9fff) AM_READ(SMH_RAM)
@@ -720,8 +721,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE(SOUND, "ym", ym2151_w)
-	AM_RANGE(0x5000, 0x6fff) AM_DEVWRITE(SOUND, "c140", c140_w)
+	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("ym", ym2151_w)
+	AM_RANGE(0x5000, 0x6fff) AM_DEVWRITE("c140", c140_w)
 	AM_RANGE(0x7000, 0x77ff) AM_WRITE(namcos2_dpram_byte_w) AM_BASE(&namcos2_dpram)
 	AM_RANGE(0x7800, 0x7fff) AM_WRITE(namcos2_dpram_byte_w)	/* mirror */
 	AM_RANGE(0x8000, 0x9fff) AM_WRITE(SMH_RAM)
@@ -1070,11 +1071,10 @@ static INPUT_PORTS_START( finalap3 )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_START("AN5")		/* Steering Wheel */		/* sensitivity, delta, min, max */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1)
-
 	PORT_START("AN6")		/* Brake Pedal */
-	PORT_BIT( 0xff, 0xff, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_PLAYER(2)
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_PLAYER(2)
 	PORT_START("AN7")		/* Accelerator Pedal */
-	PORT_BIT( 0xff, 0xff, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(15) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(15) PORT_PLAYER(1)
 
 	PORT_START("MCUH")		/* 63B05Z0 - PORT H */
 	PORT_DIPNAME( 0x01, 0x01, "PortH 0x01")
@@ -1146,7 +1146,6 @@ static INPUT_PORTS_START( fourtrax )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
-	/* Tags and additional input ports AN5 & AN6 are needed for the port handler */
 	PORT_START("AN0")		/* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 0 2 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_START("AN1")		/* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 1 3 */
@@ -1157,16 +1156,12 @@ static INPUT_PORTS_START( fourtrax )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_START("AN4")		/* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 4 6 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_START("AN5")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_START("AN6")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_START("AN7")		/* Steering Wheel 7 */		/* sensitivity, delta, min, max */
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(75) PORT_KEYDELTA(100) PORT_PLAYER(1)
-	PORT_START("AN8")		/* Brake Pedal 8 */
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x7f) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_PLAYER(2)
-	PORT_START("AN9")		/* Accelerator Pedal 9 */
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x7f) PORT_SENSITIVITY(100) PORT_KEYDELTA(15) PORT_PLAYER(1)
+	PORT_START("AN5")		/* Steering Wheel 7 */		/* sensitivity, delta, min, max */
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(75) PORT_KEYDELTA(50) PORT_PLAYER(1)
+	PORT_START("AN6")		/* Brake Pedal 8 */
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_PLAYER(2)
+	PORT_START("AN7")		/* Accelerator Pedal 9 */
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(15) PORT_PLAYER(1)
 
 	PORT_START("MCUH")		/* 63B05Z0 - PORT H */
 	PORT_DIPNAME( 0x01, 0x01, "PortH 0x01")
@@ -4871,11 +4866,11 @@ static DRIVER_INIT( luckywld ){
 /* and metal hawk have the B version and dragon saber has the C version       */
 
 /*    YEAR, NAME,     PARENT,   MACHINE,  INPUT,    INIT,     MONITOR, COMPANY, FULLNAME */
-GAME( 1987, finallap, 0,        finallap, finallap, finallap, ROT0,   "Namco", "Final Lap (Rev E)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1987, finalapd, finallap, finallap, finallap, finallap, ROT0,   "Namco", "Final Lap (Rev D)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1987, finalapc, finallap, finallap, finallap, finallap, ROT0,   "Namco", "Final Lap (Rev C)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1987, finlapjc, finallap, finallap, finallap, finallap, ROT0,   "Namco", "Final Lap (Japan - Rev C)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1987, finlapjb, finallap, finallap, finallap, finallap, ROT0,   "Namco", "Final Lap (Japan - Rev B)", GAME_IMPERFECT_GRAPHICS )
+GAMEL(1987, finallap, 0,        finallap, finallap, finallap, ROT0,   "Namco", "Final Lap (Rev E)", GAME_IMPERFECT_GRAPHICS, layout_finallap )
+GAMEL(1987, finalapd, finallap, finallap, finallap, finallap, ROT0,   "Namco", "Final Lap (Rev D)", GAME_IMPERFECT_GRAPHICS, layout_finallap )
+GAMEL(1987, finalapc, finallap, finallap, finallap, finallap, ROT0,   "Namco", "Final Lap (Rev C)", GAME_IMPERFECT_GRAPHICS, layout_finallap )
+GAMEL(1987, finlapjc, finallap, finallap, finallap, finallap, ROT0,   "Namco", "Final Lap (Japan - Rev C)", GAME_IMPERFECT_GRAPHICS, layout_finallap )
+GAMEL(1987, finlapjb, finallap, finallap, finallap, finallap, ROT0,   "Namco", "Final Lap (Japan - Rev B)", GAME_IMPERFECT_GRAPHICS, layout_finallap )
 GAME( 1988, assault,  0,        default2, assault,  assault , ROT90,  "Namco", "Assault" , 0)		/* adjusted */
 GAME( 1988, assaultj, assault,  default2, assault,  assaultj, ROT90,  "Namco", "Assault (Japan)" , 0)	/* adjusted */
 GAME( 1988, assaultp, assault,  default2, assault,  assaultp, ROT90,  "Namco", "Assault Plus (Japan)" , 0)	/* adjusted */
@@ -4897,8 +4892,8 @@ GAME( 1990, kyukaidk, 0,        default,  kyukaidk, kyukaidk, ROT0,   "Namco", "
 GAME( 1990, kyukaido, kyukaidk, default,  kyukaidk, kyukaidk, ROT0,   "Namco", "Kyuukai Douchuuki (Japan old version)", 0 )
 GAME( 1990, dsaber,   0,        default3, default,  dsaber,   ROT90,  "Namco", "Dragon Saber", 0 )
 GAME( 1990, dsaberj,  dsaber,   default3, default,  dsaberj,  ROT90,  "Namco", "Dragon Saber (Japan)", 0 )
-GAME( 1990, finalap2, 0,        finallap, finallap, finalap2, ROT0,   "Namco", "Final Lap 2", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS  )
-GAME( 1990, finalp2j, finalap2, finallap, finallap, finalap2, ROT0,   "Namco", "Final Lap 2 (Japan)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS  )
+GAMEL(1990, finalap2, 0,        finallap, finallap, finalap2, ROT0,   "Namco", "Final Lap 2", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS, layout_finallap  )
+GAMEL(1990, finalp2j, finalap2, finallap, finallap, finalap2, ROT0,   "Namco", "Final Lap 2 (Japan)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS, layout_finallap  )
 GAME( 1990, gollygho, 0,        gollygho, gollygho, gollygho, ROT180, "Namco", "Golly! Ghost!", 0 )
 GAME( 1990, rthun2,   0,        default3, default,  rthun2,   ROT0,   "Namco", "Rolling Thunder 2", 0 )
 GAME( 1990, rthun2j,  rthun2,   default3, default,  rthun2j,  ROT0,   "Namco", "Rolling Thunder 2 (Japan)", 0 )
@@ -4909,8 +4904,8 @@ GAME( 1991, sgunnr2j, sgunner2, sgunner,  sgunner,  sgunner2, ROT0,   "Namco", "
 GAME( 1991, cosmogng, 0,        default,  default,  cosmogng, ROT90,  "Namco", "Cosmo Gang the Video (US)", 0 )
 GAME( 1991, cosmognj, cosmogng, default,  default,  cosmogng, ROT90,  "Namco", "Cosmo Gang the Video (Japan)", 0 )
 GAME( 1992, bubbletr, 0,        gollygho, bubbletr, bubbletr, ROT180, "Namco", "Bubble Trouble",GAME_NOT_WORKING ) // incomplete dump
-GAME( 1992, finalap3, 0,        finallap, finalap3, finalap3, ROT0,   "Namco", "Final Lap 3 (World)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS  )
-GAME( 1992, finalp3j, finalap3, finallap, finalap3, finalap3, ROT0,   "Namco", "Final Lap 3 (Japan)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS  )
+GAMEL(1992, finalap3, 0,        finallap, finalap3, finalap3, ROT0,   "Namco", "Final Lap 3 (World)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS, layout_finallap  )
+GAMEL(1992, finalp3j, finalap3, finallap, finalap3, finalap3, ROT0,   "Namco", "Final Lap 3 (Japan)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS, layout_finallap  )
 GAME( 1992, luckywld, 0,        luckywld, luckywld, luckywld, ROT0,   "Namco", "Lucky & Wild", 0 )
 GAME( 1992, lckywldj, luckywld, luckywld, luckywld, luckywld, ROT0,   "Namco", "Lucky & Wild (Japan)", 0 )
 GAME( 1992, suzuka8h, 0,        luckywld, suzuka,   suzuka8h, ROT0,   "Namco", "Suzuka 8 Hours (World)", GAME_IMPERFECT_GRAPHICS )

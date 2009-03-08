@@ -74,10 +74,10 @@ void *cartslot_get_socket(const device_config *device, const char *socket_name);
 	MDRV_DEVICE_ADD(_tag, CARTSLOT, 0)									\
 
 #define MDRV_CARTSLOT_REMOVE(_tag)										\
-	MDRV_DEVICE_REMOVE(_tag, CARTSLOT)
+	MDRV_DEVICE_REMOVE(_tag)
 
 #define MDRV_CARTSLOT_MODIFY(_tag)										\
-	MDRV_DEVICE_MODIFY(_tag, CARTSLOT)									\
+	MDRV_DEVICE_MODIFY(_tag)									\
 
 #define MDRV_CARTSLOT_EXTENSION_LIST(_extensions)						\
 	MDRV_DEVICE_CONFIG_DATAPTR(cartslot_config, extensions, _extensions)

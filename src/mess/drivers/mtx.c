@@ -56,15 +56,15 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mtx_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREAD(CENTRONICS, "centronics", mtx_strobe_r) AM_WRITE(mtx_bankswitch_w)
+	AM_RANGE(0x00, 0x00) AM_DEVREAD("centronics", mtx_strobe_r) AM_WRITE(mtx_bankswitch_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(TMS9928A_vram_r, TMS9928A_vram_w)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(TMS9928A_register_r, TMS9928A_register_w)
 	AM_RANGE(0x03, 0x03) AM_READWRITE(mtx_cst_r, mtx_cst_w)
-	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE(CENTRONICS, "centronics", mtx_prt_r, centronics_data_w)
+	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE("centronics", mtx_prt_r, centronics_data_w)
 	AM_RANGE(0x05, 0x05) AM_READWRITE(mtx_key_lo_r, mtx_sense_w)
 	AM_RANGE(0x06, 0x06) AM_READ(mtx_key_hi_r)
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE(SOUND, "sn76489a", sn76496_w)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE(Z80CTC, "z80ctc", z80ctc_r, z80ctc_w)
+	AM_RANGE(0x06, 0x06) AM_DEVWRITE("sn76489a", sn76496_w)
+	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("z80ctc", z80ctc_r, z80ctc_w)
 ADDRESS_MAP_END
 
 
@@ -216,13 +216,13 @@ INPUT_PORTS_END
 
 static const z80_daisy_chain mtx_daisy_chain[] =
 {
-	{ Z80CTC, "z80ctc" },
+	{ "z80ctc" },
 	{ NULL }
 };
 
 static TIMER_DEVICE_CALLBACK( ctc_c0_tick )
 {
-	const device_config *z80ctc = devtag_get_device(timer->machine, Z80CTC, "z80ctc");
+	const device_config *z80ctc = devtag_get_device(timer->machine, "z80ctc");
 
 	z80ctc_trg_w(z80ctc, 0, 1);
 	z80ctc_trg_w(z80ctc, 0, 0);
@@ -230,7 +230,7 @@ static TIMER_DEVICE_CALLBACK( ctc_c0_tick )
 
 static TIMER_DEVICE_CALLBACK( ctc_c1_c2_tick )
 {
-	const device_config *z80ctc = devtag_get_device(timer->machine, Z80CTC, "z80ctc");
+	const device_config *z80ctc = devtag_get_device(timer->machine, "z80ctc");
 
 	z80ctc_trg_w(z80ctc, 1, 1);
 	z80ctc_trg_w(z80ctc, 1, 0);

@@ -39,7 +39,7 @@ static int	timer_state = 0;
 
 static const device_config *cassette_device_image(running_machine *machine)
 {
-	return devtag_get_device(machine, CASSETTE, "cassette");
+	return devtag_get_device(machine, "cassette");
 }
 
 
@@ -62,18 +62,18 @@ static WRITE8_DEVICE_HANDLER( atom_printer_data )
 
 const via6522_interface atom_6522_interface =
 {
-	DEVCB_DEVICE_HANDLER(CENTRONICS, "centronics", atom_printer_busy),
+	DEVCB_DEVICE_HANDLER("centronics", atom_printer_busy),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER(CENTRONICS, "centronics", atom_printer_data),
+	DEVCB_DEVICE_HANDLER("centronics", atom_printer_data),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	/* the CA2 output is connected to the STROBE signal on the centronics */
-	DEVCB_DEVICE_LINE(CENTRONICS, "centronics", centronics_strobe_w),
+	DEVCB_DEVICE_LINE("centronics", centronics_strobe_w),
 	DEVCB_NULL,
 	DEVCB_CPU_INPUT_LINE("maincpu", 0)
 };
@@ -87,7 +87,7 @@ const ppi8255_interface atom_8255_int =
 	DEVCB_HANDLER(atom_8255_portc_r),
 	DEVCB_HANDLER(atom_8255_porta_w),
 	DEVCB_HANDLER(atom_8255_portb_w),
-	DEVCB_DEVICE_HANDLER(SOUND, "speaker", atom_8255_portc_w),
+	DEVCB_DEVICE_HANDLER("speaker", atom_8255_portc_w),
 };
 
 static int previous_i8271_int_state = 0;

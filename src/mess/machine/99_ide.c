@@ -213,7 +213,7 @@ static void ide_cru_w(running_machine *machine, int offset, int data)
 
 		if ((offset == 6) || (offset == 7))
 			if ((cru_register & cru_reg_int_en) && !(cru_register & cru_reg_reset))
-				devtag_reset(machine, IDE_CONTROLLER, "ide");
+				devtag_reset(machine, "ide");
 		break;
 	}
 }
@@ -249,7 +249,7 @@ static READ8_HANDLER(ide_mem_r)
 		case 2:		/* IDE registers set 1 (CS1Fx) */
 			if (tms9995_mode ? (!(offset & 1)) : (offset & 1))
 			{	/* first read triggers 16-bit read cycle */
-				const device_config *ide_device = devtag_get_device(space->machine, IDE_CONTROLLER, "ide");
+				const device_config *ide_device = devtag_get_device(space->machine, "ide");
 				input_latch = (! (offset & 0x10)) ? ide_bus_r(ide_device, 0, (offset >> 1) & 0x7) : 0;
 			}
 
@@ -261,7 +261,7 @@ static READ8_HANDLER(ide_mem_r)
 		case 3:		/* IDE registers set 2 (CS3Fx) */
 			if (tms9995_mode ? (!(offset & 1)) : (offset & 1))
 			{	/* first read triggers 16-bit read cycle */
-				const device_config *ide_device = devtag_get_device(space->machine, IDE_CONTROLLER, "ide");
+				const device_config *ide_device = devtag_get_device(space->machine, "ide");
 				input_latch = (! (offset & 0x10)) ? ide_bus_r(ide_device, 1, (offset >> 1) & 0x7) : 0;
 			}
 
@@ -327,7 +327,7 @@ static WRITE8_HANDLER(ide_mem_w)
 
 			if (tms9995_mode ? (offset & 1) : (!(offset & 1)))
 			{	/* second write triggers 16-bit write cycle */
-				const device_config *ide_device = devtag_get_device(space->machine, IDE_CONTROLLER, "ide");
+				const device_config *ide_device = devtag_get_device(space->machine, "ide");
 				ide_bus_w(ide_device, 0, (offset >> 1) & 0x7, output_latch);
 			}
 			break;
@@ -345,7 +345,7 @@ static WRITE8_HANDLER(ide_mem_w)
 
 			if (tms9995_mode ? (offset & 1) : (!(offset & 1)))
 			{	/* second write triggers 16-bit write cycle */
-				const device_config *ide_device = devtag_get_device(space->machine, IDE_CONTROLLER, "ide");
+				const device_config *ide_device = devtag_get_device(space->machine, "ide");
 				ide_bus_w(ide_device, 1, (offset >> 1) & 0x7, output_latch);
 			}
 			break;

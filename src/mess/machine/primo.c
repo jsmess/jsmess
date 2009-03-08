@@ -93,7 +93,7 @@ READ8_HANDLER( primo_be_1_r )
 	// bit 3 - I3 (external bus)
 
 	// bit 2 - cassette
-	data |= (cassette_input(devtag_get_device(space->machine, CASSETTE, "cassette")) < 0.1) ? 0x04 : 0x00;
+	data |= (cassette_input(devtag_get_device(space->machine, "cassette")) < 0.1) ? 0x04 : 0x00;
 
 	// bit 1 - reset button
 	data |= (input_port_read(space->machine, "RESET")) ? 0x02 : 0x00;
@@ -135,7 +135,7 @@ READ8_HANDLER( primo_be_2_r )
 
 WRITE8_HANDLER( primo_ki_1_w )
 {
-	const device_config *speaker = devtag_get_device(space->machine, SOUND, "speaker");
+	const device_config *speaker = devtag_get_device(space->machine, "speaker");
 	// bit 7 - NMI generator enable/disable
 	primo_nmi = (data & 0x80) ? 1 : 0;
 
@@ -158,14 +158,14 @@ WRITE8_HANDLER( primo_ki_1_w )
 	switch (data & 0x03)
 	{
 		case 0:
-			cassette_output(devtag_get_device(space->machine, CASSETTE, "cassette"), -1.0);
+			cassette_output(devtag_get_device(space->machine, "cassette"), -1.0);
 			break;
 		case 1:
 		case 2:
-			cassette_output(devtag_get_device(space->machine, CASSETTE, "cassette"), 0.0);
+			cassette_output(devtag_get_device(space->machine, "cassette"), 0.0);
 			break;
 		case 3:
-			cassette_output(devtag_get_device(space->machine, CASSETTE, "cassette"), 1.0);
+			cassette_output(devtag_get_device(space->machine, "cassette"), 1.0);
 			break;
 	}
 }
@@ -274,7 +274,7 @@ MACHINE_RESET( primob )
 static void primo_setup_pss (running_machine *machine, UINT8* snapshot_data, UINT32 snapshot_size)
 {
 	int i;
-	const device_config *speaker = devtag_get_device(machine, SOUND, "speaker");
+	const device_config *speaker = devtag_get_device(machine, "speaker");
 
 	/* Z80 registers */
 

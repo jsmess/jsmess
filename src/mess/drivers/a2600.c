@@ -810,14 +810,14 @@ static READ8_HANDLER(modeSS_r)
 
 		/* Check if we should stop the tape */
 		if ( cpu_get_pc(space->machine->cpu[0]) == 0x00FD ) {
-			const device_config *img = devtag_get_device(space->machine, CASSETTE, "cassette");
+			const device_config *img = devtag_get_device(space->machine, "cassette");
 			if ( img ) {
 				cassette_change_state(img, CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 			}
 		}
 	} else if ( offset == 0xFF9 ) {
 		/* Cassette port read */
-		double tap_val = cassette_input( devtag_get_device(space->machine, CASSETTE, "cassette") );
+		double tap_val = cassette_input( devtag_get_device(space->machine, "cassette") );
 		//logerror("%04X: Cassette port read, tap_val = %f\n", cpu_get_pc(machine->cpu[0]), tap_val);
 		if ( tap_val < 0 ) {
 			data = 0x00;
@@ -1083,7 +1083,7 @@ static ADDRESS_MAP_START(a2600_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x007F) AM_MIRROR(0x0F00) AM_READWRITE(tia_r, tia_w)
 	AM_RANGE(0x0080, 0x00FF) AM_MIRROR(0x0D00) AM_RAM AM_BASE(&riot_ram)
-	AM_RANGE(0x0280, 0x029F) AM_MIRROR(0x0D00) AM_DEVREADWRITE(RIOT6532, "riot", riot6532_r, riot6532_w)
+	AM_RANGE(0x0280, 0x029F) AM_MIRROR(0x0D00) AM_DEVREADWRITE("riot", riot6532_r, riot6532_w)
 	AM_RANGE(0x1000, 0x1FFF)                   AM_ROMBANK(1)
 ADDRESS_MAP_END
 
@@ -1102,7 +1102,7 @@ static void switch_A_w(const device_config *device, UINT8 olddata, UINT8 data)
 		keypad_right_column = data & 0x0F;
 		break;
 	case 0x0a:	/* KidVid voice module */
-		cassette_change_state( devtag_get_device(machine, CASSETTE, "cassette"), ( data & 0x02 ) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED | CASSETTE_PLAY, CASSETTE_MOTOR_DISABLED );
+		cassette_change_state( devtag_get_device(machine, "cassette"), ( data & 0x02 ) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED | CASSETTE_PLAY, CASSETTE_MOTOR_DISABLED );
 		break;
 	}
 }
@@ -1168,7 +1168,7 @@ static void irq_callback(const device_config *device, int state)
 
 static UINT8 riot_input_port_8_r(const device_config *device, UINT8 olddata)
 {
-	return input_port_8_r(cpu_get_address_space(device->machine->cpu[0],ADDRESS_SPACE_PROGRAM), 0);
+	return input_port_read(device->machine, "SWB");
 }
 
 static const riot6532_interface r6532_interface =
@@ -1748,7 +1748,7 @@ static MACHINE_RESET( a2600 )
 		modeSS_byte_started = 0;
 		memory_set_direct_update_handler(space, modeSS_opbase );
 		/* Already start the motor of the cassette for the user */
-		cassette_change_state( devtag_get_device(machine, CASSETTE, "cassette"), CASSETTE_MOTOR_ENABLED, CASSETTE_MOTOR_DISABLED );
+		cassette_change_state( devtag_get_device(machine, "cassette"), CASSETTE_MOTOR_ENABLED, CASSETTE_MOTOR_DISABLED );
 		break;
 
 	case modeFV:

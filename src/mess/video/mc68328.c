@@ -25,7 +25,7 @@ VIDEO_START( mc68328 )
 /* THIS IS PRETTY MUCH TOTALLY WRONG AND DOESN'T REFLECT THE MC68328'S INTERNAL FUNCTIONALITY AT ALL! */
 VIDEO_UPDATE( mc68328 )
 {
-    const device_config *mc68328_device = device_list_find_by_tag(screen->machine->config->devicelist, MC68328, MC68328_TAG);
+    const device_config *mc68328_device = devtag_get_device(screen->machine, MC68328_TAG);
     mc68328_t* mc68328 = mc68328_get_safe_token( mc68328_device );
 
     const UINT16 *video_ram = (const UINT16 *)(mess_ram + (mc68328->regs.lssa & 0x00ffffff));

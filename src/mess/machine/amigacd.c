@@ -213,7 +213,7 @@ static READ16_HANDLER( amiga_dmac_r )
 		case 0x66:
 		case 0x67:
 		{
-			const device_config *tpi = devtag_get_device(space->machine, TPI6525, "tpi6525");
+			const device_config *tpi = devtag_get_device(space->machine, "tpi6525");
 			LOG(( "DMAC: PC=%08x - TPI6525 Read(%d)\n", cpu_get_pc(space->cpu), (offset - 0x58) ));
 			return tpi6525_r(tpi, offset - 0x58);
 		}
@@ -340,7 +340,7 @@ static WRITE16_HANDLER( amiga_dmac_w )
 		case 0x66:
 		case 0x67:
 		{
-			const device_config *tpi = devtag_get_device(space->machine, TPI6525, "tpi6525");
+			const device_config *tpi = devtag_get_device(space->machine, "tpi6525");
 			LOG(( "DMAC: PC=%08x - TPI6525 Write(%d) - data = %04x\n", cpu_get_pc(space->cpu), (offset - 0x58), data ));
 			tpi6525_w(tpi, offset - 0x58, data);
 		}
@@ -484,7 +484,7 @@ void amigacd_tpi6525_irq(const device_config *device, int level)
 
 static void cdrom_status_enabled( running_machine *machine, int level )
 {
-	const device_config *tpi = devtag_get_device(machine, TPI6525, "tpi6525");
+	const device_config *tpi = devtag_get_device(machine, "tpi6525");
 
 	/* PC3 on the 6525 */
 	tpi6525_irq3_level(tpi, level);
@@ -492,7 +492,7 @@ static void cdrom_status_enabled( running_machine *machine, int level )
 
 static void cdrom_status_change( running_machine *machine, int level )
 {
-	const device_config *tpi = devtag_get_device(machine, TPI6525, "tpi6525");
+	const device_config *tpi = devtag_get_device(machine, "tpi6525");
 
 	/* invert */
 	level = level ? 0 : 1;
@@ -503,7 +503,7 @@ static void cdrom_status_change( running_machine *machine, int level )
 
 static void cdrom_subcode_ready( running_machine *machine, int level )
 {
-	const device_config *tpi = devtag_get_device(machine, TPI6525, "tpi6525");
+	const device_config *tpi = devtag_get_device(machine, "tpi6525");
 
 	/* PC1 on the 6525 */
 	tpi6525_irq1_level(tpi, level);
@@ -524,7 +524,7 @@ MACHINE_START( amigacd )
 MACHINE_RESET( amigacd )
 {
 	/* initialize the cdrom */
-	matsucd_init( devtag_get_device(machine, CDROM, "cdrom") );
+	matsucd_init( devtag_get_device(machine, "cdrom") );
 	matsucd_set_status_enabled_callback( cdrom_status_enabled );
 	matsucd_set_status_changed_callback( cdrom_status_change );
 	matsucd_set_subcode_ready_callback( cdrom_subcode_ready );

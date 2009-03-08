@@ -746,7 +746,7 @@ MACHINE_RESET( ti99 )
 	handset_buflen = 0;
 	handset_clock = 0;
 	handset_ack = 0;
-	tms9901_set_single_int(devtag_get_device(machine, TMS9901, "tms9901"), 12, 0);
+	tms9901_set_single_int(devtag_get_device(machine, "tms9901"), 12, 0);
 
 	/* read config */
 	if (ti99_model == model_99_8)
@@ -1082,7 +1082,7 @@ WRITE16_HANDLER ( ti99_wsnd_w )
 {
 	cpu_adjust_icount(space->machine->cpu[0],-4);
 
-	sn76496_w(devtag_get_device(space->machine, SOUND, "sn76496"), offset, (data >> 8) & 0xff);
+	sn76496_w(devtag_get_device(space->machine, "sn76496"), offset, (data >> 8) & 0xff);
 }
 
 /*
@@ -1171,7 +1171,7 @@ static READ16_HANDLER ( ti99_rspeech_r )
 {
 	cpu_adjust_icount(space->machine->cpu[0],-(18+3));		/* this is just a minimum, it can be more */
 
-	return ((int) tms5220_status_r(devtag_get_device(space->machine, SOUND, "tms5220"), offset)) << 8;
+	return ((int) tms5220_status_r(devtag_get_device(space->machine, "tms5220"), offset)) << 8;
 }
 
 #if 0
@@ -1202,9 +1202,9 @@ static WRITE16_HANDLER ( ti99_wspeech_w )
 	there are 15 bytes in FIFO.  It should be 16.  Of course, if it were the
 	case, we would need to store the value on the bus, which would be more
 	complex. */
-	if (! tms5220_ready_r(devtag_get_device(space->machine, SOUND, "tms5220")))
+	if (! tms5220_ready_r(devtag_get_device(space->machine, "tms5220")))
 	{
-		attotime time_to_ready = double_to_attotime(tms5220_time_to_ready(devtag_get_device(space->machine, SOUND, "tms5220")));
+		attotime time_to_ready = double_to_attotime(tms5220_time_to_ready(devtag_get_device(space->machine, "tms5220")));
 		int cycles_to_ready = cpu_attotime_to_clocks(space->machine->cpu[0], time_to_ready);
 
 		logerror("time to ready: %f -> %d\n", attotime_to_double(time_to_ready), (int) cycles_to_ready);
@@ -1214,7 +1214,7 @@ static WRITE16_HANDLER ( ti99_wspeech_w )
 	}
 #endif
 
-	tms5220_data_w(devtag_get_device(space->machine, SOUND, "tms5220"), offset, (data >> 8) & 0xff);
+	tms5220_data_w(devtag_get_device(space->machine, "tms5220"), offset, (data >> 8) & 0xff);
 }
 
 /*
@@ -1394,7 +1394,7 @@ WRITE16_HANDLER ( ti99_4p_wgpl_w )
 				if (! (offset & 1))
 				{
 					cpu_adjust_icount(space->machine->cpu[0],-16*4);		/* this is just a minimum, it can be more */
-					reply = tms5220_status_r(devtag_get_device(space->machine, SOUND, "tms5220"), 0);
+					reply = tms5220_status_r(devtag_get_device(space->machine, "tms5220"), 0);
 				}
 				break;
 
@@ -1505,7 +1505,7 @@ WRITE8_HANDLER ( ti99_8_w )
 			case 1:
 				/* sound write + RAM */
 				if (offset < 0x8410)
-					sn76496_w(devtag_get_device(space->machine, SOUND, "sn76496"), offset, data);
+					sn76496_w(devtag_get_device(space->machine, "sn76496"), offset, data);
 				else
 					sRAM_ptr_8[offset & 0x1fff] = data;
 				break;
@@ -1563,9 +1563,9 @@ WRITE8_HANDLER ( ti99_8_w )
 					there are 15 bytes in FIFO.  It should be 16.  Of course, if it were the
 					case, we would need to store the value on the bus, which would be more
 					complex. */
-					if (! tms5220_ready_r(devtag_get_device(space->machine, SOUND, "tms5220")))
+					if (! tms5220_ready_r(devtag_get_device(space->machine, "tms5220")))
 					{
-						attotime time_to_ready = double_to_attotime(tms5220_time_to_ready(devtag_get_device(space->machine, SOUND, "tms5220")));
+						attotime time_to_ready = double_to_attotime(tms5220_time_to_ready(devtag_get_device(space->machine, "tms5220")));
 						double d = ceil(cpu_attotime_to_clocks(space->machine->cpu[0], time_to_ready));
 						int cycles_to_ready = ((int) (d + 3)) & ~3;
 
@@ -1576,7 +1576,7 @@ WRITE8_HANDLER ( ti99_8_w )
 						timer_set(space->machine, attotime_zero, NULL, 0, /*speech_kludge_callback*/NULL);
 					}
 
-					tms5220_data_w(devtag_get_device(space->machine, SOUND, "tms5220"), offset, data);
+					tms5220_data_w(devtag_get_device(space->machine, "tms5220"), offset, data);
 				}
 				break;
 
@@ -1712,7 +1712,7 @@ static TIMER_CALLBACK(ti99_handset_ack_callback)
 	handset_clock = ! handset_clock;
 	handset_buf >>= 4;
 	handset_buflen--;
-	tms9901_set_single_int(devtag_get_device(machine, TMS9901, "tms9901"), 12, 0);
+	tms9901_set_single_int(devtag_get_device(machine, "tms9901"), 12, 0);
 
 	if (handset_buflen == 1)
 	{
@@ -1760,7 +1760,7 @@ static void ti99_handset_post_message(running_machine *machine, int message)
 	handset_clock = 1;
 	handset_buf = ~ message;
 	handset_buflen = 3;
-	tms9901_set_single_int(devtag_get_device(machine, TMS9901, "tms9901"), 12, 1);
+	tms9901_set_single_int(devtag_get_device(machine, "tms9901"), 12, 1);
 }
 
 /*
@@ -2143,7 +2143,7 @@ nota:
 */
 static void tms9901_set_int1(running_machine *machine, int state)
 {
-	tms9901_set_single_int(devtag_get_device(machine, TMS9901, "tms9901"), 1, state);
+	tms9901_set_single_int(devtag_get_device(machine, "tms9901"), 1, state);
 }
 
 /*
@@ -2151,7 +2151,7 @@ static void tms9901_set_int1(running_machine *machine, int state)
 */
 void tms9901_set_int2(running_machine *machine, int state)
 {
-	tms9901_set_single_int(devtag_get_device(machine, TMS9901, "tms9901"), 2, state);
+	tms9901_set_single_int(devtag_get_device(machine, "tms9901"), 2, state);
 }
 
 /*
@@ -2235,7 +2235,7 @@ static READ8_DEVICE_HANDLER( ti99_R9901_1 )
 	}
 	
 	/* we don't take CS2 into account, as CS2 is a write-only unit */
-	/*if (cassette_input(devtag_get_device(device->machine, CASSETTE, "cassette1")) > 0)
+	/*if (cassette_input(devtag_get_device(device->machine, "cassette1")) > 0)
 		answer |= 8;*/
 
 	return answer;
@@ -2269,12 +2269,12 @@ static READ8_DEVICE_HANDLER( ti99_R9901_3 )
 	/* we don't take CS2 into account, as CS2 is a write-only unit */
 	if ( ti99_model != model_99_8 )
 	{
-		if (cassette_input(devtag_get_device(device->machine, CASSETTE, "cassette1")) > 0)
+		if (cassette_input(devtag_get_device(device->machine, "cassette1")) > 0)
 			answer |= 8;
 	}
 	else
 	{
-		if (cassette_input(devtag_get_device(device->machine, CASSETTE, "cassette")) > 0)
+		if (cassette_input(devtag_get_device(device->machine, "cassette")) > 0)
 			answer |= 8;
 	}
 
@@ -2371,7 +2371,7 @@ static READ8_DEVICE_HANDLER( ti99_8_R9901_1 )
 	}
 	
 	/* we don't take CS2 into account, as CS2 is a write-only unit */
-	/*if (cassette_input(devtag_get_device(machine, CASSETTE, "cassette")) > 0)
+	/*if (cassette_input(devtag_get_device(machine, "cassette")) > 0)
 		answer |= 8;*/
 
 	return answer;
@@ -2410,11 +2410,11 @@ static WRITE8_DEVICE_HANDLER( ti99_CS_motor )
 
 	if ( ti99_model != model_99_8 )
 	{
-		img = devtag_get_device(device->machine, CASSETTE, (offset-6 ) ? "cassette2" :  "cassette1" );
+		img = devtag_get_device(device->machine, (offset-6 ) ? "cassette2" :  "cassette1" );
 	}
 	else
 	{
-		img = devtag_get_device(device->machine, CASSETTE, "cassette");
+		img = devtag_get_device(device->machine, "cassette");
 	}
 	cassette_change_state(img, data ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
@@ -2440,12 +2440,12 @@ static WRITE8_DEVICE_HANDLER( ti99_CS_output )
 {
 	if (ti99_model != model_99_8)	/* 99/8 only has one tape port!!! */
 	{
-		cassette_output(devtag_get_device(device->machine, CASSETTE, "cassette1"), data ? +1 : -1);
-		cassette_output(devtag_get_device(device->machine, CASSETTE, "cassette2"), data ? +1 : -1);
+		cassette_output(devtag_get_device(device->machine, "cassette1"), data ? +1 : -1);
+		cassette_output(devtag_get_device(device->machine, "cassette2"), data ? +1 : -1);
 	}
 	else
 	{
-		cassette_output(devtag_get_device(device->machine, CASSETTE, "cassette"), data ? +1 : -1);
+		cassette_output(devtag_get_device(device->machine, "cassette"), data ? +1 : -1);
 	}
 }
 

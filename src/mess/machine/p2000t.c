@@ -74,7 +74,7 @@ WRITE8_HANDLER ( p2000t_port_303f_w )
 
 WRITE8_HANDLER ( p2000t_port_505f_w )
 {
-	const device_config *speaker = devtag_get_device(space->machine, SOUND, "speaker");
+	const device_config *speaker = devtag_get_device(space->machine, "speaker");
 	speaker_level_w(speaker, data & 0x01);
 }
 

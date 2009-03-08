@@ -60,7 +60,7 @@
 
 static const device_config *cassette_device_image(running_machine *machine)
 {
-	return devtag_get_device(machine, CASSETTE, "cassette");
+	return devtag_get_device(machine, "cassette");
 }
 
 static READ8_DEVICE_HANDLER(z80pio_alt_r)
@@ -118,7 +118,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(mbee_ports, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x03) AM_MIRROR(0x10) AM_DEVREADWRITE(Z80PIO, "z80pio", z80pio_alt_r, z80pio_alt_w)
+	AM_RANGE(0x00, 0x03) AM_MIRROR(0x10) AM_DEVREADWRITE("z80pio", z80pio_alt_r, z80pio_alt_w)
 	AM_RANGE(0x0b, 0x0b) AM_MIRROR(0x10) AM_READWRITE(mbee_video_bank_r, mbee_video_bank_w)
 	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x10) AM_READWRITE(m6545_status_r, m6545_index_w)
 	AM_RANGE(0x0d, 0x0d) AM_MIRROR(0x10) AM_READWRITE(m6545_data_r, m6545_data_w)
@@ -127,17 +127,17 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(mbeeic_ports, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x03) AM_MIRROR(0x10) AM_DEVREADWRITE(Z80PIO, "z80pio", z80pio_alt_r, z80pio_alt_w)
+	AM_RANGE(0x00, 0x03) AM_MIRROR(0x10) AM_DEVREADWRITE("z80pio", z80pio_alt_r, z80pio_alt_w)
 	AM_RANGE(0x08, 0x08) AM_MIRROR(0x10) AM_READWRITE(mbee_pcg_color_latch_r, mbee_pcg_color_latch_w)
 	// AM_RANGE(0x09, 0x09) AM_MIRROR(0x10)  Listed as "Colour Wait Off" or "USART 2651" but doesn't appear in the schematics
 	AM_RANGE(0x0a, 0x0a) AM_MIRROR(0x10) AM_READWRITE(mbee_color_bank_r, mbee_color_bank_w)
 	AM_RANGE(0x0b, 0x0b) AM_MIRROR(0x10) AM_READWRITE(mbee_video_bank_r, mbee_video_bank_w)
 	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x10) AM_READWRITE(m6545_status_r, m6545_index_w)
 	AM_RANGE(0x0d, 0x0d) AM_MIRROR(0x10) AM_READWRITE(m6545_data_r, m6545_data_w)
-	AM_RANGE(0x44, 0x44) AM_DEVREADWRITE(WD179X, "wd179x", wd17xx_status_r, wd17xx_command_w)
-	AM_RANGE(0x45, 0x45) AM_DEVREADWRITE(WD179X, "wd179x", wd17xx_track_r, wd17xx_track_w)
-	AM_RANGE(0x46, 0x46) AM_DEVREADWRITE(WD179X, "wd179x", wd17xx_sector_r, wd17xx_sector_w)
-	AM_RANGE(0x47, 0x47) AM_DEVREADWRITE(WD179X, "wd179x", wd17xx_data_r, wd17xx_data_w)
+	AM_RANGE(0x44, 0x44) AM_DEVREADWRITE("wd179x", wd17xx_status_r, wd17xx_command_w)
+	AM_RANGE(0x45, 0x45) AM_DEVREADWRITE("wd179x", wd17xx_track_r, wd17xx_track_w)
+	AM_RANGE(0x46, 0x46) AM_DEVREADWRITE("wd179x", wd17xx_sector_r, wd17xx_sector_w)
+	AM_RANGE(0x47, 0x47) AM_DEVREADWRITE("wd179x", wd17xx_data_r, wd17xx_data_w)
 	AM_RANGE(0x48, 0x48) AM_READWRITE(mbee_fdc_status_r, mbee_fdc_motor_w)
 ADDRESS_MAP_END
 
@@ -335,7 +335,7 @@ static WRITE8_DEVICE_HANDLER( pio_port_b_w )
 	 * 6	speaker
 	 * 7	network interrupt
 	 */
-	const device_config *speaker = devtag_get_device(device->machine, SOUND, "speaker");
+	const device_config *speaker = devtag_get_device(device->machine, "speaker");
 
 	cassette_output(cassette_device_image(device->machine), (data & 0x02) ? -1.0 : +1.0);
 
@@ -355,7 +355,7 @@ static const z80pio_interface mbee_z80pio_intf =
 
 static const z80_daisy_chain mbee_daisy_chain[] =
 {
-	{ Z80PIO, "z80pio" },
+	{ "z80pio" },
 	{ NULL }
 };
 

@@ -23,7 +23,7 @@ void abcbus_init(running_machine *machine, const char *cputag, const abcbus_dais
 	{
 		*tailptr = auto_malloc(sizeof(**tailptr));
 		(*tailptr)->next = NULL;
-		(*tailptr)->device = devtag_get_device(machine, daisy->devtype, device_inherit_tag(tempstring, cputag, daisy->devname));
+		(*tailptr)->device = devtag_get_device(machine, device_inherit_tag(tempstring, cputag, daisy->devname));
 		if ((*tailptr)->device == NULL)
 		{
 			astring_free(tempstring);

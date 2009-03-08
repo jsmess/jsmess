@@ -59,7 +59,7 @@ static READ8_DEVICE_HANDLER (radio86_8255_portb_r2 )
 
 static READ8_DEVICE_HANDLER (radio86_8255_portc_r2 )
 {
-	double level = cassette_input(devtag_get_device(device->machine, CASSETTE, "cassette"));	 									 					
+	double level = cassette_input(devtag_get_device(device->machine, "cassette"));	 									 					
 	UINT8 dat = input_port_read(device->machine, "LINE8");
 	if (level <  0) { 
 		dat ^= radio86_tape_value;
@@ -74,7 +74,7 @@ static WRITE8_DEVICE_HANDLER (radio86_8255_porta_w2 )
 
 static WRITE8_DEVICE_HANDLER (radio86_8255_portc_w2 )
 {
-	cassette_output(devtag_get_device(device->machine, CASSETTE, "cassette"),data & 0x01 ? 1 : -1);	
+	cassette_output(devtag_get_device(device->machine, "cassette"),data & 0x01 ? 1 : -1);	
 }
 
 
@@ -102,7 +102,7 @@ const ppi8255_interface mikrosha_ppi8255_interface_1 =
 
 static READ8_DEVICE_HANDLER (rk7007_8255_portc_r )
 {
-	double level = cassette_input(devtag_get_device(device->machine, CASSETTE, "cassette"));	 									 					
+	double level = cassette_input(devtag_get_device(device->machine, "cassette"));	 									 					
 	UINT8 key = 0xff;
 	if ((radio86_keyboard_mask & 0x01)!=0) { key &= input_port_read(device->machine,"CLINE0"); }
 	if ((radio86_keyboard_mask & 0x02)!=0) { key &= input_port_read(device->machine,"CLINE1"); }
@@ -130,7 +130,7 @@ const ppi8255_interface rk7007_ppi8255_interface =
 };
 
 static I8275_DMA_REQUEST(radio86_video_dma_request) {
-	const device_config *dma8257 = devtag_get_device(device->machine, DMA8257, "dma8257");
+	const device_config *dma8257 = devtag_get_device(device->machine, "dma8257");
 	dma8257_drq_w(dma8257, 2, state);
 }
 
@@ -143,7 +143,7 @@ READ8_DEVICE_HANDLER(radio86_dma_read_byte)
 
 WRITE8_DEVICE_HANDLER(radio86_write_video)
 {
-	i8275_dack_set_data((device_config*)devtag_get_device(device->machine, I8275, "i8275"),data);
+	i8275_dack_set_data((device_config*)devtag_get_device(device->machine, "i8275"),data);
 }
 
 const dma8257_interface radio86_dma =

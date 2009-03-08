@@ -107,14 +107,14 @@ static ADDRESS_MAP_START( mpf1_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
 	// The 16 I/O port combinations for the 8255 (P8255A-5, 8628LLP, (c) 1981 AMD)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE(PPI8255, "ppi8255", ppi8255_r, ppi8255_w) AM_MIRROR(0x3C)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255", ppi8255_r, ppi8255_w) AM_MIRROR(0x3C)
 
 //  TODO: create drivers to emulate the following two chips
 //  The 16 I/O port combinations for the CTC (Zilog, Z0843004PSC, Z80 CTC, 8644)
 //  AM_RANGE(0x40, 0x43) AM_WRITE(ctc_enable_w) AM_MIRROR(0x7C)
 
 	/* The 16 I/O port combinations for the PIO (Zilog, Z0842004PSC, Z80 PIO, 8735) */
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE(Z80PIO, "z80pio", z80pio_r, z80pio_w) AM_MIRROR(0xBF)
+	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("z80pio", z80pio_r, z80pio_w) AM_MIRROR(0xBF)
 
 ADDRESS_MAP_END
 
@@ -389,7 +389,7 @@ static WRITE8_DEVICE_HANDLER( mpf1_portb_w )
 
 static WRITE8_DEVICE_HANDLER( mpf1_portc_w )
 {
-	const device_config *dac_device = devtag_get_device(device->machine, SOUND, "dac");
+	const device_config *dac_device = devtag_get_device(device->machine, "dac");
 
 	kbdlatch = ~data;
 

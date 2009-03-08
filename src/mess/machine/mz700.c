@@ -44,9 +44,9 @@ static WRITE8_DEVICE_HANDLER ( pio_port_c_w );
 const ppi8255_interface mz700_ppi8255_interface =
 {
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER(TTL74145, "ls145", pio_port_b_r),
+	DEVCB_DEVICE_HANDLER("ls145", pio_port_b_r),
 	DEVCB_HANDLER(pio_port_c_r),
-	DEVCB_DEVICE_HANDLER(TTL74145, "ls145", pio_port_a_w),
+	DEVCB_DEVICE_HANDLER("ls145", pio_port_a_w),
 	DEVCB_NULL,
 	DEVCB_HANDLER(pio_port_c_w)
 };
@@ -111,8 +111,8 @@ MACHINE_START( mz700 )
 {
 	mz_state *mz = machine->driver_data;
 
-	mz->pit = devtag_get_device(machine, PIT8253, "pit8253");
-	mz->ppi = devtag_get_device(machine, PPI8255, "ppi8255");
+	mz->pit = devtag_get_device(machine, "pit8253");
+	mz->ppi = devtag_get_device(machine, "ppi8255");
 
 	/* reset memory map to defaults */
 	mz_bank_4_w(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0, 0);
@@ -410,7 +410,7 @@ WRITE8_HANDLER( mz_bank_6_w )
 /* Timer 0 is the clock for the speaker output */
 static PIT8253_OUTPUT_CHANGED( pit_out0_changed )
 {
-	const device_config *speaker = devtag_get_device(device->machine, SOUND, "speaker");
+	const device_config *speaker = devtag_get_device(device->machine, "speaker");
 	speaker_level_w(speaker, state ? 1 : 0);
 }
 
@@ -466,7 +466,7 @@ static READ8_DEVICE_HANDLER( pio_port_b_r )
  */
 static READ8_DEVICE_HANDLER( pio_port_c_r )
 {
-	const device_config *cas = devtag_get_device(device->machine, CASSETTE, "cassette");
+	const device_config *cas = devtag_get_device(device->machine, "cassette");
 	mz_state *mz = device->machine->driver_data;
 	UINT8 data = 0;
 
@@ -488,7 +488,7 @@ static READ8_DEVICE_HANDLER( pio_port_c_r )
 
 static WRITE8_DEVICE_HANDLER( pio_port_a_w )
 {
-	const device_config *timer = devtag_get_device(device->machine, TIMER, "cursor");
+	const device_config *timer = devtag_get_device(device->machine, "cursor");
 
 	LOG(2,"mz700_pio_port_a_w",("%02X\n", data),device->machine);
 
@@ -509,7 +509,7 @@ static WRITE8_DEVICE_HANDLER( pio_port_c_w )
      * bit 0 out    unused
      */
 
-//	UINT8 state = cassette_get_state(devtag_get_device(device->machine, CASSETTE, "cassette"));
+//	UINT8 state = cassette_get_state(devtag_get_device(device->machine, "cassette"));
 //	UINT8 action = ((~pio_port_c_output & 8) & (data & 8));		/* detect low-to-high transition */
 
 	/* The motor control circuit consists of a resistor, capacitor, invertor, nand-gate, and D flip-flop.
@@ -522,7 +522,7 @@ static WRITE8_DEVICE_HANDLER( pio_port_c_w )
 		If you load from the command-line or the software-picker, type in L <enter> immediately.
 
 	cassette_change_state(
-		devtag_get_device(device->machine, CASSETTE, "cassette"),
+		devtag_get_device(device->machine, "cassette"),
 		((data & 0x08) && mz700_motor_on) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,
 		CASSETTE_MOTOR_DISABLED);
 
@@ -530,7 +530,7 @@ static WRITE8_DEVICE_HANDLER( pio_port_c_w )
 
 	LOG(2,"mz700_pio_port_c_w",("%02X\n", data),device->machine);
 
-	cassette_output(devtag_get_device(device->machine, CASSETTE, "cassette"), (data & 0x02) ? +1.0 : -1.0);
+	cassette_output(devtag_get_device(device->machine, "cassette"), (data & 0x02) ? +1.0 : -1.0);
 }
 
 
@@ -558,7 +558,7 @@ static void mz800_z80pio_irq(const device_config *device, int which)
 
 static READ8_DEVICE_HANDLER( mz800_z80pio_port_a_r )
 {
-	const device_config *printer = devtag_get_device(device->machine, CENTRONICS, "centronics");
+	const device_config *printer = devtag_get_device(device->machine, "centronics");
 	UINT8 result = 0;
 
 	result |= centronics_busy_r(printer);
@@ -570,7 +570,7 @@ static READ8_DEVICE_HANDLER( mz800_z80pio_port_a_r )
 
 static WRITE8_DEVICE_HANDLER( mz800_z80pio_port_a_w )
 {
-	const device_config *printer = devtag_get_device(device->machine, CENTRONICS, "centronics");
+	const device_config *printer = devtag_get_device(device->machine, "centronics");
 
 	centronics_prime_w(printer, BIT(data, 6));
 	centronics_strobe_w(printer, BIT(data, 7));
@@ -578,7 +578,7 @@ static WRITE8_DEVICE_HANDLER( mz800_z80pio_port_a_w )
 
 static WRITE8_DEVICE_HANDLER( mz800_printer_data_w )
 {
-	const device_config *printer = devtag_get_device(device->machine, CENTRONICS, "centronics");
+	const device_config *printer = devtag_get_device(device->machine, "centronics");
 	centronics_data_w(printer, 0, data);
 }
 

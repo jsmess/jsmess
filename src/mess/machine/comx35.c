@@ -80,7 +80,7 @@ static UINT8 read_expansion(running_machine *machine)
 
 static const device_config *printer_device(running_machine *machine)
 {
-	return devtag_get_device(machine, PRINTER, "printer");
+	return devtag_get_device(machine, "printer");
 }
 
 static int expansion_box_installed(running_machine *machine)
@@ -178,7 +178,7 @@ const wd17xx_interface comx35_wd17xx_interface = { comx35_fdc_callback, NULL };
 static UINT8 fdc_r(const address_space *space)
 {
 	comx35_state *state = space->machine->driver_data;
-	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD1770, WD1770_TAG);
+	const device_config *fdc = devtag_get_device(space->machine, WD1770_TAG);
 
 	UINT8 data;
 
@@ -196,7 +196,7 @@ static UINT8 fdc_r(const address_space *space)
 
 static void fdc_w(const address_space *space, UINT8 data)
 {
-	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD1770, WD1770_TAG);
+	const device_config *fdc = devtag_get_device(space->machine, WD1770_TAG);
 	/*
 
 		bit		description
@@ -399,7 +399,7 @@ static void set_active_bank(running_machine *machine)
 
 	case BANK_80_COLUMNS:
 		{
-			const device_config *mc6845 = devtag_get_device(machine, MC6845, MC6845_TAG);
+			const device_config *mc6845 = devtag_get_device(machine, MC6845_TAG);
 
 			memory_install_readwrite8_handler(program, 0xc000, 0xc7ff, 0, 0, SMH_BANK1, SMH_UNMAP); // ROM
 			memory_install_readwrite8_handler(program, 0xc800, 0xcfff, 0, 0, SMH_UNMAP, SMH_UNMAP);

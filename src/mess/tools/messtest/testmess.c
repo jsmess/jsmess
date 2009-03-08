@@ -710,7 +710,7 @@ static const device_config *find_device_by_identity(running_machine *machine, co
 	if (ident->type == IO_UNKNOWN)
 	{
 		/* no device_type was specified; use the new preferred mechanism */
-		device = devtag_get_device(machine, DEVICE_TYPE_WILDCARD, ident->tag);
+		device = devtag_get_device(machine, ident->tag);
 	}
 	else if (ident->tag != NULL)
 	{

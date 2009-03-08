@@ -64,10 +64,7 @@ const device_config *apple2_slot(running_machine *machine, int slotnum)
 	assert((slotnum >= 0) && (slotnum <= 7));
 	snprintf(buffer, ARRAY_LENGTH(buffer), "slot_%d", slotnum);
 	
-	return device_list_find_by_tag(
-		machine->config->devicelist,
-		APPLE2_SLOT,
-		buffer);
+	return devtag_get_device(machine, buffer);
 }
 
 
@@ -85,10 +82,7 @@ static DEVICE_START(apple2_slot)
 	if (config->tag != NULL)
 	{
 		/* locate the device */
-		token->slot_device = device_list_find_by_tag(
-			device->machine->config->devicelist,
-			DEVICE_TYPE_WILDCARD,
-			config->tag);
+		token->slot_device = devtag_get_device(device->machine, config->tag);
 
 		assert(token->slot_device != NULL);
 	}

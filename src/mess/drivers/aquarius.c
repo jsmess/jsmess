@@ -29,7 +29,7 @@
 
 static const device_config *cassette_device_image(running_machine *machine)
 {
-	return devtag_get_device(machine, CASSETTE, "cassette");
+	return devtag_get_device(machine, "cassette");
 }
 
 /* Read/Write Handlers */
@@ -66,7 +66,7 @@ static WRITE8_HANDLER( cassette_w )
 
 	*/
 
-	const device_config *speaker = devtag_get_device(space->machine, SOUND, "speaker");
+	const device_config *speaker = devtag_get_device(space->machine, "speaker");
 	speaker_level_w(speaker, data & 0x01);
 
 	cassette_output(cassette_device_image(space->machine), (data & 0x01) ? +1.0 : -1.0);
@@ -207,8 +207,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( aquarius_io, ADDRESS_SPACE_IO, 8)
 //	AM_RANGE(0x7e, 0x7f) AM_MIRROR(0xff00) AM_READWRITE(modem_r, modem_w)
 //	AM_RANGE(0xe0, 0xef) AM_MIRROR(0xff00) AM_READWRITE(floppy_r, floppy_w)
-	AM_RANGE(0xf6, 0xf6) AM_MIRROR(0xff00) AM_DEVREADWRITE(SOUND, "ay8910", ay8910_r, ay8910_data_w)
-	AM_RANGE(0xf7, 0xf7) AM_MIRROR(0xff00) AM_DEVWRITE(SOUND, "ay8910", ay8910_address_w)
+	AM_RANGE(0xf6, 0xf6) AM_MIRROR(0xff00) AM_DEVREADWRITE("ay8910", ay8910_r, ay8910_data_w)
+	AM_RANGE(0xf7, 0xf7) AM_MIRROR(0xff00) AM_DEVWRITE("ay8910", ay8910_address_w)
 	AM_RANGE(0xfc, 0xfc) AM_MIRROR(0xff00) AM_READWRITE(cassette_r, cassette_w)
 	AM_RANGE(0xfd, 0xfd) AM_MIRROR(0xff00) AM_READWRITE(vsync_r, mapper_w)
 	AM_RANGE(0xfe, 0xfe) AM_MIRROR(0xff00) AM_READWRITE(printer_r, printer_w)

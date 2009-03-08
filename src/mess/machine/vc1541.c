@@ -576,9 +576,9 @@ static void gcr_double_2_gcr(UINT8 a, UINT8 b, UINT8 c, UINT8 d, UINT8 *dest)
 
 static ADDRESS_MAP_START( _1541_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE(VIA6522, "via6522_2", via_r, via_w)	/* 0 and 1 used in vc20 */
+	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE("via6522_2", via_r, via_w)	/* 0 and 1 used in vc20 */
 	AM_RANGE(0x1810, 0x189f) AM_READ(SMH_NOP)				/* for debugger */
-	AM_RANGE(0x1c00, 0x1c0f) AM_DEVREADWRITE(VIA6522, "via6522_3", via_r, via_w)
+	AM_RANGE(0x1c00, 0x1c0f) AM_DEVREADWRITE("via6522_3", via_r, via_w)
 	AM_RANGE(0x1c10, 0x1c9f) AM_READ(SMH_NOP)				/* for debugger */
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -586,8 +586,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dolphin_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE(VIA6522, "via6522_2", via_r, via_w)	/* 0 and 1 used in vc20 */
-	AM_RANGE(0x1c00, 0x1c0f) AM_DEVREADWRITE(VIA6522, "via6522_3", via_r, via_w)
+	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE("via6522_2", via_r, via_w)	/* 0 and 1 used in vc20 */
+	AM_RANGE(0x1c00, 0x1c0f) AM_DEVREADWRITE("via6522_3", via_r, via_w)
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -604,7 +604,7 @@ static TIMER_CALLBACK(drive_timer)
 	
 		if (drive->type == type_1541) 
 		{
-			const device_config *via_3 = devtag_get_device(machine, VIA6522, "via6522_3");
+			const device_config *via_3 = devtag_get_device(machine, "via6522_3");
 
 			cpu_set_input_line(machine->cpu[drive->cpunumber], M6502_SET_OVERFLOW, 1);
 			via_ca1_w(via_3, 0, 1);
@@ -642,7 +642,7 @@ static TIMER_CALLBACK(drive_timer)
 
 	if (drive->type == type_1541) 
 	{
-		const device_config *via_3 = devtag_get_device(machine, VIA6522, "via6522_3");
+		const device_config *via_3 = devtag_get_device(machine, "via6522_3");
 		cpu_set_input_line(machine->cpu[drive->cpunumber], M6502_SET_OVERFLOW, 0);
 		via_ca1_w(via_3, 0, 0);
 	}
@@ -936,7 +936,7 @@ int vc1541_serial_atn_read (int which)
 
 void vc1541_serial_atn_write (running_machine *machine, int which, int level)
 {
-	const device_config *via_2 = devtag_get_device(machine, VIA6522, "via6522_2");
+	const device_config *via_2 = devtag_get_device(machine, "via6522_2");
 #if 0
 	int value;
 #endif
@@ -1053,9 +1053,9 @@ void vc1541_serial_request_write (int which, int level)
 
 static ADDRESS_MAP_START( _1571_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE(VIA6522, "via6522_2", via_r, via_w)  /* 0 and 1 used in vc20 */
+	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE("via6522_2", via_r, via_w)  /* 0 and 1 used in vc20 */
 	AM_RANGE(0x1810, 0x189f) AM_READ(SMH_NOP) /* for debugger */
-	AM_RANGE(0x1c00, 0x1c0f) AM_DEVREADWRITE(VIA6522, "via6522_3", via_r, via_w)
+	AM_RANGE(0x1c00, 0x1c0f) AM_DEVREADWRITE("via6522_3", via_r, via_w)
 	AM_RANGE(0x1c10, 0x1c9f) AM_READ(SMH_NOP) /* for debugger */
 //	AM_RANGE(0x2000, 0x2003) // WD17xx
 //	AM_RANGE(0x4000, 0x400f) // CIA
@@ -1265,7 +1265,7 @@ static READ8_DEVICE_HANDLER( c1551_port_b_r )
 static ADDRESS_MAP_START( _1551_map, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x0000, 0x0001) AM_READWRITE(c1551_port_r, c1551_port_w)
 	AM_RANGE(0x0002, 0x07ff) AM_RAM
-    AM_RANGE(0x4000, 0x4007) AM_DEVREADWRITE(TPI6525, "c1551_tpi", tpi6525_r, tpi6525_w)
+    AM_RANGE(0x4000, 0x4007) AM_DEVREADWRITE("c1551_tpi", tpi6525_r, tpi6525_w)
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

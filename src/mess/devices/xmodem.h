@@ -28,7 +28,7 @@ typedef struct {
   MDRV_DEVICE_CONFIG(_intrf)
 
 #define MDRV_XMODEM_REMOVE(_tag)		\
-  MDRV_DEVICE_REMOVE(_tag, XMODEM)
+  MDRV_DEVICE_REMOVE(_tag)
 
 
 extern DEVICE_GET_INFO( xmodem );

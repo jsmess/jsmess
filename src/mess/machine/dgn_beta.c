@@ -61,7 +61,7 @@
 #include "driver.h"
 #include "debug/debugcon.h"
 #include "cpu/m6809/m6809.h"
-#include "machine/6821new.h"
+#include "machine/6821pia.h"
 #include "includes/coco.h"
 #include "includes/dgn_beta.h"
 #include "machine/6551.h"
@@ -692,7 +692,7 @@ static READ8_DEVICE_HANDLER(d_pia1_pa_r)
 static WRITE8_DEVICE_HANDLER(d_pia1_pa_w)
 {
 	int	HALT_DMA;
-	const device_config *fdc = devtag_get_device(device->machine, WD179X, "wd179x");
+	const device_config *fdc = devtag_get_device(device->machine, "wd179x");
 	
 	/* Only play with halt line if halt bit changed since last write */
 	if((data & 0x80)!=d_pia1_pa_last)
@@ -876,14 +876,14 @@ static WRITE_LINE_DEVICE_HANDLER( d_pia2_irq_b )
 /* CPU 0 */
 static void cpu0_recalc_irq(running_machine *machine, int state)
 {
-	const device_config *pia_0 = devtag_get_device( machine, PIA6821, "pia_0" );
-	const device_config *pia_1 = devtag_get_device( machine, PIA6821, "pia_1" );
-	const device_config *pia_2 = devtag_get_device( machine, PIA6821, "pia_2" );
-	UINT8 pia0_irq_a = pianew_get_irq_a(pia_0);
-	UINT8 pia1_irq_a = pianew_get_irq_a(pia_1);
-	UINT8 pia1_irq_b = pianew_get_irq_b(pia_1);
-	UINT8 pia2_irq_a = pianew_get_irq_a(pia_2);
-	UINT8 pia2_irq_b = pianew_get_irq_b(pia_2);
+	const device_config *pia_0 = devtag_get_device( machine, "pia_0" );
+	const device_config *pia_1 = devtag_get_device( machine, "pia_1" );
+	const device_config *pia_2 = devtag_get_device( machine, "pia_2" );
+	UINT8 pia0_irq_a = pia6821_get_irq_a(pia_0);
+	UINT8 pia1_irq_a = pia6821_get_irq_a(pia_1);
+	UINT8 pia1_irq_b = pia6821_get_irq_b(pia_1);
+	UINT8 pia2_irq_a = pia6821_get_irq_a(pia_2);
+	UINT8 pia2_irq_b = pia6821_get_irq_b(pia_2);
 	UINT8 IRQ;
 
 	if (pia0_irq_a || pia1_irq_a || pia1_irq_b || pia2_irq_a || pia2_irq_b)
@@ -897,8 +897,8 @@ static void cpu0_recalc_irq(running_machine *machine, int state)
 
 static void cpu0_recalc_firq(running_machine *machine, int state)
 {
-	const device_config *pia_0 = devtag_get_device( machine, PIA6821, "pia_0" );
-	UINT8 pia0_irq_b = pianew_get_irq_b(pia_0);
+	const device_config *pia_0 = devtag_get_device( machine, "pia_0" );
+	UINT8 pia0_irq_b = pia6821_get_irq_b(pia_0);
 	UINT8 FIRQ;
 
 	if (pia0_irq_b)
@@ -927,15 +927,15 @@ static WD17XX_CALLBACK( dgnbeta_fdc_callback )
 {
 	/* The INTRQ line goes through pia2 ca1, in exactly the same way as DRQ from DragonDos does */
 	/* DRQ is routed through various logic to the FIRQ inturrupt line on *BOTH* CPUs */
-	const device_config *pia_2 = devtag_get_device( device->machine, PIA6821, "pia_2" );
+	const device_config *pia_2 = devtag_get_device( device->machine, "pia_2" );
 
 	switch(state)
 	{
 		case WD17XX_IRQ_CLR:
-			pia_ca1_w(pia_2, 0, CLEAR_LINE);
+			pia6821_ca1_w(pia_2, 0, CLEAR_LINE);
 			break;
 		case WD17XX_IRQ_SET:
-			pia_ca1_w(pia_2, 0, ASSERT_LINE);
+			pia6821_ca1_w(pia_2, 0, ASSERT_LINE);
 			break;
 		case WD17XX_DRQ_CLR:
 			/*wd2797_drq=CLEAR_LINE;*/
@@ -955,7 +955,7 @@ const wd17xx_interface dgnbeta_wd17xx_interface = { dgnbeta_fdc_callback, NULL }
  READ8_HANDLER(dgnbeta_wd2797_r)
 {
 	int result = 0;
-	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD179X, "wd179x");
+	const device_config *fdc = devtag_get_device(space->machine, "wd179x");
 
 	switch(offset & 0x03)
 	{
@@ -981,7 +981,7 @@ const wd17xx_interface dgnbeta_wd17xx_interface = { dgnbeta_fdc_callback, NULL }
 
 WRITE8_HANDLER(dgnbeta_wd2797_w)
 {
-	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD179X, "wd179x");
+	const device_config *fdc = devtag_get_device(space->machine, "wd179x");
 
     switch(offset & 0x3)
 	{
@@ -1039,16 +1039,16 @@ static void ScanInKeyboard(void)
 /* VBlank inturrupt */
 void dgn_beta_frame_interrupt (running_machine *machine, int data)
 {
-	const device_config *pia_2 = devtag_get_device( machine, PIA6821, "pia_2" );
+	const device_config *pia_2 = devtag_get_device( machine, "pia_2" );
 
 	/* Set PIA line, so it recognises inturrupt */
 	if (!data)
 	{
-		pia_cb2_w(pia_2, 0, ASSERT_LINE);
+		pia6821_cb2_w(pia_2, 0, ASSERT_LINE);
 	}
 	else
 	{
-		pia_cb2_w(pia_2, 0, CLEAR_LINE);
+		pia6821_cb2_w(pia_2, 0, CLEAR_LINE);
 	}
 	LOG_VIDEO(("Vblank\n"));
 	ScanInKeyboard();
@@ -1072,10 +1072,10 @@ void dgn_beta_line_interrupt (int data)
 
 static void dgnbeta_reset(running_machine *machine)
 {
-	const device_config *fdc = devtag_get_device(machine, WD179X, "wd179x");
-	const device_config *pia_0 = devtag_get_device( machine, PIA6821, "pia_0" );
-	const device_config *pia_1 = devtag_get_device( machine, PIA6821, "pia_1" );
-	const device_config *pia_2 = devtag_get_device( machine, PIA6821, "pia_2" );
+	const device_config *fdc = devtag_get_device(machine, "wd179x");
+	const device_config *pia_0 = devtag_get_device( machine, "pia_0" );
+	const device_config *pia_1 = devtag_get_device( machine, "pia_1" );
+	const device_config *pia_2 = devtag_get_device( machine, "pia_2" );
 
 	system_rom = memory_region(machine, "maincpu");
 
@@ -1092,9 +1092,9 @@ static void dgnbeta_reset(running_machine *machine)
 	SetDefaultTask(machine);
 
 	/* Set pullups on all PIA port A, to match what hardware does */
-	pianew_set_port_a_z_mask(pia_0,0xFF);
-	pianew_set_port_a_z_mask(pia_1,0xFF);
-	pianew_set_port_a_z_mask(pia_2,0xFF);
+	pia6821_set_port_a_z_mask(pia_0,0xFF);
+	pia6821_set_port_a_z_mask(pia_1,0xFF);
+	pia6821_set_port_a_z_mask(pia_2,0xFF);
 
 	d_pia1_pa_last=0x00;
 	d_pia1_pb_last=0x00;

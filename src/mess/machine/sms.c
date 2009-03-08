@@ -380,7 +380,7 @@ WRITE8_HANDLER(sms_ym2413_register_port_0_w)
 {
 	if ( HAS_FM )
 	{
-		const device_config *ym = devtag_get_device(space->machine, SOUND, "ym2413");
+		const device_config *ym = devtag_get_device(space->machine, "ym2413");
 		ym2413_w(ym, 0, (data & 0x3F));
 	}
 }
@@ -390,7 +390,7 @@ WRITE8_HANDLER(sms_ym2413_data_port_0_w)
 {
 	if ( HAS_FM )
 	{
-		const device_config *ym = devtag_get_device(space->machine, SOUND, "ym2413");
+		const device_config *ym = devtag_get_device(space->machine, "ym2413");
 		logerror("data_port_0_w %x %x\n", offset, data);
 		ym2413_w(ym, 1, data);
 	}
@@ -745,7 +745,7 @@ static void sms_machine_stop(running_machine *machine)
 {
 	/* Does the cartridge have SRAM that should be saved? */
 	if ( sms_cartridge[sms_current_cartridge].sram_save )
-		image_battery_save(devtag_get_device(machine, CARTSLOT, "cart1"), sms_cartridge[sms_current_cartridge].cartSRAM, sizeof(UINT8) * NVRAM_SIZE );
+		image_battery_save(devtag_get_device(machine, "cart1"), sms_cartridge[sms_current_cartridge].cartSRAM, sizeof(UINT8) * NVRAM_SIZE );
 }
 
 

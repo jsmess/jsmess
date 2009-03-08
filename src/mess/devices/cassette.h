@@ -76,10 +76,10 @@ DEVICE_GET_INFO(cassette);
 	MDRV_DEVICE_CONFIG(_config)
 
 #define MDRV_CASSETTE_REMOVE(_tag)			\
-	MDRV_DEVICE_REMOVE(_tag, CASSETTE)
+	MDRV_DEVICE_REMOVE(_tag)
 
 #define MDRV_CASSETTE_MODIFY(_tag, _config)	\
-	MDRV_DEVICE_MODIFY(_tag, CASSETTE)		\
+	MDRV_DEVICE_MODIFY(_tag)		\
 	MDRV_DEVICE_CONFIG(_config)
 
 extern const cassette_config default_cassette_config;

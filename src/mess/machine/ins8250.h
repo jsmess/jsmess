@@ -59,7 +59,7 @@ typedef struct
 	MDRV_DEVICE_CONFIG(_intrf)
 
 #define MDRV_INS8250_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag, INS8250)
+	MDRV_DEVICE_REMOVE(_tag)
 
 
 #define MDRV_NS16450_ADD(_tag, _intrf) \
@@ -67,7 +67,7 @@ typedef struct
 	MDRV_DEVICE_CONFIG(_intrf)
 
 #define MDRV_NS16450_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag, NS16450)
+	MDRV_DEVICE_REMOVE(_tag)
 
 
 #define MDRV_NS16550_ADD(_tag, _intrf) \
@@ -75,7 +75,7 @@ typedef struct
 	MDRV_DEVICE_CONFIG(_intrf)
 
 #define MDRV_NS16550_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag, NS16550)
+	MDRV_DEVICE_REMOVE(_tag)
 
 
 /***************************************************************************

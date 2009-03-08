@@ -18,7 +18,7 @@ todo for apf m1000:
 #include "video/m6847.h"
 #include "includes/apf.h"
 
-#include "machine/6821new.h"
+#include "machine/6821pia.h"
 #include "machine/wd17xx.h"
 #include "devices/basicdsk.h"
 #include "devices/cassette.h"
@@ -132,7 +132,7 @@ static WRITE8_DEVICE_HANDLER(apf_m1000_pia_out_ca2_func)
 
 static WRITE8_DEVICE_HANDLER(apf_m1000_pia_out_cb2_func)
 {
-	const device_config *speaker = devtag_get_device(device->machine, SOUND, "speaker");
+	const device_config *speaker = devtag_get_device(device->machine, "speaker");
 	speaker_level_w(speaker, data);
 }
 
@@ -209,7 +209,7 @@ static READ8_DEVICE_HANDLER(apf_imagination_pia_in_b_func)
 
 	data = 0x000;
 
-	if (cassette_input(devtag_get_device(device->machine, CASSETTE, "cassette")) > 0.0038)
+	if (cassette_input(devtag_get_device(device->machine, "cassette")) > 0.0038)
 		data =(1<<7);
 
 	return data;
@@ -256,12 +256,12 @@ static WRITE8_DEVICE_HANDLER(apf_imagination_pia_out_b_func)
 	keyboard_data = input_port_read(device->machine, keynames[keyboard_line]);
 
 	/* bit 4: cassette motor control */
-	cassette_change_state(devtag_get_device(device->machine, CASSETTE, "cassette"),
+	cassette_change_state(devtag_get_device(device->machine, "cassette"),
 		(data & 0x10) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,
 		CASSETTE_MASK_MOTOR);
 
 	/* bit 6: cassette write */
-	cassette_output(devtag_get_device(device->machine, CASSETTE, "cassette"),
+	cassette_output(devtag_get_device(device->machine, "cassette"),
 		(data & 0x40) ? -1.0 : 1.0);
 }
 
@@ -328,7 +328,7 @@ static MACHINE_START( apf_imagination )
 static WRITE8_HANDLER(apf_dischw_w)
 {
 	int drive;
-	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD179X, "wd179x");
+	const device_config *fdc = devtag_get_device(space->machine, "wd179x");
 
 	/* bit 3 is index of drive to select */
 	drive = (data>>3) & 0x01;
@@ -351,49 +351,49 @@ static WRITE8_HANDLER(serial_w)
 
 static WRITE8_HANDLER(apf_wd179x_command_w)
 {	
-	wd17xx_command_w((device_config*)devtag_get_device(space->machine, WD179X, "wd179x"), offset,~data);
+	wd17xx_command_w((device_config*)devtag_get_device(space->machine, "wd179x"), offset,~data);
 }
 
 static WRITE8_HANDLER(apf_wd179x_track_w)
 {
-	wd17xx_track_w((device_config*)devtag_get_device(space->machine, WD179X, "wd179x"), offset,~data);
+	wd17xx_track_w((device_config*)devtag_get_device(space->machine, "wd179x"), offset,~data);
 }
 
 static WRITE8_HANDLER(apf_wd179x_sector_w)
 {
-	wd17xx_sector_w((device_config*)devtag_get_device(space->machine, WD179X, "wd179x"), offset,~data);
+	wd17xx_sector_w((device_config*)devtag_get_device(space->machine, "wd179x"), offset,~data);
 }
 
 static WRITE8_HANDLER(apf_wd179x_data_w)
 {
-	wd17xx_data_w((device_config*)devtag_get_device(space->machine, WD179X, "wd179x"), offset,~data);
+	wd17xx_data_w((device_config*)devtag_get_device(space->machine, "wd179x"), offset,~data);
 }
 
 static READ8_HANDLER(apf_wd179x_status_r)
 {
-	return ~wd17xx_status_r((device_config*)devtag_get_device(space->machine, WD179X, "wd179x"), offset);
+	return ~wd17xx_status_r((device_config*)devtag_get_device(space->machine, "wd179x"), offset);
 }
 
 static READ8_HANDLER(apf_wd179x_track_r)
 {
-	return ~wd17xx_track_r((device_config*)devtag_get_device(space->machine, WD179X, "wd179x"), offset);
+	return ~wd17xx_track_r(devtag_get_device(space->machine, "wd179x"), offset);
 }
 
 static READ8_HANDLER(apf_wd179x_sector_r)
 {
-	return ~wd17xx_sector_r((device_config*)devtag_get_device(space->machine, WD179X, "wd179x"), offset);
+	return ~wd17xx_sector_r(devtag_get_device(space->machine, "wd179x"), offset);
 }
 
 static READ8_HANDLER(apf_wd179x_data_r)
 {
-	return wd17xx_data_r((device_config*)devtag_get_device(space->machine, WD179X, "wd179x"), offset);
+	return wd17xx_data_r(devtag_get_device(space->machine, "wd179x"), offset);
 }
 
 static ADDRESS_MAP_START(apf_imagination_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x00000, 0x003ff) AM_RAM AM_BASE(&apf_video_ram) AM_MIRROR(0x1c00)
-	AM_RANGE( 0x02000, 0x03fff) AM_DEVREADWRITE(PIA6821, "pia_0", pia_r, pia_w)
+	AM_RANGE( 0x02000, 0x03fff) AM_DEVREADWRITE("pia_0", pia6821_r, pia6821_w)
 	AM_RANGE( 0x04000, 0x047ff) AM_ROM AM_REGION("maincpu", 0x10000) AM_MIRROR(0x1800)
-	AM_RANGE( 0x06000, 0x063ff) AM_DEVREADWRITE(PIA6821, "pia_1", pia_r, pia_w)
+	AM_RANGE( 0x06000, 0x063ff) AM_DEVREADWRITE("pia_1", pia6821_r, pia6821_w)
 	AM_RANGE( 0x06400, 0x064ff) AM_READWRITE(serial_r, serial_w)
 	AM_RANGE( 0x06500, 0x06500) AM_READWRITE(apf_wd179x_status_r, apf_wd179x_command_w)
 	AM_RANGE( 0x06501, 0x06501) AM_READWRITE(apf_wd179x_track_r, apf_wd179x_track_w)
@@ -409,7 +409,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(apf_m1000_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x00000, 0x003ff) AM_RAM AM_BASE(&apf_video_ram)  AM_MIRROR(0x1c00)
-	AM_RANGE( 0x02000, 0x03fff) AM_DEVREADWRITE(PIA6821, "pia_0", pia_r, pia_w)
+	AM_RANGE( 0x02000, 0x03fff) AM_DEVREADWRITE("pia_0", pia6821_r, pia6821_w)
 	AM_RANGE( 0x04000, 0x047ff) AM_ROM AM_REGION("maincpu", 0x10000) AM_MIRROR(0x1800)
 	AM_RANGE( 0x06800, 0x077ff) AM_ROM
 	AM_RANGE( 0x08000, 0x09fff) AM_ROM AM_REGION("maincpu", 0x8000)

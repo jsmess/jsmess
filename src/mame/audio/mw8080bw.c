@@ -146,7 +146,7 @@ MACHINE_DRIVER_END
 
 WRITE8_HANDLER( seawolf_audio_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(space->machine, "samples");
 	UINT8 rising_bits = data & ~port_1_last;
 
 	/* if (data & 0x01)  enable SHIP HIT sound */
@@ -212,8 +212,8 @@ MACHINE_DRIVER_END
 
 WRITE8_HANDLER( gunfight_audio_w )
 {
-	const device_config *samples0 = devtag_get_device(space->machine, SOUND, "samples1");
-	const device_config *samples1 = devtag_get_device(space->machine, SOUND, "samples2");
+	const device_config *samples0 = devtag_get_device(space->machine, "samples1");
+	const device_config *samples1 = devtag_get_device(space->machine, "samples2");
 
 	/* D0 and D1 are just tied to 1k resistors */
 
@@ -766,29 +766,40 @@ static DISCRETE_SOUND_START(boothill)
 
 	DISCRETE_OP_AMP_TRIG_VCA(NODE_30, BOOTHILL_LEFT_SHOT_EN, 0, 0, BOOTHILL_NOISE, 0, &boothill_shot_tvca_info)
 	DISCRETE_RCFILTER(NODE_31, 1, NODE_30, RES_K(12), CAP_U(.01))
-	DISCRETE_CRFILTER(BOOTHILL_L_SHOT_SND, 1, NODE_31, RES_K(12) + RES_K(68), CAP_U(.0022))
+	DISCRETE_RCFILTER(BOOTHILL_L_SHOT_SND, 1, NODE_31, RES_K(12) + RES_K(68), CAP_U(.0022))
 
 	DISCRETE_OP_AMP_TRIG_VCA(NODE_35, BOOTHILL_RIGHT_SHOT_EN, 0, 0, BOOTHILL_NOISE, 0, &boothill_shot_tvca_info)
 	DISCRETE_RCFILTER(NODE_36, 1, NODE_35, RES_K(12), CAP_U(.01))
-	DISCRETE_CRFILTER(BOOTHILL_R_SHOT_SND, 1, NODE_36, RES_K(12) + RES_K(68), CAP_U(.0033))
+	DISCRETE_RCFILTER(BOOTHILL_R_SHOT_SND, 1, NODE_36, RES_K(12) + RES_K(68), CAP_U(.0033))
 
 	/************************************************
      * Hit sounds
      ************************************************/
 	DISCRETE_OP_AMP_TRIG_VCA(NODE_40, BOOTHILL_LEFT_HIT_EN, 0, 0, BOOTHILL_NOISE, 0, &boothill_hit_tvca_info)
 	DISCRETE_RCFILTER(NODE_41, 1, NODE_40, RES_K(12), CAP_U(.033))
-	DISCRETE_CRFILTER(BOOTHILL_L_HIT_SND, 1, NODE_41, RES_K(12) + RES_K(100), CAP_U(.0033))
+	DISCRETE_RCFILTER(BOOTHILL_L_HIT_SND, 1, NODE_41, RES_K(12) + RES_K(100), CAP_U(.0033))
 
 	DISCRETE_OP_AMP_TRIG_VCA(NODE_45, BOOTHILL_RIGHT_HIT_EN, 0, 0, BOOTHILL_NOISE, 0, &boothill_hit_tvca_info)
 	DISCRETE_RCFILTER(NODE_46, 1, NODE_45, RES_K(12), CAP_U(.0033))
-	DISCRETE_CRFILTER(BOOTHILL_R_HIT_SND, 1, NODE_46, RES_K(12) + RES_K(100), CAP_U(.0022))
+	DISCRETE_RCFILTER(BOOTHILL_R_HIT_SND, 1, NODE_46, RES_K(12) + RES_K(100), CAP_U(.0022))
 
 	/************************************************
      * Combine all sound sources.
      ************************************************/
+	/* There is a 1uF cap on the input to the amp that I was too lazy to simulate.
+     * It is just a DC blocking cap needed by the Norton amp.  Doing the extra
+     * work to simulate it is not going to make a difference to the waveform
+     * or to how it sounds.  Also I use a regular amp in place of the Norton
+     * for the same reasons.  Ease of coding/simulation. */
+
+	/* The schematics show the Hit sounds as shown.
+     * This makes the death of the enemy sound on the players side.
+     * This should be verified. */
+
 	DISCRETE_MIXER2(NODE_91, BOOTHILL_GAME_ON_EN, BOOTHILL_L_SHOT_SND, BOOTHILL_L_HIT_SND, &boothill_l_mixer)
 
-	/* music is only added to the right channel */
+	/* Music is only added to the right channel per schematics */
+	/* This should be verified on the real game */
 	DISCRETE_MIXER3(NODE_92, BOOTHILL_GAME_ON_EN, BOOTHILL_R_SHOT_SND, BOOTHILL_R_HIT_SND, MIDWAY_TONE_SND, &boothill_r_mixer)
 
 	DISCRETE_OUTPUT(NODE_91, 1)
@@ -1634,8 +1645,8 @@ WRITE8_HANDLER( gmissile_audio_1_w )
        reversed (D5=R, D7=L), but the software confirms that
        ours is right */
 
-	const device_config *samples0 = devtag_get_device(space->machine, SOUND, "samples1");
-	const device_config *samples1 = devtag_get_device(space->machine, SOUND, "samples2");
+	const device_config *samples0 = devtag_get_device(space->machine, "samples1");
+	const device_config *samples1 = devtag_get_device(space->machine, "samples2");
 	UINT8 rising_bits = data & ~port_1_last;
 
 	/* D0 and D1 are not connected */
@@ -1730,8 +1741,8 @@ MACHINE_DRIVER_END
 
 WRITE8_HANDLER( m4_audio_1_w )
 {
-	const device_config *samples0 = devtag_get_device(space->machine, SOUND, "samples1");
-	const device_config *samples1 = devtag_get_device(space->machine, SOUND, "samples2");
+	const device_config *samples0 = devtag_get_device(space->machine, "samples1");
+	const device_config *samples1 = devtag_get_device(space->machine, "samples2");
 	UINT8 rising_bits = data & ~port_1_last;
 
 	/* D0 and D1 are not connected */
@@ -1758,8 +1769,8 @@ WRITE8_HANDLER( m4_audio_1_w )
 
 WRITE8_HANDLER( m4_audio_2_w )
 {
-	const device_config *samples0 = devtag_get_device(space->machine, SOUND, "samples1");
-	const device_config *samples1 = devtag_get_device(space->machine, SOUND, "samples2");
+	const device_config *samples0 = devtag_get_device(space->machine, "samples1");
+	const device_config *samples1 = devtag_get_device(space->machine, "samples2");
 	UINT8 rising_bits = data & ~port_2_last;
 
 	/* if (data & 0x01)  enable LEFT PLAYER EXPLOSION sound via 510K res (goes to left speaker) */
@@ -2032,7 +2043,7 @@ WRITE8_HANDLER( clowns_audio_1_w )
 
 WRITE8_DEVICE_HANDLER( clowns_audio_2_w )
 {
-	const device_config *samples = devtag_get_device(device->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(device->machine, "samples");
 	UINT8 rising_bits = data & ~port_2_last;
 
 	discrete_sound_w(device, CLOWNS_POP_BOTTOM_EN, (data >> 0) & 0x01);
@@ -2734,7 +2745,7 @@ WRITE8_DEVICE_HANDLER( spcenctr_audio_2_w )
 
 WRITE8_DEVICE_HANDLER( spcenctr_audio_3_w )
 {
-	const device_config *sn = devtag_get_device(device->machine, SOUND, "sn");
+	const device_config *sn = devtag_get_device(device->machine, "sn");
 
 	/* if (data & 0x01)  enable SCREECH (hit the sides) sound */
 
@@ -2787,7 +2798,7 @@ MACHINE_DRIVER_END
 
 WRITE8_HANDLER( phantom2_audio_1_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(space->machine, "samples");
 	UINT8 rising_bits = data & ~port_1_last;
 
 	/* if (data & 0x01)  enable PLAYER SHOT sound */
@@ -2809,7 +2820,7 @@ WRITE8_HANDLER( phantom2_audio_1_w )
 
 WRITE8_HANDLER( phantom2_audio_2_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(space->machine, "samples");
 	UINT8 rising_bits = data & ~port_2_last;
 
 	/* D0-D2 are not connected */
@@ -3649,7 +3660,7 @@ MACHINE_DRIVER_END
 
 WRITE8_DEVICE_HANDLER( invaders_audio_1_w )
 {
-	const device_config *sn = devtag_get_device(device->machine, SOUND, "sn");
+	const device_config *sn = devtag_get_device(device->machine, "sn");
 
 	sn76477_enable_w(sn, (~data >> 0) & 0x01);	/* saucer sound */
 
@@ -4031,7 +4042,7 @@ MACHINE_DRIVER_END
 
 WRITE8_DEVICE_HANDLER( invad2ct_audio_1_w )
 {
-	const device_config *sn = devtag_get_device(device->machine, SOUND, "sn1");
+	const device_config *sn = devtag_get_device(device->machine, "sn1");
 
 	sn76477_enable_w(sn, (~data >> 0) & 0x01);	/* saucer sound */
 
@@ -4057,7 +4068,7 @@ WRITE8_DEVICE_HANDLER( invad2ct_audio_2_w )
 
 WRITE8_DEVICE_HANDLER( invad2ct_audio_3_w )
 {
-	const device_config *sn = devtag_get_device(device->machine, SOUND, "sn2");
+	const device_config *sn = devtag_get_device(device->machine, "sn2");
 
 	sn76477_enable_w(sn, (~data >> 0) & 0x01);	/* saucer sound */
 

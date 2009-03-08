@@ -36,7 +36,7 @@ static UINT8 key_sense;
 
 static void mtx_tms9929a_interrupt(running_machine *machine, int data)
 {
-	z80ctc_trg0_w(devtag_get_device(machine, Z80CTC, "z80ctc"), 0, data ? 0 : 1);
+	z80ctc_trg0_w(devtag_get_device(machine, "z80ctc"), 0, data ? 0 : 1);
 }
 
 static const TMS9928a_interface tms9928a_interface =
@@ -266,7 +266,7 @@ DRIVER_INIT( rs128 )
 	DRIVER_INIT_CALL(mtx512);
 
 	/* install handlers for dart interface */
-	device = devtag_get_device(machine, Z80DART, "z80dart");
+	device = devtag_get_device(machine, "z80dart");
 	space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO);
 	memory_install_readwrite8_device_handler(space, device, 0x0c, 0x0d, 0, 0, z80dart_d_r, z80dart_d_w);
 	memory_install_readwrite8_device_handler(space, device, 0x0e, 0x0f, 0, 0, z80dart_c_r, z80dart_c_w);

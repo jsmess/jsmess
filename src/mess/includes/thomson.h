@@ -11,7 +11,7 @@
 
 #include "driver.h"
 #include "cpu/m6809/m6809.h"
-#include "machine/6821new.h"
+#include "machine/6821pia.h"
 #include "machine/mc6846.h"
 #include "machine/6850acia.h"
 #include "machine/6551.h"

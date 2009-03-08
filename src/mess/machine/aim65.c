@@ -9,7 +9,7 @@
 #include "includes/aim65.h"
 
 /* Peripheral chips */
-#include "machine/6821new.h"
+#include "machine/6821pia.h"
 #include "machine/6522via.h"
 
 /* DL1416A display chip */
@@ -73,11 +73,11 @@ static void dl1416_update(const device_config *device, int index)
 
 static void aim65_pia(running_machine *machine)
 {
-	dl1416_update(devtag_get_device(machine, DL1416, "ds1"), 0);
-	dl1416_update(devtag_get_device(machine, DL1416, "ds2"), 1);
-	dl1416_update(devtag_get_device(machine, DL1416, "ds3"), 2);
-	dl1416_update(devtag_get_device(machine, DL1416, "ds4"), 3);
-	dl1416_update(devtag_get_device(machine, DL1416, "ds5"), 4);
+	dl1416_update(devtag_get_device(machine, "ds1"), 0);
+	dl1416_update(devtag_get_device(machine, "ds2"), 1);
+	dl1416_update(devtag_get_device(machine, "ds3"), 2);
+	dl1416_update(devtag_get_device(machine, "ds4"), 3);
+	dl1416_update(devtag_get_device(machine, "ds5"), 4);
 }
 
 
@@ -167,7 +167,7 @@ void aim65_riot_irq(const device_config *device, int state)
 
 MACHINE_START( aim65 )
 {
-	const device_config *via_0 = devtag_get_device(machine, VIA6522, "via6522_0");
+	const device_config *via_0 = devtag_get_device(machine, "via6522_0");
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
 	/* Init RAM */

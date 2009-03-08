@@ -725,9 +725,9 @@ static void nc_sound_update(running_machine *machine, int channel)
 	frequency = (int)(1000000.0f/((float)((period & 0x07fff)<<1) * 1.6276f));
 
 	/* set state */
-	beep_set_state(devtag_get_device(machine, SOUND, beep_device), on);
+	beep_set_state(devtag_get_device(machine, beep_device), on);
 	/* set frequency */
-	beep_set_frequency(devtag_get_device(machine, SOUND, beep_device), frequency);
+	beep_set_frequency(devtag_get_device(machine, beep_device), frequency);
 }
 
 static WRITE8_HANDLER(nc_sound_w)
@@ -793,7 +793,7 @@ static const unsigned long baud_rate_table[]=
 
 static TIMER_CALLBACK(nc_serial_timer_callback)
 {
-	const device_config *uart = devtag_get_device(machine, MSM8251, "uart");
+	const device_config *uart = devtag_get_device(machine, "uart");
 
 	msm8251_transmit_clock(uart);
 	msm8251_receive_clock(uart);
@@ -810,7 +810,7 @@ static WRITE8_HANDLER(nc_uart_control_w)
 		/* changed uart from off to on */
 		if ((data & (1<<3))==0)
 		{
-			devtag_reset(space->machine, MSM8251, "uart");
+			devtag_reset(space->machine, "uart");
 		}
 	}
 
@@ -827,7 +827,7 @@ static WRITE8_HANDLER(nc_uart_control_w)
 /* same for nc100 and nc200 */
 static void	nc_printer_update(running_machine *machine, UINT8 data)
 {
-	const device_config *printer = devtag_get_device(machine, CENTRONICS, "centronics");
+	const device_config *printer = devtag_get_device(machine, "centronics");
 	centronics_strobe_w(printer, BIT(data, 6));
 }
 
@@ -966,7 +966,7 @@ static MACHINE_RESET( nc100 )
 	nc_common_open_stream_for_reading(machine);
 
 	{
-		const device_config *rtc = devtag_get_device(machine, TC8521, "rtc");
+		const device_config *rtc = devtag_get_device(machine, "rtc");
 		tc8521_load_stream(rtc, file);
 	}
 
@@ -982,7 +982,7 @@ static void nc100_machine_stop(running_machine *machine)
 {
 	nc_common_open_stream_for_writing(machine);
 	{
-		const device_config *rtc = devtag_get_device(machine, TC8521, "rtc");
+		const device_config *rtc = devtag_get_device(machine, "rtc");
 		tc8521_save_stream(rtc, file);
 	}
 	nc_common_store_memory_to_stream();
@@ -1009,7 +1009,7 @@ static WRITE8_HANDLER(nc100_poweroff_control_w)
 /* nc100 version of card/battery status */
 static  READ8_HANDLER(nc100_card_battery_status_r)
 {
-	const device_config *printer = devtag_get_device(space->machine, CENTRONICS, "centronics");
+	const device_config *printer = devtag_get_device(space->machine, "centronics");
 	int nc_card_battery_status = 0x0fc;
 
 	/* printer */
@@ -1050,7 +1050,7 @@ static ADDRESS_MAP_START(nc100_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x10, 0x13) AM_READWRITE(nc_memory_management_r, nc_memory_management_w)
 	AM_RANGE(0x20, 0x20) AM_WRITE(nc100_memory_card_wait_state_w)
 	AM_RANGE(0x30, 0x30) AM_WRITE(nc100_uart_control_w)
-	AM_RANGE(0x40, 0x40) AM_DEVWRITE(CENTRONICS, "centronics", centronics_data_w)
+	AM_RANGE(0x40, 0x40) AM_DEVWRITE("centronics", centronics_data_w)
 	AM_RANGE(0x50, 0x53) AM_WRITE(nc_sound_w)
 	AM_RANGE(0x60, 0x60) AM_WRITE(nc_irq_mask_w)
 	AM_RANGE(0x70, 0x70) AM_WRITE(nc100_poweroff_control_w)
@@ -1058,9 +1058,9 @@ static ADDRESS_MAP_START(nc100_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x91, 0x9f) AM_READ(nc_irq_status_r)
 	AM_RANGE(0xa0, 0xaf) AM_READ(nc100_card_battery_status_r)
 	AM_RANGE(0xb0, 0xb9) AM_READ(nc_key_data_in_r)
-	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE(MSM8251, "uart", msm8251_data_r, msm8251_data_w)
-	AM_RANGE(0xc1, 0xc1) AM_DEVREADWRITE(MSM8251, "uart", msm8251_status_r, msm8251_control_w)
-	AM_RANGE(0xd0, 0xdf) AM_DEVREADWRITE(TC8521, "rtc", tc8521_r, tc8521_w)
+	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE("uart", msm8251_data_r, msm8251_data_w)
+	AM_RANGE(0xc1, 0xc1) AM_DEVREADWRITE("uart", msm8251_status_r, msm8251_control_w)
+	AM_RANGE(0xd0, 0xdf) AM_DEVREADWRITE("rtc", tc8521_r, tc8521_w)
 ADDRESS_MAP_END
 
 
@@ -1431,7 +1431,7 @@ static  READ8_HANDLER(nc200_card_battery_status_r)
 
 static READ8_HANDLER(nc200_printer_status_r)
 {
-	const device_config *printer = devtag_get_device(space->machine, CENTRONICS, "centronics");
+	const device_config *printer = devtag_get_device(space->machine, "centronics");
 	UINT8 result = 0;
 
 	result |= centronics_busy_r(printer);
@@ -1472,7 +1472,7 @@ static WRITE8_HANDLER(nc200_uart_control_w)
 
 static WRITE8_HANDLER(nc200_memory_card_wait_state_w)
 {
-	device_config *fdc = (device_config*)devtag_get_device(space->machine, NEC765A, "nec765");
+	const device_config *fdc = devtag_get_device(space->machine, "nec765");
 	LOG_DEBUG(("nc200 memory card wait state: PC: %04x %02x\n",cpu_get_pc(space->machine->cpu[0]),data));
 #if 0
 	floppy_drive_set_motor_state(0,1);
@@ -1497,7 +1497,7 @@ static ADDRESS_MAP_START(nc200_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x10, 0x13) AM_READWRITE(nc_memory_management_r, nc_memory_management_w)
 	AM_RANGE(0x20, 0x20) AM_WRITE(nc200_memory_card_wait_state_w)
 	AM_RANGE(0x30, 0x30) AM_WRITE(nc200_uart_control_w)
-	AM_RANGE(0x40, 0x40) AM_DEVWRITE(CENTRONICS, "centronics", centronics_data_w)
+	AM_RANGE(0x40, 0x40) AM_DEVWRITE("centronics", centronics_data_w)
 	AM_RANGE(0x50, 0x53) AM_WRITE(nc_sound_w)
 	AM_RANGE(0x60, 0x60) AM_WRITE(nc_irq_mask_w)
 	AM_RANGE(0x70, 0x70) AM_WRITE(nc200_poweroff_control_w)
@@ -1505,11 +1505,11 @@ static ADDRESS_MAP_START(nc200_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x90, 0x90) AM_READWRITE(nc_irq_status_r, nc_irq_status_w)
 	AM_RANGE(0xa0, 0xa0) AM_READ(nc200_card_battery_status_r)
 	AM_RANGE(0xb0, 0xb9) AM_READ(nc_key_data_in_r)
-	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE(MSM8251, "uart", msm8251_data_r, msm8251_data_w)
-	AM_RANGE(0xc1, 0xc1) AM_DEVREADWRITE(MSM8251, "uart", msm8251_status_r, msm8251_control_w)
+	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE("uart", msm8251_data_r, msm8251_data_w)
+	AM_RANGE(0xc1, 0xc1) AM_DEVREADWRITE("uart", msm8251_status_r, msm8251_control_w)
 	AM_RANGE(0xd0, 0xd1) AM_READWRITE(mc146818_port_r, mc146818_port_w)
-	AM_RANGE(0xe0, 0xe0) AM_DEVREAD(NEC765A, "nec765", nec765_status_r)
-	AM_RANGE(0xe1, 0xe1) AM_DEVREADWRITE(NEC765A, "nec765",nec765_data_r, nec765_data_w)
+	AM_RANGE(0xe0, 0xe0) AM_DEVREAD("nec765", nec765_status_r)
+	AM_RANGE(0xe1, 0xe1) AM_DEVREADWRITE("nec765",nec765_data_r, nec765_data_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START(nc200)

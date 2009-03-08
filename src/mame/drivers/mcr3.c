@@ -89,6 +89,8 @@
 #include "audio/mcr.h"
 #include "mcr.h"
 
+#include "turbotag.lh"
+
 
 #define MASTER_CLOCK		XTAL_20MHz
 
@@ -121,13 +123,15 @@ static INT8 maxrpm_p2_shift;
 
 static READ8_HANDLER( demoderm_ip1_r )
 {
-	return input_port_read(space->machine, input_mux ? "MONO.IP1.ALT" : "MONO.IP1");
+	return input_port_read(space->machine, "MONO.IP1") |
+		(input_port_read(space->machine, input_mux ? "MONO.IP1.ALT2" : "MONO.IP1.ALT1") << 2);
 }
 
 
 static READ8_HANDLER( demoderm_ip2_r )
 {
-	return input_port_read(space->machine, input_mux ? "MONO.IP2.ALT" : "MONO.IP2");
+	return input_port_read(space->machine, "MONO.IP2") |
+		(input_port_read(space->machine, input_mux ? "MONO.IP2.ALT2" : "MONO.IP2.ALT1") << 2);
 }
 
 
@@ -473,7 +477,7 @@ static ADDRESS_MAP_START( mcrmono_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x04, 0x04) AM_MIRROR(0x78) AM_READ_PORT("MONO.IP4")
 	AM_RANGE(0x05, 0x05) AM_MIRROR(0x78) AM_WRITE(mcrmono_control_port_w)
 	AM_RANGE(0x07, 0x07) AM_MIRROR(0x78) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0xf0, 0xf3) AM_MIRROR(0x0c) AM_DEVREADWRITE(Z80CTC, "ctc", z80ctc_r, z80ctc_w)
+	AM_RANGE(0xf0, 0xf3) AM_MIRROR(0x0c) AM_DEVREADWRITE("ctc", z80ctc_r, z80ctc_w)
 ADDRESS_MAP_END
 
 
@@ -503,7 +507,7 @@ static ADDRESS_MAP_START( spyhunt_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x84, 0x86) AM_WRITE(mcr_scroll_value_w)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xe8, 0xe8) AM_WRITE(SMH_NOP)
-	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE(Z80CTC, "ctc", z80ctc_r, z80ctc_w)
+	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("ctc", z80ctc_r, z80ctc_w)
 ADDRESS_MAP_END
 
 
@@ -529,12 +533,22 @@ static INPUT_PORTS_START( demoderm )
 	PORT_START("MONO.IP1")	/* J2 10-13,15-18 */	/* The high 6 bits contain the steering wheel value */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0xfc, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(1)
+
+	PORT_START("MONO.IP1.ALT1")	/* J2 10-13,15-18 */	/* The high 6 bits contain the steering wheel value */
+	PORT_BIT( 0x3f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(1)
+
+	PORT_START("MONO.IP1.ALT2")	/* IN1 (muxed) -- the high 6 bits contain the steering wheel value */
+	PORT_BIT( 0x3f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(3)
 
 	PORT_START("MONO.IP2")	/* J3 1-8 */	/* The high 6 bits contain the steering wheel value */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0xfc, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(2)
+
+	PORT_START("MONO.IP2.ALT1")	/* J3 1-8 */	/* The high 6 bits contain the steering wheel value */
+	PORT_BIT( 0x3f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(2)
+
+	PORT_START("MONO.IP2.ALT2")	/* IN2 (muxed) -- the high 6 bits contain the steering wheel value */
+	PORT_BIT( 0x3f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(4)
 
 	PORT_START("MONO.IP3")	/* DIPSW @ B3 */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )
@@ -566,15 +580,6 @@ static INPUT_PORTS_START( demoderm )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
 
-	PORT_START("MONO.IP1.ALT")	/* IN1 (muxed) -- the high 6 bits contain the steering wheel value */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0xfc, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(3)
-
-	PORT_START("MONO.IP2.ALT")	/* IN2 (muxed) -- the high 6 bits contain the steering wheel value */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0xfc, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(4)
 INPUT_PORTS_END
 
 
@@ -1625,4 +1630,4 @@ GAME( 1987, stargrds, 0,        mono_sg,   stargrds, stargrds, ROT0,  "Bally Mid
 GAME( 1983, spyhunt,  0,        mcrsc_csd, spyhunt,  spyhunt,  ROT90, "Bally Midway", "Spy Hunter", GAME_SUPPORTS_SAVE )
 GAME( 1983, spyhuntp, spyhunt,  mcrsc_csd, spyhunt,  spyhunt,  ROT90, "Bally Midway", "Spy Hunter (Playtronic license)", GAME_SUPPORTS_SAVE )
 GAME( 1984, crater,   0,        mcrscroll, crater,   crater,   ORIENTATION_FLIP_X, "Bally Midway", "Crater Raider", GAME_SUPPORTS_SAVE )
-GAME( 1985, turbotag, 0,        mcrsc_csd, turbotag, turbotag, ROT90, "Bally Midway", "Turbo Tag (prototype)", GAME_SUPPORTS_SAVE )
+GAMEL(1985, turbotag, 0,        mcrsc_csd, turbotag, turbotag, ROT90, "Bally Midway", "Turbo Tag (prototype)", GAME_SUPPORTS_SAVE, layout_turbotag )

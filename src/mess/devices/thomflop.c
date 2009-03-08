@@ -270,7 +270,7 @@ static UINT8 to7_5p14_select;
 
 static READ8_HANDLER ( to7_5p14_r )
 {
-	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD2793, "wd2793");
+	const device_config *fdc = devtag_get_device(space->machine, "wd2793");
 	
 	if ( offset < 4 )
 		return wd17xx_r( fdc, offset );
@@ -285,7 +285,7 @@ static READ8_HANDLER ( to7_5p14_r )
 
 static WRITE8_HANDLER( to7_5p14_w )
 {
-	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD2793, "wd2793");
+	const device_config *fdc = devtag_get_device(space->machine, "wd2793");
 	if ( offset < 4 )
 		wd17xx_w( fdc, offset, data );
 	else if ( offset == 8 )
@@ -331,7 +331,7 @@ static WRITE8_HANDLER( to7_5p14_w )
 static void to7_5p14_reset( running_machine *machine )
 {
 	int i;
-	device_config *fdc = (device_config*)devtag_get_device(machine, WD2793, "wd2793");
+	const device_config *fdc = devtag_get_device(machine, "wd2793");
 	LOG(( "to7_5p14_reset: CD 90-640 controller\n" ));
 	thom_floppy_set_density( DEN_MFM_LO );
 	wd17xx_reset(fdc);
@@ -371,7 +371,7 @@ static UINT8 to7_5p14sd_select;
 static READ8_HANDLER ( to7_5p14sd_r )
 {
 	if ( offset < 8 )
-		return mc6843_r( devtag_get_device(space->machine, MC6843, "mc6843"), offset );
+		return mc6843_r( devtag_get_device(space->machine, "mc6843"), offset );
 	else if ( offset >= 8 && offset <= 9 )
 		return to7_5p14sd_select;
 	else
@@ -384,7 +384,7 @@ static READ8_HANDLER ( to7_5p14sd_r )
 static WRITE8_HANDLER( to7_5p14sd_w )
 {
 	if ( offset < 8 )
-		mc6843_w( devtag_get_device(space->machine, MC6843, "mc6843"), offset, data );
+		mc6843_w( devtag_get_device(space->machine, "mc6843"), offset, data );
 	else if ( offset >= 8 && offset <= 9 )
 	{
 		/* drive select */
@@ -416,8 +416,8 @@ static WRITE8_HANDLER( to7_5p14sd_w )
 		if ( drive != -1 )
 		{
 			thom_floppy_active( space->machine, 0 );
-			mc6843_set_drive( devtag_get_device(space->machine, MC6843, "mc6843"), drive );
-			mc6843_set_side( devtag_get_device(space->machine, MC6843, "mc6843"), side );
+			mc6843_set_drive( devtag_get_device(space->machine, "mc6843"), drive );
+			mc6843_set_side( devtag_get_device(space->machine, "mc6843"), side );
 			LOG(( "%f $%04x to7_5p14sd_w: $%02X set drive=%i side=%i\n",
 			      attotime_to_double(timer_get_time(space->machine)), cpu_get_previouspc( space->machine->cpu[0] ), data, drive, side ));
 		}
@@ -429,7 +429,7 @@ static WRITE8_HANDLER( to7_5p14sd_w )
 
 static void to7_5p14_index_pulse_callback( const device_config *controller,const device_config *image, int state )
 {
-	mc6843_set_index_pulse( devtag_get_device(image->machine, MC6843, "mc6843"), state );
+	mc6843_set_index_pulse( devtag_get_device(image->machine, "mc6843"), state );
 }
 
 static void to7_5p14sd_reset( running_machine *machine )
@@ -1599,27 +1599,27 @@ void thmfc_floppy_init( running_machine *machine )
 static TIMER_CALLBACK( ans4 )
 {
 	LOG(( "%f ans4\n", attotime_to_double(timer_get_time(machine)) ));
-	mc6854_set_cts( devtag_get_device(machine, MC6854, "mc6854"), 0 );
+	mc6854_set_cts( devtag_get_device(machine, "mc6854"), 0 );
 }
 
 static TIMER_CALLBACK( ans3 )
 {
 	LOG(( "%f ans3\n", attotime_to_double(timer_get_time(machine)) ));
-	mc6854_set_cts( devtag_get_device(machine, MC6854, "mc6854"), 1 );
+	mc6854_set_cts( devtag_get_device(machine, "mc6854"), 1 );
 	timer_set( machine, ATTOTIME_IN_USEC( 100 ), NULL, 0, ans4 );
 }
 
 static TIMER_CALLBACK( ans2 )
 {
 	LOG(( "%f ans2\n", attotime_to_double(timer_get_time(machine)) ));
-	mc6854_set_cts( devtag_get_device(machine, MC6854, "mc6854"), 0 );
+	mc6854_set_cts( devtag_get_device(machine, "mc6854"), 0 );
 	timer_set( machine, ATTOTIME_IN_USEC( 100 ), NULL, 0, ans3 );
 }
 
 static TIMER_CALLBACK( ans )
 {
 	LOG(( "%f ans\n", attotime_to_double(timer_get_time(machine)) ));
-	mc6854_set_cts( devtag_get_device(machine, MC6854, "mc6854"), 1 );
+	mc6854_set_cts( devtag_get_device(machine, "mc6854"), 1 );
 	timer_set( machine, ATTOTIME_IN_USEC( 100 ), NULL, 0, ans2 );
 }
 /* consigne DKBOOT
@@ -1700,8 +1700,8 @@ static void to7_network_init( running_machine *machine )
 static void to7_network_reset( running_machine *machine )
 {
 	LOG(( "to7_network_reset: NR 07-005 network extension\n" ));
-	mc6854_set_cts( devtag_get_device(machine, MC6854, "mc6854"), 0 );
-	mc6854_set_cts( devtag_get_device(machine, MC6854, "mc6854"), 1 );
+	mc6854_set_cts( devtag_get_device(machine, "mc6854"), 0 );
+	mc6854_set_cts( devtag_get_device(machine, "mc6854"), 1 );
 }
 
 
@@ -1709,7 +1709,7 @@ static void to7_network_reset( running_machine *machine )
 static READ8_HANDLER ( to7_network_r )
 {
 	if ( offset >= 0 && offset < 4 )
-		return mc6854_r( devtag_get_device(space->machine, MC6854, "mc6854"), offset );
+		return mc6854_r( devtag_get_device(space->machine, "mc6854"), offset );
 
 	if ( offset == 8 )
 	{
@@ -1728,7 +1728,7 @@ static READ8_HANDLER ( to7_network_r )
 static WRITE8_HANDLER ( to7_network_w )
 {
 	if ( offset >= 0 && offset < 4 )
-		mc6854_w( devtag_get_device(space->machine, MC6854, "mc6854"), offset, data );
+		mc6854_w( devtag_get_device(space->machine, "mc6854"), offset, data );
 	else
 	{
 		logerror( "%f $%04x to7_network_w: invalid write offset %i (data=$%02X)\n",

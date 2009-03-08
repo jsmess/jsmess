@@ -21,7 +21,7 @@
 	MDRV_DEVICE_CONFIG(_config)
 
 #define MDRV_MSM6255_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag, MSM6255)
+	MDRV_DEVICE_REMOVE(_tag)
 
 #define MSM6255_INTERFACE(_name) \
 	const msm6255_interface (_name) =

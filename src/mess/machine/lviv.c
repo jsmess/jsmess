@@ -66,7 +66,7 @@ static READ8_DEVICE_HANDLER ( lviv_ppi_0_portb_r )
 static READ8_DEVICE_HANDLER ( lviv_ppi_0_portc_r )
 {
 	UINT8 data = lviv_ppi_port_outputs[0][2] & 0x0f;
-	if (cassette_input(devtag_get_device(device->machine, CASSETTE, "cassette")) > 0.038)
+	if (cassette_input(devtag_get_device(device->machine, "cassette")) > 0.038)
 		data |= 0x10;
 	if (lviv_ppi_port_outputs[0][0] & input_port_read(device->machine, "JOY"))
 		data |= 0x80;
@@ -86,11 +86,11 @@ static WRITE8_DEVICE_HANDLER ( lviv_ppi_0_portb_w )
 
 static WRITE8_DEVICE_HANDLER ( lviv_ppi_0_portc_w )	/* tape in/out, video memory on/off */
 {
-	const device_config *speaker = devtag_get_device(device->machine, SOUND, "speaker");
+	const device_config *speaker = devtag_get_device(device->machine, "speaker");
 	lviv_ppi_port_outputs[0][2] = data;
 	if (lviv_ppi_port_outputs[0][1]&0x80)
 		speaker_level_w(speaker, data&0x01);
-	cassette_output(devtag_get_device(device->machine, CASSETTE, "cassette"), (data & 0x01) ? -1.0 : 1.0);
+	cassette_output(devtag_get_device(device->machine, "cassette"), (data & 0x01) ? -1.0 : 1.0);
 	lviv_update_memory(device->machine);
 }
 
@@ -147,10 +147,10 @@ static WRITE8_DEVICE_HANDLER ( lviv_ppi_1_portc_w )	/* kayboard scaning */
 		switch ((offset >> 4) & 0x3)
 		{
 		case 0:
-			return ppi8255_r((device_config*)devtag_get_device(space->machine, PPI8255, "ppi8255_0"), offset & 3);
+			return ppi8255_r((device_config*)devtag_get_device(space->machine, "ppi8255_0"), offset & 3);
 
 		case 1:
-			return ppi8255_r((device_config*)devtag_get_device(space->machine, PPI8255, "ppi8255_1"), offset & 3);
+			return ppi8255_r((device_config*)devtag_get_device(space->machine, "ppi8255_1"), offset & 3);
 
 		case 2:
 		case 3:
@@ -183,11 +183,11 @@ WRITE8_HANDLER ( lviv_io_w )
 		switch ((offset >> 4) & 0x3)
 		{
 		case 0:
-			ppi8255_w((device_config*)devtag_get_device(space->machine, PPI8255, "ppi8255_0"), offset & 3, data);
+			ppi8255_w((device_config*)devtag_get_device(space->machine, "ppi8255_0"), offset & 3, data);
 			break;
 
 		case 1:
-			ppi8255_w((device_config*)devtag_get_device(space->machine, PPI8255, "ppi8255_1"), offset & 3, data);
+			ppi8255_w((device_config*)devtag_get_device(space->machine, "ppi8255_1"), offset & 3, data);
 			break;
 
 		case 2:

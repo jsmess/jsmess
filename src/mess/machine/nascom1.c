@@ -78,7 +78,7 @@ READ8_HANDLER( nascom2_fdc_select_r )
 
 WRITE8_HANDLER( nascom2_fdc_select_w )
 {
-	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD1793, "wd1793");
+	const device_config *fdc = devtag_get_device(space->machine, "wd1793");
 	nascom2_fdc.select = data;
 
 	logerror("nascom2_fdc_select_w: %02x\n", data);
@@ -107,7 +107,7 @@ READ8_HANDLER( nascom2_fdc_status_r )
 DEVICE_IMAGE_LOAD( nascom2_floppy )
 {
 	int sides, sectors;
-	device_config *fdc = (device_config*)devtag_get_device(image->machine, WD1793, "wd1793");
+	const device_config *fdc = devtag_get_device(image->machine, "wd1793");
 	if (!image_has_been_created(image))
 	{
 		switch (image_length(image))
@@ -165,7 +165,7 @@ READ8_HANDLER ( nascom1_port_00_r )
 WRITE8_HANDLER( nascom1_port_00_w )
 {
 
-	cassette_change_state( devtag_get_device(space->machine, CASSETTE, "cassette"),
+	cassette_change_state( devtag_get_device(space->machine, "cassette"),
 		( data & 0x10 ) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR );
 
 	if (!(data & NASCOM1_KEY_RESET)) 
@@ -296,7 +296,7 @@ SNAPSHOT_LOAD( nascom1 )
 
 MACHINE_RESET( nascom1 )
 {
-	nascom1_hd6402 = devtag_get_device(machine, AY31015, "hd6402");
+	nascom1_hd6402 = devtag_get_device(machine, "hd6402");
 
 	/* Set up hd6402 pins */
 	ay31015_set_input_pin( nascom1_hd6402, AY31015_SWE, 1 );

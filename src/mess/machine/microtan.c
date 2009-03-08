@@ -161,7 +161,7 @@ static void microtan_set_irq_line(running_machine *machine)
 
 static const device_config *cassette_device_image(running_machine *machine)
 {
-	return devtag_get_device(machine, CASSETTE, "cassette");
+	return devtag_get_device(machine, "cassette");
 }
 
 /**************************************************************
@@ -340,7 +340,7 @@ const via6522_interface microtan_via6522_1 =
 static TIMER_CALLBACK(microtan_read_cassette)
 {
 	double level = cassette_input(cassette_device_image(machine));
-	const device_config *via_0 = devtag_get_device(machine, VIA6522, "via6522_0");
+	const device_config *via_0 = devtag_get_device(machine, "via6522_0");
 
 	LOG(("microtan_read_cassette: %g\n", level));
 	if (level < -0.07)
@@ -714,9 +714,9 @@ static void microtan_snapshot_copy(running_machine *machine, UINT8 *snapshot_buf
 {
     UINT8 *RAM = memory_region(machine, "maincpu");
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	const device_config *via_0 = devtag_get_device(machine, VIA6522, "via6522_0");
-	const device_config *via_1 = devtag_get_device(machine, VIA6522, "via6522_1");
-	const device_config *ay8910 = devtag_get_device(machine, SOUND, "ay8910.1");
+	const device_config *via_0 = devtag_get_device(machine, "via6522_0");
+	const device_config *via_1 = devtag_get_device(machine, "via6522_1");
+	const device_config *ay8910 = devtag_get_device(machine, "ay8910.1");
 	
     /* check for .DMP file format */
     if (snapshot_size == 8263)

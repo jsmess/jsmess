@@ -237,7 +237,7 @@ static MACHINE_RESET( vip );
 
 static const device_config *cassette_device_image(running_machine *machine)
 {
-	return devtag_get_device(machine, CASSETTE, "cassette");
+	return devtag_get_device(machine, "cassette");
 }
 
 /* Sound */
@@ -307,11 +307,11 @@ static ADDRESS_MAP_START( vip_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vip_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(CDP1861, CDP1861_TAG, cdp1861_dispon_r, cdp1861_dispoff_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(CDP1861_TAG, cdp1861_dispon_r, cdp1861_dispoff_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(keylatch_w)
-//	AM_RANGE(0x03, 0x03) AM_DEVWRITE(CDP1863, CDP1863_TAG, cdp1863_str_w)
+//	AM_RANGE(0x03, 0x03) AM_DEVWRITE(CDP1863_TAG, cdp1863_str_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(bankswitch_w)
-//	AM_RANGE(0x05, 0x05) AM_DEVWRITE(CDP1862, CDP1862_TAG, cdp1862_bkg_w)
+//	AM_RANGE(0x05, 0x05) AM_DEVWRITE(CDP1862_TAG, cdp1862_bkg_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -500,7 +500,7 @@ static CDP1802_EF_READ( vip_ef_r )
 
 static CDP1802_Q_WRITE( vip_q_w )
 {
-	const device_config *discrete = devtag_get_device(device->machine, SOUND, "discrete");
+	const device_config *discrete = devtag_get_device(device->machine, "discrete");
 	vip_state *state = device->machine->driver_data;
 
 	/* sound output */
@@ -589,9 +589,9 @@ static MACHINE_START( vip )
 
 	/* look up devices */
 
-	state->cdp1861 = devtag_get_device(machine, CDP1861, CDP1861_TAG);
-	state->cdp1862 = devtag_get_device(machine, CDP1862, CDP1862_TAG);
-	state->cdp1863 = devtag_get_device(machine, CDP1863, CDP1863_TAG);
+	state->cdp1861 = devtag_get_device(machine, CDP1861_TAG);
+	state->cdp1862 = devtag_get_device(machine, CDP1862_TAG);
+	state->cdp1863 = devtag_get_device(machine, CDP1863_TAG);
 
 	/* register for state saving */
 
@@ -787,7 +787,7 @@ SYSTEM_CONFIG_END
 
 static TIMER_CALLBACK( setup_beep )
 {
-	const device_config *speaker = devtag_get_device(machine, SOUND, "beep");
+	const device_config *speaker = devtag_get_device(machine, "beep");
 	beep_set_state(speaker, 0);
 	beep_set_frequency( speaker, 0 );
 }

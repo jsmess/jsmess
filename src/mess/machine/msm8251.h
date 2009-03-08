@@ -33,7 +33,7 @@
 	MDRV_DEVICE_CONFIG(_intrf)
 
 #define MDRV_MSM8251_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag, MSM8251)
+	MDRV_DEVICE_REMOVE(_tag)
 
 
 /***************************************************************************

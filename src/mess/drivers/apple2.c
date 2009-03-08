@@ -638,7 +638,7 @@ static MACHINE_DRIVER_START( apple2c_iwm )
 	MDRV_IMPORT_FROM( apple2c )
 
 	/* replace the old-style FDC with an IWM */
-	MDRV_DEVICE_REMOVE("fdc", APPLEFDC)
+	MDRV_DEVICE_REMOVE("fdc")
 	MDRV_IWM_ADD("fdc", apple2_fdc_interface)
 MACHINE_DRIVER_END
 

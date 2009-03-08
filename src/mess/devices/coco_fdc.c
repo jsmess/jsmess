@@ -237,9 +237,9 @@ static DEVICE_START(fdc)
 	fdc->hwtype			= hwtype;
 	fdc->drq			= hwtype->initial_drq;
 	fdc->cococart		= device->owner->owner;
-	fdc->disto_msm6242	= devtag_get_device(device->machine, MSM6242,			device_build_tag(tempstring, device, DISTO_TAG));
-	fdc->ds1315			= devtag_get_device(device->machine, DS1315,			device_build_tag(tempstring, device, CLOUD9_TAG));
-	fdc->wd17xx			= devtag_get_device(device->machine, hwtype->wdtype,	device_build_tag(tempstring, device, WD_TAG));
+	fdc->disto_msm6242	= devtag_get_device(device->machine, device_build_tag(tempstring, device, DISTO_TAG));
+	fdc->ds1315			= devtag_get_device(device->machine, device_build_tag(tempstring, device, CLOUD9_TAG));
+	fdc->wd17xx			= devtag_get_device(device->machine, device_build_tag(tempstring, device, WD_TAG));
 
 	assert(fdc->wd17xx != NULL);
 

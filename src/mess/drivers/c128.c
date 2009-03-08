@@ -251,11 +251,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( c128_z80_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x1000, 0x13ff) AM_READWRITE(c64_colorram_read, c64_colorram_write)
 	AM_RANGE(0xd000, 0xd3ff) AM_READWRITE(vic2_port_r, vic2_port_w)
-	AM_RANGE(0xd400, 0xd4ff) AM_DEVREADWRITE(SOUND, "sid6581", sid6581_r, sid6581_w)
+	AM_RANGE(0xd400, 0xd4ff) AM_DEVREADWRITE("sid6581", sid6581_r, sid6581_w)
 	AM_RANGE(0xd500, 0xd5ff) AM_READWRITE(c128_mmu8722_port_r, c128_mmu8722_port_w)
 	AM_RANGE(0xd600, 0xd7ff) AM_READWRITE(vdc8563_port_r, vdc8563_port_w)
-	AM_RANGE(0xdc00, 0xdcff) AM_DEVREADWRITE(CIA6526R1, "cia_0", cia_r, cia_w)
-	AM_RANGE(0xdd00, 0xddff) AM_DEVREADWRITE(CIA6526R1, "cia_1", cia_r, cia_w)
+	AM_RANGE(0xdc00, 0xdcff) AM_DEVREADWRITE("cia_0", cia_r, cia_w)
+	AM_RANGE(0xdd00, 0xddff) AM_DEVREADWRITE("cia_1", cia_r, cia_w)
 /*  AM_RANGE(0xdf00, 0xdfff) AM_READWRITE(dma_port_r, dma_port_w) */
 ADDRESS_MAP_END
 
@@ -649,8 +649,8 @@ static MACHINE_DRIVER_START( c128pal )
 	MDRV_SOUND_CONFIG(c128_sound_interface)
 
 	/* cia */
-	MDRV_CIA6526_REMOVE("cia_0", CIA6526R1)
-	MDRV_CIA6526_REMOVE("cia_1", CIA6526R1)
+	MDRV_CIA6526_REMOVE("cia_0")
+	MDRV_CIA6526_REMOVE("cia_1")
 	MDRV_CIA6526_ADD("cia_0", CIA6526R1, VIC6569_CLOCK, c64_pal_cia0)
 	MDRV_CIA6526_ADD("cia_1", CIA6526R1, VIC6569_CLOCK, c64_pal_cia1)
 MACHINE_DRIVER_END

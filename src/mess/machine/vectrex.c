@@ -245,7 +245,7 @@ READ8_DEVICE_HANDLER(v_via_pa_r)
 	if ((!(vectrex_via_out[PORTB] & 0x10)) && (vectrex_via_out[PORTB] & 0x08))
 		/* BDIR inactive, we can read the PSG. BC1 has to be active. */
 	{
-		const device_config *ay = devtag_get_device(device->machine, SOUND, "ay8912");
+		const device_config *ay = devtag_get_device(device->machine, "ay8912");
 
 		vectrex_via_out[PORTA] = ay8910_r(ay, 0)
 			& ~(vectrex_imager_pinlevel & 0x80);
@@ -281,7 +281,7 @@ static TIMER_CALLBACK(update_level)
 
 TIMER_CALLBACK(vectrex_imager_eye)
 {
-	const device_config *via_0 = devtag_get_device(machine, VIA6522, "via6522_0");
+	const device_config *via_0 = devtag_get_device(machine, "via6522_0");
 	int coffset;
 	double rtime = (1.0 / vectrex_imager_freq);
 

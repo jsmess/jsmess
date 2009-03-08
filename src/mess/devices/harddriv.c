@@ -120,7 +120,7 @@ static int internal_load_mess_hd(const device_config *image, const char *metadat
 	/* if we created the image and hence, have metadata to set, set the metadata */
 	if (metadata)
 	{
-		err = chd_set_metadata(harddisk->chd, HARD_DISK_METADATA_TAG, 0, metadata, strlen(metadata) + 1);
+		err = chd_set_metadata(harddisk->chd, HARD_DISK_METADATA_TAG, 0, metadata, strlen(metadata) + 1, 0);
 		if (err != CHDERR_NONE)
 			goto done;
 	}

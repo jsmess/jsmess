@@ -8,7 +8,7 @@
 #define DGN_BETA_H_
 
 #include "machine/wd17xx.h"
-#include "machine/6821new.h"
+#include "machine/6821pia.h"
 
 #define DGNBETA_CPU_SPEED_HZ		2000000	/* 2MHz */
 #define DGNBETA_FRAMES_PER_SECOND	50

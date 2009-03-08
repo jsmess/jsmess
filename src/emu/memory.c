@@ -361,6 +361,12 @@ static const char *handler_to_string(const address_table *table, UINT8 entry);
 static void dump_map(FILE *file, const address_space *space, const address_table *table);
 static void mem_dump(running_machine *machine);
 
+/* input port handlers */
+static UINT8 input_port_read8(const input_port_config *port, offs_t offset);
+static UINT16 input_port_read16(const input_port_config *port, offs_t offset, UINT16 mem_mask);
+static UINT32 input_port_read32(const input_port_config *port, offs_t offset, UINT32 mem_mask);
+static UINT64 input_port_read64(const input_port_config *port, offs_t offset, UINT64 mem_mask);
+
 
 
 /***************************************************************************
@@ -1319,6 +1325,31 @@ UINT64 *_memory_install_device_handler64(const address_space *space, const devic
 }
 
 
+/*-------------------------------------------------
+    memory_install_read_port_handler - install a
+    new 8-bit input port handler into the given
+    address space
+-------------------------------------------------*/
+
+void memory_install_read_port_handler(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *tag)
+{
+	const input_port_config *port = input_port_by_tag(space->machine->portconfig, tag);
+	address_space *spacerw = (address_space *)space;
+	genf *handler = NULL;
+
+	if (port == NULL)
+		fatalerror("Non-existent port referenced: '%s'\n", tag);
+	switch (space->dbits)
+	{
+		case 8:		handler = (genf *)input_port_read8; 	break;
+		case 16:	handler = (genf *)input_port_read16; 	break;
+		case 32:	handler = (genf *)input_port_read32; 	break;
+		case 64:	handler = (genf *)input_port_read64; 	break;
+	}
+	space_map_range(spacerw, ROW_READ, space->dbits, 0, addrstart, addrend, addrmask, addrmirror, handler, (void *)port, tag);
+}
+
+
 
 /***************************************************************************
     DEBUGGER HELPERS
@@ -1682,15 +1713,20 @@ static void memory_init_populate(running_machine *machine)
 				/* if we have a read port tag, look it up */
 				if (entry->read_porttag != NULL)
 				{
-					switch (space->dbits)
-					{
-						case 8:		rhandler.shandler8  = input_port_read_handler8(machine->portconfig, entry->read_porttag);	break;
-						case 16:	rhandler.shandler16 = input_port_read_handler16(machine->portconfig, entry->read_porttag);	break;
-						case 32:	rhandler.shandler32 = input_port_read_handler32(machine->portconfig, entry->read_porttag);	break;
-						case 64:	rhandler.shandler64 = input_port_read_handler64(machine->portconfig, entry->read_porttag);	break;
-					}
-					if (rhandler.generic == NULL)
+					const input_port_config *port = input_port_by_tag(machine->portconfig, entry->read_porttag);
+					int bits = (entry->read_bits == 0) ? space->dbits : entry->read_bits;
+					genf *handler = NULL;
+
+					if (port == NULL)
 						fatalerror("Non-existent port referenced: '%s'\n", entry->read_porttag);
+					switch (bits)
+					{
+						case 8:		handler = (genf *)input_port_read8; 	break;
+						case 16:	handler = (genf *)input_port_read16; 	break;
+						case 32:	handler = (genf *)input_port_read32; 	break;
+						case 64:	handler = (genf *)input_port_read64; 	break;
+					}
+					space_map_range_private(space, ROW_READ, bits, entry->read_mask, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, handler, (void *)port, entry->read_porttag);
 				}
 
 				/* install the read handler if present */
@@ -1698,11 +1734,11 @@ static void memory_init_populate(running_machine *machine)
 				{
 					int bits = (entry->read_bits == 0) ? space->dbits : entry->read_bits;
 					void *object = space;
-					if (entry->read_devtype != NULL)
+					if (entry->read_devtag != NULL)
 					{
-						object = (void *)device_list_find_by_tag(machine->config->devicelist, entry->read_devtype, entry->read_devtag);
+						object = (void *)device_list_find_by_tag(machine->config->devicelist, entry->read_devtag);
 						if (object == NULL)
-							fatalerror("Unidentified object in memory map: type=%s tag=%s\n", devtype_get_name(entry->read_devtype), entry->read_devtag);
+							fatalerror("Unidentified object in memory map: tag=%s\n", entry->read_devtag);
 					}
 					space_map_range_private(space, ROW_READ, bits, entry->read_mask, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, rhandler.generic, object, entry->read_name);
 				}
@@ -1712,11 +1748,11 @@ static void memory_init_populate(running_machine *machine)
 				{
 					int bits = (entry->write_bits == 0) ? space->dbits : entry->write_bits;
 					void *object = space;
-					if (entry->write_devtype != NULL)
+					if (entry->write_devtag != NULL)
 					{
-						object = (void *)device_list_find_by_tag(machine->config->devicelist, entry->write_devtype, entry->write_devtag);
+						object = (void *)device_list_find_by_tag(machine->config->devicelist, entry->write_devtag);
 						if (object == NULL)
-							fatalerror("Unidentified object in memory map: type=%s tag=%s\n", devtype_get_name(entry->write_devtype), entry->write_devtag);
+							fatalerror("Unidentified object in memory map: tag=%s\n", entry->write_devtag);
 					}
 					space_map_range_private(space, ROW_WRITE, bits, entry->write_mask, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, whandler.generic, object, entry->write_name);
 				}
@@ -2063,7 +2099,6 @@ static void map_detokenize(address_map *map, const game_driver *driver, const ch
 				TOKEN_GET_UINT32_UNPACK3(tokens, entrytype, 8, entry->read_bits, 8, entry->read_mask, 8);
 				entry->read = TOKEN_GET_PTR(tokens, read);
 				entry->read_name = TOKEN_GET_STRING(tokens);
-				entry->read_devtype = TOKEN_GET_PTR(tokens, devtype);
 				if (entry->read_devtag_string == NULL)
 					entry->read_devtag_string = astring_alloc();
 				entry->read_devtag = device_inherit_tag(entry->read_devtag_string, cputag, TOKEN_GET_STRING(tokens));
@@ -2075,7 +2110,6 @@ static void map_detokenize(address_map *map, const game_driver *driver, const ch
 				TOKEN_GET_UINT32_UNPACK3(tokens, entrytype, 8, entry->write_bits, 8, entry->write_mask, 8);
 				entry->write = TOKEN_GET_PTR(tokens, write);
 				entry->write_name = TOKEN_GET_STRING(tokens);
-				entry->write_devtype = TOKEN_GET_PTR(tokens, devtype);
 				if (entry->write_devtag_string == NULL)
 					entry->write_devtag_string = astring_alloc();
 				entry->write_devtag = device_inherit_tag(entry->write_devtag_string, cputag, TOKEN_GET_STRING(tokens));
@@ -3445,6 +3479,36 @@ static void mem_dump(running_machine *machine)
 			fclose(file);
 		}
 	}
+}
+
+
+
+/***************************************************************************
+    INPUT PORT READ HANDLERS
+***************************************************************************/
+
+/*-------------------------------------------------
+    input port handlers
+-------------------------------------------------*/
+
+static UINT8 input_port_read8(const input_port_config *port, offs_t offset)
+{
+	return input_port_read_direct(port);
+}
+
+static UINT16 input_port_read16(const input_port_config *port, offs_t offset, UINT16 mem_mask)
+{
+	return input_port_read_direct(port);
+}
+
+static UINT32 input_port_read32(const input_port_config *port, offs_t offset, UINT32 mem_mask)
+{
+	return input_port_read_direct(port);
+}
+
+static UINT64 input_port_read64(const input_port_config *port, offs_t offset, UINT64 mem_mask)
+{
+	return input_port_read_direct(port);
 }
 
 

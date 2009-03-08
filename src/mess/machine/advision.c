@@ -110,7 +110,7 @@ READ8_HANDLER( advision_sound_cmd_r )
 
 static void update_dac(running_machine *machine)
 {
-	const device_config *dac_device = devtag_get_device(machine, SOUND, "dac");
+	const device_config *dac_device = devtag_get_device(machine, "dac");
 	advision_state *state = machine->driver_data;
 
 	if (state->sound_g == 0 && state->sound_d == 0)

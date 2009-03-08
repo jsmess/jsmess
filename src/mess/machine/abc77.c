@@ -76,7 +76,7 @@ DISCRETE_SOUND_END
 
 static TIMER_DEVICE_CALLBACK( clock_tick )
 {
-	const device_config *device = devtag_get_device(timer->machine, ABC77, ABC77_TAG);
+	const device_config *device = devtag_get_device(timer->machine, ABC77_TAG);
 	abc77_t *abc77 = get_safe_token(device);
 
 	abc77->clock = !abc77->clock;
@@ -102,7 +102,7 @@ static TIMER_CALLBACK( reset_tick )
 
 static READ8_HANDLER( abc77_clock_r )
 {
-	const device_config *device = devtag_get_device(space->machine, ABC77, ABC77_TAG);
+	const device_config *device = devtag_get_device(space->machine, ABC77_TAG);
 	abc77_t *abc77 = get_safe_token(device);
 
 	return abc77->clock;
@@ -114,7 +114,7 @@ static READ8_HANDLER( abc77_clock_r )
 
 static READ8_HANDLER( abc77_data_r )
 {
-	const device_config *device = devtag_get_device(space->machine, ABC77, ABC77_TAG);
+	const device_config *device = devtag_get_device(space->machine, ABC77_TAG);
 	abc77_t *abc77 = get_safe_token(device);
 
 	static const char *const keynames[] = { "ABC77_X0", "ABC77_X1", "ABC77_X2", "ABC77_X3", "ABC77_X4", "ABC77_X5", "ABC77_X6", "ABC77_X7", "ABC77_X8", "ABC77_X9", "ABC77_X10", "ABC77_X11" };
@@ -128,8 +128,8 @@ static READ8_HANDLER( abc77_data_r )
 
 static WRITE8_HANDLER( abc77_data_w )
 {
-	const device_config *device = devtag_get_device(space->machine, ABC77, ABC77_TAG);
-	const device_config *discrete = devtag_get_device(space->machine, SOUND, "discrete");
+	const device_config *device = devtag_get_device(space->machine, ABC77_TAG);
+	const device_config *discrete = devtag_get_device(space->machine, "discrete");
 	abc77_t *abc77 = get_safe_token(device);
 
 	abc77->keylatch = data & 0x0f;
