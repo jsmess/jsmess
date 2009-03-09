@@ -7015,6 +7015,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( sarukani )	/* (c) 1997 Kaneko / Mediaworks (Japan) */
 	DRIVER( cyvern )	/* (c) 1998 Kaneko (Japan) */
 	DRIVER( galpans2 )	/* (c) 1999 Kaneko (Japan) */
+	DRIVER( galpans2a )	/* (c) 1999 Kaneko (Asia) */
 	DRIVER( galpansu )	/* (c) 1999 Kaneko (Korea) */
 	DRIVER( panicstr )	/* (c) 1999 Kaneko (Japan) */
 	DRIVER( senknow )	/* (c) 1999 Kaneko / Kouyousha (Japan) */
@@ -7470,6 +7471,7 @@ Other Sun games
 	DRIVER( janoh )		/* (c) 1984 Toaplan */
 	DRIVER( janoha )	/* (c) 1984 Toaplan */
 	DRIVER( jansou )	/* (c) 1985 Dyna */
+	DRIVER( jansoua )	/* (c) 1985 Dyna */
 	DRIVER( mjsiyoub )	/* (c) 1986 Visco */
 	DRIVER( mjsenka )	/* (c) 1986 Visco */
 	DRIVER( mjyarou )	/* (c) 1986 Visco / Video System */
@@ -7602,6 +7604,8 @@ Other Sun games
 	DRIVER( chleagul )	/* (c) 199? IGS */
 	DRIVER( number10 )	/* (c) IGS (Board labeled Playmark Srl) */
 	DRIVER( numbr10l )	/* (c) IGS (Board labeled Playmark Srl) */
+	DRIVER( citalian )
+	DRIVER( citaliana )
 	DRIVER( stellecu )	/* (c) 1998 */
 	DRIVER( iqblock )	/* (c) 1993 */
 	DRIVER( grndtour )	/* (c) 1993 */
@@ -7826,6 +7830,7 @@ Other Sun games
 	DRIVER( twins )		/* (c) 1994 */
 	DRIVER( twinsa )	/* (c) 1994 */
 	DRIVER( mwarr )
+	DRIVER( pzletime )
 
 	/* Arcadia System */
 	DRIVER( ar_bios )
@@ -8759,9 +8764,9 @@ Other Sun games
 	DRIVER( hldspin2d )
 	DRIVER( hldspin2v )
 	DRIVER( fcnudge )
-	DRIVER( fruitcar )
-	DRIVER( fruitcar2 )
-	DRIVER( fruitcar3 )
+	DRIVER( fcnudge2 )
+	DRIVER( fcnudge3 )
+	DRIVER( fcnudge4 )
 	DRIVER( pickwin )
 	DRIVER( pickwina )
 	DRIVER( pickwinb )
@@ -8870,6 +8875,35 @@ Other Sun games
 	DRIVER( fb4v )
 	DRIVER( fb4v2 )
 	DRIVER( fb4v3 )
+	DRIVER( fb5 )
+	DRIVER( fb5c )
+	DRIVER( fb5d )
+	DRIVER( fb5v )
+	DRIVER( fb6 )
+	DRIVER( fb6v3 )
+	DRIVER( fb6d2 )
+	DRIVER( fb6s )
+	DRIVER( fb6v )
+	DRIVER( fb6d )
+	DRIVER( fb6s2 )
+	DRIVER( fb6v2 )
+	DRIVER( fb6se )
+	DRIVER( fb6sev )
+	DRIVER( fb6sed )
+	DRIVER( fb6sev2 )
+	DRIVER( fb6sed2 )
+	DRIVER( fb6sev3 )
+	DRIVER( version4 )
+	DRIVER( bugfever )
+	DRIVER( bugfeverd )
+	DRIVER( bugfeverv )
+	DRIVER( bugfeverv2 )
+	DRIVER( dvisland )
+	DRIVER( funriver )
+	DRIVER( funriverv )
+	DRIVER( amclink )
+
+
 	DRIVER( act2000 )
 	DRIVER( act2000a )
 	DRIVER( act2000a2 )

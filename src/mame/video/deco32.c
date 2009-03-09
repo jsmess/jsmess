@@ -225,9 +225,9 @@ static void captaven_draw_sprites(running_machine* machine, bitmap_t *bitmap, co
 			continue; //fix!!!!!
 
 		if (spritedata[offs+2]&0x20)
-			prival=0;
+			prival=0xfffe; // under PF2
 		else
-			prival=2;
+			prival=0; // above everything
 
 		sx = spritedata[offs+1];
 
@@ -296,9 +296,9 @@ static void fghthist_draw_sprites(running_machine* machine, bitmap_t *bitmap, co
 		colour = (x >>9) & colourmask;
 
 		if ((y&0x8000))
-			pri=8;
+			pri=1;
 		else
-			pri=128;
+			pri=4;
 
 		fx = y & 0x2000;
 		fy = y & 0x4000;
@@ -969,9 +969,9 @@ VIDEO_START( captaven )
 VIDEO_START( fghthist )
 {
 	pf1_tilemap = tilemap_create(machine, get_pf1_tile_info, tilemap_scan_rows, 8, 8,64,32);
-	pf2_tilemap = tilemap_create(machine, get_pf2_tile_info, deco16_scan_rows,16,16,64,32);
-	pf3_tilemap = tilemap_create(machine, get_pf3_tile_info, deco16_scan_rows,16,16,64,32);
-	pf4_tilemap = tilemap_create(machine, get_pf4_tile_info, deco16_scan_rows,     16,16,64,32);
+	pf2_tilemap = tilemap_create(machine, get_pf2_tile_info, deco16_scan_rows, 16,16,64,32);
+	pf3_tilemap = tilemap_create(machine, get_pf3_tile_info, deco16_scan_rows, 16,16,64,32);
+	pf4_tilemap = tilemap_create(machine, get_pf4_tile_info, deco16_scan_rows, 16,16,64,32);
 	pf1a_tilemap =0;
 	dirty_palette = auto_malloc(4096);
 
@@ -1263,13 +1263,14 @@ VIDEO_UPDATE( captaven )
 		tilemap_draw(bitmap,cliprect,pf3_tilemap,0,1);
 	}
 
-	captaven_draw_sprites(screen->machine,bitmap,cliprect,buffered_spriteram32,3);
-
 	/* PF1 can be in 8x8 mode or 16x16 mode */
 	if (deco32_pf12_control[6]&0x80)
-		tilemap_draw(bitmap,cliprect,pf1_tilemap,0,0);
+		tilemap_draw(bitmap,cliprect,pf1_tilemap,0,2);
 	else
-		tilemap_draw(bitmap,cliprect,pf1a_tilemap,0,0);
+		tilemap_draw(bitmap,cliprect,pf1a_tilemap,0,2);
+
+	captaven_draw_sprites(screen->machine,bitmap,cliprect,buffered_spriteram32,3);
+
 	return 0;
 }
 
@@ -1397,9 +1398,17 @@ VIDEO_UPDATE( fghthist )
 	deco16_clear_sprite_priority_bitmap();
 	bitmap_fill(priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,screen->machine->pens[0x000]); // Palette index not confirmed
-	tilemap_draw(bitmap,cliprect,pf4_tilemap,0,1);
-	tilemap_draw(bitmap,cliprect,pf3_tilemap,0,4);
-	tilemap_draw(bitmap,cliprect,pf2_tilemap,0,16);
+	tilemap_draw(bitmap,cliprect,pf4_tilemap,0,0);
+	if(deco32_pri&1)
+	{
+		tilemap_draw(bitmap,cliprect,pf2_tilemap,0,0);
+		tilemap_draw(bitmap,cliprect,pf3_tilemap,0,2);
+	}
+	else
+	{
+		tilemap_draw(bitmap,cliprect,pf3_tilemap,0,0);
+		tilemap_draw(bitmap,cliprect,pf2_tilemap,0,2);
+	}
 	fghthist_draw_sprites(screen->machine, bitmap, cliprect, buffered_spriteram32,3,0, 0xf);
 	tilemap_draw(bitmap,cliprect,pf1_tilemap,0,0);
 	return 0;

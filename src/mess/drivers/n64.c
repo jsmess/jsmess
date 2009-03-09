@@ -74,11 +74,6 @@ static INTERRUPT_GEN( n64_vblank )
 	signal_rcp_interrupt(device->machine, VI_INTERRUPT);
 }
 
-static MACHINE_RESET( n64 )
-{
-	n64_machine_reset(machine);
-}
-
 static DEVICE_IMAGE_LOAD(n64_cart)
 {
 	int i, length;
