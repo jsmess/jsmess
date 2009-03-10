@@ -1023,7 +1023,7 @@ void z80dart_ctsb_w(const device_config *device, int state)
     dcd_w - data carrier detected handler
 -------------------------------------------------*/
 
-void dcd_w(const device_config *device, int channel, int state)
+static void dcd_w(const device_config *device, int channel, int state)
 {
 	z80dart_t *z80dart = get_safe_token(device);
 	dart_channel *ch = &z80dart->channel[channel];

@@ -13,6 +13,7 @@
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
 #include "machine/msm8251.h"
+#include "includes/irisha.h"
 
 static int irisha_keyboard_mask;
 

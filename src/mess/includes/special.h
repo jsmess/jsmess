@@ -7,7 +7,6 @@
 #ifndef SPECIAL_H_
 #define SPECIAL_H_
 
-#include "mame.h"
 #include "machine/8255ppi.h"
 #include "machine/pit8253.h"
 

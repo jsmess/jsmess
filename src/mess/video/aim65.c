@@ -82,7 +82,7 @@ static void aim65_printer_cr(void) {
 	flag_a=flag_b=0;
 }
 
-TIMER_CALLBACK(aim65_printer_timer)
+static TIMER_CALLBACK(aim65_printer_timer)
 {
 	const device_config *via_0 = devtag_get_device(machine, "via6522_0");
 

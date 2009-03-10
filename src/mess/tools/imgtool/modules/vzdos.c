@@ -361,24 +361,22 @@ static imgtoolerr_t vzdos_free_trackmap(imgtool_image *img, int *track, int *sec
 static imgtoolerr_t vzdos_write_formatted_sector(imgtool_image *img, int track, int sector)
 {
 	int ret;
-	UINT8 sector_data[DATA_SIZE + 4];
+	UINT8 sector_data[DATA_SIZE + 4 + 24];
 
-	static UINT8 sector_header[24] = {
+	static const UINT8 sector_header[24] = {
 		0x80, 0x80, 0x80, 0x80, 0x80, 0x00, 0xFE, 0xE7,
 		0x18, 0xC3, 0x00, 0x00, 0x00, 0x80, 0x80, 0x80,
 		0x80, 0x80, 0x80, 0x00, 0xC3, 0x18, 0xE7, 0xFE
 	};
 
 	memset(sector_data, 0x00, sizeof(sector_data));
+	memcpy(sector_data, sector_header, sizeof(sector_header));
 
-	sector_header[10] = (UINT8) track;			/* current track */
-	sector_header[11] = (UINT8) sector;			/* current sector */
-	sector_header[12] = (UINT8) track + sector;	/* checksum-8 */
+	sector_data[10] = (UINT8) track;			/* current track */
+	sector_data[11] = (UINT8) sector;			/* current sector */
+	sector_data[12] = (UINT8) track + sector;	/* checksum-8 */
 
-	ret = floppy_write_sector(imgtool_floppy(img), 0, track, sector_order[sector], 0, sector_header, sizeof(sector_header));
-	if (ret) return ret;
-
-	ret = floppy_write_sector(imgtool_floppy(img), 0, track, sector_order[sector], sizeof(sector_header), sector_data, sizeof(sector_data));
+	ret = floppy_write_sector(imgtool_floppy(img), 0, track, sector_order[sector], 0, sector_data, sizeof(sector_data));
 	if (ret) return ret;
 
 	return IMGTOOLERR_SUCCESS;

@@ -1796,8 +1796,7 @@ static void dragon_page_rom(running_machine *machine, int romswitch)
 /* Dragon Alpha onboard FDC */
 /********************************************************************************************/
 
-//static 
-WD17XX_CALLBACK( dgnalpha_fdc_callback )
+static WD17XX_CALLBACK( dgnalpha_fdc_callback )
 {
 	/* The NMI line on the alphaAlpha is gated through IC16 (early PLD), and is gated by pia2 CA2  */
 	/* The DRQ line goes through pia2 cb1, in exactly the same way as DRQ from DragonDos does */

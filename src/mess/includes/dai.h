@@ -7,7 +7,6 @@
 #ifndef DAI_H_
 #define DAI_H_
 
-#include "mame.h"
 #include "machine/8255ppi.h"
 #include "machine/tms5501.h"
 

@@ -73,7 +73,6 @@ extern unsigned char *spectrum_screen_location;
 
 INPUT_PORTS_EXTERN( spectrum );
 MACHINE_DRIVER_EXTERN( spectrum );
-SYSTEM_CONFIG_EXTERN(spectrum)
 
 extern READ8_HANDLER(spectrum_port_1f_r);
 extern READ8_HANDLER(spectrum_port_7f_r);
@@ -110,8 +109,6 @@ extern VIDEO_UPDATE( spectrum );
 extern VIDEO_EOF( spectrum );
 
 extern unsigned char *spectrum_video_ram;
-
-extern const gfx_layout spectrum_charlayout;
 
 /*----------- defined in video/timex.c -----------*/
 extern VIDEO_EOF( ts2068 );

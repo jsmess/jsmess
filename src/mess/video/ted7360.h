@@ -13,8 +13,6 @@
 #ifndef TED7360_H_
 #define TED7360_H_
 
-#include "mame.h"
-
 
 /*----------- defined in video/ted7360.c -----------*/
 

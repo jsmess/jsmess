@@ -8,6 +8,7 @@
 
 
 #include "driver.h"
+#include "includes/irisha.h"
 
 
 VIDEO_START( irisha )

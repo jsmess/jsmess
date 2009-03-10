@@ -7,7 +7,6 @@
 #ifndef b2m_H_
 #define b2m_H_
 
-#include "mame.h"
 #include "machine/8255ppi.h"
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
@@ -24,8 +23,6 @@ extern const struct pic8259_interface b2m_pic8259_config;
 extern const ppi8255_interface b2m_ppi8255_interface_1;
 extern const ppi8255_interface b2m_ppi8255_interface_2;
 extern const ppi8255_interface b2m_ppi8255_interface_3;
-
-extern void b2m_sh_change_clock(double);
 
 extern DRIVER_INIT( b2m );
 extern MACHINE_START( b2m );

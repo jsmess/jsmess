@@ -291,6 +291,7 @@ static void cps1_gfx_decode(running_machine *machine)
 	}
 }
 
+#ifdef UNUSED_FUNCTION
 static void unshuffle(UINT64 *buf,int len)
 {
 	int i;
@@ -312,6 +313,7 @@ static void unshuffle(UINT64 *buf,int len)
 		buf[len + i] = t;
 	}
 }
+#endif
 
 
 DRIVER_INIT( cps1 )

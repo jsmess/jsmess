@@ -123,7 +123,7 @@ MACHINE_START( mz700 )
     MMIO
 ***************************************************************************/
 
-READ8_HANDLER( mz700_e008_r )
+static READ8_HANDLER( mz700_e008_r )
 {
 	mz_state *mz = space->machine->driver_data;
 	UINT8 data = 0;

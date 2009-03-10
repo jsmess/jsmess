@@ -7,6 +7,7 @@
 #ifndef IRISHA_H_
 #define IRISHA_H_
 
+#include "machine/8255ppi.h"
 
 /*----------- defined in machine/irisha.c -----------*/
 

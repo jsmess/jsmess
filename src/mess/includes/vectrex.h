@@ -11,9 +11,6 @@
 
 /*----------- defined in machine/vectrex.c -----------*/
 
-extern const via6522_interface vectrex_via6522_interface;
-extern const via6522_interface spectrum1_via6522_interface;
-
 DEVICE_IMAGE_LOAD( vectrex_cart );
 
 extern int vectrex_imager_status;
@@ -38,6 +35,9 @@ READ8_DEVICE_HANDLER( s1_via_pb_r );
 
 
 /*----------- defined in video/vectrex.c -----------*/
+
+extern const via6522_interface vectrex_via6522_interface;
+extern const via6522_interface spectrum1_via6522_interface;
 
 VIDEO_START( vectrex );
 VIDEO_UPDATE( vectrex );
