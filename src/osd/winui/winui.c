@@ -5113,6 +5113,11 @@ static void CreateIcons(void)
 	int icon_count;
 	DWORD dwStyle;
 	int i;
+#ifdef MESS
+	int grow = 3000;
+#else
+	int grow = 5000;
+#endif
 
 	icon_count = 0;
 	while(g_iconData[icon_count].icon_name)
@@ -5130,9 +5135,9 @@ static void CreateIcons(void)
 	SetWindowLong(hwndList,GWL_STYLE,(dwStyle & ~LVS_TYPEMASK) | LVS_ICON);
 
 	hSmall = ImageList_Create(GetShellSmallIconSize(),GetShellSmallIconSize(),
-							  ILC_COLORDDB | ILC_MASK, icon_count, icon_count + 5000);
+							  ILC_COLORDDB | ILC_MASK, icon_count, icon_count + grow);
 	hLarge = ImageList_Create(dwLargeIconSize, dwLargeIconSize,
-							  ILC_COLORDDB | ILC_MASK, icon_count, icon_count + 5000);
+							  ILC_COLORDDB | ILC_MASK, icon_count, icon_count + grow);
 
 	if (NULL == hSmall || NULL == hLarge) {
 		win_message_box_utf8(hwndList, "Cannot allocate Icon lists", "Allocation error - Exiting", IDOK);
