@@ -11,6 +11,7 @@
 #include "devices/z80bin.h"
 #include "sound/speaker.h"
 #include "machine/ctronics.h"
+#include "video/mc6845.h"
 #include "super80.h"
 
 
@@ -37,6 +38,7 @@ UINT8 super80_mhz=2;	/* state of bit 2 of port F0 */
 
 #define SUPER80V_SCREEN_WIDTH		(560)
 #define SUPER80V_SCREEN_HEIGHT		(300)
+#define SUPER80V_DOTS			(7)
 
 
 /**************************** PIO ******************************************************************************/
@@ -234,21 +236,22 @@ static WRITE8_HANDLER( super80_fb_w ) { z80pio_c_w(super80_z80pio,1, data); }
 
 /**************************** MEMORY AND I/O MAPPINGS *****************************************************************/
 
-/* A read_byte or write_byte to unmapped memory crashes MESS, and UNMAP doesnt fix it */
+/* A read_byte or write_byte to unmapped memory crashes MESS, and UNMAP doesnt fix it.
+	This makes the H and E monitor commands show FF */
 static READ8_HANDLER( super80_read_ff ) { return 0xff; }
 
 static ADDRESS_MAP_START( super80_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK(1)
-	AM_RANGE(0x4000, 0xbfff) AM_RAM
+	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK(1) AM_REGION("maincpu", 0x0000)
+	AM_RANGE(0x4000, 0xbfff) AM_RAM AM_REGION("maincpu", 0x4000)
 	AM_RANGE(0xc000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_READWRITE(super80_read_ff, SMH_NOP)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( super80m_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK(1)
-	AM_RANGE(0x4000, 0xbfff) AM_RAM
+	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK(1) AM_REGION("maincpu", 0x0000)
+	AM_RANGE(0x4000, 0xbfff) AM_RAM AM_REGION("maincpu", 0x4000)
 	AM_RANGE(0xc000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xffff) AM_RAM
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_REGION("maincpu", 0xf000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( super80v_map, ADDRESS_SPACE_PROGRAM, 8)
@@ -276,7 +279,8 @@ static ADDRESS_MAP_START( super80r_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x10, 0x10) AM_WRITE(super80v_10_w)
-	AM_RANGE(0x11, 0x11) AM_READWRITE(super80v_11_r, super80v_11_w)
+	AM_RANGE(0x11, 0x11) AM_DEVREAD("crtc", mc6845_register_r)
+	AM_RANGE(0x11, 0x11) AM_WRITE(super80v_11_w)
 	AM_RANGE(0xdc, 0xdc) AM_READWRITE(super80_dc_r, super80_dc_w)
 	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x14) AM_WRITE(super80r_f0_w)
 	AM_RANGE(0xe2, 0xe2) AM_MIRROR(0x14) AM_READ(super80_f2_r)
@@ -290,7 +294,8 @@ static ADDRESS_MAP_START( super80v_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x10, 0x10) AM_WRITE(super80v_10_w)
-	AM_RANGE(0x11, 0x11) AM_READWRITE(super80v_11_r, super80v_11_w)
+	AM_RANGE(0x11, 0x11) AM_DEVREAD("crtc", mc6845_register_r)
+	AM_RANGE(0x11, 0x11) AM_WRITE(super80v_11_w)
 	AM_RANGE(0xdc, 0xdc) AM_READWRITE(super80_dc_r, super80_dc_w)
 	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x14) AM_WRITE(super80v_f0_w)
 	AM_RANGE(0xe2, 0xe2) AM_MIRROR(0x14) AM_READ(super80_f2_r)
@@ -575,6 +580,7 @@ static const gfx_layout super80d_charlayout =
 	8*16					/* every char takes 16 bytes */
 };
 
+/* for documentation only - not needed by video update */
 static const gfx_layout super80v_charlayout =
 {
 	8,16,					/* 8 x 16 characters */
@@ -670,6 +676,17 @@ static DEVICE_IMAGE_LOAD( super80_cart )
 	return INIT_PASS;
 }
 
+static const mc6845_interface super80v_crtc = {
+	"screen",			/* name of screen */
+	SUPER80V_DOTS,			/* number of dots per character */
+	NULL,
+	super80v_update_row,		/* handler to display a scanline */
+	NULL,
+	NULL,
+	NULL,
+	NULL
+};
+
 static MACHINE_DRIVER_START( super80_cartslot )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("rom")
@@ -755,6 +772,9 @@ static MACHINE_DRIVER_START( super80v )
 	MDRV_PALETTE_LENGTH(256*2)
 	MDRV_PALETTE_INIT(super80m)
 
+	MDRV_MC6845_ADD("crtc", MC6845, MASTER_CLOCK / SUPER80V_DOTS, super80v_crtc)
+
+	MDRV_VIDEO_START(super80v)
 	MDRV_VIDEO_EOF(super80m)
 	MDRV_VIDEO_UPDATE(super80v)
 
@@ -821,6 +841,7 @@ ROM_START( super80 )
 	ROM_LOAD("super80.u26",   0xc000, 0x1000, CRC(6a6a9664) SHA1(2c4fcd943aa9bf7419d58fbc0e28ffb89ef22e0b) )
 	ROM_LOAD("super80.u33",   0xd000, 0x1000, CRC(cf8020a8) SHA1(2179a61f80372cd49e122ad3364773451531ae85) )
 	ROM_LOAD("super80.u42",   0xe000, 0x1000, CRC(a1c6cb75) SHA1(d644ca3b399c1a8902f365c6095e0bbdcea6733b) )
+	ROM_FILL( 0xf000, 0x1000, 0xff)	/* This makes the screen show the FF character when O F1 F0 entered */
 
 	ROM_REGION(0x0400, "gfx1", ROMREGION_DISPOSE)
 	ROM_LOAD("super80.u27",   0x0000, 0x0400, CRC(d1e4b3c6) SHA1(3667b97c6136da4761937958f281609690af4081) )
@@ -836,6 +857,7 @@ ROM_START( super80d )
 	ROMX_LOAD("super80g.u26", 0xc000, 0x1000, CRC(7386f507) SHA1(69d7627033d62bd4e886ccc136e89f1524d38f47), ROM_BIOS(3))
 	ROM_LOAD("super80.u33",	  0xd000, 0x1000, CRC(cf8020a8) SHA1(2179a61f80372cd49e122ad3364773451531ae85) )
 	ROM_LOAD("super80.u42",	  0xe000, 0x1000, CRC(a1c6cb75) SHA1(d644ca3b399c1a8902f365c6095e0bbdcea6733b) )
+	ROM_FILL( 0xf000, 0x1000, 0xff)
 
 	ROM_REGION(0x1000, "gfx1", ROMREGION_DISPOSE)
 	ROM_LOAD("super80d.u27",  0x0000, 0x0800, CRC(cb4c81e2) SHA1(8096f21c914fa76df5d23f74b1f7f83bd8645783) )
@@ -847,6 +869,7 @@ ROM_START( super80e )
 	ROM_LOAD("super80e.u26",  0xc000, 0x1000, CRC(bdc668f8) SHA1(3ae30b3cab599fca77d5e461f3ec1acf404caf07) )
 	ROM_LOAD("super80.u33",	  0xd000, 0x1000, CRC(cf8020a8) SHA1(2179a61f80372cd49e122ad3364773451531ae85) )
 	ROM_LOAD("super80.u42",	  0xe000, 0x1000, CRC(a1c6cb75) SHA1(d644ca3b399c1a8902f365c6095e0bbdcea6733b) )
+	ROM_FILL( 0xf000, 0x1000, 0xff)
 
 	ROM_REGION(0x1000, "gfx1", ROMREGION_DISPOSE)
 	ROM_LOAD("super80e.u27",  0x0000, 0x1000, CRC(ebe763a7) SHA1(ffaa6d6a2c5dacc5a6651514e6707175a32e83e8) )

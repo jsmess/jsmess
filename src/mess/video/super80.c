@@ -1,6 +1,13 @@
 /* Super80.c written by Robbbert, 2005-2009. See the MESS wiki for documentation. */
 
+/* Notes on using MAME MC6845 device (MMD).
+	1. Speed of MMD is about 20% slower than pre-MMD coding
+	2. Undocumented cursor start and end-lines is not supported by MMD, so we do it here
+	3. MMD doesn't support auto-screen-resize, so we do it here. */
+
+
 #include "driver.h"
+#include "video/mc6845.h"
 #include "super80.h"
 
 
@@ -13,6 +20,15 @@ static UINT8 mc6845_cursor[16];				// cursor shape
 static UINT8 mc6845_reg[20];				/* registers */
 static UINT8 mc6845_ind;				/* register index */
 static const UINT8 mc6845_mask[]={0xff,0xff,0xff,0x0f,0x7f,0x1f,0x7f,0x7f,3,0x1f,0x7f,0x1f,0x3f,0xff,0x3f,0xff,0,0};
+
+static const device_config *mc6845;
+static UINT8 chr,col,gfx,fg,bg;
+static UINT16 mem,x;
+static UINT8 framecnt=0;
+static UINT8 speed,flash;
+static UINT16 cursor;
+static UINT8 options;
+
 
 /**************************** PALETTES for super80m and super80v ******************************************/
 
@@ -123,7 +139,7 @@ WRITE8_HANDLER( super80v_high_w )
 	}
 }
 
-/* The 6845 can produce a variety of cursor shapes - all are emulated here */
+/* The 6845 can produce a variety of cursor shapes - all are emulated here - remove when mame fixed */
 static void mc6845_cursor_configure(void)
 {
 	UINT8 i,curs_type=0,r9,r10,r11;
@@ -195,6 +211,7 @@ VIDEO_UPDATE( super80 )
 {
 	UINT8 x, y, code=32, screen_on=0;
 	UINT8 mask = screen->machine->gfx[0]->total_elements - 1;	/* 0x3F for super80; 0xFF for super80d & super80e */
+	UINT8 *RAM = memory_region(screen->machine, "maincpu");
 
 	if ((super80_mhz == 1) || (!(input_port_read(screen->machine, "CONFIG") & 4)))	/* bit 2 of port F0 is high, OR user turned on config switch */
 		screen_on++;
@@ -205,7 +222,7 @@ VIDEO_UPDATE( super80 )
 		for (x=0; x<32; x++)
 		{
 			if (screen_on)
-				code = memory_read_byte(cputag_get_address_space(screen->machine,"maincpu",ADDRESS_SPACE_PROGRAM), vidpg | x | (y<<5));
+				code = RAM[vidpg | x | (y<<5)];		/* get character to display */
 
 			drawgfx(bitmap, screen->machine->gfx[0], code & mask, 0, 0, 0, x*8, y*10, cliprect, TRANSPARENCY_NONE, 0);
 		}
@@ -217,6 +234,7 @@ VIDEO_UPDATE( super80 )
 VIDEO_UPDATE( super80m )
 {
 	UINT8 x, y, code=32, col=0, screen_on=0, options=input_port_read(screen->machine, "CONFIG");
+	UINT8 *RAM = memory_region(screen->machine, "maincpu");
 
 	/* get selected character generator */
 	UINT8 cgen = current_charset ^ ((options & 0x10)>>4);	/* bit 0 of port F1 and cgen config switch */
@@ -239,9 +257,9 @@ VIDEO_UPDATE( super80m )
 		{
 			if (screen_on)
 			{
-				code = memory_read_byte(cputag_get_address_space(screen->machine,"maincpu",ADDRESS_SPACE_PROGRAM), vidpg | x | (y<<5));		/* get character to display */
+				code = RAM[vidpg | x | (y<<5)];		/* get character to display */
 
-				if (!(options & 0x40)) col = memory_read_byte(cputag_get_address_space(screen->machine,"maincpu",ADDRESS_SPACE_PROGRAM), 0xfe00 | x | (y<<5));	/* byte of colour to display */
+				if (!(options & 0x40)) col = RAM[0xfe00 | x | (y<<5)];	/* byte of colour to display */
 			}
 
 			drawgfx(bitmap, screen->machine->gfx[cgen], code, col, 0, 0, x*8, y*10,	cliprect, TRANSPARENCY_NONE, 0);
@@ -251,88 +269,82 @@ VIDEO_UPDATE( super80m )
 	return 0;
 }
 
+
+VIDEO_START( super80v )
+{
+	mc6845 = devtag_get_device(machine, "crtc");
+}
+
 VIDEO_UPDATE( super80v )
 {
-	UINT8 y,z,chr,col,gfx,fg,bg;
-	UINT16 mem,sy=0,sx=0,x;
-	static UINT8 framecnt=0;
-	UINT8 speed = mc6845_reg[10]&0x20, flash = mc6845_reg[10]&0x40;				// cursor modes
-	UINT16 cursor = (mc6845_reg[14]<<8) | mc6845_reg[15];					// get cursor position
-	UINT16 screen_home = (mc6845_reg[12]<<8) | mc6845_reg[13];				// screen home offset (usually zero)
-	UINT8 options=input_port_read(screen->machine, "CONFIG");
 	framecnt++;
-
-	for (y = 0; y < mc6845_reg[6]; y++)							// for each row of chars
-	{
-		for (z = 0; z < mc6845_reg[9]+1; z++)						// for each scanline
-		{
-			UINT16  *p = BITMAP_ADDR16(bitmap, sy++, 0);
-
-			for (x = sx; x < sx + mc6845_reg[1]; x++)				// for each character
-			{
-				UINT8 inv=0;
-				mem = (x + screen_home) & 0xfff;
-				chr = videoram[mem];
-
-				/* get colour or b&w */
-				col = 5;					/* green */
-				if ((options & 0x60) == 0x60) col = 15;		/* b&w */
-				if (!(options & 0x40)) col = colorram[mem];			// read a byte of colour
-
-				/* if inverse mode, replace any pcgram chrs with inverse chrs */
-				if ((!super80v_rom_pcg) && (chr & 0x80))			// is it a high chr in inverse mode
-				{
-					inv = 0xff;						// invert the chr
-					chr &= 0x7f;						// and drop bit 7
-				}
-
-				/* process cursor */
-				if ((((!flash) && (!speed)) ||					// (5,6)=(0,0) = cursor on always
-					((flash) && (speed) && (framecnt & 0x10)) ||		// (5,6)=(1,1) = cycle per 32 frames
-					((flash) && (!speed) && (framecnt & 8))) &&		// (5,6)=(0,1) = cycle per 16 frames
-					(mem == cursor))						// displaying at cursor position?
-						inv ^= mc6845_cursor[z];				// cursor scan row
-
-				/* get pattern of pixels for that character scanline */
-				gfx = pcgram[(chr<<4) | z] ^ inv;
-				fg = ((col & 0x0f) << 1) + 1;
-				bg = ((col & 0xf0) >> 3) + 1;
-
-				/* Display a scanline of a character (7 pixels) */
-				*p = ( gfx & 0x80 ) ? fg : bg; p++;
-				*p = ( gfx & 0x40 ) ? fg : bg; p++;
-				*p = ( gfx & 0x20 ) ? fg : bg; p++;
-				*p = ( gfx & 0x10 ) ? fg : bg; p++;
-				*p = ( gfx & 0x08 ) ? fg : bg; p++;
-				*p = ( gfx & 0x04 ) ? fg : bg; p++;
-				*p = ( gfx & 0x02 ) ? fg : bg; p++;
-			}
-		}
-		sx+=mc6845_reg[1];
-	}
+	speed = mc6845_reg[10]&0x20, flash = mc6845_reg[10]&0x40;				// cursor modes
+	cursor = (mc6845_reg[14]<<8) | mc6845_reg[15];					// get cursor position
+	options=input_port_read(screen->machine, "CONFIG");
+	mc6845_update(mc6845, bitmap, cliprect);
 	return 0;
+}
+
+MC6845_UPDATE_ROW( super80v_update_row )
+{
+	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
+
+	for (x = 0; x < x_count; x++)				// for each character
+	{
+		UINT8 inv=0;
+		//		if (x == cursor_x) inv=0xff;	/* uncomment when mame fixed */
+		mem = (ma + x) & 0xfff;
+		chr = videoram[mem];
+
+		/* get colour or b&w */
+		col = 5;					/* green */
+		if ((options & 0x60) == 0x60) col = 15;		/* b&w */
+		if (!(options & 0x40)) col = colorram[mem];			// read a byte of colour
+
+		/* if inverse mode, replace any pcgram chrs with inverse chrs */
+		if ((!super80v_rom_pcg) && (chr & 0x80))			// is it a high chr in inverse mode
+		{
+			inv ^= 0xff;						// invert the chr
+			chr &= 0x7f;						// and drop bit 7
+		}
+
+		/* process cursor - remove when mame fixed */
+		if ((((!flash) && (!speed)) ||
+			((flash) && (speed) && (framecnt & 0x10)) ||
+			((flash) && (!speed) && (framecnt & 8))) &&
+			(mem == cursor))
+				inv ^= mc6845_cursor[ra];
+
+		/* get pattern of pixels for that character scanline */
+		gfx = pcgram[(chr<<4) | ra] ^ inv;
+		fg = ((col & 0x0f) << 1) + 1;
+		bg = ((col & 0xf0) >> 3) + 1;
+
+		/* Display a scanline of a character (7 pixels) */
+		*p = ( gfx & 0x80 ) ? fg : bg; p++;
+		*p = ( gfx & 0x40 ) ? fg : bg; p++;
+		*p = ( gfx & 0x20 ) ? fg : bg; p++;
+		*p = ( gfx & 0x10 ) ? fg : bg; p++;
+		*p = ( gfx & 0x08 ) ? fg : bg; p++;
+		*p = ( gfx & 0x04 ) ? fg : bg; p++;
+		*p = ( gfx & 0x02 ) ? fg : bg; p++;
+	}
 }
 
 /**************************** I/O PORTS *****************************************************************/
 
-READ8_HANDLER( super80v_11_r )
-{
-	if ((mc6845_ind > 13) && (mc6845_ind < 18))		/* determine readable registers */
-		return mc6845_reg[mc6845_ind];
-	else
-		return 0;
-}
-
 WRITE8_HANDLER( super80v_10_w )
 {
 	if (data < 18) mc6845_ind = data; else mc6845_ind = 19;		/* make sure if you try using an invalid register your write will go nowhere */
+	mc6845_address_w( mc6845, 0, data );
 }
 
 WRITE8_HANDLER( super80v_11_w )
 {
 	if (mc6845_ind < 16) mc6845_reg[mc6845_ind] = data & mc6845_mask[mc6845_ind];	/* save data in register */
 	if ((mc6845_ind == 1) || (mc6845_ind == 6) || (mc6845_ind == 9)) mc6845_screen_configure(space->machine); /* adjust screen size */
-	if ((mc6845_ind > 8) && (mc6845_ind < 12)) mc6845_cursor_configure();		/* adjust cursor shape */
+	if ((mc6845_ind > 8) && (mc6845_ind < 12)) mc6845_cursor_configure();		/* adjust cursor shape - remove when mame fixed */
+	mc6845_register_w( mc6845, 0, data );
 }
 
 WRITE8_HANDLER( super80_f1_w )
