@@ -433,6 +433,7 @@ DRVLIBS = \
 	$(MESSOBJ)/nec.a \
 	$(MESSOBJ)/necpc.a \
 	$(MESSOBJ)/nintendo.a \
+	$(MESSOBJ)/nokia.a \
 	$(MESSOBJ)/ondra.a \
 	$(MESSOBJ)/orion.a \
 	$(MESSOBJ)/osborne.a \
@@ -1398,6 +1399,9 @@ $(MESSOBJ)/grundy.a: \
 
 $(MESSOBJ)/votrax.a: \
 	$(MESS_DRIVERS)/votrpss.o \
+
+$(MESSOBJ)/nokia.a: \
+	$(MESS_DRIVERS)/mikromik.o \
 
 #-------------------------------------------------
 # layout dependencies

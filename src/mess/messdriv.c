@@ -1113,6 +1113,10 @@ XL/XE 16kB OS roms
 	DRIVER( newbraia )
 	DRIVER( newbraim )
 
+	/* Nokia Data */
+	DRIVER( mm1m6 )
+	DRIVER( mm1m7 )
+
 	/* Votrax */
 //	DRIVER( votrtnt ) /* Votrax Type-N-Talk */
 	DRIVER( votrpss ) /* Votrax Personal Speech System */
