@@ -363,7 +363,7 @@ void matsucd_command_w( running_machine *machine, UINT8 data )
 	if ( cd.cdda_set == 0 )
 	{
 		if ( cd.cdrom )
-			cdda_set_cdrom(0, cd.cdrom);
+			cdda_set_cdrom( cdda_from_cdrom(machine, cd.cdrom), cd.cdrom);
 
 		cd.cdda_set = 1;
 	}
