@@ -10,11 +10,9 @@ VIDEO_UPDATE( super80m );
 VIDEO_START( super80v );
 VIDEO_UPDATE( super80v );
 VIDEO_EOF( super80m );
-READ8_HANDLER( super80v_11_r );
 WRITE8_HANDLER( super80v_10_w );
 WRITE8_HANDLER( super80v_11_w );
 WRITE8_HANDLER( super80_f1_w );
-MC6845_BEGIN_UPDATE( super80v_begin_update );
 MC6845_UPDATE_ROW( super80v_update_row );
 
 extern UINT8 *pcgram;
