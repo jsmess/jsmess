@@ -161,4 +161,4 @@ ROM_START( n64)
     ROM_REGION32_BE( 0x4000000, "user2", ROMREGION_ERASEFF)
 ROM_END
 
-CONS(1996, n64, 	0,		0,		n64, 	n64, 	0,	0,	"Nintendo", "Nintendo 64", 0 )
+CONS(1996, n64, 	0,		0,		n64, 	n64, 	0,	0,	"Nintendo", "Nintendo 64", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
