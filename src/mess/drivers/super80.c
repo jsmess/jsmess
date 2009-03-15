@@ -15,8 +15,6 @@
 #include "super80.h"
 
 
-static UINT8 irq_counter;
-
 static const device_config *super80_z80pio;
 static const device_config *super80_speaker;
 static const device_config *super80_cassette;
@@ -45,17 +43,10 @@ UINT8 super80_mhz=2;	/* state of bit 2 of port F0 */
 
 static UINT8 keylatch;
 
-/* Due to pio bug since 128u7, need to eat first interrupt after boot.
-	Only works for super80m and super80v. The irq doesn't work at all for the others at this time. */
+/* This activates when Control + C + 4 pressed */
 static void super80_pio_interrupt(const device_config *device, int state)
 {
-	if ((state) && (!irq_counter))
-		irq_counter++;
-	else
-	{
-		cputag_set_input_line(device->machine, "maincpu", 0, state );
-		if (state) irq_counter=0;
-	}
+	cputag_set_input_line(device->machine, "maincpu", 0, state );
 }
 
 static WRITE8_DEVICE_HANDLER( pio_port_a_w )
@@ -116,8 +107,15 @@ static void super80_cassette_motor( running_machine *machine, UINT8 data )
 
 static UINT8 cass_data[]={ 0, 0, 0, 0 };
 
-/*	This timer runs at 200kHz and emulates the 2 chips in the cassette input circuit
-	They are U79 CD4046BCN PLL chip and U1 LM311P op-amp. U79 converts a frequency to a voltage,
+	/* this timer runs at 200khz and does 2 jobs:  
+	1. Scan the keyboard and present the results to the pio  
+	2. Emulate the 2 chips in the cassette input circuit  
+
+	Reasons why it is necessary:  
+	1. The real z80pio is driven by the cpu clock and is capable of independent actions.  
+	MAME does not support this at all. If the interrupt key sequence is entered, the  
+	computer can be reset out of a hung state by the operator.  
+	2. This "emulates" U79 CD4046BCN PLL chip and U1 LM311P op-amp. U79 converts a frequency to a voltage,  
 	and U1 amplifies that voltage to digital levels. U1 has a trimpot connected, to set the midpoint.
 
 	The MDS homebrew input circuit consists of 2 op-amps followed by a D-flipflop.
@@ -141,6 +139,8 @@ static TIMER_CALLBACK( super80_timer )
 		cass_data[2] = ((cass_data[1] < 0x40) ? 1 : 0) | cass_ws | cass_data[3];
 		cass_data[1] = 0;
 	}
+
+	z80pio_p_w(super80_z80pio,1,pio_port_b_r(super80_z80pio,0));
 }
 
 /*************************************** PRINTER ********************************************************/
