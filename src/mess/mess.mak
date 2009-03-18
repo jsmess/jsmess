@@ -1402,6 +1402,7 @@ $(MESSOBJ)/votrax.a: \
 
 $(MESSOBJ)/nokia.a: \
 	$(MESS_DRIVERS)/mikromik.o \
+	$(MESS_VIDEO)/upd7220.o
 
 #-------------------------------------------------
 # layout dependencies
