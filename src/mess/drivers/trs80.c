@@ -37,6 +37,7 @@ FF:
 - bits 0 and 1 are for writing a cassette
 - bit 2 must be high to turn the cassette player on, enables cassette data paths on a system-80
 - bit 3 switches the display between 64 or 32 characters per line
+- bit 6 remembers the 32/64 screen mode (inverted)
 - bit 7 is for reading from a cassette
 FE:
 - bit 0 is for selecting inverse video of the whole screen on a lnw80
@@ -81,6 +82,7 @@ Not emulated:
 #include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/wave.h"
+#include "machine/ctronics.h"
 #include "includes/trs80.h"
 
 /* Components */
@@ -108,31 +110,30 @@ static READ8_DEVICE_HANDLER (trs80_wd179x_r)
 	}
 }
 
-static ADDRESS_MAP_START( mem_level1, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( trs80_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x3800, 0x38ff) AM_READ(trs80_keyboard_r)
 	AM_RANGE(0x3c00, 0x3fff) AM_READWRITE(SMH_RAM, trs80_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x4000, 0x7fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_level1, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( trs80_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xfe, 0xfe) AM_READ(trs80_port_xx_r)
 	AM_RANGE(0xff, 0xff) AM_READWRITE(trs80_port_ff_r, trs80_port_ff_w)
 ADDRESS_MAP_END
 
+/* memory from 3700-37ff, 8000-ffff only exists when expansion box is used */
 static ADDRESS_MAP_START( mem_model1, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x37df) AM_ROM
+	AM_RANGE(0x0000, 0x35ff) AM_ROM
 	AM_RANGE(0x37e0, 0x37e3) AM_READWRITE(trs80_irq_status_r, trs80_motor_w)
-	AM_RANGE(0x37e4, 0x37e7) AM_NOP
+//	AM_RANGE(0x37e4, 0x37e7) AM_NOP
 	AM_RANGE(0x37e8, 0x37eb) AM_READWRITE(trs80_printer_r, trs80_printer_w)
 	AM_RANGE(0x37ec, 0x37ec) AM_DEVREADWRITE("wd179x", trs80_wd179x_r, wd17xx_command_w)
 	AM_RANGE(0x37ed, 0x37ed) AM_DEVREADWRITE("wd179x", wd17xx_track_r, wd17xx_track_w)
 	AM_RANGE(0x37ee, 0x37ee) AM_DEVREADWRITE("wd179x", wd17xx_sector_r, wd17xx_sector_w)
 	AM_RANGE(0x37ef, 0x37ef) AM_DEVREADWRITE("wd179x", wd17xx_data_r, wd17xx_data_w)
-	AM_RANGE(0x37f0, 0x37ff) AM_NOP
-	AM_RANGE(0x3800, 0x38ff) AM_READ(trs80_keyboard_r)
-	AM_RANGE(0x3900, 0x3bff) AM_NOP
+//	AM_RANGE(0x37f0, 0x37ff) AM_NOP
+	AM_RANGE(0x3800, 0x38ff) AM_MIRROR(0x300) AM_READ(trs80_keyboard_r)
 	AM_RANGE(0x3c00, 0x3fff) AM_READWRITE(SMH_RAM, trs80_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x4000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -378,14 +379,13 @@ static const cassette_config trs80l2_cassette_config =
 	CASSETTE_PLAY
 };
 
-static MACHINE_DRIVER_START( level1 )
+static MACHINE_DRIVER_START( trs80 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 1796000)        /* 1.796 MHz */
-	MDRV_CPU_PROGRAM_MAP(mem_level1, 0)
-	MDRV_CPU_IO_MAP(io_level1, 0)
+	MDRV_CPU_PROGRAM_MAP(trs80_mem, 0)
+	MDRV_CPU_IO_MAP(trs80_io, 0)
 	MDRV_CPU_VBLANK_INT("screen", trs80_frame_interrupt)
 	MDRV_CPU_PERIODIC_INT(trs80_timer_interrupt, 40)
-	MDRV_QUANTUM_TIME(HZ(60))
 
 	MDRV_MACHINE_RESET( trs80 )
 
@@ -410,31 +410,31 @@ static MACHINE_DRIVER_START( level1 )
 	MDRV_SOUND_WAVE_ADD("wave", "cassette")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	/* devices */
-	MDRV_QUICKLOAD_ADD("quickload", trs80_cmd, "cmd", 0.5)
 
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
 	
-	MDRV_WD179X_ADD("wd179x", trs80_wd17xx_interface )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( model1 )
-	MDRV_IMPORT_FROM( level1 )
+	MDRV_IMPORT_FROM( trs80 )
 	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP( mem_model1, 0 )
 	MDRV_CPU_IO_MAP( io_model1, 0 )
 
 	MDRV_CASSETTE_MODIFY( "cassette", trs80l2_cassette_config )
+	MDRV_QUICKLOAD_ADD("quickload", trs80_cmd, "cmd", 0.5)
+	MDRV_WD179X_ADD("wd179x", trs80_wd17xx_interface )
+	/* printer */
+	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( model3 )
-	MDRV_IMPORT_FROM( level1 )
+	MDRV_IMPORT_FROM( model1 )
 	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP( mem_model3, 0 )
 	MDRV_CPU_IO_MAP( io_model3, 0 )
 	MDRV_CPU_VBLANK_INT_HACK(trs80_frame_interrupt, 2)
-
-	MDRV_CASSETTE_MODIFY( "cassette", trs80l2_cassette_config )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ht1080z )
@@ -578,7 +578,7 @@ SYSTEM_CONFIG_END
 
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE	  INPUT  INIT      CONFIG       COMPANY  FULLNAME */
-COMP( 1977, trs80,    0,	0,	level1,   trs80, trs80,    0,		"Tandy Radio Shack",  "TRS-80 Model I (Level I Basic)" , 0)
+COMP( 1977, trs80,    0,	0,	trs80,    trs80, trs80,    0,		"Tandy Radio Shack",  "TRS-80 Model I (Level I Basic)" , 0)
 COMP( 1978, trs80l2,  trs80,	0,	model1,   trs80, trs80,    trs8012,	"Tandy Radio Shack",  "TRS-80 Model I (Level II Basic)" , 0)
 COMP( 1983, radionic, trs80,	0,	model1,   trs80, radionic, trs8012,	"Komtek",  "Radionic" , 0)
 COMP( 1980, sys80,    trs80,	0,	model1,   trs80, trs80,    trs8012,	"EACA Computers Ltd.","System-80" , 0)

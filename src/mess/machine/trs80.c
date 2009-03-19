@@ -9,6 +9,7 @@
 
 /* Core includes */
 #include "driver.h"
+#include "machine/ctronics.h"
 #include "includes/trs80.h"
 
 /* Components */
@@ -55,6 +56,7 @@ static UINT8 irq_mask = 0;
 static double old_cassette_val;
 static UINT8 cassette_data;
 static emu_timer *cassette_data_timer;
+static const device_config *trs80_printer;
 
 static TIMER_CALLBACK( cassette_data_callback )
 {
@@ -207,6 +209,7 @@ MACHINE_RESET( trs80 )
 	cassette_data = 0x00;
 	cassette_data_timer = timer_alloc(machine,  cassette_data_callback, NULL );
 	timer_adjust_periodic( cassette_data_timer, attotime_zero, 0, ATTOTIME_IN_HZ(11025) );
+	trs80_printer = devtag_get_device(machine, "centronics");
 }
 
 
@@ -344,7 +347,8 @@ WRITE8_HANDLER( trs80_port_ff_w )
 
  READ8_HANDLER( trs80_port_ff_r )
 {
-	return cassette_data;// | 0x7F;
+	UINT8 data = (~trs80_port_ff & 8) << 3;	// MODESEL bit (32 or 64 chars per line)
+	return data | cassette_data;
 }
 
 /*************************************
@@ -408,13 +412,20 @@ INTERRUPT_GEN( trs80_frame_interrupt )
 
  READ8_HANDLER ( trs80_printer_r )
 {
-	/* nothing yet :( */
-	return 0;
+	/* Bit 7 - 1 = Busy; 0 = Not Busy
+	   Bit 6 - 1 = Out of Paper; 0 = Paper
+	   Bit 5 - 1 = Ready; 0 = Not Ready
+	   Bit 4 - 1 = Printer selected; 0 = Printer not selected
+	   Bits 3..0 - Not used */
+
+	return 0x30 | (centronics_busy_r(trs80_printer) << 7);
 }
 
 WRITE8_HANDLER( trs80_printer_w )
 {
-	/* nothing yet :( */
+	centronics_strobe_w(trs80_printer, 1);
+	centronics_data_w(trs80_printer, 0, data);
+	centronics_strobe_w(trs80_printer, 0);
 }
 
  READ8_HANDLER( trs80_irq_status_r )
