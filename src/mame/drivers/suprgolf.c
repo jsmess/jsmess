@@ -19,31 +19,36 @@
 #include "sound/2203intf.h"
 
 static tilemap *suprgolf_tilemap;
-
+static UINT8 *suprgolf_bg_vram;
+static UINT8 *suprgolf_bg_pen;
 static int suprgolf_rom_bank;
+static UINT8 suprgolf_bg_bank;
+static UINT8 suprgolf_vreg;
 
 static TILE_GET_INFO( get_tile_info )
 {
 	int code = videoram[tile_index*2]+256*(videoram[tile_index*2+1]);
+	int color = videoram[tile_index*2+0x800] & 0x7f;
+
 	SET_TILE_INFO(
 		0,
 		code,
-		0,
+		color,
 		0);
 }
 
-#ifdef UNUSED_FUNCTION
 static READ8_HANDLER( rom_bank_select_r )
 {
     return suprgolf_rom_bank;
 }
-#endif
 
 static WRITE8_HANDLER( rom_bank_select_w )
 {
 	UINT8 *region_base = memory_region(space->machine, "user1");
 
 	suprgolf_rom_bank = data;
+
+	//popmessage("%08x %02x",((data & 0x3f) * 0x4000),data);
 
 	mame_printf_debug("ROM_BANK 0x8000 - %X @%X\n",data,cpu_get_previouspc(space->cpu));
 	memory_set_bankptr(space->machine, 2, region_base + (data&0x3f ) * 0x4000);
@@ -53,7 +58,8 @@ static WRITE8_HANDLER( rom2_bank_select_w )
 {
 	UINT8 *region_base = memory_region(space->machine, "user2");
 	mame_printf_debug("ROM_BANK 0x4000 - %X @%X\n",data,cpu_get_previouspc(space->cpu));
-	memory_set_bankptr(space->machine, 1, region_base + (data&0x3f ) * 0x4000);
+//  if(data == 0) data = 1; //test hack
+	memory_set_bankptr(space->machine, 1, region_base + (data&0x0f ) * 0x4000);
 }
 
 static MACHINE_RESET( suprgolf )
@@ -64,37 +70,148 @@ static MACHINE_RESET( suprgolf )
 static VIDEO_START( suprgolf )
 {
 	suprgolf_tilemap = tilemap_create( machine, get_tile_info,tilemap_scan_rows,8,8,32,32 );
+	paletteram = auto_malloc(0x1000);
+	suprgolf_bg_vram = auto_malloc(0x2000*0x20);
+	suprgolf_bg_pen = auto_malloc(0x2000*0x20);
+
+	tilemap_set_transparent_pen(suprgolf_tilemap,15);
+}
+
+/* TODO: fix this.*/
+static void bg_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect,UINT8 starting_offs)
+{
+	int x,y,trans;
+	UINT32 count;
+
+	count = starting_offs<<16;
+	trans = starting_offs;
+
+	for(y=0;y<256;y++)
+	{
+		for(x=0;x<512;x+=2)
+		{
+			UINT16 color;
+
+			color = ((suprgolf_bg_pen[count] & 0xff)<<4) | ((suprgolf_bg_vram[count] & 0xf0)>>4);
+			//color+= ((suprgolf_bg_pen[count+0x10000])<<4);
+			//if((x)<video_screen_get_visible_area(machine)->max_x && ((y)+0)<video_screen_get_visible_area(machine)->max_y)
+			if(x+1 < 256)
+			{
+				if(trans)
+				{
+					if((suprgolf_bg_vram[count] & 0xf0) != 0xf0)
+						*BITMAP_ADDR32(bitmap, y, x+1) = machine->pens[(color & 0x7ff)];
+				}
+				else
+					*BITMAP_ADDR32(bitmap, y, x+1) = machine->pens[(color & 0x7ff)];
+			}
+
+			color = ((suprgolf_bg_pen[count] & 0xff)<<4) | (suprgolf_bg_vram[count] & 0x0f);
+			//color+= ((suprgolf_bg_pen[count+0x10000])<<4);
+
+			//if((x+1)<video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
+			if(x < 256)
+			{
+				if(trans)
+				{
+					if((suprgolf_bg_vram[count] & 0x0f) != 0x0f)
+						*BITMAP_ADDR32(bitmap, y, x) = machine->pens[(color & 0x7ff)];
+				}
+				else
+					*BITMAP_ADDR32(bitmap, y, x) = machine->pens[(color & 0x7ff)];
+			}
+
+			count++;
+		}
+	}
 }
 
 static VIDEO_UPDATE( suprgolf )
 {
-	tilemap_mark_all_tiles_dirty(suprgolf_tilemap);
-	tilemap_draw(bitmap,cliprect,suprgolf_tilemap,TILEMAP_DRAW_OPAQUE,0);
+	bg_draw(screen->machine,bitmap,cliprect,0);
+	//bg_draw(screen->machine,bitmap,cliprect,1);
+	bg_draw(screen->machine,bitmap,cliprect,2); //this probably should be putted over the fg tilemap too.
+
+	tilemap_draw(bitmap,cliprect,suprgolf_tilemap,0,0);
 	return 0;
 }
 
+static UINT8 palette_switch;
 
-// vidram is banked?
+static READ8_HANDLER( suprgolf_videoram_r )
+{
+	if(palette_switch)
+		return paletteram[offset];
+	else
+		return videoram[offset];
+}
+
+static WRITE8_HANDLER( suprgolf_videoram_w )
+{
+	if(palette_switch)
+	{
+		int r,g,b,datax;
+		paletteram[offset] = data;
+		offset>>=1;
+		datax=paletteram[offset*2]+256*paletteram[offset*2+1];
+
+		b=(datax & 0x8000) ? 0 : ((datax)&0x001f)>>0;
+		g=(datax & 0x8000) ? 0 : ((datax)&0x03e0)>>5;
+		r=(datax & 0x8000) ? 0 : ((datax)&0x7c00)>>10;
+
+		palette_set_color_rgb(space->machine, offset, pal5bit(r), pal5bit(g), pal5bit(b));
+	}
+	else
+	{
+		videoram[offset] = data;
+		tilemap_mark_tile_dirty(suprgolf_tilemap, (offset & 0x7fe) >> 1);
+	}
+}
+
+static READ8_HANDLER( suprgolf_vregs_r )
+{
+	return suprgolf_vreg;
+}
+
+static WRITE8_HANDLER( suprgolf_vregs_w )
+{
+	//bits 0,1,2 and probably 3 controls the background vram banking
+	suprgolf_vreg = data;
+	palette_switch = (data & 0x80);
+	suprgolf_bg_bank = (data & 0x1f);
+
+	if(data & 0x20) //TODO: understand the proper condition
+		cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
+}
+
+static UINT8 pen;
+
+static READ8_HANDLER( suprgolf_bg_vram_r )
+{
+	return suprgolf_bg_vram[offset+suprgolf_bg_bank*0x2000];
+}
+
+static WRITE8_HANDLER( suprgolf_bg_vram_w )
+{
+	suprgolf_bg_vram[offset+suprgolf_bg_bank*0x2000] = data;
+	suprgolf_bg_pen[offset+suprgolf_bg_bank*0x2000] = data ? pen : 0;
+}
+
+static WRITE8_HANDLER( suprgolf_pen_w )
+{
+	pen = data;
+}
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK1)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
 	AM_RANGE(0x4000, 0x4000) AM_WRITE( rom2_bank_select_w )
-
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK2)
-
-	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE(&videoram)
-	AM_RANGE(0xe800, 0xefff) AM_RAM
-//  AM_RANGE(0xf000, 0xffff) AM_RAM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(2)
+	AM_RANGE(0xc000, 0xdfff) AM_READWRITE( suprgolf_bg_vram_r, suprgolf_bg_vram_w ) // banked background vram
+	AM_RANGE(0xe000, 0xefff) AM_READWRITE( suprgolf_videoram_r, suprgolf_videoram_w ) AM_BASE(&videoram) //foreground vram + paletteram
+	AM_RANGE(0xf000, 0xf000) AM_WRITE( suprgolf_pen_w )
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
-
-static READ8_HANDLER( suprgolf_random )
-{
-	return mame_rand(space->machine);
-}
 
 static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -102,25 +219,33 @@ static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2")
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2") // ??
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x05, 0x05) AM_READ_PORT("IN4") AM_WRITE(rom_bank_select_w)
-	AM_RANGE(0x06, 0x06) AM_READ(suprgolf_random) // game locks up or crashes? if this doesn't return right values?
+	AM_RANGE(0x05, 0x05) AM_READ(rom_bank_select_r) AM_WRITE(rom_bank_select_w)
+	AM_RANGE(0x06, 0x06) AM_READWRITE( suprgolf_vregs_r,suprgolf_vregs_w ) // game locks up or crashes? if this doesn't return right values?
 
 	AM_RANGE(0x08, 0x09) AM_DEVREADWRITE("ym", ym2203_r, ym2203_w)
  ADDRESS_MAP_END
 
 static INPUT_PORTS_START( suprgolf )
 	PORT_START("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_DIPNAME( 0x01, 0x01, "0" ) //USED!
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)	    /* D.L */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)	    /* D.R */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)			/* CNT */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)			/* SEL */
 
 	PORT_START("P2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) //USED!
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -196,30 +321,28 @@ static INPUT_PORTS_START( suprgolf )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x01, 0x01, "DSW0" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Tutorial" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x30, "Number of Balls" )
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x10, "2" )
+	PORT_DIPSETTING(    0x30, "3" )
+	PORT_DIPSETTING(    0x20, "4" )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("DSW1")
 	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
@@ -278,18 +401,17 @@ static const gfx_layout gfxlayout =
    8,8,
    RGN_FRAC(1,1),
    4,
- { 0, 1, 2, 3 },
-	{ 1*4, 0*4, 3*4, 2*4, 5*4, 4*4, 7*4, 6*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	8*8*4
+   { 0, 1, 2, 3 },
+   { 1*4, 0*4, 3*4, 2*4, 5*4, 4*4, 7*4, 6*4 },
+   { 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+   8*8*4
 };
 
 static GFXDECODE_START( suprgolf )
-	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout,   0, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout,   0, 0x80 )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( suprgolf )
-
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,4000000)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
@@ -305,12 +427,12 @@ static MACHINE_DRIVER_START( suprgolf )
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 191)
 
 	MDRV_GFXDECODE(suprgolf)
-	MDRV_PALETTE_LENGTH(512)
+	MDRV_PALETTE_LENGTH(0x1000)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -383,5 +505,5 @@ ROM_START( suprgolf )
 	ROM_LOAD( "cg12.6k",0x00000, 0x10000, CRC(5707b3d5) SHA1(9102a40fefb6426f2cd9d92d66fdc77e078e3f4c) )
 ROM_END
 
-GAME( 19??, suprgolf, 0, suprgolf,  suprgolf,  0, ROT0, "Nasco/Face?", "Super Crown Golf", GAME_NOT_WORKING )
+GAME( 1989?, suprgolf, 0, suprgolf,  suprgolf,  0, ROT0, "Nasco", "Super Crowns Golf (Japan)", GAME_NOT_WORKING )
 

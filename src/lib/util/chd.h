@@ -90,8 +90,7 @@
     [ 48] UINT8  sha1[20];      // combined raw+meta SHA1
     [ 68] UINT8  parentsha1[20];// combined raw+meta SHA1 of parent
     [ 88] UINT8  rawsha1[20];   // raw data SHA1
-    [108] UINT8  metasha1[20];  // metadata SHA1
-    [128] (V4 header length)
+    [108] (V4 header length)
 
     Flags:
         0x00000001 - set if this drive has a parent
@@ -105,11 +104,12 @@
 ***************************************************************************/
 
 /* header information */
-#define CHD_HEADER_VERSION			3
+#define CHD_HEADER_VERSION			4
 #define CHD_V1_HEADER_SIZE			76
 #define CHD_V2_HEADER_SIZE			80
 #define CHD_V3_HEADER_SIZE			120
-#define CHD_MAX_HEADER_SIZE			CHD_V3_HEADER_SIZE
+#define CHD_V4_HEADER_SIZE			108
+#define CHD_MAX_HEADER_SIZE			CHD_V4_HEADER_SIZE
 
 /* checksumming information */
 #define CHD_MD5_BYTES				16
@@ -140,6 +140,15 @@
 /* standard hard disk metadata */
 #define HARD_DISK_METADATA_TAG		0x47444444	/* 'GDDD' */
 #define HARD_DISK_METADATA_FORMAT	"CYLS:%d,HEADS:%d,SECS:%d,BPS:%d"
+
+/* hard disk identify information */
+#define HARD_DISK_IDENT_METADATA_TAG 0x49444e54 /* 'IDNT' */
+
+/* hard disk key information */
+#define HARD_DISK_KEY_METADATA_TAG	0x4b455920  /* 'KEY '  */
+
+/* pcmcia CIS information */
+#define PCMCIA_CIS_METADATA_TAG		0x43495320  /* 'CIS '  */
 
 /* standard CD-ROM metadata */
 #define CDROM_OLD_METADATA_TAG		0x43484344	/* 'CHCD' */
@@ -213,15 +222,27 @@ struct _chd_header
 	UINT32		totalhunks;					/* total # of hunks represented */
 	UINT64		logicalbytes;				/* logical size of the data */
 	UINT64		metaoffset;					/* offset in file of first metadata */
-	UINT8		md5[CHD_MD5_BYTES];			/* MD5 checksum of raw data */
-	UINT8		parentmd5[CHD_MD5_BYTES];	/* MD5 checksum of parent file */
-	UINT8		sha1[CHD_SHA1_BYTES];		/* SHA1 checksum of raw data */
-	UINT8		parentsha1[CHD_SHA1_BYTES];	/* SHA1 checksum of parent file */
+	UINT8		md5[CHD_MD5_BYTES];			/* overall MD5 checksum */
+	UINT8		parentmd5[CHD_MD5_BYTES];	/* overall MD5 checksum of parent */
+	UINT8		sha1[CHD_SHA1_BYTES];		/* overall SHA1 checksum */
+	UINT8		rawsha1[CHD_SHA1_BYTES];	/* SHA1 checksum of raw data */
+	UINT8		parentsha1[CHD_SHA1_BYTES];	/* overall SHA1 checksum of parent */
 
 	UINT32		obsolete_cylinders;			/* obsolete field -- do not use! */
 	UINT32		obsolete_sectors;			/* obsolete field -- do not use! */
 	UINT32		obsolete_heads;				/* obsolete field -- do not use! */
 	UINT32		obsolete_hunksize;			/* obsolete field -- do not use! */
+};
+
+
+/* structure for returning information about a verification pass */
+typedef struct _chd_verify_result chd_verify_result;
+struct _chd_verify_result
+{
+	UINT8		md5[CHD_MD5_BYTES];			/* overall MD5 checksum */
+	UINT8		sha1[CHD_SHA1_BYTES];		/* overall SHA1 checksum */
+	UINT8		rawsha1[CHD_SHA1_BYTES];	/* SHA1 checksum of raw data */
+	UINT8		metasha1[CHD_SHA1_BYTES];	/* SHA1 checksum of metadata */
 };
 
 
@@ -323,7 +344,7 @@ chd_error chd_verify_begin(chd_file *chd);
 chd_error chd_verify_hunk(chd_file *chd);
 
 /* finish verifying a CHD, returning the computed MD5 and SHA1 */
-chd_error chd_verify_finish(chd_file *chd, UINT8 *finalmd5, UINT8 *finalsha1);
+chd_error chd_verify_finish(chd_file *chd, chd_verify_result *result);
 
 
 

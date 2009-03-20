@@ -51,6 +51,26 @@
     variables may be requested via the 'tempvariables' attribute
     on the cheat.
 
+**********************************************************************
+
+    Cheats are generally broken down into categories based on
+    which actions are defined and whether or not there is a
+    parameter present:
+
+    ---- Actions -----
+    On   Off  Run  Chg  Param?  Type
+    ===  ===  ===  ===  ======  =================================
+     N    N    N    ?    None   Text-only (displays text in menu)
+     Y    N    N    ?    None   Oneshot (select to activate)
+     Y    Y    N    ?    None   On/Off (select to toggle)
+     ?    ?    Y    ?    None   On/Off (select to toggle)
+
+     ?    N    N    Y    Any    Oneshot parameter (select to alter)
+     ?    Y    ?    ?    Value  Value parameter (off or a live value)
+     ?    ?    Y    ?    Value  Value parameter (off or a live value)
+     ?    Y    ?    ?    List   Item list parameter (off or a live value)
+     ?    ?    Y    ?    List   Item list parameter (off or a live value)
+
 *********************************************************************/
 
 #include "driver.h"
@@ -82,6 +102,7 @@ enum _script_state
 	SCRIPT_STATE_COUNT
 };
 typedef enum _script_state script_state;
+DECLARE_ENUM_OPERATORS(script_state)
 
 
 
@@ -97,6 +118,7 @@ struct _parameter_item
 	astring *			text;							/* name of the item */
 	UINT64				value;							/* value of the item */
 	int					valformat;						/* format of value */
+	astring *			curtext;						/* name of the current item */
 };
 
 
@@ -217,11 +239,95 @@ static UINT64 execute_tobcd(void *globalref, void *ref, UINT32 params, const UIN
 ***************************************************************************/
 
 /*-------------------------------------------------
+    is_text_only_cheat - return TRUE if this
+    cheat entry is text-only (no actions)
+-------------------------------------------------*/
+
+INLINE int is_text_only_cheat(const cheat_entry *cheat)
+{
+	return (cheat->parameter == NULL &&
+			cheat->script[SCRIPT_STATE_RUN] == NULL &&
+			cheat->script[SCRIPT_STATE_OFF] == NULL &&
+			cheat->script[SCRIPT_STATE_ON] == NULL);
+}
+
+
+/*-------------------------------------------------
+    is_oneshot_cheat - return TRUE if this cheat
+    entry is a one-shot cheat (no "run" or "off"
+    action, but a valid "on" action)
+-------------------------------------------------*/
+
+INLINE int is_oneshot_cheat(const cheat_entry *cheat)
+{
+	return (cheat->parameter == NULL &&
+			cheat->script[SCRIPT_STATE_RUN] == NULL &&
+			cheat->script[SCRIPT_STATE_OFF] == NULL &&
+			cheat->script[SCRIPT_STATE_ON] != NULL);
+}
+
+
+/*-------------------------------------------------
+    is_onoff_cheat - return TRUE if this cheat
+    entry is a simple on/off toggle (either the
+    "run" or "off" actions are present)
+-------------------------------------------------*/
+
+INLINE int is_onoff_cheat(const cheat_entry *cheat)
+{
+	return (cheat->parameter == NULL &&
+			(cheat->script[SCRIPT_STATE_RUN] != NULL ||
+			 (cheat->script[SCRIPT_STATE_OFF] != NULL &&
+			  cheat->script[SCRIPT_STATE_ON] != NULL)));
+}
+
+
+/*-------------------------------------------------
+    is_value_parameter_cheat - return TRUE if this
+    cheat entry has a parameter represented by an
+    integer value
+-------------------------------------------------*/
+
+INLINE int is_value_parameter_cheat(const cheat_entry *cheat)
+{
+	return (cheat->parameter != NULL && cheat->parameter->itemlist == NULL);
+}
+
+
+/*-------------------------------------------------
+    is_itemlist_parameter_cheat - return TRUE if
+    this cheat entry has a parameter represented
+    by an item list
+-------------------------------------------------*/
+
+INLINE int is_itemlist_parameter_cheat(const cheat_entry *cheat)
+{
+	return (cheat->parameter != NULL && cheat->parameter->itemlist != NULL);
+}
+
+
+/*-------------------------------------------------
+    is_oneshot_parameter_cheat - return TRUE if
+    this cheat entry is a one-shot cheat with a
+    parameter (no "run" or "off" actions, but a
+    valid "change" action)
+-------------------------------------------------*/
+
+INLINE int is_oneshot_parameter_cheat(const cheat_entry *cheat)
+{
+	return (cheat->parameter != NULL &&
+			cheat->script[SCRIPT_STATE_RUN] == NULL &&
+			cheat->script[SCRIPT_STATE_OFF] == NULL &&
+			cheat->script[SCRIPT_STATE_CHANGE] != NULL);
+}
+
+
+/*-------------------------------------------------
     format_int - format an integer according to
     the format
 -------------------------------------------------*/
 
-static const char *format_int(astring *string, UINT64 value, int format)
+INLINE const char *format_int(astring *string, UINT64 value, int format)
 {
 	switch (format)
 	{
@@ -265,7 +371,7 @@ void cheat_init(running_machine *machine)
 	add_exit_callback(machine, cheat_exit);
 
 	/* allocate memory */
-	cheatinfo = auto_malloc(sizeof(*cheatinfo));
+	cheatinfo = (cheat_private *)auto_malloc(sizeof(*cheatinfo));
 	memset(cheatinfo, 0, sizeof(*cheatinfo));
 	machine->cheat_data = cheatinfo;
 
@@ -343,7 +449,7 @@ void cheat_render_text(running_machine *machine)
 void *cheat_get_next_menu_entry(running_machine *machine, void *previous, const char **description, const char **state, UINT32 *flags)
 {
 	cheat_private *cheatinfo = machine->cheat_data;
-	cheat_entry *preventry = previous;
+	cheat_entry *preventry = (cheat_entry *)previous;
 	cheat_entry *cheat;
 
 	/* NULL previous means get the first */
@@ -356,7 +462,7 @@ void *cheat_get_next_menu_entry(running_machine *machine, void *previous, const 
 		*description = astring_c(cheat->description);
 
 	/* some cheat entries are just text for display */
-	if (cheat->parameter == NULL && cheat->script[SCRIPT_STATE_RUN] == NULL && cheat->script[SCRIPT_STATE_OFF] == NULL && cheat->script[SCRIPT_STATE_ON] == NULL)
+	if (is_text_only_cheat(cheat))
 	{
 		if (description != NULL)
 		{
@@ -372,7 +478,7 @@ void *cheat_get_next_menu_entry(running_machine *machine, void *previous, const 
 	}
 
 	/* if we have no parameter and no run or off script, it's a oneshot cheat */
-	else if (cheat->parameter == NULL && cheat->script[SCRIPT_STATE_RUN] == NULL && cheat->script[SCRIPT_STATE_OFF] == NULL)
+	else if (is_oneshot_cheat(cheat))
 	{
 		if (state != NULL)
 			*state = "Set";
@@ -381,7 +487,7 @@ void *cheat_get_next_menu_entry(running_machine *machine, void *previous, const 
 	}
 
 	/* if we have no parameter, it's just on/off */
-	else if (cheat->parameter == NULL)
+	else if (is_onoff_cheat(cheat))
 	{
 		if (state != NULL)
 			*state = (cheat->state == SCRIPT_STATE_RUN) ? "On" : "Off";
@@ -390,12 +496,11 @@ void *cheat_get_next_menu_entry(running_machine *machine, void *previous, const 
 	}
 
 	/* if we have a value parameter, compute it */
-	else if (cheat->parameter->itemlist == NULL)
+	else if (is_value_parameter_cheat(cheat))
 	{
 		if (cheat->state == SCRIPT_STATE_OFF)
 		{
-			if (state != NULL)
-				*state = "Off";
+			*state = is_oneshot_parameter_cheat(cheat) ? "Set" : "Off";
 			if (flags != NULL)
 				*flags = MENU_FLAG_RIGHT_ARROW;
 		}
@@ -416,12 +521,12 @@ void *cheat_get_next_menu_entry(running_machine *machine, void *previous, const 
 	}
 
 	/* if we have an item list, pick the index */
-	else
+	else if (is_itemlist_parameter_cheat(cheat))
 	{
 		if (cheat->state == SCRIPT_STATE_OFF)
 		{
 			if (state != NULL)
-				*state = "Off";
+				*state = is_oneshot_parameter_cheat(cheat) ? "Set" : "Off";
 			if (flags != NULL)
 				*flags = MENU_FLAG_RIGHT_ARROW;
 		}
@@ -439,6 +544,7 @@ void *cheat_get_next_menu_entry(running_machine *machine, void *previous, const 
 				*flags = MENU_FLAG_LEFT_ARROW;
 				if (item == NULL || item->next != NULL)
 					*flags |= MENU_FLAG_RIGHT_ARROW;
+				cheat->parameter->itemlist->curtext = item->text; /* Take a copy of the most current parameter for the popmessage (if used) */
 			}
 		}
 	}
@@ -455,15 +561,26 @@ void *cheat_get_next_menu_entry(running_machine *machine, void *previous, const 
 int cheat_activate(running_machine *machine, void *entry)
 {
 	cheat_private *cheatinfo = machine->cheat_data;
-	cheat_entry *cheat = entry;
+	cheat_entry *cheat = (cheat_entry *)entry;
 	int changed = FALSE;
 
 	/* if we have no parameter and no run or off script, but we do have an on script, it's a oneshot cheat */
-	if (cheat->parameter == NULL && cheat->script[SCRIPT_STATE_RUN] == NULL && cheat->script[SCRIPT_STATE_OFF] == NULL && cheat->script[SCRIPT_STATE_ON] != NULL)
+	if (is_oneshot_cheat(cheat))
 	{
 		cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_ON);
 		changed = TRUE;
 		popmessage("Activated %s", astring_c(cheat->description));
+	}
+
+	/* if we have no run or off script, but we do have parameter and change scripts and it's not in the off state, it's a oneshot list or selectable value cheat */
+	else if (is_oneshot_parameter_cheat(cheat) && cheat->state != SCRIPT_STATE_OFF)
+	{
+		cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_CHANGE);
+		changed = TRUE;
+		if (cheat->parameter->itemlist != NULL)
+			popmessage("Activated\n %s = %s", astring_c(cheat->description), astring_c(cheat->parameter->itemlist->curtext) );
+		else
+			popmessage("Activated\n %s = %d (0x%X)", astring_c(cheat->description), (UINT32)cheat->parameter->value, (UINT32)cheat->parameter->value );
 	}
 
 	return changed;
@@ -479,11 +596,11 @@ int cheat_activate(running_machine *machine, void *entry)
 int cheat_select_default_state(running_machine *machine, void *entry)
 {
 	cheat_private *cheatinfo = machine->cheat_data;
-	cheat_entry *cheat = entry;
+	cheat_entry *cheat = (cheat_entry *)entry;
 	int changed = FALSE;
 
 	/* if we have no parameter and no run or off script, it's either text or a oneshot cheat */
-	if (cheat->parameter == NULL && cheat->script[SCRIPT_STATE_RUN] == NULL && cheat->script[SCRIPT_STATE_OFF] == NULL)
+	if (is_oneshot_cheat(cheat))
 		;
 
 	/* if we have no parameter, it's just on/off; default to off */
@@ -508,15 +625,15 @@ int cheat_select_default_state(running_machine *machine, void *entry)
 int cheat_select_previous_state(running_machine *machine, void *entry)
 {
 	cheat_private *cheatinfo = machine->cheat_data;
-	cheat_entry *cheat = entry;
+	cheat_entry *cheat = (cheat_entry *)entry;
 	int changed = FALSE;
 
 	/* if we have no parameter and no run or off script, it's either text or a oneshot cheat */
-	if (cheat->parameter == NULL && cheat->script[SCRIPT_STATE_RUN] == NULL && cheat->script[SCRIPT_STATE_OFF] == NULL)
+	if (is_oneshot_cheat(cheat))
 		;
 
 	/* if we have no parameter, it's just on/off */
-	else if (cheat->parameter == NULL)
+	else if (is_onoff_cheat(cheat))
 	{
 		if (cheat->state != SCRIPT_STATE_OFF)
 		{
@@ -527,7 +644,7 @@ int cheat_select_previous_state(running_machine *machine, void *entry)
 	}
 
 	/* if we have a value parameter, compute it */
-	else if (cheat->parameter->itemlist == NULL)
+	else if (is_value_parameter_cheat(cheat))
 	{
 		if (cheat->parameter->value > cheat->parameter->minval)
 		{
@@ -535,7 +652,8 @@ int cheat_select_previous_state(running_machine *machine, void *entry)
 				cheat->parameter->value = cheat->parameter->minval;
 			else
 				cheat->parameter->value -= cheat->parameter->stepval;
-			cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_CHANGE);
+			if (!is_oneshot_parameter_cheat(cheat))
+				cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_CHANGE);
 			changed = TRUE;
 		}
 		else if (cheat->state != SCRIPT_STATE_OFF)
@@ -562,7 +680,8 @@ int cheat_select_previous_state(running_machine *machine, void *entry)
 				cheat->state = SCRIPT_STATE_RUN;
 			}
 			cheat->parameter->value = prev->value;
-			cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_CHANGE);
+			if (!is_oneshot_parameter_cheat(cheat))
+				cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_CHANGE);
 			changed = TRUE;
 		}
 		else if (cheat->state != SCRIPT_STATE_OFF)
@@ -584,15 +703,15 @@ int cheat_select_previous_state(running_machine *machine, void *entry)
 int cheat_select_next_state(running_machine *machine, void *entry)
 {
 	cheat_private *cheatinfo = machine->cheat_data;
-	cheat_entry *cheat = entry;
+	cheat_entry *cheat = (cheat_entry *)entry;
 	int changed = FALSE;
 
 	/* if we have no parameter and no run or off script, it's a oneshot cheat */
-	if (cheat->parameter == NULL && cheat->script[SCRIPT_STATE_RUN] == NULL && cheat->script[SCRIPT_STATE_OFF] == NULL)
+	if (is_oneshot_cheat(cheat))
 		;
 
 	/* if we have no parameter, it's just on/off */
-	else if (cheat->parameter == NULL)
+	else if (is_onoff_cheat(cheat))
 	{
 		if (cheat->state != SCRIPT_STATE_RUN)
 		{
@@ -603,14 +722,15 @@ int cheat_select_next_state(running_machine *machine, void *entry)
 	}
 
 	/* if we have a value parameter, compute it */
-	else if (cheat->parameter->itemlist == NULL)
+	else if (is_value_parameter_cheat(cheat))
 	{
 		if (cheat->state == SCRIPT_STATE_OFF)
 		{
 			cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_ON);
 			cheat->state = SCRIPT_STATE_RUN;
 			cheat->parameter->value = cheat->parameter->minval;
-			cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_CHANGE);
+			if (!is_oneshot_parameter_cheat(cheat))
+				cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_CHANGE);
 			changed = TRUE;
 		}
 		else if (cheat->parameter->value < cheat->parameter->maxval)
@@ -619,7 +739,8 @@ int cheat_select_next_state(running_machine *machine, void *entry)
 				cheat->parameter->value = cheat->parameter->maxval;
 			else
 				cheat->parameter->value += cheat->parameter->stepval;
-			cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_CHANGE);
+			if (!is_oneshot_parameter_cheat(cheat))
+				cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_CHANGE);
 			changed = TRUE;
 		}
 	}
@@ -634,7 +755,8 @@ int cheat_select_next_state(running_machine *machine, void *entry)
 			cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_ON);
 			cheat->state = SCRIPT_STATE_RUN;
 			cheat->parameter->value = cheat->parameter->itemlist->value;
-			cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_CHANGE);
+			if (!is_oneshot_parameter_cheat(cheat))
+				cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_CHANGE);
 			changed = TRUE;
 		}
 		else
@@ -645,7 +767,8 @@ int cheat_select_next_state(running_machine *machine, void *entry)
 			if (item->next != NULL)
 			{
 				cheat->parameter->value = item->next->value;
-				cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_CHANGE);
+				if (!is_oneshot_parameter_cheat(cheat))
+					cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_CHANGE);
 				changed = TRUE;
 			}
 		}
@@ -937,7 +1060,7 @@ static cheat_entry *cheat_entry_load(running_machine *machine, const char *filen
 	}
 
 	/* allocate memory for the cheat */
-	cheat = malloc_or_die(sizeof(*cheat) + (tempcount - 1) * sizeof(cheat->tempvar));
+	cheat = (cheat_entry *)malloc_or_die(sizeof(*cheat) + (tempcount - 1) * sizeof(cheat->tempvar));
 	memset(cheat, 0, sizeof(*cheat) + (tempcount - 1) * sizeof(cheat->tempvar));
 	cheat->numtemp = tempcount;
 
@@ -1108,7 +1231,7 @@ static cheat_parameter *cheat_parameter_load(const char *filename, xml_data_node
 	cheat_parameter *param;
 
 	/* allocate memory for it */
-	param = malloc_or_die(sizeof(*param));
+	param = (cheat_parameter *)malloc_or_die(sizeof(*param));
 	memset(param, 0, sizeof(*param));
 
 	/* read the core attributes */
@@ -1126,7 +1249,7 @@ static cheat_parameter *cheat_parameter_load(const char *filename, xml_data_node
 		parameter_item *curitem;
 
 		/* allocate memory for it */
-		curitem = malloc_or_die(sizeof(*curitem));
+		curitem = (parameter_item *)malloc_or_die(sizeof(*curitem));
 		memset(curitem, 0, sizeof(*curitem));
 
 		/* check for NULL text */
@@ -1237,7 +1360,7 @@ static cheat_script *cheat_script_load(running_machine *machine, const char *fil
 	const char *state;
 
 	/* allocate memory for it */
-	script = malloc_or_die(sizeof(*script));
+	script = (cheat_script *)malloc_or_die(sizeof(*script));
 	memset(script, 0, sizeof(*script));
 
 	/* read the core attributes */
@@ -1352,7 +1475,7 @@ static script_entry *script_entry_load(running_machine *machine, const char *fil
 	EXPRERR experr;
 
 	/* allocate memory for it */
-	entry = malloc_or_die(sizeof(*entry));
+	entry = (script_entry *)malloc_or_die(sizeof(*entry));
 	memset(entry, 0, sizeof(*entry));
 
 	/* read the condition if present */
@@ -1422,12 +1545,19 @@ static script_entry *script_entry_load(running_machine *machine, const char *fil
 			output_argument *curarg;
 
 			/* allocate memory for it */
-			curarg = malloc_or_die(sizeof(*curarg));
+			curarg = (output_argument *)malloc_or_die(sizeof(*curarg));
 			memset(curarg, 0, sizeof(*curarg));
 
 			/* first extract attributes */
 			curarg->count = xml_get_attribute_int(argnode, "count", 1);
 			totalargs += curarg->count;
+
+			/* max out on arguments */
+			if (totalargs > MAX_ARGUMENTS)
+			{
+				mame_printf_error("%s.xml(%d): too many arguments (found %d, max is %d)\n", filename, argnode->line, totalargs, MAX_ARGUMENTS);
+				goto error;
+			}
 
 			/* read the expression */
 			expression = argnode->value;
@@ -1446,13 +1576,6 @@ static script_entry *script_entry_load(running_machine *machine, const char *fil
 			/* add to the end of the list */
 			*argtailptr = curarg;
 			argtailptr = &curarg->next;
-		}
-
-		/* max out on arguments */
-		if (totalargs > MAX_ARGUMENTS)
-		{
-			mame_printf_error("%s.xml(%d): too many arguments (found %d, max is %d)\n", filename, argnode->line, totalargs, MAX_ARGUMENTS);
-			goto error;
 		}
 
 		/* validate the format against the arguments */

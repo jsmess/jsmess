@@ -292,42 +292,49 @@ ROM_START( cndypuzl )
 	CD32_BIOS
 
 	DISK_REGION( "cdrom" )
-	DISK_IMAGE_READONLY( "cndypuzl", 0, SHA1(21093753a1875dc4fb97f23232ed3d8776b48c06) MD5(dcb6cdd7d81d5468c1290a3baf4265cb) )
+	DISK_IMAGE_READONLY( "cndypuzl", 0, SHA1(5f41ed3521b3e05d233ac1245b78cb0b118b2b90) )
 ROM_END
 
 ROM_START( haremchl )
 	CD32_BIOS
 
 	DISK_REGION( "cdrom" )
-	DISK_IMAGE_READONLY( "haremchl", 0, SHA1(4d5df2b64b376e8d0574100110f3471d3190765c) MD5(00adbd944c05747e9445446306f904be) )
+	DISK_IMAGE_READONLY( "haremchl", 0, SHA1(abbab347c0d7c5eef0465d0eee770754a452e874) )
 ROM_END
 
 ROM_START( lsrquiz )
 	CD32_BIOS
 
 	DISK_REGION( "cdrom" )
-	DISK_IMAGE_READONLY( "lsrquiz", 0, SHA1(4250c94ab77504104005229b28f24cfabe7c9e48) MD5(12a94f573fe5d218db510166b86fdda5) )
+	DISK_IMAGE_READONLY( "lsrquiz", 0, SHA1(41fb6cd0c9d36bd77e9c3db69d36801edc791e96) )
 ROM_END
 
 ROM_START( lsrquiz2 )
 	CD32_BIOS
 
 	DISK_REGION( "cdrom" )
-	DISK_IMAGE_READONLY( "lsrquiz2", 0, SHA1(ea92df0e53bf36bb86d99ad19fca21c6129e61d7) MD5(df63c32aca815f6c97889e08c10b77bc) )
+	DISK_IMAGE_READONLY( "lsrquiz2", 0, SHA1(78e261df1c548fa492e6cf37a9469640bb8816bf) )
 ROM_END
 
 ROM_START( mgprem11 )
 	CD32_BIOS
 
 	DISK_REGION( "cdrom" )
-	DISK_IMAGE_READONLY( "mgprem11", 0, SHA1(a8a32d10148ba968b57b8186fdf4d4cd378fb0d5) MD5(e0e4d00c6f981c19a1d20d5e7090b0db) )
+	DISK_IMAGE_READONLY( "mgprem11", 0, SHA1(7808db33d5949f6c86d12b32bc388c12377e7038) )
 ROM_END
 
 ROM_START( lasstixx )
 	CD32_BIOS
 
 	DISK_REGION( "cdrom" )
-	DISK_IMAGE_READONLY( "lasstixx", 0, SHA1(29c2525d43a696da54648caffac9952cec85fd37) MD5(6242dd8a3c0b15ef9eafb930b7a7e87f) )
+	DISK_IMAGE_READONLY( "lasstixx", 0, SHA1(b8f6138e1f1840c193e786c56dab03c512f3e21f) )
+ROM_END
+
+ROM_START( mgnumber )
+	CD32_BIOS
+
+	DISK_REGION( "cdrom" )
+	DISK_IMAGE_READONLY( "magicnumber", 0, SHA1(60e1fadc42694742d19cc0ac2b6e99e9e33faa3d) )
 ROM_END
 
 /***************************************************************************************************/
@@ -366,3 +373,4 @@ GAME( 1995, lsrquiz,  cd32, cd32, cd32, cd32,	   ROT0, "CD Express", "Laser Quiz
 GAME( 1995, lsrquiz2, cd32, cd32, cd32, cd32,	   ROT0, "CD Express", "Laser Quiz '2' Italy (v1.0)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 1996, mgprem11, cd32, cd32, cd32, cd32,	   ROT0, "CD Express", "Magic Premium (v1.1)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 1995, lasstixx, cd32, cd32, cd32, cd32,	   ROT0, "CD Express", "Laser Strixx", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1995, mgnumber, cd32, cd32, cd32, cd32,	   ROT0, "CD Express", "Magic Number", GAME_NOT_WORKING|GAME_NO_SOUND )

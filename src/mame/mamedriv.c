@@ -1923,164 +1923,169 @@ const game_driver * const drivers[] =
 	DRIVER( cbombers )
 
 	/* Taito F2 games */
-	DRIVER( finalb )	/* B82 (c) 1988 Taito Corporation Japan (World) */
-	DRIVER( finalbj )	/* B82 (c) 1988 Taito Corporation (Japan) */
-	DRIVER( finalbu )	/* B82 (c) 1988 Taito America Corporation (US) */
-	DRIVER( dondokod )	/* B95 (c) 1989 Taito Corporation Japan (World) */
-	DRIVER( dondokdu )	/* B95 (c) 1989 Taito America Corporation (US) */
-	DRIVER( dondokdj )	/* B95 (c) 1989 Taito Corporation (Japan) */
-	DRIVER( megab )		/* C11 (c) 1989 Taito Corporation Japan (World) */
-	DRIVER( megabj )	/* C11 (c) 1989 Taito Corporation (Japan) */
-	DRIVER( thundfox )	/* C28 (c) 1990 Taito Corporation Japan (World) */
-	DRIVER( thndfoxu )	/* C28 (c) 1990 Taito America Corporation (US) */
-	DRIVER( thndfoxj )	/* C28 (c) 1990 Taito Corporation (Japan) */
-	DRIVER( cameltry )	/* C38 (c) 1989 Taito America Corporation (US) */
-	DRIVER( camltrya )	/* C38 (c) 1989 Taito America Corporation (US) */
-	DRIVER( camltrua )	/* C38 (c) 1989 Taito America Corporation (US) */
-	DRIVER( cameltrj )	/* C38 (c) 1989 Taito Corporation (Japan) */
-	DRIVER( qtorimon )	/* C41 (c) 1990 Taito Corporation (Japan) */
-	DRIVER( liquidk )	/* C49 (c) 1990 Taito Corporation Japan (World) */
-	DRIVER( liquidku )	/* C49 (c) 1990 Taito America Corporation (US) */
-	DRIVER( mizubaku )	/* C49 (c) 1990 Taito Corporation (Japan) */
-	DRIVER( quizhq )	/* C53 (c) 1990 Taito Corporation (Japan) */
-	DRIVER( ssi )		/* C64 (c) 1990 Taito Corporation Japan (World) */
-	DRIVER( majest12 )	/* C64 (c) 1990 Taito Corporation (Japan) */
-	DRIVER( gunfront )	/* C71 (c) 1990 Taito Corporation Japan (World) */
-	DRIVER( gunfronj )	/* C71 (c) 1990 Taito Corporation (Japan) */
-	DRIVER( growl )		/* C74 (c) 1990 Taito Corporation Japan (World) */
-	DRIVER( growlu )	/* C74 (c) 1990 Taito America Corporation (US) */
-	DRIVER( runark )	/* C74 (c) 1990 Taito Corporation (Japan) */
-	DRIVER( mjnquest )	/* C77 (c) 1990 Taito Corporation (Japan) */
-	DRIVER( mjnquesb )	/* C77 (c) 1990 Taito Corporation (Japan) */
-	DRIVER( footchmp )	/* C80 (c) 1990 Taito Corporation Japan (World) */
-	DRIVER( hthero )	/* C80 (c) 1990 Taito Corporation (Japan) */
-	DRIVER( euroch92 )	/*     (c) 1992 Taito Corporation Japan (World) */
-	DRIVER( koshien )	/* C81 (c) 1990 Taito Corporation (Japan) */
-	DRIVER( yuyugogo )	/* C83 (c) 1990 Taito Corporation (Japan) */
-	DRIVER( ninjak )	/* C85 (c) 1990 Taito Corporation Japan (World) */
-	DRIVER( ninjakj )	/* C85 (c) 1990 Taito Corporation (Japan) */
-	DRIVER( ninjaku )	/* C85 (c) 1990 Taito Corporation (Japan) */
-	DRIVER( solfigtr )	/* C91 (c) 1991 Taito Corporation Japan (World) */
-	DRIVER( qzquest )	/* C92 (c) 1991 Taito Corporation (Japan) */
-	DRIVER( pulirula )	/* C98 (c) 1991 Taito Corporation Japan (World) */
-	DRIVER( pulirulj )	/* C98 (c) 1991 Taito Corporation (Japan) */
-	DRIVER( metalb )	/* D16? (c) 1991 Taito Corporation Japan (World) */
-	DRIVER( metalbj )	/* D12 (c) 1991 Taito Corporation (Japan) */
-	DRIVER( qzchikyu )	/* D19 (c) 1991 Taito Corporation (Japan) */
-	DRIVER( yesnoj )	/* D20 (c) 1992 Taito Corporation (Japan) */
-	DRIVER( deadconx )	/* D28 (c) 1992 Taito Corporation Japan (World) */
-	DRIVER( deadconj )	/* D28 (c) 1992 Taito Corporation (Japan) */
-	DRIVER( dinorex )	/* D39 (c) 1992 Taito Corporation Japan (World) */
-	DRIVER( dinorexj )	/* D39 (c) 1992 Taito Corporation (Japan) */
-	DRIVER( dinorexu )	/* D39 (c) 1992 Taito America Corporation (US) */
-	DRIVER( qjinsei )	/* D48 (c) 1992 Taito Corporation (Japan) */
-	DRIVER( qcrayon )	/* D55 (c) 1993 Taito Corporation (Japan) */
-	DRIVER( qcrayon2 )	/* D63 (c) 1993 Taito Corporation (Japan) */
-	DRIVER( driftout )	/* (c) 1991 Visco */
+	DRIVER( finalb )	/* 1989.?? B82 (c) 1988 Taito Corporation Japan (World) */
+	DRIVER( finalbj )	/* 1989.04 B82 (c) 1988 Taito Corporation (Japan) */
+	DRIVER( finalbu )	/* 1989.06 B82 (c) 1988 Taito America Corporation (US) */
+	DRIVER( dondokod )	/* 1989.?? B95 (c) 1989 Taito Corporation Japan (World) */
+	DRIVER( dondokdu )	/* 1989.?? B95 (c) 1989 Taito America Corporation (US) */
+	DRIVER( dondokdj )	/* 1989.07 B95 (c) 1989 Taito Corporation (Japan) */
+	DRIVER( megab )		/* 1989.?? C11 (c) 1989 Taito Corporation Japan (World) */
+	DRIVER( megabj )	/* 1989.11 C11 (c) 1989 Taito Corporation (Japan) */
+	DRIVER( thundfox )	/* 1990.?? C28 (c) 1990 Taito Corporation Japan (World) */
+	DRIVER( thndfoxu )	/* 1990.06 C28 (c) 1990 Taito America Corporation (US) */
+	DRIVER( thndfoxj )	/* 1990.07 C28 (c) 1990 Taito Corporation (Japan) */
+	DRIVER( cameltry )	/* 1990.?? C38 (c) 1989 Taito America Corporation (US) */
+	DRIVER( camltrya )	/* 1990.?? C38 (c) 1989 Taito America Corporation (US) */
+	DRIVER( camltrua )	/* 1990.?? C38 (c) 1989 Taito America Corporation (US) */
+	DRIVER( cameltrj )	/* 1990.04 C38 (c) 1989 Taito Corporation (Japan) */
+	DRIVER( qtorimon )	/* 1990.02 C41 (c) 1990 Taito Corporation (Japan) */
+	DRIVER( liquidk )	/* 1990.?? C49 (c) 1990 Taito Corporation Japan (World) */
+	DRIVER( liquidku )	/* 1990.?? C49 (c) 1990 Taito America Corporation (US) */
+	DRIVER( mizubaku )	/* 1990.08 C49 (c) 1990 Taito Corporation (Japan) */
+	DRIVER( quizhq )	/* 1990.07 C53 (c) 1990 Taito Corporation (Japan) */
+	DRIVER( ssi )		/* 1990.?? C64 (c) 1990 Taito Corporation Japan (World) */
+	DRIVER( majest12 )	/* 1990.11 C64 (c) 1990 Taito Corporation (Japan) */
+						/* 1990.12 C64 (US) */
+	DRIVER( gunfront )	/* 1991.?? C71 (c) 1990 Taito Corporation Japan (World) */
+	DRIVER( gunfronj )	/* 1991.01 C71 (c) 1990 Taito Corporation (Japan) */
+	DRIVER( growl )		/* 1991.?? C74 (c) 1990 Taito Corporation Japan (World) */
+	DRIVER( growlu )	/* 1991.02 C74 (c) 1990 Taito America Corporation (US) */
+	DRIVER( runark )	/* 1991.02 C74 (c) 1990 Taito Corporation (Japan) */
+	DRIVER( mjnquest )	/* 1991.05 C77 (c) 1990 Taito Corporation (Japan) */
+	DRIVER( mjnquesb )	/* 1991.05 C77 (c) 1990 Taito Corporation (Japan) */
+	DRIVER( footchmp )	/* 1991.?? C80 (c) 1990 Taito Corporation Japan (World) */
+	DRIVER( hthero )	/* 1991.03 C80 (c) 1990 Taito Corporation (Japan) */
+	DRIVER( euroch92 )	/* 1991.??     (c) 1992 Taito Corporation Japan (World) */
+	DRIVER( koshien )	/* 1991.04 C81 (c) 1990 Taito Corporation (Japan) */
+	DRIVER( yuyugogo )	/* 1991.03 C83 (c) 1990 Taito Corporation (Japan) */
+	DRIVER( ninjak )	/* 1991.?? C85 (c) 1990 Taito Corporation Japan (World) */
+	DRIVER( ninjakj )	/* 1991.04 C85 (c) 1990 Taito Corporation (Japan) */
+	DRIVER( ninjaku )	/* 1991.03 C85 (c) 1990 Taito Corporation (Japan) */
+	DRIVER( solfigtr )	/* 1991.?? C91 (c) 1991 Taito Corporation Japan (World) */
+	DRIVER( qzquest )	/* 1991.07 C92 (c) 1991 Taito Corporation (Japan) */
+	DRIVER( pulirula )	/* 1991.?? C98 (c) 1991 Taito Corporation Japan (World) */
+	DRIVER( pulirulj )	/* 1991.11 C98 (c) 1991 Taito Corporation (Japan) */
+	DRIVER( metalb )	/* 1991.?? D16? (c) 1991 Taito Corporation Japan (World) */
+	DRIVER( metalbj )	/* 1991.11 D12 (c) 1991 Taito Corporation (Japan) */
+	DRIVER( qzchikyu )	/* 1992.02 D19 (c) 1991 Taito Corporation (Japan) */
+	DRIVER( yesnoj )	/* 1992.03 D20 (c) 1992 Taito Corporation (Japan) */
+	DRIVER( deadconx )	/* 1992.?? D28 (c) 1992 Taito Corporation Japan (World) */
+	DRIVER( deadconj )	/* 1992.08 D28 (c) 1992 Taito Corporation (Japan) */
+	DRIVER( dinorex )	/* 1992.?? D39 (c) 1992 Taito Corporation Japan (World) */
+	DRIVER( dinorexj )	/* 1992.11 D39 (c) 1992 Taito Corporation (Japan) */
+	DRIVER( dinorexu )	/* 1992.?? D39 (c) 1992 Taito America Corporation (US) */
+	DRIVER( qjinsei )	/* 1993.03 D48 (c) 1992 Taito Corporation (Japan) */
+	DRIVER( qcrayon )	/* 1993.08 D55 (c) 1993 Taito Corporation (Japan) */
+	DRIVER( qcrayon2 )	/* 1994.01 D63 (c) 1993 Taito Corporation (Japan) */
+	DRIVER( driftout )	/* 1991.10 (c) 1991 Visco */
 	DRIVER( driveout )	/* bootleg */
 
 	/* Taito F3 games */
-	DRIVER( ringrage )	/* D21 (c) 1992 Taito Corporation Japan (World) */
-	DRIVER( ringragj )	/* D21 (c) 1992 Taito Corporation (Japan) */
-	DRIVER( ringragu )	/* D21 (c) 1992 Taito America Corporation (US) */
-	DRIVER( arabianm )	/* D29 (c) 1992 Taito Corporation Japan (World) */
-	DRIVER( arabiamj )	/* D29 (c) 1992 Taito Corporation (Japan) */
-	DRIVER( arabiamu )	/* D29 (c) 1992 Taito America Corporation (US) */
-	DRIVER( ridingf )	/* D34 (c) 1992 Taito Corporation Japan (World) */
-	DRIVER( ridefgtj )	/* D34 (c) 1992 Taito Corporation (Japan) */
-	DRIVER( ridefgtu )	/* D34 (c) 1992 Taito America Corporation (US) */
-	DRIVER( gseeker )	/* D40 (c) 1992 Taito Corporation Japan (World) */
-	DRIVER( gseekerj )	/* D40 (c) 1992 Taito Corporation (Japan) */
-	DRIVER( gseekeru )	/* D40 (c) 1992 Taito America Corporation (US) */
-	DRIVER( hthero93 )	/* D49 (c) 1992 Taito Corporation (Japan) */
-	DRIVER( cupfinal )	/* D49 (c) 1993 Taito Corporation Japan (World) */
-	DRIVER( trstar )	/* D53 (c) 1993 Taito Corporation Japan (World) */
-	DRIVER( trstarj )	/* D53 (c) 1993 Taito Corporation (Japan) */
-	DRIVER( prmtmfgt )	/* D53 (c) 1993 Taito Corporation (US) */
-	DRIVER( trstaro )	/* D53 (c) 1993 Taito Corporation (World) */
-	DRIVER( trstaroj )	/* D53 (c) 1993 Taito Corporation (Japan) */
-	DRIVER( prmtmfgo )	/* D53 (c) 1993 Taito Corporation (US) */
-	DRIVER( gunlock )	/* D66 (c) 1993 Taito Corporation Japan (World) */
-	DRIVER( rayforcj )	/* D66 (c) 1993 Taito Corporation (Japan) */
-	DRIVER( rayforce )	/* D66 (c) 1993 Taito America Corporation (US) */
-	DRIVER( scfinals )	/* D68 (c) 1993 Taito Corporation Japan (World) */
-	DRIVER( intcup94 )	/* D78 (c) 1994 Taito */
-	DRIVER( hthero94 )	/* D78 (c) 1994 Taito */
-	DRIVER( dungeonm )	/* D69 (c) 1993 Taito Corporation Japan (World) */
-	DRIVER( lightbr )	/* D69 (c) 1993 Taito Corporation (Japan) */
-	DRIVER( dungenmu )	/* D69 (c) 1993 Taito America Corporation (US) */
-	DRIVER( kaiserkn )	/* D84 (c) 1994 Taito Corporation Japan (World) */
-	DRIVER( kaiserkj )	/* D84 (c) 1994 Taito Corporation (Japan) */
-	DRIVER( gblchmp )	/* D84 (c) 1994 Taito America Corporation (US) */
-	DRIVER( dankuga )	/* D84? (c) 1994 Taito Corporation (Japan) */
-	DRIVER( dariusg )	/* D87 (c) 1994 Taito Corporation Japan (World) */
-	DRIVER( dariusgj )	/* D87 (c) 1994 Taito Corporation (Japan) */
-	DRIVER( dariusgu )	/* D87 (c) 1994 Taito America Corporation (US) */
-	DRIVER( dariusgx )	/* D87 (c) 1994 Taito Corporation */
-	DRIVER( bublbob2 )	/* D90 (c) 1994 Taito Corporation Japan (World) */
-	DRIVER( bubsympe )	/* D90 (c) 1994 Taito Corporation Japan (Europe) */
-	DRIVER( bubsympu )	/* D90 (c) 1994 Taito America Corporation (US) */
-	DRIVER( bubsymph )	/* D90 (c) 1994 Taito Corporation (Japan) */
+	DRIVER( ringrage )	/* 1992.?? D21 (c) 1992 Taito Corporation Japan (World) */
+	DRIVER( ringragj )	/* 1992.09 D21 (c) 1992 Taito Corporation (Japan) */
+	DRIVER( ringragu )	/* 1992.02 D21 (c) 1992 Taito America Corporation (US) */
+	DRIVER( arabianm )	/* 1992.?? D29 (c) 1992 Taito Corporation Japan (World) */
+	DRIVER( arabiamj )	/* 1992.09 D29 (c) 1992 Taito Corporation (Japan) */
+	DRIVER( arabiamu )	/* 1992.10 D29 (c) 1992 Taito America Corporation (US) */
+	DRIVER( ridingf )	/* 1992.?? D34 (c) 1992 Taito Corporation Japan (World) */
+	DRIVER( ridefgtj )	/* 1992.12 D34 (c) 1992 Taito Corporation (Japan) */
+	DRIVER( ridefgtu )	/* 1992.?? D34 (c) 1992 Taito America Corporation (US) */
+	DRIVER( gseeker )	/* 1992.?? D40 (c) 1992 Taito Corporation Japan (World) */
+	DRIVER( gseekerj )	/* 1992.12 D40 (c) 1992 Taito Corporation (Japan) */
+	DRIVER( gseekeru )	/* 1992.?? D40 (c) 1992 Taito America Corporation (US) */
+	DRIVER( hthero93 )	/* 1993.03 D49 (c) 1992 Taito Corporation (Japan) */
+						/* 1993.04 D49 (US) */
+	DRIVER( cupfinal )	/* 1993.?? D49 (c) 1993 Taito Corporation Japan (World) */
+	DRIVER( trstar )	/* 1993.?? D53 (c) 1993 Taito Corporation Japan (World) */
+	DRIVER( trstarj )	/* 1993.07 D53 (c) 1993 Taito Corporation (Japan) */
+	DRIVER( prmtmfgt )	/* 1993.08 D53 (c) 1993 Taito Corporation (US) */
+	DRIVER( prmtmfgo )	/* 1993.08 D53 (c) 1993 Taito Corporation (US) */
+	DRIVER( trstaro )	/* 1993.?? D53 (c) 1993 Taito Corporation (World) */
+	DRIVER( trstaroj )	/* 1993.07 D53 (c) 1993 Taito Corporation (Japan) */
+	DRIVER( gunlock )	/* 1994.?? D66 (c) 1993 Taito Corporation Japan (World) */
+	DRIVER( rayforcj )	/* 1994.02 D66 (c) 1993 Taito Corporation (Japan) */
+	DRIVER( rayforce )	/* 1994.?? D66 (c) 1993 Taito America Corporation (US) */
+	DRIVER( scfinals )	/* 1994.?? D68 (c) 1993 Taito Corporation Japan (World) */
+	DRIVER( intcup94 )	/* 1994.?? D78 (c) 1994 Taito (World) */
+	DRIVER( hthero94 )	/* 1994.09 D78 (c) 1994 Taito (US) */
+	DRIVER( dungeonm )	/* 1994.?? D69 (c) 1993 Taito Corporation Japan (World) */
+	DRIVER( lightbr )	/* 1994.03 D69 (c) 1993 Taito Corporation (Japan) */
+	DRIVER( dungenmu )	/* 1994.?? D69 (c) 1993 Taito America Corporation (US) */
+	DRIVER( kaiserkn )	/* 1994.?? D84 (c) 1994 Taito Corporation Japan (World) */
+	DRIVER( kaiserkj )	/* 1994.08 D84 (c) 1994 Taito Corporation (Japan) */
+	DRIVER( gblchmp )	/* 1994.10 D84 (c) 1994 Taito America Corporation (US) */
+	DRIVER( dankuga )	/* 1994.?? D84? (c) 1994 Taito Corporation (Japan) */
+	DRIVER( dariusg )	/* 1994.?? D87 (c) 1994 Taito Corporation Japan (World) */
+	DRIVER( dariusgj )	/* 1994.09 D87 (c) 1994 Taito Corporation (Japan) */
+	DRIVER( dariusgu )	/* 1994.11 D87 (c) 1994 Taito America Corporation (US) */
+	DRIVER( dariusgx )	/* 1994.?? D87 (c) 1994 Taito Corporation */
+	DRIVER( bublbob2 )	/* 1994.?? D90 (c) 1994 Taito Corporation Japan (World) */
+	DRIVER( bubsympe )	/* 1994.?? D90 (c) 1994 Taito Corporation Japan (Europe) */
+	DRIVER( bubsympu )	/* 1994.10 D90 (c) 1994 Taito America Corporation (US) */
+	DRIVER( bubsymph )	/* 1994.10 D90 (c) 1994 Taito Corporation (Japan) */
 	DRIVER( bubsympb )	/* bootleg */
-	DRIVER( spcinvdj )	/* D93 (c) 1994 Taito Corporation (Japan) */
-	DRIVER( pwrgoal )	/* D94 (c) 1995 Taito Corporation Japan (World) */
-	DRIVER( hthero95 )	/* D94 (c) 1995 Taito Corporation (Japan) */
-	DRIVER( hthro95u )	/* D94 (c) 1995 Taito America Corporation (US) */
-	DRIVER( qtheater )	/* D95 (c) 1994 Taito Corporation (Japan) */
-	DRIVER( elvactr )	/* E02 (c) 1994 Taito Corporation Japan (World) */
-	DRIVER( elvactrj )	/* E02 (c) 1994 Taito Corporation (Japan) */
-	DRIVER( elvact2u )	/* E02 (c) 1994 Taito America Corporation (US) */
-	DRIVER( spcinv95 )	/* E06 (c) 1995 Taito Corporation Japan (World) */
-	DRIVER( spcnv95u )	/* E06 (c) 1995 Taito America Corporation (US) */
-	DRIVER( akkanvdr )	/* E06 (c) 1995 Taito Corporation (Japan) */
-	DRIVER( twinqix )	/* ??? (c) 1995 Taito America Corporation (US) */
-	DRIVER( quizhuhu )	/* E08 (c) 1995 Taito Corporation (Japan) */
-	DRIVER( pbobble2 )	/* E10 (c) 1995 Taito Corporation Japan (World) */
-	DRIVER( pbobbl2o )	/* E10 (c) 1995 Taito Corporation Japan (World) */
-	DRIVER( pbobbl2j )	/* E10 (c) 1995 Taito Corporation (Japan) */
-	DRIVER( pbobbl2u )	/* E10 (c) 1995 Taito America Corporation (US) */
-	DRIVER( pbobbl2x )	/* E10 (c) 1995 Taito Corporation (Japan) */
-	DRIVER( gekirido )	/* E11 (c) 1995 Taito Corporation (Japan) */
-	DRIVER( tcobra2 )	/* E15 (c) 1995 Taito Corporation (Japan) */
-	DRIVER( tcobra2u )	/* E15 (c) 1995 Taito Corporation (Japan) */
-	DRIVER( ktiger2 )	/* E15 (c) 1995 Taito Corporation (Japan) */
-	DRIVER( bubblem )	/* E21 (c) 1995 Taito Corporation Japan (World) */
-	DRIVER( bubblemj )	/* E21 (c) 1995 Taito Corporation (Japan) */
-	DRIVER( cleopatr )	/* E28 (c) 1996 Taito Corporation (Japan) */
-	DRIVER( pbobble3 )	/* E29 (c) 1996 Taito Corporation (World) */
-	DRIVER( pbobbl3u )	/* E29 (c) 1996 Taito Corporation (US) */
-	DRIVER( pbobbl3j )	/* E29 (c) 1996 Taito Corporation (Japan) */
-	DRIVER( arkretrn )	/* E36 (c) 1997 Taito Corporation (Japan) */
-	DRIVER( kirameki )	/* E44 (c) 1997 Taito Corporation (Japan) */
-	DRIVER( puchicar )	/* E46 (c) 1997 Taito Corporation (World) */
-	DRIVER( puchicrj )	/* E46 (c) 1997 Taito Corporation (Japan) */
-	DRIVER( pbobble4 )	/* E49 (c) 1997 Taito Corporation (World) */
-	DRIVER( pbobbl4j )	/* E49 (c) 1997 Taito Corporation (Japan) */
-	DRIVER( pbobbl4u )	/* E49 (c) 1997 Taito Corporation (US) */
-	DRIVER( popnpop )	/* E51 (c) 1997 Taito Corporation (World) */
-	DRIVER( popnpopj )	/* E51 (c) 1997 Taito Corporation (Japan) */
-	DRIVER( popnpopu )	/* E51 (c) 1997 Taito Corporation (US) */
-	DRIVER( landmakr )	/* E61 (c) 1998 Taito Corporation (Japan) */
-	DRIVER( landmkrp )	/* E61 (c) 1998 Taito Corporation (World, prototype) */
+	DRIVER( spcinvdj )	/* 1994.09 D93 (c) 1994 Taito Corporation (Japan) */
+	DRIVER( pwrgoal )	/* 1994.?? D94 (c) 1995 Taito Corporation Japan (World) */
+	DRIVER( hthero95 )	/* 1994.11 D94 (c) 1995 Taito Corporation (Japan) */
+	DRIVER( hthro95u )	/* 1995.05 D94 (c) 1995 Taito America Corporation (US) */
+	DRIVER( qtheater )	/* 1995.01 D95 (c) 1994 Taito Corporation (Japan) */
+	DRIVER( elvactr )	/* 1995.?? E02 (c) 1994 Taito Corporation Japan (World) */
+	DRIVER( elvactrj )	/* 1995.03 E02 (c) 1994 Taito Corporation (Japan) */
+	DRIVER( elvact2u )	/* 1995.05 E02 (c) 1994 Taito America Corporation (US) */
+	DRIVER( spcinv95 )	/* 1995.?? E06 (c) 1995 Taito Corporation Japan (World) */
+	DRIVER( spcnv95u )	/* 1995.05 E06 (c) 1995 Taito America Corporation (US) */
+	DRIVER( akkanvdr )	/* 1995.07 E06 (c) 1995 Taito Corporation (Japan) */
+	DRIVER( twinqix )	/* 1995.03 ??? (c) 1995 Taito America Corporation (US) */
+	DRIVER( quizhuhu )	/* 1995.07 E08 (c) 1995 Taito Corporation (Japan) */
+	DRIVER( pbobble2 )	/* 1995.?? E10 (c) 1995 Taito Corporation Japan (World) */
+	DRIVER( pbobbl2o )	/* 1995.?? E10 (c) 1995 Taito Corporation Japan (World) */
+	DRIVER( pbobbl2j )	/* 1995.09 E10 (c) 1995 Taito Corporation (Japan) */
+	DRIVER( pbobbl2u )	/* 1995.11 E10 (c) 1995 Taito America Corporation (US) */
+	DRIVER( pbobbl2x )	/* 1995.12 E10 (c) 1995 Taito Corporation (Japan) */
+	DRIVER( gekirido )	/* 1995.11 E11 (c) 1995 Taito Corporation (Japan) */
+	DRIVER( tcobra2 )	/* 1996.?? E15 (c) 1995 Taito Corporation (World) */
+	DRIVER( tcobra2u )	/* 1996.?? E15 (c) 1995 Taito Corporation (US) */
+	DRIVER( ktiger2 )	/* 1996.02 E15 (c) 1995 Taito Corporation (Japan) */
+	DRIVER( bubblem )	/* 1996.?? E21 (c) 1995 Taito Corporation Japan (World) */
+	DRIVER( bubblemj )	/* 1996.04 E21 (c) 1995 Taito Corporation (Japan) */
+	DRIVER( cleopatr )	/* 1996.10 E28 (c) 1996 Taito Corporation (Japan) */
+	DRIVER( pbobble3 )	/* 1996.?? E29 (c) 1996 Taito Corporation (World) */
+	DRIVER( pbobbl3u )	/* 1996.11 E29 (c) 1996 Taito Corporation (US) */
+	DRIVER( pbobbl3j )	/* 1996.11 E29 (c) 1996 Taito Corporation (Japan) */
+	DRIVER( arkretrn )	/* 1997.03 E36 (c) 1997 Taito Corporation (Japan) */
+	DRIVER( kirameki )	/* 1997.09 E44 (c) 1997 Taito Corporation (Japan) */
+	DRIVER( puchicar )	/* 1997.?? E46 (c) 1997 Taito Corporation (World) */
+	DRIVER( puchicrj )	/* 1997.12 E46 (c) 1997 Taito Corporation (Japan) */
+	DRIVER( pbobble4 )	/* 1998.?? E49 (c) 1997 Taito Corporation (World) */
+	DRIVER( pbobbl4j )	/* 1998.02 E49 (c) 1997 Taito Corporation (Japan) */
+	DRIVER( pbobbl4u )	/* 1998.?? E49 (c) 1997 Taito Corporation (US) */
+	DRIVER( popnpop )	/* 1998.?? E51 (c) 1997 Taito Corporation (World) */
+	DRIVER( popnpopj )	/* 1998.03 E51 (c) 1997 Taito Corporation (Japan) */
+	DRIVER( popnpopu )	/* 1998.?? E51 (c) 1997 Taito Corporation (US) */
+	DRIVER( landmakr )	/* 1998.08 E61 (c) 1998 Taito Corporation (Japan) */
+	DRIVER( landmkrp )	/* 1998.?? E61 (c) 1998 Taito Corporation (World, prototype) */
 	DRIVER( recalh )	/* prototype */
 	DRIVER( commandw )	/* prototype */
 
 	/* Taito JC System */
-	DRIVER( landgear )	/* E17 (c) 1995 Taito Corporation */
-	DRIVER( dendeg )	/* E35 (c) 1996 Taito Corporation */
-	DRIVER( dendegx )	/* E35 (c) 1996 Taito Corporation */
-	DRIVER( dendeg2 )	/* E52 (c) 1998 Taito Corporation */
-	DRIVER( dendeg2x )	/* E52 (c) 1998 Taito Corporation */
-	DRIVER( sidebs )	/* E23 (c) 1996 Taito Corporation */
-	DRIVER( sidebs2 )	/* E38 (c) 1997 Taito Corporation */
-	DRIVER( sidebs2j )	/* E38 (c) 1997 Taito Corporation */
-	DRIVER( dangcurv )	/* E09 (c) 1995 Taito Corporation */
+	DRIVER( dangcurv )	/* 1995.?? E09 (c) 1995 Taito Corporation */
+						/* 1995.07 (Japan) */
+						/* 1995.10 (US) */
+	DRIVER( landgear )	/* 1996.?? E17 (c) 1995 Taito Corporation Japan (World) */
+						/* 1996.03 (Japan) */
+	DRIVER( sidebs )	/* 1996.07 E23 (c) 1996 Taito Corporation (Japan) */
+	DRIVER( dendeg )	/* 1997.03 E35 (c) 1996 Taito Corporation (Japan) */
+	DRIVER( sidebs2j )	/* 1997.07 E38 (c) 1997 Taito Corporation (Japan) */
+	DRIVER( sidebs2 )	/* 1997.?? E38 (c) 1997 Taito Corporation (Japan) */
+	DRIVER( dendegx )	/* 1997.09 E35 (c) 1996 Taito Corporation (Japan) */
+	DRIVER( dendeg2 )	/* 1998.03 E52 (c) 1998 Taito Corporation (Japan) */
+	DRIVER( dendeg2x )	/* 1998.08 E52 (c) 1998 Taito Corporation (Japan) */
 
 	/* Taito "Wolf" System */
 	DRIVER( pf2012 )	/* E59 (c) 1997 Taito */
 
 	/* Taito PPC JC System */
-	DRIVER( optiger )	/* E63 (c) 1998 Taito */
+	DRIVER( optiger )	/* 1998.09 E63 (c) 1998 Taito */
 
 	/* Taito Type-Zero System */
 	DRIVER( landhigh )	/* E68 (c) 1999 Taito */
@@ -2952,73 +2957,129 @@ V-V                           TP-027
 
 	/* Taito GNET */
 	DRIVER( taitogn )
+	DRIVER( chaoshea )  /* 1998.10 Chaos Heat (V2.08J) */
+	DRIVER( raycris )   /* 1998.12 Ray Crisis (V2.03J) */
+						/* 1999.02 Otenami Haiken (Success) */
+						/* 1999.03 Super Puzzle Bobble (Japan) */
+	DRIVER( spuzbobl )  /* 1999.?? Super Puzzle Bobble (V2.05O) */
+	DRIVER( gobyrc )    /* 1999.?? Go By RC (V2.03O) */
+	DRIVER( rcdego )    /* 1999.06 RC De Go (V2.03J) */
+	DRIVER( flipmaze )  /* 1999.09 Flip Maze (V2.04J) */
+	DRIVER( mahjngoh )  /* 1999.12 Mahjong Oh (V2.06J) */
+	DRIVER( psyvaria )  /* 2000.03 Psyvariar -Medium Unit- (V2.04J) */
+	DRIVER( shanghss )  /* 2000.07 Shanghai Shoryu Sairin (V2.03J) */
+	DRIVER( psyvarrv )  /* 2000.09 Psyvariar -Revision- (V2.04J) */
+	DRIVER( zokuoten )  /* 2000.12 Zoku Otenamihaiken (V2.03J) */
+						/* 2000.?? Taito Classic (Success, not released?) */
+	DRIVER( soutenry )  /* 2001.02 Soutenryu (V2.07J) */
+	DRIVER( nightrai )  /* 2001.05 Night Raid (V2.03J) */
+						/* 2001.09 Shikigami no Shiro */
+						/* 2001.10 Otenki Kororin */
+	DRIVER( usagi )     /* 2001.12 Usagi (V2.02J) */
+						/* 2002.02 Shanghai Sangokuhaitougi */
+	DRIVER( xiistag )   /* 2002.07 XII Stag (V2.01J) */
+	DRIVER( sianniv )   /* 2003.10 Space Invaders Anniversary (V2.02J) */
+						/* 2003.11 Kollon */
+						/* 2004.05 Zooo */
 
 	/* Namco System 11 */
-	DRIVER( tekken )	/* Tekken (TE4/VER.C) */
-	DRIVER( tekkena )	/* Tekken (TE2/VER.C) */
-	DRIVER( tekkenb )	/* Tekken (TE2/VER.B) */
-	DRIVER( tekkenc )	/* Tekken (TE1/VER.B) */
-	DRIVER( tekken2 )	/* Tekken 2 Ver.B (TES3/VER.B) */
-	DRIVER( tekken2a )	/* Tekken 2 Ver.B (TES2/VER.B) */
-	DRIVER( tekken2b )	/* Tekken 2 (TES2/VER.A) */
-	DRIVER( souledge )	/* Soul Edge Ver. II (SO4/VER.C) */
-	DRIVER( souledga )	/* Soul Edge Ver. II (SO3/VER.C) */
-	DRIVER( souledgb )	/* Soul Edge (SO3/VER.A) */
-	DRIVER( souledgc )	/* Soul Edge (SO1/VER.A) */
-	DRIVER( dunkmnia )	/* Dunk Mania (DM1/VER.C) */
-	DRIVER( dunkmnic )	/* Dunk Mania (DM1/VER.C) */
-	DRIVER( xevi3dg )	/* Xevious 3D/G (XV31/VER.A) */
-	DRIVER( primglex )	/* Prime Goal EX (PG1/VER.A) */
-	DRIVER( danceyes )	/* Dancing Eyes (DC1/VER.A) */
-	DRIVER( pocketrc )	/* Pocket Racer (PKR1/VER.B) */
-	DRIVER( starswep )	/* Star Sweep (STP1/VER.A) */
-	DRIVER( myangel3 )	/* Kosodate Quiz My Angel 3 (KQT1/VER.A) */
-	DRIVER( ptblnk2a )	/* Point Blank 2 (GNB3/VER.A) */
+	DRIVER( tekken )	/* 1994.?? Tekken (TE4/VER.C) */
+	DRIVER( tekkena )	/* 1994.?? Tekken (TE2/VER.C) */
+	DRIVER( tekkenb )	/* 1994.?? Tekken (TE2/VER.B) */
+	DRIVER( tekkenc )	/* 1994.12 Tekken (TE1/VER.B, Japan) */
+	DRIVER( tekken2 )	/* 1995.?? Tekken 2 Ver.B (TES3/VER.B) */
+	DRIVER( tekken2a )	/* 1995.?? Tekken 2 Ver.B (TES2/VER.B) */
+						/* 1995.10 Tekken 2 Ver.B (TES1/VER.B, Japan) */
+	DRIVER( tekken2b )	/* 1995.?? Tekken 2 (TES2/VER.A) */
+						/* 1995.08 Tekken 2 (TES1, Japan) */
+	DRIVER( souledgb )	/* 1996.?? Soul Edge (SO3/VER.A) */
+	DRIVER( souledgc )	/* 1996.02 Soul Edge (SO1/VER.A, Japan) */
+	DRIVER( primglex )	/* 1996.03 Prime Goal EX (PG1/VER.A, Japan) */
+	DRIVER( xevi3dg )	/* 1996.05 Xevious 3D/G (XV31/VER.A, Japan) */
+	DRIVER( souledge )	/* 1996.?? Soul Edge Ver. II (SO4/VER.C) */
+	DRIVER( souledga )	/* 1996.?? Soul Edge Ver. II (SO3/VER.C) */
+						/* 1996.05 Soul Edge Ver. II (SO1, Japan) */
+	DRIVER( dunkmnia )	/* 1996.?? Dunk Mania (DM1/VER.C) */
+	DRIVER( dunkmnic )	/* 1996.05 Dunk Mania (DM1/VER.C, Japan) */
+	DRIVER( danceyes )	/* 1996.09 Dancing Eyes (DC1/VER.A, Japan) */
+	DRIVER( pocketrc )	/* 1997.03 Pocket Racer (PKR1/VER.B, Japan) */
+	DRIVER( starswep )	/* 1997.07 Star Sweep (STP1/VER.A, Japan) */
+	DRIVER( myangel3 )	/* 1998.03 Kosodate Quiz My Angel 3 (KQT1/VER.A, Japan) */
+	DRIVER( ptblnk2a )	/* 1999.?? Point Blank 2 (GNB3/VER.A) */
+						/* 1999.02 Gunbaarl (GNB1, Japan) */
 
 	/* Namco System 12 */
-	DRIVER( tekken3 )	/* Tekken 3 (TET1/VER.E1) */
-	DRIVER( tekken3a )	/* Tekken 3 (TET2/VER.B) */
-	DRIVER( tekken3b )	/* Tekken 3 (TET3/VER.A) */
-	DRIVER( tekken3c )	/* Tekken 3 (TET2/VER.A) */
-	DRIVER( lbgrande )	/* Libero Grande (LG2/VER.A) */
-	DRIVER( toukon3 )	/* Shin Nihon Pro Wrestling Toukon Retsuden 3 Arcade Edition (TR1/VER.A) */
-	DRIVER( soulclbr )	/* Soul Calibur (SOC14/VER.C) */
-	DRIVER( soulclba )	/* Soul Calibur (SOC11/VER.C) */
-	DRIVER( soulclbb )	/* Soul Calibur (SOC13/VER.B) */
-	DRIVER( soulclbc )	/* Soul Calibur (SOC11/VER.B) */
-	DRIVER( soulclbd )	/* Soul Calibur (SOC11/VER.A2) */
-	DRIVER( ehrgeiz )	/* Ehrgeiz (EG3/VER.A) */
-	DRIVER( ehrgeiza )	/* Ehrgeiz (EG2/VER.A) */
-	DRIVER( kaiunqz )	/* Kaiun Quiz (KW1/VER.A) */
-	DRIVER( mdhorse )	/* Derby Quiz My Dream Horse (MDH1/VER.A2) */
-	DRIVER( sws98 )		/* Super World Stadium '98 (SS81/VER.A) */
-	DRIVER( tenkomor )	/* Tenkomori Shooting (TKM2/VER.A1) */
-	DRIVER( tenkomoj )	/* Tenkomori Shooting (TKM1/VER.A1) */
-	DRIVER( fgtlayer )	/* Fighting Layer (FTL0/VER.A) */
-	DRIVER( pacapp )	/* Paca Paca Passion (PPP1/VER.A2) */
-	DRIVER( ptblank2 )	/* Point Blank 2 (GNB5/VER.A) */
-	DRIVER( sws99 )		/* Super World Stadium '99 (SS91/VER.A3) */
-	DRIVER( tektagt )	/* Tekken Tag Tournament (TEG3/VER.C1) */
-	DRIVER( tektagta )	/* Tekken Tag Tournament (TEG3/VER.B) */
-	DRIVER( tektagtb )	/* Tekken Tag Tournament (TEG1/VER.B) */
-	DRIVER( tektagtc )	/* Tekken Tag Tournament (TEG1/VER.A) */
-	DRIVER( ghlpanic )	/* Ghoul Panic (OB2/VER.A) */
-	DRIVER( pacapp2 )	/* Paca Paca Passion 2 (PKS1/VER.A) */
-	DRIVER( mrdrillr )	/* Mr Driller (DRI1/VER.A2) */
-	DRIVER( aquarush )	/* Aqua Rush (AQ1/VER.A1) */
-	DRIVER( pacappsp )	/* Paca Paca Passion Special (PSP1/VER.A) */
-	DRIVER( golgo13 )	/* Golgo 13 (GLG1/VER.A) */
-	DRIVER( g13knd )	/* Golgo 13 Kiseki no Dandou (GLS1/VER.A) */
-	DRIVER( sws2000 )	/* Super World Stadium 2000 (SS01/VER.A) */
-	DRIVER( sws2001 )	/* Super World Stadium 2001 (SS11/VER.A) */
+	DRIVER( tekken3 )	/* 1997.03 Tekken 3 (TET1/VER.E1, Japan) */
+	DRIVER( tekken3a )	/* 1997.?? Tekken 3 (TET2/VER.B) */
+	DRIVER( tekken3b )	/* 1997.?? Tekken 3 (TET3/VER.A) */
+	DRIVER( tekken3c )	/* 1997.?? Tekken 3 (TET2/VER.A) */
+	DRIVER( lbgrande )	/* 1997.?? Libero Grande (LG2/VER.A) */
+						/* 1997.12 Libero Grande (LG1, Japan) */
+	DRIVER( toukon3 )	/* 1997.12 Shin Nihon Pro Wrestling Toukon Retsuden 3 Arcade Edition (TR1/VER.A, Japan) */
+	DRIVER( ehrgeiz )	/* 1998.?? Ehrgeiz (EG3/VER.A) */
+	DRIVER( ehrgeiza )	/* 1998.?? Ehrgeiz (EG2/VER.A) */
+						/* 1998.05 Ehrgeiz (EG1, Japan) */
+	DRIVER( sws98 )		/* 1998.06 Super World Stadium '98 (SS81/VER.A, Japan) */
+	DRIVER( soulclbr )	/* 1998.?? Soul Calibur (SOC14/VER.C) */
+	DRIVER( soulclba )	/* 1998.07 Soul Calibur (SOC11/VER.C, Japan) */
+	DRIVER( soulclbb )	/* 1998.?? Soul Calibur (SOC13/VER.B) */
+	DRIVER( soulclbc )	/* 1998.?? Soul Calibur (SOC11/VER.B, Japan) */
+	DRIVER( soulclbd )	/* 1998.?? Soul Calibur (SOC11/VER.A2, Japan) */
+						/* 1998.07 Techno Drive */
+	DRIVER( mdhorse )	/* 1998.11 Derby Quiz My Dream Horse (MDH1/VER.A2, Japan) */
+						/* 1998.12 Attack Pla Rail */
+	DRIVER( tenkomor )	/* 1998.?? Tenkomori Shooting (TKM2/VER.A1) */
+	DRIVER( tenkomoj )	/* 1998.12 Tenkomori Shooting (TKM1/VER.A1, Japan) */
+	DRIVER( pacapp )	/* 1998.12 Paca Paca Passion (PPP1/VER.A2, Japan) */
+	DRIVER( fgtlayer )	/* 1998.12 Fighting Layer (FTL0/VER.A, Japan) */
+						/* 1999.01 Bust A Move (Metro) */
+	DRIVER( ptblank2 )	/* 1999.?? Point Blank 2 (GNB5/VER.A) */
+	DRIVER( sws99 )		/* 1999.05 Super World Stadium '99 (SS91/VER.A3, Japan) */
+	DRIVER( ghlpanic )	/* 1999.?? Ghoul Panic (OB2/VER.A) */
+						/* 1999.07 Oh Bakyuun (OB1, Japan) */
+	DRIVER( pacapp2 )	/* 1999.07 Paca Paca Passion 2 (PKS1/VER.A, Japan) */
+						/* 1999.07 Bust A Move 2 (Metro) */
+	DRIVER( tektagt )	/* 1999.?? Tekken Tag Tournament (TEG3/VER.C1) */
+	DRIVER( tektagta )	/* 1999.?? Tekken Tag Tournament (TEG3/VER.B) */
+	DRIVER( tektagtb )	/* 1999.07 Tekken Tag Tournament (TEG1/VER.B, Japan) */
+	DRIVER( tektagtc )	/* 1999.07 Tekken Tag Tournament (TEG1/VER.A, Japan) */
+	DRIVER( mrdrillr )	/* 1999.11 Mr Driller (DRI1/VER.A2, Japan) */
+						/* 1999.12 UmJammer Lammy NOW! (Japan) */
+						/* 1999.12 Quest for Fame (Japan) */
+	DRIVER( pacappsp )	/* 1999.12 Paca Paca Passion Special (PSP1/VER.A, Japan) */
+	DRIVER( kaiunqz )	/* 1999.12 Kaiun Quiz (KW1/VER.A, Japan) */
+	DRIVER( aquarush )	/* 2000.02 Aqua Rush (AQ1/VER.A1, Japan) */
+	DRIVER( golgo13 )	/* 2000.03 Golgo 13 (GLG1/VER.A, Japan) */
+	DRIVER( sws2000 )	/* 2000.03 Super World Stadium 2000 (SS01/VER.A, Japan) */
+						/* 2000.06 Truck Kyousoukyoku (Metro) */
+						/* 2000.07 Kart Duel */
+						/* 2000.08 Teknowerk */
+	DRIVER( g13knd )	/* 2000.10 Golgo 13 Kiseki no Dandou (GLS1/VER.A, Japan) */
+	DRIVER( sws2001 )	/* 2001.04 Super World Stadium 2001 (SS11/VER.A, Japan) */
 
 	/* Namco System 10 */
-	DRIVER( mrdrilr2 )	/* Mr Driller 2 (DR21 Ver.A) */
-	DRIVER( gjspace )	/* Gekitoride-Jong Space (10011 Ver.A) */
-	DRIVER( mrdrilrg )	/* Mr. Driller G (DRG1 Ver.A) */
-	DRIVER( knpuzzle )	/* Kotoba no Puzzle Mojipittan (KPM1 Ver.A) */
-	DRIVER( startrgn )	/* Star Trigon (STT1 Ver.A) */
-	DRIVER( gamshara )	/* Gamshara (10021 Ver.A) */
+	DRIVER( mrdrilr2 )	/* 2000.07 Mr Driller 2 (DR21 Ver.A) */
+						/* 2000.12 Gunbarina */
+						/* 2001.02 Photo Battole */
+						/* 2001.02 Taiko no Tatsujin */
+						/* 2001.03 Gahaha Ippatsudou */
+	DRIVER( mrdrilrg )	/* 2001.03 Mr. Driller G (DRG1 Ver.A) */
+						/* 2001.07 Golgo 13 Juusei no Requiem */
+						/* 2001.08 Taiko no Tatsujin 2 */
+						/* 2001.09 Gahaha Ippatsudou 2 */
+						/* 2001.11 Knock Down 2001 */
+	DRIVER( knpuzzle )	/* 2001.12 Kotoba no Puzzle Mojipittan (KPM1 Ver.A) */
+	DRIVER( gjspace )	/* 2001.12 Gekitoride-Jong Space (10011 Ver.A) */
+						/* 2002.03 Panicuru Panekuru */
+						/* 2002.03 Taiko no Tatsujin 3 */
+	DRIVER( startrgn )	/* 2002.07 Star Trigon (STT1 Ver.A) */
+						/* 2002.07 Tsukkomi Yousei Gips Nice Tsukkomi */
+	DRIVER( gamshara )	/* 2002.08 Gamshara (10021 Ver.A) */
+						/* 2002.10 Uchuu Daisakusen : Chocovader Contactee */
+						/* 2002.12 Taiko no Tatsujin 4 */
+						/* 2003.04 Seisyun Quiz Colorful High School */
+						/* 2003.10 Taiko no Tatsujin 5 */
+						/* 2004.07 Taiko no Tatsujin 6 */
 
 	/* Konami GQ */
 	DRIVER( cryptklr )	/* Crypt Killer (GQ420 UAA) */
@@ -3658,30 +3719,33 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( wb3bbl )	/* BOOTLEG */
 
 	/* System 18 */
-	DRIVER( astorm )	/* (c) 1990 (protected 2 Players) */
-	DRIVER( astorm3 )	/* (c) 1990 (FD1094, decrypted) */
-	DRIVER( astormu )	/* (c) 1990 (FD1094, decrypted) */
-	DRIVER( astormj )	/* (c) 1990 (FD1094, decrypted) */
-	DRIVER( bloxeed )	/* (c) 1990 (FD1094, decrypted) */
-	DRIVER( shdancer )	/* (c) 1989 */
-	DRIVER( shdancej )	/* (c) 1989 */
-	DRIVER( shdance1 )	/* (c) 1989 */
-	DRIVER( ddcrew )	/* (c) 1991 (FD1094, decrypted) */
-	DRIVER( ddcrewu )	/* (c) 1991 (FD1094, decrypted) */
-	DRIVER( ddcrew2 )	/* (c) 1991 (FD1094, decrypted) */
-	DRIVER( ddcrew1 )	/* (c) 1991 (FD1094, decrypted) */
-	DRIVER( ddcrewj )	/* (c) 1991 (FD1094, decrypted) */
-	DRIVER( cltchitr )	/* (c) 1991 (FD1094, decrypted) */
-	DRIVER( cltchtrj )	/* (c) 1991 (FD1094, decrypted) */
-	DRIVER( desertbr )	/* (c) 1993 (FD1094, decrypted) */
-	DRIVER( mwalk )		/* (c) 1990 (FD1094+8751, decrypted) */
-	DRIVER( mwalku )	/* (c) 1990 (FD1094+8751, decrypted) */
-	DRIVER( mwalkj )	/* (c) 1990 (FD1094+8751, decrypted) */
+	DRIVER( shdancer )	/* 1989.05 Shadow Dancer (US) */
+	DRIVER( shdancej )	/* 1989.11 Shadow Dancer (Japan) */
+	DRIVER( shdance1 )	/* 1989.?? Shadow Dancer (World) */
+	DRIVER( bloxeed )	/* 1989.12 Bloxeed (Japan, FD1094, decrypted) */
+						/* 1990.04 Bloxeed (US) */
+	DRIVER( astormu )	/* 1990.04 Alien Storm (US, FD1094, decrypted) */
+	DRIVER( astormj )	/* 1990.05 Alien Storm (Japan, FD1094, decrypted) */
+	DRIVER( astorm )	/* 1990.?? Alien Storm (World, protected 2 Players) */
+	DRIVER( astorm3 )	/* 1990.?? Alien Storm (World, FD1094, decrypted) */
+	DRIVER( mwalku )	/* 1990.08 Micheal Jackson's Moonwalker (US, FD1094+8751, decrypted) */
+	DRIVER( mwalkj )	/* 1990.08 Micheal Jackson's Moonwalker (Japan, FD1094+8751, decrypted) */
+	DRIVER( mwalk )		/* 1990.?? Micheal Jackson's Moonwalker (World, FD1094+8751, decrypted) */
+	DRIVER( lghost )	/* 1990.?? Laser Ghost (World, FD1094, decrypted) */
+						/* 1990.12 Laser Ghost (Japan) */
+	DRIVER( lghostu )	/* 1991.01 Laser Ghost (US, FD1094, decrypted) */
+	DRIVER( cltchitr )	/* 1991.02 Clutch Hitter (US, FD1094, decrypted) */
+	DRIVER( cltchtrj )	/* 1991.05 Clutch Hitter (Japan, FD1094, decrypted) */
+	DRIVER( ddcrewj )	/* 1991.07 D.D.Crew (Japan, FD1094, decrypted) */
+	DRIVER( ddcrewu )	/* 1991.09 D.D.Crew (US, FD1094, decrypted) */
+	DRIVER( ddcrew )	/* 1991.?? D.D.Crew (World, FD1094, decrypted) */
+	DRIVER( ddcrew2 )	/* 1991.?? D.D.Crew (World, FD1094, decrypted) */
+	DRIVER( ddcrew1 )	/* 1991.?? D.D.Crew (World, FD1094, decrypted) */
+	DRIVER( wwallyj )	/* 1992.06 Wally wo Sagase! (Japan, FD1094, decrypted) */
+	DRIVER( wwallyja )	/* 1992.06 Wally wo Sagase! (Japan, FD1094, decrypted) */
+						/* 1992.10 Desert Breaker (Japan) */
+	DRIVER( desertbr )	/* 1993.?? Desert Breaker (World, FD1094, decrypted) */
 	DRIVER( pontoon )
-	DRIVER( lghost )	/* (c) 1990 (FD1094, decrypted) */
-	DRIVER( lghostu )	/* (c) 1990 (FD1094, decrypted) */
-	DRIVER( wwallyj )	/* (c) 1992 (FD1094, decrypted) */
-	DRIVER( wwallyja )	/* (c) 1992 (FD1094, decrypted) */
 
 	/* System18 Bootlegs */
 	DRIVER( astormbl )	/* BOOTLEG */
@@ -3691,322 +3755,356 @@ DokiDoki Penguin Land *not confirmed
 
 
 	/* Outrun Hardware */
-	DRIVER( outrun )	/* (c) 1986 (bootleg)*/
-	DRIVER( outrun2 )	/* (c) 1986 (bootleg) */
-	DRIVER( outrun1 )	/* (c) 1986 Deluxe? */
-	DRIVER( outrunb )	/* (c) 1986 (protected beta bootleg) */
-	DRIVER( toutrun )	/* (c) 1987 (FD1094, decrypted) */
-	DRIVER( toutrun2 )	/* (c) 1987 (FD1094, decrypted) */
-	DRIVER( toutrun1 )	/* (c) 1987 (protected) */
-	DRIVER( toutrunu )	/* (c) 1987 (FD1094, decrypted) */
-	DRIVER( shangon )	/* (c) 1987 (protected) */
-	DRIVER( shangon3 )	/* (c) 1987 (FD1089B, decrypted) */
-	DRIVER( shangon2 )	/* (c) 1987 (FD1089B, decrypted) */
-	DRIVER( shangon1 )	/* (c) 1987 (FD1089B, decrypted) */
-	DRIVER( shangnle )	/* (c) 1991 */
+						/* 1986.09 Outrun (Japan) */
+						/* 1986.11 Outrun (US) */
+						/* 1986.?? outrun (World) */
+	DRIVER( outrun )
+	DRIVER( outrun2 )
+	DRIVER( outrun1 )
+	DRIVER( outrunb )	/* 1986 (protected beta bootleg) */
+						/* 1987.04 Super Hang-On (Japan) */
+						/* 1987.06 Super Hang-On (US) */
+						/* 1987.?? Super Hang-On (World) */
+	DRIVER( shangon )	/* 1987 (protected) */
+	DRIVER( shangon3 )	/* 1987 (FD1089B, decrypted) */
+	DRIVER( shangon2 )	/* 1987 (FD1089B, decrypted) */
+	DRIVER( shangon1 )	/* 1987 (FD1089B, decrypted) */
+	DRIVER( shangnle )	/* 1991 */
+						/* 1989.02 Turbo Outrun (Japan) */
+						/* 1989.04 Turbo Outrun (US) */
+						/* 1989.?? Turbo Outrun (World) */
+	DRIVER( toutrun )	/* 1987 (FD1094, decrypted) */
+	DRIVER( toutrun2 )	/* 1987 (FD1094, decrypted) */
+	DRIVER( toutrun1 )	/* 1987 (protected) */
+	DRIVER( toutrunu )	/* 1987 (FD1094, decrypted) */
 
 	/* X Board */
-	DRIVER( aburner )	/* (c) 1987 */
-	DRIVER( aburner2 )	/* (c) 1987 */
-	DRIVER( thndrbld )	/* (c) 1987 (FD1094, decrypted) */
-	DRIVER( thndrbd1 )	/* (c) 1987 */
-	DRIVER( loffire )	/* (c) 1989 (FD1094, decrypted) */
-	DRIVER( loffireu )	/* (c) 1989 (FD1094, decrypted) */
-	DRIVER( loffirej )	/* (c) 1989 (FD1094, decrypted) */
-	DRIVER( rachero )	/* (c) 1989 (FD1094, decrypted) */
-	DRIVER( abcop )		/* (c) 1990 (FD1094, decrypted) */
-
-	DRIVER( gprider )	/* (c) 1990 (protected) */
-	DRIVER( gprider1 )	/* (c) 1990 (FD1094, decrypted) */
-	DRIVER( smgp )		/* (c) 1989 (FD1094, decrypted) */
-	DRIVER( smgp6 )		/* (c) 1989 (FD1094, decrypted) */
-	DRIVER( smgp5 )		/* (c) 1989 (FD1094, decrypted) */
-	DRIVER( smgpu )		/* (c) 1989 (FD1094, decrypted) */
-	DRIVER( smgpu3 )	/* (c) 1989 (FD1094, decrypted) */
-	DRIVER( smgpu2 )	/* (c) 1989 (FD1094, decrypted) */
-	DRIVER( smgpu1 )	/* (c) 1989 (FD1094, decrypted) */
-	DRIVER( smgpj )		/* (c) 1989 (FD1094, decrypted) */
-	DRIVER( smgpja )	/* (c) 1989 (FD1094, decrypted) */
+	DRIVER( aburner )	/* 1987.07 After Burner (Japan) */
+	DRIVER( aburner2 )	/* 1987.09 After Burner II (Japan) */
+	DRIVER( thndrbd1 )	/* 1987.12 Thunder Blade (Japan, deluxe/standard) */
+	DRIVER( thndrbld )	/* 1988.02 Thunder Blade (US?, upright, FD1094, decrypted) */
+						/* 1989.01 Last Survivor (Japan) */
+	DRIVER( smgpj )		/* 1989.06 Super Monaco GP (Japan, FD1094, decrypted) */
+	DRIVER( smgpja )	/* 1989.06 Super Monaco GP (Japan, FD1094, decrypted) */
+	DRIVER( smgp )		/* 1989.?? Super Monaco GP (World, FD1094, decrypted) */
+	DRIVER( smgp6 )		/* 1989.?? Super Monaco GP (World, FD1094, decrypted) */
+	DRIVER( smgp5 )		/* 1989.?? Super Monaco GP (World, FD1094, decrypted) */
+	DRIVER( smgpu )		/* 1989.08 Super Monaco GP (US, FD1094, decrypted) */
+	DRIVER( smgpu3 )	/* 1989.08 Super Monaco GP (US, FD1094, decrypted) */
+	DRIVER( smgpu2 )	/* 1989.08 Super Monaco GP (US, FD1094, decrypted) */
+	DRIVER( smgpu1 )	/* 1989.08 Super Monaco GP (US, FD1094, decrypted) */
+	DRIVER( loffirej )	/* 1989.12 Line of Fire (Japan, FD1094, decrypted) */
+	DRIVER( loffire )	/* 1989.?? Line of Fire (World, FD1094, decrypted) */
+	DRIVER( loffireu )	/* 1990.04 Line of Fire (US, FD1094, decrypted) */
+						/* 1990.03 Racing Hero (Japan) */
+	DRIVER( rachero )	/* 1990.?? Racing Hero (World, FD1094, decrypted) */
+	DRIVER( abcop )		/* 1990.?? A.B.Cop (World, FD1094, decrypted) */
+						/* 1991.01 A.B.Cop (Japan) */
+						/* 1990.10 GP Rider (Japan) */
+	DRIVER( gprider )	/* 1990.?? GP Rider (World, protected) */
+	DRIVER( gprider1 )	/* 1990.12 GP Rider (US, FD1094, decrypted) */
 
 	/* Y-Board */
-	DRIVER( gforce2 )	/* (c) 1988 */
-	DRIVER( gforce2j )	/* (c) 1988 */
-	DRIVER( gloc )		/* (c) 1990 */
-	DRIVER( glocr360 )	/* (c) 1990 */
-	DRIVER( strkfgtr )	/* (c) 1991 */
-	DRIVER( pdrift )	/* (c) 1988 */
-	DRIVER( pdrifta )	/* (c) 1988 */
-	DRIVER( pdrifte )	/* (c) 1988 */
-	DRIVER( pdriftj )	/* (c) 1988 */
-	DRIVER( rchase )	/* (c) 1991 */
+						/* 1988.05 Gaalxy Force (Japan) */
+						/* 1988.08 Galaxy Force (US) */
+	DRIVER( gforce2j )	/* 1988.07 Galaxy Force II (Japan) */
+	DRIVER( gforce2 )	/* 1988.?? Galaxy Force II (World) */
+						/* 1988.12 Galaxy Force II (US) */
+						/* 1988.08 Power Drift (US) */
+	DRIVER( pdriftj )	/* 1988.09 Power Drift (Japan) */
+	DRIVER( pdrift )	/* 1988.?? Power Drift (World) */
+	DRIVER( pdrifta )
+	DRIVER( pdrifte )
+	DRIVER( gloc )		/* 1990.04 G-LOC Air Battle (US) */
+						/* 1990.05 G-LOC Air Battle (Japan) */
+	DRIVER( glocr360 )	/* 1990.?? G-LOC (R360, World?) */
+	DRIVER( strkfgtr )	/* 1991.06 Strike Fighter (Japan) */
+	DRIVER( rchase )	/* 1991.09 Rail Chase (Japan) */
+						/* 1991.09 Rail Chase (US) */
 
-/*
-Sega System 24 game list
-Apr.1988 Hot Rod
-Oct.1988 Scramble Spirits
-Nov.1988 Gain Ground
-Apr.1989 Crack Down
-Aug.1989 Jumbo Ozaki Super Masters
-Jun.1990 Bonanza Bros.
-Dec.1990 Rough Racer
-Feb.1991 Quiz Syukudai wo Wasuremashita
-Jul.1991 Dynamic C.C.
-Dec.1991 Quiz Rouka ni Tattenasai
-Dec.1992 Tokorosan no MahMahjan
-May.1993 Quiz Mekurumeku Story
-May.1994 Tokorosan no MahMahjan 2
-Sep.1994 Quiz Ghost Hunter
-*/
+	/* Sega System 24 games */
 	/* disk based */
-	DRIVER( hotrod )	/* (c) 1988 */
-	DRIVER( hotroda )	/* (c) 1988 */
-	DRIVER( hotrodj )	/* (c) 1988 */
-	DRIVER( sspirits ) 	/* (c) 1988 */
-	DRIVER( sspiritj ) 	/* (c) 1988 */
-	DRIVER( sspirtfc )	/* (c) 1988 (protected) */
-	DRIVER( gground )	/* (c) 1988 (FD1094, decrypted) */
-	DRIVER( ggroundj )	/* (c) 1988 (FD1094, decrypted) */
-	DRIVER( crkdown )	/* (c) 1989 (FD1094, decrypted) */
-	DRIVER( crkdownu )	/* (c) 1989 (FD1094, decrypted) */
-	DRIVER( crkdownj )	/* (c) 1989 (FD1094, decrypted) */
-	DRIVER( sgmast )	/* (c) 1989 (protected) */
-	DRIVER( sgmastc )	/* (c) 1989 (FD1094, decrypted) */
-	DRIVER( sgmastj )	/* (c) 1989 (FD1094, decrypted) */
-	DRIVER( roughrac )	/* (c) 1990 (FD1094, decrypted) */
-	DRIVER( bnzabros )	/* (c) 1990 */
-	DRIVER( bnzabrsj )	/* (c) 1990 */
-	DRIVER( qsww )		/* (c) 1991 */
-	DRIVER( dcclubfd )	/* (c) 1991 */
+	DRIVER( hotrodj )	/* 1988.03 Hot Rod (Japan) */
+	DRIVER( hotrod )	/* 1988.?? Hot Rod (World) */
+	DRIVER( hotroda )
+						/* 1988.07 Hot Rod (US) */
+	DRIVER( sspiritj ) 	/* 1988.10 Scramble Spirits (Japan) */
+	DRIVER( sspirits ) 	/* 1988.?? Scramble Spirits (World) */
+	DRIVER( sspirtfc )	/* 1988.?? Scramble Spirits (protected) */
+						/* 1988.11 Scramble Spirits (US) */
+	DRIVER( ggroundj )	/* 1988.11 Gain Ground (Japan, FD1094, decrypted) */
+	DRIVER( gground )	/* 1989.?? Gain Ground (World, FD1094, decrypted) */
+						/* 1989.03 Gain Ground (US) */
+	DRIVER( crkdownj )	/* 1989.03 Crack Down (Japan, FD1094, decrypted) */
+	DRIVER( crkdown )	/* 1989.?? Crack Down (World, FD1094, decrypted) */
+	DRIVER( crkdownu )	/* 1989.06 Crack Down (US, FD1094, decrypted) */
+	DRIVER( sgmastj )	/* 1989.06 Jumbo Ozaki Super Masters (Japan, FD1094, decrypted) */
+	DRIVER( sgmast )	/* 1989.?? Super Masters Golf (World, protected) */
+	DRIVER( sgmastc )	/* 1989.?? Jumbo Ozaki Super Masters Golf (World, FD1094, decrypted) */
+						/* 1989.09 Super Masters Golf (US) */
+	DRIVER( roughrac )	/* 1990.03 Rough Racer (Japan, FD1094, decrypted) */
+	DRIVER( bnzabrsj )	/* 1990.06 Bonanza Bros. (Japan) */
+	DRIVER( bnzabros )	/* 1990.08 Bonanza Bros. (US) */
+	DRIVER( qsww )		/* 1991.02 Quiz Syukudai wo Wasuremashita! (Japan) */
+	DRIVER( dcclubfd )	/* 1991.07 Dynamic Country Club (US) */
 
 	/* ROM based */
-	DRIVER( dcclub )	/* (c) 1991 */
-	DRIVER( dcclubj )	/* (c) 1991 */
-	DRIVER( mahmajn )	/* (c) 1992 */
-	DRIVER( qgh )		/* (c) 1994 */
-	DRIVER( quizmeku )	/* (c) 1994 */
-	DRIVER( qrouka )	/* (c) 1994 */
-	DRIVER( mahmajn2 )	/* (c) 1994 */
+	DRIVER( dcclubj )	/* 1991.06 Dynamic Country Club (Japan) */
+	DRIVER( dcclub )	/* 1991.?? Dynamic Country Club (World) */
+	DRIVER( qrouka )	/* 1991.12 Quiz Rouka ni Tattenasai! (Japan) */
+	DRIVER( mahmajn )	/* 1992.12 Tokorosan no Mahmahjong (Japan) */
+	DRIVER( quizmeku )	/* 1993.05 Quiz Mekurumeku Story (Japan) */
+	DRIVER( mahmajn2 )	/* 1994.05 Tokorosan no Mahmahjong 2 (Japan) */
+	DRIVER( qgh )		/* 1994.09 Quiz Ghost Hunter */
 
 	/* Sega System 32 games */
-	DRIVER( holo )		/* (c) 1992 (US) */
-	DRIVER( svf )		/* (c) 1994 */
-	DRIVER( svs )		/* (c) 1994 */
-	DRIVER( jleague )	/* (c) 1994 (Japan) */
-	DRIVER( brival )	/* (c) 1992 (World) */
-	DRIVER( brivalj )	/* (c) 1992 (Japan) */
-	DRIVER( radm )		/* (c) 1991 (World) */
-	DRIVER( radmu )		/* (c) 1991 (US) */
-	DRIVER( radr )		/* (c) 1991 (World) */
-	DRIVER( radru )		/* (c) 1991 (US) */
-	DRIVER( f1en )		/* (c) 1991 */
-	DRIVER( alien3 )	/* (c) 1993 */
-	DRIVER( alien3u )	/* (c) 1993 */
-	DRIVER( sonic )		/* (c) 1992 (Japan) */
-	DRIVER( sonicp )	/* (c) 1992 (Japan) */
-	DRIVER( jpark )		/* (c) 1994 */
-	DRIVER( kokoroj2 )	/* (c) 1994 */
-	DRIVER( ga2 )		/* (c) 1992 (World) */
-	DRIVER( ga2u )		/* (c) 1992 (US) */
-	DRIVER( ga2j )		/* (c) 1992 (Japan) */
-	DRIVER( spidman )	/* (c) 1991 (World) */
-	DRIVER( spidmanu )	/* (c) 1991 (US) */
-	DRIVER( arabfgt )	/* (c) 1991 */
-	DRIVER( arabfgtu )	/* (c) 1991 (US) */
-	DRIVER( arabfgtj )	/* (c) 1991 (Japan) */
-	DRIVER( arescue )	/* (c) 1992 */
-	DRIVER( f1lap )		/* (c) 1993 */
-	DRIVER( dbzvrvs )	/* (c) 1994 Sega/Banpresto */
-	DRIVER( darkedge )	/* (c) 1992 */
-	DRIVER( darkedgj )	/* (c) 1992 (Japan) */
-	DRIVER( slipstrm )	/* (c) 1995 Capcom */
-	DRIVER( slipstrh )	/* (c) 1995 Capcom */
+	DRIVER( radm )		/* 1991.?? Rad Mobile (World) */
+	DRIVER( radmu )		/* 1991.03 Rad Mobile (US) */
+						/* 1991.02 Rad Mobile (Japan) */
+	DRIVER( radr )		/* 1991.?? Rad Rally (World) */
+	DRIVER( radru )		/* 1991.09 Rad Rally (US) */
+						/* 1991.07 Rad Rally (Japan) */
+	DRIVER( spidman )	/* 1991.?? Spiderman (World) */
+	DRIVER( spidmanu )	/* 1991.09 Spiderman (US) */
+						/* 1991.09 Spiderman (Japan) */
+						/* 1991.10 Hologram Time Traveler (Japan) */
+	DRIVER( f1en )		/* 1991.?? F-1 Exhaust Note (World) */
+						/* 1992.01 F-1 Exhaust Note (US) */
+						/* 1991.11 F-1 Exhaust Note (Japan) */
+	DRIVER( arabfgt )	/* 1992.?? Arabian Fight (World) */
+	DRIVER( arabfgtu )	/* 1992.03 Arabian Fight (US) */
+	DRIVER( arabfgtj )	/* 1992.03 Arabian Fight (Japan) */
+	DRIVER( arescue )	/* 1992.03 Air Rescur (US) */
+						/* 1992.04 Air Rescue (Japan) */
+	DRIVER( ga2 )		/* 1992.?? Golden Axe II (World) */
+	DRIVER( ga2u )		/* 1992.09 Golden Axe II (US) */
+	DRIVER( ga2j )		/* 1992.10 Golden Axe Death Adder no Fukusyuu (Japan) */
+	DRIVER( holo )		/* 1992.?? Hologram Holosseum (US) */
+						/* 1992.11 Hologram Holosseum (Japan) */
+	DRIVER( darkedge )	/* 1993.?? Dark Edge (World) */
+						/* 1993.?? Dark Edge (US) */
+	DRIVER( darkedgj )	/* 1993.03 Dark Edge (Japan) */
+	DRIVER( brival )	/* 1993.?? Burning Rival (World) */
+	DRIVER( brivalj )	/* 1993.08 Burning Rival (Japan) */
+	DRIVER( f1lap )		/* 1993.?? F-1 Super Lap (World) */
+						/* 1993.09 F-1 Super Lap (Japan) */
+	DRIVER( alien3 )	/* 1993.?? Aliens 3 (World) */
+	DRIVER( alien3u )	/* 1993.11 Aliens 3 (US) */
+						/* 1993.09 Aliens 3 the Gun (Japan) */
+	DRIVER( sonic )		/* 1993.09 Sonic the Hedgehog (Japan) */
+	DRIVER( sonicp )	/* 1993.?? Sonic the Hedgehog (proto, Japan) */
+	DRIVER( kokoroj2 )	/* 1993.12 Soreike! Kokoroji 2 (Japan) */
+	DRIVER( jpark )		/* 1994.?? Jurassic Park (World)  */
+						/* 1994.?? Jurassic Park (US) */
+						/* 1994.02 Jurassic Park (Japan) */
+	DRIVER( dbzvrvs )	/* 1994.03 Dragon Ball Z V.R.V.S. (Japan) */
+	DRIVER( jleague )	/* 1994.07 The J League 1994 (Japan) */
+	DRIVER( svf )		/* 1994.?? Super Visual Football */
+	DRIVER( svs )		/* 1994.?? Super Visual Soccer */
+	DRIVER( slipstrm )	/* 1995.?? Slip Stream (Capcom) */
+	DRIVER( slipstrh )
 
 	/* Sega Multi System 32 games */
-	DRIVER( orunners )	/* (c) 1992 (World) */
-	DRIVER( orunneru )	/* (c) 1992 (US) */
-	DRIVER( harddunk )	/* (c) 1994 (World) */
-	DRIVER( harddunj )	/* (c) 1994 (Japan) */
-	DRIVER( titlef )	/* (c) 1992 (World) */
-	DRIVER( titlefu )	/* (c) 1992 (US) */
-	DRIVER( scross )	/* (c) 1992 (World) */
-	DRIVER( scrossu )	/* (c) 1992 (World) */
+						/* 1993.05 Outrunners (Japan) */
+	DRIVER( orunners )	/* 1993.?? Outrunners (World) */
+	DRIVER( orunneru )	/* 1993.06 Outrunners (US) */
+	DRIVER( harddunj )	/* 1994.04 Hard Dunk 3on3 (Japan) */
+	DRIVER( harddunk )	/* 1994.?? Hard Dunk 3on3 (World) */
+						/* 1993.03 Title Fight (Japan) */
+	DRIVER( titlef )	/* 1993.?? Title Fight (World) */
+	DRIVER( titlefu )	/* 1993.04 Title Fight (US) */
+						/* 1992.07 Stadium Cross (Japan) */
+	DRIVER( scross )	/* 1992.?? Stadium Cross (World) */
+	DRIVER( scrossu )	/* 1992.09 Stadium Cross (US) */
 
 	/* Model 1 Games */
-	DRIVER( vf )		/* (c) 1993 */
-	DRIVER( vr )		/* (c) 1992 */
-	DRIVER( vformula )	/* (c) 1993 */
-	DRIVER( swa )		/* (c) 1993 */
-	DRIVER( wingwar )	/* (c) 1994 */
-	DRIVER( wingwara )	/* (c) 1994 (US) */
+	DRIVER( vr )		/* 1992.08 Virtua Racing */
+	DRIVER( vf )		/* 1993.12 Virtua Fighter */
+	DRIVER( vformula )	/* 1993.?? Virtua Formula */
+	DRIVER( swa )		/* 1994.04 Star Wars Arcade */
+	DRIVER( wingwar )	/* 1994.06 Wing War */
+	DRIVER( wingwara )	/* 1994.09 Wing War (US) */
 
 	/* Sega H1 games */
-	DRIVER( coolridr )	/* (c) 1995 */
+	DRIVER( coolridr )	/* 1995.04 Cool Riders */
 
 	/* Sega ST-V games */
 	DRIVER( stvbios )
-	DRIVER( astrass )	/* (c) 1998 Sunsoft */
-	DRIVER( bakubaku )	/* (c) 1996 */
-	DRIVER( colmns97 )	/* (c) 1996 */
-	DRIVER( cotton2 )	/* (c) 1997 Success */
-	DRIVER( cottonbm )	/* (c) 1998 Success */
-	DRIVER( decathlt )	/* (c) 1995 */
-	DRIVER( decathlo )	/* (c) 1995 */
-	DRIVER( diehard )	/* (c) 1996 */
-	DRIVER( dnmtdeka )	/* (c) 1996 */
-	DRIVER( ejihon )	/* (c) 1995 */
-	DRIVER( elandore )	/* (c) 1998 Sai-Mate */
-	DRIVER( ffreveng )	/* (c) 1999 Capcom */
-	DRIVER( fhboxers )	/* (c) 1995 */
-	DRIVER( findlove )	/* (c) 1996 Daika / FCF */
-	DRIVER( finlarch )	/* (c) 1995 */
-	DRIVER( gaxeduel )	/* (c) 1994 */
-	DRIVER( grdforce )	/* (c) 1998 Success */
-	DRIVER( groovef )	/* (c) 1996 Atlus */
-	DRIVER( hanagumi )	/* (c) 1998 */
-	DRIVER( introdon )	/* (c) 1996 Sunsoft / Success */
-	DRIVER( kiwames )	/* (c) 1995 Athena */
-	DRIVER( maruchan )	/* (c) 1992 Sega / Toyosuisan */
-	DRIVER( myfairld )	/* (c) 1998 Micronet */
-	DRIVER( othellos )	/* (c) 1998 Success */
-	DRIVER( pblbeach )	/* (c) 1995 T&E Soft */
-	DRIVER( prikura )	/* (c) 1996 Atlus */
-	DRIVER( puyosun )	/* (c) 1996 Compile */
-	DRIVER( rsgun )		/* (c) 1998 Treasure */
-	DRIVER( sandor )	/* (c) 1995 */
-	DRIVER( sanjeon )	/* (c) 1999 Sega / Deniam */
-	DRIVER( thunt )		/* (c) 1995 Sega (Deniam License) */
-	DRIVER( thuntk )	/* (c) 1995 Sega (Deniam License) */
-	DRIVER( sasissu )	/* (c) 1992 */
-	DRIVER( seabass )	/* (c) 1998 A wave Inc (Able License) */
-	DRIVER( shanhigw )	/* (c) 1996 */
-	DRIVER( shienryu )	/* (c) 1997 Warashi */
-	DRIVER( smleague )	/* (c) 1995 */
-	DRIVER( sokyugrt )	/* (c) 1996 Raizing / 8ing */
-	DRIVER( sss )		/* (c) 1998 Capcom / Cave / Victor */
-	DRIVER( suikoenb )	/* (c) 1995 Data East */
-	DRIVER( twcup98 )	/* (c) 1998 Techmo */
-	DRIVER( stress )	/* (c) 1997 Sega */
-	DRIVER( vfkids )	/* (c) 1995 */
-	DRIVER( vfremix )	/* (c) 1996 */
-	DRIVER( vmahjong )	/* (c) 1997 Micronet */
-	DRIVER( winterht )	/* (c) 1997 */
-	DRIVER( znpwfv )	/* (c) 1997 */
+						/* 1994.07 Sports Fishing */
+	DRIVER( gaxeduel )	/* 1995.02 Golden Axe the Duel */
+	DRIVER( suikoenb )	/* 1995.03 Suiko Enbu (Data East) */
+	DRIVER( bakubaku )	/* 1995.04 Bakubaku Animal */
+	DRIVER( vfremix )	/* 1995.06 Virtua Fighter Remix */
+	DRIVER( ejihon )	/* 1995.07 Ejihon Tantei Jimusyo */
+	DRIVER( finlarch )	/* 1995.07 Final Arch */
+	DRIVER( sfish2j )	/* 1995.08 Sports Fishing 2 (Japan) */
+	DRIVER( shanhigw )	/* 1995.08 Shanghai Banri no Choujou */
+	DRIVER( sandor )	/* 1995.11 Nido Aru Koto wa Sando-R */
+	DRIVER( kiwames )	/* 1995.11 Pro Mahjong Kiwame S (Athena) */
+	DRIVER( sfish2 )	/* 1995.11 Sports Fishing 2 (Export) */
+	DRIVER( critcrsh )	/* 1995.?? Critter Crusher */
+						/* 1995.12 Tatakott */
+	DRIVER( batmanfr )	/* 1996.02 Batman Forever (Acclaim) */
+	DRIVER( fhboxers )	/* 1996.02 Funky Head Boxers */
+	DRIVER( vfkids )	/* 1996.03 Virtua Fighter Kids */
+	DRIVER( pblbeach )	/* 1996.03 Pebble Beach the Great Shot (T&E Soft) */
+	DRIVER( introdon )	/* 1996.04 Karaoke Quiz Intro Dondon (Sunsoft / Success) */
+	DRIVER( smleague )	/* 1996.04 Super Major League */
+	DRIVER( decathlt )	/* 1996.05 Decathlete */
+	DRIVER( decathlo )
+	DRIVER( dnmtdeka )	/* 1996.07 Dynamite Deka */
+	DRIVER( mausuke )	/* 1996.07 Mausuke no Ojama the World (Data East) */
+	DRIVER( diehard )	/* 1996.08 Die Hard Arcade */
+	DRIVER( sokyugrt )	/* 1996.09 Soukyuu Gurentai (Raizing / 8ing) */
+	DRIVER( prikura )	/* 1996.10 Prikura Daisakusen (Atlus) */
+	DRIVER( magzun )	/* 1996.11 Magical Zunou Power */
+	DRIVER( puyosun )	/* 1996.12 Puyo Puyo SUN (Compile) */
+	DRIVER( colmns97 )	/* 1997.01 Columns 97 */
+	DRIVER( shienryu )	/* 1997.02 Shienryu (Warashi) */
+	DRIVER( vmahjong )	/* 1997.02 Virtual Mahjong (Micronet) */
+	DRIVER( groovef )	/* 1997.05 Groove on Fight (Atlus) */
+	DRIVER( winterht )	/* 1997.10 Winter Heat (Data East) */
+	DRIVER( cotton2 )	/* 1997.11 Cotton 2 (Success) */
+	DRIVER( hanagumi )	/* 1997.11 Sakura Taisen Hanagumi Taisen Columns */
+	DRIVER( findlove )	/* 1997.12 Find Love (Daiki / FCF) */
+	DRIVER( maruchan )	/* 1997.12 Maruchan de Goo!!! */
+	DRIVER( znpwfv )	/* 1997.12 Zen Nippon Pro Wrestling featuring Virtua */
+	DRIVER( seabass )	/* 1998.02 Sea Bass Fishing (A wave Inc (Able License)) */
+	DRIVER( sasissu )	/* 1998.02 Taisen Tanto-R Sasissu!! */
+						/* 1998.03 Bass Master Challenge */
+	DRIVER( twcup98 )	/* 1998.04 Tecmo World Cup '98 (Tecmo) */
+	DRIVER( grdforce )	/* 1998.05 Guardian Force (Success) */
+	DRIVER( rsgun )		/* 1998.05 Radient Silver Gun (Treasure) */
+	DRIVER( astrass )	/* 1998.06 Astra Super Stars (Sunsoft) */
+	DRIVER( myfairld )	/* 1998.07 My Fair Lady (Micronet) */
+	DRIVER( othellos )	/* 1998.07 Othello Shiyouyo (Success) */
+	DRIVER( cottonbm )	/* 1998.09 Cotton Boomerang (Success) */
+	DRIVER( stress )	/* 1998.10 Stress Busters */
+	DRIVER( elandore )	/* 1998.11 Touryuu Densetsu Elandore (Sai-Mate) */
+	DRIVER( sss )		/* 1998.12 Steep Slope Sliders (Capcom / Cave / Victor) */
+	DRIVER( danchih )	/* 1999.06 Danchi de Hanafuda Okusan Komeya Desuyo! (Altron (Tecmo License)) */
+	DRIVER( ffreveng )	/* 1999.09 Final Fight Revenge (Capcom) */
+						/* 2000.12 Danchi de Quiz Okusan Yontaku Desuyo! (Altron) */
 
-	DRIVER( danchih )	/* (c) 1999 Altron (Tecmo License) */
-	DRIVER( mausuke )	/* (c) 1995 Data East */
-	DRIVER( batmanfr )	/* (c) 1996 Acclaim */
+	DRIVER( thunt )		/* 1995.?? Puzzle & Action Treasure Hunt (Sega (Deniam License)) */
+	DRIVER( thuntk )
+	DRIVER( sanjeon )	/* 1999.?? Sanjun Sujun (Sega / Deniam) */
 
-	DRIVER( critcrsh )	/* (c) 1995 Sega */
-
-	DRIVER( sfish2 )	/* (c) 1995 */
-	DRIVER( sfish2j )	/* (c) 1995 */
-	DRIVER( magzun )	/* (c) 1995 */
 	DRIVER( nclubv3 )
 
 	/* Sega Model 2 Games */
 
 	/* Model 2 (TGPs, Model 1 sound board) */
-	DRIVER( daytona )	/* 1993 */
-	DRIVER( dayton93 )	/* 1993 */
-	DRIVER( daytonas )	/* 1993 */
+	DRIVER( daytona )	/* 1994.03 Daytona USA */
+	DRIVER( dayton93 )
+	DRIVER( daytonas )
 	DRIVER( daytonat )	/* 1993, hack */
 	DRIVER( daytonam )	/* 1993, hack */
-	DRIVER( desert )	/* 1994 */
-	DRIVER( vcop )		/* 1994 */
+	DRIVER( desert )	/* 1994.07 Desert Tank */
+	DRIVER( vcop )		/* 1994.09 Virtua Cop */
 
 	/* Model 2A-CRX (TGPs, SCSP sound board) */
-	DRIVER( manxtt )	/* 1995 */
-	DRIVER( motoraid )	/* 1995 */
-	DRIVER( srallyc )	/* 1995 */
-	DRIVER( vf2 )		/* 1995 */
-	DRIVER( vf2b )		/* 1995 */
-	DRIVER( vf2a )		/* 1995 */
-	DRIVER( vf2o )		/* 1995 */
-	DRIVER( vcop2 )		/* 1995 */
-	DRIVER( doaa )		/* 1996 */
-	DRIVER( zeroguna )	/* 1997 */
-	DRIVER( dynamcop )	/* 1998 */
-	DRIVER( dyndeka2 )	/* 1998 */
-	DRIVER( pltkidsa )	/* 1998 */
+	DRIVER( vf2o )		/* 1994.11 Virtua Fighter 2 */
+	DRIVER( vf2a )		/* 1995.?? */
+	DRIVER( vf2b )		/* 1995.?? */
+	DRIVER( srallyc )	/* 1995.02 Sega Rally Championship */
+	DRIVER( vcop2 )		/* 1995.09 Virtua Cop 2 */
+	DRIVER( vf2 )		/* 1995.09 Virtua Fighter 2.1*/
+						/* 1995.10 Sky Target */
+	DRIVER( manxtt )	/* 1995.11 Manx T.T. */
+						/* 1996.08 Dynamite Baseball */
+	DRIVER( doaa )		/* 1996.11 Dead or Alive */
+						/* 1997.04 Dynamite Baseball '97 */
+	DRIVER( motoraid )	/* 1997.10 Motor Raid */
+	DRIVER( zeroguna )	/* 1997.12 Zero Gunner */
+	DRIVER( dyndeka2 )	/* 1998.05 Dynamite Deka 2 */
+	DRIVER( dynamcop )	/* 1998.09 Dynamic Cop */
+	DRIVER( pltkidsa )	/* 1999.03 Pilot Kids */
 
 	/* Model 2B-CRX (SHARC, SCSP sound board) */
-	DRIVER( vstriker )	/* 1994 */
-	DRIVER( vstrikro )	/* 1994 */
-	DRIVER( fvipers )	/* 1995 */
-	DRIVER( gunblade )	/* 1995 */
-	DRIVER( indy500 )	/* 1995 */
-	DRIVER( indy500d )	/* 1995 */
-	DRIVER( skytargt )	/* 1995 */
-	DRIVER( schamp )	/* 1996 */
-	DRIVER( lastbrnx )	/* 1996 */
-	DRIVER( lastbrnj )	/* 1996 */
-	DRIVER( doa )		/* 1996 */
-	DRIVER( sgt24h )	/* 1996 */
-	DRIVER( von )		/* 1996 */
-	DRIVER( vonj )		/* 1996 */
-	DRIVER( dynabb )	/* 1996 */
-	DRIVER( zerogun )	/* 1997 */
-	DRIVER( zerogunj )	/* 1997 */
-	DRIVER( dynmcopb )	/* 1998 */
-	DRIVER( dyndek2b )	/* 1998 */
-	DRIVER( pltkids )	/* 1998 */
-	DRIVER( rchase2 )	/* 199? */
+	DRIVER( vstriker )	/* 1995.05 virtua Striker */
+	DRIVER( vstrikro )
+	DRIVER( rchase2 )	/* 1995.06 Rail Chase 2 */
+	DRIVER( indy500 )	/* 1995.07 Indy 500 */
+	DRIVER( indy500d )
+	DRIVER( skytargt )	/* 1995.10 Sky Target */
+	DRIVER( fvipers )	/* 1995.11 Fighting Vipers */
+	DRIVER( von )		/* 1996.01 Dennou Senki Virtual-On */
+	DRIVER( vonj )
+	DRIVER( gunblade )	/* 1996.04 Gunblade N.Y. */
+	DRIVER( schamp )	/* 1996.05 Sonic the Fighters */
+	DRIVER( lastbrnx )	/* 1996.06 Last Bronx */
+	DRIVER( lastbrnj )
+	DRIVER( sgt24h )	/* 1996.07 Super GT 24h */
+	DRIVER( dynabb )	/* 1996.08 Dynamite Baseball */
+	DRIVER( doa )		/* 1996.11 Dead or Alive */
+						/* 1997.04 Dynamite Baseball '97 */
+	DRIVER( zerogun )	/* 1997.12 Zero Gunner */
+	DRIVER( zerogunj )
+	DRIVER( dyndek2b )	/* 1998.05 Dynamite Deka 2 */
+	DRIVER( dynmcopb )	/* 1998.09 Dynamite Cop */
+	DRIVER( pltkids )	/* 1999.03 Pilot Kids */
 
 	/* Model 2C-CRX (TGPx4, SCSP sound board) */
-	DRIVER( skisuprg )	/* 1996 */
-	DRIVER( stcc )		/* 1996 */
-	DRIVER( waverunr )	/* 1996 */
-	DRIVER( hotd )		/* 1997 */
-	DRIVER( overrev )	/* 1997 */
-	DRIVER( segawski )	/* 1997 */
-	DRIVER( topskatr )	/* 1997 */
-	DRIVER( topskatu )	/* 1997 */
-	DRIVER( bel )		/* 1998 */
-	DRIVER( dynmcopc )	/* 1998 */
+	DRIVER( skisuprg )	/* 1996.12 Sega Ski Super G */
+	DRIVER( stcc )		/* 1996.09 Sega Touring Car Championship */
+	DRIVER( waverunr )	/* 1996.10 Wave Runner */
+	DRIVER( hotd )		/* 1997.03 The House of the Dead */
+	DRIVER( topskatr )	/* 1997.05 Top Skater */
+	DRIVER( topskatu )
+	DRIVER( overrev )	/* 1997.09 Overrev */
+	DRIVER( segawski )	/* 1997.09 Sega Water Ski */
+	DRIVER( dynmcopc )	/* 1998.09 Dynamite Cop */
+	DRIVER( bel )		/* 1998.12 Behind Enemy Lines */
 
 	/* Sega Model 3 Games */
 
 	/* Step 1.0 */
-	DRIVER( vf3 )		/* 1996 */
-	DRIVER( vf3a )		/* 1996 */
-	DRIVER( vf3tb )		/* 1996 */
-	DRIVER( bass )		/* 1997 */
-	DRIVER( getbass )	/* 1997 */
+	DRIVER( vf3 )		/* 1996.09 Virtua Fighter 3 */
+	DRIVER( vf3a )
+	DRIVER( vf3tb )		/* 1997.10 Virtua Fighter 3tb */
+	DRIVER( bass )		/* 1997.12 Get Bass */
+	DRIVER( getbass )
+						/* 1998.03 Get Bass Brast */
 
 	/* Step 1.5 */
-	DRIVER( scud )		/* 1996 */
-	DRIVER( scudj )		/* 1996 */
-	DRIVER( scuda )		/* 1996 */
-	DRIVER( scudp )		/* 1997 */
-	DRIVER( lostwsga )	/* 1997 */
-	DRIVER( vs215 )		/* 1997 */
-	DRIVER( lemans24 )	/* 1997 */
-	DRIVER( vs29815 )	/* 1998 */
+	DRIVER( scud )		/* 1996.12 Scud Race */
+	DRIVER( scudj )
+	DRIVER( scuda )
+	DRIVER( vs215 )		/* 1997.06 Virtua Striker 2 */
+	DRIVER( lostwsga )	/* 1997.07 Lost World Jurassic Park */
+	DRIVER( scudp )		/* 1997.09 Scud Race Plus */
+	DRIVER( lemans24 )	/* 1997.09 Le Mans 24 */
+	DRIVER( vs29815 )	/* 1998.05 Virtua Striker 2 ver.98 */
 
 	/* Step 2.0 */
-	DRIVER( vs2 )		/* 1997 */
-	DRIVER( harley )	/* 1997 */
-	DRIVER( skichamp )	/* 1998 */
-	DRIVER( srally2 )	/* 1998 */
-	DRIVER( sraly2dx )	/* 1998 */
-	DRIVER( von2 )		/* 1998 */
-	DRIVER( von254g )	/* 1998 */
-	DRIVER( fvipers2 )	/* 1998 */
-	DRIVER( vs298 )		/* 1998 */
-	DRIVER( vs2v991 )	/* 1999 */
-	DRIVER( vs299 )		/* 1999 */
+	DRIVER( vs2 )		/* 1997.06 Virtua Striker 2 */
+	DRIVER( harley )	/* 1997.12 Harley Davidson & L.A.Riders */
+	DRIVER( skichamp )	/* 1998.01 Ski Champ */
+	DRIVER( srally2 )	/* 1998.02 Sega Rally 2 Championship */
+	DRIVER( sraly2dx )
+	DRIVER( von2 )		/* 1998.03 Dennou Senki Virtual-On Oratorio Tangram */
+	DRIVER( fvipers2 )	/* 1998.04 Fighting Vipers 2 */
+	DRIVER( vs298 )		/* 1998.05 Virtua Striker 2 ver.98*/
+	DRIVER( vs299 )		/* 1998.12 Virtual Striker 2 ver.99 */
+	DRIVER( vs2v991 )	/* 1999.?? Virtual Striker 2 ver.99.1 */
+	DRIVER( von254g )	/* 1999.05 Dennou Senki Virtual-On Oratorio Tangram ver.5.4 */
 
 	/* Step 2.1 */
-	DRIVER( daytona2 )	/* 1998 */
-	DRIVER( dayto2pe )	/* 1998 */
-	DRIVER( dirtdvls )	/* 1998 */
-	DRIVER( dirtdvla )	/* 1998 */
-	DRIVER( swtrilgy )	/* 1998 */
-	DRIVER( swtrilga )	/* 1998 */
-	DRIVER( spikeout )	/* 1998 */
-	DRIVER( spikeofe )	/* 1998 */
-	DRIVER( eca )		/* 1999 */
-	DRIVER( ecax )		/* 1999 */
+	DRIVER( daytona2 )	/* 1998.06 Daytona USA 2 */
+						/* 1998.09 Ocean Hunter */
+	DRIVER( spikeout )	/* 1998.09 Spikeout */
+	DRIVER( dirtdvls )	/* 1998.10 Dirt Devils */
+	DRIVER( dirtdvla )
+	DRIVER( swtrilgy )	/* 1998.11 Star Wars Trilogy Arcade */
+	DRIVER( swtrilga )
+						/* 1998.11 Magical Trocco Adventure */
+						/* 1998.12 L.A. Machine Guns */
+	DRIVER( dayto2pe )	/* 1998.12 Daytone USA 2 Power Edition */
+						/* 1998.12 Virtua Striker 2 ver.99 */
+	DRIVER( spikeofe )	/* 1999.01 Spikeout Final Edition */
+	DRIVER( eca )		/* 1999.10 Kyukyuusya Emergency Call Ambulance */
+	DRIVER( ecax )
 
 
 	/* Deniam games */
@@ -4191,7 +4289,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( dybb99 )	/* 1999.11 Dynamite Baseball '99 */
 	DRIVER( doa2 )		/* 1999.11 Dead or Alive 2 */
 	DRIVER( samba )		/* 1999.12 Samba de Amigo */
-	DRIVER( vtennis )	/* 1999.12 Power Smash */
+	DRIVER( vtennis )	/* 1999.12 Virtua Tennis / Power Smash (ROM) */
+	DRIVER( vtennisg )	/* 1999.12 Virtua Tennis / Power Smash (GD-ROM) */
 						/* 1999.12 Puyopuyo DA! */
 						/* 1999.12 Mars TV */
 						/* 2000.01 18 Wheeler */
@@ -4201,7 +4300,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2000.02 Touch de UNO! 2 */
 	DRIVER( virnba )	/* 2000.02 Virtua NBA */
 	DRIVER( smarinef )	/* 2000.03 Sega Marine Fishing */
-						/* 2000.03 Marble vs. Capcom 2 */
+						/* 2000.03 Marvel vs. Capcom 2 */
 						/* 2000.03 World Kicks */
 	DRIVER( pstone2 )	/* 2000.04 Power Stone 2 */
 						/* 2000.04 Shin Nippon Pro-wres Toukon Retsuden 4 */
@@ -4221,7 +4320,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2000.10 Death Crimson OX */
 						/* 2000.11 WWF Royal Rumble */
 						/* 2000.11 Ninja Assault */
-						/* 2000.11 Confidential Mission */
+	DRIVER( confmiss )	/* 2000.11 Confidential Mission */											/* First GD-ROM game? */
 						/* 2000.11 Shakatto Tambourine */
 						/* 2000.12 Samba de Amigo ver.2000 */
 						/* 2000.12 Derby Owners Club 2000 ver.2 */
@@ -4238,41 +4337,41 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2001.04 Shakatto Tambourine Motto Norinori Shinkyoku Tsuika */
 	DRIVER( dygolf )	/* 2001.04 Dynamic Golf */
 						/* 2001.05 Wild Riders */
-						/* 2001.05 Monkey Ball */
+	DRIVER( monkeyba )	/* 2001.05 Monkey Ball */
 						/* 2001.06 Club Cart */
 	DRIVER( cvsgd )		/* 2001.06 Capcom vs. SNK Pro */
 						/* 2001.06 Crackin' DJ Part2 */
 	DRIVER( wsbbgd )	/* 2001.06 Super Major League */
-						/* 2001.07 Beach Spikers */
+	DRIVER( beachspi )	/* 2001.07 Beach Spikers */
 	DRIVER( spkrbtl )	/* 2001.07 Spikers Battle */
 						/* 2001.07 Dokidoki Idol Star Seeker */
 						/* 2001.08 Wave Runner GP */
-	DRIVER( vf4 )		/* 2001.08 Virtua Fighter 4 */
+	DRIVER( vf4 )		/* 2001.08 Virtua Fighter 4 (Naomi 2) */
 	DRIVER( cvs2gd )	/* 2001.08 Capcom vs. SNK 2 */
 	DRIVER( hmgeo )		/* 2001.09 Heavy Metal Geo Matrix */
 						/* 2001.09 Alien Front */
 	DRIVER( gundmxgd )	/* 2001.09 Kidou Senshi Gundam Renpou vs. Zeon DX */
 						/* 2001.10 Derby Owners Club 2 */
 						/* 2001.10 Inu no Osanpo */
-						/* 2001.10 Power Smash 2 */
+	DRIVER( vtennis2 )  /* 2001.10 Power Smash 2 / Virtua Tennis 2 */
 						/* 2001.11 La Keyboardu */
 						/* 2001.11 Shakatto Tambourine Cho Powerup Chu */
 	DRIVER( ikaruga )	/* 2001.12 Ikaruga */
-						/* 2001.12 Lupin the Third the Shooting */
+	DRIVER( lupinsho)	/* 2001.12 Lupin the Third the Shooting */
 						/* 2002.02 The King of Route 66 */
-	DRIVER( initd )		/* 2002.03 Initial D Arcade Stage */
+	DRIVER( initd )		/* 2002.03 Initial D Arcade Stage (Naomi 2) */
 	DRIVER( vathlete )	/* 2002.03 Virtua Athlete */
-						/* 2002.04 Lupin the Third the Typing */
+	DRIVER( luptype )	/* 2002.04 Lupin the Third the Typing */
 	DRIVER( ggxx )		/* 2002.05 Guilty Gear XX */
 						/* 2002.05 Cleopatra Fortune + */
-						/* 2002.05 The Maze of the Kings */
+	DRIVER( mok )		/* 2002.05 The Maze of the Kings */
 						/* 2002.06 World Club Champion Football */
 	DRIVER( chocomk )	/* 2002.06 Musapy no Choco Marker */
 						/* 2002.07 Mazan */
 						/* 2002.07 Soul Surfer */
-						/* 2002.08 Virtua Fighter 4 Evolution */
+	DRIVER( vf4evo )	/* 2002.08 Virtua Fighter 4 Evolution (Naomi 2) */
 						/* 2002.09 Yonin Uchi Mahjong MJ */
-						/* 2002.12 Initial D Arcade Stage ver.2 */
+	DRIVER( initdv2j )	/* 2002.12 Initial D Arcade Stage ver.2 */
 						/* 2002.12 Moeru Casinyo */
 	DRIVER( quizqgd )	/* 2003.01 Quiz Keitai Q mode */
 						/* 2003.02 Kouchuu Ouja Mushiking */
@@ -4280,34 +4379,128 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2003.03 WCCF 2001-2002 ver.2.0 */
 	DRIVER( ggxxrl )	/* 2003.03 Guilty Gear XX # Reload */
 	DRIVER( shikgam2 )	/* 2003.04 Shikigami no Shiro 2 */
-						/* 2003.04 Border Down */
+	DRIVER( bdrdown )	/* 2003.04 Border Down */
 						/* 2003.09 WCCF 2002-2003 */
-						/* 2003.11 Psyvariar 2 */
-						/* 2003.11 Puyopuyo Fever */
+	DRIVER( psyvar2 )	/* 2003.11 Psyvariar 2 */
+	DRIVER( puyofev	)	/* 2003.11 Puyopuyo Fever */
 						/* 2004.01 Initial D Arcade Stage ver.3 */
 						/* 2004.06 WCCF 2002-2003 ver.2.0 */
-						/* 2004.07 Virtua Fighter 4 Final Tuned */
-						/* 2004.09 Trizeal */
+	DRIVER( vf4tuned )	/* 2004.07 Virtua Fighter 4 Final Tuned (Naomi 2) */
+	DRIVER( trizeal )	/* 2004.09 Trizeal */
 						/* 2004.10 Oshare Majo Love & Berry */
 						/* 2004.12 WCCF 2002-2003 ver.2.1 */
 	DRIVER( meltybld )	/* 2005.03 Melty Blood Act Cadenza */
 						/* 2005.04 Menkyo no Tetsujin */
 	DRIVER( ss2005 )	/* 2005.04 Super Shanghai 2005 */
 	DRIVER( senko )		/* 2005.04 Senkou no Rondo */
+	DRIVER( senkoo )	/*          ^^ */
 						/* 2005.07 WCCF 2004-2005 */
 						/* 2005.09 Kodai Ouja Kyouryuu King */
-						/* 2005.10 Under Defeat */
+						/* 2005.10 Radirgy */
+	DRIVER( undefeat )	/* 2005.10 Under Defeat */
+						/* 2006.03 Kurukuru Chameleon */
+	DRIVER( trgheart )	/* 2006.05 Trigger Heart Exelica */
+						/* 2006.07 Touch de Zunou */
+						/* 2006.08 Senkou no Rondo SP */
+	DRIVER( jingystm )	/* 2006.09 Jingi Storm */
+						/* 2006.11 Karous */
+						/* 2006.12 Guilty Gear XX Accent Core */
+						/* 2006.12 Melty Blood Act Cadenza ver.B */
+						/* 2007.02 Noukone Puzzle Takoron */
+						/* 2007.07 Shooting Love */
+						/* 2007.07 Dynamite Deka EX - Asian dynamite */
+						/* 2007.09 Rhythm Tengoku */
+						/* 2007.?? Issyo ni Wanwan */
+						/* 2007.?? Konchuu Dash!! */
+						/* 2007.?? Pokasuka Ghost! */
+						/* 2007.?? Magical Dance on Dream Stage */
+						/* 2007.?? Marine Marine */
+						/* 2008.?? Akatsuki Denkou Senki Ausf.Achse */
+						/* 2008.?? Illvelo */
+						/* 2008.?? Mamoru Kun wa Norowarete Shimatta! */
+						/* 2008.?? Melty Blood Actress Again */
+						/* 2009.?? Project Cerberus */
+						/* 2009.?? Radirgy Noah */
+	DRIVER( ggxxsla  )	/* 200?.?? Guilty Gear XX Slash */
+
+	DRIVER( initdexp )	/* 200?.?? Initial D Export Version (Naomi 2) */
 
 	/* Atomiswave (Dreamcast-based) games */
 	DRIVER( awbios )
-	DRIVER( fotns )
-	DRIVER( demofist )
+						/* 2002.12 Maximum Speed */
+						/* 2003.03 Guilty Gear X ver.1.5 */
+	DRIVER( demofist )	/* 2003.06 Demolish Fist */
+						/* 2003.08 Dolphin Blue */
+						/* 2003.12 Guilty Gear Isuka */
+						/* 2003.?? Sangoku Senki Shichisei Tensei (IGS) */
+						/* 2004.03 The Rumble Fish */
+						/* 2004.03 Ranger Mission */
+						/* 2004.06 Salary Man Kintarou Net Select */
+						/* 2004.07 The King of Fighters Neo Wave */
+						/* 2004.09 Extreme Hunting */
+						/* 2004.09 Dirty Pig Skin Football */
+						/* 2004.09 Faster than Speed */
+						/* 2005.03 The Rumble Fish 2 */
+						/* 2005.03 Net Select Keiba Victory Furlong */
+						/* 2005.07 NeoGeo Battle Colloseum */
+						/* 2005.09 Samurai Spirits Tenkaichi Kenkakuden */
+						/* 2005.10 The King of Fighters XI */
+	DRIVER( fotns )		/* 2005.12 Hokuto no Ken */
+						/* 2006.02 Metal Slug 6 */
+						/* 2006.09 Extreme Hunting 2 Tournament Edition */
+						/* 2008.?? Sega Cray challenge */
 
 	/* Hikaru */
 	DRIVER( hikaru ) 	/* BIOS (c)2000 */
-	DRIVER( airtrix )	/* (c) 2000 */
-	DRIVER( pharrier )	/* (c) 2001 */
-	DRIVER( podrace )	/* (c) 2001 */
+						/* 1999.06 Syouboushi Brave Fire Fighters */
+	DRIVER( podrace )	/* 2000.06 Star Wars: Racer Arcade */
+						/* 2000.09 Nascar Arcade */
+	DRIVER( pharrier )	/* 2000.12 Planet Harriers */
+	DRIVER( airtrix )	/* 2001.02 Air Trix */
+						/* 2001.10 Dennou Senki Virtual-On Force */
+						/* 2002.04 Dennou Senki Virtual-On Force ver.7.7 */
+
+	/* Triforce (GameCube based) */
+	DRIVER( triforce )
+	DRIVER( vs2002ex )	/* GDT-0002 2002.10 Virtua Striker 2002 */
+						/* 2003.06 F-ZERO AX */
+						/* 2003.07 Avalon no Kagi */
+						/* 2003.10 Avalon no Kagi ver.1.01 */
+						/* 2003.10 Gekitou Pro Yakyuu Mizushima Shinji All Stars vs. Pro Yakyuu */
+						/* 2003.12 Avalon no Kagi ver.1.10 */
+						/* 2004.04 Avalon no Kagi ver.1.20 Aratanaru Syoukan */
+						/* 2004.07 Avalon no Kagi ver.1.30 Konton no Utage */
+	DRIVER( vs4 )		/* GDT-0015 2004.10 Virtua Striker 4 */
+						/* 2004.11 Avalon no Kagi ver.2.0 Chitsujo to Kairitsu */
+						/* 2005.08 Avalon no Kagi ver.2.5 Kagi Seisen */
+
+	/* Chihiro (X-Box based) */
+	DRIVER( chihiro )
+						/* 2002.12 The House of the Dead III */
+						/* 2003.03 Crazy Taxi High Roller */
+	DRIVER( vcop3 )		/* 2003.04 Virtua Cop 3 */
+						/* 2003.12 Outrun 2 */
+						/* 2004.03 Ollie King */
+						/* 2004.07 Wangan Midnight Maximum Tune */
+						/* 2004.09 Quest of D */
+						/* 2004.11 Sega Golf Club Network Pro Tour */
+						/* 2004.12 Outrun 2 Special Tours */
+						/* 2004.12 Quest of D ver.1.10 */
+	DRIVER( ghostsqu )	/* 2004.12 Ghost Squad */
+						/* 2005.03 Kidou Senshi Gundam Battle Operating Simulator */
+						/* 2005.03 Sangokushi Taisen */
+						/* 2005.04 Wangan Midnight Maximum Tune 2 */
+						/* 2005.05 Quest of D ver.1.20 */
+						/* 2005.06 Sega Golf Club Network Pro Tour 2005 */
+						/* 2005.09 Quest of D ver.1.21 */
+						/* 2005.10 Sangokushi Taisen Ranse no Gunrou ver.1.100 */
+						/* 2005.10 Wangan Midnight Maximum Tune 2 ver.B */
+						/* 2005.12 Kidou Senshi Gundam 0079 Card Builder */
+						/* 2005.12 Quest of D ver.2.01 Gofu no Keisyousya */
+						/* 2005.12 Sega Golf Club 2006 Next Tours */
+						/* 2006.05 Sangokushi Taisen 2 */
+						/* 2007.03 Kidou Senshi Gundam 0083 Card Builder */
+						/* 2007.10 Kidou Senshi Gundam 0083 Card Builder Ryouyuu Gekitotsu */
 
 	DRIVER( hshavoc )	/* (c) 1993 Data East */
 
@@ -5049,49 +5242,52 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( konamigx )
 
 	/* GX Type 1 */
-	DRIVER( racinfrc )	/* GX250 (c) 1994 */
-	DRIVER( racinfru )	/* GX250 (c) 1994 */
-	DRIVER( opengolf )	/* GX218 (c) 1994 */
-	DRIVER( opengol2 )	/* GX218 (c) 1994 */
-	DRIVER( ggreats2 )	/* GX218 (c) 1994 */
+	DRIVER( racinfrc )	/* 1994.?? GX250 (Europe) */
+	DRIVER( racinfru )	/* 1994.03 GX250 (US) */
+						/* 1994.02 (Japan) */
+	DRIVER( opengolf )	/* 1994.?? GX218 (Europe) */
+	DRIVER( opengol2 )	/* 1994.?? GX218 (Europe) */
+	DRIVER( ggreats2 )	/* 1994.03 GX218 (Japan) */
+						/* 1995.03 GX218 (US) */
 
 	/* GX Type 2 */
-	DRIVER( le2 )		/* GX312 (c) 1994 */
-	DRIVER( le2u )		/* GX312 (c) 1994 */
-	DRIVER( le2j )		/* GX312 (c) 1994 */
-	DRIVER( puzldama )	/* GX315 (c) 1994 (Japan) */
-	DRIVER( gokuparo )	/* GX321 (c) 1994 (Japan) */
-	DRIVER( fantjour )	/* GX321 (c) 1994 */
-	DRIVER( dragoona )	/* GX417 (c) 1995 (Asia) */
-	DRIVER( dragoonj )	/* GX417 (c) 1995 (Japan) */
-	DRIVER( tbyahhoo )	/* GX424 (c) 1995 (Japan) */
-	DRIVER( tkmmpzdm )	/* GX515 (c) 1995 (Japan) */
-	DRIVER( salmndr2 )	/* GX521 (c) 1996 (Japan) */
-	DRIVER( salmnd2a )	/* GX521 (c) 1996 (Asia) */
-	DRIVER( sexyparo )	/* GX533 (c) 1996 (Japan) */
-	DRIVER( daiskiss )	/* GX535 (c) 1996 (Japan) */
-	DRIVER( tokkae )	/* GX615 (c) 1996 (Japan) */
-	DRIVER( winspike )	/* GX705 (c) 1997 EAA */
-	DRIVER( winspikj )	/* GX705 (c) 1997 JAA */
+	DRIVER( le2 )		/* 1994.?? GX312 (Europe) */
+	DRIVER( le2u )		/* 1994.04 GX312 (US) */
+	DRIVER( le2j )		/* 1994.06 GX312 (Japan) */
+	DRIVER( puzldama )	/* 1994.07 GX315 (Japan) */
+	DRIVER( gokuparo )	/* 1994.04 GX321 (Japan) */
+	DRIVER( fantjour )	/* 1994.?? GX321 (US?) */
+	DRIVER( dragoona )	/* 1995.?? GX417 (Asia) */
+	DRIVER( dragoonj )	/* 1995.08 GX417 (Japan) */
+	DRIVER( tbyahhoo )	/* 1995.04 GX424 (Japan) */
+	DRIVER( tkmmpzdm )	/* 1995.12 GX515 (Japan) */
+	DRIVER( salmndr2 )	/* 1996.01 GX521 (Japan) */
+	DRIVER( salmnd2a )	/* 1996.?? GX521 (Asia) */
+	DRIVER( sexyparo )	/* 1996.02 GX533 (Japan) */
+	DRIVER( daiskiss )	/* 1996.03 GX535 (Japan) */
+	DRIVER( tokkae )	/* 1996.10 GX615 (Japan) */
+	DRIVER( winspike )	/* 1997.?? GX705 (Europe) */
+	DRIVER( winspikj )	/* 1997.07 GX705 (Japan) */
 
 	/* GX Type 3 */
-	DRIVER( soccerss )	/* GX427 (c) 1994 */
-	DRIVER( soccersj )	/* GX427 (c) 1994 */
-	DRIVER( soccersa )	/* GX427 (c) 1994 */
+	DRIVER( soccerss )	/* 1994.?? GX427 (Europe) */
+	DRIVER( soccersj )	/* 1994.12 GX427 (Japan) */
+	DRIVER( soccersa )	/* 1994.?? GX427 (Asia) */
+						/* 1995.04 GX427 (US) */
 
 	/* GX Type 4 */
-	DRIVER( vsnetscr )	/* GX627 (c) 1996 */
-	DRIVER( vsnetseb )	/* GX627 (c) 1996 */
-	DRIVER( vsnetscu )	/* GX627 (c) 1996 */
-	DRIVER( vsnetsca )	/* GX627 (c) 1996 */
-	DRIVER( vsnetscj )	/* GX627 (c) 1996 */
-	DRIVER( rungun2 )	/* GX505 (c) 1996 */
-	DRIVER( slamdnk2 )	/* GX505 (c) 1996 */
-	DRIVER( rushhero )	/* GX605 (c) 1996 */
+	DRIVER( vsnetscr )	/* 1996.?? GX627 (Europe) */
+	DRIVER( vsnetseb )	/* 1996.?? GX627 (Europe) */
+	DRIVER( vsnetscu )	/* 1996.?? GX627 (US) */
+	DRIVER( vsnetsca )	/* 1996.?? GX627 (Asia) */
+	DRIVER( vsnetscj )	/* 1996.12 GX627 (Japan) */
+	DRIVER( rungun2 )	/* 1996.03 GX505 (US) */
+	DRIVER( slamdnk2 )	/* 1996.03 GX505 (Japan) */
+	DRIVER( rushhero )	/* 1997.10 GX605 (US) */
 
 	/* 68k + HD */
-	DRIVER( qdrmfgp )	/* GQ460 (c) 1994 (Japan) */
-	DRIVER( qdrmfgp2 )	/* GE557 (c) 1995 (Japan) */
+	DRIVER( qdrmfgp )	/* 1994.12 GQ460 (Japan) */
+	DRIVER( qdrmfgp2 )	/* 1995.09 GE557 (Japan) */
 
 	/* DJ Main */
 	DRIVER( bm1stmix )	/* GQ753 (c) 1997 (Japan) */
@@ -6953,6 +7149,9 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
     2002: ATV Track
     */
 
+	/* Galeco PC based games */
+	DRIVER( tokyocop )
+
 	/* Kaneko games */
 	DRIVER( hvyunit )	/* (c) 1988 Kaneko */
 	DRIVER( hvyunitj )	/* (c) 1988 Kaneko */
@@ -7007,28 +7206,28 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 
 	/* Kaneko "Super Nova System" games */
 	DRIVER( skns )
-	DRIVER( galpani4 )	/* (c) 1996 Kaneko (Japan) */
-	DRIVER( galpanis )	/* (c) 1997 Kaneko (Japan) */
-	DRIVER( sengekis )	/* (c) 1997 Kaneko / Warashi (Asia) */
-	DRIVER( sengekij )	/* (c) 1997 Kaneko / Warashi (Japan) */
-	DRIVER( vblokbrk )	/* (c) 1997 Kaneko / Mediaworks (Asia) */
-	DRIVER( sarukani )	/* (c) 1997 Kaneko / Mediaworks (Japan) */
-	DRIVER( cyvern )	/* (c) 1998 Kaneko (Japan) */
-	DRIVER( galpans2 )	/* (c) 1999 Kaneko (Japan) */
-	DRIVER( galpans2a )	/* (c) 1999 Kaneko (Asia) */
-	DRIVER( galpansu )	/* (c) 1999 Kaneko (Korea) */
-	DRIVER( panicstr )	/* (c) 1999 Kaneko (Japan) */
-	DRIVER( senknow )	/* (c) 1999 Kaneko / Kouyousha (Japan) */
-	DRIVER( gutsn )		/* (c) 2000 Kaneko / Kouyousha (Japan) */
-	DRIVER( puzzloop )	/* (c) 1998 Mitchell (Europe) */
-	DRIVER( puzzloopj )	/* (c) 1998 Mitchell (Japan) */
-	DRIVER( puzzloopk )	/* (c) 1998 Mitchell (Korea) */
-	DRIVER( puzzloopu )	/* (c) 1998 Mitchell (USA) */
-	DRIVER( jjparads )	/* (c) 1996 Electro Design Co. (Japan) */
-	DRIVER( jjparad2 )	/* (c) 1997 Electro Design Co. (Japan) */
-	DRIVER( ryouran )	/* (c) 1998 Electro Design Co. (Japan) */
-	DRIVER( teljan )	/* (c) 1999 Electro Design Co. (Japan) */
-	DRIVER( galpans3 )	/* (c) 2002 Kaneko (Japan) */
+	DRIVER( galpani4 )	/* 1996.09 (c) 1996 Kaneko (Japan) */
+	DRIVER( jjparads )	/* 1996.12 (c) 1996 Electro Design Co. (Japan) */
+	DRIVER( sarukani )	/* 1997.01 (c) 1997 Kaneko / Mediaworks (Japan) */
+	DRIVER( vblokbrk )	/* 1997.?? (c) 1997 Kaneko / Mediaworks (Asia) */
+	DRIVER( galpanis )	/* 1997.04 (c) 1997 Kaneko (Japan) */
+	DRIVER( sengekis )	/* 1997.?? (c) 1997 Kaneko / Warashi (Asia) */
+	DRIVER( sengekij )	/* 1997.07 (c) 1997 Kaneko / Warashi (Japan) */
+	DRIVER( jjparad2 )	/* 1997.12 (c) 1997 Electro Design Co. (Japan) */
+	DRIVER( cyvern )	/* 1998.02 (c) 1998 Kaneko (Japan) */
+	DRIVER( ryouran )	/* 1998.07 (c) 1998 Electro Design Co. (Japan) */
+	DRIVER( puzzloop )	/* 1998.?? (c) 1998 Mitchell (Europe) */
+	DRIVER( puzzloopj )	/* 1998.12 (c) 1998 Mitchell (Japan) */
+	DRIVER( puzzloopk )	/* 1998.?? (c) 1998 Mitchell (Korea) */
+	DRIVER( puzzloopu )	/* 1999.05 (c) 1998 Mitchell (USA) */
+	DRIVER( galpans2 )	/* 1999.02 (c) 1999 Kaneko (Japan) */
+	DRIVER( galpans2a )	/* 1999.?? (c) 1999 Kaneko (Asia) */
+	DRIVER( galpansu )	/* 1999.?? (c) 1999 Kaneko (Korea) */
+	DRIVER( senknow )	/* 1999.04 (c) 1999 Kaneko / Kouyousha (Japan) */
+	DRIVER( panicstr )	/* 1999.09 (c) 1999 Kaneko (Japan) */
+	DRIVER( teljan )	/* 1999.11 (c) 1999 Electro Design Co. (Japan) */
+	DRIVER( gutsn )		/* 2000.06 (c) 2000 Kaneko / Kouyousha (Japan) */
+	DRIVER( galpans3 )	/* 2002.07 (c) 2002 Kaneko (Japan) */
 
 	/* Seta games (seta.c) */
 	DRIVER( hanaawas )	/* (c) SetaKikaku */
@@ -7213,19 +7412,13 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( blocken )	/* (c) 1994 KID / Visco */
 /*
 Other Sun games
-1978 (GT)Block Perfect
-1978 (GT)Block Challenger
-1979 Galaxy Force
-1979 Run Away
-1979 Dai San Wakusei (The Third Planet)
-1979 Warp 1
-1980 Cosmo Police (Cosmopolis?)
-1985 Ikki
-1993 Saikyou Battler Retsuden
-1995 Shanghai Banri no Choujou (ST-V)
-1996 Karaoke Quiz Intro DonDon (ST-V)
-1998 Astra Super Stars (ST-V)
-1998 Shanghai Mateki Buyuu (TPS)
+1978.11 (GT)Block Perfect
+1978.12 (GT)Block Challenger
+1979.04 Galaxy Force
+1979.07 Run Away
+1979.09 Dai San Wakusei (The Third Planet)
+1979.12 Warp 1
+1980.10 Cosmo Police (Cosmopolis?)
 */
 
 	/* SunA games */
@@ -7604,8 +7797,9 @@ Other Sun games
 	DRIVER( chleagul )	/* (c) 199? IGS */
 	DRIVER( number10 )	/* (c) IGS (Board labeled Playmark Srl) */
 	DRIVER( numbr10l )	/* (c) IGS (Board labeled Playmark Srl) */
-	DRIVER( citalian )
-	DRIVER( citaliana )
+	DRIVER( cpokerpk )	/* (c) SGS (bootleg blue board) */
+	DRIVER( cpokerpkg )	/* (c) SGS (bootleg green board) */
+	DRIVER( citalcup )	/* (c) SGS (bootleg of IGS v220it) */
 	DRIVER( stellecu )	/* (c) 1998 */
 	DRIVER( iqblock )	/* (c) 1993 */
 	DRIVER( grndtour )	/* (c) 1993 */
@@ -7680,9 +7874,11 @@ Other Sun games
   	DRIVER( kov2 )		/* (c) 2000 */
  	DRIVER( kov2106 )	/* (c) 2000 */
   	DRIVER( kov2p )		/* (c) 2000 */
+  	DRIVER( kov2p205 )	/* (c) 2000 */
 	DRIVER( ddp2 )		/* (c) 2001 */
 	DRIVER( puzzli2 )	/* (c) 2001 */
 	DRIVER( martmast )	/* (c) 2001 */
+	DRIVER( martmasc )	/* (c) 2001 */
 	DRIVER( theglad )	/* (c) 2001 */
 	DRIVER( dmnfrnt )	/* (c) 2002 */
 	DRIVER( dmnfrnta )	/* (c) 2002 */
@@ -7861,6 +8057,7 @@ Other Sun games
 	DRIVER( lsrquiz2 )	/* (c) 1995 */
 	DRIVER( mgprem11 )	/* (c) 1995 */
 	DRIVER( lasstixx )	/* (c) 1995 */
+	DRIVER( mgnumber )	/* (c) 1995 */
 
 	/* American Laser Games */
 	DRIVER( alg_bios )
@@ -8148,6 +8345,7 @@ Other Sun games
 	DRIVER( eggvent7 )	/* (c) 1997 The Game Room */
 	DRIVER( eggventa )	/* (c) 1997 The Game Room (Allied Leisure license) */
 	DRIVER( eggvntdx )	/* (c) 1997 The Game Room */
+	DRIVER( calchase )  /* (c) 1999 The Game Room */
 	DRIVER( ripribit )	/* (c) 1997 LAI Games */
 	DRIVER( cfarm )		/* (c) 1999 LAI Games */
 	DRIVER( cclownz )	/* (c) 1999 LAI Games */
@@ -8164,6 +8362,7 @@ Other Sun games
 	DRIVER( luplup29 )	/* (c) 1999 Omega System */
 	DRIVER( puzlbang )	/* (c) 1999 Omega System */
 	DRIVER( suplup )	/* (c) 1999 Omega System */
+	DRIVER( jmpbreak )	/* (c) 1999 F2 System */
 	DRIVER( vamphalf )	/* (c) 1999 DanBi & F2 System */
 	DRIVER( vamphafk )	/* (c) 1999 DanBi & F2 System */
 	DRIVER( dquizgo2 )	/* (c) 2000 Semicom */
@@ -8375,6 +8574,7 @@ Other Sun games
 	DRIVER( ampkr2b1 )	/* 1990 bootleg */
 	DRIVER( ampkr2b2 )	/* 1990 bootleg */
 	DRIVER( ampkr2b3 )	/* 1994 bootleg */
+	DRIVER( ampkr2b4 )	/* 1994 bootleg */
 	DRIVER( ampkr228 )	/* 1990 bootleg */
 	DRIVER( pkrdewin )	/* 1990 bootleg */
 	DRIVER( ampkr95 )	/* 1995 bootleg */
@@ -8668,6 +8868,7 @@ Other Sun games
 	/* Sure games */
 	DRIVER( mil4000 )	/* (c) 2000 Sure Milano */
 	DRIVER( mil4000a )	/* (c) 2000 Sure Milano */
+	DRIVER( mil4000b )	/* (c) 2000 Sure Milano */
 
 	/* Mitsubishi/Renesas M16/62A italian gambling games */
 	DRIVER( ejollyx5 )	/* (c) 200? Solar Games */
@@ -8964,6 +9165,8 @@ Other Sun games
 	DRIVER( atworld )
 	DRIVER( atworlda )
 
+	DRIVER( chsuper3 )	/* unknown */
+	DRIVER( chsuper2 )	/* unknown */
 	DRIVER( 3super8 )	/* unknown */
 	DRIVER( buster )	/* (c) 1987 Marian Electronics Ltd. */
 	DRIVER( spielbud )	/* (c) 1985 ADP */
@@ -8979,10 +9182,19 @@ Other Sun games
 	/* Sanki Denshi Kogyo */
 	DRIVER( pachifev )	/* (c) 1983? */
 
+	/* New Image Technologies */
+	DRIVER( bonanza )     /* (c) 1993 */
+	DRIVER( bonanzar2 )   /* (c) 1993 */
+	DRIVER( streetg )     /* (c) 1993 */
+	DRIVER( streetgr3 )   /* (c) 1993 */
+	DRIVER( streetg2 )    /* (c) 1993 */
+	DRIVER( streetg2r5 )  /* (c) 1993 */
+
 	/* Igrosoft - SHA1 information is not available for commented out sets, only MD5/CRC32 */
+
+	/* Multifish */
 	//DRIVER( mfish )
-	DRIVER( mfish_2 )
-	DRIVER( mfish_2a )
+	//DRIVER( mfish_2 )
 	//DRIVER( mfish_3 )
 	//DRIVER( mfish_4 )
 	//DRIVER( mfish_5 )
@@ -8992,9 +9204,58 @@ Other Sun games
 	//DRIVER( mfish_9 )
 	//DRIVER( mfish_10 )
 	//DRIVER( mfish_11 )
-	//DRIVER( mfish_12 )
-	//DRIVER( mfish_13 )
+	DRIVER( mfish_12 )
+	DRIVER( mfish_12a )
 
+	/* Crazy Monkey */
+	//DRIVER( crzmon )
+	//DRIVER( crzmon_2 )
+	//DRIVER( crzmon_3 )
+	//DRIVER( crzmon_4 )
+	//DRIVER( crzmon_5 )
+	//DRIVER( crzmon_6 )
+	DRIVER( crzmon_7 )
+
+	/* Fruit Cocktail */
+	//DRIVER( fcock )
+	//DRIVER( fcock_2 )
+	//DRIVER( fcock_3 )
+	//DRIVER( fcock_4 )
+	//DRIVER( fcock_5 )
+	DRIVER( fcock_6 )
+
+	/* Lucky Haunter */
+	//DRIVER( lhaunt )
+	//DRIVER( lhaunt_2 )
+	//DRIVER( lhaunt_3 )
+	DRIVER( lhaunt_4 )
+	DRIVER( lhaunt_5 )
+	DRIVER( lhaunt_6 )
+
+	/* Garage */
+	//DRIVER( garage )
+	//DRIVER( garage_2 )
+	//DRIVER( garage_3 )
+	DRIVER( garage_4 )
+
+	/* Rock Climber */
+	//DRIVER( rclimb )
+	//DRIVER( rclimb_2 )
+	DRIVER( rclimb_3 )
+
+	/* Sweet Life */
+	DRIVER( sweetl )
+
+	/* Resident */
+	//DRIVER( resdnt )
+	DRIVER( resdnt_2 )
+
+	/* Rollfruit */
+	//DRIVER( rollfr )
+	//DRIVER( rollfr_2 )
+
+	/* Island */
+	DRIVER( island )
 
 
 	/* Drivers below are mechanical games, usually with no video display, requiring external artwork to function.
@@ -9032,6 +9293,9 @@ Other Sun games
 
 	/* System85 games */
 	DRIVER( m_supcrd )	/* (c) 198? BFM */
+
+	/* JPM Impact games */
+	DRIVER( m_tbirds )
 
 	/* Scorpion1 games */
 	DRIVER( m_lotsse )	/* (c) 198? BFM Dutch ROMS, prelim*/

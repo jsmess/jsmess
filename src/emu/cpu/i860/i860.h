@@ -19,6 +19,7 @@
 #define __I860_H__
 
 #include "cpuintrf.h"
+#include "debugger.h"
 
 /***************************************************************************
     REGISTER ENUMERATION
@@ -176,6 +177,15 @@ typedef struct {
 	int icount;
 
 } i860_state_t;
+
+INLINE i860_state_t *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_I860);
+	return (i860_state_t *)device->token;
+}
 
 
 /***************************************************************************

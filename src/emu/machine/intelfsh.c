@@ -50,7 +50,7 @@ static struct flash_chip chips[FLASH_CHIPS_MAX];
 
 static TIMER_CALLBACK( erase_finished )
 {
-	struct flash_chip *c = ptr;
+	struct flash_chip *c = (struct flash_chip *)ptr;
 
 	switch( c->flash_mode )
 	{
@@ -98,6 +98,7 @@ void intelflash_init(running_machine *machine, int chip, int type, void *data)
 		c->device_id = 0xaa;
 		break;
 	case FLASH_SHARP_LH28F400:
+	case FLASH_INTEL_E28F400:
 		c->bits = 16;
 		c->size = 0x80000;
 		c->maker_id = 0xb0;
@@ -159,13 +160,13 @@ UINT32 intelflash_read(int chip, UINT32 address)
 		{
 		case 8:
 			{
-				UINT8 *flash_memory = c->flash_memory;
+				UINT8 *flash_memory = (UINT8 *)c->flash_memory;
 				data = flash_memory[ address ];
 			}
 			break;
 		case 16:
 			{
-				UINT16 *flash_memory = c->flash_memory;
+				UINT16 *flash_memory = (UINT16 *)c->flash_memory;
 				data = flash_memory[ address ];
 			}
 			break;
@@ -345,13 +346,13 @@ void intelflash_write(int chip, UINT32 address, UINT32 data)
 			{
 			case 8:
 				{
-					UINT8 *flash_memory = c->flash_memory;
+					UINT8 *flash_memory = (UINT8 *)c->flash_memory;
 					memset( &flash_memory[ address & ~0xffff ], 0xff, 64 * 1024 );
 				}
 				break;
 			case 16:
 				{
-					UINT16 *flash_memory = c->flash_memory;
+					UINT16 *flash_memory = (UINT16 *)c->flash_memory;
 					memset( &flash_memory[ address & ~0x7fff ], 0xff, 64 * 1024 );
 				}
 				break;
@@ -372,7 +373,7 @@ void intelflash_write(int chip, UINT32 address, UINT32 data)
 		{
 		case 8:
 			{
-				UINT8 *flash_memory = c->flash_memory;
+				UINT8 *flash_memory = (UINT8 *)c->flash_memory;
 				flash_memory[ address ] = data;
 			}
 			break;
@@ -387,13 +388,13 @@ void intelflash_write(int chip, UINT32 address, UINT32 data)
 		{
 		case 8:
 			{
-				UINT8 *flash_memory = c->flash_memory;
+				UINT8 *flash_memory = (UINT8 *)c->flash_memory;
 				flash_memory[ address ] = data;
 			}
 			break;
 		case 16:
 			{
-				UINT16 *flash_memory = c->flash_memory;
+				UINT16 *flash_memory = (UINT16 *)c->flash_memory;
 				flash_memory[ address ] = data;
 			}
 			break;
@@ -412,13 +413,13 @@ void intelflash_write(int chip, UINT32 address, UINT32 data)
 			{
 			case 8:
 				{
-					UINT8 *flash_memory = c->flash_memory;
+					UINT8 *flash_memory = (UINT8 *)c->flash_memory;
 					memset( &flash_memory[ address & ~0xffff ], 0xff, 64 * 1024 );
 				}
 				break;
 			case 16:
 				{
-					UINT16 *flash_memory = c->flash_memory;
+					UINT16 *flash_memory = (UINT16 *)c->flash_memory;
 					memset( &flash_memory[ address & ~0x7fff ], 0xff, 64 * 1024 );
 				}
 				break;

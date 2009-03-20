@@ -964,33 +964,6 @@ static INPUT_PORTS_START( system16a_generic )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( system16a_2button )
-	PORT_INCLUDE( system16a_generic )
-
-	PORT_MODIFY("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_MODIFY("P2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-INPUT_PORTS_END
-
-
-static INPUT_PORTS_START( system16a_1button )
-	PORT_INCLUDE( system16a_generic )
-
-	PORT_MODIFY("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_MODIFY("P2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_COCKTAIL
-INPUT_PORTS_END
-
-
-
 /*************************************
  *
  *  Game-specific port definitions
@@ -1084,7 +1057,7 @@ static INPUT_PORTS_START( aceattaa )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( afighter )
-	PORT_INCLUDE( system16a_2button )
+	PORT_INCLUDE( system16a_generic )
 
 	PORT_MODIFY("DSW2")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:1")
@@ -1113,7 +1086,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( alexkidd )
-	PORT_INCLUDE( system16a_2button )
+	PORT_INCLUDE( system16a_generic )
 
 	PORT_MODIFY("DSW2")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Continues ) ) PORT_DIPLOCATION("SW2:1")
@@ -1141,7 +1114,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( aliensyn )
-	PORT_INCLUDE( system16a_1button )
+	PORT_INCLUDE( system16a_generic )
 
 	PORT_MODIFY("DSW2")
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:2")
@@ -1166,7 +1139,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( aliensy1 )
-	PORT_INCLUDE( system16a_1button )
+	PORT_INCLUDE( system16a_generic )
 
 	PORT_MODIFY("DSW2")
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:2")
@@ -1201,7 +1174,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( fantzone )
-	PORT_INCLUDE( system16a_2button )
+	PORT_INCLUDE( system16a_generic )
 
 	PORT_MODIFY("DSW2")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:1")
@@ -1441,7 +1414,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( quart2 )
-	PORT_INCLUDE( system16a_2button )
+	PORT_INCLUDE( system16a_generic )
 
 	PORT_MODIFY("DSW2")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:1")
@@ -1605,7 +1578,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( tetris )
-	PORT_INCLUDE( system16a_1button )
+	PORT_INCLUDE( system16a_generic )
 
 	PORT_MODIFY("P1")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1629,7 +1602,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( timescan )
-	PORT_INCLUDE( system16a_2button )
+	PORT_INCLUDE( system16a_generic )
 
 	PORT_MODIFY("P1")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1695,7 +1668,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( wb3 )
-	PORT_INCLUDE( system16a_2button )
+	PORT_INCLUDE( system16a_generic )
 
 	PORT_MODIFY("DSW2")
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:2")

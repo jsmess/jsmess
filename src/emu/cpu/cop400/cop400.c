@@ -148,9 +148,11 @@ struct _cop400_state
 	emu_timer *microbus_timer;
 };
 
+typedef void (*cop400_opcode_func) (cop400_state *cpustate, UINT8 opcode);
+
 struct _cop400_opcode_map {
 	unsigned cycles;
-	void (*function) (cop400_state *cpustate, UINT8 opcode);
+	cop400_opcode_func function;
 };
 
 /***************************************************************************
@@ -251,6 +253,27 @@ static const cpu_state_table state_table_template =
 /***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
+
+INLINE cop400_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_COP401 ||
+		   cpu_get_type(device) == CPU_COP410 ||
+		   cpu_get_type(device) == CPU_COP411 ||
+		   cpu_get_type(device) == CPU_COP402 ||
+		   cpu_get_type(device) == CPU_COP420 ||
+		   cpu_get_type(device) == CPU_COP421 ||
+		   cpu_get_type(device) == CPU_COP422 ||
+		   cpu_get_type(device) == CPU_COP404 ||
+		   cpu_get_type(device) == CPU_COP424 ||
+		   cpu_get_type(device) == CPU_COP425 ||
+		   cpu_get_type(device) == CPU_COP426 ||
+		   cpu_get_type(device) == CPU_COP444 ||
+		   cpu_get_type(device) == CPU_COP445);
+	return (cop400_state *)device->token;
+}
 
 INLINE void PUSH(cop400_state *cpustate, UINT16 data)
 {
@@ -712,7 +735,7 @@ static const cop400_opcode_map COP444_OPCODE_MAP[256] =
 
 static TIMER_CALLBACK( serial_tick )
 {
-	cop400_state *cpustate = ptr;
+	cop400_state *cpustate = (cop400_state *)ptr;
 
 	if (BIT(EN, 0))
 	{
@@ -787,7 +810,7 @@ static TIMER_CALLBACK( serial_tick )
 
 static TIMER_CALLBACK( counter_tick )
 {
-	cop400_state *cpustate = ptr;
+	cop400_state *cpustate = (cop400_state *)ptr;
 
 	T++;
 
@@ -805,7 +828,7 @@ static TIMER_CALLBACK( counter_tick )
 
 static TIMER_CALLBACK( inil_tick )
 {
-	cop400_state *cpustate = ptr;
+	cop400_state *cpustate = (cop400_state *)ptr;
 	UINT8 in;
 	int i;
 
@@ -824,7 +847,7 @@ static TIMER_CALLBACK( inil_tick )
 
 static TIMER_CALLBACK( microbus_tick )
 {
-	cop400_state *cpustate = ptr;
+	cop400_state *cpustate = (cop400_state *)ptr;
 	UINT8 in;
 
 	in = IN_IN();
@@ -858,7 +881,7 @@ static TIMER_CALLBACK( microbus_tick )
 
 static void cop400_init(const device_config *device, UINT8 g_mask, UINT8 d_mask, UINT8 in_mask, int has_counter, int has_inil)
 {
-	cop400_state *cpustate = device->token;
+	cop400_state *cpustate = get_safe_token(device);
 
 	cpustate->intf = (cop400_interface *) device->static_config;
 
@@ -939,7 +962,7 @@ static void cop400_init(const device_config *device, UINT8 g_mask, UINT8 d_mask,
 
 static void cop410_init_opcodes(const device_config *device)
 {
-	cop400_state *cpustate = device->token;
+	cop400_state *cpustate = get_safe_token(device);
 	int i;
 
 	/* set up the state table */
@@ -970,7 +993,7 @@ static void cop410_init_opcodes(const device_config *device)
 
 static void cop420_init_opcodes(const device_config *device)
 {
-	cop400_state *cpustate = device->token;
+	cop400_state *cpustate = get_safe_token(device);
 	int i;
 
 	/* set up the state table */
@@ -1005,7 +1028,7 @@ static void cop420_init_opcodes(const device_config *device)
 
 static void cop444_init_opcodes(const device_config *device)
 {
-	cop400_state *cpustate = device->token;
+	cop400_state *cpustate = get_safe_token(device);
 	int i;
 
 	/* set up the state table */
@@ -1098,7 +1121,7 @@ static CPU_INIT( cop445 )
 
 static CPU_RESET( cop400 )
 {
-	cop400_state *cpustate = device->token;
+	cop400_state *cpustate = get_safe_token(device);
 
 	PC = 0;
 	A = 0;
@@ -1122,7 +1145,7 @@ static CPU_RESET( cop400 )
 
 static CPU_EXECUTE( cop400 )
 {
-	cop400_state *cpustate = device->token;
+	cop400_state *cpustate = get_safe_token(device);
 
 	UINT8 opcode;
 
@@ -1185,7 +1208,7 @@ static CPU_EXECUTE( cop400 )
 
 			if (BIT(EN, 1) && BIT(IL, 1))
 			{
-				void *function = cpustate->opcode_map[ROM(PC)].function;
+				cop400_opcode_func function = cpustate->opcode_map[ROM(PC)].function;
 
 				if ((function != jp) &&	(function != jmp) && (function != jsr))
 				{
@@ -1210,7 +1233,7 @@ static CPU_EXECUTE( cop400 )
 
 			if (cpustate->skip)
 			{
-				void *function = cpustate->opcode_map[ROM(PC)].function;
+				cop400_opcode_func function = cpustate->opcode_map[ROM(PC)].function;
 
 				opcode = ROM(PC);
 
@@ -1336,7 +1359,7 @@ static CPU_SET_INFO( cop400 )
 
 static CPU_GET_INFO( cop400 )
 {
-	cop400_state *cpustate = (device != NULL) ? device->token : NULL;
+	cop400_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{
@@ -1391,7 +1414,7 @@ static CPU_GET_INFO( cop400 )
 
 CPU_GET_INFO( cop410 )
 {
-	cop400_state *cpustate = (device != NULL) ? device->token : NULL;
+	cop400_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{
@@ -1454,7 +1477,7 @@ CPU_GET_INFO( cop401 )
 
 CPU_GET_INFO( cop420 )
 {
-	cop400_state *cpustate = (device != NULL) ? device->token : NULL;
+	cop400_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{
@@ -1535,7 +1558,7 @@ CPU_GET_INFO( cop402 )
 
 CPU_GET_INFO( cop444 )
 {
-	cop400_state *cpustate = (device != NULL) ? device->token : NULL;
+	cop400_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

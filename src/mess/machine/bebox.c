@@ -500,8 +500,8 @@ static const device_config *ide_device(running_machine *machine)
 	return devtag_get_device(machine, "ide_controller");
 }
 
-static READ8_HANDLER( bebox_800001F0_8_r ) { return ide_controller_r(ide_device(space->machine), offset + 0x1F0); }
-static WRITE8_HANDLER( bebox_800001F0_8_w ) { ide_controller_w(ide_device(space->machine), offset + 0x1F0, data); }
+static READ8_HANDLER( bebox_800001F0_8_r ) { return ide_controller_r(ide_device(space->machine), offset + 0x1F0, 1); }
+static WRITE8_HANDLER( bebox_800001F0_8_w ) { ide_controller_w(ide_device(space->machine), offset + 0x1F0, 1, data); }
 
 READ64_HANDLER( bebox_800001F0_r ) { return read64be_with_read8_handler(bebox_800001F0_8_r, space, offset, mem_mask); }
 WRITE64_HANDLER( bebox_800001F0_w ) { write64be_with_write8_handler(bebox_800001F0_8_w, space, offset, data, mem_mask); }
@@ -514,13 +514,13 @@ READ64_HANDLER( bebox_800003F0_r )
 	if (((mem_mask >> 8) & 0xFF) == 0)
 	{
 		result &= ~(0xFF << 8);
-		result |= ide_controller_r(ide_device(space->machine), 0x3F6) << 8;
+		result |= ide_controller_r(ide_device(space->machine), 0x3F6, 1) << 8;
 	}
 
 	if (((mem_mask >> 0) & 0xFF) == 0)
 	{
 		result &= ~(0xFF << 0);
-		result |= ide_controller_r(ide_device(space->machine), 0x3F7) << 0;
+		result |= ide_controller_r(ide_device(space->machine), 0x3F7, 1) << 0;
 	}
 	return result;
 }
@@ -531,10 +531,10 @@ WRITE64_HANDLER( bebox_800003F0_w )
 	write64be_with_write8_handler(pc_fdc_w, space, offset, data, mem_mask | 0xFFFF);
 
 	if (((mem_mask >> 8) & 0xFF) == 0)
-		ide_controller_w(ide_device(space->machine), 0x3F6, (data >> 8) & 0xFF);
+		ide_controller_w(ide_device(space->machine), 0x3F6, 1, (data >> 8) & 0xFF);
 
 	if (((mem_mask >> 0) & 0xFF) == 0)
-		ide_controller_w(ide_device(space->machine), 0x3F7, (data >> 0) & 0xFF);
+		ide_controller_w(ide_device(space->machine), 0x3F7, 1, (data >> 0) & 0xFF);
 }
 
 

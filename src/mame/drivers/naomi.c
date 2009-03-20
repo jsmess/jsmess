@@ -664,7 +664,7 @@ Notes:
 
 #define CPU_CLOCK (200000000)
 static UINT32 *dc_sound_ram;
-
+static UINT64 *naomi_ram64;
                                              /* MD2 MD1 MD0 MD6 MD4 MD3 MD5 MD7 MD8 */
 static const struct sh4_config sh4cpu_config = {  1,  0,  1,  0,  0,  0,  1,  1,  0, CPU_CLOCK };
 
@@ -751,7 +751,7 @@ static ADDRESS_MAP_START( naomi_base_map, ADDRESS_SPACE_PROGRAM, 64 )
 	AM_RANGE(0x0103ff00, 0x0103ffff) AM_READWRITE( naomi_unknown1_r, naomi_unknown1_w ) // bios uses it, actual start and end addresses not known
 	AM_RANGE(0x04000000, 0x04ffffff) AM_RAM	AM_SHARE(2) AM_BASE( &dc_texture_ram )      // texture memory 64 bit access
 	AM_RANGE(0x05000000, 0x05ffffff) AM_RAM AM_SHARE(2)                                 // mirror of texture RAM 32 bit access
-	AM_RANGE(0x0c000000, 0x0dffffff) AM_RAM
+	AM_RANGE(0x0c000000, 0x0dffffff) AM_RAM AM_BASE(&naomi_ram64)
 	AM_RANGE(0x10000000, 0x107fffff) AM_WRITE( ta_fifo_poly_w )
 	AM_RANGE(0x10800000, 0x10ffffff) AM_WRITE( ta_fifo_yuv_w )
 	AM_RANGE(0x11000000, 0x11ffffff) AM_RAM AM_SHARE(2)                                 // another mirror of texture memory
@@ -779,7 +779,7 @@ static ADDRESS_MAP_START( naomi_map, ADDRESS_SPACE_PROGRAM, 64 )
 	AM_RANGE(0x0103ff00, 0x0103ffff) AM_READWRITE( naomi_unknown1_r, naomi_unknown1_w ) // bios uses it, actual start and end addresses not known
 	AM_RANGE(0x04000000, 0x04ffffff) AM_RAM	AM_SHARE(2) AM_BASE( &dc_texture_ram )      // texture memory 64 bit access
 	AM_RANGE(0x05000000, 0x05ffffff) AM_RAM AM_SHARE(2)                                 // mirror of texture RAM 32 bit access
-	AM_RANGE(0x0c000000, 0x0dffffff) AM_RAM
+	AM_RANGE(0x0c000000, 0x0dffffff) AM_RAM AM_BASE(&naomi_ram64)
 	AM_RANGE(0x10000000, 0x107fffff) AM_WRITE( ta_fifo_poly_w )
 	AM_RANGE(0x10800000, 0x10ffffff) AM_WRITE( ta_fifo_yuv_w )
 	AM_RANGE(0x11000000, 0x11ffffff) AM_RAM AM_SHARE(2)                                 // another mirror of texture memory
@@ -896,7 +896,7 @@ static MACHINE_DRIVER_START( naomi_base )
 	MDRV_SOUND_ADD("aica", AICA, 0)
 	MDRV_SOUND_CONFIG(aica_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 2.0)
-	MDRV_SOUND_ROUTE(0, "rspeaker", 2.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 2.0)
 MACHINE_DRIVER_END
 
 /*
@@ -2700,8 +2700,6 @@ void naomi_write_keyfile(void)
 }
 #endif
 
-extern void naomi_game_decrypt(UINT64 key, UINT8* region, int length);
-
 /* All games have the regional titles at the start of the IC22 rom in the following order
 
   JAPAN
@@ -2764,7 +2762,7 @@ ROM_START( gundmgd )
 	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdl-0001", 0, SHA1(f525111e2762e5895fd0016a9bd41210c1125499) MD5(dcba598e76646a5a6b6e6da70552a7c5) )
+	DISK_IMAGE_READONLY( "gdl-0001", 0, SHA1(615e19c22f32096f3aad557019a14313b60a4070) )
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 	//PIC16C622A (317-5069-COM)
@@ -2779,7 +2777,7 @@ ROM_START( sfz3ugd )
 	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdl-0002", 0, SHA1(6e7cb0df5feea41ae0b5eb72a92adcd8966595dc) MD5(6340b2527673a8cf387dcda52ecae0ca) )
+	DISK_IMAGE_READONLY( "gdl-0002", 0, SHA1(af4669fdd7ce8e6ec4a170748d401e322a3d7ae8) )
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 	//PIC16C622A (317-5072-COM)
@@ -2793,7 +2791,7 @@ ROM_START( cvsgd )
 	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdl-0004", 0,  SHA1(8f8651527463aa01d40c280c0d9b03b7a0650a32) MD5(2d17eaf881c06bd95847e54878bc2ba9) )
+	DISK_IMAGE_READONLY( "gdl-0004", 0,  SHA1(7a7fba0fbbc769c5120b08e6d692f1ac63a42225) )
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 	//PIC16C622A (317-5076-JPN)
@@ -2808,7 +2806,7 @@ ROM_START( gundmxgd )
 	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdl-0006", 0, SHA1(b95bc07e61e57a62e276ba7fef0ae9a5c19667d9) MD5(90b1980605e7f53b38292ae32d547c8b) )
+	DISK_IMAGE_READONLY( "gdl-0006", 0, SHA1(b28d6598711b5a9c744bbf07ad03fc60962d2e28) )
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 	//PIC16C622A (317-5079-COM)
@@ -2823,7 +2821,7 @@ ROM_START( cvs2gd )
 	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdl-0007a", 0, SHA1(e8f199f2743a63765bcbcd533bbe5eed82f959a8) MD5(1f434e6f610987987d1d130e454f5c74) )
+	DISK_IMAGE_READONLY( "gdl-0007a", 0, SHA1(d6da7a404e5f22df6d4bb049143391cf4505c492) )
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 	//PIC16C622A (317-5078-COM)
@@ -2837,7 +2835,7 @@ ROM_START( ikaruga )
 	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdl-0010", 0, SHA1(3b853be7208f523100690e12a661173d023af9c1) MD5(83f1877b979b0e5fd77ebfa1ddd9fd56) )
+	DISK_IMAGE_READONLY( "gdl-0010", 0, SHA1(65dcc22dd9e9b70975096464ad8e31a4a73dc5fd) )
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 	//PIC16C622A (317-5081-JPN)
@@ -2852,7 +2850,7 @@ ROM_START( ggxx )
 	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdl-0011", 0, SHA1(c08a19acb5641d2fd14b54cc149459c345dae013) MD5(25ab6d42bf07dd26e7033cf201322d9c) )
+	DISK_IMAGE_READONLY( "gdl-0011", 0, SHA1(b7328eb2c588d55284bdcea0fe89bb8e629a8669) )
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 	//PIC16C622A (317-5082-COM)
@@ -2867,7 +2865,7 @@ ROM_START( chocomk )
 	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdl-0014a", 0, SHA1(ee71e76f136b1a25855233a614d5c60a6a3e587d) MD5(1e5a028b0ae5cf3c5602cdc657fa2bc4) )
+	DISK_IMAGE_READONLY( "gdl-0014a", 0, SHA1(f88d8203c8692f51c9492d5549a3ad7d9583dc6f) )
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 	//PIC16C622A (317-5085-JPN)
@@ -2882,7 +2880,7 @@ ROM_START( quizqgd )
 	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdl-0017", 0, SHA1(b6f3fbc81d9aea18551134b93ba3b612254bbc43) MD5(af4be08bf65cbddf2177ccf838c0df20) )
+	DISK_IMAGE_READONLY( "gdl-0017", 0, SHA1(94a9319633388968611892e36691b45c94b4f83f) )
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 	//PIC16C622A (317-5090-JPN)
@@ -2896,7 +2894,7 @@ ROM_START( ggxxrl )
 	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdl-0019a", 0, SHA1(50ec9bba5a7ba71f8543763cb139bab46dc487a5) MD5(b09c865e3e06e6e4467acf45b04e9caa) )
+	DISK_IMAGE_READONLY( "gdl-0019a", 0, SHA1(d44906505ff698eda6feee6c2b9402e19f64e5d3) )
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 	//PIC16C622A (317-5092-JPN)
@@ -2910,7 +2908,7 @@ ROM_START( shikgam2 )
 	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdl-0021", 0, SHA1(ca6a9f78b2f6b18be3fb926ebcd20c2e90923882) MD5(ba448900dd5cbc9f1f75f285f5d72231) )
+	DISK_IMAGE_READONLY( "gdl-0021", 0, SHA1(f5036711a28a211e8d71400a8322db3172c5733f) )
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 	//PIC16C622A (317-5095-JPN)
@@ -2918,6 +2916,50 @@ ROM_START( shikgam2 )
 	ROM_LOAD("317-5095-jpn.data", 0x00, 0x50, CRC(6033ec89) SHA1(9e99a8ad43fa29296dbf2e13b3a3d4552130b4e8) )
 ROM_END
 
+ROM_START( bdrdown )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0023a", 0, SHA1(caac915104d61f2122f5afe27da1ef5fa9cf9f9a) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C622A (317-5097-JPN)
+	//(sticker 253-5509-5097J)
+	ROM_LOAD("317-5097-jpn.data", 0x00, 0x50, CRC(e689d047) SHA1(7e3e298d9a8076af0254faeb0eb89fbfce94718d) )
+ROM_END
+
+ROM_START( psyvar2 )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0024", 0,  SHA1(d346762036fb1c40a261a434b50e63459f306f14) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C621A (317-5100-JPN)
+	//(sticker 253-5509-5100J)
+	ROM_LOAD("317-5100-jpn.data", 0x00, 0x50, CRC(94316f0f) SHA1(e1ec2b4225105dbaa1e59e8a05027e73f7b725a9) )
+ROM_END
+
+
+
+ROM_START( trizeal )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0026", 0, SHA1(e4c1e51292a7923b25bfc61d38fe386bf596002a) )
+
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C621A (317-5103-JPN)
+	//(sticker 253-5509-5103J)
+	ROM_LOAD("317-5103-jpn.data", 0x00, 0x50,  CRC(3affbf82) SHA1(268746e86e7546f4bab54bdd268f7b58f10c1aaf) )
+ROM_END
 
 ROM_START( meltybld )
 	NAOMIGD_BIOS
@@ -2925,7 +2967,7 @@ ROM_START( meltybld )
 	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdl-0028c", 0, SHA1(bbe95fd6bb39a33e979a0d9d8a63c0f2df1e9e96) MD5(b3318abacfea682605aaa24c756f225d) )
+	DISK_IMAGE_READONLY( "gdl-0028c", 0, SHA1(66de09738551e351784cc9695a58b35fdf6b6c4b) )
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 	//PIC16C622A (317-5104-JPN)
@@ -2941,7 +2983,7 @@ ROM_START( senko )
 	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdl-0030a", 0,  SHA1(bb9727f69f7e5452e09b151c1198d006a81aeb0e) MD5(12885cd794d8a5a839699aef4769b2dd) )
+	DISK_IMAGE_READONLY( "gdl-0030a", 0,  SHA1(1f7ade47e37a0026451b5baf3ba746400de8d156) )
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 	//PIC16C622A (317-5107-JPN)
@@ -2949,6 +2991,19 @@ ROM_START( senko )
 	ROM_LOAD("317-5107-jpn.data", 0x00, 0x50, CRC(7b607409) SHA1(a9946a0637453e4813bef18060d4420355cff800) )
 ROM_END
 
+ROM_START( senkoo )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0030", 0,  SHA1(c7f25c05f47a490c5da9369c588b6136e93c280e) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C621A (317-5107-JPN)
+	//(sticker 253-5509-5107J)
+	ROM_LOAD("317-5107-jpn.data", 0x00, 0x50, CRC(7b607409) SHA1(a9946a0637453e4813bef18060d4420355cff800) )
+ROM_END
 
 
 ROM_START( ss2005 )
@@ -2957,7 +3012,7 @@ ROM_START( ss2005 )
 	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdl-0031a", 0, SHA1(09a47ce506b9696d7bdf4d7c95aa3182cc0d9efa) MD5(1a83930f2083397868172745d3ab2926) )
+	DISK_IMAGE_READONLY( "gdl-0031a", 0, SHA1(6091525845fc2042ed43cae5a1b60c603e16cf97) )
 
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
@@ -2967,6 +3022,70 @@ ROM_START( ss2005 )
 ROM_END
 
 
+ROM_START( ggxxsla )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0033a", 0, SHA1(29de69ae97a9099b1bbe936dfa965bb4a3195f68) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C621A (317-5111-JPN)
+	//(sticker 253-5509-5111J)
+	ROM_LOAD("317-5111-jpn.data", 0x00, 0x50, CRC(a517c70d) SHA1(5f9798941355fb9abce511508c860653d6369e72) )
+ROM_END
+
+
+ROM_START( undefeat )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0035", 0, SHA1(91da482a6a082e48bee5b3bd20d9c92d23936965) )
+
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C622A (317-5117-JPN)
+	//(sticker 253-5509-5117J)
+	ROM_LOAD("317-5117-jpn.data", 0x00, 0x50,  CRC(f90f6d3b) SHA1(a18f803a8e951c375a3a55e4b0e74b698ae93f92) )
+ROM_END
+
+
+
+ROM_START( trgheart )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0036a", 0, SHA1(91f1e19136997cb1e2edfb1ad342b9427d1d3bfb) )
+
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C622A (317-5121-JPN)
+	//(sticker 253-5509-5121J)
+	ROM_LOAD("317-5121-jpn.data", 0x00, 0x50, CRC(a417b20f) SHA1(af6ed7ebf95948bff3e8df915b229189b8de1e46) )
+ROM_END
+
+ROM_START( jingystm )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0037", 0, SHA1(99ffe2987e3002b3871daf276d2be45f2e9c6e74) )
+
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C622A (317-5122-JPN)
+	//(sticker 253-5509-5122J)
+	ROM_LOAD("317-5122-jpn.data", 0x00, 0x50, CRC(0b85b7e4) SHA1(f4e419682ddc4b98a330e5ae543f9276c9bde030) )
+ROM_END
+
+
+
 
 ROM_START( sprtjam )
 	NAOMIGD_BIOS
@@ -2974,7 +3093,7 @@ ROM_START( sprtjam )
 	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gds-0003", 0, SHA1(bfabb0da1d4f0422e0b62d8a7bb67dbcdb0d5954) MD5(3a8d3cbc4067f9b5f50be9b9abdc689b) )
+	DISK_IMAGE_READONLY( "gds-0003", 0, SHA1(caaba214c1faca78b3370bcd4190eb2853d7f825) )
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 	//PIC16C622A (317-0300-COM)
@@ -2989,7 +3108,7 @@ ROM_START( slashout )
 	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gds-0004", 0, SHA1(ec1758f5ae359bcb3c66c7ce9ebcb7443c4fd967) MD5(f5228f26e661ab0cb67414f51fe1a5bc) )
+	DISK_IMAGE_READONLY( "gds-0004", 0, SHA1(3cce788393ed194ba9b603f9896ff893691d6b00) )
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 	//PIC16C622A (317-0302-COM)
@@ -3004,7 +3123,7 @@ ROM_START( spkrbtl )
 	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gds-0005", 0, SHA1(ca6e7ed2e161acad8600898e1b83aded9bb31d3b) MD5(a8a05ce6ab7d9ea67e015cd4853a5b80) )
+	DISK_IMAGE_READONLY( "gds-0005", 0, SHA1(d1c3fb2350e4a89372373e7f629c42b741af29b3) )
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 	//PIC16C622A (317-0303-COM)
@@ -3019,7 +3138,7 @@ ROM_START( dygolf )
 	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gds-0009", 0, SHA1(d58a42586c65dcb44282bf930631ea8b663c6aa7) MD5(e553e1811f28b67fd57fa8e34d978d87) )
+	DISK_IMAGE_READONLY( "gds-0009", 0, SHA1(d502155ddaf881c2c9505528004b9904aa32a59c) )
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 	//PIC16C622A (317-0308-COM)
@@ -3033,12 +3152,26 @@ ROM_START( wsbbgd )
 	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gds-0010", 0,  SHA1(8ce36c9710a8d55e8c19d7f218500b7074b66dec) MD5(bfb8c5ead5ac9e2a82bca9114390a99f) )
+	DISK_IMAGE_READONLY( "gds-0010", 0,  SHA1(c3135ede3a8bdadab91aed49abacbfbde8037069) )
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 	//PIC16C622A (317-0309-COM)
 	//(sticker 253-5508-0309)
 	ROM_LOAD("317-0309-com.data", 0x00, 0x50, CRC(8792c550) SHA1(e8d6d91583d1673d8d3fa9ccb0ab1097c5c5ad08) )
+ROM_END
+
+ROM_START( vtennisg )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0011", 0,  SHA1(b778403d73c8cdd13383691c9be2094ddfc1ba84) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C621A (317-0312-COM)
+	//(sticker 253-5508-0312)
+	ROM_LOAD("317-0312-com.data", 0x00, 0x50, CRC(6b24f78f) SHA1(43f89815ec46cf014d941b4b9238da044b338b4c) )
 ROM_END
 
 
@@ -3048,7 +3181,7 @@ ROM_START( vathlete )
 	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gds-0019", 0, SHA1(2167bbdde987c16949c5814ab7cff6eefd9f9326) MD5(67499591f2c61cda14fa581db9294315) )
+	DISK_IMAGE_READONLY( "gds-0019", 0, SHA1(955d3c0cb991be3057138c562cff69c5ef887787) )
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 	//PIC16C622A (317-0330-COM)
@@ -3056,32 +3189,290 @@ ROM_START( vathlete )
 	ROM_LOAD("317-0330-com.data", 0x00, 0x50, CRC(f5e7f7d4) SHA1(3903337e82011d132993e4366475586866bd39b1) )
 ROM_END
 
+/*
+
+Title   VIRTUA TENNIS 2 (POWER SMASH 2)
+Media ID    D72C
+Media Config    GD-ROM1/1
+Regions J
+Peripheral String   0000000
+Product Number  GDS-0015A
+Version V2.000
+Release Date    20010827
+Manufacturer ID
+TOC DISC
+Track   Start Sector    End Sector  Track Size
+track01.bin 150 449 705600
+track02.raw 600 2732    5016816
+track03.bin 45150   549299  1185760800
+
+
+PIC
+
+253-5508-0318
+317-0318-EXP
+*/
+
+ROM_START( vtennis2 )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0015a", 0, SHA1(c6e9c9901bd4f075454b7f18baf08df81bc2f1ad) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_LOAD("317-0318-exp.data", 0x00, 0x50, CRC(7758ade6) SHA1(c62f35810bce466bfb0f55fd555066efd53e9bb6) )
+ROM_END
+
+/*
+Title   MONKEY_BALL
+Media ID    43EB
+Media Config    GD-ROM1/1
+Regions J
+Peripheral String   0000000
+Product Number  GDS-0008
+Version V1.008
+Release Date    20010425
+Manufacturer ID
+Track   Start Sector    End Sector  Track Size
+track01.bin 150 449 705600
+track02.raw 600 2732    5016816
+track03.bin 45150   549299  1185760800
+
+
+PIC
+
+253-5508-0307
+317-0307-COM
+*/
+
+ROM_START( monkeyba )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0008", 0, SHA1(2fadcd141bdbde77b2b335b270959a516af44d99) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_LOAD("317-0307-com.data", 0x00, 0x50, CRC(448bedc7) SHA1(092dbe5e28890d3ee40d62ca8cbf225c3ce90304) )
+ROM_END
+
+ROM_START( luptype )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0021a", 0,  SHA1(15c6f9434494a31693cbb8e33da36e0e8a8f7c62) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C622A (317-0332-JPN)
+	//(sticker 253-5508-0332J)
+	ROM_LOAD("317-0332-jpn.data", 0x00, 0x50, CRC(ab302661) SHA1(65164cf76d78b281772bfcbf5a733b0200e86e09) )
+ROM_END
+
+/*
+Title   THE_MAZE_OF_THE_KINGS
+Media ID    E3D0
+Media Config    GD-ROM1/1
+Regions J
+Peripheral String   0000000
+Product Number  GDS-0022
+Version V1.001
+Release Date    20020306
+Manufacturer ID
+TOC DISC
+Track   Start Sector    End Sector  Track Size
+track01.bin 150 449 705600
+track02.raw 600 2732    5016816
+track03.bin 45150   549299  1185760800
+
+
+PIC
+317-0333-COM
+253-5508-0333
+
+*/
+ROM_START( mok )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0022", 0, SHA1(70b41745225006e7876176cbd239edecd4c3f8b6) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_LOAD("317-0333-com.data", 0x00, 0x50, CRC(0c07970f) SHA1(8882dd2f8ed522790ea78eed80cfa9442f88f67b) )
+ROM_END
+
+ROM_START( lupinsho )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0018", 0, SHA1(0633a99a666f363ab30450a76b9753685d6b1f57) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_LOAD("317-0332-j.data", 0x00, 0x50, CRC(31f2b632) SHA1(bbf253bfe831308a7e7fde3a4a28e5bcd2fbb273) )
+ROM_END
+
+/*
+Title   CONFIDENTIAL MISSION
+Media ID    FFCA
+Media Config    GD-ROM1/1
+Regions J
+Peripheral String   0000000
+Product Number  GDS-0001
+Version V1.050
+Release Date    20001011
+Manufacturer ID SEGA ENTERPRISES
+TOC DISC
+Track   Start Sector    End Sector  Track Size
+track01.bin 150 3788    8558928
+track02.raw 3939    6071    5016816
+track03.bin 45150   549299  1185760800
+
+
+PIC
+317-0298-COM
+*/
+
+ROM_START( confmiss )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0001", 0, SHA1(bd05f197ba8643577883dd25d9d5a74c91b27ca9) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_LOAD("317-0298-com.data", 0x00, 0x50, CRC(c989b336) SHA1(40075500888626cc2261133eec496b3e753631e5) )
+ROM_END
+
+ROM_START( puyofev )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0031", 0, SHA1(da2d421da9472b149619b6931bb2fe624be75fa2) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C621A (317-0375-COM)
+	//(sticker 253-5508-0375)
+	ROM_LOAD("317-0375-com.data", 0x00, 0x50, CRC(32bf1825) SHA1(42dfbc6777c154d8de6c6f7350da9ea737380220) )
+ROM_END
+
+static READ64_HANDLER( naomigd_bios_idle_skip_r )
+{
+
+	if (cpu_get_pc(space->cpu)==0xc04173c)
+		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(500));
+		//cpu_spinuntil_int(space->cpu);
+//  else
+//      printf("%08x\n", cpu_get_pc(space->cpu));
+
+	return naomi_ram64[0x2ad238/8];
+}
+static DRIVER_INIT(naomigd)
+{
+	memory_install_read64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc2ad238, 0xc2ad23f, 0, 0, naomigd_bios_idle_skip_r);
+}
+
+static READ64_HANDLER( naomigd_ggxxsla_idle_skip_r )
+{
+	if (cpu_get_pc(space->cpu)==0x0c0c9adc)
+		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(500));
+
+	return naomi_ram64[0x1aae18/8];
+}
+
+static DRIVER_INIT( ggxxsla )
+{
+	memory_install_read64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc1aae18, 0xc1aae1f, 0, 0, naomigd_ggxxsla_idle_skip_r);
+	DRIVER_INIT_CALL(naomigd);
+}
+
+static READ64_HANDLER( naomigd_ggxx_idle_skip_r )
+{
+	if (cpu_get_pc(space->cpu)==0xc0b5c3c) // or 0xc0bab0c
+		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(500));
+
+	return naomi_ram64[0x1837b8/8];
+}
+
+
+static DRIVER_INIT( ggxx )
+{
+	memory_install_read64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc1837b8, 0xc1837bf, 0, 0, naomigd_ggxx_idle_skip_r);
+	DRIVER_INIT_CALL(naomigd);
+}
+
+static READ64_HANDLER( naomigd_ggxxrl_idle_skip_r )
+{
+	if (cpu_get_pc(space->cpu)==0xc0b84bc) // or 0xc0bab0c
+		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(500));
+
+	//printf("%08x\n", cpu_get_pc(space->cpu));
+
+	return naomi_ram64[0x18d6c8/8];
+}
+
+
+static DRIVER_INIT( ggxxrl )
+{
+	memory_install_read64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc18d6c8, 0xc18d6cf, 0, 0, naomigd_ggxxrl_idle_skip_r);
+	DRIVER_INIT_CALL(naomigd);
+}
+
+
 /* Naomi GD-Rom Sets */
-GAME( 2001, naomigd,   0,        naomi,    naomi,    0,       ROT0, "Sega",            "Naomi GD-ROM Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
+GAME( 2001, naomigd,   0,        naomi,    naomi, naomigd,       ROT0, "Sega",            "Naomi GD-ROM Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
 
 // GDL-xxxx (licensed games?)
-GAME( 2001, gundmgd,   naomigd,  naomigd,  naomi,    0,   ROT0,   "Capcom",       "Mobile Suit Gundam: Federation VS Zeon (GDL-0001)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2001, sfz3ugd,   naomigd,  naomigd,  naomi,    0,   ROT0,   "Capcom",       "Street Fighter Zero 3 Upper (GDL-0002)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2001, cvsgd,     naomigd,  naomigd,  naomi,    0,   ROT0,   "Capcom",       "Capcom vs SNK Millenium Fight 2000 Pro (GDL-0004)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2001, gundmxgd,  naomigd,  naomigd,  naomi,    0,   ROT0,   "Capcom",       "Mobile Suit Gundam: Federation VS Zeon DX  (GDL-0006)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2001, cvs2gd,    naomigd,  naomigd,  naomi,    0,	  ROT0,   "Capcom",       "Capcom vs SNK 2 Millionaire Fighting 2001 (GDL-0007A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2001, ikaruga,   naomigd,  naomigd,  naomi,    0,   ROT270, "Treasure",     "Ikaruga (GDL-0010)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2002, ggxx,      naomigd,  naomigd,  naomi,    0,   ROT0,   "Arc System Works",       "Guilty Gear XX (GDL-0011)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2002, chocomk,   naomigd,  naomigd,  naomi,    0,   ROT0,   "Ecole Software Corporation", "Musapey's Choco Marker (GDL-0014A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2002, quizqgd,   naomigd,  naomigd,  naomi,    0,   ROT0,   "Amedio",       "Quiz Keitai Q mode (GDL-0017)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2003, ggxxrl,    naomigd,  naomigd,  naomi,    0,   ROT0,   "Arc System Works",       "Guilty Gear XX #Reload (GDL-0019A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2003, shikgam2,  naomigd,  naomigd,  naomi,    0,   ROT0,   "Alpha System", "Shikigami No Shiro II / The Castle of Shikigami II (GDL-0021)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2004, meltybld,  naomigd,  naomigd,  naomi,    0,   ROT0,   "Ecole",        "Melty Blood Act Cadenza (GDL-0028C)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2005, senko,     naomigd,  naomigd,  naomi,    0,   ROT0,   "Grev",         "Senko No Ronde (GDL-0030A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2005, ss2005,    naomigd,  naomigd,  naomi,    0,   ROT0,   "Starfish",     "Super Shanghai 2005 (GDL-0031A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, gundmgd,   naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Capcom",       "Mobile Suit Gundam: Federation VS Zeon (GDL-0001)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, sfz3ugd,   naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Capcom",       "Street Fighter Zero 3 Upper (GDL-0002)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, cvsgd,     naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Capcom",       "Capcom vs SNK Millenium Fight 2000 Pro (GDL-0004)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, gundmxgd,  naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Capcom",       "Mobile Suit Gundam: Federation VS Zeon DX  (GDL-0006)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, cvs2gd,    naomigd,  naomigd,  naomi, naomigd,	 ROT0,   "Capcom",       "Capcom vs SNK 2 Millionaire Fighting 2001 (GDL-0007A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, ikaruga,   naomigd,  naomigd,  naomi, naomigd,   ROT270, "Treasure",     "Ikaruga (GDL-0010)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2002, ggxx,      naomigd,  naomigd,  naomi, ggxx,      ROT0,   "Arc System Works",       "Guilty Gear XX (GDL-0011)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2002, chocomk,   naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Ecole Software Corporation", "Musapey's Choco Marker (GDL-0014A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2002, quizqgd,   naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Amedio",       "Quiz Keitai Q mode (GDL-0017)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2003, ggxxrl,    naomigd,  naomigd,  naomi, ggxxrl,    ROT0,   "Arc System Works",       "Guilty Gear XX #Reload (GDL-0019A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2003, shikgam2,  naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Alpha System", "Shikigami No Shiro II / The Castle of Shikigami II (GDL-0021)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2004, bdrdown,   naomigd,  naomigd,  naomi, naomigd,   ROT0,   "G-Rev",        "Border Down (GDL-0023A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2003, psyvar2,   naomigd,  naomigd,  naomi, naomigd,   ROT0,   "G-Rev",        "Psyvariar 2 - The Will To Fabricate (GDL-0024)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2004, trizeal,   naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Taito",        "Trizeal (GDL-0026)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2004, meltybld,  naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Ecole",        "Melty Blood Act Cadenza (GDL-0028C)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, senko,     naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Grev",         "Senko No Ronde (Rev. A)(GDL-0030A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, senkoo,    senko,    naomigd,  naomi, naomigd,   ROT0,   "Grev",         "Senko No Ronde (GDL-0030)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, ss2005,    naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Starfish",     "Super Shanghai 2005 (GDL-0031A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, ggxxsla,   naomigd,  naomigd,  naomi, ggxxsla,   ROT0,   "Arc System Works",       "Guilty Gear XX Slash (GDL-0033A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, undefeat,  naomigd,  naomigd,  naomi, naomigd,   ROT0,   "GRev",         "Under Defeat (GDL-0035)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, trgheart,  naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Warashi",      "Trigger Heart Exelica (GDL-0036A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, jingystm,  naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Yuki Enterprise",      "Jingi Storm - The Arcade (GDL-0037)", GAME_NO_SOUND|GAME_NOT_WORKING )
+
+
 
 // GDS-xxxx (first party games?)
-GAME( 2000, sprtjam,   naomigd,  naomigd,  naomi,    0,  ROT0, "Sega",          "Sports Jam (GDS-0003)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2000, slashout,  naomigd,  naomigd,  naomi,    0,  ROT0, "Sega",          "Slashout (GDS-0004)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2001, spkrbtl,   naomigd,  naomigd,  naomi,    0,  ROT0, "Sega",          "Spikers Battle (GDS-0005)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2001, dygolf,    naomigd,  naomigd,  naomi,    0,  ROT0, "Sega",          "Virtua Golf / Dynamic Golf (GDS-0009)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2001, wsbbgd,    naomigd,  naomigd,  naomi,    0,  ROT0, "Sega",          "World Series Baseball / Super Major League (GDS-0010)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2002, vathlete,  naomigd,  naomigd,  naomi,    0,  ROT0, "Sega",          "Virtua Athletics / Virtua Athlete (GDS-0019)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2000, sprtjam,   naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Sports Jam (GDS-0003)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2000, slashout,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Slashout (GDS-0004)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, spkrbtl,   naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Spikers Battle (GDS-0005)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, dygolf,    naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Virtua Golf / Dynamic Golf (GDS-0009)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, wsbbgd,    naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "World Series Baseball / Super Major League (GDS-0010)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, vtennisg,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Virtua Tennis (GDS-0011)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2002, vathlete,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Virtua Athletics / Virtua Athlete (GDS-0019)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, vtennis2,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Virtua Tennis 2 (GDS-0015a)", GAME_NO_SOUND|GAME_NOT_WORKING ) // bad key
+GAME( 2001, monkeyba,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Monkey Ball (GDS-0008)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2002, luptype,   naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Lupin The Third - The Typing (GDS-0021A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2002, mok,       naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "The Maze of the Kings (GDS-0022)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, lupinsho,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Lupin The Third - The Shooting (GDS-0018)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, confmiss,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Confidential Mission (GDS-0001)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2003, puyofev,   naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Puyo Puyo Fever (GDS-0031)", GAME_NO_SOUND|GAME_NOT_WORKING )
 
 /* Naomi 2 & Naomi 2 GD-ROM */
 
@@ -3124,7 +3515,7 @@ ROM_START( vstrik3 )
 	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gds-0006", 0, SHA1(293b84c7f4547060f57598b796b6fc49513cc839) MD5(060d9fef55d8f0fc1986ecc991478942) )
+	DISK_IMAGE_READONLY( "gds-0006", 0, SHA1(aca09a88506f5e462ad3fb33eac5478a2a010609) )
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 	//PIC16C622A (317-0304-COM)
@@ -3138,7 +3529,7 @@ ROM_START( vf4 )
 	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gds-0012", 0, SHA1(d68436ee72ea5db40e184b7ff38903a9cadb6df7) MD5(5a18300646a68f2994ed8c81abe9bdd8) )
+	DISK_IMAGE_READONLY( "gds-0012", 0, SHA1(c34588f59c6091cd1c3ef235171dad8d5247e707) )
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 	//PIC16C622A (317-0314-COM)
@@ -3146,24 +3537,111 @@ ROM_START( vf4 )
 	ROM_LOAD("317-0314-com.data", 0x00, 0x50, CRC(91a97eb4) SHA1(059342368bc5d25b494ed3c729870695f9584fc7) )
 ROM_END
 
-	// this is actually Beach Spikers...
-	//PIC16C622A (317-0317-COM)
-	//(sticker 253-5508-0317)
-	//ROM_LOAD("317-0317-com.data", 0x00, 0x50, CRC(66efe433) SHA1(7f7b52202ed9b1e20516aaa7553cc3cc677a70b5) )
-
-
-ROM_START( initd )
+ROM_START( vf4evo )
 	NAOMI2_BIOS
 
 	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gds-0020b", 0, SHA1(5f386183e856722fee4a6ddb0146350b73349181) MD5(b085005215e2766e0fc1e3bd16b2fd95) )
+	DISK_IMAGE_READONLY( "gds-0024b", 0, SHA1(a829169542f3bed76095ad6bfbbde7d494d04d72) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C622A (317-0338-JPN)
+	//(sticker 253-5508-0338J)
+	ROM_LOAD("317-0338-jpn.data", 0x00, 0x50, CRC(eeb2c9e9) SHA1(d30b5914c603219daea9923e1cf8da2be6096742) )
+ROM_END
+
+ROM_START( initdv2j )
+	NAOMI2_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0026", 0, SHA1(253acede106b7fbf49e24458e7fda868720e9549) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_LOAD("gds-0026.rom", 0x00, 0x50, NO_DUMP) // file on GD-ROM is BFK.BIN , _NOT_ BEM.BIN which is for Initial D : Arcade Stage (Japan)
+ROM_END
+
+ROM_START( vf4tuned ) // are there multiple files on this GD-ROM? it only compresses to 500 meg when the rom file is closer to half tha
+	NAOMI2_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0036f", 0, SHA1(ea35d6ecdf94e5c9a545952758da80f658755df0) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C622A (317-0387-COM)
+	//(sticker 253-5508-0387)
+	ROM_LOAD("317-0387-com.data", 0x00, 0x50, CRC(ab9f3851) SHA1(8b64dc6df176eb7adb48267709a27db221d5e3c3) )
+ROM_END
+
+/*
+
+Title   BEACH SPIKERS
+Media ID    0897
+Media Config    GD-ROM1/1
+Regions J
+Peripheral String   0000000
+Product Number  GDS-0014
+Version V1.001
+Release Date    20010613
+Manufacturer ID
+TOC DISC
+Track   Start Sector    End Sector  Track Size
+track01.bin 150 449 705600
+track02.raw 600 2746    5049744
+track03.bin 45150   549299  1185760800
+
+PIC
+
+253-5508-0317
+317-0317-COM
+
+*/
+
+ROM_START( beachspi )
+	NAOMI2_BIOS
+//  NAOMIGD_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0014", 0, SHA1(1ebb3695196c11a86276e034df2e1c8d7fa6b96f) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C622A (317-0317-COM)
+	//(sticker 253-5508-0317)
+	ROM_LOAD("317-0317-com.data", 0x00, 0x50, CRC(66efe433) SHA1(7f7b52202ed9b1e20516aaa7553cc3cc677a70b5) )
+ROM_END
+
+ROM_START( initd )
+	NAOMI2_BIOS
+//  NAOMIGD_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0020b", 0, SHA1(c0e901623ef4fcd97b7e4d29ae556e6f2e91b8ad) )
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 	//PIC16C622A (317-0331-JPN)
 	//(sticker 253-5508-0331J)
 	ROM_LOAD("317-0331-jpn.data", 0x00, 0x50, CRC(bb39742e) SHA1(b3100b18aeb80ebfd5312ba5c320e7e647710b55) )
+ROM_END
+
+ROM_START( initdexp )
+	NAOMI2_BIOS
+//  NAOMIGD_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0025", 0, SHA1(8ea92cf6b493f21b9453832edad7cbc5e5b350c1) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)  // key supplied was bad
+	ROM_LOAD("317-0343-com.data", 0x00, 0x50, CRC(e9d8fac0) SHA1(85f5bbffbd9d1f7162bae46ddd49e7870fe93662) )
 ROM_END
 
 GAME( 2001, naomi2,   0,        naomi,    naomi,    0, ROT0, "Sega",            "Naomi 2 Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
@@ -3174,11 +3652,193 @@ GAME( 2001, vstrik3c, naomi2,  naomi,    naomi,    0,  ROT0, "Sega",          "V
 // GDS-xxxx (first party games?)
 GAME( 2001, vstrik3, naomi2,  naomigd,    naomi,    0,  ROT0, "Sega",          "Virtua Striker 3 (GDS-0006)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2001, vf4,     naomi2,  naomigd,    naomi,    0,  ROT0, "Sega",          "Virtua Fighter 4 (GDS-0012)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2002, initd,   naomi2,  naomigd,    naomi,    0,  ROT0, "Sega",          "Initial D Arcade Stage (GDS-0020b)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2002, initd,   naomi2,  naomigd,    naomi,    0,  ROT0, "Sega",          "Initial D Arcade Stage (Japan) (GDS-0020b)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2002, beachspi,naomi2,  naomigd,    naomi,    0,  ROT0, "Sega",          "Beach Spikers (GDS-0014)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2002, initdexp,naomi2,  naomigd,    naomi,    0,  ROT0, "Sega",          "Initial D Arcade Stage (Export) (GDS-0025)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2002, vf4evo,  naomi2,  naomigd,    naomi,    0,  ROT0, "Sega",          "Virtua Fighter 4 Evolution (GDS-0024B)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2002, initdv2j,naomi2,  naomigd,    naomi,    0,  ROT0, "Sega",          "Initial D : Arcade Stage Ver. 2 (Japan) (GDS-0026)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2004, vf4tuned,naomi2,  naomigd,    naomi,    0,  ROT0, "Sega",          "Virtua Fighter 4 Final Tuned (GDS-0036F)", GAME_NO_SOUND|GAME_NOT_WORKING )
 
 
 /* Atomiswave */
 GAME( 2001, awbios,   0,        naomi,    naomi,    0, ROT0, "Sammy",           "Atomiswave Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
 GAME( 2005, fotns,    awbios,   naomi,    naomi,    fotns, ROT0, "Arc System Works",           "Fist Of The North Star", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2003, demofist, awbios,   naomi,    naomi,    demofist, ROT0, "Polygon Magic / Dimps",           "Demolish Fist", GAME_NO_SOUND|GAME_NOT_WORKING )
+
+/*********************************************************************************************************************
+**********************************************************************************************************************
+*********************************************************************************************************************/
+
+// Triforce -- this is GameCube based, not Dreamcast/Naomi based, move out of here
+// (currently here for testing the gd-rom stuff only)
+#define TRIFORCE_BIOS \
+	ROM_REGION( 0x200000, "maincpu", 0) \
+	ROM_SYSTEM_BIOS( 0, "bios0", "Triforce Bios" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "triforce_bootrom.bin", 0x000000, 0x200000, CRC(d1883221) SHA1(c3cb7227e4dbc2af861e76d00cb59726105a2e4c) ) \
+
+ROM_START( triforce )
+	TRIFORCE_BIOS
+
+	ROM_REGION( 0x8400000, "user1", ROMREGION_ERASE)
+ROM_END
+
+/*
+
+Title   VIRTUA STRIKER 4
+Media ID    93B2
+Media Config    GD-ROM1/1
+Regions J
+Peripheral String   0000000
+Product Number  GDT-0015
+Version V1.001
+Release Date    20041202
+Manufacturer ID
+TOC DISC
+Track   Start Sector    End Sector  Track Size
+track01.bin 150 449 705600
+track02.raw 600 1951    3179904
+track03.bin 45150   549299  1185760800
+
+
+PIC
+255-5508-393E
+317-0393-EXP
+
+*/
+
+ROM_START( vs4 )
+	TRIFORCE_BIOS
+	//NAOMIGD_BIOS
+
+	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdt-0015", 0, SHA1(1f83712b2b170d6edf4a27c15b6f763cc3cc4b71) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_LOAD("317-0393-exp.data", 0x00, 0x50, CRC(2dcfecd7) SHA1(d805168e1564051ae5c47876ade2c9843253c6b4) )
+ROM_END
+
+/*
+Title   VIRTUA_STRIKER_2002
+Media ID    0DD8
+Media Config    GD-ROM1/1
+Regions J
+Peripheral String   0000000
+Product Number  GDT-0002
+Version V1.005
+Release Date    20020730
+
+
+PIC
+
+253-5508-337E
+317-0337-EXP
+*/
+
+ROM_START( vs2002ex )
+	TRIFORCE_BIOS
+	//NAOMIGD_BIOS
+
+	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdt-0002", 0, SHA1(471e896d43167c93cc229cfc94ff7ac6de7cf9a4) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_LOAD("317-0337-exp.data", 0x00, 0x50, CRC(aa6be604) SHA1(fabc43ecfb7ddf1d5a87f10884852027d6f4773b) )
+ROM_END
+
+GAME( 200?, triforce, 0,        naomigd,    naomi,    0, ROT0, "Sega",           "Triforce Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
+GAME( 200?, vs4,      triforce, naomigd,    naomi,    0, ROT0, "Sega",           "Virtua Striker 4 (GDT-0015)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2002, vs2002ex, triforce, naomigd,    naomi,    0, ROT0, "Sega",           "Virtua Striker 2002 (GDT-0002)", GAME_NO_SOUND|GAME_NOT_WORKING )
+
+
+/*********************************************************************************************************************
+**********************************************************************************************************************
+*********************************************************************************************************************/
+
+// Chihiro -- this is XBox based, not Dreamcast/Naomi based, move out of here
+// (currently here for testing the gd-rom stuff only)
+#define CHIHIRO_BIOS \
+	ROM_REGION( 0x200000, "maincpu", 0) \
+	ROM_SYSTEM_BIOS( 0, "bios0", "Chihiro Bios" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "chihiro_bios.bin", 0x000000, 0x200000, NO_DUMP ) \
+
+ROM_START( chihiro )
+	CHIHIRO_BIOS
+
+	ROM_REGION( 0x8400000, "user1", ROMREGION_ERASE)
+ROM_END
+
+/*
+
+Title   GHOST SQUAD
+Media ID    004F
+Media Config    GD-ROM1/1
+Regions J
+Peripheral String   0000000
+Product Number  GDX-0012A
+Version V2.000
+Release Date    20041209
+Manufacturer ID
+
+PIC
+253-5508-0398
+317-0398-COM
+
+*/
+
+ROM_START( ghostsqu )
+	CHIHIRO_BIOS
+
+	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdx-0012a", 0,  SHA1(d7d78ce4992cb16ee5b4ac6ca7a37c46b07e8c14) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_LOAD("317-0398-com.data", 0x00, 0x50, CRC(8c5391a2) SHA1(e64cadeb30c94c3cd4002630cd79cc76c7bde2ed) )
+ROM_END
+
+/*
+
+Title   VIRTUA COP 3
+Media ID    C4AD
+Media Config    GD-ROM1/1
+Regions J
+Peripheral String   0000000
+Product Number  GDX-0003A
+Version V2.004
+Release Date    20030226
+Manufacturer ID
+TOC DISC
+Track   Start Sector    End Sector  Track Size
+track01.bin 150 599 1058400
+track02.raw 750 2101    3179904
+track03.bin 45150   549299  1185760800
+
+
+PIC
+255-5508-354
+317-054-COM
+
+*/
+
+ROM_START( vcop3 )
+	CHIHIRO_BIOS
+
+	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdx-0003a", 0,  SHA1(cdfec1d2ef02ae9e29cb1462f08904177bc4c9ea) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_LOAD("317-0354-com.data", 0x00, 0x50,  CRC(df7e3217) SHA1(9f0f4bf6b15f3b6eeea81eaa27b3d25bd94110da) )
+ROM_END
+
+
+GAME( 200?, chihiro,  0,       naomigd,    naomi,    0, ROT0, "Sega",           "Chihiro Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
+GAME( 2005, ghostsqu, chihiro, naomigd,    naomi,    0, ROT0, "Sega",           "Ghost Squad (Ver. A?) (GDX-0012a)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2003, vcop3,    chihiro, naomigd,    naomi,    0, ROT0, "Sega",           "Virtua Cop 3 (GDX-0003a)", GAME_NO_SOUND|GAME_NOT_WORKING )
 

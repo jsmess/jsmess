@@ -116,13 +116,22 @@ static void set_irq_line(h6280_Regs* cpustate, int irqline, int state);
 /* include the macros */
 #include "h6280ops.h"
 
+INLINE h6280_Regs *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_H6280);
+	return (h6280_Regs *)device->token;
+}
+
 /* include the opcode macros, functions and function pointer tables */
 #include "tblh6280.c"
 
 /*****************************************************************************/
 static CPU_INIT( h6280 )
 {
-	h6280_Regs* cpustate = device->token;
+	h6280_Regs* cpustate = get_safe_token(device);
 
 	state_save_register_device_item(device, 0, cpustate->ppc.w.l);
 	state_save_register_device_item(device, 0, cpustate->pc.w.l);
@@ -159,7 +168,7 @@ static CPU_INIT( h6280 )
 
 static CPU_RESET( h6280 )
 {
-	h6280_Regs* cpustate = device->token;
+	h6280_Regs* cpustate = get_safe_token(device);
 
 	cpu_irq_callback save_irqcallback;
 	int i;
@@ -181,7 +190,6 @@ static CPU_RESET( h6280 )
     /* read the reset vector into PC */
 	PCL = RDMEM(cpustate, H6280_RESET_VEC);
 	PCH = RDMEM(cpustate, (H6280_RESET_VEC+1));
-	CHANGE_PC;
 
 	/* CPU starts in low speed mode */
     cpustate->clocks_per_cycle = 4;
@@ -206,7 +214,7 @@ static CPU_EXIT( h6280 )
 static CPU_EXECUTE( h6280 )
 {
 	int in;
-	h6280_Regs* cpustate = device->token;
+	h6280_Regs* cpustate = get_safe_token(device);
 
 	cpustate->ICount = cycles;
 
@@ -217,8 +225,6 @@ static CPU_EXECUTE( h6280 )
 	/* Execute instructions */
 	do
     {
-    	if ((cpustate->ppc.w.l ^ cpustate->pc.w.l) & 0xe000)
-    		CHANGE_PC;
 		cpustate->ppc = cpustate->pc;
 
 		debugger_instruction_hook(device, PCW);
@@ -348,7 +354,7 @@ WRITE8_HANDLER( h6280_timer_w )
 
 static CPU_TRANSLATE( h6280 )
 {
-	h6280_Regs* cpustate = device->token;
+	h6280_Regs* cpustate = get_safe_token(device);
 
 	if (space == ADDRESS_SPACE_PROGRAM)
 		*address = TRANSLATED(*address);
@@ -358,12 +364,12 @@ static CPU_TRANSLATE( h6280 )
 
 UINT8 h6280io_get_buffer(const device_config *device)
 {
-	h6280_Regs* cpustate = device->token;
+	h6280_Regs* cpustate = get_safe_token(device);
 	return cpustate->io_buffer;
 }
 void h6280io_set_buffer(const device_config *device, UINT8 data)
 {
-	h6280_Regs* cpustate = device->token;
+	h6280_Regs* cpustate = get_safe_token(device);
 	cpustate->io_buffer=data;
 }
 
@@ -376,7 +382,7 @@ void h6280io_set_buffer(const device_config *device, UINT8 data)
 
 static CPU_SET_INFO( h6280 )
 {
-	h6280_Regs* cpustate = device->token;
+	h6280_Regs* cpustate = get_safe_token(device);
 
 	switch (state)
 	{
@@ -419,7 +425,7 @@ static CPU_SET_INFO( h6280 )
 
 CPU_GET_INFO( h6280 )
 {
-	h6280_Regs* cpustate = (device != NULL) ? device->token : NULL;
+	h6280_Regs* cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

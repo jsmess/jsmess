@@ -45,7 +45,7 @@ Memory map:
 
 0x00000000, 0x0007ffff  BIOS ROM
 0x00080000, 0x000fffff  Unused
-0x00100000, 0x00100080  SMPC
+0x00100000, 0x0010007f  SMPC
 0x00100080, 0x0017ffff  Unused
 0x00180000, 0x0018ffff  Back Up Ram
 0x00190000, 0x001fffff  Unused
@@ -114,6 +114,7 @@ ToDo / Notes:
 -Video emulation bugs: check stvvdp2.c file.
 
 (per-game issues)
+-stress: accesses the Sound Memory Expansion Area (0x05a00000-0x05afffff), unknown purpose;
 -groovef: hangs soon after loaded,caused by two memory addresses in the Work RAM-H range.
  Kludged for now to work.
 -smleague / finlarch: it randomly hangs / crashes,it works if you use a ridiculous MDRV_INTERLEAVE number,might need strict
@@ -1990,7 +1991,7 @@ static ADDRESS_MAP_START( stv_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x02000000, 0x04ffffff) AM_ROM AM_SHARE(7) AM_REGION("user1", 0) // cartridge
 	AM_RANGE(0x05800000, 0x0589ffff) AM_READWRITE(stvcd_r, stvcd_w)
 	/* Sound */
-	AM_RANGE(0x05a00000, 0x05a7ffff) AM_READWRITE(stv_sh2_soundram_r, stv_sh2_soundram_w)
+	AM_RANGE(0x05a00000, 0x05afffff) AM_READWRITE(stv_sh2_soundram_r, stv_sh2_soundram_w)
 	//AM_RANGE(0x05a80000, 0x05afffff) AM_READ(stv_sh2_random_r)
 	AM_RANGE(0x05b00000, 0x05b00fff) AM_DEVREADWRITE16("scsp", scsp_r, scsp_w, 0xffffffff)
 	/* VDP1 */
@@ -2007,7 +2008,7 @@ static ADDRESS_MAP_START( stv_mem, ADDRESS_SPACE_PROGRAM, 32 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_mem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_BASE(&sound_ram)
+	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_BASE(&sound_ram)
 	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("scsp", scsp_r, scsp_w)
 ADDRESS_MAP_END
 
@@ -3642,7 +3643,7 @@ ROM_START( sfish2 )
 	ROM_LOAD16_WORD_SWAP( "mpr18275.ic4",      0x0c00000, 0x0200000, NO_DUMP )
 
 	DISK_REGION( "cdrom" )
-	DISK_IMAGE( "sfish2", 0, MD5(3c95f7e19c5475d0ffa0d89cc45a36e5) SHA1(d07e0aa09a0858b308cc2218996b2242885a2609) )
+	DISK_IMAGE( "sfish2", 0, SHA1(a10073d83bbbe16e16f69ad48565821576557d61) )
 ROM_END
 
 ROM_START( sfish2j )
@@ -3660,7 +3661,7 @@ ROM_START( sfish2j )
 	ROM_LOAD16_WORD_SWAP( "mpr18274.ic3",      0x0800000, 0x0200000, NO_DUMP )
 
 	DISK_REGION( "cdrom" )
-	DISK_IMAGE( "sfish2", 0, MD5(3c95f7e19c5475d0ffa0d89cc45a36e5) SHA1(d07e0aa09a0858b308cc2218996b2242885a2609) )
+	DISK_IMAGE( "sfish2", 0, SHA1(a10073d83bbbe16e16f69ad48565821576557d61) )
 ROM_END
 
 

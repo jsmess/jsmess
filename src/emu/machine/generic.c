@@ -30,6 +30,7 @@ size_t generic_nvram_size;
 UINT8 *generic_nvram;
 UINT16 *generic_nvram16;
 UINT32 *generic_nvram32;
+UINT64 *generic_nvram64;
 
 /* memory card status */
 static int memcard_inserted;
@@ -80,6 +81,7 @@ void generic_machine_init(running_machine *machine)
 	generic_nvram = NULL;
 	generic_nvram16 = NULL;
 	generic_nvram32 = NULL;
+	generic_nvram64 = NULL;
 
 	/* reset memory card info */
 	memcard_inserted = -1;
@@ -241,6 +243,8 @@ INLINE void *nvram_select(void)
 		return generic_nvram16;
 	if (generic_nvram32)
 		return generic_nvram32;
+	if (generic_nvram64)
+		return generic_nvram64;
 	fatalerror("generic nvram handler called without nvram in the memory map");
 	return 0;
 }
@@ -373,7 +377,7 @@ NVRAM_HANDLER( generic_randfill )
 		mame_fread(file, nvram_select(), generic_nvram_size);
 	else
 	{
-		UINT8 *nvram = nvram_select();
+		UINT8 *nvram = (UINT8 *)nvram_select();
 		for (i = 0; i < generic_nvram_size; i++)
 			nvram[i] = mame_rand(machine);
 	}
@@ -570,7 +574,7 @@ static void interrupt_reset(running_machine *machine)
 
 static TIMER_CALLBACK( clear_all_lines )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	int inputcount = cpu_get_input_lines(device);
 	int line;
 
@@ -587,7 +591,7 @@ static TIMER_CALLBACK( clear_all_lines )
 
 static TIMER_CALLBACK( irq_pulse_clear )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	int irqline = param;
 	cpu_set_input_line(device, irqline, CLEAR_LINE);
 }
@@ -770,6 +774,6 @@ READ32_HANDLER( watchdog_reset32_r ) { watchdog_reset(space->machine); return 0x
 
 CUSTOM_INPUT( custom_port_read )
 {
-	const char *tag = param;
+	const char *tag = (const char *)param;
 	return input_port_read(field->port->machine, tag);
 }

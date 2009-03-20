@@ -234,6 +234,8 @@ static UINT16 m_p_n_b0[ 0x10000 ];
 static UINT16 m_p_n_r1[ 0x10000 ];
 static UINT16 m_p_n_b1g1[ 0x10000 ];
 
+static int need_sianniv_vblank_hack;
+
 #define SINT11( x ) ( ( (INT32)( x ) << 21 ) >> 21 )
 
 #define ADJUST_COORD( a ) \
@@ -624,6 +626,8 @@ static void psx_gpu_init( running_machine *machine )
 	int n_shaded;
 	int width = video_screen_get_width(machine->primary_screen);
 	int height = video_screen_get_height(machine->primary_screen);
+
+	need_sianniv_vblank_hack = !strcmp(machine->gamedrv->name, "sianniv");
 
 #if defined( MAME_DEBUG )
 	DebugMeshInit(machine);
@@ -3345,6 +3349,7 @@ void psx_gpu_write( running_machine *machine, UINT32 *p_ram, INT32 n_size )
 		case 0x48:
 		case 0x4a:
 		case 0x4c:
+		case 0x4e:
 			if( m_n_gpu_buffer_offset < 3 )
 			{
 				m_n_gpu_buffer_offset++;
@@ -3367,6 +3372,7 @@ void psx_gpu_write( running_machine *machine, UINT32 *p_ram, INT32 n_size )
 			break;
 		case 0x50:
 		case 0x52:
+
 			if( m_n_gpu_buffer_offset < 3 )
 			{
 				m_n_gpu_buffer_offset++;
@@ -3903,6 +3909,14 @@ INTERRUPT_GEN( psx_vblank )
 #endif
 
 	m_n_gpustatus ^= ( 1L << 31 );
+
+	if(need_sianniv_vblank_hack)
+	{
+		UINT32 pc = cpu_get_pc(device);
+		if((pc >= 0x80010018 && pc <= 0x80010028) || pc == 0x8002a4f0)
+			return;
+	}
+
 	psx_irq_set( device->machine, 0x0001 );
 }
 

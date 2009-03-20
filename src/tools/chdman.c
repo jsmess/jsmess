@@ -69,6 +69,7 @@ struct _chd_interface_file
 
 static chd_error chdman_compress_file(chd_file *chd, const char *rawfile, UINT32 offset);
 static chd_error chdman_compress_chd(chd_file *chd, chd_file *source, UINT32 totalhunks);
+static chd_error chdman_clone_metadata(chd_file *source, chd_file *dest);
 
 
 
@@ -150,7 +151,7 @@ static int usage(void)
 {
 	printf("usage: chdman -info input.chd\n");
 	printf("   or: chdman -createraw inputhd.raw output.chd [inputoffs [hunksize]]\n");
-	printf("   or: chdman -createhd inputhd.raw output.chd [inputoffs [cylinders heads sectors [sectorsize [hunksize]]]]\n");
+	printf("   or: chdman -createhd inputhd.raw output.chd [ident.bin] [inputoffs [cylinders heads sectors [sectorsize [hunksize]]]]\n");
 	printf("   or: chdman -createblankhd output.chd cylinders heads sectors [sectorsize [hunksize]]\n");
 	printf("   or: chdman -createcd input.toc output.chd\n");
 	printf("   or: chdman -createav input.avi output.chd [firstframe [numframes]]\n");
@@ -166,6 +167,8 @@ static int usage(void)
 	printf("   or: chdman -diff parent.chd compare.chd diff.chd\n");
 	printf("   or: chdman -setchs inout.chd cylinders heads sectors\n");
 	printf("   or: chdman -fixavdata inout.chd\n");
+	printf("   or: chdman -addmetabin inout.chd tag [index] sourcefile\n");
+	printf("   or: chdman -addmetatext inout.chd tag [index] sourcefile\n");
 	return 1;
 }
 
@@ -241,6 +244,53 @@ static chd_error guess_chs(const char *filename, int offset, int sectorsize, UIN
 
 
 /*-------------------------------------------------
+    get_chs_from_ident - extract chs from an ident
+    information, validate it with the file size
+
+    Note: limited to IDE for now
+-------------------------------------------------*/
+
+static chd_error get_chs_from_ident(const char *filename, int offset, const UINT8 *ident, UINT32 identsize, UINT32 *cylinders, UINT32 *heads, UINT32 *sectors, UINT32 *bps)
+{
+	UINT64 filesize, expected_size;
+
+	filesize = get_file_size(filename);
+	if (filesize <= offset)
+	{
+		fprintf(stderr, "Invalid file '%s'\n", filename);
+		return CHDERR_INVALID_FILE;
+	}
+
+	if (filesize % 512 != 0)
+	{
+		fprintf(stderr, "Can't validate CHS values because data size is not divisible by the sector size\n");
+		return CHDERR_INVALID_FILE;
+	}
+
+	if (identsize < 14)
+	{
+		fprintf(stderr, "Error: the ident metadata is too short to include geometry information\n");
+		return CHDERR_INVALID_FILE;
+	}
+
+	*bps = 512;
+	*cylinders = ((unsigned char)ident[ 2]) | (((unsigned char )ident[ 3]) << 8);
+	*heads     = ((unsigned char)ident[ 6]) | (((unsigned char )ident[ 7]) << 8);
+	*sectors   = ((unsigned char)ident[12]) | (((unsigned char )ident[13]) << 8);
+
+	expected_size = (UINT64)*cylinders * (UINT64)*heads * (UINT64)*sectors * 512;
+	if (expected_size != filesize - offset)
+	{
+		fprintf(stderr, "Error: Mismatch between the ident CHS data (%u/%u/%u, %u sectors) and the file size (%u sectors)\n",
+				*cylinders, *heads, *sectors, *cylinders * *heads * *sectors,
+				(UINT32)((filesize-offset)/512));
+		return CHDERR_INVALID_FILE;
+	}
+	return CHDERR_NONE;
+}
+
+
+/*-------------------------------------------------
     do_createhd - create a new compressed hard
     disk image from a raw file
 -------------------------------------------------*/
@@ -249,10 +299,38 @@ static int do_createhd(int argc, char *argv[], int param)
 {
 	UINT32 guess_cylinders = 0, guess_heads = 0, guess_sectors = 0, guess_sectorsize = 0;
 	UINT32 cylinders, heads, sectors, sectorsize, hunksize, totalsectors, offset;
-	const char *inputfile, *outputfile;
+	const char *inputfile, *outputfile = NULL;
+	chd_error err = CHDERR_NONE;
+	UINT32 identdatasize = 0;
+	UINT8 *identdata = NULL;
 	chd_file *chd = NULL;
 	char metadata[256];
-	chd_error err;
+
+	/* if a file is provided for argument 4 (ident filename), then shift the remaining arguments down */
+	if (argc >= 5)
+	{
+		char *scan;
+
+		/* if there are any non-digits in the 'offset', then treat it as a ident file */
+		for (scan = argv[4]; *scan != 0; scan++)
+			if (!isdigit(*scan))
+				break;
+		if (*scan != 0)
+		{
+			/* attempt to load the file */
+			file_error filerr = core_fload(argv[4], (void **)&identdata, &identdatasize);
+			if (filerr != FILERR_NONE)
+			{
+				fprintf(stderr, "Error opening ident file '%s'\n", argv[4]);
+				return 1;
+			}
+
+			/* shift the remaining arguments down */
+			if (argc > 5)
+				memmove(&argv[4], &argv[5], (argc - 5) * sizeof(argv[0]));
+			argc--;
+		}
+	}
 
 	/* require 4-5, or 8-10 args total */
 	if (argc != 4 && argc != 5 && argc != 8 && argc != 9 && argc != 10)
@@ -266,7 +344,10 @@ static int do_createhd(int argc, char *argv[], int param)
 	/* if less than 8 parameters, we need to guess the CHS values */
 	if (argc < 8)
 	{
-		err = guess_chs(inputfile, offset, IDE_SECTOR_SIZE, &guess_cylinders, &guess_heads, &guess_sectors, &guess_sectorsize);
+		if (identdata != NULL)
+			err = get_chs_from_ident(inputfile, offset, identdata, identdatasize, &guess_cylinders, &guess_heads, &guess_sectors, &guess_sectorsize);
+		else
+			err = guess_chs(inputfile, offset, IDE_SECTOR_SIZE, &guess_cylinders, &guess_heads, &guess_sectors, &guess_sectorsize);
 		if (err != CHDERR_NONE)
 			goto cleanup;
 	}
@@ -309,11 +390,22 @@ static int do_createhd(int argc, char *argv[], int param)
 
 	/* write the metadata */
 	sprintf(metadata, HARD_DISK_METADATA_FORMAT, cylinders, heads, sectors, sectorsize);
-	err = chd_set_metadata(chd, HARD_DISK_METADATA_TAG, 0, metadata, strlen(metadata) + 1, 0);
+	err = chd_set_metadata(chd, HARD_DISK_METADATA_TAG, 0, metadata, strlen(metadata) + 1, CHD_MDFLAGS_CHECKSUM);
 	if (err != CHDERR_NONE)
 	{
 		fprintf(stderr, "Error adding hard disk metadata: %s\n", chd_error_string(err));
 		goto cleanup;
+	}
+
+	/* write the ident if present */
+	if (identdata != NULL)
+	{
+		err = chd_set_metadata(chd, HARD_DISK_IDENT_METADATA_TAG, 0, identdata, identdatasize, CHD_MDFLAGS_CHECKSUM);
+		if (err != CHDERR_NONE)
+		{
+			fprintf(stderr, "Error adding hard disk metadata: %s\n", chd_error_string(err));
+			goto cleanup;
+		}
 	}
 
 	/* compress the hard drive */
@@ -327,6 +419,8 @@ cleanup:
 		chd_close(chd);
 	if (err != CHDERR_NONE)
 		osd_rmfile(outputfile);
+	if (identdata != NULL)
+		free(identdata);
 	return (err != CHDERR_NONE);
 }
 
@@ -474,18 +568,11 @@ static int do_createcd(int argc, char *argv[], int param)
 	}
 
 	/* write the metadata */
-	for (i = 0; i < toc.numtrks; i++)
+	err = cdrom_write_metadata(chd, &toc);
+	if (err != CHDERR_NONE)
 	{
-		char metadata[256];
-		sprintf(metadata, CDROM_TRACK_METADATA_FORMAT, i + 1, cdrom_get_type_string(&toc.tracks[i]),
-				cdrom_get_subtype_string(&toc.tracks[i]), toc.tracks[i].frames);
-
-		err = chd_set_metadata(chd, CDROM_TRACK_METADATA_TAG, i, metadata, strlen(metadata) + 1, 0);
-		if (err != CHDERR_NONE)
-		{
-			fprintf(stderr, "Error adding CD-ROM metadata: %s\n", chd_error_string(err));
-			goto cleanup;
-		}
+		fprintf(stderr, "Error adding CD-ROM metadata: %s\n", chd_error_string(err));
+		goto cleanup;
 	}
 
 	/* begin state for writing */
@@ -902,7 +989,7 @@ static int do_createav(int argc, char *argv[], int param)
 
 	/* write the metadata */
 	sprintf(metadata, AV_METADATA_FORMAT, fps_times_1million / 1000000, fps_times_1million % 1000000, width, height, interlaced, channels, rate);
-	err = chd_set_metadata(chd, AV_METADATA_TAG, 0, metadata, strlen(metadata) + 1, 0);
+	err = chd_set_metadata(chd, AV_METADATA_TAG, 0, metadata, strlen(metadata) + 1, CHD_MDFLAGS_CHECKSUM);
 	if (err != CHDERR_NONE)
 	{
 		fprintf(stderr, "Error adding AV metadata: %s\n", chd_error_string(err));
@@ -959,7 +1046,7 @@ static int do_createav(int argc, char *argv[], int param)
 	/* write the final metadata */
 	if (ldframedata != NULL)
 	{
-		err = chd_set_metadata(chd, AV_LD_METADATA_TAG, 0, ldframedata, numframes * VBI_PACKED_BYTES, 0);
+		err = chd_set_metadata(chd, AV_LD_METADATA_TAG, 0, ldframedata, numframes * VBI_PACKED_BYTES, CHD_MDFLAGS_CHECKSUM);
 		if (err != CHDERR_NONE)
 		{
 			fprintf(stderr, "Error adding AVLD metadata: %s\n", chd_error_string(err));
@@ -1048,7 +1135,7 @@ static int do_createblankhd(int argc, char *argv[], int param)
 
 	/* write the metadata */
 	sprintf(metadata, HARD_DISK_METADATA_FORMAT, cylinders, heads, sectors, sectorsize);
-	err = chd_set_metadata(chd, HARD_DISK_METADATA_TAG, 0, metadata, strlen(metadata) + 1, 0);
+	err = chd_set_metadata(chd, HARD_DISK_METADATA_TAG, 0, metadata, strlen(metadata) + 1, CHD_MDFLAGS_CHECKSUM);
 	if (err != CHDERR_NONE)
 	{
 		fprintf(stderr, "Error adding hard disk metadata: %s\n", chd_error_string(err));
@@ -1236,6 +1323,7 @@ static int do_extract(int argc, char *argv[], int param)
 			err = CHDERR_WRITE_ERROR;
 			goto cleanup;
 		}
+		bytesremaining -= byteswritten;
 	}
 	progress(TRUE, "Extraction complete!                    \n");
 
@@ -1636,7 +1724,7 @@ cleanup:
 
 static int do_verify(int argc, char *argv[], int param)
 {
-	UINT8 actualmd5[CHD_MD5_BYTES], actualsha1[CHD_SHA1_BYTES];
+	chd_verify_result verify;
 	const char *inputfile;
 	chd_file *chd = NULL;
 	chd_header header;
@@ -1681,7 +1769,7 @@ static int do_verify(int argc, char *argv[], int param)
 
 		/* finish it */
 		if (err == CHDERR_NONE)
-			err = chd_verify_finish(chd, actualmd5, actualsha1);
+			err = chd_verify_finish(chd, &verify);
 	}
 
 	/* handle errors */
@@ -1695,31 +1783,34 @@ static int do_verify(int argc, char *argv[], int param)
 	}
 
 	/* verify the MD5 */
-	if (memcmp(header.md5, actualmd5, sizeof(header.md5)) == 0)
-		printf("MD5 verification successful!\n");
-	else
+	if (header.version <= 3)
 	{
-		fprintf(stderr, "Error: MD5 in header = ");
-		for (i = 0; i < CHD_MD5_BYTES; i++)
-			fprintf(stderr, "%02x", header.md5[i]);
-		fprintf(stderr, "\n");
-		fprintf(stderr, "          actual MD5 = ");
-		for (i = 0; i < CHD_MD5_BYTES; i++)
-			fprintf(stderr, "%02x", actualmd5[i]);
-		fprintf(stderr, "\n");
-
-		/* fix it */
-		if (param)
+		if (memcmp(header.md5, verify.md5, sizeof(header.md5)) == 0)
+			printf("MD5 verification successful!\n");
+		else
 		{
-			memcpy(header.md5, actualmd5, sizeof(header.md5));
-			fixed = TRUE;
+			fprintf(stderr, "Error: MD5 in header = ");
+			for (i = 0; i < CHD_MD5_BYTES; i++)
+				fprintf(stderr, "%02x", header.md5[i]);
+			fprintf(stderr, "\n");
+			fprintf(stderr, "          actual MD5 = ");
+			for (i = 0; i < CHD_MD5_BYTES; i++)
+				fprintf(stderr, "%02x", verify.md5[i]);
+			fprintf(stderr, "\n");
+
+			/* fix it */
+			if (param)
+			{
+				memcpy(header.md5, verify.md5, sizeof(header.md5));
+				fixed = TRUE;
+			}
 		}
 	}
 
 	/* verify the SHA1 */
 	if (header.version >= 3)
 	{
-		if (memcmp(header.sha1, actualsha1, sizeof(header.sha1)) == 0)
+		if (memcmp(header.sha1, verify.sha1, sizeof(header.sha1)) == 0)
 			printf("SHA1 verification successful!\n");
 		else
 		{
@@ -1729,14 +1820,37 @@ static int do_verify(int argc, char *argv[], int param)
 			fprintf(stderr, "\n");
 			fprintf(stderr, "          actual SHA1 = ");
 			for (i = 0; i < CHD_SHA1_BYTES; i++)
-				fprintf(stderr, "%02x", actualsha1[i]);
+				fprintf(stderr, "%02x", verify.sha1[i]);
 			fprintf(stderr, "\n");
 
 			/* fix it */
 			if (param)
 			{
-				memcpy(header.sha1, actualsha1, sizeof(header.sha1));
+				memcpy(header.sha1, verify.sha1, sizeof(header.sha1));
 				fixed = TRUE;
+			}
+
+			/* verify the raw SHA1 */
+			if (header.version >= 4)
+			{
+				if (memcmp(header.rawsha1, verify.rawsha1, sizeof(header.rawsha1)) != 0)
+				{
+					fprintf(stderr, "Error: raw SHA1 in header = ");
+					for (i = 0; i < CHD_SHA1_BYTES; i++)
+						fprintf(stderr, "%02x", header.rawsha1[i]);
+					fprintf(stderr, "\n");
+					fprintf(stderr, "          actual raw SHA1 = ");
+					for (i = 0; i < CHD_SHA1_BYTES; i++)
+						fprintf(stderr, "%02x", verify.rawsha1[i]);
+					fprintf(stderr, "\n");
+
+					/* fix it */
+					if (param)
+					{
+						memcpy(header.rawsha1, verify.rawsha1, sizeof(header.rawsha1));
+						fixed = TRUE;
+					}
+				}
 			}
 		}
 	}
@@ -1967,7 +2081,7 @@ static int do_fixavdata(int argc, char *argv[], int param)
 		}
 
 		/* write new metadata */
-		err = chd_set_metadata(chd, AV_LD_METADATA_TAG, 0, vbidata, header.totalhunks * VBI_PACKED_BYTES, 0);
+		err = chd_set_metadata(chd, AV_LD_METADATA_TAG, 0, vbidata, header.totalhunks * VBI_PACKED_BYTES, CHD_MDFLAGS_CHECKSUM);
 		if (err != CHDERR_NONE)
 		{
 			fprintf(stderr, "Error adding AVLD metadata: %s\n", chd_error_string(err));
@@ -2036,7 +2150,7 @@ static int do_info(int argc, char *argv[], int param)
 	printf("Hunk Size:    %d bytes\n", header.hunkbytes);
 	printf("Total Hunks:  %d\n", header.totalhunks);
 	printf("Logical size: %s bytes\n", big_int_string(header.logicalbytes));
-	if (!(header.flags & CHDFLAGS_IS_WRITEABLE))
+	if (!(header.flags & CHDFLAGS_IS_WRITEABLE) && header.version <= 3)
 		printf("MD5:          %02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x\n",
 				header.md5[0], header.md5[1], header.md5[2], header.md5[3],
 				header.md5[4], header.md5[5], header.md5[6], header.md5[7],
@@ -2049,6 +2163,15 @@ static int do_info(int argc, char *argv[], int param)
 				header.sha1[8], header.sha1[9], header.sha1[10], header.sha1[11],
 				header.sha1[12], header.sha1[13], header.sha1[14], header.sha1[15],
 				header.sha1[16], header.sha1[17], header.sha1[18], header.sha1[19]);
+	if (!(header.flags & CHDFLAGS_IS_WRITEABLE) && header.version >= 4)
+	{
+		printf("Raw SHA1:     %02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x\n",
+				header.rawsha1[0], header.rawsha1[1], header.rawsha1[2], header.rawsha1[3],
+				header.rawsha1[4], header.rawsha1[5], header.rawsha1[6], header.rawsha1[7],
+				header.rawsha1[8], header.rawsha1[9], header.rawsha1[10], header.rawsha1[11],
+				header.rawsha1[12], header.rawsha1[13], header.rawsha1[14], header.rawsha1[15],
+				header.rawsha1[16], header.rawsha1[17], header.rawsha1[18], header.rawsha1[19]);
+	}
 	if (header.flags & CHDFLAGS_HAS_PARENT)
 	{
 		printf("Parent MD5:   %02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x\n",
@@ -2312,7 +2435,7 @@ static int do_merge_update_chomp(int argc, char *argv[], int param)
 	}
 
 	/* clone the metadata from the input file (which should have inherited from the parent) */
-	err = chd_clone_metadata(inputchd, outputchd);
+	err = chdman_clone_metadata(inputchd, outputchd);
 	if (err != CHDERR_NONE)
 	{
 		fprintf(stderr, "Error cloning metadata: %s\n", chd_error_string(err));
@@ -2494,7 +2617,7 @@ static int do_setchs(int argc, char *argv[], int param)
 
 	/* write our own */
 	sprintf(metadata, HARD_DISK_METADATA_FORMAT, cyls, hds, secs, oldsecsize);
-	err = chd_set_metadata(chd, HARD_DISK_METADATA_TAG, 0, metadata, strlen(metadata) + 1, 0);
+	err = chd_set_metadata(chd, HARD_DISK_METADATA_TAG, 0, metadata, strlen(metadata) + 1, CHD_MDFLAGS_CHECKSUM);
 	if (err != CHDERR_NONE)
 	{
 		fprintf(stderr, "Error writing new metadata to CHD file: %s\n", chd_error_string(err));
@@ -2529,6 +2652,155 @@ static int do_setchs(int argc, char *argv[], int param)
 		fprintf(stderr, "WARNING: new size is larger; run chdman -update to account for new empty space\n");
 
 cleanup:
+	if (chd != NULL)
+		chd_close(chd);
+	if (err != CHDERR_NONE && was_readonly)
+	{
+		header.flags &= ~CHDFLAGS_IS_WRITEABLE;
+		chd_set_header(inoutfile, &header);
+	}
+	return (err != CHDERR_NONE);
+}
+
+
+/*-------------------------------------------------
+    do_addmeta - add metadata to a CHD from a
+    file
+-------------------------------------------------*/
+
+static int do_addmeta(int argc, char *argv[], int param)
+{
+	const char *inoutfile, *srcfile, *tagstring;
+	UINT8 was_readonly = FALSE;
+	UINT8 *metadata = NULL;
+	chd_file *chd = NULL;
+	chd_header header;
+	file_error filerr;
+	UINT32 metalength;
+	UINT32 metaindex;
+	UINT32 metatag;
+	chd_error err;
+
+	/* require 5 or 6 args total */
+	if (argc != 5 && argc != 6)
+		return usage();
+
+	/* extract the data */
+	inoutfile = argv[2];
+	tagstring = argv[3];
+	if (argc == 5)
+	{
+		metaindex = 0;
+		srcfile = argv[4];
+	}
+	else
+	{
+		metaindex = atoi(argv[4]);
+		srcfile = argv[5];
+	}
+
+	/* verify the tag */
+	if (strlen(tagstring) > 4)
+	{
+		fprintf(stderr, "Invalid tag '%s'; must be 4 characters or less\n", tagstring);
+		return CHDERR_INVALID_PARAMETER;
+	}
+	metatag = ((tagstring[0] == 0) ? ' ' : tagstring[0]) << 24;
+	metatag |= ((tagstring[1] == 0) ? ' ' : tagstring[1]) << 16;
+	metatag |= ((tagstring[2] == 0) ? ' ' : tagstring[2]) << 8;
+	metatag |= ((tagstring[3] == 0) ? ' ' : tagstring[3]) << 0;
+
+	/* print some info */
+	printf("Input file:   %s\n", inoutfile);
+	printf("Tag:          '%c%c%c%c'\n", (metatag >> 24) & 0xff, (metatag >> 16) & 0xff, (metatag >> 8) & 0xff, metatag & 0xff);
+	printf("Index:        %d\n", metaindex);
+	printf("Source file:  %s\n", srcfile);
+
+	/* open the file read-only and get the header */
+	err = chd_open(inoutfile, CHD_OPEN_READ, NULL, &chd);
+	if (err != CHDERR_NONE)
+	{
+		fprintf(stderr, "Error opening CHD file '%s' read-only: %s\n", inoutfile, chd_error_string(err));
+		goto cleanup;
+	}
+	header = *chd_get_header(chd);
+	chd_close(chd);
+	chd = NULL;
+
+	/* if the drive is not writeable, note that, and make it so */
+	if (!(header.flags & CHDFLAGS_IS_WRITEABLE))
+	{
+		was_readonly = TRUE;
+		header.flags |= CHDFLAGS_IS_WRITEABLE;
+
+		/* write the new header */
+		err = chd_set_header(inoutfile, &header);
+		if (err != CHDERR_NONE)
+		{
+			fprintf(stderr, "Error making CHD file writeable: %s\n", chd_error_string(err));
+			goto cleanup;
+		}
+	}
+
+	/* open the file read/write */
+	err = chd_open(inoutfile, CHD_OPEN_READWRITE, NULL, &chd);
+	if (err != CHDERR_NONE)
+	{
+		fprintf(stderr, "Error opening CHD file '%s' read/write: %s\n", inoutfile, chd_error_string(err));
+		goto cleanup;
+	}
+
+	/* attempt to open the source file */
+	filerr = core_fload(srcfile, (void **)&metadata, &metalength);
+	if (filerr != FILERR_NONE)
+	{
+		fprintf(stderr, "Error opening source file '%s'\n", srcfile);
+		err = CHDERR_FILE_NOT_FOUND;
+		goto cleanup;
+	}
+
+	/* if it's text, strip any trailing Ctrl-Z and CR/LF and add a trailing NULL */
+	if (param)
+	{
+		metadata = realloc(metadata, metalength + 1);
+		if (metadata == NULL)
+		{
+			fprintf(stderr, "Out of memory preparing metadata\n");
+			err = CHDERR_OUT_OF_MEMORY;
+			goto cleanup;
+		}
+		metadata[metalength++] = 0;
+		while (metalength > 0 && (metadata[metalength - 2] == 0x0a || metadata[metalength - 2] == 0x0d || metadata[metalength - 2] == 0x1a))
+			metadata[--metalength] = 0;
+	}
+
+	/* write the new metadata */
+	err = chd_set_metadata(chd, metatag, metaindex, metadata, metalength, CHD_MDFLAGS_CHECKSUM);
+	if (err != CHDERR_NONE)
+	{
+		fprintf(stderr, "Error writing new metadata to CHD file: %s\n", chd_error_string(err));
+		goto cleanup;
+	}
+	header = *chd_get_header(chd);
+
+	/* close the file */
+	chd_close(chd);
+	chd = NULL;
+
+	/* restore the read-only state */
+	if (was_readonly)
+	{
+		header.flags &= ~CHDFLAGS_IS_WRITEABLE;
+		err = chd_set_header(inoutfile, &header);
+		if (err != CHDERR_NONE)
+			fprintf(stderr, "Error writing new header to CHD file: %s\n", chd_error_string(err));
+	}
+	if (err == CHDERR_NONE)
+		printf("Metadata added successfully as %s\n", param ? "text" : "binary");
+
+cleanup:
+	if (metadata != NULL)
+		free(metadata);
 	if (chd != NULL)
 		chd_close(chd);
 	if (err != CHDERR_NONE && was_readonly)
@@ -2713,17 +2985,16 @@ static chd_error chdman_compress_chd(chd_file *chd, chd_file *source, UINT32 tot
 	if (verifyerr == CHDERR_NONE && source_offset >= source_header->logicalbytes)
 	{
 		static const UINT8 empty_checksum[CHD_SHA1_BYTES] = { 0 };
-		UINT8 md5[CHD_MD5_BYTES];
-		UINT8 sha1[CHD_SHA1_BYTES];
+		chd_verify_result verify;
 		int i;
 
 		/* get the final values */
-		err = chd_verify_finish(source, md5, sha1);
+		err = chd_verify_finish(source, &verify);
 
 		/* check the MD5 */
 		if (memcmp(source_header->md5, empty_checksum, CHD_MD5_BYTES) != 0)
 		{
-			if (memcmp(source_header->md5, md5, CHD_MD5_BYTES) != 0)
+			if (memcmp(source_header->md5, verify.md5, CHD_MD5_BYTES) != 0)
 			{
 				progress(TRUE, "WARNING: expected input MD5 = ");
 				for (i = 0; i < CHD_MD5_BYTES; i++)
@@ -2732,7 +3003,7 @@ static chd_error chdman_compress_chd(chd_file *chd, chd_file *source, UINT32 tot
 
 				progress(TRUE, "                 actual MD5 = ");
 				for (i = 0; i < CHD_MD5_BYTES; i++)
-					progress(TRUE, "%02x", md5[i]);
+					progress(TRUE, "%02x", verify.md5[i]);
 				progress(TRUE, "\n");
 			}
 			else
@@ -2742,7 +3013,7 @@ static chd_error chdman_compress_chd(chd_file *chd, chd_file *source, UINT32 tot
 		/* check the SHA1 */
 		if (memcmp(source_header->sha1, empty_checksum, CHD_SHA1_BYTES) != 0)
 		{
-			if (memcmp(source_header->sha1, sha1, CHD_SHA1_BYTES) != 0)
+			if (memcmp(source_header->sha1, verify.sha1, CHD_SHA1_BYTES) != 0)
 			{
 				progress(TRUE, "WARNING: expected input SHA1 = ");
 				for (i = 0; i < CHD_SHA1_BYTES; i++)
@@ -2751,7 +3022,7 @@ static chd_error chdman_compress_chd(chd_file *chd, chd_file *source, UINT32 tot
 
 				progress(TRUE, "                 actual SHA1 = ");
 				for (i = 0; i < CHD_SHA1_BYTES; i++)
-					progress(TRUE, "%02x", sha1[i]);
+					progress(TRUE, "%02x", verify.sha1[i]);
 				progress(TRUE, "\n");
 			}
 			else
@@ -2772,6 +3043,91 @@ cleanup:
 		free(source_cache);
 	if (cache != NULL)
 		free(cache);
+	return err;
+}
+
+
+/*-------------------------------------------------
+    chdman_clone_metadata - clone the metadata from
+    one CHD to a second
+-------------------------------------------------*/
+
+static chd_error chdman_clone_metadata(chd_file *source, chd_file *dest)
+{
+	const chd_header *header = chd_get_header(source);
+	UINT8 metabuffer[MAX(4096, sizeof(cdrom_toc))];
+	UINT32 metatag, metasize, metaindex;
+	UINT8 metaflags;
+	chd_error err;
+
+	/* clone the metadata */
+	for (metaindex = 0; ; metaindex++)
+	{
+		/* fetch the next piece of metadata */
+		err = chd_get_metadata(source, CHDMETATAG_WILDCARD, metaindex, metabuffer, sizeof(metabuffer), &metasize, &metatag, &metaflags);
+		if (err != CHDERR_NONE)
+		{
+			if (err == CHDERR_METADATA_NOT_FOUND)
+				err = CHDERR_NONE;
+			break;
+		}
+
+		/* promote certain bits of metadata to checksummed for older CHDs */
+		if (header->version <= 3)
+		{
+			if (metatag == HARD_DISK_METADATA_TAG || metatag == CDROM_OLD_METADATA_TAG ||
+			    metatag == CDROM_TRACK_METADATA_TAG || metatag == AV_METADATA_TAG ||
+			    metatag == AV_LD_METADATA_TAG)
+			{
+				metaflags |= CHD_MDFLAGS_CHECKSUM;
+			}
+
+			/* convert old-style CD-ROM data to newer */
+			if (metatag == CDROM_OLD_METADATA_TAG)
+			{
+				cdrom_toc *toc = (cdrom_toc *)metabuffer;
+				err = cdrom_parse_metadata(source, toc);
+				if (err == CHDERR_NONE)
+					err = cdrom_write_metadata(dest, toc);
+				if (err == CHDERR_NONE)
+					continue;
+			}
+		}
+
+		/* if that fit, just write it back from the temporary buffer */
+		if (metasize <= sizeof(metabuffer))
+		{
+			/* write it to the target */
+			err = chd_set_metadata(dest, metatag, CHD_METAINDEX_APPEND, metabuffer, metasize, metaflags);
+			if (err != CHDERR_NONE)
+				break;
+		}
+
+		/* otherwise, allocate a bigger temporary buffer */
+		else
+		{
+			UINT8 *allocbuffer = (UINT8 *)malloc(metasize);
+			if (allocbuffer == NULL)
+			{
+				err = CHDERR_OUT_OF_MEMORY;
+				break;
+			}
+
+			/* re-read the whole thing */
+			err = chd_get_metadata(source, CHDMETATAG_WILDCARD, metaindex, allocbuffer, metasize, &metasize, &metatag, &metaflags);
+			if (err != CHDERR_NONE)
+			{
+				free(allocbuffer);
+				break;
+			}
+
+			/* write it to the target */
+			err = chd_set_metadata(dest, metatag, CHD_METAINDEX_APPEND, allocbuffer, metasize, metaflags);
+			free(allocbuffer);
+			if (err != CHDERR_NONE)
+				break;
+		}
+	}
 	return err;
 }
 
@@ -2806,7 +3162,9 @@ int CLIB_DECL main(int argc, char **argv)
 		{ "-merge",			do_merge_update_chomp, OPERATION_MERGE },
 		{ "-diff",			do_diff, 0 },
 		{ "-setchs",		do_setchs, 0 },
-		{ "-fixavdata",		do_fixavdata, 0 }
+		{ "-fixavdata",		do_fixavdata, 0 },
+		{ "-addmetatext",   do_addmeta, TRUE },
+		{ "-addmetabin",    do_addmeta, FALSE },
 	};
 	extern char build_version[];
 	int i;

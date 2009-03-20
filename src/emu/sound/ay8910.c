@@ -287,6 +287,7 @@ static const ay_ym_param ay8910_param =
 
 /*
  * RL = 2000, Based on Matthew Westcott's measurements from Dec 2001.
+ * -------------------------------------------------------------------
  *
  * http://groups.google.com/group/comp.sys.sinclair/browse_thread/thread/fb3091da4c4caf26/d5959a800cda0b5e?lnk=gst&q=Matthew+Westcott#d5959a800cda0b5e
  * After what Russell mentioned a couple of weeks back about the lack of
@@ -316,14 +317,19 @@ static const ay_ym_param ay8910_param =
  * 13     2.06
  * 14     2.32
  * 15     2.58
+ * -------------------------------------------------------------------
+ *
+ * The ZX spectrum output circuit was modelled in SwitcherCAD and
+ * the resistor values below create the voltage levels above.
+ * RD was measured on a real chip to be 8m Ohm, RU was 0.8m Ohm.
  */
 
 static const ay_ym_param ay8910_param =
 {
-	1030, 357,
+	800000, 8000000,
 	16,
-	{ 81509, 34403, 26998, 21248, 15890, 11495, 8625, 5314,
-	   4287,  2583,  1836,  1350,   978,   745,  530,  392 }
+	{ 15950, 15350, 15090, 14760, 14275, 13620, 12890, 11370,
+      10600,  8590,  7190,  5985,  4820,  3945,  3017,  2345 }
 };
 
 /*************************************
@@ -339,7 +345,7 @@ INLINE void build_3D_table(double rl, const ay_ym_param *par, const ay_ym_param 
 	double min = 10.0,  max = 0.0;
 	double *temp;
 
-	temp = malloc(8*32*32*32*sizeof(*temp));
+	temp = (double *)malloc(8*32*32*32*sizeof(*temp));
 
 	for (e=0; e < 8; e++)
 		for (j1=0; j1 < 32; j1++)
@@ -545,7 +551,7 @@ static void ay8910_write_reg(ay8910_context *psg, int r, int v)
 
 static STREAM_UPDATE( ay8910_update )
 {
-	ay8910_context *psg = param;
+	ay8910_context *psg = (ay8910_context *)param;
 	stream_sample_t *buf[NUM_CHANNELS];
 	int chan;
 
@@ -731,11 +737,11 @@ static void ay8910_statesave(ay8910_context *psg, const device_config *device)
 
 void *ay8910_start_ym(void *infoptr, sound_type chip_type, const device_config *device, int clock, const ay8910_interface *intf)
 {
-	ay8910_context *info = infoptr;
+	ay8910_context *info = (ay8910_context *)infoptr;
 
 	if (info == NULL)
 	{
-		info = auto_malloc(sizeof(*info));
+		info = (ay8910_context *)auto_malloc(sizeof(*info));
 		memset(info, 0, sizeof(*info));
 	}
 	info->device = device;
@@ -787,7 +793,7 @@ void ay8910_stop_ym(void *chip)
 
 void ay8910_reset_ym(void *chip)
 {
-	ay8910_context *psg = chip;
+	ay8910_context *psg = (ay8910_context *)chip;
 	int i;
 
 	psg->register_latch = 0;
@@ -835,13 +841,13 @@ void ay8910_set_volume(const device_config *device,int channel,int volume)
 
 void ay8910_set_clock_ym(void *chip, int clock)
 {
-	ay8910_context *psg = chip;
+	ay8910_context *psg = (ay8910_context *)chip;
 	stream_set_sample_rate(psg->channel, clock / 8 );
 }
 
 void ay8910_write_ym(void *chip, int addr, int data)
 {
-	ay8910_context *psg = chip;
+	ay8910_context *psg = (ay8910_context *)chip;
 
 	if (addr & 1)
 	{	/* Data port */
@@ -864,13 +870,15 @@ void ay8910_write_ym(void *chip, int addr, int data)
 
 int ay8910_read_ym(void *chip)
 {
-	ay8910_context *psg = chip;
+	ay8910_context *psg = (ay8910_context *)chip;
 	int r = psg->register_latch;
 
 	if (r > 15) return 0;
 
+	/* FIXME: calling stream_update here makes gyruss sound awfull.
+     *        For the time being, no idea why this is the case */
 	/* update the output buffer before returning the register */
-	stream_update(psg->channel);
+	/* stream_update(psg->channel); */
 
 	switch (r)
 	{
@@ -912,7 +920,7 @@ static DEVICE_START( ay8910 )
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	};
-	const ay8910_interface *intf = (device->static_config ? device->static_config : &generic_ay8910);
+	const ay8910_interface *intf = (device->static_config ? (const ay8910_interface *)device->static_config : &generic_ay8910);
 	ay8910_start_ym(get_safe_token(device), SOUND_AY8910, device, device->clock, intf);
 }
 
@@ -924,7 +932,7 @@ static DEVICE_START( ym2149 )
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	};
-	const ay8910_interface *intf = (device->static_config ? device->static_config : &generic_ay8910);
+	const ay8910_interface *intf = (device->static_config ? (const ay8910_interface *)device->static_config : &generic_ay8910);
 	ay8910_start_ym(get_safe_token(device), SOUND_YM2149, device, device->clock, intf);
 }
 

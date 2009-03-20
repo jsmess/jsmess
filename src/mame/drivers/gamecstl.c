@@ -743,7 +743,7 @@ ROM_START(gamecstl)
 	ROM_LOAD("cga.chr",     0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
 
 	DISK_REGION( "ide" )
-	DISK_IMAGE( "gamecstl", 0, MD5(501ddbebb530b8fd67eb64a4a2de3e35) SHA1(2477468ef1c1d4529057064a319ebfe9fd8facd7) )
+	DISK_IMAGE( "gamecstl", 0, SHA1(b431af3c42c48ba07972d77a3d24e60ee1e4359e) )
 ROM_END
 
 ROM_START(gamecst2)
@@ -754,7 +754,7 @@ ROM_START(gamecst2)
 	ROM_LOAD("cga.chr",     0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
 
 	DISK_REGION( "ide" )
-	DISK_IMAGE( "gamecst2", 0, MD5(ef880a411521e0c6e10f715ad9dd796e) SHA1(8243d7d2eacedf358334821c9401c1b945524a69) )
+	DISK_IMAGE( "gamecst2", 0, SHA1(14e1b311cb474801c7bdda3164a0c220fb102159) )
 ROM_END
 
 /*****************************************************************************/
