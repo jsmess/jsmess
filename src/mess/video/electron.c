@@ -71,7 +71,8 @@ VIDEO_UPDATE( electron )
 	r.min_y = r.max_y = scanline;
 
 	/* set up palette */
-	switch( electron_ula.screen_mode ) {
+	switch( electron_ula.screen_mode )
+	{
 	case 0: case 3: case 4: case 6: case 7: /* 2 colour mode */
 		pal[0] = electron_ula.current_pal[0];
 		pal[1] = electron_ula.current_pal[8];
@@ -83,16 +84,17 @@ VIDEO_UPDATE( electron )
 		pal[3] = electron_ula.current_pal[10];
 		break;
 	case 2:	/* 16 colour mode */
-		for( i = 0; i < 16; i++ ) {
+		for( i = 0; i < 16; i++ )
 			pal[i] = electron_ula.current_pal[i];
-		}
-		break;
 	}
+
 	/* draw line */
-	switch( electron_ula.screen_mode ) {
+	switch( electron_ula.screen_mode )
+	{
 	case 0:
-		for( i = 0; i < 80; i++ ) {
-			UINT8 pattern = read_vram( electron_ula.screen_addr + i * 8 );
+		for( i = 0; i < 80; i++ )
+		{
+			UINT8 pattern = read_vram( electron_ula.screen_addr + (i << 3) );
 			electron_plot_pixel( bitmap, x++, scanline, pal[(pattern>>7)& 1] );
 			electron_plot_pixel( bitmap, x++, scanline, pal[(pattern>>6)& 1] );
 			electron_plot_pixel( bitmap, x++, scanline, pal[(pattern>>5)& 1] );
@@ -102,14 +104,14 @@ VIDEO_UPDATE( electron )
 			electron_plot_pixel( bitmap, x++, scanline, pal[(pattern>>1)& 1] );
 			electron_plot_pixel( bitmap, x++, scanline, pal[(pattern>>0)& 1] );
 		}
-		electron_ula.screen_addr += 1;
-		if ( ( scanline & 0x07 ) == 7 ) {
-			electron_ula.screen_addr += ( 0x280 - 8 );
-		}
+		electron_ula.screen_addr++;
+		if ( ( scanline & 0x07 ) == 7 )
+			electron_ula.screen_addr += 0x278;
 		break;
+
 	case 1:
-		x = 0;
-		for( i = 0; i < 80; i++ ) {
+		for( i = 0; i < 80; i++ )
+		{
 			UINT8 pattern = read_vram( electron_ula.screen_addr + i * 8 );
 			electron_plot_pixel( bitmap, x++, scanline, pal[map4[pattern>>3]] );
 			electron_plot_pixel( bitmap, x++, scanline, pal[map4[pattern>>3]] );
@@ -120,13 +122,14 @@ VIDEO_UPDATE( electron )
 			electron_plot_pixel( bitmap, x++, scanline, pal[map4[pattern>>0]] );
 			electron_plot_pixel( bitmap, x++, scanline, pal[map4[pattern>>0]] );
 		}
-		electron_ula.screen_addr += 1;
-		if ( ( scanline & 0x07 ) == 7 ) {
-			electron_ula.screen_addr += ( 0x280 - 8 );
-		}
+		electron_ula.screen_addr++;
+		if ( ( scanline & 0x07 ) == 7 )
+			electron_ula.screen_addr += 0x278;
 		break;
+
 	case 2:
-		for( i = 0; i < 80; i++ ) {
+		for( i = 0; i < 80; i++ )
+		{
 			UINT8 pattern = read_vram( electron_ula.screen_addr + i * 8 );
 			electron_plot_pixel( bitmap, x++, scanline, pal[map16[pattern>>1]] );
 			electron_plot_pixel( bitmap, x++, scanline, pal[map16[pattern>>1]] );
@@ -137,11 +140,11 @@ VIDEO_UPDATE( electron )
 			electron_plot_pixel( bitmap, x++, scanline, pal[map16[pattern>>0]] );
 			electron_plot_pixel( bitmap, x++, scanline, pal[map16[pattern>>0]] );
 		}
-		electron_ula.screen_addr += 1;
-		if ( ( scanline & 0x07 ) == 7 ) {
-			electron_ula.screen_addr += ( 0x280 - 8 );
-		}
+		electron_ula.screen_addr++;
+		if ( ( scanline & 0x07 ) == 7 )
+			electron_ula.screen_addr += 0x278;
 		break;
+
 	case 3:
 		if ( ( scanline > 249 ) || ( scanline % 10 >= 8 ) )
 			bitmap_fill( bitmap, &r , 7);
@@ -159,14 +162,16 @@ VIDEO_UPDATE( electron )
 				electron_plot_pixel( bitmap, x++, scanline, pal[(pattern>>1)&1] );
 				electron_plot_pixel( bitmap, x++, scanline, pal[(pattern>>0)&1] );
 			}
-			electron_ula.screen_addr += 1;
+			electron_ula.screen_addr++;
 		}
-
-		if ( scanline % 10 == 9 ) electron_ula.screen_addr += ( 0x280 - 8 );
+		if ( scanline % 10 == 9 )
+			electron_ula.screen_addr += 0x278;
 		break;
+
 	case 4:
 	case 7:
-		for( i = 0; i < 40; i++ ) {
+		for( i = 0; i < 40; i++ )
+		{
 			UINT8 pattern = read_vram( electron_ula.screen_addr + i * 8 );
 			electron_plot_pixel( bitmap, x++, scanline, pal[(pattern>>7)&1] );
 			electron_plot_pixel( bitmap, x++, scanline, pal[(pattern>>7)&1] );
@@ -185,13 +190,14 @@ VIDEO_UPDATE( electron )
 			electron_plot_pixel( bitmap, x++, scanline, pal[(pattern>>0)&1] );
 			electron_plot_pixel( bitmap, x++, scanline, pal[(pattern>>0)&1] );
 		}
-		electron_ula.screen_addr += 1;
-		if ( ( scanline & 0x07 ) == 7 ) {
-			electron_ula.screen_addr += ( 0x140 - 8 );
-		}
+		electron_ula.screen_addr++;
+		if ( ( scanline & 0x07 ) == 7 )
+			electron_ula.screen_addr += 0x138;
 		break;
+
 	case 5:
-		for( i = 0; i < 40; i++ ) {
+		for( i = 0; i < 40; i++ )
+		{
 			UINT8 pattern = read_vram( electron_ula.screen_addr + i * 8 );
 			electron_plot_pixel( bitmap, x++, scanline, pal[map4[pattern>>3]] );
 			electron_plot_pixel( bitmap, x++, scanline, pal[map4[pattern>>3]] );
@@ -210,16 +216,18 @@ VIDEO_UPDATE( electron )
 			electron_plot_pixel( bitmap, x++, scanline, pal[map4[pattern>>0]] );
 			electron_plot_pixel( bitmap, x++, scanline, pal[map4[pattern>>0]] );
 		}
-		electron_ula.screen_addr += 1;
-		if ( ( scanline & 0x07 ) == 7 ) {
-			electron_ula.screen_addr += ( 0x140 - 8 );
-		}
+		electron_ula.screen_addr++;
+		if ( ( scanline & 0x07 ) == 7 )
+			electron_ula.screen_addr += 0x138;
 		break;
+
 	case 6:
-		if ( ( scanline > 249 ) || ( scanline % 10 >= 8 ) ) {
+		if ( ( scanline > 249 ) || ( scanline % 10 >= 8 ) )
 			bitmap_fill( bitmap, &r , 7);
-		} else {
-			for( i = 0; i < 40; i++ ) {
+		else
+		{
+			for( i = 0; i < 40; i++ )
+			{
 				UINT8 pattern = read_vram( electron_ula.screen_addr + i * 8 );
 				electron_plot_pixel( bitmap, x++, scanline, pal[(pattern>>7)&1] );
 				electron_plot_pixel( bitmap, x++, scanline, pal[(pattern>>7)&1] );
@@ -238,10 +246,9 @@ VIDEO_UPDATE( electron )
 				electron_plot_pixel( bitmap, x++, scanline, pal[(pattern>>0)&1] );
 				electron_plot_pixel( bitmap, x++, scanline, pal[(pattern>>0)&1] );
 			}
-			electron_ula.screen_addr += 1;
-			if ( ( scanline % 10 ) == 7 ) {
-				electron_ula.screen_addr += ( 0x140 - 8 );
-			}
+			electron_ula.screen_addr++;
+			if ( ( scanline % 10 ) == 7 )
+				electron_ula.screen_addr += 0x138;
 		}
 		break;
 	}
@@ -259,7 +266,7 @@ static TIMER_CALLBACK( electron_scanline_interrupt )
 	case 199:
 		electron_interrupt_handler( machine, INT_SET, INT_DISPLAY_END );
 		break;
-	case 255:
+	case 0:
 		electron_ula.screen_addr = electron_ula.screen_start - electron_ula.screen_base;
 		break;
 	}
