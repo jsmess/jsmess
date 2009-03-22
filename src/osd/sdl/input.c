@@ -1097,13 +1097,12 @@ void sdlinput_init(running_machine *machine)
 	// register the mice
 	sdlinput_register_mice(machine);
 
-#ifdef MAME_DEBUG
-	if (mouse_enabled)
+	if (machine->debug_flags & DEBUG_FLAG_ENABLED)
 	{
-		mame_printf_warning("Debug Build: Disabling input grab in window mode ...\n");
+		mame_printf_warning("Debug Build: Disabling input grab for -debug\n");
 		mouse_enabled = 0;
 	}
-#endif
+
 	// get Sixaxis special mode info
 	sixaxis_mode = options_get_bool(mame_options(), SDLOPTION_SIXAXIS);
 

@@ -17,7 +17,8 @@
 #if defined(__i386__) || defined(__x86_64__)
 
 
-INLINE void osd_yield_processor(void)
+INLINE void ATTR_FORCE_INLINE
+osd_yield_processor(void)
 {
 	__asm__ __volatile__ ( " rep ; nop ;" );
 }
@@ -29,8 +30,8 @@ INLINE void osd_yield_processor(void)
 //  osd_exchange64
 //============================================================
 
-ATTR_UNUSED
-INLINE INT64 _osd_exchange64(INT64 volatile *ptr, INT64 exchange)
+INLINE INT64 ATTR_UNUSED ATTR_NONNULL(1) ATTR_FORCE_INLINE
+_osd_exchange64(INT64 volatile *ptr, INT64 exchange)
 {
 	register INT64 ret;
 	__asm__ __volatile__ (
@@ -49,7 +50,8 @@ INLINE INT64 _osd_exchange64(INT64 volatile *ptr, INT64 exchange)
 #elif defined(__ppc__) || defined (__PPC__) || defined(__ppc64__) || defined(__PPC64__)
 
 
-INLINE void osd_yield_processor(void)
+INLINE void ATTR_FORCE_INLINE
+osd_yield_processor(void)
 {
 	__asm__ __volatile__ ( " nop \n nop \n" );
 }
@@ -62,14 +64,14 @@ INLINE void osd_yield_processor(void)
 //  osd_exchange64
 //============================================================
 
-ATTR_UNUSED
-INLINE INT64 _osd_exchange64(INT64 volatile *ptr, INT64 exchange)
+INLINE INT64 ATTR_UNUSED ATTR_NONNULL(1) ATTR_FORCE_INLINE
+_osd_exchange64(INT64 volatile *ptr, INT64 exchange)
 {
 	register INT64 ret;
 	__asm__ __volatile__ (
 		"1: ldarx  %[ret], 0, %[ptr]      \n"
 		"   stdcx. %[exchange], 0, %[ptr] \n"
-		"   bne--  1b                     \n"
+		"   bne-   1b                     \n"
 		: [ret]      "=&r" (ret)
 		: [ptr]      "r"   (ptr)
 		, [exchange] "r"   (exchange)

@@ -22,6 +22,7 @@
 #include "render.h"
 #include "options.h"
 #include "driver.h"
+#include "rendutil.h"
 
 // standard SDL headers
 #include <SDL/SDL.h>
@@ -128,6 +129,7 @@ typedef void (APIENTRYP PFNGLDELETERENDERBUFFERSEXTPROC) (GLsizei n, const GLuin
 //============================================================
 
 #define DEBUG_MODE_SCORES	0
+#define USE_WIN32_STYLE_LINES   0	// use the same method baseline does - yields somewhat nicer vectors but a little buggy
 
 //============================================================
 //  CONSTANTS
@@ -258,6 +260,28 @@ struct _sdl_info
     GLfloat 		texVerticex[8];
 };
 
+/* line_aa_step is used for drawing antialiased lines */
+typedef struct _line_aa_step line_aa_step;
+struct _line_aa_step
+{
+	float		xoffs, yoffs;				// X/Y deltas
+	float		weight;					// weight contribution
+};
+
+static const line_aa_step line_aa_1step[] =
+{
+	{  0.00f,  0.00f,  1.00f  },
+	{ 0 }
+};
+
+static const line_aa_step line_aa_4step[] =
+{
+	{ -0.25f,  0.00f,  0.25f  },
+	{  0.25f,  0.00f,  0.25f  },
+	{  0.00f, -0.25f,  0.25f  },
+	{  0.00f,  0.25f,  0.25f  },
+	{ 0 }
+};
 
 //============================================================
 //  INLINES
@@ -1151,7 +1175,9 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 	render_primitive *prim;
 	texture_info *texture=NULL;
 	float vofs, hofs;
-    int  pendingPrimitive=GL_NO_PRIMITIVE, curPrimitive=GL_NO_PRIMITIVE;
+	int  pendingPrimitive=GL_NO_PRIMITIVE, curPrimitive=GL_NO_PRIMITIVE, scrnum, is_vector;
+	const device_config *screen;
+	const screen_config *scrconfig;
 
 	if (video_config.novideo)
 	{
@@ -1171,8 +1197,25 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 		glDepthFunc(GL_LEQUAL);
 		glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 	}
+
+	// figure out if we're vector
+	scrnum = is_vector = 0;
+	for (screen = video_screen_first(window->machine->config); screen != NULL; screen = video_screen_next(screen))
+	{
+		if (scrnum == window->index)
+		{
+			scrconfig = screen->inline_config;
+			is_vector = (scrconfig->type == SCREEN_TYPE_VECTOR) ? 1 : 0;
+			break;
+		}
+		else
+		{
+			scrnum++;
+		}
+	}
+
 	// only clear if the geometry changes (and for 2 frames afterward to clear double and triple buffers)
-	if ((sdl->blittimer > 0) || (video_config.isvector))
+	if ((sdl->blittimer > 0) || (is_vector))
 	{
 		glClear(GL_COLOR_BUFFER_BIT);
 		sdl->blittimer--;
@@ -1289,6 +1332,7 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 			 * since entering and leaving one is most expensive..
 			 */
 			case RENDER_PRIMITIVE_LINE:
+				#if !USE_WIN32_STYLE_LINES
 				// check if it's really a point
 				if (((prim->bounds.x1 - prim->bounds.x0) == 0) && ((prim->bounds.y1 - prim->bounds.y0) == 0))
 				{
@@ -1303,8 +1347,10 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 				    pendingPrimitive=GL_NO_PRIMITIVE;
 				}
 
-                if ( pendingPrimitive==GL_NO_PRIMITIVE )
-                	set_blendmode(sdl, PRIMFLAG_GET_BLENDMODE(prim->flags));
+		                if ( pendingPrimitive==GL_NO_PRIMITIVE )
+				{
+		                	set_blendmode(sdl, PRIMFLAG_GET_BLENDMODE(prim->flags));
+				}
 
 				glColor4f(prim->color.r, prim->color.g, prim->color.b, prim->color.a);
 
@@ -1324,6 +1370,93 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 					glVertex2f(prim->bounds.x0+hofs, prim->bounds.y0+vofs);
 					glVertex2f(prim->bounds.x1+hofs, prim->bounds.y1+vofs);
 				}
+				#else
+				{
+					const line_aa_step *step = line_aa_4step;
+					render_bounds b0, b1;
+					float r, g, b, a;
+					float effwidth;
+
+					// we're not gonna play fancy here.  close anything pending and let's go.
+					if (pendingPrimitive!=GL_NO_PRIMITIVE && pendingPrimitive!=curPrimitive)
+					{
+					    glEnd();
+					    pendingPrimitive=GL_NO_PRIMITIVE;
+					}
+
+					set_blendmode(sdl, PRIMFLAG_GET_BLENDMODE(prim->flags));
+
+					// compute the effective width based on the direction of the line
+					effwidth = prim->width;
+					if (effwidth < 0.5f)
+						effwidth = 0.5f;
+
+					// determine the bounds of a quad to draw this line
+					render_line_to_quad(&prim->bounds, effwidth, &b0, &b1);
+
+					// fix window position
+					b0.x0 += hofs;
+					b0.x1 += hofs;
+					b1.x0 += hofs;
+					b1.x1 += hofs;
+					b0.y0 += vofs;
+					b0.y1 += vofs;
+					b1.y0 += vofs;
+					b1.y1 += vofs;
+
+					// iterate over AA steps
+					for (step = PRIMFLAG_GET_ANTIALIAS(prim->flags) ? line_aa_4step : line_aa_1step; step->weight != 0; step++)
+					{
+						glBegin(GL_TRIANGLE_STRIP);
+
+						// rotate the unit vector by 135 degrees and add to point 0
+						glVertex2f(b0.x0 + step->xoffs, b0.y0 + step->yoffs);
+
+						// rotate the unit vector by -135 degrees and add to point 0
+						glVertex2f(b0.x1 + step->xoffs, b0.y1 + step->yoffs);
+
+						// rotate the unit vector by 45 degrees and add to point 1
+						glVertex2f(b1.x0 + step->xoffs, b1.y0 + step->yoffs);
+
+						// rotate the unit vector by -45 degrees and add to point 1
+						glVertex2f(b1.x1 + step->xoffs, b1.y1 + step->yoffs);
+
+						// determine the color of the line
+						r = (prim->color.r * step->weight);
+						g = (prim->color.g * step->weight);
+						b = (prim->color.b * step->weight);
+						a = (prim->color.a * 255.0f);
+						if (r > 1.0) r = 1.0;
+						if (g > 1.0) g = 1.0;
+						if (b > 1.0) b = 1.0;
+						if (a > 1.0) a = 1.0;
+						glColor4f(r, g, b, a);
+
+//						texture = texture_update(window, prim, 0);
+//						if (texture) printf("line has texture!\n");
+
+						// if we have a texture to use for the vectors, use it here
+						#if 0
+						if (d3d->vector_texture != NULL)
+						{
+							printf("SDL: textured lines unsupported\n");
+							vertex[0].u0 = d3d->vector_texture->ustart;
+							vertex[0].v0 = d3d->vector_texture->vstart;
+
+							vertex[2].u0 = d3d->vector_texture->ustop;
+							vertex[2].v0 = d3d->vector_texture->vstart;
+
+							vertex[1].u0 = d3d->vector_texture->ustart;
+							vertex[1].v0 = d3d->vector_texture->vstop;
+
+							vertex[3].u0 = d3d->vector_texture->ustop;
+							vertex[3].v0 = d3d->vector_texture->vstop;
+						}
+						#endif
+						glEnd();
+					}
+				}
+				#endif
 				break;
 
 			case RENDER_PRIMITIVE_QUAD:

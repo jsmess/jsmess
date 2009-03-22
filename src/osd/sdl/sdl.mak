@@ -127,7 +127,12 @@ endif
 
 ifeq ($(TARGETOS),freebsd)
 TARGETOS = unix
-DEFS += -DNO_THREAD_COOPERATIVE -DNO_DEBUGGER
+DEFS += -DNO_THREAD_COOPERATIVE
+endif
+
+ifeq ($(TARGETOS),openbsd)
+TARGETOS = unix
+DEFS += -DNO_THREAD_COOPERATIVE
 endif
 
 ifeq ($(TARGETOS),unix)
@@ -147,18 +152,18 @@ PPC=1
 endif
 ifdef PPC
 ifdef PTR64
-CFLAGS += -arch ppc64
+CCOMFLAGS += -arch ppc64
 LDFLAGS += -arch ppc64
 else
-CFLAGS += -arch ppc
+CCOMFLAGS += -arch ppc
 LDFLAGS += -arch ppc
 endif
 else
 ifdef PTR64
-CFLAGS += -arch x86_64
+CCOMFLAGS += -arch x86_64
 LDFLAGS += -arch x86_64
 else
-CFLAGS += -arch i386
+CCOMFLAGS += -arch i386
 LDFLAGS += -arch i386
 endif
 endif

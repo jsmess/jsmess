@@ -56,6 +56,7 @@ struct _sdl_window_info
 	// monitor info
 	sdl_monitor_info *	monitor;
 	int					fullscreen;
+	int			index;
 	
 	// diverse flags
 	int					minwidth, minheight;

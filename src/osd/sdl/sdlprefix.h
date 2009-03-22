@@ -30,8 +30,8 @@
 #elif defined(__linux__)
 #define SDLMAME_LINUX 1
 
-#elif defined(__FreeBSD__) || defined(__DragonFly__)
-#define SDLMAME_FREEBSD 1
+#elif defined(__FreeBSD__) || defined(__DragonFly__) || defined(__OpenBSD__)
+#define SDLMAME_BSD 1
 #endif
 
 // fix for Ubuntu 8.10

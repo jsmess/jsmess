@@ -210,7 +210,8 @@ INLINE osd_event *osd_event_alloc(int manualreset, int initialstate)
 
 INLINE int osd_event_wait(osd_event *event, osd_ticks_t timeout)
 {
-	return WaitForSingleObject((HANDLE) event, timeout * 1000 / osd_ticks_per_second());
+	int ret = WaitForSingleObject((HANDLE) event, timeout * 1000 / osd_ticks_per_second());
+	return ( ret == WAIT_OBJECT_0);
 }
 
 INLINE void osd_event_reset(osd_event *event)

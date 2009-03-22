@@ -210,11 +210,18 @@
 #else
 #define SDLMAME_EVENTS_IN_WORKER_THREAD	(0)
 #endif
-
+			 
 #if defined(SDLMAME_WIN32)
-#define SDLMAME_INIT_IN_WORKER_THREAD	(1)
+#if (SDL_VERSION_ATLEAST(1,3,0))
+#define SDLMAME_INIT_IN_WORKER_THREAD (0) //FIXME: breaks mt
+#define SDL13_COMBINE_RESIZE (1)
 #else
-#define SDLMAME_INIT_IN_WORKER_THREAD	(0)
+#define SDLMAME_INIT_IN_WORKER_THREAD (1)
+#define SDL13_COMBINE_RESIZE (0)
+#endif
+#else
+#define SDL13_COMBINE_RESIZE (0)
+#define SDLMAME_INIT_IN_WORKER_THREAD (0)
 #endif
 
 #if defined(SDLMAME_NO_X11) || defined(SDLMAME_WIN32)

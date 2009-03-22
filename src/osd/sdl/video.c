@@ -121,15 +121,6 @@ int sdlvideo_init(running_machine *machine)
 	// we need the beam width in a float, contrary to what the core does.
 	video_config.beamwidth = options_get_float(mame_options(), OPTION_BEAM);
 
-	if (machine->config->video_attributes & SCREEN_TYPE_VECTOR)
-	{
-		video_config.isvector = 1;
-	}
-	else
-	{
-		video_config.isvector = 0;
-	}
-
 	// initialize the window system so we can make windows
 	if (sdlwindow_init(machine))
 		goto error;

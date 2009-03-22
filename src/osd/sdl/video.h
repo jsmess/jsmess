@@ -109,7 +109,6 @@ struct _sdl_video_config
 	int					fullstretch;
 
 	// vector options
-	int					isvector;		// 1 if vector, 0 if raster
 	float				beamwidth;		// beam width
 
 	// OpenGL options

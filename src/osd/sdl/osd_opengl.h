@@ -1840,7 +1840,7 @@
 	OSD_GL_UNUSED(void,glVertex2sv,(const GLshort *v))
 	OSD_GL_UNUSED(void,glVertex3d,(GLdouble x, GLdouble y, GLdouble z))
 	OSD_GL_UNUSED(void,glVertex3dv,(const GLdouble *v))
-	OSD_GL_UNUSED(void,glVertex3f,(GLfloat x, GLfloat y, GLfloat z))
+	OSD_GL(void,glVertex3f,(GLfloat x, GLfloat y, GLfloat z))
 	OSD_GL_UNUSED(void,glVertex3fv,(const GLfloat *v))
 	OSD_GL_UNUSED(void,glVertex3i,(GLint x, GLint y, GLint z))
 	OSD_GL_UNUSED(void,glVertex3iv,(const GLint *v))

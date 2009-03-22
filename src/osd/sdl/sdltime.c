@@ -376,15 +376,13 @@ osd_ticks_t osd_profiling_ticks(void)
 {
 #if defined(__i386__) || defined(__x86_64__)
 	UINT64 result;
-	UINT32 r1, r2;
 
 	// use RDTSC
 	__asm__ __volatile__ (
 		"rdtsc"
-		: "=a" (r1), "=d" (r2)
+		: "=A" (result)
 	);
 
-	result = ((UINT64)r2<<32) | (UINT64)r1;
 	return result;
 #else
 	return (*ticks_counter)();

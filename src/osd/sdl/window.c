@@ -780,6 +780,7 @@ int sdlwindow_video_window_create(running_machine *machine, int index, sdl_monit
 	window->refresh = config->refresh;
 	window->monitor = monitor;
 	window->machine = machine;
+	window->index = index;
 	
 	//FIXME: these should be per_window in config-> or even better a bit set
 	window->fullscreen = !video_config.windowed;
