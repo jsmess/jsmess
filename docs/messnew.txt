@@ -9,7 +9,9 @@ New System Drivers Supported (in no particular order):
 
 System Driver Changes:
 ----------------------
-(none)
+- [ELECTRON] Fixed graphical display modes [Robbbert]
+
+- [TRS80] Added parallel printer [Robbbert]
 
 
 
