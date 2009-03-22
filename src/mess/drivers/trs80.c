@@ -32,6 +32,9 @@ Interrupts:
 IRQ mode 1
 NMI
 
+Printer: Level II usually 37e8; System80 uses port FD; Model 4 uses port F8
+Uart: TR1602, equivalent to the uart used in the Exidy Sorcerer
+
 I/O ports
 FF:
 - bits 0 and 1 are for writing a cassette
@@ -39,27 +42,98 @@ FF:
 - bit 3 switches the display between 64 or 32 characters per line
 - bit 6 remembers the 32/64 screen mode (inverted)
 - bit 7 is for reading from a cassette
+
 FE:
 - bit 0 is for selecting inverse video of the whole screen on a lnw80
 - bit 2 enables colour on a lnw80
 - bit 3 is for selecting roms (low) or 16k hires area (high) on a lnw80
 - bit 4 selects internal cassette player (low) or external unit (high) on a system-80
+
 FD:
 - bit 7 for reading the printer status on a system-80
 - all bits for writing to a printer on a system-80
+
 F9:
 - UART data (write) status (read) on a system-80
+
 F8:
 - UART data (read) status (write) on a system-80
+For Model 4... 
+F8h Write (output) send data to the printer data lines with strobe pulsed low. 
+F8h Read (input) reads printer status as follows: 
+d7 BUSY ('1'=true) 
+d6 Out-of-Paper ('1'=true) 
+d5 Device Select ('1'=true) 
+d4 ERROR, printer fault ('1'=true) 
+d3..d0 Reserved 
+
 EB:
 - UART data (read and write) on a Model III/4
+
 EA:
 - UART status (read and write) on a Model III/4
+EAh Output (Write), when E8h bit d1 is '1' (Control Register enabled):
+bits d7..d3 are UART control; d2..d0 are Modem line control 
+d7 Even Parity Enable ('1'=even, '0'=odd) 
+d6='1',d5='1' for 8 bits 
+d6='0',d5='1' for 7 bits 
+d6='1',d5='0' for 6 bits 
+d6='0',d5='0' for 5 bits
+d4 Stop Bit Select ('1'=two stop bits, '0'=one stop bit) 
+d3 Parity Inhibit ('1'=disable; No parity, '0'=parity enabled) 
+d2 Break ('0'=disable transmit data; continuous RS232 'SPACE' condition) 
+d1 Data-Terminal-Ready (DTR), pin 20 
+d0 Request-to-Send (RTS), pin 4
+EAh Output (Write), when E8h bit d1 is '0' (Control Register disabled): bits d5..d3 are secondary line control, and could even be used for steering or multiplexing logic; d2..d0 are Modem line control same as above 
+d7,d6 Not used 
+d5 Secondary Unassigned, pin 18 
+d4 Secondary Transmit Data, pin 14 
+d3 Secondary Request-to-Send, pin 19 
+d2 Break ('0'=disable transmit data; continuous RS232 'SPACE' condition) 
+d1 Data-Terminal-Ready (DTR), pin 20 
+d0 Request-to-Send (RTS), pin 4 
+EAh Input (Read): UART Status Register 
+d7 Data Received ('1'=condition true) 
+d6 Transmitter Holding Register empty ('1'=condition true) 
+d5 Overrun Error ('1'=condition true) 
+d4 Framing Error ('1'=condition true) 
+d3 Parity Error ('1'=condition true) 
+d2..d0 Not used 
+
 E9:
 - UART Configuration jumpers (read) on a Model III/4
+Rx = bits 0..3, Tx = bits 4..7
+00h    50  
+11h    75  
+22h    100  
+33h    134.5  
+44h    150  
+55h    300  
+66h    600  
+77h    1200  
+88h    1800  
+99h    2000  
+AAh    2400  
+BBh    3600  
+CCh    4800  
+DDh    7200  
+EEh    9600  
+FFh    19200  
+
 E8:
 - UART Modem Status register (read) on a Model III/4
 - UART Master Reset (write) on a Model III/4
+Port E8h 
+E8h Output: UART Master Reset, enables UART control register load
+d1 when '1' enables control register load (see Port EAh description below). 
+Input: Modem Status Register 
+d7 Clear-to-Send (CTS), Pin 5 
+d6 Data-Set-Ready (DSR), pin 6 
+d5 Carrier Detect (CD), pin 8 
+d4 Ring Indicator (RI), pin 22 
+d3..d2 Not used 
+d0 ?? UART Receiver Input, pin 20 (pin 20 is also DTR) 
+
 ***************************************************************************
 
 Not dumped:
