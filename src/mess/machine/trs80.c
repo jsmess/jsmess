@@ -10,6 +10,7 @@
 /* Core includes */
 #include "driver.h"
 #include "machine/ctronics.h"
+#include "machine/ay31015.h"
 #include "includes/trs80.h"
 
 /* Components */
@@ -49,6 +50,7 @@ static UINT8 head;							 /* current head per drive */
 static UINT8 sector[4] = {0, }; 			/* current sector per drive */
 #endif
 static UINT8 irq_mask = 0;
+static UINT8 trs80_reg_load=1;
 
 #define FW TRS80_FONT_W
 #define FH TRS80_FONT_H
@@ -57,10 +59,12 @@ static double old_cassette_val;
 static UINT8 cassette_data;
 static emu_timer *cassette_data_timer;
 static const device_config *trs80_printer;
+static const device_config *trs80_ay31015;
+static const device_config *trs80_cass;
 
 static TIMER_CALLBACK( cassette_data_callback )
 {
-	double new_val = cassette_input(devtag_get_device(machine, "cassette"));
+	double new_val = cassette_input(trs80_cass);
 
 	/* Check for HI-LO transition */
 	if ( old_cassette_val > -0.2 && new_val < -0.2 )
@@ -201,15 +205,17 @@ DEVICE_IMAGE_LOAD( trs80_floppy )
 		/* set deleted data address mark for sector specified */
 		basicdsk_set_ddam(image, track, side, sector_id, 1);
 	}
-    return INIT_PASS;
+	return INIT_PASS;
 }
 
 MACHINE_RESET( trs80 )
 {
-	cassette_data = 0x00;
+	cassette_data = 0;
 	cassette_data_timer = timer_alloc(machine,  cassette_data_callback, NULL );
 	timer_adjust_periodic( cassette_data_timer, attotime_zero, 0, ATTOTIME_IN_HZ(11025) );
 	trs80_printer = devtag_get_device(machine, "centronics");
+	trs80_ay31015 = devtag_get_device(machine, "tr1602");
+	trs80_cass = devtag_get_device(machine, "cassette");
 }
 
 
@@ -324,32 +330,151 @@ DRIVER_INIT( ht108064 )
  *
  *************************************/
 
-
- READ8_HANDLER( trs80_port_xx_r )
+READ8_HANDLER( trs80m3_e8_r )
 {
-	return 0;
+/* These bits directly read pins on the RS-232 socket, and are not emulated
+	d7 Clear-to-Send (CTS), Pin 5 
+	d6 Data-Set-Ready (DSR), pin 6 
+	d5 Carrier Detect (CD), pin 8 
+	d4 Ring Indicator (RI), pin 22 
+	d3..d1 Not used 
+	d0 ?? UART Receiver Input, pin 20 (pin 20 is also DTR) */
+
+	return 0;	// this is a guess
+}
+
+READ8_HANDLER( trs80m3_ea_r )
+{
+/* UART Status Register 
+	d7 Data Received ('1'=condition true) 
+	d6 Transmitter Holding Register empty ('1'=condition true) 
+	d5 Overrun Error ('1'=condition true) 
+	d4 Framing Error ('1'=condition true) 
+	d3 Parity Error ('1'=condition true) 
+	d2..d0 Not used */
+
+	UINT8 data=7;
+	ay31015_set_input_pin( trs80_ay31015, AY31015_SWE, 0 );
+	data |= ay31015_get_output_pin( trs80_ay31015, AY31015_TBMT ) ? 0x40 : 0;
+	data |= ay31015_get_output_pin( trs80_ay31015, AY31015_DAV  ) ? 0x80 : 0;
+	data |= ay31015_get_output_pin( trs80_ay31015, AY31015_OR   ) ? 0x20 : 0;
+	data |= ay31015_get_output_pin( trs80_ay31015, AY31015_FE   ) ? 0x10 : 0;
+	data |= ay31015_get_output_pin( trs80_ay31015, AY31015_PE   ) ? 0x08 : 0;
+	ay31015_set_input_pin( trs80_ay31015, AY31015_SWE, 1 );
+
+	return data;
+}
+
+READ8_HANDLER( trs80m3_eb_r )
+{
+/* UART received data */
+	UINT8 data = ay31015_get_received_data( trs80_ay31015 );
+	ay31015_set_input_pin( trs80_ay31015, AY31015_RDAV, 0 );
+	ay31015_set_input_pin( trs80_ay31015, AY31015_RDAV, 1 );
+	return data;
+}
+
+READ8_HANDLER( trs80_fe_r )
+{
+/* not emulated yet */
+	return 0xff;
 }
 
 
-WRITE8_HANDLER( trs80_port_ff_w )
+READ8_HANDLER( trs80_ff_r )
+{
+	UINT8 data = (~trs80_port_ff & 8) << 3;	// MODESEL bit (32 or 64 chars per line)
+	return data | cassette_data;
+}
+
+
+WRITE8_HANDLER( trs80m3_e8_w )
+{
+/* d1 when '1' enables control register load (see below) */
+	trs80_reg_load = data & 1;
+}
+
+WRITE8_HANDLER( trs80m3_e9_w )
+{
+/* UART set baud rate. Rx = bits 0..3, Tx = bits 4..7
+	00h    50  
+	11h    75  
+	22h    100  
+	33h    134.5  
+	44h    150  
+	55h    300  
+	66h    600  
+	77h    1200  
+	88h    1800  
+	99h    2000  
+	AAh    2400  
+	BBh    3600  
+	CCh    4800  
+	DDh    7200  
+	EEh    9600  
+	FFh    19200 */
+
+	int baud_clock[]={ 800, 1200, 1600, 2152, 2400, 4800, 9600, 19200, 28800, 32000, 38400, 57600, 76800, 115200, 153600, 307200 };
+	ay31015_set_receiver_clock( trs80_ay31015, baud_clock[data & 0x0f]);
+	ay31015_set_transmitter_clock( trs80_ay31015, baud_clock[data>>4]);
+}
+
+WRITE8_HANDLER( trs80m3_ea_w )
+{
+	if (trs80_reg_load)
+
+/* bits d7..d3 are UART control; d2..d0 directly adjust levels at the RS-232 socket - we emulate UART control only
+	d7 Even Parity Enable ('1'=even, '0'=odd) 
+	d6='1',d5='1' for 8 bits 
+	d6='0',d5='1' for 7 bits 
+	d6='1',d5='0' for 6 bits 
+	d6='0',d5='0' for 5 bits
+	d4 Stop Bit Select ('1'=two stop bits, '0'=one stop bit) 
+	d3 Parity Inhibit ('1'=disable; No parity, '0'=parity enabled) 
+	d2 Break ('0'=disable transmit data; continuous RS232 'SPACE' condition) 
+	d1 Data-Terminal-Ready (DTR), pin 20 
+	d0 Request-to-Send (RTS), pin 4 */
+
+	{
+		ay31015_set_input_pin( trs80_ay31015, AY31015_CS, 0 );
+		ay31015_set_input_pin( trs80_ay31015, AY31015_NB1, ( data & 0x40 ) ? 1 : 0 );
+		ay31015_set_input_pin( trs80_ay31015, AY31015_NB2, ( data & 0x20 ) ? 1 : 0 );
+		ay31015_set_input_pin( trs80_ay31015, AY31015_TSB, ( data & 0x10 ) ? 1 : 0 );
+		ay31015_set_input_pin( trs80_ay31015, AY31015_EPS, ( data & 0x80 ) ? 1 : 0 );
+		ay31015_set_input_pin( trs80_ay31015, AY31015_NP,  ( data & 0x08 ) ? 1 : 0 );
+		ay31015_set_input_pin( trs80_ay31015, AY31015_CS, 1 );
+	}
+	else
+
+/* These directly adjust levels at the RS-232 socket - not emulated
+	d7,d6 Not used
+	d5 Secondary Unassigned, pin 18 
+	d4 Secondary Transmit Data, pin 14 
+	d3 Secondary Request-to-Send, pin 19 
+	d2 Break ('0'=disable transmit data; continuous RS232 'SPACE' condition) 
+	d1 Data-Terminal-Ready (DTR), pin 20 
+	d0 Request-to-Send (RTS), pin 4 */
+
+	{
+	}
+}
+
+WRITE8_HANDLER( trs80m3_eb_w )
+{
+	ay31015_set_transmit_data( trs80_ay31015, data );
+}
+
+WRITE8_HANDLER( trs80_ff_w )
 {
 	static const double levels[4] = { 0.0, -1.0, 0.0, 1.0 };
-	const device_config *cass = devtag_get_device(space->machine, "cassette");
 
-	cassette_change_state( cass, ( data & 0x04 ) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR );
-
-	cassette_output( cass, levels[data & 0x03]);
+	cassette_change_state( trs80_cass, ( data & 0x04 ) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR );
+	cassette_output( trs80_cass, levels[data & 0x03]);
 
 	cassette_data &= ~0x80;
 	trs80_port_ff = data;
 }
 
-
- READ8_HANDLER( trs80_port_ff_r )
-{
-	UINT8 data = (~trs80_port_ff & 8) << 3;	// MODESEL bit (32 or 64 chars per line)
-	return data | cassette_data;
-}
 
 /*************************************
  *

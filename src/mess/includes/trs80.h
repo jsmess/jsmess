@@ -29,9 +29,16 @@ DRIVER_INIT( lnw80 );
 DRIVER_INIT( ht1080z );
 DRIVER_INIT( ht108064 );
 
-WRITE8_HANDLER ( trs80_port_ff_w );
-READ8_HANDLER ( trs80_port_ff_r );
-READ8_HANDLER ( trs80_port_xx_r );
+WRITE8_HANDLER ( trs80_ff_w );
+WRITE8_HANDLER ( trs80m3_eb_w );
+WRITE8_HANDLER ( trs80m3_ea_w );
+WRITE8_HANDLER ( trs80m3_e9_w );
+WRITE8_HANDLER ( trs80m3_e8_w );
+READ8_HANDLER ( trs80_ff_r );
+READ8_HANDLER ( trs80_fe_r );
+READ8_HANDLER ( trs80m3_eb_r );
+READ8_HANDLER ( trs80m3_ea_r );
+READ8_HANDLER ( trs80m3_e8_r );
 
 INTERRUPT_GEN( trs80_frame_interrupt );
 INTERRUPT_GEN( trs80_timer_interrupt );

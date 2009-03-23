@@ -38,7 +38,7 @@ Uart: TR1602, equivalent to the uart used in the Exidy Sorcerer
 I/O ports
 FF:
 - bits 0 and 1 are for writing a cassette
-- bit 2 must be high to turn the cassette player on, enables cassette data paths on a system-80
+- bit 2 must be high to turn the cassette motor on, enables cassette data paths on a system-80
 - bit 3 switches the display between 64 or 32 characters per line
 - bit 6 remembers the 32/64 screen mode (inverted)
 - bit 7 is for reading from a cassette
@@ -59,13 +59,13 @@ F9:
 F8:
 - UART data (read) status (write) on a system-80
 For Model 4... 
-F8h Write (output) send data to the printer data lines with strobe pulsed low. 
-F8h Read (input) reads printer status as follows: 
-d7 BUSY ('1'=true) 
-d6 Out-of-Paper ('1'=true) 
-d5 Device Select ('1'=true) 
-d4 ERROR, printer fault ('1'=true) 
-d3..d0 Reserved 
+F8h Write (output) send data to the printer data lines with strobe pulsed low.
+F8h Read (input) reads printer status as follows:
+d7 BUSY ('1'=true)
+d6 Out-of-Paper ('1'=true)
+d5 Device Select ('1'=true)
+d4 ERROR, printer fault ('1'=true)
+d3..d0 Reserved
 
 EB:
 - UART data (read and write) on a Model III/4
@@ -73,66 +73,66 @@ EB:
 EA:
 - UART status (read and write) on a Model III/4
 EAh Output (Write), when E8h bit d1 is '1' (Control Register enabled):
-bits d7..d3 are UART control; d2..d0 are Modem line control 
-d7 Even Parity Enable ('1'=even, '0'=odd) 
-d6='1',d5='1' for 8 bits 
-d6='0',d5='1' for 7 bits 
-d6='1',d5='0' for 6 bits 
+bits d7..d3 are UART control; d2..d0 are Modem line control
+d7 Even Parity Enable ('1'=even, '0'=odd)
+d6='1',d5='1' for 8 bits
+d6='0',d5='1' for 7 bits
+d6='1',d5='0' for 6 bits
 d6='0',d5='0' for 5 bits
-d4 Stop Bit Select ('1'=two stop bits, '0'=one stop bit) 
-d3 Parity Inhibit ('1'=disable; No parity, '0'=parity enabled) 
-d2 Break ('0'=disable transmit data; continuous RS232 'SPACE' condition) 
-d1 Data-Terminal-Ready (DTR), pin 20 
+d4 Stop Bit Select ('1'=two stop bits, '0'=one stop bit)
+d3 Parity Inhibit ('1'=disable; No parity, '0'=parity enabled)
+d2 Break ('0'=disable transmit data; continuous RS232 'SPACE' condition)
+d1 Data-Terminal-Ready (DTR), pin 20
 d0 Request-to-Send (RTS), pin 4
-EAh Output (Write), when E8h bit d1 is '0' (Control Register disabled): bits d5..d3 are secondary line control, and could even be used for steering or multiplexing logic; d2..d0 are Modem line control same as above 
-d7,d6 Not used 
-d5 Secondary Unassigned, pin 18 
-d4 Secondary Transmit Data, pin 14 
-d3 Secondary Request-to-Send, pin 19 
-d2 Break ('0'=disable transmit data; continuous RS232 'SPACE' condition) 
-d1 Data-Terminal-Ready (DTR), pin 20 
-d0 Request-to-Send (RTS), pin 4 
-EAh Input (Read): UART Status Register 
-d7 Data Received ('1'=condition true) 
-d6 Transmitter Holding Register empty ('1'=condition true) 
-d5 Overrun Error ('1'=condition true) 
-d4 Framing Error ('1'=condition true) 
-d3 Parity Error ('1'=condition true) 
-d2..d0 Not used 
+EAh Output (Write), when E8h bit d1 is '0' (Control Register disabled): bits d5..d3 are secondary line control, and could even be used for steering or multiplexing logic; d2..d0 are Modem line control same as above
+d7,d6 Not used
+d5 Secondary Unassigned, pin 18
+d4 Secondary Transmit Data, pin 14
+d3 Secondary Request-to-Send, pin 19
+d2 Break ('0'=disable transmit data; continuous RS232 'SPACE' condition)
+d1 Data-Terminal-Ready (DTR), pin 20
+d0 Request-to-Send (RTS), pin 4
+EAh Input (Read): UART Status Register
+d7 Data Received ('1'=condition true)
+d6 Transmitter Holding Register empty ('1'=condition true)
+d5 Overrun Error ('1'=condition true)
+d4 Framing Error ('1'=condition true)
+d3 Parity Error ('1'=condition true)
+d2..d0 Not used
 
 E9:
-- UART Configuration jumpers (read) on a Model III/4
+- UART Configuration jumpers (read) on a Model III/4 (?)
 Rx = bits 0..3, Tx = bits 4..7
-00h    50  
-11h    75  
-22h    100  
-33h    134.5  
-44h    150  
-55h    300  
-66h    600  
-77h    1200  
-88h    1800  
-99h    2000  
-AAh    2400  
-BBh    3600  
-CCh    4800  
-DDh    7200  
-EEh    9600  
-FFh    19200  
+00h    50
+11h    75
+22h    100
+33h    134.5
+44h    150
+55h    300
+66h    600
+77h    1200
+88h    1800
+99h    2000
+AAh    2400
+BBh    3600
+CCh    4800
+DDh    7200
+EEh    9600
+FFh    19200
 
 E8:
 - UART Modem Status register (read) on a Model III/4
 - UART Master Reset (write) on a Model III/4
-Port E8h 
+Port E8h
 E8h Output: UART Master Reset, enables UART control register load
-d1 when '1' enables control register load (see Port EAh description below). 
-Input: Modem Status Register 
-d7 Clear-to-Send (CTS), Pin 5 
-d6 Data-Set-Ready (DSR), pin 6 
-d5 Carrier Detect (CD), pin 8 
-d4 Ring Indicator (RI), pin 22 
-d3..d2 Not used 
-d0 ?? UART Receiver Input, pin 20 (pin 20 is also DTR) 
+d1 when '1' enables control register load (see Port EAh description above).
+Input: Modem Status Register
+d7 Clear-to-Send (CTS), Pin 5
+d6 Data-Set-Ready (DSR), pin 6
+d5 Carrier Detect (CD), pin 8
+d4 Ring Indicator (RI), pin 22
+d3..d1 Not used
+d0 ?? UART Receiver Input, pin 20 (pin 20 is also DTR)
 
 ***************************************************************************
 
@@ -157,6 +157,7 @@ Not emulated:
 #include "cpu/z80/z80.h"
 #include "sound/wave.h"
 #include "machine/ctronics.h"
+#include "machine/ay31015.h"
 #include "includes/trs80.h"
 
 /* Components */
@@ -184,7 +185,7 @@ static READ8_DEVICE_HANDLER (trs80_wd179x_r)
 	}
 }
 
-static ADDRESS_MAP_START( trs80_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( trs80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x3800, 0x38ff) AM_READ(trs80_keyboard_r)
 	AM_RANGE(0x3c00, 0x3fff) AM_READWRITE(SMH_RAM, trs80_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
@@ -193,11 +194,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( trs80_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xff, 0xff) AM_READWRITE(trs80_port_ff_r, trs80_port_ff_w)
+	AM_RANGE(0xff, 0xff) AM_READWRITE(trs80_ff_r, trs80_ff_w)
 ADDRESS_MAP_END
 
 /* memory from 3700-37ff, 8000-ffff only exists when expansion box is used */
-static ADDRESS_MAP_START( mem_model1, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( model1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x35ff) AM_ROM
 	AM_RANGE(0x37e0, 0x37e3) AM_READWRITE(trs80_irq_status_r, trs80_motor_w)
 //	AM_RANGE(0x37e4, 0x37e7) AM_NOP
@@ -212,36 +213,43 @@ static ADDRESS_MAP_START( mem_model1, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_model1, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( model1_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xfe, 0xfe) AM_READ(trs80_port_xx_r)
-	AM_RANGE(0xff, 0xff) AM_READWRITE(trs80_port_ff_r, trs80_port_ff_w)
+	AM_RANGE(0xfe, 0xfe) AM_READ(trs80_fe_r)
+	AM_RANGE(0xff, 0xff) AM_READWRITE(trs80_ff_r, trs80_ff_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mem_model3, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sys80_io, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0xfd, 0xfd) AM_READWRITE(trs80_printer_r, trs80_printer_w)
+	AM_RANGE(0xfe, 0xfe) AM_READ(trs80_fe_r)
+	AM_RANGE(0xff, 0xff) AM_READWRITE(trs80_ff_r, trs80_ff_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( model3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x37ff) AM_ROM
 	AM_RANGE(0x3800, 0x38ff) AM_READ(trs80_keyboard_r)
 	AM_RANGE(0x3c00, 0x3fff) AM_READWRITE(SMH_RAM, trs80_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x4000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_model3, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( model3_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	/* the ports marked NOP are not emulated yet */
 //	AM_RANGE(0xe0, 0xe3) AM_READWRITE(trs80_irq_status_r, trs80_irq_mask_w)	// needs to be fixed because it breaks the keyboard
 	AM_RANGE(0xe4, 0xe4) AM_READWRITE(SMH_NOP,trs80_motor_w)
-	AM_RANGE(0xe8, 0xe8) AM_NOP
-	AM_RANGE(0xe9, 0xe9) AM_WRITENOP
-	AM_RANGE(0xea, 0xea) AM_NOP
-	AM_RANGE(0xeb, 0xeb) AM_NOP
+	AM_RANGE(0xe8, 0xe8) AM_READWRITE(trs80m3_e8_r, trs80m3_e8_w)
+	AM_RANGE(0xe9, 0xe9) AM_WRITE(trs80m3_e9_w)
+	AM_RANGE(0xea, 0xea) AM_READWRITE(trs80m3_ea_r, trs80m3_ea_w)
+	AM_RANGE(0xeb, 0xeb) AM_READWRITE(trs80m3_eb_r, trs80m3_eb_w)
 	AM_RANGE(0xec, 0xec) AM_WRITENOP
 	AM_RANGE(0xf0, 0xf0) AM_DEVREADWRITE("wd179x", trs80_wd179x_r, wd17xx_command_w)
 	AM_RANGE(0xf1, 0xf1) AM_DEVREADWRITE("wd179x", wd17xx_track_r, wd17xx_track_w)
 	AM_RANGE(0xf2, 0xf2) AM_DEVREADWRITE("wd179x", wd17xx_sector_r, wd17xx_sector_w)
 	AM_RANGE(0xf3, 0xf3) AM_DEVREADWRITE("wd179x", wd17xx_data_r, wd17xx_data_w)
 	AM_RANGE(0xf4, 0xf4) AM_WRITENOP
-	AM_RANGE(0xf8, 0xf8) AM_WRITENOP
-	AM_RANGE(0xff, 0xff) AM_READWRITE(trs80_port_ff_r, trs80_port_ff_w)
+	AM_RANGE(0xf8, 0xf8) AM_READWRITE(trs80_printer_r, trs80_printer_w)
+	AM_RANGE(0xff, 0xff) AM_READWRITE(trs80_ff_r, trs80_ff_w)
 ADDRESS_MAP_END
 
 
@@ -453,10 +461,20 @@ static const cassette_config trs80l2_cassette_config =
 	CASSETTE_PLAY
 };
 
+static const ay31015_config trs80_ay31015_config =
+{
+	AY_3_1015,
+	0.0,
+	0.0,
+	NULL,
+	NULL,
+	NULL
+};
+
 static MACHINE_DRIVER_START( trs80 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 1796000)        /* 1.796 MHz */
-	MDRV_CPU_PROGRAM_MAP(trs80_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(trs80_map, 0)
 	MDRV_CPU_IO_MAP(trs80_io, 0)
 	MDRV_CPU_VBLANK_INT("screen", trs80_frame_interrupt)
 	MDRV_CPU_PERIODIC_INT(trs80_timer_interrupt, 40)
@@ -492,8 +510,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( model1 )
 	MDRV_IMPORT_FROM( trs80 )
 	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP( mem_model1, 0 )
-	MDRV_CPU_IO_MAP( io_model1, 0 )
+	MDRV_CPU_PROGRAM_MAP( model1_map, 0 )
+	MDRV_CPU_IO_MAP( model1_io, 0 )
 
 	MDRV_CASSETTE_MODIFY( "cassette", trs80l2_cassette_config )
 	MDRV_QUICKLOAD_ADD("quickload", trs80_cmd, "cmd", 0.5)
@@ -506,20 +524,24 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( model3 )
 	MDRV_IMPORT_FROM( model1 )
 	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP( mem_model3, 0 )
-	MDRV_CPU_IO_MAP( io_model3, 0 )
+	MDRV_CPU_PROGRAM_MAP( model3_map, 0 )
+	MDRV_CPU_IO_MAP( model3_io, 0 )
 	MDRV_CPU_VBLANK_INT_HACK(trs80_frame_interrupt, 2)
+	MDRV_AY31015_ADD( "tr1602", trs80_ay31015_config )
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( sys80 )
+	MDRV_IMPORT_FROM( model1 )
+	MDRV_CPU_MODIFY( "maincpu" )
+	MDRV_CPU_IO_MAP( sys80_io, 0 )
+	//MDRV_AY31015_ADD( "tr1602", trs80_ay31015_config )	// need more info
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ht1080z )
-	MDRV_IMPORT_FROM( model1 )
+	MDRV_IMPORT_FROM( sys80 )
 	MDRV_GFXDECODE( ht1080z )
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( ht108064 )
-	MDRV_IMPORT_FROM( model3 )
-	MDRV_GFXDECODE( ht1080z )
-MACHINE_DRIVER_END
 
 /***************************************************************************
 
@@ -655,10 +677,10 @@ SYSTEM_CONFIG_END
 COMP( 1977, trs80,    0,	0,	trs80,    trs80, trs80,    0,		"Tandy Radio Shack",  "TRS-80 Model I (Level I Basic)" , 0)
 COMP( 1978, trs80l2,  trs80,	0,	model1,   trs80, trs80,    trs8012,	"Tandy Radio Shack",  "TRS-80 Model I (Level II Basic)" , 0)
 COMP( 1983, radionic, trs80,	0,	model1,   trs80, radionic, trs8012,	"Komtek",  "Radionic" , 0)
-COMP( 1980, sys80,    trs80,	0,	model1,   trs80, trs80,    trs8012,	"EACA Computers Ltd.","System-80" , 0)
+COMP( 1980, sys80,    trs80,	0,	sys80,    trs80, trs80,    trs8012,	"EACA Computers Ltd.","System-80" , 0)
 COMP( 1981, lnw80,    trs80,	0,	model1,   trs80, lnw80,    trs8012,	"LNW Research","LNW-80", 0 )
 COMP( 1980, trs80m3,  trs80,	0,	model3,   trs80, trs80,    trs8012,	"Tandy Radio Shack",  "TRS-80 Model III", 0 )
 COMP( 1980, trs80m4,  trs80,	0,	model3,   trs80, trs80,    trs8012,	"Tandy Radio Shack",  "TRS-80 Model 4", 0 )
 COMP( 1983, ht1080z,  trs80,	0,	ht1080z,  trs80, ht1080z,  trs8012,	"Hiradastechnika Szovetkezet",  "HT-1080Z Series I" , 0)
 COMP( 1984, ht1080z2, trs80,	0,	ht1080z,  trs80, ht1080z,  trs8012,	"Hiradastechnika Szovetkezet",  "HT-1080Z Series II" , 0)
-COMP( 1985, ht108064, trs80,	0,	ht108064, trs80, ht108064, trs8012,	"Hiradastechnika Szovetkezet",  "HT-1080Z/64" , 0)
+COMP( 1985, ht108064, trs80,	0,	ht1080z,  trs80, ht108064, trs8012,	"Hiradastechnika Szovetkezet",  "HT-1080Z/64" , 0)
