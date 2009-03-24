@@ -337,8 +337,8 @@ READ8_HANDLER( trs80m3_e8_r )
 	d6 Data-Set-Ready (DSR), pin 6 
 	d5 Carrier Detect (CD), pin 8 
 	d4 Ring Indicator (RI), pin 22 
-	d3..d1 Not used 
-	d0 ?? UART Receiver Input, pin 20 (pin 20 is also DTR) */
+	d3,d2,d0 Not used 
+	d1 UART Receiver Input, pin 20 (pin 20 is also DTR) */
 
 	return 0;	// this is a guess
 }
@@ -374,6 +374,30 @@ READ8_HANDLER( trs80m3_eb_r )
 	return data;
 }
 
+READ8_HANDLER( sys80_f9_r )
+{
+/* UART Status Register (d4..d6 not emulated)
+	d7 Transmit buffer empty (inverted)
+	d6 CTS pin
+	d5 DSR pin
+	d4 CD pin
+	d3 Parity Error
+	d2 Framing Error
+	d1 Overrun
+	d0 Data Available */
+
+	UINT8 data=70;
+	ay31015_set_input_pin( trs80_ay31015, AY31015_SWE, 0 );
+	data |= ay31015_get_output_pin( trs80_ay31015, AY31015_TBMT ) ? 0 : 0x80;
+	data |= ay31015_get_output_pin( trs80_ay31015, AY31015_DAV  ) ? 0x01 : 0;
+	data |= ay31015_get_output_pin( trs80_ay31015, AY31015_OR   ) ? 0x02 : 0;
+	data |= ay31015_get_output_pin( trs80_ay31015, AY31015_FE   ) ? 0x04 : 0;
+	data |= ay31015_get_output_pin( trs80_ay31015, AY31015_PE   ) ? 0x08 : 0;
+	ay31015_set_input_pin( trs80_ay31015, AY31015_SWE, 1 );
+
+	return data;
+}
+
 READ8_HANDLER( trs80_fe_r )
 {
 /* not emulated yet */
@@ -391,7 +415,7 @@ READ8_HANDLER( trs80_ff_r )
 WRITE8_HANDLER( trs80m3_e8_w )
 {
 /* d1 when '1' enables control register load (see below) */
-	trs80_reg_load = data & 1;
+	trs80_reg_load = data & 2;
 }
 
 WRITE8_HANDLER( trs80m3_e9_w )
@@ -432,8 +456,8 @@ WRITE8_HANDLER( trs80m3_ea_w )
 	d4 Stop Bit Select ('1'=two stop bits, '0'=one stop bit) 
 	d3 Parity Inhibit ('1'=disable; No parity, '0'=parity enabled) 
 	d2 Break ('0'=disable transmit data; continuous RS232 'SPACE' condition) 
-	d1 Data-Terminal-Ready (DTR), pin 20 
-	d0 Request-to-Send (RTS), pin 4 */
+	d1 Request-to-Send (RTS), pin 4
+	d0 Data-Terminal-Ready (DTR), pin 20 */
 
 	{
 		ay31015_set_input_pin( trs80_ay31015, AY31015_CS, 0 );
@@ -462,6 +486,14 @@ WRITE8_HANDLER( trs80m3_ea_w )
 WRITE8_HANDLER( trs80m3_eb_w )
 {
 	ay31015_set_transmit_data( trs80_ay31015, data );
+}
+
+WRITE8_HANDLER( sys80_f8_w )
+{
+/* These adjust levels at the socket pins - not emulated
+	d2 reset UART (XR pin)
+	d1 DTR
+	d0 RTS */
 }
 
 WRITE8_HANDLER( trs80_ff_w )

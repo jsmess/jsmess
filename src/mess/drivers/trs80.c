@@ -32,8 +32,12 @@ Interrupts:
 IRQ mode 1
 NMI
 
-Printer: Level II usually 37e8; System80 uses port FD; Model 4 uses port F8
-Uart: TR1602, equivalent to the uart used in the Exidy Sorcerer
+Printer: Level II usually 37e8; System80 uses port FD; Model 4 uses port F8.
+Uart: TR1602, equivalent to the uart used in the Exidy Sorcerer.
+System80 has non-addressable dip switches to set the UART control register.
+System80 and LNW80 have non-addressable links to set the baud rate. Receive and Transmit clocks are tied together.
+It is assumed that the TRS80L2 UART setup is identical to the System80, apart from the address ports used.
+Due to the above, the only working emulated UART is for the Model 3.
 
 I/O ports
 FF:
@@ -82,8 +86,8 @@ d6='0',d5='0' for 5 bits
 d4 Stop Bit Select ('1'=two stop bits, '0'=one stop bit)
 d3 Parity Inhibit ('1'=disable; No parity, '0'=parity enabled)
 d2 Break ('0'=disable transmit data; continuous RS232 'SPACE' condition)
-d1 Data-Terminal-Ready (DTR), pin 20
-d0 Request-to-Send (RTS), pin 4
+d1 Request-to-Send (RTS), pin 4
+d0 Data-Terminal-Ready (DTR), pin 20
 EAh Output (Write), when E8h bit d1 is '0' (Control Register disabled): bits d5..d3 are secondary line control, and could even be used for steering or multiplexing logic; d2..d0 are Modem line control same as above
 d7,d6 Not used
 d5 Secondary Unassigned, pin 18
@@ -131,8 +135,8 @@ d7 Clear-to-Send (CTS), Pin 5
 d6 Data-Set-Ready (DSR), pin 6
 d5 Carrier Detect (CD), pin 8
 d4 Ring Indicator (RI), pin 22
-d3..d1 Not used
-d0 ?? UART Receiver Input, pin 20 (pin 20 is also DTR)
+d3..d2,d0 Not used
+d1 UART Receiver Input, pin 20 (pin 20 is also DTR)
 
 ***************************************************************************
 
@@ -200,6 +204,8 @@ ADDRESS_MAP_END
 /* memory from 3700-37ff, 8000-ffff only exists when expansion box is used */
 static ADDRESS_MAP_START( model1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x35ff) AM_ROM
+	AM_RANGE(0x37de, 0x37de) AM_READWRITE(sys80_f9_r, sys80_f8_w)
+	AM_RANGE(0x37df, 0x37df) AM_READWRITE(trs80m3_eb_r, trs80m3_eb_w)
 	AM_RANGE(0x37e0, 0x37e3) AM_READWRITE(trs80_irq_status_r, trs80_motor_w)
 //	AM_RANGE(0x37e4, 0x37e7) AM_NOP
 	AM_RANGE(0x37e8, 0x37eb) AM_READWRITE(trs80_printer_r, trs80_printer_w)
@@ -221,6 +227,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sys80_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0xf8, 0xf8) AM_READWRITE(trs80m3_eb_r, sys80_f8_w)
+	AM_RANGE(0xf9, 0xf9) AM_READWRITE(sys80_f9_r, trs80m3_eb_w)
 	AM_RANGE(0xfd, 0xfd) AM_READWRITE(trs80_printer_r, trs80_printer_w)
 	AM_RANGE(0xfe, 0xfe) AM_READ(trs80_fe_r)
 	AM_RANGE(0xff, 0xff) AM_READWRITE(trs80_ff_r, trs80_ff_w)
@@ -228,7 +236,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( model3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x37ff) AM_ROM
-	AM_RANGE(0x3800, 0x38ff) AM_READ(trs80_keyboard_r)
+	AM_RANGE(0x3800, 0x38ff) AM_MIRROR(0x300) AM_READ(trs80_keyboard_r)
 	AM_RANGE(0x3c00, 0x3fff) AM_READWRITE(SMH_RAM, trs80_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x4000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -236,18 +244,18 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( model3_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	/* the ports marked NOP are not emulated yet */
-//	AM_RANGE(0xe0, 0xe3) AM_READWRITE(trs80_irq_status_r, trs80_irq_mask_w)	// needs to be fixed because it breaks the keyboard
+//	AM_RANGE(0xe0, 0xe3) AM_READWRITE(trs80_irq_status_r, trs80_irq_mask_w)	// it breaks the keyboard
 	AM_RANGE(0xe4, 0xe4) AM_READWRITE(SMH_NOP,trs80_motor_w)
 	AM_RANGE(0xe8, 0xe8) AM_READWRITE(trs80m3_e8_r, trs80m3_e8_w)
-	AM_RANGE(0xe9, 0xe9) AM_WRITE(trs80m3_e9_w)
+	AM_RANGE(0xe9, 0xe9) AM_READ_PORT("E9") AM_WRITE(trs80m3_e9_w)
 	AM_RANGE(0xea, 0xea) AM_READWRITE(trs80m3_ea_r, trs80m3_ea_w)
 	AM_RANGE(0xeb, 0xeb) AM_READWRITE(trs80m3_eb_r, trs80m3_eb_w)
-	AM_RANGE(0xec, 0xec) AM_WRITENOP
+//	AM_RANGE(0xec, 0xec) AM_WRITENOP
 	AM_RANGE(0xf0, 0xf0) AM_DEVREADWRITE("wd179x", trs80_wd179x_r, wd17xx_command_w)
 	AM_RANGE(0xf1, 0xf1) AM_DEVREADWRITE("wd179x", wd17xx_track_r, wd17xx_track_w)
 	AM_RANGE(0xf2, 0xf2) AM_DEVREADWRITE("wd179x", wd17xx_sector_r, wd17xx_sector_w)
 	AM_RANGE(0xf3, 0xf3) AM_DEVREADWRITE("wd179x", wd17xx_data_r, wd17xx_data_w)
-	AM_RANGE(0xf4, 0xf4) AM_WRITENOP
+//	AM_RANGE(0xf4, 0xf4) AM_WRITENOP
 	AM_RANGE(0xf8, 0xf8) AM_READWRITE(trs80_printer_r, trs80_printer_w)
 	AM_RANGE(0xff, 0xff) AM_READWRITE(trs80_ff_r, trs80_ff_w)
 ADDRESS_MAP_END
@@ -409,6 +417,23 @@ static INPUT_PORTS_START( trs80 )
 #endif
 INPUT_PORTS_END
 
+INPUT_PORTS_START( trs80m3 )
+	PORT_INCLUDE (trs80)
+	PORT_START("E9")
+	PORT_BIT(0x07, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x88, 0x08, "Parity")
+	PORT_DIPSETTING(    0x08, DEF_STR(None))
+	PORT_DIPSETTING(    0x00, "Odd")
+	PORT_DIPSETTING(    0x80, "Even")
+	PORT_DIPNAME( 0x10, 0x10, "Stop Bits")
+	PORT_DIPSETTING(    0x10, "2")
+	PORT_DIPSETTING(    0x00, "1")
+	PORT_DIPNAME( 0x60, 0x60, "Bits")
+	PORT_DIPSETTING(    0x00, "5")
+	PORT_DIPSETTING(    0x20, "6")
+	PORT_DIPSETTING(    0x40, "7")
+	PORT_DIPSETTING(    0x60, "8")
+INPUT_PORTS_END
 
 static const gfx_layout trs80_charlayout =
 {
@@ -501,10 +526,9 @@ static MACHINE_DRIVER_START( trs80 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MDRV_SOUND_WAVE_ADD("wave", "cassette")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	/* devices */
 
+	/* devices */
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
-	
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( model1 )
@@ -513,11 +537,12 @@ static MACHINE_DRIVER_START( model1 )
 	MDRV_CPU_PROGRAM_MAP( model1_map, 0 )
 	MDRV_CPU_IO_MAP( model1_io, 0 )
 
+	/* devices */
 	MDRV_CASSETTE_MODIFY( "cassette", trs80l2_cassette_config )
 	MDRV_QUICKLOAD_ADD("quickload", trs80_cmd, "cmd", 0.5)
 	MDRV_WD179X_ADD("wd179x", trs80_wd17xx_interface )
-	/* printer */
 	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
+	MDRV_AY31015_ADD( "tr1602", trs80_ay31015_config )
 MACHINE_DRIVER_END
 
 
@@ -527,14 +552,12 @@ static MACHINE_DRIVER_START( model3 )
 	MDRV_CPU_PROGRAM_MAP( model3_map, 0 )
 	MDRV_CPU_IO_MAP( model3_io, 0 )
 	MDRV_CPU_VBLANK_INT_HACK(trs80_frame_interrupt, 2)
-	MDRV_AY31015_ADD( "tr1602", trs80_ay31015_config )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( sys80 )
 	MDRV_IMPORT_FROM( model1 )
 	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_IO_MAP( sys80_io, 0 )
-	//MDRV_AY31015_ADD( "tr1602", trs80_ay31015_config )	// need more info
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ht1080z )
@@ -673,14 +696,14 @@ static SYSTEM_CONFIG_START(trs8012)
 SYSTEM_CONFIG_END
 
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE	  INPUT  INIT      CONFIG       COMPANY  FULLNAME */
-COMP( 1977, trs80,    0,	0,	trs80,    trs80, trs80,    0,		"Tandy Radio Shack",  "TRS-80 Model I (Level I Basic)" , 0)
-COMP( 1978, trs80l2,  trs80,	0,	model1,   trs80, trs80,    trs8012,	"Tandy Radio Shack",  "TRS-80 Model I (Level II Basic)" , 0)
-COMP( 1983, radionic, trs80,	0,	model1,   trs80, radionic, trs8012,	"Komtek",  "Radionic" , 0)
-COMP( 1980, sys80,    trs80,	0,	sys80,    trs80, trs80,    trs8012,	"EACA Computers Ltd.","System-80" , 0)
-COMP( 1981, lnw80,    trs80,	0,	model1,   trs80, lnw80,    trs8012,	"LNW Research","LNW-80", 0 )
-COMP( 1980, trs80m3,  trs80,	0,	model3,   trs80, trs80,    trs8012,	"Tandy Radio Shack",  "TRS-80 Model III", 0 )
-COMP( 1980, trs80m4,  trs80,	0,	model3,   trs80, trs80,    trs8012,	"Tandy Radio Shack",  "TRS-80 Model 4", 0 )
-COMP( 1983, ht1080z,  trs80,	0,	ht1080z,  trs80, ht1080z,  trs8012,	"Hiradastechnika Szovetkezet",  "HT-1080Z Series I" , 0)
-COMP( 1984, ht1080z2, trs80,	0,	ht1080z,  trs80, ht1080z,  trs8012,	"Hiradastechnika Szovetkezet",  "HT-1080Z Series II" , 0)
-COMP( 1985, ht108064, trs80,	0,	ht1080z,  trs80, ht108064, trs8012,	"Hiradastechnika Szovetkezet",  "HT-1080Z/64" , 0)
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE	  INPUT    INIT      CONFIG       COMPANY  FULLNAME */
+COMP( 1977, trs80,    0,	0,	trs80,    trs80,   trs80,    0,		"Tandy Radio Shack",  "TRS-80 Model I (Level I Basic)" , 0)
+COMP( 1978, trs80l2,  trs80,	0,	model1,   trs80,   trs80,    trs8012,	"Tandy Radio Shack",  "TRS-80 Model I (Level II Basic)" , 0)
+COMP( 1983, radionic, trs80,	0,	model1,   trs80,   radionic, trs8012,	"Komtek",  "Radionic" , 0)
+COMP( 1980, sys80,    trs80,	0,	sys80,    trs80,   trs80,    trs8012,	"EACA Computers Ltd.","System-80" , 0)
+COMP( 1981, lnw80,    trs80,	0,	model1,   trs80m3, lnw80,    trs8012,	"LNW Research","LNW-80", 0 )
+COMP( 1980, trs80m3,  trs80,	0,	model3,   trs80m3, trs80,    trs8012,	"Tandy Radio Shack",  "TRS-80 Model III", 0 )
+COMP( 1980, trs80m4,  trs80,	0,	model3,   trs80m3, trs80,    trs8012,	"Tandy Radio Shack",  "TRS-80 Model 4", 0 )
+COMP( 1983, ht1080z,  trs80,	0,	ht1080z,  trs80,   ht1080z,  trs8012,	"Hiradastechnika Szovetkezet",  "HT-1080Z Series I" , 0)
+COMP( 1984, ht1080z2, trs80,	0,	ht1080z,  trs80,   ht1080z,  trs8012,	"Hiradastechnika Szovetkezet",  "HT-1080Z Series II" , 0)
+COMP( 1985, ht108064, trs80,	0,	ht1080z,  trs80,   ht108064, trs8012,	"Hiradastechnika Szovetkezet",  "HT-1080Z/64" , 0)
