@@ -31,19 +31,28 @@ DRIVER_INIT( ht108064 );
 
 WRITE8_HANDLER ( trs80_ff_w );
 WRITE8_HANDLER ( sys80_f8_w );
-WRITE8_HANDLER ( trs80m3_eb_w );
-WRITE8_HANDLER ( trs80m3_ea_w );
-WRITE8_HANDLER ( trs80m3_e9_w );
-WRITE8_HANDLER ( trs80m3_e8_w );
+WRITE8_HANDLER ( trs80m4_ff_w );
+WRITE8_HANDLER ( trs80m4_ec_w );
+WRITE8_HANDLER ( trs80m4_eb_w );
+WRITE8_HANDLER ( trs80m4_ea_w );
+WRITE8_HANDLER ( trs80m4_e9_w );
+WRITE8_HANDLER ( trs80m4_e8_w );
+WRITE8_HANDLER ( trs80m4_e0_w );
+WRITE8_HANDLER ( trs80m4_90_w );
+WRITE8_HANDLER ( trs80m4_84_w );
 READ8_HANDLER ( trs80_ff_r );
 READ8_HANDLER ( trs80_fe_r );
 READ8_HANDLER ( sys80_f9_r );
-READ8_HANDLER ( trs80m3_eb_r );
-READ8_HANDLER ( trs80m3_ea_r );
-READ8_HANDLER ( trs80m3_e8_r );
+READ8_HANDLER ( trs80m4_ff_r );
+READ8_HANDLER ( trs80m4_ec_r );
+READ8_HANDLER ( trs80m4_eb_r );
+READ8_HANDLER ( trs80m4_ea_r );
+READ8_HANDLER ( trs80m4_e8_r );
+READ8_HANDLER ( trs80m4_e0_r );
 
 INTERRUPT_GEN( trs80_frame_interrupt );
 INTERRUPT_GEN( trs80_timer_interrupt );
+INTERRUPT_GEN( trs80m4_rtc_interrupt );
 INTERRUPT_GEN( trs80_fdc_interrupt );
 
 READ8_HANDLER( trs80_irq_status_r );

@@ -11,6 +11,7 @@
 #include "driver.h"
 #include "machine/ctronics.h"
 #include "machine/ay31015.h"
+#include "sound/speaker.h"
 #include "includes/trs80.h"
 
 /* Components */
@@ -32,13 +33,15 @@
 #define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
 
-UINT8 trs80_port_ff = 0;
+static UINT8 trs80_port_e0 = 0;
+UINT8 trs80_port_ff = 0;		// will be changed to pass mode bits to video rather than port bits
 
-#define IRQ_TIMER		0x80
-#define IRQ_FDC 		0x40
-static	UINT8			irq_status = 0;
+#define IRQ_TIMER		0x80	/* RTC on Model I */
+#define IRQ_RTC			0x04	/* RTC on Model 4 */
+#define IRQ_FDC 		0x40	/* FDC on Model 1 */
+static	UINT8 irq_status = 0;
 
-#define MAX_LUMPS		192 	/* crude storage units - don't now much about it */
+#define MAX_LUMPS	192	 	/* crude storage units - don't now much about it */
 #define MAX_GRANULES	8		/* lumps consisted of granules.. aha */
 #define MAX_SECTORS 	5		/* and granules of sectors */
 
@@ -61,6 +64,8 @@ static emu_timer *cassette_data_timer;
 static const device_config *trs80_printer;
 static const device_config *trs80_ay31015;
 static const device_config *trs80_cass;
+static const device_config *trs80_speaker;
+static const device_config *trs80_fdc;
 
 static TIMER_CALLBACK( cassette_data_callback )
 {
@@ -216,6 +221,8 @@ MACHINE_RESET( trs80 )
 	trs80_printer = devtag_get_device(machine, "centronics");
 	trs80_ay31015 = devtag_get_device(machine, "tr1602");
 	trs80_cass = devtag_get_device(machine, "cassette");
+	trs80_speaker = devtag_get_device(machine, "speaker");
+	trs80_fdc = devtag_get_device(machine, "wd179x");
 }
 
 
@@ -330,7 +337,12 @@ DRIVER_INIT( ht108064 )
  *
  *************************************/
 
-READ8_HANDLER( trs80m3_e8_r )
+READ8_HANDLER( trs80m4_e0_r )
+{
+	return ~trs80_port_e0;
+}
+
+READ8_HANDLER( trs80m4_e8_r )
 {
 /* These bits directly read pins on the RS-232 socket, and are not emulated
 	d7 Clear-to-Send (CTS), Pin 5 
@@ -343,7 +355,7 @@ READ8_HANDLER( trs80m3_e8_r )
 	return 0;	// this is a guess
 }
 
-READ8_HANDLER( trs80m3_ea_r )
+READ8_HANDLER( trs80m4_ea_r )
 {
 /* UART Status Register 
 	d7 Data Received ('1'=condition true) 
@@ -365,13 +377,20 @@ READ8_HANDLER( trs80m3_ea_r )
 	return data;
 }
 
-READ8_HANDLER( trs80m3_eb_r )
+READ8_HANDLER( trs80m4_eb_r )
 {
 /* UART received data */
 	UINT8 data = ay31015_get_received_data( trs80_ay31015 );
 	ay31015_set_input_pin( trs80_ay31015, AY31015_RDAV, 0 );
 	ay31015_set_input_pin( trs80_ay31015, AY31015_RDAV, 1 );
 	return data;
+}
+
+READ8_HANDLER( trs80m4_ec_r )
+{
+/* Reset the RTC interrupt */
+//	trs80_port_e0 &= ~IRQ_RTC;
+	return 0;
 }
 
 READ8_HANDLER( sys80_f9_r )
@@ -398,27 +417,62 @@ READ8_HANDLER( sys80_f9_r )
 	return data;
 }
 
-READ8_HANDLER( trs80_fe_r )
-{
-/* not emulated yet */
-	return 0xff;
-}
-
-
 READ8_HANDLER( trs80_ff_r )
 {
 	UINT8 data = (~trs80_port_ff & 8) << 3;	// MODESEL bit (32 or 64 chars per line)
 	return data | cassette_data;
 }
 
+READ8_HANDLER( trs80m4_ff_r )
+{
+/* Return of cassette data stream from tape
+	d7 Low-speed data
+	d0 High-speed data (not emulated yet) */
 
-WRITE8_HANDLER( trs80m3_e8_w )
+	UINT8 data = trs80m4_ec_r(space, 0);	// this is a mirror of 0xec
+	data++;					// get rid of compile error
+	return cassette_data;
+}
+
+WRITE8_HANDLER( trs80m4_84_w )
+{
+/* Hi-res graphics control (not emulated)
+	d7 Page Control
+	d6 Fix upper memory
+	d5 Memory bit 1
+	d4 Memory bit 0
+	d3 Invert Video (whole screen)
+	d2 80/64 width
+	d1 Select bit 1
+	d0 Select bit 0 */
+}
+
+WRITE8_HANDLER( trs80m4_90_w )
+{
+	speaker_level_w(trs80_speaker, ~data & 1);
+}
+
+WRITE8_HANDLER( trs80m4_e0_w )
+{
+/* Interrupt settings
+	d6 Enable Rec Err
+	d5 Enable Rec Data
+	d4 Enable Xmit Emp
+	d3 Enable I/O int
+	d2 Enable RT int
+	d1 C fall Int
+	d0 C Rise Int */
+
+	trs80_port_e0 = data;
+}
+
+WRITE8_HANDLER( trs80m4_e8_w )
 {
 /* d1 when '1' enables control register load (see below) */
 	trs80_reg_load = data & 2;
 }
 
-WRITE8_HANDLER( trs80m3_e9_w )
+WRITE8_HANDLER( trs80m4_e9_w )
 {
 /* UART set baud rate. Rx = bits 0..3, Tx = bits 4..7
 	00h    50  
@@ -443,7 +497,7 @@ WRITE8_HANDLER( trs80m3_e9_w )
 	ay31015_set_transmitter_clock( trs80_ay31015, baud_clock[data>>4]);
 }
 
-WRITE8_HANDLER( trs80m3_ea_w )
+WRITE8_HANDLER( trs80m4_ea_w )
 {
 	if (trs80_reg_load)
 
@@ -483,9 +537,22 @@ WRITE8_HANDLER( trs80m3_ea_w )
 	}
 }
 
-WRITE8_HANDLER( trs80m3_eb_w )
+WRITE8_HANDLER( trs80m4_eb_w )
 {
 	ay31015_set_transmit_data( trs80_ay31015, data );
+}
+
+WRITE8_HANDLER( trs80m4_ec_w )
+{
+/* Hardware settings - not yet emulated
+	d6 CPU fast (1=4MHz, 0=2MHz)
+	d5 Enable Video Wait
+	d4 Enable External I/O bus
+	d3 Enable Alternate Character Set
+	d2 Mode Select (0=64 chars, 1=32chars)
+	d1 Cassette Motor (1=On) */
+
+	cassette_change_state( trs80_cass, ( data & 2 ) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR );
 }
 
 WRITE8_HANDLER( sys80_f8_w )
@@ -500,11 +567,17 @@ WRITE8_HANDLER( trs80_ff_w )
 {
 	static const double levels[4] = { 0.0, -1.0, 0.0, 1.0 };
 
-	cassette_change_state( trs80_cass, ( data & 0x04 ) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR );
-	cassette_output( trs80_cass, levels[data & 0x03]);
-
+	cassette_change_state( trs80_cass, ( data & 4 ) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR );
+	cassette_output( trs80_cass, levels[data & 3]);
 	cassette_data &= ~0x80;
 	trs80_port_ff = data;
+}
+
+WRITE8_HANDLER( trs80m4_ff_w )
+{
+	static const double levels[4] = { 0.0, -1.0, 0.0, 1.0 };
+	cassette_output( trs80_cass, levels[data & 3]);
+	cassette_data &= ~0x80;
 }
 
 
@@ -520,6 +593,23 @@ INTERRUPT_GEN( trs80_timer_interrupt )
 	{
 		irq_status |= IRQ_TIMER;
 		cpu_set_input_line(device, 0, HOLD_LINE);
+	}
+}
+
+INTERRUPT_GEN( trs80m4_rtc_interrupt )
+{
+//	if( (irq_status & IRQ_RTC) == 0 )
+	if( (irq_status & 1) == 0 )
+	{
+		irq_status |= IRQ_RTC;
+		irq_status |= 1;	// indicate irq in progress
+		cpu_set_input_line(device, 0, HOLD_LINE);
+	}
+	else
+	if (irq_status & 1)
+	{
+		irq_status &= 0xfe;
+		cpu_set_input_line(device, 0, CLEAR_LINE);
 	}
 }
 
@@ -600,7 +690,6 @@ WRITE8_HANDLER( trs80_irq_mask_w )
 WRITE8_HANDLER( trs80_motor_w )
 {
 	UINT8 drive = 255;
-	const device_config *fdc = devtag_get_device(space->machine, "wd179x");
 
 	LOG(("trs80 motor_w $%02X\n", data));
 
@@ -639,8 +728,8 @@ WRITE8_HANDLER( trs80_motor_w )
 	if (drive > 3)
 		return;
 
-    wd17xx_set_drive(fdc,drive);
-	wd17xx_set_side(fdc,head);
+	wd17xx_set_drive(trs80_fdc,drive);
+	wd17xx_set_side(trs80_fdc,head);
 
 }
 
