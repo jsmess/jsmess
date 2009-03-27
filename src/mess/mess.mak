@@ -15,6 +15,9 @@
 # uncomment next line to build imgtool
 BUILD_IMGTOOL = 1
 
+# uncomment next line to build castool
+BUILD_CASTOOL = 1
+
 # uncomment next line to build wimgtool
 BUILD_WIMGTOOL = 1
 
@@ -1447,6 +1450,11 @@ $(MESS_DRIVERS)/x68k.o:		$(MESS_LAYOUT)/x68000.lh
 ifdef BUILD_IMGTOOL
 include $(MESSSRC)/tools/imgtool/imgtool.mak
 TOOLS += $(IMGTOOL)
+endif
+
+ifdef BUILD_CASTOOL
+include $(MESSSRC)/tools/castool/castool.mak
+TOOLS += $(CASTOOL)
 endif
 
 ifdef BUILD_MESSTEST

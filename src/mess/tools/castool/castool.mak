@@ -1,0 +1,82 @@
+###########################################################################
+#
+#   castool.mak
+#
+#   MESS castool makefile
+#
+###########################################################################
+
+
+# castool executable name
+CASTOOL = castool$(EXE)
+
+# add path to castool headers
+CFLAGS += -I$(SRC)/$(TARGET)/tools/castool
+
+# castool directories
+CASTOOLOBJ = $(MESSOBJ)/tools/castool
+
+
+
+#-------------------------------------------------
+# castool objects
+#-------------------------------------------------
+
+OBJDIRS += \
+	$(CASTOOLOBJ)
+
+LIBCASTOOL = $(OBJ)/libcastool.a
+
+# castool lib objects
+CASTOOL_LIB_OBJS =						\
+	$(OBJ)/version.o					\
+	$(EMUOBJ)/mamecore.o				\
+	$(MESSOBJ)/tagpool.o				\
+	$(MESSOBJ)/utils.o					\
+	$(MESSOBJ)/tagpool.o				\
+	$(MESSOBJ)/opresolv.o				\
+	$(MESS_FORMATS)/a26_cas.o           \
+	$(MESS_FORMATS)/apf_apt.o           \
+	$(MESS_FORMATS)/cbm_tap.o           \
+	$(MESS_FORMATS)/cgen_cas.o          \
+	$(MESS_FORMATS)/coco_cas.o          \
+	$(MESS_FORMATS)/csw_cas.o           \
+	$(MESS_FORMATS)/fmsx_cas.o          \
+	$(MESS_FORMATS)/gtp_cas.o           \
+	$(MESS_FORMATS)/jupi_tap.o          \
+	$(MESS_FORMATS)/kim1_cas.o          \
+	$(MESS_FORMATS)/lviv_lvt.o          \
+	$(MESS_FORMATS)/mz_cas.o            \
+	$(MESS_FORMATS)/orao_cas.o          \
+	$(MESS_FORMATS)/oric_tap.o          \
+	$(MESS_FORMATS)/pmd_pmd.o           \
+	$(MESS_FORMATS)/primoptp.o          \
+	$(MESS_FORMATS)/rk_cas.o            \
+	$(MESS_FORMATS)/sord_cas.o          \
+	$(MESS_FORMATS)/svi_cas.o           \
+	$(MESS_FORMATS)/trs_cas.o           \
+	$(MESS_FORMATS)/tzx_cas.o           \
+	$(MESS_FORMATS)/uef_cas.o           \
+	$(MESS_FORMATS)/vt_cas.o            \
+	$(MESS_FORMATS)/zx81_p.o		    \
+	$(MESS_FORMATS)/ioprocs.o			\
+	$(MESS_FORMATS)/cassimg.o			\
+	$(MESS_FORMATS)/wavfile.o			\
+	
+
+$(LIBCASTOOL): $(CASTOOL_LIB_OBJS)
+
+CASTOOL_OBJS = \
+	$(CASTOOLOBJ)/main.o \
+	$(CASTOOLOBJ)/stubs.o \
+	$(MESSOBJ)/toolerr.o
+
+
+
+#-------------------------------------------------
+# rules to build the castool executable
+#-------------------------------------------------
+
+$(CASTOOL): $(CASTOOL_OBJS) $(LIBCASTOOL) $(LIBUTIL) $(EXPAT) $(ZLIB) $(LIBOCORE)
+	@echo Linking $@...
+	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
