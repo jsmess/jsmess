@@ -190,7 +190,7 @@ int CLIB_DECL main(int argc, char *argv[])
 	fprintf(stderr, "\n");
 	display_formats();
 	fprintf(stderr, "\nExample usage:\n");
-	fprintf(stderr, "        castool.exe tzx game.tzx game.wav\n\n");	
+	fprintf(stderr, "        castool.exe convert tzx game.tzx game.wav\n\n");	
 
 theend :
 	/* clean up our tracked resources */
