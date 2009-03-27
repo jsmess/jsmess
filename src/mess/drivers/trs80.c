@@ -423,15 +423,8 @@ static const gfx_layout ht1080z_charlayout =
 static GFXDECODE_START( ht1080z )
 	GFXDECODE_ENTRY( "gfx1", 0, ht1080z_charlayout, 0, 1 )
 GFXDECODE_END
-#if 0
-static const INT16 speaker_levels[3] = {0.0*32767,0.46*32767,0.85*32767};
 
-static const speaker_interface trs80_speaker_interface =
-{
-	3,				/* optional: number of different levels */
-	speaker_levels	/* optional: level lookup table */
-};
-#endif
+
 static const cassette_config trs80l2_cassette_config =
 {
 	trs80l2_cassette_formats,

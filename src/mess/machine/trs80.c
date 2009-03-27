@@ -34,7 +34,7 @@
 
 
 static UINT8 trs80_port_e0 = 0;
-UINT8 trs80_port_ff = 0;		// will be changed to pass mode bits to video rather than port bits
+UINT8 trs80_mode = 0;
 
 #define IRQ_TIMER		0x80	/* RTC on Model I */
 #define IRQ_RTC			0x04	/* RTC on Model 4 */
@@ -57,6 +57,7 @@ static UINT8 trs80_reg_load=1;
 
 #define FW TRS80_FONT_W
 #define FH TRS80_FONT_H
+#define MODEL4_MASTER_CLOCK 20275200
 
 static double old_cassette_val;
 static UINT8 cassette_data;
@@ -419,7 +420,7 @@ READ8_HANDLER( sys80_f9_r )
 
 READ8_HANDLER( trs80_ff_r )
 {
-	UINT8 data = (~trs80_port_ff & 8) << 3;	// MODESEL bit (32 or 64 chars per line)
+	UINT8 data = (~trs80_mode & 1) << 5;	// MODESEL bit (32 or 64 chars per line)
 	return data | cassette_data;
 }
 
@@ -544,7 +545,7 @@ WRITE8_HANDLER( trs80m4_eb_w )
 
 WRITE8_HANDLER( trs80m4_ec_w )
 {
-/* Hardware settings - not yet emulated
+/* Hardware settings - d5..d3 not emulated
 	d6 CPU fast (1=4MHz, 0=2MHz)
 	d5 Enable Video Wait
 	d4 Enable External I/O bus
@@ -552,7 +553,21 @@ WRITE8_HANDLER( trs80m4_ec_w )
 	d2 Mode Select (0=64 chars, 1=32chars)
 	d1 Cassette Motor (1=On) */
 
-	cassette_change_state( trs80_cass, ( data & 2 ) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR );
+	static UINT8 settings=0xff;
+	UINT8 changed = data ^ settings;
+
+	if (changed & 0x40)
+		cpu_set_clock(space->machine->cpu[0], data & 0x40 ? MODEL4_MASTER_CLOCK/5 : MODEL4_MASTER_CLOCK/10);
+
+	if (data & 0x04)
+		trs80_mode |= 1;
+	else
+		trs80_mode &= 2;
+
+	if (changed & 0x02)
+		cassette_change_state( trs80_cass, ( data & 2 ) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR );
+
+	settings = data;
 }
 
 WRITE8_HANDLER( sys80_f8_w )
@@ -570,7 +585,8 @@ WRITE8_HANDLER( trs80_ff_w )
 	cassette_change_state( trs80_cass, ( data & 4 ) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR );
 	cassette_output( trs80_cass, levels[data & 3]);
 	cassette_data &= ~0x80;
-	trs80_port_ff = data;
+
+	trs80_mode = (data & 8) ? 1 : 0;
 }
 
 WRITE8_HANDLER( trs80m4_ff_w )

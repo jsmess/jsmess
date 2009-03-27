@@ -18,7 +18,7 @@ static int width_store = 10;  // bodgy value to force an initial resize
 
 VIDEO_UPDATE( trs80 )
 {
-	int width = 64 - ((trs80_port_ff & 8) << 2);
+	int width = 64 - ((trs80_mode & 1) << 5);
 	int skip = 3 - (width >> 5);
 	int i=0,x,y,chr;
 	int adj=input_port_read(screen->machine, "CONFIG")&0x40;
