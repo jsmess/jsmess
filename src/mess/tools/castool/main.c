@@ -131,7 +131,7 @@ int CLIB_DECL main(int argc, char *argv[])
 {	
 	int i;
 	int found =0;
-	const struct CassetteFormat * const *selected_formats;
+	const struct CassetteFormat * const *selected_formats = NULL;
 	cassette_image *cassette;
 	FILE *f;
 #ifdef WIN32
