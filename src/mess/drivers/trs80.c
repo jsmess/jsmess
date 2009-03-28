@@ -89,19 +89,24 @@ out, and RAM takes its place. There is no rom basic, and no cassette support. Di
 Expansion interface for more floppy drives. The drives use 8-inch floppies holding 0.5mb of data.
 It was extremely expensive, non-standard, and not many were sold. A rom dump does not seem to exist.
 
-About the Model 4 - Our emulation is incorrect. The correct display size is 80x24. We possibly
-have the wrong roms - to be checked.
+About the Model 4 - This has 4 memory maps.
+		We emulate Map 1 except for the legacy printer port (see address map for Model 3).
+		Map 2 - RAM=0..37FF, Keyboard=3800..3Bff, Video=3C00..3FFF, RAM=4000..FFFF
+		Map 3 - RAM=0..F3FF, Keyboard=F400..F7FF, Video=F800..FFFF
+		Map 4 - RAM=0..FFFF
 
 ***************************************************************************
 
-Not dumped:
+Not dumped (to our knowledge):
  TRS80 Japanese bios
  TRS80 Katakana Character Generator
- TRS80 Model III and 4 Character Generators
+ TRS80 Model III/4 Character Generators
+ TRS80 Model 4P bios and boot disk
+ TRS80 Model II bios and boot disk
 
 Not emulated:
  TRS80 Japanese kana/ascii switch and alternate keyboard
- TRS80 Model III and 4 hardware above what is in a Model I.
+ TRS80 Model III/4 Hard drive, Graphics board, Alternate Character set
  LNW80 1.77 / 4.0 MHz switch
  LNW80 Colour board
  LNW80 Hires graphics
@@ -147,7 +152,7 @@ static READ8_DEVICE_HANDLER (trs80_wd179x_r)
 static ADDRESS_MAP_START( trs80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x3800, 0x38ff) AM_READ(trs80_keyboard_r)
-	AM_RANGE(0x3c00, 0x3fff) AM_READWRITE(SMH_RAM, trs80_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x3c00, 0x3fff) AM_READWRITE(trs80_videoram_r, trs80_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x4000, 0x7fff) AM_RAM
 ADDRESS_MAP_END
 
@@ -168,7 +173,7 @@ static ADDRESS_MAP_START( model1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x37ee, 0x37ee) AM_DEVREADWRITE("wd179x", wd17xx_sector_r, wd17xx_sector_w)
 	AM_RANGE(0x37ef, 0x37ef) AM_DEVREADWRITE("wd179x", wd17xx_data_r, wd17xx_data_w)
 	AM_RANGE(0x3800, 0x38ff) AM_MIRROR(0x300) AM_READ(trs80_keyboard_r)
-	AM_RANGE(0x3c00, 0x3fff) AM_READWRITE(SMH_RAM, trs80_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x3c00, 0x3fff) AM_READWRITE(trs80_videoram_r, trs80_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x4000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -182,23 +187,24 @@ static ADDRESS_MAP_START( sys80_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xf8, 0xf8) AM_READWRITE(trs80m4_eb_r, sys80_f8_w)
 	AM_RANGE(0xf9, 0xf9) AM_READWRITE(sys80_f9_r, trs80m4_eb_w)
 	AM_RANGE(0xfd, 0xfd) AM_READWRITE(trs80_printer_r, trs80_printer_w)
-//	AM_RANGE(0xfe, 0xfe) AM_WRITE(sys80_fe_w)
+	AM_RANGE(0xfe, 0xfe) AM_WRITE(sys80_fe_w)
 	AM_RANGE(0xff, 0xff) AM_READWRITE(trs80_ff_r, trs80_ff_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( model3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x37ff) AM_ROM
 	AM_RANGE(0x3800, 0x38ff) AM_MIRROR(0x300) AM_READ(trs80_keyboard_r)
-	AM_RANGE(0x3c00, 0x3fff) AM_READWRITE(SMH_RAM, trs80_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x3c00, 0x3fff) AM_READWRITE(trs80_videoram_r, trs80_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x4000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( model3_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x84, 0x87) AM_WRITE(trs80m4_84_w)
+	AM_RANGE(0x88, 0x89) AM_WRITE(trs80m4_88_w)
 	AM_RANGE(0x90, 0x93) AM_WRITE(trs80m4_90_w)
 	AM_RANGE(0xe0, 0xe3) AM_READWRITE(trs80m4_e0_r, trs80m4_e0_w)
-//	AM_RANGE(0xe4, 0xe4) AM_READWRITE(SMH_NOP,SMH_NOP)	// read nmi status, write nmi mask
+	AM_RANGE(0xe4, 0xe4) AM_READWRITE(trs80m4_e4_r, trs80m4_e4_w)
 	AM_RANGE(0xe8, 0xe8) AM_READWRITE(trs80m4_e8_r, trs80m4_e8_w)
 	AM_RANGE(0xe9, 0xe9) AM_READ_PORT("E9") AM_WRITE(trs80m4_e9_w)
 	AM_RANGE(0xea, 0xea) AM_READWRITE(trs80m4_ea_r, trs80m4_ea_w)
@@ -208,7 +214,7 @@ static ADDRESS_MAP_START( model3_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xf1, 0xf1) AM_DEVREADWRITE("wd179x", wd17xx_track_r, wd17xx_track_w)
 	AM_RANGE(0xf2, 0xf2) AM_DEVREADWRITE("wd179x", wd17xx_sector_r, wd17xx_sector_w)
 	AM_RANGE(0xf3, 0xf3) AM_DEVREADWRITE("wd179x", wd17xx_data_r, wd17xx_data_w)
-	AM_RANGE(0xf4, 0xf4) AM_WRITE(trs80_motor_w)
+	AM_RANGE(0xf4, 0xf4) AM_WRITE(trs80m4_f4_w)
 	AM_RANGE(0xf8, 0xfb) AM_READWRITE(trs80_printer_r, trs80_printer_w)
 	AM_RANGE(0xfc, 0xff) AM_READWRITE(trs80m4_ff_r, trs80m4_ff_w)
 ADDRESS_MAP_END
@@ -450,7 +456,7 @@ static MACHINE_DRIVER_START( trs80 )		// the original model I, level I, with no 
 
 	MDRV_MACHINE_RESET( trs80 )
 
-    /* video hardware */
+	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -466,7 +472,6 @@ static MACHINE_DRIVER_START( trs80 )		// the original model I, level I, with no 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
-//	MDRV_SOUND_CONFIG(trs80_speaker_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MDRV_SOUND_WAVE_ADD("wave", "cassette")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -495,7 +500,6 @@ static MACHINE_DRIVER_START( model3 )
 	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP( model3_map, 0 )
 	MDRV_CPU_IO_MAP( model3_io, 0 )
-//	MDRV_CPU_VBLANK_INT_HACK(trs80_frame_interrupt, 2)
 	MDRV_CPU_PERIODIC_INT(trs80m4_rtc_interrupt, 60)
 MACHINE_DRIVER_END
 

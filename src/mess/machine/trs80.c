@@ -33,8 +33,10 @@
 #define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
 
-static UINT8 trs80_port_e0 = 0;
-UINT8 trs80_mode = 0;
+static UINT8 trs80_int=0;		/* interrupting devices */
+static UINT8 trs80_mask= 0;		/* interrupt mask */
+static UINT8 trs80_port_ec=0;		/* bit d6..d1 of port EC to be read by port FF */
+UINT8 trs80_mode = 0;			/* Control bits passed to video output routine */
 
 #define IRQ_TIMER		0x80	/* RTC on Model I */
 #define IRQ_RTC			0x04	/* RTC on Model 4 */
@@ -52,7 +54,7 @@ static UINT8 head;							 /* current head per drive */
 #ifdef USE_SECTOR
 static UINT8 sector[4] = {0, }; 			/* current sector per drive */
 #endif
-static UINT8 irq_mask = 0;
+
 static UINT8 trs80_reg_load=1;
 
 #define FW TRS80_FONT_W
@@ -224,6 +226,7 @@ MACHINE_RESET( trs80 )
 	trs80_cass = devtag_get_device(machine, "cassette");
 	trs80_speaker = devtag_get_device(machine, "speaker");
 	trs80_fdc = devtag_get_device(machine, "wd179x");
+	videoram_size = 0x800;
 }
 
 
@@ -340,20 +343,39 @@ DRIVER_INIT( ht108064 )
 
 READ8_HANDLER( trs80m4_e0_r )
 {
-	return ~trs80_port_e0;
+/* Indicates which devices are interrupting - only d2 is emulated
+	d6 RS232 Error
+	d5 RS232 Rcv
+	d4 RS232 Xmit
+	d3 I/O Bus
+	d2 RTC
+	d1 Cass 1500 baud Falling
+	d0 Cass 1500 baud Rising */
+
+	return ~(trs80_mask & trs80_int);
+}
+
+READ8_HANDLER( trs80m4_e4_r )
+{
+/* NMI status bits from the FDC - not emulated
+	d7 status of FDC INTREQ (0=true)
+	d6 status of Motor Timeout (0=true)
+	d5 status of Reset signal (0=true) */
+
+	return 0xff;
 }
 
 READ8_HANDLER( trs80m4_e8_r )
 {
 /* These bits directly read pins on the RS-232 socket, and are not emulated
-	d7 Clear-to-Send (CTS), Pin 5 
-	d6 Data-Set-Ready (DSR), pin 6 
-	d5 Carrier Detect (CD), pin 8 
-	d4 Ring Indicator (RI), pin 22 
-	d3,d2,d0 Not used 
+	d7 Clear-to-Send (CTS), Pin 5
+	d6 Data-Set-Ready (DSR), pin 6
+	d5 Carrier Detect (CD), pin 8
+	d4 Ring Indicator (RI), pin 22
+	d3,d2,d0 Not used
 	d1 UART Receiver Input, pin 20 (pin 20 is also DTR) */
 
-	return 0;	// this is a guess
+	return 0;
 }
 
 READ8_HANDLER( trs80m4_ea_r )
@@ -390,7 +412,7 @@ READ8_HANDLER( trs80m4_eb_r )
 READ8_HANDLER( trs80m4_ec_r )
 {
 /* Reset the RTC interrupt */
-//	trs80_port_e0 &= ~IRQ_RTC;
+	trs80_int &= ~IRQ_RTC;
 	return 0;
 }
 
@@ -420,7 +442,11 @@ READ8_HANDLER( sys80_f9_r )
 
 READ8_HANDLER( trs80_ff_r )
 {
-	UINT8 data = (~trs80_mode & 1) << 5;	// MODESEL bit (32 or 64 chars per line)
+/* ModeSel and cassette data
+	d7 cassette data from tape
+	d2 modesel setting */
+
+	UINT8 data = (~trs80_mode & 1) << 5;
 	return data | cassette_data;
 }
 
@@ -428,16 +454,17 @@ READ8_HANDLER( trs80m4_ff_r )
 {
 /* Return of cassette data stream from tape
 	d7 Low-speed data
+	d6..d1 info from write of port EC
 	d0 High-speed data (not emulated yet) */
 
-	UINT8 data = trs80m4_ec_r(space, 0);	// this is a mirror of 0xec
-	data++;					// get rid of compile error
-	return cassette_data;
+	trs80_int &= 0xfc;			/* clear cassette interrupts */
+	return trs80_port_ec | cassette_data;
 }
+
 
 WRITE8_HANDLER( trs80m4_84_w )
 {
-/* Hi-res graphics control (not emulated)
+/* Hi-res graphics control (only d2,d3,d7 are emulated)
 	d7 Page Control
 	d6 Fix upper memory
 	d5 Memory bit 1
@@ -446,6 +473,8 @@ WRITE8_HANDLER( trs80m4_84_w )
 	d2 80/64 width
 	d1 Select bit 1
 	d0 Select bit 0 */
+
+	trs80_mode = (trs80_mode & 0x73) | (data & 0x8c);
 }
 
 WRITE8_HANDLER( trs80m4_90_w )
@@ -455,7 +484,7 @@ WRITE8_HANDLER( trs80m4_90_w )
 
 WRITE8_HANDLER( trs80m4_e0_w )
 {
-/* Interrupt settings
+/* Interrupt settings - which devices are allowed to interrupt - bits align with read of E0
 	d6 Enable Rec Err
 	d5 Enable Rec Data
 	d4 Enable Xmit Emp
@@ -464,12 +493,20 @@ WRITE8_HANDLER( trs80m4_e0_w )
 	d1 C fall Int
 	d0 C Rise Int */
 
-	trs80_port_e0 = data;
+	trs80_mask = data;
+}
+
+WRITE8_HANDLER( trs80m4_e4_w )
+{
+/* Disk to NMI interface (not emulated)
+	d7 1=enable disk INTRQ to generate NMI
+	d6 1=enable disk Motor Timeout to generate NMI */
 }
 
 WRITE8_HANDLER( trs80m4_e8_w )
 {
 /* d1 when '1' enables control register load (see below) */
+
 	trs80_reg_load = data & 2;
 }
 
@@ -524,6 +561,7 @@ WRITE8_HANDLER( trs80m4_ea_w )
 		ay31015_set_input_pin( trs80_ay31015, AY31015_CS, 1 );
 	}
 	else
+	{
 
 /* These directly adjust levels at the RS-232 socket - not emulated
 	d7,d6 Not used
@@ -534,7 +572,6 @@ WRITE8_HANDLER( trs80m4_ea_w )
 	d1 Data-Terminal-Ready (DTR), pin 20 
 	d0 Request-to-Send (RTS), pin 4 */
 
-	{
 	}
 }
 
@@ -547,9 +584,9 @@ WRITE8_HANDLER( trs80m4_ec_w )
 {
 /* Hardware settings - d5..d3 not emulated
 	d6 CPU fast (1=4MHz, 0=2MHz)
-	d5 Enable Video Wait
-	d4 Enable External I/O bus
-	d3 Enable Alternate Character Set
+	d5 1=Enable Video Wait
+	d4 1=Enable External I/O bus
+	d3 1=Enable Alternate Character Set
 	d2 Mode Select (0=64 chars, 1=32chars)
 	d1 Cassette Motor (1=On) */
 
@@ -559,15 +596,28 @@ WRITE8_HANDLER( trs80m4_ec_w )
 	if (changed & 0x40)
 		cpu_set_clock(space->machine->cpu[0], data & 0x40 ? MODEL4_MASTER_CLOCK/5 : MODEL4_MASTER_CLOCK/10);
 
-	if (data & 0x04)
-		trs80_mode |= 1;
-	else
-		trs80_mode &= 2;
+	trs80_mode = (trs80_mode & 0xfe) | ((data & 4) ? 1 : 0);
 
 	if (changed & 0x02)
 		cassette_change_state( trs80_cass, ( data & 2 ) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR );
 
 	settings = data;
+	trs80_port_ec = data & 0x7e;
+}
+
+WRITE8_HANDLER( trs80m4_f4_w )
+{
+/* Selection of drive and parameters - not emulated.
+ A write also causes the selected drive motor to turn on for about 3 seconds.
+ When the motor turns off, the drive is deselected.
+	d7 1=MFM, 0=FM
+	d6 1=Wait
+	d5 1=Write Precompensation enabled
+	d4 0=Side 0, 1=Side 1
+	d3 1=select drive 3
+	d2 1=select drive 2
+	d1 1=select drive 1
+	d0 1=select drive 0 */
 }
 
 WRITE8_HANDLER( sys80_f8_w )
@@ -578,8 +628,28 @@ WRITE8_HANDLER( sys80_f8_w )
 	d0 RTS */
 }
 
+WRITE8_HANDLER( sys80_fe_w )
+{
+/* not emulated
+	d4 select internal or external cassette player */
+}
+
+WRITE8_HANDLER( lnw80_fe_w )
+{
+/* not emulated
+	d3 bankswitch lower 16k between roms and hires ram
+	d2 enable colour
+	d0 inverse video (whole screen) */
+
+	trs80_mode = (trs80_mode & 0xf7) | ((data & 1) ? 8 : 0);
+}
+
 WRITE8_HANDLER( trs80_ff_w )
 {
+/* Standard output port of Model I
+	d3 ModeSel bit
+	d1, d0 Cassette output */
+
 	static const double levels[4] = { 0.0, -1.0, 0.0, 1.0 };
 
 	cassette_change_state( trs80_cass, ( data & 4 ) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR );
@@ -591,6 +661,9 @@ WRITE8_HANDLER( trs80_ff_w )
 
 WRITE8_HANDLER( trs80m4_ff_w )
 {
+/* Cassette port
+	d1, d0 Cassette output */
+
 	static const double levels[4] = { 0.0, -1.0, 0.0, 1.0 };
 	cassette_output( trs80_cass, levels[data & 3]);
 	cassette_data &= ~0x80;
@@ -605,35 +678,37 @@ WRITE8_HANDLER( trs80m4_ff_w )
 
 INTERRUPT_GEN( trs80_timer_interrupt )
 {
-	if( (irq_status & IRQ_TIMER) == 0 )
+	if( (trs80_int & IRQ_TIMER) == 0 )
 	{
-		irq_status |= IRQ_TIMER;
+		trs80_int |= IRQ_TIMER;
 		cpu_set_input_line(device, 0, HOLD_LINE);
 	}
 }
 
 INTERRUPT_GEN( trs80m4_rtc_interrupt )
 {
-//	if( (irq_status & IRQ_RTC) == 0 )
-	if( (irq_status & 1) == 0 )
+/* This enables the processing of interrupts, particularly the clock and the flashing cursor.
+	We alternately raise and lower the INT line. The OS counts one tick for each interrupt.
+	There are 30 ticks per second. */
+
+	if (irq_status)
 	{
-		irq_status |= IRQ_RTC;
-		irq_status |= 1;	// indicate irq in progress
-		cpu_set_input_line(device, 0, HOLD_LINE);
+		irq_status = 0;
+		cpu_set_input_line(device, 0, CLEAR_LINE);
 	}
 	else
-	if (irq_status & 1)
 	{
-		irq_status &= 0xfe;
-		cpu_set_input_line(device, 0, CLEAR_LINE);
+		trs80_int |= IRQ_RTC;
+		irq_status = 1;
+		cpu_set_input_line(device, 0, HOLD_LINE);
 	}
 }
 
 static void trs80_fdc_interrupt_internal(running_machine *machine)
 {
-	if ((irq_status & IRQ_FDC) == 0)
+	if ((trs80_int & IRQ_FDC) == 0)
 	{
-		irq_status |= IRQ_FDC;
+		trs80_int |= IRQ_FDC;
 		cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
 	}
 }
@@ -648,7 +723,7 @@ static WD17XX_CALLBACK( trs80_fdc_callback )
 	switch (state)
 	{
 		case WD17XX_IRQ_CLR:
-			irq_status &= ~IRQ_FDC;
+			trs80_int &= ~IRQ_FDC;
 			break;
 		case WD17XX_IRQ_SET:
 			trs80_fdc_interrupt_internal(device->machine);
@@ -663,17 +738,13 @@ static WD17XX_CALLBACK( trs80_fdc_callback )
 const wd17xx_interface trs80_wd17xx_interface = { trs80_fdc_callback, NULL };
 
 
-INTERRUPT_GEN( trs80_frame_interrupt )
-{
-}
-
 /*************************************
  *				     *
  *		Memory handlers      *
  *				     *
  *************************************/
 
- READ8_HANDLER ( trs80_printer_r )
+READ8_HANDLER ( trs80_printer_r )
 {
 	/* Bit 7 - 1 = Busy; 0 = Not Busy
 	   Bit 6 - 1 = Out of Paper; 0 = Paper
@@ -691,17 +762,13 @@ WRITE8_HANDLER( trs80_printer_w )
 	centronics_strobe_w(trs80_printer, 0);
 }
 
- READ8_HANDLER( trs80_irq_status_r )
+READ8_HANDLER( trs80_irq_status_r )
 {
-	int result = irq_status;
-	irq_status &= ~(IRQ_TIMER | IRQ_FDC);
+	int result = trs80_int;
+	trs80_int &= ~(IRQ_TIMER | IRQ_FDC);
 	return result;
 }
 
-WRITE8_HANDLER( trs80_irq_mask_w )
-{
-	irq_mask = data;
-}
 
 WRITE8_HANDLER( trs80_motor_w )
 {

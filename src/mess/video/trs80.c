@@ -11,6 +11,39 @@
 #define FW  TRS80_FONT_W
 #define FH  TRS80_FONT_H
 
+/* Bit assignment for "trs80_mode"
+	d7 Page select
+	d3 Invert characters with bit 7 set (1=invert)
+	d2 80/40 or 64/32 characters per line (1=80)
+	d0 80/64 or 40/32 characters per line (1=32) */
+
+static UINT16 start_address=0;
+static UINT8 crtc_reg;
+
+WRITE8_HANDLER( trs80m4_88_w )
+{
+/* This is for the programming of the CRTC registers.
+	However this CRTC is mask-programmed, and only the
+	start address register can be used. The cursor and
+	light-pen facilities are ignored. The character clock
+	is changed depending on the screen size chosen.
+	It is assumed that character size of 6x12 is used in
+	all screen sizes, however decapping is needed to be
+	certain. Therefore it is easier to use normal
+	coding rather than the mc6845 device. */
+
+	if (!offset) crtc_reg = data & 0x1f;
+
+	if (offset) switch (crtc_reg)
+	{
+		case 12:
+			start_address = (start_address & 0x00ff) | (data << 8);
+			break;
+		case 13:
+			start_address = (start_address & 0xff00) | data;
+	}
+}
+
 /***************************************************************************
   Statics for this module
 ***************************************************************************/
@@ -47,8 +80,15 @@ VIDEO_UPDATE( trs80 )
   Write to video ram
 ***************************************************************************/
 
+READ8_HANDLER( trs80_videoram_r )
+{
+	if (trs80_mode & 0x80) offset |= 0x400;
+	return videoram[offset];
+}
+
 WRITE8_HANDLER( trs80_videoram_w )
 {
+	if (trs80_mode & 0x80) offset |= 0x400;
 	videoram[offset] = data;
 }
 
