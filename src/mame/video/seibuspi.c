@@ -12,6 +12,7 @@ static UINT32 layer_bank;
 static UINT32 layer_enable;
 static UINT32 video_dma_length;
 static UINT32 video_dma_address;
+static UINT32 sprite_dma_length;
 
 static int rf2_layer_bank[3];
 static UINT32 *tilemap_ram;
@@ -24,7 +25,8 @@ static int text_layer_offset;
 
 static UINT32 bg_fore_layer_position;
 
-static UINT8 alpha_table[6144];
+static UINT8 alpha_table[8192];
+static UINT8 sprite_bpp;
 
 READ32_HANDLER( spi_layer_bank_r )
 {
@@ -218,7 +220,7 @@ WRITE32_HANDLER( sprite_dma_start_w )
 {
 	if (video_dma_address != 0)
 	{
-		memcpy( sprite_ram, &spimainram[(video_dma_address / 4) - 0x200], 0x1000);
+		memcpy( sprite_ram, &spimainram[(video_dma_address / 4) - 0x200], sprite_dma_length);
 	}
 }
 
@@ -320,15 +322,16 @@ static void draw_blend_gfx(running_machine *machine, bitmap_t *bitmap, const rec
 	for (j=y1; j <= y2; j++)
 	{
 		UINT32 *p = BITMAP_ADDR32(bitmap, j, 0);
+		UINT8 trans_pen = (1 << sprite_bpp) - 1;
 		int dp_i = (py * width) + px;
 		py += yd;
 
 		for (i=x1; i <= x2; i++)
 		{
 			UINT8 pen = dp[dp_i];
-			if (pen != 0x3f)
+			if (pen != trans_pen)
 			{
-				int global_pen = pen + color*64;
+				int global_pen = pen + (color << sprite_bpp);
 				UINT8 alpha = alpha_table[global_pen];
 				if (alpha)
 				{
@@ -369,7 +372,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	if( layer_enable & 0x10 )
 		return;
 
-	for( a = 0x400 - 2; a >= 0; a -= 2 ) {
+	for( a = (sprite_dma_length / 4) - 2; a >= 0; a -= 2 ) {
 		tile_num = (sprite_ram[a + 0] >> 16) & 0xffff;
 		if( sprite_ram[a + 1] & 0x1000 )
 			tile_num |= 0x10000;
@@ -497,6 +500,9 @@ VIDEO_START( spi )
 	memset(tilemap_ram, 0, 0x4000);
 	memset(palette_ram, 0, 0x3000);
 	memset(sprite_ram, 0, 0x1000);
+
+	sprite_bpp = 6;
+	sprite_dma_length = 0x1000;
 
 	for (i=0; i < 6144; i++) {
 		palette_set_color(machine, i, MAKE_RGB(0, 0, 0));
@@ -650,5 +656,35 @@ VIDEO_UPDATE( spi )
 	draw_sprites(screen->machine, bitmap, cliprect, 3);
 
 	combine_tilemap(screen->machine, bitmap, cliprect, text_layer, 0, 0, 0, NULL);
+	return 0;
+}
+
+VIDEO_START( sys386f2 )
+{
+	int i;
+
+	palette_ram = auto_malloc(0x4000);
+	sprite_ram = auto_malloc(0x2000);
+	memset(palette_ram, 0, 0x4000);
+	memset(sprite_ram, 0, 0x2000);
+
+	sprite_bpp = 8;
+	sprite_dma_length = 0x2000;
+	layer_enable = 0;
+
+	for (i=0; i < 8192; i++) {
+		palette_set_color(machine, i, MAKE_RGB(0, 0, 0));
+	}
+
+	memset(alpha_table, 0, 8192 * sizeof(UINT8));
+}
+
+VIDEO_UPDATE( sys386f2 )
+{
+	bitmap_fill(bitmap, cliprect, 0);
+	draw_sprites(screen->machine, bitmap, cliprect, 0);
+	draw_sprites(screen->machine, bitmap, cliprect, 1);
+	draw_sprites(screen->machine, bitmap, cliprect, 2);
+	draw_sprites(screen->machine, bitmap, cliprect, 3);
 	return 0;
 }

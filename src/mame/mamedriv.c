@@ -1699,6 +1699,7 @@ const game_driver * const drivers[] =
 	DRIVER( fullthrl )	/* B14 (c) 1987 Taito Corporation (Japan) */
 	DRIVER( opwolf )	/* B20 (c) 1987 Taito Corporation Japan (World) */
 	DRIVER( opwolfa )	/* B20 (c) 1987 Taito Corporation Japan (World) */
+	DRIVER( opwolfj )	/* B20 (c) 1987 Taito Corporation (Japan) */
 	DRIVER( opwolfu )	/* B20 (c) 1987 Taito America Corporation (US) */
 	DRIVER( opwolfb )	/* bootleg */
 	DRIVER( othunder )	/* B67 (c) 1988 Taito Corporation Japan (World) */
@@ -2957,30 +2958,30 @@ V-V                           TP-027
 
 	/* Taito GNET */
 	DRIVER( taitogn )
-	DRIVER( chaoshea )  /* 1998.10 Chaos Heat (V2.08J) */
-	DRIVER( raycris )   /* 1998.12 Ray Crisis (V2.03J) */
+	DRIVER( chaoshea )	/* 1998.10 Chaos Heat (V2.08J) */
+	DRIVER( raycris )	/* 1998.12 Ray Crisis (V2.03J) */
 						/* 1999.02 Otenami Haiken (Success) */
-						/* 1999.03 Super Puzzle Bobble (Japan) */
-	DRIVER( spuzbobl )  /* 1999.?? Super Puzzle Bobble (V2.05O) */
-	DRIVER( gobyrc )    /* 1999.?? Go By RC (V2.03O) */
-	DRIVER( rcdego )    /* 1999.06 RC De Go (V2.03J) */
-	DRIVER( flipmaze )  /* 1999.09 Flip Maze (V2.04J) */
-	DRIVER( mahjngoh )  /* 1999.12 Mahjong Oh (V2.06J) */
-	DRIVER( psyvaria )  /* 2000.03 Psyvariar -Medium Unit- (V2.04J) */
-	DRIVER( shanghss )  /* 2000.07 Shanghai Shoryu Sairin (V2.03J) */
-	DRIVER( psyvarrv )  /* 2000.09 Psyvariar -Revision- (V2.04J) */
-	DRIVER( zokuoten )  /* 2000.12 Zoku Otenamihaiken (V2.03J) */
+	DRIVER( spuzbobj )	/* 1999.03 Super Puzzle Bobble (Japan) */
+	DRIVER( spuzbobl )	/* 1999.?? Super Puzzle Bobble (V2.05O) */
+	DRIVER( gobyrc )	/* 1999.?? Go By RC (V2.03O) */
+	DRIVER( rcdego )	/* 1999.06 RC De Go (V2.03J) */
+	DRIVER( flipmaze )	/* 1999.09 Flip Maze (V2.04J) */
+	DRIVER( mahjngoh )	/* 1999.12 Mahjong Oh (V2.06J) */
+	DRIVER( psyvaria )	/* 2000.03 Psyvariar -Medium Unit- (V2.04J) */
+	DRIVER( shanghss )	/* 2000.07 Shanghai Shoryu Sairin (V2.03J) */
+	DRIVER( psyvarrv )	/* 2000.09 Psyvariar -Revision- (V2.04J) */
+	DRIVER( zokuoten )	/* 2000.12 Zoku Otenamihaiken (V2.03J) */
 						/* 2000.?? Taito Classic (Success, not released?) */
-	DRIVER( soutenry )  /* 2001.02 Soutenryu (V2.07J) */
-	DRIVER( nightrai )  /* 2001.05 Night Raid (V2.03J) */
-						/* 2001.09 Shikigami no Shiro */
-						/* 2001.10 Otenki Kororin */
-	DRIVER( usagi )     /* 2001.12 Usagi (V2.02J) */
+	DRIVER( soutenry )	/* 2001.02 Soutenryu (V2.07J) */
+	DRIVER( nightrai )	/* 2001.05 Night Raid (V2.03J) */
+	DRIVER( shikigam )	/* 2001.09 Shikigami no Shiro */
+	DRIVER( otenki )	/* 2001.10 Otenki Kororin */
+	DRIVER( usagi )		/* 2001.12 Usagi (V2.02J) */
 						/* 2002.02 Shanghai Sangokuhaitougi */
-	DRIVER( xiistag )   /* 2002.07 XII Stag (V2.01J) */
-	DRIVER( sianniv )   /* 2003.10 Space Invaders Anniversary (V2.02J) */
-						/* 2003.11 Kollon */
-						/* 2004.05 Zooo */
+	DRIVER( xiistag )	/* 2002.07 XII Stag (V2.01J) */
+	DRIVER( sianniv )	/* 2003.10 Space Invaders Anniversary (V2.02J) */
+	DRIVER( kollon )	/* 2003.11 Kollon */
+	DRIVER( zooo )		/* 2004.05 Zooo */
 
 	/* Namco System 11 */
 	DRIVER( tekken )	/* 1994.?? Tekken (TE4/VER.C) */
@@ -3544,7 +3545,6 @@ V-V                           TP-027
 other System 1 / System 2 games:
 
 WarBall
-Sanrin Sanchan
 DokiDoki Penguin Land *not confirmed
 */
 
@@ -3757,7 +3757,7 @@ DokiDoki Penguin Land *not confirmed
 	/* Outrun Hardware */
 						/* 1986.09 Outrun (Japan) */
 						/* 1986.11 Outrun (US) */
-						/* 1986.?? outrun (World) */
+						/* 1986.?? Outrun (World) */
 	DRIVER( outrun )
 	DRIVER( outrun2 )
 	DRIVER( outrun1 )
@@ -4332,21 +4332,14 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( csmasho )
 	DRIVER( sfz3ugd )	/* 2001.02 Street Fighter ZERO3 Upper */
 	DRIVER( gundmgd )	/* 2001.03 Kidou Senshi Gundam Renpou vs. Zeon */
-	DRIVER( vstrik3c )	/* 2001.04 Virtua Striker 3 */
-	DRIVER( vstrik3 )
 						/* 2001.04 Shakatto Tambourine Motto Norinori Shinkyoku Tsuika */
 	DRIVER( dygolf )	/* 2001.04 Dynamic Golf */
-						/* 2001.05 Wild Riders */
 	DRIVER( monkeyba )	/* 2001.05 Monkey Ball */
-						/* 2001.06 Club Cart */
 	DRIVER( cvsgd )		/* 2001.06 Capcom vs. SNK Pro */
 						/* 2001.06 Crackin' DJ Part2 */
 	DRIVER( wsbbgd )	/* 2001.06 Super Major League */
-	DRIVER( beachspi )	/* 2001.07 Beach Spikers */
 	DRIVER( spkrbtl )	/* 2001.07 Spikers Battle */
 						/* 2001.07 Dokidoki Idol Star Seeker */
-						/* 2001.08 Wave Runner GP */
-	DRIVER( vf4 )		/* 2001.08 Virtua Fighter 4 (Naomi 2) */
 	DRIVER( cvs2gd )	/* 2001.08 Capcom vs. SNK 2 */
 	DRIVER( hmgeo )		/* 2001.09 Heavy Metal Geo Matrix */
 						/* 2001.09 Alien Front */
@@ -4354,76 +4347,109 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2001.10 Derby Owners Club 2 */
 						/* 2001.10 Inu no Osanpo */
 	DRIVER( vtennis2 )  /* 2001.10 Power Smash 2 / Virtua Tennis 2 */
-						/* 2001.11 La Keyboardu */
+	DRIVER( keyboard )	/* 2001.11 La Keyboardxyu */
 						/* 2001.11 Shakatto Tambourine Cho Powerup Chu */
 	DRIVER( ikaruga )	/* 2001.12 Ikaruga */
-	DRIVER( lupinsho)	/* 2001.12 Lupin the Third the Shooting */
-						/* 2002.02 The King of Route 66 */
-	DRIVER( initd )		/* 2002.03 Initial D Arcade Stage (Naomi 2) */
+	DRIVER( lupinsho )	/* 2001.12 Lupin the Third the Shooting */
 	DRIVER( vathlete )	/* 2002.03 Virtua Athlete */
 	DRIVER( luptype )	/* 2002.04 Lupin the Third the Typing */
 	DRIVER( ggxx )		/* 2002.05 Guilty Gear XX */
 						/* 2002.05 Cleopatra Fortune + */
 	DRIVER( mok )		/* 2002.05 The Maze of the Kings */
-						/* 2002.06 World Club Champion Football */
+	DRIVER( ngdup23a )	/* DIMM Firmware Updater */
+	DRIVER( ngdup23c )
 	DRIVER( chocomk )	/* 2002.06 Musapy no Choco Marker */
 						/* 2002.07 Mazan */
-						/* 2002.07 Soul Surfer */
-	DRIVER( vf4evo )	/* 2002.08 Virtua Fighter 4 Evolution (Naomi 2) */
 						/* 2002.09 Yonin Uchi Mahjong MJ */
-	DRIVER( initdv2j )	/* 2002.12 Initial D Arcade Stage ver.2 */
-						/* 2002.12 Moeru Casinyo */
+						/* 2002.12 Azumanga Daiou Puzzle Bobble */
+	DRIVER( moeru )		/* 2002.12 Moeru Casinyo */
 	DRIVER( quizqgd )	/* 2003.01 Quiz Keitai Q mode */
-						/* 2003.02 Kouchuu Ouja Mushiking */
 						/* 2003.03 Yonin Uchi Mahjong MJ Network Taisen ver. */
-						/* 2003.03 WCCF 2001-2002 ver.2.0 */
+	DRIVER( usagui )
 	DRIVER( ggxxrl )	/* 2003.03 Guilty Gear XX # Reload */
 	DRIVER( shikgam2 )	/* 2003.04 Shikigami no Shiro 2 */
 	DRIVER( bdrdown )	/* 2003.04 Border Down */
-						/* 2003.09 WCCF 2002-2003 */
 	DRIVER( psyvar2 )	/* 2003.11 Psyvariar 2 */
 	DRIVER( puyofev	)	/* 2003.11 Puyopuyo Fever */
-						/* 2004.01 Initial D Arcade Stage ver.3 */
-						/* 2004.06 WCCF 2002-2003 ver.2.0 */
-	DRIVER( vf4tuned )	/* 2004.07 Virtua Fighter 4 Final Tuned (Naomi 2) */
+	DRIVER( cfield )	/* 2004.06 Chaos Field */
+	DRIVER( tetkiwam )	/* 2004.06 Tetris Kiwamemichi */
 	DRIVER( trizeal )	/* 2004.09 Trizeal */
-						/* 2004.10 Oshare Majo Love & Berry */
-						/* 2004.12 WCCF 2002-2003 ver.2.1 */
-	DRIVER( meltybld )	/* 2005.03 Melty Blood Act Cadenza */
-						/* 2005.04 Menkyo no Tetsujin */
+						/* 2005.03 Melty Blood Act Cadenza */
 	DRIVER( ss2005 )	/* 2005.04 Super Shanghai 2005 */
-	DRIVER( senko )		/* 2005.04 Senkou no Rondo */
-	DRIVER( senkoo )	/*          ^^ */
-						/* 2005.07 WCCF 2004-2005 */
-						/* 2005.09 Kodai Ouja Kyouryuu King */
-						/* 2005.10 Radirgy */
+	DRIVER( senkoo )	/* 2005.04 Senkou no Rondo */
+	DRIVER( senko )		/* 2005.08 Senkou no Rondo NEW ver. */
+	DRIVER( meltybld )	/* 2005.08 Melty Blood Act Cadenza ver.A */
+	DRIVER( ggxxsla  )	/* 2005.09 Guilty Gear XX Slash */
+	DRIVER( radirgy )	/* 2005.10 Radirgy */
 	DRIVER( undefeat )	/* 2005.10 Under Defeat */
-						/* 2006.03 Kurukuru Chameleon */
+						/* 2005.12 Radirgy (Rev. A) */
+	DRIVER( kurucham )	/* 2006.03 Kurukuru Chameleon */
 	DRIVER( trgheart )	/* 2006.05 Trigger Heart Exelica */
 						/* 2006.07 Touch de Zunou */
 						/* 2006.08 Senkou no Rondo SP */
 	DRIVER( jingystm )	/* 2006.09 Jingi Storm */
-						/* 2006.11 Karous */
+	DRIVER( karous )	/* 2006.11 Karous */
 						/* 2006.12 Guilty Gear XX Accent Core */
-						/* 2006.12 Melty Blood Act Cadenza ver.B */
-						/* 2007.02 Noukone Puzzle Takoron */
+	DRIVER( meltyb )	/* 2006.12 Melty Blood Act Cadenza ver.B */
+	DRIVER( takoron )	/* 2006.12.16 Noukone Puzzle Takoron */
+	DRIVER( meltyba )	/* 2007.03 Melty Blood Act Cadenza ver.B Syuuseiban(ver.B2) */
+
+						/* Releases below use flash/mask ROMs like older NAOMI titles, not GD-ROM as GD-ROM Hardware (Drives and Discs) were no longer being produced */
+
 						/* 2007.07 Shooting Love */
 						/* 2007.07 Dynamite Deka EX - Asian dynamite */
+						/* 2007.07 Pokasuka Ghost! */
 						/* 2007.09 Rhythm Tengoku */
-						/* 2007.?? Issyo ni Wanwan */
-						/* 2007.?? Konchuu Dash!! */
-						/* 2007.?? Pokasuka Ghost! */
-						/* 2007.?? Magical Dance on Dream Stage */
-						/* 2007.?? Marine Marine */
-						/* 2008.?? Akatsuki Denkou Senki Ausf.Achse */
-						/* 2008.?? Illvelo */
-						/* 2008.?? Mamoru Kun wa Norowarete Shimatta! */
-						/* 2008.?? Melty Blood Actress Again */
-						/* 2009.?? Project Cerberus */
-						/* 2009.?? Radirgy Noah */
-	DRIVER( ggxxsla  )	/* 200?.?? Guilty Gear XX Slash */
+						/* 2008.02 Akatsuki Denkou Senki Ausf.Achse */
+						/* 2008.06 Illvelo (Illmatic Envelope) */
+						/* 2008.07 Mamoru Kun wa Norowarete Shimatta! */
+						/* 2008.09 Melty Blood Actress Again */
+						/* 2009.?? Project Cerberus (planned to be released in 2009 spring) */
+						/* 2009.?? Radirgy Noah (planned to be released in 2009.06) */
 
-	DRIVER( initdexp )	/* 200?.?? Initial D Export Version (Naomi 2) */
+
+
+	/* NAOMI based (System SP) */
+						/* 2003.02 Kouchuu Ouja Mushiking */
+						/* 2004.10 Oshare Majo Love & Berry */
+						/* 2005.09 Kodai Ouja Kyouryuu King */
+						/* 2007.06 Issyo ni Wanwan */
+						/* 2007.06 Konchuu Dash!! */
+						/* 2007.07 Marine Marine */
+						/* 2007.11 Magical Dance on Dream Stage */
+						/* 2008.02 Marine Marine ver.2 */
+						/* 2008.04 Issyo ni Wanwan Waiwai Puppy */
+						/* 2008.07 Issyo ni Turbo Drive */
+
+	/* NAOMI 2 */
+	DRIVER( vstrik3c )	/* 2001.04 Virtua Striker 3 */
+	DRIVER( vstrik3 )
+						/* 2001.05 Wild Riders */
+						/* 2001.06 Club Cart */
+	DRIVER( beachspi )	/* 2001.07 Beach Spikers */
+						/* 2001.08 Wave Runner GP */
+	DRIVER( vf4 )		/* 2001.08.02 Virtua Fighter 4 */
+	DRIVER( vf4b )		/* 2001.08.20 Virtua Fighter 4 ver.B */
+	DRIVER( vf4c )		/* 2002.01.31 Virtua Fighter 4 ver.C */
+						/* 2002.02 The King of Route 66 */
+	DRIVER( initd )		/* 2002.03 Initial D Arcade Stage */
+	DRIVER( initdexp )	/* 200?.?? Initial D Export Version */
+						/* 2002.06 World Club Champion Football */
+						/* 2002.07 Soul Surfer */
+	DRIVER( vf4evo )	/* 2002.08 Virtua Fighter 4 Evolution */
+	DRIVER( initdv2j )	/* 2002.12 Initial D Arcade Stage ver.2 */
+						/* 2002.12 Virtua Fighter 4 Evolution ver.B */
+						/* 2003.03 WCCF 2001-2002 ver.2.0 */
+						/* 2003.09 WCCF 2002-2003 */
+						/* 2004.01 Initial D Arcade Stage ver.3 */
+						/* 2004.06 WCCF 2002-2003 ver.2.0 */
+	DRIVER( vf4tuned )	/* 2004.07 Virtua Fighter 4 Final Tuned */
+						/* 2004.12 WCCF 2002-2003 ver.2.1 */
+						/* 2005.01 Virtua Fighter 4 final Tuned ver.B */
+						/* 2005.04 Menkyo no Tetsujin */
+						/* 2005.07 WCCF 2004-2005 */
+						/* 2006.08 WCCF European Clubs 2005-2006 */
+
 
 	/* Atomiswave (Dreamcast-based) games */
 	DRIVER( awbios )
@@ -4448,7 +4474,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( fotns )		/* 2005.12 Hokuto no Ken */
 						/* 2006.02 Metal Slug 6 */
 						/* 2006.09 Extreme Hunting 2 Tournament Edition */
-						/* 2008.?? Sega Cray challenge */
+						/* 2008.?? Sega Clay Challenge */
 
 	/* Hikaru */
 	DRIVER( hikaru ) 	/* BIOS (c)2000 */
@@ -4466,7 +4492,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2003.06 F-ZERO AX */
 						/* 2003.07 Avalon no Kagi */
 						/* 2003.10 Avalon no Kagi ver.1.01 */
-						/* 2003.10 Gekitou Pro Yakyuu Mizushima Shinji All Stars vs. Pro Yakyuu */
+	DRIVER( gekpurya )	/* 2003.10 Gekitou Pro Yakyuu Mizushima Shinji All Stars vs. Pro Yakyuu */
 						/* 2003.12 Avalon no Kagi ver.1.10 */
 						/* 2004.04 Avalon no Kagi ver.1.20 Aratanaru Syoukan */
 						/* 2004.07 Avalon no Kagi ver.1.30 Konton no Utage */
@@ -4481,7 +4507,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( vcop3 )		/* 2003.04 Virtua Cop 3 */
 						/* 2003.12 Outrun 2 */
 						/* 2004.03 Ollie King */
-						/* 2004.07 Wangan Midnight Maximum Tune */
+	DRIVER( wangmid )	/* 2004.07 Wangan Midnight Maximum Tune */
 						/* 2004.09 Quest of D */
 						/* 2004.11 Sega Golf Club Network Pro Tour */
 						/* 2004.12 Outrun 2 Special Tours */
@@ -7218,6 +7244,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( ryouran )	/* 1998.07 (c) 1998 Electro Design Co. (Japan) */
 	DRIVER( puzzloop )	/* 1998.?? (c) 1998 Mitchell (Europe) */
 	DRIVER( puzzloopj )	/* 1998.12 (c) 1998 Mitchell (Japan) */
+	DRIVER( puzzloopa )	/* 1998.?? (c) 1998 Mitchell (Asia) */
 	DRIVER( puzzloopk )	/* 1998.?? (c) 1998 Mitchell (Korea) */
 	DRIVER( puzzloopu )	/* 1999.05 (c) 1998 Mitchell (USA) */
 	DRIVER( galpans2 )	/* 1999.02 (c) 1999 Kaneko (Japan) */
@@ -7694,6 +7721,7 @@ Other Sun games
 	DRIVER( mjifb2 )	/* "29" 1990 Dynax */
 	DRIVER( mjifb3 )	/* "29" 1990 Dynax */
 	DRIVER( mjvegas )	/* 1991 Dynax */
+	DRIVER( mjvegasa )	/* 1991 Dynax */
 	DRIVER( cafetime )	/* 1992 Dynax */
 	DRIVER( cafedoll )	/* 1993 Dynax */
 	DRIVER( janptr96 )	/* 1996 Dynax */
@@ -7876,12 +7904,17 @@ Other Sun games
   	DRIVER( kov2p )		/* (c) 2000 */
   	DRIVER( kov2p205 )	/* (c) 2000 */
 	DRIVER( ddp2 )		/* (c) 2001 */
+	DRIVER( ddp2a )		/* (c) 2001 */
 	DRIVER( puzzli2 )	/* (c) 2001 */
 	DRIVER( martmast )	/* (c) 2001 */
 	DRIVER( martmasc )	/* (c) 2001 */
 	DRIVER( theglad )	/* (c) 2001 */
 	DRIVER( dmnfrnt )	/* (c) 2002 */
 	DRIVER( dmnfrnta )	/* (c) 2002 */
+	DRIVER( kovh )
+	DRIVER( oldss )
+	DRIVER( killbldp )
+	DRIVER( svg )
 
 	/* RamTek games */
 	DRIVER( hitme )		/* (c) 1976 Ramtek */
@@ -8368,6 +8401,7 @@ Other Sun games
 	DRIVER( dquizgo2 )	/* (c) 2000 Semicom */
 	DRIVER( misncrft )	/* (c) 2000 Sun */
 	DRIVER( hidnctch )	/* (c) 1998 Eolith */
+	DRIVER( ironfort )	/* (c) 1998 Eolith */
 	DRIVER( puzzlekg )	/* (c) 1998 Eolith */
 	DRIVER( hidctch2 )	/* (c) 1999 Eolith */
 	DRIVER( nhidctch )	/* (c) 1999 Eolith */

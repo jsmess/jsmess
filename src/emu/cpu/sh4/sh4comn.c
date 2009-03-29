@@ -212,6 +212,8 @@ void sh4_exception(SH4 *sh4, const char *message, int exception) // handle excep
 
 	/* fetch PC */
 	sh4->pc = sh4->vbr + vector;
+	/* wake up if a sleep opcode is triggered */
+	if(sh4->sleep_mode == 1) { sh4->sleep_mode = 2; }
 }
 
 static UINT32 compute_ticks_refresh_timer(emu_timer *timer, int hertz, int base, int divisor)
@@ -641,6 +643,32 @@ WRITE32_HANDLER( sh4_internal_w )
 
 	switch( offset )
 	{
+	case MMUCR: // MMU Control
+		if (data & 1)
+		{
+			printf("SH4 MMU Enabled\n");
+			printf("If you're seeing this, but running something other than a Naomi GD-ROM game then chances are it won't work\n");
+			printf("The MMU emulation is a hack specific to that system\n");
+			sh4->sh4_mmu_enabled = 1;
+
+			// should be a different bit!
+			{
+				int i;
+				for (i=0;i<64;i++)
+				{
+					sh4->sh4_tlb_address[i] = 0;
+					sh4->sh4_tlb_data[i] = 0;
+				}
+
+			}
+		}
+		else
+		{
+			sh4->sh4_mmu_enabled = 0;
+		}
+
+		break;
+
 		// Memory refresh
 	case RTCSR:
 		sh4->m[RTCSR] &= 255;

@@ -124,7 +124,7 @@ UINT32 dc_coin_counts[2];
 static UINT32 maple_regs[0x100/4];
 static UINT32 dc_rtcregister[4];
 static UINT32 g1bus_regs[0x100/4];
-static UINT8 maple0x86data1[0x80];
+UINT8 maple0x86data1[0x80];
 static UINT8 maple0x86data2[0x400];
 static emu_timer *dc_rtc_timer;
 
@@ -796,17 +796,65 @@ WRITE64_HANDLER( dc_g2_ctrl_w )
 	int reg;
 	UINT64 shift;
 	UINT32 dat;
+	static UINT32 wave_dma_aica_addr,wave_dma_root_addr,wave_dma_size,wave_dma_dir,wave_dma_flag;
 
 	reg = decode_reg32_64(space->machine, offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
 	switch (reg)
 	{
-	case SB_ADTSEL:
-		mame_printf_verbose("G2CTRL: initiation mode %d\n",dat);
-		break;
-	case SB_ADST:
-		mame_printf_verbose("G2CTRL: AICA:G2-DMA start\n");
-		break;
+		/*AICA Address register*/
+		case SB_ADSTAG:
+			//printf("SB_ADSTAG data %08x\n",dat);
+			wave_dma_aica_addr = dat;
+			break;
+		/*Root address (work ram)*/
+		case SB_ADSTAR:
+			//printf("SB_ADSTAR data %08x\n",dat);
+			wave_dma_root_addr = dat;
+			break;
+		/*DMA size (in dword units, bit 31 is "set dma initiation enable setting to 0"*/
+		case SB_ADLEN:
+			//printf("SB_ADLEN data %08x\n",dat);
+			wave_dma_size = dat & 0x7fffffff;
+			break;
+		/*0 = root memory to aica / 1 = aica to root memory*/
+		case SB_ADDIR:
+			//printf("SB_ADDIR data %08x\n",dat);
+			wave_dma_dir = 1 ^ (dat & 1);
+			break;
+		/*dma flag (active HIGH, bug in docs)*/
+		case SB_ADEN:
+			//printf("SB_ADEN data %08x\n",dat);
+			wave_dma_flag = (dat & 1);
+			break;
+		case SB_ADTSEL:
+			mame_printf_verbose("G2CTRL: initiation mode %d\n",dat);
+			//printf("SB_ADTSEL data %08x\n",dat);
+			break;
+		/*ready for dma'ing*/
+		case SB_ADST:
+			mame_printf_verbose("G2CTRL: AICA:G2-DMA start\n");
+			//printf("SB_ADST data %08x\n",dat);
+			if(wave_dma_flag)
+			{
+				UINT32 src,dst,size;
+				src = wave_dma_aica_addr;
+				dst = wave_dma_root_addr;
+				//size = wave_dma_size;
+				size = 0;
+				/* TODO: use the ddt function. */
+				if(wave_dma_dir == 1)
+				{
+					for(;size<wave_dma_size;size++)
+						memory_write_dword_64le(space,wave_dma_aica_addr+size*4,memory_read_dword(space,wave_dma_root_addr+size*4));
+				}
+				else
+				{
+					for(;size<wave_dma_size;size++)
+						memory_write_dword_64le(space,wave_dma_root_addr+size*4,memory_read_dword(space,wave_dma_aica_addr+size*4));
+				}
+			}
+			break;
 	}
 	mame_printf_verbose("G2CTRL: [%08x=%x] write %llx to %x, mask %llx\n", 0x5f7800+reg*4, dat, data, offset, mem_mask);
 }
@@ -894,8 +942,6 @@ MACHINE_START( dc )
 
 MACHINE_RESET( dc )
 {
-	int a;
-
 	/* halt the ARM7 */
 	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
 
@@ -908,14 +954,6 @@ MACHINE_RESET( dc )
 	timer_adjust_periodic(dc_rtc_timer, attotime_zero, 0, ATTOTIME_IN_SEC(1));
 
 	dc_sysctrl_regs[SB_SBREV] = 0x0b;
-	for (a=0;a < 0x80;a++)
-		maple0x86data1[a]=0x11+a;
-
-	// checksums
-	maple0x86data1[0]=0xb9;
-	maple0x86data1[1]=0xb1;
-	maple0x86data1[18]=0xb8;
-	maple0x86data1[19]=0x8a;
 }
 
 READ64_DEVICE_HANDLER( dc_aica_reg_r )
@@ -951,7 +989,7 @@ WRITE64_DEVICE_HANDLER( dc_aica_reg_w )
 			/* it's alive ! */
 			cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
 		}
-        }
+    }
 
 	aica_w(device, offset*2, dat, shift ? ((mem_mask>>32)&0xffff) : (mem_mask & 0xffff));
 

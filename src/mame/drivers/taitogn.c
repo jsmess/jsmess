@@ -127,6 +127,185 @@ Notes:
       CD PCB          - A PCMCIA cart slot connector mounted onto a small daughterboard
       *               - These parts located under the PCB
 
+
+Taito G-Net card info
+---------------------
+
+The G-Net system uses a custom PCMCIA card for game software storage. The card is
+locked with a password and can't be read by conventional means.
+Some of the cards are made in separate pieces and can be opened. However some
+are encased in a single-piece steel shell and opening it up destroys the card.
+Some of the later games came packaged as a Compact Flash card and a PCMCIA to CF
+adapter, however these cards were also locked the same as the older type.
+The game uses an analog wheel (5k potentiometer) in the shape of a hand-held
+control unit and a trigger (another 5k potentiometer) used for acceleration
+and brake. The trigger and wheel are self centering. If the trigger is pulled back
+(like firing a gun) the car goes faster. If the trigger is pushed forward the car
+slows down. The controller looks a lot like the old Scalextric controllers (remember those?  :-)
+
+The controller is connected to the ZN2 main board to the 10 pin connector labelled
+'ANALOG'. Using two 5k-Ohm potentiometers, power (+5V) and ground are taken from the JAMMA
+edge connector or directly from the power supply. The output of the steering pot is
+connected to pin 2 and the output of the acceleration pot is connected to pin 3.
+The ANALOG connector output pins are tied directly to a chip next to the connector marked
+'NEC 78081G503 9810KX189'. This is a NEC 8-bit 78K0-family microcontroller with on-chip 8k ROM,
+256 bytes RAM, 33 I/O ports, 8-bit resolution 8-channel A/D converter, 3-channel timer, 1-channel
+3-wire serial interface interrupt control (USART) and other peripheral hardware.
+
+
+Card PCB Layouts
+----------------
+
+Type 1 (standard 'Taito' type, as found on most G-Net games)
+------ (This type has separate top and bottom pieces which are glued together and
+       (can be opened if done 'carefully'. But be careful the edges of the top lid are SHARP!)
+
+Top
+---
+
+RO-055A AI AM-1
+|-|-------------------------------------|
+| |        |---------|     |--------|   |
+| |        |S2812A150|     |CXK58257|   |
+| |        |---------|     |--------|   |
+| |                                     |
+| |        |-------|     |-----------|  |
+| |        |       |     |           |  |
+| |        |ML-101 |     |           |  |
+| |        |       |     |  F1PACK   |  |
+| |        |-------|     |           |  |
+| |                      |           |  |
+| |        |-----|       |-----------|  |
+| |        |ROM1 |                      |
+| |        |-----|                      |
+| |                                     |
+|-|-------------------------------------|
+Notes:
+      F1PACK    - TEL F1PACK(tm) TE6350B 9744 E0B (TQFP176)
+      S2812A150 - Seiko Instruments 2k x8 parallel EEPROM (TSOP28)
+      ML-101    - ML-101 24942-6420 9833 Z03 JAPAN (TQFP100, NOTE! This chip looks like it is Fujitsu-manufactured)
+      CXK58257  - SONY CXK58257 32k x8 SRAM (TSOP28)
+      ROM1      - TOSHIBA TC58V32FT 4M x8 (32MBit) CMOS NAND Flash EEPROM 3.3Volt (TSOP44)
+                  The ROMs use a non-standard format and can not be read by conventional methods.
+
+Bottom
+------
+
+|-|-------------------------------------|
+| |                                     |
+| |  |-----|      |-----|     |-----|   |
+| |  |ROM2 |      |ROM3 |     |ROM4 |   |
+| |  |-----|      |-----|     |-----|   |
+| |                                     |
+| |                                     |
+| |  |-----|      |-----|     |-----|   |
+| |  |ROM5 |      |ROM6 |     |ROM7 |   |
+| |  |-----|      |-----|     |-----|   |
+| |                                     |
+| |                                     |
+| |  |-----|      |-----|     |-----|   |
+| |  |ROM8 |      |ROM9 |     |ROM10|   |
+| |  |-----|      |-----|     |-----|   |
+| |                                     |
+|-|-------------------------------------|
+Notes:
+      ROM2-10   - TOSHIBA TC58V32FT 4M x8 (32MBit) CMOS NAND Flash EEPROM 3.3Volt (TSOP44)
+                  The ROMs use a non-standard format and can not be read by conventional methods.
+
+      Note: All ROMs have no markings (except part number) and no labels. There are also
+      no PCB location marks. The numbers I've assigned to the ROMs are made up for
+      simplicity. The actual cards have been dumped as a single storage device.
+
+      Confirmed usage on.... (not all games listed)
+      Chaos Heat
+      Flip Maze
+      Kollon
+      Mahjong OH
+      Nightraid
+      Otenki Kororin / Weather Tales
+      Psyvariar Medium Unit
+      Psyvariar Revision
+      Ray Crisis
+      RC de Go
+      Shanghai Shoryu Sairin
+      Shikigami no Shiro
+      Souten Ryu
+      Space Invaders Anniversary
+      Super Puzzle Bobble (English)
+      XIIStag
+      Zoku Otenami Haiken
+      Zooo
+
+
+Type 2 (3rd party type 'sealed' cards)
+------
+
+Note only 1 card was sacrificed and opened.
+
+Top
+---
+
+|-|-------------------------------------|
+| |             18.00         |-----|   |
+| |                           |U15  |   |
+| |        |---------|        |-----|   |
+| |        |20H2877  |                  |
+| |        |IBM0398  |        |-----|   |
+| |        |1B37001TQ|        |U13  |   |
+| |        |KOREA    |        |-----|   |
+| |        |---------|                  |
+| |                                     |
+| |                                     |
+| |   |-----|     |-------|             |
+| |   |U10  |     |D431000|             |
+| |   |-----|     |-------|             |
+| |                                     |
+|-|-------------------------------------|
+Notes:
+      IBM0398 - Custom IC marked 20H2877 IBM0398 1B37001TQ KOREA (TQFP176)
+      D431000 - NEC D431000 128k x8 SRAM (TSOP32)
+      18.00   - Small square white 'thing', may be an oscillator at 18MHz?
+      U*      - TOSHIBA TC58V32FT 4M x8 (32MBit) CMOS NAND Flash EEPROM 3.3Volt (TSOP44)
+                The ROMs use a non-standard format and can not be read by conventional methods.
+
+Bottom
+------
+
+|-|-------------------------------------|
+| |                                     |
+| |  |-----|      |-----|     |-----|   |
+| |  |U1   |      |U2   |     |U3   |   |
+| |  |-----|      |-----|     |-----|   |
+| |                                     |
+| |                                     |
+| |  |-----|      |-----|     |-----|   |
+| |  |U4   |      |U5   |     |U6   |   |
+| |  |-----|      |-----|     |-----|   |
+| |                                     |
+| |                                     |
+| |               |-----|     |-----|   |
+| |               |U7   |     |U8   |   |
+| |               |-----|     |-----|   |
+| |                                     |
+|-|-------------------------------------|
+Notes:
+      U*  - TOSHIBA TC58V32FT 4M x8 (32MBit) CMOS NAND Flash EEPROM 3.3Volt (TSOP44)
+            The ROMs use a non-standard format and can not be read by conventional methods.
+            U8 not populated in Nightraid card, but may be populated in other cards.
+
+      Note: All ROMs have no markings (except part number) and no labels. There are PCB
+            location marks. The actual cards have been dumped as a single storage device.
+
+      Confirmed usage on.... (not all games listed)
+      Nightraid (another one, not the same as listed above)
+
+      Based on card type (made with single sealed steel shell) these are also using the same PCB...
+      XIIStag (another one, not the same as listed above)
+      Go By RC
+      Space Invaders Anniversary (another one, not the same as listed above)
+      Super Puzzle Bobble (Japan)
+      Usagi
+
 */
 
 #include "driver.h"
@@ -859,7 +1038,7 @@ INPUT_PORTS_END
 	ROM_REGION32_LE( 0x080000, "mainbios", 0 ) \
 	ROM_LOAD( "coh-3002t.353", 0x000000, 0x080000, CRC(03967fa7) SHA1(0e17fec2286e4e25deb23d40e41ce0986f373d49) ) \
 \
-	ROM_REGION32_LE( 0x200000, "subbios", 0 ) \
+	ROM_REGION16_LE( 0x200000, "subbios", 0 ) \
     ROM_LOAD( "flash.u30",     0x000000, 0x200000, CRC(c48c8236) SHA1(c6dad60266ce2ff635696bc0d91903c543273559) ) \
 	ROM_REGION32_LE( 0x80000,  "soundcpu", 0) \
 	ROM_FILL( 0, 0x80000, 0xff) \
@@ -917,6 +1096,12 @@ ROM_START(spuzbobl)
 	DISK_IMAGE( "spuzbobl", 0, SHA1(1b1c72fb7e5656021485fefaef8f2ba48e2b4ea8))
 ROM_END
 
+ROM_START(spuzbobj)
+	TAITOGNET_BIOS
+
+	DISK_REGION( "card" )
+	DISK_IMAGE( "spuzbobj", 0, SHA1(dac433cf88543d2499bf797d7406b82ae4338726))
+ROM_END
 
 ROM_START(soutenry)
 	TAITOGNET_BIOS
@@ -939,6 +1124,19 @@ ROM_START(sianniv)
 	DISK_IMAGE( "sianniv", 0, SHA1(1e08b813190a9e1baf29bc16884172d6c8da7ae3))
 ROM_END
 
+ROM_START(kollon)
+	TAITOGNET_BIOS
+
+	DISK_REGION( "card" )
+	DISK_IMAGE( "kollon", 0, SHA1(d8ea5b5b0ee99004b16ef89883e23de6c7ddd7ce))
+ROM_END
+
+ROM_START(shikigam)
+	TAITOGNET_BIOS
+
+	DISK_REGION( "card" )
+	DISK_IMAGE( "shikigam", 0, SHA1(fa49a0bc47f5cb7c30d7e49e2c3696b21bafb840))
+ROM_END
 
 /* Success */
 
@@ -946,16 +1144,22 @@ ROM_START(psyvaria)
 	TAITOGNET_BIOS
 
 	DISK_REGION( "card" )
-	DISK_IMAGE( "psyvaria", 0,  SHA1(a80e164c09d795085b65659d1df60710530549c3))
+	DISK_IMAGE( "psyvaria", 0,  SHA1(b981a42a10069322b77f7a268beae1d409b4156d))
 ROM_END
 
 ROM_START(psyvarrv)
 	TAITOGNET_BIOS
 
 	DISK_REGION( "card" )
-	DISK_IMAGE( "psyvarrv", 0, SHA1(c12f0d5cbb6ec7f906e3dcdc3047c22de36457a5))
+	DISK_IMAGE( "psyvarrv", 0, SHA1(277c4f52502bcd7acc1889840962ec80d56465f3))
 ROM_END
 
+ROM_START(zooo)
+	TAITOGNET_BIOS
+
+	DISK_REGION( "card" )
+	DISK_IMAGE( "zooo", 0, SHA1(e275b3141b2bc49142990e6b497a5394a314a30b))
+ROM_END
 
 ROM_START(zokuoten)
 	TAITOGNET_BIOS
@@ -970,7 +1174,14 @@ ROM_START(nightrai)
 	TAITOGNET_BIOS
 
 	DISK_REGION( "card" )
-	DISK_IMAGE( "nightrai", 0, SHA1(7a4d62018fd19ccbdec12b6d24052d49f8a8359e))
+	DISK_IMAGE( "nightrai", 0, SHA1(74d0458f851cbcf10453c5cc4c47bb4388244cdf))
+ROM_END
+
+ROM_START(otenki)
+	TAITOGNET_BIOS
+
+	DISK_REGION( "card" )
+	DISK_IMAGE( "otenki", 0, SHA1(7e745ca4c4570215f452fd09cdd56a42c39caeba))
 ROM_END
 
 /* Warashi */
@@ -995,7 +1206,7 @@ ROM_START(xiistag)
 	TAITOGNET_BIOS
 
 	DISK_REGION( "card" )
-	DISK_IMAGE( "xiistag", 0, SHA1(8e0b2ee88edf0b45b3b4063d65eae236c12ee8ff))
+	DISK_IMAGE( "xiistag", 0, SHA1(586e37c8d926293b2bd928e5f0d693910cfb05a2))
 ROM_END
 
 
@@ -1004,23 +1215,28 @@ ROM_END
 /* it in every zip file */
 GAME( 1997, taitogn,  0, coh3002t, coh3002t, coh3002t, ROT0, "Sony/Taito", "Taito GNET", GAME_IS_BIOS_ROOT )
 
-GAME( 1998, raycris,  taitogn, coh3002t, coh3002t, coh3002t, ROT0, "Taito", "Ray Crisis (V2.03J)", 0 )
-GAME( 199?, gobyrc, taitogn, coh3002t, coh3002t, coh3002t, ROT0, "Taito", "Go By RC (V2.03O)", GAME_NOT_WORKING ) // custom inputs need calibrating
-GAME( 199?, rcdego, gobyrc,  coh3002t, coh3002t, coh3002t, ROT0, "Taito", "RC De Go (V2.03J)", GAME_NOT_WORKING ) // custom inputs need calibrating
-GAME( 1998, chaoshea, taitogn, coh3002t, coh3002t, coh3002t, ROT0, "Taito", "Chaos Heat (V2.08J)", 0 )
-GAME( 1998, flipmaze, taitogn, coh3002t, coh3002t, coh3002t, ROT0, "Taito/Moss", "Flip Maze (V2.04J)", 0 )
-GAME( 1999, spuzbobl, taitogn, coh3002t, coh3002t, coh3002t, ROT0, "Taito", "Super Puzzle Bobble (V2.05O)", 0 )
-GAME( 2000, soutenry, taitogn, coh3002t, coh3002t, coh3002t, ROT0, "Taito", "Soutenryu (V2.07J)", 0 )
-GAME( 2000, shanghss, taitogn, coh3002t, coh3002t, coh3002t, ROT0, "Taito", "Shanghai Shoryu Sairin (V2.03J)", 0 )
-GAME( 2003, sianniv,  taitogn, coh3002t, coh3002t, coh3002t, ROT270, "Taito", "Space Invaders Anniversary (V2.02J)", GAME_NOT_WORKING ) // IRQ at the wrong time
+GAME( 1998, chaoshea, taitogn,  coh3002t, coh3002t, coh3002t, ROT0,   "Taito", "Chaos Heat (V2.08J)", 0 )
+GAME( 1998, raycris,  taitogn,  coh3002t, coh3002t, coh3002t, ROT0,   "Taito", "Ray Crisis (V2.03J)", 0 )
+GAME( 1999, spuzbobl, taitogn,  coh3002t, coh3002t, coh3002t, ROT0,   "Taito", "Super Puzzle Bobble (V2.05O)", 0 )
+GAME( 1999, spuzbobj, spuzbobl, coh3002t, coh3002t, coh3002t, ROT0,   "Taito", "Super Puzzle Bobble (V2.04J)", 0 )
+GAME( 1999, gobyrc,   taitogn,  coh3002t, coh3002t, coh3002t, ROT0,   "Taito", "Go By RC (V2.03O)", GAME_NOT_WORKING ) // custom inputs need calibrating
+GAME( 1999, rcdego,   gobyrc,   coh3002t, coh3002t, coh3002t, ROT0,   "Taito", "RC De Go (V2.03J)", GAME_NOT_WORKING ) // custom inputs need calibrating
+GAME( 1999, flipmaze, taitogn,  coh3002t, coh3002t, coh3002t, ROT0,   "Taito/Moss", "Flip Maze (V2.04J)", 0 )
+GAME( 2001, shikigam, taitogn,  coh3002t, coh3002t, coh3002t, ROT270, "Taito/Alfa System", "Shikigami no Shiro (V2.03J)", 0 )
+GAME( 2003, sianniv,  taitogn,  coh3002t, coh3002t, coh3002t, ROT270, "Taito", "Space Invaders Anniversary (V2.02J)", GAME_NOT_WORKING ) // IRQ at the wrong time
+GAME( 2003, kollon,   taitogn,  coh3002t, coh3002t, coh3002t, ROT0,   "Taito", "Kollon (V2.04J)", 0 )
 
 GAME( 2000, psyvaria, taitogn, coh3002t, coh3002t, coh3002t, ROT270, "Success", "Psyvariar -Medium Unit- (V2.04J)", 0 )
 GAME( 2000, psyvarrv, taitogn, coh3002t, coh3002t, coh3002t, ROT270, "Success", "Psyvariar -Revision- (V2.04J)", 0 )
 GAME( 2000, zokuoten, taitogn, coh3002t, coh3002t, coh3002t, ROT0,   "Success", "Zoku Otenamihaiken (V2.03J)", 0 )
+GAME( 2004, zooo,     taitogn, coh3002t, coh3002t, coh3002t, ROT0,   "Success", "Zooo (V2.01J)", GAME_NOT_WORKING ) // missing most of the playfield
 
-GAME( 199?, usagi,    taitogn, coh3002t, coh3002t_mp, coh3002t_mp, ROT0, "Warashi/Mahjong Kobo/Taito", "Usagi (V2.02J)", 0 )
 GAME( 1999, mahjngoh, taitogn, coh3002t, coh3002t_mp, coh3002t_mp, ROT0, "Warashi/Mahjong Kobo/Taito", "Mahjong Oh (V2.06J)", 0 )
+GAME( 2001, usagi,    taitogn, coh3002t, coh3002t_mp, coh3002t_mp, ROT0, "Warashi/Mahjong Kobo/Taito", "Usagi (V2.02J)", 0 )
+GAME( 2000, soutenry, taitogn, coh3002t, coh3002t, coh3002t, ROT0,   "Warashi", "Soutenryu (V2.07J)", 0 )
+GAME( 2000, shanghss, taitogn, coh3002t, coh3002t, coh3002t, ROT0,   "Warashi", "Shanghai Shoryu Sairin (V2.03J)", 0 )
 
 GAME( 2001, nightrai, taitogn, coh3002t, coh3002t, coh3002t, ROT0, "Takumi", "Night Raid (V2.03J)", GAME_NOT_WORKING ) // no background / enemy sprites
+GAME( 2001, otenki,   taitogn, coh3002t, coh3002t, coh3002t, ROT0, "Takumi", "Otenki Kororin (V2.01J)", 0 )
 
 GAME( 2002, xiistag,  taitogn, coh3002t, coh3002t, coh3002t, ROT270, "Triangle Service", "XII Stag (V2.01J)", 0 )

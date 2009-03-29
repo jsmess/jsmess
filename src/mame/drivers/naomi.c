@@ -3,9 +3,72 @@
   Sega Naomi
  + Related Systems (possibly to be split at a later date)
 
-  Driver by Samuele Zannoli, R. Belmont, and ElSemi.
+  Driver by Samuele Zannoli, R. Belmont, and ElSemi,
+            David Haywood & Angelo Salese
 
 Sega Naomi is Dreamcast based Arcade hardware.
+
+Current Compatibility notes (GD-rom games only)
+|----------|-------|-----|------|------|------|--------------------------------|-----------------------------------------------------|
+|romname   | Pl(s) | Rot | Test | Boot | Game | Control Type                   | Notes                                               |
+|----------|-------|-----|------|------|------|--------------------------------|-----------------------------------------------------|
+|gundmgd   |   1   |  H  | Yes  | Yes  | Yes  | twin-joystick with 4+6 buttons |                                                     |
+|sfz3ugd   |   2   |  H  | Yes  | Yes  | No   | joystick with 6 buttons        | Spurious irq on ARM7 prg / broken timings           |
+|cvsgd     |   2   |  H  | Yes  | Yes  | Yes  | joystick with 4 buttons        | 2 + 2 extra buttons                                 |
+|gundmxgd  |   1   |  H  | Yes  | Yes  | Yes  | twin-joystick with 4+6 buttons |                                                     |
+|cvs2gd    |   2   |  H  | Yes  | Yes  | Yes  | joystick with 6 buttons        |                                                     |
+|ikaruga   |   2   |  V  | Yes  | Yes  | No   | joystick with 2 buttons?       | Broken i/o / timings                                |
+|ggxx      |   2   |  H  | Yes  | Yes  | Yes  | joystick with 5 buttons        |                                                     |
+|moeru     |   2   |  H  | No   | No   | No   | joystick with 3 buttons?       | Broken i/o, stuck at the "now loading" msg          |
+|chocomk   |   2   |  H  | No?  | Yes  | Yes? | joystick with 3 buttons?       | Broken i/o?                                         |
+|quizqgd   |   2   |  V  | Yes  | Yes  | Yes  | joystick(?) with 4 buttons     |                                                     |
+|ggxxrl    |   2   |  H  | Yes  | Yes  | Yes  | joystick with 5 buttons        |                                                     |
+|tetkiwam  |   2   |  H  | No   | No   | No   | joystick with 3 buttons?       |                                                     |
+|shikgam2  |   2   |  V  | Yes  | Yes  | No   | joystick with 3 buttons?       | Broken i/o                                          |
+|usagui    |   1   |  H  | Yes  | Yes  | No   | mahjong panel                  |                                                     |
+|bdrdown   |   2   |  H  | Yes  | Yes  | No?  | joystick with 3 buttons?       | Broken i/o in test mode                             |
+|psyvar2   |   1   |  V  | No   | No   | No   | joystick with 3 buttons?       |                                                     |
+|cfield    |   1?  |  H  | No?  | Yes  | No   | joystick with 3 buttons?       | Broken i/o                                          |
+|trizeal   |   2   |  V  | No   | No   | No   | joystick with 3 buttons?       |                                                     |
+|meltybld  |   2   |  H  | No?  | Yes  | No?  | joystick with 4 buttons?       | Crashes in attract with wrong mask                  |
+|senko     |   2   |  H  | Yes  | Yes  | No   | joystick with 3 buttons?       | Broken i/o                                          |
+|senkoo    |   2   |  H  | Yes  | Yes  | No   | joystick with 3 buttons?       | Broken i/o                                          |
+|ss2005    |   1   |  H  | Yes  | Yes  | No   | joystick with 3 buttons?       | Broken i/o                                          |
+|radirgy   |   1   |  V  | Yes  | Yes  | No   | joystick with 3 buttons?       | Broken i/o                                          |
+|ggxxsla   |   2   |  H  | Yes  | Yes  | Yes  | joystick with 5 buttons        |                                                     |
+|kurucham  |   2   |  H  | Yes  | Yes  | No   | joystick with 3 buttons?       | Broken i/o, crashes in attract with wrong mask      |
+|undefeat  |   2   |  V  | No   | No   | No   | joystick with 3 buttons?       | Stuck at the "now loading" msg                      |
+|trgheart  |   1   |  V  | Yes  | Yes  | No   | joystick with 3 buttons?       | Broken i/o                                          |
+|jingystm  |   2   |  H  | Yes  | Yes  | No   | joystick with 4 buttons?       | Broken i/o                                          |
+|meltyb    |   2   |  H  | No?  | Yes  | No?  | joystick with 4 buttons?       | Crashes in attract with wrong mask                  |
+|meltyba   |   2   |  H  | No?  | Yes  | No?  | joystick with 4 buttons?       | Crashes in attract with wrong mask                  |
+|karous    |   1   |  V  | Yes  | Yes  | No   | joystick with 3 buttons?       | Broken i/o                                          |
+|takoron   |   2   |  H  | Yes  | Yes  | Yes  | joystick with 3 buttons        |                                                     |
+--------------------------------------------------------------------------------------------------------------------------------------
+|confmiss  |   2   |  H  | Yes  | Yes  | No   | lightgun                       |                                                     |
+|sprtjam   |   2   |  H  | Yes  | Yes  | Yes  | joystick with 2 buttons        |                                                     |
+|slashout  |   1   |  H  | Yes  | Yes  | Yes  | joystick with 4 buttons        | Needs to map the extra button                       |
+|spkrbtl   |   2   |  H  | Yes  | Yes  | No   | joystick with 4 buttons        | Crashes when loading the gameplay                   |
+|monkeyba  |   1   |  H  | Yes  | Yes  | No   | ad stick                       | Crashes when loading the gameplay                   |
+|dygolf    |   2   |  H  | No   | No   | No   | trackball + 4 buttons          | Moans about the jvs settings                        |
+|wsbbgd    |   2   |  H  | No   | No   | No   | ad stick + 2 buttons           | Moans about the jvs settings                        |
+|vtennisg  |   2   |  H  | Yes  | Yes  | No   | joystick with 2 buttons        | Broken gfxs, crashes after a while                  |
+|vathlete  |   2   |  H  | Yes  | Yes  | No   | joystick with 3 buttons?       | Broken i/o                                          |
+|vtennis2  |   2   |  H  | No   | No   | No   | joystick with 3 buttons        |                                                     |
+|keyboard  |   2   |  H  | Yes  | Yes  | No   | keyboard                       | Broken i/o, crashes after a while                   |
+|lupinsho  |   2   |  H  | Yes  | Yes  | No   | lightgun                       | Broken i/o, crashes after a while                   |
+|luptype   |   2   |  H  | Yes  | Yes  | No   | keyboard                       | Broken i/o, crashes after a while                   |
+|mok       |   2   |  H  | Yes  | Yes  | No   | lightgun                       | Broken i/o                                          |
+|ngdup23a  |   2   |  H  | Yes  | Yes  | Yes  | n/a                            | Missing DIMM emulation                              |
+|ngdup23c  |   2   |  H  | Yes  | Yes  | Yes  | n/a                            | Missing DIMM emulation                              |
+|puyofev   |   2   |  H  | Yes  | Yes  | No   | joystick with 3 buttons?       | Broken i/o                                          |
+--------------------------------------------------------------------------------------------------------------------------------------
+
+Test: If it enters into test mode (not actually working test mode, i.e. if inputs doesn't work)
+Boot: If game boots and draws some gfxs
+Game: If game can be coined up and can actually be played without problems.
+If the three aforementioned are all yes and there aren't any notes, game is fully working.
+
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -698,17 +761,114 @@ static WRITE64_HANDLER( naomi_unknown1_w )
 * Non-volatile memories
 */
 
+extern UINT8 maple0x86data1[0x80];
+
+
+// some default eeprom settings
+UINT8 jvseeprom_default_karous[128] =   { 0x58, 0xE5, 0x11, 0x42, 0x4D, 0x57, 0x00, 0x09, 0x00, 0x00, 0x01, 0x01, 0x01, 0x00, 0x11, 0x11, 0x11, 0x11, 0x58, 0xE5, 0x11, 0x42, 0x4D, 0x57, 0x00, 0x09, 0x00, 0x00, 0x01, 0x01, 0x01, 0x00, 0x11, 0x11, 0x11, 0x11,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+UINT8 jvseeprom_default_sfz3ugd[128] =  { 0xE3, 0xF2, 0x10, 0x42, 0x43, 0x59, 0x30, 0x09, 0x10, 0x00, 0x01, 0x01, 0x01, 0x00, 0x11, 0x11, 0x11, 0x11, 0xE3, 0xF2, 0x10, 0x42, 0x43, 0x59, 0x30, 0x09, 0x10, 0x00, 0x01, 0x01, 0x01, 0x00, 0x11, 0x11, 0x11, 0x11, 0xBE, 0x1F, 0x18, 0x18, 0xBE, 0x1F, 0x18, 0x18, 0x30, 0x59, 0x43, 0x42, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x01, 0x01, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x01, 0x01, 0x01, 0x00, 0x00, 0x30, 0x59, 0x43, 0x42, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x01, 0x01, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x01, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+UINT8 jvseeprom_default_shikgam2[128] = { 0xA4, 0xF6, 0x11, 0x42, 0x47, 0x45, 0x30, 0x09, 0x10, 0x00, 0x01, 0x01, 0x01, 0x00, 0x11, 0x11, 0x11, 0x11, 0xA4, 0xF6, 0x11, 0x42, 0x47, 0x45,	0x30, 0x09, 0x10, 0x00, 0x01, 0x01, 0x01, 0x00, 0x11, 0x11, 0x11, 0x11,0x43, 0x84, 0x20, 0x20, 0x43, 0x84, 0x20, 0x20, 0x42, 0x47, 0x45, 0x30,	0x53, 0x48, 0x49, 0x4B, 0x49, 0x32, 0x52, 0x4F, 0x4D, 0x20, 0x30, 0x32,	0x32, 0x38, 0x00, 0x00, 0x4B, 0x4B, 0x00, 0x02, 0x00, 0x02, 0x01, 0x00,	0x00, 0x00, 0x00, 0x00, 0x42, 0x47, 0x45, 0x30, 0x53, 0x48, 0x49, 0x4B,	0x49, 0x32, 0x52, 0x4F, 0x4D, 0x20, 0x30, 0x32, 0x32, 0x38, 0x00, 0x00,	0x4B, 0x4B, 0x00, 0x02, 0x00, 0x02, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+UINT8 jvseeprom_default_quizqgd[128] =  { 0xAD, 0x1E, 0x11, 0x42, 0x46, 0x50, 0x31, 0x09, 0x10, 0x00, 0x01, 0x01,	0x01, 0x00, 0x11, 0x11, 0x11, 0x11, 0xAD, 0x1E, 0x11, 0x42, 0x46, 0x50,	0x31, 0x09, 0x10, 0x00, 0x01, 0x01, 0x01, 0x00, 0x11, 0x11, 0x11, 0x11,	0xC4, 0x18, 0x1D, 0x20, 0xC4, 0x18, 0x1D, 0x20, 0x42, 0x46, 0x50, 0x31,	0x51, 0x2D, 0x4D, 0x4F, 0x44, 0x45, 0x51, 0x2D, 0x4D, 0x4F, 0x44, 0x45,	0x01, 0x01, 0x05, 0x01, 0x02, 0x00, 0x01, 0x03, 0x01, 0x00, 0x4B, 0x4B,	0x00, 0x00, 0x00, 0x00, 0x42, 0x46, 0x50, 0x31, 0x51, 0x2D, 0x4D, 0x4F,	0x44, 0x45, 0x51, 0x2D, 0x4D, 0x4F, 0x44, 0x45, 0x01, 0x01, 0x05, 0x01,	0x02, 0x00, 0x01, 0x03, 0x01, 0x00, 0x4B, 0x4B, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+UINT8 jvseeprom_default_senko[128] =    { 0xCD, 0xEE, 0x10, 0x42, 0x4B, 0x47, 0x30, 0x09, 0x10, 0x00, 0x01, 0x01,	0x01, 0x00, 0x11, 0x11, 0x11, 0x11, 0xCD, 0xEE, 0x10, 0x42, 0x4B, 0x47,	0x30, 0x09, 0x10, 0x00, 0x01, 0x01, 0x01, 0x00, 0x11, 0x11, 0x11, 0x11,	0xE5, 0x91, 0x10, 0x10, 0xE5, 0x91, 0x10, 0x10, 0x07, 0x51, 0x17, 0x03,	0x00, 0x01, 0x02, 0x02, 0x46, 0x00, 0x96, 0x00, 0x46, 0x00, 0x00, 0x00,	0x07, 0x51, 0x17, 0x03, 0x00, 0x01, 0x02, 0x02, 0x46, 0x00, 0x96, 0x00,	0x46, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+UINT8 jvseeprom_default_senkoo[128] =   { 0xCD, 0xEE, 0x10, 0x42, 0x4B, 0x47, 0x30, 0x09, 0x10, 0x00, 0x01, 0x01,	0x01, 0x00, 0x11, 0x11, 0x11, 0x11, 0xCD, 0xEE, 0x10, 0x42, 0x4B, 0x47,	0x30, 0x09, 0x10, 0x00, 0x01, 0x01, 0x01, 0x00, 0x11, 0x11, 0x11, 0x11,	0x12, 0xF0, 0x0C, 0x0C, 0x12, 0xF0, 0x0C, 0x0C, 0x07, 0x51, 0x17, 0x03,	0x01, 0x02, 0x46, 0x00, 0x96, 0x00, 0x00, 0x00, 0x07, 0x51, 0x17, 0x03,	0x01, 0x02, 0x46, 0x00, 0x96, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+UINT8 jvseeprom_default_radirgy[128] =  { 0x0C, 0x29, 0x11, 0x42, 0x4B, 0x57, 0x00, 0x09, 0x00, 0x00, 0x01, 0x01,	0x01, 0x00, 0x11, 0x11, 0x11, 0x11, 0x0C, 0x29, 0x11, 0x42, 0x4B, 0x57,	0x00, 0x09, 0x00, 0x00, 0x01, 0x01, 0x01, 0x00, 0x11, 0x11, 0x11, 0x11,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+UINT8 jvseeprom_default_trgheart[128] = { 0xF0, 0xC2, 0x11, 0x42, 0x4D, 0x41, 0x31, 0x09, 0x00, 0x00, 0x01, 0x01,	0x01, 0x00, 0x11, 0x11, 0x11, 0x11, 0xF0, 0xC2, 0x11, 0x42, 0x4D, 0x41,	0x31, 0x09, 0x00, 0x00, 0x01, 0x01, 0x01, 0x00, 0x11, 0x11, 0x11, 0x11,	0x7E, 0xE1, 0x24, 0x24, 0x7E, 0xE1, 0x24, 0x24, 0x30, 0x41, 0x4D, 0x42,	0x54, 0x52, 0x49, 0x47, 0x47, 0x45, 0x52, 0x48, 0x45, 0x41, 0x52, 0x54,	0x20, 0x45, 0x58, 0x45, 0x4C, 0x49, 0x43, 0x41, 0x00, 0x00, 0x00, 0x00,	0x01, 0x03, 0x02, 0x00, 0x09, 0x09, 0x09, 0x00, 0x30, 0x41, 0x4D, 0x42,	0x54, 0x52, 0x49, 0x47, 0x47, 0x45, 0x52, 0x48, 0x45, 0x41, 0x52, 0x54,	0x20, 0x45, 0x58, 0x45, 0x4C, 0x49, 0x43, 0x41, 0x00, 0x00, 0x00, 0x00,	0x01, 0x03, 0x02, 0x00, 0x09, 0x09, 0x09, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+UINT8 jvseeprom_default_gundmgd[128] =  { 0xCD, 0x77, 0x10, 0x42, 0x43, 0x56, 0x30, 0x09, 0x00, 0x00, 0x01, 0x01,	0x01, 0x00, 0x11, 0x11, 0x11, 0x11, 0xCD, 0x77, 0x10, 0x42, 0x43, 0x56,	0x30, 0x09, 0x00, 0x00, 0x01, 0x01, 0x01, 0x00, 0x11, 0x11, 0x11, 0x11,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+UINT8 jvseeprom_default_gundmxgd[128] = { 0xAA, 0xAD, 0x10, 0x42, 0x44, 0x55, 0x30, 0x09, 0x00, 0x00, 0x01, 0x01,	0x01, 0x00, 0x11, 0x11, 0x11, 0x11, 0xAA, 0xAD, 0x10, 0x42, 0x44, 0x55,	0x30, 0x09, 0x00, 0x00, 0x01, 0x01, 0x01, 0x00, 0x11, 0x11, 0x11, 0x11,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+UINT8 jvseeprom_default_psyvar2[128] =  { 0xCB, 0x6E, 0x11, 0x42, 0x48, 0x42, 0x30, 0x09, 0x00, 0x00, 0x01, 0x01,	0x01, 0x00, 0x11, 0x11, 0x11, 0x11, 0xCB, 0x6E, 0x11, 0x42, 0x48, 0x42,	0x30, 0x09, 0x00, 0x00, 0x01, 0x01, 0x01, 0x00, 0x11, 0x11, 0x11, 0x11,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+UINT8 jvseeprom_default_cfield[128] =   { 0xFB, 0xD4, 0x10, 0x42, 0x4A, 0x42, 0x00, 0x09, 0x00, 0x00, 0x01, 0x01,	0x01, 0x00, 0x11, 0x11, 0x11, 0x11, 0xFB, 0xD4, 0x10, 0x42, 0x4A, 0x42,	0x00, 0x09, 0x00, 0x00, 0x01, 0x01, 0x01, 0x00, 0x11, 0x11, 0x11, 0x11,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+UINT8 jvseeprom_default_puyofev[128] =  { 0x65, 0x7E, 0x10, 0x42, 0x48, 0x44, 0x00, 0x09, 0x10, 0x00, 0x01, 0x01,	0x01, 0x00, 0x11, 0x11, 0x11, 0x11, 0x65, 0x7E, 0x10, 0x42, 0x48, 0x44,	0x00, 0x09, 0x10, 0x00, 0x01, 0x01, 0x01, 0x00, 0x11, 0x11, 0x11, 0x11,	0x0E, 0x0B, 0x20, 0x20, 0x0E, 0x0B, 0x20, 0x20, 0x42, 0x48, 0x44, 0x00,	0x50, 0x55, 0x59, 0x4F, 0x20, 0x50, 0x55, 0x59, 0x4F, 0x20, 0x46, 0x45,	0x56, 0x45, 0x52, 0x2E, 0x20, 0x10, 0x03, 0x20, 0x01, 0x00, 0x02, 0x03,	0x00, 0x80, 0x00, 0x00, 0x42, 0x48, 0x44, 0x00, 0x50, 0x55, 0x59, 0x4F,	0x20, 0x50, 0x55, 0x59, 0x4F, 0x20, 0x46, 0x45, 0x56, 0x45, 0x52, 0x2E,	0x20, 0x10, 0x03, 0x20, 0x01, 0x00, 0x02, 0x03, 0x00, 0x80, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+UINT8 jvseeprom_default_bdrdown[128] =  { 0xA0, 0x75, 0x10, 0x42, 0x47, 0x48, 0x30, 0x09, 0x10, 0x00, 0x01, 0x01,	0x01, 0x00, 0x11, 0x11, 0x11, 0x11, 0xA0, 0x75, 0x10, 0x42, 0x47, 0x48,	0x30, 0x09, 0x10, 0x00, 0x01, 0x01, 0x01, 0x00, 0x11, 0x11, 0x11, 0x11,	0xAE, 0x7E, 0x08, 0x08, 0xAE, 0x7E, 0x08, 0x08, 0x01, 0x00, 0x00, 0x00,	0x33, 0xB8, 0x96, 0xE4, 0x01, 0x00, 0x00, 0x00, 0x33, 0xB8, 0x96, 0xE4,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+UINT8 jvseeprom_default_ss2005[128] =   { 0xAD, 0x0A, 0x10, 0x42, 0x4B, 0x4C, 0x30, 0x09, 0x00, 0x00, 0x01, 0x01,	0x01, 0x00, 0x11, 0x11, 0x11, 0x11, 0xAD, 0x0A, 0x10, 0x42, 0x4B, 0x4C,	0x30, 0x09, 0x00, 0x00, 0x01, 0x01, 0x01, 0x00, 0x11, 0x11, 0x11, 0x11,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+UINT8 jvseeprom_default_usagui[128] =   { 0x02, 0x8C, 0x10, 0x42, 0x47, 0x46, 0x00, 0x09, 0x00, 0x00, 0x01, 0x01,	0x01, 0x00, 0x11, 0x11, 0x11, 0x11, 0x02, 0x8C, 0x10, 0x42, 0x47, 0x46,	0x00, 0x09, 0x00, 0x00, 0x01, 0x01, 0x01, 0x00, 0x11, 0x11, 0x11, 0x11,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+UINT8 jvseeprom_default_undefeat[128] = { 0x06, 0x18, 0x11, 0x42, 0x4C, 0x48, 0x30, 0x09, 0x00, 0x00, 0x01, 0x01,	0x01, 0x00, 0x11, 0x11, 0x11, 0x11, 0x06, 0x18, 0x11, 0x42, 0x4C, 0x48,	0x30, 0x09, 0x00, 0x00, 0x01, 0x01, 0x01, 0x00, 0x11, 0x11, 0x11, 0x11,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+UINT8 jvseeprom_default_trizeal[128] =  { 0x8F, 0x05, 0x11, 0x42, 0x4A, 0x46, 0x30, 0x09, 0x10, 0x00, 0x01, 0x01,	0x01, 0x00, 0x11, 0x11, 0x11, 0x11, 0x8F, 0x05, 0x11, 0x42, 0x4A, 0x46,	0x30, 0x09, 0x10, 0x00, 0x01, 0x01, 0x01, 0x00, 0x11, 0x11, 0x11, 0x11,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+UINT8 jvseeprom_default_moeru[128] =    { 0xA1, 0x18, 0x10, 0x42, 0x45, 0x55, 0x20, 0x09, 0x00, 0x00, 0x01, 0x01,	0x01, 0x00, 0x11, 0x11, 0x11, 0x11, 0xA1, 0x18, 0x10, 0x42, 0x45, 0x55,	0x20, 0x09, 0x00, 0x00, 0x01, 0x01, 0x01, 0x00, 0x11, 0x11, 0x11, 0x11,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+UINT8 jvseeprom_default_tetkiwam[128] = { 0x3C, 0x11, 0x10, 0x42, 0x47, 0x43, 0x31, 0x09, 0x10, 0x00, 0x01, 0x01,	0x01, 0x00, 0x11, 0x11, 0x11, 0x11, 0x3C, 0x11, 0x10, 0x42, 0x47, 0x43,	0x31, 0x09, 0x10, 0x00, 0x01, 0x01, 0x01, 0x00, 0x11, 0x11, 0x11, 0x11,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+UINT8 jvseeprom_default_keyboard[128] = { 0x32, 0x7E, 0x10, 0x42, 0x45, 0x42, 0x30, 0x09, 0x10, 0x00, 0x01, 0x01,	0x01, 0x00, 0x11, 0x11, 0x11, 0x11, 0x32, 0x7E, 0x10, 0x42, 0x45, 0x42,	0x30, 0x09, 0x10, 0x00, 0x01, 0x01, 0x01, 0x00, 0x11, 0x11, 0x11, 0x11,	0xF0, 0x4A, 0x0C, 0x0C, 0xF0, 0x4A, 0x0C, 0x0C, 0x18, 0x09, 0x01, 0x20,	0x02, 0x00, 0x3C, 0x00, 0x32, 0x00, 0x00, 0x00, 0x18, 0x09, 0x01, 0x20,	0x02, 0x00, 0x3C, 0x00, 0x32, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+
+
 static NVRAM_HANDLER( naomi_eeproms )
 {
 	if (read_or_write)
-		/*eeprom_save(file)*/;
+	{
+		/* JVS 'eeprom' */
+		mame_fwrite(file,maple0x86data1,0x80);
+
+
+		// mainboard eeprom?
+		eeprom_save(file);
+
+	}
 	else
 	{
 		eeprom_init(machine, &eeprom_interface_93C46);
-		/*if (file)
+		if (file)
+		{
+			UINT8 tmp[0x80];
+
+			/* JVS 'eeprom' */
+			mame_fread(file,maple0x86data1,0x80);
+
+			mame_fread(file,&tmp,0x80);
+			eeprom_set_data((UINT8 *)tmp, 0x80);
+
+			// mainboard eeprom?
             eeprom_load(file);
-        else*/
-		eeprom_set_data((UINT8 *)"\011\241                              0000000000000000", 48);  // 2*checksum 30*unknown 16*serial
+
+		}
+        else
+		{
+		//  int a;
+
+			UINT32 length, size;
+			UINT8 *dat;
+			UINT8* jvseeprom_default = NULL;
+
+			dat = eeprom_get_data_pointer(&length, &size);
+			memset(dat, 0, length * size);
+
+			// mainboard eeprom?
+			eeprom_set_data((UINT8 *)"\011\241                              0000000000000000", 48);  // 2*checksum 30*unknown 16*serial
+
+			// some games require defaults to boot (vertical, 1 player etc.)
+			if (!strcmp(machine->gamedrv->name,"karous"))  jvseeprom_default = jvseeprom_default_karous;
+			if (!strcmp(machine->gamedrv->name,"sfz3ugd")) jvseeprom_default = jvseeprom_default_sfz3ugd;
+			if (!strcmp(machine->gamedrv->name,"shikgam2")) jvseeprom_default = jvseeprom_default_shikgam2;
+			if (!strcmp(machine->gamedrv->name,"quizqgd")) jvseeprom_default = jvseeprom_default_quizqgd;
+			if (!strcmp(machine->gamedrv->name,"senko")) jvseeprom_default = jvseeprom_default_senko;
+			if (!strcmp(machine->gamedrv->name,"senkoo")) jvseeprom_default = jvseeprom_default_senkoo;
+			if (!strcmp(machine->gamedrv->name,"radirgy")) jvseeprom_default = jvseeprom_default_radirgy;
+			if (!strcmp(machine->gamedrv->name,"trgheart")) jvseeprom_default = jvseeprom_default_trgheart;
+			if (!strcmp(machine->gamedrv->name,"gundmgd")) jvseeprom_default = jvseeprom_default_gundmgd;
+			if (!strcmp(machine->gamedrv->name,"gundmxgd")) jvseeprom_default = jvseeprom_default_gundmxgd;
+			if (!strcmp(machine->gamedrv->name,"psyvar2")) jvseeprom_default = jvseeprom_default_psyvar2;
+			if (!strcmp(machine->gamedrv->name,"cfield")) jvseeprom_default = jvseeprom_default_cfield;
+			if (!strcmp(machine->gamedrv->name,"puyofev")) jvseeprom_default = jvseeprom_default_puyofev;
+			if (!strcmp(machine->gamedrv->name,"bdrdown")) jvseeprom_default = jvseeprom_default_bdrdown;
+			if (!strcmp(machine->gamedrv->name,"ss2005")) jvseeprom_default = jvseeprom_default_ss2005;
+			if (!strcmp(machine->gamedrv->name,"usagui")) jvseeprom_default = jvseeprom_default_usagui;
+			if (!strcmp(machine->gamedrv->name,"undefeat")) jvseeprom_default = jvseeprom_default_undefeat;
+			if (!strcmp(machine->gamedrv->name,"trizeal")) jvseeprom_default = jvseeprom_default_trizeal;
+			if (!strcmp(machine->gamedrv->name,"moeru")) jvseeprom_default = jvseeprom_default_moeru;
+			if (!strcmp(machine->gamedrv->name,"tetkiwam")) jvseeprom_default = jvseeprom_default_tetkiwam;
+			if (!strcmp(machine->gamedrv->name,"keyboard")) jvseeprom_default = jvseeprom_default_keyboard;
+
+			if (jvseeprom_default)
+				memcpy(maple0x86data1, jvseeprom_default, 0x80);
+
+		#if 0
+			/* JVS 'eeprom' */
+			for (a=0;a < 0x80;a++)
+				maple0x86data1[a]=0x11+a;
+
+			// checksums
+			maple0x86data1[0]=0xb9;
+			maple0x86data1[1]=0xb1;
+			maple0x86data1[18]=0xb8;
+			maple0x86data1[19]=0x8a;
+		#endif
+		}
 	}
 }
 
@@ -730,6 +890,50 @@ static WRITE64_HANDLER( eeprom_93c46a_w )
 	eeprom_set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
 	eeprom_set_clock_line((data & 0x4) ? ASSERT_LINE : CLEAR_LINE);
 }
+
+/* Dreamcast MAP
+
+0 0x00000000 - 0x001FFFFF MPX System/Boot ROM
+0 0x00200000 - 0x0021FFFF Flash Memory
+0 0x00400000 - 0x005F67FF Unassigned
+0 0x005F6800 - 0x005F69FF System Control Reg.
+0 0x005F6C00 - 0x005F6CFF Maple i/f Control Reg.
+0 0x005F7000 - 0x005F70FF GD-ROM
+0 0x005F7400 - 0x005F74FF G1 i/f Control Reg.
+0 0x005F7800 - 0x005F78FF G2 i/f Control Reg.
+0 0x005F7C00 - 0x005F7CFF PVR i/f Control Reg.
+0 0x005F8000 - 0x005F9FFF TA / PVR Core Reg.
+0 0x00600000 - 0x006007FF MODEM
+0 0x00600800 - 0x006FFFFF G2 (Reserved)
+0 0x00700000 - 0x00707FFF AICA- Sound Cntr. Reg.
+0 0x00710000 - 0x0071000B AICA- RTC Cntr. Reg.
+0 0x00800000 - 0x00FFFFFF AICA- Wave Memory
+0 0x01000000 - 0x01FFFFFF Ext. Device
+0 0x02000000 - 0x03FFFFFF Image Area (Mirror Area)
+
+1 0x04000000 - 0x04FFFFFF MPX Tex.Mem. 64bit Acc.
+1 0x05000000 - 0x05FFFFFF Tex.Mem. 32bit Acc.
+1 0x06000000 - 0x07FFFFFF Image Area*
+
+2 0x08000000 - 0x0BFFFFFF Unassigned
+
+3 0x0C000000 - 0x0CFFFFFF System Memory
+3 0x0D000000 - 0x0DFFFFFF (Mirror on DC, Extra RAM on Naomi)
+
+3 0x0E000000 - 0x0FFFFFFF Image Area (Mirror Area)
+
+4 0x10000000 - 0x107FFFFF MPX TA FIFO Polygon Cnv.
+4 0x10800000 - 0x10FFFFFF TA FIFO YUV Conv.
+4 0x11000000 - 0x11FFFFFF Tex.Mem. 32/64bit Acc.
+4 0x12000000 - 0x13FFFFFF Image Area (Mirror Area)
+
+5 0x14000000 - 0x17FFFFFF MPX Ext.
+
+6 0x18000000 - 0x1BFFFFFF Unassigned
+
+7 0x1C000000 - 0x1FFFFFFF(SH4 Internal area)
+
+*/
 
 /*
  * Common address map for Naomi 1, Naomi GD-Rom, Naomi 2, Atomiswave ...
@@ -764,10 +968,14 @@ ADDRESS_MAP_END
  */
 
 static ADDRESS_MAP_START( naomi_map, ADDRESS_SPACE_PROGRAM, 64 )
-	AM_RANGE(0x00000000, 0x001fffff) AM_ROM                                             // BIOS
+	/* Area 0 */
+	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_SHARE(3) AM_REGION("maincpu", 0) // BIOS
+	AM_RANGE(0xa0000000, 0xa01fffff) AM_ROM AM_SHARE(3)  // non cachable access to  0x00000000 - 0x001fffff
+
 	AM_RANGE(0x00200000, 0x00207fff) AM_RAM                                             // bios uses it (battery backed ram ?)
 	AM_RANGE(0x005f6800, 0x005f69ff) AM_READWRITE( dc_sysctrl_r, dc_sysctrl_w )
 	AM_RANGE(0x005f6c00, 0x005f6cff) AM_READWRITE( dc_maple_r, dc_maple_w )
+	AM_RANGE(0x005f7000, 0x005f70ff) AM_DEVREADWRITE("rom_board", naomibd_r, naomibd_w)
 	AM_RANGE(0x005f7400, 0x005f74ff) AM_READWRITE( dc_g1_ctrl_r, dc_g1_ctrl_w )
 	AM_RANGE(0x005f7800, 0x005f78ff) AM_READWRITE( dc_g2_ctrl_r, dc_g2_ctrl_w )
 	AM_RANGE(0x005f7c00, 0x005f7cff) AM_READWRITE( pvr_ctrl_r, pvr_ctrl_w )
@@ -776,17 +984,43 @@ static ADDRESS_MAP_START( naomi_map, ADDRESS_SPACE_PROGRAM, 64 )
 	AM_RANGE(0x00700000, 0x00707fff) AM_DEVREADWRITE( "aica", dc_aica_reg_r, dc_aica_reg_w )
 	AM_RANGE(0x00710000, 0x0071000f) AM_READWRITE( dc_rtc_r, dc_rtc_w )
 	AM_RANGE(0x00800000, 0x00ffffff) AM_READWRITE( naomi_arm_r, naomi_arm_w )           // sound RAM (8 MB)
+
+
 	AM_RANGE(0x0103ff00, 0x0103ffff) AM_READWRITE( naomi_unknown1_r, naomi_unknown1_w ) // bios uses it, actual start and end addresses not known
+
+	/* Area 1 */
 	AM_RANGE(0x04000000, 0x04ffffff) AM_RAM	AM_SHARE(2) AM_BASE( &dc_texture_ram )      // texture memory 64 bit access
 	AM_RANGE(0x05000000, 0x05ffffff) AM_RAM AM_SHARE(2)                                 // mirror of texture RAM 32 bit access
-	AM_RANGE(0x0c000000, 0x0dffffff) AM_RAM AM_BASE(&naomi_ram64)
+
+	/* Area 2*/
+	AM_RANGE(0x08000000, 0x0bffffff) AM_NOP // 'Unassigned'
+
+	/* Area 3 */
+	AM_RANGE(0x0c000000, 0x0cffffff) AM_RAM AM_BASE(&naomi_ram64) AM_SHARE(4)
+	AM_RANGE(0x0d000000, 0x0dffffff) AM_RAM AM_SHARE(5)// extra ram on Naomi (mirror on DC)
+	AM_RANGE(0x0e000000, 0x0effffff) AM_RAM AM_SHARE(4)// mirror
+	AM_RANGE(0x0f000000, 0x0fffffff) AM_RAM AM_SHARE(5)// mirror
+
+	AM_RANGE(0x8c000000, 0x8cffffff) AM_RAM AM_SHARE(4) // RAM access through cache
+
+
+	/* Area 4 */
 	AM_RANGE(0x10000000, 0x107fffff) AM_WRITE( ta_fifo_poly_w )
 	AM_RANGE(0x10800000, 0x10ffffff) AM_WRITE( ta_fifo_yuv_w )
-	AM_RANGE(0x11000000, 0x11ffffff) AM_RAM AM_SHARE(2)                                 // another mirror of texture memory
-	AM_RANGE(0x13000000, 0x13ffffff) AM_RAM AM_SHARE(2)                                 // another mirror of texture memory
-	AM_RANGE(0xa0000000, 0xa01fffff) AM_ROM AM_REGION("maincpu", 0)
+	AM_RANGE(0x11000000, 0x11ffffff) AM_RAM AM_SHARE(2)
+	/*       0x12000000 -0x13ffffff Mirror area of  0x10000000 -0x11ffffff */
+	AM_RANGE(0x12000000, 0x127fffff) AM_WRITE( ta_fifo_poly_w )
+	AM_RANGE(0x12800000, 0x12ffffff) AM_WRITE( ta_fifo_yuv_w )
+	AM_RANGE(0x13000000, 0x13ffffff) AM_RAM AM_SHARE(2)
 
-	AM_RANGE(0x005f7000, 0x005f70ff) AM_DEVREADWRITE("rom_board", naomibd_r, naomibd_w)
+	/* Area 5 */
+	//AM_RANGE(0x14000000, 0x17ffffff) AM_NOP // MPX Ext.
+
+	/* Area 6 */
+	//AM_RANGE(0x18000000, 0x1bffffff) AM_NOP // Unassigned
+
+	/* Area 7 */
+	//AM_RANGE(0x1c000000, 0x1fffffff) AM_NOP // SH4 Internal
 ADDRESS_MAP_END
 
 
@@ -988,30 +1222,31 @@ Scan ROM for the text string "LOADING TEST MODE NOW" back up four (4) bytes for 
 
 */
 // game specific bios roms quite clearly don't belong in here.
-
+// Japan bios is default, because most games require it.
+/* bios e works, the newer japan one gives 'board malfunction' with some games?' */
 #define NAOMI_BIOS \
-	ROM_SYSTEM_BIOS( 0, "bios0", "epr-21578e (Export)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 0, "epr-21578e.bin",  0x000000, 0x200000, CRC(087f09a3) SHA1(0418eb2cf9766f0b1b874a4e92528779e22c0a4a) ) \
-	ROM_SYSTEM_BIOS( 1, "bios1", "epr-21578d (Export)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 1, "epr-21578d.bin",  0x000000, 0x200000, CRC(dfd5f42a) SHA1(614a0db4743a5e5a206190d6786ade24325afbfd) ) \
-	ROM_SYSTEM_BIOS( 2, "bios2", "epr-21578b (Export)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 2, "epr-21578b.bin",  0x000000, 0x200000, CRC(6c9aad83) SHA1(555918de76d8dbee2a97d8a95297ef694b3e803f) ) \
-	ROM_SYSTEM_BIOS( 3, "bios3", "epr-21577e (USA)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 3, "epr-21577e.bin",  0x000000, 0x200000, CRC(cf36e97b) SHA1(b085305982e7572e58b03a9d35f17ae319c3bbc6) ) \
-	ROM_SYSTEM_BIOS( 4, "bios4", "epr-21577d (USA)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 4, "epr-21577d.bin",  0x000000, 0x200000, CRC(60ddcbbe) SHA1(58b15096d269d6df617ca1810b66b47deb184958) ) \
-	ROM_SYSTEM_BIOS( 5, "bios5", "epr-21576h (Japan)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 5, "epr-21576h.bin",  0x000000, 0x200000, CRC(d4895685) SHA1(91424d481ff99a8d3f4c45cea6d3f0eada049a6d) ) \
-	ROM_SYSTEM_BIOS( 6, "bios6", "epr-21576g (Japan)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 6, "epr-21576g.bin",  0x000000, 0x200000, CRC(d2a1c6bf) SHA1(6d27d71aec4dfba98f66316ae74a1426d567698a) ) \
-	ROM_SYSTEM_BIOS( 7, "bios7", "epr-21576e (Japan)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 7, "epr-21576e.bin",  0x000000, 0x200000, CRC(08c0add7) SHA1(e7c1a7673cb2ccb21748ef44105e46d1bad7266d) ) \
-	ROM_SYSTEM_BIOS( 8, "bios8", "epr-21576d (Japan)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 8, "epr-21576d.bin",  0x000000, 0x200000, CRC(3b2afa7b) SHA1(d007e1d321c198a38c5baff86eb2ab84385d150a) ) \
-	ROM_SYSTEM_BIOS( 9, "bios9", "epr-21576b (Japan)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 9, "epr-21576b.bin",  0x000000, 0x200000, CRC(755a6e07) SHA1(7e8b8ccfc063144d89668e7224dcd8a36c54f3b3) ) \
-	ROM_SYSTEM_BIOS( 10, "bios10", "epr-21576 (Japan)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 10,  "epr-21576.bin", 0x000000, 0x200000, CRC(9dad3495) SHA1(5fb66f9a2b68d120f059c72758e65d34f461044a) ) \
+	ROM_SYSTEM_BIOS( 0, "bios0", "epr-21576e (Japan)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 0, "epr-21576e.bin",  0x000000, 0x200000, CRC(08c0add7) SHA1(e7c1a7673cb2ccb21748ef44105e46d1bad7266d) ) \
+	ROM_SYSTEM_BIOS( 1, "bios1", "epr-21576g (Japan)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 1, "epr-21576g.bin",  0x000000, 0x200000, CRC(d2a1c6bf) SHA1(6d27d71aec4dfba98f66316ae74a1426d567698a) ) \
+	ROM_SYSTEM_BIOS( 2, "bios2", "epr-21576h (Japan)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 2, "epr-21576h.bin",  0x000000, 0x200000, CRC(d4895685) SHA1(91424d481ff99a8d3f4c45cea6d3f0eada049a6d) ) \
+	ROM_SYSTEM_BIOS( 3, "bios3", "epr-21576d (Japan)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 3, "epr-21576d.bin",  0x000000, 0x200000, CRC(3b2afa7b) SHA1(d007e1d321c198a38c5baff86eb2ab84385d150a) ) \
+	ROM_SYSTEM_BIOS( 4, "bios4", "epr-21576b (Japan)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 4, "epr-21576b.bin",  0x000000, 0x200000, CRC(755a6e07) SHA1(7e8b8ccfc063144d89668e7224dcd8a36c54f3b3) ) \
+	ROM_SYSTEM_BIOS( 5, "bios5", "epr-21576 (Japan)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 5,  "epr-21576.bin", 0x000000, 0x200000, CRC(9dad3495) SHA1(5fb66f9a2b68d120f059c72758e65d34f461044a) ) \
+	ROM_SYSTEM_BIOS( 6, "bios6", "epr-21578e (Export)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 6, "epr-21578e.bin",  0x000000, 0x200000, CRC(087f09a3) SHA1(0418eb2cf9766f0b1b874a4e92528779e22c0a4a) ) \
+	ROM_SYSTEM_BIOS( 7, "bios7", "epr-21578d (Export)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 7, "epr-21578d.bin",  0x000000, 0x200000, CRC(dfd5f42a) SHA1(614a0db4743a5e5a206190d6786ade24325afbfd) ) \
+	ROM_SYSTEM_BIOS( 8, "bios8", "epr-21578b (Export)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 8, "epr-21578b.bin",  0x000000, 0x200000, CRC(6c9aad83) SHA1(555918de76d8dbee2a97d8a95297ef694b3e803f) ) \
+	ROM_SYSTEM_BIOS( 9, "bios9", "epr-21577e (USA)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 9, "epr-21577e.bin",  0x000000, 0x200000, CRC(cf36e97b) SHA1(b085305982e7572e58b03a9d35f17ae319c3bbc6) ) \
+	ROM_SYSTEM_BIOS( 10, "bios10", "epr-21577d (USA)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 10, "epr-21577d.bin",  0x000000, 0x200000, CRC(60ddcbbe) SHA1(58b15096d269d6df617ca1810b66b47deb184958) ) \
 	ROM_SYSTEM_BIOS( 11, "bios11", "Ferrari F355 (Export)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 11,  "epr-22851.bin", 0x000000, 0x200000, CRC(62483677) SHA1(3e3bcacf5f972c376b569f45307ee7fd0b5031b7) ) \
 	ROM_SYSTEM_BIOS( 12, "bios12", "Ferrari F355 (USA)" ) \
@@ -1028,24 +1263,25 @@ Scan ROM for the text string "LOADING TEST MODE NOW" back up four (4) bytes for 
 
 
 /* only revisions d and higher support the GDROM, and there is an additional bios (and SH4!) on the DIMM board for the CD Controller */
+/* bios e works, the newer japan one gives 'board malfunction' with some games?' */
 #define NAOMIGD_BIOS \
 	ROM_REGION( 0x200000, "maincpu", 0) \
-	ROM_SYSTEM_BIOS( 0, "bios0", "epr-21578e (Export)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 0, "epr-21578e.bin",  0x000000, 0x200000, CRC(087f09a3) SHA1(0418eb2cf9766f0b1b874a4e92528779e22c0a4a) ) \
-	ROM_SYSTEM_BIOS( 1, "bios1", "epr-21578d (Export)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 1, "epr-21578d.bin",  0x000000, 0x200000, CRC(dfd5f42a) SHA1(614a0db4743a5e5a206190d6786ade24325afbfd) ) \
-	ROM_SYSTEM_BIOS( 2, "bios2", "epr-21577e (USA)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 2, "epr-21577e.bin",  0x000000, 0x200000, CRC(cf36e97b) SHA1(b085305982e7572e58b03a9d35f17ae319c3bbc6) ) \
-	ROM_SYSTEM_BIOS( 3, "bios3", "epr-21577d (USA)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 3, "epr-21577d.bin",  0x000000, 0x200000, CRC(60ddcbbe) SHA1(58b15096d269d6df617ca1810b66b47deb184958) ) \
-	ROM_SYSTEM_BIOS( 4, "bios4", "epr-21576h (Japan)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 4, "epr-21576h.bin",  0x000000, 0x200000, CRC(d4895685) SHA1(91424d481ff99a8d3f4c45cea6d3f0eada049a6d) ) \
-	ROM_SYSTEM_BIOS( 5, "bios5", "epr-21576g (Japan)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 5, "epr-21576g.bin",  0x000000, 0x200000, CRC(d2a1c6bf) SHA1(6d27d71aec4dfba98f66316ae74a1426d567698a) ) \
-	ROM_SYSTEM_BIOS( 6, "bios6", "epr-21576e (Japan)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 6, "epr-21576e.bin",  0x000000, 0x200000, CRC(08c0add7) SHA1(e7c1a7673cb2ccb21748ef44105e46d1bad7266d) ) \
-	ROM_SYSTEM_BIOS( 7, "bios7", "epr-21576d (Japan)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 7, "epr-21576d.bin",  0x000000, 0x200000, CRC(3b2afa7b) SHA1(d007e1d321c198a38c5baff86eb2ab84385d150a) ) \
+	ROM_SYSTEM_BIOS( 0, "bios0", "epr-21576e (Japan)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 0, "epr-21576e.bin",  0x000000, 0x200000, CRC(08c0add7) SHA1(e7c1a7673cb2ccb21748ef44105e46d1bad7266d) ) \
+	ROM_SYSTEM_BIOS( 1, "bios1", "epr-21576g (Japan)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 1, "epr-21576g.bin",  0x000000, 0x200000, CRC(d2a1c6bf) SHA1(6d27d71aec4dfba98f66316ae74a1426d567698a) ) \
+	ROM_SYSTEM_BIOS( 2, "bios2", "epr-21576h (Japan)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 2, "epr-21576h.bin",  0x000000, 0x200000, CRC(d4895685) SHA1(91424d481ff99a8d3f4c45cea6d3f0eada049a6d) ) \
+	ROM_SYSTEM_BIOS( 3, "bios3", "epr-21576d (Japan)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 3, "epr-21576d.bin",  0x000000, 0x200000, CRC(3b2afa7b) SHA1(d007e1d321c198a38c5baff86eb2ab84385d150a) ) \
+	ROM_SYSTEM_BIOS( 4, "bios4", "epr-21578e (Export)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 4, "epr-21578e.bin",  0x000000, 0x200000, CRC(087f09a3) SHA1(0418eb2cf9766f0b1b874a4e92528779e22c0a4a) ) \
+	ROM_SYSTEM_BIOS( 5, "bios5", "epr-21578d (Export)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 5, "epr-21578d.bin",  0x000000, 0x200000, CRC(dfd5f42a) SHA1(614a0db4743a5e5a206190d6786ade24325afbfd) ) \
+	ROM_SYSTEM_BIOS( 6, "bios6", "epr-21577e (USA)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 6, "epr-21577e.bin",  0x000000, 0x200000, CRC(cf36e97b) SHA1(b085305982e7572e58b03a9d35f17ae319c3bbc6) ) \
+	ROM_SYSTEM_BIOS( 7, "bios7", "epr-21577d (USA)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 7, "epr-21577d.bin",  0x000000, 0x200000, CRC(60ddcbbe) SHA1(58b15096d269d6df617ca1810b66b47deb184958) ) \
 	ROM_REGION( 0x200000, "user2", 0) \
 	ROM_LOAD16_WORD_SWAP( "fpr-23489c.ic14", 0x000000, 0x200000, CRC(bc38bea1) SHA1(b36fcc6902f397d9749e9d02de1bbb7a5e29d468) ) \
 
@@ -1078,22 +1314,22 @@ Region byte encoding is as follows:
 
 #define NAOMI2_BIOS \
 	ROM_REGION( 0x200000, "maincpu", 0) \
-	ROM_SYSTEM_BIOS( 0, "bios0", "epr-23608b (Export)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 0, "epr-23608b.bin",   0x000000, 0x200000, CRC(a554b1e3) SHA1(343b727a3619d1c75a9b6d4cc156a9050447f155) ) \
-	ROM_SYSTEM_BIOS( 1, "bios1", "epr-23608 (Export)"  ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 1, "epr-23608.bin",    0x000000, 0x200000, CRC(929cc3a6) SHA1(47d00c818de23f733a4a33b1bbc72eb8aa729246) ) \
-	ROM_SYSTEM_BIOS( 2, "bios2", "epr-23607b (USA)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 2, "epr-23607b.bin",   0x000000, 0x200000, CRC(f308c5e9) SHA1(5470ab1cee6afecbd8ca8cf40f8fbe4ec2cb1471) ) \
-	ROM_SYSTEM_BIOS( 3, "bios3", "epr-23607 (USA)"  ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 3, "epr-23607.bin",    0x000000, 0x200000, CRC(2b55add2) SHA1(547de5f97d3183c8cd069c4fa3c09f13d8b637d9) ) \
-	ROM_SYSTEM_BIOS( 4, "bios4", "epr-23605c (Japan)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 4, "epr-23605c.bin",   0x000000, 0x200000, CRC(297ea6ed) SHA1(cfbfe57c80e6ee86a101fa83aec0a01e00c0f42a) ) \
-	ROM_SYSTEM_BIOS( 5, "bios5", "epr-23605b (Japan)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 5, "epr-23605b.bin",   0x000000, 0x200000, CRC(3a3242d4) SHA1(aaca4df51ef91d926f8191d372f3dfe1d20d9484) ) \
-	ROM_SYSTEM_BIOS( 6, "bios6", "epr-23605a (Japan)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 6, "epr-23605a.bin",   0x000000, 0x200000, CRC(7bc3fc2d) SHA1(a4a9531a7c66ff30046908cf71f6c7b6fb59c392) ) \
-	ROM_SYSTEM_BIOS( 7, "bios7", "epr-23605 (Japan)"  ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 7, "epr-23605.bin",    0x000000, 0x200000, CRC(5731e446) SHA1(787b0844fc408cf124c12405c095c59948709ea6) )
+	ROM_SYSTEM_BIOS( 0, "bios0", "epr-23605c (Japan)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 0, "epr-23605c.bin",   0x000000, 0x200000, CRC(297ea6ed) SHA1(cfbfe57c80e6ee86a101fa83aec0a01e00c0f42a) ) \
+	ROM_SYSTEM_BIOS( 1, "bios1", "epr-23605b (Japan)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 1, "epr-23605b.bin",   0x000000, 0x200000, CRC(3a3242d4) SHA1(aaca4df51ef91d926f8191d372f3dfe1d20d9484) ) \
+	ROM_SYSTEM_BIOS( 2, "bios2", "epr-23605a (Japan)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 2, "epr-23605a.bin",   0x000000, 0x200000, CRC(7bc3fc2d) SHA1(a4a9531a7c66ff30046908cf71f6c7b6fb59c392) ) \
+	ROM_SYSTEM_BIOS( 3, "bios3", "epr-23605 (Japan)"  ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 3, "epr-23605.bin",    0x000000, 0x200000, CRC(5731e446) SHA1(787b0844fc408cf124c12405c095c59948709ea6) ) \
+	ROM_SYSTEM_BIOS( 4, "bios4", "epr-23608b (Export)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 4, "epr-23608b.bin",   0x000000, 0x200000, CRC(a554b1e3) SHA1(343b727a3619d1c75a9b6d4cc156a9050447f155) ) \
+	ROM_SYSTEM_BIOS( 5, "bios5", "epr-23608 (Export)"  ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 5, "epr-23608.bin",    0x000000, 0x200000, CRC(929cc3a6) SHA1(47d00c818de23f733a4a33b1bbc72eb8aa729246) ) \
+	ROM_SYSTEM_BIOS( 6, "bios6", "epr-23607b (USA)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 6, "epr-23607b.bin",   0x000000, 0x200000, CRC(f308c5e9) SHA1(5470ab1cee6afecbd8ca8cf40f8fbe4ec2cb1471) ) \
+	ROM_SYSTEM_BIOS( 7, "bios7", "epr-23607 (USA)"  ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 7, "epr-23607.bin",    0x000000, 0x200000, CRC(2b55add2) SHA1(547de5f97d3183c8cd069c4fa3c09f13d8b637d9) ) \
 
 /* this is one flashrom, however the second half looks like it's used for game settings, may differ between dumps, and may not be needed / could be blanked */
 #define AW_BIOS \
@@ -1428,6 +1664,51 @@ ROM_START( csmasho )
 	ROM_LOAD("mpr23426.7", 0x3800000, 0x0800000, CRC(7f91b13f) SHA1(2d534f77291ebfedc011bf0e803a1b9243fb477f) )
 	ROM_LOAD("mpr23427.8", 0x4000000, 0x0800000, CRC(5851d525) SHA1(1cb1073542d75a3bcc0d363ed31d49bcaf1fd494) )
 ROM_END
+
+
+/*
+
+SYSTEMID: NAOMI
+JAP:  POWER SMASH --------------
+USA:  VIRTUA TENNIS IN USA -----
+EXP:  VIRTUA TENNIS IN EXPORT --
+
+NO. Type    Byte    Word
+IC22    32M 0000    1111
+IC1 64M 7422    83DD
+IC2 64M 7F26    A93D
+IC3 64M 8E02    D3FC
+IC4 64M 2545    F734
+IC5 64M E197    B75D
+IC6 64M 9453    CF75
+IC7 64M 29AC    2FEB
+IC8 64M 0434    2E9E
+IC9 64M C86E    79E6
+IC10    64M C67A    BF14
+IC11    64M F590    D280
+
+*/
+
+ROM_START( vtennis )
+	ROM_REGION( 0x200000, "maincpu", 0)
+	NAOMI_BIOS
+
+	ROM_REGION( 0x6000000, "user1", 0)
+	ROM_LOAD("epr22927.22", 0x0000000, 0x0400000,  CRC(89781723) SHA1(cf644aa66abcec6964d77485a0292f11ba80dd0d) )
+	ROM_RELOAD( 0x400000, 0x400000)
+	ROM_LOAD("ic1.bin", 0x0800000, 0x0800000, CRC(903873e5) SHA1(09af791bc02cca0e2dc72187679830ed9f4fc772) )
+	ROM_LOAD("ic2.bin", 0x1000000, 0x0800000, CRC(5f020fa6) SHA1(bd2519be8c88ff34cf2fd2b17271d2b41b64ce9f) )
+	ROM_LOAD("ic3.bin", 0x1800000, 0x0800000, CRC(3c3bf533) SHA1(db43ca9332e76b968b9b388b4824b768f82b9859) )
+	ROM_LOAD("ic4.bin", 0x2000000, 0x0800000, CRC(3d8dd003) SHA1(91f494b06b9977215ab726a2499b5855d4d49e81) )
+	ROM_LOAD("ic5.bin", 0x2800000, 0x0800000, CRC(efd781d4) SHA1(ced5a8dc8ff7677b3cac2a4fae04670c46cc96af) )
+	ROM_LOAD("ic6.bin", 0x3000000, 0x0800000, CRC(79e75be1) SHA1(82318613c947907e01bbe50569b05ef24789d7c9) )
+	ROM_LOAD("ic7.bin", 0x3800000, 0x0800000, CRC(44bd3883) SHA1(5c595d903d8865bf8bf3aafb1f527bff232718ed) )
+	ROM_LOAD("ic8.bin", 0x4000000, 0x0800000, CRC(9ebdf0f8) SHA1(f1b688bda387fc00c70cb6a0c374c6c13926c138) )
+	ROM_LOAD("ic9.bin", 0x4800000, 0x0800000, CRC(ecde9d57) SHA1(1fbe7fdf66a56f4f1765baf113dff95142bfd114) )
+	ROM_LOAD("ic10.bin",0x5000000, 0x0800000, CRC(81057e42) SHA1(d41137ae28c64dbdb50150db8cf25851bc0709c4) )
+	ROM_LOAD("ic11.bin",0x5800000, 0x0800000, CRC(57eec89d) SHA1(dd8f9a9155e51ee5260f559449fb0ea245077952) )
+ROM_END
+
 
 /*
 
@@ -1789,6 +2070,63 @@ ROM_START( toyfight )
 	ROM_LOAD("mpr-22034.ic10",0x5000000, 0x0800000, CRC(3aa5ce5e) SHA1(f00a906235e4522d6fc2ac771324114346875314) )
 ROM_END
 
+
+/*
+
+SYSTEMID: NAOMI
+JAP: SLASHOUT JAPAN VERSION
+USA: SLASHOUT USA VERSION
+EXP: SLASHOUT EXPORT VERSION
+
+NO.  Type   Byte    Word
+IC22 32M    0000    0000
+IC1  64M    D1BF    FB18
+IC2  64M    1F98    4295
+IC3  64M    5F61    67E3
+IC4  64M    C6A4    449B
+IC5  64M    BB2A    58AB
+IC6  64M    60B2    5262
+IC7  64M    178B    3705
+IC8  64M    E4B9    FF46
+IC9  64M    D4FC    2273
+IC10 64M    6BA5    8087
+IC11 64M    7DBA    A143
+IC12 64M    B708    0C61
+IC13 64M    0C4A    8DF0
+IC14 64M    B2FF    A057
+IC15 64M    60DB    3D06
+IC16 64M    B5EA    4965
+IC17 64M    6586    1F3F
+
+*/
+
+ROM_START( slasho )
+	ROM_REGION( 0x200000, "maincpu", 0)
+	NAOMI_BIOS
+
+	ROM_REGION( 0x9000000, "user1", 0)
+	ROM_LOAD("epr23341.22", 0x0000000, 0x0400000,  CRC(477fa123) SHA1(d2474766dcd0b0e5fe317a858534829eb1c26789) )
+	ROM_RELOAD( 0x400000, 0x400000)
+	ROM_LOAD("ic1.bin", 0x0800000, 0x0800000, CRC(8624493a) SHA1(4fe940a889619f2a75c45e15efb2b8ed9020bc55) )
+	ROM_LOAD("ic2.bin", 0x1000000, 0x0800000, CRC(f952d0d4) SHA1(4b5403b98bf977c1e3a045619e1eddb4e4ab69c7) )
+	ROM_LOAD("ic3.bin", 0x1800000, 0x0800000, CRC(6c5ce16e) SHA1(110b5d536557ab6610a7c32db2e6e46901da9579) )
+	ROM_LOAD("ic4.bin", 0x2000000, 0x0800000, CRC(1b3d02a0) SHA1(3e02a0cb3d945e5d6cea03236d6571d45a7afd51) )
+	ROM_LOAD("ic5.bin", 0x2800000, 0x0800000, CRC(50053662) SHA1(3ced87ee533fd7a32d64c41f1fcbde9c648ab188) )
+	ROM_LOAD("ic6.bin", 0x3000000, 0x0800000, CRC(96148e80) SHA1(c0f30556395edb9a7558006e89d6adc2f6bdc048) )
+	ROM_LOAD("ic7.bin", 0x3800000, 0x0800000, CRC(15f2f9a1) SHA1(9cea71b6f6466ccd840218f5dcb09ea7525208d8) )
+	ROM_LOAD("ic8.bin", 0x4000000, 0x0800000, CRC(a084ab51) SHA1(1f5c863012004bbeefc82b172a92011a175428a6) )
+	ROM_LOAD("ic9.bin", 0x4800000, 0x0800000, CRC(50539e17) SHA1(38ec16a868c892e177fbb45be563e1b649956550) )
+	ROM_LOAD("ic10.bin",0x5000000, 0x0800000, CRC(29891831) SHA1(f318bca11ac5eb24b32d5b910a596280221a44ab) )
+	ROM_LOAD("ic11.bin",0x5800000, 0x0800000, CRC(c1ad0614) SHA1(e38ff316da889eb029d0a9348f6b2284f3a36f29) )
+	ROM_LOAD("ic12.bin",0x6000000, 0x0800000, CRC(faeb25ed) SHA1(623f3f78c94ba44e77491c18a6521a19b1101a67) )
+	ROM_LOAD("ic13.bin",0x6800000, 0x0800000, CRC(63589d0f) SHA1(53770cc1268892e8cdb76b6edf2fb39e8b605554) )
+	ROM_LOAD("ic14.bin",0x7000000, 0x0800000, CRC(2bc46263) SHA1(38ec579768ac37ed3ad21911b1970241906af8ea) )
+	ROM_LOAD("ic15.bin",0x7800000, 0x0800000, CRC(323e4db2) SHA1(c5484589c1613110faef6cf8b8f4def8867a8226) )
+	ROM_LOAD("ic16.bin",0x8000000, 0x0800000, CRC(fd8c2736) SHA1(34ae1a4e35b4aac6666719fb4fc0959bd64ff3d6) )
+	ROM_LOAD("ic17.bin",0x8800000, 0x0800000, CRC(001604f8) SHA1(615ec027d383d44d4aadb1175be6320e4139d7d1) )
+ROM_END
+
+
 /*
 
 SYSTEMID: NAOMI
@@ -2055,62 +2393,6 @@ ROM_END
 /*
 
 SYSTEMID: NAOMI
-JAP: SLASHOUT JAPAN VERSION
-USA: SLASHOUT USA VERSION
-EXP: SLASHOUT EXPORT VERSION
-
-NO.  Type   Byte    Word
-IC22 32M    0000    0000
-IC1  64M    D1BF    FB18
-IC2  64M    1F98    4295
-IC3  64M    5F61    67E3
-IC4  64M    C6A4    449B
-IC5  64M    BB2A    58AB
-IC6  64M    60B2    5262
-IC7  64M    178B    3705
-IC8  64M    E4B9    FF46
-IC9  64M    D4FC    2273
-IC10 64M    6BA5    8087
-IC11 64M    7DBA    A143
-IC12 64M    B708    0C61
-IC13 64M    0C4A    8DF0
-IC14 64M    B2FF    A057
-IC15 64M    60DB    3D06
-IC16 64M    B5EA    4965
-IC17 64M    6586    1F3F
-
-*/
-
-ROM_START( slasho )
-	ROM_REGION( 0x200000, "maincpu", 0)
-	NAOMI_BIOS
-
-	ROM_REGION( 0x400000, "user1", 0)
-	ROM_LOAD("epr23341.22", 0x0000000, 0x0400000,  CRC(477fa123) SHA1(d2474766dcd0b0e5fe317a858534829eb1c26789) )
-
-	ROM_REGION( 0x8800000, "user2", 0)
-	ROM_LOAD("ic1", 0x0000000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic2", 0x0800000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic3", 0x1000000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic4", 0x1800000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic5", 0x2000000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic6", 0x2800000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic7", 0x3000000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic8", 0x3800000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic9", 0x4000000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic10",0x4800000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic11",0x5000000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic12",0x5800000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic13",0x6000000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic14",0x6800000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic15",0x7000000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic16",0x7800000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic17",0x8000000, 0x0800000, NO_DUMP )
-ROM_END
-
-/*
-
-SYSTEMID: NAOMI
 JAP: SPAWN JAPAN
 USA: SPAWN USA
 EXP: SPAWN EURO
@@ -2288,50 +2570,6 @@ ROM_START( smarinef )
 	ROM_LOAD("mpr-22219.ic12",0x6000000, 0x0800000, CRC(b3b45811) SHA1(045e7236b814f848d4c9767618ddcd4344d880ec) )
 ROM_END
 
-
-/*
-
-SYSTEMID: NAOMI
-JAP:  POWER SMASH --------------
-USA:  VIRTUA TENNIS IN USA -----
-EXP:  VIRTUA TENNIS IN EXPORT --
-
-NO. Type    Byte    Word
-IC22    32M 0000    1111
-IC1 64M 7422    83DD
-IC2 64M 7F26    A93D
-IC3 64M 8E02    D3FC
-IC4 64M 2545    F734
-IC5 64M E197    B75D
-IC6 64M 9453    CF75
-IC7 64M 29AC    2FEB
-IC8 64M 0434    2E9E
-IC9 64M C86E    79E6
-IC10    64M C67A    BF14
-IC11    64M F590    D280
-
-*/
-
-ROM_START( vtennis )
-	ROM_REGION( 0x200000, "maincpu", 0)
-	NAOMI_BIOS
-
-	ROM_REGION( 0x400000, "user1", 0)
-	ROM_LOAD("epr22927.22", 0x0000000, 0x0400000,  CRC(89781723) SHA1(cf644aa66abcec6964d77485a0292f11ba80dd0d) )
-
-	ROM_REGION( 0x5800000, "user2", 0)
-	ROM_LOAD("ic1", 0x0000000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic2", 0x0800000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic3", 0x1000000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic4", 0x1800000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic5", 0x2000000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic6", 0x2800000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic7", 0x3000000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic8", 0x3800000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic9", 0x4000000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic10",0x4800000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic11",0x5000000, 0x0800000, NO_DUMP )
-ROM_END
 
 /*
 
@@ -2726,6 +2964,11 @@ GAME( 1999, suchie3,  naomi,    naomi,    naomi,    0, ROT0, "Jaleco",          
 GAME( 1999, vs2_2k,   naomi,    naomi,    naomi,    0, ROT0, "Sega",            "Virtua Striker 2 Ver. 2000 (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 1999, smarinef, naomi,    naomi,    naomi,    0, ROT0, "Sega",            "Sega Marine Fishing", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 1999, toyfight, naomi,    naomi,    naomi,    0, ROT0, "Sega",            "Toy Fighter", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 1999, doa2,     naomi,    naomi,    naomi,    0, ROT0, "Tecmo",           "Dead or Alive 2 (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2000, doa2m,    doa2,     naomi,    naomi,    0, ROT0, "Tecmo",           "Dead or Alive 2 Millennium (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 1999, vtennis,  naomi,    naomi,    naomi,    0, ROT0, "Sega",            "Power Smash (JPN) / Virtua Tennis (USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2000, slasho,   naomi,    naomi,    naomi,    0, ROT0, "Sega",            "Slashout (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
+
 
 /* Incomplete Dumps (just the program rom IC22) */
 GAME( 2000, cspike,   naomi,    naomi,    naomi,    0, ROT0, "Psikyo / Capcom", "Gun Spike (JPN) / Cannon Spike (USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
@@ -2741,13 +2984,9 @@ GAME( 1999, pstone,   naomi,    naomi,    naomi,    0, ROT0, "Capcom",          
 GAME( 2000, pstone2,  naomi,    naomi,    naomi,    0, ROT0, "Capcom",          "Power Stone 2 (JPN, USA, EUR, ASI, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 1999, otrigger, naomi,    naomi,    naomi,    0, ROT0, "Sega",            "OutTrigger (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 1999, samba,    naomi,    naomi,    naomi,    0, ROT0, "Sega",            "Samba De Amigo (JPN)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2000, slasho,   naomi,    naomi,    naomi,    0, ROT0, "Sega",            "Slashout (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 1999, spawn,    naomi,    naomi,    naomi,    0, ROT0, "Capcom",          "Spawn (JPN, USA, EUR, ASI, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2000, virnba,   naomi,    naomi,    naomi,    0, ROT0, "Sega",            "Virtua NBA (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 1999, vtennis,  naomi,    naomi,    naomi,    0, ROT0, "Sega",            "Power Smash (JPN) / Virtua Tennis (USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 1999, zombrvn,  naomi,    naomi,    naomi,    0, ROT0, "Sega",            "Zombie Revenge (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 1999, doa2,     naomi,    naomi,    naomi,    0, ROT0, "Tecmo",           "Dead or Alive 2 (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2000, doa2m,    doa2,     naomi,    naomi,    0, ROT0, "Tecmo",           "Dead or Alive 2 Millennium (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 1998, dybbnao,  naomi,    naomi,    naomi,    0, ROT0, "Sega",            "Dynamite Baseball NAOMI (JPN)", GAME_NO_SOUND|GAME_NOT_WORKING )
 
 /* Games with game specific bios sets */
@@ -2821,7 +3060,7 @@ ROM_START( cvs2gd )
 	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdl-0007a", 0, SHA1(d6da7a404e5f22df6d4bb049143391cf4505c492) )
+	DISK_IMAGE_READONLY( "gdl-0007a", 0, SHA1(56510390667b39b3915d8bc078660cbe093cf566) )
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 	//PIC16C622A (317-5078-COM)
@@ -2859,6 +3098,18 @@ ROM_START( ggxx )
 ROM_END
 
 
+ROM_START( moeru )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0013", 0, SHA1(c8869069c28bc8eec96d820886bc388d69d46143) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_LOAD("gdl-0013.data", 0x00, 0x50, CRC(56de2066) SHA1(a16a6d9f7272d3f8d322c85222a0487a87811910) )
+ROM_END
+
 ROM_START( chocomk )
 	NAOMIGD_BIOS
 
@@ -2888,6 +3139,8 @@ ROM_START( quizqgd )
 	ROM_LOAD("317-5090-jpn.data", 0x00, 0x50, CRC(b4dd88f6) SHA1(c9aacd79c1088225fa5a69b7bd31a7c1286160e1) )
 ROM_END
 
+
+
 ROM_START( ggxxrl )
 	NAOMIGD_BIOS
 
@@ -2902,6 +3155,21 @@ ROM_START( ggxxrl )
 	ROM_LOAD("317-5092-jpn.data", 0x00, 0x50, CRC(7c8cca4b) SHA1(92c5a0fd8916744eefc023e64daea69803573928) )
 ROM_END
 
+ROM_START( tetkiwam )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0020", 0, SHA1(7b2ef47ca2038d6a93615b760b03e8f7cb1b83c2) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C622A (317-5095-JPN)
+	//(sticker 253-5509-5095J)
+	ROM_LOAD("gdl-0020.data", 0x00, 0x50, CRC(06bc5013) SHA1(f7a46b7e34b20409ce2fdae80e5cdfff7adb9c64) )
+ROM_END
+
+
 ROM_START( shikgam2 )
 	NAOMIGD_BIOS
 
@@ -2915,6 +3183,21 @@ ROM_START( shikgam2 )
 	//(sticker 253-5509-5095J)
 	ROM_LOAD("317-5095-jpn.data", 0x00, 0x50, CRC(6033ec89) SHA1(9e99a8ad43fa29296dbf2e13b3a3d4552130b4e8) )
 ROM_END
+
+ROM_START( usagui )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0022", 0, SHA1(45deba05a12abbf6390c0fc0e4cdeaedfa7d2ca5) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C622A (317-5095-JPN)
+	//(sticker 253-5509-5095J)
+	ROM_LOAD("gdl-0022.data", 0x00, 0x50, CRC(621e827a) SHA1(cdc7580f5d1dfe85d2806233f22bc4f13fd62946) )
+ROM_END
+
 
 ROM_START( bdrdown )
 	NAOMIGD_BIOS
@@ -2944,6 +3227,19 @@ ROM_START( psyvar2 )
 	ROM_LOAD("317-5100-jpn.data", 0x00, 0x50, CRC(94316f0f) SHA1(e1ec2b4225105dbaa1e59e8a05027e73f7b725a9) )
 ROM_END
 
+
+ROM_START( cfield )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0025", 0, SHA1(be0d88eb4f48403a2ceaa7ef588ed60b96ba93bf) )
+
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_LOAD("gdl-0025.data", 0x00, 0x50, CRC(32adf2eb) SHA1(d86752e6fe9ccac093c512828fca5b7ae62a3ff2) )
+ROM_END
 
 
 ROM_START( trizeal )
@@ -3021,6 +3317,20 @@ ROM_START( ss2005 )
 	ROM_LOAD("317-5108-jpn.data", 0x00, 0x50, CRC(6a2eb334) SHA1(cab407d2e994f33aa921d50f399b17e6fbf98eb0) )
 ROM_END
 
+ROM_START( radirgy )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0032", 0, SHA1(ebd7a40e59082e660ebf9a2d4ae7cb64371dae8d) )
+
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_LOAD("gdl-0032.data", 0x00, 0x50, CRC(04e4ac45) SHA1(4102a4d68f20a7e78f6c7e3494e7229018e30e39) )
+ROM_END
+
+
 
 ROM_START( ggxxsla )
 	NAOMIGD_BIOS
@@ -3037,6 +3347,19 @@ ROM_START( ggxxsla )
 ROM_END
 
 
+ROM_START( kurucham )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0034", 0, SHA1(10fd7edb0b620133c003d686e5af2ed27004fa09) )
+
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_LOAD("gdl-0034.data", 0x00, 0x50,  CRC(f40072a8) SHA1(366df2079a4d2ff7a93082c9bf849aad40ab079d) )
+ROM_END
+
 ROM_START( undefeat )
 	NAOMIGD_BIOS
 
@@ -3052,6 +3375,34 @@ ROM_START( undefeat )
 	ROM_LOAD("317-5117-jpn.data", 0x00, 0x50,  CRC(f90f6d3b) SHA1(a18f803a8e951c375a3a55e4b0e74b698ae93f92) )
 ROM_END
 
+
+ROM_START( meltyb )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0039", 0, SHA1(ffc7f6e113ad69422a4f22f318bdf9b1dc5c25db) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C622A (317-5104-JPN)
+	//(sticker 253-5509-5104J)
+	ROM_LOAD("gdl-0039.data", 0x00, 0x50, CRC(4d6e2c77) SHA1(3bed734c291140d0a61afa40f221395369a251a9) )
+ROM_END
+
+ROM_START( meltyba )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0039a", 0, SHA1(e6aa3d65b43a20606e6754bcb8665438770a1f8c) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C622A (317-5104-JPN)
+	//(sticker 253-5509-5104J)
+	ROM_LOAD("gdl-0039.data", 0x00, 0x50, CRC(4d6e2c77) SHA1(3bed734c291140d0a61afa40f221395369a251a9) )
+ROM_END
 
 
 ROM_START( trgheart )
@@ -3084,7 +3435,66 @@ ROM_START( jingystm )
 	ROM_LOAD("317-5122-jpn.data", 0x00, 0x50, CRC(0b85b7e4) SHA1(f4e419682ddc4b98a330e5ae543f9276c9bde030) )
 ROM_END
 
+ROM_START( karous )
+	NAOMIGD_BIOS
 
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0040", 0, SHA1(a62c8d4b6c5be44a4aeeea1a1a94f3d0fe542593) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_LOAD("gdl-0040.data", 0x00, 0x50, CRC(9d37b5e3) SHA1(e1d3cdc2ed82c864c9ff54d9399a80b70ba150c5) )
+ROM_END
+
+
+ROM_START( takoron )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0042", 0, SHA1(984a4fa012d83dd8c748304958c847c9867f4125) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_LOAD("gdl-0042.data", 0x00, 0x50, CRC(e1a6dbe4) SHA1(61b458937acca55e4010f86b684aaa86b8c10eac) )
+ROM_END
+
+/* -------------------------------- 1st party -------------- */
+
+
+/*
+Title   CONFIDENTIAL MISSION
+Media ID    FFCA
+Media Config    GD-ROM1/1
+Regions J
+Peripheral String   0000000
+Product Number  GDS-0001
+Version V1.050
+Release Date    20001011
+Manufacturer ID SEGA ENTERPRISES
+TOC DISC
+Track   Start Sector    End Sector  Track Size
+track01.bin 150 3788    8558928
+track02.raw 3939    6071    5016816
+track03.bin 45150   549299  1185760800
+
+
+PIC
+317-0298-COM
+*/
+
+ROM_START( confmiss )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0001", 0, SHA1(bd05f197ba8643577883dd25d9d5a74c91b27ca9) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_LOAD("317-0298-com.data", 0x00, 0x50, CRC(c989b336) SHA1(40075500888626cc2261133eec496b3e753631e5) )
+ROM_END
 
 
 ROM_START( sprtjam )
@@ -3131,6 +3541,40 @@ ROM_START( spkrbtl )
 	ROM_LOAD("317-0303-com.data", 0x00, 0x50, CRC(6e7888a3) SHA1(5ca78052bcfd9e9f81934cbddd9c173e88973e0e) )
 ROM_END
 
+/*
+Title   MONKEY_BALL
+Media ID    43EB
+Media Config    GD-ROM1/1
+Regions J
+Peripheral String   0000000
+Product Number  GDS-0008
+Version V1.008
+Release Date    20010425
+Manufacturer ID
+Track   Start Sector    End Sector  Track Size
+track01.bin 150 449 705600
+track02.raw 600 2732    5016816
+track03.bin 45150   549299  1185760800
+
+
+PIC
+
+253-5508-0307
+317-0307-COM
+*/
+
+ROM_START( monkeyba )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0008", 0, SHA1(2fadcd141bdbde77b2b335b270959a516af44d99) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_LOAD("317-0307-com.data", 0x00, 0x50, CRC(448bedc7) SHA1(092dbe5e28890d3ee40d62ca8cbf225c3ce90304) )
+ROM_END
+
 
 ROM_START( dygolf )
 	NAOMIGD_BIOS
@@ -3174,6 +3618,17 @@ ROM_START( vtennisg )
 	ROM_LOAD("317-0312-com.data", 0x00, 0x50, CRC(6b24f78f) SHA1(43f89815ec46cf014d941b4b9238da044b338b4c) )
 ROM_END
 
+ROM_START( keyboard )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0017", 0, SHA1(fb86eff3ef38de7fd78cfde897d5332d2092c172) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_LOAD("gds-0017.data", 0x00, 0x50, CRC(c1277eb3) SHA1(529ed5a133550e2854f8656cd377706060a7befa) )
+ROM_END
 
 ROM_START( vathlete )
 	NAOMIGD_BIOS
@@ -3225,38 +3680,16 @@ ROM_START( vtennis2 )
 	ROM_LOAD("317-0318-exp.data", 0x00, 0x50, CRC(7758ade6) SHA1(c62f35810bce466bfb0f55fd555066efd53e9bb6) )
 ROM_END
 
-/*
-Title   MONKEY_BALL
-Media ID    43EB
-Media Config    GD-ROM1/1
-Regions J
-Peripheral String   0000000
-Product Number  GDS-0008
-Version V1.008
-Release Date    20010425
-Manufacturer ID
-Track   Start Sector    End Sector  Track Size
-track01.bin 150 449 705600
-track02.raw 600 2732    5016816
-track03.bin 45150   549299  1185760800
-
-
-PIC
-
-253-5508-0307
-317-0307-COM
-*/
-
-ROM_START( monkeyba )
+ROM_START( lupinsho )
 	NAOMIGD_BIOS
 
 	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gds-0008", 0, SHA1(2fadcd141bdbde77b2b335b270959a516af44d99) )
+	DISK_IMAGE_READONLY( "gds-0018", 0, SHA1(0633a99a666f363ab30450a76b9753685d6b1f57) )
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
-	ROM_LOAD("317-0307-com.data", 0x00, 0x50, CRC(448bedc7) SHA1(092dbe5e28890d3ee40d62ca8cbf225c3ce90304) )
+	ROM_LOAD("317-0332-j.data", 0x00, 0x50, CRC(31f2b632) SHA1(bbf253bfe831308a7e7fde3a4a28e5bcd2fbb273) )
 ROM_END
 
 ROM_START( luptype )
@@ -3307,49 +3740,32 @@ ROM_START( mok )
 	ROM_LOAD("317-0333-com.data", 0x00, 0x50, CRC(0c07970f) SHA1(8882dd2f8ed522790ea78eed80cfa9442f88f67b) )
 ROM_END
 
-ROM_START( lupinsho )
+ROM_START( ngdup23a )
 	NAOMIGD_BIOS
 
 	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gds-0018", 0, SHA1(0633a99a666f363ab30450a76b9753685d6b1f57) )
+	DISK_IMAGE_READONLY( "gds-0023a", 0, SHA1(cd9d808b59eb8f40673ec4353d476f2b9c7f783c) )
 
-	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
-	ROM_LOAD("317-0332-j.data", 0x00, 0x50, CRC(31f2b632) SHA1(bbf253bfe831308a7e7fde3a4a28e5bcd2fbb273) )
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE) // uses the vf4 pic
+	//PIC16C622A (317-0314-COM)
+	//(sticker 253-5508-0314)
+	ROM_LOAD("317-0314-com.data", 0x00, 0x50, CRC(91a97eb4) SHA1(059342368bc5d25b494ed3c729870695f9584fc7) )
 ROM_END
 
-/*
-Title   CONFIDENTIAL MISSION
-Media ID    FFCA
-Media Config    GD-ROM1/1
-Regions J
-Peripheral String   0000000
-Product Number  GDS-0001
-Version V1.050
-Release Date    20001011
-Manufacturer ID SEGA ENTERPRISES
-TOC DISC
-Track   Start Sector    End Sector  Track Size
-track01.bin 150 3788    8558928
-track02.raw 3939    6071    5016816
-track03.bin 45150   549299  1185760800
-
-
-PIC
-317-0298-COM
-*/
-
-ROM_START( confmiss )
+ROM_START( ngdup23c )
 	NAOMIGD_BIOS
 
 	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gds-0001", 0, SHA1(bd05f197ba8643577883dd25d9d5a74c91b27ca9) )
+	DISK_IMAGE_READONLY( "gds-0023c", 0, SHA1(1fcb5530748886f4c4f45487d047859182ff7496))
 
-	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
-	ROM_LOAD("317-0298-com.data", 0x00, 0x50, CRC(c989b336) SHA1(40075500888626cc2261133eec496b3e753631e5) )
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE) // uses the vf4 evolution pic
+	//PIC16C622A (317-0338-JPN)
+	//(sticker 253-5508-0338J)
+	ROM_LOAD("317-0338-jpn.data", 0x00, 0x50, CRC(eeb2c9e9) SHA1(d30b5914c603219daea9923e1cf8da2be6096742) )
 ROM_END
 
 ROM_START( puyofev )
@@ -3430,48 +3846,63 @@ static DRIVER_INIT( ggxxrl )
 
 
 /* Naomi GD-Rom Sets */
-GAME( 2001, naomigd,   0,        naomi,    naomi, naomigd,       ROT0, "Sega",            "Naomi GD-ROM Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
+GAME( 2001, naomigd,   0,        naomi,    naomi, naomigd,       ROT0, "Sega",           "Naomi GD-ROM Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
 
 // GDL-xxxx (licensed games?)
-GAME( 2001, gundmgd,   naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Capcom",       "Mobile Suit Gundam: Federation VS Zeon (GDL-0001)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2001, sfz3ugd,   naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Capcom",       "Street Fighter Zero 3 Upper (GDL-0002)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2001, cvsgd,     naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Capcom",       "Capcom vs SNK Millenium Fight 2000 Pro (GDL-0004)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2001, gundmxgd,  naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Capcom",       "Mobile Suit Gundam: Federation VS Zeon DX  (GDL-0006)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2001, cvs2gd,    naomigd,  naomigd,  naomi, naomigd,	 ROT0,   "Capcom",       "Capcom vs SNK 2 Millionaire Fighting 2001 (GDL-0007A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2001, ikaruga,   naomigd,  naomigd,  naomi, naomigd,   ROT270, "Treasure",     "Ikaruga (GDL-0010)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2002, ggxx,      naomigd,  naomigd,  naomi, ggxx,      ROT0,   "Arc System Works",       "Guilty Gear XX (GDL-0011)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2002, chocomk,   naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Ecole Software Corporation", "Musapey's Choco Marker (GDL-0014A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2002, quizqgd,   naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Amedio",       "Quiz Keitai Q mode (GDL-0017)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2003, ggxxrl,    naomigd,  naomigd,  naomi, ggxxrl,    ROT0,   "Arc System Works",       "Guilty Gear XX #Reload (GDL-0019A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2003, shikgam2,  naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Alpha System", "Shikigami No Shiro II / The Castle of Shikigami II (GDL-0021)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2004, bdrdown,   naomigd,  naomigd,  naomi, naomigd,   ROT0,   "G-Rev",        "Border Down (GDL-0023A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2003, psyvar2,   naomigd,  naomigd,  naomi, naomigd,   ROT0,   "G-Rev",        "Psyvariar 2 - The Will To Fabricate (GDL-0024)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2004, trizeal,   naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Taito",        "Trizeal (GDL-0026)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2004, meltybld,  naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Ecole",        "Melty Blood Act Cadenza (GDL-0028C)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2005, senko,     naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Grev",         "Senko No Ronde (Rev. A)(GDL-0030A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2005, senkoo,    senko,    naomigd,  naomi, naomigd,   ROT0,   "Grev",         "Senko No Ronde (GDL-0030)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2005, ss2005,    naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Starfish",     "Super Shanghai 2005 (GDL-0031A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2005, ggxxsla,   naomigd,  naomigd,  naomi, ggxxsla,   ROT0,   "Arc System Works",       "Guilty Gear XX Slash (GDL-0033A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2005, undefeat,  naomigd,  naomigd,  naomi, naomigd,   ROT0,   "GRev",         "Under Defeat (GDL-0035)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2005, trgheart,  naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Warashi",      "Trigger Heart Exelica (GDL-0036A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2005, jingystm,  naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Yuki Enterprise",      "Jingi Storm - The Arcade (GDL-0037)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, gundmgd,   naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Capcom",           "Mobile Suit Gundam: Federation VS Zeon (GDL-0001)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, sfz3ugd,   naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Capcom",           "Street Fighter Zero 3 Upper (GDL-0002)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, cvsgd,     naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Capcom",           "Capcom vs SNK Millenium Fight 2000 Pro (GDL-0004)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, gundmxgd,  naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Capcom",           "Mobile Suit Gundam: Federation VS Zeon DX  (GDL-0006)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, cvs2gd,    naomigd,  naomigd,  naomi, naomigd,	 ROT0,   "Capcom",           "Capcom vs SNK 2 Millionaire Fighting 2001 (Rev A) (GDL-0007A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, ikaruga,   naomigd,  naomigd,  naomi, naomigd,   ROT270, "Treasure",         "Ikaruga (GDL-0010)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2002, ggxx,      naomigd,  naomigd,  naomi, ggxx,      ROT0,   "Arc System Works", "Guilty Gear XX (GDL-0011)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2002, moeru,     naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Altron",   		 "Moeru Casinyo (GDL-0013)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2002, chocomk,   naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Ecole Software",   "Musapey's Choco Marker (Rev A) (GDL-0014A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2002, quizqgd,   naomigd,  naomigd,  naomi, naomigd,   ROT270, "Amedio",           "Quiz Keitai Q mode (GDL-0017)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2003, ggxxrl,    naomigd,  naomigd,  naomi, ggxxrl,    ROT0,   "Arc System Works", "Guilty Gear XX #Reload (Rev A) (GDL-0019A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, tetkiwam,  naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Success",          "Tetris Kiwamemichi (GDL-0020)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2003, shikgam2,  naomigd,  naomigd,  naomi, naomigd,   ROT270, "Alpha System",     "Shikigami No Shiro II / The Castle of Shikigami II (GDL-0021)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2003, usagui,    naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Warashi",          "Usagui - Yamashiro Mahjong Hen (GDL-0022)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2004, bdrdown,   naomigd,  naomigd,  naomi, naomigd,   ROT0,   "G-Rev",            "Border Down (Rev A) (GDL-0023A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2003, psyvar2,   naomigd,  naomigd,  naomi, naomigd,   ROT270, "G-Rev",            "Psyvariar 2 - The Will To Fabricate (GDL-0024)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2004, cfield,    naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Able",             "Chaos Field (GDL-0025)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2004, trizeal,   naomigd,  naomigd,  naomi, naomigd,   ROT270, "Taito",            "Trizeal (GDL-0026)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, meltybld,  naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Ecole Software",   "Melty Blood Act Cadenza (Rev C) (GDL-0028C)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, senko,     naomigd,  naomigd,  naomi, naomigd,   ROT0,   "G-Rev",            "Senko No Ronde NEW ver. (Rev A) (GDL-0030A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, senkoo,    senko,    naomigd,  naomi, naomigd,   ROT0,   "G-Rev",            "Senko No Ronde (GDL-0030)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, ss2005,    naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Starfish",         "Super Shanghai 2005 (Rev A) (GDL-0031A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, radirgy,   naomigd,  naomigd,  naomi, naomigd,   ROT270, "Milestone",        "Radirgy (GDL-0032)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, ggxxsla,   naomigd,  naomigd,  naomi, ggxxsla,   ROT0,   "Arc System Works", "Guilty Gear XX Slash (Rev A) (GDL-0033A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2006, kurucham,  naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Able",             "Kurukuru Chameleon (GDL-0034)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, undefeat,  naomigd,  naomigd,  naomi, naomigd,   ROT270, "G-Rev",            "Under Defeat (GDL-0035)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, trgheart,  naomigd,  naomigd,  naomi, naomigd,   ROT270, "Warashi",          "Trigger Heart Exelica (Rev A) (GDL-0036A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, jingystm,  naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Atrativa Japan",   "Jingi Storm - The Arcade (GDL-0037)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2006, meltyb,    naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Ecole Software",   "Melty Blood Act Cadenza Ver B (GDL-0039)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2006, meltyba,   meltyb,   naomigd,  naomi, naomigd,   ROT0,   "Ecole Software",   "Melty Blood Act Cadenza Ver B (Rev A) (GDL-0039A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2006, karous,    naomigd,  naomigd,  naomi, naomigd,   ROT270, "Milestone",        "Karous (GDL-0040)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2006, takoron,   naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Compile",          "Noukone Puzzle Takoron (GDL-0042)", GAME_NO_SOUND|GAME_NOT_WORKING )
+
+
 
 
 
 // GDS-xxxx (first party games?)
+GAME( 2001, confmiss,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Confidential Mission (GDS-0001)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2000, sprtjam,   naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Sports Jam (GDS-0003)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2000, slashout,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Slashout (GDS-0004)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2001, spkrbtl,   naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Spikers Battle (GDS-0005)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, monkeyba,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Monkey Ball (GDS-0008)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2001, dygolf,    naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Virtua Golf / Dynamic Golf (GDS-0009)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2001, wsbbgd,    naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "World Series Baseball / Super Major League (GDS-0010)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2001, vtennisg,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Virtua Tennis (GDS-0011)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2002, vathlete,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Virtua Athletics / Virtua Athlete (GDS-0019)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2001, vtennis2,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Virtua Tennis 2 (GDS-0015a)", GAME_NO_SOUND|GAME_NOT_WORKING ) // bad key
-GAME( 2001, monkeyba,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Monkey Ball (GDS-0008)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2002, luptype,   naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Lupin The Third - The Typing (GDS-0021A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2002, mok,       naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "The Maze of the Kings (GDS-0022)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, vtennis2,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Virtua Tennis 2 (Rev A) (GDS-0015A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, keyboard,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "La Keyboardxyu (GDS-0017)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2001, lupinsho,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Lupin The Third - The Shooting (GDS-0018)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2001, confmiss,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Confidential Mission (GDS-0001)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2002, luptype,   naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Lupin The Third - The Typing (Rev A) (GDS-0021A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2002, mok,       naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "The Maze of the Kings (GDS-0022)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, ngdup23a,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Naomi DIMM Firmware Updater (GDL-0023A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, ngdup23c,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Naomi DIMM Firmware Updater (GDL-0023C)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2003, puyofev,   naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Puyo Puyo Fever (GDS-0031)", GAME_NO_SOUND|GAME_NOT_WORKING )
 
 /* Naomi 2 & Naomi 2 GD-ROM */
@@ -3480,31 +3911,29 @@ ROM_START( vstrik3c )
 
 	NAOMI2_BIOS
 
-	ROM_REGION( 0x400000, "user1", 0)
+	ROM_REGION( 0xb000000, "user1", 0)
 	ROM_LOAD("epr23663.22", 0x0000000, 0x0400000, CRC(7007fec7) SHA1(523168f0b218d0bd5c815d65bf0caba2c8468c9d) )
-
-	ROM_REGION( 0xa800000, "user2", 0)
-	ROM_LOAD("ic1", 0x0000000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic2", 0x0800000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic3", 0x1000000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic4", 0x1800000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic5", 0x2000000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic6", 0x2800000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic7", 0x3000000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic8", 0x3800000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic9", 0x4000000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic10",0x4800000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic11",0x5000000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic12",0x5800000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic13",0x6000000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic14",0x6800000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic15",0x7000000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic16",0x7800000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic17",0x8000000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic18",0x8800000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic19",0x9000000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic20",0x9800000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic21",0xa000000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic.1", 0x0800000, 0x0800000, CRC(db8bf632) SHA1(cd0c5c385dc33778eb6477f48a33d31f8461b810) )
+	ROM_LOAD("ic.2", 0x1000000, 0x0800000, CRC(f5889f8b) SHA1(540aa6a9adf10d5426ac4962afdc300cc9c5c6ba) )
+	ROM_LOAD("ic.3", 0x1800000, 0x0800000, CRC(74e7ef35) SHA1(6b63910fa05f98b31689882d3f7f32ea84fb11e5) )
+	ROM_LOAD("ic.4", 0x2000000, 0x0800000, CRC(69e5eeb3) SHA1(1c615e6150e8c9f5211f7db55158c9b56b9b52fe) )
+	ROM_LOAD("ic.5", 0x2800000, 0x0800000, CRC(7ea41bdb) SHA1(1a58c4731f9cc570f79e81a3b87b590d52cf3887) )
+	ROM_LOAD("ic.6", 0x3000000, 0x0800000, CRC(cf730ca3) SHA1(f8e132463d574be906f573ca66fbc8d74959be08) )
+	ROM_LOAD("ic.7", 0x3800000, 0x0800000, CRC(b8d838fe) SHA1(6722f54a170302978e06305773903a336c6fc9d8) )
+	ROM_LOAD("ic.8", 0x4000000, 0x0800000, CRC(03aacb8b) SHA1(7ab12a3c79718fea8b7ae019acafb86bb7381c7e) )
+	ROM_LOAD("ic.9", 0x4800000, 0x0800000, CRC(3252196e) SHA1(2e45de03931554e6500fbb83a0d2b1249f2d3015) )
+	ROM_LOAD("ic.10",0x5000000, 0x0800000, CRC(b448948b) SHA1(1df5bbd14b24a952bb5289778ceea15ffe161491) )
+	ROM_LOAD("ic.11",0x5800000, 0x0800000, CRC(937a3280) SHA1(46c6277402c029a55aa0e2417ea14634d17e2601) )
+	ROM_LOAD("ic.12",0x6000000, 0x0800000, CRC(e3ca01df) SHA1(1c96e596d5ad6e08fcc7625788952d5ca5c80ce5) )
+	ROM_LOAD("ic.13",0x6800000, 0x0800000, CRC(9bbbbbdc) SHA1(19d124743b686e4d5d38181cee547452402cdf61) )
+	ROM_LOAD("ic.14",0x7000000, 0x0800000, CRC(eed0270a) SHA1(2b75a2d5bda05e68bb7d81570a7f4e180085fbd5) )
+	ROM_LOAD("ic.15",0x7800000, 0x0800000, CRC(02bee590) SHA1(77ce37209f525be58d9373b5467b6be9f0e7fb4b) )
+	ROM_LOAD("ic.16",0x8000000, 0x0800000, CRC(025f4f2f) SHA1(b104dc936036464dcf17524fd5e639c9852e1bd1) )
+	ROM_LOAD("ic.17",0x8800000, 0x0800000, CRC(98fc3c54) SHA1(d2ba54b9bf15d2b3d623c5358bbf104b48d23223) )
+	ROM_LOAD("ic.18",0x9000000, 0x0800000, CRC(e9fe50a4) SHA1(053f2a33ab7310c518a66b49d83fc817f2db3ef0) )
+	ROM_LOAD("ic.19",0x9800000, 0x0800000, CRC(bbd0139c) SHA1(f87e729534d503f2bc37b7d595d25070ae33353c) )
+	ROM_LOAD("ic.20",0xa000000, 0x0800000, CRC(5a69ab9e) SHA1(205a8facded5dbee8653807ef4d4b5e4210f56ef) )
+	ROM_LOAD("ic.21",0xa800000, 0x0800000, CRC(d6ef7d68) SHA1(4ee396af6c5caf4c5af6e9ad0e03a7ac2c5039f4) )
 ROM_END
 
 
@@ -3536,6 +3965,35 @@ ROM_START( vf4 )
 	//(sticker 253-5508-0314)
 	ROM_LOAD("317-0314-com.data", 0x00, 0x50, CRC(91a97eb4) SHA1(059342368bc5d25b494ed3c729870695f9584fc7) )
 ROM_END
+
+ROM_START( vf4b )
+	NAOMI2_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0012b", 0, SHA1(9b8e05c3d28a09323b13c198dfcc2b771bba67cd) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C622A (317-0314-COM)
+	//(sticker 253-5508-0314)
+	ROM_LOAD("317-0314-com.data", 0x00, 0x50, CRC(91a97eb4) SHA1(059342368bc5d25b494ed3c729870695f9584fc7) )
+ROM_END
+
+ROM_START( vf4c )
+	NAOMI2_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0012c", 0, SHA1(0ec149d7edfb326777cdc45a2ac8ad578a32aba1) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C622A (317-0314-COM)
+	//(sticker 253-5508-0314)
+	ROM_LOAD("317-0314-com.data", 0x00, 0x50, CRC(91a97eb4) SHA1(059342368bc5d25b494ed3c729870695f9584fc7) )
+ROM_END
+
 
 ROM_START( vf4evo )
 	NAOMI2_BIOS
@@ -3652,12 +4110,14 @@ GAME( 2001, vstrik3c, naomi2,  naomi,    naomi,    0,  ROT0, "Sega",          "V
 // GDS-xxxx (first party games?)
 GAME( 2001, vstrik3, naomi2,  naomigd,    naomi,    0,  ROT0, "Sega",          "Virtua Striker 3 (GDS-0006)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2001, vf4,     naomi2,  naomigd,    naomi,    0,  ROT0, "Sega",          "Virtua Fighter 4 (GDS-0012)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2002, initd,   naomi2,  naomigd,    naomi,    0,  ROT0, "Sega",          "Initial D Arcade Stage (Japan) (GDS-0020b)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, vf4b,    vf4,     naomigd,    naomi,    0,  ROT0, "Sega",          "Virtua Fighter 4 (Rev B) (GDS-0012B)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, vf4c,    vf4,     naomigd,    naomi,    0,  ROT0, "Sega",          "Virtua Fighter 4 (Rev C) (GDS-0012C)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2002, initd,   naomi2,  naomigd,    naomi,    0,  ROT0, "Sega",          "Initial D Arcade Stage (Rev B) (Japan) (GDS-0020B)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2002, beachspi,naomi2,  naomigd,    naomi,    0,  ROT0, "Sega",          "Beach Spikers (GDS-0014)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2002, initdexp,naomi2,  naomigd,    naomi,    0,  ROT0, "Sega",          "Initial D Arcade Stage (Export) (GDS-0025)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2002, vf4evo,  naomi2,  naomigd,    naomi,    0,  ROT0, "Sega",          "Virtua Fighter 4 Evolution (GDS-0024B)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2002, vf4evo,  naomi2,  naomigd,    naomi,    0,  ROT0, "Sega",          "Virtua Fighter 4 Evolution (Rev B) (GDS-0024B)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2002, initdv2j,naomi2,  naomigd,    naomi,    0,  ROT0, "Sega",          "Initial D : Arcade Stage Ver. 2 (Japan) (GDS-0026)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2004, vf4tuned,naomi2,  naomigd,    naomi,    0,  ROT0, "Sega",          "Virtua Fighter 4 Final Tuned (GDS-0036F)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2004, vf4tuned,naomi2,  naomigd,    naomi,    0,  ROT0, "Sega",          "Virtua Fighter 4 Final Tuned (Rev F) (GDS-0036F)", GAME_NO_SOUND|GAME_NOT_WORKING )
 
 
 /* Atomiswave */
@@ -3749,9 +4209,26 @@ ROM_START( vs2002ex )
 	ROM_LOAD("317-0337-exp.data", 0x00, 0x50, CRC(aa6be604) SHA1(fabc43ecfb7ddf1d5a87f10884852027d6f4773b) )
 ROM_END
 
+
+ROM_START( gekpurya )
+	TRIFORCE_BIOS
+	//NAOMIGD_BIOS
+
+	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdt-0008c", 0, SHA1(2c1bdb8324efc216edd771fe45c680ac726111a0) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_LOAD("gdt-0008c.data", 0x00, 0x50, CRC(08434e5e) SHA1(2121999e851f6f62ab845e6de40849d850ac9d1c) )
+ROM_END
+
+
+
 GAME( 200?, triforce, 0,        naomigd,    naomi,    0, ROT0, "Sega",           "Triforce Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
-GAME( 200?, vs4,      triforce, naomigd,    naomi,    0, ROT0, "Sega",           "Virtua Striker 4 (GDT-0015)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2002, vs2002ex, triforce, naomigd,    naomi,    0, ROT0, "Sega",           "Virtua Striker 2002 (GDT-0002)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2003, gekpurya, triforce, naomigd,    naomi,    0, ROT0, "Sega",           "Gekitou Pro Yakyuu Mizushima Shinji All Stars vs. Pro Yakyuu (Rev C) (GDT-0008C)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, vs4,      triforce, naomigd,    naomi,    0, ROT0, "Sega",           "Virtua Striker 4 (GDT-0015)", GAME_NO_SOUND|GAME_NOT_WORKING )
 
 
 /*********************************************************************************************************************
@@ -3837,8 +4314,22 @@ ROM_START( vcop3 )
 	ROM_LOAD("317-0354-com.data", 0x00, 0x50,  CRC(df7e3217) SHA1(9f0f4bf6b15f3b6eeea81eaa27b3d25bd94110da) )
 ROM_END
 
+ROM_START( wangmid )
+	CHIHIRO_BIOS
+
+	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdx-0009b", 0, SHA1(e032b9fd8d5d09255592f02f7531a608e8179c9c) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_LOAD("gdx-0009b.data", 0x00, 0x50, CRC(3af801f3) SHA1(e9a2558930f3f1f55d5b3c2cadad69329d931f26) )
+ROM_END
+
 
 GAME( 200?, chihiro,  0,       naomigd,    naomi,    0, ROT0, "Sega",           "Chihiro Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
-GAME( 2005, ghostsqu, chihiro, naomigd,    naomi,    0, ROT0, "Sega",           "Ghost Squad (Ver. A?) (GDX-0012a)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2003, vcop3,    chihiro, naomigd,    naomi,    0, ROT0, "Sega",           "Virtua Cop 3 (GDX-0003a)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, wangmid,  chihiro, naomigd,    naomi,    0, ROT0, "Sega",           "Wangan Midnight Maximum Tune (Ver. B) (Export) (GDX-0009B)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, ghostsqu, chihiro, naomigd,    naomi,    0, ROT0, "Sega",           "Ghost Squad (Ver. A?) (GDX-0012A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2003, vcop3,    chihiro, naomigd,    naomi,    0, ROT0, "Sega",           "Virtua Cop 3 (GDX-0003A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+
 

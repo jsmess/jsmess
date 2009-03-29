@@ -11,6 +11,9 @@
 
   Games using ADSR: gyruss
 
+  A list with more games using ADSR can be found here:
+        http://mametesters.org/mantis/view.php?id=3043
+
   TODO:
   * The AY8930 has an extended mode which is currently
     not emulated.

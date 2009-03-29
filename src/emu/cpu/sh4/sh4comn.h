@@ -37,6 +37,7 @@
 #define FP_XFS2(r) *( (float  *)(sh4->xf+((r) ^ sh4->fpu_pr)) )
 #endif
 
+
 typedef struct
 {
 	UINT32	ppc;
@@ -68,6 +69,8 @@ typedef struct
 	UINT32	*m;
 	INT8	nmi_line_state;
 
+	UINT8 sleep_mode;
+
 	int		frt_input;
 	int		irln;
 	int 	internal_irq_level;
@@ -88,6 +91,13 @@ typedef struct
 	int		ioport4_pullup, ioport4_direction;
 
 	void	(*ftcsr_read_callback)(UINT32 data);
+
+
+	/* This MMU simulation is good for the simple remap used on Naomi GD-ROM SQ access *ONLY* */
+	UINT32 sh4_tlb_address[64];
+	UINT32 sh4_tlb_data[64];
+	UINT8 sh4_mmu_enabled;
+
 } SH4;
 
 enum
