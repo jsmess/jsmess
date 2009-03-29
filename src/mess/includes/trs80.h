@@ -23,11 +23,6 @@ DEVICE_IMAGE_LOAD( trs80_floppy );
 QUICKLOAD_LOAD( trs80_cmd );
 
 MACHINE_RESET( trs80 );
-DRIVER_INIT( trs80 );
-DRIVER_INIT( radionic );
-DRIVER_INIT( lnw80 );
-DRIVER_INIT( ht1080z );
-DRIVER_INIT( ht108064 );
 
 WRITE8_HANDLER ( trs80_ff_w );
 WRITE8_HANDLER ( lnw80_fe_w );
@@ -76,6 +71,10 @@ READ8_HANDLER( trs80_keyboard_r );
 /*----------- defined in video/trs80.c -----------*/
 
 VIDEO_UPDATE( trs80 );
+VIDEO_UPDATE( model1 );
+VIDEO_UPDATE( ht1080z );
+VIDEO_UPDATE( lnw80 );
+VIDEO_UPDATE( radionic );
 
 READ8_HANDLER( trs80_videoram_r );
 WRITE8_HANDLER( trs80_videoram_w );

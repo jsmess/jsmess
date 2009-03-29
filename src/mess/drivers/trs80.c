@@ -116,7 +116,6 @@ Not emulated:
 
 /* Core includes */
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/wave.h"
 #include "machine/ctronics.h"
@@ -173,7 +172,7 @@ static ADDRESS_MAP_START( model1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x37ee, 0x37ee) AM_DEVREADWRITE("wd179x", wd17xx_sector_r, wd17xx_sector_w)
 	AM_RANGE(0x37ef, 0x37ef) AM_DEVREADWRITE("wd179x", wd17xx_data_r, wd17xx_data_w)
 	AM_RANGE(0x3800, 0x38ff) AM_MIRROR(0x300) AM_READ(trs80_keyboard_r)
-	AM_RANGE(0x3c00, 0x3fff) AM_READWRITE(trs80_videoram_r, trs80_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x3c00, 0x3fff) AM_READWRITE(trs80_videoram_r, trs80_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x4000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -194,7 +193,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( model3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x37ff) AM_ROM
 	AM_RANGE(0x3800, 0x38ff) AM_MIRROR(0x300) AM_READ(trs80_keyboard_r)
-	AM_RANGE(0x3c00, 0x3fff) AM_READWRITE(trs80_videoram_r, trs80_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x3c00, 0x3fff) AM_READWRITE(trs80_videoram_r, trs80_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x4000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -394,42 +393,6 @@ INPUT_PORTS_START( trs80m3 )
 	PORT_DIPSETTING(    0x60, "8")
 INPUT_PORTS_END
 
-static const gfx_layout trs80_charlayout =
-{
-	FW,FH,			/* 6 x 12 characters */
-	256,			/* 256 characters */
-	1,				/* 1 bits per pixel */
-	{ 0 },			/* no bitplanes; 1 bit per pixel */
-	/* x offsets */
-	{ 0, 1, 2, 3, 4, 5 },
-	/* y offsets */
-	{  0*8, 1*8, 2*8, 3*8, 4*8, 5*8,
-	   6*8, 7*8, 8*8, 9*8,10*8,11*8 },
-	8*FH		   /* every char takes FH bytes */
-};
-
-static GFXDECODE_START( trs80 )
-	GFXDECODE_ENTRY( "gfx1", 0, trs80_charlayout, 0, 1 )
-GFXDECODE_END
-
-static const gfx_layout ht1080z_charlayout =
-{
-	6,12,			/* 6 x 12 characters */
-	128,			/* 128 characters */
-	1,				/* 1 bits per pixel */
-	{ 0 },			/* no bitplanes; 1 bit per pixel */
-	/* x offsets */
-	{ 0, 1, 2, 3, 4, 5 },
-	/* y offsets */
-	{  0*8, 1*8, 2*8, 3*8, 4*8, 5*8,
-	   6*8, 7*8, 8*8, 9*8,10*8,11*8 },
-	8*16		   /* every char takes FH bytes */
-};
-
-static GFXDECODE_START( ht1080z )
-	GFXDECODE_ENTRY( "gfx1", 0, ht1080z_charlayout, 0, 1 )
-GFXDECODE_END
-
 
 static const cassette_config trs80l2_cassette_config =
 {
@@ -463,7 +426,6 @@ static MACHINE_DRIVER_START( trs80 )		// the original model I, level I, with no 
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*FW, 16*FH)
 	MDRV_SCREEN_VISIBLE_AREA(0*FW,64*FW-1,0*FH,16*FH-1)
-	MDRV_GFXDECODE( trs80 )
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(black_and_white)
 
@@ -511,7 +473,17 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ht1080z )
 	MDRV_IMPORT_FROM( sys80 )
-	MDRV_GFXDECODE( ht1080z )
+	MDRV_VIDEO_UPDATE( ht1080z )
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( lnw80 )
+	MDRV_IMPORT_FROM( model1 )
+	MDRV_VIDEO_UPDATE( lnw80 )
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( radionic )
+	MDRV_IMPORT_FROM( model1 )
+	MDRV_VIDEO_UPDATE( radionic )
 MACHINE_DRIVER_END
 
 
@@ -525,8 +497,8 @@ ROM_START(trs80)
 	ROM_REGION(0x10000, "maincpu",0)
 	ROM_LOAD("level1.rom",  0x0000, 0x1000, CRC(70d06dff) SHA1(20d75478fbf42214381e05b14f57072f3970f765))
 
-	ROM_REGION(0x00c00, "gfx1",0)
-	ROM_LOAD("trs80m1.chr", 0x0800, 0x0400, CRC(0033f2b9) SHA1(0d2cd4197d54e2e872b515bbfdaa98efe502eda7))
+	ROM_REGION(0x00400, "gfx1",0)
+	ROM_LOAD("trs80m1.chr", 0x0000, 0x0400, CRC(0033f2b9) SHA1(0d2cd4197d54e2e872b515bbfdaa98efe502eda7))
 ROM_END
 
 ROM_START(trs80l2)
@@ -540,8 +512,8 @@ ROM_START(trs80l2)
 	ROMX_LOAD("trs80alt.z34",0x1000, 0x1000, CRC(6c791c2d) SHA1(2a38e0a248f6619d38f1a108eea7b95761cf2aee), ROM_BIOS(2))
 	ROMX_LOAD("trs80alt.zl2",0x2000, 0x1000, CRC(55b3ad13) SHA1(6279f6a68f927ea8628458b278616736f0b3c339), ROM_BIOS(2))
 
-	ROM_REGION(0x00c00, "gfx1",0)
-	ROM_LOAD("trs80m1.chr", 0x0800, 0x0400, CRC(0033f2b9) SHA1(0d2cd4197d54e2e872b515bbfdaa98efe502eda7))
+	ROM_REGION(0x00400, "gfx1",0)
+	ROM_LOAD("trs80m1.chr", 0x0000, 0x0400, CRC(0033f2b9) SHA1(0d2cd4197d54e2e872b515bbfdaa98efe502eda7))
 ROM_END
 
 ROM_START(radionic)
@@ -551,21 +523,21 @@ ROM_START(radionic)
 	ROM_LOAD("ep3.bin",0x2000, 0x1000, CRC(306e5d66) SHA1(1e1abcfb5b02d4567cf6a81ffc35318723442369))
 	ROM_LOAD("ep4.bin",0x3000, 0x0400, CRC(70f90f26) SHA1(cbee70da04a3efac08e50b8e3a270262c2440120))
 	ROM_CONTINUE(0x3000, 0x400)
-	ROM_CONTINUE(0x3000, 0x7e0)
-	ROM_IGNORE(0x20)
+	ROM_CONTINUE(0x3000, 0x600)
+	ROM_IGNORE(0x200)
 
-	ROM_REGION(0x01800, "gfx1",0)
-	ROM_LOAD("trschar.bin", 0x0800, 0x1000, CRC(02e767b6) SHA1(c431fcc6bd04ce2800ca8c36f6f8aeb2f91ce9f7))
+	ROM_REGION(0x01000, "gfx1",0)
+	ROM_LOAD("trschar.bin", 0x0000, 0x1000, CRC(02e767b6) SHA1(c431fcc6bd04ce2800ca8c36f6f8aeb2f91ce9f7))
 ROM_END
 
 ROM_START(sys80)
 	ROM_REGION(0x10000, "maincpu",0)
-	ROM_LOAD("sys80rom.1",  0x0000, 0x1000, CRC(8f5214de) SHA1(d8c052be5a2d0ec74433043684791d0554bf203b))
-	ROM_LOAD("sys80rom.2",  0x1000, 0x1000, CRC(46e88fbf) SHA1(a3ca32757f269e09316e1e91ba1502774e2f5155))
+	ROM_LOAD("sys80rom.1", 0x0000, 0x1000, CRC(8f5214de) SHA1(d8c052be5a2d0ec74433043684791d0554bf203b))
+	ROM_LOAD("sys80rom.2", 0x1000, 0x1000, CRC(46e88fbf) SHA1(a3ca32757f269e09316e1e91ba1502774e2f5155))
 	ROM_LOAD("trs80.zl2",  0x2000, 0x1000, CRC(306e5d66) SHA1(1e1abcfb5b02d4567cf6a81ffc35318723442369))
 
-	ROM_REGION(0x00c00, "gfx1",0)
-	ROM_LOAD("trs80m1.chr", 0x0800, 0x0400, CRC(0033f2b9) SHA1(0d2cd4197d54e2e872b515bbfdaa98efe502eda7))
+	ROM_REGION(0x00400, "gfx1",0)
+	ROM_LOAD("trs80m1.chr", 0x0000, 0x0400, CRC(0033f2b9) SHA1(0d2cd4197d54e2e872b515bbfdaa98efe502eda7))
 ROM_END
 
 ROM_START(lnw80)
@@ -577,31 +549,31 @@ ROM_START(lnw80)
 	ROM_LOAD("lnw_c.bin",  0x2000, 0x0800, CRC(2ba025d7) SHA1(232efbe23c3f5c2c6655466ebc0a51cf3697be9b))
 	ROM_LOAD("lnw_c1.bin", 0x2800, 0x0800, CRC(ed547445) SHA1(20102de89a3ee4a65366bc2d62be94da984a156b))
 
-	ROM_REGION(0x01000, "gfx1",0)
-	ROM_LOAD("lnw_chr.bin",0x0800, 0x0400, CRC(c89b27df) SHA1(be2a009a07e4378d070002a558705e9a0de59389))
-	ROM_IGNORE( 0x400 )		/* leave out unused ff's */
+	ROM_REGION(0x00800, "gfx1",0)
+	ROM_LOAD("lnw_chr.bin",0x0000, 0x0800, CRC(c89b27df) SHA1(be2a009a07e4378d070002a558705e9a0de59389))
 ROM_END
 
 ROM_START(trs80m3)
 	ROM_REGION(0x10000, "maincpu",0)
 	ROM_LOAD("trs80m3.rom", 0x0000, 0x3800, CRC(bddbf843) SHA1(04a1f062cf73c3931c038434e3f299482b6bf613))
 
-	ROM_REGION(0x00c00, "gfx1",0)
-	ROM_LOAD("trs80m1.chr", 0x0800, 0x0400, CRC(0033f2b9) SHA1(0d2cd4197d54e2e872b515bbfdaa98efe502eda7))
+	ROM_REGION(0x00400, "gfx1",0)	/* incorrect rom */
+	ROM_LOAD("trs80m1.chr", 0x0000, 0x0400, CRC(0033f2b9) SHA1(0d2cd4197d54e2e872b515bbfdaa98efe502eda7))
 ROM_END
 
 ROM_START(trs80m4)
 	ROM_REGION(0x10000, "maincpu",0)
 	ROM_LOAD("trs80m4.rom", 0x0000, 0x3800, CRC(1a92d54d) SHA1(752555fdd0ff23abc9f35c6e03d9d9b4c0e9677b))
 
-	ROM_REGION(0x00c00, "gfx1",0)
+	ROM_REGION(0x00400, "gfx1",0)
 	/* this rom unlikely to be the correct one, but it will do for now */
-	ROM_LOAD("trs80m1.chr", 0x0800, 0x0400, CRC(0033f2b9) SHA1(0d2cd4197d54e2e872b515bbfdaa98efe502eda7))
+	ROM_LOAD("trs80m1.chr", 0x0000, 0x0400, CRC(0033f2b9) SHA1(0d2cd4197d54e2e872b515bbfdaa98efe502eda7))
 ROM_END
 
 ROM_START(ht1080z)
 	ROM_REGION(0x10000, "maincpu",0)
 	ROM_LOAD("ht1080z.rom", 0x0000, 0x3000, CRC(2bfef8f7) SHA1(7a350925fd05c20a3c95118c1ae56040c621be8f))
+
 	ROM_REGION(0x00800, "gfx1",0)
 	ROM_LOAD("ht1080-1.chr", 0x0000, 0x0800, CRC(e8c59d4f) SHA1(a15f30a543e53d3e30927a2e5b766fcf80f0ae31))
 ROM_END
@@ -609,6 +581,7 @@ ROM_END
 ROM_START(ht1080z2)
 	ROM_REGION(0x10000, "maincpu",0)
 	ROM_LOAD("ht1080z.rom", 0x0000, 0x3000, CRC(2bfef8f7) SHA1(7a350925fd05c20a3c95118c1ae56040c621be8f))
+
 	ROM_REGION(0x00800, "gfx1",0)
 	ROM_LOAD("ht1080-2.chr", 0x0000, 0x0800, CRC(6728f0ab) SHA1(1ba949f8596f1976546f99a3fdcd3beb7aded2c5))
 ROM_END
@@ -617,6 +590,7 @@ ROM_START(ht108064)
 	ROM_REGION(0x10000, "maincpu",0)
 	ROM_LOAD("ht1080z.64", 0x0000, 0x3000, CRC(48985a30) SHA1(e84cf3121f9e0bb9e1b01b095f7a9581dcfaaae4))
 	ROM_LOAD("ht1080z.ext", 0x3000, 0x0800, CRC(fc12bd28) SHA1(0da93a311f99ec7a1e77486afe800a937778e73b))
+
 	ROM_REGION(0x00800, "gfx1",0)
 	ROM_LOAD("ht1080-3.chr", 0x0000, 0x0800, CRC(e76b73a4) SHA1(6361ee9667bf59d50059d09b0baf8672fdb2e8af))
 ROM_END
@@ -646,13 +620,13 @@ SYSTEM_CONFIG_END
 
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE	  INPUT    INIT      CONFIG       COMPANY  FULLNAME */
-COMP( 1977, trs80,    0,	0,	trs80,    trs80,   trs80,    0,		"Tandy Radio Shack",  "TRS-80 Model I (Level I Basic)" , 0)
-COMP( 1978, trs80l2,  trs80,	0,	model1,   trs80,   trs80,    trs8012,	"Tandy Radio Shack",  "TRS-80 Model I (Level II Basic)" , 0)
-COMP( 1983, radionic, trs80,	0,	model1,   trs80,   radionic, trs8012,	"Komtek",  "Radionic" , 0)
-COMP( 1980, sys80,    trs80,	0,	sys80,    trs80,   trs80,    trs8012,	"EACA Computers Ltd.","System-80" , 0)
-COMP( 1981, lnw80,    trs80,	0,	model1,   trs80m3, lnw80,    trs8012,	"LNW Research","LNW-80", 0 )
-COMP( 1980, trs80m3,  trs80,	0,	model3,   trs80m3, trs80,    trs8012,	"Tandy Radio Shack",  "TRS-80 Model III", 0 )
-COMP( 1980, trs80m4,  trs80,	0,	model3,   trs80m3, trs80,    trs8012,	"Tandy Radio Shack",  "TRS-80 Model 4", 0 )
-COMP( 1983, ht1080z,  trs80,	0,	ht1080z,  trs80,   ht1080z,  trs8012,	"Hiradastechnika Szovetkezet",  "HT-1080Z Series I" , 0)
-COMP( 1984, ht1080z2, trs80,	0,	ht1080z,  trs80,   ht1080z,  trs8012,	"Hiradastechnika Szovetkezet",  "HT-1080Z Series II" , 0)
-COMP( 1985, ht108064, trs80,	0,	ht1080z,  trs80,   ht108064, trs8012,	"Hiradastechnika Szovetkezet",  "HT-1080Z/64" , 0)
+COMP( 1977, trs80,    0,	0,	trs80,    trs80,   0,        0,		"Tandy Radio Shack",  "TRS-80 Model I (Level I Basic)" , 0)
+COMP( 1978, trs80l2,  trs80,	0,	model1,   trs80,   0,        trs8012,	"Tandy Radio Shack",  "TRS-80 Model I (Level II Basic)" , 1<<24)
+COMP( 1983, radionic, trs80,	0,	radionic, trs80,   0,        trs8012,	"Komtek",  "Radionic" , 0)
+COMP( 1980, sys80,    trs80,	0,	sys80,    trs80,   0,        trs8012,	"EACA Computers Ltd.","System-80" , 1<<24)
+COMP( 1981, lnw80,    trs80,	0,	lnw80,    trs80m3, 0,        trs8012,	"LNW Research","LNW-80", 0 )
+COMP( 1980, trs80m3,  trs80,	0,	model3,   trs80m3, 0,        trs8012,	"Tandy Radio Shack",  "TRS-80 Model III", 0 )
+COMP( 1980, trs80m4,  trs80,	0,	model3,   trs80m3, 0,        trs8012,	"Tandy Radio Shack",  "TRS-80 Model 4", 0 )
+COMP( 1983, ht1080z,  trs80,	0,	ht1080z,  trs80,   0,        trs8012,	"Hiradastechnika Szovetkezet",  "HT-1080Z Series I" , 1<<24)
+COMP( 1984, ht1080z2, trs80,	0,	ht1080z,  trs80,   0,        trs8012,	"Hiradastechnika Szovetkezet",  "HT-1080Z Series II" , 1<<24)
+COMP( 1985, ht108064, trs80,	0,	ht1080z,  trs80,   0,        trs8012,	"Hiradastechnika Szovetkezet",  "HT-1080Z/64" , 0)

@@ -44,37 +44,263 @@ WRITE8_HANDLER( trs80m4_88_w )
 	}
 }
 
-/***************************************************************************
-  Statics for this module
-***************************************************************************/
-static int width_store = 10;  // bodgy value to force an initial resize
 
+/* 7 or 8-bit video, 32/64 characters per line = trs80, trs80l2, sys80 */
 VIDEO_UPDATE( trs80 )
 {
-	int width = 64 - ((trs80_mode & 1) << 5);
-	int skip = 3 - (width >> 5);
-	int i=0,x,y,chr;
-	int adj=input_port_read(screen->machine, "CONFIG")&0x40;
+	UINT8 y,ra,chr,gfx;
+	UINT16 sy=0,ma=0,x;
+	UINT8 *FNT = memory_region(screen->machine, "gfx1");
+	UINT8 seven_bit = screen->machine->gamedrv->flags >> 24;
+	static UINT8 size_store=0;
+	static UINT8 cols=64,skip=1;
+	UINT8 lores1,lores2;
 
-	if (width != width_store)
+	if ((trs80_mode & 0x7f) != size_store)
 	{
-		width_store = width;
-		video_screen_set_visarea(screen, 0, width*FW-1, 0, 16*FH-1);
+		size_store = trs80_mode & 0x7f;
+		cols = (trs80_mode & 1) ? 32 : 64;
+		skip = (trs80_mode & 1) ? 2 : 1;
+		video_screen_set_visarea(screen, 0, cols*FW-1, 0, 16*FH-1);
 	}
 
 	for (y = 0; y < 16; y++)
 	{
-		for (x = 0; x < 64; x+=skip)
+		for (ra = 0; ra < FH; ra++)
 		{
-			i = (y << 6) + x;
-			chr=videoram[i];
-			if ((adj) && (chr < 32)) chr+=64;			// 7-bit video handler
-			drawgfx( bitmap,screen->machine->gfx[0],chr,0,0,0,x/skip*FW,y*FH,
-				NULL,TRANSPARENCY_NONE,0);
+			UINT16  *p = BITMAP_ADDR16(bitmap, sy++, 0);
+
+			for (x = ma; x < ma + 64; x+=skip)
+			{
+				chr = videoram[x];
+
+				if (chr & 0x80)
+				{
+					lores1 = 1<<((ra & 0x0c)>>1);
+					lores2 = lores1<<1; 
+					/* Display one line of a lores character (6 pixels) */
+					*p = ( chr & lores1 ) ? 1 : 0; p++;
+					*p = ( chr & lores1 ) ? 1 : 0; p++;
+					*p = ( chr & lores1 ) ? 1 : 0; p++;
+					*p = ( chr & lores2 ) ? 1 : 0; p++;
+					*p = ( chr & lores2 ) ? 1 : 0; p++;
+					*p = ( chr & lores2 ) ? 1 : 0; p++;
+				}
+				else
+				{
+					if ((seven_bit) && (chr < 32)) chr+=64;
+
+					/* get pattern of pixels for that character scanline */
+					if (ra < 8)
+						gfx = FNT[(chr<<3) | ra ];
+					else
+						gfx = 0;
+
+					/* Display a scanline of a character (6 pixels) */
+					*p = ( gfx & 0x20 ) ? 1 : 0; p++;
+					*p = ( gfx & 0x10 ) ? 1 : 0; p++;
+					*p = ( gfx & 0x08 ) ? 1 : 0; p++;
+					*p = ( gfx & 0x04 ) ? 1 : 0; p++;
+					*p = ( gfx & 0x02 ) ? 1 : 0; p++;
+					*p = ( gfx & 0x01 ) ? 1 : 0; p++;
+				}
+			}
 		}
+		ma+=64;
 	}
 	return 0;
 }
+
+
+/* 7 or 8-bit video, 64/32 characters per line = ht1080z, ht1080z2, ht108064 */		
+VIDEO_UPDATE( ht1080z )
+{
+	UINT8 y,ra,chr,gfx;
+	UINT16 sy=0,ma=0,x;
+	UINT8 *FNT = memory_region(screen->machine, "gfx1");
+	UINT8 seven_bit = screen->machine->gamedrv->flags >> 24;
+	static UINT8 size_store=0;
+	static UINT8 cols=64,skip=1;
+	UINT8 lores1,lores2;
+
+	if ((trs80_mode & 0x7f) != size_store)
+	{
+		size_store = trs80_mode & 0x7f;
+		cols = (trs80_mode & 1) ? 32 : 64;
+		skip = (trs80_mode & 1) ? 2 : 1;
+		video_screen_set_visarea(screen, 0, cols*FW-1, 0, 16*FH-1);
+	}
+
+	for (y = 0; y < 16; y++)
+	{
+		for (ra = 0; ra < FH; ra++)
+		{
+			UINT16  *p = BITMAP_ADDR16(bitmap, sy++, 0);
+
+			for (x = ma; x < ma + 64; x+=skip)
+			{
+				chr = videoram[x];
+
+				if (chr & 0x80)
+				{
+					lores1 = 1<<((ra & 0x0c)>>1);
+					lores2 = lores1<<1; 
+					/* Display one line of a lores character (6 pixels) */
+					*p = ( chr & lores1 ) ? 1 : 0; p++;
+					*p = ( chr & lores1 ) ? 1 : 0; p++;
+					*p = ( chr & lores1 ) ? 1 : 0; p++;
+					*p = ( chr & lores2 ) ? 1 : 0; p++;
+					*p = ( chr & lores2 ) ? 1 : 0; p++;
+					*p = ( chr & lores2 ) ? 1 : 0; p++;
+				}
+				else
+				{
+					if ((seven_bit) && (chr < 32)) chr+=64;
+
+					/* get pattern of pixels for that character scanline */
+					gfx = FNT[(chr<<4) | ra ];
+
+					/* Display a scanline of a character (6 pixels) */
+					*p = ( gfx & 0x80 ) ? 1 : 0; p++;
+					*p = ( gfx & 0x40 ) ? 1 : 0; p++;
+					*p = ( gfx & 0x20 ) ? 1 : 0; p++;
+					*p = ( gfx & 0x10 ) ? 1 : 0; p++;
+					*p = ( gfx & 0x08 ) ? 1 : 0; p++;
+					*p = ( gfx & 0x04 ) ? 1 : 0; p++;
+				}
+			}
+		}
+		ma+=64;
+	}
+	return 0;
+}
+
+VIDEO_UPDATE( lnw80 )
+{
+	const UINT16 rows[] = { 0, 0x200, 0x100, 0x300, 1, 0x201, 0x101, 0x301 };
+	UINT8 y,ra,chr,gfx;
+	UINT16 sy=0,ma=0,x;
+	UINT8 *FNT = memory_region(screen->machine, "gfx1");
+	static UINT8 size_store=0;
+	static UINT8 cols=64,skip=1;
+	UINT8 lores1,lores2;
+
+	if ((trs80_mode & 0x7f) != size_store)
+	{
+		size_store = trs80_mode & 0x7f;
+		cols = (trs80_mode & 1) ? 32 : 64;
+		skip = (trs80_mode & 1) ? 2 : 1;
+		video_screen_set_visarea(screen, 0, cols*FW-1, 0, 16*FH-1);
+	}
+
+	for (y = 0; y < 16; y++)
+	{
+		for (ra = 0; ra < FH; ra++)
+		{
+			UINT16  *p = BITMAP_ADDR16(bitmap, sy++, 0);
+
+			for (x = ma; x < ma + 64; x+=skip)
+			{
+				chr = videoram[x];
+
+				if (chr & 0x80)
+				{
+					lores1 = 1<<((ra & 0x0c)>>1);
+					lores2 = lores1<<1; 
+					/* Display one line of a lores character (6 pixels) */
+					*p = ( chr & lores1 ) ? 1 : 0; p++;
+					*p = ( chr & lores1 ) ? 1 : 0; p++;
+					*p = ( chr & lores1 ) ? 1 : 0; p++;
+					*p = ( chr & lores2 ) ? 1 : 0; p++;
+					*p = ( chr & lores2 ) ? 1 : 0; p++;
+					*p = ( chr & lores2 ) ? 1 : 0; p++;
+				}
+				else
+				{
+					/* get pattern of pixels for that character scanline */
+					if (ra < 8)
+						gfx = FNT[(chr<<1) | rows[ra] ];
+					else
+						gfx = 0;
+
+					/* Display a scanline of a character (6 pixels) */
+					*p = ( gfx & 0x04 ) ? 1 : 0; p++;
+					*p = ( gfx & 0x02 ) ? 1 : 0; p++;
+					*p = ( gfx & 0x40 ) ? 1 : 0; p++;
+					*p = ( gfx & 0x80 ) ? 1 : 0; p++;
+					*p = ( gfx & 0x20 ) ? 1 : 0; p++;
+					*p = ( gfx & 0x08 ) ? 1 : 0; p++;
+				}
+			}
+		}
+		ma+=64;
+	}
+	return 0;
+}
+
+
+VIDEO_UPDATE( radionic )
+{
+	UINT8 y,ra,chr,gfx;
+	UINT16 sy=0,ma=0,x;
+	UINT8 *FNT = memory_region(screen->machine, "gfx1");
+	static UINT8 size_store=0;
+	static UINT8 cols=64,skip=1;
+	UINT8 lores1,lores2;
+
+	if ((trs80_mode & 0x7f) != size_store)
+	{
+		size_store = trs80_mode & 0x7f;
+		cols = (trs80_mode & 1) ? 32 : 64;
+		skip = (trs80_mode & 1) ? 2 : 1;
+		video_screen_set_visarea(screen, 0, cols*FW-1, 0, 16*FH-1);
+	}
+
+	for (y = 0; y < 16; y++)
+	{
+		for (ra = 0; ra < FH; ra++)
+		{
+			UINT16  *p = BITMAP_ADDR16(bitmap, sy++, 0);
+
+			for (x = ma; x < ma + 64; x+=skip)
+			{
+				chr = videoram[x];
+
+				if ((chr & 0xc0) == 0x80)
+				{
+					lores1 = 1<<((ra & 0x0c)>>1);
+					lores2 = lores1<<1; 
+					/* Display one line of a lores character (6 pixels) */
+					*p = ( chr & lores1 ) ? 1 : 0; p++;
+					*p = ( chr & lores1 ) ? 1 : 0; p++;
+					*p = ( chr & lores1 ) ? 1 : 0; p++;
+					*p = ( chr & lores2 ) ? 1 : 0; p++;
+					*p = ( chr & lores2 ) ? 1 : 0; p++;
+					*p = ( chr & lores2 ) ? 1 : 0; p++;
+				}
+				else
+				{
+					/* get pattern of pixels for that character scanline */
+					if (ra < 8)
+						gfx = FNT[(chr<<3) | ra ];
+					else
+						gfx = FNT[(chr<<3) | (ra & 7) | 0x800];
+
+					/* Display a scanline of a character (6 pixels) */
+					*p = ( gfx & 0x01 ) ? 1 : 0; p++;
+					*p = ( gfx & 0x02 ) ? 1 : 0; p++;
+					*p = ( gfx & 0x04 ) ? 1 : 0; p++;
+					*p = ( gfx & 0x08 ) ? 1 : 0; p++;
+					*p = ( gfx & 0x10 ) ? 1 : 0; p++;
+					*p = ( gfx & 0x20 ) ? 1 : 0; p++;
+				}
+			}
+		}
+		ma+=64;
+	}
+	return 0;
+}
+
 
 /***************************************************************************
   Write to video ram
