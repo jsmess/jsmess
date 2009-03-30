@@ -41,7 +41,8 @@ UINT8 trs80_mode = 0;			/* Control bits passed to video output routine */
 #define IRQ_TIMER		0x80	/* RTC on Model I */
 #define IRQ_RTC			0x04	/* RTC on Model 4 */
 #define IRQ_FDC 		0x40	/* FDC on Model 1 */
-static	UINT8 irq_status = 0;
+#define CASS_RISE		0x01	/* high speed cass on Model III/4) */
+#define CASS_FALL		0x02	/* high speed cass on Model III/4) */
 
 #define MAX_LUMPS	192	 	/* crude storage units - don't now much about it */
 #define MAX_GRANULES	8		/* lumps consisted of granules.. aha */
@@ -61,7 +62,6 @@ static UINT8 trs80_reg_load=1;
 #define FH TRS80_FONT_H
 #define MODEL4_MASTER_CLOCK 20275200
 
-static double old_cassette_val;
 static UINT8 cassette_data;
 static emu_timer *cassette_data_timer;
 static const device_config *trs80_printer;
@@ -72,13 +72,31 @@ static const device_config *trs80_fdc;
 
 static TIMER_CALLBACK( cassette_data_callback )
 {
+	static double old_cassette_val;
 	double new_val = cassette_input(trs80_cass);
 
 	/* Check for HI-LO transition */
 	if ( old_cassette_val > -0.2 && new_val < -0.2 )
 	{
 		cassette_data |= 0x80;
+		if (trs80_mask & CASS_FALL)
+		{
+			cassette_data = 0;
+			trs80_int |= CASS_FALL;
+			cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
+		}
 	}
+	else
+	if ( old_cassette_val < -0.2 && new_val > -0.2 )
+	{
+		if (trs80_mask & CASS_RISE)
+		{
+			cassette_data = 1;
+			trs80_int |= CASS_RISE;
+			cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
+		}
+	}
+
 	old_cassette_val = new_val;
 }
 
@@ -247,6 +265,7 @@ READ8_HANDLER( trs80m4_e0_r )
 	d1 Cass 1500 baud Falling
 	d0 Cass 1500 baud Rising */
 
+	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 	return ~(trs80_mask & trs80_int);
 }
 
@@ -352,7 +371,8 @@ READ8_HANDLER( trs80m4_ff_r )
 	d6..d1 info from write of port EC
 	d0 High-speed data (not emulated yet) */
 
-	trs80_int &= 0xfc;			/* clear cassette interrupts */
+	trs80_int &= 0xfc;	/* clear cassette interrupts */
+
 	return trs80_port_ec | cassette_data;
 }
 
@@ -573,7 +593,7 @@ WRITE8_HANDLER( trs80m4_ff_w )
 
 INTERRUPT_GEN( trs80_timer_interrupt )
 {
-	if( (trs80_int & IRQ_TIMER) == 0 )
+	if (trs80_mask & IRQ_TIMER)
 	{
 		trs80_int |= IRQ_TIMER;
 		cpu_set_input_line(device, 0, HOLD_LINE);
@@ -582,26 +602,19 @@ INTERRUPT_GEN( trs80_timer_interrupt )
 
 INTERRUPT_GEN( trs80m4_rtc_interrupt )
 {
-/* This enables the processing of interrupts, particularly the clock and the flashing cursor.
-	We alternately raise and lower the INT line. The OS counts one tick for each interrupt.
-	There are 30 ticks per second. */
+/* This enables the processing of interrupts for the clock and the flashing cursor.
+	The OS counts one tick for each interrupt. There are 30 ticks per second. */
 
-	if (irq_status)
-	{
-		irq_status = 0;
-		cpu_set_input_line(device, 0, CLEAR_LINE);
-	}
-	else
+	if (trs80_mask & IRQ_RTC)
 	{
 		trs80_int |= IRQ_RTC;
-		irq_status = 1;
 		cpu_set_input_line(device, 0, HOLD_LINE);
 	}
 }
 
 static void trs80_fdc_interrupt_internal(running_machine *machine)
 {
-	if ((trs80_int & IRQ_FDC) == 0)
+	if (trs80_mask & IRQ_FDC)
 	{
 		trs80_int |= IRQ_FDC;
 		cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);

@@ -75,6 +75,7 @@ VIDEO_UPDATE( model1 );
 VIDEO_UPDATE( ht1080z );
 VIDEO_UPDATE( lnw80 );
 VIDEO_UPDATE( radionic );
+VIDEO_UPDATE( trs80m4 );
 
 READ8_HANDLER( trs80_videoram_r );
 WRITE8_HANDLER( trs80_videoram_w );
