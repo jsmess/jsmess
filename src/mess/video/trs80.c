@@ -8,9 +8,6 @@
 #include "driver.h"
 #include "includes/trs80.h"
 
-#define FW  TRS80_FONT_W
-#define FH  TRS80_FONT_H
-
 /* Bit assignment for "trs80_mode"
 	d7 Page select
 	d3 Invert characters with bit 7 set (1=invert)
