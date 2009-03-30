@@ -48,13 +48,12 @@ WRITE8_HANDLER( trs80m4_88_w )
 /* 7 or 8-bit video, 32/64 characters per line = trs80, trs80l2, sys80 */
 VIDEO_UPDATE( trs80 )
 {
-	UINT8 y,ra,chr,gfx;
+	UINT8 y,ra,chr,gfx,gfxbit;
 	UINT16 sy=0,ma=0,x;
 	UINT8 *FNT = memory_region(screen->machine, "gfx1");
 	UINT8 seven_bit = screen->machine->gamedrv->flags >> 24;
-	static UINT8 size_store=0;
+	static UINT8 size_store=0xff;
 	static UINT8 cols=64,skip=1;
-	UINT8 lores1,lores2;
 
 	if ((trs80_mode & 0x7f) != size_store)
 	{
@@ -76,15 +75,15 @@ VIDEO_UPDATE( trs80 )
 
 				if (chr & 0x80)
 				{
-					lores1 = 1<<((ra & 0x0c)>>1);
-					lores2 = lores1<<1; 
+					gfxbit = 1<<((ra & 0x0c)>>1);
 					/* Display one line of a lores character (6 pixels) */
-					*p = ( chr & lores1 ) ? 1 : 0; p++;
-					*p = ( chr & lores1 ) ? 1 : 0; p++;
-					*p = ( chr & lores1 ) ? 1 : 0; p++;
-					*p = ( chr & lores2 ) ? 1 : 0; p++;
-					*p = ( chr & lores2 ) ? 1 : 0; p++;
-					*p = ( chr & lores2 ) ? 1 : 0; p++;
+					*p = ( chr & gfxbit ) ? 1 : 0; p++;
+					*p = ( chr & gfxbit ) ? 1 : 0; p++;
+					*p = ( chr & gfxbit ) ? 1 : 0; p++;
+					gfxbit = gfxbit<<1; 
+					*p = ( chr & gfxbit ) ? 1 : 0; p++;
+					*p = ( chr & gfxbit ) ? 1 : 0; p++;
+					*p = ( chr & gfxbit ) ? 1 : 0; p++;
 				}
 				else
 				{
@@ -111,17 +110,88 @@ VIDEO_UPDATE( trs80 )
 	return 0;
 }
 
+/* 8-bit video, 32/64/40/80 characters per line = trs80m3, trs80m4.
+	The proper character generator is not dumped, and has extra characters in the 192-255 range. */
+VIDEO_UPDATE( trs80m4 )
+{
+	UINT8 y,ra,chr,gfx,gfxbit;
+	UINT16 sy=0,ma=0,x;
+	UINT8 *FNT = memory_region(screen->machine, "gfx1");
+	static UINT8 size_store=0xff;
+	static UINT8 cols=64,rows=16,skip=1,s_cols;
+
+	if ((trs80_mode & 0x7f) != size_store)
+	{
+		size_store = trs80_mode & 0x7f;
+		s_cols = cols = (trs80_mode & 4) ? 80 : 64;
+		rows = (trs80_mode & 4) ? 24 : 16;
+
+		if (trs80_mode & 1)
+		{
+			s_cols >>= 1;
+			skip = 2;
+		}
+		video_screen_set_visarea(screen, 0, s_cols*FW-1, 0, rows*FH-1);
+	}
+
+	for (y = 0; y < rows; y++)
+	{
+		for (ra = 0; ra < FH; ra++)
+		{
+			UINT16  *p = BITMAP_ADDR16(bitmap, sy++, 0);
+
+			for (x = ma; x < ma + cols; x+=skip)
+			{
+				chr = videoram[x+start_address];
+
+				if ((chr & 0x80) && (~trs80_mode & 8))
+				{
+					gfxbit = 1<<((ra & 0x0c)>>1);
+					/* Display one line of a lores character (6 pixels) */
+					*p = ( chr & gfxbit ) ? 1 : 0; p++;
+					*p = ( chr & gfxbit ) ? 1 : 0; p++;
+					*p = ( chr & gfxbit ) ? 1 : 0; p++;
+					gfxbit <<= 1;
+					*p = ( chr & gfxbit ) ? 1 : 0; p++;
+					*p = ( chr & gfxbit ) ? 1 : 0; p++;
+					*p = ( chr & gfxbit ) ? 1 : 0; p++;
+				}
+				else
+				{
+					/* get pattern of pixels for that character scanline */
+					if (ra < 8)
+						gfx = FNT[((chr&0x7f)<<3) | ra ];
+					else
+						gfx = 0;
+
+					/* if inverse mode, and bit 7 set, invert gfx */
+					if ((trs80_mode & 8) && (chr & 0x80))
+						gfx ^= 0xff;
+
+					/* Display a scanline of a character (6 pixels) */
+					*p = ( gfx & 0x20 ) ? 1 : 0; p++;
+					*p = ( gfx & 0x10 ) ? 1 : 0; p++;
+					*p = ( gfx & 0x08 ) ? 1 : 0; p++;
+					*p = ( gfx & 0x04 ) ? 1 : 0; p++;
+					*p = ( gfx & 0x02 ) ? 1 : 0; p++;
+					*p = ( gfx & 0x01 ) ? 1 : 0; p++;
+				}
+			}
+		}
+		ma+=cols;
+	}
+	return 0;
+}
 
 /* 7 or 8-bit video, 64/32 characters per line = ht1080z, ht1080z2, ht108064 */		
 VIDEO_UPDATE( ht1080z )
 {
-	UINT8 y,ra,chr,gfx;
+	UINT8 y,ra,chr,gfx,gfxbit;
 	UINT16 sy=0,ma=0,x;
 	UINT8 *FNT = memory_region(screen->machine, "gfx1");
 	UINT8 seven_bit = screen->machine->gamedrv->flags >> 24;
-	static UINT8 size_store=0;
+	static UINT8 size_store=0xff;
 	static UINT8 cols=64,skip=1;
-	UINT8 lores1,lores2;
 
 	if ((trs80_mode & 0x7f) != size_store)
 	{
@@ -143,15 +213,15 @@ VIDEO_UPDATE( ht1080z )
 
 				if (chr & 0x80)
 				{
-					lores1 = 1<<((ra & 0x0c)>>1);
-					lores2 = lores1<<1; 
+					gfxbit = 1<<((ra & 0x0c)>>1);
 					/* Display one line of a lores character (6 pixels) */
-					*p = ( chr & lores1 ) ? 1 : 0; p++;
-					*p = ( chr & lores1 ) ? 1 : 0; p++;
-					*p = ( chr & lores1 ) ? 1 : 0; p++;
-					*p = ( chr & lores2 ) ? 1 : 0; p++;
-					*p = ( chr & lores2 ) ? 1 : 0; p++;
-					*p = ( chr & lores2 ) ? 1 : 0; p++;
+					*p = ( chr & gfxbit ) ? 1 : 0; p++;
+					*p = ( chr & gfxbit ) ? 1 : 0; p++;
+					*p = ( chr & gfxbit ) ? 1 : 0; p++;
+					gfxbit = gfxbit<<1; 
+					*p = ( chr & gfxbit ) ? 1 : 0; p++;
+					*p = ( chr & gfxbit ) ? 1 : 0; p++;
+					*p = ( chr & gfxbit ) ? 1 : 0; p++;
 				}
 				else
 				{
@@ -178,12 +248,11 @@ VIDEO_UPDATE( ht1080z )
 VIDEO_UPDATE( lnw80 )
 {
 	const UINT16 rows[] = { 0, 0x200, 0x100, 0x300, 1, 0x201, 0x101, 0x301 };
-	UINT8 y,ra,chr,gfx;
+	UINT8 y,ra,chr,gfx,gfxbit;
 	UINT16 sy=0,ma=0,x;
 	UINT8 *FNT = memory_region(screen->machine, "gfx1");
-	static UINT8 size_store=0;
+	static UINT8 size_store=0xff;
 	static UINT8 cols=64,skip=1;
-	UINT8 lores1,lores2;
 
 	if ((trs80_mode & 0x7f) != size_store)
 	{
@@ -205,15 +274,15 @@ VIDEO_UPDATE( lnw80 )
 
 				if (chr & 0x80)
 				{
-					lores1 = 1<<((ra & 0x0c)>>1);
-					lores2 = lores1<<1; 
+					gfxbit = 1<<((ra & 0x0c)>>1);
 					/* Display one line of a lores character (6 pixels) */
-					*p = ( chr & lores1 ) ? 1 : 0; p++;
-					*p = ( chr & lores1 ) ? 1 : 0; p++;
-					*p = ( chr & lores1 ) ? 1 : 0; p++;
-					*p = ( chr & lores2 ) ? 1 : 0; p++;
-					*p = ( chr & lores2 ) ? 1 : 0; p++;
-					*p = ( chr & lores2 ) ? 1 : 0; p++;
+					*p = ( chr & gfxbit ) ? 1 : 0; p++;
+					*p = ( chr & gfxbit ) ? 1 : 0; p++;
+					*p = ( chr & gfxbit ) ? 1 : 0; p++;
+					gfxbit = gfxbit<<1; 
+					*p = ( chr & gfxbit ) ? 1 : 0; p++;
+					*p = ( chr & gfxbit ) ? 1 : 0; p++;
+					*p = ( chr & gfxbit ) ? 1 : 0; p++;
 				}
 				else
 				{
@@ -238,27 +307,26 @@ VIDEO_UPDATE( lnw80 )
 	return 0;
 }
 
-
+/* lores characters are in the character generator. Each character is 8x16. */
 VIDEO_UPDATE( radionic )
 {
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0,x;
 	UINT8 *FNT = memory_region(screen->machine, "gfx1");
-	static UINT8 size_store=0;
+	static UINT8 size_store=0xff;
 	static UINT8 cols=64,skip=1;
-	UINT8 lores1,lores2;
 
 	if ((trs80_mode & 0x7f) != size_store)
 	{
 		size_store = trs80_mode & 0x7f;
 		cols = (trs80_mode & 1) ? 32 : 64;
 		skip = (trs80_mode & 1) ? 2 : 1;
-		video_screen_set_visarea(screen, 0, cols*FW-1, 0, 16*FH-1);
+		video_screen_set_visarea(screen, 0, cols*8-1, 0, 16*16-1);
 	}
 
 	for (y = 0; y < 16; y++)
 	{
-		for (ra = 0; ra < FH; ra++)
+		for (ra = 0; ra < 16; ra++)
 		{
 			UINT16  *p = BITMAP_ADDR16(bitmap, sy++, 0);
 
@@ -266,34 +334,18 @@ VIDEO_UPDATE( radionic )
 			{
 				chr = videoram[x];
 
-				if ((chr & 0xc0) == 0x80)
-				{
-					lores1 = 1<<((ra & 0x0c)>>1);
-					lores2 = lores1<<1; 
-					/* Display one line of a lores character (6 pixels) */
-					*p = ( chr & lores1 ) ? 1 : 0; p++;
-					*p = ( chr & lores1 ) ? 1 : 0; p++;
-					*p = ( chr & lores1 ) ? 1 : 0; p++;
-					*p = ( chr & lores2 ) ? 1 : 0; p++;
-					*p = ( chr & lores2 ) ? 1 : 0; p++;
-					*p = ( chr & lores2 ) ? 1 : 0; p++;
-				}
-				else
-				{
-					/* get pattern of pixels for that character scanline */
-					if (ra < 8)
-						gfx = FNT[(chr<<3) | ra ];
-					else
-						gfx = FNT[(chr<<3) | (ra & 7) | 0x800];
+				/* get pattern of pixels for that character scanline */
+				gfx = FNT[(chr<<3) | (ra & 7) | (ra & 8) << 8];
 
-					/* Display a scanline of a character (6 pixels) */
-					*p = ( gfx & 0x01 ) ? 1 : 0; p++;
-					*p = ( gfx & 0x02 ) ? 1 : 0; p++;
-					*p = ( gfx & 0x04 ) ? 1 : 0; p++;
-					*p = ( gfx & 0x08 ) ? 1 : 0; p++;
-					*p = ( gfx & 0x10 ) ? 1 : 0; p++;
-					*p = ( gfx & 0x20 ) ? 1 : 0; p++;
-				}
+				/* Display a scanline of a character (8 pixels) */
+				*p = ( gfx & 0x01 ) ? 1 : 0; p++;
+				*p = ( gfx & 0x02 ) ? 1 : 0; p++;
+				*p = ( gfx & 0x04 ) ? 1 : 0; p++;
+				*p = ( gfx & 0x08 ) ? 1 : 0; p++;
+				*p = ( gfx & 0x10 ) ? 1 : 0; p++;
+				*p = ( gfx & 0x20 ) ? 1 : 0; p++;
+				*p = ( gfx & 0x40 ) ? 1 : 0; p++;
+				*p = ( gfx & 0x80 ) ? 1 : 0; p++;
 			}
 		}
 		ma+=64;
