@@ -53,6 +53,10 @@ static const i8275_interface mm1_i8275_intf =
 	crtc_display_pixels
 };
 
+static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
+{
+}
+
 static WRITE_LINE_DEVICE_HANDLER( hgdc_drq_w )
 {
 	mm1_state *driver_state = device->machine->driver_data;
@@ -63,7 +67,12 @@ static WRITE_LINE_DEVICE_HANDLER( hgdc_drq_w )
 static UPD7220_INTERFACE( mm1_upd7220_intf )
 {
 	SCREEN_TAG,
+	8,
+	hgdc_display_pixels,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_LINE(hgdc_drq_w),
+	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
 };
