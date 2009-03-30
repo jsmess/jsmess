@@ -10,8 +10,8 @@
 #include "devices/snapquik.h"
 #include "machine/wd17xx.h"
 
-#define TRS80_FONT_W 6
-#define TRS80_FONT_H 12
+#define FW 6
+#define FH 12
 
 
 /*----------- defined in machine/trs80.c -----------*/
@@ -52,8 +52,7 @@ READ8_HANDLER ( trs80m4_e8_r );
 READ8_HANDLER ( trs80m4_e4_r );
 READ8_HANDLER ( trs80m4_e0_r );
 
-INTERRUPT_GEN( trs80_frame_interrupt );
-INTERRUPT_GEN( trs80_timer_interrupt );
+INTERRUPT_GEN( trs80_rtc_interrupt );
 INTERRUPT_GEN( trs80m4_rtc_interrupt );
 INTERRUPT_GEN( trs80_fdc_interrupt );
 
@@ -63,6 +62,7 @@ WRITE8_HANDLER( trs80_irq_mask_w );
 READ8_HANDLER( trs80_printer_r );
 WRITE8_HANDLER( trs80_printer_w );
 
+WRITE8_HANDLER( trs80_cassunit_w );
 WRITE8_HANDLER( trs80_motor_w );
 
 READ8_HANDLER( trs80_keyboard_r );

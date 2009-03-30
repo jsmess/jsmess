@@ -619,6 +619,7 @@ XL/XE 16kB OS roms
 	DRIVER( lnw80 )		/* LNW Research LNW-80								*/
 	DRIVER( trs80m3 )	/* TRS-80 Model III - Radio Shack/Tandy				*/
 	DRIVER( trs80m4 )
+	DRIVER( trs80m4p )
 	DRIVER( ht1080z ) /* Hradstechnika Szvetkezet HT-1080Z */
 	DRIVER( ht1080z2 ) /* Hradstechnika Szvetkezet HT-1080Z Series II */
 	DRIVER( ht108064 ) /* Hradstechnika Szvetkezet HT-1080Z/64 */

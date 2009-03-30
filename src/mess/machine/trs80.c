@@ -38,9 +38,9 @@ static UINT8 trs80_mask= 0;		/* interrupt mask */
 static UINT8 trs80_port_ec=0;		/* bit d6..d1 of port EC to be read by port FF */
 UINT8 trs80_mode = 0;			/* Control bits passed to video output routine */
 
-#define IRQ_TIMER		0x80	/* RTC on Model I */
-#define IRQ_RTC			0x04	/* RTC on Model 4 */
-#define IRQ_FDC 		0x40	/* FDC on Model 1 */
+#define IRQ_M1_RTC		0x80	/* RTC on Model I */
+#define IRQ_M1_FDC 		0x40	/* FDC on Model I */
+#define IRQ_M4_RTC		0x04	/* RTC on Model 4 */
 #define CASS_RISE		0x01	/* high speed cass on Model III/4) */
 #define CASS_FALL		0x02	/* high speed cass on Model III/4) */
 
@@ -58,8 +58,6 @@ static UINT8 sector[4] = {0, }; 			/* current sector per drive */
 
 static UINT8 trs80_reg_load=1;
 
-#define FW TRS80_FONT_W
-#define FH TRS80_FONT_H
 #define MODEL4_MASTER_CLOCK 20275200
 
 static UINT8 cassette_data;
@@ -256,10 +254,15 @@ MACHINE_RESET( trs80 )
 
 READ8_HANDLER( trs80m4_e0_r )
 {
-/* Indicates which devices are interrupting - only d2 is emulated
-	d6 RS232 Error
-	d5 RS232 Rcv
-	d4 RS232 Xmit
+/* Indicates which devices are interrupting - d2..d0 are emulated
+	Whenever an interrupt occurs, this port is immediately read
+	to find out which device requires service. Lowest-numbered
+	bit takes precedence. We take this opportunity to clear the
+	cpu INT line.
+
+	d6 RS232 Error (Any of {FE, PE, OR} errors has occured)
+	d5 RS232 Rcv (DAV indicates a char ready to be picked up from uart)
+	d4 RS232 Xmit (TBMT indicates ready to accept another char from cpu)
 	d3 I/O Bus
 	d2 RTC
 	d1 Cass 1500 baud Falling
@@ -326,7 +329,7 @@ READ8_HANDLER( trs80m4_eb_r )
 READ8_HANDLER( trs80m4_ec_r )
 {
 /* Reset the RTC interrupt */
-	trs80_int &= ~IRQ_RTC;
+	trs80_int &= ~IRQ_M4_RTC;
 	return 0;
 }
 
@@ -533,6 +536,28 @@ WRITE8_HANDLER( trs80m4_f4_w )
 	d2 1=select drive 2
 	d1 1=select drive 1
 	d0 1=select drive 0 */
+
+	UINT8 drive = 255;
+
+	if (data & 1)
+		drive = 0;
+	else
+	if (data & 2)
+		drive = 1;
+	else
+	if (data & 4)
+		drive = 2;
+	else
+	if (data & 8)
+		drive = 3;
+
+	head = (data & 16) ? 1 : 0;
+
+	if (drive < 4)
+	{
+		wd17xx_set_drive(trs80_fdc,drive);
+		wd17xx_set_side(trs80_fdc,head);
+	}
 }
 
 WRITE8_HANDLER( sys80_f8_w )
@@ -591,11 +616,11 @@ WRITE8_HANDLER( trs80m4_ff_w )
  *
  *************************************/
 
-INTERRUPT_GEN( trs80_timer_interrupt )
+INTERRUPT_GEN( trs80_rtc_interrupt )
 {
-	if (trs80_mask & IRQ_TIMER)
+	if (trs80_mask & IRQ_M1_RTC)
 	{
-		trs80_int |= IRQ_TIMER;
+		trs80_int |= IRQ_M1_RTC;
 		cpu_set_input_line(device, 0, HOLD_LINE);
 	}
 }
@@ -605,18 +630,18 @@ INTERRUPT_GEN( trs80m4_rtc_interrupt )
 /* This enables the processing of interrupts for the clock and the flashing cursor.
 	The OS counts one tick for each interrupt. There are 30 ticks per second. */
 
-	if (trs80_mask & IRQ_RTC)
+	if (trs80_mask & IRQ_M4_RTC)
 	{
-		trs80_int |= IRQ_RTC;
+		trs80_int |= IRQ_M4_RTC;
 		cpu_set_input_line(device, 0, HOLD_LINE);
 	}
 }
 
 static void trs80_fdc_interrupt_internal(running_machine *machine)
 {
-	if (trs80_mask & IRQ_FDC)
+	if (trs80_mask & IRQ_M1_FDC)
 	{
-		trs80_int |= IRQ_FDC;
+		trs80_int |= IRQ_M1_FDC;
 		cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
 	}
 }
@@ -631,7 +656,7 @@ static WD17XX_CALLBACK( trs80_fdc_callback )
 	switch (state)
 	{
 		case WD17XX_IRQ_CLR:
-			trs80_int &= ~IRQ_FDC;
+			trs80_int &= ~IRQ_M1_FDC;
 			break;
 		case WD17XX_IRQ_SET:
 			trs80_fdc_interrupt_internal(device->machine);
@@ -670,10 +695,17 @@ WRITE8_HANDLER( trs80_printer_w )
 	centronics_strobe_w(trs80_printer, 0);
 }
 
+WRITE8_HANDLER( trs80_cassunit_w )
+{
+/* not emulated
+	01 for unit 1 (default
+	02 for unit 2 */
+}
+
 READ8_HANDLER( trs80_irq_status_r )
 {
 	int result = trs80_int;
-	trs80_int &= ~(IRQ_TIMER | IRQ_FDC);
+	trs80_int &= ~(IRQ_M1_RTC | IRQ_M1_FDC);
 	return result;
 }
 

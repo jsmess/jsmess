@@ -27,9 +27,7 @@ WRITE8_HANDLER( trs80m4_88_w )
 	start address register can be used. The cursor and
 	light-pen facilities are ignored. The character clock
 	is changed depending on the screen size chosen.
-	It is assumed that character size of 6x12 is used in
-	all screen sizes, however decapping is needed to be
-	certain. Therefore it is easier to use normal
+	Therefore it is easier to use normal
 	coding rather than the mc6845 device. */
 
 	if (!offset) crtc_reg = data & 0x1f;
@@ -80,7 +78,7 @@ VIDEO_UPDATE( trs80 )
 					*p = ( chr & gfxbit ) ? 1 : 0; p++;
 					*p = ( chr & gfxbit ) ? 1 : 0; p++;
 					*p = ( chr & gfxbit ) ? 1 : 0; p++;
-					gfxbit = gfxbit<<1; 
+					gfxbit <<= 1; 
 					*p = ( chr & gfxbit ) ? 1 : 0; p++;
 					*p = ( chr & gfxbit ) ? 1 : 0; p++;
 					*p = ( chr & gfxbit ) ? 1 : 0; p++;
@@ -118,25 +116,26 @@ VIDEO_UPDATE( trs80m4 )
 	UINT16 sy=0,ma=0,x;
 	UINT8 *FNT = memory_region(screen->machine, "gfx1");
 	static UINT8 size_store=0xff;
-	static UINT8 cols=64,rows=16,skip=1,s_cols;
+	static UINT8 cols=64,rows=16,skip=1,s_cols,lines=12;
 
 	if ((trs80_mode & 0x7f) != size_store)
 	{
 		size_store = trs80_mode & 0x7f;
 		s_cols = cols = (trs80_mode & 4) ? 80 : 64;
 		rows = (trs80_mode & 4) ? 24 : 16;
+		lines = (trs80_mode & 4) ? 10 : 12;
 
 		if (trs80_mode & 1)
 		{
 			s_cols >>= 1;
 			skip = 2;
 		}
-		video_screen_set_visarea(screen, 0, s_cols*FW-1, 0, rows*FH-1);
+		video_screen_set_visarea(screen, 0, s_cols*FW-1, 0, rows*lines-1);
 	}
 
 	for (y = 0; y < rows; y++)
 	{
-		for (ra = 0; ra < FH; ra++)
+		for (ra = 0; ra < lines; ra++)
 		{
 			UINT16  *p = BITMAP_ADDR16(bitmap, sy++, 0);
 
@@ -218,7 +217,7 @@ VIDEO_UPDATE( ht1080z )
 					*p = ( chr & gfxbit ) ? 1 : 0; p++;
 					*p = ( chr & gfxbit ) ? 1 : 0; p++;
 					*p = ( chr & gfxbit ) ? 1 : 0; p++;
-					gfxbit = gfxbit<<1; 
+					gfxbit <<= 1; 
 					*p = ( chr & gfxbit ) ? 1 : 0; p++;
 					*p = ( chr & gfxbit ) ? 1 : 0; p++;
 					*p = ( chr & gfxbit ) ? 1 : 0; p++;
@@ -236,7 +235,7 @@ VIDEO_UPDATE( ht1080z )
 					*p = ( gfx & 0x20 ) ? 1 : 0; p++;
 					*p = ( gfx & 0x10 ) ? 1 : 0; p++;
 					*p = ( gfx & 0x08 ) ? 1 : 0; p++;
-					*p = ( gfx & 0x04 ) ? 1 : 0; p++;
+					*p = 0; p++;	/* fix for ht108064 */
 				}
 			}
 		}
@@ -279,7 +278,7 @@ VIDEO_UPDATE( lnw80 )
 					*p = ( chr & gfxbit ) ? 1 : 0; p++;
 					*p = ( chr & gfxbit ) ? 1 : 0; p++;
 					*p = ( chr & gfxbit ) ? 1 : 0; p++;
-					gfxbit = gfxbit<<1; 
+					gfxbit <<= 1; 
 					*p = ( chr & gfxbit ) ? 1 : 0; p++;
 					*p = ( chr & gfxbit ) ? 1 : 0; p++;
 					*p = ( chr & gfxbit ) ? 1 : 0; p++;
