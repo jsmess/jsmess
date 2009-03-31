@@ -53,7 +53,6 @@ READ8_HANDLER ( trs80m4_e4_r );
 READ8_HANDLER ( trs80m4_e0_r );
 
 INTERRUPT_GEN( trs80_rtc_interrupt );
-INTERRUPT_GEN( trs80m4_rtc_interrupt );
 INTERRUPT_GEN( trs80_fdc_interrupt );
 
 READ8_HANDLER( trs80_irq_status_r );

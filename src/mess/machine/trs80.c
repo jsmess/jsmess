@@ -35,7 +35,11 @@
 
 static UINT8 trs80_int=0;		/* interrupting devices */
 static UINT8 trs80_mask= 0;		/* interrupt mask */
+static UINT8 trs80_nmi_mask= 0;		/* nmi mask */
 static UINT8 trs80_port_ec=0;		/* bit d6..d1 of port EC to be read by port FF */
+static UINT8 trs80_tape_unit=1;		/* selected cassette unit (trs80l2 and sys80 only) (not implemented yet) */
+static UINT8 trs80_reg_load=1;		/* Controls what port EA will do */
+static UINT8 trs80_nmi_data=0;		/* Passes FDC int to NMI handler */
 UINT8 trs80_mode = 0;			/* Control bits passed to video output routine */
 
 #define IRQ_M1_RTC		0x80	/* RTC on Model I */
@@ -56,8 +60,6 @@ static UINT8 head;							 /* current head per drive */
 static UINT8 sector[4] = {0, }; 			/* current sector per drive */
 #endif
 
-static UINT8 trs80_reg_load=1;
-
 #define MODEL4_MASTER_CLOCK 20275200
 
 static UINT8 cassette_data;
@@ -70,14 +72,17 @@ static const device_config *trs80_fdc;
 
 static TIMER_CALLBACK( cassette_data_callback )
 {
+/* This does all baud rates. 250 baud (trs80), and 500 baud (all others) set bit 7 of "cassette_data".
+	1500 baud (trs80m3, trs80m4) is interrupt-driven and uses bit 0 of "cassette_data" */
+
 	static double old_cassette_val;
 	double new_val = cassette_input(trs80_cass);
 
 	/* Check for HI-LO transition */
 	if ( old_cassette_val > -0.2 && new_val < -0.2 )
 	{
-		cassette_data |= 0x80;
-		if (trs80_mask & CASS_FALL)
+		cassette_data |= 0x80;		/* 500 baud */
+		if (trs80_mask & CASS_FALL)	/* see if 1500 baud */
 		{
 			cassette_data = 0;
 			trs80_int |= CASS_FALL;
@@ -87,7 +92,7 @@ static TIMER_CALLBACK( cassette_data_callback )
 	else
 	if ( old_cassette_val < -0.2 && new_val > -0.2 )
 	{
-		if (trs80_mask & CASS_RISE)
+		if (trs80_mask & CASS_RISE)	/* 1500 baud */
 		{
 			cassette_data = 1;
 			trs80_int |= CASS_RISE;
@@ -176,10 +181,10 @@ DEVICE_IMAGE_LOAD( trs80_floppy )
 	int dir_length; /* length of directory in sectors (aka DDGA) */
 	int id = image_index_in_device(image);
 
-    if (device_load_basicdsk_floppy(image) != INIT_PASS)
+	if (device_load_basicdsk_floppy(image) != INIT_PASS)
 		return INIT_FAIL;
 
-    if (image_index_in_device(image) == 0)        /* first floppy? */
+	if (image_index_in_device(image) == 0)        /* first floppy? */
 	{
 		image_fseek(image, 0, SEEK_SET);
 		image_fread(image, pdrive, 2);
@@ -254,7 +259,7 @@ MACHINE_RESET( trs80 )
 
 READ8_HANDLER( trs80m4_e0_r )
 {
-/* Indicates which devices are interrupting - d2..d0 are emulated
+/* Indicates which devices are interrupting - d6..d3 not emulated.
 	Whenever an interrupt occurs, this port is immediately read
 	to find out which device requires service. Lowest-numbered
 	bit takes precedence. We take this opportunity to clear the
@@ -274,17 +279,26 @@ READ8_HANDLER( trs80m4_e0_r )
 
 READ8_HANDLER( trs80m4_e4_r )
 {
-/* NMI status bits from the FDC - not emulated
+/* Indicates which devices are interrupting - not emulated.
+	Whenever an NMI occurs, this port is immediately read
+	to find out which device requires service. Lowest-numbered
+	bit takes precedence. We take this opportunity to clear the
+	cpu NMI line.
+
 	d7 status of FDC INTREQ (0=true)
 	d6 status of Motor Timeout (0=true)
-	d5 status of Reset signal (0=true) */
+	d5 status of Reset signal (0=true - this will reboot the computer) */
 
-	return 0xff;
+	cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
+
+	return ~(trs80_nmi_mask & trs80_nmi_data);
+
+//	return 0xff;
 }
 
 READ8_HANDLER( trs80m4_e8_r )
 {
-/* These bits directly read pins on the RS-232 socket, and are not emulated
+/* not emulated
 	d7 Clear-to-Send (CTS), Pin 5
 	d6 Data-Set-Ready (DSR), pin 6
 	d5 Carrier Detect (CD), pin 8
@@ -335,7 +349,7 @@ READ8_HANDLER( trs80m4_ec_r )
 
 READ8_HANDLER( sys80_f9_r )
 {
-/* UART Status Register (d4..d6 not emulated)
+/* UART Status Register - d6..d4 not emulated
 	d7 Transmit buffer empty (inverted)
 	d6 CTS pin
 	d5 DSR pin
@@ -372,7 +386,7 @@ READ8_HANDLER( trs80m4_ff_r )
 /* Return of cassette data stream from tape
 	d7 Low-speed data
 	d6..d1 info from write of port EC
-	d0 High-speed data (not emulated yet) */
+	d0 High-speed data */
 
 	trs80_int &= 0xfc;	/* clear cassette interrupts */
 
@@ -382,12 +396,12 @@ READ8_HANDLER( trs80m4_ff_r )
 
 WRITE8_HANDLER( trs80m4_84_w )
 {
-/* Hi-res graphics control (only d2,d3,d7 are emulated)
+/* Hi-res graphics control - d6..d4,d1..d0 not emulated
 	d7 Page Control
 	d6 Fix upper memory
 	d5 Memory bit 1
 	d4 Memory bit 0
-	d3 Invert Video (whole screen)
+	d3 Invert Video
 	d2 80/64 width
 	d1 Select bit 1
 	d0 Select bit 0 */
@@ -416,9 +430,11 @@ WRITE8_HANDLER( trs80m4_e0_w )
 
 WRITE8_HANDLER( trs80m4_e4_w )
 {
-/* Disk to NMI interface (not emulated)
+/* Disk to NMI interface - not emulated
 	d7 1=enable disk INTRQ to generate NMI
 	d6 1=enable disk Motor Timeout to generate NMI */
+
+	trs80_nmi_mask = data;
 }
 
 WRITE8_HANDLER( trs80m4_e8_w )
@@ -457,7 +473,7 @@ WRITE8_HANDLER( trs80m4_ea_w )
 {
 	if (trs80_reg_load)
 
-/* bits d7..d3 are UART control; d2..d0 directly adjust levels at the RS-232 socket - we emulate UART control only
+/* d2..d0 not emulated
 	d7 Even Parity Enable ('1'=even, '0'=odd) 
 	d6='1',d5='1' for 8 bits 
 	d6='0',d5='1' for 7 bits 
@@ -481,7 +497,7 @@ WRITE8_HANDLER( trs80m4_ea_w )
 	else
 	{
 
-/* These directly adjust levels at the RS-232 socket - not emulated
+/* not emulated
 	d7,d6 Not used
 	d5 Secondary Unassigned, pin 18 
 	d4 Secondary Transmit Data, pin 14 
@@ -525,7 +541,7 @@ WRITE8_HANDLER( trs80m4_ec_w )
 
 WRITE8_HANDLER( trs80m4_f4_w )
 {
-/* Selection of drive and parameters - not emulated.
+/* Selection of drive and parameters - d7..d5 not emulated.
  A write also causes the selected drive motor to turn on for about 3 seconds.
  When the motor turns off, the drive is deselected.
 	d7 1=MFM, 0=FM
@@ -562,7 +578,7 @@ WRITE8_HANDLER( trs80m4_f4_w )
 
 WRITE8_HANDLER( sys80_f8_w )
 {
-/* These adjust levels at the socket pins - not emulated
+/* not emulated
 	d2 reset UART (XR pin)
 	d1 DTR
 	d0 RTS */
@@ -572,14 +588,16 @@ WRITE8_HANDLER( sys80_fe_w )
 {
 /* not emulated
 	d4 select internal or external cassette player */
+
+	trs80_tape_unit = (data & 0x10) ? 2 : 1;
 }
 
 WRITE8_HANDLER( lnw80_fe_w )
 {
-/* not emulated
+/* d3..d2 not emulated
 	d3 bankswitch lower 16k between roms and hires ram
 	d2 enable colour
-	d0 inverse video (whole screen) */
+	d0 inverse video */
 
 	trs80_mode = (trs80_mode & 0xf7) | ((data & 1) ? 8 : 0);
 }
@@ -618,45 +636,56 @@ WRITE8_HANDLER( trs80m4_ff_w )
 
 INTERRUPT_GEN( trs80_rtc_interrupt )
 {
-	if (trs80_mask & IRQ_M1_RTC)
+/* This enables the processing of interrupts for the clock and the flashing cursor.
+	The OS counts one tick for each interrupt. The Model I has 40 ticks per
+	second, while the Model III/4 has 30. */
+
+	UINT8 system = (device->machine->gamedrv->flags >> 25) & 1;
+
+	if (system)	// Model 4
+	{
+		if (trs80_mask & IRQ_M4_RTC)
+		{
+			trs80_int |= IRQ_M4_RTC;
+			cpu_set_input_line(device, 0, HOLD_LINE);
+		}
+	}
+	else		// Model 1
 	{
 		trs80_int |= IRQ_M1_RTC;
 		cpu_set_input_line(device, 0, HOLD_LINE);
 	}
 }
 
-INTERRUPT_GEN( trs80m4_rtc_interrupt )
-{
-/* This enables the processing of interrupts for the clock and the flashing cursor.
-	The OS counts one tick for each interrupt. There are 30 ticks per second. */
-
-	if (trs80_mask & IRQ_M4_RTC)
-	{
-		trs80_int |= IRQ_M4_RTC;
-		cpu_set_input_line(device, 0, HOLD_LINE);
-	}
-}
-
 static void trs80_fdc_interrupt_internal(running_machine *machine)
 {
-	if (trs80_mask & IRQ_M1_FDC)
+	UINT8 system = (machine->gamedrv->flags >> 25) & 1;
+
+	if (system)	// Model 4 does a NMI
+	{
+		trs80_nmi_data = 0x80;
+	//	cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, HOLD_LINE);
+	}
+	else		// Model 1 does a IRQ
 	{
 		trs80_int |= IRQ_M1_FDC;
 		cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
 	}
 }
 
-INTERRUPT_GEN( trs80_fdc_interrupt )
+INTERRUPT_GEN( trs80_fdc_interrupt )	/* not used - should it be? */
 {
 	trs80_fdc_interrupt_internal(device->machine);
 }
 
 static WD17XX_CALLBACK( trs80_fdc_callback )
 {
+	UINT8 system = (device->machine->gamedrv->flags >> 25) & 1;
+
 	switch (state)
 	{
 		case WD17XX_IRQ_CLR:
-			trs80_int &= ~IRQ_M1_FDC;
+			if (system) trs80_int &= ~IRQ_M1_FDC;
 			break;
 		case WD17XX_IRQ_SET:
 			trs80_fdc_interrupt_internal(device->machine);
@@ -700,12 +729,22 @@ WRITE8_HANDLER( trs80_cassunit_w )
 /* not emulated
 	01 for unit 1 (default
 	02 for unit 2 */
+
+	trs80_tape_unit = data;
 }
 
 READ8_HANDLER( trs80_irq_status_r )
 {
+/* (trs80l2) Whenever an interrupt occurs, 37E0 is read to see what devices require service.
+	d7 = RTC
+	d6 = FDC
+	d2 = Communications (not emulated)
+	All interrupting devices are serviced in a single interrupt. There is a mask byte,
+	which is dealt with by the DOS. We take the opportunity to reset the cpu INT line. */
+
 	int result = trs80_int;
-	trs80_int &= ~(IRQ_M1_RTC | IRQ_M1_FDC);
+	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
+	trs80_int = 0;
 	return result;
 }
 
@@ -734,6 +773,7 @@ WRITE8_HANDLER( trs80_motor_w )
 		drive = 3;
 		head = 0;
 		break;
+	/* These 3 combinations aren't documented */
 	case 9:
 		drive = 0;
 		head = 1;
@@ -761,7 +801,7 @@ WRITE8_HANDLER( trs80_motor_w )
  *************************************/
 READ8_HANDLER( trs80_keyboard_r )
 {
-	int result = 0;
+	UINT8 result = 0;
 
 	if (offset & 1)
 		result |= input_port_read(space->machine, "LINE0");

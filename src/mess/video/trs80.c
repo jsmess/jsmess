@@ -46,7 +46,7 @@ VIDEO_UPDATE( trs80 )
 	UINT8 y,ra,chr,gfx,gfxbit;
 	UINT16 sy=0,ma=0,x;
 	UINT8 *FNT = memory_region(screen->machine, "gfx1");
-	UINT8 seven_bit = screen->machine->gamedrv->flags >> 24;
+	UINT8 seven_bit = (screen->machine->gamedrv->flags >> 24) & 1;
 	static UINT8 size_store=0xff;
 	static UINT8 cols=64,skip=1;
 
@@ -185,7 +185,7 @@ VIDEO_UPDATE( ht1080z )
 	UINT8 y,ra,chr,gfx,gfxbit;
 	UINT16 sy=0,ma=0,x;
 	UINT8 *FNT = memory_region(screen->machine, "gfx1");
-	UINT8 seven_bit = screen->machine->gamedrv->flags >> 24;
+	UINT8 seven_bit = (screen->machine->gamedrv->flags >> 24) & 1;
 	static UINT8 size_store=0xff;
 	static UINT8 cols=64,skip=1;
 
