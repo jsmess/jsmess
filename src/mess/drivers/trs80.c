@@ -95,11 +95,16 @@ About the Model 4 - This has 4 memory maps.
 		Map 3 - RAM=0..F3FF, Keyboard=F400..F7FF, Video=F800..FFFF
 		Map 4 - RAM=0..FFFF
 
+About the ht1080z - This was made for schools in Hungary. Each comes with a BASIC extension roms
+		which activated Hungarian features. To activate - start emulation - enter SYSTEM
+		Enter /12288 and the extensions will be installed and you are returned to READY.
+
 ***************************************************************************
 
 Not dumped (to our knowledge):
  TRS80 Japanese bios
  TRS80 Katakana Character Generator
+ TRS80 Small English Character Generator
  TRS80 Model III/4 Character Generators
  TRS80 Model 4P boot disk
  TRS80 Model II bios and boot disk
@@ -265,13 +270,7 @@ static INPUT_PORTS_START( trs80 )
 	PORT_CONFNAME(	  0x80, 0x00,	"Floppy Disc Drives")
 	PORT_CONFSETTING(	0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(	0x80, DEF_STR( On ) )
-	PORT_CONFNAME(	  0x20, 0x00,	"Virtual Tape")
-	PORT_CONFSETTING(	0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(	0x20, DEF_STR( On ) )
-	PORT_BIT(	  0x08, 0x00, IPT_KEYBOARD) PORT_NAME("NMI") PORT_CODE(KEYCODE_F4)
-	PORT_BIT(	  0x04, 0x00, IPT_KEYBOARD) PORT_NAME("Tape start") PORT_CODE(KEYCODE_F5)
-	PORT_BIT(	  0x02, 0x00, IPT_KEYBOARD) PORT_NAME("Tape stop") PORT_CODE(KEYCODE_F6)
-	PORT_BIT(	  0x01, 0x00, IPT_KEYBOARD) PORT_NAME("Tape rewind") PORT_CODE(KEYCODE_F7)
+	PORT_BIT(0x7f, 0x7f, IPT_UNUSED)
 
 	PORT_START("LINE0") /* KEY ROW 0 */
 	PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("@") PORT_CODE(KEYCODE_OPENBRACE)		PORT_CHAR('@')
@@ -361,7 +360,7 @@ INPUT_PORTS_END
 
 INPUT_PORTS_START( trs80m3 )
 	PORT_INCLUDE (trs80)
-	PORT_START("E9")
+	PORT_START("E9")	// these are the power-on uart settings
 	PORT_BIT(0x07, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x88, 0x08, "Parity")
 	PORT_DIPSETTING(    0x08, DEF_STR(None))
@@ -568,32 +567,34 @@ ROM_START(trs80m4p)
 
 	ROM_REGION(0x00400, "gfx1",0)
 	/* this rom unlikely to be the correct one, but it will do for now */
-	ROM_LOAD("trs80m1.chr", 0x0000, 0x0400, NO_DUMP CRC(0033f2b9) SHA1(0d2cd4197d54e2e872b515bbfdaa98efe502eda7))
+	ROM_LOAD("trs80m1.chr",  0x0000, 0x0400, NO_DUMP CRC(0033f2b9) SHA1(0d2cd4197d54e2e872b515bbfdaa98efe502eda7))
 ROM_END
 
 ROM_START(ht1080z)
 	ROM_REGION(0x10000, "maincpu",0)
-	ROM_LOAD("ht1080z.rom", 0x0000, 0x3000, CRC(2bfef8f7) SHA1(7a350925fd05c20a3c95118c1ae56040c621be8f))
+	ROM_LOAD("ht1080z.rom",  0x0000, 0x3000, CRC(2bfef8f7) SHA1(7a350925fd05c20a3c95118c1ae56040c621be8f))
+	ROM_LOAD("ht1080z.ext",  0x3000, 0x0800, CRC(2a851e33) SHA1(dad21ec60973eb66e499fe0ecbd469118826a715))
 
 	ROM_REGION(0x00800, "gfx1",0)
-	ROM_LOAD("ht1080-1.chr", 0x0000, 0x0800, CRC(e8c59d4f) SHA1(a15f30a543e53d3e30927a2e5b766fcf80f0ae31))
+	ROM_LOAD("ht1080z.chr",  0x0000, 0x0800, CRC(e8c59d4f) SHA1(a15f30a543e53d3e30927a2e5b766fcf80f0ae31))
 ROM_END
 
 ROM_START(ht1080z2)
 	ROM_REGION(0x10000, "maincpu",0)
-	ROM_LOAD("ht1080z.rom", 0x0000, 0x3000, CRC(2bfef8f7) SHA1(7a350925fd05c20a3c95118c1ae56040c621be8f))
+	ROM_LOAD("ht1080z.rom",  0x0000, 0x3000, CRC(2bfef8f7) SHA1(7a350925fd05c20a3c95118c1ae56040c621be8f))
+	ROM_LOAD("ht1080z2.ext", 0x3000, 0x0800, CRC(07415ac6) SHA1(b08746b187946e78c4971295c0aefc4e3de97115))
 
 	ROM_REGION(0x00800, "gfx1",0)
-	ROM_LOAD("ht1080-2.chr", 0x0000, 0x0800, CRC(6728f0ab) SHA1(1ba949f8596f1976546f99a3fdcd3beb7aded2c5))
+	ROM_LOAD("ht1080z2.chr", 0x0000, 0x0800, CRC(6728f0ab) SHA1(1ba949f8596f1976546f99a3fdcd3beb7aded2c5))
 ROM_END
 
 ROM_START(ht108064)
 	ROM_REGION(0x10000, "maincpu",0)
-	ROM_LOAD("ht1080z.64", 0x0000, 0x3000, CRC(48985a30) SHA1(e84cf3121f9e0bb9e1b01b095f7a9581dcfaaae4))
-	ROM_LOAD("ht1080z.ext", 0x3000, 0x0800, CRC(fc12bd28) SHA1(0da93a311f99ec7a1e77486afe800a937778e73b))
+	ROM_LOAD("ht108064.rom", 0x0000, 0x3000, CRC(48985a30) SHA1(e84cf3121f9e0bb9e1b01b095f7a9581dcfaaae4))
+	ROM_LOAD("ht108064.ext", 0x3000, 0x0800, CRC(fc12bd28) SHA1(0da93a311f99ec7a1e77486afe800a937778e73b))
 
 	ROM_REGION(0x00800, "gfx1",0)
-	ROM_LOAD("ht1080-3.chr", 0x0000, 0x0800, CRC(e76b73a4) SHA1(6361ee9667bf59d50059d09b0baf8672fdb2e8af))
+	ROM_LOAD("ht108064.chr", 0x0000, 0x0800, CRC(e76b73a4) SHA1(6361ee9667bf59d50059d09b0baf8672fdb2e8af))
 ROM_END
 
 
