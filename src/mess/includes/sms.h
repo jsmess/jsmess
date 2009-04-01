@@ -15,23 +15,6 @@
 #define NVRAM_SIZE								(0x8000)
 #define CPU_ADDRESSABLE_SIZE			(0x10000)
 
-
-#define FLAG_GAMEGEAR			0x00020000
-#define FLAG_BIOS_0400			0x00040000
-#define FLAG_BIOS_2000			0x00080000
-#define FLAG_BIOS_FULL			0x00100000
-#define FLAG_FM				0x00200000
-#define FLAG_REGION_JAPAN		0x00400000
-
-#define IS_GAMEGEAR			( space->machine->gamedrv->flags & FLAG_GAMEGEAR )
-#define HAS_BIOS_0400			( space->machine->gamedrv->flags & FLAG_BIOS_0400 )
-#define HAS_BIOS_2000			( space->machine->gamedrv->flags & FLAG_BIOS_2000 )
-#define HAS_BIOS_FULL			( space->machine->gamedrv->flags & FLAG_BIOS_FULL )
-#define HAS_BIOS			( space->machine->gamedrv->flags & ( FLAG_BIOS_0400 | FLAG_BIOS_2000 | FLAG_BIOS_FULL ) )
-#define HAS_FM				( space->machine->gamedrv->flags & FLAG_FM )
-#define IS_REGION_JAPAN			( space->machine->gamedrv->flags & FLAG_REGION_JAPAN )
-
-
 /*----------- defined in machine/sms.c -----------*/
 
 /* Function prototypes */
@@ -77,6 +60,15 @@ void sms_store_int_callback( running_machine *machine, int state );
 #define IO_WORK_RAM					(0x10)	/* Work RAM disabled (1= disabled, 0= enabled) */
 #define IO_BIOS_ROM					(0x08)	/* BIOS ROM disabled (1= disabled, 0= enabled) */
 #define IO_CHIP							(0x04)	/* I/O chip disabled (1= disabled, 0= enabled) */
+
+
+DRIVER_INIT( sg1000m3 );
+DRIVER_INIT( sms1 );
+DRIVER_INIT( smsj );
+DRIVER_INIT( sms2kr );
+DRIVER_INIT( smssdisp );
+DRIVER_INIT( gamegear );
+DRIVER_INIT( gamegeaj );
 
 
 #endif /* SMS_H_ */

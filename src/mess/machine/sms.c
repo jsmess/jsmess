@@ -9,6 +9,23 @@
 #define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
+#define FLAG_GAMEGEAR		0x00020000
+#define FLAG_BIOS_0400		0x00040000
+#define FLAG_BIOS_2000		0x00080000
+#define FLAG_BIOS_FULL		0x00100000
+#define FLAG_FM				0x00200000
+#define FLAG_REGION_JAPAN	0x00400000
+
+
+#define IS_GAMEGEAR			( sms_flags & FLAG_GAMEGEAR )
+#define HAS_BIOS_0400		( sms_flags & FLAG_BIOS_0400 )
+#define HAS_BIOS_2000		( sms_flags & FLAG_BIOS_2000 )
+#define HAS_BIOS_FULL		( sms_flags & FLAG_BIOS_FULL )
+#define HAS_BIOS			( sms_flags & ( FLAG_BIOS_0400 | FLAG_BIOS_2000 | FLAG_BIOS_FULL ) )
+#define HAS_FM				( sms_flags & FLAG_FM )
+#define IS_REGION_JAPAN		( sms_flags & FLAG_REGION_JAPAN )
+
+
 #define CF_CODEMASTERS_MAPPER	0x01
 #define CF_KOREAN_MAPPER	0x02
 #define CF_93C46_EEPROM		0x04
@@ -23,7 +40,7 @@ static UINT8 smsVersion;
 static int smsPaused;
 
 static UINT8 biosPort;
-
+static UINT32 sms_flags;
 static UINT8 *BIOS;
 
 static UINT8 *sms_mapper_ram;
@@ -927,8 +944,6 @@ static int detect_korean_mapper( UINT8 *rom )
 
 DEVICE_START( sms_cart )
 {
-	running_machine *machine = device->machine;
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	int i;
 
 	for ( i = 0; i < MAX_CARTRIDGES; i++ )
@@ -955,13 +970,11 @@ DEVICE_START( sms_cart )
 
 DEVICE_IMAGE_LOAD( sms_cart )
 {
-	running_machine *machine = image->machine;
 	int size = image_length(image);
 	int index = 0;
 	const char *fname = image_filename( image );
 	int fname_len = fname ? strlen( fname ) : 0;
 	const char *extrainfo = image_extrainfo( image );
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
 	if (strcmp(image->tag,"cart1")==0)
 	{
@@ -1166,6 +1179,8 @@ MACHINE_RESET(sms)
 
 	sms_mapper_ram = memory_get_write_ptr( space, 0xDFFC );
 
+	biosPort = 0;
+
 	if ( sms_cartridge[sms_current_cartridge].features & CF_CODEMASTERS_MAPPER )
 	{
 		/* Install special memory handlers */
@@ -1279,5 +1294,47 @@ void sms_int_callback( running_machine *machine, int state )
 void sms_store_int_callback( running_machine *machine, int state )
 {
 	cpu_set_input_line(machine->cpu[0], sms_store_control & 0x01 ? 1 : 0, state );
+}
+
+
+DRIVER_INIT( sg1000m3 )
+{
+	sms_flags = FLAG_REGION_JAPAN | FLAG_FM;
+}
+
+
+DRIVER_INIT( sms1 )
+{
+	sms_flags = FLAG_BIOS_FULL;
+}
+
+
+DRIVER_INIT( smsj )
+{
+	sms_flags = FLAG_REGION_JAPAN | FLAG_BIOS_2000 | FLAG_FM;
+}
+
+
+DRIVER_INIT( sms2kr )
+{
+	sms_flags = FLAG_REGION_JAPAN | FLAG_BIOS_FULL | FLAG_FM;
+}
+
+
+DRIVER_INIT( smssdisp )
+{
+	sms_flags = 0;
+}
+
+
+DRIVER_INIT( gamegear )
+{
+	sms_flags = FLAG_GAMEGEAR;
+}
+
+
+DRIVER_INIT( gamegeaj )
+{
+	sms_flags = FLAG_REGION_JAPAN | FLAG_GAMEGEAR | FLAG_BIOS_0400;
 }
 
