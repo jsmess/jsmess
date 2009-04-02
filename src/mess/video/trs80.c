@@ -46,7 +46,6 @@ VIDEO_UPDATE( trs80 )
 	UINT8 y,ra,chr,gfx,gfxbit;
 	UINT16 sy=0,ma=0,x;
 	UINT8 *FNT = memory_region(screen->machine, "gfx1");
-	UINT8 seven_bit = (screen->machine->gamedrv->flags >> 24) & 1;
 	static UINT8 size_store=0xff;
 	static UINT8 cols=64,skip=1;
 
@@ -82,7 +81,7 @@ VIDEO_UPDATE( trs80 )
 				}
 				else
 				{
-					if ((seven_bit) && (chr < 32)) chr+=64;
+					if ((trs80_seven_bit) && (chr < 32)) chr+=64;
 
 					/* get pattern of pixels for that character scanline */
 					if (ra < 8)
@@ -185,7 +184,6 @@ VIDEO_UPDATE( ht1080z )
 	UINT8 y,ra,chr,gfx,gfxbit;
 	UINT16 sy=0,ma=0,x;
 	UINT8 *FNT = memory_region(screen->machine, "gfx1");
-	UINT8 seven_bit = (screen->machine->gamedrv->flags >> 24) & 1;
 	static UINT8 size_store=0xff;
 	static UINT8 cols=64,skip=1;
 
@@ -221,7 +219,7 @@ VIDEO_UPDATE( ht1080z )
 				}
 				else
 				{
-					if ((seven_bit) && (chr < 32)) chr+=64;
+					if ((trs80_seven_bit) && (chr < 32)) chr+=64;
 
 					/* get pattern of pixels for that character scanline */
 					gfx = FNT[(chr<<4) | ra ];

@@ -39,7 +39,7 @@ static UINT8 trs80_nmi_mask= 0;		/* nmi mask */
 static UINT8 trs80_port_ec=0;		/* bit d6..d1 of port EC to be read by port FF */
 static UINT8 trs80_tape_unit=1;		/* selected cassette unit (trs80l2 and sys80 only) (not implemented yet) */
 static UINT8 trs80_reg_load=1;		/* Controls what port EA will do */
-static UINT8 trs80_nmi_data=0;		/* Passes FDC int to NMI handler */
+static UINT8 trs80_nmi_data=0xff;	/* Passes FDC int to NMI handler */
 UINT8 trs80_mode = 0;			/* Control bits passed to video output routine */
 
 #define IRQ_M1_RTC		0x80	/* RTC on Model I */
@@ -292,8 +292,6 @@ READ8_HANDLER( trs80m4_e4_r )
 	cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
 
 	return ~(trs80_nmi_mask & trs80_nmi_data);
-
-//	return 0xff;
 }
 
 READ8_HANDLER( trs80m4_e8_r )
@@ -640,9 +638,7 @@ INTERRUPT_GEN( trs80_rtc_interrupt )
 	The OS counts one tick for each interrupt. The Model I has 40 ticks per
 	second, while the Model III/4 has 30. */
 
-	UINT8 system = (device->machine->gamedrv->flags >> 25) & 1;
-
-	if (system)	// Model 4
+	if (trs80_model4)	// Model 4
 	{
 		if (trs80_mask & IRQ_M4_RTC)
 		{
@@ -659,12 +655,13 @@ INTERRUPT_GEN( trs80_rtc_interrupt )
 
 static void trs80_fdc_interrupt_internal(running_machine *machine)
 {
-	UINT8 system = (machine->gamedrv->flags >> 25) & 1;
-
-	if (system)	// Model 4 does a NMI
+	if (trs80_model4)
 	{
-		trs80_nmi_data = 0x80;
-	//	cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, HOLD_LINE);
+		if (trs80_nmi_mask & 0x80)	// Model 4 does a NMI
+		{
+			trs80_nmi_data = 0x80;
+			cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
+		}
 	}
 	else		// Model 1 does a IRQ
 	{
@@ -680,12 +677,13 @@ INTERRUPT_GEN( trs80_fdc_interrupt )	/* not used - should it be? */
 
 static WD17XX_CALLBACK( trs80_fdc_callback )
 {
-	UINT8 system = (device->machine->gamedrv->flags >> 25) & 1;
-
 	switch (state)
 	{
 		case WD17XX_IRQ_CLR:
-			if (system) trs80_int &= ~IRQ_M1_FDC;
+			if (trs80_model4)
+				trs80_nmi_data = 0;
+			else
+				trs80_int &= ~IRQ_M1_FDC;
 			break;
 		case WD17XX_IRQ_SET:
 			trs80_fdc_interrupt_internal(device->machine);

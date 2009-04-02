@@ -18,6 +18,8 @@
 
 extern const wd17xx_interface trs80_wd17xx_interface;
 extern UINT8 trs80_mode;
+extern UINT8 trs80_model4;
+extern UINT8 trs80_seven_bit;
 
 DEVICE_IMAGE_LOAD( trs80_floppy );
 QUICKLOAD_LOAD( trs80_cmd );

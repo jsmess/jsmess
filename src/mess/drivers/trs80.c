@@ -39,6 +39,11 @@ System80 and LNW80 have non-addressable links to set the baud rate. Receive and 
 It is assumed that the TRS80L2 UART setup is identical to the System80, apart from the address ports used.
 Due to the above, the only working emulated UART is for the Model 3.
 
+Cassette baud rates: 	Model I level I - 250 baud
+			Model I level II and all clones - 500 baud
+			Model III/4 - 500 and 1500 baud selectable at boot time
+			- When it says "Cass?" press L for 500 baud, or Enter otherwise.
+
 I/O ports
 FF:
 - bits 0 and 1 are for writing a cassette
@@ -137,6 +142,8 @@ Not emulated:
 #include "devices/cassette.h"
 #include "formats/trs_cas.h"
 
+UINT8 trs80_model4;
+UINT8 trs80_seven_bit;
 
 static READ8_DEVICE_HANDLER (trs80_wd179x_r)
 {
@@ -597,6 +604,23 @@ ROM_START(ht108064)
 	ROM_LOAD("ht108064.chr", 0x0000, 0x0800, CRC(e76b73a4) SHA1(6361ee9667bf59d50059d09b0baf8672fdb2e8af))
 ROM_END
 
+static DRIVER_INIT( trs80 )
+{
+	trs80_seven_bit = 0;
+	trs80_model4 = 0;
+}
+
+static DRIVER_INIT( trs80l2 )
+{
+	trs80_seven_bit = 1;
+	trs80_model4 = 0;
+}
+
+static DRIVER_INIT( trs80m4 )
+{
+	trs80_seven_bit = 0;
+	trs80_model4 = 1;
+}
 
 static void trs8012_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
@@ -604,15 +628,15 @@ static void trs8012_floppy_getinfo(const mess_device_class *devclass, UINT32 sta
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 4; break;
+		case MESS_DEVINFO_INT_COUNT:			info->i = 4; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(trs80_floppy); break;
+		case MESS_DEVINFO_PTR_LOAD:			info->load = DEVICE_IMAGE_LOAD_NAME(trs80_floppy); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "dsk"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:		strcpy(info->s = device_temp_str(), "dsk"); break;
 
-		default:										legacybasicdsk_device_getinfo(devclass, state, info); break;
+		default:					legacybasicdsk_device_getinfo(devclass, state, info); break;
 	}
 }
 
@@ -620,16 +644,15 @@ static SYSTEM_CONFIG_START(trs8012)
 	CONFIG_DEVICE(trs8012_floppy_getinfo)
 SYSTEM_CONFIG_END
 
-/* Note - "1<<24" = needs 7-bit video; "1<<25" = Uses Model 4 IRQ system */
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE	  INPUT    INIT      CONFIG       COMPANY  FULLNAME */
-COMP( 1977, trs80,    0,	0,	trs80,    trs80,   0,        0,		"Tandy Radio Shack",  "TRS-80 Model I (Level I Basic)" , 0)
-COMP( 1978, trs80l2,  trs80,	0,	model1,   trs80,   0,        trs8012,	"Tandy Radio Shack",  "TRS-80 Model I (Level II Basic)" , 1<<24)
-COMP( 1983, radionic, trs80,	0,	radionic, trs80,   0,        trs8012,	"Komtek",  "Radionic" , 0)
-COMP( 1980, sys80,    trs80,	0,	sys80,    trs80,   0,        trs8012,	"EACA Computers Ltd.","System-80" , 1<<24)
-COMP( 1981, lnw80,    trs80,	0,	lnw80,    trs80m3, 0,        trs8012,	"LNW Research","LNW-80", 0 )
-COMP( 1980, trs80m3,  trs80,	0,	model3,   trs80m3, 0,        trs8012,	"Tandy Radio Shack",  "TRS-80 Model III", 1<<25 )
-COMP( 1980, trs80m4,  trs80,	0,	model3,   trs80m3, 0,        trs8012,	"Tandy Radio Shack",  "TRS-80 Model 4", 1<<25 )
-COMP( 1980, trs80m4p, trs80,	0,	model3,   trs80m3, 0,        trs8012,	"Tandy Radio Shack",  "TRS-80 Model 4P", GAME_NOT_WORKING | 1<<25)
-COMP( 1983, ht1080z,  trs80,	0,	ht1080z,  trs80,   0,        trs8012,	"Hiradastechnika Szovetkezet",  "HT-1080Z Series I" , 1<<24)
-COMP( 1984, ht1080z2, trs80,	0,	ht1080z,  trs80,   0,        trs8012,	"Hiradastechnika Szovetkezet",  "HT-1080Z Series II" , 1<<24)
-COMP( 1985, ht108064, trs80,	0,	ht1080z,  trs80,   0,        trs8012,	"Hiradastechnika Szovetkezet",  "HT-1080Z/64" , 0)
+COMP( 1977, trs80,    0,	0,	trs80,    trs80,   trs80,    0,		"Tandy Radio Shack",  "TRS-80 Model I (Level I Basic)" , 0 )
+COMP( 1978, trs80l2,  trs80,	0,	model1,   trs80,   trs80l2,  trs8012,	"Tandy Radio Shack",  "TRS-80 Model I (Level II Basic)" , 0 )
+COMP( 1983, radionic, trs80,	0,	radionic, trs80,   trs80,    trs8012,	"Komtek",  "Radionic" , 0 )
+COMP( 1980, sys80,    trs80,	0,	sys80,    trs80,   trs80l2,  trs8012,	"EACA Computers Ltd.","System-80" , 0 )
+COMP( 1981, lnw80,    trs80,	0,	lnw80,    trs80m3, trs80,    trs8012,	"LNW Research","LNW-80", 0 )
+COMP( 1980, trs80m3,  trs80,	0,	model3,   trs80m3, trs80m4,  trs8012,	"Tandy Radio Shack",  "TRS-80 Model III", 0 )
+COMP( 1980, trs80m4,  trs80,	0,	model3,   trs80m3, trs80m4,  trs8012,	"Tandy Radio Shack",  "TRS-80 Model 4", 0 )
+COMP( 1980, trs80m4p, trs80,	0,	model3,   trs80m3, trs80m4,  trs8012,	"Tandy Radio Shack",  "TRS-80 Model 4P", GAME_NOT_WORKING )
+COMP( 1983, ht1080z,  trs80,	0,	ht1080z,  trs80,   trs80l2,  trs8012,	"Hiradastechnika Szovetkezet",  "HT-1080Z Series I" , 0 )
+COMP( 1984, ht1080z2, trs80,	0,	ht1080z,  trs80,   trs80l2,  trs8012,	"Hiradastechnika Szovetkezet",  "HT-1080Z Series II" , 0 )
+COMP( 1985, ht108064, trs80,	0,	ht1080z,  trs80,   trs80,    trs8012,	"Hiradastechnika Szovetkezet",  "HT-1080Z/64" , 0 )
