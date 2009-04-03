@@ -13,6 +13,8 @@ System Driver Changes:
 
 - [TRS80] Added parallel printer [Robbbert]
 
+- [STUDIO2] Fixed .st2 cartridge loading. [Curt Coder]
+
 
 
 User Interface Changes:
