@@ -264,7 +264,7 @@ static CDP1802_SC_WRITE( comx35_sc_w )
 
 			if (!driver_state->iden)
 			{
-				cpu_set_input_line(device->machine->cpu[0], CDP1802_INPUT_LINE_DMAOUT, HOLD_LINE);
+				cputag_set_input_line(device->machine, CDP1802_TAG, CDP1802_INPUT_LINE_DMAOUT, HOLD_LINE);
 			}
 		}
 		else
@@ -275,12 +275,12 @@ static CDP1802_SC_WRITE( comx35_sc_w )
 
 	case CDP1802_STATE_CODE_S2_DMA:
 		// DMA acknowledge clears the DMAOUT request
-		cpu_set_input_line(device->machine->cpu[0], CDP1802_INPUT_LINE_DMAOUT, CLEAR_LINE);
+		cputag_set_input_line(device->machine, CDP1802_TAG, CDP1802_INPUT_LINE_DMAOUT, CLEAR_LINE);
 		break;
 
 	case CDP1802_STATE_CODE_S3_INTERRUPT:
 		// interrupt acknowledge clears the INT request
-		cpu_set_input_line(device->machine->cpu[0], CDP1802_INPUT_LINE_INT, CLEAR_LINE);
+		cputag_set_input_line(device->machine, CDP1802_TAG, CDP1802_INPUT_LINE_INT, CLEAR_LINE);
 		break;
 	}
 }

@@ -360,7 +360,7 @@ static void get_active_bank(running_machine *machine, UINT8 data)
 static void set_active_bank(running_machine *machine)
 {
 	comx35_state *state = machine->driver_data;
-	const address_space *program = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *program = cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
 	int bank = state->bank;
 
 	switch (state->bank)
@@ -561,7 +561,7 @@ static STATE_POSTLOAD( comx35_state_save_postload )
 MACHINE_START( comx35p )
 {
 	comx35_state *state = machine->driver_data;
-	const address_space *program = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *program = cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
 
 	/* opbase handling for DOS Card */
 
@@ -671,14 +671,14 @@ INPUT_CHANGED( comx35_reset )
 
 static void image_fread_memory(const device_config *image, UINT16 addr, UINT32 count)
 {
-	void *ptr = memory_get_write_ptr(cpu_get_address_space(image->machine->cpu[0], ADDRESS_SPACE_PROGRAM), addr);
+	void *ptr = memory_get_write_ptr(cputag_get_address_space(image->machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM), addr);
 
 	image_fread(image, ptr, count);
 }
 
 QUICKLOAD_LOAD( comx35 )
 {
-	const address_space *program = cpu_get_address_space(image->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *program = cputag_get_address_space(image->machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
 
 	UINT8 header[16] = {0};
 	int size = image_length(image);
