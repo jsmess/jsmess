@@ -40,6 +40,7 @@ static UINT8 trs80_port_ec=0;		/* bit d6..d1 of port EC to be read by port FF */
 static UINT8 trs80_tape_unit=1;		/* selected cassette unit (trs80l2 and sys80 only) (not implemented yet) */
 static UINT8 trs80_reg_load=1;		/* Controls what port EA will do */
 static UINT8 trs80_nmi_data=0xff;	/* Passes FDC int to NMI handler */
+static UINT8 lnw80_port_fe=0xf0;	/* LNW80 video control bits */
 UINT8 trs80_mode = 0;			/* Control bits passed to video output routine */
 
 #define IRQ_M1_RTC		0x80	/* RTC on Model I */
@@ -248,6 +249,7 @@ MACHINE_RESET( trs80 )
 	trs80_speaker = devtag_get_device(machine, "speaker");
 	trs80_fdc = devtag_get_device(machine, "wd179x");
 	videoram_size = 0x800;
+	trs80_reg_load = 1;		/* for LNW80 */
 }
 
 
@@ -279,7 +281,7 @@ READ8_HANDLER( trs80m4_e0_r )
 
 READ8_HANDLER( trs80m4_e4_r )
 {
-/* Indicates which devices are interrupting - not emulated.
+/* Indicates which devices are interrupting - d6..d5 not emulated.
 	Whenever an NMI occurs, this port is immediately read
 	to find out which device requires service. Lowest-numbered
 	bit takes precedence. We take this opportunity to clear the
@@ -367,6 +369,11 @@ READ8_HANDLER( sys80_f9_r )
 	ay31015_set_input_pin( trs80_ay31015, AY31015_SWE, 1 );
 
 	return data;
+}
+
+READ8_HANDLER( lnw80_fe_r )
+{
+	return lnw80_port_fe | 0xf0;
 }
 
 READ8_HANDLER( trs80_ff_r )
@@ -593,11 +600,13 @@ WRITE8_HANDLER( sys80_fe_w )
 WRITE8_HANDLER( lnw80_fe_w )
 {
 /* d3..d2 not emulated
-	d3 bankswitch lower 16k between roms and hires ram
-	d2 enable colour
-	d0 inverse video */
+	d3 bankswitch lower 16k between roms and hires ram (1=hires)
+	d2 enable colour	\
+	d1 hres			/	these 2 are the bits from the MODE command of LNWBASIC
+	d0 inverse video (entire screen) */
 
-	trs80_mode = (trs80_mode & 0xf7) | ((data & 1) ? 8 : 0);
+	trs80_mode = (trs80_mode & 0x87) | ((data & 0x0f) << 3);
+	lnw80_port_fe = data;
 }
 
 WRITE8_HANDLER( trs80_ff_w )
@@ -612,7 +621,7 @@ WRITE8_HANDLER( trs80_ff_w )
 	cassette_output( trs80_cass, levels[data & 3]);
 	cassette_data &= ~0x80;
 
-	trs80_mode = (data & 8) ? 1 : 0;
+	trs80_mode = (trs80_mode & 0xfe) | ((data & 8) >> 3);
 }
 
 WRITE8_HANDLER( trs80m4_ff_w )

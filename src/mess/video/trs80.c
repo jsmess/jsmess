@@ -10,8 +10,12 @@
 
 /* Bit assignment for "trs80_mode"
 	d7 Page select
-	d3 Invert characters with bit 7 set (1=invert)
+	d6 LNW80 switch to graphics ram
+	d5 LNW80 colour or monochrome (1=colour)
+	d4 LNW80 lores or hires (1=hires) also does 64 or 80 chars per line
+	d3 LNW80 invert entire screen / Model III/4 Invert characters with bit 7 set (1=invert)
 	d2 80/40 or 64/32 characters per line (1=80)
+	d1 7 or 8 bit video (1=requires 7-bit, 0=don't care)
 	d0 80/64 or 40/32 characters per line (1=32) */
 
 static UINT16 start_address=0;
@@ -81,7 +85,7 @@ VIDEO_UPDATE( trs80 )
 				}
 				else
 				{
-					if ((trs80_seven_bit) && (chr < 32)) chr+=64;
+					if ((trs80_mode & 2) && (chr < 32)) chr+=64;
 
 					/* get pattern of pixels for that character scanline */
 					if (ra < 8)
@@ -219,7 +223,7 @@ VIDEO_UPDATE( ht1080z )
 				}
 				else
 				{
-					if ((trs80_seven_bit) && (chr < 32)) chr+=64;
+					if ((trs80_mode & 2) && (chr < 32)) chr+=64;
 
 					/* get pattern of pixels for that character scanline */
 					gfx = FNT[(chr<<4) | ra ];
@@ -239,64 +243,116 @@ VIDEO_UPDATE( ht1080z )
 	return 0;
 }
 
+/* 8-bit video, 64/80 characters per line = lnw80 */
 VIDEO_UPDATE( lnw80 )
 {
 	const UINT16 rows[] = { 0, 0x200, 0x100, 0x300, 1, 0x201, 0x101, 0x301 };
-	UINT8 y,ra,chr,gfx,gfxbit;
+	UINT8 y,ra,chr,gfx,gfxbit,bg=7,fg=0;
 	UINT16 sy=0,ma=0,x;
 	UINT8 *FNT = memory_region(screen->machine, "gfx1");
 	static UINT8 size_store=0xff;
-	static UINT8 cols=64,skip=1;
+	static UINT8 cols=64;
 
+	/* Although the OS can select 32-character mode, it is not supported by hardware */
 	if ((trs80_mode & 0x7f) != size_store)
 	{
 		size_store = trs80_mode & 0x7f;
-		cols = (trs80_mode & 1) ? 32 : 64;
-		skip = (trs80_mode & 1) ? 2 : 1;
+		cols = (trs80_mode & 16) ? 80 : 64;
 		video_screen_set_visarea(screen, 0, cols*FW-1, 0, 16*FH-1);
 	}
 
-	for (y = 0; y < 16; y++)
+	if (trs80_mode & 8)
 	{
-		for (ra = 0; ra < FH; ra++)
-		{
-			UINT16  *p = BITMAP_ADDR16(bitmap, sy++, 0);
+		bg = 0;
+		fg = 7;
+	}
 
-			for (x = ma; x < ma + 64; x+=skip)
+	switch (trs80_mode & 0x30)
+	{
+		case 0:					// MODE 0
+			for (y = 0; y < 16; y++)
 			{
-				chr = videoram[x];
-
-				if (chr & 0x80)
+				for (ra = 0; ra < FH; ra++)
 				{
-					gfxbit = 1<<((ra & 0x0c)>>1);
-					/* Display one line of a lores character (6 pixels) */
-					*p = ( chr & gfxbit ) ? 1 : 0; p++;
-					*p = ( chr & gfxbit ) ? 1 : 0; p++;
-					*p = ( chr & gfxbit ) ? 1 : 0; p++;
-					gfxbit <<= 1; 
-					*p = ( chr & gfxbit ) ? 1 : 0; p++;
-					*p = ( chr & gfxbit ) ? 1 : 0; p++;
-					*p = ( chr & gfxbit ) ? 1 : 0; p++;
+					UINT16  *p = BITMAP_ADDR16(bitmap, sy++, 0);
+
+					for (x = ma; x < ma + 64; x++)
+					{
+						chr = videoram[x];
+
+						if (chr & 0x80)
+						{
+							gfxbit = 1<<((ra & 0x0c)>>1);
+							/* Display one line of a lores character (6 pixels) */
+							*p = ( chr & gfxbit ) ? fg : bg; p++;
+							*p = ( chr & gfxbit ) ? fg : bg; p++;
+							*p = ( chr & gfxbit ) ? fg : bg; p++;
+							gfxbit <<= 1; 
+							*p = ( chr & gfxbit ) ? fg : bg; p++;
+							*p = ( chr & gfxbit ) ? fg : bg; p++;
+							*p = ( chr & gfxbit ) ? fg : bg; p++;
+						}
+						else
+						{
+							/* get pattern of pixels for that character scanline */
+							if (ra < 8)
+								gfx = FNT[(chr<<1) | rows[ra] ];
+							else
+								gfx = 0;
+
+							/* Display a scanline of a character (6 pixels) */
+							*p = ( gfx & 0x04 ) ? fg : bg; p++;
+							*p = ( gfx & 0x02 ) ? fg : bg; p++;
+							*p = ( gfx & 0x40 ) ? fg : bg; p++;
+							*p = ( gfx & 0x80 ) ? fg : bg; p++;
+							*p = ( gfx & 0x20 ) ? fg : bg; p++;
+							*p = ( gfx & 0x08 ) ? fg : bg; p++;
+						}
+					}
 				}
-				else
-				{
-					/* get pattern of pixels for that character scanline */
-					if (ra < 8)
-						gfx = FNT[(chr<<1) | rows[ra] ];
-					else
-						gfx = 0;
+				ma+=64;
+			}
+			break;
 
-					/* Display a scanline of a character (6 pixels) */
-					*p = ( gfx & 0x04 ) ? 1 : 0; p++;
-					*p = ( gfx & 0x02 ) ? 1 : 0; p++;
-					*p = ( gfx & 0x40 ) ? 1 : 0; p++;
-					*p = ( gfx & 0x80 ) ? 1 : 0; p++;
-					*p = ( gfx & 0x20 ) ? 1 : 0; p++;
-					*p = ( gfx & 0x08 ) ? 1 : 0; p++;
+		case 0x10:					// MODE 1
+#if 0	// not ready yet
+			for (y = 0x40; y < 0x400; y+=0x40)
+			{
+				for (ra = 0x400; ra < 0x3000; ra+=0x400)
+				{
+					UINT16  *p = BITMAP_ADDR16(bitmap, sy++, 0);
+
+					for (x = 0; x < 0x40; x++)
+					{
+						gfx = gfxram[ y | x | ra];		
+						/* Display 6 pixels in normal region */
+						*p = ( gfx & 0x04 ) ? fg : bg; p++;
+						*p = ( gfx & 0x02 ) ? fg : bg; p++;
+						*p = ( gfx & 0x40 ) ? fg : bg; p++;
+						*p = ( gfx & 0x80 ) ? fg : bg; p++;
+						*p = ( gfx & 0x20 ) ? fg : bg; p++;
+						*p = ( gfx & 0x08 ) ? fg : bg; p++;
+					}
+
+					for (x = 0; x < 0x10; x++)
+					{
+						gfx = gfxram[ 0x3000 | x | ra & 0xc00 | (ra & 0x3000) >> 8];		
+						/* Display 6 pixels in extended region */
+						*p = ( gfx & 0x04 ) ? fg : bg; p++;
+						*p = ( gfx & 0x02 ) ? fg : bg; p++;
+						*p = ( gfx & 0x40 ) ? fg : bg; p++;
+						*p = ( gfx & 0x80 ) ? fg : bg; p++;
+						*p = ( gfx & 0x20 ) ? fg : bg; p++;
+						*p = ( gfx & 0x08 ) ? fg : bg; p++;
+					}
 				}
 			}
-		}
-		ma+=64;
+#endif
+			break;
+		case 0x20:					// MODE 2
+			break;
+		case 0x30:					// MODE 3
+			break;
 	}
 	return 0;
 }
@@ -364,3 +420,39 @@ WRITE8_HANDLER( trs80_videoram_w )
 	videoram[offset] = data;
 }
 
+/***************************************************************************
+  Write to graphics ram
+***************************************************************************/
+#if 0					// not ready yet
+READ8_HANDLER( trs80_gfxram_r )
+{
+	return gfxram[offset];
+}
+
+WRITE8_HANDLER( trs80_gfxram_w )
+{
+	gfxram[offset] = data;
+}
+#endif
+
+/***************************************************************************
+  Palettes
+***************************************************************************/
+
+/* Levels are unknown - guessing */
+static const rgb_t lnw80_palette[] =
+{
+	MAKE_RGB(200, 200, 200), // white
+	MAKE_RGB(0, 175, 0), // green
+	MAKE_RGB(200, 200, 0), // yellow
+	MAKE_RGB(255, 0, 0), // red
+	MAKE_RGB(255, 0, 255), // magenta
+	MAKE_RGB(0, 0, 175), // blue
+	MAKE_RGB(0, 255, 255), // cyan
+	MAKE_RGB(0, 0, 0), // black
+};
+
+PALETTE_INIT( lnw80 )
+{
+	palette_set_colors(machine, 0, lnw80_palette, ARRAY_LENGTH(lnw80_palette));
+}

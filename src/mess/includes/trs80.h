@@ -19,7 +19,6 @@
 extern const wd17xx_interface trs80_wd17xx_interface;
 extern UINT8 trs80_mode;
 extern UINT8 trs80_model4;
-extern UINT8 trs80_seven_bit;
 
 DEVICE_IMAGE_LOAD( trs80_floppy );
 QUICKLOAD_LOAD( trs80_cmd );
@@ -42,6 +41,7 @@ WRITE8_HANDLER ( trs80m4_e0_w );
 WRITE8_HANDLER ( trs80m4_90_w );
 WRITE8_HANDLER ( trs80m4_88_w );
 WRITE8_HANDLER ( trs80m4_84_w );
+READ8_HANDLER ( lnw80_fe_r );
 READ8_HANDLER ( trs80_ff_r );
 READ8_HANDLER ( trs80_fe_r );
 READ8_HANDLER ( sys80_f9_r );
@@ -80,6 +80,8 @@ VIDEO_UPDATE( trs80m4 );
 
 READ8_HANDLER( trs80_videoram_r );
 WRITE8_HANDLER( trs80_videoram_w );
+
+PALETTE_INIT( lnw80 );
 
 
 #endif	/* TRS80_H_ */

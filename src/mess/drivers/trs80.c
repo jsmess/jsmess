@@ -103,6 +103,8 @@ About the Model 4 - This has 4 memory maps.
 About the ht1080z - This was made for schools in Hungary. Each comes with a BASIC extension roms
 		which activated Hungarian features. To activate - start emulation - enter SYSTEM
 		Enter /12288 and the extensions will be installed and you are returned to READY.
+		The ht1080z is identical to the System 80, apart from the character rom.
+		The ht1080z2 has a modified extension rom and character generator.
 
 ***************************************************************************
 
@@ -117,7 +119,7 @@ Not dumped (to our knowledge):
 Not emulated:
  TRS80 Japanese kana/ascii switch and alternate keyboard
  TRS80 Model III/4 Hard drive, Graphics board, Alternate Character set
- LNW80 1.77 / 4.0 MHz switch
+ LNW80 1.77 / 4.0 MHz switch (this is a physical switch)
  LNW80 Colour board
  LNW80 Hires graphics
  LNW80 24x80 screen
@@ -143,18 +145,13 @@ Not emulated:
 #include "formats/trs_cas.h"
 
 UINT8 trs80_model4;
-UINT8 trs80_seven_bit;
 
 static READ8_DEVICE_HANDLER (trs80_wd179x_r)
 {
 	if (input_port_read(device->machine, "CONFIG") & 0x80)
-	{
 		return wd17xx_status_r(device, offset);
-	}
 	else
-	{
 		return 0xff;
-	}
 }
 
 static ADDRESS_MAP_START( trs80_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -169,9 +166,8 @@ static ADDRESS_MAP_START( trs80_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xff, 0xff) AM_READWRITE(trs80_ff_r, trs80_ff_w)
 ADDRESS_MAP_END
 
-/* memory from 37de-37ff, 8000-ffff only exists when expansion box is used */
 static ADDRESS_MAP_START( model1_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x377f) AM_ROM	// ht108064 needs up to 375F
+	AM_RANGE(0x0000, 0x377f) AM_ROM	// sys80,ht1080 needs up to 375F
 	AM_RANGE(0x37de, 0x37de) AM_READWRITE(sys80_f9_r, sys80_f8_w)
 	AM_RANGE(0x37df, 0x37df) AM_READWRITE(trs80m4_eb_r, trs80m4_eb_w)
 	AM_RANGE(0x37e0, 0x37e3) AM_READWRITE(trs80_irq_status_r, trs80_motor_w)
@@ -197,6 +193,16 @@ static ADDRESS_MAP_START( sys80_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xf9, 0xf9) AM_READWRITE(sys80_f9_r, trs80m4_eb_w)
 	AM_RANGE(0xfd, 0xfd) AM_READWRITE(trs80_printer_r, trs80_printer_w)
 	AM_RANGE(0xfe, 0xfe) AM_WRITE(sys80_fe_w)
+	AM_RANGE(0xff, 0xff) AM_READWRITE(trs80_ff_r, trs80_ff_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( lnw80_io, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0xe8, 0xe8) AM_READWRITE(trs80m4_e8_r, trs80m4_e8_w)
+	AM_RANGE(0xe9, 0xe9) AM_READ_PORT("E9")
+	AM_RANGE(0xea, 0xea) AM_READWRITE(trs80m4_ea_r, trs80m4_ea_w)
+	AM_RANGE(0xeb, 0xeb) AM_READWRITE(trs80m4_eb_r, trs80m4_eb_w)
+	AM_RANGE(0xfe, 0xfe) AM_READWRITE(lnw80_fe_r, lnw80_fe_w)
 	AM_RANGE(0xff, 0xff) AM_READWRITE(trs80_ff_r, trs80_ff_w)
 ADDRESS_MAP_END
 
@@ -454,6 +460,7 @@ static MACHINE_DRIVER_START( model3 )
 	MDRV_CPU_PROGRAM_MAP( model3_map, 0 )
 	MDRV_CPU_IO_MAP( model3_io, 0 )
 	MDRV_CPU_PERIODIC_INT(trs80_rtc_interrupt, 30)
+
 	MDRV_VIDEO_UPDATE( trs80m4 )
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_SIZE(80*FW, 240)
@@ -473,7 +480,16 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( lnw80 )
 	MDRV_IMPORT_FROM( model1 )
-	MDRV_VIDEO_UPDATE( lnw80 )
+	MDRV_CPU_MODIFY( "maincpu" )
+	MDRV_CPU_PROGRAM_MAP( model1_map, 0 )
+	MDRV_CPU_IO_MAP( lnw80_io, 0 )
+
+	MDRV_PALETTE_LENGTH(8)
+	MDRV_PALETTE_INIT(lnw80)
+	MDRV_VIDEO_UPDATE(lnw80)
+	MDRV_SCREEN_MODIFY("screen")
+	MDRV_SCREEN_SIZE(80*FW, 16*FH)
+	MDRV_SCREEN_VISIBLE_AREA(0,80*FW-1,0,16*FH-1)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( radionic )
@@ -493,10 +509,10 @@ MACHINE_DRIVER_END
 
 ROM_START(trs80)
 	ROM_REGION(0x10000, "maincpu",0)
-	ROM_LOAD("level1.rom",  0x0000, 0x1000, CRC(70d06dff) SHA1(20d75478fbf42214381e05b14f57072f3970f765))
+	ROM_LOAD("level1.rom",   0x0000, 0x1000, CRC(70d06dff) SHA1(20d75478fbf42214381e05b14f57072f3970f765))
 
 	ROM_REGION(0x00400, "gfx1",0)
-	ROM_LOAD("trs80m1.chr", 0x0000, 0x0400, CRC(0033f2b9) SHA1(0d2cd4197d54e2e872b515bbfdaa98efe502eda7))
+	ROM_LOAD("trs80m1.chr",  0x0000, 0x0400, CRC(0033f2b9) SHA1(0d2cd4197d54e2e872b515bbfdaa98efe502eda7))
 ROM_END
 
 ROM_START(trs80l2)
@@ -511,61 +527,63 @@ ROM_START(trs80l2)
 	ROMX_LOAD("trs80alt.zl2",0x2000, 0x1000, CRC(55b3ad13) SHA1(6279f6a68f927ea8628458b278616736f0b3c339), ROM_BIOS(2))
 
 	ROM_REGION(0x00400, "gfx1",0)
-	ROM_LOAD("trs80m1.chr", 0x0000, 0x0400, CRC(0033f2b9) SHA1(0d2cd4197d54e2e872b515bbfdaa98efe502eda7))
+	ROM_LOAD("trs80m1.chr",  0x0000, 0x0400, CRC(0033f2b9) SHA1(0d2cd4197d54e2e872b515bbfdaa98efe502eda7))
 ROM_END
 
 ROM_START(radionic)
 	ROM_REGION(0x10000, "maincpu",0)
-	ROM_LOAD("ep1.bin",0x0000, 0x1000, CRC(e8908f44) SHA1(7a5a60c3afbeb6b8434737dd302332179a7fca59))
-	ROM_LOAD("ep2.bin",0x1000, 0x1000, CRC(46e88fbf) SHA1(a3ca32757f269e09316e1e91ba1502774e2f5155))
-	ROM_LOAD("ep3.bin",0x2000, 0x1000, CRC(306e5d66) SHA1(1e1abcfb5b02d4567cf6a81ffc35318723442369))
-	ROM_LOAD("ep4.bin",0x3000, 0x0400, CRC(70f90f26) SHA1(cbee70da04a3efac08e50b8e3a270262c2440120))
+	ROM_LOAD("ep1.bin",      0x0000, 0x1000, CRC(e8908f44) SHA1(7a5a60c3afbeb6b8434737dd302332179a7fca59))
+	ROM_LOAD("ep2.bin",      0x1000, 0x1000, CRC(46e88fbf) SHA1(a3ca32757f269e09316e1e91ba1502774e2f5155))
+	ROM_LOAD("ep3.bin",      0x2000, 0x1000, CRC(306e5d66) SHA1(1e1abcfb5b02d4567cf6a81ffc35318723442369))
+	ROM_LOAD("ep4.bin",      0x3000, 0x0400, CRC(70f90f26) SHA1(cbee70da04a3efac08e50b8e3a270262c2440120))
 	ROM_CONTINUE(0x3000, 0x400)
 	ROM_CONTINUE(0x3000, 0x600)
 	ROM_IGNORE(0x200)
 
 	ROM_REGION(0x01000, "gfx1",0)
-	ROM_LOAD("trschar.bin", 0x0000, 0x1000, CRC(02e767b6) SHA1(c431fcc6bd04ce2800ca8c36f6f8aeb2f91ce9f7))
+	ROM_LOAD("trschar.bin",  0x0000, 0x1000, CRC(02e767b6) SHA1(c431fcc6bd04ce2800ca8c36f6f8aeb2f91ce9f7))
 ROM_END
 
 ROM_START(sys80)
 	ROM_REGION(0x10000, "maincpu",0)
-	ROM_LOAD("sys80rom.1", 0x0000, 0x1000, CRC(8f5214de) SHA1(d8c052be5a2d0ec74433043684791d0554bf203b))
-	ROM_LOAD("sys80rom.2", 0x1000, 0x1000, CRC(46e88fbf) SHA1(a3ca32757f269e09316e1e91ba1502774e2f5155))
-	ROM_LOAD("trs80.zl2",  0x2000, 0x1000, CRC(306e5d66) SHA1(1e1abcfb5b02d4567cf6a81ffc35318723442369))
+	ROM_LOAD("sys80rom.1",   0x0000, 0x1000, CRC(8f5214de) SHA1(d8c052be5a2d0ec74433043684791d0554bf203b))
+	ROM_LOAD("sys80rom.2",   0x1000, 0x1000, CRC(46e88fbf) SHA1(a3ca32757f269e09316e1e91ba1502774e2f5155))
+	ROM_LOAD("trs80.zl2",    0x2000, 0x1000, CRC(306e5d66) SHA1(1e1abcfb5b02d4567cf6a81ffc35318723442369))
+	/* This rom turns the system80 into the "blue label" version. SYSTEM then /12288 to activate. */
+	ROM_LOAD("sys80.ext",    0x3000, 0x0800, CRC(2a851e33) SHA1(dad21ec60973eb66e499fe0ecbd469118826a715))
 
 	ROM_REGION(0x00400, "gfx1",0)
-	ROM_LOAD("trs80m1.chr", 0x0000, 0x0400, CRC(0033f2b9) SHA1(0d2cd4197d54e2e872b515bbfdaa98efe502eda7))
+	ROM_LOAD("trs80m1.chr",  0x0000, 0x0400, CRC(0033f2b9) SHA1(0d2cd4197d54e2e872b515bbfdaa98efe502eda7))
 ROM_END
 
 ROM_START(lnw80)
 	ROM_REGION(0x10000, "maincpu",0)
-	ROM_LOAD("lnw_a.bin",  0x0000, 0x0800, CRC(e09f7e91) SHA1(cd28e72efcfebde6cf1c7dbec4a4880a69e683da))
-	ROM_LOAD("lnw_a1.bin", 0x0800, 0x0800, CRC(ac297d99) SHA1(ccf31d3f9d02c3b68a0ee3be4984424df0e83ab0))
-	ROM_LOAD("lnw_b.bin",  0x1000, 0x0800, CRC(c4303568) SHA1(13e3d81c6f0de0e93956fa58c465b5368ea51682))
-	ROM_LOAD("lnw_b1.bin", 0x1800, 0x0800, CRC(3a5ea239) SHA1(8c489670977892d7f2bfb098f5df0b4dfa8fbba6))
-	ROM_LOAD("lnw_c.bin",  0x2000, 0x0800, CRC(2ba025d7) SHA1(232efbe23c3f5c2c6655466ebc0a51cf3697be9b))
-	ROM_LOAD("lnw_c1.bin", 0x2800, 0x0800, CRC(ed547445) SHA1(20102de89a3ee4a65366bc2d62be94da984a156b))
+	ROM_LOAD("lnw_a.bin",    0x0000, 0x0800, CRC(e09f7e91) SHA1(cd28e72efcfebde6cf1c7dbec4a4880a69e683da))
+	ROM_LOAD("lnw_a1.bin",   0x0800, 0x0800, CRC(ac297d99) SHA1(ccf31d3f9d02c3b68a0ee3be4984424df0e83ab0))
+	ROM_LOAD("lnw_b.bin",    0x1000, 0x0800, CRC(c4303568) SHA1(13e3d81c6f0de0e93956fa58c465b5368ea51682))
+	ROM_LOAD("lnw_b1.bin",   0x1800, 0x0800, CRC(3a5ea239) SHA1(8c489670977892d7f2bfb098f5df0b4dfa8fbba6))
+	ROM_LOAD("lnw_c.bin",    0x2000, 0x0800, CRC(2ba025d7) SHA1(232efbe23c3f5c2c6655466ebc0a51cf3697be9b))
+	ROM_LOAD("lnw_c1.bin",   0x2800, 0x0800, CRC(ed547445) SHA1(20102de89a3ee4a65366bc2d62be94da984a156b))
 
 	ROM_REGION(0x00800, "gfx1",0)
-	ROM_LOAD("lnw_chr.bin",0x0000, 0x0800, CRC(c89b27df) SHA1(be2a009a07e4378d070002a558705e9a0de59389))
+	ROM_LOAD("lnw_chr.bin",  0x0000, 0x0800, CRC(c89b27df) SHA1(be2a009a07e4378d070002a558705e9a0de59389))
 ROM_END
 
 ROM_START(trs80m3)
 	ROM_REGION(0x10000, "maincpu",0)
-	ROM_LOAD("trs80m3.rom", 0x0000, 0x3800, CRC(bddbf843) SHA1(04a1f062cf73c3931c038434e3f299482b6bf613))
+	ROM_LOAD("trs80m3.rom",  0x0000, 0x3800, CRC(bddbf843) SHA1(04a1f062cf73c3931c038434e3f299482b6bf613))
 
 	ROM_REGION(0x00400, "gfx1",0)	/* incorrect rom */
-	ROM_LOAD("trs80m1.chr", 0x0000, 0x0400, NO_DUMP CRC(0033f2b9) SHA1(0d2cd4197d54e2e872b515bbfdaa98efe502eda7))
+	ROM_LOAD("trs80m1.chr",  0x0000, 0x0400, NO_DUMP CRC(0033f2b9) SHA1(0d2cd4197d54e2e872b515bbfdaa98efe502eda7))
 ROM_END
 
 ROM_START(trs80m4)
 	ROM_REGION(0x10000, "maincpu",0)
-	ROM_LOAD("trs80m4.rom", 0x0000, 0x3800, CRC(1a92d54d) SHA1(752555fdd0ff23abc9f35c6e03d9d9b4c0e9677b))
+	ROM_LOAD("trs80m4.rom",  0x0000, 0x3800, CRC(1a92d54d) SHA1(752555fdd0ff23abc9f35c6e03d9d9b4c0e9677b))
 
 	ROM_REGION(0x00400, "gfx1",0)
 	/* this rom unlikely to be the correct one, but it will do for now */
-	ROM_LOAD("trs80m1.chr", 0x0000, 0x0400, NO_DUMP CRC(0033f2b9) SHA1(0d2cd4197d54e2e872b515bbfdaa98efe502eda7))
+	ROM_LOAD("trs80m1.chr",  0x0000, 0x0400, NO_DUMP CRC(0033f2b9) SHA1(0d2cd4197d54e2e872b515bbfdaa98efe502eda7))
 ROM_END
 
 ROM_START(trs80m4p)
@@ -580,7 +598,7 @@ ROM_END
 ROM_START(ht1080z)
 	ROM_REGION(0x10000, "maincpu",0)
 	ROM_LOAD("ht1080z.rom",  0x0000, 0x3000, CRC(2bfef8f7) SHA1(7a350925fd05c20a3c95118c1ae56040c621be8f))
-	ROM_LOAD("ht1080z.ext",  0x3000, 0x0800, CRC(2a851e33) SHA1(dad21ec60973eb66e499fe0ecbd469118826a715))
+	ROM_LOAD("sys80.ext",    0x3000, 0x0800, CRC(2a851e33) SHA1(dad21ec60973eb66e499fe0ecbd469118826a715))
 
 	ROM_REGION(0x00800, "gfx1",0)
 	ROM_LOAD("ht1080z.chr",  0x0000, 0x0800, CRC(e8c59d4f) SHA1(a15f30a543e53d3e30927a2e5b766fcf80f0ae31))
@@ -606,19 +624,19 @@ ROM_END
 
 static DRIVER_INIT( trs80 )
 {
-	trs80_seven_bit = 0;
+	trs80_mode = 0;
 	trs80_model4 = 0;
 }
 
 static DRIVER_INIT( trs80l2 )
 {
-	trs80_seven_bit = 1;
+	trs80_mode = 2;
 	trs80_model4 = 0;
 }
 
 static DRIVER_INIT( trs80m4 )
 {
-	trs80_seven_bit = 0;
+	trs80_mode = 0;
 	trs80_model4 = 1;
 }
 
