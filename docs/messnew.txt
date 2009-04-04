@@ -9,11 +9,13 @@ New System Drivers Supported (in no particular order):
 
 System Driver Changes:
 ----------------------
-- [ELECTRON] Fixed graphical display modes [Robbbert]
+- [A7800] Better NTSC palette.  [Robert Tuccitto]
 
-- [TRS80] Added parallel printer [Robbbert]
+- [ELECTRON] Fixed graphical display modes. [Robbbert]
 
 - [STUDIO2] Fixed .st2 cartridge loading. [Curt Coder]
+
+- [TRS80] Added parallel printer. [Robbbert]
 
 
 
