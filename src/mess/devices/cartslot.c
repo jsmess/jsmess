@@ -338,6 +338,10 @@ static const cartslot_pcb_type *identify_pcb(const device_config *device)
 				break;
 			}
 		}
+		
+		/* check for unknown PCB type */
+		if ((mc != NULL) && (pcb_type == NULL))
+			fatalerror("Unknown PCB type \"%s\"\n", astring_c(pcb_name));
 	}
 	else
 	{
