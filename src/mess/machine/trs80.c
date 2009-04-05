@@ -40,7 +40,6 @@ static UINT8 trs80_port_ec=0;		/* bit d6..d1 of port EC to be read by port FF */
 static UINT8 trs80_tape_unit=1;		/* selected cassette unit (trs80l2 and sys80 only) (not implemented yet) */
 static UINT8 trs80_reg_load=1;		/* Controls what port EA will do */
 static UINT8 trs80_nmi_data=0xff;	/* Passes FDC int to NMI handler */
-static UINT8 lnw80_port_fe=0xf0;	/* LNW80 video control bits */
 UINT8 trs80_mode = 0;			/* Control bits passed to video output routine */
 
 #define IRQ_M1_RTC		0x80	/* RTC on Model I */
@@ -253,11 +252,88 @@ MACHINE_RESET( trs80 )
 }
 
 
+
 /*************************************
  *
  *				Port handlers.
  *
  *************************************/
+
+/* lnw80 can switch out all the devices, roms and video ram to be replaced by graphics ram. */
+READ8_HANDLER( lnw80_r )
+{
+	UINT8 *ROM = memory_region(space->machine, "maincpu");
+	if (trs80_mode & 0x40)
+		return gfxram[offset];
+	else
+	if (offset <= 0x3000)
+		return ROM[offset];
+	else
+	if (offset < 0x37e4)
+		return trs80_irq_status_r(space, 0);
+	else
+	if (offset < 0x37e8)
+		return 0xff;
+	else
+	if (offset < 0x37ec)
+		return trs80_printer_r(space, 0);
+	else
+	if (offset == 0x37ec)
+		return trs80_wd179x_r(trs80_fdc, 0);
+	else
+	if (offset == 0x37ed)
+		return wd17xx_track_r(trs80_fdc, 0);
+	else
+	if (offset == 0x37ee)
+		return wd17xx_sector_r(trs80_fdc, 0);
+	else
+	if (offset == 0x37ef)
+		return wd17xx_data_r(trs80_fdc, 0);
+	else
+	if (offset < 0x3800)
+		return 0xff;
+	else
+	if (offset < 0x3c00)
+		return trs80_keyboard_r(space, offset & 0xff);
+	else
+		return videoram[offset&0x3ff];
+}
+
+WRITE8_HANDLER( lnw80_w )
+{
+	if (trs80_mode & 0x40)
+		gfxram[offset] = data;
+	else
+	if (offset < 0x37e0)
+		return;
+	else
+	if (offset < 0x37e4)
+		trs80_motor_w(space, 0, data);
+	else
+	if (offset < 0x37e8)
+		return;
+	else
+	if (offset < 0x37ec)
+		trs80_printer_w(space, 0, data);
+	else
+	if (offset == 0x37ec)
+		wd17xx_command_w(trs80_fdc, 0, data);
+	else
+	if (offset == 0x37ed)
+		wd17xx_track_w(trs80_fdc, 0, data);
+	else
+	if (offset == 0x37ee)
+		wd17xx_sector_w(trs80_fdc, 0, data);
+	else
+	if (offset == 0x37ef)
+		wd17xx_data_w(trs80_fdc, 0, data);
+	else
+	if (offset < 0x3c00)
+		return;
+	else
+		videoram[offset&0x3ff]=data;
+}
+
 
 READ8_HANDLER( trs80m4_e0_r )
 {
@@ -373,7 +449,7 @@ READ8_HANDLER( sys80_f9_r )
 
 READ8_HANDLER( lnw80_fe_r )
 {
-	return lnw80_port_fe | 0xf0;
+	return ((trs80_mode & 0x78) >> 3) | 0xf0;
 }
 
 READ8_HANDLER( trs80_ff_r )
@@ -529,18 +605,12 @@ WRITE8_HANDLER( trs80m4_ec_w )
 	d2 Mode Select (0=64 chars, 1=32chars)
 	d1 Cassette Motor (1=On) */
 
-	static UINT8 settings=0xff;
-	UINT8 changed = data ^ settings;
-
-	if (changed & 0x40)
-		cpu_set_clock(space->machine->cpu[0], data & 0x40 ? MODEL4_MASTER_CLOCK/5 : MODEL4_MASTER_CLOCK/10);
+	cpu_set_clock(space->machine->cpu[0], data & 0x40 ? MODEL4_MASTER_CLOCK/5 : MODEL4_MASTER_CLOCK/10);
 
 	trs80_mode = (trs80_mode & 0xfe) | ((data & 4) ? 1 : 0);
 
-	if (changed & 0x02)
-		cassette_change_state( trs80_cass, ( data & 2 ) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR );
+	cassette_change_state( trs80_cass, ( data & 2 ) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR );
 
-	settings = data;
 	trs80_port_ec = data & 0x7e;
 }
 
@@ -606,7 +676,6 @@ WRITE8_HANDLER( lnw80_fe_w )
 	d0 inverse video (entire screen) */
 
 	trs80_mode = (trs80_mode & 0x87) | ((data & 0x0f) << 3);
-	lnw80_port_fe = data;
 }
 
 WRITE8_HANDLER( trs80_ff_w )
@@ -713,6 +782,14 @@ const wd17xx_interface trs80_wd17xx_interface = { trs80_fdc_callback, NULL };
  *				     *
  *************************************/
 
+READ8_DEVICE_HANDLER (trs80_wd179x_r)
+{
+	if (input_port_read(device->machine, "CONFIG") & 0x80)
+		return wd17xx_status_r(device, offset);
+	else
+		return 0xff;
+}
+
 READ8_HANDLER ( trs80_printer_r )
 {
 	/* Bit 7 - 1 = Busy; 0 = Not Busy
@@ -780,7 +857,8 @@ WRITE8_HANDLER( trs80_motor_w )
 		drive = 3;
 		head = 0;
 		break;
-	/* These 3 combinations aren't documented */
+	/* These 3 combinations aren't official. Some manufacturers of double-sided disks
+		used drive select 4 to indicate the other side. */
 	case 9:
 		drive = 0;
 		head = 1;

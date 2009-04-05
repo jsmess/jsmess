@@ -144,15 +144,8 @@ Not emulated:
 #include "devices/cassette.h"
 #include "formats/trs_cas.h"
 
+UINT8 *gfxram;
 UINT8 trs80_model4;
-
-static READ8_DEVICE_HANDLER (trs80_wd179x_r)
-{
-	if (input_port_read(device->machine, "CONFIG") & 0x80)
-		return wd17xx_status_r(device, offset);
-	else
-		return 0xff;
-}
 
 static ADDRESS_MAP_START( trs80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
@@ -194,6 +187,11 @@ static ADDRESS_MAP_START( sys80_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xfd, 0xfd) AM_READWRITE(trs80_printer_r, trs80_printer_w)
 	AM_RANGE(0xfe, 0xfe) AM_WRITE(sys80_fe_w)
 	AM_RANGE(0xff, 0xff) AM_READWRITE(trs80_ff_r, trs80_ff_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( lnw80_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(lnw80_r, lnw80_w)
+	AM_RANGE(0x4000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lnw80_io, ADDRESS_SPACE_IO, 8 )
@@ -425,6 +423,7 @@ static MACHINE_DRIVER_START( trs80 )		// the original model I, level I, with no 
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(black_and_white)
 
+	MDRV_VIDEO_START( trs80 )
 	MDRV_VIDEO_UPDATE( trs80 )
 
 	/* sound hardware */
@@ -481,7 +480,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( lnw80 )
 	MDRV_IMPORT_FROM( model1 )
 	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP( model1_map, 0 )
+	MDRV_CPU_PROGRAM_MAP( lnw80_map, 0 )
 	MDRV_CPU_IO_MAP( lnw80_io, 0 )
 
 	MDRV_PALETTE_LENGTH(8)
@@ -567,6 +566,9 @@ ROM_START(lnw80)
 
 	ROM_REGION(0x00800, "gfx1",0)
 	ROM_LOAD("lnw_chr.bin",  0x0000, 0x0800, CRC(c89b27df) SHA1(be2a009a07e4378d070002a558705e9a0de59389))
+
+	ROM_REGION(0x04400, "gfx2",0)
+	ROM_FILL(0, 0x4400, 0xff)	/* 0x4000 for gfxram + 0x400 for videoram */
 ROM_END
 
 ROM_START(trs80m3)
@@ -640,6 +642,14 @@ static DRIVER_INIT( trs80m4 )
 	trs80_model4 = 1;
 }
 
+static DRIVER_INIT( lnw80 )
+{
+	trs80_mode = 0;
+	trs80_model4 = 0;
+	gfxram = memory_region(machine, "gfx2");
+	videoram = memory_region(machine, "gfx2")+0x4000;
+}
+
 static void trs8012_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
@@ -667,7 +677,7 @@ COMP( 1977, trs80,    0,	0,	trs80,    trs80,   trs80,    0,		"Tandy Radio Shack"
 COMP( 1978, trs80l2,  trs80,	0,	model1,   trs80,   trs80l2,  trs8012,	"Tandy Radio Shack",  "TRS-80 Model I (Level II Basic)" , 0 )
 COMP( 1983, radionic, trs80,	0,	radionic, trs80,   trs80,    trs8012,	"Komtek",  "Radionic" , 0 )
 COMP( 1980, sys80,    trs80,	0,	sys80,    trs80,   trs80l2,  trs8012,	"EACA Computers Ltd.","System-80" , 0 )
-COMP( 1981, lnw80,    trs80,	0,	lnw80,    trs80m3, trs80,    trs8012,	"LNW Research","LNW-80", 0 )
+COMP( 1981, lnw80,    trs80,	0,	lnw80,    trs80m3, lnw80,    trs8012,	"LNW Research","LNW-80", 0 )
 COMP( 1980, trs80m3,  trs80,	0,	model3,   trs80m3, trs80m4,  trs8012,	"Tandy Radio Shack",  "TRS-80 Model III", 0 )
 COMP( 1980, trs80m4,  trs80,	0,	model3,   trs80m3, trs80m4,  trs8012,	"Tandy Radio Shack",  "TRS-80 Model 4", 0 )
 COMP( 1980, trs80m4p, trs80,	0,	model3,   trs80m3, trs80m4,  trs8012,	"Tandy Radio Shack",  "TRS-80 Model 4P", GAME_NOT_WORKING )

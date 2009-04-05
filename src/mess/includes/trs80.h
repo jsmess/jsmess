@@ -19,12 +19,14 @@
 extern const wd17xx_interface trs80_wd17xx_interface;
 extern UINT8 trs80_mode;
 extern UINT8 trs80_model4;
+extern UINT8 *gfxram;
 
 DEVICE_IMAGE_LOAD( trs80_floppy );
 QUICKLOAD_LOAD( trs80_cmd );
 
 MACHINE_RESET( trs80 );
 
+WRITE8_HANDLER ( lnw80_w );
 WRITE8_HANDLER ( trs80_ff_w );
 WRITE8_HANDLER ( lnw80_fe_w );
 WRITE8_HANDLER ( sys80_fe_w );
@@ -41,6 +43,7 @@ WRITE8_HANDLER ( trs80m4_e0_w );
 WRITE8_HANDLER ( trs80m4_90_w );
 WRITE8_HANDLER ( trs80m4_88_w );
 WRITE8_HANDLER ( trs80m4_84_w );
+READ8_HANDLER ( lnw80_r );
 READ8_HANDLER ( lnw80_fe_r );
 READ8_HANDLER ( trs80_ff_r );
 READ8_HANDLER ( trs80_fe_r );
@@ -67,10 +70,12 @@ WRITE8_HANDLER( trs80_cassunit_w );
 WRITE8_HANDLER( trs80_motor_w );
 
 READ8_HANDLER( trs80_keyboard_r );
+READ8_DEVICE_HANDLER (trs80_wd179x_r);
 
 
 /*----------- defined in video/trs80.c -----------*/
 
+VIDEO_START( trs80 );
 VIDEO_UPDATE( trs80 );
 VIDEO_UPDATE( model1 );
 VIDEO_UPDATE( ht1080z );
