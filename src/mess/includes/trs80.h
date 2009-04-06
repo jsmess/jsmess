@@ -25,6 +25,7 @@ DEVICE_IMAGE_LOAD( trs80_floppy );
 QUICKLOAD_LOAD( trs80_cmd );
 
 MACHINE_RESET( trs80 );
+MACHINE_RESET( lnw80 );
 
 WRITE8_HANDLER ( lnw80_w );
 WRITE8_HANDLER ( trs80_ff_w );
@@ -85,6 +86,8 @@ VIDEO_UPDATE( trs80m4 );
 
 READ8_HANDLER( trs80_videoram_r );
 WRITE8_HANDLER( trs80_videoram_w );
+READ8_HANDLER( trs80_gfxram_r );
+WRITE8_HANDLER( trs80_gfxram_w );
 
 PALETTE_INIT( lnw80 );
 

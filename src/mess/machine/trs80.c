@@ -48,7 +48,7 @@ UINT8 trs80_mode = 0;			/* Control bits passed to video output routine */
 #define CASS_RISE		0x01	/* high speed cass on Model III/4) */
 #define CASS_FALL		0x02	/* high speed cass on Model III/4) */
 
-#define MAX_LUMPS	192	 	/* crude storage units - don't now much about it */
+#define MAX_LUMPS	192	 	/* crude storage units - don't know much about it */
 #define MAX_GRANULES	8		/* lumps consisted of granules.. aha */
 #define MAX_SECTORS 	5		/* and granules of sectors */
 
@@ -237,20 +237,6 @@ DEVICE_IMAGE_LOAD( trs80_floppy )
 	return INIT_PASS;
 }
 
-MACHINE_RESET( trs80 )
-{
-	cassette_data = 0;
-	cassette_data_timer = timer_alloc(machine,  cassette_data_callback, NULL );
-	timer_adjust_periodic( cassette_data_timer, attotime_zero, 0, ATTOTIME_IN_HZ(11025) );
-	trs80_printer = devtag_get_device(machine, "centronics");
-	trs80_ay31015 = devtag_get_device(machine, "tr1602");
-	trs80_cass = devtag_get_device(machine, "cassette");
-	trs80_speaker = devtag_get_device(machine, "speaker");
-	trs80_fdc = devtag_get_device(machine, "wd179x");
-	videoram_size = 0x800;
-	trs80_reg_load = 1;		/* for LNW80 */
-}
-
 
 
 /*************************************
@@ -258,81 +244,6 @@ MACHINE_RESET( trs80 )
  *				Port handlers.
  *
  *************************************/
-
-/* lnw80 can switch out all the devices, roms and video ram to be replaced by graphics ram. */
-READ8_HANDLER( lnw80_r )
-{
-	UINT8 *ROM = memory_region(space->machine, "maincpu");
-	if (trs80_mode & 0x40)
-		return gfxram[offset];
-	else
-	if (offset <= 0x3000)
-		return ROM[offset];
-	else
-	if (offset < 0x37e4)
-		return trs80_irq_status_r(space, 0);
-	else
-	if (offset < 0x37e8)
-		return 0xff;
-	else
-	if (offset < 0x37ec)
-		return trs80_printer_r(space, 0);
-	else
-	if (offset == 0x37ec)
-		return trs80_wd179x_r(trs80_fdc, 0);
-	else
-	if (offset == 0x37ed)
-		return wd17xx_track_r(trs80_fdc, 0);
-	else
-	if (offset == 0x37ee)
-		return wd17xx_sector_r(trs80_fdc, 0);
-	else
-	if (offset == 0x37ef)
-		return wd17xx_data_r(trs80_fdc, 0);
-	else
-	if (offset < 0x3800)
-		return 0xff;
-	else
-	if (offset < 0x3c00)
-		return trs80_keyboard_r(space, offset & 0xff);
-	else
-		return videoram[offset&0x3ff];
-}
-
-WRITE8_HANDLER( lnw80_w )
-{
-	if (trs80_mode & 0x40)
-		gfxram[offset] = data;
-	else
-	if (offset < 0x37e0)
-		return;
-	else
-	if (offset < 0x37e4)
-		trs80_motor_w(space, 0, data);
-	else
-	if (offset < 0x37e8)
-		return;
-	else
-	if (offset < 0x37ec)
-		trs80_printer_w(space, 0, data);
-	else
-	if (offset == 0x37ec)
-		wd17xx_command_w(trs80_fdc, 0, data);
-	else
-	if (offset == 0x37ed)
-		wd17xx_track_w(trs80_fdc, 0, data);
-	else
-	if (offset == 0x37ee)
-		wd17xx_sector_w(trs80_fdc, 0, data);
-	else
-	if (offset == 0x37ef)
-		wd17xx_data_w(trs80_fdc, 0, data);
-	else
-	if (offset < 0x3c00)
-		return;
-	else
-		videoram[offset&0x3ff]=data;
-}
 
 
 READ8_HANDLER( trs80m4_e0_r )
@@ -511,7 +422,7 @@ WRITE8_HANDLER( trs80m4_e0_w )
 
 WRITE8_HANDLER( trs80m4_e4_w )
 {
-/* Disk to NMI interface - not emulated
+/* Disk to NMI interface
 	d7 1=enable disk INTRQ to generate NMI
 	d6 1=enable disk Motor Timeout to generate NMI */
 
@@ -667,15 +578,39 @@ WRITE8_HANDLER( sys80_fe_w )
 	trs80_tape_unit = (data & 0x10) ? 2 : 1;
 }
 
+/* lnw80 can switch out all the devices, roms and video ram to be replaced by graphics ram. */
 WRITE8_HANDLER( lnw80_fe_w )
 {
-/* d3..d2 not emulated
+/* lnw80 video options
 	d3 bankswitch lower 16k between roms and hires ram (1=hires)
 	d2 enable colour	\
 	d1 hres			/	these 2 are the bits from the MODE command of LNWBASIC
 	d0 inverse video (entire screen) */
 
+	/* get address space instead of io space */
+	const address_space *mem = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+
 	trs80_mode = (trs80_mode & 0x87) | ((data & 0x0f) << 3);
+
+	if (data & 8)
+	{
+		memory_install_readwrite8_handler (mem, 0x0000, 0x3fff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite8_handler (mem, 0x0000, 0x3fff, 0, 0, trs80_gfxram_r, trs80_gfxram_w);
+	}
+	else
+	{
+		memory_install_readwrite8_handler (mem, 0x0000, 0x3fff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+ 		memory_install_read8_handler (mem, 0x0000, 0x2fff, 0, 0, SMH_BANK1);
+		memory_set_bankptr(mem->machine, 1, memory_region(mem->machine, "maincpu"));
+		memory_install_readwrite8_handler (mem, 0x37e0, 0x37e3, 0, 0, trs80_irq_status_r, trs80_motor_w);
+		memory_install_readwrite8_handler (mem, 0x37e8, 0x37eb, 0, 0, trs80_printer_r, trs80_printer_w);
+		memory_install_readwrite8_device_handler (mem, trs80_fdc, 0x37ec, 0x37ec, 0, 0, trs80_wd179x_r, wd17xx_command_w);
+		memory_install_readwrite8_device_handler (mem, trs80_fdc, 0x37ed, 0x37ed, 0, 0, wd17xx_track_r, wd17xx_track_w);
+		memory_install_readwrite8_device_handler (mem, trs80_fdc, 0x37ee, 0x37ee, 0, 0, wd17xx_sector_r, wd17xx_sector_w);
+		memory_install_readwrite8_device_handler (mem, trs80_fdc, 0x37ef, 0x37ef, 0, 0, wd17xx_data_r, wd17xx_data_w);
+		memory_install_read8_handler (mem, 0x3800, 0x38ff, 0, 0x0300, trs80_keyboard_r);
+		memory_install_readwrite8_handler (mem, 0x3c00, 0x3fff, 0, 0, trs80_videoram_r, trs80_videoram_w);
+	}
 }
 
 WRITE8_HANDLER( trs80_ff_w )
@@ -882,7 +817,7 @@ WRITE8_HANDLER( trs80_motor_w )
 }
 
 /*************************************
- *		Keyboard					 *
+ *		Keyboard	     *
  *************************************/
 READ8_HANDLER( trs80_keyboard_r )
 {
@@ -908,4 +843,29 @@ READ8_HANDLER( trs80_keyboard_r )
 	return result;
 }
 
+
+/*************************************
+ *	Machine			     *
+ *************************************/
+
+MACHINE_RESET( trs80 )
+{
+	cassette_data = 0;
+	cassette_data_timer = timer_alloc(machine,  cassette_data_callback, NULL );
+	timer_adjust_periodic( cassette_data_timer, attotime_zero, 0, ATTOTIME_IN_HZ(11025) );
+	trs80_printer = devtag_get_device(machine, "centronics");
+	trs80_ay31015 = devtag_get_device(machine, "tr1602");
+	trs80_cass = devtag_get_device(machine, "cassette");
+	trs80_speaker = devtag_get_device(machine, "speaker");
+	trs80_fdc = devtag_get_device(machine, "wd179x");
+	videoram_size = 0x800;
+}
+
+MACHINE_RESET( lnw80 )
+{
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	MACHINE_RESET_CALL(trs80);
+	trs80_reg_load = 1;		/* for LNW80 */
+	lnw80_fe_w(space, 0, 0);
+}
 

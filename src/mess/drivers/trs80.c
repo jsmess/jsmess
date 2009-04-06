@@ -43,6 +43,7 @@ Cassette baud rates: 	Model I level I - 250 baud
 			Model I level II and all clones - 500 baud
 			Model III/4 - 500 and 1500 baud selectable at boot time
 			- When it says "Cass?" press L for 500 baud, or Enter otherwise.
+			LNW-80 - 500 baud @1.77MHz and 1000 baud @4MHz.
 
 I/O ports
 FF:
@@ -120,9 +121,6 @@ Not emulated:
  TRS80 Japanese kana/ascii switch and alternate keyboard
  TRS80 Model III/4 Hard drive, Graphics board, Alternate Character set
  LNW80 1.77 / 4.0 MHz switch (this is a physical switch)
- LNW80 Colour board
- LNW80 Hires graphics
- LNW80 24x80 screen
 
 ***************************************************************************/
 
@@ -141,8 +139,10 @@ Not emulated:
 
 /* Devices */
 #include "devices/basicdsk.h"
+#include "devices/mflopimg.h"
 #include "devices/cassette.h"
 #include "formats/trs_cas.h"
+#include "formats/trs_dsk.h"
 
 UINT8 *gfxram;
 UINT8 trs80_model4;
@@ -190,7 +190,6 @@ static ADDRESS_MAP_START( sys80_io, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lnw80_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(lnw80_r, lnw80_w)
 	AM_RANGE(0x4000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -482,6 +481,7 @@ static MACHINE_DRIVER_START( lnw80 )
 	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP( lnw80_map, 0 )
 	MDRV_CPU_IO_MAP( lnw80_io, 0 )
+	MDRV_MACHINE_RESET( lnw80 )
 
 	MDRV_PALETTE_LENGTH(8)
 	MDRV_PALETTE_INIT(lnw80)
@@ -662,7 +662,9 @@ static void trs8012_floppy_getinfo(const mess_device_class *devclass, UINT32 sta
 		case MESS_DEVINFO_PTR_LOAD:			info->load = DEVICE_IMAGE_LOAD_NAME(trs80_floppy); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:		strcpy(info->s = device_temp_str(), "dsk"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:		strcpy(info->s = device_temp_str(), "dsk,dmk"); break;
+
+//		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:		info->p = (void *) floppyoptions_trs80; break;
 
 		default:					legacybasicdsk_device_getinfo(devclass, state, info); break;
 	}
