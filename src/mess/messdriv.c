@@ -1148,4 +1148,8 @@ XL/XE 16kB OS roms
 /*********** Misc ***********************************************************/
 	DRIVER( ex800 )
 
+	DRIVER( z80ne )			/* Nuova Elettronica z80ne */
+	DRIVER( z80net )		/* Nuova Elettronica z80ne */
+	DRIVER( z80netb )		/* Nuova Elettronica z80ne */
+
 #endif /* DRIVER_RECURSIVE */

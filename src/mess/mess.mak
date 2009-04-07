@@ -355,6 +355,7 @@ DRVLIBS = \
 	$(MESSOBJ)/votrax.a \
 	$(MESSOBJ)/vtech.a \
 	$(MESSOBJ)/shared.a \
+	$(MESSOBJ)/z80ne.a \
 
 
 
@@ -1273,7 +1274,14 @@ $(MESSOBJ)/votrax.a: \
 
 $(MESSOBJ)/nokia.a: \
 	$(MESS_DRIVERS)/mikromik.o \
-	$(MESS_VIDEO)/upd7220.o
+	$(MESS_VIDEO)/upd7220.o \
+
+$(MESSOBJ)/z80ne.a:	\
+    $(MESS_DRIVERS)/z80ne.o     \
+    $(MESS_VIDEO)/z80ne.o       \
+    $(MESS_MACHINE)/z80ne.o     \
+	$(MESS_MACHINE)/ay31015.o   \
+	$(MESS_MACHINE)/kr2376.o	\
 
 #-------------------------------------------------
 # layout dependencies
@@ -1308,7 +1316,9 @@ $(MESS_DRIVERS)/sym1.o:		$(MESS_LAYOUT)/sym1.lh
 $(MESS_DRIVERS)/ut88.o:		$(MESS_LAYOUT)/ut88mini.lh
 $(MESS_DRIVERS)/votrpss.o:	$(MESS_LAYOUT)/votrpss.lh
 $(MESS_DRIVERS)/x68k.o:		$(MESS_LAYOUT)/x68000.lh
-
+$(MESS_DRIVERS)/z80ne.o:	$(MESS_LAYOUT)/z80ne.lh   \
+							$(MESS_LAYOUT)/z80net.lh  \
+							$(MESS_LAYOUT)/z80netb.lh
 
 #-------------------------------------------------
 # MESS-specific tools

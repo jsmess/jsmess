@@ -305,10 +305,10 @@ static TIMER_CALLBACK( ay31015_rx_process )
 				ay31015->rx_pulses = 16;
 				ay31015->rx_state = FIRST_STOP_BIT;
 
-				if ((ay31015->control_reg & CONTROL_EPS) && (ay31015->rx_parity))
+				if ((!(ay31015->control_reg & CONTROL_EPS)) && (ay31015->rx_parity))
 					ay31015->rx_parity = 0;			// odd parity, ok
 				else
-				if ((!(ay31015->control_reg & CONTROL_EPS)) && (!ay31015->rx_parity))
+				if ((ay31015->control_reg & CONTROL_EPS) && (!ay31015->rx_parity))
 					ay31015->rx_parity = 0;			// even parity, ok
 				else
 					ay31015->rx_parity = 1;			// parity error
