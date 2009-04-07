@@ -317,9 +317,9 @@ VIDEO_UPDATE( lnw80 )
 			break;
 
 		case 0x10:					// MODE 1
-			for (y = 0x40; y < 0x400; y+=0x40)
+			for (y = 0; y < 0x400; y+=0x40)
 			{
-				for (ra = 0x400; ra < 0x3000; ra+=0x400)
+				for (ra = 0; ra < 0x3000; ra+=0x400)
 				{
 					UINT16  *p = BITMAP_ADDR16(bitmap, sy++, 0);
 
@@ -353,9 +353,9 @@ VIDEO_UPDATE( lnw80 )
 		case 0x20:					// MODE 2
 			/* it seems the text video ram can have an effect in this mode,
 				not explained clearly, so not emulated */
-			for (y = 0x40; y < 0x400; y+=0x40)
+			for (y = 0; y < 0x400; y+=0x40)
 			{
-				for (ra = 0x400; ra < 0x3000; ra+=0x400)
+				for (ra = 0; ra < 0x3000; ra+=0x400)
 				{
 					UINT16  *p = BITMAP_ADDR16(bitmap, sy++, 0);
 
@@ -380,9 +380,9 @@ VIDEO_UPDATE( lnw80 )
 			/* the manual does not explain at all how colour is determined
 				for the extended area. Further, the background colour
 				is not mentioned anywhere. Black is assumed. */
-			for (y = 0x40; y < 0x400; y+=0x40)
+			for (y = 0; y < 0x400; y+=0x40)
 			{
-				for (ra = 0x400; ra < 0x3000; ra+=0x400)
+				for (ra = 0; ra < 0x3000; ra+=0x400)
 				{
 					UINT16  *p = BITMAP_ADDR16(bitmap, sy++, 0);
 
@@ -504,7 +504,7 @@ WRITE8_HANDLER( trs80_gfxram_w )
 /* Levels are unknown - guessing */
 static const rgb_t lnw80_palette[] =
 {
-	MAKE_RGB(200, 200, 200), // white
+	MAKE_RGB(220, 220, 220), // white
 	MAKE_RGB(0, 175, 0), // green
 	MAKE_RGB(200, 200, 0), // yellow
 	MAKE_RGB(255, 0, 0), // red
