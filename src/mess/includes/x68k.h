@@ -185,6 +185,15 @@ struct x68k_system
 		char last_mouse_y;  // previous mouse y-axis value
 		int bufferempty;  // non-zero if buffer is empty
 	} mouse;
+	struct
+	{
+		// port A
+		int mux1;  // multiplexer value
+		int seq1;  // part of 6-button input sequence.
+		// port B
+		int mux2;  // multiplexer value
+		int seq2;  // part of 6-button input sequence.
+	} mdctrl;
 };
 
 /*----------- defined in drivers/x68k.c -----------*/
