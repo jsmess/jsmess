@@ -27,7 +27,6 @@ QUICKLOAD_LOAD( trs80_cmd );
 MACHINE_RESET( trs80 );
 MACHINE_RESET( lnw80 );
 
-WRITE8_HANDLER ( lnw80_w );
 WRITE8_HANDLER ( trs80_ff_w );
 WRITE8_HANDLER ( lnw80_fe_w );
 WRITE8_HANDLER ( sys80_fe_w );
@@ -44,7 +43,6 @@ WRITE8_HANDLER ( trs80m4_e0_w );
 WRITE8_HANDLER ( trs80m4_90_w );
 WRITE8_HANDLER ( trs80m4_88_w );
 WRITE8_HANDLER ( trs80m4_84_w );
-READ8_HANDLER ( lnw80_r );
 READ8_HANDLER ( lnw80_fe_r );
 READ8_HANDLER ( trs80_ff_r );
 READ8_HANDLER ( trs80_fe_r );

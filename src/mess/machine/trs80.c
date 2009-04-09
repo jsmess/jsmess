@@ -865,7 +865,7 @@ MACHINE_RESET( lnw80 )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	MACHINE_RESET_CALL(trs80);
-	trs80_reg_load = 1;		/* for LNW80 */
+	trs80_reg_load = 1;
 	lnw80_fe_w(space, 0, 0);
 }
 

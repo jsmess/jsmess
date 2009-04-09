@@ -107,6 +107,11 @@ About the ht1080z - This was made for schools in Hungary. Each comes with a BASI
 		The ht1080z is identical to the System 80, apart from the character rom.
 		The ht1080z2 has a modified extension rom and character generator.
 
+About the RTC - The time is incremented while ever the cursor is flashing. It is stored in a series
+		of bytes in the computer's work area. The bytes are in a certain order, this is:
+		seconds, minutes, hours, year, day, month. On a model 1, the seconds are stored at
+		0x4041, while on the model 4 it is 0x4217. A reboot always sets the time to zero.
+
 ***************************************************************************
 
 Not dumped (to our knowledge):
@@ -121,6 +126,9 @@ Not emulated:
  TRS80 Japanese kana/ascii switch and alternate keyboard
  TRS80 Model III/4 Hard drive, Graphics board, Alternate Character set
  LNW80 1.77 / 4.0 MHz switch (this is a physical switch)
+
+Virtual floppy disk formats are JV1, JV3, and DMK. Only the JV1 is emulated.
+There don't seem to be any JV1 boot disks for Model III/4.
 
 ***************************************************************************/
 
@@ -139,10 +147,8 @@ Not emulated:
 
 /* Devices */
 #include "devices/basicdsk.h"
-#include "devices/mflopimg.h"
 #include "devices/cassette.h"
 #include "formats/trs_cas.h"
-#include "formats/trs_dsk.h"
 
 UINT8 *gfxram;
 UINT8 trs80_model4;
@@ -662,9 +668,7 @@ static void trs8012_floppy_getinfo(const mess_device_class *devclass, UINT32 sta
 		case MESS_DEVINFO_PTR_LOAD:			info->load = DEVICE_IMAGE_LOAD_NAME(trs80_floppy); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:		strcpy(info->s = device_temp_str(), "dsk,dmk"); break;
-
-//		case MESS_DEVINFO_PTR_FLOPPY_OPTIONS:		info->p = (void *) floppyoptions_trs80; break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:		strcpy(info->s = device_temp_str(), "dsk"); break;
 
 		default:					legacybasicdsk_device_getinfo(devclass, state, info); break;
 	}
