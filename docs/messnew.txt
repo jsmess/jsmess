@@ -16,7 +16,13 @@ System Driver Changes:
 
 - [STUDIO2] Fixed .st2 cartridge loading. [Curt Coder]
 
-- [TRS80] Added parallel printer. [Robbbert]
+- [TRS80] Various improvements: [Robbbert]
+          - added centronics printer
+          - cassette works on all clones
+          - Model III/4 RTC and cassette hooked up
+          - UART added
+          - LNW-80 graphics and colour added
+          - ht1080z and system-80 extension roms added
 
 
 
