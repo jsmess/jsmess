@@ -686,7 +686,7 @@ static UINT8 md_3button_r(const device_config* device, int port)
 {
 	if(port == 1)
 	{
-		if(x68k_sys.mdctrl.mux1 & 0x01)
+		if(x68k_sys.mdctrl.mux1 & 0x10)
 		{	
 			return input_port_read(device->machine,"md3b_0") | 0x90;
 		}
@@ -698,7 +698,7 @@ static UINT8 md_3button_r(const device_config* device, int port)
 	}
 	if(port == 2)
 	{
-		if(x68k_sys.mdctrl.mux2 & 0x01)
+		if(x68k_sys.mdctrl.mux2 & 0x20)
 		{	
 			return input_port_read(device->machine,"md3b_2") | 0x90;
 		}
@@ -711,6 +711,98 @@ static UINT8 md_3button_r(const device_config* device, int port)
 	return 0xff;
 }
 
+// Megadrive 6 button gamepad
+// Multiplexer is controlled by bit 0 in the PPI control port
+static TIMER_CALLBACK(md_6button_port1_timeout)
+{
+	x68k_sys.mdctrl.seq1 = 0;
+}
+
+static TIMER_CALLBACK(md_6button_port2_timeout)
+{
+	x68k_sys.mdctrl.seq2 = 0;
+}
+
+static void md_6button_init(running_machine* machine)
+{
+	x68k_sys.mdctrl.io_timeout1 = timer_alloc(machine,md_6button_port1_timeout,NULL);
+	x68k_sys.mdctrl.io_timeout2 = timer_alloc(machine,md_6button_port2_timeout,NULL);
+}
+
+static UINT8 md_6button_r(const device_config* device, int port)
+{
+	if(port == 1)
+	{
+		switch(x68k_sys.mdctrl.seq1)
+		{
+			case 1:
+			default:
+				if(x68k_sys.mdctrl.mux1 & 0x10)
+				{	
+					return input_port_read(device->machine,"md6b_0") | 0x90;
+				}
+				else
+				{	
+					return (input_port_read(device->machine,"md6b_1") & 0x60) |
+						 (input_port_read(device->machine,"md6b_0") & 0x03) | 0x90;
+				}
+			case 2:
+				if(x68k_sys.mdctrl.mux1 & 0x10)
+				{	
+					return input_port_read(device->machine,"md6b_0") | 0x90;
+				}
+				else
+				{	
+					return (input_port_read(device->machine,"md6b_1") & 0x60) | 0x90;
+				}
+			case 3:
+				if(x68k_sys.mdctrl.mux1 & 0x10)
+				{	
+					return (input_port_read(device->machine,"md6b_0") & 0x60) | (input_port_read(device->machine,"md6b_4") & 0x0f) | 0x90;
+				}
+				else
+				{	
+					return (input_port_read(device->machine,"md6b_1") & 0x60) | 0x9f;
+				}
+		}
+	}
+	if(port == 2)
+	{
+		switch(x68k_sys.mdctrl.seq2)
+		{
+			case 1:
+			default:
+				if(x68k_sys.mdctrl.mux2 & 0x20)
+				{	
+					return input_port_read(device->machine,"md6b_2") | 0x90;
+				}
+				else
+				{	
+					return (input_port_read(device->machine,"md6b_3") & 0x60) |
+						 (input_port_read(device->machine,"md6b_2") & 0x03) | 0x90;
+				}
+			case 2:
+				if(x68k_sys.mdctrl.mux2 & 0x20)
+				{	
+					return input_port_read(device->machine,"md6b_2") | 0x90;
+				}
+				else
+				{	
+					return (input_port_read(device->machine,"md6b_3") & 0x60) | 0x90;
+				}
+			case 3:
+				if(x68k_sys.mdctrl.mux2 & 0x20)
+				{	
+					return (input_port_read(device->machine,"md6b_2") & 0x60) | (input_port_read(device->machine,"md6b_5") & 0x0f) | 0x90;
+				}
+				else
+				{	
+					return (input_port_read(device->machine,"md6b_3") & 0x60) | 0x9f;
+				}
+		}
+	}
+	return 0xff;
+}
 
 // Judging from the XM6 source code, PPI ports A and B are joystick inputs
 static READ8_DEVICE_HANDLER( ppi_port_a_r )
@@ -726,6 +818,8 @@ static READ8_DEVICE_HANDLER( ppi_port_a_r )
 				return 0xff;
 		case 0x01:  // 3-button Megadrive gamepad
 			return md_3button_r(device,1);
+		case 0x02:  // 6-button Megadrive gamepad
+			return md_6button_r(device,1);
 	}
 	
 	return 0xff;
@@ -744,6 +838,8 @@ static READ8_DEVICE_HANDLER( ppi_port_b_r )
 				return 0xff;
 		case 0x10:  // 3-button Megadrive gamepad
 			return md_3button_r(device,2);
+		case 0x20:  // 6-button Megadrive gamepad
+			return md_6button_r(device,2);
 	}
 	
 	return 0xff;
@@ -766,6 +862,8 @@ static WRITE8_DEVICE_HANDLER( ppi_port_c_w )
 {
 	// ADPCM / Joystick control
 	const device_config *oki = devtag_get_device(device->machine, "okim6258");
+	static UINT16 prev1;
+	static UINT16 prev2;
 	
 	ppi_port[2] = data;
 	x68k_sys.adpcm.pan = data & 0x03;
@@ -773,10 +871,28 @@ static WRITE8_DEVICE_HANDLER( ppi_port_c_w )
 	x68k_set_adpcm(device->machine);
 	okim6258_set_divider(oki, (data >> 2) & 3);
 
+	// The joystick enable bits also handle the multiplexer for various controllers
 	x68k_sys.joy.joy1_enable = data & 0x10;
+	x68k_sys.mdctrl.mux1 = data & 0x10;
+	if((prev1 & 0x10) == 0x00 && (data & 0x10) == 0x10)
+	{
+		x68k_sys.mdctrl.seq1++;
+		timer_adjust_oneshot(x68k_sys.mdctrl.io_timeout1,cpu_clocks_to_attotime(device->machine->cpu[0],8192),0);
+	}
+	prev1 = data;
+
 	x68k_sys.joy.joy2_enable = data & 0x20;
+	x68k_sys.mdctrl.mux2 = data & 0x20;
+	if((prev2 & 0x20) == 0x00 && (data & 0x20) == 0x20)
+	{
+		x68k_sys.mdctrl.seq2++;
+		timer_adjust_oneshot(x68k_sys.mdctrl.io_timeout2,cpu_clocks_to_attotime(device->machine->cpu[0],8192),0);
+	}
+	prev2 = data;
+
 	x68k_sys.joy.ioc6 = data & 0x40;
 	x68k_sys.joy.ioc7 = data & 0x80;
+
 }
 
 
@@ -1287,16 +1403,6 @@ static WRITE16_HANDLER( x68k_mfp_w )
 static WRITE16_DEVICE_HANDLER( x68k_ppi_w )
 {
 	ppi8255_w(device,offset & 0x03,data);
-
-	// It appears that bit 0 of the PPI control port also controls the 
-	// Megadrive controller multiplexer, with bit 1 determining which port.
-	if(offset == 0x03)
-	{
-		if(data & 0x02)  // 0 = port A, 1 = port B
-			x68k_sys.mdctrl.mux2 = data & 0x01;
-		else
-			x68k_sys.mdctrl.mux1 = data & 0x01;
-	}
 }
 
 static READ16_DEVICE_HANDLER( x68k_ppi_r )
@@ -1762,11 +1868,11 @@ static INPUT_PORTS_START( x68000 )
 	PORT_CATEGORY_CLASS(0x0f,0x00,"Joystick Port 1")
 	PORT_CATEGORY_ITEM(0x00,"Standard 2-button MSX/FM-Towns joystick",10)
 	PORT_CATEGORY_ITEM(0x01,"3-button Megadrive gamepad",11)
-//	PORT_CATEGORY_ITEM(0x02,"6-button Megadrive gamepad",12)
+	PORT_CATEGORY_ITEM(0x02,"6-button Megadrive gamepad",12)
 	PORT_CATEGORY_CLASS(0xf0,0x00,"Joystick Port 2")
 	PORT_CATEGORY_ITEM(0x00,"Standard 2-button MSX/FM-Towns joystick",20)
 	PORT_CATEGORY_ITEM(0x10,"3-button Megadrive gamepad",21)
-//	PORT_CATEGORY_ITEM(0x20,"6-button Megadrive gamepad",22)
+	PORT_CATEGORY_ITEM(0x20,"6-button Megadrive gamepad",22)
 // TODO: Sharp Cyber Stick (CZ-8NJ2) support
 
 	PORT_START( "joy1" )
@@ -1974,6 +2080,59 @@ static INPUT_PORTS_START( x68000 )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(2) PORT_NAME("MD Pad 2 Start Button") PORT_CATEGORY(21)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CATEGORY(21)
 	
+	PORT_START("md6b_0")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("MD Pad 1 Up") PORT_8WAY PORT_PLAYER(1) PORT_CATEGORY(12)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("MD Pad 1 Down") PORT_8WAY PORT_PLAYER(1) PORT_CATEGORY(12)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_NAME("MD Pad 1 Left") PORT_8WAY PORT_PLAYER(1) PORT_CATEGORY(12)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_NAME("MD Pad 1 Right") PORT_8WAY PORT_PLAYER(1) PORT_CATEGORY(12)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CATEGORY(12)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("MD Pad 1 B Button") PORT_CATEGORY(12)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("MD Pad 1 C Button") PORT_CATEGORY(12)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CATEGORY(12)
+
+	PORT_START("md6b_1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CATEGORY(12)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CATEGORY(12)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CATEGORY(12)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CATEGORY(12)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CATEGORY(12)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("MD Pad 1 A Button") PORT_CATEGORY(12)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(1) PORT_NAME("MD Pad 1 Start Button") PORT_CATEGORY(12)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CATEGORY(12)
+
+	PORT_START("md6b_2")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("MD Pad 2 Up") PORT_8WAY PORT_PLAYER(2) PORT_CATEGORY(22)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("MD Pad 2 Down") PORT_8WAY PORT_PLAYER(2) PORT_CATEGORY(22)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_NAME("MD Pad 2 Left") PORT_8WAY PORT_PLAYER(2) PORT_CATEGORY(22)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_NAME("MD Pad 2 Right") PORT_8WAY PORT_PLAYER(2) PORT_CATEGORY(22)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CATEGORY(22)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("MD Pad 2 B Button") PORT_CATEGORY(22)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("MD Pad 2 C Button") PORT_CATEGORY(22)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CATEGORY(22)
+
+	PORT_START("md6b_3")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CATEGORY(22)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CATEGORY(22)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CATEGORY(22)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CATEGORY(22)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CATEGORY(22)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("MD Pad 2 A Button") PORT_CATEGORY(22)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(2) PORT_NAME("MD Pad 2 Start Button") PORT_CATEGORY(22)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CATEGORY(22)
+
+	// extra inputs
+	PORT_START("md6b_4")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME("MD Pad 1 Z Button") PORT_CATEGORY(12)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("MD Pad 1 Y Button") PORT_CATEGORY(12)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("MD Pad 1 X Button") PORT_CATEGORY(12)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(1) PORT_NAME("MD Pad 1 Mode Button") PORT_CATEGORY(12)
+
+	PORT_START("md6b_5")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2) PORT_NAME("MD Pad 2 Z Button") PORT_CATEGORY(22)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2) PORT_NAME("MD Pad 2 Y Button") PORT_CATEGORY(22)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("MD Pad 2 X Button") PORT_CATEGORY(22)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(2) PORT_NAME("MD Pad 2 Mode Button") PORT_CATEGORY(22)
+
 INPUT_PORTS_END
 
 static void dimdsk_set_geometry(const device_config* image)
@@ -2242,6 +2401,9 @@ static DRIVER_INIT( x68000 )
 	x68k_vblank_irq = timer_alloc(machine, x68k_crtc_vblank_irq,NULL);
 	mouse_timer = timer_alloc(machine, x68k_scc_ack,NULL);
 	led_timer = timer_alloc(machine, x68k_led_callback,NULL);
+	
+	// Initialise timers for 6-button MD controllers
+	md_6button_init(machine);
 }
 
 static MACHINE_DRIVER_START( x68000 )

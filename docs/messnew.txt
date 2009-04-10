@@ -24,6 +24,8 @@ System Driver Changes:
           - LNW-80 graphics and colour added
           - ht1080z and system-80 extension roms added
 
+- [X68000] Added support for 3 and 6 button Megadrive gamepads. [Barry Rodewald]
+
 
 
 User Interface Changes:
