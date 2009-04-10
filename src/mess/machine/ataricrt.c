@@ -18,6 +18,7 @@ static int atari = 0;
  *
  *************************************/
 
+/* 2009-04 FP: is this used anywhere? */
 DRIVER_INIT( atari )
 {
 	offs_t ram_top;
