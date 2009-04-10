@@ -4,6 +4,7 @@ New System Drivers Supported (in no particular order):
 ------------------------------------------------------
 - Nokia MikroMikko 1 M6 (not working)  [Curt Coder]
 - Nokia MikroMikko 1 M7 (not working)  [Curt Coder]
+- Talking Electronics Computer (TEC-1)  [Robbbert]
 - Z80 N.E.  [Roberto Lavarone]
 
 
