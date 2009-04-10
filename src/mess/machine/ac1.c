@@ -77,13 +77,13 @@ static WRITE8_DEVICE_HANDLER (ac1_port_b_w)
 
 const z80pio_interface ac1_z80pio_intf =
 {
-	NULL,	/* callback when change interrupt status */
-	ac1_port_a_r,
-	ac1_port_b_r,
-	ac1_port_a_w,
-	ac1_port_b_w,
-	NULL,
-	NULL
+	DEVCB_NULL,	/* callback when change interrupt status */
+	DEVCB_HANDLER(ac1_port_a_r),
+	DEVCB_HANDLER(ac1_port_b_r),
+	DEVCB_HANDLER(ac1_port_a_w),
+	DEVCB_HANDLER(ac1_port_b_w),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 /* Driver initialization */

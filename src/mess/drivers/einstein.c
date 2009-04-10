@@ -453,13 +453,13 @@ static WRITE8_DEVICE_HANDLER( einstein_pio_port_a_w )
 
 static const z80pio_interface einstein_pio_intf =
 {
-	einstein_pio_interrupt,
-	NULL,
-	NULL,
-	einstein_pio_port_a_w,
-	NULL,
-	einstein_pio_ardy,
-	NULL
+	DEVCB_LINE(einstein_pio_interrupt),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(einstein_pio_port_a_w),
+	DEVCB_NULL,
+	DEVCB_LINE(einstein_pio_ardy),
+	DEVCB_NULL
 };
 
 

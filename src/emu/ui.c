@@ -39,23 +39,6 @@
 
 enum
 {
-	INPUT_TYPE_DIGITAL = 0,
-	INPUT_TYPE_ANALOG = 1,
-	INPUT_TYPE_ANALOG_DEC = 2,
-	INPUT_TYPE_ANALOG_INC = 3
-};
-
-enum
-{
-	ANALOG_ITEM_KEYSPEED = 0,
-	ANALOG_ITEM_CENTERSPEED,
-	ANALOG_ITEM_REVERSE,
-	ANALOG_ITEM_SENSITIVITY,
-	ANALOG_ITEM_COUNT
-};
-
-enum
-{
 	LOADSAVE_NONE,
 	LOADSAVE_LOAD,
 	LOADSAVE_SAVE
@@ -1066,7 +1049,7 @@ astring *game_info_astring(running_machine *machine, astring *string)
 
 		for (screen = video_screen_first(machine->config); screen != NULL; screen = video_screen_next(screen))
 		{
-			const screen_config *scrconfig = screen->inline_config;
+			const screen_config *scrconfig = (const screen_config *)screen->inline_config;
 
 			if (scrcount > 1)
 			{
@@ -1283,10 +1266,6 @@ static UINT32 handler_ingame(running_machine *machine, UINT32 state)
 	if (ui_input_pressed(machine, IPT_UI_SHOW_FPS))
 		ui_set_show_fps(!ui_get_show_fps());
 
-	/* toggle crosshair display */
-	if (ui_input_pressed(machine, IPT_UI_TOGGLE_CROSSHAIR))
-		crosshair_toggle(machine);
-
 	/* increment frameskip? */
 	if (ui_input_pressed(machine, IPT_UI_FRAMESKIP_INC))
 	{
@@ -1421,7 +1400,7 @@ const slider_state *ui_get_slider_list(void)
 static slider_state *slider_alloc(const char *title, INT32 minval, INT32 defval, INT32 maxval, INT32 incval, slider_update update, void *arg)
 {
 	int size = sizeof(slider_state) + strlen(title);
-	slider_state *state = auto_malloc(size);
+	slider_state *state = (slider_state *)auto_malloc(size);
 	memset(state, 0, size);
 
 	state->minval = minval;
@@ -1495,7 +1474,7 @@ static slider_state *slider_init(running_machine *machine)
 	/* add screen parameters */
 	for (device = video_screen_first(machine->config); device != NULL; device = video_screen_next(device))
 	{
-		const screen_config *scrconfig = device->inline_config;
+		const screen_config *scrconfig = (const screen_config *)device->inline_config;
 		int defxscale = floor(scrconfig->xscale * 1000.0f + 0.5f);
 		int defyscale = floor(scrconfig->yscale * 1000.0f + 0.5f);
 		int defxoffset = floor(scrconfig->xoffset * 1000.0f + 0.5f);
@@ -1538,7 +1517,7 @@ static slider_state *slider_init(running_machine *machine)
 
 	for (device = device_list_first(machine->config->devicelist, LASERDISC); device != NULL; device = device_list_next(device, LASERDISC))
 	{
-		const laserdisc_config *config = device->inline_config;
+		const laserdisc_config *config = (const laserdisc_config *)device->inline_config;
 		if (config->overupdate != NULL)
 		{
 			int defxscale = floor(config->overscalex * 1000.0f + 0.5f);
@@ -1565,7 +1544,7 @@ static slider_state *slider_init(running_machine *machine)
 
 	for (device = video_screen_first(machine->config); device != NULL; device = video_screen_next(device))
 	{
-		const screen_config *scrconfig = device->inline_config;
+		const screen_config *scrconfig = (const screen_config *)device->inline_config;
 		if (scrconfig->type == SCREEN_TYPE_VECTOR)
 		{
 			/* add flicker control */
@@ -1635,7 +1614,7 @@ static INT32 slider_mixervol(running_machine *machine, void *arg, astring *strin
 
 static INT32 slider_adjuster(running_machine *machine, void *arg, astring *string, INT32 newval)
 {
-	const input_field_config *field = arg;
+	const input_field_config *field = (const input_field_config *)arg;
 	input_field_user_settings settings;
 
 	input_field_get_user_settings(field, &settings);
@@ -1672,8 +1651,8 @@ static INT32 slider_overclock(running_machine *machine, void *arg, astring *stri
 
 static INT32 slider_refresh(running_machine *machine, void *arg, astring *string, INT32 newval)
 {
-	const device_config *screen = arg;
-	const screen_config *scrconfig = screen->inline_config;
+	const device_config *screen = (const device_config *)arg;
+	const screen_config *scrconfig = (const screen_config *)screen->inline_config;
 	double defrefresh = ATTOSECONDS_TO_HZ(scrconfig->refresh);
 	double refresh;
 
@@ -1699,7 +1678,7 @@ static INT32 slider_refresh(running_machine *machine, void *arg, astring *string
 
 static INT32 slider_brightness(running_machine *machine, void *arg, astring *string, INT32 newval)
 {
-	const device_config *screen = arg;
+	const device_config *screen = (const device_config *)arg;
 	render_container *container = render_container_get_screen(screen);
 	render_container_user_settings settings;
 
@@ -1722,7 +1701,7 @@ static INT32 slider_brightness(running_machine *machine, void *arg, astring *str
 
 static INT32 slider_contrast(running_machine *machine, void *arg, astring *string, INT32 newval)
 {
-	const device_config *screen = arg;
+	const device_config *screen = (const device_config *)arg;
 	render_container *container = render_container_get_screen(screen);
 	render_container_user_settings settings;
 
@@ -1744,7 +1723,7 @@ static INT32 slider_contrast(running_machine *machine, void *arg, astring *strin
 
 static INT32 slider_gamma(running_machine *machine, void *arg, astring *string, INT32 newval)
 {
-	const device_config *screen = arg;
+	const device_config *screen = (const device_config *)arg;
 	render_container *container = render_container_get_screen(screen);
 	render_container_user_settings settings;
 
@@ -1767,7 +1746,7 @@ static INT32 slider_gamma(running_machine *machine, void *arg, astring *string, 
 
 static INT32 slider_xscale(running_machine *machine, void *arg, astring *string, INT32 newval)
 {
-	const device_config *screen = arg;
+	const device_config *screen = (const device_config *)arg;
 	render_container *container = render_container_get_screen(screen);
 	render_container_user_settings settings;
 
@@ -1790,7 +1769,7 @@ static INT32 slider_xscale(running_machine *machine, void *arg, astring *string,
 
 static INT32 slider_yscale(running_machine *machine, void *arg, astring *string, INT32 newval)
 {
-	const device_config *screen = arg;
+	const device_config *screen = (const device_config *)arg;
 	render_container *container = render_container_get_screen(screen);
 	render_container_user_settings settings;
 
@@ -1813,7 +1792,7 @@ static INT32 slider_yscale(running_machine *machine, void *arg, astring *string,
 
 static INT32 slider_xoffset(running_machine *machine, void *arg, astring *string, INT32 newval)
 {
-	const device_config *screen = arg;
+	const device_config *screen = (const device_config *)arg;
 	render_container *container = render_container_get_screen(screen);
 	render_container_user_settings settings;
 
@@ -1836,7 +1815,7 @@ static INT32 slider_xoffset(running_machine *machine, void *arg, astring *string
 
 static INT32 slider_yoffset(running_machine *machine, void *arg, astring *string, INT32 newval)
 {
-	const device_config *screen = arg;
+	const device_config *screen = (const device_config *)arg;
 	render_container *container = render_container_get_screen(screen);
 	render_container_user_settings settings;
 
@@ -1859,7 +1838,7 @@ static INT32 slider_yoffset(running_machine *machine, void *arg, astring *string
 
 static INT32 slider_overxscale(running_machine *machine, void *arg, astring *string, INT32 newval)
 {
-	const device_config *laserdisc = arg;
+	const device_config *laserdisc = (const device_config *)arg;
 	laserdisc_config settings;
 
 	laserdisc_get_config(laserdisc, &settings);
@@ -1881,7 +1860,7 @@ static INT32 slider_overxscale(running_machine *machine, void *arg, astring *str
 
 static INT32 slider_overyscale(running_machine *machine, void *arg, astring *string, INT32 newval)
 {
-	const device_config *laserdisc = arg;
+	const device_config *laserdisc = (const device_config *)arg;
 	laserdisc_config settings;
 
 	laserdisc_get_config(laserdisc, &settings);
@@ -1903,7 +1882,7 @@ static INT32 slider_overyscale(running_machine *machine, void *arg, astring *str
 
 static INT32 slider_overxoffset(running_machine *machine, void *arg, astring *string, INT32 newval)
 {
-	const device_config *laserdisc = arg;
+	const device_config *laserdisc = (const device_config *)arg;
 	laserdisc_config settings;
 
 	laserdisc_get_config(laserdisc, &settings);
@@ -1925,7 +1904,7 @@ static INT32 slider_overxoffset(running_machine *machine, void *arg, astring *st
 
 static INT32 slider_overyoffset(running_machine *machine, void *arg, astring *string, INT32 newval)
 {
-	const device_config *laserdisc = arg;
+	const device_config *laserdisc = (const device_config *)arg;
 	laserdisc_config settings;
 
 	laserdisc_get_config(laserdisc, &settings);

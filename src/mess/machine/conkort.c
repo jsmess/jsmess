@@ -583,13 +583,13 @@ static void conkort_pio_ardy_w(const device_config *device, int state)
 
 static const z80pio_interface conkort_pio_intf =
 {
-	conkort_pio_interrupt,				/* interrupt callback */
-	conkort_pio_port_a_r,				/* port A read callback */
-	conkort_pio_port_b_r,				/* port B read callback */
-	conkort_pio_port_a_w,				/* port A write callback */
-	conkort_pio_port_b_w,				/* port B write callback */
-	conkort_pio_ardy_w,					/* port A ready callback */
-	NULL						/* port B ready callback */
+	DEVCB_LINE(conkort_pio_interrupt),				/* interrupt callback */
+	DEVCB_HANDLER(conkort_pio_port_a_r),				/* port A read callback */
+	DEVCB_HANDLER(conkort_pio_port_b_r),				/* port B read callback */
+	DEVCB_HANDLER(conkort_pio_port_a_w),				/* port A write callback */
+	DEVCB_HANDLER(conkort_pio_port_b_w),				/* port B write callback */
+	DEVCB_LINE(conkort_pio_ardy_w),					/* port A ready callback */
+	DEVCB_NULL						/* port B ready callback */
 };
 
 static const z80_daisy_chain slow_daisy_chain[] =

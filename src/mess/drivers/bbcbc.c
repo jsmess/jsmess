@@ -106,13 +106,13 @@ static const TMS9928a_interface tms9129_interface =
 /* TODO */
 static const z80pio_interface bbcbc_z80pio_intf =
 {
-	NULL,	/* int callback */
-	NULL,	/* port a read */
-	NULL,	/* port b read */
-	NULL,	/* port a write */
-	NULL,	/* port b write */
-	NULL,	/* ready a */
-	NULL	/* ready b */
+	DEVCB_NULL,	/* int callback */
+	DEVCB_NULL,	/* port a read */
+	DEVCB_NULL,	/* port b read */
+	DEVCB_NULL,	/* port a write */
+	DEVCB_NULL,	/* port b write */
+	DEVCB_NULL,	/* ready a */
+	DEVCB_NULL	/* ready b */
 };
 
 static const z80_daisy_chain bbcbc_daisy_chain[] =

@@ -71,13 +71,13 @@ static READ8_DEVICE_HANDLER( pio_port_b_r )
 
 static const z80pio_interface super80_pio_intf =
 {
-	super80_pio_interrupt,		/* callback when change interrupt status */
-	NULL,
-	pio_port_b_r,
-	pio_port_a_w,
-	NULL,
-	NULL,			/* portA ready active callback (not used in super80) */
-	NULL			/* portB ready active callback (not used in super80) */
+	DEVCB_LINE(super80_pio_interrupt),		/* callback when change interrupt status */
+	DEVCB_NULL,
+	DEVCB_HANDLER(pio_port_b_r),
+	DEVCB_HANDLER(pio_port_a_w),
+	DEVCB_NULL,
+	DEVCB_NULL,			/* portA ready active callback (not used in super80) */
+	DEVCB_NULL			/* portB ready active callback (not used in super80) */
 };
 
 

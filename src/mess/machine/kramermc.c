@@ -32,13 +32,13 @@ static WRITE8_DEVICE_HANDLER (kramermc_port_a_w)
 
 const z80pio_interface kramermc_z80pio_intf =
 {
-	NULL,	/* callback when change interrupt status */
-	kramermc_port_a_r,
-	kramermc_port_b_r,
-	kramermc_port_a_w,
-	NULL,
-	NULL,
-	NULL
+	DEVCB_NULL,	/* callback when change interrupt status */
+	DEVCB_HANDLER(kramermc_port_a_r),
+	DEVCB_HANDLER(kramermc_port_b_r),
+	DEVCB_HANDLER(kramermc_port_a_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 /* Driver initialization */

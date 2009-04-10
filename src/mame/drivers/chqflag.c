@@ -192,7 +192,7 @@ static ADDRESS_MAP_START( chqflag_readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREAD("konami2", k007232_r)	/* 007232 (chip 2) */
 	AM_RANGE(0xc000, 0xc001) AM_DEVREAD("ym", ym2151_r)	/* YM2151 */
 	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_r)			/* soundlatch_r */
-	//AM_RANGE(0xe000, 0xe000) AM_READ(SMH_NOP)                /* ??? */
+	//AM_RANGE(0xe000, 0xe000) AM_READNOP                /* ??? */
 ADDRESS_MAP_END
 
 static WRITE8_HANDLER( k007232_bankswitch_w )
@@ -219,7 +219,7 @@ static ADDRESS_MAP_START( chqflag_writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 											/* selecting a different latch for the external port */
 	AM_RANGE(0xb000, 0xb00d) AM_DEVWRITE("konami2", k007232_w)		/* 007232 (chip 2) */
 	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("ym", ym2151_w)		/* YM2151 */
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(SMH_NOP)					/* ??? */
+	AM_RANGE(0xf000, 0xf000) AM_WRITENOP					/* ??? */
 ADDRESS_MAP_END
 
 
@@ -258,7 +258,8 @@ static INPUT_PORTS_START( chqflag )
 	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x90, DEF_STR( 1C_7C ) )
-//  PORT_DIPSETTING(    0x00, "Coin Slot 2 Invalidity" )
+	PORT_DIPSETTING(    0x00, "Invalid" )
+	/* Invalid = both coin slots disabled */
 
 	PORT_START("DSW2")
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW2:1" )	/* Manual says it's not used */

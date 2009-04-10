@@ -584,13 +584,13 @@ static WRITE8_DEVICE_HANDLER( mz800_printer_data_w )
 
 const z80pio_interface mz800_z80pio_config =
 {
-	mz800_z80pio_irq,
-	mz800_z80pio_port_a_r,
-	NULL,
-	mz800_z80pio_port_a_w,
-	mz800_printer_data_w,
-	NULL,
-	NULL,
+	DEVCB_LINE(mz800_z80pio_irq),
+	DEVCB_HANDLER(mz800_z80pio_port_a_r),
+	DEVCB_NULL,
+	DEVCB_HANDLER(mz800_z80pio_port_a_w),
+	DEVCB_HANDLER(mz800_printer_data_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
 };
 
 

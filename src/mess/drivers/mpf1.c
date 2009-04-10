@@ -284,13 +284,13 @@ static void mpf1_pio_interrupt(const device_config *device, int state)
 
 static const z80pio_interface mpf1_pio_intf =
 {
-	mpf1_pio_interrupt,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL
+	DEVCB_LINE(mpf1_pio_interrupt),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 /* Z80 CTC Interface */

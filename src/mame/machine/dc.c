@@ -124,6 +124,7 @@ UINT32 dc_coin_counts[2];
 static UINT32 maple_regs[0x100/4];
 static UINT32 dc_rtcregister[4];
 static UINT32 g1bus_regs[0x100/4];
+static UINT32 g2bus_regs[0x100/4];
 UINT8 maple0x86data1[0x80];
 static UINT8 maple0x86data2[0x400];
 static emu_timer *dc_rtc_timer;
@@ -274,6 +275,8 @@ WRITE64_HANDLER( dc_sysctrl_w )
 		case SB_C2DST:
 			address=dc_sysctrl_regs[SB_C2DSTAT];
 			ddtdata.destination=address;
+			/* 0 rounding size = 16 Mbytes */
+			if(dc_sysctrl_regs[SB_C2DLEN] == 0) { dc_sysctrl_regs[SB_C2DLEN] = 0x1000000; }
 			ddtdata.length=dc_sysctrl_regs[SB_C2DLEN];
 			ddtdata.size=1;
 			ddtdata.direction=0;
@@ -625,6 +628,60 @@ WRITE64_HANDLER( dc_maple_w )
 									jvs_command=0;
 									ddtdata.length = (tocopy+7)/4;
 								}
+								else if (subcommand == 0x33) // "direct mode" input port reading
+								{
+									int tocopy;
+
+									maple0x86data2[0] = 0xa0;
+									for (a=1;a < 32;a++)
+										maple0x86data2[a] = maple0x86data2[a-1] + 1;
+									maple0x86data2[3] = maple0x86data2[3] | 0x0c;
+									maple0x86data2[6] = maple0x86data2[6] & 0xcf;
+
+									a = input_port_read(space->machine, "IN0"); // put keys here
+									maple0x86data2[6] = maple0x86data2[6] | (a << 4);
+
+									tocopy = 8+0x11+16;
+									/* valid data check*/
+									maple0x86data2[0x11] = 0x00;
+									maple0x86data2[0x12] = 0x8e;
+									maple0x86data2[0x13] = 0x01;
+									maple0x86data2[0x14] = 0x00;
+									maple0x86data2[0x15] = 0xff;
+									maple0x86data2[0x16] = 0xe0;
+									maple0x86data2[0x19] = 0x01;
+
+									/* read the inputs */
+									maple0x86data2[0x1a]=1;
+									maple0x86data2[0x1b]=2; //number of players
+									maple0x86data2[0x1c]=input_port_read(space->machine, "IN1");
+									maple0x86data2[0x1d]=input_port_read(space->machine, "IN2");
+									maple0x86data2[0x1e]=input_port_read(space->machine, "IN3");
+									maple0x86data2[0x1f]=input_port_read(space->machine, "IN4");
+									maple0x86data2[0x20]=1;
+									maple0x86data2[0x21]=(dc_coin_counts[0] >> 8) & 0xff; //coin counter read-back hi byte
+									maple0x86data2[0x22]=dc_coin_counts[0] & 0xff; //coin counter read-back lo byte
+									maple0x86data2[0x23]=(dc_coin_counts[1] >> 8) & 0xff;
+									maple0x86data2[0x24]=dc_coin_counts[1] & 0xff;
+									maple0x86data2[0x25]=1;
+									maple0x86data2[0x26]=1;
+									maple0x86data2[0x27]=0;
+									maple0x86data2[0x28]=0;
+									maple0x86data2[0x29]=0;
+									maple0x86data2[0x2a]=0;
+									/*0x2b-0x2f rotary inputs */
+									//...
+
+									// command end flag
+									maple0x86data2[0x18]= (jvs_command == -1) ? 19 : 17;
+									maple0x86data2[0x15]= (jvs_command == -1) ? 24 : 16;
+
+									for (a=0;a < tocopy;a=a+4)
+										buff[1+a/4] = maple0x86data2[a] | (maple0x86data2[a+1] << 8) | (maple0x86data2[a+2] << 16) | (maple0x86data2[a+3] << 24);
+
+									//jvs_command=0;
+									ddtdata.length = (tocopy+7)/4;
+								}
 								else if (subcommand == 0x21)
 								{
 									// 21,*c295407 (77),*c295404,*c295405,*c295406,0,1,0
@@ -751,14 +808,14 @@ WRITE64_HANDLER( dc_g1_ctrl_w )
 	dat = (UINT32)(data >> shift);
 	old = g1bus_regs[reg];
 
-	g1bus_regs[reg] = dat; // 5f6c00+reg*4=dat
+	g1bus_regs[reg] = dat; // 5f7400+reg*4=dat
 	mame_printf_verbose("G1CTRL: [%08x=%x] write %llx to %x, mask %llx\n", 0x5f7400+reg*4, dat, data, offset, mem_mask);
 	switch (reg)
 	{
 	case SB_GDST:
-		if (!(old & 1) && (dat & 1)) // 0 -> 1
+		if (dat & 1 && g1bus_regs[SB_GDEN] == 1) // 0 -> 1
 		{
-			if ((g1bus_regs[SB_GDEN] == 0) || (g1bus_regs[SB_GDDIR] == 0))
+			if (g1bus_regs[SB_GDDIR] == 0)
 			{
 				mame_printf_verbose("G1CTRL: unsupported transfer\n");
 				return;
@@ -788,71 +845,91 @@ READ64_HANDLER( dc_g2_ctrl_r )
 
 	reg = decode_reg32_64(space->machine, offset, mem_mask, &shift);
 	mame_printf_verbose("G2CTRL:  Unmapped read %08x\n", 0x5f7800+reg*4);
-	return 0;
+	return (UINT64)g2bus_regs[reg] << shift;
 }
 
 WRITE64_HANDLER( dc_g2_ctrl_w )
 {
 	int reg;
 	UINT64 shift;
-	UINT32 dat;
-	static UINT32 wave_dma_aica_addr,wave_dma_root_addr,wave_dma_size,wave_dma_dir,wave_dma_flag;
+	UINT32 dat,old;
+	static struct {
+		UINT32 aica_addr;
+		UINT32 root_addr;
+		UINT32 size;
+		UINT8 dir;
+		UINT8 flag;
+		UINT8 indirect;
+		UINT8 start;
+	}wave_dma;
 
 	reg = decode_reg32_64(space->machine, offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
+	old = g2bus_regs[reg];
+
+	g2bus_regs[reg] = dat; // 5f7800+reg*4=dat
+
 	switch (reg)
 	{
 		/*AICA Address register*/
-		case SB_ADSTAG:
-			//printf("SB_ADSTAG data %08x\n",dat);
-			wave_dma_aica_addr = dat;
-			break;
+		case SB_ADSTAG: wave_dma.aica_addr = dat; break;
 		/*Root address (work ram)*/
-		case SB_ADSTAR:
-			//printf("SB_ADSTAR data %08x\n",dat);
-			wave_dma_root_addr = dat;
-			break;
+		case SB_ADSTAR:	wave_dma.root_addr = dat; break;
 		/*DMA size (in dword units, bit 31 is "set dma initiation enable setting to 0"*/
 		case SB_ADLEN:
-			//printf("SB_ADLEN data %08x\n",dat);
-			wave_dma_size = dat & 0x7fffffff;
+			wave_dma.size = dat & 0x7fffffff;
+			wave_dma.indirect = (dat & 0x80000000)>>31;
 			break;
 		/*0 = root memory to aica / 1 = aica to root memory*/
-		case SB_ADDIR:
-			//printf("SB_ADDIR data %08x\n",dat);
-			wave_dma_dir = 1 ^ (dat & 1);
-			break;
+		case SB_ADDIR: wave_dma.dir = (dat & 1); break;
 		/*dma flag (active HIGH, bug in docs)*/
-		case SB_ADEN:
-			//printf("SB_ADEN data %08x\n",dat);
-			wave_dma_flag = (dat & 1);
-			break;
+		case SB_ADEN: wave_dma.flag = (dat & 1); break;
 		case SB_ADTSEL:
 			mame_printf_verbose("G2CTRL: initiation mode %d\n",dat);
-			//printf("SB_ADTSEL data %08x\n",dat);
+			//mame_printf_verbose("SB_ADTSEL data %08x\n",dat);
 			break;
 		/*ready for dma'ing*/
 		case SB_ADST:
 			mame_printf_verbose("G2CTRL: AICA:G2-DMA start\n");
-			//printf("SB_ADST data %08x\n",dat);
-			if(wave_dma_flag)
+			//mame_printf_verbose("AICA: G2-DMA start\n");
+			//mame_printf_verbose("%08x %08x %08x %02x\n",wave_dma.aica_addr,wave_dma.root_addr,wave_dma.size,wave_dma.indirect);
+			wave_dma.start = dat & 1;
+			//mame_printf_verbose("SB_ADST data %08x\n",dat);
+			if(wave_dma.flag && wave_dma.start)
 			{
 				UINT32 src,dst,size;
-				src = wave_dma_aica_addr;
-				dst = wave_dma_root_addr;
-				//size = wave_dma_size;
+				dst = wave_dma.aica_addr;
+				src = wave_dma.root_addr;
 				size = 0;
+				/* 0 rounding size = 32 Mbytes */
+				if(wave_dma.size == 0) { wave_dma.size = 0x200000; }
+
 				/* TODO: use the ddt function. */
-				if(wave_dma_dir == 1)
+				if(wave_dma.dir == 0)
 				{
-					for(;size<wave_dma_size;size++)
-						memory_write_dword_64le(space,wave_dma_aica_addr+size*4,memory_read_dword(space,wave_dma_root_addr+size*4));
+					for(;size<wave_dma.size;size+=4)
+					{
+						memory_write_dword_64le(space,dst,memory_read_dword(space,src));
+						src+=4;
+						dst+=4;
+					}
 				}
 				else
 				{
-					for(;size<wave_dma_size;size++)
-						memory_write_dword_64le(space,wave_dma_root_addr+size*4,memory_read_dword(space,wave_dma_aica_addr+size*4));
+					for(;size<wave_dma.size;size+=4)
+					{
+						memory_write_dword_64le(space,src,memory_read_dword(space,dst));
+						src+=4;
+						dst+=4;
+					}
 				}
+				/* update the params*/
+				wave_dma.aica_addr = g2bus_regs[SB_ADSTAG] = dst;
+				wave_dma.root_addr = g2bus_regs[SB_ADSTAR] = src;
+				wave_dma.size = g2bus_regs[SB_ADLEN] = 0;
+				wave_dma.flag = (wave_dma.indirect & 1) ? 1 : 0;
+				wave_dma.start = g2bus_regs[SB_ADST] = 0;
+				dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_AICA;
 			}
 			break;
 	}

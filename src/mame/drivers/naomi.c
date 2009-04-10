@@ -12,25 +12,25 @@ Current Compatibility notes (GD-rom games only)
 |----------|-------|-----|------|------|------|--------------------------------|-----------------------------------------------------|
 |romname   | Pl(s) | Rot | Test | Boot | Game | Control Type                   | Notes                                               |
 |----------|-------|-----|------|------|------|--------------------------------|-----------------------------------------------------|
-|gundmgd   |   1   |  H  | Yes  | Yes  | Yes  | twin-joystick with 4+6 buttons |                                                     |
-|sfz3ugd   |   2   |  H  | Yes  | Yes  | No   | joystick with 6 buttons        | Spurious irq on ARM7 prg / broken timings           |
+|gundmgd   |   1   |  H  | Yes  | Yes  | Yes  | joystick with 4 buttons        |                                                     |
+|sfz3ugd   |   2   |  H  | Yes  | Yes  | No   | joystick with 6 buttons        | Hangs after pressing start                          |
 |cvsgd     |   2   |  H  | Yes  | Yes  | Yes  | joystick with 4 buttons        | 2 + 2 extra buttons                                 |
-|gundmxgd  |   1   |  H  | Yes  | Yes  | Yes  | twin-joystick with 4+6 buttons |                                                     |
+|gundmxgd  |   1   |  H  | Yes  | Yes  | Yes  | joystick with 4+6 buttons      |                                                     |
 |cvs2gd    |   2   |  H  | Yes  | Yes  | Yes  | joystick with 6 buttons        |                                                     |
-|ikaruga   |   2   |  V  | Yes  | Yes  | No   | joystick with 2 buttons?       | Broken i/o / timings                                |
+|ikaruga   |   2   |  V  | Yes  | Yes  | Yes  | joystick with 3 buttons?       |                                                     |
 |ggxx      |   2   |  H  | Yes  | Yes  | Yes  | joystick with 5 buttons        |                                                     |
 |moeru     |   2   |  H  | No   | No   | No   | joystick with 3 buttons?       | Broken i/o, stuck at the "now loading" msg          |
-|chocomk   |   2   |  H  | No?  | Yes  | Yes? | joystick with 3 buttons?       | Broken i/o?                                         |
+|chocomk   |   2   |  H  | Yes  | Yes  | Yes  | joystick with 3 buttons?       |                                                     |
 |quizqgd   |   2   |  V  | Yes  | Yes  | Yes  | joystick(?) with 4 buttons     |                                                     |
 |ggxxrl    |   2   |  H  | Yes  | Yes  | Yes  | joystick with 5 buttons        |                                                     |
-|tetkiwam  |   2   |  H  | No   | No   | No   | joystick with 3 buttons?       |                                                     |
-|shikgam2  |   2   |  V  | Yes  | Yes  | No   | joystick with 3 buttons?       | Broken i/o                                          |
+|tetkiwam  |   2   |  H  | No   | No   | No   | joystick with 3 buttons?       | Black screen, tests the SCIF (UART) regs?           |
+|shikgam2  |   2   |  V  | Yes  | Yes  | No   | joystick with 3 buttons?       | Broken i/o, crashes on the proper gameplay          |
 |usagui    |   1   |  H  | Yes  | Yes  | No   | mahjong panel                  |                                                     |
-|bdrdown   |   2   |  H  | Yes  | Yes  | No?  | joystick with 3 buttons?       | Broken i/o in test mode                             |
+|bdrdown   |   2   |  H  | Yes  | Yes  | Yes  | joystick with 3 buttons?       |                                                     |
 |psyvar2   |   1   |  V  | No   | No   | No   | joystick with 3 buttons?       |                                                     |
 |cfield    |   1?  |  H  | No?  | Yes  | No   | joystick with 3 buttons?       | Broken i/o                                          |
 |trizeal   |   2   |  V  | No   | No   | No   | joystick with 3 buttons?       |                                                     |
-|meltybld  |   2   |  H  | No?  | Yes  | No?  | joystick with 4 buttons?       | Crashes in attract with wrong mask                  |
+|meltybld  |   2   |  H  | No?  | Yes  | No?  | joystick with 4 buttons?       | Crashes in attract/gameplay with wrong mask         |
 |senko     |   2   |  H  | Yes  | Yes  | No   | joystick with 3 buttons?       | Broken i/o                                          |
 |senkoo    |   2   |  H  | Yes  | Yes  | No   | joystick with 3 buttons?       | Broken i/o                                          |
 |ss2005    |   1   |  H  | Yes  | Yes  | No   | joystick with 3 buttons?       | Broken i/o                                          |
@@ -40,14 +40,14 @@ Current Compatibility notes (GD-rom games only)
 |undefeat  |   2   |  V  | No   | No   | No   | joystick with 3 buttons?       | Stuck at the "now loading" msg                      |
 |trgheart  |   1   |  V  | Yes  | Yes  | No   | joystick with 3 buttons?       | Broken i/o                                          |
 |jingystm  |   2   |  H  | Yes  | Yes  | No   | joystick with 4 buttons?       | Broken i/o                                          |
-|meltyb    |   2   |  H  | No?  | Yes  | No?  | joystick with 4 buttons?       | Crashes in attract with wrong mask                  |
-|meltyba   |   2   |  H  | No?  | Yes  | No?  | joystick with 4 buttons?       | Crashes in attract with wrong mask                  |
+|meltyb    |   2   |  H  | No?  | Yes  | No?  | joystick with 4 buttons?       | Crashes in attract/gameplay with wrong mask         |
+|meltyba   |   2   |  H  | No?  | Yes  | No?  | joystick with 4 buttons?       | Crashes in attract/gameplay with wrong mask         |
 |karous    |   1   |  V  | Yes  | Yes  | No   | joystick with 3 buttons?       | Broken i/o                                          |
 |takoron   |   2   |  H  | Yes  | Yes  | Yes  | joystick with 3 buttons        |                                                     |
 --------------------------------------------------------------------------------------------------------------------------------------
 |confmiss  |   2   |  H  | Yes  | Yes  | No   | lightgun                       |                                                     |
 |sprtjam   |   2   |  H  | Yes  | Yes  | Yes  | joystick with 2 buttons        |                                                     |
-|slashout  |   1   |  H  | Yes  | Yes  | Yes  | joystick with 4 buttons        | Needs to map the extra button                       |
+|slashout  |   1   |  H  | Yes  | Yes  | Yes  | joystick with 4 buttons        |                                                     |
 |spkrbtl   |   2   |  H  | Yes  | Yes  | No   | joystick with 4 buttons        | Crashes when loading the gameplay                   |
 |monkeyba  |   1   |  H  | Yes  | Yes  | No   | ad stick                       | Crashes when loading the gameplay                   |
 |dygolf    |   2   |  H  | No   | No   | No   | trackball + 4 buttons          | Moans about the jvs settings                        |
@@ -1057,6 +1057,7 @@ ADDRESS_MAP_END
 * Input ports
 */
 
+/* for now we hardwire a joystick + 6 buttons for every game.*/
 static INPUT_PORTS_START( naomi )
 	PORT_START("IN0")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service")
@@ -1070,6 +1071,9 @@ static INPUT_PORTS_START( naomi )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_START("IN2")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON6 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON5 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON4 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON3 )
 	PORT_START("IN3")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START2 )
@@ -1080,6 +1084,9 @@ static INPUT_PORTS_START( naomi )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_START("IN4")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)
 
 	PORT_START("COINS")
@@ -2973,7 +2980,7 @@ GAME( 2000, slasho,   naomi,    naomi,    naomi,    0, ROT0, "Sega",            
 /* Incomplete Dumps (just the program rom IC22) */
 GAME( 2000, cspike,   naomi,    naomi,    naomi,    0, ROT0, "Psikyo / Capcom", "Gun Spike (JPN) / Cannon Spike (USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2000, capsnk,   naomi,    naomi,    naomi,    0, ROT0, "Capcom / SNK",    "Capcom Vs. SNK Millennium Fight 2000 (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( ????, derbyoc,  naomi,    naomi,    naomi,    0, ROT0, "Sega",            "Derby Owners Club (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 1999, derbyoc,  naomi,    naomi,    naomi,    0, ROT0, "Sega",            "Derby Owners Club (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 1998, dybb99,   naomi,    naomi,    naomi,    0, ROT0, "Sega",            "Dynamite Baseball '99 (JPN) / World Series '99 (USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2000, gram2000, naomi,    naomi,    naomi,    0, ROT0, "Sega",            "Giant Gram 2000 (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 1999, ggram2,   naomi,    naomi,    naomi,    0, ROT0, "Sega",            "Giant Gram (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING ) // strings in rom don't contain '2'
@@ -4009,6 +4016,20 @@ ROM_START( vf4evo )
 	ROM_LOAD("317-0338-jpn.data", 0x00, 0x50, CRC(eeb2c9e9) SHA1(d30b5914c603219daea9923e1cf8da2be6096742) )
 ROM_END
 
+ROM_START( vf4evoa )
+	NAOMI2_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0024a", 0, SHA1(6225e778d73db18be26f882d4f9cd3b3a136d1c9) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C622A (317-0338-JPN)
+	//(sticker 253-5508-0338J)
+	ROM_LOAD("317-0338-jpn.data", 0x00, 0x50, CRC(eeb2c9e9) SHA1(d30b5914c603219daea9923e1cf8da2be6096742) )
+ROM_END
+
 ROM_START( initdv2j )
 	NAOMI2_BIOS
 
@@ -4034,6 +4055,36 @@ ROM_START( vf4tuned ) // are there multiple files on this GD-ROM? it only compre
 	//(sticker 253-5508-0387)
 	ROM_LOAD("317-0387-com.data", 0x00, 0x50, CRC(ab9f3851) SHA1(8b64dc6df176eb7adb48267709a27db221d5e3c3) )
 ROM_END
+
+ROM_START( vf4tunedd )
+	NAOMI2_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0036d", 0, SHA1(2f7654307a4c978c5af6c8238c44e70275dd34f9) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C622A (317-0387-COM)
+	//(sticker 253-5508-0387)
+	ROM_LOAD("317-0387-com.data", 0x00, 0x50, CRC(ab9f3851) SHA1(8b64dc6df176eb7adb48267709a27db221d5e3c3) )
+ROM_END
+
+
+ROM_START( vf4tuneda )
+	NAOMI2_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0036a", 0, SHA1(cd630fc4e8f7ed5641b85c609584d7efe0eac137) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C622A (317-0387-COM)
+	//(sticker 253-5508-0387)
+	ROM_LOAD("317-0387-com.data", 0x00, 0x50, CRC(ab9f3851) SHA1(8b64dc6df176eb7adb48267709a27db221d5e3c3) )
+ROM_END
+
 
 /*
 
@@ -4098,9 +4149,23 @@ ROM_START( initdexp )
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gds-0025", 0, SHA1(8ea92cf6b493f21b9453832edad7cbc5e5b350c1) )
 
-	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)  // key supplied was bad
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 	ROM_LOAD("317-0343-com.data", 0x00, 0x50, CRC(e9d8fac0) SHA1(85f5bbffbd9d1f7162bae46ddd49e7870fe93662) )
 ROM_END
+
+ROM_START( initdv3j )
+	NAOMI2_BIOS
+//  NAOMIGD_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0032b", 0, SHA1(568411aa72ca308a03a6b5b61c79833464b88bc6) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_LOAD("gds-0032_pic", 0x00, 0x50, NO_DUMP ) // PIC was missing
+ROM_END
+
 
 GAME( 2001, naomi2,   0,        naomi,    naomi,    0, ROT0, "Sega",            "Naomi 2 Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
 
@@ -4116,8 +4181,12 @@ GAME( 2002, initd,   naomi2,  naomigd,    naomi,    0,  ROT0, "Sega",          "
 GAME( 2002, beachspi,naomi2,  naomigd,    naomi,    0,  ROT0, "Sega",          "Beach Spikers (GDS-0014)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2002, initdexp,naomi2,  naomigd,    naomi,    0,  ROT0, "Sega",          "Initial D Arcade Stage (Export) (GDS-0025)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2002, vf4evo,  naomi2,  naomigd,    naomi,    0,  ROT0, "Sega",          "Virtua Fighter 4 Evolution (Rev B) (GDS-0024B)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2002, vf4evoa, vf4evo,  naomigd,    naomi,    0,  ROT0, "Sega",          "Virtua Fighter 4 Evolution (Rev A) (GDS-0024A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2002, initdv2j,naomi2,  naomigd,    naomi,    0,  ROT0, "Sega",          "Initial D : Arcade Stage Ver. 2 (Japan) (GDS-0026)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2004, initdv3j,naomi2,  naomigd,    naomi,    0,  ROT0, "Sega",          "Initial D : Arcade Stage Ver. 3 (Japan) (Rev B) (GDS-0032B)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2004, vf4tuned,naomi2,  naomigd,    naomi,    0,  ROT0, "Sega",          "Virtua Fighter 4 Final Tuned (Rev F) (GDS-0036F)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2004, vf4tunedd,vf4tuned,naomigd,   naomi,    0,  ROT0, "Sega",          "Virtua Fighter 4 Final Tuned (Rev D) (GDS-0036D)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2004, vf4tuneda,vf4tuned,naomigd,   naomi,    0,  ROT0, "Sega",          "Virtua Fighter 4 Final Tuned (Rev A) (GDS-0036A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 
 
 /* Atomiswave */
@@ -4140,43 +4209,6 @@ ROM_START( triforce )
 	TRIFORCE_BIOS
 
 	ROM_REGION( 0x8400000, "user1", ROMREGION_ERASE)
-ROM_END
-
-/*
-
-Title   VIRTUA STRIKER 4
-Media ID    93B2
-Media Config    GD-ROM1/1
-Regions J
-Peripheral String   0000000
-Product Number  GDT-0015
-Version V1.001
-Release Date    20041202
-Manufacturer ID
-TOC DISC
-Track   Start Sector    End Sector  Track Size
-track01.bin 150 449 705600
-track02.raw 600 1951    3179904
-track03.bin 45150   549299  1185760800
-
-
-PIC
-255-5508-393E
-317-0393-EXP
-
-*/
-
-ROM_START( vs4 )
-	TRIFORCE_BIOS
-	//NAOMIGD_BIOS
-
-	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
-	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdt-0015", 0, SHA1(1f83712b2b170d6edf4a27c15b6f763cc3cc4b71) )
-
-	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
-	ROM_LOAD("317-0393-exp.data", 0x00, 0x50, CRC(2dcfecd7) SHA1(d805168e1564051ae5c47876ade2c9843253c6b4) )
 ROM_END
 
 /*
@@ -4223,12 +4255,133 @@ ROM_START( gekpurya )
 	ROM_LOAD("gdt-0008c.data", 0x00, 0x50, CRC(08434e5e) SHA1(2121999e851f6f62ab845e6de40849d850ac9d1c) )
 ROM_END
 
+ROM_START( tfupdate )
+	TRIFORCE_BIOS
+	//NAOMIGD_BIOS
+
+	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdt-0011", 0, SHA1(71bfa8f53d211085c020d54f55eeeabf85212a0b) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_LOAD("gdt-0011.data", 0x00, 0x50, CRC(08434e5e) SHA1(2121999e851f6f62ab845e6de40849d850ac9d1c) )
+ROM_END
 
 
-GAME( 200?, triforce, 0,        naomigd,    naomi,    0, ROT0, "Sega",           "Triforce Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
+/*
+
+Title   VIRTUA STRIKER 4
+Media ID    93B2
+Media Config    GD-ROM1/1
+Regions J
+Peripheral String   0000000
+Product Number  GDT-0015
+Version V1.001
+Release Date    20041202
+Manufacturer ID
+TOC DISC
+Track   Start Sector    End Sector  Track Size
+track01.bin 150 449 705600
+track02.raw 600 1951    3179904
+track03.bin 45150   549299  1185760800
+
+
+PIC
+255-5508-393E
+317-0393-EXP
+
+*/
+
+ROM_START( vs4 )
+	TRIFORCE_BIOS
+	//NAOMIGD_BIOS
+
+	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdt-0015", 0, SHA1(1f83712b2b170d6edf4a27c15b6f763cc3cc4b71) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_LOAD("317-0393-exp.data", 0x00, 0x50, CRC(2dcfecd7) SHA1(d805168e1564051ae5c47876ade2c9843253c6b4) )
+ROM_END
+
+
+/*
+
+Title   TRF GDROM TBA EX SATL
+Media ID    92C5
+Media Config    GD-ROM1/1
+Regions J
+Peripheral String   0000000
+Product Number  GDT-0010C
+Version V4.000
+Release Date    20040608
+Manufacturer ID
+
+TOC DISC
+Track   Start Sector    End Sector  Track Size
+track01.bin 150 599 1058400
+track02.raw 750 2101    3179904
+track03.bin 45150   549299  1185760800
+*/
+
+ROM_START( avalon13 )
+	TRIFORCE_BIOS
+	//NAOMIGD_BIOS
+
+	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdt-0010c", 0, SHA1(716c441d8dc9036a13c66ef0048cd6d32ac63c4e) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_LOAD("gdt-0010c.data", 0x00, 0x50, CRC(6c51e5d6) SHA1(84afef983f1f855fe8722f55baa8ea5121da9369) )
+ROM_END
+
+
+/*
+
+Title   TRF GDROM TBT SATL
+Media ID    1348
+Media Config    GD-ROM1/1
+Regions J
+Peripheral String   0000000
+Product Number  GDT-0017B
+Version V3.001
+Release Date    20041102
+Manufacturer ID
+
+TOC DISC
+Track   Start Sector    End Sector  Track Size
+track01.bin 150 599 1058400
+track02.raw 750 2101    3179904
+track03.bin 45150   549299  1185760800
+
+*/
+
+ROM_START( avalon20 )
+	TRIFORCE_BIOS
+	//NAOMIGD_BIOS
+
+	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdt-0017b", 0, SHA1(e2dd32c322ffcaf38b82275d2721b71bb3dfc1f2) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_LOAD("gdt-0017b.data", 0x00, 0x50, CRC(32cb46d4) SHA1(a58b9e03d57b317133d9b6c29e42852af8e77559) )
+ROM_END
+
+
+
+GAME( 2002, triforce, 0,        naomigd,    naomi,    0, ROT0, "Sega",           "Triforce Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
 GAME( 2002, vs2002ex, triforce, naomigd,    naomi,    0, ROT0, "Sega",           "Virtua Striker 2002 (GDT-0002)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2003, gekpurya, triforce, naomigd,    naomi,    0, ROT0, "Sega",           "Gekitou Pro Yakyuu Mizushima Shinji All Stars vs. Pro Yakyuu (Rev C) (GDT-0008C)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 200?, vs4,      triforce, naomigd,    naomi,    0, ROT0, "Sega",           "Virtua Striker 4 (GDT-0015)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, tfupdate, triforce, naomigd,    naomi,    0, ROT0, "Sega",           "Triforce DIMM Updater (GDT-0011)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2004, vs4,      triforce, naomigd,    naomi,    0, ROT0, "Sega",           "Virtua Striker 4 (GDT-0015)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2004, avalon13, triforce, naomigd,    naomi,    0, ROT0, "Sega",           "The Key Of Avalon 1.3 - Chaotic Sabbat - Client (GDT-0010C) (V4.000)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2004, avalon20, triforce, naomigd,    naomi,    0, ROT0, "Sega",           "The Key Of Avalon 2.0 - Eutaxy and Commandment - Client (GDT-0017B) (V3.001)", GAME_NO_SOUND|GAME_NOT_WORKING )
 
 
 /*********************************************************************************************************************
@@ -4314,6 +4467,19 @@ ROM_START( vcop3 )
 	ROM_LOAD("317-0354-com.data", 0x00, 0x50,  CRC(df7e3217) SHA1(9f0f4bf6b15f3b6eeea81eaa27b3d25bd94110da) )
 ROM_END
 
+ROM_START( mj2 )
+	CHIHIRO_BIOS
+
+	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdx-0006c", 0, SHA1(505653117a73ed8b256ccf19450e7573a4dc57e9) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE) // key was missing
+	ROM_LOAD("gdx-0006c.pic_data", 0x00, 0x50, NO_DUMP )
+ROM_END
+
+
 ROM_START( wangmid )
 	CHIHIRO_BIOS
 
@@ -4326,10 +4492,37 @@ ROM_START( wangmid )
 	ROM_LOAD("gdx-0009b.data", 0x00, 0x50, CRC(3af801f3) SHA1(e9a2558930f3f1f55d5b3c2cadad69329d931f26) )
 ROM_END
 
+ROM_START( wangmid2 )
+	CHIHIRO_BIOS
+
+	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdx-0015", 0, SHA1(259483fd211a70c23205ffd852316d616c5a2740) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_LOAD("gdx-0015.data", 0x00, 0x50, CRC(75c716aa) SHA1(5c2bcf3d28a80b336c6882d5aeb010d04327f8c1) )
+ROM_END
+
+ROM_START( mj3 )
+	CHIHIRO_BIOS
+
+	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdx-0017d", 0, SHA1(cfbbd452c8f4efe0e99f398f5521fc3574b913bb) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE) // key was missing
+	ROM_LOAD("gdx-0017d.pic_data", 0x00, 0x50, NO_DUMP )
+ROM_END
+
 
 GAME( 200?, chihiro,  0,       naomigd,    naomi,    0, ROT0, "Sega",           "Chihiro Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
-GAME( 2005, wangmid,  chihiro, naomigd,    naomi,    0, ROT0, "Sega",           "Wangan Midnight Maximum Tune (Ver. B) (Export) (GDX-0009B)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, mj2,      chihiro, naomigd,    naomi,    0, ROT0, "Sega",           "Sega Network Taisen Mahjong MJ 2 (Rev C) [GDX-0006C]", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, wangmid,  chihiro, naomigd,    naomi,    0, ROT0, "Sega",           "Wangan Midnight Maximum Tune (Rev. B) (Export) (GDX-0009B)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, wangmid2, chihiro, naomigd,    naomi,    0, ROT0, "Sega",           "Wangan Midnight Maximum Tune 2 (Japan?) (GDX-0015)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2005, ghostsqu, chihiro, naomigd,    naomi,    0, ROT0, "Sega",           "Ghost Squad (Ver. A?) (GDX-0012A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2003, vcop3,    chihiro, naomigd,    naomi,    0, ROT0, "Sega",           "Virtua Cop 3 (GDX-0003A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, mj3,      chihiro, naomigd,    naomi,    0, ROT0, "Sega",           "Sega Network Taisen Mahjong MJ 3 (Rev D) [GDX-0017D]", GAME_NO_SOUND|GAME_NOT_WORKING )
 
 

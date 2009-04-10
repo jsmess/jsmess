@@ -113,7 +113,8 @@ INLINE int decode_reg_64(UINT32 offset, UINT64 mem_mask, UINT64 *shift)
 	// non 32-bit accesses have not yet been seen here, we need to know when they are
 	if ((mem_mask != U64(0xffffffff00000000)) && (mem_mask != U64(0x00000000ffffffff)))
 	{
-		assert_always(0, "Wrong mask!\n");
+		/*assume to return the lower 32-bits ONLY*/
+		return reg & 0xffffffff;
 	}
 
 	if (mem_mask == U64(0xffffffff00000000))
@@ -144,17 +145,64 @@ WRITE64_HANDLER( pvr_ctrl_w )
 	int reg;
 	UINT64 shift;
 	UINT32 dat;
+	static struct {
+		UINT32 pvr_addr;
+		UINT32 sys_addr;
+		UINT32 size;
+		UINT8 dir;
+		UINT8 flag;
+		UINT8 start;
+	}pvr_dma;
 
 	reg = decode_reg_64(offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
 
 	switch (reg)
 	{
-	case SB_PDST:
-		#if DEBUG_PVRCTRL
-		mame_printf_verbose("PVRCTRL: PVR-DMA start\n");
-		#endif
-		break;
+		case SB_PDSTAP: pvr_dma.pvr_addr = dat; break;
+		case SB_PDSTAR: pvr_dma.sys_addr = dat; break;
+		case SB_PDLEN: pvr_dma.size = dat; break;
+		case SB_PDDIR: pvr_dma.dir = dat & 1; break;
+		case SB_PDTSEL: mame_printf_verbose("PVRCTRL: initiation mode %x\n",dat); break;
+		case SB_PDEN: pvr_dma.flag = dat & 1; break;
+		case SB_PDST:
+			pvr_dma.start = dat & 1;
+			/*We need to know where this is actually used on Naomi, for testing purpose.*/
+			if(pvr_dma.start) { printf("Warning: PVR-DMA start\n"); }
+
+			/*TODO: use the ddt function.*/
+			if(pvr_dma.flag && pvr_dma.start)
+			{
+				UINT32 src,dst,size;
+				dst = pvr_dma.pvr_addr;
+				src = pvr_dma.sys_addr;
+				size = 0;
+				/* 0 rounding size = 16 Mbytes */
+				if(pvr_dma.size == 0) { pvr_dma.size = 0x100000; }
+
+				if(pvr_dma.dir == 0)
+				{
+					for(;size<pvr_dma.size;size+=4)
+					{
+						memory_write_dword_64le(space,dst,memory_read_dword(space,src));
+						src+=4;
+						dst+=4;
+					}
+				}
+				else
+				{
+					for(;size<pvr_dma.size;size+=4)
+					{
+						memory_write_dword_64le(space,src,memory_read_dword(space,dst));
+						src+=4;
+						dst+=4;
+					}
+				}
+				/*Note: do not update the params, since this DMA type doesn't support it. */
+
+				dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_PVR;
+			}
+			break;
 	}
 
 	#if DEBUG_PVRCTRL
@@ -823,7 +871,9 @@ static void computedilated(void)
 }
 
 #if DEBUG_VERTICES
-static void testdrawline(bitmap_t *bitmap, int index, int from, int to)
+
+
+INLINE void testdrawline(bitmap_t *bitmap, testvertices* from, testvertices* to)
 {
 UINT32 *bmpaddr;
 int ix, iy, i, inc, x, y, dx, dy, plotx, ploty;
@@ -834,10 +884,10 @@ render_bounds line, clip;
 	clip.y0=0;
 	clip.x1=639;
 	clip.y1=479;
-	line.x0=state_ta.grab[index].showvertices[from].x;
-	line.y0=state_ta.grab[index].showvertices[from].y;
-	line.x1=state_ta.grab[index].showvertices[to].x;
-	line.y1=state_ta.grab[index].showvertices[to].y;
+	line.x0=from->x;
+	line.y0=from->y;
+	line.x1=to->x;
+	line.y1=to->y;
 	if (render_clip_line(&line, &clip))
 		return;
 	dx=line.x1-line.x0;
@@ -871,6 +921,15 @@ render_bounds line, clip;
 		}
 	}
 }
+
+INLINE void testdrawpoly(bitmap_t *bitmap, testvertices **v)
+{
+	testdrawline(bitmap,v[0],v[1]);
+	testdrawline(bitmap,v[1],v[2]);
+	testdrawline(bitmap,v[2],v[0]);
+}
+
+
 #endif
 
 #if 0
@@ -1025,6 +1084,38 @@ static void testdrawscreen(const running_machine *machine,bitmap_t *bitmap,const
 				case 4: // bumpmap
 					break;
 				case 5: // 4 bpp palette
+					if (state_ta.grab[rs].showsprites[cs].texturemode & 2) // vq-compressed
+					{
+						c=0x800+(dilated1[cd][xt >> 1] + dilated0[cd][yt >> 2]);
+						c=*(((UINT8 *)dc_texture_ram) + BYTE_XOR_LE(state_ta.grab[rs].showsprites[cs].textureaddress+c));
+						addrp=state_ta.grab[rs].showsprites[cs].textureaddress+c*8+(dilated1[cd][xt & 1] + dilated0[cd][yt & 3]);
+					}
+					else
+					{
+						addrp=state_ta.grab[rs].showsprites[cs].textureaddress+(dilated1[cd][xt] + dilated0[cd][yt]);
+					}
+					c=*(((UINT8 *)dc_texture_ram) + BYTE_XOR_LE(addrp));
+					c=((state_ta.grab[rs].showsprites[cs].texturepalette & 0x3f) << 4) + (c & 0xf);
+					c=pvrta_regs[0x1000/4+c];
+					switch (pvrta_regs[PAL_RAM_CTRL])
+					{
+					case 0: // argb1555
+						a=(((c & 0x8000) >> 8)*255)/0x80;
+						c=MAKE_RGB((c&0x7c00) >> 7, (c&0x3e0) >> 2, (c&0x1f) << 3);
+						break;
+					case 1: // rgb565
+						a=255;
+						c=MAKE_RGB((c&0xf800) >> 8, (c&0x7e0) >> 3, (c&0x1f) << 3);
+						break;
+					case 2: // argb4444
+						a=(((c & 0xf000) >> 8)*255)/0xf0;
+						c=MAKE_RGB((c&0xf00) >> 4, c&0xf0, (c&0xf) << 4);
+						break;
+					case 3: // argb8888
+						a=(c & 0xff000000) >> 24;
+						c=MAKE_RGB((c&0xff0000) >> 16, (c&0xff00) >> 8, c&0xff);
+						break;
+					}
 					break;
 				case 6: // 8 bpp palette
 					if (state_ta.grab[rs].showsprites[cs].texturemode & 2) // vq-compressed
@@ -1097,19 +1188,55 @@ static void testdrawscreen(const running_machine *machine,bitmap_t *bitmap,const
 #endif
 			}
 		}
+
+
+		// test--draw the verts fore each quad as polys too
+		{
+			testvertices vv[4];
+			testvertices* v[3];
+
+			vv[0].x = state_ta.grab[rs].showsprites[cs].a.x;
+			vv[0].y = state_ta.grab[rs].showsprites[cs].a.y;
+			vv[1].x = state_ta.grab[rs].showsprites[cs].b.x;
+			vv[1].y = state_ta.grab[rs].showsprites[cs].b.y;
+			vv[2].x = state_ta.grab[rs].showsprites[cs].c.x;
+			vv[2].y = state_ta.grab[rs].showsprites[cs].c.y;
+			vv[3].x = state_ta.grab[rs].showsprites[cs].d.x;
+			vv[3].y = state_ta.grab[rs].showsprites[cs].d.y;
+
+			v[0] = &vv[0];
+			v[1] = &vv[1];
+			v[2] = &vv[2];
+			testdrawpoly(bitmap,v);
+			v[0] = &vv[0];
+			v[1] = &vv[2];
+			v[2] = &vv[3];
+			testdrawpoly(bitmap,v);
+		}
+
 	}
 	state_ta.grab[rs].busy=0;
 #if DEBUG_VERTICES
 	a = state_ta.grab[rs].testvertices_size;
 	if (a > 65530)
 		a = 65530;
-	for (cs=1;cs < a;cs++)
+
+	cs = 0;
+
+	while (cs<a)
 	{
-		testdrawline(bitmap,rs,cs-1,cs);  // draw a segment from vertex xi to vertex yi
-		if ((cs > 1) && (state_ta.grab[rs].showvertices[cs-2].endofstrip == 0))
-			testdrawline(bitmap,rs,cs-2,cs);
-		if (state_ta.grab[rs].showvertices[cs].endofstrip == 1)
-			cs++;
+		testvertices *v[3];
+
+		v[0] = &state_ta.grab[rs].showvertices[cs]; cs++;
+		v[1] = &state_ta.grab[rs].showvertices[cs]; cs++;
+		v[2] = &state_ta.grab[rs].showvertices[cs]; cs++;
+
+		testdrawpoly(bitmap,v);
+
+		if (v[2]->endofstrip==0)
+		{
+			cs-=2;
+		}
 	}
 #endif
 }
@@ -1119,8 +1246,9 @@ static void testdrawscreenframebuffer(bitmap_t *bitmap,const rectangle *cliprect
 {
 	int x,y,dy,xi;
 	UINT32 addrp;
-	UINT16 *fbaddr;
+	UINT32 *fbaddr;
 	UINT32 c;
+	UINT32 r,g,b;
 
 	// only for rgb565 framebuffer
 	xi=((pvrta_regs[FB_R_SIZE] & 0x3ff)+1) << 1;
@@ -1130,9 +1258,12 @@ static void testdrawscreenframebuffer(bitmap_t *bitmap,const rectangle *cliprect
 		addrp=pvrta_regs[FB_R_SOF1]+y*xi*2;
 		for (x=0;x < xi;x++)
 		{
-			fbaddr=BITMAP_ADDR16(bitmap,y,x);
+			fbaddr=BITMAP_ADDR32(bitmap,y,x);
 			c=*(((UINT16 *)dc_texture_ram) + (WORD2_XOR_LE(addrp) >> 1));
-			*fbaddr = (UINT16)c;
+			b = (c & 0x001f) << 3;
+			g = (c & 0x07e0) >> 3;
+			r = (c & 0xf800) >> 8;
+			*fbaddr = b | (g<<8) | (r<<16);
 			addrp+=2;
 		}
 	}

@@ -344,13 +344,13 @@ static WRITE8_DEVICE_HANDLER( pio_port_b_w )
 
 static const z80pio_interface mbee_z80pio_intf =
 {
-	mbee_pio_interrupt,	/* callback when change interrupt status */
-	NULL,
-	pio_port_b_r,
-	NULL,
-	pio_port_b_w,
-	NULL,
-	NULL
+	DEVCB_LINE(mbee_pio_interrupt),	/* callback when change interrupt status */
+	DEVCB_NULL,
+	DEVCB_HANDLER(pio_port_b_r),
+	DEVCB_NULL,
+	DEVCB_HANDLER(pio_port_b_w),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static const z80_daisy_chain mbee_daisy_chain[] =

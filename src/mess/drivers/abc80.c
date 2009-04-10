@@ -457,13 +457,13 @@ static WRITE8_DEVICE_HANDLER( abc80_pio_port_b_w )
 
 static const z80pio_interface abc80_pio_intf =
 {
-	abc80_pio_interrupt,		/* callback when change interrupt status */
-	abc80_pio_port_a_r,			/* port A read callback */
-	abc80_pio_port_b_r,			/* port B read callback */
-	NULL,						/* port A write callback */
-	abc80_pio_port_b_w,			/* port B write callback */
-	NULL,						/* portA ready active callback */
-	NULL						/* portB ready active callback */
+	DEVCB_LINE(abc80_pio_interrupt),		/* callback when change interrupt status */
+	DEVCB_HANDLER(abc80_pio_port_a_r),			/* port A read callback */
+	DEVCB_HANDLER(abc80_pio_port_b_r),			/* port B read callback */
+	DEVCB_NULL,						/* port A write callback */
+	DEVCB_HANDLER(abc80_pio_port_b_w),			/* port B write callback */
+	DEVCB_NULL,						/* portA ready active callback */
+	DEVCB_NULL						/* portB ready active callback */
 };
 
 static const z80_daisy_chain abc80_daisy_chain[] =

@@ -1772,13 +1772,13 @@ static void kc85_pio_brdy_callback(const device_config *device, int state)
 
 const z80pio_interface kc85_pio_intf =
 {
-	kc85_pio_interrupt,		/* callback when change interrupt status */
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	kc85_pio_ardy_callback,	/* portA ready active callback */
-	kc85_pio_brdy_callback	/* portB ready active callback */
+	DEVCB_LINE(kc85_pio_interrupt),		/* callback when change interrupt status */
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_LINE(kc85_pio_ardy_callback),	/* portA ready active callback */
+	DEVCB_LINE(kc85_pio_brdy_callback)	/* portB ready active callback */
 };
 
 

@@ -3267,12 +3267,13 @@ static void amstrad_common_init(running_machine *machine)
 
 	/* Using the cool code Juergen has provided, I will override
     the timing tables with the values for the amstrad */
-	device_set_info_ptr(machine->cpu[0],CPUINFO_PTR_Z80_CYCLE_TABLE+Z80_TABLE_op, (void*)amstrad_cycle_table_op);
-	device_set_info_ptr(machine->cpu[0],CPUINFO_PTR_Z80_CYCLE_TABLE+Z80_TABLE_cb, (void*)amstrad_cycle_table_cb);
-	device_set_info_ptr(machine->cpu[0],CPUINFO_PTR_Z80_CYCLE_TABLE+Z80_TABLE_ed, (void*)amstrad_cycle_table_ed);
-	device_set_info_ptr(machine->cpu[0],CPUINFO_PTR_Z80_CYCLE_TABLE+Z80_TABLE_xy, (void*)amstrad_cycle_table_xy);
-	device_set_info_ptr(machine->cpu[0],CPUINFO_PTR_Z80_CYCLE_TABLE+Z80_TABLE_xycb, (void*)amstrad_cycle_table_xycb);
-	device_set_info_ptr(machine->cpu[0],CPUINFO_PTR_Z80_CYCLE_TABLE+Z80_TABLE_ex, (void*)amstrad_cycle_table_ex);
+	z80_set_cycle_tables(machine->cpu[0],
+		(void*)amstrad_cycle_table_op,
+		(void*)amstrad_cycle_table_cb,
+		(void*)amstrad_cycle_table_ed,
+		(void*)amstrad_cycle_table_xy,
+		(void*)amstrad_cycle_table_xycb,
+		(void*)amstrad_cycle_table_ex);
 
 	/* Juergen is a cool dude! */
 	cpu_set_irq_callback(machine->cpu[0], amstrad_cpu_acknowledge_int);

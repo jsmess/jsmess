@@ -66,7 +66,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pastelg_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-//  AM_RANGE(0x00, 0x00) AM_WRITE(SMH_NOP)
+//  AM_RANGE(0x00, 0x00) AM_WRITENOP
 	AM_RANGE(0x00, 0x7f) AM_READ(nb1413m3_sndrom_r)
 	AM_RANGE(0x81, 0x81) AM_DEVREAD("ay", ay8910_r)
 	AM_RANGE(0x82, 0x83) AM_DEVWRITE("ay", ay8910_data_address_w)
@@ -541,5 +541,4 @@ ROM_END
 
 
 GAME( 1985, pastelg, 0, pastelg, pastelg, pastelg, ROT0, "Nichibutsu", "Pastel Gal (Japan 851224)", 0 )
-GAME( 1985, 3ds, 0, threeds, threeds, pastelg, ROT0, "Nihon Bussan", "Three Ds - Three Dealers Casino House", GAME_IMPERFECT_GRAPHICS )
-
+GAME( 1985, 3ds,     0, threeds, threeds, pastelg, ROT0, "Nichibutsu", "Three Ds - Three Dealers Casino House", GAME_IMPERFECT_GRAPHICS )

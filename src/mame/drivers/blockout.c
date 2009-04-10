@@ -54,7 +54,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100006, 0x100007) AM_READ_PORT("DSW1")
 	AM_RANGE(0x100008, 0x100009) AM_READ_PORT("DSW2")
 	AM_RANGE(0x100014, 0x100015) AM_WRITE(blockout_sound_command_w)
-	AM_RANGE(0x100016, 0x100017) AM_WRITE(SMH_NOP)	/* don't know, maybe reset sound CPU */
+	AM_RANGE(0x100016, 0x100017) AM_WRITENOP	/* don't know, maybe reset sound CPU */
 	AM_RANGE(0x180000, 0x1bffff) AM_RAM_WRITE(blockout_videoram_w) AM_BASE(&blockout_videoram)
 	AM_RANGE(0x1d4000, 0x1dffff) AM_RAM	/* work RAM */
 	AM_RANGE(0x1f4000, 0x1fffff) AM_RAM	/* work RAM */
@@ -357,8 +357,8 @@ ROM_START( agressb )
 ROM_END
 
 
-GAME( 1989, blockout, 0,        blockout, blockout, 0, ROT0, "Technos + California Dreams", "Block Out (set 1)", 0 )
-GAME( 1989, blckout2, blockout, blockout, blockout, 0, ROT0, "Technos + California Dreams", "Block Out (set 2)", 0 )
-GAME( 1989, blckoutj, blockout, blockout, blckoutj, 0, ROT0, "Technos + California Dreams", "Block Out (Japan)", 0 )
+GAME( 1989, blockout, 0,        blockout, blockout, 0, ROT0, "Technos Japan + California Dreams", "Block Out (set 1)", 0 )
+GAME( 1989, blckout2, blockout, blockout, blockout, 0, ROT0, "Technos Japan + California Dreams", "Block Out (set 2)", 0 )
+GAME( 1989, blckoutj, blockout, blockout, blckoutj, 0, ROT0, "Technos Japan + California Dreams", "Block Out (Japan)", 0 )
 GAME( 1991, agress,   0,        blockout, agress,   0, ROT0, "Palco", "Agress", 0 )
 GAME( 2003, agressb,  agress,   blockout, agress,   0, ROT0, "Palco", "Agress (English bootleg)", 0 )

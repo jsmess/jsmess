@@ -93,6 +93,7 @@ Notes:
 #include "machine/eeprom.h"
 #include "sound/2151intf.h"
 #include "sound/k053260.h"
+#include "konamipt.h"
 
 /* prototypes */
 static MACHINE_RESET( vendetta );
@@ -266,95 +267,63 @@ static READ8_DEVICE_HANDLER( vendetta_sound_r )
 
 /********************************************/
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(SMH_BANK1	)
-	AM_RANGE(0x2000, 0x3fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x5f80, 0x5f9f) AM_READ(K054000_r)
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK(1)
+	AM_RANGE(0x2000, 0x3fff) AM_RAM
+	AM_RANGE(0x5f80, 0x5f9f) AM_READWRITE(K054000_r, K054000_w)
+	AM_RANGE(0x5fa0, 0x5faf) AM_WRITE(K053251_w)
+	AM_RANGE(0x5fb0, 0x5fb7) AM_WRITE(K053246_w)
 	AM_RANGE(0x5fc0, 0x5fc0) AM_READ_PORT("P1")
 	AM_RANGE(0x5fc1, 0x5fc1) AM_READ_PORT("P2")
 	AM_RANGE(0x5fc2, 0x5fc2) AM_READ_PORT("P3")
 	AM_RANGE(0x5fc3, 0x5fc3) AM_READ_PORT("P4")
 	AM_RANGE(0x5fd0, 0x5fd0) AM_READ(vendetta_eeprom_r) /* vblank, service */
 	AM_RANGE(0x5fd1, 0x5fd1) AM_READ_PORT("SERVICE")
-	AM_RANGE(0x5fe4, 0x5fe4) AM_READ(vendetta_sound_interrupt_r)
-	AM_RANGE(0x5fe6, 0x5fe7) AM_DEVREAD("konami", vendetta_sound_r)
+	AM_RANGE(0x5fe0, 0x5fe0) AM_WRITE(vendetta_5fe0_w)
+	AM_RANGE(0x5fe2, 0x5fe2) AM_WRITE(vendetta_eeprom_w)
+	AM_RANGE(0x5fe4, 0x5fe4) AM_READWRITE(vendetta_sound_interrupt_r, z80_irq_w)
+	AM_RANGE(0x5fe6, 0x5fe7) AM_DEVREADWRITE("konami", vendetta_sound_r, k053260_w)
 	AM_RANGE(0x5fe8, 0x5fe9) AM_READ(K053246_r)
 	AM_RANGE(0x5fea, 0x5fea) AM_READ(watchdog_reset_r)
 	/* what is the desired effect of overlapping these memory regions anyway? */
-	AM_RANGE(0x4000, 0x4fff) AM_READ(SMH_BANK3)
-	AM_RANGE(0x6000, 0x6fff) AM_READ(SMH_BANK2)
-	AM_RANGE(0x4000, 0x7fff) AM_READ(K052109_r)
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
+	AM_RANGE(0x4000, 0x4fff) AM_RAMBANK(3)
+	AM_RANGE(0x6000, 0x6fff) AM_RAMBANK(2)
+	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(K052109_r, K052109_w)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x2000, 0x3fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x5f80, 0x5f9f) AM_WRITE(K054000_w)
-	AM_RANGE(0x5fa0, 0x5faf) AM_WRITE(K053251_w)
-	AM_RANGE(0x5fb0, 0x5fb7) AM_WRITE(K053246_w)
-	AM_RANGE(0x5fe0, 0x5fe0) AM_WRITE(vendetta_5fe0_w)
-	AM_RANGE(0x5fe2, 0x5fe2) AM_WRITE(vendetta_eeprom_w)
-	AM_RANGE(0x5fe4, 0x5fe4) AM_WRITE(z80_irq_w)
-	AM_RANGE(0x5fe6, 0x5fe7) AM_DEVWRITE("konami", k053260_w)
-	/* what is the desired effect of overlapping these memory regions anyway? */
-	AM_RANGE(0x4000, 0x4fff) AM_WRITE(SMH_BANK3)
-	AM_RANGE(0x6000, 0x6fff) AM_WRITE(SMH_BANK2)
-	AM_RANGE(0x4000, 0x7fff) AM_WRITE(K052109_w)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( esckids_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(SMH_RAM)			// 053248 64K SRAM
+static ADDRESS_MAP_START( esckids_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_RAM							// 053248 64K SRAM
 	AM_RANGE(0x3f80, 0x3f80) AM_READ_PORT("P1")
 	AM_RANGE(0x3f81, 0x3f81) AM_READ_PORT("P2")
-	AM_RANGE(0x3f82, 0x3f82) AM_READ_PORT("P3")			// ???  (But not used)
-	AM_RANGE(0x3f83, 0x3f83) AM_READ_PORT("P4")			// ???  (But not used)
-	AM_RANGE(0x3f92, 0x3f92) AM_READ(vendetta_eeprom_r)	// vblank, TEST SW on PCB
+	AM_RANGE(0x3f82, 0x3f82) AM_READ_PORT("P3")				// ???  (But not used)
+	AM_RANGE(0x3f83, 0x3f83) AM_READ_PORT("P4")				// ???  (But not used)
+	AM_RANGE(0x3f92, 0x3f92) AM_READ(vendetta_eeprom_r)		// vblank, TEST SW on PCB
 	AM_RANGE(0x3f93, 0x3f93) AM_READ_PORT("SERVICE")
-	AM_RANGE(0x3fd4, 0x3fd4) AM_READ(vendetta_sound_interrupt_r)	// Sound
-	AM_RANGE(0x3fd6, 0x3fd7) AM_DEVREAD("konami", vendetta_sound_r)				// Sound
-	AM_RANGE(0x3fd8, 0x3fd9) AM_READ(K053246_r)			// 053246 (Sprite)
-	/* what is the desired effect of overlapping these memory regions anyway? */
-	AM_RANGE(0x2000, 0x2fff) AM_READ(SMH_BANK3)			// 052109 (Tilemap) 0x0000-0x0fff
-	AM_RANGE(0x4000, 0x4fff) AM_READ(SMH_BANK2)			// 052109 (Tilemap) 0x2000-0x3fff, Tilemap MASK-ROM bank selector (MASK-ROM Test)
-	AM_RANGE(0x2000, 0x5fff) AM_READ(K052109_r)			// 052109 (Tilemap)
-	AM_RANGE(0x6000, 0x7fff) AM_READ(SMH_BANK1)			// 053248 '975r01' 1M ROM (Banked)
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)			// 053248 '975r01' 1M ROM (0x18000-0x1ffff)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( esckids_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(SMH_RAM)			// 053248 64K SRAM
 	AM_RANGE(0x3fa0, 0x3fa7) AM_WRITE(K053246_w)			// 053246 (Sprite)
 	AM_RANGE(0x3fb0, 0x3fbf) AM_WRITE(K053251_w)			// 053251 (Priority Encoder)
-	AM_RANGE(0x3fc0, 0x3fcf) AM_WRITE(SMH_NOP)			// Not Emulated (053252 ???)
-	AM_RANGE(0x3fd0, 0x3fd0) AM_WRITE(vendetta_5fe0_w)	// Coin Counter, 052109 RMRD, 053246 OBJCHA
+	AM_RANGE(0x3fc0, 0x3fcf) AM_WRITENOP				// Not Emulated (053252 ???)
+	AM_RANGE(0x3fd0, 0x3fd0) AM_WRITE(vendetta_5fe0_w)		// Coin Counter, 052109 RMRD, 053246 OBJCHA
 	AM_RANGE(0x3fd2, 0x3fd2) AM_WRITE(vendetta_eeprom_w)	// EEPROM, Video banking
-	AM_RANGE(0x3fd4, 0x3fd4) AM_WRITE(z80_irq_w)			// Sound
-	AM_RANGE(0x3fd6, 0x3fd7) AM_DEVWRITE("konami", k053260_w)		// Sound
-	AM_RANGE(0x3fda, 0x3fda) AM_WRITE(SMH_NOP)			// Not Emulated (Watchdog ???)
+	AM_RANGE(0x3fd4, 0x3fd4) AM_READWRITE(vendetta_sound_interrupt_r, z80_irq_w)			// Sound
+	AM_RANGE(0x3fd6, 0x3fd7) AM_DEVREADWRITE("konami", vendetta_sound_r, k053260_w)		// Sound
+	AM_RANGE(0x3fd8, 0x3fd9) AM_READ(K053246_r)				// 053246 (Sprite)
+	AM_RANGE(0x3fda, 0x3fda) AM_WRITENOP				// Not Emulated (Watchdog ???)
 	/* what is the desired effect of overlapping these memory regions anyway? */
-	AM_RANGE(0x2000, 0x2fff) AM_WRITE(SMH_BANK3)			// 052109 (Tilemap) 0x0000-0x0fff
-	AM_RANGE(0x4000, 0x4fff) AM_WRITE(SMH_BANK2)			// 052109 (Tilemap) 0x2000-0x3fff, Tilemap MASK-ROM bank selector (MASK-ROM Test)
-	AM_RANGE(0x2000, 0x5fff) AM_WRITE(K052109_w)			// 052109 (Tilemap)
-	AM_RANGE(0x6000, 0x7fff) AM_WRITE(SMH_ROM)			// 053248 '975r01' 1M ROM (Banked)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)			// 053248 '975r01' 1M ROM (0x18000-0x1ffff)
+	AM_RANGE(0x2000, 0x2fff) AM_RAMBANK(3)					// 052109 (Tilemap) 0x0000-0x0fff
+	AM_RANGE(0x4000, 0x4fff) AM_RAMBANK(2)					// 052109 (Tilemap) 0x2000-0x3fff, Tilemap MASK-ROM bank selector (MASK-ROM Test)
+	AM_RANGE(0x2000, 0x5fff) AM_READWRITE(K052109_r, K052109_w)			// 052109 (Tilemap)
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK(1)					// 053248 '975r01' 1M ROM (Banked)
+	AM_RANGE(0x8000, 0xffff) AM_ROM							// 053248 '975r01' 1M ROM (0x18000-0x1ffff)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xefff) AM_READ(SMH_ROM)
-	AM_RANGE(0xf000, 0xf7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xf800, 0xf801) AM_DEVREAD("ym", ym2151_r)
-	AM_RANGE(0xfc00, 0xfc2f) AM_DEVREAD("konami", k053260_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xefff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xf800, 0xf801) AM_DEVWRITE("ym", ym2151_w)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xefff) AM_ROM
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM
+	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
 	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(z80_arm_nmi_w)
-	AM_RANGE(0xfc00, 0xfc2f) AM_DEVWRITE("konami", k053260_w)
+	AM_RANGE(0xfc00, 0xfc2f) AM_DEVREADWRITE("konami", k053260_r, k053260_w)
 ADDRESS_MAP_END
 
 
@@ -366,24 +335,16 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( vendet4p )
 	PORT_START("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+	KONAMI8_RL_B12_COIN(1)
 
 	PORT_START("P2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
+	KONAMI8_RL_B12_COIN(2)
+
+	PORT_START("P3")
+	KONAMI8_RL_B12_COIN(3)
+
+	PORT_START("P4")
+	KONAMI8_RL_B12_COIN(4)
 
 	PORT_START("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -401,30 +362,16 @@ static INPUT_PORTS_START( vendet4p )
 	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_VBLANK ) /* not really vblank, object related. Its timed, otherwise sprites flicker */
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("P3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )
-
-	PORT_START("P4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(4)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(4)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(4)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(4)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN4 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vendetta )
 	PORT_INCLUDE( vendet4p )
+
+	PORT_MODIFY("P3")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("P4")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
@@ -435,34 +382,20 @@ static INPUT_PORTS_START( vendetta )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_MODIFY("P3")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_MODIFY("P4")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( esckids )
-	PORT_START("P1")		// Player 1 Control
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_START("P1")
+	KONAMI8_RL_B12_COIN(1)		// Player 1 Control
 
-	PORT_START("P2")		// Player 2 Control
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_START("P2")
+	KONAMI8_RL_B12_COIN(2)		// Player 2 Control
+
+	PORT_START("P3")
+	KONAMI8_RL_B12_COIN(3)		// Player 3 Control ???  (Not used)
+
+	PORT_START("P4")
+	KONAMI8_RL_B12_COIN(4)		// Player 4 Control ???  (Not used)
 
 	PORT_START("SERVICE")		// Start, Service
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
@@ -480,26 +413,6 @@ static INPUT_PORTS_START( esckids )
 	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_VBLANK ) /* not really vblank, object related. Its timed, otherwise sprites flicker */
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("P3")		// Player 3 Control ???  (Not used)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )
-
-	PORT_START("P4")		// Player 4 Control ???  (Not used)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(4)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(4)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(4)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(4)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN4 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( esckidsj )
@@ -529,11 +442,11 @@ static MACHINE_DRIVER_START( vendetta )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", KONAMI, 6000000)	/* this is strange, seems an overclock but */
 //  MDRV_CPU_ADD("maincpu", KONAMI, 3000000)   /* is needed to have correct music speed */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(main_map, 0)
 	MDRV_CPU_VBLANK_INT("screen", vendetta_irq)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3579545)	/* verified with PCB */
-	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
+	MDRV_CPU_PROGRAM_MAP(sound_map, 0)
                             /* interrupts are triggered by the main CPU */
 
 	MDRV_MACHINE_RESET(vendetta)
@@ -572,7 +485,7 @@ static MACHINE_DRIVER_START( esckids )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(vendetta)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(esckids_readmem,esckids_writemem)
+	MDRV_CPU_PROGRAM_MAP(esckids_map, 0)
 
 	MDRV_SCREEN_MODIFY("screen")
 //MDRV_SCREEN_VISIBLE_AREA(13*8, (64-13)*8-1, 2*8, 30*8-1 )    /* black areas on the edges */
@@ -612,7 +525,7 @@ ROM_START( vendetta )
 	ROM_LOAD( "081a03", 0x000000, 0x100000, CRC(14b6baea) SHA1(fe15ee57f19f5acaad6c1642d51f390046a7468a) )
 ROM_END
 
-ROM_START( vendetao )
+ROM_START( vendettar )
 	ROM_REGION( 0x49000, "maincpu", 0 ) /* code + banked roms + banked ram */
 	ROM_LOAD( "081r01", 0x10000, 0x38000, CRC(84796281) SHA1(e4330c6eaa17adda5b4bd3eb824388c89fb07918) )
 	ROM_CONTINUE(		0x08000, 0x08000 )
@@ -634,7 +547,7 @@ ROM_START( vendetao )
 	ROM_LOAD( "081a03", 0x000000, 0x100000, CRC(14b6baea) SHA1(fe15ee57f19f5acaad6c1642d51f390046a7468a) )
 ROM_END
 
-ROM_START( vendet2p )
+ROM_START( vendetta2p )
 	ROM_REGION( 0x49000, "maincpu", 0 ) /* code + banked roms + banked ram */
 	ROM_LOAD( "081w01", 0x10000, 0x38000, CRC(cee57132) SHA1(8b6413877e127511daa76278910c2ee3247d613a) )
 	ROM_CONTINUE(		0x08000, 0x08000 )
@@ -656,7 +569,7 @@ ROM_START( vendet2p )
 	ROM_LOAD( "081a03", 0x000000, 0x100000, CRC(14b6baea) SHA1(fe15ee57f19f5acaad6c1642d51f390046a7468a) )
 ROM_END
 
-ROM_START( vendetas )
+ROM_START( vendetta2pu )
 	ROM_REGION( 0x49000, "maincpu", 0 ) /* code + banked roms + banked ram */
 	ROM_LOAD( "081u01", 0x10000, 0x38000, CRC(b4d9ade5) SHA1(fbd543738cb0b68c80ff05eed7849b608de03395) )
 	ROM_CONTINUE(		0x08000, 0x08000 )
@@ -678,7 +591,7 @@ ROM_START( vendetas )
 	ROM_LOAD( "081a03", 0x000000, 0x100000, CRC(14b6baea) SHA1(fe15ee57f19f5acaad6c1642d51f390046a7468a) )
 ROM_END
 
-ROM_START( vendtaso )
+ROM_START( vendetta2pd )
 	ROM_REGION( 0x49000, "maincpu", 0 ) /* code + banked roms + banked ram */
 	ROM_LOAD( "081d01", 0x10000, 0x38000, CRC(335da495) SHA1(ea74680eb898aeecf9f1eec95f151bcf66e6b6cb) )
 	ROM_CONTINUE(		0x08000, 0x08000 )
@@ -700,7 +613,7 @@ ROM_START( vendtaso )
 	ROM_LOAD( "081a03", 0x000000, 0x100000, CRC(14b6baea) SHA1(fe15ee57f19f5acaad6c1642d51f390046a7468a) )
 ROM_END
 
-ROM_START( vendettj )
+ROM_START( vendettaj )
 	ROM_REGION( 0x49000, "maincpu", 0 ) /* code + banked roms + banked ram */
 	ROM_LOAD( "081p01", 0x10000, 0x38000, CRC(5fe30242) SHA1(2ea98e66637fa2ad60044b1a2b0dd158a82403a2) )
 	ROM_CONTINUE(		0x08000, 0x08000 )
@@ -815,11 +728,11 @@ static DRIVER_INIT( esckids )
 
 
 
-GAME( 1991, vendetta, 0,        vendetta, vendet4p, vendetta, ROT0, "Konami", "Vendetta (World 4 Players ver. T)", 0 )
-GAME( 1991, vendetao, vendetta, vendetta, vendet4p, vendetta, ROT0, "Konami", "Vendetta (World 4 Players ver. R)", 0 )
-GAME( 1991, vendet2p, vendetta, vendetta, vendetta, vendetta, ROT0, "Konami", "Vendetta (World 2 Players ver. W)", 0 )
-GAME( 1991, vendetas, vendetta, vendetta, vendetta, vendetta, ROT0, "Konami", "Vendetta (Asia 2 Players ver. U)", 0 )
-GAME( 1991, vendtaso, vendetta, vendetta, vendetta, vendetta, ROT0, "Konami", "Vendetta (Asia 2 Players ver. D)", 0 )
-GAME( 1991, vendettj, vendetta, vendetta, vendetta, vendetta, ROT0, "Konami", "Crime Fighters 2 (Japan 2 Players ver. P)", 0 )
-GAME( 1991, esckids,  0,        esckids,  esckids,  esckids,  ROT0, "Konami", "Escape Kids (Asia, 4 Players)", 0 )
-GAME( 1991, esckidsj, esckids,  esckids,  esckidsj, esckids,  ROT0, "Konami", "Escape Kids (Japan, 2 Players)", 0 )
+GAME( 1991, vendetta,    0,        vendetta, vendet4p, vendetta, ROT0, "Konami", "Vendetta (World 4 Players ver. T)", 0 )
+GAME( 1991, vendettar,   vendetta, vendetta, vendet4p, vendetta, ROT0, "Konami", "Vendetta (World 4 Players ver. R)", 0 )
+GAME( 1991, vendetta2p,  vendetta, vendetta, vendetta, vendetta, ROT0, "Konami", "Vendetta (World 2 Players ver. W)", 0 )
+GAME( 1991, vendetta2pu, vendetta, vendetta, vendetta, vendetta, ROT0, "Konami", "Vendetta (Asia 2 Players ver. U)", 0 )
+GAME( 1991, vendetta2pd, vendetta, vendetta, vendetta, vendetta, ROT0, "Konami", "Vendetta (Asia 2 Players ver. D)", 0 )
+GAME( 1991, vendettaj,   vendetta, vendetta, vendetta, vendetta, ROT0, "Konami", "Crime Fighters 2 (Japan 2 Players ver. P)", 0 )
+GAME( 1991, esckids,     0,        esckids,  esckids,  esckids,  ROT0, "Konami", "Escape Kids (Asia, 4 Players)", 0 )
+GAME( 1991, esckidsj,    esckids,  esckids,  esckidsj, esckids,  ROT0, "Konami", "Escape Kids (Japan, 2 Players)", 0 )

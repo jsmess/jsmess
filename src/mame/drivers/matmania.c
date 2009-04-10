@@ -76,7 +76,7 @@ static ADDRESS_MAP_START( matmania_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(SMH_RAM) AM_BASE(&matmania_pageselect)
 	AM_RANGE(0x3010, 0x3010) AM_WRITE(matmania_sh_command_w)
 	AM_RANGE(0x3020, 0x3020) AM_WRITE(SMH_RAM) AM_BASE(&matmania_scroll)
-//  AM_RANGE(0x3030, 0x3030) AM_WRITE(SMH_NOP) /* ?? */
+//  AM_RANGE(0x3030, 0x3030) AM_WRITENOP /* ?? */
 	AM_RANGE(0x3050, 0x307f) AM_WRITE(matmania_paletteram_w) AM_BASE(&paletteram)
 	AM_RANGE(0x4000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
@@ -106,7 +106,7 @@ static ADDRESS_MAP_START( maniach_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(SMH_RAM) AM_BASE(&matmania_pageselect)
 	AM_RANGE(0x3010, 0x3010) AM_WRITE(maniach_sh_command_w)
 	AM_RANGE(0x3020, 0x3020) AM_WRITE(SMH_RAM) AM_BASE(&matmania_scroll)
-	AM_RANGE(0x3030, 0x3030) AM_WRITE(SMH_NOP)	/* ?? */
+	AM_RANGE(0x3030, 0x3030) AM_WRITENOP	/* ?? */
 	AM_RANGE(0x3040, 0x3040) AM_WRITE(maniach_mcu_w)
 	AM_RANGE(0x3050, 0x307f) AM_WRITE(matmania_paletteram_w) AM_BASE(&paletteram)
 	AM_RANGE(0x4000, 0xffff) AM_WRITE(SMH_ROM)
@@ -633,7 +633,7 @@ ROM_END
 
 
 
-GAME( 1985, matmania, 0,        matmania, matmania, 0, ROT270, "Technos (Taito America license)", "Mat Mania", 0 )
-GAME( 1985, excthour, matmania, matmania, maniach,  0, ROT270, "Technos (Taito license)", "Exciting Hour", 0 )
-GAME( 1986, maniach,  0,        maniach,  maniach,  0, ROT270, "Technos (Taito America license)", "Mania Challenge (set 1)", 0 )
-GAME( 1986, maniach2, maniach,  maniach,  maniach,  0, ROT270, "Technos (Taito America license)", "Mania Challenge (set 2)" , 0)	/* earlier version? */
+GAME( 1985, matmania, 0,        matmania, matmania, 0, ROT270, "Technos Japan (Taito America license)", "Mat Mania", 0 )
+GAME( 1985, excthour, matmania, matmania, maniach,  0, ROT270, "Technos Japan (Taito license)", "Exciting Hour", 0 )
+GAME( 1986, maniach,  0,        maniach,  maniach,  0, ROT270, "Technos Japan (Taito America license)", "Mania Challenge (set 1)", 0 )
+GAME( 1986, maniach2, maniach,  maniach,  maniach,  0, ROT270, "Technos Japan (Taito America license)", "Mania Challenge (set 2)" , 0)	/* earlier version? */

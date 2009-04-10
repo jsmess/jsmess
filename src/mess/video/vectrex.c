@@ -313,9 +313,6 @@ VIDEO_START(vectrex)
 
 	lp_t = timer_alloc(machine, lightpen_trigger, NULL);
 
-	/* Switch off crosshairs since most games don't use lightpen */
-	crosshair_toggle(machine);
-
 	refresh = timer_alloc(machine, vectrex_refresh, NULL);
 
 	VIDEO_START_CALL(vector);

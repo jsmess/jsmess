@@ -356,8 +356,8 @@ static ADDRESS_MAP_START( sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(chinagat_sub_bankswitch_w)
 	AM_RANGE(0x2800, 0x2800) AM_WRITE(SMH_RAM) /* Called on CPU start and after return from jump table */
-//  AM_RANGE(0x2a2b, 0x2a2b) AM_READ(SMH_NOP) /* What lives here? */
-//  AM_RANGE(0x2a30, 0x2a30) AM_READ(SMH_NOP) /* What lives here? */
+//  AM_RANGE(0x2a2b, 0x2a2b) AM_READNOP /* What lives here? */
+//  AM_RANGE(0x2a30, 0x2a30) AM_READNOP /* What lives here? */
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(4)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -891,7 +891,7 @@ static DRIVER_INIT( chinagat )
 
 
 /*   ( YEAR  NAME      PARENT    MACHINE   INPUT     INIT    MONITOR COMPANY    FULLNAME     FLAGS ) */
-GAME( 1988, chinagat, 0,        chinagat, chinagat, chinagat, ROT0, "[Technos] (Taito Romstar license)", "China Gate (US)", 0 )
-GAME( 1988, saiyugou, chinagat, chinagat, chinagat, chinagat, ROT0, "Technos", "Sai Yu Gou Ma Roku (Japan)", 0 )
+GAME( 1988, chinagat, 0,        chinagat, chinagat, chinagat, ROT0, "[Technos Japan] (Taito Romstar license)", "China Gate (US)", 0 )
+GAME( 1988, saiyugou, chinagat, chinagat, chinagat, chinagat, ROT0, "Technos Japan", "Sai Yu Gou Ma Roku (Japan)", 0 )
 GAME( 1988, saiyugb1, chinagat, saiyugb1, chinagat, chinagat, ROT0, "bootleg", "Sai Yu Gou Ma Roku (Japan bootleg 1)", GAME_IMPERFECT_SOUND )
 GAME( 1988, saiyugb2, chinagat, saiyugb2, chinagat, chinagat, ROT0, "bootleg", "Sai Yu Gou Ma Roku (Japan bootleg 2)", 0 )
