@@ -10,6 +10,7 @@
 #include "deprecat.h"
 #include "cpu/m6502/m6502.h"
 #include "includes/atari.h"
+#include "machine/ataridev.h"
 #include "devices/cartslot.h"
 #include "sound/pokey.h"
 #include "machine/6821pia.h"

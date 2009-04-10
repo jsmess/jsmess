@@ -463,6 +463,7 @@ $(MESSOBJ)/atari.a:			\
 	$(MAME_VIDEO)/atari.o		\
 	$(MAME_VIDEO)/antic.o		\
 	$(MAME_VIDEO)/gtia.o		\
+	$(MESS_MACHINE)/ataricrt.o	\
 	$(MESS_MACHINE)/atarifdc.o	\
 	$(MESS_DRIVERS)/atari.o		\
 	$(MESS_MACHINE)/a7800.o		\

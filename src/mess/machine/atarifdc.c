@@ -13,6 +13,7 @@
 #include "driver.h"
 #include "cpu/m6502/m6502.h"
 #include "includes/atari.h"
+#include "ataridev.h"
 #include "sound/pokey.h"
 #include "machine/6821pia.h"
 #include "image.h"
@@ -20,6 +21,20 @@
 #define VERBOSE_SERIAL	0
 #define VERBOSE_CHKSUM	0
 
+typedef struct {
+	int  serout_count;
+	int  serout_offs;
+	UINT8 serout_buff[512];
+	UINT8 serout_chksum;
+	int  serout_delay;
+
+	int  serin_count;
+	int  serin_offs;
+	UINT8 serin_buff[512];
+	UINT8 serin_chksum;
+	int  serin_delay;
+}	ATARI_FDC;
+ 
 ATARI_FDC atari_fdc;
 
 typedef struct _atari_drive atari_drive;
@@ -726,7 +741,7 @@ WRITE8_HANDLER ( atari_serout_w )
 
 
 
-WRITE_LINE_DEVICE_HANDLER(atari_pia_cb2_w)
+WRITE_LINE_DEVICE_HANDLER(atarifdc_pia_cb2_w)
 {
 	if (!state)
 	{
