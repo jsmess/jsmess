@@ -1151,4 +1151,5 @@ XL/XE 16kB OS roms
 	DRIVER( z80net )		/* Nuova Elettronica z80ne */
 	DRIVER( z80netb )		/* Nuova Elettronica z80ne */
 
+	DRIVER( tec1 )			/* Talking Electronics Computer */
 #endif /* DRIVER_RECURSIVE */

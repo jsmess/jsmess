@@ -337,6 +337,7 @@ DRVLIBS = \
 	$(MESSOBJ)/tangerin.a \
 	$(MESSOBJ)/tatung.a \
 	$(MESSOBJ)/teamconc.a \
+	$(MESSOBJ)/tec1.a \
 	$(MESSOBJ)/telmac.a \
 	$(MESSOBJ)/thomson.a \
 	$(MESSOBJ)/ti85.a \
@@ -1278,11 +1279,14 @@ $(MESSOBJ)/nokia.a: \
 	$(MESS_VIDEO)/upd7220.o \
 
 $(MESSOBJ)/z80ne.a:	\
-    $(MESS_DRIVERS)/z80ne.o     \
-    $(MESS_VIDEO)/z80ne.o       \
-    $(MESS_MACHINE)/z80ne.o     \
+	$(MESS_DRIVERS)/z80ne.o     \
+	$(MESS_VIDEO)/z80ne.o       \
+	$(MESS_MACHINE)/z80ne.o     \
 	$(MESS_MACHINE)/ay31015.o   \
 	$(MESS_MACHINE)/kr2376.o	\
+
+$(MESSOBJ)/tec1.a: \
+	$(MESS_DRIVERS)/tec1.o \
 
 #-------------------------------------------------
 # layout dependencies
@@ -1314,6 +1318,7 @@ $(MESS_DRIVERS)/px4.o:		$(MESS_LAYOUT)/px4.lh
 $(MESS_DRIVERS)/svi318.o:	$(MESS_LAYOUT)/sv328806.lh
 $(MESS_DRIVERS)/svision.o:	$(MESS_LAYOUT)/svision.lh
 $(MESS_DRIVERS)/sym1.o:		$(MESS_LAYOUT)/sym1.lh
+$(MESS_DRIVERS)/tec1.o:		$(MESS_LAYOUT)/tec1.lh
 $(MESS_DRIVERS)/ut88.o:		$(MESS_LAYOUT)/ut88mini.lh
 $(MESS_DRIVERS)/votrpss.o:	$(MESS_LAYOUT)/votrpss.lh
 $(MESS_DRIVERS)/x68k.o:		$(MESS_LAYOUT)/x68000.lh
