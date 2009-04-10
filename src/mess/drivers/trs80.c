@@ -138,7 +138,6 @@ There don't seem to be any JV1 boot disks for Model III/4.
 #include "sound/wave.h"
 #include "machine/ctronics.h"
 #include "machine/ay31015.h"
-#include "sound/speaker.h"
 #include "includes/trs80.h"
 
 /* Components */
