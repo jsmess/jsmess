@@ -13,6 +13,11 @@ System Driver Changes:
 ----------------------
 - [A7800] Better NTSC palette.  [Robert Tuccitto]
 
+- [ATARI] Refactored MESS specific code from MAME to MESS source. [Fabio Priuli]
+
+- [ATARI] Updated keyboard and keypad scan handling to be more accurate. Added 
+  natural keyboard support. [Fabio Priuli]
+
 - [COLECO] Converted to use PORT_CATEGORY for controller selection. Check 
   the Category Menu (after pressing TAB) to enable Extra controllers. [Fabio 
   Priuli]
