@@ -244,23 +244,13 @@ static INPUT_PORTS_START( gg )
 	PORT_START("START")
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START ) PORT_NAME("Start") /* Game Gear START */
-
-	PORT_START("CTRLSEL")	/* Controller selection */
-	PORT_CATEGORY_CLASS( 0x0F, 0x00, "Player 1 Controller" )
-	PORT_CATEGORY_ITEM( 0x00, DEF_STR( Joystick ), 10 )
-//  PORT_CATEGORY_ITEM( 0x01, "Light Phaser", 11 )
-	PORT_CATEGORY_ITEM( 0x02, "Sega Paddle Control", 12 )
-	PORT_CATEGORY_ITEM( 0x03, "Sega Sports Pad", 13 )
-	PORT_CATEGORY_CLASS( 0xF0, 0x00, "Player 2 Controller" )
-	PORT_CATEGORY_ITEM( 0x00, DEF_STR( Joystick ), 20 )
-//  PORT_CATEGORY_ITEM( 0x10, "Light Phaser", 21 )
-	PORT_CATEGORY_ITEM( 0x20, "Sega Paddle Control", 22 )
-	PORT_CATEGORY_ITEM( 0x30, "Sega Sports Pad", 23 )
 INPUT_PORTS_END
 
-static PALETTE_INIT( sms ) {
+static PALETTE_INIT( sms ) 
+{
 	int i;
-	for( i = 0; i < 64; i++ ) {
+	for( i = 0; i < 64; i++ ) 
+	{
 		int r = i & 0x03;
 		int g = ( i & 0x0C ) >> 2;
 		int b = ( i & 0x30 ) >> 4;
@@ -285,9 +275,11 @@ static PALETTE_INIT( sms ) {
 	palette_set_color_rgb(machine, 64+15, 255, 255, 255 );
 }
 
-static PALETTE_INIT( gamegear ) {
+static PALETTE_INIT( gamegear ) 
+{
 	int i;
-	for( i = 0; i < 4096; i++ ) {
+	for( i = 0; i < 4096; i++ ) 
+	{
 		int r = i & 0x000F;
 		int g = ( i & 0x00F0 ) >> 4;
 		int b = ( i & 0x0F00 ) >> 8;
@@ -300,19 +292,23 @@ static const smsvdp_configuration config_315_5246 = { MODEL_315_5246, sms_int_ca
 static const smsvdp_configuration config_315_5378 = { MODEL_315_5378, sms_int_callback };
 static const smsvdp_configuration config_store = { MODEL_315_5124, sms_store_int_callback };
 
-static VIDEO_START(sega_315_5124) {
+static VIDEO_START(sega_315_5124) 
+{
 	smsvdp_video_init( machine, &config_315_5124 );
 }
 
-static VIDEO_START(sega_315_5246) {
+static VIDEO_START(sega_315_5246) 
+{
 	smsvdp_video_init( machine, &config_315_5246 );
 }
 
-static VIDEO_START(sega_315_5378) {
+static VIDEO_START(sega_315_5378) 
+{
 	smsvdp_video_init( machine, &config_315_5378 );
 }
 
-static VIDEO_START(sega_store_315_5124) {
+static VIDEO_START(sega_store_315_5124) 
+{
 	smsvdp_video_init( machine, &config_store );
 }
 
@@ -619,14 +615,14 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT    CONFIG      COMPANY     FULLNAME                            FLAGS */
-CONS( 1984, sg1000m3,   sms,        0,      sg1000m3,   sms,    sg1000m3, 0,   	  "Sega",     "SG-1000 Mark III",                 0 )
+CONS( 1984, sg1000m3,   sms,        0,      sg1000m3,   sms,    sg1000m3, 0,        "Sega",     "SG-1000 Mark III",                 0 )
 CONS( 1986, sms1,       sms,        0,      sms1ntsc,   sms,    sms1,     0,        "Sega",     "Master System I",                  0 )
 CONS( 1986, sms1pal,    sms,        0,      sms1pal,    sms,    sms1,     0,        "Sega",     "Master System I (PAL)" ,           0 )
-CONS( 1986, smssdisp,   sms,        0,      smssdisp,   sms,    smssdisp, 0,	  "Sega",     "Master System Store Display Unit", GAME_NOT_WORKING )
+CONS( 1986, smssdisp,   sms,        0,      smssdisp,   sms,    smssdisp, 0,        "Sega",     "Master System Store Display Unit", GAME_NOT_WORKING )
 CONS( 1987, smsj,       sms,        0,      smsfm,      sms,    smsj,     0,        "Sega",     "Master System (Japan)",            0 )
 CONS( 1990, sms,        0,          0,      sms2ntsc,   sms,    sms1,     0,        "Sega",     "Master System II",                 0 )
 CONS( 1990, smspal,     sms,        0,      sms2pal,    sms,    sms1,     0,        "Sega",     "Master System II (PAL)",           0 )
 CONS( 1990, sms2kr,     sms,        0,      sms2fm,     sms,    sms2kr,   0,        "Samsung",  "Gam*Boy II (Korea)",               0 )
 
-CONS( 1990, gamegear,   0,          sms,    gamegear,   gg,     gamegear, 0,  	  "Sega",     "Game Gear (Europe/America)",       0 )
-CONS( 1990, gamegeaj,   gamegear,   0,      gamegear,   gg,     gamegeaj, 0,   	  "Sega",     "Game Gear (Japan)",                0 )
+CONS( 1990, gamegear,   0,          sms,    gamegear,   gg,     gamegear, 0,        "Sega",     "Game Gear (Europe/America)",       0 )
+CONS( 1990, gamegeaj,   gamegear,   0,      gamegear,   gg,     gamegeaj, 0,        "Sega",     "Game Gear (Japan)",                0 )

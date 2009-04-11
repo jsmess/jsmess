@@ -103,7 +103,7 @@ static WRITE8_HANDLER( sms_input_write )
 	switch( offset )
 	{
 	case 0:
-		switch( input_port_read(space->machine, "CTRLSEL") & 0x0F )
+		switch( input_port_read_safe(space->machine, "CTRLSEL", 0x00) & 0x0F )
 		{
 		case 0x03:	/* Sports Pad */
 			if ( data != sports_pad_last_data_1 )
@@ -125,7 +125,7 @@ static WRITE8_HANDLER( sms_input_write )
 		break;
 
 	case 1:
-		switch( input_port_read(space->machine, "CTRLSEL") >> 4 )
+		switch( input_port_read_safe(space->machine, "CTRLSEL", 0x00) >> 4 )
 		{
 		case 0x03:	/* Sports Pad */
 			if ( data != sports_pad_last_data_2 )
@@ -163,7 +163,7 @@ static void sms_get_inputs(const address_space *space)
 	}
 
 	/* Player 1 */
-	switch( input_port_read(machine, "CTRLSEL") & 0x0F )
+	switch( input_port_read_safe(machine, "CTRLSEL", 0x00) & 0x0F )
 	{
 	case 0x00:  /* Joystick */
 		data = input_port_read(machine, "PORT_DC");
@@ -215,7 +215,7 @@ static void sms_get_inputs(const address_space *space)
 	}
 
 	/* Player 2 */
-	switch( input_port_read(machine, "CTRLSEL") >> 4 )
+	switch( input_port_read_safe(machine, "CTRLSEL", 0x00) >> 4 )
 	{
 	case 0x00:	/* Joystick */
 		data = input_port_read(machine, "PORT_DC");
