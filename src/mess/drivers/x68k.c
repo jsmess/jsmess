@@ -680,8 +680,11 @@ static void x68k_set_adpcm(running_machine* machine)
 }
 
 // Megadrive 3 button gamepad
-// Multiplexer is controlled by bit 0 in the PPI control port
 // According to XM6, bits 4 and 7 are always 1 (is this correct?)
+// Bits 4 and 5 of PPI port C control each controller's multiplexer
+// Button inputs (Start, A, B and C) are read in bits 5 and 6 (rather than 4
+// and 5 like on a Megadrive)
+
 static UINT8 md_3button_r(const device_config* device, int port)
 {
 	if(port == 1)
@@ -712,7 +715,6 @@ static UINT8 md_3button_r(const device_config* device, int port)
 }
 
 // Megadrive 6 button gamepad
-// Multiplexer is controlled by bit 0 in the PPI control port
 static TIMER_CALLBACK(md_6button_port1_timeout)
 {
 	x68k_sys.mdctrl.seq1 = 0;
@@ -864,13 +866,18 @@ static WRITE8_DEVICE_HANDLER( ppi_port_c_w )
 	const device_config *oki = devtag_get_device(device->machine, "okim6258");
 	static UINT16 prev1;
 	static UINT16 prev2;
+	static UINT16 prevA;
 	
 	ppi_port[2] = data;
-	x68k_sys.adpcm.pan = data & 0x03;
-	x68k_sys.adpcm.rate = data & 0x0c;
-	x68k_set_adpcm(device->machine);
-	okim6258_set_divider(oki, (data >> 2) & 3);
-
+	if((data & 0x0f) != (prevA & 0x0f))
+	{
+		x68k_sys.adpcm.pan = data & 0x03;
+		x68k_sys.adpcm.rate = data & 0x0c;
+		x68k_set_adpcm(device->machine);
+		okim6258_set_divider(oki, (data >> 2) & 3);
+	}
+	prevA = data & 0x0f;
+	
 	// The joystick enable bits also handle the multiplexer for various controllers
 	x68k_sys.joy.joy1_enable = data & 0x10;
 	x68k_sys.mdctrl.mux1 = data & 0x10;
