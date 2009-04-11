@@ -1,8 +1,48 @@
 /***************************************************************************
 
+	TEC-1 driver, written by Robbbert in April, 2009 for MESS.
+
+The TEC-1 was a single-board "computer" described in Talking Electronics
+magazine, issues number 10 and 11. Talking Electronics do not have dates on
+their issues, so the date is uncertain, although 1984 seems a reasonable
+guess. Talking Electronics operated from Cheltenham, a suburb of Melbourne.
+
+The hardware is quite simple, consisting of a Z80 cpu, 2x 8212 8-bit latch,
+74C923 keyboard scanner, 20 push-button keys, 6-digit LED display, a speaker,
+a 2k EPROM and sundry parts.
+
+The cpu speed could be adjusted by using a potentiometer, the range being
+250 kHz to 2MHz. This is a simple method of adjusting a game's difficulty.
+
+We emulate the original version. Later enhancements included more RAM, speech
+synthesis and various attachments, however I have no information on these.
+
+Keys:
+0 to 9, A to F are on the key of the same name.
+AD (input an address) is the J key.
++ and - (increment / decrement address) are the - and = keys.
+GO (execute program at current address) is the Enter key.
+Whenever a program listing mentions RESET, do a Soft Reset.
+
+Each key causes a beep to be heard. You may need to press more than once
+to get it to register.
+
+Inbuilt games - press the following sequence of keys:
+- Welcome: RESET D 1 + 0 2 AD 0 2 7 0 GO GO
+- Nim: RESET AD 3 E 0 GO GO
+- Invaders: RESET AD 3 2 0 GO GO
+- Luna Lander: RESET AD 4 9 0 GO GO
+
+Not emulated / need to be checked:
+- The 74C923 code may need to be revisited to improve keyboard response.
+- The 10ms debounce is not emulated.
+- Artwork needs to be produced.
+
+Thanks to Chris Schwartz who dumped his ROM for me way back in the old days.
+It's only taken 25 years to get around to emulating it...
+
 ***************************************************************************/
 
-/* Core includes */
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "sound/speaker.h"
@@ -10,11 +50,16 @@
 
 static emu_timer *tec1_kbd_timer;
 static UINT8 tec1_kbd=0;
-static UINT8 tec1_nmi=0;
 static UINT8 tec1_segment=0;
 static UINT8 tec1_digit=0;
 static const device_config *tec1_speaker;
 
+
+/***************************************************************************
+
+	Display
+
+***************************************************************************/
 
 static void tec1_display(void)
 {
@@ -26,78 +71,114 @@ static void tec1_display(void)
 
 static WRITE8_HANDLER( tec1_segment_w )
 {
+/*	d7 segment d
+	d6 segment e
+	d5 segment c
+	d4 segment dot
+	d3 segment b
+	d2 segment g
+	d1 segment f
+	d0 segment a */
+
 	tec1_segment = BITSWAP8(data, 4, 2, 1, 6, 7, 5, 3, 0);
-	tec1_display();
+	if (tec1_digit) tec1_display();
 }
 
 static WRITE8_HANDLER( tec1_digit_w )
 {
-	tec1_digit = data & 0x3f;
+/* 	d7 speaker
+	d6 not used
+	d5 data digit 1
+	d4 data digit 2
+	d3 address digit 1
+	d2 address digit 2
+	d1 address digit 3
+	d0 address digit 4 */
+
 	speaker_level_w(tec1_speaker, (data & 0x80) ? 1 : 0);
-	tec1_display();
+
+	tec1_digit = data & 0x3f;
+	if (tec1_digit) tec1_display();
 }
+
+
+/***************************************************************************
+
+	Keyboard
+
+***************************************************************************/
 
 static READ8_HANDLER( tec1_kbd_r )
 {
-	UINT8 data = tec1_kbd;
 	cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
-	tec1_nmi = 0;
-	return data;
+	return tec1_kbd;
 }
 	
+static UINT8 tec1_convert_col_to_bin( UINT8 col, UINT8 row )
+{
+	UINT8 data = row;
+
+	if (col & 2)
+		data |= 4;
+	else
+	if (col & 4)
+		data |= 8;
+	else
+	if (col & 8)
+		data |= 12;
+	else
+	if (col & 16)
+		data |= 16;
+
+	return data;
+}
+
+
+static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3" };
+
 static TIMER_CALLBACK( tec1_kbd_callback )
 {
-/* 74C923 4 by 5 key encoder. If a key is pressed, scanning stops. */
+/* 74C923 4 by 5 key encoder. */
+
 
 	static UINT8 row=0;
-	if (tec1_nmi) return;
+
+	/* if previous key is still held, bail out */
+	if (input_port_read(machine, keynames[row]))
+		if (tec1_convert_col_to_bin(input_port_read(machine, keynames[row]), row) == tec1_kbd)
+			return; 
+		
 	row++;
 	row &= 3;
 
 	/* see if a key pressed */
-	if (row == 0)
-		tec1_kbd = input_port_read(machine, "LINE0");
-	else
-	if (row == 1)
-		tec1_kbd = input_port_read(machine, "LINE1");
-	else
-	if (row == 2)
-		tec1_kbd = input_port_read(machine, "LINE2");
-	else
-	if (row == 3)
-		tec1_kbd = input_port_read(machine, "LINE3");
-
-	/* convert to the code that the chip uses */
-	if (tec1_kbd)
+	if (input_port_read(machine, keynames[row]))
 	{
-		if (tec1_kbd & 1)
-			tec1_kbd = 0;
-		else
-		if (tec1_kbd & 2)
-			tec1_kbd = 4;
-		else
-		if (tec1_kbd & 4)
-			tec1_kbd = 8;
-		else
-		if (tec1_kbd & 8)
-			tec1_kbd = 12;
-		else
-		if (tec1_kbd & 16)
-			tec1_kbd = 16;
-
-		tec1_kbd |= row;
-		tec1_nmi = 1;
+		tec1_kbd = tec1_convert_col_to_bin(input_port_read(machine, keynames[row]), row);
 		cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, HOLD_LINE);
 	}
 }
 
+
+/***************************************************************************
+
+	Machine
+
+***************************************************************************/
+
 static MACHINE_RESET( tec1 )
 {
 	tec1_kbd_timer = timer_alloc(machine,  tec1_kbd_callback, NULL );
-	timer_adjust_periodic( tec1_kbd_timer, attotime_zero, 0, ATTOTIME_IN_HZ(30) );
+	timer_adjust_periodic( tec1_kbd_timer, attotime_zero, 0, ATTOTIME_IN_HZ(500) );
 	tec1_speaker = devtag_get_device(machine, "speaker");
 }
 
+
+/***************************************************************************
+
+	Address Map
+
+***************************************************************************/
 
 static ADDRESS_MAP_START( tec1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
@@ -115,7 +196,7 @@ ADDRESS_MAP_END
 
 /**************************************************************************
 
-	Keyboard
+	Keyboard Layout
 
 ***************************************************************************/
 
@@ -150,6 +231,12 @@ static INPUT_PORTS_START( tec1 )
 INPUT_PORTS_END
 
 
+/***************************************************************************
+
+	Machine driver
+
+***************************************************************************/
+
 static MACHINE_DRIVER_START( tec1 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 500000)	/* speed can be varied between 250kHz and 2MHz */
@@ -170,7 +257,7 @@ MACHINE_DRIVER_END
 
 /***************************************************************************
 
-  Game driver(s)
+	Game driver
 
 ***************************************************************************/
 
@@ -184,4 +271,4 @@ ROM_START(tec1)
 ROM_END
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE	  INPUT    INIT      CONFIG       COMPANY  FULLNAME */
-COMP( 1984, tec1,     0,      0,      tec1,       tec1,    0,        0,		"Talking Electronics Magazine",  "TEC-1" , 0 )
+COMP( 1984, tec1,     0,      0,      tec1,       tec1,    0,        0,		"Talking Electronics magazine",  "TEC-1" , 0 )
