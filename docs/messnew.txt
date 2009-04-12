@@ -11,7 +11,7 @@ New System Drivers Supported (in no particular order):
 
 System Driver Changes:
 ----------------------
-- [A7800] Better NTSC palette.  [Robert Tuccitto]
+- [A7800] Better NTSC palette.  [Robert Tuccitto, Underball, GroovyBee]
 
 - [ATARI] Refactored MESS specific code from MAME to MESS source. [Fabio Priuli]
 
