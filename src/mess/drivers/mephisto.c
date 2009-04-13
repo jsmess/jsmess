@@ -251,8 +251,6 @@ ROM_START(mm50)
 ROM_END
 
 
-
-
 static DRIVER_INIT( mephisto )
 {
 	lcd_shift_counter = 3;
@@ -268,6 +266,6 @@ static DRIVER_INIT( mephisto )
 //CONS( 1983, mephisto,   0,      0,      mephisto,   mephisto,   mephisto,   NULL,   "Hegener & Glaser", "Mephisto Schach Computer",         GAME_NOT_WORKING )
 CONS( 1987, mm4,        0,      0,      mephisto,   mephisto,   mephisto,   NULL,   "Hegener & Glaser", "Mephisto 4 Schach Computer",       0 )
 CONS( 1990, mm5,        0,      0,      mephisto,   mephisto,   mephisto,   NULL,   "Hegener & Glaser", "Mephisto 5.1 Schach Computer",     0 )
-CONS( 1990, mm50,       0,      0,      mephisto,   mephisto,   mephisto,   NULL,   "Hegener & Glaser", "Mephisto 5.0 Schach Computer",     0 )
+CONS( 1990, mm50,       mm5,    0,      mephisto,   mephisto,   mephisto,   NULL,   "Hegener & Glaser", "Mephisto 5.0 Schach Computer",     0 )
 CONS( 1986, rebel5,     0,      0,      rebel5,     mephisto,   mephisto,   NULL,   "Hegener & Glaser", "Mephisto Rebel 5 Schach Computer", 0 )
 // second design sold (same computer/program?)
