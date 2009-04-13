@@ -19,8 +19,6 @@
 
 
 	Things that need doing:
-	- How to specify interrupts in callbacks when a daisy-chain is in use?
-	- Which order are devices to be specified in the daisy chain?
 	- Keyboard is a separate device and not emulated (includes a beeper)
 	- Floppy disks (I have no knowledge of how to set these up)
 	- Split this code to video, machine
@@ -59,7 +57,7 @@ static UINT8 printer_data;
 static PALETTE_INIT( kaypro2 )
 {
 	palette_set_color(machine,0,RGB_BLACK); /* black */
-	palette_set_color(machine,1,MAKE_RGB(0, 200, 0)); /* green */	
+	palette_set_color(machine,1,MAKE_RGB(0, 220, 0)); /* green */	
 }
 
 static VIDEO_UPDATE( kaypro2 )
@@ -133,6 +131,11 @@ static WRITE8_HANDLER( kaypro2_videoram_w )
 
 ************************************************************/
 
+static WRITE8_DEVICE_HANDLER( kaypro2_interrupt )
+{
+	cpu_set_input_line(device->machine->cpu[0], 0, data);
+}
+
 static WRITE8_DEVICE_HANDLER( pio_printer_w )
 {
 /*	d7..d0 output to Centronics printer */
@@ -196,7 +199,7 @@ static WRITE8_DEVICE_HANDLER( pio_system_w )
 
 static const z80pio_interface kaypro2_pio_g_intf =
 {
-	DEVCB_NULL,		/* callback when change interrupt status - assume this is handled by the daisy-chain? */
+	DEVCB_HANDLER(kaypro2_interrupt),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_HANDLER(pio_printer_w),	/* output data to printer */
@@ -207,7 +210,7 @@ static const z80pio_interface kaypro2_pio_g_intf =
 
 static const z80pio_interface kaypro2_pio_s_intf =
 {
-	DEVCB_NULL,		/* callback when change interrupt status - assume this is handled by the daisy-chain? */
+	DEVCB_HANDLER(kaypro2_interrupt),
 	DEVCB_HANDLER(pio_system_r),	/* read printer status */
 	DEVCB_NULL,
 	DEVCB_HANDLER(pio_system_w),	/* activate various internal devices */
@@ -288,15 +291,20 @@ static WRITE8_HANDLER( kaypro2_baud_w )
 	}
 }
 
+/* when sio devcb'ed like pio is, change to use pio's int handler */
+static void kaypro2_int_sio(const device_config *device, int state)
+{
+	cpu_set_input_line(device->machine->cpu[0], 0, state);
+}
 
 static const z80sio_interface kaypro2_sio_intf =
 {
-	0,			/* interrupt handler - assume handled by daisy-chain? */
-	0,				/* DTR changed handler */
-	0,						/* RTS changed handler */
-	0,						/* BREAK changed handler */
-	0,	/* transmit handler - which channel is this for? */
-	0		/* receive handler - which channel is this for? */
+	kaypro2_int_sio,	/* interrupt handler */
+	0,			/* DTR changed handler */
+	0,			/* RTS changed handler */
+	0,			/* BREAK changed handler */
+	0,			/* transmit handler - which channel is this for? */
+	0			/* receive handler - which channel is this for? */
 };
 
 static const z80_daisy_chain kaypro2_daisy_chain[] =

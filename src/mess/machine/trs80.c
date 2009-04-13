@@ -441,7 +441,7 @@ WRITE8_HANDLER( trs80m4_e9_w )
 /* UART set baud rate. Rx = bits 0..3, Tx = bits 4..7
 	00h    50  
 	11h    75  
-	22h    100  
+	22h    110  
 	33h    134.5  
 	44h    150  
 	55h    300  
@@ -456,7 +456,7 @@ WRITE8_HANDLER( trs80m4_e9_w )
 	EEh    9600  
 	FFh    19200 */
 
-	int baud_clock[]={ 800, 1200, 1600, 2152, 2400, 4800, 9600, 19200, 28800, 32000, 38400, 57600, 76800, 115200, 153600, 307200 };
+	int baud_clock[]={ 800, 1200, 1760, 2152, 2400, 4800, 9600, 19200, 28800, 32000, 38400, 57600, 76800, 115200, 153600, 307200 };
 	ay31015_set_receiver_clock( trs80_ay31015, baud_clock[data & 0x0f]);
 	ay31015_set_transmitter_clock( trs80_ay31015, baud_clock[data>>4]);
 }
@@ -527,7 +527,7 @@ WRITE8_HANDLER( trs80m4_ec_w )
 
 WRITE8_HANDLER( trs80m4_f4_w )
 {
-/* Selection of drive and parameters - d7..d5 not emulated.
+/* Selection of drive and parameters - d6..d5 not emulated.
  A write also causes the selected drive motor to turn on for about 3 seconds.
  When the motor turns off, the drive is deselected.
 	d7 1=MFM, 0=FM
@@ -560,6 +560,8 @@ WRITE8_HANDLER( trs80m4_f4_w )
 		wd17xx_set_drive(trs80_fdc,drive);
 		wd17xx_set_side(trs80_fdc,head);
 	}
+
+	wd17xx_set_density(trs80_fdc, (data & 0x80) ? 1 : 0);
 }
 
 WRITE8_HANDLER( sys80_f8_w )
