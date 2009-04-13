@@ -597,6 +597,7 @@ XL/XE 16kB OS roms
 
 	/* NON LINEAR SYSTEMS */
 	DRIVER( kaypro )	/* Kaypro 2X										*/
+	DRIVER( kaypro2 )	/* Kaypro 2/83										*/
 
 	/* VEB MIKROELEKTRONIK */
 	/* KC compact is partial CPC compatible */

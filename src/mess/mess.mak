@@ -599,6 +599,7 @@ $(MESSOBJ)/apexc.a:     \
 
 $(MESSOBJ)/kaypro.a:   \
 	$(MESS_DRIVERS)/kaypro.o	\
+	$(MESS_DRIVERS)/kaypro2.o	\
 	$(MESS_MACHINE)/cpm_bios.o	\
 	$(MESS_VIDEO)/kaypro.o	 \
 	$(MESS_AUDIO)/kaypro.o	 \
