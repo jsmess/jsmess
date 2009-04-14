@@ -45,7 +45,6 @@ static const device_config *kaypro2_z80sio;
 static const device_config *kaypro2_printer;
 static const device_config *kaypro2_fdc;
 
-static UINT8 printer_data;
 
 
 /***********************************************************
@@ -87,6 +86,7 @@ static VIDEO_UPDATE( kaypro2 )
 			{
 				chr = videoram[x]^0x80;
 
+				/* Take care of flashing characters */
 				if ((chr < 0x80) && (framecnt & 0x08))
 					chr |= 0x80;
 
@@ -136,13 +136,6 @@ static WRITE8_DEVICE_HANDLER( kaypro2_interrupt )
 	cpu_set_input_line(device->machine->cpu[0], 0, data);
 }
 
-static WRITE8_DEVICE_HANDLER( pio_printer_w )
-{
-/*	d7..d0 output to Centronics printer */
-
-	printer_data = data;
-}
-
 static READ8_DEVICE_HANDLER( pio_system_r )
 {
 /*	d3 Centronics ready flag */
@@ -179,13 +172,7 @@ static WRITE8_DEVICE_HANDLER( pio_system_w )
 
 	wd17xx_set_density(kaypro2_fdc, (data & 0x20) ? 1 : 0);
 
-	if (data & 0x10)
-	{
-		centronics_strobe_w(kaypro2_printer, 1);
-		centronics_data_w(kaypro2_printer, 0, printer_data);
-	}
-	else
-		centronics_strobe_w(kaypro2_printer, 0);
+	centronics_strobe_w(kaypro2_printer, BIT(data, 4));
 
 	if (data & 1)
 		wd17xx_set_drive(kaypro2_fdc, 0);
@@ -202,7 +189,7 @@ static const z80pio_interface kaypro2_pio_g_intf =
 	DEVCB_HANDLER(kaypro2_interrupt),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(pio_printer_w),	/* output data to printer */
+	DEVCB_DEVICE_HANDLER("centronics", centronics_data_w),
 	DEVCB_NULL,
 	DEVCB_NULL,			/* portA ready active callback */
 	DEVCB_NULL			/* portB ready active callback */
