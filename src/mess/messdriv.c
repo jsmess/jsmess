@@ -62,20 +62,20 @@ const game_driver * const drivers[] =
 //	DRIVER( falcon40 )	/* Atari Falcon040 (prototype)						*/
 
 	/* NINTENDO */
-//0130u4	DRIVER( nes )		/* Nintendo Entertainment System					*/
-//0130u4	DRIVER( nespal )	/* Nintendo Entertainment System					*/
-//0130u4	DRIVER( famicom )
-//0130u4	DRIVER( famitwin )	/* Sharp Famicom Twin System						*/
-//0130u4	DRIVER( gameboy )	/* Nintendo Game Boy Handheld						*/
-//0130u4	DRIVER( supergb )	/* Nintendo Super Game Boy SNES Cartridge			*/
-//0130u4	DRIVER( gbpocket )	/* Nintendo Game Boy Pocket Handheld				*/
-//0130u4	DRIVER( gbcolor )	/* Nintendo Game Boy Color Handheld					*/
-//0130u4	DRIVER( snes )		/* Nintendo Super Nintendo NTSC						*/
-//0130u4	DRIVER( snespal )	/* Nintendo Super Nintendo PAL						*/
-//0130u4	DRIVER( n64 )		/* Nintendo N64										*/
-//0130u4	DRIVER( pokemini )	/* Nintendo Pokemon Mini							*/
+	DRIVER( nes )		/* Nintendo Entertainment System					*/
+	DRIVER( nespal )	/* Nintendo Entertainment System					*/
+	DRIVER( famicom )
+	DRIVER( famitwin )	/* Sharp Famicom Twin System						*/
+	DRIVER( gameboy )	/* Nintendo Game Boy Handheld						*/
+	DRIVER( supergb )	/* Nintendo Super Game Boy SNES Cartridge			*/
+	DRIVER( gbpocket )	/* Nintendo Game Boy Pocket Handheld				*/
+	DRIVER( gbcolor )	/* Nintendo Game Boy Color Handheld					*/
+	DRIVER( snes )		/* Nintendo Super Nintendo NTSC						*/
+	DRIVER( snespal )	/* Nintendo Super Nintendo PAL						*/
+	DRIVER( n64 )		/* Nintendo N64										*/
+	DRIVER( pokemini )	/* Nintendo Pokemon Mini							*/
 
-//0130u4	DRIVER( megaduck )	/* Megaduck											*/
+	DRIVER( megaduck )	/* Megaduck											*/
 
 	/* SEGA */
 	DRIVER( sg1000 )	/* Sega SG-1000 (Japan)								*/

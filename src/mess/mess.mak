@@ -302,6 +302,7 @@ DRVLIBS = \
 	$(MESSOBJ)/nascom1.a \
 	$(MESSOBJ)/nec.a \
 	$(MESSOBJ)/necpc.a \
+	$(MESSOBJ)/nintendo.a \
 	$(MESSOBJ)/nokia.a \
 	$(MESSOBJ)/ondra.a \
 	$(MESSOBJ)/orion.a \
@@ -357,7 +358,6 @@ DRVLIBS = \
 	$(MESSOBJ)/z80ne.a \
 	$(MESSOBJ)/shared.a \
 
-#	$(MESSOBJ)/nintendo.a \
 
 
 

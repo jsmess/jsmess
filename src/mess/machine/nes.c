@@ -72,12 +72,7 @@ static const device_config *cartslot_image(running_machine *machine)
 
 static void init_nes_core (running_machine *machine)
 {
-	nes_state *state = machine->driver_data;
 	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
-
-	state->ppu = devtag_get_device(machine, "ppu");
-	state->sound = devtag_get_device(machine, "nessound");
-	state->cart = devtag_get_device(machine, "cart");
 
 	/* We set these here in case they weren't set in the cart loader */
 	nes.rom = memory_region(machine, "maincpu");
@@ -168,7 +163,7 @@ static void init_nes_core (running_machine *machine)
 	memcpy (nes_battery_ram, battery_data, BATTERY_SIZE);
 }
 
-int nes_ppu_vidaccess( running_machine *machine, int num, int address, int data )
+int nes_ppu_vidaccess( const device_config *device, int address, int data )
 {
 	/* TODO: this is a bit of a hack, needed to get Argus, ASO, etc to work */
 	/* but, B-Wings, submath (j) seem to use this location differently... */
@@ -183,6 +178,12 @@ int nes_ppu_vidaccess( running_machine *machine, int num, int address, int data 
 
 MACHINE_RESET( nes )
 {
+	nes_state *state = machine->driver_data;
+
+	state->ppu = devtag_get_device(machine, "ppu");
+	state->sound = devtag_get_device(machine, "nessound");
+	state->cart = devtag_get_device(machine, "cart");
+
 	/* Some carts have extra RAM and require it on at startup, e.g. Metroid */
 	nes.mid_ram_enable = 1;
 
@@ -192,6 +193,8 @@ MACHINE_RESET( nes )
 	/* Reset the serial input ports */
 	in_0.shift = 0;
 	in_1.shift = 0;
+
+	cputag_reset( machine, "maincpu" );
 }
 
 MACHINE_START( nes )
@@ -211,6 +214,7 @@ static void nes_machine_stop(running_machine *machine)
 
  READ8_HANDLER ( nes_IN0_r )
 {
+	nes_state *state = space->machine->driver_data;
 	int ret;
 
 	/* Some games expect bit 6 to be set because the last entry on the data bus shows up */
@@ -227,10 +231,10 @@ static void nes_machine_stop(running_machine *machine)
 		UINT32 pix, color_base;
 
 		/* get the pixel at the gun position */
-		pix = ppu2c0x_get_pixel( 0, x, y );
+		pix = ppu2c0x_get_pixel( state->ppu, x, y );
 
 		/* get the color base from the ppu */
-		color_base = ppu2c0x_get_colorbase( 0 );
+		color_base = ppu2c0x_get_colorbase( state->ppu );
 
 		/* look at the screen and see if the cursor is over a bright pixel */
 		if ( ( pix == color_base + 0x20 ) || ( pix == color_base + 0x30 ) ||
@@ -254,6 +258,7 @@ static void nes_machine_stop(running_machine *machine)
 
  READ8_HANDLER ( nes_IN1_r )
 {
+	nes_state *state = space->machine->driver_data;
 	int ret;
 
 	/* Some games expect bit 6 to be set because the last entry on the data bus shows up */
@@ -271,10 +276,10 @@ static void nes_machine_stop(running_machine *machine)
 		UINT32 pix, color_base;
 
 		/* get the pixel at the gun position */
-		pix = ppu2c0x_get_pixel( 0, x, y );
+		pix = ppu2c0x_get_pixel( state->ppu, x, y );
 
 		/* get the color base from the ppu */
-		color_base = ppu2c0x_get_colorbase( 0 );
+		color_base = ppu2c0x_get_colorbase( state->ppu );
 
 		/* look at the screen and see if the cursor is over a bright pixel */
 		if ( ( pix == color_base + 0x20 ) || ( pix == color_base + 0x30 ) ||

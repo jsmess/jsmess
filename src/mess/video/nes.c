@@ -13,67 +13,52 @@
 
 int nes_vram_sprite[8]; /* Used only by mmc5 for now */
 static int last_frame_flip = 0;
-
-static void ppu_nmi(running_machine *machine, int num, int *ppu_regs)
-{
-	cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
-}
+static double nes_scanlines_per_frame;
 
 static void nes_vh_reset(running_machine *machine)
 {
-	ppu2c0x_reset( machine, 0, 1 );
-}
-
-static void nes_vh_start(running_machine *machine, ppu_t ppu_type, double scanlines_per_frame)
-{
-	ppu2c0x_interface ppu_interface;
-
-	last_frame_flip =  0;
-
-	memset(&ppu_interface, 0, sizeof(ppu_interface));
-	ppu_interface.type				= ppu_type;
-	ppu_interface.num				= 1;
-	ppu_interface.vrom_region[0]	= nes.chr_chunks ? "gfx1" : NULL;
-	ppu_interface.mirroring[0]		= PPU_MIRROR_NONE;
-	ppu_interface.nmi_handler[0]	= ppu_nmi;
-
-	ppu2c0x_init(machine, &ppu_interface);
-	ppu2c0x_set_vidaccess_callback(0, nes_ppu_vidaccess);
-	ppu2c0x_set_scanlines_per_frame(0, ceil(scanlines_per_frame));
+	ppu2c0x_set_vidaccess_callback(devtag_get_device(machine,"ppu"), nes_ppu_vidaccess);
+	ppu2c0x_set_scanlines_per_frame(devtag_get_device(machine,"ppu"), ceil(nes_scanlines_per_frame));
 
 	if (nes.four_screen_vram)
 	{
-		ppu2c0x_set_mirroring(0, PPU_MIRROR_4SCREEN);
+		ppu2c0x_set_mirroring(devtag_get_device(machine,"ppu"), PPU_MIRROR_4SCREEN);
 	}
 	else
 	{
 		switch(nes.hard_mirroring)
 		{
 			case 0:
-				ppu2c0x_set_mirroring(0, PPU_MIRROR_HORZ);
+				ppu2c0x_set_mirroring(devtag_get_device(machine,"ppu"), PPU_MIRROR_HORZ);
 				break;
 			case 1:
-				ppu2c0x_set_mirroring(0, PPU_MIRROR_VERT);
+				ppu2c0x_set_mirroring(devtag_get_device(machine,"ppu"), PPU_MIRROR_VERT);
+				break;
+			default:
+				ppu2c0x_set_mirroring(devtag_get_device(machine,"ppu"), PPU_MIRROR_NONE );
 				break;
 		}
 	}
+}
+
+static void nes_vh_start(running_machine *machine, double scanlines_per_frame)
+{
+	last_frame_flip =  0;
+	nes_scanlines_per_frame = scanlines_per_frame;
 
 	add_reset_callback(machine, nes_vh_reset);
-
-	/* Reset the mapper variables. Will also mark the char-gen ram as dirty */
-	mapper_reset(machine, nes.mapper);
 }
 
 
 
 VIDEO_START( nes_ntsc )
 {
-	nes_vh_start(machine, PPU_2C02, PPU_NTSC_SCANLINES_PER_FRAME);
+	nes_vh_start(machine, PPU_NTSC_SCANLINES_PER_FRAME);
 }
 
 VIDEO_START( nes_pal )
 {
-	nes_vh_start(machine, PPU_2C07, PPU_PAL_SCANLINES_PER_FRAME);
+	nes_vh_start(machine, PPU_PAL_SCANLINES_PER_FRAME);
 }
 
 PALETTE_INIT( nes )
@@ -90,8 +75,10 @@ PALETTE_INIT( nes )
 
 VIDEO_UPDATE( nes )
 {
+	nes_state *state = screen->machine->driver_data;
+
 	/* render the ppu */
-	ppu2c0x_render( 0, bitmap, 0, 0, 0, 0 );
+	ppu2c0x_render( state->ppu, bitmap, 0, 0, 0, 0 );
 
 	/* if this is a disk system game, check for the flip-disk key */
 	if (nes.mapper == 20)

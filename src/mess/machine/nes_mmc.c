@@ -50,7 +50,6 @@ read8_space_func mmc_read_low;
 write8_space_func mmc_write_mid;
 read8_space_func mmc_read_mid;
 write8_space_func mmc_write;
-/*void (*ppu_latch)(offs_t offset);*/
 
 static int vrom_bank[16];
 static int mult1, mult2;
@@ -1390,31 +1389,31 @@ static WRITE8_HANDLER( mapper8_w )
 }
 
 
-static void mapper9_latch (running_machine *machine, offs_t offset)
+static void mapper9_latch (const device_config *device, offs_t offset)
 {
 	if ((offset & 0x3ff0) == 0x0fd0)
 	{
 		logerror ("mapper9 vrom latch switch (bank 0 low): %02x\n", MMC2_bank0);
 		MMC2_bank0_latch = 0xfd;
-		chr4_0 (machine, MMC2_bank0);
+		chr4_0 (device->machine, MMC2_bank0);
 	}
 	else if ((offset & 0x3ff0) == 0x0fe0)
 	{
 		logerror ("mapper9 vrom latch switch (bank 0 high): %02x\n", MMC2_bank0_hi);
 		MMC2_bank0_latch = 0xfe;
-		chr4_0 (machine, MMC2_bank0_hi);
+		chr4_0 (device->machine, MMC2_bank0_hi);
 	}
 	else if ((offset & 0x3ff0) == 0x1fd0)
 	{
 		logerror ("mapper9 vrom latch switch (bank 1 low): %02x\n", MMC2_bank1);
 		MMC2_bank1_latch = 0xfd;
-		chr4_4 (machine, MMC2_bank1);
+		chr4_4 (device->machine, MMC2_bank1);
 	}
 	else if ((offset & 0x3ff0) == 0x1fe0)
 	{
 		logerror ("mapper9 vrom latch switch (bank 0 high): %02x\n", MMC2_bank1_hi);
 		MMC2_bank1_latch = 0xfe;
-		chr4_4 (machine, MMC2_bank1_hi);
+		chr4_4 (device->machine, MMC2_bank1_hi);
 	}
 }
 
@@ -1465,31 +1464,31 @@ static WRITE8_HANDLER( mapper9_w )
 }
 
 
-static void mapper10_latch (running_machine *machine, offs_t offset)
+static void mapper10_latch (const device_config *device, offs_t offset)
 {
 	if ((offset & 0x3ff0) == 0x0fd0)
 	{
 		logerror ("mapper10 vrom latch switch (bank 0 low): %02x\n", MMC2_bank0);
 		MMC2_bank0_latch = 0xfd;
-		chr4_0 (machine, MMC2_bank0);
+		chr4_0 (device->machine, MMC2_bank0);
 	}
 	else if ((offset & 0x3ff0) == 0x0fe0)
 	{
 		logerror ("mapper10 vrom latch switch (bank 0 high): %02x\n", MMC2_bank0_hi);
 		MMC2_bank0_latch = 0xfe;
-		chr4_0 (machine, MMC2_bank0_hi);
+		chr4_0 (device->machine, MMC2_bank0_hi);
 	}
 	else if ((offset & 0x3ff0) == 0x1fd0)
 	{
 		logerror ("mapper10 vrom latch switch (bank 1 low): %02x\n", MMC2_bank1);
 		MMC2_bank1_latch = 0xfd;
-		chr4_4 (machine, MMC2_bank1);
+		chr4_4 (device->machine, MMC2_bank1);
 	}
 	else if ((offset & 0x3ff0) == 0x1fe0)
 	{
 		logerror ("mapper10 vrom latch switch (bank 0 high): %02x\n", MMC2_bank1_hi);
 		MMC2_bank1_latch = 0xfe;
-		chr4_4 (machine, MMC2_bank1_hi);
+		chr4_4 (device->machine, MMC2_bank1_hi);
 	}
 }
 

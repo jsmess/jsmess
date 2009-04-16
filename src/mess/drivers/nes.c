@@ -36,12 +36,13 @@ static WRITE8_DEVICE_HANDLER( psg_4017_w )
 
 static WRITE8_HANDLER(nes_vh_sprite_dma_w)
 {
-	ppu2c0x_spriteram_dma(space, 0, data);
+	nes_state *state = space->machine->driver_data;
+	ppu2c0x_spriteram_dma(space, state->ppu, data);
 }
 
 static ADDRESS_MAP_START( nes_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_MIRROR(0x1800)					/* RAM */
-	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(ppu2c0x_0_r, ppu2c0x_0_w)		/* PPU registers */
+	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_r, ppu2c0x_w)		/* PPU registers */
 	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE("nessound", nes_psg_r, nes_psg_w)		/* PSG primary registers */
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(nes_vh_sprite_dma_w)				/* stupid address space hole */
 	AM_RANGE(0x4015, 0x4015) AM_DEVREADWRITE("nessound", psg_4015_r, psg_4015_w)		/* PSG status / first control register */
@@ -213,6 +214,24 @@ ROM_START( famitwin )
 	ROM_FILL( 0x0000, 0x10000, 0x00 )
 ROM_END
 
+
+static void ppu_nmi(const device_config *device, int *ppu_regs)
+{
+	cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
+}
+
+
+static ppu2c0x_interface nes_ppu_interface =
+{
+	NULL/*"gfx1"*/,
+	0,
+	0,
+	PPU_MIRROR_NONE,
+	ppu_nmi,
+	0
+};
+
+
 static MACHINE_DRIVER_START( nes )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", N2A03, NTSC_CLOCK)
@@ -225,6 +244,8 @@ static MACHINE_DRIVER_START( nes )
 	// cycles for the actual vblank period.
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((113.66/(NTSC_CLOCK/1000000)) * (PPU_VBLANK_LAST_SCANLINE_NTSC-PPU_VBLANK_FIRST_SCANLINE+1+2)))
 
+	MDRV_DRIVER_DATA( nes_state )
+
 	MDRV_MACHINE_START( nes )
 	MDRV_MACHINE_RESET( nes )
 
@@ -236,6 +257,8 @@ static MACHINE_DRIVER_START( nes )
 	MDRV_VIDEO_UPDATE(nes)
 
 	MDRV_PALETTE_LENGTH(4*16*8)
+
+	MDRV_PPU2C02_ADD( "ppu", nes_ppu_interface )
 
     /* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -255,6 +278,9 @@ static MACHINE_DRIVER_START( nespal )
 
 	/* basic machine hardware */
 	MDRV_CPU_REPLACE("maincpu", N2A03, PAL_CLOCK)
+
+	MDRV_DEVICE_REMOVE( "ppu" )
+	MDRV_PPU2C07_ADD( "ppu", nes_ppu_interface )
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
@@ -311,7 +337,7 @@ SYSTEM_CONFIG_END
 ***************************************************************************/
 
 /*     YEAR  NAME      PARENT    COMPAT MACHINE   INPUT     INIT      CONFIG    COMPANY   FULLNAME */
-CONS( 1983, famicom,   0,        0,		famicom,  famicom,  0,	      famicom,	"Nintendo",	"Famicom" , 0)
-CONS( 1986, famitwin,  famicom,  0,		famicom,  famicom,  0,	      famicom,	"Sharp",	"Famicom Twin" , 0)
-CONS( 1985, nes,       0,        0,		nes,      nes,      0,        0,		"Nintendo",	"Nintendo Entertainment System (NTSC)" , 0)
-CONS( 1987, nespal,    nes,      0,		nespal,   nes,      0,	      0,		"Nintendo",	"Nintendo Entertainment System (PAL)" , 0)
+CONS( 1983, famicom,   0,        0,		famicom,  famicom,  0,	      famicom,	"Nintendo",	"Famicom" , GAME_NOT_WORKING)
+CONS( 1986, famitwin,  famicom,  0,		famicom,  famicom,  0,	      famicom,	"Sharp",	"Famicom Twin" , GAME_NOT_WORKING)
+CONS( 1985, nes,       0,        0,		nes,      nes,      0,        0,		"Nintendo",	"Nintendo Entertainment System (NTSC)" , GAME_NOT_WORKING)
+CONS( 1987, nespal,    nes,      0,		nespal,   nes,      0,	      0,		"Nintendo",	"Nintendo Entertainment System (PAL)" , GAME_NOT_WORKING)
