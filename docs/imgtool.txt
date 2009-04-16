@@ -120,11 +120,11 @@ type 1: 5 1/4 inch, DD, SS, 180kb: sectors 9, heads 1, tracks 40
 type 2: 5 1/4 inch, DD, double sided, 320kb: sectors 8, heads 2, tracks 40
 type 3: 5 1/4 inch, DD, DS, 360kb: sectors 9, heads 2, tracks 40
 type 4: 3 1/2 inch, DD, DS, 720kb: sectors 9, heads 2, tracks 80
-at disk controller neccessary for high density
+at disk controller necessary for high density
 type 5: 5 1/4 inch, high density, DS, 1.2mb: sectors 15, heads 2, tracks 80
         3 1/2 inch, HD, DS, 1.2mb: sectors 15, heads 2, tracks 80
 type 6: 3 1/2 inch, HD, DS, 1.44mb: sectors 18, heads 2, tracks 80
-special disk controller neccessary for enhanced density
+special disk controller necessary for enhanced density
 type 7: 3 1/2 inch, enhanced density, DS, 2.88mb: sectors 36, heads 2, tracks 80
 
 unix with bash: use
@@ -137,7 +137,7 @@ msdoshd/fat Microsoft DOS Harddisk/PC Partition Table
 not finished and not working
 (see also unter msdos/fat)
 
-No low level format neccessary with image files
+No low level format necessary with image files
 Partitioning must be done with the msdos utility fdisk
 Then you can format each partition with msdos utility format
 
