@@ -5,7 +5,7 @@
 	Each disk was single sided, and could hold 191k. The computer had 2x pio
 	and 1x sio. One of the sio ports communicated with the keyboard with a coiled
 	telephone cord, complete with modular plug on each end. The keyboard carries
-	its own processor and is an intelligent device.
+	its own Intel 8748 processor and is an intelligent device.
 
 	There are 2 major problems preventing this driver from working
 
@@ -33,18 +33,19 @@
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
 #include "machine/ctronics.h"
+#include "machine/kay_kbd.h"
 #include "machine/wd17xx.h"
 #include "devices/basicdsk.h"
-//#include "machine/beeper.h"
+#include "sound/beep.h"
 
 
 static const device_config *kaypro2_z80pio_g;
 static const device_config *kaypro2_z80pio_s;
 static const device_config *kaypro2_z80sio;
-//static const device_config *kaypro2_beeper;
 static const device_config *kaypro2_printer;
 static const device_config *kaypro2_fdc;
 
+INPUT_PORTS_EXTERN( kay_kbd );
 
 
 /***********************************************************
@@ -84,15 +85,17 @@ static VIDEO_UPDATE( kaypro2 )
 
 			for (x = ma; x < ma + 80; x++)
 			{
-				chr = videoram[x]^0x80;
+				if (ra < 8)
+				{
+					chr = videoram[x]^0x80;
 
-				/* Take care of flashing characters */
-				if ((chr < 0x80) && (framecnt & 0x08))
-					chr |= 0x80;
+					/* Take care of flashing characters */
+					if ((chr < 0x80) && (framecnt & 0x08))
+						chr |= 0x80;
 
-				/* get pattern of pixels for that character scanline */
-				if (ra < 8) 
+					/* get pattern of pixels for that character scanline */
 					gfx = FNT[(chr<<3) | ra ];
+				}
 				else
 					gfx = 0xff;
 
@@ -234,6 +237,7 @@ static WRITE8_DEVICE_HANDLER( kaypro2_pio_w )
 		z80pio_c_w(device, 1, data);
 }
 
+
 /***********************************************************
 
 	SIO
@@ -309,12 +313,14 @@ static READ8_DEVICE_HANDLER( kaypro2_sio_r )
 		return z80sio_d_r(device, 0);
 	else
 	if (offset == 1)
-		return z80sio_d_r(device, 1);
+//		return z80sio_d_r(device, 1);
+		return kay_kbd_d_r();
 	else
 	if (offset == 2)
 		return z80sio_c_r(device, 0);
 	else
-		return z80sio_c_r(device, 1);
+//		return z80sio_c_r(device, 1);
+		return kay_kbd_c_r();
 }
 		
 static WRITE8_DEVICE_HANDLER( kaypro2_sio_w )
@@ -323,7 +329,8 @@ static WRITE8_DEVICE_HANDLER( kaypro2_sio_w )
 		z80sio_d_w(device, 0, data);
 	else
 	if (offset == 1)
-		z80sio_d_w(device, 1, data);
+//		z80sio_d_w(device, 1, data);
+		kay_kbd_d_w(data);
 	else
 	if (offset == 2)
 		z80sio_c_w(device, 0, data);
@@ -380,6 +387,7 @@ static void kaypro2_floppy_getinfo(const mess_device_class *devclass, UINT32 sta
 	}
 }
 
+
 /***********************************************************
 
 	Address Maps
@@ -406,15 +414,6 @@ static ADDRESS_MAP_START( kaypro2_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x1c, 0x1f) AM_DEVREADWRITE("z80pio_s", kaypro2_pio_r, kaypro2_pio_w)
 ADDRESS_MAP_END
 
-/***********************************************************
-
-	Keyboard Layout
-
-************************************************************/
-
-static INPUT_PORTS_START( kaypro2 )
-INPUT_PORTS_END
-
 
 /***********************************************************
 
@@ -427,11 +426,11 @@ static MACHINE_RESET( kaypro2 )
 	kaypro2_z80pio_g = devtag_get_device(machine, "z80pio_g");
 	kaypro2_z80pio_s = devtag_get_device(machine, "z80pio_s");
 	kaypro2_z80sio = devtag_get_device(machine, "z80sio");
-//	kaypro2_beeper = devtag_get_device(machine, "beeper");
 	kaypro2_printer = devtag_get_device(machine, "centronics");
 	kaypro2_fdc = devtag_get_device(machine, "wd1793");
 	pio_system_w(kaypro2_z80pio_s, 0, 0x80);
 }
+
 
 /***********************************************************
 
@@ -444,6 +443,7 @@ static MACHINE_DRIVER_START( kaypro2 )
 	MDRV_CPU_ADD("maincpu", Z80, 2500000)	/* 2.5 MHz */
 	MDRV_CPU_PROGRAM_MAP(kaypro2_map, 0)
 	MDRV_CPU_IO_MAP(kaypro2_io, 0)
+	MDRV_CPU_VBLANK_INT("screen", kay_kbd_interrupt)	/* this doesn't actually exist, it is to run the keyboard */
 
 	MDRV_MACHINE_RESET( kaypro2 )
 
@@ -460,9 +460,9 @@ static MACHINE_DRIVER_START( kaypro2 )
 	MDRV_VIDEO_UPDATE( kaypro2 )
 
 	/* sound hardware */
-//	MDRV_SPEAKER_STANDARD_MONO("mono")
-//	MDRV_SOUND_ADD("beeper", BEEPER, 0)
-//	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("beep", BEEP, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
 	MDRV_WD179X_ADD("wd1793", kaypro2_wd1793_interface )
@@ -471,6 +471,7 @@ static MACHINE_DRIVER_START( kaypro2 )
 	MDRV_Z80PIO_ADD( "z80pio_s", kaypro2_pio_s_intf )
 	MDRV_Z80SIO_ADD( "z80sio", 4800, kaypro2_sio_intf )	/* start at 300 baud */
 MACHINE_DRIVER_END
+
 
 /***********************************************************
 
@@ -497,4 +498,4 @@ static SYSTEM_CONFIG_START(kaypro2)
 SYSTEM_CONFIG_END
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE	  INPUT    INIT      CONFIG       COMPANY  FULLNAME */
-COMP( 1983, kaypro2,  0,      0,      kaypro2,    kaypro2, 0,        kaypro2,	  "Non Linear Systems",  "Kaypro 2/83" , GAME_NOT_WORKING )
+COMP( 1983, kaypro2,  0,      0,      kaypro2,    kay_kbd, 0,        kaypro2,	  "Non Linear Systems",  "Kaypro 2/83" , GAME_NOT_WORKING )

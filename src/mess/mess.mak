@@ -604,6 +604,7 @@ $(MESSOBJ)/kaypro.a:   \
 	$(MESS_VIDEO)/kaypro.o	 \
 	$(MESS_AUDIO)/kaypro.o	 \
 	$(MESS_MACHINE)/kaypro.o	 \
+	$(MESS_MACHINE)/kay_kbd.o	 \
 
 $(MESSOBJ)/sinclair.a: \
 	$(MESS_VIDEO)/border.o		\
