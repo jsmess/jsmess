@@ -620,7 +620,7 @@ static void mapper4_set_prg ( const address_space *space)
 
 static void mapper4_set_chr (running_machine *machine)
 {
-	nes_state *state = space->machine->driver_data;
+	nes_state *state = machine->driver_data;
 	UINT8 chr_page = (MMC3_cmd & 0x80) >> 5;
 	ppu2c0x_set_videorom_bank(state->ppu, chr_page ^ 0, 2, MMC3_chr_base * 64 | ( MMC3_chr[0] & ( MMC3_chr_mask * 64 ) ), 1);
 	ppu2c0x_set_videorom_bank(state->ppu, chr_page ^ 2, 2, MMC3_chr_base * 64 | ( MMC3_chr[1] & ( MMC3_chr_mask * 64 ) ), 1);
@@ -630,7 +630,7 @@ static void mapper4_set_chr (running_machine *machine)
 	ppu2c0x_set_videorom_bank(state->ppu, chr_page ^ 7, 1, MMC3_chr_base * 64 | ( MMC3_chr[5] & ( MMC3_chr_mask * 64 ) ), 1);
 }
 
-static void mapper4_irq ( running_machine *machine, int num, int scanline, int vblank, int blanked )
+static void mapper4_irq ( const device_config *device, int scanline, int vblank, int blanked )
 {
 	if ((scanline < PPU_BOTTOM_VISIBLE_SCANLINE) /*|| (scanline == ppu_scanlines_per_frame-1)*/)
 	{
@@ -645,9 +645,9 @@ static void mapper4_irq ( running_machine *machine, int num, int scanline, int v
 
 		if (IRQ_enable && !blanked && (IRQ_count == 0) && priorCount)
 		{
-			logerror("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline, video_screen_get_vpos(machine->primary_screen), video_screen_get_hpos(machine->primary_screen));
-			cpu_set_input_line(machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
-//			timer_adjust_oneshot(nes_irq_timer, cpu_clocks_to_attotime(machine->cpu[0], 4), 0);
+			logerror("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline, video_screen_get_vpos(device->machine->primary_screen), video_screen_get_hpos(device->machine->primary_screen));
+			cpu_set_input_line(device->machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
+//			timer_adjust_oneshot(nes_irq_timer, cpu_clocks_to_attotime(device->machine->cpu[0], 4), 0);
 		}
 	}
 }
@@ -670,7 +670,7 @@ static WRITE8_HANDLER( mapper4_w )
 			{
 				/* Reset the banks */
 				mapper4_set_prg (space);
-				mapper4_set_chr ();
+				mapper4_set_chr (space->machine);
 				LOG_MMC(("     MMC3 reset banks\n"));
 			}
 			last_bank = data & 0xc0;
@@ -684,13 +684,13 @@ static WRITE8_HANDLER( mapper4_w )
 				case 0: case 1:
 					data &= 0xfe;
 					MMC3_chr[cmd] = data * 64;
-					mapper4_set_chr ();
+					mapper4_set_chr (space->machine);
 					LOG_MMC(("     MMC3 set vram %d: %d\n", cmd, data));
 					break;
 
 				case 2: case 3: case 4: case 5:
 					MMC3_chr[cmd] = data * 64;
-					mapper4_set_chr ();
+					mapper4_set_chr (space->machine);
 					LOG_MMC(("     MMC3 set vram %d: %d\n", cmd, data));
 					break;
 
@@ -751,6 +751,7 @@ static WRITE8_HANDLER( mapper4_w )
 
 static WRITE8_HANDLER( mapper118_w )
 {
+	nes_state *state = space->machine->driver_data;
 	static UINT8 last_bank = 0xff;
 
 //	logerror("mapper4_w offset: %04x, data: %02x, scanline: %d\n", offset, data, current_scanline);
@@ -766,7 +767,7 @@ static WRITE8_HANDLER( mapper118_w )
 			{
 				/* Reset the banks */
 				mapper4_set_prg (space);
-				mapper4_set_chr ();
+				mapper4_set_chr (space->machine);
 			}
 			last_bank = data & 0xc0;
 			break;
@@ -779,12 +780,12 @@ static WRITE8_HANDLER( mapper118_w )
 				case 0: case 1:
 					data &= 0xfe;
 					MMC3_chr[cmd] = data * 64;
-					mapper4_set_chr ();
+					mapper4_set_chr (space->machine);
 					break;
 
 				case 2: case 3: case 4: case 5:
 					MMC3_chr[cmd] = data * 64;
-					mapper4_set_chr ();
+					mapper4_set_chr (space->machine);
 					break;
 
 				case 6:
@@ -840,7 +841,7 @@ static WRITE8_HANDLER( mapper118_w )
 	}
 }
 
-static void mapper5_irq ( running_machine *machine, int num, int scanline, int vblank, int blanked )
+static void mapper5_irq ( const device_config *device, int scanline, int vblank, int blanked )
 {
 #if 1
 	if (scanline == 0)
@@ -852,7 +853,7 @@ static void mapper5_irq ( running_machine *machine, int num, int scanline, int v
 	if (scanline == IRQ_count)
 	{
 		if (IRQ_enable)
-			cpu_set_input_line(machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
+			cpu_set_input_line(device->machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
 
 		IRQ_status = 0xff;
 	}
@@ -1139,11 +1140,11 @@ static WRITE8_HANDLER( mapper5_l_w )
 			switch (MMC5_vrom_bank_mode)
 			{
 				case 0x01:
-					chr4_0 (data);
+					chr4_0 (space->machine, data);
 					break;
 				case 0x02:
 					/* 2k switch */
-					chr2_2 (data);
+					chr2_2 (space->machine, data);
 					break;
 				case 0x03:
 					/* 1k switch */
@@ -1366,6 +1367,8 @@ static WRITE8_HANDLER( mapper5_w )
 
 static WRITE8_HANDLER( mapper7_w )
 {
+	nes_state *state = space->machine->driver_data;
+
 	if (data & 0x10)
 		ppu2c0x_set_mirroring(state->ppu, PPU_MIRROR_HIGH);
 	else
@@ -1378,7 +1381,7 @@ static WRITE8_HANDLER( mapper8_w )
 {
 	LOG_MMC(("* Mapper 8 switch, vrom: %02x, rom: %02x\n", data & 0x07, (data >> 3)));
 	/* Switch 8k VROM bank */
-	chr8 (data & 0x07);
+	chr8 (space->machine, data & 0x07);
 
 	/* Switch 16k PRG bank */
 	data = (data >> 3) & (nes.prg_chunks - 1);
@@ -1417,6 +1420,8 @@ static void mapper9_latch (running_machine *machine, offs_t offset)
 
 static WRITE8_HANDLER( mapper9_w )
 {
+	nes_state *state = space->machine->driver_data;
+
 	switch (offset & 0x7000)
 	{
 		case 0x2000:
@@ -1426,25 +1431,25 @@ static WRITE8_HANDLER( mapper9_w )
 		case 0x3000:
 			MMC2_bank0 = data;
 			if (MMC2_bank0_latch == 0xfd)
-				chr4_0 (MMC2_bank0);
+				chr4_0 (space->machine, MMC2_bank0);
 			logerror("MMC2 VROM switch #1 (low): %02x\n", MMC2_bank0);
 			break;
 		case 0x4000:
 			MMC2_bank0_hi = data;
 			if (MMC2_bank0_latch == 0xfe)
-				chr4_0 (MMC2_bank0_hi);
+				chr4_0 (space->machine, MMC2_bank0_hi);
 			logerror("MMC2 VROM switch #1 (high): %02x\n", MMC2_bank0_hi);
 			break;
 		case 0x5000:
 			MMC2_bank1 = data;
 			if (MMC2_bank1_latch == 0xfd)
-				chr4_4 (MMC2_bank1);
+				chr4_4 (space->machine, MMC2_bank1);
 			logerror("MMC2 VROM switch #2 (low): %02x\n", data);
 			break;
 		case 0x6000:
 			MMC2_bank1_hi = data;
 			if (MMC2_bank1_latch == 0xfe)
-				chr4_4 (MMC2_bank1_hi);
+				chr4_4 (space->machine, MMC2_bank1_hi);
 			logerror("MMC2 VROM switch #2 (high): %02x\n", data);
 			break;
 		case 0x7000:
@@ -1460,36 +1465,38 @@ static WRITE8_HANDLER( mapper9_w )
 }
 
 
-static void mapper10_latch (offs_t offset)
+static void mapper10_latch (running_machine *machine, offs_t offset)
 {
 	if ((offset & 0x3ff0) == 0x0fd0)
 	{
 		logerror ("mapper10 vrom latch switch (bank 0 low): %02x\n", MMC2_bank0);
 		MMC2_bank0_latch = 0xfd;
-		chr4_0 (MMC2_bank0);
+		chr4_0 (machine, MMC2_bank0);
 	}
 	else if ((offset & 0x3ff0) == 0x0fe0)
 	{
 		logerror ("mapper10 vrom latch switch (bank 0 high): %02x\n", MMC2_bank0_hi);
 		MMC2_bank0_latch = 0xfe;
-		chr4_0 (MMC2_bank0_hi);
+		chr4_0 (machine, MMC2_bank0_hi);
 	}
 	else if ((offset & 0x3ff0) == 0x1fd0)
 	{
 		logerror ("mapper10 vrom latch switch (bank 1 low): %02x\n", MMC2_bank1);
 		MMC2_bank1_latch = 0xfd;
-		chr4_4 (MMC2_bank1);
+		chr4_4 (machine, MMC2_bank1);
 	}
 	else if ((offset & 0x3ff0) == 0x1fe0)
 	{
 		logerror ("mapper10 vrom latch switch (bank 0 high): %02x\n", MMC2_bank1_hi);
 		MMC2_bank1_latch = 0xfe;
-		chr4_4 (MMC2_bank1_hi);
+		chr4_4 (machine, MMC2_bank1_hi);
 	}
 }
 
 static WRITE8_HANDLER( mapper10_w )
 {
+	nes_state *state = space->machine->driver_data;
+
 	switch (offset & 0x7000)
 	{
 		case 0x2000:
@@ -1499,25 +1506,25 @@ static WRITE8_HANDLER( mapper10_w )
 		case 0x3000:
 			MMC2_bank0 = data;
 			if (MMC2_bank0_latch == 0xfd)
-				chr4_0 (MMC2_bank0);
+				chr4_0 (space->machine, MMC2_bank0);
 			logerror("MMC4 VROM switch #1 (low): %02x\n", MMC2_bank0);
 			break;
 		case 0x4000:
 			MMC2_bank0_hi = data;
 			if (MMC2_bank0_latch == 0xfe)
-				chr4_0 (MMC2_bank0_hi);
+				chr4_0 (space->machine, MMC2_bank0_hi);
 			logerror("MMC4 VROM switch #1 (high): %02x\n", MMC2_bank0_hi);
 			break;
 		case 0x5000:
 			MMC2_bank1 = data;
 			if (MMC2_bank1_latch == 0xfd)
-				chr4_4 (MMC2_bank1);
+				chr4_4 (space->machine, MMC2_bank1);
 			logerror("MMC4 VROM switch #2 (low): %02x\n", data);
 			break;
 		case 0x6000:
 			MMC2_bank1_hi = data;
 			if (MMC2_bank1_latch == 0xfe)
-				chr4_4 (MMC2_bank1_hi);
+				chr4_4 (space->machine, MMC2_bank1_hi);
 			logerror("MMC4 VROM switch #2 (high): %02x\n", data);
 			break;
 		case 0x7000:
@@ -1537,7 +1544,7 @@ static WRITE8_HANDLER( mapper11_w )
 	LOG_MMC(("* Mapper 11 switch, data: %02x\n", data));
 
 	/* Switch 8k VROM bank */
-	chr8 (data >> 4);
+	chr8 (space->machine, data >> 4);
 
 	/* Switch 32k prg bank */
 	prg32 (space, data & 0x0f);
@@ -1548,11 +1555,12 @@ static WRITE8_HANDLER( mapper13_w )
 
 	//this is a place-holder call.
 	//mapper doesn't work because CHR-RAM is not mapped.
-	chr4_4 (data);
+	chr4_4 (space->machine, data);
 }
 
 static WRITE8_HANDLER( mapper15_w )
 {
+	nes_state *state = space->machine->driver_data;
 	int bank = (data & (nes.prg_chunks - 1)) * 0x4000;
 	int base = data & 0x80 ? 0x12000 : 0x10000;
 
@@ -1592,7 +1600,7 @@ static WRITE8_HANDLER( mapper15_w )
 	}
 }
 
-static void bandai_irq ( running_machine *machine, int num, int scanline, int vblank, int blanked )
+static void bandai_irq ( const device_config *device, int scanline, int vblank, int blanked )
 {
 	/* 114 is the number of cycles per scanline */
 	/* TODO: change to reflect the actual number of cycles spent */
@@ -1601,7 +1609,7 @@ static void bandai_irq ( running_machine *machine, int num, int scanline, int vb
 	{
 		if (IRQ_count <= 114)
 		{
-			cpu_set_input_line(machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
+			cpu_set_input_line(device->machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
 		}
 		IRQ_count -= 114;
 	}
@@ -1609,6 +1617,8 @@ static void bandai_irq ( running_machine *machine, int num, int scanline, int vb
 
 static WRITE8_HANDLER( mapper16_w )
 {
+	nes_state *state = space->machine->driver_data;
+
 	logerror ("mapper16 (mid and high) w, offset: %04x, data: %02x\n", offset, data);
 
 	switch (offset & 0x000f)
@@ -1678,6 +1688,8 @@ static WRITE8_HANDLER( mapper16_w )
 
 static WRITE8_HANDLER( mapper17_l_w )
 {
+	nes_state *state = space->machine->driver_data;
+
 	switch (offset)
 	{
 		/* $42fe - mirroring */
@@ -1727,7 +1739,7 @@ static WRITE8_HANDLER( mapper17_l_w )
 	}
 }
 
-static void jaleco_irq ( running_machine *machine, int num, int scanline, int vblank, int blanked )
+static void jaleco_irq ( const device_config *device, int scanline, int vblank, int blanked )
 {
 	if (scanline <= PPU_BOTTOM_VISIBLE_SCANLINE)
 	{
@@ -1741,23 +1753,23 @@ static void jaleco_irq ( running_machine *machine, int num, int scanline, int vb
 			{
 				if ((IRQ_count & 0x0f) == 0x00)
 					/* rollover every 0x10 */
-					cpu_set_input_line(machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
+					cpu_set_input_line(device->machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
 			}
 			else if (IRQ_mode & 0x04)
 			{
 				if ((IRQ_count & 0x0ff) == 0x00)
 					/* rollover every 0x100 */
-					cpu_set_input_line(machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
+					cpu_set_input_line(device->machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
 			}
 			else if (IRQ_mode & 0x02)
 			{
 				if ((IRQ_count & 0x0fff) == 0x000)
 					/* rollover every 0x1000 */
-					cpu_set_input_line(machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
+					cpu_set_input_line(device->machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
 			}
 			else if (IRQ_count == 0)
 				/* rollover at 0x10000 */
-				cpu_set_input_line(machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
+				cpu_set_input_line(device->machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
 		}
 	}
 	else
@@ -1769,6 +1781,7 @@ static void jaleco_irq ( running_machine *machine, int num, int scanline, int vb
 
 static WRITE8_HANDLER( mapper18_w )
 {
+	nes_state *state = space->machine->driver_data;
 //	static int irq;
 	static int bank_8000 = 0;
 	static int bank_a000 = 0;
@@ -1969,13 +1982,13 @@ static WRITE8_HANDLER( mapper18_w )
 	}
 }
 
-static void namcot_irq ( running_machine *machine, int num, int scanline, int vblank, int blanked )
+static void namcot_irq ( const device_config *device, int scanline, int vblank, int blanked )
 {
 	IRQ_count ++;
 	/* Increment & check the IRQ scanline counter */
 	if (IRQ_enable && (IRQ_count == 0x7fff))
 	{
-		cpu_set_input_line(machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
+		cpu_set_input_line(device->machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
 	}
 }
 
@@ -1997,6 +2010,8 @@ static WRITE8_HANDLER( mapper19_l_w )
 
 static WRITE8_HANDLER( mapper19_w )
 {
+	nes_state *state = space->machine->driver_data;
+
 	switch (offset & 0x7800)
 	{
 		case 0x0000:
@@ -2029,17 +2044,17 @@ static WRITE8_HANDLER( mapper19_w )
 	}
 }
 
-static void fds_irq ( running_machine *machine, int num, int scanline, int vblank, int blanked )
+static void fds_irq ( const device_config *device, int scanline, int vblank, int blanked )
 {
 	if (IRQ_enable_latch)
-		cpu_set_input_line(machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
+		cpu_set_input_line(device->machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
 
 	/* Increment & check the IRQ scanline counter */
 	if (IRQ_enable)
 	{
 		if (IRQ_count <= 114)
 		{
-			cpu_set_input_line(machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
+			cpu_set_input_line(device->machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
 			IRQ_enable = 0;
 			nes_fds.status0 |= 0x01;
 		}
@@ -2103,6 +2118,8 @@ READ8_HANDLER ( fds_r )
 
 WRITE8_HANDLER ( fds_w )
 {
+	nes_state *state = space->machine->driver_data;
+
 	switch (offset)
 	{
 		case 0x00: /* $4020 */
@@ -2143,19 +2160,21 @@ WRITE8_HANDLER ( fds_w )
 	LOG_FDS(("fds_w, address: %04x, data: %02x\n", offset + 0x4020, data));
 }
 
-static void konami_irq ( running_machine *machine, int num, int scanline, int vblank, int blanked )
+static void konami_irq ( const device_config *device, int scanline, int vblank, int blanked )
 {
 	/* Increment & check the IRQ scanline counter */
 	if (IRQ_enable && (++IRQ_count == 0x100))
 	{
 		IRQ_count = IRQ_count_latch;
 		IRQ_enable = IRQ_enable_latch;
-		cpu_set_input_line(machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
+		cpu_set_input_line(device->machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
 	}
 }
 
 static WRITE8_HANDLER( konami_vrc2a_w )
 {
+	nes_state *state = space->machine->driver_data;
+
 	if (offset < 0x3000)
 	{
 		switch (offset & 0x3000)
@@ -2230,6 +2249,7 @@ static WRITE8_HANDLER( konami_vrc2a_w )
 
 static WRITE8_HANDLER( konami_vrc2b_w )
 {
+	nes_state *state = space->machine->driver_data;
 	UINT16 select;
 
 //	logerror("konami_vrc2b_w offset: %04x value: %02x\n", offset, data);
@@ -2392,6 +2412,8 @@ static WRITE8_HANDLER( konami_vrc2b_w )
 
 static WRITE8_HANDLER( konami_vrc4_w )
 {
+	nes_state *state = space->machine->driver_data;
+
 	switch (offset & 0x7007)
 	{
 		case 0x0000:
@@ -2557,6 +2579,8 @@ static WRITE8_HANDLER( konami_vrc4_w )
 
 static WRITE8_HANDLER( konami_vrc6a_w )
 {
+	nes_state *state = space->machine->driver_data;
+
 //	logerror("konami_vrc6_w offset: %04x, data: %02x, scanline: %d\n", offset, data, current_scanline);
 
 	switch (offset & 0x7003)
@@ -2620,6 +2644,8 @@ static WRITE8_HANDLER( konami_vrc6a_w )
 
 static WRITE8_HANDLER( konami_vrc6b_w )
 {
+	nes_state *state = space->machine->driver_data;
+
 //	logerror("konami_vrc6_w offset: %04x, data: %02x, scanline: %d\n", offset, data, current_scanline);
 
 	switch (offset & 0x7003)
@@ -2698,6 +2724,7 @@ static WRITE8_HANDLER( konami_vrc6b_w )
 
 static WRITE8_HANDLER( mapper32_w )
 {
+	nes_state *state = space->machine->driver_data;
 	static int bankSel;
 
 //	logerror("mapper32_w offset: %04x, data: %02x, scanline: %d\n", offset, data, current_scanline);
@@ -2734,6 +2761,7 @@ static WRITE8_HANDLER( mapper32_w )
 
 static WRITE8_HANDLER( mapper33_w )
 {
+	nes_state *state = space->machine->driver_data;
 
 //	logerror("mapper33_w offset: %04x, data: %02x, scanline: %d\n", offset, data, current_scanline);
 
@@ -2791,11 +2819,11 @@ static WRITE8_HANDLER( mapper34_m_w )
 			break;
 		case 0x1ffe:
 			/* Switch 4k VNES_ROM at 0x0000 */
-			chr4_0 (data);
+			chr4_0 (space->machine, data);
 			break;
 		case 0x1fff:
 			/* Switch 4k VNES_ROM at 0x1000 */
-			chr4_4 (data);
+			chr4_4 (space->machine, data);
 			break;
 	}
 }
@@ -2810,14 +2838,14 @@ static WRITE8_HANDLER( mapper34_w )
 	prg32 (space, data);
 }
 
-static void mapper40_irq ( running_machine *machine, int num, int scanline, int vblank, int blanked )
+static void mapper40_irq ( const device_config *device, int scanline, int vblank, int blanked )
 {
 	/* Decrement & check the IRQ scanline counter */
 	if (IRQ_enable)
 	{
 		if (--IRQ_count == 0)
 		{
-			cpu_set_input_line(machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
+			cpu_set_input_line(device->machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
 		}
 	}
 }
@@ -2861,8 +2889,6 @@ static WRITE8_HANDLER( mapper41_m_w )
 
 static WRITE8_HANDLER( mapper41_w )
 {
-	nes_state *state = space->machine->driver_data;
-
 	LOG_MMC(("mapper41_w, offset: %04x, data: %02x\n", offset, data));
 
 	if (mapper41_reg2)
@@ -2906,6 +2932,7 @@ static WRITE8_HANDLER( mapper42_w )
 
 static WRITE8_HANDLER( mapper43_w )
 {
+	nes_state *state = space->machine->driver_data;
 	int		bank = ( ( ( offset >> 8 ) & 0x03 ) * 0x20 ) + ( offset & 0x1F );
 
 	LOG_MMC(("mapper43_w, offset: %04x, data: %02x\n", offset, data));
@@ -2975,7 +3002,7 @@ static WRITE8_HANDLER( mapper44_w )
 			MMC3_chr_mask = ( page > 5 ) ? 0xFF : 0x7F;
 		}
 		mapper4_set_prg(space);
-		mapper4_set_chr();
+		mapper4_set_chr(space->machine);
 		break;
 
 	default:
@@ -3005,7 +3032,7 @@ static WRITE8_HANDLER( mapper45_m_w )
 				MMC3_chr_mask = 0;
 			}
 			mapper4_set_prg(space);
-			mapper4_set_chr();
+			mapper4_set_chr(space->machine);
 		}
 	}
 	if ( mapper45_data[3] & 0x40 ) {
@@ -3020,7 +3047,7 @@ static WRITE8_HANDLER( mapper46_m_w )
 	MMC1_bank1 = ( MMC1_bank1 & 0x01 ) | ( ( data & 0x0F ) << 1 );
 	MMC1_bank2 = ( MMC1_bank2 & 0x07 ) | ( ( data & 0xF0 ) >> 1 );
 	prg32(space, MMC1_bank1);
-	chr8(MMC1_bank2);
+	chr8(space->machine, MMC1_bank2);
 }
 
 static WRITE8_HANDLER( mapper46_w )
@@ -3030,7 +3057,7 @@ static WRITE8_HANDLER( mapper46_w )
 	MMC1_bank1 = ( MMC1_bank1 & ~0x01 ) | ( ( data & 0x02 ) >> 1 );
 	MMC1_bank2 = ( MMC1_bank2 & ~0x07 ) | ( ( data & 0x70 ) >> 4 );
 	prg32(space, MMC1_bank1);
-	chr8(MMC1_bank2);
+	chr8(space->machine, MMC1_bank2);
 }
 
 static WRITE8_HANDLER( mapper47_m_w )
@@ -3043,7 +3070,7 @@ static WRITE8_HANDLER( mapper47_m_w )
 		MMC3_chr_base = ( data & 0x01 ) << 7;
 		MMC3_chr_mask = 0x7F;
 		mapper4_set_prg(space);
-		mapper4_set_chr();
+		mapper4_set_chr(space->machine);
 	}
 }
 
@@ -3057,11 +3084,13 @@ static WRITE8_HANDLER( mapper49_m_w )
 		MMC3_chr_base = ( data & 0xC0 ) << 1;
 		MMC3_chr_mask = 0x7F;
 		mapper4_set_prg(space);
-		mapper4_set_chr();
+		mapper4_set_chr(space->machine);
 	}
 }
 
 static void mapper51_set_banks( const address_space *space ) {
+	nes_state *state = space->machine->driver_data;
+
 	ppu2c0x_set_mirroring( state->ppu, ( MMC1_bank1 == 3 ) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT );
 
 	if ( MMC1_bank1 & 0x01 ) {
@@ -3094,6 +3123,8 @@ static WRITE8_HANDLER( mapper51_w )
 
 static WRITE8_HANDLER( mapper57_w )
 {
+	nes_state *state = space->machine->driver_data;
+
 	LOG_MMC(("mapper57_w, offset: %04x, data: %02x\n", offset, data));
 
 	if ( offset & 0x0800 ) {
@@ -3111,11 +3142,13 @@ static WRITE8_HANDLER( mapper57_w )
 
 	ppu2c0x_set_mirroring( state->ppu, ( MMC1_bank2 & 0x08 ) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT );
 
-	chr8( ( MMC1_bank1 & 0x03 ) | ( MMC1_bank2 & 0x07 ) | ( ( MMC1_bank2 & 0x10 ) >> 1 ) );
+	chr8( space->machine, ( MMC1_bank1 & 0x03 ) | ( MMC1_bank2 & 0x07 ) | ( ( MMC1_bank2 & 0x10 ) >> 1 ) );
 }
 
 static WRITE8_HANDLER( mapper58_w )
 {
+	nes_state *state = space->machine->driver_data;
+
 	LOG_MMC(("mapper58_w, offset: %04x, data: %02x\n", offset, data));
 
 	if ( offset & 0x4000 ) {
@@ -3126,7 +3159,7 @@ static WRITE8_HANDLER( mapper58_w )
 			prg32( space, ( offset & 0x06 ) >> 1 );
 		}
 
-		chr8( ( offset & 0x38 ) >> 3 );
+		chr8( space->machine, ( offset & 0x38 ) >> 3 );
 
 		ppu2c0x_set_mirroring( state->ppu, ( data & 0x02 ) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT );
 	}
@@ -3134,6 +3167,8 @@ static WRITE8_HANDLER( mapper58_w )
 
 static WRITE8_HANDLER( mapper61_w )
 {
+	nes_state *state = space->machine->driver_data;
+
 	LOG_MMC(("mapper61_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch ( offset & 0x30 ) {
@@ -3152,9 +3187,11 @@ static WRITE8_HANDLER( mapper61_w )
 
 static WRITE8_HANDLER( mapper62_w )
 {
+	nes_state *state = space->machine->driver_data;
+
 	LOG_MMC(("mapper62_w, offset :%04x, data: %02x\n", offset, data));
 
-	chr8( ( ( offset & 0x1F ) << 2 ) | ( data & 0x03 ) );
+	chr8( space->machine, ( ( offset & 0x1F ) << 2 ) | ( data & 0x03 ) );
 
 	if ( offset & 0x20 ) {
 		prg16_89ab( space, ( offset & 0x40 ) | ( ( offset >> 8 ) & 0x3F ) );
@@ -3196,6 +3233,7 @@ static WRITE8_HANDLER( mapper64_m_w )
 static WRITE8_HANDLER( mapper64_w )
 {
 /* TODO: something in the IRQ handling hoses Skull & Crossbones */
+	nes_state *state = space->machine->driver_data;
 
 //	logerror("mapper64_w offset: %04x, data: %02x, scanline: %d\n", offset, data, current_scanline);
 
@@ -3261,13 +3299,13 @@ static WRITE8_HANDLER( mapper64_w )
 	}
 }
 
-static void irem_irq ( running_machine *machine, int num, int scanline, int vblank, int blanked )
+static void irem_irq ( const device_config *device, int scanline, int vblank, int blanked )
 {
 	/* Increment & check the IRQ scanline counter */
 	if (IRQ_enable)
 	{
 		if (--IRQ_count == 0)
-			cpu_set_input_line(machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
+			cpu_set_input_line(device->machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
 	}
 }
 
@@ -3275,6 +3313,8 @@ static void irem_irq ( running_machine *machine, int num, int scanline, int vbla
 
 static WRITE8_HANDLER( mapper65_w )
 {
+	nes_state *state = space->machine->driver_data;
+
 	switch (offset & 0x7007)
 	{
 		case 0x0000:
@@ -3333,10 +3373,10 @@ static WRITE8_HANDLER( mapper66_w )
 	LOG_MMC(("* Mapper 66 switch, offset %04x, data: %02x\n", offset, data));
 
 	prg32 (space, (data & 0x30) >> 4);
-	chr8 (data & 0x03);
+	chr8 (space->machine, data & 0x03);
 }
 
-static void sunsoft_irq ( running_machine *machine, int num, int scanline, int vblank, int blanked )
+static void sunsoft_irq ( const device_config *device, int scanline, int vblank, int blanked )
 {
 	/* 114 is the number of cycles per scanline */
 	/* TODO: change to reflect the actual number of cycles spent */
@@ -3345,7 +3385,7 @@ static void sunsoft_irq ( running_machine *machine, int num, int scanline, int v
 	{
 		if (IRQ_count <= 114)
 		{
-			cpu_set_input_line(machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
+			cpu_set_input_line(device->machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
 		}
 		IRQ_count -= 114;
 	}
@@ -3354,6 +3394,8 @@ static void sunsoft_irq ( running_machine *machine, int num, int scanline, int v
 
 static WRITE8_HANDLER( mapper67_w )
 {
+	nes_state *state = space->machine->driver_data;
+
 //	logerror("mapper67_w, offset %04x, data: %02x\n", offset, data);
 	switch (offset & 0x7801)
 	{
@@ -3361,16 +3403,16 @@ static WRITE8_HANDLER( mapper67_w )
 //			IRQ_enable = 0;
 //			break;
 		case 0x0800:
-			chr2_0 (data);
+			chr2_0 (space->machine, data);
 			break;
 		case 0x1800:
-			chr2_2 (data);
+			chr2_2 (space->machine, data);
 			break;
 		case 0x2800:
-			chr2_4 (data);
+			chr2_4 (space->machine, data);
 			break;
 		case 0x3800:
-			chr2_6 (data);
+			chr2_6 (space->machine, data);
 			break;
 		case 0x4800:
 //			nes_vram[5] = data * 64;
@@ -3381,7 +3423,7 @@ static WRITE8_HANDLER( mapper67_w )
 			IRQ_count_latch = data;
 			break;
 		case 0x5800:
-//			chr4_0 (data);
+//			chr4_0 (space->machine, data);
 //			break;
 		case 0x5801:
 			IRQ_enable = data;
@@ -3407,8 +3449,10 @@ static WRITE8_HANDLER( mapper67_w )
 	}
 }
 
-static void mapper68_mirror (int m68_mirror, int m0, int m1)
+static void mapper68_mirror (running_machine *machine, int m68_mirror, int m0, int m1)
 {
+	nes_state *state = machine->driver_data;
+
 	/* The 0x20000 (128k) offset is a magic number */
 	#define M68_OFFSET 0x20000
 
@@ -3454,31 +3498,31 @@ static WRITE8_HANDLER( mapper68_w )
 	{
 		case 0x0000:
 			/* Switch 2k VROM at $0000 */
-			chr2_0 (data);
+			chr2_0 (space->machine, data);
 			break;
 		case 0x1000:
 			/* Switch 2k VROM at $0800 */
-			chr2_2 (data);
+			chr2_2 (space->machine, data);
 			break;
 		case 0x2000:
 			/* Switch 2k VROM at $1000 */
-			chr2_4 (data);
+			chr2_4 (space->machine, data);
 			break;
 		case 0x3000:
 			/* Switch 2k VROM at $1800 */
-			chr2_6 (data);
+			chr2_6 (space->machine, data);
 			break;
 		case 0x4000:
 			m0 = data;
-			mapper68_mirror (m68_mirror, m0, m1);
+			mapper68_mirror (space->machine, m68_mirror, m0, m1);
 			break;
 		case 0x5000:
 			m1 = data;
-			mapper68_mirror (m68_mirror, m0, m1);
+			mapper68_mirror (space->machine, m68_mirror, m0, m1);
 			break;
 		case 0x6000:
 			m68_mirror = data & 0x13;
-			mapper68_mirror (m68_mirror, m0, m1);
+			mapper68_mirror (space->machine, m68_mirror, m0, m1);
 			break;
 		case 0x7000:
 			prg16_89ab (space, data);
@@ -3492,6 +3536,7 @@ static WRITE8_HANDLER( mapper68_w )
 
 static WRITE8_HANDLER( mapper69_w )
 {
+	nes_state *state = space->machine->driver_data;
 	static int cmd = 0;
 
 //	logerror("mapper69_w offset: %04x, data: %02x, scanline: %d\n", offset, data, current_scanline);
@@ -3559,13 +3604,15 @@ static WRITE8_HANDLER( mapper69_w )
 
 static WRITE8_HANDLER( mapper70_w )
 {
+	nes_state *state = space->machine->driver_data;
+
 	logerror("mapper70_w offset %04x, data: %02x\n", offset, data);
 
 	/* TODO: is the data being written irrelevant? */
 
 	prg16_89ab (space, (data & 0xf0) >> 4);
 
-	chr8 (data & 0x0f);
+	chr8 (space->machine, data & 0x0f);
 
 #if 1
 	if (data & 0x80)
@@ -3599,7 +3646,7 @@ static WRITE8_HANDLER( mapper72_w )
 	if(data&0x80)
 		prg16_89ab (space, data & 0x0f);
 	if(data&0x40)
-		chr8 (data & 0x0f);
+		chr8 (space->machine, data & 0x0f);
 
 }
 
@@ -3636,7 +3683,10 @@ static WRITE8_HANDLER( mapper73_w )
 
 static WRITE8_HANDLER( mapper75_w )
 {
+	nes_state *state = space->machine->driver_data;
+
 	logerror("mapper75_w, offset: %04x, data: %02x\n", offset, data);
+
 	switch (offset & 0x7000)
 	{
 		case 0x0000:
@@ -3656,18 +3706,21 @@ static WRITE8_HANDLER( mapper75_w )
 			prg8_cd (space, data);
 			break;
 		case 0x6000:
-			chr4_0 (data);
+			chr4_0 (space->machine, data);
 			break;
 		case 0x7000:
-			chr4_4 (data);
+			chr4_4 (space->machine, data);
 			break;
 	}
 }
 
 static WRITE8_HANDLER( mapper76_w )
 {
+	nes_state *state = space->machine->driver_data;
 	static int cmd=0;
+
 	logerror("mapper76_w, offset: %04x, data: %02x\n", offset, data);
+
 	switch(offset&0x7001)
 	{
 	case 0: cmd=data;break;
@@ -3675,10 +3728,10 @@ static WRITE8_HANDLER( mapper76_w )
 		{
 			switch(cmd&7)
 			{
-			case 2:chr2_0(data);break;
-			case 3:chr2_2(data);break;
-			case 4:chr2_4(data);break;
-			case 5:chr2_6(data);break;
+			case 2:chr2_0(space->machine, data);break;
+			case 3:chr2_2(space->machine, data);break;
+			case 4:chr2_4(space->machine, data);break;
+			case 5:chr2_6(space->machine, data);break;
 			case 6:(cmd&0x40)?prg8_cd(space, data):prg8_89(space, data);break;
 			case 7:prg8_ab(space, data);break;
 			default:logerror("mapper76 unsupported command: %02x, data: %02x\n", cmd, data);break;
@@ -3713,7 +3766,7 @@ static WRITE8_HANDLER( mapper78_w )
 {
 	logerror("mapper78_w, offset: %04x, data: %02x\n", offset, data);
 	/* Switch 8k VROM bank */
-	chr8 ((data & 0xf0) >> 4);
+	chr8 (space->machine, (data & 0xf0) >> 4);
 
 	/* Switch 16k ROM bank */
 	prg16_89ab (space, data & 0x0f);
@@ -3726,7 +3779,7 @@ static WRITE8_HANDLER( mapper79_l_w )
 	if ((offset-0x100) & 0x0100)
 	{
 		/* Select 8k VROM bank */
-		chr8 (data & 0x07);
+		chr8 (space->machine, data & 0x07);
 
 		/* Select 32k ROM bank? */
 		prg32 (space, (data & 0x08) >> 3);
@@ -3740,13 +3793,15 @@ static WRITE8_HANDLER( mapper79_w )
 
 static WRITE8_HANDLER( mapper80_m_w )
 {
+	nes_state *state = space->machine->driver_data;
+
 	logerror("mapper80_m_w, offset: %04x, data: %02x\n", offset, data);
 
 	switch (offset)
 	{
 		case 0x1ef0:
 			/* Switch 2k VROM at $0000 */
-			chr2_0 ((data & 0x7f) >> 1);
+			chr2_0 (space->machine, (data & 0x7f) >> 1);
 			if (data & 0x80)
 			{
 				/* Horizontal, $2000-$27ff */
@@ -3762,7 +3817,7 @@ static WRITE8_HANDLER( mapper80_m_w )
 			break;
 		case 0x1ef1:
 			/* Switch 2k VROM at $0000 */
-			chr2_2 ((data & 0x7f) >> 1);
+			chr2_2 (space->machine, (data & 0x7f) >> 1);
 			if (data & 0x80)
 			{
 				/* Horizontal, $2800-$2fff */
@@ -3812,6 +3867,7 @@ static WRITE8_HANDLER( mapper80_m_w )
 
 static WRITE8_HANDLER( mapper82_m_w )
 {
+	nes_state *state = space->machine->driver_data;
 	static int vrom_switch;
 
 	/* This mapper has problems */
@@ -3823,16 +3879,16 @@ static WRITE8_HANDLER( mapper82_m_w )
 		case 0x1ef0:
 			/* Switch 2k VROM at $0000 or $1000 */
 			if (vrom_switch)
-				chr2_4 (data);
+				chr2_4 (space->machine, data);
 			else
-				chr2_0 (data);
+				chr2_0 (space->machine, data);
 			break;
 		case 0x1ef1:
 			/* Switch 2k VROM at $0800 or $1800 */
 			if (vrom_switch)
-				chr2_6 (data);
+				chr2_6 (space->machine, data);
 			else
-				chr2_2 (data);
+				chr2_2 (space->machine, data);
 			break;
 		case 0x1ef2:
 			/* Switch 1k VROM at $1000 */
@@ -3913,7 +3969,7 @@ static WRITE8_HANDLER( mapper83_w )
 	case 0x31FF:
 		mapper83_data[8] = data;
 		mapper83_set_prg(space);
-		mapper83_set_chr();
+		mapper83_set_chr(space->machine);
 		break;
 	case 0x0100:
 		switch( data & 0x03 ) {
@@ -3956,7 +4012,7 @@ static WRITE8_HANDLER( mapper83_w )
 	case 0x0316:
 	case 0x0317:
 		mapper83_data[ offset - 0x0310 ] = data;
-		mapper83_set_chr();
+		mapper83_set_chr(space->machine);
 		break;
 	case 0x0318:
 		mapper83_data[9] = data;
@@ -3967,6 +4023,8 @@ static WRITE8_HANDLER( mapper83_w )
 
 static WRITE8_HANDLER( konami_vrc7_w )
 {
+	nes_state *state = space->machine->driver_data;
+
 //	logerror("konami_vrc7_w offset: %04x, data: %02x, scanline: %d\n", offset, data, current_scanline);
 
 	switch (offset & 0x7018)
@@ -4068,15 +4126,16 @@ static WRITE8_HANDLER( mapper87_m_w )
 	logerror("mapper87_m_w %04x:%02x\n", offset, data);
 
 	/* TODO: verify */
-	chr8 (data >> 1);
+	chr8 (space->machine, data >> 1);
 }
 static WRITE8_HANDLER( mapper89_w )
 {
+	nes_state *state = space->machine->driver_data;
 	int chr;
 	logerror("mapper89_m_w %04x:%02x\n", offset, data);
 	prg16_89ab(space, (data>>4)&7);
 	chr=(data&7)|((data&0x80)?8:0);
-	chr8(chr);
+	chr8(space->machine, chr);
 	(data&8)?ppu2c0x_set_mirroring(state->ppu, PPU_MIRROR_HIGH):ppu2c0x_set_mirroring(state->ppu, PPU_MIRROR_LOW);
 
 }
@@ -4090,10 +4149,10 @@ static WRITE8_HANDLER( mapper91_m_w )
 		case 0x0000:
 			switch (offset & 0x03)
 			{
-				case 0x00: chr2_0 (data); break;
-				case 0x01: chr2_2 (data); break;
-				case 0x02: chr2_4 (data); break;
-				case 0x03: chr2_6 (data); break;
+				case 0x00: chr2_0 (space->machine, data); break;
+				case 0x01: chr2_2 (space->machine, data); break;
+				case 0x02: chr2_4 (space->machine, data); break;
+				case 0x03: chr2_6 (space->machine, data); break;
 			}
 			break;
 		case 0x1000:
@@ -4115,7 +4174,7 @@ static WRITE8_HANDLER( mapper92_w )
 	if(data&0x80)
 		prg16_cdef (space, data & 0x0f);
 	if(data&0x40)
-		chr8 (data & 0x0f);
+		chr8 (space->machine, data & 0x0f);
 
 }
 
@@ -4166,6 +4225,8 @@ static WRITE8_HANDLER( mapper96_w )
 
 static WRITE8_HANDLER( mapper97_w )
 {
+	nes_state *state = space->machine->driver_data;
+
 	if(offset&0x4000)
 		return;
 	if(data&0x80)
@@ -4177,7 +4238,7 @@ static WRITE8_HANDLER( mapper101_m_w )
 {
 	LOG_MMC(("mapper101_m_w %04x:%02x\n", offset, data));
 
-	chr8 (data);
+	chr8 (space->machine, data);
 }
 
 static WRITE8_HANDLER( mapper101_w )
@@ -4189,6 +4250,8 @@ static WRITE8_HANDLER( mapper101_w )
 
 static WRITE8_HANDLER( mapper112_w )
 {
+	nes_state *state = space->machine->driver_data;
+
 	LOG_MMC(("mapper112_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch( offset ) {
@@ -4205,25 +4268,25 @@ static WRITE8_HANDLER( mapper112_w )
 			break;
 		case 2:
 			data &= 0xFE;
-			chr1_0( data );
-			chr1_1( data + 1 );
+			chr1_0( space->machine, data );
+			chr1_1( space->machine, data + 1 );
 			break;
 		case 3:
 			data &= 0xFE;
-			chr1_2( data );
-			chr1_3( data + 1 );
+			chr1_2( space->machine, data );
+			chr1_3( space->machine, data + 1 );
 			break;
 		case 4:
-			chr1_4( data );
+			chr1_4( space->machine, data );
 			break;
 		case 5:
-			chr1_5( data );
+			chr1_5( space->machine, data );
 			break;
 		case 6:
-			chr1_6( data );
+			chr1_6( space->machine, data );
 			break;
 		case 7:
-			chr1_7( data );
+			chr1_7( space->machine, data );
 			break;
 		}
 		break;
@@ -4241,7 +4304,7 @@ static WRITE8_HANDLER( mapper113_l_w )
 	if(offset>0xFF)
 		return;
 	prg32(space, data>>3);
-	chr8(data&7);
+	chr8(space->machine, data&7);
 }
 static WRITE8_HANDLER( mapper133_l_w )
 {
@@ -4251,12 +4314,12 @@ static WRITE8_HANDLER( mapper133_l_w )
 	if(offset!=0x20)
 		return;
 	prg32(space, data>>2);
-	chr8(data&3);
+	chr8(space->machine, data&3);
 }
 
 static WRITE8_HANDLER( mapper_140_m_w )
 {
-       chr8(data&0x0f);
+       chr8(space->machine, data&0x0f);
        prg32(space, (data>>4)&0x03);
 }
 
@@ -4273,7 +4336,7 @@ static WRITE8_HANDLER( mapper144_w )
 	data = data|(memory_read_byte(space,offset)&1);
 
 	/* Switch 8k VROM bank */
-	chr8 (data >> 4);
+	chr8 (space->machine, data >> 4);
 
 	/* Switch 32k prg bank */
 	prg32 (space, data & 0x07);
@@ -4287,6 +4350,8 @@ static WRITE8_HANDLER( mapper180_w )
 
 static WRITE8_HANDLER( mapper182_w )
 {
+	nes_state *state = space->machine->driver_data;
+
 	LOG_MMC(("mapper182_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch( offset & 0x7003 ) {
@@ -4299,16 +4364,16 @@ static WRITE8_HANDLER( mapper182_w )
 	case 0x4000:
 		switch( MMC1_bank1 ) {
 		case 0:
-			chr2_0( data >> 1 );
+			chr2_0( space->machine, data >> 1 );
 			break;
 		case 1:
-			chr1_5( data );
+			chr1_5( space->machine, data );
 			break;
 		case 2:
-			chr2_2( data >> 1 );
+			chr2_2( space->machine, data >> 1 );
 			break;
 		case 3:
-			chr1_7( data );
+			chr1_7( space->machine, data );
 			break;
 		case 4:
 			prg8_89( space, data );
@@ -4317,10 +4382,10 @@ static WRITE8_HANDLER( mapper182_w )
 			prg8_ab( space, data );
 			break;
 		case 6:
-			chr1_4( data );
+			chr1_4( space->machine, data );
 			break;
 		case 7:
-			chr1_6( data );
+			chr1_6( space->machine, data );
 			break;
 		}
 		break;
@@ -4331,7 +4396,7 @@ static WRITE8_HANDLER( mapper182_w )
 	}
 }
 
-static void mapper182_irq( running_machine *machine, int num, int scanline, int vblank, int blanked )
+static void mapper182_irq( const device_config *device, int scanline, int vblank, int blanked )
 {
 	if ((scanline < PPU_BOTTOM_VISIBLE_SCANLINE) /*|| (scanline == ppu_scanlines_per_frame-1)*/)
 	{
@@ -4346,8 +4411,8 @@ static void mapper182_irq( running_machine *machine, int num, int scanline, int 
 
 		if (IRQ_enable && !blanked && (IRQ_count == 0) && priorCount)
 		{
-			logerror("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline, video_screen_get_vpos(machine->primary_screen), video_screen_get_hpos(machine->primary_screen));
-			cpu_set_input_line(machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
+			logerror("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline, video_screen_get_vpos(device->machine->primary_screen), video_screen_get_hpos(device->machine->primary_screen));
+			cpu_set_input_line(device->machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
 		}
 	}
 }
@@ -4358,8 +4423,8 @@ static WRITE8_HANDLER( mapper184_m_w )
 
 	if(0==offset)
 	{
-		chr4_0(data&0x0F);
-		chr4_4((data>>4));
+		chr4_0(space->machine, data&0x0F);
+		chr4_4(space->machine, (data>>4));
 	}
 }
 
@@ -4376,13 +4441,13 @@ static WRITE8_HANDLER( mapper193_m_w )
 
 	switch( offset & 0x03 ) {
 	case 0:
-		chr4_0( data >> 2 );
+		chr4_0( space->machine, data >> 2 );
 		break;
 	case 1:
-		chr2_4( data >> 1 );
+		chr2_4( space->machine, data >> 1 );
 		break;
 	case 2:
-		chr2_6( data >> 1 );
+		chr2_6( space->machine, data >> 1 );
 		break;
 	case 3:
 		prg16_89ab( space, data );
@@ -4392,11 +4457,13 @@ static WRITE8_HANDLER( mapper193_m_w )
 
 static WRITE8_HANDLER( mapper200_w )
 {
+	nes_state *state = space->machine->driver_data;
+
 	LOG_MMC(("mapper200_w, offset: %04x, data: %02x\n", offset, data ));
 
 	prg16_89ab( space, offset & 0x07 );
 	prg16_cdef( space, offset & 0x07 );
-	chr8( offset & 0x07 );
+	chr8( space->machine, offset & 0x07 );
 	
 	ppu2c0x_set_mirroring( state->ppu, ( offset & 0x08 ) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT );
 }
@@ -4407,22 +4474,23 @@ static WRITE8_HANDLER( mapper201_w )
 
 	if ( offset & 0x08 ) {
 		prg32( space, offset & 0x03 );
-		chr8( offset & 0x03 );
+		chr8( space->machine, offset & 0x03 );
 	} else {
 		prg32( space, 0 );
-		chr8( 0 );
+		chr8( space->machine, 0 );
 	}
 }
 
 static WRITE8_HANDLER( mapper202_w )
 {
+	nes_state *state = space->machine->driver_data;
 	int	bank = ( offset >> 1 ) & 0x07;
 
 	LOG_MMC(("mapper202_w, offset: %04x, data: %02x\n", offset, data));
 
 	prg16_89ab( space, bank );
 	prg16_cdef( space, bank + ( ( ( bank & 0x06 ) == 0x06 ) ? 1 : 0 ) );
-	chr8( bank );
+	chr8( space->machine, bank );
 
 	ppu2c0x_set_mirroring( state->ppu, ( offset & 0x01 ) ? PPU_MIRROR_HORZ: PPU_MIRROR_VERT );
 }
@@ -4433,7 +4501,7 @@ static WRITE8_HANDLER( mapper203_w )
 
 	prg16_89ab( space, ( data >> 2 ) & 0x03 );
 	prg16_cdef( space, ( data >> 2 ) & 0x03 );
-	chr8( data & 0x03 );
+	chr8( space->machine, data & 0x03 );
 }
 
 static WRITE8_HANDLER( mapper206_w )
@@ -4446,13 +4514,14 @@ static WRITE8_HANDLER( mapper206_w )
 
 static WRITE8_HANDLER( mapper225_w )
 {
+	nes_state *state = space->machine->driver_data;
 	int hi_bank;
 	int size_16;
 	int bank;
 
 	LOG_MMC(("mapper225_w, offset: %04x, data: %02x\n", offset, data));
 
-	chr8 (offset & 0x3f);
+	chr8 (space->machine, offset & 0x3f);
 	hi_bank = offset & 0x40;
 	size_16 = offset & 0x1000;
 	bank = (offset & 0xf80) >> 7;
@@ -4476,6 +4545,7 @@ static WRITE8_HANDLER( mapper225_w )
 
 static WRITE8_HANDLER( mapper226_w )
 {
+	nes_state *state = space->machine->driver_data;
 	int hi_bank;
 	int size_16;
 	int bank;
@@ -4516,6 +4586,7 @@ static WRITE8_HANDLER( mapper226_w )
 
 static WRITE8_HANDLER( mapper227_w )
 {
+	nes_state *state = space->machine->driver_data;
 	int hi_bank;
 	int size_32;
 	int bank;
@@ -4555,6 +4626,7 @@ static WRITE8_HANDLER( mapper228_w )
 {
 	/* The address lines double as data */
 	/* --mPPppppPP-cccc */
+	nes_state *state = space->machine->driver_data;
 	int bank;
 	int chr;
 
@@ -4601,11 +4673,13 @@ static WRITE8_HANDLER( mapper228_w )
 
 	/* Now handle vrom banking */
 	chr = (data & 0x03) + ((offset & 0x0f) << 2);
-	chr8 (chr);
+	chr8 (space->machine, chr);
 }
 
 static WRITE8_HANDLER( mapper229_w )
 {
+	nes_state *state = space->machine->driver_data;
+
 	LOG_MMC(("mapper229_w, offset: %04x, data: %02x\n", offset, data));
 
 	if (offset & 0x20)
@@ -4616,18 +4690,20 @@ static WRITE8_HANDLER( mapper229_w )
 	if ((offset & 0x1e) == 0)
 	{
 		prg32 (space, 0);
-		chr8 (0);
+		chr8 (space->machine, 0);
 	}
 	else
 	{
 		prg16_89ab (space, offset & 0x1f);
 		prg16_89ab (space, offset & 0x1f);
-		chr8 (offset);
+		chr8 (space->machine, offset);
 	}
 }
 
 static WRITE8_HANDLER( mapper230_w )
 {
+	nes_state *state = space->machine->driver_data;
+
 	LOG_MMC(("mapper230_w, offset: %04x, data: %02x\n", offset, data));
 
 	if ( 1 ) {
@@ -4651,7 +4727,7 @@ static WRITE8_HANDLER( mapper231_w )
 
 	bank = (data & 0x03) | ((data & 0x80) >> 5);
 	prg32 (space, bank);
-	chr8 ((data & 0x70) >> 4);
+	chr8 (space->machine, (data & 0x70) >> 4);
 }
 
 static void mapper232_set_prg( const address_space *space )
@@ -4676,7 +4752,7 @@ static WRITE8_HANDLER( mapper240_l_w )
 	LOG_MMC(("mapper240_l_w, offset: %04x, data: %02x\n", offset, data));
 
 	prg32( space, data >> 4 );
-	chr8( data & 0x0F );
+	chr8( space->machine, data & 0x0F );
 }
 
 static READ8_HANDLER( mapper241_l_r )
@@ -4693,6 +4769,8 @@ static WRITE8_HANDLER( mapper241_w )
 
 static WRITE8_HANDLER( mapper242_w )
 {
+	nes_state *state = space->machine->driver_data;
+
 	LOG_MMC(("mapper242_w, offset: %04x, data: %02x\n", offset, data));
 
 	prg32( space, ( offset >> 3 ) & 0x0F );
@@ -4724,7 +4802,7 @@ static WRITE8_HANDLER( mapper244_w )
 		return;
 	}
 	if ( offset < 0x00e5 ) {
-		chr8( ( offset - 0x00a5 ) & 0x07 );
+		chr8( space->machine, ( offset - 0x00a5 ) & 0x07 );
 	}
 }
 
@@ -4747,16 +4825,16 @@ static WRITE8_HANDLER( mapper246_m_w )
 			prg8_ef( space, data );
 			break;
 		case 0x0004:
-			chr2_0( data );
+			chr2_0( space->machine, data );
 			break;
 		case 0x0005:
-			chr2_2( data );
+			chr2_2( space->machine, data );
 			break;
 		case 0x0006:
-			chr2_4( data );
+			chr2_4( space->machine, data );
 			break;
 		case 0x0007:
-			chr2_6( data );
+			chr2_6( space->machine, data );
 			break;
 		}
 	} else {
@@ -4783,6 +4861,8 @@ static WRITE8_HANDLER( mapper248_m_w )
 
 static WRITE8_HANDLER( mapper248_w )
 {
+	nes_state *state = space->machine->driver_data;
+
 	LOG_MMC(("mapper248_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch( offset & 0x7001 ) {
@@ -4792,22 +4872,22 @@ static WRITE8_HANDLER( mapper248_w )
 	case 0x0001:
 		switch( MMC1_bank1 & 0x07 ) {
 		case 0:
-			chr2_0( data >> 1 );
+			chr2_0( space->machine, data >> 1 );
 			break;
 		case 1:
-			chr2_2( data >> 1 );
+			chr2_2( space->machine, data >> 1 );
 			break;
 		case 2:
-			chr1_4( data );
+			chr1_4( space->machine, data );
 			break;
 		case 3:
-			chr1_5( data );
+			chr1_5( space->machine, data );
 			break;
 		case 4:
-			chr1_6( data );
+			chr1_6( space->machine, data );
 			break;
 		case 5:
-			chr1_7( data );
+			chr1_7( space->machine, data );
 			break;
 		case 6:
 			MMC1_bank2 = data;
@@ -4837,7 +4917,7 @@ static WRITE8_HANDLER( mapper248_w )
 	}
 }
 
-static void mapper248_irq( running_machine *machine, int num, int scanline, int vblank, int blanked )
+static void mapper248_irq( const device_config *device, int scanline, int vblank, int blanked )
 {
 	if ((scanline < PPU_BOTTOM_VISIBLE_SCANLINE) /*|| (scanline == ppu_scanlines_per_frame-1)*/)
 	{
@@ -4852,8 +4932,8 @@ static void mapper248_irq( running_machine *machine, int num, int scanline, int 
 
 		if (IRQ_enable && !blanked && (IRQ_count == 0) && priorCount)
 		{
-			logerror("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline, video_screen_get_vpos(machine->primary_screen), video_screen_get_hpos(machine->primary_screen));
-			cpu_set_input_line(machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
+			logerror("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline, video_screen_get_vpos(device->machine->primary_screen), video_screen_get_hpos(device->machine->primary_screen));
+			cpu_set_input_line(device->machine->cpu[0], M6502_IRQ_LINE, HOLD_LINE);
 		}
 	}
 }
@@ -4871,6 +4951,7 @@ static void mapper248_irq( running_machine *machine, int num, int scanline, int 
 int mapper_reset (running_machine *machine, int mapperNum)
 {
 	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	nes_state *state = machine->driver_data;
 	int err = 0;
 	const mmc *mapper;
 
@@ -4879,8 +4960,8 @@ int mapper_reset (running_machine *machine, int mapperNum)
 
 	/* Set the mapper irq callback */
 	mapper = nes_mapper_lookup(mapperNum);
-	ppu2c0x_set_scanline_callback (0, mapper ? mapper->mmc_scanline : NULL);
-	ppu2c0x_set_hblank_callback (0, mapper ? mapper->mmc_hblank :  NULL);
+	ppu2c0x_set_scanline_callback (state->ppu, mapper ? mapper->mmc_scanline : NULL);
+	ppu2c0x_set_hblank_callback (state->ppu, mapper ? mapper->mmc_hblank : NULL);
 
 	if (!nes_irq_timer)
 		nes_irq_timer = timer_alloc(machine, nes_irq_callback, NULL);
@@ -4961,7 +5042,7 @@ int mapper_reset (running_machine *machine, int mapperNum)
 			MMC3_chr_base = 0;
 			MMC3_chr_mask = ( nes.chr_chunks << 3 ) - 1;
 			mapper4_set_prg(space);
-			mapper4_set_chr();
+			mapper4_set_chr(space->machine);
 			break;
 		case 5:
 			/* Can switch 8k prg banks, but they are saved as 16k in size */
@@ -5104,7 +5185,7 @@ int mapper_reset (running_machine *machine, int mapperNum)
 			MMC3_chr_base = 0;
 			MMC3_chr_mask = 0x7F;
 			mapper4_set_prg(space);
-			mapper4_set_chr();
+			mapper4_set_chr(space->machine);
 			break;
 		case 45:
 			IRQ_enable = 0;
@@ -5120,7 +5201,7 @@ int mapper_reset (running_machine *machine, int mapperNum)
 			mapper45_cmd = 0;
 			mapper45_data[0] = mapper45_data[1] = mapper45_data[2] = mapper45_data[3] = 0;
 			mapper4_set_prg(space);
-			mapper4_set_chr();
+			mapper4_set_chr(space->machine);
 			memory_set_bankptr( space->machine, 5, nes.wram );
 			break;
 		case 46:
@@ -5128,7 +5209,7 @@ int mapper_reset (running_machine *machine, int mapperNum)
 			MMC1_bank1 = 0;
 			MMC1_bank2 = 0;
 			prg32(space, MMC1_bank1);
-			chr8(MMC1_bank2);
+			chr8(space->machine, MMC1_bank2);
 			break;
 		case 51:
 			MMC1_bank1 = 0x01;
@@ -5141,11 +5222,11 @@ int mapper_reset (running_machine *machine, int mapperNum)
 			MMC1_bank2 = 0x00;
 			prg16_89ab( space, 0 );
 			prg16_cdef( space, 0 );
-			chr8(0);
+			chr8(space->machine, 0);
 			break;
 		case 58:
 			prg32(space, 0);
-			chr8(0);
+			chr8(space->machine, 0);
 			break;
 		case 61:
 		case 62:
@@ -5174,10 +5255,10 @@ int mapper_reset (running_machine *machine, int mapperNum)
 			prg8_ab(space, 1);
 			//cd is bankable, but this should init all banks just fine.
 			prg16_cdef(space, nes.prg_chunks-1);
-			chr2_0(0);
-			chr2_2(1);
-			chr2_4(2);
-			chr2_6(3);
+			chr2_0(space->machine, 0);
+			chr2_2(space->machine, 1);
+			chr2_4(space->machine, 2);
+			chr2_6(space->machine, 3);
 			break;
 		case 79:
 			/* Mirroring always horizontal...? */
@@ -5258,13 +5339,13 @@ int mapper_reset (running_machine *machine, int mapperNum)
 			break;
 		case 201:
 			prg32( space, 0 );
-			chr8( 0 );
+			chr8( space->machine, 0 );
 			break;
 		case 202:
 		case 203:
 			prg16_89ab( space, 0 );
 			prg16_cdef( space, 0 );
-			chr8( 0 );
+			chr8( space->machine, 0 );
 			break;
 		case 225:
 		case 226:
