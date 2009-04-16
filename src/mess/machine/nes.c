@@ -66,12 +66,18 @@ static void nes_machine_stop(running_machine *machine);
 
 static const device_config *cartslot_image(running_machine *machine)
 {
-	return devtag_get_device(machine, "cart");
+	nes_state *state = machine->driver_data;
+	return state->cart;
 }
 
 static void init_nes_core (running_machine *machine)
 {
+	nes_state *state = machine->driver_data;
 	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+
+	state->ppu = devtag_get_device(machine, "ppu");
+	state->sound = devtag_get_device(machine, "nessound");
+	state->cart = devtag_get_device(machine, "cart");
 
 	/* We set these here in case they weren't set in the cart loader */
 	nes.rom = memory_region(machine, "maincpu");

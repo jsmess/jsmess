@@ -33,7 +33,12 @@ UINT64 *dc_texture_ram;
 static UINT32 tafifo_buff[32];
 
 static emu_timer *vbout_timer;
-static emu_timer *endofrender_timer;
+static emu_timer *hbin_timer;
+static emu_timer *endofrender_timer_isp;
+static emu_timer *endofrender_timer_tsp;
+static emu_timer *endofrender_timer_video;
+
+static int scanline;
 static bitmap_t *fakeframebuffer_bitmap;
 static void testdrawscreen(const running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect);
 
@@ -170,7 +175,6 @@ WRITE64_HANDLER( pvr_ctrl_w )
 			/*We need to know where this is actually used on Naomi, for testing purpose.*/
 			if(pvr_dma.start) { printf("Warning: PVR-DMA start\n"); }
 
-			/*TODO: use the ddt function.*/
 			if(pvr_dma.flag && pvr_dma.start)
 			{
 				UINT32 src,dst,size;
@@ -201,6 +205,7 @@ WRITE64_HANDLER( pvr_ctrl_w )
 				/*Note: do not update the params, since this DMA type doesn't support it. */
 
 				dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_PVR;
+				dc_update_interrupt_status(space->machine);
 			}
 			break;
 	}
@@ -343,7 +348,7 @@ WRITE64_HANDLER( pvr_ta_w )
 				// we've got a request to draw, so, draw to the fake fraembuffer!
 				testdrawscreen(space->machine,fakeframebuffer_bitmap,&clip);
 
-				timer_adjust_oneshot(endofrender_timer, ATTOTIME_IN_USEC(1000) , 0); // hack, make sure render takes some amount of time
+				timer_adjust_oneshot(endofrender_timer_isp, ATTOTIME_IN_USEC(4000) , 0); // hack, make sure render takes some amount of time
 
 				break;
 			}
@@ -1189,7 +1194,7 @@ static void testdrawscreen(const running_machine *machine,bitmap_t *bitmap,const
 			}
 		}
 
-
+		#if 1
 		// test--draw the verts fore each quad as polys too
 		{
 			testvertices vv[4];
@@ -1213,7 +1218,7 @@ static void testdrawscreen(const running_machine *machine,bitmap_t *bitmap,const
 			v[2] = &vv[3];
 			testdrawpoly(bitmap,v);
 		}
-
+		#endif
 	}
 	state_ta.grab[rs].busy=0;
 #if DEBUG_VERTICES
@@ -1360,7 +1365,6 @@ static void pvr_build_parameterconfig(void)
 
 static TIMER_CALLBACK(vbout)
 {
-
 	UINT32 a;
 	//printf("vbout\n");
 
@@ -1368,33 +1372,48 @@ static TIMER_CALLBACK(vbout)
 	dc_sysctrl_regs[SB_ISTNRM] = a; // V Blank-out interrupt
 	dc_update_interrupt_status(machine);
 
+	scanline = 0;
 	timer_adjust_oneshot(vbout_timer, attotime_never, 0);
+	timer_adjust_oneshot(hbin_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 640), 0);
 }
 
-// moved, interrupts should never be changed in a VIDEO_UDPATE call!!
-static TIMER_CALLBACK(endofrender)
+static TIMER_CALLBACK(hbin)
 {
-	UINT32 a;
+	dc_sysctrl_regs[SB_ISTNRM] |= IST_HBL_IN; // H Blank-in interrupt
+	dc_update_interrupt_status(machine);
 
-	//printf("endofrender\n");
+//  printf("hbin on scanline %d\n",scanline);
 
-	// don't know if this is right.. but we get asserts otherwise, timing error?
-	if (state_ta.start_render_received == 1)
-	{
-		for (a=0;a < NUM_BUFFERS;a++)
-			if (state_ta.grab[a].busy == 1)
-				state_ta.grab[a].busy = 0;
-		state_ta.start_render_received = 0;
-	}
+	scanline++;
 
-	state_ta.start_render_received=0;
-	state_ta.renderselect= -1;
+	timer_adjust_oneshot(hbin_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 640), 0);
+}
+
+
+
+static TIMER_CALLBACK(endofrender_video)
+{
+	dc_sysctrl_regs[SB_ISTNRM] |= IST_EOR_VIDEO;// VIDEO end of render
+	dc_update_interrupt_status(machine);
+	timer_adjust_oneshot(endofrender_timer_video, attotime_never, 0);
+}
+
+static TIMER_CALLBACK(endofrender_tsp)
+{
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_EOR_TSP;	// TSP end of render
 	dc_update_interrupt_status(machine);
 
-	timer_adjust_oneshot(endofrender_timer, attotime_never, 0);
+	timer_adjust_oneshot(endofrender_timer_tsp, attotime_never, 0);
+	timer_adjust_oneshot(endofrender_timer_video, ATTOTIME_IN_USEC(500) , 0);
+}
 
+static TIMER_CALLBACK(endofrender_isp)
+{
+	dc_sysctrl_regs[SB_ISTNRM] |= IST_EOR_ISP;	// ISP end of render
+	dc_update_interrupt_status(machine);
 
+	timer_adjust_oneshot(endofrender_timer_isp, attotime_never, 0);
+	timer_adjust_oneshot(endofrender_timer_tsp, ATTOTIME_IN_USEC(500) , 0);
 }
 
 
@@ -1423,11 +1442,19 @@ VIDEO_START(dc)
 	vbout_timer = timer_alloc(machine, vbout, 0);
 	timer_adjust_oneshot(vbout_timer, attotime_never, 0);
 
-	endofrender_timer = timer_alloc(machine, endofrender, 0);
-	timer_adjust_oneshot(endofrender_timer, attotime_never, 0);
+	hbin_timer = timer_alloc(machine, hbin, 0);
+	timer_adjust_oneshot(hbin_timer, attotime_never, 0);
+	scanline = 0;
+
+	endofrender_timer_isp = timer_alloc(machine, endofrender_isp, 0);
+	endofrender_timer_tsp = timer_alloc(machine, endofrender_tsp, 0);
+	endofrender_timer_video = timer_alloc(machine, endofrender_video, 0);
+
+	timer_adjust_oneshot(endofrender_timer_isp, attotime_never, 0);
+	timer_adjust_oneshot(endofrender_timer_tsp, attotime_never, 0);
+	timer_adjust_oneshot(endofrender_timer_video, attotime_never, 0);
 
 	fakeframebuffer_bitmap = auto_bitmap_alloc(1024,1024,BITMAP_FORMAT_RGB32);
-
 
 }
 
@@ -1478,4 +1505,3 @@ void dc_vblank(running_machine *machine)
 
 	timer_adjust_oneshot(vbout_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 }
-

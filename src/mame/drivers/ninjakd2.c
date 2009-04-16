@@ -76,6 +76,13 @@ Notes:
   ROM is replaced with a double-sized decrypted version. They are presumably
   bootlegs but this isn't known for sure.
 
+- For Ninja Kid II: On Nov 15, 2008 a fully decrypted sound rom was created by
+  www.segaresurrection.com It allows you to replace the NEC MC8123 and encrypted
+  sound rom with a standard Z80B and the newly decrypted sound without any other
+  mods to the Z80 & sound rom as required by the other "double-sized" version.
+  The CRCs are listed here so it doesn't show up as a newly "found" bootleg version:
+  nk2_06.rom   CRC32: 73b1b0d2  SHA1: 56add8c5f959a86b98aa4870b32aa23455be21ef
+
 - The Ninja Kid II sound program writes to unmapped locations 0xeff5, 0xeff6, and
   0xefee due to a bug. This happens in both the encrypted and decrypted versions,
   so it appears to be a genuine bug with no ill effect.
@@ -117,6 +124,7 @@ Notes:
 TODO:
 -----
 - What does the "credit service" dip switch do in Ninja Kid II?
+
 
 ******************************************************************************/
 
@@ -1476,9 +1484,9 @@ GAME( 1987, ninjak2a, ninjakd2, ninjakd2, ninjakd2, bootleg,  ROT0,   "UPL", "Ni
 GAME( 1987, ninjak2b, ninjakd2, ninjakd2, rdaction, bootleg,  ROT0,   "UPL", "Ninja-Kid II / NinjaKun Ashura no Shou (set 3, bootleg?)", 0 )
 GAME( 1987, rdaction, ninjakd2, ninjakd2, rdaction, ninjakd2, ROT0,   "UPL (World Games license)", "Rad Action / NinjaKun Ashura no Shou", 0 )
 GAME( 1987, mnight,   0,        mnight,   mnight,   mnight,   ROT0,   "UPL (Kawakus license)", "Mutant Night", GAME_IMPERFECT_GRAPHICS )
-GAME( 1987, arkarea,  0,        mnight,   arkarea,  mnight,   ROT0,   "UPL", "Ark Area", 0 )
-GAME( 1988, robokid,  0,        robokid,  robokid,  0,        ROT0,   "UPL", "Atomic Robo-kid", 0 )
-GAME( 1988, robokidj, robokid,  robokid,  robokidj, 0,        ROT0,   "UPL", "Atomic Robo-kid (Japan, set 1)", 0 )
-GAME( 1988, robokdj2, robokid,  robokid,  robokidj, 0,        ROT0,   "UPL", "Atomic Robo-kid (Japan, set 2)", 0 )
-GAME( 1989, omegaf,   0,        omegaf,   omegaf,   0,        ROT270, "UPL", "Omega Fighter", 0 )
-GAME( 1989, omegafs,  omegaf,   omegaf,   omegaf,   0,        ROT270, "UPL", "Omega Fighter Special", 0 )
+GAME( 1987, arkarea,  0,        mnight,   arkarea,  mnight,   ROT0,   "UPL", "Ark Area", GAME_IMPERFECT_GRAPHICS )
+GAME( 1988, robokid,  0,        robokid,  robokid,  0,        ROT0,   "UPL", "Atomic Robo-kid", GAME_IMPERFECT_GRAPHICS )
+GAME( 1988, robokidj, robokid,  robokid,  robokidj, 0,        ROT0,   "UPL", "Atomic Robo-kid (Japan, set 1)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1988, robokdj2, robokid,  robokid,  robokidj, 0,        ROT0,   "UPL", "Atomic Robo-kid (Japan, set 2)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1989, omegaf,   0,        omegaf,   omegaf,   0,        ROT270, "UPL", "Omega Fighter", GAME_IMPERFECT_GRAPHICS )
+GAME( 1989, omegafs,  omegaf,   omegaf,   omegaf,   0,        ROT270, "UPL", "Omega Fighter Special", GAME_IMPERFECT_GRAPHICS )

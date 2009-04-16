@@ -163,6 +163,7 @@ struct _analog_item_data
 	int					type;
 	int					min, max;
 	int					cur;
+	int 				defvalue;
 };
 
 
@@ -189,7 +190,7 @@ struct _settings_menu_state
 typedef struct _input_menu_state input_menu_state;
 struct _input_menu_state
 {
-	const void *		lastref;
+	UINT16 				last_sortorder;
 	const void *		pollingref;
 	input_item_data *	pollingitem;
 	UINT8				record_next;
@@ -1778,7 +1779,7 @@ static void menu_input_common(running_machine *machine, ui_menu *menu, void *par
 			/* an item was selected: begin polling */
 			case IPT_UI_SELECT:
 				menustate->pollingitem = item;
-				menustate->lastref = item->ref;
+				menustate->last_sortorder = item->sortorder;
 				menustate->starting_seq = item->seq;
 				input_seq_poll_start((item->type == INPUT_TYPE_ANALOG) ? ITEM_CLASS_ABSOLUTE : ITEM_CLASS_SWITCH, menustate->record_next ? &item->seq : NULL);
 				invalidate = TRUE;
@@ -1793,9 +1794,9 @@ static void menu_input_common(running_machine *machine, ui_menu *menu, void *par
 		}
 
 		/* if the selection changed, reset the "record next" flag */
-		if (item->ref != menustate->lastref)
+		if (item->sortorder != menustate->last_sortorder)
 			menustate->record_next = FALSE;
-		menustate->lastref = item->ref;
+		menustate->last_sortorder = item->sortorder;
 	}
 
 	/* if the sequence changed, update it */
@@ -2222,7 +2223,7 @@ static void menu_analog(running_machine *machine, ui_menu *menu, void *parameter
 		{
 			/* if selected, reset to default value */
 			case IPT_UI_SELECT:
-				newval = data->field->defvalue;
+				newval = data->defvalue;
 				break;
 
 			/* left decrements */
@@ -2331,6 +2332,7 @@ static void menu_analog_populate(running_machine *machine, ui_menu *menu)
 								data->min = 0;
 								data->max = 255;
 								data->cur = settings.delta;
+								data->defvalue = field->delta;
 								break;
 
 							case ANALOG_ITEM_CENTERSPEED:
@@ -2339,6 +2341,7 @@ static void menu_analog_populate(running_machine *machine, ui_menu *menu)
 								data->min = 0;
 								data->max = 255;
 								data->cur = settings.centerdelta;
+								data->defvalue = field->centerdelta;
 								break;
 
 							case ANALOG_ITEM_REVERSE:
@@ -2347,6 +2350,7 @@ static void menu_analog_populate(running_machine *machine, ui_menu *menu)
 								data->min = 0;
 								data->max = 1;
 								data->cur = settings.reverse;
+								data->defvalue = ((field->flags & ANALOG_FLAG_REVERSE) != 0);
 								break;
 
 							case ANALOG_ITEM_SENSITIVITY:
@@ -2355,6 +2359,7 @@ static void menu_analog_populate(running_machine *machine, ui_menu *menu)
 								data->min = 1;
 								data->max = 255;
 								data->cur = settings.sensitivity;
+								data->defvalue = field->sensitivity;
 								break;
 						}
 
@@ -3241,10 +3246,10 @@ static void menu_crosshair_populate(running_machine *machine, ui_menu *menu)
 
 					/* look for files ending in .png with a name not larger then 9 chars*/
 					if ((length > 4) && (length <= CROSSHAIR_PIC_NAME_LENGTH + 4) &&
-						tolower(dir->name[length - 4] == '.') &&
-						tolower(dir->name[length - 3] == 'p') &&
-						tolower(dir->name[length - 2] == 'n') &&
-						tolower(dir->name[length - 1] == 'g'))
+						dir->name[length - 4] == '.' &&
+						tolower(dir->name[length - 3]) == 'p' &&
+						tolower(dir->name[length - 2]) == 'n' &&
+						tolower(dir->name[length - 1]) == 'g')
 
 					{
 						/* remove .png from length */

@@ -590,7 +590,8 @@ const game_driver * const drivers[] =
 	DRIVER( trvmstr )	/* (c) 1985 Enerdyne Technologies Inc. */
 	DRIVER( trvmstra )	/* (c) 1985 Enerdyne Technologies Inc. */
 	DRIVER( trvmstrb )	/* (c) 1985 Enerdyne Technologies Inc. */
-	DRIVER( trvgns )	/* (c) 198? Enerdyne Technologies Inc. */
+	DRIVER( trvmstrc )	/* (c) 1985 Enerdyne Technologies Inc. */
+	DRIVER( trvgns )	/* bootleg */
 
 
 
@@ -1779,12 +1780,12 @@ const game_driver * const drivers[] =
 
 	/* Taito "X"-system games */
 	DRIVER( superman )	/* B61 (c) 1988 Taito Corporation */
-	DRIVER( suprmanj )	/* B61 (c) 1988 Taito Corporation */
+	DRIVER( supermanj )	/* B61 (c) 1988 Taito Corporation */
 	DRIVER( twinhawk )	/* B87 (c) 1989 Taito Corporation Japan (World) */
-	DRIVER( twinhwku )	/* B87 (c) 1989 Taito America Corporation (US) */
+	DRIVER( twinhawku )	/* B87 (c) 1989 Taito America Corporation (US) */
 	DRIVER( daisenpu )	/* B87 (c) 1989 Taito Corporation (Japan) */
 	DRIVER( gigandes )	/* (c) 1989 East Technology */
-	DRIVER( gigandsj )	/* (c) 1989 East Technology */
+	DRIVER( gigandesj )	/* (c) 1989 East Technology */
 	DRIVER( kyustrkr )	/* (c) 1989 East Technology */
 	DRIVER( ballbros )	/* no copyright notice */
 
@@ -1820,18 +1821,18 @@ const game_driver * const drivers[] =
 	/* Taito L-System games */
 	DRIVER( raimais )	/* B36 (c) 1988 Taito Corporation (Japan) */
 	DRIVER( raimaisj )	/* B36 (c) 1988 Taito Corporation */
-	DRIVER( raimaijo )	/* B36 (c) 1988 Taito Corporation */
+	DRIVER( raimaisjo )	/* B36 (c) 1988 Taito Corporation */
 	DRIVER( kurikint )	/* B42 (c) 1988 Taito Corporation Japan (World) */
-	DRIVER( kurikinu )	/* B42 (c) 1988 Taito America Corporation (US) */
-	DRIVER( kurikinj )	/* B42 (c) 1988 Taito Corporation (Japan) */
-	DRIVER( kurikina )	/* B42 (c) 1988 Taito Corporation Japan (World) */
+	DRIVER( kurikintu )	/* B42 (c) 1988 Taito America Corporation (US) */
+	DRIVER( kurikintj )	/* B42 (c) 1988 Taito Corporation (Japan) */
+	DRIVER( kurikinta )	/* B42 (c) 1988 Taito Corporation Japan (World) */
 	DRIVER( evilston )	/* C67 (c) 1990 Spacy Industrial, Ltd */
 	DRIVER( fhawk )		/* B70 (c) 1988 Taito Corporation Japan (World) */
 	DRIVER( fhawkj )	/* B70 (c) 1988 Taito Corporation (Japan) */
 	DRIVER( plotting )	/* B96 (c) 1989 Taito Corporation Japan (World) */
-	DRIVER( plottinu )	/* B96 (c) 1989 Taito Corporation Japan (US) */
-	DRIVER( plottina )	/* B96 (c) 1989 Taito Corporation Japan (World) */
-	DRIVER( plottinb )	/* B96 (c) 1989 Taito Corporation Japan (World) */
+	DRIVER( plottingu )	/* B96 (c) 1989 Taito Corporation Japan (US) */
+	DRIVER( plottinga )	/* B96 (c) 1989 Taito Corporation Japan (World) */
+	DRIVER( plottingb )	/* B96 (c) 1989 Taito Corporation Japan (World) */
 	DRIVER( flipull )	/* B96 (c) 1989 Taito Corporation Japan (World) */
 	DRIVER( champwr )	/* C01 (c) 1989 Taito Corporation Japan (World) */
 	DRIVER( champwru )	/* C01 (c) 1989 Taito America Corporation (US) */
@@ -1868,8 +1869,8 @@ const game_driver * const drivers[] =
 	DRIVER( tetrist )	/* C12 (c) 1989 Sega Enterprises,Ltd. (Japan) */
 	DRIVER( tetrista )	/* C35 (c) 1989 Sega Enterprises,Ltd. (Japan) */
 	DRIVER( viofight )	/* C16 (c) 1989 Taito Corporation Japan (World) */
-	DRIVER( viofighu )	/* C16 (c) 1989 Taito America Corporation (US) */
-	DRIVER( viofighj )	/* C16 (c) 1989 Taito Corporation (Japan) */
+	DRIVER( viofightu )	/* C16 (c) 1989 Taito America Corporation (US) */
+	DRIVER( viofightj )	/* C16 (c) 1989 Taito Corporation (Japan) */
 	DRIVER( ashura )	/* C43 (c) 1990 Taito Corporation (Japan) */
 	DRIVER( ashurau )	/* C43 (c) 1990 Taito America Corporation (US) */
 	DRIVER( hitice )	/* C59 (c) 1990 Williams (US) */
@@ -1930,17 +1931,17 @@ const game_driver * const drivers[] =
 	DRIVER( finalbj )	/* 1989.04 B82 (c) 1988 Taito Corporation (Japan) */
 	DRIVER( finalbu )	/* 1989.06 B82 (c) 1988 Taito America Corporation (US) */
 	DRIVER( dondokod )	/* 1989.?? B95 (c) 1989 Taito Corporation Japan (World) */
-	DRIVER( dondokdu )	/* 1989.?? B95 (c) 1989 Taito America Corporation (US) */
-	DRIVER( dondokdj )	/* 1989.07 B95 (c) 1989 Taito Corporation (Japan) */
+	DRIVER( dondokodu )	/* 1989.?? B95 (c) 1989 Taito America Corporation (US) */
+	DRIVER( dondokodj )	/* 1989.07 B95 (c) 1989 Taito Corporation (Japan) */
 	DRIVER( megab )		/* 1989.?? C11 (c) 1989 Taito Corporation Japan (World) */
 	DRIVER( megabj )	/* 1989.11 C11 (c) 1989 Taito Corporation (Japan) */
 	DRIVER( thundfox )	/* 1990.?? C28 (c) 1990 Taito Corporation Japan (World) */
-	DRIVER( thndfoxu )	/* 1990.06 C28 (c) 1990 Taito America Corporation (US) */
-	DRIVER( thndfoxj )	/* 1990.07 C28 (c) 1990 Taito Corporation (Japan) */
+	DRIVER( thundfoxu )	/* 1990.06 C28 (c) 1990 Taito America Corporation (US) */
+	DRIVER( thundfoxj )	/* 1990.07 C28 (c) 1990 Taito Corporation (Japan) */
 	DRIVER( cameltry )	/* 1990.?? C38 (c) 1989 Taito America Corporation (US) */
-	DRIVER( camltrya )	/* 1990.?? C38 (c) 1989 Taito America Corporation (US) */
-	DRIVER( camltrua )	/* 1990.?? C38 (c) 1989 Taito America Corporation (US) */
-	DRIVER( cameltrj )	/* 1990.04 C38 (c) 1989 Taito Corporation (Japan) */
+	DRIVER( cameltrya )	/* 1990.?? C38 (c) 1989 Taito America Corporation (US) */
+	DRIVER( cameltryua )/* 1990.?? C38 (c) 1989 Taito America Corporation (US) */
+	DRIVER( cameltryj )	/* 1990.04 C38 (c) 1989 Taito Corporation (Japan) */
 	DRIVER( qtorimon )	/* 1990.02 C41 (c) 1990 Taito Corporation (Japan) */
 	DRIVER( liquidk )	/* 1990.?? C49 (c) 1990 Taito Corporation Japan (World) */
 	DRIVER( liquidku )	/* 1990.?? C49 (c) 1990 Taito America Corporation (US) */
@@ -1950,12 +1951,12 @@ const game_driver * const drivers[] =
 	DRIVER( majest12 )	/* 1990.11 C64 (c) 1990 Taito Corporation (Japan) */
 						/* 1990.12 C64 (US) */
 	DRIVER( gunfront )	/* 1991.?? C71 (c) 1990 Taito Corporation Japan (World) */
-	DRIVER( gunfronj )	/* 1991.01 C71 (c) 1990 Taito Corporation (Japan) */
+	DRIVER( gunfrontj )	/* 1991.01 C71 (c) 1990 Taito Corporation (Japan) */
 	DRIVER( growl )		/* 1991.?? C74 (c) 1990 Taito Corporation Japan (World) */
 	DRIVER( growlu )	/* 1991.02 C74 (c) 1990 Taito America Corporation (US) */
 	DRIVER( runark )	/* 1991.02 C74 (c) 1990 Taito Corporation (Japan) */
 	DRIVER( mjnquest )	/* 1991.05 C77 (c) 1990 Taito Corporation (Japan) */
-	DRIVER( mjnquesb )	/* 1991.05 C77 (c) 1990 Taito Corporation (Japan) */
+	DRIVER( mjnquestb )	/* 1991.05 C77 (c) 1990 Taito Corporation (Japan) */
 	DRIVER( footchmp )	/* 1991.?? C80 (c) 1990 Taito Corporation Japan (World) */
 	DRIVER( hthero )	/* 1991.03 C80 (c) 1990 Taito Corporation (Japan) */
 	DRIVER( euroch92 )	/* 1991.??     (c) 1992 Taito Corporation Japan (World) */
@@ -1967,13 +1968,13 @@ const game_driver * const drivers[] =
 	DRIVER( solfigtr )	/* 1991.?? C91 (c) 1991 Taito Corporation Japan (World) */
 	DRIVER( qzquest )	/* 1991.07 C92 (c) 1991 Taito Corporation (Japan) */
 	DRIVER( pulirula )	/* 1991.?? C98 (c) 1991 Taito Corporation Japan (World) */
-	DRIVER( pulirulj )	/* 1991.11 C98 (c) 1991 Taito Corporation (Japan) */
+	DRIVER( pulirulaj )	/* 1991.11 C98 (c) 1991 Taito Corporation (Japan) */
 	DRIVER( metalb )	/* 1991.?? D16? (c) 1991 Taito Corporation Japan (World) */
 	DRIVER( metalbj )	/* 1991.11 D12 (c) 1991 Taito Corporation (Japan) */
 	DRIVER( qzchikyu )	/* 1992.02 D19 (c) 1991 Taito Corporation (Japan) */
 	DRIVER( yesnoj )	/* 1992.03 D20 (c) 1992 Taito Corporation (Japan) */
 	DRIVER( deadconx )	/* 1992.?? D28 (c) 1992 Taito Corporation Japan (World) */
-	DRIVER( deadconj )	/* 1992.08 D28 (c) 1992 Taito Corporation (Japan) */
+	DRIVER( deadconxj )	/* 1992.08 D28 (c) 1992 Taito Corporation (Japan) */
 	DRIVER( dinorex )	/* 1992.?? D39 (c) 1992 Taito Corporation Japan (World) */
 	DRIVER( dinorexj )	/* 1992.11 D39 (c) 1992 Taito Corporation (Japan) */
 	DRIVER( dinorexu )	/* 1992.?? D39 (c) 1992 Taito America Corporation (US) */
@@ -2657,6 +2658,7 @@ V-V                           TP-027
 	DRIVER( nwarru )	/* 06/04/1995 (c) 1995 (US) */
 	DRIVER( nwarrh )	/* 03/04/1995 (c) 1995 (Hispanic) */
 	DRIVER( nwarrb )	/* 03/04/1995 (c) 1995 (Brazil) */
+	DRIVER( nwarra )	/* 02/03/1995 (c) 1995 (Asia) */
 	DRIVER( vhuntj )	/* 02/03/1995 (c) 1995 (Japan) */
 	DRIVER( vhuntjr1 )	/* 07/03/1995 (c) 1995 (Japan) */
 	DRIVER( vhuntjr2 )	/* 02/03/1995 (c) 1995 (Japan) */
@@ -2793,6 +2795,7 @@ V-V                           TP-027
 	DRIVER( 1944 )		/* 20/06/2000 (c) 2000 Eighting/Raizing (US) */
 	DRIVER( 1944j )		/* 20/06/2000 (c) 2000 Eighting/Raizing (Japan) */
 	DRIVER( mpang )		/* 10/10/2000 (c) 2000 Mitchell (Euro) */
+	DRIVER( mpangr1 )	/* 25/09/2000 (c) 2000 Mitchell (Euro) */
 	DRIVER( mpangu )	/* 10/10/2000 (c) 2000 Mitchell (US) */
 	DRIVER( mpangj )	/* 11/10/2000 (c) 2000 Mitchell (Japan) */
 	DRIVER( progear )	/* 17/01/2001 (c) 2001 Cave (US) */
@@ -4296,7 +4299,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 1999.12 Puyopuyo DA! */
 						/* 1999.12 Mars TV */
 						/* 2000.01 18 Wheeler */
-						/* 2000.01 The Typing of the Dead */
+	DRIVER( totd )		/* 2000.01 The Typing of the Dead */
 	DRIVER( spawn )		/* 2000.01 Spawn */
 	DRIVER( doa2m )		/* 2000.01 Dead or Alive 2 Millenium */
 						/* 2000.02 Touch de UNO! 2 */
@@ -4585,43 +4588,63 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 		/* cassette system, parent is decocass */
 	DRIVER( decocass )
 	DRIVER( ctsttape )	/* ? */
-	DRIVER( cterrani )	/* 04 (c) 1981 */
-	DRIVER( castfant )	/* 07 (c) 1981 */
-	DRIVER( csuperas )	/* 09 (c) 1981 */
-	DRIVER( clocknch )	/* 11 (c) 1981 */
-	DRIVER( cprogolf )	/* 13 (c) 1981 */
-	DRIVER( cluckypo )	/* 15 (c) 1981 */
-	DRIVER( ctisland )	/* 16 (c) 1981 */
-	DRIVER( ctislnd2 )	/* 16 (c) 1981 */
-	DRIVER( ctislnd3 )	/* 16? (c) 1981 */
-	DRIVER( cdiscon1 )	/* 19 (c) 1982 */
-	DRIVER( csweetht )	/* ?? (c) 1982, clone of disco no 1 */
-	DRIVER( ctornado )	/* 20 (c) 1982 */
-	DRIVER( cmissnx )	/* 21 (c) 1982 */
-	DRIVER( cptennis )	/* 22 (c) 1982 */
-	DRIVER( cexplore )	/* ?? (c) 1982 */
-	DRIVER( cbtime )	/* 26 (c) 1982 */
-	DRIVER( cburnrub )	/* ?? (c) 1982 */
-	DRIVER( cburnrb2 )	/* ?? (c) 1982 */
-	DRIVER( cbnj )		/* 27 (c) 1982 */
-	DRIVER( cgraplop )	/* 28 (c) 1983 */
-	DRIVER( cgraplp2 )	/* 28? (c) 1983 */
-	DRIVER( clapapa )	/* 29 (c) 1983 */
-	DRIVER( clapapa2 )	/* 29 (c) 1983 */ /* this one doesn't display lapapa anyehere */
-	DRIVER( cnightst )	/* 32 (c) 1983 */
-	DRIVER( cnights2 )	/* 32 (c) 1983 */
-	DRIVER( cprosocc )	/* 33 (c) 1983 */
-	DRIVER( cprobowl )	/* ?? (c) 1983 */
-	DRIVER( cscrtry )	/* 38 (c) 1984 */
-	DRIVER( cscrtry2 )	/* 38 (c) 1984 */
-	DRIVER( cppicf )	/* 39 (c) 1984 */
-	DRIVER( cppicf2 )	/* 39 (c) 1984 */
-	DRIVER( cfghtice )	/* 40 (c) 1984 */
-	DRIVER( cbdash )	/* 44 (c) 1985 */
-		/* the following don't work at all */
-	DRIVER( chwy )		/* ?? (c) 198? */
-	DRIVER( cflyball )	/* ?? (c) 198? */
-	DRIVER( czeroize )	/* ?? (c) 198? */
+	DRIVER( chwy )		/* 01 1980.12 Highway Chase */
+						/* 02 1980.12 Sengoku Ninjatai */
+						/* 03 1981.01 Manhattan */
+	DRIVER( cterrani )	/* 04 1981.02 Terranian */
+						/* 05 1981.?? Missile Sprinter */
+						/* 06 1980.12 Nebbler */
+	DRIVER( castfant )	/* 07 1981.02 Astro Fantasia */
+						/* 08 1981.03 The Tower */
+	DRIVER( csuperas )	/* 09 1981.05 Super Astro Fighter */
+						/* 10 1981.?? Ocean to Ocean (medal) */
+	DRIVER( clocknch )	/* 11 1981.04 Rock'n Chase */
+						/* 12 1981.08 Flash Boy/DECO Kid */
+	DRIVER( cprogolf )	/* 13 1981.08 Pro Golf */
+						/* 14 1981.06 DS Telejan */
+	DRIVER( cluckypo )	/* 15 1981.?? Lucky Poker */
+	DRIVER( ctisland )	/* 16 1982.02 Treasure Island */
+	DRIVER( ctislnd2 )	/* 16 */
+	DRIVER( ctislnd3 )	/* 16 */
+						/* 17 1981.10 Bobbit */
+	DRIVER( cexplore )	/* 18 1982.02 Explorer */
+	DRIVER( cdiscon1 )	/* 19 1982.04 Disco No.1 */
+	DRIVER( csweetht )	/* 19 */
+	DRIVER( ctornado )	/* 20 1982.05 Tornado */
+	DRIVER( cmissnx )	/* 21 1982.04 Mission X/Zoar */
+	DRIVER( cptennis )	/* 22 1982.06 Pro Tennis */
+						/* 23 1982.?? 18 Hole Pro Golf */
+						/* 24 1982.07 Tsumego Kaisyou */
+						/* 25 1982.10 Fishing */
+	DRIVER( cbtime )	/* 26 1982.08 Hamburger/Burger Time */
+	DRIVER( cburnrub )	/* 27 1982.11 Burnin' Rubber/Bump'n Jump */
+	DRIVER( cburnrb2 )	/* 27 */
+	DRIVER( cbnj )		/* 27 */
+	DRIVER( cgraplop )	/* 28 1982.11 Grapelop */
+	DRIVER( cgraplp2 )	/* 28 */
+	DRIVER( clapapa )	/* 29 1982.11 Lapapa/Rootin' Tootin' */
+	DRIVER( clapapa2 )	/* 29 */ /* this one doesn't display lapapa anyehere */
+						/* 30 1983.03 Skater */
+	DRIVER( cprobowl )	/* 31 1983.03 Pro Bowling */
+	DRIVER( cnightst )	/* 32 1983.04 Night Star */
+	DRIVER( cnights2 )	/* 32 */
+	DRIVER( cprosocc )	/* 33 1982.08 Pro Soccer */
+						/* 34 1983.09 Super Doubles Tennis */
+	DRIVER( cflyball )	/* 35 1983.?? Bampoline/Flying Ball */
+						/* 36 1984.04 Genesis/Boomer Rang'r */
+	DRIVER( czeroize )	/* 37 1983.10 Zeroize */ /* doesn't work at all */
+	DRIVER( cscrtry )	/* 38 1984.03 Scrum Try */
+	DRIVER( cscrtry2 )	/* 38 */
+	DRIVER( cppicf )	/* 39 1984.02 Peter Pepper's Ice Cream Factory */
+	DRIVER( cppicf2 )	/* 39 */
+	DRIVER( cfghtice )	/* 40 1984.04 Fighting Ice Hockey */
+						/* 41 1984.05 Oozumou */
+						/* 42 1984.08 Hellow Gateball */ /* not a typo, this is official spelling */
+						/* 43 1984.08 Yellow Cab */
+	DRIVER( cbdash )	/* 44 1985.08 Boulder Dash */
+						/* UX7 1984.12 Tokyo Mie Shinryoujo */
+						/* UX8 1985.01 Tokyo Mie Shinryoujo Part 2 */
+						/* UX9 1985.05 Geinoujin Shikaku Shiken */
 
 	/* other Data East games */
 	DRIVER( madalien )	/* (c) 1980 */
@@ -4802,6 +4825,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( rohga2 )	/* MAM (c) 1991 Data East Corporation (Asia/Euro) */
 	DRIVER( rohgah )	/* MAM (c) 1991 Data East Corporation (Hong Kong) */
 	DRIVER( rohgau )	/* MAM (c) 1991 Data East Corporation (US) */
+	DRIVER( wolffang )	/* MAM (c) 1991 Data East Corporation (Japan) */
 	DRIVER( schmeisr )	/*     (c) 1993 Hot B */
 	DRIVER( captaven )	/* MAN (c) 1991 Data East Corporation (Asia) */
 	DRIVER( captavna )	/* MAN (c) 1991 Data East Corporation (Asia) */
@@ -5263,6 +5287,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( gaiapolj )	/* GX123 (c) 1993 (Japan) */
 	DRIVER( mystwarr )	/* GX128 (c) 1993 (World) */
 	DRIVER( mystwaru )	/* GX128 (c) 1993 (US) */
+	DRIVER( mystwarj )	/* GX128 (c) 1993 (Japan) */
 	DRIVER( viostorm )	/* GX168 (c) 1993 (Europe) */
 	DRIVER( viostrmu )	/* GX168 (c) 1993 (US) */
 	DRIVER( viostmub )	/* GX168 (c) 1993 (US) */
@@ -9017,6 +9042,7 @@ Other Sun games
 
 	DRIVER( ladylinr )	/* (c) 198? TAB Austria */
 	DRIVER( kkojnoli )	/* 198? south korean hack */
+	DRIVER( wcat3 )
 	DRIVER( mtonic )	/* 198? (c) Tonic */
 
 	DRIVER( sfbonus )	/* (c) 199? Amcoe */
@@ -9391,5 +9417,7 @@ Other Sun games
 
 	/* MPU5 */
 	DRIVER( m_honmon )
+
+	DRIVER( roul )
 
 #endif	/* DRIVER_RECURSIVE */

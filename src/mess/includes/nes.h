@@ -10,8 +10,25 @@
 #define NES_H_
 
 
+/***************************************************************************
+    CONSTANTS
+***************************************************************************/
+
 #define NTSC_CLOCK		N2A03_DEFAULTCLOCK	/* 1.789772 MHz */
 #define PAL_CLOCK		(26601712.0/16)		/* 1.662607 MHz */
+
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef struct _nes_state nes_state;
+struct _nes_state
+{
+	const device_config *ppu;
+	const device_config *sound;
+	const device_config *cart;
+};
 
 
 /*----------- defined in machine/nes.c -----------*/

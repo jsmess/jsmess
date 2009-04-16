@@ -19,6 +19,8 @@
 #define DEBUG_MAPLE	(0)
 #define DEBUG_MAPLE_REGS	(0)
 
+#define ENABLE_MAPLE_IRQ (0)
+
 #if DEBUG_SYSCTRL
 static const char *const sysctrl_names[] =
 {
@@ -374,12 +376,14 @@ WRITE64_HANDLER( dc_maple_w )
 	{
 	case SB_MDST:
 		maple_regs[reg] = old;
-		if (!(old & 1) && (dat & 1)) // 0 -> 1
+		if (!(old & 1) && (dat & 1) && maple_regs[SB_MDEN] & 1) // 0 -> 1
 		{
 			if (!(maple_regs[SB_MDTSEL] & 1))
 			{
 				maple_regs[reg] = 1;
 				dat=maple_regs[SB_MDSTAR];
+				//printf("Maple DMA: %08x %08x %08x %08x\n",maple_regs[SB_MDSTAR],maple_regs[SB_MDTSEL],maple_regs[SB_MDEN],maple_regs[SB_MDST]);
+				//printf("           %08x %08x %08x %08x\n",maple_regs[SB_MSYS],maple_regs[SB_MST],maple_regs[SB_MSHTCL],maple_regs[SB_MMSEL]);
 				while (1) // do transfers
 				{
 					ddtdata.source=dat;		// source address
@@ -413,7 +417,7 @@ WRITE64_HANDLER( dc_maple_w )
 							case 3:
 								ddtdata.length=1;
 								#if DEBUG_MAPLE
-								mame_printf_verbose("MAPLE: transfer command %d port %d\n", command, port);
+								printf("MAPLE: transfer command %x port %x\n", command, port);
 								#endif
 								break;
 							case 0x80: // get data and compute checksum
@@ -453,7 +457,7 @@ WRITE64_HANDLER( dc_maple_w )
 
 								subcommand = buff[0] & 0xff;
 								#if DEBUG_MAPLE
-								mame_printf_verbose("MAPLE: transfer command %d port %d subcommand %d\n", command, port, subcommand);
+								printf("MAPLE: transfer command %x port %x subcommand %x\n", command, port, subcommand);
 								#endif
 								if (subcommand == 3) // read data
 								{
@@ -485,7 +489,7 @@ WRITE64_HANDLER( dc_maple_w )
 									jvs_address = (buff[1] >> 16) & 0xff; // slave address
 									jvs_command = buff[2] & 0xff; // jvs command
 									#if DEBUG_MAPLE
-									mame_printf_verbose("MAPLE: sent jvs command %d\n", jvs_command);
+									printf("MAPLE: sent jvs command %x\n", jvs_command);
 									#endif
 									buff[1] = 0xe4e3e2e1;
 									ddtdata.length = 2;
@@ -703,7 +707,7 @@ WRITE64_HANDLER( dc_maple_w )
 								break;
 							default:
 								#if DEBUG_MAPLE
-								mame_printf_verbose("MAPLE: unknown transfer command %d port %d\n", command, port);
+								printf("MAPLE: unknown transfer command %x port %x\n", command, port);
 								#endif
 								ddtdata.length=1;
 								buff[0]=0xffffffff;
@@ -717,6 +721,11 @@ WRITE64_HANDLER( dc_maple_w )
 
 					if (endflag)
 					{
+						#if ENABLE_MAPLE_IRQ
+						/*TODO: this fixes moeru but breaks other games, understand why.*/
+						dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_MAPLE;
+						dc_update_interrupt_status(space->machine);
+						#endif
 						break;
 					}
 					// skip fixed packet header
@@ -729,7 +738,7 @@ WRITE64_HANDLER( dc_maple_w )
 			else
 			{
 				#if DEBUG_MAPLE
-				mame_printf_verbose("MAPLE: hardware trigger not supported yet\n");
+				printf("MAPLE: hardware trigger not supported yet\n");
 				#endif
 			}
 		}
@@ -833,6 +842,7 @@ WRITE64_HANDLER( dc_g1_ctrl_w )
 			device_set_info_ptr(space->machine->cpu[0], CPUINFO_PTR_SH4_EXTERNAL_DDT_DMA, &ddtdata);
 			g1bus_regs[SB_GDST]=0;
 			dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_GDROM;
+			dc_update_interrupt_status(space->machine);
 		}
 		break;
 	}
@@ -904,7 +914,6 @@ WRITE64_HANDLER( dc_g2_ctrl_w )
 				/* 0 rounding size = 32 Mbytes */
 				if(wave_dma.size == 0) { wave_dma.size = 0x200000; }
 
-				/* TODO: use the ddt function. */
 				if(wave_dma.dir == 0)
 				{
 					for(;size<wave_dma.size;size+=4)
@@ -930,6 +939,7 @@ WRITE64_HANDLER( dc_g2_ctrl_w )
 				wave_dma.flag = (wave_dma.indirect & 1) ? 1 : 0;
 				wave_dma.start = g2bus_regs[SB_ADST] = 0;
 				dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_AICA;
+				dc_update_interrupt_status(space->machine);
 			}
 			break;
 	}

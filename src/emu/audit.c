@@ -22,8 +22,8 @@
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static int audit_one_rom(core_options *options, const rom_entry *rom, const char *regiontag, const game_driver *gamedrv, UINT32 validation, audit_record *record);
-static int audit_one_disk(core_options *options, const rom_entry *rom, const game_driver *gamedrv, UINT32 validation, audit_record *record);
+static void audit_one_rom(core_options *options, const rom_entry *rom, const char *regiontag, const game_driver *gamedrv, UINT32 validation, audit_record *record);
+static void audit_one_disk(core_options *options, const rom_entry *rom, const game_driver *gamedrv, UINT32 validation, audit_record *record);
 static int rom_used_by_parent(const game_driver *gamedrv, const rom_entry *romentry, const game_driver **parent);
 
 
@@ -60,7 +60,8 @@ int audit_images(core_options *options, const game_driver *gamedrv, UINT32 valid
 	const rom_entry *region, *rom;
 	const rom_source *source;
 	audit_record *record;
-	int foundany = FALSE;
+	int anyfound = FALSE;
+	int anyrequired = FALSE;
 	int allshared = TRUE;
 	int records;
 
@@ -73,8 +74,13 @@ int audit_images(core_options *options, const game_driver *gamedrv, UINT32 valid
 			for (rom = rom_first_file(region); rom != NULL; rom = rom_next_file(rom))
 				if (ROMREGION_ISROMDATA(region) || ROMREGION_ISDISKDATA(region))
 				{
-					if (source_is_gamedrv && allshared && !rom_used_by_parent(gamedrv, rom, NULL))
-						allshared = FALSE;
+					if (source_is_gamedrv && !ROM_ISOPTIONAL(rom) && !ROM_NOGOODDUMP(rom))
+					{
+						anyrequired = TRUE;
+
+						if (allshared && !rom_used_by_parent(gamedrv, rom, NULL))
+							allshared = FALSE;
+					}
 					records++;
 				}
 	}
@@ -95,33 +101,38 @@ int audit_images(core_options *options, const game_driver *gamedrv, UINT32 valid
 				const char *regiontag = ROMREGION_ISLOADBYNAME(region) ? ROM_GETNAME(region) : NULL;
 				for (rom = rom_first_file(region); rom; rom = rom_next_file(rom))
 				{
-					int shared = rom_used_by_parent(gamedrv, rom, NULL);
-
 					/* audit a file */
 					if (ROMREGION_ISROMDATA(region))
 					{
-						if (audit_one_rom(options, rom, regiontag, gamedrv, validation, record++) && source_is_gamedrv && (!shared || allshared))
-							foundany = TRUE;
+						audit_one_rom(options, rom, regiontag, gamedrv, validation, record);
 					}
 
 					/* audit a disk */
 					else if (ROMREGION_ISDISKDATA(region))
 					{
-						if (audit_one_disk(options, rom, gamedrv, validation, record++) && source_is_gamedrv && (!shared || allshared))
-							foundany = TRUE;
+						audit_one_disk(options, rom, gamedrv, validation, record);
 					}
+
+					else
+					{
+						continue;
+					}
+
+					if (source_is_gamedrv && record->status != AUDIT_STATUS_NOT_FOUND && (allshared || !rom_used_by_parent(gamedrv, rom, NULL)))
+						anyfound = TRUE;
+
+					record++;
 				}
 			}
-
-			/* if we found nothing, we don't have the set at all */
-			if (rom_source_is_gamedrv(gamedrv, source) && !foundany)
-			{
-				free(*audit);
-				*audit = NULL;
-				records = 0;
-				break;
-			}
 		}
+	}
+
+	/* if we found nothing, we don't have the set at all */
+	if (!anyfound && anyrequired)
+	{
+		free(*audit);
+		*audit = NULL;
+		records = 0;
 	}
 
 	machine_config_free(config);
@@ -227,14 +238,11 @@ skip:
 int audit_summary(const game_driver *gamedrv, int count, const audit_record *records, int output)
 {
 	int overall_status = CORRECT;
-	int notfound = 0;
 	int recnum;
 
-	/* no count AND no records means not found, no count only means no ROMs required (= correct) */
+	/* no count AND no records means not found */
 	if (count == 0 && records == NULL)
 		return NOTFOUND;
-        else if (count == 0)
-		return CORRECT;
 
 	/* loop over records */
 	for (recnum = 0; recnum < count; recnum++)
@@ -245,10 +253,6 @@ int audit_summary(const game_driver *gamedrv, int count, const audit_record *rec
 		/* skip anything that's fine */
 		if (record->substatus == SUBSTATUS_GOOD)
 			continue;
-
-		/* count the number of missing items */
-		if (record->status == AUDIT_STATUS_NOT_FOUND)
-			notfound++;
 
 		/* output the game name, file name, and length (if applicable) */
 		if (output)
@@ -316,7 +320,7 @@ int audit_summary(const game_driver *gamedrv, int count, const audit_record *rec
 		overall_status = MAX(overall_status, best_new_status);
 	}
 
-	return (notfound == count) ? NOTFOUND : overall_status;
+	return overall_status;
 }
 
 
@@ -329,7 +333,7 @@ int audit_summary(const game_driver *gamedrv, int count, const audit_record *rec
     audit_one_rom - validate a single ROM entry
 -------------------------------------------------*/
 
-static int audit_one_rom(core_options *options, const rom_entry *rom, const char *regiontag, const game_driver *gamedrv, UINT32 validation, audit_record *record)
+static void audit_one_rom(core_options *options, const rom_entry *rom, const char *regiontag, const game_driver *gamedrv, UINT32 validation, audit_record *record)
 {
 	const game_driver *drv;
 	UINT32 crc = 0;
@@ -442,9 +446,6 @@ static int audit_one_rom(core_options *options, const rom_entry *rom, const char
 		else
 			set_status(record, AUDIT_STATUS_GOOD, SUBSTATUS_GOOD);
 	}
-
-	/* return TRUE if we found anything at all */
-	return (drv != NULL);
 }
 
 
@@ -452,7 +453,7 @@ static int audit_one_rom(core_options *options, const rom_entry *rom, const char
     audit_one_disk - validate a single disk entry
 -------------------------------------------------*/
 
-static int audit_one_disk(core_options *options, const rom_entry *rom, const game_driver *gamedrv, UINT32 validation, audit_record *record)
+static void audit_one_disk(core_options *options, const rom_entry *rom, const game_driver *gamedrv, UINT32 validation, audit_record *record)
 {
 	mame_file *source_file;
 	chd_file *source;
@@ -517,9 +518,6 @@ static int audit_one_disk(core_options *options, const rom_entry *rom, const gam
 		chd_close(source);
 		mame_fclose(source_file);
 	}
-
-	/* return TRUE if we found anything at all */
-	return (source != NULL);
 }
 
 

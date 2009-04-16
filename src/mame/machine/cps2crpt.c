@@ -823,6 +823,7 @@ static const struct game_keys keys_table[] =
 	{ "nwarru",   { 0x104a7d0c,0x3f1b7a1e }, 0x180000 },	// 0838 0000 6160  btst    #0,$6160
 	{ "nwarrh",   { 0xc4961b01,0x2a946020 }, 0x180000 },	// 0838 0000 6160  btst    #0,$6160
 	{ "nwarrb",   { 0x17c67109,0xb7362a20 }, 0x180000 },	// 0838 0000 6160  btst    #0,$6160
+	{ "nwarra",   { 0x4e940d0c,0x39b861a4 }, 0x180000 },	// 0838 0000 6160  btst    #0,$6160
 	{ "vhuntj",   { 0x1135b2c3,0xa4e9d7f2 }, 0x180000 },	// 0838 0000 6160  btst    #0,$6160
 	{ "vhuntjr1", { 0x1135b2c3,0xa4e9d7f2 }, 0x180000 },	// 0838 0000 6160  btst    #0,$6160
 	{ "vhuntjr2", { 0x1135b2c3,0xa4e9d7f2 }, 0x180000 },	// 0838 0000 6160  btst    #0,$6160
@@ -945,6 +946,7 @@ static const struct game_keys keys_table[] =
 	{ "mmatrix",  { 0xac9ebd79,0x410467df }, 0x180000 },	// B6C0 B447 BACF  cmpa.w  D0,A3   cmp.w   D7,D2   cmpa.w  A7,A5
 	{ "mmatrixj", { 0x4df81e95,0x72ed9823 }, 0x180000 },	// B6C0 B447 BACF  cmpa.w  D0,A3   cmp.w   D7,D2   cmpa.w  A7,A5
 	{ "mpang",    { 0x95f741c6,0xe547a21b }, 0x100000 },	// 0C84 347D 89A3  cmpi.l  #$347D89A3,D4
+	{ "mpangr1",  { 0x95f741c6,0xe547a21b }, 0x100000 },	// 0C84 347D 89A3  cmpi.l  #$347D89A3,D4
 	{ "mpangu",   { 0x95f741c6,0xe547a21b }, 0x100000 },	// 0C84 347D 89A3  cmpi.l  #$347D89A3,D4
 	{ "mpangj",   { 0x95f741c6,0xe547a21b }, 0x100000 },	// 0C84 347D 89A3  cmpi.l  #$347D89A3,D4
 	{ "pzloop2",  { 0xa054f812,0xc40d36b4 }, 0x400000 },	// 0C82 9A73 15F1  cmpi.l  #$9A7315F1,D2

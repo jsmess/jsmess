@@ -108,6 +108,12 @@
 #endif /* MESS */
 
 
+/* temporary: set this to 1 to enable the originally defined behavior that
+   a field specified via PORT_MODIFY which intersects a previously-defined
+   field completely wipes out the previous definition */
+#define INPUT_PORT_OVERRIDE_FULLY_NUKES_PREVIOUS	1
+
+
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
@@ -2219,7 +2225,7 @@ static void frame_update_analog_field(analog_field_state *analog)
 	if (analog->autocenter)
 	{
 		INT32 center = APPLY_INVERSE_SENSITIVITY(analog->center, analog->sensitivity);
-		if (!analog->lastdigital && !keypressed)
+		if (analog->lastdigital && !keypressed)
 		{
 			/* autocenter from positive values */
 			if (analog->accum >= center)
@@ -2244,8 +2250,7 @@ static void frame_update_analog_field(analog_field_state *analog)
 			}
 		}
 	}
-
-	if (!keypressed)
+	else if (!keypressed)
 		analog->lastdigital = FALSE;
 }
 
@@ -3066,7 +3071,7 @@ static void field_config_insert(input_field_config *field, input_port_value *dis
 			config->mask &= ~field->mask;
 
 			/* if the new entry fully overrides the previous one, we nuke */
-			if (config->mask == 0)
+			if (INPUT_PORT_OVERRIDE_FULLY_NUKES_PREVIOUS || config->mask == 0)
 			{
 				field_config_free((input_field_config **)scanfieldptr);
 				scanfieldnextptr = scanfieldptr;
