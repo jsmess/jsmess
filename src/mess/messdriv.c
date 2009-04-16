@@ -221,24 +221,24 @@ const game_driver * const drivers[] =
 	DRIVER( z88 )		/*													*/
 
 	/* AMSTRAD */
-//0130u3	DRIVER( cpc464 )	/* Amstrad (Schneider in Germany) 1984				*/
-//0130u3	DRIVER( cpc664 )	/* Amstrad (Schneider in Germany) 1985				*/
-//0130u3	DRIVER( cpc6128 )	/* Amstrad (Schneider in Germany) 1985				*/
-//0130u3	DRIVER( cpc6128s )	/* Amstrad (Schneider in Germany) 1985				*/
-//0130u3	DRIVER( cpc6128f )	/* Amstrad (Schneider in Germany) 1985 (AZERTY)		*/
-//0130u3	DRIVER( cpc464p )	/* Amstrad CPC464  Plus - 1990						*/
-//0130u3	DRIVER( cpc6128p )	/* Amstrad CPC6128 Plus - 1990						*/
-//0130u3	DRIVER( gx4000 )	/* Amstrad GX4000 - 1990							*/
-//0130u3	DRIVER( kccomp )	/* VEB KC compact									*/
-//0130u3	DRIVER( al520ex )	/* Patisonic Aleste 520EX (1993)					*/
-//0130u3	DRIVER( pcw8256 )	/* 198? PCW8256										*/
-//0130u3	DRIVER( pcw8512 )	/* 198? PCW8512										*/
-//0130u3	DRIVER( pcw9256 )	/* 198? PCW9256										*/
-//0130u3	DRIVER( pcw9512 )	/* 198? PCW9512 (+)									*/
-//0130u3	DRIVER( pcw10 ) 	/* 198? PCW10										*/
-//0130u3	DRIVER( pcw16 )		/* 1995 PCW16										*/
-//0130u3	DRIVER( nc100 )		/* 19?? NC100										*/
-//0130u3	DRIVER( nc200 )		/* 19?? NC200										*/
+	DRIVER( cpc464 )	/* Amstrad (Schneider in Germany) 1984				*/
+	DRIVER( cpc664 )	/* Amstrad (Schneider in Germany) 1985				*/
+	DRIVER( cpc6128 )	/* Amstrad (Schneider in Germany) 1985				*/
+	DRIVER( cpc6128s )	/* Amstrad (Schneider in Germany) 1985				*/
+	DRIVER( cpc6128f )	/* Amstrad (Schneider in Germany) 1985 (AZERTY)		*/
+	DRIVER( cpc464p )	/* Amstrad CPC464  Plus - 1990						*/
+	DRIVER( cpc6128p )	/* Amstrad CPC6128 Plus - 1990						*/
+	DRIVER( gx4000 )	/* Amstrad GX4000 - 1990							*/
+	DRIVER( kccomp )	/* VEB KC compact									*/
+	DRIVER( al520ex )	/* Patisonic Aleste 520EX (1993)					*/
+	DRIVER( pcw8256 )	/* 198? PCW8256										*/
+	DRIVER( pcw8512 )	/* 198? PCW8512										*/
+	DRIVER( pcw9256 )	/* 198? PCW9256										*/
+	DRIVER( pcw9512 )	/* 198? PCW9512 (+)									*/
+	DRIVER( pcw10 ) 	/* 198? PCW10										*/
+	DRIVER( pcw16 )		/* 1995 PCW16										*/
+	DRIVER( nc100 )		/* 19?? NC100										*/
+	DRIVER( nc200 )		/* 19?? NC200										*/
 
 	/* APPLE */
 	DRIVER( apple1 )	/* Jul 1976 Apple 1									*/
@@ -688,131 +688,131 @@ XL/XE 16kB OS roms
 	DRIVER( c1pmf )
 
 	/* ASCII & MICROSOFT */
-//0130u3	DRIVER( msx )		/* 1983 MSX 										*/
-//0130u3	DRIVER( ax170 )
-//0130u3	DRIVER( canonv10 )
-//0130u3	DRIVER( canonv20 )
-//0130u3	DRIVER( dpc100 )	/* 1984 MSX Korea									*/
-//0130u3	DRIVER( dpc180 )	/* 1984 MSX Korea									*/
-//0130u3	DRIVER( dpc200 )	/* 1984 MSX Korea									*/
-//0130u3	DRIVER( gsfc200 )
-//0130u3	DRIVER( expert10 )	/* 1983 MSX Brazil									*/
-//0130u3	DRIVER( expert11 )	/* 1984 MSX Brazil									*/
-//0130u3	DRIVER( expert13 )	/* 1984 MSX Brazil									*/
-//0130u3	DRIVER( expertdp )	/* 1985 MSX Brazil									*/
-//0130u3	DRIVER( expertpl )	/* 1984 MSX Brazil									*/
-//0130u3	DRIVER( jvchc7gb )
-//0130u3	DRIVER( mlf80 )
-//0130u3	DRIVER( mlfx1 )
-//0130u3	DRIVER( cf1200 )	/* 1984 MSX Japan									*/
-//0130u3	DRIVER( cf2000 )	/* 1983 MSX Japan									*/
-//0130u3	DRIVER( cf2700 )	/* 1984 MSX Japan									*/
-//0130u3	DRIVER( cf3000 )	/* 1984 MSX Japan									*/
-//0130u3	DRIVER( cf3300 )	/* 1985 MSX Japan									*/
-//0130u3	DRIVER( fs1300 )	/* 1985 MSX Japan									*/
-//0130u3	DRIVER( fs4000 )	/* 1985 MSX Japan									*/
-//0130u3	DRIVER( nms801 )
-//0130u3	DRIVER( vg802000 )
-//0130u3	DRIVER( vg802020 )	/* 1985 MSX											*/
-//0130u3	DRIVER( piopx7 )
-//0130u3	DRIVER( mpc100 )
-//0130u3	DRIVER( hotbit11 )	/* 1985 MSX Brazil									*/
-//0130u3	DRIVER( hotbit12 )	/* 1985 MSX	Brazil									*/
-//0130u3	DRIVER( hotbi13b )	/* 1985 MSX	Brazil									*/
-//0130u3	DRIVER( hotbi13p )	/* 1985 MSX	Brazil									*/
-//0130u3	DRIVER( hotbit20 )	/* 1986 MSX2 Brazil									*/
-//0130u3	DRIVER( hb10p )
-//0130u3	DRIVER( hb20p )
-//0130u3	DRIVER( hb201 )		/* 1985 MSX Japan									*/
-//0130u3	DRIVER( hb201p )	/* 1985 MSX											*/
-//0130u3	DRIVER( hb501p )	/* 1984 MSX											*/
-//0130u3	DRIVER( hb55d )		/* 1983 MSX Germany									*/
-//0130u3	DRIVER( hb55p )		/* 1983 MSX											*/
-//0130u3	DRIVER( hb75d )		/* 1983 MSX Germany									*/
-//0130u3	DRIVER( hb75p )		/* 1983 MSX											*/
-//0130u3	DRIVER( svi728 )	/* 1985 MSX											*/
-//0130u3	DRIVER( svi738 )	/* 1985 MSX											*/
-//0130u3	DRIVER( svi738sw )	/* 1985 MSX											*/
-//0130u3	DRIVER( tadpc200 )
-//0130u3	DRIVER( tadpc20a )
-//0130u3	DRIVER( hx10 )		/* 1984 MSX											*/
-//0130u3	DRIVER( hx10s )		/* 1984 MSX											*/
-//0130u3	DRIVER( hx20 )		/* 1984 MSX											*/
-//0130u3	DRIVER( cx5m )
-//0130u3	DRIVER( cx5m128 )
-//0130u3	DRIVER( cx5m2 )
-//0130u3	DRIVER( yis303 )
-//0130u3	DRIVER( yis503 )
-//0130u3	DRIVER( yis503ii )
-//0130u3	DRIVER( y503iir )
-//0130u3	DRIVER( y503iir2 )
-//0130u3	DRIVER( yis503m )
-//0130u3	DRIVER( yc64 )
+	DRIVER( msx )		/* 1983 MSX 										*/
+	DRIVER( ax170 )
+	DRIVER( canonv10 )
+	DRIVER( canonv20 )
+	DRIVER( dpc100 )	/* 1984 MSX Korea									*/
+	DRIVER( dpc180 )	/* 1984 MSX Korea									*/
+	DRIVER( dpc200 )	/* 1984 MSX Korea									*/
+	DRIVER( gsfc200 )
+	DRIVER( expert10 )	/* 1983 MSX Brazil									*/
+	DRIVER( expert11 )	/* 1984 MSX Brazil									*/
+	DRIVER( expert13 )	/* 1984 MSX Brazil									*/
+	DRIVER( expertdp )	/* 1985 MSX Brazil									*/
+	DRIVER( expertpl )	/* 1984 MSX Brazil									*/
+	DRIVER( jvchc7gb )
+	DRIVER( mlf80 )
+	DRIVER( mlfx1 )
+	DRIVER( cf1200 )	/* 1984 MSX Japan									*/
+	DRIVER( cf2000 )	/* 1983 MSX Japan									*/
+	DRIVER( cf2700 )	/* 1984 MSX Japan									*/
+	DRIVER( cf3000 )	/* 1984 MSX Japan									*/
+	DRIVER( cf3300 )	/* 1985 MSX Japan									*/
+	DRIVER( fs1300 )	/* 1985 MSX Japan									*/
+	DRIVER( fs4000 )	/* 1985 MSX Japan									*/
+	DRIVER( nms801 )
+	DRIVER( vg802000 )
+	DRIVER( vg802020 )	/* 1985 MSX											*/
+	DRIVER( piopx7 )
+	DRIVER( mpc100 )
+	DRIVER( hotbit11 )	/* 1985 MSX Brazil									*/
+	DRIVER( hotbit12 )	/* 1985 MSX	Brazil									*/
+	DRIVER( hotbi13b )	/* 1985 MSX	Brazil									*/
+	DRIVER( hotbi13p )	/* 1985 MSX	Brazil									*/
+	DRIVER( hotbit20 )	/* 1986 MSX2 Brazil									*/
+	DRIVER( hb10p )
+	DRIVER( hb20p )
+	DRIVER( hb201 )		/* 1985 MSX Japan									*/
+	DRIVER( hb201p )	/* 1985 MSX											*/
+	DRIVER( hb501p )	/* 1984 MSX											*/
+	DRIVER( hb55d )		/* 1983 MSX Germany									*/
+	DRIVER( hb55p )		/* 1983 MSX											*/
+	DRIVER( hb75d )		/* 1983 MSX Germany									*/
+	DRIVER( hb75p )		/* 1983 MSX											*/
+	DRIVER( svi728 )	/* 1985 MSX											*/
+	DRIVER( svi738 )	/* 1985 MSX											*/
+	DRIVER( svi738sw )	/* 1985 MSX											*/
+	DRIVER( tadpc200 )
+	DRIVER( tadpc20a )
+	DRIVER( hx10 )		/* 1984 MSX											*/
+	DRIVER( hx10s )		/* 1984 MSX											*/
+	DRIVER( hx20 )		/* 1984 MSX											*/
+	DRIVER( cx5m )
+	DRIVER( cx5m128 )
+	DRIVER( cx5m2 )
+	DRIVER( yis303 )
+	DRIVER( yis503 )
+	DRIVER( yis503ii )
+	DRIVER( y503iir )
+	DRIVER( y503iir2 )
+	DRIVER( yis503m )
+	DRIVER( yc64 )
 
 
-//0130u3	DRIVER( msx2 )		/* 1985 MSX2										*/
-//0130u3	DRIVER( ax350 )
-//0130u3	DRIVER( ax370 )
-//0130u3	DRIVER( hbf9p )		/* 1985 MSX2										*/
-//0130u3	DRIVER( hbf9s )		/* 1985 MSX2										*/
-//0130u3	DRIVER( hbf500p )	/* 1985 MSX2										*/
-//0130u3	DRIVER( hbf700d )	/* 1985 MSX2 Germany								*/
-//0130u3	DRIVER( hbf700f )	/* 1985 MSX2 						*/
-//0130u3	DRIVER( hbf700p )	/* 1985 MSX2										*/
-//0130u3	DRIVER( hbf700s )	/* 1985 MSX2 Spain									*/
-//0130u3	DRIVER( hbg900ap )	/* 1986 MSX2										*/
-//0130u3	DRIVER( hbg900p )	/* 1986 MSX2										*/
-//0130u3	DRIVER( nms8220 )	/* 1986 MSX2										*/
-//0130u3	DRIVER( nms8220a )	/* 1986 MSX2										*/
-//0130u3	DRIVER( vg8230 )	/* 1986 MSX2										*/
-//0130u3	DRIVER( vg8235 )	/* 1986 MSX2										*/
-//0130u3	DRIVER( vg8235f)	/* 1986 MSX2										*/
-//0130u3	DRIVER( vg8240)	/* 1986 MSX2										*/
-//0130u3	DRIVER( nms8245 )	/* 1986 MSX2										*/
-//0130u3	DRIVER( nms8245f)	/* 1986 MSX2										*/
-//0130u3	DRIVER( nms8250 )	/* 1986 MSX2										*/
-//0130u3	DRIVER( nms8255 )	/* 1986 MSX2										*/
-//0130u3	DRIVER( nms8280 )	/* 1986 MSX2										*/
-//0130u3	DRIVER( nms8280g)	/* 1986 MSX2										*/
-//0130u3	DRIVER( tpc310)	  /* 1986 MSX2										*/
-//0130u3	DRIVER( hx23)	    /* 1986 MSX2										*/
-//0130u3	DRIVER( hx23f)	  /* 1986 MSX2										*/
-//0130u3	DRIVER( cx7m)	    /* 1986 MSX2										*/
-//0130u3	DRIVER( cx7m128)	/* 1986 MSX2										*/
-//0130u3	DRIVER( fs5500 )	/* 1985 MSX2 Japan									*/
-//0130u3	DRIVER( fs4500 )	/* 1986 MSX2 Japan									*/
-//0130u3	DRIVER( fs4700 )	/* 1986 MSX2 Japan									*/
-//0130u3	DRIVER( fs5000 )	/* 1986 MSX2 Japan									*/
-//0130u3	DRIVER( fs4600 )	/* 1986 MSX2 Japan									*/
-//0130u3	DRIVER( fsa1 )		/* 1986 MSX2 Japan									*/
-//0130u3	DRIVER( fsa1a )		/* 1986 MSX2 Japan									*/
-//0130u3	DRIVER( fsa1mk2 )	/* 1987 MSX2 Japan									*/
-//0130u3	DRIVER( fsa1f )		/* 1987 MSX2 Japan									*/
-//0130u3	DRIVER( fsa1fm )	/* 1988 MSX2 Japan									*/
-//0130u3	DRIVER( hbf500 )	/* 1986 MSX2 Japan									*/
-//0130u3	DRIVER( hbf900 )	/* 1986 MSX2 Japan									*/
-//0130u3	DRIVER( hbf900a )	/* 1986 MSX2 Japan									*/
-//0130u3	DRIVER( hbf1 )		/* 1986 MSX2 Japan									*/
-//0130u3	DRIVER( hbf12 )		/* 1987 MSX2 Japan									*/
-//0130u3	DRIVER( hbf1xd )	/* 1987 MSX2 Japan									*/
-//0130u3	DRIVER( hbf1xdm2 )	/* 1988 MSX2 Japan									*/
-//0130u3	DRIVER( phc23 )		/* 1986 MSX2 Japan									*/
-//0130u3	DRIVER( cpc300 )	/* 1986 MSX2 Korea									*/
-//0130u3	DRIVER( cpc300e )	/* 1986 MSX2 Korea									*/
-//0130u3	DRIVER( cpc400 )	/* 1986 MSX2 Korea									*/
-//0130u3	DRIVER( cpc400s )	/* 1986 MSX2 Korea									*/
-//0130u3	DRIVER( expert20 )/* 1986 MSX2 Korea									*/
+	DRIVER( msx2 )		/* 1985 MSX2										*/
+	DRIVER( ax350 )
+	DRIVER( ax370 )
+	DRIVER( hbf9p )		/* 1985 MSX2										*/
+	DRIVER( hbf9s )		/* 1985 MSX2										*/
+	DRIVER( hbf500p )	/* 1985 MSX2										*/
+	DRIVER( hbf700d )	/* 1985 MSX2 Germany								*/
+	DRIVER( hbf700f )	/* 1985 MSX2 						*/
+	DRIVER( hbf700p )	/* 1985 MSX2										*/
+	DRIVER( hbf700s )	/* 1985 MSX2 Spain									*/
+	DRIVER( hbg900ap )	/* 1986 MSX2										*/
+	DRIVER( hbg900p )	/* 1986 MSX2										*/
+	DRIVER( nms8220 )	/* 1986 MSX2										*/
+	DRIVER( nms8220a )	/* 1986 MSX2										*/
+	DRIVER( vg8230 )	/* 1986 MSX2										*/
+	DRIVER( vg8235 )	/* 1986 MSX2										*/
+	DRIVER( vg8235f)	/* 1986 MSX2										*/
+	DRIVER( vg8240)	/* 1986 MSX2										*/
+	DRIVER( nms8245 )	/* 1986 MSX2										*/
+	DRIVER( nms8245f)	/* 1986 MSX2										*/
+	DRIVER( nms8250 )	/* 1986 MSX2										*/
+	DRIVER( nms8255 )	/* 1986 MSX2										*/
+	DRIVER( nms8280 )	/* 1986 MSX2										*/
+	DRIVER( nms8280g)	/* 1986 MSX2										*/
+	DRIVER( tpc310)	  /* 1986 MSX2										*/
+	DRIVER( hx23)	    /* 1986 MSX2										*/
+	DRIVER( hx23f)	  /* 1986 MSX2										*/
+	DRIVER( cx7m)	    /* 1986 MSX2										*/
+	DRIVER( cx7m128)	/* 1986 MSX2										*/
+	DRIVER( fs5500 )	/* 1985 MSX2 Japan									*/
+	DRIVER( fs4500 )	/* 1986 MSX2 Japan									*/
+	DRIVER( fs4700 )	/* 1986 MSX2 Japan									*/
+	DRIVER( fs5000 )	/* 1986 MSX2 Japan									*/
+	DRIVER( fs4600 )	/* 1986 MSX2 Japan									*/
+	DRIVER( fsa1 )		/* 1986 MSX2 Japan									*/
+	DRIVER( fsa1a )		/* 1986 MSX2 Japan									*/
+	DRIVER( fsa1mk2 )	/* 1987 MSX2 Japan									*/
+	DRIVER( fsa1f )		/* 1987 MSX2 Japan									*/
+	DRIVER( fsa1fm )	/* 1988 MSX2 Japan									*/
+	DRIVER( hbf500 )	/* 1986 MSX2 Japan									*/
+	DRIVER( hbf900 )	/* 1986 MSX2 Japan									*/
+	DRIVER( hbf900a )	/* 1986 MSX2 Japan									*/
+	DRIVER( hbf1 )		/* 1986 MSX2 Japan									*/
+	DRIVER( hbf12 )		/* 1987 MSX2 Japan									*/
+	DRIVER( hbf1xd )	/* 1987 MSX2 Japan									*/
+	DRIVER( hbf1xdm2 )	/* 1988 MSX2 Japan									*/
+	DRIVER( phc23 )		/* 1986 MSX2 Japan									*/
+	DRIVER( cpc300 )	/* 1986 MSX2 Korea									*/
+	DRIVER( cpc300e )	/* 1986 MSX2 Korea									*/
+	DRIVER( cpc400 )	/* 1986 MSX2 Korea									*/
+	DRIVER( cpc400s )	/* 1986 MSX2 Korea									*/
+	DRIVER( expert20 )/* 1986 MSX2 Korea									*/
 
-//0130u3	DRIVER( msx2p )		/* 1988 MSX2+ Japan									*/
-//0130u3	DRIVER( fsa1fx )	/* 1988 MSX2+ Japan									*/
-//0130u3	DRIVER( fsa1wx )	/* 1988 MSX2+ Japan									*/
-//0130u3	DRIVER( fsa1wxa )	/* 1988 MSX2+ Japan									*/
-//0130u3	DRIVER( fsa1wsx )	/* 1989 MSX2+ Japan									*/
-//0130u3	DRIVER( hbf1xdj )	/* 1988 MSX2+ Japan									*/
-//0130u3	DRIVER( hbf1xv )	/* 1989 MSX2+ Japan									*/
-//0130u3	DRIVER( phc70fd )	/* 1988 MSX2+ Japan									*/
-//0130u3	DRIVER( phc70fd2 )	/* 1988 MSX2+ Japan									*/
-//0130u3	DRIVER( phc35j )	/* 1989 MSX2+ Japan									*/
+	DRIVER( msx2p )		/* 1988 MSX2+ Japan									*/
+	DRIVER( fsa1fx )	/* 1988 MSX2+ Japan									*/
+	DRIVER( fsa1wx )	/* 1988 MSX2+ Japan									*/
+	DRIVER( fsa1wxa )	/* 1988 MSX2+ Japan									*/
+	DRIVER( fsa1wsx )	/* 1989 MSX2+ Japan									*/
+	DRIVER( hbf1xdj )	/* 1988 MSX2+ Japan									*/
+	DRIVER( hbf1xv )	/* 1989 MSX2+ Japan									*/
+	DRIVER( phc70fd )	/* 1988 MSX2+ Japan									*/
+	DRIVER( phc70fd2 )	/* 1988 MSX2+ Japan									*/
+	DRIVER( phc35j )	/* 1989 MSX2+ Japan									*/
 
 
 	/* NASCOM MICROCOMPUTERS */
@@ -887,12 +887,12 @@ XL/XE 16kB OS roms
 	DRIVER( hp48gp )        /* HP 48G+ */
 
 	/* SpectraVideo */
-//0130u3	DRIVER( svi318 )	/* SVI-318 (PAL)									*/
-//0130u3	DRIVER( svi318n )	/* SVI-318 (NTSC)									*/
-//0130u3	DRIVER( svi328 )	/* SVI-328 (PAL)									*/
-//0130u3	DRIVER( svi328n )	/* SVI-328 (NTSC)									*/
-//0130u3	DRIVER( sv328p80 )	/* SVI-328 (PAL) + SVI-806 80 column card			*/
-//0130u3	DRIVER( sv328n80 )	/* SVI-328 (NTSC) + SVI-806 80 column card			*/
+	DRIVER( svi318 )	/* SVI-318 (PAL)									*/
+	DRIVER( svi318n )	/* SVI-318 (NTSC)									*/
+	DRIVER( svi328 )	/* SVI-328 (PAL)									*/
+	DRIVER( svi328n )	/* SVI-328 (NTSC)									*/
+	DRIVER( sv328p80 )	/* SVI-328 (PAL) + SVI-806 80 column card			*/
+	DRIVER( sv328n80 )	/* SVI-328 (NTSC) + SVI-806 80 column card			*/
 
 	/* Andrew Donald Booth (this is the name of the designer, not a company) */
 //	DRIVER( apexc53 )	/* 1951(?) APEXC: All-Purpose Electronic X-ray Computer */
