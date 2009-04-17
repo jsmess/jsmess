@@ -330,7 +330,7 @@ static WRITE8_DEVICE_HANDLER( kaypro2_sio_w )
 	else
 	if (offset == 1)
 //		z80sio_d_w(device, 1, data);
-		kay_kbd_d_w(data);
+		kay_kbd_d_w(device->machine, data);
 	else
 	if (offset == 2)
 		z80sio_c_w(device, 0, data);
@@ -429,6 +429,7 @@ static MACHINE_RESET( kaypro2 )
 	kaypro2_printer = devtag_get_device(machine, "centronics");
 	kaypro2_fdc = devtag_get_device(machine, "wd1793");
 	pio_system_w(kaypro2_z80pio_s, 0, 0x80);
+	MACHINE_RESET_CALL(kay_kbd);
 }
 
 

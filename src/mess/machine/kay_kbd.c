@@ -19,6 +19,7 @@
 
 #include "driver.h"
 #include "sound/beep.h"
+#include "kay_kbd.h"
 
 
 /*
@@ -164,10 +165,12 @@ INPUT_PORTS_START( kay_kbd )
 	PORT_BIT(0xf0, 0x00, IPT_UNUSED)
 INPUT_PORTS_END
 
+static void kay_kbd_in( running_machine *machine, UINT8 data );
 static const device_config *kay_kbd_beeper;
-//static UINT8 kbd_buff[16];
-//static int kbd_head = 0;
-//static int kbd_tail = 0;
+static UINT8 kbd_buff[16];
+static UINT8 kbd_head = 0;
+static UINT8 kbd_tail = 0;
+static UINT8 beep_on = 0;
 static UINT8 keyrows[10] = { 0,0,0,0,0,0,0,0,0,0 };
 static const char keyboard[8][10][8] = {
 	{ /* normal */
@@ -274,6 +277,9 @@ MACHINE_RESET( kay_kbd )
 	set_led_status(1, 1);
 	set_led_status(1, 0);
 	kay_kbd_beeper = devtag_get_device(machine, "beep");
+	beep_on = 1;
+	beep_set_state(kay_kbd_beeper, 0);
+	beep_set_frequency(kay_kbd_beeper, 950);	/* piezo-device needs to be measured */
 }
 
 /******************************************************
@@ -285,7 +291,6 @@ MACHINE_RESET( kay_kbd )
  ******************************************************/
 INTERRUPT_GEN( kay_kbd_interrupt )
 {
-//	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	int mod, row, col, chg, new;
 	static int lastrow = 0, mask = 0x00, key = 0x00, repeat = 0, repeater = 0;
 
@@ -356,11 +361,11 @@ INTERRUPT_GEN( kay_kbd_interrupt )
 			if( key )	/* normal key */
 			{
 				repeater = 30;
-	//			kaypro_conin_w(space, 0, key);
+				kay_kbd_in(device->machine, key);
 			}
 			else
 			if( (row == 0) && (chg == 0x04) ) /* Ctrl-@ (NUL) */
-	//			kaypro_conin_w(space, 0, 0);
+				kay_kbd_in(device->machine, 0);
 			keyrows[row] |= new;
 		}
 		else
@@ -371,22 +376,11 @@ INTERRUPT_GEN( kay_kbd_interrupt )
 	}
 	else if ( key && (keyrows[lastrow] & mask) && repeat == 0 )
 	{
-	//	kaypro_conin_w(space, 0, key);
+		kay_kbd_in(device->machine, key);
 	}
 }
+
 #if 0
-/******************************************************
- * kaypro_const_r (read console status)
- * 00  no key available
- * ff  key(s) available
- ******************************************************/
-static READ8_HANDLER (kaypro2_const_r )
-{
-	int data = 0x00;
-	if( kbd_head != kbd_tail )
-		data = 0xff;
-	return data;
-}
 
 /******************************************************
  *	kaypro_const_w (write console status ;)
@@ -399,22 +393,7 @@ static WRITE8_HANDLER ( kaypro2_const_w )
 		kbd_head = kbd_tail = 0;
 }
 
-/******************************************************
- *	kaypro_conin_r (read console input, ie. keyboard)
- *	returns next character from the keyboard buffer
- *	suspends CPU if no key is available
- ******************************************************/
-static READ8_HANDLER (kaypro2_conin_r )
-{
-	int data = 0;
-
-	if (kbd_tail != kbd_head)
-	{
-		data = kbd_buff[kbd_tail];
-		kbd_tail = (kbd_tail + 1) % sizeof(kbd_buff);
-	}
-	return data;
-}
+#endif
 
 /******************************************************
  *	kaypro_conin_w
@@ -422,11 +401,9 @@ static READ8_HANDLER (kaypro2_conin_r )
  *	releases CPU if it was waiting for a key
  *	sounds bell if buffer would overflow
  ******************************************************/
-static WRITE8_HANDLER ( kaypro2_conin_w )
+static void kay_kbd_in( running_machine *machine, UINT8 data )
 {
-	int kbd_head_old;
-
-//	kaypro_click();
+	UINT8 kbd_head_old;
 
 	kbd_head_old = kbd_head;
 	kbd_buff[kbd_head] = data;
@@ -435,33 +412,78 @@ static WRITE8_HANDLER ( kaypro2_conin_w )
 	if (kbd_head == kbd_tail)
 	{
 		kbd_head = kbd_head_old;
-//		kaypro_bell();
+		kay_kbd_d_w(machine, 4);
 	}
+	else
+		kay_kbd_d_w(machine, 1);
 }
-#endif
+
 
 UINT8 kay_kbd_c_r( void )
 {
 /*	d4 transmit buffer empty - 1=ok to send
 	d0 keyboard buffer empty - 1=key waiting to be used */
 
-	return 0x10;
+	UINT8 data = 0x10;
+
+	if( kbd_head != kbd_tail )
+		data++;
+
+	return data;
 }
 
 UINT8 kay_kbd_d_r( void )
 {
 /* return next key in buffer */
 
-	return 0;
+	UINT8 data = 0;
+
+	if (kbd_tail != kbd_head)
+	{
+		data = kbd_buff[kbd_tail];
+		kbd_tail = (kbd_tail + 1) % sizeof(kbd_buff);
+	}
+
+	return data;
 }
 
-void kay_kbd_d_w( UINT8 data )
+static TIMER_CALLBACK( kay_kbd_beepoff )
 {
-/* Beeper control - not emulated yet.
+	beep_set_state(kay_kbd_beeper, 0);
+}
+
+void kay_kbd_d_w( running_machine *machine, UINT8 data )
+{
+/* Beeper control - lengths need verifying
 	01 - keyclick
 	02 - short beep
 	04 - standard bell beep
 	08 - mute
 	16 - unmute */
 
+	UINT16 length = 0;
+
+	if (data & 0x10)
+		beep_on = 1;
+	else
+	if (data & 0x08)
+		beep_on = 0;
+	else
+	if (beep_on)
+	{
+		if (data & 0x04)
+			length = 400;
+		else
+		if (data & 0x02)
+			length = 200;
+		else
+		if (data & 0x01)
+			length = 4;
+
+		if (length)
+		{
+			timer_set(machine, ATTOTIME_IN_MSEC(length), NULL, 0, kay_kbd_beepoff);
+			beep_set_state(kay_kbd_beeper, 1);
+		}
+	}
 }
