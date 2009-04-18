@@ -1,4 +1,4 @@
-﻿0.130.1
+0.130.1
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
@@ -18,6 +18,8 @@ System Driver Changes:
 
 - [ATARI] Updated keyboard and keypad scan handling to be more accurate. Added 
   natural keyboard support. [Fabio Priuli]
+
+- [ATMOS] Added Basic v1.2x enhanced BIOS [Fabio Priuli]
 
 - [COLECO] Converted to use PORT_CATEGORY for controller selection. Check 
   the Category Menu (after pressing TAB) to enable Extra controllers. [Fabio 
