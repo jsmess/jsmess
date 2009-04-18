@@ -569,6 +569,17 @@ ROM_START(kaypro2x)
 	ROM_LOAD("kaypro2.u9",   0x0000, 0x1000, CRC(5f72da5b) SHA1(8a597000cce1a7e184abfb7bebcb564c6bf24fb7) )
 ROM_END
 
+ROM_START(kaypro10)
+	ROM_REGION(0x4000, "maincpu",0)
+	ROM_LOAD("kaypro10.u42", 0x0000, 0x1000, CRC(3f9bee20) SHA1(b29114a199e70afe46511119b77a662e97b093a0) )
+
+	ROM_REGION(0x10000, "rambank",0)
+	ROM_FILL( 0, 0x10000, 0xff)
+
+	ROM_REGION(0x1000, "gfx1",0)
+	ROM_LOAD("kaypro10.u31", 0x0000, 0x1000, CRC(5f72da5b) SHA1(8a597000cce1a7e184abfb7bebcb564c6bf24fb7) )
+ROM_END
+
 
 static SYSTEM_CONFIG_START(kaypro2)
 	CONFIG_DEVICE(kaypro2_floppy_getinfo)
@@ -577,4 +588,5 @@ SYSTEM_CONFIG_END
 /*    YEAR  NAME      PARENT   COMPAT  MACHINE	  INPUT    INIT      CONFIG       COMPANY  FULLNAME */
 COMP( 1983, kayproii, 0,       0,      kaypro2,   kay_kbd, 0,        kaypro2,	  "Non Linear Systems",  "Kaypro II - 2/83" , GAME_NOT_WORKING )
 COMP( 198?, omni2,    0,       0,      omni2,     kay_kbd, 0,        kaypro2,	  "Non Linear Systems",  "Omni II" , GAME_NOT_WORKING )
-COMP( 198?, kaypro2x, 0,       0,      kaypro2,   kay_kbd, 0,        kaypro2,	  "Non Linear Systems",  "Kaypro 2x" , GAME_NOT_WORKING )
+COMP( 1984, kaypro2x, 0,       0,      kaypro2,   kay_kbd, 0,        kaypro2,	  "Non Linear Systems",  "Kaypro 2x" , GAME_NOT_WORKING )
+COMP( 198?, kaypro10, 0,       0,      kaypro2,   kay_kbd, 0,        kaypro2,	  "Non Linear Systems",  "Kaypro 10" , GAME_NOT_WORKING )

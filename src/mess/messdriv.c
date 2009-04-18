@@ -596,8 +596,9 @@ XL/XE 16kB OS roms
 	DRIVER( phc64 )		/* Hegener & Glaser Mephisto PHC 64					*/
 
 	/* NON LINEAR SYSTEMS */
-	DRIVER( kaypro2x )	/* Kaypro 2 - new */
+	DRIVER( kaypro2x )	/* Kaypro 2 - 2/84 */
 	DRIVER( kayproii )	/* Kaypro II - 2/83 */
+	DRIVER( kaypro10 )	/* Kaypro 10 */
 	DRIVER( omni2 )		/* Omni II */
 
 	/* VEB MIKROELEKTRONIK */
