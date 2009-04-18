@@ -72,6 +72,8 @@ extern QUICKLOAD_LOAD( spectrum );
 extern unsigned char *spectrum_screen_location;
 
 INPUT_PORTS_EXTERN( spectrum );
+INPUT_PORTS_EXTERN( spec_plus );
+
 MACHINE_DRIVER_EXTERN( spectrum );
 
 extern READ8_HANDLER(spectrum_port_1f_r);
