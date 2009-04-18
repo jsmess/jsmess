@@ -19,9 +19,9 @@
 
 
 	Things that need doing:
-	- Keyboard is a separate device and not emulated (includes a beeper)
 	- Floppy disks (I have no knowledge of how to set these up)
 	- Split this code to video, machine
+	- Add clones
 
 
 **************************************************************************************************/
@@ -45,7 +45,6 @@ static const device_config *kaypro2_z80sio;
 static const device_config *kaypro2_printer;
 static const device_config *kaypro2_fdc;
 
-INPUT_PORTS_EXTERN( kay_kbd );
 
 
 /***********************************************************
@@ -107,6 +106,52 @@ static VIDEO_UPDATE( kaypro2 )
 				*p = ( gfx & 0x02 ) ? 0 : 1; p++;
 				*p = ( gfx & 0x01 ) ? 0 : 1; p++;
 				*p = 0; p++;
+			}
+		}
+		ma+=128;
+	}
+	return 0;
+}
+
+static VIDEO_UPDATE( omni2 )
+{
+	static UINT8 framecnt=0;
+	UINT8 y,ra,chr,gfx;
+	UINT16 sy=0,ma=0,x;
+	UINT8 *FNT = memory_region(screen->machine, "gfx1");
+
+	framecnt++;
+
+	for (y = 0; y < 24; y++)
+	{
+		for (ra = 0; ra < 10; ra++)
+		{
+			UINT16  *p = BITMAP_ADDR16(bitmap, sy++, 0);
+
+			for (x = ma; x < ma + 80; x++)
+			{
+				if (ra < 8)
+				{
+					chr = videoram[x];
+
+					/* Take care of flashing characters */
+					if ((chr > 0x7f) && (framecnt & 0x08))
+						chr |= 0x80;
+
+					/* get pattern of pixels for that character scanline */
+					gfx = FNT[(chr<<3) | ra ];
+				}
+				else
+					gfx = 0xff;
+
+				/* Display a scanline of a character (7 pixels) */
+				*p = ( gfx & 0x40 ) ? 0 : 1; p++;
+				*p = ( gfx & 0x20 ) ? 0 : 1; p++;
+				*p = ( gfx & 0x10 ) ? 0 : 1; p++;
+				*p = ( gfx & 0x08 ) ? 0 : 1; p++;
+				*p = ( gfx & 0x04 ) ? 0 : 1; p++;
+				*p = ( gfx & 0x02 ) ? 0 : 1; p++;
+				*p = ( gfx & 0x01 ) ? 0 : 1; p++;
 			}
 		}
 		ma+=128;
@@ -241,12 +286,12 @@ static WRITE8_DEVICE_HANDLER( kaypro2_pio_w )
 /***********************************************************
 
 	SIO
+	Baud rate setup commented out until MAME includes
+	the feature.
 
 ************************************************************/
 
-static WRITE8_HANDLER( kaypro2_baud_w )
-{
-/* Set baud rate. bits 0..3 Rx and Tx are tied together. Baud Rate Generator is a AY-5-8116.
+/* Set baud rate. bits 0..3 Rx and Tx are tied together. Baud Rate Generator is a AY-5-8116, SMC8116, etc.
 	00h    50  
 	11h    75  
 	22h    110  
@@ -264,22 +309,24 @@ static WRITE8_HANDLER( kaypro2_baud_w )
 	EEh    9600  
 	FFh    19200 */
 
-//	int baud_clock[]={ 800, 1200, 1760, 2152, 2400, 4800, 9600, 19200, 28800, 32000, 38400, 57600, 76800, 115200, 153600, 307200 };
+static const int baud_clock[]={ 800, 1200, 1760, 2152, 2400, 4800, 9600, 19200, 28800, 32000, 38400, 57600, 76800, 115200, 153600, 307200 };
+
+static WRITE8_HANDLER( kaypro2_baud_a_w )	/* channel A - RS232C */
+{
+	data &= 0x0f;
+
+//	z80sio_set_rx_clock( kaypro2_z80sio, baud_clock[data], 0);
+//	z80sio_set_tx_clock( kaypro2_z80sio, baud_clock[data], 0);
+}
+
+static WRITE8_HANDLER( kaypro2_baud_b_w )	/* Channel B - Keyboard */
+{
+/* Only speed used is 300 baud */
 
 	data &= 0x0f;
 
-	if (offset < 4)
-	{
-	/* channel A */
-//		z80sio_set_rx_clock( kaypro2_z80sio, baud_clock[data], 0);
-//		z80sio_set_tx_clock( kaypro2_z80sio, baud_clock[data], 0);
-	}
-	else
-	{
-	/* channel B */
-//		z80sio_set_rx_clock( kaypro2_z80sio, baud_clock[data], 1);
-//		z80sio_set_tx_clock( kaypro2_z80sio, baud_clock[data], 1);
-	}
+//	z80sio_set_rx_clock( kaypro2_z80sio, baud_clock[data], 1);
+//	z80sio_set_tx_clock( kaypro2_z80sio, baud_clock[data], 1);
 }
 
 /* when sio devcb'ed like pio is, change to use pio's int handler */
@@ -367,7 +414,7 @@ static WD17XX_CALLBACK( kaypro2_fdc_callback )
 
 static const wd17xx_interface kaypro2_wd1793_interface = { kaypro2_fdc_callback, NULL };
 
-/* I have no idea how to set up floppies - these ones have 40 tracks, 10 sectors, 512 bytes per track, single sided */
+/* I have no idea how to set up floppies - these ones have 40 tracks, 40 sectors, 128 bytes per track, single sided */
 
 static void kaypro2_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
@@ -403,10 +450,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( kaypro2_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x03) AM_WRITE(kaypro2_baud_w)
+	AM_RANGE(0x00, 0x03) AM_WRITE(kaypro2_baud_a_w)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("z80sio", kaypro2_sio_r, kaypro2_sio_w)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("z80pio_g", kaypro2_pio_r, kaypro2_pio_w)
-	AM_RANGE(0x0c, 0x0f) AM_WRITE(kaypro2_baud_w)
+	AM_RANGE(0x0c, 0x0f) AM_WRITE(kaypro2_baud_b_w)
 	AM_RANGE(0x10, 0x10) AM_DEVREADWRITE("wd1793", wd17xx_status_r, wd17xx_command_w)
 	AM_RANGE(0x11, 0x11) AM_DEVREADWRITE("wd1793", wd17xx_track_r, wd17xx_track_w)
 	AM_RANGE(0x12, 0x12) AM_DEVREADWRITE("wd1793", wd17xx_sector_r, wd17xx_sector_w)
@@ -473,6 +520,11 @@ static MACHINE_DRIVER_START( kaypro2 )
 	MDRV_Z80SIO_ADD( "z80sio", 4800, kaypro2_sio_intf )	/* start at 300 baud */
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( omni2 )
+	MDRV_IMPORT_FROM( kaypro2 )
+	MDRV_VIDEO_UPDATE( omni2 )
+MACHINE_DRIVER_END
+
 
 /***********************************************************
 
@@ -480,17 +532,41 @@ MACHINE_DRIVER_END
 
 ************************************************************/
 
-ROM_START(kaypro2)
+/* The roms need to be renamed to their part numbers (81-xxx) when known */
+
+ROM_START(kayproii)
 	/* The board could take a 2716 or 2732 */
 	ROM_REGION(0x4000, "maincpu",0)
-	ROM_LOAD("kaypro2.u47", 0x0000, 0x0800, CRC(28264bc1) SHA1(a12afb11a538fc0217e569bc29633d5270dfa51b))
-//	ROM_LOAD("kaypro2.u47", 0x0000, 0x1000, CRC(4918fb91) SHA1(cd9f45cc3546bcaad7254b92c5d501c40e2ef0b2))
+	ROM_LOAD("kayproii.u47", 0x0000, 0x0800, CRC(28264bc1) SHA1(a12afb11a538fc0217e569bc29633d5270dfa51b) )
+//	ROM_LOAD("kayproii.u47", 0x0000, 0x1000, CRC(4918fb91) SHA1(cd9f45cc3546bcaad7254b92c5d501c40e2ef0b2) )
 
 	ROM_REGION(0x10000, "rambank",0)
 	ROM_FILL( 0, 0x10000, 0xff)
 
 	ROM_REGION(0x0800, "gfx1",0)
-	ROM_LOAD("kaypro2.u43", 0x00000, 0x0800, CRC(4cc7d206) SHA1(5cb880083b94bd8220aac1f87d537db7cfeb9013))
+	ROM_LOAD("kayproii.u43", 0x0000, 0x0800, CRC(4cc7d206) SHA1(5cb880083b94bd8220aac1f87d537db7cfeb9013) )
+ROM_END
+
+ROM_START(omni2)
+	ROM_REGION(0x4000, "maincpu",0)
+	ROM_LOAD("omni2.u47",    0x0000, 0x1000, CRC(2883f9e0) SHA1(d98c784e62853582d298bf7ca84c75872847ac9b) )
+
+	ROM_REGION(0x10000, "rambank",0)
+	ROM_FILL( 0, 0x10000, 0xff)
+
+	ROM_REGION(0x0800, "gfx1",0)
+	ROM_LOAD("omni2.u43",    0x0000, 0x0800, CRC(049b3381) SHA1(46f1d4f038747ba9048b075dc617361be088f82a) )
+ROM_END
+
+ROM_START(kaypro2x)
+	ROM_REGION(0x4000, "maincpu",0)
+	ROM_LOAD("kaypro2.u34",  0x0000, 0x2000, CRC(5eb69aec) SHA1(525f955ca002976e2e30ac7ee37e4a54f279fe96) )
+
+	ROM_REGION(0x10000, "rambank",0)
+	ROM_FILL( 0, 0x10000, 0xff)
+
+	ROM_REGION(0x1000, "gfx1",0)
+	ROM_LOAD("kaypro2.u9",   0x0000, 0x1000, CRC(5f72da5b) SHA1(8a597000cce1a7e184abfb7bebcb564c6bf24fb7) )
 ROM_END
 
 
@@ -498,5 +574,7 @@ static SYSTEM_CONFIG_START(kaypro2)
 	CONFIG_DEVICE(kaypro2_floppy_getinfo)
 SYSTEM_CONFIG_END
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE	  INPUT    INIT      CONFIG       COMPANY  FULLNAME */
-COMP( 1983, kaypro2,  0,      0,      kaypro2,    kay_kbd, 0,        kaypro2,	  "Non Linear Systems",  "Kaypro 2/83" , GAME_NOT_WORKING )
+/*    YEAR  NAME      PARENT   COMPAT  MACHINE	  INPUT    INIT      CONFIG       COMPANY  FULLNAME */
+COMP( 1983, kayproii, 0,       0,      kaypro2,   kay_kbd, 0,        kaypro2,	  "Non Linear Systems",  "Kaypro II - 2/83" , GAME_NOT_WORKING )
+COMP( 198?, omni2,    0,       0,      omni2,     kay_kbd, 0,        kaypro2,	  "Non Linear Systems",  "Omni II" , GAME_NOT_WORKING )
+COMP( 198?, kaypro2x, 0,       0,      kaypro2,   kay_kbd, 0,        kaypro2,	  "Non Linear Systems",  "Kaypro 2x" , GAME_NOT_WORKING )

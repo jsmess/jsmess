@@ -280,6 +280,7 @@ MACHINE_RESET( kay_kbd )
 	beep_on = 1;
 	beep_set_state(kay_kbd_beeper, 0);
 	beep_set_frequency(kay_kbd_beeper, 950);	/* piezo-device needs to be measured */
+	kbd_head = kbd_tail = 0;			/* init buffer */
 }
 
 /******************************************************
