@@ -33,6 +33,7 @@
 #include "machine/kay_kbd.h"
 #include "machine/wd17xx.h"
 #include "sound/beep.h"
+#include "video/mc6845.h"
 #include "includes/kaypro.h"
 
 
@@ -43,13 +44,13 @@
 
 ************************************************************/
 
-static ADDRESS_MAP_START( kaypro2_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( kayproii_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("maincpu", 0x0000)
 	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_REGION("maincpu", 0x3000) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x4000, 0xffff) AM_RAM AM_REGION("rambank", 0x4000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kaypro2_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( kayproii_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x03) AM_WRITE(kaypro2_baud_a_w)
@@ -74,8 +75,8 @@ ADDRESS_MAP_END
 static MACHINE_DRIVER_START( kayproii )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 2500000)	/* 2.5 MHz */
-	MDRV_CPU_PROGRAM_MAP(kaypro2_map, 0)
-	MDRV_CPU_IO_MAP(kaypro2_io, 0)
+	MDRV_CPU_PROGRAM_MAP(kayproii_map, 0)
+	MDRV_CPU_IO_MAP(kayproii_io, 0)
 	MDRV_CPU_VBLANK_INT("screen", kay_kbd_interrupt)	/* this doesn't actually exist, it is to run the keyboard */
 
 	MDRV_MACHINE_RESET( kayproii )
@@ -109,8 +110,40 @@ static MACHINE_DRIVER_START( omni2 )
 	MDRV_IMPORT_FROM( kayproii )
 	MDRV_VIDEO_UPDATE( omni2 )
 MACHINE_DRIVER_END
+#if 0
+static MACHINE_DRIVER_START( kaypro2x )
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz */
+	MDRV_CPU_PROGRAM_MAP(kaypro2x_map, 0)
+	MDRV_CPU_IO_MAP(kaypro2x_io, 0)
+	MDRV_CPU_VBLANK_INT("screen", kay_kbd_interrupt)	/* this doesn't actually exist, it is to run the keyboard */
 
+	MDRV_MACHINE_RESET( kaypro2x )
 
+	/* video hardware */
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(80*7, 24*10)
+	MDRV_SCREEN_VISIBLE_AREA(0,80*7-1,0,24*10-1)
+	MDRV_PALETTE_LENGTH(2)
+	MDRV_PALETTE_INIT(kaypro)
+
+	MDRV_VIDEO_UPDATE( kaypro2x )
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("beep", BEEP, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	/* devices */
+	MDRV_WD179X_ADD("wd1793", kaypro2_wd1793_interface )
+	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
+	MDRV_Z80SIO_ADD( "z80sio", 4800, kaypro2_sio_intf )	/* same job as in kayproii */
+	MDRV_Z80SIO_ADD( "z80sio_2", 4800, kaypro2_sio_2_intf )	/* extra sio for the modem */
+MACHINE_DRIVER_END
+#endif
 /***********************************************************
 
 	Game driver
