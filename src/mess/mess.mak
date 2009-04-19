@@ -598,7 +598,9 @@ $(MESSOBJ)/apexc.a:     \
 	$(MESS_DRIVERS)/apexc.o
 
 $(MESSOBJ)/kaypro.a:   \
-	$(MESS_DRIVERS)/kaypro2.o	\
+	$(MESS_DRIVERS)/kaypro.o	\
+	$(MESS_MACHINE)/kaypro.o	\
+	$(MESS_VIDEO)/kaypro.o	\
 	$(MESS_MACHINE)/kay_kbd.o	 \
 
 $(MESSOBJ)/sinclair.a: \
