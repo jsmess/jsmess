@@ -746,25 +746,25 @@ ROM_END
 COMP( 1982, spectrum, 0,        0,		spectrum,		spectrum,	0,		0,	"Sinclair Research",	"ZX Spectrum" , 0)
 COMP( 1987, spec80k,  spectrum, 0,		spectrum,		spectrum,	0,		0,	"",	"ZX Spectrum 80K" , GAME_COMPUTER_MODIFIED)
 COMP( 1995, specide,  spectrum, 0,		spectrum,		spectrum,	0,		0,	"",	"ZX Spectrum IDE" , GAME_COMPUTER_MODIFIED)
-COMP( 1986, inves,    spectrum, 0,		spectrum,		spectrum,	0,		0,	"Investronica",	"Inves Spectrum 48K+" , 0)
+COMP( 1986, inves,    spectrum, 0,		spectrum,		spec_plus,	0,		0,	"Investronica",	"Inves Spectrum 48K+" , 0)
 COMP( 1985, tk90x,    spectrum, 0,		spectrum,		spectrum,	0,		0,	"Micro Digital",	"TK-90x Color Computer" , 0)
-COMP( 1986, tk95,     spectrum, 0,		spectrum,		spectrum,	0,		0,	"Micro Digital",	"TK-95 Color Computer" , 0)
+COMP( 1986, tk95,     spectrum, 0,		spectrum,		spec_plus,	0,		0,	"Micro Digital",	"TK-95 Color Computer" , 0)
 COMP( 1985, hc85,     spectrum, 0,		spectrum,		spectrum,	0,		0,	"ICE-Felix",	"HC-85" , 0)
 COMP( 1990, hc90,     spectrum, 0,		spectrum,		spectrum,	0,		0,	"ICE-Felix",	"HC-90" , 0)
-COMP( 1991, hc91,     spectrum, 0,		spectrum,		spectrum,	0,		0,	"ICE-Felix",	"HC-91" , 0)
-COMP( 1988, cip03,    spectrum, 0,		spectrum,		spectrum,	0,		0,	"Electronica",	"CIP-03" , 0)
-COMP( 1990, jet,      spectrum, 0,		spectrum,		spectrum,	0,		0,	"Electromagnetica",	"JET" , 0)
+COMP( 1991, hc91,     spectrum, 0,		spectrum,		spec_plus,	0,		0,	"ICE-Felix",	"HC-91" , 0)
+COMP( 1988, cip03,    spectrum, 0,		spectrum,		spectrum,	0,		0,	"Electronica",	"CIP-03" , 0)	// keyboard should be spectrum, but image was not clear
+COMP( 1990, jet,      spectrum, 0,		spectrum,		spectrum,	0,		0,	"Electromagnetica",	"JET" , 0)	// keyboard should be spectrum, but image was not clear
 COMP( 1987, dgama87,  spectrum, 0,		spectrum,		spectrum,	0,		0,	"Didaktik Skalica",	"Didaktik Gama 87" , 0)
 COMP( 1988, dgama88,  spectrum, 0,		spectrum,		spectrum,	0,		0,	"Didaktik Skalica",	"Didaktik Gama 88" , 0)
 COMP( 1989, dgama89,  spectrum, 0,		spectrum,		spectrum,	0,		0,	"Didaktik Skalica",	"Didaktik Gama 89" , 0)
 COMP( 1990, didakt90, spectrum, 0,		spectrum,		spectrum,	0,		0,	"Didaktik Skalica",	"Didaktik 90" , 0)
-COMP( 1991, didakm91, spectrum, 0,		spectrum,		spectrum,	0,		0,	"Didaktik Skalica",	"Didaktik M 91" , 0)
-COMP( 1992, didaktk,  spectrum, 0,		spectrum,		spectrum,	0,		0,	"Didaktik Skalica",	"Didaktik Kompakt" , 0)
-COMP( 1993, didakm93, spectrum, 0,		spectrum,		spectrum,	0,		0,	"Didaktik Skalica",	"Didaktik M 93" , 0)
-COMP( 1988, mistrum,  spectrum, 0,		spectrum,		spectrum,	0,		0,	"Amaterske RADIO",	"Mistrum" , 0)
-COMP( 1990, blitz,    spectrum, 0,		spectrum,		spectrum,	0,		0,	"",	"Blic" , 0)
-COMP( 1990, byte,     spectrum, 0,		spectrum,		spectrum,	0,		0,	"",	"Byte" , 0)
-COMP( 199?, orizon,   spectrum, 0,		spectrum,		spectrum,	0,		0,	"",	"Orizon-Micro" , 0)
+COMP( 1991, didakm91, spectrum, 0,		spectrum,		spec_plus,	0,		0,	"Didaktik Skalica",	"Didaktik M 91" , 0)
+COMP( 1992, didaktk,  spectrum, 0,		spectrum,		spec_plus,	0,		0,	"Didaktik Skalica",	"Didaktik Kompakt" , 0)
+COMP( 1993, didakm93, spectrum, 0,		spectrum,		spec_plus,	0,		0,	"Didaktik Skalica",	"Didaktik M 93" , 0)
+COMP( 1988, mistrum,  spectrum, 0,		spectrum,		spectrum,	0,		0,	"Amaterske RADIO",	"Mistrum" , 0)	// keyboard could be spectrum in some models (since it was a build-yourself design)
+COMP( 1990, blitz,    spectrum, 0,		spectrum,		spectrum,	0,		0,	"",	"Blic" , 0)		// no keyboard images found
+COMP( 1990, byte,     spectrum, 0,		spectrum,		spectrum,	0,		0,	"",	"Byte" , 0)		// no keyboard images found
+COMP( 199?, orizon,   spectrum, 0,		spectrum,		spectrum,	0,		0,	"",	"Orizon-Micro" , 0)		// no keyboard images found
 COMP( 1993, quorum48, spectrum, 0,		spectrum,		spectrum,	0,		0,	"",	"Kvorum 48K" , 0)
-COMP( 1993, magic6,   spectrum, 0,		spectrum,		spectrum,	0,		0,	"",	"Magic 6" , 0)
-COMP( 1990, compani1, spectrum, 0,		spectrum,		spectrum,	0,		0,	"",	"Kompanion 1" , 0)
+COMP( 1993, magic6,   spectrum, 0,		spectrum,		spectrum,	0,		0,	"",	"Magic 6" , 0)	// keyboard should be spectrum, but image was not clear
+COMP( 1990, compani1, spectrum, 0,		spectrum,		spectrum,	0,		0,	"",	"Kompanion 1" , 0)		// no keyboard images found
