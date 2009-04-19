@@ -18,7 +18,6 @@ struct k1ge
 	devcb_resolved_write8 vblank_pin_w;
 	devcb_resolved_write8 hblank_pin_w;
 	UINT8 *vram;
-	UINT8 reg[0x800];
 	UINT8 wba_h, wba_v, wsi_h, wsi_v;
 
 	void (*draw)( const device_config *device, int line );
@@ -72,7 +71,7 @@ INLINE k1ge_t *get_safe_token( const device_config *device )
 READ8_DEVICE_HANDLER( k1ge_r )
 {
 	k1ge_t	*k1ge = get_safe_token( device );
-	UINT8	data = k1ge->reg[offset & 0x7ff];
+	UINT8	data = k1ge->vram[offset & 0x7ff];
 
 	switch( offset )
 	{
@@ -95,7 +94,7 @@ WRITE8_DEVICE_HANDLER( k1ge_w )
 	{
 	case 0x000:
 		if ( k1ge->vblank_pin_w.write != NULL )
-			devcb_call_write8( &k1ge->vblank_pin_w, 0, ( data & 0x80 ) ? ( ( k1ge->reg[0x010] & 0x40 ) ? 1 : 0 ) : 0 );
+			devcb_call_write8( &k1ge->vblank_pin_w, 0, ( data & 0x80 ) ? ( ( k1ge->vram[0x010] & 0x40 ) ? 1 : 0 ) : 0 );
 		break;
 	case 0x030:
 		data &= 0x80;
@@ -109,12 +108,12 @@ WRITE8_DEVICE_HANDLER( k1ge_w )
 		data &= 0x07;
 		break;
 	case 0x7e2:
-		if ( k1ge->reg[0x7f0] != 0xAA )
+		if ( k1ge->vram[0x7f0] != 0xAA )
 			return;
 		data &= 0x80;
 		break;
 	}
-	k1ge->reg[offset & 0x7ff] = data;
+	k1ge->vram[offset & 0x7ff] = data;
 }
 
 
@@ -164,7 +163,7 @@ INLINE void k1ge_draw_scroll_plane( k1ge_t *k1ge, UINT16 *p, UINT16 base, int li
 
 		if ( col )
 		{
-			p[ i ] = k1ge->reg[ pcode + col ];
+			p[ i ] = k1ge->vram[ pcode + col ];
 		}
 
 		px++;
@@ -256,7 +255,7 @@ INLINE void k1ge_draw_sprite_plane( k1ge_t *k1ge, UINT16 *p, UINT16 priority, in
 
 			if ( spr_x < 160 && col )
 			{
-				p[ spr_x ] = k1ge->reg[ pcode + col ];
+				p[ spr_x ] = k1ge->vram[ pcode + col ];
 			}
 		}
 	}
@@ -273,7 +272,7 @@ static void k1ge_draw( const device_config *device, int line )
 	{
 		for( i = 0; i < 160; i++ )
 		{
-			p[i] = k1ge->reg[0x012] & 0x07;
+			p[i] = k1ge->vram[0x012] & 0x07;
 		}
 	}
 	else
@@ -281,49 +280,49 @@ static void k1ge_draw( const device_config *device, int line )
 		for ( i = 0; i < 160; i++ )
 			p[i] = 0;
 
-		if ( k1ge->reg[0x030] & 0x80 )
+		if ( k1ge->vram[0x030] & 0x80 )
 		{
 			/* Draw sprites with 01 priority */
-			k1ge_draw_sprite_plane( k1ge, p, 1, line, k1ge->reg[0x020], k1ge->reg[0x021] );
+			k1ge_draw_sprite_plane( k1ge, p, 1, line, k1ge->vram[0x020], k1ge->vram[0x021] );
 
 			/* Draw PF1 */
-			k1ge_draw_scroll_plane( k1ge, p, 0x1000, line, k1ge->reg[0x032], k1ge->reg[0x033], 0x108 );
+			k1ge_draw_scroll_plane( k1ge, p, 0x1000, line, k1ge->vram[0x032], k1ge->vram[0x033], 0x108 );
 
 			/* Draw sprites with 10 priority */
-			k1ge_draw_sprite_plane( k1ge, p, 2, line, k1ge->reg[0x020], k1ge->reg[0x021] );
+			k1ge_draw_sprite_plane( k1ge, p, 2, line, k1ge->vram[0x020], k1ge->vram[0x021] );
 
 			/* Draw PF2 */
-			k1ge_draw_scroll_plane( k1ge, p, 0x1800, line, k1ge->reg[0x034], k1ge->reg[0x035], 0x110 );
+			k1ge_draw_scroll_plane( k1ge, p, 0x1800, line, k1ge->vram[0x034], k1ge->vram[0x035], 0x110 );
 
 			/* Draw sprites with 11 priority */
-			k1ge_draw_sprite_plane( k1ge, p, 3, line, k1ge->reg[0x020], k1ge->reg[0x021] );
+			k1ge_draw_sprite_plane( k1ge, p, 3, line, k1ge->vram[0x020], k1ge->vram[0x021] );
 		}
 		else
 		{
 			/* Draw sprites with 01 priority */
-			k1ge_draw_sprite_plane( k1ge, p, 1, line, k1ge->reg[0x020], k1ge->reg[0x021] );
+			k1ge_draw_sprite_plane( k1ge, p, 1, line, k1ge->vram[0x020], k1ge->vram[0x021] );
 
 			/* Draw PF2 */
-			k1ge_draw_scroll_plane( k1ge, p, 0x1800, line, k1ge->reg[0x034], k1ge->reg[0x035], 0x110 );
+			k1ge_draw_scroll_plane( k1ge, p, 0x1800, line, k1ge->vram[0x034], k1ge->vram[0x035], 0x110 );
 
 			/* Draw sprites with 10 priority */
-			k1ge_draw_sprite_plane( k1ge, p, 2, line, k1ge->reg[0x020], k1ge->reg[0x021] );
+			k1ge_draw_sprite_plane( k1ge, p, 2, line, k1ge->vram[0x020], k1ge->vram[0x021] );
 
 			/* Draw PF1 */
-			k1ge_draw_scroll_plane( k1ge, p, 0x1000, line, k1ge->reg[0x032], k1ge->reg[0x033], 0x108 );
+			k1ge_draw_scroll_plane( k1ge, p, 0x1000, line, k1ge->vram[0x032], k1ge->vram[0x033], 0x108 );
 
 			/* Draw sprites with 11 priority */
-			k1ge_draw_sprite_plane( k1ge, p, 3, line, k1ge->reg[0x020], k1ge->reg[0x021] );
+			k1ge_draw_sprite_plane( k1ge, p, 3, line, k1ge->vram[0x020], k1ge->vram[0x021] );
 		}
 
 		for( i = 0; i < k1ge->wba_h; i++ )
 		{       
-			p[i] = k1ge->reg[0x012] & 0x07;
+			p[i] = k1ge->vram[0x012] & 0x07;
 		}
 
 		for( i = k1ge->wba_h + k1ge->wsi_h; i < 160; i++ )
 		{       
-			p[i] = k1ge->reg[0x012] & 0x07;
+			p[i] = k1ge->vram[0x012] & 0x07;
 		}
 	}
 }
@@ -375,7 +374,7 @@ INLINE void k2ge_draw_scroll_plane( k1ge_t *k1ge, UINT16 *p, UINT16 base, int li
 
 		if ( col )
 		{
-			p[ i ]  = k1ge->reg[ pcode + col * 2 ] | ( k1ge->reg[ pcode + col * 2 + 1 ] << 8 );
+			p[ i ]  = k1ge->vram[ pcode + col * 2 ] | ( k1ge->vram[ pcode + col * 2 + 1 ] << 8 );
 		}
 
 		px++;
@@ -469,7 +468,7 @@ INLINE void k2ge_draw_sprite_plane( k1ge_t *k1ge, UINT16 *p, UINT16 priority, in
 
 			if ( spr_x < 160 && col )
 			{
-				p[ spr_x ] = k1ge->reg[ pcode + col * 2 ] | ( k1ge->reg[ pcode + col * 2 + 1 ] << 8 );
+				p[ spr_x ] = k1ge->vram[ pcode + col * 2 ] | ( k1ge->vram[ pcode + col * 2 + 1 ] << 8 );
 			}
 		}
 	}
@@ -522,8 +521,8 @@ INLINE void k2ge_k1ge_draw_scroll_plane( k1ge_t *k1ge, UINT16 *p, UINT16 base, i
 
 		if ( col )
 		{
-			UINT16 col2 = 16 * pcode + ( k1ge->reg[ pal_lut_base + 4 * pcode + col ] * 2 );
-			p[ i ]  = k1ge->reg[ k2ge_lut_base + col2 ] | ( k1ge->reg[ k2ge_lut_base + col2 + 1 ] << 8 );;
+			UINT16 col2 = 16 * pcode + ( k1ge->vram[ pal_lut_base + 4 * pcode + col ] * 2 );
+			p[ i ]  = k1ge->vram[ k2ge_lut_base + col2 ] | ( k1ge->vram[ k2ge_lut_base + col2 + 1 ] << 8 );;
 		}
 
 		px++;
@@ -615,8 +614,8 @@ INLINE void k2ge_k1ge_draw_sprite_plane( k1ge_t *k1ge, UINT16 *p, UINT16 priorit
 
 			if ( spr_x < 160 && col )
 			{
-				UINT16 col2 = 16 * pcode + k1ge->reg[ 0x100 + 4 * pcode + col ] * 2;
-				p[ spr_x ] = k1ge->reg[ 0x380 + col2 ] | ( k1ge->reg[ 0x381 + col2 ] << 8 );
+				UINT16 col2 = 16 * pcode + k1ge->vram[ 0x100 + 4 * pcode + col ] * 2;
+				p[ spr_x ] = k1ge->vram[ 0x380 + col2 ] | ( k1ge->vram[ 0x381 + col2 ] << 8 );
 			}
 		}
 	}
@@ -631,8 +630,8 @@ static void k2ge_draw( const device_config *device, int line )
 	UINT16 oowcol;
 	int i;
 
-	oowcol = ( k1ge->reg[0x012] & 0x07 ) * 2;
-	oowcol = k1ge->reg[0x3f0 + col ] | ( k1ge->reg[0x3f1 + col ] << 8 );
+	oowcol = ( k1ge->vram[0x012] & 0x07 ) * 2;
+	oowcol = k1ge->vram[0x3f0 + col ] | ( k1ge->vram[0x3f1 + col ] << 8 );
 
 	if ( line < k1ge->wba_v || line >= k1ge->wba_v + k1ge->wsi_v )
 	{
@@ -643,10 +642,10 @@ static void k2ge_draw( const device_config *device, int line )
 	}
 	else
 	{
-		if ( ( k1ge->reg[0x118] & 0xc0 ) == 0x80 )
+		if ( ( k1ge->vram[0x118] & 0xc0 ) == 0x80 )
 		{
-			col = ( k1ge->reg[0x118] & 0x07 ) * 2;
-			col = k1ge->reg[0x3e0 + col ] | ( k1ge->reg[0x3e1 + col ] << 8 );
+			col = ( k1ge->vram[0x118] & 0x07 ) * 2;
+			col = k1ge->vram[0x3e0 + col ] | ( k1ge->vram[0x3e1 + col ] << 8 );
 		}
 
 		for ( i = 0; i < 160; i++ )
@@ -654,80 +653,80 @@ static void k2ge_draw( const device_config *device, int line )
 			p[i] = col;
 		}
 
-		if ( k1ge->reg[0x7e2] & 0x80 )
+		if ( k1ge->vram[0x7e2] & 0x80 )
 		{
 			/* K1GE compatibility mode */
-			if ( k1ge->reg[0x030] & 0x80 )
+			if ( k1ge->vram[0x030] & 0x80 )
 			{
 				/* Draw sprites with 01 priority */
-				k2ge_k1ge_draw_sprite_plane( k1ge, p, 1, line, k1ge->reg[0x020], k1ge->reg[0x021] );
+				k2ge_k1ge_draw_sprite_plane( k1ge, p, 1, line, k1ge->vram[0x020], k1ge->vram[0x021] );
 
 				/* Draw PF1 */
-				k2ge_k1ge_draw_scroll_plane( k1ge, p, 0x1000, line, k1ge->reg[0x032], k1ge->reg[0x033], 0x108, 0x3a0 );
+				k2ge_k1ge_draw_scroll_plane( k1ge, p, 0x1000, line, k1ge->vram[0x032], k1ge->vram[0x033], 0x108, 0x3a0 );
 
 				/* Draw sprites with 10 priority */
-				k2ge_k1ge_draw_sprite_plane( k1ge, p, 2, line, k1ge->reg[0x020], k1ge->reg[0x021] );
+				k2ge_k1ge_draw_sprite_plane( k1ge, p, 2, line, k1ge->vram[0x020], k1ge->vram[0x021] );
 
 				/* Draw PF2 */
-				k2ge_k1ge_draw_scroll_plane( k1ge, p, 0x1800, line, k1ge->reg[0x034], k1ge->reg[0x035], 0x110, 0x3c0 );
+				k2ge_k1ge_draw_scroll_plane( k1ge, p, 0x1800, line, k1ge->vram[0x034], k1ge->vram[0x035], 0x110, 0x3c0 );
 
 				/* Draw sprites with 11 priority */
-				k2ge_k1ge_draw_sprite_plane( k1ge, p, 3, line, k1ge->reg[0x020], k1ge->reg[0x021] );
+				k2ge_k1ge_draw_sprite_plane( k1ge, p, 3, line, k1ge->vram[0x020], k1ge->vram[0x021] );
 			}
 			else
 			{
 				/* Draw sprites with 01 priority */
-				k2ge_k1ge_draw_sprite_plane( k1ge, p, 1, line, k1ge->reg[0x020], k1ge->reg[0x021] );
+				k2ge_k1ge_draw_sprite_plane( k1ge, p, 1, line, k1ge->vram[0x020], k1ge->vram[0x021] );
 
 				/* Draw PF2 */
-				k2ge_k1ge_draw_scroll_plane( k1ge, p, 0x1800, line, k1ge->reg[0x034], k1ge->reg[0x035], 0x110, 0x3c0 );
+				k2ge_k1ge_draw_scroll_plane( k1ge, p, 0x1800, line, k1ge->vram[0x034], k1ge->vram[0x035], 0x110, 0x3c0 );
 
 				/* Draw sprites with 10 priority */
-				k2ge_k1ge_draw_sprite_plane( k1ge, p, 2, line, k1ge->reg[0x020], k1ge->reg[0x021] );
+				k2ge_k1ge_draw_sprite_plane( k1ge, p, 2, line, k1ge->vram[0x020], k1ge->vram[0x021] );
 
 				/* Draw PF1 */
-				k2ge_k1ge_draw_scroll_plane( k1ge, p, 0x1000, line, k1ge->reg[0x032], k1ge->reg[0x033], 0x108, 0x3a0 );
+				k2ge_k1ge_draw_scroll_plane( k1ge, p, 0x1000, line, k1ge->vram[0x032], k1ge->vram[0x033], 0x108, 0x3a0 );
 
 				/* Draw sprites with 11 priority */
-				k2ge_k1ge_draw_sprite_plane( k1ge, p, 3, line, k1ge->reg[0x020], k1ge->reg[0x021] );
+				k2ge_k1ge_draw_sprite_plane( k1ge, p, 3, line, k1ge->vram[0x020], k1ge->vram[0x021] );
 			}
 		}
 		else
 		{
 			/* K2GE mode */
-			if ( k1ge->reg[0x030] & 0x80 )
+			if ( k1ge->vram[0x030] & 0x80 )
 			{
 				/* Draw sprites with 01 priority */
-				k2ge_draw_sprite_plane( k1ge, p, 1, line, k1ge->reg[0x020], k1ge->reg[0x021] );
+				k2ge_draw_sprite_plane( k1ge, p, 1, line, k1ge->vram[0x020], k1ge->vram[0x021] );
 
 				/* Draw PF1 */
-				k2ge_draw_scroll_plane( k1ge, p, 0x1000, line, k1ge->reg[0x032], k1ge->reg[0x033], 0x280 );
+				k2ge_draw_scroll_plane( k1ge, p, 0x1000, line, k1ge->vram[0x032], k1ge->vram[0x033], 0x280 );
 
 				/* Draw sprites with 10 priority */
-				k2ge_draw_sprite_plane( k1ge, p, 2, line, k1ge->reg[0x020], k1ge->reg[0x021] );
+				k2ge_draw_sprite_plane( k1ge, p, 2, line, k1ge->vram[0x020], k1ge->vram[0x021] );
 
 				/* Draw PF2 */
-				k2ge_draw_scroll_plane( k1ge, p, 0x1800, line, k1ge->reg[0x034], k1ge->reg[0x035], 0x300 );
+				k2ge_draw_scroll_plane( k1ge, p, 0x1800, line, k1ge->vram[0x034], k1ge->vram[0x035], 0x300 );
 
 				/* Draw sprites with 11 priority */
-				k2ge_draw_sprite_plane( k1ge, p, 3, line, k1ge->reg[0x020], k1ge->reg[0x021] );
+				k2ge_draw_sprite_plane( k1ge, p, 3, line, k1ge->vram[0x020], k1ge->vram[0x021] );
 			}
 			else
 			{
 				/* Draw sprites with 01 priority */
-				k2ge_draw_sprite_plane( k1ge, p, 1, line, k1ge->reg[0x020], k1ge->reg[0x021] );
+				k2ge_draw_sprite_plane( k1ge, p, 1, line, k1ge->vram[0x020], k1ge->vram[0x021] );
 
 				/* Draw PF2 */
-				k2ge_draw_scroll_plane( k1ge, p, 0x1800, line, k1ge->reg[0x034], k1ge->reg[0x035], 0x300 );
+				k2ge_draw_scroll_plane( k1ge, p, 0x1800, line, k1ge->vram[0x034], k1ge->vram[0x035], 0x300 );
 
 				/* Draw sprites with 10 priority */
-				k2ge_draw_sprite_plane( k1ge, p, 2, line, k1ge->reg[0x020], k1ge->reg[0x021] );
+				k2ge_draw_sprite_plane( k1ge, p, 2, line, k1ge->vram[0x020], k1ge->vram[0x021] );
 
 				/* Draw PF1 */
-				k2ge_draw_scroll_plane( k1ge, p, 0x1000, line, k1ge->reg[0x032], k1ge->reg[0x033], 0x280 );
+				k2ge_draw_scroll_plane( k1ge, p, 0x1000, line, k1ge->vram[0x032], k1ge->vram[0x033], 0x280 );
 
 				/* Draw sprites with 11 priority */
-				k2ge_draw_sprite_plane( k1ge, p, 3, line, k1ge->reg[0x020], k1ge->reg[0x021] );
+				k2ge_draw_sprite_plane( k1ge, p, 3, line, k1ge->vram[0x020], k1ge->vram[0x021] );
 			}
 		}
 
@@ -763,20 +762,20 @@ static TIMER_CALLBACK( k1ge_timer_callback )
 	/* Check for start of VBlank */
 	if ( y >= 152 )
 	{
-		k1ge->reg[0x010] |= 0x40;
-		if ( ( k1ge->reg[0x000] & 0x80 ) && k1ge->vblank_pin_w.write != NULL )
+		k1ge->vram[0x010] |= 0x40;
+		if ( ( k1ge->vram[0x000] & 0x80 ) && k1ge->vblank_pin_w.write != NULL )
 				devcb_call_write8( &k1ge->vblank_pin_w, 0, 1 );
 	}
 
 	/* Check for end of VBlank */
 	if ( y == 0 )
 	{
-		k1ge->wba_h = k1ge->reg[0x002];
-		k1ge->wba_v = k1ge->reg[0x003];
-		k1ge->wsi_h = k1ge->reg[0x004];
-		k1ge->wsi_v = k1ge->reg[0x005];
-		k1ge->reg[0x010] &= ~ 0x40;
-		if ( ( k1ge->reg[0x000] & 0x80 ) && k1ge->vblank_pin_w.write != NULL )
+		k1ge->wba_h = k1ge->vram[0x002];
+		k1ge->wba_v = k1ge->vram[0x003];
+		k1ge->wsi_h = k1ge->vram[0x004];
+		k1ge->wsi_v = k1ge->vram[0x005];
+		k1ge->vram[0x010] &= ~ 0x40;
+		if ( ( k1ge->vram[0x000] & 0x80 ) && k1ge->vblank_pin_w.write != NULL )
 			devcb_call_write8( &k1ge->vblank_pin_w, 0, 0 );
 	}
 
@@ -785,7 +784,7 @@ static TIMER_CALLBACK( k1ge_timer_callback )
 	{
 		if ( k1ge->hblank_pin_w.write != NULL )
 		{
-			if ( k1ge->reg[0x000] & 0x40 )
+			if ( k1ge->vram[0x000] & 0x40 )
 				devcb_call_write8( &k1ge->hblank_pin_w, 0, 1 );
 			timer_adjust_oneshot( k1ge->hblank_on_timer, video_screen_get_time_until_pos( k1ge->screen, y, 480 ), 0 );
 		}
@@ -840,43 +839,43 @@ static DEVICE_RESET( k1ge )
 {
 	k1ge_t *k1ge = get_safe_token( device );
 
-	k1ge->reg[0x000] = 0x00;	/* Interrupt enable */
-	k1ge->reg[0x002] = 0x00;	/* WBA.H */
-	k1ge->reg[0x003] = 0x00;	/* WVA.V */
-	k1ge->reg[0x004] = 0xFF;	/* WSI.H */
-	k1ge->reg[0x005] = 0xFF;	/* WSI.V */
-	k1ge->reg[0x007] = 0xc6;	/* REF */
-	k1ge->reg[0x012] = 0x00;	/* 2D control */
-	k1ge->reg[0x020] = 0x00;	/* PO.H */
-	k1ge->reg[0x021] = 0x00;	/* PO.V */
-	k1ge->reg[0x030] = 0x00;	/* PF */
-	k1ge->reg[0x032] = 0x00;	/* S1SO.H */
-	k1ge->reg[0x033] = 0x00;	/* S1SO.V */
-	k1ge->reg[0x034] = 0x00;	/* S2SO.H */
-	k1ge->reg[0x035] = 0x00;	/* S2SO.V */
-	k1ge->reg[0x101] = 0x07;	/* SPPLT01 */
-	k1ge->reg[0x102] = 0x07;	/* SPPLT02 */
-	k1ge->reg[0x103] = 0x07;	/* SPPLT03 */
-	k1ge->reg[0x105] = 0x07;	/* SPPLT11 */
-	k1ge->reg[0x106] = 0x07;	/* SPPLT12 */
-	k1ge->reg[0x107] = 0x07;	/* SPPLT13 */
-	k1ge->reg[0x109] = 0x07;	/* SC1PLT01 */
-	k1ge->reg[0x10a] = 0x07;	/* SC1PLT02 */
-	k1ge->reg[0x10b] = 0x07;	/* SC1PLT03 */
-	k1ge->reg[0x10d] = 0x07;	/* SC1PLT11 */
-	k1ge->reg[0x10e] = 0x07;	/* SC1PLT12 */
-	k1ge->reg[0x10f] = 0x07;	/* SC1PLT13 */
-	k1ge->reg[0x111] = 0x07;	/* SC2PLT01 */
-	k1ge->reg[0x112] = 0x07;	/* SC2PLT02 */
-	k1ge->reg[0x113] = 0x07;	/* SC2PLT03 */
-	k1ge->reg[0x115] = 0x07;	/* SC2PLT11 */
-	k1ge->reg[0x116] = 0x07;	/* SC2PLT12 */
-	k1ge->reg[0x117] = 0x07;	/* SC2PLT13 */
-	k1ge->reg[0x118] = 0x07;	/* BG */
-	k1ge->reg[0x400] = 0xFF;	/* LED control */
-	k1ge->reg[0x402] = 0x80;	/* LEDFREG */
-	k1ge->reg[0x7e0] = 0x52;	/* RESET */
-	k1ge->reg[0x7e2] = 0x00;	/* MODE */
+	k1ge->vram[0x000] = 0x00;	/* Interrupt enable */
+	k1ge->vram[0x002] = 0x00;	/* WBA.H */
+	k1ge->vram[0x003] = 0x00;	/* WVA.V */
+	k1ge->vram[0x004] = 0xFF;	/* WSI.H */
+	k1ge->vram[0x005] = 0xFF;	/* WSI.V */
+	k1ge->vram[0x007] = 0xc6;	/* REF */
+	k1ge->vram[0x012] = 0x00;	/* 2D control */
+	k1ge->vram[0x020] = 0x00;	/* PO.H */
+	k1ge->vram[0x021] = 0x00;	/* PO.V */
+	k1ge->vram[0x030] = 0x00;	/* PF */
+	k1ge->vram[0x032] = 0x00;	/* S1SO.H */
+	k1ge->vram[0x033] = 0x00;	/* S1SO.V */
+	k1ge->vram[0x034] = 0x00;	/* S2SO.H */
+	k1ge->vram[0x035] = 0x00;	/* S2SO.V */
+	k1ge->vram[0x101] = 0x07;	/* SPPLT01 */
+	k1ge->vram[0x102] = 0x07;	/* SPPLT02 */
+	k1ge->vram[0x103] = 0x07;	/* SPPLT03 */
+	k1ge->vram[0x105] = 0x07;	/* SPPLT11 */
+	k1ge->vram[0x106] = 0x07;	/* SPPLT12 */
+	k1ge->vram[0x107] = 0x07;	/* SPPLT13 */
+	k1ge->vram[0x109] = 0x07;	/* SC1PLT01 */
+	k1ge->vram[0x10a] = 0x07;	/* SC1PLT02 */
+	k1ge->vram[0x10b] = 0x07;	/* SC1PLT03 */
+	k1ge->vram[0x10d] = 0x07;	/* SC1PLT11 */
+	k1ge->vram[0x10e] = 0x07;	/* SC1PLT12 */
+	k1ge->vram[0x10f] = 0x07;	/* SC1PLT13 */
+	k1ge->vram[0x111] = 0x07;	/* SC2PLT01 */
+	k1ge->vram[0x112] = 0x07;	/* SC2PLT02 */
+	k1ge->vram[0x113] = 0x07;	/* SC2PLT03 */
+	k1ge->vram[0x115] = 0x07;	/* SC2PLT11 */
+	k1ge->vram[0x116] = 0x07;	/* SC2PLT12 */
+	k1ge->vram[0x117] = 0x07;	/* SC2PLT13 */
+	k1ge->vram[0x118] = 0x07;	/* BG */
+	k1ge->vram[0x400] = 0xFF;	/* LED control */
+	k1ge->vram[0x402] = 0x80;	/* LEDFREG */
+	k1ge->vram[0x7e0] = 0x52;	/* RESET */
+	k1ge->vram[0x7e2] = 0x00;	/* MODE */
 
 	timer_adjust_oneshot( k1ge->timer, video_screen_get_time_until_pos( k1ge->screen, ( video_screen_get_vpos( k1ge->screen ) + 1 ) % K1GE_SCREEN_HEIGHT, 0 ), 0 );
 }
