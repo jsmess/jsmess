@@ -27,13 +27,10 @@
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "machine/z80pio.h"
-#include "machine/z80sio.h"
+#include "cpu/z80/z80daisy.h"
 #include "machine/ctronics.h"
 #include "machine/kay_kbd.h"
-#include "machine/wd17xx.h"
 #include "sound/beep.h"
-#include "video/mc6845.h"
 #include "includes/kaypro.h"
 
 
@@ -44,7 +41,7 @@
 
 ************************************************************/
 
-static ADDRESS_MAP_START( kayproii_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( kaypro_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("maincpu", 0x0000)
 	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_REGION("maincpu", 0x3000) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x4000, 0xffff) AM_RAM AM_REGION("rambank", 0x4000)
@@ -53,17 +50,66 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( kayproii_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x03) AM_WRITE(kaypro2_baud_a_w)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("z80sio", kaypro2_sio_r, kaypro2_sio_w)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("z80pio_g", kaypro2_pio_r, kaypro2_pio_w)
-	AM_RANGE(0x0c, 0x0f) AM_WRITE(kaypro2_baud_b_w)
+	AM_RANGE(0x00, 0x03) AM_WRITE(kaypro_baud_a_w)
+	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("z80sio", kaypro_sio_r, kaypro_sio_w)
+	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("z80pio_g", kayproii_pio_r, kayproii_pio_w)
+	AM_RANGE(0x0c, 0x0f) AM_WRITE(kayproii_baud_b_w)
 	AM_RANGE(0x10, 0x10) AM_DEVREADWRITE("wd1793", wd17xx_status_r, wd17xx_command_w)
 	AM_RANGE(0x11, 0x11) AM_DEVREADWRITE("wd1793", wd17xx_track_r, wd17xx_track_w)
 	AM_RANGE(0x12, 0x12) AM_DEVREADWRITE("wd1793", wd17xx_sector_r, wd17xx_sector_w)
 	AM_RANGE(0x13, 0x13) AM_DEVREADWRITE("wd1793", wd17xx_data_r, wd17xx_data_w)
-	AM_RANGE(0x1c, 0x1f) AM_DEVREADWRITE("z80pio_s", kaypro2_pio_r, kaypro2_pio_w)
+	AM_RANGE(0x1c, 0x1f) AM_DEVREADWRITE("z80pio_s", kayproii_pio_r, kayproii_pio_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( kaypro2x_io, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x00, 0x03) AM_WRITE(kaypro_baud_a_w)
+	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("z80sio", kaypro_sio_r, kaypro_sio_w)
+	AM_RANGE(0x08, 0x0b) AM_WRITE(kaypro2x_baud_a_w)
+	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("z80sio_2x", kaypro2x_sio_r, kaypro2x_sio_w)
+	AM_RANGE(0x10, 0x10) AM_DEVREADWRITE("wd1793", wd17xx_status_r, wd17xx_command_w)
+	AM_RANGE(0x11, 0x11) AM_DEVREADWRITE("wd1793", wd17xx_track_r, wd17xx_track_w)
+	AM_RANGE(0x12, 0x12) AM_DEVREADWRITE("wd1793", wd17xx_sector_r, wd17xx_sector_w)
+	AM_RANGE(0x13, 0x13) AM_DEVREADWRITE("wd1793", wd17xx_data_r, wd17xx_data_w)
+	AM_RANGE(0x14, 0x17) AM_READWRITE(kaypro2x_system_port_r,kaypro2x_system_port_w)
+	AM_RANGE(0x18, 0x1b) AM_DEVWRITE("centronics", centronics_data_w)
+	AM_RANGE(0x1c, 0x1c) AM_MIRROR(2) AM_WRITE(kaypro2x_index_w)
+	AM_RANGE(0x1d, 0x1d) AM_MIRROR(2) AM_DEVREAD("crtc", mc6845_register_r) AM_WRITE(kaypro2x_data_w)
+ADDRESS_MAP_END
+
+
+/***************************************************************
+
+	Interfaces
+
+****************************************************************/
+
+static const z80_daisy_chain kayproii_daisy_chain[] =
+{
+	{ "z80sio" },		/* sio */
+	{ "z80pio_s" },		/* System pio */
+	{ "z80pio_g" },		/* General purpose pio */
+	{ NULL }
+};
+
+static const z80_daisy_chain kaypro2x_daisy_chain[] =
+{
+	{ "z80sio" },		/* sio for RS232C and keyboard */
+	{ "z80sio_2x" },	/* sio for serial printer and inbuilt modem */
+	{ NULL }
+};
+
+static const mc6845_interface kaypro2x_crtc = {
+	"screen",			/* name of screen */
+	7,				/* number of dots per character */
+	NULL,
+	kaypro2x_update_row,		/* handler to display a scanline */
+	NULL,
+	NULL,
+	NULL,
+	NULL
+};
 
 
 /***********************************************************
@@ -75,9 +121,10 @@ ADDRESS_MAP_END
 static MACHINE_DRIVER_START( kayproii )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 2500000)	/* 2.5 MHz */
-	MDRV_CPU_PROGRAM_MAP(kayproii_map, 0)
+	MDRV_CPU_PROGRAM_MAP(kaypro_map, 0)
 	MDRV_CPU_IO_MAP(kayproii_io, 0)
 	MDRV_CPU_VBLANK_INT("screen", kay_kbd_interrupt)	/* this doesn't actually exist, it is to run the keyboard */
+	MDRV_CPU_CONFIG(kayproii_daisy_chain)
 
 	MDRV_MACHINE_RESET( kayproii )
 
@@ -91,6 +138,7 @@ static MACHINE_DRIVER_START( kayproii )
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(kaypro)
 
+	MDRV_VIDEO_START( kaypro )
 	MDRV_VIDEO_UPDATE( kayproii )
 
 	/* sound hardware */
@@ -99,24 +147,25 @@ static MACHINE_DRIVER_START( kayproii )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
-	MDRV_WD179X_ADD("wd1793", kaypro2_wd1793_interface )
+	MDRV_WD179X_ADD("wd1793", kaypro_wd1793_interface )
 	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
-	MDRV_Z80PIO_ADD( "z80pio_g", kaypro2_pio_g_intf )
-	MDRV_Z80PIO_ADD( "z80pio_s", kaypro2_pio_s_intf )
-	MDRV_Z80SIO_ADD( "z80sio", 4800, kaypro2_sio_intf )	/* start at 300 baud */
+	MDRV_Z80PIO_ADD( "z80pio_g", kayproii_pio_g_intf )
+	MDRV_Z80PIO_ADD( "z80pio_s", kayproii_pio_s_intf )
+	MDRV_Z80SIO_ADD( "z80sio", 4800, kaypro_sio_intf )	/* start at 300 baud */
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( omni2 )
 	MDRV_IMPORT_FROM( kayproii )
 	MDRV_VIDEO_UPDATE( omni2 )
 MACHINE_DRIVER_END
-#if 0
+
 static MACHINE_DRIVER_START( kaypro2x )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(kaypro2x_map, 0)
+	MDRV_CPU_PROGRAM_MAP(kaypro_map, 0)
 	MDRV_CPU_IO_MAP(kaypro2x_io, 0)
-	MDRV_CPU_VBLANK_INT("screen", kay_kbd_interrupt)	/* this doesn't actually exist, it is to run the keyboard */
+	MDRV_CPU_VBLANK_INT("screen", kay_kbd_interrupt)
+	MDRV_CPU_CONFIG(kaypro2x_daisy_chain)
 
 	MDRV_MACHINE_RESET( kaypro2x )
 
@@ -125,11 +174,14 @@ static MACHINE_DRIVER_START( kaypro2x )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(80*7, 24*10)
-	MDRV_SCREEN_VISIBLE_AREA(0,80*7-1,0,24*10-1)
+	MDRV_SCREEN_SIZE(80*8, 24*16)
+	MDRV_SCREEN_VISIBLE_AREA(0,80*8-1,0,24*16-1)
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(kaypro)
 
+	MDRV_MC6845_ADD("crtc", MC6845, 1500000 , kaypro2x_crtc) /* speed to be determined ****************/
+
+	MDRV_VIDEO_START( kaypro )
 	MDRV_VIDEO_UPDATE( kaypro2x )
 
 	/* sound hardware */
@@ -138,12 +190,12 @@ static MACHINE_DRIVER_START( kaypro2x )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
-	MDRV_WD179X_ADD("wd1793", kaypro2_wd1793_interface )
+	MDRV_WD179X_ADD("wd1793", kaypro_wd1793_interface )
 	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
-	MDRV_Z80SIO_ADD( "z80sio", 4800, kaypro2_sio_intf )	/* same job as in kayproii */
-	MDRV_Z80SIO_ADD( "z80sio_2", 4800, kaypro2_sio_2_intf )	/* extra sio for the modem */
+	MDRV_Z80SIO_ADD( "z80sio", 4800, kaypro_sio_intf )
+	MDRV_Z80SIO_ADD( "z80sio_2x", 4800, kaypro_sio_intf )	/* extra sio for modem and printer */
 MACHINE_DRIVER_END
-#endif
+
 /***********************************************************
 
 	Game driver
@@ -209,13 +261,17 @@ ROM_START(kaypro10)
 ROM_END
 
 
-static SYSTEM_CONFIG_START(kaypro2)
-	CONFIG_DEVICE(kaypro2_floppy_getinfo)
+static SYSTEM_CONFIG_START(kayproii)
+	CONFIG_DEVICE(kayproii_floppy_getinfo)
+SYSTEM_CONFIG_END
+
+static SYSTEM_CONFIG_START(kaypro2x)
+	CONFIG_DEVICE(kaypro2x_floppy_getinfo)
 SYSTEM_CONFIG_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE	  INPUT    INIT      CONFIG       COMPANY  FULLNAME */
-COMP( 1983, kayproii, 0,        0,      kayproii, kay_kbd, 0,        kaypro2,	  "Non Linear Systems",  "Kaypro II - 2/83" , GAME_NOT_WORKING )
-COMP( 198?, kaypro4,  kayproii, 0,      kayproii, kay_kbd, 0,        kaypro2,	  "Non Linear Systems",  "Kaypro 4 - 4/83" , GAME_NOT_WORKING )
-COMP( 198?, omni2,    kayproii, 0,      omni2,    kay_kbd, 0,        kaypro2,	  "Non Linear Systems",  "Omni II" , GAME_NOT_WORKING )
-COMP( 1984, kaypro2x, 0,        0,      kayproii, kay_kbd, 0,        kaypro2,	  "Non Linear Systems",  "Kaypro 2x" , GAME_NOT_WORKING )
-COMP( 198?, kaypro10, 0,        0,      kayproii, kay_kbd, 0,        kaypro2,	  "Non Linear Systems",  "Kaypro 10" , GAME_NOT_WORKING )
+COMP( 1983, kayproii, 0,        0,      kayproii, kay_kbd, 0,        kayproii,	  "Non Linear Systems",  "Kaypro II - 2/83" , GAME_NOT_WORKING )
+COMP( 198?, kaypro4,  kayproii, 0,      kayproii, kay_kbd, 0,        kayproii,	  "Non Linear Systems",  "Kaypro 4 - 4/83" , GAME_NOT_WORKING )
+COMP( 198?, omni2,    kayproii, 0,      omni2,    kay_kbd, 0,        kayproii,	  "Non Linear Systems",  "Omni II" , GAME_NOT_WORKING )
+COMP( 1984, kaypro2x, 0,        0,      kaypro2x, kay_kbd, 0,        kaypro2x,	  "Non Linear Systems",  "Kaypro 2x" , GAME_NOT_WORKING )
+COMP( 198?, kaypro10, 0,        0,      kaypro2x, kay_kbd, 0,        kaypro2x,	  "Non Linear Systems",  "Kaypro 10" , GAME_NOT_WORKING )
