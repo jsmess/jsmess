@@ -1,10 +1,14 @@
-0.130.1
+﻿0.130.1
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
 - Kaypro II (Model 2/83) (not working)  [Robbbert]
+- Kaypro 4 (Model 4/83) (not working)  [Robbbert]
+- Kaypro 2x (Model 2/84) (not working)  [Robbbert]
+- Kaypro 10 (Model 2/83) (not working)  [Robbbert]
 - Nokia MikroMikko 1 M6 (not working)  [Curt Coder]
 - Nokia MikroMikko 1 M7 (not working)  [Curt Coder]
+- Omni II (not working)  [Robbbert]
 - Talking Electronics Computer (TEC-1)  [Robbbert]
 - Z80 N.E.  [Roberto Lavarone]
 
