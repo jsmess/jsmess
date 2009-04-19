@@ -627,17 +627,18 @@ static void k2ge_draw( const device_config *device, int line )
 {
 	k1ge_t *k1ge = get_safe_token( device );
 	UINT16 *p = BITMAP_ADDR16( k1ge->bitmap, line, 0 );
-	UINT16 col;
+	UINT16 col = 0;
+	UINT16 oowcol;
 	int i;
+
+	oowcol = ( k1ge->reg[0x012] & 0x07 ) * 2;
+	oowcol = k1ge->reg[0x3f0 + col ] | ( k1ge->reg[0x3f1 + col ] << 8 );
 
 	if ( line < k1ge->wba_v || line >= k1ge->wba_v + k1ge->wsi_v )
 	{
-		col = ( k1ge->reg[0x012] & 0x07 ) * 2;
-		col = k1ge->reg[0x3f0 + col ] | ( k1ge->reg[0x3f1 + col ] << 8 );
-
 		for( i = 0; i < 160; i++ )
 		{
-			p[i] = col;
+			p[i] = oowcol;
 		}
 	}
 	else
@@ -646,11 +647,11 @@ static void k2ge_draw( const device_config *device, int line )
 		{
 			col = ( k1ge->reg[0x118] & 0x07 ) * 2;
 			col = k1ge->reg[0x3e0 + col ] | ( k1ge->reg[0x3e1 + col ] << 8 );
+		}
 
-			for ( i = 0; i < 160; i++ )
-			{
-				p[i] = col;
-			}
+		for ( i = 0; i < 160; i++ )
+		{
+			p[i] = col;
 		}
 
 		if ( k1ge->reg[0x7e2] & 0x80 )
@@ -728,6 +729,16 @@ static void k2ge_draw( const device_config *device, int line )
 				/* Draw sprites with 11 priority */
 				k2ge_draw_sprite_plane( k1ge, p, 3, line, k1ge->reg[0x020], k1ge->reg[0x021] );
 			}
+		}
+
+		for ( i = 0; i < k1ge->wba_h; i++ )
+		{
+			p[i] = oowcol;
+		}
+
+		for ( i = k1ge->wba_h + k1ge->wsi_h; i < 160; i++ )
+		{
+			p[i] = oowcol;
 		}
 	}
 }
