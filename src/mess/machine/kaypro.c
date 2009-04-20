@@ -369,13 +369,14 @@ void kayproii_floppy_getinfo(const mess_device_class *devclass, UINT32 state, un
 	}
 }
 
+/* all machines have 2 floppies except kaypro 10 has one floppy and one hard drive */
 void kaypro2x_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:			info->i = 4; break;
+		case MESS_DEVINFO_INT_COUNT:			info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 //		case MESS_DEVINFO_PTR_LOAD:			info->load = DEVICE_IMAGE_LOAD_NAME(kaypro2_floppy); break;

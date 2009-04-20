@@ -74,8 +74,22 @@ static ADDRESS_MAP_START( kaypro2x_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x13, 0x13) AM_DEVREADWRITE("wd1793", wd17xx_data_r, wd17xx_data_w)
 	AM_RANGE(0x14, 0x17) AM_READWRITE(kaypro2x_system_port_r,kaypro2x_system_port_w)
 	AM_RANGE(0x18, 0x1b) AM_DEVWRITE("centronics", centronics_data_w)
-	AM_RANGE(0x1c, 0x1c) AM_MIRROR(2) AM_WRITE(kaypro2x_index_w)
-	AM_RANGE(0x1d, 0x1d) AM_MIRROR(2) AM_DEVREAD("crtc", mc6845_register_r) AM_WRITE(kaypro2x_data_w)
+	AM_RANGE(0x1c, 0x1c) AM_READWRITE(kaypro2x_status_r,kaypro2x_index_w)
+	AM_RANGE(0x1d, 0x1d) AM_DEVREAD("crtc", mc6845_register_r) AM_WRITE(kaypro2x_register_w)
+	AM_RANGE(0x1f, 0x1f) AM_READWRITE(kaypro2x_videoram_r,kaypro2x_videoram_w)
+
+	/* The below are not emulated */
+/*	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("z80pio", kaypro2x_pio_r, kaypro2x_pio_w) - for RTC and Modem
+	AM_RANGE(0x24, 0x27) communicate with MM58167A RTC. Modem uses TMS99531 and TMS99532 chips.
+	AM_RANGE(0x80, 0x80) Hard drive controller card I/O port - 10MB hard drive only fitted to the Kaypro 10
+	AM_RANGE(0x81, 0x81) Hard Drive READ error register, WRITE precomp
+	AM_RANGE(0x82, 0x82) Hard Drive Sector register count I/O
+	AM_RANGE(0x83, 0x83) Hard Drive Sector register number I/O
+	AM_RANGE(0x84, 0x84) Hard Drive Cylinder low register I/O
+	AM_RANGE(0x85, 0x85) Hard Drive Cylinder high register I/O
+	AM_RANGE(0x86, 0x86) Hard Drive Size / Drive / Head register I/O
+	AM_RANGE(0x87, 0x87) Hard Drive READ status register, WRITE command register */
+	AM_RANGE(0x20, 0x87) AM_NOP
 ADDRESS_MAP_END
 
 
@@ -174,12 +188,12 @@ static MACHINE_DRIVER_START( kaypro2x )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(80*8, 24*16)
-	MDRV_SCREEN_VISIBLE_AREA(0,80*8-1,0,24*16-1)
-	MDRV_PALETTE_LENGTH(2)
+	MDRV_SCREEN_SIZE(80*8, 25*16)
+	MDRV_SCREEN_VISIBLE_AREA(0,80*8-1,0,25*16-1)
+	MDRV_PALETTE_LENGTH(3)
 	MDRV_PALETTE_INIT(kaypro)
 
-	MDRV_MC6845_ADD("crtc", MC6845, 1500000 , kaypro2x_crtc) /* speed to be determined ****************/
+	MDRV_MC6845_ADD("crtc", MC6845, 1500000, kaypro2x_crtc) /* comes out of ULA - needs to be measured */
 
 	MDRV_VIDEO_START( kaypro )
 	MDRV_VIDEO_UPDATE( kaypro2x )
@@ -202,7 +216,7 @@ MACHINE_DRIVER_END
 
 ************************************************************/
 
-/* The roms need to be renamed to their part numbers (81-xxx) when known */
+/* The detested bios "universal rom" is part number 81-478 */
 
 ROM_START(kayproii)
 	/* The board could take a 2716 or 2732 */
@@ -272,6 +286,6 @@ SYSTEM_CONFIG_END
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE	  INPUT    INIT      CONFIG       COMPANY  FULLNAME */
 COMP( 1983, kayproii, 0,        0,      kayproii, kay_kbd, 0,        kayproii,	  "Non Linear Systems",  "Kaypro II - 2/83" , GAME_NOT_WORKING )
 COMP( 198?, kaypro4,  kayproii, 0,      kayproii, kay_kbd, 0,        kayproii,	  "Non Linear Systems",  "Kaypro 4 - 4/83" , GAME_NOT_WORKING )
-COMP( 198?, omni2,    kayproii, 0,      omni2,    kay_kbd, 0,        kayproii,	  "Non Linear Systems",  "Omni II" , GAME_NOT_WORKING )
-COMP( 1984, kaypro2x, 0,        0,      kaypro2x, kay_kbd, 0,        kaypro2x,	  "Non Linear Systems",  "Kaypro 2x" , GAME_NOT_WORKING )
+COMP( 198?, omni2,    kayproii, 0,      omni2,    kay_kbd, 0,        kayproii,	  "Unknown",  "Omni II" , GAME_NOT_WORKING )
+COMP( 1984, kaypro2x, 0,        0,      kaypro2x, kay_kbd, 0,        kayproii,	  "Non Linear Systems",  "Kaypro 2x" , GAME_NOT_WORKING )
 COMP( 198?, kaypro10, 0,        0,      kaypro2x, kay_kbd, 0,        kaypro2x,	  "Non Linear Systems",  "Kaypro 10" , GAME_NOT_WORKING )

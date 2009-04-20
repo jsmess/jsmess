@@ -9,12 +9,8 @@ static const UINT8 mc6845_mask[32]={0xff,0xff,0xff,0x0f,0x7f,0x1f,0x7f,0x7f,3,0x
 
 static const device_config *mc6845;
 static const UINT8 *FNT;
-static UINT8 chr,gfx,fg,bg;
-static UINT16 mem,x;
-static UINT8 framecnt=0;
-static UINT8 speed,flash;
-static UINT16 cursor;
-static UINT16 mc6845_video_address;
+static UINT8 chr,gfx,fg,bg,attr,speed,flash,framecnt=0;
+static UINT16 mem,x,cursor,mc6845_video_address;
 
 /***********************************************************
 
@@ -24,8 +20,9 @@ static UINT16 mc6845_video_address;
 
 PALETTE_INIT( kaypro )
 {
-	palette_set_color(machine,0,RGB_BLACK); /* black */
-	palette_set_color(machine,1,MAKE_RGB(0, 220, 0)); /* green */	
+	palette_set_color(machine, 0, RGB_BLACK); /* black */
+	palette_set_color(machine, 1, MAKE_RGB(0, 220, 0)); /* green */	
+	palette_set_color(machine, 2, MAKE_RGB(0, 110, 0)); /* low intensity green */	
 }
 
 VIDEO_UPDATE( kayproii )
@@ -135,34 +132,55 @@ VIDEO_UPDATE( kaypro2x )
 	return 0;
 }
 
-/* bit 6 of kaypro2x_system_port selects alternate characters (A12 on character generator rom) */
+/* bit 6 of kaypro2x_system_port selects alternate characters (A12 on character generator rom).
+	The diagram specifies a 2732 with 28 pins, and more address pins. Possibly a 2764 or 27128.
+	Since our dump only goes up to A11, the alternate character set doesn't exist.
+
+	0000-07FF of videoram is memory-mapped characters; 0800-0FFF is equivalent attribute bytes.
+	d3 Underline
+	d2 blinking (at unknown rate)
+	d1 low intensity
+	d0 reverse video */
 
 
 MC6845_UPDATE_ROW( kaypro2x_update_row )
 {
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 
-	fg = 1;
-	bg=0;
-
 	for (x = 0; x < x_count; x++)				// for each character
 	{
 		UINT8 inv=0;
 		//		if (x == cursor_x) inv=0xff;	/* uncomment when mame fixed */
-		mem = (ma + x) & 0xfff;
+		mem = (ma + x) & 0x7ff;
 		chr = videoram[mem];
+		attr = videoram[mem | 0x800];
 
-		/* get colour or b&w */
-//		col = 5;					/* green */
-//		if ((options & 0x60) == 0x60) col = 15;		/* b&w */
-//		if (!(options & 0x40)) col = colorram[mem];			// read a byte of colour
+		if ((attr & 3) == 3)
+		{
+			fg = 0;
+			bg = 2;
+		}
+		else
+		if ((attr & 3) == 2)
+		{
+			fg = 2;
+			bg = 0;
+		}
+		else
+		if ((attr & 3) == 1)
+		{
+			fg = 0;
+			bg = 1;
+		}
+		else
+		{
+			fg = 1;
+			bg = 0;
+		}
 
-		/* if inverse mode, replace any pcgram chrs with inverse chrs */
-//		if ((!super80v_rom_pcg) && (chr & 0x80))			// is it a high chr in inverse mode
-//		{
-//			inv ^= 0xff;						// invert the chr
-//			chr &= 0x7f;						// and drop bit 7
-//		}
+		/* Take care of flashing characters */
+		if ((attr & 4) && (framecnt & 8))
+			fg = bg;
 
 		/* process cursor - remove when mame fixed */
 		if ((((!flash) && (!speed)) ||
@@ -174,7 +192,7 @@ MC6845_UPDATE_ROW( kaypro2x_update_row )
 		/* get pattern of pixels for that character scanline */
 		gfx = FNT[(chr<<4) | ra ];
 
-		/* Display a scanline of a character (7 pixels) */
+		/* Display a scanline of a character (8 pixels) */
 		*p = ( gfx & 0x80 ) ? fg : bg; p++;
 		*p = ( gfx & 0x40 ) ? fg : bg; p++;
 		*p = ( gfx & 0x20 ) ? fg : bg; p++;
@@ -182,7 +200,14 @@ MC6845_UPDATE_ROW( kaypro2x_update_row )
 		*p = ( gfx & 0x08 ) ? fg : bg; p++;
 		*p = ( gfx & 0x04 ) ? fg : bg; p++;
 		*p = ( gfx & 0x02 ) ? fg : bg; p++;
-		*p = ( gfx & 0x01 ) ? fg : bg; p++;
+
+		/* underline */
+		if (attr & 8)
+			*p = fg;
+		else
+			*p = ( gfx & 0x01 ) ? fg : bg;
+
+		p++;
 	}
 }
 
@@ -223,12 +248,14 @@ static void mc6845_cursor_configure(void)
 	if (curs_type == 3) for (i = r11; i < r10;i++) mc6845_cursor[i]=0; // now take a bite out of the middle
 }
 
-/* Resize the screen within the limits of the hardware. Expand the image to fill the screen area */
+/* Resize the screen within the limits of the hardware. Expand the image to fill the screen area.
+	Standard screen is 640 x 400 = 0x7d0 bytes. */
+
 static void mc6845_screen_configure(running_machine *machine)
 {
 	rectangle visarea;
 
-	UINT16 width = mc6845_reg[1]*7-1;							// width in pixels
+	UINT16 width = mc6845_reg[1]*8-1;							// width in pixels
 	UINT16 height = mc6845_reg[6]*(mc6845_reg[9]+1)-1;					// height in pixels
 	UINT16 bytes = mc6845_reg[1]*mc6845_reg[6]-1;						// video ram needed -1
 
@@ -237,20 +264,27 @@ static void mc6845_screen_configure(running_machine *machine)
 	visarea.max_x = width-1;
 	visarea.min_y = 0;
 	visarea.max_y = height-1;
-	if ((width < 610) && (height < 460) && (bytes < 0x1000))	/* bounds checking to prevent an assert or violation */
+	if ((width < 640) && (height < 400) && (bytes < 0x800))	/* bounds checking to prevent an assert or violation */
 		video_screen_set_visarea(machine->primary_screen, 0, width, 0, height);
 }
 
 
 /**************************** I/O PORTS *****************************************************************/
 
+READ8_HANDLER( kaypro2x_status_r )
+{
+/* Need bit 7 high or computer hangs */
+
+	return 0x80 | mc6845_register_r( mc6845, 0);
+}
+
 WRITE8_HANDLER( kaypro2x_index_w )
 {
-	if (data < 32) mc6845_ind = data; else mc6845_ind = 32;		/* make sure if you try using an invalid register your write will go nowhere */
+	mc6845_ind = data & 0x1f;
 	mc6845_address_w( mc6845, 0, data );
 }
 
-WRITE8_HANDLER( kaypro2x_data_w )
+WRITE8_HANDLER( kaypro2x_register_w )
 {
 	if (mc6845_ind < 16)
 		mc6845_reg[mc6845_ind] = data & mc6845_mask[mc6845_ind];	/* save data in register */
@@ -264,10 +298,7 @@ WRITE8_HANDLER( kaypro2x_data_w )
 		mc6845_cursor_configure();		/* adjust cursor shape - remove when mame fixed */
 
 	if ((mc6845_ind > 17) && (mc6845_ind < 20))
-		mc6845_video_address = mc6845_reg[19] | (mc6845_reg[18] << 8);	/* internal ULA address */
-
-	if (mc6845_ind == 31)
-		kaypro_videoram_w(space, mc6845_video_address, data);
+		mc6845_video_address = mc6845_reg[19] | ((mc6845_reg[18] & 0x3f) << 8);	/* internal ULA address */
 
 	mc6845_register_w( mc6845, 0, data );
 }
@@ -280,6 +311,16 @@ READ8_HANDLER( kaypro_videoram_r )
 WRITE8_HANDLER( kaypro_videoram_w )
 {
 	videoram[offset] = data;
+}
+
+READ8_HANDLER( kaypro2x_videoram_r )
+{
+	return videoram[mc6845_video_address];
+}
+
+WRITE8_HANDLER( kaypro2x_videoram_w )
+{
+	videoram[mc6845_video_address] = data;
 }
 
 VIDEO_START( kaypro )

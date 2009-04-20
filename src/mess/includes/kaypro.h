@@ -45,6 +45,10 @@ VIDEO_UPDATE( omni2 );
 VIDEO_UPDATE( kaypro2x );
 
 READ8_HANDLER( kaypro_videoram_r );
+READ8_HANDLER( kaypro2x_status_r );
+READ8_HANDLER( kaypro2x_videoram_r );
+
 WRITE8_HANDLER( kaypro_videoram_w );
 WRITE8_HANDLER( kaypro2x_index_w );
-WRITE8_HANDLER( kaypro2x_data_w );
+WRITE8_HANDLER( kaypro2x_register_w );
+WRITE8_HANDLER( kaypro2x_videoram_w );
