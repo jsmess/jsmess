@@ -140,7 +140,9 @@ VIDEO_UPDATE( kaypro2x )
 	d3 Underline
 	d2 blinking (at unknown rate)
 	d1 low intensity
-	d0 reverse video */
+	d0 reverse video
+
+	Not sure how the attributes interact, for example does an underline blink? */
 
 
 MC6845_UPDATE_ROW( kaypro2x_update_row )
@@ -190,7 +192,10 @@ MC6845_UPDATE_ROW( kaypro2x_update_row )
 				inv ^= mc6845_cursor[ra];
 
 		/* get pattern of pixels for that character scanline */
-		gfx = FNT[(chr<<4) | ra ];
+		if ((ra == 15) && (attr & 8))	/* underline */
+			gfx = 0xff;
+		else
+			gfx = FNT[(chr<<4) | ra ];
 
 		/* Display a scanline of a character (8 pixels) */
 		*p = ( gfx & 0x80 ) ? fg : bg; p++;
@@ -200,14 +205,7 @@ MC6845_UPDATE_ROW( kaypro2x_update_row )
 		*p = ( gfx & 0x08 ) ? fg : bg; p++;
 		*p = ( gfx & 0x04 ) ? fg : bg; p++;
 		*p = ( gfx & 0x02 ) ? fg : bg; p++;
-
-		/* underline */
-		if (attr & 8)
-			*p = fg;
-		else
-			*p = ( gfx & 0x01 ) ? fg : bg;
-
-		p++;
+		*p = ( gfx & 0x01 ) ? fg : bg; p++;
 	}
 }
 
