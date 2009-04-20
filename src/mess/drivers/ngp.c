@@ -673,6 +673,16 @@ static DEVICE_IMAGE_LOAD( ngp_cart )
 }
 
 
+static DEVICE_IMAGE_UNLOAD( ngp_cart )
+{
+	flash_chip[0].present = 0;
+	flash_chip[0].state = F_READ;
+
+	flash_chip[1].present = 0;
+	flash_chip[1].state = F_READ;
+}
+
+
 static k1ge_interface ngp_k1ge_interface =
 {
 	"screen",
@@ -724,6 +734,7 @@ static MACHINE_DRIVER_START( ngp_common )
 	MDRV_CARTSLOT_NOT_MANDATORY
 	MDRV_CARTSLOT_START( ngp_cart )
 	MDRV_CARTSLOT_LOAD( ngp_cart )
+	MDRV_CARTSLOT_UNLOAD( ngp_cart )
 MACHINE_DRIVER_END
 
 
