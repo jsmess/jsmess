@@ -767,6 +767,6 @@ ROM_START( ngpc )
 ROM_END
 
 
-CONS( 1998, ngp, 0, 0, ngp, ngp, 0, 0, "SNK", "NeoGeo Pocket", 0 )
-CONS( 1999, ngpc, ngp, 0, ngpc, ngp, 0, 0, "SNK", "NeoGeo Pocket Color", 0 )
+CONS( 1998, ngp, 0, 0, ngp, ngp, 0, 0, "SNK", "NeoGeo Pocket", GAME_IMPERFECT_SOUND )
+CONS( 1999, ngpc, ngp, 0, ngpc, ngp, 0, 0, "SNK", "NeoGeo Pocket Color", GAME_IMPERFECT_SOUND )
 
