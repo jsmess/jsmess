@@ -224,6 +224,7 @@ SOUNDS += SID6581
 SOUNDS += SID8580
 SOUNDS += SP0256
 #SOUNDS += DIGITALKER
+SOUNDS += T6W28
 
 
 #-------------------------------------------------

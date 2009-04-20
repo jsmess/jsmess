@@ -98,7 +98,7 @@ the Neogeo Pocket.
 #include "cpu/tlcs900/tlcs900.h"
 #include "cpu/z80/z80.h"
 #include "devices/cartslot.h"
-#include "sound/sn76496.h"
+#include "sound/t6w28.h"
 #include "sound/dac.h"
 #include "video/k1ge.h"
 
@@ -187,9 +187,12 @@ static WRITE8_HANDLER( ngp_io_w )
 {
 	switch( offset )
 	{
-	case 0x20:		/* sn76489 right */
-	case 0x21:		/* sn76489 left */
-		sn76496_w( devtag_get_device( space->machine, "sn76489a" ), 0, data );
+	case 0x20:		/* t6w28 "right" */
+	case 0x21:		/* t6w28 "left" */
+		if ( io_reg[0x38] == 0x55 && io_reg[0x39] == 0xAA )
+		{
+			t6w28_w( devtag_get_device( space->machine, "t6w28" ), 0, data );
+		}
 		break;
 
 	case 0x22:		/* DAC right */
@@ -490,8 +493,7 @@ static WRITE8_HANDLER( ngp_z80_signal_main_w )
 
 static ADDRESS_MAP_START( z80_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x0FFF )	AM_RAM AM_SHARE(1)								/* shared with tlcs900 */
-	AM_RANGE( 0x4000, 0x4000 )	AM_DEVWRITE( "sn76489a", sn76496_w )			/* sound chip (right) */
-	AM_RANGE( 0x4001, 0x4001 )	AM_DEVWRITE( "sn76489a", sn76496_w )			/* sound chip (left) */
+	AM_RANGE( 0x4000, 0x4001 )	AM_DEVWRITE( "t6w28", t6w28_w )					/* sound chip (right, left) */
 	AM_RANGE( 0x8000, 0x8000 )	AM_READWRITE( ngp_z80_comm_r, ngp_z80_comm_w )	/* main-sound communication */
 	AM_RANGE( 0xc000, 0xc000 )	AM_WRITE( ngp_z80_signal_main_w )				/* signal irq to main cpu */
 ADDRESS_MAP_END
@@ -720,9 +722,9 @@ static MACHINE_DRIVER_START( ngp_common )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO( "lspeaker","rspeaker" )
 
-	MDRV_SOUND_ADD( "sn76489a", SN76489A, XTAL_6_144MHz/2 )
-	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "lspeaker", 0.50 )
-	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "rspeaker", 0.50 )
+	MDRV_SOUND_ADD( "t6w28", T6W28, XTAL_6_144MHz/2 )
+	MDRV_SOUND_ROUTE( 0, "lspeaker", 0.50 )
+	MDRV_SOUND_ROUTE( 1, "rspeaker", 0.50 )
 
 	MDRV_SOUND_ADD( "dac_l", DAC, 0 )
 	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "lspeaker", 0.50 )
@@ -778,6 +780,6 @@ ROM_START( ngpc )
 ROM_END
 
 
-CONS( 1998, ngp, 0, 0, ngp, ngp, 0, 0, "SNK", "NeoGeo Pocket", GAME_IMPERFECT_SOUND )
-CONS( 1999, ngpc, ngp, 0, ngpc, ngp, 0, 0, "SNK", "NeoGeo Pocket Color", GAME_IMPERFECT_SOUND )
+CONS( 1998, ngp, 0, 0, ngp, ngp, 0, 0, "SNK", "NeoGeo Pocket", 0 )
+CONS( 1999, ngpc, ngp, 0, ngpc, ngp, 0, 0, "SNK", "NeoGeo Pocket Color", 0 )
 
