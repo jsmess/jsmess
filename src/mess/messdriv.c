@@ -202,6 +202,9 @@ const game_driver * const drivers[] =
 	/* KOEI */
 	DRIVER( pasogo )	/* KOEI PasoGo										*/
 
+	/* SNK */
+	DRIVER( ngp )		/* NeoGeo Pocket									*/
+	DRIVER( ngpc )		/* NeoGeo Pocket Color								*/
 
 /****************COMPUTERS***************************************************/
     /* ACORN */

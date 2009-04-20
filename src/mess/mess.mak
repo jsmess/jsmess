@@ -104,6 +104,7 @@ CPUS += RSP
 CPUS += CDP1802
 CPUS += COP400
 #CPUS += TLCS90
+CPUS += TLCS900
 #CPUS += MB88XX
 #CPUS += MB86233
 CPUS += SSP1601
@@ -329,6 +330,7 @@ DRVLIBS = \
 	$(MESSOBJ)/sgi.a \
 	$(MESSOBJ)/sharp.a \
 	$(MESSOBJ)/sinclair.a \
+	$(MESSOBJ)/snk.a \
 	$(MESSOBJ)/sony.a \
 	$(MESSOBJ)/sord.a \
 	$(MESSOBJ)/special.a \
@@ -1277,6 +1279,10 @@ $(MESSOBJ)/votrax.a: \
 $(MESSOBJ)/nokia.a: \
 	$(MESS_DRIVERS)/mikromik.o \
 	$(MESS_VIDEO)/upd7220.o \
+
+$(MESSOBJ)/snk.a: \
+	$(MESS_DRIVERS)/ngp.o \
+	$(MESS_VIDEO)/k1ge.o
 
 $(MESSOBJ)/z80ne.a:	\
 	$(MESS_DRIVERS)/z80ne.o     \

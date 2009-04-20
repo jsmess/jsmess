@@ -9,6 +9,8 @@ New System Drivers Supported (in no particular order):
 - Nokia MikroMikko 1 M6 (not working)  [Curt Coder]
 - Nokia MikroMikko 1 M7 (not working)  [Curt Coder]
 - Omni II (not working)  [Robbbert]
+- SNK NeoGeo Pocket  [Wilbert Pol]
+- SNK NeoGeo Pocket Color  [Wilbert Pol]
 - Talking Electronics Computer (TEC-1)  [Robbbert]
 - Z80 N.E.  [Roberto Lavarone]
 
