@@ -1,4 +1,4 @@
-﻿0.130.1
+0.130.1
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
@@ -27,7 +27,7 @@ System Driver Changes:
 
 - [ATMOS] Added Basic v1.2x enhanced BIOS [Fabio Priuli]
 
-- [COLECO] Converted to use PORT_CATEGORY for controller selection. Check 
+- [COLECO] Converted to use PORT_CATEGORY for controller selection. Look into 
   the Category Menu (after pressing TAB) to enable Extra controllers. [Fabio 
   Priuli]
 
@@ -38,6 +38,12 @@ System Driver Changes:
 
 - [MBEE] The pc85 now has the correct bioses, and the shell multi-rom selector
   is working. [Robbbert]
+
+- [SPECTRUM] Removed Spectrum+ keyboard keys from earlier models (and from 
+  some clones). Moved Joystick interface selection to the Category Menu. [Fabio 
+  Priuli]
+
+- [SPECTRUM] Added natural keyboard support. [Fabio Priuli]
 
 - [STUDIO2] Fixed .st2 cartridge loading. [Curt Coder]
 
@@ -50,6 +56,11 @@ System Driver Changes:
           - ht1080z and system-80 extension roms added
 
 - [X68000] Added support for 3 and 6 button Megadrive gamepads. [Barry Rodewald]
+
+- Added natural keyboard support to a number of drivers: ac1.c, amiga.c, 
+  apogee.c, b2m.c, bk.c, einstein.c, galeb.c, homelab.c, irisha.c, mikro80.c, 
+  mikrosha.c, mz80.c, orao.c, partner.c, radio86.c, sapi1.c, ti99_8.c, tm990189.c, 
+  ut88.c [Fabio Priuli]
 
 
 
