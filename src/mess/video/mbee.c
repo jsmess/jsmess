@@ -39,10 +39,10 @@ typedef struct {		 // CRTC 6545
 } CRTC6545;
 
 static CRTC6545 crt;
-static int framecnt = 0;
-static int m6545_color_bank = 0;
-static int m6545_video_bank = 0;
-static int mbee_pcg_color_latch = 0;
+static UINT8 framecnt = 0;
+static UINT8 m6545_color_bank = 0;
+static UINT8 m6545_video_bank = 0;
+static UINT8 mbee_pcg_color_latch = 0;
 
 int mbee_frame_counter;
 UINT8 *mbee_pcgram;
@@ -131,7 +131,7 @@ static int keyboard_matrix_r(running_machine *machine, int offs)
 	return data;
 }
 
- READ8_HANDLER ( mbee_color_bank_r )
+READ8_HANDLER ( mbee_color_bank_r )
 {
 	return m6545_color_bank;
 }
@@ -139,6 +139,7 @@ static int keyboard_matrix_r(running_machine *machine, int offs)
 WRITE8_HANDLER ( mbee_color_bank_w )
 {
 	m6545_color_bank = data;
+	memory_set_bank(space->machine, 4, data & 7);
 }
 
  READ8_HANDLER ( mbee_video_bank_r )

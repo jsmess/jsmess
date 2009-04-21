@@ -105,6 +105,17 @@ static ADDRESS_MAP_START(mbeeic_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xf800, 0xffff) AM_READWRITE(SMH_BANK3, mbee_pcg_color_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START(mbeepc85_mem, ADDRESS_SPACE_PROGRAM, 8)
+	AM_RANGE(0x0000, 0x7fff) AM_SIZE(&mbee_size)
+	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK(1)
+	AM_RANGE(0x1000, 0x7fff) AM_RAM
+	AM_RANGE(0x8000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK(4)
+	AM_RANGE(0xd000, 0xefff) AM_ROM
+	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(SMH_BANK2, mbee_videoram_w) AM_SIZE(&videoram_size)
+	AM_RANGE(0xf800, 0xffff) AM_READWRITE(SMH_BANK3, mbee_pcg_color_w)
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START(mbee56_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0xdfff) AM_SIZE(&mbee_size)
 	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK(1)
@@ -115,7 +126,7 @@ static ADDRESS_MAP_START(mbee56_mem, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(mbee_ports, ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START(mbee_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0x10) AM_DEVREADWRITE("z80pio", z80pio_alt_r, z80pio_alt_w)
@@ -124,13 +135,30 @@ static ADDRESS_MAP_START(mbee_ports, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0d, 0x0d) AM_MIRROR(0x10) AM_READWRITE(m6545_data_r, m6545_data_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(mbeeic_ports, ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START(mbeeic_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0x10) AM_DEVREADWRITE("z80pio", z80pio_alt_r, z80pio_alt_w)
 	AM_RANGE(0x08, 0x08) AM_MIRROR(0x10) AM_READWRITE(mbee_pcg_color_latch_r, mbee_pcg_color_latch_w)
 	// AM_RANGE(0x09, 0x09) AM_MIRROR(0x10)  Listed as "Colour Wait Off" or "USART 2651" but doesn't appear in the schematics
 	AM_RANGE(0x0a, 0x0a) AM_MIRROR(0x10) AM_READWRITE(mbee_color_bank_r, mbee_color_bank_w)
+	AM_RANGE(0x0b, 0x0b) AM_MIRROR(0x10) AM_READWRITE(mbee_video_bank_r, mbee_video_bank_w)
+	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x10) AM_READWRITE(m6545_status_r, m6545_index_w)
+	AM_RANGE(0x0d, 0x0d) AM_MIRROR(0x10) AM_READWRITE(m6545_data_r, m6545_data_w)
+	AM_RANGE(0x44, 0x44) AM_DEVREADWRITE("wd179x", wd17xx_status_r, wd17xx_command_w)
+	AM_RANGE(0x45, 0x45) AM_DEVREADWRITE("wd179x", wd17xx_track_r, wd17xx_track_w)
+	AM_RANGE(0x46, 0x46) AM_DEVREADWRITE("wd179x", wd17xx_sector_r, wd17xx_sector_w)
+	AM_RANGE(0x47, 0x47) AM_DEVREADWRITE("wd179x", wd17xx_data_r, wd17xx_data_w)
+	AM_RANGE(0x48, 0x48) AM_READWRITE(mbee_fdc_status_r, mbee_fdc_motor_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(mbee56_io, ADDRESS_SPACE_IO, 8)
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x00, 0x03) AM_MIRROR(0x10) AM_DEVREADWRITE("z80pio", z80pio_alt_r, z80pio_alt_w)
+	AM_RANGE(0x08, 0x08) AM_MIRROR(0x10) AM_READWRITE(mbee_pcg_color_latch_r, mbee_pcg_color_latch_w)
+	// AM_RANGE(0x09, 0x09) AM_MIRROR(0x10)  Listed as "Colour Wait Off" or "USART 2651" but doesn't appear in the schematics
+	//	AM_RANGE(0x0a, 0x0a) AM_MIRROR(0x10) AM_READWRITE(mbee_color_bank_r, mbee_color_bank_w)
 	AM_RANGE(0x0b, 0x0b) AM_MIRROR(0x10) AM_READWRITE(mbee_video_bank_r, mbee_video_bank_w)
 	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x10) AM_READWRITE(m6545_status_r, m6545_index_w)
 	AM_RANGE(0x0d, 0x0d) AM_MIRROR(0x10) AM_READWRITE(m6545_data_r, m6545_data_w)
@@ -376,7 +404,7 @@ static MACHINE_DRIVER_START( mbee )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz / 6)         /* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(mbee_mem, 0)
-	MDRV_CPU_IO_MAP(mbee_ports, 0)
+	MDRV_CPU_IO_MAP(mbee_io, 0)
 	MDRV_CPU_CONFIG(mbee_daisy_chain)
 	MDRV_CPU_VBLANK_INT("screen", mbee_interrupt)
 
@@ -419,7 +447,7 @@ static MACHINE_DRIVER_START( mbeeic )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3375000)         /* 3.37500 MHz */
 	MDRV_CPU_PROGRAM_MAP(mbeeic_mem, 0)
-	MDRV_CPU_IO_MAP(mbeeic_ports, 0)
+	MDRV_CPU_IO_MAP(mbeeic_io, 0)
 	MDRV_CPU_CONFIG(mbee_daisy_chain)
 	MDRV_CPU_VBLANK_INT("screen", mbee_interrupt)
 
@@ -459,11 +487,17 @@ static MACHINE_DRIVER_START( mbeeic )
 	MDRV_IMPORT_FROM(mbee_cartslot)
 MACHINE_DRIVER_END
 
-
 static MACHINE_DRIVER_START( mbee56 )
 	MDRV_IMPORT_FROM( mbeeic )
 	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP(mbee56_mem, 0)
+	MDRV_CPU_IO_MAP(mbee56_io, 0)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( mbeepc85 )
+	MDRV_IMPORT_FROM( mbeeic )
+	MDRV_CPU_MODIFY( "maincpu" )
+	MDRV_CPU_PROGRAM_MAP(mbeepc85_mem, 0)
 MACHINE_DRIVER_END
 
 static DRIVER_INIT( mbee )
@@ -474,6 +508,18 @@ static DRIVER_INIT( mbee )
 	memory_configure_bank(machine, 3, 0, 2, &RAM[0x11800], 0x4000);
 	memory_set_bank(machine, 2, 1);
 	memory_set_bank(machine, 3, 0);
+}
+
+static DRIVER_INIT( mbeepc85 )
+{
+	UINT8 *RAM = memory_region(machine, "maincpu");
+	memory_configure_bank(machine, 1, 0, 2, &RAM[0x0000], 0x8000);
+	memory_configure_bank(machine, 2, 0, 2, &RAM[0x11000], 0x4000);
+	memory_configure_bank(machine, 3, 0, 2, &RAM[0x11800], 0x4000);
+	memory_configure_bank(machine, 4, 0, 8, &RAM[0x20000], 0x2000);
+	memory_set_bank(machine, 2, 1);
+	memory_set_bank(machine, 3, 0);
+	memory_set_bank(machine, 4, 5);
 }
 
 static DRIVER_INIT( mbee56 )
@@ -518,18 +564,19 @@ ROM_START( mbeeic )
 ROM_END
 
 ROM_START( mbeepc85 )
-	ROM_REGION(0x18000,"maincpu",0)
+	ROM_REGION(0x30000,"maincpu",0)
 	ROM_LOAD("bas525a.rom",   0x8000, 0x2000, CRC(a6e02afe) SHA1(0495308c7e1d84b5989a3af6d3b881f4580b2641))
 	ROM_LOAD("bas525b.rom",   0xa000, 0x2000, CRC(245dd36b) SHA1(dd288f3e6737627f50d3d2a49df3e57c423d3118))
-	ROM_LOAD("shell.rom",     0xc000, 0x2000, CRC(5a2c7cd6) SHA1(8edc086710cb558f2146d660eddc8a18ba6a141c))
-	/* need to emulate the PAK command to bankswitch these roms */
-//	ROM_LOAD("wbee13.rom",    0xc000, 0x2000, CRC(d7c58b7b) SHA1(5af1b8d21a0f21534ed1833ae919dbbc6ca973e2))
-//	ROM_LOAD("edasm.rom",     0xc000, 0x2000, CRC(1af1b3a9) SHA1(d035a997c2dbbb3918b3395a3a5a1076aa203ee5))
-//	ROM_LOAD("cmdhelp.rom",   0xc000, 0x2000, CRC(a4f1fa90) SHA1(1456abc6ed0501a3b15a99b4302750843293ae5f))
-//	ROM_LOAD("forth.rom",     0xc000, 0x2000, CRC(c0795c2b) SHA1(8faa0a46fbbdb8a1019d706a40cd4431a5063f8c))
-//	ROM_LOAD("wbee12.rom",    0xc000, 0x2000, CRC(0fc21cb5) SHA1(33b3995988fc51ddef1568e160dfe699867adbd5))
 	ROM_LOAD("charrom.bin",   0x11000, 0x1000, CRC(1f9fcee4) SHA1(e57ac94e03638075dde68a0a8c834a4f84ba47b0))
 	ROM_RELOAD( 0x17000, 0x1000 )
+
+	/* PAK option roms - Wordbee must be in slot 0 and Shell must be in slot 5. Slot 6 and 7 can be used as well. */
+	ROM_LOAD("wbee13.rom",    0x20000, 0x2000, CRC(d7c58b7b) SHA1(5af1b8d21a0f21534ed1833ae919dbbc6ca973e2)) // 0
+	ROM_LOAD("cmdhelp.rom",   0x22000, 0x2000, CRC(a4f1fa90) SHA1(1456abc6ed0501a3b15a99b4302750843293ae5f)) // 1
+	ROM_LOAD("edasm.rom",     0x24000, 0x2000, CRC(1af1b3a9) SHA1(d035a997c2dbbb3918b3395a3a5a1076aa203ee5)) // 2
+	ROM_LOAD("forth.rom",     0x26000, 0x2000, CRC(c0795c2b) SHA1(8faa0a46fbbdb8a1019d706a40cd4431a5063f8c)) // 3
+	ROM_LOAD("wbee12.rom",    0x28000, 0x2000, CRC(0fc21cb5) SHA1(33b3995988fc51ddef1568e160dfe699867adbd5)) // 4
+	ROM_LOAD("shell.rom",     0x2a000, 0x2000, CRC(5a2c7cd6) SHA1(8edc086710cb558f2146d660eddc8a18ba6a141c)) // 5
 
 	ROM_REGION( 0x0040, "proms", 0 )
 	ROM_LOAD( "82s123.ic7",   0x0000, 0x0020, CRC(61b9c16c) SHA1(0ee72377831c21339360c376f7248861d476dc20) )
@@ -665,6 +712,6 @@ SYSTEM_CONFIG_END
 COMP( 1982, mbee,     0,	0,	mbee,     mbee,     mbee,     0,			"Applied Technology",  "Microbee 16 Standard" , 0)
 COMP( 1982, mbeeic,   mbee,	0,	mbeeic,   mbee,     mbee,     mbeeic,		"Applied Technology",  "Microbee 32 IC" , 0)
 COMP( 1982, mbeepc,   mbee,	0,	mbeeic,   mbee,     mbee,     mbeeic,		"Applied Technology",  "Microbee 32 PC" , 0)
-COMP( 1985?,mbeepc85, mbee,	0,	mbeeic,   mbee,     mbee,     mbeeic,		"Applied Technology",  "Microbee 32 PC85" , 0)
+COMP( 1985, mbeepc85, mbee,	0,	mbeepc85, mbee,     mbeepc85, mbeeic,		"Applied Technology",  "Microbee 32 PC85" , 0)
 COMP( 1983, mbee56,   mbee,	0,	mbee56,   mbee,     mbee56,   mbeeic,		"Applied Technology",  "Microbee 56" , 0)
 
