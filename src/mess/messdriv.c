@@ -49,17 +49,6 @@ const game_driver * const drivers[] =
 	DRIVER( lynx )		/* Atari Lynx Handheld								*/
 	DRIVER( lynx2 )		/* Atari Lynx II Handheld redesigned, no additions	*/
 	DRIVER( jaguar )	/* Atari Jaguar										*/
-	DRIVER( atarist )	/* Atari ST											*/
-	DRIVER( megast )	/* Atari Mega ST									*/
-//	DRIVER( stacy )		/* Atari STacy										*/
-	DRIVER( atariste )	/* Atari STe										*/
-	DRIVER( stbook )	/* Atari STBook										*/
-	DRIVER( megaste )	/* Atari Mega STe									*/
-//	DRIVER( stpad )		/* Atari STPad (prototype)							*/
-//	DRIVER( tt030 )		/* Atari TT030										*/
-//	DRIVER( fx1 )		/* Atari FX-1 (prototype)							*/
-//	DRIVER( falcon )	/* Atari Falcon030									*/
-//	DRIVER( falcon40 )	/* Atari Falcon040 (prototype)						*/
 
 	/* NINTENDO */
 	DRIVER( nes )		/* Nintendo Entertainment System					*/
@@ -312,6 +301,17 @@ XL/XE 16kB OS roms
 	DRIVER( a800 )		/* 1979 Atari 800									*/
 	DRIVER( a800pal )	/* 1979 Atari 800 PAL								*/
 	DRIVER( a800xl )	/* 1983 Atari 800 XL								*/
+	DRIVER( atarist )	/* Atari ST											*/
+	DRIVER( megast )	/* Atari Mega ST									*/
+//	DRIVER( stacy )		/* Atari STacy										*/
+	DRIVER( atariste )	/* Atari STe										*/
+	DRIVER( stbook )	/* Atari STBook										*/
+	DRIVER( megaste )	/* Atari Mega STe									*/
+//	DRIVER( stpad )		/* Atari STPad (prototype)							*/
+//	DRIVER( tt030 )		/* Atari TT030										*/
+//	DRIVER( fx1 )		/* Atari FX-1 (prototype)							*/
+//	DRIVER( falcon )	/* Atari Falcon030									*/
+//	DRIVER( falcon40 )	/* Atari Falcon040 (prototype)						*/
 
 	/* COMMODORE */
 	DRIVER( kim1 )		/* Commodore (MOS) KIM-1 1975						*/
@@ -1124,6 +1124,14 @@ XL/XE 16kB OS roms
 	DRIVER( mm1m6 )
 	DRIVER( mm1m7 )
 
+	/* Nuova Elettronica */
+	DRIVER( z80ne )			/* 1980 - Z80NE */
+	DRIVER( z80net )		/* 1980 - Z80NE + LX388 Video Interface */
+	DRIVER( z80netb )		/* 1980 - Z80NE + LX388 Video Interface + 16Kb BASIC */
+
+	/* Talking Electronics Magazine */
+	DRIVER( tec1 )			/* Talking Electronics Computer */
+
 	/* Votrax */
 //	DRIVER( votrtnt ) /* Votrax Type-N-Talk */
 	DRIVER( votrpss ) /* Votrax Personal Speech System */
@@ -1154,9 +1162,4 @@ XL/XE 16kB OS roms
 /*********** Misc ***********************************************************/
 	DRIVER( ex800 )
 
-	DRIVER( z80ne )			/* Nuova Elettronica z80ne */
-	DRIVER( z80net )		/* Nuova Elettronica z80ne */
-	DRIVER( z80netb )		/* Nuova Elettronica z80ne */
-
-	DRIVER( tec1 )			/* Talking Electronics Computer */
 #endif /* DRIVER_RECURSIVE */
