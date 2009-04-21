@@ -231,9 +231,9 @@ INLINE void k1ge_draw_sprite_plane( k1ge_t *k1ge, UINT16 *p, UINT16 priority, in
 
 		tile_addr = 0x2000 + ( ( spr[i].spr_data & 0x1ff ) * 16 );
 		if ( spr[i].spr_data & 0x4000 )
-			tile_addr += ( 7 - ( line - spr[i].y ) ) * 2;
+			tile_addr += ( 7 - ( ( line - spr[i].y ) & 0x07 ) ) * 2;
 		else
-			tile_addr += ( line - spr[i].y ) * 2;
+			tile_addr += ( ( line - spr[i].y ) & 0x07 ) * 2;
 		tile_data = k1ge->vram[ tile_addr ] | ( k1ge->vram[ tile_addr + 1 ] << 8 );
 
 		for ( j = 0; j < 8; j++ )
@@ -444,9 +444,9 @@ INLINE void k2ge_draw_sprite_plane( k1ge_t *k1ge, UINT16 *p, UINT16 priority, in
 
 		tile_addr = 0x2000 + ( ( spr[i].spr_data & 0x1ff ) * 16 );
 		if ( spr[i].spr_data & 0x4000 )
-			tile_addr += ( 7 - ( line - spr[i].y ) ) * 2;
+			tile_addr += ( 7 - ( ( line - spr[i].y ) & 0x07 ) ) * 2;
 		else
-			tile_addr += ( line - spr[i].y ) * 2;
+			tile_addr += ( ( line - spr[i].y ) & 0x07 ) * 2;
 		tile_data = k1ge->vram[ tile_addr ] | ( k1ge->vram[ tile_addr + 1 ] << 8 );
 
 		for ( j = 0; j < 8; j++ )
@@ -590,9 +590,9 @@ INLINE void k2ge_k1ge_draw_sprite_plane( k1ge_t *k1ge, UINT16 *p, UINT16 priorit
 
 		tile_addr = 0x2000 + ( ( spr[i].spr_data & 0x1ff ) * 16 );
 		if ( spr[i].spr_data & 0x4000 )
-			tile_addr += ( 7 - ( line - spr[i].y ) ) * 2;
+			tile_addr += ( 7 - ( ( line - spr[i].y ) & 0x07 ) ) * 2;
 		else
-			tile_addr += ( line - spr[i].y ) * 2;
+			tile_addr += ( ( line - spr[i].y ) & 0x07 ) * 2;
 		tile_data = k1ge->vram[ tile_addr ] | ( k1ge->vram[ tile_addr + 1 ] << 8 );
 
 		for ( j = 0; j < 8; j++ )
