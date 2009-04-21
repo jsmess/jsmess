@@ -85,7 +85,7 @@ WRITE8_HANDLER ( mbee_pcg_color_w )
 
 static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
 
-/* The "extra" keys are non-standard and will be removed eventually */
+/* The direction keys are used by the pc85 menu. Do not know what uses the "insert" key. */
 static int keyboard_matrix_r(running_machine *machine, int offs)
 {
 	int port = (offs >> 7) & 7;
