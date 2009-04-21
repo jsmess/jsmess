@@ -101,6 +101,7 @@ the Neogeo Pocket.
 #include "sound/t6w28.h"
 #include "sound/dac.h"
 #include "video/k1ge.h"
+#include "ngp.lh"
 
 
 enum flash_state
@@ -713,6 +714,7 @@ static MACHINE_DRIVER_START( ngp_common )
 	MDRV_SCREEN_ADD( "screen", LCD )
 	MDRV_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
 	MDRV_SCREEN_RAW_PARAMS( XTAL_6_144MHz, 515, 0, 160 /*480*/, 199, 0, 152 )
+	MDRV_DEFAULT_LAYOUT(layout_ngp)
 
 	MDRV_MACHINE_START( ngp )
 	MDRV_MACHINE_RESET( ngp )
