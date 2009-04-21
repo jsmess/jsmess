@@ -449,11 +449,10 @@ static MACHINE_DRIVER_START( ibm5170 )
 
 	MDRV_PIC8259_ADD( "pic8259_slave", at_pic8259_slave_config )
 
-	MDRV_NS16450_ADD( "ns16450_0", ibm5170_com_interface[0] )			/* TODO: verify model */
-	MDRV_NS16450_ADD( "ns16450_1", ibm5170_com_interface[1] )			/* TODO: verify model */
-	MDRV_NS16450_ADD( "ns16450_2", ibm5170_com_interface[2] )			/* TODO: verify model */
-	MDRV_NS16450_ADD( "ns16450_3", ibm5170_com_interface[3] )			/* TODO: verify model */
-
+	MDRV_NS16450_ADD( "ns16450_0", ibm5170_com_interface[0] ) /* Verified: IBM P/N 6320947 Serial/Parallel card uses an NS16450N */
+	MDRV_NS16450_ADD( "ns16450_1", ibm5170_com_interface[1] )
+	MDRV_NS16450_ADD( "ns16450_2", ibm5170_com_interface[2] )
+	MDRV_NS16450_ADD( "ns16450_3", ibm5170_com_interface[3] )
 	MDRV_MACHINE_START( at )
 	MDRV_MACHINE_RESET( at )
 
@@ -803,8 +802,8 @@ ROM_START( ibm5170 )
 	ROM_REGION(0x100000,"maincpu", 0)
 
 	ROM_SYSTEM_BIOS( 0, "rev1", "IBM PC/AT 5170 01/10/84")
-	ROMX_LOAD("t6181028.u27", 0xf0000, 0x8000, CRC(f6573f2a) SHA1(3e52cfa6a6a62b4e8576f4fe076c858c220e6c1a), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD("t6181029.u47", 0xf0001, 0x8000, CRC(7075fbb2) SHA1(a7b885cfd38710c9bc509da1e3ba9b543a2760be), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("6181028.u27", 0xf0000, 0x8000, CRC(f6573f2a) SHA1(3e52cfa6a6a62b4e8576f4fe076c858c220e6c1a), ROM_SKIP(1) | ROM_BIOS(1)) /* T 6181028 8506AAA // TMM23256P-5878 // (C)IBM CORP 1981,-1984 */
+	ROMX_LOAD("6181029.u47", 0xf0001, 0x8000, CRC(7075fbb2) SHA1(a7b885cfd38710c9bc509da1e3ba9b543a2760be), ROM_SKIP(1) | ROM_BIOS(1)) /* T 6181029 8506AAA // TMM23256P-5879 // (C)IBM CORP 1981,-1984 */
 
 	ROM_SYSTEM_BIOS( 1, "rev2", "IBM PC/AT 5170 06/10/85")	/* Another verifaction of these crcs would be nice */
 	ROMX_LOAD("6480090.u27", 0xf0000, 0x8000, CRC(99703aa9) SHA1(18022e93a0412c8477e58f8c61a87718a0b9ab0e), ROM_SKIP(1) | ROM_BIOS(2))
@@ -827,16 +826,18 @@ ROM_START( ibm5170 )
 	ROM_REGION( 0x0800, "kbdc8042", 0 )
 	ROM_LOAD("1503033.bin", 0x0000, 0x0800, CRC(5a81c0d2) SHA1(0100f8789fb4de74706ae7f9473a12ec2b9bd729))
 
-	/* 8051 keytronic keyboard controller */
+	/* 8051 Keytronic KB3270-PC keyboard row/column decoder */
 	ROM_REGION( 0x2000, KEYTRONIC_KB3270PC_CPU, 0 )
 	ROM_LOAD("14166.bin", 0x0000, 0x2000, CRC(1aea1b53) SHA1(b75b6d4509036406052157bc34159f7039cdc72e))
 
-	/* PALS */
+	/* Mainboard PALS */
 	ROM_REGION( 0x2000, "pals", 0 )
 	ROM_LOAD("1501824.pal14l4.u87", 0x0000, 0x0800, NO_DUMP) /* MMI 1501824 717750 // (C)1983 IBM(M) */
 	ROM_LOAD("1503135.pal14l4.u130", 0x0800, 0x0800, NO_DUMP) /* MMI 1503135 705075 // (C) IBM CORP 83 */
+	/* P/N 6320947 Serial/Parallel ISA expansion card PAL */
+	ROM_LOAD("1503085.pal.u14", 0x1000, 0x0800, NO_DUMP) /* MMI 1503085 8449 // (C) IBM CORP 83 */ /* Not sure of type */
 
-	/* PROMS */
+	/* Mainboard PROMS */
 	ROM_REGION( 0x2000, "proms", 0 )
 	ROM_LOAD("1501814.82s123.u115", 0x0000, 0x0800, NO_DUMP) /* N82S123AN 8713 // SK-D 1501814 */
 	ROM_LOAD("55x8041.82s147.u72", 0x0800, 0x1000, NO_DUMP) /* S N82S147AN 8709 // V-C55X8041 */
@@ -867,28 +868,30 @@ ROM_START( ibm5170a )
 	ROM_REGION( 0x0800, "kbdc8042", 0 )
 	ROM_LOAD("1503033.bin", 0x0000, 0x0800, CRC(5a81c0d2) SHA1(0100f8789fb4de74706ae7f9473a12ec2b9bd729))
 
-	/* 8051 keytronic keyboard controller */
+	/* 8051 Keytronic KB3270-PC keyboard row/column decoder */
 	ROM_REGION( 0x2000, KEYTRONIC_KB3270PC_CPU, 0 )
 	ROM_LOAD("14166.bin", 0x0000, 0x2000, CRC(1aea1b53) SHA1(b75b6d4509036406052157bc34159f7039cdc72e))
 
-	/* PALS */
+	/* Mainboard PALS */
 	ROM_REGION( 0x2000, "pals", 0 )
 	ROM_LOAD("1501824.pal14l4.u87", 0x0000, 0x0800, NO_DUMP) /* MMI 1501824 717750 // (C)1983 IBM(M) */
 	ROM_LOAD("1503135.pal14l4.u130", 0x0800, 0x0800, NO_DUMP) /* MMI 1503135 705075 // (C) IBM CORP 83 */
+	/* P/N 6320947 Serial/Parallel ISA expansion card PAL */
+	ROM_LOAD("1503085.pal.u14", 0x1000, 0x0800, NO_DUMP) /* MMI 1503085 8449 // (C) IBM CORP 83 */ /* Not sure of type */
 
-	/* PROMS */
+	/* Mainboard PROMS */
 	ROM_REGION( 0x2000, "proms", 0 )
 	ROM_LOAD("1501814.82s123.u115", 0x0000, 0x0800, NO_DUMP) /* N82S123AN 8713 // SK-D 1501814 */
 	ROM_LOAD("55x8041.82s147.u72", 0x0800, 0x1000, NO_DUMP) /* S N82S147AN 8709 // V-C55X8041 */
 ROM_END
 
 
-ROM_START( ibm5162 )
+ROM_START( ibm5162 ) //MB p/n 62x1168 
 	ROM_REGION16_LE(0x1000000,"maincpu", 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
 
-	ROM_LOAD16_BYTE("78x7460.u34", 0xf0000, 0x8000, CRC(1db4bd8f) SHA1(7be669fbb998d8b4626fefa7cd1208d3b2a88c31))
-	ROM_LOAD16_BYTE("78x7461.u35", 0xf0001, 0x8000, CRC(be14b453) SHA1(ec7c10087dbd53f9c6d1174e8f14212e2aec1818))
+	ROM_LOAD16_BYTE("78x7460.u34", 0xf0000, 0x8000, CRC(1db4bd8f) SHA1(7be669fbb998d8b4626fefa7cd1208d3b2a88c31)) /* 78X7460 U34 // (C) IBM CORP // 1981-1986 */
+	ROM_LOAD16_BYTE("78x7461.u35", 0xf0001, 0x8000, CRC(be14b453) SHA1(ec7c10087dbd53f9c6d1174e8f14212e2aec1818)) /* 78X7461 U35 // (C) IBM CORP // 1981-1986 */
 
 	/* Character rom */
 	ROM_REGION(0x2000,"gfx1", 0)
@@ -898,9 +901,21 @@ ROM_START( ibm5162 )
 	ROM_REGION( 0x0800, "kbdc8042", 0 )
 	ROM_LOAD("1503033.bin", 0x0000, 0x0800, CRC(5a81c0d2) SHA1(0100f8789fb4de74706ae7f9473a12ec2b9bd729))
 
-	/* 8051 keytronic keyboard controller */
+	/* 8051 Keytronic KB3270-PC keyboard row/column decoder */
 	ROM_REGION( 0x2000, KEYTRONIC_KB3270PC_CPU, 0 )
 	ROM_LOAD("14166.bin", 0x0000, 0x2000, CRC(1aea1b53) SHA1(b75b6d4509036406052157bc34159f7039cdc72e))
+
+	/* Mainboard PALS */
+	ROM_REGION( 0x2000, "pals", 0 )
+	ROM_LOAD("59x7599.pal20l8.u27", 0x0000, 0x0800, NO_DUMP) /* MMI PAL20L8ACN5 8631 // N59X7599 IBM (C)85 K3 */
+	ROM_LOAD("1503135.pal14l4.u81", 0x0800, 0x0800, NO_DUMP) /* MMI 1503135 8625 // (C) IBM CORP 83 */
+	/* P/N 6320947 Serial/Parallel ISA expansion card PAL */
+	ROM_LOAD("1503085.pal.u14", 0x1000, 0x0800, NO_DUMP) /* MMI 1503085 8449 // (C) IBM CORP 83 */ /* Not sure of type */
+
+	/* Mainboard PROMS */
+	ROM_REGION( 0x2000, "proms", 0 )
+	ROM_LOAD("1501814.82s123.u72", 0x0000, 0x0800, NO_DUMP) /* N82S123AN 8623 // SK-U 1501814 */
+	ROM_LOAD("68x7594.82s147.u90", 0x0800, 0x1000, NO_DUMP) /* S N82S147AN 8629 // VCT 68X7594 (warning, this is an educated guess because it is REALLY hard to read on http://www.yesterpc.com/Hardware/ISA%20motherboard/IBM%20XT286/slideshow/IMG_3608.JPG due to that damn watermark and EXTREME crappy jpeg artifacting. The only letters I'm really sure of are ...7.94 */
 ROM_END
 
 
@@ -917,7 +932,7 @@ ROM_START( i8530286 )
 	ROM_REGION( 0x0800, "kbdc8042", 0 )
 	ROM_LOAD("1503033.bin", 0x0000, 0x0800, CRC(5a81c0d2) SHA1(0100f8789fb4de74706ae7f9473a12ec2b9bd729))
 
-	/* 8051 keytronic keyboard controller */
+	/* 8051 Keytronic KB3270-PC keyboard row/column decoder */
 	ROM_REGION( 0x2000, KEYTRONIC_KB3270PC_CPU, 0 )
 	ROM_LOAD("14166.bin", 0x0000, 0x2000, CRC(1aea1b53) SHA1(b75b6d4509036406052157bc34159f7039cdc72e))
 ROM_END
@@ -939,7 +954,7 @@ ROM_START( at )
 	ROM_REGION( 0x0800, "kbdc8042", 0 )
 	ROM_LOAD("1503033.bin", 0x0000, 0x0800, CRC(5a81c0d2) SHA1(0100f8789fb4de74706ae7f9473a12ec2b9bd729))
 
-	/* 8051 keytronic keyboard controller */
+	/* 8051 Keytronic KB3270-PC keyboard row/column decoder */
 	ROM_REGION( 0x2000, KEYTRONIC_KB3270PC_CPU, 0 )
 	ROM_LOAD("14166.bin", 0x0000, 0x2000, CRC(1aea1b53) SHA1(b75b6d4509036406052157bc34159f7039cdc72e))
 ROM_END
@@ -958,7 +973,7 @@ ROM_START( atvga )
 	ROM_REGION( 0x0800, "kbdc8042", 0 )
 	ROM_LOAD("1503033.bin", 0x0000, 0x0800, CRC(5a81c0d2) SHA1(0100f8789fb4de74706ae7f9473a12ec2b9bd729))
 
-	/* 8051 keytronic keyboard controller */
+	/* 8051 Keytronic KB3270-PC keyboard row/column decoder */
 	ROM_REGION( 0x2000, KEYTRONIC_KB3270PC_CPU, 0 )
 	ROM_LOAD("14166.bin", 0x0000, 0x2000, CRC(1aea1b53) SHA1(b75b6d4509036406052157bc34159f7039cdc72e))
 ROM_END
@@ -980,7 +995,7 @@ ROM_START( neat )
 	ROM_REGION( 0x0800, "kbdc8042", 0 )
 	ROM_LOAD("1503033.bin", 0x0000, 0x0800, CRC(5a81c0d2) SHA1(0100f8789fb4de74706ae7f9473a12ec2b9bd729))
 
-	/* 8051 keytronic keyboard controller */
+	/* 8051 Keytronic KB3270-PC keyboard row/column decoder */
 	ROM_REGION( 0x2000, KEYTRONIC_KB3270PC_CPU, 0 )
 	ROM_LOAD("14166.bin", 0x0000, 0x2000, CRC(1aea1b53) SHA1(b75b6d4509036406052157bc34159f7039cdc72e))
 ROM_END
@@ -998,7 +1013,7 @@ ROM_START( at386 )
 	ROM_REGION( 0x0800, "kbdc8042", 0 )
 	ROM_LOAD("1503033.bin", 0x0000, 0x0800, CRC(5a81c0d2) SHA1(0100f8789fb4de74706ae7f9473a12ec2b9bd729))
 
-	/* 8051 keytronic keyboard controller */
+	/* 8051 Keytronic KB3270-PC keyboard row/column decoder */
 	ROM_REGION( 0x2000, KEYTRONIC_KB3270PC_CPU, 0 )
 	ROM_LOAD("14166.bin", 0x0000, 0x2000, CRC(1aea1b53) SHA1(b75b6d4509036406052157bc34159f7039cdc72e))
 ROM_END
@@ -1023,7 +1038,7 @@ ROM_START( at486 )
 	ROM_REGION( 0x0800, "kbdc8042", 0 )
 	ROM_LOAD("1503033.bin", 0x0000, 0x0800, CRC(5a81c0d2) SHA1(0100f8789fb4de74706ae7f9473a12ec2b9bd729))
 
-	/* 8051 keytronic keyboard controller */
+	/* 8051 Keytronic KB3270-PC keyboard row/column decoder */
 	ROM_REGION( 0x2000, KEYTRONIC_KB3270PC_CPU, 0 )
 	ROM_LOAD("14166.bin", 0x0000, 0x2000, CRC(1aea1b53) SHA1(b75b6d4509036406052157bc34159f7039cdc72e))
 ROM_END
@@ -1041,7 +1056,7 @@ ROM_START( at586 )
 	ROM_REGION( 0x0800, "kbdc8042", 0 )
 	ROM_LOAD("1503033.bin", 0x0000, 0x0800, CRC(5a81c0d2) SHA1(0100f8789fb4de74706ae7f9473a12ec2b9bd729))
 
-	/* 8051 keytronic keyboard controller */
+	/* 8051 Keytronic KB3270-PC keyboard row/column decoder */
 	ROM_REGION( 0x2000, KEYTRONIC_KB3270PC_CPU, 0 )
 	ROM_LOAD("14166.bin", 0x0000, 0x2000, CRC(1aea1b53) SHA1(b75b6d4509036406052157bc34159f7039cdc72e))
 ROM_END
