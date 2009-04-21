@@ -36,6 +36,9 @@ System Driver Changes:
 
 - [ELECTRON] Fixed graphical display modes. [Robbbert]
 
+- [MBEE] The pc85 now has the correct bioses, and the shell multi-rom selector
+  is working. [Robbbert]
+
 - [STUDIO2] Fixed .st2 cartridge loading. [Curt Coder]
 
 - [TRS80] Various improvements: [Robbbert]
