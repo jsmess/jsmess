@@ -29,17 +29,16 @@ WRITE8_HANDLER ( mbee_fdc_motor_w );
 extern int mbee_frame_counter;
 extern UINT8 *mbee_pcgram;
 
- READ8_HANDLER ( m6545_status_r );
+READ8_HANDLER ( m6545_status_r );
 WRITE8_HANDLER ( m6545_index_w );
- READ8_HANDLER ( m6545_data_r );
+READ8_HANDLER ( m6545_data_r );
 WRITE8_HANDLER ( m6545_data_w );
-
- READ8_HANDLER ( mbee_color_bank_r );
+READ8_HANDLER ( mbee_color_bank_r );
 WRITE8_HANDLER ( mbee_color_bank_w );
- READ8_HANDLER ( mbee_video_bank_r );
+READ8_HANDLER ( mbee_video_bank_r );
 WRITE8_HANDLER ( mbee_video_bank_w );
-
- READ8_HANDLER ( mbee_pcg_color_latch_r );
+READ8_HANDLER ( mbee_bank_netrom_r );
+READ8_HANDLER ( mbee_pcg_color_latch_r );
 WRITE8_HANDLER ( mbee_pcg_color_latch_w );
 
 WRITE8_HANDLER ( mbee_videoram_w );

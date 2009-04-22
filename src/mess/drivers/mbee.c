@@ -111,7 +111,7 @@ static ADDRESS_MAP_START(mbeepc85_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x1000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK(4)
-	AM_RANGE(0xd000, 0xefff) AM_ROM
+	AM_RANGE(0xe000, 0xefff) AM_ROMBANK(5)
 	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(SMH_BANK2, mbee_videoram_w) AM_SIZE(&videoram_size)
 	AM_RANGE(0xf800, 0xffff) AM_READWRITE(SMH_BANK3, mbee_pcg_color_w)
 ADDRESS_MAP_END
@@ -136,20 +136,32 @@ static ADDRESS_MAP_START(mbee_io, ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mbeeic_io, ADDRESS_SPACE_IO, 8)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	ADDRESS_MAP_GLOBAL_MASK(0x1ff)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x03) AM_MIRROR(0x10) AM_DEVREADWRITE("z80pio", z80pio_alt_r, z80pio_alt_w)
-	AM_RANGE(0x08, 0x08) AM_MIRROR(0x10) AM_READWRITE(mbee_pcg_color_latch_r, mbee_pcg_color_latch_w)
-	// AM_RANGE(0x09, 0x09) AM_MIRROR(0x10)  Listed as "Colour Wait Off" or "USART 2651" but doesn't appear in the schematics
-	AM_RANGE(0x0a, 0x0a) AM_MIRROR(0x10) AM_READWRITE(mbee_color_bank_r, mbee_color_bank_w)
-	AM_RANGE(0x0b, 0x0b) AM_MIRROR(0x10) AM_READWRITE(mbee_video_bank_r, mbee_video_bank_w)
-	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x10) AM_READWRITE(m6545_status_r, m6545_index_w)
-	AM_RANGE(0x0d, 0x0d) AM_MIRROR(0x10) AM_READWRITE(m6545_data_r, m6545_data_w)
-	AM_RANGE(0x44, 0x44) AM_DEVREADWRITE("wd179x", wd17xx_status_r, wd17xx_command_w)
-	AM_RANGE(0x45, 0x45) AM_DEVREADWRITE("wd179x", wd17xx_track_r, wd17xx_track_w)
-	AM_RANGE(0x46, 0x46) AM_DEVREADWRITE("wd179x", wd17xx_sector_r, wd17xx_sector_w)
-	AM_RANGE(0x47, 0x47) AM_DEVREADWRITE("wd179x", wd17xx_data_r, wd17xx_data_w)
-	AM_RANGE(0x48, 0x48) AM_READWRITE(mbee_fdc_status_r, mbee_fdc_motor_w)
+	AM_RANGE(0x000, 0x003) AM_MIRROR(0x10) AM_DEVREADWRITE("z80pio", z80pio_alt_r, z80pio_alt_w)
+	AM_RANGE(0x008, 0x008) AM_MIRROR(0x10) AM_READWRITE(mbee_pcg_color_latch_r, mbee_pcg_color_latch_w)
+	// AM_RANGE(0x009, 0x009) AM_MIRROR(0x10)  Listed as "Colour Wait Off" or "USART 2651" but doesn't appear in the schematics
+	AM_RANGE(0x00a, 0x00a) AM_MIRROR(0x10) AM_READWRITE(mbee_color_bank_r, mbee_color_bank_w)
+	AM_RANGE(0x00b, 0x00b) AM_MIRROR(0x10) AM_READWRITE(mbee_video_bank_r, mbee_video_bank_w)
+	AM_RANGE(0x00c, 0x00c) AM_MIRROR(0x10) AM_READWRITE(m6545_status_r, m6545_index_w)
+	AM_RANGE(0x00d, 0x00d) AM_MIRROR(0x10) AM_READWRITE(m6545_data_r, m6545_data_w)
+	AM_RANGE(0x044, 0x044) AM_DEVREADWRITE("wd179x", wd17xx_status_r, wd17xx_command_w)
+	AM_RANGE(0x045, 0x045) AM_DEVREADWRITE("wd179x", wd17xx_track_r, wd17xx_track_w)
+	AM_RANGE(0x046, 0x046) AM_DEVREADWRITE("wd179x", wd17xx_sector_r, wd17xx_sector_w)
+	AM_RANGE(0x047, 0x047) AM_DEVREADWRITE("wd179x", wd17xx_data_r, wd17xx_data_w)
+	AM_RANGE(0x048, 0x048) AM_READWRITE(mbee_fdc_status_r, mbee_fdc_motor_w)
+	AM_RANGE(0x100, 0x103) AM_MIRROR(0x10) AM_DEVREADWRITE("z80pio", z80pio_alt_r, z80pio_alt_w)
+	AM_RANGE(0x108, 0x108) AM_MIRROR(0x10) AM_READWRITE(mbee_pcg_color_latch_r, mbee_pcg_color_latch_w)
+	// AM_RANGE(0x109, 0x109) AM_MIRROR(0x10)  Listed as "Colour Wait Off" or "USART 2651" but doesn't appear in the schematics
+	AM_RANGE(0x10a, 0x10a) AM_MIRROR(0x10) AM_READWRITE(mbee_bank_netrom_r, mbee_color_bank_w)
+	AM_RANGE(0x10b, 0x10b) AM_MIRROR(0x10) AM_READWRITE(mbee_video_bank_r, mbee_video_bank_w)
+	AM_RANGE(0x10c, 0x10c) AM_MIRROR(0x10) AM_READWRITE(m6545_status_r, m6545_index_w)
+	AM_RANGE(0x10d, 0x10d) AM_MIRROR(0x10) AM_READWRITE(m6545_data_r, m6545_data_w)
+	AM_RANGE(0x144, 0x144) AM_DEVREADWRITE("wd179x", wd17xx_status_r, wd17xx_command_w)
+	AM_RANGE(0x145, 0x145) AM_DEVREADWRITE("wd179x", wd17xx_track_r, wd17xx_track_w)
+	AM_RANGE(0x146, 0x146) AM_DEVREADWRITE("wd179x", wd17xx_sector_r, wd17xx_sector_w)
+	AM_RANGE(0x147, 0x147) AM_DEVREADWRITE("wd179x", wd17xx_data_r, wd17xx_data_w)
+	AM_RANGE(0x148, 0x148) AM_READWRITE(mbee_fdc_status_r, mbee_fdc_motor_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mbee56_io, ADDRESS_SPACE_IO, 8)
@@ -517,9 +529,11 @@ static DRIVER_INIT( mbeepc85 )
 	memory_configure_bank(machine, 2, 0, 2, &RAM[0x11000], 0x4000);
 	memory_configure_bank(machine, 3, 0, 2, &RAM[0x11800], 0x4000);
 	memory_configure_bank(machine, 4, 0, 8, &RAM[0x20000], 0x2000);
+	memory_configure_bank(machine, 5, 0, 2, &RAM[0x18000], 0x1000);
 	memory_set_bank(machine, 2, 1);
 	memory_set_bank(machine, 3, 0);
 	memory_set_bank(machine, 4, 5);
+	memory_set_bank(machine, 5, 0);
 }
 
 static DRIVER_INIT( mbee56 )
@@ -551,11 +565,11 @@ ROM_END
 
 ROM_START( mbeeic )
 	ROM_REGION(0x18000,"maincpu",0)
-	ROM_LOAD("bas522a.rom",   0x8000, 0x2000, CRC(7896a696) SHA1(a158f7803296766160e1f258dfc46134735a9477))
-	ROM_LOAD("bas522b.rom",   0xa000, 0x2000, CRC(b21d9679) SHA1(332844433763331e9483409cd7da3f90ac58259d))
-	ROM_LOAD("edasm.rom",     0xc000, 0x2000, CRC(1af1b3a9) SHA1(d035a997c2dbbb3918b3395a3a5a1076aa203ee5))
+	ROM_LOAD("bas522a.rom",   0x8000, 0x2000, CRC(7896a696) SHA1(a158f7803296766160e1f258dfc46134735a9477) )
+	ROM_LOAD("bas522b.rom",   0xa000, 0x2000, CRC(b21d9679) SHA1(332844433763331e9483409cd7da3f90ac58259d) )
+	ROM_LOAD("edasm.rom",     0xc000, 0x2000, CRC(1af1b3a9) SHA1(d035a997c2dbbb3918b3395a3a5a1076aa203ee5) )
 	ROM_LOAD("telcom12.rom",  0xe000, 0x1000, CRC(0231bda3) SHA1(be7b32499034f985cc8f7865f2bc2b78c485585c) )
-	ROM_LOAD("charrom.bin",   0x11000, 0x1000, CRC(1f9fcee4) SHA1(e57ac94e03638075dde68a0a8c834a4f84ba47b0))
+	ROM_LOAD("charrom.bin",   0x11000, 0x1000, CRC(1f9fcee4) SHA1(e57ac94e03638075dde68a0a8c834a4f84ba47b0) )
 	ROM_RELOAD( 0x17000, 0x1000 )
 
 	ROM_REGION( 0x0040, "proms", 0 )
@@ -565,18 +579,22 @@ ROM_END
 
 ROM_START( mbeepc85 )
 	ROM_REGION(0x30000,"maincpu",0)
-	ROM_LOAD("bas525a.rom",   0x8000, 0x2000, CRC(a6e02afe) SHA1(0495308c7e1d84b5989a3af6d3b881f4580b2641))
-	ROM_LOAD("bas525b.rom",   0xa000, 0x2000, CRC(245dd36b) SHA1(dd288f3e6737627f50d3d2a49df3e57c423d3118))
-	ROM_LOAD("charrom.bin",   0x11000, 0x1000, CRC(1f9fcee4) SHA1(e57ac94e03638075dde68a0a8c834a4f84ba47b0))
+	ROM_LOAD("bas525a.rom",   0x8000, 0x2000, CRC(a6e02afe) SHA1(0495308c7e1d84b5989a3af6d3b881f4580b2641) )
+	ROM_LOAD("bas525b.rom",   0xa000, 0x2000, CRC(245dd36b) SHA1(dd288f3e6737627f50d3d2a49df3e57c423d3118) )
+	ROM_LOAD("charrom.bin",   0x11000, 0x1000, CRC(1f9fcee4) SHA1(e57ac94e03638075dde68a0a8c834a4f84ba47b0) )
 	ROM_RELOAD( 0x17000, 0x1000 )
 
+	ROM_LOAD("telco321.rom",  0x18000, 0x2000, CRC(36852a11) SHA1(c45b8d03629e86231c6b256a7435abd87d8872a4) )
+
 	/* PAK option roms - Wordbee must be in slot 0 and Shell must be in slot 5. Slot 6 and 7 can be used as well. */
-	ROM_LOAD("wbee13.rom",    0x20000, 0x2000, CRC(d7c58b7b) SHA1(5af1b8d21a0f21534ed1833ae919dbbc6ca973e2)) // 0
-	ROM_LOAD("cmdhelp.rom",   0x22000, 0x2000, CRC(a4f1fa90) SHA1(1456abc6ed0501a3b15a99b4302750843293ae5f)) // 1
-	ROM_LOAD("edasm.rom",     0x24000, 0x2000, CRC(1af1b3a9) SHA1(d035a997c2dbbb3918b3395a3a5a1076aa203ee5)) // 2
-	ROM_LOAD("forth.rom",     0x26000, 0x2000, CRC(c0795c2b) SHA1(8faa0a46fbbdb8a1019d706a40cd4431a5063f8c)) // 3
-	ROM_LOAD("wbee12.rom",    0x28000, 0x2000, CRC(0fc21cb5) SHA1(33b3995988fc51ddef1568e160dfe699867adbd5)) // 4
-	ROM_LOAD("shell.rom",     0x2a000, 0x2000, CRC(5a2c7cd6) SHA1(8edc086710cb558f2146d660eddc8a18ba6a141c)) // 5
+	ROM_LOAD("wbee13.rom",    0x20000, 0x2000, CRC(d7c58b7b) SHA1(5af1b8d21a0f21534ed1833ae919dbbc6ca973e2) ) // 0
+	ROM_LOAD("cmdhelp.rom",   0x22000, 0x2000, CRC(a4f1fa90) SHA1(1456abc6ed0501a3b15a99b4302750843293ae5f) ) // 1
+	ROM_LOAD("edasm.rom",     0x24000, 0x2000, CRC(1af1b3a9) SHA1(d035a997c2dbbb3918b3395a3a5a1076aa203ee5) ) // 2
+	ROM_LOAD("forth.rom",     0x26000, 0x2000, CRC(c0795c2b) SHA1(8faa0a46fbbdb8a1019d706a40cd4431a5063f8c) ) // 3
+	ROM_LOAD("wbee12.rom",    0x28000, 0x2000, CRC(0fc21cb5) SHA1(33b3995988fc51ddef1568e160dfe699867adbd5) ) // 4
+	ROM_LOAD("shell.rom",     0x2a000, 0x2000, CRC(5a2c7cd6) SHA1(8edc086710cb558f2146d660eddc8a18ba6a141c) ) // 5
+	ROM_FILL(0x2a49a, 3, 0)	/* fix a bug in the shell when telcom is present */
+	ROM_FILL(0x2a911, 3, 0)
 
 	ROM_REGION( 0x0040, "proms", 0 )
 	ROM_LOAD( "82s123.ic7",   0x0000, 0x0020, CRC(61b9c16c) SHA1(0ee72377831c21339360c376f7248861d476dc20) )
@@ -584,13 +602,14 @@ ROM_START( mbeepc85 )
 ROM_END
 
 ROM_START( mbeepc )
-	ROM_REGION(0x18000,"maincpu",0)
-	ROM_LOAD("bas522a.rom",   0x8000, 0x2000, CRC(7896a696) SHA1(a158f7803296766160e1f258dfc46134735a9477))
-	ROM_LOAD("bas522b.rom",   0xa000, 0x2000, CRC(b21d9679) SHA1(332844433763331e9483409cd7da3f90ac58259d))
-	/* This telcom rom is banked between its 2 halves, hooked to port 0A -  not emulated yet */
-	ROM_LOAD("telc321.rom",   0xe000, 0x2000, CRC(b07eefaa) SHA1(5dab90b2c232673282d215845c9947cc5bdd50c8))
-	ROM_LOAD("charrom.bin",   0x11000, 0x1000, CRC(1f9fcee4) SHA1(e57ac94e03638075dde68a0a8c834a4f84ba47b0))
+	ROM_REGION(0x30000,"maincpu",0)
+	/* These are not the correct Basic roms, but they will do for now */
+	ROM_LOAD("bas522a.rom",   0x8000, 0x2000, CRC(7896a696) SHA1(a158f7803296766160e1f258dfc46134735a9477) )
+	ROM_LOAD("bas522b.rom",   0xa000, 0x2000, CRC(b21d9679) SHA1(332844433763331e9483409cd7da3f90ac58259d) )
+	ROM_LOAD("charrom.bin",   0x11000, 0x1000, CRC(1f9fcee4) SHA1(e57ac94e03638075dde68a0a8c834a4f84ba47b0) )
 	ROM_RELOAD( 0x17000, 0x1000 )
+
+	ROM_LOAD("telco321.rom",  0x18000, 0x2000, CRC(36852a11) SHA1(c45b8d03629e86231c6b256a7435abd87d8872a4) )
 
 	ROM_REGION( 0x0040, "proms", 0 )
 	ROM_LOAD( "82s123.ic7",   0x0000, 0x0020, CRC(61b9c16c) SHA1(0ee72377831c21339360c376f7248861d476dc20) )
@@ -599,8 +618,8 @@ ROM_END
 
 ROM_START( mbee56 )
 	ROM_REGION(0x18000,"maincpu",0)
-	ROM_LOAD("56kb.rom",      0xe000, 0x1000, CRC(28211224) SHA1(b6056339402a6b2677b0e6c57bd9b78a62d20e4f))
-	ROM_LOAD("charrom.bin",   0x11000, 0x1000, CRC(1f9fcee4) SHA1(e57ac94e03638075dde68a0a8c834a4f84ba47b0))
+	ROM_LOAD("56kb.rom",      0xe000, 0x1000, CRC(28211224) SHA1(b6056339402a6b2677b0e6c57bd9b78a62d20e4f) )
+	ROM_LOAD("charrom.bin",   0x11000, 0x1000, CRC(1f9fcee4) SHA1(e57ac94e03638075dde68a0a8c834a4f84ba47b0) )
 	ROM_RELOAD( 0x17000, 0x1000 )
 
 	ROM_REGION( 0x0040, "proms", 0 )
@@ -711,7 +730,7 @@ SYSTEM_CONFIG_END
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT      CONFIG    COMPANY   FULLNAME */
 COMP( 1982, mbee,     0,	0,	mbee,     mbee,     mbee,     0,			"Applied Technology",  "Microbee 16 Standard" , 0)
 COMP( 1982, mbeeic,   mbee,	0,	mbeeic,   mbee,     mbee,     mbeeic,		"Applied Technology",  "Microbee 32 IC" , 0)
-COMP( 1982, mbeepc,   mbee,	0,	mbeeic,   mbee,     mbee,     mbeeic,		"Applied Technology",  "Microbee 32 PC" , 0)
+COMP( 1982, mbeepc,   mbee,	0,	mbeepc85, mbee,     mbeepc85, mbeeic,		"Applied Technology",  "Microbee 32 PC" , 0)
 COMP( 1985, mbeepc85, mbee,	0,	mbeepc85, mbee,     mbeepc85, mbeeic,		"Applied Technology",  "Microbee 32 PC85" , 0)
 COMP( 1983, mbee56,   mbee,	0,	mbee56,   mbee,     mbee56,   mbeeic,		"Applied Technology",  "Microbee 56" , 0)
 
