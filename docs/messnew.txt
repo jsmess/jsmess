@@ -1,4 +1,4 @@
-0.130.1
+﻿0.130.1
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
@@ -36,8 +36,9 @@ System Driver Changes:
 
 - [ELECTRON] Fixed graphical display modes. [Robbbert]
 
-- [MBEE] The pc85 now has the correct bioses, and the shell multi-rom selector
-  is working. [Robbbert]
+- [MBEE] The pc85 now has the correct bioses (Thanks to Stewart Kay and IanM).
+  The shell multi-rom selector is working. The bad dump of Telcom 3.21 has
+  been replaced. The rom banking feature of Telcom 3.21 is now emulated. [Robbbert]
 
 - [SPECTRUM] Removed Spectrum+ keyboard keys from earlier models (and from 
   some clones). Moved Joystick interface selection to the Category Menu. [Fabio 
