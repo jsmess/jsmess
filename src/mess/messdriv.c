@@ -1050,6 +1050,10 @@ XL/XE 16kB OS roms
 	/* Robotron 1715 */
 	DRIVER (rt1715)
 	DRIVER (rt1715w)
+	
+	/* Z1013 */
+	DRIVER (z1013)
+	DRIVER (z1013a2)
 
 	/* PP-01 */
 	DRIVER (pp01)

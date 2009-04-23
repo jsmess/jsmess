@@ -12,6 +12,7 @@ New System Drivers Supported (in no particular order):
 - SNK NeoGeo Pocket  [Wilbert Pol]
 - SNK NeoGeo Pocket Color  [Wilbert Pol]
 - Talking Electronics Computer (TEC-1)  [Robbbert]
+- Z1013 (Model with 8x4 and 8x8 keyboard) [Miodrag Milanovic]
 - Z80 N.E.  [Roberto Lavarone]
 
 

@@ -324,7 +324,7 @@ DRVLIBS = \
 	$(MESSOBJ)/radio.a \
 	$(MESSOBJ)/rca.a \
 	$(MESSOBJ)/rockwell.a \
-	$(MESSOBJ)/rt1715.a \
+	$(MESSOBJ)/robotron.a \
 	$(MESSOBJ)/samcoupe.a \
 	$(MESSOBJ)/sapi1.a \
 	$(MESSOBJ)/sega.a \
@@ -1229,10 +1229,13 @@ $(MESSOBJ)/vector06.a:      \
 	$(MESS_MACHINE)/vector06.o \
 	$(MESS_VIDEO)/vector06.o \
 
-$(MESSOBJ)/rt1715.a:      \
+$(MESSOBJ)/robotron.a:      \
 	$(MESS_DRIVERS)/rt1715.o \
 	$(MESS_MACHINE)/rt1715.o \
 	$(MESS_VIDEO)/rt1715.o \
+	$(MESS_DRIVERS)/z1013.o \
+	$(MESS_MACHINE)/z1013.o \
+	$(MESS_VIDEO)/z1013.o \
 
 $(MESSOBJ)/homelab.a: \
 	$(MESS_DRIVERS)/homelab.o \
