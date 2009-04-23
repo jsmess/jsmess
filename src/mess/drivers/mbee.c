@@ -555,6 +555,10 @@ ROM_START( mbee )
 	ROM_LOAD("edasma.ic31",   0xc000, 0x1000, CRC(120c3dea) SHA1(32c9bb6e54dd50d5218bb43cc921885a0307161d) )
 	ROM_LOAD("edasmb.ic33",   0xd000, 0x1000, CRC(a23bf3c8) SHA1(73a57c2800a1c744b527d0440b170b8b03351753) )
 	ROM_LOAD("telcom11.rom",  0xe000, 0x1000, CRC(15516499) SHA1(2d4953f994b66c5d3b1d457b8c92d9a0a69eb8b8) )
+
+/*	Optional Dreamcards Chip-8 V2.2 rom, take out the Telcom rom and insert this in its place
+	ROM_LOAD("chip8_22.rom",  0xe000, 0x1000, CRC(11fbb547) SHA1(7bd9dc4b67b33b8e1be99beb6a0ddff25bdbd3f7) ) */
+
 	ROM_LOAD("charrom.ic13",  0x11000, 0x0800, CRC(b149737b) SHA1(a3cd4f5d0d3c71137cd1f0f650db83333a2e3597) )
 	ROM_RELOAD( 0x17000, 0x0800 )
 	ROM_RELOAD( 0x17800, 0x0800 )
@@ -588,13 +592,11 @@ ROM_START( mbeepc85 )
 
 	/* PAK option roms - Wordbee must be in slot 0 and Shell must be in slot 5. Slot 6 and 7 can be used as well. */
 	ROM_LOAD("wbee13.rom",    0x20000, 0x2000, CRC(d7c58b7b) SHA1(5af1b8d21a0f21534ed1833ae919dbbc6ca973e2) ) // 0
-	ROM_LOAD("cmdhelp.rom",   0x22000, 0x2000, CRC(a4f1fa90) SHA1(1456abc6ed0501a3b15a99b4302750843293ae5f) ) // 1
-	ROM_LOAD("edasm.rom",     0x24000, 0x2000, CRC(1af1b3a9) SHA1(d035a997c2dbbb3918b3395a3a5a1076aa203ee5) ) // 2
-	ROM_LOAD("forth.rom",     0x26000, 0x2000, CRC(c0795c2b) SHA1(8faa0a46fbbdb8a1019d706a40cd4431a5063f8c) ) // 3
-	ROM_LOAD("wbee12.rom",    0x28000, 0x2000, CRC(0fc21cb5) SHA1(33b3995988fc51ddef1568e160dfe699867adbd5) ) // 4
+	ROM_LOAD_OPTIONAL("cmdhelp.rom",   0x22000, 0x2000, CRC(a4f1fa90) SHA1(1456abc6ed0501a3b15a99b4302750843293ae5f) ) // 1
+	ROM_LOAD_OPTIONAL("edasm.rom",     0x24000, 0x2000, CRC(1af1b3a9) SHA1(d035a997c2dbbb3918b3395a3a5a1076aa203ee5) ) // 2
+	ROM_LOAD_OPTIONAL("forth.rom",     0x26000, 0x2000, CRC(c0795c2b) SHA1(8faa0a46fbbdb8a1019d706a40cd4431a5063f8c) ) // 3
+	ROM_LOAD_OPTIONAL("wbee12.rom",    0x28000, 0x2000, CRC(0fc21cb5) SHA1(33b3995988fc51ddef1568e160dfe699867adbd5) ) // 4
 	ROM_LOAD("shell.rom",     0x2a000, 0x2000, CRC(5a2c7cd6) SHA1(8edc086710cb558f2146d660eddc8a18ba6a141c) ) // 5
-	ROM_FILL(0x2a49a, 3, 0)	/* fix a bug in the shell when telcom is present */
-	ROM_FILL(0x2a911, 3, 0)
 
 	ROM_REGION( 0x0040, "proms", 0 )
 	ROM_LOAD( "82s123.ic7",   0x0000, 0x0020, CRC(61b9c16c) SHA1(0ee72377831c21339360c376f7248861d476dc20) )
@@ -603,7 +605,6 @@ ROM_END
 
 ROM_START( mbeepc )
 	ROM_REGION(0x30000,"maincpu",0)
-	/* These are not the correct Basic roms, but they will do for now */
 	ROM_LOAD("bas522a.rom",   0x8000, 0x2000, CRC(7896a696) SHA1(a158f7803296766160e1f258dfc46134735a9477) )
 	ROM_LOAD("bas522b.rom",   0xa000, 0x2000, CRC(b21d9679) SHA1(332844433763331e9483409cd7da3f90ac58259d) )
 	ROM_LOAD("charrom.bin",   0x11000, 0x1000, CRC(1f9fcee4) SHA1(e57ac94e03638075dde68a0a8c834a4f84ba47b0) )
