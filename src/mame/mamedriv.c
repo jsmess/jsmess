@@ -1121,6 +1121,7 @@ const game_driver * const drivers[] =
 	/* NES-based hacks */
 	DRIVER( multigam )	/* 1992 */
 	DRIVER( multigmb )	/* 1992 */
+	DRIVER( multigm2 )  /* 1992 */
 	DRIVER( multigm3 )  /* 19?? */
 	DRIVER( cham24 )	/* 2002 */
 
@@ -1871,7 +1872,8 @@ const game_driver * const drivers[] =
 	DRIVER( viofight )	/* C16 (c) 1989 Taito Corporation Japan (World) */
 	DRIVER( viofightu )	/* C16 (c) 1989 Taito America Corporation (US) */
 	DRIVER( viofightj )	/* C16 (c) 1989 Taito Corporation (Japan) */
-	DRIVER( ashura )	/* C43 (c) 1990 Taito Corporation (Japan) */
+	DRIVER( ashura )	/* C43 (c) 1990 Taito Corporation Japan (World) */
+	DRIVER( ashuraj )	/* C43 (c) 1990 Taito Corporation (Japan) */
 	DRIVER( ashurau )	/* C43 (c) 1990 Taito America Corporation (US) */
 	DRIVER( hitice )	/* C59 (c) 1990 Williams (US) */
 	DRIVER( hiticej )	/* C59 (c) 1990 Midway/Taito Corporation (Japan) */
@@ -4273,64 +4275,66 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 
 	DRIVER( hod2bios )	/* 1998.11 The House of the Dead 2 */
 	DRIVER( dybbnao )	/* 1998.12 Dynamite Baseball NAOMI */
+	DRIVER( pstone )	/* 1999.02 Power Stone */
 						/* 1999.02 Crazy Taxi */
 	DRIVER( zombrvn )	/* 1999.02 Zombie Revenge */
-	DRIVER( pstone )	/* 1999.02 Power Stone */
 						/* 1999.03 Airline Pilots */
 	DRIVER( ggram2 )	/* 1999.04 Giant Gram Zen Nippon Pro-wres 2 */
 						/* 1999.05 Taisen Puzzle Kurutto Stone */
 						/* 1999.06 Ringout 4x4 */
-						/* 1999.07 F355 Challenge */
-	DRIVER( vs2_2k )	/* 1999.08 Virtua Striker 2 version 2000 */
+	DRIVER( f355bios )	/* 1999.07 F355 Challenge */
+	DRIVER( shangril )	/* 1999.08 Dengen Tenshi Taisen Janshi Shangri-la */
 						/* 1999.08 Unou Nouryoku Check Machine Touch de UNO! */
-						/* 1999.08 Dengen Tenshi Taisen Janshi Shangrilla */
+	DRIVER( vs2_2k )	/* 1999.08 Virtua Striker 2 version 2000 */
 	DRIVER( suchie3 )	/* 1999.09 Idol Janshi Su-Chi-Pi 3 */
+	DRIVER( toyfight )	/* 1999.09 Toy Fighter */
 						/* 1999.09 Jumbo! Safari */
 						/* 1999.09 Super Major League 99 */
-	DRIVER( toyfight )	/* 1999.09 Toy Fighter */
 						/* 1999.10 Sega Tetris */
 	DRIVER( derbyoc )	/* 1999.10 Derby Owners Club */
+	DRIVER( doa2 )		/* 1999.11 Dead or Alive 2 */
 	DRIVER( otrigger )	/* 1999.11 Out Trigger */
 	DRIVER( dybb99 )	/* 1999.11 Dynamite Baseball '99 */
-	DRIVER( doa2 )		/* 1999.11 Dead or Alive 2 */
+						/* 1999.12 Mars TV */
 	DRIVER( samba )		/* 1999.12 Samba de Amigo */
 	DRIVER( vtennis )	/* 1999.12 Virtua Tennis / Power Smash (ROM) */
 	DRIVER( vtennisg )	/* 1999.12 Virtua Tennis / Power Smash (GD-ROM) */
 						/* 1999.12 Puyopuyo DA! */
-						/* 1999.12 Mars TV */
 						/* 2000.01 18 Wheeler */
 	DRIVER( totd )		/* 2000.01 The Typing of the Dead */
 	DRIVER( spawn )		/* 2000.01 Spawn */
 	DRIVER( doa2m )		/* 2000.01 Dead or Alive 2 Millenium */
 						/* 2000.02 Touch de UNO! 2 */
 	DRIVER( virnba )	/* 2000.02 Virtua NBA */
+	DRIVER( virnbao )
+	DRIVER( mvsc2 )		/* 2000.03 Marvel vs. Capcom 2 */
 	DRIVER( smarinef )	/* 2000.03 Sega Marine Fishing */
-						/* 2000.03 Marvel vs. Capcom 2 */
 						/* 2000.03 World Kicks */
-	DRIVER( pstone2 )	/* 2000.04 Power Stone 2 */
 						/* 2000.04 Shin Nippon Pro-wres Toukon Retsuden 4 */
-						/* 2000.05 Quiz Ah Megamisama */
-						/* 2000.06 Derby Owners Club 2000 */
+	DRIVER( pstone2 )	/* 2000.04 Power Stone 2 */
+	DRIVER( qmegamis )	/* 2000.05 Quiz Ah Megamisama */
 						/* 2000.06 Virtual-on Oratorio Tangram M.S.B.S. ver.5.66 2000 edition */
-						/* 2000.07 Guilty Gear X */
+						/* 2000.06 Derby Owners Club 2000 */
+	DRIVER( ggx )		/* 2000.07 Guilty Gear X */
 	DRIVER( slasho )	/* 2000.07 Slashout */
 	DRIVER( slashout )
 	DRIVER( capsnk )	/* 2000.08 Capcom vs. SNK Millenium Fight 2000 */
 						/* 2000.08 Tokyo Bus Annai */
-						/* 2000.09 Crackin' DJ */
 	DRIVER( gram2000 )	/* 2000.09 Giant Gram 2000 Zen Nippon Pro-wres 3 */
 						/* 2000.09 Nittere Shiki! Mirai Yosou Studio */
+						/* 2000.10 Crackin' DJ */
 	DRIVER( cspike )	/* 2000.10 Gun Spike */
 						/* 2000.10 Sega Strike Fighter */
-						/* 2000.10 Death Crimson OX */
-						/* 2000.11 WWF Royal Rumble */
+	DRIVER( deathcox )	/* 2000.10 Death Crimson OX */
 						/* 2000.11 Ninja Assault */
 	DRIVER( confmiss )	/* 2000.11 Confidential Mission */											/* First GD-ROM game? */
 						/* 2000.11 Shakatto Tambourine */
-						/* 2000.12 Samba de Amigo ver.2000 */
-						/* 2000.12 Derby Owners Club 2000 ver.2 */
+	DRIVER( wwfroyal )	/* 2000.11 WWF Royal Rumble */
 	DRIVER( pjustic )	/* 2000.12 Moero Justice Gakuen */
+						/* 2000.12 Samba de Amigo ver.2000 */
 	DRIVER( sprtjam )	/* 2000.12 Sports Jam */
+						/* 2000.12 Derby Owners Club 2000 ver.2 */
+						/* 2000.?? World Kicks New ver. */
 						/* 2001.01 F355 Challenge 2 */
 	DRIVER( gwing2 )	/* 2001.01 Giga Wing 2 */
 	DRIVER( csmash )	/* 2001.01 Cosmic Smash */
@@ -4339,43 +4343,46 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( gundmgd )	/* 2001.03 Kidou Senshi Gundam Renpou vs. Zeon */
 						/* 2001.04 Shakatto Tambourine Motto Norinori Shinkyoku Tsuika */
 	DRIVER( dygolf )	/* 2001.04 Dynamic Golf */
+						/* 2001.05 Zero Gunner 2 */
 	DRIVER( monkeyba )	/* 2001.05 Monkey Ball */
 	DRIVER( cvsgd )		/* 2001.06 Capcom vs. SNK Pro */
 						/* 2001.06 Crackin' DJ Part2 */
 	DRIVER( wsbbgd )	/* 2001.06 Super Major League */
 	DRIVER( spkrbtl )	/* 2001.07 Spikers Battle */
+						/* 2001.07 Gun Survivor 2: Bio Hazard Code Veronica */
 						/* 2001.07 Dokidoki Idol Star Seeker */
 	DRIVER( cvs2gd )	/* 2001.08 Capcom vs. SNK 2 */
-	DRIVER( hmgeo )		/* 2001.09 Heavy Metal Geo Matrix */
-						/* 2001.09 Alien Front */
 	DRIVER( gundmxgd )	/* 2001.09 Kidou Senshi Gundam Renpou vs. Zeon DX */
-						/* 2001.10 Derby Owners Club 2 */
+						/* 2001.09 Alien Front */
+	DRIVER( hmgeo )		/* 2001.09 Heavy Metal Geo Matrix */
 						/* 2001.10 Inu no Osanpo */
+	DRIVER( derbyoc2 )	/* 2001.10 Derby Owners Club 2 */
 	DRIVER( vtennis2 )  /* 2001.10 Power Smash 2 / Virtua Tennis 2 */
-	DRIVER( keyboard )	/* 2001.11 La Keyboardxyu */
 						/* 2001.11 Shakatto Tambourine Cho Powerup Chu */
+	DRIVER( keyboard )	/* 2001.11 La Keyboardxyu */
 	DRIVER( ikaruga )	/* 2001.12 Ikaruga */
-	DRIVER( lupinsho )	/* 2001.12 Lupin the Third the Shooting */
+	DRIVER( lupinsho )	/* 2001.12 Lupin the Third: the Shooting */
 	DRIVER( vathlete )	/* 2002.03 Virtua Athlete */
-	DRIVER( luptype )	/* 2002.04 Lupin the Third the Typing */
+	DRIVER( luptype )	/* 2002.04 Lupin the Third: the Typing */
 	DRIVER( ggxx )		/* 2002.05 Guilty Gear XX */
-						/* 2002.05 Cleopatra Fortune + */
 	DRIVER( mok )		/* 2002.05 The Maze of the Kings */
-	DRIVER( chocomk )	/* 2002.06 Musapy no Choco Marker */
+						/* 2002.05 Cleopatra Fortune + */
+	DRIVER( chocomk )	/* 2002.06 Musapey no Choco Marker */
 						/* 2002.07 Mazan */
 						/* 2002.09 Yonin Uchi Mahjong MJ */
 						/* 2002.12 Azumanga Daiou Puzzle Bobble */
 	DRIVER( moeru )		/* 2002.12 Moeru Casinyo */
 	DRIVER( quizqgd )	/* 2003.01 Quiz Keitai Q mode */
 						/* 2003.03 Yonin Uchi Mahjong MJ Network Taisen ver. */
-	DRIVER( usagui )
 	DRIVER( ggxxrl )	/* 2003.03 Guilty Gear XX # Reload */
 	DRIVER( shikgam2 )	/* 2003.04 Shikigami no Shiro 2 */
 	DRIVER( bdrdown )	/* 2003.04 Border Down */
+	DRIVER( usagui )	/* 2003.06 Usagi Yamashiro Mahjong Hen */
+						/* 2003.07 Yonin Uchi Mahjong MJ Network Taisen ver. NEW */
 	DRIVER( psyvar2 )	/* 2003.11 Psyvariar 2 */
 	DRIVER( puyofev	)	/* 2003.11 Puyopuyo Fever */
-	DRIVER( cfield )	/* 2004.06 Chaos Field */
 	DRIVER( tetkiwam )	/* 2004.06 Tetris Kiwamemichi */
+	DRIVER( cfield )	/* 2004.06 Chaos Field */
 	DRIVER( trizeal )	/* 2004.09 Trizeal */
 						/* 2005.03 Melty Blood Act Cadenza */
 	DRIVER( ss2005 )	/* 2005.04 Super Shanghai 2005 */
@@ -4402,14 +4409,15 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 
 						/* Releases below use flash/mask ROMs like older NAOMI titles, not GD-ROM as GD-ROM Hardware (Drives and Discs) were no longer being produced */
 
+						/* 2007.07 Pokasuka Ghost! */
 						/* 2007.07 Shooting Love */
 						/* 2007.07 Dynamite Deka EX - Asian dynamite */
-						/* 2007.07 Pokasuka Ghost! */
 						/* 2007.09 Rhythm Tengoku */
 						/* 2008.02 Akatsuki Denkou Senki Ausf.Achse */
 						/* 2008.06 Illvelo (Illmatic Envelope) */
 						/* 2008.07 Mamoru Kun wa Norowarete Shimatta! */
 						/* 2008.09 Melty Blood Actress Again */
+						/* 2008.12 Melty Blood Actress Again ver.A */
 						/* 2009.?? Project Cerberus (planned to be released in 2009 spring) */
 						/* 2009.?? Radirgy Noah (planned to be released in 2009.06) */
 
@@ -4430,8 +4438,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	/* NAOMI 2 */
 	DRIVER( vstrik3c )	/* 2001.04 Virtua Striker 3 */
 	DRIVER( vstrik3 )
-						/* 2001.05 Wild Riders */
-						/* 2001.06 Club Cart */
+	DRIVER( wldrider )	/* 2001.05 Wild Riders */
+						/* 2001.06 Club Kart */
 	DRIVER( beachspi )	/* 2001.07 Beach Spikers */
 						/* 2001.08 Wave Runner GP */
 	DRIVER( vf4 )		/* 2001.08.02 Virtua Fighter 4 */
@@ -4440,24 +4448,28 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2002.02 The King of Route 66 */
 	DRIVER( initd )		/* 2002.03 Initial D Arcade Stage */
 	DRIVER( initdexp )	/* 200?.?? Initial D Export Version */
-						/* 2002.06 World Club Champion Football */
+						/* 2002.06 WCCF SERIE A 2001-2002 */
 						/* 2002.07 Soul Surfer */
-	DRIVER( vf4evo )	/* 2002.08 Virtua Fighter 4 Evolution (revision B) */
-	DRIVER( vf4evoa )
+	DRIVER( vf4evoa )	/* 2002.08 Virtua Fighter 4 Evolution */
+						/* 2002.11 WCCF SERIE A 2001-2002 ver.1.2 */
 	DRIVER( initdv2j )	/* 2002.12 Initial D Arcade Stage ver.2 */
-						/* 2002.12 Virtua Fighter 4 Evolution ver.B */
-						/* 2003.03 WCCF 2001-2002 ver.2.0 */
-						/* 2003.09 WCCF 2002-2003 */
+	DRIVER( vf4evo )	/* 2002.12 Virtua Fighter 4 Evolution ver.B */
+						/* 2003.03 WCCF SERIE A 2001-2002 ver.2.0 */
+						/* 2003.09 WCCF 2002-2003 SERIE A */
+						/* 2003.?? CYCRAFT Club Kart ver. */
 	DRIVER( initdv3j )	/* 2004.01 Initial D Arcade Stage ver.3 */
 						/* 2004.?? Initial D Arcade Stage ver.3 for CYCRAFT */
-						/* 2004.06 WCCF 2002-2003 ver.2.0 */
+						/* 2004.06 WCCF 2002-2003 SERIE A ver.2.0 */
 						/* 2004.07 Virtua Fighter 4 Final Tuned */
 	DRIVER( vf4tuneda )	/* 2004.09 Virtua Fighter 4 Final Tuned ver.A */
 						/* 2004.12 WCCF 2002-2003 ver.2.1 */
 						/* 2005.01 Virtua Fighter 4 final Tuned ver.B */
 						/* 2005.04 Menkyo no Tetsujin */
-						/* 2005.07 WCCF 2004-2005 */
+						/* 2005.06 WCCF European Clubs 2004-2005 */
+						/* 2006.01 WCCF European Clubs 2004-2005 ver.1.1 */
+						/* 2006.03 WCCF European Clubs 2004-2005 ver.1.2 */
 						/* 2006.08 WCCF European Clubs 2005-2006 */
+						/* 2006.10 WCCF European Clubs 2005-2006 bugfix ver. */
 	DRIVER( vf4tunedd )
 	DRIVER( vf4tuned )	/* 200?.?? Virtual fighter 4 Final Tuned ver.F */
 
@@ -4465,11 +4477,12 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	/* Atomiswave (Dreamcast-based) games */
 	DRIVER( awbios )
 						/* 2002.12 Maximum Speed */
+						/* 2002.12 Sports Shooting USA */
 						/* 2003.03 Guilty Gear X ver.1.5 */
 	DRIVER( demofist )	/* 2003.06 Demolish Fist */
 						/* 2003.08 Dolphin Blue */
 						/* 2003.12 Guilty Gear Isuka */
-						/* 2003.?? Sangoku Senki Shichisei Tensei (IGS) */
+						/* 2003.12 Sangoku Senki Shichisei Tensei (IGS) */
 						/* 2004.03 The Rumble Fish */
 						/* 2004.03 Ranger Mission */
 						/* 2004.06 Salary Man Kintarou Net Select */
@@ -4477,8 +4490,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2004.09 Extreme Hunting */
 						/* 2004.09 Dirty Pig Skin Football */
 						/* 2004.09 Faster than Speed */
-						/* 2005.03 The Rumble Fish 2 */
 						/* 2005.03 Net Select Keiba Victory Furlong */
+						/* 2005.03 The Rumble Fish 2 */
 						/* 2005.07 NeoGeo Battle Colloseum */
 						/* 2005.09 Samurai Spirits Tenkaichi Kenkakuden */
 						/* 2005.10 The King of Fighters XI */
@@ -4499,20 +4512,24 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 
 	/* Triforce (GameCube based) */
 	DRIVER( triforce )
-	DRIVER( vs2002ex )	/* 2002.10 Virtua Striker 2002 */
+	DRIVER( vs2002j )	/* 2002.10 Virtua Striker 2002 */
+	DRIVER( vs2002ex )
 						/* 2003.06 F-ZERO AX */
-						/* 2003.07 Avalon no Kagi */
+	DRIVER( avalons )	/* 2003.07 Avalon no Kagi */
+						/* 2003.08 Avalon no Kagi ver.1.00 */
 						/* 2003.10 Avalon no Kagi ver.1.01 */
 	DRIVER( gekpurya )	/* 2003.10 Gekitou Pro Yakyuu Mizushima Shinji All Stars vs. Pro Yakyuu */
 						/* 2003.12 Avalon no Kagi ver.1.10 */
+						/* 2003.?? CYCRAFT F-ZERO AX Monster Ride */
 						/* 2004.04 Avalon no Kagi ver.1.20 Aratanaru Syoukan */
 	DRIVER( avalon13 )	/* 2004.07 Avalon no Kagi ver.1.30 Konton no Utage */
 	DRIVER( vs4 )		/* 2004.10 Virtua Striker 4 */
+	DRIVER( vs4j )		/* 2004.10 Virtua Striker 4 */
 	DRIVER( avalon20 )	/* 2004.11 Avalon no Kagi ver.2.0 Chitsujo to Kairitsu */
 						/* 2005.04 Virtua Striker 4 ver.A */
 						/* 2005.08 Avalon no Kagi ver.2.5 Kagi Seisen */
 						/* 2005.12 Mario Kart Arcade Grand Prix */
-						/* 2006.05 Virtua Striker 4 ver.2006 */
+	DRIVER( vs42006 )	/* 2006.05 Virtua Striker 4 ver.2006 */
 						/* 2007.03 Mario Kart Arcade Grand Prix 2 */
 
 	DRIVER( tfupdate )	/* Triforce GDROM Boot Update (GDT-0011) */
@@ -4523,40 +4540,48 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2003.03 Crazy Taxi High Roller */
 	DRIVER( vcop3 )		/* 2003.04 Virtua Cop 3 */
 						/* 2003.12 Outrun 2 */
-						/* 2004.03 Ollie King */
 						/* 2004.03 Sega Network Taisen Mahjong MJ 2 */
+						/* 2004.03 Ollie King */
 						/* 2004.04 Sega Network Taisen Mahjong MJ 2 ver.B */
 	DRIVER( wangmid )	/* 2004.07 Wangan Midnight Maximum Tune */
 	DRIVER( mj2 )		/* 2004.07 Sega Network Taisen Mahjong MJ 2 ver.C */
 						/* 2004.09 Quest of D */
 						/* 2004.11 Sega Golf Club Network Pro Tour */
 						/* 2004.12 Sega Network Taisen Mahjong MJ 2 ver.D */
-						/* 2004.12 Outrun 2 Special Tours */
 						/* 2004.12 Quest of D ver.1.02 */
+						/* 2004.12 Outrun 2 Special Tours */
 						/* 2004.12 Quest of D ver.1.10 */
 	DRIVER( ghostsqu )	/* 2004.12 Ghost Squad */
-						/* 2005.03 Kidou Senshi Gundam Battle Operating Simulator */
+						/* 2004.12 Quest of D ver.1.10a */
 						/* 2005.03 Sangokushi Taisen */
-	DRIVER( wangmid2 )	/* 2005.04 Wangan Midnight Maximum Tune 2 */
-						/* 2005.04 Sega Network Taisen Mahjong MJ 2 ver.E */
+						/* 2005.03 Kidou Senshi Gundam Battle Operating Simulator */
 						/* 2005.04 Quest of D ver.1.20 */
-						/* 2005.04 Quest of D ver.1.20a */
-						/* 2005.06 Sega Golf Club Network Pro Tour 2005 */
+						/* 2005.04 Sega Network Taisen Mahjong MJ 2 ver.E */
+	DRIVER( wangmid2 )	/* 2005.04 Wangan Midnight Maximum Tune 2 */
 						/* 2005.06 Sangokushi Taisen ver.1.003 */
+						/* 2005.06 Sega Golf Club Network Pro Tour 2005 */
+						/* 2005.06 Quest of D ver.1.20a */
 						/* 2005.09 Quest of D ver.1.21 */
 						/* 2005.10 Sangokushi Taisen Ranse no Gunrou ver.1.100 */
 						/* 2005.10 Wangan Midnight Maximum Tune 2 ver.B */
+						/* 2005.11 Sangokushi Taisen Ranse no Gunrou ver.1.110 */
+						/* 2005.12 Quest of D Gofu no Keisyousya ver.2.00 */
 						/* 2005.12 Kidou Senshi Gundam 0079 Card Builder */
-						/* 2005.12 Quest of D ver.2.00 Gofu no Keisyousya */
-						/* 2005.12 Quest of D ver.2.01 Gofu no Keisyousya */
-						/* 2005.12 Sega Golf Club 2006 Next Tours */
 	DRIVER( mj3 )		/* 2005.12 Sega Network Taisen Mahjong MJ 3 */
+						/* 2005.12 Quest of D Gofu no Keisyousya ver.2.01 */
+						/* 2005.12 Sega Golf Club 2006 Next Tours */
 						/* 2006.02 Sangokushi Taisen Ranse no Gunrou ver.1.12 */
-						/* 2006.03 Quest of D ver.2.01 Gofu no Keisyousya ver.2.02b */
+						/* 2006.03 Kidou Senshi Gundam 0079 Card Builder ver.1.007 */
+						/* 2006.03 Quest of D Gofu no Keisyousya ver.2.02b */
+						/* 2006.04 Sega Network Taisen Mahjong MJ 3 ver.A+ */
 						/* 2006.05 Sangokushi Taisen 2 */
+						/* 2006.07 Kidou Senshi Gundam 0079 Card Builder ver.2.00 */
+						/* 2006.09 Sangokushi Taisen 2 ver.2.01 */
 						/* 2006.09 Sega Network Taisen Mahjong MJ 3 ver.B */
+						/* 2006.09 Kidou Senshi Gundam 0079 Card Builder ver.2.01 */
 						/* 2006.10 Quest of D ver.3.00 Oukoku no Syugosya */
 						/* 2006.11 Quest of D ver.3.01 Oukoku no Syugosya */
+						/* 2006.11 Kidou Senshi Gundam 0079 Card Builder ver.2.02 */
 						/* 2007.03 Kidou Senshi Gundam 0083 Card Builder */
 						/* 2007.03 Sega Network Taisen Mahjong MJ 3 Evolution */
 						/* 2007.10 Kidou Senshi Gundam 0083 Card Builder Ryouyuu Gekitotsu */
@@ -5267,6 +5292,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( asterix )	/* GX068 (c) 1992 (World) */
 	DRIVER( astrxeac )	/* GX068 (c) 1992 (World) */
 	DRIVER( astrxeaa )	/* GX068 (c) 1992 (World) */
+	DRIVER( asterixj )	/* GX068 (c) 1992 (Japan) */
 	DRIVER( gijoe )		/* GX069 (c) 1991 (World) */
 	DRIVER( gijoeu )	/* GX069 (c) 1991 (US) */
 	DRIVER( gijoej )	/* GX069 (c) 1991 (Japan) */
@@ -8408,6 +8434,8 @@ Other Sun games
 	DRIVER( dblpoint )	/* (c) 1995 Min Corp. */
 	DRIVER( dblpoind )	/* (c) 1995 Dong Bang Electron */
 	DRIVER( statusbj )	/* (c) 1981 Status Games */
+	DRIVER( tripdraw )	/* (c) 1981 Status Games */
+	DRIVER( funcsino )	/* (c) 1981 Status Games */
 	DRIVER( hangman )	/* (c) 1984 Status Games */
 	DRIVER( trivquiz )	/* (c) 1984 Status Games */
 	DRIVER( statriv2 )	/* (c) 1984 Status Games */
@@ -8417,6 +8445,7 @@ Other Sun games
 	DRIVER( quaquiz2 )	/* (c) 1985 Status Games */
 	DRIVER( supertr2 )	/* (c) 1986 Status Games */
 	DRIVER( supertr3 )	/* (c) 1986 Status Games */
+	DRIVER( cstripxi )	/* (c) 1981 Status Games */
 	DRIVER( tickee )	/* (c) 1994 Raster Elite */
 	DRIVER( ghoshunt )	/* (c) 1995? Hanaho Games */
 	DRIVER( tutstomb )	/* (c) 199?? Island Design */

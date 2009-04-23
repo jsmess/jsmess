@@ -505,7 +505,7 @@ endif
 
 
 #-------------------------------------------------
-# SNK custom stereo sn76489a clone
+# SNK(?) custom stereo sn76489a clone
 #-------------------------------------------------
 
 SOUNDDEFS += -DHAS_T6W28=$(if $(filter T6W28,$(SOUNDS)),1,0)

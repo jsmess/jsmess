@@ -99,7 +99,6 @@ typedef struct _mouse_state mouse_state;
 struct _mouse_state
 {
 	DIMOUSESTATE2			state;
-	mouse_state *			partner;
 	LONG					raw_x, raw_y, raw_z;
 };
 
@@ -1771,7 +1770,7 @@ static void rawinput_device_release(device_info *devinfo)
 
 
 //============================================================
-//  rawinput_device_name
+//  rawinput_device_improve_name
 //============================================================
 
 static TCHAR *rawinput_device_improve_name(TCHAR *name)
@@ -1787,8 +1786,13 @@ static TCHAR *rawinput_device_improve_name(TCHAR *name)
 	TCHAR *chdst;
 	LONG result;
 
+	// The RAW name received is formatted as:
+	//   \??\type-id#hardware-id#instance-id#{DeviceClasses-id}
+	// XP starts with "\??\"
+	// Vista64 starts with "\\?\"
+
 	// ensure the name is something we can handle
-	if (_tcsncmp(name, TEXT("\\\\?\\"), 4) != 0)
+	if (_tcsncmp(name, TEXT("\\\\?\\"), 4) != 0 && _tcsncmp(name, TEXT("\\??\\"), 4) != 0)
 		return name;
 
 	// allocate a temporary string and concatenate the base path plus the name
@@ -2011,8 +2015,7 @@ static void rawinput_mouse_enum(running_machine *machine, PRAWINPUTDEVICELIST de
 	if (guninfo != NULL)
 	{
 		guninfo->device = input_device_add(machine, DEVICE_CLASS_LIGHTGUN, guninfo->name, guninfo);
-		guninfo->poll = (guninfo == lightgun_list) ? win32_lightgun_poll : NULL;
-		guninfo->mouse.partner = &devinfo->mouse;
+		guninfo->poll = NULL;
 	}
 
 	// populate the axes
@@ -2034,10 +2037,9 @@ static void rawinput_mouse_enum(running_machine *machine, PRAWINPUTDEVICELIST de
 		const char *name = utf8_from_tstring(default_button_name(butnum));
 
 		// add to the mouse device and optionally to the gun device as well
-		// note that the gun device points to the mouse buttons rather than its own
 		input_device_item_add(devinfo->device, name, &devinfo->mouse.state.rgbButtons[butnum], (input_item_id)(ITEM_ID_BUTTON1 + butnum), generic_button_get_state);
 		if (guninfo != NULL)
-			input_device_item_add(guninfo->device, name, &devinfo->mouse.state.rgbButtons[butnum], (input_item_id)(ITEM_ID_BUTTON1 + butnum), generic_button_get_state);
+			input_device_item_add(guninfo->device, name, &guninfo->mouse.state.rgbButtons[butnum], (input_item_id)(ITEM_ID_BUTTON1 + butnum), generic_button_get_state);
 
 		free((void *)name);
 	}
@@ -2057,8 +2059,6 @@ static void rawinput_mouse_update(HANDLE device, RAWMOUSE *data)
 	for (devinfo = devlist; devinfo != NULL; devinfo = devinfo->next)
 		if (devinfo->rawinput.device == device)
 		{
-			mouse_state *mouseinfo = (devinfo->mouse.partner != NULL) ? devinfo->mouse.partner : &devinfo->mouse;
-
 			// if we got relative data, update it as a mouse
 			if (!(data->usFlags & MOUSE_MOVE_ABSOLUTE))
 			{
@@ -2075,22 +2075,19 @@ static void rawinput_mouse_update(HANDLE device, RAWMOUSE *data)
 			{
 				devinfo->mouse.state.lX = normalize_absolute_axis(data->lLastX, 0, 0xffff);
 				devinfo->mouse.state.lY = normalize_absolute_axis(data->lLastY, 0, 0xffff);
-
-				// also clear the polling function so win32_lightgun_poll isn't called
-				devinfo->poll = NULL;
 			}
 
 			// update the button states; always update the corresponding mouse buttons
-			if (data->usButtonFlags & RI_MOUSE_BUTTON_1_DOWN) mouseinfo->state.rgbButtons[0] = 0x80;
-			if (data->usButtonFlags & RI_MOUSE_BUTTON_1_UP)   mouseinfo->state.rgbButtons[0] = 0x00;
-			if (data->usButtonFlags & RI_MOUSE_BUTTON_2_DOWN) mouseinfo->state.rgbButtons[1] = 0x80;
-			if (data->usButtonFlags & RI_MOUSE_BUTTON_2_UP)   mouseinfo->state.rgbButtons[1] = 0x00;
-			if (data->usButtonFlags & RI_MOUSE_BUTTON_3_DOWN) mouseinfo->state.rgbButtons[2] = 0x80;
-			if (data->usButtonFlags & RI_MOUSE_BUTTON_3_UP)   mouseinfo->state.rgbButtons[2] = 0x00;
-			if (data->usButtonFlags & RI_MOUSE_BUTTON_4_DOWN) mouseinfo->state.rgbButtons[3] = 0x80;
-			if (data->usButtonFlags & RI_MOUSE_BUTTON_4_UP)   mouseinfo->state.rgbButtons[3] = 0x00;
-			if (data->usButtonFlags & RI_MOUSE_BUTTON_5_DOWN) mouseinfo->state.rgbButtons[4] = 0x80;
-			if (data->usButtonFlags & RI_MOUSE_BUTTON_5_UP)   mouseinfo->state.rgbButtons[4] = 0x00;
+			if (data->usButtonFlags & RI_MOUSE_BUTTON_1_DOWN) devinfo->mouse.state.rgbButtons[0] = 0x80;
+			if (data->usButtonFlags & RI_MOUSE_BUTTON_1_UP)   devinfo->mouse.state.rgbButtons[0] = 0x00;
+			if (data->usButtonFlags & RI_MOUSE_BUTTON_2_DOWN) devinfo->mouse.state.rgbButtons[1] = 0x80;
+			if (data->usButtonFlags & RI_MOUSE_BUTTON_2_UP)   devinfo->mouse.state.rgbButtons[1] = 0x00;
+			if (data->usButtonFlags & RI_MOUSE_BUTTON_3_DOWN) devinfo->mouse.state.rgbButtons[2] = 0x80;
+			if (data->usButtonFlags & RI_MOUSE_BUTTON_3_UP)   devinfo->mouse.state.rgbButtons[2] = 0x00;
+			if (data->usButtonFlags & RI_MOUSE_BUTTON_4_DOWN) devinfo->mouse.state.rgbButtons[3] = 0x80;
+			if (data->usButtonFlags & RI_MOUSE_BUTTON_4_UP)   devinfo->mouse.state.rgbButtons[3] = 0x00;
+			if (data->usButtonFlags & RI_MOUSE_BUTTON_5_DOWN) devinfo->mouse.state.rgbButtons[4] = 0x80;
+			if (data->usButtonFlags & RI_MOUSE_BUTTON_5_UP)   devinfo->mouse.state.rgbButtons[4] = 0x00;
 			break;
 		}
 }
