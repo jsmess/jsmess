@@ -1,4 +1,4 @@
-﻿0.131
+0.131
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
@@ -60,6 +60,11 @@ System Driver Changes:
           - ht1080z and system-80 extension roms added
 
 - [X68000] Added support for 3 and 6 button Megadrive gamepads. [Barry Rodewald]
+
+- [ZX] Improved natural keyboard support. Removed hacky double mappings for Cursor 
+  Keys (and a few others). To access these keys, now you have to either press Shift
+  together with another key, like in the real keyboard, or simply switch to natural 
+  keyboard emulation [Fabio Priuli]
 
 - Added natural keyboard support to a number of drivers: ac1.c, amiga.c, 
   apogee.c, b2m.c, bk.c, einstein.c, galeb.c, homelab.c, irisha.c, mikro80.c, 

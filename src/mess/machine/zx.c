@@ -111,24 +111,16 @@ READ8_HANDLER ( zx80_io_r )
 
 	if (offs == 0xfe)
 	{
-		UINT8 extra1 = input_port_read(space->machine, "SPC1");
-		UINT8 extra2 = input_port_read(space->machine, "SPC2");
-
 		if ((offset & 0x0100) == 0)
-		{
 			data &= input_port_read(space->machine, "ROW0");
-			/* SHIFT for extra keys */
-			if (extra1 != 0xff || extra2 != 0xff)
-				data &= ~0x01;
-		}
 		if ((offset & 0x0200) == 0)
 			data &= input_port_read(space->machine, "ROW1");
 		if ((offset & 0x0400) == 0)
 			data &= input_port_read(space->machine, "ROW2");
 		if ((offset & 0x0800) == 0)
-			data &= input_port_read(space->machine, "ROW3") & extra1;
+			data &= input_port_read(space->machine, "ROW3");
 		if ((offset & 0x1000) == 0)
-			data &= input_port_read(space->machine, "ROW4") & extra2;
+			data &= input_port_read(space->machine, "ROW4");
 		if ((offset & 0x2000) == 0)
 			data &= input_port_read(space->machine, "ROW5");
 		if ((offset & 0x4000) == 0)
@@ -183,24 +175,16 @@ READ8_HANDLER ( zx81_io_r )
 
 	if (offs == 0xfe)
 	{
-		UINT8 extra1 = input_port_read(space->machine, "SPC1");
-		UINT8 extra2 = input_port_read(space->machine, "SPC2");
-
 		if ((offset & 0x0100) == 0)
-		{
 			data &= input_port_read(space->machine, "ROW0");
-			/* SHIFT for extra keys */
-			if (extra1 != 0xff || extra2 != 0xff)
-				data &= ~0x01;
-		}
 		if ((offset & 0x0200) == 0)
 			data &= input_port_read(space->machine, "ROW1");
 		if ((offset & 0x0400) == 0)
 			data &= input_port_read(space->machine, "ROW2");
 		if ((offset & 0x0800) == 0)
-			data &= input_port_read(space->machine, "ROW3") & extra1;
+			data &= input_port_read(space->machine, "ROW3");
 		if ((offset & 0x1000) == 0)
-			data &= input_port_read(space->machine, "ROW4") & extra2;
+			data &= input_port_read(space->machine, "ROW4");
 		if ((offset & 0x2000) == 0)
 			data &= input_port_read(space->machine, "ROW5");
 		if ((offset & 0x4000) == 0)
@@ -266,24 +250,16 @@ READ8_HANDLER ( pc8300_io_r )
 	else
 	if (offs == 0xfe)
 	{
-		UINT8 extra1 = input_port_read(space->machine, "SPC1");
-		UINT8 extra2 = input_port_read(space->machine, "SPC2");
-
 		if ((offset & 0x0100) == 0)
-		{
 			data &= input_port_read(space->machine, "ROW0");
-			/* SHIFT for extra keys */
-			if (extra1 != 0xff || extra2 != 0xff)
-				data &= ~0x01;
-		}
 		if ((offset & 0x0200) == 0)
 			data &= input_port_read(space->machine, "ROW1");
 		if ((offset & 0x0400) == 0)
 			data &= input_port_read(space->machine, "ROW2");
 		if ((offset & 0x0800) == 0)
-			data &= input_port_read(space->machine, "ROW3") & extra1;
+			data &= input_port_read(space->machine, "ROW3");
 		if ((offset & 0x1000) == 0)
-			data &= input_port_read(space->machine, "ROW4") & extra2;
+			data &= input_port_read(space->machine, "ROW4");
 		if ((offset & 0x2000) == 0)
 			data &= input_port_read(space->machine, "ROW5");
 		if ((offset & 0x4000) == 0)
@@ -351,17 +327,8 @@ READ8_HANDLER ( pow3000_io_r )
 	else
 	if (offs == 0xfe)
 	{
-		UINT8 extra0 = input_port_read(space->machine, "SPC0");
-		UINT8 extra1 = input_port_read(space->machine, "SPC1");
-		UINT8 extra2 = input_port_read(space->machine, "SPC2");
-
 		if ((offset & 0x0100) == 0)
-		{
-			data &= input_port_read(space->machine, "ROW0") & extra0;
-			/* SHIFT for extra keys */
-			if (extra0 != 0xff || extra1 != 0xff || extra2 != 0xff)
-				data &= ~0x01;
-		}
+			data &= input_port_read(space->machine, "ROW0");
 		if ((offset & 0x0200) == 0)
 			data &= input_port_read(space->machine, "ROW1");
 		if ((offset & 0x0400) == 0)
@@ -373,9 +340,9 @@ READ8_HANDLER ( pow3000_io_r )
 		if ((offset & 0x2000) == 0)
 			data &= input_port_read(space->machine, "ROW5");
 		if ((offset & 0x4000) == 0)
-			data &= input_port_read(space->machine, "ROW6") & extra1;
+			data &= input_port_read(space->machine, "ROW6");
 		if ((offset & 0x8000) == 0)
-			data &= input_port_read(space->machine, "ROW7") & extra2;
+			data &= input_port_read(space->machine, "ROW7");
 
 		cassette_output(devtag_get_device(space->machine, "cassette"), +0.75);
 
