@@ -163,14 +163,6 @@ static DEVICE_START( adc080x )
 	state_save_register_item(device->machine, "adc080x", device->tag, 0, adc080x->bit);
 }
 
-static DEVICE_SET_INFO( adc080x )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
 DEVICE_GET_INFO( adc0808 )
 {
 	switch (state)
@@ -181,7 +173,6 @@ DEVICE_GET_INFO( adc0808 )
 		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(adc080x); break;
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(adc080x);	break;
 		case DEVINFO_FCT_STOP:							/* Nothing */								break;
 		case DEVINFO_FCT_RESET:							/* Nothing */								break;

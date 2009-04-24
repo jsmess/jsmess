@@ -118,14 +118,6 @@ static DEVICE_RESET( pc_lpt )
 	lpt->irq_enabled = FALSE;
 }
 
-static DEVICE_SET_INFO( pc_lpt )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
 DEVICE_GET_INFO( pc_lpt )
 {
 	switch (state)
@@ -139,7 +131,6 @@ DEVICE_GET_INFO( pc_lpt )
 		case DEVINFO_PTR_MACHINE_CONFIG:		info->machine_config = MACHINE_DRIVER_NAME(pc_lpt);	break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:				info->set_info = DEVICE_SET_INFO_NAME(pc_lpt);	break;
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(pc_lpt);		break;
 		case DEVINFO_FCT_STOP:					/* Nothing */									break;
 		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(pc_lpt);		break;

@@ -152,15 +152,6 @@ static DEVICE_RESET( dl1416 )
 }
 
 
-static DEVICE_SET_INFO( dl1416 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
 DEVICE_GET_INFO( dl1416 )
 {
 	switch (state)
@@ -171,7 +162,6 @@ DEVICE_GET_INFO( dl1416 )
 		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:				info->set_info = DEVICE_SET_INFO_NAME( dl1416 );		break;
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME( dl1416 );				break;
 		case DEVINFO_FCT_STOP:					/* Nothing */							break;
 		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME( dl1416 );				break;

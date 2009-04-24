@@ -414,18 +414,6 @@ static DEVICE_START( abc77 )
 }
 
 /*-------------------------------------------------
-    DEVICE_SET_INFO( abc77 )
--------------------------------------------------*/
-
-static DEVICE_SET_INFO( abc77 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-/*-------------------------------------------------
     DEVICE_GET_INFO( abc77 )
 -------------------------------------------------*/
 
@@ -443,7 +431,6 @@ DEVICE_GET_INFO( abc77 )
 		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = machine_config_abc77; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(abc77); break;
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(abc77);		break;
 		case DEVINFO_FCT_STOP:							/* Nothing */								break;
 		case DEVINFO_FCT_RESET:							/* Nothing */								break;

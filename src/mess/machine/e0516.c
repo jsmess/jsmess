@@ -229,18 +229,6 @@ static DEVICE_START( e0516 )
 }
 
 /*-------------------------------------------------
-    DEVICE_SET_INFO( e0516 )
--------------------------------------------------*/
-
-static DEVICE_SET_INFO( e0516 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-/*-------------------------------------------------
     DEVICE_GET_INFO( e0516 )
 -------------------------------------------------*/
 
@@ -254,7 +242,6 @@ DEVICE_GET_INFO( e0516 )
 		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(e0516); break;
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(e0516);		break;
 		case DEVINFO_FCT_STOP:							/* Nothing */								break;
 		case DEVINFO_FCT_RESET:							/* Nothing */								break;

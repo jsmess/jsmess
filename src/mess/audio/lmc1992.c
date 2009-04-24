@@ -161,14 +161,6 @@ static DEVICE_START( lmc1992 )
 	state_save_register_device_item(device, 0, lmc1992->fader_lr);
 }
 
-static DEVICE_SET_INFO( lmc1992 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
 DEVICE_GET_INFO( lmc1992 )
 {
 	switch (state)
@@ -179,7 +171,6 @@ DEVICE_GET_INFO( lmc1992 )
 		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(lmc1992); break;
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(lmc1992);	break;
 		case DEVINFO_FCT_STOP:							/* Nothing */								break;
 		case DEVINFO_FCT_RESET:							/* Nothing */								break;

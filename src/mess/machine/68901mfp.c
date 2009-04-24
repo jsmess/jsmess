@@ -1628,18 +1628,6 @@ static DEVICE_RESET( mc68901 )
 }
 
 /*-------------------------------------------------
-    DEVICE_SET_INFO( mc68901 )
--------------------------------------------------*/
-
-static DEVICE_SET_INFO( mc68901 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-/*-------------------------------------------------
     DEVICE_GET_INFO( mc68901 )
 -------------------------------------------------*/
 
@@ -1653,7 +1641,6 @@ DEVICE_GET_INFO( mc68901 )
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(mc68901_t);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(mc68901); break;
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(mc68901);	break;
 		case DEVINFO_FCT_STOP:							/* Nothing */								break;
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(mc68901);	break;
@@ -1682,7 +1669,6 @@ DEVICE_GET_INFO( mk68901 )
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(mc68901_t);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(mc68901); break;
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(mc68901);	break;
 		case DEVINFO_FCT_STOP:							/* Nothing */								break;
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(mc68901);	break;

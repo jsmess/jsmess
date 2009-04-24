@@ -735,15 +735,6 @@ static DEVICE_RESET( ay31015 )
 }
 
 
-static DEVICE_SET_INFO( ay31015 )
-{
-	switch ( state )
-	{
-		/* no parameters to set */
-	}
-}
-
-
 /*-------------------------------------------------
     DEVICE_GET_INFO(ay31015) - device getinfo
 	function
@@ -759,7 +750,6 @@ DEVICE_GET_INFO( ay31015 )
 		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_PERIPHERAL;				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:				info->set_info = DEVICE_SET_INFO_NAME(ay31015);	break;
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(ay31015);		break;
 		case DEVINFO_FCT_STOP:					/* nothing */									break;
 		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME( ay31015 );		break;

@@ -335,20 +335,6 @@ WRITE8_DEVICE_HANDLER(scc_w)
 
 
 /*-------------------------------------------------
-    DEVICE_SET_INFO( scc8530 )
--------------------------------------------------*/
-
-static DEVICE_SET_INFO( scc8530 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-
-/*-------------------------------------------------
     DEVICE_GET_INFO( scc8530 )
 -------------------------------------------------*/
 
@@ -362,7 +348,6 @@ DEVICE_GET_INFO( scc8530 )
 		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to functions --- */
-		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(scc8530); break;
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(scc8530);	break;
 		case DEVINFO_FCT_STOP:							/* Nothing */								break;
 		case DEVINFO_FCT_RESET:							/* Nothing */								break;

@@ -379,19 +379,6 @@ static DEVICE_GET_IMAGE_DEVICES(cartslot)
 
 
 /*-------------------------------------------------
-    DEVICE_SET_INFO( cartslot )
--------------------------------------------------*/
-
-static DEVICE_SET_INFO( cartslot )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-/*-------------------------------------------------
     DEVICE_GET_INFO( cartslot )
 -------------------------------------------------*/
 
@@ -416,7 +403,6 @@ DEVICE_GET_INFO( cartslot )
 													break;
 
 		/* --- the following bits of info are returned as pointers to functions --- */
-		case DEVINFO_FCT_SET_INFO:					info->set_info = DEVICE_SET_INFO_NAME(cartslot);			break;
 		case DEVINFO_FCT_START:						info->start = DEVICE_START_NAME(cartslot);					break;
 		case DEVINFO_FCT_IMAGE_LOAD:				info->f = (genf *) DEVICE_IMAGE_LOAD_NAME(cartslot);		break; 
 		case DEVINFO_FCT_IMAGE_UNLOAD:				info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(cartslot);		break; 

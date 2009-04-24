@@ -517,14 +517,6 @@ static DEVICE_RESET( mm58274c )
 	mm58274c->tenths = 0;
 }
 
-static DEVICE_SET_INFO( mm58274c )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
 DEVICE_GET_INFO( mm58274c )
 {
 	switch (state)
@@ -535,7 +527,6 @@ DEVICE_GET_INFO( mm58274c )
 		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(mm58274c); break;
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(mm58274c);	break;
 		case DEVINFO_FCT_STOP:							/* Nothing */								break;
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(mm58274c);	break;

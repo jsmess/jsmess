@@ -158,14 +158,6 @@ static DEVICE_RESET( cdp1863 )
 	cdp1863->latch = CDP1863_DEFAULT_LATCH;
 }
 
-static DEVICE_SET_INFO( cdp1863 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
 DEVICE_GET_INFO( cdp1863 )
 {
 	switch (state)
@@ -176,7 +168,6 @@ DEVICE_GET_INFO( cdp1863 )
 		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(cdp1863); break;
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(cdp1863);	break;
 		case DEVINFO_FCT_STOP:							/* Nothing */								break;
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(cdp1863);	break;

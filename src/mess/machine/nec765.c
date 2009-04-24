@@ -2303,14 +2303,6 @@ static DEVICE_RESET( nec765 )
 	nec765_reset(device,0);
 }
 
-static DEVICE_SET_INFO( nec765 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
 DEVICE_GET_INFO( nec765a )
 {
 	switch (state)
@@ -2321,7 +2313,6 @@ DEVICE_GET_INFO( nec765a )
 		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(nec765); break;
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(nec765a);	break;
 		case DEVINFO_FCT_STOP:							/* Nothing */								break;
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(nec765);	break;

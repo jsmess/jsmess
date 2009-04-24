@@ -584,20 +584,6 @@ void acia_6551_connect_to_serial_device(const device_config *device, const devic
 
 
 /*-------------------------------------------------
-    DEVICE_SET_INFO( acia6551 )
--------------------------------------------------*/
-
-static DEVICE_SET_INFO( acia6551 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-
-/*-------------------------------------------------
     DEVICE_GET_INFO( acia6551 )
 -------------------------------------------------*/
 
@@ -611,7 +597,6 @@ DEVICE_GET_INFO( acia6551 )
 		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(acia6551); break;
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(acia6551);	break;
 		case DEVINFO_FCT_STOP:							/* Nothing */								break;
 		case DEVINFO_FCT_RESET:							/* Nothing */								break;

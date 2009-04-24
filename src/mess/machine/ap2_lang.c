@@ -108,7 +108,6 @@ DEVICE_GET_INFO(apple2_langcard)
 		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:						/* Nothing */								break;
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(apple2_langcard);	break;
 		case DEVINFO_FCT_STOP:							/* Nothing */								break;
 		case DEVINFO_FCT_RESET:							/* Nothing */								break;

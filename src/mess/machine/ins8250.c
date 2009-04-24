@@ -602,15 +602,6 @@ static DEVICE_RESET( ins8250 )
 }
 
 
-static DEVICE_SET_INFO( ins8250 )
-{
-	switch ( state )
-	{
-		/* no parameters to set */
-	}
-}
-
-
 DEVICE_GET_INFO( ins8250 )
 {
 	switch ( state )
@@ -621,7 +612,6 @@ DEVICE_GET_INFO( ins8250 )
 		case DEVINFO_INT_CLASS:						info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:					info->set_info = DEVICE_SET_INFO_NAME(ins8250);	break;
 		case DEVINFO_FCT_START:						info->start = DEVICE_START_NAME(ins8250);	break;
 		case DEVINFO_FCT_STOP:						/* nothing */								break;
 		case DEVINFO_FCT_RESET:						info->reset = DEVICE_RESET_NAME(ins8250);	break;

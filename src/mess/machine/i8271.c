@@ -1587,14 +1587,6 @@ static DEVICE_RESET( i8271 )
 
 }
 
-static DEVICE_SET_INFO( i8271 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
 DEVICE_GET_INFO( i8271 )
 {
 	switch (state)
@@ -1605,7 +1597,6 @@ DEVICE_GET_INFO( i8271 )
 		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(i8271); break;
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(i8271);		break;
 		case DEVINFO_FCT_STOP:							/* Nothing */								break;
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(i8271);		break;

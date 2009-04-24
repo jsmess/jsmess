@@ -881,11 +881,6 @@ static DEVICE_RESET( k1ge )
 }
 
 
-static DEVICE_SET_INFO( k1ge )
-{
-}
-
-
 DEVICE_GET_INFO( k1ge )
 {
 	switch ( state )
@@ -896,7 +891,6 @@ DEVICE_GET_INFO( k1ge )
 		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_PERIPHERAL; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:				info->set_info = DEVICE_SET_INFO_NAME( k1ge ); break;
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME( k1ge ); break;
 		case DEVINFO_FCT_STOP:					break;
 		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME( k1ge ); break;

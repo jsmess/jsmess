@@ -428,18 +428,6 @@ static DEVICE_RESET( upd7220 )
 }
 
 /*-------------------------------------------------
-    DEVICE_SET_INFO( upd7220 )
--------------------------------------------------*/
-
-static DEVICE_SET_INFO( upd7220 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-/*-------------------------------------------------
     DEVICE_GET_INFO( upd7220 )
 -------------------------------------------------*/
 
@@ -456,7 +444,6 @@ DEVICE_GET_INFO( upd7220 )
 		case DEVINFO_PTR_ROM_REGION:					info->romregion = ROM_NAME(upd7220);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(upd7220);		break;
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(upd7220);			break;
 		case DEVINFO_FCT_STOP:							/* Nothing */										break;
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(upd7220);			break;

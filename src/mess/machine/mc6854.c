@@ -1025,14 +1025,6 @@ static DEVICE_START( mc6854 )
 /************************** configuration ****************************/
 
 
-static DEVICE_SET_INFO( mc6854 )
-{
-	switch ( state ) {
-		/* no parameters to set */
-	}
-}
-
-
 DEVICE_GET_INFO( mc6854 ) {
 	switch ( state ) {
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
@@ -1041,7 +1033,6 @@ DEVICE_GET_INFO( mc6854 ) {
 		case DEVINFO_INT_CLASS:				info->i = DEVICE_CLASS_PERIPHERAL;		break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-	        case DEVINFO_FCT_SET_INFO:		     	info->set_info = DEVICE_SET_INFO_NAME(mc6854);  break;
 		case DEVINFO_FCT_START:				info->start = DEVICE_START_NAME(mc6854);	break;
 		case DEVINFO_FCT_STOP:				/* nothing */					break;
 		case DEVINFO_FCT_RESET:				info->reset = DEVICE_RESET_NAME(mc6854);	break;

@@ -98,7 +98,6 @@ DEVICE_GET_INFO(coco_cartridge_pcb_orch90)
 		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;		break;
 
 		/* --- the following bits of info are returned as pointers to functions --- */
-		case DEVINFO_FCT_SET_INFO:						/* Nothing */							break;
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(orch90);break;
 		case DEVINFO_FCT_STOP:							/* Nothing */							break;
 		case DEVINFO_FCT_RESET:							/* Nothing */							break;

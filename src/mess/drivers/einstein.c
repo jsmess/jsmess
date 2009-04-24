@@ -488,11 +488,6 @@ static DEVICE_RESET( einstein_daisy )
 }
 
 
-static DEVICE_SET_INFO( einstein_daisy )
-{
-}
-
-
 static DEVICE_GET_INFO( einstein_daisy )
 {
 	switch (state)
@@ -503,7 +498,6 @@ static DEVICE_GET_INFO( einstein_daisy )
 		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;						break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(einstein_daisy);	break;
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(einstein_daisy);		break;
 		case DEVINFO_FCT_STOP:							/* Nothing */											break;
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(einstein_daisy);		break;

@@ -447,14 +447,6 @@ int hd63450_get_error_vector(const device_config* device, int channel)
 	return dmac->reg[channel].eiv;
 }
 
-static DEVICE_SET_INFO( hd63450 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
 DEVICE_GET_INFO(hd63450)
 {
 	switch (state)
@@ -464,7 +456,6 @@ DEVICE_GET_INFO(hd63450)
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(hd63450_t);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(hd63450); break;
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(hd63450);	break;
 		case DEVINFO_FCT_STOP:							/* Nothing */								break;
 		case DEVINFO_FCT_RESET:							/*info->reset = DEVICE_RESET_NAME(hd63450);*/	break;

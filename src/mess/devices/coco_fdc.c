@@ -249,19 +249,6 @@ static DEVICE_START(fdc)
 
 
 /*-------------------------------------------------
-    DEVICE_SET_INFO( fdc ) - general FDC set info func
--------------------------------------------------*/
-
-static DEVICE_SET_INFO( fdc )
-{
-	switch (state)
-	{
-	}
-}
-
-
-
-/*-------------------------------------------------
     DEVICE_GET_INFO( fdc ) - general FDC get info func
 -------------------------------------------------*/
 
@@ -280,7 +267,6 @@ static void general_fdc_get_info(const device_config *device, UINT32 state, devi
 		case FDCINFO_PTR_HWTYPE:						info->p = (void *) hwtype;					break;
 
 		/* --- the following bits of info are returned as pointers to functions --- */
-		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(fdc); break;
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(fdc);		break;
 		case DEVINFO_FCT_STOP:							/* Nothing */								break;
 		case DEVINFO_FCT_RESET:							/* Nothing */								break;

@@ -360,14 +360,6 @@ static DEVICE_START( kr2376 )
 	state_save_register_device_item(device, 0, kr2376->data);
 }
 
-static DEVICE_SET_INFO( kr2376 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
 DEVICE_GET_INFO( kr2376 )
 {
 	switch (state)
@@ -378,7 +370,6 @@ DEVICE_GET_INFO( kr2376 )
 		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(kr2376); break;
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(kr2376);	break;
 		case DEVINFO_FCT_STOP:							/* Nothing */								break;
 		case DEVINFO_FCT_RESET:							/* Nothing */								break;

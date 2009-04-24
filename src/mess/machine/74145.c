@@ -176,15 +176,6 @@ static DEVICE_RESET( ttl74145 )
 }
 
 
-static DEVICE_SET_INFO( ttl74145 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
 DEVICE_GET_INFO( ttl74145 )
 {
 	switch (state)
@@ -195,7 +186,6 @@ DEVICE_GET_INFO( ttl74145 )
 		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:				info->set_info = DEVICE_SET_INFO_NAME(ttl74145); break;
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(ttl74145);	break;
 		case DEVINFO_FCT_STOP:					/* Nothing */								break;
 		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(ttl74145);	break;

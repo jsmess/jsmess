@@ -873,18 +873,6 @@ static DEVICE_RESET( luxor_55_10828 )
 }
 
 /*-------------------------------------------------
-    DEVICE_SET_INFO( luxor_55_10828 )
--------------------------------------------------*/
-
-static DEVICE_SET_INFO( luxor_55_10828 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-/*-------------------------------------------------
     DEVICE_GET_INFO( luxor_55_10828 )
 -------------------------------------------------*/
 
@@ -902,7 +890,6 @@ DEVICE_GET_INFO( luxor_55_10828 )
 		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME(luxor_55_10828);	break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(luxor_55_10828);		break;
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(luxor_55_10828);			break;
 		case DEVINFO_FCT_STOP:							/* Nothing */												break;
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(luxor_55_10828);			break;
@@ -956,18 +943,6 @@ static DEVICE_RESET( luxor_55_21046 )
 }
 
 /*-------------------------------------------------
-    DEVICE_SET_INFO( luxor_55_21046 )
--------------------------------------------------*/
-
-static DEVICE_SET_INFO( luxor_55_21046 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-/*-------------------------------------------------
     DEVICE_GET_INFO( luxor_55_21046 )
 -------------------------------------------------*/
 
@@ -985,7 +960,6 @@ DEVICE_GET_INFO( luxor_55_21046 )
 		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME(luxor_55_21046);	break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(luxor_55_21046);		break;
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(luxor_55_21046);			break;
 		case DEVINFO_FCT_STOP:							/* Nothing */												break;
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(luxor_55_21046);			break;

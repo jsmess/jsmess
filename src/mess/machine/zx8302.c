@@ -754,18 +754,6 @@ static DEVICE_RESET( zx8302 )
 }
 
 /*-------------------------------------------------
-    DEVICE_SET_INFO( zx8301 )
--------------------------------------------------*/
-
-static DEVICE_SET_INFO( zx8302 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-/*-------------------------------------------------
     DEVICE_GET_INFO( zx8301 )
 -------------------------------------------------*/
 
@@ -779,7 +767,6 @@ DEVICE_GET_INFO( zx8302 )
 		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(zx8302);	break;
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(zx8302);		break;
 		case DEVINFO_FCT_STOP:							/* Nothing */									break;
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(zx8302);		break;

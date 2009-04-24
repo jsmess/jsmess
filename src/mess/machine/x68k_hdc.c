@@ -438,14 +438,6 @@ READ16_DEVICE_HANDLER( x68k_hdc_r )
 	}
 }
 
-static DEVICE_SET_INFO( x68k_hdc )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
 DEVICE_GET_INFO(x68k_hdc)
 {
 	switch (state)
@@ -459,7 +451,6 @@ DEVICE_GET_INFO(x68k_hdc)
 		case DEVINFO_INT_IMAGE_CREATABLE:				info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(x68k_hdc); break;
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(x68k_hdc);	break;
 		case DEVINFO_FCT_STOP:							/* Nothing */								break;
 		case DEVINFO_FCT_RESET:							/*info->reset = DEVICE_RESET_NAME(x68k_hdc);*/	break;

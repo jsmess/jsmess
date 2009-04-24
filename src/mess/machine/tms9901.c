@@ -601,20 +601,6 @@ static DEVICE_START( tms9901 )
 
 
 /*-------------------------------------------------
-    DEVICE_SET_INFO( tms9901 )
--------------------------------------------------*/
-
-static DEVICE_SET_INFO( tms9901 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-
-/*-------------------------------------------------
     DEVICE_GET_INFO( tms9901 )
 -------------------------------------------------*/
 
@@ -628,7 +614,6 @@ DEVICE_GET_INFO( tms9901 )
 		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(tms9901); break;
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(tms9901);	break;
 		case DEVINFO_FCT_STOP:							info->stop  = DEVICE_STOP_NAME (tms9901);	break;
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(tms9901);	break;

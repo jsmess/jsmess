@@ -116,7 +116,6 @@ DEVICE_GET_INFO(coco_cartridge_pcb_rs232)
 		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME(coco_rs232);	break;
 
 		/* --- the following bits of info are returned as pointers to functions --- */
-		case DEVINFO_FCT_SET_INFO:						/* Nothing */								break;
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(coco_rs232);	break;
 		case DEVINFO_FCT_STOP:							/* Nothing */								break;
 		case DEVINFO_FCT_RESET:							/* Nothing */								break;

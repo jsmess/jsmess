@@ -228,15 +228,6 @@ WRITE8_DEVICE_HANDLER( ins8154_w )
 }
 
 
-static DEVICE_SET_INFO( ins8154 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
 DEVICE_GET_INFO( ins8154 )
 {
 	switch (state)
@@ -247,7 +238,6 @@ DEVICE_GET_INFO( ins8154 )
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(ins8154_t);					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:				info->set_info = DEVICE_SET_INFO_NAME(ins8154);	break;
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(ins8154);		break;
 		case DEVINFO_FCT_STOP:					/* Nothing */									break;
 		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(ins8154);		break;

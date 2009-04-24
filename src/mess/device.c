@@ -287,7 +287,6 @@ DEVICE_GET_INFO(mess_device)
 		case DEVINFO_PTR_IMAGE_CREATE_OPTGUIDE:	info->p = mess_device_get_info_ptr(&mess_device->io_device.devclass, MESS_DEVINFO_PTR_CREATE_OPTGUIDE); break;
 
 		/* --- the following bits of info are returned as pointers to functions --- */
-		case DEVINFO_FCT_SET_INFO:				/* Nothing */									break;
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(mess_device);	break;
 		case DEVINFO_FCT_STOP:					info->stop = DEVICE_STOP_NAME(mess_device);		break;
 		case DEVINFO_FCT_RESET:					/* Nothing */									break;

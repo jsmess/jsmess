@@ -1711,14 +1711,6 @@ static DEVICE_START( mb8877 )
 	common_start(device, WD_TYPE_MB8877);
 }
 
-static DEVICE_SET_INFO( wd17xx )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
 DEVICE_GET_INFO( wd1770 )
 {
 	switch (state)
@@ -1729,7 +1721,6 @@ DEVICE_GET_INFO( wd1770 )
 		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(wd17xx); break;
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(wd1770);		break;
 		case DEVINFO_FCT_STOP:							/* Nothing */								break;
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(wd17xx);		break;

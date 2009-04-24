@@ -240,20 +240,6 @@ static void ds1315_input_raw_data(const device_config *device)
 
 
 /*-------------------------------------------------
-    DEVICE_SET_INFO( ds1315 )
--------------------------------------------------*/
-
-static DEVICE_SET_INFO( ds1315 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-
-/*-------------------------------------------------
     DEVICE_GET_INFO( ds1315 )
 -------------------------------------------------*/
 
@@ -267,7 +253,6 @@ DEVICE_GET_INFO( ds1315 )
 		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(ds1315); break;
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(ds1315);	break;
 		case DEVINFO_FCT_STOP:							/* Nothing */								break;
 		case DEVINFO_FCT_RESET:							/* Nothing */								break;
