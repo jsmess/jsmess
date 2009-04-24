@@ -1320,9 +1320,9 @@ static void soundmux_update(running_machine *machine)
 		break;
 	}
 
-	device_set_info_int(
+	coco_cartridge_set_line(
 		cococart_device(machine),
-		COCOCARTINFO_INT_LINE_SOUND_ENABLE,
+		COCOCART_LINE_SOUND_ENABLE,
 		(soundmux_status == (SOUNDMUX_STATUS_ENABLE|SOUNDMUX_STATUS_SEL2)
 			? COCOCART_LINE_VALUE_ASSERT : COCOCART_LINE_VALUE_CLEAR));
 

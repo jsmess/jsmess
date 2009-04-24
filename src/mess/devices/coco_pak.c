@@ -67,9 +67,9 @@ static DEVICE_RESET(coco_pak)
 		: COCOCART_LINE_VALUE_CLEAR;
 
 	/* normal CoCo PAKs tie their CART line to Q - the system clock */
-	device_set_info_int(
+	coco_cartridge_set_line(
 		pak_pcb->cococart,
-		COCOCARTINFO_INT_LINE_CART,
+		COCOCART_LINE_CART,
 		cart_line);
 }
 

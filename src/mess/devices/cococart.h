@@ -30,12 +30,6 @@
 
 enum
 {
-	/* output lines on the CoCo cartridge slot */
-	COCOCARTINFO_INT_LINE_CART	= DEVINFO_INT_DEVICE_SPECIFIC,	/* connects to PIA1 CB1 */
-	COCOCARTINFO_INT_LINE_NMI,									/* connects to NMI line on CPU */
-	COCOCARTINFO_INT_LINE_HALT,									/* connects to HALT line on CPU */
-	COCOCARTINFO_INT_LINE_SOUND_ENABLE,							/* sound enable */
-
 	COCOCARTINFO_FCT_FF40_R = DEVINFO_FCT_DEVICE_SPECIFIC,		/* read8_device_handler */
 	COCOCARTINFO_FCT_FF40_W,									/* write8_device_handler */
 };
@@ -43,6 +37,16 @@ enum
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
+
+/* output lines on the CoCo cartridge slot */
+enum _cococart_line
+{
+	COCOCART_LINE_CART,				/* connects to PIA1 CB1 */
+	COCOCART_LINE_NMI,				/* connects to NMI line on CPU */
+	COCOCART_LINE_HALT,				/* connects to HALT line on CPU */
+	COCOCART_LINE_SOUND_ENABLE		/* sound enable */
+};
+typedef enum _cococart_line cococart_line;
 
 /* since we have a special value "Q" - we have to use a special enum here */
 enum _cococart_line_value
@@ -82,6 +86,9 @@ DEVICE_GET_INFO(coco_cartridge_pcb_pak_banked16k);
 DEVICE_GET_INFO(coco_cartridge_pcb_orch90);
 DEVICE_GET_INFO(coco_cartridge_pcb_rs232);
 DEVICE_GET_INFO(coco_cartridge_pcb_speechsound);
+
+/* sets a cartridge line */
+void coco_cartridge_set_line(const device_config *device, cococart_line line, cococart_line_value value);
 
 /* hack to support twiddling the Q line */
 void coco_cartridge_twiddle_q_lines(const device_config *device);

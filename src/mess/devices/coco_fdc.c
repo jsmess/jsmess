@@ -301,15 +301,15 @@ static void fdc_coco_update_lines(const device_config *device)
 		fdc->dskreg &= ~0x80;	/* clear halt enable */
 
 	/* set the NMI line */
-	device_set_info_int(
+	coco_cartridge_set_line(
 		fdc->cococart,
-		COCOCARTINFO_INT_LINE_NMI,
+		COCOCART_LINE_NMI,
 		((fdc->intrq != 0) && (fdc->dskreg & 0x20)) ? COCOCART_LINE_VALUE_ASSERT : COCOCART_LINE_VALUE_CLEAR);
 
 	/* set the HALT line */
-	device_set_info_int(
+	coco_cartridge_set_line(
 		fdc->cococart,
-		COCOCARTINFO_INT_LINE_HALT,
+		COCOCART_LINE_HALT,
 		((fdc->drq == 0) && (fdc->dskreg & 0x80)) ? COCOCART_LINE_VALUE_ASSERT : COCOCART_LINE_VALUE_CLEAR);
 }
 
@@ -508,15 +508,15 @@ static void fdc_dragon_update_lines(const device_config *device)
 	fdc_t *fdc = get_token(device);
 
 	/* set the NMI line */
-	device_set_info_int(
+	coco_cartridge_set_line(
 		fdc->cococart,
-		COCOCARTINFO_INT_LINE_NMI,
+		COCOCART_LINE_NMI,
 		((fdc->intrq != 0) && (fdc->dskreg & 0x20)) ? COCOCART_LINE_VALUE_ASSERT : COCOCART_LINE_VALUE_CLEAR);
 
 	/* set the CART line */
-	device_set_info_int(
+	coco_cartridge_set_line(
 		fdc->cococart,
-		COCOCARTINFO_INT_LINE_CART,
+		COCOCART_LINE_CART,
 		(fdc->drq != 0) ? COCOCART_LINE_VALUE_ASSERT : COCOCART_LINE_VALUE_CLEAR);
 }
 

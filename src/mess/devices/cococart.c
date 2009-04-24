@@ -291,24 +291,27 @@ void coco_cartridge_twiddle_q_lines(const device_config *device)
 
 
 /*-------------------------------------------------
-    DEVICE_SET_INFO(general_cartridge)
+    coco_cartridge_set_line
 -------------------------------------------------*/
 
-static DEVICE_SET_INFO(general_cartridge)
+void coco_cartridge_set_line(const device_config *device, cococart_line line, cococart_line_value value)
 {
-	switch (state)
+	switch (line)
 	{
-		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case COCOCARTINFO_INT_LINE_CART:
-			set_line_timer(device, &get_token(device)->cart_line, (cococart_line_value) info->i);
+		case COCOCART_LINE_CART:
+			set_line_timer(device, &get_token(device)->cart_line, value);
 			break;
 
-		case COCOCARTINFO_INT_LINE_NMI:
-			set_line_timer(device, &get_token(device)->nmi_line, (cococart_line_value) info->i);
+		case COCOCART_LINE_NMI:
+			set_line_timer(device, &get_token(device)->nmi_line, value);
 			break;
 
-		case COCOCARTINFO_INT_LINE_HALT:
-			set_line_timer(device, &get_token(device)->halt_line, (cococart_line_value) info->i);
+		case COCOCART_LINE_HALT:
+			set_line_timer(device, &get_token(device)->halt_line, value);
+			break;
+
+		case COCOCART_LINE_SOUND_ENABLE:
+			/* do nothing for now */
 			break;
 	}
 }
@@ -328,7 +331,6 @@ static DEVICE_GET_INFO(general_cartridge)
 		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to functions --- */
-		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(general_cartridge); break;
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(coco_cartridge);	break;
 		case DEVINFO_FCT_STOP:							/* Nothing */								break;
 		case DEVINFO_FCT_RESET:							/* Nothing */								break;
