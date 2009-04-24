@@ -6,6 +6,8 @@ New System Drivers Supported (in no particular order):
 - Kaypro 4 (Model 4/83) (not working)  [Robbbert]
 - Kaypro 2x (Model 2/84) (not working)  [Robbbert]
 - Kaypro 10 (not working)  [Robbbert]
+- LLC1 (not working) [Miodrag Milanovic]
+- LLC2 [Miodrag Milanovic]
 - Nokia MikroMikko 1 M6 (not working)  [Curt Coder]
 - Nokia MikroMikko 1 M7 (not working)  [Curt Coder]
 - Omni II (not working)  [Robbbert]

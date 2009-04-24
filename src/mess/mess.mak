@@ -288,6 +288,7 @@ DRVLIBS = \
 	$(MESSOBJ)/kaypro.a \
 	$(MESSOBJ)/kim1.a \
 	$(MESSOBJ)/kramermc.a \
+	$(MESSOBJ)/llc.a \
 	$(MESSOBJ)/luxor.a \
 	$(MESSOBJ)/lviv.a \
 	$(MESSOBJ)/lynx.a \
@@ -1236,6 +1237,11 @@ $(MESSOBJ)/robotron.a:      \
 	$(MESS_DRIVERS)/z1013.o \
 	$(MESS_MACHINE)/z1013.o \
 	$(MESS_VIDEO)/z1013.o \
+
+$(MESSOBJ)/llc.a: \
+	$(MESS_DRIVERS)/llc.o \
+	$(MESS_VIDEO)/llc.o		\
+	$(MESS_MACHINE)/llc.o	\
 
 $(MESSOBJ)/homelab.a: \
 	$(MESS_DRIVERS)/homelab.o \

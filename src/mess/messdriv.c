@@ -1054,6 +1054,10 @@ XL/XE 16kB OS roms
 	/* Z1013 */
 	DRIVER (z1013)
 	DRIVER (z1013a2)
+	
+	/* LLC */
+	DRIVER (llc1)
+	DRIVER (llc2)
 
 	/* PP-01 */
 	DRIVER (pp01)
