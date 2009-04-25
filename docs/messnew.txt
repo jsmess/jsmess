@@ -66,9 +66,9 @@ System Driver Changes:
   together with another key, like in the real keyboard, or simply switch to natural 
   keyboard emulation [Fabio Priuli]
 
-- Added natural keyboard support to a number of drivers: ac1.c, amiga.c, 
-  apogee.c, b2m.c, bk.c, einstein.c, galeb.c, homelab.c, irisha.c, mikro80.c, 
-  mikrosha.c, mz80.c, orao.c, partner.c, radio86.c, sapi1.c, ti99_8.c, tm990189.c, 
+- Added natural keyboard support to a number of drivers: ac1.c, amiga.c, apogee.c,
+  b2m.c, bk.c, einstein.c, galeb.c, homelab.c, irisha.c, mikro80.c, mikrosha.c,
+  mz80.c, orao.c, partner.c, pecom.c, radio86.c, sapi1.c, ti99_8.c, tm990189.c, 
   ut88.c [Fabio Priuli]
 
 
