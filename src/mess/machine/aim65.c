@@ -156,7 +156,7 @@ void aim65_riot_a_w(const device_config *device, UINT8 data, UINT8 olddata)
 
 void aim65_riot_irq(const device_config *device, int state)
 {
-	cpu_set_input_line(device->machine->cpu[0], M6502_IRQ_LINE, state ? HOLD_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 
@@ -168,7 +168,7 @@ void aim65_riot_irq(const device_config *device, int state)
 MACHINE_START( aim65 )
 {
 	const device_config *via_0 = devtag_get_device(machine, "via6522_0");
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* Init RAM */
 	memory_install_readwrite8_handler(space, 0, mess_ram_size - 1, 0, 0, SMH_BANK1, SMH_BANK1);

@@ -106,7 +106,7 @@ VIDEO_START( a7800 )
 
 static void maria_draw_scanline(running_machine *machine)
 {
-	const address_space* space = cpu_get_address_space(machine->cpu[0],ADDRESS_SPACE_PROGRAM);
+	const address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	unsigned int graph_adr,data_addr;
 	int width,hpos,pal,mode,ind;
 	unsigned int dl;
@@ -340,7 +340,7 @@ INTERRUPT_GEN( a7800_interrupt )
 {
 	int frame_scanline;
 	UINT8 *ROM = memory_region(device->machine, "maincpu");
-	const address_space* space = cpu_get_address_space(device->machine->cpu[0],ADDRESS_SPACE_PROGRAM);
+	const address_space* space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	
 	maria_scanline++;
 
@@ -498,7 +498,7 @@ WRITE8_HANDLER( a7800_MARIA_w )
 			maria_palette[0][3] = data;
 			break;
 		case 0x04:
-			cpu_spinuntil_trigger(space->machine->cpu[0],TRIGGER_HSYNC);
+			cpu_spinuntil_trigger(cputag_get_cpu(space->machine, "maincpu"), TRIGGER_HSYNC);
 			maria_wsync=1;
 			break;
 

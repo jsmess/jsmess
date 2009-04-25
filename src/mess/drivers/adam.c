@@ -435,7 +435,7 @@ static void adam_vdp_interrupt (running_machine *machine, int state)
     /* only if it goes up */
 	if (state && !last_state)
     {
-        cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
+        cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
     }
 	last_state = state;
 }
@@ -460,7 +460,7 @@ static TIMER_CALLBACK(adam_paddle_callback)
 		adam_joy_stat[1] = 1;
 
 	if (adam_joy_stat[0] || adam_joy_stat[1])
-		cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
+		cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
 }
 
 void adam_set_memory_banks(running_machine *machine)

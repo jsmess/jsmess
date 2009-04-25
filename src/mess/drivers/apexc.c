@@ -278,42 +278,40 @@ static INPUT_PORTS_START(apexc)
 	PORT_BIT(panel_mem, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Read mem")                PORT_CODE(KEYCODE_6_PAD)
 	PORT_BIT(panel_write, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Write instead of read") PORT_CODE(KEYCODE_LSHIFT)
 
-	PORT_START("data1")	/* 1 : data edit #1 */
-	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #1")              PORT_CODE(KEYCODE_1)
-	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #2")              PORT_CODE(KEYCODE_2)
-	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #3")              PORT_CODE(KEYCODE_3)
-	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #4")              PORT_CODE(KEYCODE_4)
-	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #5")              PORT_CODE(KEYCODE_5)
-	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #6")              PORT_CODE(KEYCODE_6)
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #7")              PORT_CODE(KEYCODE_7)
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #8")              PORT_CODE(KEYCODE_8)
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #9")              PORT_CODE(KEYCODE_9)
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #10")             PORT_CODE(KEYCODE_0)
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #11")             PORT_CODE(KEYCODE_Q)
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #12")             PORT_CODE(KEYCODE_W)
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #13")             PORT_CODE(KEYCODE_E)
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #14")             PORT_CODE(KEYCODE_R)
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #15")             PORT_CODE(KEYCODE_T)
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #16")             PORT_CODE(KEYCODE_Y)
+	PORT_START("data")	/* data edit */
+	PORT_BIT(0x80000000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #1")              PORT_CODE(KEYCODE_1)
+	PORT_BIT(0x40000000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #2")              PORT_CODE(KEYCODE_2)
+	PORT_BIT(0x20000000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #3")              PORT_CODE(KEYCODE_3)
+	PORT_BIT(0x10000000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #4")              PORT_CODE(KEYCODE_4)
+	PORT_BIT(0x08000000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #5")              PORT_CODE(KEYCODE_5)
+	PORT_BIT(0x04000000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #6")              PORT_CODE(KEYCODE_6)
+	PORT_BIT(0x02000000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #7")              PORT_CODE(KEYCODE_7)
+	PORT_BIT(0x01000000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #8")              PORT_CODE(KEYCODE_8)
+	PORT_BIT(0x00800000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #9")              PORT_CODE(KEYCODE_9)
+	PORT_BIT(0x00400000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #10")             PORT_CODE(KEYCODE_0)
+	PORT_BIT(0x00200000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #11")             PORT_CODE(KEYCODE_Q)
+	PORT_BIT(0x00100000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #12")             PORT_CODE(KEYCODE_W)
+	PORT_BIT(0x00080000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #13")             PORT_CODE(KEYCODE_E)
+	PORT_BIT(0x00040000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #14")             PORT_CODE(KEYCODE_R)
+	PORT_BIT(0x00020000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #15")             PORT_CODE(KEYCODE_T)
+	PORT_BIT(0x00010000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #16")             PORT_CODE(KEYCODE_Y)
 
-	PORT_START("data2")	/* 2 : data edit #2 */
-	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #17")             PORT_CODE(KEYCODE_U)
-	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #18")             PORT_CODE(KEYCODE_I)
-	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #19")             PORT_CODE(KEYCODE_O)
-	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #20")             PORT_CODE(KEYCODE_P)
-	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #21")             PORT_CODE(KEYCODE_A)
-	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #22")             PORT_CODE(KEYCODE_S)
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #23")             PORT_CODE(KEYCODE_D)
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #24")             PORT_CODE(KEYCODE_F)
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #25")             PORT_CODE(KEYCODE_G)
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #26")             PORT_CODE(KEYCODE_H)
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #27")             PORT_CODE(KEYCODE_J)
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #28")             PORT_CODE(KEYCODE_K)
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #29")             PORT_CODE(KEYCODE_L)
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #30")             PORT_CODE(KEYCODE_Z)
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #31")             PORT_CODE(KEYCODE_X)
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #32")             PORT_CODE(KEYCODE_C)
-
+	PORT_BIT(0x00008000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #17")             PORT_CODE(KEYCODE_U)
+	PORT_BIT(0x00004000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #18")             PORT_CODE(KEYCODE_I)
+	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #19")             PORT_CODE(KEYCODE_O)
+	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #20")             PORT_CODE(KEYCODE_P)
+	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #21")             PORT_CODE(KEYCODE_A)
+	PORT_BIT(0x00000400, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #22")             PORT_CODE(KEYCODE_S)
+	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #23")             PORT_CODE(KEYCODE_D)
+	PORT_BIT(0x00000100, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #24")             PORT_CODE(KEYCODE_F)
+	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #25")             PORT_CODE(KEYCODE_G)
+	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #26")             PORT_CODE(KEYCODE_H)
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #27")             PORT_CODE(KEYCODE_J)
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #28")             PORT_CODE(KEYCODE_K)
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #29")             PORT_CODE(KEYCODE_L)
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #30")             PORT_CODE(KEYCODE_Z)
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #31")             PORT_CODE(KEYCODE_X)
+	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #32")             PORT_CODE(KEYCODE_C)
 INPUT_PORTS_END
 
 
@@ -326,7 +324,7 @@ static UINT32 panel_data_reg;	/* value of a data register on the control panel w
 */
 static INTERRUPT_GEN( apexc_interrupt )
 {
-	const address_space* space = cpu_get_address_space(device->machine->cpu[0],ADDRESS_SPACE_PROGRAM);
+	const address_space* space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT32 edit_keys;
 	int control_keys;
 
@@ -337,7 +335,7 @@ static INTERRUPT_GEN( apexc_interrupt )
 
 
 	/* read new state of edit keys */
-	edit_keys = (input_port_read(device->machine, "data1") << 16) | input_port_read(device->machine, "data2");
+	edit_keys = input_port_read(device->machine, "data");
 
 	/* toggle data reg according to transitions */
 	panel_data_reg ^= edit_keys & (~ old_edit_keys);
@@ -542,7 +540,7 @@ static VIDEO_UPDATE( apexc )
 
 	apexc_draw_led(bitmap, 0, 0, 1);
 
-	apexc_draw_led(bitmap, 0, 8, cpu_get_reg(screen->machine->cpu[0], APEXC_STATE));
+	apexc_draw_led(bitmap, 0, 8, cpu_get_reg(cputag_get_cpu(screen->machine, "maincpu"), APEXC_STATE));
 
 	for (i=0; i<32; i++)
 	{

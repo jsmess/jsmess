@@ -790,7 +790,7 @@ static TIMER_DEVICE_CALLBACK( ctc_tick )
 
 static void ctc_interrupt(const device_config *device, int state)
 {
-	cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_IRQ0, state);
+	cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_IRQ0, state);
 }
 
 static WRITE8_DEVICE_HANDLER( ctc_z0_w )
@@ -857,7 +857,7 @@ static const z80ctc_interface ctc_intf =
 
 static void sio_interrupt(const device_config *device, int state)
 {
-	cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_IRQ0, state);
+	cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_IRQ0, state);
 }
 
 static WRITE8_DEVICE_HANDLER( sio_dtr_w )
