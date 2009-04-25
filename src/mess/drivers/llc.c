@@ -348,7 +348,7 @@ ROM_START( llc2 )
 	ROM_REGION(0x0800, "gfx1",0)
 	ROM_LOAD ("llc2font.bin", 0x0000, 0x0800, CRC(CE53E55D) )    
 	ROM_REGION(0x1000, "k7659",0)
-	ROM_LOAD ("k7659n.bin", 0x0000, 0x1000, CRC(7454BF0A) )    
+	ROM_LOAD ("k7659n.bin", 0x0000, 0x0800, CRC(7454BF0A) )    
 ROM_END
  
 /* Driver */
