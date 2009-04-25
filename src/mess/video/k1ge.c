@@ -642,12 +642,14 @@ static void k2ge_draw( const device_config *device, int line )
 	}
 	else
 	{
+		/* Determine the background color */
 		if ( ( k1ge->vram[0x118] & 0xc0 ) == 0x80 )
 		{
 			col = ( k1ge->vram[0x118] & 0x07 ) * 2;
-			col = k1ge->vram[0x3e0 + col ] | ( k1ge->vram[0x3e1 + col ] << 8 );
 		}
+		col = k1ge->vram[0x3e0 + col ] | ( k1ge->vram[0x3e1 + col ] << 8 );
 
+		/* Set the bacground color */
 		for ( i = 0; i < 160; i++ )
 		{
 			p[i] = col;
@@ -791,9 +793,9 @@ static TIMER_CALLBACK( k1ge_timer_callback )
 	}
 
 	/* Draw a line when inside visible area */
-	if ( y < 152 )
+	if ( y && y < 153 )
 	{
-		k1ge->draw( device, y );
+		k1ge->draw( device, y - 1 );
 	}
 
 	timer_adjust_oneshot( k1ge->timer, video_screen_get_time_until_pos( k1ge->screen, ( y + 1 ) % K1GE_SCREEN_HEIGHT, 0 ), 0 );
