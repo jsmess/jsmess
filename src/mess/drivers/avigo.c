@@ -96,7 +96,7 @@ static NVRAM_HANDLER( avigo )
 
 static void avigo_setbank(running_machine *machine, int bank, void *address, read8_space_func rh, write8_space_func wh)
 {
-	const address_space* space = cpu_get_address_space(machine->cpu[0],ADDRESS_SPACE_PROGRAM);
+	const address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	if (address)
 	{
 		memory_set_bankptr(machine, 1+bank, address);
@@ -156,9 +156,9 @@ static WRITE8_HANDLER(avigo_flash_0x8000_write_handler)
 static void avigo_refresh_ints(running_machine *machine)
 {
 	if (avigo_irq!=0)
-		cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
+		cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
 	else
-		cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
 }
 
 
@@ -213,7 +213,7 @@ static TIMER_CALLBACK(avigo_dummy_timer_callback)
 		if ((current_input_port_data[3] & 0x02)!=0)
 		{
 			/* ????? causes a NMI */
-			cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
+			cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 		}
 	}
 
@@ -435,7 +435,7 @@ static MACHINE_RESET( avigo )
 	/* clear */
 	memset(mess_ram, 0, 128*1024);
 
-	memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[0],ADDRESS_SPACE_PROGRAM), avigo_opbase_handler);
+	memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), avigo_opbase_handler);
 
 	addr = (unsigned char *)intelflash_getmemptr(0);
 	avigo_setbank(machine, 0, addr, avigo_flash_0x0000_read_handler, avigo_flash_0x0000_write_handler);

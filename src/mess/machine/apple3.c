@@ -338,14 +338,14 @@ static void apple3_update_memory(running_machine *machine)
 {
 	UINT16 bank;
 	UINT8 page;
-	const address_space* space = cpu_get_address_space(machine->cpu[0],ADDRESS_SPACE_PROGRAM);
+	const address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	if (LOG_MEMORY)
 	{
 		logerror("apple3_update_memory(): via_0_b=0x%02x via_1_a=0x0x%02x\n", via_0_b, via_1_a);
 	}
 
-	cpu_set_clock(machine->cpu[0], (via_0_a & 0x80) ? 1000000 : 2000000);
+	cputag_set_clock(machine, "maincpu", (via_0_a & 0x80) ? 1000000 : 2000000);
 
 	/* bank 2 (0100-01FF) */
 	if (!(via_0_a & 0x04))
@@ -493,8 +493,8 @@ static void apple2_via_1_irq_func(const device_config *device, int state)
 {
 	if (!via_1_irq && state)
 	{
-		cpu_set_input_line(device->machine->cpu[0], M6502_IRQ_LINE, ASSERT_LINE);
-		cpu_set_input_line(device->machine->cpu[0], M6502_IRQ_LINE, CLEAR_LINE);
+		cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, ASSERT_LINE);
+		cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, CLEAR_LINE);
 	}
 	via_1_irq = state;
 }
@@ -729,11 +729,11 @@ DRIVER_INIT( apple3 )
 	via_1_irq = 0;
 	apple3_update_memory(machine);
 
-	memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[0],ADDRESS_SPACE_PROGRAM), apple3_opbase);
+	memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), apple3_opbase);
 
 	/* the Apple /// does some weird tricks whereby it monitors the SYNC pin
 	 * on the CPU to check for indexed instructions and directs them to
 	 * different memory locations */
-	device_set_info_fct(machine->cpu[0], CPUINFO_FCT_M6502_READINDEXED_CALLBACK, (genf *) apple3_indexed_read);
-	device_set_info_fct(machine->cpu[0], CPUINFO_FCT_M6502_WRITEINDEXED_CALLBACK, (genf *) apple3_indexed_write);
+	device_set_info_fct(cputag_get_cpu(machine, "maincpu"), CPUINFO_FCT_M6502_READINDEXED_CALLBACK, (genf *) apple3_indexed_read);
+	device_set_info_fct(cputag_get_cpu(machine, "maincpu"), CPUINFO_FCT_M6502_WRITEINDEXED_CALLBACK, (genf *) apple3_indexed_write);
 }

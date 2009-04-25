@@ -317,7 +317,7 @@ static void apple2gs_add_irq(running_machine *machine, UINT8 irq_mask)
 			logerror("apple2gs_add_irq(): adding %s\n", apple2gs_irq_name(irq_mask));
 
 		apple2gs_pending_irqs |= irq_mask;
-		cpu_set_input_line(machine->cpu[0], G65816_LINE_IRQ, apple2gs_pending_irqs ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", G65816_LINE_IRQ, apple2gs_pending_irqs ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -331,7 +331,7 @@ static void apple2gs_remove_irq(running_machine *machine, UINT8 irq_mask)
 			logerror("apple2gs_remove_irq(): removing %s\n", apple2gs_irq_name(irq_mask));
 
 		apple2gs_pending_irqs &= ~irq_mask;
-		cpu_set_input_line(machine->cpu[0], G65816_LINE_IRQ, apple2gs_pending_irqs ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", G65816_LINE_IRQ, apple2gs_pending_irqs ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -828,7 +828,7 @@ static TIMER_CALLBACK(apple2gs_scanline_tick)
 
 		/* call Apple II interrupt handler */
 		if ((video_screen_get_vpos(machine->primary_screen) % 8) == 7)
-			apple2_interrupt(machine->cpu[0]);
+			apple2_interrupt(cputag_get_cpu(machine, "maincpu"));
 	}
 
 	timer_adjust_oneshot(apple2gs_scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, (scanline+1)%262, 0), 0);
@@ -1176,7 +1176,7 @@ static WRITE8_HANDLER( apple2gs_c0xx_w )
 
 		case 0x36:	/* C036 - CYAREG */
 			apple2gs_cyareg = data & ~0x20;
-			cpu_set_clock(space->machine->cpu[0], (data & 0x80) ? APPLE2GS_14M/5 : APPLE2GS_7M/7);
+			cputag_set_clock(space->machine, "maincpu", (data & 0x80) ? APPLE2GS_14M/5 : APPLE2GS_7M/7);
 			break;
 
 		case 0x38:	/* C038 - SCCBREG */
@@ -1538,7 +1538,7 @@ static UINT8 apple2gs_xxCxxx_r(running_machine *machine, offs_t address)
 	}
 	else if ((address & 0x000F00) == 0x000000)
 	{
-		result = apple2gs_c0xx_r(cpu_get_address_space(machine->cpu[0],ADDRESS_SPACE_PROGRAM), address);
+		result = apple2gs_c0xx_r(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), address);
 	}
 	else
 	{
@@ -1564,7 +1564,7 @@ static void apple2gs_xxCxxx_w(running_machine *machine, offs_t address, UINT8 da
 	}
 	else if ((address & 0x000F00) == 0x000000)
 	{
-		apple2gs_c0xx_w(cpu_get_address_space(machine->cpu[0],ADDRESS_SPACE_PROGRAM), address, data);
+		apple2gs_c0xx_w(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), address, data);
 	}
 	else
 	{
@@ -1653,7 +1653,7 @@ static WRITE8_HANDLER( apple2gs_slowmem_w )
 
 static void apple2gs_setup_memory(running_machine *machine)
 {
-	const address_space* space = cpu_get_address_space(machine->cpu[0],ADDRESS_SPACE_PROGRAM);
+	const address_space* space = cputag_get_address_space(machine, "maincpu",ADDRESS_SPACE_PROGRAM);
 	offs_t begin, end;
 	apple2_memmap_config cfg;
 
@@ -1739,7 +1739,7 @@ MACHINE_START( apple2gs )
 	apple2_init_common(machine);
 
 	/* set up Apple IIgs vectoring */
-	device_set_info_fct(machine->cpu[0], CPUINFO_FCT_G65816_READVECTOR_CALLBACK, (genf *) apple2gs_read_vector);
+	device_set_info_fct(cputag_get_cpu(machine, "maincpu"), CPUINFO_FCT_G65816_READVECTOR_CALLBACK, (genf *) apple2gs_read_vector);
 
 	/* setup globals */
 	apple2gs_cur_slot6_image = NULL;

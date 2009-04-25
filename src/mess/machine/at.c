@@ -54,7 +54,7 @@ static const SOUNDBLASTER_CONFIG soundblaster = { 1,5, {1,0} };
  *************************************************************/
 
 static PIC8259_SET_INT_LINE( at_pic8259_master_set_int_line ) {
-	cpu_set_input_line(device->machine->cpu[0], 0, interrupt ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "maincpu", 0, interrupt ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -146,7 +146,7 @@ const struct pit8253_config at_pit8254_config =
 static void at_set_gate_a20(running_machine *machine, int a20)
 {
 	/* set the CPU's A20 line */
-	cpu_set_input_line(machine->cpu[0], INPUT_LINE_A20, a20);
+	cputag_set_input_line(machine, "maincpu", INPUT_LINE_A20, a20);
 }
 
 
@@ -162,7 +162,7 @@ static void at_set_keyb_int(running_machine *machine, int state) {
 
 static void init_at_common(running_machine *machine, const struct kbdc8042_interface *at8042)
 {
-	const address_space* space = cpu_get_address_space(machine->cpu[0],ADDRESS_SPACE_PROGRAM);
+	const address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_AT, at_set_keyb_int, at_set_irq_line);
 	mc146818_init(machine, MC146818_STANDARD);
 	soundblaster_config(&soundblaster);
@@ -224,7 +224,8 @@ WRITE8_HANDLER(at_page8_w)
 
 	if (LOG_PORT80 && (offset == 0))
 	{
-		logerror(" at_page8_w(): Port 80h <== 0x%02x (PC=0x%08x)\n", data, (unsigned) cpu_get_reg(space->machine->cpu[0],REG_GENPC));
+		logerror(" at_page8_w(): Port 80h <== 0x%02x (PC=0x%08x)\n", data, 
+							(unsigned) cpu_get_reg(cputag_get_cpu(space->machine, "maincpu"), REG_GENPC));
 	}
 
 	switch(offset % 8) {
@@ -250,7 +251,7 @@ static DMA8237_MEM_READ( pc_dma_read_byte )
 	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
 		& 0xFF0000;
 
-	result = memory_read_byte(cpu_get_address_space(device->machine->cpu[0],ADDRESS_SPACE_PROGRAM), page_offset + offset);
+	result = memory_read_byte(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), page_offset + offset);
 	return result;
 }
 
@@ -260,7 +261,7 @@ static DMA8237_MEM_WRITE( pc_dma_write_byte )
 	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
 		& 0xFF0000;
 
-	memory_write_byte(cpu_get_address_space(device->machine->cpu[0],ADDRESS_SPACE_PROGRAM), page_offset + offset, data);
+	memory_write_byte(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), page_offset + offset, data);
 }
 
 
@@ -471,7 +472,7 @@ static struct {
 
 static READ8_HANDLER( at_kbdc8042_p1_r )
 {
-	logerror("%04x: reading P1\n", cpu_get_pc(space->machine->cpu[0]) );
+	logerror("%04x: reading P1\n", cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")) );
 	return 0xFF;
 }
 
@@ -484,11 +485,11 @@ static READ8_HANDLER( at_kbdc8042_p2_r )
 
 static WRITE8_HANDLER( at_kbdc8042_p2_w )
 {
-	logerror("%04x: writing $%02x to P2\n", cpu_get_pc(space->machine->cpu[0]), data );
+	logerror("%04x: writing $%02x to P2\n", cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")), data );
 
 	at_set_gate_a20( space->machine, ( data & 0x02 ) ? 1 : 0 );
 	
-	cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_RESET, ( data & 0x01 ) ? CLEAR_LINE : ASSERT_LINE );
+	cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_RESET, ( data & 0x01 ) ? CLEAR_LINE : ASSERT_LINE );
 
 	at_kbdc8042.clock_signal = ( data & 0x40 ) ? 1 : 0;
 	at_kbdc8042.data_signal = ( data & 0x80 ) ? 1 : 0;
@@ -552,7 +553,7 @@ READ8_HANDLER(at_kbdc8042_r)
 	switch ( offset )
 	{
 	case 0:		/* A2 is wired to 8042 A0 */
-		data = upi41_master_r( space->machine->cpu[1], 0 );
+		data = upi41_master_r( cputag_get_cpu(space->machine, "kbdc8042"), 0 );
 		break;
 
 	case 1:
@@ -581,7 +582,7 @@ READ8_HANDLER(at_kbdc8042_r)
 		break;
 
 	case 4:		/* A2 is wired to 8042 A0 */
-		data = upi41_master_r( space->machine->cpu[1], 1 );
+		data = upi41_master_r( cputag_get_cpu(space->machine, "kbdc8042"), 1 );
 		break;
 	}
 
@@ -598,7 +599,7 @@ WRITE8_HANDLER(at_kbdc8042_w)
 
 	switch (offset) {
 	case 0:		/* A2 is wired to 8042 A0 */
-		upi41_master_w( space->machine->cpu[1], 0, data );
+		upi41_master_w( cputag_get_cpu(space->machine, "kbdc8042"), 0, data );
 		break;
 
 	case 1:
@@ -608,7 +609,7 @@ WRITE8_HANDLER(at_kbdc8042_w)
 		break;
 
 	case 4:		/* A2 is wired to 8042 A0 */
-		upi41_master_w( space->machine->cpu[1], 1, data );
+		upi41_master_w( cputag_get_cpu(space->machine, "kbdc8042"), 1, data );
 		break;
     }
 }
@@ -686,8 +687,8 @@ DRIVER_INIT( at586 )
 static void at_map_vga_memory(running_machine *machine, offs_t begin, offs_t end, read8_space_func rh, write8_space_func wh)
 {
 	int buswidth;
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	buswidth = cpu_get_databus_width(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	buswidth = cpu_get_databus_width(cputag_get_cpu(machine, "maincpu"), ADDRESS_SPACE_PROGRAM);
 	switch(buswidth)
 	{
 		case 8:
@@ -761,7 +762,7 @@ static IRQ_CALLBACK(at_irq_callback)
 
 MACHINE_START( at )
 {
-	cpu_set_irq_callback(machine->cpu[0], at_irq_callback);
+	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), at_irq_callback);
 	pc_fdc_init( machine, &fdc_interface );
 }
 

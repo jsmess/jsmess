@@ -100,7 +100,7 @@ void apple2_setup_memory(running_machine *machine, const apple2_memmap_config *c
 
 void apple2_update_memory(running_machine *machine)
 {
-	const address_space* space = cpu_get_address_space(machine->cpu[0],ADDRESS_SPACE_PROGRAM);
+	const address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int i, bank, rbank, wbank;
 	int full_update = 0;
 	apple2_meminfo meminfo;
@@ -569,7 +569,8 @@ static const apple2_memmap_entry apple2_memmap_entries[] =
 
 void apple2_setvar(running_machine *machine, UINT32 val, UINT32 mask)
 {
-	LOG(("apple2_setvar(): val=0x%06x mask=0x%06x pc=0x%04x\n", val, mask, (unsigned int) cpu_get_reg(machine->cpu[0], REG_GENPC)));
+	LOG(("apple2_setvar(): val=0x%06x mask=0x%06x pc=0x%04x\n", val, mask, 
+					(unsigned int) cpu_get_reg(cputag_get_cpu(machine, "maincpu"), REG_GENPC)));
 
 	assert((val & mask) == val);
 
@@ -628,7 +629,7 @@ UINT8 apple2_getfloatingbusvalue(running_machine *machine)
 
 	// video scanner data
 	//
-	i = cpu_get_total_cycles(machine->cpu[0]) % kClocksPerVSync; // cycles into this VSync
+	i = cputag_get_total_cycles(machine, "maincpu") % kClocksPerVSync; // cycles into this VSync
 
 	// machine state switches
 	//
@@ -784,7 +785,7 @@ INTERRUPT_GEN( apple2_interrupt )
 			irq_freq = 1;
 
 		if (irq_freq)
-			cpu_set_input_line(device->machine->cpu[0], M6502_IRQ_LINE, PULSE_LINE);
+			cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, PULSE_LINE);
 	}
 
 	video_screen_update_partial(device->machine->primary_screen, scanline);

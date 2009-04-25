@@ -582,7 +582,7 @@ static void amstrad_plus_dma_parse(running_machine *machine, int channel)
 		{
 			amstrad_plus_irq_cause = channel * 2;
 			amstrad_plus_asic_ram[0x2c0f] |= (0x40 >> channel);
-			cpu_set_input_line(machine->cpu[0],0,ASSERT_LINE);
+			cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 			logerror("DMA %i: INT\n",channel);
 		}
 		if (command & 0x20)  // Stop processing on this channel
@@ -1206,7 +1206,7 @@ static MC6845_ON_HSYNC_CHANGED( amstrad_hsync_changed )
 			{
 				if (amstrad_CRTC_HS_Counter >= 32)
 				{
-					cpu_set_input_line(device->machine->cpu[0],0, ASSERT_LINE);
+					cputag_set_input_line(device->machine, "maincpu", 0, ASSERT_LINE);
 				}
 				amstrad_CRTC_HS_Counter = 0;
 			}
@@ -1215,7 +1215,7 @@ static MC6845_ON_HSYNC_CHANGED( amstrad_hsync_changed )
 		if ( amstrad_CRTC_HS_Counter >= 52 )
 		{
 			amstrad_CRTC_HS_Counter = 0;
-			cpu_set_input_line(device->machine->cpu[0],0, ASSERT_LINE);
+			cputag_set_input_line(device->machine, "maincpu", 0, ASSERT_LINE);
 		}
 	}
 	amstrad_CRTC_HS = hsync ? 1 : 0;
@@ -1238,7 +1238,7 @@ static MC6845_ON_HSYNC_CHANGED( amstrad_plus_hsync_changed )
 				{
 					if( asic.pri == 0 || asic.enabled == 0)
 					{
-						cpu_set_input_line(device->machine->cpu[0],0, ASSERT_LINE);
+						cputag_set_input_line(device->machine, "maincpu", 0, ASSERT_LINE);
 					}
 				}
 				amstrad_CRTC_HS_Counter = 0;
@@ -1250,7 +1250,7 @@ static MC6845_ON_HSYNC_CHANGED( amstrad_plus_hsync_changed )
 			amstrad_CRTC_HS_Counter = 0;
 			if ( asic.pri == 0 || asic.enabled == 0 )
 			{
-				cpu_set_input_line(device->machine->cpu[0],0, ASSERT_LINE);
+				cputag_set_input_line(device->machine, "maincpu", 0, ASSERT_LINE);
 			}
 		}
 
@@ -1262,7 +1262,7 @@ static MC6845_ON_HSYNC_CHANGED( amstrad_plus_hsync_changed )
 				if ( asic.pri == video_screen_get_vpos( device->machine->primary_screen ) )
 				{
 					logerror("PRI: triggered, scanline %d\n",asic.pri);
-					cpu_set_input_line(device->machine->cpu[0],0,ASSERT_LINE);
+					cputag_set_input_line(device->machine, "maincpu", 0, ASSERT_LINE);
 					amstrad_plus_irq_cause = 0x06;  // raster interrupt vector
 					amstrad_CRTC_HS_Counter &= ~0x20;  // ASIC PRI resets the MSB of the raster counter
 				}
@@ -1366,7 +1366,7 @@ static DIRECT_UPDATE_HANDLER( amstrad_multiface_directoverride )
 {
 		int pc;
 
-		pc = cpu_get_pc(space->machine->cpu[0]);
+		pc = cpu_get_pc(cputag_get_cpu(space->machine, "maincpu"));
 
 		/* there are two places where CALL &0065 can be found
         in the multiface rom. At this address there is a RET.
@@ -1484,10 +1484,10 @@ static void multiface_stop(running_machine *machine)
 		multiface_rethink_memory(machine);
 
 		/* pulse the nmi line */
-		cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 
 		/* initialise 0065 override to monitor calls to 0065 */
-		memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM),amstrad_multiface_directoverride);
+		memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), amstrad_multiface_directoverride);
 	}
 
 }
@@ -1651,7 +1651,7 @@ static void amstrad_setLowerRom(running_machine *machine)
 	}
 	else  // CPC+/GX4000
 	{
-		const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+		const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 		if ( asic.enabled && ( asic.rmr2 & 0x18 ) == 0x18 )
 		{
@@ -1782,7 +1782,9 @@ static void AmstradCPC_GA_SetRamConfiguration(running_machine *machine)
 			Aleste_RamBanks[i] = BankAddr;
 			AmstradCPC_RamBanks[i] = BankAddr;
 		}
-	} else {/* Need to add the ram expansion configuration here ! */
+	} 
+	else 
+	{/* Need to add the ram expansion configuration here ! */
 	}
 	amstrad_rethinkMemory(machine);
 }
@@ -1890,7 +1892,7 @@ WRITE8_HANDLER( amstrad_plus_asic_6000_w )
 		if ( asic.enabled )
 		{
 			vector = (data & 0xf8) + (amstrad_plus_irq_cause);
-			cpu_set_input_line_vector(space->machine->cpu[0], 0, vector);
+			cpu_set_input_line_vector(cputag_get_cpu(space->machine, "maincpu"), 0, vector);
 			logerror("ASIC: IM 2 vector write %02x, data = &%02x\n",vector,data);
 		}
 		asic.dma_clear = data & 0x01;
@@ -1934,21 +1936,21 @@ WRITE8_HANDLER( amstrad_plus_asic_6000_w )
 		if(data & 0x40)
 		{
 			logerror("ASIC: DMA 0 IRQ acknowledge\n");
-			cpu_set_input_line(space->machine->cpu[0],0,CLEAR_LINE);
+			cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 			amstrad_plus_irq_cause = 0x06;
 			amstrad_plus_asic_ram[0x2c0f] &= ~0x40;
 		}
 		if(data & 0x20)
 		{
 			logerror("ASIC: DMA 1 IRQ acknowledge\n");
-			cpu_set_input_line(space->machine->cpu[0],0,CLEAR_LINE);
+			cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 			amstrad_plus_irq_cause = 0x06;
 			amstrad_plus_asic_ram[0x2c0f] &= ~0x20;
 		}
 		if(data & 0x10)
 		{
 			logerror("ASIC: DMA 2 IRQ acknowledge\n");
-			cpu_set_input_line(space->machine->cpu[0],0,CLEAR_LINE);
+			cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 			amstrad_plus_irq_cause = 0x06;
 			amstrad_plus_asic_ram[0x2c0f] &= ~0x10;
 		}
@@ -2044,7 +2046,8 @@ Note 1 : This function is not available in the Gate-Array, but is performed by a
 static void amstrad_GateArray_write(running_machine *machine, UINT8 dataToGateArray)
 {
 /* Get Bit 7 and 6 of the dataToGateArray = Gate Array function selected */
-	switch ((dataToGateArray & 0xc0)>>6) {
+	switch ((dataToGateArray & 0xc0)>>6) 
+	{
 /* Pen selection
    -------------
 Bit Value Function        Bit Value Function
@@ -2130,7 +2133,7 @@ Bit 4 controls the interrupt generation. It can be used to delay interrupts.*/
 		if ( gate_array.mrer & 0x10 )
 		{
 			amstrad_CRTC_HS_Counter = 0;
-			cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+			cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
 		}
 
 		/* b3b2 != 0 then change the state of upper or lower rom area and rethink memory */
@@ -2311,7 +2314,8 @@ READ8_HANDLER ( amstrad_cpc_io_r )
 	/* if b14 = 0 : CRTC Read selected */
 	if ((offset & (1<<14)) == 0)
 	{
-		switch(r1r0) {
+		switch(r1r0) 
+		{
 		case 0x02:
 			data = mc6845_status_r( mc6845, 0 );
 //			/* CRTC Type 1 : Read Status Register
@@ -2584,7 +2588,7 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 /* load CPCEMU style snapshots */
 static void amstrad_handle_snapshot(running_machine *machine, unsigned char *pSnapshot)
 {
-	const address_space* space = cpu_get_address_space(machine->cpu[0],ADDRESS_SPACE_PROGRAM);
+	const address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	const device_config *mc6845 = devtag_get_device(space->machine, "mc6845" );
 	const device_config *ay8910 = devtag_get_device(machine, "ay");
 	int RegData;
@@ -2592,70 +2596,70 @@ static void amstrad_handle_snapshot(running_machine *machine, unsigned char *pSn
 
 	/* init Z80 */
 	RegData = (pSnapshot[0x011] & 0x0ff) | ((pSnapshot[0x012] & 0x0ff)<<8);
-	cpu_set_reg(machine->cpu[0],Z80_AF, RegData);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_AF, RegData);
 
 	RegData = (pSnapshot[0x013] & 0x0ff) | ((pSnapshot[0x014] & 0x0ff)<<8);
-	cpu_set_reg(machine->cpu[0],Z80_BC, RegData);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_BC, RegData);
 
 	RegData = (pSnapshot[0x015] & 0x0ff) | ((pSnapshot[0x016] & 0x0ff)<<8);
-	cpu_set_reg(machine->cpu[0],Z80_DE, RegData);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_DE, RegData);
 
 	RegData = (pSnapshot[0x017] & 0x0ff) | ((pSnapshot[0x018] & 0x0ff)<<8);
-	cpu_set_reg(machine->cpu[0],Z80_HL, RegData);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_HL, RegData);
 
 	RegData = (pSnapshot[0x019] & 0x0ff) ;
-	cpu_set_reg(machine->cpu[0],Z80_R, RegData);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_R, RegData);
 
 	RegData = (pSnapshot[0x01a] & 0x0ff);
-	cpu_set_reg(machine->cpu[0],Z80_I, RegData);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_I, RegData);
 
 	if ((pSnapshot[0x01b] & 1)==1)
 	{
-		cpu_set_reg(machine->cpu[0],Z80_IFF1, 1);
+		cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_IFF1, 1);
 	}
 	else
 	{
-		cpu_set_reg(machine->cpu[0],Z80_IFF1, 0);
+		cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_IFF1, 0);
 	}
 
 	if ((pSnapshot[0x01c] & 1)==1)
 	{
-		cpu_set_reg(machine->cpu[0],Z80_IFF2, 1);
+		cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_IFF2, 1);
 	}
 	else
 	{
-		cpu_set_reg(machine->cpu[0],Z80_IFF2, 0);
+		cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_IFF2, 0);
 	}
 
 	RegData = (pSnapshot[0x01d] & 0x0ff) | ((pSnapshot[0x01e] & 0x0ff)<<8);
-	cpu_set_reg(machine->cpu[0],Z80_IX, RegData);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_IX, RegData);
 
 	RegData = (pSnapshot[0x01f] & 0x0ff) | ((pSnapshot[0x020] & 0x0ff)<<8);
-	cpu_set_reg(machine->cpu[0],Z80_IY, RegData);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_IY, RegData);
 
 	RegData = (pSnapshot[0x021] & 0x0ff) | ((pSnapshot[0x022] & 0x0ff)<<8);
-	cpu_set_reg(machine->cpu[0],Z80_SP, RegData);
-	cpu_set_reg(machine->cpu[0],REG_GENSP,RegData);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_SP, RegData);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), REG_GENSP, RegData);
 
 	RegData = (pSnapshot[0x023] & 0x0ff) | ((pSnapshot[0x024] & 0x0ff)<<8);
 
-	cpu_set_reg(machine->cpu[0],Z80_PC, RegData);
-//	cpu_set_reg(machine->cpu[0],REG_SP,RegData);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_PC, RegData);
+//	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), REG_SP, RegData);
 
 	RegData = (pSnapshot[0x025] & 0x0ff);
-	cpu_set_reg(machine->cpu[0],Z80_IM, RegData);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_IM, RegData);
 
 	RegData = (pSnapshot[0x026] & 0x0ff) | ((pSnapshot[0x027] & 0x0ff)<<8);
-	cpu_set_reg(machine->cpu[0],Z80_AF2, RegData);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_AF2, RegData);
 
 	RegData = (pSnapshot[0x028] & 0x0ff) | ((pSnapshot[0x029] & 0x0ff)<<8);
-	cpu_set_reg(machine->cpu[0],Z80_BC2, RegData);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_BC2, RegData);
 
 	RegData = (pSnapshot[0x02a] & 0x0ff) | ((pSnapshot[0x02b] & 0x0ff)<<8);
-	cpu_set_reg(machine->cpu[0],Z80_DE2, RegData);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_DE2, RegData);
 
 	RegData = (pSnapshot[0x02c] & 0x0ff) | ((pSnapshot[0x02d] & 0x0ff)<<8);
-	cpu_set_reg(machine->cpu[0],Z80_HL2, RegData);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_HL2, RegData);
 
 	/* init GA */
 	for (i=0; i<17; i++)
@@ -2804,7 +2808,8 @@ static void amstrad_rethinkMemory(running_machine *machine)
 	}
 
 	/* multiface hardware enabled? */
-	if (multiface_hardware_enabled(machine)) {
+	if (multiface_hardware_enabled(machine)) 
+	{
 		multiface_rethink_memory(machine);
 	}
 }
@@ -2854,7 +2859,7 @@ BDIR BC1       |
 static unsigned char amstrad_Psg_FunctionSelected;
 static void update_psg(running_machine *machine)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	const device_config *ay8910 = devtag_get_device(machine, "ay");
 	
 	if(aleste_mode & 0x20)  // RTC selected
@@ -2946,7 +2951,8 @@ READ8_DEVICE_HANDLER (amstrad_ppi_portb_r)
 /* Set b7 with cassette tape input */
 	if(amstrad_system_type != SYSTEM_GX4000)
 	{
-		if (cassette_input(devtag_get_device(device->machine, "cassette" )) > 0.03) {
+		if (cassette_input(devtag_get_device(device->machine, "cassette" )) > 0.03) 
+		{
 			data |= (1<<7);
 		}
 	}
@@ -3011,7 +3017,8 @@ WRITE8_DEVICE_HANDLER ( amstrad_ppi_portc_w )
 	/* b5 Cassette Write data */
 	if(amstrad_system_type != SYSTEM_GX4000)
 	{
-		if ((changed_data & 0x20) != 0) {
+		if ((changed_data & 0x20) != 0) 
+		{
 			cassette_output(devtag_get_device(device->machine, "cassette" ),
 				((data & 0x20) ? -1.0 : +1.0));
 		}
@@ -3074,7 +3081,7 @@ static IRQ_CALLBACK(amstrad_cpu_acknowledge_int)
 		amstrad_plus_asic_ram[0x2c0f] &= ~0x80;  // not a raster interrupt, so this bit is reset
 		return (amstrad_plus_asic_ram[0x2805] & 0xf8) | amstrad_plus_irq_cause;
 	}
-	cpu_set_input_line(device->machine->cpu[0],0, CLEAR_LINE);
+	cputag_set_input_line(device->machine,"maincpu", 0, CLEAR_LINE);
 	amstrad_CRTC_HS_Counter &= 0x1F;
 	if ( asic.enabled )
 	{
@@ -3213,7 +3220,7 @@ static const UINT8 amstrad_cycle_table_ex[256]=
 
 static void amstrad_common_init(running_machine *machine)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	aleste_mode = 0;
 
@@ -3245,11 +3252,11 @@ static void amstrad_common_init(running_machine *machine)
 	memory_install_write8_handler(space, 0xc000, 0xdfff, 0, 0, SMH_BANK15);
 	memory_install_write8_handler(space, 0xe000, 0xffff, 0, 0, SMH_BANK16);
 
-	device_reset(space->machine->cpu[0]);
+	device_reset(cputag_get_cpu(space->machine, "maincpu"));
 	if ( amstrad_system_type == SYSTEM_CPC || amstrad_system_type == SYSTEM_ALESTE )
-		cpu_set_input_line_vector(machine->cpu[0], 0,0xff);
+		cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), 0, 0xff);
 	else
-		cpu_set_input_line_vector(machine->cpu[0], 0,0x00);
+		cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), 0, 0x00);
 
 	if(amstrad_system_type != SYSTEM_GX4000)
 	{
@@ -3267,7 +3274,7 @@ static void amstrad_common_init(running_machine *machine)
 
 	/* Using the cool code Juergen has provided, I will override
     the timing tables with the values for the amstrad */
-	z80_set_cycle_tables(machine->cpu[0],
+	z80_set_cycle_tables(cputag_get_cpu(machine, "maincpu"),
 		(void*)amstrad_cycle_table_op,
 		(void*)amstrad_cycle_table_cb,
 		(void*)amstrad_cycle_table_ed,
@@ -3276,7 +3283,7 @@ static void amstrad_common_init(running_machine *machine)
 		(void*)amstrad_cycle_table_ex);
 
 	/* Juergen is a cool dude! */
-	cpu_set_irq_callback(machine->cpu[0], amstrad_cpu_acknowledge_int);
+	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), amstrad_cpu_acknowledge_int);
 }
 
 

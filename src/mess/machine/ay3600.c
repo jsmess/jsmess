@@ -436,18 +436,20 @@ static TIMER_CALLBACK(AY3600_poll)
 
 	/* reset key check */
 	if (apple2_pressed_specialkey(machine, SPECIALKEY_RESET) &&
-		(a2_no_ctrl_reset(machine) || switchkey & A2_KEY_CONTROL)) {
-			if (!reset_flag) {
+		(a2_no_ctrl_reset(machine) || switchkey & A2_KEY_CONTROL)) 
+		{
+			if (!reset_flag) 
+			{
 				reset_flag = 1;
 				/* using PULSE_LINE does not allow us to press and hold key */
-				cpu_set_input_line(machine->cpu[0], INPUT_LINE_RESET, ASSERT_LINE);
+				cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, ASSERT_LINE);
 			}
 			return;
 	}
 	if (reset_flag)
 	{
 		reset_flag = 0;
-		cpu_set_input_line(machine->cpu[0], INPUT_LINE_RESET, CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, CLEAR_LINE);
 		mame_schedule_soft_reset(machine);
 	}
 

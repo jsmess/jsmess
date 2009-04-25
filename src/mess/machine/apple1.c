@@ -144,7 +144,7 @@ static int apple1_kbd_data = 0;
 
 DRIVER_INIT( apple1 )
 {
-	const address_space* space = cpu_get_address_space(machine->cpu[0],ADDRESS_SPACE_PROGRAM);
+	const address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	/* Set up the handlers for MESS's dynamically-sized RAM. */
 	memory_install_read8_handler(space,
 								 0x0000, mess_ram_size - 1, 0, 0, SMH_BANK1);
@@ -259,7 +259,7 @@ SNAPSHOT_LOAD(apple1)
 	for (addr = start_addr, snapptr = snapbuf + SNAP_HEADER_LEN;
 		 addr <= end_addr;
 		 addr++, snapptr++)
-		memory_write_byte(cpu_get_address_space(image->machine->cpu[0],ADDRESS_SPACE_PROGRAM), addr, *snapptr);
+		memory_write_byte(cputag_get_address_space(image->machine, "maincpu", ADDRESS_SPACE_PROGRAM), addr, *snapptr);
 
 	return INIT_PASS;
 }
@@ -302,14 +302,14 @@ static TIMER_CALLBACK(apple1_kbd_poll)
 		if (!reset_flag) {
 			reset_flag = 1;
 			/* using PULSE_LINE does not allow us to press and hold key */
-			cpu_set_input_line(machine->cpu[0], INPUT_LINE_RESET, ASSERT_LINE);
+			cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, ASSERT_LINE);
 			device_reset( pia );
 		}
 	}
 	else if (reset_flag) {
 		/* RESET released--allow the processor to continue. */
 		reset_flag = 0;
-		cpu_set_input_line(machine->cpu[0], INPUT_LINE_RESET, CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, CLEAR_LINE);
 	}
 
 	/* The CLEAR SCREEN switch clears the video hardware. */

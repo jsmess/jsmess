@@ -119,7 +119,7 @@ INLINE void atarist_shifter_load(running_machine *machine)
 {
 	atarist_state *state = machine->driver_data;
 
-	const address_space *program = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *program = cputag_get_address_space(machine, M68000_TAG, ADDRESS_SPACE_PROGRAM);
 	UINT16 data = memory_read_word_16be(program, state->shifter_ofs);
 
 	state->shifter_ir[state->shifter_bitplane] = data;
@@ -162,13 +162,13 @@ static TIMER_CALLBACK( atarist_glue_tick )
 
 	if ((y == state->shifter_vblank_start) && (x == 0))
 	{
-		cpu_set_input_line(machine->cpu[0], M68K_IRQ_4, HOLD_LINE);
+		cputag_set_input_line(machine, M68000_TAG, M68K_IRQ_4, HOLD_LINE);
 		state->shifter_ofs = state->shifter_base;
 	}
 
 	if (x == state->shifter_hblank_start)
 	{
-		cpu_set_input_line(machine->cpu[0], M68K_IRQ_2, HOLD_LINE);
+		cputag_set_input_line(machine, M68000_TAG, M68K_IRQ_2, HOLD_LINE);
 		state->shifter_ofs += (state->shifter_lineofs * 2); // STe
 	}
 }
@@ -421,7 +421,7 @@ static void atarist_blitter_source(running_machine *machine)
 {
 	atarist_state *state = machine->driver_data;
 
-	const address_space *program = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *program = cputag_get_address_space(machine, M68000_TAG, ADDRESS_SPACE_PROGRAM);
 	UINT16 data = memory_read_word_16be(program, state->blitter_src);
 
 	if (state->blitter_src_inc_x < 0)
@@ -464,7 +464,7 @@ static UINT16 atarist_blitter_hop(running_machine *machine)
 static void atarist_blitter_op(running_machine *machine, UINT16 s, UINT32 dstaddr, UINT16 mask)
 {
 	atarist_state *state = machine->driver_data;
-	const address_space *program = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *program = cputag_get_address_space(machine, M68000_TAG, ADDRESS_SPACE_PROGRAM);
 
 	UINT16 d = memory_read_word_16be(program, dstaddr);
 	UINT16 result = 0;

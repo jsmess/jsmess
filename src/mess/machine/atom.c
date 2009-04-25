@@ -106,7 +106,7 @@ static void atom_8271_interrupt_callback(const device_config *device, int state)
 		{
 			/* I'll pulse it because if I used hold-line I'm not sure
 			it would clear - to be checked */
-			cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
+			cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 		}
 	}
 
@@ -254,14 +254,14 @@ QUICKLOAD_LOAD(atom)
 	/* copy data into memory */
 	for (i=size-1; i>=0; i--)
 	{
-		memory_write_byte( cpu_get_address_space( image->machine->cpu[0], ADDRESS_SPACE_PROGRAM ), addr, data[0]);
+		memory_write_byte( cputag_get_address_space( image->machine, "maincpu", ADDRESS_SPACE_PROGRAM ), addr, data[0]);
 		addr++;
 		data++;
 	}
 
 
 	/* set new pc address */
-	cpu_set_reg( image->machine->cpu[0], REG_GENPC, exec);
+	cpu_set_reg( cputag_get_cpu(image->machine, "maincpu"), REG_GENPC, exec);
 
 	/* free the data */
 	free(quickload_data);

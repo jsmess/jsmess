@@ -146,7 +146,7 @@ unsigned char apf_ints;
 
 void apf_update_ints(running_machine *machine)
 {
-	cpu_set_input_line(machine->cpu[0], 0, apf_ints ? HOLD_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 0, apf_ints ? HOLD_LINE : CLEAR_LINE);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( apf_m1000_irq_a_func )
