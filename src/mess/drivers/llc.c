@@ -333,29 +333,29 @@ MACHINE_DRIVER_END
 
 ROM_START( llc1 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-    ROM_LOAD( "llc1-monitor.rom", 0x0000, 0x0800, CRC(0E81378D) )        
-    ROM_LOAD( "llc1_tb1.bin", 0x0800, 0x0400, CRC(0D9D4039) )
-    ROM_LOAD( "llc1_tb2.bin", 0x0C00, 0x0400, CRC(28BFEA2A) )
-    ROM_LOAD( "llc1_tb3.bin", 0x1000, 0x0400, CRC(FE5E3132) )
+    ROM_LOAD( "llc1-monitor.rom", 0x0000, 0x0800, CRC(0e81378d) SHA1(0fbb6eca016d0f439ea1c9aa0cb0affb5f49ea69) )
+    ROM_LOAD( "llc1_tb1.bin", 0x0800, 0x0400, CRC(0d9d4039) SHA1(b515e385af57f4faf3a9f7b4a1edd59a1c1ea260) )
+    ROM_LOAD( "llc1_tb2.bin", 0x0c00, 0x0400, CRC(28bfea2a) SHA1(a68a8b87bfc931627ddd8d124b153e511477fbaf) )
+    ROM_LOAD( "llc1_tb3.bin", 0x1000, 0x0400, CRC(fe5e3132) SHA1(cc3b191e41f5772a4b86b8eb0ebe6fce67872df6) )
 	ROM_REGION(0x0400, "gfx1",0)
-	ROM_LOAD ("llc1_zg.bin", 0x0000, 0x0400, CRC(FA2CD659) )    
+	ROM_LOAD ("llc1_zg.bin", 0x0000, 0x0400, CRC(fa2cd659) SHA1(1fa5f9992f35929f656c4ce55ed6980c5da1772b) )
 ROM_END
 
 ROM_START( llc2 )
 	ROM_REGION( 0x12000, "maincpu", ROMREGION_ERASEFF )
-    ROM_LOAD( "scchmon_91.bin", 0x0000, 0x1000, CRC(218D8236) )    
-    ROM_LOAD( "gsbasic.bin", 0x10000, 0x2000, CRC(78A5F388) )    
+    ROM_LOAD( "scchmon_91.bin", 0x0000, 0x1000, CRC(218d8236) SHA1(b8297272cc79751afc2eb8688d99b40691346dcb) )
+    ROM_LOAD( "gsbasic.bin", 0x10000, 0x2000, CRC(78a5f388) SHA1(e7b475b98dce36b24540ad11eb89046ddb4f02af) )
 	ROM_REGION(0x0800, "gfx1",0)
-	ROM_LOAD ("llc2font.bin", 0x0000, 0x0800, CRC(CE53E55D) )    
+	ROM_LOAD ("llc2font.bin", 0x0000, 0x0800, CRC(ce53e55d) SHA1(da23d93f14a8a1f8d82bb72470a96b0bfd81ed1b) )
 	ROM_REGION(0x1000, "k7659",0)
-	ROM_LOAD ("k7659n.bin", 0x0000, 0x0800, CRC(7454BF0A) )    
+	ROM_LOAD ("k7659n.bin", 0x0000, 0x0800, CRC(7454bf0a) SHA1(b97e7df93778fa371b96b6f4fb1a5b1c8b89d7ba) )
 ROM_END
  
-/* Driver */
-
 static SYSTEM_CONFIG_START(llc2)
 	CONFIG_RAM_DEFAULT(64 * 1024)
 SYSTEM_CONFIG_END
+
+/* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT     CONFIG COMPANY          FULLNAME   	FLAGS */
 COMP( 1984, llc1,	0,		0,		llc1, 		llc1, 		llc1, 	 0, 	"",		 "LLC-1",	 	GAME_NOT_WORKING)
