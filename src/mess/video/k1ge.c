@@ -638,7 +638,7 @@ static void k2ge_draw( const device_config *device, int line )
 	int i;
 
 	oowcol = ( k1ge->vram[0x012] & 0x07 ) * 2;
-	oowcol = k1ge->vram[0x3f0 + col ] | ( k1ge->vram[0x3f1 + col ] << 8 );
+	oowcol = k1ge->vram[0x3f0 + oowcol ] | ( k1ge->vram[0x3f1 + oowcol ] << 8 );
 
 	if ( line < k1ge->wba_v || line >= k1ge->wba_v + k1ge->wsi_v )
 	{
