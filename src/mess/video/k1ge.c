@@ -113,6 +113,13 @@ WRITE8_DEVICE_HANDLER( k1ge_w )
 		data &= 0x80;
 		break;
 	}
+
+	/* Only the lower 4 bits of the palette entry high bytes can be written */
+	if ( offset >= 0x0200 && offset < 0x0400 && ( offset & 1 ) )
+	{
+		data &= 0x0f;
+	}
+
 	k1ge->vram[offset & 0x7ff] = data;
 }
 
