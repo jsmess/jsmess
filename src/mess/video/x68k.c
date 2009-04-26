@@ -467,23 +467,23 @@ WRITE16_HANDLER( x68k_crtc_w )
 				bitmap_fill(x68k_gfx_0_bitmap_256,&rect,0);
 				bitmap_fill(x68k_gfx_0_bitmap_65536,&rect,0);
 				bitmap_fill(x68k_gfx_big_bitmap,&rect,0);
-				memset(x68k_gvram,0,0x40000);
+				memset(x68k_gvram,0,0x20000);
 			}
 			if(x68k_sys.crtc.reg[21] & 0x02)
 			{
 				bitmap_fill(x68k_gfx_1_bitmap_16,&rect,0);
 				bitmap_fill(x68k_gfx_1_bitmap_256,&rect,0);
-				memset(x68k_gvram+0x40000,0,0x40000);
+				memset(x68k_gvram+0x10000,0,0x20000);
 			}
 			if(x68k_sys.crtc.reg[21] & 0x04)
 			{
 				bitmap_fill(x68k_gfx_2_bitmap_16,&rect,0);
-				memset(x68k_gvram+0x80000,0,0x40000);
+				memset(x68k_gvram+0x20000,0,0x20000);
 			}
 			if(x68k_sys.crtc.reg[21] & 0x08)
 			{
 				bitmap_fill(x68k_gfx_3_bitmap_16,&rect,0);
-				memset(x68k_gvram+0xc0000,0,0x40000);
+				memset(x68k_gvram+0x30000,0,0x20000);
 			}
 			timer_set(space->machine, ATTOTIME_IN_MSEC(10), NULL, 0x02,x68k_crtc_operation_end);  // time taken to do operation is a complete guess.
 //			popmessage("CRTC: High-speed gfx screen clear [0x%02x]",x68k_sys.crtc.reg[21] & 0x0f);
