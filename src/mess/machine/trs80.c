@@ -731,11 +731,17 @@ READ8_HANDLER ( trs80_printer_r )
 {
 	/* Bit 7 - 1 = Busy; 0 = Not Busy
 	   Bit 6 - 1 = Out of Paper; 0 = Paper
-	   Bit 5 - 1 = Ready; 0 = Not Ready
-	   Bit 4 - 1 = Printer selected; 0 = Printer not selected
+	   Bit 5 - 1 = Printer selected; 0 = Printer not selected
+	   Bit 4 - 1 = No Fault; 0 = Fault
 	   Bits 3..0 - Not used */
 
-	return 0x30 | (centronics_busy_r(trs80_printer) << 7);
+	UINT8 data = 0;
+	data |= centronics_busy_r(trs80_printer) << 7;
+	data |= centronics_pe_r(trs80_printer) << 6;
+	data |= centronics_vcc_r(trs80_printer) << 5;
+	data |= centronics_fault_r(trs80_printer) << 4;
+
+	return data;
 }
 
 WRITE8_HANDLER( trs80_printer_w )
