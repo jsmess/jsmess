@@ -225,9 +225,7 @@
 */
 
 static ADDRESS_MAP_START(memmap, ADDRESS_SPACE_PROGRAM, 8)
-
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(geneve_r, geneve_w)
-
 ADDRESS_MAP_END
 
 
@@ -235,18 +233,12 @@ ADDRESS_MAP_END
     CRU map
 */
 
-static ADDRESS_MAP_START(writecru, ADDRESS_SPACE_IO, 8)
-
-	AM_RANGE(0x0000, 0x07ff) AM_DEVWRITE("tms9901", tms9901_cru_w)
-	AM_RANGE(0x0800, 0x0fff) AM_WRITE(geneve_peb_mode_cru_w)
-
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START(readcru, ADDRESS_SPACE_IO, 8)
-
+static ADDRESS_MAP_START(cru_map, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0000, 0x00ff) AM_DEVREAD("tms9901", tms9901_cru_r)
 	AM_RANGE(0x0100, 0x01ff) AM_READ(geneve_peb_cru_r)
 
+	AM_RANGE(0x0000, 0x07ff) AM_DEVWRITE("tms9901", tms9901_cru_w)
+	AM_RANGE(0x0800, 0x0fff) AM_WRITE(geneve_peb_mode_cru_w)
 ADDRESS_MAP_END
 
 
@@ -472,7 +464,7 @@ static MACHINE_DRIVER_START(geneve_60hz)
 	/* TMS9995 CPU @ 12.0 MHz */
 	MDRV_CPU_ADD("maincpu", TMS9995, 12000000)
 	MDRV_CPU_PROGRAM_MAP(memmap, 0)
-	MDRV_CPU_IO_MAP(readcru, writecru)
+	MDRV_CPU_IO_MAP(cru_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(geneve_hblank_interrupt, 262)	/* 262.5 in 60Hz, 312.5 in 50Hz */
 
 	MDRV_MACHINE_START( geneve )

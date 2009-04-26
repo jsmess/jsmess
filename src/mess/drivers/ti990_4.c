@@ -145,12 +145,10 @@ static VIDEO_UPDATE( ti990_4 )
 */
 
 static ADDRESS_MAP_START(ti990_4_memmap, ADDRESS_SPACE_PROGRAM, 16)
-
 	AM_RANGE(0x0000, 0x7fff) AM_RAM	/* dynamic RAM */
 	AM_RANGE(0x8000, 0xf7ff) AM_NOP	/* reserved for expansion */
 	AM_RANGE(0xf800, 0xfbff) AM_RAM	/* static RAM? */
 	AM_RANGE(0xfc00, 0xffff) AM_ROM	/* LOAD ROM */
-
 ADDRESS_MAP_END
 
 
@@ -176,16 +174,19 @@ ADDRESS_MAP_END
     0x0a0-0x0bf: VDT3 (int ??? - wired to int 9, unused)
 */
 
-static ADDRESS_MAP_START(ti990_4_writecru, ADDRESS_SPACE_IO, 8)
-
+static ADDRESS_MAP_START(ti990_4_cru_map, ADDRESS_SPACE_IO, 8)
 #if VIDEO_911
+	AM_RANGE(0x10, 0x11) AM_READ(vdt911_0_cru_r)
 	AM_RANGE(0x80, 0x8f) AM_WRITE(vdt911_0_cru_w)
 #else
+	AM_RANGE(0x00, 0x01) AM_READ(asr733_0_cru_r)
 	AM_RANGE(0x00, 0x0f) AM_WRITE(asr733_0_cru_w)
 #endif
 
+	AM_RANGE(0x08, 0x0b) AM_READ(fd800_cru_r)
 	AM_RANGE(0x40, 0x5f) AM_WRITE(fd800_cru_w)
 
+	AM_RANGE(0x1fe, 0x1ff) AM_READ(ti990_panel_read)
 	AM_RANGE(0xff0, 0xfff) AM_WRITE(ti990_panel_write)
 
 	/* external instruction decoding */
@@ -193,22 +194,8 @@ static ADDRESS_MAP_START(ti990_4_writecru, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x3000, 0x3fff) AM_WRITE(rset_callback)
 	AM_RANGE(0x5000, 0x6fff) AM_WRITE(ckon_ckof_callback)
 	AM_RANGE(0x7000, 0x7fff) AM_WRITE(lrex_callback)
-
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(ti990_4_readcru, ADDRESS_SPACE_IO, 8)
-
-#if VIDEO_911
-	AM_RANGE(0x10, 0x11) AM_READ(vdt911_0_cru_r)
-#else
-	AM_RANGE(0x00, 0x01) AM_READ(asr733_0_cru_r)
-#endif
-
-	AM_RANGE(0x08, 0x0b) AM_READ(fd800_cru_r)
-
-	AM_RANGE(0x1fe, 0x1ff) AM_READ(ti990_panel_read)
-
-ADDRESS_MAP_END
 
 /*static tms9900reset_param reset_params =
 {
@@ -220,7 +207,7 @@ static MACHINE_DRIVER_START(ti990_4)
 	/* TMS9900 CPU @ 3.0(???) MHz */
 	MDRV_CPU_ADD("maincpu", TMS9900, 3000000)
 	MDRV_CPU_PROGRAM_MAP(ti990_4_memmap, 0)
-	MDRV_CPU_IO_MAP(ti990_4_readcru, ti990_4_writecru)
+	MDRV_CPU_IO_MAP(ti990_4_cru_map, 0)
 	MDRV_CPU_PERIODIC_INT(ti990_4_line_interrupt, 120/*or TIME_IN_HZ(100) in Europe*/)
 
 	MDRV_MACHINE_RESET( ti990_4 )

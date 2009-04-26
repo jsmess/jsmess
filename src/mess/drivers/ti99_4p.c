@@ -50,7 +50,6 @@
 #include "machine/smc92x4.h"
 
 static ADDRESS_MAP_START(memmap, ADDRESS_SPACE_PROGRAM, 16)
-
 	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK(1)								/*system ROM*/
 	AM_RANGE(0x2000, 0x2fff) AM_RAMBANK(3)								/*lower 8kb of RAM extension: AMS bank 2*/
 	AM_RANGE(0x3000, 0x3fff) AM_RAMBANK(4)								/*lower 8kb of RAM extension: AMS bank 3*/
@@ -71,21 +70,14 @@ static ADDRESS_MAP_START(memmap, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0xd000, 0xdfff) AM_RAMBANK(8)								/*upper 24kb of RAM extension: AMS bank 13*/
 	AM_RANGE(0xe000, 0xefff) AM_RAMBANK(9)								/*upper 24kb of RAM extension: AMS bank 14*/
 	AM_RANGE(0xf000, 0xffff) AM_RAMBANK(10)								/*upper 24kb of RAM extension: AMS bank 15*/
-
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(writecru, ADDRESS_SPACE_IO, 8)
-
-	AM_RANGE(0x0000, 0x01ff) AM_DEVWRITE("tms9901", tms9901_cru_w)
-	AM_RANGE(0x0200, 0x0fff) AM_WRITE(ti99_4p_peb_cru_w)
-
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START(readcru, ADDRESS_SPACE_IO, 8)
-
+static ADDRESS_MAP_START(cru_map, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0000, 0x003f) AM_DEVREAD("tms9901", tms9901_cru_r)
 	AM_RANGE(0x0040, 0x01ff) AM_READ(ti99_4p_peb_cru_r)
 
+	AM_RANGE(0x0000, 0x01ff) AM_DEVWRITE("tms9901", tms9901_cru_w)
+	AM_RANGE(0x0200, 0x0fff) AM_WRITE(ti99_4p_peb_cru_w)
 ADDRESS_MAP_END
 
 
@@ -249,7 +241,7 @@ static MACHINE_DRIVER_START(ti99_4p_60hz)
 	/* TMS9900 CPU @ 3.0 MHz */
 	MDRV_CPU_ADD("maincpu", TMS9900, 3000000)
 	MDRV_CPU_PROGRAM_MAP(memmap, 0)
-	MDRV_CPU_IO_MAP(readcru, writecru)
+	MDRV_CPU_IO_MAP(cru_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(ti99_4ev_hblank_interrupt, 263)	/* 262.5 in 60Hz, 312.5 in 50Hz */
 
 	MDRV_MACHINE_RESET( ti99 )

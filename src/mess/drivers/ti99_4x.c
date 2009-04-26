@@ -62,7 +62,6 @@ static ADDRESS_MAP_START(memmap, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x9800, 0x9bff) AM_READWRITE(ti99_rgpl_r, ti99_nop_8_w)	/*GPL read*/
 	AM_RANGE(0x9c00, 0x9fff) AM_READWRITE(ti99_nop_8_r, ti99_wgpl_w)	/*GPL write*/
 	AM_RANGE(0xa000, 0xffff) AM_READWRITE(ti99_nop_8_r, ti99_nop_8_w)	/*upper 24kb of RAM extension - installed dynamically*/
-
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(memmap_4ev, ADDRESS_SPACE_PROGRAM, 16)
@@ -80,25 +79,18 @@ static ADDRESS_MAP_START(memmap_4ev, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x9800, 0x9bff) AM_READWRITE(ti99_rgpl_r, ti99_nop_8_w)	/*GPL read*/
 	AM_RANGE(0x9c00, 0x9fff) AM_READWRITE(ti99_nop_8_r, ti99_wgpl_w)	/*GPL write*/
 	AM_RANGE(0xa000, 0xffff) AM_READWRITE(ti99_nop_8_r, ti99_nop_8_w)	/*upper 24kb of RAM extension - installed dynamically*/
-
 ADDRESS_MAP_END
 
 /*
     CRU map
 */
 
-static ADDRESS_MAP_START(writecru, ADDRESS_SPACE_IO, 8)
-
-	AM_RANGE(0x0000, 0x07ff) AM_DEVWRITE("tms9901", tms9901_cru_w)
-	AM_RANGE(0x0800, 0x0fff) AM_WRITE(ti99_4x_peb_cru_w)
-
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START(readcru, ADDRESS_SPACE_IO, 8)
-
+static ADDRESS_MAP_START(cru_map, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0000, 0x00ff) AM_DEVREAD("tms9901", tms9901_cru_r)
 	AM_RANGE(0x0100, 0x01ff) AM_READ(ti99_4x_peb_cru_r)
 
+	AM_RANGE(0x0000, 0x07ff) AM_DEVWRITE("tms9901", tms9901_cru_w)
+	AM_RANGE(0x0800, 0x0fff) AM_WRITE(ti99_4x_peb_cru_w)
 ADDRESS_MAP_END
 
 
@@ -538,7 +530,7 @@ static MACHINE_DRIVER_START(ti99_4_60hz)
 	/* TMS9900 CPU @ 3.0 MHz */
 	MDRV_CPU_ADD("maincpu", TMS9900, 3000000)
 	MDRV_CPU_PROGRAM_MAP(memmap, 0)
-	MDRV_CPU_IO_MAP(readcru, writecru)
+	MDRV_CPU_IO_MAP(cru_map, 0)
 	MDRV_CPU_VBLANK_INT("screen", ti99_vblank_interrupt)
 
 	MDRV_MACHINE_START( ti99_4_60hz )
@@ -590,7 +582,7 @@ static MACHINE_DRIVER_START(ti99_4_50hz)
 	/* TMS9900 CPU @ 3.0 MHz */
 	MDRV_CPU_ADD("maincpu", TMS9900, 3000000)
 	MDRV_CPU_PROGRAM_MAP(memmap, 0)
-	MDRV_CPU_IO_MAP(readcru, writecru)
+	MDRV_CPU_IO_MAP(cru_map, 0)
 	MDRV_CPU_VBLANK_INT("screen", ti99_vblank_interrupt)
 
 	MDRV_MACHINE_START( ti99_4_50hz )
@@ -640,7 +632,7 @@ static MACHINE_DRIVER_START(ti99_4a_60hz)
 	/* TMS9900 CPU @ 3.0 MHz */
 	MDRV_CPU_ADD("maincpu", TMS9900, 3000000)
 	MDRV_CPU_PROGRAM_MAP(memmap, 0)
-	MDRV_CPU_IO_MAP(readcru, writecru)
+	MDRV_CPU_IO_MAP(cru_map, 0)
 	MDRV_CPU_VBLANK_INT("screen", ti99_vblank_interrupt)
 
 	MDRV_MACHINE_START( ti99_4a_60hz )
@@ -692,7 +684,7 @@ static MACHINE_DRIVER_START(ti99_4a_50hz)
 	/* TMS9900 CPU @ 3.0 MHz */
 	MDRV_CPU_ADD("maincpu", TMS9900, 3000000)
 	MDRV_CPU_PROGRAM_MAP(memmap, 0)
-	MDRV_CPU_IO_MAP(readcru, writecru)
+	MDRV_CPU_IO_MAP(cru_map, 0)
 	MDRV_CPU_VBLANK_INT("screen", ti99_vblank_interrupt)
 
 	MDRV_MACHINE_START( ti99_4a_50hz )
@@ -743,7 +735,7 @@ static MACHINE_DRIVER_START(ti99_4ev_60hz)
 	/* TMS9900 CPU @ 3.0 MHz */
 	MDRV_CPU_ADD("maincpu", TMS9900, 3000000)
 	MDRV_CPU_PROGRAM_MAP(memmap_4ev, 0)
-	MDRV_CPU_IO_MAP(readcru, writecru)
+	MDRV_CPU_IO_MAP(cru_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(ti99_4ev_hblank_interrupt, 263)	/* 262.5 in 60Hz, 312.5 in 50Hz */
 
 	MDRV_MACHINE_START( ti99_4ev_60hz )
