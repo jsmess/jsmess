@@ -109,7 +109,7 @@ static WRITE8_DEVICE_HANDLER( enterprise_dave_reg_write )
 	case 0x11:
 	case 0x12:
 	case 0x13:
-		enterprise_update_memory_page(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), offset - 0x0f, data);
+		enterprise_update_memory_page(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), offset - 0x0f, data);
 		break;
 
 	case 0x15:
@@ -173,7 +173,7 @@ static const dave_interface enterprise_dave_interface =
 
 static MACHINE_RESET( enterprise )
 {
-	cpu_set_input_line_vector(machine->cpu[0], 0, 0xff);
+	cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), 0, 0xff);
 
 	floppy_drive_set_geometry(image_from_devtype_and_index(machine, IO_FLOPPY, 0), FLOPPY_DRIVE_DS_80);
 }

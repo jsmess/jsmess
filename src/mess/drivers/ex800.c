@@ -172,7 +172,7 @@ static INPUT_CHANGED( online_switch )
 
 	if (newval)
 	{
-		cpu_set_input_line(field->port->machine->cpu[0], UPD7810_INTF1, state);
+		cputag_set_input_line(field->port->machine, "maincpu", UPD7810_INTF1, state);
 		state = (state == ASSERT_LINE) ? CLEAR_LINE : ASSERT_LINE;
 	}
 }

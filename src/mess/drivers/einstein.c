@@ -358,19 +358,19 @@ static void einstein_update_interrupts(running_machine *machine)
 	/* NPW 21-Jul-2005 - Not sure how to update this for MAME 0.98u2 */
 /*
     if (einstein_int & einstein_int_mask & EINSTEIN_KEY_INT)
-        cpu_set_input_line(machine->cpu[0], Z80_INT_REQ, PULSE_LINE);
+        cputag_set_input_line(machine, "maincpu", Z80_INT_REQ, PULSE_LINE);
     else
-        cpu_set_input_line(machine->cpu[0], Z80_INT_IEO, PULSE_LINE);
+        cputag_set_input_line(machine, "maincpu", Z80_INT_IEO, PULSE_LINE);
 
     if (einstein_int & einstein_int_mask & EINSTEIN_ADC_INT)
-        cpu_set_input_line(machine->cpu[0], Z80_INT_REQ, PULSE_LINE);
+        cputag_set_input_line(machine, "maincpu", Z80_INT_REQ, PULSE_LINE);
     else
-        cpu_set_input_line(machine->cpu[0], Z80_INT_IEO, PULSE_LINE);
+        cputag_set_input_line(machine, "maincpu", Z80_INT_IEO, PULSE_LINE);
 
     if (einstein_int & einstein_int_mask & EINSTEIN_FIRE_INT)
-        cpu_set_input_line(machine->cpu[0], Z80_INT_REQ, PULSE_LINE);
+        cputag_set_input_line(machine, "maincpu", Z80_INT_REQ, PULSE_LINE);
     else
-        cpu_set_input_line(machine->cpu[0], Z80_INT_IEO, PULSE_LINE);
+        cputag_set_input_line(machine, "maincpu", Z80_INT_IEO, PULSE_LINE);
 */
 }
 
@@ -406,14 +406,14 @@ static TIMER_CALLBACK(einstein_keyboard_timer_callback)
 /* interrupt state callback for ctc */
 static void einstein_ctc_interrupt(const device_config *device, int state)
 {
-	logerror("ctc irq state: %02x\n",state);
-	cpu_set_input_line(device->machine->cpu[0], 1, state);
+	logerror("ctc irq state: %02x\n", state);
+	cputag_set_input_line(device->machine, "maincpu", 1, state);
 }
 
 static void einstein_pio_interrupt(const device_config *device, int state)
 {
-	logerror("pio irq state: %02x\n",state);
-	cpu_set_input_line(device->machine->cpu[0], 3, state);
+	logerror("pio irq state: %02x\n", state);
+	cputag_set_input_line(device->machine, "maincpu", 3, state);
 }
 
 static WRITE8_DEVICE_HANDLER(einstein_serial_transmit_clock)
@@ -580,7 +580,7 @@ static WRITE8_HANDLER(einstein_fdc_w)
 	int reg = offset & 0x03;
 	const device_config *fdc = devtag_get_device(space->machine, "wd177x");
 
-	logerror("fdc w: PC: %04x %04x %02x\n",cpu_get_pc(space->machine->cpu[0]),offset,data);
+	logerror("fdc w: PC: %04x %04x %02x\n", cpu_get_pc(cputag_get_cpu(space->machine,"maincpu")), offset, data);
 
 	switch (reg)
 	{
@@ -616,7 +616,7 @@ static  READ8_HANDLER(einstein_fdc_r)
 	int reg = offset & 0x03;
 	const device_config *fdc = devtag_get_device(space->machine, "wd177x");
 
-	logerror("fdc r: PC: %04x %04x\n",cpu_get_pc(space->machine->cpu[0]),offset);
+	logerror("fdc r: PC: %04x %04x\n", cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")), offset);
 
 	switch (reg)
 	{
@@ -815,34 +815,34 @@ static WRITE8_HANDLER(einstein_drive_w)
 	/* bit 1: select drive 1 */
 	/* bit 0: select drive 0 */
 
-	logerror("drive w: PC: %04x %04x %02x\n",cpu_get_pc(space->machine->cpu[0]),offset,data);
+	logerror("drive w: PC: %04x %04x %02x\n", cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")), offset, data);
 
-	wd17xx_set_side(fdc,(data>>4) & 0x01);
+	wd17xx_set_side(fdc, (data >> 4) & 0x01);
 
 	if (data & 0x01)
 	{
-		wd17xx_set_drive(fdc,0);
+		wd17xx_set_drive(fdc, 0);
 	}
 	else
 	if (data & 0x02)
 	{
-		wd17xx_set_drive(fdc,1);
+		wd17xx_set_drive(fdc, 1);
 	}
 	else
 	if (data & 0x04)
 	{
-		wd17xx_set_drive(fdc,2);
+		wd17xx_set_drive(fdc, 2);
 	}
 	else
 	if (data & 0x08)
 	{
-		wd17xx_set_drive(fdc,3);
+		wd17xx_set_drive(fdc, 3);
 	}
 }
 
 static WRITE8_HANDLER(einstein_rom_w)
 {
-	einstein_rom_enabled^=1;
+	einstein_rom_enabled ^= 1;
 	einstein_page_rom(space->machine);
 }
 
@@ -1385,7 +1385,7 @@ static MACHINE_RESET( einstein )
 	einstein_int_mask = 0;
 	floppy_drive_set_geometry(image_from_devtype_and_index(machine, IO_FLOPPY, 0), FLOPPY_DRIVE_SS_40);
 
-	cpu_set_irq_callback(machine->cpu[0], einstein_cpu_acknowledge_int);
+	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), einstein_cpu_acknowledge_int);
 
 	/* the einstein keyboard can generate a interrupt */
 	/* the int is actually clocked at the system clock 4 MHz, but this would be too fast for our

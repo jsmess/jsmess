@@ -46,8 +46,9 @@ PALETTE_INIT( dai )
 {
 	int i;
 
-	for ( i = 0; i < sizeof(dai_palette) / 3; i++ ) {
-		palette_set_color_rgb(machine, i, dai_palette[i*3], dai_palette[i*3+1], dai_palette[i*3+2]);
+	for ( i = 0; i < sizeof(dai_palette) / 3; i++ ) 
+	{
+		palette_set_color_rgb(machine, i, dai_palette[i * 3], dai_palette[i * 3 + 1], dai_palette[i * 3 + 2]);
 	}
 }
 
@@ -58,7 +59,7 @@ VIDEO_START( dai )
 
 VIDEO_UPDATE( dai )
 {
-	const address_space *space = cpu_get_address_space(screen->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int i, j, k, l;
 
 	UINT8* char_rom = memory_region(screen->machine, "gfx1");

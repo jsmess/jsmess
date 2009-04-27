@@ -229,7 +229,7 @@ void dgnbeta_vid_set_gctrl(running_machine *machine, int data)
 				     data & GCtrlHiLo		? "Hi" : "Lo",
 				     data & GCtrlSWChar		? "C0" : "C1",
 				     data & GCtrlWI		? "Wi" : "  ",
-				     cpu_get_pc( machine->cpu[0] ));
+				     cpu_get_pc(cputag_get_cpu(machine,"maincpu")));
 }
 
 // called when the 6845 changes the character row

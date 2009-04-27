@@ -47,7 +47,7 @@ static void dai_update_memory(running_machine *machine, int dai_rom_bank)
 
 static TIMER_CALLBACK(dai_bootstrap_callback)
 {
-	cpu_set_reg(machine->cpu[0], REG_GENPC, 0xc000);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), REG_GENPC, 0xc000);
 }
 
 static UINT8 dai_keyboard_scan_mask = 0;
@@ -74,9 +74,9 @@ static void dai_keyboard_write (const device_config *device, UINT8 data)
 static void dai_interrupt_callback(const device_config *device, int intreq, UINT8 vector)
 {
 	if (intreq)
-		cpu_set_input_line_and_vector(device->machine->cpu[0], 0, HOLD_LINE, vector);
+		cputag_set_input_line_and_vector(device->machine, "maincpu", 0, HOLD_LINE, vector);
 	else
-		cpu_set_input_line(device->machine->cpu[0], 0, CLEAR_LINE);
+		cputag_set_input_line(device->machine, "maincpu", 0, CLEAR_LINE);
 }
 
 const tms5501_interface dai_tms5501_interface =
@@ -248,7 +248,7 @@ WRITE8_HANDLER( dai_io_discrete_devices_w )
 
 ***************************************************************************/
 
- READ8_HANDLER( amd9511_r )
+READ8_HANDLER( amd9511_r )
 {
 	/* optional and no present at this moment */
 	return 0xff;

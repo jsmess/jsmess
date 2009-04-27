@@ -268,8 +268,8 @@ static int IsIOPage(int	Page)
 
 static void UpdateBanks(running_machine *machine, int first, int last)
 {
-	const address_space *space_0 = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
-	const address_space *space_1 = cpu_get_address_space( machine->cpu[1], ADDRESS_SPACE_PROGRAM );
+	const address_space *space_0 = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	const address_space *space_1 = cputag_get_address_space(machine, "dma", ADDRESS_SPACE_PROGRAM);
 	int		Page;
 	UINT8 		*readbank;
 	write8_space_func 	writebank;
@@ -695,37 +695,37 @@ static WRITE8_DEVICE_HANDLER(d_pia1_pa_w)
 	const device_config *fdc = devtag_get_device(device->machine, "wd179x");
 	
 	/* Only play with halt line if halt bit changed since last write */
-	if((data & 0x80)!=d_pia1_pa_last)
+	if((data & 0x80) != d_pia1_pa_last)
 	{
 		/* Bit 7 of $FF24, seems to control HALT on second CPU (through an inverter) */
 		if(data & 0x80)
-			HALT_DMA=ASSERT_LINE;
+			HALT_DMA = ASSERT_LINE;
 		else
-			HALT_DMA=CLEAR_LINE;
+			HALT_DMA = CLEAR_LINE;
 
-		LOG_HALT(("DMA_CPU HALT=%d\n",HALT_DMA));
-		cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_HALT, HALT_DMA);
+		LOG_HALT(("DMA_CPU HALT=%d\n", HALT_DMA));
+		cputag_set_input_line(device->machine, "dma", INPUT_LINE_HALT, HALT_DMA);
 
 		/* CPU un-halted let it run ! */
-		if (HALT_DMA==CLEAR_LINE)
-			cpu_yield(device->machine->cpu[0]);
+		if (HALT_DMA == CLEAR_LINE)
+			cpu_yield(cputag_get_cpu(device->machine, "maincpu"));
 
-		d_pia1_pa_last=data & 0x80;
+		d_pia1_pa_last = data & 0x80;
 	}
 
 	/* Drive selects are binary encoded on PA0 & PA1 */
-	wd17xx_set_drive(fdc,~data & DSMask);
+	wd17xx_set_drive(fdc, ~data & DSMask);
 
 	/* Set density of WD2797 */
 	if (data & DDenCtrl)
 	{
-		wd17xx_set_density(fdc,DEN_FM_LO);
-		LOG_DISK(("Set density low %d\n",(data & DDenCtrl)));
+		wd17xx_set_density(fdc, DEN_FM_LO);
+		LOG_DISK(("Set density low %d\n", (data & DDenCtrl)));
 	}
 	else
 	{
-		wd17xx_set_density(fdc,DEN_MFM_LO);
-		LOG_DISK(("Set density high %d\n",(data & DDenCtrl)));
+		wd17xx_set_density(fdc, DEN_MFM_LO);
+		LOG_DISK(("Set density high %d\n", (data & DDenCtrl)));
 	}
 }
 
@@ -739,21 +739,21 @@ static WRITE8_DEVICE_HANDLER(d_pia1_pb_w)
 	int	HALT_CPU;
 
 	/* Only play with halt line if halt bit changed since last write */
-	if((data & 0x02)!=d_pia1_pb_last)
+	if((data & 0x02) != d_pia1_pb_last)
 	{
 		/* Bit 1 of $FF26, seems to control HALT on primary CPU */
 		if(data & 0x02)
-			HALT_CPU=CLEAR_LINE;
+			HALT_CPU = CLEAR_LINE;
 		else
-			HALT_CPU=ASSERT_LINE;
-		LOG_HALT(("MAIN_CPU HALT=%d\n",HALT_CPU));
-		cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_HALT, HALT_CPU);
+			HALT_CPU = ASSERT_LINE;
+		LOG_HALT(("MAIN_CPU HALT=%d\n", HALT_CPU));
+		cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_HALT, HALT_CPU);
 
-		d_pia1_pb_last=data & 0x02;
+		d_pia1_pb_last = data & 0x02;
 
 		/* CPU un-halted let it run ! */
-		if (HALT_CPU==CLEAR_LINE)
-			cpu_yield(device->machine->cpu[1]);
+		if (HALT_CPU == CLEAR_LINE)
+			cpu_yield(cputag_get_cpu(device->machine, "dma"));
 	}
 }
 
@@ -787,66 +787,66 @@ static WRITE8_DEVICE_HANDLER(d_pia2_pa_w)
 	int OldEnableMap;
 	int NMI;
 
-	LOG_TASK(("FCC0 write : $%02X\n",data));
+	LOG_TASK(("FCC0 write : $%02X\n", data));
 
 	/* Bit 7 of $FFC0, seems to control NMI on second CPU */
 	NMI=(data & 0x80);
 
 	/* only take action if NMI changed */
-	if(NMI!=DMA_NMI_LAST)
+	if(NMI != DMA_NMI_LAST)
 	{
-		LOG_INTS(("cpu1 NMI : %d\n",NMI));
+		LOG_INTS(("cpu1 NMI : %d\n", NMI));
 		if(!NMI)
 		{
-			cpu_set_input_line(device->machine->cpu[1],INPUT_LINE_NMI,ASSERT_LINE);
+			cputag_set_input_line(device->machine, "dma", INPUT_LINE_NMI, ASSERT_LINE);
 			logerror("cpu_yield()\n");
-			cpu_yield(device->machine->cpu[1]);	/* Let DMA CPU run */
+			cpu_yield(cputag_get_cpu(device->machine, "dma"));	/* Let DMA CPU run */
 		}
 		else
 		{
-			cpu_set_input_line(device->machine->cpu[1],INPUT_LINE_NMI,CLEAR_LINE);
+			cputag_set_input_line(device->machine, "dma", INPUT_LINE_NMI, CLEAR_LINE);
 		}
 
-		DMA_NMI_LAST=NMI;	/* Save it for next time */
+		DMA_NMI_LAST = NMI;	/* Save it for next time */
 	}
 
-	OldEnableMap=EnableMapRegs;
+	OldEnableMap = EnableMapRegs;
 	/* Bit 6 seems to enable memory paging */
 	if(data & 0x40)
-		EnableMapRegs=0;
+		EnableMapRegs = 0;
 	else
-		EnableMapRegs=1;
+		EnableMapRegs = 1;
 
 	/* Bits 0..3 seem to control which task register is selected */
-	OldTask=PIATaskReg;
-	PIATaskReg=data & 0x0F;
+	OldTask = PIATaskReg;
+	PIATaskReg = data & 0x0F;
 
-	LOG_TASK(("OldTask=$%02X EnableMapRegs=%d OldEnableMap=%d\n",OldTask,EnableMapRegs,OldEnableMap));
+	LOG_TASK(("OldTask=$%02X EnableMapRegs=%d OldEnableMap=%d\n", OldTask, EnableMapRegs, OldEnableMap));
 
 	// Maping was enabled or disabled, select apropreate task reg
 	// and map it in
-	if (EnableMapRegs!=OldEnableMap)
+	if (EnableMapRegs != OldEnableMap)
 	{
 		if(EnableMapRegs)
 		{
-			TaskReg=PIATaskReg;
+			TaskReg = PIATaskReg;
 		}
 		else
 		{
-			TaskReg=NoPagingTask;
+			TaskReg = NoPagingTask;
 		}
-		UpdateBanks(device->machine, 0,IOPage+1);
+		UpdateBanks(device->machine, 0, IOPage + 1);
 	}
 	else
 	{
 		// Update ram banks only if task reg changed and mapping enabled
-		if ((PIATaskReg!=OldTask) && (EnableMapRegs))
+		if ((PIATaskReg != OldTask) && (EnableMapRegs))
 		{
-			TaskReg=PIATaskReg;
-			UpdateBanks(device->machine, 0,IOPage+1);
+			TaskReg = PIATaskReg;
+			UpdateBanks(device->machine, 0, IOPage + 1);
 		}
 	}
-	LOG_TASK(("TaskReg=$%02X PIATaskReg=$%02X\n",TaskReg,PIATaskReg));
+	LOG_TASK(("TaskReg=$%02X PIATaskReg=$%02X\n", TaskReg, PIATaskReg));
 }
 
 static READ8_DEVICE_HANDLER(d_pia2_pb_r)
@@ -862,7 +862,7 @@ static WRITE8_DEVICE_HANDLER(d_pia2_pb_w)
 
 static WRITE_LINE_DEVICE_HANDLER( d_pia2_irq_a )
 {
-	logerror("PIA2 IRQ1 state=%02X\n",state);
+	logerror("PIA2 IRQ1 state=%02X\n", state);
 	cpu0_recalc_irq(device->machine, state);
 }
 
@@ -891,8 +891,8 @@ static void cpu0_recalc_irq(running_machine *machine, int state)
 	else
 		IRQ = CLEAR_LINE;
 
-	cpu_set_input_line(machine->cpu[0], M6809_IRQ_LINE, IRQ);
-	LOG_INTS(("cpu0 IRQ : %d\n",IRQ));
+	cputag_set_input_line(machine, "maincpu", M6809_IRQ_LINE, IRQ);
+	LOG_INTS(("cpu0 IRQ : %d\n", IRQ));
 }
 
 static void cpu0_recalc_firq(running_machine *machine, int state)
@@ -906,16 +906,16 @@ static void cpu0_recalc_firq(running_machine *machine, int state)
 	else
 		FIRQ = CLEAR_LINE;
 
-	cpu_set_input_line(machine->cpu[0], M6809_FIRQ_LINE, FIRQ);
+	cputag_set_input_line(machine, "maincpu", M6809_FIRQ_LINE, FIRQ);
 
-	LOG_INTS(("cpu0 FIRQ : %d\n",FIRQ));
+	LOG_INTS(("cpu0 FIRQ : %d\n", FIRQ));
 }
 
 /* CPU 1 */
 
 static void cpu1_recalc_firq(running_machine *machine, int state)
 {
-	cpu_set_input_line(machine->cpu[1], M6809_FIRQ_LINE, state);
+	cputag_set_input_line(machine, "dma", M6809_FIRQ_LINE, state);
 	LOG_INTS(("cpu1 FIRQ : %d\n",state));
 }
 
@@ -1080,39 +1080,39 @@ static void dgnbeta_reset(running_machine *machine)
 	system_rom = memory_region(machine, "maincpu");
 
 	/* Make sure CPU 1 is started out halted ! */
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
+	cputag_set_input_line(machine, "dma", INPUT_LINE_HALT, ASSERT_LINE);
 
 	/* Reset to task 0, and map banks disabled, so standard memory map */
 	/* with ram at $0000-$BFFF, ROM at $C000-FBFF, IO at $FC00-$FEFF */
 	/* and ROM at $FF00-$FFFF */
-	TaskReg=0;
-	PIATaskReg=0;
-	EnableMapRegs=0;
-	memset(PageRegs,0,sizeof(PageRegs));	/* Reset page registers to 0 */
+	TaskReg = 0;
+	PIATaskReg = 0;
+	EnableMapRegs = 0;
+	memset(PageRegs, 0, sizeof(PageRegs));	/* Reset page registers to 0 */
 	SetDefaultTask(machine);
 
 	/* Set pullups on all PIA port A, to match what hardware does */
-	pia6821_set_port_a_z_mask(pia_0,0xFF);
-	pia6821_set_port_a_z_mask(pia_1,0xFF);
-	pia6821_set_port_a_z_mask(pia_2,0xFF);
+	pia6821_set_port_a_z_mask(pia_0, 0xFF);
+	pia6821_set_port_a_z_mask(pia_1, 0xFF);
+	pia6821_set_port_a_z_mask(pia_2, 0xFF);
 
-	d_pia1_pa_last=0x00;
-	d_pia1_pb_last=0x00;
-	RowShifter=0x00;			/* shift register to select row */
-	Keyrow=0x00;				/* Keyboard row being shifted out */
-	d_pia0_pb_last=0x00;			/* Last byte output to pia0 port b */
-	d_pia0_cb2_last=0x00;			/* Last state of CB2 */
+	d_pia1_pa_last = 0x00;
+	d_pia1_pb_last = 0x00;
+	RowShifter = 0x00;			/* shift register to select row */
+	Keyrow = 0x00;				/* Keyboard row being shifted out */
+	d_pia0_pb_last = 0x00;		/* Last byte output to pia0 port b */
+	d_pia0_cb2_last = 0x00;		/* Last state of CB2 */
 
-	KInDat_next=0x00;			/* Next data bit to input */
-	KAny_next=0x00;				/* Next value for KAny */
+	KInDat_next = 0x00;			/* Next data bit to input */
+	KAny_next = 0x00;			/* Next value for KAny */
 
-	DMA_NMI_LAST=0x80;			/* start with DMA NMI inactive, as pulled up */
-//	DMA_NMI=CLEAR_LINE;			/* start with DMA NMI inactive */
+	DMA_NMI_LAST = 0x80;		/* start with DMA NMI inactive, as pulled up */
+//	DMA_NMI = CLEAR_LINE;		/* start with DMA NMI inactive */
 
-	wd17xx_set_density(fdc,DEN_MFM_LO);
-	wd17xx_set_drive(fdc,0);
+	wd17xx_set_density(fdc, DEN_MFM_LO);
+	wd17xx_set_drive(fdc, 0);
 
-	videoram=mess_ram;			/* Point video ram at the start of physical ram */
+	videoram = mess_ram;		/* Point video ram at the start of physical ram */
 }
 
 
@@ -1120,7 +1120,7 @@ MACHINE_START( dgnbeta )
 {
 	dgnbeta_init_video(machine);
 
-	debug_cpu_set_dasm_override(machine->cpu[0],dgnbeta_dasm_override);
+	debug_cpu_set_dasm_override(cputag_get_cpu(machine, "maincpu"), dgnbeta_dasm_override);
 
 	add_reset_callback(machine, dgnbeta_reset);
 	dgnbeta_reset(machine);

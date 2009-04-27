@@ -207,8 +207,8 @@ static void io_iterate(running_machine *machine)
 			break;
 		case IOS_INIT:
 			mailbox_out = 0x08;
-			cpu_set_input_line(machine->cpu[0], TMS7000_IRQ1_LINE, ASSERT_LINE);
-			cpu_set_input_line(machine->cpu[0], TMS7000_IRQ1_LINE, CLEAR_LINE);
+			cputag_set_input_line(machine, "maincpu", TMS7000_IRQ1_LINE, ASSERT_LINE);
+			cputag_set_input_line(machine, "maincpu", TMS7000_IRQ1_LINE, CLEAR_LINE);
 			io_state = IOS_NOP;
 			break;
 		case IOS_RESET:
@@ -224,20 +224,20 @@ static void io_iterate(running_machine *machine)
 			break;
 		case IOS_CHARDEF1:
 			mailbox_out = 0x07;
-			cpu_set_input_line(machine->cpu[0], TMS7000_IRQ1_LINE, ASSERT_LINE);
-			cpu_set_input_line(machine->cpu[0], TMS7000_IRQ1_LINE, CLEAR_LINE);
+			cputag_set_input_line(machine, "maincpu", TMS7000_IRQ1_LINE, ASSERT_LINE);
+			cputag_set_input_line(machine, "maincpu", TMS7000_IRQ1_LINE, CLEAR_LINE);
 			io_state = IOS_CHARDEF2;
 			break;
 		case IOS_CHARDEF2:
 			mailbox_out = 0x04;
-			cpu_set_input_line(machine->cpu[0], TMS7000_IRQ1_LINE, ASSERT_LINE);
-			cpu_set_input_line(machine->cpu[0], TMS7000_IRQ1_LINE, CLEAR_LINE);
+			cputag_set_input_line(machine, "maincpu", TMS7000_IRQ1_LINE, ASSERT_LINE);
+			cputag_set_input_line(machine, "maincpu", TMS7000_IRQ1_LINE, CLEAR_LINE);
 			io_state = IOS_CHARDEF3;
 			break;
 		case IOS_CHARDEF3:
 			mailbox_out = 0xF5;
-			cpu_set_input_line(machine->cpu[0], TMS7000_IRQ1_LINE, ASSERT_LINE);
-			cpu_set_input_line(machine->cpu[0], TMS7000_IRQ1_LINE, CLEAR_LINE);
+			cputag_set_input_line(machine, "maincpu", TMS7000_IRQ1_LINE, ASSERT_LINE);
+			cputag_set_input_line(machine, "maincpu", TMS7000_IRQ1_LINE, CLEAR_LINE);
 			io_state = IOS_CHARDEF4;
 			io_counter = 0;
 			break;
@@ -375,11 +375,11 @@ static void io_iterate(running_machine *machine)
 					0x00,0x48,0xA8,0x90,0x00,0x00,0x00,0x00,0x00,0x00,
 					0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
 				};
-				mailbox_out = fontdata[io_counter+9-2*(io_counter%10)] >> 2;
-				cpu_set_input_line(machine->cpu[0], TMS7000_IRQ1_LINE, ASSERT_LINE);
-				cpu_set_input_line(machine->cpu[0], TMS7000_IRQ1_LINE, CLEAR_LINE);
+				mailbox_out = fontdata[io_counter + 9 - 2 * (io_counter % 10)] >> 2;
+				cputag_set_input_line(machine, "maincpu", TMS7000_IRQ1_LINE, ASSERT_LINE);
+				cputag_set_input_line(machine, "maincpu", TMS7000_IRQ1_LINE, CLEAR_LINE);
 				io_counter++;
-				if (io_counter == 127*10)
+				if (io_counter == 127 * 10)
 					io_state = IOS_NOP;
 			}
 			break;
@@ -395,8 +395,8 @@ static void set_io_hsk(running_machine *machine, int state)
 		if (io_command_ack)
 		{
 			if (io_hsk) {
-				cpu_set_input_line(machine->cpu[0], TMS7000_IRQ1_LINE, ASSERT_LINE);
-				cpu_set_input_line(machine->cpu[0], TMS7000_IRQ1_LINE, CLEAR_LINE);
+				cputag_set_input_line(machine, "maincpu", TMS7000_IRQ1_LINE, ASSERT_LINE);
+				cputag_set_input_line(machine, "maincpu", TMS7000_IRQ1_LINE, CLEAR_LINE);
 			}
 			else
 			{

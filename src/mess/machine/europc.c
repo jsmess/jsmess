@@ -76,7 +76,7 @@ static struct {
 	UINT8 data[16];
 	UINT8 state;
 	AGA_MODE mode;
-} europc_jim= { { 0 } } ;
+} europc_jim = { { 0 } } ;
 
 /*
   250..253 write only 00 be 00 10
@@ -96,45 +96,50 @@ static struct {
 */
 WRITE8_HANDLER ( europc_jim_w )
 {
-	switch (offset) {
+	switch (offset) 
+	{
 	case 2:
-		if (!(data&0x80)) {
-			switch (data) {
+		if (!(data & 0x80)) 
+		{
+			switch (data) 
+			{
 			case 0x1f:
-			case 0x0b: europc_jim.mode=AGA_MONO; break;
+			case 0x0b: europc_jim.mode = AGA_MONO; break;
 			case 0xe: //80 columns?
 			case 0xd: //40 columns?
 			case 0x18:
-			case 0x1a: europc_jim.mode=AGA_COLOR; break;
-			default: europc_jim.mode=AGA_OFF; break;
+			case 0x1a: europc_jim.mode = AGA_COLOR; break;
+			default: europc_jim.mode = AGA_OFF; break;
 			}
 		}
 //		mode= data&0x10?AGA_COLOR:AGA_MONO;
 //		mode= data&0x10?AGA_COLOR:AGA_OFF;
-		pc_aga_set_mode(space->machine,europc_jim.mode);
-		if (data&0x80) europc_jim.state=0;
+		pc_aga_set_mode(space->machine, europc_jim.mode);
+		if (data & 0x80) europc_jim.state = 0;
 		break;
 	case 4:
-		switch(data&0xc0) {
-		case 0x00: cpu_set_clockscale(space->machine->cpu[0], 1.0/2);break;
-		case 0x40: cpu_set_clockscale(space->machine->cpu[0], 3.0/4);break;
-		default: cpu_set_clockscale(space->machine->cpu[0], 1);break;
+		switch(data & 0xc0) 
+		{
+		case 0x00: cpu_set_clockscale(cputag_get_cpu(space->machine, "maincpu"), 1.0 / 2); break;
+		case 0x40: cpu_set_clockscale(cputag_get_cpu(space->machine, "maincpu"), 3.0 / 4); break;
+		default: cpu_set_clockscale(cputag_get_cpu(space->machine, "maincpu"), 1); break;
 		}
 		break;
 	case 0xa:
 		europc_rtc_w(space, 0, data);
 		return;
 	}
-	logerror("jim write %.2x %.2x\n",offset,data);
-	europc_jim.data[offset]=data;
+	logerror("jim write %.2x %.2x\n", offset, data);
+	europc_jim.data[offset] = data;
 }
 
 READ8_HANDLER ( europc_jim_r )
 {
-	int data=0;
-	switch(offset) {
-	case 4: case 5: case 6: case 7: data=europc_jim.data[offset];break;
-	case 0: case 1: case 2: case 3: data=0;break;
+	int data = 0;
+	switch(offset) 
+	{
+	case 4: case 5: case 6: case 7: data = europc_jim.data[offset]; break;
+	case 0: case 1: case 2: case 3: data = 0; break;
 	case 0xa: return europc_rtc_r(space, 0);
 	}
 	return data;
@@ -142,12 +147,14 @@ READ8_HANDLER ( europc_jim_r )
 
 READ8_HANDLER ( europc_jim2_r )
 {
-	switch (europc_jim.state) {
+	switch (europc_jim.state) 
+	{
 	case 0: europc_jim.state++; return 0;
 	case 1: europc_jim.state++; return 0x80;
 	case 2:
-		europc_jim.state=0;
-		switch (europc_jim.mode) {
+		europc_jim.state = 0;
+		switch (europc_jim.mode) 
+		{
 		case AGA_COLOR: return 0x87; // for color;
 		case AGA_MONO: return 0x90; //for mono
 		case AGA_OFF: return 0x80; // for vram
@@ -165,34 +172,37 @@ static struct {
 
 WRITE8_HANDLER( europc_pio_w )
 {
-	switch (offset) {
+	switch (offset) 
+	{
 	case 1:
 		europc_pio.port61=data;
-//		if (data==0x30) pc1640.port62=(pc1640.port65&0x10)>>4;
-//		else if (data==0x34) pc1640.port62=pc1640.port65&0xf;
+//		if (data == 0x30) pc1640.port62 = (pc1640.port65 & 0x10) >> 4;
+//		else if (data == 0x34) pc1640.port62 = pc1640.port65 & 0xf;
 		pit8253_gate_w(devtag_get_device(space->machine, "pit8253"), 2, BIT(data, 0));
 		pc_speaker_set_spkrdata(space->machine, BIT(data, 1));
 		pc_keyb_set_clock(BIT(data, 6));
 		break;
 	}
 
-	logerror("europc pio write %.2x %.2x\n",offset,data);
+	logerror("europc pio write %.2x %.2x\n", offset, data);
 }
 
 
  READ8_HANDLER( europc_pio_r )
 {
-	int data=0;
-	switch (offset) {
+	int data = 0;
+	switch (offset) 
+	{
 	case 0:
 		if (!(europc_pio.port61&0x80))
 			data = pc_keyb_read();
 		break;
 	case 1:
-		data=europc_pio.port61;
+		data = europc_pio.port61;
 		break;
 	case 2:
-		if (pit8253_get_output(devtag_get_device(space->machine, "pit8253"),2)) data|=0x20;
+		if (pit8253_get_output(devtag_get_device(space->machine, "pit8253"), 2)) 
+			data |= 0x20;
 		break;
 	}
 	return data;
@@ -249,21 +259,26 @@ static TIMER_CALLBACK(europc_rtc_timer)
 {
 	int month, year;
 	europc_rtc.data[0]=bcd_adjust(europc_rtc.data[0]+1);
-	if (europc_rtc.data[0]>=0x60) {
+	if (europc_rtc.data[0]>=0x60) 
+	{
 		europc_rtc.data[0]=0;
 		europc_rtc.data[1]=bcd_adjust(europc_rtc.data[1]+1);
-		if (europc_rtc.data[1]>=0x60) {
+		if (europc_rtc.data[1]>=0x60) 
+		{
 			europc_rtc.data[1]=0;
 			europc_rtc.data[2]=bcd_adjust(europc_rtc.data[2]+1);
-			if (europc_rtc.data[2]>=0x24) {
+			if (europc_rtc.data[2]>=0x24) 
+			{
 				europc_rtc.data[2]=0;
 				europc_rtc.data[3]=bcd_adjust(europc_rtc.data[3]+1);
 				month=bcd_2_dec(europc_rtc.data[4]);
 				year=bcd_2_dec(europc_rtc.data[5])+2000; // save for julian_days_in_month_calculation
-				if (europc_rtc.data[3]> gregorian_days_in_month(month, year)) {
+				if (europc_rtc.data[3]> gregorian_days_in_month(month, year)) 
+				{
 					europc_rtc.data[3]=1;
 					europc_rtc.data[4]=bcd_adjust(europc_rtc.data[4]+1);
-					if (europc_rtc.data[4]>0x12) {
+					if (europc_rtc.data[4]>0x12) 
+					{
 						europc_rtc.data[4]=1;
 						europc_rtc.data[5]=bcd_adjust(europc_rtc.data[5]+1)&0xff;
 					}
@@ -285,7 +300,8 @@ void europc_rtc_init(running_machine *machine)
  READ8_HANDLER( europc_rtc_r )
 {
 	int data=0;
-	switch (europc_rtc.state) {
+	switch (europc_rtc.state) 
+	{
 	case 1:
 		data=(europc_rtc.data[europc_rtc.reg]&0xf0)>>4;
 		europc_rtc.state++;
@@ -301,7 +317,8 @@ void europc_rtc_init(running_machine *machine)
 
 WRITE8_HANDLER( europc_rtc_w )
 {
-	switch (europc_rtc.state) {
+	switch (europc_rtc.state) 
+	{
 	case 0:
 		europc_rtc.reg=data;
 		europc_rtc.state=1;
