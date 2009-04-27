@@ -288,6 +288,7 @@ DRVLIBS = \
 	$(MESSOBJ)/kaypro.a \
 	$(MESSOBJ)/kim1.a \
 	$(MESSOBJ)/kramermc.a \
+	$(MESSOBJ)/kyocera.a \
 	$(MESSOBJ)/llc.a \
 	$(MESSOBJ)/luxor.a \
 	$(MESSOBJ)/lviv.a \
@@ -1303,6 +1304,10 @@ $(MESSOBJ)/z80ne.a:	\
 
 $(MESSOBJ)/tec1.a: \
 	$(MESS_DRIVERS)/tec1.o \
+
+$(MESSOBJ)/kyocera.a: \
+	$(MESS_DRIVERS)/kyocera.o \
+	$(MESS_MACHINE)/upd1990a.o \
 
 #-------------------------------------------------
 # layout dependencies

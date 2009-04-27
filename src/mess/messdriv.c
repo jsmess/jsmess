@@ -1140,6 +1140,14 @@ XL/XE 16kB OS roms
 	/* Talking Electronics Magazine */
 	DRIVER( tec1 )			/* Talking Electronics Computer */
 
+	/* Kyocera (and clones) */
+	DRIVER( kyo85 )
+	DRIVER( olivm10 )	
+	DRIVER( trsm100 )
+	DRIVER( trsm102 )
+	DRIVER( trsm200 )
+	DRIVER( npc8201 )
+
 	/* Votrax */
 //	DRIVER( votrtnt ) /* Votrax Type-N-Talk */
 	DRIVER( votrpss ) /* Votrax Personal Speech System */
