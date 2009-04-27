@@ -150,7 +150,7 @@ DEVICE_IMAGE_LOAD( kc85_floppy )
 #if 0
 static void kc85_disc_hw_ctc_interrupt(int state)
 {
-	cpu_set_input_line(machine->cpu[1], 0, state);
+	cputag_set_input_line(machine, "disc", 0, state);
 }
 #endif
 
@@ -235,8 +235,8 @@ const nec765_interface kc_fdc_interface=
 
 static TIMER_CALLBACK(kc85_disk_reset_timer_callback)
 {
-	cpu_set_reg(machine->cpu[1], REG_GENPC, 0x0f000);
-	cpu_set_reg(machine->cpu[0], REG_GENPC, 0x0f000);
+	cpu_set_reg(cputag_get_cpu(machine, "disc"), REG_GENPC, 0x0f000);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), REG_GENPC, 0x0f000);
 }
 
 static void kc_disc_interface_init(running_machine *machine)
@@ -244,7 +244,7 @@ static void kc_disc_interface_init(running_machine *machine)
 	timer_set(machine, attotime_zero, NULL, 0, kc85_disk_reset_timer_callback);
 
 	/* hold cpu at reset */
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(machine, "disc", INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 /*****************/
@@ -1132,7 +1132,7 @@ bit 0: ram 4
 
 static void kc85_4_update_0x08000(running_machine *machine)
 {
-	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	const address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
 	unsigned char *ram_page;
 
     if (kc85_pio_data[1] & (1<<5))
@@ -1201,7 +1201,7 @@ static void kc85_4_update_0x08000(running_machine *machine)
 /* update status of memory area 0x0000-0x03fff */
 static void kc85_4_update_0x00000(running_machine *machine)
 {
-	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	const address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
 
 	/* access ram? */
 	if (kc85_pio_data[0] & (1<<1))
@@ -1244,7 +1244,7 @@ static void kc85_4_update_0x00000(running_machine *machine)
 /* update status of memory area 0x4000-0x07fff */
 static void kc85_4_update_0x04000(running_machine *machine)
 {
-	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	const address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
 	read8_space_func rh;
 	write8_space_func wh;
 
@@ -1295,7 +1295,7 @@ static void kc85_4_update_0x04000(running_machine *machine)
 /* update memory address 0x0c000-0x0e000 */
 static void kc85_4_update_0x0c000(running_machine *machine)
 {
-	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	const address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
 	read8_space_func rh;
 
 	if (kc85_86_data & (1<<7))
@@ -1337,7 +1337,7 @@ static void kc85_4_update_0x0c000(running_machine *machine)
 /* update memory address 0x0e000-0x0ffff */
 static void kc85_4_update_0x0e000(running_machine *machine)
 {
-	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	const address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
 	read8_space_func rh;
 
 	if (kc85_pio_data[0] & (1<<0))
@@ -1453,7 +1453,7 @@ WRITE8_HANDLER ( kc85_4_84_w )
 /* update memory region 0x0c000-0x0e000 */
 static void kc85_3_update_0x0c000(running_machine *machine)
 {
-	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	const address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
 	read8_space_func rh;
 
 	if (kc85_pio_data[0] & (1<<7))
@@ -1476,7 +1476,7 @@ static void kc85_3_update_0x0c000(running_machine *machine)
 /* update memory address 0x0e000-0x0ffff */
 static void kc85_3_update_0x0e000(running_machine *machine)
 {
-	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	const address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
 	read8_space_func rh;
 
 	if (kc85_pio_data[0] & (1<<0))
@@ -1501,7 +1501,7 @@ static void kc85_3_update_0x0e000(running_machine *machine)
 for write operations */
 static void kc85_3_update_0x00000(running_machine *machine)
 {
-	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	const address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
 	read8_space_func rh;
 	write8_space_func wh;
 
@@ -1551,7 +1551,7 @@ static void kc85_3_update_0x00000(running_machine *machine)
 /* SMH_BANK3 is used for read, SMH_BANK8 is used for write */
 static void kc85_3_update_0x08000(running_machine *machine)
 {
-	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	const address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
 	read8_space_func rh;
 	write8_space_func wh;
     unsigned char *ram_page;
@@ -1699,7 +1699,7 @@ static DIRECT_UPDATE_HANDLER( kc85_4_opbaseoverride )
 
 static TIMER_CALLBACK(kc85_reset_timer_callback)
 {
-	cpu_set_reg(machine->cpu[0], REG_GENPC, 0x0f000);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), REG_GENPC, 0x0f000);
 }
 
  READ8_HANDLER ( kc85_pio_data_r )
@@ -1738,12 +1738,12 @@ WRITE8_DEVICE_HANDLER ( kc85_ctc_w )
 
 static void kc85_pio_interrupt(const device_config *device, int state)
 {
-	cpu_set_input_line(device->machine->cpu[0], 0, state);
+	cputag_set_input_line(device->machine, "maincpu", 0, state);
 }
 
 static void kc85_ctc_interrupt(const device_config *device, int state)
 {
-	cpu_set_input_line(device->machine->cpu[0], 1, state);
+	cputag_set_input_line(device->machine, "maincpu", 1, state);
 }
 
 /* callback for ardy output from PIO */

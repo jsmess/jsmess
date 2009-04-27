@@ -28,7 +28,7 @@ UINT8 kaypro2x_system_port;
 
 static WRITE8_DEVICE_HANDLER( kaypro_interrupt )
 {
-	cpu_set_input_line(device->machine->cpu[0], 0, data);
+	cputag_set_input_line(device->machine, "maincpu", 0, data);
 }
 
 static READ8_DEVICE_HANDLER( pio_system_r )
@@ -248,7 +248,7 @@ WRITE8_HANDLER( kaypro2x_baud_a_w )	/* Channel A on 2nd SIO - Serial Printer */
 /* when sio devcb'ed like pio is, change to use pio's int handler */
 static void kaypro_int_sio(const device_config *device, int state)
 {
-	cpu_set_input_line(device->machine->cpu[0], 0, state);
+	cputag_set_input_line(device->machine, "maincpu", 0, state);
 }
 
 const z80sio_interface kaypro_sio_intf =
@@ -337,12 +337,12 @@ static WD17XX_CALLBACK( kaypro_fdc_callback )
 	{
 		case WD17XX_DRQ_CLR:
 		case WD17XX_IRQ_CLR:
-			cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_NMI, 0);
+			cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, 0);
 			break;
 		case WD17XX_DRQ_SET:
 		case WD17XX_IRQ_SET:
-			if (cpu_get_reg(device->machine->cpu[0], Z80_HALT))
-				cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
+			if (cpu_get_reg(cputag_get_cpu(device->machine, "maincpu"), Z80_HALT))
+				cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 			break;
 	}
 }

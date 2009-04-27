@@ -226,7 +226,7 @@ void mac_fdc_set_enable_lines(const device_config *device,int enable_mask)
 static void mac_install_memory(running_machine *machine, offs_t memory_begin, offs_t memory_end,
 	offs_t memory_size, void *memory_data, int is_rom, int bank)
 {
-	const address_space* space = cpu_get_address_space(machine->cpu[0],ADDRESS_SPACE_PROGRAM);
+	const address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	offs_t memory_mask;
 	read16_space_func rh;
 	write16_space_func wh;
@@ -290,13 +290,13 @@ static void mac_field_interrupts(running_machine *machine)
 
 	if (last_taken_interrupt != -1)
 	{
-		cpu_set_input_line(machine->cpu[0], last_taken_interrupt, CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", last_taken_interrupt, CLEAR_LINE);
 		last_taken_interrupt = -1;
 	}
 
 	if (take_interrupt != -1)
 	{
-		cpu_set_input_line(machine->cpu[0], take_interrupt, ASSERT_LINE);
+		cputag_set_input_line(machine, "maincpu", take_interrupt, ASSERT_LINE);
 		last_taken_interrupt = take_interrupt;
 	}
 }
@@ -910,7 +910,7 @@ void mac_scc_mouse_irq(running_machine *machine, int x, int y)
 			scc_set_status(scc, 0x02);
 	}
 
-	//cpu_set_input_line(machine->cpu[0], 2, ASSERT_LINE);
+	//cputag_set_input_line(machine, "maincpu", 2, ASSERT_LINE);
 	set_scc_interrupt(machine, 1);
 }
 
@@ -1770,7 +1770,7 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_b)
 static void mac_via_irq(const device_config *device, int state)
 {
 	/* interrupt the 68k (level 1) */
-	//cpu_set_input_line(machine->cpu[0], 1, state);
+	//cputag_set_input_line(machine, "maincpu", 1, state);
 	set_via_interrupt(device->machine, state);
 }
 
@@ -1843,26 +1843,26 @@ WRITE16_HANDLER ( mac_via2_w )
 
 static READ8_DEVICE_HANDLER(mac_via2_in_a)
 {
-	logerror("VIA2 IN A (PC %x)\n", cpu_get_pc(device->machine->cpu[0]));
+	logerror("VIA2 IN A (PC %x)\n", cpu_get_pc(cputag_get_cpu(device->machine, "maincpu")));
 
 	return 0;
 }
 
 static READ8_DEVICE_HANDLER(mac_via2_in_b)
 {
-	logerror("VIA2 IN B (PC %x)\n", cpu_get_pc(device->machine->cpu[0]));
+	logerror("VIA2 IN B (PC %x)\n", cpu_get_pc(cputag_get_cpu(device->machine, "maincpu")));
 
 	return 0;
 }
 
 static WRITE8_DEVICE_HANDLER(mac_via2_out_a)
 {
-	logerror("VIA2 OUT A: %02x (PC %x)\n", data, cpu_get_pc(device->machine->cpu[0]));
+	logerror("VIA2 OUT A: %02x (PC %x)\n", data, cpu_get_pc(cputag_get_cpu(device->machine, "maincpu")));
 }
 
 static WRITE8_DEVICE_HANDLER(mac_via2_out_b)
 {
-	logerror("VIA2 OUT B: %02x (PC %x)\n", data, cpu_get_pc(device->machine->cpu[0]));
+	logerror("VIA2 OUT B: %02x (PC %x)\n", data, cpu_get_pc(cputag_get_cpu(device->machine, "maincpu")));
 }
 
 /* *************************************************************************
@@ -1960,7 +1960,7 @@ static void mac_driver_init(running_machine *machine, mac_model_t model)
 		// classic will fail RAM test and try to boot appletalk if RAM is not all zero
 		memset(mess_ram, 0, mess_ram_size);
 
-		memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[0],ADDRESS_SPACE_PROGRAM), overlay_opbaseoverride);
+		memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), overlay_opbaseoverride);
 		mac_overlay = 1;
 	}
 
@@ -1969,7 +1969,7 @@ static void mac_driver_init(running_machine *machine, mac_model_t model)
 
 	inquiry_timeout = timer_alloc(machine, inquiry_timeout_func, NULL);
 
-	debug_cpu_set_dasm_override(machine->cpu[0], mac_dasm_override);
+	debug_cpu_set_dasm_override(cputag_get_cpu(machine, "maincpu"), mac_dasm_override);
 
 	/* save state stuff */
 	state_save_register_global(machine, mac_overlay);
@@ -3057,6 +3057,3 @@ static void mac_tracetrap(const char *cpu_name_local, int addr, int trap)
 	logerror("mac_trace_trap: %s at 0x%08x: %s\n",cpu_name_local, addr, buf);
 }
 #endif
-
-
-

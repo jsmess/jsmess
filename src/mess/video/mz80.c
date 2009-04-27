@@ -41,7 +41,7 @@ VIDEO_START( mz80k )
 VIDEO_UPDATE( mz80k )
 {
 	int x,y;
-	const address_space *space = cpu_get_address_space(screen->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	mz80k_vertical = mz80k_vertical ? 0 : 1;	
 	mz80k_cursor_cnt++;
 	if (mz80k_cursor_cnt==64) mz80k_cursor_cnt = 0;

@@ -42,7 +42,7 @@ MACHINE_START( mc10 )
 	mc10_bfff = 0x00;
 	mc10_keyboard_strobe = 0x00;
 
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM),
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),
 			0x4000,	0x4000 + mess_ram_size - 1,	0, 0, SMH_BANK1, SMH_BANK1);
 	memory_set_bankptr(machine, 1, mess_ram);
 

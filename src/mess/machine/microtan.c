@@ -156,7 +156,7 @@ static void microtan_set_irq_line(running_machine *machine)
     /* The 6502 IRQ line is active low and probably driven
        by open collector outputs (guess). Since MAME/MESS use
        a non-0 value for ASSERT_LINE we OR the signals here */
-    cpu_set_input_line(machine->cpu[0], 0, via_0_irq_line | via_1_irq_line | kbd_irq_line);
+    cputag_set_input_line(machine, "maincpu", 0, via_0_irq_line | via_1_irq_line | kbd_irq_line);
 }
 
 static const device_config *cassette_device_image(running_machine *machine)
@@ -388,7 +388,7 @@ WRITE8_HANDLER( microtan_sound_w )
 /* This callback is called one clock cycle after BFF2 is written (delayed nmi) */
 static TIMER_CALLBACK(microtan_pulse_nmi)
 {
-    cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
+    cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 WRITE8_HANDLER ( microtan_bffx_w )
@@ -404,7 +404,7 @@ WRITE8_HANDLER ( microtan_bffx_w )
         break;
     case 1: /* BFF1: write delayed NMI */
         LOG(("microtan_bff1_w: %d <- %02x (delayed NMI)\n", offset, data));
-        timer_set(space->machine, cpu_clocks_to_attotime(space->machine->cpu[0], 8), NULL, 0, microtan_pulse_nmi);
+        timer_set(space->machine, cputag_clocks_to_attotime(space->machine, "maincpu", 8), NULL, 0, microtan_pulse_nmi);
         break;
     case 2: /* BFF2: write keypad column write (what is this meant for?) */
         LOG(("microtan_bff2_w: %d <- %02x (keypad column)\n", offset, data));
@@ -702,18 +702,18 @@ static void microtan_set_cpu_regs(running_machine *machine,const UINT8 *snapshot
     LOG(("microtan_snapshot_copy: PC:%02X%02X P:%02X A:%02X X:%02X Y:%02X SP:1%02X",
         snapshot_buff[base+1], snapshot_buff[base+0], snapshot_buff[base+2], snapshot_buff[base+3],
         snapshot_buff[base+4], snapshot_buff[base+5], snapshot_buff[base+6]);
-    cpu_set_reg(machine->cpu[0], M6502_PC, snapshot_buff[base+0] + 256 * snapshot_buff[base+1]));
-    cpu_set_reg(machine->cpu[0], M6502_P, snapshot_buff[base+2]);
-    cpu_set_reg(machine->cpu[0], M6502_A, snapshot_buff[base+3]);
-    cpu_set_reg(machine->cpu[0], M6502_X, snapshot_buff[base+4]);
-    cpu_set_reg(machine->cpu[0], M6502_Y, snapshot_buff[base+5]);
-    cpu_set_reg(machine->cpu[0], M6502_S, snapshot_buff[base+6]);
+    cpu_set_reg(cputag_get_cpu(machine, "maincpu"), M6502_PC, snapshot_buff[base+0] + 256 * snapshot_buff[base+1]));
+    cpu_set_reg(cputag_get_cpu(machine, "maincpu"), M6502_P, snapshot_buff[base+2]);
+    cpu_set_reg(cputag_get_cpu(machine, "maincpu"), M6502_A, snapshot_buff[base+3]);
+    cpu_set_reg(cputag_get_cpu(machine, "maincpu"), M6502_X, snapshot_buff[base+4]);
+    cpu_set_reg(cputag_get_cpu(machine, "maincpu"), M6502_Y, snapshot_buff[base+5]);
+    cpu_set_reg(cputag_get_cpu(machine, "maincpu"), M6502_S, snapshot_buff[base+6]);
 }
 
 static void microtan_snapshot_copy(running_machine *machine, UINT8 *snapshot_buff, int snapshot_size)
 {
     UINT8 *RAM = memory_region(machine, "maincpu");
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	const device_config *via_0 = devtag_get_device(machine, "via6522_0");
 	const device_config *via_1 = devtag_get_device(machine, "via6522_1");
 	const device_config *ay8910 = devtag_get_device(machine, "ay8910.1");
@@ -869,7 +869,7 @@ DRIVER_INIT( microtan )
 {
     UINT8 *dst = memory_region(machine, "gfx2");
     int i;
-    const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+    const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
     for (i = 0; i < 256; i++)
     {

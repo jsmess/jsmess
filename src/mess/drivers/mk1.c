@@ -164,8 +164,8 @@ static MACHINE_START( mk1 )
 
 static void mk1_interrupt( const device_config *device, UINT16 addr, int level )
 {
-	cpu_set_input_line_vector(device->machine->cpu[0], 0, addr );
-	cpu_set_input_line(device->machine->cpu[0], 0, level ? F8_INT_INTR : F8_INT_NONE );
+	cpu_set_input_line_vector(cputag_get_cpu(device->machine, "maincpu"), 0, addr );
+	cputag_set_input_line(device->machine,"maincpu", 0, level ? F8_INT_INTR : F8_INT_NONE );
 }
 
 

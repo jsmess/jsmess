@@ -175,7 +175,7 @@ INPUT_PORTS_END
 static TIMER_CALLBACK( update_nmi )
 {
 	const device_config *speaker = devtag_get_device(machine, "beep");
-	cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI,PULSE_LINE);
+	cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI,PULSE_LINE);
 	// dac_data_w(0,led_status&64?128:0);
 	beep_set_state(speaker,led_status&64?1:0);
 }
@@ -185,14 +185,14 @@ static MACHINE_START( mephisto )
 	lcd_shift_counter=3;
 	// timer_pulse(machine, ATTOTIME_IN_HZ(60), NULL, 0, update_leds);
 	timer_pulse(machine, ATTOTIME_IN_HZ(600), NULL, 0, update_nmi);
-	// cpu_set_input_line(machine->cpu[0], M65C02_IRQ_LINE,CLEAR_LINE);
+	// cputag_set_input_line(machine, "maincpu", M65C02_IRQ_LINE,CLEAR_LINE);
 	//beep_set_frequency(0, 4000);
 }
 
 
 static MACHINE_RESET( mephisto )
 {
-	lcd_shift_counter=3;
+	lcd_shift_counter = 3;
 }
 
 

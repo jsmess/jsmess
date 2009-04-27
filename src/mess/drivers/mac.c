@@ -68,14 +68,14 @@ static UINT8 mac_asc_regs[0x2000];
 
 static READ8_HANDLER(mac_asc_r)
 {
-	logerror("ASC: Read @ %x (PC %x)\n", offset, cpu_get_pc(space->machine->cpu[0]));
+	logerror("ASC: Read @ %x (PC %x)\n", offset, cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")));
 
 	return mac_asc_regs[offset];
 }
 
 static WRITE8_HANDLER(mac_asc_w)
 {
-	logerror("ASC: %02x to %x (PC %x)\n", data, offset, cpu_get_pc(space->machine->cpu[0]));
+	logerror("ASC: %02x to %x (PC %x)\n", data, offset, cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")));
 
 	mac_asc_regs[offset] = data;
 }
@@ -448,4 +448,3 @@ COMP( 1986,	macplus,  0,		0,	macplus,  macplus,  macplus,		macplus,	"Apple Compu
 COMP( 1987,	macse,    0,		0,	macse,  macplus,  macse,		    macse,		"Apple Computer",	"Macintosh SE",  0 )
 COMP( 1990,	macclasc, 0,		0,	macse,  macplus,  macclassic,		    macse,		"Apple Computer",	"Macintosh Classic",  GAME_NOT_WORKING )
 COMP( 1990,	maclc,    0,		0,  maclc,    macplus,  maclc,		maclc,		"Apple Computer",	"Macintosh LC",  GAME_NOT_WORKING )
-

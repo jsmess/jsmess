@@ -84,7 +84,7 @@ static PIT8253_OUTPUT_CHANGED( pit_out1_changed )
 
 static PIT8253_OUTPUT_CHANGED( pit_out2_changed )
 {
-	cpu_set_input_line(device->machine->cpu[0], 0, HOLD_LINE);
+	cputag_set_input_line(device->machine, "maincpu", 0, HOLD_LINE);
 }
 
 const ppi8255_interface mz80k_8255_int =

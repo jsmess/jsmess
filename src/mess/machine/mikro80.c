@@ -60,9 +60,9 @@ WRITE8_HANDLER (mikro80_8255_portc_w )
 {
 }
 
-static READ8_DEVICE_HANDLER( mikro80_8255_portb_device_r ) { return mikro80_8255_portb_r(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), offset); }
-static READ8_DEVICE_HANDLER( mikro80_8255_portc_device_r ) { return mikro80_8255_portc_r(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), offset); }
-static WRITE8_DEVICE_HANDLER( mikro80_8255_porta_device_w ) { mikro80_8255_porta_w(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), offset, data); }
+static READ8_DEVICE_HANDLER( mikro80_8255_portb_device_r ) { return mikro80_8255_portb_r(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), offset); }
+static READ8_DEVICE_HANDLER( mikro80_8255_portc_device_r ) { return mikro80_8255_portc_r(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), offset); }
+static WRITE8_DEVICE_HANDLER( mikro80_8255_porta_device_w ) { mikro80_8255_porta_w(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), offset, data); }
 
 const ppi8255_interface mikro80_ppi8255_interface =
 {

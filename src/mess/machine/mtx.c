@@ -220,19 +220,19 @@ WRITE8_HANDLER( mtx_bankswitch_w )
 	/* set ram bank, for invalid pages a nop-handler will be installed */
 	if (ram_page >= mess_ram_size/0x8000)
 	{
-		memory_install_readwrite8_handler(cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0, SMH_NOP, SMH_NOP);
-		memory_install_readwrite8_handler(cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, SMH_NOP, SMH_NOP);
+		memory_install_readwrite8_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0, SMH_NOP, SMH_NOP);
+		memory_install_readwrite8_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, SMH_NOP, SMH_NOP);
 	}
 	else if (ram_page + 1 == mess_ram_size/0x8000)
 	{
-		memory_install_readwrite8_handler(cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0, SMH_NOP, SMH_NOP);
-		memory_install_readwrite8_handler(cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, SMH_BANK4, SMH_BANK4);
+		memory_install_readwrite8_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0, SMH_NOP, SMH_NOP);
+		memory_install_readwrite8_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, SMH_BANK4, SMH_BANK4);
 		memory_set_bank(space->machine, 4, ram_page);
 	}
 	else
 	{
-		memory_install_readwrite8_handler(cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0, SMH_BANK3, SMH_BANK3);
-		memory_install_readwrite8_handler(cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, SMH_BANK4, SMH_BANK4);
+		memory_install_readwrite8_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0, SMH_BANK3, SMH_BANK3);
+		memory_install_readwrite8_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, SMH_BANK4, SMH_BANK4);
 		memory_set_bank(space->machine, 3, ram_page);
 		memory_set_bank(space->machine, 4, ram_page);
 	}
@@ -267,7 +267,7 @@ DRIVER_INIT( rs128 )
 
 	/* install handlers for dart interface */
 	device = devtag_get_device(machine, "z80dart");
-	space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO);
+	space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
 	memory_install_readwrite8_device_handler(space, device, 0x0c, 0x0d, 0, 0, z80dart_d_r, z80dart_d_w);
 	memory_install_readwrite8_device_handler(space, device, 0x0e, 0x0f, 0, 0, z80dart_c_r, z80dart_c_w);
 }

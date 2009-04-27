@@ -785,7 +785,7 @@ static void lynx_blitter(running_machine *machine)
 	int i; int o;int colors;
 
 	blitter.memory_accesses = 0;
-	blitter.mem = memory_get_read_ptr(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000);
+	blitter.mem = memory_get_read_ptr(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000);
 
 	blitter.xoff   = GET_WORD(suzy.data, 0x04);
 	blitter.yoff   = GET_WORD(suzy.data, 0x06);
@@ -886,7 +886,7 @@ static void lynx_blitter(running_machine *machine)
 	}
 
 	if (0)
-		timer_set(machine, cpu_clocks_to_attotime(machine->cpu[0], blitter.memory_accesses*20), NULL, 0, lynx_blitter_timer);
+		timer_set(machine, cputag_clocks_to_attotime(machine, "maincpu", blitter.memory_accesses*20), NULL, 0, lynx_blitter_timer);
 }
 
 
@@ -1005,7 +1005,7 @@ READ8_HANDLER( suzy_read )
 		case 0x92:	/* Better check this with docs! */
 			if (!attotime_compare(blitter.time, attotime_zero))
 			{
-				if (cpu_attotime_to_clocks(space->machine->cpu[0], attotime_sub(timer_get_time(space->machine), blitter.time)) > blitter.memory_accesses * 20)
+				if (cputag_attotime_to_clocks(space->machine, "maincpu", attotime_sub(timer_get_time(space->machine), blitter.time)) > blitter.memory_accesses * 20)
 				{
 					suzy.data[offset] &= ~0x01; //blitter finished
 					blitter.time = attotime_zero;
@@ -1361,11 +1361,13 @@ static void lynx_timer_init(running_machine *machine, int which)
 
 static void lynx_timer_signal_irq(running_machine *machine, int which)
 {
-	if ( ( lynx_timer[which].cntrl1 & 0x80 ) && ( which != 4 ) ) { // irq flag handling later
+	if ( ( lynx_timer[which].cntrl1 & 0x80 ) && ( which != 4 ) ) 
+	{ // irq flag handling later
 		mikey.data[0x81] |= ( 1 << which );
-		cpu_set_input_line(machine->cpu[0], M65SC02_IRQ_LINE, ASSERT_LINE);
+		cputag_set_input_line(machine, "maincpu", M65SC02_IRQ_LINE, ASSERT_LINE);
 	}
-	switch ( which ) {
+	switch ( which ) 
+	{
 	case 0:
 		lynx_timer_count_down( machine, 2 );
 		lynx_line++;
@@ -1392,17 +1394,23 @@ static void lynx_timer_signal_irq(running_machine *machine, int which)
 
 void lynx_timer_count_down(running_machine *machine, int which)
 {
-	if ( ( lynx_timer[which].cntrl1 & 0x0f ) == 0x0f ) {
-		if ( lynx_timer[which].counter > 0 ) {
+	if ( ( lynx_timer[which].cntrl1 & 0x0f ) == 0x0f ) 
+	{
+		if ( lynx_timer[which].counter > 0 ) 
+		{
 			lynx_timer[which].counter--;
 			return;
 		}
-		if ( lynx_timer[which].counter == 0 ) {
+		if ( lynx_timer[which].counter == 0 ) 
+		{
 			lynx_timer[which].cntrl2 |= 8;
 			lynx_timer_signal_irq(machine, which);
-			if ( lynx_timer[which].cntrl1 & 0x10 ) {
+			if ( lynx_timer[which].cntrl1 & 0x10 ) 
+			{
 				lynx_timer[which].counter = lynx_timer[which].bakup;
-			} else {
+			} 
+			else 
+			{
 				lynx_timer[which].counter--;
 			}
 			return;
@@ -1544,7 +1552,7 @@ static TIMER_CALLBACK(lynx_uart_timer)
 	if (uart.serctl & 0x80)
 	{
 		mikey.data[0x81] |= 0x10;
-		cpu_set_input_line(machine->cpu[0], M65SC02_IRQ_LINE, ASSERT_LINE);
+		cputag_set_input_line(machine, "maincpu", M65SC02_IRQ_LINE, ASSERT_LINE);
     }
 }
 
@@ -1700,7 +1708,7 @@ WRITE8_HANDLER(mikey_write)
 		mikey.data[0x81] &= ~data; // clear interrupt source
 		logerror("mikey write %.2x %.2x\n", offset, data);
 		if (!mikey.data[0x81])
-			cpu_set_input_line(space->machine->cpu[0], M65SC02_IRQ_LINE, CLEAR_LINE);
+			cputag_set_input_line(space->machine, "maincpu", M65SC02_IRQ_LINE, CLEAR_LINE);
 		break;
 
 	/* Is this correct? */
@@ -1803,9 +1811,9 @@ WRITE8_HANDLER( lynx_memory_config_w )
 static void lynx_reset(running_machine *machine)
 {
 	int i;
-	lynx_memory_config_w(cputag_get_address_space(machine,"maincpu",ADDRESS_SPACE_PROGRAM), 0, 0);
+	lynx_memory_config_w(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0, 0);
 
-	cpu_set_input_line(machine->cpu[0], M65SC02_IRQ_LINE, CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", M65SC02_IRQ_LINE, CLEAR_LINE);
 
 	memset(&suzy, 0, sizeof(suzy));
 	memset(&mikey, 0, sizeof(mikey));
@@ -1839,7 +1847,7 @@ static void lynx_reset(running_machine *machine)
 
 static STATE_POSTLOAD( lynx_postload )
 {
-	lynx_memory_config_w( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0, lynx_memory_config);
+	lynx_memory_config_w( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0, lynx_memory_config);
 }
 
 MACHINE_START( lynx )

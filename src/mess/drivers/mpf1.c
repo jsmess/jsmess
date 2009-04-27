@@ -63,7 +63,7 @@ static TIMER_CALLBACK( check_halt_callback )
 {
 	// halt-LED; the red one, is turned on when the processor is halted
 	// TODO: processor seems to halt, but restarts(?) at 0x0000 after a while -> fix
-	led_halt = (UINT8) device_get_info_int(machine->cpu[0], CPUINFO_INT_REGISTER + Z80_HALT);
+	led_halt = (UINT8) devtag_get_info_int(machine, "maincpu", CPUINFO_INT_REGISTER + Z80_HALT);
 	set_led_status(1, led_tone);
 }
 
@@ -368,7 +368,7 @@ static WRITE8_DEVICE_HANDLER( mpf1_portb_w )
         The next statement converts this to the following assignment: (which is compatible with draw_led())
         bit      7 6 5 4 3 2 1 0
         segment  p g f e d c b a */
-	if( data | ( cpu_get_pc(device->machine->cpu[0]) != 0x63C ) )
+	if( data | ( cpu_get_pc(cputag_get_cpu(device->machine, "maincpu")) != 0x63C ) )
 	{
 		data = ( (data & 0x08) >> 3 ) |
 		       ( (data & 0x10) >> 3 ) |
@@ -435,7 +435,7 @@ static const ppi8255_interface ppi8255_intf =
 
 static TIMER_CALLBACK( irq0_callback )
 {
-	irq0_line_hold( machine->cpu[0] );
+	irq0_line_hold( cputag_get_cpu(machine, "maincpu") );
 }
 
 static MACHINE_RESET( mpf1 )

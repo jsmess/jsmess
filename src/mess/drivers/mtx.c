@@ -240,7 +240,7 @@ static TIMER_DEVICE_CALLBACK( ctc_c1_c2_tick )
 
 static void mtx_ctc_interrupt(const device_config *device, int state)
 {
-	cpu_set_input_line(device->machine->cpu[0], 0, state);
+	cputag_set_input_line(device->machine, "maincpu", 0, state);
 }
 
 

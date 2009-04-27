@@ -163,7 +163,7 @@ static WRITE8_DEVICE_HANDLER ( lviv_ppi_1_portc_w )	/* kayboard scaning */
 
 WRITE8_HANDLER ( lviv_io_w )
 {
-	const address_space *cpuspace = cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *cpuspace = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	if (startup_mem_map)
 	{
 		startup_mem_map = 0;
@@ -221,7 +221,7 @@ const ppi8255_interface lviv_ppi8255_interface_1 =
 
 MACHINE_RESET( lviv )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	memory_set_direct_update_handler(space, lviv_directoverride);
 
 	lviv_video_ram = mess_ram + 0xc000;
@@ -266,22 +266,22 @@ static void lviv_setup_snapshot (running_machine *machine,UINT8 * data)
 	/* Set registers */
 	lo = data[0x14112] & 0x0ff;
 	hi = data[0x14111] & 0x0ff;
-	cpu_set_reg(machine->cpu[0], I8085_BC, (hi << 8) | lo);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), I8085_BC, (hi << 8) | lo);
 	lo = data[0x14114] & 0x0ff;
 	hi = data[0x14113] & 0x0ff;
-	cpu_set_reg(machine->cpu[0], I8085_DE, (hi << 8) | lo);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), I8085_DE, (hi << 8) | lo);
 	lo = data[0x14116] & 0x0ff;
 	hi = data[0x14115] & 0x0ff;
-	cpu_set_reg(machine->cpu[0], I8085_HL, (hi << 8) | lo);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), I8085_HL, (hi << 8) | lo);
 	lo = data[0x14118] & 0x0ff;
 	hi = data[0x14117] & 0x0ff;
-	cpu_set_reg(machine->cpu[0], I8085_AF, (hi << 8) | lo);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), I8085_AF, (hi << 8) | lo);
 	lo = data[0x14119] & 0x0ff;
 	hi = data[0x1411a] & 0x0ff;
-	cpu_set_reg(machine->cpu[0], I8085_SP, (hi << 8) | lo);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), I8085_SP, (hi << 8) | lo);
 	lo = data[0x1411b] & 0x0ff;
 	hi = data[0x1411c] & 0x0ff;
-	cpu_set_reg(machine->cpu[0], I8085_PC, (hi << 8) | lo);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), I8085_PC, (hi << 8) | lo);
 
 	/* Memory dump */
 	memcpy (mess_ram, data+0x0011, 0xc000);
@@ -297,12 +297,12 @@ static void lviv_setup_snapshot (running_machine *machine,UINT8 * data)
 
 static void dump_registers(running_machine *machine)
 {
-	logerror("PC   = %04x\n", (unsigned) cpu_get_reg(machine->cpu[0], I8085_PC));
-	logerror("SP   = %04x\n", (unsigned) cpu_get_reg(machine->cpu[0], I8085_SP));
-	logerror("AF   = %04x\n", (unsigned) cpu_get_reg(machine->cpu[0], I8085_AF));
-	logerror("BC   = %04x\n", (unsigned) cpu_get_reg(machine->cpu[0], I8085_BC));
-	logerror("DE   = %04x\n", (unsigned) cpu_get_reg(machine->cpu[0], I8085_DE));
-	logerror("HL   = %04x\n", (unsigned) cpu_get_reg(machine->cpu[0], I8085_HL));
+	logerror("PC   = %04x\n", (unsigned) cpu_get_reg(cputag_get_cpu(machine, "maincpu"), I8085_PC));
+	logerror("SP   = %04x\n", (unsigned) cpu_get_reg(cputag_get_cpu(machine, "maincpu"), I8085_SP));
+	logerror("AF   = %04x\n", (unsigned) cpu_get_reg(cputag_get_cpu(machine, "maincpu"), I8085_AF));
+	logerror("BC   = %04x\n", (unsigned) cpu_get_reg(cputag_get_cpu(machine, "maincpu"), I8085_BC));
+	logerror("DE   = %04x\n", (unsigned) cpu_get_reg(cputag_get_cpu(machine, "maincpu"), I8085_DE));
+	logerror("HL   = %04x\n", (unsigned) cpu_get_reg(cputag_get_cpu(machine, "maincpu"), I8085_HL));
 }
 
 static int lviv_verify_snapshot (UINT8 * data, UINT32 size)

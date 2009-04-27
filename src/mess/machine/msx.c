@@ -299,7 +299,7 @@ DEVICE_IMAGE_UNLOAD (msx_cart)
 
 void msx_vdp_interrupt(running_machine *machine, int i)
 {
-	cpu_set_input_line (machine->cpu[0], 0, (i ? HOLD_LINE : CLEAR_LINE));
+	cputag_set_input_line (machine, "maincpu", 0, (i ? HOLD_LINE : CLEAR_LINE));
 }
 
 static void msx_ch_reset_core (running_machine *machine)
@@ -473,15 +473,16 @@ DRIVER_INIT( msx )
 
 	memset (&msx1, 0, sizeof (MSX));
 	/* LOAD_DEVICE is called before DRIVER_INIT */
-	for (i=0; i<MSX_MAX_CARTS; i++) {
+	for (i=0; i<MSX_MAX_CARTS; i++) 
+	{
 		msx1.cart_state[i] = cart_state[i];
 	}
 
-	cpu_set_input_line_vector (machine->cpu[0], 0, 0xff);
+	cpu_set_input_line_vector (cputag_get_cpu(machine, "maincpu"), 0, 0xff);
 
 	msx_memory_init (machine);
 
-	z80_set_cycle_tables( machine->cpu[0], cc_op, cc_cb, cc_ed, cc_xy, cc_xycb, cc_ex );
+	z80_set_cycle_tables( cputag_get_cpu(machine, "maincpu"), cc_op, cc_cb, cc_ed, cc_xy, cc_xycb, cc_ex );
 }
 
 INTERRUPT_GEN( msx2_interrupt )

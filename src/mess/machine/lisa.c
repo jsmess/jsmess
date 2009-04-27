@@ -224,25 +224,25 @@ static void lisa_field_interrupts(running_machine *machine)
 
 	/*if (RSIR)
 		// serial interrupt
-		cpu_set_input_line_and_vector(machine->cpu[0], M68K_IRQ_6, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_6, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
 	else if (int0)
 		// external interrupt
-		cpu_set_input_line_and_vector(machine->cpu[0], M68K_IRQ_5, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_5, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
 	else if (int1)
 		// external interrupt
-		cpu_set_input_line_and_vector(machine->cpu[0], M68K_IRQ_4, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_4, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
 	else if (int2)
 		// external interrupt
-		cpu_set_input_line_and_vector(machine->cpu[0], M68K_IRQ_3, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_3, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
 	else*/ if (KBIR)
 		/* COPS VIA interrupt */
-		cpu_set_input_line_and_vector(machine->cpu[0], M68K_IRQ_2, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_2, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
 	else if (FDIR || VTIR)
 		/* floppy disk or VBl */
-		cpu_set_input_line_and_vector(machine->cpu[0], M68K_IRQ_1, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_1, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
 	else
 		/* clear all interrupts */
-		cpu_set_input_line_and_vector(machine->cpu[0], M68K_IRQ_1, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
+		cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_1, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
 }
 
 static void set_parity_error_pending(running_machine *machine, int value)
@@ -252,18 +252,18 @@ static void set_parity_error_pending(running_machine *machine, int value)
 	parity_error_pending = value;
 	if (parity_error_pending)
 	{
-		cpu_set_input_line_and_vector(machine->cpu[0], M68K_IRQ_7, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_7, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
 	}
 	else
 	{
-		cpu_set_input_line(machine->cpu[0], M68K_IRQ_7, CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", M68K_IRQ_7, CLEAR_LINE);
 	}
 #else
 	/* work-around... */
 	if ((! parity_error_pending) && value)
 	{
 		parity_error_pending = 1;
-		cpu_set_input_line_and_vector(machine->cpu[0], M68K_IRQ_7, PULSE_LINE, M68K_INT_ACK_AUTOVECTOR);
+		cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_7, PULSE_LINE, M68K_INT_ACK_AUTOVECTOR);
 	}
 	else if (parity_error_pending && (! value))
 	{
@@ -426,8 +426,8 @@ static void scan_keyboard(running_machine *machine)
 #if 0
 						if (keycode == NMIcode)
 						{	/* generate NMI interrupt */
-							cpu_set_input_line(machine->cpu[0], M68K_IRQ_7, PULSE_LINE);
-							cpu_set_input_line_vector(machine->cpu[0], M68K_IRQ_7, M68K_INT_ACK_AUTOVECTOR);
+							cputag_set_input_line(machine, "maincpu", M68K_IRQ_7, PULSE_LINE);
+							cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), M68K_IRQ_7, M68K_INT_ACK_AUTOVECTOR);
 						}
 #endif
 						COPS_queue_data(machine, & keycode, 1);
@@ -969,7 +969,7 @@ static DIRECT_UPDATE_HANDLER (lisa_OPbaseoverride)
 
 	}
 
-	if (cpu_get_reg(space->machine->cpu[0], M68K_SR) & 0x2000)
+	if (cpu_get_reg(cputag_get_cpu(space->machine, "maincpu"), M68K_SR) & 0x2000)
 		/* supervisor mode -> force register file 0 */
 		the_seg = 0;
 
@@ -1139,10 +1139,10 @@ MACHINE_RESET( lisa )
 
 	videoROM_ptr = memory_region(machine, "gfx1");
 
-	memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[0],ADDRESS_SPACE_PROGRAM), lisa_OPbaseoverride);
-	memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[1],ADDRESS_SPACE_PROGRAM), lisa_fdc_OPbaseoverride);
+	memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), lisa_OPbaseoverride);
+	memory_set_direct_update_handler(cputag_get_address_space(machine, "fdccpu",  ADDRESS_SPACE_PROGRAM), lisa_fdc_OPbaseoverride);
 
-	device_set_info_fct(machine->cpu[0], CPUINFO_FCT_M68K_RESET_CALLBACK, (genf *)/*lisa_reset_instr_callback*/NULL);
+	devtag_set_info_fct(machine, "maincpu", CPUINFO_FCT_M68K_RESET_CALLBACK, (genf *)/*lisa_reset_instr_callback*/NULL);
 
 	/* init MMU */
 
@@ -1499,7 +1499,7 @@ READ16_HANDLER ( lisa_r )
 		}
 	}
 
-	if (cpu_get_reg(space->machine->cpu[0], M68K_SR) & 0x2000)
+	if (cpu_get_reg(cputag_get_cpu(space->machine, "maincpu"), M68K_SR) & 0x2000)
 		/* supervisor mode -> force register file 0 */
 		the_seg = 0;
 
@@ -1603,12 +1603,12 @@ READ16_HANDLER ( lisa_r )
 					if ((time_in_frame >= 364) && (time_in_frame <= 375))
 					{
 						answer = videoROM_ptr[videoROM_address|0x80] << 8;
-  				logerror("reading1 %06X=%04x PC=%06x time=%d\n", address, answer, cpu_get_pc(space->machine->cpu[0]), time_in_frame);
+  				logerror("reading1 %06X=%04x PC=%06x time=%d\n", address, answer, cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")), time_in_frame);
 					}
 					else
 					{
 						answer = videoROM_ptr[videoROM_address] << 8;
-  				logerror("reading2 %06X=%04x PC=%06x time=%d\n", address, answer, cpu_get_pc(space->machine->cpu[0]), time_in_frame);
+  				logerror("reading2 %06X=%04x PC=%06x time=%d\n", address, answer, cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")), time_in_frame);
 					}
 				}
 
@@ -1707,7 +1707,7 @@ WRITE16_HANDLER ( lisa_w )
 		}
 	}
 
-	if (cpu_get_reg(space->machine->cpu[0], M68K_SR) & 0x2000)
+	if (cpu_get_reg(cputag_get_cpu(space->machine, "maincpu"), M68K_SR) & 0x2000)
 		/* supervisor mode -> force register file 0 */
 		the_seg = 0;
 
@@ -1869,19 +1869,19 @@ INLINE void cpu_board_control_access(running_machine *machine, offs_t offset)
 		seg &= ~2;
 		break;
 	case 0x0010:	/* SETUP register SET */
-    	logerror("setup SET PC=%x\n", cpu_get_pc(machine->cpu[0]));
+    	logerror("setup SET PC=%x\n", cpu_get_pc(cputag_get_cpu(machine, "maincpu")));
 		setup = 1;
 		break;
 	case 0x0012:	/* SETUP register RESET */
-    	logerror("setup UNSET PC=%x\n", cpu_get_pc(machine->cpu[0]));
+    	logerror("setup UNSET PC=%x\n", cpu_get_pc(cputag_get_cpu(machine, "maincpu")));
 		setup = 0;
 		break;
 	case 0x001A:	/* Enable Vertical Retrace Interrupt */
-    	logerror("enable retrace PC=%x\n", cpu_get_pc(machine->cpu[0]));
+    	logerror("enable retrace PC=%x\n", cpu_get_pc(cputag_get_cpu(machine, "maincpu")));
 		VTMSK = 1;
 		break;
 	case 0x0018:	/* Disable Vertical Retrace Interrupt */
-    	logerror("disable retrace PC=%x\n", cpu_get_pc(machine->cpu[0]));
+    	logerror("disable retrace PC=%x\n", cpu_get_pc(cputag_get_cpu(machine, "maincpu")));
 		VTMSK = 0;
 		set_VTIR(machine, 2);
 		break;
@@ -2017,7 +2017,7 @@ static READ16_HANDLER ( lisa_IO_r )
 			else
 						answer |= 0x04;
 			/* huh... we need to emulate some other bits */
-			 logerror("read status PC=%x val=%x\n", cpu_get_pc(space->machine->cpu[0]),answer);
+			 logerror("read status PC=%x val=%x\n", cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")), answer);
 
 			break;
 		}
