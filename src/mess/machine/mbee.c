@@ -5,22 +5,12 @@
     machine driver
 	Juergen Buchmueller <pullmoll@t-online.de>, Jan 2000
 
-	"busnop" emulation by R. Belmont, May 2006.
-
-	"busnop" is a trick by which all reads from 0x0000-0x7FFF are held at 0x00
-	until A15 is asserted.  The Z80 NOP instruction is 0x00, so the effect is
-	to cause reset to skip all memory up to 0x8000, where the actual handling
-	code resides.
 
 ****************************************************************************/
 
 #include "driver.h"
-#include "machine/z80ctc.h"
-#include "machine/z80pio.h"
-#include "machine/z80sio.h"
 #include "machine/wd17xx.h"
 #include "includes/mbee.h"
-#include "devices/cassette.h"
 #include "cpu/z80/z80.h"
 
 
@@ -28,8 +18,6 @@ static UINT8 fdc_drv = 0;
 static UINT8 fdc_head = 0;
 static UINT8 fdc_den = 0;
 static UINT8 fdc_status = 0;
-
-UINT8 *mbee_workram;
 
 
 /*
@@ -48,6 +36,10 @@ MACHINE_RESET( mbee )
 {
 	timer_set(machine, ATTOTIME_IN_USEC(4), NULL, 0, mbee_reset);
 	memory_set_bank(machine, 1, 1);
+	mbee_z80pio = devtag_get_device(machine, "z80pio");
+	mbee_speaker = devtag_get_device(machine, "speaker");
+	mbee_cassette = devtag_get_device(machine, "cassette");
+	mbee_printer = devtag_get_device(machine, "centronics");
 }
 
 static WD17XX_CALLBACK( mbee_fdc_callback )
@@ -105,19 +97,3 @@ WRITE8_HANDLER ( mbee_fdc_motor_w )
 
 }
 
-DEVICE_IMAGE_LOAD( mbee_cart )
-{
-	int size = image_length(image);
-	UINT8 *mem = malloc(size);
-	if (!mem)
-		return INIT_FAIL;
-
-	{
-		if( image_fread(image, mem, size) == size )
-		{
-			memcpy(memory_region(image->machine, "maincpu")+0x8000, mem, size);
-		}
-		free(mem);
-	}
-	return INIT_PASS;
-}

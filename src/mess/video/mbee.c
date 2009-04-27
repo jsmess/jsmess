@@ -44,7 +44,6 @@ static UINT8 m6545_color_bank = 0;
 static UINT8 m6545_video_bank = 0;
 static UINT8 mbee_pcg_color_latch = 0;
 
-int mbee_frame_counter;
 UINT8 *mbee_pcgram;
 
 static UINT8 mc6845_cursor[16];				// cursor shape
