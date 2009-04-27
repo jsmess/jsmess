@@ -61,7 +61,7 @@ static READ8_HANDLER (b2m_keyboard_r )
 static void b2m_set_bank(running_machine *machine,int bank) 
 {
 	UINT8 *rom;
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	
 	memory_install_write8_handler(space, 0x0000, 0x27ff, 0, 0, SMH_BANK1);
 	memory_install_write8_handler(space, 0x2800, 0x2fff, 0, 0, SMH_BANK2);
@@ -283,7 +283,7 @@ const ppi8255_interface b2m_ppi8255_interface_3 =
 
 static PIC8259_SET_INT_LINE( b2m_pic_set_int_line )
 {		
-	cpu_set_input_line(device->machine->cpu[0],0,interrupt ?  HOLD_LINE : CLEAR_LINE);  
+	cputag_set_input_line(device->machine, "maincpu", 0, interrupt ?  HOLD_LINE : CLEAR_LINE);  
 } 
 static UINT8 vblank_state = 0;
 
@@ -346,7 +346,7 @@ INTERRUPT_GEN (b2m_vblank_interrupt)
 {	
 	vblank_state++;
 	if (vblank_state>1) vblank_state=0;
-	pic8259_set_irq_line((device_config*)devtag_get_device(device->machine, "pic8259"),0,vblank_state);		
+	pic8259_set_irq_line((device_config*)devtag_get_device(device->machine, "pic8259"), 0, vblank_state);		
 }
 
 MACHINE_RESET(b2m)
@@ -356,8 +356,8 @@ MACHINE_RESET(b2m)
 	b2m_side = 0;
 	b2m_drive = 0;
 
-	cpu_set_irq_callback(machine->cpu[0], b2m_irq_callback);
-	b2m_set_bank(machine,7);
+	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), b2m_irq_callback);
+	b2m_set_bank(machine, 7);
 }
 
 DEVICE_IMAGE_LOAD( b2m_floppy )

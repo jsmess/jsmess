@@ -210,7 +210,7 @@ static INTERRUPT_GEN( crvision_int )
 
 static void crvision_vdp_interrupt(running_machine *machine, int state)
 {
-	cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ0, state);
+	cputag_set_input_line(machine, M6502_TAG, INPUT_LINE_IRQ0, state);
 }
 
 static const TMS9928a_interface tms9918_intf =
@@ -422,46 +422,46 @@ static DEVICE_IMAGE_LOAD( crvision_cart )
 	{
 	case 0x1000: // 4K
 		image_fread(image, mem + 0x9000, 0x1000);
-		memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0x9fff, 0, 0x2000, SMH_BANK1);
+		memory_install_read8_handler(cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM), 0x8000, 0x9fff, 0, 0x2000, SMH_BANK1);
 		break;
 
 	case 0x1800: // 6K
 		image_fread(image, mem + 0x9000, 0x1000);
 		image_fread(image, mem + 0x8800, 0x0800);
-		memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0x9fff, 0, 0x2000, SMH_BANK1);
+		memory_install_read8_handler(cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM), 0x8000, 0x9fff, 0, 0x2000, SMH_BANK1);
 		break;
 
 	case 0x2000: // 8K
 		image_fread(image, mem + 0x8000, 0x2000);
-		memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0x9fff, 0, 0x2000, SMH_BANK1);
+		memory_install_read8_handler(cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM), 0x8000, 0x9fff, 0, 0x2000, SMH_BANK1);
 		break;
 
 	case 0x2800: // 10K
 		image_fread(image, mem + 0x8000, 0x2000);
 		image_fread(image, mem + 0x5800, 0x0800);
-		memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0x9fff, 0, 0x2000, SMH_BANK1);
-		memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4000, 0x5fff, 0, 0x2000, SMH_BANK2);
+		memory_install_read8_handler(cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM), 0x8000, 0x9fff, 0, 0x2000, SMH_BANK1);
+		memory_install_read8_handler(cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM), 0x4000, 0x5fff, 0, 0x2000, SMH_BANK2);
 		break;
 
 	case 0x3000: // 12K
 		image_fread(image, mem + 0x8000, 0x2000);
 		image_fread(image, mem + 0x5000, 0x1000);
-		memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0x9fff, 0, 0x2000, SMH_BANK1);
-		memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4000, 0x5fff, 0, 0x2000, SMH_BANK2);
+		memory_install_read8_handler(cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM), 0x8000, 0x9fff, 0, 0x2000, SMH_BANK1);
+		memory_install_read8_handler(cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM), 0x4000, 0x5fff, 0, 0x2000, SMH_BANK2);
 		break;
 
 	case 0x4000: // 16K
 		image_fread(image, mem + 0xa000, 0x2000);
 		image_fread(image, mem + 0x8000, 0x2000);
-		memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, SMH_BANK1);
+		memory_install_read8_handler(cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, SMH_BANK1);
 		break;
 
 	case 0x4800: // 18K
 		image_fread(image, mem + 0xa000, 0x2000);
 		image_fread(image, mem + 0x8000, 0x2000);
 		image_fread(image, mem + 0x4800, 0x0800);
-		memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0x8fff, 0, 0, SMH_BANK1);
-		memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4000, 0x4fff, 0, 0x3000, SMH_BANK2);
+		memory_install_read8_handler(cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM), 0x8000, 0x8fff, 0, 0, SMH_BANK1);
+		memory_install_read8_handler(cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM), 0x4000, 0x4fff, 0, 0x3000, SMH_BANK2);
 		break;
 
 	default:

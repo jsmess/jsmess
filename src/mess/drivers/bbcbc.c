@@ -87,7 +87,7 @@ INPUT_PORTS_END
 
 static void tms_interrupt(running_machine *machine, int dummy)
 {
-	cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
+	cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( bbcbc_interrupt )
@@ -166,4 +166,3 @@ ROM_END
 
 /*   YEAR  NAME  PARENT  COMPAT  MACHINE INPUT  INIT  CONFIG  COMPANY  FULLNAME  FLAGS */
 CONS(1985, bbcbc,     0, 0,      bbcbc,  bbcbc, 0,    0,  "BBC",   "Bridge Companion", GAME_NOT_WORKING )
-

@@ -195,7 +195,7 @@ READ64_HANDLER( bebox_crossproc_interrupts_r )
 	result = bebox_crossproc_interrupts;
 
 	/* return a different result depending on which CPU is accessing this handler */
-	if (space != cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM))
+	if (space != cputag_get_address_space(space->machine, "ppc1", ADDRESS_SPACE_PROGRAM))
 		result |= 0x02000000;
 	else
 		result &= ~0x02000000;
@@ -220,6 +220,7 @@ WRITE64_HANDLER( bebox_crossproc_interrupts_w )
 	};
 	int i, line;
 	UINT32 old_crossproc_interrupts = bebox_crossproc_interrupts;
+	static const char *const cputags[] = { "ppc1", "ppc2" };
 
 	bebox_mbreg32_w(&bebox_crossproc_interrupts, data, mem_mask);
 
@@ -241,7 +242,7 @@ WRITE64_HANDLER( bebox_crossproc_interrupts_w )
 					*/
 			}
 
-			cpu_set_input_line(space->machine->cpu[crossproc_map[i].cpunum], crossproc_map[i].inputline, line);
+			cputag_set_input_line(space->machine, cputags[crossproc_map[i].cpunum], crossproc_map[i].inputline, line);
 		}
 	}
 }
@@ -252,7 +253,7 @@ WRITE64_HANDLER( bebox_processor_resets_w )
 
 	if (b & 0x20)
 	{
-		cpu_set_input_line( space->machine->cpu[1], INPUT_LINE_RESET, (b & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+		cputag_set_input_line(space->machine, "ppc2", INPUT_LINE_RESET, (b & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 	}
 }
 
@@ -261,6 +262,7 @@ static void bebox_update_interrupts(running_machine *machine)
 {
 	int cpunum;
 	UINT32 interrupt;
+	static const char *const cputags[] = { "ppc1", "ppc2" };
 
 	for (cpunum = 0; cpunum < 2; cpunum++)
 	{
@@ -272,7 +274,7 @@ static void bebox_update_interrupts(running_machine *machine)
 				bebox_interrupts, bebox_cpu_imask[cpunum], interrupt ? "on" : "off");
 		}
 
-		cpu_set_input_line(machine->cpu[cpunum], INPUT_LINE_IRQ0, interrupt ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(machine, cputags[cpunum], INPUT_LINE_IRQ0, interrupt ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -322,8 +324,8 @@ static void bebox_set_irq_bit(running_machine *machine, unsigned int interrupt_b
 		assert_always((interrupt_bit < ARRAY_LENGTH(interrupt_names)) && (interrupt_names[interrupt_bit] != NULL), "Raising invalid interrupt");
 
 		logerror("bebox_set_irq_bit(): pc[0]=0x%08x pc[1]=0x%08x %s interrupt #%u (%s)\n",
-			(unsigned) cpu_get_reg( machine->cpu[0], REG_GENPC),
-			(unsigned) cpu_get_reg( machine->cpu[1], REG_GENPC),
+			(unsigned) cpu_get_reg(cputag_get_cpu(machine, "ppc1"), REG_GENPC),
+			(unsigned) cpu_get_reg(cputag_get_cpu(machine, "ppc2"), REG_GENPC),
 			val ? "Asserting" : "Clearing",
 			interrupt_bit, interrupt_names[interrupt_bit]);
 	}
@@ -586,7 +588,7 @@ static WRITE64_HANDLER( bebox_vga_memory_w )
 
 static void bebox_map_vga_memory(running_machine *machine, offs_t begin, offs_t end, read8_space_func rh, write8_space_func wh)
 {
-	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	const address_space *space = cputag_get_address_space(machine, "ppc1", ADDRESS_SPACE_PROGRAM);
 
 	read64_space_func rh64 = (rh == SMH_BANK4) ? SMH_BANK4 : bebox_vga_memory_r;
 	write64_space_func wh64 = (wh == SMH_BANK4) ? SMH_BANK4 : bebox_vga_memory_w;
@@ -722,7 +724,7 @@ WRITE64_HANDLER(bebox_80000480_w)
 
 static DMA8237_MEM_READ( bebox_dma_read_byte )
 {
-	const address_space *space = cpu_get_address_space( device->machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	const address_space *space = cputag_get_address_space(device->machine, "ppc1", ADDRESS_SPACE_PROGRAM);
 	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
 		& 0x7FFF0000;
 	return memory_read_byte(space, page_offset + offset);
@@ -731,7 +733,7 @@ static DMA8237_MEM_READ( bebox_dma_read_byte )
 
 static DMA8237_MEM_WRITE( bebox_dma_write_byte )
 {
-	const address_space *space = cpu_get_address_space( device->machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	const address_space *space = cputag_get_address_space(device->machine, "ppc1", ADDRESS_SPACE_PROGRAM);
 	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
 		& 0x7FFF0000;
 	memory_write_byte(space, page_offset + offset, data);
@@ -952,7 +954,7 @@ static WRITE64_HANDLER( scsi53c810_w )
 static UINT32 scsi53c810_fetch(running_machine *machine, UINT32 dsp)
 {
 	UINT32 result;
-	result = memory_read_dword_64be( cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM ), dsp & 0x7FFFFFFF);
+	result = memory_read_dword_64be(cputag_get_address_space(machine, "ppc1", ADDRESS_SPACE_PROGRAM), dsp & 0x7FFFFFFF);
 	return BYTE_REVERSE32(result);
 }
 
@@ -1018,7 +1020,7 @@ void scsi53c810_pci_write(const device_config *busdevice, const device_config *d
 					/* brutal ugly hack; at some point the PCI code should be handling this stuff */
 					if (scsi53c810_data[5] != 0xFFFFFFF0)
 					{
-						const address_space *space = cpu_get_address_space( device->machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+						const address_space *space = cputag_get_address_space(device->machine, "ppc1", ADDRESS_SPACE_PROGRAM);
 
 						addr = (scsi53c810_data[5] | 0xC0000000) & ~0xFF;
 						memory_install_read64_handler(space, addr, addr + 0xFF, 0, 0, scsi53c810_r);
@@ -1077,8 +1079,8 @@ MACHINE_RESET( bebox )
 
 	timer_set(machine,  attotime_zero, NULL, 0, bebox_get_devices );
 
-	cpu_set_input_line(machine->cpu[0], INPUT_LINE_RESET, CLEAR_LINE);
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(machine, "ppc1", INPUT_LINE_RESET, CLEAR_LINE);
+	cputag_set_input_line(machine, "ppc2", INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static void bebox_exit(running_machine *machine)
@@ -1096,8 +1098,8 @@ MACHINE_START( bebox )
 
 DRIVER_INIT( bebox )
 {
-	const address_space *space_0 = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
-	const address_space *space_1 = cpu_get_address_space( machine->cpu[1], ADDRESS_SPACE_PROGRAM );
+	const address_space *space_0 = cputag_get_address_space(machine, "ppc1", ADDRESS_SPACE_PROGRAM);
+	const address_space *space_1 = cputag_get_address_space(machine, "ppc2", ADDRESS_SPACE_PROGRAM);
 	offs_t vram_begin;
 	offs_t vram_end;
 

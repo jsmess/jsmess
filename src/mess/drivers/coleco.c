@@ -468,7 +468,9 @@ static void coleco_vdp_interrupt(running_machine *machine, int state)
 	static int last_state = 0;
 
     // only if it goes up
-	if (state && !last_state) cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
+	if (state && !last_state) 
+		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+
 	last_state = state;
 }
 
@@ -516,7 +518,7 @@ static TIMER_CALLBACK( paddle_callback )
 		joy_status[1] = 1;
 
     if (joy_status[0] || joy_status[1])
-		cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ0, HOLD_LINE);
+		cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ0, HOLD_LINE);
 }
 
 /* Machine Initialization */
@@ -536,7 +538,7 @@ static MACHINE_START( coleco )
 
 static MACHINE_RESET( coleco )
 {
-    cpu_set_input_line_vector(machine->cpu[0], INPUT_LINE_IRQ0, 0xff);
+    cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), INPUT_LINE_IRQ0, 0xff);
 	memset(&memory_region(machine, "maincpu")[0x6000], 0xff, 0x400);	// initialize RAM
     timer_pulse(machine, ATTOTIME_IN_MSEC(20), NULL, 0, paddle_callback);
 }

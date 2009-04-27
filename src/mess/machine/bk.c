@@ -62,7 +62,7 @@ static TIMER_CALLBACK(keyboard_callback)
 			{
 				key_irq_vector = 0xBC;
 			}
-			cpu_set_input_line(machine->cpu[0], 0, ASSERT_LINE);
+			cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 			break;
 		}
 	}
@@ -82,45 +82,56 @@ static IRQ_CALLBACK(bk0010_irq_callback)
 
 MACHINE_RESET( bk0010 )
 {
-	cpu_set_irq_callback(machine->cpu[0], bk0010_irq_callback);
+	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), bk0010_irq_callback);
 	timer_pulse(machine, ATTOTIME_IN_HZ(2400), NULL, 0, keyboard_callback);
 
 	kbd_state = 0;
 	bk_scrool = 01330;
 }
 
-READ16_HANDLER (bk_key_state_r) {		
+READ16_HANDLER (bk_key_state_r) 
+{		
 	return kbd_state;
 }
-READ16_HANDLER (bk_key_code_r) {
+READ16_HANDLER (bk_key_code_r) 
+{
 	kbd_state &= ~0x80; // mark reading done
 	key_pressed = 0;
 	return key_code;
 }
-READ16_HANDLER (bk_vid_scrool_r) {
+READ16_HANDLER (bk_vid_scrool_r) 
+{
 	return bk_scrool;
 }
 
-READ16_HANDLER (bk_key_press_r) {
+READ16_HANDLER (bk_key_press_r) 
+{
 	double level = cassette_input(devtag_get_device(space->machine, "cassette"));	 									 					
 	UINT16 cas;
-	if (level < 0) { 
+	if (level < 0) 
+	{ 
 	 	cas = 0x00; 
- 	} else {
+ 	} 
+	else 
+	{
 		cas = 0x20;
 	}
 
 	return 0x8080 | key_pressed | cas;
 }
 
-WRITE16_HANDLER(bk_key_state_w) {
+WRITE16_HANDLER(bk_key_state_w) 
+{
 	kbd_state = (kbd_state & ~0x40) | (data & 0x40);
 }
-WRITE16_HANDLER(bk_vid_scrool_w) {
+
+WRITE16_HANDLER(bk_vid_scrool_w) 
+{
 	bk_scrool = data;
 }
 
-WRITE16_HANDLER(bk_key_press_w) {
+WRITE16_HANDLER(bk_key_press_w) 
+{
 }
 
 READ16_HANDLER (bk_floppy_cmd_r)
@@ -130,19 +141,24 @@ READ16_HANDLER (bk_floppy_cmd_r)
 
 WRITE16_HANDLER(bk_floppy_cmd_w)
 {
-	if ((data & 1)==1) {
+	if ((data & 1) == 1) 
+	{
 		bk_drive = 0;
 	}
-	if ((data & 2)==2) {
+	if ((data & 2) == 2) 
+	{
 		bk_drive = 1;
 	}
-	if ((data & 4)==4) {
+	if ((data & 4) == 4) 
+	{
 		bk_drive = 2;
 	}
-	if ((data & 8)==8) {
+	if ((data & 8) == 8) 
+	{
 		bk_drive = 3;
 	}
-	if (data==0) {
+	if (data == 0) 
+	{
 		bk_drive = -1;
 	}
 }

@@ -95,7 +95,7 @@ static TIMER_CALLBACK( handle_cassette_input )
 
 MACHINE_RESET( cgenie )
 {
-	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	const device_config *ay8910 = devtag_get_device(machine, "ay8910");
 	UINT8 *ROM = memory_region(machine, "maincpu");
 
@@ -177,7 +177,7 @@ MACHINE_RESET( cgenie )
 
 MACHINE_START( cgenie )
 {
-	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *gfx = memory_region(machine, "gfx2");
 	int i;
 
@@ -560,7 +560,7 @@ INTERRUPT_GEN( cgenie_timer_interrupt )
 	if( (irq_status & IRQ_TIMER) == 0 )
 	{
 		irq_status |= IRQ_TIMER;
-		cpu_set_input_line(device->machine->cpu[0], 0, HOLD_LINE);
+		cputag_set_input_line(device->machine, "maincpu", 0, HOLD_LINE);
 	}
 }
 
@@ -579,7 +579,7 @@ static  WD17XX_CALLBACK( cgenie_fdc_callback )
 			if( (irq_status & IRQ_FDC) == 0 )
 			{
 				irq_status |= IRQ_FDC;
-				cpu_set_input_line(device->machine->cpu[0], 0, HOLD_LINE);
+				cputag_set_input_line(device->machine, "maincpu", 0, HOLD_LINE);
 			}
 			break;
 		case WD17XX_DRQ_CLR:
@@ -730,6 +730,6 @@ INTERRUPT_GEN( cgenie_frame_interrupt )
 		cgenie_tv_mode = input_port_read(device->machine, "DSW0") & 0x10;
 		/* force setting of background color */
 		port_ff ^= FF_BGD0;
-		cgenie_port_ff_w(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0, port_ff ^ FF_BGD0);
+		cgenie_port_ff_w(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0, port_ff ^ FF_BGD0);
 	}
 }

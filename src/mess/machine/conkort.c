@@ -235,7 +235,7 @@ static ABCBUS_CARD_SELECT( luxor_55_10828 )
 
 	if (data == 0x2d) // TODO: bit 0 of this is configurable with S1
 	{
-		const address_space *io = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_IO);
+		const address_space *io = cputag_get_address_space(device->machine, Z80_TAG, ADDRESS_SPACE_IO);
 
 		memory_install_readwrite8_handler(io, ABCBUS_INP, ABCBUS_OUT, 0x18, 0, slow_bus_data_r, slow_bus_data_w);
 		memory_install_read8_handler(io, ABCBUS_STAT, ABCBUS_STAT, 0x18, 0, slow_bus_stat_r);
@@ -366,7 +366,7 @@ static ABCBUS_CARD_SELECT( luxor_55_21046 )
 
 	if (data == input_port_read(device->machine, "SW3"))
 	{
-		const address_space *io = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_IO);
+		const address_space *io = cputag_get_address_space(device->machine, Z80_TAG, ADDRESS_SPACE_IO);
 
 		memory_install_readwrite8_handler(io, ABCBUS_INP, ABCBUS_OUT, 0x18, 0, fast_bus_data_r, fast_bus_data_w);
 		memory_install_read8_handler(io, ABCBUS_STAT, ABCBUS_STAT, 0x18, 0, fast_bus_stat_r);

@@ -81,8 +81,8 @@ static void cybiko_rs232_reset( void);
 
 static void init_ram_handler(running_machine *machine, offs_t start, offs_t size, offs_t mirror)
 {
-	memory_install_read_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), start, start + size - 1, 0, mirror - size, STATIC_BANK1);
-	memory_install_write_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), start, start + size - 1, 0, mirror - size, STATIC_BANK1);
+	memory_install_read_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), start, start + size - 1, 0, mirror - size, STATIC_BANK1);
+	memory_install_write_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), start, start + size - 1, 0, mirror - size, STATIC_BANK1);
 	memory_set_bankptr( machine, 1, mess_ram);
 }
 
