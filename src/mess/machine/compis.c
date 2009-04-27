@@ -190,8 +190,8 @@ static TYP_COMPIS compis;
 #ifdef UNUSED_FUNCTION
 void compis_irq_set(UINT8 irq)
 {
-	cpu_set_input_line_vector(machine->cpu[0], 0, irq);
-	cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
+	cputag_set_input_line_vector(machine, "maincpu", 0, irq);
+	cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
 }
 #endif
 
@@ -634,7 +634,7 @@ generate_int:
 	/* generate the appropriate interrupt */
 	i186.intr.poll_status = 0x8000 | new_vector;
 	if (!i186.intr.pending)
-		cpu_set_input_line(machine->cpu[2], 0, ASSERT_LINE);
+		cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 	i186.intr.pending = 1;
 	cpuexec_trigger(machine, CPU_RESUME_TRIGGER);
 	if (LOG_OPTIMIZATION) logerror("  - trigger due to interrupt pending\n");
@@ -661,7 +661,7 @@ static void handle_eoi(running_machine *machine,int data)
 			case 0x0d:	i186.intr.in_service &= ~0x20;	break;
 			case 0x0e:	i186.intr.in_service &= ~0x40;	break;
 			case 0x0f:	i186.intr.in_service &= ~0x80;	break;
-			default:	logerror("%05X:ERROR - 80186 EOI with unknown vector %02X\n", cpu_get_pc(machine->cpu[0]), data & 0x1f);
+			default:	logerror("%05X:ERROR - 80186 EOI with unknown vector %02X\n", cpu_get_pc(cputag_get_cpu(machine, "maincpu")), data & 0x1f);
 		}
 		if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for vector %02X\n", attotime_to_double(timer_get_time(machine)), data & 0x1f);
 	}
@@ -833,8 +833,7 @@ static void internal_timer_update(running_machine *machine,
 		diff = new_control ^ t->control;
 		if (diff & 0x001c)
 		  logerror("%05X:ERROR! -unsupported timer mode %04X\n",
-			   cpu_get_pc(machine->cpu[0]),
-			   new_control);
+			   cpu_get_pc(cputag_get_cpu(machine, "maincpu")), new_control);
 
 		/* if we have real changes, update things */
 		if (diff != 0)
@@ -935,8 +934,7 @@ static void update_dma_control(running_machine *machine, int which, int new_cont
 	diff = new_control ^ d->control;
 	if (diff & 0x6811)
 	  logerror("%05X:ERROR! - unsupported DMA mode %04X\n",
-		   cpu_get_pc(machine->cpu[0]),
-		   new_control);
+		   cpu_get_pc(cputag_get_cpu(machine, "maincpu")), new_control);
 
 	/* if we're going live, set a timer */
 	if ((diff & 0x0002) && (new_control & 0x0002))
@@ -997,7 +995,7 @@ READ16_HANDLER( i186_internal_port_r )
 		case 0x12:
 			if (LOG_PORTS) logerror("%05X:read 80186 interrupt poll\n", cpu_get_pc(space->cpu));
 			if (i186.intr.poll_status & 0x8000)
-				int_callback(space->machine->cpu[0],0);
+				int_callback(cputag_get_cpu(space->machine, "maincpu"), 0);
 			return i186.intr.poll_status;
 
 		case 0x13:
@@ -1388,14 +1386,14 @@ WRITE16_HANDLER( i186_internal_port_w )
 			temp = (data16 & 0x0fff) << 8;
 			if (data16 & 0x1000)
 			{
-				memory_install_read16_handler(cpu_get_address_space(space->machine->cpu[2], ADDRESS_SPACE_PROGRAM), temp, temp + 0xff, 0, 0, i186_internal_port_r);
-				memory_install_write16_handler(cpu_get_address_space(space->machine->cpu[2], ADDRESS_SPACE_PROGRAM), temp, temp + 0xff, 0, 0, i186_internal_port_w);
+				memory_install_read16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), temp, temp + 0xff, 0, 0, i186_internal_port_r);
+				memory_install_write16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), temp, temp + 0xff, 0, 0, i186_internal_port_w);
 			}
 			else
 			{
 				temp &= 0xffff;
-				memory_install_read16_handler(cpu_get_address_space(space->machine->cpu[2], ADDRESS_SPACE_IO), temp, temp + 0xff, 0, 0, i186_internal_port_r);
-				memory_install_write16_handler(cpu_get_address_space(space->machine->cpu[2], ADDRESS_SPACE_IO), temp, temp + 0xff, 0, 0, i186_internal_port_w);
+				memory_install_read16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_IO), temp, temp + 0xff, 0, 0, i186_internal_port_r);
+				memory_install_write16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_IO), temp, temp + 0xff, 0, 0, i186_internal_port_w);
 			}
 /*			popmessage("Sound CPU reset");*/
 			break;
@@ -1434,14 +1432,17 @@ static void compis_cpu_init(running_machine *machine)
  *
  *************************************************************/
 
-static PIC8259_SET_INT_LINE( compis_pic8259_master_set_int_line ) {
-	cpu_set_input_line(device->machine->cpu[0], 0, interrupt ? HOLD_LINE : CLEAR_LINE);
+static PIC8259_SET_INT_LINE( compis_pic8259_master_set_int_line ) 
+{
+	cputag_set_input_line(device->machine, "maincpu", 0, interrupt ? HOLD_LINE : CLEAR_LINE);
 }
 
 
-static PIC8259_SET_INT_LINE( compis_pic8259_slave_set_int_line ) {
-	if ( compis_devices.pic8259_master ) {
-		pic8259_set_irq_line( compis_devices.pic8259_master, 2, interrupt);
+static PIC8259_SET_INT_LINE( compis_pic8259_slave_set_int_line ) 
+{
+	if ( compis_devices.pic8259_master ) 
+	{
+		pic8259_set_irq_line(compis_devices.pic8259_master, 2, interrupt);
 	}
 }
 
@@ -1471,7 +1472,7 @@ static const compis_gdc_interface i82720_interface =
 DRIVER_INIT( compis )
 {
 	compis_init( &i82720_interface );
-	cpu_set_irq_callback(machine->cpu[0], compis_irq_callback);
+	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), compis_irq_callback);
 	memset (&compis, 0, sizeof (compis) );
 }
 
@@ -1491,7 +1492,7 @@ MACHINE_RESET( compis )
 	compis_keyb_init();
 
 	/* OSP PIC 8259 */
-	cpu_set_irq_callback(machine->cpu[0], compis_irq_callback);
+	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), compis_irq_callback);
 
 	compis_devices.pic8259_master = devtag_get_device(machine, "pic8259_master");
 	compis_devices.pic8259_slave = devtag_get_device(machine, "pic8259_slave");
