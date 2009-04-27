@@ -44,6 +44,22 @@
 #include "machine/nec765.h"
 #include "formats/cpis_dsk.h"
 
+static READ8_DEVICE_HANDLER( compis_ppi_r )
+{
+/* Port 3 is the control port and mame returns a hardcoded FF, but compis
+	does not like it. Code at that point:
+	F8DBD:	mov dx, 3
+		in al, dx
+		and al, 8
+		je F8DF1
+	The jump must be taken to succeed. It seems that the read should
+	return some kind of status rather than FF. Until this matter is
+	resolved, this will have to do. - R */
+
+	if (offset == 3) return 0;
+	else
+	return ppi8255_r(device, offset);
+}
 
 static ADDRESS_MAP_START( compis_mem , ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x00000, 0x3ffff) AM_RAM
@@ -56,7 +72,7 @@ static ADDRESS_MAP_START( compis_mem , ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( compis_io, ADDRESS_SPACE_IO, 16 )
-	AM_RANGE( 0x0000, 0x0007) AM_DEVREADWRITE8("ppi8255", ppi8255_r, ppi8255_w, 0xffff)
+	AM_RANGE( 0x0000, 0x0007) AM_DEVREADWRITE8("ppi8255", compis_ppi_r, ppi8255_w, 0xffff)
 	AM_RANGE( 0x0080, 0x0087) AM_DEVREADWRITE8("pit8253", pit8253_r, pit8253_w, 0xffff)
 	AM_RANGE( 0x0100, 0x011b) AM_DEVREADWRITE8("mm58274c", mm58274c_r, mm58274c_w, 0xffff)
 	AM_RANGE( 0x0280, 0x0283) AM_DEVREADWRITE8("pic8259_master", pic8259_r, pic8259_w, 0xffff) /* 80150/80130 */
@@ -97,8 +113,8 @@ Small note about natural keyboard: currently,
 - "Compis S" is mapped to 'F6'
 - "Avbryt" is mapped to 'F7'
 - "Inpassa" is mapped to 'Insert'
-- "SÃ¶k" is mapped to "Print Screen"
-- "UtplÃ¥na"is mapped to 'Delete'
+- "Sök" is mapped to "Print Screen"
+- "Utplåna"is mapped to 'Delete'
 - "Start / Stop" is mapped to 'Pause'
 - "TabL" is mapped to 'Page Up'
 - "TabR" is mapped to 'Page Down'
