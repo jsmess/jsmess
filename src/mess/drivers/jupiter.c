@@ -250,13 +250,13 @@ static WRITE8_HANDLER( jupiter_vh_charram_w )
 
 static TIMER_CALLBACK( jupiter_set_irq_callback )
 {
-	cpu_set_input_line( machine->cpu[0], 0, ASSERT_LINE );
+	cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 }
 
 
 static TIMER_CALLBACK( jupiter_clear_irq_callback )
 {
-	cpu_set_input_line( machine->cpu[0], 0, CLEAR_LINE );
+	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
 }
 
 

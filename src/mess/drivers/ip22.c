@@ -69,7 +69,7 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, 
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%08x: %s", cpu_get_pc(machine->cpu[0]), buf );
+		logerror("%08x: %s", cpu_get_pc(cputag_get_cpu(machine, "maincpu")), buf);
 	}
 }
 
@@ -150,7 +150,7 @@ static void int3_raise_local0_irq(running_machine *machine, UINT8 source_mask)
 	// if it's not masked, also assert it now at the CPU
 	if (int3_regs[1] & source_mask)
 	{
-		cpu_set_input_line(machine->cpu[0], MIPS3_IRQ0, ASSERT_LINE);
+		cputag_set_input_line(machine, "maincpu", MIPS3_IRQ0, ASSERT_LINE);
 	}
 }
 
@@ -162,7 +162,7 @@ static void int3_lower_local0_irq(UINT8 source_mask)
 
 #ifdef UNUSED_FUNCTION
 // raise a local1 interrupt
-static void int3_raise_local1_irq(UINT8 source_mask)
+static void int3_raise_local1_irq(running_machine *machine, UINT8 source_mask)
 {
 	// signal the interrupt is pending
 	int3_regs[2] |= source_mask;
@@ -170,7 +170,7 @@ static void int3_raise_local1_irq(UINT8 source_mask)
 	// if it's not masked, also assert it now at the CPU
 	if (int3_regs[2] & source_mask)
 	{
-		cpu_set_input_line(Machine->cpu[0], MIPS3_IRQ1, ASSERT_LINE);
+		cputag_set_input_line(machine, "maincpu", MIPS3_IRQ1, ASSERT_LINE);
 	}
 }
 
@@ -321,21 +321,21 @@ static WRITE32_HANDLER( hpc3_pbus6_w )
 		// if no local0 interrupts now, clear the input to the CPU
 		if ((int3_regs[0] & int3_regs[1]) == 0)
 		{
-			cpu_set_input_line(machine->cpu[0], MIPS3_IRQ0, CLEAR_LINE);
+			cputag_set_input_line(machine, "maincpu", MIPS3_IRQ0, CLEAR_LINE);
 		}
 		else
 		{
-			cpu_set_input_line(machine->cpu[0], MIPS3_IRQ0, ASSERT_LINE);
+			cputag_set_input_line(machine, "maincpu", MIPS3_IRQ0, ASSERT_LINE);
 		}
 
 		// if no local1 interrupts now, clear the input to the CPU
 		if ((int3_regs[2] & int3_regs[3]) == 0)
 		{
-			cpu_set_input_line(machine->cpu[0], MIPS3_IRQ1, CLEAR_LINE);
+			cputag_set_input_line(machine, "maincpu", MIPS3_IRQ1, CLEAR_LINE);
 		}
 		else
 		{
-			cpu_set_input_line(machine->cpu[0], MIPS3_IRQ1, ASSERT_LINE);
+			cputag_set_input_line(machine, "maincpu", MIPS3_IRQ1, ASSERT_LINE);
 		}
 		break;
 	case 0xb0/4:
@@ -1202,7 +1202,7 @@ static UINT8 dma_buffer[4096];
 
 static void scsi_irq(running_machine *machine, int state)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	if (state)
 	{
@@ -1220,7 +1220,7 @@ static void scsi_irq(running_machine *machine, int state)
 				int length;
 
 				rptr = memory_read_dword(space, nHPC_SCSI0Descriptor);
-				length = memory_read_dword(space, nHPC_SCSI0Descriptor+4) & 0x3fff;
+				length = memory_read_dword(space, nHPC_SCSI0Descriptor + 4) & 0x3fff;
 
 /*              mame_printf_info("DMA to device: length %x\n", length);
                 mame_printf_info("first words: %08x %08x %08x %08x\n",

@@ -65,7 +65,7 @@ static TIMER_CALLBACK(gamecom_clock_timer_callback)
 {
 	UINT8 val = ( ( gamecom_internal_registers[SM8521_CLKT] & 0x3F ) + 1 ) & 0x3F;
 	gamecom_internal_registers[SM8521_CLKT] = ( gamecom_internal_registers[SM8521_CLKT] & 0xC0 ) | val;
-	cpu_set_input_line(machine->cpu[0], CK_INT, HOLD_LINE );
+	cputag_set_input_line(machine, "maincpu", CK_INT, HOLD_LINE );
 }
 
 MACHINE_RESET( gamecom )
@@ -90,9 +90,9 @@ MACHINE_RESET( gamecom )
 	gamecom_dma.enabled = 0;
 
 	memset( gamecom_internal_registers, 0x00, sizeof(gamecom_internal_registers) );
-	gamecom_internal_w( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), SM8521_URTT, 0xFF );
-	gamecom_internal_w( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), SM8521_URTS, 0x42 );
-	gamecom_internal_w( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), SM8521_WDTC, 0x38 );
+	gamecom_internal_w( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), SM8521_URTT, 0xFF );
+	gamecom_internal_w( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), SM8521_URTS, 0x42 );
+	gamecom_internal_w( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), SM8521_WDTC, 0x38 );
 }
 
 static void gamecom_set_mmu( running_machine *machine, int mmu, UINT8 data ) 
@@ -138,13 +138,13 @@ static void handle_stylus_press( running_machine *machine, UINT8 column )
 
 	if ( stylus_x == column ) 
 	{
-		cpu_set_reg( machine->cpu[0], SM8500_P0, row_data[stylus_y] & 0xFF );
-		cpu_set_reg( machine->cpu[0], SM8500_P1, ( cpu_get_reg( machine->cpu[0], SM8500_P1 ) & 0xFC ) | ( ( row_data[stylus_y] >> 8 ) & 0x03 ) );
+		cpu_set_reg( cputag_get_cpu(machine, "maincpu"), SM8500_P0, row_data[stylus_y] & 0xFF );
+		cpu_set_reg( cputag_get_cpu(machine, "maincpu"), SM8500_P1, ( cpu_get_reg( cputag_get_cpu(machine, "maincpu"), SM8500_P1 ) & 0xFC ) | ( ( row_data[stylus_y] >> 8 ) & 0x03 ) );
 	} 
 	else 
 	{
-		cpu_set_reg( machine->cpu[0], SM8500_P0, 0xFF );
-		cpu_set_reg( machine->cpu[0], SM8500_P1, ( cpu_get_reg( machine->cpu[0], SM8500_P1 ) & 0xFC ) | 0x03 );
+		cpu_set_reg( cputag_get_cpu(machine, "maincpu"), SM8500_P0, 0xFF );
+		cpu_set_reg( cputag_get_cpu(machine, "maincpu"), SM8500_P1, ( cpu_get_reg( cputag_get_cpu(machine, "maincpu"), SM8500_P1 ) & 0xFC ) | 0x03 );
 	}
 }
 
@@ -158,14 +158,14 @@ WRITE8_HANDLER( gamecom_internal_w )
 
 	switch( offset ) 
 	{
-	case SM8521_IE0:	cpu_set_reg( space->machine->cpu[0], SM8500_IE0, data ); return;
-	case SM8521_IE1:	cpu_set_reg( space->machine->cpu[0], SM8500_IE1, data ); return;
-	case SM8521_IR0:	cpu_set_reg( space->machine->cpu[0], SM8500_IR0, data ); return;
-	case SM8521_IR1:	cpu_set_reg( space->machine->cpu[0], SM8500_IR1, data ); return;
-	case SM8521_P0:		cpu_set_reg( space->machine->cpu[0], SM8500_P0, data ); return;
-	case SM8521_P1:		cpu_set_reg( space->machine->cpu[0], SM8500_P1, data ); return;
-	case SM8521_P2:		cpu_set_reg( space->machine->cpu[0], SM8500_P2, data );
-				switch( ( cpu_get_reg( space->machine->cpu[0], SM8500_P1 ) << 8 ) | data ) 
+	case SM8521_IE0:	cpu_set_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_IE0, data ); return;
+	case SM8521_IE1:	cpu_set_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_IE1, data ); return;
+	case SM8521_IR0:	cpu_set_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_IR0, data ); return;
+	case SM8521_IR1:	cpu_set_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_IR1, data ); return;
+	case SM8521_P0:		cpu_set_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_P0, data ); return;
+	case SM8521_P1:		cpu_set_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_P1, data ); return;
+	case SM8521_P2:		cpu_set_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_P2, data );
+				switch( ( cpu_get_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_P1 ) << 8 ) | data ) 
 				{
 				case 0xFBFF:	/* column #0 */
 						/* P0 bit 0 cleared => 01 */
@@ -227,8 +227,8 @@ WRITE8_HANDLER( gamecom_internal_w )
 						/* P0 bit 7 cleared => 8B (button A) */
 						/* P1 bit 0 cleared => 8C (button B) */
 						/* P1 bit 1 cleared => 8D (button C) */
-					cpu_set_reg( space->machine->cpu[0], SM8500_P0, input_port_read(space->machine, "IN0") );
-					cpu_set_reg( space->machine->cpu[0], SM8500_P1, ( cpu_get_reg( space->machine->cpu[0], SM8500_P1 ) & 0xFC ) | ( input_port_read(space->machine, "IN1") & 0x03 ) );
+					cpu_set_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_P0, input_port_read(space->machine, "IN0") );
+					cpu_set_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_P1, ( cpu_get_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_P1 ) & 0xFC ) | ( input_port_read(space->machine, "IN1") & 0x03 ) );
 					break;
 				case 0xFFFF:	/* keys #2 */
 						/* P0 bit 0 cleared => 88 (power) */
@@ -241,15 +241,15 @@ WRITE8_HANDLER( gamecom_internal_w )
 						/* P0 bit 7 cleared => A0 */
 						/* P1 bit 0 cleared => A0 */
 						/* P1 bit 1 cleared => A0 */
-					cpu_set_reg( space->machine->cpu[0], SM8500_P0, ( cpu_get_reg( space->machine->cpu[0], SM8500_P0 ) & 0xFC ) | ( input_port_read(space->machine, "IN2") & 0x03 ) );
-					cpu_set_reg( space->machine->cpu[0], SM8500_P1, 0xFF );
+					cpu_set_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_P0, ( cpu_get_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_P0 ) & 0xFC ) | ( input_port_read(space->machine, "IN2") & 0x03 ) );
+					cpu_set_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_P1, 0xFF );
 					break;
 				}
 				return;
 	case SM8521_P3:
 				/* P3 bit7 clear, bit6 set -> enable cartridge port #0? */
 				/* P3 bit6 clear, bit7 set -> enable cartridge port #1? */
-				cpu_set_reg( space->machine->cpu[0], SM8500_P3, data );
+				cpu_set_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_P3, data );
 				switch( data & 0xc0 ) 
 				{
 				case 0x40: cartridge = cartridge1; break;
@@ -262,16 +262,16 @@ WRITE8_HANDLER( gamecom_internal_w )
 				gamecom_set_mmu( space->machine, 3, gamecom_internal_registers[SM8521_MMU3] );
 				gamecom_set_mmu( space->machine, 4, gamecom_internal_registers[SM8521_MMU4] );
 				return;
-	case SM8521_SYS:	cpu_set_reg( space->machine->cpu[0], SM8500_SYS, data ); return;
-	case SM8521_CKC:	cpu_set_reg( space->machine->cpu[0], SM8500_CKC, data ); return;
-	case SM8521_SPH:	cpu_set_reg( space->machine->cpu[0], SM8500_SPH, data ); return;
-	case SM8521_SPL:	cpu_set_reg( space->machine->cpu[0], SM8500_SPL, data ); return;
-	case SM8521_PS0:	cpu_set_reg( space->machine->cpu[0], SM8500_PS0, data ); return;
-	case SM8521_PS1:	cpu_set_reg( space->machine->cpu[0], SM8500_PS1, data ); return;
-	case SM8521_P0C:	cpu_set_reg( space->machine->cpu[0], SM8500_P0C, data ); return;
-	case SM8521_P1C:	cpu_set_reg( space->machine->cpu[0], SM8500_P1C, data ); return;
-	case SM8521_P2C:	cpu_set_reg( space->machine->cpu[0], SM8500_P2C, data ); return;
-	case SM8521_P3C:	cpu_set_reg( space->machine->cpu[0], SM8500_P3C, data ); return;
+	case SM8521_SYS:	cpu_set_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_SYS, data ); return;
+	case SM8521_CKC:	cpu_set_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_CKC, data ); return;
+	case SM8521_SPH:	cpu_set_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_SPH, data ); return;
+	case SM8521_SPL:	cpu_set_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_SPL, data ); return;
+	case SM8521_PS0:	cpu_set_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_PS0, data ); return;
+	case SM8521_PS1:	cpu_set_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_PS1, data ); return;
+	case SM8521_P0C:	cpu_set_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_P0C, data ); return;
+	case SM8521_P1C:	cpu_set_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_P1C, data ); return;
+	case SM8521_P2C:	cpu_set_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_P2C, data ); return;
+	case SM8521_P3C:	cpu_set_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_P3C, data ); return;
 	case SM8521_MMU0:	/* disable bootstrap ROM? most likely not written to on game.com */
 		logerror( "Write to MMU0\n" );
 		break;
@@ -397,24 +397,24 @@ READ8_HANDLER( gamecom_internal_r )
 	case SM8521_R12: case SM8521_R13: case SM8521_R14: case SM8521_R15:
 		return 0;	/* NPW 22-Dec-2008 - Not sure what to do here */
 		/*return sm85cpu_mem_readbyte( state, offset );*/
-	case SM8521_IE0:	return cpu_get_reg( space->machine->cpu[0], SM8500_IE0 );
-	case SM8521_IE1:	return cpu_get_reg( space->machine->cpu[0], SM8500_IE1 );
-	case SM8521_IR0:	return cpu_get_reg( space->machine->cpu[0], SM8500_IR0 );
-	case SM8521_IR1:	return cpu_get_reg( space->machine->cpu[0], SM8500_IR1 );
-	case SM8521_P0:		/* logerror( "%X: Read from P0\n", cpu_get_pc(space->cpu) ); */ return cpu_get_reg( space->machine->cpu[0], SM8500_P0 );
-	case SM8521_P1:		/* logerror( "%X: Read from P1\n", cpu_get_pc(space->cpu) ); */ return cpu_get_reg( space->machine->cpu[0], SM8500_P1 );
-	case SM8521_P2:		/* logerror( "%X: Read from P2\n", cpu_get_pc(space->cpu) ); */ return cpu_get_reg( space->machine->cpu[0], SM8500_P2 );
-	case SM8521_P3:		return cpu_get_reg( space->machine->cpu[0], SM8500_P3 );
-	case SM8521_SYS:	return cpu_get_reg( space->machine->cpu[0], SM8500_SYS );
-	case SM8521_CKC:	return cpu_get_reg( space->machine->cpu[0], SM8500_CKC );
-	case SM8521_SPH:	return cpu_get_reg( space->machine->cpu[0], SM8500_SPH );
-	case SM8521_SPL:	return cpu_get_reg( space->machine->cpu[0], SM8500_SPL );
-	case SM8521_PS0:	return cpu_get_reg( space->machine->cpu[0], SM8500_PS0 );
-	case SM8521_PS1:	return cpu_get_reg( space->machine->cpu[0], SM8500_PS1 );
-	case SM8521_P0C:	return cpu_get_reg( space->machine->cpu[0], SM8500_P0C );
-	case SM8521_P1C:	return cpu_get_reg( space->machine->cpu[0], SM8500_P1C );
-	case SM8521_P2C:	return cpu_get_reg( space->machine->cpu[0], SM8500_P2C );
-	case SM8521_P3C:	return cpu_get_reg( space->machine->cpu[0], SM8500_P3C );
+	case SM8521_IE0:	return cpu_get_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_IE0 );
+	case SM8521_IE1:	return cpu_get_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_IE1 );
+	case SM8521_IR0:	return cpu_get_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_IR0 );
+	case SM8521_IR1:	return cpu_get_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_IR1 );
+	case SM8521_P0:		/* logerror( "%X: Read from P0\n", cpu_get_pc(space->cpu) ); */ return cpu_get_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_P0 );
+	case SM8521_P1:		/* logerror( "%X: Read from P1\n", cpu_get_pc(space->cpu) ); */ return cpu_get_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_P1 );
+	case SM8521_P2:		/* logerror( "%X: Read from P2\n", cpu_get_pc(space->cpu) ); */ return cpu_get_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_P2 );
+	case SM8521_P3:		return cpu_get_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_P3 );
+	case SM8521_SYS:	return cpu_get_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_SYS );
+	case SM8521_CKC:	return cpu_get_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_CKC );
+	case SM8521_SPH:	return cpu_get_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_SPH );
+	case SM8521_SPL:	return cpu_get_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_SPL );
+	case SM8521_PS0:	return cpu_get_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_PS0 );
+	case SM8521_PS1:	return cpu_get_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_PS1 );
+	case SM8521_P0C:	return cpu_get_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_P0C );
+	case SM8521_P1C:	return cpu_get_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_P1C );
+	case SM8521_P2C:	return cpu_get_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_P2C );
+	case SM8521_P3C:	return cpu_get_reg( cputag_get_cpu(space->machine, "maincpu"), SM8500_P3C );
 	case SM8521_TM0D:	return gamecom_timer[0].counter;
 	case SM8521_TM1D:	return gamecom_timer[1].counter;
 //	case SM8521_CLKT:	/* bit 0-5 read only, 6-7 read/write */
@@ -490,14 +490,14 @@ static void gamecom_dma_init(running_machine *machine)
 	case 0x04:
 		/* Extend RAM->VRAM */
 		gamecom_dma.source_width = 64;
-		gamecom_dma.source_bank = memory_get_read_ptr(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM),  0xE000 );
+		gamecom_dma.source_bank = memory_get_read_ptr(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xE000 );
 		gamecom_dma.dest_bank = &gamecom_vram[(gamecom_internal_registers[SM8521_DMVP] & 0x02) ? 0x2000 : 0x0000];
 		break;
 	case 0x06:
 		/* VRAM->Extend RAM */
 		gamecom_dma.source_bank = &gamecom_vram[(gamecom_internal_registers[SM8521_DMVP] & 0x01) ? 0x2000 : 0x0000];
 		gamecom_dma.dest_width = 64;
-		gamecom_dma.dest_bank = memory_get_read_ptr(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xE000 );
+		gamecom_dma.dest_bank = memory_get_read_ptr(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xE000 );
 		break;
 	}
 	gamecom_dma.source_current = gamecom_dma.source_width * gamecom_dma.source_y;
@@ -604,7 +604,7 @@ void gamecom_handle_dma( const device_config *device, int cycles )
 		gamecom_dma.dest_current = gamecom_dma.dest_line;
 	}
 	gamecom_dma.enabled = 0;
-	cpu_set_input_line(device->machine->cpu[0], DMA_INT, HOLD_LINE );
+	cputag_set_input_line(device->machine, "maincpu", DMA_INT, HOLD_LINE );
 }
 
 void gamecom_update_timers( const device_config *device, int cycles ) 
@@ -619,7 +619,7 @@ void gamecom_update_timers( const device_config *device, int cycles )
 			if ( gamecom_timer[0].counter == gamecom_timer[0].check_value ) 
 			{
 				gamecom_timer[0].counter = 0;
-				cpu_set_input_line(device->machine->cpu[0], TIM0_INT, HOLD_LINE );
+				cputag_set_input_line(device->machine, "maincpu", TIM0_INT, HOLD_LINE );
 			}
 		}
 	}
@@ -633,7 +633,7 @@ void gamecom_update_timers( const device_config *device, int cycles )
 			if ( gamecom_timer[1].counter == gamecom_timer[1].check_value ) 
 			{
 				gamecom_timer[1].counter = 0;
-				cpu_set_input_line(device->machine->cpu[0], TIM1_INT, HOLD_LINE );
+				cputag_set_input_line(device->machine, "maincpu", TIM1_INT, HOLD_LINE );
 			}
 		}
 	}
@@ -651,7 +651,7 @@ READ8_HANDLER( gamecom_vram_r )
 
 DEVICE_START( gamecom_cart )
 {
-	internal_ram = device_get_info_ptr(device->machine->cpu[0], CPUINFO_PTR_SM8500_INTERNAL_RAM);
+	internal_ram = devtag_get_info_ptr(device->machine, "maincpu", CPUINFO_PTR_SM8500_INTERNAL_RAM);
 }
 
 DEVICE_IMAGE_LOAD( gamecom_cart )

@@ -137,7 +137,7 @@ PALETTE_INIT ( hp48 )
 
 VIDEO_UPDATE ( hp48 )
 {
-	const address_space *space = cpu_get_address_space( cputag_get_cpu(screen->machine, "maincpu"), ADDRESS_SPACE_PROGRAM );
+	const address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int x, y, xp, i, addr;
 	int display       = HP48_IO_4(0) >> 3;           /* 1=on, 0=off */
 	int left_margin   = HP48_IO_4(0) & 7;            /* 0..7 pixels for main bitmap */

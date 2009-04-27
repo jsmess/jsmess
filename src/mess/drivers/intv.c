@@ -376,7 +376,7 @@ ADDRESS_MAP_END
 
 static INTERRUPT_GEN( intv_interrupt2 )
 {
-	cpu_set_input_line(device->machine->cpu[1], 0, ASSERT_LINE);
+	cputag_set_input_line(device->machine, "keyboard", 0, ASSERT_LINE);
 }
 
 static MACHINE_DRIVER_START( intv )

@@ -83,7 +83,7 @@ DIRECT_UPDATE_HANDLER( jupiter_opbaseoverride )
 
 MACHINE_START( jupiter )
 {
-	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	logerror("jupiter_init\r\n");
 	logerror("data: %p\n", jupiter_data);
@@ -242,4 +242,3 @@ DEVICE_IMAGE_UNLOAD( jupiter_tap )
 		jupiter_data_type = JUPITER_NONE;
 	}
 }
-

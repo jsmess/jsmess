@@ -20,23 +20,29 @@ emu_timer *gal_video_timer = NULL;
 
 TIMER_CALLBACK( gal_video )
 {	
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	int y,x;
-	if (galaxy_interrupts_enabled==TRUE) {
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	int y, x;
+	if (galaxy_interrupts_enabled == TRUE) 
+	{
 		UINT8 *gfx = memory_region(machine, "gfx1");
 		UINT8 dat = (gal_latch_value & 0x3c) >> 2;
-		if ((gal_cnt >= 48 * 2) && (gal_cnt < 48 * 210)) { // display on screen just first 208 lines
+		if ((gal_cnt >= 48 * 2) && (gal_cnt < 48 * 210))  // display on screen just first 208 lines
+		{
 			UINT8 mode = (gal_latch_value >> 1) & 1; // bit 2 latch represents mode
-			UINT16 addr = (cpu_get_reg(machine->cpu[0], Z80_I) << 8) | cpu_get_reg(machine->cpu[0], Z80_R) | ((gal_latch_value & 0x80) ^ 0x80);
-  			if (mode == 0){
+			UINT16 addr = (cpu_get_reg(cputag_get_cpu(machine, "maincpu"), Z80_I) << 8) | cpu_get_reg(cputag_get_cpu(machine, "maincpu"), Z80_R) | ((gal_latch_value & 0x80) ^ 0x80);
+  			if (mode == 0)
+			{
   				// Text mode
-	  			if (first==0 && (cpu_get_reg(machine->cpu[0], Z80_R) & 0x1f) ==0) {
+	  			if (first == 0 && (cpu_get_reg(cputag_get_cpu(machine, "maincpu"), Z80_R) & 0x1f) == 0) 
+				{
 		  			// Due to a fact that on real processor latch value is set at
 		  			// the end of last cycle we need to skip dusplay of double
 		  			// first char in each row
 		  			code = 0x00;
 		  			first = 1;
-				} else {
+				} 
+				else 
+				{
 					code = memory_read_byte(space,addr) & 0xbf;
 					code += (code & 0x80) >> 1;
 					code = gfx[(code & 0x7f) +(dat << 7 )] ^ 0xff;
@@ -56,13 +62,16 @@ TIMER_CALLBACK( gal_video )
 			}
 			else 
 			{ // Graphics mode
-	  			if (first<4 && (cpu_get_reg(machine->cpu[0], Z80_R) & 0x1f) ==0) {
+	  			if (first < 4 && (cpu_get_reg(cputag_get_cpu(machine, "maincpu"), Z80_R) & 0x1f) == 0) 
+				{
 		  			// Due to a fact that on real processor latch value is set at
 		  			// the end of last cycle we need to skip dusplay of 4 times
 		  			// first char in each row
 		  			code = 0x00;
 		  			first++;
-				} else {
+				} 
+				else 
+				{
 					code = memory_read_byte(space,addr) ^ 0xff;
 					first = 0;
 				}
@@ -70,12 +79,16 @@ TIMER_CALLBACK( gal_video )
 				x = (gal_cnt % 48) * 8;
 				
 				/* hack - until calc of R is fixed in Z80 */
-				if (x==11*8 && y==0) {
+				if (x == 11 * 8 && y == 0) 
+				{
 					start_addr = addr;
 				}
-				if ((x/8 >=11) && (x/8<44)) {
-					code = memory_read_byte(space,start_addr + y * 32 + (gal_cnt % 48)-11) ^ 0xff;
-				} else {
+				if ((x / 8 >= 11) && (x / 8 < 44)) 
+				{
+					code = memory_read_byte(space, start_addr + y * 32 + (gal_cnt % 48) - 11) ^ 0xff;
+				} 
+				else 
+				{
 					code = 0x00;
 				}
 				/* end of hack */
@@ -97,8 +110,9 @@ TIMER_CALLBACK( gal_video )
 VIDEO_UPDATE( galaxy )
 {
 	timer_adjust_periodic(gal_video_timer, attotime_zero, 0, attotime_never);
-	if (galaxy_interrupts_enabled == FALSE) {
-		rectangle black_area = {0,384-1,0,208-1};
+	if (galaxy_interrupts_enabled == FALSE) 
+	{
+		rectangle black_area = {0, 384 - 1, 0, 208 - 1};
 		bitmap_fill(tmpbitmap, &black_area, 0);
 	}
 	galaxy_interrupts_enabled = FALSE;

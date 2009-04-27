@@ -505,11 +505,11 @@ DRIVER_INIT( intv )
 /* Set Reset and INTR/INTRM Vector */
 MACHINE_RESET( intv )
 {
-	cpu_set_input_line_vector(machine->cpu[0], CP1610_RESET, 0x1000);
+	cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), CP1610_RESET, 0x1000);
 
 	/* These are actually the same vector, and INTR is unused */
-	cpu_set_input_line_vector(machine->cpu[0], CP1610_INT_INTRM, 0x1004);
-	cpu_set_input_line_vector(machine->cpu[0], CP1610_INT_INTR,  0x1004);
+	cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), CP1610_INT_INTRM, 0x1004);
+	cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), CP1610_INT_INTR,  0x1004);
 
 	return;
 }
@@ -517,14 +517,14 @@ MACHINE_RESET( intv )
 
 static TIMER_CALLBACK(intv_interrupt_complete)
 {
-	cpu_set_input_line(machine->cpu[0], CP1610_INT_INTRM, CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", CP1610_INT_INTRM, CLEAR_LINE);
 }
 
 INTERRUPT_GEN( intv_interrupt )
 {
-	cpu_set_input_line(device->machine->cpu[0], CP1610_INT_INTRM, ASSERT_LINE);
+	cputag_set_input_line(device->machine, "maincpu", CP1610_INT_INTRM, ASSERT_LINE);
 	sr1_int_pending = 1;
-	timer_set(device->machine, cpu_clocks_to_attotime(device->machine->cpu[0], 3791), NULL, 0, intv_interrupt_complete);
+	timer_set(device->machine, cputag_clocks_to_attotime(device->machine, "maincpu", 3791), NULL, 0, intv_interrupt_complete);
 	stic_screenrefresh(device->machine);
 }
 

@@ -100,7 +100,7 @@ const ppi8255_interface irisha_ppi8255_interface =
 
 static PIC8259_SET_INT_LINE( irisha_pic_set_int_line )
 {
-	cpu_set_input_line(device->machine->cpu[0], 0,interrupt ?  HOLD_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "maincpu", 0, interrupt ?  HOLD_LINE : CLEAR_LINE);
 }
 
 const struct pic8259_interface irisha_pic8259_config = {

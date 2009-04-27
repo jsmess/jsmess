@@ -145,8 +145,8 @@ static void hp48_apply_modules( running_machine *machine, void* param );
 
 static void hp48_pulse_irq( running_machine *machine, int irq_line)
 {
-	cpu_set_input_line( machine->cpu[0], irq_line, ASSERT_LINE );
-	cpu_set_input_line( machine->cpu[0], irq_line, CLEAR_LINE );	
+	cputag_set_input_line(machine, "maincpu", irq_line, ASSERT_LINE );
+	cputag_set_input_line(machine, "maincpu", irq_line, CLEAR_LINE );	
 }
 
 
@@ -222,7 +222,7 @@ static void hp48_rs232_send_byte( running_machine *machine )
 	UINT8 data = HP48_IO_8(0x16); /* byte to send */
 
 	LOG_SERIAL(( "%05x %f hp48_rs232_send_byte: start sending, data=%02x\n", 
-		     cpu_get_previouspc(machine->cpu[0]), attotime_to_double(timer_get_time(machine)), data ));
+		     cpu_get_previouspc(cputag_get_cpu(machine, "maincpu")), attotime_to_double(timer_get_time(machine)), data ));
 
 	/* set byte sending and send buffer full */
 	hp48_io[0x12] |= 3;
@@ -296,7 +296,7 @@ static const chardev_interface hp48_chardev_iface =
 void hp48_reg_out( const device_config *device, int out )
 {
 	LOG(( "%05x %f hp48_reg_out: %03x\n",
-	      cpu_get_previouspc(device->machine->cpu[0]), attotime_to_double(timer_get_time(device->machine)), out ));
+	      cpu_get_previouspc(cputag_get_cpu(device->machine, "maincpu")), attotime_to_double(timer_get_time(device->machine)), out ));
 
 	/* bits 0-8: keyboard lines */
 	hp48_out = out & 0x1ff;
@@ -333,7 +333,7 @@ int hp48_reg_in( const device_config *device )
 {
 	int in = hp48_get_in( device->machine );
 	LOG(( "%05x %f hp48_reg_in: %04x\n",
-	      cpu_get_previouspc(device->machine->cpu[0]), attotime_to_double(timer_get_time(device->machine)), in ));
+	      cpu_get_previouspc(cputag_get_cpu(device->machine, "maincpu")), attotime_to_double(timer_get_time(device->machine)), in ));
 	return in;
 }
 
@@ -375,7 +375,7 @@ static TIMER_CALLBACK( hp48_kbd_cb )
 /* RSI opcode */
 void hp48_rsi( const device_config *device )
 {
-	LOG(( "%05x %f hp48_rsi\n", cpu_get_previouspc(device->machine->cpu[0]), attotime_to_double(timer_get_time(device->machine)) ));
+	LOG(( "%05x %f hp48_rsi\n", cpu_get_previouspc(cputag_get_cpu(device->machine, "maincpu")), attotime_to_double(timer_get_time(device->machine)) ));
 
 	/* enables interrupts on key repeat 
 	   (normally, there is only one interrupt, when the key is pressed)
@@ -752,7 +752,7 @@ static void hp48_apply_modules( running_machine *machine, void* param )
 {
 	int i;
 	int nce2_enable = 1;
-	const address_space* space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	hp48_io_addr = 0x100000;
 
@@ -855,7 +855,7 @@ static void hp48_reset_modules( running_machine *machine )
 /* RESET opcode */
 void hp48_mem_reset( const device_config *device )
 {
-	LOG(( "%05x %f hp48_mem_reset\n", cpu_get_previouspc(device->machine->cpu[0]), attotime_to_double(timer_get_time(device->machine)) ));
+	LOG(( "%05x %f hp48_mem_reset\n", cpu_get_previouspc(cputag_get_cpu(device->machine, "maincpu")), attotime_to_double(timer_get_time(device->machine)) ));
 	hp48_reset_modules( device->machine );
 }
 
@@ -865,7 +865,7 @@ void hp48_mem_config( const device_config *device, int v )
 {	
 	int i;
 
-	LOG(( "%05x %f hp48_mem_config: %05x\n", cpu_get_previouspc(device->machine->cpu[0]), attotime_to_double(timer_get_time(device->machine)), v ));
+	LOG(( "%05x %f hp48_mem_config: %05x\n", cpu_get_previouspc(cputag_get_cpu(device->machine, "maincpu")), attotime_to_double(timer_get_time(device->machine)), v ));
 
 	/* find the highest priority unconfigured module (except non-configurable NCE1)... */
 	for ( i = 0; i < 5; i++ )
@@ -896,7 +896,7 @@ void hp48_mem_config( const device_config *device, int v )
 void hp48_mem_unconfig( const device_config *device, int v )
 {	
 	int i;
-	LOG(( "%05x %f hp48_mem_unconfig: %05x\n", cpu_get_previouspc(device->machine->cpu[0]), attotime_to_double(timer_get_time(device->machine)), v ));
+	LOG(( "%05x %f hp48_mem_unconfig: %05x\n", cpu_get_previouspc(cputag_get_cpu(device->machine, "maincpu")), attotime_to_double(timer_get_time(device->machine)), v ));
 
 	/* find the highest priority fully configured module at address v (except NCE1)... */
 	for ( i = 0; i < 5; i++ )
@@ -939,7 +939,7 @@ int  hp48_mem_id( const device_config *device )
 	}
 
 	LOG(( "%05x %f hp48_mem_id = %02x\n", 
-	      cpu_get_previouspc(device->machine->cpu[0]), attotime_to_double(timer_get_time(device->machine)), data ));
+	      cpu_get_previouspc(cputag_get_cpu(device->machine, "maincpu")), attotime_to_double(timer_get_time(device->machine)), data ));
 
 	return data; /* everything is configured */
 }
