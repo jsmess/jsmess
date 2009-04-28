@@ -121,6 +121,7 @@ enum flash_state
 typedef struct _ngp_state ngp_state;
 struct _ngp_state {
 	UINT8 io_reg[0x40];
+	UINT8 old_to3;
 	emu_timer* seconds_timer;
 
 	struct {
@@ -132,6 +133,13 @@ struct _ngp_state {
 		int		state;
 		UINT8	command[2];
 	} flash_chip[2];
+
+	const device_config *tlcs900;
+	const device_config *z80;
+	const device_config *t6w28;
+	const device_config *dac_l;
+	const device_config *dac_r;
+	const device_config *k1ge;
 };
 
 
@@ -200,15 +208,15 @@ static WRITE8_HANDLER( ngp_io_w )
 	case 0x21:		/* t6w28 "left" */
 		if ( state->io_reg[0x38] == 0x55 && state->io_reg[0x39] == 0xAA )
 		{
-			t6w28_w( devtag_get_device( space->machine, "t6w28" ), 0, data );
+			t6w28_w( state->t6w28, 0, data );
 		}
 		break;
 
 	case 0x22:		/* DAC right */
-		dac_w( devtag_get_device( space->machine, "dac_r" ), 0, data );
+		dac_w( state->dac_r, 0, data );
 		break;
 	case 0x23:		/* DAC left */
-		dac_w( devtag_get_device( space->machine, "dac_l" ), 0, data );
+		dac_w( state->dac_l, 0, data );
 		break;
 
 	/* Internal eeprom related? */
@@ -229,18 +237,18 @@ static WRITE8_HANDLER( ngp_io_w )
 		switch( data )
 		{
 		case 0x55:		/* Enable Z80 */
-			cputag_resume( space->machine, "soundcpu", SUSPEND_REASON_HALT );
-			cputag_reset( space->machine, "soundcpu" );
-			cputag_set_input_line( space->machine, "soundcpu", 0, CLEAR_LINE );
+			cpu_resume( state->z80, SUSPEND_REASON_HALT );
+			device_reset( state->z80 );
+			cpu_set_input_line( state->z80, 0, CLEAR_LINE );
 			break;
 		case 0xAA:		/* Disable Z80 */
-			cputag_suspend( space->machine, "soundcpu", SUSPEND_REASON_HALT, 1 );
+			cpu_suspend( state->z80, SUSPEND_REASON_HALT, 1 );
 			break;
 		}
 		break;
 
 	case 0x3a:	/* Trigger Z80 NMI */
-		cputag_set_input_line( space->machine, "soundcpu", INPUT_LINE_NMI, PULSE_LINE );
+		cpu_set_input_line( state->z80, INPUT_LINE_NMI, PULSE_LINE );
 		break;
 	}
 	state->io_reg[offset] = data;
@@ -504,7 +512,9 @@ static WRITE8_HANDLER( ngp_z80_comm_w )
 
 static WRITE8_HANDLER( ngp_z80_signal_main_w )
 {
-	cputag_set_input_line( space->machine, "maincpu", TLCS900_INT5, ASSERT_LINE );
+	ngp_state *state = space->machine->driver_data;
+
+	cpu_set_input_line( state->tlcs900, TLCS900_INT5, ASSERT_LINE );
 }
 
 
@@ -518,10 +528,12 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( ngp_z80_clear_irq )
 {
-	cputag_set_input_line( space->machine, "soundcpu", 0, CLEAR_LINE );
+	ngp_state *state = space->machine->driver_data;
+
+	cpu_set_input_line( state->z80, 0, CLEAR_LINE );
 
 	/* I am not exactly sure what causes the maincpu INT5 signal to be cleared. This will do for now. */
-	cputag_set_input_line( space->machine, "maincpu", TLCS900_INT5, CLEAR_LINE );
+	cpu_set_input_line( state->tlcs900, TLCS900_INT5, CLEAR_LINE );
 }
 
 
@@ -536,7 +548,7 @@ static INPUT_CHANGED( power_callback )
 
 	if ( state->io_reg[0x33] & 0x04 )
 	{
-		cputag_set_input_line( field->port->machine, "maincpu", TLCS900_NMI,
+		cpu_set_input_line( state->tlcs900, TLCS900_NMI,
 			(input_port_read(field->port->machine, "Power") & 0x01 ) ? CLEAR_LINE : ASSERT_LINE );
 	}
 }
@@ -560,24 +572,28 @@ INPUT_PORTS_END
 
 static WRITE8_DEVICE_HANDLER( ngp_vblank_pin_w )
 {
-	cputag_set_input_line( device->machine, "maincpu", TLCS900_INT4, data ? ASSERT_LINE : CLEAR_LINE );
+	ngp_state *state = device->machine->driver_data;
+
+	cpu_set_input_line( state->tlcs900, TLCS900_INT4, data ? ASSERT_LINE : CLEAR_LINE );
 }
 
 
 static WRITE8_DEVICE_HANDLER( ngp_hblank_pin_w )
 {
-	cputag_set_input_line( device->machine, "maincpu", TLCS900_TIO, data ? ASSERT_LINE : CLEAR_LINE );
+	ngp_state *state = device->machine->driver_data;
+
+	cpu_set_input_line( state->tlcs900, TLCS900_TIO, data ? ASSERT_LINE : CLEAR_LINE );
 }
 
 
-static UINT8 old_to3;
-
 static WRITE8_DEVICE_HANDLER( ngp_tlcs900_to3 )
 {
-	if ( data && ! old_to3 )
-		cputag_set_input_line( device->machine, "soundcpu", 0, ASSERT_LINE );
+	ngp_state * state = device->machine->driver_data;
 
-	old_to3 = data;
+	if ( data && ! state->old_to3 )
+		cpu_set_input_line( state->z80, 0, ASSERT_LINE );
+
+	state->old_to3 = data;
 }
 
 
@@ -592,14 +608,26 @@ static MACHINE_START( ngp )
 
 static MACHINE_RESET( ngp )
 {
-	cputag_suspend( machine, "soundcpu", SUSPEND_REASON_HALT, 1 );
-	cputag_set_input_line( machine, "soundcpu", 0, CLEAR_LINE );
+	ngp_state *state = machine->driver_data;
+
+	state->old_to3 = 0;
+	state->tlcs900 = devtag_get_device( machine, "maincpu" );
+	state->z80 = devtag_get_device( machine, "soundcpu" );
+	state->t6w28 = devtag_get_device( machine, "t8w28" );
+	state->dac_l = devtag_get_device( machine, "dac_l" );
+	state->dac_r = devtag_get_device( machine, "dac_r" );
+	state->k1ge = devtag_get_device( machine, "k1ge" );
+
+	cpu_suspend( state->z80, SUSPEND_REASON_HALT, 1 );
+	cpu_set_input_line( state->z80, 0, CLEAR_LINE );
 }
 
 
 static VIDEO_UPDATE( ngp )
 {
-	k1ge_update( devtag_get_device( screen->machine, "k1ge" ), bitmap, cliprect );
+	ngp_state *state = screen->machine->driver_data;
+
+	k1ge_update( state->k1ge, bitmap, cliprect );
 	return 0;
 }
 
