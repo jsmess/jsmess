@@ -90,7 +90,7 @@ static MACHINE_DRIVER_START( lynx )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
-	MDRV_QUICKLOAD_ADD("quickload", lynx, "o,lnx", 0)
+	MDRV_QUICKLOAD_ADD("quickload", lynx, "o", 0)
 	
 	MDRV_IMPORT_FROM(lynx_cartslot)
 MACHINE_DRIVER_END
@@ -139,6 +139,8 @@ ROM_END
 
 static QUICKLOAD_LOAD( lynx )
 {
+	const device_config *cpu = cputag_get_cpu(image->machine, "maincpu");
+	const address_space *space = cputag_get_address_space(image->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *data = NULL;
 	UINT8 *rom = memory_region(image->machine, "maincpu");
 	UINT8 header[10]; // 80 08 dw Start dw Len B S 9 3
@@ -162,12 +164,16 @@ static QUICKLOAD_LOAD( lynx )
 		return INIT_FAIL;
 
 	for (i = 0; i < length; i++)
-		memory_write_byte(cputag_get_address_space(image->machine,"maincpu",ADDRESS_SPACE_PROGRAM), start + i, data[i]);
+		memory_write_byte(space, start + i, data[i]);
 
 	rom[0x1fc] = start & 0xff;
 	rom[0x1fd] = start >> 8;
+	memory_write_byte(space, 0x1fc, start & 0xff);
+	memory_write_byte(space, 0x1fd, start >> 8);
 
 	lynx_crc_keyword(devtag_get_device(image->machine, "quickload")); 
+
+	cpu_set_reg(cpu, REG_GENPC, start);
 
 	return INIT_PASS;
 }
