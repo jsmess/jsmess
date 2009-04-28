@@ -613,7 +613,7 @@ static MACHINE_RESET( ngp )
 	state->old_to3 = 0;
 	state->tlcs900 = devtag_get_device( machine, "maincpu" );
 	state->z80 = devtag_get_device( machine, "soundcpu" );
-	state->t6w28 = devtag_get_device( machine, "t8w28" );
+	state->t6w28 = devtag_get_device( machine, "t6w28" );
 	state->dac_l = devtag_get_device( machine, "dac_l" );
 	state->dac_r = devtag_get_device( machine, "dac_r" );
 	state->k1ge = devtag_get_device( machine, "k1ge" );
