@@ -12,11 +12,10 @@
 
     TODO:
 
-	- cassette left (data) / right (audio) separation
-    - proper emulation of the monstrous keyboard
+	- BASIC v1,v2 numbers are invisible
+	- cassette left (data) / right (audio) track separation
+    - proper keyboard emulation, need keyboard schematics
 	- parallel I/O module
-	- Chopper Rescue 18K cartridge not working
-	- HAPMON cartridge not working
 
 */
 
@@ -51,7 +50,6 @@ ADDRESS_MAP_END
 /* Input Ports */
 
 static INPUT_PORTS_START( crvision )
-
 	// Player 1 Joystick
 
 	PORT_START("PA0-0")
@@ -89,7 +87,7 @@ static INPUT_PORTS_START( crvision )
 	PORT_START("PA1-0")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_CHAR('G')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("<-") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x90") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('S')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
@@ -162,7 +160,7 @@ static INPUT_PORTS_START( crvision )
 
 	PORT_START("PA2-7")
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P2 Button 2 / ->") PORT_CODE(KEYCODE_TAB) PORT_CHAR(9) PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P2 Button 2 / \xE2\x86\x92") PORT_CODE(KEYCODE_TAB) PORT_CHAR(9) PORT_PLAYER(2)
 
 	// Player 2 Keyboard
 
@@ -311,7 +309,7 @@ static READ8_DEVICE_HANDLER( crvision_pia_porta_r )
 
 	UINT8 data = 0x7f;
 
-	if (cassette_input(cassette_device_image(device->machine)) < +0.0) data |= 0x80;
+	if (cassette_input(cassette_device_image(device->machine)) > -0.1469) data |= 0x80;
 
 	return data;
 }

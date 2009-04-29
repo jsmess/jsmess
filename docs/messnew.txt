@@ -47,6 +47,9 @@ System Driver Changes:
 - [COLECO] Fixed Super Action Controller emulation (it was missing additional
   action buttons and P2 slider). [Fabio Priuli]
 
+- [CRVISION] Added tape loading. You can now load tapes which have only the
+  left track. Stereo (data+audio) tapes are not supported yet. [Curt Coder]
+
 - [ELECTRON] Fixed graphical display modes. [Robbbert]
 
 - [MBEE] The pc85 now has the correct bioses (Thanks to Stewart Kay and IanM).
