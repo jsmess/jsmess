@@ -22,6 +22,10 @@ New System Drivers Supported (in no particular order):
 - TRS-80 Model 200 (not working) [Fabio Priuli]
 - Z1013 (Model with 8x4 and 8x8 keyboard) [Miodrag Milanovic]
 - Z80 N.E.  [Roberto Lavarone]
+- Dick Smith Wizzard [Curt Coder]
+- Dick Smith VZ 2000 [Curt Coder]
+- Hanimex Rameses [Curt Coder]
+- Sanyo Creativision MK-II [Curt Coder]
 
 
 

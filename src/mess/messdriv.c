@@ -655,6 +655,11 @@ XL/XE 16kB OS roms
 	/* VIDEO TECHNOLOGY */
 	DRIVER( crvision )	/* 1981 creatiVision								*/
 	DRIVER( fnvision )	/* 1983 FunVision									*/
+	DRIVER( crvisiop )
+	DRIVER( wizzard )
+	DRIVER( rameses )
+	DRIVER( vz2000 )
+	DRIVER( crvisio2 )
 	DRIVER( laser110 )	/* 1983 Laser 110									*/
 	DRIVER( las110de )	/* 1983 Sanyo Laser 110 (Germany)					*/
 	DRIVER( laser200 )	/* 1983 Laser 200 (color version of 110)			*/

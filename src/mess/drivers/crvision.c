@@ -5,13 +5,23 @@
 	There is also a CreatiVision Mk 2, possibly also known as the Laser 500. This was a proper computer,
 	containing a CreatiVision cartridge slot.
 
+	NOTE:
+
+	If you find that the keys R,D,F,G are not working while using the BASIC cartridge,
+	please remap the Joystick 2 keys to somewhere else. By default they overlap those keys.
+
     TODO:
 
+	- cassette left (data) / right (audio) separation
     - proper emulation of the monstrous keyboard
+	- parallel I/O module
+	- Chopper Rescue 18K cartridge not working
+	- HAPMON cartridge not working
 
 */
 
 #include "driver.h"
+#include "includes/crvision.h"
 #include "cpu/m6502/m6502.h"
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
@@ -19,21 +29,23 @@
 #include "sound/sn76496.h"
 #include "video/tms9928a.h"
 
-#define M6502_TAG	"m6502"
-#define SCREEN_TAG	"screen"
+static const device_config *cassette_device_image(running_machine *machine)
+{
+	return devtag_get_device(machine, "cassette");
+}
 
 /* Memory Map */
 
 static ADDRESS_MAP_START( crvision_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_MIRROR(0x0c00)
-	AM_RANGE(0x1000, 0x1003) AM_DEVREADWRITE("pia", pia6821_r, pia6821_w)
-	AM_RANGE(0x2000, 0x2000) AM_READ(TMS9928A_vram_r)
-	AM_RANGE(0x2001, 0x2001) AM_READ(TMS9928A_register_r)
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(TMS9928A_vram_w)
-	AM_RANGE(0x3001, 0x3001) AM_WRITE(TMS9928A_register_w)
+	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x0c00) AM_RAM 
+	AM_RANGE(0x1000, 0x1003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE(PIA6821_TAG, pia6821_r, pia6821_w)
+	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0ffe) AM_READ(TMS9928A_vram_r)
+	AM_RANGE(0x2001, 0x2001) AM_MIRROR(0x0ffe) AM_READ(TMS9928A_register_r)
+	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x0ffe) AM_WRITE(TMS9928A_vram_w)
+	AM_RANGE(0x3001, 0x3001) AM_MIRROR(0x0ffe) AM_WRITE(TMS9928A_register_w)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(2)
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
-	AM_RANGE(0xc000, 0xc7ff) AM_ROM AM_MIRROR(0x3800)
+	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x3800) AM_ROM
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -229,24 +241,31 @@ static const TMS9928a_interface tms9929_intf =
 	crvision_vdp_interrupt
 };
 
-static int keylatch;
-
 static WRITE8_DEVICE_HANDLER( crvision_pia_porta_w )
 {
 	/*
         Signal  Description
 
-        PA0     Keyboard raster player 1 output
-        PA1     Keyboard raster player 1 output
-        PA2     Keyboard raster player 2 output
-        PA3     Keyboard raster player 2 output
+        PA0     Keyboard raster player 1 output (joystick)
+        PA1     Keyboard raster player 1 output (hand keys)
+        PA2     Keyboard raster player 2 output (joystick)
+        PA3     Keyboard raster player 2 output (hand keys)
         PA4     ?
         PA5     ?
-        PA6     ?
-        PA7     ?
+        PA6     Cassette motor
+        PA7     Cassette data in/out
     */
 
-	keylatch = ~data & 0x0f;
+	crvision_state *state = device->machine->driver_data;
+
+	/* keyboard raster */
+	state->keylatch = ~data & 0x0f;
+
+	/* cassette motor */
+	cassette_change_state(cassette_device_image(device->machine), BIT(data, 6) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+
+	/* cassette data output */
+	cassette_output(cassette_device_image(device->machine), BIT(data, 7) ? +1.0 : -1.0);
 }
 
 static UINT8 read_keyboard(running_machine *machine, int pa)
@@ -280,17 +299,21 @@ static UINT8 read_keyboard(running_machine *machine, int pa)
 static READ8_DEVICE_HANDLER( crvision_pia_porta_r )
 {
 	/*
-        PA0     Keyboard raster player 1 output
-        PA1     Keyboard raster player 1 output
-        PA2     Keyboard raster player 2 output
-        PA3     Keyboard raster player 2 output
+        PA0     Keyboard raster player 1 output (joystick)
+        PA1     Keyboard raster player 1 output (hand keys)
+        PA2     Keyboard raster player 2 output (joystick)
+        PA3     Keyboard raster player 2 output (hand keys)
         PA4     ?
         PA5     ?
-        PA6     ?
-        PA7     ?
+        PA6     Cassette motor
+        PA7     Cassette data in/out
     */
 
-	return 0xff;
+	UINT8 data = 0x7f;
+
+	if (cassette_input(cassette_device_image(device->machine)) < +0.0) data |= 0x80;
+
+	return data;
 }
 
 static READ8_DEVICE_HANDLER( crvision_pia_portb_r )
@@ -308,46 +331,32 @@ static READ8_DEVICE_HANDLER( crvision_pia_portb_r )
         PB7     Keyboard input
     */
 
-	if (keylatch & 0x01)
-	{
-		return read_keyboard(device->machine, 0);
-	}
-	else if (keylatch & 0x02)
-	{
-		return read_keyboard(device->machine, 1);
-	}
-	else if (keylatch & 0x04)
-	{
-		return read_keyboard(device->machine, 2);
-	}
-	else if (keylatch & 0x08)
-	{
-		return read_keyboard(device->machine, 3);
-	}
+	crvision_state *state = device->machine->driver_data;
 
-	return 0xff;
+	UINT8 data = 0xff;
+
+	if (BIT(state->keylatch, 0)) data &= read_keyboard(device->machine, 0);
+	if (BIT(state->keylatch, 1)) data &= read_keyboard(device->machine, 1);
+	if (BIT(state->keylatch, 2)) data &= read_keyboard(device->machine, 2);
+	if (BIT(state->keylatch, 3)) data &= read_keyboard(device->machine, 3);
+
+	return data;
 }
 
-static READ8_DEVICE_HANDLER( crvision_pia_ca1_r )
+static READ_LINE_DEVICE_HANDLER( crvision_pia_ca_r )
 {
 	return 1;
 }
 
-static READ8_DEVICE_HANDLER( crvision_pia_ca2_r )
+static READ_LINE_DEVICE_HANDLER( crvision_pia_cb1_r )
 {
-	return 1;
+	crvision_state *state = device->machine->driver_data;
+
+	return sn76496_ready_r(state->sn76489, 0);
 }
 
-static int sn76489_ready;
-
-static READ8_DEVICE_HANDLER( crvision_pia_cb1_r )
+static WRITE_LINE_DEVICE_HANDLER( crvision_pia_cb2_w )
 {
-	return sn76489_ready;
-}
-
-static TIMER_CALLBACK(sn76489_set_ready)
-{
-	sn76489_ready = 1;
 }
 
 static WRITE8_DEVICE_HANDLER( crvision_pia_portb_w )
@@ -365,103 +374,103 @@ static WRITE8_DEVICE_HANDLER( crvision_pia_portb_w )
         PB7     SN76489 data output
     */
 
-	const device_config *sn76489 = devtag_get_device(device->machine, "sn76489");
-	sn76496_w(sn76489, 0, data);
+	crvision_state *state = device->machine->driver_data;
 
-	sn76489_ready = 0;
-
-	// wait 32 cycles of 2 MHz to synchronize CPU and SN76489
-	timer_set(device->machine, ATTOTIME_IN_USEC(16), NULL, 0, sn76489_set_ready);
-}
-
-static WRITE8_DEVICE_HANDLER( crvision_pia_cb2_w )
-{
-	sn76489_ready = data & 0x01;
+	sn76496_w(state->sn76489, 0, data);
 }
 
 static const pia6821_interface crvision_pia_intf =
 {
 	DEVCB_HANDLER(crvision_pia_porta_r),	// input A
 	DEVCB_HANDLER(crvision_pia_portb_r),	// input B
-	DEVCB_HANDLER(crvision_pia_ca1_r),		// input CA1 (+5V)
-	DEVCB_HANDLER(crvision_pia_cb1_r),		// input CB1 (SN76489 pin READY )
-	DEVCB_HANDLER(crvision_pia_ca2_r),		// input CA2 (+5V)
-	DEVCB_NULL,								// input CB2
+	DEVCB_LINE(crvision_pia_ca_r),			// input CA1 (+5V)
+	DEVCB_LINE(crvision_pia_cb1_r),			// input CB1 (SN76489 pin READY )
+	DEVCB_LINE(crvision_pia_ca_r),			// input CA2 (+5V)
+	DEVCB_LINE(crvision_pia_ca_r),			// input CB2 (+5V)
 	DEVCB_HANDLER(crvision_pia_porta_w),	// output A
 	DEVCB_HANDLER(crvision_pia_portb_w),	// output B (SN76489 pins D0-D7)
 	DEVCB_NULL,								// output CA2
-	DEVCB_HANDLER(crvision_pia_cb2_w),		// output CB2 (SN76489 pin CE_)
+	DEVCB_LINE(crvision_pia_cb2_w),			// output CB2 (SN76489 pin CE_)
 	DEVCB_NULL,								// irq A
 	DEVCB_NULL								// irq B
 };
 
-static MACHINE_START( crvision )
+static MACHINE_START( creativision )
 {
-	state_save_register_global(machine, keylatch);
-	state_save_register_global(machine, sn76489_ready);
+	crvision_state *state = machine->driver_data;
+
+	/* find devices */
+	state->sn76489 = devtag_get_device(machine, SN76489_TAG);
+
+	/* register for state saving */
+	state_save_register_global(machine, state->keylatch);
+}
+
+static MACHINE_START( ntsc )
+{
+	MACHINE_START_CALL(creativision);
 
 	TMS9928A_configure(&tms9918_intf);
 }
 
-static MACHINE_START( fnvision )
+static MACHINE_START( pal )
 {
-	state_save_register_global(machine, keylatch);
-	state_save_register_global(machine, sn76489_ready);
+	MACHINE_START_CALL(creativision);
 
 	TMS9928A_configure(&tms9929_intf);
 }
-
 
 static DEVICE_IMAGE_LOAD( crvision_cart )
 {
 	int size = image_length(image);
 	running_machine *machine = image->machine;
 	UINT8 *mem = memory_region(machine, M6502_TAG);
+	const address_space *program = cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM);
 
 	switch (size)
 	{
 	case 0x1000: // 4K
 		image_fread(image, mem + 0x9000, 0x1000);
-		memory_install_read8_handler(cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM), 0x8000, 0x9fff, 0, 0x2000, SMH_BANK1);
+		memory_install_read8_handler(program, 0x8000, 0x9fff, 0, 0x2000, SMH_BANK1);
 		break;
 
 	case 0x1800: // 6K
 		image_fread(image, mem + 0x9000, 0x1000);
 		image_fread(image, mem + 0x8800, 0x0800);
-		memory_install_read8_handler(cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM), 0x8000, 0x9fff, 0, 0x2000, SMH_BANK1);
+		memory_install_read8_handler(program, 0x8000, 0x9fff, 0, 0x2000, SMH_BANK1);
 		break;
 
 	case 0x2000: // 8K
 		image_fread(image, mem + 0x8000, 0x2000);
-		memory_install_read8_handler(cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM), 0x8000, 0x9fff, 0, 0x2000, SMH_BANK1);
+		memory_install_read8_handler(program, 0x8000, 0x9fff, 0, 0x2000, SMH_BANK1);
 		break;
 
 	case 0x2800: // 10K
 		image_fread(image, mem + 0x8000, 0x2000);
 		image_fread(image, mem + 0x5800, 0x0800);
-		memory_install_read8_handler(cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM), 0x8000, 0x9fff, 0, 0x2000, SMH_BANK1);
-		memory_install_read8_handler(cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM), 0x4000, 0x5fff, 0, 0x2000, SMH_BANK2);
+		memory_install_read8_handler(program, 0x8000, 0x9fff, 0, 0x2000, SMH_BANK1);
+		memory_install_read8_handler(program, 0x4000, 0x5fff, 0, 0x2000, SMH_BANK2);
 		break;
 
 	case 0x3000: // 12K
 		image_fread(image, mem + 0x8000, 0x2000);
 		image_fread(image, mem + 0x5000, 0x1000);
-		memory_install_read8_handler(cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM), 0x8000, 0x9fff, 0, 0x2000, SMH_BANK1);
-		memory_install_read8_handler(cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM), 0x4000, 0x5fff, 0, 0x2000, SMH_BANK2);
+		memory_install_read8_handler(program, 0x8000, 0x9fff, 0, 0x2000, SMH_BANK1);
+		memory_install_read8_handler(program, 0x4000, 0x5fff, 0, 0x2000, SMH_BANK2);
 		break;
 
 	case 0x4000: // 16K
 		image_fread(image, mem + 0xa000, 0x2000);
 		image_fread(image, mem + 0x8000, 0x2000);
-		memory_install_read8_handler(cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, SMH_BANK1);
+		memory_install_read8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_BANK1);
 		break;
 
 	case 0x4800: // 18K
 		image_fread(image, mem + 0xa000, 0x2000);
 		image_fread(image, mem + 0x8000, 0x2000);
 		image_fread(image, mem + 0x4800, 0x0800);
-		memory_install_read8_handler(cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM), 0x8000, 0x8fff, 0, 0, SMH_BANK1);
-		memory_install_read8_handler(cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM), 0x4000, 0x4fff, 0, 0x3000, SMH_BANK2);
+		memory_install_read8_handler(program, 0x8000, 0x8fff, 0, 0, SMH_BANK1);
+		memory_install_read8_handler(program, 0x4000, 0x4fff, 0, 0x3000, SMH_BANK2);
 		break;
 
 	default:
@@ -479,50 +488,68 @@ static DEVICE_IMAGE_LOAD( crvision_cart )
 
 /* Machine Driver */
 
-static MACHINE_DRIVER_START( crvision )
-	// basic machine hardware
-	MDRV_CPU_ADD(M6502_TAG, M6502, 2000000)
+static const cassette_config crvision_cassette_config =
+{
+	cassette_default_formats,
+	NULL,
+	CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED
+};
+
+static MACHINE_DRIVER_START( creativision )
+	MDRV_DRIVER_DATA(crvision_state)
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_2MHz)
 	MDRV_CPU_PROGRAM_MAP(crvision_map, 0)
 	MDRV_CPU_VBLANK_INT(SCREEN_TAG, crvision_int)
 
-	MDRV_MACHINE_START( crvision )
-
-    // video hardware
-	MDRV_IMPORT_FROM(tms9928a)
-	MDRV_SCREEN_MODIFY(SCREEN_TAG)
-	MDRV_SCREEN_REFRESH_RATE(10738635.0/2/342/262)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-
-	MDRV_PIA6821_ADD( "pia", crvision_pia_intf )
-
-	// sound hardware
+	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("sn76489", SN76489, 2000000)
+	MDRV_SOUND_ADD(SN76489_TAG, SN76489, XTAL_2MHz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
+	/* peripheral hardware */
+	MDRV_PIA6821_ADD(PIA6821_TAG, crvision_pia_intf)
 
 	/* cartridge */
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
 	MDRV_CARTSLOT_MANDATORY
 	MDRV_CARTSLOT_LOAD(crvision_cart)
+
+	/* cassette */
+	MDRV_CASSETTE_ADD("cassette", crvision_cassette_config)
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( fnvision )
-	MDRV_IMPORT_FROM( crvision )
-	MDRV_MACHINE_START( fnvision )
-	MDRV_SCREEN_MODIFY(SCREEN_TAG)
-	MDRV_SCREEN_REFRESH_RATE(10738635.0/2/342/313)
+static MACHINE_DRIVER_START( ntsc )
+	MDRV_IMPORT_FROM(creativision)
 
-	MDRV_CASSETTE_REMOVE( "cassette" )
+	MDRV_MACHINE_START(ntsc)
+
+    /* video hardware */
+	MDRV_IMPORT_FROM(tms9928a)
+	MDRV_SCREEN_MODIFY(SCREEN_TAG)
+	MDRV_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( pal )
+	MDRV_IMPORT_FROM(creativision)
+
+	MDRV_MACHINE_START(pal)
+
+	/* video hardware */
+	MDRV_IMPORT_FROM(tms9928a)
+	MDRV_SCREEN_MODIFY(SCREEN_TAG)
+	MDRV_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/313)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 MACHINE_DRIVER_END
 
 /* ROMs */
 
 ROM_START( crvision )
     ROM_REGION( 0x10000, M6502_TAG, 0 )
-    ROM_LOAD( "crvision.rom", 0xc000, 0x0800, CRC(c3c590c6) SHA1(5ac620c529e4965efb5560fe824854a44c983757) )
+    ROM_LOAD( "crvision.u20", 0xc000, 0x0800, CRC(c3c590c6) SHA1(5ac620c529e4965efb5560fe824854a44c983757) )
 ROM_END
 
 ROM_START( fnvision )
@@ -530,8 +557,19 @@ ROM_START( fnvision )
     ROM_LOAD( "funboot.rom", 0xc000, 0x0800, CRC(05602697) SHA1(c280b20c8074ba9abb4be4338b538361dfae517f) )
 ROM_END
 
+#define rom_crvisiop rom_crvision
+#define rom_wizzard rom_crvision
+#define rom_rameses rom_crvision
+#define rom_vz2000 rom_crvision
+#define rom_crvisio2 rom_crvision
+
 /* System Drivers */
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    CONFIG      COMPANY             FULLNAME */
-COMP( 1981, crvision, 0,		0,		crvision,	crvision,	0,		0,	"Video Technology", "CreatiVision (NTSC)", GAME_SUPPORTS_SAVE )
-CONS( 1983, fnvision, crvision, 0,		fnvision,	crvision,	0,		0,	"Video Technology", "FunVision Computer Video Games System (PAL)", GAME_SUPPORTS_SAVE )
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    CONFIG  COMPANY						FULLNAME */
+COMP( 1982, crvision, 0,		0,		ntsc,		crvision,	0,		0,		"Cheryco",					"CreatiVision (Japan)", GAME_SUPPORTS_SAVE )
+CONS( 1982, crvisiop, crvision, 0,		pal,		crvision,	0,		0,		"Video Technology",			"CreatiVision", GAME_SUPPORTS_SAVE )
+CONS( 1982, fnvision, crvision, 0,		pal,		crvision,	0,		0,		"Video Technology",			"FunVision", GAME_SUPPORTS_SAVE )
+CONS( 1982, wizzard,  crvision, 0,		pal,		crvision,	0,		0,		"Dick Smith Electronics",	"Wizzard (Australia)", GAME_SUPPORTS_SAVE )
+CONS( 1982, rameses,  crvision, 0,		pal,		crvision,	0,		0,		"Hanimex",					"Rameses (Australia)", GAME_SUPPORTS_SAVE )
+CONS( 1983, vz2000,   crvision, 0,		pal,		crvision,	0,		0,		"Dick Smith Electronics",	"VZ 2000 (Australia)", GAME_SUPPORTS_SAVE )
+CONS( 1983, crvisio2, crvision, 0,		pal,		crvision,	0,		0,		"Sanyo Video",				"CreatiVision MK-II (Germany)", GAME_SUPPORTS_SAVE )
