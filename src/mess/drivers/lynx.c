@@ -166,6 +166,8 @@ static QUICKLOAD_LOAD( lynx )
 	for (i = 0; i < length; i++)
 		memory_write_byte(space, start + i, data[i]);
 
+	free (data);
+
 	rom[0x1fc] = start & 0xff;
 	rom[0x1fd] = start >> 8;
 	memory_write_byte(space, 0x1fc, start & 0xff);
