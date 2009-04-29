@@ -72,7 +72,7 @@ static const device_config *cartslot_image(running_machine *machine)
 
 static void init_nes_core (running_machine *machine)
 {
-	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* We set these here in case they weren't set in the cart loader */
 	nes.rom = memory_region(machine, "maincpu");

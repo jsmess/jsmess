@@ -48,20 +48,20 @@ static void ondra_update_banks(running_machine *machine)
 {
 	UINT8 *mem = memory_region(machine, "maincpu");
 	if (ondra_bank1_status==0) {
-		memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
+		memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
 		memory_set_bankptr(machine, 1, mem + 0x010000);
 	} else {
-		memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, SMH_BANK1);
+		memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, SMH_BANK1);
 		memory_set_bankptr(machine, 1, mess_ram + 0x0000);
 	}
 	memory_set_bankptr(machine, 2, mess_ram + 0x4000);
 	if (ondra_bank2_status==0) {
-		memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xe000, 0xffff, 0, 0, SMH_BANK3);
-		memory_install_read8_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xe000, 0xffff, 0, 0, SMH_BANK3);
+		memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe000, 0xffff, 0, 0, SMH_BANK3);
+		memory_install_read8_handler (cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe000, 0xffff, 0, 0, SMH_BANK3);
 		memory_set_bankptr(machine, 3, mess_ram + 0xe000);
 	} else {
-		memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xe000, 0xffff, 0, 0, SMH_UNMAP);
-		memory_install_read8_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xe000, 0xffff, 0, 0, ondra_keyboard_r);
+		memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe000, 0xffff, 0, 0, SMH_UNMAP);
+		memory_install_read8_handler (cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe000, 0xffff, 0, 0, ondra_keyboard_r);
 	}
 }
 
@@ -84,8 +84,9 @@ WRITE8_HANDLER( ondra_port_0a_w )
 
 static TIMER_CALLBACK(nmi_check_callback)
 {
-	if ((input_port_read(machine, "NMI") & 1)==1) {
-		cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
+	if ((input_port_read(machine, "NMI") & 1) == 1) 
+	{
+		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 

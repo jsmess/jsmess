@@ -35,7 +35,7 @@ static emu_timer * pmd85_cassette_timer;
 
 static void pmd851_update_memory(running_machine *machine)
 {
-	const address_space* space = cpu_get_address_space(machine->cpu[0],ADDRESS_SPACE_PROGRAM);
+	const address_space* space = cputag_get_address_space(machine, "maincpu",ADDRESS_SPACE_PROGRAM);
 	
 	if (pmd85_startup_mem_map)
 	{
@@ -78,7 +78,7 @@ static void pmd851_update_memory(running_machine *machine)
 
 static void pmd852a_update_memory(running_machine *machine)
 {
-	const address_space* space = cpu_get_address_space(machine->cpu[0],ADDRESS_SPACE_PROGRAM);
+	const address_space* space = cputag_get_address_space(machine, "maincpu",ADDRESS_SPACE_PROGRAM);
 
 	if (pmd85_startup_mem_map)
 	{
@@ -150,7 +150,7 @@ static void pmd853_update_memory(running_machine *machine)
 
 static void alfa_update_memory(running_machine *machine)
 {
-	const address_space* space = cpu_get_address_space(machine->cpu[0],ADDRESS_SPACE_PROGRAM);
+	const address_space* space = cputag_get_address_space(machine, "maincpu",ADDRESS_SPACE_PROGRAM);
 
 	if (pmd85_startup_mem_map)
 	{
@@ -182,7 +182,7 @@ static void alfa_update_memory(running_machine *machine)
 
 static void mato_update_memory(running_machine *machine)
 {
-	const address_space* space = cpu_get_address_space(machine->cpu[0],ADDRESS_SPACE_PROGRAM);
+	const address_space* space = cputag_get_address_space(machine, "maincpu",ADDRESS_SPACE_PROGRAM);
 
 	if (pmd85_startup_mem_map)
 	{
@@ -206,7 +206,7 @@ static void mato_update_memory(running_machine *machine)
 
 static void c2717_update_memory(running_machine *machine)
 {
-	const address_space* space = cpu_get_address_space(machine->cpu[0],ADDRESS_SPACE_PROGRAM);
+	const address_space* space = cputag_get_address_space(machine, "maincpu",ADDRESS_SPACE_PROGRAM);
 
 	UINT8 *mem = memory_region(machine, "maincpu");
 	if (pmd85_startup_mem_map)
@@ -899,13 +899,15 @@ DRIVER_INIT ( c2717 )
 	pmd85_common_driver_init(machine);
 }
 
-static TIMER_CALLBACK( setup_machine_state ) {
+static TIMER_CALLBACK( setup_machine_state ) 
+{
 	device_config *pit8253 = (device_config*)devtag_get_device(machine, "pit8253");
 
 	pit8253_gate_w(pit8253, 0, 1);
 	pit8253_gate_w(pit8253, 1, 1);
 	pit8253_gate_w(pit8253, 2, 1);
-	if (pmd85_model!=MATO) {
+	if (pmd85_model!=MATO) 
+	{
 		msm8251_connect(devtag_get_device(machine, "uart"), &pmd85_cassette_serial_connection);
 	}
 }
@@ -934,5 +936,5 @@ MACHINE_RESET( pmd85 )
 
 	timer_set(machine,  attotime_zero, NULL, 0, setup_machine_state );
 
-	memory_set_direct_update_handler(cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM), pmd85_opbaseoverride);	
+	memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), pmd85_opbaseoverride);	
 }

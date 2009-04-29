@@ -529,7 +529,7 @@ static MACHINE_START( ql )
 {
 	ql_state *state = machine->driver_data;
 
-	const address_space *program = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *program = cputag_get_address_space(machine, M68008_TAG, ADDRESS_SPACE_PROGRAM);
 
 	/* configure ROM cartridge */
 
@@ -613,7 +613,6 @@ static MACHINE_DRIVER_START( ql )
 	MDRV_DRIVER_DATA(ql_state)
 
 	// basic machine hardware
-
 	MDRV_CPU_ADD(M68008_TAG, M68008, X1/2)
 	MDRV_CPU_PROGRAM_MAP(ql_map, 0)
 

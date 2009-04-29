@@ -143,7 +143,7 @@ static TIMER_CALLBACK(pc1401_power_up)
 DRIVER_INIT( pc1401 )
 {
 	int i;
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *gfx=memory_region(machine, "gfx1");
 #if 0
 	char sucker[]={

@@ -45,11 +45,11 @@ INPUT_PORTS_END
 /* Machine driver */
 static MACHINE_DRIVER_START( pk8020 )
   /* basic machine hardware */
-  MDRV_CPU_ADD("maincpu", 8080, 2500000)
-  MDRV_CPU_PROGRAM_MAP(pk8020_mem, 0)
-  MDRV_CPU_IO_MAP(pk8020_io, 0)
+	MDRV_CPU_ADD("maincpu", 8080, 2500000)
+	MDRV_CPU_PROGRAM_MAP(pk8020_mem, 0)
+	MDRV_CPU_IO_MAP(pk8020_io, 0)
 
-  MDRV_MACHINE_RESET( pk8020 )
+	MDRV_MACHINE_RESET( pk8020 )
 
     /* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -62,7 +62,7 @@ static MACHINE_DRIVER_START( pk8020 )
 	MDRV_PALETTE_INIT(pk8020)
 
 	MDRV_VIDEO_START(pk8020)
-  MDRV_VIDEO_UPDATE(pk8020)
+	MDRV_VIDEO_UPDATE(pk8020)
 MACHINE_DRIVER_END
 
 /* ROM definition */

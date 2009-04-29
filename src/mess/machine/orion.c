@@ -97,7 +97,8 @@ WRITE8_HANDLER ( orion128_romdisk_w )
 	ppi8255_w((device_config*)devtag_get_device(space->machine, "ppi8255_1"), offset & 3, data);	
 }
 
-static void orion_set_video_mode(running_machine *machine, int width) {
+static void orion_set_video_mode(running_machine *machine, int width) 
+{
 		rectangle visarea;
 		
 		visarea.min_x = 0;
@@ -109,16 +110,23 @@ static void orion_set_video_mode(running_machine *machine, int width) {
 
 WRITE8_HANDLER ( orion128_video_mode_w )
 {				
-	if ((data & 0x80)!=(orion128_video_mode & 0x80)) {
-		if ((data & 0x80)==0x80) {
-			if (orion_video_mode_mask == 31) {
+	if ((data & 0x80)!=(orion128_video_mode & 0x80)) 
+	{
+		if ((data & 0x80)==0x80) 
+		{
+			if (orion_video_mode_mask == 31) 
+			{
 				orion128_video_width = SCREEN_WIDTH_512;
 				orion_set_video_mode(space->machine,512);		
-			} else {
+			} 
+			else 
+			{
 				orion128_video_width = SCREEN_WIDTH_480;
 				orion_set_video_mode(space->machine,480);		
 			}			
-		} else {
+		} 
+		else 
+		{
 			orion128_video_width = SCREEN_WIDTH_384;
 			orion_set_video_mode(space->machine,384);
 		}
@@ -129,17 +137,25 @@ WRITE8_HANDLER ( orion128_video_mode_w )
 
 WRITE8_HANDLER ( orion128_video_page_w )
 {	
-	if (orion128_video_page != data) {
-		if ((data & 0x80)!=(orion128_video_page & 0x80)) {
-			if ((data & 0x80)==0x80) {
-				if (orion_video_mode_mask == 31) {
+	if (orion128_video_page != data) 
+	{
+		if ((data & 0x80)!=(orion128_video_page & 0x80)) 
+		{
+			if ((data & 0x80)==0x80) 
+			{
+				if (orion_video_mode_mask == 31) 
+				{
 					orion128_video_width = SCREEN_WIDTH_512;
 					orion_set_video_mode(space->machine,512);		
-				} else {
+				} 
+				else 
+				{
 					orion128_video_width = SCREEN_WIDTH_480;
 					orion_set_video_mode(space->machine,480);		
 				}			
-			} else {
+			} 
+			else 
+			{
 				orion128_video_width = SCREEN_WIDTH_384;
 				orion_set_video_mode(space->machine,384);
 			}
@@ -151,7 +167,8 @@ WRITE8_HANDLER ( orion128_video_page_w )
 
 WRITE8_HANDLER ( orion128_memory_page_w )
 {				
-	if (data!=orion128_memory_page ) {
+	if (data!=orion128_memory_page ) 
+	{
 		memory_set_bankptr(space->machine, 1, mess_ram + (data & 3) * 0x10000);
 		orion128_memory_page = (data & 3);
 	}
@@ -194,9 +211,12 @@ DEVICE_IMAGE_LOAD( orion_floppy )
 	if (device_load_basicdsk_floppy (image) != INIT_PASS)
 		return INIT_FAIL;
 
-	if (size==800*1024) {
+	if (size==800*1024) 
+	{
 		basicdsk_set_geometry (image, 80, 2, 5, 1024, 1, 0, FALSE);
-	} else {
+	} 
+	else 
+	{
 		basicdsk_set_geometry (image, 80, 2, 9, 512, 1, 0, FALSE);
 	}
 	return INIT_PASS;
@@ -214,7 +234,8 @@ READ8_HANDLER ( orion128_floppy_r )
 {	
 	const device_config *fdc = devtag_get_device(space->machine, "wd1793");
 
-	switch(offset) {
+	switch(offset) 
+	{
 		case 0x0	:
 		case 0x10 : return wd17xx_status_r(fdc,0);
 		case 0x1 	:
@@ -231,7 +252,8 @@ WRITE8_HANDLER ( orion128_floppy_w )
 {		
 	const device_config *fdc = devtag_get_device(space->machine, "wd1793");
 	
-	switch(offset) {
+	switch(offset) 
+	{
 		case 0x0	:
 		case 0x10 : wd17xx_command_w(fdc,0,data); break;
 		case 0x1 	:
@@ -247,18 +269,24 @@ WRITE8_HANDLER ( orion128_floppy_w )
 }
 static READ8_HANDLER ( orionz80_floppy_rtc_r )
 {	
-	if ((offset >= 0x60) && (offset <= 0x6f)) {
+	if ((offset >= 0x60) && (offset <= 0x6f)) 
+	{
 		return mc146818_port_r(space,offset-0x60);
-	} else { 
+	} 
+	else 
+	{ 
 		return orion128_floppy_r(space,offset);
 	}	
 }
 
 static WRITE8_HANDLER ( orionz80_floppy_rtc_w )
 {		
-	if ((offset >= 0x60) && (offset <= 0x6f)) {
+	if ((offset >= 0x60) && (offset <= 0x6f)) 
+	{
 		mc146818_port_w(space,offset-0x60,data);
-	} else { 
+	} 
+	else 
+	{
 		orion128_floppy_w(space,offset,data);
 	}	
 }
@@ -283,9 +311,12 @@ static UINT8 orion_speaker;
 WRITE8_HANDLER ( orionz80_sound_w )
 {	
 	const device_config *speaker = devtag_get_device(space->machine, "speaker");
-	if (orion_speaker==0) {
+	if (orion_speaker == 0) 
+	{
 		orion_speaker = data;		
-	} else {
+	} 
+	else 
+	{
 		orion_speaker = 0 ;	
 	}
 	speaker_level_w(speaker,orion_speaker);
@@ -303,21 +334,25 @@ static void orionz80_switch_bank(running_machine *machine)
 {
 	UINT8 bank_select;
 	UINT8 segment_select;
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	
 	bank_select = (orionz80_dispatcher & 0x0c) >> 2;
 	segment_select = orionz80_dispatcher & 0x03;
 	
 	memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_BANK1);
-	if ((orionz80_dispatcher & 0x80)==0) { // dispatcher on
+	if ((orionz80_dispatcher & 0x80)==0) 
+	{ // dispatcher on
 		memory_set_bankptr(machine, 1, mess_ram + 0x10000 * bank_select + segment_select * 0x4000 );		
-	} else { // dispatcher off
+	} 
+	else 
+	{ // dispatcher off
 		memory_set_bankptr(machine, 1, mess_ram + 0x10000 * orionz80_memory_page);		
 	}
 		
 	memory_set_bankptr(machine, 2, mess_ram + 0x4000 + 0x10000 * orionz80_memory_page);		
 	
-	if ((orionz80_dispatcher & 0x20) == 0) {
+	if ((orionz80_dispatcher & 0x20) == 0) 
+	{
 		memory_install_write8_handler(space, 0xf400, 0xf4ff, 0, 0, orion128_system_w);
 		memory_install_write8_handler(space, 0xf500, 0xf5ff, 0, 0, orion128_romdisk_w);
 		memory_install_write8_handler(space, 0xf700, 0xf7ff, 0, 0, orionz80_floppy_rtc_w);	
@@ -335,7 +370,9 @@ static void orionz80_switch_bank(running_machine *machine)
 		memory_set_bankptr(machine, 3, mess_ram + 0xf000);				
 		memory_set_bankptr(machine, 5, memory_region(machine, "maincpu") + 0xf800);		
 		
-	} else {
+	} 
+	else 
+	{
 		/* if it is full memory access */
 		memory_set_bankptr(machine, 3, mess_ram + 0xf000 + 0x10000 * orionz80_memory_page);		
 		memory_set_bankptr(machine, 4, mess_ram + 0xf400 + 0x10000 * orionz80_memory_page);		
@@ -357,7 +394,7 @@ WRITE8_HANDLER ( orionz80_dispatcher_w )
 
 MACHINE_RESET ( orionz80 ) 
 {	
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	
 	memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
 	memory_install_write8_handler(space, 0x4000, 0xefff, 0, 0, SMH_BANK2);
@@ -396,20 +433,25 @@ MACHINE_RESET ( orionz80 )
 
 INTERRUPT_GEN( orionz80_interrupt ) 
 {
-	if ((orionz80_dispatcher & 0x40)==0x40) {
+	if ((orionz80_dispatcher & 0x40)==0x40) 
+	{
 		cpu_set_input_line(device, 0, HOLD_LINE);			
 	}	
 }
 
-READ8_HANDLER ( orionz80_io_r ) {
-	if (offset == 0xFFFD) {
+READ8_HANDLER ( orionz80_io_r ) 
+{
+	if (offset == 0xFFFD) 
+	{
 		return ay8910_r (devtag_get_device(space->machine, "ay8912"), 0);
 	}
 	return 0xff;
 }
 
-WRITE8_HANDLER ( orionz80_io_w ) {
-	switch (offset & 0xff) {
+WRITE8_HANDLER ( orionz80_io_w ) 
+{
+	switch (offset & 0xff) 
+	{
 		case 0xf8 : orion128_video_mode_w(space,0,data);break;
 		case 0xf9 : orionz80_memory_page_w(space,0,data);break;
 		case 0xfa : orion128_video_page_w(space,0,data);break;
@@ -417,7 +459,8 @@ WRITE8_HANDLER ( orionz80_io_w ) {
 		case 0xfe : orionz80_sound_fe_w(space,0,data);break;
 		case 0xff : orionz80_sound_w(space,0,data);break;
 	}
-	switch(offset) {
+	switch(offset) 
+	{
 		case 0xfffd : ay8910_address_w(devtag_get_device(space->machine, "ay8912"), 0, data);
 					  break;
 		case 0xbffd :
@@ -453,10 +496,11 @@ static WRITE8_HANDLER ( orionpro_memory_page_w );
 
 static void orionpro_bank_switch(running_machine *machine)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int page = orionpro_page & 7; // we have only 8 pages	
 	int is128 = (orionpro_dispatcher & 0x80) ? 1 : 0;
-	if (is128==1) {
+	if (is128==1) 
+	{
 		page = orionpro_128_page & 7;
 	}
 	memory_install_write8_handler(space, 0x0000, 0x1fff, 0, 0, SMH_BANK1);
@@ -469,37 +513,49 @@ static void orionpro_bank_switch(running_machine *machine)
 	memory_install_write8_handler(space, 0xf800, 0xffff, 0, 0, SMH_BANK8);
 	
 	
-	if ((orionpro_dispatcher & 0x01)==0x00) {	// RAM0 segment disabled
+	if ((orionpro_dispatcher & 0x01)==0x00) 
+	{	// RAM0 segment disabled
 		memory_set_bankptr(machine, 1, mess_ram + 0x10000 * page);
 		memory_set_bankptr(machine, 2, mess_ram + 0x10000 * page + 0x2000);		
-	} else {                
+	} 
+	else 
+	{
 		memory_set_bankptr(machine, 1, mess_ram + (orionpro_ram0_segment & 31) * 0x4000);
 		memory_set_bankptr(machine, 2, mess_ram + (orionpro_ram0_segment & 31) * 0x4000 + 0x2000);
 	}
-	if ((orionpro_dispatcher & 0x10)==0x10) {	// ROM1 enabled		
+	if ((orionpro_dispatcher & 0x10)==0x10) 
+	{	// ROM1 enabled		
 		memory_install_write8_handler(space, 0x0000, 0x1fff, 0, 0, SMH_UNMAP);
 		memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0x20000);		
 	}
-	if ((orionpro_dispatcher & 0x08)==0x08) {	// ROM2 enabled
+	if ((orionpro_dispatcher & 0x08)==0x08) 
+	{	// ROM2 enabled
 		memory_install_write8_handler(space, 0x2000, 0x3fff, 0, 0, SMH_UNMAP);
 		memory_set_bankptr(machine, 2, memory_region(machine, "maincpu") + 0x22000 + (orionpro_rom2_segment & 7) * 0x2000);		
 	}
 
-	if ((orionpro_dispatcher & 0x02)==0x00) {	// RAM1 segment disabled
+	if ((orionpro_dispatcher & 0x02)==0x00) 
+	{	// RAM1 segment disabled
 		memory_set_bankptr(machine, 3, mess_ram + 0x10000 * page + 0x4000);		
-	} else {                     
+	} 
+	else 
+	{
 		memory_set_bankptr(machine, 3, mess_ram + (orionpro_ram1_segment & 31) * 0x4000);		
 	}
 	
-	if ((orionpro_dispatcher & 0x04)==0x00) {	// RAM2 segment disabled
+	if ((orionpro_dispatcher & 0x04)==0x00) 
+	{	// RAM2 segment disabled
 		memory_set_bankptr(machine, 4, mess_ram + 0x10000 * page + 0x8000);
-	} else {        
+	} 
+	else
+	{ 
 		memory_set_bankptr(machine, 4, mess_ram + (orionpro_ram2_segment & 31) * 0x4000);
 	}
 	
 	memory_set_bankptr(machine, 5, mess_ram + 0x10000 * page + 0xc000);
 	
-	if (is128) {
+	if (is128) 
+	{
 		memory_set_bankptr(machine, 6, mess_ram + 0x10000 * 0 + 0xf000);	
 
 		memory_install_write8_handler(space, 0xf400, 0xf4ff, 0, 0, orion128_system_w);
@@ -519,12 +575,17 @@ static void orionpro_bank_switch(running_machine *machine)
 	
 	
 		memory_set_bankptr(machine, 8, mess_ram + 0x10000 * 0 + 0xf800);	
-	} else {
-		if ((orionpro_dispatcher & 0x40)==0x40) {	// FIX F000 enabled
+	} 
+	else 
+	{
+		if ((orionpro_dispatcher & 0x40)==0x40) 
+		{	// FIX F000 enabled
 			memory_set_bankptr(machine, 6, mess_ram + 0x10000 * 0 + 0xf000);		
 			memory_set_bankptr(machine, 7, mess_ram + 0x10000 * 0 + 0xf400);		
 			memory_set_bankptr(machine, 8, mess_ram + 0x10000 * 0 + 0xf800);		
-		} else {
+		} 
+		else 
+		{
 			memory_set_bankptr(machine, 6, mess_ram + 0x10000 * page + 0xf000);		
 			memory_set_bankptr(machine, 7, mess_ram + 0x10000 * page + 0xf400);		
 			memory_set_bankptr(machine, 8, mess_ram + 0x10000 * page + 0xf800);		
@@ -563,10 +624,12 @@ MACHINE_RESET ( orionpro )
 	orionpro_pseudo_color = 0;
 }
 
-READ8_HANDLER ( orionpro_io_r ) {
+READ8_HANDLER ( orionpro_io_r ) 
+{
 	const device_config *fdc = devtag_get_device(space->machine, "wd1793");
 		
-	switch (offset & 0xff) {		
+	switch (offset & 0xff) 
+	{		
 		case 0x00 : return 0x56;
 		case 0x04 : return orionpro_ram0_segment;
 		case 0x05 : return orionpro_ram1_segment;
@@ -588,16 +651,19 @@ READ8_HANDLER ( orionpro_io_r ) {
 		case 0x2a : return orion128_romdisk_r(space,2);
 		case 0x2b : return orion128_romdisk_r(space,3);
 	}
-	if (offset == 0xFFFD) {
+	if (offset == 0xFFFD) 
+	{
 		return ay8910_r (devtag_get_device(space->machine, "ay8912"), 0);
 	}
 	return 0xff;
 }
 
-WRITE8_HANDLER ( orionpro_io_w ) {
+WRITE8_HANDLER ( orionpro_io_w ) 
+{
 	const device_config *fdc = devtag_get_device(space->machine, "wd1793");
 		
-	switch (offset & 0xff) {		
+	switch (offset & 0xff) 
+	{		
 		case 0x04 : orionpro_ram0_segment = data; orionpro_bank_switch(space->machine); break;		
 		case 0x05 : orionpro_ram1_segment = data; orionpro_bank_switch(space->machine); break;
 		case 0x06 : orionpro_ram2_segment = data; orionpro_bank_switch(space->machine); break;
@@ -625,7 +691,8 @@ WRITE8_HANDLER ( orionpro_io_w ) {
 		case 0xfe : orionz80_sound_fe_w(space,0,data);break;
 		case 0xff : orionz80_sound_w(space,0,data);break;
 	}
-	switch(offset) {
+	switch(offset) 
+	{
 		case 0xfffd : ay8910_address_w(devtag_get_device(space->machine, "ay8912"), 0, data);
 					  break;
 		case 0xbffd :

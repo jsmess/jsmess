@@ -82,11 +82,11 @@ static void oric_refresh_ints(running_machine *machine)
 	/* any irq set? */
 	if ((oric_irqs & 0x0f)!=0)
 	{
-		cpu_set_input_line(machine->cpu[0],0, HOLD_LINE);
+		cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
 	}
 	else
 	{
-		cpu_set_input_line(machine->cpu[0],0, CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
 	}
 }
 
@@ -162,7 +162,7 @@ static char oric_psg_control;
 /* this port is also used to read printer data */
 static READ8_DEVICE_HANDLER ( oric_via_in_a_func )
 {
-	const address_space *space = cpu_get_address_space( device->machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	const address_space *space = cputag_get_address_space( device->machine, "maincpu", ADDRESS_SPACE_PROGRAM );
 
 	/*logerror("port a read\r\n"); */
 
@@ -464,7 +464,7 @@ CALL &320 to start, or use BOBY rom.
 static void oric_install_apple2_interface(running_machine *machine)
 {
 	const device_config *fdc = devtag_get_device(machine, "fdc");
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	memory_install_read8_handler(space, 0x0300, 0x030f, 0, 0, oric_IO_r);
 	memory_install_read8_device_handler(space, fdc, 0x0310, 0x031f, 0, 0, applefdc_r);
@@ -479,7 +479,7 @@ static void oric_install_apple2_interface(running_machine *machine)
 static void oric_enable_memory(running_machine *machine, int low, int high, int rd, int wr)
 {
 	int i;
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	for (i = low; i <= high; i++)
 	{
 		switch(i) {
@@ -558,7 +558,7 @@ static WRITE8_HANDLER(apple2_v2_interface_w)
 static void oric_install_apple2_v2_interface(running_machine *machine)
 {
 	const device_config *fdc = devtag_get_device(machine, "fdc");
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	memory_install_read8_handler(space, 0x0300, 0x030f, 0, 0, oric_IO_r);
 	memory_install_read8_device_handler(space, fdc, 0x0310, 0x031f, 0, 0, applefdc_r);
@@ -748,12 +748,12 @@ static WRITE8_HANDLER(oric_jasmin_w)
 			wd17xx_reset(fdc);
 			break;
 		case 0x0a:
-			logerror("jasmin overlay ram w: %02x PC: %04x\n",data,cpu_get_pc(space->machine->cpu[0]));
+			logerror("jasmin overlay ram w: %02x PC: %04x\n", data, cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")));
 			port_3fa_w = data;
 			oric_jasmin_set_mem_0x0c000(space->machine);
 			break;
 		case 0x0b:
-			logerror("jasmin romdis w: %02x PC: %04x\n",data,cpu_get_pc(space->machine->cpu[0]));
+			logerror("jasmin romdis w: %02x PC: %04x\n", data, cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")));
 			port_3fb_w = data;
 			oric_jasmin_set_mem_0x0c000(space->machine);
 			break;
@@ -774,7 +774,7 @@ static WRITE8_HANDLER(oric_jasmin_w)
 
 static void oric_install_jasmin_interface(running_machine *machine)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	/* romdis */
 	port_3fb_w = 1;
 	oric_jasmin_set_mem_0x0c000(machine);
@@ -1026,7 +1026,7 @@ WRITE8_HANDLER(oric_microdisc_w)
 
 static void oric_install_microdisc_interface(running_machine *machine)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	memory_install_read8_handler(space, 0x0300, 0x030f, 0, 0, oric_IO_r);
 	memory_install_read8_handler(space, 0x0310, 0x031f, 0, 0, oric_microdisc_r);
@@ -1117,7 +1117,7 @@ MACHINE_START( oric )
 MACHINE_RESET( oric )
 {
 	int disc_interface_id = input_port_read(machine, "FLOPPY") & 0x07;
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	switch (disc_interface_id)
 	{
@@ -1208,7 +1208,7 @@ READ8_HANDLER ( oric_IO_r )
 	{
 		if ((offset & 0x0f)!=0x0d)
 		{
-			logerror("via 0 r: %04x %04x\n",offset, (unsigned) cpu_get_reg(space->machine->cpu[0], REG_GENPC));
+			logerror("via 0 r: %04x %04x\n",offset, (unsigned) cpu_get_reg(cputag_get_cpu(space->machine, "maincpu"), REG_GENPC));
 		}
 	}
 	/* it is repeated */
@@ -1227,7 +1227,7 @@ WRITE8_HANDLER ( oric_IO_w )
 
 		case ORIC_FLOPPY_INTERFACE_MICRODISC:
 		{
-			if ((offset>=0x010) && (offset<=0x01f))
+			if ((offset >= 0x010) && (offset <= 0x01f))
 			{
 				oric_microdisc_w(offset, data);
 				return;
@@ -1237,9 +1237,9 @@ WRITE8_HANDLER ( oric_IO_w )
 
 		case ORIC_FLOPPY_INTERFACE_JASMIN:
 		{
-			if ((offset>=0x0f4) && (offset<=0x0ff))
+			if ((offset >= 0x0f4) && (offset <= 0x0ff))
 			{
-				oric_jasmin_w(offset,data);
+				oric_jasmin_w(offset, data);
 				return;
 			}
 
@@ -1249,10 +1249,10 @@ WRITE8_HANDLER ( oric_IO_w )
 #endif
 	if (enable_logging)
 	{
-		logerror("via 0 w: %04x %02x %04x\n",offset,data,(unsigned) cpu_get_reg(space->machine->cpu[0], REG_GENPC));
+		logerror("via 0 w: %04x %02x %04x\n", offset, data,(unsigned) cpu_get_reg(cputag_get_cpu(space->machine, "maincpu"), REG_GENPC));
 	}
 
-	via_w(via_0, offset & 0x0f,data);
+	via_w(via_0, offset & 0x0f, data);
 }
 
 
@@ -1331,7 +1331,7 @@ static void	telestrat_refresh_mem(running_machine *machine)
 {
 	read8_space_func rh;
 	write8_space_func wh;
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	struct telestrat_mem_block *mem_block = &telestrat_blocks[telestrat_bank_selection];
 

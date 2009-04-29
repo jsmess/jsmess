@@ -21,7 +21,7 @@ DRIVER_INIT(pk8020)
 
 MACHINE_RESET( pk8020 )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);	
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);	
 	
 	memory_install_read8_handler (space, 0x0000, 0x1fff, 0, 0, SMH_BANK1);
 	memory_install_write8_handler(space, 0x0000, 0x7fff, 0, 0, SMH_UNMAP);

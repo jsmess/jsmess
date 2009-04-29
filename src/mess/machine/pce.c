@@ -199,7 +199,7 @@ DEVICE_IMAGE_LOAD(pce_cart)
 	/* Check for Street fighter 2 */
 	if ( size == PCE_ROM_MAXSIZE ) 
 	{
-		memory_install_write8_handler(cpu_get_address_space(image->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x01ff0, 0x01ff3, 0, 0, pce_sf2_banking_w );
+		memory_install_write8_handler(cputag_get_address_space(image->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01ff0, 0x01ff3, 0, 0, pce_sf2_banking_w );
 	}
 
 	/* Check for Populous */
@@ -207,7 +207,7 @@ DEVICE_IMAGE_LOAD(pce_cart)
 	{
 		cartridge_ram = auto_malloc( 0x8000 );
 		memory_set_bankptr( image->machine, 2, cartridge_ram );
-		memory_install_write8_handler(cpu_get_address_space(image->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x080000, 0x087FFF, 0, 0, pce_cartridge_ram_w );
+		memory_install_write8_handler(cputag_get_address_space(image->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x080000, 0x087FFF, 0, 0, pce_cartridge_ram_w );
 	}
 
 	/* Check for CD system card */
@@ -220,7 +220,7 @@ DEVICE_IMAGE_LOAD(pce_cart)
 			pce_sys3_card = 1;
 			cartridge_ram = auto_malloc( 0x30000 );
 			memory_set_bankptr( image->machine, 4, cartridge_ram );
-			memory_install_write8_handler(cpu_get_address_space(image->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0D0000, 0x0FFFFF, 0, 0, pce_cartridge_ram_w );
+			memory_install_write8_handler(cputag_get_address_space(image->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0D0000, 0x0FFFFF, 0, 0, pce_cartridge_ram_w );
 		}
 	}
 	return 0;
@@ -863,11 +863,11 @@ static void pce_cd_set_irq_line( running_machine *machine, int num, int state )
 
 	if ( pce_cd.regs[0x02] & pce_cd.regs[0x03] & ( PCE_CD_IRQ_TRANSFER_DONE | PCE_CD_IRQ_TRANSFER_READY ) ) 
 	{
-		cpu_set_input_line(machine->cpu[0], 1, ASSERT_LINE );
+		cputag_set_input_line(machine, "maincpu", 1, ASSERT_LINE );
 	} 
 	else 
 	{
-		cpu_set_input_line(machine->cpu[0], 1, CLEAR_LINE );
+		cputag_set_input_line(machine, "maincpu", 1, CLEAR_LINE );
 	}
 }
 
@@ -1078,7 +1078,7 @@ static UINT8 pce_cd_get_cd_data_byte(running_machine *machine)
 		if ( pce_cd.scsi_IO ) 
 		{
 			pce_cd.scsi_ACK = 1;
-			timer_set(machine,  cpu_clocks_to_attotime(machine->cpu[0], 15), NULL, 0, pce_cd_clear_ack );
+			timer_set(machine, cputag_clocks_to_attotime(machine, "maincpu", 15), NULL, 0, pce_cd_clear_ack );
 		}
 	}
 	return data;

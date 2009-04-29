@@ -137,7 +137,7 @@ static I8275_DMA_REQUEST(radio86_video_dma_request) {
 READ8_DEVICE_HANDLER(radio86_dma_read_byte)
 {
 	UINT8 result;
-	result = memory_read_byte(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM),offset);
+	result = memory_read_byte(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), offset);
 	return result;
 }
 
@@ -172,12 +172,12 @@ READ8_HANDLER (radio_cpu_state_r )
 
 READ8_HANDLER (radio_io_r )
 {
-	return memory_read_byte(cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM),(offset << 8) + offset);
+	return memory_read_byte(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), (offset << 8) + offset);
 }
 
 WRITE8_HANDLER(radio_io_w )
 {
-	memory_write_byte(cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM),(offset << 8) + offset,data);
+	memory_write_byte(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), (offset << 8) + offset,data);
 }
 
 MACHINE_RESET( radio86 )

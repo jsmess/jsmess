@@ -122,7 +122,7 @@ static void pc8801_update_interrupt(running_machine *machine)
 	}
 	if (level >= 0 && level<interrupt_level_reg)
 	{
-		cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
+		cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
 	}
 }
 
@@ -170,11 +170,11 @@ static TIMER_CALLBACK(pc8801_timer_interrupt)
 
 static void pc8801_init_interrupt(running_machine *machine)
 {
-	interrupt_level_reg=0;
-	interrupt_mask_reg=0xf8;
-	interrupt_trig_reg=0x0;
-	cpu_set_irq_callback(machine->cpu[0],pc8801_interrupt_callback);
-	timer_pulse(machine, ATTOTIME_IN_HZ(600),NULL, 0,pc8801_timer_interrupt);
+	interrupt_level_reg = 0;
+	interrupt_mask_reg = 0xf8;
+	interrupt_trig_reg = 0x0;
+	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), pc8801_interrupt_callback);
+	timer_pulse(machine, ATTOTIME_IN_HZ(600), NULL, 0, pc8801_timer_interrupt);
 }
 
 WRITE8_HANDLER(pc88sr_outport_30)
@@ -394,14 +394,14 @@ void pc8801_update_bank(running_machine *machine)
 		if(ext_w==NULL)
 		{
 			/* read only mode */
-			memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x5fff, 0, 0, SMH_NOP);
-			memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, SMH_NOP);
+			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x5fff, 0, 0, SMH_NOP);
+			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, SMH_NOP);
 		}
 		else
 		{
 			/* r/w mode */
-			memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x5fff, 0, 0, SMH_BANK1);
-			memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, SMH_BANK2);
+			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x5fff, 0, 0, SMH_BANK1);
+			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, SMH_BANK2);
 			if(ext_w!=ext_r) logerror("differnt between read and write bank of extension memory.\n");
 		}
 	}
@@ -411,8 +411,8 @@ void pc8801_update_bank(running_machine *machine)
 		if(RAMmode)
 		{
 			/* RAM */
-			memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x5fff, 0, 0, SMH_BANK1);
-			memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, SMH_BANK2);
+			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x5fff, 0, 0, SMH_BANK1);
+			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, SMH_BANK2);
 			memory_set_bankptr(machine, 1, pc8801_mainRAM + 0x0000);
 			memory_set_bankptr(machine, 2, pc8801_mainRAM + 0x6000);
 		}
@@ -420,8 +420,8 @@ void pc8801_update_bank(running_machine *machine)
 		{
 			/* ROM */
 			/* write through to main RAM */
-			memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x5fff, 0, 0, pc8801_writemem1);
-			memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, pc8801_writemem2);
+			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x5fff, 0, 0, pc8801_writemem1);
+			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, pc8801_writemem2);
 			if(ROMmode)
 			{
 				/* N-BASIC */
@@ -443,8 +443,8 @@ void pc8801_update_bank(running_machine *machine)
 	}
 
 	/* 0x8000 to 0xffff */
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0x83ff, 0, 0, (RAMmode || ROMmode) ? SMH_BANK3 : pc8801_read_textwindow);
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0x83ff, 0, 0, (RAMmode || ROMmode) ? SMH_BANK3 : pc8801_write_textwindow);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0x83ff, 0, 0, (RAMmode || ROMmode) ? SMH_BANK3 : pc8801_read_textwindow);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0x83ff, 0, 0, (RAMmode || ROMmode) ? SMH_BANK3 : pc8801_write_textwindow);
 
 	memory_set_bankptr(machine, 4, pc8801_mainRAM + 0x8400);
 
@@ -455,10 +455,10 @@ void pc8801_update_bank(running_machine *machine)
 	}
 	else
 	{
-		memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc000, 0xefff, 0, 0, SMH_BANK5);
-		memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc000, 0xefff, 0, 0, SMH_BANK5);
-		memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf000, 0xffff, 0, 0, SMH_BANK6);
-		memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf000, 0xffff, 0, 0, SMH_BANK6);
+		memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xefff, 0, 0, SMH_BANK5);
+		memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xefff, 0, 0, SMH_BANK5);
+		memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf000, 0xffff, 0, 0, SMH_BANK6);
+		memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf000, 0xffff, 0, 0, SMH_BANK6);
 
 		memory_set_bankptr(machine, 5, pc8801_mainRAM + 0xc000);
 		if(maptvram)
@@ -805,7 +805,7 @@ READ8_HANDLER(pc8801fd_nec765_tc)
 /* callback for /INT output from FDC */
 static NEC765_INTERRUPT( pc8801_fdc_interrupt )
 {
-    cpu_set_input_line(device->machine->cpu[1], 0, state ? HOLD_LINE : CLEAR_LINE);
+    cputag_set_input_line(device->machine, "sub", 0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 /* callback for /DRQ output from FDC */
@@ -825,10 +825,10 @@ static void pc8801_init_5fd(running_machine *machine)
 {
 	use_5FD = (input_port_read(machine, "DSW2") & 0x80) != 0x00;
 	if (!use_5FD)
-		cpu_suspend(machine->cpu[1], SUSPEND_REASON_DISABLE, 1);
+		cputag_suspend(machine, "sub", SUSPEND_REASON_DISABLE, 1);
 	else
-		cpu_resume(machine->cpu[1], SUSPEND_REASON_DISABLE);
-	cpu_set_input_line_vector(machine->cpu[1],0,0);
+		cputag_resume(machine, "sub", SUSPEND_REASON_DISABLE);
+	cpu_set_input_line_vector(cputag_get_cpu(machine, "sub"), 0, 0);
 	floppy_drive_set_motor_state(image_from_devtype_and_index(machine, IO_FLOPPY, 0), 1);
 	floppy_drive_set_motor_state(image_from_devtype_and_index(machine, IO_FLOPPY, 1), 1);
 	floppy_drive_set_ready_state(image_from_devtype_and_index(machine, IO_FLOPPY, 0), 1,0);

@@ -371,7 +371,7 @@ static DIRECT_UPDATE_HANDLER( psx_setopbase )
 {
 	if( address == 0x80030000 )
 	{
-		const device_config *cpu = space->machine->cpu[ 0 ];
+		const device_config *cpu = cputag_get_cpu(space->machine, "maincpu");
 
 		memory_set_direct_update_handler( space, NULL );
 
@@ -396,7 +396,7 @@ static DIRECT_UPDATE_HANDLER( psx_setopbase )
 
 static QUICKLOAD_LOAD( psx_exe_load )
 {
-	const address_space *space = cpu_get_address_space( image->machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	const address_space *space = cputag_get_address_space( image->machine, "maincpu", ADDRESS_SPACE_PROGRAM );
 
 	exe_size = 0;
 	exe_buffer = malloc( quickload_size );

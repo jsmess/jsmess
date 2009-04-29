@@ -150,11 +150,11 @@ static void pcw_interrupt_handle(running_machine *machine)
 		((fdc_interrupt_code==1) && ((pcw_system_status & (1<<5))!=0))
 		)
 	{
-		cpu_set_input_line(machine->cpu[0], 0,HOLD_LINE);
+		cputag_set_input_line(machine, "maincpu", 0,HOLD_LINE);
 	}
 	else
 	{
-		cpu_set_input_line(machine->cpu[0], 0,CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", 0,CLEAR_LINE);
 	}
 }
 
@@ -194,7 +194,7 @@ static void	pcw_trigger_fdc_int(running_machine *machine)
 				{
 					/* I'll pulse it because if I used hold-line I'm not sure
                     it would clear - to be checked */
-					cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
+					cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 				}
 			}
 		}
@@ -262,7 +262,7 @@ static  READ8_HANDLER(pcw_keyboard_r)
 
 static void pcw_update_read_memory_block(running_machine *machine, int block, int bank)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	memory_set_bankptr(machine, block + 1, mess_ram + ((bank * 0x4000) % mess_ram_size));
 
 	/* bank 3? */
@@ -488,7 +488,7 @@ static WRITE8_HANDLER(pcw_system_control_w)
 				/* yes */
 
 				/* clear nmi interrupt */
-				cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
+				cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 			}
 
 			/* re-issue interrupt */
@@ -510,7 +510,7 @@ static WRITE8_HANDLER(pcw_system_control_w)
 				/* yes */
 
 				/* Clear NMI */
-				cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
+				cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 
 			}
 
@@ -761,7 +761,7 @@ static DRIVER_INIT(pcw)
 {
 	pcw_boot = 1;
 
-	cpu_set_input_line_vector(machine->cpu[0], 0,0x0ff);
+	cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), 0, 0x0ff);
 
 
 	/* ram paging is actually undefined at power-on */
@@ -1079,4 +1079,3 @@ COMP( 1985, pcw8512,   pcw8256,	0,		pcw,	  pcw,	pcw,	pcw_512k,	"Amstrad plc", "P
 COMP( 1987, pcw9256,   pcw8256,	0,		pcw,	  pcw,	pcw,	pcw_256k,	"Amstrad plc", "PCW9256",		GAME_NOT_WORKING)
 COMP( 1987, pcw9512,   pcw8256,	0,		pcw9512,  pcw,	pcw,	pcw_512k,	"Amstrad plc", "PCW9512 (+)",	GAME_NOT_WORKING)
 COMP( 1993, pcw10,	    pcw8256,	0,		pcw9512,  pcw,	pcw,	pcw_512k,	"Amstrad plc", "PCW10",			GAME_NOT_WORKING)
-

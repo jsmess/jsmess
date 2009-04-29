@@ -1042,7 +1042,7 @@ static WRITE8_HANDLER( ei_paging_w )
 
 		*/
 
-		cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, BIT(data, 5) ? HOLD_LINE : CLEAR_LINE);
+		cputag_set_input_line(space->machine, FDC_Z80_TAG, INPUT_LINE_RESET, BIT(data, 5) ? HOLD_LINE : CLEAR_LINE);
 
 		state->paging = BIT(data, 0);
 		state->a16 = BIT(data, 2);

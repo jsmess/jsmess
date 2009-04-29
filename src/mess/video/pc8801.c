@@ -298,10 +298,10 @@ int is_pc8801_vram_select(running_machine *machine)
   }
 
 
-	if (rh5) memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc000, 0xefff, 0, 0, rh5);
-	if (wh5) memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc000, 0xefff, 0, 0, wh5);
-	if (rh6) memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf000, 0xffff, 0, 0, rh6);
-	if (wh6) memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf000, 0xffff, 0, 0, wh6);
+	if (rh5) memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xefff, 0, 0, rh5);
+	if (wh5) memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xefff, 0, 0, wh5);
+	if (rh6) memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf000, 0xffff, 0, 0, rh6);
+	if (wh6) memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf000, 0xffff, 0, 0, wh6);
 }
 
 WRITE8_HANDLER(pc88sr_disp_32)

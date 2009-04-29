@@ -194,7 +194,7 @@ static void pdp1_machine_stop(running_machine *machine)
 MACHINE_START( pdp1 )
 {
 	UINT8 *dst;
-	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	const address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
 
 	static const unsigned char fontdata6x8[pdp1_fontdata_size] =
 	{	/* ASCII characters */
@@ -526,7 +526,7 @@ static TIMER_CALLBACK(reader_callback)
 					tape_reader.rcl = 0;
 					if (tape_reader.rcp)
 					{
-						cpu_set_reg(machine->cpu[0], PDP1_IO, tape_reader.rb);	/* transfer reader buffer to IO */
+						cpu_set_reg(cputag_get_cpu(machine, "maincpu"), PDP1_IO, tape_reader.rb);	/* transfer reader buffer to IO */
 						pdp1_pulse_iot_done();
 					}
 					else
@@ -921,7 +921,7 @@ void iot_tyi(const device_config *device, int op2, int nac, int mb, int *io, int
 	{
 		io_status &= ~io_st_tyi;
 		if (USE_SBS)
-			cpu_set_input_line_and_vector(device->machine->cpu[0], 0, CLEAR_LINE, 0);	/* interrupt it, baby */
+			cputag_set_input_line_and_vector(device->machine, "maincpu", 0, CLEAR_LINE, 0);	/* interrupt it, baby */
 	}
 }
 
@@ -991,7 +991,7 @@ void iot_dpy(const device_config *device, int op2, int nac, int mb, int *io, int
 	{
 		io_status |= io_st_pen;
 
-		cpu_set_reg(device->machine->cpu[0], PDP1_PF3, 1);
+		cpu_set_reg(cputag_get_cpu(device->machine, "maincpu"), PDP1_PF3, 1);
 	}
 
 	if (nac)
@@ -1131,12 +1131,12 @@ void iot_dcc(const device_config *device, int op2, int nac, int mb, int *io, int
 	{
 		if ((parallel_drum.wfb >= 1) && (parallel_drum.wfb <= 22))
 		{
-			drum_write(parallel_drum.wfb-1, dc, (signed)memory_read_dword_32be(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM),parallel_drum.wcl<<2));
+			drum_write(parallel_drum.wfb-1, dc, (signed)memory_read_dword_32be(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM),parallel_drum.wcl<<2));
 		}
 
 		if ((parallel_drum.rfb >= 1) && (parallel_drum.rfb <= 22))
 		{
-			memory_write_dword_32be(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM),parallel_drum.wcl<<2, drum_read(parallel_drum.rfb-1, dc));
+			memory_write_dword_32be(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM),parallel_drum.wcl<<2, drum_read(parallel_drum.rfb-1, dc));
 		}
 
 		parallel_drum.wc = (parallel_drum.wc+1) & 07777;
@@ -1145,9 +1145,9 @@ void iot_dcc(const device_config *device, int op2, int nac, int mb, int *io, int
 		if (parallel_drum.wc)
 			delay = attotime_add(delay, PARALLEL_DRUM_WORD_TIME);
 	} while (parallel_drum.wc);
-	cpu_adjust_icount(device->machine->cpu[0],-cpu_attotime_to_clocks(device->machine->cpu[0], delay));
+	cpu_adjust_icount(cputag_get_cpu(device->machine, "maincpu"),-cputag_attotime_to_clocks(device->machine, "maincpu", delay));
 	/* if no error, skip */
-	cpu_set_reg(device->machine->cpu[0], PDP1_PC, cpu_get_reg(device->machine->cpu[0], PDP1_PC)+1);
+	cpu_set_reg(cputag_get_cpu(device->machine, "maincpu"), PDP1_PC, cpu_get_reg(cputag_get_cpu(device->machine, "maincpu"), PDP1_PC)+1);
 }
 
 void iot_dra(const device_config *device, int op2, int nac, int mb, int *io, int ac)
@@ -1274,9 +1274,9 @@ static void pdp1_keyboard(running_machine *machine)
 			typewriter.tb = (i << 4) + j;
 			io_status |= io_st_tyi;
 			#if USE_SBS
-				cpu_set_input_line_and_vector(machine->cpu[0], 0, ASSERT_LINE, 0);	/* interrupt it, baby */
+				cputag_set_input_line_and_vector(machine, "maincpu", 0, ASSERT_LINE, 0);	/* interrupt it, baby */
 			#endif
-			cpu_set_reg(machine->cpu[0], PDP1_PF1, 1);
+			cpu_set_reg(cputag_get_cpu(machine, "maincpu"), PDP1_PF1, 1);
 			pdp1_typewriter_drawchar(machine, typewriter.tb);	/* we want to echo input */
 			break;
 		}
@@ -1427,7 +1427,7 @@ INTERRUPT_GEN( pdp1_interrupt )
 			pdp1_pulse_start_clear();	/* pulse Start Clear line */
 			cpu_set_reg(device, PDP1_PC, (  cpu_get_reg(device, PDP1_TA) & 0170000)
 										|  (cpu_get_reg(device, PDP1_PC) & 0007777));	/* transfer ETA to EPC */
-			/*cpu_set_reg(machine->cpu[0], PDP1_MA, cpu_get_reg(machine->cpu[0], PDP1_PC));*/
+			/*cpu_set_reg(cputag_get_cpu(machine, "maincpu"), PDP1_MA, cpu_get_reg(cputag_get_cpu(machine, "maincpu"), PDP1_PC));*/
 			cpu_set_reg(device, PDP1_EXD, cpu_get_reg(device, PDP1_EXTEND_SW));
 			cpu_set_reg(device, PDP1_OV, 0);		/* right??? */
 			cpu_set_reg(device, PDP1_RUN, 0);

@@ -420,7 +420,7 @@ static VIDEO_UPDATE( pasogo )
 
 static INTERRUPT_GEN( pasogo_interrupt )
 {
-//	cpu_set_input_line(machine->cpu[0], UPD7810_INTFE1, PULSE_LINE);
+//	cputag_set_input_line(machine, "maincpu", UPD7810_INTFE1, PULSE_LINE);
 }
 
 static IRQ_CALLBACK(pasogo_irq_callback)
@@ -430,7 +430,7 @@ static IRQ_CALLBACK(pasogo_irq_callback)
 
 static MACHINE_RESET( pasogo )
 {
-	cpu_set_irq_callback(machine->cpu[0], pasogo_irq_callback);
+	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), pasogo_irq_callback);
 }
 
 //static const unsigned i86_address_mask = 0x000fffff;
@@ -459,7 +459,7 @@ static const struct pit8253_config pc_pit8254_config =
 
 static PIC8259_SET_INT_LINE( pasogo_pic8259_set_int_line ) 
 {
-	cpu_set_input_line(device->machine->cpu[0], 0, interrupt ? HOLD_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "maincpu", 0, interrupt ? HOLD_LINE : CLEAR_LINE);
 }
 
 

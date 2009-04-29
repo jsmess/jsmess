@@ -217,7 +217,7 @@ ROM_END
 
 static void ppu_nmi(const device_config *device, int *ppu_regs)
 {
-	cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

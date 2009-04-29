@@ -146,7 +146,7 @@ static WRITE8_HANDLER ( partner_floppy_w ) {
 
 static void partner_iomap_bank(running_machine *machine,UINT8 *rom)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	switch(partner_win_mem_page) {
 		case 2 :
 				// FDD
@@ -163,7 +163,7 @@ static void partner_iomap_bank(running_machine *machine,UINT8 *rom)
 }
 static void partner_bank_switch(running_machine *machine)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = memory_region(machine, "maincpu");
 	
 	memory_install_write8_handler(space, 0x0000, 0x07ff, 0, 0, SMH_BANK1);
@@ -378,7 +378,7 @@ WRITE8_HANDLER (partner_mem_page_w )
 
 static WRITE8_DEVICE_HANDLER(partner_dma_write_byte)
 {
-	memory_write_byte(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM),offset,data);
+	memory_write_byte(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), offset, data);
 }
 
 static READ8_DEVICE_HANDLER ( partner_wd17xx_data_r )

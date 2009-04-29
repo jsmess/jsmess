@@ -121,7 +121,7 @@ static void oric_vh_update_attribute(running_machine *machine,int c)
 {
 	/* attribute */
 	int attribute = c & 0x03f;
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	switch ((attribute>>3) & 0x03)
 	{
@@ -299,20 +299,20 @@ VIDEO_UPDATE( oric )
 			}
 
 			/* fetch data */
-			c = RAM ? RAM[read_addr] : memory_read_byte(cpu_get_address_space(screen->machine->cpu[0], ADDRESS_SPACE_PROGRAM), read_addr);
+			c = RAM ? RAM[read_addr] : memory_read_byte(cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM), read_addr);
 
 			/* if bits 6 and 5 are zero, the byte contains a serial attribute */
-			if ((c & ((1<<6) | (1<<5)))==0)
+			if ((c & ((1 << 6) | (1 << 5))) == 0)
 			{
-				oric_vh_update_attribute(screen->machine,c);
+				oric_vh_update_attribute(screen->machine, c);
 
 				/* display background colour when attribute has been found */
-				oric_vh_render_6pixels(bitmap,x,y,vh_state.active_foreground_colour, vh_state.active_background_colour, 0,(c & 0x080));
+				oric_vh_render_6pixels(bitmap, x, y, vh_state.active_foreground_colour, vh_state.active_background_colour, 0, (c & 0x080));
 
-				if (y<200)
+				if (y < 200)
 				{
 					/* is hires active? */
-					if (vh_state.mode & (1<<2))
+					if (vh_state.mode & (1 << 2))
 					{
 						hires_active = 1;
 					}

@@ -91,9 +91,9 @@ static void palm_spim_exchange( const device_config *device )
 
 static MACHINE_START( palm )
 {
-    const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-    memory_install_read16_handler(space,0x000000,mess_ram_size-1,mess_ram_size-1,0,(read16_space_func)1);
-    memory_install_write16_handler(space,0x000000,mess_ram_size-1,mess_ram_size-1,0,(write16_space_func)1);
+    const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+    memory_install_read16_handler (space, 0x000000, mess_ram_size - 1, mess_ram_size - 1, 0, (read16_space_func)1);
+    memory_install_write16_handler(space, 0x000000, mess_ram_size - 1, mess_ram_size - 1, 0, (write16_space_func)1);
     memory_set_bankptr(machine, 1, mess_ram);
 
     state_save_register_global(machine, port_f_latch);
@@ -107,7 +107,7 @@ static MACHINE_RESET( palm )
     memset(mess_ram, 0, mess_ram_size);
     memcpy(mess_ram, bios, 0x20000);
 
-    device_reset(machine->cpu[0]);
+    device_reset(cputag_get_cpu(machine, "maincpu"));
 }
 
 
@@ -137,7 +137,7 @@ static WRITE8_DEVICE_HANDLER( palm_dac_transition )
 
 static DRIVER_INIT( palm )
 {
-    debug_cpu_set_dasm_override(machine->cpu[0], palm_dasm_override);
+    debug_cpu_set_dasm_override(cputag_get_cpu(machine, "maincpu"), palm_dasm_override);
 }
 
 static const mc68328_interface palm_dragonball_iface =

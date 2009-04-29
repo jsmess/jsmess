@@ -304,14 +304,14 @@ static void nc_update_interrupts(running_machine *machine)
 			(((nc_irq_status & nc_irq_mask) & 0x3f)!=0)
 			)
 	{
-		logerror("int set %02x\n",nc_irq_status & nc_irq_mask);
+		logerror("int set %02x\n", nc_irq_status & nc_irq_mask);
 		/* set int */
-		cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
+		cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
 	}
 	else
 	{
 		/* clear int */
-		cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
 	}
 }
 
@@ -338,7 +338,7 @@ SMH_BANK5, SMH_BANK6, SMH_BANK7, SMH_BANK8};
 
 static void nc_refresh_memory_bank_config(running_machine *machine, int bank)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int mem_type;
 	int mem_bank;
 	read8_space_func read_handler;
@@ -533,13 +533,13 @@ static TIMER_CALLBACK(dummy_timer_callback)
 				case NC_TYPE_1xx:
 				{
 			        LOG(("nmi triggered\n"));
-				    cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
+				    cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 				}
 				break;
 
 				case NC_TYPE_200:
 				{
-					nc_irq_status |=(1<<4);
+					nc_irq_status |= (1 << 4);
 					nc_update_interrupts(machine);
 				}
 				break;
@@ -872,13 +872,13 @@ static void	nc100_tc8521_alarm_callback(const device_config *device, int state)
     is cleared this will not cause another nmi */
 	/* I'll emulate it like this to be sure */
 
-	if (state!=previous_alarm_state)
+	if (state != previous_alarm_state)
 	{
 		if (state)
 		{
 			/* I'll pulse it because if I used hold-line I'm not sure
             it would clear - to be checked */
-			cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
+			cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 		}
 	}
 
@@ -887,15 +887,15 @@ static void	nc100_tc8521_alarm_callback(const device_config *device, int state)
 
 static void nc100_txrdy_callback(const device_config *device, int state)
 {
-	nc_irq_latch &= ~(1<<1);
+	nc_irq_latch &= ~(1 << 1);
 
 	/* uart on? */
-	if ((nc_uart_control & (1<<3))==0)
+	if ((nc_uart_control & (1 << 3)) == 0)
 	{
 		if (state)
 		{
 			logerror("tx ready\n");
-			nc_irq_latch |= (1<<1);
+			nc_irq_latch |= (1 << 1);
 		}
 	}
 
@@ -1454,7 +1454,7 @@ static WRITE8_HANDLER(nc200_uart_control_w)
 	}
 
 	/* bit 5 is used in disk interface */
-	LOG_DEBUG(("bit 5: PC: %04x %02x\n",cpu_get_pc(space->machine->cpu[0]), data & (1<<5)));
+	LOG_DEBUG(("bit 5: PC: %04x %02x\n", cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")), data & (1 << 5)));
 }
 
 
@@ -1473,10 +1473,10 @@ static WRITE8_HANDLER(nc200_uart_control_w)
 static WRITE8_HANDLER(nc200_memory_card_wait_state_w)
 {
 	const device_config *fdc = devtag_get_device(space->machine, "nec765");
-	LOG_DEBUG(("nc200 memory card wait state: PC: %04x %02x\n",cpu_get_pc(space->machine->cpu[0]),data));
+	LOG_DEBUG(("nc200 memory card wait state: PC: %04x %02x\n", cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")), data));
 #if 0
-	floppy_drive_set_motor_state(0,1);
-	floppy_drive_set_ready_state(0,1,1);
+	floppy_drive_set_motor_state(0, 1);
+	floppy_drive_set_ready_state(0, 1, 1);
 #endif
 	nec765_set_tc_state(fdc, (data & 0x01));
 }
@@ -1486,9 +1486,9 @@ static WRITE8_HANDLER(nc200_memory_card_wait_state_w)
 /* bit 0 seems to be the same as nc100 */
 static WRITE8_HANDLER(nc200_poweroff_control_w)
 {
-	LOG_DEBUG(("nc200 power off: PC: %04x %02x\n",cpu_get_pc(space->machine->cpu[0]),data));
+	LOG_DEBUG(("nc200 power off: PC: %04x %02x\n", cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")), data));
 
-	nc200_video_set_backlight(((data^(1<<2))>>2) & 0x01);
+	nc200_video_set_backlight(((data ^ (1 << 2)) >> 2) & 0x01);
 }
 
 static ADDRESS_MAP_START(nc200_io, ADDRESS_SPACE_IO, 8)

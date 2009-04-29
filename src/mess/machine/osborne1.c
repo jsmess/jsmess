@@ -243,11 +243,11 @@ static void osborne1_update_irq_state(running_machine *machine)
 
 	if ( osborne1.pia_1_irq_state )
 	{
-		cpu_set_input_line(machine->cpu[0], 0, ASSERT_LINE );
+		cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE );
 	}
 	else
 	{
-		cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE );
+		cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE );
 	}
 }
 
@@ -349,7 +349,7 @@ const pia6821_interface osborne1_video_pia_config =
 
 static TIMER_CALLBACK(osborne1_video_callback)
 {
-	const address_space* space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	const device_config *speaker = devtag_get_device(space->machine, "beep");
 	const device_config *pia_1 = devtag_get_device(space->machine, "pia_1");
 	int y = video_screen_get_vpos(machine->primary_screen);
@@ -491,7 +491,7 @@ static TIMER_CALLBACK( setup_osborne1 )
 
 MACHINE_RESET( osborne1 )
 {
-	const address_space* space = cpu_get_address_space(machine->cpu[0],ADDRESS_SPACE_PROGRAM);
+	const address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	/* Initialize memory configuration */
 	osborne1_bankswitch_w( space, 0x00, 0 );
 
@@ -541,7 +541,7 @@ static int osborne1_daisy_irq_ack(const device_config *device)
 {
     /* Enable ROM and I/O when IRQ is acknowledged */
     UINT8	old_bankswitch = osborne1.bankswitch;
-    const address_space* space = cpu_get_address_space(device->machine->cpu[0],ADDRESS_SPACE_PROGRAM);
+    const address_space* space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
     
     osborne1_bankswitch_w( space, 0, 0 );
     osborne1.bankswitch = old_bankswitch;

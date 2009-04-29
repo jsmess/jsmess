@@ -16,9 +16,11 @@ static int ROMSelection;
 
 static DIRECT_UPDATE_HANDLER( pentagon_direct )
 {	
-	UINT16 pc = cpu_get_reg(space->machine->cpu[0], REG_GENPCBASE);
-	if (betadisk_is_active()) {
-		if (pc >= 0x4000) {
+	UINT16 pc = cpu_get_reg(cputag_get_cpu(space->machine, "maincpu"), REG_GENPCBASE);
+	if (betadisk_is_active()) 
+	{
+		if (pc >= 0x4000) 
+		{
 			ROMSelection = ((spectrum_128_port_7ffd_data>>4) & 0x01) ? 1 : 0;
 			betadisk_disable();
 			memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
@@ -30,7 +32,8 @@ static DIRECT_UPDATE_HANDLER( pentagon_direct )
 		betadisk_enable();
 		
 	} 
-	if((address>=0x0000) && (address<=0x3fff)) {
+	if((address>=0x0000) && (address<=0x3fff)) 
+	{
 		memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
 		direct->raw = direct->decrypted =  memory_region(space->machine, "maincpu") + 0x010000 + (ROMSelection<<14);
 		memory_set_bankptr(space->machine, 1, direct->raw);
@@ -45,7 +48,8 @@ static void pentagon_update_memory(running_machine *machine)
 
 	memory_set_bankptr(machine, 4, mess_ram + ((spectrum_128_port_7ffd_data & 0x07) * 0x4000));
 
-	if( betadisk_is_active() && !( spectrum_128_port_7ffd_data & 0x10 ) ) {    
+	if( betadisk_is_active() && !( spectrum_128_port_7ffd_data & 0x10 ) ) 
+	{    
 		/* GLUK */
 		ROMSelection = 2;
 	}
@@ -86,7 +90,7 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( pentagon )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	memory_install_read8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_BANK1);
 	memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);

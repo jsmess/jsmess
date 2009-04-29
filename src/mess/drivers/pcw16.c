@@ -131,11 +131,11 @@ static void pcw16_refresh_ints(running_machine *machine)
 	/* any bits set excluding vsync */
 	if ((pcw16_system_status & (~0x04))!=0)
 	{
-		cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
+		cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
 	}
 	else
 	{
-		cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
 	}
 }
 
@@ -370,7 +370,7 @@ static  READ8_HANDLER(pcw16_no_mem_r)
 
 static void pcw16_set_bank_handlers(running_machine *machine, int bank, PCW16_RAM_TYPE type)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	read8_space_func read_handler;
 	write8_space_func write_handler;
 
@@ -1010,7 +1010,7 @@ static void pcw16_trigger_fdc_int(running_machine *machine)
 				{
 					/* I'll pulse it because if I used hold-line I'm not sure
                     it would clear - to be checked */
-					cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
+					cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 				}
 			}
 		}

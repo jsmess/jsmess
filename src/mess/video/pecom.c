@@ -71,7 +71,7 @@ static WRITE_LINE_DEVICE_HANDLER( pecom_prd_w )
 	{
 		driver_state->dma = 0;
 
-		cpu_set_input_line(device->machine->cpu[0], CDP1802_INPUT_LINE_DMAOUT, HOLD_LINE);
+		cputag_set_input_line(device->machine, "maincpu", CDP1802_INPUT_LINE_DMAOUT, HOLD_LINE);
 	}
 	else
 	{

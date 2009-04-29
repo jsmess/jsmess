@@ -121,7 +121,7 @@ static TIMER_CALLBACK(pc1251_power_up)
 DRIVER_INIT( pc1251 )
 {
 	int i;
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *gfx = memory_region(machine, "gfx1");
 	for (i=0; i<128; i++) gfx[i]=i;
 

@@ -232,7 +232,7 @@ static void install_rom_capsule(const address_space *space, int size, const char
 static WRITE8_HANDLER( px4_bankr_w )
 {
 	px4_state *px4 = space->machine->driver_data;
-	const address_space *space_program = cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space_program = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	logerror("%s: px4_bankr_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
 

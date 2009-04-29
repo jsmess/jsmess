@@ -126,7 +126,7 @@ int pc1403_inb(void)
 void pc1403_outc(const device_config *device, int data)
 {
     pc1403_portc = data;
-//    logerror("%g pc %.4x outc %.2x\n", attotime_to_double(timer_get_time(device->machine)), cpu_get_pc(device->machine->cpu[0]), data);
+//    logerror("%g pc %.4x outc %.2x\n", attotime_to_double(timer_get_time(device->machine)), cpu_get_pc(cputag_get_cpu(device->machine, "maincpu")), data);
 }
 
 
@@ -172,7 +172,7 @@ static TIMER_CALLBACK(pc1403_power_up)
 DRIVER_INIT( pc1403 )
 {
 	int i;
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *gfx=memory_region(machine, "gfx1");
 
 	for (i=0; i<128; i++) gfx[i]=i;
@@ -192,4 +192,3 @@ DRIVER_INIT( pc1403 )
 		memory_install_write8_handler(space, 0x8000, 0xdfff, 0, 0, SMH_NOP);
 	}
 }
-
