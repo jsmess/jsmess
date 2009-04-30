@@ -215,7 +215,7 @@ void cbmb_irq(const device_config *device, int level)
 	if (level != old_level)
 	{
 		DBG_LOG (3, "mos6509", ("irq %s\n", level ? "start" : "end"));
-		cpu_set_input_line(device->machine->cpu[0], M6502_IRQ_LINE, level);
+		cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, level);
 		old_level = level;
 	}
 }

@@ -182,7 +182,7 @@ static DIRECT_UPDATE_HANDLER( nmi_delay_count )
 	if (!nmi_delay_counter)
 	{
 		memory_set_direct_update_handler( space, NULL );
-		cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(space->machine, "z80ne", INPUT_LINE_NMI, PULSE_LINE);
 	}
 	return address;
 }
@@ -287,7 +287,7 @@ INPUT_CHANGED( z80ne_reset )
 	{
 		running_machine *machine = field->port->machine;
 		//MACHINE_RESET_CALL(z80ne);
-		//device_reset(machine->cpu[0]);
+		//device_reset(cputag_get_cpu(machine, "z80ne"));
 		mame_schedule_soft_reset(machine);
 	}
 }
@@ -299,7 +299,7 @@ INPUT_CHANGED( z80ne_nmi )
 
 	if ( ! BIT(nmi, 0))
 	{
-		cpu_set_input_line(field->port->machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(field->port->machine, "z80ne", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -385,7 +385,7 @@ WRITE8_HANDLER( lx383_w )
     else
     	/* after writing to port 0xF8 and the first ~M1 cycles strike a NMI for single step execution */
     	nmi_delay_counter = 1;
-    	memory_set_direct_update_handler(cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM),nmi_delay_count);
+    	memory_set_direct_update_handler(cputag_get_address_space(space->machine, "z80ne", ADDRESS_SPACE_PROGRAM),nmi_delay_count);
 }
 
 

@@ -490,7 +490,7 @@ WRITE16_HANDLER( x68k_crtc_w )
 		}
 		break;
 	}
-//	logerror("CRTC: [%08x] Wrote %04x to CRTC register %i\n",cpu_get_pc(space->machine->cpu[0]),data,offset);
+//	logerror("CRTC: [%08x] Wrote %04x to CRTC register %i\n",cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")),data,offset);
 }
 
 READ16_HANDLER( x68k_crtc_r )
@@ -503,7 +503,7 @@ READ16_HANDLER( x68k_crtc_r )
 	}*/
 	if(offset < 24)
 	{
-//		logerror("CRTC: [%08x] Read %04x from CRTC register %i\n",cpu_get_pc(space->machine->cpu[0]),x68k_sys.crtc.reg[offset],offset);
+//		logerror("CRTC: [%08x] Read %04x from CRTC register %i\n",cpu_get_pc(cputag_get_cpu(space->machine, "maincpu")),x68k_sys.crtc.reg[offset],offset);
 		switch(offset)
 		{
 		case 9:
@@ -1192,7 +1192,7 @@ VIDEO_UPDATE( x68000 )
 		x68k_sys.mfp.isra = 0;
 		x68k_sys.mfp.isrb = 0;
 //		mfp_trigger_irq(MFP_IRQ_GPIP6);
-//		cpu_set_input_line_and_vector(machine->cpu[0],6,ASSERT_LINE,0x43);
+//		cputag_set_input_line_and_vector(machine, "maincpu",6,ASSERT_LINE,0x43);
 	}
 	if(input_code_pressed(KEYCODE_9))
 	{

@@ -218,7 +218,7 @@ static WRITE8_HANDLER(ts2068_port_ff_w)
  *******************************************************************/
 void ts2068_update_memory(running_machine *machine)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	unsigned char *ChosenROM, *ExROM, *DOCK;
 	read8_space_func rh;
 	write8_space_func wh;

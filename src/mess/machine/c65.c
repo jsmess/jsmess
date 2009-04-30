@@ -97,7 +97,7 @@ static void c65_dma_port_w(running_machine *machine, int offset, int value)
 	PAIR pair, src, dst, len;
 	UINT8 cmd, fill;
 	int i;
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	switch (offset&3) {
 	case 2:
@@ -336,7 +336,7 @@ static void c65_fdc_state(void)
 
 static void c65_fdc_w(running_machine *machine, int offset, int data)
 {
-	DBG_LOG (1, "fdc write", ("%.5x %.2x %.2x\n", cpu_get_pc(machine->cpu[0]), offset, data));
+	DBG_LOG (1, "fdc write", ("%.5x %.2x %.2x\n", cpu_get_pc(cputag_get_cpu(machine, "maincpu")), offset, data));
 	switch (offset&0xf) {
 	case 0:
 		c65_fdc.reg[0]=data;
@@ -417,7 +417,7 @@ static int c65_fdc_r(running_machine *machine, int offset)
 		data=c65_fdc.reg[offset&0xf];
 		break;
 	}
-	DBG_LOG (1, "fdc read", ("%.5x %.2x %.2x\n", cpu_get_pc(machine->cpu[0]), offset, data));
+	DBG_LOG (1, "fdc read", ("%.5x %.2x %.2x\n", cpu_get_pc(cputag_get_cpu(machine, "maincpu")), offset, data));
 	return data;
 }
 
@@ -621,8 +621,8 @@ static void c65_bankswitch_interface(running_machine *machine, int value)
 			rh = c65_read_io_dc00;
 			wh = c65_write_io_dc00;
 		}
-		memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0dc00, 0x0dfff, 0, 0, rh);
-		memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0dc00, 0x0dfff, 0, 0, wh);
+		memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0dc00, 0x0dfff, 0, 0, rh);
+		memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0dc00, 0x0dfff, 0, 0, wh);
 	}
 
 	c65_io_dc00_on=!(value&1);
@@ -664,7 +664,7 @@ void c65_bankswitch (running_machine *machine)
 	read8_space_func rh4, rh8;
 	write8_space_func wh5, wh9;
 
-	data = (UINT8) device_get_info_int(machine->cpu[0], CPUINFO_INT_M6510_PORT);
+	data = (UINT8) devtag_get_info_int(machine, "maincpu", CPUINFO_INT_M6510_PORT);
 	if (data == old)
 		return;
 
@@ -718,8 +718,8 @@ void c65_bankswitch (running_machine *machine)
 			memory_set_bankptr (machine, 8, c64_colorram+0x400);
 			memory_set_bankptr (machine, 9, c64_colorram+0x400);
 		}
-		memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0dc00, 0x0dfff, 0, 0, rh8);
-		memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0dc00, 0x0dfff, 0, 0, wh9);
+		memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0dc00, 0x0dfff, 0, 0, rh8);
+		memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0dc00, 0x0dfff, 0, 0, wh9);
 	}
 	else
 	{
@@ -742,8 +742,8 @@ void c65_bankswitch (running_machine *machine)
 			memory_set_bankptr (machine, 8, c64_memory + 0xdc00);
 		}
 	}
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0d000, 0x0d7ff, 0, 0, rh4);
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0d000, 0x0d7ff, 0, 0, wh5);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0d000, 0x0d7ff, 0, 0, rh4);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0d000, 0x0d7ff, 0, 0, wh5);
 
 	if (!c64_game && c64_exrom)
 	{

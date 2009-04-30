@@ -75,7 +75,7 @@ UINT8 *vc20_memory_9400;
 */
 static void vc20_via0_irq (const device_config *device, int level)
 {
-	cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_NMI, level);
+	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, level);
 }
 
 static READ8_DEVICE_HANDLER( vc20_via0_read_ca1 )
@@ -149,7 +149,7 @@ static WRITE8_DEVICE_HANDLER( vc20_via0_write_porta )
  */
 static void vc20_via1_irq (const device_config *device, int level)
 {
-	cpu_set_input_line(device->machine->cpu[0], M6502_IRQ_LINE, level);
+	cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, level);
 }
 
 static READ8_DEVICE_HANDLER( vc20_via1_read_porta )

@@ -110,7 +110,7 @@ static WRITE8_HANDLER( tec1_digit_w )
 
 static READ8_HANDLER( tec1_kbd_r )
 {
-	cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 	return tec1_kbd;
 }
 	
@@ -155,7 +155,7 @@ static TIMER_CALLBACK( tec1_kbd_callback )
 	if (input_port_read(machine, keynames[row]))
 	{
 		tec1_kbd = tec1_convert_col_to_bin(input_port_read(machine, keynames[row]), row);
-		cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, HOLD_LINE);
+		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, HOLD_LINE);
 	}
 }
 

@@ -176,7 +176,7 @@ READ8_HANDLER(vc4000_video_r)
 	case 0xcc:		/* left joystick */
 		if (input_port_read(space->machine, "CONFIG")&1)
 		{		/* paddle */
-			if (!cpu_get_reg(space->machine->cpu[0], S2650_FO))
+			if (!cpu_get_reg(cputag_get_cpu(space->machine, "maincpu"), S2650_FO))
 			{
 				data = input_port_read(space->machine, "JOYS") & 0x03;
 				switch (data)
@@ -215,7 +215,7 @@ READ8_HANDLER(vc4000_video_r)
 		}
 		else
 		{		/* buttons */
-			if (!cpu_get_reg(space->machine->cpu[0], S2650_FO))
+			if (!cpu_get_reg(cputag_get_cpu(space->machine, "maincpu"), S2650_FO))
 			{
 				data = input_port_read(space->machine, "JOYS") & 0x03;
 				switch (data)
@@ -253,7 +253,7 @@ READ8_HANDLER(vc4000_video_r)
 	case 0xcd:		/* right joystick */
 		if (input_port_read(space->machine, "CONFIG")&1)
 		{
-			if (!cpu_get_reg(space->machine->cpu[0], S2650_FO))
+			if (!cpu_get_reg(cputag_get_cpu(space->machine, "maincpu"), S2650_FO))
 			{
 				data = input_port_read(space->machine, "JOYS") & 0x30;
 				switch (data)
@@ -292,7 +292,7 @@ READ8_HANDLER(vc4000_video_r)
 		}
 		else
 		{
-			if (!cpu_get_reg(space->machine->cpu[0], S2650_FO))
+			if (!cpu_get_reg(cputag_get_cpu(space->machine, "maincpu"), S2650_FO))
 			{
 				data = input_port_read(space->machine, "JOYS") & 0x30;
 				switch (data)
@@ -635,7 +635,7 @@ INTERRUPT_GEN( vc4000_video_line )
 
 	if (irq_pause>10)
 	{
-		cpu_set_input_line(device->machine->cpu[0], 0, CLEAR_LINE);
+		cputag_set_input_line(device->machine, "maincpu", 0, CLEAR_LINE);
 		irq_pause = 0;
 	}
 
@@ -681,7 +681,7 @@ INTERRUPT_GEN( vc4000_video_line )
 		(vc4000_video.sprites[1].finished_now) |
 		(vc4000_video.sprites[0].finished_now)) && (!irq_pause))
 		{
-			cpu_set_input_line_and_vector(device->machine->cpu[0], 0, ASSERT_LINE, 3);
+			cputag_set_input_line_and_vector(device->machine, "maincpu", 0, ASSERT_LINE, 3);
 			irq_pause=1;
 		}
 }

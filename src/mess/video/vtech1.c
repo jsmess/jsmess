@@ -89,9 +89,9 @@ static const UINT8 *vtech1_get_video_ram(running_machine *machine, int scanline)
 static void vtech1_field_sync_callback(running_machine *machine, int data)
 {
 	if (data)
-		cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
 	else
-		cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
+		cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
 }
 
 

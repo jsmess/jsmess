@@ -20,7 +20,7 @@ DRIVER_INIT(z1013)
 
 MACHINE_RESET( z1013 )
 {
-	cpu_set_reg(machine->cpu[0], Z80_PC, 0xF000);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_PC, 0xF000);
 	z1013_keyboard_part = 0;
 	z1013_keyboard_line = 0;
 }
@@ -69,10 +69,10 @@ SNAPSHOT_LOAD( z1013 )
 	if (data[12]!='C') return INIT_FAIL;
 	if (data[13]!=0xD3 || data[14]!=0xD3 || data[14]!=0xD3) return INIT_FAIL;
 		
-	memcpy (memory_get_read_ptr(cpu_get_address_space(image->machine->cpu[0], ADDRESS_SPACE_PROGRAM),  startaddr ),
+	memcpy (memory_get_read_ptr(cputag_get_address_space(image->machine, "maincpu", ADDRESS_SPACE_PROGRAM),  startaddr ),
 		 data+0x20, endaddr - startaddr + 1);
 
-	cpu_set_reg(image->machine->cpu[0], Z80_PC, runaddr);
+	cpu_set_reg(cputag_get_cpu(image->machine, "maincpu"), Z80_PC, runaddr);
 
 	return INIT_PASS;
 }

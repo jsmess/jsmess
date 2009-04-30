@@ -49,7 +49,7 @@ READ8_HANDLER( zx_ram_r )
 
 DRIVER_INIT ( zx )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	memory_install_readwrite8_handler(space, 0x4000, 0x4000 + mess_ram_size - 1, 0, 0, SMH_BANK1, zx_ram_w);
 	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0x4000);
@@ -78,19 +78,19 @@ static DIRECT_UPDATE_HANDLER ( pow3000_setdirect )
 
 MACHINE_RESET ( zx80 )
 {
-	memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), zx_setdirect);
+	memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), zx_setdirect);
 	zx_tape_bit = 0x80;
 }
 
 MACHINE_RESET ( pow3000 )
 {
-	memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), pow3000_setdirect);
+	memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), pow3000_setdirect);
 	zx_tape_bit = 0x80;
 }
 
 MACHINE_RESET ( pc8300 )
 {
-	memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), pc8300_setdirect);
+	memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), pc8300_setdirect);
 	zx_tape_bit = 0x80;
 }
 
@@ -410,7 +410,7 @@ WRITE8_HANDLER ( zx81_io_w )
 	else
 	if (offs == 0xfe)
 	{
-		timer_adjust_periodic(ula_nmi, attotime_zero, 0, cpu_clocks_to_attotime(space->machine->cpu[0], 207));
+		timer_adjust_periodic(ula_nmi, attotime_zero, 0, cputag_clocks_to_attotime(space->machine, "maincpu", 207));
 
 		LOG_ZX81_IOW("ULA NMIs on");
 

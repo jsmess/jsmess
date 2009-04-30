@@ -105,7 +105,7 @@ static TIMER_CALLBACK(lightpen_trigger)
 
 	if (vectrex_lightpen_port & 2)
 	{
-		cpu_set_input_line(machine->cpu[0], M6809_FIRQ_LINE, PULSE_LINE);
+		cputag_set_input_line(machine, "maincpu", M6809_FIRQ_LINE, PULSE_LINE);
 	}
 }
 
@@ -149,7 +149,7 @@ WRITE8_HANDLER(vectrex_via_w)
 	case 9:
 		via_timer2 = (via_timer2 & 0x00ff) | (data << 8);
 
-		period = attotime_mul(ATTOTIME_IN_HZ(cpu_get_clock(space->machine->cpu[0])), via_timer2);
+		period = attotime_mul(ATTOTIME_IN_HZ(cputag_get_clock(space->machine, "maincpu")), via_timer2);
 
 		if (vectrex_reset_refresh)
 			timer_adjust_periodic(refresh, period, 0, period);
@@ -266,7 +266,7 @@ static TIMER_CALLBACK(update_signal)
 
 	if (!ramp)
 	{
-		length = cpu_get_clock(machine->cpu[0]) * INT_PER_CLOCK 
+		length = cputag_get_clock(machine, "maincpu") * INT_PER_CLOCK 
 			* attotime_to_double(attotime_sub(timer_get_time(machine), vector_start_time));
 
 		x_int += length * (analog[A_X] + analog[A_ZR]);
@@ -376,7 +376,7 @@ static WRITE8_DEVICE_HANDLER(v_via_pb_w)
 						+(double)(pen_y - y_int) * (pen_y - y_int);
 					d2 = b2 - ab * ab / a2;
 					if (d2 < 2e10 && analog[A_Z] * blank > 0)
-						timer_adjust_oneshot(lp_t, double_to_attotime(ab / a2 / (cpu_get_clock(device->machine->cpu[0]) * INT_PER_CLOCK)), 0);
+						timer_adjust_oneshot(lp_t, double_to_attotime(ab / a2 / (cputag_get_clock(device->machine, "maincpu") * INT_PER_CLOCK)), 0);
 				}
 			}
 		}

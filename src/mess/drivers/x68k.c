@@ -213,7 +213,7 @@ TIMER_CALLBACK(mfp_update_irq)
 //              if(x68k_sys.mfp.iera & (1 << x))
                 {
                     current_vector[6] = (x68k_sys.mfp.vr & 0xf0) | (x+8);
-                    cpu_set_input_line_and_vector(machine->cpu[0],x68k_sys.mfp.irqline,ASSERT_LINE,(x68k_sys.mfp.vr & 0xf0) | (x + 8));
+                    cputag_set_input_line_and_vector(machine, "maincpu",x68k_sys.mfp.irqline,ASSERT_LINE,(x68k_sys.mfp.vr & 0xf0) | (x + 8));
 //                  logerror("MFP: Sent IRQ vector 0x%02x (IRQ line %i)\n",(x68k_sys.mfp.vr & 0xf0) | (x+8),x68k_sys.mfp.irqline);
                     return;  // one at a time only
                 }
@@ -232,7 +232,7 @@ TIMER_CALLBACK(mfp_update_irq)
 //              if(x68k_sys.mfp.ierb & (1 << x))
                 {
                     current_vector[6] = (x68k_sys.mfp.vr & 0xf0) | x;
-                    cpu_set_input_line_and_vector(machine->cpu[0],x68k_sys.mfp.irqline,ASSERT_LINE,(x68k_sys.mfp.vr & 0xf0) | x);
+                    cputag_set_input_line_and_vector(machine, "maincpu",x68k_sys.mfp.irqline,ASSERT_LINE,(x68k_sys.mfp.vr & 0xf0) | x);
 //                  logerror("MFP: Sent IRQ vector 0x%02x (IRQ line %i)\n",(x68k_sys.mfp.vr & 0xf0) | x,x68k_sys.mfp.irqline);
                     return;  // one at a time only
                 }
@@ -453,7 +453,7 @@ static void x68k_keyboard_push_scancode(running_machine* machine,unsigned char c
 			if(input_port_read(machine,"options") & 0x01)
 			{
 				current_vector[6] = 0x4c;
-				cpu_set_input_line_and_vector(machine->cpu[0],6,ASSERT_LINE,0x4c);
+				cputag_set_input_line_and_vector(machine, "maincpu",6,ASSERT_LINE,0x4c);
 				logerror("MFP: Receive buffer full IRQ sent\n");
 			}
 		}
@@ -464,7 +464,7 @@ static void x68k_keyboard_push_scancode(running_machine* machine,unsigned char c
 		x68k_sys.keyboard.headpos = 0;
 //      mfp_trigger_irq(MFP_IRQ_RX_ERROR);
 		current_vector[6] = 0x4b;
-//		cpu_set_input_line_and_vector(machine->cpu[0],6,ASSERT_LINE,0x4b);
+//		cputag_set_input_line_and_vector(machine, "maincpu",6,ASSERT_LINE,0x4b);
 	}
 }
 
@@ -648,7 +648,7 @@ static TIMER_CALLBACK(x68k_scc_ack)
 				x68k_sys.mouse.irqactive = 1;
 				current_vector[5] = 0x54;
 				current_irq_line = 5;
-				cpu_set_input_line_and_vector(machine->cpu[0],5,ASSERT_LINE,0x54);
+				cputag_set_input_line_and_vector(machine, "maincpu",5,ASSERT_LINE,0x54);
 			}
 		}
 	}
@@ -884,7 +884,7 @@ static WRITE8_DEVICE_HANDLER( ppi_port_c_w )
 	if((prev1 & 0x10) == 0x00 && (data & 0x10) == 0x10)
 	{
 		x68k_sys.mdctrl.seq1++;
-		timer_adjust_oneshot(x68k_sys.mdctrl.io_timeout1,cpu_clocks_to_attotime(device->machine->cpu[0],8192),0);
+		timer_adjust_oneshot(x68k_sys.mdctrl.io_timeout1,cputag_clocks_to_attotime(device->machine, "maincpu", 8192),0);
 	}
 	prev1 = data;
 
@@ -893,7 +893,7 @@ static WRITE8_DEVICE_HANDLER( ppi_port_c_w )
 	if((prev2 & 0x20) == 0x00 && (data & 0x20) == 0x20)
 	{
 		x68k_sys.mdctrl.seq2++;
-		timer_adjust_oneshot(x68k_sys.mdctrl.io_timeout2,cpu_clocks_to_attotime(device->machine->cpu[0],8192),0);
+		timer_adjust_oneshot(x68k_sys.mdctrl.io_timeout2,cputag_clocks_to_attotime(device->machine, "maincpu", 8192),0);
 	}
 	prev2 = data;
 
@@ -1026,7 +1026,7 @@ static NEC765_INTERRUPT( fdc_irq )
 		x68k_sys.ioc.irqstatus |= 0x80;
 		current_irq_line = 1;
 		logerror("FDC: IRQ triggered\n");
-		cpu_set_input_line_and_vector(device->machine->cpu[0],1,ASSERT_LINE,current_vector[1]);
+		cputag_set_input_line_and_vector(device->machine, "maincpu", 1, ASSERT_LINE, current_vector[1]);
 	}
 }
 
@@ -1571,11 +1571,11 @@ static TIMER_CALLBACK(x68k_fake_bus_error)
 	if(mess_ram[0x09] != 0x02)  // normal vector for bus errors points to 02FF0540
 	{
 		int addr = (mess_ram[0x09] << 24) | (mess_ram[0x08] << 16) |(mess_ram[0x0b] << 8) | mess_ram[0x0a];
-		int sp = cpu_get_reg(machine->cpu[0],REG_GENSP);
-		int pc = cpu_get_reg(machine->cpu[0],REG_GENPC);
-		int sr = cpu_get_reg(machine->cpu[0],M68K_SR);
-		//int pda = cpu_get_reg(machine->cpu[0],M68K_PREF_DATA);
-		cpu_set_reg(machine->cpu[0],REG_GENSP,sp-14);
+		int sp = cpu_get_reg(cputag_get_cpu(machine, "maincpu"), REG_GENSP);
+		int pc = cpu_get_reg(cputag_get_cpu(machine, "maincpu"), REG_GENPC);
+		int sr = cpu_get_reg(cputag_get_cpu(machine, "maincpu"), M68K_SR);
+		//int pda = cpu_get_reg(cputag_get_cpu(machine, "maincpu"), M68K_PREF_DATA);
+		cpu_set_reg(cputag_get_cpu(machine, "maincpu"), REG_GENSP, sp - 14);
 		mess_ram[sp-11] = (val & 0xff000000) >> 24;
 		mess_ram[sp-12] = (val & 0x00ff0000) >> 16;
 		mess_ram[sp-9] = (val & 0x0000ff00) >> 8;
@@ -1586,8 +1586,8 @@ static TIMER_CALLBACK(x68k_fake_bus_error)
 		mess_ram[sp-2] = (pc & 0x000000ff);  // place PC onto the stack
 		mess_ram[sp-5] = (sr & 0xff00) >> 8;
 		mess_ram[sp-6] = (sr & 0x00ff);  // place SR onto the stack
-		cpu_set_reg(machine->cpu[0],REG_GENPC,addr);  // real exceptions seem to take too long to be acknowledged
-		popmessage("Expansion access [%08x]: PC jump to %08x",val,addr);
+		cpu_set_reg(cputag_get_cpu(machine, "maincpu"), REG_GENPC, addr);  // real exceptions seem to take too long to be acknowledged
+		popmessage("Expansion access [%08x]: PC jump to %08x", val, addr);
 	}
 }
 
@@ -1597,13 +1597,13 @@ static READ16_HANDLER( x68k_rom0_r )
        then access causes a bus error */
 	current_vector[2] = 0x02;  // bus error
 	current_irq_line = 2;
-//	cpu_set_input_line_and_vector(space->machine->cpu[0],2,ASSERT_LINE,current_vector[2]);
+//	cputag_set_input_line_and_vector(space->machine, "maincpu",2,ASSERT_LINE,current_vector[2]);
 	if(input_port_read(space->machine, "options") & 0x02)
 	{
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		timer_set(space->machine, cpu_clocks_to_attotime(space->machine->cpu[0], 4), NULL, 0xbffffc+offset,x68k_fake_bus_error);
+		timer_set(space->machine, cputag_clocks_to_attotime(space->machine, "maincpu", 4), NULL, 0xbffffc+offset,x68k_fake_bus_error);
 	}
 	return 0xff;
 }
@@ -1614,13 +1614,13 @@ static WRITE16_HANDLER( x68k_rom0_w )
        then access causes a bus error */
 	current_vector[2] = 0x02;  // bus error
 	current_irq_line = 2;
-//	cpu_set_input_line_and_vector(space->machine->cpu[0],2,ASSERT_LINE,current_vector[2]);
+//	cputag_set_input_line_and_vector(space->machine, "maincpu",2,ASSERT_LINE,current_vector[2]);
 	if(input_port_read(space->machine, "options") & 0x02)
 	{
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		timer_set(space->machine, cpu_clocks_to_attotime(space->machine->cpu[0], 4), NULL, 0xbffffc+offset,x68k_fake_bus_error);
+		timer_set(space->machine, cputag_clocks_to_attotime(space->machine, "maincpu", 4), NULL, 0xbffffc+offset,x68k_fake_bus_error);
 	}
 }
 
@@ -1634,8 +1634,8 @@ static READ16_HANDLER( x68k_exp_r )
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		timer_set(space->machine, cpu_clocks_to_attotime(space->machine->cpu[0], 16), NULL, 0xeafa00+offset,x68k_fake_bus_error);
-//      cpu_set_input_line_and_vector(machine->cpu[0],2,ASSERT_LINE,current_vector[2]);
+		timer_set(space->machine, cputag_clocks_to_attotime(space->machine, "maincpu", 16), NULL, 0xeafa00+offset,x68k_fake_bus_error);
+//      cputag_set_input_line_and_vector(machine, "maincpu",2,ASSERT_LINE,current_vector[2]);
 	}
 	return 0xffff;
 }
@@ -1650,8 +1650,8 @@ static WRITE16_HANDLER( x68k_exp_w )
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		timer_set(space->machine, cpu_clocks_to_attotime(space->machine->cpu[0], 16), NULL, 0xeafa00+offset,x68k_fake_bus_error);
-//      cpu_set_input_line_and_vector(machine->cpu[0],2,ASSERT_LINE,current_vector[2]);
+		timer_set(space->machine, cputag_clocks_to_attotime(space->machine, "maincpu", 16), NULL, 0xeafa00+offset,x68k_fake_bus_error);
+//      cputag_set_input_line_and_vector(machine, "maincpu",2,ASSERT_LINE,current_vector[2]);
 	}
 }
 
@@ -1661,7 +1661,7 @@ static void x68k_dma_irq(running_machine *machine, int channel)
 	current_vector[3] = hd63450_get_vector(device, channel);
 	current_irq_line = 3;
 	logerror("DMA#%i: DMA End (vector 0x%02x)\n",channel,current_vector[3]);
-	cpu_set_input_line_and_vector(machine->cpu[0],3,ASSERT_LINE,current_vector[3]);
+	cputag_set_input_line_and_vector(machine, "maincpu",3,ASSERT_LINE,current_vector[3]);
 }
 
 static void x68k_dma_end(running_machine *machine, int channel,int irq)
@@ -1679,7 +1679,7 @@ static void x68k_dma_error(running_machine *machine, int channel, int irq)
 	{
 		current_vector[3] = hd63450_get_error_vector(device,channel);
 		current_irq_line = 3;
-		cpu_set_input_line_and_vector(machine->cpu[0],3,ASSERT_LINE,current_vector[3]);
+		cputag_set_input_line_and_vector(machine, "maincpu",3,ASSERT_LINE,current_vector[3]);
 	}
 }
 
@@ -1715,7 +1715,7 @@ static WRITE_LINE_DEVICE_HANDLER( mfp_irq_callback )
 		return;
 //	if((x68k_sys.ioc.irqstatus & 0xc0) != 0)  // if the FDC is busy, then we don't want to miss that IRQ
 //		return;
-	cpu_set_input_line(device->machine->cpu[0], 6, state);
+	cputag_set_input_line(device->machine, "maincpu", 6, state);
 	current_vector[6] = 0;
 	prev = state;
 }
@@ -1746,12 +1746,12 @@ static IRQ_CALLBACK(x68k_int_ack)
 		if(current_vector[6] != 0x4b && current_vector[6] != 0x4c)
 			current_vector[6] = mc68901_get_vector(x68k_mfp);
 		else
-			cpu_set_input_line_and_vector(device->machine->cpu[0],irqline,CLEAR_LINE,current_vector[irqline]);
+			cputag_set_input_line_and_vector(device->machine, "maincpu",irqline,CLEAR_LINE,current_vector[irqline]);
 		logerror("SYS: IRQ acknowledged (vector=0x%02x, line = %i)\n",current_vector[6],irqline);
 		return current_vector[6];
 	}
 	
-	cpu_set_input_line_and_vector(device->machine->cpu[0],irqline,CLEAR_LINE,current_vector[irqline]);
+	cputag_set_input_line_and_vector(device->machine, "maincpu",irqline,CLEAR_LINE,current_vector[irqline]);
 	if(irqline == 1)  // IOSC
 	{
 		x68k_sys.ioc.irqstatus &= ~0xf0;
@@ -2217,7 +2217,7 @@ static DEVICE_IMAGE_LOAD( x68k_floppy )
 			current_vector[1] = 0x61;
 			x68k_sys.ioc.irqstatus |= 0x40;
 			current_irq_line = 1;
-			cpu_set_input_line_and_vector(image->machine->cpu[0],1,ASSERT_LINE,current_vector[1]);  // Disk insert/eject interrupt
+			cputag_set_input_line_and_vector(image->machine, "maincpu",1,ASSERT_LINE,current_vector[1]);  // Disk insert/eject interrupt
 			logerror("IOC: Disk image inserted\n");
 		}
 		x68k_sys.fdc.disk_inserted[image_index_in_device(image)] = 1;
@@ -2234,7 +2234,7 @@ static DEVICE_IMAGE_UNLOAD( x68k_floppy )
 		current_vector[1] = 0x61;
 		x68k_sys.ioc.irqstatus |= 0x40;
 		current_irq_line = 1;
-		cpu_set_input_line_and_vector(image->machine->cpu[0],1,ASSERT_LINE,current_vector[1]);  // Disk insert/eject interrupt
+		cputag_set_input_line_and_vector(image->machine, "maincpu",1,ASSERT_LINE,current_vector[1]);  // Disk insert/eject interrupt
 	}
 	x68k_sys.fdc.disk_inserted[image_index_in_device(image)] = 0;
 }
@@ -2337,12 +2337,12 @@ static MACHINE_RESET( x68000 )
 	}
 	
 	// reset CPU
-	device_reset(machine->cpu[0]);
+	device_reset(cputag_get_cpu(machine, "maincpu"));
 }
 
 static MACHINE_START( x68000 )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	/*  Install RAM handlers  */
 	x68k_spriteram = (UINT16*)memory_region(machine, "user1");
 	memory_install_read16_handler(space,0x000000,mess_ram_size-1,mess_ram_size-1,0,(read16_space_func)1);
@@ -2397,7 +2397,7 @@ static DRIVER_INIT( x68000 )
 
 	mfp_init();
 
-	cpu_set_irq_callback(machine->cpu[0], x68k_int_ack);
+	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), x68k_int_ack);
 
 	// init keyboard
 	x68k_sys.keyboard.delay = 500;  // 3*100+200

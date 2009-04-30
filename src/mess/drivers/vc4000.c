@@ -193,17 +193,17 @@ static DEVICE_IMAGE_LOAD( vc4000_cart )
 
 	if (size > 0x1000)	/* 6k rom + 1k ram - Chess2 only */
 	{
-		memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1000, 0x15ff, 0, 0, SMH_BANK1);	/* extra rom */
+		memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1000, 0x15ff, 0, 0, SMH_BANK1);	/* extra rom */
 		memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0x1000);
 
-		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1800, 0x1bff, 0, 0, SMH_BANK3, SMH_BANK4);	/* ram */
+		memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1800, 0x1bff, 0, 0, SMH_BANK3, SMH_BANK4);	/* ram */
 		memory_set_bankptr(machine, 3, memory_region(machine, "maincpu") + 0x1800);
 		memory_set_bankptr(machine, 4, memory_region(machine, "maincpu") + 0x1800);
 	}
 	else
 	if (size > 0x0800)	/* some 4k roms have 1k of mirrored ram */
 	{
-		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1000, 0x15ff, 0, 0x800, SMH_BANK1, SMH_BANK2); /* ram */
+		memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1000, 0x15ff, 0, 0x800, SMH_BANK1, SMH_BANK2); /* ram */
 		memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0x1000);
 		memory_set_bankptr(machine, 2, memory_region(machine, "maincpu") + 0x1000);
 	}
@@ -259,7 +259,7 @@ ROM_END
 
 QUICKLOAD_LOAD(vc4000)
 {
-	const address_space *space = cpu_get_address_space(image->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(image->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int i;
 	int quick_addr = 0x08c0;
 	int quick_length;

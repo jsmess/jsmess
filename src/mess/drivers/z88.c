@@ -46,13 +46,13 @@ static void z88_interrupt_refresh(running_machine *machine)
 			)
 		{
 			logerror("set int\n");
-			cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
+			cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
 			return;
 		}
 	}
 
 	logerror("clear int\n");
-	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
 }
 
 static void z88_update_rtc_interrupt(void)
@@ -191,8 +191,8 @@ static void z88_install_memory_handler_pair(running_machine *machine, offs_t sta
 	write_handler = (write_addr != NULL) ? (write8_space_func) (STATIC_BANK1 + (FPTR)(bank_base - 1 + 1)) : SMH_UNMAP;
 
 	/* install the handlers */
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0],  ADDRESS_SPACE_PROGRAM ), start, start + size - 1, 0, 0, read_handler);
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM ), start, start + size - 1, 0, 0, write_handler);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu",  ADDRESS_SPACE_PROGRAM ), start, start + size - 1, 0, 0, read_handler);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM ), start, start + size - 1, 0, 0, write_handler);
 
 	/* and set the banks */
 	if (read_addr != NULL)
@@ -542,7 +542,7 @@ static  READ8_HANDLER(z88_port_r)
 			{
 				z88_blink.z88_state = Z88_SNOOZE;
 				/* spin cycles until rtc timer */
-				cpu_spinuntil_trigger( space->machine->cpu[0], Z88_SNOOZE_TRIGGER);
+				cpu_spinuntil_trigger( cputag_get_cpu(space->machine, "maincpu"), Z88_SNOOZE_TRIGGER);
 
 				logerror("z88 entering snooze!\n");
 			}
@@ -771,4 +771,3 @@ SYSTEM_CONFIG_END
 
 /*     YEAR     NAME    PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG  COMPANY                 FULLNAME */
 COMP( 1988,	z88,	0,		0,		z88,		z88,		0,		z88,	"Cambridge Computers",	"Z88",GAME_NOT_WORKING)
-

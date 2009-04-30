@@ -114,7 +114,7 @@ static TIMER_CALLBACK(ti85_timer_callback)
 	{
 		if (ti85_ON_interrupt_mask && !ti85_ON_pressed)
 		{
-			cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
+			cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
 			ti85_ON_interrupt_status = 1;
 			if (!ti85_timer_interrupt_mask) ti85_timer_interrupt_mask = 1;
 		}
@@ -125,7 +125,7 @@ static TIMER_CALLBACK(ti85_timer_callback)
 		ti85_ON_pressed = 0;
 	if (ti85_timer_interrupt_mask)
 	{
-		cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
+		cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
 		ti85_timer_interrupt_status = 1;
 	}
 }
@@ -137,7 +137,7 @@ static void update_ti85_memory (running_machine *machine)
 
 static void update_ti86_memory (running_machine *machine)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	write8_space_func wh;
 
 	if (ti85_memory_page_0x4000 & 0x40)
@@ -173,7 +173,7 @@ static void update_ti86_memory (running_machine *machine)
 
 MACHINE_START( ti81 )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *mem = memory_region(machine, "maincpu");
 
 	ti85_timer_interrupt_mask = 0;
@@ -207,7 +207,7 @@ MACHINE_START( ti81 )
 
 MACHINE_START( ti85 )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *mem = memory_region(machine, "maincpu");
 
 	ti85_timer_interrupt_mask = 0;
@@ -243,7 +243,7 @@ MACHINE_START( ti85 )
 
 MACHINE_START( ti86 )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *mem = memory_region(machine, "maincpu");
 
 	ti85_timer_interrupt_mask = 0;
@@ -452,7 +452,7 @@ NVRAM_HANDLER( ti81 )
 		if (file)
 		{
 			mame_fread(file, mem+0x8000, sizeof(unsigned char)*0x8000);
-			cpu_set_reg(machine->cpu[0], Z80_PC,0x0239);
+			cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_PC,0x0239);
 		}
 		else
 			memset(mem+0x8000, 0, sizeof(unsigned char)*0x8000);
@@ -470,7 +470,7 @@ NVRAM_HANDLER( ti85 )
 		if (file)
 		{
 			mame_fread(file, mem+0x8000, sizeof(unsigned char)*0x8000);
-			cpu_set_reg(machine->cpu[0], Z80_PC,0x0b5f);
+			cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_PC,0x0b5f);
 		}
 		else
 			memset(mem+0x8000, 0, sizeof(unsigned char)*0x8000);
@@ -488,7 +488,7 @@ NVRAM_HANDLER( ti86 )
 			if (file)
 			{
 				mame_fread(file, ti86_ram, sizeof(unsigned char)*128*1024);
-				cpu_set_reg(machine->cpu[0], Z80_PC,0x0c59);
+				cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_PC,0x0c59);
 			}
 			else
 				memset(ti86_ram, 0, sizeof(unsigned char)*128*1024);
@@ -507,56 +507,56 @@ static void ti8x_snapshot_setup_registers (running_machine *machine, UINT8 * dat
 	/* Set registers */
 	lo = reg[0x00] & 0x0ff;
 	hi = reg[0x01] & 0x0ff;
-	cpu_set_reg(machine->cpu[0], Z80_AF, (hi << 8) | lo);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_AF, (hi << 8) | lo);
 	lo = reg[0x04] & 0x0ff;
 	hi = reg[0x05] & 0x0ff;
-	cpu_set_reg(machine->cpu[0], Z80_BC, (hi << 8) | lo);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_BC, (hi << 8) | lo);
 	lo = reg[0x08] & 0x0ff;
 	hi = reg[0x09] & 0x0ff;
-	cpu_set_reg(machine->cpu[0], Z80_DE, (hi << 8) | lo);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_DE, (hi << 8) | lo);
 	lo = reg[0x0c] & 0x0ff;
 	hi = reg[0x0d] & 0x0ff;
-	cpu_set_reg(machine->cpu[0], Z80_HL, (hi << 8) | lo);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_HL, (hi << 8) | lo);
 	lo = reg[0x10] & 0x0ff;
 	hi = reg[0x11] & 0x0ff;
-	cpu_set_reg(machine->cpu[0], Z80_IX, (hi << 8) | lo);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_IX, (hi << 8) | lo);
 	lo = reg[0x14] & 0x0ff;
 	hi = reg[0x15] & 0x0ff;
-	cpu_set_reg(machine->cpu[0], Z80_IY, (hi << 8) | lo);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_IY, (hi << 8) | lo);
 	lo = reg[0x18] & 0x0ff;
 	hi = reg[0x19] & 0x0ff;
-	cpu_set_reg(machine->cpu[0], Z80_PC, (hi << 8) | lo);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_PC, (hi << 8) | lo);
 	lo = reg[0x1c] & 0x0ff;
 	hi = reg[0x1d] & 0x0ff;
-	cpu_set_reg(machine->cpu[0], Z80_SP, (hi << 8) | lo);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_SP, (hi << 8) | lo);
 	lo = reg[0x20] & 0x0ff;
 	hi = reg[0x21] & 0x0ff;
-	cpu_set_reg(machine->cpu[0], Z80_AF2, (hi << 8) | lo);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_AF2, (hi << 8) | lo);
 	lo = reg[0x24] & 0x0ff;
 	hi = reg[0x25] & 0x0ff;
-	cpu_set_reg(machine->cpu[0], Z80_BC2, (hi << 8) | lo);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_BC2, (hi << 8) | lo);
 	lo = reg[0x28] & 0x0ff;
 	hi = reg[0x29] & 0x0ff;
-	cpu_set_reg(machine->cpu[0], Z80_DE2, (hi << 8) | lo);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_DE2, (hi << 8) | lo);
 	lo = reg[0x2c] & 0x0ff;
 	hi = reg[0x2d] & 0x0ff;
-	cpu_set_reg(machine->cpu[0], Z80_HL2, (hi << 8) | lo);
-	cpu_set_reg(machine->cpu[0], Z80_IFF1, reg[0x30]&0x0ff);
-	cpu_set_reg(machine->cpu[0], Z80_IFF2, reg[0x34]&0x0ff);
-	cpu_set_reg(machine->cpu[0], Z80_HALT, reg[0x38]&0x0ff);
-	cpu_set_reg(machine->cpu[0], Z80_IM, reg[0x3c]&0x0ff);
-	cpu_set_reg(machine->cpu[0], Z80_I, reg[0x40]&0x0ff);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_HL2, (hi << 8) | lo);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_IFF1, reg[0x30]&0x0ff);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_IFF2, reg[0x34]&0x0ff);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_HALT, reg[0x38]&0x0ff);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_IM, reg[0x3c]&0x0ff);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_I, reg[0x40]&0x0ff);
 
-	cpu_set_reg(machine->cpu[0], Z80_R, (reg[0x44]&0x7f) | (reg[0x48]&0x80));
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), Z80_R, (reg[0x44]&0x7f) | (reg[0x48]&0x80));
 
-	cpu_set_input_line(machine->cpu[0], 0, 0);
-	cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, 0);
-	cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, 0);
+	cputag_set_input_line(machine, "maincpu", 0, 0);
+	cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, 0);
+	cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, 0);
 }
 
 static void ti85_setup_snapshot (running_machine *machine, UINT8 * data)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int i;
 	unsigned char lo,hi;
 	unsigned char * hdw = data + 0x8000 + 0x94;

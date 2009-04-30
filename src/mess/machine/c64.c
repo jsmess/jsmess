@@ -119,17 +119,17 @@ static void c64_nmi(running_machine *machine)
 			if (1) // this was never valid, there is no active CPU during a timer firing!  cpu_getactivecpu() == 0)
 			{
 				/* z80 */
-				cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq);
+				cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq);
 			}
 			else
 			{
-				cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq);
+				cputag_set_input_line(machine, "m8502", INPUT_LINE_NMI, (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq);
 			}
 		}
 
 		else
 		{
-			cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq);
+			cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq);
 		}
 
 		nmilevel = (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq;
@@ -331,16 +331,16 @@ static void c64_irq (running_machine *machine, int level)
 		{
 			if (0) // && (cpu_getactivecpu() == 0))
 			{
-				cpu_set_input_line(machine->cpu[0], 0, level);
+				cputag_set_input_line(machine, "maincpu", 0, level);
 			}
 			else
 			{
-				cpu_set_input_line(machine->cpu[1], M6510_IRQ_LINE, level);
+				cputag_set_input_line(machine, "m8502", M6510_IRQ_LINE, level);
 			}
 		}
 		else
 		{
-			cpu_set_input_line(machine->cpu[0], M6510_IRQ_LINE, level);
+			cputag_set_input_line(machine, "maincpu", M6510_IRQ_LINE, level);
 		}
 		old_level = level;
 	}
@@ -679,7 +679,7 @@ static void c64_bankswitch(running_machine *machine, int reset)
 	static int old = -1, exrom, game;
 	int loram, hiram, charen;
 	int ultimax_mode = 0;
-	int data = (UINT8) device_get_info_int(machine->cpu[0], CPUINFO_INT_M6510_PORT) & 0x07;
+	int data = (UINT8) devtag_get_info_int(machine, "maincpu", CPUINFO_INT_M6510_PORT) & 0x07;
 
 	/* If nothing has changed or reset = 0, don't do anything */
 	if ((data == old) && (exrom == c64_exrom) && (game == c64_game) && !reset)
@@ -704,7 +704,7 @@ static void c64_bankswitch(running_machine *machine, int reset)
 			memory_set_bankptr (machine, 2, c64_memory + 0x8000);
 			memory_set_bankptr (machine, 3, c64_memory + 0xa000);
 			memory_set_bankptr (machine, 4, romh);
-			memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xe000, 0xffff, 0, 0, SMH_NOP);
+			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe000, 0xffff, 0, 0, SMH_NOP);
 	}
 	else
 	{
@@ -1025,8 +1025,8 @@ TIMER_CALLBACK( c64_tape_timer )
 static void c64_common_driver_init (running_machine *machine)
 {
 	/* configure the M6510 port */
-	device_set_info_fct(machine->cpu[0], CPUINFO_FCT_M6510_PORTREAD, (genf *) c64_m6510_port_read);
-	device_set_info_fct(machine->cpu[0], CPUINFO_FCT_M6510_PORTWRITE, (genf *) c64_m6510_port_write);
+	devtag_set_info_fct(machine, "maincpu", CPUINFO_FCT_M6510_PORTREAD, (genf *) c64_m6510_port_read);
+	devtag_set_info_fct(machine, "maincpu", CPUINFO_FCT_M6510_PORTWRITE, (genf *) c64_m6510_port_write);
 
 	if (!ultimax)
 	{

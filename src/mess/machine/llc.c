@@ -47,7 +47,7 @@ static READ8_DEVICE_HANDLER (llc1_port_a_r)
 
 static void llc1_ctc_interrupt(const device_config *device, int state)
 {
-	cpu_set_input_line(device->machine->cpu[0], 0, state);
+	cputag_set_input_line(device->machine, "maincpu", 0, state);
 }
 
 const z80ctc_interface llc1_ctc_intf =
@@ -113,7 +113,7 @@ DRIVER_INIT(llc2)
 
 MACHINE_RESET( llc2 )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	
 	memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
 	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu"));
@@ -131,7 +131,7 @@ MACHINE_RESET( llc2 )
 
 WRITE8_HANDLER( llc2_rom_disable_w )
 {	
-	const address_space *mem_space = cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *mem_space = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	
 	memory_install_write8_handler(mem_space, 0x0000, 0xbfff, 0, 0, SMH_BANK1);
 	memory_set_bankptr(space->machine, 1, mess_ram); 
@@ -150,7 +150,7 @@ WRITE8_HANDLER( llc2_rom_disable_w )
 WRITE8_HANDLER( llc2_basic_enable_w )
 {
 
-	const address_space *mem_space = cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *mem_space = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	if (data & 0x02) {
 		memory_install_write8_handler(mem_space, 0x4000, 0x5fff, 0, 0, SMH_UNMAP);
 		memory_set_bankptr(space->machine, 2, memory_region(space->machine, "maincpu") + 0x10000);			

@@ -97,7 +97,7 @@ WRITE8_HANDLER( c128_write_d000 )
 	const device_config *cia_1 = devtag_get_device(space->machine, "cia_1");
 	const device_config *sid = devtag_get_device(space->machine, "sid6581");
 
-	UINT8 c64_port6510 = (UINT8) device_get_info_int(space->machine->cpu[0], CPUINFO_INT_M6510_PORT);
+	UINT8 c64_port6510 = (UINT8) devtag_get_info_int(space->machine, "maincpu", CPUINFO_INT_M6510_PORT);
 
 	if (!c128_write_io)
 	{
@@ -192,7 +192,7 @@ void c128_bankswitch_64(running_machine *machine, int reset)
 	if (!c64mode)
 		return;
 
-	data = (UINT8) device_get_info_int(machine->cpu[0], CPUINFO_INT_M6510_PORT) & 0x07;
+	data = (UINT8) devtag_get_info_int(machine, "maincpu", CPUINFO_INT_M6510_PORT) & 0x07;
 	if ((data == old)&&(exrom==c64_exrom)&&(game==c64_game)&&!reset)
 		return;
 
@@ -564,8 +564,8 @@ static void c128_bankswitch (running_machine *machine, int reset)
 //			memory_set_context(machine, 0);
 			c128_bankswitch_z80(machine);
 //			memory_set_context(machine, 1);
-			cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, CLEAR_LINE);
-			cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
+			cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
+			cputag_set_input_line(machine, "m8502", INPUT_LINE_HALT, ASSERT_LINE);
 		}
 		else
 		{
@@ -573,8 +573,8 @@ static void c128_bankswitch (running_machine *machine, int reset)
 //			memory_set_context(machine, 1);
 			c128_bankswitch_128(machine, reset);
 //			memory_set_context(machine, 0);
-			cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, ASSERT_LINE);
-			cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, CLEAR_LINE);
+			cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, ASSERT_LINE);
+			cputag_set_input_line(machine, "m8502", INPUT_LINE_HALT, CLEAR_LINE);
 
 			/* NPW 19-Nov-2005 - In the C128, CPU #0 starts out and hands over
 			 * control to CPU #1.  CPU #1 seems to execute garbage from 0x0000
@@ -588,8 +588,8 @@ static void c128_bankswitch (running_machine *machine, int reset)
 			 * driver used to work with this behavior, so I am doing this hack
 			 * where I set CPU #1's PC to 0x1100 on reset.
 			 */
-			if (cpu_get_reg(machine->cpu[1], REG_GENPC) == 0x0000)
-				cpu_set_reg(machine->cpu[1], REG_GENPC, 0x1100);
+			if (cpu_get_reg(cputag_get_cpu(machine, "m8502"), REG_GENPC) == 0x0000)
+				cpu_set_reg(cputag_get_cpu(machine, "m8502"), REG_GENPC, 0x1100);
 		}
 		mmu_cpu = MMU_CPU8502;
 		return;
@@ -782,7 +782,7 @@ WRITE8_HANDLER( c128_write_ff05 )
  */
 static int c128_dma_read(running_machine *machine, int offset)
 {
-	UINT8 c64_port6510 = (UINT8) device_get_info_int(machine->cpu[0], CPUINFO_INT_M6510_PORT);
+	UINT8 c64_port6510 = (UINT8) devtag_get_info_int(machine, "maincpu", CPUINFO_INT_M6510_PORT);
 
 	/* main memory configuration to include */
 	if (c64mode)
@@ -805,7 +805,7 @@ static int c128_dma_read(running_machine *machine, int offset)
 
 static int c128_dma_read_color(running_machine *machine, int offset)
 {
-	UINT8 c64_port6510 = (UINT8) device_get_info_int(machine->cpu[0], CPUINFO_INT_M6510_PORT);
+	UINT8 c64_port6510 = (UINT8) devtag_get_info_int(machine, "maincpu", CPUINFO_INT_M6510_PORT);
 
 	if (c64mode)
 		return c64_colorram[offset & 0x3ff] & 0xf;
@@ -892,8 +892,8 @@ static void c128_common_driver_init(running_machine *machine)
 	int i;
 
 	/* configure the M6510 port */
-	device_set_info_fct(machine->cpu[1], CPUINFO_FCT_M6510_PORTREAD, (genf *) c128_m6510_port_read);
-	device_set_info_fct(machine->cpu[1], CPUINFO_FCT_M6510_PORTWRITE, (genf *) c128_m6510_port_write);
+	devtag_set_info_fct(machine, "m8502", CPUINFO_FCT_M6510_PORTREAD, (genf *) c128_m6510_port_read);
+	devtag_set_info_fct(machine, "m8502", CPUINFO_FCT_M6510_PORTWRITE, (genf *) c128_m6510_port_write);
 
 	c64_memory = ram;
 
@@ -959,8 +959,8 @@ MACHINE_RESET( c128 )
 	c128_vicaddr = c64_vicaddr = c64_memory;
 	c64mode = 0;
 	c128_mmu8722_reset (machine);
-	cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, CLEAR_LINE);
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
+	cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
+	cputag_set_input_line(machine, "m8502", INPUT_LINE_HALT, ASSERT_LINE);
 }
 
 VIDEO_START( c128 )

@@ -178,8 +178,8 @@ static WRITE_LINE_DEVICE_HANDLER( pet_irq )
 	{
 		DBG_LOG (3, "mos6502", ("irq %s\n", level ? "start" : "end"));
 		if (driver_state->superpet)
-			cpu_set_input_line(machine->cpu[1], M6809_IRQ_LINE, level);
-		cpu_set_input_line(machine->cpu[0], M6502_IRQ_LINE, level);
+			cputag_set_input_line(machine, "m6809", M6809_IRQ_LINE, level);
+		cputag_set_input_line(machine, "maincpu", M6502_IRQ_LINE, level);
 		old_level = level;
 	}
 }
@@ -595,14 +595,14 @@ static void pet_common_driver_init(running_machine *machine)
 	state->superpet = 0;
 	state->cbm8096 = 0;
 
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, mess_ram_size - 1, 0, 0, SMH_BANK10);
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, mess_ram_size - 1, 0, 0, SMH_BANK10);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, mess_ram_size - 1, 0, 0, SMH_BANK10);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, mess_ram_size - 1, 0, 0, SMH_BANK10);
 	memory_set_bankptr (machine, 10, pet_memory);
 
 	if (mess_ram_size < 0x8000)
 	{
-		memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), mess_ram_size, 0x7FFF, 0, 0, SMH_NOP);
-		memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), mess_ram_size, 0x7FFF, 0, 0, SMH_NOP);
+		memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), mess_ram_size, 0x7FFF, 0, 0, SMH_NOP);
+		memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), mess_ram_size, 0x7FFF, 0, 0, SMH_NOP);
 	}
 
 	/* 2114 poweron ? 64 x 0xff, 64x 0, and so on */
@@ -675,14 +675,14 @@ MACHINE_RESET( pet )
 		spet.rom = 0;
 		if (input_port_read(machine, "CFG") & 0x04)
 		{
-			cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, 1);
-			cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, 0);
+			cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, 1);
+			cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, 0);
 			pet_font = 2;
 		}
 		else
 		{
-			cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, 0);
-			cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, 1);
+			cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, 0);
+			cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, 1);
 			pet_font = 0;
 		}
 	}
@@ -691,11 +691,11 @@ MACHINE_RESET( pet )
 	{
 		if (input_port_read(machine, "CFG") & 0x08)
 		{
-			memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xfff0, 0xfff0, 0, 0, cbm8096_w);
+			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xfff0, 0xfff0, 0, 0, cbm8096_w);
 		}
 		else
 		{
-			memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xfff0, 0xfff0, 0, 0, SMH_NOP);
+			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xfff0, 0xfff0, 0, 0, SMH_NOP);
 		}
 		cbm8096_w(cputag_get_address_space(machine,"maincpu",ADDRESS_SPACE_PROGRAM), 0, 0);
 	}

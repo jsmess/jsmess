@@ -31,10 +31,10 @@ void ti990_set_int_line(running_machine *machine, int line, int state)
 	{
 		for (level = 0; ! (intlines & (1 << level)); level++)
 			;
-		cpu_set_input_line_and_vector(machine->cpu[0], 0, ASSERT_LINE, level);	/* interrupt it, baby */
+		cputag_set_input_line_and_vector(machine, "maincpu", 0, ASSERT_LINE, level);	/* interrupt it, baby */
 	}
 	else
-		cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
 }
 
 void ti990_set_int2(const device_config *device, int state)
@@ -78,12 +78,12 @@ void ti990_set_int13(running_machine *machine, int state)
 
 static TIMER_CALLBACK(clear_load)
 {
-	cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 void ti990_hold_load(running_machine *machine)
 {
-	cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, ASSERT_LINE);
+	cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
 	timer_set(machine, ATTOTIME_IN_MSEC(100), NULL, 0, clear_load);
 }
 

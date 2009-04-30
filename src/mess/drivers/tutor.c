@@ -357,7 +357,7 @@ static WRITE8_HANDLER(tutor_mapper_w)
 static TIMER_CALLBACK(tape_interrupt_handler)
 {
 	//assert(tape_interrupt_enable);
-	cpu_set_input_line(machine->cpu[0], 1, (cassette_input(devtag_get_device(machine, "cassette")) > 0.0) ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 1, (cassette_input(devtag_get_device(machine, "cassette")) > 0.0) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /* CRU handler */
@@ -393,7 +393,7 @@ static WRITE8_HANDLER(tutor_cassette_w)
 				else
 				{
 					timer_adjust_oneshot(tape_interrupt_timer, attotime_never, 0);
-					cpu_set_input_line(space->machine->cpu[0], 1, CLEAR_LINE);
+					cputag_set_input_line(space->machine, "maincpu", 1, CLEAR_LINE);
 				}
 			}
 			break;

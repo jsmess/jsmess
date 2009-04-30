@@ -83,13 +83,13 @@ static IRQ_CALLBACK(amiga_ar1_irqack)
 static TIMER_CALLBACK( amiga_ar1_delayed_nmi )
 {
 	(void)param;
-	cpu_set_input_line(machine->cpu[0], 7, PULSE_LINE);
+	cputag_set_input_line(machine, "maincpu", 7, PULSE_LINE);
 }
 
 static void amiga_ar1_nmi( running_machine *machine )
 {
 	/* get the cart's built-in ram */
-	UINT16 *ar_ram = (UINT16 *)memory_get_write_ptr(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x9fc000);
+	UINT16 *ar_ram = (UINT16 *)memory_get_write_ptr(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x9fc000);
 
 	if ( ar_ram != NULL )
 	{
@@ -101,7 +101,7 @@ static void amiga_ar1_nmi( running_machine *machine )
 
 		/* trigger NMI irq */
 		amiga_ar1_spurious = 0;
-		timer_set(machine,  cpu_clocks_to_attotime(machine->cpu[0], 28), NULL, 0, amiga_ar1_delayed_nmi );
+		timer_set(machine,  cputag_clocks_to_attotime(machine, "maincpu", 28), NULL, 0, amiga_ar1_delayed_nmi );
 	}
 }
 
@@ -118,7 +118,7 @@ static WRITE16_HANDLER( amiga_ar1_chipmem_w )
 		{
 			/* trigger an NMI or spurious irq */
 			amiga_ar1_spurious = (offset == 0x60/2) ? 0 : 1;
-			timer_set(space->machine,  cpu_clocks_to_attotime(space->machine->cpu[0], 28), NULL, 0, amiga_ar1_delayed_nmi );
+			timer_set(space->machine,  cputag_clocks_to_attotime(space->machine, "maincpu", 28), NULL, 0, amiga_ar1_delayed_nmi );
 		}
 	}
 
@@ -127,7 +127,7 @@ static WRITE16_HANDLER( amiga_ar1_chipmem_w )
 
 static void amiga_ar1_check_overlay( running_machine *machine )
 {
-	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x000000, 0x00007f, 0, 0, amiga_ar1_chipmem_w);
+	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x000000, 0x00007f, 0, 0, amiga_ar1_chipmem_w);
 }
 
 static void amiga_ar1_init( running_machine *machine )
@@ -146,12 +146,12 @@ static void amiga_ar1_init( running_machine *machine )
 	memset(ar_ram, 0, 0x4000);
 
 	/* Install ROM */
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf00000, 0xf7ffff, 0, 0, SMH_BANK2);
-	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf00000, 0xf7ffff, 0, 0, SMH_ROM);
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf00000, 0xf7ffff, 0, 0, SMH_BANK2);
+	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf00000, 0xf7ffff, 0, 0, SMH_ROM);
 
 	/* Install RAM */
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x9fc000, 0x9fffff, 0, 0, SMH_BANK3);
-	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x9fc000, 0x9fffff, 0, 0, SMH_BANK3);
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x9fc000, 0x9fffff, 0, 0, SMH_BANK3);
+	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x9fc000, 0x9fffff, 0, 0, SMH_BANK3);
 
 	/* Configure Banks */
 	memory_set_bankptr(machine, 2, memory_region(machine, "user2"));
@@ -160,7 +160,7 @@ static void amiga_ar1_init( running_machine *machine )
 	amiga_ar1_spurious = 0;
 
 	/* Install IRQ ACK callback */
-	cpu_set_irq_callback(machine->cpu[0],amiga_ar1_irqack);
+	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), amiga_ar1_irqack);
 }
 
 /***************************************************************************
@@ -256,13 +256,13 @@ static WRITE16_HANDLER( amiga_ar23_chipmem_w )
 
 static void amiga_ar23_freeze( running_machine *machine )
 {
-	int pc = cpu_get_pc(machine->cpu[0]);
+	int pc = cpu_get_pc(cputag_get_cpu(machine, "maincpu"));
 
 	/* only freeze if we're not inside the cart's ROM */
 	if ( ((pc >> 16) & 0xfe ) != 0x40 )
 	{
 		/* get the cart's built-in ram */
-		UINT16 *ar_ram = (UINT16 *)memory_get_write_ptr(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x440000);
+		UINT16 *ar_ram = (UINT16 *)memory_get_write_ptr(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x440000);
 
 		if ( ar_ram != NULL )
 		{
@@ -276,10 +276,10 @@ static void amiga_ar23_freeze( running_machine *machine )
 		memory_set_bank(machine, 1, 2);
 
 		/* writes go to chipram */
-		memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x000000, amiga_chip_ram_size - 1, 0, 0, amiga_ar23_chipmem_w);
+		memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x000000, amiga_chip_ram_size - 1, 0, 0, amiga_ar23_chipmem_w);
 
 		/* trigger NMI irq */
-		cpu_set_input_line(machine->cpu[0], 7, PULSE_LINE);
+		cputag_set_input_line(machine, "maincpu", 7, PULSE_LINE);
 	}
 }
 
@@ -334,7 +334,7 @@ static READ16_HANDLER( amiga_ar23_custom_r )
 static void amiga_ar23_check_overlay( running_machine *machine )
 {
 	amiga_ar23_mode = 3;
-	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x000000, 0x00000f, 0, 0, amiga_ar23_chipmem_w);
+	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x000000, 0x00000f, 0, 0, amiga_ar23_chipmem_w);
 }
 
 static void amiga_ar23_init( running_machine *machine, int ar3 )
@@ -361,20 +361,20 @@ static void amiga_ar23_init( running_machine *machine, int ar3 )
 	}
 
 	/* Install ROM */
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x400000, 0x400000+size, 0, mirror, SMH_BANK2);
-	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x400000, 0x400000+size, 0, mirror, SMH_ROM);
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400000+size, 0, mirror, SMH_BANK2);
+	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400000+size, 0, mirror, SMH_ROM);
 
 	/* Install RAM */
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x440000, 0x44ffff, 0, 0, SMH_BANK3);
-	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x440000, 0x44ffff, 0, 0, SMH_BANK3);
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x440000, 0x44ffff, 0, 0, SMH_BANK3);
+	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x440000, 0x44ffff, 0, 0, SMH_BANK3);
 
 	/* Install Custom chip monitor */
-//	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xdff000, 0xdff1ff, 0, 0, amiga_ar23_custom_r);
-//	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xdff000, 0xdff1ff, 0, 0, amiga_ar23_custom_w);
+//	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xdff000, 0xdff1ff, 0, 0, amiga_ar23_custom_r);
+//	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xdff000, 0xdff1ff, 0, 0, amiga_ar23_custom_w);
 
 	/* Install status/mode handlers */
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x400000, 0x400007, 0, mirror, amiga_ar23_mode_r);
-	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x400000, 0x400003, 0, mirror, amiga_ar23_mode_w);
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400007, 0, mirror, amiga_ar23_mode_r);
+	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400003, 0, mirror, amiga_ar23_mode_w);
 
 	/* Configure Banks */
 	memory_set_bankptr(machine, 2, memory_region(machine, "user2"));

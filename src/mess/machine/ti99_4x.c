@@ -290,7 +290,7 @@ static UINT8 *sRAM_ptr_8;
 
 /* tms9900_ICount: used to implement memory waitstates (hack) */
 /* tms9995_ICount: used to implement memory waitstates (hack) */
-/* NPW 23-Feb-2004 - externs no longer needed because we now use cpu_adjust_icount(space->machine->cpu[0],) */
+/* NPW 23-Feb-2004 - externs no longer needed because we now use cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),) */
 
 
 
@@ -424,7 +424,7 @@ DEVICE_IMAGE_LOAD( ti99_cart )
 	/* There is a circuitry in TI99/4(a) that resets the console when a
 	cartridge is inserted or removed.  We emulate this instead of resetting the
 	emulator (which is the default in MESS). */
-	/*cpu_set_input_line(machine->cpu[0], INPUT_LINE_RESET, PULSE_LINE);
+	/*cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, PULSE_LINE);
 	tms9901_reset(0);
 	if (! has_evpc)
 		TMS9928A_reset();
@@ -551,7 +551,7 @@ DEVICE_IMAGE_UNLOAD( ti99_cart )
 	/* There is a circuitry in TI99/4(a) that resets the console when a
 	cartridge is inserted or removed.  We emulate this instead of resetting the
 	emulator (which is the default in MESS). */
-	/*cpu_set_input_line(machine->cpu[0], INPUT_LINE_RESET, PULSE_LINE);
+	/*cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, PULSE_LINE);
 	tms9901_reset(0);
 	if (! has_evpc)
 		TMS9928A_reset();
@@ -702,7 +702,7 @@ void ti99_common_init(running_machine *machine, const TMS9928a_interface *gfxpar
 */
 MACHINE_RESET( ti99 )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	/*console_GROMs.data_ptr = memory_region(machine, region_grom);*/
 	console_GROMs.addr = 0;
 
@@ -952,14 +952,14 @@ void set_hsgpl_crdena(int data)
 */
 READ16_HANDLER ( ti99_nop_8_r )
 {
-	cpu_adjust_icount(space->machine->cpu[0],-4);
+	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
 
 	return (0);
 }
 
 WRITE16_HANDLER ( ti99_nop_8_w )
 {
-	cpu_adjust_icount(space->machine->cpu[0],-4);
+	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
 }
 
 /*
@@ -977,7 +977,7 @@ WRITE16_HANDLER ( ti99_nop_8_w )
 */
 READ16_HANDLER ( ti99_cart_r )
 {
-	cpu_adjust_icount(space->machine->cpu[0],-4);
+	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
 
 	if (hsgpl_crdena)
 		/* hsgpl is enabled */
@@ -991,7 +991,7 @@ READ16_HANDLER ( ti99_cart_r )
 
 WRITE16_HANDLER ( ti99_cart_w )
 {
-	cpu_adjust_icount(space->machine->cpu[0],-4);
+	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
 
 	if (hsgpl_crdena)
 		/* hsgpl is enabled */
@@ -1021,7 +1021,7 @@ READ16_HANDLER ( ti99_4p_cart_r )
 	if (ti99_4p_internal_rom6_enable)
 		return ti99_4p_internal_ROM6[offset];
 
-	cpu_adjust_icount(space->machine->cpu[0],-4);
+	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
 
 	if (hsgpl_crdena)
 		/* hsgpl is enabled */
@@ -1038,7 +1038,7 @@ WRITE16_HANDLER ( ti99_4p_cart_w )
 		return;
 	}
 
-	cpu_adjust_icount(space->machine->cpu[0],-4);
+	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
 
 	if (hsgpl_crdena)
 		/* hsgpl is enabled */
@@ -1080,7 +1080,7 @@ Theory:
 */
 WRITE16_HANDLER ( ti99_wsnd_w )
 {
-	cpu_adjust_icount(space->machine->cpu[0],-4);
+	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
 
 	sn76496_w(devtag_get_device(space->machine, "sn76496"), offset, (data >> 8) & 0xff);
 }
@@ -1090,7 +1090,7 @@ WRITE16_HANDLER ( ti99_wsnd_w )
 */
 READ16_HANDLER ( ti99_rvdp_r )
 {
-	cpu_adjust_icount(space->machine->cpu[0],-4);
+	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
 
 	if (offset & 1)
 	{	/* read VDP status */
@@ -1107,7 +1107,7 @@ READ16_HANDLER ( ti99_rvdp_r )
 */
 WRITE16_HANDLER ( ti99_wvdp_w )
 {
-	cpu_adjust_icount(space->machine->cpu[0],-4);
+	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
 
 	if (offset & 1)
 	{	/* write VDP address */
@@ -1124,7 +1124,7 @@ WRITE16_HANDLER ( ti99_wvdp_w )
 */
 READ16_HANDLER ( ti99_rv38_r )
 {
-	cpu_adjust_icount(space->machine->cpu[0],-4);
+	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
 
 	if (offset & 1)
 	{	/* read VDP status */
@@ -1141,7 +1141,7 @@ READ16_HANDLER ( ti99_rv38_r )
 */
 WRITE16_HANDLER ( ti99_wv38_w )
 {
-	cpu_adjust_icount(space->machine->cpu[0],-4);
+	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
 
 	switch (offset & 3)
 	{
@@ -1169,7 +1169,7 @@ WRITE16_HANDLER ( ti99_wv38_w )
 */
 static READ16_HANDLER ( ti99_rspeech_r )
 {
-	cpu_adjust_icount(space->machine->cpu[0],-(18+3));		/* this is just a minimum, it can be more */
+	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-(18+3));		/* this is just a minimum, it can be more */
 
 	return ((int) tms5220_status_r(devtag_get_device(space->machine, "tms5220"), offset)) << 8;
 }
@@ -1195,7 +1195,7 @@ static void speech_kludge_callback(int dummy)
 */
 static WRITE16_HANDLER ( ti99_wspeech_w )
 {
-	cpu_adjust_icount(space->machine->cpu[0],-(54+3));		/* this is just an approx. minimum, it can be much more */
+	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-(54+3));		/* this is just an approx. minimum, it can be much more */
 
 #if 1
 	/* the stupid design of the tms5220 core means that ready is cleared when
@@ -1205,11 +1205,11 @@ static WRITE16_HANDLER ( ti99_wspeech_w )
 	if (! tms5220_ready_r(devtag_get_device(space->machine, "tms5220")))
 	{
 		attotime time_to_ready = double_to_attotime(tms5220_time_to_ready(devtag_get_device(space->machine, "tms5220")));
-		int cycles_to_ready = cpu_attotime_to_clocks(space->machine->cpu[0], time_to_ready);
+		int cycles_to_ready = cputag_attotime_to_clocks(space->machine, "maincpu", time_to_ready);
 
 		logerror("time to ready: %f -> %d\n", attotime_to_double(time_to_ready), (int) cycles_to_ready);
 
-		cpu_adjust_icount(space->machine->cpu[0],-cycles_to_ready);
+		cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-cycles_to_ready);
 		timer_set(space->machine, attotime_zero, NULL, 0, /*speech_kludge_callback*/NULL);
 	}
 #endif
@@ -1225,7 +1225,7 @@ READ16_HANDLER ( ti99_rgpl_r )
 	int reply;
 
 
-	cpu_adjust_icount(space->machine->cpu[0],-4 /*20+3*/);		/* from 4 to 23? */
+	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4 /*20+3*/);		/* from 4 to 23? */
 
 	if (offset & 1)
 	{	/* read GPL address */
@@ -1266,7 +1266,7 @@ READ16_HANDLER ( ti99_rgpl_r )
 */
 WRITE16_HANDLER ( ti99_wgpl_w )
 {
-	cpu_adjust_icount(space->machine->cpu[0],-4/*20+3*/);		/* from 4 to 23? */
+	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4/*20+3*/);		/* from 4 to 23? */
 
 	if (offset & 1)
 	{	/* write GPL address */
@@ -1312,7 +1312,7 @@ WRITE16_HANDLER ( ti99_wgpl_w )
 */
 READ16_HANDLER ( ti99_4p_rgpl_r )
 {
-	cpu_adjust_icount(space->machine->cpu[0],-4);		/* HSGPL is located on 8-bit bus? */
+	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);		/* HSGPL is located on 8-bit bus? */
 
 	return /*hsgpl_crdena ?*/ ti99_hsgpl_gpl_r(space, offset, mem_mask) /*: 0*/;
 }
@@ -1322,7 +1322,7 @@ READ16_HANDLER ( ti99_4p_rgpl_r )
 */
 WRITE16_HANDLER ( ti99_4p_wgpl_w )
 {
-	cpu_adjust_icount(space->machine->cpu[0],-4);		/* HSGPL is located on 8-bit bus? */
+	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);		/* HSGPL is located on 8-bit bus? */
 
 	/*if (hsgpl_crdena)*/
 		ti99_hsgpl_gpl_w(space, offset, data, mem_mask);
@@ -1393,7 +1393,7 @@ WRITE16_HANDLER ( ti99_4p_wgpl_w )
 				/* speech read */
 				if (! (offset & 1))
 				{
-					cpu_adjust_icount(space->machine->cpu[0],-16*4);		/* this is just a minimum, it can be more */
+					cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-16*4);		/* this is just a minimum, it can be more */
 					reply = tms5220_status_r(devtag_get_device(space->machine, "tms5220"), 0);
 				}
 				break;
@@ -1557,7 +1557,7 @@ WRITE8_HANDLER ( ti99_8_w )
 				/* speech write */
 				if (! (offset & 1))
 				{
-					cpu_adjust_icount(space->machine->cpu[0],-48*4);		/* this is just an approx. minimum, it can be much more */
+					cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-48*4);		/* this is just an approx. minimum, it can be much more */
 
 					/* the stupid design of the tms5220 core means that ready is cleared when
 					there are 15 bytes in FIFO.  It should be 16.  Of course, if it were the
@@ -1566,13 +1566,13 @@ WRITE8_HANDLER ( ti99_8_w )
 					if (! tms5220_ready_r(devtag_get_device(space->machine, "tms5220")))
 					{
 						attotime time_to_ready = double_to_attotime(tms5220_time_to_ready(devtag_get_device(space->machine, "tms5220")));
-						double d = ceil(cpu_attotime_to_clocks(space->machine->cpu[0], time_to_ready));
+						double d = ceil(cputag_attotime_to_clocks(space->machine, "maincpu", time_to_ready));
 						int cycles_to_ready = ((int) (d + 3)) & ~3;
 
 						logerror("time to ready: %f -> %d\n", attotime_to_double(time_to_ready)
 							, (int) cycles_to_ready);
 
-						cpu_adjust_icount(space->machine->cpu[0],-cycles_to_ready);
+						cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-cycles_to_ready);
 						timer_set(space->machine, attotime_zero, NULL, 0, /*speech_kludge_callback*/NULL);
 					}
 
@@ -2163,11 +2163,11 @@ static TMS9901_INT_CALLBACK( tms9901_interrupt_callback )
 	{
 		/* On TI99, TMS9900 IC0-3 lines are not connected to TMS9901,
 		 * but hard-wired to force level 1 interrupts */
-		cpu_set_input_line_and_vector(device->machine->cpu[0], 0, ASSERT_LINE, 1);	/* interrupt it, baby */
+		cputag_set_input_line_and_vector(device->machine, "maincpu", 0, ASSERT_LINE, 1);	/* interrupt it, baby */
 	}
 	else
 	{
-		cpu_set_input_line(device->machine->cpu[0], 0, CLEAR_LINE);
+		cputag_set_input_line(device->machine, "maincpu", 0, CLEAR_LINE);
 	}
 }
 
@@ -2607,7 +2607,7 @@ static WRITE16_HANDLER ( ti99_TIxramhigh_w );
 
 static void ti99_TIxram_init(running_machine *machine)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	
 	memory_install_read16_handler(space, 0x2000, 0x3fff, 0, 0, ti99_TIxramlow_r);
 	memory_install_write16_handler(space, 0x2000, 0x3fff, 0, 0, ti99_TIxramlow_w);
@@ -2618,14 +2618,14 @@ static void ti99_TIxram_init(running_machine *machine)
 /* low 8 kb: 0x2000-0x3fff */
 static READ16_HANDLER ( ti99_TIxramlow_r )
 {
-	cpu_adjust_icount(space->machine->cpu[0],-4);
+	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
 
 	return xRAM_ptr[offset];
 }
 
 static WRITE16_HANDLER ( ti99_TIxramlow_w )
 {
-	cpu_adjust_icount(space->machine->cpu[0],-4);
+	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
 
 	COMBINE_DATA(xRAM_ptr + offset);
 }
@@ -2633,14 +2633,14 @@ static WRITE16_HANDLER ( ti99_TIxramlow_w )
 /* high 24 kb: 0xa000-0xffff */
 static READ16_HANDLER ( ti99_TIxramhigh_r )
 {
-	cpu_adjust_icount(space->machine->cpu[0],-4);
+	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
 
 	return xRAM_ptr[offset+0x1000];
 }
 
 static WRITE16_HANDLER ( ti99_TIxramhigh_w )
 {
-	cpu_adjust_icount(space->machine->cpu[0],-4);
+	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
 
 	COMBINE_DATA(xRAM_ptr + offset+0x1000);
 }
@@ -2683,7 +2683,7 @@ static void ti99_sAMSxram_init(running_machine *machine)
 {
 	int i;
 
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	
 	memory_install_read16_handler(space, 0x2000, 0x3fff, 0, 0, ti99_sAMSxramlow_r);
 	memory_install_write16_handler(space, 0x2000, 0x3fff, 0, 0, ti99_sAMSxramlow_w);
@@ -2722,7 +2722,7 @@ static WRITE8_HANDLER(sAMS_mapper_w)
 /* low 8 kb: 0x2000-0x3fff */
 static READ16_HANDLER ( ti99_sAMSxramlow_r )
 {
-	cpu_adjust_icount(space->machine->cpu[0],-4);
+	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
 
 	if (sAMS_mapper_on)
 		return xRAM_ptr[(offset&0x7ff)+sAMSlookup[(0x1000+offset)>>11]];
@@ -2732,7 +2732,7 @@ static READ16_HANDLER ( ti99_sAMSxramlow_r )
 
 static WRITE16_HANDLER ( ti99_sAMSxramlow_w )
 {
-	cpu_adjust_icount(space->machine->cpu[0],-4);
+	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
 
 	if (sAMS_mapper_on)
 		COMBINE_DATA(xRAM_ptr + (offset&0x7ff)+sAMSlookup[(0x1000+offset)>>11]);
@@ -2743,7 +2743,7 @@ static WRITE16_HANDLER ( ti99_sAMSxramlow_w )
 /* high 24 kb: 0xa000-0xffff */
 static READ16_HANDLER ( ti99_sAMSxramhigh_r )
 {
-	cpu_adjust_icount(space->machine->cpu[0],-4);
+	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
 
 	if (sAMS_mapper_on)
 		return xRAM_ptr[(offset&0x7ff)+sAMSlookup[(0x5000+offset)>>11]];
@@ -2753,7 +2753,7 @@ static READ16_HANDLER ( ti99_sAMSxramhigh_r )
 
 static WRITE16_HANDLER ( ti99_sAMSxramhigh_w )
 {
-	cpu_adjust_icount(space->machine->cpu[0],-4);
+	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
 
 	if (sAMS_mapper_on)
 		COMBINE_DATA(xRAM_ptr + (offset&0x7ff)+sAMSlookup[(0x5000+offset)>>11]);
@@ -2946,7 +2946,7 @@ static int myarc_page_offset_mask;
 /* set up myarc handlers, and set initial state */
 static void ti99_myarcxram_init(running_machine *machine)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	
 	memory_install_read16_handler(space, 0x2000, 0x3fff, 0, 0, ti99_myarcxramlow_r);
 	memory_install_write16_handler(space, 0x2000, 0x3fff, 0, 0, ti99_myarcxramlow_w);
@@ -3016,14 +3016,14 @@ static void myarc_cru_w(running_machine *machine, int offset, int data)
 /* low 8 kb: 0x2000-0x3fff */
 static READ16_HANDLER ( ti99_myarcxramlow_r )
 {
-	cpu_adjust_icount(space->machine->cpu[0],-4);
+	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
 
 	return xRAM_ptr[myarc_cur_page_offset + offset];
 }
 
 static WRITE16_HANDLER ( ti99_myarcxramlow_w )
 {
-	cpu_adjust_icount(space->machine->cpu[0],-4);
+	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
 
 	COMBINE_DATA(xRAM_ptr + myarc_cur_page_offset + offset);
 }
@@ -3031,14 +3031,14 @@ static WRITE16_HANDLER ( ti99_myarcxramlow_w )
 /* high 24 kb: 0xa000-0xffff */
 static READ16_HANDLER ( ti99_myarcxramhigh_r )
 {
-	cpu_adjust_icount(space->machine->cpu[0],-4);
+	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
 
 	return xRAM_ptr[myarc_cur_page_offset + offset+0x1000];
 }
 
 static WRITE16_HANDLER ( ti99_myarcxramhigh_w )
 {
-	cpu_adjust_icount(space->machine->cpu[0],-4);
+	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
 
 	COMBINE_DATA(xRAM_ptr + myarc_cur_page_offset + offset+0x1000);
 }

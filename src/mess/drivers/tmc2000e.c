@@ -272,7 +272,7 @@ static MACHINE_RESET( tmc2000e )
 
 	device_reset(state->cdp1864);
 
-	cpu_set_input_line(machine->cpu[0], INPUT_LINE_RESET, PULSE_LINE);
+	cputag_set_input_line(machine, CDP1802_TAG, INPUT_LINE_RESET, PULSE_LINE);
 
 	// reset program counter to 0xc000
 }

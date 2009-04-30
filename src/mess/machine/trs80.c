@@ -86,7 +86,7 @@ static TIMER_CALLBACK( cassette_data_callback )
 		{
 			cassette_data = 0;
 			trs80_int |= CASS_FALL;
-			cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
+			cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
 		}
 	}
 	else
@@ -96,7 +96,7 @@ static TIMER_CALLBACK( cassette_data_callback )
 		{
 			cassette_data = 1;
 			trs80_int |= CASS_RISE;
-			cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
+			cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
 		}
 	}
 
@@ -106,7 +106,7 @@ static TIMER_CALLBACK( cassette_data_callback )
 
 QUICKLOAD_LOAD( trs80_cmd )
 {
-	const address_space *space = cpu_get_address_space(image->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(image->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT16 entry = 0, block_ofs = 0, block_len = 0;
 	unsigned offs = 0;
 	UINT8 *cmd_buff;
@@ -164,7 +164,7 @@ QUICKLOAD_LOAD( trs80_cmd )
 			quickload_size--;
 		}
 	}
-	cpu_set_reg(image->machine->cpu[0], Z80_PC, entry);
+	cpu_set_reg(cputag_get_cpu(image->machine, "maincpu"), Z80_PC, entry);
 
 	free(cmd_buff);
 	return INIT_PASS;
@@ -262,7 +262,7 @@ READ8_HANDLER( trs80m4_e0_r )
 	d1 Cass 1500 baud Falling
 	d0 Cass 1500 baud Rising */
 
-	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 	return ~(trs80_mask & trs80_int);
 }
 
@@ -278,7 +278,7 @@ READ8_HANDLER( trs80m4_e4_r )
 	d6 status of Motor Timeout (0=true)
 	d5 status of Reset signal (0=true - this will reboot the computer) */
 
-	cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 
 	return ~(trs80_nmi_mask & trs80_nmi_data);
 }
@@ -516,7 +516,7 @@ WRITE8_HANDLER( trs80m4_ec_w )
 	d2 Mode Select (0=64 chars, 1=32chars)
 	d1 Cassette Motor (1=On) */
 
-	cpu_set_clock(space->machine->cpu[0], data & 0x40 ? MODEL4_MASTER_CLOCK/5 : MODEL4_MASTER_CLOCK/10);
+	cputag_set_clock(space->machine, "maincpu", data & 0x40 ? MODEL4_MASTER_CLOCK/5 : MODEL4_MASTER_CLOCK/10);
 
 	trs80_mode = (trs80_mode & 0xfe) | ((data & 4) ? 1 : 0);
 
@@ -675,13 +675,13 @@ static void trs80_fdc_interrupt_internal(running_machine *machine)
 		if (trs80_nmi_mask & 0x80)	// Model 4 does a NMI
 		{
 			trs80_nmi_data = 0x80;
-			cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
+			cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 		}
 	}
 	else		// Model 1 does a IRQ
 	{
 		trs80_int |= IRQ_M1_FDC;
-		cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
+		cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
 	}
 }
 
@@ -770,7 +770,7 @@ READ8_HANDLER( trs80_irq_status_r )
 	which is dealt with by the DOS. We take the opportunity to reset the cpu INT line. */
 
 	int result = trs80_int;
-	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 	trs80_int = 0;
 	return result;
 }

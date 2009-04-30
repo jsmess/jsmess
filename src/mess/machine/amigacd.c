@@ -82,7 +82,7 @@ static void check_interrupts( running_machine *machine )
 		return;
 
 	/* otherwise, generate the IRQ */
-	amiga_custom_w(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), REG_INTREQ, 0x8000 | INTENA_PORTS, 0xffff);
+	amiga_custom_w(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), REG_INTREQ, 0x8000 | INTENA_PORTS, 0xffff);
 }
 
 static TIMER_CALLBACK(dmac_dma_proc)
@@ -388,14 +388,14 @@ static WRITE16_HANDLER( amiga_dmac_w )
 
 static void	dmac_install(running_machine *machine, offs_t base)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	memory_install_read16_handler(space, base, base + 0xFFFF, 0, 0, amiga_dmac_r);
 	memory_install_write16_handler(space, base, base + 0xFFFF, 0, 0, amiga_dmac_w);
 }
 
 static void	dmac_uninstall(running_machine *machine, offs_t base)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	memory_install_read16_handler(space, base, base + 0xFFFF, 0, 0, SMH_UNMAP);
 	memory_install_write16_handler(space, base, base + 0xFFFF, 0, 0, SMH_UNMAP);
 }
@@ -456,7 +456,7 @@ static TIMER_CALLBACK(tp6525_delayed_irq)
 
 	if ( (CUSTOM_REG(REG_INTREQ) & INTENA_PORTS) == 0 )
 	{
-		amiga_custom_w(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), REG_INTREQ, 0x8000 | INTENA_PORTS, 0xffff);
+		amiga_custom_w(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), REG_INTREQ, 0x8000 | INTENA_PORTS, 0xffff);
 	}
 	else
 	{
@@ -472,7 +472,7 @@ void amigacd_tpi6525_irq(const device_config *device, int level)
 	{
 		if ( (CUSTOM_REG(REG_INTREQ) & INTENA_PORTS) == 0 )
 		{
-			amiga_custom_w(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), REG_INTREQ, 0x8000 | INTENA_PORTS, 0xffff);
+			amiga_custom_w(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), REG_INTREQ, 0x8000 | INTENA_PORTS, 0xffff);
 		}
 		else
 		{

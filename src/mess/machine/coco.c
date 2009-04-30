@@ -600,15 +600,15 @@ static void pak_load_trailer(running_machine *machine, const pak_decodedtrailer 
 {
 	coco_state *state = machine->driver_data;
 
-	cpu_set_reg(machine->cpu[0], M6809_PC, trailer->reg_pc);
-	cpu_set_reg(machine->cpu[0], M6809_X, trailer->reg_x);
-	cpu_set_reg(machine->cpu[0], M6809_Y, trailer->reg_y);
-	cpu_set_reg(machine->cpu[0], M6809_U, trailer->reg_u);
-	cpu_set_reg(machine->cpu[0], M6809_S, trailer->reg_s);
-	cpu_set_reg(machine->cpu[0], M6809_DP, trailer->reg_dp);
-	cpu_set_reg(machine->cpu[0], M6809_B, trailer->reg_b);
-	cpu_set_reg(machine->cpu[0], M6809_A, trailer->reg_a);
-	cpu_set_reg(machine->cpu[0], M6809_CC, trailer->reg_cc);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), M6809_PC, trailer->reg_pc);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), M6809_X, trailer->reg_x);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), M6809_Y, trailer->reg_y);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), M6809_U, trailer->reg_u);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), M6809_S, trailer->reg_s);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), M6809_DP, trailer->reg_dp);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), M6809_B, trailer->reg_b);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), M6809_A, trailer->reg_a);
+	cpu_set_reg(cputag_get_cpu(machine, "maincpu"), M6809_CC, trailer->reg_cc);
 
 	/* I seem to only be able to get a small amount of the PIA state from the
 	 * snapshot trailers. Thus I am going to configure the PIA myself. The
@@ -773,12 +773,12 @@ QUICKLOAD_LOAD ( coco )
 		if (preamble != 0)
 		{
 			/* start address - just set the address and return */
-			cpu_set_reg(image->machine->cpu[0], REG_GENPC, block_address);
+			cpu_set_reg(cputag_get_cpu(image->machine, "maincpu"), REG_GENPC, block_address);
 			done = TRUE;
 		}
 		else
 		{
-			const address_space *space = cpu_get_address_space( image->machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+			const address_space *space = cputag_get_address_space( image->machine, "maincpu", ADDRESS_SPACE_PROGRAM );
 
 			/* data block - need to cap the maximum length of the block */
 			block_length = MIN(block_length, length - position);
@@ -912,9 +912,9 @@ static void d_recalc_irq(running_machine *machine)
 	UINT8 pia0_irq_b = pia6821_get_irq_b(state->pia_0);
 
 	if (pia0_irq_a || pia0_irq_b)
-		cpu_set_input_line(machine->cpu[0], M6809_IRQ_LINE, ASSERT_LINE);
+		cputag_set_input_line(machine, "maincpu", M6809_IRQ_LINE, ASSERT_LINE);
 	else
-		cpu_set_input_line(machine->cpu[0], M6809_IRQ_LINE, CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 static void d_recalc_firq(running_machine *machine)
@@ -926,15 +926,15 @@ static void d_recalc_firq(running_machine *machine)
 	UINT8 pia2_firq_b = (state->pia_2 != NULL) ? pia6821_get_irq_b(state->pia_2) : 0x00;
 
 	if (pia1_firq_a || pia1_firq_b || pia2_firq_a || pia2_firq_b)
-		cpu_set_input_line(machine->cpu[0], M6809_FIRQ_LINE, ASSERT_LINE);
+		cputag_set_input_line(machine, "maincpu", M6809_FIRQ_LINE, ASSERT_LINE);
 	else
-		cpu_set_input_line(machine->cpu[0], M6809_FIRQ_LINE, CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 static void coco3_recalc_irq(running_machine *machine)
 {
 	if ((coco3_gimereg[0] & 0x20) && gime_irq)
-		cpu_set_input_line(machine->cpu[0], M6809_IRQ_LINE, ASSERT_LINE);
+		cputag_set_input_line(machine, "maincpu", M6809_IRQ_LINE, ASSERT_LINE);
 	else
 		d_recalc_irq(machine);
 }
@@ -942,7 +942,7 @@ static void coco3_recalc_irq(running_machine *machine)
 static void coco3_recalc_firq(running_machine *machine)
 {
 	if ((coco3_gimereg[0] & 0x10) && gime_firq)
-		cpu_set_input_line(machine->cpu[0], M6809_FIRQ_LINE, ASSERT_LINE);
+		cputag_set_input_line(machine, "maincpu", M6809_FIRQ_LINE, ASSERT_LINE);
 	else
 		d_recalc_firq(machine);
 }
@@ -1079,7 +1079,7 @@ void coco_set_halt_line(running_machine *machine, int halt_line)
 {
 	cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, halt_line);
 	if (halt_line == CLEAR_LINE)
-		timer_set(machine, cpu_clocks_to_attotime(machine->cpu[0], 1), NULL, 0, recalc_interrupts);
+		timer_set(machine, cputag_clocks_to_attotime(machine, "maincpu", 1), NULL, 0, recalc_interrupts);
 }
 #endif
 
@@ -1806,7 +1806,7 @@ static WD17XX_CALLBACK( dgnalpha_fdc_callback )
 	switch(state)
 	{
 		case WD17XX_IRQ_CLR:
-			cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
+			cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 			break;
 		case WD17XX_IRQ_SET:
 			if(dgnalpha_just_reset)
@@ -1816,7 +1816,7 @@ static WD17XX_CALLBACK( dgnalpha_fdc_callback )
 			else
 			{
 				if (pia6821_get_output_ca2_z(cstate->pia_2))
-					cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_NMI, ASSERT_LINE);
+					cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
 			}
 			break;
 		case WD17XX_DRQ_CLR:
@@ -2040,7 +2040,7 @@ static SAM6883_SET_MPU_RATE( d_sam_set_mpurate )
 	 * TODO:  Make the overclock more accurate.  In dual speed, ROM was a fast
 	 * access but RAM was not.  I don't know how to simulate this.
 	 */
-    cpu_set_clockscale(device->machine->cpu[0], val ? 2 : 1);
+    cpu_set_clockscale(cputag_get_cpu(device->machine, "maincpu"), val ? 2 : 1);
 }
 
 READ8_HANDLER(dragon_alpha_mapped_irq_r)
@@ -2100,7 +2100,7 @@ static void setup_memory_map(running_machine *machine)
 	};
 
 	/* We need to init these vars from the sam, as this may be called from outside the sam callbacks */
-	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	const address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
 	coco_state *state = machine->driver_data;
 	UINT8 memsize	= get_sam_memorysize(state->sam);
 	UINT8 maptype	= get_sam_maptype(state->sam);
@@ -2443,7 +2443,7 @@ static void coco3_mmu_update(running_machine *machine, int lowblock, int hiblock
 		{ 0xfe00, 0xfeff }
 	};
 
-	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	const address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
 	int i, offset, writebank;
 	UINT8 *readbank;
 	UINT8 *cart_rom = memory_region(machine, "cart");
@@ -2804,7 +2804,7 @@ void coco3_cart_w(const device_config *device, int data)
 
 void coco_halt_w(const device_config *device, int data)
 {
-	cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_HALT, data ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_HALT, data ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -2815,7 +2815,7 @@ void coco_halt_w(const device_config *device, int data)
 
 void coco_nmi_w(const device_config *device, int data)
 {
-	cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_NMI, data ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, data ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -2893,7 +2893,7 @@ static void generic_init_machine(running_machine *machine, const machine_init_in
 	/* setup printer output callback */
 	printer_out = init->printer_out_;
 
-	debug_cpu_set_dasm_override(machine->cpu[0], coco_dasm_override);
+	debug_cpu_set_dasm_override(cputag_get_cpu(machine, "maincpu"), coco_dasm_override);
 
 	state_save_register_global(machine, mux_sel1);
 	state_save_register_global(machine, mux_sel2);

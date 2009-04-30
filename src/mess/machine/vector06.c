@@ -161,11 +161,11 @@ static TIMER_CALLBACK(reset_check_callback)
 	UINT8 val = input_port_read(machine, "RESET");
 	if ((val & 1)==1) {
 		memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0x10000);
-		device_reset(machine->cpu[0]);
+		device_reset(cputag_get_cpu(machine, "maincpu"));
 	}
 	if ((val & 2)==2) {
 		memory_set_bankptr(machine, 1, mess_ram + 0x0000);
-		device_reset(machine->cpu[0]);
+		device_reset(cputag_get_cpu(machine, "maincpu"));
 	}
 }
 
@@ -211,9 +211,9 @@ MACHINE_START( vector06 )
 
 MACHINE_RESET( vector06 )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	
-	cpu_set_irq_callback(machine->cpu[0], vector06_irq_callback);
+	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), vector06_irq_callback);
 	memory_install_read8_handler (space, 0x0000, 0x7fff, 0, 0, SMH_BANK1);
 	memory_install_write8_handler(space, 0x0000, 0x7fff, 0, 0, SMH_BANK2);
 	memory_install_read8_handler (space, 0x8000, 0xffff, 0, 0, SMH_BANK3);

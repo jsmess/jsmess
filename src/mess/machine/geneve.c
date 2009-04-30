@@ -133,7 +133,7 @@ enum
 };
 
 /* tms9995_ICount: used to implement memory waitstates (hack) */
-/* NPW 23-Feb-2004 - externs no longer needed because we now use cpu_adjust_icount(space->machine->cpu[0],) */
+/* NPW 23-Feb-2004 - externs no longer needed because we now use cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),) */
 
 
 
@@ -291,7 +291,7 @@ INTERRUPT_GEN( geneve_hblank_interrupt )
 static void inta_callback(running_machine *machine, int state)
 {
 	tms9901_set_single_int(devtag_get_device(machine, "tms9901"), 1, state);
-	cpu_set_input_line(machine->cpu[0], 1, state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 1, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /*
@@ -317,7 +317,7 @@ static void intb_callback(running_machine *machine, int state)
 */
 static  READ8_HANDLER ( geneve_speech_r )
 {
-	cpu_adjust_icount(space->machine->cpu[0],-8);		/* this is just a minimum, it can be more */
+	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-8);		/* this is just a minimum, it can be more */
 
 	return tms5220_status_r(devtag_get_device(space->machine, "tms5220"), offset);
 }
@@ -343,7 +343,7 @@ static void speech_kludge_callback(int dummy)
 */
 static WRITE8_HANDLER ( geneve_speech_w )
 {
-	cpu_adjust_icount(space->machine->cpu[0],-32*4);		/* this is just an approx. minimum, it can be much more */
+	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-32*4);		/* this is just an approx. minimum, it can be much more */
 
 #if 1
 	/* the stupid design of the tms5220 core means that ready is cleared when
@@ -353,11 +353,11 @@ static WRITE8_HANDLER ( geneve_speech_w )
 	if (! tms5220_ready_r(devtag_get_device(space->machine, "tms5220")))
 	{
 		attotime time_to_ready = double_to_attotime(tms5220_time_to_ready(devtag_get_device(space->machine, "tms5220")));
-		int cycles_to_ready = ceil(cpu_attotime_to_clocks(space->machine->cpu[0], time_to_ready));
+		int cycles_to_ready = ceil(cputag_attotime_to_clocks(space->machine, "maincpu", time_to_ready));
 
 		logerror("time to ready: %f -> %d\n", attotime_to_double(time_to_ready), (int) cycles_to_ready);
 
-		cpu_adjust_icount(space->machine->cpu[0],-cycles_to_ready);
+		cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-cycles_to_ready);
 		timer_set(space->machine, attotime_zero, NULL, 0, /*speech_kludge_callback*/NULL);
 	}
 #endif
@@ -1290,7 +1290,7 @@ static void poll_mouse(running_machine *machine)
 static TMS9901_INT_CALLBACK( tms9901_interrupt_callback )
 {
 	/* INTREQ is connected to INT1 (IC0-3 are not connected) */
-	cpu_set_input_line(device->machine->cpu[0], 0, intreq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "maincpu", 0, intreq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /*

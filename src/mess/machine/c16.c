@@ -125,7 +125,7 @@ void c16_m7501_port_write(const device_config *device, UINT8 direction, UINT8 da
 UINT8 c16_m7501_port_read(const device_config *device, UINT8 direction)
 {
 	UINT8 data = 0xff;
-	UINT8 c16_port7501 = (UINT8) device_get_info_int(device->machine->cpu[0], CPUINFO_INT_M6510_PORT);
+	UINT8 c16_port7501 = (UINT8) devtag_get_info_int(device->machine, "maincpu", CPUINFO_INT_M6510_PORT);
 
 	if ((c16_port7501 & 0x01) || !cbm_serial_data_read(device->machine))
 		data &= ~0x80;
@@ -422,7 +422,7 @@ void c16_interrupt (running_machine *machine, int level)
 	if (level != old_level)
 	{
 		DBG_LOG (3, "mos7501", ("irq %s\n", level ? "start" : "end"));
-		cpu_set_input_line(machine->cpu[0], M6510_IRQ_LINE, level);
+		cputag_set_input_line(machine, "maincpu", M6510_IRQ_LINE, level);
 		old_level = level;
 	}
 }
@@ -432,8 +432,8 @@ static void c16_common_driver_init (running_machine *machine)
 	UINT8 *rom;
 
 	/* configure the M7501 port */
-	device_set_info_fct(machine->cpu[0], CPUINFO_FCT_M6510_PORTREAD, (genf *) c16_m7501_port_read);
-	device_set_info_fct(machine->cpu[0], CPUINFO_FCT_M6510_PORTWRITE, (genf *) c16_m7501_port_write);
+	devtag_set_info_fct(machine, "maincpu", CPUINFO_FCT_M6510_PORTREAD, (genf *) c16_m7501_port_read);
+	devtag_set_info_fct(machine, "maincpu", CPUINFO_FCT_M6510_PORTWRITE, (genf *) c16_m7501_port_write);
 
 	c16_select_roms (cputag_get_address_space(machine,"maincpu",ADDRESS_SPACE_PROGRAM), 0, 0);
 	c16_switch_to_rom (cputag_get_address_space(machine,"maincpu",ADDRESS_SPACE_PROGRAM), 0, 0);
@@ -489,7 +489,7 @@ DRIVER_INIT( c16v )
 
 MACHINE_RESET( c16 )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	const device_config *sid = devtag_get_device(space->machine, "sid6581");
 	
 	c364_speech_init(machine);

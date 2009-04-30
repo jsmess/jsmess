@@ -274,7 +274,7 @@ static WRITE8_HANDLER( bankswitch_w )
 {
 	/* enable RAM */
 
-	const address_space *program = cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *program = cputag_get_address_space(space->machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
 
 	memory_set_bank(space->machine, 1, VIP_BANK_RAM);
 
@@ -568,7 +568,7 @@ static MACHINE_START( vip )
 
 	/* ROM banking */
 
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0x81ff, 0, 0x7e00, SMH_BANK2, SMH_UNMAP);
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM), 0x8000, 0x81ff, 0, 0x7e00, SMH_BANK2, SMH_UNMAP);
 	memory_configure_bank(machine, 2, 0, 1, memory_region(machine, CDP1802_TAG) + 0x8000, 0);
 	memory_set_bank(machine, 2, 0);
 
@@ -607,8 +607,8 @@ static MACHINE_RESET( vip )
 {
 	vip_state *state = machine->driver_data;
 	
-	const address_space *program = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	const address_space *io = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO);
+	const address_space *program = cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
+	const address_space *io = cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_IO);
 
 	/* reset auxiliary chips */
 

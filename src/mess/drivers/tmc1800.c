@@ -205,15 +205,15 @@ static WRITE8_DEVICE_HANDLER( tmc2000_bankswitch_w )
 	switch (mess_ram_size)
 	{
 	case 4 * 1024:
-		memory_install_readwrite8_handler(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x0fff, 0, 0x7000, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite8_handler(cputag_get_address_space(device->machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x0fff, 0, 0x7000, SMH_BANK1, SMH_BANK1);
 		break;
 
 	case 16 * 1024:
-		memory_install_readwrite8_handler(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0x4000, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite8_handler(cputag_get_address_space(device->machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0x4000, SMH_BANK1, SMH_BANK1);
 		break;
 
 	case 32 * 1024:
-		memory_install_readwrite8_handler(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x7fff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite8_handler(cputag_get_address_space(device->machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x7fff, 0, 0, SMH_BANK1, SMH_BANK1);
 		break;
 	}
 
@@ -224,11 +224,11 @@ static WRITE8_DEVICE_HANDLER( tmc2000_bankswitch_w )
 	switch (bank)
 	{
 	case TMC2000_BANK_MONITOR:
-		memory_install_readwrite8_handler(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0x81ff, 0, 0x7e00, SMH_BANK2, SMH_UNMAP);
+		memory_install_readwrite8_handler(cputag_get_address_space(device->machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM), 0x8000, 0x81ff, 0, 0x7e00, SMH_BANK2, SMH_UNMAP);
 		break;
 
 	case TMC2000_BANK_COLORRAM: // write-only
-		memory_install_readwrite8_handler(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0x81ff, 0, 0x7e00, SMH_UNMAP, SMH_BANK2);
+		memory_install_readwrite8_handler(cputag_get_address_space(device->machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM), 0x8000, 0x81ff, 0, 0x7e00, SMH_UNMAP, SMH_BANK2);
 		break;
 	}
 
@@ -243,7 +243,7 @@ static WRITE8_DEVICE_HANDLER( oscnano_bankswitch_w )
 
 	memory_set_bank(device->machine, 1, OSCNANO_BANK_RAM);
 
-	memory_install_readwrite8_handler(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x0fff, 0, 0x7000, SMH_BANK1, SMH_BANK1);
+	memory_install_readwrite8_handler(cputag_get_address_space(device->machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x0fff, 0, 0x7000, SMH_BANK1, SMH_BANK1);
 
 	/* write to CDP1864 tone latch */
 
@@ -802,13 +802,13 @@ static MACHINE_RESET( tmc2000 )
 
 	memory_set_bank(machine, 1, TMC2000_BANK_ROM);
 
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x01ff, 0, 0x7e00, SMH_BANK1, SMH_UNMAP);
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x01ff, 0, 0x7e00, SMH_BANK1, SMH_UNMAP);
 
 	/* enable monitor */
 
 	memory_set_bank(machine, 2, TMC2000_BANK_MONITOR);
 
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0x81ff, 0, 0x7e00, SMH_BANK2, SMH_UNMAP);
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM), 0x8000, 0x81ff, 0, 0x7e00, SMH_BANK2, SMH_UNMAP);
 }
 
 // OSCOM Nano
@@ -853,7 +853,7 @@ static MACHINE_RESET( oscnano )
 
 	memory_set_bank(machine, 1, OSCNANO_BANK_ROM);
 
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x01ff, 0, 0x7e00, SMH_BANK1, SMH_BANK1);
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x01ff, 0, 0x7e00, SMH_BANK1, SMH_BANK1);
 }
 
 /* Machine Drivers */

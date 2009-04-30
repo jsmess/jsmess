@@ -358,7 +358,7 @@ static void cmd_read_binary_forward(running_machine *machine)
 		/* DMA */
 		for (i=0; i<bytes_read; i+=2)
 		{
-			memory_write_word_16be(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM),dma_address, (((int) buffer[i]) << 8) | buffer[i+1]);
+			memory_write_word_16be(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),dma_address, (((int) buffer[i]) << 8) | buffer[i+1]);
 			dma_address = (dma_address + 2) & 0x1ffffe;
 		}
 

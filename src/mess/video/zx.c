@@ -110,8 +110,8 @@ static TIMER_CALLBACK(zx_ula_nmi)
 
 	r.min_y = r.max_y = ula_scanline_count;
 	bitmap_fill(bitmap, &r, 1);
-//	logerror("ULA %3d[%d] NMI, R:$%02X, $%04x\n", video_screen_get_vpos(machine->primary_screen), ula_scancode_count, (unsigned) cpu_get_reg(machine->cpu[0], Z80_R), (unsigned) cpu_get_reg(machine->cpu[0], Z80_PC));
-	cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
+//	logerror("ULA %3d[%d] NMI, R:$%02X, $%04x\n", video_screen_get_vpos(machine->primary_screen), ula_scancode_count, (unsigned) cpu_get_reg(cputag_get_cpu(machine, "maincpu"), Z80_R), (unsigned) cpu_get_reg(cputag_get_cpu(machine, "maincpu"), Z80_PC));
+	cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 	if (++ula_scanline_count == height)
 		ula_scanline_count = 0;
 }
@@ -126,10 +126,10 @@ static TIMER_CALLBACK(zx_ula_irq)
 	 */
 	if (ula_irq_active)
 	{
-//		logerror("ULA %3d[%d] IRQ, R:$%02X, $%04x\n", video_screen_get_vpos(machine->primary_screen), ula_scancode_count, (unsigned) cpu_get_reg(machine->cpu[0], Z80_R), (unsigned) cpu_get_reg(machine->cpu[0], Z80_PC));
+//		logerror("ULA %3d[%d] IRQ, R:$%02X, $%04x\n", video_screen_get_vpos(machine->primary_screen), ula_scancode_count, (unsigned) cpu_get_reg(cputag_get_cpu(machine, "maincpu"), Z80_R), (unsigned) cpu_get_reg(cputag_get_cpu(machine, "maincpu"), Z80_PC));
 
 		ula_irq_active = 0;
-		cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
+		cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
 	}
 }
 
@@ -144,13 +144,13 @@ void zx_ula_r(running_machine *machine, int offs, const char *region, const UINT
 	{
 		bitmap_t *bitmap = tmpbitmap;
 		UINT16 y, *scanline;
-		UINT16 ireg = cpu_get_reg(machine->cpu[0], Z80_I) << 8;
+		UINT16 ireg = cpu_get_reg(cputag_get_cpu(machine, "maincpu"), Z80_I) << 8;
 		UINT8 data, *chrgen, creg;
 
 		if (param)
-			creg = cpu_get_reg(machine->cpu[0], Z80_B);
+			creg = cpu_get_reg(cputag_get_cpu(machine, "maincpu"), Z80_B);
 		else
-			creg = cpu_get_reg(machine->cpu[0], Z80_C);
+			creg = cpu_get_reg(cputag_get_cpu(machine, "maincpu"), Z80_C);
 
 		chrgen = memory_region(machine, region);
 
@@ -172,7 +172,7 @@ void zx_ula_r(running_machine *machine, int offs, const char *region, const UINT
 		for (y = charline_ptr; y < ARRAY_LENGTH(charline); y++)
 			charline[y] = 0;
 
-		timer_set(machine, cpu_clocks_to_attotime(machine->cpu[0], ((32 - charline_ptr) << 2)), NULL, 0, zx_ula_irq);
+		timer_set(machine, cputag_clocks_to_attotime(machine, "maincpu", ((32 - charline_ptr) << 2)), NULL, 0, zx_ula_irq);
 		ula_irq_active++;
 
 		scanline = BITMAP_ADDR16(bitmap, ula_scanline_count, 0);
