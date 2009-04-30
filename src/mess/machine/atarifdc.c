@@ -739,8 +739,6 @@ WRITE8_HANDLER ( atari_serout_w )
 	}
 }
 
-
-/* 2009-04 FP: is this used anywhere? */
 WRITE_LINE_DEVICE_HANDLER(atarifdc_pia_cb2_w)
 {
 	if (!state)

@@ -63,36 +63,20 @@ void atari_interrupt_cb(const device_config *device, int mask)
  *
  **************************************************************/
 
-static READ8_DEVICE_HANDLER(atari_pia_pa_r)
+READ8_DEVICE_HANDLER(atari_pia_pa_r)
 {
 	return atari_input_disabled() ? 0xFF : input_port_read_safe(device->machine, "djoy_0_1", 0);
 }
 
-static READ8_DEVICE_HANDLER(atari_pia_pb_r)
+READ8_DEVICE_HANDLER(atari_pia_pb_r)
 {
 	return atari_input_disabled() ? 0xFF : input_port_read_safe(device->machine, "djoy_2_3", 0);
 }
 
 static WRITE8_DEVICE_HANDLER(a600xl_pia_pb_w) { a600xl_mmu(device->machine, data); }
-static WRITE8_DEVICE_HANDLER(a800xl_pia_pb_w) { a800xl_mmu(device->machine, data); }
+WRITE8_DEVICE_HANDLER(a800xl_pia_pb_w) { a800xl_mmu(device->machine, data); }
 
-WRITE_LINE_DEVICE_HANDLER(atari_pia_cb2_w) { }
-
-const pia6821_interface atari_pia_interface =
-{
-	DEVCB_HANDLER(atari_pia_pa_r),		/* port A in */
-	DEVCB_HANDLER(atari_pia_pb_r),	/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_NULL,		/* port A out */
-	DEVCB_NULL,		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_LINE(atari_pia_cb2_w),		/* port CB2 out */
-	DEVCB_NULL,		/* IRQA */
-	DEVCB_NULL		/* IRQB */
-};
+static WRITE_LINE_DEVICE_HANDLER(atari_pia_cb2_w) { }	// This is used by Floppy drive on Atari 8bits Home Computers
 
 const pia6821_interface a600xl_pia_interface =
 {
@@ -109,24 +93,6 @@ const pia6821_interface a600xl_pia_interface =
 	DEVCB_NULL,		/* IRQA */
 	DEVCB_NULL		/* IRQB */
 };
-
-const pia6821_interface a800xl_pia_interface =
-{
-	DEVCB_HANDLER(atari_pia_pa_r),		/* port A in */
-	DEVCB_HANDLER(atari_pia_pb_r),	/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_NULL,		/* port A out */
-	DEVCB_HANDLER(a800xl_pia_pb_w),		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_LINE(atari_pia_cb2_w),		/* port CB2 out */
-	DEVCB_NULL,		/* IRQA */
-	DEVCB_NULL		/* IRQB */
-};
-
-
 
 
 /**************************************************************
@@ -224,7 +190,7 @@ void a800xl_mmu(running_machine *machine, UINT8 new_mmu)
 		base2 = memory_region(machine, "maincpu") + 0x15000;  /* 0x0800 bytes */
 	}
 	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x5000, 0x57ff, 0, 0, rbank2, wbank2);
-	memory_set_bankptr(machine, 2, base2);
+	memory_set_bankptr(machine, 2, base2);	
 }
 
 

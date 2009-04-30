@@ -29,6 +29,9 @@ DEVICE_IMAGE_UNLOAD( a5200_cart );
 
 /* defined in atarifdc.c */
 DEVICE_IMAGE_LOAD( a800_floppy );
+READ8_HANDLER( atari_serin_r );
+WRITE8_HANDLER( atari_serout_w );
+WRITE_LINE_DEVICE_HANDLER( atarifdc_pia_cb2_w );
 
 #endif /* _ATARIDEV_H */
 

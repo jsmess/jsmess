@@ -656,7 +656,8 @@ static PALETTE_INIT( atari )
 {
 	int i;
 
-	for ( i = 0; i < sizeof(atari_palette) / 3; i++ ) {
+	for ( i = 0; i < sizeof(atari_palette) / 3; i++ ) 
+	{
 		palette_set_color_rgb(machine, i, atari_palette[i*3], atari_palette[i*3+1], atari_palette[i*3+2]);
 	}
 }
@@ -681,20 +682,36 @@ static const pokey_interface atari_pokey_interface =
 };
 
 
-static const pia6821_interface pia_dummy_intf =
+const pia6821_interface atari_pia_interface =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_HANDLER(atari_pia_pa_r),		/* port A in */
+	DEVCB_HANDLER(atari_pia_pb_r),	/* port B in */
+	DEVCB_NULL,		/* line CA1 in */
+	DEVCB_NULL,		/* line CB1 in */
+	DEVCB_NULL,		/* line CA2 in */
+	DEVCB_NULL,		/* line CB2 in */
+	DEVCB_NULL,		/* port A out */
+	DEVCB_NULL,		/* port B out */
+	DEVCB_NULL,		/* line CA2 out */
+	DEVCB_LINE(atarifdc_pia_cb2_w),		/* port CB2 out */
+	DEVCB_NULL,		/* IRQA */
+	DEVCB_NULL		/* IRQB */
+};
+
+const pia6821_interface a800xl_pia_interface =
+{
+	DEVCB_HANDLER(atari_pia_pa_r),		/* port A in */
+	DEVCB_HANDLER(atari_pia_pb_r),	/* port B in */
+	DEVCB_NULL,		/* line CA1 in */
+	DEVCB_NULL,		/* line CB1 in */
+	DEVCB_NULL,		/* line CA2 in */
+	DEVCB_NULL,		/* line CB2 in */
+	DEVCB_NULL,		/* port A out */
+	DEVCB_HANDLER(a800xl_pia_pb_w),		/* port B out */
+	DEVCB_NULL,		/* line CA2 out */
+	DEVCB_LINE(atarifdc_pia_cb2_w),		/* port CB2 out */
+	DEVCB_NULL,		/* IRQA */
+	DEVCB_NULL		/* IRQB */
 };
 
 
@@ -735,7 +752,7 @@ static MACHINE_DRIVER_START( atari_common_nodac )
 	MDRV_VIDEO_START(atari)
 	MDRV_VIDEO_UPDATE(atari)
 
-	MDRV_PIA6821_ADD( "pia", pia_dummy_intf )
+	MDRV_PIA6821_ADD( "pia", atari_pia_interface )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -826,6 +843,8 @@ static MACHINE_DRIVER_START( a800xl )
 	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP(a800xl_mem, 0)
 	MDRV_CPU_VBLANK_INT_HACK(a800xl_interrupt, TOTAL_LINES_60HZ)
+
+	MDRV_PIA6821_MODIFY( "pia", a800xl_pia_interface )
 
 	MDRV_MACHINE_START( a800xl )
 
@@ -936,6 +955,22 @@ static SYSTEM_CONFIG_START(a5200)
 	CONFIG_RAM_DEFAULT(16 * 1024)
 SYSTEM_CONFIG_END
 
+
+// VERY WIP code to load OS at start and, hopefully, go on with the implementation...
+static DRIVER_INIT( a800xl )
+{
+	UINT8 *rom = memory_region(machine, "maincpu");
+
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa000, 0xbfff, 0, 0, SMH_BANK1, SMH_UNMAP);
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5000, 0x57ff, 0, 0, SMH_BANK2, SMH_UNMAP);
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xcfff, 0, 0, SMH_BANK3, SMH_UNMAP);
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd800, 0xffff, 0, 0, SMH_BANK4, SMH_UNMAP);
+	memory_set_bankptr(machine, 1, rom + 0x10000);
+	memory_set_bankptr(machine, 2, rom + 0x15000);
+	memory_set_bankptr(machine, 3, rom + 0x14000);
+	memory_set_bankptr(machine, 4, rom + 0x15800);
+}
+
 /***************************************************************************
 
   Game driver(s)
@@ -947,5 +982,5 @@ COMP ( 1979, a400,	   0,		 0,		a400,		a800,	 0,		a400,	"Atari",  "Atari 400 (NTS
 COMP ( 1979, a400pal,  a400,	 0,		a400pal,	a800,	 0,		a400,	"Atari",  "Atari 400 (PAL)" , 0)
 COMP ( 1979, a800,	   0,		 0,		a800,		a800,	 0,		a800,	"Atari",  "Atari 800 (NTSC)" , 0)
 COMP ( 1979, a800pal,  a800,	 0,		a800pal,	a800,	 0,		a800,	"Atari",  "Atari 800 (PAL)" , 0)
-COMP ( 1983, a800xl,   a800,	 0,		a800xl,		a800xl,	 0,		a800,	"Atari",  "Atari 800XL", GAME_NOT_WORKING )
+COMP ( 1983, a800xl,   a800,	 0,		a800xl,		a800xl,	 a800xl,a800,	"Atari",  "Atari 800XL", GAME_NOT_WORKING )
 CONS ( 1982, a5200,    0,		 0,		a5200,		a5200,	 0,		a5200,	"Atari",  "Atari 5200", 0)
