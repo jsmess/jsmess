@@ -431,8 +431,8 @@ static void mc6845_screen_configure(running_machine *machine)
 	UINT16 height = crt.vertical_displayed*(crt.scan_lines+1)-1;					// height in pixels
 	UINT16 bytes = crt.horizontal_displayed*crt.vertical_displayed-1;				// video ram needed
 
-	if (width > 639) width=639;	
-	if (height > 271) height=271;
+	if (width > 0x27f) width=0x27f;	
+	if (height > 0x10f) height=0x10f;
 
 	/* Resize the screen */
 	visarea.min_x = 0;

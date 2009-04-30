@@ -622,13 +622,14 @@ ROM_START( mbeepc85 )
 
 	ROM_LOAD("telco321.rom",          0x18000, 0x2000, CRC(36852a11) SHA1(c45b8d03629e86231c6b256a7435abd87d8872a4) )
 
-	/* PAK option roms - Wordbee must be in slot 0 and Shell must be in slot 5. Slot 6 and 7 can be used as well. */
+	/* PAK option roms - Wordbee must be in slot 0 and Shell must be in slot 5. Slot 7 can be used as well. */
 	ROM_LOAD("wbee13.rom",            0x20000, 0x2000, CRC(d7c58b7b) SHA1(5af1b8d21a0f21534ed1833ae919dbbc6ca973e2) ) // 0
 	ROM_LOAD_OPTIONAL("cmdhelp.rom",  0x22000, 0x2000, CRC(a4f1fa90) SHA1(1456abc6ed0501a3b15a99b4302750843293ae5f) ) // 1
 	ROM_LOAD_OPTIONAL("edasm.rom",    0x24000, 0x2000, CRC(1af1b3a9) SHA1(d035a997c2dbbb3918b3395a3a5a1076aa203ee5) ) // 2
 	ROM_LOAD_OPTIONAL("forth.rom",    0x26000, 0x2000, CRC(c0795c2b) SHA1(8faa0a46fbbdb8a1019d706a40cd4431a5063f8c) ) // 3
 	ROM_LOAD_OPTIONAL("wbee12.rom",   0x28000, 0x2000, CRC(0fc21cb5) SHA1(33b3995988fc51ddef1568e160dfe699867adbd5) ) // 4
 	ROM_LOAD("shell.rom",             0x2a000, 0x2000, CRC(5a2c7cd6) SHA1(8edc086710cb558f2146d660eddc8a18ba6a141c) ) // 5
+	ROM_LOAD_OPTIONAL("ozlogo.rom",   0x2c000, 0x2000, CRC(47c3ef69) SHA1(8274d27c323ca4a6cc9e7d24946ae9c0531c3112) ) // 6
 
 	ROM_REGION( 0x0040, "proms", 0 )
 	ROM_LOAD( "82s123.ic7",           0x0000,  0x0020, CRC(61b9c16c) SHA1(0ee72377831c21339360c376f7248861d476dc20) )
