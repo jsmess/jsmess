@@ -625,12 +625,12 @@ static TIMER_CALLBACK( super80_halfspeed )
 	if (!go_fast)
 	{
 		if (!int_sw)
-			cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, ASSERT_LINE);	// if going, stop it
+			cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, ASSERT_LINE);	// if going, stop it
 
 		int_sw++;
 		if (int_sw > 1)
 		{
-			cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, CLEAR_LINE);		// if stopped, start it
+			cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, CLEAR_LINE);		// if stopped, start it
 			int_sw = 0;
 		}
 	}
@@ -638,7 +638,7 @@ static TIMER_CALLBACK( super80_halfspeed )
 	{
 		if (int_sw < 8)								// @2MHz, reset just once
 		{
-			cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, CLEAR_LINE);
+			cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
 			int_sw = 8;							// ...not every time
 		}
 	}
@@ -916,4 +916,3 @@ COMP( 1981, super80e, super80, 0, super80d, super80d, super80,  0, "Dick Smith E
 COMP( 1981, super80m, super80, 0, super80m, super80m, super80d, 0, "Dick Smith Electronics","Super-80 (8R0)" , 0)
 COMP( 1981, super80r, super80, 0, super80r, super80r, super80v, 0, "Dick Smith Electronics","Super-80 (with VDUEB)" , 0)
 COMP( 1981, super80v, super80, 0, super80v, super80v, super80v, 0, "Dick Smith Electronics","Super-80 (with enhanced VDUEB)" , 0)
-

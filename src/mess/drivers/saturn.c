@@ -261,7 +261,7 @@ attotime minit_boost_timeslice, sinit_boost_timeslice;
 
 /*A-Bus IRQ checks,where they could be located these?*/
 #define ABUSIRQ(_irq_,_vector_) \
-	{ cpu_set_input_line_and_vector(device->machine->cpu[0], _irq_, HOLD_LINE , _vector_); }
+	{ cputag_set_input_line_and_vector(device->machine, "maincpu", _irq_, HOLD_LINE , _vector_); }
 #if 0
 if(stv_scu[42] & 1)//IRQ ACK
 {
@@ -586,7 +586,7 @@ static void stv_SMPC_w8(const address_space *space, int offset, UINT8 data)
 			intback_stage = 2;
 		}
 		smpc_intbackhelper(machine);
-		cpu_set_input_line_and_vector(machine->cpu[0], 8, HOLD_LINE , 0x47);
+		cputag_set_input_line_and_vector(machine, "maincpu", 8, HOLD_LINE , 0x47);
 	}
 
 	if ((offset == 1) && (data & 0x40))
@@ -629,7 +629,7 @@ static void stv_SMPC_w8(const address_space *space, int offset, UINT8 data)
 			if(!(stv_scu[40] & 0x0100)) /*Pad irq*/
 			{
 				if(LOG_SMPC) logerror ("Interrupt: PAD irq, Vector 0x48 Level 0x08\n");
-				cpu_set_input_line_and_vector(machine->cpu[0], 8, HOLD_LINE , 0x48);
+				cputag_set_input_line_and_vector(machine, "maincpu", 8, HOLD_LINE , 0x48);
 			}
 	}
 
@@ -646,25 +646,25 @@ static void stv_SMPC_w8(const address_space *space, int offset, UINT8 data)
 				if(LOG_SMPC) logerror ("SMPC: Slave ON\n");
 				smpc_ram[0x5f]=0x02;
 				stv_enable_slave_sh2 = 1;
-				cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
+				cputag_set_input_line(machine, "slave", INPUT_LINE_RESET, CLEAR_LINE);
 				break;
 			case 0x03:
 				if(LOG_SMPC) logerror ("SMPC: Slave OFF\n");
 				smpc_ram[0x5f]=0x03;
 				stv_enable_slave_sh2 = 0;
 				cpuexec_trigger(machine, 1000);
-				cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+				cputag_set_input_line(machine, "slave", INPUT_LINE_RESET, ASSERT_LINE);
 				break;
 			case 0x06:
 				if(LOG_SMPC) logerror ("SMPC: Sound ON\n");
 				/* wrong? */
 				smpc_ram[0x5f]=0x06;
-				cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, CLEAR_LINE);
+				cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
 				en_68k = 1;
 				break;
 			case 0x07:
 				if(LOG_SMPC) logerror ("SMPC: Sound OFF\n");
-				cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, ASSERT_LINE);
+				cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 				en_68k = 0;
 				smpc_ram[0x5f]=0x07;
 				break;
@@ -674,24 +674,24 @@ static void stv_SMPC_w8(const address_space *space, int offset, UINT8 data)
 			case 0x0d:
 				if(LOG_SMPC) logerror ("SMPC: System Reset\n");
 				smpc_ram[0x5f]=0x0d;
-				cpu_set_input_line(machine->cpu[0], INPUT_LINE_RESET, PULSE_LINE);
+				cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, PULSE_LINE);
 				system_reset();
 				break;
 			case 0x0e:
 				if(LOG_SMPC) logerror ("SMPC: Change Clock to 352\n");
 				smpc_ram[0x5f]=0x0e;
-				cpu_set_clock(machine->cpu[0], MASTER_CLOCK_352/2);
-				cpu_set_clock(machine->cpu[1], MASTER_CLOCK_352/2);
-				cpu_set_clock(machine->cpu[2], MASTER_CLOCK_352/5);
-				cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE); // ff said this causes nmi, should we set a timer then nmi?
+				cputag_set_clock(machine, "maincpu", MASTER_CLOCK_352/2);
+				cputag_set_clock(machine, "slave", MASTER_CLOCK_352/2);
+				cputag_set_clock(machine, "audiocpu", MASTER_CLOCK_352/5);
+				cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE); // ff said this causes nmi, should we set a timer then nmi?
 				break;
 			case 0x0f:
 				if(LOG_SMPC) logerror ("SMPC: Change Clock to 320\n");
 				smpc_ram[0x5f]=0x0f;
-				cpu_set_clock(machine->cpu[0], MASTER_CLOCK_320/2);
-				cpu_set_clock(machine->cpu[1], MASTER_CLOCK_320/2);
-				cpu_set_clock(machine->cpu[2], MASTER_CLOCK_320/5);
-				cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE); // ff said this causes nmi, should we set a timer then nmi?
+				cputag_set_clock(machine, "maincpu", MASTER_CLOCK_320/2);
+				cputag_set_clock(machine, "slave", MASTER_CLOCK_320/2);
+				cputag_set_clock(machine, "audiocpu", MASTER_CLOCK_320/5);
+				cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE); // ff said this causes nmi, should we set a timer then nmi?
 				break;
 			/*"Interrupt Back"*/
 			case 0x10:
@@ -743,7 +743,7 @@ static void stv_SMPC_w8(const address_space *space, int offset, UINT8 data)
 				{
 //                  if(LOG_SMPC) logerror ("Interrupt: System Manager (SMPC) at scanline %04x, Vector 0x47 Level 0x08\n",scanline);
 					smpc_intbackhelper(machine);
-					cpu_set_input_line_and_vector(machine->cpu[0], 8, HOLD_LINE , 0x47);
+					cputag_set_input_line_and_vector(machine, "maincpu", 8, HOLD_LINE , 0x47);
 				}
 			break;
 			/* RTC write*/
@@ -772,7 +772,7 @@ static void stv_SMPC_w8(const address_space *space, int offset, UINT8 data)
 				if(LOG_SMPC) logerror ("SMPC: NMI request\n");
 				smpc_ram[0x5f]=0x18;
 				/*NMI is unconditionally requested?*/
-				cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
+				cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 				break;
 			case 0x19:
 				if(LOG_SMPC) logerror ("SMPC: NMI Enable\n");
@@ -1062,14 +1062,14 @@ static WRITE32_HANDLER( stv_scu_w32 )
 			/*Sound IRQ*/
 			if(/*(!(stv_scu[40] & 0x40)) &&*/ scsp_to_main_irq == 1)
 			{
-				//cpu_set_input_line_and_vector(space->machine->cpu[0], 9, HOLD_LINE , 0x46);
+				//cputag_set_input_line_and_vector(space->machine, "maincpu", 9, HOLD_LINE , 0x46);
 				logerror("SCSP: Main CPU interrupt\n");
 				#if 0
 				if((scu_dst_0 & 0x7ffffff) != 0x05a00000)
 				{
 					if(!(stv_scu[40] & 0x1000))
 					{
-						cpu_set_input_line_and_vector(space->machine->cpu[0], 3, HOLD_LINE, 0x4c);
+						cputag_set_input_line_and_vector(space->machine, "maincpu", 3, HOLD_LINE, 0x4c);
 						logerror("SCU: Illegal DMA interrupt\n");
 					}
 				}
@@ -1123,7 +1123,7 @@ static WRITE32_HANDLER( stv_scu_w32 )
 			/*Sound IRQ*/
 			if(/*(!(stv_scu[40] & 0x40)) &&*/ scsp_to_main_irq == 1)
 			{
-				//cpu_set_input_line_and_vector(space->machine->cpu[0], 9, HOLD_LINE , 0x46);
+				//cputag_set_input_line_and_vector(space->machine, "maincpu", 9, HOLD_LINE , 0x46);
 				logerror("SCSP: Main CPU interrupt\n");
 			}
 		}
@@ -1173,7 +1173,7 @@ static WRITE32_HANDLER( stv_scu_w32 )
 			/*Sound IRQ*/
 			if(/*(!(stv_scu[40] & 0x40)) &&*/ scsp_to_main_irq == 1)
 			{
-				//cpu_set_input_line_and_vector(space->machine->cpu[0], 9, HOLD_LINE , 0x46);
+				//cputag_set_input_line_and_vector(space->machine, "maincpu", 9, HOLD_LINE , 0x46);
 				logerror("SCSP: Main CPU interrupt\n");
 			}
 		}
@@ -1290,7 +1290,7 @@ static WRITE32_HANDLER( stv_scu_w32 )
 /*Lv 0 DMA end irq*/
 static TIMER_CALLBACK( dma_lv0_ended )
 {
-	cpu_set_input_line_and_vector(machine->cpu[0], 5, (stv_irq.dma_end[0]) ? HOLD_LINE : CLEAR_LINE, 0x4b);
+	cputag_set_input_line_and_vector(machine, "maincpu", 5, (stv_irq.dma_end[0]) ? HOLD_LINE : CLEAR_LINE, 0x4b);
 
 	D0MV_0;
 }
@@ -1298,7 +1298,7 @@ static TIMER_CALLBACK( dma_lv0_ended )
 /*Lv 1 DMA end irq*/
 static TIMER_CALLBACK( dma_lv1_ended )
 {
-	cpu_set_input_line_and_vector(machine->cpu[0], 6, (stv_irq.dma_end[1]) ? HOLD_LINE : CLEAR_LINE, 0x4a);
+	cputag_set_input_line_and_vector(machine, "maincpu", 6, (stv_irq.dma_end[1]) ? HOLD_LINE : CLEAR_LINE, 0x4a);
 
 	D1MV_0;
 }
@@ -1306,7 +1306,7 @@ static TIMER_CALLBACK( dma_lv1_ended )
 /*Lv 2 DMA end irq*/
 static TIMER_CALLBACK( dma_lv2_ended )
 {
-	cpu_set_input_line_and_vector(machine->cpu[0], 6, (stv_irq.dma_end[2]) ? HOLD_LINE : CLEAR_LINE, 0x49);
+	cputag_set_input_line_and_vector(machine, "maincpu", 6, (stv_irq.dma_end[2]) ? HOLD_LINE : CLEAR_LINE, 0x49);
 
 	D2MV_0;
 }
@@ -1867,14 +1867,14 @@ static WRITE32_HANDLER( minit_w )
 	logerror("cpu %s (PC=%08X) MINIT write = %08x\n", space->cpu->tag, cpu_get_pc(space->cpu),data);
 	cpuexec_boost_interleave(space->machine, minit_boost_timeslice, ATTOTIME_IN_USEC(minit_boost));
 	cpuexec_trigger(space->machine, 1000);
-	sh2_set_frt_input(space->machine->cpu[1], PULSE_LINE);
+	sh2_set_frt_input(cputag_get_cpu(space->machine, "slave"), PULSE_LINE);
 }
 
 static WRITE32_HANDLER( sinit_w )
 {
 	logerror("cpu %s (PC=%08X) SINIT write = %08x\n", space->cpu->tag, cpu_get_pc(space->cpu),data);
 	cpuexec_boost_interleave(space->machine, sinit_boost_timeslice, ATTOTIME_IN_USEC(sinit_boost));
-	sh2_set_frt_input(space->machine->cpu[0], PULSE_LINE);
+	sh2_set_frt_input(cputag_get_cpu(space->machine, "maincpu"), PULSE_LINE);
 }
 
 static UINT32 backup[64*1024/4];
@@ -2067,27 +2067,27 @@ static int cur_scan;
 timer_0 = 0; \
 { \
 	/*if(LOG_IRQ) logerror ("Interrupt: VBlank-OUT Vector 0x41 Level 0x0e\n");*/ \
-	cpu_set_input_line_and_vector(machine->cpu[0], 0xe, (stv_irq.vblank_out) ? HOLD_LINE : CLEAR_LINE , 0x41); \
+	cputag_set_input_line_and_vector(machine, "maincpu", 0xe, (stv_irq.vblank_out) ? HOLD_LINE : CLEAR_LINE , 0x41); \
 } \
 
 #define VBLANK_IN_IRQ \
 { \
 	/*if(LOG_IRQ) logerror ("Interrupt: VBlank IN Vector 0x40 Level 0x0f\n");*/ \
-	cpu_set_input_line_and_vector(device->machine->cpu[0], 0xf, (stv_irq.vblank_in) ? HOLD_LINE : CLEAR_LINE , 0x40); \
+	cputag_set_input_line_and_vector(device->machine, "maincpu", 0xf, (stv_irq.vblank_in) ? HOLD_LINE : CLEAR_LINE , 0x40); \
 } \
 
 #define HBLANK_IN_IRQ \
 timer_1 = stv_scu[37] & 0x1ff; \
 { \
 	/*if(LOG_IRQ) logerror ("Interrupt: HBlank-In at scanline %04x, Vector 0x42 Level 0x0d\n",scanline);*/ \
-	cpu_set_input_line_and_vector(machine->cpu[0], 0xd, (stv_irq.hblank_in) ? HOLD_LINE : CLEAR_LINE, 0x42); \
+	cputag_set_input_line_and_vector(machine, "maincpu", 0xd, (stv_irq.hblank_in) ? HOLD_LINE : CLEAR_LINE, 0x42); \
 } \
 
 #define TIMER_0_IRQ \
 if(timer_0 == (stv_scu[36] & 0x3ff)) \
 { \
 	/*if(LOG_IRQ) logerror ("Interrupt: Timer 0 at scanline %04x, Vector 0x43 Level 0x0c\n",scanline);*/ \
-	cpu_set_input_line_and_vector(machine->cpu[0], 0xc, (stv_irq.timer_0) ? HOLD_LINE : CLEAR_LINE, 0x43 ); \
+	cputag_set_input_line_and_vector(machine, "maincpu", 0xc, (stv_irq.timer_0) ? HOLD_LINE : CLEAR_LINE, 0x43 ); \
 } \
 
 #define TIMER_1_IRQ	\
@@ -2096,21 +2096,21 @@ if((stv_scu[38] & 1)) \
 	if(!(stv_scu[38] & 0x80)) \
 	{ \
 		/*if(LOG_IRQ) logerror ("Interrupt: Timer 1 at point %04x, Vector 0x44 Level 0x0b\n",point);*/ \
-		cpu_set_input_line_and_vector(machine->cpu[0], 0xb, (stv_irq.timer_1) ? HOLD_LINE : CLEAR_LINE, 0x44 ); \
+		cputag_set_input_line_and_vector(machine, "maincpu", 0xb, (stv_irq.timer_1) ? HOLD_LINE : CLEAR_LINE, 0x44 ); \
 	} \
 	else \
 	{ \
 		if((timer_0) == (stv_scu[36] & 0x3ff)) \
 		{ \
 			/*if(LOG_IRQ) logerror ("Interrupt: Timer 1 at point %04x, Vector 0x44 Level 0x0b\n",point);*/ \
-			cpu_set_input_line_and_vector(machine->cpu[0], 0xb, (stv_irq.timer_1) ? HOLD_LINE : CLEAR_LINE, 0x44 ); \
+			cputag_set_input_line_and_vector(machine, "maincpu", 0xb, (stv_irq.timer_1) ? HOLD_LINE : CLEAR_LINE, 0x44 ); \
 		} \
 	} \
 } \
 
 #define VDP1_IRQ \
 { \
-	cpu_set_input_line_and_vector(machine->cpu[0], 2, (stv_irq.vdp1_end) ? HOLD_LINE : CLEAR_LINE, 0x4d); \
+	cputag_set_input_line_and_vector(machine, "maincpu", 2, (stv_irq.vdp1_end) ? HOLD_LINE : CLEAR_LINE, 0x4d); \
 } \
 
 static TIMER_CALLBACK( hblank_in_irq )
@@ -2190,8 +2190,8 @@ static void saturn_init_driver(running_machine *machine, int rgn)
 	saturn_region = rgn;
 
 	// set compatible options
-	sh2drc_set_options(machine->cpu[0], SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
-	sh2drc_set_options(machine->cpu[1], SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
+	sh2drc_set_options(cputag_get_cpu(machine, "maincpu"), SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
+	sh2drc_set_options(cputag_get_cpu(machine, "slave"), SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
 
 	/* get the current date/time from the core */
 	mame_get_current_datetime(machine, &systime);
@@ -2271,9 +2271,9 @@ static MACHINE_START( saturn )
 static MACHINE_RESET( saturn )
 {
 	// don't let the slave cpu and the 68k go anywhere
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(machine, "slave", INPUT_LINE_RESET, ASSERT_LINE);
 	stv_enable_slave_sh2 = 0;
-	cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 
 	smpcSR = 0x40;	// this bit is always on according to docs
 
@@ -2288,9 +2288,9 @@ static MACHINE_RESET( saturn )
 	memset(stv_workram_l, 0, 0x100000);
 	memset(stv_workram_h, 0, 0x100000);
 
-	cpu_set_clock(machine->cpu[0], MASTER_CLOCK_320/2);
-	cpu_set_clock(machine->cpu[1], MASTER_CLOCK_320/2);
-	cpu_set_clock(machine->cpu[2], MASTER_CLOCK_320/5);
+	cputag_set_clock(machine, "maincpu", MASTER_CLOCK_320/2);
+	cputag_set_clock(machine, "slave", MASTER_CLOCK_320/2);
+	cputag_set_clock(machine, "audiocpu", MASTER_CLOCK_320/5);
 
 	stvcd_reset( machine );
 
@@ -2387,15 +2387,15 @@ static void scsp_irq(const device_config *device, int irq)
 	if (irq > 0)
 	{
 		scsp_last_line = irq;
-		cpu_set_input_line(device->machine->cpu[2], irq, ASSERT_LINE);
+		cputag_set_input_line(device->machine, "audiocpu", irq, ASSERT_LINE);
 	}
 	else if (irq < 0)
 	{
-		cpu_set_input_line(device->machine->cpu[2], -irq, CLEAR_LINE);
+		cputag_set_input_line(device->machine, "audiocpu", -irq, CLEAR_LINE);
 	}
 	else
 	{
-		cpu_set_input_line(device->machine->cpu[2], scsp_last_line, CLEAR_LINE);
+		cputag_set_input_line(device->machine, "audiocpu", scsp_last_line, CLEAR_LINE);
 	}
 }
 
@@ -2516,5 +2516,3 @@ CONS( 1994, saturnjp,   saturn, 0,      saturn, saturn, saturnjp,   0, "Sega",  
 CONS( 1994, saturneu,   saturn, 0,      saturn, saturn, saturneu,   0, "Sega",     "Saturn (PAL)",     GAME_NOT_WORKING )
 CONS( 1995, vsaturn,    saturn, 0,      saturn, saturn, saturnjp,   0, "JVC",      "V-Saturn",         GAME_NOT_WORKING )
 CONS( 1995, hisaturn,   saturn, 0,      saturn, saturn, saturnjp,   0, "Hitachi",  "HiSaturn",         GAME_NOT_WORKING )
-
-

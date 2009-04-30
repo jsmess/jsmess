@@ -155,11 +155,11 @@ static NEC765_INTERRUPT( sord_fd5_fdc_interrupt )
 {
 	if (state)
 	{
-		cpu_set_input_line(device->machine->cpu[1], 0, HOLD_LINE);
+		cputag_set_input_line(device->machine, "floppy", 0, HOLD_LINE);
 	}
 	else
 	{
-		cpu_set_input_line(device->machine->cpu[1], 0,CLEAR_LINE);
+		cputag_set_input_line(device->machine, "floppy", 0,CLEAR_LINE);
 	}
 }
 
@@ -190,25 +190,25 @@ static const device_config *cassette_device_image(running_machine *machine)
 
 static READ8_DEVICE_HANDLER(sord_ppi_porta_r)
 {
-	cpu_yield(device->machine->cpu[0]);
+	cpu_yield(cputag_get_cpu(device->machine, "maincpu"));
 
 	return fd5_databus;
 }
 
 static READ8_DEVICE_HANDLER(sord_ppi_portb_r)
 {
-	cpu_yield(device->machine->cpu[0]);
+	cpu_yield(cputag_get_cpu(device->machine, "maincpu"));
 
-	LOG(("m5 read from pi5 port b %04x\n",cpu_get_pc(device->machine->cpu[0])));
+	LOG(("m5 read from pi5 port b %04x\n", cpu_get_pc(cputag_get_cpu(device->machine, "maincpu"))));
 
 	return 0x0ff;
 }
 
 static READ8_DEVICE_HANDLER(sord_ppi_portc_r)
 {
-	cpu_yield(device->machine->cpu[0]);
+	cpu_yield(cputag_get_cpu(device->machine, "maincpu"));
 
-	LOG(("m5 read from pi5 port c %04x\n",cpu_get_pc(device->machine->cpu[0])));
+	LOG(("m5 read from pi5 port c %04x\n", cpu_get_pc(cputag_get_cpu(device->machine, "maincpu"))));
 
 /* from fd5 */
 /* 00 = 0000 = write */
@@ -237,25 +237,25 @@ static READ8_DEVICE_HANDLER(sord_ppi_portc_r)
 
 static WRITE8_DEVICE_HANDLER(sord_ppi_porta_w)
 {
-	cpu_yield(device->machine->cpu[0]);
+	cpu_yield(cputag_get_cpu(device->machine, "maincpu"));
 
 	fd5_databus = data;
 }
 
 static WRITE8_DEVICE_HANDLER(sord_ppi_portb_w)
 {
-	cpu_yield(device->machine->cpu[0]);
+	cpu_yield(cputag_get_cpu(device->machine, "maincpu"));
 
 	/* f0, 40 */
 	/* 1111 */
 	/* 0100 */
 
-	if (data==0x0f0)
+	if (data == 0x0f0)
 	{
-		cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
-		cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
+		cputag_set_input_line(device->machine, "floppy", INPUT_LINE_RESET, ASSERT_LINE);
+		cputag_set_input_line(device->machine, "floppy", INPUT_LINE_RESET, CLEAR_LINE);
 	}
-	LOG(("m5 write to pi5 port b: %02x %04x\n",data,cpu_get_pc(device->machine->cpu[0])));
+	LOG(("m5 write to pi5 port b: %02x %04x\n", data, cpu_get_pc(cputag_get_cpu(device->machine, "maincpu"))));
 }
 
 /* A,  B,  C,  D,  E,   F,  G,  H,  I,  J, K,  L,  M,   N, O, P, Q, R,   */
@@ -270,8 +270,8 @@ static WRITE8_DEVICE_HANDLER(sord_ppi_portc_w)
 	intra = (data & 0x08) ? 1 : 0;
 	ibfa = (data & 0x20) ? 1 : 0;
 
-	cpu_yield(device->machine->cpu[0]);
-	LOG(("m5 write to pi5 port c: %02x %04x\n",data,cpu_get_pc(device->machine->cpu[0])));
+	cpu_yield(cputag_get_cpu(device->machine, "maincpu"));
+	LOG(("m5 write to pi5 port c: %02x %04x\n", data, cpu_get_pc(cputag_get_cpu(device->machine, "maincpu"))));
 }
 
 static const ppi8255_interface sord_ppi8255_interface =
@@ -290,7 +290,7 @@ static const ppi8255_interface sord_ppi8255_interface =
 static void sord_m5_ctc_interrupt(const device_config *device, int state)
 {
 	//logerror("interrupting ctc %02x\r\n ",state);
-	cpu_set_input_line(device->machine->cpu[0], 0, state);
+	cputag_set_input_line(device->machine, "maincpu", 0, state);
 }
 
 static const z80ctc_interface	sord_m5_ctc_intf =
@@ -572,7 +572,7 @@ static const z80_daisy_chain sord_m5_daisy_chain[] =
 static INTERRUPT_GEN( sord_interrupt )
 {
 	if (TMS9928A_interrupt(device->machine))
-		cpu_set_input_line(device->machine->cpu[0], 0, HOLD_LINE);
+		cputag_set_input_line(device->machine, "maincpu", 0, HOLD_LINE);
 }
 
 static const cassette_config sordm5_cassette_config =

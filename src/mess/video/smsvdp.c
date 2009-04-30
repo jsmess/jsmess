@@ -273,7 +273,7 @@ static TIMER_CALLBACK(smsvdp_display_callback)
 	/* Check if we're on the last line of a frame */
 	if ( vpos == vpos_limit - 1 )
 	{
-		sms_check_pause_button( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM) );
+		sms_check_pause_button( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM) );
 		return;
 	}
 

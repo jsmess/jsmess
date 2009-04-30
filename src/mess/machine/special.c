@@ -71,7 +71,8 @@ static READ8_DEVICE_HANDLER (specialist_8255_portb_r )
 	if (input_port_read(device->machine, "LINE12")!=0xff) dat ^= 0x02;
 		
 	level = cassette_input(devtag_get_device(device->machine, "cassette"));	 									 					
-	if (level >=  0) { 
+	if (level >=  0) 
+	{ 
 			dat ^= 0x01;
  	}		
 	return dat & 0xff;
@@ -162,11 +163,12 @@ READ8_HANDLER (specimx_video_color_r )
 
 static void specimx_set_bank(running_machine *machine, int i,int data)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	memory_install_write8_handler(space, 0xc000, 0xffbf, 0, 0, SMH_BANK3);
 	memory_install_write8_handler(space, 0xffc0, 0xffdf, 0, 0, SMH_BANK4);
 	memory_set_bankptr(machine, 4, mess_ram + 0xffc0);
-	switch(i) {
+	switch(i) 
+	{
 		case 0 :			  
 				memory_install_write8_handler(space, 0x0000, 0x8fff, 0, 0, SMH_BANK1);
 				memory_install_write8_handler(space, 0x9000, 0xbfff, 0, 0, video_memory_w);
@@ -189,9 +191,12 @@ static void specimx_set_bank(running_machine *machine, int i,int data)
 			
 				memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0x10000);
 				memory_set_bankptr(machine, 2, memory_region(machine, "maincpu") + 0x19000);
-			  if (data & 0x80) {
+				if (data & 0x80) 
+				{
 					memory_set_bankptr(machine, 3, mess_ram + 0x1c000);					
-				} else {
+				} 
+				else 
+				{
 					memory_set_bankptr(machine, 3, mess_ram + 0xc000);					
 				}
 				break;
@@ -252,7 +257,8 @@ MACHINE_START( specimx )
 	wd17xx_set_density (fdc,DEN_FM_HI);
 }
 
-static TIMER_CALLBACK( setup_pit8253_gates ) {
+static TIMER_CALLBACK( setup_pit8253_gates ) 
+{
 	device_config *pit8253 = (device_config*)devtag_get_device(machine, "pit8253");
 
 	pit8253_gate_w(pit8253, 0, 0);
@@ -276,7 +282,8 @@ WRITE8_HANDLER( specimx_disk_ctrl_w )
 {	
 	const device_config *fdc = devtag_get_device(space->machine, "wd1793");
 
-	switch(offset) {  				
+	switch(offset) 
+	{  				
 		case 2 :						
 		 		wd17xx_set_side(fdc,data & 1);							
 				break;			
@@ -329,13 +336,14 @@ DEVICE_IMAGE_LOAD( specimx_floppy )
 static UINT8 RR_register;
 static UINT8 RC_register;
 
-static void erik_set_bank(running_machine *machine) {		
+static void erik_set_bank(running_machine *machine) 
+{		
 	UINT8 bank1 = (RR_register & 3);
 	UINT8 bank2 = ((RR_register >> 2) & 3);
 	UINT8 bank3 = ((RR_register >> 4) & 3);
 	UINT8 bank4 = ((RR_register >> 6) & 3);
 	UINT8 *mem = memory_region(machine, "maincpu");
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);	
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);	
 	
 	memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_BANK1);
 	memory_install_write8_handler(space, 0x4000, 0x8fff, 0, 0, SMH_BANK2);
@@ -344,7 +352,8 @@ static void erik_set_bank(running_machine *machine) {
 	memory_install_write8_handler(space, 0xf000, 0xf7ff, 0, 0, SMH_BANK5);
 	memory_install_write8_handler(space, 0xf800, 0xffff, 0, 0, SMH_BANK6);
 	
-	switch(bank1) {
+	switch(bank1) 
+	{
 		case 	1: 						
 		case 	2:
 		case 	3: 			
@@ -355,7 +364,8 @@ static void erik_set_bank(running_machine *machine) {
 						memory_set_bankptr(machine, 1, mem + 0x10000);	
 						break;
 	}
-	switch(bank2) {
+	switch(bank2) 
+	{
 		case 	1: 						
 		case 	2:
 		case 	3: 			
@@ -366,7 +376,8 @@ static void erik_set_bank(running_machine *machine) {
 						memory_set_bankptr(machine, 2, mem + 0x14000);	
 						break;
 	}
-	switch(bank3) {
+	switch(bank3) 
+	{
 		case 	1: 												
 		case 	2:
 		case 	3: 			
@@ -377,7 +388,8 @@ static void erik_set_bank(running_machine *machine) {
 						memory_set_bankptr(machine, 3, mem + 0x19000);	
 						break;
 	}
-	switch(bank4) {
+	switch(bank4) 
+	{
 		case 	1: 						
 		case 	2:
 		case 	3: 			
@@ -435,18 +447,23 @@ WRITE8_HANDLER( erik_rc_reg_w )
 	erik_background = ((RC_register  >> 6 ) & 1) + ((RC_register  >> 7 ) & 1) * 4;
 }
 
-READ8_HANDLER ( erik_disk_reg_r ) {
+READ8_HANDLER ( erik_disk_reg_r ) 
+{
 	return 0xff;	
 }
 
-WRITE8_HANDLER( erik_disk_reg_w ) {
+WRITE8_HANDLER( erik_disk_reg_w ) 
+{
 	const device_config *fdc = devtag_get_device(space->machine, "wd1793");
 	
 	wd17xx_set_side (fdc,data & 1);	
 	wd17xx_set_drive(fdc,(data >> 1) & 1);
-	if((data >>2) & 1) {
+	if((data >>2) & 1) 
+	{
 		wd17xx_set_density (fdc,DEN_FM_LO);
-	} else {
+	} 
+	else 
+	{
 		wd17xx_set_density (fdc,DEN_FM_HI);
   }	
 }

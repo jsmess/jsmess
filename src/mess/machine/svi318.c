@@ -61,8 +61,9 @@ static void svi318_set_banks(running_machine *machine);
 
 static INS8250_INTERRUPT( svi318_ins8250_interrupt )
 {
-	if (svi.bankLow != SVI_CART) {
-		cpu_set_input_line(device->machine->cpu[0], 0, (state ? HOLD_LINE : CLEAR_LINE));
+	if (svi.bankLow != SVI_CART) 
+	{
+		cputag_set_input_line(device->machine, "maincpu", 0, (state ? HOLD_LINE : CLEAR_LINE));
 	}
 }
 
@@ -435,7 +436,8 @@ MC6845_UPDATE_ROW( svi806_crtc6845_update_row )
 		int j;
 		UINT8	data = svi.svi806_gfx[ svi.svi806_ram[ ( ma + i ) & 0x7FF ] * 16 + ra ];
 
-		if ( i == cursor_x ) {
+		if ( i == cursor_x ) 
+		{
 			data = 0xFF;
 		}
 
@@ -506,7 +508,7 @@ MACHINE_RESET( svi328_806 )
 
 void svi318_vdp_interrupt(running_machine *machine, int i)
 {
-	cpu_set_input_line(machine->cpu[0], 0, (i ? HOLD_LINE : CLEAR_LINE));
+	cputag_set_input_line(machine, "maincpu", 0, (i ? HOLD_LINE : CLEAR_LINE));
 }
 
 
@@ -623,15 +625,16 @@ static const UINT8 cc_ex[0x100] = {
 DRIVER_INIT( svi318 )
 {
 	/* z80 stuff */
-	z80_set_cycle_tables( machine->cpu[0], cc_op, cc_cb, cc_ed, cc_xy, cc_xycb, cc_ex );
+	z80_set_cycle_tables( cputag_get_cpu(machine, "maincpu"), cc_op, cc_cb, cc_ed, cc_xy, cc_xycb, cc_ex );
 
 	memset(&svi, 0, sizeof (svi) );
 
-	if ( ! strcmp( machine->gamedrv->name, "svi318" ) || ! strcmp( machine->gamedrv->name, "svi318n" ) ) {
+	if ( ! strcmp( machine->gamedrv->name, "svi318" ) || ! strcmp( machine->gamedrv->name, "svi318n" ) ) 
+	{
 		svi.svi318 = 1;
 	}
 
-	cpu_set_input_line_vector(machine->cpu[0], 0, 0xff);
+	cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), 0, 0xff);
 
 	/* memory */
 	svi.empty_bank = auto_malloc (0x8000);
@@ -712,11 +715,15 @@ WRITE8_HANDLER( svi318_writemem3 )
 
 WRITE8_HANDLER( svi318_writemem4 )
 {
-	if ( svi.svi806_ram_enabled ) {
-		if ( offset < 0x800 ) {
+	if ( svi.svi806_ram_enabled ) 
+	{
+		if ( offset < 0x800 ) 
+		{
 			svi.svi806_ram[ offset ] = data;
 		}
-	} else {
+	} 
+	else 
+	{
 		if ( svi.bankHigh2_read_only )
 			return;
 
@@ -734,23 +741,27 @@ static void svi318_set_banks(running_machine *machine)
 	svi.bankLow_ptr = svi.empty_bank;
 	svi.bankLow_read_only = 1;
 
-	switch( svi.bankLow ) {
+	switch( svi.bankLow ) 
+	{
 	case SVI_INTERNAL:
 		svi.bankLow_ptr = memory_region(machine, "maincpu");
 		break;
 	case SVI_CART:
-		if ( pcart ) {
+		if ( pcart ) 
+		{
 			svi.bankLow_ptr = pcart;
 		}
 		break;
 	case SVI_EXPRAM2:
-		if ( mess_ram_size >= 64 * 1024 ) {
+		if ( mess_ram_size >= 64 * 1024 ) 
+		{
 			svi.bankLow_ptr = mess_ram + mess_ram_size - 64 * 1024;
 			svi.bankLow_read_only = 0;
 		}
 		break;
 	case SVI_EXPRAM3:
-		if ( mess_ram_size > 128 * 1024 ) {
+		if ( mess_ram_size > 128 * 1024 ) 
+		{
 			svi.bankLow_ptr = mess_ram + mess_ram_size - 128 * 1024;
 			svi.bankLow_read_only = 0;
 		}
@@ -760,12 +771,16 @@ static void svi318_set_banks(running_machine *machine)
 	svi.bankHigh1_ptr = svi.bankHigh2_ptr = svi.empty_bank;
 	svi.bankHigh1_read_only = svi.bankHigh2_read_only = 1;
 
-	switch( svi.bankHigh1 ) {
+	switch( svi.bankHigh1 ) 
+	{
 	case SVI_INTERNAL:
-		if ( mess_ram_size == 16 * 1024 ) {
+		if ( mess_ram_size == 16 * 1024 ) 
+		{
 			svi.bankHigh2_ptr = mess_ram;
 			svi.bankHigh2_read_only = 0;
-		} else {
+		} 
+		else 
+		{
 			svi.bankHigh1_ptr = mess_ram;
 			svi.bankHigh1_read_only = 0;
 			svi.bankHigh2_ptr = mess_ram + 0x4000;
@@ -773,7 +788,8 @@ static void svi318_set_banks(running_machine *machine)
 		}
 		break;
 	case SVI_EXPRAM2:
-		if ( mess_ram_size > 64 * 1024 ) {
+		if ( mess_ram_size > 64 * 1024 ) 
+		{
 			svi.bankHigh1_ptr = mess_ram + mess_ram_size - 64 * 1024 + 32 * 1024;
 			svi.bankHigh1_read_only = 0;
 			svi.bankHigh2_ptr = mess_ram + mess_ram_size - 64 * 1024 + 48 * 1024;
@@ -781,7 +797,8 @@ static void svi318_set_banks(running_machine *machine)
 		}
 		break;
 	case SVI_EXPRAM3:
-		if ( mess_ram_size > 128 * 1024 ) {
+		if ( mess_ram_size > 128 * 1024 ) 
+		{
 			svi.bankHigh1_ptr = mess_ram + mess_ram_size - 128 * 1024 + 32 * 1024;
 			svi.bankHigh1_read_only = 0;
 			svi.bankHigh2_ptr = mess_ram + mess_ram_size - 128 * 1024 + 48 * 1024;
@@ -791,15 +808,18 @@ static void svi318_set_banks(running_machine *machine)
 	}
 
 	/* Check for special CART based banking */
-	if ( svi.bankLow == SVI_CART && ( v & 0xc0 ) != 0xc0 ) {
+	if ( svi.bankLow == SVI_CART && ( v & 0xc0 ) != 0xc0 ) 
+	{
 		svi.bankHigh1_ptr = svi.empty_bank;
 		svi.bankHigh1_read_only = 1;
 		svi.bankHigh2_ptr = svi.empty_bank;
 		svi.bankHigh2_read_only = 1;
-		if ( pcart && ! ( v & 0x80 ) ) {
+		if ( pcart && ! ( v & 0x80 ) ) 
+		{
 			svi.bankHigh2_ptr = pcart + 0x4000;
 		}
-		if ( pcart && ! ( v & 0x40 ) ) {
+		if ( pcart && ! ( v & 0x40 ) ) 
+		{
 			svi.bankHigh1_ptr = pcart;
 		}
 	}
@@ -809,10 +829,14 @@ static void svi318_set_banks(running_machine *machine)
 	memory_set_bankptr(machine, 3, svi.bankHigh2_ptr );
 
 	/* SVI-806 80 column card specific banking */
-	if ( svi.svi806_present ) {
-		if ( svi.svi806_ram_enabled ) {
+	if ( svi.svi806_present ) 
+	{
+		if ( svi.svi806_ram_enabled ) 
+		{
 			memory_set_bankptr(machine, 4, svi.svi806_ram );
-		} else {
+		} 
+		else 
+		{
 			memory_set_bankptr(machine, 4, svi.bankHigh2_ptr + 0x3000 );
 		}
 	}
@@ -837,7 +861,8 @@ READ8_HANDLER( svi318_io_ext_r )
 	const device_config *fdc = devtag_get_device(space->machine, "wd179x");
 	const device_config *printer = devtag_get_device(space->machine, "centronics");
 
-	if (svi.bankLow == SVI_CART) {
+	if (svi.bankLow == SVI_CART) 
+	{
 		return 0xff;
 	}
 
@@ -899,7 +924,8 @@ WRITE8_HANDLER( svi318_io_ext_w )
 	const device_config *fdc = devtag_get_device(space->machine, "wd179x");
 	const device_config *printer = devtag_get_device(space->machine, "centronics");
 
-	if (svi.bankLow == SVI_CART) {
+	if (svi.bankLow == SVI_CART) 
+	{
 		return;
 	}
 

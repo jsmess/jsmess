@@ -164,8 +164,8 @@ static WRITE8_HANDLER( samcoupe_rtc_w )
 
 MACHINE_RESET( samcoupe )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	const address_space *spaceio = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	const address_space *spaceio = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
 	coupe_asic *asic = machine->driver_data;
 
 	asic->lmpr = 0x0f;      /* ROM0 paged in, ROM1 paged out RAM Banks */

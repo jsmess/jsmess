@@ -115,7 +115,7 @@ static UINT8 sym1_riot_b_r(const device_config *device, UINT8 olddata)
 
 static void sym1_riot_a_w(const device_config *device, UINT8 newdata, UINT8 data)
 {
-	logerror("%x: riot_a_w 0x%02x\n", cpu_get_pc( device->machine->cpu[0] ), data);
+	logerror("%x: riot_a_w 0x%02x\n", cpu_get_pc( cputag_get_cpu(device->machine, "maincpu") ), data);
 
 	/* save for later use */
 	riot_port_a = data;
@@ -124,7 +124,7 @@ static void sym1_riot_a_w(const device_config *device, UINT8 newdata, UINT8 data
 
 static void sym1_riot_b_w(const device_config *device, UINT8 newdata, UINT8 data)
 {
-	logerror("%x: riot_b_w 0x%02x\n", cpu_get_pc( device->machine->cpu[0] ), data);
+	logerror("%x: riot_b_w 0x%02x\n", cpu_get_pc( cputag_get_cpu(device->machine, "maincpu") ), data);
 
 	/* save for later use */
 	riot_port_b = data;
@@ -165,7 +165,7 @@ const ttl74145_interface sym1_ttl74145_intf =
 
 static void sym1_irq(const device_config *device, int level)
 {
-	cpu_set_input_line(device->machine->cpu[0], M6502_IRQ_LINE, level);
+	cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, level);
 }
 
 
@@ -188,7 +188,7 @@ static WRITE8_DEVICE_HANDLER( sym1_via0_b_w )
  */
 static WRITE8_DEVICE_HANDLER( sym1_via2_a_w )
 {
-	const address_space *cpu0space = cpu_get_address_space( device->machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	const address_space *cpu0space = cputag_get_address_space( device->machine, "maincpu", ADDRESS_SPACE_PROGRAM );
 
 	logerror("SYM1 VIA2 W 0x%02x\n", data);
 
@@ -271,7 +271,7 @@ DRIVER_INIT( sym1 )
 	/* wipe expansion memory banks that are not installed */
 	if (mess_ram_size < 4*1024)
 	{
-		memory_install_readwrite8_handler(cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM ),
+		memory_install_readwrite8_handler(cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM ),
 			mess_ram_size, 0x0fff, 0, 0, SMH_NOP, SMH_NOP);
 	}
 
@@ -284,7 +284,7 @@ MACHINE_RESET( sym1 )
 {
 	/* make 0xf800 to 0xffff point to the last half of the monitor ROM
 	   so that the CPU can find its reset vectors */
-	memory_install_readwrite8_handler(cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM ),
+	memory_install_readwrite8_handler(cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM ),
 			0xf800, 0xffff, 0, 0, SMH_BANK1, SMH_NOP);
 	memory_set_bankptr(machine, 1, sym1_monitor + 0x800);
 	device_reset(cputag_get_cpu(machine, "maincpu"));

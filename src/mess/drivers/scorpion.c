@@ -193,7 +193,7 @@ static int ROMSelection;
 
 static void scorpion_update_memory(running_machine *machine)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	spectrum_screen_location = mess_ram + ((spectrum_128_port_7ffd_data & 8) ? (7<<14) : (5<<14));
 
 	memory_set_bankptr(machine, 4, mess_ram + (((spectrum_128_port_7ffd_data & 0x07) | ((scorpion_256_port_1ffd_data & 0x10)>>1)) * 0x4000));
@@ -209,7 +209,9 @@ static void scorpion_update_memory(running_machine *machine)
 		if ((scorpion_256_port_1ffd_data & 0x02)==0x02)
 		{
 			ROMSelection = 2;			
-		} else {
+		} 
+		else 
+		{
 			ROMSelection = ((spectrum_128_port_7ffd_data>>4) & 0x01) ? 1 : 0;
 		}			
 		memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
@@ -221,9 +223,11 @@ static void scorpion_update_memory(running_machine *machine)
 
 static DIRECT_UPDATE_HANDLER( scorpion_direct )
 {	
-	UINT16 pc = cpu_get_reg(space->machine->cpu[0], REG_GENPCBASE);
-	if (betadisk_is_active()) {
-		if (pc >= 0x4000) {
+	UINT16 pc = cpu_get_reg(cputag_get_cpu(space->machine, "maincpu"), REG_GENPCBASE);
+	if (betadisk_is_active()) 
+	{
+		if (pc >= 0x4000) 
+		{
 			ROMSelection = ((spectrum_128_port_7ffd_data>>4) & 0x01) ? 1 : 0;
 			betadisk_disable();
 			memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
@@ -235,7 +239,8 @@ static DIRECT_UPDATE_HANDLER( scorpion_direct )
 		betadisk_enable();
 		
 	} 
-	if((address>=0x0000) && (address<=0x3fff)) {
+	if((address>=0x0000) && (address<=0x3fff)) 
+	{
 		memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
 		direct->raw = direct->decrypted =  memory_region(space->machine, "maincpu") + 0x010000 + (ROMSelection<<14);
 		memory_set_bankptr(space->machine, 1, direct->raw);
@@ -246,10 +251,11 @@ static DIRECT_UPDATE_HANDLER( scorpion_direct )
 
 static TIMER_CALLBACK(nmi_check_callback)
 {
-	if ((input_port_read(machine, "NMI") & 1)==1) {
+	if ((input_port_read(machine, "NMI") & 1)==1) 
+	{
 		scorpion_256_port_1ffd_data |= 0x02;
 		scorpion_update_memory(machine);
-		cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -293,7 +299,7 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( scorpion )
 {	
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);	
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);	
 	
 	memory_install_read8_handler (space, 0x0000, 0x3fff, 0, 0, SMH_BANK1);
 	

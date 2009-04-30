@@ -210,20 +210,20 @@ static  READ8_HANDLER(spectrum_plus3_port_2ffd_r)
 
 void spectrum_plus3_update_memory(running_machine *machine)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	
 	if (spectrum_128_port_7ffd_data & 8)
 	{
 			logerror("+3 SCREEN 1: BLOCK 7\n");
-			spectrum_screen_location = mess_ram + (7<<14);
+			spectrum_screen_location = mess_ram + (7 << 14);
 	}
 	else
 	{
 			logerror("+3 SCREEN 0: BLOCK 5\n");
-			spectrum_screen_location = mess_ram + (5<<14);
+			spectrum_screen_location = mess_ram + (5 << 14);
 	}
 
-	if ((spectrum_plus3_port_1ffd_data & 0x01)==0)
+	if ((spectrum_plus3_port_1ffd_data & 0x01) == 0)
 	{
 			int ram_page;
 			unsigned char *ram_data;
@@ -238,22 +238,22 @@ void spectrum_plus3_update_memory(running_machine *machine)
 
 			memory_set_bankptr(machine, 4, ram_data);
 
-			logerror("RAM at 0xc000: %02x\n",ram_page);
+			logerror("RAM at 0xc000: %02x\n", ram_page);
 
 			/* Reset memory between 0x4000 - 0xbfff in case extended paging was being used */
 			/* Bank 5 in 0x4000 - 0x7fff */
-			memory_set_bankptr(machine, 2, mess_ram + (5<<14));
+			memory_set_bankptr(machine, 2, mess_ram + (5 << 14));
 
 			/* Bank 2 in 0x8000 - 0xbfff */
-			memory_set_bankptr(machine, 3, mess_ram + (2<<14));
+			memory_set_bankptr(machine, 3, mess_ram + (2 << 14));
 
 
-			ROMSelection = ((spectrum_128_port_7ffd_data>>4) & 0x01) |
-				((spectrum_plus3_port_1ffd_data>>1) & 0x02);
+			ROMSelection = ((spectrum_128_port_7ffd_data >> 4) & 0x01) |
+				((spectrum_plus3_port_1ffd_data >> 1) & 0x02);
 
 			/* rom 0 is editor, rom 1 is syntax, rom 2 is DOS, rom 3 is 48 BASIC */
 
-			ChosenROM = memory_region(machine, "maincpu") + 0x010000 + (ROMSelection<<14);
+			ChosenROM = memory_region(machine, "maincpu") + 0x010000 + (ROMSelection << 14);
 
 			memory_set_bankptr(machine, 1, ChosenROM);
 			memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
@@ -268,25 +268,25 @@ void spectrum_plus3_update_memory(running_machine *machine)
 			int MemorySelection;
 			unsigned char *ram_data;
 
-			MemorySelection = (spectrum_plus3_port_1ffd_data>>1) & 0x03;
+			MemorySelection = (spectrum_plus3_port_1ffd_data >> 1) & 0x03;
 
-			memory_selection = &spectrum_plus3_memory_selections[(MemorySelection<<2)];
+			memory_selection = &spectrum_plus3_memory_selections[(MemorySelection << 2)];
 
-			ram_data = mess_ram + (memory_selection[0]<<14);
+			ram_data = mess_ram + (memory_selection[0] << 14);
 			memory_set_bankptr(machine, 1, ram_data);
 			/* allow writes to 0x0000-0x03fff */
 			memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_BANK1);
 
-			ram_data = mess_ram + (memory_selection[1]<<14);
+			ram_data = mess_ram + (memory_selection[1] << 14);
 			memory_set_bankptr(machine, 2, ram_data);
 
-			ram_data = mess_ram + (memory_selection[2]<<14);
+			ram_data = mess_ram + (memory_selection[2] << 14);
 			memory_set_bankptr(machine, 3, ram_data);
 
-			ram_data = mess_ram + (memory_selection[3]<<14);
+			ram_data = mess_ram + (memory_selection[3] << 14);
 			memory_set_bankptr(machine, 4, ram_data);
 
-			logerror("extended memory paging: %02x\n",MemorySelection);
+			logerror("extended memory paging: %02x\n", MemorySelection);
 		}
 }
 

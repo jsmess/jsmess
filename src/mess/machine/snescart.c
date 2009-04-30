@@ -337,7 +337,7 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 {
 	int i, supported_type = 0;
 	running_machine *machine = image->machine;
-	const address_space *space = cpu_get_address_space( machine->cpu[0], ADDRESS_SPACE_PROGRAM );
+	const address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
 	int total_blocks, read_blocks;
 	UINT32 offset;
 	UINT8 header[512];

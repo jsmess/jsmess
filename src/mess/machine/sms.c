@@ -368,7 +368,7 @@ void sms_check_pause_button(const address_space *space)
 	}
 	if ( ! (input_port_read(space->machine, IS_GAMEGEAR ? "START" : "PAUSE") & 0x80) ) {
 		if ( ! smsPaused ) {
-			cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE );
+			cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE );
 		}
 		smsPaused = 1;
 	}
@@ -1169,7 +1169,7 @@ MACHINE_START(sms)
 
 MACHINE_RESET(sms)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	smsVersion = 0x00;
 	if ( HAS_FM )
@@ -1273,13 +1273,13 @@ WRITE8_HANDLER(sms_store_control_w)
 	logerror( "0x%04X: sms_store_control write 0x%02X\n", cpu_get_pc(space->cpu), data );
 	if ( data & 0x02 )
 	{
-		cpu_resume( space->machine->cpu[0], SUSPEND_REASON_HALT );
+		cputag_resume( space->machine, "maincpu", SUSPEND_REASON_HALT );
 	}
 	else
 	{
 		/* Pull reset line of CPU #0 low */
-		cpu_suspend( space->machine->cpu[0], SUSPEND_REASON_HALT, 1 );
-		device_reset(space->machine->cpu[0]);
+		cputag_suspend( space->machine, "maincpu", SUSPEND_REASON_HALT, 1 );
+		device_reset(cputag_get_cpu(space->machine, "maincpu"));
 	}
 	sms_store_control = data;
 }
@@ -1287,13 +1287,13 @@ WRITE8_HANDLER(sms_store_control_w)
 
 void sms_int_callback( running_machine *machine, int state )
 {
-	cpu_set_input_line(machine->cpu[0], 0, state );
+	cputag_set_input_line(machine, "maincpu", 0, state );
 }
 
 
 void sms_store_int_callback( running_machine *machine, int state )
 {
-	cpu_set_input_line(machine->cpu[0], sms_store_control & 0x01 ? 1 : 0, state );
+	cputag_set_input_line(machine, "maincpu", sms_store_control & 0x01 ? 1 : 0, state );
 }
 
 
@@ -1337,4 +1337,3 @@ DRIVER_INIT( gamegeaj )
 {
 	sms_flags = FLAG_REGION_JAPAN | FLAG_GAMEGEAR | FLAG_BIOS_0400;
 }
-

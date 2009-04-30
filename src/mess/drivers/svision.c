@@ -77,7 +77,7 @@ void svision_irq(running_machine *machine)
 	int irq = svision.timer_shot && (BANK & 2);
 	irq = irq || (svision_dma.finished && (BANK & 4));
 
-	cpu_set_input_line(machine->cpu[0], M6502_IRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", M6502_IRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static TIMER_CALLBACK(svision_timer)
@@ -155,7 +155,7 @@ static WRITE8_HANDLER(svision_w)
 			else
 				delay = 256;
 			timer_enable(svision.timer1, TRUE);
-			timer_reset(svision.timer1, cpu_clocks_to_attotime(space->machine->cpu[0], value * delay));
+			timer_reset(svision.timer1, cputag_clocks_to_attotime(space->machine, "maincpu", value * delay));
 			break;
 		case 0x10: case 0x11: case 0x12: case 0x13:
 			svision_soundport_w(space->machine, svision_channel + 0, offset & 3, data);
@@ -453,7 +453,7 @@ static DRIVER_INIT( svisions )
 	svision.timer1 = timer_alloc(machine, svision_timer, NULL);
 	svision_pet.on = TRUE;
 	svision_pet.timer = timer_alloc(machine, svision_pet_timer, NULL);
-	timer_pulse(machine, attotime_mul(ATTOTIME_IN_SEC(8), 256/cpu_get_clock(machine->cpu[0])), NULL, 0, svision_pet_timer);
+	timer_pulse(machine, attotime_mul(ATTOTIME_IN_SEC(8), 256/cputag_get_clock(machine, "maincpu")), NULL, 0, svision_pet_timer);
 }
 
 static MACHINE_RESET( svision )
@@ -530,7 +530,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( tvlinkp )
 	MDRV_IMPORT_FROM( svisionp )
-	 MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(tvlink_mem, 0)
 
 	MDRV_MACHINE_RESET( tvlink )
