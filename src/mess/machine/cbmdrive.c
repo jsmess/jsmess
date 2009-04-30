@@ -74,7 +74,7 @@ void cbm_drive_open_helper (void)
 	int i;
 
 	d64_offset[0] = 0;
-	for (i = 1; i <= 35; i++)
+	for (i = 1; i < D64_MAX_TRACKS; i++)
 		d64_offset[i] = d64_offset[i - 1] + d64_sectors_per_track[i - 1] * 256;
 }
 

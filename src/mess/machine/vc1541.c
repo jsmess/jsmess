@@ -332,34 +332,34 @@ static void offset_init (int format)
 		case format_d64:
 		case format_d64_err:
 		case format_d67:
-			for (i = 1; i <= D64_MAX_TRACKS; i++)
+			for (i = 1; i < D64_MAX_TRACKS; i++)
 				image_offset[i] = image_offset[i - 1] + d64_sectors_per_track[i - 1] * 256;
 			break;
 
 		case format_d64_40t:
 		case format_d64_40t_err:
-			for (i = 1; i <= D64_40T_MAX_TRACKS; i++)
+			for (i = 1; i < D64_40T_MAX_TRACKS; i++)
 				image_offset[i] = image_offset[i - 1] + d64_sectors_per_track[i - 1] * 256;
 			break;
 
 		case format_d71:
 		case format_d71_err:
-			for (i = 1; i <= D71_MAX_TRACKS; i++)
+			for (i = 1; i < D71_MAX_TRACKS; i++)
 				image_offset[i] = image_offset[i - 1] + d71_sectors_per_track[i - 1] * 256;
 			break;
 
 		case format_d81:
-			for (i = 1; i <= D81_MAX_TRACKS; i++)
+			for (i = 1; i < D81_MAX_TRACKS; i++)
 				image_offset[i] = image_offset[i - 1] + 40 * 256;
 			break;
 
 		case format_d80:
-			for (i = 1; i <= D80_MAX_TRACKS; i++)
+			for (i = 1; i < D80_MAX_TRACKS; i++)
 				image_offset[i] = image_offset[i - 1] + d80_sectors_per_track[i - 1] * 256;
 			break;
 
 		case format_d82:
-			for (i = 1; i <= D82_MAX_TRACKS; i++)
+			for (i = 1; i < D82_MAX_TRACKS; i++)
 				image_offset[i] = image_offset[i - 1] + d82_sectors_per_track[i - 1] * 256;
 			break;
 
