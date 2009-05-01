@@ -7,12 +7,6 @@
 ***************************************************************************/
 
 /*
-  unsolved problems:
-   execution of code in the io devices
-    (program write some short test code into the vic sprite register)
- */
-
-/*
 	2008-09-06: Tape status for C64 & C128 [FP & RZ]
 	- tape loading works
 	- tap files are supported
