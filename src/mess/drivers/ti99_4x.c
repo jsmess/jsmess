@@ -141,6 +141,12 @@ static INPUT_PORTS_START(ti99_4a)
 			PORT_DIPSETTING( 0x0000, DEF_STR( Off ) )
 			PORT_DIPSETTING( 1 << config_usbsm_bit, DEF_STR( On ) )
 
+		PORT_DIPNAME( config_cartslot_mask << config_cartslot_bit, 0, "Active cartridge slot")                
+			PORT_DIPSETTING( 0, "auto" )
+			PORT_DIPSETTING( 1 << config_cartslot_bit, "Slot 1" )
+			PORT_DIPSETTING( 2 << config_cartslot_bit, "Slot 2" )
+			PORT_DIPSETTING( 3 << config_cartslot_bit, "Slot 3" )
+			PORT_DIPSETTING( 4 << config_cartslot_bit, "Slot 4" )
 
 	/* 3 ports for mouse */
 	PORT_START("MOUSEX") /* Mouse - X AXIS */
