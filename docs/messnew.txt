@@ -69,6 +69,9 @@ System Driver Changes:
 - [TI99 family] Added functionality for multi-cartridge handling. Added
   support for complex/multi-file cartridge images.  [Michael Zapf]
 
+- [TI99_8] Fixed the driver and removed the GAME_NOT_WORKING flag.
+  [Michael Zapf]
+
 - [TRS80] Various improvements: [Robbbert]
           - added centronics printer
           - cassette works on all clones
