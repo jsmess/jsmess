@@ -682,6 +682,7 @@ $(MESSOBJ)/fairch.a: \
 	$(MESS_DRIVERS)/channelf.o 
 
 $(MESSOBJ)/ti99.a:	   \
+	$(MESS_DEVICES)/ti99cart.o	\
 	$(MESS_MACHINE)/tms9901.o	\
 	$(MESS_MACHINE)/tms9902.o	\
 	$(MESS_MACHINE)/ti99_4x.o	\

@@ -144,6 +144,19 @@ Keyboard interface:
     and key matrix are different from both 99/4 and 99/4a.
     - P0-P3: column select
     - INT6*-INT11*: row inputs (int6* is only used for joystick fire)
+
+
+Known Issues (MZ, 2009-04-26)
+- Extended Basic II does not start when a floppy controller is present
+- Multiple cartridges are not shown in the startup screen; only one 
+  cartridge is presented. The slots are scanned, though. Need to check whether
+  this is a bug of the operating system or of the emulation.
+- Emulation speed must be checked. I have inserted adjust_icounts, but I need to
+  check whether the console experienced those delays actually. Unfortunately,
+  there is almost no real hardware available.
+- Extended Basic II gets stuck with OLD MINIMEM. MiniMemory may be incompatible
+  due to the different memory layout. SAVE/OLD only works if the machine is 
+  neither reset nor restarted.
 */
 
 #include "driver.h"
@@ -165,13 +178,19 @@ Keyboard interface:
 #include "sound/wave.h"
 #include "devices/harddriv.h"
 #include "machine/idectrl.h"
+#include "machine/smc92x4.h"
+#include "machine/mm58274c.h"
+#include "devices/ti99cart.h"
 
 /*
     Memory map - see description above
 */
 
 static ADDRESS_MAP_START(ti99_8_memmap, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(ti99_8_r, ti99_8_w)
+        /* There is a mapper device involved, so we need to handle
+           the range mapping in a bit more complicated way. */
+        AM_RANGE(0x0000, 0xffff) AM_READWRITE(ti99_8_r, ti99_8_w)
+
 ADDRESS_MAP_END
 
 
@@ -180,11 +199,16 @@ ADDRESS_MAP_END
 */
 
 static ADDRESS_MAP_START(ti99_8_cru_map, ADDRESS_SPACE_IO, 8)
-	AM_RANGE(0x0000, 0x00ff) AM_DEVREAD("tms9901", tms9901_cru_r)
-	AM_RANGE(0x0100, 0x02ff) AM_READ(ti99_8_peb_cru_r)
+//	AM_RANGE(0x0000, 0x00ff) AM_DEVREAD("tms9901", tms9901_cru_r)
+        AM_RANGE(0x0000, 0x007f) AM_DEVREAD("tms9901", tms9901_cru_r)
+        AM_RANGE(0x0080, 0x00ff) AM_DEVREAD("ti99_multicart", ti99_multicart_cru_r)     /* SuperSpace cartridge */
+        AM_RANGE(0x0100, 0x02ff) AM_READ(ti99_8_peb_cru_r)
 
-	AM_RANGE(0x0000, 0x07ff) AM_DEVWRITE("tms9901", tms9901_cru_w)
-	AM_RANGE(0x0800, 0x17ff) AM_WRITE(ti99_8_peb_cru_w)
+//      AM_RANGE(0x0000, 0x07ff) AM_DEVWRITE("tms9901", tms9901_cru_w)
+        AM_RANGE(0x0000, 0x03ff) AM_DEVWRITE("tms9901", tms9901_cru_w)
+        AM_RANGE(0x0400, 0x07ff) AM_DEVWRITE("ti99_multicart", ti99_multicart_cru_w)    /* SuperSpace cartridge */
+        AM_RANGE(0x0800, 0x17ff) AM_WRITE(ti99_8_peb_cru_w)
+
 ADDRESS_MAP_END
 
 
@@ -389,29 +413,12 @@ static const struct tms9995reset_param ti99_8_processor_config =
 	1				/* MP9537 mask */
 };
 
-static MACHINE_DRIVER_START(ti99_8_cartslot)
- 	MDRV_CARTSLOT_ADD("cart1")
-	MDRV_CARTSLOT_EXTENSION_LIST("bin,c,d,g,m,crom,drom,grom,mrom")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_START(ti99_cart)
-	MDRV_CARTSLOT_LOAD(ti99_cart)
-	MDRV_CARTSLOT_UNLOAD(ti99_cart)
+static const mm58274c_interface floppy_mm58274c_interface =
+{
+	1,	/* 	mode 24*/
+	0   /*  first day of week */
+};
 
- 	MDRV_CARTSLOT_ADD("cart2")
-	MDRV_CARTSLOT_EXTENSION_LIST("bin,c,d,g,m,crom,drom,grom,mrom")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_START(ti99_cart)
-	MDRV_CARTSLOT_LOAD(ti99_cart)
-	MDRV_CARTSLOT_UNLOAD(ti99_cart)
-
- 	MDRV_CARTSLOT_ADD("cart3")
-	MDRV_CARTSLOT_EXTENSION_LIST("bin,c,d,g,m,crom,drom,grom,mrom")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_START(ti99_cart)
-	MDRV_CARTSLOT_LOAD(ti99_cart)
-	MDRV_CARTSLOT_UNLOAD(ti99_cart)
-MACHINE_DRIVER_END
-	
 static MACHINE_DRIVER_START(ti99_8_60hz)
 	/* basic machine hardware */
 	/* TMS9995-MP9537 CPU @ 10.7 MHz */
@@ -441,20 +448,23 @@ static MACHINE_DRIVER_START(ti99_8_60hz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
-	MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )	/* FIXME */
+	MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )
 
-	MDRV_HARDDISK_ADD( "harddisk1" )
-	MDRV_HARDDISK_ADD( "harddisk2" )
-	MDRV_HARDDISK_ADD( "harddisk3" )
+	MDRV_IMPORT_FROM( smc92x4_hd )
 
 	MDRV_IDE_HARDDISK_ADD( "ide_harddisk" )
 
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
+
+	/* rtc */
+	MDRV_MM58274C_ADD("mm58274c_floppy", floppy_mm58274c_interface)		
 	
 	/* tms9901 */
 	MDRV_TMS9901_ADD("tms9901", tms9901reset_param_ti99_8)	
+
+	MDRV_WD179X_ADD("wd179x", ti99_wd17xx_interface )
 	
-	MDRV_IMPORT_FROM(ti99_8_cartslot)
+	MDRV_TI99_CARTRIDGE_ADD("ti99_multicart")
 MACHINE_DRIVER_END
 
 
@@ -489,18 +499,21 @@ static MACHINE_DRIVER_START(ti99_8_50hz)
 	/* devices */
 	MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )	/* FIXME */
 
-	MDRV_HARDDISK_ADD( "harddisk1" )
-	MDRV_HARDDISK_ADD( "harddisk2" )
-	MDRV_HARDDISK_ADD( "harddisk3" )
+	MDRV_IMPORT_FROM( smc92x4_hd )
 
 	MDRV_IDE_HARDDISK_ADD( "ide_harddisk" )
 
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
 
+	/* rtc */
+	MDRV_MM58274C_ADD("mm58274c_floppy", floppy_mm58274c_interface)		
+	
 	/* tms9901 */
 	MDRV_TMS9901_ADD("tms9901", tms9901reset_param_ti99_8)	
-	
-	MDRV_IMPORT_FROM(ti99_8_cartslot)
+
+	MDRV_WD179X_ADD("wd179x", ti99_wd17xx_interface )
+
+	MDRV_TI99_CARTRIDGE_ADD("ti99_multicart")
 MACHINE_DRIVER_END
 
 /*
@@ -509,11 +522,11 @@ MACHINE_DRIVER_END
 ROM_START(ti99_8)
 	/*CPU memory space*/
 	ROM_REGION(region_cpu1_len_8,"maincpu",0)
-	ROM_LOAD("998rom.bin", 0x0000, 0x8000, NO_DUMP)		/* system ROMs */
+	ROM_LOAD("998rom.bin", 0x0000, 0x8000, CRC(b7a06ffd) SHA1(17dc8529fa808172fc47089982efb0bf0548c80c))		/* system ROMs */
 
 	/*GROM memory space*/
 	ROM_REGION(0x10000, region_grom, 0)
-	ROM_LOAD("998grom.bin", 0x0000, 0x6000, NO_DUMP)	/* system GROMs */
+	ROM_LOAD("998grom.bin", 0x0000, 0x6000, CRC(c63806bc) SHA1(cbfa8b04b4aefbbd9a713c54267ad4dd179c13a3))	/* system GROMs */
 
 	/*DSR ROM space*/
 	ROM_REGION(region_dsr_len, region_dsr, 0)
@@ -628,5 +641,5 @@ static SYSTEM_CONFIG_START(ti99_8)
 SYSTEM_CONFIG_END
 
 /*      YEAR    NAME        PARENT      COMPAT  MACHINE     INPUT   INIT        CONFIG      COMPANY                 FULLNAME */
-COMP(	1983,	ti99_8,		0,	0,	ti99_8_60hz,ti99_8,	ti99_8,	ti99_8,	"Texas Instruments",	"TI-99/8 Computer (US)" , GAME_NOT_WORKING )
-COMP(	1983,	ti99_8e,	ti99_8,	0,	ti99_8_50hz,ti99_8,	ti99_8,	ti99_8,	"Texas Instruments",	"TI-99/8 Computer (Europe)" , GAME_NOT_WORKING )
+COMP(	1983,	ti99_8,		0,	0,	ti99_8_60hz,ti99_8,	ti99_8,	ti99_8,	"Texas Instruments",	"TI-99/8 Computer (US)" , 0)
+COMP(	1983,	ti99_8e,	ti99_8,	0,	ti99_8_50hz,ti99_8,	ti99_8,	ti99_8,	"Texas Instruments",	"TI-99/8 Computer (Europe)" , 0 )

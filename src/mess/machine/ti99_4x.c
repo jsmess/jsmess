@@ -221,65 +221,30 @@ GPL ports:
 	The p-code card (-> UCSD Pascal system) contains 8 GROMs, all in port 16.  This port is not
 	in the range recognized by the TI ROMs (0-15), and therefore it is used by the p-code DSR ROMs
 	as custom data.  Additionally, some hackers used the extra ports to implement "GRAM" devices.
+
+	The handling of cartridge GROMs has moved to ti99cart.c.	
 */
-/* GROM_port_t: descriptor for a port of 8 GROMs */
-typedef struct GROM_port_t
-{
-	/* pointer to GROM data */
-	UINT8 *data_ptr;
-	/* current address pointer for the active GROM in port (16 bits) */
-	unsigned int addr;
-	/* GROM data buffer */
-	UINT8 buf;
-	/* internal flip-flops that are set after the first access to the GROM
-	address so that next access is mapped to the LSB, and cleared after each
-	data access */
-	char raddr_LSB, waddr_LSB;
-} GROM_port_t;
 
 /* descriptor for console GROMs */
-static GROM_port_t console_GROMs;
+GROM_port_t console_GROMs;
 
 /* true if hsgpl is enabled (i.e. has_hsgpl is true and hsgpl cru bit crdena is
 set) */
 static char hsgpl_crdena;
-
-/*
-	Cartridge support
-*/
-/* pointer on two 8kb cartridge pages */
-static UINT16 *cartridge_pages[2] = {NULL, NULL};
-static UINT8 *cartridge_pages_8[2] = {NULL, NULL};
-/* flag: TRUE if the cartridge is minimemory (4kb of battery-backed SRAM in 0x5000-0x5fff) */
-static char cartridge_minimemory = FALSE;
-/* flag: TRUE if the cartridge is paged */
-static char cartridge_paged = FALSE;
-/* flag: TRUE if the cartridge is MBX-style */
-static char cartridge_mbx = FALSE;
-/* flag on the data for the current page (cartridge_pages[0] if cartridge is not paged) */
-static UINT16 *current_page_ptr;
-static UINT8 *current_page_ptr_8;
-/* keep track of cart file types - required for cleanup... */
-typedef enum _slot_type_t { SLOT_EMPTY = -1, SLOT_GROM = 0, SLOT_CROM = 1, SLOT_DROM = 2, SLOT_MINIMEM = 3, SLOT_MBX = 4 } slot_type_t;
-static slot_type_t slot_type[3] = { SLOT_EMPTY, SLOT_EMPTY, SLOT_EMPTY};
 
 /* true if 99/4p rom6 is enabled */
 static int ti99_4p_internal_rom6_enable;
 /* pointer to the ROM6 data */
 static UINT16 *ti99_4p_internal_ROM6;
 
+/* Pointer to the cartridge system for the 99/8 */
+static const device_config *multicart8;
 
 /* ti99/8 hardware */
-static UINT8 ti99_8_CRUS;
+static UINT8 ti99_8_enable_rom_and_ports;
 
 static UINT32 ti99_8_mapper_regs[16];
 static UINT8 ti99_8_mapper_status;
-enum
-{
-	ms_WPE = 0x80,	/* Write-Protect Error */
-	ms_XCE = 0x40,	/* eXeCute Error */
-	ms_RPE = 0x20	/* Read-Protect Error */
-};
 
 static UINT8 *xRAM_ptr_8;
 static UINT8 *ROM0_ptr_8;
@@ -292,7 +257,8 @@ static UINT8 *sRAM_ptr_8;
 /* tms9995_ICount: used to implement memory waitstates (hack) */
 /* NPW 23-Feb-2004 - externs no longer needed because we now use cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),) */
 
-
+/* Link to the cartridge system. */
+const device_config *cartslots;
 
 /*===========================================================================*/
 /*
@@ -300,25 +266,38 @@ static UINT8 *sRAM_ptr_8;
 	initialization, cart loading, etc.
 */
 
+static void create_grom_high2k(int first, int last)
+{
+        /* Generate missing chunk of each console GROMs. Although a GROM
+           occupies 8 KiB of address space, it only has 6 KiB capacity, and
+           the last 2 KiB mirror previous content as shown above. */
+        int base;
+        for (base=(first&0xe000); base<((last+1)&0xe000); base+=0x2000)
+        {
+                int j;
+                for (j=0; j<0x800; j++)
+                {
+                        console_GROMs.data_ptr[base+0x1800+j] =
+                                  console_GROMs.data_ptr[base+0x0800+j]
+                                | console_GROMs.data_ptr[base+0x1000+j];
+                }
+        }
+}
+
+int is_99_8()
+{
+	return ti99_model == model_99_8;
+}
+
 DRIVER_INIT( ti99_4 )
 {
-	int i, j;
-
-
 	ti99_model = model_99_4;
 	has_evpc = FALSE;
 
 	/* set up memory pointers */
 	xRAM_ptr = (UINT16 *) (memory_region(machine, "maincpu") + offset_xram);
 	console_GROMs.data_ptr = memory_region(machine, region_grom);
-
-	/* Generate missing chunk of each console GROMs */
-	for (i=0; i<2; i++)
-		for (j=0; j<0x800; j++)
-		{
-			console_GROMs.data_ptr[0x2000*i+0x1800+j] = console_GROMs.data_ptr[0x2000*i+0x0800+j]
-															| console_GROMs.data_ptr[0x2000*i+0x1000+j];
-		}
+	create_grom_high2k(0x0000, 0x5fff);
 }
 
 DRIVER_INIT( ti99_4a )
@@ -329,6 +308,7 @@ DRIVER_INIT( ti99_4a )
 	/* set up memory pointers */
 	xRAM_ptr = (UINT16 *) (memory_region(machine, "maincpu") + offset_xram);
 	console_GROMs.data_ptr = memory_region(machine, region_grom);
+	create_grom_high2k(0x0000, 0x5fff);
 }
 
 DRIVER_INIT( ti99_4ev )
@@ -339,9 +319,8 @@ DRIVER_INIT( ti99_4ev )
 
 	/* set up memory pointers */
 	xRAM_ptr = (UINT16 *) (mem + offset_xram);
-	cartridge_pages[0] = (UINT16 *) (mem+offset_cart);
-	cartridge_pages[1] = (UINT16 *) (mem+offset_cart + 0x2000);
 	console_GROMs.data_ptr = memory_region(machine, region_grom);
+	create_grom_high2k(0x0000, 0x5fff);
 }
 
 DRIVER_INIT( ti99_8 )
@@ -349,7 +328,7 @@ DRIVER_INIT( ti99_8 )
 	UINT8 *mem = memory_region(machine, "maincpu");
 	ti99_model = model_99_8;
 	has_evpc = FALSE;
-
+	
 	/* set up memory pointers */
 	xRAM_ptr_8 = mem + offset_xram_8;
 	ROM0_ptr_8 = mem + offset_rom0_8;
@@ -358,9 +337,14 @@ DRIVER_INIT( ti99_8 )
 	ROM3_ptr_8 = ROM2_ptr_8 + 0x2000;
 	sRAM_ptr_8 = mem + offset_sram_8;
 
-	cartridge_pages_8[0] = mem+offset_cart_8;
-	cartridge_pages_8[1] = mem+offset_cart_8 + 0x2000;
+	/* Pull this one up here. */
+	ti99_8_enable_rom_and_ports = 1;
+	
 	console_GROMs.data_ptr = memory_region(machine, region_grom);
+	create_grom_high2k(0x0000, 0x5fff);
+
+	multicart8 = devtag_get_device(machine, "ti99_multicart");
+	assert (multicart8 != NULL);
 }
 
 DRIVER_INIT( ti99_4p )
@@ -371,256 +355,7 @@ DRIVER_INIT( ti99_4p )
 	/* set up memory pointers */
 	xRAM_ptr = (UINT16 *) (memory_region(machine, "maincpu") + offset_xram_4p);
 	/*console_GROMs.data_ptr = memory_region(machine, region_grom);*/
-}
-
-DEVICE_START( ti99_cart )
-{
-	int id = 0;
-	if (strcmp(device->tag,"cart1")==0) {
-		id = 0;
-	}
-	if (strcmp(device->tag,"cart2")==0) {
-		id = 1;
-	}
-	if (strcmp(device->tag,"cart3")==0) {
-		id = 2;
-	}
-	
-	cartridge_pages[id] = (UINT16 *) (memory_region(device->machine, "maincpu") + offset_cart + (id * 0x2000));
-}
-
-/*
-	Load ROM.  All files are in raw binary format.
-	1st ROM: GROM (up to 40kb)
-	2nd ROM: CPU ROM (8kb)
-	3rd ROM: CPU ROM, 2nd page (8kb)
-
-	We don't need to support 99/4p, as it has no cartridge port.
-*/
-DEVICE_IMAGE_LOAD( ti99_cart )
-{
-	/* Trick - we identify file types according to their extension */
-	/* Note that if we do not recognize the extension, we revert to the slot location <-> type
-	scheme.  I do this because the extension concept is quite unfamiliar to mac people
-	(I am dead serious). */
-	/* Original idea by Norberto Bensa */
-	const char *name = image_filename(image);
-	const char *ch, *ch2;
-	int id = 0;
-	int i;
-	slot_type_t type;
-	
-	if (strcmp(image->tag,"cart1")==0) {
-		id = 0;
-	}
-	if (strcmp(image->tag,"cart2")==0) {
-		id = 1;
-	}
-	if (strcmp(image->tag,"cart3")==0) {
-		id = 2;
-	}	
-	type = (slot_type_t) id;
-
-	/* There is a circuitry in TI99/4(a) that resets the console when a
-	cartridge is inserted or removed.  We emulate this instead of resetting the
-	emulator (which is the default in MESS). */
-	/*cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, PULSE_LINE);
-	tms9901_reset(0);
-	if (! has_evpc)
-		TMS9928A_reset();
-	if (has_evpc)
-		v9938_reset(0);*/
-
-	ch = strrchr(name, '.');
-	ch2 = (ch-1 >= name) ? ch-1 : "";
-
-	if (ch)
-	{
-		if ((! mame_stricmp(ch2, "g.bin")) || (! mame_stricmp(ch, ".grom")) || (! mame_stricmp(ch, ".g")))
-		{
-			/* grom */
-			type = SLOT_GROM;
-		}
-		else if ((! mame_stricmp(ch2, "c.bin")) || (! mame_stricmp(ch, ".crom")) || (! mame_stricmp(ch, ".c")))
-		{
-			/* rom first page */
-			type = SLOT_CROM;
-		}
-		else if ((! mame_stricmp(ch2, "d.bin")) || (! mame_stricmp(ch, ".drom")) || (! mame_stricmp(ch, ".d")))
-		{
-			/* rom second page */
-			type = SLOT_DROM;
-		}
-		else if ((! mame_stricmp(ch2, "m.bin")) || (! mame_stricmp(ch, ".mrom")) || (! mame_stricmp(ch, ".m")))
-		{
-			/* rom minimemory  */
-			type = SLOT_MINIMEM;
-		}
-		else if ((! mame_stricmp(ch2, "b.bin")) || (! mame_stricmp(ch, ".brom")) || (! mame_stricmp(ch, ".b")))
-		{
-			/* rom MBX  */
-			type = SLOT_MBX;
-		}
-	}
-
-	slot_type[id] = type;
-
-	switch (type)
-	{
-	case SLOT_EMPTY:
-		break;
-
-	case SLOT_GROM:
-		image_fread(image, memory_region(image->machine, region_grom) + 0x6000, 0xA000);
-		break;
-
-	case SLOT_MINIMEM:
-		cartridge_minimemory = TRUE;
-		/* Load the NVRAM. Need to BIG_ENDIANIZE it.
-		   MiniMemory has only one cartridge page. */
-		image_battery_load(image, cartridge_pages[0]+0x800,0x1000);
-		for (i = 0x800; i < 0x1000; i++)
-			cartridge_pages[0][i] = BIG_ENDIANIZE_INT16(cartridge_pages[0][i]);
-		break;
-	case SLOT_MBX:
-		cartridge_mbx = TRUE;
-		break;
-	case SLOT_CROM:
-		if (ti99_model == model_99_8)
-		{
-			if (cartridge_minimemory) 
-				/* Only load 4K so we don't overwrite the NVRAM. */
-				image_fread(image, cartridge_pages_8[0], 0x1000);
-			else 
-				image_fread(image, cartridge_pages_8[0], 0x2000);
-			current_page_ptr_8 = cartridge_pages_8[0];
-		}
-		else
-		{
-		    if (cartridge_minimemory) 
-		    {
-			/* Only load 4K so we don't overwrite the NVRAM that
-			   has been loaded already. */
-			image_fread(image, cartridge_pages[0], 0x1000);
-			for (i = 0; i < 0x0800; i++)
-				cartridge_pages[0][i] = BIG_ENDIANIZE_INT16(cartridge_pages[0][i]);
-		    }
-		    else 
-		    {
-			image_fread(image, cartridge_pages[0], 0x2000);
-			for (i = 0; i < 0x1000; i++)
-				cartridge_pages[0][i] = BIG_ENDIANIZE_INT16(cartridge_pages[0][i]);
-		    }
-		    current_page_ptr = cartridge_pages[0];
-		}
-		break;
-
-	case SLOT_DROM:
-		cartridge_paged = TRUE;
-		if (ti99_model == model_99_8)
-		{
-			image_fread(image, cartridge_pages_8[1], 0x2000);
-			current_page_ptr_8 = cartridge_pages_8[0];
-		}
-		else
-		{
-			image_fread(image, cartridge_pages[1], 0x2000);
-			for (i = 0; i < 0x1000; i++)
-				cartridge_pages[1][i] = BIG_ENDIANIZE_INT16(cartridge_pages[1][i]);
-			current_page_ptr = cartridge_pages[0];
-		}
-		break;
-	}
-
-	return INIT_PASS;
-}
-
-DEVICE_IMAGE_UNLOAD( ti99_cart )
-{
-	int i;
-	int id = 0;
-	if (strcmp(image->tag,"cart1")==0) {
-		id = 0;
-	}
-	if (strcmp(image->tag,"cart2")==0) {
-		id = 1;
-	}
-	if (strcmp(image->tag,"cart3")==0) {
-		id = 2;
-	}		
-	/* There is a circuitry in TI99/4(a) that resets the console when a
-	cartridge is inserted or removed.  We emulate this instead of resetting the
-	emulator (which is the default in MESS). */
-	/*cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, PULSE_LINE);
-	tms9901_reset(0);
-	if (! has_evpc)
-		TMS9928A_reset();
-	if (has_evpc)
-		v9938_reset(0);*/
-
-	switch (slot_type[id])
-	{
-	case SLOT_EMPTY:
-		break;
-
-	case SLOT_GROM:
-		memset(memory_region(image->machine, region_grom) + 0x6000, 0, 0xA000);
-		break;
-
-	case SLOT_MINIMEM:
-		cartridge_minimemory = FALSE;
-		if (ti99_model == model_99_8) 
-		{
-			image_battery_save(image, cartridge_pages_8[0] + 0x1000, 0x1000);
-			memset(cartridge_pages_8[0] + 0x1000, 0, 0x1000);
-		}
-		else 
-		{
-			/* We BIG_ENDIANIZE before saving. This is consistent
-			   with the cartridge save format. */
-			for (i = 0x800; i < 0x1000; i++)
-				cartridge_pages[0][i] = BIG_ENDIANIZE_INT16(cartridge_pages[0][i]);
-			image_battery_save(image, cartridge_pages[0] + 0x800, 0x1000);
-			memset(cartridge_pages[0] + 0x800, 0, 0x1000);
-		}
-		break;
-	case SLOT_MBX:
-		if (slot_type[id] == SLOT_MBX)
-			cartridge_mbx = FALSE;
-			/* maybe we should insert some code to save the memory contents... */
-                break;
-	case SLOT_CROM:
-		if (ti99_model == model_99_8)
-		{
-			if (cartridge_minimemory) 
-				/* Don't wipe the RAM before it is saved. */
-				memset(cartridge_pages_8[0], 0, 0x1000);
-			else
-				memset(cartridge_pages_8[0], 0, 0x2000);
-		}
-		else
-		{
-			if (cartridge_minimemory) 
-				memset(cartridge_pages[0], 0, 0x1000);
-			else
-				memset(cartridge_pages[0], 0, 0x2000);
-		}
-		break;
-
-	case SLOT_DROM:
-		cartridge_paged = FALSE;
-		if (ti99_model == model_99_8)
-		{
-			current_page_ptr_8 = cartridge_pages_8[0];
-		}
-		else
-		{
-			current_page_ptr = cartridge_pages[0];
-		}
-		break;
-	}
-
-	slot_type[id] = SLOT_EMPTY;
+	create_grom_high2k(0x0000, 0x5fff);
 }
 
 static const TMS9928a_interface tms9918_interface =
@@ -683,7 +418,8 @@ MACHINE_START( ti99_4ev_60hz)
 
 void ti99_common_init(running_machine *machine, const TMS9928a_interface *gfxparm) 
 {
-	if (gfxparm!=0) TMS9928A_configure(gfxparm);
+	if (gfxparm != 0)
+		TMS9928A_configure(gfxparm);
 
         /* Initialize all. Actually, at this point, we don't know
            how the switches are set. Later we use the configuration switches to
@@ -694,6 +430,11 @@ void ti99_common_init(running_machine *machine, const TMS9928a_interface *gfxpar
 	ti99_rs232_init(machine);
 	ti99_hsgpl_init(machine);
 	ti99_usbsm_init(machine);
+	
+	/* Find the cartslot device and cache it. This is a string search,
+	   and we don't want to repeat it on each memory access. */
+	cartslots = devtag_get_device(machine, "ti99_multicart");
+	assert(cartslots != NULL);
 }
 
 
@@ -709,7 +450,8 @@ MACHINE_RESET( ti99 )
 	if (ti99_model == model_99_8)
 	{
 		/* ... */
-		ti99_8_CRUS = 1;		/* ??? maybe there is a pull-up */
+		ti99_8_enable_rom_and_ports = 1;		/* ??? maybe there is a pull-up */
+		/* MZ: already setting this in driver init, otherwise machine locks up */
 	}
 	else if (ti99_model == model_99_4p)
 	{
@@ -726,13 +468,13 @@ MACHINE_RESET( ti99 )
 		memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + offset_sram);
 	}
 
-	if (ti99_model != model_99_4p)
-	{	/* reset cartridge mapper */
+/*	if (ti99_model != model_99_4p)
+	{
 		if (ti99_model == model_99_8)
 			current_page_ptr_8 = cartridge_pages_8[0];
 		else
 			current_page_ptr = cartridge_pages[0];
-	}
+	} */
 
 	if (!has_evpc) TMS9928A_reset();
         else v9938_reset(0);
@@ -775,7 +517,7 @@ MACHINE_RESET( ti99 )
 	if (ti99_model == model_99_4p)
 		ti99_4p_internal_dsr_reset(machine);
 
-        if (has_speech)
+        if (has_speech) 
 	{
 		static const spchroms_interface speech_intf = { region_speech_rom };
 
@@ -789,12 +531,12 @@ MACHINE_RESET( ti99 )
 	}
 	else
 	{
-		if (ti99_model != model_99_8)
-		{
-			memory_install_read16_handler(space, 0x9000, 0x93ff, 0, 0, ti99_nop_8_r);
-			memory_install_write16_handler(space, 0x9400, 0x97ff, 0, 0, ti99_nop_8_w);
-		}
+		/* which is never true for TI-99/8 */
+		memory_install_read16_handler(space, 0x9000, 0x93ff, 0, 0, ti99_nop_8_r);
+		memory_install_write16_handler(space, 0x9400, 0x97ff, 0, 0, ti99_nop_8_w);
 	}
+	/* Check whether we have locked the cartslot. */
+	lock_cartridge_slot(cartslots, (input_port_read(machine, "CFG") >> config_cartslot_bit) & config_cartslot_mask);
 
 	switch (xRAM_kind)
 	{
@@ -953,6 +695,7 @@ void set_hsgpl_crdena(int data)
 READ16_HANDLER ( ti99_nop_8_r )
 {
 	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
+//	cpu_spinuntil_time(space->machine->cpu[0], ATTOTIME_IN_USEC(6));
 
 	return (0);
 }
@@ -960,57 +703,7 @@ READ16_HANDLER ( ti99_nop_8_r )
 WRITE16_HANDLER ( ti99_nop_8_w )
 {
 	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
-}
-
-/*
-	TI-99 cartridge port: attached to the 8-bit bus.
-
-	Cartridges are usually made of ROM, through a few cartridges include some
-	RAM as well.  Bank switching is common: I know three banking schemes,
-	namely TI, MBX and Supercart.  The TI scheme writes a dummy value in
-	cartridge space, and the write address gives the bank number.  The MBX
-	scheme has a cartridge bank register at 0x6fff.  I think the Supercart
-	scheme has a cartridge bank register in CRU space, but I don't what the
-	register address is, and it is therefore not emulated.
-
-	HSGPL maps here, too, in order to emulate cartridge ROM/RAM.
-*/
-READ16_HANDLER ( ti99_cart_r )
-{
-	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
-
-	if (hsgpl_crdena)
-		/* hsgpl is enabled */
-		return ti99_hsgpl_rom6_r(space, offset, mem_mask);
-
-	if (cartridge_mbx && (offset >= 0x0600) && (offset <= 0x07fe))
-		return (cartridge_pages[0])[offset];
-
-	return current_page_ptr[offset];
-}
-
-WRITE16_HANDLER ( ti99_cart_w )
-{
-	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
-
-	if (hsgpl_crdena)
-		/* hsgpl is enabled */
-		ti99_hsgpl_rom6_w(space, offset, data, mem_mask);
-	else if (cartridge_minimemory && offset >= 0x800)
-		/* handle minimem RAM */
-		COMBINE_DATA(current_page_ptr+offset);
-	else if (cartridge_mbx)
-	{	/* handle MBX cart */
-		/* RAM in 0x6c00-0x6ffd (presumably non-paged) */
-		/* mapper at 0x6ffe */
-		if ((offset >= 0x0600) && (offset <= 0x07fe))
-			COMBINE_DATA(cartridge_pages[0]+offset);
-		else if ((offset == 0x07ff) && ACCESSING_BITS_8_15)
-			current_page_ptr = cartridge_pages[cartridge_paged ? ((data >> 8) & 1) : 0];
-	}
-	else if (cartridge_paged)
-		/* handle pager */
-		current_page_ptr = cartridge_pages[offset & 1];
+//	cpu_spinuntil_time(space->machine->cpu[0], ATTOTIME_IN_USEC(6));
 }
 
 /*
@@ -1022,6 +715,7 @@ READ16_HANDLER ( ti99_4p_cart_r )
 		return ti99_4p_internal_ROM6[offset];
 
 	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
+//	cpu_spinuntil_time(space->machine->cpu[0], ATTOTIME_IN_USEC(6));
 
 	if (hsgpl_crdena)
 		/* hsgpl is enabled */
@@ -1039,6 +733,7 @@ WRITE16_HANDLER ( ti99_4p_cart_w )
 	}
 
 	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
+//	cpu_spinuntil_time(space->machine->cpu[0], ATTOTIME_IN_USEC(6));
 
 	if (hsgpl_crdena)
 		/* hsgpl is enabled */
@@ -1081,6 +776,7 @@ Theory:
 WRITE16_HANDLER ( ti99_wsnd_w )
 {
 	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
+//	cpu_spinuntil_time(space->machine->cpu[0], ATTOTIME_IN_USEC(6));
 
 	sn76496_w(devtag_get_device(space->machine, "sn76496"), offset, (data >> 8) & 0xff);
 }
@@ -1091,6 +787,7 @@ WRITE16_HANDLER ( ti99_wsnd_w )
 READ16_HANDLER ( ti99_rvdp_r )
 {
 	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
+//	cpu_spinuntil_time(space->machine->cpu[0], ATTOTIME_IN_USEC(6));
 
 	if (offset & 1)
 	{	/* read VDP status */
@@ -1108,6 +805,7 @@ READ16_HANDLER ( ti99_rvdp_r )
 WRITE16_HANDLER ( ti99_wvdp_w )
 {
 	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
+//	cpu_spinuntil_time(space->machine->cpu[0], ATTOTIME_IN_USEC(6));
 
 	if (offset & 1)
 	{	/* write VDP address */
@@ -1125,6 +823,7 @@ WRITE16_HANDLER ( ti99_wvdp_w )
 READ16_HANDLER ( ti99_rv38_r )
 {
 	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
+//	cpu_spinuntil_time(space->machine->cpu[0], ATTOTIME_IN_USEC(6));
 
 	if (offset & 1)
 	{	/* read VDP status */
@@ -1142,6 +841,7 @@ READ16_HANDLER ( ti99_rv38_r )
 WRITE16_HANDLER ( ti99_wv38_w )
 {
 	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
+//	cpu_spinuntil_time(space->machine->cpu[0], ATTOTIME_IN_USEC(6));
 
 	switch (offset & 3)
 	{
@@ -1217,41 +917,102 @@ static WRITE16_HANDLER ( ti99_wspeech_w )
 	tms5220_data_w(devtag_get_device(space->machine, "tms5220"), offset, (data >> 8) & 0xff);
 }
 
+static UINT8 GROM_dataread(void)
+{
+	UINT8 reply;
+	if (console_GROMs.addr >= 0x6000)
+	{
+		/* Pass the (one and only) program counter for GROMs. The 
+		   buffer is set and used in the cartridge chip. */
+		reply = cartridge_grom_read(cartslots, console_GROMs.addr-0x6000);
+	}
+	else 
+	{
+		/* GROMs are buffered. Data is retrieved from a buffer, 
+		while the buffer is replaced with the next cell 
+		content. */
+		reply = console_GROMs.buf;
+		
+		/* Get next value, put it in buffer. Note that the
+		GROM wraps at 8K boundaries. */
+		console_GROMs.buf = console_GROMs.data_ptr[console_GROMs.addr];
+	}
+
+//	printf("GROM address = %04x, reply = %02x\n", console_GROMs.addr, reply>>8);
+	/* The program counter wraps at each GROM chip size (8K), 
+	   so 0x5fff + 1 = 0x4000. */
+	console_GROMs.addr = ((console_GROMs.addr + 1) & 0x1FFF) | (console_GROMs.addr & 0xE000);
+	
+	/* Reset the read and write address flipflops. */
+	console_GROMs.raddr_LSB = console_GROMs.waddr_LSB = FALSE;
+
+	return reply;
+}
+
 /*
 	GPL read
 */
-READ16_HANDLER ( ti99_rgpl_r )
+READ16_HANDLER ( ti99_grom_r )
 {
-	int reply;
-
+	UINT16 reply;
 
 	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4 /*20+3*/);		/* from 4 to 23? */
+//	cpu_spinuntil_time(space->machine->cpu[0], ATTOTIME_IN_USEC(6));
 
+	/* This implementation features a multislot cartridge system which
+	   is based on multiple GROM base addresses. The standard base 
+	   is >9800 (slot 0). When we access the port >9804, we switch to 
+	   slot 1, >9808 is slot 2, ... >983C is slot 15. Although theoretically
+	   we could address up to 256 banks, the TI operating system does not
+	   check more than 16 banks.
+	   Cartridges may also contain ROMs which need to be banked 
+	   simultaneously. We use the cartridge slot number to swap the ROM at
+	   >6000, or RAM if available. I don't know whether this is the way
+	   Texas Instruments envisaged it in the OS, but it is the only
+	   plausible way to allow for GROM+ROM cartridges.
+	   Note that some cartridges may have programming flaws which only 
+	   appear when the cartridge is used in a higher-numbered slot.
+	   Parsec is one example which only runs in slot 0 as the 
+	   programmers hard-coded an access to GROM port 0. Note: This *may*
+	   be worked around if we make sure that switching only occurs
+	   when the address is set, not when data is read or written. But
+	   it's not clear whether this has unwanted side effects.
+	*/
+	
+	/* Activates a slot in the multi-cartridge extender. */
+	cartridge_slot_set(cartslots, (offset & 0x01fe)/2);
+	
 	if (offset & 1)
-	{	/* read GPL address */
-		/* the console GROMs are always affected */
-		console_GROMs.waddr_LSB = FALSE;	/* right??? */
+	{	/* Read GROM address
+		   We only have one GROM program counter for the console GROMs
+		   and all cartridge GROMs in all banks(!). Hardware 
+		   implementations must take this into account as well. Thus,
+		   we use a structure here in the console, rather than separate
+		   counters in each GROM chip. */
+		
+		/* When reading, reset the hi/lo flag byte for writing. 
+		   TODO: Verify this with a real machine. */
+		console_GROMs.waddr_LSB = FALSE;
 
+		/* Address reading is done in two steps; first, the high byte
+		   is transferred, then the low byte. */
 		if (console_GROMs.raddr_LSB)
 		{
+			/* second pass */
 			reply = (console_GROMs.addr << 8) & 0xff00;
 			console_GROMs.raddr_LSB = FALSE;
 		}
 		else
 		{
+			/* first pass */
 			reply = console_GROMs.addr & 0xff00;
 			console_GROMs.raddr_LSB = TRUE;
 		}
 	}
 	else
-	{	/* read GPL data */
-		/* the console GROMs are always affected */
-		reply = ((int) console_GROMs.buf) << 8;	/* retreive buffer */
-
-		/* read ahead */
-		console_GROMs.buf = console_GROMs.data_ptr[console_GROMs.addr];
-		console_GROMs.addr = ((console_GROMs.addr + 1) & 0x1FFF) | (console_GROMs.addr & 0xE000);
-		console_GROMs.raddr_LSB = console_GROMs.waddr_LSB = FALSE;
+	{	
+		/* Read GROM data */
+		reply = ((UINT16)GROM_dataread()) << 8;		
 	}
 
 	if (hsgpl_crdena)
@@ -1264,43 +1025,55 @@ READ16_HANDLER ( ti99_rgpl_r )
 /*
 	GPL write
 */
-WRITE16_HANDLER ( ti99_wgpl_w )
+WRITE16_HANDLER ( ti99_grom_w )
 {
 	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4/*20+3*/);		/* from 4 to 23? */
+//	cpu_spinuntil_time(space->machine->cpu[0], ATTOTIME_IN_USEC(6));
 
+	/* Activates a slot in the multi-cartridge extender. */
+	cartridge_slot_set(cartslots, (offset & 0x01fe)/2);
+
+	// 1001 1wbb bbbb bbr0
+	
 	if (offset & 1)
-	{	/* write GPL address */
-		/* the console GROMs are always affected */
+	{	/* write GROM address */
+		/* see comments above */
 		console_GROMs.raddr_LSB = FALSE;
-
+		
+		/* Implements the internal flipflop.
+		   The Editor/Assembler manuals says that the current address
+		   plus one is returned. This effect is properly emulated
+		   as we are using a read-ahead buffer.
+		*/
 		if (console_GROMs.waddr_LSB)
 		{
+			/* Accept low byte (2nd write) */
 			console_GROMs.addr = (console_GROMs.addr & 0xFF00) | ((data >> 8) & 0xFF);
-
-			/* read ahead */
-			console_GROMs.buf = console_GROMs.data_ptr[console_GROMs.addr];
-			console_GROMs.addr = ((console_GROMs.addr + 1) & 0x1FFF) | (console_GROMs.addr & 0xE000);
-
+			
+			/* Setting the address causes a new read, putting the 
+			   value into the buffer. We don't need the value here. */
+			GROM_dataread();
 			console_GROMs.waddr_LSB = FALSE;
 		}
 		else
 		{
+			/* Accept high byte (1st write) */
 			console_GROMs.addr = (data & 0xFF00) | (console_GROMs.addr & 0xFF);
-
 			console_GROMs.waddr_LSB = TRUE;
 		}
 
 	}
 	else
-	{	/* write GPL data */
+	{
+		/* write GROM data */
 		/* the console GROMs are always affected */
-		/* BTW, console GROMs are never GRAMs, therefore there is no need to
-		actually write anything */
-		/* read ahead */
-		console_GROMs.buf = console_GROMs.data_ptr[console_GROMs.addr];
-		console_GROMs.addr = ((console_GROMs.addr + 1) & 0x1FFF) | (console_GROMs.addr & 0xE000);
+		/* BTW, console GROMs are never GRAMs, therefore there is no
+		   need to actually write anything, so we just read ahead 
+		   TODO: There could be cartridges with GRAM, so this must be
+		   fixed.
+		*/
+		GROM_dataread();
 		console_GROMs.raddr_LSB = console_GROMs.waddr_LSB = FALSE;
-
 	}
 
 	if (hsgpl_crdena)
@@ -1308,21 +1081,94 @@ WRITE16_HANDLER ( ti99_wgpl_w )
 }
 
 /*
-	GPL read
+	GROM read for TI-99/8
+	For comments, see the handler for TI-99/4A
 */
-READ16_HANDLER ( ti99_4p_rgpl_r )
+READ8_HANDLER ( ti99_grom_r8 )
+{
+	UINT8 reply;
+
+	cpu_adjust_icount(space->machine->cpu[0],-4);
+	
+	/* Activates a slot in the multi-cartridge extender. */
+	// 1001 1wbb bbbb bbr0
+	cartridge_slot_set(cartslots, (offset & 0x03fc)/4);
+	
+	if (offset & 2)
+	{	
+		console_GROMs.waddr_LSB = FALSE;
+
+		if (console_GROMs.raddr_LSB)
+		{
+			reply = console_GROMs.addr & 0x00ff;
+			console_GROMs.raddr_LSB = FALSE;
+		}
+		else
+		{
+			reply = (console_GROMs.addr>>8) & 0x00ff;
+			console_GROMs.raddr_LSB = TRUE;
+		}
+	}
+	else
+		reply = GROM_dataread();		
+
+	return reply;
+}
+
+/*
+	GROM write for TI-99/8
+	For comments, see the handler for TI-99/4A
+*/
+WRITE8_HANDLER ( ti99_grom_w8 )
+{
+	cpu_adjust_icount(space->machine->cpu[0],-4/*20+3*/);		/* from 4 to 23? */
+
+	/* Activates a slot in the multi-cartridge extender. */
+	cartridge_slot_set(cartslots, (offset & 0x03fc)/4);
+	
+	if (offset & 2)
+	{
+		console_GROMs.raddr_LSB = FALSE;
+		if (console_GROMs.waddr_LSB)
+		{
+			console_GROMs.addr = (console_GROMs.addr & 0xFF00) | (data & 0xFF);
+			
+			GROM_dataread();
+			console_GROMs.waddr_LSB = FALSE;
+		}
+		else
+		{
+			console_GROMs.addr = ((data<<8) & 0xFF00) | (console_GROMs.addr & 0xFF);
+			console_GROMs.waddr_LSB = TRUE;
+		}
+
+	}
+	else
+	{
+		GROM_dataread();
+		console_GROMs.raddr_LSB = console_GROMs.waddr_LSB = FALSE;
+	}
+}
+
+
+/*
+	GROM read for TI-99/4p
+*/
+READ16_HANDLER ( ti99_4p_grom_r )
 {
 	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);		/* HSGPL is located on 8-bit bus? */
+//	cpu_spinuntil_time(space->machine->cpu[0], ATTOTIME_IN_USEC(6));
 
 	return /*hsgpl_crdena ?*/ ti99_hsgpl_gpl_r(space, offset, mem_mask) /*: 0*/;
 }
 
 /*
-	GPL write
+	GROM write
 */
-WRITE16_HANDLER ( ti99_4p_wgpl_w )
+WRITE16_HANDLER ( ti99_4p_grom_w )
 {
 	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);		/* HSGPL is located on 8-bit bus? */
+//	cpu_spinuntil_time(space->machine->cpu[0], ATTOTIME_IN_USEC(6));
 
 	/*if (hsgpl_crdena)*/
 		ti99_hsgpl_gpl_w(space, offset, data, mem_mask);
@@ -1334,22 +1180,23 @@ WRITE16_HANDLER ( ti99_4p_wgpl_w )
 #pragma mark 99/8 MEMORY HANDLERS
 #endif
 
- READ8_HANDLER ( ti99_8_r )
+READ8_HANDLER( ti99_8_r )
 {
+	/* Set the page. Page size is 4 KiB; page number are the high 4 bits. */
 	int page = offset >> 12;
 	UINT32 mapper_reg;
-	int reply = 0;
+	UINT8 reply = 0;
 
-	/* 03-Apr-2007 - hack because this seems to be called on startup */
-	if (!xRAM_ptr_8)
-		return 0;
-
-	if (ti99_8_CRUS)
+	if (ti99_8_enable_rom_and_ports)
 	{
-		/* memory mapped ports enabled */
+		/* This is only important for address access 0000-1fff and 
+		   8000-9fff. Outside, the mapper mode is used. */
 		if ((offset >= 0x0000) && (offset < 0x2000))
-			/* ROM? */
-			return ROM0_ptr_8[offset & 0x1fff];
+		{
+			/* ROM */
+			reply = ROM0_ptr_8[offset & 0x1fff];
+			return reply;
+		}
 		else if ((offset >= 0x8000) && (offset < 0xa000))
 		{
 			/* ti99 scratch pad and memory-mapped registers */
@@ -1357,12 +1204,13 @@ WRITE16_HANDLER ( ti99_4p_wgpl_w )
 			switch ((offset - 0x8000) >> 10)
 			{
 			case 0:
-				/* RAM */
+				/* RAM: >8000 - >83ff */
 				reply = sRAM_ptr_8[offset & 0x1fff];
 				break;
 
 			case 1:
-				/* sound write + RAM */
+				/* >8400 - >840f: sound (cannot read) 
+				   >8410 - >87ff: SRAM */
 				if (offset >= 0x8410)
 					reply = sRAM_ptr_8[offset & 0x1fff];
 				break;
@@ -1374,23 +1222,23 @@ WRITE16_HANDLER ( ti99_4p_wgpl_w )
 					if (! (offset & 1))
 					{
 						if (offset & 2)
-							/* read VDP status */
+							/* read VDP status >8802 */
 							reply = TMS9928A_register_r(space, 0);
 						else
-							/* read VDP RAM */
+							/* read VDP RAM >8800 */
 							reply = TMS9928A_vram_r(space, 0);
 					}
 				}
 				else
 				{
+					/* Read mapper >8810 */
 					reply = ti99_8_mapper_status;
-
 					ti99_8_mapper_status = 0;
 				}
 				break;
 
 			case 4:
-				/* speech read */
+				/* speech read: >9000 */
 				if (! (offset & 1))
 				{
 					cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-16*4);		/* this is just a minimum, it can be more */
@@ -1399,9 +1247,9 @@ WRITE16_HANDLER ( ti99_4p_wgpl_w )
 				break;
 
 			case 6:
-				/* GPL read */
+				/* GROM read: >9800 */
 				if (! (offset & 1))
-					reply = ti99_rgpl_r(space, offset >> 1, 0) >> 8;
+					reply = ti99_grom_r8(space, offset);
 				break;
 
 			default:
@@ -1434,44 +1282,37 @@ WRITE16_HANDLER ( ti99_4p_wgpl_w )
 		default:
 			/* should never happen */
 		case 0:
-			/* unassigned??? */
+			/* ff0000 - ff1fff: unassigned? */
 		case 1:
-			/* ??? */
+			/* ff2000 - ff3fff: ? */
 		case 4:
-			/* internal DSR ROM??? (normally enabled with a write to CRU >2700) */
+			/* ff8000 - ff9fff: internal DSR ROM? (normally enabled with a write to CRU >2700) */
 		case 7:
-			/* ??? */
+			/* ffe000 - ffffff: ? */
 			logerror("unmapped read page=%d offs=%d\n", (int) page, (int) offset);
 			break;
 
 		case 2:
-			/* DSR space */
+			/* ff4000 - ff5fff: DSR space */
 			reply = ti99_8_peb_r(space, offset & 0x1fff);
 			break;
 
 		case 3:
-			/* cartridge space */
+			/* ff6000 - ff7fff: cartridge ROM space */
 			offset &= 0x1fff;
-#if 0
-			if (hsgpl_crdena)
-				/* hsgpl is enabled */
-				reply = ti99_hsgpl_rom6_r(offset, mem_mask);
-			else
-#endif
 
-			if (cartridge_mbx && (offset >= 0x0c00) && (offset <= 0x0ffd))
-				reply = (cartridge_pages_8[0])[offset];
-			else
-				reply = current_page_ptr_8[offset];
+			/* We do not support hsgpl here because it is a 16 bit 
+			   system. Just check the cartridges.  */
+			reply = ti99_multicart8_r(multicart8, offset); 
 			break;
 
 		case 5:
-			/* >2000 ROM (ROM1) */
+			/* ffa000 - ffbfff: >2000 ROM (ROM1) */
 			reply = ROM1_ptr_8[offset & 0x1fff];
 			break;
 
 		case 6:
-			/* >6000 ROM */
+			/* ffc000 - ffdfff: >6000 ROM */
 			reply = ROM3_ptr_8[offset & 0x1fff];
 			break;
 		}
@@ -1485,12 +1326,14 @@ WRITE8_HANDLER ( ti99_8_w )
 	int page = offset >> 12;
 	UINT32 mapper_reg;
 
-	if (ti99_8_CRUS)
+	if (ti99_8_enable_rom_and_ports)
 	{
 		/* memory mapped ports enabled */
 		if ((offset >= 0x0000) && (offset < 0x2000))
+		{
 			/* ROM? */
 			return;
+		}
 		else if ((offset >= 0x8000) && (offset < 0xa000))
 		{
 			/* ti99 scratch pad and memory-mapped registers */
@@ -1583,7 +1426,7 @@ WRITE8_HANDLER ( ti99_8_w )
 			case 7:
 				/* GPL write */
 				if (! (offset & 1))
-					ti99_wgpl_w(space, offset >> 1, data << 8, 0);
+					ti99_grom_w8(space, offset, data);
 				break;
 
 			default:
@@ -1595,6 +1438,8 @@ WRITE8_HANDLER ( ti99_8_w )
 	}
 
 	mapper_reg = ti99_8_mapper_regs[page];
+	
+	/* 4 KiB page size */ 
 	offset = (mapper_reg + (offset & 0x0fff)) & 0x00ffffff;
 
 	/* test write protect */
@@ -1628,28 +1473,8 @@ WRITE8_HANDLER ( ti99_8_w )
 
 		case 3:
 			/* cartridge space */
-			offset &= 0x1fff;
-#if 0
-			if (hsgpl_crdena)
-				/* hsgpl is enabled */
-				ti99_hsgpl_rom6_w(offset, data);
-			else
-#endif
-			if (cartridge_minimemory && (offset >= 0x1000))
-				/* handle minimem RAM */
-				current_page_ptr_8[offset] = data;
-			else if (cartridge_mbx)
-			{	/* handle MBX cart */
-				/* RAM in 0x6c00-0x6ffd (presumably non-paged) */
-				/* mapper at 0x6ffe */
-				if ((offset >= 0x0c00) && (offset <= 0x0ffd))
-					(cartridge_pages_8[0])[offset] = data;
-				else if (offset == 0x0ffe)
-					current_page_ptr_8 = cartridge_pages_8[cartridge_paged ? (data & 1) : 0];
-			}
-			else if (cartridge_paged)
-				/* handle pager */
-				current_page_ptr_8 = cartridge_pages_8[(offset & 2) >> 1];
+			/* We do not support HSGPL for the 99/8 at this time. */
+			ti99_multicart8_w(multicart8, offset & 0x1fff, data); 
 			break;
 
 		case 5:
@@ -1662,7 +1487,9 @@ WRITE8_HANDLER ( ti99_8_w )
 		}
 	}
 	else
+	{
 		logerror("unmapped write page=%d offs=%d\n", (int) page, (int) offset);
+	}
 }
 
 /*===========================================================================*/
@@ -2393,7 +2220,7 @@ static WRITE8_DEVICE_HANDLER( ti99_8_KeyC )
 
 static WRITE8_DEVICE_HANDLER( ti99_8_WCRUS )
 {
-	ti99_8_CRUS = data;
+	ti99_8_enable_rom_and_ports = data;
 }
 
 static WRITE8_DEVICE_HANDLER( ti99_8_PTGEN )
@@ -2619,6 +2446,7 @@ static void ti99_TIxram_init(running_machine *machine)
 static READ16_HANDLER ( ti99_TIxramlow_r )
 {
 	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
+//	cpu_spinuntil_time(space->machine->cpu[0], ATTOTIME_IN_USEC(6));
 
 	return xRAM_ptr[offset];
 }
@@ -2626,6 +2454,7 @@ static READ16_HANDLER ( ti99_TIxramlow_r )
 static WRITE16_HANDLER ( ti99_TIxramlow_w )
 {
 	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
+//	cpu_spinuntil_time(space->machine->cpu[0], ATTOTIME_IN_USEC(6));
 
 	COMBINE_DATA(xRAM_ptr + offset);
 }
@@ -2634,6 +2463,7 @@ static WRITE16_HANDLER ( ti99_TIxramlow_w )
 static READ16_HANDLER ( ti99_TIxramhigh_r )
 {
 	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
+//	cpu_spinuntil_time(space->machine->cpu[0], ATTOTIME_IN_USEC(6));
 
 	return xRAM_ptr[offset+0x1000];
 }
@@ -2641,6 +2471,7 @@ static READ16_HANDLER ( ti99_TIxramhigh_r )
 static WRITE16_HANDLER ( ti99_TIxramhigh_w )
 {
 	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
+//	cpu_spinuntil_time(space->machine->cpu[0], ATTOTIME_IN_USEC(6));
 
 	COMBINE_DATA(xRAM_ptr + offset+0x1000);
 }
@@ -2723,6 +2554,7 @@ static WRITE8_HANDLER(sAMS_mapper_w)
 static READ16_HANDLER ( ti99_sAMSxramlow_r )
 {
 	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
+//	cpu_spinuntil_time(space->machine->cpu[0], ATTOTIME_IN_USEC(6));
 
 	if (sAMS_mapper_on)
 		return xRAM_ptr[(offset&0x7ff)+sAMSlookup[(0x1000+offset)>>11]];
@@ -2733,6 +2565,7 @@ static READ16_HANDLER ( ti99_sAMSxramlow_r )
 static WRITE16_HANDLER ( ti99_sAMSxramlow_w )
 {
 	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
+//	cpu_spinuntil_time(space->machine->cpu[0], ATTOTIME_IN_USEC(6));
 
 	if (sAMS_mapper_on)
 		COMBINE_DATA(xRAM_ptr + (offset&0x7ff)+sAMSlookup[(0x1000+offset)>>11]);
@@ -2744,6 +2577,7 @@ static WRITE16_HANDLER ( ti99_sAMSxramlow_w )
 static READ16_HANDLER ( ti99_sAMSxramhigh_r )
 {
 	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
+//	cpu_spinuntil_time(space->machine->cpu[0], ATTOTIME_IN_USEC(6));
 
 	if (sAMS_mapper_on)
 		return xRAM_ptr[(offset&0x7ff)+sAMSlookup[(0x5000+offset)>>11]];
@@ -2754,6 +2588,7 @@ static READ16_HANDLER ( ti99_sAMSxramhigh_r )
 static WRITE16_HANDLER ( ti99_sAMSxramhigh_w )
 {
 	cpu_adjust_icount(cputag_get_cpu(space->machine, "maincpu"),-4);
+//	cpu_spinuntil_time(space->machine->cpu[0], ATTOTIME_IN_USEC(6));
 
 	if (sAMS_mapper_on)
 		COMBINE_DATA(xRAM_ptr + (offset&0x7ff)+sAMSlookup[(0x5000+offset)>>11]);

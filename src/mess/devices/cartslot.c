@@ -11,25 +11,9 @@
 #include "cartslot.h"
 #include "multcart.h"
 
-
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
-
-#define TAG_PCB		"pcb"
-
-
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-typedef struct _cartslot_t cartslot_t;
-struct _cartslot_t
-{
-	const device_config *pcb_device;
-	multicart *mc;
-};
-
 
 enum _process_mode
 {
@@ -194,7 +178,7 @@ const device_config *cartslot_get_pcb(const device_config *device)
 
 
 /*-------------------------------------------------
-    cartslot_get_pcb
+    cartslot_get_socket
 -------------------------------------------------*/
 
 void *cartslot_get_socket(const device_config *device, const char *socket_name)
@@ -216,6 +200,34 @@ void *cartslot_get_socket(const device_config *device, const char *socket_name)
 	{
 		result = image_ptr(device);
 	}
+	return result;
+}
+
+/*-------------------------------------------------
+    cartslot_get_resource_length
+-------------------------------------------------*/
+
+int cartslot_get_resource_length(const device_config *device, const char *socket_name)
+{
+	cartslot_t *cart = get_token(device);
+	int result = 0;
+
+	if (cart->mc != NULL)
+	{
+		const multicart_socket *socket;
+
+		for (socket = cart->mc->sockets; socket != NULL; socket = socket->next)
+		{
+			if (!strcmp(socket->id, socket_name)) {
+				break;
+			}
+		}
+		if (socket != NULL) 
+			result = socket->resource->length;
+	}
+	else 
+		result = 0;
+
 	return result;
 }
 
@@ -262,7 +274,7 @@ static DEVICE_IMAGE_LOAD( cartslot )
 		return (*config->device_load)(image);
 
 	/* try opening this as if it were a multicart */
-	multicart_open(image_filename(image), MULTICART_FLAGS_LOAD_RESOURCES, &cart->mc);
+	multicart_open(image_filename(image), image->machine->gamedrv->name, MULTICART_FLAGS_LOAD_RESOURCES, &cart->mc);
 	if (cart->mc == NULL)
 	{
 		/* otherwise try the normal route */
@@ -316,17 +328,22 @@ static const cartslot_pcb_type *identify_pcb(const device_config *device)
 	if (image_exists(device))
 	{
 		/* try opening this as if it were a multicart */
-		multicart_open(image_filename(device), MULTICART_FLAGS_DONT_LOAD_RESOURCES, &mc);
-		if (mc != NULL)
+		multicart_open_error me = multicart_open(image_filename(device), device->machine->gamedrv->name, MULTICART_FLAGS_DONT_LOAD_RESOURCES, &mc);
+		if (me == MCERR_NONE)
 		{
 			/* this was a multicart - read from it */
 			astring_cpyc(pcb_name, mc->pcb_type);
 			multicart_close(mc);
 		}
-		else if (image_pcb(device) != NULL)
+		else
 		{
-			/* read from hash file */
-			astring_cpyc(pcb_name, image_pcb(device));
+			if (me != MCERR_NOT_MULTICART)
+				fatalerror("multicart error: %s\n", mc_error_text(me));
+			if (image_pcb(device) != NULL)
+			{
+				/* read from hash file */
+				astring_cpyc(pcb_name, image_pcb(device));
+			}
 		}
 
 		/* look for PCB type with matching name */

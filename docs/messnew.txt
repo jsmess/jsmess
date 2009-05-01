@@ -66,6 +66,9 @@ System Driver Changes:
 
 - [STUDIO2] Fixed .st2 cartridge loading. [Curt Coder]
 
+- [TI99 family] Added functionality for multi-cartridge handling. Added
+  support for complex/multi-file cartridge images.  [Michael Zapf]
+
 - [TRS80] Various improvements: [Robbbert]
           - added centronics printer
           - cassette works on all clones

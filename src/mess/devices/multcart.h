@@ -35,6 +35,7 @@ typedef struct _multicart_resource multicart_resource;
 struct _multicart_resource
 {
 	const char *				id;
+	const char *				filename;
 	multicart_resource *		next;
 	multicart_resource_type		type;
 	UINT32						length;
@@ -60,6 +61,7 @@ struct _multicart
 	const multicart_resource *	resources;
 	const multicart_socket *	sockets;
 	const char *				pcb_type;
+	const char *				gamedrv_name; /* need this to find the path to the nvram files */
 	multicart_private *			data;
 };
 
@@ -69,17 +71,28 @@ enum _multicart_open_error
 	MCERR_NONE,
 	MCERR_NOT_MULTICART,
 	MCERR_CORRUPT,
-	MCERR_OUT_OF_MEMORY
+	MCERR_OUT_OF_MEMORY,
+	MCERR_XML_ERROR,
+	MCERR_INVALID_FILE_REF,
+	MCERR_ZIP_ERROR,
+	MCERR_MISSING_RAM_LENGTH,
+	MCERR_INVALID_RAM_SPEC,
+	MCERR_UNKNOWN_RESOURCE_TYPE,
+	MCERR_INVALID_RESOURCE_REF,
+	MCERR_INVALID_FILE_FORMAT,
+	MCERR_MISSING_LAYOUT,
+	MCERR_NO_PCB_OR_RESOURCES
 };
 typedef enum _multicart_open_error multicart_open_error;
 
+const char *mc_error_text(multicart_open_error error);
 
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
 
 /* opens a multicart */
-multicart_open_error multicart_open(const char *filename, multicart_load_flags load_flags, multicart **cart);
+multicart_open_error multicart_open(const char *filename, const char *drvname, multicart_load_flags load_flags, multicart **cart);
 
 /* closes a multicart */
 void multicart_close(multicart *cart);

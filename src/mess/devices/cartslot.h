@@ -9,11 +9,13 @@
 
 #include "device.h"
 #include "image.h"
+#include "multcart.h"
 
 
 /***************************************************************************
     MACROS
 ***************************************************************************/
+#define TAG_PCB		"pcb"
 
 #define ROM_CART_LOAD(tag,offset,length,flags)	\
 	{ NULL, tag, offset, length, ROMENTRYTYPE_CARTRIDGE | (flags) },
@@ -31,6 +33,14 @@
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
+
+typedef struct _cartslot_t cartslot_t;
+struct _cartslot_t
+{
+	const device_config *pcb_device;
+	multicart *mc;
+};
+
 
 typedef struct _cartslot_pcb_type cartslot_pcb_type;
 struct _cartslot_pcb_type
@@ -64,6 +74,9 @@ const device_config *cartslot_get_pcb(const device_config *device);
 
 /* accesses a particular socket */
 void *cartslot_get_socket(const device_config *device, const char *socket_name);
+
+/* accesses a particular socket; gets the length of the associated resource */
+int cartslot_get_resource_length(const device_config *device, const char *socket_name);
 
 
 /***************************************************************************

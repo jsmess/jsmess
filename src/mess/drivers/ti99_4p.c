@@ -61,9 +61,9 @@ static ADDRESS_MAP_START(memmap, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x8C00, 0x8fff) AM_READWRITE(ti99_nop_8_r, ti99_wv38_w)	/*vdp write*/
 	AM_RANGE(0x9000, 0x93ff) AM_READWRITE(ti99_nop_8_r, ti99_nop_8_w)	/*speech read - installed dynamically*/
 	AM_RANGE(0x9400, 0x97ff) AM_READWRITE(ti99_nop_8_r, ti99_nop_8_w)	/*speech write - installed dynamically*/
-	AM_RANGE(0x9800, 0x98ff) AM_READWRITE(ti99_4p_rgpl_r, ti99_nop_8_w)	/*GPL read*/
+	AM_RANGE(0x9800, 0x98ff) AM_READWRITE(ti99_4p_grom_r, ti99_nop_8_w)	/*GPL read*/
 	AM_RANGE(0x9900, 0x9bff) AM_RAMBANK(11)								/*extra RAM for debugger*/
-	AM_RANGE(0x9c00, 0x9fff) AM_READWRITE(ti99_nop_8_r, ti99_4p_wgpl_w)	/*GPL write*/
+	AM_RANGE(0x9c00, 0x9fff) AM_READWRITE(ti99_nop_8_r, ti99_4p_grom_w)	/*GPL write*/
 	AM_RANGE(0xa000, 0xafff) AM_RAMBANK(5)								/*upper 24kb of RAM extension: AMS bank 10*/
 	AM_RANGE(0xb000, 0xbfff) AM_RAMBANK(6)								/*upper 24kb of RAM extension: AMS bank 11*/
 	AM_RANGE(0xc000, 0xcfff) AM_RAMBANK(7)								/*upper 24kb of RAM extension: AMS bank 12*/

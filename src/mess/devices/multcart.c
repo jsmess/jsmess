@@ -14,7 +14,6 @@
 #include "driver.h"
 #include "compcfg.h"
 
-
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
@@ -29,15 +28,37 @@ struct _multicart_private
 typedef struct _multicart_load_state multicart_load_state;
 struct _multicart_load_state
 {
-	multicart *				multicart;
-	zip_file *				zip;
+	multicart *			multicart;
+	zip_file *			zip;
 	xml_data_node *			layout_xml;
 	xml_data_node *			resources_node;
 	xml_data_node *			pcb_node;
-	multicart_resource *	resources;
+	multicart_resource *		resources;
 	multicart_socket *		sockets;
 };
 
+static const char multicart_error_text[14][30] = 
+{
+	"no error",
+	"not a multicart",
+	"module definition corrupt",
+	"out of memory",
+	"xml format error",
+	"invalid file reference",
+	"zip file error",
+	"missing ram length",
+	"invalid ram specification",
+	"unknown resource type",
+	"invalid resource reference",
+	"invalid file format",
+	"missing layout",
+	"no pcb or resource found"
+};
+
+const char *mc_error_text(multicart_open_error error)
+{
+	return multicart_error_text[(int)error];
+}
 
 /***************************************************************************
     IMPLEMENTATION
@@ -123,12 +144,12 @@ static multicart_open_error load_rom_resource(multicart_load_state *state, xml_d
 	/* locate the 'file' attribute */
 	file = xml_get_attribute_string(resource_node, "file", NULL);
 	if (file == NULL)
-		return MCERR_NOT_MULTICART;
+		return MCERR_XML_ERROR;
 
 	/* locate the file in the ZIP file */
 	header = find_file(state->zip, file);
 	if (header == NULL)
-		return MCERR_NOT_MULTICART;
+		return MCERR_INVALID_FILE_REF;
 	resource->length = header->uncompressed_length;
 
 	/* allocate bytes for this resource */
@@ -139,7 +160,7 @@ static multicart_open_error load_rom_resource(multicart_load_state *state, xml_d
 	/* and decompress it */
 	ziperr = zip_file_decompress(state->zip, resource->ptr, resource->length);
 	if (ziperr != ZIPERR_NONE)
-		return MCERR_NOT_MULTICART;
+		return MCERR_ZIP_ERROR;
 
 	return MCERR_NONE;
 }
@@ -153,17 +174,52 @@ static multicart_open_error load_ram_resource(multicart_load_state *state, xml_d
 	multicart_resource *resource)
 {
 	const char *length_string;
+	const char *ram_type;
+	const char *ram_filename;
 
+	astring *ram_pathname;
+	
 	/* locate the 'length' attribute */
 	length_string = xml_get_attribute_string(resource_node, "length", NULL);
 	if (length_string == NULL)
-		return MCERR_NOT_MULTICART;
-
+		return MCERR_MISSING_RAM_LENGTH;
+	
 	/* ...and parse it */
 	resource->length = ram_parse_string(length_string);
 	if (resource->length <= 0)
-		return MCERR_NOT_MULTICART;
-
+		return MCERR_INVALID_RAM_SPEC;
+	
+	/* allocate bytes for this resource */
+	resource->ptr = pool_malloc(state->multicart->data->pool, resource->length);
+	if (resource->ptr == NULL)
+		return MCERR_OUT_OF_MEMORY;
+	
+	/* Is this a persistent RAM resource? Then try to load it. */
+	ram_type = xml_get_attribute_string(resource_node, "type", NULL);
+	if (ram_type != NULL)
+	{
+		if (strcmp(ram_type, "persistent")==0)
+		{
+			/* Get the file name. */
+			ram_filename = xml_get_attribute_string(resource_node, "file", NULL);
+			if (ram_filename==NULL)
+				return MCERR_XML_ERROR;
+			
+			ram_pathname = astring_assemble_3(astring_alloc(), state->multicart->gamedrv_name, PATH_SEPARATOR, ram_filename);
+			
+			/* Save the file name so that we can write the contents on unloading. 
+			   If the RAM resource has no filename, we know that it was volatile only. */
+			resource->filename = pool_strdup(state->multicart->data->pool, astring_c(ram_pathname));
+			if (resource->filename == NULL)
+				return MCERR_OUT_OF_MEMORY;
+			
+			astring_free(ram_pathname);
+			
+			image_battery_load_by_name(resource->filename, resource->ptr, resource->length);
+		}
+		/* else this type is volatile, in which case we just have 
+			a memory expansion */
+	}
 	return MCERR_NONE;
 }
 
@@ -183,7 +239,7 @@ static multicart_open_error load_resource(multicart_load_state *state, xml_data_
 	/* get the 'id' attribute; error if not present */
 	id = xml_get_attribute_string(resource_node, "id", NULL);
 	if (id == NULL)
-		return MCERR_NOT_MULTICART;
+		return MCERR_XML_ERROR;
 
 	/* allocate memory for the resource */
 	resource = pool_malloc(state->multicart->data->pool, sizeof(*resource));
@@ -212,7 +268,7 @@ static multicart_open_error load_resource(multicart_load_state *state, xml_data_
 			break;
 
 		default:
-			return MCERR_NOT_MULTICART; 
+			return MCERR_UNKNOWN_RESOURCE_TYPE; 
 	}
 
 	/* append the resource */
@@ -249,6 +305,25 @@ static multicart_open_error load_all_resources(multicart_load_state *state)
 	return MCERR_NONE;
 }
 
+/*-------------------------------------------------
+    save_ram_resources. This is important for persistent RAM. All 
+    resources were allocated within the memory pool of this device and will
+    be freed on multicart_close.
+-------------------------------------------------*/
+
+static multicart_open_error save_ram_resources(multicart *cart)
+{
+	const multicart_resource *resource;
+	
+	for (resource = cart->resources; resource != NULL; resource = resource->next)
+	{
+		if ((resource->type == MULTICART_RESOURCE_TYPE_RAM) && (resource->filename != NULL))
+		{
+			image_battery_save_by_name(resource->filename, resource->ptr, resource->length);
+		}
+	}
+	return MCERR_NONE;
+}
 
 /*-------------------------------------------------
     load_socket
@@ -266,7 +341,7 @@ static multicart_open_error load_socket(multicart_load_state *state, xml_data_no
 	id = xml_get_attribute_string(socket_node, "id", NULL);
 	uses = xml_get_attribute_string(socket_node, "uses", NULL);
 	if ((id == NULL) || (uses == NULL))
-		return MCERR_NOT_MULTICART;
+		return MCERR_XML_ERROR;
 
 	/* find the resource */
 	for (resource = state->multicart->resources; resource != NULL; resource = resource->next)
@@ -275,7 +350,7 @@ static multicart_open_error load_socket(multicart_load_state *state, xml_data_no
 			break;
 	}
 	if (resource == NULL)
-		return MCERR_NOT_MULTICART;
+		return MCERR_INVALID_RESOURCE_REF;
 
 	/* create the socket */
 	socket = pool_malloc(state->multicart->data->pool, sizeof(*socket));
@@ -342,7 +417,7 @@ static multicart_open_error load_all_sockets(multicart_load_state *state)
     multicart_open - opens a multicart
 -------------------------------------------------*/
 
-multicart_open_error multicart_open(const char *filename, multicart_load_flags load_flags, multicart **cart)
+multicart_open_error multicart_open(const char *filename, const char *gamedrv, multicart_load_flags load_flags, multicart **cart)
 {
 	multicart_open_error err;
 	zip_error ziperr;
@@ -392,7 +467,7 @@ multicart_open_error multicart_open(const char *filename, multicart_load_flags l
 	header = find_file(state.zip, "layout.xml");
 	if (header == NULL)
 	{
-		err = MCERR_NOT_MULTICART;
+		err = MCERR_MISSING_LAYOUT;
 		goto done;
 	}
 
@@ -408,7 +483,7 @@ multicart_open_error multicart_open(const char *filename, multicart_load_flags l
 	ziperr = zip_file_decompress(state.zip, layout_text, header->uncompressed_length);
 	if (ziperr != ZIPERR_NONE)
 	{
-		err = MCERR_NOT_MULTICART;
+		err = MCERR_ZIP_ERROR;
 		goto done;
 	}
 	layout_text[header->uncompressed_length] = '\0';
@@ -417,14 +492,14 @@ multicart_open_error multicart_open(const char *filename, multicart_load_flags l
 	state.layout_xml = xml_string_read(layout_text, NULL);
 	if (state.layout_xml == NULL)
 	{
-		err = MCERR_NOT_MULTICART;
+		err = MCERR_XML_ERROR;
 		goto done;
 	}
 
 	/* locate the PCB node */
 	if (!find_pcb_and_resource_nodes(state.layout_xml, &state.pcb_node, &state.resources_node))
 	{
-		err = MCERR_NOT_MULTICART;
+		err = MCERR_NO_PCB_OR_RESOURCES;
 		goto done;
 	}
 
@@ -437,6 +512,13 @@ multicart_open_error multicart_open(const char *filename, multicart_load_flags l
 		goto done;
 	}
 
+	state.multicart->gamedrv_name = pool_strdup(state.multicart->data->pool, gamedrv);
+	if (state.multicart->gamedrv_name == NULL)
+	{
+		err = MCERR_OUT_OF_MEMORY;
+		goto done;
+	}
+	
 	/* do we have to load resources? */
 	if (load_flags & MULTICART_FLAGS_LOAD_RESOURCES)
 	{
@@ -477,6 +559,7 @@ done:
 
 void multicart_close(multicart *cart)
 {
+	save_ram_resources(cart);
 	pool_free(cart->data->pool);
 }
 

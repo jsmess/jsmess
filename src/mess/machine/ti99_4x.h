@@ -4,14 +4,17 @@
 #include "video/tms9928a.h"
 #include "machine/tms9901.h"
 
+#include "devices/ti99cart.h"
+#include "devices/cartslot.h"
+
 /* defines */
 
 #define HAS_99CCFDC 0
 
 /* region identifiers */
-#define region_grom "user1"
-#define region_dsr "user2"
-#define region_hsgpl "user3"
+#define region_grom "cons_grom"
+#define region_dsr "dsr"
+#define region_hsgpl "hsgpl"
 #define region_speech_rom "tms5220"
 
 /* offsets for "maincpu" */
@@ -103,7 +106,6 @@ typedef enum
 #endif
 } fdc_kind_t;
 
-
 /* defines for input port "CFG" */
 enum
 {
@@ -127,9 +129,18 @@ enum
 	config_usbsm_bit	= 11,
 	config_usbsm_mask	= 0x1,
 	config_boot_bit		= 13,
-	config_boot_mask	= 0x1
+	config_boot_mask	= 0x1,
+	config_cartslot_bit	= 14,
+	config_cartslot_mask	= 0xf  /* need four bits: covers all current and possibly future cartslots, and one auto mode */
 };
 
+enum {
+	STANDARD,
+	EXBAS,
+	MINIMEM,
+	SUPERSPACE,
+	MBX
+};
 
 /* prototypes for machine code */
 
@@ -147,8 +158,8 @@ MACHINE_START( ti99_4ev_60hz );
 MACHINE_RESET( ti99 );
 
 DEVICE_START( ti99_cart );
-DEVICE_IMAGE_LOAD( ti99_cart );
-DEVICE_IMAGE_UNLOAD( ti99_cart );
+// DEVICE_IMAGE_LOAD( ti99_cart );
+// DEVICE_IMAGE_UNLOAD( ti99_cart );
 
 VIDEO_START( ti99_4ev );
 INTERRUPT_GEN( ti99_vblank_interrupt );
@@ -156,9 +167,13 @@ INTERRUPT_GEN( ti99_4ev_hblank_interrupt );
 
 void set_hsgpl_crdena(int data);
 void ti99_common_init(running_machine *machine, const TMS9928a_interface *gfxparm);
+int is_99_8(void);
 
 READ16_HANDLER ( ti99_nop_8_r );
 WRITE16_HANDLER ( ti99_nop_8_w );
+
+READ8_HANDLER ( ti99_cart_cru_r );
+WRITE8_HANDLER ( ti99_cart_cru_w );
 
 READ16_HANDLER ( ti99_cart_r );
 WRITE16_HANDLER ( ti99_cart_w );
@@ -172,10 +187,10 @@ WRITE16_HANDLER ( ti99_wvdp_w );
 READ16_HANDLER ( ti99_rv38_r );
 WRITE16_HANDLER ( ti99_wv38_w );
 
-READ16_HANDLER ( ti99_rgpl_r );
-WRITE16_HANDLER( ti99_wgpl_w );
-READ16_HANDLER ( ti99_4p_rgpl_r );
-WRITE16_HANDLER ( ti99_4p_wgpl_w );
+READ16_HANDLER ( ti99_grom_r );
+WRITE16_HANDLER( ti99_grom_w );
+READ16_HANDLER ( ti99_4p_grom_r );
+WRITE16_HANDLER ( ti99_4p_grom_w );
 
 extern void tms9901_set_int2(running_machine *machine, int state);
 

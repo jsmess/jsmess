@@ -1753,34 +1753,24 @@ const char *image_extrainfo(const device_config *device)
 ****************************************************************************/
 
 /*-------------------------------------------------
-    open_battery_file - opens the battery backed
+    open_battery_file_by_name - opens the battery backed
 	NVRAM file for an image
 -------------------------------------------------*/
 
-static file_error open_battery_file(const device_config *image, UINT32 openflags, mame_file **file)
+static file_error open_battery_file_by_name(const char *filename, UINT32 openflags, mame_file **file)
 {
 	file_error filerr;
-	char *basename_noext;
-	astring *fname;
-
-	basename_noext = strip_extension(image_basename(image));
-	if (!basename_noext)
-		return FILERR_OUT_OF_MEMORY;
-	fname = astring_assemble_4(astring_alloc(), image->machine->gamedrv->name, PATH_SEPARATOR, basename_noext, ".nv");
-	filerr = mame_fopen(SEARCHPATH_NVRAM, astring_c(fname), openflags, file);
-	astring_free(fname);
-	free(basename_noext);
+	filerr = mame_fopen(SEARCHPATH_NVRAM, filename, openflags, file);
 	return filerr;
 }
 
-
-
 /*-------------------------------------------------
-    image_battery_load - retrieves the battery
-	backed RAM for an image
+    image_battery_load_by_name - retrieves the battery
+	backed RAM for an image. A filename may be supplied
+	to the function.
 -------------------------------------------------*/
 
-void image_battery_load(const device_config *image, void *buffer, int length)
+void image_battery_load_by_name(const char *filename, void *buffer, int length)
 {
 	file_error filerr;
 	mame_file *file;
@@ -1789,7 +1779,7 @@ void image_battery_load(const device_config *image, void *buffer, int length)
 	assert_always(buffer && (length > 0), "Must specify sensical buffer/length");
 
 	/* try to open the battery file and read it in, if possible */
-	filerr = open_battery_file(image, OPEN_FLAG_READ, &file);
+	filerr = open_battery_file_by_name(filename, OPEN_FLAG_READ, &file);
 	if (filerr == FILERR_NONE)
 	{
 		bytes_read = mame_fread(file, buffer, length);
@@ -1801,13 +1791,36 @@ void image_battery_load(const device_config *image, void *buffer, int length)
 }
 
 
-
 /*-------------------------------------------------
-    image_battery_save - stores the battery
-	backed RAM for an image
+    image_battery_load - retrieves the battery
+	backed RAM for an image. The file name is 
+	created from the machine driver name and the
+	image name. 
 -------------------------------------------------*/
 
-void image_battery_save(const device_config *image, const void *buffer, int length)
+void image_battery_load(const device_config *image, void *buffer, int length)
+{
+	char *basename_noext;
+	astring *fname;
+
+	basename_noext = strip_extension(image_basename(image));
+	if (!basename_noext)
+		fatalerror("FILERR_OUT_OF_MEMORY");
+
+	fname = astring_assemble_4(astring_alloc(), image->machine->gamedrv->name, PATH_SEPARATOR, basename_noext, ".nv");
+
+	image_battery_load_by_name(astring_c(fname), buffer, length);
+	astring_free(fname);
+	free(basename_noext);
+}
+
+
+/*-------------------------------------------------
+    image_battery_save_by_name - stores the battery
+	backed RAM for an image. A filename may be supplied
+	to the function.
+-------------------------------------------------*/
+void image_battery_save_by_name(const char *filename, const void *buffer, int length)
 {
 	file_error filerr;
 	mame_file *file;
@@ -1815,12 +1828,35 @@ void image_battery_save(const device_config *image, const void *buffer, int leng
 	assert_always(buffer && (length > 0), "Must specify sensical buffer/length");
 
 	/* try to open the battery file and write it out, if possible */
-	filerr = open_battery_file(image, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
+	filerr = open_battery_file_by_name(filename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
 	if (filerr == FILERR_NONE)
 	{
 		mame_fwrite(file, buffer, length);
 		mame_fclose(file);
 	}
+}
+
+/*-------------------------------------------------
+    image_battery_save - stores the battery
+	backed RAM for an image. The file name is 
+	created from the machine driver name and the
+	image name.
+-------------------------------------------------*/
+
+void image_battery_save(const device_config *image, const void *buffer, int length)
+{
+	astring *fname;
+	char *basename_noext;
+
+	basename_noext = strip_extension(image_basename(image));
+	if (!basename_noext)
+		fatalerror("FILERR_OUT_OF_MEMORY");
+
+	fname = astring_assemble_4(astring_alloc(), image->machine->gamedrv->name, PATH_SEPARATOR, basename_noext, ".nv");
+
+	image_battery_save_by_name(astring_c(fname), buffer, length);
+	astring_free(fname);
+	free(basename_noext);
 }
 
 
