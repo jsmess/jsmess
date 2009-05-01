@@ -38,6 +38,8 @@ System Driver Changes:
 - [ATARI] Updated keyboard and keypad scan handling to be more accurate. Added 
   natural keyboard support. [Fabio Priuli]
 
+- [ATARI] Fixed PIA regression. Floppy disks work again. [Fabio Priuli]
+
 - [ATMOS] Added Basic v1.2x enhanced BIOS [Fabio Priuli]
 
 - [COLECO] Converted to use PORT_CATEGORY for controller selection. Look into 
