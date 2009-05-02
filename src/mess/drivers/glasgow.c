@@ -404,17 +404,17 @@ static WRITE32_HANDLER ( write_beeper32 )
 
 static TIMER_CALLBACK( update_nmi )
 {
-	//cputag_set_input_line_and_vector(machine, "main",  M68K_IRQ_7,irq_edge&0xff ? CLEAR_LINE:ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
-		cputag_set_input_line_and_vector(machine, "main",  M68K_IRQ_7,ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
-		cputag_set_input_line_and_vector(machine, "main",  M68K_IRQ_7,CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
+	//cputag_set_input_line_and_vector(machine, "maincpu",  M68K_IRQ_7,irq_edge&0xff ? CLEAR_LINE:ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		cputag_set_input_line_and_vector(machine, "maincpu",  M68K_IRQ_7,ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		cputag_set_input_line_and_vector(machine, "maincpu",  M68K_IRQ_7,CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
    	irq_edge=~irq_edge;
 }
 
 static TIMER_CALLBACK( update_nmi32 )
 {
-	// cputag_set_input_line_and_vector(machine, "main",  M68K_IRQ_7, irq_edge&0xff ? CLEAR_LINE:ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
-		cputag_set_input_line_and_vector(machine, "main",  M68K_IRQ_7, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
-		cputag_set_input_line_and_vector(machine, "main",  M68K_IRQ_7, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
+	// cputag_set_input_line_and_vector(machine, "maincpu",  M68K_IRQ_7, irq_edge&0xff ? CLEAR_LINE:ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		cputag_set_input_line_and_vector(machine, "maincpu",  M68K_IRQ_7, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		cputag_set_input_line_and_vector(machine, "maincpu",  M68K_IRQ_7, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
     irq_edge=~irq_edge;
 }
 
