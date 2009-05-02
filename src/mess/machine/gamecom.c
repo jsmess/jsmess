@@ -126,8 +126,8 @@ static void handle_stylus_press( running_machine *machine, UINT8 column )
 	{
 		if ( ! ( input_port_read(machine, "IN2") & 0x04 ) ) 
 		{
-			stylus_x = input_port_read(machine, "IN3") >> 4;
-			stylus_y = input_port_read(machine, "IN4") >> 4;
+			stylus_x = input_port_read(machine, "STYX") >> 4;
+			stylus_y = input_port_read(machine, "STYY") >> 4;
 		} 
 		else 
 		{
