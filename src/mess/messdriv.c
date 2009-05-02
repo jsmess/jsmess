@@ -1183,4 +1183,9 @@ XL/XE 16kB OS roms
 /*********** Misc ***********************************************************/
 	DRIVER( ex800 )
 
+	/* NTS Computer Systems Ltd. electronic typewriters and clones */
+	DRIVER( drwrt400 )	/* 19?? DreamWriter T400                            */
+	DRIVER( wales210 )	/* 19?? Walther E-210 (German)                      */
+	DRIVER( dator3k )	/* 19?? Dator 3000 (Spanish)                        */
+
 #endif /* DRIVER_RECURSIVE */

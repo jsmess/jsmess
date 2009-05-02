@@ -2,6 +2,8 @@
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
+- Dator 3000 (not working)  [Roberto Carlos Fernandez
+  Gerhardt, Wilbert Pol]
 - Kaypro II (Model 2/83) (not working)  [Robbbert]
 - Kaypro 4 (Model 4/83) (not working)  [Robbbert]
 - Kaypro 2x (Model 2/84) (not working)  [Robbbert]
@@ -12,6 +14,8 @@ New System Drivers Supported (in no particular order):
 - NEC PC-8201A (not working) [Fabio Priuli]
 - Nokia MikroMikko 1 M6 (not working)  [Curt Coder]
 - Nokia MikroMikko 1 M7 (not working)  [Curt Coder]
+- NTS DreamWriter T400 (not working)  [Roberto Carlos
+  Fernandez Gerhardt, Wilbert Pol]
 - Olivetti M10 (not working) [Fabio Priuli]
 - Omni II (not working)  [Robbbert]
 - SNK NeoGeo Pocket  [Wilbert Pol]
@@ -26,6 +30,8 @@ New System Drivers Supported (in no particular order):
 - Dick Smith VZ 2000 [Curt Coder]
 - Hanimex Rameses [Curt Coder]
 - Sanyo Creativision MK-II [Curt Coder]
+- Walther E-210 (not working)  [Roberto Carlos Fernandez
+  Gerhardt, Wilbert Pol]
 
 
 
