@@ -30,7 +30,7 @@ New System Drivers Supported (in no particular order):
 - Dick Smith VZ 2000 [Curt Coder]
 - Hanimex Rameses [Curt Coder]
 - Sanyo Creativision MK-II [Curt Coder]
-- Walther E-210 (not working)  [Roberto Carlos Fernandez
+- Walther ES-210 (not working)  [Roberto Carlos Fernandez
   Gerhardt, Wilbert Pol]
 
 
