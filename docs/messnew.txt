@@ -13,6 +13,7 @@ New System Drivers Supported (in no particular order):
   Gerhardt, Wilbert Pol]
 - Dick Smith Wizzard [Curt Coder]
 - Dick Smith VZ 2000 [Curt Coder]
+- DEC VT100 (not working) [Miodrag Milanovic]
 - Hanimex Rameses [Curt Coder]
 - Kaypro II (Model 2/83) (not working)  [Robbbert]
 - Kaypro 4 (Model 4/83) (not working)  [Robbbert]

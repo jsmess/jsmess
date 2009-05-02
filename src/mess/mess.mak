@@ -267,6 +267,7 @@ DRVLIBS = \
 	$(MESSOBJ)/cpschngr.a \
 	$(MESSOBJ)/cybiko.a \
 	$(MESSOBJ)/dai.a \
+	$(MESSOBJ)/dec.a \
 	$(MESSOBJ)/dgn_beta.a \
 	$(MESSOBJ)/einis.a \
 	$(MESSOBJ)/enterp.a \
@@ -1281,6 +1282,10 @@ $(MESSOBJ)/ac1.a:      \
 	$(MESS_MACHINE)/ac1.o \
 	$(MESS_VIDEO)/ac1.o \
 
+$(MESSOBJ)/dec.a:      \
+	$(MESS_DRIVERS)/vt100.o \
+	$(MESS_VIDEO)/vtvideo.o \
+
 $(MESSOBJ)/grundy.a: \
 	$(MESS_DRIVERS)/newbrain.o \
 	$(MESS_VIDEO)/newbrain.o \
@@ -1348,6 +1353,7 @@ $(MESS_DRIVERS)/sym1.o:		$(MESS_LAYOUT)/sym1.lh
 $(MESS_DRIVERS)/tec1.o:		$(MESS_LAYOUT)/tec1.lh
 $(MESS_DRIVERS)/ut88.o:		$(MESS_LAYOUT)/ut88mini.lh
 $(MESS_DRIVERS)/votrpss.o:	$(MESS_LAYOUT)/votrpss.lh
+$(MESS_DRIVERS)/vt100.o:	$(MESS_LAYOUT)/vt100.lh
 $(MESS_DRIVERS)/x68k.o:		$(MESS_LAYOUT)/x68000.lh
 $(MESS_DRIVERS)/z80ne.o:	$(MESS_LAYOUT)/z80ne.lh   \
 							$(MESS_LAYOUT)/z80net.lh  \
