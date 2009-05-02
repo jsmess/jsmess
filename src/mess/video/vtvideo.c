@@ -87,7 +87,7 @@ WRITE8_DEVICE_HANDLER( vt_video_brightness_w )
 void vt_video_display_char(const device_config *device,bitmap_t *bitmap, UINT8 code, 
 	int x, int y,UINT8 scroll_region,UINT8 display_type) 
 {					
-	UINT8 line;
+	UINT8 line=0;
    	int i,b,bit;
  	int double_width = (display_type==2) ? 1 : 0;
  	vt_video_t *vt = get_safe_token(device);
