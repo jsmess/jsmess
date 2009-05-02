@@ -614,7 +614,7 @@ ROM_START( mbeeic )
 ROM_END
 
 ROM_START( mbeepc85 )
-	ROM_REGION(0x30000,"maincpu",0)
+	ROM_REGION(0x30000,"maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD("bas525a.rom",           0x8000,  0x2000, CRC(a6e02afe) SHA1(0495308c7e1d84b5989a3af6d3b881f4580b2641) )
 	ROM_LOAD("bas525b.rom",           0xa000,  0x2000, CRC(245dd36b) SHA1(dd288f3e6737627f50d3d2a49df3e57c423d3118) )
 	ROM_LOAD("charrom.bin",           0x11000, 0x1000, CRC(1f9fcee4) SHA1(e57ac94e03638075dde68a0a8c834a4f84ba47b0) )
