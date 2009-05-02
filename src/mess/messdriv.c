@@ -229,8 +229,8 @@ const game_driver * const drivers[] =
 	DRIVER( pcw9512 )	/* 198? PCW9512 (+)									*/
 	DRIVER( pcw10 ) 	/* 198? PCW10										*/
 	DRIVER( pcw16 )		/* 1995 PCW16										*/
-	DRIVER( nc100 )		/* 19?? NC100										*/
-	DRIVER( nc200 )		/* 19?? NC200										*/
+	DRIVER( nc100 )		/* 1992 NC100										*/
+	DRIVER( nc200 )		/* 1993 NC200										*/
 
 	/* APPLE */
 	DRIVER( apple1 )	/* Jul 1976 Apple 1									*/
