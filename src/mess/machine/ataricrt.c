@@ -24,17 +24,14 @@ DRIVER_INIT( atari )
 	offs_t ram_top;
 	offs_t ram_size;
 
-	if (!strcmp(machine->gamedrv->name, "a400")
-		|| !strcmp(machine->gamedrv->name, "a400pal")
-		|| !strcmp(machine->gamedrv->name, "a800")
-		|| !strcmp(machine->gamedrv->name, "a800pal")
-		|| !strcmp(machine->gamedrv->name, "a800xl"))
+	if (!strcmp(machine->gamedrv->name, "a5200")
+		|| !strcmp(machine->gamedrv->name, "a600xl"))
 	{
-		ram_size = 0xA000;
+		ram_size = 0x8000;
 	}
 	else
 	{
-		ram_size = 0x8000;
+		ram_size = 0xa000;
 	}
 
 	/* install RAM */

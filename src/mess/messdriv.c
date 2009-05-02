@@ -280,27 +280,18 @@ const game_driver * const drivers[] =
 	DRIVER( macclasc )	/* 1990 Apple Macintosh Classic						*/
 
 	/* ATARI */
-/*
-400/800 10kB OS roms
-A    NTSC  (?)         (?)         (?)
-A    PAL   (?)         0x72b3fed4  CO15199, CO15299, CO12399B
-B    NTSC  (?)         0x0e86d61d  CO12499B, CO14599B, 12399B
-B    PAL   (?)         (?)         (?)
-
-XL/XE 16kB OS roms
-10   1200XL  10/26/1982  0xc5c11546  CO60616A, CO60617A
-11   1200XL  12/23/1982  (?)         CO60616B, CO60617B
-1    600XL   03/11/1983  0x643bcc98  CO62024
-2    XL/XE   05/10/1983  0x1f9cd270  CO61598B
-3    800XE   03/01/1985  0x29f133f7  C300717
-4    XEGS    05/07/1987  0x1eaf4002  C101687
-*/
-
 	DRIVER( a400 )		/* 1979 Atari 400									*/
 	DRIVER( a400pal )	/* 1979 Atari 400 PAL								*/
 	DRIVER( a800 )		/* 1979 Atari 800									*/
 	DRIVER( a800pal )	/* 1979 Atari 800 PAL								*/
+	DRIVER( a1200xl )	/* 1982 Atari 1200 XL								*/
+	DRIVER( a600xl )	/* 1983 Atari 600 XL								*/
 	DRIVER( a800xl )	/* 1983 Atari 800 XL								*/
+	DRIVER( a65xe )		/* 1986 Atari 65 XE (XL Extended)					*/
+	DRIVER( a65xea )	/* 1986? Atari 65 XE Arabic							*/
+	DRIVER( a130xe )	/* 1986 Atari 130 XE								*/
+	DRIVER( a800xe )	/* 1986 Atari 800 XE								*/
+	DRIVER( xegs )		/* 1987 Atari XE Game System						*/
 	DRIVER( atarist )	/* Atari ST											*/
 	DRIVER( megast )	/* Atari Mega ST									*/
 //	DRIVER( stacy )		/* Atari STacy										*/
@@ -1153,6 +1144,11 @@ XL/XE 16kB OS roms
 	DRIVER( trsm200 )
 	DRIVER( npc8201 )
 
+	/* NTS Computer Systems Ltd. electronic typewriters and clones */
+	DRIVER( drwrt400 )	/* 19?? DreamWriter T400                            */
+	DRIVER( wales210 )	/* 19?? Walther ES-210 (German)                      */
+	DRIVER( dator3k )	/* 19?? Dator 3000 (Spanish)                        */
+
 	/* Votrax */
 //	DRIVER( votrtnt ) /* Votrax Type-N-Talk */
 	DRIVER( votrpss ) /* Votrax Personal Speech System */
@@ -1182,10 +1178,5 @@ XL/XE 16kB OS roms
 
 /*********** Misc ***********************************************************/
 	DRIVER( ex800 )
-
-	/* NTS Computer Systems Ltd. electronic typewriters and clones */
-	DRIVER( drwrt400 )	/* 19?? DreamWriter T400                            */
-	DRIVER( wales210 )	/* 19?? Walther ES-210 (German)                     */
-	DRIVER( dator3k )	/* 19?? Dator 3000 (Spanish)                        */
 
 #endif /* DRIVER_RECURSIVE */

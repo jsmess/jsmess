@@ -4,6 +4,30 @@
     MESS Driver
 
     Juergen Buchmueller, June 1998
+
+	2009-05 FP changes:
+	 Factored out MESS specific code from MAME
+	 Added skeleton support for other XL/XE machines (VERY preliminary):
+	 - a600xl based on maxaflex emulation in MAME
+	 - a1200xl sharing a800xl code without BASIC
+	 - a65xe, a130xe, a800xe, xegs sharing a800xl code (and this is wrong at least 
+	  for xegs)
+	 - a65xea as placeholder (I think it needs a different memory map, among other 
+	  things)
+
+	 To Do:
+	 - Find out exact checksums for OS Roms split as in the original machines
+	 - Find out why a600xl and a800xl don't work (xe machines should then follow)
+	 - Investigate supported RAM sizes and OS versions in different models 
+	 - Implement differences between various models (currently most of the
+	  XL/XE are exactly an a800xl, but this will change as soon as emulation 
+	  starts to work)
+	 - Investigate 65 XE Arabic dump: is it correct?
+	 - Fix various keyboard differences
+	 - Freddy emulation for 800XLF?
+	 - Add support for proto boards and expansions (a1400xl, C/PM board, etc.)
+	 - Clean up the whole driver + cart + floppy structure
+
 ******************************************************************************/
 
 #include "driver.h"
@@ -206,9 +230,16 @@
     E000-FFFF ROM     BIOS ROM
 ******************************************************************************/
 
+/**************************************************************
+ *
+ * Memory maps
+ *
+ **************************************************************/
+
+
 static ADDRESS_MAP_START(a400_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x9fff) AM_NOP	/* RAM installed at runtime */
-	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(SMH_BANK1, SMH_BANK1)
+	AM_RANGE(0xa000, 0xbfff) AM_RAMBANK(1)
 	AM_RANGE(0xc000, 0xcfff) AM_ROM
 	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE(atari_gtia_r, atari_gtia_w)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
@@ -222,7 +253,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(a800_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x9fff) AM_NOP	/* RAM installed at runtime */
-	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(SMH_BANK1, SMH_BANK1)
+	AM_RANGE(0xa000, 0xbfff) AM_RAMBANK(1)
 	AM_RANGE(0xc000, 0xcfff) AM_ROM
 	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE(atari_gtia_r, atari_gtia_w)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
@@ -234,19 +265,34 @@ static ADDRESS_MAP_START(a800_mem, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 
+static ADDRESS_MAP_START(a600xl_mem, ADDRESS_SPACE_PROGRAM, 8)
+	AM_RANGE(0x0000, 0x3fff) AM_RAM
+	AM_RANGE(0x5000, 0x57ff) AM_ROM AM_REGION("maincpu", 0x5000)	/* self test */
+	AM_RANGE(0xa000, 0xbfff) AM_ROM	/* BASIC */
+	AM_RANGE(0xc000, 0xcfff) AM_ROM /* OS */
+	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE(atari_gtia_r, atari_gtia_w)
+	AM_RANGE(0xd100, 0xd1ff) AM_NOP
+	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE("pokey", pokey_r, pokey_w)
+    AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE("pia", pia6821_alt_r, pia6821_alt_w)
+	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE(atari_antic_r, atari_antic_w)
+	AM_RANGE(0xd500, 0xd7ff) AM_NOP
+	AM_RANGE(0xd800, 0xffff) AM_ROM /* OS */
+ADDRESS_MAP_END
+
+
 static ADDRESS_MAP_START(a800xl_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x4fff) AM_RAM
-	AM_RANGE(0x5000, 0x57ff) AM_READWRITE(SMH_BANK2, SMH_BANK2)
+	AM_RANGE(0x5000, 0x57ff) AM_RAMBANK(2)
 	AM_RANGE(0x5800, 0x9fff) AM_RAM
-	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(SMH_BANK1, SMH_BANK1)
-	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(SMH_BANK3, SMH_BANK3)
+	AM_RANGE(0xa000, 0xbfff) AM_RAMBANK(1)
+	AM_RANGE(0xc000, 0xcfff) AM_RAMBANK(3)
 	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE(atari_gtia_r, atari_gtia_w)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
 	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE("pokey", pokey_r, pokey_w)
 	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE("pia", pia6821_alt_r, pia6821_alt_w)
 	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE(atari_antic_r, atari_antic_w)
 	AM_RANGE(0xd500, 0xd7ff) AM_NOP
-	AM_RANGE(0xd800, 0xffff) AM_READWRITE(SMH_BANK4, SMH_BANK4)
+	AM_RANGE(0xd800, 0xffff) AM_RAMBANK(4)
 ADDRESS_MAP_END
 
 
@@ -266,6 +312,12 @@ int atari_input_disabled(void)
 	return 0;
 }
 
+
+/**************************************************************
+ *
+ * Input ports
+ *
+ **************************************************************/
 
 
 #define JOYSTICK_DELTA			10
@@ -566,6 +618,12 @@ static INPUT_PORTS_START( a5200 )
 INPUT_PORTS_END
 
 
+/**************************************************************
+ *
+ * Palette
+ *
+ **************************************************************/
+
 static const UINT8 atari_palette[256*3] =
 {
 	/* Grey */
@@ -662,6 +720,141 @@ static PALETTE_INIT( atari )
 	}
 }
 
+/**************************************************************
+ *
+ * Memory banking
+ *
+ **************************************************************/
+
+void a800xl_mmu(running_machine *machine, UINT8 new_mmu)
+{
+	read8_space_func rbank1, rbank2, rbank3, rbank4;
+	write8_space_func wbank1, wbank2, wbank3, wbank4;
+	UINT8 *base1, *base2, *base3, *base4;
+
+	/* check if memory C000-FFFF changed */
+	if( new_mmu & 0x01 )
+	{
+		logerror("%s MMU BIOS ROM\n", machine->gamedrv->name);
+		rbank3 = SMH_BANK3;
+		wbank3 = SMH_UNMAP;
+		base3 = memory_region(machine, "maincpu") + 0x14000;  /* 8K lo BIOS */
+		rbank4 = SMH_BANK4;
+		wbank4 = SMH_UNMAP;
+		base4 = memory_region(machine, "maincpu") + 0x15800;  /* 4K FP ROM + 8K hi BIOS */
+	}
+	else
+	{
+		logerror("%s MMU BIOS RAM\n", machine->gamedrv->name);
+		rbank3 = SMH_BANK3;
+		wbank3 = SMH_BANK3;
+		base3 = memory_region(machine, "maincpu") + 0x0c000;  /* 8K RAM */
+		rbank4 = SMH_BANK4;
+		wbank4 = SMH_BANK4;
+		base4 = memory_region(machine, "maincpu") + 0x0d800;  /* 4K RAM + 8K RAM */
+	}
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xcfff, 0, 0, rbank3, wbank3);
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd800, 0xffff, 0, 0, rbank4, wbank4);
+	memory_set_bankptr(machine, 3, base3);
+	memory_set_bankptr(machine, 4, base4);
+
+	/* check if BASIC changed */
+	if( new_mmu & 0x02 )
+	{
+		logerror("%s MMU BASIC RAM\n", machine->gamedrv->name);
+		rbank1 = SMH_BANK1;
+		wbank1 = SMH_BANK1;
+		base1 = memory_region(machine, "maincpu") + 0x0a000;  /* 8K RAM */
+	}
+	else
+	{
+		logerror("%s MMU BASIC ROM\n", machine->gamedrv->name);
+		rbank1 = SMH_BANK1;
+		wbank1 = SMH_UNMAP;
+		base1 = memory_region(machine, "maincpu") + 0x10000;  /* 8K BASIC */
+	}
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa000, 0xbfff, 0, 0, rbank1, wbank1);
+	memory_set_bankptr(machine, 1, base1);
+
+	/* check if self-test ROM changed */
+	if( new_mmu & 0x80 )
+	{
+		logerror("%s MMU SELFTEST RAM\n", machine->gamedrv->name);
+		rbank2 = SMH_BANK2;
+		wbank2 = SMH_BANK2;
+		base2 = memory_region(machine, "maincpu") + 0x05000;  /* 0x0800 bytes */
+	}
+	else
+	{
+		logerror("%s MMU SELFTEST ROM\n", machine->gamedrv->name);
+		rbank2 = SMH_BANK2;
+		wbank2 = SMH_UNMAP;
+		base2 = memory_region(machine, "maincpu") + 0x15000;  /* 0x0800 bytes */
+	}
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5000, 0x57ff, 0, 0, rbank2, wbank2);
+	memory_set_bankptr(machine, 2, base2);	
+}
+
+/* BASIC was available in a separate cart, so we don't test it */
+void a1200xl_mmu(running_machine *machine, UINT8 new_mmu)
+{
+	read8_space_func rbank2, rbank3, rbank4;
+	write8_space_func wbank2, wbank3, wbank4;
+	UINT8 *base2, *base3, *base4;
+
+	/* check if memory C000-FFFF changed */
+	if( new_mmu & 0x01 )
+	{
+		logerror("%s MMU BIOS ROM\n", machine->gamedrv->name);
+		rbank3 = SMH_BANK3;
+		wbank3 = SMH_UNMAP;
+		base3 = memory_region(machine, "maincpu") + 0x14000;  /* 8K lo BIOS */
+		rbank4 = SMH_BANK4;
+		wbank4 = SMH_UNMAP;
+		base4 = memory_region(machine, "maincpu") + 0x15800;  /* 4K FP ROM + 8K hi BIOS */
+	}
+	else
+	{
+		logerror("%s MMU BIOS RAM\n", machine->gamedrv->name);
+		rbank3 = SMH_BANK3;
+		wbank3 = SMH_BANK3;
+		base3 = memory_region(machine, "maincpu") + 0x0c000;  /* 8K RAM */
+		rbank4 = SMH_BANK4;
+		wbank4 = SMH_BANK4;
+		base4 = memory_region(machine, "maincpu") + 0x0d800;  /* 4K RAM + 8K RAM */
+	}
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xcfff, 0, 0, rbank3, wbank3);
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd800, 0xffff, 0, 0, rbank4, wbank4);
+	memory_set_bankptr(machine, 3, base3);
+	memory_set_bankptr(machine, 4, base4);
+
+	/* check if self-test ROM changed */
+	if( new_mmu & 0x80 )
+	{
+		logerror("%s MMU SELFTEST RAM\n", machine->gamedrv->name);
+		rbank2 = SMH_BANK2;
+		wbank2 = SMH_BANK2;
+		base2 = memory_region(machine, "maincpu") + 0x05000;  /* 0x0800 bytes */
+	}
+	else
+	{
+		logerror("%s MMU SELFTEST ROM\n", machine->gamedrv->name);
+		rbank2 = SMH_BANK2;
+		wbank2 = SMH_UNMAP;
+		base2 = memory_region(machine, "maincpu") + 0x15000;  /* 0x0800 bytes */
+	}
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5000, 0x57ff, 0, 0, rbank2, wbank2);
+	memory_set_bankptr(machine, 2, base2);	
+}
+
+/**************************************************************
+ *
+ * PIA interface
+ *
+ **************************************************************/
+
+static WRITE8_DEVICE_HANDLER(a1200xl_pia_pb_w) { a1200xl_mmu(device->machine, data); }
+static WRITE8_DEVICE_HANDLER(a800xl_pia_pb_w) { a800xl_mmu(device->machine, data); }
 
 static const pokey_interface atari_pokey_interface =
 {
@@ -698,6 +891,38 @@ const pia6821_interface atari_pia_interface =
 	DEVCB_NULL		/* IRQB */
 };
 
+const pia6821_interface a600xl_pia_interface =
+{
+	DEVCB_HANDLER(atari_pia_pa_r),		/* port A in */
+	DEVCB_HANDLER(atari_pia_pb_r),	/* port B in */
+	DEVCB_NULL,		/* line CA1 in */
+	DEVCB_NULL,		/* line CB1 in */
+	DEVCB_NULL,		/* line CA2 in */
+	DEVCB_NULL,		/* line CB2 in */
+	DEVCB_NULL,		/* port A out */
+	DEVCB_HANDLER(a600xl_pia_pb_w),		/* port B out */
+	DEVCB_NULL,		/* line CA2 out */
+	DEVCB_LINE(atarifdc_pia_cb2_w),		/* port CB2 out */
+	DEVCB_NULL,		/* IRQA */
+	DEVCB_NULL		/* IRQB */
+};
+
+const pia6821_interface a1200xl_pia_interface =
+{
+	DEVCB_HANDLER(atari_pia_pa_r),		/* port A in */
+	DEVCB_HANDLER(atari_pia_pb_r),	/* port B in */
+	DEVCB_NULL,		/* line CA1 in */
+	DEVCB_NULL,		/* line CB1 in */
+	DEVCB_NULL,		/* line CA2 in */
+	DEVCB_NULL,		/* line CB2 in */
+	DEVCB_NULL,		/* port A out */
+	DEVCB_HANDLER(a1200xl_pia_pb_w),		/* port B out */
+	DEVCB_NULL,		/* line CA2 out */
+	DEVCB_LINE(atarifdc_pia_cb2_w),		/* port CB2 out */
+	DEVCB_NULL,		/* IRQA */
+	DEVCB_NULL		/* IRQB */
+};
+
 const pia6821_interface a800xl_pia_interface =
 {
 	DEVCB_HANDLER(atari_pia_pa_r),		/* port A in */
@@ -714,6 +939,12 @@ const pia6821_interface a800xl_pia_interface =
 	DEVCB_NULL		/* IRQB */
 };
 
+
+/**************************************************************
+ *
+ * Machine drivers
+ *
+ **************************************************************/
 
 static MACHINE_DRIVER_START( a400_cartslot )
 	MDRV_CARTSLOT_ADD("cart1")
@@ -837,6 +1068,25 @@ static MACHINE_DRIVER_START( a800pal )
 MACHINE_DRIVER_END
 
 
+static MACHINE_DRIVER_START( a600xl )
+	MDRV_IMPORT_FROM( atari_common )
+
+	MDRV_CPU_MODIFY( "maincpu" )
+	MDRV_CPU_PROGRAM_MAP(a600xl_mem, 0)	// FIXME
+	MDRV_CPU_VBLANK_INT_HACK(a800xl_interrupt, TOTAL_LINES_60HZ)
+
+	MDRV_PIA6821_MODIFY( "pia", a600xl_pia_interface )
+
+	MDRV_MACHINE_START( a800xl )	// FIXME?
+
+	MDRV_SCREEN_MODIFY("screen")
+	MDRV_SCREEN_REFRESH_RATE(FRAME_RATE_60HZ)
+	MDRV_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_60HZ)
+	
+	MDRV_IMPORT_FROM(a400_cartslot)
+MACHINE_DRIVER_END
+
+
 static MACHINE_DRIVER_START( a800xl )
 	MDRV_IMPORT_FROM( atari_common )
 
@@ -852,7 +1102,14 @@ static MACHINE_DRIVER_START( a800xl )
 	MDRV_SCREEN_REFRESH_RATE(FRAME_RATE_60HZ)
 	MDRV_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_60HZ)
 	
-	MDRV_IMPORT_FROM(a800_cartslot)
+	MDRV_IMPORT_FROM(a400_cartslot)
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( a1200xl )
+	MDRV_IMPORT_FROM( a800xl )
+
+	MDRV_PIA6821_MODIFY( "pia", a1200xl_pia_interface )
 MACHINE_DRIVER_END
 
 
@@ -877,35 +1134,97 @@ static MACHINE_DRIVER_START( a5200 )
 MACHINE_DRIVER_END
 
 
+/**************************************************************
+ *
+ * ROM loading
+ *
+ **************************************************************/
+
 ROM_START(a400)
 	ROM_REGION(0x14000,"maincpu",0) /* 64K for the CPU + 2 * 8K for cartridges */
-	ROM_LOAD("floatpnt.rom", 0xd800, 0x0800, CRC(6a5d766e) SHA1(01a6044f7a81d409c938e7dfde0a1af5832229d2))
-	ROM_LOAD("atari400.rom", 0xe000, 0x2000, CRC(cb4db9af) SHA1(4e784f4e2530110366f7e5d257d0f050de4201b2))
+	ROM_SYSTEM_BIOS(0, "default", "OS Rev. B")
+	ROMX_LOAD("co12399b.rom", 0xd800, 0x0800, CRC(6a5d766e) SHA1(01a6044f7a81d409c938e7dfde0a1af5832229d2), ROM_BIOS(1))
+	ROMX_LOAD("os_revb.rom",  0xe000, 0x2000, BAD_DUMP CRC(fbe3ce4c) SHA1(44d9ff3279a97557ade60255366f7b6a563242c9), ROM_BIOS(1))	// It should be split in two
+	ROM_SYSTEM_BIOS(1, "reva", "OS Rev. A")
+	ROMX_LOAD("co12399b.rom", 0xd800, 0x0800, CRC(6a5d766e) SHA1(01a6044f7a81d409c938e7dfde0a1af5832229d2), ROM_BIOS(2))
+	ROMX_LOAD("os_reva.rom",  0xe000, 0x2000, BAD_DUMP CRC(34d6a353) SHA1(db010853dc4039bf91e3446903f14e1a802fe933), ROM_BIOS(2))	// It should be split in two
 ROM_END
 
 ROM_START(a400pal)
 	ROM_REGION(0x14000,"maincpu",0) /* 64K for the CPU + 2 * 8K for cartridges */
-	ROM_LOAD("floatpnt.rom", 0xd800, 0x0800, CRC(6a5d766e) SHA1(01a6044f7a81d409c938e7dfde0a1af5832229d2))
-	ROM_LOAD("atari400.rom", 0xe000, 0x2000, CRC(cb4db9af) SHA1(4e784f4e2530110366f7e5d257d0f050de4201b2))
+	ROM_LOAD("co12399b.rom", 0xd800, 0x0800, CRC(6a5d766e) SHA1(01a6044f7a81d409c938e7dfde0a1af5832229d2))
+	ROM_LOAD("os_revap.rom", 0xe000, 0x2000, BAD_DUMP CRC(87d6e685) SHA1(4abbde82ec4077cfbd8d7e7b835107414f366862))	// Rev. A - It should be split in two
 ROM_END
 
 ROM_START(a800)
 	ROM_REGION(0x14000,"maincpu",0) /* 64K for the CPU + 2 * 8K for cartridges */
-	ROM_LOAD("floatpnt.rom", 0xd800, 0x0800, CRC(6a5d766e) SHA1(01a6044f7a81d409c938e7dfde0a1af5832229d2))
-	ROM_LOAD("atari800.rom", 0xe000, 0x2000, CRC(cb4db9af) SHA1(4e784f4e2530110366f7e5d257d0f050de4201b2))
+	ROM_SYSTEM_BIOS(0, "default", "OS Rev. B")
+	ROMX_LOAD("co12399b.rom", 0xd800, 0x0800, CRC(6a5d766e) SHA1(01a6044f7a81d409c938e7dfde0a1af5832229d2), ROM_BIOS(1))
+	ROMX_LOAD("os_revb.rom",  0xe000, 0x2000, BAD_DUMP CRC(fbe3ce4c) SHA1(44d9ff3279a97557ade60255366f7b6a563242c9), ROM_BIOS(1))	// It should be split in two
+	ROM_SYSTEM_BIOS(1, "reva", "OS Rev. A")
+	ROMX_LOAD("co12399b.rom", 0xd800, 0x0800, CRC(6a5d766e) SHA1(01a6044f7a81d409c938e7dfde0a1af5832229d2), ROM_BIOS(2))
+	ROMX_LOAD("os_reva.rom",  0xe000, 0x2000, BAD_DUMP CRC(34d6a353) SHA1(db010853dc4039bf91e3446903f14e1a802fe933), ROM_BIOS(2))	// It should be split in two
 ROM_END
 
 ROM_START(a800pal)
 	ROM_REGION(0x14000,"maincpu",0) /* 64K for the CPU + 2 * 8K for cartridges */
-	ROM_LOAD("floatpnt.rom", 0xd800, 0x0800, CRC(6a5d766e) SHA1(01a6044f7a81d409c938e7dfde0a1af5832229d2))
-	ROM_LOAD("atari800.rom", 0xe000, 0x2000, CRC(cb4db9af) SHA1(4e784f4e2530110366f7e5d257d0f050de4201b2))
+	ROM_LOAD("co12399b.rom", 0xd800, 0x0800, CRC(6a5d766e) SHA1(01a6044f7a81d409c938e7dfde0a1af5832229d2))
+	ROM_LOAD("os_revap.rom", 0xe000, 0x2000, BAD_DUMP CRC(87d6e685) SHA1(4abbde82ec4077cfbd8d7e7b835107414f366862))	// Rev. A - It should be split in two
+ROM_END
+
+ROM_START(a1200xl)
+	ROM_REGION(0x18000,"maincpu",0)
+	ROM_SYSTEM_BIOS(0, "default", "OS Rev. 11")
+	ROMX_LOAD("co60616b.rom", 0x14000, 0x4000, BAD_DUMP CRC(1a1d7b1b) SHA1(4e784f4e2530110366f7e5d257d0f050de4201b2), ROM_BIOS(1))	// It should be split in two
+	ROM_SYSTEM_BIOS(1, "rev10", "OS Rev. 10")
+	ROMX_LOAD("co60616a.rom", 0x14000, 0x4000, BAD_DUMP CRC(c5c11546) SHA1(4e784f4e2530110366f7e5d257d0f050de4201b2), ROM_BIOS(2))	// It should be split in two
+ROM_END
+
+ROM_START(a600xl)
+	ROM_REGION(0x10000,"maincpu",0)
+	ROM_LOAD("co60302a.rom", 0xa000, 0x2000, CRC(f0202fb3) SHA1(7ad88dd99ff4a6ee66f6d162074db6f8bef7a9b6))	// Rev. B
+	ROM_LOAD("co62024.rom",  0xc000, 0x4000, CRC(643bcc98) SHA1(881d030656b40bbe48f15a696b28f22c0b752ab0))	// Rev. 1
 ROM_END
 
 ROM_START(a800xl)
-	ROM_REGION(0x18000,"maincpu",0) /* 64K for the CPU + 16K + 2 * 8K for cartridges */
-	ROM_LOAD("basic.rom",   0x10000, 0x2000, CRC(7d684184) SHA1(3693c9cb9bf3b41bae1150f7a8264992468fc8c0))
-	ROM_LOAD("atarixl.rom", 0x14000, 0x4000, CRC(1f9cd270) SHA1(ae4f523ba08b6fd59f3cae515a2b2410bbd98f55))
+	ROM_REGION(0x18000,"maincpu",0)
+	ROM_LOAD("co60302a.rom", 0x10000, 0x2000, CRC(f0202fb3) SHA1(7ad88dd99ff4a6ee66f6d162074db6f8bef7a9b6))	// Rev. B
+	ROM_LOAD("co61598b.rom", 0x14000, 0x4000, CRC(1f9cd270) SHA1(ae4f523ba08b6fd59f3cae515a2b2410bbd98f55))	// Rev. 2
 ROM_END
+
+ROM_START(a65xe)
+	ROM_REGION(0x18000,"maincpu",0)
+	ROM_LOAD("co24947a.rom", 0x10000, 0x2000, CRC(7d684184) SHA1(3693c9cb9bf3b41bae1150f7a8264992468fc8c0))	// Rev. C
+	ROM_LOAD("co61598b.rom", 0x14000, 0x4000, CRC(1f9cd270) SHA1(ae4f523ba08b6fd59f3cae515a2b2410bbd98f55))	// Rev. 2
+ROM_END
+
+ROM_START(a65xea)
+	ROM_REGION(0x18000,"maincpu",0)
+	ROM_LOAD("basic_ar.rom", 0x10000, 0x2000, CRC(c899f4d6) SHA1(043df191d1fe402e792266a108e147ffcda35130))
+	ROM_LOAD("c101700.rom",  0x14000, 0x4000, CRC(7f9a76c8) SHA1(57eb6d87850a763f11767f53d4eaede186f831a2))	// Rev. 3B ?
+	// According to Freddy Offenga's doc OS rom should have been CRC 0xf0a236d3. Is this an alt version?
+ROM_END
+
+ROM_START(a130xe)
+	ROM_REGION(0x18000,"maincpu",0)
+	ROM_LOAD("co24947a.rom", 0x10000, 0x2000, CRC(7d684184) SHA1(3693c9cb9bf3b41bae1150f7a8264992468fc8c0))	// Rev. C
+	ROM_LOAD("co61598b.rom", 0x14000, 0x4000, CRC(1f9cd270) SHA1(ae4f523ba08b6fd59f3cae515a2b2410bbd98f55))	// Rev. 2
+ROM_END
+
+ROM_START(a800xe)
+	ROM_REGION(0x18000,"maincpu",0)
+	ROM_LOAD("co24947a.rom", 0x10000, 0x2000, CRC(7d684184) SHA1(3693c9cb9bf3b41bae1150f7a8264992468fc8c0))	// Rev. C
+	ROM_LOAD("c300717.rom",  0x14000, 0x4000, CRC(29f133f7) SHA1(f03b9b93000ee84abb9cf8d6367241006f172182))	// Rev. 3
+ROM_END
+
+ROM_START(xegs)
+	ROM_REGION(0x1a000,"maincpu",0)
+	/* These should be in a unique 32kb block! */
+	ROM_LOAD("basic.rom",   0x10000, 0x2000, BAD_DUMP CRC(7d684184) SHA1(3693c9cb9bf3b41bae1150f7a8264992468fc8c0))	// Rev. C
+	ROM_LOAD("xegs.rom",    0x14000, 0x4000, BAD_DUMP CRC(1eaf4002) SHA1(decde89fbae90adb591ad2fc553d35f49030c129))	// Rev. 4
+	ROM_LOAD("mcommand.rom",   0x18000, 0x2000, NO_DUMP)
+ROM_END
+
 
 ROM_START(a5200)
 	ROM_REGION(0x14000,"maincpu",0) /* 64K for the CPU + 16K for cartridges */
@@ -914,6 +1233,12 @@ ROM_START(a5200)
 	ROM_SYSTEM_BIOS(1, "alt", "a5200 (alt)")
 	ROMX_LOAD("5200a.rom", 0xf800, 0x0800, CRC(c2ba2613) SHA1(1d2a3f00109d75d2d79fecb565775eb95b7d04d5), ROM_BIOS(2))
 ROM_END
+
+/**************************************************************
+ *
+ * Configs
+ *
+ **************************************************************/
 
 static void atari_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
@@ -956,6 +1281,12 @@ static SYSTEM_CONFIG_START(a5200)
 SYSTEM_CONFIG_END
 
 
+/**************************************************************
+ *
+ * Driver initializations
+ *
+ **************************************************************/
+
 // VERY WIP code to load OS at start and, hopefully, go on with the implementation...
 static DRIVER_INIT( a800xl )
 {
@@ -971,16 +1302,30 @@ static DRIVER_INIT( a800xl )
 	memory_set_bankptr(machine, 4, rom + 0x15800);
 }
 
-/***************************************************************************
+static DRIVER_INIT( a600xl )
+{
+	UINT8 *rom = memory_region(machine, "maincpu");
+	memcpy( rom + 0x5000, rom + 0xd000, 0x800 );
+}
 
-  Game driver(s)
+/**************************************************************
+ *
+ * Game driver(s)
+ *
+ **************************************************************/
 
-***************************************************************************/
+/*     YEAR  NAME      PARENT    COMPAT MACHINE     INPUT    INIT    CONFIG   COMPANY    FULLNAME */
+COMP ( 1979, a400,	   0,        0,     a400,       a800,    0,      a400,    "Atari",   "400 (NTSC)", 0)
+COMP ( 1979, a400pal,  a400,     0,     a400pal,    a800,    0,      a400,    "Atari",   "400 (PAL)",  0)
+COMP ( 1979, a800,	   0,        0,     a800,       a800,    0,      a800,    "Atari",   "800 (NTSC)", 0)
+COMP ( 1979, a800pal,  a800,     0,     a800pal,    a800,    0,      a800,    "Atari",   "800 (PAL)",  0)
+COMP ( 1982, a1200xl,  a800,     0,     a1200xl,    a800xl,  a800xl, a800,    "Atari",   "1200XL",     GAME_NOT_WORKING )		// 64k RAM
+COMP ( 1983, a600xl,   a800,     0,     a600xl,     a800xl,  a600xl, a5200,   "Atari",   "600XL",      GAME_NOT_WORKING )		// 16k RAM
+COMP ( 1983, a800xl,   a800,     0,     a800xl,     a800xl,  a800xl, a800,    "Atari",   "800XL",      GAME_NOT_WORKING )		// 64k RAM
+COMP ( 1986, a65xe,    0,        0,     a800xl,     a800xl,  a800xl, a800,    "Atari",   "65XE",       GAME_NOT_WORKING )		// 64k RAM
+COMP ( 1986, a65xea,   a65xe,    0,     a800xl,     a800xl,  a800xl, a800,    "Atari",   "65XE (Arabic)", GAME_NOT_WORKING )
+COMP ( 1986, a130xe,   a65xe,    0,     a800xl,     a800xl,  a800xl, a800,    "Atari",   "130XE",      GAME_NOT_WORKING )		// 128k RAM
+COMP ( 1986, a800xe,   a65xe,    0,     a800xl,     a800xl,  a800xl, a800,    "Atari",   "800XE",      GAME_NOT_WORKING )		// 64k RAM
+COMP ( 1987, xegs,     0,        0,     a800xl,     a800xl,  a800xl, a800,    "Atari",   "XE Game System", GAME_NOT_WORKING )	// 64k RAM
 
-/*     YEAR  NAME      PARENT    COMPAT MACHINE     INPUT    INIT   CONFIG  COMPANY   FULLNAME */
-COMP ( 1979, a400,	   0,		 0,		a400,		a800,	 0,		a400,	"Atari",  "Atari 400 (NTSC)" , 0)
-COMP ( 1979, a400pal,  a400,	 0,		a400pal,	a800,	 0,		a400,	"Atari",  "Atari 400 (PAL)" , 0)
-COMP ( 1979, a800,	   0,		 0,		a800,		a800,	 0,		a800,	"Atari",  "Atari 800 (NTSC)" , 0)
-COMP ( 1979, a800pal,  a800,	 0,		a800pal,	a800,	 0,		a800,	"Atari",  "Atari 800 (PAL)" , 0)
-COMP ( 1983, a800xl,   a800,	 0,		a800xl,		a800xl,	 a800xl,a800,	"Atari",  "Atari 800XL", GAME_NOT_WORKING )
-CONS ( 1982, a5200,    0,		 0,		a5200,		a5200,	 0,		a5200,	"Atari",  "Atari 5200", 0)
+CONS ( 1982, a5200,    0,        0,     a5200,      a5200,   0,		a5200,    "Atari",   "5200",       0)
