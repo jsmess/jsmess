@@ -211,29 +211,13 @@ static struct genesis_z80_vars
 	int z80_cpunum;
 	int z80_is_reset;
 	int z80_has_bus;
-	int z80_bank_pos;
-	UINT32 z80_bank_partial;
 	UINT32 z80_bank_addr;
 	UINT8* z80_prgram;
 } genz80;
 
 static void megadriv_z80_bank_w(UINT16 data)
 {
-	genz80.z80_bank_partial |= (data & 0x01)<<23; // add new bit to partial address
-	genz80.z80_bank_pos++;
-
-	if (genz80.z80_bank_pos<9)
-	{
-		genz80.z80_bank_partial >>= 1;
-	}
-	else
-	{
-		genz80.z80_bank_pos = 0;
-		genz80.z80_bank_addr = genz80.z80_bank_partial;
-		genz80.z80_bank_partial = 0;
-	//  logerror("z80 bank set to %08x\n",genz80.z80_bank_addr);
-
-	}
+	genz80.z80_bank_addr = ( ( genz80.z80_bank_addr >> 1 ) | ( data << 23 ) ) & 0xff8000;
 }
 
 static WRITE16_HANDLER( megadriv_68k_z80_bank_write )
@@ -6020,7 +6004,6 @@ MACHINE_RESET( megadriv )
 		cpu_set_input_line(machine->cpu[genz80.z80_cpunum], INPUT_LINE_RESET, ASSERT_LINE);
 		genz80.z80_has_bus = 1;
 		cpu_set_input_line(machine->cpu[genz80.z80_cpunum], INPUT_LINE_HALT, CLEAR_LINE);
-		genz80.z80_bank_pos = 0;
 		genz80.z80_bank_addr = 0;
 		genesis_scanline_counter = -1;
 	}
