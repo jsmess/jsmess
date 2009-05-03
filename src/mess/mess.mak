@@ -304,12 +304,12 @@ DRVLIBS = \
 	$(MESSOBJ)/mk2.a \
 	$(MESSOBJ)/motorola.a \
 	$(MESSOBJ)/multitch.a \
+	$(MESSOBJ)/nakajima.a \
 	$(MESSOBJ)/nascom1.a \
 	$(MESSOBJ)/nec.a \
 	$(MESSOBJ)/necpc.a \
 	$(MESSOBJ)/nintendo.a \
 	$(MESSOBJ)/nokia.a \
-	$(MESSOBJ)/nts.a \
 	$(MESSOBJ)/ondra.a \
 	$(MESSOBJ)/orion.a \
 	$(MESSOBJ)/osborne.a \
@@ -1298,8 +1298,8 @@ $(MESSOBJ)/nokia.a: \
 	$(MESS_DRIVERS)/mikromik.o \
 	$(MESS_VIDEO)/upd7220.o \
 
-$(MESSOBJ)/nts.a: \
-	$(MESS_DRIVERS)/dreamwri.o
+$(MESSOBJ)/nakajima.a: \
+	$(MESS_DRIVERS)/nakajies.o
 
 $(MESSOBJ)/snk.a: \
 	$(MESS_DRIVERS)/ngp.o \
