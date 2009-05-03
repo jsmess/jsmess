@@ -1175,9 +1175,9 @@ ROM_END
 ROM_START(a1200xl)
 	ROM_REGION(0x18000,"maincpu",0)
 	ROM_SYSTEM_BIOS(0, "default", "OS Rev. 11")
-	ROMX_LOAD("co60616b.rom", 0x14000, 0x4000, BAD_DUMP CRC(1a1d7b1b) SHA1(4e784f4e2530110366f7e5d257d0f050de4201b2), ROM_BIOS(1))	// It should be split in two
+	ROMX_LOAD("co60616b.rom", 0x14000, 0x4000, BAD_DUMP CRC(1a1d7b1b) SHA1(5833e3a51d3a966a42baea37c40c01186e8a89cc), ROM_BIOS(1))	// It should be split in two
 	ROM_SYSTEM_BIOS(1, "rev10", "OS Rev. 10")
-	ROMX_LOAD("co60616a.rom", 0x14000, 0x4000, BAD_DUMP CRC(c5c11546) SHA1(4e784f4e2530110366f7e5d257d0f050de4201b2), ROM_BIOS(2))	// It should be split in two
+	ROMX_LOAD("co60616a.rom", 0x14000, 0x4000, BAD_DUMP CRC(c5c11546) SHA1(83c9afee8828a4026c55f10f920c42f76ad9ff65), ROM_BIOS(2))	// It should be split in two
 ROM_END
 
 ROM_START(a600xl)
