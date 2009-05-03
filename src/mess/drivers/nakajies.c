@@ -12,7 +12,7 @@ support).
 Model   |  SRAM | Language | Branded model
 --------+-------+----------+----------------------
 ES-210N | 128KB | German   | Walther ES-210
-ES-220  | 256KB | Englsih  | NTS DreamWriter T400
+ES-220  | 256KB | English  | NTS DreamWriter T400
 ES-2??  | ???KB | Spanish  | Dator 3000
 
 
@@ -46,6 +46,56 @@ Hardware:
 · FCC and CSA approved
 
 
+I/O Map:
+
+0000 - unknown
+       0x00 written during boot sequence
+
+0010 - unknown
+       0x17 written during boot sequence
+
+0011 - unknown
+       0x1e written during boot sequence
+
+0012 - unknown
+       0x1f written during boot sequence
+
+0013 - unknown
+       0x1e written during boot sequence
+
+0014 - unknown
+       0x1d written during boot sequence
+
+0015 - unknown
+       0x1c written during boot sequence
+
+0016 - unknown
+       0x01 written during boot sequence
+
+0017 - unknown
+       0x00 written during boot sequence
+
+0020 - unknown
+       0x00 written during boot sequence
+
+0040 - unknown
+       0xff written during boot sequence
+
+0060 - Irq enable/disable (?)
+       0xff written at start of boot sequence
+       0x7f written just before enabling interrupts
+
+0090 - unknown
+       0xff written during boot sequence
+00A0 - unknown
+       Read during initial boot sequence, expects to have bit 3 set at least once durnig the boot sequence
+
+00DD - unknown
+       0xf8 written during boot sequence
+
+00DE - unknown
+       0xf0 writter during boot sequence
+
 
 ******************************************************************************/
 
@@ -66,6 +116,17 @@ static ADDRESS_MAP_START( nakajies256_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
+static READ8_HANDLER( unk_a0_r )
+{
+	return 0xff;
+}
+
+
+static ADDRESS_MAP_START( nakajies_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE( 0x00a0, 0x00a0 ) AM_READ( unk_a0_r )
+ADDRESS_MAP_END
+
+
 static INPUT_PORTS_START( nakajies )
 INPUT_PORTS_END
 
@@ -73,6 +134,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( nakajies128 )
 	MDRV_CPU_ADD( "v20hl", V20, 9830000 )	/* Weird clock */
 	MDRV_CPU_PROGRAM_MAP( nakajies128_map, 0 )
+	MDRV_CPU_IO_MAP( nakajies_io_map, 0 )
 
 	MDRV_SCREEN_ADD( "screen", LCD )
 	MDRV_SCREEN_REFRESH_RATE( 50 )	/* Wild guess */
@@ -91,6 +153,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( nakajies256 )
 	MDRV_CPU_ADD( "v20hl", V20, 9830000 )	/* Weird clock */
 	MDRV_CPU_PROGRAM_MAP( nakajies256_map, 0 )
+	MDRV_CPU_IO_MAP( nakajies_io_map, 0 )
 
 	MDRV_SCREEN_ADD( "screen", LCD )
 	MDRV_SCREEN_REFRESH_RATE( 50 )	/* Wild guess */
