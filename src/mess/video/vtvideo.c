@@ -54,7 +54,7 @@ INLINE vt_video_t *get_safe_token(const device_config *device)
 INLINE const vt_video_interface *get_interface(const device_config *device)
 {
 	assert(device != NULL);
-	assert((device->type == dc012));
+//	assert((device->type == dc012));
 	return (const vt_video_interface *) device->static_config;
 }
 
