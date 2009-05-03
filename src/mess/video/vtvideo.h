@@ -37,6 +37,7 @@ struct _vt_video_interface
 
 	/* this gets called for every memory read */
 	devcb_read8			in_ram_func;
+	devcb_write8		clear_video_interrupt;
 };
 
 /***************************************************************************

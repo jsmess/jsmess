@@ -29,14 +29,24 @@ typedef struct _vt_video_t vt_video_t;
 struct _vt_video_t
 {
 	devcb_resolved_read8		in_ram_func;
+	devcb_resolved_write8		clear_video_interrupt;
 
 	const device_config *screen;	/* screen */
 	UINT8 *gfx;		/* content of char rom */
-	
-    int skip_lines;	
-    int height;
-    int width;
+	    
     int lba7;
+    
+    // dc012 attributes
+    UINT8 scroll_latch;
+    UINT8 blink_flip_flop;
+    UINT8 reverse_field;
+    UINT8 basic_attribute;
+    // dc011 attributes
+    UINT8 columns;
+    UINT8 height;
+    UINT8 skip_lines;	
+    UINT8 frequency;
+    UINT8 interlaced;
 };
 
 /***************************************************************************
@@ -70,13 +80,74 @@ READ8_DEVICE_HANDLER( lba7_r )
 
 WRITE8_DEVICE_HANDLER( dc012_w )
 {
-//	vt_video_t *vt = get_safe_token(device);
+	vt_video_t *vt = get_safe_token(device);
+	    
+    if ((data & 0x08)==0) {
+		if ((data & 0x04)==0) {
+			// set lower part scroll
+			vt->scroll_latch = (vt->scroll_latch & 0x0c) | (data & 0x03);
+		} else {
+			// set higher part scroll
+			vt->scroll_latch = (vt->scroll_latch & 0x03) | ((data & 0x03) << 2);
+		}
+	} else {
+		switch( data & 0x0f) {
+			case 0x08:
+				// toggle blink flip flop
+				vt->blink_flip_flop = (vt->blink_flip_flop==0) ? 1 : 0;
+				break;
+			case 0x09:
+				// clear vertical frequency interrupt;
+				devcb_call_write8(&vt->clear_video_interrupt, 0, 0);
+				break;
+			case 0x0A:
+				// set reverse field on
+				vt->reverse_field = 1;
+				break;				
+			case 0x0B:
+				// set reverse field off
+				vt->reverse_field = 0;
+				break;
+			case 0x0C:
+				// set basic attribute to underline
+				vt->basic_attribute = 0;
+				vt->blink_flip_flop = 0;
+				break;
+			case 0x0D:
+				// set basic attribute to reverse video
+				vt->basic_attribute = 1;
+				vt->blink_flip_flop = 0;
+				break;
+			case 0x0E:
+			case 0x0F:
+				// reserved for future specification
+				vt->blink_flip_flop = 0;
+				break;
+		}
+	}
 }
 
 
 WRITE8_DEVICE_HANDLER( dc011_w )
 {
-//	vt_video_t *vt = get_safe_token(device);
+	vt_video_t *vt = get_safe_token(device);
+	if (BIT(data,5)==0) {
+		if (BIT(data,4)==0) {
+			vt->columns = 80;
+		} else {
+			vt->columns = 132;
+		}
+		vt->interlaced = 1;
+	} else {
+		if (BIT(data,4)==0) {
+			vt->frequency = 60;
+			vt->skip_lines = 2;
+		} else {
+			vt->frequency = 50;
+			vt->skip_lines = 5;
+		}
+		vt->interlaced = 0;		
+	}
 }
 
 WRITE8_DEVICE_HANDLER( vt_video_brightness_w )
@@ -94,16 +165,20 @@ void vt_video_display_char(const device_config *device,bitmap_t *bitmap, UINT8 c
 
 	for (i = 0; i < 10; i++)
 	{
-		if (i==0) j=15; else j=i-1;
+		
 		switch(display_type) {
 			case 0 : // bottom half, double height
-					 line = vt->gfx[(code & 0x7f)*16 + (j >> 1)+5]; break;
+					 j = (i >> 1)+5; break;
 			case 1 : // top half, double height
-				 	 line = vt->gfx[(code & 0x7f)*16 + (j >> 1)]; break;
+				 	 j = (i >> 1); break;
 			case 2 : // double width				
 			case 3 : // normal
-					 line = vt->gfx[(code & 0x7f)*16 + j]; break;
+					 j = i;	break;
 		}
+		// modify line since that is how it is stored in rom
+		if (j==0) j=15; else j=j-1;
+		
+		line = vt->gfx[(code & 0x7f)*16 + j];
 		
 		for (b = 0; b < 8; b++)
 		{
@@ -149,7 +224,7 @@ void vt_video_update(const device_config *device, bitmap_t *bitmap, const rectan
 	    if (code == 0x7f) {
 	    	// end of line, fill empty till end of line
 	    	if (line >= vt->skip_lines) {
-	    		for(x = xpos; x < ((display_type==2) ? (vt->width / 2) : vt->width); x++ )
+	    		for(x = xpos; x < ((display_type==2) ? (vt->columns / 2) : vt->columns); x++ )
 				{
 					vt_video_display_char(device,bitmap,code,x,ypos,scroll_region,display_type);
 				}
@@ -172,7 +247,7 @@ void vt_video_update(const device_config *device, bitmap_t *bitmap, const rectan
 				vt_video_display_char(device,bitmap,code,xpos,ypos,scroll_region,display_type);
 			}    				
 			xpos++;
-			if (xpos > vt->width) {
+			if (xpos > vt->columns) {
 				line++;				
 				xpos=0;
 			}
@@ -192,6 +267,7 @@ static DEVICE_START( vt_video )
 
 	/* resolve callbacks */
 	devcb_resolve_read8(&vt->in_ram_func, &intf->in_ram_func, device);
+	devcb_resolve_write8(&vt->clear_video_interrupt, &intf->clear_video_interrupt, device);	
 
 	/* get the screen device */
 	vt->screen = devtag_get_device(device->machine, intf->screen_tag);
@@ -220,12 +296,19 @@ static DEVICE_RESET( vt_video )
 	palette_set_color_rgb(device->machine, 0, 0x00, 0x00, 0x00); // black
 	palette_set_color_rgb(device->machine, 1, 0xff, 0xff, 0xff); // white
 
-	vt->skip_lines = 2; // for 60Hz
-	vt->width = 80;
 	vt->height = 24;
 	vt->lba7 = 0;
 
-	// LBA7 is scan line frequency update
+	vt->scroll_latch = 0;
+    vt->blink_flip_flop = 0;
+    vt->reverse_field = 0;
+    vt->basic_attribute = 0;
+
+	vt->columns = 80;
+    vt->frequency = 60;
+    vt->interlaced = 1;
+	vt->skip_lines = 2; // for 60Hz
+    // LBA7 is scan line frequency update
 	timer_pulse(device->machine, ATTOTIME_IN_NSEC(31778), (void *) device, 0, lba7_change);	
 }
 

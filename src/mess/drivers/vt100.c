@@ -262,7 +262,6 @@ static IRQ_CALLBACK(vt100_irq_callback)
 	UINT8 retVal = 0xc7 | (0x08 * vt100_keyboard_int) | (0x10 * vt100_receiver_int) | (0x20 * vt100_vertical_int);
 	vt100_keyboard_int = 0;
 	vt100_receiver_int = 0;
-	vt100_vertical_int = 0;
 
 	return retVal;
 } 
@@ -291,10 +290,16 @@ static READ8_DEVICE_HANDLER (vt100_read_video_ram_r )
 	return vt100_ram[offset];
 }
 
+static WRITE8_DEVICE_HANDLER (vt100_clear_video_interrupt)
+{
+	vt100_vertical_int = 0;	
+}
+
 const vt_video_interface vt100_video_interface = {
 	"screen",
 	"gfx1",
-	DEVCB_HANDLER(vt100_read_video_ram_r)
+	DEVCB_HANDLER(vt100_read_video_ram_r),
+	DEVCB_HANDLER(vt100_clear_video_interrupt)
 };
 
 INTERRUPT_GEN( vt100_vertical_interrupt )
