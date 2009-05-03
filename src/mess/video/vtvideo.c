@@ -174,6 +174,7 @@ void vt_video_display_char(const device_config *device,bitmap_t *bitmap, UINT8 c
 			case 2 : // double width				
 			case 3 : // normal
 					 j = i;	break;
+			default : j = 0; break;
 		}
 		// modify line since that is how it is stored in rom
 		if (j==0) j=15; else j=j-1;
