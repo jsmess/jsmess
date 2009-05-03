@@ -88,20 +88,21 @@ void vt_video_display_char(const device_config *device,bitmap_t *bitmap, UINT8 c
 	int x, int y,UINT8 scroll_region,UINT8 display_type) 
 {					
 	UINT8 line=0;
-   	int i,b,bit;
+   	int i,b,bit,j;
  	int double_width = (display_type==2) ? 1 : 0;
  	vt_video_t *vt = get_safe_token(device);
 
 	for (i = 0; i < 10; i++)
 	{
+		if (i==0) j=15; else j=i-1;
 		switch(display_type) {
 			case 0 : // bottom half, double height
-					 line = vt->gfx[(code & 0x7f)*16 + (i >> 1)+5]; break;
+					 line = vt->gfx[(code & 0x7f)*16 + (j >> 1)+5]; break;
 			case 1 : // top half, double height
-				 	 line = vt->gfx[(code & 0x7f)*16 + (i >> 1)]; break;
+				 	 line = vt->gfx[(code & 0x7f)*16 + (j >> 1)]; break;
 			case 2 : // double width				
 			case 3 : // normal
-					 line = vt->gfx[(code & 0x7f)*16 + i]; break;
+					 line = vt->gfx[(code & 0x7f)*16 + j]; break;
 		}
 		
 		for (b = 0; b < 8; b++)
