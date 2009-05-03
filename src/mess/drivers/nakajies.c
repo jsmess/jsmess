@@ -85,8 +85,16 @@ I/O Map:
        0xff written at start of boot sequence
        0x7f written just before enabling interrupts
 
-0090 - unknown
-       0xff written during boot sequence
+0090 - Interrupt source clear
+       b7 - 1 = clear interrupt source for irq vector 0xf8
+       b6 - 1 = clear interrupt source for irq vector 0xf9
+       b5 - 1 = clear interrupt source for irq vector 0xfa
+       b4 - 1 = clear interrupt source for irq vector 0xfb
+       b3 - 1 = clear interrupt source for irq vector 0xfc
+       b2 - 1 = clear interrupt source for irq vector 0xfd
+       b1 - 1 = clear interrupt source for irq vector 0xfe
+       b0 - 1 = clear interrupt source for irq vector 0xff
+
 00A0 - unknown
        Read during initial boot sequence, expects to have bit 3 set at least once durnig the boot sequence
 
@@ -94,7 +102,7 @@ I/O Map:
        0xf8 written during boot sequence
 
 00DE - unknown
-       0xf0 writter during boot sequence
+       0xf0 written during boot sequence
 
 
 ******************************************************************************/
