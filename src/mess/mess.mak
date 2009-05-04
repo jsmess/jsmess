@@ -1309,7 +1309,6 @@ $(MESSOBJ)/z80ne.a:	\
 	$(MESS_DRIVERS)/z80ne.o     \
 	$(MESS_VIDEO)/z80ne.o       \
 	$(MESS_MACHINE)/z80ne.o     \
-	$(MESS_MACHINE)/ay31015.o   \
 	$(MESS_MACHINE)/kr2376.o	\
 
 $(MESSOBJ)/tec1.a: \
