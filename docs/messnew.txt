@@ -8,7 +8,7 @@ New System Drivers Supported (in no particular order):
 
 System Driver Changes:
 ----------------------
-(none)
+- [CRVISION] Added support for stereo tapes. [Curt Coder]
 
 
 
@@ -26,7 +26,7 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-(none)
+- Converted the WAVE sound device to stereo. [Curt Coder]
 
 
 

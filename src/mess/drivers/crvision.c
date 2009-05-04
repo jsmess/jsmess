@@ -13,7 +13,6 @@
     TODO:
 
 	- BASIC v1,v2 numbers are invisible
-	- cassette left (data) / right (audio) track separation
     - proper keyboard emulation, need keyboard schematics
 	- parallel I/O module
 
@@ -26,6 +25,7 @@
 #include "devices/cassette.h"
 #include "machine/6821pia.h"
 #include "sound/sn76496.h"
+#include "sound/wave.h"
 #include "video/tms9928a.h"
 
 static const device_config *cassette_device_image(running_machine *machine)
@@ -505,6 +505,9 @@ static MACHINE_DRIVER_START( creativision )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(SN76489_TAG, SN76489, XTAL_2MHz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	MDRV_SOUND_WAVE_ADD("wave", "cassette")
+	MDRV_SOUND_ROUTE(1, "mono", 0.25)
 
 	/* peripheral hardware */
 	MDRV_PIA6821_ADD(PIA6821_TAG, crvision_pia_intf)
