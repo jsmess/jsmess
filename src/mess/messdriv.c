@@ -195,6 +195,9 @@ const game_driver * const drivers[] =
 	DRIVER( ngp )		/* NeoGeo Pocket									*/
 	DRIVER( ngpc )		/* NeoGeo Pocket Color								*/
 
+	/* Philips */
+	DRIVER( cdi )		/* Philips CD-i									*/
+
 /****************COMPUTERS***************************************************/
     /* ACORN */
 	DRIVER( acrnsys1 )	/* 1979 Acorn System 1 (Microcomputer Kit)			*/
