@@ -113,6 +113,8 @@ I/O Map:
 00A0 - unknown
        Read during initial boot sequence, expects to have bit 3 set at least once durnig the boot sequence
 
+00D0 - 00DC - Keyboard??
+
 00DD - unknown
        0xf8 written during boot sequence
 
