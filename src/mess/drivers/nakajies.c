@@ -16,6 +16,9 @@ ES-220  | 256KB | English  | NTS DreamWriter T400
 ES-2??  | ???KB | Spanish  | Dator 3000
 
 
+The LCD is driven by 6x Sanyo LC7940 and 1x Sanyo LC7942.
+
+
 
 NTS information from http://web.archive.org/web/19980205154137/nts.dreamwriter.com/dreamwt4.html:
 
@@ -78,12 +81,24 @@ I/O Map:
 0020 - unknown
        0x00 written during boot sequence
 
+0030 - unknown
+       Looking at code at C0769 bit 5 this seems to be used
+       as some kind of clock for data that was written to
+       I/O port 0040h.
+
 0040 - unknown
        0xff written during boot sequence
+
+0050 - counter low?
+0051 - counter high?
+0052 - counter enable/disable?
 
 0060 - Irq enable/disable (?)
        0xff written at start of boot sequence
        0x7f written just before enabling interrupts
+
+0061 - unknown
+       0xFE written in irq 0xFB handler
 
 0090 - Interrupt source clear
        b7 - 1 = clear interrupt source for irq vector 0xf8
@@ -110,6 +125,9 @@ I/O Map:
 #include "driver.h"
 #include "cpu/nec/nec.h"
 #include "sound/speaker.h"
+
+
+#define X301	19660000
 
 
 static ADDRESS_MAP_START( nakajies128_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -140,15 +158,15 @@ INPUT_PORTS_END
 
 
 static MACHINE_DRIVER_START( nakajies128 )
-	MDRV_CPU_ADD( "v20hl", V20, 9830000 )	/* Weird clock */
+	MDRV_CPU_ADD( "v20hl", V20, X301 / 2 )
 	MDRV_CPU_PROGRAM_MAP( nakajies128_map, 0 )
 	MDRV_CPU_IO_MAP( nakajies_io_map, 0 )
 
 	MDRV_SCREEN_ADD( "screen", LCD )
 	MDRV_SCREEN_REFRESH_RATE( 50 )	/* Wild guess */
 	MDRV_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
-	MDRV_SCREEN_SIZE( 80 * 8, 8 * 8 )
-	MDRV_SCREEN_VISIBLE_AREA( 0, 8 * 80 - 1, 0, 8 * 8 - 1 )
+	MDRV_SCREEN_SIZE( 80 * 6, 8 * 8 )
+	MDRV_SCREEN_VISIBLE_AREA( 0, 6 * 80 - 1, 0, 8 * 8 - 1 )
 	MDRV_PALETTE_LENGTH( 2 )
 
 	/* sound */
@@ -159,15 +177,15 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( nakajies256 )
-	MDRV_CPU_ADD( "v20hl", V20, 9830000 )	/* Weird clock */
+	MDRV_CPU_ADD( "v20hl", V20, X301 / 2 )
 	MDRV_CPU_PROGRAM_MAP( nakajies256_map, 0 )
 	MDRV_CPU_IO_MAP( nakajies_io_map, 0 )
 
 	MDRV_SCREEN_ADD( "screen", LCD )
 	MDRV_SCREEN_REFRESH_RATE( 50 )	/* Wild guess */
 	MDRV_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
-	MDRV_SCREEN_SIZE( 80 * 8, 8 * 8 )
-	MDRV_SCREEN_VISIBLE_AREA( 0, 8 * 80 - 1, 0, 8 * 8 - 1 )
+	MDRV_SCREEN_SIZE( 80 * 6, 8 * 8 )
+	MDRV_SCREEN_VISIBLE_AREA( 0, 6 * 80 - 1, 0, 8 * 8 - 1 )
 	MDRV_PALETTE_LENGTH( 2 )
 
 	/* sound */
