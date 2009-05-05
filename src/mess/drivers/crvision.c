@@ -14,6 +14,7 @@
 
 	- BASIC v1,v2 numbers are invisible
     - proper keyboard emulation, need keyboard schematics
+	- memory expansion
 	- parallel I/O module
 
 */
@@ -48,6 +49,11 @@ static ADDRESS_MAP_START( crvision_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 /* Input Ports */
+
+static INPUT_CHANGED( trigger_nmi )
+{
+	cputag_set_input_line(field->port->machine, M6502_TAG, INPUT_LINE_NMI, (input_port_read(field->port->machine, "NMI") ? CLEAR_LINE : ASSERT_LINE));
+}
 
 static INPUT_PORTS_START( crvision )
 	// Player 1 Joystick
@@ -209,6 +215,9 @@ static INPUT_PORTS_START( crvision )
 	PORT_START("PA3-7")
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P2 Button 1 / - =") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('=') PORT_PLAYER(2)
+
+	PORT_START("NMI")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F10) PORT_CHANGED(trigger_nmi, 0)
 INPUT_PORTS_END
 
 /* Machine Interface */
