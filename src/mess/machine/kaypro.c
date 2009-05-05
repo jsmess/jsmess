@@ -349,7 +349,27 @@ static WD17XX_CALLBACK( kaypro_fdc_callback )
 
 const wd17xx_interface kaypro_wd1793_interface = { kaypro_fdc_callback, NULL };
 
-/* I have no idea how to set up floppies - these ones have 40 tracks, 40 sectors, 128 bytes per track, single sided */
+static DEVICE_IMAGE_LOAD( kayproii_floppy )
+{
+	if (device_load_basicdsk_floppy(image)==INIT_PASS)
+	{
+		basicdsk_set_geometry(image, 40, 1, 40, 128, 0, 0, FALSE);
+		return INIT_PASS;
+	}
+
+	return INIT_FAIL;
+}
+
+static DEVICE_IMAGE_LOAD( kaypro2x_floppy )
+{
+	if (device_load_basicdsk_floppy(image)==INIT_PASS)
+	{
+		basicdsk_set_geometry(image, 80, 2, 40, 128, 0, 0, FALSE);
+		return INIT_PASS;
+	}
+
+	return INIT_FAIL;
+}
 
 void kayproii_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
@@ -360,7 +380,7 @@ void kayproii_floppy_getinfo(const mess_device_class *devclass, UINT32 state, un
 		case MESS_DEVINFO_INT_COUNT:			info->i = 2; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-//		case MESS_DEVINFO_PTR_LOAD:			info->load = DEVICE_IMAGE_LOAD_NAME(kaypro2_floppy); break;
+		case MESS_DEVINFO_PTR_LOAD:			info->load = DEVICE_IMAGE_LOAD_NAME(kayproii_floppy); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case MESS_DEVINFO_STR_FILE_EXTENSIONS:		strcpy(info->s = device_temp_str(), "dsk"); break;
@@ -376,10 +396,10 @@ void kaypro2x_floppy_getinfo(const mess_device_class *devclass, UINT32 state, un
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:			info->i = 1; break;
+		case MESS_DEVINFO_INT_COUNT:			info->i = 2; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-//		case MESS_DEVINFO_PTR_LOAD:			info->load = DEVICE_IMAGE_LOAD_NAME(kaypro2_floppy); break;
+		case MESS_DEVINFO_PTR_LOAD:			info->load = DEVICE_IMAGE_LOAD_NAME(kaypro2x_floppy); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case MESS_DEVINFO_STR_FILE_EXTENSIONS:		strcpy(info->s = device_temp_str(), "dsk"); break;
