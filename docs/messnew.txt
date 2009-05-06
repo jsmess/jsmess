@@ -10,6 +10,8 @@ New System Drivers Supported (in no particular order):
 
 System Driver Changes:
 ----------------------
+- [COLECO] Fixed controller bug introduced in 0.131. [Fabio Priuli]
+
 - [CRVISION] Added support for stereo tapes. [Curt Coder]
 
 - [X68000] Added support for the XPD-1LR dual D-pad controller.  [Barry Rodewald]

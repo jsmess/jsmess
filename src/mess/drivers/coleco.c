@@ -113,7 +113,7 @@ static READ8_HANDLER( paddle_1_r )
 				if (!(ipt1 & 0x2000)) data &= 0x08; /* Purple Action Button */
 			}
 
-			return ((ipt1 & 0x4000) >> 2) | 0x30 | (data);
+			return ((ipt1 & 0x4000) >> 8) | 0x30 | (data);
 		}
 		/* Joystick and fire 2 (SAC Red Button) */
 		else
@@ -176,7 +176,7 @@ static READ8_HANDLER( paddle_2_r )
 			if (!(ipt2 & 0x1000)) data &= 0x04; /* Blue Action Button */
 			if (!(ipt2 & 0x2000)) data &= 0x08; /* Purple Action Button */
 
-			return ((ipt2 & 0x4000) >> 2) | 0x30 | (data);
+			return ((ipt2 & 0x4000) >> 8) | 0x30 | (data);
 		}
 		/* Joystick and fire 2*/
 		else
