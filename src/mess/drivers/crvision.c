@@ -16,6 +16,17 @@
     - proper keyboard emulation, need keyboard schematics
 	- memory expansion 16K/32K, can be chained
 	- centronics control/status port
+	- convert to use new cartridge system
+	- non-working cartridges:
+		* Deep Sea Adventure (6K)
+		* Locomotive (10K)
+		* Planet Defender (6K)
+		* Tennis (Dick Smith 6K)
+		* Tennis (Wimbledon 6K)
+	- homebrew roms with graphics issues:
+		* Christmas Demo 1.0
+		* Titanic Frogger Demo 1.0
+		* Titanic Frogger Demo 1.1
 
 */
 
@@ -503,6 +514,7 @@ static DEVICE_IMAGE_LOAD( crvision_cart )
 		image_fread(image, mem + 0xa000, 0x2000);
 		image_fread(image, mem + 0x8000, 0x2000);
 		memory_install_read8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_BANK(BANK_ROM1));
+		memory_install_read8_handler(program, 0x4000, 0x7fff, 0, 0, SMH_BANK(BANK_ROM2));
 		break;
 
 	case 0x4800: // 18K
@@ -616,10 +628,9 @@ ROM_START( fnvision )
 ROM_END
 
 #define rom_crvisioj rom_crvision
-#define rom_crvisiop rom_crvision
-#define rom_rameses rom_crvision
-#define rom_vz2000 rom_crvision
 #define rom_crvisio2 rom_crvision
+#define rom_rameses rom_fnvision
+#define rom_vz2000 rom_fnvision
 
 /* System Configuration */
 
@@ -631,11 +642,16 @@ SYSTEM_CONFIG_END
 
 /* System Drivers */
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    CONFIG  COMPANY						FULLNAME */
-CONS( 1982, crvision, 0,		0,		pal,		crvision,	0,		0,		"Video Technology",			"CreatiVision", GAME_SUPPORTS_SAVE )
-CONS( 1982, fnvision, crvision, 0,		pal,		crvision,	0,		0,		"Video Technology",			"FunVision", GAME_SUPPORTS_SAVE )
-CONS( 1982, crvisioj, crvision,	0,		ntsc,		crvision,	0,		0,		"Cheryco",					"CreatiVision (Japan)", GAME_SUPPORTS_SAVE )
-COMP( 1982, wizzard,  crvision, 0,		wizzard,	crvision,	0,		wizzard,"Dick Smith Electronics",	"Wizzard (Australia)", GAME_SUPPORTS_SAVE )
-CONS( 1982, rameses,  crvision, 0,		pal,		crvision,	0,		0,		"Hanimex",					"Rameses (Australia)", GAME_SUPPORTS_SAVE )
-CONS( 1983, vz2000,   crvision, 0,		pal,		crvision,	0,		0,		"Dick Smith Electronics",	"VZ 2000 (Australia)", GAME_SUPPORTS_SAVE )
-COMP( 1983, crvisio2, crvision, 0,		pal,		crvision,	0,		0,		"Sanyo Video",				"CreatiVision MK-II (Germany)", GAME_SUPPORTS_SAVE )
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    CONFIG		COMPANY						FULLNAME */
+CONS( 1982, crvision, 0,		0,		pal,		crvision,	0,		0,			"Video Technology",			"CreatiVision", 0 )
+CONS( 1982, fnvision, crvision, 0,		pal,		crvision,	0,		0,			"Video Technology",			"FunVision", 0 )
+CONS( 1982, crvisioj, crvision,	0,		ntsc,		crvision,	0,		0,			"Cheryco",					"CreatiVision (Japan)", 0 )
+CONS( 1982, wizzard,  crvision, 0,		wizzard,	crvision,	0,		wizzard,	"Dick Smith Electronics",	"Wizzard (Oceania)", 0 )
+CONS( 1982, rameses,  crvision, 0,		pal,		crvision,	0,		0,			"Hanimex",					"Rameses (Oceania)", 0 )
+CONS( 1983, vz2000,   crvision, 0,		pal,		crvision,	0,		0,			"Dick Smith Electronics",	"VZ 2000 (Oceania)", 0 )
+CONS( 1983, crvisio2, crvision, 0,		pal,		crvision,	0,		0,			"Sanyo Video",				"CreatiVision MK-II (Germany)", 0 )
+/*
+COMP( 1983, lasr2001, 0,		0,		lasr2001,	lasr2001,	0,		lasr2001,	"Video Technology",			"Laser 2001", GAME_NOT_WORKING )
+COMP( 1983, vz2001,	  lasr2001,	0,		lasr2001,	lasr2001,	0,		lasr2001,	"Dick Smith Electronics",	"VZ 2001 (Oceania)", GAME_NOT_WORKING )
+COMP( 1983, manager,  lasr2001,	0,		lasr2001,	lasr2001,	0,		lasr2001,	"Salora",					"Manager (Finland)", GAME_NOT_WORKING )
+*/
