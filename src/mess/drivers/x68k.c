@@ -814,6 +814,44 @@ static UINT8 md_6button_r(const device_config* device, int port)
 	return 0xff;
 }
 
+// XPD-1LR dual D-pad controller.
+// Sold with Video Game Anthology Vol 4: Libble Rabble.
+// Also compatible with Video Game Anthology Vol 5: Crazy Climber 1 & 2
+// Uses the same input multiplexer hardware as Megadrive controllers
+// Output is the same as for standard controllers, but when ctl is high,
+// the directions refer to the right D-pad, and when low, the left D-pad
+// The buttons are read the same as normal, regardless of ctl.
+static UINT8 xpd1lr_r(const device_config* device, int port)
+{
+	if(port == 1)
+	{
+		UINT8 porta = input_port_read(device->machine,"xpd1lr") & 0xff;
+		UINT8 portb = (input_port_read(device->machine,"xpd1lr") >> 8) & 0xff;
+		if(x68k_sys.mdctrl.mux1 & 0x10)
+		{	
+			return porta;
+		}
+		else
+		{	
+			return portb | (porta & 0x60);
+		}
+	}
+	if(port == 2)
+	{
+		UINT8 porta = (input_port_read(device->machine,"xpd1lr") >> 16) & 0xff;
+		UINT8 portb = (input_port_read(device->machine,"xpd1lr") >> 24) & 0xff;
+		if(x68k_sys.mdctrl.mux2 & 0x20)
+		{	
+			return porta;
+		}
+		else
+		{	
+			return portb | (porta & 0x60);
+		}
+	}
+	return 0xff;
+}
+
 // Judging from the XM6 source code, PPI ports A and B are joystick inputs
 static READ8_DEVICE_HANDLER( ppi_port_a_r )
 {
@@ -830,6 +868,8 @@ static READ8_DEVICE_HANDLER( ppi_port_a_r )
 			return md_3button_r(device,1);
 		case 0x02:  // 6-button Megadrive gamepad
 			return md_6button_r(device,1);
+		case 0x03:  // XPD-1LR
+			return xpd1lr_r(device,1);
 	}
 	
 	return 0xff;
@@ -850,6 +890,8 @@ static READ8_DEVICE_HANDLER( ppi_port_b_r )
 			return md_3button_r(device,2);
 		case 0x20:  // 6-button Megadrive gamepad
 			return md_6button_r(device,2);
+		case 0x30:  // XPD-1LR
+			return xpd1lr_r(device,2);
 	}
 	
 	return 0xff;
@@ -1884,11 +1926,12 @@ static INPUT_PORTS_START( x68000 )
 	PORT_CATEGORY_ITEM(0x00,"Standard 2-button MSX/FM-Towns joystick",10)
 	PORT_CATEGORY_ITEM(0x01,"3-button Megadrive gamepad",11)
 	PORT_CATEGORY_ITEM(0x02,"6-button Megadrive gamepad",12)
+	PORT_CATEGORY_ITEM(0x03,"XPD-1LR dual D-pad gamepad",13)
 	PORT_CATEGORY_CLASS(0xf0,0x00,"Joystick Port 2")
 	PORT_CATEGORY_ITEM(0x00,"Standard 2-button MSX/FM-Towns joystick",20)
 	PORT_CATEGORY_ITEM(0x10,"3-button Megadrive gamepad",21)
 	PORT_CATEGORY_ITEM(0x20,"6-button Megadrive gamepad",22)
-// TODO: XPD-1LR (Dual D-pad) support
+	PORT_CATEGORY_ITEM(0x30,"XPD-1LR dual D-pad gamepad",23)
 // TODO: Sharp Cyber Stick (CZ-8NJ2) support
 
 	PORT_START( "joy1" )
@@ -2143,6 +2186,44 @@ static INPUT_PORTS_START( x68000 )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2) PORT_NAME("MD Pad 2 Y Button") PORT_CATEGORY(22)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("MD Pad 2 X Button") PORT_CATEGORY(22)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(2) PORT_NAME("MD Pad 2 Mode Button") PORT_CATEGORY(22)
+
+	// Dempa/Micomsoft XPD-1LR (dual D-pad gamepad sold with Libble Rabble)
+	PORT_START("xpd1lr")
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_NAME("XPD Pad 1 Left/Up") PORT_8WAY PORT_PLAYER(1) PORT_CATEGORY(13)
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_NAME("XPD Pad 1 Left/Down") PORT_8WAY PORT_PLAYER(1) PORT_CATEGORY(13)
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT ) PORT_NAME("XPD Pad 1 Left/Left") PORT_8WAY PORT_PLAYER(1) PORT_CATEGORY(13)
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_RIGHT ) PORT_NAME("XPD Pad 1 Left/Right") PORT_8WAY PORT_PLAYER(1) PORT_CATEGORY(13)
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CATEGORY(13)
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("XPD Pad 1 B Button") PORT_CATEGORY(13)
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("XPD Pad 1 A Button") PORT_CATEGORY(13)
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CATEGORY(13)
+
+	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP ) PORT_NAME("XPD Pad 1 Right/Up") PORT_8WAY PORT_PLAYER(1) PORT_CATEGORY(13)
+	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_NAME("XPD Pad 1 Right/Down") PORT_8WAY PORT_PLAYER(1) PORT_CATEGORY(13)
+	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_LEFT ) PORT_NAME("XPD Pad 1 Right/Left") PORT_8WAY PORT_PLAYER(1) PORT_CATEGORY(13)
+	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT ) PORT_NAME("XPD Pad 1 Right/Right") PORT_8WAY PORT_PLAYER(1) PORT_CATEGORY(13)
+	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CATEGORY(13)
+	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CATEGORY(13)
+	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CATEGORY(13)
+	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CATEGORY(13)
+
+	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_NAME("XPD Pad 2 Left/Up") PORT_8WAY PORT_PLAYER(2) PORT_CATEGORY(23)
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_NAME("XPD Pad 2 Left/Down") PORT_8WAY PORT_PLAYER(2) PORT_CATEGORY(23)
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT ) PORT_NAME("XPD Pad 2 Left/Left") PORT_8WAY PORT_PLAYER(2) PORT_CATEGORY(23)
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_RIGHT ) PORT_NAME("XPD Pad 2 Left/Right") PORT_8WAY PORT_PLAYER(2) PORT_CATEGORY(23)
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CATEGORY(23)
+	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("XPD Pad 2 B Button") PORT_CATEGORY(23)
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("XPD Pad 2 A Button") PORT_CATEGORY(23)
+	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CATEGORY(23)
+
+	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP ) PORT_NAME("XPD Pad 2 Right/Up") PORT_8WAY PORT_PLAYER(2) PORT_CATEGORY(23)
+	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_NAME("XPD Pad 2 Right/Down") PORT_8WAY PORT_PLAYER(2) PORT_CATEGORY(23)
+	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_LEFT ) PORT_NAME("XPD Pad 2 Right/Left") PORT_8WAY PORT_PLAYER(2) PORT_CATEGORY(23)
+	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT ) PORT_NAME("XPD Pad 2 Right/Right") PORT_8WAY PORT_PLAYER(2) PORT_CATEGORY(23)
+	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CATEGORY(23)
+	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CATEGORY(23)
+	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CATEGORY(23)
+	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CATEGORY(23)
 
 INPUT_PORTS_END
 

@@ -10,6 +10,8 @@ System Driver Changes:
 ----------------------
 - [CRVISION] Added support for stereo tapes. [Curt Coder]
 
+- [X68000] Added support for the XPD-1LR dual D-pad controller.  [Barry Rodewald]
+
 
 
 User Interface Changes:
