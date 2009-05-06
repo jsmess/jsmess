@@ -1151,9 +1151,9 @@ const game_driver * const drivers[] =
 	DRIVER( npc8201 )
 
 	/* Nakajima manufactured eletronic typewriters */
-	DRIVER( drwrt400 )	/* 199? NTS DreamWriter T400                         */
+	DRIVER( drwrt400 )	/* 1996 NTS DreamWriter T400                         */
 	DRIVER( wales210 )	/* 199? Walther ES-210 (German)                      */
-	DRIVER( dator3k )	/* 199? Dator 3000 (Spanish)                        */
+	DRIVER( dator3k )	/* 199? Dator 3000 (Spanish)                         */
 
 	/* Votrax */
 //	DRIVER( votrtnt ) /* Votrax Type-N-Talk */

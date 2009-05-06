@@ -246,6 +246,6 @@ ROM_END
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE      INPUT     INIT    CONFIG  COMPANY    FULLNAME            FLAGS */
 COMP( 199?, wales210,        0, 0,      nakajies128, nakajies, 0,      0,      "Walther", "ES-210",           GAME_NOT_WORKING )	/* German */
 COMP( 199?, dator3k,  wales210, 0,      nakajies128, nakajies, 0,      0,      "Dator",   "Dator 3000",       GAME_NOT_WORKING )	/* Spanish */
-COMP( 199?, drwrt400, wales210, 0,      nakajies256, nakajies, 0,      0,      "NTS",     "DreamWriter T400", GAME_NOT_WORKING )	/* English */
+COMP( 1996, drwrt400, wales210, 0,      nakajies256, nakajies, 0,      0,      "NTS",     "DreamWriter T400", GAME_NOT_WORKING )	/* English */
 
 
