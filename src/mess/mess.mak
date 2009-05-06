@@ -523,6 +523,8 @@ $(MESSOBJ)/amiga.a: \
 	$(MESS_MACHINE)/matsucd.o	\
 	$(MESS_MACHINE)/amigakbd.o	\
 	$(MESS_DRIVERS)/amiga.o		\
+	$(MAME_MACHINE)/cubocd32.o	\
+	$(MESS_DRIVERS)/ami1200.o	\
 
 $(MESSOBJ)/cbmshare.a: \
 	$(MESS_FORMATS)/cbm_tap.o 	\

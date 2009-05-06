@@ -411,7 +411,10 @@ const game_driver * const drivers[] =
 	DRIVER( a500p )		/* Commodore Amiga 500 - PAL						*/
 	DRIVER( a1000n )	/* Commodore Amiga 1000 - NTSC						*/
 	DRIVER( a1000p )	/* Commodore Amiga 1000 - PAL						*/
-	DRIVER( cdtv )
+	DRIVER( cdtv )		/* Commodore CDTV									*/
+	DRIVER( a1200n )	/* Commodore Amiga 1200 - NTSC						*/
+	DRIVER( a1200p )	/* Commodore Amiga 1200 - PAL						*/
+	DRIVER( cd32 )		/* Commodore Amiga CD32								*/
 
 	DRIVER( c65 )		/* 1991 C65 / C64DX (Prototype, NTSC)				*/
 	DRIVER( c64dx )		/* 1991 C65 / C64DX (Prototype, German PAL)			*/
