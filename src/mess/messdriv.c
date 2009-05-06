@@ -649,7 +649,7 @@ const game_driver * const drivers[] =
 	/* VIDEO TECHNOLOGY */
 	DRIVER( crvision )	/* 1981 creatiVision								*/
 	DRIVER( fnvision )	/* 1983 FunVision									*/
-	DRIVER( crvisiop )
+	DRIVER( crvisioj )
 	DRIVER( wizzard )
 	DRIVER( rameses )
 	DRIVER( vz2000 )
