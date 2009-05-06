@@ -94,10 +94,10 @@ struct _cdp1861_interface
 DEVICE_GET_INFO( cdp1861 );
 
 /* display on */
-READ8_DEVICE_HANDLER( cdp1861_dispon_r );
+WRITE_LINE_DEVICE_HANDLER( cdp1861_dispon_w );
 
 /* display off */
-WRITE8_DEVICE_HANDLER( cdp1861_dispoff_w );
+WRITE_LINE_DEVICE_HANDLER( cdp1861_dispoff_w );
 
 /* DMA write */
 void cdp1861_dma_w(const device_config *device, UINT8 data);

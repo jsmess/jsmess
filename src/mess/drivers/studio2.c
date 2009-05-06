@@ -186,8 +186,8 @@ Notes:
 
     TODO:
 
-	- rewrite cartridge loading
-	- cpu clock from schematics
+	- studio2 cpu clock from schematics
+	- visicom alternate videoram @ 0x1300 ?
     - mpt02/mustang cdp1864 colors
     - discrete sound
 	- Academy Apollo 80 (Germany)
@@ -212,25 +212,42 @@ static WRITE8_HANDLER( keylatch_w )
 	state->keylatch = data & 0x0f;
 }
 
+static READ8_DEVICE_HANDLER( studio2_cdp1861_dispon_r )
+{
+	cdp1861_dispon_w(device, 1);
+	cdp1861_dispon_w(device, 0);
+
+	return 0xff;
+}
+
+static WRITE8_DEVICE_HANDLER( visicom_cdp1861_dispon_w )
+{
+	cdp1861_dispon_w(device, 1);
+	cdp1861_dispon_w(device, 0);
+}
+
 /* Memory Maps */
 
 static ADDRESS_MAP_START( studio2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x0800, 0x09ff) AM_RAM AM_MIRROR(0x400)
+	AM_RANGE(0x0800, 0x09ff) AM_MIRROR(0xf400) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( studio2_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x01, 0x01) AM_DEVREAD(CDP1861_TAG, cdp1861_dispon_r)
+	AM_RANGE(0x01, 0x01) AM_DEVREAD(CDP1861_TAG, studio2_cdp1861_dispon_r)
 	AM_RANGE(0x02, 0x02) AM_WRITE(keylatch_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( visicom_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x1000, 0x13ff) AM_RAM
+	AM_RANGE(0x1000, 0x10ff) AM_MIRROR(0x200) AM_RAM
+	AM_RANGE(0x1100, 0x11ff) AM_RAM
+//	AM_RANGE(0x1200, 0x12ff) AM_RAM
+	AM_RANGE(0x1300, 0x13ff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( visicom_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(CDP1861_TAG, cdp1861_dispon_r, cdp1861_dispoff_w)
+	AM_RANGE(0x01, 0x01) AM_DEVWRITE(CDP1861_TAG, visicom_cdp1861_dispon_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(keylatch_w)
 ADDRESS_MAP_END
 
@@ -673,13 +690,12 @@ static DRIVER_INIT( studio2 )
 	timer_set(machine, attotime_zero, NULL, 0, setup_beep);
 }
 
-
 /* Game Drivers */
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        CONFIG      COMPANY   FULLNAME */
-CONS( 1977,	studio2,	0,		0,		studio2,	studio2,	studio2,	0,	"RCA",		"Studio II", GAME_SUPPORTS_SAVE )
-CONS( 1978, visicom,	studio2,0,		visicom,	studio2,	studio2,	0,	"Toshiba",	"Visicom (Japan)", GAME_NOT_WORKING )
-CONS( 1978,	mpt02s,		studio2,0,		mpt02,		studio2,	studio2,	0,	"Soundic",	"MPT-02 Victory Home TV Programmer (Austria)", GAME_NOT_WORKING )
-CONS( 1978,	mpt02h,		studio2,0,		mpt02,		studio2,	studio2,	0,	"Hanimex",	"MPT-02 Jeu TV Programmable (France)", GAME_NOT_WORKING )
-CONS( 1978,	mtc9016,	studio2,0,		mpt02,		studio2,	studio2,	0,	"Mustang",	"9016 Telespiel Computer (Germany)", GAME_NOT_WORKING )
-CONS( 1978, shmc1200,	studio2,0,		mpt02,		studio2,	studio2,	0,	"Sheen",	"1200 Micro Computer (Australia)", GAME_NOT_WORKING )
+CONS( 1977,	studio2,	0,		0,		studio2,	studio2,	studio2,	0,			"RCA",		"Studio II", GAME_SUPPORTS_SAVE )
+CONS( 1978, visicom,	studio2,0,		visicom,	studio2,	studio2,	0,			"Toshiba",	"Visicom (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+CONS( 1978,	mpt02s,		studio2,0,		mpt02,		studio2,	studio2,	0,			"Soundic",	"MPT-02 Victory Home TV Programmer (Austria)", GAME_NOT_WORKING )
+CONS( 1978,	mpt02h,		studio2,0,		mpt02,		studio2,	studio2,	0,			"Hanimex",	"MPT-02 Jeu TV Programmable (France)", GAME_NOT_WORKING )
+CONS( 1978,	mtc9016,	studio2,0,		mpt02,		studio2,	studio2,	0,			"Mustang",	"9016 Telespiel Computer (Germany)", GAME_NOT_WORKING )
+CONS( 1978, shmc1200,	studio2,0,		mpt02,		studio2,	studio2,	0,			"Sheen",	"1200 Micro Computer (Australia)", GAME_NOT_WORKING )

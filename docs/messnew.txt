@@ -1,4 +1,4 @@
-0.131.1
+﻿0.131.1
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
@@ -11,6 +11,9 @@ System Driver Changes:
 - [CRVISION] Added support for stereo tapes. [Curt Coder]
 
 - [X68000] Added support for the XPD-1LR dual D-pad controller.  [Barry Rodewald]
+
+- [VISICOM] Toshiba Visicom is now working and playable, but the
+  graphics emulation is not perfect yet. [Curt Coder]
 
 
 

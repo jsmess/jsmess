@@ -298,6 +298,20 @@ static WRITE8_HANDLER( bankswitch_w )
 	}
 }
 
+static READ8_DEVICE_HANDLER( vip_cdp1861_dispon_r )
+{
+	cdp1861_dispon_w(device, 1);
+	cdp1861_dispon_w(device, 0);
+
+	return 0xff;
+}
+
+static WRITE8_DEVICE_HANDLER( vip_cdp1861_dispoff_w )
+{
+	cdp1861_dispoff_w(device, 1);
+	cdp1861_dispoff_w(device, 0);
+}
+
 /* Memory Maps */
 
 static ADDRESS_MAP_START( vip_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -307,7 +321,7 @@ static ADDRESS_MAP_START( vip_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vip_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(CDP1861_TAG, cdp1861_dispon_r, cdp1861_dispoff_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(CDP1861_TAG, vip_cdp1861_dispon_r, vip_cdp1861_dispoff_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(keylatch_w)
 //	AM_RANGE(0x03, 0x03) AM_DEVWRITE(CDP1863_TAG, cdp1863_str_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(bankswitch_w)

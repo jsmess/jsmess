@@ -250,6 +250,20 @@ static WRITE8_DEVICE_HANDLER( oscnano_bankswitch_w )
 	cdp1864_tone_latch_w(device, 0, data);
 }
 
+static READ8_DEVICE_HANDLER( tmc1800_cdp1861_dispon_r )
+{
+	cdp1861_dispon_w(device, 1);
+	cdp1861_dispon_w(device, 0);
+
+	return 0xff;
+}
+
+static WRITE8_DEVICE_HANDLER( tmc1800_cdp1861_dispoff_w )
+{
+	cdp1861_dispoff_w(device, 1);
+	cdp1861_dispoff_w(device, 0);
+}
+
 /* Memory Maps */
 
 // Telmac 1800
@@ -260,7 +274,7 @@ static ADDRESS_MAP_START( tmc1800_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tmc1800_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(CDP1861_TAG, cdp1861_dispon_r, cdp1861_dispoff_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(CDP1861_TAG, tmc1800_cdp1861_dispon_r, tmc1800_cdp1861_dispoff_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(tmc1800_keylatch_w)
 ADDRESS_MAP_END
 
