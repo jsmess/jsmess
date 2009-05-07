@@ -121,13 +121,13 @@ INLINE UINT8 get_timer_mode(pio8155_t *pio8155)
 	return (pio8155->count_length >> 8) & PIO8155_TIMER_MODE_MASK;
 }
 
-INLINE timer_output(pio8155_t *pio8155)
+INLINE void timer_output(pio8155_t *pio8155)
 {
 	devcb_call_write_line(&pio8155->out_to_func, pio8155->to);
 	logerror("8155 Timer Output: %u\n", pio8155->to);
 }
 
-INLINE pulse_timer_output(pio8155_t *pio8155)
+INLINE void pulse_timer_output(pio8155_t *pio8155)
 {
 	pio8155->to = 0; timer_output(pio8155);
 	pio8155->to = 1; timer_output(pio8155);
