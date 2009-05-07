@@ -9,7 +9,6 @@
 	Very preliminary emulation
 	
 	TODO:
-		- implement TP settings to 64Hz, 256Hz, 2048Hz (started implementation)
 		- implement Set Clock mode
 		- implement TEST Mode
 		- what about data_in?
@@ -28,14 +27,16 @@
 typedef struct _upd1990a_t upd1990a_t;
 struct _upd1990a_t
 {
+	devcb_resolved_write_line	out_tp_func;
+
 	UINT8 shift_reg[5];	/* 40 Bit Shift Register */
 	UINT8 data_in;
 	UINT8 data_out;
 	UINT8 shift_mode;
 	UINT16 freq_divider;
-    emu_timer *tp;
+    
+	emu_timer *tp_timer;
 };
-
 
 /***************************************************************************
     INLINE FUNCTIONS
@@ -50,6 +51,12 @@ INLINE upd1990a_t *get_safe_token(const device_config *device)
 	return (upd1990a_t *)device->token;
 }
 
+INLINE const upd1990a_interface *get_interface(const device_config *device)
+{
+	assert(device != NULL);
+	assert((device->type == UPD1990A));
+	return (const upd1990a_interface *) device->static_config;
+}
 
 /***************************************************************************
     IMPLEMENTATION
@@ -136,9 +143,9 @@ WRITE8_DEVICE_HANDLER( upd1990a_w )
 	{	
 		UINT16 frequency = UPD1990AC_XTAL / upd1990a->freq_divider;
 
-//		logerror("TP freq %d \n", frequency);
+		logerror("TP freq %d \n", frequency);
 
-		timer_adjust_periodic(upd1990a->tp, attotime_zero, 0, ATTOTIME_IN_HZ(frequency));
+		timer_adjust_periodic(upd1990a->tp_timer, attotime_zero, 0, ATTOTIME_IN_HZ(frequency));
 	}
 }
 
@@ -171,15 +178,13 @@ READ8_DEVICE_HANDLER( upd1990a_data_out_r )
 	return upd1990a->data_out;
 }
 
-static TIMER_CALLBACK( rtc_tick )
+static TIMER_CALLBACK( tp_tick )
 {
-	const device_config *device = devtag_get_device(machine, "rtc");
+	const device_config *device = ptr;
 	upd1990a_t *upd1990a = get_safe_token(device);
-	UINT16 frequency = UPD1990AC_XTAL / upd1990a->freq_divider;
 
-	logerror("TP freq %d \n", frequency);
-
-//	take system time here?
+	devcb_call_write_line(&upd1990a->out_tp_func, ASSERT_LINE);
+	devcb_call_write_line(&upd1990a->out_tp_func, CLEAR_LINE);
 }
 
 /* Untested save state support */
@@ -187,23 +192,25 @@ static void upd1990a_register_state_save(const device_config *device)
 {
     upd1990a_t* upd1990a = get_safe_token( device );
 
-    state_save_register_global(device->machine, upd1990a->shift_reg[0]);
-    state_save_register_global(device->machine, upd1990a->shift_reg[1]);
-    state_save_register_global(device->machine, upd1990a->shift_reg[2]);
-    state_save_register_global(device->machine, upd1990a->shift_reg[3]);
-    state_save_register_global(device->machine, upd1990a->shift_reg[4]);
+    state_save_register_global_array(device->machine, upd1990a->shift_reg);
     state_save_register_global(device->machine, upd1990a->data_in);
     state_save_register_global(device->machine, upd1990a->data_out);
     state_save_register_global(device->machine, upd1990a->shift_mode);
     state_save_register_global(device->machine, upd1990a->freq_divider);
 }
 
-
 static DEVICE_START( upd1990a )
 {
 	upd1990a_t *upd1990a = get_safe_token(device);
+	const upd1990a_interface *intf = get_interface(device);
 
-	upd1990a->tp = timer_alloc(device->machine, rtc_tick, 0);
+	/* resolve callbacks */
+	devcb_resolve_write_line(&upd1990a->out_tp_func, &intf->out_tp_func, device);
+
+	/* create the timers */
+	upd1990a->tp_timer = timer_alloc(device->machine, tp_tick, (void *)device);
+
+	/* register for state saving */
 	upd1990a_register_state_save(device);
 }
 
