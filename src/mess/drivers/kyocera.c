@@ -26,7 +26,6 @@
 		* what are the differences between available BIOSes for trsm100 and olivm10?
 		* Tandy Model 200 support (video emulation completely different, but also 
 		  memory map & IO have to be adapted)
-		* PIO8155 might be made an independent device
 		* clean up driver and split machine & video parts
 
 	  - Find dumps of systems which could easily be added:
@@ -43,6 +42,7 @@
 #include "driver.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/upd1990a.h"
+#include "machine/8155pio.h"
 
 static UINT8 rom_page, ram_page;
 static UINT8 port_a, port_b, port_c;
@@ -157,90 +157,6 @@ static WRITE8_HANDLER( pc8201_bank_write )
 			
 	io_A1 = data & 0x0f;
 }
-
-// 0xB8
-static WRITE8_HANDLER( pio8155_status_write )
-{
-// enable-disable
-			/*
-			Bit:
-			    0 - Direction of Port A (0-input, 1-output)
-			    1 - Direction of Port B (0-input, 1-output)
-			2 & 3 - Port C definition (00 - All input, 11 - All output, 
-				01 - Alt 3, 10 - Alt 4 (see Intel technical sheets 
-				for more information))
-			    4 - Enable Port A interrupt (1 - enable)
-			    5 - Enable Port B interrupt (1 - enable)
-			6 & 7 - Timer mode (00 - No effect on counter, 01 - Stop 
-				counter immediately, 10 - Stop counter after TC, 11 
-				- Start counter) */
-}
-
-// 0xB9
-static WRITE8_HANDLER( pio8155_portA_write )
-{
-	port_a = data;
-	lcd_bank_update( port_a | ((port_b & 3) << 8) );
-
-			/*
-			The first 5 bits of this port is used to control the 1990 real time clock chip.  
-			The configuration of these five bits are:
-			Bit:
-			    0 -  C0
-			    1 -  C1
-			    2 -  C2
-			    3 -  Clock
-			    4 -  Serial data into clock chip */
-	if ((data & 0x08) != (port_a & 0x08))
-	{
-		const device_config *rtc = devtag_get_device(space->machine, "rtc");
-		upd1990a_clk_w(rtc, offset, data);
-		logerror("CLK write %d\n", data);
-	}
-}
-
-// 0xBA
-static WRITE8_HANDLER( pio8155_portB_write )
-{
-			/*
-			Bit:
-			    0 - Column 9 select line for keyboard.  This line is
-				also used for the CS-28 line of the LCD.
-			    1 - CS 29 line of LCD
-			    2 - Beep toggle (1-Data from bit 5, 0-Data from 8155 
-				timer)
-			    3 - Serial toggle (1-Modem, 0-RS232)
-			    4 - Software on/off switch for computer
-			    5 - Data to beeper if bit 2 set.  Set if bit 2 low.
-			    6 - DTR (not) line for RS232
-			    7 - RTS (not) line for RS232 */
-	port_b = data;
-	lcd_bank_update( port_a | ((port_b & 3) << 8) );
-}
-
-// 0xBB
-static WRITE8_HANDLER( pio8155_portC_write )
-{
-	port_c = data;
-}
-
-// 0xBC
-static WRITE8_HANDLER( pio8155_timer_lsb_write )
-{
-	timer_lsb = data;
-}
-
-// 0xBD
-static WRITE8_HANDLER( pio8155_timer_msb_write )
-{
-	UINT8 timer_counter = 0;
-
-	timer_msb = data;
-	timer_counter = (timer_lsb | (timer_msb & 0x3f) << 8);
-	
-	// set serial baud
-}
-
 
 // 0xC0->0xCF
 // serial write byet
@@ -410,62 +326,6 @@ static READ8_HANDLER( pc8201_bank_read )
 	return io_A1;
 }
 
-// 0xB8
-static READ8_HANDLER( pio8155_status_read )
-{
-			/*
-			Bit:
-			    0 - Port A interrupt request
-			    1 - Port A buffer full/empty (input/output)
-			    2 - Port A interrupt enabled
-			    3 - Port B interrupt request
-			    4 - Port B buffer full/empty (input/output)
-			    5 - Port B interrupt enabled
-			    6 - Timer interrupt (status of TC pin)
-			    7 - Not used */
-
-	/* Force TC high */
-	return 0x89;
-}
-
-// 0xB9
-static READ8_HANDLER( pio8155_portA_read )
-{
-	return port_a;
-}
-
-// 0xBA
-static READ8_HANDLER( pio8155_portB_read )
-{
-	return port_b;
-}
-
-// 0xBB
-static READ8_HANDLER( pio8155_portC_read )
-{
-	const device_config *rtc = devtag_get_device(space->machine, "rtc");
-	port_c = (port_c & ~0x01) | upd1990a_data_out_r(rtc, offset);
-
-	return port_c;
-			/*
-			Bits:
-			    0 - Serial data input from clock chip
-			    1 - Busy (not) signal from printer
-			    2 - Busy signal from printer
-			    3 - Data from BCR
-			    4 - CTS (not) line from RS232
-			    5 - DSR (not) line from RS232
-			    6-7 - Not avaiable on 8155 */
-}
-
-// 0xBC
-// 0xBD
-static READ8_HANDLER( pio8155_timer_read )
-{
-	logerror("kyocera timer r: %04x\n", offset);
-	return 0;
-}
-
 // 0xC0->0xCF all systems but T200
 // serial read byte
 
@@ -557,12 +417,7 @@ static ADDRESS_MAP_START( kyo85_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x82, 0x82) AM_READ( io82_read )
 	AM_RANGE(0x83, 0x9f) AM_READWRITE( unk_read, unk_write )
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE( modem_control_port_read, modem_control_port_write )
-	AM_RANGE(0xb9, 0xb9) AM_READWRITE( pio8155_portA_read, pio8155_portA_write )
-	AM_RANGE(0xba, 0xba) AM_READWRITE( pio8155_portB_read, pio8155_portB_write )
-	AM_RANGE(0xbb, 0xbb) AM_READWRITE( pio8155_portC_read, pio8155_portC_write )
-	AM_RANGE(0xbc, 0xbd) AM_READ( pio8155_timer_read )			// currently, this only logs read attempts
-	AM_RANGE(0xbc, 0xbc) AM_WRITE( pio8155_timer_lsb_write )	// these should set serial comms but it's not yet implemented
-	AM_RANGE(0xbd, 0xbd) AM_WRITE( pio8155_timer_msb_write )
+	AM_RANGE(0xb8, 0xbf) AM_DEVREADWRITE( "pio8155", pio8155_r, pio8155_w )
 	AM_RANGE(0xd8, 0xd8) AM_READ( uart_read )
 	AM_RANGE(0xe0, 0xe8) AM_READ( keyboard_read )
 	AM_RANGE(0xe0, 0xe8) AM_READWRITE( keyboard_read, ioE8_write )
@@ -575,13 +430,7 @@ static ADDRESS_MAP_START( pc8201_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x90, 0x90) AM_WRITE( pc8201_io90_write )
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE( pc8201_ioa0_read, modem_control_port_write )
 	AM_RANGE(0xa1, 0xa1) AM_READWRITE( pc8201_bank_read, pc8201_bank_write )
-	AM_RANGE(0xb8, 0xb8) AM_READWRITE( pio8155_status_read, pio8155_status_write )
-	AM_RANGE(0xb9, 0xb9) AM_READWRITE( pio8155_portA_read, pio8155_portA_write )
-	AM_RANGE(0xba, 0xba) AM_READWRITE( pio8155_portB_read, pio8155_portB_write )
-	AM_RANGE(0xbb, 0xbb) AM_READWRITE( pio8155_portC_read, pio8155_portC_write )
-	AM_RANGE(0xbc, 0xbd) AM_READ( pio8155_timer_read )			// currently, this only logs read attempts
-	AM_RANGE(0xbc, 0xbc) AM_WRITE( pio8155_timer_lsb_write )	// these should set serial comms but it's not yet implemented
-	AM_RANGE(0xbd, 0xbd) AM_WRITE( pio8155_timer_msb_write )
+	AM_RANGE(0xb8, 0xbf) AM_DEVREADWRITE( "pio8155", pio8155_r, pio8155_w )
 	AM_RANGE(0xd8, 0xd8) AM_READ( uart_read )
 	AM_RANGE(0xe0, 0xe8) AM_READ( keyboard_read )
 //	AM_RANGE(0xe0, 0xe8) AM_READWRITE( keyboard_read, ioE8_write )
@@ -596,12 +445,7 @@ static ADDRESS_MAP_START( trs200_io, ADDRESS_SPACE_IO, 8 )
 //	AM_RANGE(0x90, 0x90) AM_WRITE( trs200_clock_mode_write )
 //	AM_RANGE(0x91, 0x9f) AM_READWRITE( unk_read, unk_write )
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE( modem_control_port_read, modem_control_port_write )
-	AM_RANGE(0xb9, 0xb9) AM_READWRITE( pio8155_portA_read, pio8155_portA_write )
-	AM_RANGE(0xba, 0xba) AM_READWRITE( pio8155_portB_read, pio8155_portB_write )
-	AM_RANGE(0xbb, 0xbb) AM_READWRITE( pio8155_portC_read, pio8155_portC_write )
-	AM_RANGE(0xbc, 0xbd) AM_READ( pio8155_timer_read )			// currently, this only logs read attempts
-	AM_RANGE(0xbc, 0xbc) AM_WRITE( pio8155_timer_lsb_write )	// these should set serial comms but it's not yet implemented
-	AM_RANGE(0xbd, 0xbd) AM_WRITE( pio8155_timer_msb_write )
+	AM_RANGE(0xb8, 0xbf) AM_DEVREADWRITE( "pio8155", pio8155_r, pio8155_w )
 	AM_RANGE(0xd0, 0xdf) AM_READWRITE( trs200_bank_read, trs200_bank_write )
 	AM_RANGE(0xe0, 0xe8) AM_READ( keyboard_read )
 //	AM_RANGE(0xe0, 0xe8) AM_READWRITE( keyboard_read, ioE8_write )
@@ -893,6 +737,74 @@ static UPD1990A_INTERFACE( kyocera_upd1990a_intf )
 	DEVCB_CPU_INPUT_LINE("maincpu", I8085_RST75_LINE)
 };
 
+static READ8_DEVICE_HANDLER( kyocera_8155_port_c_r )
+{
+	const device_config *rtc = devtag_get_device(device->machine, "rtc");
+	port_c = (port_c & ~0x01) | upd1990a_data_out_r(rtc, offset);
+
+	return port_c;
+			/*
+			Bits:
+			    0 - Serial data input from clock chip
+			    1 - Busy (not) signal from printer
+			    2 - Busy signal from printer
+			    3 - Data from BCR
+			    4 - CTS (not) line from RS232
+			    5 - DSR (not) line from RS232
+			    6-7 - Not avaiable on 8155 */
+}
+
+static WRITE8_DEVICE_HANDLER( kyocera_8155_port_a_w )
+{
+	port_a = data;
+	lcd_bank_update( port_a | ((port_b & 3) << 8) );
+
+			/*
+			The first 5 bits of this port is used to control the 1990 real time clock chip.  
+			The configuration of these five bits are:
+			Bit:
+			    0 -  C0
+			    1 -  C1
+			    2 -  C2
+			    3 -  Clock
+			    4 -  Serial data into clock chip */
+	if ((data & 0x08) != (port_a & 0x08))
+	{
+		const device_config *rtc = devtag_get_device(device->machine, "rtc");
+		upd1990a_clk_w(rtc, offset, data);
+		logerror("CLK write %d\n", data);
+	}
+}
+
+static WRITE8_DEVICE_HANDLER( kyocera_8155_port_b_w )
+{
+			/*
+			Bit:
+			    0 - Column 9 select line for keyboard.  This line is
+				also used for the CS-28 line of the LCD.
+			    1 - CS 29 line of LCD
+			    2 - Beep toggle (1-Data from bit 5, 0-Data from 8155 
+				timer)
+			    3 - Serial toggle (1-Modem, 0-RS232)
+			    4 - Software on/off switch for computer
+			    5 - Data to beeper if bit 2 set.  Set if bit 2 low.
+			    6 - DTR (not) line for RS232
+			    7 - RTS (not) line for RS232 */
+	port_b = data;
+	lcd_bank_update( port_a | ((port_b & 3) << 8) );
+}
+
+static PIO8155_INTERFACE( kyocera_8155_intf )
+{
+	DEVCB_NULL,								/* port A read */
+	DEVCB_NULL,								/* port B read */
+	DEVCB_HANDLER(kyocera_8155_port_c_r),	/* port C read */
+	DEVCB_HANDLER(kyocera_8155_port_a_w),	/* port A write */
+	DEVCB_HANDLER(kyocera_8155_port_b_w),	/* port B write */
+	DEVCB_NULL,								/* port C write */
+	DEVCB_NULL								/* timer output */
+};
+
 static MACHINE_DRIVER_START( kyo85 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", 8085A, 2400000)
@@ -922,6 +834,7 @@ static MACHINE_DRIVER_START( kyo85 )
 //	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
+	MDRV_PIO8155_ADD("pio8155", 2400000, kyocera_8155_intf)
 	MDRV_UPD1990A_ADD("rtc", XTAL_32_768kHz, kyocera_upd1990a_intf)
 MACHINE_DRIVER_END
 
