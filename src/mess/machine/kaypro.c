@@ -42,8 +42,9 @@ static WRITE8_DEVICE_HANDLER( pio_system_w )
 {
 /*	d7 bank select
 	d6 disk drive motors - not emulated
-	d5 double-density enable
+	d5 double-density enable (0=double density)
 	d4 Centronics strobe
+	d2 side select (1=side 1)
 	d1 drive B
 	d0 drive A */
 
@@ -65,7 +66,7 @@ static WRITE8_DEVICE_HANDLER( pio_system_w )
 		memory_set_bankptr(mem->machine, 3, memory_region(mem->machine, "rambank"));
 	}
 
-	wd17xx_set_density(kaypro_fdc, (data & 0x20) ? 1 : 0);
+	wd17xx_set_density(kaypro_fdc, (data & 0x20) ? 0 : 1);
 
 	centronics_strobe_w(kaypro_printer, BIT(data, 4));
 
@@ -75,8 +76,7 @@ static WRITE8_DEVICE_HANDLER( pio_system_w )
 	if (data & 2)
 		wd17xx_set_drive(kaypro_fdc, 1);
 
-	if (data & 3)
-		wd17xx_set_side(kaypro_fdc, 0);	/* only has 1 side */
+	wd17xx_set_side(kaypro_fdc, (data & 4) ? 1 : 0);	/* only has one side but this circuit exists... */
 }
 
 const z80pio_interface kayproii_pio_g_intf =
@@ -173,7 +173,7 @@ WRITE8_HANDLER( kaypro2x_system_port_w )
 		memory_set_bankptr(mem->machine, 3, memory_region(mem->machine, "rambank"));
 	}
 
-	wd17xx_set_density(kaypro_fdc, (data & 0x20) ? 1 : 0);
+	wd17xx_set_density(kaypro_fdc, (data & 0x20) ? 0 : 1);
 
 	centronics_strobe_w(kaypro_printer, BIT(data, 3));
 
@@ -183,8 +183,7 @@ WRITE8_HANDLER( kaypro2x_system_port_w )
 	if (data & 2)
 		wd17xx_set_drive(kaypro_fdc, 1);
 
-	if (data & 3)
-		wd17xx_set_side(kaypro_fdc, (data & 4) ? 0 : 1);	/* The line is marked "/SIDE ONE" */
+	wd17xx_set_side(kaypro_fdc, (data & 4) ? 0 : 1);
 }
 
 
@@ -321,29 +320,33 @@ WRITE8_DEVICE_HANDLER( kaypro2x_sio_w )
 }
 
 
-/***********************************************************
+/*************************************************************************************
 
 	Floppy DIsk
 
-	If there is no diskette in the drive, the cpu will
-	HALT, until the fdc does a NMI. NMI is deactivated
-	otherwise.
+	If DRQ or IRQ is set, and cpu is halted, the NMI goes low.
+	Since the HALT occurs last (and has no callback mechanism), we need to set
+	a short delay, to give time for the processor to execute the HALT before NMI
+	becomes active.
 
-************************************************************/
+*************************************************************************************/
+
+static TIMER_CALLBACK( kaypro_timer_callback )
+{
+	if (cpu_get_reg(cputag_get_cpu(machine, "maincpu"), Z80_HALT))
+		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, 1);
+}
+
 
 static WD17XX_CALLBACK( kaypro_fdc_callback )
 {
-	switch (state)
+	if ((state == WD17XX_DRQ_SET) || (state == WD17XX_IRQ_SET))
 	{
-		case WD17XX_DRQ_CLR:
-		case WD17XX_IRQ_CLR:
-			cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, 0);
-			break;
-		case WD17XX_DRQ_SET:
-		case WD17XX_IRQ_SET:
-			if (cpu_get_reg(cputag_get_cpu(device->machine, "maincpu"), Z80_HALT))
-				cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
-			break;
+		timer_set(device->machine, ATTOTIME_IN_USEC(10), NULL, 0, kaypro_timer_callback);
+	}
+	else
+	{
+		cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, 0);
 	}
 }
 
@@ -353,7 +356,7 @@ static DEVICE_IMAGE_LOAD( kayproii_floppy )
 {
 	if (device_load_basicdsk_floppy(image)==INIT_PASS)
 	{
-		basicdsk_set_geometry(image, 40, 1, 40, 128, 0, 0, FALSE);
+		basicdsk_set_geometry(image, 40, 1, 10, 512, 0, 0, FALSE);
 		return INIT_PASS;
 	}
 
@@ -364,7 +367,7 @@ static DEVICE_IMAGE_LOAD( kaypro2x_floppy )
 {
 	if (device_load_basicdsk_floppy(image)==INIT_PASS)
 	{
-		basicdsk_set_geometry(image, 80, 2, 40, 128, 0, 0, FALSE);
+		basicdsk_set_geometry(image, 80, 2, 10, 512, 0, 0, FALSE);
 		return INIT_PASS;
 	}
 
