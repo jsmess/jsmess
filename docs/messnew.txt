@@ -5,6 +5,8 @@ New System Drivers Supported (in no particular order):
 - Amiga 1200 NTSC & PAL (not working)  [incog nito, Fabio Priuli]
 - Amiga CD32 (not working)  [incog nito, Fabio Priuli]
 - CD-I (not working)  [incog nito]
+- NTS DreamWriter T200 (not working)  [Roberto Carlos
+  Fernandez Gerhardt, Wilbert Pol]
 
 
 
