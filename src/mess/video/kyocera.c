@@ -1,7 +1,7 @@
 #include "driver.h"
 #include "includes/kyocera.h"
 
-static bitmap_t *tmpbitmap;
+static bitmap_t *kyo_tmpbitmap;
 static int bank;
 static UINT8 lcd[11][256];
 static UINT8 lcd_addr[10];
@@ -117,7 +117,7 @@ WRITE8_HANDLER( kyo85_lcd_data_w )
 	for (y = 0; y < 8; y++)
 	{
 		int color = BIT(data, y);
-		*BITMAP_ADDR16(tmpbitmap, sy + y, sx) = color;
+		*BITMAP_ADDR16(kyo_tmpbitmap, sy + y, sx) = color;
 	}
 
 	//logerror("LCD driver %u column %u row %u data write %02x\n", bank, addr & 0x3f, addr >> 6, data);
@@ -134,12 +134,12 @@ PALETTE_INIT( kyo85 )
 VIDEO_START( kyo85 )
 {
 	/* allocate the temporary bitmap */
-	tmpbitmap = auto_bitmap_alloc(240, 64, BITMAP_FORMAT_INDEXED16);
+	kyo_tmpbitmap = auto_bitmap_alloc(240, 64, BITMAP_FORMAT_INDEXED16);
 }
 
 VIDEO_UPDATE( kyo85 )
 {
-	copybitmap(bitmap, tmpbitmap, 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, kyo_tmpbitmap, 0, 0, 0, 0, cliprect);
 
 	return 0;
 }
