@@ -56,16 +56,46 @@ typedef struct {
 
 static BOARD_FIELD m_board[8][8];
 
-static int irq_edge=0x00;
+static const BOARD_FIELD start_board[8][8] =
+{
+	{ { 7,44,434,"WR1"}, { 6,100,434,"WN1"}, { 5,156,434,"WB1"}, { 4,212,434,"WQ1"}, { 3,268,434,"WK"}, { 2,324,434,"WB2"}, { 1,380,434,"WN2"}, { 0,436,434,"WR2"} },
+	{ {15,44,378,"WP1"}, {14,100,378,"WP2"}, {13,156,378,"WP3"}, {12,212,378,"WP4"}, {11,268,378,"WP5"}, {10,324,378,"WP6"}, { 9,380,378,"WP7"}, { 8,436,378,"WP8"} },
+
+	{ {23,44,322, "EMP"}, {22,100,322, "EMP"}, {21,156,322, "EMP"}, {20,212,322, "EMP"}, {19,268,322, "EMP"}, {18,324,322, "EMP"}, {17,380,322, "EMP"}, {16,436,322, "EMP"} },
+	{ {31,44,266, "EMP"}, {30,100,266, "EMP"}, {29,156,266, "EMP"}, {28,212,266, "EMP"}, {27,268,266, "EMP"}, {26,324,266, "EMP"}, {25,380,266, "EMP"}, {24,436,266, "EMP"} },
+	{ {39,44,210, "EMP"}, {38,100,210, "EMP"}, {37,156,210, "EMP"}, {36,212,210, "EMP"}, {35,268,210, "EMP"}, {34,324,210, "EMP"}, {33,380,210, "EMP"}, {32,436,210, "EMP"} },
+	{ {47,44,154, "EMP"}, {46,100,154, "EMP"}, {45,156,154, "EMP"}, {44,212,154, "EMP"}, {43,268,154, "EMP"}, {42,324,154, "EMP"}, {41,380,154, "EMP"}, {40,436,154, "EMP"} },
+
+	{ {55,44,100,"BP1"}, {54,100,100,"BP2"}, {53,156,100,"BP3"}, {52,212,100,"BP4"}, {51,268,100,"BP5"}, {50,324,100,"BP6"}, {49,380,100,"BP7"}, {48,436,100,"BP8"} },
+	{ {63,44,44 ,"BR1"}, {62,100,44 ,"BN1"}, {61,156,44 ,"BB1"}, {60,212,44 ,"BQ1"}, {59,268,44 ,"BK"}, {58,324,44 ,"BB2"}, {57,380,44 ,"BN2"}, {56,436,44 ,"BR2"} }
+};
+
+static void set_board( void )
+{
+	UINT8 i_AH, i_18;
+
+	for (i_AH = 0; i_AH < 8; i_AH++)
+	{
+		for (i_18 = 0; i_18 < 8; i_18++)
+		{
+			// copy start postition to m_board
+			m_board[i_18][i_AH] = start_board[i_18][i_AH];
+		}
+	}
+}
+
+
+static int irq_edge = 0x00;
 
 
 // Used by Glasgow and Dallas
 static WRITE16_HANDLER( write_lcd_gg )
 {
-	UINT8 lcd_data;
-	lcd_data = data>>8;
+	UINT8 lcd_data = data >> 8;
+
 	if (led7 == 0) 
 		output_set_digit_value(lcd_shift_counter, lcd_data);
+
 	lcd_shift_counter--;
 	lcd_shift_counter &= 3;
 //	logerror("LCD Offset = %d Data low = %x \n", offset, lcd_data);
@@ -74,17 +104,18 @@ static WRITE16_HANDLER( write_lcd_gg )
 static WRITE16_HANDLER( write_beeper )
 {
 	UINT8 beep_flag;
+
 	lcd_invert = 1;
 	beep_flag = data >> 8;
-//	if ((beep_flag &02)== 0) key_selector=0;else key_selector=1;
+//	if ((beep_flag & 02) == 0) key_selector = 0; else key_selector = 1;
 	logerror("Write Beeper = %x \n", data);
 	beeper = data;
 }
 
 static WRITE16_HANDLER( write_lcd )
 {
-	UINT8 lcd_data;
-	lcd_data = data >> 8;
+	UINT8 lcd_data = data >> 8;
+
 	output_set_digit_value(lcd_shift_counter, lcd_invert & 1 ? lcd_data^0xff : lcd_data);
 	lcd_shift_counter--;
 	lcd_shift_counter &= 3;
@@ -96,7 +127,7 @@ static WRITE16_HANDLER( write_lcd_flag )
 	UINT8 lcd_flag;
 	lcd_invert = 0;
 	lcd_flag=data >> 8;
-	//beep_set_state(0,lcd_flag&1?1:0);
+	//beep_set_state(0, lcd_flag & 1 ? 1 : 0);
 	if (lcd_flag == 0) 
 		key_selector = 1;
 
@@ -113,9 +144,10 @@ static WRITE16_HANDLER( write_lcd_flag )
 static WRITE16_HANDLER( write_lcd_flag_gg )
 {
 	const device_config *speaker = devtag_get_device(space->machine, "beep");
-	UINT8 lcd_flag;
-	lcd_flag = data >> 8;
+	UINT8 lcd_flag = data >> 8;
+
 	beep_set_state(speaker, lcd_flag & 1 ? 1 : 0);
+
 	if (lcd_flag == 0) 
 		key_selector = 1;
 
@@ -140,9 +172,10 @@ static READ16_HANDLER( read_board )
 
 static WRITE16_HANDLER( write_board )
 {
-	UINT8 board;
-	board = data >> 8;
+	UINT8 board = data >> 8;
+
 	board_value = board;
+
 	if (board == 0xff) 
 		key_selector = 0;
 //	The key function in the rom expects after writing to
@@ -157,7 +190,6 @@ static WRITE16_HANDLER( write_board_gg )
 	Line18_REED = data >> 8;
 
 	// LED's or REED's ?
-
 	if (read_board_flag)
 	{
 		Line18_LED = 0;
@@ -173,7 +205,7 @@ static WRITE16_HANDLER( write_board_gg )
 
 	lcd_invert = 1;
 	beep_flag = data >> 8;
-	//if ((beep_flag &02)== 0) key_selector=0;else key_selector=1;
+	//if ((beep_flag & 02) == 0) key_selector = 0; else key_selector = 1;
 	//logerror("Write Beeper   = %x \n  ",data);
 	beeper = data;
 }
@@ -181,6 +213,7 @@ static WRITE16_HANDLER( write_board_gg )
 static WRITE16_HANDLER( write_irq_flag )
 {
 	const device_config *speaker = devtag_get_device(space->machine, "beep");
+
 	beep_set_state(speaker, data & 0x100);
 	logerror("Write 0x800004 = %x \n", data);
 	irq_flag = 1;
@@ -189,16 +222,18 @@ static WRITE16_HANDLER( write_irq_flag )
 
 static READ16_HANDLER( read_keys ) // Glasgow, Dallas
 {
-	UINT16 data;
-	data = 0x0300;
+	UINT16 data = 0x0300;
+
 	key_low = input_port_read(space->machine, "LINE0");
 	key_hi = input_port_read(space->machine, "LINE1");
-	//logerror("Keyboard Offset = %x Data = %x\n  ",offset,data);
+
 	if (key_select == key_low)
 		data = data & 0x100;
+
 	if (key_select == key_hi)
 		data = data & 0x200;
 
+	//logerror("Keyboard Offset = %x Data = %x\n  ", offset, data);
 	return data;
 }
 
@@ -219,21 +254,15 @@ static READ16_HANDLER( read_newkeys16 )  //Amsterdam, Roma
 static READ16_HANDLER( read_board_gg )
 {
 	UINT8 i_18, i_AH;
-	UINT16 data;
+	UINT16 data = 0xff;
 
-	data = 0xff;
-
-	for (i_18 = 0; i_18 < 8; i_18 = i_18 + 1)
+	for (i_18 = 0; i_18 < 8; i_18++)
 	{
-
-	// Looking for cleared bit in Line18 -> current line
-
-		if ( !(Line18_REED & (1<<i_18)) )
+		// Looking for cleared bit in Line18 -> current line
+		if (!(Line18_REED & (1 << i_18)))
 		{
-
-	// if there is a piece on the field -> set bit in data
-
-			for (i_AH = 0; i_AH < 8; i_AH = i_AH + 1)
+			// if there is a piece on the field -> set bit in data
+			for (i_AH = 0; i_AH < 8; i_AH++)
 			{
 				if (strcmp ((char *)m_board[i_18][i_AH].piece, EMP))
 					data &= ~(1 << i_AH);  // clear bit
@@ -266,45 +295,44 @@ static WRITE16_HANDLER( write_beeper_gg )
 //	logerror("Line18_LED   = %x \n  ",Line18_LED);
 //	logerror("LineAH   = %x \n  ",LineAH);
 
-		for (i_AH = 0; i_AH < 8; i_AH = i_AH + 1)
+		for (i_AH = 0; i_AH < 8; i_AH++)
 		{
-			if ( LineAH & (1<<i_AH) )
+			if (LineAH & (1 << i_AH))
 			{
-				for ( i_18 = 0; i_18 < 8; i_18 = i_18 + 1)
+				for (i_18 = 0; i_18 < 8; i_18++)
 				{
-					if ( !(Line18_LED & (1<<i_18)) )
+					if (!(Line18_LED & (1 << i_18)))
 					{
 //						logerror("i_18   = %d \n  ",i_18);
 //						logerror("i_AH   = %d \n  ",i_AH);
 //						logerror("LED an:   = %d \n  ",m_board[i_18][i_AH]);
 
 						LED = m_board[i_18][i_AH].field;
-						output_set_led_value( LED, 1 );
-
-//  LED on
+						output_set_led_value(LED, 1);
+						//  LED on
 					}
 					else
 					{
-//  LED off
+					//  LED off
 
-					} // End IF 18
-				} // End For 18
-			} // End IF AH
-		} // End For AH
-	} // End IF LineAH
+					}
+				}
+			}
+		}
+	}
 	else
 	{
-//  No LED  -> all LED's off
-		for ( i_AH = 0; i_AH < 8; i_AH = i_AH + 1)
+		//  No LED  -> all LED's off
+		for (i_AH = 0; i_AH < 8; i_AH++)
 		{
-			for ( i_18 = 0; i_18 < 8; i_18 = i_18 + 1)
+			for (i_18 = 0; i_18 < 8; i_18++)
 			{
-// LED off
+				// LED off
 				LED = m_board[i_18][i_AH].field;
-				output_set_led_value( LED, 0 );
-			} //End For 18
-		} // End For AH
-	} //End ELSE LineAH
+				output_set_led_value(LED, 0);
+			}
+		}
+	}
 }
 
 /*
@@ -324,23 +352,25 @@ static READ16_HANDLER(read_test)
 
 static WRITE32_HANDLER( write_lcd32 )
 {
-	UINT8 lcd_data;
-	lcd_data = data >> 8;
+	UINT8 lcd_data = data >> 8;
+
 	output_set_digit_value(lcd_shift_counter, lcd_invert & 1 ? lcd_data^0xff : lcd_data);
 	lcd_shift_counter--;
 	lcd_shift_counter &= 3;
-	//logerror("LCD Offset = %d Data   = %x \n  ",offset,lcd_data);
+	//logerror("LCD Offset = %d Data   = %x \n  ", offset, lcd_data);
 }
 
 static WRITE32_HANDLER( write_lcd_flag32 )
 {
-	UINT8 lcd_flag;
+	UINT8 lcd_flag = data >> 24;
+
 	lcd_invert = 0;
-	lcd_flag = data >> 24;
+
 	if (lcd_flag == 0) 
 		key_selector = 1;
+
 	logerror("LCD Flag 32 = %x \n", lcd_flag);
-	//beep_set_state(0,lcd_flag&1?1:0);
+	//beep_set_state(0, lcd_flag & 1 ? 1 : 0);
 
 	if (lcd_flag != 0) 
 		led7 = 255;
@@ -359,11 +389,12 @@ static WRITE32_HANDLER( write_keys32 )
 static READ32_HANDLER( read_newkeys32 ) // Dallas 32, Roma 32
 {
 	UINT32 data;
+
 	if (key_selector == 0) 
 		data = input_port_read(space->machine, "LINE0");
 	else 
 		data = input_port_read(space->machine, "LINE1");
-	//if (key_selector==1) data=input_port_read(machine, "LINE0");else data=0;
+	//if (key_selector == 1) data = input_port_read(machine, "LINE0"); else data = 0;
 	logerror("read Keyboard Offset = %x Data = %x\n", offset, data);
 	data = data << 24;
 	return data ;
@@ -378,7 +409,7 @@ static READ32_HANDLER( read_board32 )
 /*
 static READ16_HANDLER(read_board_amsterd)
 {
-  logerror("read board amsterdam Offset = %x \n  ",offset);
+  logerror("read board amsterdam Offset = %x \n  ", offset);
   return 0xffff;
 }
 */
@@ -404,23 +435,24 @@ static WRITE32_HANDLER ( write_beeper32 )
 
 static TIMER_CALLBACK( update_nmi )
 {
-	//cputag_set_input_line_and_vector(machine, "maincpu",  M68K_IRQ_7,irq_edge&0xff ? CLEAR_LINE:ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
-		cputag_set_input_line_and_vector(machine, "maincpu",  M68K_IRQ_7,ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
-		cputag_set_input_line_and_vector(machine, "maincpu",  M68K_IRQ_7,CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
-   	irq_edge=~irq_edge;
+	//cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_7, irq_edge & 0xff ? CLEAR_LINE : ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_7, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_7, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
+   	irq_edge = ~irq_edge;
 }
 
 static TIMER_CALLBACK( update_nmi32 )
 {
-	// cputag_set_input_line_and_vector(machine, "maincpu",  M68K_IRQ_7, irq_edge&0xff ? CLEAR_LINE:ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
-		cputag_set_input_line_and_vector(machine, "maincpu",  M68K_IRQ_7, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
-		cputag_set_input_line_and_vector(machine, "maincpu",  M68K_IRQ_7, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
-    irq_edge=~irq_edge;
+	// cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_7, irq_edge & 0xff ? CLEAR_LINE : ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_7, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_7, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
+    irq_edge = ~irq_edge;
 }
 
 static MACHINE_START( glasgow )
 {
 	const device_config *speaker = devtag_get_device(machine, "beep");
+
 	key_selector = 0;
 	irq_flag = 0;
 	lcd_shift_counter = 3;
@@ -432,6 +464,7 @@ static MACHINE_START( glasgow )
 static MACHINE_START( dallas32 )
 {
 	const device_config *speaker = devtag_get_device(machine, "beep");
+
 	lcd_shift_counter = 3;
 	timer_pulse(machine, ATTOTIME_IN_HZ(50), NULL, 0, update_nmi32);
 	beep_set_frequency(speaker, 44);
@@ -441,6 +474,7 @@ static MACHINE_START( dallas32 )
 static MACHINE_RESET( glasgow )
 {
 	lcd_shift_counter = 3;
+	set_board();
 }
 
 
