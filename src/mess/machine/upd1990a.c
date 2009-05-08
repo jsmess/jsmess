@@ -15,6 +15,7 @@
 	- set clock mode
 	- test mode
 	- clock advance (currently it just reads the system time)
+	- divide frequencies from chip clock
 
 */
 
@@ -156,6 +157,13 @@ WRITE_LINE_DEVICE_HANDLER( upd1990a_stb_w )
 			/* enable time counter */
 			timer_enable(upd1990a->clock_timer, 1);
 
+			/* disable data out pulse */
+			timer_enable(upd1990a->data_out_timer, 0);
+
+			/* output LSB of shift register */
+			upd1990a->data_out = BIT(upd1990a->shift_reg[0], 0);
+			devcb_call_write_line(&upd1990a->out_data_func, upd1990a->data_out);
+
 			/* 32 Hz time pulse */
 			timer_adjust_periodic(upd1990a->tp_timer, attotime_zero, 0, ATTOTIME_IN_HZ(32*2));
 			break;
@@ -169,6 +177,13 @@ WRITE_LINE_DEVICE_HANDLER( upd1990a_stb_w )
 
 			/* disable time counter */
 			timer_enable(upd1990a->clock_timer, 0);
+
+			/* disable data out pulse */
+			timer_enable(upd1990a->data_out_timer, 0);
+
+			/* output LSB of shift register */
+			upd1990a->data_out = BIT(upd1990a->shift_reg[0], 0);
+			devcb_call_write_line(&upd1990a->out_data_func, upd1990a->data_out);
 
 			/* load shift register data into time counter */
 			for (i = 0; i < 5; i++)
@@ -199,7 +214,7 @@ WRITE_LINE_DEVICE_HANDLER( upd1990a_stb_w )
 			upd1990a->time_counter[2] = convert_to_bcd(systime->local_time.hour);
 			upd1990a->time_counter[3] = convert_to_bcd(systime->local_time.mday);
 			upd1990a->time_counter[4] = systime->local_time.weekday;
-			upd1990a->time_counter[4] |= systime->local_time.month << 4;
+			upd1990a->time_counter[4] |= (systime->local_time.month + 1) << 4;
 
 			/* load time counter data into shift register */
 			for (i = 0; i < 5; i++)
@@ -260,15 +275,6 @@ WRITE_LINE_DEVICE_HANDLER( upd1990a_clk_w )
 	{
 		if (upd1990a->c == UPD1990A_MODE_SHIFT)
 		{
-			if (upd1990a->oe)
-			{
-				upd1990a->data_out = BIT(upd1990a->shift_reg[0], 0);
-
-				devcb_call_write_line(&upd1990a->out_data_func, upd1990a->data_out);
-
-				if (LOG) logerror("UPD1990A DATA OUT %u\n", upd1990a->data_out);
-			}
-
 			upd1990a->shift_reg[0] >>= 1;
 			upd1990a->shift_reg[0] |= (BIT(upd1990a->shift_reg[1], 0) << 7);
 
@@ -283,6 +289,16 @@ WRITE_LINE_DEVICE_HANDLER( upd1990a_clk_w )
 
 			upd1990a->shift_reg[4] >>= 1;
 			upd1990a->shift_reg[4] |= (upd1990a->data_in << 7);
+
+			if (upd1990a->oe)
+			{
+				upd1990a->data_out = BIT(upd1990a->shift_reg[0], 0);
+
+				logerror("UPD1990A DATA OUT %u\n", upd1990a->data_out);
+				devcb_call_write_line(&upd1990a->out_data_func, upd1990a->data_out);
+
+			}
+
 		}
 	}
 
@@ -298,6 +314,7 @@ WRITE_LINE_DEVICE_HANDLER( upd1990a_c0_w )
 	upd1990a_t *upd1990a = get_safe_token(device);
 
 	if (LOG) logerror("UPD1990A C0 %u\n", state);
+
 	upd1990a->c = (upd1990a->c & 0x06) | state;
 }
 
@@ -310,6 +327,7 @@ WRITE_LINE_DEVICE_HANDLER( upd1990a_c1_w )
 	upd1990a_t *upd1990a = get_safe_token(device);
 
 	if (LOG) logerror("UPD1990A C1 %u\n", state);
+
 	upd1990a->c = (upd1990a->c & 0x05) | (state << 1);
 }
 
@@ -322,6 +340,7 @@ WRITE_LINE_DEVICE_HANDLER( upd1990a_c2_w )
 	upd1990a_t *upd1990a = get_safe_token(device);
 
 	if (LOG) logerror("UPD1990A C2 %u\n", state);
+
 	upd1990a->c = (upd1990a->c & 0x03) | (state << 2);
 }
 
@@ -334,6 +353,7 @@ WRITE_LINE_DEVICE_HANDLER( upd1990a_data_w )
 	upd1990a_t *upd1990a = get_safe_token(device);
 
 	if (LOG) logerror("UPD1990A DATA IN %u\n", state);
+
 	upd1990a->data_in = state;
 }
 
@@ -374,7 +394,7 @@ static TIMER_CALLBACK( data_out_tick )
 	const device_config *device = ptr;
 	upd1990a_t *upd1990a = get_safe_token(device);
 
-	if (LOG) logerror("UPD1990A DATA OUT %u\n", upd1990a->data_out);
+	logerror("UPD1990A DATA OUT TICK %u\n", upd1990a->data_out);
 
 	devcb_call_write_line(&upd1990a->out_data_func, upd1990a->data_out);
 
