@@ -34,6 +34,9 @@
 typedef struct _upd1990a_interface upd1990a_interface;
 struct _upd1990a_interface
 {
+	/* this gets called for every change of the DATA OUT pin (pin 9) */
+	devcb_write_line		out_data_func;
+
 	/* this gets called for every change of the TP pin (pin 10) */
 	devcb_write_line		out_tp_func;
 };
@@ -45,8 +48,24 @@ struct _upd1990a_interface
 /* device interface */
 DEVICE_GET_INFO( upd1990a );
 
-READ8_DEVICE_HANDLER( upd1990a_data_out_r );
-WRITE8_DEVICE_HANDLER( upd1990a_w );
-WRITE8_DEVICE_HANDLER( upd1990a_clk_w );
+/* output enable */
+WRITE_LINE_DEVICE_HANDLER( upd1990a_oe_w );
+
+/* chip select */
+WRITE_LINE_DEVICE_HANDLER( upd1990a_cs_w );
+
+/* strobe */
+WRITE_LINE_DEVICE_HANDLER( upd1990a_stb_w );
+
+/* clock */
+WRITE_LINE_DEVICE_HANDLER( upd1990a_clk_w );
+
+/* command select */
+WRITE_LINE_DEVICE_HANDLER( upd1990a_c0_w );
+WRITE_LINE_DEVICE_HANDLER( upd1990a_c1_w );
+WRITE_LINE_DEVICE_HANDLER( upd1990a_c2_w );
+
+/* data in */
+WRITE_LINE_DEVICE_HANDLER( upd1990a_data_w );
 
 #endif /* __UPD1990A_H__ */

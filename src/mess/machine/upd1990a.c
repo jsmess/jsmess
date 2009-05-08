@@ -5,20 +5,39 @@
 	NEC uPD1990AC CMOS Digital Integrated Circuit
 	Serial I/O Calendar & Clock
 	CMOS LSI
-	
-	Very preliminary emulation
-	
-	TODO:
-		- implement Set Clock mode
-		- implement TEST Mode
-		- what about data_in?
 
 *********************************************************************/
+
+/*
+
+	TODO:
+
+	- set clock mode
+	- test mode
+	- clock advance (currently it just reads the system time)
+
+*/
 
 #include "driver.h"
 #include "upd1990a.h"
 
-#define UPD1990AC_XTAL 32768
+/***************************************************************************
+    PARAMETERS
+***************************************************************************/
+
+#define LOG 0
+
+enum
+{
+	UPD1990A_MODE_REGISTER_HOLD = 0,
+	UPD1990A_MODE_SHIFT,
+	UPD1990A_MODE_TIME_SET,
+	UPD1990A_MODE_TIME_READ,
+	UPD1990A_MODE_TP_64HZ_SET,
+	UPD1990A_MODE_TP_256HZ_SET,
+	UPD1990A_MODE_TP_2048HZ_SET,
+	UPD1990A_MODE_TEST,
+};
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -27,14 +46,24 @@
 typedef struct _upd1990a_t upd1990a_t;
 struct _upd1990a_t
 {
+	devcb_resolved_write_line	out_data_func;
 	devcb_resolved_write_line	out_tp_func;
 
-	UINT8 shift_reg[5];	/* 40 Bit Shift Register */
-	UINT8 data_in;
-	UINT8 data_out;
-	UINT8 shift_mode;
-	UINT16 freq_divider;
+	UINT8 time_counter[5];		/* time counter */
+	UINT8 shift_reg[5];			/* shift register */
+
+	int oe;						/* output enable */
+	int cs;						/* chip select */
+	int stb;					/* strobe */
+	int data_in;				/* data in */
+	int data_out;				/* data out */
+	int c;						/* command */
+	int clk;					/* shift clock */
+	int tp;						/* time pulse */
     
+	/* timers */
+	emu_timer *clock_timer;
+	emu_timer *data_out_timer;
 	emu_timer *tp_timer;
 };
 
@@ -47,7 +76,6 @@ INLINE upd1990a_t *get_safe_token(const device_config *device)
 	assert(device != NULL);
 	assert(device->token != NULL);
 	assert(device->type == UPD1990A);
-
 	return (upd1990a_t *)device->token;
 }
 
@@ -58,146 +86,304 @@ INLINE const upd1990a_interface *get_interface(const device_config *device)
 	return (const upd1990a_interface *) device->static_config;
 }
 
-/***************************************************************************
-    IMPLEMENTATION
-***************************************************************************/
-
-static UINT8 upd1990a_bcd( UINT8 val )
+INLINE UINT8 convert_to_bcd(int val)
 {
 	return ((val / 10) << 4) | (val % 10);
 }
 
-WRITE8_DEVICE_HANDLER( upd1990a_w )
+/***************************************************************************
+    IMPLEMENTATION
+***************************************************************************/
+
+/*-------------------------------------------------
+    upd1990a_oe_w - output enable write
+-------------------------------------------------*/
+
+WRITE_LINE_DEVICE_HANDLER( upd1990a_oe_w )
 {
-	UINT8 command = data & 0x07;
 	upd1990a_t *upd1990a = get_safe_token(device);
-	mame_system_time curtime, *systime = &curtime;
-	int i;
 
-	if (data & ~0x07)
-		logerror("uPD1990AC expects only 3 bits data, found %d > 7\n", data);
+	upd1990a->oe = state;
 
-	mame_get_current_datetime(device->machine, &curtime);
+	if (LOG) logerror("UPD1990A OE %u\n", state);
+}
 
-	/* 
-       c0 = command bit 0
-       c1 = command bit 1
-       c2 = command bit 2
+/*-------------------------------------------------
+    upd1990a_oe_w - output enable write
+-------------------------------------------------*/
 
-       c2   c1   c0  |  Function
-      ----------------------------
-        0    0    0  |  Register Hold (TEST Mode released)
-        0    0    1  |  Register Shift
-        0    1    0  |  Timer Set & Counter Hold
-        0    1    1  |  Timer Read
-        1    0    0  |  TP = 64Hz Set (TEST Mode released)
-        1    0    1  |  TP = 256Hz Set (TEST Mode released)
-        1    1    0  |  TP = 2048z Set (TEST Mode released)
-        1    1    1  |  TEST Mode Set
-	*/
+WRITE_LINE_DEVICE_HANDLER( upd1990a_cs_w )
+{
+	upd1990a_t *upd1990a = get_safe_token(device);
 
-	switch (command)
+	upd1990a->cs = state;
+
+	if (LOG) logerror("UPD1990A CS %u\n", state);
+}
+
+/*-------------------------------------------------
+    upd1990a_stb_w - strobe write
+-------------------------------------------------*/
+
+WRITE_LINE_DEVICE_HANDLER( upd1990a_stb_w )
+{
+	upd1990a_t *upd1990a = get_safe_token(device);
+
+	if (LOG) logerror("UPD1990A STB %u\n", state);
+
+	upd1990a->stb = state;
+
+	if (upd1990a->cs && upd1990a->stb && !upd1990a->clk)
 	{
-		case 0x00:
-			upd1990a->shift_mode = 0;
-			break;
-		case 0x01:
-			upd1990a->shift_mode = 1;
-			upd1990a->data_out = upd1990a->shift_reg[0] & 0x01;
-			break;
-		case 0x02:	/* Set Clock */
-			upd1990a->shift_mode = 0;
-			logerror("RTC Set Clock attempt\n");
-			/* Not implemented yet */
-		case 0x03:	/* Read Clock */
-			upd1990a->shift_mode = 0;
-			upd1990a->shift_reg[0] = upd1990a_bcd(systime->local_time.second);
-			upd1990a->shift_reg[1] = upd1990a_bcd(systime->local_time.minute);
-			upd1990a->shift_reg[2] = upd1990a_bcd(systime->local_time.hour);
-			upd1990a->shift_reg[3] = upd1990a_bcd(systime->local_time.mday);
-			upd1990a->shift_reg[4] = systime->local_time.weekday;
-			upd1990a->shift_reg[4] |= systime->local_time.month << 4;
-			for(i=0; i<5; i++)
-				logerror("%d     ", (upd1990a->shift_reg[i] & 0x0f) + ((upd1990a->shift_reg[i] & 0xf0)>>4)*10);
-			logerror("\n");
-			break;
-		case 0x04:
-			upd1990a->freq_divider = 512;
-			logerror("RTC Set TP 64Hz attempt\n");
-			break;
-		case 0x05:
-			upd1990a->freq_divider = 128;
-			logerror("RTC Set TP 256Hz attempt\n");
-			break;
-		case 0x06:
-			upd1990a->freq_divider = 16;
-			logerror("RTC Set TP 2048Hz attempt\n");
-			break;
-		case 0x07:
-			logerror("RTC TEST Mode attempt\n");
-			/* Not implemented yet */
-			break;
-	}
+		switch (upd1990a->c)
+		{
+		case UPD1990A_MODE_REGISTER_HOLD:
+			if (LOG) logerror("UPD1990A Register Hold Mode\n");
 
-	if (command & 0x04 )
-	{	
-		UINT16 frequency = UPD1990AC_XTAL / upd1990a->freq_divider;
+			/* enable time counter */
+			timer_enable(upd1990a->clock_timer, 1);
 
-		logerror("TP freq %d \n", frequency);
+			/* 1 Hz data out pulse */
+			upd1990a->data_out = 1;
+			timer_adjust_periodic(upd1990a->data_out_timer, attotime_zero, 0, ATTOTIME_IN_HZ(1*2));
 
-		timer_adjust_periodic(upd1990a->tp_timer, attotime_zero, 0, ATTOTIME_IN_HZ(frequency));
+			/* 64 Hz time pulse */
+			timer_adjust_periodic(upd1990a->tp_timer, attotime_zero, 0, ATTOTIME_IN_HZ(64*2));
+			break;
+
+		case UPD1990A_MODE_SHIFT:
+			if (LOG) logerror("UPD1990A Shift Mode\n");
+			/* enable time counter */
+			timer_enable(upd1990a->clock_timer, 1);
+
+			/* 32 Hz time pulse */
+			timer_adjust_periodic(upd1990a->tp_timer, attotime_zero, 0, ATTOTIME_IN_HZ(32*2));
+			break;
+
+		case UPD1990A_MODE_TIME_SET:
+			{
+			int i;
+
+			if (LOG) logerror("UPD1990A Time Set Mode not supported!\n");
+			if (LOG) logerror("UPD1990A Shift Register %02x%02x%02x%02x%02x\n", upd1990a->shift_reg[4], upd1990a->shift_reg[3], upd1990a->shift_reg[2], upd1990a->shift_reg[1], upd1990a->shift_reg[0]);
+
+			/* disable time counter */
+			timer_enable(upd1990a->clock_timer, 0);
+
+			/* load shift register data into time counter */
+			for (i = 0; i < 5; i++)
+			{
+				upd1990a->time_counter[i] = upd1990a->shift_reg[i];
+			}
+
+			/* 32 Hz time pulse */
+			timer_adjust_periodic(upd1990a->tp_timer, attotime_zero, 0, ATTOTIME_IN_HZ(32*2));
+			}
+			break;
+
+		case UPD1990A_MODE_TIME_READ:
+			{
+			mame_system_time curtime, *systime = &curtime;
+			int i;
+			
+			if (LOG) logerror("UPD1990A Time Read Mode\n");
+
+			/* enable time counter */
+			timer_enable(upd1990a->clock_timer, 1);
+
+			/* HACK: load time counter from system time */
+			mame_get_current_datetime(device->machine, &curtime);
+
+			upd1990a->time_counter[0] = convert_to_bcd(systime->local_time.second);
+			upd1990a->time_counter[1] = convert_to_bcd(systime->local_time.minute);
+			upd1990a->time_counter[2] = convert_to_bcd(systime->local_time.hour);
+			upd1990a->time_counter[3] = convert_to_bcd(systime->local_time.mday);
+			upd1990a->time_counter[4] = systime->local_time.weekday;
+			upd1990a->time_counter[4] |= systime->local_time.month << 4;
+
+			/* load time counter data into shift register */
+			for (i = 0; i < 5; i++)
+			{
+				upd1990a->shift_reg[i] = upd1990a->time_counter[i];
+			}
+
+			if (LOG) logerror("UPD1990A Shift Register %02x%02x%02x%02x%02x\n", upd1990a->shift_reg[4], upd1990a->shift_reg[3], upd1990a->shift_reg[2], upd1990a->shift_reg[1], upd1990a->shift_reg[0]);
+
+			/* 512 Hz data out pulse */
+			upd1990a->data_out = 1;
+			timer_adjust_periodic(upd1990a->data_out_timer, attotime_zero, 0, ATTOTIME_IN_HZ(512*2));
+
+			/* 32 Hz time pulse */
+			timer_adjust_periodic(upd1990a->tp_timer, attotime_zero, 0, ATTOTIME_IN_HZ(32*2));
+			}
+			break;
+
+		case UPD1990A_MODE_TP_64HZ_SET:
+			if (LOG) logerror("UPD1990A TP = 64 Hz Set Mode\n");
+			
+			/* 64 Hz time pulse */
+			timer_adjust_periodic(upd1990a->tp_timer, attotime_zero, 0, ATTOTIME_IN_HZ(64*2));
+			break;
+
+		case UPD1990A_MODE_TP_256HZ_SET:
+			if (LOG) logerror("UPD1990A TP = 256 Hz Set Mode\n");
+			
+			/* 256 Hz time pulse */
+			timer_adjust_periodic(upd1990a->tp_timer, attotime_zero, 0, ATTOTIME_IN_HZ(256*2));
+			break;
+
+		case UPD1990A_MODE_TP_2048HZ_SET:
+			if (LOG) logerror("UPD1990A TP = 2048 Hz Set Mode\n");
+
+			/* 2048 Hz time pulse */
+			timer_adjust_periodic(upd1990a->tp_timer, attotime_zero, 0, ATTOTIME_IN_HZ(2048*2));
+			break;
+
+		case UPD1990A_MODE_TEST:
+			if (LOG) logerror("UPD1990A Test Mode not supported!\n");
+			break;
+		}
 	}
 }
 
+/*-------------------------------------------------
+    upd1990a_clk_w - shift clock write
+-------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER( upd1990a_clk_w )
+WRITE_LINE_DEVICE_HANDLER( upd1990a_clk_w )
 {
 	upd1990a_t *upd1990a = get_safe_token(device);
 
-	if (upd1990a->shift_mode)
+	if (LOG) logerror("UPD1990A CLK %u\n", state);
+
+	if (!upd1990a->clk && state) // rising edge
 	{
-	/* Shift Register */
-		upd1990a->shift_reg[0] >>= 1;
-		upd1990a->shift_reg[0] |= upd1990a->shift_reg[1] & 1 ? 0x80 : 0;
-		upd1990a->shift_reg[1] >>= 1;
-		upd1990a->shift_reg[1] |= upd1990a->shift_reg[2] & 1 ? 0x80 : 0;
-		upd1990a->shift_reg[2] >>= 1;
-		upd1990a->shift_reg[2] |= upd1990a->shift_reg[3] & 1 ? 0x80 : 0;
-		upd1990a->shift_reg[3] >>= 1;
-		upd1990a->shift_reg[3] |= upd1990a->shift_reg[4] & 1 ? 0x80 : 0;
-		upd1990a->shift_reg[4] >>= 1;
-		upd1990a->shift_reg[4] |= data & 0x10 ? 0x80 : 0;
-		upd1990a->data_out = upd1990a->shift_reg[0] & 1;
+		if (upd1990a->c == UPD1990A_MODE_SHIFT)
+		{
+			if (upd1990a->oe)
+			{
+				upd1990a->data_out = BIT(upd1990a->shift_reg[0], 0);
+
+				devcb_call_write_line(&upd1990a->out_data_func, upd1990a->data_out);
+
+				if (LOG) logerror("UPD1990A DATA OUT %u\n", upd1990a->data_out);
+			}
+
+			upd1990a->shift_reg[0] >>= 1;
+			upd1990a->shift_reg[0] |= (BIT(upd1990a->shift_reg[1], 0) << 7);
+
+			upd1990a->shift_reg[1] >>= 1;
+			upd1990a->shift_reg[1] |= (BIT(upd1990a->shift_reg[2], 0) << 7);
+
+			upd1990a->shift_reg[2] >>= 1;
+			upd1990a->shift_reg[2] |= (BIT(upd1990a->shift_reg[3], 0) << 7);
+
+			upd1990a->shift_reg[3] >>= 1;
+			upd1990a->shift_reg[3] |= (BIT(upd1990a->shift_reg[4], 0) << 7);
+
+			upd1990a->shift_reg[4] >>= 1;
+			upd1990a->shift_reg[4] |= (upd1990a->data_in << 7);
+		}
 	}
+
+	upd1990a->clk = state;
 }
 
-READ8_DEVICE_HANDLER( upd1990a_data_out_r )
+/*-------------------------------------------------
+    upd1990a_c0_w - command bit 0 write
+-------------------------------------------------*/
+
+WRITE_LINE_DEVICE_HANDLER( upd1990a_c0_w )
 {
 	upd1990a_t *upd1990a = get_safe_token(device);
 
-	return upd1990a->data_out;
+	if (LOG) logerror("UPD1990A C0 %u\n", state);
+	upd1990a->c = (upd1990a->c & 0x06) | state;
 }
+
+/*-------------------------------------------------
+    upd1990a_c1_w - command bit 1 write
+-------------------------------------------------*/
+
+WRITE_LINE_DEVICE_HANDLER( upd1990a_c1_w )
+{
+	upd1990a_t *upd1990a = get_safe_token(device);
+
+	if (LOG) logerror("UPD1990A C1 %u\n", state);
+	upd1990a->c = (upd1990a->c & 0x05) | (state << 1);
+}
+
+/*-------------------------------------------------
+    upd1990a_c2_w - command bit 2 write
+-------------------------------------------------*/
+
+WRITE_LINE_DEVICE_HANDLER( upd1990a_c2_w )
+{
+	upd1990a_t *upd1990a = get_safe_token(device);
+
+	if (LOG) logerror("UPD1990A C2 %u\n", state);
+	upd1990a->c = (upd1990a->c & 0x03) | (state << 2);
+}
+
+/*-------------------------------------------------
+    upd1990a_data_w - data input write
+-------------------------------------------------*/
+
+WRITE_LINE_DEVICE_HANDLER( upd1990a_data_w )
+{
+	upd1990a_t *upd1990a = get_safe_token(device);
+
+	if (LOG) logerror("UPD1990A DATA IN %u\n", state);
+	upd1990a->data_in = state;
+}
+
+/*-------------------------------------------------
+    TIMER_CALLBACK( clock_tick )
+-------------------------------------------------*/
+
+static TIMER_CALLBACK( clock_tick )
+{
+	const device_config *device = ptr;
+	upd1990a_t *upd1990a = get_safe_token(device);
+
+	// TODO: advance clock
+}
+
+/*-------------------------------------------------
+    TIMER_CALLBACK( tp_tick )
+-------------------------------------------------*/
 
 static TIMER_CALLBACK( tp_tick )
 {
 	const device_config *device = ptr;
 	upd1990a_t *upd1990a = get_safe_token(device);
 
-	devcb_call_write_line(&upd1990a->out_tp_func, ASSERT_LINE);
-	devcb_call_write_line(&upd1990a->out_tp_func, CLEAR_LINE);
+	if (LOG) logerror("UPD1990A TP %u\n", upd1990a->tp);
+
+	devcb_call_write_line(&upd1990a->out_tp_func, upd1990a->tp);
+
+	upd1990a->tp = !upd1990a->tp;
 }
 
-/* Untested save state support */
-static void upd1990a_register_state_save(const device_config *device)
+/*-------------------------------------------------
+    TIMER_CALLBACK( data_out_tick )
+-------------------------------------------------*/
+
+static TIMER_CALLBACK( data_out_tick )
 {
-    upd1990a_t* upd1990a = get_safe_token( device );
+	const device_config *device = ptr;
+	upd1990a_t *upd1990a = get_safe_token(device);
 
-    state_save_register_global_array(device->machine, upd1990a->shift_reg);
-    state_save_register_global(device->machine, upd1990a->data_in);
-    state_save_register_global(device->machine, upd1990a->data_out);
-    state_save_register_global(device->machine, upd1990a->shift_mode);
-    state_save_register_global(device->machine, upd1990a->freq_divider);
+	if (LOG) logerror("UPD1990A DATA OUT %u\n", upd1990a->data_out);
+
+	devcb_call_write_line(&upd1990a->out_data_func, upd1990a->data_out);
+
+	upd1990a->data_out = !upd1990a->data_out;
 }
+
+/*-------------------------------------------------
+    DEVICE_START( upd1990a )
+-------------------------------------------------*/
 
 static DEVICE_START( upd1990a )
 {
@@ -205,29 +391,33 @@ static DEVICE_START( upd1990a )
 	const upd1990a_interface *intf = get_interface(device);
 
 	/* resolve callbacks */
+	devcb_resolve_write_line(&upd1990a->out_data_func, &intf->out_data_func, device);
 	devcb_resolve_write_line(&upd1990a->out_tp_func, &intf->out_tp_func, device);
 
 	/* create the timers */
+	upd1990a->clock_timer = timer_alloc(device->machine, clock_tick, (void *)device);
+	timer_adjust_periodic(upd1990a->clock_timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock / 32768));
+
 	upd1990a->tp_timer = timer_alloc(device->machine, tp_tick, (void *)device);
 
+	upd1990a->data_out_timer = timer_alloc(device->machine, data_out_tick, (void *)device);
+
 	/* register for state saving */
-	upd1990a_register_state_save(device);
+    state_save_register_global_array(device->machine, upd1990a->time_counter);
+    state_save_register_global_array(device->machine, upd1990a->shift_reg);
+    state_save_register_global(device->machine, upd1990a->oe);
+    state_save_register_global(device->machine, upd1990a->cs);
+    state_save_register_global(device->machine, upd1990a->stb);
+	state_save_register_global(device->machine, upd1990a->data_in);
+    state_save_register_global(device->machine, upd1990a->data_out);
+    state_save_register_global(device->machine, upd1990a->c);
+    state_save_register_global(device->machine, upd1990a->clk);
+    state_save_register_global(device->machine, upd1990a->tp);
 }
 
-static DEVICE_RESET( upd1990a )
-{
-	upd1990a_t *upd1990a = get_safe_token(device);
-
-	upd1990a->shift_reg[0] = 0x00;
-	upd1990a->shift_reg[1] = 0x00;
-	upd1990a->shift_reg[2] = 0x00;
-	upd1990a->shift_reg[3] = 0x00;
-	upd1990a->shift_reg[4] = 0x00;
-	upd1990a->data_in = 0;
-	upd1990a->data_out = 0;
-	upd1990a->shift_mode = 0;
-	upd1990a->freq_divider = 0;
-}
+/*-------------------------------------------------
+    DEVICE_GET_INFO( upd1990a )
+-------------------------------------------------*/
 
 DEVICE_GET_INFO( upd1990a )
 {
@@ -236,12 +426,12 @@ DEVICE_GET_INFO( upd1990a )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(upd1990a_t);				break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_TIMER;				break;
+		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(upd1990a);	break;
 		case DEVINFO_FCT_STOP:							/* Nothing */								break;
-		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(upd1990a);	break;
+		case DEVINFO_FCT_RESET:							/* Nothing */								break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "NEC uPD1990AC");			break;

@@ -17,7 +17,6 @@
 	
 	To Do:
 	  - Basically everything:
-	    * rtc (which also controls input reads)
 		* inputs (keyboards are different)
 		* sound
 		* cassettes
@@ -26,7 +25,7 @@
 		* what are the differences between available BIOSes for trsm100 and olivm10?
 		* Tandy Model 200 support (video emulation completely different, but also 
 		  memory map & IO have to be adapted)
-		* clean up driver and split machine & video parts
+		* clean up driver and split machine part
 
 	  - Find dumps of systems which could easily be added:
 		* Olivetti M10 US (diff BIOS than the European version, it might be the alt BIOS)
@@ -40,49 +39,25 @@
 
 /* Core includes */
 #include "driver.h"
+#include "includes/kyocera.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/upd1990a.h"
 #include "machine/8155pio.h"
 
 static UINT8 rom_page, ram_page;
-static UINT8 port_a, port_b, port_c;
+static UINT8 port_a, port_b;
 static UINT8 timer_lsb, timer_msb;
 static UINT8 io_E8, io_A1, io_90, io_D0;
-
-int pc8201_lcd_bank = 0;
-
-void lcd_bank_update( UINT16 bank )
-{
-	switch ( bank ) 
-	{
-			case 0x000:	pc8201_lcd_bank = 0; break;
-			case 0x001:	pc8201_lcd_bank = 1; break;
-			case 0x002:	pc8201_lcd_bank = 2; break;
-			case 0x004:	pc8201_lcd_bank = 3; break;
-			case 0x008:	pc8201_lcd_bank = 4; break;
-			case 0x010:	pc8201_lcd_bank = 5; break;
-			case 0x020:	pc8201_lcd_bank = 6; break;
-			case 0x040:	pc8201_lcd_bank = 7; break;
-			case 0x080:	pc8201_lcd_bank = 8; break;
-			case 0x100:	pc8201_lcd_bank = 9; break;
-			case 0x200:	pc8201_lcd_bank = 10; break;
-			default: /*logerror("pc8201: bank update with unk bank = %d\n", bank);*/ break;
-	}
-
-//	logerror("pc8201: _lcd_bank = %i\n",pc8201_lcd_bank);
-}
 
 /*  WRITE HANDLERS  */
 
 // 0x90 PC-8201 only
 static WRITE8_HANDLER( pc8201_io90_write )
 {
-	if ((data & 0x10) != (io_90 & 0x10))
-	{
-		const device_config *rtc = devtag_get_device(space->machine, "rtc");
-		upd1990a_w(rtc, offset, port_a);
-		logerror("RTC write: %d\n", port_a);
-	}
+	const device_config *rtc = devtag_get_device(space->machine, "rtc");
+
+	upd1990a_stb_w(rtc, BIT(data, 5));
+		
 
 	/* printer */
 //	if ((data & 0x20) != (io_90 & 0x20))
@@ -243,13 +218,9 @@ static WRITE8_HANDLER( trs200_bank_write )
 			    3 - Remote plug control signal */
 static WRITE8_HANDLER( ioE8_write )
 {
-	/* Check for Clock Chip strobe */
-	if ((data & 0x04) != (io_E8 & 0x04))
-	{
-		const device_config *rtc = devtag_get_device(space->machine, "rtc");
-		upd1990a_w(rtc, offset, port_a);
-		logerror("RTC write: %d\n", port_a);
-	}
+	const device_config *rtc = devtag_get_device(space->machine, "rtc");
+
+	upd1990a_stb_w(rtc, BIT(data, 2));
 
 	/* printer */
 //	if ((data & 0x02) != (io_E8 & 0x02))
@@ -268,25 +239,6 @@ static WRITE8_HANDLER( ioE8_write )
 
 //	io_E8 = data;
 //}
-
-
-UINT8 pc8201_lcd[11][256];
-UINT8 pc8201_lcd_addr[10];
-
-// 0xF0...
-static WRITE8_HANDLER( lcd_command_write )
-{
-	pc8201_lcd_addr[pc8201_lcd_bank] = data;
-	/* logerror("pc8201: LCDCM = 0x%02x\n",data); */
-}
-
-// 0xFF
-static WRITE8_HANDLER( lcd_data_write )
-{
-	UINT8 addr = pc8201_lcd_addr[pc8201_lcd_bank]++;
-	pc8201_lcd[pc8201_lcd_bank][addr] = data;
-	/* logerror("pc8201: LCD [%i][%02x] = 0x%02x\n",pc8201_lcd_bank,addr,data); */
-}
 
 static WRITE8_HANDLER( unk_write )
 {
@@ -375,20 +327,6 @@ static READ8_HANDLER( keyboard_read )
 	return data;
 }
 
-// 0xF0...
-static READ8_HANDLER( lcd_status_read )
-{
-	/* logerror("pc8201: LCDST = 0\n"); */
-	return 0;	/* currently we are always ready */
-}
-
-// 0xFF
-static READ8_HANDLER( lcd_data_read )
-{
-	UINT8 addr = pc8201_lcd_addr[pc8201_lcd_bank]++;
-	return pc8201_lcd[pc8201_lcd_bank][addr];
-}
-
 static READ8_HANDLER( unk_read )
 {
 	logerror("pc8201 IO port r: %04x\n", offset);
@@ -421,8 +359,8 @@ static ADDRESS_MAP_START( kyo85_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xd8, 0xd8) AM_READ( uart_read )
 	AM_RANGE(0xe0, 0xe8) AM_READ( keyboard_read )
 	AM_RANGE(0xe0, 0xe8) AM_READWRITE( keyboard_read, ioE8_write )
-	AM_RANGE(0xfe, 0xfe) AM_READWRITE( lcd_status_read, lcd_command_write ) /* LCD status / command */
-	AM_RANGE(0xff, 0xff) AM_READWRITE( lcd_data_read, lcd_data_write )		/* LCD data */
+	AM_RANGE(0xfe, 0xfe) AM_READWRITE( kyo85_lcd_status_r, kyo85_lcd_command_w )
+	AM_RANGE(0xff, 0xff) AM_READWRITE( kyo85_lcd_data_r, kyo85_lcd_data_w )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc8201_io, ADDRESS_SPACE_IO, 8 )
@@ -434,8 +372,8 @@ static ADDRESS_MAP_START( pc8201_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xd8, 0xd8) AM_READ( uart_read )
 	AM_RANGE(0xe0, 0xe8) AM_READ( keyboard_read )
 //	AM_RANGE(0xe0, 0xe8) AM_READWRITE( keyboard_read, ioE8_write )
-	AM_RANGE(0xfe, 0xfe) AM_READWRITE( lcd_status_read, lcd_command_write ) /* LCD status / command */
-	AM_RANGE(0xff, 0xff) AM_READWRITE( lcd_data_read, lcd_data_write )		/* LCD data */
+	AM_RANGE(0xfe, 0xfe) AM_READWRITE( kyo85_lcd_status_r, kyo85_lcd_command_w )
+	AM_RANGE(0xff, 0xff) AM_READWRITE( kyo85_lcd_data_r, kyo85_lcd_data_w )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( trs200_io, ADDRESS_SPACE_IO, 8 )
@@ -449,62 +387,9 @@ static ADDRESS_MAP_START( trs200_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xd0, 0xdf) AM_READWRITE( trs200_bank_read, trs200_bank_write )
 	AM_RANGE(0xe0, 0xe8) AM_READ( keyboard_read )
 //	AM_RANGE(0xe0, 0xe8) AM_READWRITE( keyboard_read, ioE8_write )
-	AM_RANGE(0xfe, 0xfe) AM_READWRITE( lcd_status_read, lcd_command_write ) /* LCD status / command */
-	AM_RANGE(0xff, 0xff) AM_READWRITE( lcd_data_read, lcd_data_write )		/* LCD data */
+	AM_RANGE(0xfe, 0xfe) AM_READWRITE( kyo85_lcd_status_r, kyo85_lcd_command_w )
+	AM_RANGE(0xff, 0xff) AM_READWRITE( kyo85_lcd_data_r, kyo85_lcd_data_w )
 ADDRESS_MAP_END
-
-
-// pasted from PX-4. to be fixed!!
-static PALETTE_INIT( kyo85 )
-{
-	palette_set_color(machine, 0, MAKE_RGB(138, 146, 148));
-	palette_set_color(machine, 1, MAKE_RGB(92, 83, 88));
-}
-
-static VIDEO_UPDATE( kyo85 )
-{
-	int x,y;
-	int bank;
-	int row,col;
-	int addr;
-	int yoff;
-	unsigned char b;
-
-	int pen1,pen0;
-
-	pen0 = screen->machine->pens[0];
-	pen1 = screen->machine->pens[1];
-
-	for (y=0;y<64;y+=8) 
-	{
-		for (x=0;x<240;x++) 
-		{
-			bank = x/50;
-			row = x%50;
-			col = y/8;
-			if (col>3) 
-			{
-				col -= 4;
-				bank+= 5;
-			}
-
-		addr = col*64 + row;
-
-		b = pc8201_lcd[bank+1][addr];
-
-		/*logerror("pc8201: vid [%i][%02x] = 0x%02x (%i,%i)\n",bank,addr,b,x,y); */
-
-	for (yoff = 0; yoff < 8; yoff++)
-	{
-		*BITMAP_ADDR16(bitmap, y+yoff, x ) = ((b & (1 << yoff)) == (1 << yoff)) ? pen0 : pen1;
-	}
-	
-		}
-	}
-
-	return 0;
-}
-
 
 /**************************************************************************
 
@@ -715,6 +600,10 @@ INPUT_PORTS_END
 
 static MACHINE_START( kyo85 )
 {
+	const device_config *rtc = devtag_get_device(machine, "rtc");
+
+	upd1990a_cs_w(rtc, 1);
+	upd1990a_oe_w(rtc, 1);
 }
 
 static MACHINE_RESET( kyo85 )
@@ -723,7 +612,6 @@ static MACHINE_RESET( kyo85 )
 	ram_page = -1;
 	port_a = 0;
 	port_b = 0;
-	port_c = 0;
 	timer_lsb = 0;
 	timer_msb = 0;
 	io_E8 = 0;
@@ -732,32 +620,48 @@ static MACHINE_RESET( kyo85 )
 	io_90 = 0;
 }
 
+static int upd1990a_data;
+
+static WRITE_LINE_DEVICE_HANDLER( kyocera_upd1990a_data_w )
+{
+	upd1990a_data = state;
+}
+
 static UPD1990A_INTERFACE( kyocera_upd1990a_intf )
 {
+	DEVCB_LINE(kyocera_upd1990a_data_w),
 	DEVCB_CPU_INPUT_LINE("maincpu", I8085_RST75_LINE)
 };
 
 static READ8_DEVICE_HANDLER( kyocera_8155_port_c_r )
 {
-	const device_config *rtc = devtag_get_device(device->machine, "rtc");
-	port_c = (port_c & ~0x01) | upd1990a_data_out_r(rtc, offset);
+	/*
+	
+		bit		description
 
-	return port_c;
-			/*
-			Bits:
-			    0 - Serial data input from clock chip
-			    1 - Busy (not) signal from printer
-			    2 - Busy signal from printer
-			    3 - Data from BCR
-			    4 - CTS (not) line from RS232
-			    5 - DSR (not) line from RS232
-			    6-7 - Not avaiable on 8155 */
+		0		serial data input from clock chip
+		1		_BUSY signal from printer
+		2		BUSY signal from printer
+		3		data from BCR
+		4		_CTS from RS232
+		5		_DSR from RS232
+
+	*/
+	UINT8 data = 0;
+
+	data |= upd1990a_data;
+//	data |= centronics_not_busy_r(centronics) << 1;
+//	data |= centronics_busy_r(centronics) << 2;
+
+	return data;
 }
 
 static WRITE8_DEVICE_HANDLER( kyocera_8155_port_a_w )
 {
+	const device_config *rtc = devtag_get_device(device->machine, "rtc");
+
 	port_a = data;
-	lcd_bank_update( port_a | ((port_b & 3) << 8) );
+	kyo85_set_lcd_bank( port_a | ((port_b & 3) << 8) );
 
 			/*
 			The first 5 bits of this port is used to control the 1990 real time clock chip.  
@@ -768,12 +672,12 @@ static WRITE8_DEVICE_HANDLER( kyocera_8155_port_a_w )
 			    2 -  C2
 			    3 -  Clock
 			    4 -  Serial data into clock chip */
-	if ((data & 0x08) != (port_a & 0x08))
-	{
-		const device_config *rtc = devtag_get_device(device->machine, "rtc");
-		upd1990a_clk_w(rtc, offset, data);
-		logerror("CLK write %d\n", data);
-	}
+
+	upd1990a_c0_w(rtc, BIT(data, 0));
+	upd1990a_c1_w(rtc, BIT(data, 1));
+	upd1990a_c2_w(rtc, BIT(data, 2));
+	upd1990a_clk_w(rtc, BIT(data, 3));
+	upd1990a_data_w(rtc, BIT(data, 4));
 }
 
 static WRITE8_DEVICE_HANDLER( kyocera_8155_port_b_w )
@@ -791,7 +695,7 @@ static WRITE8_DEVICE_HANDLER( kyocera_8155_port_b_w )
 			    6 - DTR (not) line for RS232
 			    7 - RTS (not) line for RS232 */
 	port_b = data;
-	lcd_bank_update( port_a | ((port_b & 3) << 8) );
+	kyo85_set_lcd_bank( port_a | ((port_b & 3) << 8) );
 }
 
 static PIO8155_INTERFACE( kyocera_8155_intf )
@@ -826,6 +730,7 @@ static MACHINE_DRIVER_START( kyo85 )
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(kyo85)
 
+	MDRV_VIDEO_START(kyo85)
 	MDRV_VIDEO_UPDATE(kyo85)
 
 	/* sound hardware */
