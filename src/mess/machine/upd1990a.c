@@ -343,8 +343,8 @@ WRITE_LINE_DEVICE_HANDLER( upd1990a_data_w )
 
 static TIMER_CALLBACK( clock_tick )
 {
-	const device_config *device = ptr;
-	upd1990a_t *upd1990a = get_safe_token(device);
+//	const device_config *device = ptr;
+//	upd1990a_t *upd1990a = get_safe_token(device);
 
 	// TODO: advance clock
 }
