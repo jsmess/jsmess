@@ -82,11 +82,17 @@ WRITE8_HANDLER ( msx_90in1_w );
 DEVICE_IMAGE_LOAD( msx_floppy );
 
 /* new memory emulation */
-WRITE8_HANDLER (msx_superloadrunner_w);
 WRITE8_HANDLER (msx_page0_w);
+WRITE8_HANDLER (msx_page0_1_w);
 WRITE8_HANDLER (msx_page1_w);
+WRITE8_HANDLER (msx_page1_1_w);
+WRITE8_HANDLER (msx_page1_2_w);
 WRITE8_HANDLER (msx_page2_w);
+WRITE8_HANDLER (msx_page2_1_w);
+WRITE8_HANDLER (msx_page2_2_w);
+WRITE8_HANDLER (msx_page2_3_w);
 WRITE8_HANDLER (msx_page3_w);
+WRITE8_HANDLER (msx_page3_1_w);
 WRITE8_HANDLER (msx_sec_slot_w);
  READ8_HANDLER (msx_sec_slot_r);
 WRITE8_HANDLER (msx_ram_mapper_w);

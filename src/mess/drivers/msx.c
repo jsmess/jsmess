@@ -295,87 +295,65 @@ PCB Layouts missing
 #include "sound/k051649.h"
 #include "sound/2413intf.h"
 
-static ADDRESS_MAP_START (readmem, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE( 0x0000, 0x1fff) AM_READ( SMH_BANK1 )
-	AM_RANGE( 0x2000, 0x3fff) AM_READ( SMH_BANK2 )
-	AM_RANGE( 0x4000, 0x5fff) AM_READ( SMH_BANK3 )
-	AM_RANGE( 0x6000, 0x7ff7) AM_READ( SMH_BANK4 )
-	AM_RANGE( 0x7ff8, 0x7fff) AM_READ( SMH_BANK5 )
-	AM_RANGE( 0x8000, 0x97ff) AM_READ( SMH_BANK6 )
-	AM_RANGE( 0x9800, 0x9fff) AM_READ( SMH_BANK7 )
-	AM_RANGE( 0xa000, 0xb7ff) AM_READ( SMH_BANK8 )
-	AM_RANGE( 0xb800, 0xbfff) AM_READ( SMH_BANK9 )
-	AM_RANGE( 0xc000, 0xdfff) AM_READ( SMH_BANK10 )
-	AM_RANGE( 0xe000, 0xfffe) AM_READ( SMH_BANK11 )
-	AM_RANGE( 0xffff, 0xffff) AM_READ( msx_sec_slot_r )
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem , ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE( 0x0000, 0x0000) AM_WRITE( msx_superloadrunner_w )
-	AM_RANGE( 0x0001, 0x3fff) AM_WRITE( msx_page0_w )
-	AM_RANGE( 0x4000, 0x7fff) AM_WRITE( msx_page1_w )
-	AM_RANGE( 0x8000, 0xbfff) AM_WRITE( msx_page2_w )
-	AM_RANGE( 0xc000, 0xfffe) AM_WRITE( msx_page3_w )
-	AM_RANGE( 0xffff, 0xffff) AM_WRITE( msx_sec_slot_w )
+static ADDRESS_MAP_START (msx_memory_map, ADDRESS_SPACE_PROGRAM, 8)
+	AM_RANGE( 0x0000, 0x1fff) AM_READWRITE( SMH_BANK1, msx_page0_w )
+	AM_RANGE( 0x2000, 0x3fff) AM_READWRITE( SMH_BANK2, msx_page0_1_w )
+	AM_RANGE( 0x4000, 0x5fff) AM_READWRITE( SMH_BANK3, msx_page1_w )
+	AM_RANGE( 0x6000, 0x7ff7) AM_READWRITE( SMH_BANK4, msx_page1_1_w )
+	AM_RANGE( 0x7ff8, 0x7fff) AM_READWRITE( SMH_BANK5, msx_page1_2_w )
+	AM_RANGE( 0x8000, 0x97ff) AM_READWRITE( SMH_BANK6, msx_page2_w )
+	AM_RANGE( 0x9800, 0x9fff) AM_READWRITE( SMH_BANK7, msx_page2_1_w )
+	AM_RANGE( 0xa000, 0xb7ff) AM_READWRITE( SMH_BANK8, msx_page2_2_w )
+	AM_RANGE( 0xb800, 0xbfff) AM_READWRITE( SMH_BANK9, msx_page2_3_w )
+	AM_RANGE( 0xc000, 0xdfff) AM_READWRITE( SMH_BANK10, msx_page3_w )
+	AM_RANGE( 0xe000, 0xfffe) AM_READWRITE( SMH_BANK11, msx_page3_1_w )
+	AM_RANGE( 0xffff, 0xffff) AM_READWRITE( msx_sec_slot_r, msx_sec_slot_w )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START (readport, ADDRESS_SPACE_IO, 8)
+static WRITE8_DEVICE_HANDLER( msx_ay8910_w )
+{
+	if ( offset & 1 )
+		ay8910_data_w( device, offset, data );
+	else
+		ay8910_address_w( device, offset, data );
+}
+
+
+static ADDRESS_MAP_START (msx_io_map, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x90, 0x90) AM_DEVREAD("centronics", msx_printer_status_r)
-	AM_RANGE( 0xa0, 0xa7) AM_DEVREAD("ay8910", ay8910_r )
-	AM_RANGE( 0xa8, 0xab) AM_DEVREAD("ppi8255", ppi8255_r )
-	AM_RANGE( 0x98, 0x98) AM_READ( TMS9928A_vram_r )
-	AM_RANGE( 0x99, 0x99) AM_READ( TMS9928A_register_r )
-	AM_RANGE( 0xd9, 0xd9) AM_READ( msx_kanji_r )
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START (writeport, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x77, 0x77) AM_WRITE( msx_90in1_w )
 	AM_RANGE( 0x7c, 0x7d) AM_WRITE( msx_fmpac_w )
-	AM_RANGE( 0x90, 0x90) AM_DEVWRITE("centronics", msx_printer_strobe_w)
+	AM_RANGE( 0x90, 0x90) AM_DEVREADWRITE("centronics", msx_printer_status_r, msx_printer_strobe_w)
 	AM_RANGE( 0x91, 0x91) AM_DEVWRITE("centronics", msx_printer_data_w)
-	AM_RANGE( 0xa0, 0xa0) AM_DEVWRITE("ay8910", ay8910_address_w ) AM_MIRROR(0x06)
-	AM_RANGE( 0xa1, 0xa1) AM_DEVWRITE("ay8910", ay8910_data_w ) AM_MIRROR(0x06)
-	AM_RANGE( 0xa8, 0xab) AM_DEVWRITE("ppi8255", ppi8255_w )
-	AM_RANGE( 0x98, 0x98) AM_WRITE( TMS9928A_vram_w )
-	AM_RANGE( 0x99, 0x99) AM_WRITE( TMS9928A_register_w )
-	AM_RANGE( 0xd8, 0xd9) AM_WRITE( msx_kanji_w )
+	AM_RANGE( 0xa0, 0xa7) AM_DEVREADWRITE("ay8910", ay8910_r, msx_ay8910_w )
+	AM_RANGE( 0xa8, 0xab) AM_DEVREADWRITE("ppi8255", ppi8255_r, ppi8255_w )
+	AM_RANGE( 0x98, 0x98) AM_READWRITE( TMS9928A_vram_r, TMS9928A_vram_w )
+	AM_RANGE( 0x99, 0x99) AM_READWRITE( TMS9928A_register_r, TMS9928A_register_w )
+	AM_RANGE( 0xd8, 0xd9) AM_READWRITE( msx_kanji_r, msx_kanji_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START (readport2, ADDRESS_SPACE_IO, 8)
+
+static ADDRESS_MAP_START (msx2_io_map, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x90, 0x90) AM_DEVREAD("centronics", msx_printer_status_r)
-	AM_RANGE( 0xa0, 0xa7) AM_DEVREAD("ay8910", ay8910_r )
-	AM_RANGE( 0xa8, 0xab) AM_DEVREAD("ppi8255", ppi8255_r )
-	AM_RANGE( 0x98, 0x98) AM_READ( v9938_0_vram_r )
-	AM_RANGE( 0x99, 0x99) AM_READ( v9938_0_status_r )
-	AM_RANGE( 0xb5, 0xb5) AM_READ( msx_rtc_reg_r )
-	AM_RANGE( 0xd9, 0xd9) AM_READ( msx_kanji_r )
-	AM_RANGE( 0xfc, 0xff) AM_READ( msx_ram_mapper_r )
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START (writeport2, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x77, 0x77) AM_WRITE( msx_90in1_w )
 	AM_RANGE( 0x7c, 0x7d) AM_WRITE( msx_fmpac_w )
-	AM_RANGE( 0x90, 0x90) AM_DEVWRITE("centronics", msx_printer_strobe_w)
+	AM_RANGE( 0x90, 0x90) AM_DEVREADWRITE("centronics", msx_printer_status_r, msx_printer_strobe_w)
 	AM_RANGE( 0x91, 0x91) AM_DEVWRITE("centronics", msx_printer_data_w)
-	AM_RANGE( 0xa0, 0xa0) AM_DEVWRITE("ay8910", ay8910_address_w ) AM_MIRROR(0x06)
-	AM_RANGE( 0xa1, 0xa1) AM_DEVWRITE("ay8910", ay8910_data_w ) AM_MIRROR(0x06)
-	AM_RANGE( 0xa8, 0xab) AM_DEVWRITE("ppi8255", ppi8255_w )
-	AM_RANGE( 0x98, 0x98) AM_WRITE( v9938_0_vram_w )
-	AM_RANGE( 0x99, 0x99) AM_WRITE( v9938_0_command_w )
+	AM_RANGE( 0xa0, 0xa7) AM_DEVREADWRITE("ay8910", ay8910_r, msx_ay8910_w )
+	AM_RANGE( 0xa8, 0xab) AM_DEVREADWRITE("ppi8255", ppi8255_r, ppi8255_w )
+	AM_RANGE( 0x98, 0x98) AM_READWRITE( v9938_0_vram_r, v9938_0_vram_w )
+	AM_RANGE( 0x99, 0x99) AM_READWRITE( v9938_0_status_r, v9938_0_command_w )
 	AM_RANGE( 0x9a, 0x9a) AM_WRITE( v9938_0_palette_w )
 	AM_RANGE( 0x9b, 0x9b) AM_WRITE( v9938_0_register_w )
 	AM_RANGE( 0xb4, 0xb4) AM_WRITE( msx_rtc_latch_w )
-	AM_RANGE( 0xb5, 0xb5) AM_WRITE( msx_rtc_reg_w )
-	AM_RANGE( 0xd8, 0xd9) AM_WRITE( msx_kanji_w )
-	AM_RANGE( 0xfc, 0xff) AM_WRITE( msx_ram_mapper_w )
+	AM_RANGE( 0xb5, 0xb5) AM_READWRITE( msx_rtc_reg_r, msx_rtc_reg_w )
+	AM_RANGE( 0xd8, 0xd9) AM_READWRITE( msx_kanji_r, msx_kanji_w )
+	AM_RANGE( 0xfc, 0xff) AM_READWRITE( msx_ram_mapper_r, msx_ram_mapper_w )
 ADDRESS_MAP_END
+
 
 static INPUT_PORTS_START( msx_dips )
 	PORT_START("JOY0")
@@ -1052,8 +1030,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( msx )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3579545)		  /* 3.579545 MHz */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(readport,writeport)
+	MDRV_CPU_PROGRAM_MAP(msx_memory_map, 0)
+	MDRV_CPU_IO_MAP(msx_io_map, 0)
 	MDRV_CPU_VBLANK_INT("screen", msx_interrupt)
 	MDRV_QUANTUM_TIME(HZ(60))
 
@@ -1111,8 +1089,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( msx2 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3579545)		  /* 3.579545 MHz */
-	MDRV_CPU_PROGRAM_MAP(readmem, writemem)
-	MDRV_CPU_IO_MAP(readport2,writeport2)
+	MDRV_CPU_PROGRAM_MAP(msx_memory_map, 0)
+	MDRV_CPU_IO_MAP(msx2_io_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(msx2_interrupt, 262)
 	MDRV_QUANTUM_TIME(HZ(60))
 

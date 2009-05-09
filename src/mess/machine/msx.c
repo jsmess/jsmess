@@ -1027,18 +1027,15 @@ void msx_memory_map_all (running_machine *machine)
 	}
 }
 
-WRITE8_HANDLER (msx_superloadrunner_w)
-{
-	msx1.superloadrunner_bank = data;
-	if (msx1.slot[2]->slot_type == SLOT_SUPERLOADRUNNER) {
-		msx1.slot[2]->map (space->machine, msx1.state[2], 2);
-	}
-	msx_page0_w(space, -1, data);
-}
-
 WRITE8_HANDLER (msx_page0_w)
 {
-	offset++;
+	if ( offset == 0 )
+	{
+		msx1.superloadrunner_bank = data;
+		if (msx1.slot[2]->slot_type == SLOT_SUPERLOADRUNNER) {
+			msx1.slot[2]->map (space->machine, msx1.state[2], 2);
+		}
+	}
 
 	switch (msx1.slot[0]->mem_type) {
 	case MSX_MEM_RAM:
@@ -1047,6 +1044,11 @@ WRITE8_HANDLER (msx_page0_w)
 	case MSX_MEM_HANDLER:
 		msx1.slot[0]->write (space->machine, msx1.state[0], offset, data);
 	}
+}
+
+WRITE8_HANDLER (msx_page0_1_w)
+{
+	msx_page0_w( space, 0x2000 + offset, data );
 }
 
 WRITE8_HANDLER (msx_page1_w)
@@ -1060,6 +1062,16 @@ WRITE8_HANDLER (msx_page1_w)
 	}
 }
 
+WRITE8_HANDLER (msx_page1_1_w)
+{
+	msx_page1_w( space, 0x2000 + offset, data );
+}
+
+WRITE8_HANDLER (msx_page1_2_w)
+{
+	msx_page1_w( space, 0x3ff8 + offset, data );
+}
+
 WRITE8_HANDLER (msx_page2_w)
 {
 	switch (msx1.slot[2]->mem_type) {
@@ -1071,6 +1083,21 @@ WRITE8_HANDLER (msx_page2_w)
 	}
 }
 
+WRITE8_HANDLER (msx_page2_1_w)
+{
+	msx_page2_w( space, 0x1800 + offset, data );
+}
+
+WRITE8_HANDLER (msx_page2_2_w)
+{
+	msx_page2_w( space, 0x2000 + offset, data );
+}
+
+WRITE8_HANDLER (msx_page2_3_w)
+{
+	msx_page2_w( space, 0x3800 + offset, data );
+}
+
 WRITE8_HANDLER (msx_page3_w)
 {
 	switch (msx1.slot[3]->mem_type) {
@@ -1080,6 +1107,11 @@ WRITE8_HANDLER (msx_page3_w)
 	case MSX_MEM_HANDLER:
 		msx1.slot[3]->write (space->machine, msx1.state[3], 0xc000 + offset, data);
 	}
+}
+
+WRITE8_HANDLER (msx_page3_1_w)
+{
+	msx_page3_w( space, 0x2000 + offset, data );
 }
 
 WRITE8_HANDLER (msx_sec_slot_w)
@@ -1141,7 +1173,7 @@ READ8_HANDLER (msx_kanji_r)
 {
 	UINT8 result = 0xff;
 
-	if (msx1.kanji_mem)
+	if (offset && msx1.kanji_mem)
 	{
 		int latch;
 		UINT8 ret;
