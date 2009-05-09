@@ -278,7 +278,7 @@ static SYSTEM_CONFIG_START(kaypro2x)
 SYSTEM_CONFIG_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE	  INPUT    INIT      CONFIG       COMPANY  FULLNAME */
-COMP( 1983, kayproii, 0,        0,      kayproii, kay_kbd, 0,        kayproii,	  "Non Linear Systems",  "Kaypro II - 2/83" , GAME_NOT_WORKING )
+COMP( 1983, kayproii, 0,        0,      kayproii, kay_kbd, 0,        kayproii,	  "Non Linear Systems",  "Kaypro II - 2/83" , 0 )
 COMP( 198?, kaypro4,  kayproii, 0,      kayproii, kay_kbd, 0,        kaypro2x,	  "Non Linear Systems",  "Kaypro 4 - 4/83" , GAME_NOT_WORKING )
 COMP( 198?, omni2,    kayproii, 0,      omni2,    kay_kbd, 0,        kaypro2x,	  "Non Linear Systems",  "Omni II" , GAME_NOT_WORKING )
 COMP( 1984, kaypro2x, 0,        0,      kaypro2x, kay_kbd, 0,        kaypro2x,	  "Non Linear Systems",  "Kaypro 2x" , GAME_NOT_WORKING )

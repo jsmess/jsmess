@@ -570,7 +570,7 @@ INLINE void vc4000_draw_grid(running_machine *machine, UINT8 *collision)
 	plot_box(vc4000_video.bitmap, 0, vc4000_video.line, width, 1, (vc4000_video.reg.d.background)&7);
 
 	if (line<0 || line>=200) return;
-	if (!(vc4000_video.reg.d.background&8)) return;
+	if (~vc4000_video.reg.d.background & 8) return;
 
 	i=(line/20)*2;
 	if (line%20>=2) i++;

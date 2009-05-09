@@ -1356,14 +1356,11 @@ WRITE8_DEVICE_HANDLER ( wd17xx_command_w )
 			w->status &= ~STA_2_LOST_DAT;
   			wd17xx_clear_data_request(device);
 
-			if (!floppy_drive_get_flag_state(wd17xx_current_image(device), FLOPPY_DRIVE_READY))
-            {
-				wd17xx_complete_command(device, DELAY_NOTREADY);
-            }
-            else
-            {
-                wd17xx_read_id(device);
-            }
+			if (floppy_drive_get_flag_state(wd17xx_current_image(device), FLOPPY_DRIVE_READY))
+				wd17xx_read_id(device);
+
+			wd17xx_complete_command(device, DELAY_NOTREADY);
+
 			return;
 		}
 
