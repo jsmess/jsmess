@@ -248,9 +248,11 @@ const game_driver * const drivers[] =
 	DRIVER( apple2c3 )	/* Sep 1986 Apple //c (Original Mem. Exp.)			*/
 	DRIVER( apple2c4 )	/* ??? 198? Apple //c (rev 4)						*/
 	DRIVER( apple2cp )	/* Sep 1988 Apple //c+								*/
-	DRIVER( apple2g0 )	/* Sep 1986 Apple IIgs ROM00						*/
-	DRIVER( apple2g1 )	/* Sep 1987 Apple IIgs ROM01						*/
+	DRIVER( apple2gsr0 )	/* Sep 1986 Apple IIgs ROM00					*/
+	DRIVER( apple2gsr1 )	/* Sep 1987 Apple IIgs ROM01					*/
 	DRIVER( apple2gs )	/* Aug 1989 Apple IIgs ROM03						*/
+	DRIVER( apple2gsr3p )	/* ??? 198? Apple IIgs ROM03 prototype			*/
+	DRIVER( apple2gsr4p )	/* ??? 1989 Apple IIgs ROM04 prototype			*/
 	DRIVER( apple3 )	/* May 1980 Apple ///								*/
 					/* Dec 1983 Apple ///+								*/
 	DRIVER( ace100 )	/* ??? 1982 Franklin Ace 100						*/

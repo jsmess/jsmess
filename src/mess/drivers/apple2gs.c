@@ -192,26 +192,61 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START(apple2gs)
+	ROM_REGION(0x1000,"keyboard",0)
+	ROM_LOAD ("341-0024-a", 0x0000, 0x07FF, NO_DUMP) /* Keyboard i8048 MCU Rev1 */
+
 	ROM_REGION(0x1000,"gfx1",0)
-	ROM_LOAD ( "apple2gs.chr", 0x0000, 0x1000, CRC(91e53cd8) SHA1(34e2443e2ef960a36c047a09ed5a93f471797f89))
+	ROM_LOAD ( "apple2gs.chr", 0x0000, 0x1000, CRC(91e53cd8) SHA1(34e2443e2ef960a36c047a09ed5a93f471797f89)) /* need label/part number */
 
 	ROM_REGION(0x40000,"maincpu",0)
-	ROM_LOAD("rom03", 0x0000, 0x40000, CRC(de7ddf29) SHA1(bc32bc0e8902946663998f56aea52be597d9e361))
+	ROM_LOAD("341-0737", 0x0000, 0x20000, CRC(8d410067) SHA1(c0f4704233ead14cb8e1e8a68fbd7063c56afd27)) /* Needs verification; 341-0737: ROM03 FC-FD */
+	ROM_LOAD("341-0748", 0x20000, 0x20000, CRC(d4c50550) SHA1(2784cdd7ac7094b3e494409db3e72b4e6d2d9e81)) /* Needs verification; 341-0748: ROM03 FE-FF */
 ROM_END
 
-ROM_START(apple2g1)
+ROM_START(apple2gsr3p)
+	ROM_REGION(0x1000,"keyboard",0)
+	ROM_LOAD ("341-0024-a", 0x0000, 0x07FF, NO_DUMP) /* Keyboard i8048 MCU Rev1 */
+
+	ROM_REGION(0x1000,"gfx1",0)
+	ROM_LOAD ( "apple2gs.chr", 0x0000, 0x1000, CRC(91e53cd8) SHA1(34e2443e2ef960a36c047a09ed5a93f471797f89)) /* need label/part number */
+
+	ROM_REGION(0x40000,"maincpu",0)
+	ROM_LOAD("341-0728", 0x0000, 0x20000, NO_DUMP) /* 341-0728: ROM03 prototype FC-FD */
+	ROM_LOAD("341-0729", 0x20000, 0x20000, NO_DUMP) /* 341-0729: ROM03 prototype FE-FF */
+ROM_END
+
+ROM_START(apple2gsr4p)
+	ROM_REGION(0x1000,"keyboard",0)
+	ROM_LOAD ("341-0024-a", 0x0000, 0x07FF, NO_DUMP) /* Keyboard i8048 MCU Rev1 */
+
+	ROM_REGION(0x1000,"gfx1",0)
+	ROM_LOAD ( "apple2gs.chr", 0x0000, 0x1000, CRC(91e53cd8) SHA1(34e2443e2ef960a36c047a09ed5a93f471797f89)) /* need label/part number */
+
+	ROM_REGION(0x40000,"maincpu",0)
+	ROM_LOAD("341-0737", 0x0000, 0x20000, CRC(8d410067) SHA1(c0f4704233ead14cb8e1e8a68fbd7063c56afd27)) /* 341-0737: ROM03 FC-FD */
+	ROM_LOAD("341-0749", 0x20000, 0x20000, NO_DUMP) /* 341-0749: an early prototype for ROM04 or a last minute bugfix to rom03 which missed the deadline and wasn't released; still has the ROM03 internal label FE-FF */
+ROM_END
+
+ROM_START(apple2gsr1)
+	ROM_REGION(0x1000,"keyboard",0)
+	ROM_LOAD ("341-0024-a", 0x0000, 0x07FF, NO_DUMP) /* Keyboard i8048 MCU Rev1? */
+
+	ROM_REGION(0x1000,"gfx1",0)
+	ROM_LOAD ( "apple2gs.chr", 0x0000, 0x1000, CRC(91e53cd8) SHA1(34e2443e2ef960a36c047a09ed5a93f471797f89)) /* need label/part number */
+
+	ROM_REGION(0x20000,"maincpu",0)
+	ROM_LOAD("342-0077-b", 0x0000, 0x20000, CRC(42f124b0) SHA1(e4fc7560b69d062cb2da5b1ffbe11cd1ca03cc37)) /* 342-0077-B: ROM01 */
+ROM_END
+
+ROM_START(apple2gsr0)
+	ROM_REGION(0x1000,"keyboard",0)
+	ROM_LOAD ("341-0024", 0x0000, 0x07FF, NO_DUMP) /* Keyboard i8048 MCU Rev0? */
+
 	ROM_REGION(0x1000,"gfx1",0)
 	ROM_LOAD ( "apple2gs.chr", 0x0000, 0x1000, CRC(91e53cd8) SHA1(34e2443e2ef960a36c047a09ed5a93f471797f89))
 
 	ROM_REGION(0x20000,"maincpu",0)
-	ROM_LOAD("rom01", 0x0000, 0x20000, CRC(42f124b0) SHA1(e4fc7560b69d062cb2da5b1ffbe11cd1ca03cc37))
-ROM_END
-
-ROM_START(apple2g0)
-	ROM_REGION(0x1000,"gfx1",0)
-	ROM_LOAD ( "apple2gs.chr", 0x0000, 0x1000, CRC(91e53cd8) SHA1(34e2443e2ef960a36c047a09ed5a93f471797f89))
-
-	ROM_REGION(0x20000,"maincpu",0)
+	/* Should these roms really be split like this? according to the unofficial apple rom list, IIgs ROM00 was on one rom labeled 342-0077-A */
 	ROM_LOAD("rom0a.bin", 0x0000,  0x8000, CRC(9cc78238) SHA1(0ea82e10720a01b68722ab7d9f66efec672a44d3))
 	ROM_LOAD("rom0b.bin", 0x8000,  0x8000, CRC(8baf2a79) SHA1(91beeb11827932fe10475252d8036a63a2edbb1c))
 	ROM_LOAD("rom0c.bin", 0x10000, 0x8000, CRC(94c32caa) SHA1(4806d50d676b06f5213b181693fc1585956b98bb))
@@ -283,5 +318,7 @@ SYSTEM_CONFIG_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT       INIT      CONFIG      COMPANY            FULLNAME */
 COMP( 1989, apple2gs, 0,        apple2, apple2gs, apple2gs,   apple2gs, apple2gs,	"Apple Computer", "Apple IIgs (ROM03)", 0 )
-COMP( 1987, apple2g1, apple2gs, 0,      apple2gs, apple2gs,   apple2gs, apple2gs,	"Apple Computer", "Apple IIgs (ROM01)", 0 )
-COMP( 1986, apple2g0, apple2gs, 0,      apple2gs, apple2gs,   apple2gs, apple2gs,	"Apple Computer", "Apple IIgs (ROM00)", 0 )
+COMP( 198?, apple2gsr3p, apple2gs,        apple2gs, apple2gs, apple2gs,   apple2gs, apple2gs,	"Apple Computer", "Apple IIgs (ROM03 prototype)", GAME_NOT_WORKING )
+COMP( 1989, apple2gsr4p, apple2gs,        apple2gs, apple2gs, apple2gs,   apple2gs, apple2gs,	"Apple Computer", "Apple IIgs (ROM04 prototype)", GAME_NOT_WORKING )
+COMP( 1987, apple2gsr1, apple2gs, 0,      apple2gs, apple2gs,   apple2gs, apple2gs,	"Apple Computer", "Apple IIgs (ROM01)", 0 )
+COMP( 1986, apple2gsr0, apple2gs, 0,      apple2gs, apple2gs,   apple2gs, apple2gs,	"Apple Computer", "Apple IIgs (ROM00)", 0 )
