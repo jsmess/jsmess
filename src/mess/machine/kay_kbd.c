@@ -4,7 +4,7 @@
  *
  *	Kaypro II Serial Keyboard
  *
- *	Most of this is copied from kaypro.c,
+ *	Most of this is copied from the old kaypro.c,
  *	rather than re-inventing the wheel.
  *
  *	Juergen Buchmueller, July 1998
@@ -12,8 +12,6 @@
  *
  *	Converted to a serial device (as far as MESS will allow)
  *	by Robbbert, April 2009.
-
-	NOTE: THIS IS A WIP, IT DOESN'T DO ANYTHING AT THIS TIME !!
  *
  ******************************************************************************/
 
@@ -397,7 +395,6 @@ static WRITE8_HANDLER ( kaypro2_const_w )
 #endif
 
 /******************************************************
- *	kaypro_conin_w
  *	stuff character into the keyboard buffer
  *	releases CPU if it was waiting for a key
  *	sounds bell if buffer would overflow
