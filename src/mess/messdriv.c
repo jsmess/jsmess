@@ -281,6 +281,7 @@ const game_driver * const drivers[] =
 	DRIVER( macplus )	/* 1986 Apple Macintosh Plus						*/
 	DRIVER( macse )		/* 1987 Apple Macintosh SE							*/
 	DRIVER( macclasc )	/* 1990 Apple Macintosh Classic						*/
+//	DRIVER( maclc )		/* 1990 Apple Macintosh LC							*/
 
 	/* ATARI */
 	DRIVER( a400 )		/* 1979 Atari 400									*/
@@ -942,6 +943,7 @@ const game_driver * const drivers[] =
 
 	/* Luxor Datorer AB */
 	DRIVER( abc80 )
+//	DRIVER( abc80h )
 	DRIVER( abc802 )
 	DRIVER( abc800m )
 	DRIVER( abc800c )
