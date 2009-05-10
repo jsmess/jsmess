@@ -10,13 +10,6 @@
 
 #include <zlib.h>
 
-#ifndef FALSE
-#	 define FALSE 0
-#endif
-#ifndef TRUE
-#	 define TRUE (!FALSE)
-#endif
-
 typedef struct _cybiko_file_system cybiko_file_system;
 struct _cybiko_file_system
 {
