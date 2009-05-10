@@ -21,14 +21,13 @@ UINT8 kaypro2x_system_port;
 
 	PIO
 
-	It seems there must have been a bulk-purchase
-	special on pios - port B is unused on both of them
+	Port B is unused on both PIOs
 
 ************************************************************/
 
-static WRITE8_DEVICE_HANDLER( kaypro_interrupt )
+static void kaypro_interrupt(const device_config *device, int state)
 {
-	cputag_set_input_line(device->machine, "maincpu", 0, data);
+	cputag_set_input_line(device->machine, "maincpu", 0, state);
 }
 
 static READ8_DEVICE_HANDLER( pio_system_r )
@@ -81,7 +80,7 @@ static WRITE8_DEVICE_HANDLER( pio_system_w )
 
 const z80pio_interface kayproii_pio_g_intf =
 {
-	DEVCB_HANDLER(kaypro_interrupt),
+	DEVCB_LINE(kaypro_interrupt),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DEVICE_HANDLER("centronics", centronics_data_w),
@@ -92,7 +91,7 @@ const z80pio_interface kayproii_pio_g_intf =
 
 const z80pio_interface kayproii_pio_s_intf =
 {
-	DEVCB_HANDLER(kaypro_interrupt),
+	DEVCB_LINE(kaypro_interrupt),
 	DEVCB_HANDLER(pio_system_r),	/* read printer status */
 	DEVCB_NULL,
 	DEVCB_HANDLER(pio_system_w),	/* activate various internal devices */
@@ -243,16 +242,9 @@ WRITE8_HANDLER( kaypro2x_baud_a_w )	/* Channel A on 2nd SIO - Serial Printer */
 //	z80sio_set_tx_clock( kaypro2x_z80sio, baud_clock[data], 0);
 }
 
-
-/* when sio devcb'ed like pio is, change to use pio's int handler */
-static void kaypro_int_sio(const device_config *device, int state)
-{
-	cputag_set_input_line(device->machine, "maincpu", 0, state);
-}
-
 const z80sio_interface kaypro_sio_intf =
 {
-	kaypro_int_sio,		/* interrupt handler */
+	kaypro_interrupt,	/* interrupt handler */
 	0,			/* DTR changed handler */
 	0,			/* RTS changed handler */
 	0,			/* BREAK changed handler */
@@ -342,7 +334,7 @@ static WD17XX_CALLBACK( kaypro_fdc_callback )
 {
 	if ((state == WD17XX_DRQ_SET) || (state == WD17XX_IRQ_SET))
 	{
-		timer_set(device->machine, ATTOTIME_IN_USEC(10), NULL, 0, kaypro_timer_callback);
+		timer_set(device->machine, ATTOTIME_IN_USEC(25), NULL, 0, kaypro_timer_callback);
 	}
 	else
 	{

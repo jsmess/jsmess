@@ -27,6 +27,16 @@
 			-               wd17xx_complete_command(device, DELAY_DATADONE);
 			+               wd17xx_set_data_request();
 
+	2009-May-10 Robbbert:
+		Further change to get the Kaypro II to work
+		- When wd17xx_read_id has generated the 6 data bytes, it should make
+		  an IRQ and turn off the busy status. The timing for Osborne is
+		  critical, it must be between 300 and 700 usec, I've settled on 400.
+		  The Kaypro doesn't care timewise, but the busy flag must turn off
+		  sometime or it hangs.
+			-		w->status |= STA_2_BUSY;
+			+		wd17xx_set_busy(device, ATTOTIME_IN_USEC(400));
+
 	TODO:
 		- Multiple record write
 		- What happens if a track is read that doesn't have any id's on it?
@@ -200,7 +210,7 @@ struct _wd17xx_t
 	/* this is the head currently selected */
 	UINT8 hd;
 
-	/* pause time when writeing/reading sector */
+	/* pause time when writing/reading sector */
 	int pause_time;
 	
 	/* Pointer to interface */
@@ -623,8 +633,7 @@ static void wd17xx_read_id(const device_config *device)
 		w->buffer[5] = crc & 255;
 
 		w->sector = id.C;
-
-		w->status |= STA_2_BUSY;
+		wd17xx_set_busy(device, ATTOTIME_IN_USEC(400));
 		w->busy_count = 0;
 
 		wd17xx_set_data_request(device);
@@ -1238,7 +1247,7 @@ WRITE8_DEVICE_HANDLER ( wd17xx_command_w )
 
 		w->data_count = 0;
 		w->data_offset = 0;
-		w->status &= ~(STA_2_BUSY);
+		w->status &= ~STA_2_BUSY;
 
 		wd17xx_clear_data_request(device);
 
@@ -1362,7 +1371,7 @@ WRITE8_DEVICE_HANDLER ( wd17xx_command_w )
 			if (floppy_drive_get_flag_state(wd17xx_current_image(device), FLOPPY_DRIVE_READY))
 				wd17xx_read_id(device);
 			else
-			wd17xx_complete_command(device, DELAY_NOTREADY);
+				wd17xx_complete_command(device, DELAY_NOTREADY);
 
 			return;
 		}
