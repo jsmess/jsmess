@@ -1,3 +1,12 @@
+/**********************************************************************
+
+    8155 - 2048-Bit Static MOS RAM with I/O Ports and Timer emulation
+
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+**********************************************************************/
+
 /*
 
 	TODO:
@@ -11,6 +20,8 @@
 /***************************************************************************
     PARAMETERS
 ***************************************************************************/
+
+#define LOG 0
 
 enum
 {
@@ -75,8 +86,6 @@ enum
 typedef struct _pio8155_t pio8155_t;
 struct _pio8155_t
 {
-	int clock;			/* timer input clock */
-
 	devcb_resolved_read8		in_port_func[PIO8155_PORT_COUNT];
 	devcb_resolved_write8		out_port_func[PIO8155_PORT_COUNT];
 	devcb_resolved_write_line	out_to_func;
@@ -124,7 +133,8 @@ INLINE UINT8 get_timer_mode(pio8155_t *pio8155)
 INLINE void timer_output(pio8155_t *pio8155)
 {
 	devcb_call_write_line(&pio8155->out_to_func, pio8155->to);
-	logerror("8155 Timer Output: %u\n", pio8155->to);
+
+	if (LOG) logerror("8155 Timer Output: %u\n", pio8155->to);
 }
 
 INLINE void pulse_timer_output(pio8155_t *pio8155)
@@ -236,14 +246,15 @@ static TIMER_CALLBACK( counter_tick )
 
 	if (pio8155->counter == 0)
 	{
-		logerror("8155 Timer Count Reached\n");
+		if (LOG) logerror("8155 Timer Count Reached\n");
 
 		switch (pio8155->command & PIO8155_COMMAND_TM_MASK)
 		{
 		case PIO8155_COMMAND_TM_STOP_AFTER_TC:
 			/* stop timer */
 			timer_enable(pio8155->timer, 0);
-			logerror("8155 Timer Stopped\n");
+
+			if (LOG) logerror("8155 Timer Stopped\n");
 			break;
 		}
 
@@ -325,28 +336,28 @@ WRITE8_DEVICE_HANDLER( pio8155_w )
 	case PIO8155_REGISTER_COMMAND:
 		pio8155->command = data;
 
-		logerror("8155 Port A Mode: %s\n", (data & PIO8155_COMMAND_PA) ? "output" : "input");
-		logerror("8155 Port B Mode: %s\n", (data & PIO8155_COMMAND_PB) ? "output" : "input");
+		if (LOG) logerror("8155 Port A Mode: %s\n", (data & PIO8155_COMMAND_PA) ? "output" : "input");
+		if (LOG) logerror("8155 Port B Mode: %s\n", (data & PIO8155_COMMAND_PB) ? "output" : "input");
 
-		logerror("8155 Port A Interrupt: %s\n", (data & PIO8155_COMMAND_IEA) ? "enabled" : "disabled");
-		logerror("8155 Port B Interrupt: %s\n", (data & PIO8155_COMMAND_IEB) ? "enabled" : "disabled");
+		if (LOG) logerror("8155 Port A Interrupt: %s\n", (data & PIO8155_COMMAND_IEA) ? "enabled" : "disabled");
+		if (LOG) logerror("8155 Port B Interrupt: %s\n", (data & PIO8155_COMMAND_IEB) ? "enabled" : "disabled");
 
 		switch (data & PIO8155_COMMAND_PC_MASK)
 		{
 		case PIO8155_COMMAND_PC_ALT_1:
-			logerror("8155 Port C Mode: Alt 1\n");
+			if (LOG) logerror("8155 Port C Mode: Alt 1\n");
 			break;
 
 		case PIO8155_COMMAND_PC_ALT_2:
-			logerror("8155 Port C Mode: Alt 2\n");
+			if (LOG) logerror("8155 Port C Mode: Alt 2\n");
 			break;
 
 		case PIO8155_COMMAND_PC_ALT_3:
-			logerror("8155 Port C Mode: Alt 3\n");
+			if (LOG) logerror("8155 Port C Mode: Alt 3\n");
 			break;
 
 		case PIO8155_COMMAND_PC_ALT_4:
-			logerror("8155 Port C Mode: Alt 4\n");
+			if (LOG) logerror("8155 Port C Mode: Alt 4\n");
 			break;
 		}
 
@@ -358,17 +369,17 @@ WRITE8_DEVICE_HANDLER( pio8155_w )
 
 		case PIO8155_COMMAND_TM_STOP:
 			/* NOP if timer has not started, stop counting if the timer is running */
-			logerror("8155 Timer Command: Stop\n");
+			if (LOG) logerror("8155 Timer Command: Stop\n");
 			timer_enable(pio8155->timer, 0);
 			break;
 
 		case PIO8155_COMMAND_TM_STOP_AFTER_TC:
 			/* stop immediately after present TC is reached (NOP if timer has not started) */
-			logerror("8155 Timer Command: Stop after TC\n");
+			if (LOG) logerror("8155 Timer Command: Stop after TC\n");
 			break;
 
 		case PIO8155_COMMAND_TM_START:
-			logerror("8155 Timer Command: Start\n");
+			if (LOG) logerror("8155 Timer Command: Start\n");
 
 			if (timer_enabled(pio8155->timer))
 			{
@@ -378,7 +389,7 @@ WRITE8_DEVICE_HANDLER( pio8155_w )
 			{
 				/* load mode and CNT length and start immediately after loading (if timer is not running) */
 				pio8155->counter = pio8155->count_length;
-				timer_adjust_periodic(pio8155->timer, attotime_zero, 0, ATTOTIME_IN_HZ(pio8155->clock));
+				timer_adjust_periodic(pio8155->timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock));
 			}
 			break;
 		}
@@ -398,33 +409,33 @@ WRITE8_DEVICE_HANDLER( pio8155_w )
 
 	case PIO8155_REGISTER_TIMER_LOW:
 		pio8155->count_length = (pio8155->count_length & 0xff00) | data;
-		logerror("8155 Count Length Low: %04x\n", pio8155->count_length);
+		if (LOG) logerror("8155 Count Length Low: %04x\n", pio8155->count_length);
 		break;
 
 	case PIO8155_REGISTER_TIMER_HIGH:
 		pio8155->count_length = (data << 8) | (pio8155->count_length & 0xff);
-		logerror("8155 Count Length High: %04x\n", pio8155->count_length);
+		if (LOG) logerror("8155 Count Length High: %04x\n", pio8155->count_length);
 
 		switch (data & PIO8155_TIMER_MODE_MASK)
 		{
 		case PIO8155_TIMER_MODE_LOW:
 			/* puts out LOW during second half of count */
-			logerror("8155 Timer Mode: LOW\n");
+			if (LOG) logerror("8155 Timer Mode: LOW\n");
 			break;
 
 		case PIO8155_TIMER_MODE_SQUARE_WAVE:
 			/* square wave, i.e. the period of the square wave equals the count length programmed with automatic reload at terminal count */
-			logerror("8155 Timer Mode: Square wave\n");
+			if (LOG) logerror("8155 Timer Mode: Square wave\n");
 			break;
 
 		case PIO8155_TIMER_MODE_SINGLE_PULSE:
 			/* single pulse upon TC being reached */
-			logerror("8155 Timer Mode: Single pulse\n");
+			if (LOG) logerror("8155 Timer Mode: Single pulse\n");
 			break;
 
 		case PIO8155_TIMER_MODE_AUTOMATIC_RELOAD:
 			/* automatic reload, i.e. single pulse every time TC is reached */
-			logerror("8155 Timer Mode: Automatic reload\n");
+			if (LOG) logerror("8155 Timer Mode: Automatic reload\n");
 			break;
 		}
 		break;

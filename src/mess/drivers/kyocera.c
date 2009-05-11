@@ -54,7 +54,7 @@ static UINT8 io_E8, io_A1, io_90, io_D0;
 // 0x90 PC-8201 only
 static WRITE8_HANDLER( pc8201_io90_write )
 {
-	const device_config *rtc = devtag_get_device(space->machine, "rtc");
+	const device_config *rtc = devtag_get_device(space->machine, UPD1990A_TAG);
 
 	upd1990a_stb_w(rtc, BIT(data, 5));
 		
@@ -79,8 +79,8 @@ static WRITE8_HANDLER( modem_control_port_write )
 // 0xA1 PC-8201 only
 static WRITE8_HANDLER( pc8201_bank_write )
 {
-	UINT8 *rom = memory_region(space->machine, "maincpu");
-	const address_space *space_program = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	UINT8 *rom = memory_region(space->machine, I8085_TAG);
+	const address_space *space_program = cputag_get_address_space(space->machine, I8085_TAG, ADDRESS_SPACE_PROGRAM);
 	
 	if ((data & 0x03) != rom_page)
 	{
@@ -145,8 +145,8 @@ static WRITE8_HANDLER( pc8201_bank_write )
 // 0xD0... T200 only
 static WRITE8_HANDLER( trs200_bank_write )	
 {
-	UINT8 *rom = memory_region(space->machine, "maincpu");
-	const address_space *space_program = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	UINT8 *rom = memory_region(space->machine, I8085_TAG);
+	const address_space *space_program = cputag_get_address_space(space->machine, I8085_TAG, ADDRESS_SPACE_PROGRAM);
 	
 	if ((data & 0x03) != rom_page)
 	{
@@ -218,7 +218,7 @@ static WRITE8_HANDLER( trs200_bank_write )
 			    3 - Remote plug control signal */
 static WRITE8_HANDLER( ioE8_write )
 {
-	const device_config *rtc = devtag_get_device(space->machine, "rtc");
+	const device_config *rtc = devtag_get_device(space->machine, UPD1990A_TAG);
 
 	upd1990a_stb_w(rtc, BIT(data, 2));
 
@@ -355,7 +355,7 @@ static ADDRESS_MAP_START( kyo85_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x82, 0x82) AM_READ( io82_read )
 	AM_RANGE(0x83, 0x9f) AM_READWRITE( unk_read, unk_write )
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE( modem_control_port_read, modem_control_port_write )
-	AM_RANGE(0xb8, 0xbf) AM_DEVREADWRITE( "pio8155", pio8155_r, pio8155_w )
+	AM_RANGE(0xb0, 0xb7) AM_MIRROR(0x08) AM_DEVREADWRITE( PIO8155_TAG, pio8155_r, pio8155_w )
 	AM_RANGE(0xd8, 0xd8) AM_READ( uart_read )
 	AM_RANGE(0xe0, 0xe8) AM_READ( keyboard_read )
 	AM_RANGE(0xe0, 0xe8) AM_READWRITE( keyboard_read, ioE8_write )
@@ -368,7 +368,7 @@ static ADDRESS_MAP_START( pc8201_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x90, 0x90) AM_WRITE( pc8201_io90_write )
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE( pc8201_ioa0_read, modem_control_port_write )
 	AM_RANGE(0xa1, 0xa1) AM_READWRITE( pc8201_bank_read, pc8201_bank_write )
-	AM_RANGE(0xb8, 0xbf) AM_DEVREADWRITE( "pio8155", pio8155_r, pio8155_w )
+	AM_RANGE(0xb0, 0xb7) AM_MIRROR(0x08) AM_DEVREADWRITE( PIO8155_TAG, pio8155_r, pio8155_w )
 	AM_RANGE(0xd8, 0xd8) AM_READ( uart_read )
 	AM_RANGE(0xe0, 0xe8) AM_READ( keyboard_read )
 //	AM_RANGE(0xe0, 0xe8) AM_READWRITE( keyboard_read, ioE8_write )
@@ -383,7 +383,7 @@ static ADDRESS_MAP_START( trs200_io, ADDRESS_SPACE_IO, 8 )
 //	AM_RANGE(0x90, 0x90) AM_WRITE( trs200_clock_mode_write )
 //	AM_RANGE(0x91, 0x9f) AM_READWRITE( unk_read, unk_write )
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE( modem_control_port_read, modem_control_port_write )
-	AM_RANGE(0xb8, 0xbf) AM_DEVREADWRITE( "pio8155", pio8155_r, pio8155_w )
+	AM_RANGE(0xb0, 0xb7) AM_MIRROR(0x08) AM_DEVREADWRITE( PIO8155_TAG, pio8155_r, pio8155_w )
 	AM_RANGE(0xd0, 0xdf) AM_READWRITE( trs200_bank_read, trs200_bank_write )
 	AM_RANGE(0xe0, 0xe8) AM_READ( keyboard_read )
 //	AM_RANGE(0xe0, 0xe8) AM_READWRITE( keyboard_read, ioE8_write )
@@ -600,7 +600,7 @@ INPUT_PORTS_END
 
 static MACHINE_START( kyo85 )
 {
-	const device_config *rtc = devtag_get_device(machine, "rtc");
+	const device_config *rtc = devtag_get_device(machine, UPD1990A_TAG);
 
 	upd1990a_cs_w(rtc, 1);
 	upd1990a_oe_w(rtc, 1);
@@ -630,7 +630,7 @@ static WRITE_LINE_DEVICE_HANDLER( kyocera_upd1990a_data_w )
 static UPD1990A_INTERFACE( kyocera_upd1990a_intf )
 {
 	DEVCB_LINE(kyocera_upd1990a_data_w),
-	DEVCB_CPU_INPUT_LINE("maincpu", I8085_RST75_LINE)
+	DEVCB_CPU_INPUT_LINE(I8085_TAG, I8085_RST75_LINE)
 };
 
 static READ8_DEVICE_HANDLER( kyocera_8155_port_c_r )
@@ -658,7 +658,7 @@ static READ8_DEVICE_HANDLER( kyocera_8155_port_c_r )
 
 static WRITE8_DEVICE_HANDLER( kyocera_8155_port_a_w )
 {
-	const device_config *rtc = devtag_get_device(device->machine, "rtc");
+	const device_config *rtc = devtag_get_device(device->machine, UPD1990A_TAG);
 
 	port_a = data;
 	kyo85_set_lcd_bank( port_a | ((port_b & 3) << 8) );
@@ -711,7 +711,7 @@ static PIO8155_INTERFACE( kyocera_8155_intf )
 
 static MACHINE_DRIVER_START( kyo85 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", 8085A, 2400000)
+	MDRV_CPU_ADD(I8085_TAG, 8085A, 2400000)
 	MDRV_CPU_PROGRAM_MAP(kyo85_mem, 0)
 	MDRV_CPU_IO_MAP(kyo85_io, 0)
 
@@ -719,7 +719,7 @@ static MACHINE_DRIVER_START( kyo85 )
 	MDRV_MACHINE_RESET( kyo85 )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", LCD)
+	MDRV_SCREEN_ADD(SCREEN_TAG, LCD)
 	MDRV_SCREEN_REFRESH_RATE(44)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(240, 64)
@@ -739,14 +739,14 @@ static MACHINE_DRIVER_START( kyo85 )
 //	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
-	MDRV_PIO8155_ADD("pio8155", 2400000, kyocera_8155_intf)
-	MDRV_UPD1990A_ADD("rtc", XTAL_32_768kHz, kyocera_upd1990a_intf)
+	MDRV_PIO8155_ADD(PIO8155_TAG, 2400000, kyocera_8155_intf)
+	MDRV_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, kyocera_upd1990a_intf)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( npc8201 )
 	MDRV_IMPORT_FROM(kyo85)
 
-	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_MODIFY(I8085_TAG)
 	MDRV_CPU_PROGRAM_MAP(npc8201_mem, 0)
 	MDRV_CPU_IO_MAP(pc8201_io, 0)
 MACHINE_DRIVER_END
@@ -754,12 +754,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( trs200 )
 	MDRV_IMPORT_FROM(kyo85)
 
-	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_MODIFY(I8085_TAG)
 	MDRV_CPU_PROGRAM_MAP(trs200_mem, 0)
 	MDRV_CPU_IO_MAP(trs200_io, 0)
 
 	/* devices */
-	MDRV_UPD1990A_REMOVE("rtc")
+	MDRV_UPD1990A_REMOVE(UPD1990A_TAG)
 MACHINE_DRIVER_END
 
 
@@ -770,7 +770,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START(trsm100)
-	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_REGION( 0x8000, I8085_TAG, 0 )
 	ROM_SYSTEM_BIOS(0, "default", "Model 100")
 	ROMX_LOAD( "m100rom.bin",  0x0000, 0x8000, CRC(730a3611) SHA1(094dbc4ac5a4ea5cdf51a1ac581a40a9622bb25d), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(1, "alt", "Model 100 (alt)")
@@ -778,7 +778,7 @@ ROM_START(trsm100)
 ROM_END
 
 ROM_START(olivm10)
-	ROM_REGION( 0x8010, "maincpu", 0 )
+	ROM_REGION( 0x8010, I8085_TAG, 0 )
 	ROM_SYSTEM_BIOS(0, "default", "M10")
 	ROMX_LOAD( "m10rom.bin", 0x0000, 0x8010, CRC(0be02b58) SHA1(56f2087a658efd0323663d15afcd4f5f27c68664), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(1, "alt", "M10 (alt)")
@@ -786,31 +786,31 @@ ROM_START(olivm10)
 ROM_END
 
 ROM_START(kyo85)
-	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_REGION( 0x8000, I8085_TAG, 0 )
 	ROM_LOAD( "kc85rom.bin", 0x0000, 0x8000, CRC(8a9ddd6b) SHA1(9d18cb525580c9e071e23bc3c472380aa46356c0) )
 ROM_END
 
 ROM_START(trsm102)
-	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_REGION( 0x8000, I8085_TAG, 0 )
 	ROM_LOAD( "m102rom.bin", 0x0000, 0x8000, CRC(0e4ff73a) SHA1(d91f4f412fb78c131ccd710e8158642de47355e2) )
 ROM_END
 
 ROM_START(npc8201)
-	ROM_REGION( 0x18000, "maincpu", 0 )
+	ROM_REGION( 0x18000, I8085_TAG, 0 )
 	ROM_LOAD( "pc8201rom.bin", 0x10000, 0x8000, CRC(4c534662) SHA1(758fefbba251513e7f9d86f7e9016ad8817188d8) )
 ROM_END
 
 ROM_START(trsm200)
-	ROM_REGION( 0x22000, "maincpu", 0 )
+	ROM_REGION( 0x22000, I8085_TAG, 0 )
 	ROM_LOAD( "t200rom.bin", 0x10000, 0x12000, CRC(e3358b38) SHA1(35d4e6a5fb8fc584419f57ec12b423f6021c0991) )
 ROM_END
 
 static DRIVER_INIT( npc8201 )
 {
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = memory_region(machine, I8085_TAG);
 
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x7fff, 0, 0, SMH_BANK1, SMH_UNMAP);
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, SMH_BANK2, SMH_BANK2);
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, I8085_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x7fff, 0, 0, SMH_BANK1, SMH_UNMAP);
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, I8085_TAG, ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, SMH_BANK2, SMH_BANK2);
 
 	memory_set_bankptr(machine, 1, rom + 0x10000);
 	memory_set_bankptr(machine, 2, mess_ram);
@@ -818,11 +818,11 @@ static DRIVER_INIT( npc8201 )
 
 static DRIVER_INIT( trs200 )
 {
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = memory_region(machine, I8085_TAG);
 
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x7fff, 0, 0, SMH_BANK1, SMH_UNMAP);
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0x9fff, 0, 0, SMH_BANK2, SMH_UNMAP);
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa000, 0xffff, 0, 0, SMH_BANK3, SMH_BANK3);
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, I8085_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x7fff, 0, 0, SMH_BANK1, SMH_UNMAP);
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, I8085_TAG, ADDRESS_SPACE_PROGRAM), 0x8000, 0x9fff, 0, 0, SMH_BANK2, SMH_UNMAP);
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, I8085_TAG, ADDRESS_SPACE_PROGRAM), 0xa000, 0xffff, 0, 0, SMH_BANK3, SMH_BANK3);
 
 	memory_set_bankptr(machine, 1, rom + 0x10000);
 	memory_set_bankptr(machine, 2, rom + 0x18000);
