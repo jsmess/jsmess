@@ -149,8 +149,6 @@ network in slot 7
 Apple IIc (Original Memory Expansion)
 -------------------------------------
 
-ROMSET NOT DUMPED
-
 Identical to IIc except for:
 
 Support for Memory Expansion Board (mapped to slot 4)

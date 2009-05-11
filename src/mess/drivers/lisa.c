@@ -281,14 +281,23 @@ static INPUT_PORTS_START( lisa )
 	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Command") PORT_CODE(KEYCODE_LCONTROL)					PORT_CHAR(UCHAR_SHIFT_2)
 INPUT_PORTS_END
 
+/* which systems used the 341-0193-A parallel interface card rom? it is dumped...*/
 
 ROM_START( lisa2 )
+	ROM_DEFAULT_BIOS( "revh" )
 	ROM_REGION16_BE(0x204000,"maincpu",0)	/* 68k rom and ram */
-	ROM_LOAD16_BYTE( "booth.hi", 0x000000, 0x2000, CRC(adfd4516) SHA1(97a89ce1218b8aa38f69f92f6f363f435c887914))
-	ROM_LOAD16_BYTE( "booth.lo", 0x000001, 0x2000, CRC(546d6603) SHA1(2a81e4d483f50ae8a2519621daeb7feb440a3e4d))
+
+	/* Note we're missing a whole bunch of lisa bootrom revisions; based on http://www.cs.dartmouth.edu/~woz/bootrom.pdf at least 2.0(initial release? 1/28/83) D(5/12/83) 3B(9/8/83) E(10/20/83) X(12/16/83) F(12/21/83) G(2/8/84) and H(2/24/84) are known to exist. Earlier prototypes existed as well. Only F and H are dumped. */
+	ROM_SYSTEM_BIOS( 0, "revh", "LISA Bootrom Rev H (2/24/84)")
+	ROMX_LOAD( "341-0175-h", 0x000000, 0x2000, CRC(adfd4516) SHA1(97a89ce1218b8aa38f69f92f6f363f435c887914), ROM_SKIP(1) | ROM_BIOS(1)) /* 341-0175-H LISA Bootrom Rev H (2/24/84) (Even) */
+	ROMX_LOAD( "341-0176-h", 0x000001, 0x2000, CRC(546d6603) SHA1(2a81e4d483f50ae8a2519621daeb7feb440a3e4d), ROM_SKIP(1) | ROM_BIOS(1)) /* 341-0176-H LISA Bootrom Rev H (2/24/84) (Odd) */
+
+	ROM_SYSTEM_BIOS( 1, "revf", "LISA Bootrom Rev F (12/21/83)")
+	ROMX_LOAD( "341-0175-f", 0x000000, 0x2000, CRC(701b9dab) SHA1(b116e5fada7b9a51f1b6e25757b2814d1b2737a5), ROM_SKIP(1) | ROM_BIOS(2)) /* 341-0175-F LISA Bootrom Rev F (12/21/83) (Even) */
+	ROMX_LOAD( "341-0176-f", 0x000001, 0x2000, CRC(036010b6) SHA1(ac93e6dbe4ce59396d7d191ee3e3e79a504e518f), ROM_SKIP(1) | ROM_BIOS(2)) /* 341-0176-F LISA Bootrom Rev F (12/21/83) (Odd) */
 
 	ROM_REGION(0x2000,"fdccpu",0)		/* 6504 RAM and ROM */
-	ROM_LOAD( "ioa8.rom", 0x1000, 0x1000, CRC(bc6364f1) SHA1(f3164923330a51366a06d9d8a4a01ec7b0d3a8aa))
+	ROM_LOAD( "341-0290-b", 0x1000, 0x1000, CRC(bc6364f1) SHA1(f3164923330a51366a06d9d8a4a01ec7b0d3a8aa)) /* 341-0290-B LISA 2/5 Disk Rom (ioa8) */
 
 	ROM_REGION(0x100,"gfx1",0)		/* video ROM (includes S/N) */
 	ROM_LOAD( "vidstate.rom", 0x00, 0x100, CRC(75904783) SHA1(3b0023bd90f2ca1be0b099160a566b044856885d))
@@ -296,16 +305,18 @@ ROM_END
 
 ROM_START( lisa210 )
 	ROM_REGION16_BE(0x204000,"maincpu", 0)	/* 68k rom and ram */
-	ROM_LOAD16_BYTE( "booth.hi", 0x000000, 0x2000, CRC(adfd4516) SHA1(97a89ce1218b8aa38f69f92f6f363f435c887914))
-	ROM_LOAD16_BYTE( "booth.lo", 0x000001, 0x2000, CRC(546d6603) SHA1(2a81e4d483f50ae8a2519621daeb7feb440a3e4d))
+	ROM_LOAD16_BYTE( "341-0175-h", 0x000000, 0x2000, CRC(adfd4516) SHA1(97a89ce1218b8aa38f69f92f6f363f435c887914)) /* 341-0175-H LISA Bootrom Rev H (Even) */
+	ROM_LOAD16_BYTE( "341-0176-h", 0x000001, 0x2000, CRC(546d6603) SHA1(2a81e4d483f50ae8a2519621daeb7feb440a3e4d)) /* 341-0176-H LISA Bootrom Rev H (Odd) */
 
 #if 1
 	ROM_REGION(0x2000,"fdccpu", 0)		/* 6504 RAM and ROM */
-	ROM_LOAD( "io88.rom", 0x1000, 0x1000, CRC(e343fe74) SHA1(a0e484ead2d2315fca261f39fff2f211ff61b0ef))
+	ROM_LOAD( "341-0281-d", 0x1000, 0x1000, CRC(e343fe74) SHA1(a0e484ead2d2315fca261f39fff2f211ff61b0ef)) /* 341-0281-D LISA 2/10 Disk Rom (io88) */
 #else
 	ROM_REGION(0x2000,"fdccpu", 0)		/* 6504 RAM and ROM */
-	ROM_LOAD( "io88800k.rom", 0x1000, 0x1000, CRC(8c67959a))
+	ROM_LOAD( "341-8003-c", 0x1000, 0x1000, CRC(8c67959a) SHA1(aa446b0c4acb4cb6c9d0adfbbea900fb8c04c1e9)) /* 341-8003-C Sun Mac XL Disk rom for 800k drives (from Goodwill XL) (io88800k) */
+	/* Note: there are two earlier/alternate versions of this rom as well which are dumped */
 #endif
+	/* should the widget-10 controller roms (341-0288-A and 341-0289-A) be loaded here as well for the lisa 2/10? */
 
 	ROM_REGION(0x100,"gfx1", 0)		/* video ROM (includes S/N) */
 	ROM_LOAD( "vidstate.rom", 0x00, 0x100, CRC(75904783) SHA1(3b0023bd90f2ca1be0b099160a566b044856885d))
@@ -313,15 +324,16 @@ ROM_END
 
 ROM_START( macxl )
 	ROM_REGION16_BE(0x204000,"maincpu", 0)	/* 68k rom and ram */
-	ROM_LOAD16_BYTE( "boot3a.hi", 0x000000, 0x2000, CRC(80add605) SHA1(82215688b778d8c712a8186235f7981e3dc4dd7f))
-	ROM_LOAD16_BYTE( "boot3a.lo", 0x000001, 0x2000, CRC(edf5222f) SHA1(b0388ee8dbbc51a2d628473dc29b65ce913fcd76))
+	ROM_LOAD16_BYTE( "341-0347-a", 0x000000, 0x2000, CRC(80add605) SHA1(82215688b778d8c712a8186235f7981e3dc4dd7f)) /* 341-0347-A Mac XL Bootrom Hi (boot3a.hi)*/
+	ROM_LOAD16_BYTE( "341-0346-a", 0x000001, 0x2000, CRC(edf5222f) SHA1(b0388ee8dbbc51a2d628473dc29b65ce913fcd76)) /* 341-0346-A Mac XL Bootrom Lo (boot3a.lo)*/
 
 #if 1
 	ROM_REGION(0x2000,"fdccpu", 0)		/* 6504 RAM and ROM */
-	ROM_LOAD( "io88.rom", 0x1000, 0x1000, CRC(e343fe74) SHA1(a0e484ead2d2315fca261f39fff2f211ff61b0ef))
+	ROM_LOAD( "341-0281-d", 0x1000, 0x1000, CRC(e343fe74) SHA1(a0e484ead2d2315fca261f39fff2f211ff61b0ef)) /* 341-0281-D LISA 2/10 Disk Rom (io88) */
 #else
 	ROM_REGION(0x2000,"fdccpu", 0)		/* 6504 RAM and ROM */
-	ROM_LOAD( "io88800k.rom", 0x1000, 0x1000, CRC(8c67959a))
+	ROM_LOAD( "341-8003-c", 0x1000, 0x1000, CRC(8c67959a) SHA1(aa446b0c4acb4cb6c9d0adfbbea900fb8c04c1e9)) /* 341-8003-C Sun Mac XL Disk rom for 800k drives (from Goodwill XL) (io88800k) */
+	/* Note: there are two earlier/alternate versions of this rom as well which are dumped */
 #endif
 
 	ROM_REGION(0x100,"gfx1", 0)		/* video ROM (includes S/N) ; no dump known, although Lisa ROM works fine at our level of emulation */
