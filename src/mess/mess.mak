@@ -1327,6 +1327,7 @@ $(MESSOBJ)/tec1.a: \
 $(MESSOBJ)/kyocera.a: \
 	$(MESS_DRIVERS)/kyocera.o \
 	$(MESS_VIDEO)/kyocera.o \
+	$(MESS_VIDEO)/hd44102.o \
 	$(MESS_MACHINE)/upd1990a.o \
 	$(MESS_MACHINE)/8155pio.o \
 

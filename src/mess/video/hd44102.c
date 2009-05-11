@@ -1,0 +1,264 @@
+/**********************************************************************
+
+    HD44102 Dot Matrix Liquid Crystal Graphic Display Column Driver emulation
+
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+**********************************************************************/
+
+/*
+
+	TODO:
+
+	- 4 bit mode
+	- what if write Y > 49?
+
+*/
+
+#include "driver.h"
+#include "hd44102.h"
+
+/***************************************************************************
+    PARAMETERS
+***************************************************************************/
+
+#define LOG 0
+
+#define HD44102_CONTROL_DISPLAY_OFF		0x38
+#define HD44102_CONTROL_DISPLAY_ON		0x39
+#define HD44102_CONTROL_COUNT_DOWN_MODE	0x3a
+#define HD44102_CONTROL_COUNT_UP_MODE	0x3b
+#define HD44102_CONTROL_Y_ADDRESS_MASK	0x3f
+#define HD44102_CONTROL_X_ADDRESS_MASK	0xc0
+
+#define HD44102_STATUS_BUSY				0x80
+#define HD44102_STATUS_COUNT_UP			0x40
+#define HD44102_STATUS_DISPLAY_OFF		0x20
+#define HD44102_STATUS_RESET			0x10
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef struct _hd44102_t hd44102_t;
+struct _hd44102_t
+{
+	const device_config *screen;	/* screen */
+
+	UINT8 ram[4][50];				/* display memory */
+
+	UINT8 status;					/* status register */
+	UINT8 output;					/* output register */
+
+	int x;							/* X address */
+	int y;							/* Y address */
+};
+
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
+
+INLINE hd44102_t *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	return (hd44102_t *)device->token;
+}
+
+INLINE hd44102_config *get_safe_config(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->type == HD44102);
+	return (hd44102_config *)device->inline_config;
+}
+
+/***************************************************************************
+    IMPLEMENTATION
+***************************************************************************/
+
+/*-------------------------------------------------
+    hd44102_status_r - status read
+-------------------------------------------------*/
+
+READ8_DEVICE_HANDLER( hd44102_status_r )
+{
+	hd44102_t *hd44102 = get_safe_token(device);
+
+	return hd44102->status;
+}
+
+/*-------------------------------------------------
+    hd44102_control_w - control write
+-------------------------------------------------*/
+
+WRITE8_DEVICE_HANDLER( hd44102_control_w )
+{
+	hd44102_t *hd44102 = get_safe_token(device);
+
+	if (hd44102->status & HD44102_STATUS_BUSY) return;
+
+	switch (data)
+	{
+	case HD44102_CONTROL_DISPLAY_OFF:
+		if (LOG) logerror("HD44102 '%s' Display Off\n", device->tag);
+		hd44102->status |= HD44102_STATUS_DISPLAY_OFF;
+		break;
+
+	case HD44102_CONTROL_DISPLAY_ON:
+		if (LOG) logerror("HD44102 '%s' Display On\n", device->tag);
+		hd44102->status &= ~HD44102_STATUS_DISPLAY_OFF;
+		break;
+
+	case HD44102_CONTROL_COUNT_DOWN_MODE:
+		if (LOG) logerror("HD44102 '%s' Count Down Mode\n", device->tag);
+		hd44102->status &= ~HD44102_STATUS_COUNT_UP;
+		break;
+
+	case HD44102_CONTROL_COUNT_UP_MODE:
+		if (LOG) logerror("HD44102 '%s' Count Up Mode\n", device->tag);
+		hd44102->status |= HD44102_STATUS_COUNT_UP;
+		break;
+
+	default:
+		hd44102->x = (data & HD44102_CONTROL_X_ADDRESS_MASK) >> 6;
+		hd44102->y = data & HD44102_CONTROL_Y_ADDRESS_MASK;
+		if (LOG) logerror("HD44102 '%s' Address %02x -> X %u Y %u\n", device->tag, data, hd44102->x, hd44102->y);
+		break;
+	}
+}
+
+/*-------------------------------------------------
+    hd44102_data_r - data read
+-------------------------------------------------*/
+
+READ8_DEVICE_HANDLER( hd44102_data_r )
+{
+	hd44102_t *hd44102 = get_safe_token(device);
+
+	UINT8 data = hd44102->output;
+
+	hd44102->output = hd44102->ram[hd44102->x][hd44102->y];
+
+	if (hd44102->status & HD44102_STATUS_COUNT_UP)
+	{
+		if (++hd44102->y > 49) hd44102->y = 0;
+	}
+	else
+	{
+		if (--hd44102->y < 0) hd44102->y = 49;
+	}
+
+	return data;
+}
+
+/*-------------------------------------------------
+    hd44102_data_w - data write
+-------------------------------------------------*/
+
+WRITE8_DEVICE_HANDLER( hd44102_data_w )
+{
+	hd44102_t *hd44102 = get_safe_token(device);
+
+	hd44102->ram[hd44102->x][hd44102->y] = data;
+
+	if (hd44102->status & HD44102_STATUS_COUNT_UP)
+	{
+		if (++hd44102->y > 49) hd44102->y = 0;
+	}
+	else
+	{
+		if (--hd44102->y < 0) hd44102->y = 49;
+	}
+}
+
+/*-------------------------------------------------
+    hd44102_update - update screen
+-------------------------------------------------*/
+
+void hd44102_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect)
+{
+	hd44102_t *hd44102 = get_safe_token(device);
+	const hd44102_config *config = get_safe_config(device);
+
+	if (hd44102->status & HD44102_STATUS_DISPLAY_OFF)
+	{
+	}
+	else
+	{
+		int y, z;
+
+		for (y = 0; y < 50; y++)
+		{
+			for (z = 0; z < 32; z++)
+			{
+				UINT8 data = hd44102->ram[z / 8][y];
+
+				int sy = config->sy + z;
+				int sx = config->sx + y;
+
+				if ((sy >= cliprect->min_y) && (sy <= cliprect->max_y) && (sx >= cliprect->min_x) && (sx <= cliprect->max_x))
+				{
+					*BITMAP_ADDR16(bitmap, sy, sx) = BIT(data, z % 8);
+				}
+			}
+		}
+	}
+}
+
+/*-------------------------------------------------
+    DEVICE_START( hd44102 )
+-------------------------------------------------*/
+
+static DEVICE_START( hd44102 )
+{
+	hd44102_t *hd44102 = get_safe_token(device);
+	const hd44102_config *config = get_safe_config(device);
+
+	/* get the screen device */
+	hd44102->screen = devtag_get_device(device->machine, config->screen_tag);
+	assert(hd44102->screen != NULL);
+
+	/* register for state saving */
+	state_save_register_device_item(device, 0, hd44102->status);
+	state_save_register_device_item(device, 0, hd44102->output);
+	state_save_register_device_item(device, 0, hd44102->x);
+	state_save_register_device_item(device, 0, hd44102->y);
+}
+
+/*-------------------------------------------------
+    DEVICE_RESET( hd44102 )
+-------------------------------------------------*/
+
+static DEVICE_RESET( hd44102 )
+{
+//	hd44102_t *hd44102 = get_safe_token(device);
+
+}
+
+/*-------------------------------------------------
+    DEVICE_GET_INFO( hd44102 )
+-------------------------------------------------*/
+
+DEVICE_GET_INFO( hd44102 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(hd44102_t);						break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(hd44102_config);					break;
+		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;					break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(hd44102);			break;
+		case DEVINFO_FCT_STOP:							/* Nothing */										break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(hd44102);			break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Hitachi HD44102");					break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Hitachi HD44102");					break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");								break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);							break;
+		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");				break;
+	}
+}

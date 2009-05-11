@@ -661,7 +661,7 @@ static WRITE8_DEVICE_HANDLER( kyocera_8155_port_a_w )
 	const device_config *rtc = devtag_get_device(device->machine, UPD1990A_TAG);
 
 	port_a = data;
-	kyo85_set_lcd_bank( port_a | ((port_b & 3) << 8) );
+	kyo85_set_lcd_bank( device->machine, port_a | ((port_b & 3) << 8) );
 
 			/*
 			The first 5 bits of this port is used to control the 1990 real time clock chip.  
@@ -695,7 +695,7 @@ static WRITE8_DEVICE_HANDLER( kyocera_8155_port_b_w )
 			    6 - DTR (not) line for RS232
 			    7 - RTS (not) line for RS232 */
 	port_b = data;
-	kyo85_set_lcd_bank( port_a | ((port_b & 3) << 8) );
+	kyo85_set_lcd_bank( device->machine, port_a | ((port_b & 3) << 8) );
 }
 
 static PIO8155_INTERFACE( kyocera_8155_intf )
@@ -710,6 +710,8 @@ static PIO8155_INTERFACE( kyocera_8155_intf )
 };
 
 static MACHINE_DRIVER_START( kyo85 )
+	MDRV_DRIVER_DATA(kyocera_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD(I8085_TAG, 8085A, 2400000)
 	MDRV_CPU_PROGRAM_MAP(kyo85_mem, 0)
@@ -719,19 +721,7 @@ static MACHINE_DRIVER_START( kyo85 )
 	MDRV_MACHINE_RESET( kyo85 )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD(SCREEN_TAG, LCD)
-	MDRV_SCREEN_REFRESH_RATE(44)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(240, 64)
-	MDRV_SCREEN_VISIBLE_AREA(0, 240-1, 0, 64-1)
-
-//	MDRV_DEFAULT_LAYOUT(layout_kyo85)
-
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(kyo85)
-
-	MDRV_VIDEO_START(kyo85)
-	MDRV_VIDEO_UPDATE(kyo85)
+	MDRV_IMPORT_FROM(kyo85_video)
 
 	/* sound hardware */
 //	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -771,18 +761,12 @@ MACHINE_DRIVER_END
 
 ROM_START(trsm100)
 	ROM_REGION( 0x8000, I8085_TAG, 0 )
-	ROM_SYSTEM_BIOS(0, "default", "Model 100")
-	ROMX_LOAD( "m100rom.bin",  0x0000, 0x8000, CRC(730a3611) SHA1(094dbc4ac5a4ea5cdf51a1ac581a40a9622bb25d), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS(1, "alt", "Model 100 (alt)")
-	ROMX_LOAD( "m100arom.bin", 0x0000, 0x8000, CRC(75ac39b7) SHA1(824e730ae45babf886023151504fcd6191bbed10), ROM_BIOS(2) )
+	ROM_LOAD( "m100rom.bin",  0x0000, 0x8000, CRC(730a3611) SHA1(094dbc4ac5a4ea5cdf51a1ac581a40a9622bb25d) )
 ROM_END
 
 ROM_START(olivm10)
 	ROM_REGION( 0x8010, I8085_TAG, 0 )
-	ROM_SYSTEM_BIOS(0, "default", "M10")
-	ROMX_LOAD( "m10rom.bin", 0x0000, 0x8010, CRC(0be02b58) SHA1(56f2087a658efd0323663d15afcd4f5f27c68664), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS(1, "alt", "M10 (alt)")
-	ROMX_LOAD( "m10arom.bin", 0x0000, 0x8010, CRC(afd5a43d) SHA1(b8362f7f248692de13128a47c6c116172e38da10), ROM_BIOS(2) )
+	ROM_LOAD( "m10rom.bin", 0x0000, 0x8010, CRC(0be02b58) SHA1(56f2087a658efd0323663d15afcd4f5f27c68664) )
 ROM_END
 
 ROM_START(kyo85)
