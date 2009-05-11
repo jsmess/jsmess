@@ -187,8 +187,8 @@ static void x68k_crtc_refresh_mode(running_machine *machine)
 	if(visiblescr.max_y >= scr.max_y - 1)
 		visiblescr.max_y = scr.max_y - 2;
 
-	logerror("CRTC regs - %i %i %i %i  - %i %i %i %i - %i - %i\n",x68k_sys.crtc.reg[0],x68k_sys.crtc.reg[1],x68k_sys.crtc.reg[2],x68k_sys.crtc.reg[3],
-		x68k_sys.crtc.reg[4],x68k_sys.crtc.reg[5],x68k_sys.crtc.reg[6],x68k_sys.crtc.reg[7],x68k_sys.crtc.reg[8],x68k_sys.crtc.reg[9]);
+//	logerror("CRTC regs - %i %i %i %i  - %i %i %i %i - %i - %i\n",x68k_sys.crtc.reg[0],x68k_sys.crtc.reg[1],x68k_sys.crtc.reg[2],x68k_sys.crtc.reg[3],
+//		x68k_sys.crtc.reg[4],x68k_sys.crtc.reg[5],x68k_sys.crtc.reg[6],x68k_sys.crtc.reg[7],x68k_sys.crtc.reg[8],x68k_sys.crtc.reg[9]);
 	logerror("video_screen_configure(machine->primary_screen,%i,%i,[%i,%i,%i,%i],55.45)\n",scr.max_x,scr.max_y,visiblescr.min_x,visiblescr.min_y,visiblescr.max_x,visiblescr.max_y);
 	video_screen_configure(machine->primary_screen,scr.max_x,scr.max_y,&visiblescr,HZ_TO_ATTOSECONDS(55.45));
 }
@@ -1108,8 +1108,8 @@ VIDEO_UPDATE( x68000 )
 	rect.min_y=x68k_sys.crtc.vbegin;
 //	rect.max_x=rect.min_x + x68k_sys.crtc.visible_width-1;
 //	rect.max_y=rect.min_y + x68k_sys.crtc.visible_height-1;
-	rect.max_x=x68k_sys.crtc.hend + 1;
-	rect.max_y=x68k_sys.crtc.vend + 1;
+	rect.max_x=x68k_sys.crtc.hend;
+	rect.max_y=x68k_sys.crtc.vend;
 
 	if(rect.min_y < cliprect->min_y)
 		rect.min_y = cliprect->min_y;
