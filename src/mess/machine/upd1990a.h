@@ -1,10 +1,21 @@
-/***************************************************************************
+/**********************************************************************
 
-	NEC uPD1990AC CMOS Digital Integrated Circuit
-	Serial I/O Calendar & Clock
-	CMOS LSI
+	NEC uPD1990AC Serial I/O Calendar & Clock emulation
 
-***************************************************************************/
+	Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+**********************************************************************
+							_____   _____
+				    C2	 1 |*    \_/     | 14  Vdd
+					C1	 2 |			 | 13  XTAL
+					C0	 3 |			 | 12  _XTAL
+				   STB	 4 |  uPD1990AC	 | 11  OUT ENBL
+					CS	 5 |			 | 10  TP
+			   DATA IN	 6 |			 | 9   DATA OUT
+				   GND   7 |_____________| 8   CLK
+
+**********************************************************************/
 
 #ifndef __UPD1990A_H__
 #define __UPD1990A_H__

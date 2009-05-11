@@ -1,10 +1,9 @@
-/*********************************************************************
+/**********************************************************************
 
-	upd1990a.c
+	NEC uPD1990AC Serial I/O Calendar & Clock emulation
 
-	NEC uPD1990AC CMOS Digital Integrated Circuit
-	Serial I/O Calendar & Clock
-	CMOS LSI
+	Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
 
 *********************************************************************/
 
@@ -12,10 +11,7 @@
 
 	TODO:
 
-	- set clock mode
 	- test mode
-	- clock advance (currently it just reads the system time)
-	- divide frequencies from chip clock
 
 */
 
@@ -92,6 +88,11 @@ INLINE UINT8 convert_to_bcd(int val)
 	return ((val / 10) << 4) | (val % 10);
 }
 
+INLINE int bcd_to_integer(UINT8 val)
+{
+	return (((val & 0xf0) >> 4) * 10) + (val & 0x0f);
+}
+
 /***************************************************************************
     IMPLEMENTATION
 ***************************************************************************/
@@ -146,14 +147,15 @@ WRITE_LINE_DEVICE_HANDLER( upd1990a_stb_w )
 
 			/* 1 Hz data out pulse */
 			upd1990a->data_out = 1;
-			timer_adjust_periodic(upd1990a->data_out_timer, attotime_zero, 0, ATTOTIME_IN_HZ(1*2));
+			timer_adjust_periodic(upd1990a->data_out_timer, attotime_zero, 0, ATTOTIME_IN_HZ((device->clock/32768)*2));
 
 			/* 64 Hz time pulse */
-			timer_adjust_periodic(upd1990a->tp_timer, attotime_zero, 0, ATTOTIME_IN_HZ(64*2));
+			timer_adjust_periodic(upd1990a->tp_timer, attotime_zero, 0, ATTOTIME_IN_HZ((device->clock/512)*2));
 			break;
 
 		case UPD1990A_MODE_SHIFT:
 			if (LOG) logerror("UPD1990A Shift Mode\n");
+			
 			/* enable time counter */
 			timer_enable(upd1990a->clock_timer, 1);
 
@@ -165,14 +167,14 @@ WRITE_LINE_DEVICE_HANDLER( upd1990a_stb_w )
 			devcb_call_write_line(&upd1990a->out_data_func, upd1990a->data_out);
 
 			/* 32 Hz time pulse */
-			timer_adjust_periodic(upd1990a->tp_timer, attotime_zero, 0, ATTOTIME_IN_HZ(32*2));
+			timer_adjust_periodic(upd1990a->tp_timer, attotime_zero, 0, ATTOTIME_IN_HZ((device->clock/1024)*2));
 			break;
 
 		case UPD1990A_MODE_TIME_SET:
 			{
 			int i;
 
-			if (LOG) logerror("UPD1990A Time Set Mode not supported!\n");
+			if (LOG) logerror("UPD1990A Time Set Mode\n");
 			if (LOG) logerror("UPD1990A Shift Register %02x%02x%02x%02x%02x\n", upd1990a->shift_reg[4], upd1990a->shift_reg[3], upd1990a->shift_reg[2], upd1990a->shift_reg[1], upd1990a->shift_reg[0]);
 
 			/* disable time counter */
@@ -192,29 +194,18 @@ WRITE_LINE_DEVICE_HANDLER( upd1990a_stb_w )
 			}
 
 			/* 32 Hz time pulse */
-			timer_adjust_periodic(upd1990a->tp_timer, attotime_zero, 0, ATTOTIME_IN_HZ(32*2));
+			timer_adjust_periodic(upd1990a->tp_timer, attotime_zero, 0, ATTOTIME_IN_HZ((device->clock/1024)*2));
 			}
 			break;
 
 		case UPD1990A_MODE_TIME_READ:
 			{
-			mame_system_time curtime, *systime = &curtime;
 			int i;
 			
 			if (LOG) logerror("UPD1990A Time Read Mode\n");
 
 			/* enable time counter */
 			timer_enable(upd1990a->clock_timer, 1);
-
-			/* HACK: load time counter from system time */
-			mame_get_current_datetime(device->machine, &curtime);
-
-			upd1990a->time_counter[0] = convert_to_bcd(systime->local_time.second);
-			upd1990a->time_counter[1] = convert_to_bcd(systime->local_time.minute);
-			upd1990a->time_counter[2] = convert_to_bcd(systime->local_time.hour);
-			upd1990a->time_counter[3] = convert_to_bcd(systime->local_time.mday);
-			upd1990a->time_counter[4] = systime->local_time.weekday;
-			upd1990a->time_counter[4] |= (systime->local_time.month + 1) << 4;
 
 			/* load time counter data into shift register */
 			for (i = 0; i < 5; i++)
@@ -226,10 +217,10 @@ WRITE_LINE_DEVICE_HANDLER( upd1990a_stb_w )
 
 			/* 512 Hz data out pulse */
 			upd1990a->data_out = 1;
-			timer_adjust_periodic(upd1990a->data_out_timer, attotime_zero, 0, ATTOTIME_IN_HZ(512*2));
+			timer_adjust_periodic(upd1990a->data_out_timer, attotime_zero, 0, ATTOTIME_IN_HZ((device->clock/64)*2));
 
 			/* 32 Hz time pulse */
-			timer_adjust_periodic(upd1990a->tp_timer, attotime_zero, 0, ATTOTIME_IN_HZ(32*2));
+			timer_adjust_periodic(upd1990a->tp_timer, attotime_zero, 0, ATTOTIME_IN_HZ((device->clock/1024)*2));
 			}
 			break;
 
@@ -237,25 +228,35 @@ WRITE_LINE_DEVICE_HANDLER( upd1990a_stb_w )
 			if (LOG) logerror("UPD1990A TP = 64 Hz Set Mode\n");
 			
 			/* 64 Hz time pulse */
-			timer_adjust_periodic(upd1990a->tp_timer, attotime_zero, 0, ATTOTIME_IN_HZ(64*2));
+			timer_adjust_periodic(upd1990a->tp_timer, attotime_zero, 0, ATTOTIME_IN_HZ((device->clock/512)*2));
 			break;
 
 		case UPD1990A_MODE_TP_256HZ_SET:
 			if (LOG) logerror("UPD1990A TP = 256 Hz Set Mode\n");
 			
 			/* 256 Hz time pulse */
-			timer_adjust_periodic(upd1990a->tp_timer, attotime_zero, 0, ATTOTIME_IN_HZ(256*2));
+			timer_adjust_periodic(upd1990a->tp_timer, attotime_zero, 0, ATTOTIME_IN_HZ((device->clock/128)*2));
 			break;
 
 		case UPD1990A_MODE_TP_2048HZ_SET:
 			if (LOG) logerror("UPD1990A TP = 2048 Hz Set Mode\n");
 
 			/* 2048 Hz time pulse */
-			timer_adjust_periodic(upd1990a->tp_timer, attotime_zero, 0, ATTOTIME_IN_HZ(2048*2));
+			timer_adjust_periodic(upd1990a->tp_timer, attotime_zero, 0, ATTOTIME_IN_HZ((device->clock/16)*2));
 			break;
 
 		case UPD1990A_MODE_TEST:
 			if (LOG) logerror("UPD1990A Test Mode not supported!\n");
+
+			if (upd1990a->oe)
+			{
+				/* time counter is advanced at 1024 Hz from "Second" counter input */
+			}
+			else
+			{
+				/* each counter is advanced at 1024 Hz in parallel, overflow carry does not affect next counter */
+			}
+
 			break;
 		}
 	}
@@ -294,11 +295,10 @@ WRITE_LINE_DEVICE_HANDLER( upd1990a_clk_w )
 			{
 				upd1990a->data_out = BIT(upd1990a->shift_reg[0], 0);
 
-				logerror("UPD1990A DATA OUT %u\n", upd1990a->data_out);
+				if (LOG) logerror("UPD1990A DATA OUT %u\n", upd1990a->data_out);
+
 				devcb_call_write_line(&upd1990a->out_data_func, upd1990a->data_out);
-
 			}
-
 		}
 	}
 
@@ -358,15 +358,74 @@ WRITE_LINE_DEVICE_HANDLER( upd1990a_data_w )
 }
 
 /*-------------------------------------------------
+    advance_seconds - advance seconds counter
+-------------------------------------------------*/
+
+static void advance_seconds(upd1990a_t *upd1990a)
+{
+	int days_per_month[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+
+	int seconds = bcd_to_integer(upd1990a->time_counter[0]);
+	int minutes = bcd_to_integer(upd1990a->time_counter[1]);
+	int hours = bcd_to_integer(upd1990a->time_counter[2]);
+	int days = bcd_to_integer(upd1990a->time_counter[3]);
+	int day_of_week = upd1990a->time_counter[4] & 0x0f;
+	int month = (upd1990a->time_counter[4] & 0xf0) >> 4;
+
+	seconds++;
+
+	if (seconds > 59)
+	{
+		seconds = 0;
+		minutes++;
+	}
+
+	if (minutes > 59)
+	{
+		minutes = 0;
+		hours++;
+	}
+
+	if (hours > 23)
+	{
+		hours = 0;
+		days++;
+		day_of_week++;
+	}
+
+	if (day_of_week > 6)
+	{
+		day_of_week++;
+	}
+
+	if (days > days_per_month[month - 1])
+	{
+		days = 1;
+		month++;
+	}
+
+	if (month > 12)
+	{
+		month = 1;
+	}
+
+	upd1990a->time_counter[0] = convert_to_bcd(seconds);
+	upd1990a->time_counter[1] = convert_to_bcd(minutes);
+	upd1990a->time_counter[2] = convert_to_bcd(hours);
+	upd1990a->time_counter[3] = convert_to_bcd(days);
+	upd1990a->time_counter[4] = (month << 4) | day_of_week;
+}
+
+/*-------------------------------------------------
     TIMER_CALLBACK( clock_tick )
 -------------------------------------------------*/
 
 static TIMER_CALLBACK( clock_tick )
 {
-//	const device_config *device = ptr;
-//	upd1990a_t *upd1990a = get_safe_token(device);
+	const device_config *device = ptr;
+	upd1990a_t *upd1990a = get_safe_token(device);
 
-	// TODO: advance clock
+	advance_seconds(upd1990a);
 }
 
 /*-------------------------------------------------
@@ -394,7 +453,7 @@ static TIMER_CALLBACK( data_out_tick )
 	const device_config *device = ptr;
 	upd1990a_t *upd1990a = get_safe_token(device);
 
-	logerror("UPD1990A DATA OUT TICK %u\n", upd1990a->data_out);
+	if (LOG) logerror("UPD1990A DATA OUT TICK %u\n", upd1990a->data_out);
 
 	devcb_call_write_line(&upd1990a->out_data_func, upd1990a->data_out);
 
@@ -416,7 +475,7 @@ static DEVICE_START( upd1990a )
 
 	/* create the timers */
 	upd1990a->clock_timer = timer_alloc(device->machine, clock_tick, (void *)device);
-	timer_adjust_periodic(upd1990a->clock_timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock / 32768));
+	timer_adjust_periodic(upd1990a->clock_timer, attotime_zero, 0, ATTOTIME_IN_HZ(1));
 
 	upd1990a->tp_timer = timer_alloc(device->machine, tp_tick, (void *)device);
 
@@ -435,6 +494,23 @@ static DEVICE_START( upd1990a )
     state_save_register_global(device->machine, upd1990a->tp);
 }
 
+static DEVICE_RESET( upd1990a )
+{
+	upd1990a_t *upd1990a = get_safe_token(device);
+
+	mame_system_time curtime, *systime = &curtime;
+
+	mame_get_current_datetime(device->machine, &curtime);
+
+	/* HACK: load time counter from system time */
+	upd1990a->time_counter[0] = convert_to_bcd(systime->local_time.second);
+	upd1990a->time_counter[1] = convert_to_bcd(systime->local_time.minute);
+	upd1990a->time_counter[2] = convert_to_bcd(systime->local_time.hour);
+	upd1990a->time_counter[3] = convert_to_bcd(systime->local_time.mday);
+	upd1990a->time_counter[4] = systime->local_time.weekday;
+	upd1990a->time_counter[4] |= (systime->local_time.month + 1) << 4;
+}
+
 /*-------------------------------------------------
     DEVICE_GET_INFO( upd1990a )
 -------------------------------------------------*/
@@ -451,7 +527,7 @@ DEVICE_GET_INFO( upd1990a )
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(upd1990a);	break;
 		case DEVINFO_FCT_STOP:							/* Nothing */								break;
-		case DEVINFO_FCT_RESET:							/* Nothing */								break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(upd1990a);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "NEC uPD1990AC");			break;
