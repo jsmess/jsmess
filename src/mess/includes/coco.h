@@ -50,7 +50,7 @@ struct _coco_state
 
 /*----------- defined in video/coco.c -----------*/
 
-ATTR_CONST UINT8 coco_get_attributes(running_machine *machine, UINT8 c);
+ATTR_CONST UINT8 coco_get_attributes(running_machine *machine, UINT8 c, UINT8 attr);
 
 VIDEO_START( dragon );
 VIDEO_START( coco );

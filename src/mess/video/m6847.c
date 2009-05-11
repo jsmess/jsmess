@@ -108,7 +108,7 @@ struct _m6847_vdg
 	/* callbacks */
 	void (*horizontal_sync_callback)(running_machine *machine, int line);
 	void (*field_sync_callback)(running_machine *machine, int line);
-	UINT8 (*get_attributes)(running_machine *machine, UINT8 video_byte);
+	UINT8 (*get_attributes)(running_machine *machine, UINT8 video_byte,UINT8 attr);
 	const UINT8 *(*get_video_ram)(running_machine *machine, int scanline);
 	int (*new_frame_callback)(void);	/* returns whether the M6847 is in charge of this frame */
 	void (*custom_prepare_scanline)(int scanline);
@@ -1513,7 +1513,7 @@ INLINE void prepare_scanline(running_machine *machine, int xpos)
 		else
 		{
 			/* has the border color changed? */
-			attrs = (*m6847->get_attributes)(machine, 0x00);
+			attrs = (*m6847->get_attributes)(machine, 0x00, 0x00);
 			if (attrs != m6847->attrs[scanline])
 			{
 				m6847->dirty = TRUE;
@@ -1542,7 +1542,7 @@ INLINE void prepare_scanline(running_machine *machine, int xpos)
 				for (i = xpos; i < 32; i++)
 				{
 					data = video_ram[i];
-					attr = (*m6847->get_attributes)(machine, video_ram[i]);
+					attr = (*m6847->get_attributes)(machine, video_ram[i],video_ram[i + 0x0800]);
 
 					if ((data != scanline_data[i].data)	|| (attr != scanline_data[i].attr))
 					{
@@ -1744,8 +1744,13 @@ static const UINT8 *find_char(const m6847_variant *v,
 				ch += 0x40;
 			}
 
+			if ((ch > 0x20) && (attr & M6847_GM0) && !(attr & M6847_INV)) {
+				ch += 0x20;
+			}
+
 			if (attr & M6847_GM1)
 				attr ^= M6847_INV;
+			
 		}
 
 		if (attr & M6847_INV)

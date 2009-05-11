@@ -7,7 +7,7 @@ New System Drivers Supported (in no particular order):
 - CD-I (not working)  [incog nito]
 - NTS DreamWriter T200 (not working)  [Roberto Carlos
   Fernandez Gerhardt, Wilbert Pol]
-
+- Samsung SPC-1000 [Miodrag Milanovic]
 
 
 System Driver Changes:

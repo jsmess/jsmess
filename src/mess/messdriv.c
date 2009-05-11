@@ -1119,6 +1119,9 @@ const game_driver * const drivers[] =
 	/* Ei Nis */
 	DRIVER(pecom64)
 
+	/* Samsung SPC-1000 */
+	DRIVER(spc1000)
+
 	/* Bondwell */
 	DRIVER( bw2 )
 

@@ -331,6 +331,7 @@ DRVLIBS = \
 	$(MESSOBJ)/rockwell.a \
 	$(MESSOBJ)/robotron.a \
 	$(MESSOBJ)/samcoupe.a \
+	$(MESSOBJ)/samsung.a \
 	$(MESSOBJ)/sapi1.a \
 	$(MESSOBJ)/sega.a \
 	$(MESSOBJ)/sgi.a \
@@ -1291,6 +1292,9 @@ $(MESSOBJ)/ac1.a:      \
 $(MESSOBJ)/dec.a:      \
 	$(MESS_DRIVERS)/vt100.o \
 	$(MESS_VIDEO)/vtvideo.o \
+
+$(MESSOBJ)/samsung.a: \
+	$(MESS_DRIVERS)/spc1000.o \
 
 $(MESSOBJ)/grundy.a: \
 	$(MESS_DRIVERS)/newbrain.o \
