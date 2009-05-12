@@ -169,6 +169,7 @@ static UINT8 kbd_buff[16];
 static UINT8 kbd_head = 0;
 static UINT8 kbd_tail = 0;
 static UINT8 beep_on = 0;
+static UINT8 control_status = 0;
 static UINT8 keyrows[10] = { 0,0,0,0,0,0,0,0,0,0 };
 static const char keyboard[8][10][8] = {
 	{ /* normal */
@@ -276,6 +277,7 @@ MACHINE_RESET( kay_kbd )
 	set_led_status(1, 0);
 	kay_kbd_beeper = devtag_get_device(machine, "beep");
 	beep_on = 1;
+	control_status = 0x14;
 	beep_set_state(kay_kbd_beeper, 0);
 	beep_set_frequency(kay_kbd_beeper, 950);	/* piezo-device needs to be measured */
 	kbd_head = kbd_tail = 0;			/* init buffer */
@@ -420,9 +422,10 @@ static void kay_kbd_in( running_machine *machine, UINT8 data )
 UINT8 kay_kbd_c_r( void )
 {
 /*	d4 transmit buffer empty - 1=ok to send
+	d2 appears to be receive buffer empty - 1=ok to receive
 	d0 keyboard buffer empty - 1=key waiting to be used */
 
-	UINT8 data = 0x10;
+	UINT8 data = control_status;
 
 	if( kbd_head != kbd_tail )
 		data++;
@@ -448,6 +451,7 @@ UINT8 kay_kbd_d_r( void )
 static TIMER_CALLBACK( kay_kbd_beepoff )
 {
 	beep_set_state(kay_kbd_beeper, 0);
+	control_status |= 4;
 }
 
 void kay_kbd_d_w( running_machine *machine, UINT8 data )
@@ -480,6 +484,7 @@ void kay_kbd_d_w( running_machine *machine, UINT8 data )
 
 		if (length)
 		{
+			control_status &= 0xfb;
 			timer_set(machine, ATTOTIME_IN_MSEC(length), NULL, 0, kay_kbd_beepoff);
 			beep_set_state(kay_kbd_beeper, 1);
 		}

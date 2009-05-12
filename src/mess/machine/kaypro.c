@@ -4,6 +4,7 @@
 #include "machine/ctronics.h"
 #include "machine/kay_kbd.h"
 #include "devices/basicdsk.h"
+#include "devices/snapquik.h"
 #include "includes/kaypro.h"
 
 
@@ -14,7 +15,7 @@ static const device_config *kaypro2x_z80sio;
 static const device_config *kaypro_printer;
 static const device_config *kaypro_fdc;
 
-UINT8 kaypro2x_system_port;
+UINT8 kaypro_system_port;
 
 
 /***********************************************************
@@ -34,7 +35,8 @@ static READ8_DEVICE_HANDLER( pio_system_r )
 {
 /*	d3 Centronics ready flag */
 
-	return ~centronics_busy_r(kaypro_printer) << 3;
+	UINT8 data = ~centronics_busy_r(kaypro_printer) << 3;
+	return (kaypro_system_port & 0xf7) | (data & 8) ;
 }
 
 static WRITE8_DEVICE_HANDLER( pio_system_w )
@@ -76,6 +78,8 @@ static WRITE8_DEVICE_HANDLER( pio_system_w )
 		wd17xx_set_drive(kaypro_fdc, 1);
 
 	wd17xx_set_side(kaypro_fdc, (data & 4) ? 1 : 0);	/* only has one side but this circuit exists... */
+
+	kaypro_system_port = data;
 }
 
 const z80pio_interface kayproii_pio_g_intf =
@@ -139,7 +143,7 @@ WRITE8_DEVICE_HANDLER( kayproii_pio_w )
 READ8_HANDLER( kaypro2x_system_port_r )
 {
 	UINT8 data = centronics_busy_r(kaypro_printer) << 6;
-	return data | kaypro2x_system_port;
+	return (kaypro_system_port & 0xbf) | data;
 }
 
 WRITE8_HANDLER( kaypro2x_system_port_w )
@@ -155,8 +159,6 @@ WRITE8_HANDLER( kaypro2x_system_port_w )
 
 	/* get address space */
 	const address_space *mem = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-
-	kaypro2x_system_port = data & 0xbf;
 
 	if (data & 0x80)
 	{
@@ -183,6 +185,8 @@ WRITE8_HANDLER( kaypro2x_system_port_w )
 		wd17xx_set_drive(kaypro_fdc, 1);
 
 	wd17xx_set_side(kaypro_fdc, (data & 4) ? 0 : 1);
+
+	kaypro_system_port = data;
 }
 
 
@@ -432,3 +436,66 @@ MACHINE_RESET( kaypro2x )
 	MACHINE_RESET_CALL(kay_kbd);
 }
 
+
+/***********************************************************
+
+	Quickload
+
+	This loads a .COM file to address 0x100 then jumps
+	there. Sometimes .COM has been renamed to .CPM to
+	prevent windows going ballistic. These can be loaded
+	as well.
+
+************************************************************/
+
+QUICKLOAD_LOAD( kayproii )
+{
+	const device_config *cpu = cputag_get_cpu(image->machine, "maincpu");
+	UINT8 *RAM = memory_region(image->machine, "rambank");
+	UINT16 i;
+	UINT8 data;
+
+	/* Load image to the TPA (Transient Program Area) */
+	for (i = 0; i < quickload_size; i++)
+	{
+		if (image_fread(image, &data, 1) != 1) return INIT_FAIL;
+
+		RAM[i+0x100] = data;
+	}
+
+//	if (input_port_read(image->machine, "CONFIG") & 1)
+	{
+		pio_system_w(kayproii_z80pio_s, 0, kaypro_system_port & 0x7f);	// switch TPA in
+		RAM[0x80]=0;							// clear out command tail
+		RAM[0x81]=0;
+		cpu_set_reg(cpu, REG_GENPC, 0x100);				// start program
+	}
+
+	return INIT_PASS;
+}
+
+QUICKLOAD_LOAD( kaypro2x )
+{
+	const address_space *space = cputag_get_address_space(image->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	const device_config *cpu = cputag_get_cpu(image->machine, "maincpu");
+	UINT8 *RAM = memory_region(image->machine, "rambank");
+	UINT16 i;
+	UINT8 data;
+
+	for (i = 0; i < quickload_size; i++)
+	{
+		if (image_fread(image, &data, 1) != 1) return INIT_FAIL;
+
+		RAM[i+0x100] = data;
+	}
+
+//	if (input_port_read(image->machine, "CONFIG") & 1)
+	{
+		kaypro2x_system_port_w(space, 0, kaypro_system_port & 0x7f);
+		RAM[0x80]=0;
+		RAM[0x81]=0;
+		cpu_set_reg(cpu, REG_GENPC, 0x100);
+	}
+
+	return INIT_PASS;
+}

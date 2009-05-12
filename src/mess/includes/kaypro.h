@@ -35,6 +35,9 @@ void kaypro2x_floppy_getinfo(const mess_device_class *devclass, UINT32 state, un
 MACHINE_RESET( kayproii );
 MACHINE_RESET( kaypro2x );
 
+QUICKLOAD_LOAD( kayproii );
+QUICKLOAD_LOAD( kaypro2x );
+
 /* video.c */
 
 MC6845_UPDATE_ROW( kaypro2x_update_row );

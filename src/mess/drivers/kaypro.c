@@ -19,7 +19,16 @@
 
 
 	Things that need doing:
-	- Floppy disks (I have no knowledge of how to set these up)
+
+	- Need schematics of 2x and kaypro10 (used 2-84 which doesn't seem to be the same).
+	  They currently are not reading any data from disk.
+
+	- omni2 and kaypro4 would (I believe) boot up if we had a proper boot disk. The IMD
+	  conversions seem to have the tracks scrambled (e.g reading side 0 track 1 gives us
+	  side 1 track 0).
+
+	- Kaypro2x and Kaypro10 don't centre the display at boot, but a soft reset fixes it.
+	  Perhaps the guesswork emulation of the video ULA is incomplete.
 
 
 **************************************************************************************************/
@@ -31,6 +40,7 @@
 #include "machine/ctronics.h"
 #include "machine/kay_kbd.h"
 #include "sound/beep.h"
+#include "devices/snapquik.h"
 #include "includes/kaypro.h"
 
 
@@ -155,16 +165,12 @@ static MACHINE_DRIVER_START( kayproii )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
+	MDRV_QUICKLOAD_ADD("quickload", kayproii, "com,cpm", 3)
 	MDRV_WD1793_ADD("wd1793", kaypro_wd1793_interface )
 	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
 	MDRV_Z80PIO_ADD( "z80pio_g", kayproii_pio_g_intf )
 	MDRV_Z80PIO_ADD( "z80pio_s", kayproii_pio_s_intf )
 	MDRV_Z80SIO_ADD( "z80sio", 4800, kaypro_sio_intf )	/* start at 300 baud */
-MACHINE_DRIVER_END
-
-static MACHINE_DRIVER_START( omni2 )
-	MDRV_IMPORT_FROM( kayproii )
-	MDRV_VIDEO_UPDATE( omni2 )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( kaypro2x )
@@ -198,10 +204,16 @@ static MACHINE_DRIVER_START( kaypro2x )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
+	MDRV_QUICKLOAD_ADD("quickload", kaypro2x, "com,cpm", 3)
 	MDRV_WD179X_ADD("wd1793", kaypro_wd1793_interface )
 	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
 	MDRV_Z80SIO_ADD( "z80sio", 4800, kaypro_sio_intf )
 	MDRV_Z80SIO_ADD( "z80sio_2x", 4800, kaypro_sio_intf )	/* extra sio for modem and printer */
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( omni2 )
+	MDRV_IMPORT_FROM( kayproii )
+	MDRV_VIDEO_UPDATE( omni2 )
 MACHINE_DRIVER_END
 
 /***********************************************************
