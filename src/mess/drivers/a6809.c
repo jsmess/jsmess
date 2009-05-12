@@ -1,6 +1,6 @@
 /***************************************************************************
 
-        Acron 6809
+        Acorn 6809
 
         12/05/2009 Skeleton driver.
 
@@ -71,5 +71,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( ????, a6809,  0,       0, 	a6809, 	a6809, 	 0,  	  a6809,  	 "Acron",   "6809",		GAME_NOT_WORKING)
+COMP( ????, a6809,  0,       0, 	a6809, 	a6809, 	 0,  	  a6809,  	 "Acorn",   "6809",		GAME_NOT_WORKING)
 
