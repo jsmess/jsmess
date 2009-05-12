@@ -762,6 +762,7 @@ const game_driver * const drivers[] =
 	DRIVER( y503iir2 )
 	DRIVER( yis503m )
 	DRIVER( yc64 )
+	DRIVER( bruc100 )
 
 
 	DRIVER( msx2 )		/* 1985 MSX2										*/

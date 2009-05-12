@@ -12,6 +12,7 @@ New System Drivers Supported (in no particular order):
 - TK85 (not working) [Miodrag Milanovic]
 - Timex Sinclair 1500 (not working) [Miodrag Milanovic]
 - Ringo 470 (not working) [Miodrag Milanovic]
+- Frael Bruc 100-1 [Miodrag Milanovic]
 
 Skeleton drivers : 
 ------------------

@@ -2061,6 +2061,21 @@ MSX_LAYOUT_INIT (yc64)
 	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
 MSX_LAYOUT_END
 
+/* MSX - Frael Bruc 100-1 */
+
+ROM_START (bruc100)
+	ROM_REGION (0x8000, "maincpu",0)
+	 ROM_LOAD( "bruc100-1bios.rom", 0x0000, 0x8000, CRC(c7bc4298) SHA1(3abca440cba16ac5e162b602557d30169f77adab))
+ROM_END
+
+MSX_LAYOUT_INIT (bruc100)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM_MM, 0x10000, 0x0000)	/* 64KB RAM */
+MSX_LAYOUT_END
+ 
+  
 /********************************  MSX 2 **********************************/
 
 /* MSX2 */
@@ -3677,6 +3692,7 @@ MSX_DRIVER_LIST
 	MSX_DRIVER (y503iir2)
 	MSX_DRIVER (yis503m)
 	MSX_DRIVER (yc64)
+	MSX_DRIVER (bruc100)
 
 
 
@@ -3807,6 +3823,7 @@ COMP(1986, y503iir, msx,	0,	msx_pal,	  msx,      msx,     msx, "Yamaha",	 "YIS50
 COMP(1986, y503iir2, msx,	0,	msx_pal,	  msx,      msx,     msx, "Yamaha",	 "YIS503IIR (Estonian)" , 0)
 COMP(1984, yis503m, msx,	0,	msx_pal,	  msx,      msx,     msx, "Yamaha",	 "YIS503M" , GAME_NOT_WORKING)
 COMP(1984, yc64,  	msx,	0,	msx_pal,	  msx,      msx,     msx, "Yashica", "YC-64" , 0)
+COMP(1984, bruc100, msx,	0,	msx_pal,	  msx,      msx,     msx, "Frael", "Bruc 100-1" , 0)
 
 COMP(1985, msx2,     0,		msx,	msx2_pal, msx2,	    msx,    msx, "ASCII & Microsoft", "MSX2", 0)
 COMP(1986, ax350,    msx2,	0,	msx2_pal, msx2,	    msx,    msx, "Al Alamiah", "AX-350", 0)
