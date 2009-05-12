@@ -365,6 +365,7 @@ DRVLIBS = \
 	$(MESSOBJ)/votrax.a \
 	$(MESSOBJ)/vtech.a \
 	$(MESSOBJ)/z80ne.a \
+	$(MESSOBJ)/skeleton.a \
 	$(MESSOBJ)/shared.a \
 
 
@@ -1331,6 +1332,46 @@ $(MESSOBJ)/kyocera.a: \
 	$(MESS_MACHINE)/upd1990a.o \
 	$(MESS_MACHINE)/8155pio.o \
 
+$(MESSOBJ)/skeleton.a: \
+	$(MESS_DRIVERS)/a6809.o \
+	$(MESS_DRIVERS)/a5105.o \
+	$(MESS_DRIVERS)/bcs3.o \
+	$(MESS_DRIVERS)/bob85.o \
+	$(MESS_DRIVERS)/c80.o \
+	$(MESS_DRIVERS)/mc1000.o \
+	$(MESS_DRIVERS)/vk100.o \
+	$(MESS_DRIVERS)/d6809.o \
+	$(MESS_DRIVERS)/mk90.o \
+	$(MESS_DRIVERS)/elwro800.o \
+	$(MESS_DRIVERS)/px8.o \
+	$(MESS_DRIVERS)/qx10.o \
+	$(MESS_DRIVERS)/fk1.o \
+	$(MESS_DRIVERS)/fm7.o \
+	$(MESS_DRIVERS)/et3400.o \
+	$(MESS_DRIVERS)/huebler.o \
+	$(MESS_DRIVERS)/interact.o \
+	$(MESS_DRIVERS)/sc80.o \
+	$(MESS_DRIVERS)/lc80.o \
+	$(MESS_DRIVERS)/jr200.o \
+	$(MESS_DRIVERS)/mc80.o \
+	$(MESS_DRIVERS)/hec2hrp.o \
+	$(MESS_DRIVERS)/hec2hrx.o \
+	$(MESS_DRIVERS)/hector1.o \
+	$(MESS_DRIVERS)/poly880.o \
+	$(MESS_DRIVERS)/sc1.o \
+	$(MESS_DRIVERS)/sc2.o \
+	$(MESS_DRIVERS)/chessmst.o \
+	$(MESS_DRIVERS)/sys2900.o \
+	$(MESS_DRIVERS)/pmi80.o \
+	$(MESS_DRIVERS)/tiki100.o \
+	$(MESS_DRIVERS)/vcs80.o \
+	$(MESS_DRIVERS)/v1050.o \
+	$(MESS_DRIVERS)/xerox820.o \
+	$(MESS_DRIVERS)/xor100.o \
+	$(MESS_DRIVERS)/iq151.o \
+	$(MESS_DRIVERS)/pc6001.o \
+	$(MESS_DRIVERS)/ply601.o \
+	
 #-------------------------------------------------
 # layout dependencies
 #-------------------------------------------------

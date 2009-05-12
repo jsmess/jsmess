@@ -25,26 +25,26 @@ static ADDRESS_MAP_START(spc1000_mem, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 static WRITE8_HANDLER(spc1000_iplk_w)
-{	
-	IPLK = IPLK ? 0 : 1; 
+{
+	IPLK = IPLK ? 0 : 1;
 	if (IPLK == 1) {
 		memory_set_bankptr(space->machine, 1, memory_region(space->machine, "maincpu"));
-		memory_set_bankptr(space->machine, 3, memory_region(space->machine, "maincpu"));		
+		memory_set_bankptr(space->machine, 3, memory_region(space->machine, "maincpu"));
 	} else {
 		memory_set_bankptr(space->machine, 1, mess_ram);
-		memory_set_bankptr(space->machine, 3, mess_ram + 0x8000);		
+		memory_set_bankptr(space->machine, 3, mess_ram + 0x8000);
 	}
 }
 
 static READ8_HANDLER(spc1000_iplk_r)
-{	
-	IPLK = IPLK ? 0 : 1; 
+{
+	IPLK = IPLK ? 0 : 1;
 	if (IPLK == 1) {
 		memory_set_bankptr(space->machine, 1, memory_region(space->machine, "maincpu"));
-		memory_set_bankptr(space->machine, 3, memory_region(space->machine, "maincpu"));		
+		memory_set_bankptr(space->machine, 3, memory_region(space->machine, "maincpu"));
 	} else {
 		memory_set_bankptr(space->machine, 1, mess_ram);
-		memory_set_bankptr(space->machine, 3, mess_ram + 0x8000);		
+		memory_set_bankptr(space->machine, 3, mess_ram + 0x8000);
 	}
 	return 0;
 }
@@ -52,29 +52,29 @@ static READ8_HANDLER(spc1000_iplk_r)
 
 
 static WRITE8_HANDLER(spc1000_video_ram_w)
-{	
+{
 	spc1000_video_ram[offset] = data;
 }
 
 static READ8_HANDLER(spc1000_video_ram_r)
-{	
+{
 	return spc1000_video_ram[offset];
 }
 
 static READ8_HANDLER(spc1000_keyboard_r) {
-	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", 
+	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3",
 											"LINE4", "LINE5", "LINE6", "LINE7",
-											"LINE8", "LINE9" };	
+											"LINE8", "LINE9" };
 	return input_port_read(space->machine, keynames[offset]);
 }
 
 static WRITE8_HANDLER(spc1000_gmode_w)
-{	
+{
 	GMODE = data;
 }
 
 static READ8_HANDLER(spc1000_gmode_r)
-{	
+{
 	return GMODE;
 }
 
@@ -83,7 +83,7 @@ static ADDRESS_MAP_START( spc1000_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(spc1000_video_ram_r, spc1000_video_ram_w)
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(spc1000_gmode_r, spc1000_gmode_w)
 	AM_RANGE(0x8000, 0x8009) AM_READ(spc1000_keyboard_r)
-	AM_RANGE(0xA000, 0xA000) AM_READWRITE(spc1000_iplk_r, spc1000_iplk_w)	
+	AM_RANGE(0xA000, 0xA000) AM_READWRITE(spc1000_iplk_r, spc1000_iplk_w)
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("ay8910", ay8910_address_w)
 	AM_RANGE(0x4001, 0x4001) AM_DEVREADWRITE("ay8910", ay8910_r, ay8910_data_w)
 ADDRESS_MAP_END
@@ -91,14 +91,14 @@ ADDRESS_MAP_END
 /* Input ports */
 INPUT_PORTS_START( spc1000 )
 	PORT_START("LINE0")
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED) 
+		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_RSHIFT) PORT_CODE(KEYCODE_LSHIFT)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_RCONTROL) PORT_CODE(KEYCODE_LCONTROL)
-		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED) 
+		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Break") PORT_CODE(KEYCODE_PAUSE)
-		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED) 
-		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Graph") PORT_CODE(KEYCODE_LALT) PORT_CODE(KEYCODE_RALT)		
-		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED) 
+		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
+		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Graph") PORT_CODE(KEYCODE_LALT) PORT_CODE(KEYCODE_RALT)
+		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_START("LINE1")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("~") PORT_CODE(KEYCODE_TILDE)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Home") PORT_CODE(KEYCODE_HOME)
@@ -183,21 +183,21 @@ INPUT_PORTS_START( spc1000 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(spc1000) 
-{	
+static MACHINE_RESET(spc1000)
+{
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	
+
 	memory_install_read8_handler(space, 0x0000, 0x7fff, 0, 0, SMH_BANK1);
 	memory_install_read8_handler(space, 0x8000, 0xffff, 0, 0, SMH_BANK3);
-		
+
 	memory_install_write8_handler(space, 0x0000, 0x7fff, 0, 0, SMH_BANK2);
 	memory_install_write8_handler(space, 0x8000, 0xffff, 0, 0, SMH_BANK4);
-	
+
 	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu"));
 	memory_set_bankptr(machine, 2, mess_ram);
 	memory_set_bankptr(machine, 3, memory_region(machine, "maincpu"));
 	memory_set_bankptr(machine, 4, mess_ram + 0x8000);
-	
+
 	IPLK = 1;
 }
 
@@ -205,17 +205,17 @@ static MACHINE_RESET(spc1000)
 static ATTR_CONST UINT8 spc1000_get_attributes(running_machine *machine, UINT8 c, UINT8 attr)
 {
 	UINT8 result = 0x00;
-	//if (c & 0x40)				result |= M6847_INTEXT;
+	//if (c & 0x40)             result |= M6847_INTEXT;
 	if (attr & 0x01)				result |= M6847_INV;
 	if (attr & 0x02)				result |= M6847_CSS;
 	if (attr & 0x04)				result |= M6847_AS;
 	if (attr & 0x08)				result |= M6847_GM0;
-	
+
 	if (GMODE & 0x08)	result |= M6847_AG;
 	if (GMODE & 0x04)	result |= M6847_GM2;
 	if (GMODE & 0x02)	result |= M6847_GM1;
 	if (GMODE & 0x80)	result |= M6847_GM0;
-	
+
 	return result;
 }
 
@@ -229,12 +229,12 @@ VIDEO_START( spc1000 )
 	m6847_config cfg;
 
 	spc1000_video_ram = auto_malloc (0x2000);
-	
+
 	memset(&cfg, 0, sizeof(cfg));
 	cfg.type = M6847_VERSION_M6847T1_NTSC;
 	cfg.get_attributes = spc1000_get_attributes;
 	cfg.get_video_ram = spc1000_get_video_ram;
-	m6847_init(machine, &cfg);		
+	m6847_init(machine, &cfg);
 }
 
 static const ay8910_interface spc1000_ay_interface =
@@ -256,10 +256,10 @@ static MACHINE_DRIVER_START( spc1000 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MDRV_CPU_PROGRAM_MAP(spc1000_mem, 0)
-	MDRV_CPU_IO_MAP(spc1000_io, 0)	
+	MDRV_CPU_IO_MAP(spc1000_io, 0)
 
 	MDRV_MACHINE_RESET(spc1000)
-	
+
     /* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(M6847_NTSC_FRAMES_PER_SECOND)
@@ -268,7 +268,7 @@ static MACHINE_DRIVER_START( spc1000 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(320, 25+192+26)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
-	
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("ay8910", AY8910, XTAL_4MHz / 1)
@@ -276,7 +276,7 @@ static MACHINE_DRIVER_START( spc1000 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MDRV_SOUND_WAVE_ADD("wave", "cassette")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	
+
 	MDRV_CASSETTE_ADD( "cassette", spc1000_cassette_config )
 MACHINE_DRIVER_END
 

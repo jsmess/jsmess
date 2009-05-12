@@ -1,6 +1,6 @@
 /***************************************************************************
 
-	NOTE: ****** Specbusy: press N, R, or E to boot *************
+    NOTE: ****** Specbusy: press N, R, or E to boot *************
 
 
         Spectrum/Inves/TK90X etc. memory map:
@@ -268,7 +268,7 @@ READ8_HANDLER(spectrum_port_fe_r)
 	}
 
 	/* Issue 2 Spectrums default to having bits 5, 6 & 7 set.
-	Issue 3 Spectrums default to having bits 5 & 7 set and bit 6 reset. */
+    Issue 3 Spectrums default to having bits 5 & 7 set and bit 6 reset. */
 	if (input_port_read(space->machine, "CONFIG") & 0x80)
 		data ^= (0x40);
 
@@ -301,7 +301,7 @@ static  READ8_HANDLER ( spectrum_port_ula_r )
 /* ports are not decoded full.
 The function decodes the ports appropriately */
 static ADDRESS_MAP_START (spectrum_io, ADDRESS_SPACE_IO, 8)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_MIRROR(0xfffe) AM_MASK(0xffff) 
+	AM_RANGE(0x00, 0x00) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_MIRROR(0xfffe) AM_MASK(0xffff)
 	AM_RANGE(0x1f, 0x1f) AM_READ(spectrum_port_1f_r) AM_MIRROR(0xff00)
 	AM_RANGE(0x7f, 0x7f) AM_READ(spectrum_port_7f_r) AM_MIRROR(0xff00)
 	AM_RANGE(0xdf, 0xdf) AM_READ(spectrum_port_df_r) AM_MIRROR(0xff00)
@@ -349,7 +349,7 @@ Spectrum keyboard is quite complicate to emulate. Each key can have 5 or 6 diffe
     KEY Mode       |  Simply press the key              |  Simply press the key
     CAPS Mode      |  Press Key + CAPS SHIFT            |  Press Key + LShift (default mapping)
     SYMBOL Mode    |  Press Key + SYMBOL SHIFT          |  Press Key + RShift (default mapping)
-    EXT Mode       |  Press CAPS + SYMBOL once,         |  Press LShift + RShift (to enter EXT Mode), 
+    EXT Mode       |  Press CAPS + SYMBOL once,         |  Press LShift + RShift (to enter EXT Mode),
                    |     then press Key                 |     then press Key
     EXT+Shift Mode |  In EXT Mode, press Key + SHIFT    |  In EXT Mode, press Key + LShift or Key + RShift
                    |    (no matter if CAPS and SYMBOL)  |
@@ -358,11 +358,11 @@ Spectrum keyboard is quite complicate to emulate. Each key can have 5 or 6 diffe
 
 Number Keys are the only keys not having a function in BASIC Mode (hence, they only have 5 functions)
 
-2009-04: Added natural keyboard support. The commented out PORT_CHARs are not reachable in natural keyboard mode (they are entered 
+2009-04: Added natural keyboard support. The commented out PORT_CHARs are not reachable in natural keyboard mode (they are entered
 in EXT+Shift Mode on a real Spectrum).
 */
 
-/* TO DO: replace PORT_CHAR('\xD7') with an 'empty' PORT_CHAR. I used \xD7 (multiplication sign) just as a placeholder. There should be no 
+/* TO DO: replace PORT_CHAR('\xD7') with an 'empty' PORT_CHAR. I used \xD7 (multiplication sign) just as a placeholder. There should be no
 PORT_CHAR for those functions (which have no equivalent on modern keyboards), but something is needed (to correctly have natural support for
 a few keys in SYMBOL Mode) and I found no EMPTY PORT_CHAR in MESS */
 INPUT_PORTS_START( spectrum )
@@ -425,7 +425,7 @@ INPUT_PORTS_START( spectrum )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("n    N    ,      INKEY$   OVER     NEXT") PORT_CODE(KEYCODE_N)	PORT_CHAR('n') PORT_CHAR('N') PORT_CHAR(',')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("b    B    *      BIN      BRIGHT   BORDER") PORT_CODE(KEYCODE_B)	PORT_CHAR('b') PORT_CHAR('B') PORT_CHAR('*')
 
-	PORT_START("NMI") 
+	PORT_START("NMI")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("NMI") PORT_CODE(KEYCODE_F12)
 
 	PORT_START("CONFIG")
@@ -528,7 +528,7 @@ MACHINE_DRIVER_START( spectrum )
 	MDRV_SNAPSHOT_ADD("snapshot", spectrum, "sna,z80,sp", 0)
 	MDRV_QUICKLOAD_ADD("quickload", spectrum, "scr", 0)
 	MDRV_CASSETTE_ADD( "cassette", spectrum_cassette_config )
-	
+
 	/* cartridge */
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("rom")
@@ -639,6 +639,12 @@ ROM_START(cip03)
 	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
+ROM_START(cip01)
+	ROM_REGION(0x10000,"maincpu",0)
+	ROM_LOAD("cip01.rom",0x0000,0x4000, CRC(0516a329) SHA1(4e3e0c5719a64d3b4fb224db499b4bef7d146917))
+	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
+ROM_END
+
 ROM_START(jet)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("jet.rom",0x0000,0x4000, CRC(e56a7d11) SHA1(e76be9ee71bae6aa1c2ff969276fb599ed68cb50))
@@ -670,7 +676,7 @@ ROM_START(dgama89)
 	ROM_SYSTEM_BIOS(2, "iso", "ISO")
 	ROMX_LOAD("iso.rom",0x0000,0x4000, CRC(2ee3a992) SHA1(2e39995dd032036d33a6dd88a38b750057bca19d), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS(3, "isopolak", "ISO Polak")
-	ROMX_LOAD("isopolak.rom",0x0000,0x4000, CRC(5e3f1f66) SHA1(61713117c944fc6afcb96c647bdba5ad36fd6a4b), ROM_BIOS(4))	
+	ROMX_LOAD("isopolak.rom",0x0000,0x4000, CRC(5e3f1f66) SHA1(61713117c944fc6afcb96c647bdba5ad36fd6a4b), ROM_BIOS(4))
 	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
@@ -752,6 +758,7 @@ COMP( 1986, tk95,     spectrum, 0,		spectrum,		spec_plus,	0,		0,	"Micro Digital"
 COMP( 1985, hc85,     spectrum, 0,		spectrum,		spectrum,	0,		0,	"ICE-Felix",	"HC-85" , 0)
 COMP( 1990, hc90,     spectrum, 0,		spectrum,		spectrum,	0,		0,	"ICE-Felix",	"HC-90" , 0)
 COMP( 1991, hc91,     spectrum, 0,		spectrum,		spec_plus,	0,		0,	"ICE-Felix",	"HC-91" , 0)
+COMP( 1987, cip01,    spectrum, 0,		spectrum,		spectrum,	0,		0,	"Electronica",	"CIP-01" , 0)	// keyboard should be spectrum, but image was not clear
 COMP( 1988, cip03,    spectrum, 0,		spectrum,		spectrum,	0,		0,	"Electronica",	"CIP-03" , 0)	// keyboard should be spectrum, but image was not clear
 COMP( 1990, jet,      spectrum, 0,		spectrum,		spectrum,	0,		0,	"Electromagnetica",	"JET" , 0)	// keyboard should be spectrum, but image was not clear
 COMP( 1987, dgama87,  spectrum, 0,		spectrum,		spectrum,	0,		0,	"Didaktik Skalica",	"Didaktik Gama 87" , 0)

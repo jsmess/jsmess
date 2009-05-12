@@ -8,7 +8,57 @@ New System Drivers Supported (in no particular order):
 - NTS DreamWriter T200 (not working)  [Roberto Carlos
   Fernandez Gerhardt, Wilbert Pol]
 - Samsung SPC-1000 [Miodrag Milanovic]
+- CIP-01 [Miodrag Milanovic]
+- TK85 (not working) [Miodrag Milanovic]
+- Timex Sinclair 1500 (not working) [Miodrag Milanovic]
+- Ringo 470 (not working) [Miodrag Milanovic]
 
+Skeleton drivers : 
+------------------
+- Acron 6809
+- BIC A5105
+- BCS-3
+- BOB-85
+- C-80
+- CCE MC-1000
+- DEC VK-100
+- Dunfield 6809 Portable
+- Elektronika MK-90
+- Elwro 800 Junior
+- Epson PX-8
+- Epson QX-10
+- FK-1
+- Fujitsu FM7
+- Heathkit ET-3400
+- Hubler/Everts MC
+- Interact Family Computer
+- SC-80
+- LC-80
+- National JR200
+- MC 80
+- Hector 2HR+
+- Hector 2HRX
+- Hector 1
+- Poly-Computer 880
+- Schachcomputer SC1
+- Schachcomputer SC2
+- Chess-Master	
+- System 2900
+- Tesla PMI-80
+- Tiki 100
+- VCS-80
+- Visual 1050
+- Xerox 820
+- XOR-100-12
+- IQ-151
+- NEC PC-6001
+- NEC PC-6001A
+- NEC PC-6001mkII
+- NEC PC-6001mkIISR
+- NEC PC-6600
+- NEC PC-6600SR
+- Plydin-601 
+- Plydin-601A
 
 System Driver Changes:
 ----------------------
@@ -21,7 +71,11 @@ System Driver Changes:
 - [VISICOM] Toshiba Visicom is now working and playable, but the
   graphics emulation is not perfect yet. [Curt Coder]
 
+- [Z88] Added version 3.0 and 4.01 finnish version of roms [Miodrag Milanovic]
 
+- [ORIC] Various bioses added for different languages [Miodrag Milanovic]
+
+- [PP01] 16 roms of 1K instead one of 16KB as in real machine [Miodrag Milanovic]
 
 User Interface Changes:
 -----------------------

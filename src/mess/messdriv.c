@@ -478,9 +478,12 @@ const game_driver * const drivers[] =
 	DRIVER( zx80 )		/* 1980 Sinclair ZX-80								*/
 	DRIVER( zx81 )		/* 1981 Sinclair ZX-81								*/
 	DRIVER( ts1000 )	/* 1982 Timex Sinclair 1000							*/
+	DRIVER( ts1500 )	/* Timex Sinclair 1500								*/
+	DRIVER( ringo470 )	/* Ringo 470										*/
 	DRIVER( pc8300 )	/* Your Computer - PC8300							*/
 	DRIVER( pow3000 )	/* Creon Enterprises - Power 3000					*/
 	DRIVER( lambda )	/* Lambda 8300										*/
+	DRIVER( tk85 )		/* Microdigital TK85 								*/
 
 	DRIVER( spectrum )/* 1982 ZX Spectrum									*/
 	DRIVER( spec80k ) /* 1987 ZX Spectrum 80k							*/
@@ -1084,7 +1087,8 @@ const game_driver * const drivers[] =
 	DRIVER( hc128 )   /* 1991 HC-128									  */
 	DRIVER( hc2000 )  /* 1992 HC-2000									  */
 
-	DRIVER( cip03 )   /* 1988 CIP-03										  */
+	DRIVER( cip01 )   /* 1987 CIP-01									  */
+	DRIVER( cip03 )   /* 1988 CIP-03									  */
 	DRIVER( jet )     /* 1990 JET										  */
 
   /* Didaktik Skalica */
@@ -1196,4 +1200,49 @@ const game_driver * const drivers[] =
 /*********** Misc ***********************************************************/
 	DRIVER( ex800 )
 
+/*********** Skeleton drivers ***********************************************/		
+	DRIVER( a6809 )
+	DRIVER( a5105 )
+	DRIVER( bcs3 )
+	DRIVER( bob85 )
+	DRIVER( c80 )
+	DRIVER( mc1000 )
+	DRIVER( vk100 )
+	DRIVER( d6809 )
+	DRIVER( mk90 )
+	DRIVER( elwro800 )
+	DRIVER( px8 )
+	DRIVER( qx10 )
+	DRIVER( fk1 )
+	DRIVER( fm7 )
+	DRIVER( et3400 )
+	DRIVER( huebler )
+	DRIVER( interact )
+	DRIVER( sc80 )
+	DRIVER( lc80 )
+	DRIVER( jr200 )
+	DRIVER( mc80 )
+	DRIVER( hec2hrp )
+	DRIVER( hec2hrx )
+	DRIVER( hector1 )
+	DRIVER( poly880 )
+	DRIVER( sc1 )
+	DRIVER( sc2 )
+	DRIVER( chessmst )
+	DRIVER( sys2900 )
+	DRIVER( pmi80 )
+	DRIVER( tiki100 )
+	DRIVER( vcs80 )
+	DRIVER( v1050 )
+	DRIVER( xerox820 )
+	DRIVER( xor100 )
+	DRIVER( iq151 )
+    DRIVER( pc6001 )
+	DRIVER( pc6001a )
+	DRIVER( pc6001m2 )
+	DRIVER( pc6001sr )
+	DRIVER( pc6600 )
+	DRIVER( pc6600sr )
+	DRIVER( ply601 )
+	DRIVER( ply601a )
 #endif /* DRIVER_RECURSIVE */
