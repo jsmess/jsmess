@@ -4,6 +4,7 @@
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
 #include "machine/wd17xx.h"
+#include "devices/snapquik.h"
 
 
 /* machine.c */
