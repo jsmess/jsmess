@@ -9,7 +9,7 @@
 
 	Supported systems:
 	  - Kyocera Kyotronic 85
-	  - Olivetti M10 (slightly diff hw, the whole bios is shifted by 1 word)
+	  - Olivetti M10 (slightly diff hw)
 	  - NEC PC-8201A (slightly diff hw)
 	  - Tandy Model 100
 	  - Tandy Model 102 (slightly diff hw)
@@ -766,7 +766,7 @@ ROM_END
 
 ROM_START(olivm10)
 	ROM_REGION( 0x8010, I8085_TAG, 0 )
-	ROM_LOAD( "m10rom.bin", 0x0000, 0x8010, CRC(0be02b58) SHA1(56f2087a658efd0323663d15afcd4f5f27c68664) )
+	ROM_LOAD( "m10rom.bin", 0x0000, 0x8000, CRC(0be02b58) SHA1(56f2087a658efd0323663d15afcd4f5f27c68664) )
 ROM_END
 
 ROM_START(kyo85)
