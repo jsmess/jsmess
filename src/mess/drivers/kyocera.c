@@ -268,10 +268,34 @@ static WRITE8_HANDLER( trsm200_bank_w )
 {
 	trsm200_state *state = space->machine->driver_data;
 
-	state->bank = data;
+	const address_space *program = cputag_get_address_space(space->machine, I8085_TAG, ADDRESS_SPACE_PROGRAM);
 
-	memory_set_bank(space->machine, 1, data & 0x03);
-	memory_set_bank(space->machine, 2, (data >> 2) & 0x03);
+	int rom_bank = data & 0x03;
+	int ram_bank = (data >> 2) & 0x03;
+
+	state->bank = data & 0x0f;
+
+	if (rom_bank == 3)
+	{
+		/* invalid ROM bank */
+		memory_install_readwrite8_handler(program, 0x0000, 0x7fff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+	}
+	else
+	{
+		memory_install_readwrite8_handler(program, 0x0000, 0x7fff, 0, 0, SMH_BANK(1), SMH_UNMAP);
+		memory_set_bank(space->machine, 1, rom_bank);
+	}
+
+	if (mess_ram_size < ((ram_bank + 1) * 24 * 1024))
+	{
+		/* invalid RAM bank */
+		memory_install_readwrite8_handler(program, 0xa000, 0xffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+	}
+	else
+	{
+		memory_install_readwrite8_handler(program, 0xa000, 0xffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
+		memory_set_bank(space->machine, 2, ram_bank);
+	}
 }
 
 static READ8_HANDLER( trsm200_stbk_r )
