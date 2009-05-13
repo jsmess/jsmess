@@ -1176,7 +1176,7 @@ const game_driver * const drivers[] =
 	DRIVER( trsm100 )
 	DRIVER( trsm102 )
 	DRIVER( trsm200 )
-	DRIVER( npc8201 )
+	DRIVER( pc8201 )
 
 	/* Nakajima manufactured eletronic typewriters */
 	DRIVER( drwrt200 )	/* 199? NTS DreamWriter T200                         */

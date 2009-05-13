@@ -12,6 +12,9 @@
 typedef struct _kyocera_state kyocera_state;
 struct _kyocera_state
 {
+	/* memory state */
+	UINT8 bank;				/* memory bank selection */
+
 	/* clock state */
 	int upd1990a_data;		/* RTC data output */
 
@@ -19,6 +22,8 @@ struct _kyocera_state
 	UINT16 lcd_cs2;			/* LCD driver chip select */
 
 	const device_config *hd44102[10];
+	const device_config *upd1990a;
+	const device_config *centronics;
 };
 
 typedef struct _trsm200_state trsm200_state;

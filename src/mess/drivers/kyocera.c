@@ -47,9 +47,7 @@
 #include "machine/rp5c01a.h"
 #include "video/hd61830.h"
 
-static UINT8 rom_page, ram_page;
 static UINT8 port_a, port_b;
-static UINT8 timer_lsb, timer_msb;
 static UINT8 io_E8, io_A1, io_90, io_D0;
 
 static const device_config *cassette_device_image(running_machine *machine)
@@ -57,7 +55,72 @@ static const device_config *cassette_device_image(running_machine *machine)
 	return devtag_get_device(machine, "cassette");
 }
 
-/*  WRITE HANDLERS  */
+/* Read/Write Handlers */
+
+static READ8_HANDLER( pc8201_bank_r )
+{
+	kyocera_state *state = space->machine->driver_data;
+
+	return state->bank;
+}
+
+static void pc8201_bankswitch(running_machine *machine, UINT8 data)
+{
+	kyocera_state *state = machine->driver_data;
+
+	const address_space *program = cputag_get_address_space(machine, I8085_TAG, ADDRESS_SPACE_PROGRAM);
+
+	int rom_bank = data & 0x03;
+	int ram_bank = (data >> 2) & 0x03;
+
+	state->bank = data & 0x0f;
+
+	if (rom_bank > 1)
+	{
+		/* RAM */
+		memory_install_readwrite8_handler(program, 0x0000, 0x7fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
+	}
+	else
+	{
+		/* ROM */
+		memory_install_readwrite8_handler(program, 0x0000, 0x7fff, 0, 0, SMH_BANK(1), SMH_UNMAP);
+	}
+
+	memory_set_bank(machine, 1, rom_bank);
+
+	switch (ram_bank)
+	{
+	case 0:
+		memory_install_readwrite8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite8_handler(program, 0xc000, 0xffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
+		break;
+
+	case 1:
+		memory_install_readwrite8_handler(program, 0x8000, 0xffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		break;
+
+	case 2:
+		if (mess_ram_size > 16 * 1024)
+			memory_install_readwrite8_handler(program, 0x8000, 0xffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
+		else
+			memory_install_readwrite8_handler(program, 0x8000, 0xffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		break;
+
+	case 3:
+		if (mess_ram_size > 48 * 1024)
+			memory_install_readwrite8_handler(program, 0x8000, 0xffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
+		else
+			memory_install_readwrite8_handler(program, 0x8000, 0xffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		break;
+	}
+
+	memory_set_bank(machine, 2, ram_bank);
+}
+
+static WRITE8_HANDLER( pc8201_bank_w )
+{
+	pc8201_bankswitch(space->machine, data);
+}
 
 // 0x90 PC-8201 only
 static WRITE8_HANDLER( pc8201_io90_write )
@@ -77,63 +140,6 @@ static WRITE8_HANDLER( pc8201_io90_write )
 // 0xA0
 static WRITE8_HANDLER( modem_control_port_write )
 {
-}
-
-// 0xA1 PC-8201 only
-static WRITE8_HANDLER( pc8201_bank_write )
-{
-	UINT8 *rom = memory_region(space->machine, I8085_TAG);
-	const address_space *space_program = cputag_get_address_space(space->machine, I8085_TAG, ADDRESS_SPACE_PROGRAM);
-	
-	if ((data & 0x03) != rom_page)
-	{
-		UINT8 read_only = 0;
-		UINT8 optional_rom = 0;
-		rom_page = data & 0x03;
-		
-		/* Test for a change to the ROM bank (0x0000 - 0x7FFF) */
-		switch (rom_page)
-		{
-			case 0:
-				memory_set_bankptr(space_program->machine, 1, rom + 0x10000);
-				read_only = 1;
-				break;
-			case 1:
-				optional_rom = 1;	/* Not implemented yet */
-				break;
-			case 2:
-			case 3:
-				memory_set_bankptr(space_program->machine, 1, mess_ram + (rom_page - 1) * 0x8000);
-				break;
-		}
-
-		if (!optional_rom)
-			memory_install_readwrite8_handler(space_program, 0x0000, 0x7fff, 0, 0, SMH_BANK(1), read_only ? SMH_UNMAP : SMH_BANK(1));
-	}
-
-	if (((data >> 2) & 0x03) != ram_page)
-	{
-		ram_page = (data >> 2) & 0x03;
-
-		/* Test for a change to the RAM bank (0x8000 - 0xFFFF) */
-		/* According to the PC-8200 Tech Notes, only 0,2,3 are admissible values here */
-		switch (ram_page)
-		{
-			case 0:
-			case 1:		/* However, we treat 1 as 0*/
-				if (ram_page == 1)
-					logerror("PC-8201 Illegal RAM Bank value\n");
-
-				memory_set_bankptr(space_program->machine, 2, mess_ram);
-				break;
-			case 2:
-			case 3:
-				memory_set_bankptr(space_program->machine, 2, mess_ram + (ram_page - 1) * 0x8000);
-				break;
-		}
-	}
-			
-	io_A1 = data & 0x0f;
 }
 
 // 0xC0->0xCF
@@ -193,18 +199,6 @@ static READ8_HANDLER( io82_read )
 static READ8_HANDLER( modem_control_port_read )
 {
 	return 0;	// FIXME
-}
-
-// 0xA0 PC8201 only
-static READ8_HANDLER( pc8201_ioa0_read )
-{
-	return (io_A1 & 0x3f) | (io_90 & 0xc0);
-}
-
-// 0xA1 PC-8201 only
-static READ8_HANDLER( pc8201_bank_read )
-{
-	return io_A1;
 }
 
 // 0xC0->0xCF all systems but T200
@@ -342,12 +336,11 @@ static WRITE8_HANDLER( trsm200_stbk_w )
 }
 
 static ADDRESS_MAP_START( kyo85_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xffff) AM_RAM
+	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xffff) AM_RAMBANK(2)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( npc8201_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( pc8201_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK(1)
 	AM_RANGE(0x8000, 0xffff) AM_RAMBANK(2)
 ADDRESS_MAP_END
@@ -374,8 +367,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pc8201_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x82, 0x82) AM_READ( io82_read )
 	AM_RANGE(0x90, 0x90) AM_WRITE( pc8201_io90_write )
-	AM_RANGE(0xa0, 0xa0) AM_READWRITE( pc8201_ioa0_read, modem_control_port_write )
-	AM_RANGE(0xa1, 0xa1) AM_READWRITE( pc8201_bank_read, pc8201_bank_write )
+/*	AM_RANGE(0xa0, 0xa0) AM_READWRITE( pc8201_ioa0_read, modem_control_port_write )
+	AM_RANGE(0xa1, 0xa1) AM_READWRITE( pc8201_bank_read, pc8201_bank_write )*/
+	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) AM_READWRITE(pc8201_bank_r, pc8201_bank_w)
 	AM_RANGE(0xb0, 0xb7) AM_MIRROR(0x08) AM_DEVREADWRITE( PIO8155_TAG, pio8155_r, pio8155_w )
 	AM_RANGE(0xd8, 0xd8) AM_READ( uart_read )
 	AM_RANGE(0xe0, 0xe8) AM_READ( keyboard_read )
@@ -511,7 +505,7 @@ static INPUT_PORTS_START( kyo85 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( npc8201a )
+static INPUT_PORTS_START( pc8201a )
 	PORT_INCLUDE( kyo85 )
 
 	PORT_MODIFY("KEY3")
@@ -755,24 +749,107 @@ INPUT_PORTS_END
 
 static MACHINE_START( kyo85 )
 {
+	const address_space *program = cputag_get_address_space(machine, I8085_TAG, ADDRESS_SPACE_PROGRAM);
 	const device_config *rtc = devtag_get_device(machine, UPD1990A_TAG);
 
 	upd1990a_cs_w(rtc, 1);
 	upd1990a_oe_w(rtc, 1);
+
+	/* configure ROM banking */
+	memory_install_readwrite8_handler(program, 0x0000, 0x7fff, 0, 0, SMH_BANK(1), SMH_UNMAP);
+	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, I8085_TAG), 0);
+	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "option"), 0);
+	memory_set_bank(machine, 1, 0);
+
+	/* configure RAM banking */
+	switch (mess_ram_size)
+	{
+	case 16 * 1024:
+		memory_install_readwrite8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite8_handler(program, 0xc000, 0xffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
+		break;
+
+	case 32 * 1024:
+		memory_install_readwrite8_handler(program, 0x8000, 0xffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
+		break;
+	}
+
+	memory_configure_bank(machine, 2, 0, 1, mess_ram, 0);
+	memory_set_bank(machine, 2, 0);
 }
 
 static MACHINE_RESET( kyo85 )
 {
-	rom_page = -1;
-	ram_page = -1;
 	port_a = 0;
 	port_b = 0;
-	timer_lsb = 0;
-	timer_msb = 0;
 	io_E8 = 0;
 	io_D0 = 0;
 	io_A1 = 0;
 	io_90 = 0;
+}
+
+static MACHINE_START( pc8201 )
+{
+	kyocera_state *state = machine->driver_data;
+
+	/* configure ROM banking */
+	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, I8085_TAG), 0);
+	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "ext"), 0);
+	memory_configure_bank(machine, 1, 2, 2, mess_ram + 0x4000, 0x8000);
+	memory_set_bank(machine, 1, 0);
+
+	/* configure RAM banking */
+	memory_configure_bank(machine, 2, 0, 1, mess_ram, 0);
+	memory_configure_bank(machine, 2, 2, 2, mess_ram + 0x4000, 0x8000);
+	memory_set_bank(machine, 2, 0);
+
+	pc8201_bankswitch(machine, 0);
+
+	/* find devices */
+	state->centronics = devtag_get_device(machine, "centronics");
+
+	/* register for state saving */
+}
+
+static MACHINE_START( trsm100 )
+{
+	const address_space *program = cputag_get_address_space(machine, I8085_TAG, ADDRESS_SPACE_PROGRAM);
+	const device_config *rtc = devtag_get_device(machine, UPD1990A_TAG);
+
+	upd1990a_cs_w(rtc, 1);
+	upd1990a_oe_w(rtc, 1);
+
+	/* configure ROM banking */
+	memory_install_readwrite8_handler(program, 0x0000, 0x7fff, 0, 0, SMH_BANK(1), SMH_UNMAP);
+	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, I8085_TAG), 0);
+	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "option"), 0);
+	memory_set_bank(machine, 1, 0);
+
+	/* configure RAM banking */
+	switch (mess_ram_size)
+	{
+	case 8 * 1024:
+		memory_install_readwrite8_handler(program, 0x8000, 0xcfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite8_handler(program, 0xe000, 0xffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
+		break;
+
+	case 16 * 1024:
+		memory_install_readwrite8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite8_handler(program, 0xc000, 0xffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
+		break;
+
+	case 24 * 1024:
+		memory_install_readwrite8_handler(program, 0x8000, 0x9fff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite8_handler(program, 0xa000, 0xffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
+		break;
+
+	case 32 * 1024:
+		memory_install_readwrite8_handler(program, 0x8000, 0xffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
+		break;
+	}
+
+	memory_configure_bank(machine, 2, 0, 1, mess_ram, 0);
+	memory_set_bank(machine, 2, 0);
 }
 
 static MACHINE_START( trsm200 )
@@ -793,10 +870,6 @@ static MACHINE_START( trsm200 )
 	state->centronics = devtag_get_device(machine, "centronics");
 
 	/* register for state saving */
-}
-
-static MACHINE_RESET( trsm200 )
-{
 }
 
 static WRITE_LINE_DEVICE_HANDLER( kyocera_upd1990a_data_w )
@@ -1036,16 +1109,47 @@ static MACHINE_DRIVER_START( kyo85 )
 	MDRV_PIO8155_ADD(PIO8155_TAG, 2400000, kyocera_8155_intf)
 	MDRV_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, kyocera_upd1990a_intf)
 
+	/* printer */
+	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
+
 	/* cassette */
 	MDRV_CASSETTE_ADD("cassette", kyocera_cassette_config)
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( npc8201 )
+static MACHINE_DRIVER_START( pc8201 )
+	MDRV_DRIVER_DATA(kyocera_state)
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD(I8085_TAG, 8085A, 2400000)
+	MDRV_CPU_PROGRAM_MAP(pc8201_mem, 0)
+	MDRV_CPU_IO_MAP(pc8201_io, 0)
+	MDRV_CPU_CONFIG(kyocera_i8085_config)
+
+	MDRV_MACHINE_START(pc8201)
+
+	/* video hardware */
+	MDRV_IMPORT_FROM(kyo85_video)
+
+	/* sound hardware */
+//	MDRV_SPEAKER_STANDARD_MONO("mono")
+//	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+//	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	/* devices */
+	MDRV_PIO8155_ADD(PIO8155_TAG, 2400000, kyocera_8155_intf)
+	MDRV_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, kyocera_upd1990a_intf)
+
+	/* printer */
+	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
+
+	/* cassette */
+	MDRV_CASSETTE_ADD("cassette", kyocera_cassette_config)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( trsm100 )
 	MDRV_IMPORT_FROM(kyo85)
 
-	MDRV_CPU_MODIFY(I8085_TAG)
-	MDRV_CPU_PROGRAM_MAP(npc8201_mem, 0)
-	MDRV_CPU_IO_MAP(pc8201_io, 0)
+	MDRV_MACHINE_START(trsm100)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( trsm200 )
@@ -1058,7 +1162,6 @@ static MACHINE_DRIVER_START( trsm200 )
 	MDRV_CPU_CONFIG(kyocera_i8085_config)
 
 	MDRV_MACHINE_START( trsm200 )
-	MDRV_MACHINE_RESET( trsm200 )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(trsm200_video)
@@ -1084,38 +1187,44 @@ static MACHINE_DRIVER_START( trsm200 )
 	MDRV_CASSETTE_ADD("cassette", kyocera_cassette_config)
 MACHINE_DRIVER_END
 
-/***************************************************************************
+/* ROMs */
 
-  Game driver(s)
-
-***************************************************************************/
-
-ROM_START(kyo85)
+ROM_START( kyo85 )
 	ROM_REGION( 0x8000, I8085_TAG, 0 )
 	ROM_LOAD( "kc85rom.bin", 0x0000, 0x8000, CRC(8a9ddd6b) SHA1(9d18cb525580c9e071e23bc3c472380aa46356c0) )
+
+	ROM_REGION( 0x8000, "option", ROMREGION_ERASE00 )
 ROM_END
 
-ROM_START(npc8201)
-	ROM_REGION( 0x18000, I8085_TAG, 0 )
-	ROM_LOAD( "pc8201rom.bin", 0x10000, 0x8000, BAD_DUMP CRC(4c534662) SHA1(758fefbba251513e7f9d86f7e9016ad8817188d8) ) /* Y2K hacked */
+ROM_START( pc8201 )
+	ROM_REGION( 0x10000, I8085_TAG, 0 )
+	ROM_LOAD( "pc8201rom.bin", 0x0000, 0x8000, BAD_DUMP CRC(4c534662) SHA1(758fefbba251513e7f9d86f7e9016ad8817188d8) ) /* Y2K hacked */
+
+	ROM_REGION( 0x8000, "ext", ROMREGION_ERASE00 )
 ROM_END
 
-ROM_START(trsm100)
+ROM_START( trsm100 )
 	ROM_REGION( 0x8000, I8085_TAG, 0 )
 	ROM_LOAD( "m100rom.bin",  0x0000, 0x8000, CRC(730a3611) SHA1(094dbc4ac5a4ea5cdf51a1ac581a40a9622bb25d) )
+
+	ROM_REGION( 0x8000, "option", ROMREGION_ERASE00 )
 ROM_END
 
-ROM_START(olivm10)
+ROM_START( olivm10 )
 	ROM_REGION( 0x8010, I8085_TAG, 0 )
 	ROM_LOAD( "m10rom.bin", 0x0000, 0x8010, CRC(0be02b58) SHA1(56f2087a658efd0323663d15afcd4f5f27c68664) )
+
+	ROM_REGION( 0x8000, "option", ROMREGION_ERASE00 )
 ROM_END
 
-ROM_START(trsm102)
+ROM_START( trsm102 )
 	ROM_REGION( 0x8000, I8085_TAG, 0 )
 	ROM_LOAD( "m102rom.bin", 0x0000, 0x8000, BAD_DUMP CRC(0e4ff73a) SHA1(d91f4f412fb78c131ccd710e8158642de47355e2) ) /* Y2K hacked */
+
+	ROM_REGION( 0x8000, "option", ROMREGION_ERASE00 )
 ROM_END
 
-ROM_START(trsm200)
+ROM_START( trsm200 )
 	ROM_REGION( 0x18000, I8085_TAG, 0 )
 	ROM_LOAD( "t200rom.bin", 0x0000, 0xa000, BAD_DUMP CRC(e3358b38) SHA1(35d4e6a5fb8fc584419f57ec12b423f6021c0991) ) /* Y2K hacked */
 	ROM_CONTINUE(			0x10000, 0x8000 )
@@ -1123,19 +1232,29 @@ ROM_START(trsm200)
 	ROM_REGION( 0x8000, "option", ROMREGION_ERASE00 )
 ROM_END
 
-static DRIVER_INIT( npc8201 )
-{
-	UINT8 *rom = memory_region(machine, I8085_TAG);
+/* System Configurations */
 
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, I8085_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x7fff, 0, 0, SMH_BANK(1), SMH_UNMAP);
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, I8085_TAG, ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
+static SYSTEM_CONFIG_START( kyo85 )
+	CONFIG_RAM_DEFAULT	(16 * 1024)
+	CONFIG_RAM			(32 * 1024)
+SYSTEM_CONFIG_END
 
-	memory_set_bankptr(machine, 1, rom + 0x10000);
-	memory_set_bankptr(machine, 2, mess_ram);
-}
+static SYSTEM_CONFIG_START( pc8201 )
+	CONFIG_RAM_DEFAULT	(16 * 1024)
+	CONFIG_RAM			(48 * 1024)
+	CONFIG_RAM			(80 * 1024)
+SYSTEM_CONFIG_END
 
-static SYSTEM_CONFIG_START( npc8201 )
-	CONFIG_RAM_DEFAULT(96 * 1024)
+static SYSTEM_CONFIG_START( trsm100 )
+	CONFIG_RAM_DEFAULT	( 8 * 1024)
+	CONFIG_RAM			(16 * 1024)
+	CONFIG_RAM			(24 * 1024)
+	CONFIG_RAM			(32 * 1024)
+SYSTEM_CONFIG_END
+
+static SYSTEM_CONFIG_START( trsm102 )
+	CONFIG_RAM_DEFAULT	(24 * 1024)
+	CONFIG_RAM			(32 * 1024)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START( trsm200 )
@@ -1144,10 +1263,12 @@ static SYSTEM_CONFIG_START( trsm200 )
 	CONFIG_RAM			(72 * 1024)
 SYSTEM_CONFIG_END
 
+/* System Drivers */
+
 /*    YEAR  NAME      PARENT   COMPAT  MACHINE     INPUT    INIT      CONFIG       COMPANY  FULLNAME */
-COMP( 1983, kyo85,    0,       0,      kyo85,      kyo85,   0,        0,          "Kyocera",            "Kyotronic 85", GAME_IMPERFECT_SOUND )
-COMP( 1983, olivm10,  0,       0,      kyo85,      olivm10, 0,        0,          "Olivetti",           "M10",       GAME_IMPERFECT_SOUND )
-COMP( 1983, npc8201,  0,       0,      npc8201,    npc8201a,npc8201,  npc8201,    "NEC",                "PC-8201A", GAME_NOT_WORKING )
-COMP( 1983, trsm100,  0,       0,      kyo85,      kyo85,   0,        0,          "Tandy Radio Shack",  "TRS-80 Model 100", GAME_IMPERFECT_SOUND )
+COMP( 1983, kyo85,    0,       0,      kyo85,      kyo85,   0,        kyo85,      "Kyocera",            "Kyotronic 85", GAME_IMPERFECT_SOUND )
+COMP( 1983, olivm10,  0,       0,      kyo85,      olivm10, 0,        kyo85,      "Olivetti",           "M10",       GAME_IMPERFECT_SOUND )
+COMP( 1983, pc8201,   0,       0,      pc8201,     pc8201a, 0,		  pc8201,     "NEC",                "PC-8201A", GAME_NOT_WORKING )
+COMP( 1983, trsm100,  0,       0,      trsm100,    kyo85,   0,        trsm100,    "Tandy Radio Shack",  "TRS-80 Model 100", GAME_IMPERFECT_SOUND )
 COMP( 1984, trsm200,  0,       0,      trsm200,    trsm200, 0,		  trsm200,    "Tandy Radio Shack",  "TRS-80 Model 200", GAME_IMPERFECT_SOUND )
-COMP( 1986, trsm102,  0,       0,      kyo85,      kyo85,   0,        0,          "Tandy Radio Shack",  "TRS-80 Model 102", GAME_IMPERFECT_SOUND )
+COMP( 1986, trsm102,  0,       0,      trsm100,    kyo85,   0,        trsm102,    "Tandy Radio Shack",  "TRS-80 Model 102", GAME_IMPERFECT_SOUND )
