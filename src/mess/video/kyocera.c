@@ -3,13 +3,6 @@
 #include "video/hd44102.h"
 #include "video/hd61830.h"
 
-void kyo85_set_lcd_bank(running_machine *machine, UINT16 data)
-{
-	kyocera_state *state = machine->driver_data;
-
-	state->lcd_cs2 = data;
-}
-
 READ8_HANDLER( kyo85_lcd_status_r )
 {
 	kyocera_state *state = space->machine->driver_data;
@@ -19,7 +12,7 @@ READ8_HANDLER( kyo85_lcd_status_r )
 
 	for (i = 0; i < 10; i++)
 	{
-		if (BIT(state->lcd_cs2, i))
+		if (state->lcd_cs2[i])
 		{
 			data |= hd44102_status_r(state->hd44102[i], 0);
 		}
@@ -36,7 +29,7 @@ READ8_HANDLER( kyo85_lcd_data_r )
 
 	for (i = 0; i < 10; i++)
 	{
-		if (BIT(state->lcd_cs2, i))
+		if (state->lcd_cs2[i])
 		{
 			data |= hd44102_data_r(state->hd44102[i], 0);
 		}
@@ -52,7 +45,7 @@ WRITE8_HANDLER( kyo85_lcd_command_w )
 
 	for (i = 0; i < 10; i++)
 	{
-		if (BIT(state->lcd_cs2, i))
+		if (state->lcd_cs2[i])
 		{
 			hd44102_control_w(state->hd44102[i], 0, data);
 		}
@@ -66,7 +59,7 @@ WRITE8_HANDLER( kyo85_lcd_data_w )
 	
 	for (i = 0; i < 10; i++)
 	{
-		if (BIT(state->lcd_cs2, i))
+		if (state->lcd_cs2[i])
 		{
 			hd44102_data_w(state->hd44102[i], 0, data);
 		}
@@ -96,7 +89,7 @@ static VIDEO_START( kyo85 )
 	state->hd44102[9] = devtag_get_device(machine, "m10");
 
 	/* register for state saving */
-	state_save_register_global(machine, state->lcd_cs2);
+	state_save_register_global_array(machine, state->lcd_cs2);
 }
 
 static VIDEO_UPDATE( kyo85 )

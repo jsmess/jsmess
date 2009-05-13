@@ -18,8 +18,11 @@ struct _kyocera_state
 	/* clock state */
 	int upd1990a_data;		/* RTC data output */
 
+	/* keyboard state */
+	UINT16 keylatch;
+
 	/* video state */
-	UINT16 lcd_cs2;			/* LCD driver chip select */
+	int lcd_cs2[10];		/* LCD driver chip select */
 
 	const device_config *hd44102[10];
 	const device_config *upd1990a;
@@ -44,8 +47,6 @@ struct _trsm200_state
 };
 
 /* ---------- defined in video/kyocera.c ---------- */
-
-void kyo85_set_lcd_bank(running_machine *machine, UINT16 data);
 
 READ8_HANDLER( kyo85_lcd_status_r );
 READ8_HANDLER( kyo85_lcd_data_r );
