@@ -183,30 +183,30 @@ static WRITE16_HANDLER( ddragon3_io16_w )
 		break;
 
 		case 1: /* soundlatch_w */
-		soundlatch_w(space,1,reg[1]&0xff);
-		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
+		soundlatch_w(space, 1, reg[1] & 0xff);
+		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE );
 		break;
 
 		case 2:
 		/*  this gets written to on startup and at the end of IRQ6
         **  possibly trigger IRQ on sound CPU
         */
-		cpu_set_input_line(space->machine->cpu[0], 6, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "maincpu", 6, CLEAR_LINE);
 		break;
 
 		case 3:
 		/*  this gets written to on startup,
         **  and at the end of IRQ5 (input port read) */
-		cpu_set_input_line(space->machine->cpu[0], 5, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "maincpu", 5, CLEAR_LINE);
 		break;
 
 		case 4:
 		/* this gets written to at the end of IRQ6 only */
-		cpu_set_input_line(space->machine->cpu[0], 6, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "maincpu", 6, CLEAR_LINE);
 		break;
 
 		default:
-		logerror("OUTPUT 1400[%02x] %08x, pc=%06x \n", offset,(unsigned)data, cpu_get_pc(space->cpu) );
+		logerror("OUTPUT 1400[%02x] %08x, pc=%06x \n", offset, (unsigned)data, cpu_get_pc(space->cpu) );
 		break;
 	}
 }
@@ -217,110 +217,67 @@ static WRITE16_HANDLER( ddragon3_io16_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x080000, 0x080fff) AM_READ(SMH_RAM)	/* Foreground (32x32 Tiles - 4 by per tile) */
-	AM_RANGE(0x082000, 0x0827ff) AM_READ(SMH_RAM)	/* Background (32x32 Tiles - 2 by per tile) */
+static ADDRESS_MAP_START( ddragon3_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(ddragon3_fg_videoram16_w) AM_BASE(&ddragon3_fg_videoram16) /* Foreground (32x32 Tiles - 4 by per tile) */
+	AM_RANGE(0x082000, 0x0827ff) AM_RAM_WRITE(ddragon3_bg_videoram16_w) AM_BASE(&ddragon3_bg_videoram16) /* Background (32x32 Tiles - 2 by per tile) */
+	AM_RANGE(0x0c0000, 0x0c000f) AM_WRITE(ddragon3_scroll16_w)
 	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x100002, 0x100003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x100004, 0x100005) AM_READ_PORT("DSW")
 	AM_RANGE(0x100006, 0x100007) AM_READ_PORT("P3")
-	AM_RANGE(0x140000, 0x1405ff) AM_READ(SMH_RAM)	/* Palette RAM */
-	AM_RANGE(0x180000, 0x180fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x1c0000, 0x1c3fff) AM_READ(SMH_RAM)	/* working RAM */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x080000, 0x080fff) AM_WRITE(ddragon3_fg_videoram16_w) AM_BASE(&ddragon3_fg_videoram16)
-	AM_RANGE(0x082000, 0x0827ff) AM_WRITE(ddragon3_bg_videoram16_w) AM_BASE(&ddragon3_bg_videoram16)
-	AM_RANGE(0x0c0000, 0x0c000f) AM_WRITE(ddragon3_scroll16_w)
 	AM_RANGE(0x100000, 0x10000f) AM_WRITE(ddragon3_io16_w)
-	AM_RANGE(0x140000, 0x1405ff) AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x180000, 0x180fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) /* Sprites (16 bytes per sprite) */
-	AM_RANGE(0x1c0000, 0x1c3fff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x140000, 0x1405ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16) /* Palette RAM */
+	AM_RANGE(0x180000, 0x180fff) AM_RAM AM_BASE(&spriteram16)
+	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM /* working RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dd3b_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x080000, 0x080fff) AM_READ(SMH_RAM)	/* Foreground (32x32 Tiles - 4 by per tile) */
-	AM_RANGE(0x081000, 0x081fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x082000, 0x0827ff) AM_READ(SMH_RAM)	/* Background (32x32 Tiles - 2 by per tile) */
-	AM_RANGE(0x100000, 0x1005ff) AM_READ(SMH_RAM)	/* Palette RAM */
+static ADDRESS_MAP_START( dd3b_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(ddragon3_fg_videoram16_w) AM_BASE(&ddragon3_fg_videoram16) /* Foreground (32x32 Tiles - 4 by per tile) */
+	AM_RANGE(0x081000, 0x081fff) AM_RAM AM_BASE(&spriteram16)
+	AM_RANGE(0x082000, 0x0827ff) AM_RAM_WRITE(ddragon3_bg_videoram16_w) AM_BASE(&ddragon3_bg_videoram16) /* Background (32x32 Tiles - 2 by per tile) */
+	AM_RANGE(0x0c0000, 0x0c000f) AM_WRITE(ddragon3_scroll16_w)
+	AM_RANGE(0x100000, 0x1005ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16) /* Palette RAM */
+	AM_RANGE(0x140000, 0x14000f) AM_WRITE(ddragon3_io16_w)
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("IN0")
 	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("IN1")
 	AM_RANGE(0x180004, 0x180005) AM_READ_PORT("IN2")
 	AM_RANGE(0x180006, 0x180007) AM_READ_PORT("IN3")
-	AM_RANGE(0x1c0000, 0x1c3fff) AM_READ(SMH_RAM)	/* working RAM */
+	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM /* working RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dd3b_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x080000, 0x080fff) AM_WRITE(ddragon3_fg_videoram16_w) AM_BASE(&ddragon3_fg_videoram16)
-	AM_RANGE(0x081000, 0x081fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) /* Sprites (16 bytes per sprite) */
-	AM_RANGE(0x082000, 0x0827ff) AM_WRITE(ddragon3_bg_videoram16_w) AM_BASE(&ddragon3_bg_videoram16)
-	AM_RANGE(0x0c0000, 0x0c000f) AM_WRITE(ddragon3_scroll16_w)
-	AM_RANGE(0x100000, 0x1005ff) AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+static ADDRESS_MAP_START( ctribe_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(ddragon3_fg_videoram16_w) AM_BASE(&ddragon3_fg_videoram16) /* Foreground (32x32 Tiles - 4 by per tile) */
+	AM_RANGE(0x081000, 0x081fff) AM_RAM AM_BASE(&spriteram16)
+	AM_RANGE(0x082000, 0x0827ff) AM_RAM_WRITE(ddragon3_bg_videoram16_w) AM_BASE(&ddragon3_bg_videoram16) /* Background (32x32 Tiles - 2 by per tile) */
+	AM_RANGE(0x082800, 0x082fff) AM_RAM
+	AM_RANGE(0x0c0000, 0x0c000f) AM_READWRITE(ddragon3_scroll16_r, ddragon3_scroll16_w)
+	AM_RANGE(0x100000, 0x1005ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16) /* Palette RAM */
 	AM_RANGE(0x140000, 0x14000f) AM_WRITE(ddragon3_io16_w)
-	AM_RANGE(0x1c0000, 0x1c3fff) AM_WRITE(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( ctribe_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x080000, 0x080fff) AM_READ(SMH_RAM)	/* Foreground (32x32 Tiles - 4 by per tile) */
-	AM_RANGE(0x081000, 0x081fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x082000, 0x0827ff) AM_READ(SMH_RAM)	/* Background (32x32 Tiles - 2 by per tile) */
-	AM_RANGE(0x082800, 0x082fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x0c0000, 0x0c000f) AM_READ(ddragon3_scroll16_r)
-	AM_RANGE(0x100000, 0x1005ff) AM_READ(SMH_RAM)	/* Palette RAM */
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("IN0")
 	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("IN1")
 	AM_RANGE(0x180004, 0x180005) AM_READ_PORT("IN2")
 	AM_RANGE(0x180006, 0x180007) AM_READ_PORT("IN3")
-	AM_RANGE(0x1c0000, 0x1c3fff) AM_READ(SMH_RAM)	/* working RAM */
+	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM /* working RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ctribe_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x080000, 0x080fff) AM_WRITE(ddragon3_fg_videoram16_w) AM_BASE(&ddragon3_fg_videoram16)
-	AM_RANGE(0x081000, 0x081fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) /* Sprites (16 bytes per sprite) */
-	AM_RANGE(0x082000, 0x0827ff) AM_WRITE(ddragon3_bg_videoram16_w) AM_BASE(&ddragon3_bg_videoram16)
-	AM_RANGE(0x082800, 0x082fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x0c0000, 0x0c000f) AM_WRITE(ddragon3_scroll16_w)
-	AM_RANGE(0x100000, 0x1005ff) AM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x140000, 0x14000f) AM_WRITE(ddragon3_io16_w)
-	AM_RANGE(0x1c0000, 0x1c3fff) AM_WRITE(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_READ(SMH_ROM)
-	AM_RANGE(0xc000, 0xc7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xc800, 0xc801) AM_DEVREAD("ym2151", ym2151_r)
-	AM_RANGE(0xd800, 0xd800) AM_DEVREAD("oki", okim6295_r)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM
+	AM_RANGE(0xc800, 0xc801) AM_DEVREADWRITE("ym2151", ym2151_r, ym2151_w)
+	AM_RANGE(0xd800, 0xd800) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE("ym2151", ym2151_w)
-	AM_RANGE(0xd800, 0xd800) AM_DEVWRITE("oki", okim6295_w)
 	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE("oki", oki_bankswitch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ctribe_readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x8801, 0x8801) AM_DEVREAD("ym2151", ym2151_status_port_r)
-	AM_RANGE(0x9800, 0x9800) AM_DEVREAD("oki", okim6295_r)
+static ADDRESS_MAP_START( ctribe_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
+	AM_RANGE(0x8801, 0x8801) AM_DEVREADWRITE("ym2151", ym2151_status_port_r, ym2151_w)
+	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( ctribe_writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x8800, 0x8801) AM_DEVWRITE("ym2151", ym2151_w)
-	AM_RANGE(0x9800, 0x9800) AM_DEVWRITE("oki", okim6295_w)
 ADDRESS_MAP_END
 
 /*************************************
@@ -569,7 +526,7 @@ GFXDECODE_END
 
 static void dd3_ymirq_handler(const device_config *device, int irq)
 {
-	cpu_set_input_line(device->machine->cpu[1], 0 , irq ? ASSERT_LINE : CLEAR_LINE );
+	cputag_set_input_line(device->machine, "audiocpu", 0 , irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static const ym2151_interface ym2151_config =
@@ -592,14 +549,14 @@ static TIMER_DEVICE_CALLBACK( ddragon3_scanline )
 	{
 		if (scanline > 0)
 			video_screen_update_partial(timer->machine->primary_screen, scanline - 1);
-		cpu_set_input_line(timer->machine->cpu[0], 5, ASSERT_LINE);
+		cputag_set_input_line(timer->machine, "maincpu", 5, ASSERT_LINE);
 	}
 
 	/* Vblank is raised on scanline 248 */
 	if (scanline == 248)
 	{
 		video_screen_update_partial(timer->machine->primary_screen, scanline - 1);
-		cpu_set_input_line(timer->machine->cpu[0], 6, ASSERT_LINE);
+		cputag_set_input_line(timer->machine, "maincpu", 6, ASSERT_LINE);
 	}
 }
 
@@ -612,11 +569,11 @@ static TIMER_DEVICE_CALLBACK( ddragon3_scanline )
 static MACHINE_DRIVER_START( ddragon3 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
-	MDRV_CPU_PROGRAM_MAP(readmem, writemem)
+	MDRV_CPU_PROGRAM_MAP(ddragon3_map,0)
 	MDRV_TIMER_ADD_SCANLINE("scantimer", ddragon3_scanline, "screen", 0, 1)
 
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
-	MDRV_CPU_PROGRAM_MAP(readmem_sound, writemem_sound)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -647,17 +604,17 @@ static MACHINE_DRIVER_START( ddrago3b )
 	MDRV_IMPORT_FROM(ddragon3)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(dd3b_readmem, dd3b_writemem)
+	MDRV_CPU_PROGRAM_MAP(dd3b_map,0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ctribe )
 	MDRV_IMPORT_FROM(ddragon3)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(ctribe_readmem,ctribe_writemem)
+	MDRV_CPU_PROGRAM_MAP(ctribe_map,0)
 
 	MDRV_CPU_MODIFY("audiocpu")
-	MDRV_CPU_PROGRAM_MAP(ctribe_readmem_sound,ctribe_writemem_sound)
+	MDRV_CPU_PROGRAM_MAP(ctribe_sound_map,0)
 
 	MDRV_VIDEO_UPDATE(ctribe)
 
@@ -842,7 +799,7 @@ ROM_START( ctribe )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 64k for cpu code */
 	ROM_LOAD16_BYTE( "28a16-2.ic26", 0x00001, 0x20000, CRC(c46b2e63) SHA1(86ace715dca48c78a46da1d102de47e5f948a86c) )
 	ROM_LOAD16_BYTE( "28a15-2.ic25", 0x00000, 0x20000, CRC(3221c755) SHA1(0f6fe5cd6947f6547585eedb7fc5e6af8544b1f7) )
-	ROM_LOAD16_BYTE( "ct_ep2.ic104", 0x40001, 0x10000, CRC(8c2c6dbd) SHA1(b99b9be6e0bdc8340fedd258819c4df587926a84) )
+	ROM_LOAD16_BYTE( "28j17-0.104", 0x40001, 0x10000, CRC(8c2c6dbd) SHA1(b99b9be6e0bdc8340fedd258819c4df587926a84) )
 	/* No EVEN rom! */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for sound cpu code */
@@ -876,7 +833,7 @@ ROM_START( ctribe1 )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 64k for cpu code */
 	ROM_LOAD16_BYTE( "28a16-2.ic26", 0x00001, 0x20000, CRC(f00f8443) SHA1(3c099b6bea9956cc60ce4a9a5d790ac2bf7d77bd) )
 	ROM_LOAD16_BYTE( "28a15-2.ic25", 0x00000, 0x20000, CRC(dd70079f) SHA1(321b523fefec2a962d0afa20b33428e7caea8958) )
-	ROM_LOAD16_BYTE( "ct_ep2.ic104", 0x40001, 0x10000, CRC(8c2c6dbd) SHA1(b99b9be6e0bdc8340fedd258819c4df587926a84) )
+	ROM_LOAD16_BYTE( "28j17-0.104", 0x40001, 0x10000, CRC(8c2c6dbd) SHA1(b99b9be6e0bdc8340fedd258819c4df587926a84) )
 	/* No EVEN rom! */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for sound cpu code */
@@ -897,6 +854,40 @@ ROM_START( ctribe1 )
 	ROM_LOAD( "28a12-0.ic85", 0x280000, 0x10000, CRC(c602ac97) SHA1(44440739636b684c6dcac837f59664120c9ba5f3) )
 	ROM_LOAD( "28j0-0.ic98",  0x300000, 0x80000, CRC(ba73c49e) SHA1(830099027ede1f7c56bb0bf3cdef3018b92e0b87) )
 	ROM_LOAD( "28a11-0.ic86", 0x380000, 0x10000, CRC(4da1d8e5) SHA1(568e9e8d00f1b1ca27c28df5fc0ffc74ad91da7e) )
+
+	ROM_REGION( 0x040000, "oki", 0 ) /* ADPCM Samples */
+	ROM_LOAD( "28j9-0.ic83", 0x00000, 0x20000, CRC(f92a7f4a) SHA1(3717ef64876be9ada378b449749918ce9072073a) )
+	ROM_LOAD( "28j8-0.ic82", 0x20000, 0x20000, CRC(1a3a0b39) SHA1(8847530027cf4be03ffbc6d78dee97b459d03a04) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "28.ic44", 0x0000, 0x0100, CRC(964329ef) SHA1(f26846571a16d27b726f689049deb0188103aadb) )
+ROM_END
+
+ROM_START( ctribej )
+	ROM_REGION( 0x80000, "maincpu", 0 )	/* 64k for cpu code */
+	ROM_LOAD16_BYTE( "28j16-02.26", 0x00001, 0x20000, CRC(658b8568) SHA1(899682f6ab28b184654c51c1169216974043f1b9) )
+	ROM_LOAD16_BYTE( "28j15-12.25", 0x00000, 0x20000, CRC(50aac7e7) SHA1(af77107f325f9b45a92c544328d3073ed1db5465) )
+	ROM_LOAD16_BYTE( "28j17-0.104", 0x40001, 0x10000, CRC(8c2c6dbd) SHA1(b99b9be6e0bdc8340fedd258819c4df587926a84) )
+	/* No EVEN rom! */
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for sound cpu code */
+	ROM_LOAD( "28j10-0.89", 0x00000, 0x8000, CRC(4346de13) SHA1(67c6de90ba31a325f03e64d28c9391a315ee359c) )
+
+	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )	/* Background */
+	ROM_LOAD( "28j7-0.ic11",  0x000000, 0x40000, CRC(a8b773f1) SHA1(999e41dfeb3fb937da769c4a33bb29bf4076dc63) )
+	ROM_LOAD( "28j6-0.ic13",  0x040000, 0x40000, CRC(617530fc) SHA1(b9155ed0ae1437bf4d0b7a95e769bc05a820ecec) )
+	ROM_LOAD( "28j5-0.ic12",  0x080000, 0x40000, CRC(cef0a821) SHA1(c7a35048d5ebf3f09abf9d27f91d12adc03befeb) )
+	ROM_LOAD( "28j4-0.ic14",  0x0c0000, 0x40000, CRC(b84fda09) SHA1(3ae0c0ec6c398dea17e248b017ea3e2f6c3571e1) )
+
+	ROM_REGION( 0x400000, "gfx2", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_LOAD( "28j3-0.ic77",  0x000000, 0x80000, CRC(1ac2a461) SHA1(17436f5dcf29041ca5f470dfae538e4fc12153cc) )
+	ROM_LOAD( "28j14-0.60",   0x080000, 0x10000, CRC(6869050a) SHA1(34bdab383f2b0c5327306d419f65ce7974e1b7ba) )
+	ROM_LOAD( "28j2-0.ic78",  0x100000, 0x80000, CRC(8c796707) SHA1(7417ad0413083876ed65a8612845ccb0d2717530) )
+	ROM_LOAD( "28j13-0.61",   0x180000, 0x10000, CRC(8b8addea) SHA1(87bc1c843a51d232d339735a85946dde799a9ac5) )
+	ROM_LOAD( "28j1-0.ic97",  0x200000, 0x80000, CRC(1c9badbd) SHA1(d28f6d684d88448eaa3feae0bba2f5a836d89bd7) )
+	ROM_LOAD( "28j12-0.85",   0x280000, 0x10000, CRC(422b041c) SHA1(fa19dce6ee84b5a2ad729963073abe8919cb1689) )
+	ROM_LOAD( "28j0-0.ic98",  0x300000, 0x80000, CRC(ba73c49e) SHA1(830099027ede1f7c56bb0bf3cdef3018b92e0b87) )
+	ROM_LOAD( "28j11-0.86",   0x380000, 0x10000, CRC(4a391c5b) SHA1(520aa49808a3e7faf32efbb6b0ec22f90e5b4890) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* ADPCM Samples */
 	ROM_LOAD( "28j9-0.ic83", 0x00000, 0x20000, CRC(f92a7f4a) SHA1(3717ef64876be9ada378b449749918ce9072073a) )
@@ -996,5 +987,6 @@ GAME( 1990, ddrago3p, ddragon3, ddragon3, ddragon3, 0, ROT0, "Technos Japan", "D
 GAME( 1990, ddrago3b, ddragon3, ddrago3b, ddrago3b, 0, ROT0, "bootleg", "Double Dragon 3 - The Rosetta Stone (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1990, ctribe,   0,        ctribe,   ctribe,   0, ROT0, "Technos Japan", "The Combatribes (US)", GAME_SUPPORTS_SAVE )
 GAME( 1990, ctribe1,  ctribe,   ctribe,   ctribe,   0, ROT0, "Technos Japan", "The Combatribes (US Set 1?)", GAME_SUPPORTS_SAVE )
+GAME( 1990, ctribej,  ctribe,   ctribe,   ctribe,   0, ROT0, "Technos Japan", "The Combatribes (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1990, ctribeb,  ctribe,   ctribe,   ctribeb,  0, ROT0, "bootleg", "The Combatribes (bootleg Set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1990, ctribb2,  ctribe,   ctribe,   ctribeb,  0, ROT0, "bootleg", "The Combatribes (bootleg Set 2)", GAME_SUPPORTS_SAVE )

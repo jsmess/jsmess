@@ -106,7 +106,7 @@ INLINE void K053936GP_copyroz32clip( running_machine *machine,
 	cmask = colormask[tilebpp];
 
 	src_pitch = src_bitmap->rowpixels;
-	src_base = src_bitmap->base;
+	src_base = (UINT16 *)src_bitmap->base;
 
 	dst_ptr = dst_base;
 	cy = starty;
@@ -374,7 +374,7 @@ INLINE void zdrawgfxzoom32GP( running_machine *machine,
 	pal_base  = machine->pens + gfx->color_base + (color % gfx->total_colors) * granularity;
 	shd_base  = machine->shadow_table;
 
-	dst_ptr   = bitmap->base;
+	dst_ptr   = (UINT32 *)bitmap->base;
 	dst_pitch = bitmap->rowpixels;
 	dst_minx  = cliprect->min_x;
 	dst_maxx  = cliprect->max_x;
@@ -1047,15 +1047,15 @@ void konamigx_mixer_init(running_machine *machine, int objdma)
 	gx_primode = 0;
 
 	gx_objzbuf = (UINT8 *)priority_bitmap->base;
-	gx_shdzbuf = auto_malloc(GX_ZBUFSIZE);
-	gx_objpool = auto_malloc(sizeof(struct GX_OBJ) * (GX_MAX_OBJECTS));
+	gx_shdzbuf = auto_alloc_array(machine, UINT8, GX_ZBUFSIZE);
+	gx_objpool = auto_alloc_array(machine, struct GX_OBJ, GX_MAX_OBJECTS);
 
 	K053247_export_config(&K053247_ram, &K053247_gfx, &K053247_callback, &K053247_dx, &K053247_dy);
 	K054338_export_config(&K054338_shdRGB);
 
 	if (objdma)
 	{
-		gx_spriteram = auto_malloc(0x1000);
+		gx_spriteram = auto_alloc_array(machine, UINT16, 0x1000/2);
 		gx_objdma = 1;
 	}
 	else
@@ -2108,7 +2108,7 @@ static UINT32 fantjour_dma[8];
 void fantjour_dma_install(running_machine *machine)
 {
 	state_save_register_global_array(machine, fantjour_dma);
-	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xdb0000, 0xdb001f, 0, 0, fantjour_dma_w);
+	memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xdb0000, 0xdb001f, 0, 0, fantjour_dma_w);
 	memset(fantjour_dma, 0, sizeof(fantjour_dma));
 }
 

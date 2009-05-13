@@ -215,12 +215,12 @@ static void abc800_bankswitch(running_machine *machine)
 	if (state->fetch_charram)
 	{
 		/* HR video RAM selected */
-		memory_install_readwrite8_handler(program, 0x0000, 0x3fff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite8_handler(program, 0x0000, 0x3fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
 	}
 	else
 	{
 		/* BASIC ROM selected */
-		memory_install_readwrite8_handler(program, 0x0000, 0x3fff, 0, 0, SMH_BANK1, SMH_UNMAP);
+		memory_install_readwrite8_handler(program, 0x0000, 0x3fff, 0, 0, SMH_BANK(1), SMH_UNMAP);
 	}
 
 	memory_set_bank(machine, 1, state->fetch_charram);
@@ -234,13 +234,13 @@ static void abc802_bankswitch(running_machine *machine)
 	if (state->lrs)
 	{
 		/* ROM and video RAM selected */
-		memory_install_readwrite8_handler(program, 0x0000, 0x77ff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite8_handler(program, 0x0000, 0x77ff, 0, 0, SMH_BANK(1), SMH_BANK(1));
 		memory_install_readwrite8_handler(program, 0x7800, 0x7fff, 0, 0, abc802_charram_r, abc802_charram_w);
 	}
 	else
 	{
 		/* low RAM selected */
-		memory_install_readwrite8_handler(program, 0x0000, 0x7fff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite8_handler(program, 0x0000, 0x7fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
 	}
 
 	memory_set_bank(machine, 1, state->lrs);
@@ -1050,7 +1050,7 @@ static MACHINE_START( abc800 )
 
 	/* configure memory */
 
-	state->videoram = auto_malloc(ABC800_VIDEO_RAM_SIZE);
+	state->videoram = auto_alloc_array(machine, UINT8, ABC800_VIDEO_RAM_SIZE);
 
 	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, Z80_TAG), 0);
 	memory_configure_bank(machine, 1, 1, 1, state->videoram, 0);
@@ -1139,7 +1139,7 @@ static MACHINE_START( abc806 )
 
 	/* setup memory banking */
 
-	state->videoram = auto_malloc(videoram_size);
+	state->videoram = auto_alloc_array(machine, UINT8, videoram_size);
 
 	for (bank = 1; bank <= 16; bank++)
 	{

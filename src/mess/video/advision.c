@@ -22,7 +22,7 @@ VIDEO_START( advision )
 	advision_state *state = machine->driver_data;
 
     state->video_hpos = 0;
-	state->display = auto_malloc(8 * 8 * 256);
+	state->display = auto_alloc_array(machine, UINT8, 8 * 8 * 256);
 	memset(state->display, 0, 8 * 8 * 256);
 }
 

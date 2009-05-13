@@ -31,7 +31,7 @@ MACHINE_START( advision )
 	/* configure EA banking */
 	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, "bios"), 0);
 	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, I8048_TAG), 0);
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, I8048_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x03ff, 0, 0, SMH_BANK1, SMH_BANK1);
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, I8048_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x03ff, 0, 0, SMH_BANK(1), SMH_BANK(1));
 	memory_set_bank(machine, 1, 0);
 }
 
@@ -40,7 +40,7 @@ MACHINE_RESET( advision )
 	advision_state *state = machine->driver_data;
 
 	/* allocate external RAM */
-	state->extram = auto_malloc(0x400);
+	state->extram = auto_alloc_array(machine, UINT8, 0x400);
 
 	/* enable internal ROM */
 	cputag_set_input_line(machine, I8048_TAG, MCS48_INPUT_EA, CLEAR_LINE);

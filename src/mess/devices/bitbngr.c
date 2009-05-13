@@ -86,8 +86,8 @@ static DEVICE_START(bitbanger)
 	const bitbanger_config *config = get_config(device);
 
 	bi = get_token(device);
-	bi->pulses = (double *) auto_malloc(config->maximum_pulses * sizeof(double));
-	bi->factored_pulses = (int *) auto_malloc(config->maximum_pulses * sizeof(int));
+	bi->pulses = auto_alloc_array(device->machine, double, config->maximum_pulses);
+	bi->factored_pulses = auto_alloc_array(device->machine, int, config->maximum_pulses);
 	bi->last_pulse_time = 0.0;
 	bi->recorded_pulses = 0;
 	bi->value = config->initial_value;

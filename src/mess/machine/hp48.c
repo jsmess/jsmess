@@ -1147,12 +1147,12 @@ static void hp48_machine_start( running_machine *machine, hp48_models model )
 	/* internal RAM */
 	ram_size = HP48_GX_MODEL ? (128 * 1024) : (32 * 1024);
 	generic_nvram_size = 2 * ram_size;
-	generic_nvram = auto_malloc( generic_nvram_size );
+	generic_nvram = auto_alloc_array(machine, UINT8, generic_nvram_size);
 	ram = (UINT8*) generic_nvram;
 
 	/* ROM load */
 	rom_size = HP48_S_SERIES ? (256 * 1024) : (512 * 1024);
-	rom = auto_malloc( 2 * rom_size );
+	rom = auto_alloc_array(machine, UINT8, 2 * rom_size);
 	hp48_decode_nibble( rom, memory_region( machine, "maincpu" ), rom_size );
 
 	/* init state */
@@ -1174,8 +1174,8 @@ static void hp48_machine_start( running_machine *machine, hp48_models model )
 
 	/* internal RAM */
 	hp48_modules[1].off_mask = 2 * ram_size - 1;
-	hp48_modules[1].read     = SMH_BANK1;
-	hp48_modules[1].write    = SMH_BANK1;
+	hp48_modules[1].read     = SMH_BANK(1);
+	hp48_modules[1].write    = SMH_BANK(1);
 	hp48_modules[1].data     = ram;
 
 	if ( HP48_G_SERIES ) 
@@ -1188,7 +1188,7 @@ static void hp48_machine_start( running_machine *machine, hp48_models model )
 
 	/* ROM */
 	hp48_modules[5].off_mask = 2 * rom_size - 1;
-	hp48_modules[5].read     = SMH_BANK5;
+	hp48_modules[5].read     = SMH_BANK(5);
 	hp48_modules[5].write    = SMH_NOP;
 	hp48_modules[5].data     = rom;
 

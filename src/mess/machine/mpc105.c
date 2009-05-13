@@ -207,10 +207,10 @@ void mpc105_pci_write(const device_config *busdevice, const device_config *devic
 
 
 
-void mpc105_init(int bank_base)
+void mpc105_init(running_machine *machine, int bank_base)
 {
 	/* setup PCI */
-	mpc105 = (struct mpc105_info *) auto_malloc(sizeof(*mpc105));
+	mpc105 = auto_alloc(machine, struct mpc105_info);
 	memset(mpc105, '\0', sizeof(*mpc105));
 	mpc105->bank_base = bank_base;
 }

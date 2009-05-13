@@ -20,7 +20,7 @@ MACHINE_RESET( scramble )
 {
 	MACHINE_RESET_CALL(galaxold);
 
-	if (machine->cpu[1] != NULL)
+	if (cputag_get_cpu(machine, "audiocpu") != NULL)
 		scramble_sh_init(machine);
 
   security_2B_counter = 0;
@@ -71,7 +71,7 @@ CUSTOM_INPUT( darkplnt_custom_r )
 							  0x2b, 0x2a, 0x28, 0x29, 0x09, 0x08, 0x0a, 0x0b,
 							  0x0f, 0x0e, 0x0c, 0x0d, 0x2d, 0x2c, 0x2e, 0x2f,
 							  0x27, 0x26, 0x24, 0x25, 0x05, 0x04, 0x06, 0x07 };
-	UINT8 val = input_port_read(field->port->machine, param);
+	UINT8 val = input_port_read(field->port->machine, (const char *)param);
 
 	return remap[val >> 2];
 }
@@ -86,7 +86,7 @@ static WRITE8_DEVICE_HANDLER( scramble_protection_w )
 
 static READ8_DEVICE_HANDLER( scramble_protection_r )
 {
-	switch (cpu_get_pc(device->machine->cpu[0]))
+	switch (cpu_get_pc(cputag_get_cpu(device->machine, "maincpu")))
 	{
 	case 0x00a8: return 0xf0;
 	case 0x00be: return 0xb0;
@@ -234,12 +234,12 @@ DRIVER_INIT( scramble_ppi )
 
 DRIVER_INIT( scobra )
 {
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa803, 0xa803, 0, 0, scrambold_background_enable_w);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa803, 0xa803, 0, 0, scrambold_background_enable_w);
 }
 
 DRIVER_INIT( atlantis )
 {
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x6803, 0x6803, 0, 0, scrambold_background_enable_w);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6803, 0x6803, 0, 0, scrambold_background_enable_w);
 }
 
 DRIVER_INIT( scramble )
@@ -249,14 +249,14 @@ DRIVER_INIT( scramble )
 
 DRIVER_INIT( stratgyx )
 {
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xb000, 0xb000, 0, 0, scrambold_background_green_w);
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xb002, 0xb002, 0, 0, scrambold_background_blue_w);
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xb00a, 0xb00a, 0, 0, scrambold_background_red_w);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xb000, 0xb000, 0, 0, scrambold_background_green_w);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xb002, 0xb002, 0, 0, scrambold_background_blue_w);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xb00a, 0xb00a, 0, 0, scrambold_background_red_w);
 }
 
 DRIVER_INIT( tazmani2 )
 {
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xb002, 0xb002, 0, 0, scrambold_background_enable_w);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xb002, 0xb002, 0, 0, scrambold_background_enable_w);
 }
 
 DRIVER_INIT( ckongs )
@@ -266,14 +266,14 @@ DRIVER_INIT( ckongs )
 DRIVER_INIT( mariner )
 {
 	/* extra ROM */
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x5800, 0x67ff, 0, 0, SMH_BANK1, SMH_UNMAP);
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5800, 0x67ff, 0, 0, (read8_space_func)SMH_BANK(1), (write8_space_func)SMH_UNMAP);
 	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0x5800);
 
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x9008, 0x9008, 0, 0, mariner_protection_2_r);
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xb401, 0xb401, 0, 0, mariner_protection_1_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x9008, 0x9008, 0, 0, mariner_protection_2_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xb401, 0xb401, 0, 0, mariner_protection_1_r);
 
 	/* ??? (it's NOT a background enable) */
-	/*memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x6803, 0x6803, 0, 0, SMH_NOP);*/
+	/*memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6803, 0x6803, 0, 0, (write8_space_func)SMH_NOP);*/
 }
 
 DRIVER_INIT( frogger )
@@ -323,9 +323,9 @@ DRIVER_INIT( devilfsh )
 
 		for (j = 0; j < 16; j++)
 		{
-			offs_t new = BITSWAP8(j,7,6,5,4,2,0,3,1);
+			offs_t newval = BITSWAP8(j,7,6,5,4,2,0,3,1);
 
-			swapbuffer[j] = RAM[i + new];
+			swapbuffer[j] = RAM[i + newval];
 		}
 
 		memcpy(&RAM[i], swapbuffer, 16);
@@ -349,15 +349,15 @@ DRIVER_INIT( cavelon )
 	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	/* banked ROM */
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, SMH_BANK1);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, (read8_space_func)SMH_BANK(1));
 	memory_configure_bank(machine, 1, 0, 2, &ROM[0x00000], 0x10000);
 	cavelon_banksw(machine);
 
 	/* A15 switches memory banks */
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, cavelon_banksw_r, cavelon_banksw_w);
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, cavelon_banksw_r, cavelon_banksw_w);
 
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2000, 0x2000, 0, 0, SMH_NOP);	/* ??? */
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x3800, 0x3801, 0, 0, SMH_NOP);  /* looks suspicously like
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x2000, 0x2000, 0, 0, (write8_space_func)SMH_NOP);	/* ??? */
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x3800, 0x3801, 0, 0, (write8_space_func)SMH_NOP);  /* looks suspicously like
                                                                an AY8910, but not sure */
 	state_save_register_global(machine, cavelon_bank);
 }
@@ -366,7 +366,7 @@ DRIVER_INIT( cavelon )
 
 DRIVER_INIT( darkplnt )
 {
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xb00a, 0xb00a, 0, 0, darkplnt_bullet_color_w);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xb00a, 0xb00a, 0, 0, darkplnt_bullet_color_w);
 }
 
 DRIVER_INIT( mimonkey )
@@ -402,17 +402,17 @@ DRIVER_INIT( mimonkey )
 		ctr++;
 	}
 
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa804, 0xa804, 0, 0, scrambold_background_enable_w);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa804, 0xa804, 0, 0, scrambold_background_enable_w);
 }
 
 DRIVER_INIT( mimonsco )
 {
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa804, 0xa804, 0, 0, scrambold_background_enable_w);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa804, 0xa804, 0, 0, scrambold_background_enable_w);
 }
 
 DRIVER_INIT( mimonscr )
 {
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x6804, 0x6804, 0, 0, scrambold_background_enable_w);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6804, 0x6804, 0, 0, scrambold_background_enable_w);
 }
 
 
@@ -439,7 +439,7 @@ DRIVER_INIT( anteater )
 	RAM = memory_region(machine, "gfx1");
 	len = memory_region_length(machine, "gfx1");
 
-	scratch = malloc_or_die(len);
+	scratch = alloc_array_or_die(UINT8, len);
 
 		memcpy(scratch, RAM, len);
 
@@ -476,7 +476,7 @@ DRIVER_INIT( rescue )
 	RAM = memory_region(machine, "gfx1");
 	len = memory_region_length(machine, "gfx1");
 
-	scratch = malloc_or_die(len);
+	scratch = alloc_array_or_die(UINT8, len);
 
 		memcpy(scratch, RAM, len);
 
@@ -512,7 +512,7 @@ DRIVER_INIT( minefld )
 	RAM = memory_region(machine, "gfx1");
 	len = memory_region_length(machine, "gfx1");
 
-	scratch = malloc_or_die(len);
+	scratch = alloc_array_or_die(UINT8, len);
 
 		memcpy(scratch, RAM, len);
 
@@ -550,7 +550,7 @@ DRIVER_INIT( losttomb )
 	RAM = memory_region(machine, "gfx1");
 	len = memory_region_length(machine, "gfx1");
 
-	scratch = malloc_or_die(len);
+	scratch = alloc_array_or_die(UINT8, len);
 
 		memcpy(scratch, RAM, len);
 

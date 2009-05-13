@@ -82,7 +82,7 @@ MACHINE_RESET( gamecom )
 	/* intialize the empty dummy bank */
 	if ( dummy_bank == NULL ) 
 	{
-		dummy_bank = auto_malloc( 8 * 1024 );
+		dummy_bank = auto_alloc_array(machine, UINT8, 8 * 1024 );
 	}
 	memset( dummy_bank, 0xff, 8 * 1024 );
 	cartridge = NULL;
@@ -662,7 +662,7 @@ DEVICE_IMAGE_LOAD( gamecom_cart )
 	/* allocate memory on first load of a cartridge */
 	if ( cartridge1 == NULL ) 
 	{
-		cartridge1 = auto_malloc( 2048 * 1024 );
+		cartridge1 = auto_alloc_array(image->machine, UINT8, 2048 * 1024 );
 	}
 	filesize = image_length( image );
 	switch( filesize ) 

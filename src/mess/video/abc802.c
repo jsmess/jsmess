@@ -219,7 +219,7 @@ static VIDEO_START( abc802 )
 	
 	/* allocate memory */
 
-	state->charram = auto_malloc(ABC802_CHAR_RAM_SIZE);
+	state->charram = auto_alloc_array(machine, UINT8, ABC802_CHAR_RAM_SIZE);
 
 	/* find devices */
 

@@ -97,7 +97,7 @@ static UINT8 *poly17 = NULL;
 static UINT8 *rand17 = NULL;
 
 /* local prototypes */
-static void poly17_init(void);
+static void poly17_init(running_machine *machine);
 
 /* local timers */
 static emu_timer *irq_off;
@@ -113,7 +113,7 @@ static emu_timer *firq_timer;
 
 static TIMER_CALLBACK( irq_off_tick )
 {
-	cpu_set_input_line(machine->cpu[0], M6809_IRQ_LINE, CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -126,7 +126,7 @@ static TIMER_CALLBACK( irq_timer_tick )
         timer_adjust_oneshot(irq_timer, video_screen_get_time_until_pos(machine->primary_screen, param + 64, 0), param + 64);
 
 	/* IRQ starts on scanline 0, 64, 128, etc. */
-	cpu_set_input_line(machine->cpu[0], M6809_IRQ_LINE, ASSERT_LINE);
+	cputag_set_input_line(machine, "maincpu", M6809_IRQ_LINE, ASSERT_LINE);
 
 	/* it will turn off on the next HBLANK */
     timer_adjust_oneshot(irq_off, video_screen_get_time_until_pos(machine->primary_screen, param, BALSENTE_HBSTART), 0);
@@ -135,7 +135,7 @@ static TIMER_CALLBACK( irq_timer_tick )
 
 static TIMER_CALLBACK( firq_off_tick )
 {
-	cpu_set_input_line(machine->cpu[0], M6809_FIRQ_LINE, CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -145,7 +145,7 @@ static TIMER_CALLBACK( firq_timer_tick )
     timer_adjust_oneshot(firq_timer, video_screen_get_time_until_pos(machine->primary_screen, FIRQ_SCANLINE, 0), 0);
 
 	/* IRQ starts on scanline FIRQ_SCANLINE? */
-	cpu_set_input_line(machine->cpu[0], M6809_FIRQ_LINE, ASSERT_LINE);
+	cputag_set_input_line(machine, "maincpu", M6809_FIRQ_LINE, ASSERT_LINE);
 
 	/* it will turn off on the next HBLANK */
     timer_adjust_oneshot(firq_off, video_screen_get_time_until_pos(machine->primary_screen, FIRQ_SCANLINE, BALSENTE_HBSTART), 0);
@@ -154,7 +154,7 @@ static TIMER_CALLBACK( firq_timer_tick )
 static MACHINE_START( gridlee )
 {
     /* create the polynomial tables */
-    poly17_init();
+    poly17_init(machine);
 
     state_save_register_global_array(machine, last_analog_input);
     state_save_register_global_array(machine, last_analog_output);
@@ -233,13 +233,13 @@ static READ8_HANDLER( analog_port_r )
 #define POLY17_SHR	10
 #define POLY17_ADD	0x18000
 
-static void poly17_init(void)
+static void poly17_init(running_machine *machine)
 {
 	UINT32 i, x = 0;
 	UINT8 *p, *r;
 
 	/* allocate memory */
-	p = poly17 = auto_malloc(2 * (POLY17_SIZE + 1));
+	p = poly17 = auto_alloc_array(machine, UINT8, 2 * (POLY17_SIZE + 1));
 	r = rand17 = poly17 + POLY17_SIZE + 1;
 
 	/* generate the polynomial */
@@ -311,22 +311,9 @@ static WRITE8_HANDLER( gridlee_coin_counter_w )
  *************************************/
 
 /* CPU 1 read addresses */
-static ADDRESS_MAP_START( readmem_cpu1, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x9500, 0x9501) AM_READ(analog_port_r)
-	AM_RANGE(0x9502, 0x9502) AM_READ_PORT("IN0")
-	AM_RANGE(0x9503, 0x9503) AM_READ_PORT("IN1")
-	AM_RANGE(0x9600, 0x9600) AM_READ_PORT("DSW")
-	AM_RANGE(0x9700, 0x9700) AM_READ_PORT("IN2")
-	AM_RANGE(0x9820, 0x9820) AM_READ(random_num_r)
-	AM_RANGE(0x9c00, 0x9cff) AM_READ(SMH_RAM)
-	AM_RANGE(0xa000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( writemem_cpu1, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram)
-	AM_RANGE(0x0800, 0x7fff) AM_WRITE(gridlee_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+static ADDRESS_MAP_START( cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&spriteram)
+	AM_RANGE(0x0800, 0x7fff) AM_RAM_WRITE(gridlee_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(led_0_w)
 	AM_RANGE(0x9010, 0x9010) AM_WRITE(led_1_w)
 	AM_RANGE(0x9020, 0x9020) AM_WRITE(gridlee_coin_counter_w)
@@ -334,10 +321,15 @@ static ADDRESS_MAP_START( writemem_cpu1, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9070, 0x9070) AM_WRITE(gridlee_cocktail_flip_w)
 	AM_RANGE(0x9200, 0x9200) AM_WRITE(gridlee_palette_select_w)
 	AM_RANGE(0x9380, 0x9380) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x9700, 0x9700) AM_WRITENOP
+	AM_RANGE(0x9500, 0x9501) AM_READ(analog_port_r)
+	AM_RANGE(0x9502, 0x9502) AM_READ_PORT("IN0")
+	AM_RANGE(0x9503, 0x9503) AM_READ_PORT("IN1")
+	AM_RANGE(0x9600, 0x9600) AM_READ_PORT("DSW")
+	AM_RANGE(0x9700, 0x9700) AM_READ_PORT("IN2") AM_WRITENOP
+	AM_RANGE(0x9820, 0x9820) AM_READ(random_num_r)
 	AM_RANGE(0x9828, 0x993f) AM_WRITE(gridlee_sound_w)
-	AM_RANGE(0x9c00, 0x9cff) AM_WRITE(SMH_RAM) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0xa000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x9c00, 0x9cff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -442,7 +434,7 @@ static MACHINE_DRIVER_START( gridlee )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, BALSENTE_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(readmem_cpu1,writemem_cpu1)
+	MDRV_CPU_PROGRAM_MAP(cpu1_map,0)
 
     MDRV_MACHINE_START(gridlee)
 	MDRV_MACHINE_RESET(gridlee)

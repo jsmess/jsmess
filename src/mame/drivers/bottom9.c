@@ -102,7 +102,7 @@ static WRITE8_HANDLER( bottom9_1f90_w )
 
 static WRITE8_HANDLER( bottom9_sh_irqtrigger_w )
 {
-	cpu_set_input_line_and_vector(space->machine->cpu[1],0,HOLD_LINE,0xff);
+	cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff);
 }
 
 static int nmienable;
@@ -147,7 +147,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(bottom9_bankedram2_r, bottom9_bankedram2_w) AM_BASE(&paletteram)
 	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(K052109_051960_r, K052109_051960_w)
 	AM_RANGE(0x4000, 0x5fff) AM_RAM
-	AM_RANGE(0x6000, 0x7fff) AM_READWRITE(SMH_BANK1, SMH_ROM)
+	AM_RANGE(0x6000, 0x7fff) AM_READWRITE(SMH_BANK(1), SMH_ROM)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

@@ -42,7 +42,7 @@ Notes:
 
 static READ8_HANDLER( trvquest_question_r )
 {
-	gameplan_state *state = space->machine->driver_data;
+	gameplan_state *state = (gameplan_state *)space->machine->driver_data;
 
 	return memory_region(space->machine, "questions")[*state->trvquest_question * 0x2000 + offset];
 }
@@ -148,7 +148,7 @@ INPUT_PORTS_END
 
 static TIMER_CALLBACK( via_irq_delayed )
 {
-	cpu_set_input_line(machine->cpu[0], 0, param);
+	cputag_set_input_line(machine, "maincpu", 0, param);
 }
 
 static void via_irq(const device_config *device, int state)

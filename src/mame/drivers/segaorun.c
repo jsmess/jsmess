@@ -97,17 +97,17 @@ static const ppi8255_interface single_ppi_intf =
 
 static const segaic16_memory_map_entry outrun_info[] =
 {
-	{ 0x35/2, 0x90000, 0x10000, 0xf00000,      ~0, segaic16_road_control_0_r, segaic16_road_control_0_w, NULL,                  "road control" },
-	{ 0x35/2, 0x80000, 0x01000, 0xf0f000,      ~0, SMH_BANK10,              SMH_BANK10,              &segaic16_roadram_0,   "road RAM" },
-	{ 0x35/2, 0x60000, 0x08000, 0xf18000,      ~0, SMH_BANK11,              SMH_BANK11,              &cpu1ram,              "CPU 1 RAM" },
-	{ 0x35/2, 0x00000, 0x60000, 0xf00000,      ~0, SMH_BANK12,              SMH_UNMAP,               &cpu1rom,              "CPU 1 ROM" },
-	{ 0x31/2, 0x00000, 0x04000, 0xffc000,      ~0, misc_io_r,                 misc_io_w,                 NULL,                  "I/O space" },
-	{ 0x2d/2, 0x00000, 0x01000, 0xfff000,      ~0, SMH_BANK13,              SMH_BANK13,              &segaic16_spriteram_0, "object RAM" },
-	{ 0x29/2, 0x00000, 0x02000, 0xffe000,      ~0, SMH_BANK14,              segaic16_paletteram_w,     &paletteram16,         "color RAM" },
-	{ 0x25/2, 0x00000, 0x10000, 0xfe0000,      ~0, SMH_BANK15,              segaic16_tileram_0_w,      &segaic16_tileram_0,   "tile RAM" },
-	{ 0x25/2, 0x10000, 0x01000, 0xfef000,      ~0, SMH_BANK16,              segaic16_textram_0_w,      &segaic16_textram_0,   "text RAM" },
-	{ 0x21/2, 0x60000, 0x08000, 0xf98000,      ~0, SMH_BANK17,              SMH_BANK17,              &workram,              "CPU 0 RAM" },
-	{ 0x21/2, 0x00000, 0x60000, 0xf80000, 0x00000, SMH_BANK18,              SMH_UNMAP,               NULL,                  "CPU 0 ROM" },
+	{ 0x35/2, 0x90000, 0x10000, 0xf00000,      ~0, segaic16_road_control_0_r,       segaic16_road_control_0_w,        NULL,                  "road control" },
+	{ 0x35/2, 0x80000, 0x01000, 0xf0f000,      ~0, (read16_space_func)SMH_BANK(10), (write16_space_func)SMH_BANK(10), &segaic16_roadram_0,   "road RAM" },
+	{ 0x35/2, 0x60000, 0x08000, 0xf18000,      ~0, (read16_space_func)SMH_BANK(11), (write16_space_func)SMH_BANK(11), &cpu1ram,              "CPU 1 RAM" },
+	{ 0x35/2, 0x00000, 0x60000, 0xf00000,      ~0, (read16_space_func)SMH_BANK(12), (write16_space_func)SMH_UNMAP,    &cpu1rom,              "CPU 1 ROM" },
+	{ 0x31/2, 0x00000, 0x04000, 0xffc000,      ~0, misc_io_r,                       misc_io_w,                        NULL,                  "I/O space" },
+	{ 0x2d/2, 0x00000, 0x01000, 0xfff000,      ~0, (read16_space_func)SMH_BANK(13), (write16_space_func)SMH_BANK(13), &segaic16_spriteram_0, "object RAM" },
+	{ 0x29/2, 0x00000, 0x02000, 0xffe000,      ~0, (read16_space_func)SMH_BANK(14), segaic16_paletteram_w,            &paletteram16,         "color RAM" },
+	{ 0x25/2, 0x00000, 0x10000, 0xfe0000,      ~0, (read16_space_func)SMH_BANK(15), segaic16_tileram_0_w,             &segaic16_tileram_0,   "tile RAM" },
+	{ 0x25/2, 0x10000, 0x01000, 0xfef000,      ~0, (read16_space_func)SMH_BANK(16), segaic16_textram_0_w,             &segaic16_textram_0,   "text RAM" },
+	{ 0x21/2, 0x60000, 0x08000, 0xf98000,      ~0, (read16_space_func)SMH_BANK(17), (write16_space_func)SMH_BANK(17), &workram,              "CPU 0 RAM" },
+	{ 0x21/2, 0x00000, 0x60000, 0xf80000, 0x00000, (read16_space_func)SMH_BANK(18), (write16_space_func)SMH_UNMAP,    NULL,                  "CPU 0 ROM" },
 	{ 0 }
 };
 
@@ -121,9 +121,9 @@ static const segaic16_memory_map_entry outrun_info[] =
 
 static TIMER_CALLBACK( delayed_sound_data_w )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	soundlatch_w(space, 0, param);
-	cpu_set_input_line(machine->cpu[2], INPUT_LINE_NMI, ASSERT_LINE);
+	cputag_set_input_line(machine, "soundcpu", INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -135,7 +135,7 @@ static void sound_data_w(running_machine *machine, UINT8 data)
 
 static READ8_HANDLER( sound_data_r )
 {
-	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_NMI, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_NMI, CLEAR_LINE);
 	return soundlatch_r(space,offset);
 }
 
@@ -144,11 +144,11 @@ static READ8_HANDLER( sound_data_r )
 static void outrun_generic_init(running_machine *machine)
 {
 	/* allocate memory for regions not automatically assigned */
-	segaic16_spriteram_0 = auto_malloc(0x01000);
-	paletteram16         = auto_malloc(0x02000);
-	segaic16_tileram_0   = auto_malloc(0x10000);
-	segaic16_textram_0   = auto_malloc(0x01000);
-	workram              = auto_malloc(0x08000);
+	segaic16_spriteram_0 = auto_alloc_array(machine, UINT16, 0x01000/2);
+	paletteram16         = auto_alloc_array(machine, UINT16, 0x02000/2);
+	segaic16_tileram_0   = auto_alloc_array(machine, UINT16, 0x10000/2);
+	segaic16_textram_0   = auto_alloc_array(machine, UINT16, 0x01000/2);
+	workram              = auto_alloc_array(machine, UINT16, 0x08000/2);
 
 	/* init the memory mapper */
 	segaic16_memory_mapper_init(cputag_get_cpu(machine, "maincpu"), outrun_info, sound_data_w, NULL);
@@ -172,9 +172,9 @@ static void outrun_generic_init(running_machine *machine)
 
 static void update_main_irqs(running_machine *machine)
 {
-	cpu_set_input_line(machine->cpu[0], 2, irq2_state ? ASSERT_LINE : CLEAR_LINE);
-	cpu_set_input_line(machine->cpu[0], 4, vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	cpu_set_input_line(machine->cpu[0], 6, vblank_irq_state && irq2_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 2, irq2_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 4, vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 6, vblank_irq_state && irq2_state ? ASSERT_LINE : CLEAR_LINE);
 
 	if(vblank_irq_state || irq2_state)
 		cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(100));
@@ -217,14 +217,14 @@ static TIMER_CALLBACK( scanline_callback )
 		case 223:
 			vblank_irq_state = 1;
 			next_scanline = scanline + 1;
-			cpu_set_input_line(machine->cpu[1], 4, ASSERT_LINE);
+			cputag_set_input_line(machine, "sub", 4, ASSERT_LINE);
 			break;
 
 		/* VBLANK turns off at the start of scanline 224 */
 		case 224:
 			vblank_irq_state = 0;
 			next_scanline = 65;
-			cpu_set_input_line(machine->cpu[1], 4, CLEAR_LINE);
+			cputag_set_input_line(machine, "sub", 4, CLEAR_LINE);
 			break;
 	}
 
@@ -245,13 +245,13 @@ static TIMER_CALLBACK( scanline_callback )
 
 static void outrun_reset(const device_config *device)
 {
-	cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
+	cputag_set_input_line(device->machine, "sub", INPUT_LINE_RESET, PULSE_LINE);
 }
 
 
 static MACHINE_RESET( outrun )
 {
-	fd1094_machine_init(machine->cpu[0]);
+	fd1094_machine_init(cputag_get_cpu(machine, "maincpu"));
 
 	/* reset misc components */
 	segaic16_memory_mapper_reset(machine);
@@ -260,7 +260,7 @@ static MACHINE_RESET( outrun )
 	segaic16_tilemap_reset(machine, 0);
 
 	/* hook the RESET line, which resets CPU #1 */
-	device_set_info_fct(machine->cpu[0], CPUINFO_FCT_M68K_RESET_CALLBACK, (genf *)outrun_reset);
+	m68k_set_reset_callback(cputag_get_cpu(machine, "maincpu"), outrun_reset);
 
 	/* start timers to track interrupts */
 	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 223, 0), NULL, 223, scanline_callback);
@@ -278,7 +278,7 @@ static void log_unknown_ppi_read( running_machine *machine, unsigned port )
 {
 	static const char ports[] = "ABC";
 
-	logerror("%06X:read from 8255 port %c\n", cpu_get_pc(machine->cpu[0]), ports[port]);
+	logerror("%06X:read from 8255 port %c\n", cpu_get_pc(cputag_get_cpu(machine, "maincpu")), ports[port]);
 }
 
 
@@ -286,7 +286,7 @@ static void log_unknown_ppi_write( running_machine *machine, unsigned port, UINT
 {
 	static const char ports[] = "ABC";
 
-	logerror("%06X:write %02X to 8255 port %c\n", cpu_get_pc(machine->cpu[0]), data, ports[port]);
+	logerror("%06X:write %02X to 8255 port %c\n", cpu_get_pc(cputag_get_cpu(machine, "maincpu")), data, ports[port]);
 }
 
 
@@ -335,7 +335,7 @@ static WRITE8_DEVICE_HANDLER( video_control_w )
     */
 	segaic16_set_display_enable(device->machine, data & 0x20);
 	adc_select = (data >> 2) & 7;
-	cpu_set_input_line(device->machine->cpu[2], INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(device->machine, "soundcpu", INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -475,7 +475,7 @@ static WRITE16_HANDLER( shangon_custom_io_w )
 			/* Output port:
                 D0: Sound section reset (1= normal operation, 0= reset)
             */
-			cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+			cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 			return;
 
 		case 0x3000/2:

@@ -322,8 +322,7 @@ INLINE int a2_no_ctrl_reset(running_machine *machine)
 int AY3600_init(running_machine *machine)
 {
 	/* Init the key remapping table */
-	ay3600_keys = auto_malloc(AY3600_KEYS_LENGTH * sizeof(*ay3600_keys));
-	memset(ay3600_keys, 0, AY3600_KEYS_LENGTH * sizeof(*ay3600_keys));
+	ay3600_keys = auto_alloc_array_clear(machine, unsigned int, AY3600_KEYS_LENGTH);
 
 	/* We poll the keyboard periodically to scan the keys.  This is
 	actually consistent with how the AY-3600 keyboard controller works. */

@@ -7482,7 +7482,7 @@ static DRIVER_INIT( kf2k3pcb )
 	neogeo_fixed_layer_bank_type = 2;
 	DRIVER_INIT_CALL(neogeo);
 	install_pvc_protection(machine);
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc00000, 0xc7ffff, 0, 0, SMH_BANK6 );  // 512k bios
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc00000, 0xc7ffff, 0, 0, (read16_space_func)SMH_BANK(6) );  // 512k bios
 }
 
 static DRIVER_INIT( kof2003 )
@@ -7555,14 +7555,14 @@ static DRIVER_INIT( jockeygp )
 	kof2000_neogeo_gfx_decrypt(machine, 0xac);
 
 	/* install some extra RAM */
-	extra_ram = auto_malloc(0x2000);
+	extra_ram = auto_alloc_array(machine, UINT16, 0x2000/2);
 	state_save_register_global_pointer(machine, extra_ram, 0x2000 / 2);
 
-	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x200000, 0x201fff, 0, 0, SMH_BANK8, SMH_BANK8);
+	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200000, 0x201fff, 0, 0, (read16_space_func)SMH_BANK(8), (write16_space_func)SMH_BANK(8));
 	memory_set_bankptr(machine, NEOGEO_BANK_EXTRA_RAM, extra_ram);
 
-//  memory_install_read_port_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x280000, 0x280001, 0, 0, "IN5");
-//  memory_install_read_port_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2c0000, 0x2c0001, 0, 0, "IN6");
+//  memory_install_read_port_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x280000, 0x280001, 0, 0, "IN5");
+//  memory_install_read_port_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x2c0000, 0x2c0001, 0, 0, "IN6");
 
 	DRIVER_INIT_CALL(neogeo);
 }
@@ -7572,14 +7572,14 @@ static DRIVER_INIT( vliner )
 	UINT16* extra_ram;
 
 	/* install some extra RAM */
-	extra_ram = auto_malloc(0x2000);
+	extra_ram = auto_alloc_array(machine, UINT16, 0x2000/2);
 	state_save_register_global_pointer(machine, extra_ram, 0x2000 / 2);
 
-	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x200000, 0x201fff, 0, 0, SMH_BANK8, SMH_BANK8);
+	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200000, 0x201fff, 0, 0, (read16_space_func)SMH_BANK(8), (write16_space_func)SMH_BANK(8));
 	memory_set_bankptr(machine, NEOGEO_BANK_EXTRA_RAM, extra_ram);
 
-	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x280000, 0x280001, 0, 0, "IN5");
-	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2c0000, 0x2c0001, 0, 0, "IN6");
+	memory_install_read_port_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x280000, 0x280001, 0, 0, "IN5");
+	memory_install_read_port_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x2c0000, 0x2c0001, 0, 0, "IN6");
 
 	DRIVER_INIT_CALL(neogeo);
 }
@@ -7587,7 +7587,7 @@ static DRIVER_INIT( vliner )
 static DRIVER_INIT( kog )
 {
 	/* overlay cartridge ROM */
-	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0ffffe, 0x0fffff, 0, 0, "JUMPER");
+	memory_install_read_port_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0ffffe, 0x0fffff, 0, 0, "JUMPER");
 
 	kog_px_decrypt(machine);
 	neogeo_bootleg_sx_decrypt(machine, 1);
@@ -7715,7 +7715,7 @@ GAME( 2000, mslug3b6, mslug3,   neogeo,   neogeo,   mslug3b6, ROT0, "bootleg", "
 GAME( 2000, kof2000,  neogeo,   neogeo,   neogeo,   kof2000,  ROT0, "SNK", "The King of Fighters 2000" , 0 ) /* Encrypted Code & GFX */
 GAME( 2000, kof2000n, kof2000,  neogeo,   neogeo,   kof2000n, ROT0, "SNK", "The King of Fighters 2000 (not encrypted)" , 0 ) /* Encrypted GFX */
 GAME( 2001, zupapa,   neogeo,   neogeo,   neogeo,   zupapa,   ROT0, "SNK", "Zupapa!" , 0 )	/* Encrypted GFX */
-GAME( 2001, sengoku3, neogeo,   neogeo,   neogeo,   sengoku3, ROT0, "Noise Factory / SNK", "Sengoku 3" , 0 )	/* Encrypted GFX */
+GAME( 2001, sengoku3, neogeo,   neogeo,   neogeo,   sengoku3, ROT0, "Noise Factory / SNK", "Sengoku 3 / Sengoku Densho 2001" , 0 )	/* Encrypted GFX */
 GAME( 2001, kof2001,  neogeo,   neogeo,   neogeo,   kof2001,  ROT0, "Eolith / SNK", "The King of Fighters 2001 (set 1)" , 0 ) /* Encrypted GFX */
 GAME( 2001, kof2001h, kof2001,  neogeo,   neogeo,   kof2001,  ROT0, "Eolith / SNK", "The King of Fighters 2001 (set 2)" , 0 ) /* Encrypted GFX */
 GAME( 2003, cthd2003, kof2001,  neogeo,   neogeo,   cthd2003, ROT0, "bootleg", "Crouching Tiger Hidden Dragon 2003 (The King of Fighters 2001 bootleg)", 0 ) /* Protected Hack / Bootleg of kof2001 */
@@ -7781,9 +7781,12 @@ GAME( 1996, ninjamas, neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "ADK / SNK",
 GAME( 1996, twinspri, neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "ADK",              "Twinkle Star Sprites", 0 )
 GAME( 1996, zintrckb, neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "hack / bootleg",   "Zintrick / Oshidashi Zentrix (hack / bootleg)", 0 )
 
-/* Aicom */
+/* Aicom (was a part of Sammy) / Yumekobo (changed name in 1996) */
+GAME( 1992, viewpoin, neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "Sammy / Aicom", "Viewpoint", 0 )
 GAME( 1994, janshin,  neogeo,   neogeo,   mjneogeo, neogeo,   ROT0, "Aicom", "Jyanshin Densetsu - Quest of Jongmaster", 0 )
 GAME( 1995, pulstar,  neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "Aicom", "Pulstar", 0 )
+GAME( 1998, blazstar, neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "Yumekobo", "Blazing Star", 0 )
+GAME( 1999, preisle2, neogeo,   neogeo,   neogeo,   preisle2, ROT0, "Yumekobo", "Prehistoric Isle 2" , 0 ) /* Encrypted GFX */
 
 /* Data East Corporation */
 GAME( 1993, spinmast, neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "Data East Corporation", "Spin Master / Miracle Adventure", 0 )
@@ -7811,7 +7814,7 @@ GAME( 1997, neobombe, neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "Hudson", "N
 GAME( 1990, minasan,  neogeo,   neogeo,   mjneogeo, neogeo,   ROT0, "Monolith Corp.", "Minnasanno Okagesamadesu", 0 )
 GAME( 1991, bakatono, neogeo,   neogeo,   mjneogeo, neogeo,   ROT0, "Monolith Corp.", "Bakatonosama Mahjong Manyuki", 0 )
 
-/* Nazca */
+/* Nazca (later acquired by SNK) */
 GAME( 1996, turfmast, neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "Nazca", "Neo Turf Masters / Big Tournament Golf", 0 )
 GAME( 1996, mslug,    neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "Nazca", "Metal Slug - Super Vehicle-001", 0 )
 
@@ -7820,9 +7823,6 @@ GAME( 1994, zedblade, neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "NMK", "Zed 
 
 /* Psikyo */
 GAME( 1999, s1945p,   neogeo,   neogeo,   neogeo,   s1945p,   ROT0, "Psikyo", "Strikers 1945 Plus" , 0 )	/* Encrypted GFX */
-
-/* Sammy */
-GAME( 1992, viewpoin, neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "Sammy", "Viewpoint", 0 )
 
 /* Saurus */
 GAME( 1995, quizkof,  neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "Saurus", "Quiz King of Fighters", 0 )
@@ -7855,10 +7855,6 @@ GAME( 1996, sdodgeb,  neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "Technos Jap
 
 /* Tecmo */
 GAME( 1996, tws96,    neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "Tecmo", "Tecmo World Soccer '96", 0 )
-
-/* Yumekobo */
-GAME( 1998, blazstar, neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "Yumekobo", "Blazing Star", 0 )
-GAME( 1999, preisle2, neogeo,   neogeo,   neogeo,   preisle2, ROT0, "Yumekobo", "Prehistoric Isle 2" , 0 ) /* Encrypted GFX */
 
 /* Viccom */
 GAME( 1994, fightfev, neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "Viccom", "Fight Fever (set 1)", 0 )

@@ -1448,24 +1448,24 @@ static void atarist_configure_memory(running_machine *machine)
 	switch (mess_ram_size)
 	{
 	case 256 * 1024:
-		memory_install_readwrite16_handler(program, 0x000008, 0x03ffff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite16_handler(program, 0x000008, 0x03ffff, 0, 0, SMH_BANK(1), SMH_BANK(1));
 		memory_install_readwrite16_handler(program, 0x040000, 0x3fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		break;
 	case 512 * 1024:
-		memory_install_readwrite16_handler(program, 0x000008, 0x07ffff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite16_handler(program, 0x000008, 0x07ffff, 0, 0, SMH_BANK(1), SMH_BANK(1));
 		memory_install_readwrite16_handler(program, 0x080000, 0x3fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		break;
 	case 1024 * 1024:
-		memory_install_readwrite16_handler(program, 0x000008, 0x0fffff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite16_handler(program, 0x000008, 0x0fffff, 0, 0, SMH_BANK(1), SMH_BANK(1));
 		memory_install_readwrite16_handler(program, 0x100000, 0x3fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		break;
 	case 2048 * 1024:
-		memory_install_readwrite16_handler(program, 0x000008, 0x1fffff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite16_handler(program, 0x000008, 0x1fffff, 0, 0, SMH_BANK(1), SMH_BANK(1));
 		memory_install_readwrite16_handler(program, 0x200000, 0x3fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		break;
 	case 4096 * 1024:
-		memory_install_readwrite16_handler(program, 0x000008, 0x1fffff, 0, 0, SMH_BANK1, SMH_BANK1);
-		memory_install_readwrite16_handler(program, 0x200000, 0x3fffff, 0, 0, SMH_BANK2, SMH_BANK2);
+		memory_install_readwrite16_handler(program, 0x000008, 0x1fffff, 0, 0, SMH_BANK(1), SMH_BANK(1));
+		memory_install_readwrite16_handler(program, 0x200000, 0x3fffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
 		break;
 	}
 
@@ -1642,12 +1642,12 @@ static void stbook_configure_memory(running_machine *machine)
 	switch (mess_ram_size)
 	{
 	case 1024 * 1024:
-		memory_install_readwrite16_handler(program, 0x000008, 0x07ffff, 0, 0x080000, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite16_handler(program, 0x000008, 0x07ffff, 0, 0x080000, SMH_BANK(1), SMH_BANK(1));
 		memory_install_readwrite16_handler(program, 0x100000, 0x3fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		break;
 	case 4096 * 1024:
-		memory_install_readwrite16_handler(program, 0x000008, 0x1fffff, 0, 0, SMH_BANK1, SMH_BANK1);
-		memory_install_readwrite16_handler(program, 0x200000, 0x3fffff, 0, 0, SMH_BANK2, SMH_BANK2);
+		memory_install_readwrite16_handler(program, 0x000008, 0x1fffff, 0, 0, SMH_BANK(1), SMH_BANK(1));
+		memory_install_readwrite16_handler(program, 0x200000, 0x3fffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
 		break;
 	}
 
@@ -1782,7 +1782,7 @@ static DEVICE_IMAGE_LOAD( atarist_cart )
 	{
 		if (image_fread(image, ptr, filesize) == filesize)
 		{
-			memory_install_readwrite16_handler(cputag_get_address_space(image->machine, M68000_TAG, ADDRESS_SPACE_PROGRAM), 0xfa0000, 0xfbffff, 0, 0, SMH_BANK3, SMH_BANK3);
+			memory_install_readwrite16_handler(cputag_get_address_space(image->machine, M68000_TAG, ADDRESS_SPACE_PROGRAM), 0xfa0000, 0xfbffff, 0, 0, SMH_BANK(3), SMH_BANK(3));
 
 			return INIT_PASS;
 		}

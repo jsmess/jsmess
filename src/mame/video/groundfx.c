@@ -22,7 +22,7 @@ static rectangle hack_cliprect;
 
 VIDEO_START( groundfx )
 {
-	spritelist = auto_malloc(0x4000 * sizeof(*spritelist));
+	spritelist = auto_alloc_array(machine, struct tempsprite, 0x4000);
 
 	TC0100SCN_vh_start(machine,1,TC0100SCN_GFX_NUM,50,8,0,0,0,0,0);
 	TC0480SCP_vh_start(machine,TC0480SCP_GFX_NUM,0,0x24,0,-1,0,0,0,0);
@@ -220,7 +220,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 VIDEO_UPDATE( groundfx )
 {
-	const address_space *space = cpu_get_address_space(screen->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 layer[5];
 	UINT8 pivlayer[3];
 	UINT16 priority;

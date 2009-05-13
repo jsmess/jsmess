@@ -141,7 +141,7 @@ WRITE16_HANDLER( m92_paletteram_w )
 
 static TILE_GET_INFO( get_pf_tile_info )
 {
-	pf_layer_info *layer = param;
+	pf_layer_info *layer = (pf_layer_info *)param;
 	int tile, attrib;
 	tile_index = 2 * tile_index + layer->vram_base;
 
@@ -279,7 +279,7 @@ VIDEO_START( m92 )
 		state_save_register_item_array(machine, "layer", NULL, laynum, layer->control);
 	}
 
-	paletteram16 = auto_malloc(0x1000);
+	paletteram16 = auto_alloc_array(machine, UINT16, 0x1000/2);
 
 	memset(spriteram16,0,0x800);
 	memset(buffered_spriteram16,0,0x800);

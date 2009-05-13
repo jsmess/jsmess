@@ -44,7 +44,7 @@ VIDEO_START( microtan )
 	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
 		8, 16, 32, 16);
 
-	microtan_chunky_buffer = auto_malloc(videoram_size);
+	microtan_chunky_buffer = auto_alloc_array(machine, UINT8, videoram_size);
 	memset(microtan_chunky_buffer, 0, videoram_size);
 	microtan_chunky_graphics = 0;
 }

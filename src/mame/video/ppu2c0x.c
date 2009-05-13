@@ -315,17 +315,13 @@ static DEVICE_START( ppu2c0x )
 	chip->scan_scale = 1;
 
 	/* allocate a screen bitmap, videomem and spriteram, a dirtychar array and the monochromatic colortable */
-	chip->bitmap = auto_bitmap_alloc( VISIBLE_SCREEN_WIDTH, VISIBLE_SCREEN_HEIGHT, video_screen_get_format(device->machine->primary_screen));
-	chip->videomem = auto_malloc( VIDEOMEM_SIZE );
-	chip->videoram = auto_malloc( VIDEOMEM_SIZE );
-	chip->spriteram = auto_malloc( SPRITERAM_SIZE );
-	chip->colortable = auto_malloc( sizeof( default_colortable ) );
-	chip->colortable_mono = auto_malloc( sizeof( default_colortable_mono ) );
+	chip->bitmap = auto_bitmap_alloc(device->machine, VISIBLE_SCREEN_WIDTH, VISIBLE_SCREEN_HEIGHT, video_screen_get_format(device->machine->primary_screen));
+	chip->videomem = auto_alloc_array_clear(device->machine, UINT8, VIDEOMEM_SIZE );
+	chip->videoram = auto_alloc_array_clear(device->machine, UINT8, VIDEOMEM_SIZE );
+	chip->spriteram = auto_alloc_array_clear(device->machine, UINT8, SPRITERAM_SIZE );
+	chip->colortable = auto_alloc_array(device->machine, pen_t, ARRAY_LENGTH( default_colortable ) );
+	chip->colortable_mono = auto_alloc_array(device->machine, pen_t, ARRAY_LENGTH( default_colortable_mono ) );
 
-	/* clear videomem & spriteram */
-	memset( chip->videomem, 0, VIDEOMEM_SIZE );
-	memset( chip->videoram, 0, VIDEOMEM_SIZE );
-	memset( chip->spriteram, 0, SPRITERAM_SIZE );
 	memset( chip->videoram_banks_indices, 0xff, sizeof(chip->videoram_banks_indices) );
 
 	if ( intf->vram_enabled )
@@ -376,7 +372,7 @@ static DEVICE_START( ppu2c0x )
 
 static TIMER_CALLBACK( hblank_callback )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	ppu2c0x_chip *this_ppu = get_token(device);
 	int *ppu_regs = &this_ppu->regs[0];
 
@@ -393,7 +389,7 @@ static TIMER_CALLBACK( hblank_callback )
 
 static TIMER_CALLBACK( nmi_callback )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	ppu2c0x_chip *this_ppu = get_token(device);
 	const ppu2c0x_interface *intf = get_interface(device);
 	int *ppu_regs = &this_ppu->regs[0];
@@ -865,7 +861,7 @@ static void update_scanline(const device_config *device)
 
 static TIMER_CALLBACK( scanline_callback )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	ppu2c0x_chip *this_ppu = get_token(device);
 	int *ppu_regs = &this_ppu->regs[0];
 	int blanked = ( ppu_regs[PPU_CONTROL1] & ( PPU_CONTROL1_BACKGROUND | PPU_CONTROL1_SPRITES ) ) == 0;
@@ -1535,7 +1531,6 @@ DEVICE_GET_INFO(ppu2c02)
 		case PPU2C0XINFO_INT_SCANLINES_PER_FRAME:		info->i = PPU_NTSC_SCANLINES_PER_FRAME;		break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:						/* Nothing */								break;
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(ppu2c0x);	break;
 		case DEVINFO_FCT_STOP:							/* Nothing */								break;
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(ppu2c0x);	break;

@@ -370,26 +370,26 @@ static void set_active_bank(running_machine *machine)
 		break;
 
 	case BANK_FLOPPY:
-		memory_install_readwrite8_handler(program, 0xc000, 0xdfff, 0, 0, SMH_BANK1, SMH_UNMAP);
+		memory_install_readwrite8_handler(program, 0xc000, 0xdfff, 0, 0, SMH_BANK(1), SMH_UNMAP);
 		break;
 
 	case BANK_PRINTER_PARALLEL:
-		memory_install_readwrite8_handler(program, 0xc000, 0xc7ff, 0, 0, SMH_BANK1, SMH_UNMAP);
+		memory_install_readwrite8_handler(program, 0xc000, 0xc7ff, 0, 0, SMH_BANK(1), SMH_UNMAP);
 		memory_install_readwrite8_handler(program, 0xc800, 0xdfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		break;
 
 	case BANK_PRINTER_PARALLEL_FM:
-		memory_install_readwrite8_handler(program, 0xc000, 0xcfff, 0, 0, SMH_BANK1, SMH_UNMAP);
+		memory_install_readwrite8_handler(program, 0xc000, 0xcfff, 0, 0, SMH_BANK(1), SMH_UNMAP);
 		memory_install_readwrite8_handler(program, 0xd000, 0xdfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		break;
 
 	case BANK_PRINTER_SERIAL:
-		memory_install_readwrite8_handler(program, 0xc000, 0xc7ff, 0, 0, SMH_BANK1, SMH_UNMAP);
+		memory_install_readwrite8_handler(program, 0xc000, 0xc7ff, 0, 0, SMH_BANK(1), SMH_UNMAP);
 		memory_install_readwrite8_handler(program, 0xc800, 0xdfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		break;
 
 	case BANK_PRINTER_THERMAL:
-		memory_install_readwrite8_handler(program, 0xc000, 0xcfff, 0, 0, SMH_BANK1, SMH_UNMAP);
+		memory_install_readwrite8_handler(program, 0xc000, 0xcfff, 0, 0, SMH_BANK(1), SMH_UNMAP);
 		memory_install_readwrite8_handler(program, 0xd000, 0xdfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		break;
 
@@ -401,7 +401,7 @@ static void set_active_bank(running_machine *machine)
 		{
 			const device_config *mc6845 = devtag_get_device(machine, MC6845_TAG);
 
-			memory_install_readwrite8_handler(program, 0xc000, 0xc7ff, 0, 0, SMH_BANK1, SMH_UNMAP); // ROM
+			memory_install_readwrite8_handler(program, 0xc000, 0xc7ff, 0, 0, SMH_BANK(1), SMH_UNMAP); // ROM
 			memory_install_readwrite8_handler(program, 0xc800, 0xcfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 			memory_install_readwrite8_handler(program, 0xd000, 0xd7ff, 0, 0, comx35_videoram_r, comx35_videoram_w);
 			memory_install_readwrite8_device_handler(program, mc6845, 0xd800, 0xd800, 0, 0, SMH_UNMAP, mc6845_address_w);
@@ -414,7 +414,7 @@ static void set_active_bank(running_machine *machine)
 		{
 			bank = BANK_RAMCARD + state->rambank;
 
-			memory_install_readwrite8_handler(program, 0xc000, 0xdfff, 0, 0, SMH_BANK1, SMH_BANK1);
+			memory_install_readwrite8_handler(program, 0xc000, 0xdfff, 0, 0, SMH_BANK(1), SMH_BANK(1));
 		}
 		break;
 	}
@@ -569,7 +569,7 @@ MACHINE_START( comx35p )
 
 	/* BASIC ROM banking */
 
-	memory_install_readwrite8_handler(program, 0x1000, 0x17ff, 0, 0, SMH_BANK2, SMH_UNMAP);
+	memory_install_readwrite8_handler(program, 0x1000, 0x17ff, 0, 0, SMH_BANK(2), SMH_UNMAP);
 	memory_configure_bank(machine, 2, 0, 1, memory_region(machine, CDP1802_TAG) + 0x1000, 0); // normal ROM
 	memory_configure_bank(machine, 2, 1, 1, memory_region(machine, CDP1802_TAG) + 0xe000, 0); // expansion box ROM
 
@@ -578,7 +578,7 @@ MACHINE_START( comx35p )
 
 	if (expansion_box_installed(machine))
 	{
-		memory_install_readwrite8_handler(program, 0xe000, 0xefff, 0, 0, SMH_BANK3, SMH_UNMAP);
+		memory_install_readwrite8_handler(program, 0xe000, 0xefff, 0, 0, SMH_BANK(3), SMH_UNMAP);
 		memory_set_bank(machine, 2, 1);
 	}
 	else

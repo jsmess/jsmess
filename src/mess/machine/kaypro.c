@@ -55,14 +55,14 @@ static WRITE8_DEVICE_HANDLER( pio_system_w )
 	if (data & 0x80)
 	{
 		memory_install_readwrite8_handler (mem, 0x0000, 0x3fff, 0, 0, SMH_UNMAP, SMH_UNMAP);
-		memory_install_read8_handler (mem, 0x0000, 0x0fff, 0, 0, SMH_BANK1);
+		memory_install_read8_handler (mem, 0x0000, 0x0fff, 0, 0, SMH_BANK(1));
 		memory_set_bankptr(mem->machine, 1, memory_region(mem->machine, "maincpu"));
 		memory_install_readwrite8_handler (mem, 0x3000, 0x3fff, 0, 0, kaypro_videoram_r, kaypro_videoram_w);
 	}
 	else
 	{
 		memory_install_readwrite8_handler (mem, 0x0000, 0x3fff, 0, 0, SMH_UNMAP, SMH_UNMAP);
- 		memory_install_readwrite8_handler (mem, 0x0000, 0x3fff, 0, 0, SMH_BANK2, SMH_BANK3);
+ 		memory_install_readwrite8_handler (mem, 0x0000, 0x3fff, 0, 0, SMH_BANK(2), SMH_BANK(3));
 		memory_set_bankptr(mem->machine, 2, memory_region(mem->machine, "rambank"));
 		memory_set_bankptr(mem->machine, 3, memory_region(mem->machine, "rambank"));
 	}
@@ -163,13 +163,13 @@ WRITE8_HANDLER( kaypro2x_system_port_w )
 	if (data & 0x80)
 	{
 		memory_install_readwrite8_handler (mem, 0x0000, 0x3fff, 0, 0, SMH_UNMAP, SMH_UNMAP);
-		memory_install_read8_handler (mem, 0x0000, 0x1fff, 0, 0, SMH_BANK1);
+		memory_install_read8_handler (mem, 0x0000, 0x1fff, 0, 0, SMH_BANK(1));
 		memory_set_bankptr(mem->machine, 1, memory_region(mem->machine, "maincpu"));
 	}
 	else
 	{
 		memory_install_readwrite8_handler (mem, 0x0000, 0x3fff, 0, 0, SMH_UNMAP, SMH_UNMAP);
- 		memory_install_readwrite8_handler (mem, 0x0000, 0x3fff, 0, 0, SMH_BANK2, SMH_BANK3);
+ 		memory_install_readwrite8_handler (mem, 0x0000, 0x3fff, 0, 0, SMH_BANK(2), SMH_BANK(3));
 		memory_set_bankptr(mem->machine, 2, memory_region(mem->machine, "rambank"));
 		memory_set_bankptr(mem->machine, 3, memory_region(mem->machine, "rambank"));
 	}

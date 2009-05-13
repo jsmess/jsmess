@@ -1156,8 +1156,8 @@ static READ32_HANDLER( system11gun_r )
 
 static void system11gun_install( running_machine *machine )
 {
-	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f788000, 0x1f788003, 0, 0, system11gun_w );
-	memory_install_read32_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f780000, 0x1f78000f, 0, 0, system11gun_r );
+	memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f788000, 0x1f788003, 0, 0, system11gun_w );
+	memory_install_read32_handler (cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f780000, 0x1f78000f, 0, 0, system11gun_r );
 }
 
 static UINT8 kcram[ 12 ];
@@ -1225,7 +1225,7 @@ static READ32_HANDLER( tektagt_protection_3_r )
 
 static MACHINE_RESET( namcos12 )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	psx_machine_init(machine);
 	bankoffset_w(space,0,0,0xffffffff);
 	has_tektagt_dma = 0;
@@ -1260,7 +1260,7 @@ static MACHINE_RESET( namcos12 )
 		strcmp( machine->gamedrv->name, "ghlpanic" ) == 0 )
 	{
 		/* this is based on guesswork, it might not even be keycus. */
-		memory_install_read32_handler (space, 0x1fc20280, 0x1fc2028b, 0, 0, SMH_BANK2 );
+		memory_install_read32_handler (space, 0x1fc20280, 0x1fc2028b, 0, 0, (read32_space_func)SMH_BANK(2) );
 		memory_install_write32_handler(space, 0x1f008000, 0x1f008003, 0, 0, kcon_w );
 		memory_install_write32_handler(space, 0x1f018000, 0x1f018003, 0, 0, kcoff_w );
 

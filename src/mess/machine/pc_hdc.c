@@ -184,7 +184,7 @@ int pc_hdc_setup(running_machine *machine, void (*hdc_set_irq_func)(int,int))
 	hdc_control = 0;
 	hdc_set_irq = hdc_set_irq_func;
 
-	buffer = auto_malloc(17*4*512);
+	buffer = auto_alloc_array(machine, UINT8, 17*4*512);
 
 	/* init for all boards */
 	for (i = 0; i < MAX_BOARD; i++)

@@ -145,8 +145,7 @@ PALETTE_INIT( ti85 )
 		return;
 	}
 
-	ti85_frames = (UINT8 *) auto_malloc(ti_number_of_frames*ti_video_memory_size*sizeof (UINT8));
-	memset (ti85_frames, 0, sizeof(UINT8)*ti_number_of_frames*ti_video_memory_size);
+	ti85_frames = auto_alloc_array_clear(machine, UINT8, ti_number_of_frames*ti_video_memory_size);
 }
 
 VIDEO_START( ti85 )

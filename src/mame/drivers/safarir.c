@@ -126,7 +126,7 @@ static PALETTE_INIT( safarir )
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	int color;
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 code = ram_r(space,tile_index | 0x400);
 
 	/* this is wrong */
@@ -142,7 +142,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	int color, flags;
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	UINT8 code = ram_r(space,tile_index);
 
@@ -186,8 +186,8 @@ static VIDEO_UPDATE( safarir )
 
 static MACHINE_START( safarir )
 {
-	ram_1 = auto_malloc(ram_size);
-	ram_2 = auto_malloc(ram_size);
+	ram_1 = auto_alloc_array(machine, UINT8, ram_size);
+	ram_2 = auto_alloc_array(machine, UINT8, ram_size);
 
 	/* setup for save states */
 	state_save_register_global_pointer(machine, ram_1, ram_size);

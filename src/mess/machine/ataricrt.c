@@ -37,9 +37,9 @@ DRIVER_INIT( atari )
 	/* install RAM */
 	ram_top = MIN(mess_ram_size, ram_size) - 1;
 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),
-		0x0000, ram_top, 0, 0, SMH_BANK2);
+		0x0000, ram_top, 0, 0, SMH_BANK(2));
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),
-		0x0000, ram_top, 0, 0, SMH_BANK2);
+		0x0000, ram_top, 0, 0, SMH_BANK(2));
 	memory_set_bankptr(machine, 2, mess_ram);
 }
 
@@ -72,9 +72,9 @@ static void a800_setbank(running_machine *machine, int n)
 	}
 
 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0,
-		read_addr ? SMH_BANK1 : SMH_NOP);
+		read_addr ? SMH_BANK(1) : SMH_NOP);
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0,
-		write_addr ? SMH_BANK1 : SMH_NOP);
+		write_addr ? SMH_BANK(1) : SMH_NOP);
 	if (read_addr)
 		memory_set_bankptr(machine, 1, read_addr);
 	if (write_addr)
@@ -114,9 +114,9 @@ static void ms_atari_machine_start(running_machine *machine, int type, int has_c
 	/* install RAM */
 	ram_top = MIN(mess_ram_size, ram_size) - 1;
 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),
-		0x0000, ram_top, 0, 0, SMH_BANK2);
+		0x0000, ram_top, 0, 0, SMH_BANK(2));
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),
-		0x0000, ram_top, 0, 0, SMH_BANK2);
+		0x0000, ram_top, 0, 0, SMH_BANK(2));
 	memory_set_bankptr(machine, 2, mess_ram);
 
 	/* cartridge */

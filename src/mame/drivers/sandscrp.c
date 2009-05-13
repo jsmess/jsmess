@@ -105,9 +105,9 @@ static UINT8 vblank_irq;
 static void update_irq_state(running_machine *machine)
 {
 	if (vblank_irq || sprite_irq || unknown_irq)
-		cpu_set_input_line(machine->cpu[0], 1, ASSERT_LINE);
+		cputag_set_input_line(machine, "maincpu", 1, ASSERT_LINE);
 	else
-		cpu_set_input_line(machine->cpu[0], 1, CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", 1, CLEAR_LINE);
 }
 
 
@@ -197,7 +197,7 @@ static WRITE16_HANDLER( sandscrp_soundlatch_word_w )
 	{
 		latch1_full = 1;
 		soundlatch_w(space, 0, data & 0xff);
-		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(100));	// Allow the other cpu to reply
 	}
 }
@@ -265,7 +265,7 @@ static WRITE8_HANDLER( sandscrp_soundlatch_w )
 
 static ADDRESS_MAP_START( sandscrp_soundmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM		// ROM
-	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_BANK1, SMH_ROM)	// Banked ROM
+	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_BANK(1), SMH_ROM)	// Banked ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM		// RAM
 ADDRESS_MAP_END
 
@@ -414,7 +414,7 @@ GFXDECODE_END
 
 static void irq_handler(const device_config *device, int irq)
 {
-	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_intf_sandscrp =

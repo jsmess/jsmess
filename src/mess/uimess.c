@@ -90,8 +90,7 @@ struct _ui_mess_private
 void ui_mess_init(running_machine *machine)
 {
 	/* allocate memory for our data structure */
-	machine->ui_mess_data = auto_malloc(sizeof(*machine->ui_mess_data));
-	memset(machine->ui_mess_data, 0, sizeof(*machine->ui_mess_data));
+	machine->ui_mess_data = auto_alloc_clear(machine, ui_mess_private);
 
 	/* retrieve options */
 	machine->ui_mess_data->use_natural_keyboard = options_get_bool(mame_options(), OPTION_NATURAL_KEYBOARD);

@@ -101,7 +101,7 @@ VIDEO_START(vc4000)
 		if ((i&0x18)==0x18) background_collision[i]|=0x10;
 	}
 
-	vc4000_video.bitmap = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
+	vc4000_video.bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 }
 
 #define STICKCENTRE	(105)

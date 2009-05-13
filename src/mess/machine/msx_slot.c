@@ -40,17 +40,17 @@ static void msx_cpu_setbank (running_machine *machine, int page, UINT8 *mem)
 	case 4:
 		memory_set_bankptr (machine,4, mem);
 		memory_set_bankptr (machine,5, mem + 0x1ff8);
-		memory_install_read8_handler(space, 0x7ff8, 0x7fff, 0, 0, SMH_BANK5);
+		memory_install_read8_handler(space, 0x7ff8, 0x7fff, 0, 0, SMH_BANK(5));
 		break;
 	case 5:
 		memory_set_bankptr (machine,6, mem);
 		memory_set_bankptr (machine,7, mem + 0x1800);
-		memory_install_read8_handler(space, 0x9800, 0x9fff, 0, 0, SMH_BANK7);
+		memory_install_read8_handler(space, 0x9800, 0x9fff, 0, 0, SMH_BANK(7));
 		break;
 	case 6:
 		memory_set_bankptr (machine,8, mem);
 		memory_set_bankptr (machine,9, mem + 0x1800);
-		memory_install_read8_handler(space, 0xb800, 0xbfff, 0, 0, SMH_BANK9);
+		memory_install_read8_handler(space, 0xb800, 0xbfff, 0, 0, SMH_BANK(9));
 		break;
 	case 7:
 		memory_set_bankptr (machine,10, mem);
@@ -105,7 +105,7 @@ MSX_SLOT_MAP(rom)
 
 MSX_SLOT_INIT(ram)
 {
-	state->mem = auto_malloc (size);
+	state->mem = auto_alloc_array(machine, UINT8, size);
 	memset (state->mem, 0, size);
 	state->type = SLOT_RAM;
 	state->start_page = page;
@@ -151,7 +151,7 @@ MSX_SLOT_INIT(rammm)
 				  "1mb, 2mb or 4mb\n");
 		return 1;
 	}
-	state->mem = auto_malloc (size);
+	state->mem = auto_alloc_array(machine, UINT8, size);
 	memset (state->mem, 0, size);
 
 #ifdef MONMSX
@@ -384,7 +384,7 @@ MSX_SLOT_MAP(konami_scc)
 		msx_cpu_setbank (machine, 5, state->mem + state->banks[2] * 0x2000);
 		msx_cpu_setbank (machine, 6, state->mem + state->banks[3] * 0x2000);
 		memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x9800, 0x9fff, 0, 0,
-				state->cart.scc.active ? konami_scc_bank5 : SMH_BANK7);
+				state->cart.scc.active ? konami_scc_bank5 : SMH_BANK(7));
 		break;
 	case 3:
 		msx_cpu_setbank (machine, 7, state->mem + state->banks[0] * 0x2000);
@@ -618,7 +618,7 @@ MSX_SLOT_INIT(ascii8_sram)
 	static const char sramfile[] = "ascii8";
 	int banks;
 
-	state->cart.sram.mem = auto_malloc (0x2000);
+	state->cart.sram.mem = auto_alloc_array(machine, UINT8, 0x2000);
 	if (size > 0x100000) 
 	{
 		logerror ("ascii8_sram: warning: truncating to 1mb\n");
@@ -783,7 +783,7 @@ MSX_SLOT_INIT(ascii16_sram)
 	static const char sramfile[] = "ascii16";
 	int banks;
 
-	state->cart.sram.mem = auto_malloc (0x4000);
+	state->cart.sram.mem = auto_alloc_array(machine, UINT8, 0x4000);
 
 	if (size > 0x200000) 
 	{
@@ -1046,7 +1046,7 @@ MSX_SLOT_INIT(gmaster2)
 	state->size = size;
 	state->mem = mem;
 
-	p = auto_malloc (0x4000);
+	p = auto_alloc_array(machine, UINT8, 0x4000);
 	memset (p, 0, 0x4000);
 	state->cart.sram.mem = p;
 	if (!state->sramfile) 
@@ -1618,7 +1618,7 @@ MSX_SLOT_INIT(fmpac)
 	if (!strncmp ((char*)mem + 0x18, "PAC2", 4)) 
 	{
 		state->cart.fmpac.sram_support = 1;
-		p = auto_malloc (0x4000);
+		p = auto_alloc_array(machine, UINT8, 0x4000);
 		memset (p, 0, 0x2000);
 		memset (p + 0x2000, 0xff, 0x2000);
 		state->cart.fmpac.mem = p;
@@ -2157,7 +2157,7 @@ MSX_SLOT_INIT(soundcartridge)
 {
 	UINT8 *p;
 
-	p = auto_malloc (0x20000);
+	p = auto_alloc_array(machine, UINT8, 0x20000);
 	memset (p, 0, 0x20000);
 
 	state->mem = p;
@@ -2262,9 +2262,9 @@ MSX_SLOT_MAP(soundcartridge)
 		msx_cpu_setbank (machine, 5, state->mem + state->banks[2] * 0x2000);
 		msx_cpu_setbank (machine, 6, state->mem + state->banks[3] * 0x2000);
 		memory_install_read8_handler(space, 0x9800, 0x9fff, 0, 0,
-			state->cart.sccp.scc_active ? soundcartridge_scc : SMH_BANK7);
+			state->cart.sccp.scc_active ? soundcartridge_scc : SMH_BANK(7));
 		memory_install_read8_handler(space, 0xb800, 0xbfff, 0, 0,
-			state->cart.sccp.sccp_active ? soundcartridge_sccp : SMH_BANK9);
+			state->cart.sccp.sccp_active ? soundcartridge_sccp : SMH_BANK(9));
 		break;
 	case 3:
 		msx_cpu_setbank (machine, 7, state->mem + state->banks[0] * 0x2000);

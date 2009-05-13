@@ -105,7 +105,7 @@ VIDEO_START( pc_mda )
 	switch(buswidth)
 	{
 		case 8:
-			memory_install_read8_handler(space, 0xb0000, 0xb0fff, 0, 0x07000, SMH_BANK11 );
+			memory_install_read8_handler(space, 0xb0000, 0xb0fff, 0, 0x07000, SMH_BANK(11) );
 			memory_install_write8_handler(space, 0xb0000, 0xb0fff, 0, 0x07000, pc_video_videoram_w );
 			memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x3b0, 0x3bf, 0, 0, pc_MDA_r );
 			memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x3b0, 0x3bf, 0, 0, pc_MDA_w );
@@ -121,7 +121,7 @@ VIDEO_START( pc_mda )
 	mda.chr_gen = memory_region( machine, "gfx1" );
 
 	videoram_size = 0x1000;	/* This is actually 0x1000 in reality */
-	videoram = auto_malloc(videoram_size);
+	videoram = auto_alloc_array(machine, UINT8, videoram_size);
 	memory_set_bankptr(machine,11, videoram);
 }
 
@@ -455,7 +455,7 @@ static VIDEO_START( pc_hercules )
 	switch(buswidth)
 	{
 	case 8:
-		memory_install_read8_handler(space, 0xb0000, 0xbffff, 0, 0, SMH_BANK11 );
+		memory_install_read8_handler(space, 0xb0000, 0xbffff, 0, 0, SMH_BANK(11) );
 		memory_install_write8_handler(space, 0xb0000, 0xbffff, 0, 0, pc_video_videoram_w );
 		memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x3b0, 0x3bf, 0, 0, pc_hercules_r );
 		memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x3b0, 0x3bf, 0, 0, pc_hercules_w );
@@ -471,7 +471,7 @@ static VIDEO_START( pc_hercules )
 	mda.chr_gen = memory_region( machine, "gfx1" );
 
 	videoram_size = 0x10000;
-	videoram = auto_malloc(videoram_size);
+	videoram = auto_alloc_array(machine, UINT8, videoram_size);
 	memory_set_bankptr(machine,11, videoram);
 }
 

@@ -67,8 +67,8 @@ static READ16_HANDLER( io1_r ) //240006
 static WRITE16_HANDLER(ml_subreset_w)
 {
 	//wrong
-	if(cpu_get_pc(space->cpu)==0x822)
-		cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, PULSE_LINE);
+	if(cpu_get_pc(space->cpu) == 0x822)
+		cputag_set_input_line(space->machine, "sub", INPUT_LINE_RESET, PULSE_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
@@ -155,7 +155,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mlanding_z80_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK1)
+	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK(1))
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
 	AM_RANGE(0x9002, 0x9100) AM_READ(SMH_RAM)
@@ -314,7 +314,7 @@ INPUT_PORTS_END
 
 static void irq_handler(const device_config *device, int irq)
 {
-	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "z80", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static GFXDECODE_START( mlanding )

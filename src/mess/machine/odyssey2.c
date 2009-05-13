@@ -49,7 +49,7 @@ DRIVER_INIT( odyssey2 )
 {
 	int i;
 	UINT8 *gfx = memory_region(machine, "gfx1");
-	ram        = auto_malloc(256);
+	ram        = auto_alloc_array(machine, UINT8, 256);
 
 	for (i = 0; i < 256; i++)
     {

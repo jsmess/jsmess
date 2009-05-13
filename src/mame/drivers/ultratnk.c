@@ -29,7 +29,7 @@ static CUSTOM_INPUT( get_collision )
 
 static CUSTOM_INPUT( get_joystick )
 {
-	UINT8 joy = input_port_read(field->port->machine, param) & 3;
+	UINT8 joy = input_port_read(field->port->machine, (const char *)param) & 3;
 
 	if (joy == 1)
 	{
@@ -56,7 +56,7 @@ static TIMER_CALLBACK( nmi_callback	)
 	watchdog_enable(machine, input_port_read(machine, "IN0") & 0x40);
 
 	if (input_port_read(machine, "IN0") & 0x40)
-		cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 
 	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), NULL, scanline, nmi_callback);
 }

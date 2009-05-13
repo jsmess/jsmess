@@ -85,7 +85,7 @@ static void tzx_cas_get_blocks( const UINT8 *casdata, int caslen ) {
 	int pos = sizeof(TZX_HEADER) + 2;
 	int max_block_count = INITIAL_MAX_BLOCK_COUNT;
 
-	blocks = auto_malloc( max_block_count * sizeof(UINT8*) );
+	blocks = alloc_array_clear_or_die(UINT8*, max_block_count);
 	block_count = 0;
 
 	while( pos < caslen ) {
@@ -97,7 +97,7 @@ static void tzx_cas_get_blocks( const UINT8 *casdata, int caslen ) {
 			int	old_max_block_count = max_block_count;
 
 			max_block_count = max_block_count + BLOCK_COUNT_INCREMENTS;
-			blocks = auto_malloc( max_block_count * sizeof(UINT8*) );
+			blocks = auto_alloc_array(NULL /*machine*/, UINT8*, max_block_count);	// SHOULD NOT BE USING auto_alloc_array()
 			memcpy( blocks, old_blocks, old_max_block_count * sizeof(UINT8*) );
 		}
 
@@ -183,6 +183,7 @@ static void tzx_cas_get_blocks( const UINT8 *casdata, int caslen ) {
 
 		block_count++;
 	}
+	free(blocks);
 }
 
 INLINE int millisec_to_samplecount( int millisec ) {

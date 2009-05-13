@@ -239,14 +239,14 @@ static PALETTE_INIT( tms3556 )
 
 	tms3556 core init (called at video init time)
 */
-void tms3556_init(int vram_size)
+void tms3556_init(running_machine *machine, int vram_size)
 {
 	memset(&vdp, 0, sizeof (vdp));
 
 	vdp.vram_size = vram_size;
 
 	/* allocate VRAM */
-	vdp.vram = auto_malloc(0x10000);
+	vdp.vram = auto_alloc_array(machine, UINT8, 0x10000);
 	memset (vdp.vram, 0, 0x10000);
 	if (vdp.vram_size < 0x10000)
 	{

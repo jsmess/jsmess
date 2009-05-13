@@ -155,16 +155,16 @@ static CUSTOM_INPUT( prot_r )
        602e and 62a6 */
 	/* For Genix, see 6576 for setting values and 67c2,d3b4 and dbc2 for tests. */
 
-	if (cpu_get_pc(field->port->machine->cpu[0]) == 0x6134)
+	if (cpu_get_pc(cputag_get_cpu(field->port->machine, "main")) == 0x6134)
 	{
 		bit = prot & 1;
 		prot = (prot >> 1) | (bit << 7);
 	}
-	else if (cpu_get_pc(field->port->machine->cpu[0]) == 0x6020)
+	else if (cputag_get_cpu(field->port->machine, "main")) == 0x6020)
 		bit = 0;
-	else if (cpu_get_pc(field->port->machine->cpu[0]) == 0x6168)
+	else if (cputag_get_cpu(field->port->machine, "main")) == 0x6168)
 		bit = 0;
-	else if (cpu_get_pc(field->port->machine->cpu[0]) == 0x61cc)
+	else if (cputag_get_cpu(field->port->machine, "main")) == 0x61cc)
 		bit = 1;
 	else
 #endif
@@ -177,34 +177,25 @@ static CUSTOM_INPUT( prot_r )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( pirates_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x100000, 0x10ffff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( pirates_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM // main ram
 	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("SYSTEM")
-//  AM_RANGE(0x500000, 0x5007ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x800000, 0x803fff) AM_READ(SMH_RAM)
-//  AM_RANGE(0x900000, 0x903fff) AM_READ(SMH_RAM)
-	AM_RANGE(0xa00000, 0xa00001) AM_DEVREAD8("oki", okim6295_r, 0x00ff)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( pirates_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x100000, 0x10ffff) AM_WRITE(SMH_RAM) // main ram
-	AM_RANGE(0x500000, 0x5007ff) AM_WRITE(SMH_RAM) AM_BASE(&pirates_spriteram)
-//  AM_RANGE(0x500800, 0x50080f) AM_WRITE(SMH_RAM)
+//  AM_RANGE(0x500000, 0x5007ff) AM_RAM
+	AM_RANGE(0x500000, 0x5007ff) AM_WRITEONLY AM_BASE(&pirates_spriteram)
+//  AM_RANGE(0x500800, 0x50080f) AM_WRITENOP
 	AM_RANGE(0x600000, 0x600001) AM_WRITE(pirates_out_w)
-	AM_RANGE(0x700000, 0x700001) AM_WRITE(SMH_RAM) AM_BASE(&pirates_scroll)	// scroll reg
-	AM_RANGE(0x800000, 0x803fff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x900000, 0x90017f) AM_WRITE(SMH_RAM)  // more of tilemaps ?
-	AM_RANGE(0x900180, 0x90137f) AM_WRITE(pirates_tx_tileram_w) AM_BASE(&pirates_tx_tileram)
-	AM_RANGE(0x901380, 0x902a7f) AM_WRITE(pirates_fg_tileram_w) AM_BASE(&pirates_fg_tileram)
-//  AM_RANGE(0x902580, 0x902a7f) AM_WRITE(SMH_RAM)  // more of tilemaps ?
-	AM_RANGE(0x902a80, 0x904187) AM_WRITE(pirates_bg_tileram_w) AM_BASE(&pirates_bg_tileram)
-//  AM_RANGE(0x903c80, 0x904187) AM_WRITE(SMH_RAM)  // more of tilemaps ?
-	AM_RANGE(0xa00000, 0xa00001) AM_DEVWRITE8("oki", okim6295_w, 0x00ff)
+	AM_RANGE(0x700000, 0x700001) AM_WRITEONLY AM_BASE(&pirates_scroll)	// scroll reg
+	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x900000, 0x90017f) AM_RAM  // more of tilemaps ?
+	AM_RANGE(0x900180, 0x90137f) AM_RAM_WRITE(pirates_tx_tileram_w) AM_BASE(&pirates_tx_tileram)
+	AM_RANGE(0x901380, 0x902a7f) AM_RAM_WRITE(pirates_fg_tileram_w) AM_BASE(&pirates_fg_tileram)
+//  AM_RANGE(0x902580, 0x902a7f) AM_RAM  // more of tilemaps ?
+	AM_RANGE(0x902a80, 0x904187) AM_RAM_WRITE(pirates_bg_tileram_w) AM_BASE(&pirates_bg_tileram)
+//  AM_RANGE(0x903c80, 0x904187) AM_RAM  // more of tilemaps ?
+	AM_RANGE(0xa00000, 0xa00001) AM_DEVREADWRITE8("oki", okim6295_r,okim6295_w, 0x00ff)
 ADDRESS_MAP_END
-
 
 
 /* Input Ports */
@@ -286,7 +277,7 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( pirates )
 	MDRV_CPU_ADD("maincpu", M68000, 16000000) /* 16mhz */
-	MDRV_CPU_PROGRAM_MAP(pirates_readmem,pirates_writemem)
+	MDRV_CPU_PROGRAM_MAP(pirates_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_NVRAM_HANDLER(pirates)
@@ -370,7 +361,7 @@ static void pirates_decrypt_68k(running_machine *machine)
 
     rom_size = memory_region_length(machine, "maincpu");
 
-    buf = malloc_or_die(rom_size);
+    buf = alloc_array_or_die(UINT16, rom_size/2);
 
     rom = (UINT16 *)memory_region(machine, "maincpu");
     memcpy (buf, rom, rom_size);
@@ -399,7 +390,7 @@ static void pirates_decrypt_p(running_machine *machine)
 
     rom_size = memory_region_length(machine, "gfx1");
 
-    buf = malloc_or_die(rom_size);
+    buf = alloc_array_or_die(UINT8, rom_size);
 
     rom = memory_region(machine, "gfx1");
     memcpy (buf, rom, rom_size);
@@ -423,7 +414,7 @@ static void pirates_decrypt_s(running_machine *machine)
 
     rom_size = memory_region_length(machine, "gfx2");
 
-    buf = malloc_or_die(rom_size);
+    buf = alloc_array_or_die(UINT8, rom_size);
 
     rom = memory_region(machine, "gfx2");
     memcpy (buf, rom, rom_size);
@@ -448,7 +439,7 @@ static void pirates_decrypt_oki(running_machine *machine)
 
     rom_size = memory_region_length(machine, "oki");
 
-    buf = malloc_or_die(rom_size);
+    buf = alloc_array_or_die(UINT8, rom_size);
 
     rom = memory_region(machine, "oki");
     memcpy (buf, rom, rom_size);
@@ -486,7 +477,7 @@ static DRIVER_INIT( genix )
 
 	/* If this value is increased then something has gone wrong and the protection failed */
 	/* Write-protect it for now */
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x109e98, 0x109e9b, 0, 0, genix_prot_r );
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x109e98, 0x109e9b, 0, 0, genix_prot_r );
 }
 
 

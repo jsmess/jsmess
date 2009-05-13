@@ -308,7 +308,7 @@ static DEVICE_START(timekeeper)
 	c->month = make_bcd( systime.local_time.month + 1 );
 	c->year = make_bcd( systime.local_time.year % 100 );
 	c->century = make_bcd( systime.local_time.year / 100 );
-	c->data = (UINT8 *)auto_malloc( c->size );
+	c->data = auto_alloc_array( device->machine, UINT8, c->size );
 
 	c->default_data = device->region;
 	if (c->default_data != NULL)
@@ -447,18 +447,6 @@ static DEVICE_NVRAM(timekeeper)
 }
 
 /*-------------------------------------------------
-    device set info callback
--------------------------------------------------*/
-
-static DEVICE_SET_INFO(timekeeper)
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-/*-------------------------------------------------
     device get info callback
 -------------------------------------------------*/
 
@@ -472,7 +460,6 @@ static DEVICE_GET_INFO(timekeeper)
 		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_PERIPHERAL; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:				info->set_info = DEVICE_SET_INFO_NAME(timekeeper); break;
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(timekeeper); break;
 		case DEVINFO_FCT_STOP:					/* nothing */ break;
 		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(timekeeper); break;

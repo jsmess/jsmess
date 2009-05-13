@@ -468,7 +468,7 @@ static void oric_install_apple2_interface(running_machine *machine)
 
 	memory_install_read8_handler(space, 0x0300, 0x030f, 0, 0, oric_IO_r);
 	memory_install_read8_device_handler(space, fdc, 0x0310, 0x031f, 0, 0, applefdc_r);
-	memory_install_read8_handler(space, 0x0320, 0x03ff, 0, 0, SMH_BANK4);
+	memory_install_read8_handler(space, 0x0320, 0x03ff, 0, 0, SMH_BANK(4));
 
 	memory_install_write8_handler(space, 0x0300, 0x030f, 0, 0, oric_IO_w);
 	memory_install_write8_device_handler(space, fdc, 0x0310, 0x031f, 0, 0, applefdc_w);
@@ -484,15 +484,15 @@ static void oric_enable_memory(running_machine *machine, int low, int high, int 
 	{
 		switch(i) {
 		case 1:
-			memory_install_read8_handler(space, 0xc000, 0xdfff, 0, 0, rd ? SMH_BANK1 : SMH_NOP);
-			memory_install_write8_handler(space, 0xc000, 0xdfff, 0, 0, wr ? SMH_BANK5 : SMH_UNMAP);
+			memory_install_read8_handler(space, 0xc000, 0xdfff, 0, 0, rd ? SMH_BANK(1) : SMH_NOP);
+			memory_install_write8_handler(space, 0xc000, 0xdfff, 0, 0, wr ? SMH_BANK(5) : SMH_UNMAP);
 			break;
 		case 2:
-			memory_install_read8_handler(space, 0xe000, 0xf7ff, 0, 0, rd ? SMH_BANK2 : SMH_NOP);
-			memory_install_write8_handler(space, 0xe000, 0xf7ff, 0, 0, wr ? SMH_BANK6 : SMH_UNMAP);
+			memory_install_read8_handler(space, 0xe000, 0xf7ff, 0, 0, rd ? SMH_BANK(2) : SMH_NOP);
+			memory_install_write8_handler(space, 0xe000, 0xf7ff, 0, 0, wr ? SMH_BANK(6) : SMH_UNMAP);
 			break;
 		case 3:
-			memory_install_read8_handler(space, 0xf800, 0xffff, 0, 0, rd ? SMH_BANK3 : SMH_NOP);
+			memory_install_read8_handler(space, 0xf800, 0xffff, 0, 0, rd ? SMH_BANK(3) : SMH_NOP);
 			break;
 		}
 	}
@@ -562,7 +562,7 @@ static void oric_install_apple2_v2_interface(running_machine *machine)
 
 	memory_install_read8_handler(space, 0x0300, 0x030f, 0, 0, oric_IO_r);
 	memory_install_read8_device_handler(space, fdc, 0x0310, 0x031f, 0, 0, applefdc_r);
-	memory_install_read8_handler(space, 0x0320, 0x03ff, 0, 0, SMH_BANK4);
+	memory_install_read8_handler(space, 0x0320, 0x03ff, 0, 0, SMH_BANK(4));
 
 	memory_install_write8_handler(space, 0x0300, 0x030f, 0, 0, oric_IO_w);
 	memory_install_write8_device_handler(space, fdc, 0x0310, 0x031f, 0, 0, applefdc_w);
@@ -1110,7 +1110,7 @@ MACHINE_START( oric )
 
 	oric_is_telestrat = 0;
 
-	oric_ram_0x0c000 = auto_malloc(16384);
+	oric_ram_0x0c000 = auto_alloc_array(machine, char, 16384);
 }
 
 
@@ -1339,8 +1339,8 @@ static void	telestrat_refresh_mem(running_machine *machine)
 	{
 		case TELESTRAT_MEM_BLOCK_RAM:
 		{
-			rh = SMH_BANK1;
-			wh = SMH_BANK2;
+			rh = SMH_BANK(1);
+			wh = SMH_BANK(2);
 			memory_set_bankptr(machine, 1, mem_block->ptr);
 			memory_set_bankptr(machine, 2, mem_block->ptr);
 		}
@@ -1348,7 +1348,7 @@ static void	telestrat_refresh_mem(running_machine *machine)
 
 		case TELESTRAT_MEM_BLOCK_ROM:
 		{
-			rh = SMH_BANK1;
+			rh = SMH_BANK(1);
 			wh = SMH_NOP;
 			memory_set_bankptr(machine, 1, mem_block->ptr);
 		}
@@ -1467,19 +1467,19 @@ MACHINE_START( telestrat )
 
 	/* initialise overlay ram */
 	telestrat_blocks[0].MemType = TELESTRAT_MEM_BLOCK_RAM;
-	telestrat_blocks[0].ptr = (unsigned char *) auto_malloc(16384);
+	telestrat_blocks[0].ptr = auto_alloc_array(machine, UINT8, 16384);
 
 	telestrat_blocks[1].MemType = TELESTRAT_MEM_BLOCK_RAM;
-	telestrat_blocks[1].ptr = (unsigned char *) auto_malloc(16384);
+	telestrat_blocks[1].ptr = auto_alloc_array(machine, UINT8, 16384);
 	telestrat_blocks[2].MemType = TELESTRAT_MEM_BLOCK_RAM;
-	telestrat_blocks[2].ptr = (unsigned char *) auto_malloc(16384);
+	telestrat_blocks[2].ptr = auto_alloc_array(machine, UINT8, 16384);
 
 	/* initialise default cartridge */
 	telestrat_blocks[3].MemType = TELESTRAT_MEM_BLOCK_ROM;
 	telestrat_blocks[3].ptr = memory_region(machine, "maincpu")+0x010000;
 
 	telestrat_blocks[4].MemType = TELESTRAT_MEM_BLOCK_RAM;
-	telestrat_blocks[4].ptr = (unsigned char *) auto_malloc(16384);
+	telestrat_blocks[4].ptr = auto_alloc_array(machine, UINT8, 16384);
 
 	/* initialise default cartridge */
 	telestrat_blocks[5].MemType = TELESTRAT_MEM_BLOCK_ROM;

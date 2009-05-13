@@ -119,8 +119,9 @@ bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 
 ***************************************************************************/
 
+typedef enum { STATE_IDLE = 0, STATE_ADDR_R, STATE_ROM_R, STATE_EEPROM_R, STATE_EEPROM_W } prot_state;
 static struct {
-	enum { STATE_IDLE = 0, STATE_ADDR_R, STATE_ROM_R, STATE_EEPROM_R, STATE_EEPROM_W } state;
+	prot_state state;
 	int wait_param;
 	int param;
 	int cmd;
@@ -280,13 +281,13 @@ static WRITE8_HANDLER( quizpun2_rombank_w )
 
 static WRITE8_HANDLER( quizpun2_irq_ack )
 {
-	cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_IRQ0, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( quizpun2_soundlatch_w )
 {
 	soundlatch_w(space, 0, data);
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( quizpun2_map, ADDRESS_SPACE_PROGRAM, 8 )

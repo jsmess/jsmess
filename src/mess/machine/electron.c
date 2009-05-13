@@ -214,7 +214,7 @@ WRITE8_HANDLER( electron_ula_w )
 			} 
 			else 
 			{
-				memory_install_read8_handler( space, 0x8000, 0xbfff, 0, 0, SMH_BANK2 );
+				memory_install_read8_handler( space, 0x8000, 0xbfff, 0, 0, SMH_BANK(2) );
 			}
 			memory_set_bank(space->machine, 2, electron_ula.rompage);
 		}

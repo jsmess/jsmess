@@ -64,7 +64,7 @@ static void io_reset(void);
 static VIDEO_START( exelv )
 {
 	VIDEO_START_CALL( generic_bitmapped );
-	tms3556_init(/*0x8000*/0x10000);	/* tms3556 with 32 kb of video RAM */
+	tms3556_init(machine, /*0x8000*/0x10000);	/* tms3556 with 32 kb of video RAM */
 }
 
 static MACHINE_RESET( exelv )

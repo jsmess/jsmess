@@ -950,71 +950,71 @@ static WRITE16_HANDLER( atomicp_sound_w );
 
 static const segaic16_memory_map_entry rom_171_5358_info_small[] =
 {
-	{ 0x3d/2, 0x00000, 0x04000, 0xffc000,      ~0, misc_io_r,             misc_io_w,             NULL,                  "I/O space" },
-	{ 0x39/2, 0x00000, 0x01000, 0xfff000,      ~0, SMH_BANK10,          segaic16_paletteram_w, &paletteram16,         "color RAM" },
-	{ 0x35/2, 0x00000, 0x10000, 0xfe0000,      ~0, SMH_BANK11,          segaic16_tileram_0_w,  &segaic16_tileram_0,   "tile RAM" },
-	{ 0x35/2, 0x10000, 0x01000, 0xfef000,      ~0, SMH_BANK12,          segaic16_textram_0_w,  &segaic16_textram_0,   "text RAM" },
-	{ 0x31/2, 0x00000, 0x00800, 0xfff800,      ~0, SMH_BANK13,          SMH_BANK13,          &segaic16_spriteram_0, "object RAM" },
-	{ 0x2d/2, 0x00000, 0x04000, 0xffc000,      ~0, SMH_BANK14,          SMH_BANK14,          &workram,              "work RAM" },
-	{ 0x29/2, 0x00000, 0x20000, 0xfe0000, 0x20000, SMH_BANK15,          SMH_UNMAP,           NULL,                  "ROM 2" },
-	{ 0x25/2, 0x00000, 0x20000, 0xfe0000, 0x10000, SMH_BANK16,          SMH_UNMAP,           NULL,                  "ROM 1" },
-	{ 0x21/2, 0x00000, 0x20000, 0xfe0000, 0x00000, SMH_BANK17,          SMH_UNMAP,           NULL,                  "ROM 0" },
+	{ 0x3d/2, 0x00000, 0x04000, 0xffc000,      ~0, misc_io_r,                       misc_io_w,                        NULL,                  "I/O space" },
+	{ 0x39/2, 0x00000, 0x01000, 0xfff000,      ~0, (read16_space_func)SMH_BANK(10), segaic16_paletteram_w,            &paletteram16,         "color RAM" },
+	{ 0x35/2, 0x00000, 0x10000, 0xfe0000,      ~0, (read16_space_func)SMH_BANK(11), segaic16_tileram_0_w,             &segaic16_tileram_0,   "tile RAM" },
+	{ 0x35/2, 0x10000, 0x01000, 0xfef000,      ~0, (read16_space_func)SMH_BANK(12), segaic16_textram_0_w,             &segaic16_textram_0,   "text RAM" },
+	{ 0x31/2, 0x00000, 0x00800, 0xfff800,      ~0, (read16_space_func)SMH_BANK(13), (write16_space_func)SMH_BANK(13), &segaic16_spriteram_0, "object RAM" },
+	{ 0x2d/2, 0x00000, 0x04000, 0xffc000,      ~0, (read16_space_func)SMH_BANK(14), (write16_space_func)SMH_BANK(14), &workram,              "work RAM" },
+	{ 0x29/2, 0x00000, 0x20000, 0xfe0000, 0x20000, (read16_space_func)SMH_BANK(15), (write16_space_func)SMH_UNMAP,    NULL,                  "ROM 2" },
+	{ 0x25/2, 0x00000, 0x20000, 0xfe0000, 0x10000, (read16_space_func)SMH_BANK(16), (write16_space_func)SMH_UNMAP,    NULL,                  "ROM 1" },
+	{ 0x21/2, 0x00000, 0x20000, 0xfe0000, 0x00000, (read16_space_func)SMH_BANK(17), (write16_space_func)SMH_UNMAP,    NULL,                  "ROM 0" },
 	{ 0 }
 };
 
 static const segaic16_memory_map_entry rom_171_5358_info[] =
 {
-	{ 0x3d/2, 0x00000, 0x04000, 0xffc000,      ~0, misc_io_r,             misc_io_w,             NULL,                  "I/O space" },
-	{ 0x39/2, 0x00000, 0x01000, 0xfff000,      ~0, SMH_BANK10,          segaic16_paletteram_w, &paletteram16,         "color RAM" },
-	{ 0x35/2, 0x00000, 0x10000, 0xfe0000,      ~0, SMH_BANK11,          segaic16_tileram_0_w,  &segaic16_tileram_0,   "tile RAM" },
-	{ 0x35/2, 0x10000, 0x01000, 0xfef000,      ~0, SMH_BANK12,          segaic16_textram_0_w,  &segaic16_textram_0,   "text RAM" },
-	{ 0x31/2, 0x00000, 0x00800, 0xfff800,      ~0, SMH_BANK13,          SMH_BANK13,          &segaic16_spriteram_0, "object RAM" },
-	{ 0x2d/2, 0x00000, 0x04000, 0xffc000,      ~0, SMH_BANK14,          SMH_BANK14,          &workram,              "work RAM" },
-	{ 0x29/2, 0x00000, 0x20000, 0xfe0000, 0x40000, SMH_BANK15,          SMH_UNMAP,           NULL,                  "ROM 2" },
-	{ 0x25/2, 0x00000, 0x20000, 0xfe0000, 0x20000, SMH_BANK16,          SMH_UNMAP,           NULL,                  "ROM 1" },
-	{ 0x21/2, 0x00000, 0x20000, 0xfe0000, 0x00000, SMH_BANK17,          SMH_UNMAP,           NULL,                  "ROM 0" },
+	{ 0x3d/2, 0x00000, 0x04000, 0xffc000,      ~0, misc_io_r,                       misc_io_w,                        NULL,                  "I/O space" },
+	{ 0x39/2, 0x00000, 0x01000, 0xfff000,      ~0, (read16_space_func)SMH_BANK(10), segaic16_paletteram_w,            &paletteram16,         "color RAM" },
+	{ 0x35/2, 0x00000, 0x10000, 0xfe0000,      ~0, (read16_space_func)SMH_BANK(11), segaic16_tileram_0_w,             &segaic16_tileram_0,   "tile RAM" },
+	{ 0x35/2, 0x10000, 0x01000, 0xfef000,      ~0, (read16_space_func)SMH_BANK(12), segaic16_textram_0_w,             &segaic16_textram_0,   "text RAM" },
+	{ 0x31/2, 0x00000, 0x00800, 0xfff800,      ~0, (read16_space_func)SMH_BANK(13), (write16_space_func)SMH_BANK(13), &segaic16_spriteram_0, "object RAM" },
+	{ 0x2d/2, 0x00000, 0x04000, 0xffc000,      ~0, (read16_space_func)SMH_BANK(14), (write16_space_func)SMH_BANK(14), &workram,              "work RAM" },
+	{ 0x29/2, 0x00000, 0x20000, 0xfe0000, 0x40000, (read16_space_func)SMH_BANK(15), (write16_space_func)SMH_UNMAP,    NULL,                  "ROM 2" },
+	{ 0x25/2, 0x00000, 0x20000, 0xfe0000, 0x20000, (read16_space_func)SMH_BANK(16), (write16_space_func)SMH_UNMAP,    NULL,                  "ROM 1" },
+	{ 0x21/2, 0x00000, 0x20000, 0xfe0000, 0x00000, (read16_space_func)SMH_BANK(17), (write16_space_func)SMH_UNMAP,    NULL,                  "ROM 0" },
 	{ 0 }
 };
 
 static const segaic16_memory_map_entry rom_171_5704_info[] =
 {
-	{ 0x3d/2, 0x00000, 0x04000, 0xffc000,      ~0, misc_io_r,             misc_io_w,             NULL,                  "I/O space" },
-	{ 0x39/2, 0x00000, 0x01000, 0xfff000,      ~0, SMH_BANK10,          segaic16_paletteram_w, &paletteram16,         "color RAM" },
-	{ 0x35/2, 0x00000, 0x10000, 0xfe0000,      ~0, SMH_BANK11,          segaic16_tileram_0_w,  &segaic16_tileram_0,   "tile RAM" },
-	{ 0x35/2, 0x10000, 0x01000, 0xfef000,      ~0, SMH_BANK12,          segaic16_textram_0_w,  &segaic16_textram_0,   "text RAM" },
-	{ 0x31/2, 0x00000, 0x00800, 0xfff800,      ~0, SMH_BANK13,          SMH_BANK13,          &segaic16_spriteram_0, "object RAM" },
-	{ 0x2d/2, 0x00000, 0x04000, 0xffc000,      ~0, SMH_BANK14,          SMH_BANK14,          &workram,              "work RAM" },
-	{ 0x29/2, 0x00000, 0x10000, 0xff0000,      ~0, NULL,                  rom_5704_bank_w,       NULL,                  "tile bank" },
-	{ 0x25/2, 0x00000, 0x80000, 0xfc0000, 0x80000, SMH_BANK16,          SMH_UNMAP,           NULL,                  "ROM 1" },
-	{ 0x21/2, 0x00000, 0x80000, 0xfc0000, 0x00000, SMH_BANK17,          SMH_UNMAP,           NULL,                  "ROM 0" },
+	{ 0x3d/2, 0x00000, 0x04000, 0xffc000,      ~0, misc_io_r,                       misc_io_w,                        NULL,                  "I/O space" },
+	{ 0x39/2, 0x00000, 0x01000, 0xfff000,      ~0, (read16_space_func)SMH_BANK(10), segaic16_paletteram_w,            &paletteram16,         "color RAM" },
+	{ 0x35/2, 0x00000, 0x10000, 0xfe0000,      ~0, (read16_space_func)SMH_BANK(11), segaic16_tileram_0_w,             &segaic16_tileram_0,   "tile RAM" },
+	{ 0x35/2, 0x10000, 0x01000, 0xfef000,      ~0, (read16_space_func)SMH_BANK(12), segaic16_textram_0_w,             &segaic16_textram_0,   "text RAM" },
+	{ 0x31/2, 0x00000, 0x00800, 0xfff800,      ~0, (read16_space_func)SMH_BANK(13), (write16_space_func)SMH_BANK(13), &segaic16_spriteram_0, "object RAM" },
+	{ 0x2d/2, 0x00000, 0x04000, 0xffc000,      ~0, (read16_space_func)SMH_BANK(14), (write16_space_func)SMH_BANK(14), &workram,              "work RAM" },
+	{ 0x29/2, 0x00000, 0x10000, 0xff0000,      ~0, NULL,                            rom_5704_bank_w,                  NULL,                  "tile bank" },
+	{ 0x25/2, 0x00000, 0x80000, 0xfc0000, 0x80000, (read16_space_func)SMH_BANK(16), (write16_space_func)SMH_UNMAP,    NULL,                  "ROM 1" },
+	{ 0x21/2, 0x00000, 0x80000, 0xfc0000, 0x00000, (read16_space_func)SMH_BANK(17), (write16_space_func)SMH_UNMAP,    NULL,                  "ROM 0" },
 	{ 0 }
 };
 
 static const segaic16_memory_map_entry rom_atomicp_info[] =
 {
-	{ 0x3d/2, 0x00000, 0x04000, 0xffc000,      ~0, misc_io_r,             misc_io_w,             NULL,                  "I/O space" },
-	{ 0x39/2, 0x00000, 0x01000, 0xfff000,      ~0, SMH_BANK10,          segaic16_paletteram_w, &paletteram16,         "color RAM" },
-	{ 0x35/2, 0x00000, 0x10000, 0xfe0000,      ~0, SMH_BANK11,          segaic16_tileram_0_w,  &segaic16_tileram_0,   "tile RAM" },
-	{ 0x35/2, 0x10000, 0x01000, 0xfef000,      ~0, SMH_BANK12,          segaic16_textram_0_w,  &segaic16_textram_0,   "text RAM" },
-	{ 0x31/2, 0x00000, 0x00800, 0xfff800,      ~0, SMH_BANK13,          SMH_BANK13,          &segaic16_spriteram_0, "object RAM" },
-	{ 0x2d/2, 0x00000, 0x04000, 0xffc000,      ~0, SMH_BANK14,          SMH_BANK14,          &workram,              "work RAM" },
-	{ 0x29/2, 0x00000, 0x10000, 0xff0000,      ~0, NULL,                  rom_5704_bank_w,       NULL,                  "tile bank" },
-	{ 0x25/2, 0x00000, 0x10000, 0xff0000,      ~0, NULL,                  atomicp_sound_w,       NULL,                  "sound" },
-	{ 0x21/2, 0x00000, 0x80000, 0xfc0000, 0x00000, SMH_BANK17,          SMH_UNMAP,           NULL,                  "ROM 0" },
+	{ 0x3d/2, 0x00000, 0x04000, 0xffc000,      ~0, misc_io_r,                       misc_io_w,                        NULL,                  "I/O space" },
+	{ 0x39/2, 0x00000, 0x01000, 0xfff000,      ~0, (read16_space_func)SMH_BANK(10), segaic16_paletteram_w,            &paletteram16,         "color RAM" },
+	{ 0x35/2, 0x00000, 0x10000, 0xfe0000,      ~0, (read16_space_func)SMH_BANK(11), segaic16_tileram_0_w,             &segaic16_tileram_0,   "tile RAM" },
+	{ 0x35/2, 0x10000, 0x01000, 0xfef000,      ~0, (read16_space_func)SMH_BANK(12), segaic16_textram_0_w,             &segaic16_textram_0,   "text RAM" },
+	{ 0x31/2, 0x00000, 0x00800, 0xfff800,      ~0, (read16_space_func)SMH_BANK(13), (write16_space_func)SMH_BANK(13), &segaic16_spriteram_0, "object RAM" },
+	{ 0x2d/2, 0x00000, 0x04000, 0xffc000,      ~0, (read16_space_func)SMH_BANK(14), (write16_space_func)SMH_BANK(14), &workram,              "work RAM" },
+	{ 0x29/2, 0x00000, 0x10000, 0xff0000,      ~0, NULL,                            rom_5704_bank_w,                  NULL,                  "tile bank" },
+	{ 0x25/2, 0x00000, 0x10000, 0xff0000,      ~0, NULL,                            atomicp_sound_w,                  NULL,                  "sound" },
+	{ 0x21/2, 0x00000, 0x80000, 0xfc0000, 0x00000, (read16_space_func)SMH_BANK(17), (write16_space_func)SMH_UNMAP,    NULL,                  "ROM 0" },
 	{ 0 }
 };
 
 static const segaic16_memory_map_entry rom_171_5797_info[] =
 {
-	{ 0x3d/2, 0x00000, 0x04000, 0xffc000,      ~0, misc_io_r,             misc_io_w,             NULL,                  "I/O space" },
-	{ 0x39/2, 0x00000, 0x01000, 0xfff000,      ~0, SMH_BANK10,          segaic16_paletteram_w, &paletteram16,         "color RAM" },
-	{ 0x35/2, 0x00000, 0x10000, 0xfe0000,      ~0, SMH_BANK11,          segaic16_tileram_0_w,  &segaic16_tileram_0,   "tile RAM" },
-	{ 0x35/2, 0x10000, 0x01000, 0xfef000,      ~0, SMH_BANK12,          segaic16_textram_0_w,  &segaic16_textram_0,   "text RAM" },
-	{ 0x31/2, 0x00000, 0x00800, 0xfff800,      ~0, SMH_BANK13,          SMH_BANK13,          &segaic16_spriteram_0, "object RAM" },
-	{ 0x2d/2, 0x00000, 0x04000, 0xffc000,      ~0, SMH_BANK14,          SMH_BANK14,          &workram,              "work RAM" },
-	{ 0x29/2, 0x00000, 0x10000, 0xff0000,      ~0, unknown_rgn2_r,        unknown_rgn2_w,        NULL,                  "???" },
-	{ 0x25/2, 0x00000, 0x04000, 0xffc000,      ~0, rom_5797_bank_math_r,  rom_5797_bank_math_w,  NULL,                  "tile bank/math" },
-	{ 0x21/2, 0x00000, 0x80000, 0xf80000, 0x00000, SMH_BANK17,          SMH_UNMAP,           NULL,                  "ROM 0" },
+	{ 0x3d/2, 0x00000, 0x04000, 0xffc000,      ~0, misc_io_r,                       misc_io_w,                        NULL,                  "I/O space" },
+	{ 0x39/2, 0x00000, 0x01000, 0xfff000,      ~0, (read16_space_func)SMH_BANK(10), segaic16_paletteram_w,            &paletteram16,         "color RAM" },
+	{ 0x35/2, 0x00000, 0x10000, 0xfe0000,      ~0, (read16_space_func)SMH_BANK(11), segaic16_tileram_0_w,             &segaic16_tileram_0,   "tile RAM" },
+	{ 0x35/2, 0x10000, 0x01000, 0xfef000,      ~0, (read16_space_func)SMH_BANK(12), segaic16_textram_0_w,             &segaic16_textram_0,   "text RAM" },
+	{ 0x31/2, 0x00000, 0x00800, 0xfff800,      ~0, (read16_space_func)SMH_BANK(13), (write16_space_func)SMH_BANK(13), &segaic16_spriteram_0, "object RAM" },
+	{ 0x2d/2, 0x00000, 0x04000, 0xffc000,      ~0, (read16_space_func)SMH_BANK(14), (write16_space_func)SMH_BANK(14), &workram,              "work RAM" },
+	{ 0x29/2, 0x00000, 0x10000, 0xff0000,      ~0, unknown_rgn2_r,                  unknown_rgn2_w,                   NULL,                  "???" },
+	{ 0x25/2, 0x00000, 0x04000, 0xffc000,      ~0, rom_5797_bank_math_r,            rom_5797_bank_math_w,             NULL,                  "tile bank/math" },
+	{ 0x21/2, 0x00000, 0x80000, 0xf80000, 0x00000, (read16_space_func)SMH_BANK(17), (write16_space_func)SMH_UNMAP,    NULL,                  "ROM 0" },
 	{ 0 }
 };
 
@@ -1039,9 +1039,9 @@ static void sound_w(running_machine *machine, UINT8 data)
 {
 	if (has_sound_cpu)
 	{
-		const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+		const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 		soundlatch_w(space, 0, data & 0xff);
-		cpu_set_input_line(machine->cpu[1], 0, HOLD_LINE);
+		cputag_set_input_line(machine, "soundcpu", 0, HOLD_LINE);
 	}
 }
 
@@ -1052,11 +1052,11 @@ static void system16b_generic_init(running_machine *machine, int _rom_board)
 	rom_board = _rom_board;
 
 	/* allocate memory for regions not autmatically assigned */
-	segaic16_spriteram_0 = auto_malloc(0x00800);
-	paletteram16         = auto_malloc(0x01000);
-	segaic16_tileram_0   = auto_malloc(0x10000);
-	segaic16_textram_0   = auto_malloc(0x01000);
-	workram              = auto_malloc(0x04000);
+	segaic16_spriteram_0 = auto_alloc_array(machine, UINT16, 0x00800/2);
+	paletteram16         = auto_alloc_array(machine, UINT16, 0x01000/2);
+	segaic16_tileram_0   = auto_alloc_array(machine, UINT16, 0x10000/2);
+	segaic16_textram_0   = auto_alloc_array(machine, UINT16, 0x01000/2);
+	workram              = auto_alloc_array(machine, UINT16, 0x04000/2);
 
 	/* init the memory mapper */
 	segaic16_memory_mapper_init(cputag_get_cpu(machine, "maincpu"), region_info_list[rom_board], sound_w, NULL);
@@ -1100,7 +1100,7 @@ static MACHINE_RESET( system16b )
 		segaic16_memory_mapper_config(machine, i8751_initial_config);
 	segaic16_tilemap_reset(machine, 0);
 
-	fd1094_machine_init(machine->cpu[0]);
+	fd1094_machine_init(cputag_get_cpu(machine, "maincpu"));
 
 	/* if we have a fake i8751 handler, disable the actual 8751 */
 	if (i8751_vblank_hook != NULL)
@@ -1114,7 +1114,7 @@ static MACHINE_RESET( system16b )
 
 static TIMER_CALLBACK( atomicp_sound_irq )
 {
-	cpu_set_input_line(machine->cpu[0], 2, HOLD_LINE);
+	cputag_set_input_line(machine, "maincpu", 2, HOLD_LINE);
 }
 
 
@@ -1347,7 +1347,7 @@ static READ8_DEVICE_HANDLER( upd7759_status_r )
 static void upd7759_generate_nmi(const device_config *device, int state)
 {
 	if (state)
-		cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(device->machine, "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -1355,7 +1355,7 @@ static void upd7759_generate_nmi(const device_config *device, int state)
 static WRITE8_HANDLER( mcu_data_w )
 {
 	mcu_data = data;
-	generic_pulse_irq_line(space->machine->cpu[2], 1);
+	generic_pulse_irq_line(cputag_get_cpu(space->machine, "mcu"), 1);
 }
 #endif
 
@@ -1383,11 +1383,11 @@ static INTERRUPT_GEN( i8751_main_cpu_vblank )
 
 static void altbeast_common_i8751_sim(running_machine *machine, offs_t soundoffs, offs_t inputoffs)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT16 temp;
 
 	/* signal a VBLANK to the main CPU */
-	cpu_set_input_line(machine->cpu[0], 4, HOLD_LINE);
+	cputag_set_input_line(machine, "maincpu", 4, HOLD_LINE);
 
 	/* set tile banks */
 	rom_5704_bank_w(space, 1, workram[0x3094/2] & 0x00ff, 0x00ff);
@@ -1422,11 +1422,11 @@ static void altbeast_i8751_sim(running_machine *machine)
 
 static void ddux_i8751_sim(running_machine *machine)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT16 temp;
 
 	/* signal a VBLANK to the main CPU */
-	cpu_set_input_line(machine->cpu[0], 4, HOLD_LINE);
+	cputag_set_input_line(machine, "maincpu", 4, HOLD_LINE);
 
 	/* process any new sound data */
 	temp = workram[0x0bd0/2];
@@ -1458,11 +1458,11 @@ static void goldnaxe_i8751_init(running_machine *machine)
 
 static void goldnaxe_i8751_sim(running_machine *machine)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT16 temp;
 
 	/* signal a VBLANK to the main CPU */
-	cpu_set_input_line(machine->cpu[0], 4, HOLD_LINE);
+	cputag_set_input_line(machine, "maincpu", 4, HOLD_LINE);
 
 	/* they periodically clear the data at 2cd8,2cda,2cdc,2cde and expect the MCU to fill it in */
 	if (workram[0x2cd8/2] == 0 && workram[0x2cda/2] == 0 && workram[0x2cdc/2] == 0 && workram[0x2cde/2] == 0)
@@ -1489,11 +1489,11 @@ static void goldnaxe_i8751_sim(running_machine *machine)
 
 static void tturf_i8751_sim(running_machine *machine)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT16 temp;
 
 	/* signal a VBLANK to the main CPU */
-	cpu_set_input_line(machine->cpu[0], 4, HOLD_LINE);
+	cputag_set_input_line(machine, "maincpu", 4, HOLD_LINE);
 
 	/* process any new sound data */
 	temp = workram[0x01d0/2];
@@ -1512,11 +1512,11 @@ static void tturf_i8751_sim(running_machine *machine)
 
 static void wb3_i8751_sim(running_machine *machine)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT16 temp;
 
 	/* signal a VBLANK to the main CPU */
-	cpu_set_input_line(machine->cpu[0], 4, HOLD_LINE);
+	cputag_set_input_line(machine, "maincpu", 4, HOLD_LINE);
 
 	/* process any new sound data */
 	temp = workram[0x0008/2];
@@ -1530,11 +1530,11 @@ static void wb3_i8751_sim(running_machine *machine)
 
 static void wrestwar_i8751_sim(running_machine *machine)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT16 temp;
 
 	/* signal a VBLANK to the main CPU */
-	cpu_set_input_line(machine->cpu[0], 4, HOLD_LINE);
+	cputag_set_input_line(machine, "maincpu", 4, HOLD_LINE);
 
 	/* process any new sound data */
 	temp = workram[0x208e/2];

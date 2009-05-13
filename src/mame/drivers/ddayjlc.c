@@ -173,7 +173,7 @@ static WRITE8_HANDLER(bg2_w)
 static WRITE8_HANDLER( sound_w )
 {
 	soundlatch_w(space,offset,data);
-	cpu_set_input_line_and_vector(space->machine->cpu[1], 0, HOLD_LINE, 0xff);
+	cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_HANDLER( i8257_CH0_w )
@@ -556,7 +556,7 @@ static DRIVER_INIT( ddayjlc )
 	{
 		UINT32 oldaddr, newadr, length,j;
 		UINT8 *src, *dst, *temp;
-		temp = malloc_or_die(0x10000);
+		temp = alloc_array_or_die(UINT8, 0x10000);
 		src = temp;
 		dst = memory_region(machine, "gfx1");
 		length = memory_region_length(machine, "gfx1");

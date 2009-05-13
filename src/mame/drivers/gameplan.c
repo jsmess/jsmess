@@ -91,7 +91,7 @@ TODO:
 
 static WRITE8_DEVICE_HANDLER( io_select_w )
 {
-	gameplan_state *state = device->machine->driver_data;
+	gameplan_state *state = (gameplan_state *)device->machine->driver_data;
 
 	switch (data)
 	{
@@ -108,7 +108,7 @@ static WRITE8_DEVICE_HANDLER( io_select_w )
 static READ8_DEVICE_HANDLER( io_port_r )
 {
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3", "DSW0", "DSW1" };
-	gameplan_state *state = device->machine->driver_data;
+	gameplan_state *state = (gameplan_state *)device->machine->driver_data;
 
 	return input_port_read(device->machine, portnames[state->current_port]);
 }
@@ -139,8 +139,8 @@ static const via6522_interface via_1_interface =
 
 static WRITE8_DEVICE_HANDLER( audio_reset_w )
 {
-	gameplan_state *state = device->machine->driver_data;
-	cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
+	gameplan_state *state = (gameplan_state *)device->machine->driver_data;
+	cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
 	if (data == 0)
 	{
 		device_reset(state->riot);
@@ -151,14 +151,14 @@ static WRITE8_DEVICE_HANDLER( audio_reset_w )
 
 static WRITE8_DEVICE_HANDLER( audio_cmd_w )
 {
-	gameplan_state *state = device->machine->driver_data;
+	gameplan_state *state = (gameplan_state *)device->machine->driver_data;
 	riot6532_porta_in_set(state->riot, data, 0x7f);
 }
 
 
 static WRITE8_DEVICE_HANDLER( audio_trigger_w )
 {
-	gameplan_state *state = device->machine->driver_data;
+	gameplan_state *state = (gameplan_state *)device->machine->driver_data;
 	riot6532_porta_in_set(state->riot, data << 7, 0x80);
 }
 
@@ -182,7 +182,7 @@ static const via6522_interface via_2_interface =
 
 static void r6532_irq(const device_config *device, int state)
 {
-	cpu_set_input_line(device->machine->cpu[1], 0, state);
+	cputag_set_input_line(device->machine, "audiocpu", 0, state);
 	if (state == ASSERT_LINE)
 		cpuexec_boost_interleave(device->machine, attotime_zero, ATTOTIME_IN_USEC(10));
 }
@@ -190,7 +190,7 @@ static void r6532_irq(const device_config *device, int state)
 
 static void r6532_soundlatch_w(const device_config *device, UINT8 newdata, UINT8 olddata)
 {
-	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	soundlatch_w(space, 0, newdata);
 }
 
@@ -214,7 +214,7 @@ static const riot6532_interface r6532_interface =
 
 static MACHINE_START( gameplan )
 {
-	gameplan_state *state = machine->driver_data;
+	gameplan_state *state = (gameplan_state *)machine->driver_data;
 
 	state->riot = devtag_get_device(machine, "riot");
 

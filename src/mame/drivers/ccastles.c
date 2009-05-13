@@ -174,7 +174,7 @@ static TIMER_CALLBACK( clock_irq )
 	/* assert the IRQ if not already asserted */
 	if (!irq_state)
 	{
-		cpu_set_input_line(machine->cpu[0], 0, ASSERT_LINE);
+		cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 		irq_state = 1;
 	}
 
@@ -238,7 +238,7 @@ static MACHINE_START( ccastles )
 	schedule_next_irq(machine, 0);
 
 	/* allocate backing memory for the NVRAM */
-	generic_nvram = auto_malloc(generic_nvram_size);
+	generic_nvram = auto_alloc_array(machine, UINT8, generic_nvram_size);
 
 	/* setup for save states */
 	state_save_register_global(machine, irq_state);
@@ -249,7 +249,7 @@ static MACHINE_START( ccastles )
 
 static MACHINE_RESET( ccastles )
 {
-	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
 	irq_state = 0;
 }
 
@@ -265,7 +265,7 @@ static WRITE8_HANDLER( irq_ack_w )
 {
 	if (irq_state)
 	{
-		cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 		irq_state = 0;
 	}
 }

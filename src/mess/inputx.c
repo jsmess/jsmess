@@ -533,7 +533,7 @@ static int scan_keys(const input_port_config *portconfig, mess_input_code *codes
 	chars
 -------------------------------------------------*/
 
-static mess_input_code *build_codes(const input_port_config *portconfig)
+static mess_input_code *build_codes(running_machine *machine, const input_port_config *portconfig)
 {
 	mess_input_code *codes = NULL;
 	const input_port_config *ports[NUM_SIMUL_KEYS];
@@ -545,9 +545,8 @@ static mess_input_code *build_codes(const input_port_config *portconfig)
 	if (code_count > 0)
 	{
 		/* allocate the codes */
-		codes = auto_malloc(sizeof(*codes) * (code_count + 1));
-		memset(codes, 0, sizeof(*codes) * (code_count + 1));
-
+		codes = auto_alloc_array_clear(machine, mess_input_code, code_count + 1);
+	
 		/* and populate them */
 		scan_keys(portconfig, codes, ports, fields, 0, 0);
 	}
@@ -650,8 +649,7 @@ static void clear_keybuffer(running_machine *machine)
 static void setup_keybuffer(running_machine *machine)
 {
 	inputx_timer = timer_alloc(machine, inputx_timerproc, NULL);
-	keybuffer = auto_malloc(sizeof(key_buffer));
-	memset(keybuffer, 0, sizeof(*keybuffer));
+	keybuffer = auto_alloc_clear(machine, key_buffer);
 	add_exit_callback(machine, clear_keybuffer);
 }
 
@@ -675,7 +673,7 @@ void inputx_init(running_machine *machine)
 	/* posting keys directly only makes sense for a computer */
 	if (machine->gamedrv->flags & GAME_COMPUTER)
 	{
-		codes = build_codes(machine->portconfig);
+		codes = build_codes(machine, machine->portconfig);
 		setup_keybuffer(machine);
 	}
 }

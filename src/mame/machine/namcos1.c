@@ -64,22 +64,6 @@ static WRITE8_HANDLER( bank14_w ) { (*namcos1_active_bank[13].bank_handler_w)(sp
 static WRITE8_HANDLER( bank15_w ) { (*namcos1_active_bank[14].bank_handler_w)(space, offset + namcos1_active_bank[14].bank_offset, data); }
 static WRITE8_HANDLER( bank16_w ) { (*namcos1_active_bank[15].bank_handler_w)(space, offset + namcos1_active_bank[15].bank_offset, data); }
 
-static const read8_space_func ram_bank_handler_r[16] =
-{
-	SMH_BANK1 ,SMH_BANK2 ,SMH_BANK3 ,SMH_BANK4 ,
-	SMH_BANK5 ,SMH_BANK6 ,SMH_BANK7 ,SMH_BANK8 ,
-	SMH_BANK9 ,SMH_BANK10,SMH_BANK11,SMH_BANK12,
-	SMH_BANK13,SMH_BANK14,SMH_BANK15,SMH_BANK16
-};
-
-static const write8_space_func ram_bank_handler_w[16] =
-{
-	SMH_BANK1 ,SMH_BANK2 ,SMH_BANK3 ,SMH_BANK4 ,
-	SMH_BANK5 ,SMH_BANK6 ,SMH_BANK7 ,SMH_BANK8 ,
-	SMH_BANK9 ,SMH_BANK10,SMH_BANK11,SMH_BANK12,
-	SMH_BANK13,SMH_BANK14,SMH_BANK15,SMH_BANK16
-};
-
 static const read8_space_func io_bank_handler_r[16] =
 {
 	bank1_r, bank2_r, bank3_r, bank4_r,
@@ -110,6 +94,8 @@ static int key_id, key_reg, key_rng, key_swap4_arg, key_swap4, key_bottom4, key_
 static unsigned int key_quotient, key_reminder, key_numerator_high_word;
 static UINT8 key[8];
 
+// used by faceoff and tankforce 4 player (input multiplex)
+static READ8_HANDLER( faceoff_inputs_r );
 
 static READ8_HANDLER( no_key_r )
 {
@@ -601,9 +587,9 @@ WRITE8_HANDLER( namcos1_cpu_control_w )
 		namcos1_reset = data & 1;
 	}
 
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
-	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
-	cpu_set_input_line(space->machine->cpu[3], INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(space->machine, "sub", INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(space->machine, "mcu", INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -681,7 +667,8 @@ static WRITE8_HANDLER( unknown_w )
 /* Main bankswitching routine */
 static void set_bank(running_machine *machine, int banknum, const bankhandler *handler)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[(banknum >> 3) & 1], ADDRESS_SPACE_PROGRAM);
+	static const char *const cputags[] = { "maincpu", "sub" };
+	const address_space *space = cputag_get_address_space(machine, cputags[(banknum >> 3) & 1], ADDRESS_SPACE_PROGRAM);
 	int bankstart = (banknum & 7) * 0x2000;
 
 	/* for BANK handlers , memory direct and OP-code base */
@@ -692,7 +679,7 @@ static void set_bank(running_machine *machine, int banknum, const bankhandler *h
 	if (!handler->bank_handler_r)
 	{
 		if (namcos1_active_bank[banknum].bank_handler_r)
-			memory_install_read8_handler(space, bankstart, bankstart + 0x1fff, 0, 0, ram_bank_handler_r[banknum]);
+			memory_install_read8_handler(space, bankstart, bankstart + 0x1fff, 0, 0, (read8_space_func)SMH_BANK(banknum + 1));
 	}
 	else
 	{
@@ -706,7 +693,7 @@ static void set_bank(running_machine *machine, int banknum, const bankhandler *h
 		if (!handler->bank_handler_w)
 		{
 			if (namcos1_active_bank[banknum].bank_handler_w)
-				memory_install_write8_handler(space, bankstart, bankstart + 0x1fff, 0, 0, ram_bank_handler_w[banknum]);
+				memory_install_write8_handler(space, bankstart, bankstart + 0x1fff, 0, 0, (write8_space_func)SMH_BANK(banknum + 1));
 		}
 		else
 		{
@@ -748,7 +735,7 @@ WRITE8_HANDLER( namcos1_bankswitch_w )
 {
 //  logerror("cpu %s: namcos1_bankswitch_w offset %04x data %02x\n", space->cpu->tag, offset, data);
 
-	namcos1_bankswitch(space->machine, (space->cpu == space->machine->cpu[0]) ? 0 : 1, offset, data);
+	namcos1_bankswitch(space->machine, (space->cpu == cputag_get_cpu(space->machine, "maincpu")) ? 0 : 1, offset, data);
 }
 
 /* Sub cpu set start bank port */
@@ -789,7 +776,7 @@ static void namcos1_build_banks(running_machine *machine,read8_space_func key_r,
 	int i;
 
 	/**** kludge alert ****/
-	UINT8 *dummyrom = auto_malloc(0x2000);
+	UINT8 *dummyrom = auto_alloc_array(machine, UINT8, 0x2000);
 
 	/* when the games want to reset because the test switch has been flipped (or
        because the protection checks failed!) they just set the top bits of bank #7
@@ -873,10 +860,10 @@ MACHINE_RESET( namcos1 )
 	namcos1_bankswitch(machine, 1, 0x0e01, 0xff);
 
 	/* reset Cpu 0 and stop all other CPUs */
-	device_reset(machine->cpu[0]);
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
-	cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, ASSERT_LINE);
-	cpu_set_input_line(machine->cpu[3], INPUT_LINE_RESET, ASSERT_LINE);
+	device_reset(cputag_get_cpu(machine, "maincpu"));
+	cputag_set_input_line(machine, "sub", INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(machine, "mcu", INPUT_LINE_RESET, ASSERT_LINE);
 
 	/* mcu patch data clear */
 	mcu_patch_data = 0;
@@ -988,9 +975,9 @@ static void namcos1_driver_init( running_machine *machine, const struct namcos1_
 	key_top4      = specific->key_reg6;
 
 	/* S1 RAM pointer set */
-	s1ram = auto_malloc(0x8000);
-	namcos1_triram = auto_malloc(0x800);
-	namcos1_paletteram = auto_malloc(0x8000);
+	s1ram = auto_alloc_array(machine, UINT8, 0x8000);
+	namcos1_triram = auto_alloc_array(machine, UINT8, 0x800);
+	namcos1_paletteram = auto_alloc_array(machine, UINT8, 0x8000);
 
 	/* Register volatile user memory for save state */
 	state_save_register_global_pointer(machine, s1ram, 0x8000);
@@ -1208,22 +1195,7 @@ DRIVER_INIT( tankfrce )
 	namcos1_driver_init(machine, &tankfrce_specific);
 }
 
-// Inputs are multiplexed, somehow
-static READ8_HANDLER( tankfrc4_input_r )
-{
 
-	switch (offset)
-	{
-		case 0:
-			return mame_rand(space->machine);
-
-		case 1:
-			return mame_rand(space->machine);
-
-	}
-	return 0x00;
-
-}
 
 DRIVER_INIT( tankfrc4 )
 {
@@ -1233,7 +1205,7 @@ DRIVER_INIT( tankfrc4 )
 	};
 	namcos1_driver_init(machine, &tankfrce_specific);
 
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[3], ADDRESS_SPACE_PROGRAM), 0x1400, 0x1401, 0, 0, tankfrc4_input_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "mcu", ADDRESS_SPACE_PROGRAM), 0x1400, 0x1401, 0, 0, faceoff_inputs_r);
 }
 
 /*******************************************************************************
@@ -1324,7 +1296,7 @@ static READ8_HANDLER( quester_paddle_r )
 DRIVER_INIT( quester )
 {
 	namcos1_driver_init(machine, NULL);
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[3], ADDRESS_SPACE_PROGRAM), 0x1400, 0x1401, 0, 0, quester_paddle_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "mcu", ADDRESS_SPACE_PROGRAM), 0x1400, 0x1401, 0, 0, quester_paddle_r);
 }
 
 
@@ -1413,7 +1385,7 @@ static READ8_HANDLER( berabohm_buttons_r )
 DRIVER_INIT( berabohm )
 {
 	namcos1_driver_init(machine, NULL);
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[3], ADDRESS_SPACE_PROGRAM), 0x1400, 0x1401, 0, 0, berabohm_buttons_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "mcu", ADDRESS_SPACE_PROGRAM), 0x1400, 0x1401, 0, 0, berabohm_buttons_r);
 }
 
 
@@ -1483,5 +1455,5 @@ static READ8_HANDLER( faceoff_inputs_r )
 DRIVER_INIT( faceoff )
 {
 	namcos1_driver_init(machine, NULL);
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[3], ADDRESS_SPACE_PROGRAM), 0x1400, 0x1401, 0, 0, faceoff_inputs_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "mcu", ADDRESS_SPACE_PROGRAM), 0x1400, 0x1401, 0, 0, faceoff_inputs_r);
 }

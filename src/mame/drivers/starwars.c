@@ -56,7 +56,7 @@ static MACHINE_RESET( starwars )
 	/* ESB-specific */
 	if (starwars_is_esb)
 	{
-		const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+		const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 		/* reset the slapstic */
 		slapstic_reset();
@@ -81,7 +81,7 @@ static MACHINE_RESET( starwars )
 
 static WRITE8_HANDLER( irq_ack_w )
 {
-	cpu_set_input_line(space->machine->cpu[0], M6809_IRQ_LINE, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "maincpu", M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -496,7 +496,7 @@ ROM_END
 static DRIVER_INIT( starwars )
 {
 	/* X2212 nvram */
-	generic_nvram = auto_malloc(generic_nvram_size);
+	generic_nvram = auto_alloc_array(machine, UINT8, generic_nvram_size);
 
 	/* prepare the mathbox */
 	starwars_is_esb = 0;
@@ -513,7 +513,7 @@ static DRIVER_INIT( esb )
 	UINT8 *rom = memory_region(machine, "maincpu");
 
 	/* X2212 nvram */
-	generic_nvram = auto_malloc(generic_nvram_size);
+	generic_nvram = auto_alloc_array(machine, UINT8, generic_nvram_size);
 
 	/* init the slapstic */
 	slapstic_init(machine, 101);
@@ -521,13 +521,13 @@ static DRIVER_INIT( esb )
 	slapstic_base = &rom[0x08000];
 
 	/* install an opcode base handler */
-	memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), esb_setdirect);
+	memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), esb_setdirect);
 
 	/* install read/write handlers for it */
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0x9fff, 0, 0, esb_slapstic_r, esb_slapstic_w);
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0x9fff, 0, 0, esb_slapstic_r, esb_slapstic_w);
 
 	/* install additional banking */
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa000, 0xffff, 0, 0, SMH_BANK2);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa000, 0xffff, 0, 0, (read8_space_func)SMH_BANK(2));
 
 	/* prepare the matrix processor */
 	starwars_is_esb = 1;

@@ -64,17 +64,6 @@ WRITE8_HANDLER( pitnrun_videoram2_w )
 	tilemap_mark_all_tiles_dirty( bg );
 }
 
-
-READ8_HANDLER( pitnrun_videoram_r )
-{
-	return videoram[offset];
-}
-
-READ8_HANDLER( pitnrun_videoram2_r )
-{
-	return pitnrun_videoram2[offset];
-}
-
 WRITE8_HANDLER( pitnrun_char_bank_select )
 {
 	if(pitnrun_char_bank!=data)
@@ -181,10 +170,10 @@ VIDEO_START(pitnrun)
 	fg = tilemap_create( machine, get_tile_info1,tilemap_scan_rows,8,8,32,32 );
 	bg = tilemap_create( machine, get_tile_info2,tilemap_scan_rows,8,8,32*4,32 );
 	tilemap_set_transparent_pen( fg, 0 );
-	tmp_bitmap[0] = auto_bitmap_alloc(128,128,video_screen_get_format(machine->primary_screen));
-	tmp_bitmap[1] = auto_bitmap_alloc(128,128,video_screen_get_format(machine->primary_screen));
-	tmp_bitmap[2] = auto_bitmap_alloc(128,128,video_screen_get_format(machine->primary_screen));
-	tmp_bitmap[3] = auto_bitmap_alloc(128,128,video_screen_get_format(machine->primary_screen));
+	tmp_bitmap[0] = auto_bitmap_alloc(machine,128,128,video_screen_get_format(machine->primary_screen));
+	tmp_bitmap[1] = auto_bitmap_alloc(machine,128,128,video_screen_get_format(machine->primary_screen));
+	tmp_bitmap[2] = auto_bitmap_alloc(machine,128,128,video_screen_get_format(machine->primary_screen));
+	tmp_bitmap[3] = auto_bitmap_alloc(machine,128,128,video_screen_get_format(machine->primary_screen));
 	pitnrun_spotlights(machine);
 }
 

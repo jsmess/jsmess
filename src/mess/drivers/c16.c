@@ -176,16 +176,16 @@ printers and other devices; most expansion modules; userport; rs232/v.24 interfa
 
 static ADDRESS_MAP_START(c16_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK(9)
-	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(SMH_BANK1, SMH_BANK5)	   /* only ram memory configuration */
-	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_BANK2, SMH_BANK6)
-	AM_RANGE(0xc000, 0xfbff) AM_READ(SMH_BANK3)
-	AM_RANGE(0xfc00, 0xfcff) AM_READ(SMH_BANK4)
-	AM_RANGE(0xc000, 0xfcff) AM_WRITE(SMH_BANK7)
+	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(SMH_BANK(1), SMH_BANK(5))	   /* only ram memory configuration */
+	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_BANK(2), SMH_BANK(6))
+	AM_RANGE(0xc000, 0xfbff) AM_READ(SMH_BANK(3))
+	AM_RANGE(0xfc00, 0xfcff) AM_READ(SMH_BANK(4))
+	AM_RANGE(0xc000, 0xfcff) AM_WRITE(SMH_BANK(7))
 	AM_RANGE(0xfd10, 0xfd1f) AM_READ(c16_fd1x_r)
 	AM_RANGE(0xfd30, 0xfd3f) AM_READWRITE(c16_6529_port_r, c16_6529_port_w)		/* 6529 keyboard matrix */
 	AM_RANGE(0xfdd0, 0xfddf) AM_WRITE(c16_select_roms) /* rom chips selection */
 	AM_RANGE(0xff00, 0xff1f) AM_READWRITE(ted7360_port_r, ted7360_port_w)
-	AM_RANGE(0xff20, 0xffff) AM_READ(SMH_BANK8)
+	AM_RANGE(0xff20, 0xffff) AM_READ(SMH_BANK(8))
 	AM_RANGE(0xff3e, 0xff3e) AM_WRITE(c16_switch_to_rom)
 	AM_RANGE(0xff3f, 0xff3f) AM_WRITE(c16_switch_to_ram)
 #if 0
@@ -201,11 +201,11 @@ static ADDRESS_MAP_START(c16_map, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(plus4_map, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_BANK9)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK2)
-	AM_RANGE(0xc000, 0xfbff) AM_READ(SMH_BANK3)
-	AM_RANGE(0xfc00, 0xfcff) AM_READ(SMH_BANK4)
-	AM_RANGE(0x0000, 0xfcff) AM_WRITE(SMH_BANK9)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_BANK(9))
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(2))
+	AM_RANGE(0xc000, 0xfbff) AM_READ(SMH_BANK(3))
+	AM_RANGE(0xfc00, 0xfcff) AM_READ(SMH_BANK(4))
+	AM_RANGE(0x0000, 0xfcff) AM_WRITE(SMH_BANK(9))
 	AM_RANGE(0xfd00, 0xfd0f) AM_READWRITE(c16_6551_port_r, c16_6551_port_w)
 	AM_RANGE(0xfd10, 0xfd1f) AM_READWRITE(plus4_6529_port_r, plus4_6529_port_w)
 	AM_RANGE(0xfd30, 0xfd3f) AM_READWRITE(c16_6529_port_r, c16_6529_port_w) /* 6529 keyboard matrix */
@@ -216,7 +216,7 @@ static ADDRESS_MAP_START(plus4_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xfee0, 0xfeff) AM_READWRITE(c16_iec8_port_r, c16_iec8_port_w)		/*configured in c16_common_init */
 #endif
 	AM_RANGE(0xff00, 0xff1f) AM_READWRITE(ted7360_port_r, ted7360_port_w)
-	AM_RANGE(0xff20, 0xffff) AM_READ(SMH_BANK8)
+	AM_RANGE(0xff20, 0xffff) AM_READ(SMH_BANK(8))
 	AM_RANGE(0xff20, 0xff3d) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xff3e, 0xff3e) AM_WRITE(c16_switch_to_rom)
 	AM_RANGE(0xff3f, 0xff3f) AM_WRITE(c16_switch_to_ram)
@@ -224,11 +224,11 @@ static ADDRESS_MAP_START(plus4_map, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(c364_map , ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_BANK9)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK2)
-	AM_RANGE(0xc000, 0xfbff) AM_READ(SMH_BANK3)
-	AM_RANGE(0xfc00, 0xfcff) AM_READ(SMH_BANK4)
-	AM_RANGE(0x0000, 0xfcff) AM_WRITE(SMH_BANK9)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_BANK(9))
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(2))
+	AM_RANGE(0xc000, 0xfbff) AM_READ(SMH_BANK(3))
+	AM_RANGE(0xfc00, 0xfcff) AM_READ(SMH_BANK(4))
+	AM_RANGE(0x0000, 0xfcff) AM_WRITE(SMH_BANK(9))
 	AM_RANGE(0xfd00, 0xfd0f) AM_READWRITE(c16_6551_port_r, c16_6551_port_w)
 	AM_RANGE(0xfd10, 0xfd1f) AM_READWRITE(plus4_6529_port_r, plus4_6529_port_w)
 	AM_RANGE(0xfd20, 0xfd2f) AM_READWRITE(c364_speech_r, c364_speech_w)
@@ -240,7 +240,7 @@ static ADDRESS_MAP_START(c364_map , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xfee0, 0xfeff) AM_READWRITE(c16_iec8_port_r, c16_iec8_port_w)		/*configured in c16_common_init */
 #endif
 	AM_RANGE(0xff00, 0xff1f) AM_READWRITE(ted7360_port_r, ted7360_port_w)
-	AM_RANGE(0xff20, 0xffff) AM_READ(SMH_BANK8)
+	AM_RANGE(0xff20, 0xffff) AM_READ(SMH_BANK(8))
 	AM_RANGE(0xff20, 0xff3d) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xff3e, 0xff3e) AM_WRITE(c16_switch_to_rom)
 	AM_RANGE(0xff3f, 0xff3f) AM_WRITE(c16_switch_to_ram)

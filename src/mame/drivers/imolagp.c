@@ -113,7 +113,7 @@ static WRITE8_HANDLER( transmit_data_w )
 }
 static READ8_HANDLER( trigger_slave_nmi_r )
 {
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(space->machine, "slave", INPUT_LINE_NMI, PULSE_LINE);
 	return 0;
 }
 
@@ -164,7 +164,7 @@ static VIDEO_START( imolagp )
 	int i;
 	for( i=0; i<3; i++ )
 	{
-		imola_videoram[i] = auto_malloc(0x4000);
+		imola_videoram[i] = auto_alloc_array(machine, UINT8, 0x4000);
 		memset( imola_videoram[i], 0x00, 0x4000 );
 	}
 	InitializeColors(machine);

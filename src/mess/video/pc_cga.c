@@ -307,16 +307,16 @@ static void ntsc_clear(struct ntsc_decoder *ntsc)
 
    The correct value for hue will usually be a multiple of 128.
 */
-static void ntsc_decoder_init(struct ntsc_decoder *ntsc, int period, int hue)
+static void ntsc_decoder_init(running_machine *machine, struct ntsc_decoder *ntsc, int period, int hue)
 {
 	int j;
 
 	ntsc->period = period;
-	ntsc->I_filter = auto_malloc(period * sizeof(int));
-	ntsc->Q_filter = auto_malloc(period * sizeof(int));
-	ntsc->Y_buffer = auto_malloc(period * sizeof(int));
-	ntsc->I_buffer = auto_malloc(period * sizeof(int));
-	ntsc->Q_buffer = auto_malloc(period * sizeof(int));
+	ntsc->I_filter = auto_alloc_array(machine, int, period);
+	ntsc->Q_filter = auto_alloc_array(machine, int, period);
+	ntsc->Y_buffer = auto_alloc_array(machine, int, period);
+	ntsc->I_buffer = auto_alloc_array(machine, int, period);
+	ntsc->Q_buffer = auto_alloc_array(machine, int, period);
 	ntsc_clear(ntsc);
 	for (j=0;j<period;++j)
 	{
@@ -476,21 +476,21 @@ static VIDEO_START( pc_cga )
 	switch(buswidth)
 	{
 		case 8:
-			memory_install_read8_handler(space, 0xb8000, 0xbbfff, 0, 0x04000, SMH_BANK11 );
+			memory_install_read8_handler(space, 0xb8000, 0xbbfff, 0, 0x04000, SMH_BANK(11) );
 			memory_install_write8_handler(space, 0xb8000, 0xbbfff, 0, 0x04000, pc_video_videoram_w );
 			memory_install_read8_handler(spaceio, 0x3d0, 0x3df, 0, 0, pc_cga8_r );
 			memory_install_write8_handler(spaceio, 0x3d0, 0x3df, 0, 0, pc_cga8_w );
 			break;
 
 		case 16:
-			memory_install_read16_handler(space, 0xb8000, 0xbbfff, 0, 0x04000, SMH_BANK11 );
+			memory_install_read16_handler(space, 0xb8000, 0xbbfff, 0, 0x04000, SMH_BANK(11) );
 			memory_install_write16_handler(space, 0xb8000, 0xbbfff, 0, 0x04000, pc_video_videoram16le_w );
 			memory_install_read16_handler(spaceio, 0x3d0, 0x3df, 0, 0, pc_cga16le_r );
 			memory_install_write16_handler(spaceio, 0x3d0, 0x3df, 0, 0, pc_cga16le_w );
 			break;
 
 		case 32:
-			memory_install_read32_handler(space, 0xb8000, 0xbbfff, 0, 0x04000, SMH_BANK11 );
+			memory_install_read32_handler(space, 0xb8000, 0xbbfff, 0, 0x04000, SMH_BANK(11) );
 			memory_install_write32_handler(space, 0xb8000, 0xbbfff, 0, 0x04000, pc_video_videoram32_w );
 			memory_install_read32_handler(spaceio, 0x3d0, 0x3df, 0, 0, pc_cga32le_r );
 			memory_install_write32_handler(spaceio, 0x3d0, 0x3df, 0, 0, pc_cga32le_w );
@@ -503,13 +503,13 @@ static VIDEO_START( pc_cga )
 
 	videoram_size = 0x4000;
 
-	videoram = auto_malloc(videoram_size);
+	videoram = auto_alloc_array(machine, UINT8, videoram_size);
 
 	memory_set_bankptr(machine,11, videoram);
 
 	internal_pc_cga_video_start(machine, M6845_PERSONALITY_GENUINE);
 
-	ntsc_decoder_init( &ntsc, 8, 256 );
+	ntsc_decoder_init( machine, &ntsc, 8, 256 );
 }
 
 
@@ -1637,7 +1637,7 @@ WRITE16_HANDLER ( pc1512_videoram16le_w ) { write16le_with_write8_handler(pc1512
 static VIDEO_START( pc1512 )
 {
 	videoram_size = 0x10000;
-	videoram = auto_malloc( videoram_size );
+	videoram = auto_alloc_array(machine, UINT8, videoram_size );
 	memory_set_bankptr(machine,1,videoram + videoram_offset[0]);
 
 	memset( &pc1512, 0, sizeof ( pc1512 ) );

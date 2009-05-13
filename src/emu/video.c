@@ -434,7 +434,7 @@ static void init_buffered_spriteram(running_machine *machine)
 	assert_always(spriteram_size != 0, "Video buffers spriteram but spriteram_size is 0");
 
 	/* allocate memory for the back buffer */
-	buffered_spriteram = (UINT8 *)auto_malloc(spriteram_size);
+	buffered_spriteram = auto_alloc_array(machine, UINT8, spriteram_size);
 
 	/* register for saving it */
 	state_save_register_global_pointer(machine, buffered_spriteram, spriteram_size);
@@ -443,7 +443,7 @@ static void init_buffered_spriteram(running_machine *machine)
 	if (spriteram_2_size)
 	{
 		/* allocate memory */
-		buffered_spriteram_2 = (UINT8 *)auto_malloc(spriteram_2_size);
+		buffered_spriteram_2 = auto_alloc_array(machine, UINT8, spriteram_2_size);
 
 		/* register for saving it */
 		state_save_register_global_pointer(machine, buffered_spriteram_2, spriteram_2_size);
@@ -1302,20 +1302,6 @@ static DEVICE_STOP( video_screen )
 
 
 /*-------------------------------------------------
-    video_screen_set_info - device set info
-    callback
--------------------------------------------------*/
-
-static DEVICE_SET_INFO( video_screen )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-/*-------------------------------------------------
     video_screen_get_info - device get info
     callback
 -------------------------------------------------*/
@@ -1330,7 +1316,6 @@ DEVICE_GET_INFO( video_screen )
 		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:				info->set_info = DEVICE_SET_INFO_NAME(video_screen); break;
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(video_screen); break;
 		case DEVINFO_FCT_STOP:					info->stop = DEVICE_STOP_NAME(video_screen); break;
 		case DEVINFO_FCT_RESET:					/* Nothing */							break;

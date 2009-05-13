@@ -310,14 +310,14 @@ static VIDEO_EOF(hvyunit)
 
 static WRITE8_HANDLER( trigger_nmi_on_sound_cpu2 )
 {
-	soundlatch_w(space,0,data);
-	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(space, 0, data);
+	cputag_set_input_line(space->machine, "suoundcpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
 static WRITE8_HANDLER( trigger_nmi_on_sub_cpu)
 {
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(space->machine, "sub", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( main_bankswitch_w )
@@ -345,7 +345,7 @@ WRITE8_HANDLER( hu_colorram_w )
 
 static ADDRESS_MAP_START( main_memory, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(1))
 	AM_RANGE(0xc000, 0xcfff) AM_READWRITE( pandora_spriteram_r, pandora_spriteram_w )
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE(1)
@@ -381,7 +381,7 @@ static WRITE8_HANDLER( hu_scrolly_w)
 
 static ADDRESS_MAP_START( sub_memory, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK2)
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(2))
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(hu_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(hu_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0xd000, 0xd1ff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_split2_w) AM_BASE(&paletteram_2)
@@ -418,7 +418,7 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 
 static ADDRESS_MAP_START( sound_memory, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK3)
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(3))
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 ADDRESS_MAP_END
 
@@ -693,5 +693,3 @@ ROM_END
 GAME( 1988, hvyunit, 0,        hvyunit, hvyunit, 0, ROT0, "Kaneko / Taito", "Heavy Unit (World)" ,GAME_NOT_WORKING )
 GAME( 1988, hvyunitj, hvyunit, hvyunit, hvyunit, 0, ROT0, "Kaneko / Taito", "Heavy Unit (Japan, Newer)" ,GAME_NOT_WORKING )
 GAME( 1988, hvyunito, hvyunit, hvyunit, hvyunit, 0, ROT0, "Kaneko / Taito", "Heavy Unit (Japan, Older)" ,GAME_NOT_WORKING )
-
-

@@ -32,34 +32,11 @@ To do:
 #include "machine/eeprom.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
+#include "lordgun.h"
 
-// Variables defined in video:
 
-extern UINT16 *lordgun_vram_0, *lordgun_scroll_x_0, *lordgun_scroll_y_0;
-extern UINT16 *lordgun_vram_1, *lordgun_scroll_x_1, *lordgun_scroll_y_1;
-extern UINT16 *lordgun_vram_2, *lordgun_scroll_x_2, *lordgun_scroll_y_2;
-extern UINT16 *lordgun_vram_3, *lordgun_scroll_x_3, *lordgun_scroll_y_3;
-extern UINT16 *lordgun_scrollram;
 static UINT16 *lordgun_priority_ram, lordgun_priority;
-extern int lordgun_whitescreen;
 
-extern struct
-{
-	int		scr_x,	scr_y;
-	UINT16	hw_x,	hw_y;
-}	lordgun_gun[2];
-
-// Functions defined in video:
-
-WRITE16_HANDLER( lordgun_vram_0_w );
-WRITE16_HANDLER( lordgun_vram_1_w );
-WRITE16_HANDLER( lordgun_vram_2_w );
-WRITE16_HANDLER( lordgun_vram_3_w );
-
-void lordgun_update_gun(running_machine *machine, int i);
-
-VIDEO_START( lordgun );
-VIDEO_UPDATE( lordgun );
 
 /***************************************************************************
 
@@ -163,7 +140,7 @@ static WRITE16_HANDLER( lordgun_soundlatch_w )
 	if (ACCESSING_BITS_0_7)	soundlatch_w (space, 0, (data >> 0) & 0xff);
 	if (ACCESSING_BITS_8_15)	soundlatch2_w(space, 0, (data >> 8) & 0xff);
 
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( lordgun_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -336,8 +313,8 @@ static INPUT_PORTS_START( lordgun )
 	PORT_DIPNAME( 0x08, 0x08, "Coin Slots" )
 	PORT_DIPSETTING(    0x08, "Separate" )
 	PORT_DIPSETTING(    0x00, "Common" )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_SERVICE_NO_TOGGLE( 0x40, IP_ACTIVE_LOW )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
 
@@ -423,7 +400,7 @@ static const ppi8255_interface ppi8255_intf[2] =
 
 static void soundirq(const device_config *device, int state)
 {
-	cpu_set_input_line(device->machine->cpu[1], 0, state);
+	cputag_set_input_line(device->machine, "soundcpu", 0, state);
 }
 
 static const ym3812_interface lordgun_ym3812_interface =

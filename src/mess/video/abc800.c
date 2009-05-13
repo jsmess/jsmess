@@ -203,7 +203,7 @@ static VIDEO_START( abc800m )
 	
 	/* allocate memory */
 
-	state->charram = auto_malloc(ABC800M_CHAR_RAM_SIZE);
+	state->charram = auto_alloc_array(machine, UINT8, ABC800M_CHAR_RAM_SIZE);
 
 	/* find devices */
 
@@ -229,7 +229,7 @@ static VIDEO_START( abc800c )
 	
 	/* allocate memory */
 
-	state->charram = auto_malloc(ABC800C_CHAR_RAM_SIZE);
+	state->charram = auto_alloc_array(machine, UINT8, ABC800C_CHAR_RAM_SIZE);
 
 	/* find memory regions */
 

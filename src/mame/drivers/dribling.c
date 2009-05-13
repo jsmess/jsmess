@@ -99,7 +99,7 @@ static WRITE8_DEVICE_HANDLER( misc_w )
 	/* bit 7 = di */
 	di = (data >> 7) & 1;
 	if (!di)
-		cpu_set_input_line(device->machine->cpu[0], 0, CLEAR_LINE);
+		cputag_set_input_line(device->machine, "maincpu", 0, CLEAR_LINE);
 
 	/* bit 6 = parata */
 
@@ -215,19 +215,11 @@ static const ppi8255_interface ppi8255_intf[2] =
  *
  *************************************/
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x2000, 0x3fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x2000, 0x3fff) AM_WRITE(SMH_RAM) AM_BASE(&videoram)
-	AM_RANGE(0x4000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(dribling_colorram_w) AM_BASE(&colorram)
+static ADDRESS_MAP_START( dribling_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE(&videoram)
+	AM_RANGE(0x4000, 0x7fff) AM_ROM
+	AM_RANGE(0xc000, 0xdfff) AM_RAM_WRITE(dribling_colorram_w) AM_BASE(&colorram)
 ADDRESS_MAP_END
 
 
@@ -297,7 +289,7 @@ static MACHINE_DRIVER_START( dribling )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 5000000)
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(dribling_map,0)
 	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT("screen", dribling_irq_gen)
 
@@ -377,4 +369,3 @@ ROM_END
 
 GAME( 1983, dribling, 0,        dribling, dribling, 0, ROT0, "Model Racing", "Dribbling", GAME_NO_SOUND )
 GAME( 1983, driblino, dribling, dribling, dribling, 0, ROT0, "Model Racing (Olympia license)", "Dribbling (Olympia)", GAME_NO_SOUND )
-

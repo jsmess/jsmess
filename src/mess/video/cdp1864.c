@@ -430,7 +430,7 @@ static DEVICE_START( cdp1864 )
 	assert(cdp1864->screen != NULL);
 
 	/* allocate the temporary bitmap */
-	cdp1864->bitmap = auto_bitmap_alloc(video_screen_get_width(cdp1864->screen), video_screen_get_height(cdp1864->screen), video_screen_get_format(cdp1864->screen));
+	cdp1864->bitmap = auto_bitmap_alloc(device->machine, video_screen_get_width(cdp1864->screen), video_screen_get_height(cdp1864->screen), video_screen_get_format(cdp1864->screen));
 	bitmap_fill(cdp1864->bitmap, 0, CDP1864_BACKGROUND_COLOR_SEQUENCE[cdp1864->bgcolor] + 8);
 
 	/* initialize the palette */

@@ -71,7 +71,7 @@ static TILE_GET_INFO( get_tx_tile_info )
 
 VIDEO_START( blktiger )
 {
-	scroll_ram = auto_malloc(BGRAM_BANK_SIZE * BGRAM_BANKS);
+	scroll_ram = auto_alloc_array(machine, UINT8, BGRAM_BANK_SIZE * BGRAM_BANKS);
 
 	tx_tilemap =    tilemap_create(machine, get_tx_tile_info,tilemap_scan_rows,8,8,32,32);
 	bg_tilemap8x4 = tilemap_create(machine, get_bg_tile_info,bg8x4_scan,          16,16,128,64);
@@ -160,7 +160,7 @@ WRITE8_HANDLER( blktiger_video_control_w )
 	coin_counter_w(1,data & 2);
 
 	/* bit 5 resets the sound CPU */
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* bit 6 flips screen */
 	flip_screen_set(space->machine, data & 0x40);
@@ -244,7 +244,7 @@ VIDEO_UPDATE( blktiger )
 
 VIDEO_EOF( blktiger )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	buffer_spriteram_w(space, 0, 0);
 }

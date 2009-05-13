@@ -275,7 +275,7 @@ void spectrum_plus3_update_memory(running_machine *machine)
 			ram_data = mess_ram + (memory_selection[0] << 14);
 			memory_set_bankptr(machine, 1, ram_data);
 			/* allow writes to 0x0000-0x03fff */
-			memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_BANK1);
+			memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_BANK(1));
 
 			ram_data = mess_ram + (memory_selection[1] << 14);
 			memory_set_bankptr(machine, 2, ram_data);

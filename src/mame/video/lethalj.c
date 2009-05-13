@@ -91,7 +91,7 @@ READ16_HANDLER( lethalj_gun_r )
 VIDEO_START( lethalj )
 {
 	/* allocate video RAM for screen */
-	screenram = auto_malloc(BLITTER_DEST_WIDTH * BLITTER_DEST_HEIGHT * sizeof(screenram[0]));
+	screenram = auto_alloc_array(machine, UINT16, BLITTER_DEST_WIDTH * BLITTER_DEST_HEIGHT);
 
 	/* predetermine blitter info */
 	blitter_base = (UINT16 *)memory_region(machine, "gfx1");
@@ -108,7 +108,7 @@ VIDEO_START( lethalj )
 
 static TIMER_CALLBACK( gen_ext1_int )
 {
-	cpu_set_input_line(machine->cpu[0], 0, ASSERT_LINE);
+	cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 }
 
 
@@ -170,7 +170,7 @@ WRITE16_HANDLER( lethalj_blitter_w )
 
 	/* clear the IRQ on offset 0 */
 	else if (offset == 0)
-		cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 }
 
 

@@ -21,7 +21,7 @@ void abcbus_init(running_machine *machine, const char *cputag, const abcbus_dais
 	/* create a linked list of devices */
 	for ( ; daisy->devtype != NULL; daisy++)
 	{
-		*tailptr = auto_malloc(sizeof(**tailptr));
+		*tailptr = auto_alloc(machine, abcbus_daisy_state);
 		(*tailptr)->next = NULL;
 		(*tailptr)->device = devtag_get_device(machine, device_inherit_tag(tempstring, cputag, daisy->devname));
 		if ((*tailptr)->device == NULL)

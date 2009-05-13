@@ -1255,10 +1255,10 @@ static void install_banks(running_machine *machine, int count, unsigned init)
 	{
 		static const read8_space_func handler[] =
 		{
-			SMH_BANK1,
-			SMH_BANK2,
-			SMH_BANK3,
-			SMH_BANK4,
+			SMH_BANK(1),
+			SMH_BANK(2),
+			SMH_BANK(3),
+			SMH_BANK(4),
 		};
 
 		memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),
@@ -1843,8 +1843,8 @@ static MACHINE_RESET( a2600 )
 		memory_install_read8_handler(space, 0x1fe0, 0x1fe7, 0, 0, modeE7_switch_r);
 		memory_install_write8_handler(space, 0x1fe8, 0x1feb, 0, 0, modeE7_RAM_switch_w);
 		memory_install_read8_handler(space, 0x1fe8, 0x1feb, 0, 0, modeE7_RAM_switch_r);
-		memory_install_write8_handler(space, 0x1800, 0x18ff, 0, 0, SMH_BANK9);
-		memory_install_read8_handler(space, 0x1900, 0x19ff, 0, 0, SMH_BANK9);
+		memory_install_write8_handler(space, 0x1800, 0x18ff, 0, 0, SMH_BANK(9));
+		memory_install_read8_handler(space, 0x1900, 0x19ff, 0, 0, SMH_BANK(9));
 		memory_set_bankptr(machine, 9, extra_RAM + 4 * 256 );
 		break;
 
@@ -1916,24 +1916,24 @@ static MACHINE_RESET( a2600 )
 
 	if (banking_mode == modeFA)
 	{
-		memory_install_write8_handler(space, 0x1000, 0x10ff, 0, 0, SMH_BANK9);
-		memory_install_read8_handler(space, 0x1100, 0x11ff, 0, 0, SMH_BANK9);
+		memory_install_write8_handler(space, 0x1000, 0x10ff, 0, 0, SMH_BANK(9));
+		memory_install_read8_handler(space, 0x1100, 0x11ff, 0, 0, SMH_BANK(9));
 
 		memory_set_bankptr(machine,9, extra_RAM);
 	}
 
 	if (banking_mode == modeCV)
 	{
-		memory_install_write8_handler(space, 0x1400, 0x17ff, 0, 0, SMH_BANK9);
-		memory_install_read8_handler(space, 0x1000, 0x13ff, 0, 0, SMH_BANK9);
+		memory_install_write8_handler(space, 0x1400, 0x17ff, 0, 0, SMH_BANK(9));
+		memory_install_read8_handler(space, 0x1000, 0x13ff, 0, 0, SMH_BANK(9));
 
 		memory_set_bankptr(machine,9, extra_RAM);
 	}
 
 	if (chip)
 	{
-		memory_install_write8_handler(space, 0x1000, 0x107f, 0, 0, SMH_BANK9);
-		memory_install_read8_handler(space, 0x1080, 0x10ff, 0, 0, SMH_BANK9);
+		memory_install_write8_handler(space, 0x1000, 0x107f, 0, 0, SMH_BANK(9));
+		memory_install_read8_handler(space, 0x1080, 0x10ff, 0, 0, SMH_BANK(9));
 
 		memory_set_bankptr(machine,9, extra_RAM);
 	}

@@ -43,7 +43,7 @@ static UINT8 *				hsyncram;
 
 VIDEO_START( beathead )
 {
-	hsyncram = auto_malloc(0x800);
+	hsyncram = auto_alloc_array(machine, UINT8, 0x800);
 }
 
 
@@ -114,7 +114,7 @@ WRITE32_HANDLER( beathead_finescroll_w )
 	if ((oldword & 8) && !(newword & 8) && video_screen_get_vpos(space->machine->primary_screen) != 261)
 	{
 		logerror("Suspending time! (scanline = %d)\n", video_screen_get_vpos(space->machine->primary_screen));
-		cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_HALT, ASSERT_LINE);
+		cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_HALT, ASSERT_LINE);
 	}
 }
 

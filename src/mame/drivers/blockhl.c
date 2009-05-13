@@ -62,7 +62,7 @@ static WRITE8_HANDLER( bankedram_w )
 
 static WRITE8_HANDLER( blockhl_sh_irqtrigger_w )
 {
-	cpu_set_input_line_and_vector(space->machine->cpu[1], 0, HOLD_LINE, 0xff);
+	cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff);
 }
 
 
@@ -79,7 +79,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(K052109_051960_r, K052109_051960_w)
 	AM_RANGE(0x4000, 0x57ff) AM_RAM
 	AM_RANGE(0x5800, 0x5fff) AM_READWRITE(bankedram_r, bankedram_w) AM_BASE(&ram)
-	AM_RANGE(0x6000, 0x7fff) AM_READWRITE(SMH_BANK1, SMH_ROM)
+	AM_RANGE(0x6000, 0x7fff) AM_READWRITE(SMH_BANK(1), SMH_ROM)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -274,7 +274,7 @@ static MACHINE_RESET( blockhl )
 {
 	UINT8 *RAM = memory_region(machine, "maincpu");
 
-	konami_configure_set_lines(machine->cpu[0], blockhl_banking);
+	konami_configure_set_lines(cputag_get_cpu(machine, "maincpu"), blockhl_banking);
 
 	paletteram = &RAM[0x18000];
 }

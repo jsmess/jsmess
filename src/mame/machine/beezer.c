@@ -51,9 +51,9 @@ static READ8_DEVICE_HANDLER( b_via_0_pb_r )
 static WRITE8_DEVICE_HANDLER( b_via_0_pa_w )
 {
 	if ((data & 0x08) == 0)
-		cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+		cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 	else
-		cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
+		cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
 
 	if ((data & 0x04) == 0)
 	{
@@ -117,9 +117,7 @@ WRITE8_HANDLER( beezer_bankswitch_w )
 	else
 	{
 		UINT8 *rom = memory_region(space->machine, "maincpu") + 0x10000;
-		memory_install_readwrite8_handler(space, 0xc000, 0xcfff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite8_handler(space, 0xc000, 0xcfff, 0, 0, (read8_space_func)SMH_BANK(1), (write8_space_func)SMH_BANK(1));
 		memory_set_bankptr(space->machine, 1, rom + (data & 0x07) * 0x2000 + ((data & 0x08) ? 0x1000: 0));
 	}
 }
-
-

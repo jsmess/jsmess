@@ -105,7 +105,7 @@ void sprtmtch_update_irq(running_machine *machine)
 	int irq	=	((dynax_sound_irq)   ? 0x08 : 0) |
 				((dynax_vblank_irq)  ? 0x10 : 0) |
 				((dynax_blitter_irq) ? 0x20 : 0) ;
-	cpu_set_input_line_and_vector(machine->cpu[0], 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); /* rst $xx */
+	cputag_set_input_line_and_vector(machine, "maincpu", 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); /* rst $xx */
 }
 
 static WRITE8_HANDLER( dynax_vblank_ack_w )
@@ -145,7 +145,7 @@ void jantouki_update_irq(running_machine *machine)
 	int irq	=	((dynax_blitter_irq)	? 0x08 : 0) |
 				((dynax_blitter2_irq)	? 0x10 : 0) |
 				((dynax_vblank_irq)		? 0x20 : 0) ;
-	cpu_set_input_line_and_vector(machine->cpu[0], 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); /* rst $xx */
+	cputag_set_input_line_and_vector(machine, "maincpu", 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); /* rst $xx */
 }
 
 static WRITE8_HANDLER( jantouki_vblank_ack_w )
@@ -185,7 +185,7 @@ static void jantouki_sound_update_irq(running_machine *machine)
 	int irq	=	((dynax_sound_irq)			? 0x08 : 0) |
 				((dynax_soundlatch_irq)		? 0x10 : 0) |
 				((dynax_sound_vblank_irq)	? 0x20 : 0) ;
-	cpu_set_input_line_and_vector(machine->cpu[1], 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); /* rst $xx */
+	cputag_set_input_line_and_vector(machine, "soundcpu", 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); /* rst $xx */
 }
 
 static INTERRUPT_GEN( jantouki_sound_vblank_interrupt )
@@ -408,7 +408,7 @@ static void adpcm_int(const device_config *device)
 	if (toggle)
 	{
 		if (resetkludge)	// don't know what's wrong, but NMIs when the 5205 is reset make the game crash
-		cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 static void adpcm_int_cpu1(const device_config *device)
@@ -422,7 +422,7 @@ static void adpcm_int_cpu1(const device_config *device)
 	if (toggle)
 	{
 		if (resetkludge)	// don't know what's wrong, but NMIs when the 5205 is reset make the game crash
-		cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);	// cpu1
+		cputag_set_input_line(device->machine, "soundcpu", INPUT_LINE_NMI, PULSE_LINE);	// cpu1
 	}
 }
 
@@ -463,14 +463,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( hnoridur_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x6fff ) AM_ROM
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE( 0x8000, 0xffff ) AM_READWRITE(SMH_BANK1, hnoridur_palette_w)
+	AM_RANGE( 0x8000, 0xffff ) AM_READWRITE(SMH_BANK(1), hnoridur_palette_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcnpshnt_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
 	AM_RANGE( 0x6000, 0x6fff ) AM_RAM
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE( 0x8000, 0xffff ) AM_READWRITE(SMH_BANK1, hnoridur_palette_w)
+	AM_RANGE( 0x8000, 0xffff ) AM_READWRITE(SMH_BANK(1), hnoridur_palette_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nanajign_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -3980,7 +3980,7 @@ MACHINE_DRIVER_END
 void mjelctrn_update_irq(running_machine *machine)
 {
 	dynax_blitter_irq = 1;
-	cpu_set_input_line_and_vector(machine->cpu[0], 0, HOLD_LINE, 0xfa);
+	cputag_set_input_line_and_vector(machine, "maincpu", 0, HOLD_LINE, 0xfa);
 }
 
 static INTERRUPT_GEN( mjelctrn_vblank_interrupt )
@@ -4014,7 +4014,7 @@ MACHINE_DRIVER_END
 void neruton_update_irq(running_machine *machine)
 {
 	dynax_blitter_irq = 1;
-	cpu_set_input_line_and_vector(machine->cpu[0], 0, HOLD_LINE, 0x42);
+	cputag_set_input_line_and_vector(machine, "maincpu", 0, HOLD_LINE, 0x42);
 }
 
 static INTERRUPT_GEN( neruton_vblank_interrupt )
@@ -4543,7 +4543,7 @@ static DRIVER_INIT( maya )
 	}
 
 	/* Address lines scrambling on the blitter data roms */
-	rom = malloc_or_die(0xc0000);
+	rom = alloc_array_or_die(UINT8, 0xc0000);
 	memcpy(rom, gfx, 0xc0000);
 	for (i = 0; i < 0xc0000; i++)
 		gfx[i] = rom[BITSWAP24(i,23,22,21,20,19,18,14,15, 16,17,13,12,11,10,9,8, 7,6,5,4,3,2,1,0)];
@@ -5250,7 +5250,7 @@ static DRIVER_INIT( mjelct3 )
 	int i;
 	UINT8	*rom = memory_region(machine, "maincpu");
 	size_t  size = memory_region_length(machine, "maincpu");
-	UINT8	*rom1 = malloc_or_die(size);
+	UINT8	*rom1 = alloc_array_or_die(UINT8, size);
 
 		memcpy(rom1,rom,size);
 		for (i = 0; i < size; i++)
@@ -5263,7 +5263,7 @@ static DRIVER_INIT( mjelct3a )
 	int i,j;
 	UINT8	*rom = memory_region(machine, "maincpu");
 	size_t  size = memory_region_length(machine, "maincpu");
-	UINT8	*rom1 = malloc_or_die(size);
+	UINT8	*rom1 = alloc_array_or_die(UINT8, size);
 
 		memcpy(rom1,rom,size);
 		for (i = 0; i < size; i++)
@@ -5600,7 +5600,7 @@ ROM_END
 
 static DRIVER_INIT( mjreach )
 {
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x10060, 0x10060, 0, 0, yarunara_flipscreen_w);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x10060, 0x10060, 0, 0, yarunara_flipscreen_w);
 }
 
 /***************************************************************************

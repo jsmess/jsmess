@@ -108,8 +108,7 @@ struct mscrtc6845 *mscrtc6845_init(running_machine *machine, const struct mscrtc
 	struct mscrtc6845 *crtc;
 	int idx;
 
-	crtc = auto_malloc(sizeof(struct mscrtc6845));
-	memset(crtc, 0, sizeof(*crtc));
+	crtc = auto_alloc_clear(machine, struct mscrtc6845);
 	crtc->cursor_time = attotime_to_double(timer_get_time(machine));
 	crtc->config = *config;
 	mscrtc6845 = crtc;

@@ -16,7 +16,7 @@
 
 
 /* local prototypes */
-static void poly17_init(void);
+static void poly17_init(running_machine *machine);
 static void counter_set_out(running_machine *machine, int which, int gate);
 static TIMER_CALLBACK( counter_callback );
 static TIMER_CALLBACK( clock_counter_0_ff );
@@ -103,7 +103,7 @@ static UINT8 grudge_last_steering[3];
 
 static TIMER_CALLBACK( irq_off )
 {
-	cpu_set_input_line(machine->cpu[0], M6809_IRQ_LINE, CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -116,7 +116,7 @@ static TIMER_CALLBACK( interrupt_timer )
 		timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, param + 64, 0), param + 64);
 
 	/* IRQ starts on scanline 0, 64, 128, etc. */
-	cpu_set_input_line(machine->cpu[0], M6809_IRQ_LINE, ASSERT_LINE);
+	cputag_set_input_line(machine, "maincpu", M6809_IRQ_LINE, ASSERT_LINE);
 
 	/* it will turn off on the next HBLANK */
 	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, param, BALSENTE_HBSTART), NULL, 0, irq_off);
@@ -148,11 +148,11 @@ static TIMER_CALLBACK( interrupt_timer )
 
 MACHINE_RESET( balsente )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int numbanks, i;
 
 	/* create the polynomial tables */
-	poly17_init();
+	poly17_init(machine);
 
 	/* reset counters; counter 2's gate is tied high */
 	memset(counter, 0, sizeof(counter));
@@ -199,7 +199,7 @@ MACHINE_RESET( balsente )
 	memory_configure_bank(machine, 2, 0, numbanks, &memory_region(machine, "maincpu")[0x12000], 0x6000);
 	memory_set_bank(space->machine, 1, 0);
 	memory_set_bank(space->machine, 2, 0);
-	device_reset(machine->cpu[0]);
+	device_reset(cputag_get_cpu(machine, "maincpu"));
 
 	/* start a timer to generate interrupts */
 	scanline_timer = timer_alloc(machine, interrupt_timer, NULL);
@@ -267,14 +267,14 @@ MACHINE_RESET( balsente )
 #define POLY17_SHR	10
 #define POLY17_ADD	0x18000
 
-static void poly17_init(void)
+static void poly17_init(running_machine *machine)
 {
 	UINT32 i, x = 0;
 	UINT8 *p, *r;
 
 	/* allocate memory */
-	p = poly17 = auto_malloc(POLY17_SIZE + 1);
-	r = rand17 = auto_malloc(POLY17_SIZE + 1);
+	p = poly17 = auto_alloc_array(machine, UINT8, POLY17_SIZE + 1);
+	r = rand17 = auto_alloc_array(machine, UINT8, POLY17_SIZE + 1);
 
 	/* generate the polynomial */
 	for (i = 0; i < POLY17_SIZE; i++)
@@ -475,12 +475,12 @@ static void m6850_update_io(running_machine *machine)
 	/* apply the change */
 	if (new_state && !(m6850_status & 0x80))
 	{
-		cpu_set_input_line(machine->cpu[0], M6809_FIRQ_LINE, ASSERT_LINE);
+		cputag_set_input_line(machine, "maincpu", M6809_FIRQ_LINE, ASSERT_LINE);
 		m6850_status |= 0x80;
 	}
 	else if (!new_state && (m6850_status & 0x80))
 	{
-		cpu_set_input_line(machine->cpu[0], M6809_FIRQ_LINE, CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", M6809_FIRQ_LINE, CLEAR_LINE);
 		m6850_status &= ~0x80;
 	}
 
@@ -493,12 +493,12 @@ static void m6850_update_io(running_machine *machine)
 	/* apply the change */
 	if (new_state && !(m6850_sound_status & 0x80))
 	{
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, ASSERT_LINE);
+		cputag_set_input_line(machine, "audiocpu", INPUT_LINE_NMI, ASSERT_LINE);
 		m6850_sound_status |= 0x80;
 	}
 	else if (!new_state && (m6850_sound_status & 0x80))
 	{
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
+		cputag_set_input_line(machine, "audiocpu", INPUT_LINE_NMI, CLEAR_LINE);
 		m6850_sound_status &= ~0x80;
 	}
 }
@@ -784,7 +784,7 @@ static void counter_set_out(running_machine *machine, int which, int out)
 {
 	/* OUT on counter 2 is hooked to the /INT line on the Z80 */
 	if (which == 2)
-		cpu_set_input_line(machine->cpu[1], 0, out ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(machine, "audiocpu", 0, out ? ASSERT_LINE : CLEAR_LINE);
 
 	/* OUT on counter 0 is hooked to the GATE line on counter 1 */
 	else if (which == 0)

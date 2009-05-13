@@ -339,7 +339,7 @@ static void orionz80_switch_bank(running_machine *machine)
 	bank_select = (orionz80_dispatcher & 0x0c) >> 2;
 	segment_select = orionz80_dispatcher & 0x03;
 	
-	memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_BANK1);
+	memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_BANK(1));
 	if ((orionz80_dispatcher & 0x80)==0) 
 	{ // dispatcher on
 		memory_set_bankptr(machine, 1, mess_ram + 0x10000 * bank_select + segment_select * 0x4000 );		
@@ -397,8 +397,8 @@ MACHINE_RESET ( orionz80 )
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	
 	memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
-	memory_install_write8_handler(space, 0x4000, 0xefff, 0, 0, SMH_BANK2);
-	memory_install_write8_handler(space, 0xf000, 0xf3ff, 0, 0, SMH_BANK3);
+	memory_install_write8_handler(space, 0x4000, 0xefff, 0, 0, SMH_BANK(2));
+	memory_install_write8_handler(space, 0xf000, 0xf3ff, 0, 0, SMH_BANK(3));
 
 	memory_install_write8_handler(space, 0xf400, 0xf4ff, 0, 0, orion128_system_w);
 	memory_install_write8_handler(space, 0xf500, 0xf5ff, 0, 0, orion128_romdisk_w);
@@ -503,14 +503,14 @@ static void orionpro_bank_switch(running_machine *machine)
 	{
 		page = orionpro_128_page & 7;
 	}
-	memory_install_write8_handler(space, 0x0000, 0x1fff, 0, 0, SMH_BANK1);
-	memory_install_write8_handler(space, 0x2000, 0x3fff, 0, 0, SMH_BANK2);
-	memory_install_write8_handler(space, 0x4000, 0x7fff, 0, 0, SMH_BANK3);
-	memory_install_write8_handler(space, 0x8000, 0xbfff, 0, 0, SMH_BANK4);
-	memory_install_write8_handler(space, 0xc000, 0xefff, 0, 0, SMH_BANK5);
-	memory_install_write8_handler(space, 0xf000, 0xf3ff, 0, 0, SMH_BANK6);
-	memory_install_write8_handler(space, 0xf400, 0xf7ff, 0, 0, SMH_BANK7);
-	memory_install_write8_handler(space, 0xf800, 0xffff, 0, 0, SMH_BANK8);
+	memory_install_write8_handler(space, 0x0000, 0x1fff, 0, 0, SMH_BANK(1));
+	memory_install_write8_handler(space, 0x2000, 0x3fff, 0, 0, SMH_BANK(2));
+	memory_install_write8_handler(space, 0x4000, 0x7fff, 0, 0, SMH_BANK(3));
+	memory_install_write8_handler(space, 0x8000, 0xbfff, 0, 0, SMH_BANK(4));
+	memory_install_write8_handler(space, 0xc000, 0xefff, 0, 0, SMH_BANK(5));
+	memory_install_write8_handler(space, 0xf000, 0xf3ff, 0, 0, SMH_BANK(6));
+	memory_install_write8_handler(space, 0xf400, 0xf7ff, 0, 0, SMH_BANK(7));
+	memory_install_write8_handler(space, 0xf800, 0xffff, 0, 0, SMH_BANK(8));
 	
 	
 	if ((orionpro_dispatcher & 0x01)==0x00) 

@@ -2630,22 +2630,22 @@ static void ti99_4p_mapper_init(running_machine *machine)
 	int i;
 
 	/* Not required at run-time */
-	/*memory_install_read16_handler(space, 0x2000, 0x2fff, SMH_BANK3);
-	memory_install_write16_handler(space, 0x2000, 0x2fff, SMH_BANK3);
-	memory_install_read16_handler(space, 0x3000, 0x3fff, SMH_BANK4);
-	memory_install_write16_handler(space, 0x3000, 0x3fff, SMH_BANK4);
-	memory_install_read16_handler(space, 0xa000, 0xafff, SMH_BANK5);
-	memory_install_write16_handler(space, 0xa000, 0xafff, SMH_BANK5);
-	memory_install_read16_handler(space, 0xb000, 0xbfff, SMH_BANK6);
-	memory_install_write16_handler(space, 0xb000, 0xbfff, SMH_BANK6);
-	memory_install_read16_handler(space, 0xc000, 0xcfff, SMH_BANK7);
-	memory_install_write16_handler(space, 0xc000, 0xcfff, SMH_BANK7);
-	memory_install_read16_handler(space, 0xd000, 0xdfff, SMH_BANK8);
-	memory_install_write16_handler(space, 0xd000, 0xdfff, SMH_BANK8);
-	memory_install_read16_handler(space, 0xe000, 0xefff, SMH_BANK9);
-	memory_install_write16_handler(space, 0xe000, 0xefff, SMH_BANK9);
-	memory_install_read16_handler(space, 0xf000, 0xffff, SMH_BANK10);
-	memory_install_write16_handler(space, 0xf000, 0xffff, SMH_BANK10);*/
+	/*memory_install_read16_handler(space, 0x2000, 0x2fff, SMH_BANK(3));
+	memory_install_write16_handler(space, 0x2000, 0x2fff, SMH_BANK(3));
+	memory_install_read16_handler(space, 0x3000, 0x3fff, SMH_BANK(4));
+	memory_install_write16_handler(space, 0x3000, 0x3fff, SMH_BANK(4));
+	memory_install_read16_handler(space, 0xa000, 0xafff, SMH_BANK(5));
+	memory_install_write16_handler(space, 0xa000, 0xafff, SMH_BANK(5));
+	memory_install_read16_handler(space, 0xb000, 0xbfff, SMH_BANK(6));
+	memory_install_write16_handler(space, 0xb000, 0xbfff, SMH_BANK(6));
+	memory_install_read16_handler(space, 0xc000, 0xcfff, SMH_BANK(7));
+	memory_install_write16_handler(space, 0xc000, 0xcfff, SMH_BANK(7));
+	memory_install_read16_handler(space, 0xd000, 0xdfff, SMH_BANK(8));
+	memory_install_write16_handler(space, 0xd000, 0xdfff, SMH_BANK(8));
+	memory_install_read16_handler(space, 0xe000, 0xefff, SMH_BANK(9));
+	memory_install_write16_handler(space, 0xe000, 0xefff, SMH_BANK(9));
+	memory_install_read16_handler(space, 0xf000, 0xffff, SMH_BANK(10));
+	memory_install_write16_handler(space, 0xf000, 0xffff, SMH_BANK(10));*/
 
 	ti99_peb_set_16bit_card_handlers(0x1e00, & ti99_4p_mapper_handlers);
 

@@ -220,7 +220,7 @@ void *restrack_register_object(object_type type, void *ptr, size_t size, const c
     freeing memory
 -------------------------------------------------*/
 
-void *auto_malloc_file_line(size_t size, const char *file, int line)
+void *auto_malloc_file_line(running_machine *machine, size_t size, const char *file, int line)
 {
 	void *result = pool_malloc_file_line(current_pool(), size, file, line);
 #ifdef MAME_DEBUG
@@ -235,7 +235,7 @@ void *auto_malloc_file_line(size_t size, const char *file, int line)
     freeing memory
 -------------------------------------------------*/
 
-void *auto_realloc_file_line(void *ptr, size_t size, const char *file, int line)
+void *auto_realloc_file_line(running_machine *machine, void *ptr, size_t size, const char *file, int line)
 {
 	object_pool *pool = current_pool();
 	if (ptr != NULL)
@@ -259,7 +259,7 @@ void *auto_realloc_file_line(void *ptr, size_t size, const char *file, int line)
     string
 -------------------------------------------------*/
 
-char *auto_strdup_file_line(const char *str, const char *file, int line)
+char *auto_strdup_file_line(running_machine *machine, const char *str, const char *file, int line)
 {
 	return pool_strdup_file_line(current_pool(), str, file, line);
 }
@@ -270,9 +270,9 @@ char *auto_strdup_file_line(const char *str, const char *file, int line)
     auto-freeing string if str is null
 -------------------------------------------------*/
 
-char *auto_strdup_allow_null_file_line(const char *str, const char *file, int line)
+char *auto_strdup_allow_null_file_line(running_machine *machine, const char *str, const char *file, int line)
 {
-	return (str != NULL) ? auto_strdup_file_line(str, file, line) : NULL;
+	return (str != NULL) ? auto_strdup_file_line(machine, str, file, line) : NULL;
 }
 
 
@@ -281,7 +281,7 @@ char *auto_strdup_allow_null_file_line(const char *str, const char *file, int li
     auto-freeing astring
 -------------------------------------------------*/
 
-astring *auto_astring_alloc_file_line(const char *file, int line)
+astring *auto_astring_alloc_file_line(running_machine *machine, const char *file, int line)
 {
 	return (astring *)restrack_register_object(OBJTYPE_ASTRING, astring_alloc(), 0, file, line);
 }
@@ -310,3 +310,7 @@ static void bitmap_destructor(void *object, size_t size)
 }
 
 
+void *malloc_or_die_file_line(size_t size, const char *file, int line)
+{
+	return malloc(size);
+}

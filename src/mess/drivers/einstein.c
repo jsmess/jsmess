@@ -267,10 +267,10 @@ static const mc6845_interface einstein_crtc6845_interface = {
 };
 
 /* 80 column card init */
-static void	einstein_80col_init(void)
+static void	einstein_80col_init(running_machine *machine)
 {
 	/* 2K RAM */
-	einstein_80col_ram = auto_malloc(2048);
+	einstein_80col_ram = auto_alloc_array(machine, char, 2048);
 
 	einstein_80col_state=(1<<2)|(1<<1);
 }
@@ -784,8 +784,8 @@ static READ8_HANDLER(einstein_psg_r)
 
 
 static ADDRESS_MAP_START( einstein_mem , ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x01fff) AM_READWRITE(SMH_BANK1, SMH_BANK3)
-	AM_RANGE(0x2000, 0x0ffff) AM_READWRITE(SMH_BANK2, SMH_BANK4)
+	AM_RANGE(0x0000, 0x01fff) AM_READWRITE(SMH_BANK(1), SMH_BANK(3))
+	AM_RANGE(0x2000, 0x0ffff) AM_READWRITE(SMH_BANK(2), SMH_BANK(4))
 ADDRESS_MAP_END
 
 
@@ -1400,7 +1400,7 @@ static MACHINE_RESET( einstein )
 static MACHINE_RESET( einstein2 )
 {
 	MACHINE_RESET_CALL(einstein);
-	einstein_80col_init();
+	einstein_80col_init(machine);
 }
 
 static INPUT_PORTS_START(einstein)

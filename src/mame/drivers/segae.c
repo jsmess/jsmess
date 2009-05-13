@@ -316,31 +316,19 @@ static struct sms_vdp *md_sms_vdp;
 #define SMS_VDP_VRAM(address) chip->vram[(address)&0x3fff]
 
 #ifdef UNUSED_FUNCTION
-static ADDRESS_MAP_START( sms_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-//  AM_RANGE(0x0000 , 0xbfff) AM_READ(SMH_ROM)
-//  AM_RANGE(0xc000 , 0xdfff) AM_READ(SMH_RAM) AM_MIRROR(0x2000)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sms_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-//  AM_RANGE(0x0000 , 0xbfff) AM_WRITE(SMH_ROM)
-//  AM_RANGE(0xc000 , 0xdfff) AM_WRITE(SMH_RAM) AM_MIRROR(0x2000)
+static ADDRESS_MAP_START( sms_map, ADDRESS_SPACE_PROGRAM, 8 )
+//  AM_RANGE(0x0000 , 0xbfff) AM_ROM
+//  AM_RANGE(0xc000 , 0xdfff) AM_RAM AM_MIRROR(0x2000)
 ADDRESS_MAP_END
 #endif
 
 /* we have to fill in the ROM addresses for systeme due to the encrypted games */
-static ADDRESS_MAP_START( systeme_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)				/* Fixed ROM */
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)				/* Banked ROM */
+static ADDRESS_MAP_START( systeme_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM								/* Fixed ROM */
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)						/* Banked ROM */
 
-//  AM_RANGE(0x0000 , 0xbfff) AM_READ(SMH_ROM)
-//  AM_RANGE(0xc000 , 0xdfff) AM_READ(SMH_RAM) AM_MIRROR(0x2000)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( systeme_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)				/* Fixed ROM */
-
-//  AM_RANGE(0x0000 , 0xbfff) AM_WRITE(SMH_ROM)
-//  AM_RANGE(0xc000 , 0xdfff) AM_WRITE(SMH_RAM) AM_MIRROR(0x2000)
+//  AM_RANGE(0x0000 , 0xbfff) AM_ROM
+//  AM_RANGE(0xc000 , 0xdfff) AM_RAM     AM_MIRROR(0x2000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sms_io_map, ADDRESS_SPACE_IO, 8 )
@@ -577,20 +565,20 @@ static int sms_vdp_null_irq_callback(running_machine *machine, int status)
 
 static int sms_vdp_cpu0_irq_callback(running_machine *machine, int status)
 {
-	if (status==1)
-		cpu_set_input_line(machine->cpu[0],0,HOLD_LINE);
+	if (status == 1)
+		cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
 	else
-		cpu_set_input_line(machine->cpu[0],0,CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
 
 	return 0;
 }
 
 static int sms_vdp_cpu1_irq_callback(running_machine *machine, int status)
 {
-	if (status==1)
-		cpu_set_input_line(machine->cpu[1],0,HOLD_LINE);
+	if (status == 1)
+		cputag_set_input_line(machine, "genesis_snd_z80", 0, HOLD_LINE);
 	else
-		cpu_set_input_line(machine->cpu[1],0,CLEAR_LINE);
+		cputag_set_input_line(machine, "genesis_snd_z80", 0, CLEAR_LINE);
 
 	return 0;
 }
@@ -598,10 +586,10 @@ static int sms_vdp_cpu1_irq_callback(running_machine *machine, int status)
 
 static int sms_vdp_cpu2_irq_callback(running_machine *machine, int status)
 {
-	if (status==1)
-		cpu_set_input_line(machine->cpu[2],0,HOLD_LINE);
+	if (status == 1)
+		cputag_set_input_line(machine, "mtbios", 0, HOLD_LINE);
 	else
-		cpu_set_input_line(machine->cpu[2],0,CLEAR_LINE);
+		cputag_set_input_line(machine, "mtbios", 0, CLEAR_LINE);
 
 	return 0;
 }
@@ -658,8 +646,7 @@ static void *start_vdp(running_machine *machine, int type)
 {
 	struct sms_vdp *chip;
 
-	chip = auto_malloc(sizeof(*chip));
-	memset(chip, 0, sizeof(*chip));
+	chip = auto_alloc_clear(machine, struct sms_vdp);
 
 	chip->vdp_type = type;
 
@@ -684,35 +671,30 @@ static void *start_vdp(running_machine *machine, int type)
 	chip->regs[0xa] = 0;
 	/* b-f don't matter */
 	chip->readbuf = 0;
-	chip->vram = auto_malloc(0x4000);
-	memset(chip->vram,0x00,0x4000);
+	chip->vram = auto_alloc_array_clear(machine, UINT8, 0x4000);
 
 	//printf("%d\n", (*chip->set_irq)(machine, 200));
 
 	if (chip->vdp_type==GG_VDP)
 	{
-		chip->cram = auto_malloc(0x0040);
-		memset(chip->cram,0x00,0x0040);
-		chip->cram_mamecolours = auto_malloc(0x0080);
-		memset(chip->cram_mamecolours,0x00,0x0080);
+		chip->cram = auto_alloc_array_clear(machine, UINT8, 0x0040);
+		chip->cram_mamecolours = auto_alloc_array_clear(machine, UINT16, 0x0080/2);
 		chip->gg_cram_latch = 0;
 	}
 	else
 	{
-		chip->cram = auto_malloc(0x0020);
-		memset(chip->cram,0x00,0x0020);
-		chip->cram_mamecolours = auto_malloc(0x0040);
-		memset(chip->cram_mamecolours,0x00,0x0040);
+		chip->cram = auto_alloc_array_clear(machine, UINT8, 0x0020);
+		chip->cram_mamecolours = auto_alloc_array(machine, UINT16, 0x0040/2);
 	}
 
-	chip->tile_renderline = auto_malloc(256+8);
+	chip->tile_renderline = auto_alloc_array(machine, UINT8, 256+8);
 	memset(chip->tile_renderline,0x00,256+8);
 
-	chip->sprite_renderline = auto_malloc(256+32);
+	chip->sprite_renderline = auto_alloc_array(machine, UINT8, 256+32);
 	memset(chip->sprite_renderline,0x00,256+32);
 
 	chip->writemode = 0;
-	chip->r_bitmap = auto_bitmap_alloc(256, 256, BITMAP_FORMAT_RGB15);
+	chip->r_bitmap = auto_bitmap_alloc(machine, 256, 256, BITMAP_FORMAT_RGB15);
 
 	chip->sms_scanline_timer = timer_alloc(machine, sms_scanline_timer_callback, chip);
 
@@ -1279,7 +1261,7 @@ static TIMER_CALLBACK( sms_scanline_timer_callback )
        The position to get the H position also has to compensate for a few errors
     */
 //  printf("num %d\n",num );
-	struct sms_vdp *chip = ptr;
+	struct sms_vdp *chip = (struct sms_vdp *)ptr;
 
 	if (chip->sms_scanline_counter<(chip->sms_total_scanlines-1))
 	{
@@ -1456,7 +1438,7 @@ static void end_of_frame(running_machine *machine, struct sms_vdp *chip)
 VIDEO_EOF(sms)
 {
 	end_of_frame(machine, vdp1);
-	//if (SMS_PAUSE_BUTTON) cpu_set_input_line(machine->cpu[0],INPUT_LINE_NMI,PULSE_LINE); // not on systeme!!!
+	//if (SMS_PAUSE_BUTTON) cputag_set_input_line(machine, , "maincpu", INPUT_LINE_NMI, PULSE_LINE); // not on systeme!!!
 }
 #endif
 
@@ -1846,7 +1828,7 @@ INPUT_PORTS_END
 
 
 ROM_START( hangonjr )
-	ROM_REGION( 0x30000, "z80", 0 )
+	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "rom5.ic7",	0x00000, 0x08000, CRC(d63925a7) SHA1(699f222d9712fa42651c753fe75d7b60e016d3ad) ) /* Fixed Code */
 
 	/* The following are 8 0x4000 banks that get mapped to reads from 0x8000 - 0xbfff */
@@ -1857,7 +1839,7 @@ ROM_START( hangonjr )
 ROM_END
 
 ROM_START( ridleofp )
-	ROM_REGION( 0x30000, "z80", 0 )
+	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "epr10426.bin",	0x00000, 0x08000, CRC(4404c7e7) SHA1(555f44786976a009d96a6395c9173929ad6138a7) ) /* Fixed Code */
 
 	/* The following are 8 0x4000 banks that get mapped to reads from 0x8000 - 0xbfff */
@@ -1868,7 +1850,7 @@ ROM_START( ridleofp )
 ROM_END
 
 ROM_START( transfrm )
-	ROM_REGION( 0x30000, "z80", 0 )
+	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "ic7.top",	0x00000, 0x08000, CRC(ccf1d123) SHA1(5ade9b00e2a36d034fafdf1902d47a9a00e96fc4) ) /* Fixed Code */
 
 	/* The following are 8 0x4000 banks that get mapped to reads from 0x8000 - 0xbfff */
@@ -1879,7 +1861,7 @@ ROM_START( transfrm )
 ROM_END
 
 ROM_START( astrofl )
-	ROM_REGION( 0x50000, "z80", 0 )
+	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "epr-7723.ic7",	0x00000, 0x08000, CRC(66061137) SHA1(cb6a2c7864f9f87bbedfd4b1448ad6c2de65d6ca) ) /* encrypted */
 
 	/* The following are 8 0x4000 banks that get mapped to reads from 0x8000 - 0xbfff */
@@ -1891,7 +1873,7 @@ ROM_END
 
 
 ROM_START( tetrisse )
-	ROM_REGION( 0x30000, "z80", 0 )
+	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "epr12213.7",	0x00000, 0x08000, CRC(ef3c7a38) SHA1(cbb91aef330ab1a37d3e21ecf1d008143d0dd7ec) ) /* Fixed Code */
 
 	/* The following are 8 0x4000 banks that get mapped to reads from 0x8000 - 0xbfff */
@@ -1903,7 +1885,7 @@ ROM_END
 
 
 ROM_START( fantzn2 )
-	ROM_REGION( 0x50000, "z80", 0 )
+	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "epr-11416.ic7",	0x00000, 0x08000, CRC(76db7b7b) SHA1(d60e2961fc893dcb4445aed5f67515cbd25b610f) )	/* encrypted */
 
 	ROM_LOAD( "epr-11415.ic5",	0x10000, 0x10000, CRC(57b45681) SHA1(1ae6d0d58352e246a4ec4e1ce02b0417257d5d20) )
@@ -1916,7 +1898,7 @@ ROM_START( fantzn2 )
 ROM_END
 
 ROM_START( opaopa )
-	ROM_REGION( 0x50000, "z80", 0 )
+	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "epr11224.ic7",	0x00000, 0x08000, CRC(024b1244) SHA1(59a522ac3d98982cc4ddb1c81f9584d3da453649) ) /* encrypted */
 
 	/* The following are 8 0x4000 banks that get mapped to reads from 0x8000 - 0xbfff */
@@ -2041,8 +2023,8 @@ static VIDEO_UPDATE(systeme)
 
 
 static MACHINE_DRIVER_START( systeme )
-	MDRV_CPU_ADD("z80", Z80, 10738600/2) /* correct for hangonjr, and astroflash/transformer at least  */
-	MDRV_CPU_PROGRAM_MAP(systeme_readmem,systeme_writemem)
+	MDRV_CPU_ADD("maincpu", Z80, 10738600/2) /* correct for hangonjr, and astroflash/transformer at least  */
+	MDRV_CPU_PROGRAM_MAP(systeme_map,0)
 	MDRV_CPU_IO_MAP(sms_io_map,0)
 
 	/* IRQ handled via the timers */
@@ -2156,7 +2138,7 @@ static void init_ports_systeme(running_machine *machine)
 {
 	/* INIT THE PORTS *********************************************************************************************/
 
-	const address_space *io = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO);
+	const address_space *io = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
 	const device_config *sn1 = devtag_get_device(machine, "sn1");
 	const device_config *sn2 = devtag_get_device(machine, "sn2");
 
@@ -2186,24 +2168,24 @@ static void init_systeme_map(running_machine *machine)
 	/* INIT THE MEMMAP / BANKING *********************************************************************************/
 
 	/* catch any addresses that don't get mapped */
-//  memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0xffff, 0, 0, z80_unmapped_r, z80_unmapped_w);
+//  memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0xffff, 0, 0, z80_unmapped_r, z80_unmapped_w);
 
 	/* fixed rom bank area */
-//  sms_rom = auto_malloc(0xc000);
-//  memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0xbfff, 0, 0, SMH_BANK1, SMH_UNMAP);
+//  sms_rom = auto_alloc_array(machine, UINT8, 0xc000);
+//  memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0xbfff, 0, 0, (read8_space_func)SMH_BANK(1), (write8_space_func)SMH_UNMAP);
 //  memory_set_bankptr(machine,  1, sms_rom );
 
-	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "z80") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 
 	/* alternate way of accessing video ram */
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, segasyse_videoram_w);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, segasyse_videoram_w);
 
 
 //  memcpy(sms_rom, memory_region(machine, "user1"), 0x8000);
 
 	/* main ram area */
-	sms_mainram = auto_malloc(0x4000);
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc000, 0xffff, 0, 0, SMH_BANK2, SMH_BANK2);
+	sms_mainram = auto_alloc_array(machine, UINT8, 0x4000);
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xffff, 0, 0, (read8_space_func)SMH_BANK(2), (write8_space_func)SMH_BANK(2));
 	memory_set_bankptr(machine,  2, sms_mainram );
 	memset(sms_mainram,0x00,0x4000);
 
@@ -2212,7 +2194,7 @@ static void init_systeme_map(running_machine *machine)
 
 void init_for_megadrive(running_machine *machine)
 {
-	md_sms_vdp = start_vdp(machine, GEN_VDP);
+	md_sms_vdp = (struct sms_vdp *)start_vdp(machine, GEN_VDP);
 	md_sms_vdp->set_irq = sms_vdp_cpu1_irq_callback;
 	md_sms_vdp->is_pal = 0;
 	md_sms_vdp->sms_total_scanlines = 262;
@@ -2226,7 +2208,7 @@ DRIVER_INIT( megatech_bios )
 {
 //  init_systeme_map(machine);
 
-	vdp1 = start_vdp(machine, SMS2_VDP);
+	vdp1 = (struct sms_vdp *)start_vdp(machine, SMS2_VDP);
 	vdp1->set_irq = sms_vdp_cpu2_irq_callback;
 	vdp1->is_pal = 0;
 	vdp1->sms_total_scanlines = 262;
@@ -2234,14 +2216,14 @@ DRIVER_INIT( megatech_bios )
 	vdp1->chip_id = 1;
 
 	vdp1_vram_bank0 = vdp1->vram;
-	vdp1_vram_bank1 = auto_malloc(0x4000);
+	vdp1_vram_bank1 = auto_alloc_array(machine, UINT8, 0x4000);
 }
 
 static DRIVER_INIT( segasyse )
 {
 	init_systeme_map(machine);
 
-	vdp1 = start_vdp(machine, SMS2_VDP);
+	vdp1 = (struct sms_vdp *)start_vdp(machine, SMS2_VDP);
 //  vdp1->set_irq = sms_vdp_cpu0_irq_callback;
 	vdp1->is_pal = 0;
 	vdp1->sms_total_scanlines = 262;
@@ -2249,10 +2231,10 @@ static DRIVER_INIT( segasyse )
 	vdp1->chip_id = 1;
 
 	vdp1_vram_bank0 = vdp1->vram;
-	vdp1_vram_bank1 = auto_malloc(0x4000);
+	vdp1_vram_bank1 = auto_alloc_array(machine, UINT8, 0x4000);
 
 
-	vdp2 = start_vdp(machine, SMS2_VDP);
+	vdp2 = (struct sms_vdp *)start_vdp(machine, SMS2_VDP);
 	vdp2->set_irq = sms_vdp_cpu0_irq_callback;
 	vdp2->is_pal = 0;
 	vdp2->sms_total_scanlines = 262;
@@ -2260,7 +2242,7 @@ static DRIVER_INIT( segasyse )
 	vdp2->chip_id = 2;
 
 	vdp2_vram_bank0 = vdp2->vram;
-	vdp2_vram_bank1 = auto_malloc(0x4000);
+	vdp2_vram_bank1 = auto_alloc_array(machine, UINT8, 0x4000);
 }
 
 /*- Hang On Jr. Specific -*/
@@ -2328,8 +2310,8 @@ static DRIVER_INIT( ridleofp )
 {
 	DRIVER_INIT_CALL(segasyse);
 
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xf8, 0xf8, 0, 0, segae_ridleofp_port_f8_r);
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xfa, 0xfa, 0, 0, segae_ridleofp_port_fa_w);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0xf8, 0xf8, 0, 0, segae_ridleofp_port_f8_r);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0xfa, 0xfa, 0, 0, segae_ridleofp_port_fa_w);
 }
 
 
@@ -2337,29 +2319,29 @@ static DRIVER_INIT( hangonjr )
 {
 	DRIVER_INIT_CALL(segasyse);
 
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xf8, 0xf8, 0, 0, segae_hangonjr_port_f8_r);
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xfa, 0xfa, 0, 0, segae_hangonjr_port_fa_w);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0xf8, 0xf8, 0, 0, segae_hangonjr_port_f8_r);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0xfa, 0xfa, 0, 0, segae_hangonjr_port_fa_w);
 }
 
 static DRIVER_INIT( opaopa )
 {
 	DRIVER_INIT_CALL(segasyse);
 
-	mc8123_decrypt_rom(machine, "z80", "user1", 1, 8);
+	mc8123_decrypt_rom(machine, "maincpu", "user1", 1, 8);
 }
 
 static DRIVER_INIT( fantzn2 )
 {
 	DRIVER_INIT_CALL(segasyse);
 
-	mc8123_decrypt_rom(machine, "z80", "user1", 0, 0);
+	mc8123_decrypt_rom(machine, "maincpu", "user1", 0, 0);
 }
 
 static DRIVER_INIT( astrofl )
 {
 	DRIVER_INIT_CALL(segasyse);
 
-	astrofl_decode(machine, "z80");
+	astrofl_decode(machine, "maincpu");
 }
 
 GAME( 1985, hangonjr, 0,        systeme, hangonjr, hangonjr, ROT0,  "Sega", "Hang-On Jr.", 0 )

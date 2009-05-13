@@ -518,7 +518,7 @@ DRIVER_INIT( osborne1 )
 {
 	memset( &osborne1, 0, sizeof( osborne1 ) );
 
-	osborne1.empty_4K = auto_malloc( 0x1000 );
+	osborne1.empty_4K = auto_alloc_array(machine, UINT8, 0x1000 );
 	memset( osborne1.empty_4K, 0xFF, 0x1000 );
 
 	/* Configure the 6850 ACIA */

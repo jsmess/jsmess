@@ -1188,23 +1188,23 @@ static int kram3_permut1(int idx, int value)
 
 static int kram3_permut2(int tbl_index, int idx, const UINT8 *xor_table)
 {
-	int xor = 0;
+	int xorval = 0;
 
 	if (idx == 0 || idx == 3)
 	{
-		xor = xor_table[tbl_index];
+		xorval = xor_table[tbl_index];
 
 		// handle missing values in table
-		if (xor == 99)
-			return xor;
+		if (xorval == 99)
+			return xorval;
 	}
 
-	xor ^= 0x02;
+	xorval ^= 0x02;
 
 	if (idx == 3)
-		xor = BITSWAP8(xor, 7,6,5,4, 0,2,3,1);
+		xorval = BITSWAP8(xorval, 7,6,5,4, 0,2,3,1);
 
-	return xor;
+	return xorval;
 }
 
 static int kram3_decrypt(int address, int value)
@@ -1258,7 +1258,7 @@ static DRIVER_INIT( kram3 )
 	i = 0;
 	patch = memory_region(machine, "user1");
 	rom = memory_region(machine, "maincpu");
-	decrypted = auto_malloc(0x6000);
+	decrypted = auto_alloc_array(machine, UINT8, 0x6000);
 
 	memory_set_decrypted_region(mainspace, 0xa000, 0xffff, decrypted);
 
@@ -1272,7 +1272,7 @@ static DRIVER_INIT( kram3 )
 	patch = memory_region(machine, "user2");
 	size = memory_region_length(machine, "user2");
 	rom = memory_region(machine, "videocpu");
-	decrypted = auto_malloc(0x6000);
+	decrypted = auto_alloc_array(machine, UINT8, 0x6000);
 
 	memory_set_decrypted_region(videospace, 0xa000, 0xffff, decrypted);
 

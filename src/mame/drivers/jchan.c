@@ -325,15 +325,15 @@ static INTERRUPT_GEN( jchan_vblank )
 		{
 
 			case 0:
-				cpu_set_input_line(device->machine->cpu[1], 1, HOLD_LINE);
+				cputag_set_input_line(device->machine, "sub", 1, HOLD_LINE);
 				break;
 
 			case 220:
-				cpu_set_input_line(device->machine->cpu[1], 2, HOLD_LINE);
+				cputag_set_input_line(device->machine, "sub", 2, HOLD_LINE);
 				break;
 
 			case 100:
-				cpu_set_input_line(device->machine->cpu[1], 3, HOLD_LINE);
+				cputag_set_input_line(device->machine, "sub", 3, HOLD_LINE);
 				break;
 
 		}
@@ -346,15 +346,15 @@ static INTERRUPT_GEN( jchan_vblank )
 static VIDEO_START(jchan)
 {
 	/* so we can use suprnova.c */
-	jchan_sprite_ram32_1 = auto_malloc ( 0x4000 );
-	jchan_sprite_ram32_2 = auto_malloc ( 0x4000 );
+	jchan_sprite_ram32_1 = auto_alloc_array(machine, UINT32, 0x4000/4);
+	jchan_sprite_ram32_2 = auto_alloc_array(machine, UINT32, 0x4000/4);
 
 	spriteram_size = 0x4000;
-	jchan_sprite_regs32_1 = auto_malloc (0x40);
-	jchan_sprite_regs32_2 = auto_malloc (0x40);
+	jchan_sprite_regs32_1 = auto_alloc_array(machine, UINT32, 0x40/4);
+	jchan_sprite_regs32_2 = auto_alloc_array(machine, UINT32, 0x40/4);
 
-	sprite_bitmap_1 = auto_bitmap_alloc(1024,1024,BITMAP_FORMAT_INDEXED16);
-	sprite_bitmap_2 = auto_bitmap_alloc(1024,1024,BITMAP_FORMAT_INDEXED16);
+	sprite_bitmap_1 = auto_bitmap_alloc(machine,1024,1024,BITMAP_FORMAT_INDEXED16);
+	sprite_bitmap_2 = auto_bitmap_alloc(machine,1024,1024,BITMAP_FORMAT_INDEXED16);
 
 	suprnova_alt_enable_sprites = 1;
 
@@ -451,19 +451,17 @@ static READ16_HANDLER ( jchan_ctrl_r )
 ***************************************************************************/
 
 /* communications - hacky! */
-static UINT16 *mainsub_shared_ram;
-
 static WRITE16_HANDLER( main2sub_cmd_w )
 {
 	COMBINE_DATA(&mainsub_shared_ram[0x03ffe/2]);
-	cpu_set_input_line(space->machine->cpu[1], 4, HOLD_LINE);
+	cputag_set_input_line(space->machine, "sub", 4, HOLD_LINE);
 }
 
 // is this called?
 static WRITE16_HANDLER( sub2main_cmd_w )
 {
 	COMBINE_DATA(&mainsub_shared_ram[0x0000/2]);
-	cpu_set_input_line(space->machine->cpu[0], 3, HOLD_LINE);
+	cputag_set_input_line(space->machine, "maincpu", 3, HOLD_LINE);
 }
 
 /* ram convert for suprnova (requires 32-bit stuff) */
@@ -775,8 +773,8 @@ static DRIVER_INIT( jchan )
 {
 	DRIVER_INIT_CALL( decrypt_toybox_rom );
 	// install these here, putting them in the memory map causes issues
-	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x403ffe, 0x403fff, 0, 0, main2sub_cmd_w );
-	memory_install_write16_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x400000, 0x400001, 0, 0, sub2main_cmd_w );
+	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x403ffe, 0x403fff, 0, 0, main2sub_cmd_w );
+	memory_install_write16_handler(cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400001, 0, 0, sub2main_cmd_w );
 
 
 	memset(jchan_mcu_com, 0, 4 * sizeof( UINT16 ) );
@@ -786,4 +784,3 @@ static DRIVER_INIT( jchan )
 /* game drivers */
 GAME( 1995, jchan,     0,        jchan,    jchan,    jchan,    ROT0, "Kaneko", "Jackie Chan - The Kung-Fu Master", GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, jchan2,    0,        jchan,    jchan2,   jchan,    ROT0, "Kaneko", "Jackie Chan in Fists of Fire", GAME_IMPERFECT_GRAPHICS )
-

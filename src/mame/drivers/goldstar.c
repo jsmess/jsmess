@@ -111,6 +111,7 @@ extern WRITE8_HANDLER( goldstar_reel3_ram_w );
 
 extern WRITE8_HANDLER( goldstar_fg_vidram_w );
 extern WRITE8_HANDLER( goldstar_fg_atrram_w );
+extern WRITE8_HANDLER( cm_girl_scroll_w );
 
 WRITE8_HANDLER( goldstar_fa00_w );
 WRITE8_HANDLER( cm_background_col_w );
@@ -188,8 +189,13 @@ static ADDRESS_MAP_START( goldstar_readport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW6")
 ADDRESS_MAP_END
 
+static WRITE8_HANDLER( ncb3_port81_w )
+{
+//  if (data!=0x00)
+//      popmessage("ncb3_port81_w %02x\n",data);
+}
 
-
+// where is colour bank for 'all blue' in attract?
 static ADDRESS_MAP_START( ncb3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xb7ff) AM_ROM
 	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_BASE(&nvram) AM_SIZE(&nvram_size)
@@ -220,7 +226,7 @@ static ADDRESS_MAP_START( ncb3_readwriteport, ADDRESS_SPACE_IO, 8 )
 //  AM_RANGE(0x06, 0x06) AM_READ(ncb3_unkread_r)    // unknown...
 //  AM_RANGE(0x08, 0x08) AM_READ(ncb3_unkread_r)    // unknown...
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW5")	/* confirmed for ncb3 */
-//  AM_RANGE(0x81, 0x81) ---> large writes.
+	AM_RANGE(0x81, 0x81) AM_WRITE(ncb3_port81_w) // ---> large writes.
 
 ADDRESS_MAP_END
 
@@ -265,6 +271,7 @@ static ADDRESS_MAP_START( cm_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE(&nvram) AM_SIZE(&nvram_size)
 
+
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_WRITE(goldstar_fg_vidram_w) AM_BASE(&videoram)
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_WRITE(goldstar_fg_atrram_w) AM_BASE(&colorram)
 
@@ -281,6 +288,29 @@ static ADDRESS_MAP_START( cm_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfc80, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( nfm_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xd7ff) AM_ROM AM_WRITENOP
+
+	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_BASE(&nvram) AM_SIZE(&nvram_size)
+
+
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_WRITE(goldstar_fg_vidram_w) AM_BASE(&videoram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM AM_WRITE(goldstar_fg_atrram_w) AM_BASE(&colorram)
+
+	AM_RANGE(0xf000, 0xf1ff) AM_RAM AM_WRITE( goldstar_reel1_ram_w ) AM_BASE(&goldstar_reel1_ram)
+	AM_RANGE(0xf200, 0xf3ff) AM_RAM AM_WRITE( goldstar_reel2_ram_w ) AM_BASE(&goldstar_reel2_ram)
+	AM_RANGE(0xf400, 0xf5ff) AM_RAM AM_WRITE( goldstar_reel3_ram_w ) AM_BASE(&goldstar_reel3_ram)
+	AM_RANGE(0xf600, 0xf7ff) AM_RAM
+
+	AM_RANGE(0xf800, 0xf87f) AM_RAM AM_BASE(&goldstar_reel1_scroll)
+	AM_RANGE(0xf880, 0xf9ff) AM_RAM
+	AM_RANGE(0xfa00, 0xfa7f) AM_RAM AM_BASE(&goldstar_reel2_scroll)
+	AM_RANGE(0xfa80, 0xfbff) AM_RAM
+	AM_RANGE(0xfc00, 0xfc7f) AM_RAM AM_BASE(&goldstar_reel3_scroll)
+	AM_RANGE(0xfc80, 0xffff) AM_RAM
+ADDRESS_MAP_END
+
+
 static ADDRESS_MAP_START( cm_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_DEVREAD("ay", ay8910_r)
@@ -288,9 +318,10 @@ static ADDRESS_MAP_START( cm_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)	/* Input Ports */
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)	/* DIP switches */
 	AM_RANGE(0x10, 0x10) AM_WRITE (cm_outport0_w)	/* output port */
-//  AM_RANGE(0x11, 0x11) AM_WRITENOP
+	AM_RANGE(0x11, 0x11) AM_WRITENOP
 	AM_RANGE(0x12, 0x12) AM_WRITE (cm_outport1_w)	/* output port */
 	AM_RANGE(0x13, 0x13) AM_WRITE(cm_background_col_w)
+	AM_RANGE(0x14, 0x14) AM_WRITE(cm_girl_scroll_w)
 ADDRESS_MAP_END
 
 
@@ -556,7 +587,7 @@ static INPUT_PORTS_START( cmv801 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW5")
-	PORT_DIPNAME( 0x01, 0x01, "Display Of Doll On Demo" )          PORT_DIPLOCATION("DSW5:1")	/* not working */
+	PORT_DIPNAME( 0x01, 0x00, "Display Of Doll On Demo" )          PORT_DIPLOCATION("DSW5:1")	/* not working */
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x06, 0x06, "Coin In Limit" )                    PORT_DIPLOCATION("DSW5:2,3")	/* not checked */
@@ -569,7 +600,7 @@ static INPUT_PORTS_START( cmv801 )
 	PORT_DIPSETTING(    0x10, "9-5-1" )
 	PORT_DIPSETTING(    0x08, "6-3-1" )
 	PORT_DIPSETTING(    0x00, "3-2-1" )
-	PORT_DIPNAME( 0x20, 0x20, "Display Of Doll At All Fr. Bonus" ) PORT_DIPLOCATION("DSW5:6")	/* not checked */
+	PORT_DIPNAME( 0x20, 0x00, "Display Of Doll At All Fr. Bonus" ) PORT_DIPLOCATION("DSW5:6")	/* not checked */
 	PORT_DIPSETTING(    0x20, DEF_STR( Low ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )                 PORT_DIPLOCATION("DSW5:7")	/* listed as unused */
@@ -718,7 +749,7 @@ static INPUT_PORTS_START( cmv4 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW5")
-	PORT_DIPNAME( 0x01, 0x01, "Flash 'Dyna - C.M.V.4' string in attract" ) PORT_DIPLOCATION("DSW5:1")	/* OK */
+	PORT_DIPNAME( 0x01, 0x00, "Flash 'Dyna - C.M.V.4' string in attract" ) PORT_DIPLOCATION("DSW5:1")	/* OK */
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x06, 0x06, "Coin In Limit" )                    PORT_DIPLOCATION("DSW5:2,3")	/* not checked */
@@ -731,7 +762,7 @@ static INPUT_PORTS_START( cmv4 )
 	PORT_DIPSETTING(    0x10, "9-5-1" )
 	PORT_DIPSETTING(    0x08, "6-3-1" )
 	PORT_DIPSETTING(    0x00, "3-2-1" )
-	PORT_DIPNAME( 0x20, 0x20, "Display Of Doll At All Fr. Bonus" ) PORT_DIPLOCATION("DSW5:6")	/* not checked */
+	PORT_DIPNAME( 0x20, 0x00, "Display Of Doll At All Fr. Bonus" ) PORT_DIPLOCATION("DSW5:6")	/* not checked */
 	PORT_DIPSETTING(    0x20, DEF_STR( Low ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )                 PORT_DIPLOCATION("DSW5:7")	/* listed as unused */
@@ -880,7 +911,7 @@ static INPUT_PORTS_START( cmaster )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW5")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )                 PORT_DIPLOCATION("DSW5:1")	/* not checked */
+	PORT_DIPNAME( 0x01, 0x00, "Display Of Doll On Demo" )          PORT_DIPLOCATION("DSW5:1")	/* not working */
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x06, 0x06, "Coin In Limit" )                    PORT_DIPLOCATION("DSW5:2,3")	/* not checked */
@@ -893,7 +924,7 @@ static INPUT_PORTS_START( cmaster )
 	PORT_DIPSETTING(    0x10, "9-5-1" )
 	PORT_DIPSETTING(    0x08, "6-3-1" )
 	PORT_DIPSETTING(    0x00, "3-2-1" )
-	PORT_DIPNAME( 0x20, 0x20, "Display Of Doll At All Fr. Bonus" ) PORT_DIPLOCATION("DSW5:6")	/* not checked */
+	PORT_DIPNAME( 0x20, 0x00, "Display Of Doll At All Fr. Bonus" ) PORT_DIPLOCATION("DSW5:6")	/* not checked */
 	PORT_DIPSETTING(    0x20, DEF_STR( Low ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )                 PORT_DIPLOCATION("DSW5:7")	/* listed as unused */
@@ -1042,7 +1073,7 @@ static INPUT_PORTS_START( cmasterb )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW5")
-	PORT_DIPNAME( 0x01, 0x01, "Display Of Doll On Demo" )          PORT_DIPLOCATION("DSW5:1")	/* not checked */
+	PORT_DIPNAME( 0x01, 0x00, "Display Of Doll On Demo" )          PORT_DIPLOCATION("DSW5:1")	/* not checked */
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x06, 0x06, "Coin In Limit" )                    PORT_DIPLOCATION("DSW5:2,3")	/* not checked */
@@ -1055,7 +1086,7 @@ static INPUT_PORTS_START( cmasterb )
 	PORT_DIPSETTING(    0x10, "9-5-1" )
 	PORT_DIPSETTING(    0x08, "6-3-1" )
 	PORT_DIPSETTING(    0x00, "3-2-1" )
-	PORT_DIPNAME( 0x20, 0x20, "Display Of Doll At All Fr. Bonus" ) PORT_DIPLOCATION("DSW5:6")	/* not checked */
+	PORT_DIPNAME( 0x20, 0x00, "Display Of Doll At All Fr. Bonus" ) PORT_DIPLOCATION("DSW5:6")	/* not checked */
 	PORT_DIPSETTING(    0x20, DEF_STR( Low ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )                 PORT_DIPLOCATION("DSW5:7")	/* listed as unused */
@@ -1204,7 +1235,7 @@ static INPUT_PORTS_START( cmasterc )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW5")
-	PORT_DIPNAME( 0x01, 0x01, "Display Of Doll On Demo" )          PORT_DIPLOCATION("DSW5:1")	/* not checked */
+	PORT_DIPNAME( 0x01, 0x00, "Display Of Doll On Demo" )          PORT_DIPLOCATION("DSW5:1")	/* not checked */
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x06, 0x06, "Coin In Limit" )                    PORT_DIPLOCATION("DSW5:2,3")	/* not checked */
@@ -1217,7 +1248,7 @@ static INPUT_PORTS_START( cmasterc )
 	PORT_DIPSETTING(    0x10, "9-5-1" )
 	PORT_DIPSETTING(    0x08, "6-3-1" )
 	PORT_DIPSETTING(    0x00, "3-2-1" )
-	PORT_DIPNAME( 0x20, 0x20, "Display Of Doll At All Fr. Bonus" ) PORT_DIPLOCATION("DSW5:6")	/* not checked */
+	PORT_DIPNAME( 0x20, 0x00, "Display Of Doll At All Fr. Bonus" ) PORT_DIPLOCATION("DSW5:6")	/* not checked */
 	PORT_DIPSETTING(    0x20, DEF_STR( Low ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )                 PORT_DIPLOCATION("DSW5:7")	/* listed as unused */
@@ -3997,6 +4028,22 @@ static const gfx_layout tiles8x32x4_layout =
 	32*8
 };
 
+// cmasterc set
+static const gfx_layout tiles8x32x4alt_layout =
+{
+	8,32,
+	RGN_FRAC(1,2),
+	4,
+	{ RGN_FRAC(1,2)+0, RGN_FRAC(1,2)+4,0,4 },
+	{ 3,2,1,0,11, 10, 9, 8 },
+	{ 0*16, 1*16,  2*16,  3*16,  4*16,  5*16,  6*16,  7*16,
+	  8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16,
+	 16*16,17*16, 18*16, 19*16, 20*16, 21*16, 22*16, 23*16,
+     24*16,25*16, 26*16, 27*16, 28*16, 29*16, 30*16, 31*16
+	},
+	16*32
+};
+
 static const UINT32 layout_xoffset[128] =
 {
 	STEP32(0*128,4),STEP32(1*128,4),STEP32(2*128,4),STEP32(3*128,4)
@@ -4098,6 +4145,13 @@ static GFXDECODE_START( cmbitmap )
 	GFXDECODE_ENTRY( "user1", 0, tiles128x128x4_layout, 128, 4 )
 GFXDECODE_END
 
+static GFXDECODE_START( cmasterc )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x3_layout, 0, 16 )
+	GFXDECODE_ENTRY( "reels", 0, tiles8x32x4alt_layout, 128+64, 4 )
+	GFXDECODE_ENTRY( "user1", 0, tiles128x128x4_layout, 128, 4 )
+GFXDECODE_END
+
+
 static GFXDECODE_START( cmast91 )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x3_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4_layout, 128+64, 4 ) // or is there a register for the +64?
@@ -4110,6 +4164,34 @@ static GFXDECODE_START( cmasterb )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x5_layout, 0, 4 )
 GFXDECODE_END
 #endif
+
+
+static const gfx_layout tiles8x32_4bpp_layout =
+{
+	8,32,
+	RGN_FRAC(1,4),
+	4,
+	{ RGN_FRAC(0,4),RGN_FRAC(1,4),RGN_FRAC(2,4),RGN_FRAC(3,4) },
+	{ 0,1,2,3,4,5,6,7},
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,8*8,9*8,10*8,11*8,12*8,13*8,14*8,15*8,16*8,17*8,18*8,19*8,20*8,21*8,22*8,23*8,24*8,25*8,26*8,27*8,28*8,29*8,30*8,31*8 },
+	32*8
+};
+
+static const gfx_layout tiles8x8_3bpp_layout =
+{
+	8,8,
+	RGN_FRAC(1,3),
+	3,
+	{ RGN_FRAC(0,3),RGN_FRAC(1,3),RGN_FRAC(2,3) },
+	{ 0,1,2,3,4,5,6,7},
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8
+};
+
+static GFXDECODE_START( nfm )
+	GFXDECODE_ENTRY( "tilegfx", 0, tiles8x8_3bpp_layout, 0, 16 )
+	GFXDECODE_ENTRY( "reelgfx", 0, tiles8x32_4bpp_layout, 0, 16 )
+GFXDECODE_END
 
 
 /*************************************
@@ -4566,6 +4648,13 @@ static MACHINE_DRIVER_START( cm )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( cmasterc )
+
+	MDRV_IMPORT_FROM(cm)
+	MDRV_GFXDECODE(cmasterc)
+
+MACHINE_DRIVER_END
+
 static MACHINE_DRIVER_START( cmnobmp )
 
 	/* basic machine hardware */
@@ -4860,6 +4949,41 @@ static MACHINE_DRIVER_START( amcoe2 )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 
 	MDRV_GFXDECODE(cm)
+	MDRV_PALETTE_LENGTH(256)
+	MDRV_PALETTE_INIT(cm)
+	MDRV_NVRAM_HANDLER(goldstar)
+
+	MDRV_VIDEO_START(cherrym)
+	MDRV_VIDEO_UPDATE(goldstar)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("ay", AY8910, AY_CLOCK)
+	MDRV_SOUND_CONFIG(cm_ay8910_config)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.00)	/* analyzed for clips */
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( nfm )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
+	MDRV_CPU_PROGRAM_MAP(nfm_map, 0)
+	MDRV_CPU_IO_MAP(amcoe2_portmap, 0)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+
+	/* 2x 8255 */
+	MDRV_PPI8255_ADD( "ppi8255_0", cm_ppi8255_intf[0] )
+	MDRV_PPI8255_ADD( "ppi8255_1", cm_ppi8255_intf[1] )
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+//  MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(64*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
+
+	MDRV_GFXDECODE(nfm)
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_PALETTE_INIT(cm)
 	MDRV_NVRAM_HANDLER(goldstar)
@@ -5420,7 +5544,7 @@ ROM_START( cmasterc )
 	ROM_LOAD( "msii841.u4",  0x10000,  0x8000, CRC(e39fff9c) SHA1(22fdc517fa478441622c6245cecb5728c5595757) )
 
 	/* these gfx are in a different format to usual */
-	ROM_REGION( 0x8000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x8000, "reels", ROMREGION_DISPOSE )
 	ROM_LOAD( "msii841.u1",  0x0000,  0x4000, CRC(cf322ed2) SHA1(84df96229b7bdba0ab498e3bf9c77d7a7661f7b3) )
 	ROM_LOAD( "msii841.u2",  0x4000,  0x4000, CRC(58c05653) SHA1(59454c07f4fe5b684d078cf97f2b1ee05b02f4ed) )
 
@@ -6677,6 +6801,7 @@ ROM_END
 
 
 
+
 /* descrambled by looking at CALLs
 
 0000 -> 0000
@@ -6926,6 +7051,43 @@ ROM_END
 
 
 
+ROM_START( nfm )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "fuitprg", 0x00000, 0x01000, CRC(6f6c98cf) SHA1(4641cb2b90d4d21edc65e504584f3ec92fe741c4) )
+	ROM_CONTINUE(0x5000,0x1000)
+	ROM_CONTINUE(0x7000,0x1000)
+	ROM_CONTINUE(0xa000,0x1000)
+	ROM_CONTINUE(0x2000,0x1000) //?
+	ROM_CONTINUE(0xb000,0x1000) //?
+	ROM_CONTINUE(0x9000,0x1000)
+	ROM_CONTINUE(0xc000,0x1000)
+	ROM_CONTINUE(0x1000,0x1000)
+	ROM_CONTINUE(0x3000,0x1000)
+	ROM_CONTINUE(0x6000,0x1000)
+	ROM_CONTINUE(0x4000,0x1000)
+	ROM_CONTINUE(0x8000,0x1000)
+	ROM_CONTINUE(0xd000,0x1000) // ?
+	ROM_CONTINUE(0xe000,0x1000)
+	ROM_CONTINUE(0xf000,0x1000)
+
+	ROM_REGION( 0x10000, "reelgfx", 0 )
+	ROM_LOAD( "fruit1", 0x00000, 0x04000, CRC(dd096dae) SHA1(ab34942cfa4fe7d46892819372c42f566c249f8c) )
+	ROM_CONTINUE(0x0000, 0x4000)
+	ROM_LOAD( "fruit2", 0x04000, 0x04000, CRC(6a37a16f) SHA1(7adb08d3e4de9768a8e41760a044bf52509da211) )
+	ROM_CONTINUE(0x0000, 0x4000)
+	ROM_LOAD( "fruit3", 0x08000, 0x04000, CRC(f3361ba7) SHA1(1a7b9c4f685656447bd6ce5f361e6e4af63012e3) )
+	ROM_CONTINUE(0x8000, 0x4000)
+	ROM_LOAD( "fruit4", 0x0c000, 0x04000, CRC(99ac5ddf) SHA1(65b6abb98f3156f4c0c55478d09c612eed5ae555) )
+
+	// do these graphics really belong with this set? a lot of the tiles seem wrong for it
+	ROM_REGION( 0x18000, "tilegfx", 0 )
+	ROM_LOAD( "fruit5", 0x00000, 0x08000, CRC(a7a8f08d) SHA1(76c93194133ba85c0dde1f364260e16d5b647134) )
+	ROM_LOAD( "fruit6", 0x08000, 0x08000, CRC(39d5b89a) SHA1(4cf52fa557ffc792d3e13f7dbb5d45fd617bac85) )
+	ROM_LOAD( "fruit7", 0x10000, 0x08000, CRC(3ade6709) SHA1(9cdf2814e50c5433c582fc40265c5df2a16e99e7) )
+
+	ROM_REGION( 0x18000, "proms", 0 ) // colours?
+	ROM_LOAD( "fruiprg2", 0x00000, 0x08000, CRC(13925ff5) SHA1(236415a244ef6092834f8080cf0d2e04bbfa2650) )
+ROM_END
 
 
 static DRIVER_INIT(goldstar)
@@ -6963,7 +7125,7 @@ static void do_blockswaps(UINT8* ROM)
 		0xa000, 0xa800, 0xb000, 0xb800,
 	};
 
-	buffer = malloc(0x10000);
+	buffer = alloc_array_or_die(UINT8, 0x10000);
 	memcpy(buffer,ROM,0x10000);
 
 	// swap some 0x800 blocks around..
@@ -7028,7 +7190,7 @@ static DRIVER_INIT( chry10 )
 		ROM[i] = chry10_decrypt(ROM[i]);
 	}
 
-	buffer = malloc_or_die(size);
+	buffer = alloc_array_or_die(UINT8, size);
 	memcpy(buffer, ROM, size);
 
 	free(buffer);
@@ -7058,7 +7220,7 @@ static DRIVER_INIT( cb3 )
 		ROM[i] = decrypt(ROM[i], i);
 	}
 
-	buffer = malloc_or_die(size);
+	buffer = alloc_array_or_die(UINT8, size);
 	memcpy(buffer, ROM, size);
 
 	free(buffer);
@@ -7176,8 +7338,8 @@ static DRIVER_INIT( schery97 )
      	ROM[i] = x;
 	}
 
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x1d, 0x1d, 0, 0, fixedvala8_r);
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x2a, 0x2a, 0, 0, fixedvalb4_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x1d, 0x1d, 0, 0, fixedvala8_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x2a, 0x2a, 0, 0, fixedvalb4_r);
 	/* Oki 6295 at 0x20 */
 }
 
@@ -7206,7 +7368,7 @@ static DRIVER_INIT( schery97a )
 
 
 
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x16, 0x16, 0, 0, fixedval38_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x16, 0x16, 0, 0, fixedval38_r);
 	/* Oki 6295 at 0x20 */
 }
 
@@ -7233,7 +7395,7 @@ static DRIVER_INIT( skill98 )
 		ROM[i] = x;
 	}
 
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x1e, 0x1e, 0, 0, fixedvalea_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x1e, 0x1e, 0, 0, fixedvalea_r);
 	/* Oki 6295 at 0x20 */
 }
 
@@ -7260,7 +7422,7 @@ static DRIVER_INIT( fb36xc1 )
 		ROM[i] = x;
 	}
 
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x31, 0x31, 0, 0, fixedval68_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x31, 0x31, 0, 0, fixedval68_r);
 
 }
 
@@ -7296,11 +7458,11 @@ static DRIVER_INIT( fbse354 )
 		ROM[i] = x;
 	}
 	// nfb96b needs both of these
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x23, 0x23, 0, 0, fixedval80_r);
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x5a, 0x5a, 0, 0, fixedvalaa_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x23, 0x23, 0, 0, fixedval80_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x5a, 0x5a, 0, 0, fixedvalaa_r);
 
 	// csel96b
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x6e, 0x6e, 0, 0, fixedval96_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x6e, 0x6e, 0, 0, fixedval96_r);
 
 }
 
@@ -7327,7 +7489,7 @@ static DRIVER_INIT( fbse362 )
 		ROM[i] = x;
 	}
 
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x2e, 0x2e, 0, 0, fixedvalbe_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x2e, 0x2e, 0, 0, fixedvalbe_r);
 
 }
 
@@ -7358,8 +7520,8 @@ static DRIVER_INIT( rp35 )
 		ROM[i] = x;
 	}
 
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x5e, 0x5e, 0, 0, fixedval84_r);
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x36, 0x36, 0, 0, fixedval90_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x5e, 0x5e, 0, 0, fixedval84_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x36, 0x36, 0, 0, fixedval90_r);
 }
 
 static READ8_HANDLER( fixedvalb2_r )
@@ -7385,7 +7547,7 @@ static DRIVER_INIT( rp36 )
 		ROM[i] = x;
 	}
 
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x34, 0x34, 0, 0, fixedvalb2_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x34, 0x34, 0, 0, fixedvalb2_r);
 }
 
 static READ8_HANDLER( fixedval48_r )
@@ -7411,7 +7573,7 @@ static DRIVER_INIT( rp36c3 )
 		ROM[i] = x;
 	}
 
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x17, 0x17, 0, 0, fixedval48_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x17, 0x17, 0, 0, fixedval48_r);
 }
 
 static READ8_HANDLER( fixedval09_r )
@@ -7442,8 +7604,8 @@ static DRIVER_INIT( po33 )
 
 		ROM[i] = x;
 	}
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x32, 0x32, 0, 0, fixedval74_r);
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x12, 0x12, 0, 0, fixedval09_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x32, 0x32, 0, 0, fixedval74_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x12, 0x12, 0, 0, fixedval09_r);
 	/* oki6295 at 0x20 */
 }
 
@@ -7470,7 +7632,7 @@ static DRIVER_INIT( tc132axt )
 		ROM[i] = x;
 	}
 
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x21, 0x21, 0, 0, fixedval58_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x21, 0x21, 0, 0, fixedval58_r);
 }
 
 static READ8_HANDLER( fixedvale4_r )
@@ -7501,8 +7663,8 @@ static DRIVER_INIT( match133 )
 		ROM[i] = x;
 	}
 
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x16, 0x16, 0, 0, fixedvalc7_r);
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x1a, 0x1a, 0, 0, fixedvale4_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x16, 0x16, 0, 0, fixedvalc7_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x1a, 0x1a, 0, 0, fixedvale4_r);
 }
 
 
@@ -7531,7 +7693,7 @@ GAME( 1992, cmv4,      0,        cm,       cmv4,     cmv4,      ROT0, "Dyna",   
 GAME( 1992, cmv4a,     cmv4,     cm,       cmv4,     cmv4,      ROT0, "Dyna",              "Cherry Master (ver.4, set 2)",                GAME_NOT_WORKING )	/* stealth game? */
 GAME( 1991, cmaster,   0,        cm,       cmaster,  0,         ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 1)",           0 )
 GAME( 1991, cmasterb,  cmaster,  cm,       cmasterb, cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 2)",           0 )
-GAME( 1991, cmasterc,  cmaster,  cm,       cmasterc, cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 3)",           GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, cmasterc,  cmaster,  cmasterc, cmasterc, cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 3)",           0 )
 GAME( 1991, cmast91,   0,        cmast91,  cmast91,  cmast91,   ROT0, "Dyna",              "Cherry Master '91 (ver.1.30)",                0 )
 
 
@@ -7581,6 +7743,7 @@ GAME( 1996, nfb96seb,  nfb96,    amcoe2,   nfb96bl,   0,         ROT0, "bootleg"
 GAME( 2002, carb2002,  nfb96,    amcoe2,   nfb96bl,   0,         ROT0, "bootleg", "Carriage Bonus 2002 (bootleg)",                         GAME_WRONG_COLORS )
 GAME( 2003, carb2003,  nfb96,    amcoe2,   nfb96bl,   0,         ROT0, "bootleg", "Carriage Bonus 2003 (bootleg)",                         GAME_WRONG_COLORS )
 
+GAME( 2003, nfm, 0, nfm, nfb96bl, 0, ROT0, "Ming-Yang Electronic",         "New Fruit Machine (Ming-Yang Electronic)", GAME_NOT_WORKING )
 
 /* possible stealth sets:
 

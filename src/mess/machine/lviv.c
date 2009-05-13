@@ -168,9 +168,9 @@ WRITE8_HANDLER ( lviv_io_w )
 	{
 		startup_mem_map = 0;
 
-		memory_install_write8_handler(cpuspace, 0x0000, 0x3fff, 0, 0, SMH_BANK1);
-		memory_install_write8_handler(cpuspace, 0x4000, 0x7fff, 0, 0, SMH_BANK2);
-		memory_install_write8_handler(cpuspace, 0x8000, 0xbfff, 0, 0, SMH_BANK3);
+		memory_install_write8_handler(cpuspace, 0x0000, 0x3fff, 0, 0, SMH_BANK(1));
+		memory_install_write8_handler(cpuspace, 0x4000, 0x7fff, 0, 0, SMH_BANK(2));
+		memory_install_write8_handler(cpuspace, 0x8000, 0xbfff, 0, 0, SMH_BANK(3));
 		memory_install_write8_handler(cpuspace, 0xC000, 0xffff, 0, 0, SMH_UNMAP);
 
 		memory_set_bankptr(space->machine,1, mess_ram);

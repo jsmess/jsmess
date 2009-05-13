@@ -53,7 +53,7 @@ void atari_interrupt_cb(const device_config *device, int mask)
 			logerror("atari interrupt_cb TIMR1\n");
 	}
 
-	cpu_set_input_line(device->machine->cpu[0], 0, HOLD_LINE);
+	cputag_set_input_line(device->machine, "maincpu", 0, HOLD_LINE);
 }
 
 /**************************************************************
@@ -108,17 +108,17 @@ void a600xl_mmu(running_machine *machine, UINT8 new_mmu)
 	if ( new_mmu & 0x80 )
 	{
 		logerror("%s MMU SELFTEST RAM\n", machine->gamedrv->name);
-		rbank2 = SMH_NOP;
-		wbank2 = SMH_NOP;
+		rbank2 = (read8_space_func)SMH_NOP;
+		wbank2 = (write8_space_func)SMH_NOP;
 	}
 	else
 	{
 		logerror("%s MMU SELFTEST ROM\n", machine->gamedrv->name);
-		rbank2 = SMH_BANK2;
-		wbank2 = SMH_UNMAP;
+		rbank2 = (read8_space_func)SMH_BANK(2);
+		wbank2 = (write8_space_func)SMH_UNMAP;
 	}
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x5000, 0x57ff, 0, 0, rbank2, wbank2);
-	if (rbank2 == SMH_BANK2)
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5000, 0x57ff, 0, 0, rbank2, wbank2);
+	if (rbank2 == (read8_space_func)SMH_BANK(2))
 		memory_set_bankptr(machine, 2, memory_region(machine, "maincpu") + 0x5000);
 }
 

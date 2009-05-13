@@ -102,17 +102,6 @@ Hardware Info
 
 /*************************************
  *
- *  Constants
- *
- *************************************/
-
-#define CVS_MAIN_CPU_INDEX		(0)
-#define CVS_DAC_CPU_INDEX		(1)
-
-
-
-/*************************************
- *
  *  Global variables
  *
  *************************************/
@@ -265,8 +254,8 @@ static INTERRUPT_GEN( cvs_main_cpu_interrupt )
 
 static void cvs_dac_cpu_interrupt(running_machine *machine)
 {
-	cpu_set_input_line_vector(machine->cpu[CVS_DAC_CPU_INDEX], 0, 0x03);
-	cpu_set_input_line(machine->cpu[CVS_DAC_CPU_INDEX], 0, HOLD_LINE);
+	cpu_set_input_line_vector(cputag_get_cpu(machine, "audiocpu"), 0, 0x03);
+	cputag_set_input_line(machine, "audiocpu", 0, HOLD_LINE);
 }
 
 
@@ -504,9 +493,9 @@ static WRITE8_HANDLER( audio_command_w )
 MACHINE_START( cvs )
 {
 	/* allocate memory */
-	cvs_color_ram = auto_malloc(0x400);
-	cvs_palette_ram = auto_malloc(0x10);
-	cvs_character_ram = auto_malloc(3 * 0x800);  /* only half is used, but
+	cvs_color_ram = auto_alloc_array(machine, UINT8, 0x400);
+	cvs_palette_ram = auto_alloc_array(machine, UINT8, 0x10);
+	cvs_character_ram = auto_alloc_array(machine, UINT8, 3 * 0x800);  /* only half is used, but
                                                     by allocating twice the amount,
                                                     we can use the same gfx_layout */
 

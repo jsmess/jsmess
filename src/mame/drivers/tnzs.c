@@ -664,7 +664,7 @@ static SAMPLES_START( kageki_init_samples )
 				size++;
 			}
 		}
-		sampledata[i] = auto_malloc(size * sizeof(sampledata[0]));
+		sampledata[i] = auto_alloc_array(machine, INT16, size);
 		samplesize[i] = size;
 
 		if (start < 0x100) start = size = 0;
@@ -810,8 +810,8 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( tnzsb_sound_command_w )
 {
-	soundlatch_w(space,offset,data);
-	cpu_set_input_line_and_vector(space->machine->cpu[2],0,HOLD_LINE,0xff);
+	soundlatch_w(space, offset, data);
+	cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff);
 }
 
 static ADDRESS_MAP_START( tnzsb_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -890,7 +890,7 @@ static WRITE8_HANDLER( jpopnics_palette_w )
 
 static ADDRESS_MAP_START( jpopnics_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_BANK1, SMH_ROM)
+	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_BANK(1), SMH_ROM)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE(&tnzs_objram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE(1) /* WORK RAM (shared by the 2 z80's) */
 	AM_RANGE(0xf000, 0xf1ff) AM_RAM AM_BASE(&tnzs_vdcram) 	/* VDC RAM */
@@ -911,7 +911,7 @@ static WRITE8_HANDLER( jpopnics_subbankswitch_w )
 
 static ADDRESS_MAP_START( jpopnics_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_READWRITE(SMH_BANK2, SMH_ROM)
+	AM_RANGE(0x8000, 0x9fff) AM_READWRITE(SMH_BANK(2), SMH_ROM)
 
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(jpopnics_subbankswitch_w)
 	AM_RANGE(0xb000, 0xb001) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
@@ -1560,7 +1560,7 @@ static const ym2203_interface ym2203_config =
 /* handler called by the 2203 emulator when the internal timers cause an IRQ */
 static void irqhandler(const device_config *device, int irq)
 {
-	cpu_set_input_line(device->machine->cpu[2], INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface kageki_ym2203_interface =

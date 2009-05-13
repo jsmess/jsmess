@@ -142,7 +142,7 @@ static SAMPLES_START( pbillian_sh_start )
 	int i, len = memory_region_length(machine, "samples");
 
 	/* convert 8-bit unsigned samples to 8-bit signed */
-	samplebuf = auto_malloc(len * 2);
+	samplebuf = auto_alloc_array(machine, INT16, len);
 	for (i = 0;i < len;i++)
 		samplebuf[i] = (INT8)(src[i] ^ 0x80) * 256;
 }
@@ -295,7 +295,7 @@ static WRITE8_HANDLER( mcu_p3_w )
 
 static READ8_HANDLER( nmi_ack_r )
 {
-	cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 	return 0;
 }
 
@@ -349,7 +349,7 @@ static TIMER_CALLBACK( delayed_z80_mcu_w )
 logerror("Z80 sends command %02x\n",param);
 	from_z80 = param;
 	from_mcu_pending = 0;
-	cpu_set_input_line(machine->cpu[1], 0, HOLD_LINE);
+	cputag_set_input_line(machine, "mcu", 0, HOLD_LINE);
 	cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(200));
 }
 

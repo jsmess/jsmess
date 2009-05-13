@@ -300,8 +300,7 @@ void timer_init(running_machine *machine)
 	int i;
 
 	/* allocate global data */
-	global = machine->timer_data = (timer_private *)auto_malloc(sizeof(*global));
-	memset(global, 0, sizeof(*global));
+	global = machine->timer_data = auto_alloc_clear(machine, timer_private);
 
 	/* we need to wait until the first call to timer_cyclestorun before using real CPU times */
 	global->exec.basetime = attotime_zero;
@@ -704,7 +703,7 @@ void timer_adjust_oneshot(emu_timer *which, attotime duration, INT32 param)
 void timer_device_adjust_oneshot(const device_config *timer, attotime duration, INT32 param)
 {
 #ifdef MAME_DEBUG
-	timer_config *config = timer->inline_config;
+	timer_config *config = (timer_config *)timer->inline_config;
 
 	/* doesn't make sense for scanline timers */
 	assert(config->type != TIMER_TYPE_SCANLINE);
@@ -757,7 +756,7 @@ void timer_device_adjust_periodic(const device_config *timer, attotime start_del
 {
 	timer_state *state = get_safe_token(timer);
 #ifdef MAME_DEBUG
-	timer_config *config = timer->inline_config;
+	timer_config *config = (timer_config *)timer->inline_config;
 
 	/* doesn't make sense for scanline timers */
 	assert(config->type != TIMER_TYPE_SCANLINE);
@@ -821,7 +820,7 @@ void timer_device_reset(const device_config *timer)
 {
 	timer_state *state = get_safe_token(timer);
 #ifdef MAME_DEBUG
-	timer_config *config = timer->inline_config;
+	timer_config *config = (timer_config *)timer->inline_config;
 
 	/* doesn't make sense for scanline timers */
 	assert(config->type != TIMER_TYPE_SCANLINE);
@@ -891,7 +890,7 @@ int timer_device_get_param(const device_config *timer)
 {
 	timer_state *state = get_safe_token(timer);
 #ifdef MAME_DEBUG
-	timer_config *config = timer->inline_config;
+	timer_config *config = (timer_config *)timer->inline_config;
 
 	/* doesn't make sense for scanline timers */
 	assert(config->type != TIMER_TYPE_SCANLINE);
@@ -916,7 +915,7 @@ void timer_device_set_param(const device_config *timer, int param)
 {
 	timer_state *state = get_safe_token(timer);
 #ifdef MAME_DEBUG
-	timer_config *config = timer->inline_config;
+	timer_config *config = (timer_config *)timer->inline_config;
 
 	/* doesn't make sense for scanline timers */
 	assert(config->type != TIMER_TYPE_SCANLINE);
@@ -1273,19 +1272,6 @@ static DEVICE_START( timer )
 
 
 /*-------------------------------------------------
-    timer_set_info - device set info callback
--------------------------------------------------*/
-
-static DEVICE_SET_INFO( timer )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-/*-------------------------------------------------
     timer_get_info - device get info callback
 -------------------------------------------------*/
 
@@ -1299,7 +1285,6 @@ DEVICE_GET_INFO( timer )
 		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_TIMER;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:				info->set_info = DEVICE_SET_INFO_NAME(timer); break;
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(timer); break;
 		case DEVINFO_FCT_STOP:					/* Nothing */							break;
 		case DEVINFO_FCT_RESET:					/* Nothing */							break;

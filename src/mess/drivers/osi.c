@@ -679,12 +679,12 @@ static MACHINE_START( osi600 )
 	switch (mess_ram_size)
 	{
 	case 4*1024:
-		memory_install_readwrite8_handler(program, 0x0000, 0x0fff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite8_handler(program, 0x0000, 0x0fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
 		memory_install_readwrite8_handler(program, 0x1000, 0x1fff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		break;
 
 	case 8*1024:
-		memory_install_readwrite8_handler(program, 0x0000, 0x1fff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite8_handler(program, 0x0000, 0x1fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
 		break;
 	}
 
@@ -706,12 +706,12 @@ static MACHINE_START( c1p )
 	switch (mess_ram_size)
 	{
 	case 8*1024:
-		memory_install_readwrite8_handler(program, 0x0000, 0x1fff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite8_handler(program, 0x0000, 0x1fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
 		memory_install_readwrite8_handler(program, 0x2000, 0x4fff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		break;
 
 	case 20*1024:
-		memory_install_readwrite8_handler(program, 0x0000, 0x4fff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite8_handler(program, 0x0000, 0x4fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
 		break;
 	}
 

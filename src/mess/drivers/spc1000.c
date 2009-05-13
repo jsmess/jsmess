@@ -20,8 +20,8 @@ static UINT8 GMODE;
 
 static ADDRESS_MAP_START(spc1000_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x7fff ) AM_READWRITE(SMH_BANK1, SMH_BANK2)
-	AM_RANGE( 0x8000, 0xffff ) AM_READWRITE(SMH_BANK3, SMH_BANK4)
+	AM_RANGE( 0x0000, 0x7fff ) AM_READWRITE(SMH_BANK(1), SMH_BANK(2))
+	AM_RANGE( 0x8000, 0xffff ) AM_READWRITE(SMH_BANK(3), SMH_BANK(4))
 ADDRESS_MAP_END
 
 static WRITE8_HANDLER(spc1000_iplk_w)
@@ -187,11 +187,11 @@ static MACHINE_RESET(spc1000)
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
-	memory_install_read8_handler(space, 0x0000, 0x7fff, 0, 0, SMH_BANK1);
-	memory_install_read8_handler(space, 0x8000, 0xffff, 0, 0, SMH_BANK3);
+	memory_install_read8_handler(space, 0x0000, 0x7fff, 0, 0, SMH_BANK(1));
+	memory_install_read8_handler(space, 0x8000, 0xffff, 0, 0, SMH_BANK(3));
 
-	memory_install_write8_handler(space, 0x0000, 0x7fff, 0, 0, SMH_BANK2);
-	memory_install_write8_handler(space, 0x8000, 0xffff, 0, 0, SMH_BANK4);
+	memory_install_write8_handler(space, 0x0000, 0x7fff, 0, 0, SMH_BANK(2));
+	memory_install_write8_handler(space, 0x8000, 0xffff, 0, 0, SMH_BANK(4));
 
 	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu"));
 	memory_set_bankptr(machine, 2, mess_ram);
@@ -228,7 +228,7 @@ VIDEO_START( spc1000 )
 {
 	m6847_config cfg;
 
-	spc1000_video_ram = auto_malloc (0x2000);
+	spc1000_video_ram = auto_alloc_array (machine, UINT8, 0x2000);
 
 	memset(&cfg, 0, sizeof(cfg));
 	cfg.type = M6847_VERSION_M6847T1_NTSC;

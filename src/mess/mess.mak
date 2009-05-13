@@ -240,10 +240,8 @@ DRVLIBS = \
 	$(MESSOBJ)/acorn.a \
 	$(MESSOBJ)/advision.a \
 	$(MESSOBJ)/amiga.a \
-	$(MESSOBJ)/amstrad.a \
 	$(MESSOBJ)/apexc.a \
 	$(MESSOBJ)/apf.a \
-	$(MESSOBJ)/apple.a \
 	$(MESSOBJ)/aquarius.a \
 	$(MESSOBJ)/arcadia.a \
 	$(MESSOBJ)/ascii.a \
@@ -256,8 +254,6 @@ DRVLIBS = \
 	$(MESSOBJ)/be.a \
 	$(MESSOBJ)/bk.a \
 	$(MESSOBJ)/bondwell.a \
-	$(MESSOBJ)/cbm.a \
-	$(MESSOBJ)/cbmshare.a \
 	$(MESSOBJ)/cdi.a \
 	$(MESSOBJ)/cgenie.a \
 	$(MESSOBJ)/coco.a \
@@ -325,18 +321,16 @@ DRVLIBS = \
 	$(MESSOBJ)/pk8020.a \
 	$(MESSOBJ)/pmd85.a \
 	$(MESSOBJ)/pp01.a \
-	$(MESSOBJ)/primo.a \
 	$(MESSOBJ)/radio.a \
 	$(MESSOBJ)/rca.a \
-	$(MESSOBJ)/rockwell.a \
 	$(MESSOBJ)/robotron.a \
+	$(MESSOBJ)/rockwell.a \
 	$(MESSOBJ)/samcoupe.a \
 	$(MESSOBJ)/samsung.a \
 	$(MESSOBJ)/sapi1.a \
 	$(MESSOBJ)/sega.a \
 	$(MESSOBJ)/sgi.a \
 	$(MESSOBJ)/sharp.a \
-	$(MESSOBJ)/sinclair.a \
 	$(MESSOBJ)/snk.a \
 	$(MESSOBJ)/sony.a \
 	$(MESSOBJ)/sord.a \
@@ -346,12 +340,10 @@ DRVLIBS = \
 	$(MESSOBJ)/svi.a \
 	$(MESSOBJ)/svision.a \
 	$(MESSOBJ)/synertec.a \
-	$(MESSOBJ)/tangerin.a \
 	$(MESSOBJ)/tatung.a \
 	$(MESSOBJ)/teamconc.a \
 	$(MESSOBJ)/tec1.a \
 	$(MESSOBJ)/telmac.a \
-	$(MESSOBJ)/thomson.a \
 	$(MESSOBJ)/ti85.a \
 	$(MESSOBJ)/ti99.a \
 	$(MESSOBJ)/tiger.a \
@@ -368,6 +360,14 @@ DRVLIBS = \
 	$(MESSOBJ)/skeleton.a \
 	$(MESSOBJ)/shared.a \
 
+#	$(MESSOBJ)/amstrad.a \
+#	$(MESSOBJ)/apple.a \
+#	$(MESSOBJ)/cbm.a \
+#	$(MESSOBJ)/cbmshare.a \
+#	$(MESSOBJ)/primo.a \
+#	$(MESSOBJ)/sinclair.a \
+#	$(MESSOBJ)/tangerin.a \
+#	$(MESSOBJ)/thomson.a \
 
 
 

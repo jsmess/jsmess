@@ -82,19 +82,19 @@ static const write8_space_func mwa_bank_soft[4] =
 /* read banked memory (plain ROM/RAM) */
 static const read8_space_func mra_bank_hard[4] =
 {
-    SMH_BANK1,  /* mapped in 0000-3fff */
-    SMH_BANK2,  /* mapped in 4000-7fff */
-    SMH_BANK3,  /* mapped in 8000-bfff */
-    SMH_BANK4   /* mapped in c000-ffff */
+    SMH_BANK(1),  /* mapped in 0000-3fff */
+    SMH_BANK(2),  /* mapped in 4000-7fff */
+    SMH_BANK(3),  /* mapped in 8000-bfff */
+    SMH_BANK(4)   /* mapped in c000-ffff */
 };
 
 /* write banked memory (plain ROM/RAM) */
 static const write8_space_func mwa_bank_hard[4] =
 {
-    SMH_BANK1,  /* mapped in 0000-3fff */
-    SMH_BANK2,  /* mapped in 4000-7fff */
-    SMH_BANK3,  /* mapped in 8000-bfff */
-    SMH_BANK4   /* mapped in c000-ffff */
+    SMH_BANK(1),  /* mapped in 0000-3fff */
+    SMH_BANK(2),  /* mapped in 4000-7fff */
+    SMH_BANK(3),  /* mapped in 8000-bfff */
+    SMH_BANK(4)   /* mapped in c000-ffff */
 };
 
 DRIVER_INIT(laser)

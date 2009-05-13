@@ -1414,12 +1414,11 @@ static void compis_gdc_start(running_machine *machine, const compis_gdc_interfac
 	gdc_mess.mode = intf->mode;
 
 	/* Video RAM */
-	gdc_mess.vram = (UINT16*)auto_malloc (gdc_mess.vramsize * sizeof(UINT16) );
-	memset (gdc_mess.vram, 0, gdc_mess.vramsize*sizeof(UINT16) );
+	gdc_mess.vram = auto_alloc_array_clear(machine, UINT16, gdc_mess.vramsize);
 
 	/* back bitmap */
 
-	gdc_mess.tmpbmp = auto_bitmap_alloc (640, 400, BITMAP_FORMAT_INDEXED16);
+	gdc_mess.tmpbmp = auto_bitmap_alloc (machine, 640, 400, BITMAP_FORMAT_INDEXED16);
 	gdc_fifo_reset(&gdc);
 	videoram_size = gdc_mess.vramsize;
 

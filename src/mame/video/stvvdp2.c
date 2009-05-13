@@ -4860,7 +4860,7 @@ static void stv_vdp2_draw_rotation_screen(running_machine *machine, bitmap_t *bi
 	else
 	{
 		if ( stv_vdp2_roz_bitmap[iRP-1] == NULL )
-			stv_vdp2_roz_bitmap[iRP-1] = auto_bitmap_alloc(4096, 4096, video_screen_get_format(machine->primary_screen));
+			stv_vdp2_roz_bitmap[iRP-1] = auto_bitmap_alloc(machine, 4096, 4096, video_screen_get_format(machine->primary_screen));
 
 		roz_clip_rect.min_x = roz_clip_rect.min_y = 0;
 		if ( (iRP == 1 && STV_VDP2_RAOVR == 3) ||
@@ -5256,12 +5256,18 @@ READ32_HANDLER ( stv_vdp2_cram_r )
 WRITE32_HANDLER ( stv_vdp2_regs_w )
 {
 	static UINT8 old_crmd;
+	static UINT16 old_tvmd;
 	COMBINE_DATA(&stv_vdp2_regs[offset]);
 
 	if(old_crmd != STV_VDP2_CRMD)
 	{
 		old_crmd = STV_VDP2_CRMD;
 		refresh_palette_data(space->machine);
+	}
+	if(old_tvmd != STV_VDP2_TVMD)
+	{
+		old_tvmd = STV_VDP2_TVMD;
+		stv_vdp2_dynamic_res_change(space->machine);
 	}
 }
 
@@ -5383,14 +5389,10 @@ static STATE_POSTLOAD( stv_vdp2_state_save_postload )
 
 static int stv_vdp2_start (running_machine *machine)
 {
-	stv_vdp2_regs = auto_malloc ( 0x040000 );
-	stv_vdp2_vram = auto_malloc ( 0x100000 ); // actually we only need half of it since we don't emulate extra 4mbit ram cart.
-	stv_vdp2_cram = auto_malloc ( 0x080000 );
-	stv_vdp2_gfx_decode = auto_malloc ( 0x100000 );
-
-	memset(stv_vdp2_regs, 0, 0x040000);
-	memset(stv_vdp2_vram, 0, 0x100000);
-	memset(stv_vdp2_cram, 0, 0x080000);
+	stv_vdp2_regs = auto_alloc_array_clear(machine, UINT32, 0x040000/4 );
+	stv_vdp2_vram = auto_alloc_array_clear(machine, UINT32, 0x100000/4 ); // actually we only need half of it since we don't emulate extra 4mbit ram cart.
+	stv_vdp2_cram = auto_alloc_array_clear(machine, UINT32, 0x080000/4 );
+	stv_vdp2_gfx_decode = auto_alloc_array(machine, UINT8, 0x100000 );
 
 	stv_vdp2_render_rbg0 = 1;
 //  machine->gfx[0]->color_granularity=4;
@@ -6208,8 +6210,6 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 VIDEO_UPDATE( stv_vdp2 )
 {
 	static UINT8 pri;
-	stv_vdp2_dynamic_res_change(screen->machine);
-
 	video_update_vdp1(screen->machine);
 
 	stv_vdp2_fade_effects(screen->machine);

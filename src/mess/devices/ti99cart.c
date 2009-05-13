@@ -1191,9 +1191,6 @@ static DEVICE_GET_INFO(ti99_cart_common)
 			break;
 
 		/* --- the following bits of info are returned as pointers to functions --- */
-		case DEVINFO_FCT_SET_INFO:
-			/* Nothing */
-			break;
 		case DEVINFO_FCT_START:
 			info->start = DEVICE_START_NAME(ti99_pcb_std);
 			break;
@@ -2359,11 +2356,6 @@ static MACHINE_DRIVER_START(ti99_multicart)
 	MDRV_CARTSLOT_UNLOAD(ti99_cartridge)
 MACHINE_DRIVER_END
 
-static DEVICE_SET_INFO(ti99_multicart)
-{
-//	printf("device_set_info(ti99-cart)");
-}
-
 
 DEVICE_GET_INFO(ti99_multicart)
 {
@@ -2395,9 +2387,6 @@ DEVICE_GET_INFO(ti99_multicart)
 			strcpy(info->s, __FILE__);
 			break;
 		/* --- the following bits of info are returned as pointers to functions --- */
-		case DEVINFO_FCT_SET_INFO:
-			info->set_info = DEVICE_SET_INFO_NAME(ti99_multicart); 
-			break;			
 		case DEVINFO_FCT_START:
 			info->start = DEVICE_START_NAME(ti99_multicart);
 			break;

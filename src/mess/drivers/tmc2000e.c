@@ -253,7 +253,7 @@ static MACHINE_START( tmc2000e )
 
 	/* allocate color RAM */
 
-	state->colorram = auto_malloc(TMC2000E_COLORRAM_SIZE);
+	state->colorram = auto_alloc_array(machine, UINT8, TMC2000E_COLORRAM_SIZE);
 
 	/* find devices */
 

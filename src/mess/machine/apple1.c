@@ -147,9 +147,9 @@ DRIVER_INIT( apple1 )
 	const address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	/* Set up the handlers for MESS's dynamically-sized RAM. */
 	memory_install_read8_handler(space,
-								 0x0000, mess_ram_size - 1, 0, 0, SMH_BANK1);
+								 0x0000, mess_ram_size - 1, 0, 0, SMH_BANK(1));
 	memory_install_write8_handler(space,
-								  0x0000, mess_ram_size - 1, 0, 0, SMH_BANK1);
+								  0x0000, mess_ram_size - 1, 0, 0, SMH_BANK(1));
 	memory_set_bankptr(machine,1, mess_ram);
 
 	/* Poll the keyboard input ports periodically.  These include both

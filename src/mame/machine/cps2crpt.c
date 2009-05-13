@@ -635,7 +635,7 @@ static void cps2_decrypt(running_machine *machine, const UINT32 *master_key, UIN
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
 	int length = memory_region_length(machine, "maincpu");
-	UINT16 *dec = auto_malloc(length);
+	UINT16 *dec = auto_alloc_array(machine, UINT16, length/2);
 	int i;
 	UINT32 key1[4];
 	struct optimised_sbox sboxes1[4*4];
@@ -721,7 +721,7 @@ static void cps2_decrypt(running_machine *machine, const UINT32 *master_key, UIN
 	}
 
 	memory_set_decrypted_region(space, 0x000000, length - 1, dec);
-	m68k_set_encrypted_opcode_range(machine->cpu[0],0,length);
+	m68k_set_encrypted_opcode_range(cputag_get_cpu(machine, "maincpu"), 0, length);
 }
 
 
@@ -961,7 +961,7 @@ static const struct game_keys keys_table[] =
 	{ "progearj", { 0x9f7edc56,0x39fb47be }, 0x400000 },	// 0C81 63A1 B8D3  cmpi.l  #$63A1B8D3,D1
 	{ "progeara", { 0x658ab128,0xfddc9b5e }, 0x400000 },	// 0C81 63A1 B8D3  cmpi.l  #$63A1B8D3,D1
 
-	{ 0 }	// end of table
+	{ NULL, { 0,0 }, 0 }	// end of table
 };
 
 

@@ -264,10 +264,8 @@ VIDEO_START( combasc )
 	bg_tilemap[1] = tilemap_create(machine, get_tile_info1,tilemap_scan_rows,8,8,32,32);
 	textlayer =  tilemap_create(machine, get_text_info, tilemap_scan_rows,     8,8,32,32);
 
-	private_spriteram[0] = auto_malloc(0x800);
-	private_spriteram[1] = auto_malloc(0x800);
-	memset(private_spriteram[0],0,0x800);
-	memset(private_spriteram[1],0,0x800);
+	private_spriteram[0] = auto_alloc_array_clear(machine, UINT8, 0x800);
+	private_spriteram[1] = auto_alloc_array_clear(machine, UINT8, 0x800);
 
 		tilemap_set_transparent_pen(bg_tilemap[0],0);
 		tilemap_set_transparent_pen(bg_tilemap[1],0);
@@ -284,10 +282,8 @@ VIDEO_START( combascb )
 	bg_tilemap[1] = tilemap_create(machine, get_tile_info1_bootleg,tilemap_scan_rows,8,8,32,32);
 	textlayer =  tilemap_create(machine, get_text_info_bootleg, tilemap_scan_rows,8,8,32,32);
 
-	private_spriteram[0] = auto_malloc(0x800);
-	private_spriteram[1] = auto_malloc(0x800);
-	memset(private_spriteram[0],0,0x800);
-	memset(private_spriteram[1],0,0x800);
+	private_spriteram[0] = auto_alloc_array_clear(machine, UINT8, 0x800);
+	private_spriteram[1] = auto_alloc_array_clear(machine, UINT8, 0x800);
 
 		tilemap_set_transparent_pen(bg_tilemap[0],0);
 		tilemap_set_transparent_pen(bg_tilemap[1],0);
@@ -340,8 +336,8 @@ WRITE8_HANDLER( combasc_vreg_w )
 
 static WRITE8_HANDLER( combascb_sh_irqtrigger_w )
 {
-	soundlatch_w(space,offset,data);
-	cpu_set_input_line_and_vector(space->machine->cpu[1],0,HOLD_LINE,0xff);
+	soundlatch_w(space, offset, data);
+	cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff);
 }
 
 static READ8_HANDLER( combascb_io_r )
@@ -423,7 +419,7 @@ WRITE8_HANDLER( combascb_bankselect_w )
 		}
 		else
 		{
-			memory_install_readwrite8_handler(space, 0x4000, 0x7fff, 0, 0, SMH_BANK1, SMH_UNMAP);	/* banked ROM */
+			memory_install_readwrite8_handler(space, 0x4000, 0x7fff, 0, 0, (read8_space_func)SMH_BANK(1), (write8_space_func)SMH_UNMAP);	/* banked ROM */
 		}
 	}
 }
@@ -431,7 +427,7 @@ WRITE8_HANDLER( combascb_bankselect_w )
 MACHINE_RESET( combasc )
 {
 	UINT8 *MEM = memory_region(machine, "maincpu") + 0x38000;
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	combasc_io_ram  = MEM + 0x0000;
 	combasc_page[0] = MEM + 0x4000;
@@ -600,7 +596,7 @@ byte #4:
 
 static void bootleg_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, const UINT8 *source, int circuit )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	const gfx_element *gfx = machine->gfx[circuit+2];
 
 	int limit = ( circuit) ? (memory_read_byte(space, 0xc2)*256 + memory_read_byte(space, 0xc3)) : (memory_read_byte(space, 0xc0)*256 + memory_read_byte(space, 0xc1));

@@ -40,7 +40,7 @@ DRIVER_INIT(radio86)
 DRIVER_INIT(radioram)
 {
 	DRIVER_INIT_CALL(radio86);
-	radio_ram_disk = auto_malloc(0x20000);
+	radio_ram_disk = auto_alloc_array(machine, UINT8, 0x20000);
 	memset(radio_ram_disk,0,0x20000);
 }
 static READ8_DEVICE_HANDLER (radio86_8255_portb_r2 )

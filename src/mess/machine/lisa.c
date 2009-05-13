@@ -1101,7 +1101,7 @@ DRIVER_INIT( lisa2 )
 	lisa_features.has_double_sided_floppy = 0;
 	lisa_features.has_mac_xl_video = 0;
 	
-	bad_parity_table = auto_malloc(0x40000);  /* 1 bit per byte of CPU RAM */
+	bad_parity_table = auto_alloc_array(machine, UINT8, 0x40000);  /* 1 bit per byte of CPU RAM */
 }
 
 DRIVER_INIT( lisa210 )
@@ -1114,7 +1114,7 @@ DRIVER_INIT( lisa210 )
 	lisa_features.has_double_sided_floppy = 0;
 	lisa_features.has_mac_xl_video = 0;
 	
-	bad_parity_table = auto_malloc(0x40000);  /* 1 bit per byte of CPU RAM */
+	bad_parity_table = auto_alloc_array(machine, UINT8, 0x40000);  /* 1 bit per byte of CPU RAM */
 }
 
 DRIVER_INIT( mac_xl )
@@ -1127,7 +1127,7 @@ DRIVER_INIT( mac_xl )
 	lisa_features.has_double_sided_floppy = 0;
 	lisa_features.has_mac_xl_video = 1;
 	
-	bad_parity_table = auto_malloc(0x40000);  /* 1 bit per byte of CPU RAM */
+	bad_parity_table = auto_alloc_array(machine, UINT8, 0x40000);  /* 1 bit per byte of CPU RAM */
 }
 
 MACHINE_RESET( lisa )
@@ -1142,7 +1142,7 @@ MACHINE_RESET( lisa )
 	memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), lisa_OPbaseoverride);
 	memory_set_direct_update_handler(cputag_get_address_space(machine, "fdccpu",  ADDRESS_SPACE_PROGRAM), lisa_fdc_OPbaseoverride);
 
-	devtag_set_info_fct(machine, "maincpu", CPUINFO_FCT_M68K_RESET_CALLBACK, (genf *)/*lisa_reset_instr_callback*/NULL);
+	m68k_set_reset_callback(devtag_get_device(machine, "maincpu"), /*lisa_reset_instr_callback*/NULL);
 
 	/* init MMU */
 

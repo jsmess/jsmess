@@ -620,13 +620,13 @@ static UINT16 rotate_left(UINT16 value, int n)
    return ((value<<n)|aux)%0x10000;
 }
 
-static UINT16 rotxor(UINT16 val, UINT16 xor)
+static UINT16 rotxor(UINT16 val, UINT16 xorval)
 {
 	UINT16 res;
 
 	res = val + rotate_left(val,2);
 
-	res = rotate_left(res,4) ^ (res & (val ^ xor));
+	res = rotate_left(res,4) ^ (res & (val ^ xorval));
 
 	return res;
 }
@@ -690,30 +690,30 @@ static DRIVER_INIT( cps3 )
 	cps3_user4region = memory_region(machine,"user4");
 	cps3_user5region = memory_region(machine,"user5");
 
-	if (!cps3_user4region) cps3_user4region = auto_malloc(USER4REGION_LENGTH);
-	if (!cps3_user5region) cps3_user5region = auto_malloc(USER5REGION_LENGTH);
+	if (!cps3_user4region) cps3_user4region = auto_alloc_array(machine, UINT8, USER4REGION_LENGTH);
+	if (!cps3_user5region) cps3_user5region = auto_alloc_array(machine, UINT8, USER5REGION_LENGTH);
 
 	// set strict verify
-	sh2drc_set_options(machine->cpu[0], SH2DRC_STRICT_VERIFY);
+	sh2drc_set_options(cputag_get_cpu(machine, "maincpu"), SH2DRC_STRICT_VERIFY);
 
 	cps3_decrypt_bios(machine);
-	decrypted_gamerom = auto_malloc(0x1000000);
+	decrypted_gamerom = auto_alloc_array(machine, UINT32, 0x1000000/4);
 
 	/* just some NOPs for the game to execute if it crashes and starts executing unmapped addresses
      - this prevents MAME from crashing */
-	cps3_nops = auto_malloc(0x4);
+	cps3_nops = auto_alloc(machine, UINT32);
 	cps3_nops[0] = 0x00090009;
 
 
-	cps3_0xc0000000_ram_decrypted = auto_malloc(0x400);
-	memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), cps3_direct_handler);
+	cps3_0xc0000000_ram_decrypted = auto_alloc_array(machine, UINT32, 0x400/4);
+	memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), cps3_direct_handler);
 
 	// flash roms
 
 	for (i=0;i<48;i++)
 		intelflash_init( machine, i, FLASH_FUJITSU_29F016A, NULL );
 
-	cps3_eeprom = auto_malloc(0x400);
+	cps3_eeprom = auto_alloc_array(machine, UINT32, 0x400/4);
 }
 
 static DRIVER_INIT( jojo )    { cps3_key1 = 0x02203ee3; cps3_key2 = 0x01301972; cps3_altEncryption = 0; DRIVER_INIT_CALL(cps3); }
@@ -796,11 +796,11 @@ static void cps3_set_mame_colours(running_machine *machine, int colournum, UINT1
 
 static VIDEO_START(cps3)
 {
-	cps3_ss_ram       = auto_malloc(0x10000);
+	cps3_ss_ram       = auto_alloc_array(machine, UINT32, 0x10000/4);
 	memset(cps3_ss_ram, 0x00, 0x10000);
 	state_save_register_global_pointer(machine, cps3_ss_ram, 0x10000/4);
 
-	cps3_char_ram = auto_malloc(0x800000);
+	cps3_char_ram = auto_alloc_array(machine, UINT32, 0x800000/4);
 	memset(cps3_char_ram, 0x00, 0x800000);
 	state_save_register_global_pointer(machine, cps3_char_ram, 0x800000 /4);
 
@@ -815,14 +815,14 @@ static VIDEO_START(cps3)
 
 	//decode_charram();
 
-	cps3_mame_colours = auto_malloc(0x80000);
+	cps3_mame_colours = auto_alloc_array(machine, UINT32, 0x80000/4);
 	memset(cps3_mame_colours, 0x00, 0x80000);
 
 	cps3_screenwidth = 384;
 
 	// the renderbuffer can be twice the size of the screen, this allows us to handle framebuffer zoom values
 	// between 0x00 and 0x80 (0x40 is normal, 0x80 would be 'view twice as much', 0x20 is 'view half as much')
-	renderbuffer_bitmap = auto_bitmap_alloc(512*2,224*2,video_screen_get_format(machine->primary_screen));
+	renderbuffer_bitmap = auto_bitmap_alloc(machine,512*2,224*2,video_screen_get_format(machine->primary_screen));
 
 	renderbuffer_clip.min_x = 0;
 	renderbuffer_clip.max_x = cps3_screenwidth-1;
@@ -1429,8 +1429,8 @@ static WRITE32_HANDLER( cps3_gfxflash_w )
 		UINT32* romdata = (UINT32*)cps3_user5region;
 		int real_offset = 0;
 		UINT32 newdata;
-		UINT8* ptr1 = intelflash_getmemptr(flash1);
-		UINT8* ptr2 = intelflash_getmemptr(flash2);
+		UINT8* ptr1 = (UINT8*)intelflash_getmemptr(flash1);
+		UINT8* ptr2 = (UINT8*)intelflash_getmemptr(flash2);
 
 		real_offset = ((cram_gfxflash_bank&0x3e) * 0x200000) + offset*4;
 
@@ -1532,10 +1532,10 @@ static void cps3_flashmain_w(running_machine *machine, int base, UINT32 offset, 
 		UINT32* romdata2 = (UINT32*)decrypted_gamerom;
 		int real_offset = 0;
 		UINT32 newdata;
-		UINT8* ptr1 = intelflash_getmemptr(base+0);
-		UINT8* ptr2 = intelflash_getmemptr(base+1);
-		UINT8* ptr3 = intelflash_getmemptr(base+2);
-		UINT8* ptr4 = intelflash_getmemptr(base+3);
+		UINT8* ptr1 = (UINT8*)intelflash_getmemptr(base+0);
+		UINT8* ptr2 = (UINT8*)intelflash_getmemptr(base+1);
+		UINT8* ptr3 = (UINT8*)intelflash_getmemptr(base+2);
+		UINT8* ptr4 = (UINT8*)intelflash_getmemptr(base+3);
 
 		real_offset = offset * 4;
 
@@ -1806,7 +1806,7 @@ static WRITE32_HANDLER( cps3_palettedma_w )
 				}
 
 
-				cpu_set_input_line(space->machine->cpu[0],10, ASSERT_LINE);
+				cputag_set_input_line(space->machine, "maincpu", 10, ASSERT_LINE);
 
 
 			}
@@ -2002,43 +2002,43 @@ static void cps3_process_character_dma(running_machine *machine, UINT32 address)
 
 	//printf("charDMA start:\n");
 
-	for (i=0;i<0x1000;i+=3)
+	for (i = 0; i < 0x1000; i += 3)
 	{
-		UINT32 dat1 = LITTLE_ENDIANIZE_INT32(cps3_char_ram[i+0+(address)]);
-		UINT32 dat2 = LITTLE_ENDIANIZE_INT32(cps3_char_ram[i+1+(address)]);
-		UINT32 dat3 = LITTLE_ENDIANIZE_INT32(cps3_char_ram[i+2+(address)]);
-		UINT32 real_source      = (dat3<<1)-0x400000;
-		UINT32 real_destination =  dat2<<3;
-		UINT32 real_length      = (((dat1&0x001fffff)+1)<<3);
+		UINT32 dat1 = LITTLE_ENDIANIZE_INT32(cps3_char_ram[i + 0 + (address)]);
+		UINT32 dat2 = LITTLE_ENDIANIZE_INT32(cps3_char_ram[i + 1 + (address)]);
+		UINT32 dat3 = LITTLE_ENDIANIZE_INT32(cps3_char_ram[i + 2 + (address)]);
+		UINT32 real_source      = (dat3 << 1) - 0x400000;
+		UINT32 real_destination =  dat2 << 3;
+		UINT32 real_length      = (((dat1 & 0x001fffff) + 1) << 3);
 
 		/* 0x01000000 is the end of list marker, 0x13131313 is our default fill */
-		if ((dat1==0x01000000) || (dat1==0x13131313)) break;
+		if ((dat1 == 0x01000000) || (dat1 == 0x13131313)) break;
 
         //printf("%08x %08x %08x real_source %08x (rom %d offset %08x) real_destination %08x, real_length %08x\n", dat1, dat2, dat3, real_source, real_source/0x800000, real_source%0x800000, real_destination, real_length);
 
-		if  ( (dat1&0x00e00000) ==0x00800000 )
+		if  ((dat1 & 0x00e00000) == 0x00800000)
 		{
 			/* Sets a table used by the decompression routines */
 			{
 				/* We should probably copy this, but a pointer to it is fine for our purposes as the data doesn't change */
 				current_table_address = real_source;
 			}
-			cpu_set_input_line(machine->cpu[0],10, ASSERT_LINE);
+			cputag_set_input_line(machine, "maincpu", 10, ASSERT_LINE);
 		}
-		else if  ( (dat1&0x00e00000) ==0x00400000 )
+		else if  ((dat1 & 0x00e00000) == 0x00400000)
 		{
 			/* 6bpp DMA decompression
               - this is used for the majority of sprites and backgrounds */
 			cps3_do_char_dma( machine, real_source, real_destination, real_length );
-			cpu_set_input_line(machine->cpu[0],10, ASSERT_LINE);
+			cputag_set_input_line(machine, "maincpu", 10, ASSERT_LINE);
 
 		}
-		else if  ( (dat1&0x00e00000) ==0x00600000 )
+		else if  ((dat1 & 0x00e00000) == 0x00600000)
 		{
 			/* 8bpp DMA decompression
               - this is used on SFIII NG Sean's Stage ONLY */
 			cps3_do_alt_char_dma( machine, real_source, real_destination, real_length);
-			cpu_set_input_line(machine->cpu[0],10, ASSERT_LINE);
+			cputag_set_input_line(machine, "maincpu", 10, ASSERT_LINE);
 		}
 		else
 		{
@@ -2095,12 +2095,12 @@ static WRITE32_HANDLER( cps3_characterdma_w )
 
 static WRITE32_HANDLER( cps3_irq10_ack_w )
 {
-	cpu_set_input_line(space->machine->cpu[0],10, CLEAR_LINE); return;
+	cputag_set_input_line(space->machine, "maincpu", 10, CLEAR_LINE); return;
 }
 
 static WRITE32_HANDLER( cps3_irq12_ack_w )
 {
-	cpu_set_input_line(space->machine->cpu[0],12, CLEAR_LINE); return;
+	cputag_set_input_line(space->machine, "maincpu", 12, CLEAR_LINE); return;
 }
 
 static WRITE32_HANDLER( cps3_unk_vidregs_w )
@@ -2297,10 +2297,10 @@ static void precopy_to_flash(running_machine *machine)
 	for (i=0;i<0x800000;i+=4)
 	{
 		UINT32 data;
-		UINT8* ptr1 = intelflash_getmemptr(0);
-		UINT8* ptr2 = intelflash_getmemptr(1);
-		UINT8* ptr3 = intelflash_getmemptr(2);
-		UINT8* ptr4 = intelflash_getmemptr(3);
+		UINT8* ptr1 = (UINT8*)intelflash_getmemptr(0);
+		UINT8* ptr2 = (UINT8*)intelflash_getmemptr(1);
+		UINT8* ptr3 = (UINT8*)intelflash_getmemptr(2);
+		UINT8* ptr4 = (UINT8*)intelflash_getmemptr(3);
 
 		data = romdata[i/4];
 
@@ -2313,10 +2313,10 @@ static void precopy_to_flash(running_machine *machine)
 	for (i=0;i<0x800000;i+=4)
 	{
 		UINT32 data;
-		UINT8* ptr1 = intelflash_getmemptr(4);
-		UINT8* ptr2 = intelflash_getmemptr(5);
-		UINT8* ptr3 = intelflash_getmemptr(6);
-		UINT8* ptr4 = intelflash_getmemptr(7);
+		UINT8* ptr1 = (UINT8*)intelflash_getmemptr(4);
+		UINT8* ptr2 = (UINT8*)intelflash_getmemptr(5);
+		UINT8* ptr3 = (UINT8*)intelflash_getmemptr(6);
+		UINT8* ptr4 = (UINT8*)intelflash_getmemptr(7);
 
 		data = romdata[(0x800000+i)/4];
 
@@ -2338,8 +2338,8 @@ static void precopy_to_flash(running_machine *machine)
 
 			for (i=0;i<0x200000;i+=2)
 			{
-				UINT8* ptr1 = intelflash_getmemptr(flashnum);
-				UINT8* ptr2 = intelflash_getmemptr(flashnum+1);
+				UINT8* ptr1 = (UINT8*)intelflash_getmemptr(flashnum);
+				UINT8* ptr2 = (UINT8*)intelflash_getmemptr(flashnum+1);
 				UINT32 dat = romdata[(thebase+i)/2];
 
 				ptr1[BYTE_XOR_LE(i+1)] =  (dat&0xff000000)>>24;
@@ -2364,10 +2364,10 @@ static void copy_from_nvram(running_machine *machine)
 	for (i=0;i<0x800000;i+=4)
 	{
 		UINT32 data;
-		UINT8* ptr1 = intelflash_getmemptr(0);
-		UINT8* ptr2 = intelflash_getmemptr(1);
-		UINT8* ptr3 = intelflash_getmemptr(2);
-		UINT8* ptr4 = intelflash_getmemptr(3);
+		UINT8* ptr1 = (UINT8*)intelflash_getmemptr(0);
+		UINT8* ptr2 = (UINT8*)intelflash_getmemptr(1);
+		UINT8* ptr3 = (UINT8*)intelflash_getmemptr(2);
+		UINT8* ptr4 = (UINT8*)intelflash_getmemptr(3);
 
 		data = ((ptr1[i/4]<<24) | (ptr2[i/4]<<16) | (ptr3[i/4]<<8) | (ptr4[i/4]<<0));
 
@@ -2383,10 +2383,10 @@ static void copy_from_nvram(running_machine *machine)
 	for (i=0;i<0x800000;i+=4)
 	{
 		UINT32 data;
-		UINT8* ptr1 = intelflash_getmemptr(4);
-		UINT8* ptr2 = intelflash_getmemptr(5);
-		UINT8* ptr3 = intelflash_getmemptr(6);
-		UINT8* ptr4 = intelflash_getmemptr(7);
+		UINT8* ptr1 = (UINT8*)intelflash_getmemptr(4);
+		UINT8* ptr2 = (UINT8*)intelflash_getmemptr(5);
+		UINT8* ptr3 = (UINT8*)intelflash_getmemptr(6);
+		UINT8* ptr4 = (UINT8*)intelflash_getmemptr(7);
 
 		data = ((ptr1[i/4]<<24) | (ptr2[i/4]<<16) | (ptr3[i/4]<<8) | (ptr4[i/4]<<0));
 
@@ -2408,8 +2408,8 @@ static void copy_from_nvram(running_machine *machine)
 
 			for (i=0;i<0x200000;i+=2)
 			{
-				UINT8* ptr1 = intelflash_getmemptr(flashnum);
-				UINT8* ptr2 = intelflash_getmemptr(flashnum+1);
+				UINT8* ptr1 = (UINT8*)intelflash_getmemptr(flashnum);
+				UINT8* ptr2 = (UINT8*)intelflash_getmemptr(flashnum+1);
 				UINT32 dat = (ptr1[i+0]<<8) |
 					         (ptr1[i+1]<<24) |
 							 (ptr2[i+0]<<0) |
@@ -2476,7 +2476,7 @@ static NVRAM_HANDLER( cps3 )
 
 
 
-static UINT32 cps3_dma_callback(UINT32 src, UINT32 dst, UINT32 data, int size)
+static int cps3_dma_callback(UINT32 src, UINT32 dst, UINT32 data, int size)
 {
 	/*
       on the actual CPS3 hardware the SH2 DMA bypasses the encryption.
@@ -2535,7 +2535,7 @@ static UINT32 cps3_dma_callback(UINT32 src, UINT32 dst, UINT32 data, int size)
 
 static const sh2_cpu_core sh2_conf_cps3 = {
 	0, // master
-	(void*)cps3_dma_callback
+	cps3_dma_callback
 };
 
 static MACHINE_DRIVER_START( cps3 )

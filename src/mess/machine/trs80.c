@@ -602,7 +602,7 @@ WRITE8_HANDLER( lnw80_fe_w )
 	else
 	{
 		memory_install_readwrite8_handler (mem, 0x0000, 0x3fff, 0, 0, SMH_UNMAP, SMH_UNMAP);
- 		memory_install_read8_handler (mem, 0x0000, 0x2fff, 0, 0, SMH_BANK1);
+ 		memory_install_read8_handler (mem, 0x0000, 0x2fff, 0, 0, SMH_BANK(1));
 		memory_set_bankptr(mem->machine, 1, memory_region(mem->machine, "maincpu"));
 		memory_install_readwrite8_handler (mem, 0x37e0, 0x37e3, 0, 0, trs80_irq_status_r, trs80_motor_w);
 		memory_install_readwrite8_handler (mem, 0x37e8, 0x37eb, 0, 0, trs80_printer_r, trs80_printer_w);

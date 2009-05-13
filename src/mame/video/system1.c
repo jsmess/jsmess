@@ -105,7 +105,7 @@ static UINT8 tilemap_pages;
 
 static TILE_GET_INFO( tile_get_info )
 {
-	UINT8 *rambase = param;
+	const UINT8 *rambase = (const UINT8 *)param;
 	UINT32 tiledata = rambase[tile_index*2+0] | (rambase[tile_index*2+1] << 8);
 	UINT32 code = ((tiledata >> 4) & 0x800) | (tiledata & 0x7ff);
 	UINT32 color = (tiledata >> 5) & 0xff;
@@ -126,15 +126,12 @@ static void video_start_common(running_machine *machine, int pagecount)
 	int pagenum;
 
 	/* allocate memory for the collision arrays */
-	mix_collide = auto_malloc(64);
-	memset(mix_collide, 0, 64);
-	sprite_collide = auto_malloc(1024);
-	memset(sprite_collide, 0, 1024);
+	mix_collide = auto_alloc_array_clear(machine, UINT8, 64);
+	sprite_collide = auto_alloc_array_clear(machine, UINT8, 1024);
 
 	/* allocate memory for videoram */
 	tilemap_pages = pagecount;
-	videoram = auto_malloc(0x800 * pagecount);
-	memset(videoram, 0, 0x800 * pagecount);
+	videoram = auto_alloc_array_clear(machine, UINT8, 0x800 * pagecount);
 
 	/* create the tilemap pages */
 	for (pagenum = 0; pagenum < pagecount; pagenum++)
@@ -145,7 +142,7 @@ static void video_start_common(running_machine *machine, int pagecount)
 	}
 
 	/* allocate a temporary bitmap for sprite rendering */
-	sprite_bitmap = auto_bitmap_alloc(256, 256, BITMAP_FORMAT_INDEXED16);
+	sprite_bitmap = auto_bitmap_alloc(machine, 256, 256, BITMAP_FORMAT_INDEXED16);
 
 	/* register for save stats */
 	state_save_register_global(machine, system1_video_mode);

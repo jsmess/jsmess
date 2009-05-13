@@ -802,8 +802,7 @@ static void internal_video_start_coco3(running_machine *machine, m6847_type type
 	const UINT8 *rom;
 
 	/* allocate video */
-	video = auto_malloc(sizeof(*video));
-	memset(video, 0, sizeof(*video));
+	video = auto_alloc_clear(machine, coco3_video);
 	coco3_set_dirty();
 
 	/* initialize palette */

@@ -100,8 +100,8 @@ void pc8801_video_init (running_machine *machine, int hireso)
 	int width = video_screen_get_width(screen);
 	int height = video_screen_get_height(screen);
 
-	wbm1 = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
-	wbm2 = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
+	wbm1 = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
+	wbm2 = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 	pc8801_is_24KHz=hireso;
 	crtcON=0;
 	textON=1;
@@ -112,12 +112,12 @@ void pc8801_video_init (running_machine *machine, int hireso)
 	dmac_addr[2]=dmac_size[2]=0;
 	dmac_flag=dmac_status=0;
 
-	gVRAM = (UINT8*) auto_malloc(0xc000);
-	pc88sr_textRAM = (UINT8*) auto_malloc(0x1000);
-	attr_tmp = auto_malloc(sizeof(unsigned short)*80*25);
-	attr_old = auto_malloc(sizeof(unsigned short)*80*100);
-	text_old = auto_malloc(sizeof(unsigned short)*80*100);
-	graph_dirty = auto_malloc(80*100);
+	gVRAM = auto_alloc_array(machine, UINT8, 0xc000);
+	pc88sr_textRAM = auto_alloc_array(machine, UINT8, 0x1000);
+	attr_tmp = auto_alloc_array(machine, UINT16, 80*25);
+	attr_old = auto_alloc_array(machine, UINT16, 80*100);
+	text_old = auto_alloc_array(machine, UINT16, 80*100);
+	graph_dirty = auto_alloc_array(machine, char, 80*100);
 
 	memset(gVRAM,0,0xc000);
 	memset(pc88sr_textRAM,0,0x1000);
@@ -279,8 +279,8 @@ int is_pc8801_vram_select(running_machine *machine)
     switch(selected_vram) {
 #define XXX(n) \
     case (n+1): \
-      rh5 = SMH_BANK5; \
-      rh6 = SMH_BANK6; \
+      rh5 = SMH_BANK(5); \
+      rh6 = SMH_BANK(6); \
       wh5 = write_gvram##n##_bank5; \
       wh6 = write_gvram##n##_bank6; \
       memory_set_bankptr(machine, 5, gVRAM + 0x4000*n ); \

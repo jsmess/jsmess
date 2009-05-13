@@ -1044,15 +1044,15 @@ VIDEO_START( x68000 )
 {
 	int gfx_index;
 
-	x68k_text_bitmap = auto_bitmap_alloc(1024,1024,BITMAP_FORMAT_INDEXED16);
-	x68k_gfx_big_bitmap = auto_bitmap_alloc(1024,1024,BITMAP_FORMAT_INDEXED16);
-	x68k_gfx_0_bitmap_16 = auto_bitmap_alloc(512,512,BITMAP_FORMAT_INDEXED16);
-	x68k_gfx_1_bitmap_16 = auto_bitmap_alloc(512,512,BITMAP_FORMAT_INDEXED16);
-	x68k_gfx_2_bitmap_16 = auto_bitmap_alloc(512,512,BITMAP_FORMAT_INDEXED16);
-	x68k_gfx_3_bitmap_16 = auto_bitmap_alloc(512,512,BITMAP_FORMAT_INDEXED16);
-	x68k_gfx_0_bitmap_256 = auto_bitmap_alloc(512,512,BITMAP_FORMAT_INDEXED16);
-	x68k_gfx_1_bitmap_256 = auto_bitmap_alloc(512,512,BITMAP_FORMAT_INDEXED16);
-	x68k_gfx_0_bitmap_65536 = auto_bitmap_alloc(512,512,BITMAP_FORMAT_INDEXED16);
+	x68k_text_bitmap = auto_bitmap_alloc(machine, 1024,1024,BITMAP_FORMAT_INDEXED16);
+	x68k_gfx_big_bitmap = auto_bitmap_alloc(machine, 1024,1024,BITMAP_FORMAT_INDEXED16);
+	x68k_gfx_0_bitmap_16 = auto_bitmap_alloc(machine, 512,512,BITMAP_FORMAT_INDEXED16);
+	x68k_gfx_1_bitmap_16 = auto_bitmap_alloc(machine, 512,512,BITMAP_FORMAT_INDEXED16);
+	x68k_gfx_2_bitmap_16 = auto_bitmap_alloc(machine, 512,512,BITMAP_FORMAT_INDEXED16);
+	x68k_gfx_3_bitmap_16 = auto_bitmap_alloc(machine, 512,512,BITMAP_FORMAT_INDEXED16);
+	x68k_gfx_0_bitmap_256 = auto_bitmap_alloc(machine, 512,512,BITMAP_FORMAT_INDEXED16);
+	x68k_gfx_1_bitmap_256 = auto_bitmap_alloc(machine, 512,512,BITMAP_FORMAT_INDEXED16);
+	x68k_gfx_0_bitmap_65536 = auto_bitmap_alloc(machine, 512,512,BITMAP_FORMAT_INDEXED16);
 
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
 		if (machine->gfx[gfx_index] == 0)

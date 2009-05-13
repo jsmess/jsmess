@@ -1401,13 +1401,13 @@ static DIRECT_UPDATE_HANDLER( amstrad_multiface_directoverride )
 		return pc;
 }
 
-static void multiface_init(void)
+static void multiface_init(running_machine *machine)
 {
 	/* after a reset the multiface is visible */
 	multiface_flags = MULTIFACE_VISIBLE;
 
 	/* allocate ram */
-	multiface_ram = (unsigned char *)auto_malloc(8192);
+	multiface_ram = auto_alloc_array(machine, UINT8, 8192);
 }
 
 /* call when a system reset is done */
@@ -1662,10 +1662,10 @@ static void amstrad_setLowerRom(running_machine *machine)
 		}
 		else
 		{
-			memory_install_read8_handler(space, 0x4000, 0x5fff, 0, 0, SMH_BANK3);
-			memory_install_read8_handler(space, 0x6000, 0x7fff, 0, 0, SMH_BANK4);
-			memory_install_write8_handler(space, 0x4000, 0x5fff, 0, 0, SMH_BANK11);
-			memory_install_write8_handler(space, 0x6000, 0x7fff, 0, 0, SMH_BANK12);
+			memory_install_read8_handler(space, 0x4000, 0x5fff, 0, 0, SMH_BANK(3));
+			memory_install_read8_handler(space, 0x6000, 0x7fff, 0, 0, SMH_BANK(4));
+			memory_install_write8_handler(space, 0x4000, 0x5fff, 0, 0, SMH_BANK(11));
+			memory_install_write8_handler(space, 0x6000, 0x7fff, 0, 0, SMH_BANK(12));
 		}
 
 		if(AmstradCPC_RamBanks[0] != NULL)
@@ -3228,29 +3228,29 @@ static void amstrad_common_init(running_machine *machine)
 	amstrad_GateArray_RamConfiguration = 0;
 	amstrad_CRTC_HS_Counter = 2;
 
-	memory_install_read8_handler(space, 0x0000, 0x1fff, 0, 0, SMH_BANK1);
-	memory_install_read8_handler(space, 0x2000, 0x3fff, 0, 0, SMH_BANK2);
+	memory_install_read8_handler(space, 0x0000, 0x1fff, 0, 0, SMH_BANK(1));
+	memory_install_read8_handler(space, 0x2000, 0x3fff, 0, 0, SMH_BANK(2));
 
-	memory_install_read8_handler(space, 0x4000, 0x5fff, 0, 0, SMH_BANK3);
-	memory_install_read8_handler(space, 0x6000, 0x7fff, 0, 0, SMH_BANK4);
+	memory_install_read8_handler(space, 0x4000, 0x5fff, 0, 0, SMH_BANK(3));
+	memory_install_read8_handler(space, 0x6000, 0x7fff, 0, 0, SMH_BANK(4));
 
-	memory_install_read8_handler(space, 0x8000, 0x9fff, 0, 0, SMH_BANK5);
-	memory_install_read8_handler(space, 0xa000, 0xbfff, 0, 0, SMH_BANK6);
+	memory_install_read8_handler(space, 0x8000, 0x9fff, 0, 0, SMH_BANK(5));
+	memory_install_read8_handler(space, 0xa000, 0xbfff, 0, 0, SMH_BANK(6));
 
-	memory_install_read8_handler(space, 0xc000, 0xdfff, 0, 0, SMH_BANK7);
-	memory_install_read8_handler(space, 0xe000, 0xffff, 0, 0, SMH_BANK8);
+	memory_install_read8_handler(space, 0xc000, 0xdfff, 0, 0, SMH_BANK(7));
+	memory_install_read8_handler(space, 0xe000, 0xffff, 0, 0, SMH_BANK(8));
 
-	memory_install_write8_handler(space, 0x0000, 0x1fff, 0, 0, SMH_BANK9);
-	memory_install_write8_handler(space, 0x2000, 0x3fff, 0, 0, SMH_BANK10);
+	memory_install_write8_handler(space, 0x0000, 0x1fff, 0, 0, SMH_BANK(9));
+	memory_install_write8_handler(space, 0x2000, 0x3fff, 0, 0, SMH_BANK(10));
 
-	memory_install_write8_handler(space, 0x4000, 0x5fff, 0, 0, SMH_BANK11);
-	memory_install_write8_handler(space, 0x6000, 0x7fff, 0, 0, SMH_BANK12);
+	memory_install_write8_handler(space, 0x4000, 0x5fff, 0, 0, SMH_BANK(11));
+	memory_install_write8_handler(space, 0x6000, 0x7fff, 0, 0, SMH_BANK(12));
 
-	memory_install_write8_handler(space, 0x8000, 0x9fff, 0, 0, SMH_BANK13);
-	memory_install_write8_handler(space, 0xa000, 0xbfff, 0, 0, SMH_BANK14);
+	memory_install_write8_handler(space, 0x8000, 0x9fff, 0, 0, SMH_BANK(13));
+	memory_install_write8_handler(space, 0xa000, 0xbfff, 0, 0, SMH_BANK(14));
 
-	memory_install_write8_handler(space, 0xc000, 0xdfff, 0, 0, SMH_BANK15);
-	memory_install_write8_handler(space, 0xe000, 0xffff, 0, 0, SMH_BANK16);
+	memory_install_write8_handler(space, 0xc000, 0xdfff, 0, 0, SMH_BANK(15));
+	memory_install_write8_handler(space, 0xe000, 0xffff, 0, 0, SMH_BANK(16));
 
 	device_reset(cputag_get_cpu(space->machine, "maincpu"));
 	if ( amstrad_system_type == SYSTEM_CPC || amstrad_system_type == SYSTEM_ALESTE )
@@ -3304,7 +3304,7 @@ MACHINE_RESET( amstrad )
 	amstrad_reset_machine(machine);
 //	amstrad_init_palette(machine);
 
-	multiface_init();
+	multiface_init(machine);
 
 }
 

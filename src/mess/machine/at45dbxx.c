@@ -100,9 +100,9 @@ static void common_start(const device_config *device, int device_type)
 		case TYPE_AT45DB161 : flash->pages = 4096; flash->page_size = 528; flash->devid = 0x28; break;
 	}
 	flash->size = flash->pages * flash->page_size;
-	flash->data = auto_malloc( flash->size);
-	flash->buffer1 = auto_malloc( flash->page_size);
-	flash->buffer2 = auto_malloc( flash->page_size);
+	flash->data = auto_alloc_array(device->machine, UINT8, flash->size);
+	flash->buffer1 = auto_alloc_array(device->machine, UINT8, flash->page_size);
+	flash->buffer2 = auto_alloc_array(device->machine, UINT8, flash->page_size);
 	
 	// data
 	state_save_register_item_pointer(device->machine, "at45dbxx", device->tag, 0, flash->data, flash->size);

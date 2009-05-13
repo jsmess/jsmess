@@ -41,6 +41,7 @@ To do:
 #include "cpu/hd6309/hd6309.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6502/m6502.h"
+#include "cpu/mcs51/mcs51.h"
 #include "sound/2203intf.h"
 #include "sound/3812intf.h"
 #include "sound/3526intf.h"
@@ -56,23 +57,23 @@ static int msm5205next;
 /* Only used by ghostb, gondo, garyoret, other games can control buffering */
 static VIDEO_EOF( dec8 )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	buffer_spriteram_w(space,0,0);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	buffer_spriteram_w(space, 0, 0);
 }
 
 static READ8_HANDLER( i8751_h_r )
 {
-	return i8751_return>>8; /* MSB */
+	return i8751_return >> 8; /* MSB */
 }
 
 static READ8_HANDLER( i8751_l_r )
 {
-	return i8751_return&0xff; /* LSB */
+	return i8751_return & 0xff; /* LSB */
 }
 
 static WRITE8_HANDLER( i8751_reset_w )
 {
-	i8751_return=0;
+	i8751_return = 0;
 }
 
 /******************************************************************************/
@@ -81,7 +82,8 @@ static READ8_HANDLER( gondo_player_1_r )
 {
 	int val = 1 << input_port_read(space->machine, "AN0");
 
-	switch (offset) {
+	switch (offset)
+	{
 		case 0: /* Rotary low byte */
 			return ~(val & 0xff);
 		case 1: /* Joystick = bottom 4 bits, rotary = top 4 */
@@ -94,7 +96,8 @@ static READ8_HANDLER( gondo_player_2_r )
 {
 	int val = 1 << input_port_read(space->machine, "AN1");
 
-	switch (offset) {
+	switch (offset)
+	{
 		case 0: /* Rotary low byte */
 			return ~(val & 0xff);
 		case 1: /* Joystick = bottom 4 bits, rotary = top 4 */
@@ -105,47 +108,77 @@ static READ8_HANDLER( gondo_player_2_r )
 
 /******************************************************************************/
 
-static WRITE8_HANDLER( ghostb_i8751_w )
-{
-	i8751_return=0;
+/***************************************************
+*
+* Hook-up for games that we have a proper MCU dump.
+*
+***************************************************/
 
-	switch (offset) {
+static WRITE8_HANDLER( meikyuh_i8751_w )
+{
+	switch (offset)
+	{
 	case 0: /* High byte */
-		i8751_value=(i8751_value&0xff) | (data<<8);
+		i8751_value = (i8751_value & 0xff) | (data << 8);
 		break;
 	case 1: /* Low byte */
-		i8751_value=(i8751_value&0xff00) | data;
+		i8751_value = (i8751_value & 0xff00) | data;
+		cputag_set_input_line(space->machine, "mcu", MCS51_INT1_LINE, ASSERT_LINE);
+		break;
+	}
+}
+
+/********************************
+*
+* MCU simulations
+*
+********************************/
+
+static WRITE8_HANDLER( ghostb_i8751_w )
+{
+	i8751_return = 0;
+
+	switch (offset)
+	{
+	case 0: /* High byte */
+		i8751_value = (i8751_value & 0xff) | (data << 8);
+		break;
+	case 1: /* Low byte */
+		i8751_value = (i8751_value & 0xff00) | data;
 		break;
 	}
 
-	if (i8751_value==0x00aa) i8751_return=0x655;
-	if (i8751_value==0x021a) i8751_return=0x6e5; /* Ghostbusters ID */
-	if (i8751_value==0x021b) i8751_return=0x6e4; /* Meikyuu Hunter G ID */
+	if (i8751_value == 0x00aa) i8751_return = 0x655;
+	if (i8751_value == 0x021a) i8751_return = 0x6e5; /* Ghostbusters ID */
+	if (i8751_value == 0x021b) i8751_return = 0x6e4; /* Meikyuu Hunter G ID */
 }
+
+
 
 static WRITE8_HANDLER( srdarwin_i8751_w )
 {
-	static int coins,latch;
-	i8751_return=0;
+	static int coins, latch;
+	i8751_return = 0;
 
-	switch (offset) {
+	switch (offset)
+	{
 	case 0: /* High byte */
-		i8751_value=(i8751_value&0xff) | (data<<8);
+		i8751_value = (i8751_value & 0xff) | (data << 8);
 		break;
 	case 1: /* Low byte */
-		i8751_value=(i8751_value&0xff00) | data;
+		i8751_value = (i8751_value & 0xff00) | data;
 		break;
 	}
 
-	if (i8751_value==0x0000) {i8751_return=0;coins=0;}
-	if (i8751_value==0x3063) i8751_return=0x9c; /* Protection - Japanese version */
-	if (i8751_value==0x306b) i8751_return=0x94; /* Protection - World version */
-	if ((i8751_value&0xff00)==0x4000) i8751_return=i8751_value; /* Coinage settings */
- 	if (i8751_value==0x5000) i8751_return=((coins / 10) << 4) | (coins % 10); /* Coin request */
- 	if (i8751_value==0x6000) {i8751_value=-1; coins--; } /* Coin clear */
+	if (i8751_value == 0x0000) {i8751_return = 0; coins = 0;}
+	if (i8751_value == 0x3063) i8751_return = 0x9c;				/* Protection - Japanese version */
+	if (i8751_value == 0x306b) i8751_return = 0x94;				/* Protection - World version */
+	if ((i8751_value & 0xff00) == 0x4000) i8751_return = i8751_value;	/* Coinage settings */
+ 	if (i8751_value == 0x5000) i8751_return =((coins / 10) << 4) | (coins % 10);	/* Coin request */
+ 	if (i8751_value == 0x6000) {i8751_value = -1; coins--; }	/* Coin clear */
 	/* Nb:  Command 0x4000 for setting coinage options is not supported */
- 	if ((input_port_read(space->machine, "FAKE") & 1) == 1) latch=1;
- 	if ((input_port_read(space->machine, "FAKE") & 1) != 1 && latch) {coins++; latch=0;}
+ 	if ((input_port_read(space->machine, "FAKE") & 1) == 1) latch = 1;
+ 	if ((input_port_read(space->machine, "FAKE") & 1) != 1 && latch) {coins++; latch = 0;}
 
 	/* This next value is the index to a series of tables,
     each table controls the end of level bad guy, wrong values crash the
@@ -183,165 +216,171 @@ bb63           = Square things again
     but Boss #6 is uncomfirmed as correct.
 
 */
-	if (i8751_value==0x8000) i8751_return=0xf580 +  0; /* Boss #1: Snake + Bees */
-	if (i8751_value==0x8001) i8751_return=0xf580 + 30; /* Boss #2: 4 Corners */
-	if (i8751_value==0x8002) i8751_return=0xf580 + 26; /* Boss #3: Clock */
-	if (i8751_value==0x8003) i8751_return=0xf580 +  2; /* Boss #4: Pyramid */
-	if (i8751_value==0x8004) i8751_return=0xf580 +  6; /* Boss #5: Snake + Head Combo */
-	if (i8751_value==0x8005) i8751_return=0xf580 + 24; /* Boss #6: LED Panels */
-	if (i8751_value==0x8006) i8751_return=0xf580 + 28; /* Boss #7: Dragon */
-	if (i8751_value==0x8007) i8751_return=0xf580 + 32; /* Boss #8: Teleport */
-	if (i8751_value==0x8008) i8751_return=0xf580 + 38; /* Boss #9: Octopus (Pincer) */
-	if (i8751_value==0x8009) i8751_return=0xf580 + 40; /* Boss #10: Bird */
-	if (i8751_value==0x800a) i8751_return=0xf580 + 42; /* End Game(bad address?) */
+	if (i8751_value == 0x8000) i8751_return = 0xf580 +  0; /* Boss #1: Snake + Bees */
+	if (i8751_value == 0x8001) i8751_return = 0xf580 + 30; /* Boss #2: 4 Corners */
+	if (i8751_value == 0x8002) i8751_return = 0xf580 + 26; /* Boss #3: Clock */
+	if (i8751_value == 0x8003) i8751_return = 0xf580 +  2; /* Boss #4: Pyramid */
+	if (i8751_value == 0x8004) i8751_return = 0xf580 +  6; /* Boss #5: Snake + Head Combo */
+	if (i8751_value == 0x8005) i8751_return = 0xf580 + 24; /* Boss #6: LED Panels */
+	if (i8751_value == 0x8006) i8751_return = 0xf580 + 28; /* Boss #7: Dragon */
+	if (i8751_value == 0x8007) i8751_return = 0xf580 + 32; /* Boss #8: Teleport */
+	if (i8751_value == 0x8008) i8751_return = 0xf580 + 38; /* Boss #9: Octopus (Pincer) */
+	if (i8751_value == 0x8009) i8751_return = 0xf580 + 40; /* Boss #10: Bird */
+	if (i8751_value == 0x800a) i8751_return = 0xf580 + 42; /* End Game(bad address?) */
 }
 
 static WRITE8_HANDLER( gondo_i8751_w )
 {
-	static int coin1,coin2,latch,snd;
-	i8751_return=0;
+	static int coin1, coin2, latch,snd;
+	i8751_return = 0;
 
-	switch (offset) {
+	switch (offset)
+	{
 	case 0: /* High byte */
-		i8751_value=(i8751_value&0xff) | (data<<8);
-		if (int_enable) cpu_set_input_line (space->machine->cpu[0], M6809_IRQ_LINE, HOLD_LINE); /* IRQ on *high* byte only */
+		i8751_value = (i8751_value & 0xff) | (data << 8);
+		if (int_enable)
+			cputag_set_input_line (space->machine, "maincpu", M6809_IRQ_LINE, HOLD_LINE); /* IRQ on *high* byte only */
 		break;
 	case 1: /* Low byte */
-		i8751_value=(i8751_value&0xff00) | data;
+		i8751_value = (i8751_value & 0xff00) | data;
 		break;
 	}
 
 	/* Coins are controlled by the i8751 */
- 	if ((input_port_read(space->machine, "I8751") & 3) == 3) latch=1;
- 	if ((input_port_read(space->machine, "I8751") & 1) != 1 && latch) {coin1++; snd=1; latch=0;}
- 	if ((input_port_read(space->machine, "I8751") & 2) != 2 && latch) {coin2++; snd=1; latch=0;}
+ 	if ((input_port_read(space->machine, "I8751") & 3) == 3) latch = 1;
+ 	if ((input_port_read(space->machine, "I8751") & 1) != 1 && latch) {coin1++; snd = 1; latch = 0;}
+ 	if ((input_port_read(space->machine, "I8751") & 2) != 2 && latch) {coin2++; snd = 1; latch = 0;}
 
 	/* Work out return values */
-	if (i8751_value==0x0000) {i8751_return=0; coin1=coin2=snd=0;}
-	if (i8751_value==0x038a)  i8751_return=0x375; /* Makyou Senshi ID */
-	if (i8751_value==0x038b)  i8751_return=0x374; /* Gondomania ID */
-	if ((i8751_value>>8)==0x04)  i8751_return=0x40f; /* Coinage settings (Not supported) */
-	if ((i8751_value>>8)==0x05) {i8751_return=0x500 | ((coin1 / 10) << 4) | (coin1 % 10);  } /* Coin 1 */
-	if ((i8751_value>>8)==0x06 && coin1 && !offset) {i8751_return=0x600; coin1--; } /* Coin 1 clear */
-	if ((i8751_value>>8)==0x07) {i8751_return=0x700 | ((coin2 / 10) << 4) | (coin2 % 10);  } /* Coin 2 */
-	if ((i8751_value>>8)==0x08 && coin2 && !offset) {i8751_return=0x800; coin2--; } /* Coin 2 clear */
+	if (i8751_value == 0x0000) {i8751_return = 0; coin1 = coin2 = snd = 0;}
+	if (i8751_value == 0x038a)  i8751_return = 0x375; /* Makyou Senshi ID */
+	if (i8751_value == 0x038b)  i8751_return = 0x374; /* Gondomania ID */
+	if ((i8751_value >> 8) == 0x04)  i8751_return = 0x40f; /* Coinage settings (Not supported) */
+	if ((i8751_value >> 8) == 0x05) {i8751_return = 0x500 | ((coin1 / 10) << 4) | (coin1 % 10);  } /* Coin 1 */
+	if ((i8751_value >> 8) == 0x06 && coin1 && !offset) {i8751_return = 0x600; coin1--; } /* Coin 1 clear */
+	if ((i8751_value >> 8) == 0x07) {i8751_return = 0x700 | ((coin2 / 10) << 4) | (coin2 % 10);  } /* Coin 2 */
+	if ((i8751_value >> 8) == 0x08 && coin2 && !offset) {i8751_return = 0x800; coin2--; } /* Coin 2 clear */
 	/* Commands 0x9xx do nothing */
-	if ((i8751_value>>8)==0x0a) {i8751_return=0xa00 | snd; if (snd) snd=0; }
+	if ((i8751_value >> 8) == 0x0a) {i8751_return = 0xa00 | snd; if (snd) snd = 0; }
 }
 
 static WRITE8_HANDLER( shackled_i8751_w )
 {
-	static int coin1,coin2,latch=0;
-	i8751_return=0;
+	static int coin1, coin2, latch = 0;
+	i8751_return = 0;
 
-	switch (offset) {
+	switch (offset)
+	{
 	case 0: /* High byte */
-		i8751_value=(i8751_value&0xff) | (data<<8);
-		cpu_set_input_line (space->machine->cpu[1], M6809_FIRQ_LINE, HOLD_LINE); /* Signal main cpu */
+		i8751_value = (i8751_value & 0xff) | (data << 8);
+		cputag_set_input_line(space->machine, "sub", M6809_FIRQ_LINE, HOLD_LINE); /* Signal main cpu */
 		break;
 	case 1: /* Low byte */
-		i8751_value=(i8751_value&0xff00) | data;
+		i8751_value = (i8751_value & 0xff00) | data;
 		break;
 	}
 
 	/* Coins are controlled by the i8751 */
- 	if (/*(input_port_read(space->machine, "IN2") & 3) == 3*/!latch) {latch=1;coin1=coin2=0;}
- 	if ((input_port_read(space->machine, "IN2") & 1) != 1 && latch) {coin1=1; latch=0;}
- 	if ((input_port_read(space->machine, "IN2") & 2) != 2 && latch) {coin2=1; latch=0;}
+ 	if (/*(input_port_read(space->machine, "IN2") & 3) == 3*/!latch) {latch = 1; coin1 = coin2 = 0;}
+ 	if ((input_port_read(space->machine, "IN2") & 1) != 1 && latch)  {coin1 = 1; latch = 0;}
+ 	if ((input_port_read(space->machine, "IN2") & 2) != 2 && latch)  {coin2 = 1; latch = 0;}
 
-	if (i8751_value==0x0050) i8751_return=0; /* Breywood ID */
-	if (i8751_value==0x0051) i8751_return=0; /* Shackled ID */
-	if (i8751_value==0x0102) i8751_return=0; /* ?? */
-	if (i8751_value==0x0101) i8751_return=0; /* ?? */
-	if (i8751_value==0x8101) i8751_return=((coin2 / 10) << 4) | (coin2 % 10) |
-			((((coin1 / 10) << 4) | (coin1 % 10))<<8); /* Coins */
+	if (i8751_value == 0x0050) i8751_return = 0; /* Breywood ID */
+	if (i8751_value == 0x0051) i8751_return = 0; /* Shackled ID */
+	if (i8751_value == 0x0102) i8751_return = 0; /* ?? */
+	if (i8751_value == 0x0101) i8751_return = 0; /* ?? */
+	if (i8751_value == 0x8101) i8751_return = ((coin2 / 10) << 4) | (coin2 % 10) |
+			((((coin1 / 10) << 4) | (coin1 % 10)) << 8); /* Coins */
 }
 
 static WRITE8_HANDLER( lastmiss_i8751_w )
 {
-	static int coin,latch=0,snd;
-	i8751_return=0;
+	static int coin, latch = 0, snd;
+	i8751_return = 0;
 
-	switch (offset) {
+	switch (offset)
+	{
 	case 0: /* High byte */
-		i8751_value=(i8751_value&0xff) | (data<<8);
-		cpu_set_input_line (space->machine->cpu[0], M6809_FIRQ_LINE, HOLD_LINE); /* Signal main cpu */
+		i8751_value = (i8751_value & 0xff) | (data << 8);
+		cputag_set_input_line(space->machine, "maincpu", M6809_FIRQ_LINE, HOLD_LINE); /* Signal main cpu */
 		break;
 	case 1: /* Low byte */
-		i8751_value=(i8751_value&0xff00) | data;
+		i8751_value = (i8751_value & 0xff00) | data;
 		break;
 	}
 
-	if(offset==0)
+	if(offset == 0)
 	{
 		/* Coins are controlled by the i8751 */
- 		if ((input_port_read(space->machine, "IN2") & 3) == 3 && !latch) latch=1;
- 		if ((input_port_read(space->machine, "IN2") & 3) != 3 && latch) {coin++; latch=0;snd=0x400;i8751_return=0x400;return;}
-		if (i8751_value==0x007a) i8751_return=0x0185; /* Japan ID code */
-		if (i8751_value==0x007b) i8751_return=0x0184; /* USA ID code */
-		if (i8751_value==0x0001) {coin=snd=0;}//???
-		if (i8751_value==0x0000) {i8751_return=0x0184;}//???
-		if (i8751_value==0x0401) i8751_return=0x0184; //???
-		if ((i8751_value>>8)==0x01) i8751_return=0x0184; /* Coinage setup */
-		if ((i8751_value>>8)==0x02) {i8751_return=snd | ((coin / 10) << 4) | (coin % 10); snd=0;} /* Coin return */
-		if ((i8751_value>>8)==0x03 && coin) {i8751_return=0; coin--; } /* Coin clear */
+ 		if ((input_port_read(space->machine, "IN2") & 3) == 3 && !latch) latch = 1;
+ 		if ((input_port_read(space->machine, "IN2") & 3) != 3 && latch) {coin++; latch = 0; snd = 0x400; i8751_return = 0x400; return;}
+		if (i8751_value == 0x007a) i8751_return = 0x0185; /* Japan ID code */
+		if (i8751_value == 0x007b) i8751_return = 0x0184; /* USA ID code */
+		if (i8751_value == 0x0001) {coin = snd = 0;}//???
+		if (i8751_value == 0x0000) {i8751_return = 0x0184;}//???
+		if (i8751_value == 0x0401) i8751_return = 0x0184; //???
+		if ((i8751_value >> 8) == 0x01) i8751_return = 0x0184; /* Coinage setup */
+		if ((i8751_value >> 8) == 0x02) {i8751_return = snd | ((coin / 10) << 4) | (coin % 10); snd = 0;} /* Coin return */
+		if ((i8751_value >> 8) == 0x03 && coin) {i8751_return = 0; coin--; } /* Coin clear */
 	}
 }
 
 static WRITE8_HANDLER( csilver_i8751_w )
 {
-	static int coin,latch=0,snd;
-	i8751_return=0;
+	static int coin, latch = 0, snd;
+	i8751_return = 0;
 
-	switch (offset) {
+	switch (offset)
+	{
 	case 0: /* High byte */
-		i8751_value=(i8751_value&0xff) | (data<<8);
-		cpu_set_input_line (space->machine->cpu[0], M6809_FIRQ_LINE, HOLD_LINE); /* Signal main cpu */
+		i8751_value = (i8751_value & 0xff) | (data << 8);
+		cputag_set_input_line (space->machine, "maincpu", M6809_FIRQ_LINE, HOLD_LINE); /* Signal main cpu */
 		break;
 	case 1: /* Low byte */
-		i8751_value=(i8751_value&0xff00) | data;
+		i8751_value = (i8751_value & 0xff00) | data;
 		break;
 	}
 
-	if(offset==0)
+	if(offset == 0)
 	{
 		/* Coins are controlled by the i8751 */
- 		if ((input_port_read(space->machine, "IN2") & 3) == 3 && !latch) latch=1;
- 		if ((input_port_read(space->machine, "IN2") & 3) != 3 && latch) {coin++; latch=0; snd=0x1200; i8751_return=0x1200;return;}
+ 		if ((input_port_read(space->machine, "IN2") & 3) == 3 && !latch) latch = 1;
+ 		if ((input_port_read(space->machine, "IN2") & 3) != 3 && latch) {coin++; latch = 0; snd = 0x1200; i8751_return = 0x1200; return;}
 
-		if (i8751_value==0x054a) {i8751_return=~(0x4a); coin=0; snd=0;} /* Captain Silver (Japan) ID */
-		if (i8751_value==0x054c) {i8751_return=~(0x4c); coin=0; snd=0;} /* Captain Silver (World) ID */
-		if ((i8751_value>>8)==0x01) i8751_return=0; /* Coinage - Not Supported */
-		if ((i8751_value>>8)==0x02) {i8751_return=snd | coin; snd=0; } /* Coin Return */
-		if ((i8751_value>>8)==0x03 && coin) {i8751_return=0; coin--;} /* Coin Clear */
+		if (i8751_value == 0x054a) {i8751_return = ~(0x4a); coin = 0; snd = 0;} /* Captain Silver (Japan) ID */
+		if (i8751_value == 0x054c) {i8751_return = ~(0x4c); coin = 0; snd = 0;} /* Captain Silver (World) ID */
+		if ((i8751_value >> 8) == 0x01) i8751_return = 0; /* Coinage - Not Supported */
+		if ((i8751_value >> 8) == 0x02) {i8751_return = snd | coin; snd = 0; } /* Coin Return */
+		if ((i8751_value >> 8) == 0x03 && coin) {i8751_return = 0; coin--;} /* Coin Clear */
 	}
 }
 
 static WRITE8_HANDLER( garyoret_i8751_w )
 {
-	static int coin1,coin2,latch;
-	i8751_return=0;
+	static int coin1, coin2, latch;
+	i8751_return = 0;
 
-	switch (offset) {
+	switch (offset)
+	{
 	case 0: /* High byte */
-		i8751_value=(i8751_value&0xff) | (data<<8);
+		i8751_value = (i8751_value & 0xff) | (data << 8);
 		break;
 	case 1: /* Low byte */
-		i8751_value=(i8751_value&0xff00) | data;
+		i8751_value = (i8751_value & 0xff00) | data;
 		break;
 	}
 
 	/* Coins are controlled by the i8751 */
  	if ((input_port_read(space->machine, "I8751") & 3) == 3) latch=1;
- 	if ((input_port_read(space->machine, "I8751") & 1) != 1 && latch) {coin1++; latch=0;}
- 	if ((input_port_read(space->machine, "I8751") & 2) != 2 && latch) {coin2++; latch=0;}
+ 	if ((input_port_read(space->machine, "I8751") & 1) != 1 && latch) {coin1++; latch = 0;}
+ 	if ((input_port_read(space->machine, "I8751") & 2) != 2 && latch) {coin2++; latch = 0;}
 
 	/* Work out return values */
-	if ((i8751_value>>8)==0x00) {i8751_return=0; coin1=coin2=0;}
-	if ((i8751_value>>8)==0x01)  i8751_return=0x59a; /* ID */
-	if ((i8751_value>>8)==0x04)  i8751_return=i8751_value; /* Coinage settings (Not supported) */
-	if ((i8751_value>>8)==0x05) {i8751_return=0x00 | ((coin1 / 10) << 4) | (coin1 % 10);  } /* Coin 1 */
-	if ((i8751_value>>8)==0x06 && coin1 && !offset) {i8751_return=0x600; coin1--; } /* Coin 1 clear */
+	if ((i8751_value >> 8) == 0x00) {i8751_return = 0; coin1 = coin2 = 0;}
+	if ((i8751_value >> 8) == 0x01)  i8751_return = 0x59a; /* ID */
+	if ((i8751_value >> 8) == 0x04)  i8751_return = i8751_value; /* Coinage settings (Not supported) */
+	if ((i8751_value >> 8) == 0x05) {i8751_return = 0x00 | ((coin1 / 10) << 4) | (coin1 % 10);  } /* Coin 1 */
+	if ((i8751_value >> 8) == 0x06 && coin1 && !offset) {i8751_return = 0x600; coin1--; } /* Coin 1 clear */
 }
 
 /******************************************************************************/
@@ -369,10 +408,10 @@ static WRITE8_HANDLER( ghostb_bank_w )
     */
 
 	bankaddress = 0x10000 + (data >> 4) * 0x4000;
-	memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
+	memory_set_bankptr(space->machine, 1, &RAM[bankaddress]);
 
-	if (data&1) int_enable=1; else int_enable=0;
-	if (data&2) nmi_enable=1; else nmi_enable=0;
+	if (data & 1) int_enable =1; else int_enable = 0;
+	if (data & 2) nmi_enable =1; else nmi_enable = 0;
 	flip_screen_set(space->machine, data & 0x08);
 }
 
@@ -387,36 +426,30 @@ static WRITE8_HANDLER( csilver_control_w )
         Bit 0x40 - Unused.
         Bit 0x80 - Hold subcpu reset line high if clear, else low?  (Not needed anyway)
     */
-	memory_set_bankptr(space->machine, 1,&RAM[0x10000 + (data & 0x0f) * 0x4000]);
+	memory_set_bankptr(space->machine, 1, &RAM[0x10000 + (data & 0x0f) * 0x4000]);
 }
 
 static WRITE8_HANDLER( dec8_sound_w )
 {
- 	soundlatch_w(space,0,data);
-	cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
-}
-
-static WRITE8_HANDLER( oscar_sound_w )
-{
- 	soundlatch_w(space,0,data);
-	cpu_set_input_line(space->machine->cpu[2],INPUT_LINE_NMI,PULSE_LINE);
+ 	soundlatch_w(space, 0, data);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static void csilver_adpcm_int(const device_config *device)
 {
-	static int toggle =0;
+	static int toggle = 0;
 
 	toggle ^= 1;
 	if (toggle)
-		cpu_set_input_line(device->machine->cpu[2],M6502_IRQ_LINE,HOLD_LINE);
+		cputag_set_input_line(device->machine, "audiocpu", M6502_IRQ_LINE, HOLD_LINE);
 
-	msm5205_data_w (device,msm5205next>>4);
-	msm5205next<<=4;
+	msm5205_data_w(device, msm5205next >> 4);
+	msm5205next <<= 4;
 }
 
 static READ8_DEVICE_HANDLER( csilver_adpcm_reset_r )
 {
-	msm5205_reset_w(device,0);
+	msm5205_reset_w(device, 0);
 	return 0;
 }
 
@@ -429,8 +462,10 @@ static WRITE8_HANDLER( csilver_sound_bank_w )
 {
 	UINT8 *RAM = memory_region(space->machine, "audiocpu");
 
-	if (data&8) { memory_set_bankptr(space->machine, 3,&RAM[0x14000]); }
-	else { memory_set_bankptr(space->machine, 3,&RAM[0x10000]); }
+	if (data & 8)
+		memory_set_bankptr(space->machine, 3, &RAM[0x14000]);
+	else
+		memory_set_bankptr(space->machine, 3, &RAM[0x10000]);
 }
 
 /******************************************************************************/
@@ -438,18 +473,19 @@ static WRITE8_HANDLER( csilver_sound_bank_w )
 static WRITE8_HANDLER( oscar_int_w )
 {
 	/* Deal with interrupts, coins also generate NMI to CPU 0 */
-	switch (offset) {
+	switch (offset)
+	{
 		case 0: /* IRQ2 */
-			cpu_set_input_line(space->machine->cpu[1],M6809_IRQ_LINE,ASSERT_LINE);
+			cputag_set_input_line(space->machine, "sub", M6809_IRQ_LINE, ASSERT_LINE);
 			return;
 		case 1: /* IRC 1 */
-			cpu_set_input_line(space->machine->cpu[0],M6809_IRQ_LINE,CLEAR_LINE);
+			cputag_set_input_line(space->machine, "maincpu", M6809_IRQ_LINE, CLEAR_LINE);
 			return;
 		case 2: /* IRQ 1 */
-			cpu_set_input_line(space->machine->cpu[0],M6809_IRQ_LINE,ASSERT_LINE);
+			cputag_set_input_line(space->machine, "maincpu", M6809_IRQ_LINE, ASSERT_LINE);
 			return;
 		case 3: /* IRC 2 */
-			cpu_set_input_line(space->machine->cpu[1],M6809_IRQ_LINE,CLEAR_LINE);
+			cputag_set_input_line(space->machine, "sub", M6809_IRQ_LINE, CLEAR_LINE);
 			return;
 	}
 }
@@ -461,25 +497,27 @@ static WRITE8_HANDLER( shackled_int_w )
 /* This is correct, but the cpus in Shackled need an interleave of about 5000!
     With lower interleave CPU 0 misses an interrupt at the start of the game
     (The last interrupt has not finished and been ack'd when the new one occurs */
-	switch (offset) {
+	switch (offset)
+	{
 		case 0: /* CPU 2 - IRQ acknowledge */
-			cpu_set_input_line(space->machine->cpu[1],M6809_IRQ_LINE,CLEAR_LINE);
+			cputag_set_input_line(space->machine, "sub", M6809_IRQ_LINE, CLEAR_LINE);
             return;
         case 1: /* CPU 1 - IRQ acknowledge */
-			cpu_set_input_line(space->machine->cpu[0],M6809_IRQ_LINE,CLEAR_LINE);
+			cputag_set_input_line(space->machine, "maincpu", M6809_IRQ_LINE, CLEAR_LINE);
         	return;
         case 2: /* i8751 - FIRQ acknowledge */
             return;
         case 3: /* IRQ 1 */
-			cpu_set_input_line(space->machine->cpu[0],M6809_IRQ_LINE,ASSERT_LINE);
+			cputag_set_input_line(space->machine, "maincpu", M6809_IRQ_LINE, ASSERT_LINE);
 			return;
         case 4: /* IRQ 2 */
-            cpu_set_input_line(space->machine->cpu[1],M6809_IRQ_LINE,ASSERT_LINE);
+            cputag_set_input_line(space->machine, "sub", M6809_IRQ_LINE, ASSERT_LINE);
             return;
 	}
 #endif
 
-	switch (offset) {
+	switch (offset)
+	{
 		case 0: /* CPU 2 - IRQ acknowledge */
             return;
         case 1: /* CPU 1 - IRQ acknowledge */
@@ -487,10 +525,10 @@ static WRITE8_HANDLER( shackled_int_w )
         case 2: /* i8751 - FIRQ acknowledge */
             return;
         case 3: /* IRQ 1 */
-			cpu_set_input_line (space->machine->cpu[0], M6809_IRQ_LINE, HOLD_LINE);
+			cputag_set_input_line (space->machine, "maincpu", M6809_IRQ_LINE, HOLD_LINE);
 			return;
         case 4: /* IRQ 2 */
-            cpu_set_input_line (space->machine->cpu[1], M6809_IRQ_LINE, HOLD_LINE);
+            cputag_set_input_line (space->machine, "sub", M6809_IRQ_LINE, HOLD_LINE);
             return;
 	}
 }
@@ -498,480 +536,392 @@ static WRITE8_HANDLER( shackled_int_w )
 /******************************************************************************/
 
 static READ8_HANDLER( shackled_sprite_r ) { return spriteram[offset]; }
-static WRITE8_HANDLER( shackled_sprite_w ) { spriteram[offset]=data; }
-static WRITE8_HANDLER( flip_screen_w ) {	flip_screen_set(space->machine, data); }
+static WRITE8_HANDLER( shackled_sprite_w ) { spriteram[offset] = data; }
+static WRITE8_HANDLER( flip_screen_w ) { flip_screen_set(space->machine, data); }
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( cobra_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x0800, 0x0fff) AM_READ(dec8_pf0_data_r)
-	AM_RANGE(0x1000, 0x17ff) AM_READ(dec8_pf1_data_r)
-	AM_RANGE(0x1800, 0x2fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x3000, 0x31ff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( cobra_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM
+	AM_RANGE(0x0800, 0x0fff) AM_READWRITE(dec8_pf0_data_r, dec8_pf0_data_w) AM_BASE(&dec8_pf0_data)
+	AM_RANGE(0x1000, 0x17ff) AM_READWRITE(dec8_pf1_data_r, dec8_pf1_data_w) AM_BASE(&dec8_pf1_data)
+	AM_RANGE(0x1800, 0x1fff) AM_RAM
+	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(dec8_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x3000, 0x31ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_be_w) AM_BASE(&paletteram)
+	AM_RANGE(0x3200, 0x37ff) AM_WRITE(SMH_RAM) /* Unused */
 	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("IN0")	/* Player 1 */
 	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("IN1")	/* Player 2 */
 	AM_RANGE(0x3802, 0x3802) AM_READ_PORT("DSW0")	/* Dip 1 */
 	AM_RANGE(0x3803, 0x3803) AM_READ_PORT("DSW1")	/* Dip 2 */
-	AM_RANGE(0x3a00, 0x3a00) AM_READ_PORT("IN2")	/* VBL & coins */
-	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK1)
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( cobra_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x0800, 0x0fff) AM_WRITE(dec8_pf0_data_w) AM_BASE(&dec8_pf0_data)
-	AM_RANGE(0x1000, 0x17ff) AM_WRITE(dec8_pf1_data_w) AM_BASE(&dec8_pf1_data)
-	AM_RANGE(0x1800, 0x1fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x2000, 0x27ff) AM_WRITE(dec8_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x2800, 0x2fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x3000, 0x31ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_be_w) AM_BASE(&paletteram)
-	AM_RANGE(0x3200, 0x37ff) AM_WRITE(SMH_RAM) /* Unused */
 	AM_RANGE(0x3800, 0x381f) AM_WRITE(dec8_bac06_0_w)
+	AM_RANGE(0x3a00, 0x3a00) AM_READ_PORT("IN2")	/* VBL & coins */
 	AM_RANGE(0x3a00, 0x3a1f) AM_WRITE(dec8_bac06_1_w)
 	AM_RANGE(0x3c00, 0x3c00) AM_WRITE(dec8_bank_w)
 	AM_RANGE(0x3c02, 0x3c02) AM_WRITE(buffer_spriteram_w) /* DMA */
 	AM_RANGE(0x3e00, 0x3e00) AM_WRITE(dec8_sound_w)
-	AM_RANGE(0x4000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ghostb_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x1800, 0x1fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x2000, 0x27ff) AM_READ(dec8_pf0_data_r)
-	AM_RANGE(0x2800, 0x2dff) AM_READ(SMH_RAM)
-	AM_RANGE(0x3000, 0x37ff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( ghostb_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0fff) AM_RAM
+	AM_RANGE(0x1000, 0x17ff) AM_RAM
+	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(dec8_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(dec8_pf0_data_r, dec8_pf0_data_w) AM_BASE(&dec8_pf0_data)
+	AM_RANGE(0x2800, 0x2bff) AM_RAM
+	AM_RANGE(0x2c00, 0x2dff) AM_RAM AM_BASE(&dec8_row)
+	AM_RANGE(0x2e00, 0x2fff) AM_RAM /* Unused */
+	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("IN0")	/* Player 1 */
+	AM_RANGE(0x3800, 0x3800) AM_WRITE(dec8_sound_w)
 	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("IN1")	/* Player 2 */
 	AM_RANGE(0x3802, 0x3802) AM_READ_PORT("IN2")	/* Player 3 */
 	AM_RANGE(0x3803, 0x3803) AM_READ_PORT("DSW0")	/* Start buttons + VBL */
 	AM_RANGE(0x3820, 0x3820) AM_READ_PORT("DSW1")	/* Dip */
-	AM_RANGE(0x3840, 0x3840) AM_READ(i8751_h_r)
-	AM_RANGE(0x3860, 0x3860) AM_READ(i8751_l_r)
-	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK1)
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( ghostb_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x1000, 0x17ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x1800, 0x1fff) AM_WRITE(dec8_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x2000, 0x27ff) AM_WRITE(dec8_pf0_data_w) AM_BASE(&dec8_pf0_data)
-	AM_RANGE(0x2800, 0x2bff) AM_WRITE(SMH_RAM) /* Scratch ram for rowscroll? */
-	AM_RANGE(0x2c00, 0x2dff) AM_WRITE(SMH_RAM) AM_BASE(&dec8_row)
-	AM_RANGE(0x2e00, 0x2fff) AM_WRITE(SMH_RAM) /* Unused */
-	AM_RANGE(0x3000, 0x37ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x3800, 0x3800) AM_WRITE(dec8_sound_w)
 	AM_RANGE(0x3820, 0x383f) AM_WRITE(dec8_bac06_0_w)
+	AM_RANGE(0x3840, 0x3840) AM_READ(i8751_h_r)
 	AM_RANGE(0x3840, 0x3840) AM_WRITE(ghostb_bank_w)
+	AM_RANGE(0x3860, 0x3860) AM_READ(i8751_l_r)
 	AM_RANGE(0x3860, 0x3861) AM_WRITE(ghostb_i8751_w)
-	AM_RANGE(0x4000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( srdarwin_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x13ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x1400, 0x17ff) AM_READ(dec8_pf0_data_r)
-	AM_RANGE(0x2000, 0x2000) AM_READ(i8751_h_r)
-	AM_RANGE(0x2001, 0x2001) AM_READ(i8751_l_r)
-	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("DSW0")	/* Dip 1 */
-	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("IN0")	/* Player 1 */
-	AM_RANGE(0x3802, 0x3802) AM_READ_PORT("IN1")	/* Player 2 (cocktail) + VBL */
-	AM_RANGE(0x3803, 0x3803) AM_READ_PORT("DSW1")	/* Dip 2 */
-	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK1)
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
+static ADDRESS_MAP_START( meikyuh_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0fff) AM_RAM
+	AM_RANGE(0x1000, 0x17ff) AM_RAM
+	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(dec8_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(dec8_pf0_data_r, dec8_pf0_data_w) AM_BASE(&dec8_pf0_data)
+	AM_RANGE(0x2800, 0x2bff) AM_RAM
+	AM_RANGE(0x2c00, 0x2dff) AM_RAM AM_BASE(&dec8_row)
+	AM_RANGE(0x2e00, 0x2fff) AM_RAM /* Unused */
+	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("IN0")	/* Player 1 */
+	AM_RANGE(0x3800, 0x3800) AM_WRITE(dec8_sound_w)
+	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("IN1")	/* Player 2 */
+	AM_RANGE(0x3802, 0x3802) AM_READ_PORT("IN2")	/* Player 3 */
+	AM_RANGE(0x3803, 0x3803) AM_READ_PORT("DSW0")	/* Start buttons + VBL */
+	AM_RANGE(0x3820, 0x3820) AM_READ_PORT("DSW1")	/* Dip */
+	AM_RANGE(0x3820, 0x383f) AM_WRITE(dec8_bac06_0_w)
+	AM_RANGE(0x3840, 0x3840) AM_READ(i8751_h_r)
+	AM_RANGE(0x3840, 0x3840) AM_WRITE(ghostb_bank_w)
+	AM_RANGE(0x3860, 0x3860) AM_READ(i8751_l_r)
+	AM_RANGE(0x3860, 0x3861) AM_WRITE(meikyuh_i8751_w)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( srdarwin_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x05ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x0600, 0x07ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram)
-	AM_RANGE(0x0800, 0x0fff) AM_WRITE(srdarwin_videoram_w) AM_BASE(&videoram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x1000, 0x13ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x1400, 0x17ff) AM_WRITE(dec8_pf0_data_w) AM_BASE(&dec8_pf0_data)
+static ADDRESS_MAP_START( srdarwin_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x05ff) AM_RAM
+	AM_RANGE(0x0600, 0x07ff) AM_RAM AM_BASE(&spriteram)
+	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(srdarwin_videoram_w) AM_BASE(&videoram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM
+	AM_RANGE(0x1400, 0x17ff) AM_READWRITE(dec8_pf0_data_r, dec8_pf0_data_w) AM_BASE(&dec8_pf0_data)
 	AM_RANGE(0x1800, 0x1801) AM_WRITE(srdarwin_i8751_w)
 	AM_RANGE(0x1802, 0x1802) AM_WRITE(i8751_reset_w)		/* Maybe.. */
 	AM_RANGE(0x1803, 0x1803) AM_WRITENOP            /* NMI ack */
 	AM_RANGE(0x1804, 0x1804) AM_WRITE(buffer_spriteram_w) /* DMA */
 	AM_RANGE(0x1805, 0x1806) AM_WRITE(srdarwin_control_w) /* Scroll & Bank */
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(dec8_sound_w)       /* Sound */
-	AM_RANGE(0x2001, 0x2001) AM_WRITE(flip_screen_w)  /* Flipscreen */
+	AM_RANGE(0x2000, 0x2000) AM_READWRITE(i8751_h_r, dec8_sound_w)	/* Sound */
+	AM_RANGE(0x2001, 0x2001) AM_READWRITE(i8751_l_r, flip_screen_w)		/* Flipscreen */
 	AM_RANGE(0x2800, 0x288f) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE(&paletteram)
 	AM_RANGE(0x3000, 0x308f) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE(&paletteram_2)
-	AM_RANGE(0x4000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("DSW0")	/* Dip 1 */
+	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("IN0")	/* Player 1 */
+	AM_RANGE(0x3802, 0x3802) AM_READ_PORT("IN1")	/* Player 2 (cocktail) + VBL */
+	AM_RANGE(0x3803, 0x3803) AM_READ_PORT("DSW1")	/* Dip 2 */
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gondo_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x17ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x1800, 0x1fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x2000, 0x27ff) AM_READ(dec8_pf0_data_r)
-	AM_RANGE(0x2800, 0x2bff) AM_READ(SMH_RAM)
-	AM_RANGE(0x2c00, 0x2fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x3000, 0x37ff) AM_READ(SMH_RAM)			/* Sprites */
+static ADDRESS_MAP_START( gondo_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x17ff) AM_RAM
+	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(dec8_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(dec8_pf0_data_r, dec8_pf0_data_w) AM_BASE(&dec8_pf0_data)
+	AM_RANGE(0x2800, 0x2bff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE(&paletteram)
+	AM_RANGE(0x2c00, 0x2fff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE(&paletteram_2)
+	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)	/* Sprites */
 	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("DSW0")		/* Dip 1 */
 	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("DSW1")		/* Dip 2 */
 	AM_RANGE(0x380a, 0x380b) AM_READ(gondo_player_1_r)	/* Player 1 rotary */
 	AM_RANGE(0x380c, 0x380d) AM_READ(gondo_player_2_r)	/* Player 2 rotary */
 	AM_RANGE(0x380e, 0x380e) AM_READ_PORT("IN3")		/* VBL */
 	AM_RANGE(0x380f, 0x380f) AM_READ_PORT("IN2")		/* Fire buttons */
-	AM_RANGE(0x3838, 0x3838) AM_READ(i8751_h_r)
-	AM_RANGE(0x3839, 0x3839) AM_READ(i8751_l_r)
-	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK1)
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( gondo_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x17ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x1800, 0x1fff) AM_WRITE(dec8_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x2000, 0x27ff) AM_WRITE(dec8_pf0_data_w) AM_BASE(&dec8_pf0_data)
-	AM_RANGE(0x2800, 0x2bff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE(&paletteram)
-	AM_RANGE(0x2c00, 0x2fff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE(&paletteram_2)
-	AM_RANGE(0x3000, 0x37ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x3810, 0x3810) AM_WRITE(dec8_sound_w)
 	AM_RANGE(0x3818, 0x382f) AM_WRITE(gondo_scroll_w)
 	AM_RANGE(0x3830, 0x3830) AM_WRITE(ghostb_bank_w) /* Bank + NMI enable */
+	AM_RANGE(0x3838, 0x3838) AM_READ(i8751_h_r)
+	AM_RANGE(0x3839, 0x3839) AM_READ(i8751_l_r)
 	AM_RANGE(0x383a, 0x383b) AM_WRITE(gondo_i8751_w)
-	AM_RANGE(0x4000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( oscar_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0eff) AM_READ(SMH_RAM) AM_SHARE(1)
-	AM_RANGE(0x0f00, 0x0fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x1000, 0x1fff) AM_READ(SMH_RAM) AM_SHARE(2)
-	AM_RANGE(0x2000, 0x27ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x2800, 0x2fff) AM_READ(dec8_pf0_data_r)
-	AM_RANGE(0x3000, 0x37ff) AM_READ(SMH_RAM)		/* Sprites */
-	AM_RANGE(0x3800, 0x3bff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( oscar_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0eff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x0f00, 0x0fff) AM_RAM
+	AM_RANGE(0x1000, 0x1fff) AM_RAM AM_SHARE(2)
+	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(dec8_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x2800, 0x2fff) AM_READWRITE(dec8_pf0_data_r, dec8_pf0_data_w) AM_BASE(&dec8_pf0_data)
+	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size) /* Sprites */
+	AM_RANGE(0x3800, 0x3bff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_be_w) AM_BASE(&paletteram)
 	AM_RANGE(0x3c00, 0x3c00) AM_READ_PORT("IN0")
 	AM_RANGE(0x3c01, 0x3c01) AM_READ_PORT("IN1")
 	AM_RANGE(0x3c02, 0x3c02) AM_READ_PORT("IN2")	/* VBL & coins */
 	AM_RANGE(0x3c03, 0x3c03) AM_READ_PORT("DSW0")	/* Dip 1 */
 	AM_RANGE(0x3c04, 0x3c04) AM_READ_PORT("DSW1")
-	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK1)
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( oscar_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0eff) AM_WRITE(SMH_RAM) AM_SHARE(1)
-	AM_RANGE(0x0f00, 0x0fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x1000, 0x1fff) AM_WRITE(SMH_RAM) AM_SHARE(2)
-	AM_RANGE(0x2000, 0x27ff) AM_WRITE(dec8_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x2800, 0x2fff) AM_WRITE(dec8_pf0_data_w) AM_BASE(&dec8_pf0_data)
-	AM_RANGE(0x3000, 0x37ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x3800, 0x3bff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_be_w) AM_BASE(&paletteram)
 	AM_RANGE(0x3c00, 0x3c1f) AM_WRITE(dec8_bac06_0_w)
 	AM_RANGE(0x3c80, 0x3c80) AM_WRITE(buffer_spriteram_w)	/* DMA */
 	AM_RANGE(0x3d00, 0x3d00) AM_WRITE(dec8_bank_w)   		/* BNKS */
-	AM_RANGE(0x3d80, 0x3d80) AM_WRITE(oscar_sound_w) 		/* SOUN */
+	AM_RANGE(0x3d80, 0x3d80) AM_WRITE(dec8_sound_w) 		/* SOUN */
 	AM_RANGE(0x3e00, 0x3e00) AM_WRITENOP       		/* COINCL */
 	AM_RANGE(0x3e80, 0x3e83) AM_WRITE(oscar_int_w)
-	AM_RANGE(0x4000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( oscar_sub_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0eff) AM_READ(SMH_RAM) AM_SHARE(1)
-	AM_RANGE(0x0f00, 0x0fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x1000, 0x1fff) AM_READ(SMH_RAM) AM_SHARE(2)
-	AM_RANGE(0x4000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( oscar_sub_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0eff) AM_WRITE(SMH_RAM) AM_SHARE(1)
-	AM_RANGE(0x0f00, 0x0fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x1000, 0x1fff) AM_WRITE(SMH_RAM) AM_SHARE(2)
+static ADDRESS_MAP_START( oscar_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0eff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x0f00, 0x0fff) AM_RAM
+	AM_RANGE(0x1000, 0x1fff) AM_RAM AM_SHARE(2)
 	AM_RANGE(0x3e80, 0x3e83) AM_WRITE(oscar_int_w)
-	AM_RANGE(0x4000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lastmiss_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_RAM) AM_SHARE(1)
-	AM_RANGE(0x1000, 0x13ff) AM_READ(SMH_RAM) AM_SHARE(3)
-	AM_RANGE(0x1400, 0x17ff) AM_READ(SMH_RAM) AM_SHARE(4)
+static ADDRESS_MAP_START( lastmiss_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE(3) AM_BASE(&paletteram)
+	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE(4) AM_BASE(&paletteram_2)
 	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("IN0")
 	AM_RANGE(0x1801, 0x1801) AM_READ_PORT("IN1")
 	AM_RANGE(0x1802, 0x1802) AM_READ_PORT("IN2")
 	AM_RANGE(0x1803, 0x1803) AM_READ_PORT("DSW0")	/* Dip 1 */
 	AM_RANGE(0x1804, 0x1804) AM_READ_PORT("DSW1")	/* Dip 2 */
-	AM_RANGE(0x1806, 0x1806) AM_READ(i8751_h_r)
-	AM_RANGE(0x1807, 0x1807) AM_READ(i8751_l_r)
-	AM_RANGE(0x2000, 0x27ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x2800, 0x2fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x3000, 0x37ff) AM_READ(SMH_RAM) AM_SHARE(2)
-	AM_RANGE(0x3800, 0x3fff) AM_READ(dec8_pf0_data_r)
-	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK1)
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( lastmiss_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_RAM) AM_SHARE(1)
-	AM_RANGE(0x1000, 0x13ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE(3) AM_BASE(&paletteram)
-	AM_RANGE(0x1400, 0x17ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE(4) AM_BASE(&paletteram_2)
 	AM_RANGE(0x1800, 0x1804) AM_WRITE(shackled_int_w)
 	AM_RANGE(0x1805, 0x1805) AM_WRITE(buffer_spriteram_w) /* DMA */
-	AM_RANGE(0x1807, 0x1807) AM_WRITE(flip_screen_w)
+	AM_RANGE(0x1806, 0x1806) AM_READ(i8751_h_r)
+	AM_RANGE(0x1807, 0x1807) AM_READWRITE(i8751_l_r, flip_screen_w)
 	AM_RANGE(0x1809, 0x1809) AM_WRITE(lastmiss_scrollx_w) /* Scroll LSB */
 	AM_RANGE(0x180b, 0x180b) AM_WRITE(lastmiss_scrolly_w) /* Scroll LSB */
-	AM_RANGE(0x180c, 0x180c) AM_WRITE(oscar_sound_w)
+	AM_RANGE(0x180c, 0x180c) AM_WRITE(dec8_sound_w)
 	AM_RANGE(0x180d, 0x180d) AM_WRITE(lastmiss_control_w) /* Bank switch + Scroll MSB */
 	AM_RANGE(0x180e, 0x180f) AM_WRITE(lastmiss_i8751_w)
-	AM_RANGE(0x2000, 0x27ff) AM_WRITE(dec8_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x2800, 0x2fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x3000, 0x37ff) AM_WRITE(SMH_RAM) AM_SHARE(2)
-	AM_RANGE(0x3800, 0x3fff) AM_WRITE(dec8_pf0_data_w) AM_BASE(&dec8_pf0_data)
-	AM_RANGE(0x4000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(dec8_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE(2)
+	AM_RANGE(0x3800, 0x3fff) AM_READWRITE(dec8_pf0_data_r, dec8_pf0_data_w) AM_BASE(&dec8_pf0_data)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lastmiss_sub_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_RAM) AM_SHARE(1)
-	AM_RANGE(0x1000, 0x13ff) AM_READ(SMH_RAM) AM_SHARE(3)
-	AM_RANGE(0x1400, 0x17ff) AM_READ(SMH_RAM) AM_SHARE(4)
+static ADDRESS_MAP_START( lastmiss_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE(3)
+	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE(4)
 	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("IN0")
 	AM_RANGE(0x1801, 0x1801) AM_READ_PORT("IN1")
 	AM_RANGE(0x1802, 0x1802) AM_READ_PORT("IN2")
 	AM_RANGE(0x1803, 0x1803) AM_READ_PORT("DSW0")	/* Dip 1 */
 	AM_RANGE(0x1804, 0x1804) AM_READ_PORT("DSW1")	/* Dip 2 */
-	AM_RANGE(0x2000, 0x27ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x3000, 0x37ff) AM_READ(SMH_RAM) AM_SHARE(2)
-	AM_RANGE(0x3800, 0x3fff) AM_READ(dec8_pf0_data_r)
-	AM_RANGE(0x4000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( lastmiss_sub_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_RAM) AM_SHARE(1)
-	AM_RANGE(0x1000, 0x13ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE(3)
-	AM_RANGE(0x1400, 0x17ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE(4)
 	AM_RANGE(0x1800, 0x1804) AM_WRITE(shackled_int_w)
 	AM_RANGE(0x1805, 0x1805) AM_WRITE(buffer_spriteram_w) /* DMA */
 	AM_RANGE(0x1807, 0x1807) AM_WRITE(flip_screen_w)
-	AM_RANGE(0x180c, 0x180c) AM_WRITE(oscar_sound_w)
-	AM_RANGE(0x2000, 0x27ff) AM_WRITE(dec8_videoram_w)
+	AM_RANGE(0x180c, 0x180c) AM_WRITE(dec8_sound_w)
+	AM_RANGE(0x2000, 0x27ff) AM_READ(SMH_RAM) AM_WRITE(dec8_videoram_w)
 	AM_RANGE(0x2800, 0x2fff) AM_WRITE(shackled_sprite_w)
-	AM_RANGE(0x3000, 0x37ff) AM_WRITE(SMH_RAM) AM_SHARE(2)
-	AM_RANGE(0x3800, 0x3fff) AM_WRITE(dec8_pf0_data_w)
-	AM_RANGE(0x4000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE(2)
+	AM_RANGE(0x3800, 0x3fff) AM_READWRITE(dec8_pf0_data_r, dec8_pf0_data_w)
+	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( shackled_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_RAM) AM_SHARE(1)
-	AM_RANGE(0x1000, 0x13ff) AM_READ(SMH_RAM) AM_SHARE(3)
-	AM_RANGE(0x1400, 0x17ff) AM_READ(SMH_RAM) AM_SHARE(4)
+static ADDRESS_MAP_START( shackled_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE(3) AM_BASE(&paletteram)
+	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE(4) AM_BASE(&paletteram_2)
 	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("IN0")
 	AM_RANGE(0x1801, 0x1801) AM_READ_PORT("IN1")
 	AM_RANGE(0x1802, 0x1802) AM_READ_PORT("IN2")
 	AM_RANGE(0x1803, 0x1803) AM_READ_PORT("DSW0")
 	AM_RANGE(0x1804, 0x1804) AM_READ_PORT("DSW1")
-	AM_RANGE(0x2000, 0x27ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x2800, 0x2fff) AM_READ(shackled_sprite_r)
-	AM_RANGE(0x3000, 0x37ff) AM_READ(SMH_RAM) AM_SHARE(2)
-	AM_RANGE(0x3800, 0x3fff) AM_READ(dec8_pf0_data_r)
-	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK1)
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( shackled_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_RAM) AM_SHARE(1)
-	AM_RANGE(0x1000, 0x13ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE(3) AM_BASE(&paletteram)
-	AM_RANGE(0x1400, 0x17ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE(4) AM_BASE(&paletteram_2)
 	AM_RANGE(0x1800, 0x1804) AM_WRITE(shackled_int_w)
 	AM_RANGE(0x1805, 0x1805) AM_WRITE(buffer_spriteram_w) /* DMA */
 	AM_RANGE(0x1807, 0x1807) AM_WRITE(flip_screen_w)
 	AM_RANGE(0x1809, 0x1809) AM_WRITE(lastmiss_scrollx_w) /* Scroll LSB */
 	AM_RANGE(0x180b, 0x180b) AM_WRITE(lastmiss_scrolly_w) /* Scroll LSB */
-	AM_RANGE(0x180c, 0x180c) AM_WRITE(oscar_sound_w)
+	AM_RANGE(0x180c, 0x180c) AM_WRITE(dec8_sound_w)
 	AM_RANGE(0x180d, 0x180d) AM_WRITE(shackled_control_w) /* Bank switch + Scroll MSB */
-	AM_RANGE(0x2000, 0x27ff) AM_WRITE(dec8_videoram_w)
-	AM_RANGE(0x2800, 0x2fff) AM_WRITE(shackled_sprite_w)
-	AM_RANGE(0x3000, 0x37ff) AM_WRITE(SMH_RAM) AM_SHARE(2)
-	AM_RANGE(0x3800, 0x3fff) AM_WRITE(dec8_pf0_data_w) AM_BASE(&dec8_pf0_data)
-	AM_RANGE(0x4000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x2000, 0x27ff) AM_READ(SMH_RAM) AM_WRITE(dec8_videoram_w)
+	AM_RANGE(0x2800, 0x2fff) AM_READWRITE(shackled_sprite_r, shackled_sprite_w)
+	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE(2)
+	AM_RANGE(0x3800, 0x3fff) AM_READWRITE(dec8_pf0_data_r, dec8_pf0_data_w) AM_BASE(&dec8_pf0_data)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( shackled_sub_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_RAM) AM_SHARE(1)
-	AM_RANGE(0x1000, 0x13ff) AM_READ(SMH_RAM) AM_SHARE(3)
-	AM_RANGE(0x1400, 0x17ff) AM_READ(SMH_RAM) AM_SHARE(4)
+static ADDRESS_MAP_START( shackled_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE(3)
+	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE(4)
 	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("IN0")
 	AM_RANGE(0x1801, 0x1801) AM_READ_PORT("IN1")
 	AM_RANGE(0x1802, 0x1802) AM_READ_PORT("IN2")
 	AM_RANGE(0x1803, 0x1803) AM_READ_PORT("DSW0")
 	AM_RANGE(0x1804, 0x1804) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1806, 0x1806) AM_READ(i8751_h_r)
-	AM_RANGE(0x1807, 0x1807) AM_READ(i8751_l_r)
-	AM_RANGE(0x2000, 0x27ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x2800, 0x2fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x3000, 0x37ff) AM_READ(SMH_RAM) AM_SHARE(2)
-	AM_RANGE(0x3800, 0x3fff) AM_READ(dec8_pf0_data_r)
-	AM_RANGE(0x4000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( shackled_sub_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_RAM) AM_SHARE(1)
-	AM_RANGE(0x1000, 0x13ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE(3)
-	AM_RANGE(0x1400, 0x17ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE(4)
 	AM_RANGE(0x1800, 0x1804) AM_WRITE(shackled_int_w)
 	AM_RANGE(0x1805, 0x1805) AM_WRITE(buffer_spriteram_w) /* DMA */
-	AM_RANGE(0x1807, 0x1807) AM_WRITE(flip_screen_w)
+	AM_RANGE(0x1806, 0x1806) AM_READ(i8751_h_r)
+	AM_RANGE(0x1807, 0x1807) AM_READWRITE(i8751_l_r, flip_screen_w)
 	AM_RANGE(0x1809, 0x1809) AM_WRITE(lastmiss_scrollx_w) /* Scroll LSB */
 	AM_RANGE(0x180b, 0x180b) AM_WRITE(lastmiss_scrolly_w) /* Scroll LSB */
-	AM_RANGE(0x180c, 0x180c) AM_WRITE(oscar_sound_w)
+	AM_RANGE(0x180c, 0x180c) AM_WRITE(dec8_sound_w)
 	AM_RANGE(0x180d, 0x180d) AM_WRITE(shackled_control_w) /* Bank switch + Scroll MSB */
 	AM_RANGE(0x180e, 0x180f) AM_WRITE(shackled_i8751_w)
-	AM_RANGE(0x2000, 0x27ff) AM_WRITE(dec8_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x2800, 0x2fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x3000, 0x37ff) AM_WRITE(SMH_RAM) AM_SHARE(2)
-	AM_RANGE(0x3800, 0x3fff) AM_WRITE(dec8_pf0_data_w)
-	AM_RANGE(0x4000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(dec8_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE(2)
+	AM_RANGE(0x3800, 0x3fff) AM_READWRITE(dec8_pf0_data_r, dec8_pf0_data_w)
+	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( csilver_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_RAM) AM_SHARE(1)
-	AM_RANGE(0x1000, 0x13ff) AM_READ(SMH_RAM) AM_SHARE(3)
-	AM_RANGE(0x1400, 0x17ff) AM_READ(SMH_RAM) AM_SHARE(4)
+static ADDRESS_MAP_START( csilver_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE(3) AM_BASE(&paletteram)
+	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE(4) AM_BASE(&paletteram_2)
 	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("IN1")
 	AM_RANGE(0x1801, 0x1801) AM_READ_PORT("IN0")
 	AM_RANGE(0x1803, 0x1803) AM_READ_PORT("IN2")
 	AM_RANGE(0x1804, 0x1804) AM_READ_PORT("DSW1")	/* Dip 2 */
-	AM_RANGE(0x1805, 0x1805) AM_READ_PORT("DSW0")	/* Dip 1 */
-	AM_RANGE(0x1c00, 0x1c00) AM_READ(i8751_h_r)
-	AM_RANGE(0x1e00, 0x1e00) AM_READ(i8751_l_r)
-	AM_RANGE(0x2000, 0x27ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x2800, 0x2fff) AM_READ(shackled_sprite_r)
-	AM_RANGE(0x3000, 0x37ff) AM_READ(SMH_RAM) AM_SHARE(2)
-	AM_RANGE(0x3800, 0x3fff) AM_READ(dec8_pf0_data_r)
-	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK1)
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( csilver_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_RAM) AM_SHARE(1)
-	AM_RANGE(0x1000, 0x13ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE(3) AM_BASE(&paletteram)
-	AM_RANGE(0x1400, 0x17ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE(4) AM_BASE(&paletteram_2)
 	AM_RANGE(0x1800, 0x1804) AM_WRITE(shackled_int_w)
-	AM_RANGE(0x1805, 0x1805) AM_WRITE(buffer_spriteram_w) /* DMA */
+	AM_RANGE(0x1805, 0x1805) AM_READ_PORT("DSW0") AM_WRITE(buffer_spriteram_w) /* Dip 1, DMA */
 	AM_RANGE(0x1807, 0x1807) AM_WRITE(flip_screen_w)
 	AM_RANGE(0x1808, 0x180b) AM_WRITE(dec8_scroll2_w)
-	AM_RANGE(0x180c, 0x180c) AM_WRITE(oscar_sound_w)
+	AM_RANGE(0x180c, 0x180c) AM_WRITE(dec8_sound_w)
 	AM_RANGE(0x180d, 0x180d) AM_WRITE(csilver_control_w)
 	AM_RANGE(0x180e, 0x180f) AM_WRITE(csilver_i8751_w)
-	AM_RANGE(0x2000, 0x27ff) AM_WRITE(dec8_videoram_w)
-	AM_RANGE(0x2800, 0x2fff) AM_WRITE(shackled_sprite_w)
-	AM_RANGE(0x3000, 0x37ff) AM_WRITE(SMH_RAM) AM_SHARE(2)
-	AM_RANGE(0x3800, 0x3fff) AM_WRITE(dec8_pf0_data_w) AM_BASE(&dec8_pf0_data)
-	AM_RANGE(0x4000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x1c00, 0x1c00) AM_READ(i8751_h_r)
+	AM_RANGE(0x1e00, 0x1e00) AM_READ(i8751_l_r)
+	AM_RANGE(0x2000, 0x27ff) AM_READ(SMH_RAM) AM_WRITE(dec8_videoram_w)
+	AM_RANGE(0x2800, 0x2fff) AM_READWRITE(shackled_sprite_r, shackled_sprite_w)
+	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE(2)
+	AM_RANGE(0x3800, 0x3fff) AM_READWRITE(dec8_pf0_data_r, dec8_pf0_data_w) AM_BASE(&dec8_pf0_data)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( csilver_sub_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_RAM) AM_SHARE(1)
-	AM_RANGE(0x1000, 0x13ff) AM_READ(SMH_RAM) AM_SHARE(3)
-	AM_RANGE(0x1400, 0x17ff) AM_READ(SMH_RAM) AM_SHARE(4)
+static ADDRESS_MAP_START( csilver_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE(3)
+	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE(4)
 	AM_RANGE(0x1803, 0x1803) AM_READ_PORT("IN2")
 	AM_RANGE(0x1804, 0x1804) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1805, 0x1805) AM_READ_PORT("DSW0")
-	AM_RANGE(0x2000, 0x27ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x2800, 0x2fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x3000, 0x37ff) AM_READ(SMH_RAM) AM_SHARE(2)
-	AM_RANGE(0x3800, 0x3fff) AM_READ(dec8_pf0_data_r)
-	AM_RANGE(0x4000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( csilver_sub_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_RAM) AM_SHARE(1)
-	AM_RANGE(0x1000, 0x13ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE(3)
-	AM_RANGE(0x1400, 0x17ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE(4)
 	AM_RANGE(0x1800, 0x1804) AM_WRITE(shackled_int_w)
-	AM_RANGE(0x1805, 0x1805) AM_WRITE(buffer_spriteram_w) /* DMA */
-	AM_RANGE(0x180c, 0x180c) AM_WRITE(oscar_sound_w)
-	AM_RANGE(0x2000, 0x27ff) AM_WRITE(dec8_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x2800, 0x2fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x3000, 0x37ff) AM_WRITE(SMH_RAM) AM_SHARE(2)
-	AM_RANGE(0x3800, 0x3fff) AM_WRITE(dec8_pf0_data_w)
-	AM_RANGE(0x4000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x1805, 0x1805) AM_READ_PORT("DSW0") AM_WRITE(buffer_spriteram_w) /* DMA */
+	AM_RANGE(0x180c, 0x180c) AM_WRITE(dec8_sound_w)
+	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(dec8_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE(2)
+	AM_RANGE(0x3800, 0x3fff) AM_READWRITE(dec8_pf0_data_r, dec8_pf0_data_w)
+	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( garyoret_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x17ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x1800, 0x1fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x2000, 0x27ff) AM_READ(dec8_pf0_data_r)
-	AM_RANGE(0x2800, 0x2bff) AM_READ(SMH_RAM)
-	AM_RANGE(0x2c00, 0x2fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x3000, 0x37ff) AM_READ(SMH_RAM)		/* Sprites */
+static ADDRESS_MAP_START( garyoret_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x17ff) AM_RAM
+	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(dec8_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(dec8_pf0_data_r, dec8_pf0_data_w) AM_BASE(&dec8_pf0_data)
+	AM_RANGE(0x2800, 0x2bff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE(&paletteram)
+	AM_RANGE(0x2c00, 0x2fff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE(&paletteram_2)
+	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size) /* Sprites */
 	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("DSW0")	/* Dip 1 */
 	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("DSW1")	/* Dip 2 */
 	AM_RANGE(0x3808, 0x3808) AM_READNOP		/* ? */
 	AM_RANGE(0x380a, 0x380a) AM_READ_PORT("IN1")	/* Player 2 + VBL */
 	AM_RANGE(0x380b, 0x380b) AM_READ_PORT("IN0")	/* Player 1 */
-	AM_RANGE(0x383a, 0x383a) AM_READ(i8751_h_r)
-	AM_RANGE(0x383b, 0x383b) AM_READ(i8751_l_r)
-	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK1)
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( garyoret_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x17ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x1800, 0x1fff) AM_WRITE(dec8_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x2000, 0x27ff) AM_WRITE(dec8_pf0_data_w) AM_BASE(&dec8_pf0_data)
-	AM_RANGE(0x2800, 0x2bff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE(&paletteram)
-	AM_RANGE(0x2c00, 0x2fff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE(&paletteram_2)
-	AM_RANGE(0x3000, 0x37ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x3810, 0x3810) AM_WRITE(dec8_sound_w)
 	AM_RANGE(0x3818, 0x382f) AM_WRITE(gondo_scroll_w)
 	AM_RANGE(0x3830, 0x3830) AM_WRITE(ghostb_bank_w) /* Bank + NMI enable */
 	AM_RANGE(0x3838, 0x3839) AM_WRITE(garyoret_i8751_w)
-	AM_RANGE(0x4000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x383a, 0x383a) AM_READ(i8751_h_r)
+	AM_RANGE(0x383b, 0x383b) AM_READ(i8751_l_r)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 /******************************************************************************/
 
 /* Used for Cobra Command, Maze Hunter, Super Real Darwin etc */
-static ADDRESS_MAP_START( dec8_s_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x05ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( dec8_s_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x05ff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( dec8_s_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x05ff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ym1", ym2203_w)
 	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("ym2", ym3812_w)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 /* Used by Gondomania, Psycho-Nics Oscar & Garyo Retsuden */
-static ADDRESS_MAP_START( oscar_s_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x05ff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( oscar_s_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x05ff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ym1", ym2203_w)
 	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("ym2", ym3526_w)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 /* Used by Last Mission, Shackled & Breywood */
-static ADDRESS_MAP_START( ym3526_s_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x05ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r)
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( ym3526_s_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x05ff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( ym3526_s_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x05ff) AM_RAM
 	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE("ym1", ym2203_w)
 	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym2", ym3526_w)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 /* Captain Silver - same sound system as Pocket Gal */
-static ADDRESS_MAP_START( csilver_s_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r)
-	AM_RANGE(0x3400, 0x3400) AM_DEVREAD("msm", csilver_adpcm_reset_r)	/* ? not sure */
-	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK3)
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( csilver_s_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( csilver_s_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE("ym1", ym2203_w)
 	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym2", ym3526_w)
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(csilver_adpcm_data_w)	/* ADPCM data for the MSM5205 chip */
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(csilver_sound_bank_w)
-	AM_RANGE(0x4000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r)
+	AM_RANGE(0x3400, 0x3400) AM_DEVREAD("msm", csilver_adpcm_reset_r)	/* ? not sure */
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(3)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+/******************************************************************************/
+
+static READ8_HANDLER( dec8_mcu_from_main_r )
+{
+	switch (offset)
+	{
+		case 0:
+			return ((i8751_value & 0xff00) >> 8);
+		case 1:
+			cputag_set_input_line(space->machine, "mcu", MCS51_INT1_LINE, CLEAR_LINE);
+			return i8751_value & 0xff;
+	}
+
+	return 0; //compile safe.
+}
+
+static WRITE8_HANDLER( dec8_mcu_to_main_w )
+{
+	switch (offset)
+	{
+		case 0: /* High byte */
+			i8751_return = (i8751_return & 0xff) | (data << 8);
+			break;
+		case 1: /* Low byte */
+			i8751_return = (i8751_return & 0xff00) | data;
+			break;
+	}
+}
+
+static ADDRESS_MAP_START( dec8_mcu_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(MCS51_PORT_P0,MCS51_PORT_P1) AM_READWRITE(dec8_mcu_from_main_r,dec8_mcu_to_main_w)
+	AM_RANGE(MCS51_PORT_P2,MCS51_PORT_P2) AM_WRITENOP
+	AM_RANGE(MCS51_PORT_P3,MCS51_PORT_P3) AM_READ_PORT("I8751") AM_WRITENOP
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -1148,6 +1098,23 @@ static INPUT_PORTS_START( ghostb3 )
 
 	PORT_MODIFY("DSW0")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START3 )
+INPUT_PORTS_END
+
+/* same but with coin latches hooked up with the irqs since we have a MCU dump. */
+static INPUT_CHANGED( coin_inserted )
+{
+	if(newval)
+		cputag_set_input_line(field->port->machine, "maincpu", M6809_IRQ_LINE, HOLD_LINE);
+}
+
+static INPUT_PORTS_START( meikyuh )
+	PORT_INCLUDE(ghostb)
+
+	PORT_MODIFY("I8751")	/* hooked up on the i8751 */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_IMPULSE(1) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(1) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED(coin_inserted, 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( srdarwin )
@@ -1970,22 +1937,12 @@ GFXDECODE_END
 /* handler called by the 3812 emulator when the internal timers cause an IRQ */
 static void irqhandler(const device_config *device, int linestate)
 {
-	cpu_set_input_line(device->machine->cpu[1],0,linestate); /* M6502_IRQ_LINE */
-}
-
-static void oscar_irqhandler(const device_config *device, int linestate)
-{
-	cpu_set_input_line(device->machine->cpu[2],0,linestate); /* M6502_IRQ_LINE */
+	cputag_set_input_line(device->machine, "audiocpu", 0, linestate); /* M6502_IRQ_LINE */
 }
 
 static const ym3526_interface ym3526_config =
 {
 	irqhandler
-};
-
-static const ym3526_interface oscar_ym3526_interface =
-{
-	oscar_irqhandler
 };
 
 static const ym3812_interface ym3812_config =
@@ -2004,18 +1961,18 @@ static const msm5205_interface msm5205_config =
 static INTERRUPT_GEN( ghostb_interrupt )
 {
 	static int latch[4];
-	int i8751_out=input_port_read(device->machine, "I8751");
+	int i8751_out = input_port_read(device->machine, "I8751");
 
 	/* Ghostbusters coins are controlled by the i8751 */
-	if ((i8751_out & 0x8) == 0x8) latch[0]=1;
-	if ((i8751_out & 0x4) == 0x4) latch[1]=1;
-	if ((i8751_out & 0x2) == 0x2) latch[2]=1;
-	if ((i8751_out & 0x1) == 0x1) latch[3]=1;
+	if ((i8751_out & 0x8) == 0x8) latch[0] = 1;
+	if ((i8751_out & 0x4) == 0x4) latch[1] = 1;
+	if ((i8751_out & 0x2) == 0x2) latch[2] = 1;
+	if ((i8751_out & 0x1) == 0x1) latch[3] = 1;
 
-	if (((i8751_out & 0x8) != 0x8) && latch[0]) {latch[0]=0; cpu_set_input_line(device,M6809_IRQ_LINE,HOLD_LINE); i8751_return=0x8001; } /* Player 1 coin */
-	if (((i8751_out & 0x4) != 0x4) && latch[1]) {latch[1]=0; cpu_set_input_line(device,M6809_IRQ_LINE,HOLD_LINE); i8751_return=0x4001; } /* Player 2 coin */
-	if (((i8751_out & 0x2) != 0x2) && latch[2]) {latch[2]=0; cpu_set_input_line(device,M6809_IRQ_LINE,HOLD_LINE); i8751_return=0x2001; } /* Player 3 coin */
-	if (((i8751_out & 0x1) != 0x1) && latch[3]) {latch[3]=0; cpu_set_input_line(device,M6809_IRQ_LINE,HOLD_LINE); i8751_return=0x1001; } /* Service */
+	if (((i8751_out & 0x8) != 0x8) && latch[0]) {latch[0] = 0; cpu_set_input_line(device,M6809_IRQ_LINE,HOLD_LINE); i8751_return = 0x8001; } /* Player 1 coin */
+	if (((i8751_out & 0x4) != 0x4) && latch[1]) {latch[1] = 0; cpu_set_input_line(device,M6809_IRQ_LINE,HOLD_LINE); i8751_return = 0x4001; } /* Player 2 coin */
+	if (((i8751_out & 0x2) != 0x2) && latch[2]) {latch[2] = 0; cpu_set_input_line(device,M6809_IRQ_LINE,HOLD_LINE); i8751_return = 0x2001; } /* Player 3 coin */
+	if (((i8751_out & 0x1) != 0x1) && latch[3]) {latch[3] = 0; cpu_set_input_line(device,M6809_IRQ_LINE,HOLD_LINE); i8751_return = 0x1001; } /* Service */
 
 	if (nmi_enable) cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE); /* VBL */
 }
@@ -2029,11 +1986,12 @@ static INTERRUPT_GEN( gondo_interrupt )
 /* Coins generate NMI's */
 static INTERRUPT_GEN( oscar_interrupt )
 {
-	static int latch=1;
+	static int latch = 1;
 
-	if ((input_port_read(device->machine, "IN2") & 0x7) == 0x7) latch=1;
-	if (latch && (input_port_read(device->machine, "IN2") & 0x7) != 0x7) {
-		latch=0;
+	if ((input_port_read(device->machine, "IN2") & 0x7) == 0x7) latch = 1;
+	if (latch && (input_port_read(device->machine, "IN2") & 0x7) != 0x7)
+	{
+		latch = 0;
     	cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
     }
 }
@@ -2044,11 +2002,11 @@ static MACHINE_DRIVER_START( cobracom )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 2000000)
-	MDRV_CPU_PROGRAM_MAP(cobra_readmem,cobra_writemem)
+	MDRV_CPU_PROGRAM_MAP(cobra_map,0)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_CPU_ADD("audiocpu", M6502, 1500000)
-	MDRV_CPU_PROGRAM_MAP(dec8_s_readmem,dec8_s_writemem)
+	MDRV_CPU_PROGRAM_MAP(dec8_s_map,0)
 								/* NMIs are caused by the main CPU */
 
 	/* video hardware */
@@ -2085,11 +2043,11 @@ static MACHINE_DRIVER_START( ghostb )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", HD6309, 3000000*4)
-	MDRV_CPU_PROGRAM_MAP(ghostb_readmem,ghostb_writemem)
+	MDRV_CPU_PROGRAM_MAP(ghostb_map,0)
 	MDRV_CPU_VBLANK_INT("screen", ghostb_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", M6502, 1500000)
-	MDRV_CPU_PROGRAM_MAP(dec8_s_readmem,dec8_s_writemem)
+	MDRV_CPU_PROGRAM_MAP(dec8_s_map,0)
 								/* NMIs are caused by the main CPU */
 
 	/* video hardware */
@@ -2124,15 +2082,27 @@ static MACHINE_DRIVER_START( ghostb )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_DRIVER_END
 
+/* these two will be unified one day... */
+static MACHINE_DRIVER_START( meikyuh )
+	MDRV_IMPORT_FROM( ghostb )
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(meikyuh_map,0)
+	MDRV_CPU_VBLANK_INT("screen", gondo_interrupt)
+
+	MDRV_CPU_ADD("mcu", I8751, 3000000*4)
+	MDRV_CPU_IO_MAP(dec8_mcu_io_map,0)
+MACHINE_DRIVER_END
+
+
 static MACHINE_DRIVER_START( srdarwin )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809,2000000)  /* MC68A09EP */
-	MDRV_CPU_PROGRAM_MAP(srdarwin_readmem,srdarwin_writemem)
+	MDRV_CPU_PROGRAM_MAP(srdarwin_map,0)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_CPU_ADD("audiocpu", M6502, 1500000)
-	MDRV_CPU_PROGRAM_MAP(dec8_s_readmem,dec8_s_writemem)
+	MDRV_CPU_PROGRAM_MAP(dec8_s_map,0)
 								/* NMIs are caused by the main CPU */
 
 	/* video hardware */
@@ -2169,11 +2139,11 @@ static MACHINE_DRIVER_START( gondo )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", HD6309,3000000*4) /* HD63C09EP */
-	MDRV_CPU_PROGRAM_MAP(gondo_readmem,gondo_writemem)
+	MDRV_CPU_PROGRAM_MAP(gondo_map,0)
 	MDRV_CPU_VBLANK_INT("screen", gondo_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", M6502, 1500000)
-	MDRV_CPU_PROGRAM_MAP(dec8_s_readmem,oscar_s_writemem)
+	MDRV_CPU_PROGRAM_MAP(oscar_s_map,0)
 								/* NMIs are caused by the main CPU */
 
 	/* video hardware */
@@ -2211,14 +2181,14 @@ static MACHINE_DRIVER_START( oscar )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", HD6309, XTAL_12MHz/2) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(oscar_readmem,oscar_writemem)
+	MDRV_CPU_PROGRAM_MAP(oscar_map,0)
 	MDRV_CPU_VBLANK_INT("screen", oscar_interrupt)
 
 	MDRV_CPU_ADD("sub", HD6309, XTAL_12MHz/2) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(oscar_sub_readmem,oscar_sub_writemem)
+	MDRV_CPU_PROGRAM_MAP(oscar_sub_map,0)
 
 	MDRV_CPU_ADD("audiocpu", M6502, XTAL_12MHz/8)
-	MDRV_CPU_PROGRAM_MAP(dec8_s_readmem,oscar_s_writemem)
+	MDRV_CPU_PROGRAM_MAP(oscar_s_map,0)
 								/* NMIs are caused by the main CPU */
 	MDRV_QUANTUM_TIME(HZ(2400)) /* 40 CPU slices per frame */
 
@@ -2248,7 +2218,7 @@ static MACHINE_DRIVER_START( oscar )
 	MDRV_SOUND_ROUTE(3, "mono", 0.20)
 
 	MDRV_SOUND_ADD("ym2", YM3526, XTAL_12MHz/4) /* verified on pcb */
-	MDRV_SOUND_CONFIG(oscar_ym3526_interface)
+	MDRV_SOUND_CONFIG(ym3526_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_DRIVER_END
 
@@ -2256,13 +2226,13 @@ static MACHINE_DRIVER_START( lastmiss )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 2000000)
-	MDRV_CPU_PROGRAM_MAP(lastmiss_readmem,lastmiss_writemem)
+	MDRV_CPU_PROGRAM_MAP(lastmiss_map,0)
 
 	MDRV_CPU_ADD("sub", M6809, 2000000)
-	MDRV_CPU_PROGRAM_MAP(lastmiss_sub_readmem,lastmiss_sub_writemem)
+	MDRV_CPU_PROGRAM_MAP(lastmiss_sub_map,0)
 
 	MDRV_CPU_ADD("audiocpu", M6502, 1500000)
-	MDRV_CPU_PROGRAM_MAP(ym3526_s_readmem,ym3526_s_writemem)
+	MDRV_CPU_PROGRAM_MAP(ym3526_s_map,0)
 								/* NMIs are caused by the main CPU */
 	MDRV_QUANTUM_TIME(HZ(12000))
 
@@ -2292,7 +2262,7 @@ static MACHINE_DRIVER_START( lastmiss )
 	MDRV_SOUND_ROUTE(3, "mono", 0.20)
 
 	MDRV_SOUND_ADD("ym2", YM3526, 3000000)
-	MDRV_SOUND_CONFIG(oscar_ym3526_interface)
+	MDRV_SOUND_CONFIG(ym3526_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_DRIVER_END
 
@@ -2300,13 +2270,13 @@ static MACHINE_DRIVER_START( shackled )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 2000000)
-	MDRV_CPU_PROGRAM_MAP(shackled_readmem,shackled_writemem)
+	MDRV_CPU_PROGRAM_MAP(shackled_map,0)
 
 	MDRV_CPU_ADD("sub", M6809, 2000000)
-	MDRV_CPU_PROGRAM_MAP(shackled_sub_readmem,shackled_sub_writemem)
+	MDRV_CPU_PROGRAM_MAP(shackled_sub_map,0)
 
 	MDRV_CPU_ADD("audiocpu", M6502, 1500000)
-	MDRV_CPU_PROGRAM_MAP(ym3526_s_readmem,ym3526_s_writemem)
+	MDRV_CPU_PROGRAM_MAP(ym3526_s_map,0)
 								/* NMIs are caused by the main CPU */
 	MDRV_QUANTUM_TIME(HZ(4800))
 
@@ -2336,7 +2306,7 @@ static MACHINE_DRIVER_START( shackled )
 	MDRV_SOUND_ROUTE(3, "mono", 0.20)
 
 	MDRV_SOUND_ADD("ym2", YM3526, 3000000)
-	MDRV_SOUND_CONFIG(oscar_ym3526_interface)
+	MDRV_SOUND_CONFIG(ym3526_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_DRIVER_END
 
@@ -2344,14 +2314,14 @@ static MACHINE_DRIVER_START( csilver )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, XTAL_12MHz/8) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(csilver_readmem,csilver_writemem)
+	MDRV_CPU_PROGRAM_MAP(csilver_map,0)
 
 	MDRV_CPU_ADD("sub", M6809, XTAL_12MHz/8) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(csilver_sub_readmem,csilver_sub_writemem)
+	MDRV_CPU_PROGRAM_MAP(csilver_sub_map,0)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_CPU_ADD("audiocpu", M6502, XTAL_12MHz/8) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(csilver_s_readmem,csilver_s_writemem)
+	MDRV_CPU_PROGRAM_MAP(csilver_s_map,0)
 								/* NMIs are caused by the main CPU */
 	MDRV_QUANTUM_TIME(HZ(6000))
 
@@ -2381,7 +2351,7 @@ static MACHINE_DRIVER_START( csilver )
 	MDRV_SOUND_ROUTE(3, "mono", 0.20)
 
 	MDRV_SOUND_ADD("ym2", YM3526, XTAL_12MHz/4) /* verified on pcb */
-	MDRV_SOUND_CONFIG(oscar_ym3526_interface)
+	MDRV_SOUND_CONFIG(ym3526_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 
 	MDRV_SOUND_ADD("msm", MSM5205, XTAL_384kHz) /* verified on pcb */
@@ -2393,11 +2363,11 @@ static MACHINE_DRIVER_START( garyoret )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", HD6309,3000000*4) /* HD63C09EP */
-	MDRV_CPU_PROGRAM_MAP(garyoret_readmem,garyoret_writemem)
+	MDRV_CPU_PROGRAM_MAP(garyoret_map,0)
 	MDRV_CPU_VBLANK_INT("screen", gondo_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", M6502, 1500000)
-	MDRV_CPU_PROGRAM_MAP(dec8_s_readmem,oscar_s_writemem)
+	MDRV_CPU_PROGRAM_MAP(oscar_s_map,0)
 								/* NMIs are caused by the main CPU */
 
 	/* video hardware */
@@ -2506,7 +2476,7 @@ ROM_START( ghostb )
 	ROM_REGION( 2*0x10000, "audiocpu", 0 )	/* 64K for sound CPU + 64k for decrypted opcodes */
 	ROM_LOAD( "dz-06.rom", 0x8000, 0x8000, CRC(798f56df) SHA1(aee33cd0c102015114e17f6cb98945e7cc806f55) )
 
-	ROM_REGION( 0x1000, "cpu2", 0 )	/* ID8751H MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )	/* ID8751H MCU */
 	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )	/* characters */
@@ -2544,7 +2514,7 @@ ROM_START( ghostb3 )
 	ROM_REGION( 2*0x10000, "audiocpu", 0 )	/* 64K for sound CPU + 64k for decrypted opcodes */
 	ROM_LOAD( "dz-06.rom", 0x8000, 0x8000, CRC(798f56df) SHA1(aee33cd0c102015114e17f6cb98945e7cc806f55) )
 
-	ROM_REGION( 0x1000, "cpu2", 0 )	/* ID8751H MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )	/* ID8751H MCU */
 	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )	/* characters */
@@ -2667,8 +2637,8 @@ ROM_START( meikyuh )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "dw-05.5f", 0x8000, 0x8000, CRC(c28c4d82) SHA1(ad88506bcbc9763e39d6e6bb25ef2bd6aa929f30) )
 
-	ROM_REGION( 0x1000, "cpu2", 0 )	/* ID8751H MCU */
-	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x1000, "mcu", 0 )	/* ID8751H MCU */
+	ROM_LOAD( "dw.1b", 0x0000, 0x1000, CRC(28e9ced9) SHA1(a3d6dfa1e44fa93c0f30fa0a88b6dd3d6e5c4dda) )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )	/* characters */
 	ROM_LOAD( "dw-00.16b", 0x00000, 0x8000, CRC(3d25f15c) SHA1(590518460d069bc235b5efebec81731d7a2375de) )
@@ -2762,8 +2732,8 @@ ROM_START( meikyuha )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "27256.5f", 0x8000, 0x8000, CRC(c28c4d82) SHA1(ad88506bcbc9763e39d6e6bb25ef2bd6aa929f30) )
 
-	ROM_REGION( 0x1000, "cpu2", 0 )	/* ID8751H MCU */
-	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x1000, "mcu", 0 )	/* ID8751H MCU */
+	ROM_LOAD( "dw.1b", 0x0000, 0x1000, CRC(28e9ced9) SHA1(a3d6dfa1e44fa93c0f30fa0a88b6dd3d6e5c4dda) )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )	/* characters */
 	ROM_LOAD( "27256.16b", 0x00000, 0x8000, CRC(3d25f15c) SHA1(590518460d069bc235b5efebec81731d7a2375de) )
@@ -2798,7 +2768,7 @@ ROM_START( srdarwin )
 	ROM_REGION( 2*0x10000, "audiocpu", 0 )	/* 64K for sound CPU + 64k for decrypted opcodes */
 	ROM_LOAD( "dy04.d7", 0x8000, 0x8000, CRC(2ae3591c) SHA1(f21b06d84e2c3d3895be0812024641fd006e45cf) )
 
-	ROM_REGION( 0x1000, "cpu2", 0 )	/* ID8751H MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )	/* ID8751H MCU */
 	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )	/* characters */
@@ -2835,7 +2805,7 @@ ROM_START( srdarwnj )
 	ROM_REGION( 2*0x10000, "audiocpu", 0 )	/* 64K for sound CPU + 64k for decrypted opcodes */
 	ROM_LOAD( "dy04.d7", 0x8000, 0x8000, CRC(2ae3591c) SHA1(f21b06d84e2c3d3895be0812024641fd006e45cf) )
 
-	ROM_REGION( 0x1000, "cpu2", 0 )	/* ID8751H MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )	/* ID8751H MCU */
 	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )	/* characters */
@@ -2873,7 +2843,7 @@ ROM_START( gondo )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "dt-05.256", 0x8000, 0x8000, CRC(ec08aa29) SHA1(ce83974ae095d9518d1ebf9f7e712f0cbc2c1b42) )
 
-	ROM_REGION( 0x1000, "cpu2", 0 )	/* ID8751H MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )	/* ID8751H MCU */
 	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )	/* characters */
@@ -2917,7 +2887,7 @@ ROM_START( makyosen )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "ds05",      0x8000, 0x8000, CRC(e6e28ca9) SHA1(3b1f8219331db1910bfb428f8964f8fc1063df6f) )
 
-	ROM_REGION( 0x1000, "cpu2", 0 )	/* ID8751H MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )	/* ID8751H MCU */
 	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )	/* characters */
@@ -2967,7 +2937,7 @@ ROM_START( oscar )
 	ROM_REGION( 2*0x10000, "audiocpu", 0 )	/* 64K for sound CPU + 64k for decrypted opcodes */
 	ROM_LOAD( "ed12", 0x8000, 0x8000, CRC(432031c5) SHA1(af2deea48b98eb0f9e85a4fb1486021f999f9abd) )
 
-	ROM_REGION( 0x1000, "cpu3", 0 )	/* ID8751H MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )	/* ID8751H MCU */
 	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )	/* characters */
@@ -2997,7 +2967,7 @@ ROM_START( oscaru )
 	ROM_REGION( 2*0x10000, "audiocpu", 0 )	/* 64K for sound CPU + 64k for decrypted opcodes */
 	ROM_LOAD( "ed12", 0x8000, 0x8000,  CRC(432031c5) SHA1(af2deea48b98eb0f9e85a4fb1486021f999f9abd) )
 
-	ROM_REGION( 0x1000, "cpu3", 0 )	/* ID8751H MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )	/* ID8751H MCU */
 	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )	/* characters */
@@ -3030,7 +3000,7 @@ ROM_START( oscarj1 )
 	ROM_REGION( 2*0x10000, "audiocpu", 0 )	/* 64K for sound CPU + 64k for decrypted opcodes */
 	ROM_LOAD( "ed12", 0x8000, 0x8000, CRC(432031c5) SHA1(af2deea48b98eb0f9e85a4fb1486021f999f9abd) )
 
-	ROM_REGION( 0x1000, "cpu3", 0 )	/* ID8751H MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )	/* ID8751H MCU */
 	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )	/* characters */
@@ -3063,7 +3033,7 @@ ROM_START( oscarj2 )
 	ROM_REGION( 2*0x10000, "audiocpu", 0 )	/* 64K for sound CPU + 64k for decrypted opcodes */
 	ROM_LOAD( "ed12", 0x8000, 0x8000, CRC(432031c5) SHA1(af2deea48b98eb0f9e85a4fb1486021f999f9abd) )
 
-	ROM_REGION( 0x1000, "cpu3", 0 )	/* ID8751H MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )	/* ID8751H MCU */
 	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )	/* characters */
@@ -3096,7 +3066,7 @@ ROM_START( lastmisn )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "dl05-.5h",    0x8000, 0x8000, CRC(1a5df8c0) SHA1(83d36b1d5fb87f50c44f3110804d6bbdbbc0da99) )
 
-	ROM_REGION( 0x1000, "cpu3", 0 )	/* ID8751H MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )	/* ID8751H MCU */
 	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )	/* characters */
@@ -3132,7 +3102,7 @@ ROM_START( lastmsno )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "dl05-.5h",    0x8000, 0x8000, CRC(1a5df8c0) SHA1(83d36b1d5fb87f50c44f3110804d6bbdbbc0da99) )
 
-	ROM_REGION( 0x1000, "cpu3", 0 )	/* ID8751H MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )	/* ID8751H MCU */
 	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )	/* characters */
@@ -3168,7 +3138,7 @@ ROM_START( lastmsnj )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "dl05-.5h",    0x8000, 0x8000, CRC(1a5df8c0) SHA1(83d36b1d5fb87f50c44f3110804d6bbdbbc0da99) )
 
-	ROM_REGION( 0x1000, "cpu3", 0 )	/* ID8751H MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )	/* ID8751H MCU */
 	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )	/* characters */
@@ -3207,7 +3177,7 @@ ROM_START( shackled )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "dk-07.rom", 0x08000, 0x08000, CRC(887e4bcc) SHA1(6427396080e9cd8647adff47c8ed04593a14268c) )
 
-	ROM_REGION( 0x1000, "cpu3", 0 )	/* ID8751H MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )	/* ID8751H MCU */
 	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )	/* characters */
@@ -3244,7 +3214,7 @@ ROM_START( breywood )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "2.bin", 0x8000, 0x8000,  CRC(4a471c38) SHA1(963ed7b6afeefdfc2cf0d65b0998f973330e6495) )
 
-	ROM_REGION( 0x1000, "cpu3", 0 )	/* ID8751H MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )	/* ID8751H MCU */
 	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )	/* characters */
@@ -3327,7 +3297,7 @@ ROM_START( csilver )
 	ROM_LOAD( "dx05.3f", 0x10000, 0x08000,  CRC(eb32cf25) SHA1(9390c88033259c65eb15320e31f5d696970987cc) )
 	ROM_CONTINUE(   0x08000, 0x08000 )
 
-	ROM_REGION( 0x1000, "cpu3", 0 )	/* ID8751H MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )	/* ID8751H MCU */
 	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP ) // dx-8.19a ?
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )	/* characters */
@@ -3365,7 +3335,7 @@ ROM_START( csilverj )
 	ROM_LOAD( "dx05.a6", 0x10000, 0x08000,  CRC(eb32cf25) SHA1(9390c88033259c65eb15320e31f5d696970987cc) )
 	ROM_CONTINUE(   0x08000, 0x08000 )
 
-	ROM_REGION( 0x1000, "cpu3", 0 )	/* ID8751H MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )	/* ID8751H MCU */
 	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )	/* characters */
@@ -3400,7 +3370,7 @@ ROM_START( garyoret )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "dv05", 0x08000, 0x08000, CRC(c97c347f) SHA1(a1b22733dc15d524af97db3e608a82503a49b182) )
 
-	ROM_REGION( 0x1000, "cpu2", 0 )	/* ID8751H MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )	/* ID8751H MCU */
 	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )	/* characters */
@@ -3450,7 +3420,7 @@ static DRIVER_INIT( deco222 )
 
 	/* bits 5 and 6 of the opcodes are swapped */
 	rom = memory_region(machine, "audiocpu");
-	decrypt = auto_malloc(0x8000);
+	decrypt = auto_alloc_array(machine, UINT8, 0x8000);
 
 	memory_set_decrypted_region(space, 0x8000, 0xffff, decrypt);
 
@@ -3477,8 +3447,8 @@ GAME( 1988, cobracom, 0,        cobracom, cobracom, 0,       ROT0,   "Data East 
 GAME( 1988, cobracmj, cobracom, cobracom, cobracom, 0,       ROT0,   "Data East Corporation", "Cobra-Command (Japan)", 0 )
 GAME( 1987, ghostb,   0,        ghostb,   ghostb,   ghostb,  ROT0,   "Data East USA", "The Real Ghostbusters (US 2 Players)", 0 )
 GAME( 1987, ghostb3,  ghostb,   ghostb,   ghostb3,  ghostb,  ROT0,   "Data East USA", "The Real Ghostbusters (US 3 Players)", 0 )
-GAME( 1987, meikyuh,  ghostb,   ghostb,   ghostb,   meikyuh, ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 1)", 0 )
-GAME( 1987, meikyuha, ghostb,   ghostb,   ghostb,   meikyuh, ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 2)", 0 )
+GAME( 1987, meikyuh,  ghostb,   meikyuh,  meikyuh,  meikyuh, ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 1)", 0 )
+GAME( 1987, meikyuha, ghostb,   meikyuh,  meikyuh,  meikyuh, ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 2)", 0 )
 GAME( 1987, srdarwin, 0,        srdarwin, srdarwin, deco222, ROT270, "Data East Corporation", "Super Real Darwin (World)", 0 )
 GAME( 1987, srdarwnj, srdarwin, srdarwin, srdarwin, deco222, ROT270, "Data East Corporation", "Super Real Darwin (Japan)", 0 )
 GAME( 1987, gondo,    0,        gondo,    gondo,    0,       ROT270, "Data East USA", "Gondomania (US)", 0 )

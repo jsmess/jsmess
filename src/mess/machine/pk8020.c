@@ -23,35 +23,35 @@ MACHINE_RESET( pk8020 )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);	
 	
-	memory_install_read8_handler (space, 0x0000, 0x1fff, 0, 0, SMH_BANK1);
+	memory_install_read8_handler (space, 0x0000, 0x1fff, 0, 0, SMH_BANK(1));
 	memory_install_write8_handler(space, 0x0000, 0x7fff, 0, 0, SMH_UNMAP);
-	memory_install_read8_handler (space, 0x2000, 0x37ff, 0, 0, SMH_BANK2);
+	memory_install_read8_handler (space, 0x2000, 0x37ff, 0, 0, SMH_BANK(2));
 	memory_install_write8_handler(space, 0x2000, 0x37ff, 0, 0, SMH_UNMAP);
 
 
-	memory_install_read8_handler (space, 0x4000, 0x5fff, 0, 0, SMH_BANK7);
-	memory_install_read8_handler (space, 0x6000, 0x7fff, 0, 0, SMH_BANK8);
-	memory_install_read8_handler (space, 0x8000, 0xbeff, 0, 0, SMH_BANK9);
-	memory_install_read8_handler (space, 0xbf00, 0xbfff, 0, 0, SMH_BANK10);
-	memory_install_read8_handler (space, 0xc000, 0xf7ff, 0, 0, SMH_BANK11);
-	memory_install_read8_handler (space, 0xf800, 0xf9ff, 0, 0, SMH_BANK12);
-	memory_install_read8_handler (space, 0xfa00, 0xfaff, 0, 0, SMH_BANK13);
-	memory_install_read8_handler (space, 0xfb00, 0xfbff, 0, 0, SMH_BANK14);
-	memory_install_read8_handler (space, 0xfc00, 0xfdff, 0, 0, SMH_BANK15);
-	memory_install_read8_handler (space, 0xfe00, 0xfeff, 0, 0, SMH_BANK16);
-	memory_install_read8_handler (space, 0xff00, 0xffff, 0, 0, SMH_BANK17);
+	memory_install_read8_handler (space, 0x4000, 0x5fff, 0, 0, SMH_BANK(7));
+	memory_install_read8_handler (space, 0x6000, 0x7fff, 0, 0, SMH_BANK(8));
+	memory_install_read8_handler (space, 0x8000, 0xbeff, 0, 0, SMH_BANK(9));
+	memory_install_read8_handler (space, 0xbf00, 0xbfff, 0, 0, SMH_BANK(10));
+	memory_install_read8_handler (space, 0xc000, 0xf7ff, 0, 0, SMH_BANK(11));
+	memory_install_read8_handler (space, 0xf800, 0xf9ff, 0, 0, SMH_BANK(12));
+	memory_install_read8_handler (space, 0xfa00, 0xfaff, 0, 0, SMH_BANK(13));
+	memory_install_read8_handler (space, 0xfb00, 0xfbff, 0, 0, SMH_BANK(14));
+	memory_install_read8_handler (space, 0xfc00, 0xfdff, 0, 0, SMH_BANK(15));
+	memory_install_read8_handler (space, 0xfe00, 0xfeff, 0, 0, SMH_BANK(16));
+	memory_install_read8_handler (space, 0xff00, 0xffff, 0, 0, SMH_BANK(17));
 
-	memory_install_write8_handler(space, 0x4000, 0x5fff, 0, 0, SMH_BANK7);
-	memory_install_write8_handler(space, 0x6000, 0x7fff, 0, 0, SMH_BANK8);
-	memory_install_write8_handler(space, 0x8000, 0xbeff, 0, 0, SMH_BANK9);
-	memory_install_write8_handler(space, 0xbf00, 0xbfff, 0, 0, SMH_BANK10);
-	memory_install_write8_handler(space, 0xc000, 0xf7ff, 0, 0, SMH_BANK11);
-	memory_install_write8_handler(space, 0xf800, 0xf9ff, 0, 0, SMH_BANK12);
-	memory_install_write8_handler(space, 0xfa00, 0xfaff, 0, 0, SMH_BANK13);
-	memory_install_write8_handler(space, 0xfb00, 0xfbff, 0, 0, SMH_BANK14);
-	memory_install_write8_handler(space, 0xfc00, 0xfdff, 0, 0, SMH_BANK15);
-	memory_install_write8_handler(space, 0xfe00, 0xfeff, 0, 0, SMH_BANK16);
-	memory_install_write8_handler(space, 0xff00, 0xffff, 0, 0, SMH_BANK17);
+	memory_install_write8_handler(space, 0x4000, 0x5fff, 0, 0, SMH_BANK(7));
+	memory_install_write8_handler(space, 0x6000, 0x7fff, 0, 0, SMH_BANK(8));
+	memory_install_write8_handler(space, 0x8000, 0xbeff, 0, 0, SMH_BANK(9));
+	memory_install_write8_handler(space, 0xbf00, 0xbfff, 0, 0, SMH_BANK(10));
+	memory_install_write8_handler(space, 0xc000, 0xf7ff, 0, 0, SMH_BANK(11));
+	memory_install_write8_handler(space, 0xf800, 0xf9ff, 0, 0, SMH_BANK(12));
+	memory_install_write8_handler(space, 0xfa00, 0xfaff, 0, 0, SMH_BANK(13));
+	memory_install_write8_handler(space, 0xfb00, 0xfbff, 0, 0, SMH_BANK(14));
+	memory_install_write8_handler(space, 0xfc00, 0xfdff, 0, 0, SMH_BANK(15));
+	memory_install_write8_handler(space, 0xfe00, 0xfeff, 0, 0, SMH_BANK(16));
+	memory_install_write8_handler(space, 0xff00, 0xffff, 0, 0, SMH_BANK(17));
 
 	memory_set_bankptr(machine, 1, memory_region(machine,"maincpu") + 0x10000);
 	memory_set_bankptr(machine, 2, memory_region(machine,"maincpu") + 0x12000);

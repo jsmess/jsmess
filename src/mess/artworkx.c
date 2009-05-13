@@ -54,7 +54,7 @@ void artwork_use_device_art(const device_config *img, const char *defaultartfile
 			len += strlen(strs[i]) + 1;
 	}
 
-	override_artfile = auto_malloc(len);
+	override_artfile = auto_alloc_array(img->machine, char, len);
 	override_artfile[len - 1] = '\0';
 
 	/* now actually concatenate the strings */

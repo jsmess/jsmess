@@ -12,7 +12,7 @@
 
 /*----------- defined in video/crt.c -----------*/
 
-int video_start_crt(int num_levels, int offset_x, int offset_y, int width, int height);
+int video_start_crt(running_machine *machine, int num_levels, int offset_x, int offset_y, int width, int height);
 void crt_plot(int x, int y);
 VIDEO_EOF( crt );
 VIDEO_UPDATE( crt );

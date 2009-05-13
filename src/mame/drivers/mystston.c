@@ -39,13 +39,13 @@
 
 void mystston_on_scanline_interrupt(running_machine *machine)
 {
-	cpu_set_input_line(machine->cpu[0], 0, ASSERT_LINE);
+	cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 }
 
 
 static WRITE8_HANDLER( irq_clear_w )
 {
-	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 }
 
 
@@ -59,7 +59,7 @@ static WRITE8_HANDLER( irq_clear_w )
 static INPUT_CHANGED( coin_inserted )
 {
 	/* coin insertion causes an NMI */
-	cpu_set_input_line(field->port->machine->cpu[0], INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(field->port->machine, "maincpu", INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -72,7 +72,7 @@ static INPUT_CHANGED( coin_inserted )
 
 static WRITE8_HANDLER( mystston_ay8910_select_w )
 {
-	mystston_state *state = space->machine->driver_data;
+	mystston_state *state = (mystston_state *)space->machine->driver_data;
 
 	/* bit 5 goes to 8910 #0 BDIR pin */
 	if (((*state->ay8910_select & 0x20) == 0x20) && ((data & 0x20) == 0x00))

@@ -23,9 +23,9 @@ static int CyclesPerFrame=0;
 can be setup as:
 
 Number_of_CPU_Cycles_In_A_Frame/Minimum_Number_Of_Cycles_Per_Instruction */
-void EventList_Initialise(int NumEntries)
+void EventList_Initialise(running_machine *machine, int NumEntries)
 {
-	pEventListBuffer = auto_malloc(sizeof(EVENT_LIST_ITEM)*NumEntries);
+	pEventListBuffer = auto_alloc_array(machine, char, NumEntries);
 	TotalEvents = NumEntries;
 	CyclesPerFrame = 0;
 	EventList_Reset();

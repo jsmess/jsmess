@@ -89,7 +89,7 @@ PALETTE_INIT( specimx )
 
 VIDEO_START( specimx )
 {	
-	specimx_colorram = auto_malloc (0x3000);
+	specimx_colorram = auto_alloc_array(machine, UINT8, 0x3000);
 	memset(specimx_colorram,0x70,0x3000);
 } 
 

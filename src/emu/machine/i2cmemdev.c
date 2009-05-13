@@ -375,7 +375,7 @@ static DEVICE_START( i2cmem )
 	assert( device->machine != NULL );
 	assert( device->machine->config != NULL );
 
-	config = device->inline_config;
+	config = (const i2cmem_config *)device->inline_config;
 
 	c->scl = 0;
 	c->sdaw = 0;
@@ -393,12 +393,11 @@ static DEVICE_START( i2cmem )
 
 	if( config != NULL )
 	{
-		c->data = auto_malloc( config->data_size );
-		if( config->data != NULL )
-			memcpy(c->data, config->data, config->data_size);
+		c->data = auto_alloc_array( device->machine, UINT8, config->data_size );
+		memcpy(c->data, config->data, config->data_size);
 
 		if( config->page_size > 0 )
-			page = auto_malloc( config->page_size );
+			page = auto_alloc_array( device->machine, UINT8, config->page_size );
 
 		c->slave_address = config->slave_address;
 		c->data_size = config->data_size;
@@ -432,7 +431,7 @@ static DEVICE_RESET( i2cmem )
 
 static DEVICE_NVRAM( i2cmem )
 {
-	const i2cmem_config *config = device->inline_config;
+	const i2cmem_config *config = (const i2cmem_config *)device->inline_config;
 	i2cmem_state *c = get_safe_token( device );
 
 	if( read_or_write )
@@ -451,18 +450,6 @@ static DEVICE_NVRAM( i2cmem )
 }
 
 /*-------------------------------------------------
-    device set info callback
--------------------------------------------------*/
-
-static DEVICE_SET_INFO( i2cmem )
-{
-	switch ( state )
-	{
-		/* no parameters to set */
-	}
-}
-
-/*-------------------------------------------------
     device get info callback
 -------------------------------------------------*/
 
@@ -476,7 +463,6 @@ DEVICE_GET_INFO( i2cmem )
 		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_PERIPHERAL; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:				info->set_info = DEVICE_SET_INFO_NAME( i2cmem ); break;
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME( i2cmem ); break;
 		case DEVINFO_FCT_STOP:					/* nothing */ break;
 		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME( i2cmem ); break;

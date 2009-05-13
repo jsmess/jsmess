@@ -402,9 +402,9 @@ struct tilemap_info
 	UINT16			latched_yscroll[4];				/* latched Y scroll values */
 	UINT16			latched_pageselect[4];			/* latched page select values */
 	INT32			xoffs;							/* X scroll offset */
-	tilemap *tilemaps[16];					/* up to 16 tilemap pages */
-	tilemap *textmap;						/* a single text tilemap */
-	struct tilemap_callback_info tilemap_info[16];	/* callback info for 16 tilemap pages */
+	tilemap *		tilemaps[16];					/* up to 16 tilemap pages */
+	tilemap *		textmap;						/* a single text tilemap */
+	struct tilemap_callback_info tmap_info[16];		/* callback info for 16 tilemap pages */
 	struct tilemap_callback_info textmap_info;		/* callback info for a single textmap page */
 	void			(*reset)(running_machine *machine, struct tilemap_info *info);/* reset callback */
 	void			(*draw_layer)(running_machine *machine, struct tilemap_info *info, bitmap_t *bitmap, const rectangle *cliprect, int which, int flags, int priority);
@@ -808,7 +808,7 @@ static void segaic16_draw_virtual_tilemap(running_machine *machine, struct tilem
 
 static TILE_GET_INFO( segaic16_tilemap_16a_tile_info )
 {
-	const struct tilemap_callback_info *info = param;
+	const struct tilemap_callback_info *info = (const struct tilemap_callback_info *)param;
 	UINT16 data = info->rambase[tile_index];
 	int code = ((data >> 1) & 0x1000) | (data & 0xfff);
 	int color = (data >> 5) & 0x7f;
@@ -820,7 +820,7 @@ static TILE_GET_INFO( segaic16_tilemap_16a_tile_info )
 
 static TILE_GET_INFO( segaic16_tilemap_16a_text_info )
 {
-	const struct tilemap_callback_info *info = param;
+	const struct tilemap_callback_info *info = (const struct tilemap_callback_info *)param;
 	UINT16 data = info->rambase[tile_index];
 	int color = (data >> 8) & 0x07;
 	int code = data & 0xff;
@@ -1020,7 +1020,7 @@ static void segaic16_tilemap_16a_draw_layer(running_machine *machine, struct til
 
 static TILE_GET_INFO( segaic16_tilemap_16b_tile_info )
 {
-	const struct tilemap_callback_info *info = param;
+	const struct tilemap_callback_info *info = (const struct tilemap_callback_info *)param;
 	UINT16 data = info->rambase[tile_index];
 	int color = (data >> 6) & 0x7f;
 	int code = data & 0x1fff;
@@ -1034,7 +1034,7 @@ static TILE_GET_INFO( segaic16_tilemap_16b_tile_info )
 
 static TILE_GET_INFO( segaic16_tilemap_16b_text_info )
 {
-	const struct tilemap_callback_info *info = param;
+	const struct tilemap_callback_info *info = (const struct tilemap_callback_info *)param;
 	UINT16 data = info->rambase[tile_index];
 	int bank = info->bank[0];
 	int color = (data >> 9) & 0x07;
@@ -1047,7 +1047,7 @@ static TILE_GET_INFO( segaic16_tilemap_16b_text_info )
 
 static TILE_GET_INFO( segaic16_tilemap_16b_alt_tile_info )
 {
-	const struct tilemap_callback_info *info = param;
+	const struct tilemap_callback_info *info = (const struct tilemap_callback_info *)param;
 	UINT16 data = info->rambase[tile_index];
 	int color = (data >> 5) & 0x7f;
 	int code = data & 0x1fff;
@@ -1061,7 +1061,7 @@ static TILE_GET_INFO( segaic16_tilemap_16b_alt_tile_info )
 
 static TILE_GET_INFO( segaic16_tilemap_16b_alt_text_info )
 {
-	const struct tilemap_callback_info *info = param;
+	const struct tilemap_callback_info *info = (const struct tilemap_callback_info *)param;
 	UINT16 data = info->rambase[tile_index];
 	int bank = info->bank[0];
 	int color = (data >> 8) & 0x07;
@@ -1287,10 +1287,10 @@ void segaic16_tilemap_init(running_machine *machine, int which, int type, int co
 		info->tilemaps[pagenum] = tilemap_create(machine, get_tile_info, tilemap_scan_rows,  8,8, 64,32);
 
 		/* configure the tilemap */
-		info->tilemap_info[pagenum].rambase = info->tileram + pagenum * 64*32;
-		info->tilemap_info[pagenum].bank = info->bank;
-		info->tilemap_info[pagenum].banksize = info->banksize;
-		tilemap_set_user_data(info->tilemaps[pagenum], &info->tilemap_info[pagenum]);
+		info->tmap_info[pagenum].rambase = info->tileram + pagenum * 64*32;
+		info->tmap_info[pagenum].bank = info->bank;
+		info->tmap_info[pagenum].banksize = info->banksize;
+		tilemap_set_user_data(info->tilemaps[pagenum], &info->tmap_info[pagenum]);
 		tilemap_set_palette_offset(info->tilemaps[pagenum], colorbase);
 		tilemap_set_transparent_pen(info->tilemaps[pagenum], 0);
 		tilemap_set_scrolldx(info->tilemaps[pagenum], 0, 22);
@@ -2734,7 +2734,7 @@ void segaic16_sprites_init(running_machine *machine, int which, int type, int co
 
 	/* if the sprites need buffering, allocate memory for the buffer */
 	if (buffer)
-		info->buffer = auto_malloc(info->ramsize);
+		info->buffer = auto_alloc_array(machine, UINT16, info->ramsize/2);
 
 	state_save_register_item(machine, "segaic16_sp", NULL, which, info->flip);
 	state_save_register_item(machine, "segaic16_sp", NULL, which, info->shadow);
@@ -2911,7 +2911,7 @@ static void segaic16_road_hangon_decode(running_machine *machine, struct road_in
 	int len = memory_region_length(machine, "gfx3");
 
 	/* allocate memory for the unpacked road data */
-	info->gfx = auto_malloc(256 * 512);
+	info->gfx = auto_alloc_array(machine, UINT8, 256 * 512);
 
 	/* loop over rows */
 	for (y = 0; y < 256; y++)
@@ -3172,7 +3172,7 @@ static void segaic16_road_outrun_decode(running_machine *machine, struct road_in
 	int len = memory_region_length(machine, "gfx3");
 
 	/* allocate memory for the unpacked road data */
-	info->gfx = auto_malloc((256 * 2 + 1) * 512);
+	info->gfx = auto_alloc_array(machine, UINT8, (256 * 2 + 1) * 512);
 
 	/* loop over rows */
 	for (y = 0; y < 256 * 2; y++)
@@ -3404,7 +3404,7 @@ void segaic16_road_init(running_machine *machine, int which, int type, int color
 
 		case SEGAIC16_ROAD_OUTRUN:
 		case SEGAIC16_ROAD_XBOARD:
-			info->buffer = auto_malloc(0x1000);
+			info->buffer = auto_alloc_array(machine, UINT16, 0x1000/2);
 			info->draw = segaic16_road_outrun_draw;
 			segaic16_road_outrun_decode(machine, info);
 			break;
@@ -3508,7 +3508,7 @@ void segaic16_rotate_init(running_machine *machine, int which, int type, int col
 	}
 
 	/* allocate a buffer for swapping */
-	info->buffer = auto_malloc(info->ramsize);
+	info->buffer = auto_alloc_array(machine, UINT16, info->ramsize/2);
 
 	state_save_register_item(machine, "segaic16_rot", NULL, which, info->colorbase);
 	state_save_register_item_pointer(machine, "segaic16_rot", NULL, which, ((UINT8 *) info->buffer), info->ramsize);

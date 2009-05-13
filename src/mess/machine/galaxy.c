@@ -137,7 +137,7 @@ SNAPSHOT_LOAD( galaxy )
 	{
 		case GALAXY_SNAPSHOT_V1_SIZE:
 		case GALAXY_SNAPSHOT_V2_SIZE:
-			snapshot_data = auto_malloc(snapshot_size);
+			snapshot_data = auto_alloc_array(image->machine, UINT8, snapshot_size);
 			break;
 		default:
 			return INIT_FAIL;
@@ -158,8 +158,8 @@ SNAPSHOT_LOAD( galaxy )
 DRIVER_INIT( galaxy )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	memory_install_read8_handler( space, 0x2800, 0x2800 + mess_ram_size - 1, 0, 0, SMH_BANK1);
-	memory_install_write8_handler(space, 0x2800, 0x2800 + mess_ram_size - 1, 0, 0, SMH_BANK1);
+	memory_install_read8_handler( space, 0x2800, 0x2800 + mess_ram_size - 1, 0, 0, SMH_BANK(1));
+	memory_install_write8_handler(space, 0x2800, 0x2800 + mess_ram_size - 1, 0, 0, SMH_BANK(1));
 	memory_set_bankptr(machine, 1, mess_ram);
 
 	if (mess_ram_size < (6 + 48) * 1024)
@@ -178,7 +178,7 @@ MACHINE_RESET( galaxy )
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	
 	/* ROM 2 enable/disable */
-	memory_install_read8_handler(space, 0x1000, 0x1fff, 0, 0, input_port_read(machine, "ROM2") ? SMH_BANK10 : SMH_NOP);
+	memory_install_read8_handler(space, 0x1000, 0x1fff, 0, 0, input_port_read(machine, "ROM2") ? SMH_BANK(10) : SMH_NOP);
 	memory_install_write8_handler(space, 0x1000, 0x1fff, 0, 0, SMH_NOP);
 	memory_set_bankptr(machine,10, memory_region(machine, "maincpu") + 0x1000);
 
@@ -206,7 +206,7 @@ MACHINE_RESET( galaxyp )
 	ROM[0x03fa] = 0x00;
 	ROM[0x03fb] = 0xe0;
 
-	memory_install_read8_handler(space, 0xe000, 0xefff, 0, 0, SMH_BANK11);
+	memory_install_read8_handler(space, 0xe000, 0xefff, 0, 0, SMH_BANK(11));
 	memory_install_write8_handler(space, 0xe000, 0xefff, 0, 0, SMH_NOP);
 	memory_set_bankptr(machine,11, memory_region(machine, "maincpu") + 0xe000);
 	galaxy_interrupts_enabled = TRUE;

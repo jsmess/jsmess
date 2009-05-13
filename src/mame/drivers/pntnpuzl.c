@@ -151,7 +151,7 @@ static NVRAM_HANDLER( pntnpuzl )
 			UINT32 length, size;
 			UINT8 *dat;
 
-			dat = eeprom_get_data_pointer(&length, &size);
+			dat = (UINT8 *)eeprom_get_data_pointer(&length, &size);
 			memset(dat, 0, length * size);
 		}
 	}
@@ -186,7 +186,7 @@ static UINT16* pntnpuzl_bank;
 /* vid */
 static VIDEO_START( pntnpuzl )
 {
-	pntnpuzl_3a0000ram=auto_malloc(0x100000);
+	pntnpuzl_3a0000ram=auto_alloc_array(machine, UINT16, 0x100000/2);
 }
 
 static VIDEO_UPDATE( pntnpuzl )

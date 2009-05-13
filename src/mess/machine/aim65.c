@@ -171,7 +171,7 @@ MACHINE_START( aim65 )
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* Init RAM */
-	memory_install_readwrite8_handler(space, 0, mess_ram_size - 1, 0, 0, SMH_BANK1, SMH_BANK1);
+	memory_install_readwrite8_handler(space, 0, mess_ram_size - 1, 0, 0, SMH_BANK(1), SMH_BANK(1));
 	memory_set_bankptr(machine, 1, mess_ram);
 
 	if (mess_ram_size < 4 * 1024)

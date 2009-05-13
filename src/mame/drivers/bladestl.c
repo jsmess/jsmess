@@ -91,7 +91,7 @@ static WRITE8_HANDLER( bladestl_bankswitch_w )
 static WRITE8_HANDLER( bladestl_sh_irqtrigger_w )
 {
 	soundlatch_w(space, offset, data);
-	cpu_set_input_line(space->machine->cpu[1], M6809_IRQ_LINE, HOLD_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", M6809_IRQ_LINE, HOLD_LINE);
 	//logerror("(sound) write %02x\n", data);
 }
 
@@ -127,7 +127,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2f80, 0x2f9f) AM_READWRITE(K051733_r, K051733_w)	/* Protection: 051733 */
 	AM_RANGE(0x2fc0, 0x2fc0) AM_WRITENOP				/* ??? */
 	AM_RANGE(0x4000, 0x5fff) AM_RAM							/* Work RAM */
-	AM_RANGE(0x6000, 0x7fff) AM_READWRITE(SMH_BANK1, SMH_RAM)	/* banked ROM */
+	AM_RANGE(0x6000, 0x7fff) AM_READWRITE(SMH_BANK(1), SMH_RAM)	/* banked ROM */
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

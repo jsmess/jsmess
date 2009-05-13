@@ -79,10 +79,12 @@ Sonic Hedgehog 2        171-6215A   837-6963-62       610-0239-62          MPR-1
 */
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "genesis.h"
+#include "sound/sn76496.h"
 #include "rendlay.h"
-#include "megadriv.h"
+
 #include "segae.h"
+#include "genesis.h"
+#include "megadriv.h"
 
 /* Megatech BIOS specific */
 static UINT32 bios_port_ctrl;
@@ -273,7 +275,7 @@ static WRITE8_HANDLER( mt_sms_standard_rom_bank_w )
 	{
 		case 0:
 			logerror("bank w %02x %02x\n", offset, data);
-			memory_install_readwrite8_handler(space, 0x0000, 0xbfff, 0, 0, SMH_BANK5, SMH_UNMAP);
+			memory_install_readwrite8_handler(space, 0x0000, 0xbfff, 0, 0, (read8_space_func)SMH_BANK(5), (write8_space_func)SMH_UNMAP);
 
 			//printf("bank ram??\n");
 			break;
@@ -308,7 +310,7 @@ static void megatech_set_genz80_as_sms_standard_ports(running_machine *machine)
 {
 	/* INIT THE PORTS *********************************************************************************************/
 
-	const address_space *io = cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_IO);
+	const address_space *io = cputag_get_address_space(machine, "genesis_snd_z80", ADDRESS_SPACE_IO);
 	const device_config *sn = devtag_get_device(machine, "sn");
 
 	memory_install_readwrite8_handler(io, 0x0000, 0xffff, 0, 0, z80_unmapped_port_r, z80_unmapped_port_w);
@@ -331,24 +333,24 @@ static void megatech_set_genz80_as_sms_standard_map(running_machine *machine)
 	/* INIT THE MEMMAP / BANKING *********************************************************************************/
 
 	/* catch any addresses that don't get mapped */
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x0000, 0xffff, 0, 0, z80_unmapped_r, z80_unmapped_w);
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, "genesis_snd_z80", ADDRESS_SPACE_PROGRAM), 0x0000, 0xffff, 0, 0, z80_unmapped_r, z80_unmapped_w);
 
 	/* fixed rom bank area */
-	sms_rom = auto_malloc(0x400000);
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x0000, 0xbfff, 0, 0, SMH_BANK5, SMH_UNMAP);
+	sms_rom = auto_alloc_array(machine, UINT8, 0x400000);
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, "genesis_snd_z80", ADDRESS_SPACE_PROGRAM), 0x0000, 0xbfff, 0, 0, (read8_space_func)SMH_BANK(5), (write8_space_func)SMH_UNMAP);
 	memory_set_bankptr(machine,  5, sms_rom );
 
 	memcpy(sms_rom, memory_region(machine, "maincpu"), 0x400000);
 
 	/* main ram area */
-	sms_mainram = auto_malloc(0x2000); // 8kb of main ram
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0xc000, 0xdfff, 0, 0, SMH_BANK6, SMH_BANK6);
+	sms_mainram = auto_alloc_array(machine, UINT8, 0x2000); // 8kb of main ram
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, "genesis_snd_z80", ADDRESS_SPACE_PROGRAM), 0xc000, 0xdfff, 0, 0, (read8_space_func)SMH_BANK(6), (write8_space_func)SMH_BANK(6));
 	memory_set_bankptr(machine,  6, sms_mainram );
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0xe000, 0xffff, 0, 0, SMH_BANK7, SMH_BANK7);
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, "genesis_snd_z80", ADDRESS_SPACE_PROGRAM), 0xe000, 0xffff, 0, 0, (read8_space_func)SMH_BANK(7), (write8_space_func)SMH_BANK(7));
 	memory_set_bankptr(machine,  7, sms_mainram );
 	memset(sms_mainram,0x00,0x2000);
 
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0xfffc, 0xffff, 0, 0, mt_sms_standard_rom_bank_w);
+	memory_install_write8_handler(cputag_get_address_space(machine, "genesis_snd_z80", ADDRESS_SPACE_PROGRAM), 0xfffc, 0xffff, 0, 0, mt_sms_standard_rom_bank_w);
 
 	megatech_set_genz80_as_sms_standard_ports(machine);
 //  smsgg_backupram = NULL;
@@ -363,10 +365,10 @@ static void megatech_select_game(running_machine *machine, int gameno)
 
 	printf("game 0 selected\n");
 
-	cpu_set_input_line(machine->cpu[0], INPUT_LINE_RESET, ASSERT_LINE);
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
-	cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, ASSERT_LINE);
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
+	cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(machine, "genesis_snd_z80", INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, ASSERT_LINE);
+	cputag_set_input_line(machine, "genesis_snd_z80", INPUT_LINE_HALT, ASSERT_LINE);
 	devtag_reset(machine, "ym");
 
 	sprintf(tempname, "game%d", gameno);
@@ -392,8 +394,8 @@ static void megatech_select_game(running_machine *machine, int gameno)
 			printf("SMS cart!!, CPU not running\n");
 			current_game_is_sms = 1;
 			megatech_set_genz80_as_sms_standard_map(machine);
-			cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, CLEAR_LINE);
-			cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
+			cputag_set_input_line(machine, "genesis_snd_z80", INPUT_LINE_HALT, CLEAR_LINE);
+			cputag_set_input_line(machine, "genesis_snd_z80", INPUT_LINE_RESET, CLEAR_LINE);
 
 
 		}
@@ -402,8 +404,8 @@ static void megatech_select_game(running_machine *machine, int gameno)
 			printf("Genesis Cart, CPU0 running\n");
 			current_game_is_sms = 0;
 			megatech_set_megadrive_z80_as_megadrive_z80(machine);
-			cpu_set_input_line(machine->cpu[0], INPUT_LINE_RESET, CLEAR_LINE);
-			cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, CLEAR_LINE);
+			cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, CLEAR_LINE);
+			cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
 		}
 		else
 		{
@@ -412,10 +414,10 @@ static void megatech_select_game(running_machine *machine, int gameno)
 	}
 	else
 	{
-		cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, ASSERT_LINE);
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
-	//  cpu_set_input_line(machine->cpu[0], INPUT_LINE_RESET, ASSERT_LINE);
-	//  cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+		cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, ASSERT_LINE);
+		cputag_set_input_line(machine, "genesis_snd_z80", INPUT_LINE_HALT, ASSERT_LINE);
+	//  cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, ASSERT_LINE);
+	//  cputag_set_input_line(machine, "genesis_snd_z80", INPUT_LINE_RESET, ASSERT_LINE);
 
 		/* no cart.. */
 		memset(memory_region(machine, "mtbios")+0x8000, 0x00, 0x8000);
@@ -574,7 +576,7 @@ ADDRESS_MAP_END
 
 static DRIVER_INIT(mtnew)
 {
-	megatech_banked_ram = auto_malloc(0x1000*8);
+	megatech_banked_ram = auto_alloc_array(machine, UINT8, 0x1000*8);
 	DRIVER_INIT_CALL(megadriv);
 	DRIVER_INIT_CALL(megatech_bios);
 }
@@ -1212,6 +1214,32 @@ ROM_START( mt_fwrld ) /* Forgotten Worlds */
 	MEGATECH_GAME26("game0", "inst0")
 ROM_END
 
+/* Game 43 - Shadow Dancer */
+
+#define MEGATECH_GAME43(GAME_REGION, INSTRUCTION_REGION) \
+	ROM_REGION16_BE( 0x300000, GAME_REGION, 0 ) \
+	ROM_LOAD16_WORD_SWAP( "mpr-13571-s.ic1", 0x000000, 0x080000, CRC(56a29310) SHA1(55836177e4a1e2deb68408976b29d0282cf661a9) ) \
+    MEGATECH_INSTRUCTION_REGION( INSTRUCTION_REGION, MEGATECH_GAME_IS_GEN ) \
+	ROM_LOAD( "epr-12368-43.ic2", 0x000000, 0x08000, CRC(1116cbc7) SHA1(ba6dd21ceadeedf730b71b67acbd20d9067114f3) ) \
+
+ROM_START( mt_shado ) /* Bonanza Bros */
+	MEGATECH_BIOS
+	MEGATECH_GAME43("game0", "inst0")
+ROM_END
+
+/* Game 51 - Streets of Rage */
+
+#define MEGATECH_GAME51(GAME_REGION, INSTRUCTION_REGION) \
+	ROM_REGION16_BE( 0x300000, GAME_REGION, 0 ) \
+	ROM_LOAD16_WORD_SWAP( "mpr-13571-s.ic1", 0x000000, 0x080000, CRC(db4ac746) SHA1(c7cc24e2329f279574513fa32bbf79f72f75aeea) ) \
+    MEGATECH_INSTRUCTION_REGION( INSTRUCTION_REGION, MEGATECH_GAME_IS_GEN ) \
+	ROM_LOAD( "epr-12368-51.ic2", 0x000000, 0x08000, CRC(49b7d6f4) SHA1(96e69851c92715e7daf35b184cf374147a8d2880) ) \
+
+ROM_START( mt_srage ) /* Bonanza Bros */
+	MEGATECH_BIOS
+	MEGATECH_GAME51("game0", "inst0")
+ROM_END
+
 /* Compilations of games to show the multi-cart support */
 
 ROM_START( mt_comp1 )
@@ -1285,7 +1313,7 @@ ROM_END
 /* 40 */ GAME( 1990, mt_mwalk, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Michael Jackson's Moonwalker (Mega-Tech)", GAME_NOT_WORKING )
 /* 41 */ GAME( 1990, mt_crack, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Crack Down (Mega-Tech)", GAME_NOT_WORKING )
 /* 42 */ // unknown
-/* 43 */ // unknown
+/* 43 */ GAME( 1990, mt_shado, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Shadow Dancer (Mega-Tech)", GAME_NOT_WORKING )
 /* 44 */ GAME( 1990, mt_arrow, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Arrow Flash (Mega-Tech)", GAME_NOT_WORKING )
 /* 45 */ // unknown
 /* 46 */ // unknown
@@ -1293,7 +1321,7 @@ ROM_END
 /* 48 */ GAME( 1991, mt_wwar,  megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Wrestle War (Mega-Tech)", GAME_NOT_WORKING ) /* Copyright 1989, 1991 Sega */
 /* 49 */ GAME( 1991, mt_bbros, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Bonanza Bros. (Mega-Tech)", GAME_NOT_WORKING )
 /* 50 */ // unknown
-/* 51 */ // unknown
+/* 51 */ GAME( 1991, mt_srage, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Streets of Rage (Mega-Tech)", GAME_NOT_WORKING )
 /* 52 */ GAME( 1991, mt_sonic, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Sonic The Hedgehog (Mega-Tech, set 1)", GAME_NOT_WORKING )
 /*    */ GAME( 1991, mt_sonia, mt_sonic, megatech, megatech, mtnew, ROT0, "Sega",                  "Sonic The Hedgehog (Mega-Tech, set 2)", GAME_NOT_WORKING )
 /* 53 */ GAME( 1990, mt_fshrk, megatech, megatech, megatech, mtnew, ROT0, "Toaplan / Sega",        "Fire Shark (Mega-Tech)", GAME_NOT_WORKING )

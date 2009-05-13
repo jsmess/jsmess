@@ -115,7 +115,7 @@ WRITE16_HANDLER( lockon_crtc_w )
 static TIMER_CALLBACK( cursor_callback )
 {
 	if (lockon_main_inten)
-		cpu_set_input_line_and_vector(machine->cpu[MAIN_CPU], 0, HOLD_LINE, 0xff);
+		cputag_set_input_line_and_vector(machine, "maincpu", 0, HOLD_LINE, 0xff);
 
 	timer_adjust_oneshot(cursor_timer, video_screen_get_time_until_pos(machine->primary_screen, CURSOR_YPOS, CURSOR_XPOS), 0);
 }
@@ -329,8 +329,8 @@ WRITE16_HANDLER( lockon_ground_ctrl_w )
 
 static TIMER_CALLBACK( bufend_callback )
 {
-	cpu_set_input_line_and_vector(machine->cpu[GROUND_CPU], 0, HOLD_LINE, 0xff);
-	cpu_set_input_line(machine->cpu[OBJECT_CPU], NEC_INPUT_LINE_POLL, ASSERT_LINE);
+	cputag_set_input_line_and_vector(machine, "ground", 0, HOLD_LINE, 0xff);
+	cputag_set_input_line(machine, "object", NEC_INPUT_LINE_POLL, ASSERT_LINE);
 }
 
 /* Get data for a each 8x8x3 ground tile */
@@ -658,7 +658,7 @@ WRITE16_HANDLER( lockon_tza112_w )
 
 READ16_HANDLER( lockon_obj_4000_r )
 {
-	cpu_set_input_line(space->machine->cpu[OBJECT_CPU], NEC_INPUT_LINE_POLL, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "object", NEC_INPUT_LINE_POLL, CLEAR_LINE);
 	return 0xffff;
 }
 
@@ -938,11 +938,11 @@ VIDEO_START( lockon )
 	tilemap_set_transparent_pen(lockon_tilemap, 0);
 
 	/* Allocate the two frame buffers for rotation */
-	back_buffer = auto_bitmap_alloc(512, 512, BITMAP_FORMAT_INDEXED16);
-	front_buffer = auto_bitmap_alloc(512, 512, BITMAP_FORMAT_INDEXED16);
+	back_buffer = auto_bitmap_alloc(machine, 512, 512, BITMAP_FORMAT_INDEXED16);
+	front_buffer = auto_bitmap_alloc(machine, 512, 512, BITMAP_FORMAT_INDEXED16);
 
 	/* 2kB of object ASIC palette RAM */
-	obj_pal_ram = auto_malloc(2048);
+	obj_pal_ram = auto_alloc_array(machine, UINT8, 2048);
 
 	/* Timer for ground display list callback */
 	bufend_timer = timer_alloc(machine, bufend_callback, NULL);

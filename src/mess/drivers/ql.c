@@ -546,27 +546,27 @@ static MACHINE_START( ql )
 		break;
 
 	case 192*1024:
-		memory_install_readwrite8_handler(program, 0x040000, 0x04ffff, 0, 0, SMH_BANK2, SMH_BANK2);
+		memory_install_readwrite8_handler(program, 0x040000, 0x04ffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
 		memory_install_readwrite8_handler(program, 0x050000, 0x0fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		break;
 
 	case 256*1024:
-		memory_install_readwrite8_handler(program, 0x040000, 0x05ffff, 0, 0, SMH_BANK2, SMH_BANK2);
+		memory_install_readwrite8_handler(program, 0x040000, 0x05ffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
 		memory_install_readwrite8_handler(program, 0x060000, 0x0fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		break;
 
 	case 384*1024:
-		memory_install_readwrite8_handler(program, 0x040000, 0x07ffff, 0, 0, SMH_BANK2, SMH_BANK2);
+		memory_install_readwrite8_handler(program, 0x040000, 0x07ffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
 		memory_install_readwrite8_handler(program, 0x080000, 0x0fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		break;
 
 	case 640*1024:
-		memory_install_readwrite8_handler(program, 0x040000, 0x0bffff, 0, 0, SMH_BANK2, SMH_BANK2);
+		memory_install_readwrite8_handler(program, 0x040000, 0x0bffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
 		memory_install_readwrite8_handler(program, 0x0c0000, 0x0fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		break;
 
 	case 896*1024:
-		memory_install_readwrite8_handler(program, 0x040000, 0x0fffff, 0, 0, SMH_BANK2, SMH_BANK2);
+		memory_install_readwrite8_handler(program, 0x040000, 0x0fffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
 		break;
 	}
 
@@ -600,7 +600,7 @@ static DEVICE_IMAGE_LOAD( ql_cart )
 	{
 		if (image_fread(image, ptr, filesize) == filesize)
 		{
-			memory_install_readwrite8_handler(cputag_get_address_space(image->machine, M68008_TAG, ADDRESS_SPACE_PROGRAM), 0x00c000, 0x00ffff, 0, 0, SMH_BANK1, SMH_UNMAP);
+			memory_install_readwrite8_handler(cputag_get_address_space(image->machine, M68008_TAG, ADDRESS_SPACE_PROGRAM), 0x00c000, 0x00ffff, 0, 0, SMH_BANK(1), SMH_UNMAP);
 
 			return INIT_PASS;
 		}

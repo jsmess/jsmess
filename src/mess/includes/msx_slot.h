@@ -149,7 +149,7 @@ typedef struct {
 	int slot_type;
 	int mem_type;
 	char name[32];
-	int (*init)(slot_state*, int page, UINT8 *mem, int size);
+	int (*init)(running_machine *machine, slot_state*, int page, UINT8 *mem, int size);
 	void (*reset)(running_machine *machine, slot_state*);
 	void (*map)(running_machine *machine, slot_state*, int page);
 	void (*write)(running_machine *machine, slot_state*, UINT16, UINT8);
@@ -215,7 +215,7 @@ const msx_slot msx_slot_list[] = {
 };
 
 #define MSX_SLOT_INIT(nm)			 static int \
-	slot_##nm##_init (slot_state *state, int page, UINT8 *mem, int size)
+	slot_##nm##_init (running_machine *machine, slot_state *state, int page, UINT8 *mem, int size)
 #define MSX_SLOT_MAP(nm)			\
 	static void slot_##nm##_map (running_machine *machine, slot_state *state, int page)
 #define MSX_SLOT_WRITE(nm)			\

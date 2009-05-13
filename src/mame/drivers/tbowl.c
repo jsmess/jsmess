@@ -68,7 +68,7 @@ static WRITE8_HANDLER( tbowlc_bankswitch_w )
 	bankaddress = 0x10000 + ((data & 0xf8) << 8);
 
 
-	memory_set_bankptr(space->machine, 2,&RAM[bankaddress]);
+	memory_set_bankptr(space->machine, 2, &RAM[bankaddress]);
 }
 
 /*** Shared Ram Handlers
@@ -87,8 +87,8 @@ static WRITE8_HANDLER( shared_w )
 
 static WRITE8_HANDLER( tbowl_sound_command_w )
 {
-	soundlatch_w(space,offset,data);
-	cpu_set_input_line(space->machine->cpu[2],INPUT_LINE_NMI,PULSE_LINE);
+	soundlatch_w(space, offset, data);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -110,7 +110,7 @@ static ADDRESS_MAP_START( 6206B_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xdfff) AM_RAM_WRITE(tbowl_bgvideoram_w) AM_BASE(&tbowl_bgvideoram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(tbowl_txvideoram_w) AM_BASE(&tbowl_txvideoram)
 //  AM_RANGE(0xf000, 0xf000) AM_WRITE(unknown_write) * written during start-up, not again */
-	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(SMH_BANK1, SMH_ROM)
+	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(SMH_BANK(1), SMH_ROM)
 	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(shared_r, shared_w) AM_BASE(&shared_ram) /* check */
 	AM_RANGE(0xfc00, 0xfc00) AM_READ_PORT("P1") AM_WRITE(tbowlb_bankswitch_w)
 	AM_RANGE(0xfc01, 0xfc01) AM_READ_PORT("P2")
@@ -141,7 +141,7 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER ( tbowl_trigger_nmi )
 {
 	/* trigger NMI on 6206B's Cpu? (guess but seems to work..) */
-	cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( 6206C_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -150,7 +150,7 @@ static ADDRESS_MAP_START( 6206C_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xd7ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xd800, 0xdfff) AM_WRITE(SMH_RAM) AM_BASE(&tbowl_spriteram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_be_w) AM_BASE(&paletteram) // 2x palettes, one for each monitor?
-	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(SMH_BANK2, SMH_ROM)
+	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(SMH_BANK(2), SMH_ROM)
 	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(shared_r, shared_w)
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(tbowlc_bankswitch_w)
 	AM_RANGE(0xfc01, 0xfc01) AM_WRITENOP /* ? */
@@ -444,7 +444,7 @@ GFXDECODE_END
 
 static void irqhandler(const device_config *device, int linestate)
 {
-	cpu_set_input_line(device->machine->cpu[2],0,linestate);
+	cputag_set_input_line(device->machine, "audiocpu", 0, linestate);
 }
 
 static const ym3812_interface ym3812_config =

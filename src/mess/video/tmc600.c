@@ -129,8 +129,8 @@ static VIDEO_START( tmc600 )
 
 	/* allocate memory */
 
-	state->page_ram = auto_malloc(TMC600_PAGE_RAM_SIZE);
-	state->color_ram = auto_malloc(TMC600_PAGE_RAM_SIZE);
+	state->page_ram = auto_alloc_array(machine, UINT8, TMC600_PAGE_RAM_SIZE);
+	state->color_ram = auto_alloc_array(machine, UINT8, TMC600_PAGE_RAM_SIZE);
 
 	/* find devices */
 

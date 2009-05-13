@@ -83,7 +83,7 @@ static UINT8 *blit_buffer;
 
 static VIDEO_START(ilpag)
 {
-	blit_buffer = auto_malloc(512*512*4); //just to be sure,number is wrong
+	blit_buffer = auto_alloc_array(machine, UINT8, 512*512*4); //just to be sure,number is wrong
 }
 
 static VIDEO_UPDATE(ilpag)
@@ -242,7 +242,7 @@ static READ16_HANDLER( test_r )
 static WRITE16_HANDLER( irq_callback_w )
 {
 //  popmessage("%02x",data);
-	cpu_set_input_line(space->machine->cpu[0],3,HOLD_LINE );
+	cputag_set_input_line(space->machine, "maincpu", 3, HOLD_LINE );
 }
 
 static WRITE16_HANDLER( sound_write_w )

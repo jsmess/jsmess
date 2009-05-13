@@ -469,19 +469,14 @@ static WRITE8_HANDLER( flip_screen_w )
 }
 
 
-static ADDRESS_MAP_START( panic_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x4000, 0x5fff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( panic_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x6000, 0x601f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x6800, 0x6800) AM_READ_PORT("P1")
 	AM_RANGE(0x6801, 0x6801) AM_READ_PORT("P2")
 	AM_RANGE(0x6802, 0x6802) AM_READ_PORT("DSW")
 	AM_RANGE(0x6803, 0x6803) AM_READ_PORT("SYSTEM")
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( panic_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x4000, 0x5fff) AM_WRITE(SMH_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x6000, 0x601f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x7000, 0x700b) AM_WRITE(panic_sound_output_w)
 	AM_RANGE(0x700c, 0x700e) AM_WRITE(cosmic_color_register_w)
 	AM_RANGE(0x700f, 0x700f) AM_WRITE(flip_screen_w)
@@ -489,33 +484,23 @@ static ADDRESS_MAP_START( panic_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( cosmica_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x4000, 0x5fff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( cosmica_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x6000, 0x601f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x6800, 0x6800) AM_READ_PORT("P1")
 	AM_RANGE(0x6801, 0x6801) AM_READ_PORT("P2")
 	AM_RANGE(0x6802, 0x6802) AM_READ_PORT("DSW")
 	AM_RANGE(0x6803, 0x6803) AM_READ(cosmica_pixel_clock_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( cosmica_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x4000, 0x5fff) AM_WRITE(SMH_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x6000, 0x601f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x7000, 0x700b) AM_WRITE(cosmica_sound_output_w)
 	AM_RANGE(0x700c, 0x700d) AM_WRITE(cosmic_color_register_w)
 	AM_RANGE(0x700f, 0x700f) AM_WRITE(flip_screen_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( cosmicg_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x2000, 0x3fff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( cosmicg_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x2000, 0x3fff) AM_WRITE(SMH_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+static ADDRESS_MAP_START( cosmicg_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cosmicg_io_map, ADDRESS_SPACE_IO, 8 )
@@ -526,23 +511,18 @@ static ADDRESS_MAP_START( cosmicg_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( magspot_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x2fff) AM_READ(SMH_ROM)
+static ADDRESS_MAP_START( magspot_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3800, 0x3807) AM_READ(magspot_coinage_dip_r)
-	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("IN0")
-	AM_RANGE(0x5001, 0x5001) AM_READ_PORT("IN1")
-	AM_RANGE(0x5002, 0x5002) AM_READ_PORT("IN2")
-	AM_RANGE(0x5003, 0x5003) AM_READ_PORT("IN3")
-	AM_RANGE(0x6000, 0x7fff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( magspot_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x2fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x4000, 0x401f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x4800, 0x4800) AM_DEVWRITE("dac", dac_w)
 	AM_RANGE(0x480c, 0x480d) AM_WRITE(cosmic_color_register_w)
 	AM_RANGE(0x480f, 0x480f) AM_WRITE(flip_screen_w)
-	AM_RANGE(0x6000, 0x7fff) AM_WRITE(SMH_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("IN0")
+	AM_RANGE(0x5001, 0x5001) AM_READ_PORT("IN1")
+	AM_RANGE(0x5002, 0x5002) AM_READ_PORT("IN2")
+	AM_RANGE(0x5003, 0x5003) AM_READ_PORT("IN3")
+	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
 ADDRESS_MAP_END
 
 
@@ -1102,7 +1082,7 @@ static MACHINE_DRIVER_START( panic )
 	MDRV_IMPORT_FROM(cosmic)
 	MDRV_CPU_MODIFY("maincpu")
 
-	MDRV_CPU_PROGRAM_MAP(panic_readmem,panic_writemem)
+	MDRV_CPU_PROGRAM_MAP(panic_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(panic_interrupt,2)
 
 	/* video hardware */
@@ -1130,7 +1110,7 @@ static MACHINE_DRIVER_START( cosmica )
 	MDRV_IMPORT_FROM(cosmic)
 	MDRV_CPU_MODIFY("maincpu")
 
-	MDRV_CPU_PROGRAM_MAP(cosmica_readmem,cosmica_writemem)
+	MDRV_CPU_PROGRAM_MAP(cosmica_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(cosmica_interrupt,32)
 
 	/* video hardware */
@@ -1161,7 +1141,7 @@ static MACHINE_DRIVER_START( cosmicg )
 			/* R Nabet : huh ? This would imply the crystal frequency is somehow divided by 2 before being
             fed to the tms9904 or tms9980.  Also, I have never heard of a tms9900/9980 operating under
             1.5MHz.  So, if someone can check this... */
-	MDRV_CPU_PROGRAM_MAP(cosmicg_readmem,cosmicg_writemem)
+	MDRV_CPU_PROGRAM_MAP(cosmicg_map,0)
 	MDRV_CPU_IO_MAP(cosmicg_io_map,0)
 	MDRV_CPU_VBLANK_INT("screen", cosmicg_interrupt)
 
@@ -1195,7 +1175,7 @@ static MACHINE_DRIVER_START( magspot )
 	MDRV_IMPORT_FROM(cosmic)
 	MDRV_CPU_MODIFY("maincpu")
 
-	MDRV_CPU_PROGRAM_MAP(magspot_readmem,magspot_writemem)
+	MDRV_CPU_PROGRAM_MAP(magspot_map,0)
 	MDRV_CPU_VBLANK_INT("screen", magspot_interrupt)
 
 	/* video hardware */
@@ -1229,7 +1209,7 @@ static MACHINE_DRIVER_START( nomnlnd )
 	MDRV_IMPORT_FROM(cosmic)
 	MDRV_CPU_MODIFY("maincpu")
 
-	MDRV_CPU_PROGRAM_MAP(magspot_readmem,magspot_writemem)
+	MDRV_CPU_PROGRAM_MAP(magspot_map,0)
 	MDRV_CPU_VBLANK_INT("screen", nomnlnd_interrupt)
 
 	/* video hardware */
@@ -1590,17 +1570,17 @@ static DRIVER_INIT( cosmicg )
 
 static DRIVER_INIT( devzone )
 {
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4807, 0x4807, 0, 0, cosmic_background_enable_w);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4807, 0x4807, 0, 0, cosmic_background_enable_w);
 }
 
 
 static DRIVER_INIT( nomnlnd )
 {
 	const device_config *dac = devtag_get_device(machine, "dac");
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x5000, 0x5001, 0, 0, nomnlnd_port_0_1_r);
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4800, 0x4800, 0, 0, SMH_NOP);
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4807, 0x4807, 0, 0, cosmic_background_enable_w);
-	memory_install_write8_device_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), dac, 0x480a, 0x480a, 0, 0, dac_w);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5000, 0x5001, 0, 0, nomnlnd_port_0_1_r);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4800, 0x4800, 0, 0, (write8_space_func)SMH_NOP);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4807, 0x4807, 0, 0, cosmic_background_enable_w);
+	memory_install_write8_device_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), dac, 0x480a, 0x480a, 0, 0, dac_w);
 }
 
 
@@ -1618,4 +1598,3 @@ GAME( 1980, panich,   panic,   panic,    panic,    0,       ROT270, "Universal",
 GAME( 1980, panicger, panic,   panic,    panic,    0,       ROT270, "Universal (ADP Automaten license)", "Space Panic (German)", 0 )
 GAME( 1980, devzone,  0,       devzone,  devzone,  devzone, ROT270, "Universal", "Devil Zone", GAME_IMPERFECT_SOUND )
 GAME( 1980, devzone2, devzone, devzone,  devzone2, devzone, ROT270, "Universal", "Devil Zone (easier)", GAME_IMPERFECT_SOUND )
-

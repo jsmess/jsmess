@@ -145,7 +145,6 @@ int segac2_sp_pal_lookup[4];
 
 // hacks for C2
 int genvdp_use_cram = 0; // c2 uses it's own palette ram
-int genesis_has_z80;
 int genesis_always_irq6 = 0; // c2 never enables the irq6, different source??
 int genesis_other_hacks = 0; // misc hacks
 
@@ -208,7 +207,6 @@ static UINT16 read_next_instruction(const address_space *space)
 
 static struct genesis_z80_vars
 {
-	int z80_cpunum;
 	int z80_is_reset;
 	int z80_has_bus;
 	UINT32 z80_bank_addr;
@@ -577,9 +575,9 @@ static void megadrive_vdp_set_register(running_machine *machine, int regnum, UIN
 		if (megadrive_irq4_pending)
 		{
 			if (MEGADRIVE_REG0_IRQ4_ENABLE)
-				cpu_set_input_line(machine->cpu[0],4,HOLD_LINE);
+				cputag_set_input_line(machine, "maincpu", 4, HOLD_LINE);
 			else
-				cpu_set_input_line(machine->cpu[0],4,CLEAR_LINE);
+				cputag_set_input_line(machine, "maincpu", 4, CLEAR_LINE);
 		}
 
 		/* ??? Fatal Rewind needs this but I'm not sure it's accurate behavior
@@ -594,9 +592,9 @@ static void megadrive_vdp_set_register(running_machine *machine, int regnum, UIN
 		if (megadrive_irq6_pending)
 		{
 			if (MEGADRIVE_REG01_IRQ6_ENABLE )
-				cpu_set_input_line(machine->cpu[0],6,HOLD_LINE);
+				cputag_set_input_line(machine, "maincpu", 6, HOLD_LINE);
 			else
-				cpu_set_input_line(machine->cpu[0],6,CLEAR_LINE);
+				cputag_set_input_line(machine, "maincpu", 6, CLEAR_LINE);
 		}
 
 		/* ??? */
@@ -704,7 +702,7 @@ static void megadrive_do_insta_68k_to_vram_dma(running_machine *machine, UINT32 
 	if (length==0x00) length = 0xffff;
 
 	/* This is a hack until real DMA timings are implemented */
-	cpu_spinuntil_time(machine->cpu[0], ATTOTIME_IN_NSEC(length*1000/3500));
+	cpu_spinuntil_time(cputag_get_cpu(machine, "maincpu"), ATTOTIME_IN_NSEC(length * 1000 / 3500));
 
 	for (count = 0;count<(length>>1);count++)
 	{
@@ -2043,7 +2041,7 @@ static void megadrive_io_write_data_port_6button(running_machine *machine, int p
 		if (((megadrive_io_data_regs[portnum]&0x40)==0x00) && ((data&0x40) == 0x40))
 		{
 			io_stage[portnum]++;
-			timer_adjust_oneshot(io_timeout[portnum], cpu_clocks_to_attotime(machine->cpu[0],8192), 0);
+			timer_adjust_oneshot(io_timeout[portnum], cputag_clocks_to_attotime(machine, "maincpu", 8192), 0);
 		}
 
 	}
@@ -2126,52 +2124,34 @@ static WRITE16_HANDLER( megadriv_68k_io_write )
 
 
 
-static ADDRESS_MAP_START( megadriv_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000 , 0x3fffff) AM_READ(SMH_ROM)
+static ADDRESS_MAP_START( megadriv_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000 , 0x3fffff) AM_ROM
 	/*      (0x000000 - 0x3fffff) == GAME ROM (4Meg Max, Some games have special banking too) */
 
-	AM_RANGE(0xa00000 , 0xa01fff) AM_READ(megadriv_68k_read_z80_ram)
-	AM_RANGE(0xa04000 , 0xa04003) AM_DEVREAD8("ym", megadriv_68k_YM2612_read, 0xffff)
-
-	AM_RANGE(0xa10000 , 0xa1001f) AM_READ(megadriv_68k_io_read)
-
-	AM_RANGE(0xa11100 , 0xa11101) AM_READ(megadriv_68k_check_z80_bus)
-
-	AM_RANGE(0xc00000 , 0xc0001f) AM_READ(megadriv_vdp_r)
-	AM_RANGE(0xd00000 , 0xd0001f) AM_READ(megadriv_vdp_r) // the earth defend
-
-	/* these are fake - remove allocs in VIDEO_START to use these to view ram instead */
-//  AM_RANGE(0xb00000 , 0xb0ffff) AM_READ(SMH_RAM) AM_BASE(&megadrive_vdp_vram)
-//  AM_RANGE(0xb10000 , 0xb1007f) AM_READ(SMH_RAM) AM_BASE(&megadrive_vdp_vsram)
-//  AM_RANGE(0xb10100 , 0xb1017f) AM_READ(SMH_RAM) AM_BASE(&megadrive_vdp_cram)
-
-
-
-	AM_RANGE(0xe00000 , 0xe0ffff) AM_READ(SMH_RAM) AM_MIRROR(0x1f0000)
-//  AM_RANGE(0xff0000 , 0xffffff) AM_READ(SMH_RAM)
-	/*       0xe00000 - 0xffffff) == MAIN RAM (64kb, Mirrored, most games use ff0000 - ffffff) */
-
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( megadriv_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000 , 0x3fffff) AM_WRITE(SMH_ROM)
-
-	AM_RANGE(0xa00000 , 0xa01fff) AM_WRITE(megadriv_68k_write_z80_ram)
+	AM_RANGE(0xa00000 , 0xa01fff) AM_READWRITE(megadriv_68k_read_z80_ram,megadriv_68k_write_z80_ram)
 	AM_RANGE(0xa02000 , 0xa03fff) AM_WRITE(megadriv_68k_write_z80_ram)
-	AM_RANGE(0xa04000 , 0xa04003) AM_DEVWRITE8("ym", megadriv_68k_YM2612_write, 0xffff)
+	AM_RANGE(0xa04000 , 0xa04003) AM_DEVREADWRITE8("ym", megadriv_68k_YM2612_read,megadriv_68k_YM2612_write, 0xffff)
 
 	AM_RANGE(0xa06000 , 0xa06001) AM_WRITE(megadriv_68k_z80_bank_write)
 
-	AM_RANGE(0xa10000 , 0xa1001f) AM_WRITE(megadriv_68k_io_write)
+	AM_RANGE(0xa10000 , 0xa1001f) AM_READWRITE(megadriv_68k_io_read,megadriv_68k_io_write)
 
-	AM_RANGE(0xa11100 , 0xa11101) AM_WRITE(megadriv_68k_req_z80_bus)
+	AM_RANGE(0xa11100 , 0xa11101) AM_READWRITE(megadriv_68k_check_z80_bus,megadriv_68k_req_z80_bus)
 	AM_RANGE(0xa11200 , 0xa11201) AM_WRITE(megadriv_68k_req_z80_reset)
 
-	AM_RANGE(0xc00000 , 0xc0001f) AM_WRITE(megadriv_vdp_w)
-	AM_RANGE(0xd00000 , 0xd0001f) AM_WRITE(megadriv_vdp_w) // the earth defend
+	/* these are fake - remove allocs in VIDEO_START to use these to view ram instead */
+//  AM_RANGE(0xb00000 , 0xb0ffff) AM_RAM AM_BASE(&megadrive_vdp_vram)
+//  AM_RANGE(0xb10000 , 0xb1007f) AM_RAM AM_BASE(&megadrive_vdp_vsram)
+//  AM_RANGE(0xb10100 , 0xb1017f) AM_RAM AM_BASE(&megadrive_vdp_cram)
 
-	AM_RANGE(0xe00000 , 0xe0ffff) AM_WRITE(SMH_RAM) AM_MIRROR(0x1f0000) AM_BASE(&megadrive_ram)
+	AM_RANGE(0xc00000 , 0xc0001f) AM_READWRITE(megadriv_vdp_r,megadriv_vdp_w)
+	AM_RANGE(0xd00000 , 0xd0001f) AM_READWRITE(megadriv_vdp_r,megadriv_vdp_w) // the earth defend
+
+	AM_RANGE(0xe00000 , 0xe0ffff) AM_RAM AM_MIRROR(0x1f0000) AM_BASE(&megadrive_ram)
+//  AM_RANGE(0xff0000 , 0xffffff) AM_READ(SMH_RAM)
+	/*       0xe00000 - 0xffffff) == MAIN RAM (64kb, Mirrored, most games use ff0000 - ffffff) */
 ADDRESS_MAP_END
+
 
 /* z80 sounds/sub CPU */
 
@@ -2270,14 +2250,14 @@ static WRITE16_HANDLER( megadriv_68k_req_z80_bus )
 		if (data & 0x0100)
 		{
 			//logerror("%06x: 68000 request z80 Bus (byte MSB access) %04x %04x\n", cpu_get_pc(space->cpu),data,mem_mask);
-			genz80.z80_has_bus=0;
-			cpu_suspend( space->machine->cpu[genz80.z80_cpunum], SUSPEND_REASON_HALT, 1 );
+			genz80.z80_has_bus = 0;
+			cputag_suspend( space->machine, "genesis_snd_z80", SUSPEND_REASON_HALT, 1 );
 		}
 		else
 		{
 			//logerror("%06x: 68000 return z80 Bus (byte MSB access) %04x %04x\n", cpu_get_pc(space->cpu),data,mem_mask);
-			genz80.z80_has_bus=1;
-			cpu_resume( space->machine->cpu[genz80.z80_cpunum], SUSPEND_REASON_HALT );
+			genz80.z80_has_bus = 1;
+			cputag_resume( space->machine, "genesis_snd_z80", SUSPEND_REASON_HALT );
 		}
 	}
 	else if (!ACCESSING_BITS_8_15) // is this valid?
@@ -2285,14 +2265,14 @@ static WRITE16_HANDLER( megadriv_68k_req_z80_bus )
 		if (data & 0x0001)
 		{
 			//logerror("%06x: 68000 request z80 Bus (byte LSB access) %04x %04x\n", cpu_get_pc(space->cpu),data,mem_mask);
-			genz80.z80_has_bus=0;
-			cpu_suspend( space->machine->cpu[genz80.z80_cpunum], SUSPEND_REASON_HALT, 1 );
+			genz80.z80_has_bus = 0;
+			cputag_suspend( space->machine, "genesis_snd_z80", SUSPEND_REASON_HALT, 1 );
 		}
 		else
 		{
 			//logerror("%06x: 68000 return z80 Bus (byte LSB access) %04x %04x\n", cpu_get_pc(space->cpu),data,mem_mask);
-			genz80.z80_has_bus=1;
-			cpu_resume( space->machine->cpu[genz80.z80_cpunum], SUSPEND_REASON_HALT );
+			genz80.z80_has_bus = 1;
+			cputag_resume( space->machine, "genesis_snd_z80", SUSPEND_REASON_HALT );
 		}
 	}
 	else // word access
@@ -2300,14 +2280,14 @@ static WRITE16_HANDLER( megadriv_68k_req_z80_bus )
 		if (data & 0x0100)
 		{
 			//logerror("%06x: 68000 request z80 Bus (word access) %04x %04x\n", cpu_get_pc(space->cpu),data,mem_mask);
-			genz80.z80_has_bus=0;
-			cpu_suspend( space->machine->cpu[genz80.z80_cpunum], SUSPEND_REASON_HALT, 1 );
+			genz80.z80_has_bus = 0;
+			cputag_suspend( space->machine, "genesis_snd_z80", SUSPEND_REASON_HALT, 1 );
 		}
 		else
 		{
 			//logerror("%06x: 68000 return z80 Bus (byte LSB access) %04x %04x\n", cpu_get_pc(space->cpu),data,mem_mask);
-			genz80.z80_has_bus=1;
-			cpu_resume( space->machine->cpu[genz80.z80_cpunum], SUSPEND_REASON_HALT );
+			genz80.z80_has_bus = 1;
+			cputag_resume( space->machine, "genesis_snd_z80", SUSPEND_REASON_HALT );
 		}
 	}
 }
@@ -2319,16 +2299,16 @@ static WRITE16_HANDLER ( megadriv_68k_req_z80_reset )
 		if (data & 0x0100)
 		{
 			//logerror("%06x: 68000 clear z80 reset (byte MSB access) %04x %04x\n", cpu_get_pc(space->cpu),data,mem_mask);
-			genz80.z80_is_reset=0;
+			genz80.z80_is_reset = 0;
 			if ( genz80.z80_has_bus )
-				cpu_resume( space->machine->cpu[genz80.z80_cpunum], SUSPEND_REASON_HALT );
+				cputag_resume( space->machine, "genesis_snd_z80", SUSPEND_REASON_HALT );
 		}
 		else
 		{
 			//logerror("%06x: 68000 start z80 reset (byte MSB access) %04x %04x\n", cpu_get_pc(space->cpu),data,mem_mask);
-			genz80.z80_is_reset=1;
-			device_reset( space->machine->cpu[genz80.z80_cpunum] );
-			cpu_suspend( space->machine->cpu[genz80.z80_cpunum], SUSPEND_REASON_HALT, 1 );
+			genz80.z80_is_reset = 1;
+			device_reset( cputag_get_cpu(space->machine, "genesis_snd_z80") );
+			cputag_suspend( space->machine, "genesis_snd_z80", SUSPEND_REASON_HALT, 1 );
 			devtag_reset(space->machine, "ym");
 		}
 	}
@@ -2337,16 +2317,16 @@ static WRITE16_HANDLER ( megadriv_68k_req_z80_reset )
 		if (data & 0x0001)
 		{
 			//logerror("%06x: 68000 clear z80 reset (byte LSB access) %04x %04x\n", cpu_get_pc(space->cpu),data,mem_mask);
-			genz80.z80_is_reset=0;
+			genz80.z80_is_reset = 0;
 			if ( genz80.z80_has_bus )
-				cpu_resume( space->machine->cpu[genz80.z80_cpunum], SUSPEND_REASON_HALT );
+				cputag_resume( space->machine, "genesis_snd_z80", SUSPEND_REASON_HALT );
 		}
 		else
 		{
 			//logerror("%06x: 68000 start z80 reset (byte LSB access) %04x %04x\n", cpu_get_pc(space->cpu),data,mem_mask);
-			genz80.z80_is_reset=1;
-			device_reset( space->machine->cpu[genz80.z80_cpunum] );
-			cpu_suspend( space->machine->cpu[genz80.z80_cpunum], SUSPEND_REASON_HALT, 1 );
+			genz80.z80_is_reset = 1;
+			device_reset( cputag_get_cpu(space->machine, "genesis_snd_z80") );
+			cputag_suspend( space->machine, "genesis_snd_z80", SUSPEND_REASON_HALT, 1 );
 			devtag_reset(space->machine, "ym");
 
 		}
@@ -2356,16 +2336,16 @@ static WRITE16_HANDLER ( megadriv_68k_req_z80_reset )
 		if (data & 0x0100)
 		{
 			//logerror("%06x: 68000 clear z80 reset (word access) %04x %04x\n", cpu_get_pc(space->cpu),data,mem_mask);
-			genz80.z80_is_reset=0;
+			genz80.z80_is_reset = 0;
 			if ( genz80.z80_has_bus )
-				cpu_resume( space->machine->cpu[genz80.z80_cpunum], SUSPEND_REASON_HALT );
+				cputag_resume( space->machine, "genesis_snd_z80", SUSPEND_REASON_HALT );
 		}
 		else
 		{
 			//logerror("%06x: 68000 start z80 reset (byte LSB access) %04x %04x\n", cpu_get_pc(space->cpu),data,mem_mask);
-			genz80.z80_is_reset=1;
-			device_reset( space->machine->cpu[genz80.z80_cpunum] );
-			cpu_suspend( space->machine->cpu[genz80.z80_cpunum], SUSPEND_REASON_HALT, 1 );
+			genz80.z80_is_reset = 1;
+			device_reset( cputag_get_cpu(space->machine, "genesis_snd_z80") );
+			cputag_suspend( space->machine, "genesis_snd_z80", SUSPEND_REASON_HALT, 1 );
 			devtag_reset(space->machine, "ym");
 		}
 	}
@@ -2476,33 +2456,23 @@ static READ8_HANDLER( megadriv_z80_unmapped_read )
 	return 0xff;
 }
 
-static ADDRESS_MAP_START( z80_portmap, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x0000 , 0xff) AM_NOP
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( z80_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-
-	AM_RANGE(0x0000 , 0x1fff) AM_READ(SMH_BANK1) AM_MIRROR(0x2000) // RAM can be accessed by the 68k
-	AM_RANGE(0x4000 , 0x4003) AM_DEVREAD("ym", ym2612_r)
-
-	AM_RANGE(0x6100 , 0x7eff) AM_READ(megadriv_z80_unmapped_read)
-
-	AM_RANGE(0x7f00 , 0x7fff) AM_READ(megadriv_z80_vdp_read)
-
-	AM_RANGE(0x8000 , 0xffff) AM_READ(z80_read_68k_banked_data) // The Z80 can read the 68k address space this way
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( z80_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000 , 0x1fff) AM_WRITE(SMH_BANK1) AM_MIRROR(0x2000)
-	AM_RANGE(0x4000 , 0x4003) AM_DEVWRITE("ym", ym2612_w)
-
-	AM_RANGE(0x7f00 , 0x7fff) AM_WRITE(megadriv_z80_vdp_write)
+static ADDRESS_MAP_START( megadriv_z80_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000 , 0x1fff) AM_RAMBANK(1) AM_MIRROR(0x2000) // RAM can be accessed by the 68k
+	AM_RANGE(0x4000 , 0x4003) AM_DEVREADWRITE("ym", ym2612_r,ym2612_w)
 
 	AM_RANGE(0x6000 , 0x6000) AM_WRITE(megadriv_z80_z80_bank_w)
 	AM_RANGE(0x6001 , 0x6001) AM_WRITE(megadriv_z80_z80_bank_w) // wacky races uses this address
 
-	AM_RANGE(0x8000 , 0xffff) AM_WRITE(z80_write_68k_banked_data)
+	AM_RANGE(0x6100 , 0x7eff) AM_READ(megadriv_z80_unmapped_read)
+
+	AM_RANGE(0x7f00 , 0x7fff) AM_READWRITE(megadriv_z80_vdp_read,megadriv_z80_vdp_write)
+
+	AM_RANGE(0x8000 , 0xffff) AM_READWRITE(z80_read_68k_banked_data,z80_write_68k_banked_data) // The Z80 can read the 68k address space this way
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( megadriv_z80_io_map, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x0000 , 0xff) AM_NOP
 ADDRESS_MAP_END
 
 /****************************************** 32X related ******************************************/
@@ -2687,13 +2657,13 @@ static WRITE16_HANDLER( _32x_68k_a15100_w )
 		if (data & 0x01)
 		{
 			_32x_adapter_enabled = 1;
-			memory_install_readwrite16_handler(space, 0x0880000, 0x08fffff, 0, 0, SMH_BANK11, SMH_BANK11); // 'fixed' 512kb rom bank
+			memory_install_readwrite16_handler(space, 0x0880000, 0x08fffff, 0, 0, (read16_space_func)SMH_BANK(11), (write16_space_func)SMH_BANK(11)); // 'fixed' 512kb rom bank
 			memory_set_bankptr(space->machine,  11, memory_region(space->machine, "gamecart") );
 
-			memory_install_readwrite16_handler(space, 0x0900000, 0x09fffff, 0, 0, SMH_BANK12, SMH_BANK12); // 'bankable' 1024kb rom bank
+			memory_install_readwrite16_handler(space, 0x0900000, 0x09fffff, 0, 0, (read16_space_func)SMH_BANK(12), (write16_space_func)SMH_BANK(12)); // 'bankable' 1024kb rom bank
 			memory_set_bankptr(space->machine,  12, memory_region(space->machine, "gamecart") );
 
-			memory_install_readwrite16_handler(space, 0x0000000, 0x03fffff, 0, 0, SMH_BANK10, SMH_BANK10);
+			memory_install_readwrite16_handler(space, 0x0000000, 0x03fffff, 0, 0, (read16_space_func)SMH_BANK(10), (write16_space_func)SMH_BANK(10));
 			memory_set_bankptr(space->machine,  10, memory_region(space->machine, "32x_68k_bios") );
 
 			memory_install_readwrite16_handler(space, 0x0a15180, 0x0a15181, 0, 0, _32x_68k_a15180_r, _32x_68k_a15180_w); // mode control regs
@@ -2716,7 +2686,7 @@ static WRITE16_HANDLER( _32x_68k_a15100_w )
 		{
 			_32x_adapter_enabled = 0;
 
-			memory_install_readwrite16_handler(space, 0x0000000, 0x03fffff, 0, 0, SMH_BANK10, SMH_BANK10);
+			memory_install_readwrite16_handler(space, 0x0000000, 0x03fffff, 0, 0, (read16_space_func)SMH_BANK(10), (write16_space_func)SMH_BANK(10));
 			memory_set_bankptr(space->machine,  10, memory_region(space->machine, "gamecart") );
 
 
@@ -3813,8 +3783,8 @@ static READ16_HANDLER( svp_68k_cell2_r )
 }
 
 static ADDRESS_MAP_START( svp_ssp_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x0000 , 0x03ff) AM_READ(SMH_BANK3)
-	AM_RANGE(0x0400 , 0xffff) AM_READ(SMH_BANK4)
+	AM_RANGE(0x0000 , 0x03ff) AM_ROMBANK(3)
+	AM_RANGE(0x0400 , 0xffff) AM_ROMBANK(4)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( svp_ext_map, ADDRESS_SPACE_IO, 16 )
@@ -3881,17 +3851,17 @@ static void svp_init(running_machine *machine)
 	memset(&svp, 0, sizeof(svp));
 
 	/* SVP stuff */
-	svp.dram = auto_malloc(0x20000);
-	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x300000, 0x31ffff, 0, 0, SMH_BANK2, SMH_BANK2);
+	svp.dram = auto_alloc_array(machine, UINT8, 0x20000);
+	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x300000, 0x31ffff, 0, 0, (read16_space_func)SMH_BANK(2), (write16_space_func)SMH_BANK(2));
 	memory_set_bankptr(machine,  2, svp.dram );
-	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa15000, 0xa150ff, 0, 0, svp_68k_io_r, svp_68k_io_w);
+	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa15000, 0xa150ff, 0, 0, svp_68k_io_r, svp_68k_io_w);
 	// "cell arrange" 1 and 2
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x390000, 0x39ffff, 0, 0, svp_68k_cell1_r);
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x3a0000, 0x3affff, 0, 0, svp_68k_cell2_r);
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x390000, 0x39ffff, 0, 0, svp_68k_cell1_r);
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x3a0000, 0x3affff, 0, 0, svp_68k_cell2_r);
 
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[2], ADDRESS_SPACE_PROGRAM), 0x438, 0x438, 0, 0, svp_speedup_r);
+	memory_install_read16_handler(cputag_get_address_space(machine, "svp", ADDRESS_SPACE_PROGRAM), 0x438, 0x438, 0, 0, svp_speedup_r);
 
-	svp.iram = auto_malloc(0x800);
+	svp.iram = auto_alloc_array(machine, UINT8, 0x800);
 	memory_set_bankptr(machine,  3, svp.iram );
 	/* SVP ROM just shares m68k region.. */
 	ROM = memory_region(machine, "maincpu");
@@ -3942,10 +3912,10 @@ VIDEO_START(megadriv)
 
 	render_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
-	megadrive_vdp_vram  = auto_malloc(0x10000);
-	megadrive_vdp_cram  = auto_malloc(0x80);
-	megadrive_vdp_vsram = auto_malloc(0x80);
-	megadrive_vdp_internal_sprite_attribute_table = auto_malloc(0x400);
+	megadrive_vdp_vram  = auto_alloc_array(machine, UINT16, 0x10000/2);
+	megadrive_vdp_cram  = auto_alloc_array(machine, UINT16, 0x80/2);
+	megadrive_vdp_vsram = auto_alloc_array(machine, UINT16, 0x80/2);
+	megadrive_vdp_internal_sprite_attribute_table = auto_alloc_array(machine, UINT16, 0x400/2);
 
 	for (x=0;x<0x20;x++)
 		megadrive_vdp_register[x]=0;
@@ -3960,15 +3930,15 @@ VIDEO_START(megadriv)
 
 	megadrive_max_hposition = 480;
 
-	sprite_renderline = auto_malloc(1024);
-	highpri_renderline = auto_malloc(320);
-	video_renderline = auto_malloc(320*4);
+	sprite_renderline = auto_alloc_array(machine, UINT8, 1024);
+	highpri_renderline = auto_alloc_array(machine, UINT8, 320);
+	video_renderline = auto_alloc_array(machine, UINT32, 320);
 
-	megadrive_vdp_palette_lookup = auto_malloc(0x40*2);
-	megadrive_vdp_palette_lookup_sprite = auto_malloc(0x40*2);
+	megadrive_vdp_palette_lookup = auto_alloc_array(machine, UINT16, 0x40);
+	megadrive_vdp_palette_lookup_sprite = auto_alloc_array(machine, UINT16, 0x40);
 
-	megadrive_vdp_palette_lookup_shadow = auto_malloc(0x40*2);
-	megadrive_vdp_palette_lookup_highlight = auto_malloc(0x40*2);
+	megadrive_vdp_palette_lookup_shadow = auto_alloc_array(machine, UINT16, 0x40);
+	megadrive_vdp_palette_lookup_highlight = auto_alloc_array(machine, UINT16, 0x40);
 
 	memset(megadrive_vdp_palette_lookup,0x00,0x40*2);
 	memset(megadrive_vdp_palette_lookup_sprite,0x00,0x40*2);
@@ -3997,7 +3967,7 @@ VIDEO_UPDATE(megadriv)
 	/* reference */
 
 //  time_elapsed_since_crap = timer_timeelapsed(frame_timer);
-//  xxx = cpu_attotime_to_clocks(screen->machine->cpu[0],time_elapsed_since_crap);
+//  xxx = cputag_attotime_to_clocks(screen->machine, "maincpu", time_elapsed_since_crap);
 //  mame_printf_debug("update cycles %d, %08x %08x\n",xxx, (UINT32)(time_elapsed_since_crap.attoseconds>>32),(UINT32)(time_elapsed_since_crap.attoseconds&0xffffffff));
 
 	return 0;
@@ -5917,22 +5887,23 @@ static TIMER_CALLBACK( scanline_timer_callback )
 
 
 
-	if (genesis_has_z80)
-	{
-		if (genesis_scanline_counter==megadrive_z80irq_scanline)
+		if (cputag_get_cpu(machine, "genesis_snd_z80") != NULL)
 		{
-			if ((genz80.z80_has_bus==1) && (genz80.z80_is_reset==0)) cpu_set_input_line(machine->cpu[1],0,HOLD_LINE);
+			if (genesis_scanline_counter == megadrive_z80irq_scanline)
+			{
+				if ((genz80.z80_has_bus == 1) && (genz80.z80_is_reset == 0))
+					cputag_set_input_line(machine, "genesis_snd_z80", 0, HOLD_LINE);
+			}
+			if (genesis_scanline_counter == megadrive_z80irq_scanline + 1)
+			{
+				cputag_set_input_line(machine, "genesis_snd_z80", 0, CLEAR_LINE);
+			}
 		}
-		if (genesis_scanline_counter==megadrive_z80irq_scanline+1)
-		{
-			cpu_set_input_line(machine->cpu[1],0,CLEAR_LINE);
-		}
-	}
 
 	}
 	else /* pretend we're still on the same scanline to compensate for rounding errors */
 	{
-		genesis_scanline_counter = megadrive_total_scanlines-1;
+		genesis_scanline_counter = megadrive_total_scanlines - 1;
 	}
 
 }
@@ -5943,14 +5914,15 @@ static TIMER_CALLBACK( irq6_on_callback )
 
 	{
 //      megadrive_irq6_pending = 1;
-		if (MEGADRIVE_REG01_IRQ6_ENABLE || genesis_always_irq6) cpu_set_input_line(machine->cpu[0],6,HOLD_LINE);
+		if (MEGADRIVE_REG01_IRQ6_ENABLE || genesis_always_irq6)
+			cputag_set_input_line(machine, "maincpu", 6, HOLD_LINE);
 	}
 }
 
 static TIMER_CALLBACK( irq4_on_callback )
 {
 	//mame_printf_debug("irq4 active on %d\n",genesis_scanline_counter);
-	cpu_set_input_line(machine->cpu[0],4,HOLD_LINE);
+	cputag_set_input_line(machine, "maincpu", 4, HOLD_LINE);
 }
 
 /*****************************************************************************************/
@@ -5998,12 +5970,12 @@ MACHINE_RESET( megadriv )
 		break;
 	}
 
-	if (genesis_has_z80)
+	if (cputag_get_cpu(machine, "genesis_snd_z80") != NULL)
 	{
 		genz80.z80_is_reset = 1;
-		cpu_set_input_line(machine->cpu[genz80.z80_cpunum], INPUT_LINE_RESET, ASSERT_LINE);
+		cputag_set_input_line(machine, "genesis_snd_z80", INPUT_LINE_RESET, ASSERT_LINE);
 		genz80.z80_has_bus = 1;
-		cpu_set_input_line(machine->cpu[genz80.z80_cpunum], INPUT_LINE_HALT, CLEAR_LINE);
+		cputag_set_input_line(machine, "genesis_snd_z80", INPUT_LINE_HALT, CLEAR_LINE);
 		genz80.z80_bank_addr = 0;
 		genesis_scanline_counter = -1;
 	}
@@ -6020,13 +5992,13 @@ MACHINE_RESET( megadriv )
 	irq4_on_timer = timer_alloc(machine, irq4_on_callback, NULL);
 
 	timer_adjust_oneshot(frame_timer, attotime_zero, 0);
-	timer_adjust_oneshot(scanline_timer,  attotime_zero, 0);
+	timer_adjust_oneshot(scanline_timer, attotime_zero, 0);
 
 	if (genesis_other_hacks)
 	{
 	//  set_refresh_rate(megadriv_framerate);
-		cpu_set_clockscale(machine->cpu[0], 0.9950f); /* Fatal Rewind is very fussy... */
-	//  cpu_set_clockscale(machine->cpu[0], 0.3800f); /* Fatal Rewind is very fussy... */
+		cpu_set_clockscale(cputag_get_cpu(machine, "maincpu"), 0.9950f); /* Fatal Rewind is very fussy... */
+	//  cpu_set_clockscale(cputag_get_cpu(machine, "maincpu"), 0.3800f); /* Fatal Rewind is very fussy... */
 
 		memset(megadrive_ram,0x00,0x10000);
 	}
@@ -6085,9 +6057,9 @@ VIDEO_EOF(megadriv)
 	megadrive_sprite_collision=0;//? when to reset this ..
 	megadrive_imode = MEGADRIVE_REG0C_INTERLEAVE; // can't change mid-frame..
 	megadrive_imode_odd_frame^=1;
-//  cpu_set_input_line(machine->cpu[1],0,CLEAR_LINE); // if the z80 interrupt hasn't happened by now, clear it..
+//  cputag_set_input_line(machine, "genesis_snd_z80", 0, CLEAR_LINE); // if the z80 interrupt hasn't happened by now, clear it..
 
-	if (MD_RESET_BUTTON(machine))  cpu_set_input_line(machine->cpu[0], INPUT_LINE_RESET, PULSE_LINE);
+	if (MD_RESET_BUTTON(machine))  cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, PULSE_LINE);
 
 /*
 int megadrive_total_scanlines = 262;
@@ -6171,7 +6143,7 @@ int megadrive_z80irq_hpos = 320;
 		frametime = ATTOSECONDS_PER_SECOND/megadriv_framerate;
 
 		time_elapsed_since_crap = timer_timeelapsed(frame_timer);
-		xxx = cpu_attotime_to_clocks(machine->cpu[0],time_elapsed_since_crap);
+		xxx = cputag_attotime_to_clocks(machine, "maincpu",time_elapsed_since_crap);
 		//mame_printf_debug("---------- cycles %d, %08x %08x\n",xxx, (UINT32)(time_elapsed_since_crap.attoseconds>>32),(UINT32)(time_elapsed_since_crap.attoseconds&0xffffffff));
 		//mame_printf_debug("---------- framet %d, %08x %08x\n",xxx, (UINT32)(frametime>>32),(UINT32)(frametime&0xffffffff));
 		timer_adjust_oneshot(frame_timer,  attotime_zero, 0);
@@ -6212,12 +6184,12 @@ static NVRAM_HANDLER( megadriv )
 
 MACHINE_DRIVER_START( megadriv )
 	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK_NTSC / 7) /* 7.67 MHz */
-	MDRV_CPU_PROGRAM_MAP(megadriv_readmem,megadriv_writemem)
+	MDRV_CPU_PROGRAM_MAP(megadriv_map,0)
 	/* IRQs are handled via the timers */
 
 	MDRV_CPU_ADD("genesis_snd_z80", Z80, MASTER_CLOCK_NTSC / 15) /* 3.58 MHz */
-	MDRV_CPU_PROGRAM_MAP(z80_readmem,z80_writemem)
-	MDRV_CPU_IO_MAP(z80_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(megadriv_z80_map,0)
+	MDRV_CPU_IO_MAP(megadriv_z80_io_map,0)
 	/* IRQ handled via the timers */
 
 	MDRV_MACHINE_RESET(megadriv)
@@ -6256,12 +6228,12 @@ MACHINE_DRIVER_END
 
 MACHINE_DRIVER_START( megadpal )
 	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK_PAL / 7) /* 7.67 MHz */
-	MDRV_CPU_PROGRAM_MAP(megadriv_readmem,megadriv_writemem)
+	MDRV_CPU_PROGRAM_MAP(megadriv_map,0)
 	/* IRQs are handled via the timers */
 
 	MDRV_CPU_ADD("genesis_snd_z80", Z80, MASTER_CLOCK_PAL / 15) /* 3.58 MHz */
-	MDRV_CPU_PROGRAM_MAP(z80_readmem,z80_writemem)
-	MDRV_CPU_IO_MAP(z80_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(megadriv_z80_map,0)
+	MDRV_CPU_IO_MAP(megadriv_z80_io_map,0)
 	/* IRQ handled via the timers */
 
 	MDRV_MACHINE_RESET(megadriv)
@@ -6378,11 +6350,9 @@ static void megadriv_init_common(running_machine *machine)
 	if (_genesis_snd_z80_cpu != NULL)
 	{
 		printf("GENESIS Sound Z80 cpu found %d\n", cpu_get_index(_genesis_snd_z80_cpu) );
-		genesis_has_z80 = 1;
-	}
-	else
-	{
-		genesis_has_z80 = 0;
+
+		genz80.z80_prgram = auto_alloc_array(machine, UINT8, 0x2000);
+		memory_set_bankptr(machine,  1, genz80.z80_prgram );
 	}
 
 	/* Look to see if this system has the 32x Master SH2 */
@@ -6421,20 +6391,13 @@ static void megadriv_init_common(running_machine *machine)
 	}
 
 
-	if (genesis_has_z80)
-	{
-		genz80.z80_cpunum = 1;
-		genz80.z80_prgram = auto_malloc(0x2000);
-		memory_set_bankptr(machine,  1, genz80.z80_prgram );
-	}
-
-	cpu_set_irq_callback(machine->cpu[0], genesis_int_callback);
+	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), genesis_int_callback);
 	megadriv_backupram = NULL;
 	megadriv_backupram_length = 0;
 
 	vdp_get_word_from_68k_mem = vdp_get_word_from_68k_mem_default;
 
-	device_set_info_fct(machine->cpu[0], CPUINFO_FCT_M68K_TAS_CALLBACK, (void *)megadriv_tas_callback);
+	m68k_set_tas_callback(cputag_get_cpu(machine, "maincpu"), megadriv_tas_callback);
 
 	if ((machine->gamedrv->ipt==ipt_megadri6) || (machine->gamedrv->ipt==ipt_ssf2ghw))
 	{
@@ -6558,28 +6521,28 @@ void megatech_set_megadrive_z80_as_megadrive_z80(running_machine *machine)
 	const device_config *ym = devtag_get_device(machine, "ym");
 
 	/* INIT THE PORTS *********************************************************************************************/
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_IO), 0x0000, 0xffff, 0, 0, z80_unmapped_port_r, z80_unmapped_port_w);
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, "genesis_snd_z80", ADDRESS_SPACE_IO), 0x0000, 0xffff, 0, 0, z80_unmapped_port_r, z80_unmapped_port_w);
 
 	/* catch any addresses that don't get mapped */
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x0000, 0xffff, 0, 0, z80_unmapped_r, z80_unmapped_w);
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, "genesis_snd_z80", ADDRESS_SPACE_PROGRAM), 0x0000, 0xffff, 0, 0, z80_unmapped_r, z80_unmapped_w);
 
 
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, SMH_BANK1, SMH_BANK1);
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, "genesis_snd_z80", ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, (read8_space_func)SMH_BANK(1), (write8_space_func)SMH_BANK(1));
 	memory_set_bankptr(machine,  1, genz80.z80_prgram );
 
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, SMH_BANK6, SMH_BANK6);
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, "genesis_snd_z80", ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, (read8_space_func)SMH_BANK(6), (write8_space_func)SMH_BANK(6));
 	memory_set_bankptr(machine,  6, genz80.z80_prgram );
 
 
 	// not allowed??
-//  memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x2000, 0x3fff, 0, 0, SMH_BANK1, SMH_BANK1);
+//  memory_install_readwrite8_handler(cputag_get_address_space(machine, "genesis_snd_z80", ADDRESS_SPACE_PROGRAM), 0x2000, 0x3fff, 0, 0, (read8_space_func)SMH_BANK(1), (write8_space_func)SMH_BANK(1));
 
-	memory_install_readwrite8_device_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), ym, 0x4000, 0x4003, 0, 0, ym2612_r, ym2612_w);
-	memory_install_write8_handler    (cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x6000, 0x6000, 0, 0, megadriv_z80_z80_bank_w);
-	memory_install_write8_handler    (cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x6001, 0x6001, 0, 0, megadriv_z80_z80_bank_w);
-	memory_install_read8_handler     (cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x6100, 0x7eff, 0, 0, megadriv_z80_unmapped_read);
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x7f00, 0x7fff, 0, 0, megadriv_z80_vdp_read, megadriv_z80_vdp_write);
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, z80_read_68k_banked_data, z80_write_68k_banked_data);
+	memory_install_readwrite8_device_handler(cputag_get_address_space(machine, "genesis_snd_z80", ADDRESS_SPACE_PROGRAM), ym, 0x4000, 0x4003, 0, 0, ym2612_r, ym2612_w);
+	memory_install_write8_handler    (cputag_get_address_space(machine, "genesis_snd_z80", ADDRESS_SPACE_PROGRAM), 0x6000, 0x6000, 0, 0, megadriv_z80_z80_bank_w);
+	memory_install_write8_handler    (cputag_get_address_space(machine, "genesis_snd_z80", ADDRESS_SPACE_PROGRAM), 0x6001, 0x6001, 0, 0, megadriv_z80_z80_bank_w);
+	memory_install_read8_handler     (cputag_get_address_space(machine, "genesis_snd_z80", ADDRESS_SPACE_PROGRAM), 0x6100, 0x7eff, 0, 0, megadriv_z80_unmapped_read);
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, "genesis_snd_z80", ADDRESS_SPACE_PROGRAM), 0x7f00, 0x7fff, 0, 0, megadriv_z80_vdp_read, megadriv_z80_vdp_write);
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, "genesis_snd_z80", ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, z80_read_68k_banked_data, z80_write_68k_banked_data);
 }
 
 // these are tests for 'special case' hardware to make sure I don't break anything while rearranging things
@@ -6591,14 +6554,14 @@ DRIVER_INIT( _32x )
 {
 
 
-	_32x_dram0 = auto_malloc(0x40000);
-	_32x_dram1 = auto_malloc(0x40000);
+	_32x_dram0 = auto_alloc_array(machine, UINT16, 0x40000/2);
+	_32x_dram1 = auto_alloc_array(machine, UINT16, 0x40000/2);
 
 	memset(_32x_dram0, 0x00, 0x40000);
 	memset(_32x_dram1, 0x00, 0x40000);
 
-	_32x_palette = auto_malloc(0x200);
-	_32x_palette_lookup = auto_malloc(0x200);
+	_32x_palette = auto_alloc_array(machine, UINT16, 0x200/2);
+	_32x_palette_lookup = auto_alloc_array(machine, UINT16, 0x200/2);
 
 	memset(_32x_palette, 0x00, 0x200);
 	memset(_32x_palette_lookup, 0x00, 0x200);
@@ -6611,20 +6574,20 @@ DRIVER_INIT( _32x )
 
 	if (_32x_adapter_enabled == 0)
 	{
-		memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000000, 0x03fffff, 0, 0, SMH_BANK10, SMH_BANK10);
+		memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000000, 0x03fffff, 0, 0, (read16_space_func)SMH_BANK(10), (write16_space_func)SMH_BANK(10));
 		memory_set_bankptr(machine,  10, memory_region(machine, "gamecart") );
 	};
 
 
 	a15100_reg = 0x0000;
-	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa15100, 0xa15101, 0, 0, _32x_68k_a15100_r, _32x_68k_a15100_w); // framebuffer control regs
-	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa15102, 0xa15103, 0, 0, _32x_68k_a15102_r, _32x_68k_a15102_w); // send irq to sh2
-	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa15104, 0xa15105, 0, 0, _32x_68k_a15104_r, _32x_68k_a15104_w); // 68k BANK rom set
-	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa15106, 0xa15107, 0, 0, _32x_68k_a15106_r, _32x_68k_a15106_w); // dreq stuff
+	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa15100, 0xa15101, 0, 0, _32x_68k_a15100_r, _32x_68k_a15100_w); // framebuffer control regs
+	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa15102, 0xa15103, 0, 0, _32x_68k_a15102_r, _32x_68k_a15102_w); // send irq to sh2
+	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa15104, 0xa15105, 0, 0, _32x_68k_a15104_r, _32x_68k_a15104_w); // 68k BANK rom set
+	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa15106, 0xa15107, 0, 0, _32x_68k_a15106_r, _32x_68k_a15106_w); // dreq stuff
 
-	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa15120, 0xa1512f, 0, 0, _32x_68k_commsram_r, _32x_68k_commsram_w); // comms reg 0-7
+	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa15120, 0xa1512f, 0, 0, _32x_68k_commsram_r, _32x_68k_commsram_w); // comms reg 0-7
 
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0a130ec, 0x0a130ef, 0, 0, _32x_68k_MARS_r); // system ID
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0a130ec, 0x0a130ef, 0, 0, _32x_68k_MARS_r); // system ID
 
 
 
@@ -6650,8 +6613,8 @@ DRIVER_INIT( _32x )
 	_32x_240mode = 0;
 
 // checking if these help brutal, they don't.
-	sh2drc_set_options(machine->cpu[2], SH2DRC_COMPATIBLE_OPTIONS);
-	sh2drc_set_options(machine->cpu[3], SH2DRC_COMPATIBLE_OPTIONS);
+	sh2drc_set_options(cputag_get_cpu(machine, "32x_master_sh2"), SH2DRC_COMPATIBLE_OPTIONS);
+	sh2drc_set_options(cputag_get_cpu(machine, "32x_slave_sh2"), SH2DRC_COMPATIBLE_OPTIONS);
 
 	DRIVER_INIT_CALL(megadriv);
 }

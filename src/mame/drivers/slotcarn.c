@@ -145,7 +145,7 @@ static MC6845_ON_HSYNC_CHANGED(hsync_changed)
 
 static MC6845_ON_VSYNC_CHANGED(vsync_changed)
 {
-	cpu_set_input_line(device->machine->cpu[0], 0, vsync ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "maincpu", 0, vsync ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const mc6845_interface mc6845_intf =
@@ -532,7 +532,7 @@ static VIDEO_UPDATE( slotcarn )
 
 static MACHINE_START(merit)
 {
-	ram_palette = auto_malloc(RAM_PALETTE_SIZE);
+	ram_palette = auto_alloc_array(machine, UINT8, RAM_PALETTE_SIZE);
 	state_save_register_global_pointer(machine, ram_palette, RAM_PALETTE_SIZE);
 }
 

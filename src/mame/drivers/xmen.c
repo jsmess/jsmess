@@ -95,7 +95,7 @@ logerror("%06x: write %04x to 108000\n",cpu_get_pc(space->cpu),data);
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 = coin counter */
-		coin_counter_w(0,data & 0x01);
+		coin_counter_w(0, data & 0x01);
 
 		/* bit 2 is data */
 		/* bit 3 is clock (active high) */
@@ -115,12 +115,13 @@ logerror("%06x: write %04x to 108000\n",cpu_get_pc(space->cpu),data);
 
 static READ16_HANDLER( sound_status_r )
 {
-	return soundlatch2_r(space,0);
+	return soundlatch2_r(space, 0);
 }
 
 static WRITE16_HANDLER( sound_cmd_w )
 {
-	if (ACCESSING_BITS_0_7) {
+	if (ACCESSING_BITS_0_7)
+	{
 		data &= 0xff;
 		soundlatch_w(space, 0, data);
 	}
@@ -128,16 +129,17 @@ static WRITE16_HANDLER( sound_cmd_w )
 
 static WRITE16_HANDLER( sound_irq_w )
 {
-	cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
 }
 
 //int xmen_irqenabled;
 
 static WRITE16_HANDLER( xmen_18fa00_w )
 {
-	if(ACCESSING_BITS_0_7) {
+	if(ACCESSING_BITS_0_7)
+	{
 		/* bit 2 is interrupt enable */
-		interrupt_enable_w(space,0,data & 0x04);
+		interrupt_enable_w(space, 0, data & 0x04);
 	//  xmen_irqenabled = data;
 	}
 }
@@ -179,7 +181,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK4)
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(4))
 	AM_RANGE(0x8000, 0xbfff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe22f) AM_DEVREADWRITE("konami", k054539_r, k054539_w)
@@ -250,12 +252,12 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( xmen )
 	PORT_START("P1_P3")
-	KONAMI16_LSB(1, IPT_BUTTON3, IPT_COIN1 )
-	KONAMI16_MSB(3, IPT_BUTTON3, IPT_COIN3 )
+	KONAMI16_LSB_UDLR(1, IPT_BUTTON3, IPT_COIN1 )
+	KONAMI16_MSB_UDLR(3, IPT_BUTTON3, IPT_COIN3 )
 
 	PORT_START("P2_P4")
-	KONAMI16_LSB(2, IPT_BUTTON3, IPT_COIN2 )
-	KONAMI16_MSB(4, IPT_BUTTON3, IPT_COIN4 )
+	KONAMI16_LSB_UDLR(2, IPT_BUTTON3, IPT_COIN2 )
+	KONAMI16_MSB_UDLR(4, IPT_BUTTON3, IPT_COIN4 )
 
 	PORT_START("EEPROM")
 	PORT_BIT( 0x003f, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
@@ -272,11 +274,11 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( xmen2p )
 	PORT_START("P1_P3")
-	KONAMI16_LSB(1, IPT_BUTTON3, IPT_COIN1 )
+	KONAMI16_LSB_UDLR(1, IPT_BUTTON3, IPT_COIN1 )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P2_P4")
-	KONAMI16_LSB(2, IPT_BUTTON3, IPT_COIN2 )
+	KONAMI16_LSB_UDLR(2, IPT_BUTTON3, IPT_COIN2 )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("EEPROM")
@@ -301,16 +303,16 @@ static CUSTOM_INPUT( xmen_frame_r )
 
 static INPUT_PORTS_START( xmen6p )
 	PORT_START("P1_P3")
-	KONAMI16_LSB(1, IPT_BUTTON3, IPT_COIN1 )
-	KONAMI16_MSB(3, IPT_BUTTON3, IPT_COIN3 )
+	KONAMI16_LSB_UDLR(1, IPT_BUTTON3, IPT_COIN1 )
+	KONAMI16_MSB_UDLR(3, IPT_BUTTON3, IPT_COIN3 )
 
 	PORT_START("P2_P4")
-	KONAMI16_LSB(2, IPT_BUTTON3, IPT_COIN2 )
-	KONAMI16_MSB(4, IPT_BUTTON3, IPT_COIN4 )
+	KONAMI16_LSB_UDLR(2, IPT_BUTTON3, IPT_COIN2 )
+	KONAMI16_MSB_UDLR(4, IPT_BUTTON3, IPT_COIN4 )
 
 	PORT_START("P5_P6")
-	KONAMI16_LSB(5, IPT_BUTTON3, IPT_COIN5 )
-	KONAMI16_MSB(6, IPT_BUTTON3, IPT_COIN6 )
+	KONAMI16_LSB_UDLR(5, IPT_BUTTON3, IPT_COIN5 )
+	KONAMI16_MSB_UDLR(6, IPT_BUTTON3, IPT_COIN6 )
 
 	PORT_START("EEPROM")
 	PORT_BIT( 0x003f, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */

@@ -157,10 +157,10 @@ static TIMER_CALLBACK(pcw16_timer_callback)
 }
 
 static ADDRESS_MAP_START(pcw16_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(SMH_BANK1, SMH_BANK5)
-	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(SMH_BANK2, SMH_BANK6)
-	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_BANK3, SMH_BANK7)
-	AM_RANGE(0xc000, 0xffff) AM_READWRITE(SMH_BANK4, SMH_BANK8)
+	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(SMH_BANK(1), SMH_BANK(5))
+	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(SMH_BANK(2), SMH_BANK(6))
+	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_BANK(3), SMH_BANK(7))
+	AM_RANGE(0xc000, 0xffff) AM_READWRITE(SMH_BANK(4), SMH_BANK(8))
 ADDRESS_MAP_END
 
 
@@ -173,18 +173,18 @@ static char *pcw16_mem_ptr[4];
 
 static const write8_space_func pcw16_write_handler_dram[4] =
 {
-	SMH_BANK5,
-	SMH_BANK6,
-	SMH_BANK7,
-	SMH_BANK8
+	SMH_BANK(5),
+	SMH_BANK(6),
+	SMH_BANK(7),
+	SMH_BANK(8)
 };
 
 static const read8_space_func pcw16_read_handler_dram[4] =
 {
-	SMH_BANK1,
-	SMH_BANK2,
-	SMH_BANK3,
-	SMH_BANK4
+	SMH_BANK(1),
+	SMH_BANK(2),
+	SMH_BANK(3),
+	SMH_BANK(4)
 };
 /*******************************************/
 

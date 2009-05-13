@@ -2202,9 +2202,9 @@ static void saturn_init_driver(running_machine *machine, int rgn)
 	minit_boost_timeslice = attotime_zero;
 	sinit_boost_timeslice = attotime_zero;
 
-	smpc_ram = auto_malloc (0x80);
-	stv_scu = auto_malloc (0x100);
-	scsp_regs = auto_malloc (0x1000);
+	smpc_ram = auto_alloc_array(machine, UINT8, 0x80);
+	stv_scu = auto_alloc_array(machine, UINT32, 0x100/4);
+	scsp_regs = auto_alloc_array(machine, UINT16, 0x1000/2);
 
 	smpc_ram[0x23] = DectoBCD(systime.local_time.year / 100);
 	smpc_ram[0x25] = DectoBCD(systime.local_time.year % 100);

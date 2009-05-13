@@ -181,7 +181,7 @@ static WRITE8_DEVICE_HANDLER( taitosj_sndnmi_msk_w )
 static WRITE8_HANDLER( taitosj_soundcommand_w )
 {
 	soundlatch_w(space,offset,data);
-	if (!sndnmi_disable) cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
+	if (!sndnmi_disable) cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static UINT8 input_port_4_f0;
@@ -199,7 +199,7 @@ static CUSTOM_INPUT( input_port_4_f0_r )
 
 static ADDRESS_MAP_START( taitosj_main_nomcu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x7fff) AM_READWRITE(SMH_BANK1, SMH_ROM)
+	AM_RANGE(0x6000, 0x7fff) AM_READWRITE(SMH_BANK(1), SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x07fe) AM_READWRITE(taitosj_fake_data_r, taitosj_fake_data_w)
 	AM_RANGE(0x8801, 0x8801) AM_MIRROR(0x07fe) AM_READ(taitosj_fake_status_r)
@@ -239,7 +239,7 @@ ADDRESS_MAP_END
 /* only difference is taitosj_fake_ replaced with taitosj_mcu_ */
 static ADDRESS_MAP_START( taitosj_main_mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x7fff) AM_READWRITE(SMH_BANK1, SMH_ROM)
+	AM_RANGE(0x6000, 0x7fff) AM_READWRITE(SMH_BANK(1), SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x07fe) AM_READWRITE(taitosj_mcu_data_r, taitosj_mcu_data_w)
 	AM_RANGE(0x8801, 0x8801) AM_MIRROR(0x07fe) AM_READ(taitosj_mcu_status_r)
@@ -302,7 +302,7 @@ static CUSTOM_INPUT( kikstart_gear_r )
 
 static ADDRESS_MAP_START( kikstart_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x7fff) AM_READWRITE(SMH_BANK1, SMH_ROM)
+	AM_RANGE(0x6000, 0x7fff) AM_READWRITE(SMH_BANK(1), SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8800) AM_READWRITE(taitosj_mcu_data_r, taitosj_mcu_data_w)
 	AM_RANGE(0x8801, 0x8801) AM_READ(taitosj_mcu_status_r)
@@ -711,44 +711,23 @@ static INPUT_PORTS_START( junglek )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( piratpet )
-	COMMON_IN0
+	PORT_INCLUDE( junglek )
 
-	COMMON_IN1 //Button 2 skips levels when Debug mode is on
+	/* These 'skip' bits actually work no matter how you set the Debug Dip!          */
+	/* If cabinet is upright -> only 1 set of controls -> only P1 Skip Next Level    */
+	/* If cabinet is cocktal -> 2 sets of controls -> both Skip Next Level bits work */
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Q) PORT_NAME("P1 Skip Next Level")	// Button 2 skips levels when Debug dips is on
 
-	COMMON_IN2
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W) PORT_NAME("P2 Skip Next Level")	// Button 2 skips levels when Debug dips is on
 
-	COMMON_IN3(IP_ACTIVE_HIGH)
-
-	PORT_START("IN4")
-	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(input_port_4_f0_r, NULL)	// from sound CPU
-
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, "Finish Bonus" )
-	PORT_DIPSETTING(    0x03, DEF_STR( None ) )
-	PORT_DIPSETTING(    0x02, "Timer x1" )
-	PORT_DIPSETTING(    0x01, "Timer x2" )
-	PORT_DIPSETTING(    0x00, "Timer x3" )
+	PORT_MODIFY("DSW1")
 	PORT_DIPNAME( 0x04, 0x04, "Debug Mode" )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x18, "3" )
-	PORT_DIPSETTING(    0x10, "4" )
-	PORT_DIPSETTING(    0x08, "5" )
-	PORT_DIPSETTING(    0x00, "6" )
-	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
-	PORT_START("DSW2")      /* Coinage */
-	DSW2_PORT
-
-	PORT_START("DSW3")
+	PORT_MODIFY("DSW3")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x02, "10000" )
 	PORT_DIPSETTING(    0x01, "20000" )
@@ -763,15 +742,9 @@ static INPUT_PORTS_START( piratpet )
 	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Harder ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x20, 0x20, "Year Display" )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x40, 0x40, "Free Game (Cheat)")
 	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x80, "A and B" )
-	PORT_DIPSETTING(    0x00, "A only" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( alpine )
@@ -2731,7 +2704,7 @@ static DRIVER_INIT( spacecr )
 	init_common(machine);
 
 	/* install protection handler */
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xd48b, 0xd48b, 0, 0, spacecr_prot_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd48b, 0xd48b, 0, 0, spacecr_prot_r);
 }
 
 static DRIVER_INIT( alpine )
@@ -2739,8 +2712,8 @@ static DRIVER_INIT( alpine )
 	init_common(machine);
 
 	/* install protection handlers */
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xd40b, 0xd40b, 0, 0, alpine_port_2_r);
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xd50f, 0xd50f, 0, 0, alpine_protection_w);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd40b, 0xd40b, 0, 0, alpine_port_2_r);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd50f, 0xd50f, 0, 0, alpine_protection_w);
 }
 
 static DRIVER_INIT( alpinea )
@@ -2748,8 +2721,8 @@ static DRIVER_INIT( alpinea )
 	init_common(machine);
 
 	/* install protection handlers */
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xd40b, 0xd40b, 0, 0, alpine_port_2_r);
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xd50e, 0xd50e, 0, 0, alpinea_bankswitch_w);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd40b, 0xd40b, 0, 0, alpine_port_2_r);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd50e, 0xd50e, 0, 0, alpinea_bankswitch_w);
 }
 
 static DRIVER_INIT( junglhbr )
@@ -2757,7 +2730,7 @@ static DRIVER_INIT( junglhbr )
 	init_common(machine);
 
 	/* inverter on bits 0 and 1 */
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x9000, 0xbfff, 0, 0, junglhbr_characterram_w);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x9000, 0xbfff, 0, 0, junglhbr_characterram_w);
 }
 
 GAME( 1981, spaceskr, 0,        nomcu,    spaceskr,   taitosj, ROT0,   "Taito Corporation", "Space Seeker", GAME_SUPPORTS_SAVE )

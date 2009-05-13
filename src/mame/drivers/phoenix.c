@@ -39,7 +39,7 @@ Pleiads:
 
 static ADDRESS_MAP_START( phoenix_memory_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x4fff) AM_READWRITE(SMH_BANK1, phoenix_videoram_w)	/* 2 pages selected by bit 0 of the video register */
+	AM_RANGE(0x4000, 0x4fff) AM_READWRITE(SMH_BANK(1), phoenix_videoram_w)	/* 2 pages selected by bit 0 of the video register */
 	AM_RANGE(0x5000, 0x53ff) AM_WRITE(phoenix_videoreg_w)
 	AM_RANGE(0x5800, 0x5bff) AM_WRITE(phoenix_scroll_w)
 	AM_RANGE(0x6000, 0x63ff) AM_DEVWRITE("discrete", phoenix_sound_control_a_w)
@@ -50,7 +50,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pleiads_memory_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x4fff) AM_READWRITE(SMH_BANK1, phoenix_videoram_w)	/* 2 pages selected by bit 0 of the video register */
+	AM_RANGE(0x4000, 0x4fff) AM_READWRITE(SMH_BANK(1), phoenix_videoram_w)	/* 2 pages selected by bit 0 of the video register */
 	AM_RANGE(0x5000, 0x53ff) AM_WRITE(pleiads_videoreg_w)
 	AM_RANGE(0x5800, 0x5bff) AM_WRITE(phoenix_scroll_w)
 	AM_RANGE(0x6000, 0x63ff) AM_WRITE(pleiads_sound_control_a_w)
@@ -61,7 +61,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( survival_memory_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x4fff) AM_READWRITE(SMH_BANK1, phoenix_videoram_w)	/* 2 pages selected by bit 0 of the video register */
+	AM_RANGE(0x4000, 0x4fff) AM_READWRITE(SMH_BANK(1), phoenix_videoram_w)	/* 2 pages selected by bit 0 of the video register */
 	AM_RANGE(0x5000, 0x53ff) AM_WRITE(phoenix_videoreg_w)
 	AM_RANGE(0x5800, 0x5bff) AM_WRITE(phoenix_scroll_w)
 	AM_RANGE(0x6800, 0x68ff) AM_DEVWRITE("ay", ay8910_address_w)
@@ -1058,7 +1058,7 @@ ROM_END
 static DRIVER_INIT( condor )
 {
 	/* additional inputs for coinage */
-	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x5000, 0x5000, 0, 0, "DSW1");
+	memory_install_read_port_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5000, 0x5000, 0, 0, "DSW1");
 }
 
 

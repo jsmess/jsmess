@@ -273,7 +273,7 @@ static WRITE16_HANDLER( sound_cmd2_w )
 
 static WRITE16_HANDLER( sound_irq_w )
 {
-	cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
 }
 
 static READ16_HANDLER( sound_status_r )
@@ -309,7 +309,7 @@ static TIMER_CALLBACK( dmaend_callback )
 
 		// IRQ 5 is the "object DMA end interrupt" and shouldn't be triggered
 		// if object data isn't ready for DMA within the frame.
-		cpu_set_input_line(machine->cpu[0], 5, HOLD_LINE);
+		cputag_set_input_line(machine, "maincpu", 5, HOLD_LINE);
 	}
 }
 
@@ -393,7 +393,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK2)
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(2))
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe22f) AM_DEVREADWRITE("konami", k054539_r, k054539_w)

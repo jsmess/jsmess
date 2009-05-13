@@ -214,7 +214,7 @@ static TIMER_CALLBACK( delayed_speech_w )
 	speech_latch = data;
 
 	/* the high bit goes directly to the INT line */
-	cpu_set_input_line(machine->cpu[1], 0, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(machine, "audiocpu", 0, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* a clock on the high bit clocks a 1 into T0 */
 	if (!(old & 0x80) && (data & 0x80))
@@ -650,7 +650,7 @@ static DEVICE_START( usb_sound )
 	assert(usb.cpu != NULL);
 
 	/* allocate work RAM */
-	usb.work_ram = auto_malloc(0x400);
+	usb.work_ram = auto_alloc_array(machine, UINT8, 0x400);
 
 	/* create a sound stream */
 	usb.stream = stream_create(device, 0, 1, SAMPLE_RATE, NULL, usb_stream_update);

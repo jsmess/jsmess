@@ -159,7 +159,7 @@ static INTERRUPT_GEN( supertnk_interrupt )
 
 static WRITE8_HANDLER( supertnk_interrupt_ack_w )
 {
-	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 }
 
 
@@ -172,9 +172,9 @@ static WRITE8_HANDLER( supertnk_interrupt_ack_w )
 
 static VIDEO_START( supertnk )
 {
-	supertnk_videoram[0] = auto_malloc(supertnk_videoram_size);
-	supertnk_videoram[1] = auto_malloc(supertnk_videoram_size);
-	supertnk_videoram[2] = auto_malloc(supertnk_videoram_size);
+	supertnk_videoram[0] = auto_alloc_array(machine, UINT8, supertnk_videoram_size);
+	supertnk_videoram[1] = auto_alloc_array(machine, UINT8, supertnk_videoram_size);
+	supertnk_videoram[2] = auto_alloc_array(machine, UINT8, supertnk_videoram_size);
 }
 
 
@@ -274,7 +274,7 @@ static VIDEO_UPDATE( supertnk )
 
 static MACHINE_RESET( supertnk )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	supertnk_bankswitch_0_w(space, 0, 0);
 	supertnk_bankswitch_1_w(space, 0, 0);
 

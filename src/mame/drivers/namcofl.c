@@ -239,8 +239,8 @@ static WRITE32_HANDLER( namcofl_share_w )
 }
 
 static ADDRESS_MAP_START( namcofl_mem, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x000fffff) AM_READWRITE(SMH_BANK1, SMH_BANK1)
-	AM_RANGE(0x10000000, 0x100fffff) AM_READWRITE(SMH_BANK2, SMH_BANK2)
+	AM_RANGE(0x00000000, 0x000fffff) AM_READWRITE(SMH_BANK(1), SMH_BANK(1))
+	AM_RANGE(0x10000000, 0x100fffff) AM_READWRITE(SMH_BANK(2), SMH_BANK(2))
 	AM_RANGE(0x20000000, 0x201fffff) AM_ROM AM_REGION("user1", 0)	/* data */
 	AM_RANGE(0x30000000, 0x30001fff) AM_RAM	AM_BASE(&generic_nvram32) AM_SIZE(&generic_nvram_size) /* nvram */
 	AM_RANGE(0x30100000, 0x30100003) AM_WRITE(namcofl_spritebank_w)
@@ -472,14 +472,14 @@ GFXDECODE_END
 
 static TIMER_CALLBACK( network_interrupt_callback )
 {
-	cpu_set_input_line(machine->cpu[0], I960_IRQ0, ASSERT_LINE);
+	cputag_set_input_line(machine, "maincpu", I960_IRQ0, ASSERT_LINE);
 	timer_set(machine, video_screen_get_frame_period(machine->primary_screen), NULL, 0, network_interrupt_callback);
 }
 
 
 static TIMER_CALLBACK( vblank_interrupt_callback )
 {
-	cpu_set_input_line(machine->cpu[0], I960_IRQ2, ASSERT_LINE);
+	cputag_set_input_line(machine, "maincpu", I960_IRQ2, ASSERT_LINE);
 	timer_set(machine, video_screen_get_frame_period(machine->primary_screen), NULL, 0, vblank_interrupt_callback);
 }
 
@@ -487,7 +487,7 @@ static TIMER_CALLBACK( vblank_interrupt_callback )
 static TIMER_CALLBACK( raster_interrupt_callback )
 {
 	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
-	cpu_set_input_line(machine->cpu[0], I960_IRQ1, ASSERT_LINE);
+	cputag_set_input_line(machine, "maincpu", I960_IRQ1, ASSERT_LINE);
 	timer_adjust_oneshot(raster_interrupt_timer, video_screen_get_frame_period(machine->primary_screen), 0);
 }
 
@@ -723,7 +723,7 @@ ROM_END
 
 static void namcofl_common_init(running_machine *machine)
 {
-	namcofl_workram = auto_malloc(0x100000);
+	namcofl_workram = auto_alloc_array(machine, UINT32, 0x100000/4);
 
 	memory_set_bankptr(machine,  1, memory_region(machine, "maincpu") );
 	memory_set_bankptr(machine,  2, namcofl_workram );

@@ -491,7 +491,7 @@ static VIDEO_START( apexc )
 	const device_config *screen = video_screen_first(machine->config);
 	int width = video_screen_get_width(screen);
 	int height = video_screen_get_height(screen);
-	apexc_bitmap = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
+	apexc_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 	bitmap_fill(apexc_bitmap, &/*machine->visible_area*/teletyper_window, 0);
 }
 

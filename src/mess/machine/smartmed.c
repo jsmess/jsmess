@@ -157,7 +157,7 @@ DEVICE_IMAGE_LOAD( smartmedia )
 	smartmedia[id].page_total_size = get_UINT32BE(custom_header.page_total_size);
 	smartmedia[id].num_pages = get_UINT32BE(custom_header.num_pages);
 	smartmedia[id].log2_pages_per_block = get_UINT32BE(custom_header.log2_pages_per_block);
-	smartmedia[id].data_ptr = auto_malloc(smartmedia[id].page_total_size*smartmedia[id].num_pages);
+	smartmedia[id].data_ptr = auto_alloc_array(image->machine, UINT8, smartmedia[id].page_total_size*smartmedia[id].num_pages);
 	smartmedia[id].mode = SM_M_INIT;
 	smartmedia[id].pointer_mode = SM_PM_A;
 	smartmedia[id].page_addr = 0;
@@ -166,7 +166,7 @@ DEVICE_IMAGE_LOAD( smartmedia )
 	if (!image_is_writable(image))
 		smartmedia[id].status |= 0x80;
 	smartmedia[id].accumulated_status = 0;
-	smartmedia[id].pagereg = auto_malloc(smartmedia[id].page_total_size);
+	smartmedia[id].pagereg = auto_alloc_array(image->machine, UINT8, smartmedia[id].page_total_size);
 	smartmedia[id].id[0] = smartmedia[id].id[1] = 0;
 
 	image_fread(image, smartmedia[id].id, 2);
@@ -202,7 +202,7 @@ DEVICE_IMAGE_UNLOAD( smartmedia )
 	smartmedia[id].byte_addr = 0;
 	smartmedia[id].status = 0x40;
 	smartmedia[id].accumulated_status = 0;
-	smartmedia[id].pagereg = auto_malloc(smartmedia[id].page_total_size);
+	smartmedia[id].pagereg = auto_alloc_array(image->machine, UINT8, smartmedia[id].page_total_size);
 	smartmedia[id].id[0] = smartmedia[id].id[1] = 0;
 	smartmedia[id].mp_opcode = 0;
 

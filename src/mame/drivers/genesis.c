@@ -15,6 +15,8 @@ segac2.c
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/2612intf.h"
+#include "sound/sn76496.h"
+
 #include "genesis.h"
 
 #define MASTER_CLOCK		53693100
@@ -72,9 +74,9 @@ UINT8 *genesis_z80_ram;
 /* call this whenever the interrupt state has changed */
 static void update_interrupts(running_machine *machine)
 {
-	cpu_set_input_line(machine->cpu[0], 2, irq2_int ? ASSERT_LINE : CLEAR_LINE);
-	cpu_set_input_line(machine->cpu[0], 4, scanline_int ? ASSERT_LINE : CLEAR_LINE);
-	cpu_set_input_line(machine->cpu[0], 6, vblank_int ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 2, irq2_int ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 4, scanline_int ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 6, vblank_int ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -151,14 +153,14 @@ MACHINE_START( genesis )
 MACHINE_RESET( genesis )
 {
 	/* C2 doesn't have a Z80, so we can't just assume */
-	if (machine->cpu[1] != NULL && cpu_get_type(machine->cpu[1]) == CPU_Z80)
+	if (cputag_get_cpu(machine, "genesis_snd_z80") != NULL && cpu_get_type(cputag_get_cpu(machine, "genesis_snd_z80")) == CPU_Z80)
 	{
 	    /* the following ensures that the Z80 begins without running away from 0 */
 		/* 0x76 is just a forced 'halt' as soon as the CPU is initially run */
 	    genesis_z80_ram[0] = 0x76;
 		genesis_z80_ram[0x38] = 0x76;
 
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
+		cputag_set_input_line(machine, "genesis_snd_z80", INPUT_LINE_HALT, ASSERT_LINE);
 
 		z80running = 0;
 	}
@@ -206,7 +208,7 @@ WRITE16_HANDLER(genesis_ctrl_w)
 		if (data == 0x100)
 		{
 			z80running = 0;
-			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);	/* halt Z80 */
+			cputag_set_input_line(space->machine, "genesis_snd_z80", INPUT_LINE_HALT, ASSERT_LINE);	/* halt Z80 */
 			/* logerror("z80 stopped by 68k BusReq\n"); */
 		}
 		else
@@ -214,17 +216,17 @@ WRITE16_HANDLER(genesis_ctrl_w)
 			z80running = 1;
 //          memory_set_bankptr(space->machine, 1, &genesis_z80_ram[0]);
 
-			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_HALT, CLEAR_LINE);
+			cputag_set_input_line(space->machine, "genesis_snd_z80", INPUT_LINE_HALT, CLEAR_LINE);
 			/* logerror("z80 started, BusReq ends\n"); */
 		}
 		return;
 	case 0x100:						/* Z80 CPU Reset */
 		if (data == 0x00)
 		{
-			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
-			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
+			cputag_set_input_line(space->machine, "genesis_snd_z80", INPUT_LINE_HALT, ASSERT_LINE);
+			cputag_set_input_line(space->machine, "genesis_snd_z80", INPUT_LINE_RESET, PULSE_LINE);
 
-			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
+			cputag_set_input_line(space->machine, "genesis_snd_z80", INPUT_LINE_HALT, ASSERT_LINE);
 			/* logerror("z80 reset, ram is %p\n", &genesis_z80_ram[0]); */
 			z80running = 0;
 			return;
@@ -465,24 +467,14 @@ WRITE16_HANDLER ( genesis_io_w )
 }
 
 #if 0
-static ADDRESS_MAP_START( genesis_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x3fffff) AM_READ(SMH_ROM)					/* Cartridge Program Rom */
-	AM_RANGE(0xa10000, 0xa1001f) AM_READ(genesis_io_r)				/* Genesis Input */
-	AM_RANGE(0xa00000, 0xa0ffff) AM_READ(genesis_68k_to_z80_r)
-	AM_RANGE(0xc00000, 0xc0001f) AM_READ(genesis_vdp_r)				/* VDP Access */
-	AM_RANGE(0xfe0000, 0xfeffff) AM_READ(SMH_BANK3)				/* Main Ram */
-	AM_RANGE(0xff0000, 0xffffff) AM_READ(SMH_RAM)					/* Main Ram */
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( genesis_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x3fffff) AM_WRITE(SMH_ROM)					/* Cartridge Program Rom */
-	AM_RANGE(0xa10000, 0xa1001f) AM_WRITE(genesis_io_w) AM_BASE(&genesis_io_ram)				/* Genesis Input */
+static ADDRESS_MAP_START( genesis_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x3fffff) AM_ROM																/* Cartridge Program Rom */
+	AM_RANGE(0xa00000, 0xa0ffff) AM_READWRITE(genesis_68k_to_z80_r, genesis_68k_to_z80_w)
+	AM_RANGE(0xa10000, 0xa1001f) AM_READWRITE(genesis_io_r, genesis_io_w) AM_BASE(&genesis_io_ram)	/* Genesis Input */
 	AM_RANGE(0xa11000, 0xa11203) AM_WRITE(genesis_ctrl_w)
-	AM_RANGE(0xa00000, 0xa0ffff) AM_WRITE(genesis_68k_to_z80_w)
-	AM_RANGE(0xc00000, 0xc0001f) AM_WRITE(genesis_vdp_w)				/* VDP Access */
-	AM_RANGE(0xfe0000, 0xfeffff) AM_WRITE(SMH_BANK3)				/* Main Ram */
-	AM_RANGE(0xff0000, 0xffffff) AM_WRITE(SMH_RAM) AM_BASE(&genesis_68k_ram)/* Main Ram */
+	AM_RANGE(0xc00000, 0xc0001f) AM_READWRITE(genesis_vdp_r, genesis_vdp_w)							/* VDP Access */
+	AM_RANGE(0xfe0000, 0xfeffff) AM_RAMBANK(3)														/* Main Ram */
+	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_BASE(&genesis_68k_ram)									/* Main Ram */
 ADDRESS_MAP_END
 #endif
 
@@ -586,28 +578,22 @@ READ8_HANDLER ( genesis_z80_bank_r )
 
 
 #if 0
-static ADDRESS_MAP_START( genesis_z80_readmem, ADDRESS_SPACE_PROGRAM, 8 )
- 	AM_RANGE(0x0000, 0x1fff) AM_READ(SMH_BANK1)
- 	AM_RANGE(0x2000, 0x3fff) AM_READ(SMH_BANK2) /* mirror */
-	AM_RANGE(0x4000, 0x7fff) AM_READ(genesis_z80_r)
+static ADDRESS_MAP_START( genesis_z80_map, ADDRESS_SPACE_PROGRAM, 8 )
+ 	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK(1) AM_BASE(&genesis_z80_ram)
+ 	AM_RANGE(0x2000, 0x3fff) AM_RAMBANK(2)	/* mirror */
+	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(genesis_z80_r, genesis_z80_w)
 	AM_RANGE(0x8000, 0xffff) AM_READ(genesis_z80_bank_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( genesis_z80_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(SMH_BANK1) AM_BASE(&genesis_z80_ram)
- 	AM_RANGE(0x2000, 0x3fff) AM_WRITE(SMH_BANK2) /* mirror */
-	AM_RANGE(0x4000, 0x7fff) AM_WRITE(genesis_z80_w)
  // AM_RANGE(0x8000, 0xffff) AM_WRITE(genesis_z80_bank_w)
 ADDRESS_MAP_END
 
 static MACHINE_DRIVER_START( genesis_base )
 	/*basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK / 7)
-	MDRV_CPU_PROGRAM_MAP(genesis_readmem, genesis_writemem)
+	MDRV_CPU_PROGRAM_MAP(genesis_map,0)
 	MDRV_CPU_VBLANK_INT("screen", genesis_vblank_interrupt)
 
 	MDRV_CPU_ADD("soundcpu", Z80, MASTER_CLOCK / 15)
-	MDRV_CPU_PROGRAM_MAP(genesis_z80_readmem, genesis_z80_writemem)
+	MDRV_CPU_PROGRAM_MAP(genesis_z80_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold) /* from vdp at scanline 0xe0 */
 
 	MDRV_QUANTUM_TIME(HZ(6000))

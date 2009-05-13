@@ -58,7 +58,7 @@ const z80pio_interface z1013_z80pio_intf =
 
 SNAPSHOT_LOAD( z1013 )
 {
-	UINT8* data= auto_malloc(snapshot_size);
+	UINT8* data= auto_alloc_array(image->machine, UINT8, snapshot_size);
 	UINT16 startaddr,endaddr,runaddr;
 
 	image_fread(image, data, snapshot_size);

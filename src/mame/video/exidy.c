@@ -57,9 +57,9 @@ VIDEO_START( exidy )
 	bitmap_format format = video_screen_get_format(machine->primary_screen);
 
 	background_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	motion_object_1_vid = auto_bitmap_alloc(16, 16, format);
-	motion_object_2_vid = auto_bitmap_alloc(16, 16, format);
-	motion_object_2_clip = auto_bitmap_alloc(16, 16, format);
+	motion_object_1_vid = auto_bitmap_alloc(machine, 16, 16, format);
+	motion_object_2_vid = auto_bitmap_alloc(machine, 16, 16, format);
+	motion_object_2_clip = auto_bitmap_alloc(machine, 16, 16, format);
 
     state_save_register_global(machine, collision_mask);
     state_save_register_global(machine, collision_invert);
@@ -111,7 +111,7 @@ INTERRUPT_GEN( teetert_vblank_interrupt )
 READ8_HANDLER( exidy_interrupt_r )
 {
 	/* clear any interrupts */
-	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 
 	/* return the latched condition */
 	return int_condition;
@@ -295,7 +295,7 @@ static TIMER_CALLBACK( collision_irq_callback )
 	latch_condition(machine, param);
 
 	/* set the IRQ line */
-	cpu_set_input_line(machine->cpu[0], 0, ASSERT_LINE);
+	cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 }
 
 

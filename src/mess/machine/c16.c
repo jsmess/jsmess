@@ -521,8 +521,8 @@ MACHINE_RESET( c16 )
 		memory_set_bankptr (machine, 6, mess_ram + (0x8000 % mess_ram_size));
 		memory_set_bankptr (machine, 7, mess_ram + (0xc000 % mess_ram_size));
 
-		memory_install_write8_handler(space, 0xff20, 0xff3d, 0, 0, SMH_BANK10);
-		memory_install_write8_handler(space, 0xff40, 0xffff, 0, 0, SMH_BANK11);
+		memory_install_write8_handler(space, 0xff20, 0xff3d, 0, 0, SMH_BANK(10));
+		memory_install_write8_handler(space, 0xff40, 0xffff, 0, 0, SMH_BANK(11));
 		memory_set_bankptr (machine, 10, mess_ram + (0xff20 % mess_ram_size));
 		memory_set_bankptr (machine, 11, mess_ram + (0xff40 % mess_ram_size));
 
@@ -530,7 +530,7 @@ MACHINE_RESET( c16 )
 	}
 	else
 	{
-		memory_install_write8_handler(space, 0x4000, 0xfcff, 0, 0, SMH_BANK10);
+		memory_install_write8_handler(space, 0x4000, 0xfcff, 0, 0, SMH_BANK(10));
 		memory_set_bankptr (machine, 10, mess_ram + (0x4000 % mess_ram_size));
 
 		ted7360_set_dma (ted7360_dma_read, ted7360_dma_read_rom);

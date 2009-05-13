@@ -508,13 +508,13 @@ static VIDEO_START( laserbat )
 
 	bg_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan_rows,8,8,32,32);
 
-	videoram = (UINT8 *)auto_malloc(0x400);
-	colorram = (UINT8 *)auto_malloc(0x400);
+	videoram = auto_alloc_array(machine, UINT8, 0x400);
+	colorram = auto_alloc_array(machine, UINT8, 0x400);
 
 	/* configure the S2636 chips */
-	s2636_0 = s2636_config(s2636_0_ram, screen_height, screen_width, 0, -19);
-	s2636_1 = s2636_config(s2636_1_ram, screen_height, screen_width, 0, -19);
-	s2636_2 = s2636_config(s2636_2_ram, screen_height, screen_width, 0, -19);
+	s2636_0 = s2636_config(machine, s2636_0_ram, screen_height, screen_width, 0, -19);
+	s2636_1 = s2636_config(machine, s2636_1_ram, screen_height, screen_width, 0, -19);
+	s2636_2 = s2636_config(machine, s2636_2_ram, screen_height, screen_width, 0, -19);
 }
 
 static VIDEO_UPDATE( laserbat )
@@ -595,8 +595,8 @@ static const sn76477_interface laserbat_sn76477_interface =
 
 /* Cat'N Mouse sound ***********************************/
 
-static WRITE_LINE_DEVICE_HANDLER( zaccaria_irq0a ) { cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE); }
-static WRITE_LINE_DEVICE_HANDLER( zaccaria_irq0b ) { cpu_set_input_line(device->machine->cpu[1],0,state ? ASSERT_LINE : CLEAR_LINE); }
+static WRITE_LINE_DEVICE_HANDLER( zaccaria_irq0a ) { cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE); }
+static WRITE_LINE_DEVICE_HANDLER( zaccaria_irq0b ) { cputag_set_input_line(device->machine, "audiocpu", 0, state ? ASSERT_LINE : CLEAR_LINE); }
 
 static int active_8910,port0a;
 

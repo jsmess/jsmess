@@ -269,7 +269,7 @@ static ADDRESS_MAP_START( llander_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("IN0")
 	AM_RANGE(0x2400, 0x2407) AM_READ(asteroid_IN1_r)	/* IN1 */
 	AM_RANGE(0x2800, 0x2803) AM_READ(asteroid_DSW1_r)	/* DSW1 */
-	AM_RANGE(0x2c00, 0x2c00) AM_READ_PORT("PADDLE")
+	AM_RANGE(0x2c00, 0x2c00) AM_READ_PORT("THRUST")
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(avgdvg_go_w)
 	AM_RANGE(0x3200, 0x3200) AM_WRITE(llander_led_w)
 	AM_RANGE(0x3400, 0x3400) AM_WRITE(watchdog_reset_w)
@@ -290,7 +290,7 @@ ADDRESS_MAP_END
 
 static CUSTOM_INPUT( clock_r )
 {
-	return (cpu_get_total_cycles(field->port->machine->cpu[0]) & 0x100) ? 1 : 0;
+	return (cputag_get_total_cycles(field->port->machine, "maincpu") & 0x100) ? 1 : 0;
 }
 
 static INPUT_PORTS_START( asteroid )
@@ -547,8 +547,10 @@ static INPUT_PORTS_START( llander )
 	/* The way the DAC/counter circuit always trys to self center at the voltage derived from the thrust control, */
 	/* I don't think it ever expected to get to 0xff. We can not emulate the external DAC circuit exactly, */
 	/* so changing the range to 0xfe seems to solve the problem. */
-	PORT_START("PADDLE")
-	PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_MINMAX(0,254) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_UP) PORT_CODE_DEC(JOYCODE_Y_UP_SWITCH) PORT_CODE_INC(KEYCODE_DOWN) PORT_CODE_INC(JOYCODE_Y_DOWN_SWITCH) PORT_REVERSE
+	/* The thrust control is basically a hand operated pedal. */
+	/* so IPT_PEDAL is used because it more accurately emulates the control then using IPT_PADDLE */
+	PORT_START("THRUST")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0,254) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
 INPUT_PORTS_END
 
 
@@ -880,14 +882,14 @@ ROM_END
 
 static DRIVER_INIT( asteroib )
 {
-	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2000, 0x2000, 0, 0, "IN0");
-	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2003, 0x2003, 0, 0, "HS");
+	memory_install_read_port_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x2000, 0x2000, 0, 0, "IN0");
+	memory_install_read_port_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x2003, 0x2003, 0, 0, "HS");
 }
 
 
 static DRIVER_INIT( asterock )
 {
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2000, 0x2007, 0, 0, asterock_IN0_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x2000, 0x2007, 0, 0, asterock_IN0_r);
 }
 
 

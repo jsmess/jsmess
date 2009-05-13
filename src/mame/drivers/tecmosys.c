@@ -299,8 +299,8 @@ static WRITE16_HANDLER( sound_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(space,0x00,data & 0xff);
-		cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
+		soundlatch_w(space, 0x00, data & 0xff);
+		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -559,11 +559,11 @@ ADDRESS_MAP_END
 
 static VIDEO_START(deroon)
 {
-	sprite_bitmap = auto_bitmap_alloc(320,240,BITMAP_FORMAT_INDEXED16);
+	sprite_bitmap = auto_bitmap_alloc(machine,320,240,BITMAP_FORMAT_INDEXED16);
 	bitmap_fill(sprite_bitmap, NULL, 0x4000);
 
-	tmp_tilemap_composebitmap = auto_bitmap_alloc(320,240,BITMAP_FORMAT_INDEXED16);
-	tmp_tilemap_renderbitmap = auto_bitmap_alloc(320,240,BITMAP_FORMAT_INDEXED16);
+	tmp_tilemap_composebitmap = auto_bitmap_alloc(machine,320,240,BITMAP_FORMAT_INDEXED16);
+	tmp_tilemap_renderbitmap = auto_bitmap_alloc(machine,320,240,BITMAP_FORMAT_INDEXED16);
 
 	bitmap_fill(tmp_tilemap_composebitmap, NULL, 0x0000);
 	bitmap_fill(tmp_tilemap_renderbitmap, NULL, 0x0000);
@@ -869,7 +869,7 @@ static VIDEO_UPDATE(deroon)
 static void sound_irq(const device_config *device, int irq)
 {
 	/* IRQ */
-	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ymf262_interface tecmosys_ymf262_interface =
@@ -1108,4 +1108,3 @@ static DRIVER_INIT( tkdensha )
 GAME( 1995, deroon,      0, deroon, deroon, deroon,     ROT0, "Tecmo", "Deroon DeroDero", 0 )
 GAME( 1996, tkdensho,    0, deroon, deroon, tkdensho,   ROT0, "Tecmo", "Touki Denshou -Angel Eyes- (VER. 960614)", 0 )
 GAME( 1996, tkdensha,    tkdensho, deroon, deroon, tkdensha,   ROT0, "Tecmo", "Touki Denshou -Angel Eyes- (VER. 960427)", 0 )
-

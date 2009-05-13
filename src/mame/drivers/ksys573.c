@@ -565,7 +565,7 @@ static TIMER_CALLBACK( atapi_xfer_end )
 		atapi_regs[ATAPI_REG_COUNTLOW] = atapi_xferlen & 0xff;
 		atapi_regs[ATAPI_REG_COUNTHIGH] = (atapi_xferlen>>8)&0xff;
 
-		timer_adjust_oneshot(atapi_timer, cpu_clocks_to_attotime(machine->cpu[0], (ATAPI_CYCLES_PER_SECTOR * (atapi_xferlen/2048))), 0);
+		timer_adjust_oneshot(atapi_timer, cputag_clocks_to_attotime(machine, "maincpu", (ATAPI_CYCLES_PER_SECTOR * (atapi_xferlen/2048))), 0);
 	}
 	else
 	{
@@ -952,7 +952,7 @@ static void atapi_init(running_machine *machine)
 {
 	int i;
 
-	atapi_regs = auto_malloc( ATAPI_REG_MAX );
+	atapi_regs = auto_alloc_array(machine, UINT8,  ATAPI_REG_MAX );
 	memset(atapi_regs, 0, sizeof(atapi_regs));
 
 	atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
@@ -980,7 +980,7 @@ static void atapi_init(running_machine *machine)
 	}
 	add_exit_callback(machine, atapi_exit);
 
-	atapi_data = auto_malloc( ATAPI_DATA_SIZE );
+	atapi_data = auto_alloc_array(machine, UINT8,  ATAPI_DATA_SIZE );
 
 	state_save_register_global_pointer(machine,  atapi_regs, ATAPI_REG_MAX );
 	state_save_register_global_pointer(machine,  atapi_data, ATAPI_DATA_SIZE / 2 );
@@ -1032,7 +1032,7 @@ static void cdrom_dma_write( running_machine *machine, UINT32 n_address, INT32 n
 	verboselog( machine, 2, "atapi_xfer_end: %d %d\n", atapi_xferlen, atapi_xfermod );
 
 	// set a transfer complete timer (Note: CYCLES_PER_SECTOR can't be lower than 2000 or the BIOS ends up "out of order")
-	timer_adjust_oneshot(atapi_timer, cpu_clocks_to_attotime(machine->cpu[0], (ATAPI_CYCLES_PER_SECTOR * (atapi_xferlen/2048))), 0);
+	timer_adjust_oneshot(atapi_timer, cputag_clocks_to_attotime(machine, "maincpu", (ATAPI_CYCLES_PER_SECTOR * (atapi_xferlen/2048))), 0);
 }
 
 static UINT32 m_n_security_control;
@@ -1188,7 +1188,7 @@ static UINT64 m_p_n_root_start[ 3 ];
 static UINT64 psxcpu_gettotalcycles( running_machine *machine )
 {
 	/* TODO: should return the start of the current tick. */
-	return cpu_get_total_cycles(machine->cpu[0]) * 2;
+	return cputag_get_total_cycles(machine, "maincpu") * 2;
 }
 
 static int root_divider( int n_counter )
@@ -1740,7 +1740,7 @@ static DRIVER_INIT( ge765pwbba )
 
 	uPD4701_init( machine, 0 );
 
-	memory_install_readwrite32_handler( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f640000, 0x1f6400ff, 0, 0, ge765pwbba_r, ge765pwbba_w );
+	memory_install_readwrite32_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f640000, 0x1f6400ff, 0, 0, ge765pwbba_r, ge765pwbba_w );
 }
 
 /*
@@ -1851,7 +1851,7 @@ static void gx700pwfbf_init( running_machine *machine, void (*output_callback_fu
 
 	gx700pwfbf_output_callback = output_callback_func;
 
-	memory_install_readwrite32_handler( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f640000, 0x1f6400ff, 0, 0, gx700pwbf_io_r, gx700pwbf_io_w );
+	memory_install_readwrite32_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f640000, 0x1f6400ff, 0, 0, gx700pwbf_io_r, gx700pwbf_io_w );
 
 	state_save_register_global_array(machine,  gx700pwbf_output_data );
 }
@@ -2094,7 +2094,7 @@ static DRIVER_INIT( gtrfrks )
 {
 	DRIVER_INIT_CALL(konami573);
 
-	memory_install_readwrite32_handler( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f600000, 0x1f6000ff, 0, 0, gtrfrks_io_r, gtrfrks_io_w );
+	memory_install_readwrite32_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f600000, 0x1f6000ff, 0, 0, gtrfrks_io_r, gtrfrks_io_w );
 }
 
 /* GX894 digital i/o */
@@ -2384,11 +2384,11 @@ static void gx894pwbba_init( running_machine *machine, void (*output_callback_fu
 
 	gx894pwbba_output_callback = output_callback_func;
 
-	memory_install_readwrite32_handler( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f640000, 0x1f6400ff, 0, 0, gx894pwbba_r, gx894pwbba_w );
+	memory_install_readwrite32_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f640000, 0x1f6400ff, 0, 0, gx894pwbba_r, gx894pwbba_w );
 
 	gx894_ram_write_offset = 0;
 	gx894_ram_read_offset = 0;
-	gx894_ram = auto_malloc( gx894_ram_size );
+	gx894_ram = auto_alloc_array(machine, UINT16,  gx894_ram_size/2);
 
 	ds2401_init( machine, 2, ds2401_xid ); /* todo: load this from roms */
 
@@ -2413,7 +2413,7 @@ static DRIVER_INIT( gtrfrkdigital )
 
 	gx894pwbba_init( machine, NULL );
 
-	memory_install_readwrite32_handler( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f600000, 0x1f6000ff, 0, 0, gtrfrks_io_r, gtrfrks_io_w );
+	memory_install_readwrite32_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f600000, 0x1f6000ff, 0, 0, gtrfrks_io_r, gtrfrks_io_w );
 }
 
 /* ddr solo */
@@ -2706,7 +2706,7 @@ static DRIVER_INIT( dmx )
 
 	gx894pwbba_init( machine, dmx_output_callback );
 
-	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f600000, 0x1f6000ff, 0, 0, dmx_io_w );
+	memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f600000, 0x1f6000ff, 0, 0, dmx_io_w );
 }
 
 /* salary man champ */
@@ -3292,6 +3292,9 @@ ROM_END
 ROM_START( ddr2ml )
 	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
+
+	ROM_REGION( 0x080000, "cpu2", 0 ) /* memory card reader */
+	ROM_LOAD( "885a01.bin",   0x000000, 0x080000, CRC(e22d093f) SHA1(927f62f63b5caa7899392decacd12fea0e6fdbea) )
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "ge885jaa.u1",  0x000000, 0x000224, BAD_DUMP CRC(cbc984c5) SHA1(6c0cd78a41000999b4ffbd9fb3707738b50a9b50) )
@@ -4011,6 +4014,29 @@ ROM_START( dsfdcta )
 	DISK_IMAGE_READONLY( "910jaa02", 0, SHA1(70851c383e3876c4a697a99706fbaae2dafcb0e0) )
 ROM_END
 
+ROM_START( dsfdr )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
+	SYS573_BIOS_A
+
+	ROM_REGION( 0x0000224, "user2", 0 ) /* install security cart eeprom */
+	ROM_LOAD( "gea37ja.u1",   0x000000, 0x000224, BAD_DUMP CRC(5321055e) SHA1(d06b0dca9caba8249d71340469ad9083b02fd087) )
+
+	ROM_REGION( 0x0001014, "user8", 0 ) /* game security cart eeprom */
+        ROM_LOAD( "gca37ja.u1",   0x000000, 0x001014, BAD_DUMP CRC(b6d9e7f9) SHA1(bc5f491de53a96d46745df09bc94e7853052296c) )
+
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
+	ROM_FILL( 0x0000000, 0x1000000, 0xff )
+
+	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
+	ROM_LOAD( "gea37ja.u6",    0x000000, 0x000008, BAD_DUMP CRC(af09e43c) SHA1(d8372f2d6e0ae07061b496a2242a63e5bc2e54dc) )
+
+	ROM_REGION( 0x000008, "user10", 0 ) /* game security cart id */
+	ROM_LOAD( "gca37ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
+
+	DISK_REGION( "cdrom0" )
+	DISK_IMAGE_READONLY( "a37jaa02", 0, SHA1(c6a23b910e884aa0d4afc388dbc8379e0d09611a) )
+ROM_END
+
 ROM_START( dsftkd )
 	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
@@ -4574,6 +4600,7 @@ GAME( 2000, ddr4m,    sys573,   konami573, ddr,       ddrdigital, ROT0, "Konami"
 GAME( 2000, ddr4mj,   ddr4m,    konami573, ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 4th Mix (G*A33 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.8 */
 GAME( 2000, ddr4ms,   sys573,   konami573, ddrsolo,   ddrsolo,    ROT0, "Konami", "Dance Dance Revolution 4th Mix Solo (G*A33 VER. ABA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.8 */
 GAME( 2000, ddr4msj,  ddr4ms,   konami573, ddrsolo,   ddrsolo,    ROT0, "Konami", "Dance Dance Revolution 4th Mix Solo (G*A33 VER. JBA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.8 */
+GAME( 2000, dsfdr,    sys573,   konami573, ddr,       ddrdigital, ROT0, "Konami", "Dancing Stage Featuring Disney's Rave (GCA37JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.8 */
 GAME( 2000, ddrusa,   sys573,   konami573, ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution USA (G*A44 VER. UAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.8 */
 GAME( 2000, ddr4mp,   sys573,   konami573, ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 4th Mix Plus (G*A34 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
 GAME( 2000, ddr4mps,  sys573,   konami573, ddrsolo,   ddrsolo,    ROT0, "Konami", "Dance Dance Revolution 4th Mix Plus Solo (G*A34 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */

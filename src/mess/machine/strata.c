@@ -80,7 +80,7 @@ int strataflash_init(running_machine *machine, int id)
 	strata[id].mode = FM_NORMAL;
 	strata[id].status = 0x80;
 	strata[id].master_lock = 0;
-	strata[id].data_ptr = auto_malloc(FEEPROM_SIZE + WRBUF_SIZE + PROT_REGS_SIZE + BLOCKLOCK_SIZE);
+	strata[id].data_ptr = auto_alloc_array(machine, UINT8, FEEPROM_SIZE + WRBUF_SIZE + PROT_REGS_SIZE + BLOCKLOCK_SIZE);
 	strata[id].wrbuf = strata[id].data_ptr + FEEPROM_SIZE;
 	strata[id].prot_regs = strata[id].wrbuf + WRBUF_SIZE;
 	strata[id].blocklock = strata[id].prot_regs + PROT_REGS_SIZE;

@@ -104,8 +104,7 @@ void pc_fdc_init(running_machine *machine, const struct pc_fdc_interface *iface)
 	const device_config *img;
 
 	/* initialize fdc structure */
-	fdc = auto_malloc(sizeof(*fdc));
-	memset(fdc, 0, sizeof(*fdc));
+	fdc = auto_alloc_clear(machine, struct pc_fdc);
 
 	/* copy specified interface */
 	if (iface)

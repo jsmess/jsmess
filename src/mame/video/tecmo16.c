@@ -68,11 +68,11 @@ VIDEO_START( fstarfrc )
 	int height = video_screen_get_height(machine->primary_screen);
 
 	/* set up tile layers */
-	tile_bitmap_bg = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
-	tile_bitmap_fg = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
+	tile_bitmap_bg = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
+	tile_bitmap_fg = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 
 	/* set up sprites */
-	sprite_bitmap = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
+	sprite_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 
 	fg_tilemap = tilemap_create(machine, fg_get_tile_info,tilemap_scan_rows,16,16,32,32);
 	bg_tilemap = tilemap_create(machine, bg_get_tile_info,tilemap_scan_rows,16,16,32,32);
@@ -93,11 +93,11 @@ VIDEO_START( ginkun )
 	int height = video_screen_get_height(machine->primary_screen);
 
 	/* set up tile layers */
-	tile_bitmap_bg = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
-	tile_bitmap_fg = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
+	tile_bitmap_bg = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
+	tile_bitmap_fg = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 
 	/* set up sprites */
-	sprite_bitmap = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
+	sprite_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 
 	fg_tilemap = tilemap_create(machine, fg_get_tile_info,tilemap_scan_rows,16,16,64,32);
 	bg_tilemap = tilemap_create(machine, bg_get_tile_info,tilemap_scan_rows,16,16,64,32);
@@ -116,11 +116,11 @@ VIDEO_START( riot )
 	int height = video_screen_get_height(machine->primary_screen);
 
 	/* set up tile layers */
-	tile_bitmap_bg = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
-	tile_bitmap_fg = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
+	tile_bitmap_bg = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
+	tile_bitmap_fg = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 
 	/* set up sprites */
-	sprite_bitmap = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
+	sprite_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 
 	fg_tilemap = tilemap_create(machine, fg_get_tile_info,tilemap_scan_rows,16,16,64,32);
 	bg_tilemap = tilemap_create(machine, bg_get_tile_info,tilemap_scan_rows,16,16,64,32);
@@ -251,9 +251,9 @@ static void blendbitmaps(running_machine *machine,
 		const pen_t *paldata = machine->pens;
 		UINT32 *end;
 
-		UINT16 *sd1 = src1->base;												/* source data   */
-		UINT16 *sd2 = src2->base;
-		UINT16 *sd3 = src3->base;
+		UINT16 *sd1 = (UINT16 *)src1->base;												/* source data   */
+		UINT16 *sd2 = (UINT16 *)src2->base;
+		UINT16 *sd3 = (UINT16 *)src3->base;
 
 		int sw = ex-sx+1;														/* source width  */
 		int sh = ey-sy+1;														/* source height */

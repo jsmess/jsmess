@@ -86,10 +86,7 @@ static TIMER_CALLBACK( scanline_callback )
 static VIDEO_START( leland )
 {
 	/* allocate memory */
-	leland_video_ram = auto_malloc(VRAM_SIZE);
-
-	/* reset videoram */
-	memset(leland_video_ram, 0, VRAM_SIZE);
+	leland_video_ram = auto_alloc_array_clear(machine, UINT8, VRAM_SIZE);
 
 	/* scanline timer */
 	scanline_timer = timer_alloc(machine, scanline_callback, NULL);
@@ -104,10 +101,7 @@ static VIDEO_START( ataxx )
 	VIDEO_START_CALL(leland);
 
 	/* allocate memory */
-	ataxx_qram = auto_malloc(QRAM_SIZE);
-
-	/* reset QRAM */
-	memset(ataxx_qram, 0, QRAM_SIZE);
+	ataxx_qram = auto_alloc_array_clear(machine, UINT8, QRAM_SIZE);
 }
 
 
@@ -319,7 +313,7 @@ WRITE8_HANDLER( leland_master_video_addr_w )
 
 static TIMER_CALLBACK( leland_delayed_mvram_w )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "master", ADDRESS_SPACE_PROGRAM);
 
 	int num = (param >> 16) & 1;
 	int offset = (param >> 8) & 0xff;

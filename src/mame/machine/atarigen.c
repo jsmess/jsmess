@@ -321,7 +321,7 @@ WRITE32_HANDLER( atarigen_video_int_ack32_w )
 
 static TIMER_CALLBACK( scanline_interrupt_callback )
 {
-	const device_config *screen = ptr;
+	const device_config *screen = (const device_config *)ptr;
 	emu_timer *timer = get_scanline_interrupt_timer_for_screen(screen);
 
 	/* generate the interrupt */
@@ -556,7 +556,7 @@ void atarigen_slapstic_init(const device_config *device, offs_t base, offs_t mir
 		atarigen_slapstic = memory_install_readwrite16_handler(cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM), base, base + 0x7fff, 0, mirror, atarigen_slapstic_r, atarigen_slapstic_w);
 
 		/* allocate memory for a copy of bank 0 */
-		atarigen_slapstic_bank0 = auto_malloc(0x2000);
+		atarigen_slapstic_bank0 = auto_alloc_array(device->machine, UINT8, 0x2000);
 		memcpy(atarigen_slapstic_bank0, atarigen_slapstic, 0x2000);
 
 		/* ensure we recopy memory for the bank */
@@ -984,7 +984,7 @@ void atarigen_scanline_timer_reset(const device_config *screen, atarigen_scanlin
 
 static TIMER_CALLBACK( scanline_timer_callback )
 {
-	const device_config *screen = ptr;
+	const device_config *screen = (const device_config *)ptr;
 	int scanline = param;
 
 	/* callback */
@@ -1049,7 +1049,7 @@ static emu_timer *get_atarivc_eof_update_timer_for_screen(const device_config *s
 
 static TIMER_CALLBACK( atarivc_eof_update )
 {
-	const device_config *screen = ptr;
+	const device_config *screen = (const device_config *)ptr;
 	emu_timer *timer = get_atarivc_eof_update_timer_for_screen(screen);
 	int i;
 
@@ -1584,8 +1584,8 @@ static TIMER_CALLBACK( unhalt_cpu )
 
 void atarigen_swap_mem(void *ptr1, void *ptr2, int bytes)
 {
-	UINT8 *p1 = ptr1;
-	UINT8 *p2 = ptr2;
+	UINT8 *p1 = (UINT8 *)ptr1;
+	UINT8 *p2 = (UINT8 *)ptr2;
 	while (bytes--)
 	{
 		int temp = *p1;
@@ -1608,7 +1608,7 @@ void atarigen_blend_gfx(running_machine *machine, int gfx0, int gfx1, int mask0,
 	int c, x, y;
 
 	/* allocate memory for the assembled data */
-	srcdata = auto_malloc(gx0->total_elements * gx0->width * gx0->height);
+	srcdata = auto_alloc_array(machine, UINT8, gx0->total_elements * gx0->width * gx0->height);
 
 	/* loop over elements */
 	dest = srcdata;

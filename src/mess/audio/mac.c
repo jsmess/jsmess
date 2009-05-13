@@ -104,7 +104,7 @@ static DEVICE_START(mac_sound)
 	mac_sound *token = get_token(device);
 
 	memset(token, 0, sizeof(*token));
-	token->snd_cache = auto_malloc(SND_CACHE_SIZE * sizeof(*token->snd_cache));
+	token->snd_cache = auto_alloc_array(device->machine, UINT8, SND_CACHE_SIZE);
 	token->mac_stream = stream_create(device, 0, 1, MAC_SAMPLE_RATE, 0, mac_sound_update);
 }
 

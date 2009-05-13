@@ -34,7 +34,7 @@ VIDEO_START( cgenie )
 
 	VIDEO_START_CALL(generic_bitmapped);
 
-    dlybitmap = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
+    dlybitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 }
 
 /***************************************************************************

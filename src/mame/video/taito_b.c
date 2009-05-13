@@ -161,10 +161,10 @@ WRITE16_HANDLER( hitice_pixel_scroll_w )
 static void hitice_clear_pixel_bitmap(running_machine *machine)
 {
 	int i;
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
-    for (i = 0;i < 0x40000;i++)
-		hitice_pixelram_w(space,i,0,0xffff);
+    for (i = 0; i < 0x40000; i++)
+		hitice_pixelram_w(space, i, 0, 0xffff);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -175,8 +175,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 	SET_TILE_INFO(
 		1,
 		tile,
-		b_bg_color_base + (color&0x3f),
-		TILE_FLIPYX((color & 0x00c0)>>6));
+		b_bg_color_base + (color & 0x3f),
+		TILE_FLIPYX((color & 0x00c0) >> 6));
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
@@ -187,8 +187,8 @@ static TILE_GET_INFO( get_fg_tile_info )
 	SET_TILE_INFO(
 		1,
 		tile,
-		b_fg_color_base + (color&0x3f),
-		TILE_FLIPYX((color & 0x00c0)>>6));
+		b_fg_color_base + (color & 0x3f),
+		TILE_FLIPYX((color & 0x00c0) >> 6));
 }
 
 static TILE_GET_INFO( get_tx_tile_info )
@@ -205,8 +205,8 @@ static TILE_GET_INFO( get_tx_tile_info )
 
 static VIDEO_START( taitob_core )
 {
-	framebuffer[0] = auto_bitmap_alloc(512,256, video_screen_get_format(machine->primary_screen));
-	framebuffer[1] = auto_bitmap_alloc(512,256, video_screen_get_format(machine->primary_screen));
+	framebuffer[0] = auto_bitmap_alloc(machine,512,256, video_screen_get_format(machine->primary_screen));
+	framebuffer[1] = auto_bitmap_alloc(machine,512,256, video_screen_get_format(machine->primary_screen));
 	pixel_bitmap = NULL;  /* only hitice needs this */
 
 	bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,     16,16,64,64);
@@ -279,7 +279,7 @@ VIDEO_START( hitice )
 {
   VIDEO_START_CALL(taitob_color_order0);
 
-  pixel_bitmap = auto_bitmap_alloc(1024,512,video_screen_get_format(machine->primary_screen));
+  pixel_bitmap = auto_bitmap_alloc(machine,1024,512,video_screen_get_format(machine->primary_screen));
 
   state_save_register_global_bitmap(machine, pixel_bitmap);
 }

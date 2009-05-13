@@ -185,7 +185,7 @@ ADDRESS_MAP_END
 // SF-7000
 
 static ADDRESS_MAP_START( sf7000_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(SMH_BANK1, SMH_BANK2)
+	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(SMH_BANK(1), SMH_BANK(2))
 	AM_RANGE(0x4000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -735,13 +735,13 @@ static void sg1000_map_cartridge_memory(running_machine *machine, UINT8 *ptr, in
 	switch (size)
 	{
 	case 40 * 1024:
-		memory_install_readwrite8_handler(program, 0x8000, 0x9fff, 0, 0, SMH_BANK1, SMH_UNMAP);
+		memory_install_readwrite8_handler(program, 0x8000, 0x9fff, 0, 0, SMH_BANK(1), SMH_UNMAP);
 		memory_configure_bank(machine, 1, 0, 1, memory_region(machine, Z80_TAG) + 0x8000, 0);
 		memory_set_bank(machine, 1, 0);
 		break;
 
 	case 48 * 1024:
-		memory_install_readwrite8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_BANK1, SMH_UNMAP);
+		memory_install_readwrite8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_BANK(1), SMH_UNMAP);
 		memory_configure_bank(machine, 1, 0, 1, memory_region(machine, Z80_TAG) + 0x8000, 0);
 		memory_set_bank(machine, 1, 0);
 		break;
@@ -755,7 +755,7 @@ static void sg1000_map_cartridge_memory(running_machine *machine, UINT8 *ptr, in
 		}
 		else if (IS_CARTRIDGE_THE_CASTLE(ptr))
 		{
-			memory_install_readwrite8_handler(program, 0x8000, 0x9fff, 0, 0, SMH_BANK1, SMH_BANK1);
+			memory_install_readwrite8_handler(program, 0x8000, 0x9fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
 		}
 		break;
 	}
@@ -776,7 +776,7 @@ static DEVICE_IMAGE_LOAD( sg1000_cart )
 	sg1000_map_cartridge_memory(image->machine, ptr, size);
 
 	/* work RAM banking */
-	memory_install_readwrite8_handler(program, 0xc000, 0xc3ff, 0, 0x3c00, SMH_BANK2, SMH_BANK2);
+	memory_install_readwrite8_handler(program, 0xc000, 0xc3ff, 0, 0x3c00, SMH_BANK(2), SMH_BANK(2));
 
 	return INIT_PASS;
 }
@@ -790,18 +790,18 @@ static void sc3000_map_cartridge_memory(running_machine *machine, UINT8 *ptr, in
 
 	if (IS_CARTRIDGE_BASIC_LEVEL_III(ptr))
 	{
-		memory_install_readwrite8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_BANK1, SMH_BANK1);
-		memory_install_readwrite8_handler(program, 0xc000, 0xffff, 0, 0, SMH_BANK2, SMH_BANK2);
+		memory_install_readwrite8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_BANK(1), SMH_BANK(1));
+		memory_install_readwrite8_handler(program, 0xc000, 0xffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
 	}
 	else if (IS_CARTRIDGE_MUSIC_EDITOR(ptr))
 	{
-		memory_install_readwrite8_handler(program, 0x8000, 0x9fff, 0, 0, SMH_BANK1, SMH_BANK1);
-		memory_install_readwrite8_handler(program, 0xc000, 0xc7ff, 0, 0x3800, SMH_BANK2, SMH_BANK2);
+		memory_install_readwrite8_handler(program, 0x8000, 0x9fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
+		memory_install_readwrite8_handler(program, 0xc000, 0xc7ff, 0, 0x3800, SMH_BANK(2), SMH_BANK(2));
 	}
 	else
 	{
 		/* regular cartridges */
-		memory_install_readwrite8_handler(program, 0xc000, 0xc7ff, 0, 0x3800, SMH_BANK2, SMH_BANK2);
+		memory_install_readwrite8_handler(program, 0xc000, 0xc7ff, 0, 0x3800, SMH_BANK(2), SMH_BANK(2));
 	}
 }
 

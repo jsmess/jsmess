@@ -9,7 +9,7 @@ Video hardware
 
 #include "driver.h"
 
-static UINT8 *mayumi_videoram;
+UINT8 *mayumi_videoram;
 static tilemap *mayumi_tilemap;
 
 static TILE_GET_INFO( get_tile_info )
@@ -22,7 +22,7 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( mayumi )
 {
-	mayumi_videoram = auto_malloc(0x1800);
+	mayumi_videoram = auto_alloc_array(machine, UINT8, 0x1800);
 
 	mayumi_tilemap = tilemap_create( machine, get_tile_info,tilemap_scan_rows,8,8,64,32 );
 }
@@ -30,13 +30,7 @@ VIDEO_START( mayumi )
 WRITE8_HANDLER( mayumi_videoram_w )
 {
 	mayumi_videoram[offset] = data;
-
 	tilemap_mark_tile_dirty(mayumi_tilemap, offset & 0x7ff );
-}
-
-READ8_HANDLER( mayumi_videoram_r )
-{
-	return mayumi_videoram[offset];
 }
 
 VIDEO_UPDATE( mayumi )

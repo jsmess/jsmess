@@ -44,13 +44,11 @@ void K001006_init(running_machine *machine)
 	int i;
 	for (i=0; i<MAX_K001006_CHIPS; i++)
 	{
-		K001006_pal_ram[i] = auto_malloc(0x800*sizeof(UINT16));
-		memset(K001006_pal_ram[i], 0, 0x800*sizeof(UINT16));
-		K001006_unknown_ram[i] = auto_malloc(0x1000*sizeof(UINT16));
-		memset(K001006_unknown_ram[i], 0, 0x1000*sizeof(UINT16));
+		K001006_pal_ram[i] = auto_alloc_array_clear(machine, UINT16, 0x800);
+		K001006_unknown_ram[i] = auto_alloc_array_clear(machine, UINT16, 0x1000);
 		K001006_addr[i] = 0;
 		K001006_device_sel[i] = 0;
-		K001006_palette[i] = auto_malloc(0x800*sizeof(UINT32));
+		K001006_palette[i] = auto_alloc_array(machine, UINT32, 0x800);
 		memset(K001006_palette[i], 0, 0x800*sizeof(UINT32));
 	}
 }
@@ -208,21 +206,21 @@ void K001005_init(running_machine *machine)
 
 	int width = video_screen_get_width(machine->primary_screen);
 	int height = video_screen_get_height(machine->primary_screen);
-	K001005_zbuffer = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED32);
+	K001005_zbuffer = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED32);
 
 	gfxrom = memory_region(machine, "gfx1");
 
 	K001005_bitmap[0] = video_screen_auto_bitmap_alloc(machine->primary_screen);
 	K001005_bitmap[1] = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
-	K001005_texture = auto_malloc(0x800000);
+	K001005_texture = auto_alloc_array(machine, UINT8, 0x800000);
 
-	K001005_ram[0] = auto_malloc(0x140000 * sizeof(UINT16));
-	K001005_ram[1] = auto_malloc(0x140000 * sizeof(UINT16));
+	K001005_ram[0] = auto_alloc_array(machine, UINT16, 0x140000);
+	K001005_ram[1] = auto_alloc_array(machine, UINT16, 0x140000);
 
-	K001005_fifo = auto_malloc(0x800 * sizeof(UINT32));
+	K001005_fifo = auto_alloc_array(machine, UINT32, 0x800);
 
-	K001005_3d_fifo = auto_malloc(0x10000 * sizeof(UINT32));
+	K001005_3d_fifo = auto_alloc_array(machine, UINT32, 0x10000);
 
 	poly = poly_alloc(machine, 4000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
 	add_exit_callback(machine, K001005_exit);
@@ -458,8 +456,8 @@ WRITE32_HANDLER( K001005_w )
 
 static void draw_scanline(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
-	const poly_extra_data *extra = extradata;
-	bitmap_t *destmap = dest;
+	const poly_extra_data *extra = (const poly_extra_data *)extradata;
+	bitmap_t *destmap = (bitmap_t *)dest;
 	float z = extent->param[0].start;
 	float dz = extent->param[0].dpdx;
 	UINT32 *fb = BITMAP_ADDR32(destmap, scanline, 0);
@@ -486,8 +484,8 @@ static void draw_scanline(void *dest, INT32 scanline, const poly_extent *extent,
 
 static void draw_scanline_tex(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
-	const poly_extra_data *extra = extradata;
-	bitmap_t *destmap = dest;
+	const poly_extra_data *extra = (const poly_extra_data *)extradata;
+	bitmap_t *destmap = (bitmap_t *)dest;
 	UINT8 *texrom = gfxrom + (extra->texture_page * 0x40000);
 	int pal_chip = (extra->texture_palette & 0x8) ? 1 : 0;
 	int palette_index = (extra->texture_palette & 0x7) * 256;
@@ -554,7 +552,7 @@ static void render_polygons(running_machine *machine)
 	{
 		if (K001005_3d_fifo[i] == 0x80000003)
 		{
-			poly_extra_data *extra = poly_get_extra_data(poly);
+			poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(poly);
 			poly_vertex v[4];
 			int r, g, b, a;
 			UINT32 color;
@@ -607,7 +605,7 @@ static void render_polygons(running_machine *machine)
 			// 0x01: -------- -------- ----x-x- x-x-x-x-    Texture X / 8
 			// 0x01: -------- -------- -----x-x -x-x-x-x    Texture Y / 8
 
-			poly_extra_data *extra = poly_get_extra_data(poly);
+			poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(poly);
 			poly_vertex v[4];
 			int tx, ty;
 			UINT32 color = 0;
@@ -721,7 +719,7 @@ static void render_polygons(running_machine *machine)
 
 			while ((K001005_3d_fifo[index] & 0xffffff00) != 0x80000000 && index < K001005_3d_fifo_ptr)
 			{
-				poly_extra_data *extra = poly_get_extra_data(poly);
+				poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(poly);
 				int new_verts = 0;
 
 				if (poly_type)
@@ -806,7 +804,7 @@ static void render_polygons(running_machine *machine)
 		else if (K001005_3d_fifo[i] == 0x80000006 || K001005_3d_fifo[i] == 0x80000026 ||
 				 K001005_3d_fifo[i] == 0x80000020 || K001005_3d_fifo[i] == 0x80000022)
 		{
-			poly_extra_data *extra = poly_get_extra_data(poly);
+			poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(poly);
 			poly_vertex v[4];
 			int r, g, b, a;
 			UINT32 color;
@@ -861,7 +859,7 @@ static void render_polygons(running_machine *machine)
 
 			while ((K001005_3d_fifo[index] & 0xffffff00) != 0x80000000 && index < K001005_3d_fifo_ptr)
 			{
-				poly_extra_data *extra = poly_get_extra_data(poly);
+				poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(poly);
 				int new_verts = 0;
 
 				if (poly_type)

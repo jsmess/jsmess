@@ -505,7 +505,7 @@ static void to7_5p14sd_init( running_machine *machine )
 #define QDD_MAXBUF ( THOM_QDD_SIZE_ID + THOM_QDD_SIZE_DATA ) * 512
 
 
-static struct
+static struct _to7qdd
 {
 	/* MC6852 registers */
 	UINT8 status;
@@ -868,8 +868,7 @@ static void to7_qdd_init( running_machine *machine )
 {
 	LOG(( "to7_qdd_init: CQ 90-028 controller\n" ));
 
-	to7qdd = auto_malloc( sizeof( *to7qdd ) );
-	assert( to7qdd );
+	to7qdd = auto_alloc(machine, struct _to7qdd);
 
 	state_save_register_global( machine, to7qdd->status );
 	state_save_register_global( machine, to7qdd->ctrl1 );
@@ -913,7 +912,7 @@ static void to7_qdd_init( running_machine *machine )
 #define THOM_MAXBUF ( THOM_QDD_SIZE_ID + THOM_QDD_SIZE_DATA ) * 512
 
 
-static struct
+static struct _thmfc1
 {
 
 	UINT8   op;
@@ -1557,8 +1556,7 @@ void thmfc_floppy_init( running_machine *machine )
 {
 	LOG(( "thmfc_floppy_init: THMFC1 controller\n" ));
 
-	thmfc1 = auto_malloc( sizeof( *thmfc1 ) );
-	assert( thmfc1 );
+	thmfc1 = auto_alloc(machine, struct _thmfc1);
 
 	thmfc_floppy_cmd = timer_alloc( machine, thmfc_floppy_cmd_complete_cb, NULL );
 

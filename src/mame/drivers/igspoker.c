@@ -101,7 +101,7 @@ static READ8_HANDLER( igs_irqack_r )
 
 static WRITE8_HANDLER( igs_irqack_w )
 {
-//  cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
+//  cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 }
 
 
@@ -2100,7 +2100,7 @@ static DRIVER_INIT( number10 )
 	/* Descramble graphic */
 	rom = memory_region(machine, "gfx1");
 	length = memory_region_length(machine, "gfx1");
-	tmp = malloc_or_die(length);
+	tmp = alloc_array_or_die(UINT8, length);
 	memcpy(tmp,rom,length);
 	for (A = 0;A < length;A++)
 	{
@@ -2251,5 +2251,3 @@ GAMEL( 2000, igs_ncs2,  0,        igs_ncs,  igs_ncs, igs_ncs2, ROT0, "IGS",   "N
 GAMEL( 1998, stellecu,  0,        number10, number10, 0,       ROT0, "Sure",   "Stelle e Cubi (Italy)",                     GAME_NOT_WORKING,	layout_igspoker )
 
 GAMEL( 1993?, pktet346, 0,        pktetris, pktet346, pktet346,  ROT0, "IGS",   "PK Tetris (v346I)",                    0, layout_igspoker )
-
-

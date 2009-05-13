@@ -257,15 +257,15 @@ INLINE UINT8 get_texel_4bit(const void *base, int y, int x, int width)
 
 static TIMER_CALLBACK( int_timer_callback )
 {
-	cpu_set_input_line(machine->cpu[0], 2, ASSERT_LINE);
+	cputag_set_input_line(machine, "maincpu", 2, ASSERT_LINE);
 }
 
 
 VIDEO_START( midzeus2 )
 {
 	/* allocate memory for "wave" RAM */
-	waveram[0] = auto_malloc(WAVERAM0_WIDTH * WAVERAM0_HEIGHT * 8);
-	waveram[1] = auto_malloc(WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 12);
+	waveram[0] = auto_alloc_array(machine, UINT32, WAVERAM0_WIDTH * WAVERAM0_HEIGHT * 8/4);
+	waveram[1] = auto_alloc_array(machine, UINT32, WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 12/4);
 
 	/* initialize polygon engine */
 	poly = poly_alloc(machine, 10000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
@@ -390,7 +390,7 @@ if (input_code_pressed(KEYCODE_DOWN)) { zbase -= 1.0f; popmessage("Zbase = %f", 
 		if (input_code_pressed(KEYCODE_RIGHT) && width < 512) { width <<= 1; while (input_code_pressed(KEYCODE_RIGHT)) ; }
 
 		if (yoffs < 0) yoffs = 0;
-		base = waveram0_ptr_from_expanded_addr(yoffs << 16);
+		base = (const UINT64 *)waveram0_ptr_from_expanded_addr(yoffs << 16);
 
 		for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 		{
@@ -498,7 +498,7 @@ if (regdata_count[offset] < 256)
 			break;
 	if (*tailptr == NULL)
 	{
-		*tailptr = malloc_or_die(sizeof(reg_info));
+		*tailptr = alloc_or_die(reg_info);
 		(*tailptr)->next = NULL;
 		(*tailptr)->value = data;
 		regdata_count[offset]++;
@@ -742,7 +742,7 @@ if (subregdata_count[which] < 256)
 			break;
 	if (*tailptr == NULL)
 	{
-		*tailptr = malloc_or_die(sizeof(reg_info));
+		*tailptr = alloc_or_die(reg_info);
 		(*tailptr)->next = NULL;
 		(*tailptr)->value = value;
 		subregdata_count[which]++;
@@ -1213,7 +1213,7 @@ vert[i].p[0] += zbase;
 			clipvert[i].y += 0.0005f;
 	}
 
-	extra = poly_get_extra_data(poly);
+	extra = (poly_extra_data *)poly_get_extra_data(poly);
 	switch (texmode)
 	{
 		case 0x01d:		/* crusnexo: RHS of score bar */
@@ -1272,7 +1272,7 @@ vert[i].p[0] += zbase;
 
 static void render_poly_8bit(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
-	const poly_extra_data *extra = extradata;
+	const poly_extra_data *extra = (const poly_extra_data *)extradata;
 	INT32 curz = extent->param[0].start;
 	INT32 curu = extent->param[1].start;
 	INT32 curv = extent->param[2].start;

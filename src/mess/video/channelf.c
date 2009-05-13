@@ -42,7 +42,7 @@ PALETTE_INIT( channelf )
 VIDEO_START( channelf )
 {
 	videoram_size = 0x2000;
-	videoram = auto_malloc(videoram_size);
+	videoram = auto_alloc_array(machine, UINT8, videoram_size);
 }
 
 static int recalc_palette_offset(int reg1, int reg2)

@@ -577,10 +577,10 @@ static void kc85_common_vh_eof_callback(void)
 }
 #endif
 
-static void kc85_common_vh_start(void)
+static void kc85_common_vh_start(running_machine *machine)
 {
 	kc85_blink_state = 0;
-	EventList_Initialise(30000);
+	EventList_Initialise(machine, 30000);
 }
 
 static unsigned char *kc85_4_display_video_ram;
@@ -589,9 +589,9 @@ static unsigned char *kc85_4_video_ram;
 
 VIDEO_START( kc85_4 )
 {
-	kc85_common_vh_start();
+	kc85_common_vh_start(machine);
 
-    kc85_4_video_ram = auto_malloc(
+    kc85_4_video_ram = auto_alloc_array(machine, UINT8,
         (KC85_4_SCREEN_COLOUR_RAM_SIZE*2) +
         (KC85_4_SCREEN_PIXEL_RAM_SIZE*2));
 
@@ -694,7 +694,7 @@ VIDEO_UPDATE( kc85_4 )
 
 VIDEO_START( kc85_3 )
 {
-	kc85_common_vh_start();
+	kc85_common_vh_start(machine);
 }
 
 

@@ -164,13 +164,13 @@ READ8_HANDLER (specimx_video_color_r )
 static void specimx_set_bank(running_machine *machine, int i,int data)
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	memory_install_write8_handler(space, 0xc000, 0xffbf, 0, 0, SMH_BANK3);
-	memory_install_write8_handler(space, 0xffc0, 0xffdf, 0, 0, SMH_BANK4);
+	memory_install_write8_handler(space, 0xc000, 0xffbf, 0, 0, SMH_BANK(3));
+	memory_install_write8_handler(space, 0xffc0, 0xffdf, 0, 0, SMH_BANK(4));
 	memory_set_bankptr(machine, 4, mess_ram + 0xffc0);
 	switch(i) 
 	{
 		case 0 :			  
-				memory_install_write8_handler(space, 0x0000, 0x8fff, 0, 0, SMH_BANK1);
+				memory_install_write8_handler(space, 0x0000, 0x8fff, 0, 0, SMH_BANK(1));
 				memory_install_write8_handler(space, 0x9000, 0xbfff, 0, 0, video_memory_w);
 			
 				memory_set_bankptr(machine, 1, mess_ram);
@@ -178,8 +178,8 @@ static void specimx_set_bank(running_machine *machine, int i,int data)
 				memory_set_bankptr(machine, 3, mess_ram + 0xc000);				
 				break;
 		case 1 :
-				memory_install_write8_handler(space, 0x0000, 0x8fff, 0, 0, SMH_BANK1);
-				memory_install_write8_handler(space, 0x9000, 0xbfff, 0, 0, SMH_BANK2);
+				memory_install_write8_handler(space, 0x0000, 0x8fff, 0, 0, SMH_BANK(1));
+				memory_install_write8_handler(space, 0x9000, 0xbfff, 0, 0, SMH_BANK(2));
 			
 				memory_set_bankptr(machine, 1, mess_ram + 0x10000);
 				memory_set_bankptr(machine, 2, mess_ram + 0x19000);
@@ -345,12 +345,12 @@ static void erik_set_bank(running_machine *machine)
 	UINT8 *mem = memory_region(machine, "maincpu");
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);	
 	
-	memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_BANK1);
-	memory_install_write8_handler(space, 0x4000, 0x8fff, 0, 0, SMH_BANK2);
-	memory_install_write8_handler(space, 0x9000, 0xbfff, 0, 0, SMH_BANK3);
-	memory_install_write8_handler(space, 0xc000, 0xefff, 0, 0, SMH_BANK4);
-	memory_install_write8_handler(space, 0xf000, 0xf7ff, 0, 0, SMH_BANK5);
-	memory_install_write8_handler(space, 0xf800, 0xffff, 0, 0, SMH_BANK6);
+	memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_BANK(1));
+	memory_install_write8_handler(space, 0x4000, 0x8fff, 0, 0, SMH_BANK(2));
+	memory_install_write8_handler(space, 0x9000, 0xbfff, 0, 0, SMH_BANK(3));
+	memory_install_write8_handler(space, 0xc000, 0xefff, 0, 0, SMH_BANK(4));
+	memory_install_write8_handler(space, 0xf000, 0xf7ff, 0, 0, SMH_BANK(5));
+	memory_install_write8_handler(space, 0xf800, 0xffff, 0, 0, SMH_BANK(6));
 	
 	switch(bank1) 
 	{

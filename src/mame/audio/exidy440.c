@@ -166,14 +166,14 @@ static DEVICE_START( exidy440_sound )
 
 	/* allocate the sample cache */
 	length = memory_region_length(machine, "cvsd") * 16 + MAX_CACHE_ENTRIES * sizeof(sound_cache_entry);
-	sound_cache = auto_malloc(length);
+	sound_cache = (sound_cache_entry *)auto_alloc_array(machine, UINT8, length);
 
 	/* determine the hard end of the cache and reset */
 	sound_cache_max = (sound_cache_entry *)((UINT8 *)sound_cache + length);
 	reset_sound_cache();
 
 	/* allocate the mixer buffer */
-	mixer_buffer_left = auto_malloc(2 * device->clock * sizeof(INT32));
+	mixer_buffer_left = auto_alloc_array(machine, INT32, 2 * device->clock);
 	mixer_buffer_right = mixer_buffer_left + device->clock;
 
 	if (SOUND_LOG)
@@ -339,7 +339,7 @@ static STREAM_UPDATE( channel_update )
 static READ8_HANDLER( sound_command_r )
 {
 	/* clear the FIRQ that got us here and acknowledge the read to the main CPU */
-	cpu_set_input_line(space->machine->cpu[1], 1, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", 1, CLEAR_LINE);
 	exidy440_sound_command_ack = 1;
 
 	return exidy440_sound_command;
@@ -375,7 +375,7 @@ static WRITE8_HANDLER( sound_volume_w )
 
 static WRITE8_HANDLER( sound_interrupt_clear_w )
 {
-	cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", 0, CLEAR_LINE);
 }
 
 
@@ -774,9 +774,9 @@ static void decode_and_filter_cvsd(UINT8 *input, int bytes, int maskbits, int fr
 	int chunk_start;
 
 	/* compute the charge, decay, and leak constants */
-	charge = pow(exp(-1), 1.0 / (FILTER_CHARGE_TC * (double)frequency));
-	decay = pow(exp(-1), 1.0 / (FILTER_DECAY_TC * (double)frequency));
-	leak = pow(exp(-1), 1.0 / (INTEGRATOR_LEAK_TC * (double)frequency));
+	charge = pow(exp(-1.0), 1.0 / (FILTER_CHARGE_TC * (double)frequency));
+	decay = pow(exp(-1.0), 1.0 / (FILTER_DECAY_TC * (double)frequency));
+	leak = pow(exp(-1.0), 1.0 / (INTEGRATOR_LEAK_TC * (double)frequency));
 
 	/* compute the gain */
 	gain = SAMPLE_GAIN;

@@ -131,7 +131,7 @@ DRIVER_INIT( pc1251 )
 	// 4 kb memory feedback 512 bytes too few???
 	// 11 kb ram: program stored at 8000
 #if 1
-	memory_install_write8_handler(space, 0x8000, 0xc7ff, 0, 0, SMH_BANK1);
+	memory_install_write8_handler(space, 0x8000, 0xc7ff, 0, 0, SMH_BANK(1));
 	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0x8000);
 #else
 	if ((input_port_read(machine, "DSW0") & 0xc0) == 0xc0)

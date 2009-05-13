@@ -111,7 +111,7 @@ device_config *device_list_add(device_config **listheadptr, const device_config 
 	configlen = (UINT32)devtype_get_info_int(type, DEVINFO_INT_INLINE_CONFIG_BYTES);
 
 	/* allocate a new device */
-	device = (device_config *)malloc_or_die(sizeof(*device) + strlen(tag) + configlen);
+	device = (device_config *)alloc_array_or_die(UINT8, sizeof(*device) + strlen(tag) + configlen);
 
 	/* populate device relationships */
 	device->next = NULL;
@@ -122,7 +122,6 @@ device_config *device_list_add(device_config **listheadptr, const device_config 
 	/* populate device properties */
 	device->type = type;
 	device->devclass = (device_class)(INT32)devtype_get_info_int(type, DEVINFO_INT_CLASS);
-	device->set_info = (device_set_info_func)devtype_get_info_fct(type, DEVINFO_FCT_SET_INFO);
 	device->execute = NULL;
 
 	/* populate device configuration */
@@ -555,8 +554,7 @@ void device_list_start(running_machine *machine)
 			fatalerror("Device %s specifies a 0 token length!\n", device_get_name(device));
 
 		/* allocate memory for the token */
-		device->token = malloc_or_die(device->tokenbytes);
-		memset(device->token, 0, device->tokenbytes);
+		device->token = alloc_array_clear_or_die(UINT8, device->tokenbytes);
 
 		/* fill in the remaining runtime fields */
 		device->execute = (device_execute_func)device_get_info_fct(device, DEVINFO_FCT_EXECUTE);
@@ -856,72 +854,7 @@ const char *devtype_get_info_string(device_type type, UINT32 state)
 
 
 /***************************************************************************
-    DEVICE INFORMATION SETTERS
-***************************************************************************/
-
-/*-------------------------------------------------
-    device_set_info_int - set an integer state
-    value for an allocated device
--------------------------------------------------*/
-
-void device_set_info_int(const device_config *device, UINT32 state, INT64 data)
-{
-	deviceinfo info;
-
-	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type != NULL);
-	assert(state >= DEVINFO_INT_FIRST && state <= DEVINFO_INT_LAST);
-
-	/* set the value */
-	info.i = data;
-	(*device->set_info)(device, state, &info);
-}
-
-
-/*-------------------------------------------------
-    device_set_info_ptr - set a pointer state
-    value for an allocated device
--------------------------------------------------*/
-
-void device_set_info_ptr(const device_config *device, UINT32 state, void *data)
-{
-	deviceinfo info;
-
-	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type != NULL);
-	assert(state >= DEVINFO_PTR_FIRST && state <= DEVINFO_PTR_LAST);
-
-	/* set the value */
-	info.p = data;
-	(*device->set_info)(device, state, &info);
-}
-
-
-/*-------------------------------------------------
-    device_set_info_fct - set a function pointer
-    state value for an allocated device
--------------------------------------------------*/
-
-void device_set_info_fct(const device_config *device, UINT32 state, genf *data)
-{
-	deviceinfo info;
-
-	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type != NULL);
-	assert(state >= DEVINFO_FCT_FIRST && state <= DEVINFO_FCT_LAST);
-
-	/* set the value */
-	info.f = data;
-	(*device->set_info)(device, state, &info);
-}
-
-
-
-/***************************************************************************
-    DEVICE INFORMATION SETTERS
+    DEFAULT HANDLERS
 ***************************************************************************/
 
 /*-------------------------------------------------

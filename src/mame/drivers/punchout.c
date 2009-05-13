@@ -150,12 +150,12 @@ static CUSTOM_INPUT( punchout_vlm5030_busy_r )
 
 static WRITE8_DEVICE_HANDLER( punchout_speech_reset_w )
 {
-	vlm5030_rst( device, data&0x01 );
+	vlm5030_rst( device, data & 0x01 );
 }
 
 static WRITE8_DEVICE_HANDLER( punchout_speech_st_w )
 {
-	vlm5030_st( device, data&0x01 );
+	vlm5030_st( device, data & 0x01 );
 }
 
 static WRITE8_DEVICE_HANDLER( punchout_speech_vcu_w )
@@ -166,9 +166,9 @@ static WRITE8_DEVICE_HANDLER( punchout_speech_vcu_w )
 static WRITE8_HANDLER( punchout_2a03_reset_w )
 {
 	if (data & 1)
-		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 	else
-		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 static int rp5c01_mode_sel; /* Mode selector */
@@ -176,7 +176,7 @@ static int rp5c01_mem[16*4];
 
 static READ8_HANDLER( spunchout_rp5c01_r )
 {
-	logerror("%04x: prot_r %x\n",cpu_get_previouspc(space->cpu),offset);
+	logerror("%04x: prot_r %x\n", cpu_get_previouspc(space->cpu), offset);
 
 	if (offset <= 0x0c)
 	{
@@ -365,7 +365,7 @@ static ADDRESS_MAP_START( armwrest_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( punchout_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
@@ -388,18 +388,12 @@ static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x07, 0x07) AM_MIRROR(0xf0) AM_MASK(0xf0) AM_READWRITE(spunchout_exp_r, spunchout_exp_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( punchout_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x4016, 0x4016) AM_READ(soundlatch_r)
 	AM_RANGE(0x4017, 0x4017) AM_READ(soundlatch2_r)
-	AM_RANGE(0x4000, 0x4017) AM_DEVREAD("nes", nes_psg_r)
-	AM_RANGE(0xe000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x4000, 0x4017) AM_DEVWRITE("nes", nes_psg_w)
-	AM_RANGE(0xe000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x4000, 0x4017) AM_DEVREADWRITE("nes", nes_psg_r,nes_psg_w)
+	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -613,11 +607,11 @@ static MACHINE_DRIVER_START( punchout )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 8000000/2)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(punchout_map,0)
-	MDRV_CPU_IO_MAP(io_map,0)
+	MDRV_CPU_IO_MAP(punchout_io_map,0)
 	MDRV_CPU_VBLANK_INT("top", nmi_line_pulse)
 
 	MDRV_CPU_ADD("audiocpu", N2A03, N2A03_DEFAULTCLOCK)
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(punchout_sound_map,0)
 	MDRV_CPU_VBLANK_INT("top", nmi_line_pulse)
 
 	MDRV_MACHINE_RESET(punchout)
@@ -1048,4 +1042,3 @@ GAME( 1984, punchita, punchout, punchout, punchout, spnchout, ROT0, "bootleg",  
 GAME( 1984, spnchout, 0,        punchout, spnchout, spnchout, ROT0, "Nintendo", "Super Punch-Out!!", 0 )
 GAME( 1984, spnchotj, spnchout, punchout, spnchout, spnchotj, ROT0, "Nintendo", "Super Punch-Out!! (Japan)", 0 )
 GAME( 1985, armwrest, 0,        armwrest, armwrest, armwrest, ROT0, "Nintendo", "Arm Wrestling", 0 )
-

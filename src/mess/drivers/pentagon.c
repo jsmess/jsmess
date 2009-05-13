@@ -92,7 +92,7 @@ static MACHINE_RESET( pentagon )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
-	memory_install_read8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_BANK1);
+	memory_install_read8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_BANK(1));
 	memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
 
 	betadisk_enable();

@@ -73,7 +73,7 @@ static INTERRUPT_GEN ( bwp1_interrupt )
 				latch_data = sound_fifo[fftail];
 				fftail = (fftail + 1) & (MAX_SOUNDS - 1);
 				soundlatch_w(cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM), 0, latch_data);
-				cpu_set_input_line(device->machine->cpu[2], DECO16_IRQ_LINE, HOLD_LINE); // SNDREQ
+				cputag_set_input_line(device->machine, "audiocpu", DECO16_IRQ_LINE, HOLD_LINE); // SNDREQ
 			}
 		break;
 
@@ -98,7 +98,7 @@ static INTERRUPT_GEN ( bwp3_interrupt ) { if (!bwp3_nmimask) cpu_set_input_line(
 
 static WRITE8_HANDLER( bwp12_sharedram1_w ) { bwp1_sharedram1[offset] = bwp2_sharedram1[offset] = data; }
 static WRITE8_HANDLER( bwp3_u8F_w ) { bwp3_u8F_d = data; } // prepares custom chip for various operations
-static WRITE8_HANDLER( bwp3_nmiack_w ) { cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_NMI, CLEAR_LINE); }
+static WRITE8_HANDLER( bwp3_nmiack_w ) { cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, CLEAR_LINE); }
 static WRITE8_HANDLER( bwp3_nmimask_w ) { bwp3_nmimask = data & 0x80; }
 
 
@@ -119,16 +119,16 @@ static WRITE8_HANDLER( bwp1_ctrl_w )
 	switch (offset)
 	{
 		// MSSTB
-		case 0: cpu_set_input_line(space->machine->cpu[1], M6809_IRQ_LINE, ASSERT_LINE); break;
+		case 0: cputag_set_input_line(space->machine, "sub", M6809_IRQ_LINE, ASSERT_LINE); break;
 
 		// IRQACK
-		case 1: cpu_set_input_line(space->machine->cpu[0], M6809_IRQ_LINE, CLEAR_LINE); break;
+		case 1: cputag_set_input_line(space->machine, "maincpu", M6809_IRQ_LINE, CLEAR_LINE); break;
 
 		// FIRQACK
-		case 2: cpu_set_input_line(space->machine->cpu[0], M6809_FIRQ_LINE, CLEAR_LINE); break;
+		case 2: cputag_set_input_line(space->machine, "maincpu", M6809_FIRQ_LINE, CLEAR_LINE); break;
 
 		// NMIACK
-		case 3: cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE); break;
+		case 3: cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE); break;
 
 		// SWAP(bank-swaps sprite RAM between 1800 & 1900; ignored bc. they're treated as a single chunk.)
 		case 4: break;
@@ -136,7 +136,7 @@ static WRITE8_HANDLER( bwp1_ctrl_w )
 		// SNDREQ
 		case 5:
 			if (data == 0x80) // protection trick to screw CPU1 & 3
-				cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, ASSERT_LINE); // SNMI
+				cputag_set_input_line(space->machine, "sub", INPUT_LINE_NMI, ASSERT_LINE); // SNMI
 			else
 			if (ffcount < MAX_SOUNDS)
 			{
@@ -163,13 +163,13 @@ static WRITE8_HANDLER( bwp2_ctrl_w )
 {
 	switch (offset)
 	{
-		case 0: cpu_set_input_line(space->machine->cpu[0], M6809_IRQ_LINE, ASSERT_LINE); break; // SMSTB
+		case 0: cputag_set_input_line(space->machine, "maincpu", M6809_IRQ_LINE, ASSERT_LINE); break; // SMSTB
 
-		case 1: cpu_set_input_line(space->machine->cpu[1], M6809_FIRQ_LINE, CLEAR_LINE); break;
+		case 1: cputag_set_input_line(space->machine, "sub", M6809_FIRQ_LINE, CLEAR_LINE); break;
 
-		case 2: cpu_set_input_line(space->machine->cpu[1], M6809_IRQ_LINE, CLEAR_LINE); break;
+		case 2: cputag_set_input_line(space->machine, "sub", M6809_IRQ_LINE, CLEAR_LINE); break;
 
-		case 3: cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE); break;
+		case 3: cputag_set_input_line(space->machine, "sub", INPUT_LINE_NMI, CLEAR_LINE); break;
 	}
 
 	#if BW_DEBUG
@@ -181,58 +181,42 @@ static WRITE8_HANDLER( bwp2_ctrl_w )
 // CPU Memory Maps
 
 // Main CPU
-static ADDRESS_MAP_START( bwp1_readmem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( bwp1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1b00, 0x1b07) AM_READ(bwp1_io_r)
-	AM_RANGE(0x0000, 0x1fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x2000, 0x3fff) AM_READ(bwing_scrollram_r)
-	AM_RANGE(0x4000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( bwp1_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_WRITE(bwp12_sharedram1_w) AM_BASE(&bwp1_sharedram1)
-	AM_RANGE(0x0800, 0x0fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x1000, 0x13ff) AM_WRITE(bwing_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x1800, 0x19ff) AM_WRITE(bwing_spriteram_w) AM_BASE(&buffered_spriteram)
-	AM_RANGE(0x1a00, 0x1aff) AM_WRITE(bwing_paletteram_w) AM_BASE(&paletteram)
-	AM_RANGE(0x1b00, 0x1b07) AM_WRITE(bwing_scrollreg_w)
-	AM_RANGE(0x1c00, 0x1c07) AM_WRITE(bwp1_ctrl_w)
-	AM_RANGE(0x2000, 0x3fff) AM_WRITE(bwing_scrollram_w)
-	AM_RANGE(0x1000, 0x1fff) AM_WRITE(SMH_RAM) // falls through
-	AM_RANGE(0x4000, 0xffff) AM_WRITENOP // "B-Wings US" writes to 9631-9632(debug?)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(bwp12_sharedram1_w) AM_BASE(&bwp1_sharedram1)
+	AM_RANGE(0x0800, 0x0fff) AM_RAM
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(bwing_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x1400, 0x17ff) AM_RAM
+	AM_RANGE(0x1800, 0x19ff) AM_RAM_WRITE(bwing_spriteram_w) AM_BASE(&buffered_spriteram)
+	AM_RANGE(0x1a00, 0x1aff) AM_RAM_WRITE(bwing_paletteram_w) AM_BASE(&paletteram)
+	AM_RANGE(0x1b00, 0x1b07) AM_RAM_WRITE(bwing_scrollreg_w)
+	AM_RANGE(0x1c00, 0x1c07) AM_RAM_WRITE(bwp1_ctrl_w)
+	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(bwing_scrollram_r, bwing_scrollram_w)
+	AM_RANGE(0x4000, 0xffff) AM_ROM // "B-Wings US" writes to 9631-9632(debug?)
 ADDRESS_MAP_END
 
 
 // Sub CPU
-static ADDRESS_MAP_START( bwp2_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_RAM)
-	AM_RANGE(0xa000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( bwp2_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_WRITE(bwp12_sharedram1_w) AM_BASE(&bwp2_sharedram1)
-	AM_RANGE(0x0800, 0x0fff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( bwp2_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(bwp12_sharedram1_w) AM_BASE(&bwp2_sharedram1)
+	AM_RANGE(0x0800, 0x0fff) AM_RAM
 	AM_RANGE(0x1800, 0x1803) AM_WRITE(bwp2_ctrl_w)
-	AM_RANGE(0xa000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
 // Sound CPU
-static ADDRESS_MAP_START( bwp3_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x01ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
-	AM_RANGE(0xe000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( bwp3_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x01ff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( bwp3_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x0200, 0x0200) AM_DEVWRITE("dac", dac_signed_w)
 	AM_RANGE(0x1000, 0x1000) AM_WRITE(bwp3_nmiack_w)
 	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("ay1", ay8910_data_w)
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("ay1", ay8910_address_w)
 	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("ay2", ay8910_data_w)
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay2", ay8910_address_w)
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(bwp3_nmimask_w)
-	AM_RANGE(0xe000, 0xffff) AM_WRITE(SMH_ROM) AM_BASE(&bwp3_rombase) AM_SIZE(&bwp3_romsize)
+	AM_RANGE(0xe000, 0xffff) AM_ROM AM_BASE(&bwp3_rombase) AM_SIZE(&bwp3_romsize)
 ADDRESS_MAP_END
 
 
@@ -387,15 +371,15 @@ static MACHINE_DRIVER_START( bwing )
 
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", M6809, 2000000)
-	MDRV_CPU_PROGRAM_MAP(bwp1_readmem, bwp1_writemem)
+	MDRV_CPU_PROGRAM_MAP(bwp1_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(bwp1_interrupt, 3)
 
 	MDRV_CPU_ADD("sub", M6809, 2000000)
-	MDRV_CPU_PROGRAM_MAP(bwp2_readmem, bwp2_writemem)
+	MDRV_CPU_PROGRAM_MAP(bwp2_map, 0)
 //  MDRV_CPU_VBLANK_INT("screen", irq1_line_assert) // vblank triggers FIRQ on CPU2 by design (unused)
 
 	MDRV_CPU_ADD("audiocpu", DECO16, 2000000)
-	MDRV_CPU_PROGRAM_MAP(bwp3_readmem, bwp3_writemem)
+	MDRV_CPU_PROGRAM_MAP(bwp3_map, 0)
 	MDRV_CPU_IO_MAP(bwp3_io_map,0)
 	MDRV_CPU_PERIODIC_INT(bwp3_interrupt, 1000)
 
@@ -625,4 +609,3 @@ GAME( 1984, bwingsa, bwings, bwing, bwing, bwing, ROT90, "Data East Corporation"
 
 GAME( 1984, zaviga,       0, bwing, bwing, bwing, ROT90, "Data East Corporation", "Zaviga", 0 )
 GAME( 1984, zavigaj, zaviga, bwing, bwing, bwing, ROT90, "Data East Corporation", "Zaviga (Japan)", 0 )
-

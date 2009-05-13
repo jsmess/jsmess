@@ -124,7 +124,7 @@ MACHINE_RESET( llc2 )
 	memory_install_write8_handler(space, 0x6000, 0xbfff, 0, 0, SMH_UNMAP);
 	memory_set_bankptr(machine, 3, memory_region(machine, "maincpu") + 0x6000);	
 
-	memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, SMH_BANK4);
+	memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, SMH_BANK(4));
 	memory_set_bankptr(machine, 4, mess_ram + 0xc000);	
 
 }
@@ -133,16 +133,16 @@ WRITE8_HANDLER( llc2_rom_disable_w )
 {	
 	const address_space *mem_space = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	
-	memory_install_write8_handler(mem_space, 0x0000, 0xbfff, 0, 0, SMH_BANK1);
+	memory_install_write8_handler(mem_space, 0x0000, 0xbfff, 0, 0, SMH_BANK(1));
 	memory_set_bankptr(space->machine, 1, mess_ram); 
 
-	memory_install_write8_handler(mem_space, 0x4000, 0x5fff, 0, 0, SMH_BANK2);
+	memory_install_write8_handler(mem_space, 0x4000, 0x5fff, 0, 0, SMH_BANK(2));
 	memory_set_bankptr(space->machine, 2, mess_ram + 0x4000);	
 
-	memory_install_write8_handler(mem_space, 0x6000, 0xbfff, 0, 0, SMH_BANK3);
+	memory_install_write8_handler(mem_space, 0x6000, 0xbfff, 0, 0, SMH_BANK(3));
 	memory_set_bankptr(space->machine, 3, mess_ram + 0x6000);	
 
-	memory_install_write8_handler(mem_space, 0xc000, 0xffff, 0, 0, SMH_BANK4);
+	memory_install_write8_handler(mem_space, 0xc000, 0xffff, 0, 0, SMH_BANK(4));
 	memory_set_bankptr(space->machine, 4, mess_ram + 0xc000);	
 
 }
@@ -155,7 +155,7 @@ WRITE8_HANDLER( llc2_basic_enable_w )
 		memory_install_write8_handler(mem_space, 0x4000, 0x5fff, 0, 0, SMH_UNMAP);
 		memory_set_bankptr(space->machine, 2, memory_region(space->machine, "maincpu") + 0x10000);			
 	} else {
-		memory_install_write8_handler(mem_space, 0x4000, 0x5fff, 0, 0, SMH_BANK2);
+		memory_install_write8_handler(mem_space, 0x4000, 0x5fff, 0, 0, SMH_BANK(2));
 		memory_set_bankptr(space->machine, 2, mess_ram + 0x4000);	
 	}
 	

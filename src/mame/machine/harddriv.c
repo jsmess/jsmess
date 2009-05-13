@@ -157,7 +157,7 @@ MACHINE_START( harddriv )
 {
 	/* predetermine memory regions */
 	sim_memory = (UINT16 *)memory_region(machine, "user1");
-	som_memory = (UINT16 *)auto_malloc(0x8000);
+	som_memory = auto_alloc_array(machine, UINT16, 0x8000/2);
 	sim_memory_size = memory_region_length(machine, "user1") / 2;
 	adsp_pgm_memory_word = (UINT16 *)((UINT8 *)hdadsp_pgm_memory + 1);
 }
@@ -895,9 +895,9 @@ static TIMER_CALLBACK( deferred_adsp_bank_switch )
 		if (commands)
 		{
 			INT16 *base = (INT16 *)&som_memory[param * 0x2000];
-			INT16 *end = base + (UINT16)*base++;
-			INT16 *current = base;
-			INT16 *table = base + (UINT16)*current++;
+			INT16 *end = base + (UINT16)*base;
+			INT16 *current = base + 1;
+			INT16 *table = base + 1 + (UINT16)*current++;
 
 			fprintf(commands, "\n---------------\n");
 
@@ -1199,7 +1199,7 @@ READ16_HANDLER( hd68k_ds3_gdata_r )
 	logerror("%06X:hd68k_ds3_gdata_r(%04X)\n", cpu_get_previouspc(space->cpu), ds3_gdata);
 
 	/* attempt to optimize the transfer if conditions are right */
-	if (space->cpu == space->machine->cpu[0] && pc == hdds3_transfer_pc &&
+	if (space->cpu == cputag_get_cpu(space->machine, "maincpu") && pc == hdds3_transfer_pc &&
 		!(!ds3_g68flag && ds3_g68irqs) && !(ds3_gflag && ds3_gfirqs))
 	{
 		UINT32 destaddr = cpu_get_reg(space->cpu, M68K_A1);

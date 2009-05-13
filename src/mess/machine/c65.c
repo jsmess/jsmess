@@ -461,9 +461,9 @@ static WRITE8_HANDLER(c65_ram_expansion_w)
 		expansion_ram_end = 0x80000 + (mess_ram_size - 128*1024) - 1;
 
 		memory_install_read8_handler(space, expansion_ram_begin, expansion_ram_end,
-			0, 0, (data == 0x00) ? SMH_BANK16 : SMH_NOP);
+			0, 0, (data == 0x00) ? SMH_BANK(16) : SMH_NOP);
 		memory_install_write8_handler(space, expansion_ram_begin, expansion_ram_end,
-			0, 0, (data == 0x00) ? SMH_BANK16 : SMH_NOP);
+			0, 0, (data == 0x00) ? SMH_BANK(16) : SMH_NOP);
 
 		if (data == 0x00)
 			memory_set_bankptr(space->machine, 16, mess_ram + 128*1024);
@@ -613,8 +613,8 @@ static void c65_bankswitch_interface(running_machine *machine, int value)
 		{
 			memory_set_bankptr (machine, 8, c64_colorram + 0x400);
 			memory_set_bankptr (machine, 9, c64_colorram + 0x400);
-			rh = SMH_BANK8;
-			wh = SMH_BANK9;
+			rh = SMH_BANK(8);
+			wh = SMH_BANK(9);
 		}
 		else
 		{
@@ -713,8 +713,8 @@ void c65_bankswitch (running_machine *machine)
 		}
 		else
 		{
-			rh8 = SMH_BANK8;
-			wh9 = SMH_BANK9;
+			rh8 = SMH_BANK(8);
+			wh9 = SMH_BANK(9);
 			memory_set_bankptr (machine, 8, c64_colorram+0x400);
 			memory_set_bankptr (machine, 9, c64_colorram+0x400);
 		}
@@ -724,8 +724,8 @@ void c65_bankswitch (running_machine *machine)
 	else
 	{
 		c65_io_on = 0;
-		rh4 = SMH_BANK4;
-		wh5 = SMH_BANK5;
+		rh4 = SMH_BANK(4);
+		wh5 = SMH_BANK(5);
 		memory_set_bankptr(machine, 5, c64_memory+0xd000);
 		memory_set_bankptr(machine, 7, c64_memory+0xd800);
 		memory_set_bankptr(machine, 9, c64_memory+0xdc00);
@@ -804,8 +804,7 @@ static int c65_dma_read_color(running_machine *machine, int offset)
 
 static void c65_common_driver_init (running_machine *machine)
 {
-	c64_memory = auto_malloc(0x10000);
-	memset(c64_memory, 0, 0x10000);
+	c64_memory = auto_alloc_array_clear(machine, UINT8, 0x10000);
 	memory_set_bankptr(machine, 11, c64_memory + 0x00000);
 	memory_set_bankptr(machine, 12, c64_memory + 0x08000);
 	memory_set_bankptr(machine, 13, c64_memory + 0x0a000);

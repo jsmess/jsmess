@@ -217,11 +217,11 @@ static void wswan_machine_stop( running_machine *machine )
 	}
 }
 
-static void wswan_setup_bios( void ) 
+static void wswan_setup_bios( running_machine *machine ) 
 {
 	if ( ws_bios_bank == NULL ) 
 	{
-		ws_bios_bank = auto_malloc( 0x10000 );
+		ws_bios_bank = auto_alloc_array(machine, UINT8, 0x10000 );
 		memcpy( ws_bios_bank + 0xffc0, ws_fake_bios_code, 0x40 );
 	}
 }
@@ -244,7 +244,7 @@ MACHINE_RESET( wswan )
 {
 	const address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
 
-	wswan_setup_bios();
+	wswan_setup_bios(machine);
 
 	/* Intialize ports */
 	memcpy( ws_portram, ws_portram_init, 256 );
@@ -1379,7 +1379,7 @@ DEVICE_IMAGE_LOAD(wswan_cart)
 
 	for( ii = 0; ii < ROMBanks; ii++ )
 	{
-		if( (ROMMap[ii] = auto_malloc( 0x10000 )) )
+		if( (ROMMap[ii] = auto_alloc_array(image->machine, UINT8, 0x10000 )) )
 		{
 			if( image_fread( image, ROMMap[ii], 0x10000 ) != 0x10000 )
 			{
@@ -1427,7 +1427,7 @@ DEVICE_IMAGE_LOAD(wswan_cart)
 
 	if ( eeprom.size != 0 ) 
 	{
-		eeprom.data = auto_malloc( eeprom.size );
+		eeprom.data = auto_alloc_array(image->machine, UINT8, eeprom.size );
 		image_battery_load( image, eeprom.data, eeprom.size );
 		eeprom.page = eeprom.data;
 	}

@@ -199,7 +199,7 @@ static WRITE8_HANDLER( robokid_bankselect_w )
 static WRITE8_HANDLER( ninjakd2_soundreset_w )
 {
 	// bit 4 resets sound CPU
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 
 	// bit 7 flips screen
 	flip_screen_set(space->machine, data & 0x80);
@@ -214,7 +214,7 @@ static SAMPLES_START( ninjakd2_init_samples )
 	running_machine *machine = device->machine;
 	const UINT8* const rom = memory_region(machine, "pcm");
 	const int length = memory_region_length(machine, "pcm");
-	INT16* const sampledata = auto_malloc(length * sizeof(sampledata[0]));
+	INT16* sampledata = auto_alloc_array(machine, INT16, length);
 
 	int i;
 
@@ -905,7 +905,7 @@ GFXDECODE_END
 
 static void irqhandler(const device_config *device, int irq)
 {
-	cpu_set_input_line(device->machine->cpu[1], 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "soundcpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -992,6 +992,21 @@ static MACHINE_DRIVER_START( mnight )
 
 	/* video hardware */
 	MDRV_VIDEO_START(mnight)
+
+	/* sound hardware */
+	MDRV_SOUND_REMOVE("pcm")
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( arkarea )
+
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(ninjakd2)
+
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(mnight_main_cpu,0)
+
+	/* video hardware */
+	MDRV_VIDEO_START(arkarea)
 
 	/* sound hardware */
 	MDRV_SOUND_REMOVE("pcm")
@@ -1405,7 +1420,7 @@ ROM_END
 /******************************************************************************
 
 Gfx ROMs in the older games have an unusual layout, where a high address bit
-(which is no the top bit) separates parts of the same tile. To make it possible
+(which is not the top bit) separates parts of the same tile. To make it possible
 to decode graphics without resorting to ROM_CONTINUE trickery, this function
 makes an address line rotation, bringing bit "bit" to bit 0 and shifting left
 by one place all the intervening bits.
@@ -1418,7 +1433,7 @@ static void lineswap_gfx_roms(running_machine *machine, const char *region, cons
 
 	UINT8* const src = memory_region(machine, region);
 
-	UINT8* const temp = malloc_or_die(length);
+	UINT8* const temp = alloc_array_or_die(UINT8, length);
 
 	const int mask = (1 << (bit + 1)) - 1;
 
@@ -1484,9 +1499,9 @@ GAME( 1987, ninjak2a, ninjakd2, ninjakd2, ninjakd2, bootleg,  ROT0,   "UPL", "Ni
 GAME( 1987, ninjak2b, ninjakd2, ninjakd2, rdaction, bootleg,  ROT0,   "UPL", "Ninja-Kid II / NinjaKun Ashura no Shou (set 3, bootleg?)", 0 )
 GAME( 1987, rdaction, ninjakd2, ninjakd2, rdaction, ninjakd2, ROT0,   "UPL (World Games license)", "Rad Action / NinjaKun Ashura no Shou", 0 )
 GAME( 1987, mnight,   0,        mnight,   mnight,   mnight,   ROT0,   "UPL (Kawakus license)", "Mutant Night", GAME_IMPERFECT_GRAPHICS )
-GAME( 1987, arkarea,  0,        mnight,   arkarea,  mnight,   ROT0,   "UPL", "Ark Area", GAME_IMPERFECT_GRAPHICS )
-GAME( 1988, robokid,  0,        robokid,  robokid,  0,        ROT0,   "UPL", "Atomic Robo-kid", GAME_IMPERFECT_GRAPHICS )
-GAME( 1988, robokidj, robokid,  robokid,  robokidj, 0,        ROT0,   "UPL", "Atomic Robo-kid (Japan, set 1)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1988, robokdj2, robokid,  robokid,  robokidj, 0,        ROT0,   "UPL", "Atomic Robo-kid (Japan, set 2)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1989, omegaf,   0,        omegaf,   omegaf,   0,        ROT270, "UPL", "Omega Fighter", GAME_IMPERFECT_GRAPHICS )
-GAME( 1989, omegafs,  omegaf,   omegaf,   omegaf,   0,        ROT270, "UPL", "Omega Fighter Special", GAME_IMPERFECT_GRAPHICS )
+GAME( 1987, arkarea,  0,        arkarea,  arkarea,  mnight,   ROT0,   "UPL", "Ark Area", 0 )
+GAME( 1988, robokid,  0,        robokid,  robokid,  0,        ROT0,   "UPL", "Atomic Robo-kid", 0 )
+GAME( 1988, robokidj, robokid,  robokid,  robokidj, 0,        ROT0,   "UPL", "Atomic Robo-kid (Japan, set 1)", 0 )
+GAME( 1988, robokdj2, robokid,  robokid,  robokidj, 0,        ROT0,   "UPL", "Atomic Robo-kid (Japan, set 2)", 0 )
+GAME( 1989, omegaf,   0,        omegaf,   omegaf,   0,        ROT270, "UPL", "Omega Fighter", 0 )
+GAME( 1989, omegafs,  omegaf,   omegaf,   omegaf,   0,        ROT270, "UPL", "Omega Fighter Special", 0 )

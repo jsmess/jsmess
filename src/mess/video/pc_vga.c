@@ -616,8 +616,8 @@ static void vga_cpu_interface(running_machine *machine)
 			else
 			{
 				memory_set_bankptr(machine,1, vga.memory);
-				memory_install_read8_handler(space,  0xa0000, 0xbffff, 0, 0, SMH_BANK1 );
-				memory_install_write8_handler(space, 0xa0000, 0xbffff, 0, 0, SMH_BANK1 );
+				memory_install_read8_handler(space,  0xa0000, 0xbffff, 0, 0, SMH_BANK(1) );
+				memory_install_write8_handler(space, 0xa0000, 0xbffff, 0, 0, SMH_BANK(1) );
 			}
 			break;
 
@@ -635,8 +635,8 @@ static void vga_cpu_interface(running_machine *machine)
 			else
 			{
 				memory_set_bankptr(machine,1, vga.memory);
-				memory_install_read64_handler(space,  0xa0000, 0xbffff, 0, 0, SMH_BANK1 );
-				memory_install_write64_handler(space, 0xa0000, 0xbffff, 0, 0, SMH_BANK1 );
+				memory_install_read64_handler(space,  0xa0000, 0xbffff, 0, 0, SMH_BANK(1) );
+				memory_install_write64_handler(space, 0xa0000, 0xbffff, 0, 0, SMH_BANK(1) );
 			}
 			break;
 
@@ -1124,11 +1124,11 @@ void pc_vga_init(running_machine *machine, const struct pc_vga_interface *vga_in
 		vga.svga_intf.crtc_regcount = 0x19;
 	}
 
-	vga.memory			= (UINT8 *) auto_malloc(vga.svga_intf.vram_size);
-	vga.fontdirty		= (UINT8 *) auto_malloc(0x800);
-	vga.sequencer.data	= (UINT8 *) auto_malloc(vga.svga_intf.seq_regcount);
-	vga.crtc.data		= (UINT8 *) auto_malloc(vga.svga_intf.crtc_regcount);
-	vga.gc.data			= (UINT8 *) auto_malloc(vga.svga_intf.gc_regcount);
+	vga.memory			= auto_alloc_array(machine, UINT8, vga.svga_intf.vram_size);
+	vga.fontdirty		= auto_alloc_array(machine, UINT8, 0x800);
+	vga.sequencer.data	= auto_alloc_array(machine, UINT8, vga.svga_intf.seq_regcount);
+	vga.crtc.data		= auto_alloc_array(machine, UINT8, vga.svga_intf.crtc_regcount);
+	vga.gc.data			= auto_alloc_array(machine, UINT8, vga.svga_intf.gc_regcount);
 	memset(vga.memory, '\0', vga.svga_intf.vram_size);
 	memset(vga.fontdirty, '\0', 0x800);
 	memset(vga.sequencer.data, '\0', vga.svga_intf.seq_regcount);

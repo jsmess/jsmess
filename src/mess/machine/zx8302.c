@@ -698,7 +698,7 @@ static DEVICE_START( zx8302 )
 	/* allocate microdrive images */
 	for (i = 0; i < 8; i++)
 	{
-		zx8302->mdv_image[i] = auto_malloc(MDV_IMAGE_LENGTH);
+		zx8302->mdv_image[i] = auto_alloc_array(machine, UINT8, MDV_IMAGE_LENGTH);
 	}
 
 	/* create the timers */

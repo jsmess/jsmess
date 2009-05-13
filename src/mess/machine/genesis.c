@@ -1204,7 +1204,7 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 		if (!(genesis_sram_end & 1))
 			genesis_sram_end += 1;
 		
-		genesis_sram = malloc_or_die(genesis_sram_end - genesis_sram_start);
+		genesis_sram = alloc_array_or_die(UINT16, (genesis_sram_end - genesis_sram_start) / sizeof(UINT16));
 		image_battery_load(devtag_get_device(image->machine, "cart"), genesis_sram, genesis_sram_end - genesis_sram_start);
 
 		megadriv_backupram = (UINT16*)ROM + ((genesis_sram_start & 0x3fffff) / 2);

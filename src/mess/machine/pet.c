@@ -418,18 +418,18 @@ WRITE8_HANDLER(cbm8096_w)
 		}
 		else
 		{
-			rh = SMH_BANK7;
+			rh = SMH_BANK(7);
 			if (!(data & 2))
-				wh = SMH_BANK7;
+				wh = SMH_BANK(7);
 			else
 				wh = SMH_NOP;
 		}
 		memory_install_read8_handler(space, 0xe800, 0xefff, 0, 0, rh);
 		memory_install_write8_handler(space, 0xe800, 0xefff, 0, 0, wh);
 
-		memory_install_write8_handler(space, 0xc000, 0xe7ff, 0, 0, (data & 2) == 0 ? SMH_BANK6 : SMH_NOP);
-		memory_install_write8_handler(space, 0xf000, 0xffef, 0, 0, (data & 2) == 0 ? SMH_BANK8 : SMH_NOP);
-		memory_install_write8_handler(space, 0xfff1, 0xffff, 0, 0, (data & 2) == 0 ? SMH_BANK9 : SMH_NOP);
+		memory_install_write8_handler(space, 0xc000, 0xe7ff, 0, 0, (data & 2) == 0 ? SMH_BANK(6) : SMH_NOP);
+		memory_install_write8_handler(space, 0xf000, 0xffef, 0, 0, (data & 2) == 0 ? SMH_BANK(8) : SMH_NOP);
+		memory_install_write8_handler(space, 0xfff1, 0xffff, 0, 0, (data & 2) == 0 ? SMH_BANK(9) : SMH_NOP);
 
 		if (data & 0x20)
 		{
@@ -440,15 +440,15 @@ WRITE8_HANDLER(cbm8096_w)
 		else
 		{
 			if (!(data & 1))
-				wh = SMH_BANK1;
+				wh = SMH_BANK(1);
 			else
 				wh = SMH_NOP;
 		}
 		memory_install_write8_handler(space, 0x8000, 0x8fff, 0, 0, wh);
 
-		memory_install_write8_handler(space, 0x9000, 0x9fff, 0, 0, (data & 1) == 0 ? SMH_BANK2 : SMH_NOP);
-		memory_install_write8_handler(space, 0xa000, 0xafff, 0, 0, (data & 1) == 0 ? SMH_BANK3 : SMH_NOP);
-		memory_install_write8_handler(space, 0xb000, 0xbfff, 0, 0, (data & 1) == 0 ? SMH_BANK4 : SMH_NOP);
+		memory_install_write8_handler(space, 0x9000, 0x9fff, 0, 0, (data & 1) == 0 ? SMH_BANK(2) : SMH_NOP);
+		memory_install_write8_handler(space, 0xa000, 0xafff, 0, 0, (data & 1) == 0 ? SMH_BANK(3) : SMH_NOP);
+		memory_install_write8_handler(space, 0xb000, 0xbfff, 0, 0, (data & 1) == 0 ? SMH_BANK(4) : SMH_NOP);
 
 
 		if (data & 4)
@@ -595,8 +595,8 @@ static void pet_common_driver_init(running_machine *machine)
 	state->superpet = 0;
 	state->cbm8096 = 0;
 
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, mess_ram_size - 1, 0, 0, SMH_BANK10);
-	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, mess_ram_size - 1, 0, 0, SMH_BANK10);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, mess_ram_size - 1, 0, 0, SMH_BANK(10));
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, mess_ram_size - 1, 0, 0, SMH_BANK(10));
 	memory_set_bankptr (machine, 10, pet_memory);
 
 	if (mess_ram_size < 0x8000)
@@ -658,7 +658,7 @@ DRIVER_INIT( superpet )
 	pet_common_driver_init(machine);
 	state->superpet = 1;
 
-	superpet_memory = auto_malloc(0x10000);
+	superpet_memory = auto_alloc_array(machine, UINT8, 0x10000);
 
 	memory_configure_bank(machine, 1, 0, 16, superpet_memory, 0x1000);
 	memory_set_bank(machine, 1, 0);

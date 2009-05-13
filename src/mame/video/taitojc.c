@@ -189,22 +189,19 @@ VIDEO_START( taitojc )
 
 	tilemap_set_transparent_pen(taitojc_tilemap, 0);
 
-	taitojc_char_ram = auto_malloc(0x4000);
-	taitojc_tile_ram = auto_malloc(0x4000);
-
-	memset(taitojc_char_ram, 0, 0x4000);
-	memset(taitojc_tile_ram, 0, 0x4000);
+	taitojc_char_ram = auto_alloc_array_clear(machine, UINT32, 0x4000/4);
+	taitojc_tile_ram = auto_alloc_array_clear(machine, UINT32, 0x4000/4);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
 	machine->gfx[taitojc_gfx_index] = gfx_element_alloc(machine, &taitojc_char_layout, (UINT8 *)taitojc_char_ram, machine->config->total_colors / 16, 0);
 
-	taitojc_texture = auto_malloc(0x400000);
+	taitojc_texture = auto_alloc_array(machine, UINT8, 0x400000);
 
 	framebuffer = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
 	width = video_screen_get_width(machine->primary_screen);
 	height = video_screen_get_height(machine->primary_screen);
-	zbuffer = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
+	zbuffer = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 }
 
 //static int tick = 0;
@@ -292,7 +289,7 @@ VIDEO_UPDATE( taitojc )
 
 static void render_solid_scan(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
-	bitmap_t *destmap = dest;
+	bitmap_t *destmap = (bitmap_t *)dest;
 	float z = extent->param[0].start;
 	int color = extent->param[1].start;
 	float dz = extent->param[0].dpdx;
@@ -316,7 +313,7 @@ static void render_solid_scan(void *dest, INT32 scanline, const poly_extent *ext
 
 static void render_shade_scan(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
-	bitmap_t *destmap = dest;
+	bitmap_t *destmap = (bitmap_t *)dest;
 	float z = extent->param[0].start;
 	float color = extent->param[1].start;
 	float dz = extent->param[0].dpdx;
@@ -343,8 +340,8 @@ static void render_shade_scan(void *dest, INT32 scanline, const poly_extent *ext
 
 static void render_texture_scan(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
-	const poly_extra_data *extra = extradata;
-	bitmap_t *destmap = dest;
+	const poly_extra_data *extra = (const poly_extra_data *)extradata;
+	bitmap_t *destmap = (bitmap_t *)dest;
 	float z = extent->param[0].start;
 	float u = extent->param[1].start;
 	float v = extent->param[2].start;
@@ -437,7 +434,7 @@ void taitojc_render_polygons(running_machine *machine, UINT16 *polygon_fifo, int
 				// 0x12: Vertex 3 X
 				// 0x13: Vertex 3 Z
 
-				poly_extra_data *extra = poly_get_extra_data(poly);
+				poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(poly);
 				UINT16 texbase;
 
 				/*
@@ -555,7 +552,7 @@ void taitojc_render_polygons(running_machine *machine, UINT16 *polygon_fifo, int
 				// 0x18: Vertex 4 X
 				// 0x19: Vertex 4 Z
 
-				poly_extra_data *extra = poly_get_extra_data(poly);
+				poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(poly);
 				UINT16 texbase;
 
 				/*

@@ -657,7 +657,7 @@ static DRIVER_INIT( djboyj )
 
 static WRITE8_HANDLER( trigger_nmi_on_cpu0 )
 {
-	cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( cpu0_bankswitch_w )
@@ -715,32 +715,32 @@ static WRITE8_HANDLER( cpu1_bankswitch_w )
 
 static WRITE8_HANDLER( trigger_nmi_on_sound_cpu2 )
 {
-	soundlatch_w(space,0,data);
-	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(space, 0, data);
+	cputag_set_input_line(space->machine, "cpu2", INPUT_LINE_NMI, PULSE_LINE);
 } /* trigger_nmi_on_sound_cpu2 */
 
 static WRITE8_HANDLER( cpu2_bankswitch_w )
 {
 	UINT8 *RAM = memory_region(space->machine, "cpu2");
 
-	if( data<3 )
+	if( data < 3 )
 	{
 		RAM = &RAM[0x04000 * data];
 	}
 	else
 	{
-		RAM = &RAM[0x10000 + 0x4000*(data-3)];
+		RAM = &RAM[0x10000 + 0x4000 * (data - 3)];
 	}
-	memory_set_bankptr(space->machine, 3,RAM);
+	memory_set_bankptr(space->machine, 3, RAM);
 }
 
 /******************************************************************************/
 
 static ADDRESS_MAP_START( cpu0_am, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0xafff) AM_READ(SMH_BANK4)
+	AM_RANGE(0x8000, 0xafff) AM_READ(SMH_BANK(4))
 	AM_RANGE(0xb000, 0xbfff) AM_READWRITE( pandora_spriteram_r, pandora_spriteram_w )
-	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_BANK1)
+	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_BANK(1))
 	AM_RANGE(0xe000, 0xefff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) AM_BASE(&sharedram)
 	AM_RANGE(0xf000, 0xf7ff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xf800, 0xffff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM)
@@ -755,7 +755,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu1_am, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK2)
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(2))
 	AM_RANGE(0xc000, 0xcfff) AM_READ(SMH_RAM) AM_WRITE(djboy_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0xd000, 0xd3ff) AM_READ(SMH_RAM) AM_WRITE(djboy_paletteram_w) AM_BASE(&paletteram)
 	AM_RANGE(0xd400, 0xd8ff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM)
@@ -778,7 +778,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu2_am, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK3)
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(3))
 	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
@@ -1052,4 +1052,3 @@ INPUT_PORTS_END
 GAME( 1989, djboy,  0,      djboy,   djboy, djboy,    ROT0, "Kaneko (American Sammy license)", "DJ Boy (set 1)", 0) // Sammy & Williams logos in FG ROM
 GAME( 1989, djboya, djboy,  djboy,   djboy, djboy,    ROT0, "Kaneko (American Sammy license)", "DJ Boy (set 2)", 0) // Sammy & Williams logos in FG ROM
 GAME( 1989, djboyj, djboy,  djboy,   djboy, djboyj,   ROT0, "Kaneko (Sega license)", "DJ Boy (Japan)", 0 ) // Sega logo in FG ROM
-

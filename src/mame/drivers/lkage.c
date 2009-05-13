@@ -89,7 +89,7 @@ static int sound_nmi_enable,pending_nmi;
 
 static TIMER_CALLBACK( nmi_callback )
 {
-	if (sound_nmi_enable) cpu_set_input_line(machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
+	if (sound_nmi_enable) cputag_set_input_line(machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	else pending_nmi = 1;
 }
 
@@ -109,19 +109,19 @@ static WRITE8_HANDLER( lkage_sh_nmi_enable_w )
 	sound_nmi_enable = 1;
 	if (pending_nmi)
 	{ /* probably wrong but commands may go lost otherwise */
-		cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
+		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 		pending_nmi = 0;
 	}
 }
 
-static ADDRESS_MAP_START( lkage, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xdfff) AM_READ(SMH_ROM) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xe000, 0xe7ff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) /* work ram */
+static ADDRESS_MAP_START( lkage_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xdfff) AM_ROM
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM /* work ram */
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_le_w) AM_BASE(&paletteram)
-	AM_RANGE(0xf000, 0xf003) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) AM_BASE(&lkage_vreg) /* video registers */
+	AM_RANGE(0xf000, 0xf003) AM_RAM AM_BASE(&lkage_vreg) /* video registers */
 	AM_RANGE(0xf060, 0xf060) AM_WRITE(lkage_sound_command_w)
 	AM_RANGE(0xf061, 0xf061) AM_WRITENOP
-	AM_RANGE(0xf062, 0xf062) AM_READ(lkage_mcu_r) AM_WRITE(lkage_mcu_w)
+	AM_RANGE(0xf062, 0xf062) AM_READWRITE(lkage_mcu_r,lkage_mcu_w)
 	AM_RANGE(0xf063, 0xf063) AM_WRITENOP /* pulsed; nmi on sound cpu? */
 	AM_RANGE(0xf080, 0xf080) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf081, 0xf081) AM_READ_PORT("DSW2")
@@ -130,11 +130,11 @@ static ADDRESS_MAP_START( lkage, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf084, 0xf084) AM_READ_PORT("P1")
 	AM_RANGE(0xf086, 0xf086) AM_READ_PORT("P2")
 	AM_RANGE(0xf087, 0xf087) AM_READ(lkage_mcu_status_r)
-	AM_RANGE(0xf0a0, 0xf0a3) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) /* unknown */
-	AM_RANGE(0xf0c0, 0xf0c5) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) AM_BASE(&lkage_scroll)
+	AM_RANGE(0xf0a0, 0xf0a3) AM_RAM /* unknown */
+	AM_RANGE(0xf0c0, 0xf0c5) AM_RAM AM_BASE(&lkage_scroll)
 	AM_RANGE(0xf0e1, 0xf0e1) AM_WRITENOP /* pulsed */
-	AM_RANGE(0xf100, 0xf15f) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) AM_BASE(&spriteram)
-	AM_RANGE(0xf400, 0xffff) AM_READ(SMH_RAM) AM_WRITE(lkage_videoram_w) AM_BASE(&videoram) /* videoram */
+	AM_RANGE(0xf100, 0xf15f) AM_RAM AM_BASE(&spriteram)
+	AM_RANGE(0xf400, 0xffff) AM_RAM_WRITE(lkage_videoram_w) AM_BASE(&videoram) /* videoram */
 ADDRESS_MAP_END
 
 static READ8_HANDLER( port_fetch_r )
@@ -142,54 +142,35 @@ static READ8_HANDLER( port_fetch_r )
 	return memory_region(space->machine, "user1")[offset];
 }
 
-static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( lkage_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x4000, 0x7fff) AM_READ(port_fetch_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( m68705_readmem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( lkage_m68705_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READ(lkage_68705_portA_r)
-	AM_RANGE(0x0001, 0x0001) AM_READ(lkage_68705_portB_r)
-	AM_RANGE(0x0002, 0x0002) AM_READ(lkage_68705_portC_r)
-	AM_RANGE(0x0010, 0x007f) AM_READ(SMH_RAM)
-	AM_RANGE(0x0080, 0x07ff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( m68705_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_WRITE(lkage_68705_portA_w)
-	AM_RANGE(0x0001, 0x0001) AM_WRITE(lkage_68705_portB_w)
-	AM_RANGE(0x0002, 0x0002) AM_WRITE(lkage_68705_portC_w)
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE(lkage_68705_portA_r,lkage_68705_portA_w)
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE(lkage_68705_portB_r,lkage_68705_portB_w)
+	AM_RANGE(0x0002, 0x0002) AM_READWRITE(lkage_68705_portC_r,lkage_68705_portC_w)
 	AM_RANGE(0x0004, 0x0004) AM_WRITE(lkage_68705_ddrA_w)
 	AM_RANGE(0x0005, 0x0005) AM_WRITE(lkage_68705_ddrB_w)
 	AM_RANGE(0x0006, 0x0006) AM_WRITE(lkage_68705_ddrC_w)
-	AM_RANGE(0x0010, 0x007f) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x0080, 0x07ff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x0010, 0x007f) AM_RAM
+	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END
 
 /***************************************************************************/
 
 /* sound section is almost identical to Bubble Bobble, YM2203 instead of YM3526 */
 
-static ADDRESS_MAP_START( readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x9000, 0x9001) AM_DEVREAD("ym1", ym2203_r)
-	AM_RANGE(0xa000, 0xa001) AM_DEVREAD("ym2", ym2203_r)
-	AM_RANGE(0xb000, 0xb000) AM_READ(soundlatch_r)
-	AM_RANGE(0xb001, 0xb001) AM_READNOP	/* ??? */
-	AM_RANGE(0xe000, 0xefff) AM_READ(SMH_ROM)	/* space for diagnostic ROM? */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x9000, 0x9001) AM_DEVWRITE("ym1", ym2203_w)
-	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("ym2", ym2203_w)
-	AM_RANGE(0xb000, 0xb000) AM_WRITENOP	/* ??? */
-	AM_RANGE(0xb001, 0xb001) AM_WRITE(lkage_sh_nmi_enable_w)
+static ADDRESS_MAP_START( lkage_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
+	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ym1", ym2203_r,ym2203_w)
+	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym2", ym2203_r,ym2203_w)
+	AM_RANGE(0xb000, 0xb000) AM_READ(soundlatch_r) AM_WRITENOP	/* ??? */
+	AM_RANGE(0xb001, 0xb001) AM_READNOP	/* ??? */ AM_WRITE(lkage_sh_nmi_enable_w)
 	AM_RANGE(0xb002, 0xb002) AM_WRITE(lkage_sh_nmi_disable_w)
-	AM_RANGE(0xe000, 0xefff) AM_WRITE(SMH_ROM)	/* space for diagnostic ROM? */
+	AM_RANGE(0xe000, 0xefff) AM_ROM	/* space for diagnostic ROM? */
 ADDRESS_MAP_END
 
 /***************************************************************************/
@@ -356,7 +337,7 @@ GFXDECODE_END
 
 static void irqhandler(const device_config *device, int irq)
 {
-	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -372,15 +353,16 @@ static const ym2203_interface ym2203_config =
 static MACHINE_DRIVER_START( lkage )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,6000000)
-	MDRV_CPU_PROGRAM_MAP(lkage,0)
-	MDRV_CPU_IO_MAP(readport,0)
+	MDRV_CPU_PROGRAM_MAP(lkage_map,0)
+	MDRV_CPU_IO_MAP(lkage_io_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 6000000)
-	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
+	MDRV_CPU_PROGRAM_MAP(lkage_sound_map,0)
 								/* IRQs are triggered by the YM2203 */
+
 	MDRV_CPU_ADD("mcu", M68705,4000000)	/* ??? */
-	MDRV_CPU_PROGRAM_MAP(m68705_readmem,m68705_writemem)
+	MDRV_CPU_PROGRAM_MAP(lkage_m68705_map,0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -417,12 +399,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( lkageb )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,6000000)
-	MDRV_CPU_PROGRAM_MAP(lkage,0)
-	MDRV_CPU_IO_MAP(readport,0)
+	MDRV_CPU_PROGRAM_MAP(lkage_map,0)
+	MDRV_CPU_IO_MAP(lkage_io_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 6000000)
-	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
+	MDRV_CPU_PROGRAM_MAP(lkage_sound_map,0)
 								/* IRQs are triggered by the YM2203 */
 
 	/* video hardware */
@@ -506,6 +488,36 @@ ROM_START( lkageo )
 	ROM_LOAD( "a54-06-1.85", 0x4000, 0x4000, CRC(9f04d9ad) SHA1(3b9a4d30348fd02e5c8ae94655548bd4a02dd65d) )
 	ROM_LOAD( "a54-07-1.86", 0x8000, 0x4000, CRC(b20561a4) SHA1(0d6d83dfae79ea133e37704ca47426b4c978fb36) )
 	ROM_LOAD( "a54-08-1.87", 0xc000, 0x4000, CRC(3ff3b230) SHA1(ffcd964efb0af32b5d7a70305dfda615ea95acbe) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "a54-10.2",    0x0000, 0x0200, CRC(17dfbd14) SHA1(f8f0b6dfedd4ba108dad43ccc7697ef4ab9cbf86) )	/* unknown */
+
+	ROM_REGION( 0x0800, "plds", ROMREGION_DISPOSE )
+	ROM_LOAD( "pal16l8-a54-11.34",  0x0000, 0x0104, CRC(56232113) SHA1(4cdc6732aa3e7fbe8df51966a1295253711ecc8f) )
+	ROM_LOAD( "pal16l8-a54-12.76",  0x0200, 0x0104, CRC(e57c3c89) SHA1(a23f91da254055bb990e8bb730564c40b5725f78) )
+	ROM_LOAD( "pal16l8a-a54-13.27", 0x0400, 0x0104, CRC(c9b1938e) SHA1(2fd1adc4bde8f07cf4b6314d56b48bb3d7144cc3) )
+	ROM_LOAD( "pal16l8a-a54-14.35", 0x0600, 0x0104, CRC(a89c644e) SHA1(b41a077d1d070d9563f924c776930c33a4ff27d0) )
+ROM_END
+
+ROM_START( lkageoo )
+	ROM_REGION( 0x14000, "maincpu", 0 ) /* Z80 code (main CPU) */
+	ROM_LOAD( "a54-01.37", 0x0000, 0x8000, CRC(34eab2c5) SHA1(25bf2dc80d21aa68c3af5debf10b24c75d83a738) )
+	ROM_LOAD( "a54-02.38", 0x8000, 0x8000, CRC(ea471d8a) SHA1(1ffc7f78e3e983e16a23e97019f7030f9846569b) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code (sound CPU) */
+	ROM_LOAD( "a54-04.54",   0x0000, 0x8000, CRC(541faf9a) SHA1(b142ff3bd198f700697ec06ea92db3109ab5818e) )
+
+	ROM_REGION( 0x10000, "mcu", 0 ) /* 68705 MCU code */
+	ROM_LOAD( "a54-09.53",   0x0000, 0x0800, CRC(0e8b8846) SHA1(a4a105462b0127229bb7edfadd2e581c7e40f1cc) )
+
+	ROM_REGION( 0x4000, "user1", 0 ) /* data */
+	ROM_LOAD( "a54-03.51",   0x0000, 0x4000, CRC(493e76d8) SHA1(13c6160edd94ba2801fd89bb33bcae3a1e3454ff) )
+
+	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD( "a54-05.84", 0x0000, 0x4000, CRC(76753e52) SHA1(13f61969d59b055a5ab40237148e091d7cabe190) )
+	ROM_LOAD( "a54-06.85", 0x4000, 0x4000, CRC(f33c015c) SHA1(756326daab255d3a36d97e51ee141b9f7157f12e) )
+	ROM_LOAD( "a54-07.86", 0x8000, 0x4000, CRC(0e02c2e8) SHA1(1d8a817ba66cf26a4fe51ae00874c0fe6e7cebe3) )
+	ROM_LOAD( "a54-08.87", 0xc000, 0x4000, CRC(4ef5f073) SHA1(dfd234542b28cff74692a1c381772da01e8bb4a7) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "a54-10.2",    0x0000, 0x0200, CRC(17dfbd14) SHA1(f8f0b6dfedd4ba108dad43ccc7697ef4ab9cbf86) )	/* unknown */
@@ -632,13 +644,14 @@ static READ8_HANDLER( fake_status_r )
 
 static DRIVER_INIT( lkageb )
 {
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf062, 0xf062, 0, 0, fake_mcu_r);
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf087, 0xf087, 0, 0, fake_status_r);
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf062, 0xf062, 0, 0, fake_mcu_w );
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf062, 0xf062, 0, 0, fake_mcu_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf087, 0xf087, 0, 0, fake_status_r);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf062, 0xf062, 0, 0, fake_mcu_w );
 }
 
 GAME( 1984, lkage,    0,        lkage,    lkage,    0,        ROT0, "Taito Corporation", "The Legend of Kage", GAME_NO_COCKTAIL )
 GAME( 1984, lkageo,   lkage,    lkage,    lkage,    0,        ROT0, "Taito Corporation", "The Legend of Kage (older)", GAME_NO_COCKTAIL )
+GAME( 1984, lkageoo,  lkage,    lkage,    lkage,    0,        ROT0, "Taito Corporation", "The Legend of Kage (oldest)", GAME_NO_COCKTAIL )
 GAME( 1984, lkageb,   lkage,    lkageb,   lkageb,   lkageb,   ROT0, "bootleg", "The Legend of Kage (bootleg set 1)", GAME_NO_COCKTAIL )
 GAME( 1984, lkageb2,  lkage,    lkageb,   lkageb,   lkageb,   ROT0, "bootleg", "The Legend of Kage (bootleg set 2)", GAME_NO_COCKTAIL )
 GAME( 1984, lkageb3,  lkage,    lkageb,   lkageb,   lkageb,   ROT0, "bootleg", "The Legend of Kage (bootleg set 3)", GAME_NO_COCKTAIL )

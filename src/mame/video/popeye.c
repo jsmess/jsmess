@@ -244,8 +244,8 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 VIDEO_START( skyskipr )
 {
-	popeye_bitmapram = auto_malloc(popeye_bitmapram_size);
-	tmpbitmap2 = auto_bitmap_alloc(1024,1024,video_screen_get_format(machine->primary_screen));	/* actually 1024x512 but not rolling over vertically? */
+	popeye_bitmapram = auto_alloc_array(machine, UINT8, popeye_bitmapram_size);
+	tmpbitmap2 = auto_bitmap_alloc(machine,1024,1024,video_screen_get_format(machine->primary_screen));	/* actually 1024x512 but not rolling over vertically? */
 
 	bitmap_type = TYPE_SKYSKIPR;
 
@@ -261,8 +261,8 @@ VIDEO_START( skyskipr )
 
 VIDEO_START( popeye )
 {
-	popeye_bitmapram = auto_malloc(popeye_bitmapram_size);
-	tmpbitmap2 = auto_bitmap_alloc(512,512,video_screen_get_format(machine->primary_screen));
+	popeye_bitmapram = auto_alloc_array(machine, UINT8, popeye_bitmapram_size);
+	tmpbitmap2 = auto_bitmap_alloc(machine,512,512,video_screen_get_format(machine->primary_screen));
 
 	bitmap_type = TYPE_POPEYE;
 
@@ -279,7 +279,7 @@ VIDEO_START( popeye )
 static void draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	if (lastflip != flip_screen_get(machine))
 	{

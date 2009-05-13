@@ -116,7 +116,7 @@ void apple2_update_memory(running_machine *machine)
 	{
 		for (i = 0; apple2_mem_config.memmap[i].end; i++)
 			;
-		apple2_current_meminfo = auto_malloc(i * sizeof(*apple2_current_meminfo));
+		apple2_current_meminfo = auto_alloc_array(machine, apple2_meminfo, i);
 		full_update = 1;
 	}
 
@@ -1305,7 +1305,7 @@ MACHINE_START( apple2 )
 	 * IIc plus; I have not found any official documentation but the BIOS
 	 * clearly uses this area as writeable memory */
 	if (!strcmp(machine->gamedrv->name, "apple2cp"))
-		apple2cp_ce00_ram = auto_malloc(0x200);
+		apple2cp_ce00_ram = auto_alloc_array(machine, UINT8, 0x200);
 
 	apple2_init_common(machine);
 

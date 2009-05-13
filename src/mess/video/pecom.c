@@ -101,8 +101,8 @@ static VIDEO_START( pecom )
 
 	/* allocate memory */
 
-	state->page_ram = auto_malloc(PECOM_PAGE_RAM_SIZE);
-	state->charram = auto_malloc(0x800);
+	state->page_ram = auto_alloc_array(machine, UINT8, PECOM_PAGE_RAM_SIZE);
+	state->charram = auto_alloc_array(machine, UINT8, 0x800);
 
 	/* find devices */
 

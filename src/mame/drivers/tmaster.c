@@ -147,7 +147,7 @@ static WRITE16_DEVICE_HANDLER( tmaster_oki_bank_w )
 
 static void duart_irq_handler(const device_config *device, UINT8 vector)
 {
-	cpu_set_input_line_and_vector(device->machine->cpu[0], 4, HOLD_LINE, vector);
+	cputag_set_input_line_and_vector(device->machine, "maincpu", 4, HOLD_LINE, vector);
 };
 
 static void duart_tx(const device_config *device, int channel, UINT8 data)
@@ -408,7 +408,7 @@ static WRITE16_HANDLER( tmaster_blitter_w )
 	{
 		case 0x0e:
 			tmaster_draw(space->machine);
-			cpu_set_input_line(space->machine->cpu[0], 2, HOLD_LINE);
+			cputag_set_input_line(space->machine, "maincpu", 2, HOLD_LINE);
 			break;
 	}
 }
@@ -602,9 +602,9 @@ static READ16_HANDLER( dummy_read_01 )
 
 static ADDRESS_MAP_START( galgames_map, ADDRESS_SPACE_PROGRAM, 16 )
 
-	AM_RANGE( 0x000000, 0x03ffff ) AM_READWRITE(SMH_BANK1, SMH_BANK2)
+	AM_RANGE( 0x000000, 0x03ffff ) AM_READWRITE(SMH_BANK(1), SMH_BANK(2))
 	AM_RANGE( 0x040000, 0x1fffff ) AM_ROM AM_REGION( "maincpu", 0 )
-	AM_RANGE( 0x200000, 0x23ffff ) AM_READWRITE(SMH_BANK3, SMH_BANK4)
+	AM_RANGE( 0x200000, 0x23ffff ) AM_READWRITE(SMH_BANK(3), SMH_BANK(4))
 	AM_RANGE( 0x240000, 0x3fffff ) AM_ROM AM_REGION( "maincpu", 0 )
 
 	AM_RANGE( 0x400000, 0x400011 ) AM_WRITE( tmaster_blitter_w ) AM_BASE( &tmaster_regs )
@@ -832,7 +832,7 @@ static MACHINE_RESET( galgames )
 	memory_set_bank(machine, 2, 0);	// ram
 	memory_set_bank(machine, 4, 0);	// ram
 
-	device_reset(machine->cpu[0]);
+	device_reset(cputag_get_cpu(machine, "maincpu"));
 }
 
 static MACHINE_DRIVER_START( galgames )

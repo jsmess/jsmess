@@ -1561,7 +1561,7 @@ static DEVICE_START( i8271 )
 	i8271->data_timer = timer_alloc(device->machine, i8271_data_timer_callback, (void *)device);
 	i8271->command_complete_timer = timer_alloc(device->machine, i8271_timed_command_complete_callback, (void *)device);
 	i8271->drive = 0;
-	i8271->pExecutionPhaseData = auto_malloc(0x4000);
+	i8271->pExecutionPhaseData = auto_alloc_array(device->machine, char, 0x4000);
 
 	// register for state saving
 	//state_save_register_item(device->machine, "i8271", device->tag, 0, i8271->number);

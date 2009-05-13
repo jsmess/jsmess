@@ -143,9 +143,9 @@ void sys24_tile_vh_start(running_machine *machine, UINT16 tile_mask)
 			break;
 	assert(sys24_char_gfx_index != MAX_GFX_ELEMENTS);
 
-	sys24_char_ram = auto_malloc(0x80000);
+	sys24_char_ram = auto_alloc_array(machine, UINT16, 0x80000/2);
 
-	sys24_tile_ram = auto_malloc(0x10000);
+	sys24_tile_ram = auto_alloc_array(machine, UINT16, 0x10000/2);
 
 	sys24_tile_layer[0] = tilemap_create(machine, sys24_tile_info_0s, tilemap_scan_rows,  8, 8, 64, 64);
 	sys24_tile_layer[1] = tilemap_create(machine, sys24_tile_info_0w, tilemap_scan_rows,  8, 8, 64, 64);
@@ -172,8 +172,8 @@ static void sys24_tile_draw_rect(running_machine *machine, bitmap_t *bm, bitmap_
 	int y;
 	const UINT16 *source  = ((UINT16 *)bm->base) + sx + sy*bm->rowpixels;
 	const UINT8  *trans = ((UINT8 *) tm->base) + sx + sy*tm->rowpixels;
-	UINT8        *prib = priority_bitmap->base;
-	UINT16       *dest = dm->base;
+	UINT8        *prib = (UINT8 *)priority_bitmap->base;
+	UINT16       *dest = (UINT16 *)dm->base;
 
 	tpri |= TILEMAP_PIXEL_LAYER0;
 
@@ -306,7 +306,7 @@ static void sys24_tile_draw_rect_rgb(running_machine *machine, bitmap_t *bm, bit
 	int y;
 	const UINT16 *source  = ((UINT16 *)bm->base) + sx + sy*bm->rowpixels;
 	const UINT8  *trans = ((UINT8 *) tm->base) + sx + sy*tm->rowpixels;
-	UINT16       *dest = dm->base;
+	UINT16       *dest = (UINT16 *)dm->base;
 	const pen_t  *pens   = machine->pens;
 
 	tpri |= TILEMAP_PIXEL_LAYER0;
@@ -649,7 +649,7 @@ static UINT16 *sys24_sprite_ram;
 
 void sys24_sprite_vh_start(running_machine *machine)
 {
-	sys24_sprite_ram = auto_malloc(0x40000);
+	sys24_sprite_ram = auto_alloc_array(machine, UINT16, 0x40000/2);
 
 	state_save_register_global_pointer(machine, sys24_sprite_ram, 0x40000/2);
 	//  kc = 0;

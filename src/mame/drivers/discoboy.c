@@ -203,10 +203,10 @@ static WRITE8_HANDLER( discoboy_port_01_w )
 
 static WRITE8_HANDLER( discoboy_port_03_w ) // sfx? (to sound cpu)
 {
-//  printf("unk discoboy_port_03_w %02x\n",data);
-//  cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,HOLD_LINE);
-	soundlatch_w(space,0,data);
-	cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
+//  printf("unk discoboy_port_03_w %02x\n", data);
+//  cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, HOLD_LINE);
+	soundlatch_w(space, 0, data);
+	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( discoboy_port_06_w )
@@ -285,23 +285,14 @@ static WRITE8_HANDLER( discoboy_ram_att_w )
 	discoboy_ram_att[offset] = data;
 }
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)
-	AM_RANGE(0xc000, 0xc7ff) AM_READ(rambank_r)
-	AM_RANGE(0xc800, 0xcfff) AM_READ(discoboy_ram_att_r)
-	AM_RANGE(0xd000, 0xdfff) AM_READ(rambank2_r)
-	AM_RANGE(0xe000, 0xefff) AM_READ(SMH_RAM)
-	AM_RANGE(0xf000, 0xffff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(rambank_w)
-	AM_RANGE(0xc800, 0xcfff) AM_WRITE(discoboy_ram_att_w)
-	AM_RANGE(0xd000, 0xdfff) AM_WRITE(rambank2_w)
-	AM_RANGE(0xe000, 0xefff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xf000, 0xffff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( discoboy_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(rambank_r, rambank_w)
+	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(discoboy_ram_att_r, discoboy_ram_att_w)
+	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(rambank2_r, rambank2_w)
+	AM_RANGE(0xe000, 0xefff) AM_RAM
+	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 
@@ -333,16 +324,11 @@ static void splash_msm5205_int(const device_config *device)
 //  adpcm_data = (adpcm_data << 4) & 0xf0;
 }
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0xf000, 0xf7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xec00, 0xec01) AM_DEVWRITE("ym", ym3812_w)
+	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 
@@ -460,12 +446,12 @@ static MACHINE_RESET( discoboy )
 static MACHINE_DRIVER_START( discoboy )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		 /* 6 MHz? */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(discoboy_map,0)
 	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,10000000/2)		 /* 5 MHz? */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 //  MDRV_CPU_IO_MAP(sound_io_map,0)
 //  MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,32)
@@ -503,12 +489,12 @@ static DRIVER_INIT( discoboy )
 {
 	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	discoboy_ram_part1 = auto_malloc(0x800);
-	discoboy_ram_part2 = auto_malloc(0x800);
-	discoboy_ram_att = auto_malloc(0x800);
+	discoboy_ram_part1 = auto_alloc_array(machine, UINT8, 0x800);
+	discoboy_ram_part2 = auto_alloc_array(machine, UINT8, 0x800);
+	discoboy_ram_att = auto_alloc_array(machine, UINT8, 0x800);
 
-	discoboy_ram_part3 = auto_malloc(0x1000);
-	discoboy_ram_part4 = auto_malloc(0x1000);
+	discoboy_ram_part3 = auto_alloc_array(machine, UINT8, 0x1000);
+	discoboy_ram_part4 = auto_alloc_array(machine, UINT8, 0x1000);
 
 	memset(discoboy_ram_part1,0,0x800);
 	memset(discoboy_ram_part2,0,0x800);
@@ -556,4 +542,3 @@ ROM_END
 
 
 GAME( 1993, discoboy,  0,    discoboy, discoboy, discoboy, ROT270, "Soft Art Co.", "Disco Boy", 0 )
-

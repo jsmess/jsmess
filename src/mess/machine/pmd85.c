@@ -59,14 +59,14 @@ static void pmd851_update_memory(running_machine *machine)
 	}
 	else
 	{
-		memory_install_write8_handler(space, 0x0000, 0x0fff, 0, 0, SMH_BANK1);
-		memory_install_write8_handler(space, 0x1000, 0x1fff, 0, 0, SMH_BANK2);
-		memory_install_write8_handler(space, 0x2000, 0x2fff, 0, 0, SMH_BANK3);
-		memory_install_write8_handler(space, 0x3000, 0x3fff, 0, 0, SMH_BANK4);
-		memory_install_write8_handler(space, 0x4000, 0x7fff, 0, 0, SMH_BANK5);
+		memory_install_write8_handler(space, 0x0000, 0x0fff, 0, 0, SMH_BANK(1));
+		memory_install_write8_handler(space, 0x1000, 0x1fff, 0, 0, SMH_BANK(2));
+		memory_install_write8_handler(space, 0x2000, 0x2fff, 0, 0, SMH_BANK(3));
+		memory_install_write8_handler(space, 0x3000, 0x3fff, 0, 0, SMH_BANK(4));
+		memory_install_write8_handler(space, 0x4000, 0x7fff, 0, 0, SMH_BANK(5));
 
-		memory_install_read8_handler(space, 0x1000, 0x1fff, 0, 0, SMH_BANK2);
-		memory_install_read8_handler(space, 0x3000, 0x3fff, 0, 0, SMH_BANK4);
+		memory_install_read8_handler(space, 0x1000, 0x1fff, 0, 0, SMH_BANK(2));
+		memory_install_read8_handler(space, 0x3000, 0x3fff, 0, 0, SMH_BANK(4));
 
 		memory_set_bankptr(machine, 1, mess_ram);
 		memory_set_bankptr(machine, 2, mess_ram + 0x1000);
@@ -101,8 +101,8 @@ static void pmd852a_update_memory(running_machine *machine)
 	}
 	else
 	{
-		memory_install_write8_handler(space, 0x0000, 0x0fff, 0, 0, SMH_BANK1);
-		memory_install_write8_handler(space, 0x2000, 0x2fff, 0, 0, SMH_BANK3);
+		memory_install_write8_handler(space, 0x0000, 0x0fff, 0, 0, SMH_BANK(1));
+		memory_install_write8_handler(space, 0x2000, 0x2fff, 0, 0, SMH_BANK(3));
 
 		memory_set_bankptr(machine, 1, mess_ram);
 		memory_set_bankptr(machine, 2, mess_ram + 0x1000);
@@ -169,9 +169,9 @@ static void alfa_update_memory(running_machine *machine)
 	}
 	else
 	{
-		memory_install_write8_handler(space, 0x0000, 0x0fff, 0, 0, SMH_BANK1);
-		memory_install_write8_handler(space, 0x1000, 0x33ff, 0, 0, SMH_BANK2);
-		memory_install_write8_handler(space, 0x3400, 0x3fff, 0, 0, SMH_BANK3);
+		memory_install_write8_handler(space, 0x0000, 0x0fff, 0, 0, SMH_BANK(1));
+		memory_install_write8_handler(space, 0x1000, 0x33ff, 0, 0, SMH_BANK(2));
+		memory_install_write8_handler(space, 0x3400, 0x3fff, 0, 0, SMH_BANK(3));
 
 		memory_set_bankptr(machine, 1, mess_ram);
 		memory_set_bankptr(machine, 2, mess_ram + 0x1000);
@@ -197,7 +197,7 @@ static void mato_update_memory(running_machine *machine)
 	}
 	else
 	{
-		memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_BANK1);
+		memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_BANK(1));
 
 		memory_set_bankptr(machine, 1, mess_ram);
 		memory_set_bankptr(machine, 2, mess_ram + 0x4000);
@@ -220,7 +220,7 @@ static void c2717_update_memory(running_machine *machine)
 	}
 	else
 	{
-		memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_BANK1);
+		memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_BANK(1));
 		memory_set_bankptr(machine, 1, mess_ram);
 		memory_set_bankptr(machine, 2, mess_ram + 0x4000);
 	}

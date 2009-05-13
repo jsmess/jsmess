@@ -177,7 +177,7 @@ static READ32_HANDLER( mlc_scanline_r )
 static TIMER_CALLBACK( interrupt_gen )
 {
 //  logerror("hit scanline IRQ %d (%08x)\n", video_screen_get_vpos(machine->primary_screen), info.i);
-	cpu_set_input_line(machine->cpu[0], mainCpuIsArm ? ARM_IRQ_LINE : 1, HOLD_LINE);
+	cputag_set_input_line(machine, "maincpu", mainCpuIsArm ? ARM_IRQ_LINE : 1, HOLD_LINE);
 }
 
 static WRITE32_HANDLER( mlc_irq_w )
@@ -189,7 +189,7 @@ static WRITE32_HANDLER( mlc_irq_w )
 	switch (offset*4)
 	{
 	case 0x10: /* IRQ ack.  Value written doesn't matter */
-		cpu_set_input_line(space->machine->cpu[0], mainCpuIsArm ? ARM_IRQ_LINE : 1, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "maincpu", mainCpuIsArm ? ARM_IRQ_LINE : 1, CLEAR_LINE);
 		return;
 	case 0x14: /* Prepare scanline interrupt */
 		timer_adjust_oneshot(raster_irq_timer,video_screen_get_time_until_pos(space->machine->primary_screen, irq_ram[0x14/4], 0),0);
@@ -264,35 +264,24 @@ static READ32_HANDLER(stadhr96_prot_146_r)
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x0000000, 0x00fffff) AM_READ(SMH_ROM) AM_MIRROR(0xff000000)
-	AM_RANGE(0x0100000, 0x011ffff) AM_READ(SMH_RAM) AM_MIRROR(0xff000000)
+static ADDRESS_MAP_START( decomlc_map, ADDRESS_SPACE_PROGRAM, 32 )
+	AM_RANGE(0x0000000, 0x00fffff) AM_ROM AM_MIRROR(0xff000000)
+	AM_RANGE(0x0100000, 0x011ffff) AM_RAM AM_BASE(&mlc_ram) AM_MIRROR(0xff000000)
 	AM_RANGE(0x0200000, 0x020000f) AM_READNOP AM_MIRROR(0xff000000)/* IRQ control? */
 	AM_RANGE(0x0200070, 0x0200073) AM_READ(decomlc_vbl_r) AM_MIRROR(0xff000000)
 	AM_RANGE(0x0200074, 0x0200077) AM_READ(mlc_scanline_r) AM_MIRROR(0xff000000)
 	AM_RANGE(0x0200078, 0x020007f) AM_READ(test2_r)	AM_MIRROR(0xff000000)
-	AM_RANGE(0x0200080, 0x02000ff) AM_READ(SMH_RAM) AM_MIRROR(0xff000000)
-	AM_RANGE(0x0204000, 0x0206fff) AM_READ(mlc_spriteram_r) AM_MIRROR(0xff000000)
-	AM_RANGE(0x0200080, 0x02000ff) AM_READ(SMH_RAM) AM_MIRROR(0xff000000)
-	AM_RANGE(0x0280000, 0x029ffff) AM_READ(mlc_vram_r) AM_MIRROR(0xff000000)
-	AM_RANGE(0x0300000, 0x0307fff) AM_READ(SMH_RAM) AM_MIRROR(0xff000000)
+	AM_RANGE(0x0200000, 0x020007f) AM_WRITE(mlc_irq_w) AM_BASE(&irq_ram) AM_MIRROR(0xff000000)
+	AM_RANGE(0x0200080, 0x02000ff) AM_RAM AM_BASE(&mlc_clip_ram) AM_MIRROR(0xff000000)
+	AM_RANGE(0x0204000, 0x0206fff) AM_READWRITE(mlc_spriteram_r, SMH_RAM) AM_BASE(&spriteram32) AM_SIZE(&spriteram_size) AM_MIRROR(0xff000000)
+	AM_RANGE(0x0280000, 0x029ffff) AM_READWRITE(mlc_vram_r, SMH_RAM) AM_BASE(&mlc_vram) AM_MIRROR(0xff000000)
+	AM_RANGE(0x0300000, 0x0307fff) AM_RAM_WRITE(avengrs_palette_w) AM_BASE(&paletteram32) AM_MIRROR(0xff000000)
 	AM_RANGE(0x0400000, 0x0400003) AM_READ_PORT("INPUTS") AM_MIRROR(0xff000000)
 	AM_RANGE(0x0440000, 0x044001f) AM_READ(test3_r)	AM_MIRROR(0xff000000)
-	AM_RANGE(0x0600000, 0x0600007) AM_DEVREAD8("ymz", ymz280b_r, 0xff000000) AM_MIRROR(0xff000000)
-	AM_RANGE(0x070f000, 0x070ffff) AM_READ(stadhr96_prot_146_r) AM_MIRROR(0xff000000)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x0000000, 0x00fffff) AM_WRITE(SMH_ROM) AM_MIRROR(0xff000000)
-	AM_RANGE(0x0100000, 0x011ffff) AM_WRITE(SMH_RAM) AM_BASE(&mlc_ram) AM_MIRROR(0xff000000)
-	AM_RANGE(0x0200000, 0x020007f) AM_WRITE(mlc_irq_w) AM_BASE(&irq_ram) AM_MIRROR(0xff000000)
-	AM_RANGE(0x0200080, 0x02000ff) AM_WRITE(SMH_RAM) AM_BASE(&mlc_clip_ram) AM_MIRROR(0xff000000)
-	AM_RANGE(0x0204000, 0x0206fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram32) AM_SIZE(&spriteram_size) AM_MIRROR(0xff000000)
-	AM_RANGE(0x0280000, 0x029ffff) AM_WRITE(SMH_RAM) AM_BASE(&mlc_vram) AM_MIRROR(0xff000000)
-	AM_RANGE(0x0300000, 0x0307fff) AM_WRITE(avengrs_palette_w) AM_BASE(&paletteram32) AM_MIRROR(0xff000000)
 	AM_RANGE(0x044001c, 0x044001f) AM_WRITENOP AM_MIRROR(0xff000000)
 	AM_RANGE(0x0500000, 0x0500003) AM_WRITE(avengrs_eprom_w) AM_MIRROR(0xff000000)
-	AM_RANGE(0x0600000, 0x0600007) AM_DEVWRITE8("ymz", ymz280b_w, 0xff000000) AM_MIRROR(0xff000000)
+	AM_RANGE(0x0600000, 0x0600007) AM_DEVREADWRITE8("ymz", ymz280b_r, ymz280b_w, 0xff000000) AM_MIRROR(0xff000000)
+	AM_RANGE(0x070f000, 0x070ffff) AM_READ(stadhr96_prot_146_r) AM_MIRROR(0xff000000)
 //  AM_RANGE(0x070f000, 0x070ffff) AM_READ(stadhr96_prot_146_w) AM_BASE(&deco32_prot_ram)
 ADDRESS_MAP_END
 
@@ -415,7 +404,7 @@ static MACHINE_DRIVER_START( avengrgs )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", SH2,42000000/2) /* 21 MHz clock confirmed on real board */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(decomlc_map,0)
 
 	MDRV_MACHINE_RESET(mlc)
 	MDRV_NVRAM_HANDLER(mlc) /* Actually 93c45 */
@@ -446,7 +435,7 @@ static MACHINE_DRIVER_START( mlc )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ARM,42000000/6) /* 42 MHz -> 7MHz clock confirmed on real board */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(decomlc_map,0)
 
 	MDRV_MACHINE_RESET(mlc)
 	MDRV_NVRAM_HANDLER(mlc) /* Actually 93c45 */
@@ -708,7 +697,7 @@ static void descramble_sound( running_machine *machine )
 	/* the same as simpl156 / heavy smash? */
 	UINT8 *rom = memory_region(machine, "ymz");
 	int length = memory_region_length(machine, "ymz");
-	UINT8 *buf1 = malloc_or_die(length);
+	UINT8 *buf1 = alloc_array_or_die(UINT8, length);
 
 	UINT32 x;
 
@@ -744,14 +733,14 @@ static READ32_HANDLER( avengrgs_speedup_r )
 static DRIVER_INIT( avengrgs )
 {
 	// init options
-	sh2drc_set_options(machine->cpu[0], SH2DRC_FASTEST_OPTIONS);
+	sh2drc_set_options(cputag_get_cpu(machine, "maincpu"), SH2DRC_FASTEST_OPTIONS);
 
 	// set up speed cheat
-	sh2drc_add_pcflush(machine->cpu[0], 0x3234);
-	sh2drc_add_pcflush(machine->cpu[0], 0x32dc);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0x3234);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0x32dc);
 
-	mainCpuIsArm=0;
-	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x01089a0, 0x01089a3, 0, 0, avengrgs_speedup_r );
+	mainCpuIsArm = 0;
+	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01089a0, 0x01089a3, 0, 0, avengrgs_speedup_r );
 	descramble_sound(machine);
 }
 
@@ -760,8 +749,8 @@ static DRIVER_INIT( mlc )
 	/* The timing in the ARM core isn't as accurate as it should be, so bump up the
         effective clock rate here to compensate otherwise we have slowdowns in
         Skull Fung where there probably shouldn't be. */
-	cpu_set_clockscale(machine->cpu[0], 2.0f);
-	mainCpuIsArm=1;
+	cpu_set_clockscale(cputag_get_cpu(machine, "maincpu"), 2.0f);
+	mainCpuIsArm = 1;
 	deco156_decrypt(machine);
 	descramble_sound(machine);
 }

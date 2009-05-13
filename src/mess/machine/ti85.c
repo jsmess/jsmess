@@ -144,7 +144,7 @@ static void update_ti86_memory (running_machine *machine)
 	{
 		memory_set_bankptr(machine, 2, ti86_ram + 0x004000*(ti85_memory_page_0x4000&0x07));
 		memory_set_bankptr(machine, 6, ti86_ram + 0x004000*(ti85_memory_page_0x4000&0x07));
-		wh = SMH_BANK6;
+		wh = SMH_BANK(6);
 	}
 	else
 	{
@@ -157,7 +157,7 @@ static void update_ti86_memory (running_machine *machine)
 	{
 		memory_set_bankptr(machine, 3, ti86_ram + 0x004000*(ti86_memory_page_0x8000&0x07));
 		memory_set_bankptr(machine, 7, ti86_ram + 0x004000*(ti86_memory_page_0x8000&0x07));
-		wh = SMH_BANK7;
+		wh = SMH_BANK(7);
 	}
 	else
 	{
@@ -262,7 +262,7 @@ MACHINE_START( ti86 )
 	ti85_interrupt_speed = 0;
 	ti85_port4_bit0 = 0;
 
-	ti86_ram = auto_malloc(128*1024);
+	ti86_ram = auto_alloc_array(machine, UINT8, 128*1024);
 	{
 		memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
 
@@ -688,7 +688,7 @@ DEVICE_IMAGE_LOAD( ti85_serial )
 
 	if (file_size != 0)
 	{
-		file_data = (UINT8*) auto_malloc(file_size);
+		file_data = auto_alloc_array(image->machine, UINT8, file_size);
 		image_fread(image, file_data, file_size);
 
 		if(!ti85_convert_file_data_to_serial_stream(file_data, file_size, &ti85_serial_stream, (char*)image->machine->gamedrv->name))

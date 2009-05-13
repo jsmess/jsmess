@@ -715,15 +715,15 @@ VIDEO_START( vic2 )
 	int width = video_screen_get_width(screen);
 	int height = video_screen_get_height(screen);
 
-	vic2.bitmap = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
+	vic2.bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 
 	if (vic2.vic3) {
-		vic2.screen[0] = (UINT8*)auto_malloc (sizeof (UINT8) * 216 * 656 / 8);
+		vic2.screen[0] = auto_alloc_array(machine, UINT8, 216 * 656 / 8);
 
 		for (i = 1; i < 216; i++)
 			vic2.screen[i] = vic2.screen[i - 1] + 656 / 8;
 	} else {
-		vic2.screen[0] = (UINT8*)auto_malloc (sizeof (UINT8) * 216 * 336 / 8);
+		vic2.screen[0] = auto_alloc_array(machine, UINT8, 216 * 336 / 8);
 
 		for (i = 1; i < 216; i++)
 			vic2.screen[i] = vic2.screen[i - 1] + 336 / 8;

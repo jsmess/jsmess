@@ -28,7 +28,7 @@ static UINT16 decrypt(UINT16 data, int address, int select_xor)
 		{ 12,15,8,13,9,11,14,10, 6,5,4,3,2,1,0,7 }, { 11,12,13,14,15,8,9,10, 4,5,7,1,6,3,2,0 },
 		{ 13,8,12,14,11,15,10,9, 7,6,5,4,3,2,1,0 }, { 15,14,13,12,11,10,9,8, 0,6,7,4,3,2,1,5 }
 	};
-	int j, xor;
+	int j, xorval;
 	const UINT8 *bs;
 
 	// calculate bitswap to use
@@ -39,10 +39,10 @@ static UINT16 decrypt(UINT16 data, int address, int select_xor)
 	// calculate xor to use
 	j = (address ^ select_xor) & 0x0f;
 	if (address & 0x40000) j ^= 2;	// boogwing
-	xor = xors[j];
+	xorval = xors[j];
 
 	// decrypt
-	return xor ^ BITSWAP16(data,
+	return xorval ^ BITSWAP16(data,
 				bs[0],bs[1],bs[2],bs[3],bs[4],bs[5],bs[6],bs[7],
 				bs[8],bs[9],bs[10],bs[11],bs[12],bs[13],bs[14],bs[15]);
 }
@@ -53,15 +53,15 @@ void deco102_decrypt_cpu(running_machine *machine, const char *cputag, int addre
 	const address_space *space = cputag_get_address_space(machine, cputag, ADDRESS_SPACE_PROGRAM);
 	UINT16 *rom = (UINT16 *)memory_region(machine, cputag);
 	int size = memory_region_length(machine, cputag);
-	UINT16 *opcodes = auto_malloc(size);
-	UINT16 *buf = malloc_or_die(size);
+	UINT16 *opcodes = auto_alloc_array(machine, UINT16, size / 2);
+	UINT16 *buf = alloc_array_or_die(UINT16, size / 2);
 
-		memcpy(buf,rom,size);
+		memcpy(buf, rom, size);
 
 		memory_set_decrypted_region(space, 0, size - 1, opcodes);
-		m68k_set_encrypted_opcode_range(machine->cpu[0],0,size);
+		m68k_set_encrypted_opcode_range(cputag_get_cpu(machine, cputag), 0, size);
 
-		for (i = 0;i < size/2;i++)
+		for (i = 0; i < size / 2; i++)
 		{
 			int src;
 

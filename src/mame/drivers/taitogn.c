@@ -484,13 +484,13 @@ static WRITE32_HANDLER(flash_s3_w)
 
 static void install_handlers(running_machine *machine, int mode)
 {
-	const address_space *a = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *a = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	if(mode == 0) {
 		// Mode 0 has access to the subbios, the mn102 flash and the rf5c296 mem zone
 		memory_install_readwrite32_handler(a, 0x1f000000, 0x1f1fffff, 0, 0, flash_subbios_r, flash_subbios_w);
 		memory_install_readwrite32_handler(a, 0x1f200000, 0x1f2fffff, 0, 0, rf5c296_mem_r, rf5c296_mem_w);
 		memory_install_readwrite32_handler(a, 0x1f300000, 0x1f37ffff, 0, 0, flash_mn102_r, flash_mn102_w);
-		memory_install_readwrite32_handler(a, 0x1f380000, 0x1f5fffff, 0, 0, SMH_NOP, SMH_NOP);
+		memory_install_readwrite32_handler(a, 0x1f380000, 0x1f5fffff, 0, 0, (read32_space_func)SMH_NOP, (write32_space_func)SMH_NOP);
 
 	} else {
 		// Mode 1 has access to the 3 samples flashes
@@ -703,7 +703,7 @@ static TIMER_CALLBACK( dip_timer_fired )
 
 	if( param )
 	{
-		timer_adjust_oneshot( dip_timer, cpu_clocks_to_attotime( machine->cpu[0], 50 ), 0 );
+		timer_adjust_oneshot(dip_timer, cputag_clocks_to_attotime(machine, "maincpu", 50), 0);
 	}
 }
 
@@ -813,7 +813,7 @@ static DRIVER_INIT( coh3002t )
 static DRIVER_INIT( coh3002t_mp )
 {
 	DRIVER_INIT_CALL(coh3002t);
-	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1fa10100, 0x1fa10103, 0, 0, gnet_mahjong_panel_r );
+	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1fa10100, 0x1fa10103, 0, 0, gnet_mahjong_panel_r );
 }
 
 static MACHINE_RESET( coh3002t )

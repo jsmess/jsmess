@@ -126,7 +126,7 @@ VIDEO_START( hd66421 )
 {
 	_logerror( 0, ("video_start_hd66421\n"));
 	memset( &lcd, 0, sizeof( lcd));
-	lcd.ram = auto_malloc( HD66421_RAM_SIZE);
+	lcd.ram = auto_alloc_array(machine, UINT8, HD66421_RAM_SIZE);
 	hd66421_state_save(machine);
 }
 

@@ -142,7 +142,7 @@ static DEVICE_START( cdp1862 )
 	assert(cdp1862->screen != NULL);
 
 	/* allocate the temporary bitmap */
-	cdp1862->bitmap = auto_bitmap_alloc(video_screen_get_width(cdp1862->screen), video_screen_get_height(cdp1862->screen), video_screen_get_format(cdp1862->screen));
+	cdp1862->bitmap = auto_bitmap_alloc(device->machine, video_screen_get_width(cdp1862->screen), video_screen_get_height(cdp1862->screen), video_screen_get_format(cdp1862->screen));
 
 	/* initialize the palette */
 	cdp1862_init_palette(device);

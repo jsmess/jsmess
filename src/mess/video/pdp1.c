@@ -56,8 +56,8 @@ INLINE void pdp1_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 VIDEO_START( pdp1 )
 {
 	/* alloc bitmaps for our private fun */
-	panel_bitmap = auto_bitmap_alloc(panel_window_width, panel_window_height, BITMAP_FORMAT_INDEXED16);
-	typewriter_bitmap = auto_bitmap_alloc(typewriter_window_width, typewriter_window_height, BITMAP_FORMAT_INDEXED16);
+	panel_bitmap = auto_bitmap_alloc(machine, panel_window_width, panel_window_height, BITMAP_FORMAT_INDEXED16);
+	typewriter_bitmap = auto_bitmap_alloc(machine, typewriter_window_width, typewriter_window_height, BITMAP_FORMAT_INDEXED16);
 
 	/* set up out bitmaps */
 	pdp1_draw_panel_backdrop(machine, panel_bitmap);
@@ -65,7 +65,7 @@ VIDEO_START( pdp1 )
 	bitmap_fill(typewriter_bitmap, &typewriter_bitmap_bounds, pen_typewriter_bg);
 
 	/* initialize CRT */
-	video_start_crt(pen_crt_num_levels, crt_window_offset_x, crt_window_offset_y, crt_window_width, crt_window_height);
+	video_start_crt(machine, pen_crt_num_levels, crt_window_offset_x, crt_window_offset_y, crt_window_width, crt_window_height);
 }
 
 

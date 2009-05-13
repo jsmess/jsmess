@@ -45,24 +45,24 @@ static void check_interrupt(running_machine *machine)
 {
 	if (!timer_int || !data_rdy_int || !ssi_data_request)
 	{
-		cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ0, HOLD_LINE);
+		cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ0, HOLD_LINE);
 	}
 	else
 	{
-		cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ0, CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
 	}
 }
 
 static TIMER_CALLBACK( intrq_tick )
 {
-	cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ0, CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( intrq_w )
 {
 	// T = 1.1 * R30 * C53 = 1.1 * 750K * 0.01uF = 8.25 ms
 
-	cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_IRQ0, HOLD_LINE);
+	cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_IRQ0, HOLD_LINE);
 
 	timer_set(space->machine, ATTOTIME_IN_USEC(8250), NULL, 0, intrq_tick);
 }
@@ -302,7 +302,7 @@ static WRITE8_HANDLER( control2_w )
 
 	if (!BIT(data, 2) & cart_present)
 	{
-		cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, HOLD_LINE);
+		cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, HOLD_LINE);
 	}
 }
 
@@ -345,19 +345,19 @@ static WRITE8_HANDLER( laserdsc_control_w )
 		laserdisc_data_w(laserdisc, laserdisc_data);
 	}
 
-	switch (device_get_info_int(laserdisc, LDINFO_INT_TYPE))
+	switch (laserdisc_get_type(laserdisc))
 	{
-	case LASERDISC_TYPE_PIONEER_PR7820:
-		pr7820_enter = BIT(data, 6) ? CLEAR_LINE : ASSERT_LINE;
+		case LASERDISC_TYPE_PIONEER_PR7820:
+			pr7820_enter = BIT(data, 6) ? CLEAR_LINE : ASSERT_LINE;
 
-		laserdisc_line_w(laserdisc, LASERDISC_LINE_ENTER, pr7820_enter);
+			laserdisc_line_w(laserdisc, LASERDISC_LINE_ENTER, pr7820_enter);
 
-		// BIT(data, 7) is INT/_EXT, but there is no such input line in laserdsc.h
-		break;
+			// BIT(data, 7) is INT/_EXT, but there is no such input line in laserdsc.h
+			break;
 
-	case LASERDISC_TYPE_PIONEER_LDV1000:
-		laserdisc_line_w(laserdisc, LASERDISC_LINE_ENTER, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
-		break;
+		case LASERDISC_TYPE_PIONEER_LDV1000:
+			laserdisc_line_w(laserdisc, LASERDISC_LINE_ENTER, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
+			break;
 	}
 }
 
@@ -584,7 +584,7 @@ ADDRESS_MAP_END
 
 static CUSTOM_INPUT( laserdisc_enter_r )
 {
-	switch (device_get_info_int(laserdisc, LDINFO_INT_TYPE))
+	switch (laserdisc_get_type(laserdisc))
 	{
 		case LASERDISC_TYPE_PIONEER_PR7820:
 			return pr7820_enter;
@@ -598,7 +598,7 @@ static CUSTOM_INPUT( laserdisc_enter_r )
 
 static CUSTOM_INPUT( laserdisc_ready_r )
 {
-	switch (device_get_info_int(laserdisc, LDINFO_INT_TYPE))
+	switch (laserdisc_get_type(laserdisc))
 	{
 		case LASERDISC_TYPE_PIONEER_PR7820:
 			return (laserdisc_line_r(laserdisc, LASERDISC_LINE_READY) == ASSERT_LINE) ? 0 : 1;
@@ -741,7 +741,7 @@ static MACHINE_RESET( thayers )
 	pr7820_enter = 0;
 
 	newtype = (input_port_read(machine, "DSWB") & 0x18) ? LASERDISC_TYPE_PIONEER_LDV1000 : LASERDISC_TYPE_PIONEER_PR7820;
-	device_set_info_int(laserdisc, LDINFO_INT_TYPE, newtype);
+	laserdisc_set_type(laserdisc, newtype);
 }
 
 /* COP400 Interface */

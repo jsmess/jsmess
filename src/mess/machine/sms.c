@@ -1012,9 +1012,9 @@ DEVICE_IMAGE_LOAD( sms_cart )
 	/* Create a new memory region to hold the ROM. */
 	/* Make sure the region holds only complete (0x4000) rom banks */
 	sms_cartridge[index].size = (size&0x3FFF) ? (((size>>14)+1)<<14) : size;
-	sms_cartridge[index].ROM = auto_malloc( sms_cartridge[index].size );
+	sms_cartridge[index].ROM = auto_alloc_array(image->machine, UINT8, sms_cartridge[index].size );
 
-	sms_cartridge[index].cartSRAM = auto_malloc( NVRAM_SIZE );
+	sms_cartridge[index].cartSRAM = auto_alloc_array(image->machine, UINT8, NVRAM_SIZE );
 
 	/* Load ROM banks */
 	size = image_fread(image, sms_cartridge[index].ROM, size);
@@ -1062,7 +1062,7 @@ DEVICE_IMAGE_LOAD( sms_cart )
 		 {
 			sms_cartridge[index].features |= CF_ONCART_RAM;
 			sms_cartridge[index].ram_size = 0x2000;
-			sms_cartridge[index].cartRAM = auto_malloc( sms_cartridge[index].ram_size );
+			sms_cartridge[index].cartRAM = auto_alloc_array(image->machine, UINT8, sms_cartridge[index].ram_size );
 		}
 	}
 	else
@@ -1096,7 +1096,7 @@ DEVICE_IMAGE_LOAD( sms_cart )
 	if ( sms_cartridge[index].features & CF_CODEMASTERS_MAPPER )
 	{
 		sms_cartridge[index].ram_size = 0x10000;
-		sms_cartridge[index].cartRAM = auto_malloc( sms_cartridge[index].ram_size );
+		sms_cartridge[index].cartRAM = auto_alloc_array(image->machine, UINT8, sms_cartridge[index].ram_size );
 		sms_cartridge[index].ram_page = 0;
 	}
 

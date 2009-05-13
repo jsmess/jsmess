@@ -616,9 +616,9 @@ static VIDEO_START( pc_ega )
 	switch(buswidth)
 	{
 		case 8:
-			memory_install_read8_handler(space, 0xa0000, 0xaffff, 0, 0, SMH_BANK11 );
-			memory_install_read8_handler(space, 0xb0000, 0xb7fff, 0, 0, SMH_BANK12 );
-			memory_install_read8_handler(space, 0xb8000, 0xbffff, 0, 0, SMH_BANK13 );
+			memory_install_read8_handler(space, 0xa0000, 0xaffff, 0, 0, SMH_BANK(11) );
+			memory_install_read8_handler(space, 0xb0000, 0xb7fff, 0, 0, SMH_BANK(12) );
+			memory_install_read8_handler(space, 0xb8000, 0xbffff, 0, 0, SMH_BANK(13) );
 			memory_install_write8_handler(space, 0xa0000, 0xbffff, 0, 0, pc_ega_videoram_w );
 			memory_install_read8_handler(spaceio, 0x3b0, 0x3bb, 0, 0, pc_ega8_3b0_r );
 			memory_install_write8_handler(spaceio, 0x3b0, 0x3bb, 0, 0, pc_ega8_3b0_w );
@@ -629,9 +629,9 @@ static VIDEO_START( pc_ega )
 			break;
 
 		case 16:
-			memory_install_read16_handler(space, 0xa0000, 0xaffff, 0, 0, SMH_BANK11 );
-			memory_install_read16_handler(space, 0xb0000, 0xb7fff, 0, 0, SMH_BANK12 );
-			memory_install_read16_handler(space, 0xb8000, 0xbffff, 0, 0, SMH_BANK13 );
+			memory_install_read16_handler(space, 0xa0000, 0xaffff, 0, 0, SMH_BANK(11) );
+			memory_install_read16_handler(space, 0xb0000, 0xb7fff, 0, 0, SMH_BANK(12) );
+			memory_install_read16_handler(space, 0xb8000, 0xbffff, 0, 0, SMH_BANK(13) );
 			memory_install_write16_handler(space, 0xa0000, 0xbffff, 0, 0, pc_ega_videoram16le_w );
 			memory_install_read16_handler(spaceio, 0x3b0, 0x3bb, 0, 0, pc_ega16le_3b0_r );
 			memory_install_write16_handler(spaceio, 0x3b0, 0x3bb, 0, 0, pc_ega16le_3b0_w );
@@ -642,9 +642,9 @@ static VIDEO_START( pc_ega )
 			break;
 
 		case 32:
-			memory_install_read32_handler(space, 0xa0000, 0xaffff, 0, 0, SMH_BANK11 );
-			memory_install_read32_handler(space, 0xb0000, 0xb7fff, 0, 0, SMH_BANK12 );
-			memory_install_read32_handler(space, 0xb8000, 0xbffff, 0, 0, SMH_BANK13 );
+			memory_install_read32_handler(space, 0xa0000, 0xaffff, 0, 0, SMH_BANK(11) );
+			memory_install_read32_handler(space, 0xb0000, 0xb7fff, 0, 0, SMH_BANK(12) );
+			memory_install_read32_handler(space, 0xb8000, 0xbffff, 0, 0, SMH_BANK(13) );
 			memory_install_write32_handler(space, 0xa0000, 0xbffff, 0, 0, pc_ega_videoram32le_w );
 			memory_install_read32_handler(spaceio, 0x3b0, 0x3bb, 0, 0, pc_ega32le_3b0_r );
 			memory_install_write32_handler(spaceio, 0x3b0, 0x3bb, 0, 0, pc_ega32le_3b0_w );

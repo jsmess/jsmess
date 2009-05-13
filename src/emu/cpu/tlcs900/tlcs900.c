@@ -9,7 +9,7 @@ Pocket emulation. The 900 and 900/M modes are not supported yet.
 TODO:
 - review cycle counts
 - implement the remaining internal mcu features
-- add support for 900 and 900/M modes
+- at support for 900 and 900/M modes
 
 *******************************************************************/
 

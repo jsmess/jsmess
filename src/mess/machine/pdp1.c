@@ -322,7 +322,7 @@ MACHINE_START( pdp1 )
 	};
 
 	/* set up memory regions */
-	pdp1_memory = auto_malloc(0x40000);
+	pdp1_memory = auto_alloc_array(machine, int, 0x40000 / sizeof(int));
 
 	/* set up our font */
 	dst = memory_region(machine, "gfx1");

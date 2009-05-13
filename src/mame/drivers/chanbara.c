@@ -184,7 +184,7 @@ static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2001, 0x2001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x2003, 0x2003) AM_READ_PORT("JOY")
 	AM_RANGE(0x3800, 0x3801) AM_DEVREADWRITE("ym", ym2203_r, ym2203_w)
-	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK1)
+	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK(1))
 	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
@@ -312,7 +312,7 @@ static WRITE8_DEVICE_HANDLER(chanbara_ay_out_1_w)
 
 static void sound_irq(const device_config *device, int linestate)
 {
-	cpu_set_input_line(device->machine->cpu[0],0,linestate);
+	cputag_set_input_line(device->machine, "maincpu", 0, linestate);
 }
 
 

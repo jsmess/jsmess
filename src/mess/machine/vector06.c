@@ -214,10 +214,10 @@ MACHINE_RESET( vector06 )
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	
 	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), vector06_irq_callback);
-	memory_install_read8_handler (space, 0x0000, 0x7fff, 0, 0, SMH_BANK1);
-	memory_install_write8_handler(space, 0x0000, 0x7fff, 0, 0, SMH_BANK2);
-	memory_install_read8_handler (space, 0x8000, 0xffff, 0, 0, SMH_BANK3);
-	memory_install_write8_handler(space, 0x8000, 0xffff, 0, 0, SMH_BANK4);
+	memory_install_read8_handler (space, 0x0000, 0x7fff, 0, 0, SMH_BANK(1));
+	memory_install_write8_handler(space, 0x0000, 0x7fff, 0, 0, SMH_BANK(2));
+	memory_install_read8_handler (space, 0x8000, 0xffff, 0, 0, SMH_BANK(3));
+	memory_install_write8_handler(space, 0x8000, 0xffff, 0, 0, SMH_BANK(4));
 
 	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0x10000);
 	memory_set_bankptr(machine, 2, mess_ram + 0x0000);

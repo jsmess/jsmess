@@ -48,7 +48,7 @@ VIDEO_START( policetr )
 	srcbitmap_height_mask = (memory_region_length(machine, "gfx1") / SRCBITMAP_WIDTH) - 1;
 
 	/* the destination bitmap is not directly accessible to the CPU */
-	dstbitmap = auto_malloc(DSTBITMAP_WIDTH * DSTBITMAP_HEIGHT);
+	dstbitmap = auto_alloc_array(machine, UINT8, DSTBITMAP_WIDTH * DSTBITMAP_HEIGHT);
 }
 
 
@@ -245,12 +245,12 @@ WRITE32_HANDLER( policetr_video_w )
 
 				/* latch 0x50 clears IRQ4 */
 				case 0x50:
-					cpu_set_input_line(space->machine->cpu[0], R3000_IRQ4, CLEAR_LINE);
+					cputag_set_input_line(space->machine, "audiocpu", R3000_IRQ4, CLEAR_LINE);
 					break;
 
 				/* latch 0x60 clears IRQ5 */
 				case 0x60:
-					cpu_set_input_line(space->machine->cpu[0], R3000_IRQ5, CLEAR_LINE);
+					cputag_set_input_line(space->machine, "audiocpu", R3000_IRQ5, CLEAR_LINE);
 					break;
 
 				/* log anything else */

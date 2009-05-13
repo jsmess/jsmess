@@ -1081,10 +1081,10 @@ VIDEO_START( psikyosh )
 {
 	int width = video_screen_get_width(machine->primary_screen);
 	int height = video_screen_get_height(machine->primary_screen);
-	z_bitmap = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
+	z_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 
 	/* Need 16-bit z-buffer */
-	zoom_bitmap = auto_bitmap_alloc(16*16, 16*16, BITMAP_FORMAT_INDEXED8);
+	zoom_bitmap = auto_bitmap_alloc(machine, 16*16, 16*16, BITMAP_FORMAT_INDEXED8);
 
 	machine->gfx[1]->color_granularity=16; /* 256 colour sprites with palette selectable on 16 colour boundaries */
 
@@ -1170,7 +1170,7 @@ VIDEO_UPDATE( psikyosh ) /* Note the z-buffer on each sprite to get correct prio
 
 VIDEO_EOF( psikyosh )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	buffer_spriteram32_w(space,0,0,0xffffffff);
 }

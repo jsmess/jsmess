@@ -60,11 +60,6 @@ PALETTE_INIT( ojankoy )
 	}
 }
 
-READ8_HANDLER( ojankohs_palette_r )
-{
-	return ojankohs_paletteram[offset];
-}
-
 WRITE8_HANDLER( ojankohs_palette_w )
 {
 	int r, g, b;
@@ -125,20 +120,10 @@ WRITE8_HANDLER( ojankoc_palette_w )
 
 ******************************************************************************/
 
-READ8_HANDLER( ojankohs_videoram_r )
-{
-	return ojankohs_videoram[offset];
-}
-
 WRITE8_HANDLER( ojankohs_videoram_w )
 {
 	ojankohs_videoram[offset] = data;
 	tilemap_mark_tile_dirty(ojankohs_tilemap, offset);
-}
-
-READ8_HANDLER( ojankohs_colorram_r )
-{
-	return ojankohs_colorram[offset];
 }
 
 WRITE8_HANDLER( ojankohs_colorram_w )
@@ -279,24 +264,24 @@ WRITE8_HANDLER( ojankoc_videoram_w )
 VIDEO_START( ojankohs )
 {
 	ojankohs_tilemap = tilemap_create(machine, ojankohs_get_tile_info, tilemap_scan_rows,  8, 4, 64, 64);
-	ojankohs_videoram = auto_malloc(0x2000);
-	ojankohs_colorram = auto_malloc(0x1000);
-	ojankohs_paletteram = auto_malloc(0x800);
+	ojankohs_videoram = auto_alloc_array(machine, UINT8, 0x2000);
+	ojankohs_colorram = auto_alloc_array(machine, UINT8, 0x1000);
+	ojankohs_paletteram = auto_alloc_array(machine, UINT8, 0x800);
 }
 
 VIDEO_START( ojankoy )
 {
 	ojankohs_tilemap = tilemap_create(machine, ojankoy_get_tile_info, tilemap_scan_rows,  8, 4, 64, 64);
-	ojankohs_videoram = auto_malloc(0x2000);
-	ojankohs_colorram = auto_malloc(0x1000);
-	ojankohs_paletteram = auto_malloc(0x800);
+	ojankohs_videoram = auto_alloc_array(machine, UINT8, 0x2000);
+	ojankohs_colorram = auto_alloc_array(machine, UINT8, 0x1000);
+	ojankohs_paletteram = auto_alloc_array(machine, UINT8, 0x800);
 }
 
 VIDEO_START( ojankoc )
 {
 	ojankoc_tmpbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	ojankohs_videoram = auto_malloc(0x8000);
-	ojankohs_paletteram = auto_malloc(0x20);
+	ojankohs_videoram = auto_alloc_array(machine, UINT8, 0x8000);
+	ojankohs_paletteram = auto_alloc_array(machine, UINT8, 0x20);
 }
 
 
@@ -321,7 +306,7 @@ VIDEO_UPDATE( ojankoc )
 
 	if (ojankoc_screen_refresh)
 	{
-		const address_space *space = cpu_get_address_space(screen->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+		const address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 		/* redraw bitmap */
 		for (offs = 0; offs < 0x8000; offs++) {

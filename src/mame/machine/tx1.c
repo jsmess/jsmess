@@ -174,7 +174,7 @@ static void sn_divide(running_machine *machine)
 	if (SN74S516.X == 0)
 	{
 		mame_printf_debug("%s:SN74S516 tried to divide by zero\n", cpuexec_describe_context(machine));
-		SN74S516.ZW.Z = 0xffff;
+		SN74S516.ZW.Z = (INT16)0xffff;
 		SN74S516.ZW.W = 0xffff;
 		SN74S516.ZWfl = 0;
 		return;
@@ -402,7 +402,7 @@ static void kick_sn74s516(running_machine *machine, UINT16 *data, const int ins)
 	}
 
 	math.dbgaddr = math.promaddr;
-	math.dbgpc = cpu_get_previouspc(machine->cpu[1]);
+	math.dbgpc = cpu_get_previouspc(cputag_get_cpu(machine, "math_cpu"));
 }
 
 

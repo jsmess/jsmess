@@ -111,8 +111,8 @@ static ADDRESS_MAP_START(mbee_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x1000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0x7fff) AM_WRITENOP	/* Needed because quickload to here will crash MESS otherwise */
 	AM_RANGE(0x8000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(SMH_BANK2, mbee_videoram_w) AM_SIZE(&videoram_size)
-	AM_RANGE(0xf800, 0xffff) AM_READWRITE(SMH_BANK3, mbee_pcg_w)
+	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(SMH_BANK(2), mbee_videoram_w) AM_SIZE(&videoram_size)
+	AM_RANGE(0xf800, 0xffff) AM_READWRITE(SMH_BANK(3), mbee_pcg_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mbeeic_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -120,8 +120,8 @@ static ADDRESS_MAP_START(mbeeic_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK(1)
 	AM_RANGE(0x1000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(SMH_BANK2, mbee_videoram_w) AM_SIZE(&videoram_size)
-	AM_RANGE(0xf800, 0xffff) AM_READWRITE(SMH_BANK3, mbee_pcg_color_w)
+	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(SMH_BANK(2), mbee_videoram_w) AM_SIZE(&videoram_size)
+	AM_RANGE(0xf800, 0xffff) AM_READWRITE(SMH_BANK(3), mbee_pcg_color_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mbeepc85_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -131,8 +131,8 @@ static ADDRESS_MAP_START(mbeepc85_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK(4)
 	AM_RANGE(0xe000, 0xefff) AM_ROMBANK(5)
-	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(SMH_BANK2, mbee_videoram_w) AM_SIZE(&videoram_size)
-	AM_RANGE(0xf800, 0xffff) AM_READWRITE(SMH_BANK3, mbee_pcg_color_w)
+	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(SMH_BANK(2), mbee_videoram_w) AM_SIZE(&videoram_size)
+	AM_RANGE(0xf800, 0xffff) AM_READWRITE(SMH_BANK(3), mbee_pcg_color_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mbee56_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -140,8 +140,8 @@ static ADDRESS_MAP_START(mbee56_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK(1)
 	AM_RANGE(0x1000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(SMH_BANK2, mbee_videoram_w) AM_SIZE(&videoram_size)
-	AM_RANGE(0xf800, 0xffff) AM_READWRITE(SMH_BANK3, mbee_pcg_color_w)
+	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(SMH_BANK(2), mbee_videoram_w) AM_SIZE(&videoram_size)
+	AM_RANGE(0xf800, 0xffff) AM_READWRITE(SMH_BANK(3), mbee_pcg_color_w)
 ADDRESS_MAP_END
 
 

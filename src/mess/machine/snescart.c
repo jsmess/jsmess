@@ -124,7 +124,7 @@ static void snes_load_sram(running_machine *machine)
 	UINT8 ii;
 	UINT8 *battery_ram, *ptr;
 
-	battery_ram = malloc_or_die(snes_cart.sram_max);
+	battery_ram = alloc_array_or_die(UINT8, snes_cart.sram_max);
 	ptr = battery_ram;
 	image_battery_load(devtag_get_device(machine, "cart"), battery_ram, snes_cart.sram_max);
 
@@ -170,7 +170,7 @@ static void snes_save_sram(running_machine *machine)
 	UINT8 ii;
 	UINT8 *battery_ram, *ptr;
 
-	battery_ram = malloc_or_die(snes_cart.sram_max);
+	battery_ram = alloc_array_or_die(UINT8, snes_cart.sram_max);
 	ptr = battery_ram;
 
 	if (snes_cart.mode == SNES_MODE_20)
@@ -341,7 +341,7 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 	int total_blocks, read_blocks;
 	UINT32 offset;
 	UINT8 header[512];
-	UINT8 *temp_buffer = auto_malloc(0x410000);
+	UINT8 *temp_buffer = auto_alloc_array(machine, UINT8, 0x410000);
 	UINT8 valid_mode20, valid_mode21, valid_mode25;
 
 	memory_region_alloc(machine, "maincpu", 0x1000000, 0);

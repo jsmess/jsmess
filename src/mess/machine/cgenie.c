@@ -132,7 +132,7 @@ MACHINE_RESET( cgenie )
 	{
 		if ( input_port_read(machine, "DSW0") & 0x80 )
 		{
-			memory_install_read8_handler(space, 0xc000, 0xdfff, 0, 0, SMH_BANK10);
+			memory_install_read8_handler(space, 0xc000, 0xdfff, 0, 0, SMH_BANK(10));
 			memory_install_write8_handler(space, 0xc000, 0xdfff, 0, 0, SMH_NOP);
 			memory_set_bankptr(machine, 10, &ROM[0x0c000]);
 			logerror("cgenie DOS enabled\n");
@@ -198,7 +198,7 @@ MACHINE_START( cgenie )
 		memset(gfx + i * 8, i, 8);
 
 	/* set up RAM */
-	memory_install_read8_handler(space, 0x4000, 0x4000 + mess_ram_size - 1, 0, 0, SMH_BANK1);
+	memory_install_read8_handler(space, 0x4000, 0x4000 + mess_ram_size - 1, 0, 0, SMH_BANK(1));
 	memory_install_write8_handler(space, 0x4000, 0x4000 + mess_ram_size - 1, 0, 0, cgenie_videoram_w);
 	videoram = mess_ram;
 	memory_set_bankptr(machine, 1, mess_ram);

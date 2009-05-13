@@ -357,11 +357,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(c64_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_BASE(&c64_memory)
-	AM_RANGE(0x8000, 0x9fff) AM_READWRITE(SMH_BANK1, SMH_BANK2)		/* ram or external roml */
+	AM_RANGE(0x8000, 0x9fff) AM_READWRITE(SMH_BANK(1), SMH_BANK(2))		/* ram or external roml */
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK(3) AM_WRITEONLY				/* ram or basic rom or external romh */
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(c64_ioarea_r, c64_ioarea_w)
-	AM_RANGE(0xe000, 0xffff) AM_READWRITE(SMH_BANK4, SMH_BANK5)	   /* ram or kernel rom or external romh */
+	AM_RANGE(0xe000, 0xffff) AM_READWRITE(SMH_BANK(4), SMH_BANK(5))	   /* ram or kernel rom or external romh */
 ADDRESS_MAP_END
 
 

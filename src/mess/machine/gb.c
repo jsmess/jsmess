@@ -319,7 +319,7 @@ MACHINE_RESET( sgb )
 	memory_set_bankptr(machine, 5, ROMMap[ROMBank00] ? ROMMap[ROMBank00] : gb_dummy_rom_bank );
 	memory_set_bankptr(machine, 10, ROMMap[ROMBank00] ? ROMMap[ROMBank00] + 0x0100 : gb_dummy_rom_bank + 0x0100 );
 
-	sgb_tile_data = auto_malloc( 0x2000 );
+	sgb_tile_data = auto_alloc_array_clear(machine, UINT8, 0x2000 );
 	memset( sgb_tile_data, 0, 0x2000 );
 
 	/* Initialize the Sound Registers */
@@ -1457,10 +1457,10 @@ DEVICE_START(gb_cart)
 {
 	int I;
 
-	gb_dummy_rom_bank = auto_malloc( 0x4000 );
+	gb_dummy_rom_bank = auto_alloc_array( device->machine, UINT8, 0x4000 );
 	memset( gb_dummy_rom_bank, 0xFF, 0x4000 );
 
-	gb_dummy_ram_bank = auto_malloc( 0x2000 );
+	gb_dummy_ram_bank = auto_alloc_array( device->machine, UINT8, 0x2000 );
 	memset( gb_dummy_ram_bank, 0x00, 0x2000 );
 
 	for(I = 0; I < MAX_ROMBANK; I++) 
@@ -1632,7 +1632,7 @@ DEVICE_IMAGE_LOAD(gb_cart)
 	}
 
 	/* Claim memory */
-	gb_cart = auto_malloc( filesize );
+	gb_cart = auto_alloc_array( image->machine, UINT8, filesize );
 
 	/* Read cartridge */
 	if ( image_fread( image, gb_cart, filesize ) != filesize ) 
@@ -1867,7 +1867,7 @@ DEVICE_IMAGE_LOAD(gb_cart)
 	if (RAMBanks && MBCType)
 	{
 		/* Claim memory */
-		gb_cart_ram = auto_malloc( RAMBanks * 0x2000 );
+		gb_cart_ram = auto_alloc_array( image->machine, UINT8, RAMBanks * 0x2000 );
 
 		for (I = 0; I < RAMBanks; I++)
 		{
@@ -1889,12 +1889,12 @@ DEVICE_IMAGE_LOAD(gb_cart)
 	/* If there's an RTC claim memory to store the RTC contents */
 	if ( CartType & TIMER ) 
 	{
-		MBC3RTCData = auto_malloc( 0x2000 );
+		MBC3RTCData = auto_alloc_array(image->machine, UINT8, 0x2000 );
 	}
 
 	if ( MBCType == MBC_TAMA5 ) 
 	{
-		MBC3RTCData = auto_malloc( 0x2000 );
+		MBC3RTCData = auto_alloc_array(image->machine, UINT8, 0x2000 );
 		memset( gbTama5Memory, 0xFF, sizeof(gbTama5Memory) );
 	}
 
@@ -2174,7 +2174,7 @@ DEVICE_IMAGE_LOAD(megaduck_cart)
 	}
 
 	/* Claim memory */
-	gb_cart = auto_malloc( filesize );
+	gb_cart = auto_alloc_array(image->machine, UINT8, filesize);
 
 	/* Read cartridge */
 	if (image_fread (image, gb_cart, filesize) != filesize) 

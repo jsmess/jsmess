@@ -439,7 +439,7 @@ static const ym2203_interface ym2203_interface_1 =
 
 static ADDRESS_MAP_START( map_main, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, UNBANKED_SIZE-1) AM_ROM
-	AM_RANGE(UNBANKED_SIZE, 0x7fff) AM_READ(SMH_BANK1)
+	AM_RANGE(UNBANKED_SIZE, 0x7fff) AM_READ(SMH_BANK(1))
 	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
 	AM_RANGE(0x8008, 0x8009) AM_DEVREADWRITE("ym2", ym2203_r, ym2203_w)
 	AM_RANGE(0xa000, 0xa00f) AM_READWRITE(read_a00x, write_a00x)
@@ -844,9 +844,9 @@ ROM_END
 static DRIVER_INIT(witch)
 {
  	UINT8 *ROM = (UINT8 *)memory_region(machine, "maincpu");
-	memory_set_bankptr(machine, 1,&ROM[0x10000+UNBANKED_SIZE]);
+	memory_set_bankptr(machine, 1, &ROM[0x10000+UNBANKED_SIZE]);
 
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x7000, 0x700f, 0, 0, prot_read_700x);
+	memory_install_read8_handler(cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM), 0x7000, 0x700f, 0, 0, prot_read_700x);
 	bank = -1;
 }
 

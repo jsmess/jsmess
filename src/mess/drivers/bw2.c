@@ -103,11 +103,11 @@ static void bw2_set_banks(running_machine *machine, UINT8 data)
 	switch (state->bank)
 	{
 	case BANK_RAM1:
-		memory_install_readwrite8_handler(cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x7fff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite8_handler(cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x7fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
 		break;
 
 	case BANK_VRAM:
-		memory_install_readwrite8_handler(cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0x4000, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite8_handler(cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0x4000, SMH_BANK(1), SMH_BANK(1));
 		break;
 
 	case BANK_RAM2:
@@ -121,12 +121,12 @@ static void bw2_set_banks(running_machine *machine, UINT8 data)
 		}
 		else
 		{
-			memory_install_readwrite8_handler(cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x7fff, 0, 0, SMH_BANK1, SMH_BANK1);
+			memory_install_readwrite8_handler(cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x7fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
 		}
 		break;
 
 	case BANK_ROM:
-		memory_install_readwrite8_handler(cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x7fff, 0, 0, SMH_BANK1, SMH_UNMAP);
+		memory_install_readwrite8_handler(cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x7fff, 0, 0, SMH_BANK(1), SMH_UNMAP);
 		break;
 	}
 
@@ -179,11 +179,11 @@ static void ramcard_set_banks(running_machine *machine, UINT8 data)
 	{
 	case BANK_RAM1:
 	case BANK_RAMCARD_RAM:
-		memory_install_readwrite8_handler(cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x7fff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite8_handler(cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x7fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
 		break;
 
 	case BANK_VRAM:
-		memory_install_readwrite8_handler(cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0x4000, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite8_handler(cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0x4000, SMH_BANK(1), SMH_BANK(1));
 		break;
 
 	case BANK_RAM3:
@@ -195,16 +195,16 @@ static void ramcard_set_banks(running_machine *machine, UINT8 data)
 		}
 		else
 		{
-			memory_install_readwrite8_handler(cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x7fff, 0, 0, SMH_BANK1, SMH_BANK1);
+			memory_install_readwrite8_handler(cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x7fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
 		}
 		break;
 
 	case BANK_RAMCARD_ROM:
-		memory_install_readwrite8_handler(cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0x4000, SMH_BANK1, SMH_UNMAP);
+		memory_install_readwrite8_handler(cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0x4000, SMH_BANK(1), SMH_UNMAP);
 		break;
 
 	case BANK_ROM:
-		memory_install_readwrite8_handler(cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x7fff, 0, 0, SMH_BANK1, SMH_UNMAP);
+		memory_install_readwrite8_handler(cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x7fff, 0, 0, SMH_BANK(1), SMH_UNMAP);
 		break;
 	}
 
@@ -224,7 +224,7 @@ static WRITE8_HANDLER( ramcard_bank_w )
 	}
 	else
 	{
-		memory_install_readwrite8_handler(cputag_get_address_space(space->machine, Z80_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x7fff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite8_handler(cputag_get_address_space(space->machine, Z80_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x7fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
 	}
 
 	memory_configure_bank(space->machine, 1, BANK_RAMCARD_RAM, 1, state->ramcard_ram + bank_offset, 0);
@@ -563,13 +563,13 @@ static DRIVER_INIT( bw2 )
 	bw2_state *state = machine->driver_data;
 
 	/* allocate work memory */
-	state->work_ram = auto_malloc(mess_ram_size);
+	state->work_ram = auto_alloc_array(machine, UINT8, mess_ram_size);
 
 	/* allocate video memory */
-	state->video_ram = auto_malloc(BW2_VIDEORAM_SIZE);
+	state->video_ram = auto_alloc_array(machine, UINT8, BW2_VIDEORAM_SIZE);
 
 	/* allocate RAMcard memory */
-	state->ramcard_ram = auto_malloc(BW2_RAMCARD_SIZE);
+	state->ramcard_ram = auto_alloc_array(machine, UINT8, BW2_RAMCARD_SIZE);
 }
 
 static MACHINE_START( bw2 )

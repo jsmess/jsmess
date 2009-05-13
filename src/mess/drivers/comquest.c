@@ -59,7 +59,7 @@ static WRITE8_HANDLER(comquest_write)
 #endif
 
 static ADDRESS_MAP_START( comquest_mem , ADDRESS_SPACE_PROGRAM, 8)
-//  { 0x0000, 0x7fff, SMH_BANK1 },
+//  { 0x0000, 0x7fff, SMH_BANK(1) },
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xffff) AM_READWRITE(SMH_ROM, SMH_RAM)
 //  { 0x8000, 0xffff, SMH_RAM }, // batterie buffered

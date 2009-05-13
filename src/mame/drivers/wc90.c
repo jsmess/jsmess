@@ -76,7 +76,7 @@ static WRITE8_HANDLER( wc90_bankswitch_w )
 
 
 	bankaddress = 0x10000 + ( ( data & 0xf8 ) << 8 );
-	memory_set_bankptr(space->machine,  1,&RAM[bankaddress] );
+	memory_set_bankptr(space->machine, 1, &RAM[bankaddress] );
 }
 
 static WRITE8_HANDLER( wc90_bankswitch1_w )
@@ -86,13 +86,13 @@ static WRITE8_HANDLER( wc90_bankswitch1_w )
 
 
 	bankaddress = 0x10000 + ( ( data & 0xf8 ) << 8 );
-	memory_set_bankptr(space->machine,  2,&RAM[bankaddress] );
+	memory_set_bankptr(space->machine, 2, &RAM[bankaddress] );
 }
 
 static WRITE8_HANDLER( wc90_sound_command_w )
 {
-	soundlatch_w(space,offset,data);
-	cpu_set_input_line(space->machine->cpu[2],INPUT_LINE_NMI,PULSE_LINE);
+	soundlatch_w(space, offset, data);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -105,7 +105,7 @@ static ADDRESS_MAP_START( wc90_map_1, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(wc90_bgvideoram_w) AM_BASE(&wc90_bgvideoram)
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(wc90_txvideoram_w) AM_BASE(&wc90_txvideoram)	/* tx video ram */
-	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(SMH_BANK1, SMH_ROM)
+	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(SMH_BANK(1), SMH_ROM)
 	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(wc90_shared_r, wc90_shared_w) AM_BASE(&wc90_shared)
 	AM_RANGE(0xfc00, 0xfc00) AM_READ_PORT("P1")
 	AM_RANGE(0xfc02, 0xfc02) AM_READ_PORT("P2")
@@ -135,7 +135,7 @@ static ADDRESS_MAP_START( wc90_map_2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_be_w) AM_BASE(&paletteram)
-	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(SMH_BANK2, SMH_ROM)
+	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(SMH_BANK(2), SMH_ROM)
 	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(wc90_shared_r, wc90_shared_w)
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(wc90_bankswitch1_w)
 	AM_RANGE(0xfc01, 0xfc01) AM_WRITE(watchdog_reset_w)
@@ -282,7 +282,7 @@ GFXDECODE_END
 /* handler called by the 2608 emulator when the internal timers cause an IRQ */
 static void irqhandler(const device_config *device, int irq)
 {
-	cpu_set_input_line(device->machine->cpu[2],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2608_interface ym2608_config =

@@ -695,7 +695,7 @@ static TIMER_CALLBACK( cchip_timer )
 	{
 		// Simulate time for command to execute (exact timing unknown, this is close)
 		current_cmd=0xf5;
-		timer_set(machine, cpu_clocks_to_attotime(machine->cpu[0],80000), NULL, 0, opwolf_timer_callback);
+		timer_set(machine, cputag_clocks_to_attotime(machine, "maincpu", 80000), NULL, 0, opwolf_timer_callback);
 	}
 	cchip_last_7a=cchip_ram[0x7a];
 
@@ -720,7 +720,7 @@ static TIMER_CALLBACK( cchip_timer )
 
 void opwolf_cchip_init(running_machine *machine)
 {
-	cchip_ram=auto_malloc(0x400 * 8);
+	cchip_ram=auto_alloc_array(machine, UINT8, 0x400 * 8);
 
 	state_save_register_global(machine, current_bank);
 	state_save_register_global(machine, current_cmd);

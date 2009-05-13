@@ -74,8 +74,8 @@ static ADDRESS_MAP_START( sms_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03FF) AM_ROMBANK(1)					/* First 0x0400 part always points to first page */
 	AM_RANGE(0x0400, 0x3FFF) AM_ROMBANK(2)					/* switchable rom bank */
 	AM_RANGE(0x4000, 0x7FFF) AM_ROMBANK(3)					/* switchable rom bank */
-	AM_RANGE(0x8000, 0x9FFF) AM_READWRITE(SMH_BANK4, sms_cartram_w)	/* ROM bank / on-cart RAM */
-	AM_RANGE(0xA000, 0xBFFF) AM_READWRITE(SMH_BANK5, sms_cartram2_w)	/* ROM bank / on-cart RAM */
+	AM_RANGE(0x8000, 0x9FFF) AM_READWRITE(SMH_BANK(4), sms_cartram_w)	/* ROM bank / on-cart RAM */
+	AM_RANGE(0xA000, 0xBFFF) AM_READWRITE(SMH_BANK(5), sms_cartram2_w)	/* ROM bank / on-cart RAM */
 	AM_RANGE(0xC000, 0xDFFB) AM_MIRROR(0x2000) AM_RAM			/* RAM (mirror at 0xE000) */
 	AM_RANGE(0xDFFC, 0xDFFF) AM_RAM						/* RAM "underneath" frame registers */
 	AM_RANGE(0xFFFC, 0xFFFF) AM_READWRITE(sms_mapper_r, sms_mapper_w)	/* Bankswitch control */

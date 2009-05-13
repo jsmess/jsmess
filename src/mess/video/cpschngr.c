@@ -573,8 +573,7 @@ VIDEO_START( cps1 )
 		palette_set_color(machine,i,MAKE_RGB(0,0,0));
 	}
 
-	cps1_buffered_obj = auto_malloc (cps1_obj_size);
-	memset(cps1_buffered_obj, 0x00, cps1_obj_size);
+	cps1_buffered_obj = auto_alloc_array_clear(machine, UINT16, cps1_obj_size / sizeof(UINT16));
 
 	memset(cps1_gfxram, 0, cps1_gfxram_size);   /* Clear GFX RAM */
 	memset(cps1_cps_a_regs, 0, 0x40);   /* Clear CPS-A registers */

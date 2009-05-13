@@ -74,7 +74,7 @@ static int tms9995_mode;
 */
 void ti99_usbsm_init(running_machine *machine)
 {
-	ti99_usbsm_RAM = auto_malloc(0x100000);
+	ti99_usbsm_RAM = auto_alloc_array(machine, UINT16, 0x100000/2);
 }
 
 /*

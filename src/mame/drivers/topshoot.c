@@ -136,6 +136,9 @@ connector, but of course, I can be wrong.
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
+#include "sound/sn76496.h"
+#include "sound/2612intf.h"
+
 #include "genesis.h"
 
 
@@ -220,7 +223,7 @@ static MACHINE_DRIVER_START( genesis_base )
 	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK / 7)
 	MDRV_CPU_VBLANK_INT("screen", genesis_vblank_interrupt)
 
-	MDRV_CPU_ADD("soundcpu", Z80, MASTER_CLOCK / 15)
+	MDRV_CPU_ADD("genesis_snd_z80", Z80, MASTER_CLOCK / 15)
 	MDRV_CPU_PROGRAM_MAP(genesis_z80_map, 0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold) /* from vdp at scanline 0xe0 */
 
@@ -282,7 +285,7 @@ static READ16_HANDLER( vdp_fake_r )
 static DRIVER_INIT(topshoot)
 {
 	/* hack -- fix vdp emulation instead */
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xC00004, 0xC00005, 0, 0, vdp_fake_r);
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xC00004, 0xC00005, 0, 0, vdp_fake_r);
 
 	memory_set_bankptr(machine, 3, memory_region(machine, "maincpu") );
 	memory_set_bankptr(machine, 4, genesis_68k_ram );

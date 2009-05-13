@@ -281,19 +281,19 @@ static WRITE8_HANDLER( bankswitch_w )
 	switch (mess_ram_size)
 	{
 	case 1 * 1024:
-		memory_install_readwrite8_handler(program, 0x0000, 0x03ff, 0, 0x7c00, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite8_handler(program, 0x0000, 0x03ff, 0, 0x7c00, SMH_BANK(1), SMH_BANK(1));
 		break;
 
 	case 2 * 1024:
-		memory_install_readwrite8_handler(program, 0x0000, 0x07ff, 0, 0x7800, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite8_handler(program, 0x0000, 0x07ff, 0, 0x7800, SMH_BANK(1), SMH_BANK(1));
 		break;
 
 	case 4 * 1024:
-		memory_install_readwrite8_handler(program, 0x0000, 0x0fff, 0, 0x7000, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite8_handler(program, 0x0000, 0x0fff, 0, 0x7000, SMH_BANK(1), SMH_BANK(1));
 		break;
 
 	case 32 * 1024:
-		memory_install_readwrite8_handler(program, 0x0000, 0x7fff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite8_handler(program, 0x0000, 0x7fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
 		break;
 	}
 }
@@ -582,7 +582,7 @@ static MACHINE_START( vip )
 
 	/* ROM banking */
 
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM), 0x8000, 0x81ff, 0, 0x7e00, SMH_BANK2, SMH_UNMAP);
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM), 0x8000, 0x81ff, 0, 0x7e00, SMH_BANK(2), SMH_UNMAP);
 	memory_configure_bank(machine, 2, 0, 1, memory_region(machine, CDP1802_TAG) + 0x8000, 0);
 	memory_set_bank(machine, 2, 0);
 
@@ -595,7 +595,7 @@ static MACHINE_START( vip )
 
 	/* allocate color RAM */
 	
-	state->colorram = auto_malloc(VP590_COLOR_RAM_SIZE);
+	state->colorram = auto_alloc_array(machine, UINT8, VP590_COLOR_RAM_SIZE);
 
 	/* enable power LED */
 
@@ -662,7 +662,7 @@ static MACHINE_RESET( vip )
 
 	/* enable ROM mirror at 0x0000 */
 
-	memory_install_readwrite8_handler(program, 0x0000, 0x01ff, 0, 0x7e00, SMH_BANK1, SMH_UNMAP);
+	memory_install_readwrite8_handler(program, 0x0000, 0x01ff, 0, 0x7e00, SMH_BANK(1), SMH_UNMAP);
 	memory_set_bank(machine, 1, VIP_BANK_ROM);
 }
 

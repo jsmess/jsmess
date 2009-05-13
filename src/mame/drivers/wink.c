@@ -56,7 +56,7 @@ static READ8_HANDLER( player_inputs_r )
 
 static WRITE8_HANDLER( sound_irq_w )
 {
-	cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
 	//sync with sound cpu (but it still loses some soundlatches...)
 	//timer_call_after_resynch(space->machine, NULL, 0, NULL);
 }
@@ -394,7 +394,7 @@ static DRIVER_INIT( wink )
 {
 	UINT32 i;
 	UINT8 *ROM = memory_region(machine, "maincpu");
-	UINT8 *buffer = malloc_or_die(0x8000);
+	UINT8 *buffer = alloc_array_or_die(UINT8, 0x8000);
 
 	// protection module reverse engineered by HIGHWAYMAN
 

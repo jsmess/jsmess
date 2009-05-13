@@ -204,7 +204,7 @@ static READ8_HANDLER( unknown_r )
 
 static WRITE8_HANDLER( unknown_w )
 {
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE ); //?
+	cputag_set_input_line(space->machine, "matrix", INPUT_LINE_NMI, CLEAR_LINE ); //?
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -226,7 +226,7 @@ void BFM_dm01_writedata(running_machine *machine, UINT8 data)
 	data_avail = 1;
 
   //pulse IRQ line
-	cpu_set_input_line(machine->cpu[1], M6809_IRQ_LINE, HOLD_LINE ); // trigger IRQ
+	cputag_set_input_line(machine, "matrix", M6809_IRQ_LINE, HOLD_LINE ); // trigger IRQ
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -240,7 +240,7 @@ INTERRUPT_GEN( bfm_dm01_vbl )
 
 VIDEO_START( bfm_dm01 )
 {
-	dm_bitmap = auto_bitmap_alloc(DM_BYTESPERROW*8, DM_MAXLINES,video_screen_get_format(machine->primary_screen));
+	dm_bitmap = auto_bitmap_alloc(machine, DM_BYTESPERROW*8, DM_MAXLINES,video_screen_get_format(machine->primary_screen));
 }
 
 ///////////////////////////////////////////////////////////////////////////

@@ -1266,7 +1266,7 @@ static ADDRESS_MAP_START( bnstars_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xfec08000, 0xfec0ffff) AM_RAM_WRITE(ms32_bg0_ram_w) AM_BASE(&ms32_bg0_ram)
 
 	AM_RANGE(0xfee00000, 0xfee1ffff) AM_RAM
-	AM_RANGE(0xffe00000, 0xffffffff) AM_READWRITE(SMH_BANK1, SMH_ROM)
+	AM_RANGE(0xffe00000, 0xffffffff) AM_READWRITE(SMH_BANK(1), SMH_ROM)
 ADDRESS_MAP_END
 
 #if 0
@@ -1290,14 +1290,14 @@ static IRQ_CALLBACK(irq_callback)
 static void irq_init(running_machine *machine)
 {
 	irqreq = 0;
-	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
-	cpu_set_irq_callback(machine->cpu[0], irq_callback);
+	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
+	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), irq_callback);
 }
 
 static void irq_raise(running_machine *machine, int level)
 {
 	irqreq |= (1<<level);
-	cpu_set_input_line(machine->cpu[0], 0, ASSERT_LINE);
+	cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 }
 
 

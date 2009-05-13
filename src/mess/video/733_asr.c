@@ -174,7 +174,7 @@ int asr733_init_term(running_machine *machine, int unit, void (*int_callback)(ru
 	int height = video_screen_get_height(screen);
 	const rectangle *visarea = video_screen_get_visible_area(screen);
 
-	asr[unit].bitmap = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
+	asr[unit].bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 
 	bitmap_fill(asr[unit].bitmap, visarea, 0);
 

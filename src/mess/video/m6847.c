@@ -1824,8 +1824,7 @@ void m6847_init(running_machine *machine, const m6847_config *cfg)
 	v = &variants[cfg->type];
 
 	/* allocate instance */
-	m6847 = auto_malloc(sizeof(*m6847));
-	memset(m6847, 0, sizeof(*m6847));
+	m6847 = auto_alloc_clear(machine, m6847_vdg);
 	set_dirty();
 
 	/* copy configuration */

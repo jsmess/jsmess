@@ -322,7 +322,7 @@ DRIVER_INIT( nascom1 )
 
 	case 16 * 1024:
 		memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),
-			0x1400, 0x4fff, 0, 0, SMH_BANK1, SMH_BANK1);
+			0x1400, 0x4fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
 		memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),
 			0x5000, 0xafff, 0, 0, SMH_NOP, SMH_NOP);
 		memory_set_bankptr(machine, 1, mess_ram);
@@ -330,7 +330,7 @@ DRIVER_INIT( nascom1 )
 
 	case 32 * 1024:
 		memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),
-			0x1400, 0x8fff, 0, 0, SMH_BANK1, SMH_BANK1);
+			0x1400, 0x8fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
 		memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),
 			0x9000, 0xafff, 0, 0, SMH_NOP, SMH_NOP);
 		memory_set_bankptr(machine, 1, mess_ram);
@@ -338,7 +338,7 @@ DRIVER_INIT( nascom1 )
 
 	case 40 * 1024:
 		memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),
-			0x1400, 0xafff, 0, 0, SMH_BANK1, SMH_BANK1);
+			0x1400, 0xafff, 0, 0, SMH_BANK(1), SMH_BANK(1));
 		memory_set_bankptr(machine, 1, mess_ram);
 		break;
 	}

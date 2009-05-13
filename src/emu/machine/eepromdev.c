@@ -361,7 +361,7 @@ void *eepromdev_get_data_pointer(const device_config *device, UINT32 *length, UI
 
 static DEVICE_NVRAM( eeprom )
 {
-	const eeprom_config *config = device->inline_config;
+	const eeprom_config *config = (const eeprom_config *)device->inline_config;
 
 	if (read_or_write)
 		eepromdev_save(device, file);
@@ -384,7 +384,7 @@ static DEVICE_START(eeprom)
 	assert(device->machine != NULL);
 	assert(device->machine->config != NULL);
 
-	config = device->inline_config;
+	config = (const eeprom_config *)device->inline_config;
 
 	c->intf = config->pinterface;
 
@@ -422,14 +422,6 @@ static DEVICE_RESET(eeprom)
 {
 }
 
-static DEVICE_SET_INFO(eeprom)
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
 DEVICE_GET_INFO(eeprom)
 {
 	switch (state)
@@ -440,7 +432,6 @@ DEVICE_GET_INFO(eeprom)
 		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_PERIPHERAL; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:				info->set_info = DEVICE_SET_INFO_NAME(eeprom); break;
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(eeprom); break;
 		case DEVINFO_FCT_STOP:					/* nothing */ break;
 		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(eeprom); break;

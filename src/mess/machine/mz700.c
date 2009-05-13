@@ -88,8 +88,8 @@ DRIVER_INIT( mz700 )
 	mz->mz700_mode = TRUE;
 
 	videoram_size = 0x800;
-	videoram = auto_malloc(videoram_size);
-	colorram = auto_malloc(0x800);
+	videoram = auto_alloc_array(machine, UINT8, videoram_size);
+	colorram = auto_alloc_array(machine, UINT8, 0x800);
 }
 
 DRIVER_INIT( mz800 )
@@ -100,11 +100,11 @@ DRIVER_INIT( mz800 )
 
 	/* video ram */
 	videoram_size = 0x4000;
-	videoram = auto_malloc(videoram_size);
+	videoram = auto_alloc_array(machine, UINT8, videoram_size);
 	colorram = videoram + 0x800;
 
 	/* character generator ram */
-	mz->cgram = auto_malloc(0x1000);
+	mz->cgram = auto_alloc_array(machine, UINT8, 0x1000);
 }
 
 MACHINE_START( mz700 )

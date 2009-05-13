@@ -103,9 +103,9 @@ static VIDEO_START( comx35 )
 
 	// allocate memory
 
-	state->pageram = auto_malloc(COMX35_PAGERAM_SIZE);
-	state->charram = auto_malloc(COMX35_CHARRAM_SIZE);
-	state->videoram = auto_malloc(COMX35_VIDEORAM_SIZE);
+	state->pageram = auto_alloc_array(machine, UINT8, COMX35_PAGERAM_SIZE);
+	state->charram = auto_alloc_array(machine, UINT8, COMX35_CHARRAM_SIZE);
+	state->videoram = auto_alloc_array(machine, UINT8, COMX35_VIDEORAM_SIZE);
 
 	// register for save state
 

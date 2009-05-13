@@ -3,6 +3,7 @@
 Driver by David Haywood, ElSemi, and Andrew Gardner.
 Rasterizing code provided in part by Andrew Zaferakis.
 
+
 Notes:
   * The top board is likely identical for all revisions and all "versions" of the hardware.
     It contains the main MIPS CPU and a secondary communications KL5C80.
@@ -15,7 +16,6 @@ Notes:
     It probably has a lot to do with the network (Roads Edge network connectors are on this board).
     And since it can return any value at any time, it may be responsible for fatfurwa's missing palette.
   * The Toshiba CPU datasheet is here : http://www.semicon.toshiba.co.jp/openb2b/websearch/productDetails.jsp?partKey=TMP87CH40N
-  * The internal ROM needs dumping.  Rumor has it, it's the same MCU as in Naomi hardware...
 
   * From the Roads Edge manual : "The Network Check screen will be displayed for about 40 seconds whether
                                   the cabinet is connected for communication competition or not.  After this,
@@ -44,7 +44,8 @@ ToDo:
   * upgrade to modern video timing.
 
   3d:
-  * Find where the remainder of the 3d display list information is 'hiding' (FIFO?)
+  * Find where the remainder of the 3d display list information is 'hiding'
+    -- should the 3d 'ram' be treated like a fifo, instead of like RAM (see Dreamcast etc.)
   * Remaining 3d bits - glowing, etc.
   * Populate the display buffers
   * Does the hng64 do perspective-correct texture mapping?  Doesn't look like it...
@@ -57,18 +58,6 @@ ToDo:
   * backup ram etc.
   * correct cpu speed and find idle skips
   * What is ROM1?  Data for the KL5C80?  There's plenty of physical space to map it to.
-*/
-
-/*
-Known games on this system
-
-Beast Busters 2nd Nightmare ( http://emustatus.rainemu.com/games/bbustr2nd.htm )
-Buriki One ( http://emustatus.rainemu.com/games/buriki1.htm )
-Fatal Fury: Wild Ambition ( http://emustatus.rainemu.com/games/ffurywa.htm )
-Roads Edge / Round Trip? ( http://emustatus.rainemu.com/games/redge.htm )
-Samurai Shodown 64 ( http://emustatus.rainemu.com/games/sams64.htm )
-Samurai Shodown: Warrior's Rage ( http://emustatus.rainemu.com/games/samswr.htm )
-Xtreme Rally / Offbeat Racer ( http://emustatus.rainemu.com/games/xrally.htm )
 */
 
 /*
@@ -463,12 +452,14 @@ or Fatal Fury for example).
 #include "deprecat.h"
 #include "cpu/mips/mips3.h"
 
+static int hng64_boothack = 0;
 static UINT32 *rombase;
 static UINT32 *hng_mainram;
 static UINT32 *hng_cart;
 static UINT32 *hng64_dualport;
 static UINT32 *hng64_sram;
 static UINT16 *hng64_soundram;
+static UINT32 *hng64_sysregs;
 
 // Stuff from over in video...
 extern tilemap *hng64_tilemap0, *hng64_tilemap1, *hng64_tilemap2, *hng64_tilemap3 ;
@@ -627,29 +618,62 @@ static WRITE32_HANDLER( hng64_pal_w )
 	//if (a != 0)
 	//  popmessage("Alpha is not zero!") ;
 
-	palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
+	// sams64 / sams64_2 never write a palette, why not?
+	if (hng64_boothack!=1)
+		palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
 }
 
-static READ32_HANDLER( hng64_port_read )
+static READ32_HANDLER( hng64_sysregs_r )
 {
-	logerror("HNG64 port read (PC=%08x) 0x%08x\n", cpu_get_pc(space->cpu),offset*4);
+	mame_system_time systime;
+	mame_get_base_datetime(space->machine, &systime);
 
-	if(offset==0x421) return 0x00000002;
- 	if(offset==0x441) return hng64_interrupt_level_request;
+	//if(((offset*4) & 0xff00) == 0x2100)
+	//  printf("HNG64 port read (PC=%08x) 0x%08x\n", cpu_get_pc(space->cpu),offset*4);
 
-	if(offset==0x85b) return 0x00000010;
+	switch(offset*4)
+	{
+		case 0x001c: return mame_rand(space->machine); // hng64 hangs on start-up if zero.
+		//case 0x106c:
+		//case 0x107c:
+		case 0x1084: return 0x00000002; //???
+		//case 0x108c:
+		case 0x1104: return hng64_interrupt_level_request;
+		case 0x1254: return 0x00000000; //dma status, 0x800
+		/* 4-bit RTC */
+		case 0x2104: return (systime.local_time.second % 10);
+		case 0x210c: return (systime.local_time.second / 10);
+		case 0x2114: return (systime.local_time.minute % 10);
+		case 0x211c: return (systime.local_time.minute / 10);
+		case 0x2124: return (systime.local_time.hour % 10);
+		case 0x212c: return (systime.local_time.hour / 10);
+		case 0x2134: return (systime.local_time.mday % 10);
+		case 0x213c: return (systime.local_time.mday / 10);
+		case 0x2144: return ((systime.local_time.month+1) % 10);
+		case 0x214c: return ((systime.local_time.month+1) / 10);
+		case 0x2154: return (systime.local_time.year%10);
+		case 0x215c: return ((systime.local_time.year%100)/10);
+		case 0x2164: return (systime.local_time.weekday);
 
-	return mame_rand(space->machine)&0xffffffff;
+		case 0x216c: return 0x00000010; //enables "system log reader"
+
+		case 0x217c: return 0; //RTC status?
+	}
+
+	//printf("%08x\n",offset*4);
+
+	//return mame_rand(space->machine)&0xffffffff;
+	return hng64_sysregs[offset];
 }
-
 
 /* preliminary dma code, dma is used to copy program code -> ram */
-static int hng_dma_start,hng_dma_dst,hng_dma_len;
+static INT32 hng_dma_start,hng_dma_dst,hng_dma_len;
+
 static void hng64_do_dma (const address_space *space)
 {
-	logerror("Performing DMA Start %08x Len %08x Dst %08x\n",hng_dma_start, hng_dma_len, hng_dma_dst);
+	printf("Performing DMA Start %08x Len %08x Dst %08x\n",hng_dma_start, hng_dma_len, hng_dma_dst);
 
-	while (hng_dma_len>0)
+	while (hng_dma_len>=0)
 	{
 		UINT32 dat;
 
@@ -659,48 +683,37 @@ static void hng64_do_dma (const address_space *space)
 		hng_dma_dst+=4;
 		hng_dma_len--;
 	}
-
-	hng_dma_start+=4;
-	hng_dma_dst+=4;
 }
 
+/*
+//  AM_RANGE(0x1F70100C, 0x1F70100F) AM_WRITENOP        // ?? often
+//  AM_RANGE(0x1F70101C, 0x1F70101F) AM_WRITENOP        // ?? often
+//  AM_RANGE(0x1F70106C, 0x1F70106F) AM_WRITENOP        // fatfur,strange
+//  AM_RANGE(0x1F701084, 0x1F701087) AM_RAM
+//  AM_RANGE(0x1F70111C, 0x1F70111F) AM_WRITENOP        // irq ack
 
-static WRITE32_HANDLER( hng_dma_start_w )
+//  AM_RANGE(0x1F70124C, 0x1F70124F) AM_WRITENOP        // dma related?
+//  AM_RANGE(0x1F70125C, 0x1F70125F) AM_WRITENOP        // dma related?
+//  AM_RANGE(0x1F7021C4, 0x1F7021C7) AM_WRITENOP        // ?? often
+
+*/
+
+static WRITE32_HANDLER( hng64_sysregs_w )
 {
-	logerror ("DMA Start Write %08x\n",data);
-	hng_dma_start = data;
+	COMBINE_DATA (&hng64_sysregs[offset]);
+	switch(offset*4)
+	{
+		case 0x111c: /* irq ack */ break;
+		case 0x1204: hng_dma_start = hng64_sysregs[offset]; break;
+		case 0x1214: hng_dma_dst = hng64_sysregs[offset]; break;
+		case 0x1224:
+			hng_dma_len = hng64_sysregs[offset];
+			hng64_do_dma(space);
+			break;
+		default:
+			logerror("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, hng64_sysregs[offset], cpu_get_pc(space->cpu));
+	}
 }
-
-static WRITE32_HANDLER( hng_dma_dst_w )
-{
-	logerror ("DMA Dst Write %08x\n",data);
-	hng_dma_dst = data;
-}
-
-static WRITE32_HANDLER( hng_dma_len_w )
-{
-	logerror ("DMA Len Write %08x\n",data);
-	hng_dma_len = data;
-	hng64_do_dma(space);
-
-}
-
-#ifdef UNUSED_FUNCTION
-READ32_HANDLER( hng64_videoram_r )
-{
-	return hng64_videoram[offset];
-}
-
-WRITE32_HANDLER( hng64_mainram_w )
-{
-	COMBINE_DATA (&hng_mainram[offset]);
-}
-
-READ32_HANDLER( hng64_cart_r )
-{
-	return hng_cart[offset];
-}
-#endif
 
 static READ32_HANDLER( hng64_sram_r )
 {
@@ -720,20 +733,36 @@ static WRITE32_HANDLER( hng64_dualport_w )
 	COMBINE_DATA (&hng64_dualport[offset]);
 }
 
+
 static READ32_HANDLER( hng64_dualport_r )
 {
+	static int toggle = 0;
+
 	logerror("dualport R %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], cpu_get_pc(space->cpu));
 
 	// These hacks create some red marks for the boot-up sequence
 	switch (offset*4)
 	{
 		//SamSho64
-//      case 0x00:  toggi^=1; if (toggi==1) {return 0x00000400;} else {return 0x00000300;};
+        case 0x00:
+		{
+
+			if (hng64_boothack == 1) // ss64
+			{
+				toggle^=1; if (toggle==1) {return 0x00000400;} else {return 0x00000300;};
+			}
+			else if (hng64_boothack == 2) // ffwa
+			{
+				return 0x00000400;
+			}
+
+			return mame_rand(space->machine);
+		}
+
 		//RoadsEdge
 //      case 0x00:  return input_port_read(space->machine, "IPT_TEST");
 
-		//Fatfurwa
-		case 0x00:  return 0x00000400;
+
 		case 0x04:  return input_port_read(space->machine, "SYSTEM");
 		case 0x08:  return input_port_read(space->machine, "P1_P2");
 
@@ -777,47 +806,39 @@ static WRITE32_HANDLER( hng64_3d_2_w )
 
 
 // The 3d 'display list'
+// is it a fifo?
+// sams64 / sams64_2 access it in a very different way to fatal fury...
 static WRITE32_HANDLER( dl_w )
 {
 	COMBINE_DATA (&hng64_dl[offset]) ;
-
-	// !!! There are a few other writes over 0x80 as well - don't forget about those someday !!!
-
-	// This method of finding the 85 writes and switching banks seems to work
-	//  the problem is when there are a lot of things to be drawn (more than what can fit in 2*0x80)
-	//  the list doesn't fit anymore, and parts aren't drawn every frame.
-
-	if (offset == 0x85)
-	{
-		// Only if it's VALID
-		if ((INT32)hng64_dl[offset] == 1 || (INT32)hng64_dl[offset] == 2)
-			activeBuffer = (INT32)hng64_dl[offset] - 1 ;		// Subtract 1 to fit into my array...
-	}
-
-	if (offset <= 0x80)
-		hng64_dls[activeBuffer][offset] = hng64_dl[offset] ;
-
-	// For some reason, if the value at 0x86 and'ed with 0x02 is non-zero, the software just keeps
-	//   checking 0x86 until and'ing it with 2 returns 0...  What could change 0x86 if cpu0 is in this infinite loop?
-	//   Why 0x2?  And why (see below) does a read of 0x86 only happen when there is data 'hiding'
-	//   in the display list?
-
-	// Sends the program into an infinite loop...
-//  if (offset == 0x85 && hng64_dl[offset] == 0x1)      // Just before the second half of the writes
-//      hng64_dl[0x86] = 0x2 ;                          // set 0x86 to 2 (so it drops into the loop)
-
-//  mame_printf_debug("dl W (%08x) : %.8x %.8x\n", cpu_get_pc(space->cpu), offset, hng64_dl[offset]) ;
 }
 
+#if 0
 static READ32_HANDLER( dl_r )
 {
-	// A read of 0x86 ONLY happens if there are more display lists than what are readily available.
-	// (PC = 8006fe1c)
+
 
 //  mame_printf_debug("dl R (%08x) : %x %x\n", cpu_get_pc(space->cpu), offset, hng64_dl[offset]) ;
 //  usrintf_showmessage("dl R (%08x) : %x %x", cpu_get_pc(space->cpu), offset, hng64_dl[offset]) ;
 	return hng64_dl[offset] ;
 }
+#endif
+
+// A read at 0x20300217 ONLY happens if there are more display lists than what are readily available.
+
+// Some kind of buffering of the display lists, or 'render current buffer' write?
+static WRITE32_HANDLER( dl_control_w )
+{
+	if (activeBuffer==0 || activeBuffer==1)
+		memcpy(&hng64_dls[activeBuffer][0],&hng64_dl[0],0x200);
+
+	// Only if it's VALID (hack)
+	if (data == 1 || data == 2)
+		activeBuffer = data - 1;
+
+}
+
+
 
 #ifdef UNUSED_FUNCTION
 WRITE32_HANDLER( activate_3d_buffer )
@@ -847,7 +868,7 @@ static WRITE32_HANDLER( tcram_w )
     if (offset == 0x0000000b)
     {
         sprintf(writeString, "%s %.8x ", writeString, hng64_tcram[offset]) ;
-//      popmessage("%s", writeString) ;
+//      _("%s", writeString) ;
     }
 */
 }
@@ -903,19 +924,7 @@ static ADDRESS_MAP_START( hng_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x04000000, 0x05ffffff) AM_WRITENOP AM_ROM AM_REGION("user3",0) AM_BASE(&hng_cart)
 
 	// Ports
-	AM_RANGE(0x1F700000, 0x1F702fff) AM_READ(hng64_port_read)
-
-//  AM_RANGE(0x1F70100C, 0x1F70100F) AM_WRITENOP        // ?? often
-//  AM_RANGE(0x1F70101C, 0x1F70101F) AM_WRITENOP        // ?? often
-//  AM_RANGE(0x1F70106C, 0x1F70106F) AM_WRITENOP        // fatfur,strange
-//  AM_RANGE(0x1F701084, 0x1F701087) AM_RAM
-//  AM_RANGE(0x1F70111C, 0x1F70111F) AM_WRITENOP        // irq ack
-	AM_RANGE(0x1F701204, 0x1F701207) AM_WRITE(hng_dma_start_w)
-	AM_RANGE(0x1F701214, 0x1F701217) AM_WRITE(hng_dma_dst_w)
-	AM_RANGE(0x1F701224, 0x1F701227) AM_WRITE(hng_dma_len_w)
-//  AM_RANGE(0x1F70124C, 0x1F70124F) AM_WRITENOP        // dma related?
-//  AM_RANGE(0x1F70125C, 0x1F70125F) AM_WRITENOP        // dma related?
-//  AM_RANGE(0x1F7021C4, 0x1F7021C7) AM_WRITENOP        // ?? often
+	AM_RANGE(0x1f700000, 0x1f702fff) AM_READWRITE(hng64_sysregs_r,hng64_sysregs_w) AM_BASE(&hng64_sysregs)
 
 	// SRAM.  Coin data, Player Statistics, etc.
 	AM_RANGE(0x1F800000, 0x1F803fff) AM_READWRITE(hng64_sram_r, hng64_sram_w) AM_BASE(&hng64_sram)
@@ -933,7 +942,8 @@ static ADDRESS_MAP_START( hng_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x20190000, 0x20190037) AM_RAM AM_BASE(&hng64_videoregs)									// Video Registers
 	AM_RANGE(0x20200000, 0x20203fff) AM_READWRITE(SMH_RAM,hng64_pal_w) AM_BASE(&paletteram32)			// Palette
 	AM_RANGE(0x20208000, 0x2020805f) AM_READWRITE(tcram_r, tcram_w) AM_BASE(&hng64_tcram)				// Transition Control
-	AM_RANGE(0x20300000, 0x2030ffff) AM_READWRITE(dl_r, dl_w) AM_BASE(&hng64_dl)						// 3d Display List
+	AM_RANGE(0x20300000, 0x203001ff) AM_WRITE(dl_w) AM_BASE(&hng64_dl)						// 3d Display List
+	AM_RANGE(0x20300214, 0x20300217) AM_WRITE(dl_control_w)
 
 	// 3d?
 //  AM_RANGE(0x30000000, 0x3000002f) AM_READWRITE(q2_r, q2_w) AM_BASE(&hng64_q2)
@@ -1242,8 +1252,8 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( hng_sound_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x00000, 0x3ffff) AM_READ(SMH_BANK2)
-	AM_RANGE(0xe0000, 0xfffff) AM_READ(SMH_BANK1)
+	AM_RANGE(0x00000, 0x3ffff) AM_READ(SMH_BANK(2))
+	AM_RANGE(0xe0000, 0xfffff) AM_READ(SMH_BANK(1))
 ADDRESS_MAP_END
 
 
@@ -1324,60 +1334,72 @@ INPUT_PORTS_END
 
 
 
-/* the 4bpp gfx encoding is annoying */
-
-static const gfx_layout hng64_4_even_layout =
+static const gfx_layout hng64_8x8x4_tilelayout =
 {
 	8,8,
 	RGN_FRAC(1,1),
 	4,
 	{ 0,1,2,3 },
-	{ 40, 44, 8,12,  32,36,    0,4},
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64 },
-	8*64
+	{ 24, 28, 8,12,  16,20,    0,4},
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	8*32
 };
 
-static const gfx_layout hng64_4_odd_layout =
+static const gfx_layout hng64_8x8x8_tilelayout =
 {
 	8,8,
 	RGN_FRAC(1,1),
+	8,
+	{ 0,1,2,3,4,5,6,7 },
+	{ 24, 8, 16, 0, 256+24, 256+8, 256+16, 256+0},
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	16*32
+};
+
+static const gfx_layout hng64_16x16x4_tilelayout =
+{
+	16,16,
+	RGN_FRAC(1,1),
 	4,
 	{ 0,1,2,3 },
-	{  56,60, 24, 28,  48,52,   16, 20 },
+	{ 24, 28, 8,12,  16,20,    0,4,
+	256+24,256+28,256+8,256+12,256+16,256+20,256+0,256+4
 
-
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64 },
-	8*64
+	},
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32, 16*32,17*32,18*32,19*32,20*32,21*32,22*32,23*32 },
+	32*32
 };
 
 
-static const gfx_layout hng64_4_16_layout =
+static const gfx_layout hng64_16x16x8_tilelayout =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	8,
+	{ 0,1,2,3,4,5,6,7 },
+	{ 24, 8, 16, 0,
+	256+24, 256+8, 256+16, 256+0,
+	1024+24,1024+8,1024+16,1024+0,
+	1280+24,1280+8,1280+16,1280+0,
+	},
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
+	  16*32,17*32,18*32,19*32,20*32,21*32,22*32,22*32,23*32
+	},
+	64*32
+};
+
+static const gfx_layout hng64_16x16x4_spritelayout =
 {
 	16,16,
 	RGN_FRAC(1,1),
 	4,
 	{ 0,1,2,3 },
 	{  56,60, 24, 28,  48,52,   16, 20,40, 44, 8,12,  32,36,    0,4 },
-
-
 	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,8*64,9*64,10*64,11*64,12*64,13*64,14*64,15*64 },
 	16*64
 };
 
-
-static const gfx_layout hng64_layout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	8,
-	{ 0,1,2,3,4,5,6,7 },
-	{ 56, 24, 48,16,  40, 8,  32, 0 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64 },
-	8*64
-};
-
-
-static const gfx_layout hng64_16_layout =
+static const gfx_layout hng64_16x16x8_spritelayout =
 {
 	16,16,
 	RGN_FRAC(1,1),
@@ -1391,29 +1413,111 @@ static const gfx_layout hng64_16_layout =
 };
 
 
+static const UINT32 texlayout_xoffset[1024] =
+{
+	STEP1024(0,8),
+
+};
+
+static const UINT32 texlayout_yoffset[512] =
+{
+	STEP512(0,8192),
+};
+
+static const gfx_layout hng64_texlayout =
+{
+	1024, 512,
+	RGN_FRAC(1,1),
+	8,
+	{ 0,1,2,3,4,5,6,7 },
+	EXTENDED_XOFFS,
+	EXTENDED_YOFFS,
+	1024*512*8,
+	texlayout_xoffset,
+	texlayout_yoffset
+};
+
+
 static GFXDECODE_START( hng64 )
-	GFXDECODE_ENTRY( "gfx1", 0, hng64_4_even_layout, 0x0, 0x100 ) /* scrolltiles */
-	GFXDECODE_ENTRY( "gfx1", 0, hng64_4_odd_layout,  0x0, 0x100 ) /* scrolltiles */
-	GFXDECODE_ENTRY( "gfx1", 0, hng64_layout,        0x0, 0x10 )  /* scrolltiles */
-	GFXDECODE_ENTRY( "gfx1", 0, hng64_16_layout,     0x0, 0x10 )  /* scroll tiles */
-	GFXDECODE_ENTRY( "gfx2", 0, hng64_4_16_layout,   0x0, 0x100 ) /* sprite tiles */
-	GFXDECODE_ENTRY( "gfx2", 0, hng64_16_layout,     0x0, 0x10 )  /* sprite tiles */
+
+	/* tilemap tiles */
+	GFXDECODE_ENTRY( "scrtile", 0, hng64_8x8x4_tilelayout,  0x0, 0x100 )
+	GFXDECODE_ENTRY( "scrtile", 0, hng64_8x8x8_tilelayout,  0x0, 0x10 )
+	GFXDECODE_ENTRY( "scrtile", 0, hng64_16x16x4_tilelayout,0x0, 0x100 )
+	GFXDECODE_ENTRY( "scrtile", 0, hng64_16x16x8_tilelayout,0x0, 0x10 )
+
+	/* sprite tiles */
+	GFXDECODE_ENTRY( "sprtile", 0, hng64_16x16x4_spritelayout, 0x0, 0x100 )
+	GFXDECODE_ENTRY( "sprtile", 0, hng64_16x16x8_spritelayout, 0x0, 0x10 )
+
+	GFXDECODE_ENTRY( "textures", 0, hng64_texlayout,     0x0, 0x10 )  /* textures */
 GFXDECODE_END
+
+static void hng64_reorder(UINT8* gfxregion, size_t gfxregionsize)
+{
+	// by default 2 4bpp tiles are stored in each 8bpp tile, this makes decoding in MAME harder than it needs to be
+	// reorder them
+	UINT8* buffer;
+	int i;
+	UINT8 tilesize = 4*8; // 4 bytes per line, 8 lines
+
+	buffer = alloc_array_or_die(UINT8, gfxregionsize);
+
+	for (i=0;i<gfxregionsize/2;i+=tilesize)
+	{
+		memcpy((buffer+i*2)+tilesize, gfxregion+i,                   tilesize);
+		memcpy((buffer+i*2),          gfxregion+i+(gfxregionsize/2), tilesize);
+	}
+
+	memcpy(gfxregion, buffer, gfxregionsize);
+
+	free (buffer);
+
+}
+
+
+static DRIVER_INIT( hng64_reorder_gfx )
+{
+	hng64_reorder(memory_region(machine,"scrtile"), memory_region_length(machine, "scrtile"));
+}
+
+
 
 static DRIVER_INIT( hng64 )
 {
-	hng64_soundram=auto_malloc(0x200000);
+	hng64_soundram=auto_alloc_array(machine, UINT16, 0x200000/2);
+	DRIVER_INIT_CALL(hng64_reorder_gfx);
 }
 
 static DRIVER_INIT(hng64_fght)
 {
-	no_machine_error_code=0x01010101;
+	no_machine_error_code=0x01000000;
 	DRIVER_INIT_CALL(hng64);
 }
 
+static DRIVER_INIT( fatfurwa )
+{
+	DRIVER_INIT_CALL(hng64_fght);
+	hng64_boothack = 2;
+}
+
+static DRIVER_INIT( ss64 )
+{
+	DRIVER_INIT_CALL(hng64_fght);
+	hng64_boothack = 1;
+}
+
+
 static DRIVER_INIT(hng64_race)
 {
-	no_machine_error_code=0x02020202;
+	no_machine_error_code=0x02000000;
+	DRIVER_INIT_CALL(hng64);
+}
+
+static DRIVER_INIT(hng64_shoot)
+{
+	hng64_boothack = 2;
+	no_machine_error_code=0x03000000;
 	DRIVER_INIT_CALL(hng64);
 }
 
@@ -1428,7 +1532,7 @@ static const mips3_config config =
 
 static TIMER_CALLBACK( irq_stop )
 {
-	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
 }
 
 static INTERRUPT_GEN( irq_start )
@@ -1454,12 +1558,12 @@ static INTERRUPT_GEN( irq_start )
 static MACHINE_START(hyperneo)
 {
 	/* set the fastest DRC options */
-	mips3drc_set_options(machine->cpu[0], MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
+	mips3drc_set_options(cputag_get_cpu(machine, "maincpu"), MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
 
 	/* configure fast RAM regions for DRC */
-	mips3drc_add_fastram(machine->cpu[0], 0x00000000, 0x00ffffff, FALSE, hng_mainram);
-	mips3drc_add_fastram(machine->cpu[0], 0x04000000, 0x05ffffff, TRUE,  hng_cart);
-	mips3drc_add_fastram(machine->cpu[0], 0x1fc00000, 0x1fc7ffff, TRUE,  rombase);
+	mips3drc_add_fastram(cputag_get_cpu(machine, "maincpu"), 0x00000000, 0x00ffffff, FALSE, hng_mainram);
+	mips3drc_add_fastram(cputag_get_cpu(machine, "maincpu"), 0x04000000, 0x05ffffff, TRUE,  hng_cart);
+	mips3drc_add_fastram(cputag_get_cpu(machine, "maincpu"), 0x1fc00000, 0x1fc7ffff, TRUE,  rombase);
 }
 
 
@@ -1472,26 +1576,26 @@ static MACHINE_RESET(hyperneo)
 	UINT8 *RAM = (UINT8*)hng64_soundram;
 	memory_set_bankptr(machine, 1,&RAM[0x1e0000]);
 	memory_set_bankptr(machine, 2,&RAM[0x001000]); // where..
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_HALT, ASSERT_LINE);
+	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 
 
 	/* Comm CPU */
 	KL5C80_init();
 
 	/* 1 meg of virtual address space for the com cpu */
-	hng64_com_virtual_mem = auto_malloc(0x100000);
-	hng64_com_op_base     = auto_malloc(0x10000);
+	hng64_com_virtual_mem = auto_alloc_array(machine, UINT8, 0x100000);
+	hng64_com_op_base     = auto_alloc_array(machine, UINT8, 0x10000);
 
 	/* Fill up virtual memory with ROM */
 	for (i = 0x0; i < 0x100000; i++)
 		hng64_com_virtual_mem[i] = rom[i] ;
 
 	KL5C80_virtual_mem_sync();
-	memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[2], ADDRESS_SPACE_PROGRAM), KL5C80_direct_handler);
+	memory_set_direct_update_handler(cputag_get_address_space(machine, "comm", ADDRESS_SPACE_PROGRAM), KL5C80_direct_handler);
 
-	cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, PULSE_LINE);     // reset the CPU and let 'er rip
-//  cpu_set_input_line(machine->cpu[2], INPUT_LINE_HALT, ASSERT_LINE);     // hold on there pardner...
+	cputag_set_input_line(machine, "comm", INPUT_LINE_RESET, PULSE_LINE);     // reset the CPU and let 'er rip
+//  cputag_set_input_line(machine, "comm", INPUT_LINE_HALT, ASSERT_LINE);     // hold on there pardner...
 
 
 
@@ -1541,11 +1645,11 @@ ROM_START( hng64 )
 	ROM_LOAD ( "rom1.bin",  0x080000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) )
 
 	/* To placate MAME */
-	ROM_REGION32_LE( 0x2000000, "user3", ROMREGION_ERASEFF ) /* Program Code, mapped at ??? maybe banked?  LE? */
-	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE | ROMREGION_ERASEFF )
-	ROM_REGION( 0x4000, "gfx2", ROMREGION_DISPOSE | ROMREGION_ERASEFF )
-	ROM_REGION( 0x1000000, "gfx3", ROMREGION_ERASEFF )
-	ROM_REGION16_BE( 0x0c00000, "gfx4", ROMREGION_ERASEFF )
+	ROM_REGION32_LE( 0x2000000, "user3", ROMREGION_ERASEFF )
+	ROM_REGION( 0x4000, "scrtile", ROMREGION_DISPOSE | ROMREGION_ERASEFF )
+	ROM_REGION( 0x4000, "sprtile", ROMREGION_DISPOSE | ROMREGION_ERASEFF )
+	ROM_REGION( 0x1000000, "textures", ROMREGION_ERASEFF )
+	ROM_REGION16_BE( 0x0c00000, "verts", ROMREGION_ERASEFF )
 	ROM_REGION( 0x1000000, "samples", ROMREGION_ERASEFF ) /* Sound Samples? */
 ROM_END
 
@@ -1560,26 +1664,26 @@ ROM_START( roadedge )
 	ROM_LOAD ( "rom1.bin",  0x080000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) )
 	/* END BIOS */
 
-	ROM_REGION32_LE( 0x2000000, "user3", 0 ) /* Program Code, mapped at ??? maybe banked?  LE? */
+	ROM_REGION32_LE( 0x2000000, "user3", 0 )
 	ROM_LOAD32_WORD( "001pr01b.81", 0x0000000, 0x400000, CRC(effbac30) SHA1(c1bddf3e511a8950f65ac7e452f81dbc4b7fd977) )
 	ROM_LOAD32_WORD( "001pr02b.82", 0x0000002, 0x400000, CRC(b9aa4ad3) SHA1(9ab3c896dbdc45560b7127486e2db6ca3b15a057) )
 
 	/* Scroll Characters 8x8x8 / 16x16x8 */
-	ROM_REGION( 0x1000000, "gfx1", ROMREGION_DISPOSE )
-	ROM_LOAD32_BYTE( "001sc01a.41", 0x0000000, 0x400000, CRC(084395a1) SHA1(8bfea8fd3981fd45dcc04bd74840a5948aaf06a8) )
-	ROM_LOAD32_BYTE( "001sc02a.42", 0x0000001, 0x400000, CRC(51dd19e3) SHA1(eeb3634294a049a357a75ee00aa9fce65b737395) )
-	ROM_LOAD32_BYTE( "001sc03a.43", 0x0000002, 0x400000, CRC(0b6f3e19) SHA1(3b6dfd0f0633b0d8b629815920edfa39d92336bf) )
-	ROM_LOAD32_BYTE( "001sc04a.44", 0x0000003, 0x400000, CRC(256c8c1c) SHA1(85935eea3722ec92f8d922f527c2e049c4185aa3) )
+	ROM_REGION( 0x1000000, "scrtile", ROMREGION_DISPOSE )
+	ROM_LOAD16_BYTE( "001sc01a.41", 0x0000000, 0x400000, CRC(084395a1) SHA1(8bfea8fd3981fd45dcc04bd74840a5948aaf06a8) )
+	ROM_LOAD16_BYTE( "001sc02a.42", 0x0000001, 0x400000, CRC(51dd19e3) SHA1(eeb3634294a049a357a75ee00aa9fce65b737395) )
+	ROM_LOAD16_BYTE( "001sc03a.43", 0x0800000, 0x400000, CRC(0b6f3e19) SHA1(3b6dfd0f0633b0d8b629815920edfa39d92336bf) )
+	ROM_LOAD16_BYTE( "001sc04a.44", 0x0800001, 0x400000, CRC(256c8c1c) SHA1(85935eea3722ec92f8d922f527c2e049c4185aa3) )
 
 	/* Sprite Characters - 8x8x8 / 16x16x8 */
-	ROM_REGION( 0x1000000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x1000000, "sprtile", ROMREGION_DISPOSE )
 	ROM_LOAD32_BYTE( "001sp01a.53",0x0000000, 0x400000, CRC(7a469453) SHA1(3738ca76f538243bb23ffd23a42b2a0558882889) )
 	ROM_LOAD32_BYTE( "001sp02a.54",0x0000001, 0x400000, CRC(6b9a3de0) SHA1(464c652f7b193326e3a871dfe751dd83c14284eb) )
 	ROM_LOAD32_BYTE( "001sp03a.55",0x0000002, 0x400000, CRC(efbbd391) SHA1(7447c481ba6f9ba154d48a4b160dd24157891d35) )
 	ROM_LOAD32_BYTE( "001sp04a.56",0x0000003, 0x400000, CRC(1a0eb173) SHA1(a69b786a9957197d1cc950ab046c57c18ca07ea7) )
 
 	/* Textures - 1024x1024x8 pages */
-	ROM_REGION( 0x1000000, "gfx3", 0 )
+	ROM_REGION( 0x1000000, "textures", 0 )
 	/* note: same roms are at different positions on the board, repeated a total of 4 times*/
 	ROM_LOAD( "001tx01a.1", 0x0000000, 0x400000, CRC(f6539bb9) SHA1(57fc5583d56846be93d6f5784acd20fc149c70a5) )
 	ROM_LOAD( "001tx02a.2", 0x0400000, 0x400000, CRC(f1d139d3) SHA1(f120243f4d55f38b10bf8d1aa861cdc546a24c80) )
@@ -1599,7 +1703,7 @@ ROM_START( roadedge )
 	ROM_LOAD( "001tx04a.16",0x0c00000, 0x400000, CRC(288a5bd5) SHA1(24e05db681894eb31cdc049cf42c1f9d7347bd0c) )
 
 	/* X,Y,Z Vertex ROMs */
-	ROM_REGION( 0x0c00000, "gfx4", ROMREGION_NODISPOSE )
+	ROM_REGION( 0x0c00000, "verts", ROMREGION_NODISPOSE )
 	ROMX_LOAD( "001vt01a.17", 0x0000000, 0x400000, CRC(1a748e1b) SHA1(376d40baa3b94890d4740045d053faf208fe43db), ROM_GROUPWORD | ROM_SKIP(4) )
 	ROMX_LOAD( "001vt02a.18", 0x0000002, 0x400000, CRC(449f94d0) SHA1(2228690532d82d2661285aeb4260689b027597cb), ROM_GROUPWORD | ROM_SKIP(4) )
 	ROMX_LOAD( "001vt03a.19", 0x0000004, 0x400000, CRC(50ac8639) SHA1(dd2d3689466990a7c479bb8f11bd930ea45e47b5), ROM_GROUPWORD | ROM_SKIP(4) )
@@ -1610,8 +1714,8 @@ ROM_START( roadedge )
 ROM_END
 
 
-ROM_START( sams64_2 )
 
+ROM_START( sams64 )
 	/* BIOS */
 	ROM_REGION32_BE( 0x0100000, "user1", 0 ) /* 512k for R4300 BIOS code */
 	ROM_LOAD ( "brom1.bin", 0x000000, 0x080000,  CRC(a30dd3de) SHA1(3e2fd0a56214e6f5dcb93687e409af13d065ea30) )
@@ -1620,7 +1724,171 @@ ROM_START( sams64_2 )
 	ROM_LOAD ( "rom1.bin",  0x080000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) )
 	/* END BIOS */
 
-	ROM_REGION32_LE( 0x2000000, "user3", 0 ) /* Program Code, mapped at ??? maybe banked?  LE? */
+	ROM_REGION32_LE( 0x2000000, "user3", 0 )
+	ROM_LOAD32_WORD( "002-pro1a.81", 0x0000000, 0x400000, CRC(e5b907c5) SHA1(83637ffaa9031d41a5bed3397a519d1dfa8052cb) )
+	ROM_LOAD32_WORD( "002-pro2a.82", 0x0000002, 0x400000, CRC(803ed2eb) SHA1(666db47886a316e68b911311e5db3bc0f5b8a34d) )
+	ROM_LOAD32_WORD( "002-pro3a.83", 0x0800000, 0x400000, CRC(582156a7) SHA1(a7bbbd472a53072cbfaed5d41d4265123c9e3f3d) )
+	ROM_LOAD32_WORD( "002-pro4a.84", 0x0800002, 0x400000, CRC(5a8291e9) SHA1(ec1e5a5a0ba37393e8b93d78b4ac855109d45ec9) )
+
+	/* Scroll Characters 8x8x8 / 16x16x8 */
+	ROM_REGION( 0x2000000, "scrtile", ROMREGION_DISPOSE )
+	ROM_LOAD16_BYTE( "002-sc01a.41", 0x0000000, 0x400000, CRC(77c3df69) SHA1(813d57814acccd2c04c951e58ac87cf7413bdf58) )
+	ROM_LOAD16_BYTE( "002-sc02a.42", 0x0000001, 0x400000, CRC(60065174) SHA1(624c2e20abb53b2466df4ce2ffa9e20273798e92) )
+	ROM_LOAD16_BYTE( "002-sc05a.45", 0x0800000, 0x400000, CRC(fd242bee) SHA1(b1fad97987da21c77d6c460bbed6f0dd18905ed4) )
+	ROM_LOAD16_BYTE( "002-sc06a.46", 0x0800001, 0x400000, CRC(87afc297) SHA1(47d5eaae88ce501fbbd5a2d7305c1d6acadfb13e) )
+	ROM_LOAD16_BYTE( "002-sc03a.43", 0x1000000, 0x400000, CRC(5d4a5289) SHA1(7a1576fdd344825cb05866c156d17b18f562a336) )
+	ROM_LOAD16_BYTE( "002-sc04a.44", 0x1000001, 0x400000, CRC(aa5536fa) SHA1(09a50a29561ac97c564243da879bd7c4cf8c3cee) )
+	ROM_LOAD16_BYTE( "002-sc07a.47", 0x1800000, 0x400000, CRC(e01e8a95) SHA1(b132214ef2b33a46cb605ea8f2193e77d9464881) )
+	ROM_LOAD16_BYTE( "002-sc08a.48", 0x1800001, 0x400000, CRC(a17464d0) SHA1(2e6b73b1e0983b2b01455b0f4d6dc7c3845adb69) )
+
+	/* Sprite Characters - 8x8x8 / 16x16x8 */
+	ROM_REGION( 0x2000000, "sprtile", ROMREGION_DISPOSE )
+	ROM_LOAD32_BYTE( "002-sp01a.53",0x0000000, 0x400000, CRC(c73cf9b4) SHA1(7c34fa1bc03cd366d473dbf3e316a6434ee5ec60) )
+	ROM_LOAD32_BYTE( "002-sp02a.54",0x0000001, 0x400000, CRC(04b0ecc8) SHA1(893e522324dd41dfcd2217974a6740e6bc3ea1d3) )
+	ROM_LOAD32_BYTE( "002-sp03a.55",0x0000002, 0x400000, CRC(13c80b74) SHA1(ad6c1690ebcde0d8237201ea43eb162cd5308ccb) )
+	ROM_LOAD32_BYTE( "002-sp04a.56",0x0000003, 0x400000, CRC(b1a6a06d) SHA1(1b11ee7cec46d0c99dc6310ee8221fa2de33c359) )
+	ROM_LOAD32_BYTE( "002-sp05a.57",0x1000000, 0x400000, CRC(fa71e825) SHA1(adfa8b5a8ec703d4f04285c47f2618a294c90ec5) )
+	ROM_LOAD32_BYTE( "002-sp06a.58",0x1000001, 0x400000, CRC(1bcfe48e) SHA1(8d85b1eb33fea48e5c6597d2fcbec903ecdad9d9) )
+	ROM_LOAD32_BYTE( "002-sp07a.59",0x1000002, 0x400000, CRC(a5049bd7) SHA1(123e32c22f53d6e55ee1d1deb4ab40891004c6fd) )
+	ROM_LOAD32_BYTE( "002-sp08a.60",0x1000003, 0x400000, CRC(c2e57813) SHA1(e7a21df1f94ed959a53da9dc4667863ee77bf676) )
+
+	/* Textures - 1024x1024x8 pages */
+	ROM_REGION( 0x1000000, "textures", 0 )
+	/* note: same roms are at different positions on the board, repeated a total of 4 times*/
+	ROM_LOAD( "002-tx01a.13", 0x0000000, 0x400000, CRC(233749b5) SHA1(7c93681bbd5f4246e0dc50d26108f04e9b248d0d) )
+	ROM_LOAD( "002-tx02a.14", 0x0400000, 0x400000, CRC(d5074be2) SHA1(c33e9b9f0d21ad5ad31d8f988b3c7378d374fc1b) )
+	ROM_LOAD( "002-tx03a.15", 0x0800000, 0x400000, CRC(68c313f7) SHA1(90ce8d0d19a994647c7167e3b256ff31647e575a) )
+	ROM_LOAD( "002-tx04a.16", 0x0c00000, 0x400000, CRC(f7dac24f) SHA1(1215354f28cbeb9fc38f6a7acae450ad5f34bb6a) )
+
+
+	/* X,Y,Z Vertex ROMs */
+	ROM_REGION( 0x1800000, "verts", ROMREGION_NODISPOSE )
+	ROMX_LOAD( "002-vt01a.17", 0x0000000, 0x400000, CRC(403fd7fd) SHA1(9bdadbeb4cd13c4c4e89a1c233af9eaaa46f8fdf), ROM_GROUPWORD | ROM_SKIP(4) )
+	ROMX_LOAD( "002-vt02a.18", 0x0000002, 0x400000, CRC(e1885905) SHA1(6b16083c50e887aebe2baf95bf56697c239970f2), ROM_GROUPWORD | ROM_SKIP(4) )
+	ROMX_LOAD( "002-vt03a.19", 0x0000004, 0x400000, CRC(2074a6a6) SHA1(9a5e8259d1e19d2b43878c24ca06afba5ee5e316), ROM_GROUPWORD | ROM_SKIP(4) )
+	ROMX_LOAD( "002-vt04a.20", 0x0400000, 0x400000, CRC(aefc4d94) SHA1(f9d8222d4320ccf9f3c7c0ef307e03c8f34ea530), ROM_GROUPWORD | ROM_SKIP(4) )
+	ROMX_LOAD( "002-vt05a.21", 0x0400002, 0x400000, CRC(d32ee9cb) SHA1(a768dfc15899924eb05eccbf8e85cb29c7b60396), ROM_GROUPWORD | ROM_SKIP(4) )
+	ROMX_LOAD( "002-vt06a.22", 0x0400004, 0x400000, CRC(13bf3636) SHA1(7c704bf66b571350207bccc7a2d6ed1ec9de4cd5), ROM_GROUPWORD | ROM_SKIP(4) )
+
+	ROM_REGION( 0x1000000, "samples", ROMREGION_DISPOSE ) /* Sound Samples? */
+	ROM_LOAD( "002-sd01a.77", 0x0000000, 0x400000, CRC(6215036b) SHA1(ded71dce98b7f7ef78ef32d966a292bbf0d15332) )
+	ROM_LOAD( "002-sd02a.78", 0x0400000, 0x400000, CRC(32b28310) SHA1(5b80750a66c12b035b493d06e3842741a3334d0f) )
+	ROM_LOAD( "002-sd03a.79", 0x0800000, 0x400000, CRC(53591413) SHA1(36c7efa1aced0ca38b3ce7b95af28755973698f3) )
+ROM_END
+
+
+ROM_START( xrally )
+	/* BIOS */
+	ROM_REGION32_BE( 0x0100000, "user1", 0 ) /* 512k for R4300 BIOS code */
+	ROM_LOAD ( "brom1.bin", 0x000000, 0x080000,  CRC(a30dd3de) SHA1(3e2fd0a56214e6f5dcb93687e409af13d065ea30) )
+	ROM_REGION( 0x0100000, "user2", 0 ) /* KL5C80 BIOS and unknown ROM */
+	ROM_LOAD ( "from1.bin", 0x000000, 0x080000,  CRC(6b933005) SHA1(e992747f46c48b66e5509fe0adf19c91250b00c7) )
+	ROM_LOAD ( "rom1.bin",  0x080000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) )
+	/* END BIOS */
+
+	ROM_REGION32_LE( 0x2000000, "user3", 0 )
+	ROM_LOAD32_WORD( "003-pr01a.81", 0x0000000, 0x400000, CRC(4e160388) SHA1(08fba66d0f0dab47f7db5bc7d411f4fc0e8219c8) )
+	ROM_LOAD32_WORD( "003-pr02a.82", 0x0000002, 0x400000, CRC(c4dd4f18) SHA1(4db0e6d5cabd9e4f82d5905556174b9eff8ad4d9) )
+
+	/* Scroll Characters 8x8x8 / 16x16x8 */
+	ROM_REGION( 0x1000000, "scrtile", ROMREGION_DISPOSE )
+	ROM_LOAD16_BYTE( "003-sc01a.41", 0x0000000, 0x400000, CRC(bc608584) SHA1(fa4b618eb36f302f58cefea7c50618a8318927d6) )
+	ROM_LOAD16_BYTE( "003-sc02a.42", 0x0000001, 0x400000, CRC(c810e9e2) SHA1(4f0d35d9b0af2a4b66253e467c0d30a519c904b6) )
+	ROM_LOAD16_BYTE( "003-sc03a.43", 0x0800000, 0x400000, CRC(12724653) SHA1(5e40947086883d64db84ac51a1b29efa2f173f58) )
+	ROM_LOAD16_BYTE( "003-sc04a.44", 0x0800001, 0x400000, CRC(b0062c4d) SHA1(73c75b59dc1463ad80f805191f4605a6b4b1c321) )
+
+	/* Sprite Characters - 8x8x8 / 16x16x8 */
+	ROM_REGION( 0x1000000, "sprtile", ROMREGION_DISPOSE )
+	ROM_LOAD32_BYTE( "003-sp01a.53",0x0000000, 0x400000, CRC(12a329dc) SHA1(00929f3c460cce5a3657dec73d467731e59de564) )
+	ROM_LOAD32_BYTE( "003-sp02a.54",0x0000001, 0x400000, CRC(ee9e5338) SHA1(681c2f34a2f292ce14fcbef4447ede7b949c7117) )
+	ROM_LOAD32_BYTE( "003-sp03a.55",0x0000002, 0x400000, CRC(6fa8dff9) SHA1(500bd128e6568e9491e52676775e9239adc332fe) )
+	ROM_LOAD32_BYTE( "003-sp04a.56",0x0000003, 0x400000, CRC(a98eec07) SHA1(de0c7db56b851daa369f37088bd536933372346f) )
+
+	/* Textures - 1024x1024x8 pages */
+	ROM_REGION( 0x2000000, "textures", 0 )
+	/* note: same roms are at different positions on the board, repeated a total of 4 times*/
+	ROM_LOAD( "003-tx01a.13", 0x0000000, 0x400000, CRC(83ea2178) SHA1(931898f57564b8b9975e06df5ccfd8c84fc2fbe3) )
+	ROM_LOAD( "003-tx02a.14", 0x0400000, 0x400000, CRC(7912f4be) SHA1(bca44c1415a25f2349857b2246e3ee7abe709a84) )
+	ROM_LOAD( "003-tx03a.15", 0x0800000, 0x400000, CRC(a319c94e) SHA1(14d720cdd8b9411fd82a7b4b33ee5dbfdd01c9f8) )
+	ROM_LOAD( "003-tx04a.16", 0x0c00000, 0x400000, CRC(16d7805b) SHA1(4cc7b2375832c2f9f20fe882e604a2a52bf07f6f) )
+
+	/* X,Y,Z Vertex ROMs */
+	ROM_REGION( 0x1800000, "verts", ROMREGION_NODISPOSE )
+	ROMX_LOAD( "003-vt01a.17", 0x0000000, 0x400000, CRC(3e5e275d) SHA1(74f5ec88c258bc224e271f7abeb02d6485e27d8c), ROM_GROUPWORD | ROM_SKIP(4) )
+	ROMX_LOAD( "003-vt02a.18", 0x0000002, 0x400000, CRC(da7b956e) SHA1(c57cbb8c51145ae224faba5b6a1a7e61cb2bee64), ROM_GROUPWORD | ROM_SKIP(4) )
+	ROMX_LOAD( "003-vt03a.19", 0x0000004, 0x400000, CRC(4fe72cb7) SHA1(9f8e662f0656f201924834d1ee78498d4223745e), ROM_GROUPWORD | ROM_SKIP(4) )
+
+	ROM_REGION( 0x1000000, "samples", ROMREGION_DISPOSE ) /* Sound Samples? */
+	ROM_LOAD( "003-sd01a.77", 0x0000000, 0x400000, CRC(c43898ff) SHA1(0e49b87181b56c62a674d255d326f761942b99b1) )
+	ROM_LOAD( "003-sd02a.78", 0x0400000, 0x400000, CRC(079a3d5a) SHA1(a97b052de69fee7d605cae30f5a228e6ffeabb26) )
+	ROM_LOAD( "003-sd03a.79", 0x0800000, 0x400000, CRC(96c0991a) SHA1(01be872b3e307258236fe96a544417dd8a0bc8bd) )
+ROM_END
+
+
+ROM_START( bbust2 )
+	/* BIOS */
+	ROM_REGION32_BE( 0x0100000, "user1", 0 ) /* 512k for R4300 BIOS code */
+	ROM_LOAD ( "brom1.bin", 0x000000, 0x080000,  CRC(a30dd3de) SHA1(3e2fd0a56214e6f5dcb93687e409af13d065ea30) )
+	ROM_REGION( 0x0100000, "user2", 0 ) /* KL5C80 BIOS and unknown ROM */
+	ROM_LOAD ( "from1.bin", 0x000000, 0x080000,  CRC(6b933005) SHA1(e992747f46c48b66e5509fe0adf19c91250b00c7) )
+	ROM_LOAD ( "rom1.bin",  0x080000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) )
+	/* END BIOS */
+
+	ROM_REGION32_LE( 0x2000000, "user3", 0 )
+	ROM_LOAD32_WORD( "004-pr01a.81", 0x0000000, 0x400000, CRC(7b836ece) SHA1(7a4a08251f1dd66c368ac203f5a006266e77f73d) )
+	ROM_LOAD32_WORD( "004-pr02a.82", 0x0000002, 0x400000, CRC(8c55a988) SHA1(d9a61ac3d8550ce0ee6aab374c9f024912163180) )
+	ROM_LOAD32_WORD( "004-pr03a.83", 0x0800000, 0x400000, CRC(f25a82dd) SHA1(74c0a03021ef424e0b9c3c818be297d2967b3012) )
+	ROM_LOAD32_WORD( "004-pr04a.84", 0x0800002, 0x400000, CRC(9258312b) SHA1(fabac42c8a033e85d503be56f266f9386adff10b) )
+
+	/* Scroll Characters 8x8x8 / 16x16x8 */
+	ROM_REGION( 0x1000000, "scrtile", ROMREGION_DISPOSE )
+	ROM_LOAD16_BYTE( "004-sc01a.41", 0x0000000, 0x400000, CRC(0b52987e) SHA1(3c7b0ce9416dea8db4cf63431166fcfa7c3bb168) )
+	ROM_LOAD16_BYTE( "004-sc02a.42", 0x0000001, 0x400000, CRC(6b55309d) SHA1(87761deed6d842075bbe13abc444ac502274eeba) )
+	ROM_LOAD16_BYTE( "004-sc03a.43", 0x0800000, 0x400000, CRC(17302f01) SHA1(5b6a927c520e421aa31b9162d3e47b06069b4bd0) )
+	ROM_LOAD16_BYTE( "004-sc04a.44", 0x0800001, 0x400000, CRC(db31d73c) SHA1(8a6847e367e87a081cd1499294935c45f1fb4794) )
+
+	/* Sprite Characters - 8x8x8 / 16x16x8 */
+	ROM_REGION( 0x2000000, "sprtile", ROMREGION_DISPOSE )
+	ROM_LOAD32_BYTE( "004-sp01a.53",0x0000000, 0x400000, CRC(72fe73c3) SHA1(82825705076c40558d414653386e3bf1d0693008) )
+	ROM_LOAD32_BYTE( "004-sp02a.54",0x0000001, 0x400000, CRC(1ece1cff) SHA1(78d88e96df979a834b5af091d3feda8b9cd466e0) )
+	ROM_LOAD32_BYTE( "004-sp03a.55",0x0000002, 0x400000, CRC(9049ab14) SHA1(0a19ccbd82f000eba19a0b407fa5765db0464cca) )
+	ROM_LOAD32_BYTE( "004-sp04a.56",0x0000003, 0x400000, CRC(8f7fb914) SHA1(dd1709881bf1d9e233b4e794c0e2ce28d265f855) )
+	ROM_LOAD32_BYTE( "004-sp05a.57",0x1000000, 0x400000, CRC(440ce760) SHA1(f6f256334c32fe7d25448fba73f8966c4c5b1cba) )
+	ROM_LOAD32_BYTE( "004-sp06a.58",0x1000001, 0x400000, CRC(fc24d2e5) SHA1(073dcb21ec6cf9c6a81987a54c0e27a2db499341) )
+	ROM_LOAD32_BYTE( "004-sp07a.59",0x1000002, 0x400000, CRC(bc580b81) SHA1(c668d0524fdc53c6ba2f3e5120f2dee7ce4279bb) )
+	ROM_LOAD32_BYTE( "004-sp08a.60",0x1000003, 0x400000, CRC(d6c69bea) SHA1(24508c0ed0ca135316aec1c8239e8b755070384a) )
+
+	/* Textures - 1024x1024x8 pages */
+	ROM_REGION( 0x1000000, "textures", 0 )
+	/* note: same roms are at different positions on the board, repeated a total of 4 times*/
+	ROM_LOAD( "004-tx01a.13", 0x0000000, 0x400000, CRC(12a78a20) SHA1(a5c1c8841cd0cb5efbf7408d908fa10a743e5c6f) )
+	ROM_LOAD( "004-tx02a.14", 0x0400000, 0x400000, CRC(a36c6c34) SHA1(3e4ad293b064a7c05aa23447ff5f17010cae2863) )
+	ROM_LOAD( "004-tx03a.15", 0x0800000, 0x400000, CRC(f46377c0) SHA1(bfa6fc3ab89599a4443577d18578569ad55774bd) )
+	ROM_LOAD( "004-tx04a.16", 0x0c00000, 0x400000, CRC(b5f0ef01) SHA1(646bfb17b9e81aecf8db33d3a021f7769b262eda) )
+
+	/* X,Y,Z Vertex ROMs */
+	ROM_REGION( 0x1800000, "verts", ROMREGION_NODISPOSE )
+	ROMX_LOAD( "004-vt01a.17", 0x0000000, 0x400000, CRC(25ebbf9b) SHA1(b7c3fb9ee9cf75824d908e7a94970282f1845d5d), ROM_GROUPWORD | ROM_SKIP(4) )
+	ROMX_LOAD( "004-vt02a.18", 0x0000002, 0x400000, CRC(279fc216) SHA1(eb90cc347745491c1d1b1fb611fd6e227310731c), ROM_GROUPWORD | ROM_SKIP(4) )
+	ROMX_LOAD( "004-vt03a.19", 0x0000004, 0x400000, CRC(e0cf6a42) SHA1(dd09b3d05739cf030c820cd7dbaea2e7262764ab), ROM_GROUPWORD | ROM_SKIP(4) )
+
+	ROM_REGION( 0x1000000, "samples", ROMREGION_DISPOSE ) /* Sound Samples? */
+	ROM_LOAD( "004-sd01a.77", 0x0000000, 0x400000, CRC(2ef868bd) SHA1(0a1ef002efe6738698ebe98a1c3695b151fdd282) )
+	ROM_LOAD( "004-sd02a.78", 0x0400000, 0x400000, CRC(07fb3135) SHA1(56cc8e29ba9b13f82a4c9248bff02e2b7a0c49b0) )
+	ROM_LOAD( "004-sd03a.79", 0x0800000, 0x400000, CRC(42571f1d) SHA1(425cbd3f7c8aea1c0f057ea8f186acffb0091dc0) )
+ROM_END
+
+
+ROM_START( sams64_2 )
+	/* BIOS */
+	ROM_REGION32_BE( 0x0100000, "user1", 0 ) /* 512k for R4300 BIOS code */
+	ROM_LOAD ( "brom1.bin", 0x000000, 0x080000,  CRC(a30dd3de) SHA1(3e2fd0a56214e6f5dcb93687e409af13d065ea30) )
+	ROM_REGION( 0x0100000, "user2", 0 ) /* KL5C80 BIOS and unknown ROM */
+	ROM_LOAD ( "from1.bin", 0x000000, 0x080000,  CRC(6b933005) SHA1(e992747f46c48b66e5509fe0adf19c91250b00c7) )
+	ROM_LOAD ( "rom1.bin",  0x080000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) )
+	/* END BIOS */
+
+	ROM_REGION32_LE( 0x2000000, "user3", 0 )
 	ROM_LOAD32_WORD( "005pr01a.81", 0x0000000, 0x400000, CRC(a69d7700) SHA1(a580783a109bc3e24248d70bcd67f62dd7d8a5dd) )
 	ROM_LOAD32_WORD( "005pr02a.82", 0x0000002, 0x400000, CRC(38b9e6b3) SHA1(d1dad8247d920cc66854a0096e1c7845842d2e1c) )
 	ROM_LOAD32_WORD( "005pr03a.83", 0x0800000, 0x400000, CRC(0bc738a8) SHA1(79893b0e1c4a31e02ab385c4382684245975ae8f) )
@@ -1631,18 +1899,18 @@ ROM_START( sams64_2 )
 	ROM_LOAD32_WORD( "005pr08a.88", 0x1800002, 0x400000, CRC(d094eb67) SHA1(3edc8d608c631a05223e1d05157cd3daf2d6597a) )
 
 	/* Scroll Characters 8x8x8 / 16x16x8 */
-	ROM_REGION( 0x4000000, "gfx1", ROMREGION_DISPOSE )
-	ROM_LOAD32_BYTE( "005sc01a.97",  0x0000000, 0x800000, CRC(7f11cda9) SHA1(5fbdabd8423e9723a6ec38f8503e6ca7f4f69fdd) )
-	ROM_LOAD32_BYTE( "005sc02a.99",  0x0000001, 0x800000, CRC(87d1e1a7) SHA1(00f2ef46ce64ab715add8cd47745c57944286f81) )
-	ROM_LOAD32_BYTE( "005sc03a.101", 0x0000002, 0x800000, CRC(a5d4c535) SHA1(089a3cd07701f025024ce73b7b4d38063c33a59f) )
-	ROM_LOAD32_BYTE( "005sc04a.103", 0x0000003, 0x800000, CRC(14930d77) SHA1(b4c613a8896e21fe2cac0595dd1ea30dc7fce0bd) )
-	ROM_LOAD32_BYTE( "005sc05a.98",  0x2000000, 0x800000, CRC(4475a3f8) SHA1(f099baf766ee00d166cfa8402baa0b6ea25a0010) )
-	ROM_LOAD32_BYTE( "005sc06a.100", 0x2000001, 0x800000, CRC(41c0fbbd) SHA1(1d9ac01c9499a6202ee59d15d498ec34edc05888) )
-	ROM_LOAD32_BYTE( "005sc07a.102", 0x2000002, 0x800000, CRC(3505b198) SHA1(2fdfdd5a1f6f31f5fb1c0af70047108d1df44af2) )
-	ROM_LOAD32_BYTE( "005sc08a.104", 0x2000003, 0x800000, CRC(3139e413) SHA1(38210541379ddeba8c0b9ef8fa5430c0090db7c7) )
+	ROM_REGION( 0x4000000, "scrtile", ROMREGION_DISPOSE )
+	ROM_LOAD16_BYTE( "005sc01a.97",  0x0000000, 0x800000, CRC(7f11cda9) SHA1(5fbdabd8423e9723a6ec38f8503e6ca7f4f69fdd) )
+	ROM_LOAD16_BYTE( "005sc02a.99",  0x0000001, 0x800000, CRC(87d1e1a7) SHA1(00f2ef46ce64ab715add8cd47745c57944286f81) )
+	ROM_LOAD16_BYTE( "005sc05a.98",  0x1000000, 0x800000, CRC(4475a3f8) SHA1(f099baf766ee00d166cfa8402baa0b6ea25a0010) )
+	ROM_LOAD16_BYTE( "005sc06a.100", 0x1000001, 0x800000, CRC(41c0fbbd) SHA1(1d9ac01c9499a6202ee59d15d498ec34edc05888) )
+	ROM_LOAD16_BYTE( "005sc03a.101", 0x2000000, 0x800000, CRC(a5d4c535) SHA1(089a3cd07701f025024ce73b7b4d38063c33a59f) )
+	ROM_LOAD16_BYTE( "005sc04a.103", 0x2000001, 0x800000, CRC(14930d77) SHA1(b4c613a8896e21fe2cac0595dd1ea30dc7fce0bd) )
+	ROM_LOAD16_BYTE( "005sc07a.102", 0x3000000, 0x800000, CRC(3505b198) SHA1(2fdfdd5a1f6f31f5fb1c0af70047108d1df44af2) )
+	ROM_LOAD16_BYTE( "005sc08a.104", 0x3000001, 0x800000, CRC(3139e413) SHA1(38210541379ddeba8c0b9ef8fa5430c0090db7c7) )
 
 	/* Sprite Characters - 8x8x8 / 16x16x8 */
-	ROM_REGION( 0x4000000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000000, "sprtile", ROMREGION_DISPOSE )
 	ROM_LOAD32_BYTE( "005sp01a.105",0x0000000, 0x800000, CRC(68eefee5) SHA1(d95bd7b549900500633af07544423b0062ac07ce) )
 	ROM_LOAD32_BYTE( "005sp02a.109",0x0000001, 0x800000, CRC(5d9a49b9) SHA1(50768c496a3e0b4379e121349f32edec4f18652f) )
 	ROM_LOAD32_BYTE( "005sp03a.113",0x0000002, 0x800000, CRC(9b6530fe) SHA1(398433b98578a6b4b950afc4d6318916376e0760) )
@@ -1653,7 +1921,7 @@ ROM_START( sams64_2 )
 	ROM_LOAD32_BYTE( "005sp08a.118",0x2000003, 0x400000, CRC(05486fbc) SHA1(747d9ae03ce999be4ab697753e93c90ea85b7d44) )
 
 	/* Textures - 1024x1024x8 pages */
-	ROM_REGION( 0x1000000, "gfx3", 0 )
+	ROM_REGION( 0x1000000, "textures", 0 )
 	/* note: same roms are at different positions on the board, repeated a total of 4 times*/
 	ROM_LOAD( "005tx01a.1", 0x0000000, 0x400000, CRC(05a4ceb7) SHA1(2dfc46a70c0a957ed0931a4c4df90c341aafff70) )
 	ROM_LOAD( "005tx02a.2", 0x0400000, 0x400000, CRC(b7094c69) SHA1(aed9a624166f6f1a2eb4e746c61f9f46f1929283) )
@@ -1673,7 +1941,7 @@ ROM_START( sams64_2 )
 	ROM_LOAD( "005tx04a.16",0x0c00000, 0x400000, CRC(6be50882) SHA1(1f99717cfa69076b258a0c52d66be007fd820374) )
 
 	/* X,Y,Z Vertex ROMs */
-	ROM_REGION( 0x1800000, "gfx4", ROMREGION_NODISPOSE )
+	ROM_REGION( 0x1800000, "verts", ROMREGION_NODISPOSE )
 	ROMX_LOAD( "005vt01a.17", 0x0000000, 0x400000, CRC(48a61479) SHA1(ef982b1ecc6dfca2ad989391afcc1b3d1e7fe652), ROM_GROUPWORD | ROM_SKIP(4) )
 	ROMX_LOAD( "005vt02a.18", 0x0000002, 0x400000, CRC(ba9100c8) SHA1(f7704fb8e5310ea7d0e6ae6b8935717ec9119b6d), ROM_GROUPWORD | ROM_SKIP(4) )
 	ROMX_LOAD( "005vt03a.19", 0x0000004, 0x400000, CRC(f54a28de) SHA1(c445cf7fee71a516065cf37e05b898208f48b17e), ROM_GROUPWORD | ROM_SKIP(4) )
@@ -1699,25 +1967,25 @@ ROM_START( fatfurwa )
 	ROM_LOAD ( "rom1.bin",  0x080000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) )
 	/* END BIOS */
 
-	ROM_REGION32_LE( 0x2000000, "user3", 0 ) /* Program Code, mapped at ??? maybe banked?  LE? */
+	ROM_REGION32_LE( 0x2000000, "user3", 0 )
 	ROM_LOAD32_WORD( "006pr01a.81", 0x0000000, 0x400000, CRC(3830efa1) SHA1(9d8c941ccb6cbe8d138499cf9d335db4ac7a9ec0) )
 	ROM_LOAD32_WORD( "006pr02a.82", 0x0000002, 0x400000, CRC(8d5de84e) SHA1(e3ae014263f370c2836f62ab323f1560cb3a9cf0) )
 	ROM_LOAD32_WORD( "006pr03a.83", 0x0800000, 0x400000, CRC(c811b458) SHA1(7d94e0df501fb086b2e5cf08905d7a3adc2c6472) )
 	ROM_LOAD32_WORD( "006pr04a.84", 0x0800002, 0x400000, CRC(de708d6c) SHA1(2c9848e7bbf61c574370f9ecab5f5a6ba63339fd) )
 
 	/* Scroll Characters 8x8x8 / 16x16x8 */
-	ROM_REGION( 0x4000000, "gfx1", ROMREGION_DISPOSE )
-	ROM_LOAD32_BYTE( "006sc01a.97", 0x0000000, 0x800000, CRC(f13dffad) SHA1(86363aeae176fd4204e446c13a028da919dc2069) )
-	ROM_LOAD32_BYTE( "006sc02a.99", 0x0000001, 0x800000, CRC(be79d42a) SHA1(f3eb950a62e2df1de116af9434027439f1305e1f) )
-	ROM_LOAD32_BYTE( "006sc03a.101",0x0000002, 0x800000, CRC(16918b73) SHA1(ad0c751a301fe3c95fca19473869dfd55fb6b0de) )
-	ROM_LOAD32_BYTE( "006sc04a.103",0x0000003, 0x800000, CRC(9b63cd98) SHA1(62519a3a531c4493a5a85dc01ca69413977120ca) )
-	ROM_LOAD32_BYTE( "006sc05a.98", 0x2000000, 0x800000, CRC(0487297b) SHA1(d3fa4d691559327739c96717312faf09b498001d) )
-	ROM_LOAD32_BYTE( "006sc06a.100",0x2000001, 0x800000, CRC(34a76c31) SHA1(be05dc75afb7cde65ba5d29c0e66a7b1b62c41cb) )
-	ROM_LOAD32_BYTE( "006sc07a.102",0x2000002, 0x800000, CRC(7a1c371e) SHA1(1cd4ad66dd007adc9ab0c29720cbf9955c7337e0) )
-	ROM_LOAD32_BYTE( "006sc08a.104",0x2000003, 0x800000, CRC(88232ade) SHA1(4ae2a572c3525087f77c95185e8697a1fc720512) )
+	ROM_REGION( 0x4000000, "scrtile", ROMREGION_DISPOSE )
+	ROM_LOAD16_BYTE( "006sc01a.97", 0x0000000, 0x800000, CRC(f13dffad) SHA1(86363aeae176fd4204e446c13a028da919dc2069) )
+	ROM_LOAD16_BYTE( "006sc02a.99", 0x0000001, 0x800000, CRC(be79d42a) SHA1(f3eb950a62e2df1de116af9434027439f1305e1f) )
+	ROM_LOAD16_BYTE( "006sc05a.98", 0x1000000, 0x800000, CRC(0487297b) SHA1(d3fa4d691559327739c96717312faf09b498001d) )
+	ROM_LOAD16_BYTE( "006sc06a.100",0x1000001, 0x800000, CRC(34a76c31) SHA1(be05dc75afb7cde65ba5d29c0e66a7b1b62c41cb) )
+	ROM_LOAD16_BYTE( "006sc03a.101",0x2000000, 0x800000, CRC(16918b73) SHA1(ad0c751a301fe3c95fca19473869dfd55fb6b0de) )
+	ROM_LOAD16_BYTE( "006sc04a.103",0x2000001, 0x800000, CRC(9b63cd98) SHA1(62519a3a531c4493a5a85dc01ca69413977120ca) )
+	ROM_LOAD16_BYTE( "006sc07a.102",0x3000000, 0x800000, CRC(7a1c371e) SHA1(1cd4ad66dd007adc9ab0c29720cbf9955c7337e0) )
+	ROM_LOAD16_BYTE( "006sc08a.104",0x3000001, 0x800000, CRC(88232ade) SHA1(4ae2a572c3525087f77c95185e8697a1fc720512) )
 
 	/* Sprite Characters - 8x8x8 / 16x16x8 */
-	ROM_REGION( 0x4000000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000000, "sprtile", ROMREGION_DISPOSE )
 	ROM_LOAD32_BYTE( "006sp01a.105",0x0000000, 0x800000, CRC(087b8c49) SHA1(bb1eb2baef7da91f904bf45414f21dd6bac30749) )
 	ROM_LOAD32_BYTE( "006sp02a.109",0x0000001, 0x800000, CRC(da28631e) SHA1(ea7e2d9195cfa4f954f4d542296eec1323223653) )
 	ROM_LOAD32_BYTE( "006sp03a.113",0x0000002, 0x800000, CRC(bb87b55b) SHA1(8644ebb356ae158244a6e03254b0212cb359e167) )
@@ -1728,7 +1996,7 @@ ROM_START( fatfurwa )
 	ROM_LOAD32_BYTE( "006sp08a.118",0x2000003, 0x800000, CRC(9c3044ac) SHA1(24b28bcc6be51ab3ff59c2894094cd03ec377d84) )
 
 	/* Textures - 1024x1024x8 pages */
-	ROM_REGION( 0x1000000, "gfx3", 0 )
+	ROM_REGION( 0x1000000, "textures", 0 )
 	/* note: same roms are at different positions on the board, repeated a total of 4 times*/
 	ROM_LOAD( "006tx01a.1", 0x0000000, 0x400000, CRC(ab4c1747) SHA1(2c097bd38f1a92c4b6534992f6bf29fd6dc2d265) )
 	ROM_LOAD( "006tx02a.2", 0x0400000, 0x400000, CRC(7854a229) SHA1(dba23c1b793dd0308ac1088c819543fff334a57e) )
@@ -1748,7 +2016,7 @@ ROM_START( fatfurwa )
 	ROM_LOAD( "006tx04a.16",0x0c00000, 0x400000, CRC(82d61652) SHA1(28303ae9e2545a4cb0b5843f9e73407754f41e9e) )
 
 	/* X,Y,Z Vertex ROMs */
-	ROM_REGION16_BE( 0x0c00000, "gfx4", ROMREGION_NODISPOSE )
+	ROM_REGION16_BE( 0x0c00000, "verts", ROMREGION_NODISPOSE )
 	ROMX_LOAD( "006vt01a.17", 0x0000000, 0x400000, CRC(5c20ed4c) SHA1(df679f518292d70b9f23d2bddabf975d56b96910), ROM_GROUPWORD | ROM_SKIP(4) )
 	ROMX_LOAD( "006vt02a.18", 0x0000002, 0x400000, CRC(150eb717) SHA1(9acb067346eb386256047c0f1d24dc8fcc2118ca), ROM_GROUPWORD | ROM_SKIP(4) )
 	ROMX_LOAD( "006vt03a.19", 0x0000004, 0x400000, CRC(021cfcaf) SHA1(fb8b5f50d3490b31f0a4c3e6d3ae1b98bae41c97), ROM_GROUPWORD | ROM_SKIP(4) )
@@ -1761,7 +2029,6 @@ ROM_START( fatfurwa )
 ROM_END
 
 ROM_START( buriki )
-
 	/* BIOS */
 	ROM_REGION32_BE( 0x0100000, "user1", 0 ) /* 512k for R4300 BIOS code */
 	ROM_LOAD ( "brom1.bin", 0x000000, 0x080000,  CRC(a30dd3de) SHA1(3e2fd0a56214e6f5dcb93687e409af13d065ea30) )
@@ -1770,7 +2037,7 @@ ROM_START( buriki )
 	ROM_LOAD ( "rom1.bin",  0x080000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) )
 	/* END BIOS */
 
-	ROM_REGION32_LE( 0x2000000, "user3", 0 ) /* Program Code, mapped at ??? maybe banked?  LE? */
+	ROM_REGION32_LE( 0x2000000, "user3", 0 )
 	ROM_LOAD32_WORD( "007pr01b.81", 0x0000000, 0x400000, CRC(a31202f5) SHA1(c657729b292d394ced021a0201a1c5608a7118ba) )
 	ROM_LOAD32_WORD( "007pr02b.82", 0x0000002, 0x400000, CRC(a563fed6) SHA1(9af9a021beb814e35df968abe5a99225a124b5eb) )
 	ROM_LOAD32_WORD( "007pr03a.83", 0x0800000, 0x400000, CRC(da5f6105) SHA1(5424cf5289cef66e301e968b4394e551918fe99b) )
@@ -1779,18 +2046,18 @@ ROM_START( buriki )
 	ROM_LOAD32_WORD( "007pr06a.86", 0x1000002, 0x400000, CRC(0620fccc) SHA1(e0bffc56b019c79276a4ef5ec7354edda15b0889) )
 
 	/* Scroll Characters 8x8x8 / 16x16x8 */
-	ROM_REGION( 0x4000000, "gfx1", ROMREGION_DISPOSE )
-	ROM_LOAD32_BYTE( "007sc01a.97", 0x0000000, 0x800000, CRC(4e8300db) SHA1(f1c9e6fddc10efc8f2a530027cca062f48b8c8d4) )
-	ROM_LOAD32_BYTE( "007sc02a.99", 0x0000001, 0x800000, CRC(d5855944) SHA1(019c0bd2f8de7ffddd53df6581b40940262f0053) )
-	ROM_LOAD32_BYTE( "007sc03a.101",0x0000002, 0x800000, CRC(ff45c9b5) SHA1(ddcc2a10ccac62eb1f3671172ad1a4d163714fca) )
-	ROM_LOAD32_BYTE( "007sc04a.103",0x0000003, 0x800000, CRC(e4cb59e9) SHA1(4e07ff374890217466a53d5bfb1fa99eb7402360) )
-	ROM_LOAD32_BYTE( "007sc05a.98", 0x2000000, 0x400000, CRC(27f848c1) SHA1(2ee9cca4e68e56c7c17c8e2d7e0f55a34a5960bd) )
-	ROM_LOAD32_BYTE( "007sc06a.100",0x2000001, 0x400000, CRC(c39e9b4c) SHA1(3c8a0494c2a6866ecc0df2c551619c57ee072440) )
-	ROM_LOAD32_BYTE( "007sc07a.102",0x2000002, 0x400000, CRC(753e7e3d) SHA1(39b2e9fd23878d8fc4f98fe88b466e963d8fc959) )
-	ROM_LOAD32_BYTE( "007sc08a.104",0x2000003, 0x400000, CRC(b605928e) SHA1(558042b84115273fa581606daafba0e9688fa002) )
+	ROM_REGION( 0x4000000, "scrtile", ROMREGION_DISPOSE )
+	ROM_LOAD16_BYTE( "007sc01a.97", 0x0000000, 0x800000, CRC(4e8300db) SHA1(f1c9e6fddc10efc8f2a530027cca062f48b8c8d4) )
+	ROM_LOAD16_BYTE( "007sc02a.99", 0x0000001, 0x800000, CRC(d5855944) SHA1(019c0bd2f8de7ffddd53df6581b40940262f0053) )
+	ROM_LOAD16_BYTE( "007sc05a.98", 0x1000000, 0x400000, CRC(27f848c1) SHA1(2ee9cca4e68e56c7c17c8e2d7e0f55a34a5960bd) )
+	ROM_LOAD16_BYTE( "007sc06a.100",0x1000001, 0x400000, CRC(c39e9b4c) SHA1(3c8a0494c2a6866ecc0df2c551619c57ee072440) )
+	ROM_LOAD16_BYTE( "007sc03a.101",0x2000000, 0x800000, CRC(ff45c9b5) SHA1(ddcc2a10ccac62eb1f3671172ad1a4d163714fca) )
+	ROM_LOAD16_BYTE( "007sc04a.103",0x2000001, 0x800000, CRC(e4cb59e9) SHA1(4e07ff374890217466a53d5bfb1fa99eb7402360) )
+	ROM_LOAD16_BYTE( "007sc07a.102",0x3000000, 0x400000, CRC(753e7e3d) SHA1(39b2e9fd23878d8fc4f98fe88b466e963d8fc959) )
+	ROM_LOAD16_BYTE( "007sc08a.104",0x3000001, 0x400000, CRC(b605928e) SHA1(558042b84115273fa581606daafba0e9688fa002) )
 
 	/* Sprite Characters - 8x8x8 / 16x16x8 */
-	ROM_REGION( 0x4000000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000000, "sprtile", ROMREGION_DISPOSE )
 	ROM_LOAD32_BYTE( "007sp01a.105",0x0000000, 0x800000, CRC(160acae6) SHA1(37c15e1d2544ec6f3b61d06200345d6abdd28edf) )
 	ROM_LOAD32_BYTE( "007sp02a.109",0x0000001, 0x800000, CRC(1a55331d) SHA1(0b03d5c7312e01874365b31f1ff3d9766abd00f1) )
 	ROM_LOAD32_BYTE( "007sp03a.113",0x0000002, 0x800000, CRC(3f308444) SHA1(0acd52312c15a2ed3bacf60a2fd820cb09ebbb55) )
@@ -1801,7 +2068,7 @@ ROM_START( buriki )
 	ROM_LOAD32_BYTE( "007sp08a.118",0x2000003, 0x400000, CRC(7a158c67) SHA1(d66f4920a513208d45b908a1934d9afb894debf1) )
 
 	/* Textures - 1024x1024x8 pages */
-	ROM_REGION( 0x1000000, "gfx3", 0 )
+	ROM_REGION( 0x1000000, "textures", 0 )
 	/* note: same roms are at different positions on the board, repeated a total of 4 times*/
 	ROM_LOAD( "007tx01a.1", 0x0000000, 0x400000, CRC(a7774075) SHA1(4f3da9af131a7efb0f0a5180da57c19c65fffb82) )
 	ROM_LOAD( "007tx02a.2", 0x0400000, 0x400000, CRC(bc05d5fd) SHA1(84e3fafcebdeb1e2ffae80785949c973a14055d8) )
@@ -1821,7 +2088,7 @@ ROM_START( buriki )
 	ROM_LOAD( "007tx04a.16",0x0c00000, 0x400000, CRC(02aa3f46) SHA1(1fca89c70586f8ebcdf669ecac121afa5cdf623f) )
 
 	/* X,Y,Z Vertex ROMs */
-	ROM_REGION16_BE( 0x0c00000, "gfx4", ROMREGION_NODISPOSE )
+	ROM_REGION16_BE( 0x0c00000, "verts", ROMREGION_NODISPOSE )
 	ROMX_LOAD( "007vt01a.17", 0x0000000, 0x400000, CRC(f78a0376) SHA1(fde4ddd4bf326ae5f1ed10311c237b13b62e060c), ROM_GROUPWORD | ROM_SKIP(4) )
 	ROMX_LOAD( "007vt02a.18", 0x0000002, 0x400000, CRC(f365f608) SHA1(035fd9b829b7720c4aee6fdf204c080e6157994f), ROM_GROUPWORD | ROM_SKIP(4) )
 	ROMX_LOAD( "007vt03a.19", 0x0000004, 0x400000, CRC(ba05654d) SHA1(b7fe532732c0af7860c8eded3c5abd304d74e08e), ROM_GROUPWORD | ROM_SKIP(4) )
@@ -1838,10 +2105,10 @@ GAME( 1997, hng64,  0,        hng64, hng64, hng64,      ROT0, "SNK", "Hyper NeoG
 
 /* Games */
 GAME( 1997, roadedge, hng64,  hng64, hng64, hng64_race, ROT0, "SNK", "Roads Edge / Round Trip (rev.B)",	  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 001 */
-/* Samurai Shodown 64           002 */
-/* Xtreme Rally / Offbeat Racer 003 */
-/* Beast Busters 2nd Nightmare  004 */
-GAME( 1998, sams64_2, hng64,  hng64, hng64, hng64_fght, ROT0, "SNK", "Samurai Shodown: Warrior's Rage",	  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 005 */
-GAME( 1998, fatfurwa, hng64,  hng64, hng64, hng64_fght, ROT0, "SNK", "Fatal Fury: Wild Ambition (rev.A)", GAME_NOT_WORKING|GAME_NO_SOUND )	/* 006 */
-GAME( 1999, buriki,   hng64,  hng64, hng64, hng64_fght, ROT0, "SNK", "Buriki One (rev.B)",				  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 007 */
+GAME( 1998, sams64,   hng64,  hng64, hng64, ss64,       ROT0, "SNK", "Samurai Shodown 64 / Samurai Spirits 64",	  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 002 */
+GAME( 1998, xrally,   hng64,  hng64, hng64, hng64_race, ROT0, "SNK", "Xtreme Rally / Off Beat Racer!",	  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 003 */
+GAME( 1998, bbust2,   hng64,  hng64, hng64, hng64_shoot,ROT0, "SNK", "Beast Busters 2nd Nightmare",	  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 004 */
+GAME( 1998, sams64_2, hng64,  hng64, hng64, ss64,       ROT0, "SNK", "Samurai Shodown: Warrior's Rage / Samurai Spirits 2: Asura Zanmaden",	  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 005 */
+GAME( 1998, fatfurwa, hng64,  hng64, hng64, fatfurwa,   ROT0, "SNK", "Fatal Fury: Wild Ambition (rev.A)", GAME_NOT_WORKING|GAME_NO_SOUND )	/* 006 */
+GAME( 1999, buriki,   hng64,  hng64, hng64, fatfurwa,   ROT0, "SNK", "Buriki One (rev.B)",				  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 007 */
 

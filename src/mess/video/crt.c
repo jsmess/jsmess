@@ -61,7 +61,7 @@ static int num_intensity_levels;
 
 	video init
 */
-int video_start_crt(int num_levels, int offset_x, int offset_y, int width, int height)
+int video_start_crt(running_machine *machine, int num_levels, int offset_x, int offset_y, int width, int height)
 {
 	int i;
 
@@ -72,9 +72,9 @@ int video_start_crt(int num_levels, int offset_x, int offset_y, int width, int h
 	window_height = height;
 
 	/* alloc the arrays */
-	list = auto_malloc(window_width * window_height * sizeof(point));
+	list = auto_alloc_array(machine, point, window_width * window_height);
 
-	list_head = auto_malloc(window_height * sizeof(int));
+	list_head = auto_alloc_array(machine, int, window_height);
 
 	/* fill with black and set up list as empty */
 	for (i=0; i<(window_width * window_height); i++)

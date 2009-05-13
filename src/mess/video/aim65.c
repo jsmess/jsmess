@@ -131,7 +131,7 @@ VIDEO_START( aim65 )
 
 	/*
     videoram_size = 600 * 10 * 2;
-    printerRAM = (UINT16*)auto_malloc (videoram_size );
+    printerRAM = auto_alloc_array(machine, UINT16, videoram_size / 2);
     memset(printerRAM, 0, videoram_size);
     printer_x = 0;
     printer_y = 0;

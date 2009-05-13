@@ -498,7 +498,7 @@ static MACHINE_START( abc80 )
 		break;
 
 	case 32*1024:
-		memory_install_readwrite8_handler(cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite8_handler(cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, SMH_BANK(1), SMH_BANK(1));
 		break;
 	}
 

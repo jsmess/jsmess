@@ -207,8 +207,8 @@ void vdc8563_set_rastering(int on)
 
 VIDEO_START( vdc8563 )
 {
-	vdc.ram=(UINT8*) auto_malloc(0x20000);
-	vdc.dirty=vdc.ram+0x10000;
+	vdc.ram = auto_alloc_array(machine, UINT8, 0x20000);
+	vdc.dirty = vdc.ram + 0x10000;
 }
 
 #define CHAR_WIDTH (((vdc.reg[0x16]&0xf0)>>4)+1)

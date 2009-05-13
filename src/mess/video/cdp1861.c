@@ -255,7 +255,7 @@ static DEVICE_START( cdp1861 )
 	assert(cdp1861->screen != NULL);
 
 	/* allocate the temporary bitmap */
-	cdp1861->bitmap = auto_bitmap_alloc(video_screen_get_width(cdp1861->screen), video_screen_get_height(cdp1861->screen), video_screen_get_format(cdp1861->screen));
+	cdp1861->bitmap = auto_bitmap_alloc(device->machine, video_screen_get_width(cdp1861->screen), video_screen_get_height(cdp1861->screen), video_screen_get_format(cdp1861->screen));
 
 	/* create the timers */
 	cdp1861->int_timer = timer_alloc(device->machine, cdp1861_int_tick, (void *)device);

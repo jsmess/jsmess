@@ -46,7 +46,7 @@ PALETTE_INIT( mekd2 )
 VIDEO_START( mekd2 )
 {
     videoram_size = 6 * 2 + 24;
-    videoram = (UINT8*)auto_malloc (videoram_size);
+    videoram = auto_alloc_array(machine, UINT8, videoram_size);
 }
 
 

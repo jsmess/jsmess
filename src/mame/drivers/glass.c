@@ -67,21 +67,6 @@ static GFXDECODE_START( glass )
 GFXDECODE_END
 
 
-static ADDRESS_MAP_START( glass_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM)				/* ROM */
-	AM_RANGE(0x100000, 0x101fff) AM_READ(SMH_RAM)				/* Video RAM */
-	AM_RANGE(0x102000, 0x102fff) AM_READ(SMH_RAM)				/* Extra Video RAM */
-	AM_RANGE(0x200000, 0x2007ff) AM_READ(SMH_RAM)				/* Palette */
-	AM_RANGE(0x440000, 0x440fff) AM_READ(SMH_RAM)				/* Sprite RAM */
-	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW2")
-	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW1")
-	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("P1")
-	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("P2")
-	AM_RANGE(0x70000e, 0x70000f) AM_DEVREAD8("oki", okim6295_r, 0x00ff)/* OKI6295 status register */
-	AM_RANGE(0xfec000, 0xfeffff) AM_READ(SMH_RAM)				/* Work RAM (partially shared with DS5002FP) */
-ADDRESS_MAP_END
-
-
 static WRITE16_HANDLER( OKIM6295_bankswitch_w )
 {
 	UINT8 *RAM = memory_region(space->machine, "oki");
@@ -107,19 +92,23 @@ static WRITE16_HANDLER( glass_coin_w )
 	}
 }
 
-static ADDRESS_MAP_START( glass_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_ROM)								/* ROM */
-	AM_RANGE(0x100000, 0x101fff) AM_WRITE(glass_vram_w) AM_BASE(&glass_videoram)			/* Video RAM */
-	AM_RANGE(0x102000, 0x102fff) AM_WRITE(SMH_RAM)								/* Extra Video RAM */
-	AM_RANGE(0x108000, 0x108007) AM_WRITE(SMH_RAM) AM_BASE(&glass_vregs)				/* Video Registers */
-	AM_RANGE(0x108008, 0x108009) AM_WRITE(clr_int_w)								/* CLR INT Video */
-	AM_RANGE(0x200000, 0x2007ff) AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)/*  Palette */
-	AM_RANGE(0x440000, 0x440fff) AM_WRITE(SMH_RAM) AM_BASE(&glass_spriteram)			/* Sprite RAM */
-	AM_RANGE(0x700008, 0x700009) AM_WRITE(glass_blitter_w)						/* serial blitter */
-	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(OKIM6295_bankswitch_w)					/* OKI6295 bankswitch */
-	AM_RANGE(0x70000e, 0x70000f) AM_DEVWRITE8("oki", okim6295_w, 0x00ff)					/* OKI6295 data register */
-	AM_RANGE(0x70000a, 0x70004b) AM_WRITE(glass_coin_w)							/* Coin Counters/Lockout */
-	AM_RANGE(0xfec000, 0xfeffff) AM_WRITE(SMH_RAM)								/* Work RAM (partially shared with DS5002FP) */
+static ADDRESS_MAP_START( glass_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM																		/* ROM */
+	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE(glass_vram_w) AM_BASE(&glass_videoram)						/* Video RAM */
+	AM_RANGE(0x102000, 0x102fff) AM_RAM																		/* Extra Video RAM */
+	AM_RANGE(0x108000, 0x108007) AM_WRITE(SMH_RAM) AM_BASE(&glass_vregs)									/* Video Registers */
+	AM_RANGE(0x108008, 0x108009) AM_WRITE(clr_int_w)														/* CLR INT Video */
+	AM_RANGE(0x200000, 0x2007ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)	/* Palette */
+	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE(&glass_spriteram)											/* Sprite RAM */
+	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW2")
+	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW1")
+	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("P1")
+	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("P2")
+	AM_RANGE(0x700008, 0x700009) AM_WRITE(glass_blitter_w)													/* serial blitter */
+	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(OKIM6295_bankswitch_w)											/* OKI6295 bankswitch */
+	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)					/* OKI6295 status register */
+	AM_RANGE(0x70000a, 0x70004b) AM_WRITE(glass_coin_w)														/* Coin Counters/Lockout */
+	AM_RANGE(0xfec000, 0xfeffff) AM_RAM																		/* Work RAM (partially shared with DS5002FP) */
 ADDRESS_MAP_END
 
 
@@ -202,7 +191,7 @@ static MACHINE_DRIVER_START( glass )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,24000000/2)		/* 12 MHz (M680000 P12) */
-	MDRV_CPU_PROGRAM_MAP(glass_readmem,glass_writemem)
+	MDRV_CPU_PROGRAM_MAP(glass_map,0)
 	MDRV_CPU_VBLANK_INT("screen", glass_interrupt)
 
 	MDRV_MACHINE_RESET(glass)
@@ -229,10 +218,10 @@ static MACHINE_DRIVER_START( glass )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
-ROM_START( glass )
+ROM_START( glass ) /* Version 1.1 */
 	ROM_REGION( 0x080000, "maincpu", 0 )	/* 68000 code */
-	ROM_LOAD16_BYTE( "1.c23",	0x000000, 0x040000, CRC(aeebd4ed) SHA1(04759dc146dff0fc74b78d70e79dfaebe68328f9) )
-	ROM_LOAD16_BYTE( "2.c22",	0x000001, 0x040000, CRC(165e2e01) SHA1(180a2e2b5151f2321d85ac23eff7fbc9f52023a5) )
+	ROM_LOAD16_BYTE( "1.c23", 0x000000, 0x040000, CRC(aeebd4ed) SHA1(04759dc146dff0fc74b78d70e79dfaebe68328f9) )
+	ROM_LOAD16_BYTE( "2.c22", 0x000001, 0x040000, CRC(165e2e01) SHA1(180a2e2b5151f2321d85ac23eff7fbc9f52023a5) )
 
 	ROM_REGION( 0x400000, "gfx1", ROMREGION_DISPOSE )	/* Graphics */
 	/* 0x000000-0x3fffff filled in later in the DRIVER_INIT */
@@ -245,15 +234,15 @@ ROM_START( glass )
 	ROM_LOAD( "h9.bin", 0x000000, 0x100000, CRC(b9492557) SHA1(3f5c0d696d65e1cd492763dfa749c813dd56a9bf) )
 
 	ROM_REGION( 0x140000, "oki", 0 )	/* ADPCM samples - sound chip is OKIM6295 */
-	ROM_LOAD( "c1.bin",	 0x000000, 0x100000, CRC(d9f075a2) SHA1(31a7a677861f39d512e9d1f51925c689e481159a) )
+	ROM_LOAD( "c1.bin", 0x000000, 0x100000, CRC(d9f075a2) SHA1(31a7a677861f39d512e9d1f51925c689e481159a) )
 	/* 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs */
-	ROM_RELOAD(				0x040000, 0x100000 )
+	ROM_RELOAD(         0x040000, 0x100000 )
 ROM_END
 
-ROM_START( glass10 )
+ROM_START( glass10 ) /* Version 1.0 */
 	ROM_REGION( 0x080000, "maincpu", 0 )	/* 68000 code */
-	ROM_LOAD16_BYTE( "c23.bin",	0x000000, 0x040000, CRC(688cdf33) SHA1(b59dcc3fc15f72037692b745927b110e97d8282e) )
-	ROM_LOAD16_BYTE( "c22.bin",	0x000001, 0x040000, CRC(ab17c992) SHA1(1509b5b4bbfb4e022e0ab6fbbc0ffc070adfa531) )
+	ROM_LOAD16_BYTE( "c23.bin", 0x000000, 0x040000, CRC(688cdf33) SHA1(b59dcc3fc15f72037692b745927b110e97d8282e) )
+	ROM_LOAD16_BYTE( "c22.bin", 0x000001, 0x040000, CRC(ab17c992) SHA1(1509b5b4bbfb4e022e0ab6fbbc0ffc070adfa531) )
 
 	ROM_REGION( 0x400000, "gfx1", ROMREGION_DISPOSE )	/* Graphics */
 	/* 0x000000-0x3fffff filled in later in the DRIVER_INIT */
@@ -266,16 +255,15 @@ ROM_START( glass10 )
 	ROM_LOAD( "h9.bin", 0x000000, 0x100000, CRC(b9492557) SHA1(3f5c0d696d65e1cd492763dfa749c813dd56a9bf) )
 
 	ROM_REGION( 0x140000, "oki", 0 )	/* ADPCM samples - sound chip is OKIM6295 */
-	ROM_LOAD( "c1.bin",	 0x000000, 0x100000, CRC(d9f075a2) SHA1(31a7a677861f39d512e9d1f51925c689e481159a) )
+	ROM_LOAD( "c1.bin", 0x000000, 0x100000, CRC(d9f075a2) SHA1(31a7a677861f39d512e9d1f51925c689e481159a) )
 	/* 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs */
-	ROM_RELOAD(				0x040000, 0x100000 )
+	ROM_RELOAD(         0x040000, 0x100000 )
 ROM_END
 
-ROM_START( glass10a )
+ROM_START( glassbrk ) /* Title screen shows "GLASS" and under that "Break Edition" on a real PCB */
 	ROM_REGION( 0x080000, "maincpu", 0 )	/* 68000 code */
-	ROM_LOAD16_BYTE( "gl.c23",	0x000000, 0x040000, CRC(c1393bea) SHA1(a5f877ba38305a7b49fa3c96b9344cbf71e8c9ef
-) )
-	ROM_LOAD16_BYTE( "gl.c22",	0x000001, 0x040000, CRC(0d6fa33e) SHA1(37e9258ef7e108d034c80abc8e5e5ab6dacf0a61) )
+	ROM_LOAD16_BYTE( "spl-c23.bin", 0x000000, 0x040000, CRC(c1393bea) SHA1(a5f877ba38305a7b49fa3c96b9344cbf71e8c9ef) )
+	ROM_LOAD16_BYTE( "spl-c22.bin", 0x000001, 0x040000, CRC(0d6fa33e) SHA1(37e9258ef7e108d034c80abc8e5e5ab6dacf0a61) )
 
 	ROM_REGION( 0x400000, "gfx1", ROMREGION_DISPOSE )	/* Graphics */
 	/* 0x000000-0x3fffff filled in later in the DRIVER_INIT */
@@ -288,9 +276,9 @@ ROM_START( glass10a )
 	ROM_LOAD( "h9.bin", 0x000000, 0x100000, CRC(b9492557) SHA1(3f5c0d696d65e1cd492763dfa749c813dd56a9bf) )
 
 	ROM_REGION( 0x140000, "oki", 0 )	/* ADPCM samples - sound chip is OKIM6295 */
-	ROM_LOAD( "c1.bin",	 0x000000, 0x100000, CRC(d9f075a2) SHA1(31a7a677861f39d512e9d1f51925c689e481159a) )
+	ROM_LOAD( "c1.bin", 0x000000, 0x100000, CRC(d9f075a2) SHA1(31a7a677861f39d512e9d1f51925c689e481159a) )
 	/* 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs */
-	ROM_RELOAD(				0x040000, 0x100000 )
+	ROM_RELOAD(         0x040000, 0x100000 )
 ROM_END
 
 /***************************************************************************
@@ -337,6 +325,6 @@ static DRIVER_INIT( glass )
 	glass_ROM16_split_gfx(machine, "gfx2", "gfx1", 0x0200000, 0x0200000, 0x0200000, 0x0300000);
 }
 
-GAME( 1993, glass,    0,     glass, glass, glass, ROT0, "Gaelco", "Glass (Ver 1.1)",        GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1993, glass10,  glass, glass, glass, glass, ROT0, "Gaelco", "Glass (Ver 1.0, set 1)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1993, glass10a, glass, glass, glass, glass, ROT0, "Gaelco", "Glass (Ver 1.0, set 2)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1993, glass,    0,     glass, glass, glass, ROT0, "Gaelco", "Glass (Ver 1.1)",                GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1993, glass10,  glass, glass, glass, glass, ROT0, "Gaelco", "Glass (Ver 1.0)",                GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1993, glassbrk, glass, glass, glass, glass, ROT0, "Gaelco", "Glass (Ver 1.0, Break Edition)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )

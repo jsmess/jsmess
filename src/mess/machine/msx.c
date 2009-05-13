@@ -262,7 +262,7 @@ DEVICE_IMAGE_LOAD (msx_cart)
 		state->sramfile = sramfile;
 	}
 
-	if (msx_slot_list[type].init (state, 0, mem, size_aligned)) {
+	if (msx_slot_list[type].init (image->machine, state, 0, mem, size_aligned)) {
 		return INIT_FAIL;
 	}
 	if (msx_slot_list[type].loadsram) {
@@ -824,7 +824,7 @@ void msx_memory_init (running_machine *machine)
 	slot_state *st;
 	UINT8 *mem = NULL;
 
-	msx1.empty = (UINT8*)auto_malloc (0x4000);
+	msx1.empty = auto_alloc_array(machine, UINT8, 0x4000);
 	memset (msx1.empty, 0xff, 0x4000);
 
 	for (prim=0; prim<4; prim++) {
@@ -912,10 +912,10 @@ void msx_memory_init (running_machine *machine)
 					mem = NULL;
 					break;
 				}
-				st = (slot_state*)auto_malloc (sizeof (slot_state));
+				st = auto_alloc_clear (machine, slot_state);
 				memset (st, 0, sizeof (slot_state));
 
-				if (slot->init (st, layout->slot_page, mem, size)) {
+				if (slot->init (machine, st, layout->slot_page, mem, size)) {
 					continue;
 				}
 			}

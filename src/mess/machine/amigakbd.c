@@ -101,7 +101,7 @@ static INPUT_CHANGED( kbd_update )
 void amigakbd_init( running_machine *machine )
 {
 	/* allocate a keyboard buffer */
-	key_buf = auto_malloc( KEYBOARD_BUFFER_SIZE );
+	key_buf = auto_alloc_array(machine, UINT8, KEYBOARD_BUFFER_SIZE );
 	key_buf_pos = 0;
 	key_cur_pos = 0;
 	kbd_timer = timer_alloc(machine, kbd_update_callback, NULL);

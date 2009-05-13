@@ -141,7 +141,7 @@ VIDEO_START( vic6560 )
 	int width = video_screen_get_width(screen);
 	int height = video_screen_get_height(screen);
 
-	vic6560_bitmap = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
+	vic6560_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 }
 
 WRITE8_HANDLER ( vic6560_port_w )

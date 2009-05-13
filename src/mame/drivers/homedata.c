@@ -327,8 +327,8 @@ static WRITE8_HANDLER( mrokumei_sound_io_w )
 
 static WRITE8_HANDLER( mrokumei_sound_cmd_w )
 {
-	soundlatch_w(space,offset,data);
-	cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
+	soundlatch_w(space, offset, data);
+	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
 }
 
 
@@ -388,7 +388,7 @@ static WRITE8_HANDLER( reikaids_upd7807_portc_w )
 
 static MACHINE_RESET( reikaids_upd7807 )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	/* on reset, ports are set as input (high impedance), therefore 0xff output */
 	reikaids_which=homedata_priority;
 	reikaids_upd7807_portc_w(space,0,0xff);
@@ -535,7 +535,7 @@ static WRITE8_HANDLER( pteacher_upd7807_portc_w )
 
 static MACHINE_RESET( pteacher_upd7807 )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	/* on reset, ports are set as input (high impedance), therefore 0xff output */
 	pteacher_upd7807_portc_w(space,0,0xff);
 }
@@ -565,34 +565,28 @@ static WRITE8_HANDLER( bankswitch_w )
 /********************************************************************************/
 
 
-static ADDRESS_MAP_START( mrokumei_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_RAM) /* videoram */
-	AM_RANGE(0x4000, 0x5fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x6000, 0x6fff) AM_READ(SMH_RAM) /* work ram */
-	AM_RANGE(0x7000, 0x77ff) AM_READ(SMH_RAM) /* hourouki expects this to act as RAM */
-	AM_RANGE(0x7800, 0x7800) AM_READ(SMH_RAM) /* only used to store the result of the ROM check */
+static ADDRESS_MAP_START( mrokumei_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(mrokumei_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x4000, 0x5fff) AM_RAM
+	AM_RANGE(0x6000, 0x6fff) AM_RAM /* work ram */
+	AM_RANGE(0x7000, 0x77ff) AM_RAM /* hourouki expects this to act as RAM */
+	AM_RANGE(0x7800, 0x7800) AM_RAM /* only used to store the result of the ROM check */
 	AM_RANGE(0x7801, 0x7802) AM_READ(mrokumei_keyboard_r)	// also vblank and active page
 	AM_RANGE(0x7803, 0x7803) AM_READ_PORT("IN0")			// coin, service
 	AM_RANGE(0x7804, 0x7804) AM_READ_PORT("DSW1")			// DSW1
 	AM_RANGE(0x7805, 0x7805) AM_READ_PORT("DSW2")			// DSW2
-	AM_RANGE(0x7ffe, 0x7ffe) AM_READNOP	// ??? read every vblank, value discarded
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( mrokumei_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(mrokumei_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x4000, 0x5fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x6000, 0x6fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x7000, 0x77ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x7800, 0x7800) AM_WRITE(SMH_RAM) /* only used to store the result of the ROM check */
 	AM_RANGE(0x7ff0, 0x7ffd) AM_WRITE(SMH_RAM) AM_BASE(&homedata_vreg)
+	AM_RANGE(0x7ffe, 0x7ffe) AM_READNOP	// ??? read every vblank, value discarded
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(mrokumei_blitter_start_w)	// in some games also ROM bank switch to access service ROM
 	AM_RANGE(0x8001, 0x8001) AM_WRITE(mrokumei_keyboard_select_w)
 	AM_RANGE(0x8002, 0x8002) AM_WRITE(mrokumei_sound_cmd_w)
 	AM_RANGE(0x8003, 0x8003) AM_DEVWRITE("sn", sn76496_w)
 	AM_RANGE(0x8006, 0x8006) AM_WRITE(homedata_blitter_param_w)
 	AM_RANGE(0x8007, 0x8007) AM_WRITE(mrokumei_blitter_bank_w)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( mrokumei_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mrokumei_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -620,7 +614,7 @@ static ADDRESS_MAP_START( reikaids_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7801, 0x7801) AM_READ_PORT("IN0")
 	AM_RANGE(0x7802, 0x7802) AM_READ_PORT("IN1")
 	AM_RANGE(0x7803, 0x7803) AM_READ(reikaids_io_r)	// coin, blitter, upd7807
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(1))
 	AM_RANGE(0xc000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
@@ -640,7 +634,7 @@ static ADDRESS_MAP_START( reikaids_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( reikaids_upd7807_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xfeff) AM_READ(SMH_BANK2)	/* External ROM (Banked) */
+	AM_RANGE(0x0000, 0xfeff) AM_READ(SMH_BANK(2))	/* External ROM (Banked) */
 	AM_RANGE(0xff00, 0xffff) AM_READ(SMH_RAM)	/* Internal RAM */
 ADDRESS_MAP_END
 
@@ -666,7 +660,7 @@ static ADDRESS_MAP_START( pteacher_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7800, 0x7800) AM_READ(SMH_RAM)
 	AM_RANGE(0x7801, 0x7801) AM_READ(pteacher_io_r)	// vblank, visible page
 	AM_RANGE(0x7ff2, 0x7ff2) AM_READ(pteacher_snd_r)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(1))
 	AM_RANGE(0xc000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
@@ -687,7 +681,7 @@ static ADDRESS_MAP_START( pteacher_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pteacher_upd7807_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xfeff) AM_READ(SMH_BANK2)	/* External ROM (Banked) */
+	AM_RANGE(0x0000, 0xfeff) AM_READ(SMH_BANK(2))	/* External ROM (Banked) */
 	AM_RANGE(0xff00, 0xffff) AM_READ(SMH_RAM)	/* Internal RAM */
 ADDRESS_MAP_END
 
@@ -1211,7 +1205,7 @@ static MACHINE_DRIVER_START( mrokumei )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 16000000/4)	/* 4MHz ? */
-	MDRV_CPU_PROGRAM_MAP(mrokumei_readmem,mrokumei_writemem)
+	MDRV_CPU_PROGRAM_MAP(mrokumei_map,0)
 	MDRV_CPU_VBLANK_INT("screen", homedata_irq)	/* also triggered by the blitter */
 
 	MDRV_CPU_ADD("audiocpu", Z80, 16000000/4)	/* 4MHz ? */
@@ -1785,15 +1779,15 @@ static DRIVER_INIT( jogakuen )
 	/* it seems that Mahjong Jogakuen runs on the same board as the others,
        but with just these two addresses swapped. Instead of creating a new
        MachineDriver, I just fix them here. */
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8007, 0x8007, 0, 0, pteacher_blitter_bank_w);
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8005, 0x8005, 0, 0, pteacher_gfx_bank_w);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8007, 0x8007, 0, 0, pteacher_blitter_bank_w);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8005, 0x8005, 0, 0, pteacher_gfx_bank_w);
 }
 
 static DRIVER_INIT( mjikaga )
 {
 	/* Mahjong Ikagadesuka is different as well. */
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x7802, 0x7802, 0, 0, pteacher_snd_r);
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x0123, 0x0123, 0, 0, pteacher_snd_answer_w);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x7802, 0x7802, 0, 0, pteacher_snd_r);
+	memory_install_write8_handler(cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM), 0x0123, 0x0123, 0, 0, pteacher_snd_answer_w);
 }
 
 static DRIVER_INIT( reikaids )
@@ -1823,4 +1817,3 @@ GAME( 1992?,jogakuen, 0, pteacher, jogakuen, jogakuen,   ROT0, "Windom",    "Mah
 GAME( 1990, lemnangl, 0, lemnangl, pteacher, 0,          ROT0, "Home Data", "Mahjong Lemon Angel (Japan)", 0 )
 
 GAME( 1991?,mjikaga,  0, lemnangl, mjikaga,  mjikaga,    ROT0, "Mitchell",  "Mahjong Ikaga Desu ka (Japan)", GAME_NOT_WORKING | GAME_NO_SOUND )
-

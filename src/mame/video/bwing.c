@@ -48,6 +48,7 @@ static void fill_srxlat(int *xlat)
 //****************************************************************************
 // Exports
 
+extern const gfx_layout bwing_tilelayout;
 const gfx_layout bwing_tilelayout =
 {
 	16, 16,
@@ -189,7 +190,7 @@ VIDEO_START( bwing )
 	charmap = tilemap_create(machine, get_charinfo,tilemap_scan_cols, 8, 8,32,32);
 	fgmap = tilemap_create(machine, get_fgtileinfo,bwing_scan_cols,16,16,64,64);
 	bgmap = tilemap_create(machine, get_bgtileinfo,bwing_scan_cols,16,16,64,64);
-	srxlat = auto_malloc(0x8000);
+	srxlat = auto_alloc_array(machine, int, 0x2000);
 
 	scrollmap[0] = fgmap;
 	scrollmap[1] = bgmap;

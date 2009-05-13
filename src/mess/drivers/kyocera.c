@@ -105,7 +105,7 @@ static WRITE8_HANDLER( pc8201_bank_write )
 		}
 
 		if (!optional_rom)
-			memory_install_readwrite8_handler(space_program, 0x0000, 0x7fff, 0, 0, SMH_BANK1, read_only ? SMH_UNMAP : SMH_BANK1);
+			memory_install_readwrite8_handler(space_program, 0x0000, 0x7fff, 0, 0, SMH_BANK(1), read_only ? SMH_UNMAP : SMH_BANK(1));
 	}
 
 	if (((data >> 2) & 0x03) != ram_page)
@@ -157,12 +157,12 @@ static WRITE8_HANDLER( trs200_bank_write )
 		{
 			case 0:
 				memory_set_bankptr(space_program->machine, 1, rom + 0x10000);
-				memory_install_readwrite8_handler(space_program, 0x0000, 0x7fff, 0, 0, SMH_BANK1, SMH_UNMAP);
-				memory_install_readwrite8_handler(space_program, 0x8000, 0x9fff, 0, 0, SMH_BANK2, SMH_UNMAP);
+				memory_install_readwrite8_handler(space_program, 0x0000, 0x7fff, 0, 0, SMH_BANK(1), SMH_UNMAP);
+				memory_install_readwrite8_handler(space_program, 0x8000, 0x9fff, 0, 0, SMH_BANK(2), SMH_UNMAP);
 				break;
 			case 1:
 				memory_set_bankptr(space_program->machine, 1, rom + 0x1a000);	/* Multiplan */
-				memory_install_readwrite8_handler(space_program, 0x0000, 0x7fff, 0, 0, SMH_BANK1, SMH_UNMAP);
+				memory_install_readwrite8_handler(space_program, 0x0000, 0x7fff, 0, 0, SMH_BANK(1), SMH_UNMAP);
 				memory_install_readwrite8_handler(space_program, 0x8000, 0x9fff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 				break;
 			case 2: /* Optional ROM, not implemented yet */
@@ -850,8 +850,8 @@ static DRIVER_INIT( npc8201 )
 {
 	UINT8 *rom = memory_region(machine, I8085_TAG);
 
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, I8085_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x7fff, 0, 0, SMH_BANK1, SMH_UNMAP);
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, I8085_TAG, ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, SMH_BANK2, SMH_BANK2);
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, I8085_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x7fff, 0, 0, SMH_BANK(1), SMH_UNMAP);
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, I8085_TAG, ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
 
 	memory_set_bankptr(machine, 1, rom + 0x10000);
 	memory_set_bankptr(machine, 2, mess_ram);
@@ -861,9 +861,9 @@ static DRIVER_INIT( trs200 )
 {
 	UINT8 *rom = memory_region(machine, I8085_TAG);
 
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, I8085_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x7fff, 0, 0, SMH_BANK1, SMH_UNMAP);
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, I8085_TAG, ADDRESS_SPACE_PROGRAM), 0x8000, 0x9fff, 0, 0, SMH_BANK2, SMH_UNMAP);
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, I8085_TAG, ADDRESS_SPACE_PROGRAM), 0xa000, 0xffff, 0, 0, SMH_BANK3, SMH_BANK3);
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, I8085_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x7fff, 0, 0, SMH_BANK(1), SMH_UNMAP);
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, I8085_TAG, ADDRESS_SPACE_PROGRAM), 0x8000, 0x9fff, 0, 0, SMH_BANK(2), SMH_UNMAP);
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, I8085_TAG, ADDRESS_SPACE_PROGRAM), 0xa000, 0xffff, 0, 0, SMH_BANK(3), SMH_BANK(3));
 
 	memory_set_bankptr(machine, 1, rom + 0x10000);
 	memory_set_bankptr(machine, 2, rom + 0x18000);

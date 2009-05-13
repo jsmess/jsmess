@@ -590,8 +590,8 @@ static void bebox_map_vga_memory(running_machine *machine, offs_t begin, offs_t 
 {
 	const address_space *space = cputag_get_address_space(machine, "ppc1", ADDRESS_SPACE_PROGRAM);
 
-	read64_space_func rh64 = (rh == SMH_BANK4) ? SMH_BANK4 : bebox_vga_memory_r;
-	write64_space_func wh64 = (wh == SMH_BANK4) ? SMH_BANK4 : bebox_vga_memory_w;
+	read64_space_func rh64 = (rh == SMH_BANK(4)) ? SMH_BANK(4) : bebox_vga_memory_r;
+	write64_space_func wh64 = (wh == SMH_BANK(4)) ? SMH_BANK(4) : bebox_vga_memory_w;
 
 	bebox_vga_memory_rh = rh;
 	bebox_vga_memory_wh = wh;
@@ -1103,17 +1103,17 @@ DRIVER_INIT( bebox )
 	offs_t vram_begin;
 	offs_t vram_end;
 
-	mpc105_init(0);
+	mpc105_init(machine, 0);
 
 	/* set up boot and flash ROM */
 	memory_set_bankptr(machine, 2, memory_region(machine, "user2"));
 	intelflash_init(machine, 0, FLASH_FUJITSU_29F016A, memory_region(machine, "user1"));
 
 	/* install MESS managed RAM */
-	memory_install_read64_handler(space_0, 0, mess_ram_size - 1, 0, 0x02000000, SMH_BANK3);
-	memory_install_write64_handler(space_0, 0, mess_ram_size - 1, 0, 0x02000000, SMH_BANK3);
-	memory_install_read64_handler(space_1, 0, mess_ram_size - 1, 0, 0x02000000, SMH_BANK3);
-	memory_install_write64_handler(space_1, 0, mess_ram_size - 1, 0, 0x02000000, SMH_BANK3);
+	memory_install_read64_handler(space_0, 0, mess_ram_size - 1, 0, 0x02000000, SMH_BANK(3));
+	memory_install_write64_handler(space_0, 0, mess_ram_size - 1, 0, 0x02000000, SMH_BANK(3));
+	memory_install_read64_handler(space_1, 0, mess_ram_size - 1, 0, 0x02000000, SMH_BANK(3));
+	memory_install_write64_handler(space_1, 0, mess_ram_size - 1, 0, 0x02000000, SMH_BANK(3));
 	memory_set_bankptr(machine, 3, mess_ram);
 
 	mc146818_init(machine, MC146818_STANDARD);
@@ -1146,7 +1146,7 @@ DRIVER_INIT( bebox )
 			/* bcctr 0x14, 0 */
 			U64(0x4E80042000000000)
 		};
-		memory_install_read64_handler(space_1, 0x9421FFF0, 0x9421FFFF, 0, 0, SMH_BANK1);
+		memory_install_read64_handler(space_1, 0x9421FFF0, 0x9421FFFF, 0, 0, SMH_BANK(1));
 		memory_set_bankptr(machine, 1, ops);
 	}
 }

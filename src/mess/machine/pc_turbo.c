@@ -42,7 +42,7 @@ int pc_turbo_setup(running_machine *machine, int cpunum, const char *port, int m
 {
 	struct pc_turbo_info *ti;
 
-	ti = auto_malloc(sizeof(struct pc_turbo_info));
+	ti = auto_alloc(machine, struct pc_turbo_info);
 	ti->cpunum = cpunum;
 	ti->port = port;
 	ti->mask = mask;

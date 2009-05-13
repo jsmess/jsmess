@@ -223,7 +223,7 @@ int smsvdp_video_init( running_machine *machine, const smsvdp_configuration *con
 	*/
 	smsvdp.VRAM = memory_region_alloc( machine, "gfx1", VRAM_SIZE, ROM_REQUIRED );
 	smsvdp.CRAM = memory_region_alloc( machine, "gfx2", MAX_CRAM_SIZE, ROM_REQUIRED );
-	smsvdp.line_buffer = auto_malloc( 256 * 5 * sizeof(int) );
+	smsvdp.line_buffer = auto_alloc_array(machine, int, 256 * 5);
 	memset( smsvdp.line_buffer, 0, 256 * 5 * sizeof(int) );
 
 	/* Clear RAM */
@@ -235,12 +235,12 @@ int smsvdp_video_init( running_machine *machine, const smsvdp_configuration *con
 
 	smsvdp.cram_mask = ( IS_GAMEGEAR_VDP && ! smsvdp.gg_sms_mode ) ? ( GG_CRAM_SIZE - 1 ) : ( SMS_CRAM_SIZE - 1 );
 
-	smsvdp.collision_buffer = auto_malloc(SMS_X_PIXELS);
+	smsvdp.collision_buffer = auto_alloc_array(machine, UINT8, SMS_X_PIXELS);
 
 	/* Make temp bitmap for rendering */
-	tmpbitmap = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED32);
+	tmpbitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED32);
 
-	smsvdp.prev_bitmap = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED32);
+	smsvdp.prev_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED32);
 
 	set_display_settings( machine );
 

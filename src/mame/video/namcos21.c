@@ -64,13 +64,13 @@ READ16_HANDLER( winrun_gpu_videoram_r )
 } /* winrun_gpu_videoram_r */
 
 static void
-AllocatePolyFrameBuffer( void )
+AllocatePolyFrameBuffer( running_machine *machine )
 {
-	mpPolyFrameBufferZ     = auto_malloc( FRAMEBUFFER_SIZE_IN_BYTES );
-	mpPolyFrameBufferPens  = auto_malloc( FRAMEBUFFER_SIZE_IN_BYTES );
+	mpPolyFrameBufferZ     = auto_alloc_array(machine, UINT16, FRAMEBUFFER_SIZE_IN_BYTES/2 );
+	mpPolyFrameBufferPens  = auto_alloc_array(machine, UINT16, FRAMEBUFFER_SIZE_IN_BYTES/2 );
 
-	mpPolyFrameBufferZ2    = auto_malloc( FRAMEBUFFER_SIZE_IN_BYTES );
-	mpPolyFrameBufferPens2 = auto_malloc( FRAMEBUFFER_SIZE_IN_BYTES );
+	mpPolyFrameBufferZ2    = auto_alloc_array(machine, UINT16, FRAMEBUFFER_SIZE_IN_BYTES/2 );
+	mpPolyFrameBufferPens2 = auto_alloc_array(machine, UINT16, FRAMEBUFFER_SIZE_IN_BYTES/2 );
 
 	namcos21_ClearPolyFrameBuffer();
 	namcos21_ClearPolyFrameBuffer();
@@ -129,10 +129,10 @@ VIDEO_START( namcos21 )
 {
 	if( namcos2_gametype == NAMCOS21_WINRUN91 )
 	{
-		videoram = auto_malloc(0x80000);
+		videoram = auto_alloc_array(machine, UINT8, 0x80000);
 	}
-	AllocatePolyFrameBuffer();
-	namco_obj_init(
+	AllocatePolyFrameBuffer(machine);
+	namco_obj_init(machine,
 		0,		/* gfx bank */
 		0xf,	/* reverse palette mapping */
 		objcode2tile );
@@ -254,14 +254,14 @@ typedef struct
 	double z;
 } edge;
 
-#define SWAP(A,B) { const void *temp = A; A = B; B = temp; }
+#define SWAP(T,A,B) { const T *temp = A; A = B; B = temp; }
 
 static void
 renderscanline_flat( const edge *e1, const edge *e2, int sy, unsigned color, int depthcueenable )
 {
 	if( e1->x > e2->x )
 	{
-		SWAP(e1,e2);
+		SWAP(edge,e1,e2);
 	}
 
 	{
@@ -335,11 +335,11 @@ rendertri(
 	{
 		if( v0->y > v1->y )
 		{
-			SWAP(v0,v1);
+			SWAP(vertex,v0,v1);
 		}
 		else if( v1->y > v2->y )
 		{
-			SWAP(v1,v2);
+			SWAP(vertex,v1,v2);
 		}
 		else
 		{

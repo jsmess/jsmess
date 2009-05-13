@@ -242,55 +242,117 @@ int level;
 	}
 
 	level=dc_compute_interrupt_level(machine);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH4_IRLn_INPUT, 15-level);
+	sh4_set_irln_input(cputag_get_cpu(machine, "maincpu"), 15-level);
 }
+
+/******************************************************
+JVS init packets
+The function packets goes like this:
+[0] Function number
+[1] Number of "devices"
+[2] Parameter of the device
+[3] End flag (always zero)
+******************************************************/
+static int jvs_mux_data;
 
 static int jvsboard_init(int pos)
 {
 	// four bytes for every available function
-	// first function
+	//1 digital inputs
 	maple0x86data2[pos+10]=1;
-	maple0x86data2[pos+11]=2; // number of players
-	maple0x86data2[pos+12]=9+4; // switches per player (27 = mahjong)
+	if(jvsboard_type == JVSBD_MAHJONG)
+	{
+		maple0x86data2[pos+11]=1; // number of players
+		maple0x86data2[pos+12]=22; // switches per player (27 = mahjong)
+		jvs_mux_data = 1;
+	}
+	else //if JVSBD_DEFAULT
+	{
+		maple0x86data2[pos+11]=2; // number of players
+		maple0x86data2[pos+12]=9+4; // switches per player (27 = mahjong)
+	}
 	maple0x86data2[pos+13]=0;
-	// second function
+	//2 coin slots
 	maple0x86data2[pos+14]=2;
 	maple0x86data2[pos+15]=2; // number of coin slots
 	maple0x86data2[pos+16]=0;
 	maple0x86data2[pos+17]=0;
-	// third function
+	//3 ad stick
 	maple0x86data2[pos+18]=3;
 	maple0x86data2[pos+19]=2; // analog channels
 	maple0x86data2[pos+20]=8; // bits per channel
 	maple0x86data2[pos+21]=0;
-	// no more functions
+	//4 rotary
 	maple0x86data2[pos+22]=0;
+	//5 keyboard
+	//6 (touch?) screen
+	//7 card reader
+	//8 hopper out
+	//9 driver out
+	//10 analog out
+	//11 character
+	//12 backup
+
 	maple0x86data2[pos+7]=13+2;
 	return 13;
 }
 
-static void jvsboard_indirect_read(running_machine *machine, int pos)
+static int jvsboard_indirect_read(running_machine *machine, int pos)
 {
 	// report1,jvsbytes repeated for each function
-	// first function
+	//1 digital inputs
 	maple0x86data2[pos+ 9]=1; // report
 	maple0x86data2[pos+10]=0; // bits TEST TILT1 TILT2 TILT3 ? ? ? ?
-	maple0x86data2[pos+11]=input_port_read(machine, "IN1"); // bits 1Pstart 1Pservice 1Pup 1Pdown 1Pleft 1Pright 1Ppush1 1Ppush2
-	maple0x86data2[pos+12]=input_port_read(machine, "IN2"); // bits 1Ppush3 1Ppush4 1Ppush5 1Ppush6 1Ppush7 1Ppush8 ...
-	maple0x86data2[pos+13]=input_port_read(machine, "IN3"); // bits 2Pstart 2Pservice 2Pup 2Pdown 2Pleft 2Pright 2Ppush1 2Ppush2
-	maple0x86data2[pos+14]=input_port_read(machine, "IN4"); // bits 2Ppush3 2Ppush4 2Ppush5 2Ppush6 2Ppush7 2Ppush8 ...
-	// second function
+	if(jvsboard_type == JVSBD_MAHJONG)
+	{
+		maple0x86data2[pos+11]=0;
+		switch(jvs_mux_data)
+		{
+			case 0x01: maple0x86data2[pos+12]=input_port_read(machine, "IN1"); break;
+			case 0x02: maple0x86data2[pos+12]=input_port_read(machine, "IN2"); break;
+			case 0x04: maple0x86data2[pos+12]=input_port_read(machine, "IN3"); break;
+			case 0x08: maple0x86data2[pos+12]=input_port_read(machine, "IN4"); break;
+			case 0x10: maple0x86data2[pos+12]=0; break;
+		}
+		maple0x86data2[pos+13]=0;
+		maple0x86data2[pos+14]=0;
+
+		jvs_mux_data<<=1;
+		if(jvs_mux_data >= 0x20) { jvs_mux_data = 1; }
+	}
+	else
+	{
+		maple0x86data2[pos+11]=input_port_read(machine, "IN1"); // bits 1Pstart 1Pservice 1Pup 1Pdown 1Pleft 1Pright 1Ppush1 1Ppush2
+		maple0x86data2[pos+12]=input_port_read(machine, "IN2"); // bits 1Ppush3 1Ppush4 1Ppush5 1Ppush6 1Ppush7 1Ppush8 ...
+		maple0x86data2[pos+13]=input_port_read(machine, "IN3"); // bits 2Pstart 2Pservice 2Pup 2Pdown 2Pleft 2Pright 2Ppush1 2Ppush2
+		maple0x86data2[pos+14]=input_port_read(machine, "IN4"); // bits 2Ppush3 2Ppush4 2Ppush5 2Ppush6 2Ppush7 2Ppush8 ...
+	}
+	//2 coin slots
 	maple0x86data2[pos+15]=1; // report
 	maple0x86data2[pos+16]=(dc_coin_counts[0] >> 8) & 0xff; // 1CONDITION, 1SLOT COIN(bit13-8)
 	maple0x86data2[pos+17]=dc_coin_counts[0] & 0xff; // 1SLOT COIN(bit7-0)
 	maple0x86data2[pos+18]=(dc_coin_counts[1] >> 8) & 0xff; // 2CONDITION, 2SLOT COIN(bit13-8)
 	maple0x86data2[pos+19]=dc_coin_counts[1] & 0xff; // 2SLOT COIN(bit7-0)
-	// third function
+	//3 ad stick
 	maple0x86data2[pos+20]=1; // report
 	maple0x86data2[pos+21]=0xff; // channel 1 bits 7-0
 	maple0x86data2[pos+22]=0; // channel 1
 	maple0x86data2[pos+23]=0; // channel 2 bits 7-0
 	maple0x86data2[pos+24]=0xff; // channel 2
+	//4 rotary
+	maple0x86data2[pos+25]=0;
+	maple0x86data2[pos+26]=0;
+	//5 keyboard
+	//6 (touch?) screen
+	//7 card reader
+	//8 hopper out
+	//9 driver out
+	//10 analog out
+	//11 character
+	//12 backup
+
+	maple0x86data2[pos+7]=17+2;
+	return 17;
 }
 
 static int jvsboard_direct_read(running_machine *machine)
@@ -305,22 +367,47 @@ static int jvsboard_direct_read(running_machine *machine)
 	maple0x86data2[0x19] = 0x01;
 
 	/* read the inputs */
+	//1 digital inputs
 	maple0x86data2[0x1a]=1;
-	maple0x86data2[0x1b]=2; //number of players
-	maple0x86data2[0x1c]=input_port_read(machine, "IN1");
-	maple0x86data2[0x1d]=input_port_read(machine, "IN2");
-	maple0x86data2[0x1e]=input_port_read(machine, "IN3");
-	maple0x86data2[0x1f]=input_port_read(machine, "IN4");
+	if(jvsboard_type == JVSBD_MAHJONG)
+		maple0x86data2[0x1b]=1; //number of players
+	else //if JVSBD_DEFAULT
+		maple0x86data2[0x1b]=2; //number of players
+	if(jvsboard_type == JVSBD_MAHJONG)
+	{
+		maple0x86data2[0x1c]=input_port_read(machine, "IN1");
+		maple0x86data2[0x1d]=input_port_read(machine, "IN2");
+		maple0x86data2[0x1e]=input_port_read(machine, "IN3");
+		maple0x86data2[0x1f]=input_port_read(machine, "IN4");
+	}
+	else
+	{
+		maple0x86data2[0x1c]=input_port_read(machine, "IN1");
+		maple0x86data2[0x1d]=input_port_read(machine, "IN2");
+		maple0x86data2[0x1e]=input_port_read(machine, "IN3");
+		maple0x86data2[0x1f]=input_port_read(machine, "IN4");
+	}
+	//2 coin slots
 	maple0x86data2[0x20]=1;
 	maple0x86data2[0x21]=(dc_coin_counts[0] >> 8) & 0xff; //coin counter read-back hi byte
 	maple0x86data2[0x22]=dc_coin_counts[0] & 0xff; //coin counter read-back lo byte
 	maple0x86data2[0x23]=(dc_coin_counts[1] >> 8) & 0xff;
 	maple0x86data2[0x24]=dc_coin_counts[1] & 0xff;
+	//3 ad stick
 	maple0x86data2[0x25]=1;
 	maple0x86data2[0x26]=1;
 	maple0x86data2[0x27]=0;
 	maple0x86data2[0x28]=0;
 	maple0x86data2[0x29]=0;
+	//4 rotary
+	//5 keyboard
+	//6 (touch?) screen
+	//7 card reader
+	//8 hopper out
+	//9 driver out
+	//10 analog out
+	//11 character
+	//12 backup
 	maple0x86data2[0x2a]=0;
 	/*0x2b-0x2f rotary inputs */
 	//...
@@ -369,7 +456,7 @@ WRITE64_HANDLER( dc_sysctrl_w )
 			ddtdata.direction=0;
 			ddtdata.channel=2;
 			ddtdata.mode=25; //011001
-			device_set_info_ptr(space->machine->cpu[0],CPUINFO_PTR_SH4_EXTERNAL_DDT_DMA,&ddtdata);
+			sh4_dma_ddt(cputag_get_cpu(space->machine, "maincpu"),&ddtdata);
 			#if DEBUG_SYSCTRL
 			if ((address >= 0x11000000) && (address <= 0x11FFFFFF))
 				if (dc_sysctrl_regs[SB_LMMODE0])
@@ -478,7 +565,7 @@ WRITE64_HANDLER( dc_maple_w )
 					ddtdata.direction=0;	// 0 source to buffer, 1 buffer to source
 					ddtdata.channel= -1;	// not used
 					ddtdata.mode= -1;		// copy from/to buffer
-					device_set_info_ptr(space->machine->cpu[0], CPUINFO_PTR_SH4_EXTERNAL_DDT_DMA, &ddtdata);
+					sh4_dma_ddt(cputag_get_cpu(space->machine, "maincpu"), &ddtdata);
 
 					maple_regs[reg] = 0;
 					endflag=buff[0] & 0x80000000;
@@ -510,7 +597,7 @@ WRITE64_HANDLER( dc_maple_w )
 								ddtdata.direction=0;
 								ddtdata.channel= -1;
 								ddtdata.mode=-1;
-								device_set_info_ptr(space->machine->cpu[0],CPUINFO_PTR_SH4_EXTERNAL_DDT_DMA,&ddtdata);
+								sh4_dma_ddt(cputag_get_cpu(space->machine, "maincpu"),&ddtdata);
 								chk=0;
 								for (a=1;a < length;a++)
 								{
@@ -538,7 +625,7 @@ WRITE64_HANDLER( dc_maple_w )
 								ddtdata.direction=0;
 								ddtdata.channel= -1;
 								ddtdata.mode=-1;
-								device_set_info_ptr(space->machine->cpu[0],CPUINFO_PTR_SH4_EXTERNAL_DDT_DMA,&ddtdata);
+								sh4_dma_ddt(cputag_get_cpu(space->machine, "maincpu"),&ddtdata);
 
 								subcommand = buff[0] & 0xff;
 								#if DEBUG_MAPLE
@@ -613,9 +700,9 @@ WRITE64_HANDLER( dc_maple_w )
 											case 0xf1: // set address
 												break;
 											case 0x10:
-												strcpy((char *)(maple0x86data2+0x11+10), "MAME test JVS I/O board"); // name
-												maple0x86data2[pos+7]=24+2;
-												tocopy += 24;
+												strcpy((char *)(maple0x86data2+0x11+10), "SEGA ENTERPRISES,LTD.\nI/O BD JVS\n837-13551"); // name
+												maple0x86data2[pos+7]=24+21+2;
+												tocopy += 24+21;
 												break;
 											case 0x11:
 												maple0x86data2[pos+10]=0x13; // version bcd
@@ -634,9 +721,7 @@ WRITE64_HANDLER( dc_maple_w )
 												break;
 											case 0x14:
 												{
-													static int dma_bytes;
-													dma_bytes = jvsboard_init(pos);
-													tocopy += dma_bytes;
+													tocopy += jvsboard_init(pos);
 												}
 												break;
 											case 0x21:
@@ -739,7 +824,7 @@ WRITE64_HANDLER( dc_maple_w )
 					ddtdata.destination=destination;
 					ddtdata.buffer=buff;
 					ddtdata.direction=1;
-					device_set_info_ptr(space->machine->cpu[0],CPUINFO_PTR_SH4_EXTERNAL_DDT_DMA,&ddtdata);
+					sh4_dma_ddt(cputag_get_cpu(space->machine, "maincpu"),&ddtdata);
 
 					if (endflag)
 					{
@@ -770,7 +855,7 @@ WRITE64_HANDLER( dc_maple_w )
 
 INPUT_CHANGED( dc_coin_slots_callback )
 {
-	UINT32 *counter = param;
+	UINT32 *counter = (UINT32 *)param;
 
 	/* check for a 0 -> 1 transition */
 	if (!oldval && newval)
@@ -861,7 +946,7 @@ WRITE64_HANDLER( dc_g1_ctrl_w )
 			ddtdata.channel= -1;	// not used
 			ddtdata.mode= -1;		// copy from/to buffer
  			mame_printf_verbose("G1CTRL: transfer %x from ROM %08x to sdram %08x\n", g1bus_regs[SB_GDLEN], dmaoffset, g1bus_regs[SB_GDSTAR]);
-			device_set_info_ptr(space->machine->cpu[0], CPUINFO_PTR_SH4_EXTERNAL_DDT_DMA, &ddtdata);
+			sh4_dma_ddt(cputag_get_cpu(space->machine, "maincpu"), &ddtdata);
 			g1bus_regs[SB_GDST]=0;
 			dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_GDROM;
 			dc_update_interrupt_status(space->machine);
@@ -1052,7 +1137,7 @@ MACHINE_START( dc )
 MACHINE_RESET( dc )
 {
 	/* halt the ARM7 */
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(machine, "soundcpu", INPUT_LINE_RESET, ASSERT_LINE);
 
 	memset(dc_sysctrl_regs, 0, sizeof(dc_sysctrl_regs));
 	memset(maple_regs, 0, sizeof(maple_regs));
@@ -1091,12 +1176,12 @@ WRITE64_DEVICE_HANDLER( dc_aica_reg_w )
 		if (dat & 1)
 		{
 			/* halt the ARM7 */
-			cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+			cputag_set_input_line(device->machine, "soundcpu", INPUT_LINE_RESET, ASSERT_LINE);
 		}
 		else
 		{
 			/* it's alive ! */
-			cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
+			cputag_set_input_line(device->machine, "soundcpu", INPUT_LINE_RESET, CLEAR_LINE);
 		}
     }
 

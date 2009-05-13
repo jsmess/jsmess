@@ -450,8 +450,8 @@ static VIDEO_START(abc806)
 
 	/* allocate memory */
 
-	state->charram = auto_malloc(ABC806_CHAR_RAM_SIZE);
-	state->colorram = auto_malloc(ABC806_ATTR_RAM_SIZE);
+	state->charram = auto_alloc_array(machine, UINT8, ABC806_CHAR_RAM_SIZE);
+	state->colorram = auto_alloc_array(machine, UINT8, ABC806_ATTR_RAM_SIZE);
 
 	/* register for state saving */
 

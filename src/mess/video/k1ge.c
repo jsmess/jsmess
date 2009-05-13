@@ -833,7 +833,7 @@ static DEVICE_START( k1ge )
 	k1ge->hblank_on_timer = timer_alloc( device->machine, k1ge_hblank_on_timer_callback, (void *) device );
 	k1ge->screen = devtag_get_device( device->machine, k1ge->intf->screen_tag );
 	k1ge->vram = memory_region( device->machine, k1ge->intf->vram_tag );
-	k1ge->bitmap = auto_bitmap_alloc( video_screen_get_width(k1ge->screen), video_screen_get_height(k1ge->screen), video_screen_get_format(k1ge->screen) );
+	k1ge->bitmap = auto_bitmap_alloc( device->machine, video_screen_get_width(k1ge->screen), video_screen_get_height(k1ge->screen), video_screen_get_format(k1ge->screen) );
 	k1ge->draw = k1ge_draw;
 }
 

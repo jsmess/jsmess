@@ -1658,18 +1658,17 @@ static void apple2gs_setup_memory(running_machine *machine)
 	apple2_memmap_config cfg;
 
 	/* allocate memory for E00000-E1FFFF */
-	apple2gs_slowmem = auto_malloc(128*1024);
-	memset(apple2gs_slowmem, 0, 128*1024);
+	apple2gs_slowmem = auto_alloc_array_clear(machine, UINT8, 128*1024);
 
 	state_save_register_item_array(machine, "APPLE2GS_SLOWMEM", NULL, 0, apple2gs_slowmem);
 
 	/* install expanded memory */
-	memory_install_read8_handler(space, 0x010000, mess_ram_size - 1, 0, 0, SMH_BANK1);
-	memory_install_write8_handler(space, 0x010000, mess_ram_size - 1, 0, 0, SMH_BANK1);
+	memory_install_read8_handler(space, 0x010000, mess_ram_size - 1, 0, 0, SMH_BANK(1));
+	memory_install_write8_handler(space, 0x010000, mess_ram_size - 1, 0, 0, SMH_BANK(1));
 	memory_set_bankptr(machine,1, mess_ram + 0x010000);
 
 	/* install hi memory */
-	memory_install_read8_handler(space, 0xe00000, 0xe1ffff, 0, 0, SMH_BANK2);
+	memory_install_read8_handler(space, 0xe00000, 0xe1ffff, 0, 0, SMH_BANK(2));
 	memory_install_write8_handler(space, 0xe00000, 0xe1ffff, 0, 0, apple2gs_slowmem_w);
 	memory_install_write8_handler(space, 0xe00400, 0xe007ff, 0, 0, apple2gs_E004xx_w);
 	memory_install_write8_handler(space, 0xe02000, 0xe03fff, 0, 0, apple2gs_E02xxx_w);
@@ -1680,7 +1679,7 @@ static void apple2gs_setup_memory(running_machine *machine)
 	/* install alternate ROM bank */
 	begin = 0x1000000 - memory_region_length(machine, "maincpu");
 	end = 0xffffff;
-	memory_install_read8_handler(space, begin, end, 0, 0, SMH_BANK3);
+	memory_install_read8_handler(space, begin, end, 0, 0, SMH_BANK(3));
 	memory_set_bankptr(machine,3, memory_region(machine, "maincpu"));
 
 	/* install new xxC000-xxCFFF handlers */
@@ -1739,7 +1738,7 @@ MACHINE_START( apple2gs )
 	apple2_init_common(machine);
 
 	/* set up Apple IIgs vectoring */
-	device_set_info_fct(cputag_get_cpu(machine, "maincpu"), CPUINFO_FCT_G65816_READVECTOR_CALLBACK, (genf *) apple2gs_read_vector);
+	g65816_set_read_vector_callback(cputag_get_cpu(machine, "maincpu"), apple2gs_read_vector);
 
 	/* setup globals */
 	apple2gs_cur_slot6_image = NULL;

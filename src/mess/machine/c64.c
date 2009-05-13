@@ -1102,7 +1102,7 @@ MACHINE_START( c64 )
 {
 	c64_port_data = 0x17;
 
-	c64_io_mirror = auto_malloc( 0x1000 );
+	c64_io_mirror = auto_alloc_array(machine, UINT8, 0x1000 );
 	c64_common_init_machine (machine);
 
 	if (is_c128(machine))

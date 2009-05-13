@@ -27,7 +27,6 @@ TODO:
 -kakumei/kakumei2:has weird text layer strings in test mode (like "#p control panel"),
  unsure if this one is somehow related to the above daireika bug, it's a BTANB or something else.
 -Check if urashima has a "mode 3" for the layer 0 tilemap;
--Complete the dip-switches for all the games;
 -There could be timing issues caused by MCU simulation at $80004;
 -Fix the sound banking, protection-related for the first version of the MCU
  (should be somewhere on the work ram/shared ram)
@@ -40,13 +39,13 @@ Notes (1st MCU ver.):
 -$f000e is bogus,maybe the program snippets can modify this value,or the MCU itself can
  do that,returning the contents of D0 register seems enough for now...
  Update: Improved it for the new mcu simulation,now it pulls all the values from 0x00 to
- 0x0f,it seems to be a MCU call snippet for the $f0000 work ram;
+ 0x0f, it seems to be a MCU call snippet for the $f0000 work ram;
 -$f030e is a mirror for $f000e in urashima.
 -I need more space for MCU code...that's why I've used an extra jmp when entering
  into mcu code,so we can debug the first version freely without being teased about
  memory space.
  BTW,the real HW is using a sort of bankswitch or I'm missing something?
--$f0020 is for the sound program,same for all games,for example mjzoomin hasn't any clear
+-$f0020 is for the sound program,same for all games, for example mjzoomin hasn't any clear
  write to $80040 area and the program jumps to $f0020 when there should be a sample.
 
 ============================================================================================
@@ -231,8 +230,8 @@ static VIDEO_START( jalmah )
 	sc3_tilemap_2 = tilemap_create(machine, get_sc3_tile_info,range2_8x8,8,8,128,64);
 	sc3_tilemap_3 = tilemap_create(machine, get_sc3_tile_info,range3_8x8,8,8,64,128);
 
-	jm_scrollram = auto_malloc(0x80);
-	jm_vregs = auto_malloc(0x40);
+	jm_scrollram = auto_alloc_array(machine, UINT16, 0x80/2);
+	jm_vregs = auto_alloc_array(machine, UINT16, 0x40/2);
 
 	tilemap_set_transparent_pen(sc0_tilemap_0,15);
 	tilemap_set_transparent_pen(sc0_tilemap_1,15);
@@ -259,8 +258,8 @@ static VIDEO_START( urashima )
 	sc0_tilemap_0 = tilemap_create(machine, get_sc0_tile_info,range0_16x16,16,16,256,32);
 	sc3_tilemap_0 = tilemap_create(machine, get_sc3_tile_info,range2_8x8,8,8,128,64);
 
-	jm_scrollram = auto_malloc(0x80);
-	jm_vregs = auto_malloc(0x40);
+	jm_scrollram = auto_alloc_array(machine, UINT16, 0x80/2);
+	jm_vregs = auto_alloc_array(machine, UINT16, 0x40/2);
 
 	tilemap_set_transparent_pen(sc0_tilemap_0,15);
 	tilemap_set_transparent_pen(sc3_tilemap_0,15);
@@ -626,27 +625,27 @@ static WRITE16_HANDLER( urashima_dma_w )
 	if(data & 4)
 	{
 		UINT32 i;
-		for(i=0;i<0x200;i+=2)
-			memory_write_word(space,0x88200+i,memory_read_word(space,0x88400+i));
+		for(i = 0; i < 0x200; i += 2)
+			memory_write_word(space, 0x88200 + i, memory_read_word(space, 0x88400 + i));
 	}
 }
 
 /*same as $f00c0 sub-routine,but with additional work-around,to remove from here...*/
-static void daireika_palette_dma(running_machine *machine,UINT16 val)
+static void daireika_palette_dma(running_machine *machine, UINT16 val)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	UINT32 index_1,index_2,src_addr,tmp_addr;
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	UINT32 index_1, index_2, src_addr, tmp_addr;
 	/*a0=301c0+jm_shared_ram[0x540/2] & 0xf00 */
 	/*a1=88000*/
 	src_addr = 0x301c0 + (val * 0x40);
 //  popmessage("%08x",src_addr);
-	for(index_1=0;index_1<0x200;index_1+=0x20)
+	for(index_1 = 0; index_1 < 0x200; index_1 += 0x20)
 	{
 		tmp_addr = src_addr;
 		src_addr = memory_read_dword(space,src_addr);
 
-		for(index_2=0;index_2<0x20;index_2+=2)
-			memory_write_word(space,0x88000+index_2+index_1,memory_read_word(space,src_addr+index_2));
+		for(index_2 = 0; index_2 < 0x20; index_2 += 2)
+			memory_write_word(space, 0x88000 + index_2 + index_1, memory_read_word(space, src_addr + index_2));
 
 		src_addr = tmp_addr + 4;
 	}
@@ -655,7 +654,7 @@ static void daireika_palette_dma(running_machine *machine,UINT16 val)
 /*RAM-based protection handlings*/
 static void daireika_mcu_run(running_machine *machine)
 {
-	static UINT16 prg_prot,dma_old;
+	static UINT16 prg_prot, dma_old;
 
 	if(((jm_shared_ram[0x550/2] & 0xf00) == 0x700) && ((jm_shared_ram[0x540/2] & 0xf00) != dma_old))
 	{
@@ -922,10 +921,10 @@ static ADDRESS_MAP_START( urashima, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x080010, 0x080011) AM_WRITE(jalmah_flip_screen_w)
 	//       0x080012, 0x080013  MCU write related,same for each game
 	//       0x080014, 0x080015  MCU write related,same for each game
-/**/AM_RANGE(0x080016, 0x080017) AM_READ(SMH_RAM) AM_WRITE(urashima_dma_w)
+/**/AM_RANGE(0x080016, 0x080017) AM_RAM_WRITE(urashima_dma_w)
 	AM_RANGE(0x080018, 0x080019) AM_WRITE(jalmah_okibank_w)
 	AM_RANGE(0x08001a, 0x08001b) AM_WRITE(jalmah_okirom_w)
-/**/AM_RANGE(0x08001c, 0x08001d) AM_READ(SMH_RAM) AM_WRITE(urashima_bank_w)
+/**/AM_RANGE(0x08001c, 0x08001d) AM_RAM_WRITE(urashima_bank_w)
 	AM_RANGE(0x080040, 0x080041) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)
 	//       0x084000, 0x084001  ?
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16) /* Palette RAM */
@@ -2301,53 +2300,54 @@ static READ16_HANDLER( suchipi_mcu_r )
 
 static DRIVER_INIT( urashima )
 {
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x80004, 0x80005, 0, 0, urashima_mcu_r );
-	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x80012, 0x80013, 0, 0, urashima_mcu_w );
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x80004, 0x80005, 0, 0, urashima_mcu_r );
+	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x80012, 0x80013, 0, 0, urashima_mcu_w );
 
 	mcu_prg = 0x12;
 }
 
 static DRIVER_INIT( daireika )
 {
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x80004, 0x80005, 0, 0, daireika_mcu_r );
-	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x80012, 0x80013, 0, 0, daireika_mcu_w );
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x80004, 0x80005, 0, 0, daireika_mcu_r );
+	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x80012, 0x80013, 0, 0, daireika_mcu_w );
 
 	mcu_prg = 0x11;
 }
 
 static DRIVER_INIT( mjzoomin )
 {
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x80004, 0x80005, 0, 0, mjzoomin_mcu_r );
-	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x80012, 0x80013, 0, 0, mjzoomin_mcu_w );
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x80004, 0x80005, 0, 0, mjzoomin_mcu_r );
+	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x80012, 0x80013, 0, 0, mjzoomin_mcu_w );
 
 	mcu_prg = 0x13;
 }
 
 static DRIVER_INIT( kakumei )
 {
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x80004, 0x80005, 0, 0, kakumei_mcu_r );
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x80004, 0x80005, 0, 0, kakumei_mcu_r );
 
 	mcu_prg = 0x21;
 }
 
 static DRIVER_INIT( kakumei2 )
 {
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x80004, 0x80005, 0, 0, kakumei_mcu_r );
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x80004, 0x80005, 0, 0, kakumei_mcu_r );
 
 	mcu_prg = 0x22;
 }
 
 static DRIVER_INIT( suchipi )
 {
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x80004, 0x80005, 0, 0, suchipi_mcu_r );
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x80004, 0x80005, 0, 0, suchipi_mcu_r );
+
 	mcu_prg = 0x23;
 }
 
 /*First version of the MCU*/
-GAME( 1989, urashima, 0, urashima,  urashima,   urashima, ROT0, "UPL",          "Otogizoushi Urashima Mahjong",         GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1989, daireika, 0, jalmah,    daireika,   daireika, ROT0, "Jaleco / NMK", "Mahjong Daireikai",                    GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1990, mjzoomin, 0, jalmah,    mjzoomin,   mjzoomin, ROT0, "Jaleco",       "Mahjong Channel Zoom In",              GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1989, urashima, 0, urashima,  urashima,   urashima, ROT0, "UPL",          "Otogizoushi Urashima Mahjong (Japan)",         GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1989, daireika, 0, jalmah,    daireika,   daireika, ROT0, "Jaleco / NMK", "Mahjong Daireikai (Japan)",                    GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1990, mjzoomin, 0, jalmah,    mjzoomin,   mjzoomin, ROT0, "Jaleco",       "Mahjong Channel Zoom In (Japan)",              GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 /*Second version of the MCU*/
-GAME( 1990, kakumei,  0, jalmah,    kakumei,    kakumei,  ROT0, "Jaleco",       "Mahjong Kakumei",                      GAME_IMPERFECT_GRAPHICS )
-GAME( 1992, kakumei2, 0, jalmah,    kakumei2,   kakumei2, ROT0, "Jaleco",       "Mahjong Kakumei 2 - Princess League",  GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, suchipi,  0, jalmah,    suchipi,    suchipi,  ROT0, "Jaleco",       "Idol Janshi Suchie-Pai Special",       GAME_IMPERFECT_GRAPHICS )
+GAME( 1990, kakumei,  0, jalmah,    kakumei,    kakumei,  ROT0, "Jaleco",       "Mahjong Kakumei (Japan)",                      GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, kakumei2, 0, jalmah,    kakumei2,   kakumei2, ROT0, "Jaleco",       "Mahjong Kakumei 2 - Princess League (Japan)",  GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, suchipi,  0, jalmah,    suchipi,    suchipi,  ROT0, "Jaleco",       "Idol Janshi Suchie-Pai Special (Japan)",       GAME_IMPERFECT_GRAPHICS )

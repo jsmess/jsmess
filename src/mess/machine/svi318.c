@@ -637,7 +637,7 @@ DRIVER_INIT( svi318 )
 	cpu_set_input_line_vector(cputag_get_cpu(machine, "maincpu"), 0, 0xff);
 
 	/* memory */
-	svi.empty_bank = auto_malloc (0x8000);
+	svi.empty_bank = auto_alloc_array(machine, UINT8, 0x8000);
 	memset (svi.empty_bank, 0xff, 0x8000);
 }
 

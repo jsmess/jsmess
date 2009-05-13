@@ -209,7 +209,7 @@ static pen_t *pen_table;
  *************************************/
 
 /* from jagobj.c */
-static void jagobj_init(void);
+static void jagobj_init(running_machine *machine);
 static void process_object_list(running_machine *machine, int vc, UINT16 *_scanline);
 
 /* from jagblit.c */
@@ -308,13 +308,13 @@ INLINE int adjust_object_timer(running_machine *machine, int vc)
 
 void jaguar_gpu_suspend(running_machine *machine)
 {
-	cpu_suspend(machine->cpu[1], SUSPEND_REASON_SPIN, 1);
+	cputag_suspend(machine, "gpu", SUSPEND_REASON_SPIN, 1);
 }
 
 
 void jaguar_gpu_resume(running_machine *machine)
 {
-	cpu_resume(machine->cpu[1], SUSPEND_REASON_SPIN);
+	cputag_resume(machine, "gpu", SUSPEND_REASON_SPIN);
 }
 
 
@@ -328,9 +328,9 @@ void jaguar_gpu_resume(running_machine *machine)
 static void update_cpu_irq(running_machine *machine)
 {
 	if (cpu_irq_state & gpu_regs[INT1] & 0x1f)
-		cpu_set_input_line(machine->cpu[0], cojag_is_r3000 ? R3000_IRQ4 : M68K_IRQ_6, ASSERT_LINE);
+		cputag_set_input_line(machine, "maincpu", cojag_is_r3000 ? R3000_IRQ4 : M68K_IRQ_6, ASSERT_LINE);
 	else
-		cpu_set_input_line(machine->cpu[0], cojag_is_r3000 ? R3000_IRQ4 : M68K_IRQ_6, CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", cojag_is_r3000 ? R3000_IRQ4 : M68K_IRQ_6, CLEAR_LINE);
 }
 
 
@@ -479,7 +479,8 @@ static void jaguar_set_palette(UINT16 vmode)
 
 static UINT8 *get_jaguar_memory(running_machine *machine, UINT32 offset)
 {
-	return memory_get_read_ptr(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), offset);
+	const address_space *space = cputag_get_address_space(machine, "gpu", ADDRESS_SPACE_PROGRAM);
+	return (UINT8 *)memory_get_read_ptr(space, offset);
 }
 
 
@@ -815,11 +816,11 @@ VIDEO_START( cojag )
 	object_timer = timer_alloc(machine, cojag_scanline_update, NULL);
 	adjust_object_timer(machine, 0);
 
-	screen_bitmap = auto_bitmap_alloc(720, 512, BITMAP_FORMAT_RGB32);
+	screen_bitmap = auto_bitmap_alloc(machine, 720, 512, BITMAP_FORMAT_RGB32);
 
-	jagobj_init();
+	jagobj_init(machine);
 
-	pen_table = auto_malloc(65536 * sizeof(pen_t));
+	pen_table = auto_alloc_array(machine, pen_t, 65536);
 
 	state_save_register_global_pointer(machine, pen_table, 65536);
 	state_save_register_global_array(machine, blitter_regs);

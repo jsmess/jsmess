@@ -61,7 +61,7 @@ static void primo_update_memory(running_machine *machine)
 			memory_set_bankptr(machine,1, memory_region(machine, "maincpu")+0x14000);
 			break;
 		case 0x02:	/* RAM */
-			memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_BANK1);
+			memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_BANK(1));
 			memory_set_bankptr(machine,1, memory_region(machine, "maincpu"));
 			break;
 		case 0x03:	/* EPROM extension 2 */

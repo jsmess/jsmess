@@ -166,7 +166,7 @@ static struct
 
 static void duart_irq_handler(const device_config *device, UINT8 vector)
 {
-	cpu_set_input_line_and_vector(device->machine->cpu[0], 4, HOLD_LINE, vector);
+	cputag_set_input_line_and_vector(device->machine, "maincpu", 4, HOLD_LINE, vector);
 };
 
 static void duart_tx(const device_config *device, int channel, UINT8 data)
@@ -241,7 +241,7 @@ static VIDEO_START(adp)
 //  UINT32 i;
 //  UINT16 *prgrom = (UINT16*)memory_region(machine, "maincpu");
 
-	HD63484_start();
+	HD63484_start(machine);
 
 //  for (i = 0; i < 0x70000; i++)
 //      HD63484_ram[0x90000 + i] = prgrom[i];

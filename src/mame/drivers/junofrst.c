@@ -141,7 +141,7 @@ static WRITE8_HANDLER( junofrst_sh_irqtrigger_w )
 	if (last == 0 && data == 1)
 	{
 		/* setting bit 0 low then high triggers IRQ on the sound CPU */
-		cpu_set_input_line_and_vector(space->machine->cpu[1],0,HOLD_LINE,0xff);
+		cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff);
 	}
 
 	last = data;
@@ -150,14 +150,14 @@ static WRITE8_HANDLER( junofrst_sh_irqtrigger_w )
 
 static WRITE8_HANDLER( junofrst_i8039_irq_w )
 {
-	cpu_set_input_line(space->machine->cpu[2], 0, ASSERT_LINE);
+	cputag_set_input_line(space->machine, "mcu", 0, ASSERT_LINE);
 }
 
 
 static WRITE8_HANDLER( i8039_irqen_and_status_w )
 {
 	if ((data & 0x80) == 0)
-		cpu_set_input_line(space->machine->cpu[2], 0, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "mcu", 0, CLEAR_LINE);
 	i8039_status = (data & 0x70) >> 4;
 }
 
@@ -194,7 +194,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8060, 0x8060) AM_WRITE(junofrst_bankselect_w)
 	AM_RANGE(0x8070, 0x8073) AM_WRITE(junofrst_blitter_w)
 	AM_RANGE(0x8100, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x9fff) AM_READ(SMH_BANK1)
+	AM_RANGE(0x9000, 0x9fff) AM_READ(SMH_BANK(1))
 	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

@@ -94,7 +94,7 @@ VIDEO_START( starshp1 )
 
 	tilemap_set_scrollx(bg_tilemap, 0, -8);
 
-	LSFR = auto_malloc(0x20000);
+	LSFR = auto_alloc_array(machine, UINT16, 0x10000);
 
 	for (i = 0; i < 0x10000; i++)
 	{
@@ -266,7 +266,7 @@ static void draw_phasor(bitmap_t* bitmap)
 
 static int get_radius(void)
 {
-	return 6 * sqrt(starshp1_circle_size);  /* size calibrated by hand */
+	return 6 * sqrt((double)starshp1_circle_size);  /* size calibrated by hand */
 }
 static int get_circle_hpos(void)
 {

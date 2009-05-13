@@ -83,7 +83,7 @@ VIDEO_START( dogfgt )
 {
 	bg_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan_rows,16,16,32,32);
 
-	bitmapram = auto_malloc(BITMAPRAM_SIZE);
+	bitmapram = auto_alloc_array(machine, UINT8, BITMAPRAM_SIZE);
 
 	pixbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 }
@@ -226,7 +226,7 @@ VIDEO_UPDATE( dogfgt )
 
 	if (lastflip != flip_screen_get(screen->machine) || lastpixcolor != pixcolor)
 	{
-		const address_space *space = cpu_get_address_space(screen->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+		const address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 		lastflip = flip_screen_get(screen->machine);
 		lastpixcolor = pixcolor;

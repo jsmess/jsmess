@@ -503,8 +503,7 @@ static debugwin_info *debugwin_window_create(running_machine *machine, LPCSTR ti
 	RECT work_bounds;
 
 	// allocate memory
-	info = (debugwin_info *)malloc_or_die(sizeof(*info));
-	memset(info, 0, sizeof(*info));
+	info = alloc_clear_or_die(debugwin_info);
 
 	// create the window
 	info->handler = handler;
@@ -2242,9 +2241,9 @@ static int disasm_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lpar
 
 							/* if it doesn't exist, add a new one */
 							if (bpindex == -1)
-								sprintf(command, "bpset %X", address);
+								sprintf(command, "bpset 0x%X", address);
 							else
-								sprintf(command, "bpclear %X", bpindex);
+								sprintf(command, "bpclear 0x%X", bpindex);
 							debug_console_execute_command(info->machine, command, 1);
 						}
 					}

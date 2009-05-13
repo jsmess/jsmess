@@ -315,8 +315,8 @@ INPUT_PORTS_END
 
 static VIDEO_START( pasha2 )
 {
-	bitmap0 = auto_malloc(0x40000);
-	bitmap1 = auto_malloc(0x40000);
+	bitmap0 = auto_alloc_array(machine, UINT16, 0x40000/2);
+	bitmap1 = auto_alloc_array(machine, UINT16, 0x40000/2);
 }
 
 static VIDEO_UPDATE( pasha2 )
@@ -445,7 +445,7 @@ static READ16_HANDLER( pasha2_speedup_r )
 
 static DRIVER_INIT( pasha2 )
 {
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x95744, 0x95747, 0, 0, pasha2_speedup_r );
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x95744, 0x95747, 0, 0, pasha2_speedup_r );
 
 	memory_set_bankptr(machine, 1, memory_region(machine, "user2"));
 }

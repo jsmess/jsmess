@@ -400,8 +400,8 @@ void pc8801_update_bank(running_machine *machine)
 		else
 		{
 			/* r/w mode */
-			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x5fff, 0, 0, SMH_BANK1);
-			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, SMH_BANK2);
+			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x5fff, 0, 0, SMH_BANK(1));
+			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, SMH_BANK(2));
 			if(ext_w!=ext_r) logerror("differnt between read and write bank of extension memory.\n");
 		}
 	}
@@ -411,8 +411,8 @@ void pc8801_update_bank(running_machine *machine)
 		if(RAMmode)
 		{
 			/* RAM */
-			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x5fff, 0, 0, SMH_BANK1);
-			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, SMH_BANK2);
+			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x5fff, 0, 0, SMH_BANK(1));
+			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, SMH_BANK(2));
 			memory_set_bankptr(machine, 1, pc8801_mainRAM + 0x0000);
 			memory_set_bankptr(machine, 2, pc8801_mainRAM + 0x6000);
 		}
@@ -443,8 +443,8 @@ void pc8801_update_bank(running_machine *machine)
 	}
 
 	/* 0x8000 to 0xffff */
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0x83ff, 0, 0, (RAMmode || ROMmode) ? SMH_BANK3 : pc8801_read_textwindow);
-	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0x83ff, 0, 0, (RAMmode || ROMmode) ? SMH_BANK3 : pc8801_write_textwindow);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0x83ff, 0, 0, (RAMmode || ROMmode) ? SMH_BANK(3) : pc8801_read_textwindow);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0x83ff, 0, 0, (RAMmode || ROMmode) ? SMH_BANK(3) : pc8801_write_textwindow);
 
 	memory_set_bankptr(machine, 4, pc8801_mainRAM + 0x8400);
 
@@ -455,10 +455,10 @@ void pc8801_update_bank(running_machine *machine)
 	}
 	else
 	{
-		memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xefff, 0, 0, SMH_BANK5);
-		memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xefff, 0, 0, SMH_BANK5);
-		memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf000, 0xffff, 0, 0, SMH_BANK6);
-		memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf000, 0xffff, 0, 0, SMH_BANK6);
+		memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xefff, 0, 0, SMH_BANK(5));
+		memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xefff, 0, 0, SMH_BANK(5));
+		memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf000, 0xffff, 0, 0, SMH_BANK(6));
+		memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf000, 0xffff, 0, 0, SMH_BANK(6));
 
 		memory_set_bankptr(machine, 5, pc8801_mainRAM + 0xc000);
 		if(maptvram)
@@ -565,7 +565,7 @@ static void pc8801_init_bank(running_machine *machine, int hireso)
 	port71_save=0xff;
 	port32_save=0x80;
 	mainROM = memory_region(machine, "maincpu");
-	pc8801_mainRAM = (UINT8 *) auto_malloc (0x10000);
+	pc8801_mainRAM = auto_alloc_array(machine, UINT8, 0x10000);
 	memset(pc8801_mainRAM, 0, 0x10000);
 
 	extmem_ctrl[0]=extmem_ctrl[1]=0;
@@ -631,7 +631,7 @@ static void pc8801_init_bank(running_machine *machine, int hireso)
       return;
     }
     if(num80!=0 || num88!=0 || numIO!=0) {
-      extRAM=malloc_or_die(num80*0x8000+num88*0x20000+numIO*0x100000);
+      extRAM=alloc_array_or_die(UINT8, num80*0x8000+num88*0x20000+numIO*0x100000);
       e=extRAM;
       for(i=0;i<num80;i++) {
 	ext_bank_80[i]=e;

@@ -1438,7 +1438,7 @@ static MACHINE_START( newbrain_eim )
 	MACHINE_START_CALL(newbrain);
 
 	/* allocate expansion RAM */
-	state->eim_ram = auto_malloc(NEWBRAIN_EIM_RAM_SIZE);
+	state->eim_ram = auto_alloc_array(machine, UINT8, NEWBRAIN_EIM_RAM_SIZE);
 
 	/* find devices */
 	state->z80ctc = devtag_get_device(machine, Z80CTC_TAG);

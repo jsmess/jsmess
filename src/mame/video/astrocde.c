@@ -92,7 +92,7 @@ static UINT8 profpac_vw;
 
 static void init_savestate(running_machine *machine);
 static TIMER_CALLBACK( scanline_callback );
-static void init_sparklestar(void);
+static void init_sparklestar(running_machine *machine);
 
 
 
@@ -230,7 +230,7 @@ VIDEO_START( astrocde )
 
 	/* initialize the sparkle and stars */
 	if (astrocade_video_config & AC_STARS)
-		init_sparklestar();
+		init_sparklestar(machine);
 }
 
 
@@ -241,7 +241,7 @@ VIDEO_START( profpac )
 	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 1, 0), 1);
 
 	/* allocate videoram */
-	profpac_videoram = auto_malloc(0x4000 * 4 * sizeof(*profpac_videoram));
+	profpac_videoram = auto_alloc_array(machine, UINT16, 0x4000 * 4);
 
 	/* register for save states */
 	init_savestate(machine);
@@ -427,7 +427,7 @@ VIDEO_UPDATE( profpac )
 
 static TIMER_CALLBACK( interrupt_off )
 {
-	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
 }
 
 
@@ -440,15 +440,15 @@ static void astrocade_trigger_lightpen(running_machine *machine, UINT8 vfeedback
 		/* bit 0 controls the interrupt mode: mode 0 means assert until acknowledged */
 		if ((interrupt_enable & 0x01) == 0)
 		{
-			cpu_set_input_line_and_vector(machine->cpu[0], 0, HOLD_LINE, interrupt_vector & 0xf0);
+			cputag_set_input_line_and_vector(machine, "maincpu", 0, HOLD_LINE, interrupt_vector & 0xf0);
 			timer_set(machine, video_screen_get_time_until_vblank_end(machine->primary_screen), NULL, 0, interrupt_off);
 		}
 
 		/* mode 1 means assert for 1 instruction */
 		else
 		{
-			cpu_set_input_line_and_vector(machine->cpu[0], 0, ASSERT_LINE, interrupt_vector & 0xf0);
-			timer_set(machine, cpu_clocks_to_attotime(machine->cpu[0], 1), NULL, 0, interrupt_off);
+			cputag_set_input_line_and_vector(machine, "maincpu", 0, ASSERT_LINE, interrupt_vector & 0xf0);
+			timer_set(machine, cputag_clocks_to_attotime(machine, "maincpu", 1), NULL, 0, interrupt_off);
 		}
 
 		/* latch the feedback registers */
@@ -480,15 +480,15 @@ static TIMER_CALLBACK( scanline_callback )
 		/* bit 2 controls the interrupt mode: mode 0 means assert until acknowledged */
 		if ((interrupt_enable & 0x04) == 0)
 		{
-			cpu_set_input_line_and_vector(machine->cpu[0], 0, HOLD_LINE, interrupt_vector);
+			cputag_set_input_line_and_vector(machine, "maincpu", 0, HOLD_LINE, interrupt_vector);
 			timer_set(machine, video_screen_get_time_until_vblank_end(machine->primary_screen), NULL, 0, interrupt_off);
 		}
 
 		/* mode 1 means assert for 1 instruction */
 		else
 		{
-			cpu_set_input_line_and_vector(machine->cpu[0], 0, ASSERT_LINE, interrupt_vector);
-			timer_set(machine, cpu_clocks_to_attotime(machine->cpu[0], 1), NULL, 0, interrupt_off);
+			cputag_set_input_line_and_vector(machine, "maincpu", 0, ASSERT_LINE, interrupt_vector);
+			timer_set(machine, cputag_clocks_to_attotime(machine, "maincpu", 1), NULL, 0, interrupt_off);
 		}
 	}
 
@@ -957,7 +957,7 @@ WRITE8_HANDLER( astrocade_pattern_board_w )
     relative to the beginning of time and use that, mod RNG_PERIOD.
 */
 
-static void init_sparklestar(void)
+static void init_sparklestar(running_machine *machine)
 {
 	UINT32 shiftreg;
 	int i;
@@ -966,7 +966,7 @@ static void init_sparklestar(void)
 	astrocade_sparkle[0] = astrocade_sparkle[1] = astrocade_sparkle[2] = astrocade_sparkle[3] = 0;
 
 	/* allocate memory for the sparkle/star array */
-	sparklestar = auto_malloc(RNG_PERIOD);
+	sparklestar = auto_alloc_array(machine, UINT8, RNG_PERIOD);
 
 	/* generate the data for the sparkle/star array */
 	for (shiftreg = i = 0; i < RNG_PERIOD; i++)

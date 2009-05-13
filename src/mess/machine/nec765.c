@@ -2263,7 +2263,7 @@ static void common_start(const device_config *device, int device_type)
 	fdc->command_timer = timer_alloc(device->machine, nec765_continue_command, (void*)device);
 
 	fdc->nec765_flags &= NEC765_FDD_READY;
-	fdc->data_buffer = auto_malloc(32*1024);
+	fdc->data_buffer = auto_alloc_array(device->machine, char, 32*1024);
 
 
 	// register for state saving

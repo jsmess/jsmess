@@ -92,7 +92,7 @@ static WRITE8_HANDLER( io_w )
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_READWRITE(SMH_BANK1, SMH_ROM)
+	AM_RANGE(0x0000, 0x5fff) AM_READWRITE(SMH_BANK(1), SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x900f) AM_READWRITE(io_r,io_w) AM_BASE(&io_ram) //i/o area
 	AM_RANGE(0xc000, 0xffff) AM_ROM
@@ -146,7 +146,7 @@ INPUT_PORTS_END
 /*Is it there an IRQ mask?*/
 static INTERRUPT_GEN( deshoros_irq )
 {
-	cpu_set_input_line(device->machine->cpu[0], M6809_IRQ_LINE, HOLD_LINE);
+	cputag_set_input_line(device->machine, "maincpu", M6809_IRQ_LINE, HOLD_LINE);
 }
 
 static MACHINE_RESET( deshoros )

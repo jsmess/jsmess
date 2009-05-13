@@ -348,7 +348,7 @@ static const ay8910_interface aquarius_ay8910_interface =
 
 static MACHINE_START( aquarius )
 {
-	decrypt_rom = auto_malloc(16*1024);
+	decrypt_rom = auto_alloc_array(machine, UINT8, 16*1024);
 }
 
 static MACHINE_RESET( aquarius )
@@ -362,17 +362,17 @@ static MACHINE_RESET( aquarius )
 		break;
 
 	case 8 * 1024: // 4K expansion
-		memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x4fff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x4fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
 		memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5000, 0xbfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		break;
 
 	case 20 * 1024: // 16K expansion
-		memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x8fff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x8fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
 		memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x9000, 0xbfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		break;
 
 	case 36 * 1024: // 32K expansion (prototype)
-		memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0xbfff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0xbfff, 0, 0, SMH_BANK(1), SMH_BANK(1));
 		break;
 	}
 
@@ -398,11 +398,11 @@ static DEVICE_IMAGE_LOAD( aquarius_cart )
 	switch (size)
 	{
 	case 8 * 1024:
-		memory_install_readwrite8_handler(cputag_get_address_space(image->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xdfff, 0, 0x2000, SMH_BANK2, SMH_UNMAP);
+		memory_install_readwrite8_handler(cputag_get_address_space(image->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xdfff, 0, 0x2000, SMH_BANK(2), SMH_UNMAP);
 		break;
 
 	case 16 * 1024:
-		memory_install_readwrite8_handler(cputag_get_address_space(image->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xffff, 0, 0, SMH_BANK2, SMH_UNMAP);
+		memory_install_readwrite8_handler(cputag_get_address_space(image->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xffff, 0, 0, SMH_BANK(2), SMH_UNMAP);
 		break;
 	}
 

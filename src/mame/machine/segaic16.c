@@ -216,7 +216,7 @@ static void memory_mapper_w(const address_space *space, struct memory_mapper_chi
 			if ((oldval ^ chip->regs[offset]) & 3)
 			{
 				if ((chip->regs[offset] & 3) == 3)
-					fd1094_machine_init(space->machine->cpu[0]);
+					fd1094_machine_init(chip->cpu);
 
 				/* fd1094_machine_init calls device_reset on the CPU, so we must do this afterwards */
 				cpu_set_input_line(chip->cpu, INPUT_LINE_RESET, (chip->regs[offset] & 3) == 3 ? ASSERT_LINE : CLEAR_LINE);
@@ -383,9 +383,9 @@ static void update_memory_mapping(running_machine *machine, struct memory_mapper
 
 				if (decrypt)
 				{
-					decrypted = fd1094_get_decrypted_base();
+					decrypted = (UINT8 *)fd1094_get_decrypted_base();
 					if (!decrypted)
-						decrypted = fd1089_get_decrypted_base();
+						decrypted = (UINT8 *)fd1089_get_decrypted_base();
 				}
 
 				memory_configure_bank(machine, banknum, 0, 1, (UINT8 *)chip->cpu->region + region_start, 0);

@@ -298,7 +298,7 @@ static TIMER_CALLBACK( namconb1_TriggerPOSIRQ )
 
 	video_screen_update_partial(machine->primary_screen, param);
 	pos_irq_active = 1;
-	cpu_set_input_line(machine->cpu[0], namconb_cpureg[0x02] & 0xf, ASSERT_LINE);
+	cputag_set_input_line(machine, "maincpu", namconb_cpureg[0x02] & 0xf, ASSERT_LINE);
 }
 
 static INTERRUPT_GEN( namconb1_interrupt )
@@ -374,7 +374,7 @@ static TIMER_CALLBACK( namconb2_TriggerPOSIRQ )
 {
 	video_screen_update_partial(machine->primary_screen, param);
 	pos_irq_active = 1;
-	cpu_set_input_line(machine->cpu[0], namconb_cpureg[0x02], ASSERT_LINE);
+	cputag_set_input_line(machine, "maincpu", namconb_cpureg[0x02], ASSERT_LINE);
 }
 
 static INTERRUPT_GEN( namconb2_interrupt )
@@ -429,9 +429,9 @@ static void namconb1_cpureg8_w(running_machine *machine, int reg, UINT8 data)
 	switch(reg) {
 	case 0x02: // POS IRQ level/enable
 		if(pos_irq_active && (((prev & 0xf) != (data & 0xf)) || !(data & 0xf0))) {
-			cpu_set_input_line(machine->cpu[0], prev & 0xf, CLEAR_LINE);
+			cputag_set_input_line(machine, "maincpu", prev & 0xf, CLEAR_LINE);
 			if(data & 0xf0)
-				cpu_set_input_line(machine->cpu[0], data & 0xf, ASSERT_LINE);
+				cputag_set_input_line(machine, "maincpu", data & 0xf, ASSERT_LINE);
 			else
 				pos_irq_active = 0;
 		}
@@ -439,9 +439,9 @@ static void namconb1_cpureg8_w(running_machine *machine, int reg, UINT8 data)
 
 	case 0x04: // VBLANK IRQ level/enable
 		if(vblank_irq_active && (((prev & 0xf) != (data & 0xf)) || !(data & 0xf0))) {
-			cpu_set_input_line(machine->cpu[0], prev & 0xf, CLEAR_LINE);
+			cputag_set_input_line(machine, "maincpu", prev & 0xf, CLEAR_LINE);
 			if(data & 0xf0)
-				cpu_set_input_line(machine->cpu[0], data & 0xf, ASSERT_LINE);
+				cputag_set_input_line(machine, "maincpu", data & 0xf, ASSERT_LINE);
 			else
 				vblank_irq_active = 0;
 		}
@@ -449,14 +449,14 @@ static void namconb1_cpureg8_w(running_machine *machine, int reg, UINT8 data)
 
 	case 0x07: // POS ack
 		if(pos_irq_active) {
-			cpu_set_input_line(machine->cpu[0], namconb_cpureg[0x02] & 0xf, CLEAR_LINE);
+			cputag_set_input_line(machine, "maincpu", namconb_cpureg[0x02] & 0xf, CLEAR_LINE);
 			pos_irq_active = 0;
 		}
 		break;
 
 	case 0x09: // VBLANK ack
 		if(vblank_irq_active) {
-			cpu_set_input_line(machine->cpu[0], namconb_cpureg[0x04] & 0xf, CLEAR_LINE);
+			cputag_set_input_line(machine, "maincpu", namconb_cpureg[0x04] & 0xf, CLEAR_LINE);
 			vblank_irq_active = 0;
 		}
 		break;
@@ -466,11 +466,11 @@ static void namconb1_cpureg8_w(running_machine *machine, int reg, UINT8 data)
 
 	case 0x18: // C75 Control
 		if(data & 1) {
-			cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, CLEAR_LINE);
-			cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
-			cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
+			cputag_set_input_line(machine, "mcu", INPUT_LINE_HALT, CLEAR_LINE);
+			cputag_set_input_line(machine, "mcu", INPUT_LINE_RESET, ASSERT_LINE);
+			cputag_set_input_line(machine, "mcu", INPUT_LINE_RESET, CLEAR_LINE);
 		} else
-			cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
+			cputag_set_input_line(machine, "mcu", INPUT_LINE_HALT, ASSERT_LINE);
 		break;
 	}
 }
@@ -495,9 +495,9 @@ static void namconb2_cpureg8_w(running_machine *machine, int reg, UINT8 data)
 	switch(reg) {
 	case 0x00: // VBLANK IRQ level
 		if(vblank_irq_active && (prev != data)) {
-			cpu_set_input_line(machine->cpu[0], prev, CLEAR_LINE);
+			cputag_set_input_line(machine, "maincpu", prev, CLEAR_LINE);
 			if(data)
-				cpu_set_input_line(machine->cpu[0], data, ASSERT_LINE);
+				cputag_set_input_line(machine, "maincpu", data, ASSERT_LINE);
 			else
 				vblank_irq_active = 0;
 		}
@@ -505,9 +505,9 @@ static void namconb2_cpureg8_w(running_machine *machine, int reg, UINT8 data)
 
 	case 0x02: // POS IRQ level
 		if(pos_irq_active && (prev != data)) {
-			cpu_set_input_line(machine->cpu[0], prev, CLEAR_LINE);
+			cputag_set_input_line(machine, "maincpu", prev, CLEAR_LINE);
 			if(data)
-				cpu_set_input_line(machine->cpu[0], data, ASSERT_LINE);
+				cputag_set_input_line(machine, "maincpu", data, ASSERT_LINE);
 			else
 				pos_irq_active = 0;
 		}
@@ -515,14 +515,14 @@ static void namconb2_cpureg8_w(running_machine *machine, int reg, UINT8 data)
 
 	case 0x04: // VBLANK ack
 		if(vblank_irq_active) {
-			cpu_set_input_line(machine->cpu[0], namconb_cpureg[0x00], CLEAR_LINE);
+			cputag_set_input_line(machine, "maincpu", namconb_cpureg[0x00], CLEAR_LINE);
 			vblank_irq_active = 0;
 		}
 		break;
 
 	case 0x06: // POS ack
 		if(pos_irq_active) {
-			cpu_set_input_line(machine->cpu[0], namconb_cpureg[0x02], CLEAR_LINE);
+			cputag_set_input_line(machine, "maincpu", namconb_cpureg[0x02], CLEAR_LINE);
 			pos_irq_active = 0;
 		}
 		break;
@@ -532,11 +532,11 @@ static void namconb2_cpureg8_w(running_machine *machine, int reg, UINT8 data)
 
 	case 0x16: // C75 Control
 		if(data & 1) {
-			cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, CLEAR_LINE);
-			cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
-			cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
+			cputag_set_input_line(machine, "mcu", INPUT_LINE_HALT, CLEAR_LINE);
+			cputag_set_input_line(machine, "mcu", INPUT_LINE_RESET, ASSERT_LINE);
+			cputag_set_input_line(machine, "mcu", INPUT_LINE_RESET, CLEAR_LINE);
 		} else {
-			cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
+			cputag_set_input_line(machine, "mcu", INPUT_LINE_HALT, ASSERT_LINE);
 		}
 		break;
 	}
@@ -852,45 +852,45 @@ static WRITE32_HANDLER(namconb_share_w)
 }
 
 static ADDRESS_MAP_START( namconb1_am, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10001f) AM_READ(gunbulet_gun_r)
-	AM_RANGE(0x1c0000, 0x1cffff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x1c0000, 0x1cffff) AM_RAM
 	AM_RANGE(0x1e4000, 0x1e4003) AM_READWRITE(randgen_r,srand_w)
 	AM_RANGE(0x200000, 0x207fff) AM_READWRITE(namconb_share_r, namconb_share_w)
 	AM_RANGE(0x208000, 0x2fffff) AM_RAM
 	AM_RANGE(0x400000, 0x40001f) AM_READWRITE(namconb_cpureg_r, namconb1_cpureg_w)
-	AM_RANGE(0x580000, 0x5807ff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) AM_BASE(&nvmem32)
+	AM_RANGE(0x580000, 0x5807ff) AM_RAM AM_BASE(&nvmem32)
 	AM_RANGE(0x600000, 0x61ffff) AM_READWRITE(namco_obj32_r,namco_obj32_w)
 	AM_RANGE(0x620000, 0x620007) AM_READWRITE(namco_spritepos32_r,namco_spritepos32_w)
 	AM_RANGE(0x640000, 0x64ffff) AM_READWRITE(namco_tilemapvideoram32_r,namco_tilemapvideoram32_w )
 	AM_RANGE(0x660000, 0x66003f) AM_READWRITE(namco_tilemapcontrol32_r,namco_tilemapcontrol32_w)
-	AM_RANGE(0x680000, 0x68000f) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) AM_BASE(&namconb1_spritebank32)
+	AM_RANGE(0x680000, 0x68000f) AM_RAM AM_BASE(&namconb1_spritebank32)
 	AM_RANGE(0x6e0000, 0x6e001f) AM_READ(custom_key_r) AM_WRITENOP
-	AM_RANGE(0x700000, 0x707fff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) AM_BASE(&paletteram32)
+	AM_RANGE(0x700000, 0x707fff) AM_RAM AM_BASE(&paletteram32)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( namconb2_am, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x1c0000, 0x1cffff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM
+	AM_RANGE(0x1c0000, 0x1cffff) AM_RAM
 	AM_RANGE(0x1e4000, 0x1e4003) AM_READWRITE(randgen_r,srand_w)
 	AM_RANGE(0x200000, 0x207fff) AM_READWRITE(namconb_share_r, namconb_share_w)
 	AM_RANGE(0x208000, 0x2fffff) AM_RAM
 	AM_RANGE(0x400000, 0x4fffff) AM_ROM AM_REGION("data", 0)
 	AM_RANGE(0x600000, 0x61ffff) AM_READWRITE(namco_obj32_r,namco_obj32_w)
 	AM_RANGE(0x620000, 0x620007) AM_READWRITE(namco_spritepos32_r,namco_spritepos32_w)
-	AM_RANGE(0x640000, 0x64000f) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) /* unknown xy offset */
+	AM_RANGE(0x640000, 0x64000f) AM_RAM /* unknown xy offset */
 	AM_RANGE(0x680000, 0x68ffff) AM_READWRITE(namco_tilemapvideoram32_r, namco_tilemapvideoram32_w )
 	AM_RANGE(0x6c0000, 0x6c003f) AM_READWRITE(namco_tilemapcontrol32_r, namco_tilemapcontrol32_w )
 	AM_RANGE(0x700000, 0x71ffff) AM_READWRITE(namco_rozvideoram32_r,namco_rozvideoram32_w)
 	AM_RANGE(0x740000, 0x74001f) AM_READWRITE(namco_rozcontrol32_r,namco_rozcontrol32_w)
-	AM_RANGE(0x800000, 0x807fff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) AM_BASE(&paletteram32)
-	AM_RANGE(0x900008, 0x90000f) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) AM_BASE(&namconb1_spritebank32)
-	AM_RANGE(0x940000, 0x94000f) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) AM_BASE(&namconb1_tilebank32)
+	AM_RANGE(0x800000, 0x807fff) AM_RAM AM_BASE(&paletteram32)
+	AM_RANGE(0x900008, 0x90000f) AM_RAM AM_BASE(&namconb1_spritebank32)
+	AM_RANGE(0x940000, 0x94000f) AM_RAM AM_BASE(&namconb1_tilebank32)
 	AM_RANGE(0x980000, 0x98000f) AM_READ(namco_rozbank32_r) AM_WRITE(namco_rozbank32_w)
-	AM_RANGE(0xa00000, 0xa007ff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) AM_BASE(&nvmem32)
+	AM_RANGE(0xa00000, 0xa007ff) AM_RAM AM_BASE(&nvmem32)
 	AM_RANGE(0xc00000, 0xc0001f) AM_READ(custom_key_r) AM_WRITENOP
 	AM_RANGE(0xf00000, 0xf0001f) AM_READWRITE(namconb_cpureg_r, namconb2_cpureg_w)
-ADDRESS_MAP_END /* namconb2_readmem */
+ADDRESS_MAP_END
 
 static WRITE16_HANDLER( nbmcu_shared_w )
 {

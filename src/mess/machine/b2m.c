@@ -63,11 +63,11 @@ static void b2m_set_bank(running_machine *machine,int bank)
 	UINT8 *rom;
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	
-	memory_install_write8_handler(space, 0x0000, 0x27ff, 0, 0, SMH_BANK1);
-	memory_install_write8_handler(space, 0x2800, 0x2fff, 0, 0, SMH_BANK2);
-	memory_install_write8_handler(space, 0x3000, 0x6fff, 0, 0, SMH_BANK3);
-	memory_install_write8_handler(space, 0x7000, 0xdfff, 0, 0, SMH_BANK4);
-	memory_install_write8_handler(space, 0xe000, 0xffff, 0, 0, SMH_BANK5);
+	memory_install_write8_handler(space, 0x0000, 0x27ff, 0, 0, SMH_BANK(1));
+	memory_install_write8_handler(space, 0x2800, 0x2fff, 0, 0, SMH_BANK(2));
+	memory_install_write8_handler(space, 0x3000, 0x6fff, 0, 0, SMH_BANK(3));
+	memory_install_write8_handler(space, 0x7000, 0xdfff, 0, 0, SMH_BANK(4));
+	memory_install_write8_handler(space, 0xe000, 0xffff, 0, 0, SMH_BANK(5));
 
 	rom = memory_region(machine, "maincpu");
 	switch(bank) {

@@ -205,7 +205,7 @@ DEVICE_IMAGE_LOAD(pce_cart)
 	/* Check for Populous */
 	if ( ! memcmp( ROM + 0x1F26, "POPULOUS", 8 ) ) 
 	{
-		cartridge_ram = auto_malloc( 0x8000 );
+		cartridge_ram = auto_alloc_array(image->machine, UINT8, 0x8000 );
 		memory_set_bankptr( image->machine, 2, cartridge_ram );
 		memory_install_write8_handler(cputag_get_address_space(image->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x080000, 0x087FFF, 0, 0, pce_cartridge_ram_w );
 	}
@@ -218,7 +218,7 @@ DEVICE_IMAGE_LOAD(pce_cart)
 		if ( ! memcmp( ROM + 0x29D1, "VER. 3.", 7 ) || ! memcmp( ROM + 0x29C4, "VER. 3.", 7 ) ) 
 		{
 			pce_sys3_card = 1;
-			cartridge_ram = auto_malloc( 0x30000 );
+			cartridge_ram = auto_alloc_array(image->machine, UINT8, 0x30000 );
 			memory_set_bankptr( image->machine, 4, cartridge_ram );
 			memory_install_write8_handler(cputag_get_address_space(image->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0D0000, 0x0FFFFF, 0, 0, pce_cartridge_ram_w );
 		}
@@ -915,28 +915,28 @@ static void pce_cd_init( running_machine *machine )
 	memset( &pce_cd, 0, sizeof(pce_cd) );
 
 	/* Initialize BRAM */
-	pce_cd.bram = auto_malloc( PCE_BRAM_SIZE * 2 );
+	pce_cd.bram = auto_alloc_array(machine, UINT8, PCE_BRAM_SIZE * 2 );
 	memset( pce_cd.bram, 0, PCE_BRAM_SIZE );
 	memset( pce_cd.bram + PCE_BRAM_SIZE, 0xFF, PCE_BRAM_SIZE );
 	pce_cd.bram_locked = 1;
 	pce_set_cd_bram(machine);
 
 	/* set up adpcm related things */
-	pce_cd.adpcm_ram = auto_malloc( PCE_ADPCM_RAM_SIZE );
+	pce_cd.adpcm_ram = auto_alloc_array(machine, UINT8, PCE_ADPCM_RAM_SIZE );
 	memset( pce_cd.adpcm_ram, 0, PCE_ADPCM_RAM_SIZE );
 	pce_cd.adpcm_clock_divider = 1;
 
 	/* Set up cd command buffer */
-	pce_cd.command_buffer = auto_malloc( PCE_CD_COMMAND_BUFFER_SIZE );
+	pce_cd.command_buffer = auto_alloc_array(machine, UINT8, PCE_CD_COMMAND_BUFFER_SIZE );
 	memset( pce_cd.command_buffer, 0, PCE_CD_COMMAND_BUFFER_SIZE );
 	pce_cd.command_buffer_index = 0;
 
-	pce_cd.data_buffer = auto_malloc( 8192 );
+	pce_cd.data_buffer = auto_alloc_array(machine, UINT8, 8192 );
 	memset( pce_cd.data_buffer, 0, 8192 );
 	pce_cd.data_buffer_size = 0;
 	pce_cd.data_buffer_index = 0;
 
-	pce_cd.subcode_buffer = auto_malloc( 96 );
+	pce_cd.subcode_buffer = auto_alloc_array(machine, UINT8, 96 );
 
 	device = devtag_get_device(machine, "cdrom");
 	if ( device )

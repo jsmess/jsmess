@@ -181,8 +181,7 @@ VIDEO_START( newport )
 	nREX3_DrawMode1 = 0x3002f001;
 	nREX3_DCBMode = 0x00000780;
 	nREX3_Kludge_SkipLine = 0;
-	video_base = auto_malloc( (1280+64) * (1024+64) * 4 );
-	memset( video_base, 0x00, (1280+64) * (1024+64) * 4 );
+	video_base = auto_alloc_array_clear(machine, UINT32, (1280+64) * (1024+64));
 }
 
 VIDEO_UPDATE( newport )

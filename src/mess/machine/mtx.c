@@ -226,13 +226,13 @@ WRITE8_HANDLER( mtx_bankswitch_w )
 	else if (ram_page + 1 == mess_ram_size/0x8000)
 	{
 		memory_install_readwrite8_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0, SMH_NOP, SMH_NOP);
-		memory_install_readwrite8_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, SMH_BANK4, SMH_BANK4);
+		memory_install_readwrite8_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, SMH_BANK(4), SMH_BANK(4));
 		memory_set_bank(space->machine, 4, ram_page);
 	}
 	else
 	{
-		memory_install_readwrite8_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0, SMH_BANK3, SMH_BANK3);
-		memory_install_readwrite8_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, SMH_BANK4, SMH_BANK4);
+		memory_install_readwrite8_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0, SMH_BANK(3), SMH_BANK(3));
+		memory_install_readwrite8_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, SMH_BANK(4), SMH_BANK(4));
 		memory_set_bank(space->machine, 3, ram_page);
 		memory_set_bank(space->machine, 4, ram_page);
 	}

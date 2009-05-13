@@ -65,7 +65,7 @@ static void common_start(const device_config *device, int device_type)
 		case TYPE_SST39VF020  : flash->size = 256 * 1024; break;
 		case TYPE_SST39VF400A : flash->size = 512 * 1024; break;
 	}
-	flash->data = auto_malloc( flash->size);
+	flash->data = auto_alloc_array(device->machine, UINT8, flash->size);
 #ifdef LSB_FIRST
 	if (config->cpu_endianess != ENDIANNESS_LITTLE) flash->swap = config->cpu_datawidth / 8; else flash->swap = 0;
 #else

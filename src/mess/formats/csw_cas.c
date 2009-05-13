@@ -93,7 +93,7 @@ int 		bsize=0;
 	//from here on down for now I am assuming it is compressed csw file.
 	in_ptr = (UINT8*) casdata+0x34+HeaderExtensionLength;
 
-	gz_ptr = (UINT8*) auto_malloc( 8 );
+	gz_ptr = malloc( 8 );
 
 
 	d_stream.next_in = (unsigned char *)in_ptr;
@@ -211,7 +211,7 @@ int		i;
 	//from here on down for now I am assuming it is compressed csw file.
 	in_ptr = (UINT8*) bytes+0x34+HeaderExtensionLength;
 
-	gz_ptr = (UINT8*) auto_malloc( 8 );
+	gz_ptr = malloc( 8 );
 
 
 	d_stream.next_in = (unsigned char *)in_ptr;

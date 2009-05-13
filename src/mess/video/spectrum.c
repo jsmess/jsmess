@@ -32,7 +32,7 @@ VIDEO_START( spectrum )
 	spectrum_frame_number = 0;
 	spectrum_flash_invert = 0;
 	
-	EventList_Initialise(30000);
+	EventList_Initialise(machine, 30000);
 
 	retrace_cycles = SPEC_RETRACE_CYCLES;
 	
@@ -44,7 +44,7 @@ VIDEO_START( spectrum_128 )
 	spectrum_frame_number = 0;
 	spectrum_flash_invert = 0;
 
-	EventList_Initialise(30000);
+	EventList_Initialise(machine, 30000);
 	
 	retrace_cycles = SPEC128_RETRACE_CYCLES;
 }

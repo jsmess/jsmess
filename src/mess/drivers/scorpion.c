@@ -200,7 +200,7 @@ static void scorpion_update_memory(running_machine *machine)
 
 	if ((scorpion_256_port_1ffd_data & 0x01)==0x01)
 	{
-		memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_BANK1);
+		memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_BANK(1));
 		memory_set_bankptr(machine, 1, mess_ram+(8<<14));	
 		logerror("RAM\n");	
 	}
@@ -301,7 +301,7 @@ static MACHINE_RESET( scorpion )
 {	
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);	
 	
-	memory_install_read8_handler (space, 0x0000, 0x3fff, 0, 0, SMH_BANK1);
+	memory_install_read8_handler (space, 0x0000, 0x3fff, 0, 0, SMH_BANK(1));
 	
 	betadisk_disable();
 	betadisk_clear_status();

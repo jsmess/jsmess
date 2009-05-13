@@ -193,16 +193,16 @@ static WRITE8_DEVICE_HANDLER( sym1_via2_a_w )
 	logerror("SYM1 VIA2 W 0x%02x\n", data);
 
 	memory_install_write8_handler(cpu0space, 0xa600, 0xa67f, 0, 0,
-		((input_port_read(device->machine, "WP") & 0x01) && !(data & 0x01)) ? SMH_NOP : SMH_BANK5);
+		((input_port_read(device->machine, "WP") & 0x01) && !(data & 0x01)) ? SMH_NOP : SMH_BANK(5));
 
 	memory_install_write8_handler(cpu0space, 0x0400, 0x07ff, 0, 0,
-		((input_port_read(device->machine, "WP") & 0x02) && !(data & 0x02)) ? SMH_NOP : SMH_BANK2);
+		((input_port_read(device->machine, "WP") & 0x02) && !(data & 0x02)) ? SMH_NOP : SMH_BANK(2));
 
 	memory_install_write8_handler(cpu0space, 0x0800, 0x0bff, 0, 0,
-		((input_port_read(device->machine, "WP") & 0x04) && !(data & 0x04)) ? SMH_NOP : SMH_BANK3);
+		((input_port_read(device->machine, "WP") & 0x04) && !(data & 0x04)) ? SMH_NOP : SMH_BANK(3));
 
 	memory_install_write8_handler(cpu0space, 0x0c00, 0x0fff, 0, 0,
-		((input_port_read(device->machine, "WP") & 0x08) && !(data & 0x08)) ? SMH_NOP : SMH_BANK4);
+		((input_port_read(device->machine, "WP") & 0x08) && !(data & 0x08)) ? SMH_NOP : SMH_BANK(4));
 }
 
 
@@ -285,7 +285,7 @@ MACHINE_RESET( sym1 )
 	/* make 0xf800 to 0xffff point to the last half of the monitor ROM
 	   so that the CPU can find its reset vectors */
 	memory_install_readwrite8_handler(cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM ),
-			0xf800, 0xffff, 0, 0, SMH_BANK1, SMH_NOP);
+			0xf800, 0xffff, 0, 0, SMH_BANK(1), SMH_NOP);
 	memory_set_bankptr(machine, 1, sym1_monitor + 0x800);
 	device_reset(cputag_get_cpu(machine, "maincpu"));
 }

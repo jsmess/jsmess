@@ -190,7 +190,7 @@ void image_init(running_machine *machine)
 	/* allocate the private structure */
 	private_size = sizeof(*machine->images_data) + ((count - 1)
 		* sizeof(machine->images_data->slots[0]));
-	machine->images_data = (images_private *) auto_malloc(private_size);
+	machine->images_data = (images_private *) auto_alloc_array_clear(machine, char, private_size);
 	memset(machine->images_data, '\0', private_size);
 
 	/* some setup */
@@ -229,14 +229,13 @@ void image_init(running_machine *machine)
 		for (i = 0; i < format_count; i++)
 		{
 			/* allocate a new format */
-			format = auto_malloc(sizeof(*format));
-			memset(format, 0, sizeof(*format));
+			format = auto_alloc_clear(machine, image_device_format);
 
 			/* populate it */
 			format->index		= i;
-			format->name		= auto_strdup(device_get_info_string(slot->dev, DEVINFO_STR_IMAGE_CREATE_OPTNAME + i));
-			format->description	= auto_strdup(device_get_info_string(slot->dev, DEVINFO_STR_IMAGE_CREATE_OPTDESC + i));
-			format->extensions	= auto_strdup(device_get_info_string(slot->dev, DEVINFO_STR_IMAGE_CREATE_OPTEXTS + i));
+			format->name		= auto_strdup(machine, device_get_info_string(slot->dev, DEVINFO_STR_IMAGE_CREATE_OPTNAME + i));
+			format->description	= auto_strdup(machine, device_get_info_string(slot->dev, DEVINFO_STR_IMAGE_CREATE_OPTDESC + i));
+			format->extensions	= auto_strdup(machine, device_get_info_string(slot->dev, DEVINFO_STR_IMAGE_CREATE_OPTEXTS + i));
 			format->optspec		= device_get_info_ptr(slot->dev, DEVINFO_PTR_IMAGE_CREATE_OPTSPEC + i);
 
 			/* and append it to the list */
@@ -1142,7 +1141,7 @@ static void run_hash(const device_config *image,
 	*dest = '\0';
 	size = (UINT32) image_length(image);
 
-	buf = (UINT8 *) malloc_or_die(size);
+	buf = alloc_array_or_die(UINT8, size);
 
 	/* read the file */
 	image_fseek(image, 0, SEEK_SET);
