@@ -1329,8 +1329,10 @@ $(MESSOBJ)/kyocera.a: \
 	$(MESS_DRIVERS)/kyocera.o \
 	$(MESS_VIDEO)/kyocera.o \
 	$(MESS_VIDEO)/hd44102.o \
+	$(MESS_VIDEO)/hd61830.o \
 	$(MESS_MACHINE)/upd1990a.o \
-	$(MESS_MACHINE)/8155pio.o \
+	$(MESS_MACHINE)/rp5c01a.o \
+	$(MESS_MACHINE)/8155pio.o
 
 $(MESSOBJ)/skeleton.a: \
 	$(MESS_DRIVERS)/a6809.o \

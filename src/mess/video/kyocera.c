@@ -1,6 +1,7 @@
 #include "driver.h"
 #include "includes/kyocera.h"
 #include "video/hd44102.h"
+#include "video/hd61830.h"
 
 void kyo85_set_lcd_bank(running_machine *machine, UINT16 data)
 {
@@ -82,6 +83,7 @@ static VIDEO_START( kyo85 )
 {
 	kyocera_state *state = machine->driver_data;
 	
+	/* find devices */
 	state->hd44102[0] = devtag_get_device(machine, "m1");
 	state->hd44102[1] = devtag_get_device(machine, "m2");
 	state->hd44102[2] = devtag_get_device(machine, "m3");
@@ -111,6 +113,47 @@ static VIDEO_UPDATE( kyo85 )
 	return 0;
 }
 
+static VIDEO_START( trsm200 )
+{
+	trsm200_state *state = machine->driver_data;
+
+	/* find devices */
+	state->hd61830 = devtag_get_device(machine, HD61830_TAG);
+
+	/* allocate video memory */
+	state->video_ram = auto_alloc_array(machine, UINT8, 8192);
+}
+
+static VIDEO_UPDATE( trsm200 )
+{
+	trsm200_state *state = screen->machine->driver_data;
+
+	hd61830_update(state->hd61830, bitmap, cliprect);
+
+	return 0;
+}
+
+static READ8_HANDLER( trsm200_rd_r )
+{
+	trsm200_state *state = space->machine->driver_data;
+
+	return state->video_ram[offset & 0x1fff];
+}
+
+static WRITE8_HANDLER( trsm200_rd_w )
+{
+	trsm200_state *state = space->machine->driver_data;
+
+	state->video_ram[offset & 0x1fff] = data;
+}
+
+static HD61830_INTERFACE( trsm200_hd61830_intf )
+{
+	SCREEN_TAG,
+	DEVCB_MEMORY_HANDLER(I8085_TAG, PROGRAM, trsm200_rd_r),
+	DEVCB_MEMORY_HANDLER(I8085_TAG, PROGRAM, trsm200_rd_w)
+};
+
 MACHINE_DRIVER_START( kyo85_video )
 	MDRV_SCREEN_ADD(SCREEN_TAG, LCD)
 	MDRV_SCREEN_REFRESH_RATE(44)
@@ -139,4 +182,22 @@ MACHINE_DRIVER_START( kyo85_video )
 
 //	MDRV_HD44103_MASTER_ADD("m11", SCREEN_TAG, CAP_P(18), RES_K(100), HD44103_FS_HIGH, HD44103_DUTY_1_32)
 //	MDRV_HD44103_SLAVE_ADD( "m12", "m11", SCREEN_TAG, HD44103_FS_HIGH, HD44103_DUTY_1_32)
+MACHINE_DRIVER_END
+
+MACHINE_DRIVER_START( trsm200_video )
+	MDRV_SCREEN_ADD(SCREEN_TAG, LCD)
+	MDRV_SCREEN_REFRESH_RATE(80)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(240, 128)
+	MDRV_SCREEN_VISIBLE_AREA(0, 240-1, 0, 128-1)
+
+//	MDRV_DEFAULT_LAYOUT(layout_trsm200)
+
+	MDRV_PALETTE_LENGTH(2)
+	MDRV_PALETTE_INIT(kyo85)
+
+	MDRV_VIDEO_START(trsm200)
+	MDRV_VIDEO_UPDATE(trsm200)
+
+	MDRV_HD61830_ADD(HD61830_TAG, XTAL_2_4576MHz/2, trsm200_hd61830_intf)
 MACHINE_DRIVER_END
