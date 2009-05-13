@@ -32,6 +32,7 @@
 static UINT32 *dc_sound_ram;
 
 //UINT32 dma_offset;
+int jvsboard_type;
 
 static UINT64 portA = 0x3, PDTRA, latched_PDTRA = 0, w;
 static int state = 0;

@@ -100,10 +100,10 @@ const game_driver * const drivers[] =
 	DRIVER( vsaturn )	/* JVC V-Saturn										*/
 	DRIVER( hisaturn )	/* Hitachi HiSaturn									*/
 
-//0131u1	DRIVER( dcjp )		/* 1998 Sega Dreamcast (Japan) */
-//0131u1	DRIVER( dc )		/* 1999 Sega Dreamcast (USA) */
-//0131u1	DRIVER( dceu )		/* 1999 Sega Dreamcast (Europe) */
-//0131u1	DRIVER( dcdev )		/* 1998 Sega HKT-0120 Sega Dreamcast Development Box */
+	DRIVER( dcjp )		/* 1998 Sega Dreamcast (Japan) */
+	DRIVER( dc )		/* 1999 Sega Dreamcast (USA) */
+	DRIVER( dceu )		/* 1999 Sega Dreamcast (Europe) */
+	DRIVER( dcdev )		/* 1998 Sega HKT-0120 Sega Dreamcast Development Box */
 
 	/* BALLY */
 	DRIVER( astrocde )	/* Bally Astrocade									*/
