@@ -58,6 +58,10 @@ typedef UINT8 (*m6510_port_read_func)(const device_config *device, UINT8 directi
 typedef void (*m6510_port_write_func)(const device_config *device, UINT8 direction, UINT8 data);
 
 
+void m6502_set_read_indexed_callback(const device_config *device, m6502_read_indexed_func callback);
+void m6502_set_write_indexed_callback(const device_config *device, m6502_write_indexed_func callback);
+void m6510_set_port_read_callback(const device_config *device, m6510_port_read_func callback);
+void m6510_set_port_write_callback(const device_config *device, m6510_port_write_func callback);
 enum
 {
 	CPUINFO_FCT_M6502_READINDEXED_CALLBACK = CPUINFO_FCT_CPU_SPECIFIC,

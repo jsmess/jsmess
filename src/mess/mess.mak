@@ -235,6 +235,12 @@ SOUNDS += SP0256
 
 DRVLIBS = \
 	$(MESSOBJ)/messdriv.o \
+	$(MESSOBJ)/apple.a \
+	$(MESSOBJ)/cbm.a \
+	$(MESSOBJ)/cbmshare.a \
+	$(MESSOBJ)/primo.a \
+	$(MESSOBJ)/tangerin.a \
+	$(MESSOBJ)/thomson.a \
 	$(MESSOBJ)/3do.a \
 	$(MESSOBJ)/ac1.a \
 	$(MESSOBJ)/acorn.a \
@@ -363,12 +369,6 @@ DRVLIBS = \
 	$(MESSOBJ)/shared.a \
 
 
-#	$(MESSOBJ)/apple.a \
-#	$(MESSOBJ)/cbm.a \
-#	$(MESSOBJ)/cbmshare.a \
-#	$(MESSOBJ)/primo.a \
-#	$(MESSOBJ)/tangerin.a \
-#	$(MESSOBJ)/thomson.a \
 
 
 

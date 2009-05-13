@@ -215,7 +215,7 @@ ROM_START(apple2gsr3p)
 	ROM_LOAD("341-0729", 0x20000, 0x20000, NO_DUMP) /* 341-0729: IIgs ROM03 prototype FE-FF */
 ROM_END
 
-ROM_START(apple2gsr4p)
+ROM_START(apple2gsr3lp)
 	ROM_REGION(0x1000,"keyboard",0)
 	ROM_LOAD ("341-0024-a", 0x0000, 0x1000, NO_DUMP) /* Label needs verify: Keyboard M50741 MCU, 4K ROM */
 

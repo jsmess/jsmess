@@ -22,27 +22,6 @@
 #define SAMPLES_PER_BLOCK		0x40000
 #define CASSETTE_FLAG_DIRTY		0x10000
 
-struct sample_block
-{
-	INT32 *block;
-	size_t sample_count;
-};
-
-struct _cassette_image
-{
-	const struct CassetteFormat *format;
-	struct io_generic io;
-	object_pool *pool;
-
-	int channels;
-	int flags;
-	UINT32 sample_frequency;
-
-	struct sample_block *blocks;
-	size_t block_count;
-	size_t sample_count;
-};
-
 
 CASSETTE_FORMATLIST_START(cassette_default_formats)
 CASSETTE_FORMATLIST_END
@@ -102,7 +81,7 @@ static INT16 interpolate16(INT32 value)
 	initialization and termination
 *********************************************************************/
 
-static cassette_image *cassette_init(const struct CassetteFormat *format, void *file, const struct io_procs *procs, int flags)
+static cassette_image *cassette_init(running_machine *machine,const struct CassetteFormat *format, void *file, const struct io_procs *procs, int flags)
 {
 	cassette_image *cassette;
 
@@ -116,6 +95,7 @@ static cassette_image *cassette_init(const struct CassetteFormat *format, void *
 	cassette->io.procs = procs;
 	cassette->flags = flags;
 	cassette->pool = pool_alloc(NULL);
+	cassette->machine = machine;
 	return cassette;
 }
 
@@ -145,7 +125,7 @@ static int good_format(const struct CassetteFormat *format, const char *extensio
 
 
 
-casserr_t cassette_open_choices(void *file, const struct io_procs *procs, const char *extension,
+casserr_t cassette_open_choices(running_machine *machine,void *file, const struct io_procs *procs, const char *extension,
 	const struct CassetteFormat *const *formats, int flags, cassette_image **outcassette)
 {
 	casserr_t err;
@@ -159,7 +139,7 @@ casserr_t cassette_open_choices(void *file, const struct io_procs *procs, const 
 		formats = cassette_default_formats;
 
 	/* create the cassette object */
-	cassette = cassette_init(NULL, file, procs, flags);
+	cassette = cassette_init(machine, NULL, file, procs, flags);
 	if (!cassette)
 	{
 		err = CASSETTE_ERROR_OUTOFMEMORY;
@@ -210,18 +190,18 @@ done:
 
 
 
-casserr_t cassette_open(void *file, const struct io_procs *procs,
+casserr_t cassette_open(running_machine *machine, void *file, const struct io_procs *procs,
 	const struct CassetteFormat *format, int flags, cassette_image **outcassette)
 {
 	const struct CassetteFormat *formats[2];
 	formats[0] = format;
 	formats[1] = NULL;
-	return cassette_open_choices(file, procs, NULL, formats, flags, outcassette);
+	return cassette_open_choices(machine, file, procs, NULL, formats, flags, outcassette);
 }
 
 
 
-casserr_t cassette_create(void *file, const struct io_procs *procs, const struct CassetteFormat *format,
+casserr_t cassette_create(running_machine *machine, void *file, const struct io_procs *procs, const struct CassetteFormat *format,
 	const struct CassetteOptions *opts, int flags, cassette_image **outcassette)
 {
 	casserr_t err;
@@ -241,7 +221,7 @@ casserr_t cassette_create(void *file, const struct io_procs *procs, const struct
 		opts = &default_options;
 
 	/* create the cassette object */
-	cassette = cassette_init(format, file, procs, flags);
+	cassette = cassette_init(machine, format, file, procs, flags);
 	if (!cassette)
 	{
 		err = CASSETTE_ERROR_OUTOFMEMORY;

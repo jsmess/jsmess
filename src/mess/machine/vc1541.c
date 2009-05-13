@@ -1498,7 +1498,7 @@ static DEVICE_IMAGE_LOAD( _1541 )
 	offset_init (format);
 
 	/* Claim memory */
-	temp_copy = auto_alloc_array(machine, UINT8, filesize);
+	temp_copy = auto_alloc_array(image->machine, UINT8, filesize);
 
 	if ((image_fread( image, temp_copy, filesize ) != filesize) || !filesize)
 		return INIT_FAIL;

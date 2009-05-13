@@ -636,8 +636,29 @@ static CPU_EXECUTE( deco16 )
 	return cycles - cpustate->icount;
 }
 
+void m6502_set_read_indexed_callback(const device_config *device, m6502_read_indexed_func callback)
+{
+	m6502_Regs *cpustate = get_safe_token(device);
+	cpustate->rdmem_id = callback;
+}
 
+void m6502_set_write_indexed_callback(const device_config *device, m6502_write_indexed_func callback)
+{
+	m6502_Regs *cpustate = get_safe_token(device);
+	cpustate->wrmem_id = callback;
+}
 
+void m6510_set_port_read_callback(const device_config *device, m6510_port_read_func callback)
+{
+	m6502_Regs *cpustate = get_safe_token(device);
+	cpustate->port_read = callback;
+}
+
+void m6510_set_port_write_callback(const device_config *device, m6510_port_write_func callback)
+{
+	m6502_Regs *cpustate = get_safe_token(device);
+	cpustate->port_write = callback;
+}
 
 /**************************************************************************
  * Generic set_info

@@ -432,8 +432,8 @@ static void c16_common_driver_init (running_machine *machine)
 	UINT8 *rom;
 
 	/* configure the M7501 port */
-	devtag_set_info_fct(machine, "maincpu", CPUINFO_FCT_M6510_PORTREAD, (genf *) c16_m7501_port_read);
-	devtag_set_info_fct(machine, "maincpu", CPUINFO_FCT_M6510_PORTWRITE, (genf *) c16_m7501_port_write);
+	m6510_set_port_read_callback(cputag_get_cpu(machine, "maincpu"), c16_m7501_port_read);
+	m6510_set_port_write_callback(cputag_get_cpu(machine, "maincpu"),c16_m7501_port_write);
 
 	c16_select_roms (cputag_get_address_space(machine,"maincpu",ADDRESS_SPACE_PROGRAM), 0, 0);
 	c16_switch_to_rom (cputag_get_address_space(machine,"maincpu",ADDRESS_SPACE_PROGRAM), 0, 0);
@@ -490,7 +490,7 @@ DRIVER_INIT( c16v )
 MACHINE_RESET( c16 )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	const device_config *sid = devtag_get_device(space->machine, "sid6581");
+	const device_config *sid = devtag_get_device(space->machine, "sid");
 	
 	c364_speech_init(machine);
 

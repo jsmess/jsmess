@@ -454,8 +454,9 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( c16c )
 	MDRV_IMPORT_FROM( c16 )
 
-	MDRV_TPI6525_REMOVE("tpi6535_tpi_2")
-	MDRV_TPI6525_ADD("tpi6535_tpi_2", c16_tpi6525_tpi_2_c1551_intf)
+	// Need to check this since c16c is only using tpi_2
+	//MDRV_TPI6525_REMOVE("tpi6535_tpi_2")
+	//MDRV_TPI6525_ADD("tpi6535_tpi_2", c16_tpi6525_tpi_2_c1551_intf)
 
 	MDRV_IMPORT_FROM( cpu_c1551 )
 #ifdef CPU_SYNC
