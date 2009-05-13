@@ -1,4 +1,4 @@
-0.131.1
+﻿0.131.1
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
@@ -72,7 +72,7 @@ System Driver Changes:
 
 - [CRVISION] Added support for stereo tapes. [Curt Coder]
 
-- [KYOCERA] All systems (except npc8201) are now usable. [Curt Coder, Fabio Priuli]
+- [KYOCERA] All systems are now working without sound. [Curt Coder, Fabio Priuli]
 
 - [ORIC] Various bioses added for different languages. [Miodrag Milanovic]
 

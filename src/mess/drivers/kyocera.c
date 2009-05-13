@@ -30,13 +30,19 @@
 
 	TODO:
 
-	- pc8201 halts after boot
-	- soft power on/off
 	- discrete sound
+	- pc8201 memory banking
+	- pc8201 I/O control registers
+	- NEC PC-8233 floppy controller
+	- NEC floppy disc drives (PC-8031-1W, PC-8031-2W, PC-80S31)
+	- NEC PC-8240 video monitor adapter
+	- Tandy Portable Disk Drive (TPDD: 100k 3½", TPDD2: 200k 3½")
+	- Chipmunk disk drive (384k 3½")
+	- soft power on/off
 	- RS232/modem select
-	- IM6042 UART
-	- trsm200 TCM5089 sound
 	- trsm200 RTC alarm
+	- trsm200 TCM5089 sound
+	- IM6042 UART
 
 */
 
@@ -58,11 +64,13 @@ static const device_config *cassette_device_image(running_machine *machine)
 
 /* Read/Write Handlers */
 
+static UINT8 sio;
+
 static READ8_HANDLER( pc8201_bank_r )
 {
 	kyocera_state *state = space->machine->driver_data;
 
-	return state->bank;
+	return (sio & 0xc0) | state->bank;
 }
 
 static void pc8201_bankswitch(running_machine *machine, UINT8 data)
@@ -92,8 +100,15 @@ static void pc8201_bankswitch(running_machine *machine, UINT8 data)
 	switch (ram_bank)
 	{
 	case 0:
-		memory_install_readwrite8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
-		memory_install_readwrite8_handler(program, 0xc000, 0xffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
+		if (mess_ram_size > 16 * 1024)
+		{
+			memory_install_readwrite8_handler(program, 0x8000, 0xffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
+		}
+		else
+		{
+			memory_install_readwrite8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+			memory_install_readwrite8_handler(program, 0xc000, 0xffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
+		}
 		break;
 
 	case 1:
@@ -101,17 +116,14 @@ static void pc8201_bankswitch(running_machine *machine, UINT8 data)
 		break;
 
 	case 2:
-		if (mess_ram_size > 16 * 1024)
+		if (mess_ram_size > 32 * 1024)
 			memory_install_readwrite8_handler(program, 0x8000, 0xffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
 		else
 			memory_install_readwrite8_handler(program, 0x8000, 0xffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		break;
 
 	case 3:
-		if (mess_ram_size > 48 * 1024)
-			memory_install_readwrite8_handler(program, 0x8000, 0xffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
-		else
-			memory_install_readwrite8_handler(program, 0x8000, 0xffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite8_handler(program, 0x8000, 0xffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		break;
 	}
 
@@ -133,16 +145,18 @@ static WRITE8_HANDLER( pc8201_90_w )
 		1		
 		2
 		3
-		4
-		5		STB			RTC strobe
+		4		STB			RTC strobe
+		5		
 		6
 		7
 
 	*/
 
 	kyocera_state *state = space->machine->driver_data;
+	
+	sio = data;
 
-	upd1990a_stb_w(state->upd1990a, BIT(data, 5));
+	upd1990a_stb_w(state->upd1990a, BIT(data, 4));
 }
 
 static WRITE8_HANDLER( pc8201_e0_w )
@@ -925,12 +939,12 @@ static MACHINE_START( pc8201 )
 	/* configure ROM banking */
 	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, I8085_TAG), 0);
 	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "ext"), 0);
-	memory_configure_bank(machine, 1, 2, 2, mess_ram + 0x4000, 0x8000);
+	memory_configure_bank(machine, 1, 2, 2, mess_ram + 0x8000, 0x8000);
 	memory_set_bank(machine, 1, 0);
 
 	/* configure RAM banking */
 	memory_configure_bank(machine, 2, 0, 1, mess_ram, 0);
-	memory_configure_bank(machine, 2, 2, 2, mess_ram + 0x4000, 0x8000);
+	memory_configure_bank(machine, 2, 2, 2, mess_ram + 0x8000, 0x8000);
 	memory_set_bank(machine, 2, 0);
 
 	pc8201_bankswitch(machine, 0);
@@ -1217,8 +1231,8 @@ SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START( pc8201 )
 	CONFIG_RAM_DEFAULT	(16 * 1024)
-	CONFIG_RAM			(48 * 1024)
-	CONFIG_RAM			(80 * 1024)
+	CONFIG_RAM			(32 * 1024)
+	CONFIG_RAM			(64 * 1024)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START( trsm100 )

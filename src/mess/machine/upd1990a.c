@@ -147,10 +147,10 @@ WRITE_LINE_DEVICE_HANDLER( upd1990a_stb_w )
 
 			/* 1 Hz data out pulse */
 			upd1990a->data_out = 1;
-			timer_adjust_periodic(upd1990a->data_out_timer, attotime_zero, 0, ATTOTIME_IN_HZ((device->clock/32768)*2));
+			timer_adjust_periodic(upd1990a->data_out_timer, attotime_zero, 0, ATTOTIME_IN_HZ(1*2));
 
 			/* 64 Hz time pulse */
-			timer_adjust_periodic(upd1990a->tp_timer, attotime_zero, 0, ATTOTIME_IN_HZ((device->clock/512)*2));
+			timer_adjust_periodic(upd1990a->tp_timer, attotime_zero, 0, ATTOTIME_IN_HZ(64*2));
 			break;
 
 		case UPD1990A_MODE_SHIFT:
@@ -167,7 +167,7 @@ WRITE_LINE_DEVICE_HANDLER( upd1990a_stb_w )
 			devcb_call_write_line(&upd1990a->out_data_func, upd1990a->data_out);
 
 			/* 32 Hz time pulse */
-			timer_adjust_periodic(upd1990a->tp_timer, attotime_zero, 0, ATTOTIME_IN_HZ((device->clock/1024)*2));
+			timer_adjust_periodic(upd1990a->tp_timer, attotime_zero, 0, ATTOTIME_IN_HZ(32*2));
 			break;
 
 		case UPD1990A_MODE_TIME_SET:
@@ -194,7 +194,7 @@ WRITE_LINE_DEVICE_HANDLER( upd1990a_stb_w )
 			}
 
 			/* 32 Hz time pulse */
-			timer_adjust_periodic(upd1990a->tp_timer, attotime_zero, 0, ATTOTIME_IN_HZ((device->clock/1024)*2));
+			timer_adjust_periodic(upd1990a->tp_timer, attotime_zero, 0, ATTOTIME_IN_HZ(32*2));
 			}
 			break;
 
@@ -217,10 +217,10 @@ WRITE_LINE_DEVICE_HANDLER( upd1990a_stb_w )
 
 			/* 512 Hz data out pulse */
 			upd1990a->data_out = 1;
-			timer_adjust_periodic(upd1990a->data_out_timer, attotime_zero, 0, ATTOTIME_IN_HZ((device->clock/64)*2));
+			timer_adjust_periodic(upd1990a->data_out_timer, attotime_zero, 0, ATTOTIME_IN_HZ(512*2));
 
 			/* 32 Hz time pulse */
-			timer_adjust_periodic(upd1990a->tp_timer, attotime_zero, 0, ATTOTIME_IN_HZ((device->clock/1024)*2));
+			timer_adjust_periodic(upd1990a->tp_timer, attotime_zero, 0, ATTOTIME_IN_HZ(32*2));
 			}
 			break;
 
@@ -228,21 +228,21 @@ WRITE_LINE_DEVICE_HANDLER( upd1990a_stb_w )
 			if (LOG) logerror("UPD1990A TP = 64 Hz Set Mode\n");
 			
 			/* 64 Hz time pulse */
-			timer_adjust_periodic(upd1990a->tp_timer, attotime_zero, 0, ATTOTIME_IN_HZ((device->clock/512)*2));
+			timer_adjust_periodic(upd1990a->tp_timer, attotime_zero, 0, ATTOTIME_IN_HZ(64*2));
 			break;
 
 		case UPD1990A_MODE_TP_256HZ_SET:
 			if (LOG) logerror("UPD1990A TP = 256 Hz Set Mode\n");
 			
 			/* 256 Hz time pulse */
-			timer_adjust_periodic(upd1990a->tp_timer, attotime_zero, 0, ATTOTIME_IN_HZ((device->clock/128)*2));
+			timer_adjust_periodic(upd1990a->tp_timer, attotime_zero, 0, ATTOTIME_IN_HZ(256*2));
 			break;
 
 		case UPD1990A_MODE_TP_2048HZ_SET:
 			if (LOG) logerror("UPD1990A TP = 2048 Hz Set Mode\n");
 
 			/* 2048 Hz time pulse */
-			timer_adjust_periodic(upd1990a->tp_timer, attotime_zero, 0, ATTOTIME_IN_HZ((device->clock/16)*2));
+			timer_adjust_periodic(upd1990a->tp_timer, attotime_zero, 0, ATTOTIME_IN_HZ(2048*2));
 			break;
 
 		case UPD1990A_MODE_TEST:
