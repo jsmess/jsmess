@@ -72,7 +72,9 @@ System Driver Changes:
 
 - [CRVISION] Added support for stereo tapes. [Curt Coder]
 
-- [ORIC] Various bioses added for different languages [Miodrag Milanovic]
+- [KYOCERA] All systems (except npc8201) are now usable. [Curt Coder, Fabio Priuli]
+
+- [ORIC] Various bioses added for different languages. [Miodrag Milanovic]
 
 - [PP01] 16 roms of 1K instead one of 16KB as in real machine [Miodrag Milanovic]
 
@@ -103,6 +105,7 @@ Source Changes:
 
 - Converted the WAVE sound device to stereo. [Curt Coder]
 
+- Implemented following devices: PIO8155, RP5C01A, HD44102, HD61830. [Curt Coder]
 
 
 0.131
