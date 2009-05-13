@@ -19,7 +19,6 @@
 	  - Basically everything:
 		* inputs (keyboards are different)
 		* sound
-		* cassettes
 		* optional ROM & RAM
 		* additional hardware
 		* Tandy Model 200 support (video emulation completely different, but also 
@@ -281,16 +280,15 @@ static READ8_HANDLER( trsm200_stbk_r )
 
 	UINT8 data = 0xff;
 
-	if (BIT(state->keylatch, 0)) data &= input_port_read(space->machine, "KEY0");
-	if (BIT(state->keylatch, 1)) data &= input_port_read(space->machine, "KEY1");
-	if (BIT(state->keylatch, 2)) data &= input_port_read(space->machine, "KEY2");
-	if (BIT(state->keylatch, 3)) data &= input_port_read(space->machine, "KEY3");
-	if (BIT(state->keylatch, 4)) data &= input_port_read(space->machine, "KEY4");
-	if (BIT(state->keylatch, 5)) data &= input_port_read(space->machine, "KEY5");
-	if (BIT(state->keylatch, 6)) data &= input_port_read(space->machine, "KEY6");
-	if (BIT(state->keylatch, 7)) data &= input_port_read(space->machine, "KEY7");
-	if (BIT(state->keylatch, 8)) data &= input_port_read(space->machine, "KEY8");
-	if (BIT(state->keylatch, 9)) data &= input_port_read(space->machine, "KEY9");
+	if (!BIT(state->keylatch, 0)) data &= input_port_read(space->machine, "KEY0");
+	if (!BIT(state->keylatch, 1)) data &= input_port_read(space->machine, "KEY1");
+	if (!BIT(state->keylatch, 2)) data &= input_port_read(space->machine, "KEY2");
+	if (!BIT(state->keylatch, 3)) data &= input_port_read(space->machine, "KEY3");
+	if (!BIT(state->keylatch, 4)) data &= input_port_read(space->machine, "KEY4");
+	if (!BIT(state->keylatch, 5)) data &= input_port_read(space->machine, "KEY5");
+	if (!BIT(state->keylatch, 6)) data &= input_port_read(space->machine, "KEY6");
+	if (!BIT(state->keylatch, 7)) data &= input_port_read(space->machine, "KEY7");
+	if (!BIT(state->keylatch, 8)) data &= input_port_read(space->machine, "KEY8");
 
 	return data;
 }
@@ -641,7 +639,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( trsm200 )
 	PORT_START("KEY0")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('b') PORT_CHAR('B')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V) PORT_CHAR('v') PORT_CHAR('V')
@@ -653,7 +651,7 @@ static INPUT_PORTS_START( trsm200 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_CHAR('h') PORT_CHAR('H')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('G')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('f') PORT_CHAR('F')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S')
@@ -666,7 +664,7 @@ static INPUT_PORTS_START( trsm200 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_CHAR('t') PORT_CHAR('T')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W')
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q')
 
 	PORT_START("KEY3")
@@ -677,7 +675,7 @@ static INPUT_PORTS_START( trsm200 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR(':')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('[') PORT_CHAR(']')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('G')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O')
 
 	PORT_START("KEY4")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('*')
@@ -972,6 +970,24 @@ static const cassette_config kyocera_cassette_config =
 	CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED
 };
 
+static void kyocera_sod_w(const device_config *device, int state)
+{
+	cassette_output(cassette_device_image(device->machine), state ? +1.0 : -1.0);
+}
+
+static int kyocera_sid_r(const device_config *device)
+{
+	return cassette_input(cassette_device_image(device->machine)) > 0.0;
+}
+
+static const i8085_config kyocera_i8085_config =
+{
+	NULL,					/* INTE changed callback */
+	NULL,					/* STATUS changed callback */
+	kyocera_sod_w,			/* SOD changed callback (8085A only) */
+	kyocera_sid_r			/* SID changed callback (8085A only) */
+};
+
 static MACHINE_DRIVER_START( kyo85 )
 	MDRV_DRIVER_DATA(kyocera_state)
 
@@ -979,6 +995,7 @@ static MACHINE_DRIVER_START( kyo85 )
 	MDRV_CPU_ADD(I8085_TAG, 8085A, 2400000)
 	MDRV_CPU_PROGRAM_MAP(kyo85_mem, 0)
 	MDRV_CPU_IO_MAP(kyo85_io, 0)
+	MDRV_CPU_CONFIG(kyocera_i8085_config)
 
 	MDRV_MACHINE_START( kyo85 )
 	MDRV_MACHINE_RESET( kyo85 )
@@ -1014,6 +1031,7 @@ static MACHINE_DRIVER_START( trsm200 )
 	MDRV_CPU_ADD(I8085_TAG, 8085A, XTAL_2_4576MHz)
 	MDRV_CPU_PROGRAM_MAP(trsm200_mem, 0)
 	MDRV_CPU_IO_MAP(trsm200_io, 0)
+	MDRV_CPU_CONFIG(kyocera_i8085_config)
 
 	MDRV_MACHINE_START( trsm200 )
 	MDRV_MACHINE_RESET( trsm200 )
