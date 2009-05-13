@@ -16,7 +16,7 @@ New System Drivers Supported (in no particular order):
 
 Skeleton drivers : 
 ------------------
-- Acron 6809
+- Acorn 6809
 - BIC A5105
 - BCS-3
 - BOB-85
@@ -60,6 +60,11 @@ Skeleton drivers :
 - NEC PC-6600SR
 - Plydin-601 
 - Plydin-601A
+- Philips VG-5000
+- Camputers Lynx 48
+- Camputers Lynx 96
+- Camputers Lynx 128
+
 
 System Driver Changes:
 ----------------------
@@ -67,16 +72,17 @@ System Driver Changes:
 
 - [CRVISION] Added support for stereo tapes. [Curt Coder]
 
-- [X68000] Added support for the XPD-1LR dual D-pad controller.  [Barry Rodewald]
+- [ORIC] Various bioses added for different languages [Miodrag Milanovic]
+
+- [PP01] 16 roms of 1K instead one of 16KB as in real machine [Miodrag Milanovic]
 
 - [VISICOM] Toshiba Visicom is now working and playable, but the
   graphics emulation is not perfect yet. [Curt Coder]
 
+- [X68000] Added support for the XPD-1LR dual D-pad controller.  [Barry Rodewald]
+
 - [Z88] Added version 3.0 and 4.01 finnish version of roms [Miodrag Milanovic]
 
-- [ORIC] Various bioses added for different languages [Miodrag Milanovic]
-
-- [PP01] 16 roms of 1K instead one of 16KB as in real machine [Miodrag Milanovic]
 
 User Interface Changes:
 -----------------------

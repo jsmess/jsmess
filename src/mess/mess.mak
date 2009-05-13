@@ -1371,6 +1371,8 @@ $(MESSOBJ)/skeleton.a: \
 	$(MESS_DRIVERS)/iq151.o \
 	$(MESS_DRIVERS)/pc6001.o \
 	$(MESS_DRIVERS)/ply601.o \
+	$(MESS_DRIVERS)/vg5k.o \
+	$(MESS_DRIVERS)/camplynx.o \
 	
 #-------------------------------------------------
 # layout dependencies

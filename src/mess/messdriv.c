@@ -211,6 +211,7 @@ const game_driver * const drivers[] =
 	DRIVER( bbcbc )		/* 1985 BBC Bridge Companion						*/
 	DRIVER( electron )	/* 1983 Acorn Electron								*/
 //	DRIVER( a310 )		/* 1988 Acorn Archimedes 310						*/
+	DRIVER( a6809 )
 
 	/* CAMBRIDGE COMPUTERS */
 	DRIVER( z88 )		/*													*/
@@ -425,6 +426,8 @@ const game_driver * const drivers[] =
 	/* EPSON */
 	DRIVER( px4 )		/* 1985 Epson PX-4									*/
 	DRIVER( px4p )		/* 1985 Epson PX-4+									*/
+	DRIVER( px8 )
+	DRIVER( qx10 )
 
 	/* IBM PC & Clones */
 	DRIVER( ibm5150 )	/* 1981	IBM 5150									*/
@@ -578,6 +581,12 @@ const game_driver * const drivers[] =
 //	DRIVER( ti84pse )	/* 2004 TI-84 Plus Silver Edition					*/
 
 	/* NEC */
+    DRIVER( pc6001 )
+	DRIVER( pc6001a )
+	DRIVER( pc6001m2 )
+	DRIVER( pc6001sr )
+	DRIVER( pc6600 )
+	DRIVER( pc6600sr )
 	DRIVER( pc88srl )	/* PC-8801mkIISR(Low res display, VSYNC 15 kHz)		*/
 	DRIVER( pc88srh )	/* PC-8801mkIISR(High res display, VSYNC 24 kHz)		*/
 
@@ -692,6 +701,7 @@ const game_driver * const drivers[] =
 	DRIVER( p2000m )	/* 1980 P2000M										*/
 	DRIVER( videopac )	/* 1979 Videopac G7000/C52							*/
 	DRIVER( g7400 )		/* 1983 Videopac Plus G7400							*/
+	DRIVER( vg5k )		/* 1984 VG-5000										*/
 
 	/* COMPUKIT */
 	DRIVER( uk101 )
@@ -1171,6 +1181,14 @@ const game_driver * const drivers[] =
 	DRIVER( wales210 )	/* 199? Walther ES-210 (German)                      */
 	DRIVER( dator3k )	/* 199? Dator 3000 (Spanish)                         */
 
+	/* Fujitsu */
+	DRIVER( fm7 )
+
+	/* Camputers */
+	DRIVER( camplynx )
+	DRIVER( camply96 )
+	DRIVER( camply128 )
+
 	/* Votrax */
 //	DRIVER( votrtnt ) /* Votrax Type-N-Talk */
 	DRIVER( votrpss ) /* Votrax Personal Speech System */
@@ -1199,10 +1217,11 @@ const game_driver * const drivers[] =
 	DRIVER( roma32 )		/* Roma											*/
 
 /*********** Misc ***********************************************************/
+
 	DRIVER( ex800 )
 
-/*********** Skeleton drivers ***********************************************/		
-	DRIVER( a6809 )
+/*********** To sort (mostly skeleton drivers) ******************************/
+
 	DRIVER( a5105 )
 	DRIVER( bcs3 )
 	DRIVER( bob85 )
@@ -1212,10 +1231,7 @@ const game_driver * const drivers[] =
 	DRIVER( d6809 )
 	DRIVER( mk90 )
 	DRIVER( elwro800 )
-	DRIVER( px8 )
-	DRIVER( qx10 )
 	DRIVER( fk1 )
-	DRIVER( fm7 )
 	DRIVER( et3400 )
 	DRIVER( huebler )
 	DRIVER( interact )
@@ -1238,12 +1254,7 @@ const game_driver * const drivers[] =
 	DRIVER( xerox820 )
 	DRIVER( xor100 )
 	DRIVER( iq151 )
-    DRIVER( pc6001 )
-	DRIVER( pc6001a )
-	DRIVER( pc6001m2 )
-	DRIVER( pc6001sr )
-	DRIVER( pc6600 )
-	DRIVER( pc6600sr )
 	DRIVER( ply601 )
 	DRIVER( ply601a )
+
 #endif /* DRIVER_RECURSIVE */
