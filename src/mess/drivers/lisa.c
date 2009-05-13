@@ -365,6 +365,10 @@ ROM_START( lisa2 ) /* internal apple codename was 'pepsi'; has one SSDD 400K dri
 	ROMX_LOAD( "341-0175-e", 0x000000, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(4)) /* 341-0175-E LISA Bootrom Rev E (10/20/83) (High) */
 	ROMX_LOAD( "341-0176-e", 0x000001, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(4)) /* 341-0176-E LISA Bootrom Rev E (10/20/83) (Low) */
 
+	ROM_SYSTEM_BIOS( 4, "rev3b", "LISA Bootrom Rev 3B (9/8/83)") /* Earliest lisa2 rom, prototype. */
+	ROMX_LOAD( "341-0175-3b", 0x000000, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(5)) /* ?label? 341-0175-3b LISA Bootrom Rev 3B (9/8/83) (High) */
+	ROMX_LOAD( "341-0176-3b", 0x000001, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(5)) /* ?label? 341-0176-3b LISA Bootrom Rev 3B (9/8/83) (Low) */
+	
 	ROM_REGION(0x2000,"fdccpu",0)		/* 6504 RAM and ROM */
 	ROM_LOAD( "341-0290-b", 0x1000, 0x1000, CRC(bc6364f1) SHA1(f3164923330a51366a06d9d8a4a01ec7b0d3a8aa)) /* 341-0290-B LISA 2/5 Disk Rom (ioa8), supports profile on external port */
 
@@ -411,8 +415,8 @@ ROM_END
 
 ROM_START( macxl )
 	ROM_REGION16_BE(0x204000,"maincpu", 0)	/* 68k rom and ram */
-	ROM_LOAD16_BYTE( "341-0347-a", 0x000000, 0x2000, CRC(80add605) SHA1(82215688b778d8c712a8186235f7981e3dc4dd7f)) /* 341-0347-A Mac XL Bootrom Hi (boot3a.hi)*/
-	ROM_LOAD16_BYTE( "341-0346-a", 0x000001, 0x2000, CRC(edf5222f) SHA1(b0388ee8dbbc51a2d628473dc29b65ce913fcd76)) /* 341-0346-A Mac XL Bootrom Lo (boot3a.lo)*/
+	ROM_LOAD16_BYTE( "341-0347-a", 0x000000, 0x2000, CRC(80add605) SHA1(82215688b778d8c712a8186235f7981e3dc4dd7f)) /* 341-0347-A Mac XL '3A' Bootrom Hi (boot3a.hi)*/
+	ROM_LOAD16_BYTE( "341-0346-a", 0x000001, 0x2000, CRC(edf5222f) SHA1(b0388ee8dbbc51a2d628473dc29b65ce913fcd76)) /* 341-0346-A Mac XL '3A' Bootrom Lo (boot3a.lo)*/
 
 #if 1
 	ROM_REGION(0x2000,"fdccpu", 0)		/* 6504 RAM and ROM */

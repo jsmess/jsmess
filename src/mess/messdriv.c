@@ -161,9 +161,9 @@ const game_driver * const drivers[] =
 
 	/* CAPCOM */
 	DRIVER( sfach )		/* CPS Changer (Street Fighter Alpha)				*/
-	DRIVER( sfzbch )	/* CPS Changer (Street Fighter ZERO Brazil)				*/
+	DRIVER( sfzbch )	/* CPS Changer (Street Fighter ZERO Brazil)			*/
 	DRIVER( sfzch )		/* CPS Changer (Street Fighter ZERO)				*/
-	DRIVER( wofch )		/* CPS Changer (Tenchi Wo Kurau II)				*/
+	DRIVER( wofch )		/* CPS Changer (Tenchi Wo Kurau II)					*/
 
 	/* MAGNAVOX */
 	DRIVER( odyssey2 )	/* Magnavox Odyssey 2 - 1978-1983					*/
@@ -196,7 +196,7 @@ const game_driver * const drivers[] =
 	DRIVER( ngpc )		/* NeoGeo Pocket Color								*/
 
 	/* Philips */
-	DRIVER( cdi )		/* Philips CD-i									*/
+	DRIVER( cdi )		/* Philips CD-i										*/
 
 /****************COMPUTERS***************************************************/
     /* ACORN */
@@ -253,7 +253,7 @@ const game_driver * const drivers[] =
 //0131u1	DRIVER( apple2gsr1 )	/* Sep 1987 Apple IIgs ROM01					*/
 //0131u1	DRIVER( apple2gs )	/* Aug 1989 Apple IIgs ROM03						*/
 //0131u1	DRIVER( apple2gsr3p )	/* ??? 198? Apple IIgs ROM03 prototype			*/
-//0131u1	DRIVER( apple2gsr4p )	/* ??? 1989 Apple IIgs ROM04 prototype			*/
+//0131u1	DRIVER( apple2gsr3lp )	/* ??? 1989 Apple IIgs ROM03 late? prototype	*/
 //0131u1	DRIVER( apple3 )	/* May 1980 Apple ///								*/
 					/* Dec 1983 Apple ///+								*/
 //0131u1	DRIVER( ace100 )	/* ??? 1982 Franklin Ace 100						*/
@@ -267,9 +267,10 @@ const game_driver * const drivers[] =
  * Lisa 2 				 January			 1984
  * Macintosh XL 		 January			 1985
  */
+//0131u1	DRIVER( lisa )		/* 1983 Apple Lisa									*/
 //0131u1	DRIVER( lisa2 )		/* 1984 Apple Lisa 2								*/
 //0131u1	DRIVER( lisa210 )	/* 1984 Apple Lisa 2/10								*/
-//0131u1	DRIVER( macxl )		/* 1984 Apple Macintosh XL							*/
+//0131u1	DRIVER( macxl )		/* 1985 Apple Macintosh XL							*/
 /*
  * Macintosh			January				1984
  * Macintosh 512k		July?				1984
