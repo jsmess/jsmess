@@ -217,24 +217,24 @@ const game_driver * const drivers[] =
 	DRIVER( z88 )		/*													*/
 
 	/* AMSTRAD */
-//0131u1	DRIVER( cpc464 )	/* Amstrad (Schneider in Germany) 1984				*/
-//0131u1	DRIVER( cpc664 )	/* Amstrad (Schneider in Germany) 1985				*/
-//0131u1	DRIVER( cpc6128 )	/* Amstrad (Schneider in Germany) 1985				*/
-//0131u1	DRIVER( cpc6128s )	/* Amstrad (Schneider in Germany) 1985				*/
-//0131u1	DRIVER( cpc6128f )	/* Amstrad (Schneider in Germany) 1985 (AZERTY)		*/
-//0131u1	DRIVER( cpc464p )	/* Amstrad CPC464  Plus - 1990						*/
-//0131u1	DRIVER( cpc6128p )	/* Amstrad CPC6128 Plus - 1990						*/
-//0131u1	DRIVER( gx4000 )	/* Amstrad GX4000 - 1990							*/
-//0131u1	DRIVER( kccomp )	/* VEB KC compact									*/
-//0131u1	DRIVER( al520ex )	/* Patisonic Aleste 520EX (1993)					*/
-//0131u1	DRIVER( pcw8256 )	/* 198? PCW8256										*/
-//0131u1	DRIVER( pcw8512 )	/* 198? PCW8512										*/
-//0131u1	DRIVER( pcw9256 )	/* 198? PCW9256										*/
-//0131u1	DRIVER( pcw9512 )	/* 198? PCW9512 (+)									*/
-//0131u1	DRIVER( pcw10 ) 	/* 198? PCW10										*/
-//0131u1	DRIVER( pcw16 )		/* 1995 PCW16										*/
-//0131u1	DRIVER( nc100 )		/* 1992 NC100										*/
-//0131u1	DRIVER( nc200 )		/* 1993 NC200										*/
+	DRIVER( cpc464 )	/* Amstrad (Schneider in Germany) 1984				*/
+	DRIVER( cpc664 )	/* Amstrad (Schneider in Germany) 1985				*/
+	DRIVER( cpc6128 )	/* Amstrad (Schneider in Germany) 1985				*/
+	DRIVER( cpc6128s )	/* Amstrad (Schneider in Germany) 1985				*/
+	DRIVER( cpc6128f )	/* Amstrad (Schneider in Germany) 1985 (AZERTY)		*/
+	DRIVER( cpc464p )	/* Amstrad CPC464  Plus - 1990						*/
+	DRIVER( cpc6128p )	/* Amstrad CPC6128 Plus - 1990						*/
+	DRIVER( gx4000 )	/* Amstrad GX4000 - 1990							*/
+	DRIVER( kccomp )	/* VEB KC compact									*/
+	DRIVER( al520ex )	/* Patisonic Aleste 520EX (1993)					*/
+	DRIVER( pcw8256 )	/* 198? PCW8256										*/
+	DRIVER( pcw8512 )	/* 198? PCW8512										*/
+	DRIVER( pcw9256 )	/* 198? PCW9256										*/
+	DRIVER( pcw9512 )	/* 198? PCW9512 (+)									*/
+	DRIVER( pcw10 ) 	/* 198? PCW10										*/
+	DRIVER( pcw16 )		/* 1995 PCW16										*/
+	DRIVER( nc100 )		/* 1992 NC100										*/
+	DRIVER( nc200 )		/* 1993 NC200										*/
 
 	/* APPLE */
 //0131u1	DRIVER( apple1 )	/* Jul 1976 Apple 1									*/
@@ -478,46 +478,46 @@ const game_driver * const drivers[] =
 	DRIVER( osborne1 )	/* 1981 Osborne-1									*/
 
 	/* SINCLAIR RESEARCH */
-//0131u1	DRIVER( zx80 )		/* 1980 Sinclair ZX-80								*/
-//0131u1	DRIVER( zx81 )		/* 1981 Sinclair ZX-81								*/
-//0131u1	DRIVER( ts1000 )	/* 1982 Timex Sinclair 1000							*/
-//0131u1	DRIVER( ts1500 )	/* Timex Sinclair 1500								*/
-//0131u1	DRIVER( ringo470 )	/* Ringo 470										*/
-//0131u1	DRIVER( pc8300 )	/* Your Computer - PC8300							*/
-//0131u1	DRIVER( pow3000 )	/* Creon Enterprises - Power 3000					*/
-//0131u1	DRIVER( lambda )	/* Lambda 8300										*/
-//0131u1	DRIVER( tk85 )		/* Microdigital TK85 								*/
+	DRIVER( zx80 )		/* 1980 Sinclair ZX-80								*/
+	DRIVER( zx81 )		/* 1981 Sinclair ZX-81								*/
+	DRIVER( ts1000 )	/* 1982 Timex Sinclair 1000							*/
+	DRIVER( ts1500 )	/* Timex Sinclair 1500								*/
+	DRIVER( ringo470 )	/* Ringo 470										*/
+	DRIVER( pc8300 )	/* Your Computer - PC8300							*/
+	DRIVER( pow3000 )	/* Creon Enterprises - Power 3000					*/
+	DRIVER( lambda )	/* Lambda 8300										*/
+	DRIVER( tk85 )		/* Microdigital TK85 								*/
 
-//0131u1	DRIVER( spectrum )/* 1982 ZX Spectrum									*/
-//0131u1	DRIVER( spec80k ) /* 1987 ZX Spectrum 80k							*/
-//0131u1	DRIVER( specide ) /* 1995 ZX Spectrum IDE							*/
-//0131u1	DRIVER( inves )		/* 1986 Inves Spectrum 48K+							*/
-//0131u1	DRIVER( tk90x )		/* 1985 TK90x Color Computer						*/
-//0131u1	DRIVER( tk95 )		/* 1986 TK95 Color Computer							*/
-//0131u1	DRIVER( tc2048 )	/* 198? TC2048										*/
-//0131u1	DRIVER( ts2068 )	/* 1983 TS2068										*/
-//0131u1	DRIVER( uk2086 )	/* 1986 UK2086										*/
+	DRIVER( spectrum )/* 1982 ZX Spectrum									*/
+	DRIVER( spec80k ) /* 1987 ZX Spectrum 80k							*/
+	DRIVER( specide ) /* 1995 ZX Spectrum IDE							*/
+	DRIVER( inves )		/* 1986 Inves Spectrum 48K+							*/
+	DRIVER( tk90x )		/* 1985 TK90x Color Computer						*/
+	DRIVER( tk95 )		/* 1986 TK95 Color Computer							*/
+	DRIVER( tc2048 )	/* 198? TC2048										*/
+	DRIVER( ts2068 )	/* 1983 TS2068										*/
+	DRIVER( uk2086 )	/* 1986 UK2086										*/
 
-//0131u1	DRIVER( spec128 )	  /* 1986 ZX Spectrum 128								*/
-//0131u1	DRIVER( specpls2 )	/* 1986 ZX Spectrum +2								*/
-//0131u1	DRIVER( specpl2a )	/* 1987 ZX Spectrum +2a								*/
-//0131u1	DRIVER( specpls3 )	/* 1987 ZX Spectrum +3								*/
-//0131u1	DRIVER( specpl3e )	/* 2000 ZX Spectrum +3e								*/
-//0131u1	DRIVER( sp3e8bit )	/* 2002 ZX Spectrum +3e	8bit IDE			*/
-//0131u1	DRIVER( sp3ezcf )  	/* 2002 ZX Spectrum +3e	ZXCF   				*/
-//0131u1	DRIVER( sp3eata )  	/* 2002 ZX Spectrum +3e	ZXATASP  			*/
-//0131u1	DRIVER( scorpion )
-//0131u1	DRIVER( pentagon )
+	DRIVER( spec128 )	  /* 1986 ZX Spectrum 128								*/
+	DRIVER( specpls2 )	/* 1986 ZX Spectrum +2								*/
+	DRIVER( specpl2a )	/* 1987 ZX Spectrum +2a								*/
+	DRIVER( specpls3 )	/* 1987 ZX Spectrum +3								*/
+	DRIVER( specpl3e )	/* 2000 ZX Spectrum +3e								*/
+	DRIVER( sp3e8bit )	/* 2002 ZX Spectrum +3e	8bit IDE			*/
+	DRIVER( sp3ezcf )  	/* 2002 ZX Spectrum +3e	ZXCF   				*/
+	DRIVER( sp3eata )  	/* 2002 ZX Spectrum +3e	ZXATASP  			*/
+	DRIVER( scorpion )
+	DRIVER( pentagon )
 
-//0131u1	DRIVER( ql )		/* 1984 Sinclair QL	(UK)							*/
-//0131u1	DRIVER( ql_us )		/* 1984 Sinclair QL	(USA)							*/
-//0131u1	DRIVER( ql_es )		/* 1984 Sinclair QL	(Spain)							*/
-//0131u1	DRIVER( ql_fr )		/* 1984 Sinclair QL	(France)						*/
-//0131u1	DRIVER( ql_de )		/* 1984 Sinclair QL	(Germany)						*/
-//0131u1	DRIVER( ql_it )		/* 1984 Sinclair QL	(Italy)							*/
-//0131u1	DRIVER( ql_se )		/* 1984 Sinclair QL	(Sweden)						*/
-//0131u1	DRIVER( ql_dk )		/* 1984 Sinclair QL	(Denmark)						*/
-//0131u1	DRIVER( ql_gr )		/* 1984 Sinclair QL	(Greece)						*/
+	DRIVER( ql )		/* 1984 Sinclair QL	(UK)							*/
+	DRIVER( ql_us )		/* 1984 Sinclair QL	(USA)							*/
+	DRIVER( ql_es )		/* 1984 Sinclair QL	(Spain)							*/
+	DRIVER( ql_fr )		/* 1984 Sinclair QL	(France)						*/
+	DRIVER( ql_de )		/* 1984 Sinclair QL	(Germany)						*/
+	DRIVER( ql_it )		/* 1984 Sinclair QL	(Italy)							*/
+	DRIVER( ql_se )		/* 1984 Sinclair QL	(Sweden)						*/
+	DRIVER( ql_dk )		/* 1984 Sinclair QL	(Denmark)						*/
+	DRIVER( ql_gr )		/* 1984 Sinclair QL	(Greece)						*/
 //	DRIVER( tonto )
 //	DRIVER( megaopd )
 
@@ -1092,34 +1092,34 @@ const game_driver * const drivers[] =
   /* Spectrum clones */
 
   /* ICE-Felix */
-//0131u1	DRIVER( hc85 )    /* 1985 HC-85										  */
-//0131u1	DRIVER( hc90 )    /* 1990 HC-90										  */
-//0131u1	DRIVER( hc91 )    /* 1991 HC-91										  */
-//0131u1	DRIVER( hc128 )   /* 1991 HC-128									  */
-//0131u1	DRIVER( hc2000 )  /* 1992 HC-2000									  */
+	DRIVER( hc85 )    /* 1985 HC-85										  */
+	DRIVER( hc90 )    /* 1990 HC-90										  */
+	DRIVER( hc91 )    /* 1991 HC-91										  */
+	DRIVER( hc128 )   /* 1991 HC-128									  */
+	DRIVER( hc2000 )  /* 1992 HC-2000									  */
 
-//0131u1	DRIVER( cip01 )   /* 1987 CIP-01									  */
-//0131u1	DRIVER( cip03 )   /* 1988 CIP-03									  */
-//0131u1	DRIVER( jet )     /* 1990 JET										  */
+	DRIVER( cip01 )   /* 1987 CIP-01									  */
+	DRIVER( cip03 )   /* 1988 CIP-03									  */
+	DRIVER( jet )     /* 1990 JET										  */
 
   /* Didaktik Skalica */
-//0131u1	DRIVER( dgama87)  /* 1987 Didaktik Gama 87          */
-//0131u1	DRIVER( dgama88)  /* 1988 Didaktik Gama 88          */
-//0131u1	DRIVER( dgama89)  /* 1989 Didaktik Gama 89          */
-//0131u1	DRIVER( didakt90) /* 1990 Didaktik Skalica 90       */
-//0131u1	DRIVER( didakm91) /* 1991 Didaktik M 91             */
-//0131u1	DRIVER( didaktk)  /* 1992 Didaktik Kompakt          */
-//0131u1	DRIVER( didakm93) /* 1993 Didaktik M 93             */
+	DRIVER( dgama87)  /* 1987 Didaktik Gama 87          */
+	DRIVER( dgama88)  /* 1988 Didaktik Gama 88          */
+	DRIVER( dgama89)  /* 1989 Didaktik Gama 89          */
+	DRIVER( didakt90) /* 1990 Didaktik Skalica 90       */
+	DRIVER( didakm91) /* 1991 Didaktik M 91             */
+	DRIVER( didaktk)  /* 1992 Didaktik Kompakt          */
+	DRIVER( didakm93) /* 1993 Didaktik M 93             */
 
-//0131u1	DRIVER( mistrum ) /* 1988 Mistrum										*/
+	DRIVER( mistrum ) /* 1988 Mistrum										*/
 
 	/* Russian clones */
-//0131u1	DRIVER( blitz )     /* 1990 Blic                     */
-//0131u1	DRIVER( byte )      /* 1990 Byte                     */
-//0131u1	DRIVER( orizon )    /* 199? Orizon-Micro             */
-//0131u1	DRIVER( quorum48 )  /* 1993 Kvorum 48K               */
-//0131u1	DRIVER( magic6 )    /* 1993 Magic 6                  */
-//0131u1	DRIVER( compani1 )  /* 1990 Kompanion 1              */
+	DRIVER( blitz )     /* 1990 Blic                     */
+	DRIVER( byte )      /* 1990 Byte                     */
+	DRIVER( orizon )    /* 199? Orizon-Micro             */
+	DRIVER( quorum48 )  /* 1993 Kvorum 48K               */
+	DRIVER( magic6 )    /* 1993 Magic 6                  */
+	DRIVER( compani1 )  /* 1990 Kompanion 1              */
 
 	/* Kramer */
 	DRIVER(kramermc) /* 1987 Kramer MC				*/
