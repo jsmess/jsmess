@@ -316,7 +316,7 @@ ROM_START( lisa ) /* with twiggy drives, io40 i/o rom; technically any of the bo
 	ROMX_LOAD( "341-0175-e", 0x000000, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(4)) /* 341-0175-E LISA Bootrom Rev E (10/20/83) (High) */
 	ROMX_LOAD( "341-0176-e", 0x000001, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(4)) /* 341-0176-E LISA Bootrom Rev E (10/20/83) (Low) */
 	
-	ROM_SYSTEM_BIOS( 4, "revd", "LISA Bootrom Rev D (10/20/83)")
+	ROM_SYSTEM_BIOS( 4, "revd", "LISA Bootrom Rev D (5/12/83)")
 	ROMX_LOAD( "341-0175-d", 0x000000, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(5)) /* 341-0175-D LISA Bootrom Rev D (5/12/83) (High) */
 	ROMX_LOAD( "341-0176-d", 0x000001, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(5)) /* 341-0176-D LISA Bootrom Rev D (5/12/83) (Low) */
 
@@ -335,6 +335,9 @@ ROM_START( lisa ) /* with twiggy drives, io40 i/o rom; technically any of the bo
 	ROM_REGION(0x2000,"fdccpu",0)		/* 6504 RAM and ROM */
 	/* note: other ?prototype? revisions of this rom for the lisa probably exist as well */
 	ROM_LOAD( "341-0138-f", 0x1000, 0x1000, NO_DUMP) /* 341-0138-F LISA 1 'Twiggy' Disk I/O Rom (io40) */
+
+	ROM_REGION(0x4000,"profile", 0)		/* Profile/5 HDD */
+	ROM_LOAD_OPTIONAL( "341-0080-b", 0x0000, 0x800, CRC(26df0b8d) SHA1(08f6689afb517e0a2bdaa48433003e62a66ae3c7)) /* 341-0080-B z8 mcu piggyback rom */
 
 	/* TODO: the 341-0193-A parallel interface card rom should be loaded here as well for the lisa 1 and 2/5? */
 
@@ -364,6 +367,9 @@ ROM_START( lisa2 ) /* internal apple codename was 'pepsi'; has one SSDD 400K dri
 
 	ROM_REGION(0x2000,"fdccpu",0)		/* 6504 RAM and ROM */
 	ROM_LOAD( "341-0290-b", 0x1000, 0x1000, CRC(bc6364f1) SHA1(f3164923330a51366a06d9d8a4a01ec7b0d3a8aa)) /* 341-0290-B LISA 2/5 Disk Rom (ioa8), supports profile on external port */
+
+	ROM_REGION(0x4000,"profile", 0)		/* Profile/5 HDD */
+	ROM_LOAD_OPTIONAL( "341-0080-b", 0x0000, 0x800, CRC(26df0b8d) SHA1(08f6689afb517e0a2bdaa48433003e62a66ae3c7)) /* 341-0080-B z8 mcu piggyback rom */
 
 	/* TODO: the 341-0193-A parallel interface card rom should be loaded here as well for the lisa 1 and 2/5? */
 
