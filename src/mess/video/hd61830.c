@@ -41,7 +41,7 @@ enum
 	HD61380_INSTRUCTION_SET_BIT						/* not supported */
 };
 
-static const HD61380_CYCLES[] = {
+static const int HD61830_CYCLES[] = {
 	4, 4, 4, 4, 4, -1, -1, -1, 4, 4, 4, 4, 6, 6, 36, 36
 };
 
@@ -301,7 +301,7 @@ WRITE8_DEVICE_HANDLER( hd61830_data_w )
 	}
 
 	/* burn cycles */
-	set_busy_flag(hd61830, HD61380_CYCLES[hd61830->ir]);
+	set_busy_flag(hd61830, HD61830_CYCLES[hd61830->ir]);
 }
 
 /*-------------------------------------------------
