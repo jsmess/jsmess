@@ -629,7 +629,9 @@ const game_driver * const drivers[] =
 	DRIVER( mbeeic )	/* Microbee 32 IC									*/
 	DRIVER( mbeepc )	/* Microbee 32 PC									*/
 	DRIVER( mbeepc85 )	/* Microbee 32 PC85									*/
+	DRIVER( mbeeppc )	/* Microbee 32 PPC85									*/
 	DRIVER( mbee56 )	/* Microbee 56K (CP/M)								*/
+	DRIVER( mbee64 )	/* Microbee 64K (CP/M)								*/
 
 	/* TANDY RADIO SHACK */
 	DRIVER( trs80 )		/* TRS-80 Model I - Level I BASIC					*/
