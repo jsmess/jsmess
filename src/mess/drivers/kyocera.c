@@ -39,8 +39,8 @@
 	- Chipmunk disk drive (384k 3½")
 	- soft power on/off
 	- RS232/modem select
-	- trsm200 RTC alarm
-	- trsm200 TCM5089 sound
+	- tandy200 RTC alarm
+	- tandy200 TCM5089 sound
 	- IM6042 UART
 
 */
@@ -318,16 +318,16 @@ static READ8_HANDLER( keyboard_r )
 	return read_keyboard(space->machine, state->keylatch);
 }
 
-static READ8_HANDLER( trsm200_bank_r )
+static READ8_HANDLER( tandy200_bank_r )
 {
-	trsm200_state *state = space->machine->driver_data;
+	tandy200_state *state = space->machine->driver_data;
 
 	return state->bank;
 }
 
-static WRITE8_HANDLER( trsm200_bank_w )
+static WRITE8_HANDLER( tandy200_bank_w )
 {
-	trsm200_state *state = space->machine->driver_data;
+	tandy200_state *state = space->machine->driver_data;
 
 	const address_space *program = cputag_get_address_space(space->machine, I8085_TAG, ADDRESS_SPACE_PROGRAM);
 
@@ -359,14 +359,14 @@ static WRITE8_HANDLER( trsm200_bank_w )
 	}
 }
 
-static READ8_HANDLER( trsm200_stbk_r )
+static READ8_HANDLER( tandy200_stbk_r )
 {
-	trsm200_state *state = space->machine->driver_data;
+	tandy200_state *state = space->machine->driver_data;
 
 	return read_keyboard(space->machine, state->keylatch);
 }
 
-static WRITE8_HANDLER( trsm200_stbk_w )
+static WRITE8_HANDLER( tandy200_stbk_w )
 {
 	/*
 		
@@ -383,7 +383,7 @@ static WRITE8_HANDLER( trsm200_stbk_w )
 
 	*/
 
-	trsm200_state *state = space->machine->driver_data;
+	tandy200_state *state = space->machine->driver_data;
 
 	/* printer strobe */
 	centronics_strobe_w(state->centronics, BIT(data, 0));
@@ -406,7 +406,7 @@ static ADDRESS_MAP_START( pc8201_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_RAMBANK(2)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( trsm200_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( tandy200_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK(1)
 	AM_RANGE(0x8000, 0x9fff) AM_ROM
@@ -441,14 +441,14 @@ static ADDRESS_MAP_START( pc8201_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xf1, 0xf1) AM_MIRROR(0x0e) AM_READWRITE(kyo85_lcd_data_r, kyo85_lcd_data_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( trsm200_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( tandy200_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x90, 0x9f) AM_DEVREADWRITE(RP5C01A_TAG, rp5c01a_r, rp5c01a_w)
 //	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) AM_DEVWRITE(TCM5089_TAG, tcm5089_w)
 	AM_RANGE(0xb0, 0xb7) AM_MIRROR(0x08) AM_DEVREADWRITE(PIO8155_TAG, pio8155_r, pio8155_w)
 //	AM_RANGE(0xc0, 0xc1) AM_MIRROR(0x0e) AM_DEVREADWRITE(UART8251_TAG, uart8251_r, uart8251_w)
-	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_READWRITE(trsm200_bank_r, trsm200_bank_w)
-	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0f) AM_READWRITE(trsm200_stbk_r, trsm200_stbk_w)
+	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_READWRITE(tandy200_bank_r, tandy200_bank_w)
+	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0f) AM_READWRITE(tandy200_stbk_r, tandy200_stbk_w)
 	AM_RANGE(0xf0, 0xf0) AM_MIRROR(0x0e) AM_DEVREADWRITE(HD61830_TAG, hd61830_data_r, hd61830_data_w)
 	AM_RANGE(0xf1, 0xf1) AM_MIRROR(0x0e) AM_DEVREADWRITE(HD61830_TAG, hd61830_status_r, hd61830_control_w)
 ADDRESS_MAP_END
@@ -693,7 +693,7 @@ static UPD1990A_INTERFACE( kyocera_upd1990a_intf )
 
 /* RP5C01A Interface */
 
-static RP5C01A_INTERFACE( trsm200_rp5c01a_intf )
+static RP5C01A_INTERFACE( tandy200_rp5c01a_intf )
 {
 	DEVCB_NULL								/* alarm */
 };
@@ -820,7 +820,7 @@ static PIO8155_INTERFACE( kyocera_8155_intf )
 	DEVCB_LINE(kyocera_8155_to_w)			/* timer output */
 };
 
-static READ8_DEVICE_HANDLER( trsm200_8155_port_c_r )
+static READ8_DEVICE_HANDLER( tandy200_8155_port_c_r )
 {
 	/*
 	
@@ -835,7 +835,7 @@ static READ8_DEVICE_HANDLER( trsm200_8155_port_c_r )
 
 	*/
 
-	trsm200_state *state = device->machine->driver_data;
+	tandy200_state *state = device->machine->driver_data;
 
 	UINT8 data = 0x01;
 
@@ -845,7 +845,7 @@ static READ8_DEVICE_HANDLER( trsm200_8155_port_c_r )
 	return data;
 }
 
-static WRITE8_DEVICE_HANDLER( trsm200_8155_port_a_w )
+static WRITE8_DEVICE_HANDLER( tandy200_8155_port_a_w )
 {
 	/*
 
@@ -862,14 +862,14 @@ static WRITE8_DEVICE_HANDLER( trsm200_8155_port_a_w )
 
 	*/
 
-	trsm200_state *state = device->machine->driver_data;
+	tandy200_state *state = device->machine->driver_data;
 
 	centronics_data_w(state->centronics, 0, data);
 
 	state->keylatch = (state->keylatch & 0x100) | data;
 }
 
-static WRITE8_DEVICE_HANDLER( trsm200_8155_port_b_w )
+static WRITE8_DEVICE_HANDLER( tandy200_8155_port_b_w )
 {
 	/*
 
@@ -886,7 +886,7 @@ static WRITE8_DEVICE_HANDLER( trsm200_8155_port_b_w )
 
 	*/
 
-	trsm200_state *state = device->machine->driver_data;
+	tandy200_state *state = device->machine->driver_data;
 
 	/* keyboard */
 	state->keylatch = (BIT(data, 0) << 8) | (state->keylatch & 0xff);
@@ -898,9 +898,9 @@ static WRITE8_DEVICE_HANDLER( trsm200_8155_port_b_w )
 	if (state->buzzer) speaker_level_w(state->speaker, state->bell);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( trsm200_8155_to_w )
+static WRITE_LINE_DEVICE_HANDLER( tandy200_8155_to_w )
 {
-	trsm200_state *driver_state = device->machine->driver_data;
+	tandy200_state *driver_state = device->machine->driver_data;
 
 	if (!driver_state->buzzer && driver_state->bell)
 	{
@@ -908,15 +908,15 @@ static WRITE_LINE_DEVICE_HANDLER( trsm200_8155_to_w )
 	}
 }
 
-static PIO8155_INTERFACE( trsm200_8155_intf )
+static PIO8155_INTERFACE( tandy200_8155_intf )
 {
 	DEVCB_NULL,								/* port A read */
 	DEVCB_NULL,								/* port B read */
-	DEVCB_HANDLER(trsm200_8155_port_c_r),	/* port C read */
-	DEVCB_HANDLER(trsm200_8155_port_a_w),	/* port A write */
-	DEVCB_HANDLER(trsm200_8155_port_b_w),	/* port B write */
+	DEVCB_HANDLER(tandy200_8155_port_c_r),	/* port C read */
+	DEVCB_HANDLER(tandy200_8155_port_a_w),	/* port A write */
+	DEVCB_HANDLER(tandy200_8155_port_b_w),	/* port B write */
 	DEVCB_NULL,								/* port C write */
-	DEVCB_LINE(trsm200_8155_to_w)			/* timer output */
+	DEVCB_LINE(tandy200_8155_to_w)			/* timer output */
 };
 
 /* Machine Drivers */
@@ -1055,9 +1055,9 @@ static MACHINE_START( trsm100 )
 	state_save_register_global(machine, state->bell);
 }
 
-static MACHINE_START( trsm200 )
+static MACHINE_START( tandy200 )
 {
-	trsm200_state *state = machine->driver_data;
+	tandy200_state *state = machine->driver_data;
 
 	/* find devices */
 	state->centronics = devtag_get_device(machine, "centronics");
@@ -1106,9 +1106,9 @@ static const i8085_config kyocera_i8085_config =
 	kyocera_sid_r			/* SID changed callback (8085A only) */
 };
 
-static TIMER_DEVICE_CALLBACK( trsm200_tp_tick )
+static TIMER_DEVICE_CALLBACK( tandy200_tp_tick )
 {
-	trsm200_state *state = timer->machine->driver_data;
+	tandy200_state *state = timer->machine->driver_data;
 
 	cputag_set_input_line(timer->machine, I8085_TAG, I8085_RST75_LINE, state->tp);
 
@@ -1191,22 +1191,22 @@ static MACHINE_DRIVER_START( trsm100 )
 	MDRV_MACHINE_START(trsm100)
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( trsm200 )
-	MDRV_DRIVER_DATA(trsm200_state)
+static MACHINE_DRIVER_START( tandy200 )
+	MDRV_DRIVER_DATA(tandy200_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(I8085_TAG, 8085A, XTAL_2_4576MHz)
-	MDRV_CPU_PROGRAM_MAP(trsm200_mem, 0)
-	MDRV_CPU_IO_MAP(trsm200_io, 0)
+	MDRV_CPU_PROGRAM_MAP(tandy200_mem, 0)
+	MDRV_CPU_IO_MAP(tandy200_io, 0)
 	MDRV_CPU_CONFIG(kyocera_i8085_config)
 
-	MDRV_MACHINE_START( trsm200 )
+	MDRV_MACHINE_START( tandy200 )
 
 	/* video hardware */
-	MDRV_IMPORT_FROM(trsm200_video)
+	MDRV_IMPORT_FROM(tandy200_video)
 
 	/* TP timer */
-	MDRV_TIMER_ADD_PERIODIC("tp", trsm200_tp_tick, HZ((XTAL_2_4576MHz/8192)*2))
+	MDRV_TIMER_ADD_PERIODIC("tp", tandy200_tp_tick, HZ((XTAL_2_4576MHz/8192)*2))
 
 	/* sound hardware */
 //	MDRV_TCM5089_ADD(TCM5089_TAG, XTAL_3_579545MHz)
@@ -1216,8 +1216,8 @@ static MACHINE_DRIVER_START( trsm200 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MDRV_PIO8155_ADD(PIO8155_TAG, XTAL_2_4576MHz, trsm200_8155_intf)
-	MDRV_RP5C01A_ADD(RP5C01A_TAG, XTAL_32_768kHz, trsm200_rp5c01a_intf)
+	MDRV_PIO8155_ADD(PIO8155_TAG, XTAL_2_4576MHz, tandy200_8155_intf)
+	MDRV_RP5C01A_ADD(RP5C01A_TAG, XTAL_32_768kHz, tandy200_rp5c01a_intf)
 
 	/* printer */
 	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
@@ -1241,7 +1241,7 @@ ROM_START( kyo85 )
 	ROM_CART_LOAD("cart", 0x0000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
-ROM_START( pc8201 )
+ROM_START( npc8201a )
 	ROM_REGION( 0x10000, I8085_TAG, 0 )
 	ROM_LOAD( "pc8201rom.bin", 0x0000, 0x8000, BAD_DUMP CRC(4c534662) SHA1(758fefbba251513e7f9d86f7e9016ad8817188d8) ) /* Y2K hacked */
 
@@ -1265,7 +1265,7 @@ ROM_START( olivm10 )
 	ROM_CART_LOAD("cart", 0x0000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
-ROM_START( trsm102 )
+ROM_START( tandy102 )
 	ROM_REGION( 0x8000, I8085_TAG, 0 )
 	ROM_LOAD( "m102rom.bin", 0x0000, 0x8000, BAD_DUMP CRC(0e4ff73a) SHA1(d91f4f412fb78c131ccd710e8158642de47355e2) ) /* Y2K hacked */
 
@@ -1273,7 +1273,7 @@ ROM_START( trsm102 )
 	ROM_CART_LOAD("cart", 0x0000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
-ROM_START( trsm200 )
+ROM_START( tandy200 )
 	ROM_REGION( 0x18000, I8085_TAG, 0 )
 	ROM_LOAD( "t200rom.bin", 0x0000, 0xa000, BAD_DUMP CRC(e3358b38) SHA1(35d4e6a5fb8fc584419f57ec12b423f6021c0991) ) /* Y2K hacked */
 	ROM_CONTINUE(			0x10000, 0x8000 )
@@ -1303,12 +1303,12 @@ static SYSTEM_CONFIG_START( trsm100 )
 	CONFIG_RAM			(32 * 1024)
 SYSTEM_CONFIG_END
 
-static SYSTEM_CONFIG_START( trsm102 )
+static SYSTEM_CONFIG_START( tandy102 )
 	CONFIG_RAM_DEFAULT	(24 * 1024)
 	CONFIG_RAM			(32 * 1024)
 SYSTEM_CONFIG_END
 
-static SYSTEM_CONFIG_START( trsm200 )
+static SYSTEM_CONFIG_START( tandy200 )
 	CONFIG_RAM_DEFAULT	(24 * 1024)
 	CONFIG_RAM			(48 * 1024)
 	CONFIG_RAM			(72 * 1024)
@@ -1316,10 +1316,13 @@ SYSTEM_CONFIG_END
 
 /* System Drivers */
 
-/*    YEAR  NAME      PARENT   COMPAT  MACHINE     INPUT    INIT      CONFIG       COMPANY  FULLNAME */
-COMP( 1983, kyo85,    0,       0,      kyo85,      kyo85,   0,        kyo85,      "Kyocera",            "Kyotronic 85", 0 )
-COMP( 1983, olivm10,  0,       0,      kyo85,      olivm10, 0,        kyo85,      "Olivetti",           "M10",       0 )
-COMP( 1983, pc8201,   0,       0,      pc8201,     pc8201a, 0,		  pc8201,     "NEC",                "PC-8201A", 0 )
-COMP( 1983, trsm100,  0,       0,      trsm100,    kyo85,   0,        trsm100,    "Tandy Radio Shack",  "TRS-80 Model 100", 0 )
-COMP( 1984, trsm200,  0,       0,      trsm200,    kyo85,   0,		  trsm200,    "Tandy Radio Shack",  "TRS-80 Model 200", 0 )
-COMP( 1986, trsm102,  0,       0,      trsm100,    kyo85,   0,        trsm102,    "Tandy Radio Shack",  "TRS-80 Model 102", 0 )
+/*    YEAR  NAME		PARENT	COMPAT	MACHINE		INPUT		INIT	CONFIG		COMPANY					FULLNAME */
+COMP( 1983,	kyo85,		0,		0,		kyo85,		kyo85,		0,		kyo85,		"Kyocera",				"Kyotronic 85 (Japan)", 0 )
+COMP( 1983, olivm10,	kyo85,	0,		kyo85,		olivm10,	0,		kyo85,		"Olivetti",				"M-10", 0 )
+//COMP( 1983, olivm10m,	kyo85,	0,		kyo85,		olivm10,	0,		kyo85,		"Olivetti",				"M-10 Modem (US)", 0 )
+COMP( 1983, trsm100,	0,		0,		trsm100,	kyo85,		0,		trsm100,	"Tandy Radio Shack",	"TRS-80 Model 100", 0 )
+COMP( 1986, tandy102,	trsm100,0,		trsm100,	kyo85,		0,		tandy102,	"Tandy Radio Shack",	"Tandy 102", 0 )
+//COMP( 1983, npc8201,	0,		0,		pc8201,		pc8201a,	0,		pc8201,		"NEC",					"PC-8201 (Japan)", 0 )
+COMP( 1983, npc8201a,	0,		0,		pc8201,		pc8201a,	0,		pc8201,		"NEC",					"PC-8201A", 0 )
+//COMP( 1983, npc8300,	npc8201,0,		pc8300,		pc8300,		0,		pc8300,		"NEC",					"PC-8300", 0 )
+COMP( 1984, tandy200,	0,		0,		tandy200,	kyo85,		0,		tandy200,	"Tandy Radio Shack",	"Tandy 200", 0 )

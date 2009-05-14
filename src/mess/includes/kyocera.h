@@ -37,8 +37,8 @@ struct _kyocera_state
 	const device_config *speaker;
 };
 
-typedef struct _trsm200_state trsm200_state;
-struct _trsm200_state
+typedef struct _tandy200_state tandy200_state;
+struct _tandy200_state
 {
 	/* memory state */
 	UINT8 bank;				/* memory bank selection */
@@ -67,6 +67,6 @@ WRITE8_HANDLER( kyo85_lcd_command_w );
 WRITE8_HANDLER( kyo85_lcd_data_w );
 
 MACHINE_DRIVER_EXTERN( kyo85_video );
-MACHINE_DRIVER_EXTERN( trsm200_video );
+MACHINE_DRIVER_EXTERN( tandy200_video );
 
 #endif

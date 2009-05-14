@@ -1173,10 +1173,13 @@ const game_driver * const drivers[] =
 	/* Kyocera (and clones) */
 	DRIVER( kyo85 )
 	DRIVER( olivm10 )	
+//	DRIVER( olivm10m )	
 	DRIVER( trsm100 )
-	DRIVER( trsm102 )
-	DRIVER( trsm200 )
-	DRIVER( pc8201 )
+	DRIVER( tandy102 )
+	DRIVER( tandy200 )
+//	DRIVER( npc8201 )
+	DRIVER( npc8201a )
+//	DRIVER( npc8300 )
 
 	/* Nakajima manufactured eletronic typewriters */
 	DRIVER( drwrt200 )	/* 199? NTS DreamWriter T200                         */
