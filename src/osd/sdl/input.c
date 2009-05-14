@@ -557,7 +557,7 @@ static int devmap_leastfree(device_map_t *devmap)
 	return -1;
 }
 
-static char *remove_spaces(const char *s)
+static char *remove_spaces(running_machine *machine, const char *s)
 {
 	char *r, *p;
 	static const char *def_name[] = { "Unknown" };
@@ -567,12 +567,12 @@ static char *remove_spaces(const char *s)
 
 	if (strlen(s) == 0)
 	{
-		r = auto_malloc(strlen((char *)def_name) + 1);
+		r = auto_alloc_array(machine, char, strlen((char *)def_name) + 1);
 		strcpy(r, (char *)def_name);
 		return r;
 	}
 
-	r = auto_malloc(strlen(s) + 1);
+	r = auto_alloc_array(machine, char, strlen(s) + 1);
 	p = r;
 	while (*s)
 	{
@@ -618,7 +618,7 @@ static void devmap_register(device_map_t *devmap, int physical_idx, char *name)
 //  init_joymap
 //============================================================
 
-static void devmap_init(device_map_t *devmap, const char *opt, int max_devices, const char *label)
+static void devmap_init(running_machine *machine, device_map_t *devmap, const char *opt, int max_devices, const char *label)
 {
 	int dev;
 	char defname[20];
@@ -641,7 +641,7 @@ static void devmap_init(device_map_t *devmap, const char *opt, int max_devices, 
 		dev_name = options_get_string(mame_options(), defname);
 		if (dev_name && *dev_name && strcmp(dev_name,SDLOPTVAL_AUTO))
 		{
-			devmap->map[dev].name = remove_spaces(dev_name);
+			devmap->map[dev].name = remove_spaces(machine, dev_name);
 			mame_printf_verbose("%s: Logical id %d: %s\n", label, dev + 1, joy_map.map[dev].name);
 			devmap->initialized = 1;
 		}
@@ -685,12 +685,12 @@ static void sdlinput_register_joysticks(running_machine *machine)
 	char tempname[512];
 	SDL_Joystick *joy;
 
-	devmap_init(&joy_map, SDLOPTION_JOYINDEX, 8, "Joystick mapping");
+	devmap_init(machine, &joy_map, SDLOPTION_JOYINDEX, 8, "Joystick mapping");
 
 	mame_printf_verbose("Joystick: Start initialization\n");
 	for (physical_stick = 0; physical_stick < SDL_NumJoysticks(); physical_stick++)
 	{
-		char *joy_name = remove_spaces(SDL_JoystickName(physical_stick));
+		char *joy_name = remove_spaces(machine, SDL_JoystickName(physical_stick));
 		
 		devmap_register(&joy_map, physical_stick, joy_name);
 	}
@@ -910,7 +910,7 @@ static int lookup_mame_code(const char *scode)
 //  sdlinput_read_keymap
 //============================================================
 
-static kt_table * sdlinput_read_keymap(void)
+static kt_table * sdlinput_read_keymap(running_machine *machine)
 {
 	char *keymap_filename;
 	kt_table *key_trans_table;
@@ -935,7 +935,7 @@ static kt_table * sdlinput_read_keymap(void)
 		return sdl_key_trans_table;
 	}
 
-	key_trans_table = auto_malloc(sizeof(sdl_key_trans_table));
+	key_trans_table = auto_alloc(machine, kt_table);
 	memcpy((void *) key_trans_table, sdl_key_trans_table, sizeof(sdl_key_trans_table));
 	
 	while (!feof(keymap_file))
@@ -962,7 +962,7 @@ static kt_table * sdlinput_read_keymap(void)
 				// vk and ak are not really needed
 				//key_trans_table[index][VIRTUAL_KEY] = vk;
 				//key_trans_table[index][ASCII_KEY] = ak;
-				key_trans_table[index].ui_name = auto_malloc(strlen(kns)+1);
+				key_trans_table[index].ui_name = auto_alloc_array(machine, char, strlen(kns)+1);
 				strcpy(key_trans_table[index].ui_name, kns);
 				mame_printf_verbose("Keymap: Mapped <%s> to <%s> with ui-text <%s>\n", sks, mks, kns);
 			}
@@ -1039,7 +1039,7 @@ static void sdlinput_register_keyboards(running_machine *machine)
 	int keynum;
 	kt_table *key_trans_table;
 
-	key_trans_table = sdlinput_read_keymap();
+	key_trans_table = sdlinput_read_keymap(machine);
 
 	keyboard_map.logical[0] = 0;
 	
@@ -1705,7 +1705,7 @@ static device_info *generic_device_alloc(device_info **devlist_head_ptr, const c
 	device_info *devinfo;
 
 	// allocate memory for the device object
-	devinfo = malloc_or_die(sizeof(*devinfo));
+	devinfo = alloc_or_die(device_info);
 	memset(devinfo, 0, sizeof(*devinfo));
 	devinfo->head = devlist_head_ptr;
 	

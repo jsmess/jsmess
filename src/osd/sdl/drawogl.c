@@ -512,7 +512,7 @@ static void load_gl_lib(void)
 			fatalerror("Unable to load opengl library: %s\n", stemp ? stemp : "<default>");
 		}
        	mame_printf_verbose("Loaded opengl shared library: %s\n", stemp ? stemp : "<default>");
-    	gl_dispatch = auto_malloc(sizeof(osd_gl_dispatch));
+    	gl_dispatch = alloc_or_die(osd_gl_dispatch);
         dll_loaded=1;
 	}
 #endif
@@ -2574,7 +2574,7 @@ static texture_info *texture_create(sdl_window_info *window, const render_texinf
     }
 
 	if (texture->prescale_effect && !texture_copy_properties[texture->format][SDL_TEXFORMAT_SRC_EQUALS_DEST])
-		texture->effectbuf = malloc_or_die(texsource->width * 3 * texture->texProperties[SDL_TEXFORMAT_PIXEL_SIZE]);
+		texture->effectbuf = alloc_array_or_die(UINT32, texsource->width * 3 * texture->texProperties[SDL_TEXFORMAT_PIXEL_SIZE]);
 
 	// add us to the texture list
 	texture->next = sdl->texlist;

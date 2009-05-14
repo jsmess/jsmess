@@ -772,7 +772,7 @@ int sdlwindow_video_window_create(running_machine *machine, int index, sdl_monit
 	clear_worker_param(wp);
 
 	// allocate a new window object
-	window = malloc_or_die(sizeof(*window));
+	window = alloc_or_die(sdl_window_info);
 	memset(window, 0, sizeof(*window));
 	window->maxwidth = config->width;
 	window->maxheight = config->height;

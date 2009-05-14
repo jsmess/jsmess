@@ -365,7 +365,7 @@ static void add_primary_monitor(void *data)
 	sdl_monitor_info *monitor;
 
 	// allocate a new monitor info
-	monitor = malloc_or_die(sizeof(*monitor));
+	monitor = alloc_or_die(sdl_monitor_info);
 	memset(monitor, 0, sizeof(*monitor));
 
 	// copy in the data
@@ -821,7 +821,7 @@ static void extract_video_config(running_machine *machine)
 static void load_effect_overlay(running_machine *machine, const char *filename)
 {
 	const device_config *screen;
-	char *tempstr = malloc_or_die(strlen(filename) + 5);
+	char *tempstr = alloc_array_or_die(char, strlen(filename) + 5);
 	char *dest;
 
 	// append a .PNG extension

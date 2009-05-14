@@ -358,6 +358,10 @@ int SDL_main(int argc, char **argv)
 {
 	int res = 0;
 
+	// disable I/O buffering
+	setvbuf(stdout, (char *) NULL, _IONBF, 0);
+	setvbuf(stderr, (char *) NULL, _IONBF, 0);
+
 	#ifdef SDLMAME_OS2
 	MorphToPM();
 	#endif

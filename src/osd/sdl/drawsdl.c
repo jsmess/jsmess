@@ -337,7 +337,7 @@ static void yuv_overlay_init(sdl_window_info *window)
 	
 	mame_printf_verbose("SDL: Creating %d x %d YUV-Overlay ...\n", minimum_width, minimum_height);
 
-	sdl->yuv_bitmap = malloc_or_die(minimum_width*minimum_height*sizeof(UINT16));
+	sdl->yuv_bitmap = alloc_array_or_die(UINT16, minimum_width*minimum_height);
 
 	sdl->yuvsurf = SDL_CreateYUVOverlay(minimum_width * sdl_sm->mult_w, minimum_height * sdl_sm->mult_h,
 			sdl_sm->pixel_format, sdl->sdlsurf);
@@ -970,7 +970,7 @@ static void drawsdl_yuv_init(sdl_info *sdl)
 {
 	unsigned char r,g,b;
 	if (sdl->yuv_lookup == NULL)
-		sdl->yuv_lookup = malloc_or_die(65536*sizeof(UINT32));
+		sdl->yuv_lookup = alloc_array_or_die(UINT32, 65536);
 	for (r = 0; r < 32; r++)
 		for (g = 0; g < 32; g++)
 			for (b = 0; b < 32; b++)
