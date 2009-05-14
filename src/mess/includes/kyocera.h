@@ -9,6 +9,9 @@
 #define TCM5089_TAG		"tcm5089"
 #define HD61830_TAG		"hd61830b"
 
+#define TRSM200_VIDEORAM_SIZE	0x2000
+#define TRSM200_VIDEORAM_MASK	0x1fff
+
 typedef struct _kyocera_state kyocera_state;
 struct _kyocera_state
 {
@@ -24,9 +27,14 @@ struct _kyocera_state
 	/* video state */
 	int lcd_cs2[10];		/* LCD driver chip select */
 
+	/* sound state */
+	int buzzer;				/* buzzer select */
+	int bell;				/* bell output */
+
 	const device_config *hd44102[10];
 	const device_config *upd1990a;
 	const device_config *centronics;
+	const device_config *speaker;
 };
 
 typedef struct _trsm200_state trsm200_state;
@@ -42,8 +50,13 @@ struct _trsm200_state
 	/* video state */
 	UINT8 *video_ram;		/* video RAM */
 
+	/* sound state */
+	int buzzer;				/* buzzer select */
+	int bell;				/* bell output */
+
 	const device_config *hd61830;
 	const device_config *centronics;
+	const device_config *speaker;
 };
 
 /* ---------- defined in video/kyocera.c ---------- */

@@ -114,7 +114,10 @@ static VIDEO_START( trsm200 )
 	state->hd61830 = devtag_get_device(machine, HD61830_TAG);
 
 	/* allocate video memory */
-	state->video_ram = auto_alloc_array(machine, UINT8, 8192);
+	state->video_ram = auto_alloc_array(machine, UINT8, TRSM200_VIDEORAM_SIZE);
+
+	/* register for state saving */
+	state_save_register_global_pointer(machine, state->video_ram, TRSM200_VIDEORAM_SIZE);
 }
 
 static VIDEO_UPDATE( trsm200 )
@@ -130,14 +133,14 @@ static READ8_HANDLER( trsm200_rd_r )
 {
 	trsm200_state *state = space->machine->driver_data;
 
-	return state->video_ram[offset & 0x1fff];
+	return state->video_ram[offset & TRSM200_VIDEORAM_MASK];
 }
 
 static WRITE8_HANDLER( trsm200_rd_w )
 {
 	trsm200_state *state = space->machine->driver_data;
 
-	state->video_ram[offset & 0x1fff] = data;
+	state->video_ram[offset & TRSM200_VIDEORAM_MASK] = data;
 }
 
 static HD61830_INTERFACE( trsm200_hd61830_intf )

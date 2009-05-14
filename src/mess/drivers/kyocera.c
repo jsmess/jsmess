@@ -30,7 +30,6 @@
 
 	TODO:
 
-	- discrete sound
 	- pc8201 memory banking
 	- pc8201 I/O control registers
 	- NEC PC-8233 floppy controller
@@ -56,6 +55,7 @@
 #include "machine/8155pio.h"
 #include "machine/rp5c01a.h"
 #include "video/hd61830.h"
+#include "sound/speaker.h"
 
 static const device_config *cassette_device_image(running_machine *machine)
 {
@@ -774,10 +774,10 @@ static WRITE8_DEVICE_HANDLER( kyocera_8155_port_b_w )
 
 		0					LCD chip select 8, key scan 8
 		1					LCD chip select 9
-		2					beeper data input select (0=data from 8155 TO, 1=data from PB5)
+		2					beeper data output
 		3		_RS232		modem select (0=RS232, 1=modem)
 		4		PCS			soft power off
-		5					beeper data output
+		5					beeper data input select (0=data from 8155 TO, 1=data from PB2)
 		6		_DTR		RS232 data terminal ready output
 		7		_RTS		RS232 request to send output
 
@@ -791,6 +791,22 @@ static WRITE8_DEVICE_HANDLER( kyocera_8155_port_b_w )
 	/* LCD */
 	state->lcd_cs2[8] = BIT(data, 0);
 	state->lcd_cs2[9] = BIT(data, 1);
+
+	/* beeper */
+	state->buzzer = BIT(data, 2);
+	state->bell = BIT(data, 5);
+
+	if (state->buzzer) speaker_level_w(state->speaker, state->bell);
+}
+
+static WRITE_LINE_DEVICE_HANDLER( kyocera_8155_to_w )
+{
+	kyocera_state *driver_state = device->machine->driver_data;
+
+	if (!driver_state->buzzer && driver_state->bell)
+	{
+		speaker_level_w(driver_state->speaker, state);
+	}
 }
 
 static PIO8155_INTERFACE( kyocera_8155_intf )
@@ -801,7 +817,7 @@ static PIO8155_INTERFACE( kyocera_8155_intf )
 	DEVCB_HANDLER(kyocera_8155_port_a_w),	/* port A write */
 	DEVCB_HANDLER(kyocera_8155_port_b_w),	/* port B write */
 	DEVCB_NULL,								/* port C write */
-	DEVCB_NULL								/* timer output */
+	DEVCB_LINE(kyocera_8155_to_w)			/* timer output */
 };
 
 static READ8_DEVICE_HANDLER( trsm200_8155_port_c_r )
@@ -861,10 +877,10 @@ static WRITE8_DEVICE_HANDLER( trsm200_8155_port_b_w )
 
 		0					key scan 8
 		1		ORIG/ANS	(1=ORIG, 0=ANS)
-		2		_BUZZER		
+		2		_BUZZER		(0=data from 8155 TO, 1=data from PB2)
 		3		_RS232C		(1=modem, 0=RS-232)
 		4		PCS			power cut signal
-		5		BELL		
+		5		BELL		buzzer data output
 		6		MEN			modem enable output
 		7		CALL		connects and disconnects the phone line
 
@@ -872,7 +888,24 @@ static WRITE8_DEVICE_HANDLER( trsm200_8155_port_b_w )
 
 	trsm200_state *state = device->machine->driver_data;
 
+	/* keyboard */
 	state->keylatch = (BIT(data, 0) << 8) | (state->keylatch & 0xff);
+
+	/* beeper */
+	state->buzzer = BIT(data, 2);
+	state->bell = BIT(data, 5);
+
+	if (state->buzzer) speaker_level_w(state->speaker, state->bell);
+}
+
+static WRITE_LINE_DEVICE_HANDLER( trsm200_8155_to_w )
+{
+	trsm200_state *driver_state = device->machine->driver_data;
+
+	if (!driver_state->buzzer && driver_state->bell)
+	{
+		speaker_level_w(driver_state->speaker, state);
+	}
 }
 
 static PIO8155_INTERFACE( trsm200_8155_intf )
@@ -883,7 +916,7 @@ static PIO8155_INTERFACE( trsm200_8155_intf )
 	DEVCB_HANDLER(trsm200_8155_port_a_w),	/* port A write */
 	DEVCB_HANDLER(trsm200_8155_port_b_w),	/* port B write */
 	DEVCB_NULL,								/* port C write */
-	DEVCB_NULL								/* timer output */
+	DEVCB_LINE(trsm200_8155_to_w)			/* timer output */
 };
 
 /* Machine Drivers */
@@ -897,6 +930,7 @@ static MACHINE_START( kyo85 )
 	/* find devices */
 	state->upd1990a = devtag_get_device(machine, UPD1990A_TAG);
 	state->centronics = devtag_get_device(machine, "centronics");
+	state->speaker = devtag_get_device(machine, "speaker");
 
 	/* initialize RTC */
 	upd1990a_cs_w(state->upd1990a, 1);
@@ -925,6 +959,11 @@ static MACHINE_START( kyo85 )
 	memory_set_bank(machine, 2, 0);
 
 	/* register for state saving */
+	state_save_register_global(machine, state->bank);
+	state_save_register_global(machine, state->upd1990a_data);
+	state_save_register_global(machine, state->keylatch);
+	state_save_register_global(machine, state->buzzer);
+	state_save_register_global(machine, state->bell);
 }
 
 static MACHINE_START( pc8201 )
@@ -934,6 +973,7 @@ static MACHINE_START( pc8201 )
 	/* find devices */
 	state->upd1990a = devtag_get_device(machine, UPD1990A_TAG);
 	state->centronics = devtag_get_device(machine, "centronics");
+	state->speaker = devtag_get_device(machine, "speaker");
 
 	/* initialize RTC */
 	upd1990a_cs_w(state->upd1990a, 1);
@@ -953,6 +993,11 @@ static MACHINE_START( pc8201 )
 	pc8201_bankswitch(machine, 0);
 
 	/* register for state saving */
+	state_save_register_global(machine, state->bank);
+	state_save_register_global(machine, state->upd1990a_data);
+	state_save_register_global(machine, state->keylatch);
+	state_save_register_global(machine, state->buzzer);
+	state_save_register_global(machine, state->bell);
 }
 
 static MACHINE_START( trsm100 )
@@ -964,6 +1009,7 @@ static MACHINE_START( trsm100 )
 	/* find devices */
 	state->upd1990a = devtag_get_device(machine, UPD1990A_TAG);
 	state->centronics = devtag_get_device(machine, "centronics");
+	state->speaker = devtag_get_device(machine, "speaker");
 
 	/* initialize RTC */
 	upd1990a_cs_w(state->upd1990a, 1);
@@ -1002,6 +1048,11 @@ static MACHINE_START( trsm100 )
 	memory_set_bank(machine, 2, 0);
 
 	/* register for state saving */
+	state_save_register_global(machine, state->bank);
+	state_save_register_global(machine, state->upd1990a_data);
+	state_save_register_global(machine, state->keylatch);
+	state_save_register_global(machine, state->buzzer);
+	state_save_register_global(machine, state->bell);
 }
 
 static MACHINE_START( trsm200 )
@@ -1010,6 +1061,7 @@ static MACHINE_START( trsm200 )
 
 	/* find devices */
 	state->centronics = devtag_get_device(machine, "centronics");
+	state->speaker = devtag_get_device(machine, "speaker");
 
 	/* configure ROM banking */
 	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, I8085_TAG), 0);
@@ -1022,6 +1074,11 @@ static MACHINE_START( trsm200 )
 	memory_set_bank(machine, 2, 0);
 
 	/* register for state saving */
+	state_save_register_global(machine, state->bank);
+	state_save_register_global(machine, state->tp);
+	state_save_register_global(machine, state->keylatch);
+	state_save_register_global(machine, state->buzzer);
+	state_save_register_global(machine, state->bell);
 }
 
 static const cassette_config kyocera_cassette_config =
@@ -1073,9 +1130,9 @@ static MACHINE_DRIVER_START( kyo85 )
 	MDRV_IMPORT_FROM(kyo85_video)
 
 	/* sound hardware */
-//	MDRV_SPEAKER_STANDARD_MONO("mono")
-//	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
-//	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
 	MDRV_PIO8155_ADD(PIO8155_TAG, 2400000, kyocera_8155_intf)
@@ -1108,9 +1165,9 @@ static MACHINE_DRIVER_START( pc8201 )
 	MDRV_IMPORT_FROM(kyo85_video)
 
 	/* sound hardware */
-//	MDRV_SPEAKER_STANDARD_MONO("mono")
-//	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
-//	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
 	MDRV_PIO8155_ADD(PIO8155_TAG, 2400000, kyocera_8155_intf)
@@ -1154,9 +1211,9 @@ static MACHINE_DRIVER_START( trsm200 )
 	/* sound hardware */
 //	MDRV_TCM5089_ADD(TCM5089_TAG, XTAL_3_579545MHz)
 
-//	MDRV_SPEAKER_STANDARD_MONO("mono")
-//	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
-//	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
 	MDRV_PIO8155_ADD(PIO8155_TAG, XTAL_2_4576MHz, trsm200_8155_intf)
@@ -1260,9 +1317,9 @@ SYSTEM_CONFIG_END
 /* System Drivers */
 
 /*    YEAR  NAME      PARENT   COMPAT  MACHINE     INPUT    INIT      CONFIG       COMPANY  FULLNAME */
-COMP( 1983, kyo85,    0,       0,      kyo85,      kyo85,   0,        kyo85,      "Kyocera",            "Kyotronic 85", GAME_IMPERFECT_SOUND )
-COMP( 1983, olivm10,  0,       0,      kyo85,      olivm10, 0,        kyo85,      "Olivetti",           "M10",       GAME_IMPERFECT_SOUND )
-COMP( 1983, pc8201,   0,       0,      pc8201,     pc8201a, 0,		  pc8201,     "NEC",                "PC-8201A", GAME_NOT_WORKING )
-COMP( 1983, trsm100,  0,       0,      trsm100,    kyo85,   0,        trsm100,    "Tandy Radio Shack",  "TRS-80 Model 100", GAME_IMPERFECT_SOUND )
-COMP( 1984, trsm200,  0,       0,      trsm200,    kyo85,   0,		  trsm200,    "Tandy Radio Shack",  "TRS-80 Model 200", GAME_IMPERFECT_SOUND )
-COMP( 1986, trsm102,  0,       0,      trsm100,    kyo85,   0,        trsm102,    "Tandy Radio Shack",  "TRS-80 Model 102", GAME_IMPERFECT_SOUND )
+COMP( 1983, kyo85,    0,       0,      kyo85,      kyo85,   0,        kyo85,      "Kyocera",            "Kyotronic 85", 0 )
+COMP( 1983, olivm10,  0,       0,      kyo85,      olivm10, 0,        kyo85,      "Olivetti",           "M10",       0 )
+COMP( 1983, pc8201,   0,       0,      pc8201,     pc8201a, 0,		  pc8201,     "NEC",                "PC-8201A", 0 )
+COMP( 1983, trsm100,  0,       0,      trsm100,    kyo85,   0,        trsm100,    "Tandy Radio Shack",  "TRS-80 Model 100", 0 )
+COMP( 1984, trsm200,  0,       0,      trsm200,    kyo85,   0,		  trsm200,    "Tandy Radio Shack",  "TRS-80 Model 200", 0 )
+COMP( 1986, trsm102,  0,       0,      trsm100,    kyo85,   0,        trsm102,    "Tandy Radio Shack",  "TRS-80 Model 102", 0 )
