@@ -123,7 +123,10 @@ static void pc8201_bankswitch(running_machine *machine, UINT8 data)
 		break;
 
 	case 3:
-		memory_install_readwrite8_handler(program, 0x8000, 0xffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		if (mess_ram_size > 64 * 1024)
+			memory_install_readwrite8_handler(program, 0x8000, 0xffff, 0, 0, SMH_BANK(2), SMH_BANK(2));
+		else
+			memory_install_readwrite8_handler(program, 0x8000, 0xffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 		break;
 	}
 
@@ -1233,6 +1236,7 @@ static SYSTEM_CONFIG_START( pc8201 )
 	CONFIG_RAM_DEFAULT	(16 * 1024)
 	CONFIG_RAM			(32 * 1024)
 	CONFIG_RAM			(64 * 1024)
+	CONFIG_RAM			(96 * 1024)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START( trsm100 )
