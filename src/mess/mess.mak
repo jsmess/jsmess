@@ -1396,6 +1396,8 @@ $(MESS_DRIVERS)/gb.o:		$(MESS_LAYOUT)/gb.lh
 $(MESS_DRIVERS)/glasgow.o:	$(MESS_LAYOUT)/glasgow.lh
 $(MESS_DRIVERS)/gmaster.o:	$(MESS_LAYOUT)/gmaster.lh
 $(MESS_DRIVERS)/kim1.o:		$(MESS_LAYOUT)/kim1.lh
+$(MESS_DRIVERS)/kyocera.o:	$(MESS_LAYOUT)/kyo85.lh \
+							$(MESS_LAYOUT)/tandy200.lh
 $(MESS_DRIVERS)/mephisto.o:	$(MESS_LAYOUT)/mephisto.lh
 $(MESS_DRIVERS)/mk1.o:		$(MESS_LAYOUT)/mk1.lh
 $(MESS_DRIVERS)/mk2.o:		$(MESS_LAYOUT)/mk2.lh
