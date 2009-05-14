@@ -233,9 +233,9 @@ READ8_DEVICE_HANDLER( pc_lpt_r )
 {
 	switch (offset)
 	{
-	case 0: return pc_lpt_data_r(device, 0); break;
-	case 1: return pc_lpt_status_r(device, 0); break;
-	case 2: return pc_lpt_control_r(device, 0); break;
+	case 0: return pc_lpt_data_r(device, 0);
+	case 1: return pc_lpt_status_r(device, 0);
+	case 2: return pc_lpt_control_r(device, 0);
 	}
 
 	/* if we reach this its an error */
