@@ -299,11 +299,13 @@ static INPUT_PORTS_START( md )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( md_svp )
+/* MegaDrive inputs + Fake Region Selection */
+/* We need this as long as we only have the US version of the SVP add-on, otherwise we could not play 
+   Non-US Virtua Racing versions. It is also handy to develop add-ons emulation without adding each 
+   region variants, while they do not even work. Once emulation is working this must disappear.  */
+static INPUT_PORTS_START( md_sel )
 	PORT_INCLUDE( md )
 
-	/* We need this as long as we only have the US version of the SVP add-on,
-	  otherwise we could not play Non-US Virtua Racing versions  */
 	PORT_START("REGION")
 	/* Region setting for Console */
 	PORT_CONFNAME( 0x000f, 0x0000, DEF_STR( Region ) )
@@ -316,7 +318,7 @@ INPUT_PORTS_END
 
 /*************************************
  *
- *  machine driver
+ *  Machine driver
  *
  *************************************/
 
@@ -414,6 +416,102 @@ static DRIVER_INIT( md_jpn )
 	DRIVER_INIT_CALL(mess_md_common);
 }
 
+/****************************************** SegaCD & 32X emulation ****************************************/
+
+/* Very preliminary skeleton code from David Haywood, borrowed for MESS by Fabio Priuli */
+/* These are only included to document BIOS informations currently available */
+
+static DRIVER_INIT( mess_32x )
+{
+	DRIVER_INIT_CALL(_32x);
+	DRIVER_INIT_CALL(mess_md_common);
+}
+
+ROM_START( 32x )
+	ROM_REGION16_BE( 0x400000, "gamecart", ROMREGION_ERASE00 ) /* 68000 Code */
+
+	ROM_REGION32_BE( 0x400000, "gamecart_sh2", 0 ) /* Copy for the SH2 */
+	ROM_COPY( "gamecart", 0x000000, 0x000000, 0x400000)
+
+	ROM_REGION16_BE( 0x400000, "32x_68k_bios", 0 ) /* 68000 Code */
+	ROM_LOAD( "32x_g_bios.bin", 0x000000,  0x000100, CRC(5c12eae8) SHA1(dbebd76a448447cb6e524ac3cb0fd19fc065d944) )
+
+	ROM_REGION16_BE( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	// temp, rom should only be visible here when one of the regs is set, tempo needs it
+	ROM_COPY( "gamecart", 0x0, 0x0, 0x400000)
+	ROM_COPY( "32x_68k_bios", 0x0, 0x0, 0x100)
+
+	ROM_REGION( 0x400000, "32x_master_sh2", 0 ) /* SH2 Code */
+	ROM_LOAD( "32x_m_bios.bin", 0x000000,  0x000800, CRC(dd9c46b8) SHA1(1e5b0b2441a4979b6966d942b20cc76c413b8c5e) )
+
+	ROM_REGION( 0x400000, "32x_slave_sh2", 0 ) /* SH2 Code */
+	ROM_LOAD( "32x_s_bios.bin", 0x000000,  0x000400, CRC(bfda1fe5) SHA1(4103668c1bbd66c5e24558e73d4f3f92061a109a) )
+ROM_END
+
+/* We need proper names for these BIOS ROMs! */
+ROM_START( megacd )
+	ROM_REGION16_BE( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_SYSTEM_BIOS(0, "v200w", "Model 2 v2.00W")	// confirmed good dump
+	ROMX_LOAD( "megacd_model2_bios_2_00w_e.bin", 0x000000,  0x020000, CRC(4d5cb8da) SHA1(f5f60f03501908962446ee02fc27d98694dd157d), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS(1, "v100", "Model 1 v1.00")		// confirmed good dump
+	ROMX_LOAD( "megacd_model1_bios_1_00_e.bin", 0x000000,  0x020000, CRC(529ac15a) SHA1(f891e0ea651e2232af0c5c4cb46a0cae2ee8f356), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS(2, "v200", "Model 2 v2.00")
+	ROMX_LOAD( "megacd_model2_bios_2_00_e.bin", 0x000000,  0x020000, CRC(0507b590) SHA1(7063192ae9f6b696c5b81bc8f0a9fe6f0c400e58), ROM_BIOS(3) )
+	ROM_SYSTEM_BIOS(3, "v221", "Multi-Mega v2.21")	// confirmed good dump
+	ROMX_LOAD( "multimega_bios_2_21_e.bin", 0x000000,  0x020000, CRC(34d3cce1) SHA1(73fc9c014ad803e9e7d8076b3642a8a5224b3e51), ROM_BIOS(4) )
+ROM_END
+
+ROM_START( megacdj )
+	ROM_REGION16_BE( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_SYSTEM_BIOS(0, "v200", "Model 2 v2.00")
+	ROMX_LOAD( "megacd_model2_bios_2_00_j.bin", 0x000000,  0x020000, CRC(f116793c) SHA1(dc68146ad1ff50faeeb2a3f685fab1a2961dabb2), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS(1, "v100p", "Model 1 v1.00P")
+	ROMX_LOAD( "megacd_model1_bios_1_00p_j.bin", 0x000000,  0x020000, CRC(9d2da8f2) SHA1(4846f448160059a7da0215a5df12ca160f26dd69), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS(2, "v100s", "Model 1 v1.00S")
+	ROMX_LOAD( "megacd_model1_bios_1_00s_j.bin", 0x000000,  0x020000, CRC(550f30bb) SHA1(e4193c6ae44c3cea002707d2a88f1fbcced664de), ROM_BIOS(3) )
+	ROM_SYSTEM_BIOS(3, "v102las", "Pioneer LaserActive v1.02")
+	ROMX_LOAD( "laseractive_bios_1_02_j.bin", 0x000000,  0x020000, CRC(00eedb3a) SHA1(26237b333db4a4c6770297fa5e655ea95840d5d9), ROM_BIOS(4) )
+	ROM_SYSTEM_BIOS(4, "xeye", "JVC X'eye")
+	ROMX_LOAD( "xeye_bios_j.bin", 0x000000,  0x020000, CRC(290f8e33) SHA1(651f14d5a5e0ecb974a60c0f43b1d2006323fb09), ROM_BIOS(5) )
+ROM_END
+
+ROM_START( segacd )
+	ROM_REGION16_BE( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_SYSTEM_BIOS(0, "v211", "Model 2 v2.11")
+	ROMX_LOAD( "segacd_model2_bios_2_11_u.bin", 0x000000,  0x020000, CRC(2e49d72c) SHA1(328a3228c29fba244b9db2055adc1ec4f7a87e6b), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS(1, "v110", "Model 1 v1.10")
+	ROMX_LOAD( "segacd_model1_bios_1_10_u.bin", 0x000000,  0x020000, CRC(c6d10268) SHA1(f4f315adcef9b8feb0364c21ab7f0eaf5457f3ed), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS(2, "v200", "Model 2 v2.00")
+	ROMX_LOAD( "segacd_model2_bios_2_00_u.bin", 0x000000,  0x020000, CRC(340b4be4) SHA1(bd3ee0c8ab732468748bf98953603ce772612704), ROM_BIOS(3) )
+	ROM_SYSTEM_BIOS(3, "v200w", "Model 2 v2.00W")
+	ROMX_LOAD( "segacd_model2_bios_2_00w_u.bin", 0x000000,  0x020000, CRC(9f6f6276) SHA1(5adb6c3af218c60868e6b723ec47e36bbdf5e6f0), ROM_BIOS(4) )
+	ROM_SYSTEM_BIOS(4, "v102las", "Pioneer LaserActive v1.02")
+	ROMX_LOAD( "laseractive_bios_1_02_u.bin", 0x000000,  0x020000, CRC(3b10cf41) SHA1(8af162223bb12fc19b414f126022910372790103), ROM_BIOS(5) )
+	ROM_SYSTEM_BIOS(5, "v221", "CDX v2.21")
+	ROMX_LOAD( "segacdx_bios_2_21_u.bin", 0x000000,  0x020000, CRC(d48c44b5) SHA1(2b125c0545afa089b617f2558e686ea723bdc06e), ROM_BIOS(6) )
+ROM_END
+
+/* some games use the 32x and SegaCD together to give better quality FMV */
+ROM_START( 32x_scd )
+	ROM_REGION16_BE( 0x400000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION16_BE( 0x400000, "gamecart", 0 ) /* 68000 Code */
+	ROM_LOAD( "segacd_model2_bios_2_11_u.bin", 0x000000,  0x020000, CRC(2e49d72c) SHA1(328a3228c29fba244b9db2055adc1ec4f7a87e6b) )
+
+	ROM_REGION32_BE( 0x400000, "gamecart_sh2", 0 ) /* Copy for the SH2 */
+	ROM_COPY( "gamecart", 0x0, 0x0, 0x400000)
+
+	ROM_REGION16_BE( 0x400000, "32x_68k_bios", 0 ) /* 68000 Code */
+	ROM_LOAD( "32x_g_bios.bin", 0x000000,  0x000100, CRC(5c12eae8) SHA1(dbebd76a448447cb6e524ac3cb0fd19fc065d944) )
+
+	ROM_REGION( 0x400000, "32x_master_sh2", 0 ) /* SH2 Code */
+	ROM_LOAD( "32x_m_bios.bin", 0x000000,  0x000800, CRC(dd9c46b8) SHA1(1e5b0b2441a4979b6966d942b20cc76c413b8c5e) )
+
+	ROM_REGION( 0x400000, "32x_slave_sh2", 0 ) /* SH2 Code */
+	ROM_LOAD( "32x_s_bios.bin", 0x000000,  0x000400, CRC(bfda1fe5) SHA1(4103668c1bbd66c5e24558e73d4f3f92061a109a) )
+ROM_END
+
+
 /****************************************** PICO emulation ****************************************/
 
 /*
@@ -464,6 +562,10 @@ static DRIVER_INIT( md_jpn )
 80001b  byte  Games write 'E'
 80001d  byte  Games write 'G'
 80001f  byte  Games write 'A'
+
+
+TODO: MAME/hazeMD code should allow to handle VDP without the z80 (Pico has no z80 CPU).
+  Currently, this is not possible, so we leave the z80 there, even if not used.
 
 */
 
@@ -645,11 +747,18 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME		PARENT		COMPAT  MACHINE    	  INPUT     INIT  		CONFIG		COMPANY   FULLNAME */
-CONS( 1989, genesis,	0,			0,      ms_megadriv,  md,		genesis,	0,		"Sega",   "Genesis (USA, NTSC)", 0)
-CONS( 1993, gensvp,		genesis,	0,      ms_megdsvp,   md_svp,	gensvp,		0,		"Sega",   "Genesis (USA, NTSC, w/SVP)", 0)
-CONS( 1990, megadriv,	genesis,	0,      ms_megadriv,  md,		md_eur,		0,		"Sega",   "Mega Drive (Europe, PAL)", 0)
-CONS( 1988, megadrij,	genesis,	0,      ms_megadriv,  md,		md_jpn,		0,		"Sega",   "Mega Drive (Japan, NTSC)", 0)
-CONS( 1994, pico,		0,			0,      pico,	      pico,		md_eur,		0,		"Sega",   "Pico (Europe, PAL)", 0)
-CONS( 1994, picou,		pico,		0,      pico,	      pico,		genesis,	0,		"Sega",   "Pico (USA, NTSC)", 0)
-CONS( 1993, picoj,		pico,		0,      pico,	      pico,		md_jpn,		0,		"Sega",   "Pico (Japan, NTSC)", 0)
+/*    YEAR  NAME        PARENT     COMPAT  MACHINE          INPUT   INIT     CONFIG COMPANY   FULLNAME */
+CONS( 1989, genesis,    0,         0,      ms_megadriv,     md,     genesis,   0,   "Sega",   "Genesis (USA, NTSC)", 0)
+CONS( 1993, gensvp,     genesis,   0,      ms_megdsvp,      md_sel, gensvp,    0,   "Sega",   "Genesis (USA, NTSC, w/SVP)", 0)
+CONS( 1990, megadriv,   genesis,   0,      ms_megadriv,     md,     md_eur,    0,   "Sega",   "Mega Drive (Europe, PAL)", 0)
+CONS( 1988, megadrij,   genesis,   0,      ms_megadriv,     md,     md_jpn,    0,   "Sega",   "Mega Drive (Japan, NTSC)", 0)
+CONS( 1994, pico,       0,         0,      pico,            pico,   md_eur,    0,   "Sega",   "Pico (Europe, PAL)", 0)
+CONS( 1994, picou,      pico,      0,      pico,            pico,   genesis,   0,   "Sega",   "Pico (USA, NTSC)", 0)
+CONS( 1993, picoj,      pico,      0,      pico,            pico,   md_jpn,    0,   "Sega",   "Pico (Japan, NTSC)", 0)
+
+/* Not Working */
+CONS( 1994, 32x,        0,         0,      genesis_32x,     md_sel, mess_32x,  0,   "Sega",   "32X", GAME_NOT_WORKING )
+CONS( 1993, megacd,     0,         0,      genesis_scd,     md,     md_eur,    0,   "Sega",   "Mega-CD (Europe, PAL)", GAME_NOT_WORKING )
+CONS( 1991, megacdj,    megacd,    0,      genesis_scd,     md,     md_jpn,    0,   "Sega",   "Mega-CD (Japan, NTSC)", GAME_NOT_WORKING )
+CONS( 1992, segacd,     megacd,    0,      genesis_scd,     md,     genesis,   0,   "Sega",   "Sega CD (USA, NTSC)", GAME_NOT_WORKING )
+CONS( 1994, 32x_scd,    megacd,    0,      genesis_32x_scd, md_sel, mess_32x,  0,   "Sega",   "Sega CD (USA, NTSC, w/32X)", GAME_NOT_WORKING )

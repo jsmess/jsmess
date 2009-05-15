@@ -93,6 +93,11 @@ const game_driver * const drivers[] =
 	DRIVER( pico )		/* 1994 Sega Pico (Europe)							*/
 	DRIVER( picou )		/* 1994 Sega Pico (USA)								*/
 	DRIVER( picoj )		/* 1993 Sega Pico (Japan)							*/
+	DRIVER( megacd )	/* 1993 Sega Mega-CD (Europe)						*/
+	DRIVER( megacdj )	/* 1991 Sega Mega-CD (Japan)						*/
+	DRIVER( segacd )	/* 1992 Sega Sega CD (USA)							*/
+	DRIVER( 32x )		/* 1994 Sega 32X (USA)								*/
+	DRIVER( 32x_scd )	/* 1994 Sega Sega CD (USA w/32X addon)				*/
 
 	DRIVER( saturnjp )	/* 1994 Sega Saturn (Japan)							*/
 	DRIVER( saturn )	/* 1995 Sega Saturn (USA)							*/

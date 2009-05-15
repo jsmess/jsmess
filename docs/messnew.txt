@@ -1,8 +1,8 @@
-﻿0.131.1
+0.131.1
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
-- Amiga 1200 NTSC & PAL (not working)  [incog nito, Fabio Priuli]
+- Amiga 1200 NTSC & PAL (not working)  [incog nito, Dirk Best, Fabio Priuli]
 - Amiga CD32 (not working)  [incog nito, Fabio Priuli]
 - CD-I (not working)  [incog nito]
 - NTS DreamWriter T200 (not working)  [Roberto Carlos
@@ -64,6 +64,9 @@ Skeleton drivers :
 - Camputers Lynx 48
 - Camputers Lynx 96
 - Camputers Lynx 128
+- Sega 32X
+- Sega Mega-CD
+- Sega CD
 
 
 System Driver Changes:
