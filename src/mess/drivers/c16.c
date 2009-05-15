@@ -403,10 +403,20 @@ static const tpi6525_interface c16_tpi6525_tpi_3_intf =
 };
 
 
+static const m6502_interface c16_m7501_interface =
+{
+	NULL,
+	NULL,
+	c16_m7501_port_read,
+	c16_m7501_port_write
+};
+
+
 static MACHINE_DRIVER_START( c16 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M7501, 1400000)        /* 7.8336 MHz */
 	MDRV_CPU_PROGRAM_MAP(c16_map)
+	MDRV_CPU_CONFIG( c16_m7501_interface )
 	MDRV_CPU_VBLANK_INT("screen", c16_frame_interrupt)
 	MDRV_CPU_PERIODIC_INT(ted7360_raster_interrupt, TED7360_HRETRACERATE)
 	MDRV_QUANTUM_TIME(HZ(60))
@@ -482,6 +492,7 @@ static MACHINE_DRIVER_START( plus4 )
 	MDRV_IMPORT_FROM( c16 )
 	MDRV_CPU_REPLACE( "maincpu", M7501, 1200000)
 	MDRV_CPU_PROGRAM_MAP(plus4_map)
+	MDRV_CPU_CONFIG( c16_m7501_interface )
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(TED7360NTSC_VRETRACERATE)
 

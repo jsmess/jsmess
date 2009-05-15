@@ -36,6 +36,8 @@ INTERRUPT_GEN( apple3_interrupt );
 READ8_HANDLER( apple3_00xx_r );
 WRITE8_HANDLER( apple3_00xx_w );
 
+READ8_HANDLER( apple3_indexed_read );
+WRITE8_HANDLER( apple3_indexed_write );
 
 /*----------- defined in video/apple3.c -----------*/
 

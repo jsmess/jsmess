@@ -469,6 +469,15 @@ static const sid6581_interface c64_sound_interface =
 };
 
 
+static const m6502_interface c64_m6510_interface =
+{
+	NULL,
+	NULL,
+	c64_m6510_port_read,
+	c64_m6510_port_write
+};
+
+
 /*************************************
  *
  *  Machine driver
@@ -479,6 +488,7 @@ static MACHINE_DRIVER_START( c64 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6510, VIC6567_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(c64_mem)
+	MDRV_CPU_CONFIG( c64_m6510_interface )
 	MDRV_CPU_VBLANK_INT("screen", c64_frame_interrupt)
 	MDRV_CPU_PERIODIC_INT(vic2_raster_irq, VIC6567_HRETRACERATE)
 	MDRV_QUANTUM_TIME(HZ(60))
@@ -519,6 +529,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( c64pal )
 	MDRV_CPU_ADD( "maincpu", M6510, VIC6569_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(c64_mem)
+	MDRV_CPU_CONFIG( c64_m6510_interface )
 	MDRV_CPU_VBLANK_INT("screen", c64_frame_interrupt)
 	MDRV_CPU_PERIODIC_INT(vic2_raster_irq, VIC6569_HRETRACERATE)
 	MDRV_QUANTUM_TIME(HZ(50))
@@ -556,6 +567,7 @@ static MACHINE_DRIVER_START( ultimax )
 	MDRV_IMPORT_FROM( c64 )
 	MDRV_CPU_REPLACE( "maincpu", M6510, VIC6567_CLOCK)
 	MDRV_CPU_PROGRAM_MAP( ultimax_mem)
+	MDRV_CPU_CONFIG( c64_m6510_interface )
 
 	MDRV_SOUND_REPLACE("sid6581", SID6581, VIC6567_CLOCK)
 	MDRV_SOUND_CONFIG(c64_sound_interface)

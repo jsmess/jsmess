@@ -431,10 +431,6 @@ static void c16_common_driver_init (running_machine *machine)
 {
 	UINT8 *rom;
 
-	/* configure the M7501 port */
-	m6510_set_port_read_callback(cputag_get_cpu(machine, "maincpu"), c16_m7501_port_read);
-	m6510_set_port_write_callback(cputag_get_cpu(machine, "maincpu"),c16_m7501_port_write);
-
 	c16_select_roms (cputag_get_address_space(machine,"maincpu",ADDRESS_SPACE_PROGRAM), 0, 0);
 	c16_switch_to_rom (cputag_get_address_space(machine,"maincpu",ADDRESS_SPACE_PROGRAM), 0, 0);
 

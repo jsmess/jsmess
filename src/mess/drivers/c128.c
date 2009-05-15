@@ -569,6 +569,14 @@ static const sid6581_interface c128_sound_interface =
 };
 
 
+static const m6502_interface c128_m8502_interface =
+{
+	NULL,
+	NULL,
+	c128_m6510_port_read,
+	c128_m6510_port_write
+};
+
 
 /*************************************
  *
@@ -587,6 +595,7 @@ static MACHINE_DRIVER_START( c128 )
 
 	MDRV_CPU_ADD("m8502", M8502, VIC6567_CLOCK)
 	MDRV_CPU_PROGRAM_MAP( c128_mem)
+	MDRV_CPU_CONFIG( c128_m8502_interface )
 	MDRV_CPU_VBLANK_INT("screen", c64_frame_interrupt)
 	MDRV_CPU_PERIODIC_INT(vic2_raster_irq, VIC6567_HRETRACERATE)
 
@@ -639,6 +648,7 @@ static MACHINE_DRIVER_START( c128pal )
 	MDRV_IMPORT_FROM( c128 )
 	MDRV_CPU_REPLACE( "maincpu", Z80, VIC6569_CLOCK )
 	MDRV_CPU_REPLACE( "m8502", M8502, VIC6569_CLOCK )
+	MDRV_CPU_CONFIG( c128_m8502_interface )
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(VIC6569_VRETRACERATE)
 	MDRV_SCREEN_SIZE(VIC6569_COLUMNS * 2, VIC6569_LINES)

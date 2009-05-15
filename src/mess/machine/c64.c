@@ -1018,10 +1018,6 @@ TIMER_CALLBACK( c64_tape_timer )
 
 static void c64_common_driver_init (running_machine *machine)
 {
-	/* configure the M6510 port */
-	m6510_set_port_read_callback(cputag_get_cpu(machine, "maincpu"), c64_m6510_port_read);
-	m6510_set_port_write_callback(cputag_get_cpu(machine, "maincpu"),c64_m6510_port_write);
-	
 	if (!ultimax)
 	{
 		UINT8 *mem = memory_region(machine, "maincpu");

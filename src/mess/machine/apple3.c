@@ -617,7 +617,7 @@ static UINT8 *apple3_get_indexed_addr(offs_t offset)
 
 
 
-static READ8_HANDLER( apple3_indexed_read )
+READ8_HANDLER( apple3_indexed_read )
 {
 	UINT8 result;
 	UINT8 *addr;
@@ -634,7 +634,7 @@ static READ8_HANDLER( apple3_indexed_read )
 
 
 
-static WRITE8_HANDLER( apple3_indexed_write )
+WRITE8_HANDLER( apple3_indexed_write )
 {
 	UINT8 *addr;
 
@@ -730,10 +730,4 @@ DRIVER_INIT( apple3 )
 	apple3_update_memory(machine);
 
 	memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), apple3_opbase);
-
-	/* the Apple /// does some weird tricks whereby it monitors the SYNC pin
-	 * on the CPU to check for indexed instructions and directs them to
-	 * different memory locations */
-	m6502_set_read_indexed_callback (cputag_get_cpu(machine, "maincpu"), apple3_indexed_read);
-	m6502_set_write_indexed_callback(cputag_get_cpu(machine, "maincpu"), apple3_indexed_write);
 }

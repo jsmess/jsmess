@@ -821,7 +821,7 @@ static int c128_dma_read_color(running_machine *machine, int offset)
 
 static emu_timer *datasette_timer;
 
-static void c128_m6510_port_write(const device_config *device, UINT8 direction, UINT8 data)
+void c128_m6510_port_write(const device_config *device, UINT8 direction, UINT8 data)
 {
 	/* if line is marked as input then keep current value */
 	data = (c64_port_data & ~direction) | (data & direction);
@@ -866,7 +866,7 @@ static void c128_m6510_port_write(const device_config *device, UINT8 direction, 
 	c64_memory[0x001] = memory_read_byte( cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM), 1 );
 }
 
-static UINT8 c128_m6510_port_read(const device_config *device, UINT8 direction)
+UINT8 c128_m6510_port_read(const device_config *device, UINT8 direction)
 {
 	UINT8 data = c64_port_data;
 
@@ -890,10 +890,6 @@ static void c128_common_driver_init(running_machine *machine)
 	UINT8 *gfx=memory_region(machine, "gfx1");
 	UINT8 *ram = memory_region(machine, "maincpu");
 	int i;
-
-	/* configure the M6510 port */
-	m6510_set_port_read_callback(cputag_get_cpu(machine, "m8502"), c128_m6510_port_read);
-	m6510_set_port_write_callback(cputag_get_cpu(machine, "m8502"),c128_m6510_port_write);
 
 	c64_memory = ram;
 
