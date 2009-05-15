@@ -12,8 +12,8 @@
 #define TRSM200_VIDEORAM_SIZE	0x2000
 #define TRSM200_VIDEORAM_MASK	0x1fff
 
-typedef struct _kyocera_state kyocera_state;
-struct _kyocera_state
+typedef struct _kc85_state kc85_state;
+struct _kc85_state
 {
 	/* memory state */
 	UINT8 bank;				/* memory bank selection */
@@ -61,12 +61,12 @@ struct _tandy200_state
 
 /* ---------- defined in video/kyocera.c ---------- */
 
-READ8_HANDLER( kyo85_lcd_status_r );
-READ8_HANDLER( kyo85_lcd_data_r );
-WRITE8_HANDLER( kyo85_lcd_command_w );
-WRITE8_HANDLER( kyo85_lcd_data_w );
+READ8_HANDLER( kc85_lcd_status_r );
+READ8_HANDLER( kc85_lcd_data_r );
+WRITE8_HANDLER( kc85_lcd_command_w );
+WRITE8_HANDLER( kc85_lcd_data_w );
 
-MACHINE_DRIVER_EXTERN( kyo85_video );
+MACHINE_DRIVER_EXTERN( kc85_video );
 MACHINE_DRIVER_EXTERN( tandy200_video );
 
 #endif

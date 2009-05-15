@@ -11,18 +11,15 @@
 	  - Kyocera Kyotronic 85
 	  - Olivetti M10 (slightly diff hw, BIOS is shifted by 2 words)
 	  - NEC PC-8201A (slightly diff hw)
-	  - Tandy Model 100
+	  - TRS-80 Model 100
 	  - Tandy Model 102 (slightly diff hw)
 	  - Tandy Model 200 (diff video & rtc)
 	
 	To Do:
 	  - Find dumps of systems which could easily be added:
-		* Olivetti M10 US (diff BIOS than the European version, it might be the alt BIOS)
+		* Olivetti M10 Modem (US) (diff BIOS than the European version)
 		* NEC PC-8201 (original Japanese version of PC-8201A)
-
-	  - Investigate other similar machines:
-		* NEC PC-8300 (similar hardware?)
-		* Tandy Model 600 (possibly different?)
+		* NEC PC-8300 (similar hardware to PC-8201)
 
 ******************************************************************************************/
 
@@ -30,18 +27,19 @@
 
 	TODO:
 
-	- pc8201 memory banking
+	- pc8201 keyboard
 	- pc8201 I/O control registers
-	- NEC PC-8233 floppy controller
-	- NEC floppy disc drives (PC-8031-1W, PC-8031-2W, PC-80S31)
-	- NEC PC-8240 video monitor adapter
-	- Tandy Portable Disk Drive (TPDD: 100k 3½", TPDD2: 200k 3½")
-	- Chipmunk disk drive (384k 3½")
 	- soft power on/off
-	- RS232/modem select
+	- kc85 IM6042 UART
+	- pc8201 NEC PC-8233 floppy controller
+	- pc8201 NEC floppy disc drives (PC-8031-1W, PC-8031-2W, PC-80S31)
+	- pc8201 NEC PC-8240 video monitor adapter
+	- trsm100 Tandy Portable Disk Drive (TPDD: 100k 3½", TPDD2: 200k 3½") (undumped HD63A01V1 MCU + full custom uPD65002, serial comms via the missing IM6042, not going to happen anytime soon)
+	- trsm100 Chipmunk disk drive (384k 3½") (full custom logic, not going to happen)
+	- kc85 RS232/modem select
 	- tandy200 RTC alarm
 	- tandy200 TCM5089 sound
-	- IM6042 UART
+	- tandy200 TP timer real value
 
 */
 
@@ -68,14 +66,14 @@ static UINT8 sio;
 
 static READ8_HANDLER( pc8201_bank_r )
 {
-	kyocera_state *state = space->machine->driver_data;
+	kc85_state *state = space->machine->driver_data;
 
 	return (sio & 0xc0) | state->bank;
 }
 
 static void pc8201_bankswitch(running_machine *machine, UINT8 data)
 {
-	kyocera_state *state = machine->driver_data;
+	kc85_state *state = machine->driver_data;
 
 	const address_space *program = cputag_get_address_space(machine, I8085_TAG, ADDRESS_SPACE_PROGRAM);
 
@@ -155,7 +153,7 @@ static WRITE8_HANDLER( pc8201_90_w )
 
 	*/
 
-	kyocera_state *state = space->machine->driver_data;
+	kc85_state *state = space->machine->driver_data;
 	
 	sio = data;
 
@@ -179,7 +177,7 @@ static WRITE8_HANDLER( pc8201_e0_w )
 
 	*/
 
-//	kyocera_state *state = space->machine->driver_data;
+//	kc85_state *state = space->machine->driver_data;
 }
 
 static WRITE8_HANDLER( im6402_ctrl_w )
@@ -199,7 +197,7 @@ static WRITE8_HANDLER( im6402_ctrl_w )
 
 	*/
 /*
-	kyocera_state *state = space->machine->driver_data;
+	kc85_state *state = space->machine->driver_data;
 
 	im6402_sbs_w(state->im6402, BIT(data, 0));
 	im6402_epe_w(state->im6402, BIT(data, 0));
@@ -226,7 +224,7 @@ static READ8_HANDLER( im6402_status_r )
 
 	*/
 /*
-	kyocera_state *state = space->machine->driver_data;
+	kc85_state *state = space->machine->driver_data;
 
 	UINT8 data = 0;
 
@@ -279,7 +277,7 @@ static WRITE8_HANDLER( e0_w )
 
 	*/
 
-	kyocera_state *state = space->machine->driver_data;
+	kc85_state *state = space->machine->driver_data;
 
 	/* ROM bank selection */
 	memory_set_bank(space->machine, 1, BIT(data, 0));
@@ -313,7 +311,7 @@ static UINT8 read_keyboard(running_machine *machine, UINT16 keylatch)
 
 static READ8_HANDLER( keyboard_r )
 {
-	kyocera_state *state = space->machine->driver_data;
+	kc85_state *state = space->machine->driver_data;
 
 	return read_keyboard(space->machine, state->keylatch);
 }
@@ -394,7 +392,7 @@ static WRITE8_HANDLER( tandy200_stbk_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( kyo85_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( kc85_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK(1)
 	AM_RANGE(0x8000, 0xffff) AM_RAMBANK(2)
@@ -413,7 +411,7 @@ static ADDRESS_MAP_START( tandy200_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa000, 0xffff) AM_RAMBANK(2)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kyo85_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( kc85_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 //	AM_RANGE(0x70, 0x70) AM_MIRROR(0x0f) optional RAM unit
 //	AM_RANGE(0x80, 0x80) AM_MIRROR(0x0f) optional I/O controller unit
@@ -423,8 +421,8 @@ static ADDRESS_MAP_START( kyo85_io, ADDRESS_SPACE_IO, 8 )
 //	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x0f) AM_DEVREADWRITE(IM6402_TAG, im6402_data_r, im6402_data_w)
 	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_READWRITE(im6402_status_r, im6402_ctrl_w)
 	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0f) AM_READWRITE(keyboard_r, e0_w)
-	AM_RANGE(0xf0, 0xf0) AM_MIRROR(0x0e) AM_READWRITE(kyo85_lcd_status_r, kyo85_lcd_command_w)
-	AM_RANGE(0xf1, 0xf1) AM_MIRROR(0x0e) AM_READWRITE(kyo85_lcd_data_r, kyo85_lcd_data_w)
+	AM_RANGE(0xf0, 0xf0) AM_MIRROR(0x0e) AM_READWRITE(kc85_lcd_status_r, kc85_lcd_command_w)
+	AM_RANGE(0xf1, 0xf1) AM_MIRROR(0x0e) AM_READWRITE(kc85_lcd_data_r, kc85_lcd_data_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc8201_io, ADDRESS_SPACE_IO, 8 )
@@ -437,8 +435,8 @@ static ADDRESS_MAP_START( pc8201_io, ADDRESS_SPACE_IO, 8 )
 //	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x0f) AM_DEVREADWRITE(IM6402_TAG, im6402_data_r, im6402_data_w)
 	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_READWRITE(im6402_status_r, im6402_ctrl_w)
 	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0f) AM_READWRITE(keyboard_r, pc8201_e0_w)
-	AM_RANGE(0xf0, 0xf0) AM_MIRROR(0x0e) AM_READWRITE(kyo85_lcd_status_r, kyo85_lcd_command_w)
-	AM_RANGE(0xf1, 0xf1) AM_MIRROR(0x0e) AM_READWRITE(kyo85_lcd_data_r, kyo85_lcd_data_w)
+	AM_RANGE(0xf0, 0xf0) AM_MIRROR(0x0e) AM_READWRITE(kc85_lcd_status_r, kc85_lcd_command_w)
+	AM_RANGE(0xf1, 0xf1) AM_MIRROR(0x0e) AM_READWRITE(kc85_lcd_data_r, kc85_lcd_data_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tandy200_io, ADDRESS_SPACE_IO, 8 )
@@ -455,7 +453,7 @@ ADDRESS_MAP_END
 
 /* Input Ports */
 
-static INPUT_PORTS_START( kyo85 )
+static INPUT_PORTS_START( kc85 )
 	PORT_START("KEY0")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M')
@@ -527,20 +525,20 @@ static INPUT_PORTS_START( kyo85 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SPACE") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
 
 	PORT_START("KEY7")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F8) PORT_CHAR(UCHAR_MAMEKEY(F8))
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F7) PORT_CHAR(UCHAR_MAMEKEY(F7))
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F6) PORT_CHAR(UCHAR_MAMEKEY(F6))
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F5) PORT_CHAR(UCHAR_MAMEKEY(F5))
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F4) PORT_CHAR(UCHAR_MAMEKEY(F4))
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F3) PORT_CHAR(UCHAR_MAMEKEY(F3))
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F2) PORT_CHAR(UCHAR_MAMEKEY(F2))
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1))
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F8") PORT_CODE(KEYCODE_F8) PORT_CHAR(UCHAR_MAMEKEY(F8))
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F7") PORT_CODE(KEYCODE_F7) PORT_CHAR(UCHAR_MAMEKEY(F7))
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F6") PORT_CODE(KEYCODE_F6) PORT_CHAR(UCHAR_MAMEKEY(F6))
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F5") PORT_CODE(KEYCODE_F5) PORT_CHAR(UCHAR_MAMEKEY(F5))
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F4") PORT_CODE(KEYCODE_F4) PORT_CHAR(UCHAR_MAMEKEY(F4))
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F3") PORT_CODE(KEYCODE_F3) PORT_CHAR(UCHAR_MAMEKEY(F3))
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F2") PORT_CODE(KEYCODE_F2) PORT_CHAR(UCHAR_MAMEKEY(F2))
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F1") PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1))
 
 	PORT_START("KEY8")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("PAUSE BREAK") PORT_CODE(KEYCODE_F12) PORT_CHAR(UCHAR_MAMEKEY(F12))
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CAPS LOCK") PORT_CODE(KEYCODE_CAPSLOCK)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("NUM") PORT_CODE(KEYCODE_RALT) PORT_CHAR(UCHAR_MAMEKEY(RALT))
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("NUM") PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_MAMEKEY(RCONTROL))
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CODE") PORT_CODE(KEYCODE_RALT) PORT_CHAR(UCHAR_MAMEKEY(RALT))
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("GRAPH") PORT_CODE(KEYCODE_LALT) PORT_CHAR(UCHAR_MAMEKEY(LALT))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
@@ -548,7 +546,7 @@ static INPUT_PORTS_START( kyo85 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pc8201a )
-	PORT_INCLUDE( kyo85 )
+	PORT_INCLUDE( kc85 )
 
 	PORT_MODIFY("KEY3")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(']') PORT_CHAR('}')
@@ -582,6 +580,23 @@ static INPUT_PORTS_START( pc8201a )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x93") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x91") PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("DEL BKSP") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
+	
+	PORT_MODIFY("KEY7")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("STOP") PORT_CODE(KEYCODE_F8) PORT_CHAR(UCHAR_MAMEKEY(F8))
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("f.5") PORT_CODE(KEYCODE_F5) PORT_CHAR(UCHAR_MAMEKEY(F5))
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("f.4") PORT_CODE(KEYCODE_F4) PORT_CHAR(UCHAR_MAMEKEY(F4))
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("f.3") PORT_CODE(KEYCODE_F3) PORT_CHAR(UCHAR_MAMEKEY(F3))
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("f.2") PORT_CODE(KEYCODE_F2) PORT_CHAR(UCHAR_MAMEKEY(F2))
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("f.1") PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1))
+
+	PORT_MODIFY("KEY8")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CAPS LOCK") PORT_CODE(KEYCODE_CAPSLOCK)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR('[') PORT_CHAR('{')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RALT) PORT_CHAR(']') PORT_CHAR('}')
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( olivm10 )
@@ -680,7 +695,7 @@ INPUT_PORTS_END
 
 static WRITE_LINE_DEVICE_HANDLER( kyocera_upd1990a_data_w )
 {
-	kyocera_state *driver_state = device->machine->driver_data;
+	kc85_state *driver_state = device->machine->driver_data;
 
 	driver_state->upd1990a_data = state;
 }
@@ -715,7 +730,7 @@ static READ8_DEVICE_HANDLER( kyocera_8155_port_c_r )
 
 	*/
 
-	kyocera_state *state = device->machine->driver_data;
+	kc85_state *state = device->machine->driver_data;
 
 	UINT8 data = 0;
 
@@ -743,7 +758,7 @@ static WRITE8_DEVICE_HANDLER( kyocera_8155_port_a_w )
 
 	*/
 
-	kyocera_state *state = device->machine->driver_data;
+	kc85_state *state = device->machine->driver_data;
 
 	/* keyboard */
 	state->keylatch = (state->keylatch & 0x100) | data;
@@ -783,7 +798,7 @@ static WRITE8_DEVICE_HANDLER( kyocera_8155_port_b_w )
 
 	*/
 
-	kyocera_state *state = device->machine->driver_data;
+	kc85_state *state = device->machine->driver_data;
 
 	/* keyboard */
 	state->keylatch = (BIT(data, 0) << 8) | (state->keylatch & 0xff);
@@ -801,7 +816,7 @@ static WRITE8_DEVICE_HANDLER( kyocera_8155_port_b_w )
 
 static WRITE_LINE_DEVICE_HANDLER( kyocera_8155_to_w )
 {
-	kyocera_state *driver_state = device->machine->driver_data;
+	kc85_state *driver_state = device->machine->driver_data;
 
 	if (!driver_state->buzzer && driver_state->bell)
 	{
@@ -921,9 +936,9 @@ static PIO8155_INTERFACE( tandy200_8155_intf )
 
 /* Machine Drivers */
 
-static MACHINE_START( kyo85 )
+static MACHINE_START( kc85 )
 {
-	kyocera_state *state = machine->driver_data;
+	kc85_state *state = machine->driver_data;
 
 	const address_space *program = cputag_get_address_space(machine, I8085_TAG, ADDRESS_SPACE_PROGRAM);
 
@@ -968,7 +983,7 @@ static MACHINE_START( kyo85 )
 
 static MACHINE_START( pc8201 )
 {
-	kyocera_state *state = machine->driver_data;
+	kc85_state *state = machine->driver_data;
 
 	/* find devices */
 	state->upd1990a = devtag_get_device(machine, UPD1990A_TAG);
@@ -1002,7 +1017,7 @@ static MACHINE_START( pc8201 )
 
 static MACHINE_START( trsm100 )
 {
-	kyocera_state *state = machine->driver_data;
+	kc85_state *state = machine->driver_data;
 
 	const address_space *program = cputag_get_address_space(machine, I8085_TAG, ADDRESS_SPACE_PROGRAM);
 	
@@ -1115,19 +1130,19 @@ static TIMER_DEVICE_CALLBACK( tandy200_tp_tick )
 	state->tp = !state->tp;
 }
 
-static MACHINE_DRIVER_START( kyo85 )
-	MDRV_DRIVER_DATA(kyocera_state)
+static MACHINE_DRIVER_START( kc85 )
+	MDRV_DRIVER_DATA(kc85_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(I8085_TAG, 8085A, 2400000)
-	MDRV_CPU_PROGRAM_MAP(kyo85_mem)
-	MDRV_CPU_IO_MAP(kyo85_io)
+	MDRV_CPU_ADD(I8085_TAG, 8085A, XTAL_4_9152MHz)
+	MDRV_CPU_PROGRAM_MAP(kc85_mem)
+	MDRV_CPU_IO_MAP(kc85_io)
 	MDRV_CPU_CONFIG(kyocera_i8085_config)
 
-	MDRV_MACHINE_START( kyo85 )
+	MDRV_MACHINE_START( kc85 )
 
 	/* video hardware */
-	MDRV_IMPORT_FROM(kyo85_video)
+	MDRV_IMPORT_FROM(kc85_video)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -1135,7 +1150,7 @@ static MACHINE_DRIVER_START( kyo85 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MDRV_PIO8155_ADD(PIO8155_TAG, 2400000, kyocera_8155_intf)
+	MDRV_PIO8155_ADD(PIO8155_TAG, XTAL_4_9152MHz/2, kyocera_8155_intf)
 	MDRV_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, kyocera_upd1990a_intf)
 
 	/* printer */
@@ -1151,10 +1166,10 @@ static MACHINE_DRIVER_START( kyo85 )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pc8201 )
-	MDRV_DRIVER_DATA(kyocera_state)
+	MDRV_DRIVER_DATA(kc85_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(I8085_TAG, 8085A, 2400000)
+	MDRV_CPU_ADD(I8085_TAG, 8085A, XTAL_4_9152MHz)
 	MDRV_CPU_PROGRAM_MAP(pc8201_mem)
 	MDRV_CPU_IO_MAP(pc8201_io)
 	MDRV_CPU_CONFIG(kyocera_i8085_config)
@@ -1162,7 +1177,7 @@ static MACHINE_DRIVER_START( pc8201 )
 	MDRV_MACHINE_START(pc8201)
 
 	/* video hardware */
-	MDRV_IMPORT_FROM(kyo85_video)
+	MDRV_IMPORT_FROM(kc85_video)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -1170,7 +1185,7 @@ static MACHINE_DRIVER_START( pc8201 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MDRV_PIO8155_ADD(PIO8155_TAG, 2400000, kyocera_8155_intf)
+	MDRV_PIO8155_ADD(PIO8155_TAG, XTAL_4_9152MHz/2, kyocera_8155_intf)
 	MDRV_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, kyocera_upd1990a_intf)
 
 	/* printer */
@@ -1186,7 +1201,7 @@ static MACHINE_DRIVER_START( pc8201 )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( trsm100 )
-	MDRV_IMPORT_FROM(kyo85)
+	MDRV_IMPORT_FROM(kc85)
 
 	MDRV_MACHINE_START(trsm100)
 MACHINE_DRIVER_END
@@ -1195,7 +1210,7 @@ static MACHINE_DRIVER_START( tandy200 )
 	MDRV_DRIVER_DATA(tandy200_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(I8085_TAG, 8085A, XTAL_2_4576MHz)
+	MDRV_CPU_ADD(I8085_TAG, 8085A, XTAL_4_9152MHz)
 	MDRV_CPU_PROGRAM_MAP(tandy200_mem)
 	MDRV_CPU_IO_MAP(tandy200_io)
 	MDRV_CPU_CONFIG(kyocera_i8085_config)
@@ -1206,7 +1221,7 @@ static MACHINE_DRIVER_START( tandy200 )
 	MDRV_IMPORT_FROM(tandy200_video)
 
 	/* TP timer */
-	MDRV_TIMER_ADD_PERIODIC("tp", tandy200_tp_tick, HZ((XTAL_2_4576MHz/8192)*2))
+	MDRV_TIMER_ADD_PERIODIC("tp", tandy200_tp_tick, USEC(3300)) // 3.3 ms
 
 	/* sound hardware */
 //	MDRV_TCM5089_ADD(TCM5089_TAG, XTAL_3_579545MHz)
@@ -1216,7 +1231,7 @@ static MACHINE_DRIVER_START( tandy200 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MDRV_PIO8155_ADD(PIO8155_TAG, XTAL_2_4576MHz, tandy200_8155_intf)
+	MDRV_PIO8155_ADD(PIO8155_TAG, XTAL_4_9152MHz/2, tandy200_8155_intf)
 	MDRV_RP5C01A_ADD(RP5C01A_TAG, XTAL_32_768kHz, tandy200_rp5c01a_intf)
 
 	/* printer */
@@ -1233,7 +1248,7 @@ MACHINE_DRIVER_END
 
 /* ROMs */
 
-ROM_START( kyo85 )
+ROM_START( kc85 )
 	ROM_REGION( 0x8000, I8085_TAG, 0 )
 	ROM_LOAD( "kc85rom.bin", 0x0000, 0x8000, CRC(8a9ddd6b) SHA1(9d18cb525580c9e071e23bc3c472380aa46356c0) )
 
@@ -1284,7 +1299,7 @@ ROM_END
 
 /* System Configurations */
 
-static SYSTEM_CONFIG_START( kyo85 )
+static SYSTEM_CONFIG_START( kc85 )
 	CONFIG_RAM_DEFAULT	(16 * 1024)
 	CONFIG_RAM			(32 * 1024)
 SYSTEM_CONFIG_END
@@ -1317,12 +1332,12 @@ SYSTEM_CONFIG_END
 /* System Drivers */
 
 /*    YEAR  NAME		PARENT	COMPAT	MACHINE		INPUT		INIT	CONFIG		COMPANY					FULLNAME */
-COMP( 1983,	kyo85,		0,		0,		kyo85,		kyo85,		0,		kyo85,		"Kyocera",				"Kyotronic 85 (Japan)", 0 )
-COMP( 1983, olivm10,	kyo85,	0,		kyo85,		olivm10,	0,		kyo85,		"Olivetti",				"M-10", 0 )
-//COMP( 1983, olivm10m,	kyo85,	0,		kyo85,		olivm10,	0,		kyo85,		"Olivetti",				"M-10 Modem (US)", 0 )
-COMP( 1983, trsm100,	0,		0,		trsm100,	kyo85,		0,		trsm100,	"Tandy Radio Shack",	"TRS-80 Model 100", 0 )
-COMP( 1986, tandy102,	trsm100,0,		trsm100,	kyo85,		0,		tandy102,	"Tandy Radio Shack",	"Tandy 102", 0 )
+COMP( 1983,	kc85,		0,		0,		kc85,		kc85,		0,		kc85,		"Kyocera",				"Kyotronic 85 (Japan)", 0 )
+COMP( 1983, olivm10,	kc85,	0,		kc85,		olivm10,	0,		kc85,		"Olivetti",				"M-10", 0 )
+//COMP( 1983, olivm10m,	kc85,	0,		kc85,		olivm10,	0,		kc85,		"Olivetti",				"M-10 Modem (US)", 0 )
+COMP( 1983, trsm100,	0,		0,		trsm100,	kc85,		0,		trsm100,	"Tandy Radio Shack",	"TRS-80 Model 100", 0 )
+COMP( 1986, tandy102,	trsm100,0,		trsm100,	kc85,		0,		tandy102,	"Tandy Radio Shack",	"Tandy 102", 0 )
 //COMP( 1983, npc8201,	0,		0,		pc8201,		pc8201a,	0,		pc8201,		"NEC",					"PC-8201 (Japan)", 0 )
 COMP( 1983, npc8201a,	0,		0,		pc8201,		pc8201a,	0,		pc8201,		"NEC",					"PC-8201A", 0 )
-//COMP( 1983, npc8300,	npc8201,0,		pc8300,		pc8300,		0,		pc8300,		"NEC",					"PC-8300", 0 )
-COMP( 1984, tandy200,	0,		0,		tandy200,	kyo85,		0,		tandy200,	"Tandy Radio Shack",	"Tandy 200", 0 )
+//COMP( 1987, npc8300,	npc8201,0,		pc8300,		pc8300,		0,		pc8300,		"NEC",					"PC-8300", 0 )
+COMP( 1984, tandy200,	0,		0,		tandy200,	kc85,		0,		tandy200,	"Tandy Radio Shack",	"Tandy 200", 0 )

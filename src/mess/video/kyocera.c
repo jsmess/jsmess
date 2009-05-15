@@ -5,9 +5,9 @@
 #include "kyo85.lh"
 #include "tandy200.lh"
 
-READ8_HANDLER( kyo85_lcd_status_r )
+READ8_HANDLER( kc85_lcd_status_r )
 {
-	kyocera_state *state = space->machine->driver_data;
+	kc85_state *state = space->machine->driver_data;
 
 	UINT8 data = 0;
 	int i;
@@ -23,9 +23,9 @@ READ8_HANDLER( kyo85_lcd_status_r )
 	return data;
 }
 
-READ8_HANDLER( kyo85_lcd_data_r )
+READ8_HANDLER( kc85_lcd_data_r )
 {
-	kyocera_state *state = space->machine->driver_data;
+	kc85_state *state = space->machine->driver_data;
 	UINT8 data = 0;
 	int i;
 
@@ -40,9 +40,9 @@ READ8_HANDLER( kyo85_lcd_data_r )
 	return data;
 }
 
-WRITE8_HANDLER( kyo85_lcd_command_w )
+WRITE8_HANDLER( kc85_lcd_command_w )
 {
-	kyocera_state *state = space->machine->driver_data;
+	kc85_state *state = space->machine->driver_data;
 	int i;
 
 	for (i = 0; i < 10; i++)
@@ -54,9 +54,9 @@ WRITE8_HANDLER( kyo85_lcd_command_w )
 	}
 }
 
-WRITE8_HANDLER( kyo85_lcd_data_w )
+WRITE8_HANDLER( kc85_lcd_data_w )
 {
-	kyocera_state *state = space->machine->driver_data;
+	kc85_state *state = space->machine->driver_data;
 	int i;
 	
 	for (i = 0; i < 10; i++)
@@ -68,15 +68,15 @@ WRITE8_HANDLER( kyo85_lcd_data_w )
 	}
 }
 
-static PALETTE_INIT( kyo85 )
+static PALETTE_INIT( kc85 )
 {
 	palette_set_color(machine, 0, MAKE_RGB(138, 146, 148));
 	palette_set_color(machine, 1, MAKE_RGB(92, 83, 88));
 }
 
-static VIDEO_START( kyo85 )
+static VIDEO_START( kc85 )
 {
-	kyocera_state *state = machine->driver_data;
+	kc85_state *state = machine->driver_data;
 	
 	/* find devices */
 	state->hd44102[0] = devtag_get_device(machine, "m1");
@@ -94,9 +94,9 @@ static VIDEO_START( kyo85 )
 	state_save_register_global_array(machine, state->lcd_cs2);
 }
 
-static VIDEO_UPDATE( kyo85 )
+static VIDEO_UPDATE( kc85 )
 {
-	kyocera_state *state = screen->machine->driver_data;
+	kc85_state *state = screen->machine->driver_data;
 
 	int i;
 
@@ -152,7 +152,7 @@ static HD61830_INTERFACE( tandy200_hd61830_intf )
 	DEVCB_MEMORY_HANDLER(I8085_TAG, PROGRAM, tandy200_rd_w)
 };
 
-MACHINE_DRIVER_START( kyo85_video )
+MACHINE_DRIVER_START( kc85_video )
 	MDRV_SCREEN_ADD(SCREEN_TAG, LCD)
 	MDRV_SCREEN_REFRESH_RATE(44)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -162,10 +162,10 @@ MACHINE_DRIVER_START( kyo85_video )
 	MDRV_DEFAULT_LAYOUT(layout_kyo85)
 
 	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(kyo85)
+	MDRV_PALETTE_INIT(kc85)
 
-	MDRV_VIDEO_START(kyo85)
-	MDRV_VIDEO_UPDATE(kyo85)
+	MDRV_VIDEO_START(kc85)
+	MDRV_VIDEO_UPDATE(kc85)
 
 	MDRV_HD44102_ADD( "m1", SCREEN_TAG,   0,  0)
 	MDRV_HD44102_ADD( "m2", SCREEN_TAG,  50,  0)
@@ -192,7 +192,7 @@ MACHINE_DRIVER_START( tandy200_video )
 	MDRV_DEFAULT_LAYOUT(layout_tandy200)
 
 	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(kyo85)
+	MDRV_PALETTE_INIT(kc85)
 
 	MDRV_VIDEO_START(tandy200)
 	MDRV_VIDEO_UPDATE(tandy200)

@@ -1171,7 +1171,7 @@ const game_driver * const drivers[] =
 	DRIVER( tec1 )			/* Talking Electronics Computer */
 
 	/* Kyocera (and clones) */
-	DRIVER( kyo85 )
+	DRIVER( kc85 )
 	DRIVER( olivm10 )	
 //	DRIVER( olivm10m )	
 	DRIVER( trsm100 )
