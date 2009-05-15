@@ -2,7 +2,7 @@
 #include "includes/kyocera.h"
 #include "video/hd44102.h"
 #include "video/hd61830.h"
-#include "kyo85.lh"
+#include "kc85.lh"
 #include "tandy200.lh"
 
 READ8_HANDLER( kc85_lcd_status_r )
@@ -159,7 +159,7 @@ MACHINE_DRIVER_START( kc85_video )
 	MDRV_SCREEN_SIZE(240, 64)
 	MDRV_SCREEN_VISIBLE_AREA(0, 240-1, 0, 64-1)
 
-	MDRV_DEFAULT_LAYOUT(layout_kyo85)
+	MDRV_DEFAULT_LAYOUT(layout_kc85)
 
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(kc85)
