@@ -31,6 +31,9 @@ struct _kc85_state
 	int buzzer;				/* buzzer select */
 	int bell;				/* bell output */
 
+	/* peripheral state */
+	int iosel;				/* serial interface select */
+
 	const device_config *hd44102[10];
 	const device_config *upd1990a;
 	const device_config *centronics;
