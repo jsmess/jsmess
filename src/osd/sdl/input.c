@@ -935,7 +935,7 @@ static kt_table * sdlinput_read_keymap(running_machine *machine)
 		return sdl_key_trans_table;
 	}
 
-	key_trans_table = auto_alloc(machine, kt_table);
+	key_trans_table = auto_alloc_array(machine, kt_table, ARRAY_LENGTH(sdl_key_trans_table));
 	memcpy((void *) key_trans_table, sdl_key_trans_table, sizeof(sdl_key_trans_table));
 	
 	while (!feof(keymap_file))
