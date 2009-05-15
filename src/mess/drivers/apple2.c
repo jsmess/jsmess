@@ -647,12 +647,12 @@ MACHINE_DRIVER_END
 
 ***************************************************************************/
 
-ROM_START(apple2)
+ROM_START(apple2) /* the classic, non-autoboot apple2 with integer basic in rom. optional card with autoboot and applesoft basic was possible but isn't yet supported */
 	ROM_REGION(0x0800,"gfx1",0)
 	ROM_LOAD ( "a2.chr", 0x0000, 0x0800, BAD_DUMP CRC(64f415c6) SHA1(f9d312f128c9557d9d6ac03bfad6c3ddf83e5659)) /* current dump is 341-0036 which is the appleII+ character generator, not the original appleII one, whose rom number is not yet known! */
 
 	ROM_REGION(0x4700,"maincpu",0)
-	ROM_LOAD_OPTIONAL ( "341-0016.rom", 0x1000, 0x0800, CRC(4234e88a) SHA1(c9a81d704dc2f0c3416c20f9c4ab71fedda937ed)) /* Programmer's Aid Rom 341-0016 */
+	ROM_LOAD_OPTIONAL ( "341-0016.rom", 0x1000, 0x0800, CRC(4234e88a) SHA1(c9a81d704dc2f0c3416c20f9c4ab71fedda937ed)) /* 341-0016: Programmer's Aid #1 D0 */
 
 /* The area $D800-$DFFF in Apple II is reserved for 3rd party add-ons:
    Maybe MESS should map this space to a CARTSLOT device?              */
@@ -661,10 +661,18 @@ ROM_START(apple2)
 	ROM_LOAD ( "341-0002-00.e8", 0x2800, 0x0800, CRC(a99c2cf6) SHA1(9767d92d04fc65c626223f25564cca31f5248980)) /* Needs verification. From eBay: Label: S7916E // C48078 // 3410002-00 // (C)APPLE78 E8 */
 	ROM_LOAD ( "341-0003-00.f0", 0x3000, 0x0800, CRC(62230d38) SHA1(f268022da555e4c809ca1ae9e5d2f00b388ff61c)) /* Needs verification. From eBay: Label: S7908E // C48709 // 3410003 // CAPPLE78 F0 */
 	ROM_LOAD ( "341-0004-00.f8", 0x3800, 0x0800, CRC(020a86d0) SHA1(52a18bd578a4694420009cad7a7a5779a8c00226))
-	ROM_LOAD ( "3410027a.rom", 0x4500, 0x0100, BAD_DUMP CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16)) /* should be 341-0009 and 341-0010 13-sector floppy roms, rather than the 341-0026/341-0027 16-sector floppy roms! */
-ROM_END
+	ROM_LOAD ( "341-0027-a.p5", 0x4500, 0x0100, CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16)) /* 341-0027-a: 16-sector disk drive (older version), PROM P5 */
+	//ROMX_LOAD ( "341-0009.p5", 0x4500, 0x0100, CRC(d34eb2ff) SHA1(afd060e6f35faf3bb0146fa889fc787adf56330a), ROM_BIOS(1)) /* 341-0009: 13-sector disk drive, PROM P5 */
+	//ROMX_LOAD ( "341-0027-a.p5", 0x4500, 0x0100, CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16), ROM_BIOS(2)) /* 341-0027-a: 16-sector disk drive (older version), PROM P5 */
+	//ROMX_LOAD ( "341-0127-a.p5a", 0x4500, 0x0100, NO_DUMP, ROM_BIOS(3)) /* 341-0127-A: 16-sector disk drive (later version) PROM P5; Label: 341-0127-A // (C) APPLE 81 P5A (see 'Apple Disk II Interface Card.jpg') */
 
-ROM_START(apple2p)
+	//ROM_REGION(0x100,"wsmprom",0) /* prom 'p6' for the woz state machine on 650-X104- Disk II interface card */
+	//ROMX_LOAD ( "341-0010.rom", 0x0000, 0x0100, CRC(62e22620) SHA1(e3d6d1c30653572b49ecc2dc54ce073978411a04), ROM_BIOS(1)) /* 341-0010: 13-sector disk drive, PROM P6 */
+	//ROMX_LOAD ( "341-0028-a.rom", 0x0000, 0x0100, CRC(b72a2c70) SHA1(bc39fbd5b9a8d2287ac5d0a42e639fc4d3c2f9d4), ROM_BIOS(2)) /* 341-0028: 16-sector disk drive (older version), PROM P6 */
+	//ROMX_LOAD ( "341-0128-a.rom", 0x0000, 0x0100, NO_DUMP, ROM_BIOS(3)) /* 341-0128-A: 16-sector disk drive (later version), PROM P6 Label: 341-0128-A // (C) APPLE 81 P6A (see 'Apple Disk II Interface Card.jpg') */
+	ROM_END
+
+ROM_START(apple2p) /* the autoboot apple2+ with applesoft (microsoft-written) basic in rom; optional card with monitor and integer basic was possible but isn't yet supported */
 	ROM_REGION(0x0800,"gfx1",0)
 	ROM_LOAD ( "341-0036.chr", 0x0000, 0x0800, CRC(64f415c6) SHA1(f9d312f128c9557d9d6ac03bfad6c3ddf83e5659))
 
@@ -675,7 +683,7 @@ ROM_START(apple2p)
 	ROM_LOAD ( "341-0014.e8", 0x2800, 0x0800, CRC(5719871a) SHA1(37501be96d36d041667c15d63e0c1eff2f7dd4e9))
 	ROM_LOAD ( "341-0015.f0", 0x3000, 0x0800, CRC(9a04eecf) SHA1(e6bf91ed28464f42b807f798fc6422e5948bf581))
 	ROM_LOAD ( "341-0020.f8", 0x3800, 0x0800, CRC(079589c4) SHA1(a28852ff997b4790e53d8d0352112c4b1a395098))
-	ROM_LOAD ( "3410027a.rom", 0x4500, 0x0100, CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16)) /* Disk II ROM - DOS 3.3 version */
+	ROM_LOAD ( "341-0027-a.rom", 0x4500, 0x0100, CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16)) /* 341-0027-a "P5A" State machine PROM (Disk II ROM - DOS 3.3 version?) */
 ROM_END
 
 ROM_START(apple2jp)
@@ -689,7 +697,7 @@ ROM_START(apple2jp)
 	ROM_LOAD ( "a2p.e8", 0x2800, 0x0800, BAD_DUMP CRC(5719871a) SHA1(37501be96d36d041667c15d63e0c1eff2f7dd4e9)) // not confirmed as the actual rom on motherboard
 	ROM_LOAD ( "a2p.f0", 0x3000, 0x0800, BAD_DUMP CRC(9a04eecf) SHA1(e6bf91ed28464f42b807f798fc6422e5948bf581)) // not confirmed as the actual rom on motherboard
 	ROM_LOAD ( "a2jp.f8", 0x3800, 0x0800, CRC(6ea8379b) SHA1(00a75ae3b58e1917ad640249366f654608589cf4))
-	ROM_LOAD ( "3410027a.rom", 0x4500, 0x0100, CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16)) /* Disk II ROM - DOS 3.3 version */
+	ROM_LOAD ( "341-0027-a.rom", 0x4500, 0x0100, CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16)) /* Disk II ROM - DOS 3.3 version */
 ROM_END
 
 ROM_START(ace100)
@@ -698,45 +706,45 @@ ROM_START(ace100)
 
 	ROM_REGION(0x4700,"maincpu",0)
 	ROM_LOAD ( "ace100.rom", 0x1000, 0x3000, CRC(9d5ec94f) SHA1(8f2b3f2561788bebc7a805f620ec9e7ade973460))
-	ROM_LOAD ( "3410027a.rom", 0x4500, 0x0100, CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16)) /* Disk II ROM - DOS 3.3 version */
+	ROM_LOAD ( "341-0027-a.rom", 0x4500, 0x0100, CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16)) /* Disk II ROM - DOS 3.3 version */
 ROM_END
 
 ROM_START(apple2e)
 	ROM_REGION(0x2000,"gfx1",0)
-	ROM_LOAD ( "3420133a.chr", 0x0000, 0x1000,CRC(b081df66) SHA1(7060de104046736529c1e8a687a0dd7b84f8c51b))
-	ROM_LOAD ( "3420133a.chr", 0x1000, 0x1000,CRC(b081df66) SHA1(7060de104046736529c1e8a687a0dd7b84f8c51b))
+	ROM_LOAD ( "342-0133-a.chr", 0x0000, 0x1000,CRC(b081df66) SHA1(7060de104046736529c1e8a687a0dd7b84f8c51b))
+	ROM_LOAD ( "342-0133-a.chr", 0x1000, 0x1000,CRC(b081df66) SHA1(7060de104046736529c1e8a687a0dd7b84f8c51b))
 
 	ROM_REGION(0x4700,"maincpu",0)
-	ROM_LOAD ( "3420135b.64", 0x0000, 0x2000, CRC(e248835e) SHA1(523838c19c79f481fa02df56856da1ec3816d16e))
-	ROM_LOAD ( "3420134a.64", 0x2000, 0x2000, CRC(fc3d59d8) SHA1(8895a4b703f2184b673078f411f4089889b61c54))
-	ROM_LOAD ( "3410027a.rom", 0x4500, 0x0100, CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16)) /* Disk II ROM - DOS 3.3 version */
+	ROM_LOAD ( "342-0135-b.64", 0x0000, 0x2000, CRC(e248835e) SHA1(523838c19c79f481fa02df56856da1ec3816d16e))
+	ROM_LOAD ( "342-0134-a.64", 0x2000, 0x2000, CRC(fc3d59d8) SHA1(8895a4b703f2184b673078f411f4089889b61c54))
+	ROM_LOAD ( "341-0027-a.rom", 0x4500, 0x0100, CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16)) /* Disk II ROM - DOS 3.3 version */
 ROM_END
 
 ROM_START(apple2ee)
 	ROM_REGION(0x2000,"gfx1",0)
-	ROM_LOAD ( "3420265a.chr", 0x0000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
-	ROM_LOAD ( "3420265a.chr", 0x1000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
+	ROM_LOAD ( "342-0265-a.chr", 0x0000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
+	ROM_LOAD ( "342-0265-a.chr", 0x1000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
 
 	ROM_REGION(0x4700,"maincpu",0)
-	ROM_LOAD ( "3420304a.64", 0x0000, 0x2000, CRC(443aa7c4) SHA1(3aecc56a26134df51e65e17f33ae80c1f1ac93e6))
-	ROM_LOAD ( "3420303a.64", 0x2000, 0x2000, CRC(95e10034) SHA1(afb09bb96038232dc757d40c0605623cae38088e))
-	ROM_LOAD ( "3410027a.rom", 0x4500, 0x0100, CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16)) /* Disk II ROM - DOS 3.3 version */
+	ROM_LOAD ( "342-0304-a.64", 0x0000, 0x2000, CRC(443aa7c4) SHA1(3aecc56a26134df51e65e17f33ae80c1f1ac93e6))
+	ROM_LOAD ( "342-0303-a.64", 0x2000, 0x2000, CRC(95e10034) SHA1(afb09bb96038232dc757d40c0605623cae38088e))
+	ROM_LOAD ( "341-0027-a.rom", 0x4500, 0x0100, CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16)) /* Disk II ROM - DOS 3.3 version */
 ROM_END
 
 ROM_START(apple2ep)
 	ROM_REGION(0x2000,"gfx1",0)
-	ROM_LOAD ( "3420265a.chr", 0x0000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
-	ROM_LOAD ( "3420265a.chr", 0x1000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
+	ROM_LOAD ( "342-0265-a.chr", 0x0000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
+	ROM_LOAD ( "342-0265-a.chr", 0x1000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
 
 	ROM_REGION(0x4700,"maincpu",0)
-	ROM_LOAD ("320349b.128", 0x0000, 0x4000, CRC(1d70b193) SHA1(b8ea90abe135a0031065e01697c4a3a20d51198b))
+	ROM_LOAD ("32-0349-b.128", 0x0000, 0x4000, CRC(1d70b193) SHA1(b8ea90abe135a0031065e01697c4a3a20d51198b)) /* should rom name be 342-0349-b? */
 	ROM_LOAD ("3410027a.rom", 0x4500, 0x0100, CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16)) /* Disk II ROM - DOS 3.3 version */
 ROM_END
 
 ROM_START(apple2c)
 	ROM_REGION(0x2000,"gfx1",0)
-	ROM_LOAD ( "3410265a.chr", 0x0000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
-	ROM_LOAD ( "3410265a.chr", 0x1000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
+	ROM_LOAD ( "341-0265-a.chr", 0x0000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
+	ROM_LOAD ( "341-0265-a.chr", 0x1000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
 
 	ROM_REGION(0x4000,"maincpu",0)
 	ROM_LOAD ( "a2c.128", 0x0000, 0x4000, CRC(f0edaa1b) SHA1(1a9b8aca5e32bb702ddb7791daddd60a89655729))
@@ -744,8 +752,8 @@ ROM_END
 
 ROM_START(apple2c0)
 	ROM_REGION(0x2000,"gfx1",0)
-	ROM_LOAD ( "3410265a.chr", 0x0000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
-	ROM_LOAD ( "3410265a.chr", 0x1000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
+	ROM_LOAD ( "341-0265-a.chr", 0x0000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
+	ROM_LOAD ( "341-0265-a.chr", 0x1000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
 
 	ROM_REGION(0x8700,"maincpu",0)
 	ROM_LOAD("3420033a.256", 0x0000, 0x8000, CRC(c8b979b3) SHA1(10767e96cc17bad0970afda3a4146564e6272ba1))
@@ -753,17 +761,17 @@ ROM_END
 
 ROM_START(apple2c3)
 	ROM_REGION(0x2000,"gfx1",0)
-	ROM_LOAD ( "3410265a.chr", 0x0000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
-	ROM_LOAD ( "3410265a.chr", 0x1000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
+	ROM_LOAD ( "341-0265-a.chr", 0x0000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
+	ROM_LOAD ( "341-0265-a.chr", 0x1000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
 
 	ROM_REGION(0x8700,"maincpu",0)
-	ROM_LOAD("3420445a.256", 0x0000, 0x8000, CRC(bc5a79ff) SHA1(5338d9baa7ae202457b6500fde5883dbdc86e5d3))
+	ROM_LOAD("342-0445-a.256", 0x0000, 0x8000, CRC(bc5a79ff) SHA1(5338d9baa7ae202457b6500fde5883dbdc86e5d3))
 ROM_END
 
 ROM_START(apple2c4)
 	ROM_REGION(0x2000,"gfx1",0)
-	ROM_LOAD ( "3410265a.chr", 0x0000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
-	ROM_LOAD ( "3410265a.chr", 0x1000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
+	ROM_LOAD ( "341-0265-a.chr", 0x0000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
+	ROM_LOAD ( "341-0265-a.chr", 0x1000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
 
 	ROM_REGION(0x8700,"maincpu",0)
 	ROM_LOAD("3410445b.256", 0x0000, 0x8000, CRC(06f53328) SHA1(015061597c4cda7755aeb88b735994ffd2f235ca))
@@ -771,8 +779,8 @@ ROM_END
 
 ROM_START(laser128)
 	ROM_REGION(0x2000,"gfx1",0)
-	ROM_LOAD ( "3410265a.chr", 0x0000, 0x1000, BAD_DUMP CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10)) // need to dump real laser rom
-	ROM_LOAD ( "3410265a.chr", 0x1000, 0x1000, BAD_DUMP CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10)) // need to dump real laser rom
+	ROM_LOAD ( "341-0265-a.chr", 0x0000, 0x1000, BAD_DUMP CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10)) // need to dump real laser rom
+	ROM_LOAD ( "341-0265-a.chr", 0x1000, 0x1000, BAD_DUMP CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10)) // need to dump real laser rom
 
 	ROM_REGION(0x8700,"maincpu",0)
 	ROM_LOAD("laser128.256", 0x0000, 0x8000, CRC(39E59ED3) SHA1(CBD2F45C923725BFD57F8548E65CC80B13BC18DA))
@@ -780,8 +788,8 @@ ROM_END
 
 ROM_START(las128ex)
 	ROM_REGION(0x2000,"gfx1",0)
-	ROM_LOAD ( "3410265a.chr", 0x0000, 0x1000, BAD_DUMP CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10)) // need to dump real laser rom
-	ROM_LOAD ( "3410265a.chr", 0x1000, 0x1000, BAD_DUMP CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10)) // need to dump real laser rom
+	ROM_LOAD ( "341-0265-a.chr", 0x0000, 0x1000, BAD_DUMP CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10)) // need to dump real laser rom
+	ROM_LOAD ( "341-0265-a.chr", 0x1000, 0x1000, BAD_DUMP CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10)) // need to dump real laser rom
 
 	ROM_REGION(0x8700,"maincpu",0)
 	ROM_LOAD("las128ex.256", 0x0000, 0x8000, CRC(B67C8BA1) SHA1(8BD5F82A501B1CF9D988C7207DA81E514CA254B0))
@@ -790,11 +798,11 @@ ROM_END
 
 ROM_START(apple2cp)
 	ROM_REGION(0x2000,"gfx1",0)
-	ROM_LOAD ( "3410265a.chr", 0x0000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
-	ROM_LOAD ( "3410265a.chr", 0x1000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
+	ROM_LOAD ( "341-0265-a.chr", 0x0000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
+	ROM_LOAD ( "341-0265-a.chr", 0x1000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
 
 	ROM_REGION(0x8700,"maincpu",0)
-	ROM_LOAD("3410625a.256", 0x0000, 0x8000, CRC(0b996420) SHA1(1a27ae26966bbafd825d08ad1a24742d3e33557c))
+	ROM_LOAD("341-0625-a.256", 0x0000, 0x8000, CRC(0b996420) SHA1(1a27ae26966bbafd825d08ad1a24742d3e33557c))
 ROM_END
 
 ROM_START(ivelultr)
@@ -805,7 +813,7 @@ ROM_START(ivelultr)
 	ROM_LOAD ( "ultra1.002", 0x1000, 0x1000, CRC(392170ff) SHA1(f065104ab5a476321d56d802f1a174afabff9dbd))
 	ROM_LOAD ( "ultra1.001", 0x2000, 0x1000, CRC(671b8c2e) SHA1(c1e4b1477620c9292f2c2b25df55965eef445dee))
 	ROM_LOAD ( "ultra2.bin", 0x3000, 0x1000, CRC(1ac1e17e) SHA1(a5b8adec37da91970c303905b5e2c4d1b715ee4e))
-	ROM_LOAD ( "3410027a.rom", 0x4500, 0x0100, CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16)) /* Disk II ROM - DOS 3.3 version */
+	ROM_LOAD ( "341-0027-a.rom", 0x4500, 0x0100, CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16)) /* Disk II ROM - DOS 3.3 version */
 ROM_END
 
 static void apple2_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
