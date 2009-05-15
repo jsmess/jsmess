@@ -38,8 +38,8 @@ static VIDEO_UPDATE( sc2 )
 static MACHINE_DRIVER_START( sc2 )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
-    MDRV_CPU_PROGRAM_MAP(sc2_mem, 0)
-    MDRV_CPU_IO_MAP(sc2_io, 0)
+    MDRV_CPU_PROGRAM_MAP(sc2_mem)
+    MDRV_CPU_IO_MAP(sc2_io)
 
     MDRV_MACHINE_RESET(sc2)
 

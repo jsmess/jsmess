@@ -399,7 +399,7 @@ static INTERRUPT_GEN( cdi_irq )
 
 static MACHINE_DRIVER_START( cdi )
 	MDRV_CPU_ADD("maincpu", M68000, CLOCK_A/2)	/* SCC-68070 CCA84 datasheet */
-	MDRV_CPU_PROGRAM_MAP(cdi_mem,0)
+	MDRV_CPU_PROGRAM_MAP(cdi_mem)
  	MDRV_CPU_VBLANK_INT("screen", cdi_irq) /* no interrupts? (it erases the vectors..) */
 
 	MDRV_SCREEN_ADD("screen", RASTER)

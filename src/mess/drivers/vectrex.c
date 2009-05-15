@@ -97,7 +97,7 @@ static const ay8910_interface vectrex_ay8910_interface =
 static MACHINE_DRIVER_START(vectrex)
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, XTAL_6MHz / 4)
-	MDRV_CPU_PROGRAM_MAP(vectrex_map, 0)
+	MDRV_CPU_PROGRAM_MAP(vectrex_map)
 
 	MDRV_SCREEN_ADD("screen", VECTOR)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -200,7 +200,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START(raaspec)
 	MDRV_IMPORT_FROM(vectrex)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(raaspec_map, 0)
+	MDRV_CPU_PROGRAM_MAP(raaspec_map)
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	MDRV_VIDEO_START(raaspec)

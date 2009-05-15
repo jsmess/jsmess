@@ -823,11 +823,11 @@ static MACHINE_DRIVER_START( shadoww )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 18432000/2)	/* 9.216 MHz */
-	MDRV_CPU_PROGRAM_MAP(gaiden_map,0)
+	MDRV_CPU_PROGRAM_MAP(gaiden_map)
 	MDRV_CPU_VBLANK_INT("screen", irq5_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 								/* IRQs are triggered by the YM2203 */
 
 	MDRV_MACHINE_RESET(raiga)
@@ -882,12 +882,12 @@ static MACHINE_DRIVER_START( drgnbowl )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 20000000/2)	/* 10 MHz */
-	MDRV_CPU_PROGRAM_MAP(drgnbowl_map,0)
+	MDRV_CPU_PROGRAM_MAP(drgnbowl_map)
 	MDRV_CPU_VBLANK_INT("screen", irq5_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 12000000/2)	/* 6 MHz */
-	MDRV_CPU_PROGRAM_MAP(drgnbowl_sound_map,0)
-	MDRV_CPU_IO_MAP(drgnbowl_sound_port_map,0)
+	MDRV_CPU_PROGRAM_MAP(drgnbowl_sound_map)
+	MDRV_CPU_IO_MAP(drgnbowl_sound_port_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1138,6 +1138,9 @@ ROM_START( tknight )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "tkni3.bin",    0x0000, 0x10000, CRC(15623ec7) SHA1(db43fe6c417117d7cd90a26e12a52efb0e1a5ca6) )   /* Audio CPU is a Z80  */
 
+	ROM_REGION( 0x1000, "mcu", 0 )	/* protection NEC D8749 */
+	ROM_LOAD( "a-6v.mcu",         0x00000, 0x1000, NO_DUMP )
+
 	ROM_REGION( 0x010000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "tkni5.bin",    0x000000, 0x10000, CRC(5ed15896) SHA1(87bdddb26934af0b2c4e704e6d85c69a7531aeb1) )	/* 8x8 tiles */
 
@@ -1162,6 +1165,9 @@ ROM_START( wildfang )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "tkni3.bin",    0x0000, 0x10000, CRC(15623ec7) SHA1(db43fe6c417117d7cd90a26e12a52efb0e1a5ca6) )   /* Audio CPU is a Z80  */
+
+	ROM_REGION( 0x1000, "mcu", 0 )	/* protection NEC D8749 */
+	ROM_LOAD( "a-6v.mcu",         0x00000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x010000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "tkni5.bin",    0x000000, 0x10000, CRC(5ed15896) SHA1(87bdddb26934af0b2c4e704e6d85c69a7531aeb1) )	/* 8x8 tiles */
@@ -1191,7 +1197,7 @@ ROM_START( stratof )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a-4b.3",           0x00000, 0x10000, CRC(18655c95) SHA1(8357e0520565a201bb930cadffc759463931ec41) )
 
-	ROM_REGION( 0x1000, "cpu2", 0 )	/* protection NEC D8749 */
+	ROM_REGION( 0x1000, "mcu", 0 )	/* protection NEC D8749 */
 	ROM_LOAD( "a-6v.mcu",         0x00000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
@@ -1219,7 +1225,7 @@ ROM_START( raiga )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a-4b.3",           0x00000, 0x10000, CRC(18655c95) SHA1(8357e0520565a201bb930cadffc759463931ec41) )
 
-	ROM_REGION( 0x1000, "cpu2", 0 )	/* protection NEC D8749 */
+	ROM_REGION( 0x1000, "mcu", 0 )	/* protection NEC D8749 */
 	ROM_LOAD( "a-6v.mcu",         0x00000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )

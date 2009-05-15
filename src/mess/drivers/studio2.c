@@ -545,8 +545,8 @@ static MACHINE_DRIVER_START( studio2 )
 	// basic machine hardware
 
 	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, 3579545/2) // the real clock is derived from an oscillator circuit
-	MDRV_CPU_PROGRAM_MAP(studio2_map, 0)
-	MDRV_CPU_IO_MAP(studio2_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(studio2_map)
+	MDRV_CPU_IO_MAP(studio2_io_map)
 	MDRV_CPU_CONFIG(studio2_config)
 
 	MDRV_MACHINE_START(studio2)
@@ -579,8 +579,8 @@ static MACHINE_DRIVER_START( visicom )
 	// basic machine hardware
 
 	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_3_579545MHz/2)
-	MDRV_CPU_PROGRAM_MAP(visicom_map, 0)
-	MDRV_CPU_IO_MAP(visicom_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(visicom_map)
+	MDRV_CPU_IO_MAP(visicom_io_map)
 	MDRV_CPU_CONFIG(studio2_config)
 
 	MDRV_MACHINE_START(studio2)
@@ -613,8 +613,8 @@ static MACHINE_DRIVER_START( mpt02 )
 	// basic machine hardware
 
 	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, CDP1864_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(mpt02_map, 0)
-	MDRV_CPU_IO_MAP(mpt02_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(mpt02_map)
+	MDRV_CPU_IO_MAP(mpt02_io_map)
 	MDRV_CPU_CONFIG(mpt02_config)
 
 	MDRV_MACHINE_START(mpt02)

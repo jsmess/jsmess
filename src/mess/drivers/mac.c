@@ -138,7 +138,7 @@ static const applefdc_interface mac_iwm_interface =
 static MACHINE_DRIVER_START( mac512ke )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 7833600)        /* 7.8336 MHz */
-	MDRV_CPU_PROGRAM_MAP(mac512ke_map, 0)
+	MDRV_CPU_PROGRAM_MAP(mac512ke_map)
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60.15)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1260))
@@ -175,7 +175,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( macplus )
 	MDRV_IMPORT_FROM( mac512ke )
 	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP(macplus_map, 0)
+	MDRV_CPU_PROGRAM_MAP(macplus_map)
 
 	MDRV_MACHINE_START(macscsi)
 
@@ -195,7 +195,7 @@ static MACHINE_DRIVER_START( maclc )
 	MDRV_IMPORT_FROM( macplus )
 
 	MDRV_CPU_REPLACE("maincpu", M68020, 7833600*2)
-	MDRV_CPU_PROGRAM_MAP(maclc_map, 0)
+	MDRV_CPU_PROGRAM_MAP(maclc_map)
 
 	MDRV_VIA6522_REMOVE("via6522_0")
 	MDRV_VIA6522_ADD("via6522_0", 1000000, mac_via6522_adb_intf)

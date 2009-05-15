@@ -133,8 +133,8 @@ static MACHINE_RESET( bbcbc )
 
 static MACHINE_DRIVER_START( bbcbc )
 	MDRV_CPU_ADD( "maincpu", Z80, 4000000 )
-	MDRV_CPU_PROGRAM_MAP( bbcbc_prg, 0 )
-	MDRV_CPU_IO_MAP( bbcbc_io, 0 )
+	MDRV_CPU_PROGRAM_MAP( bbcbc_prg)
+	MDRV_CPU_IO_MAP( bbcbc_io)
 	MDRV_CPU_CONFIG(bbcbc_daisy_chain)
 	MDRV_CPU_VBLANK_INT("screen", bbcbc_interrupt)
 

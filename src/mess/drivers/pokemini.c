@@ -55,7 +55,7 @@ static const speaker_interface pokemini_speaker_interface =
 static MACHINE_DRIVER_START( pokemini )
 	/* basic machine hardware */
 	MDRV_CPU_ADD( "maincpu", MINX, 4000000 )
-	MDRV_CPU_PROGRAM_MAP( pokemini_mem_map, 0 )
+	MDRV_CPU_PROGRAM_MAP( pokemini_mem_map)
 
 	MDRV_QUANTUM_TIME(HZ(60))
 

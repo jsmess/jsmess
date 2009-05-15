@@ -123,7 +123,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( sym1 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, SYM1_CLOCK)  /* 1 MHz */
-	MDRV_CPU_PROGRAM_MAP(sym1_map, 0)
+	MDRV_CPU_PROGRAM_MAP(sym1_map)
 	MDRV_MACHINE_RESET(sym1)
 
 	MDRV_DEFAULT_LAYOUT(layout_sym1)

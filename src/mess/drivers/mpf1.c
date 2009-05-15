@@ -451,8 +451,8 @@ static MACHINE_RESET( mpf1 )
 static MACHINE_DRIVER_START( mpf1 )
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", Z80, 3579500/2)	// 1.79 MHz
-	MDRV_CPU_PROGRAM_MAP(mpf1_map, 0)
-	MDRV_CPU_IO_MAP(mpf1_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(mpf1_map)
+	MDRV_CPU_IO_MAP(mpf1_io_map)
 
 	MDRV_MACHINE_RESET( mpf1 )
 

@@ -164,7 +164,7 @@ static const cassette_config galaxy_cassette_config =
 static MACHINE_DRIVER_START( galaxy )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL / 2)
-	MDRV_CPU_PROGRAM_MAP(galaxy_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(galaxy_mem)
 	MDRV_CPU_VBLANK_INT("screen", galaxy_interrupt)
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
@@ -194,8 +194,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( galaxyp )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL / 2)
-	MDRV_CPU_PROGRAM_MAP(galaxyp_mem, 0)
-	MDRV_CPU_IO_MAP(galaxyp_io, 0)
+	MDRV_CPU_PROGRAM_MAP(galaxyp_mem)
+	MDRV_CPU_IO_MAP(galaxyp_io)
 	MDRV_CPU_VBLANK_INT("screen", galaxy_interrupt)
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)

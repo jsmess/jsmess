@@ -323,8 +323,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START(sms1ntsc)
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_53_693175MHz/15)
-	MDRV_CPU_PROGRAM_MAP(sms_mem, 0)
-	MDRV_CPU_IO_MAP(sms_io, 0)
+	MDRV_CPU_PROGRAM_MAP(sms_mem)
+	MDRV_CPU_IO_MAP(sms_io)
 
 	MDRV_QUANTUM_TIME(HZ(60))
 
@@ -361,9 +361,9 @@ static MACHINE_DRIVER_START(smssdisp)
 	MDRV_VIDEO_START(sega_store_315_5124)
 
 	MDRV_CPU_ADD("control", Z80, XTAL_53_693175MHz/15)
-	MDRV_CPU_PROGRAM_MAP(sms_store_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(sms_store_mem)
 	/* Both CPUs seem to communicate with the VDP etc? */
-	MDRV_CPU_IO_MAP(sms_io, 0)
+	MDRV_CPU_IO_MAP(sms_io)
 
 	MDRV_CARTSLOT_MODIFY("cart1")
 	MDRV_CARTSLOT_EXTENSION_LIST("sms,bin")
@@ -390,8 +390,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START(sms1pal)
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK_PAL/15)
-	MDRV_CPU_PROGRAM_MAP(sms_mem, 0)
-	MDRV_CPU_IO_MAP(sms_io, 0)
+	MDRV_CPU_PROGRAM_MAP(sms_mem)
+	MDRV_CPU_IO_MAP(sms_io)
 
 	MDRV_QUANTUM_TIME(HZ(60))
 
@@ -449,8 +449,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START(gamegear)
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_53_693175MHz/15)
-	MDRV_CPU_PROGRAM_MAP(sms_mem, 0)
-	MDRV_CPU_IO_MAP(gg_io, 0)
+	MDRV_CPU_PROGRAM_MAP(sms_mem)
+	MDRV_CPU_IO_MAP(gg_io)
 
 	MDRV_QUANTUM_TIME(HZ(60))
 

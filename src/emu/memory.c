@@ -778,8 +778,6 @@ address_map *address_map_alloc(const device_config *device, const game_driver *d
 	/* construct the standard map */
 	if (cpuconfig->address_map[spacenum] != NULL)
 		map_detokenize(map, driver, device->tag, cpuconfig->address_map[spacenum]);
-	if (cpuconfig->address_map2[spacenum] != NULL)
-		map_detokenize(map, driver, device->tag, cpuconfig->address_map2[spacenum]);
 
 	return map;
 }
@@ -3414,8 +3412,8 @@ static const char *handler_to_string(const address_table *table, UINT8 entry)
 		"ram[52]",		"ram[53]",		"ram[54]",		"ram[55]",
 		"ram[56]",		"ram[57]",		"ram[58]",		"ram[59]",
 		"ram[60]",		"ram[61]",		"ram[62]",		"ram[63]",
-		"ram[64]",		"ram[65]",		"ram[66]",		"ram[67]",
-		"ram[68]",		"rom",			"nop",			"unmapped"
+		"ram[64]",		"ram[65]",		"ram[66]",		"ram",
+		"rom",			"nop",			"unmapped",     "watchpoint"
 	};
 
 	/* constant strings for lower entries */

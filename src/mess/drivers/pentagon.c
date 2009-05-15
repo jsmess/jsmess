@@ -116,7 +116,7 @@ static MACHINE_RESET( pentagon )
 static MACHINE_DRIVER_START( pentagon )
 	MDRV_IMPORT_FROM( spectrum_128 )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(pentagon_io, 0)
+	MDRV_CPU_IO_MAP(pentagon_io)
 	MDRV_MACHINE_RESET( pentagon )
 		
 	MDRV_WD179X_ADD("wd179x", beta_wd17xx_interface )

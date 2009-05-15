@@ -1337,8 +1337,8 @@ static const pc_lpt_interface pc_lpt_config =
 
 #define MDRV_CPU_PC(mem, port, type, clock, vblankfunc)	\
 	MDRV_CPU_ADD("maincpu", type, clock)				\
-	MDRV_CPU_PROGRAM_MAP(mem##_map, 0)			\
-	MDRV_CPU_IO_MAP(port##_io, 0)				\
+	MDRV_CPU_PROGRAM_MAP(mem##_map)	\
+	MDRV_CPU_IO_MAP(port##_io)	\
 	MDRV_CPU_VBLANK_INT_HACK(vblankfunc, 4)					\
 	MDRV_CPU_CONFIG(i86_address_mask)
 
@@ -1346,8 +1346,8 @@ static const pc_lpt_interface pc_lpt_config =
 static MACHINE_DRIVER_START( pcmda )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V20, 4772720)
-	MDRV_CPU_PROGRAM_MAP(pc8_map, 0)
-	MDRV_CPU_IO_MAP(pc8_io, 0)
+	MDRV_CPU_PROGRAM_MAP(pc8_map)
+	MDRV_CPU_IO_MAP(pc8_io)
 	MDRV_CPU_VBLANK_INT_HACK(pc_frame_interrupt, 4)
 
 	MDRV_QUANTUM_TIME(HZ(60))
@@ -1407,8 +1407,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( pcherc )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V20, 4772720)
-	MDRV_CPU_PROGRAM_MAP(pc8_map, 0)
-	MDRV_CPU_IO_MAP(pc8_io, 0)
+	MDRV_CPU_PROGRAM_MAP(pc8_map)
+	MDRV_CPU_IO_MAP(pc8_io)
 	MDRV_CPU_VBLANK_INT_HACK(pc_frame_interrupt, 4)
 
 	MDRV_MACHINE_START(pc)
@@ -1474,8 +1474,8 @@ static const cassette_config ibm5150_cassette_config =
 static MACHINE_DRIVER_START( ibm5150 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8088, XTAL_14_31818MHz/3)
-	MDRV_CPU_PROGRAM_MAP(pc8_map, 0)
-	MDRV_CPU_IO_MAP(pc8_io, 0)
+	MDRV_CPU_PROGRAM_MAP(pc8_map)
+	MDRV_CPU_IO_MAP(pc8_io)
 	MDRV_CPU_CONFIG(i86_address_mask)
 
 	MDRV_QUANTUM_TIME(HZ(60))

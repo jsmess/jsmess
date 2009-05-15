@@ -456,15 +456,15 @@ static MACHINE_DRIVER_START( jaguar )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, M68K_CLOCK/2)
-	MDRV_CPU_PROGRAM_MAP(jaguar_map,0)
+	MDRV_CPU_PROGRAM_MAP(jaguar_map)
 
 	MDRV_CPU_ADD("gpu", JAGUARGPU, JAGUAR_CLOCK/2)
 	MDRV_CPU_CONFIG(gpu_config)
-	MDRV_CPU_PROGRAM_MAP(gpu_map,0)
+	MDRV_CPU_PROGRAM_MAP(gpu_map)
 
 	MDRV_CPU_ADD("audiocpu", JAGUARDSP, JAGUAR_CLOCK/2)
 	MDRV_CPU_CONFIG(dsp_config)
-	MDRV_CPU_PROGRAM_MAP(dsp_map,0)
+	MDRV_CPU_PROGRAM_MAP(dsp_map)
 
 	MDRV_MACHINE_RESET(jaguar)
 

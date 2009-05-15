@@ -1506,7 +1506,7 @@ static const pc_lpt_interface ip22_lpt_config =
 static MACHINE_DRIVER_START( ip225015 )
 	MDRV_CPU_ADD( "maincpu", R5000BE, 50000000*3 )
 	MDRV_CPU_CONFIG( config )
-	MDRV_CPU_PROGRAM_MAP( ip225015_map, 0 )
+	MDRV_CPU_PROGRAM_MAP( ip225015_map)
 	MDRV_CPU_VBLANK_INT("screen", ip22_vbl)
 
 	MDRV_MACHINE_RESET( ip225015 )

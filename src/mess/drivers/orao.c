@@ -173,7 +173,7 @@ static const cassette_config orao_cassette_config =
 static MACHINE_DRIVER_START( orao )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", M6502, 1000000)
-    MDRV_CPU_PROGRAM_MAP(orao_mem, 0)
+    MDRV_CPU_PROGRAM_MAP(orao_mem)
     MDRV_MACHINE_RESET( orao )
 
     /* video hardware */

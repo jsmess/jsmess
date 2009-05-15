@@ -141,9 +141,6 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	{
 		int x,y,spr_offs,colour,fx,dx,dy,h,w,mode;
 
-		if((spriteram[count+3] & 1) == 1)
-			continue;
-
 		spr_offs = (spriteram[count]);
 		spr_offs &=0x7f;
 		mode = spr_offs;
@@ -154,10 +151,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			y = 0;
 		else
 			y = 0x100-spriteram[count+1];
-		x = spriteram[count+2];
+		x = spriteram[count+2] - ((spriteram[count+3] & 1)<<8);
 
 		/*TODO: I really believe that this is actually driven by a prom.*/
-		if((mode  >= 0x168/4) && (mode <= 0x17f/4))     { h = 1; w = 1; }
+		if((mode >= 0x168/4) && (mode <= 0x17f/4))     { h = 1; w = 1; }
 		else if((mode >= 0x18c/4) && (mode <= 0x18f/4)) { h = 1; w = 1; }
 		else if((mode >= 0x19c/4) && (mode <= 0x19f/4)) { h = 1; w = 1; }
 		else if((mode & 3) == 3 || (mode) >= 0x13c/4)  { h = 2; w = 2; }
@@ -167,13 +164,13 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		{
 			for(dy=0;dy<h;dy++)
 				for(dx=0;dx<w;dx++)
-					drawgfx(bitmap,machine->gfx[0],spr_offs++,colour,1,0,(x+16*w)-dx*16,y+dy*16,cliprect,TRANSPARENCY_PEN,0);
+					drawgfx(bitmap,machine->gfx[0],spr_offs++,colour,1,0,((x+16*w)-(dx+1)*16),(y+dy*16),cliprect,TRANSPARENCY_PEN,0);
 		}
 		else
 		{
 			for(dy=0;dy<h;dy++)
 				for(dx=0;dx<w;dx++)
-					drawgfx(bitmap,machine->gfx[0],spr_offs++,colour,0,0,(x+dx*16),y+dy*16,cliprect,TRANSPARENCY_PEN,0);
+					drawgfx(bitmap,machine->gfx[0],spr_offs++,colour,0,0,(x+dx*16),(y+dy*16),cliprect,TRANSPARENCY_PEN,0);
 		}
 	}
 }
@@ -682,18 +679,18 @@ static PALETTE_INIT(kingdrby)
 
 static MACHINE_DRIVER_START( kingdrby )
 	MDRV_CPU_ADD("master", Z80, CLK_2)
-	MDRV_CPU_PROGRAM_MAP(master_map,0)
-	MDRV_CPU_IO_MAP(master_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(master_map)
+	MDRV_CPU_IO_MAP(master_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("slave", Z80, CLK_2)
-	MDRV_CPU_PROGRAM_MAP(slave_map,0)
-	MDRV_CPU_IO_MAP(slave_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(slave_map)
+	MDRV_CPU_IO_MAP(slave_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("soundcpu", Z80, CLK_2)
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-	MDRV_CPU_IO_MAP(sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MDRV_CPU_IO_MAP(sound_io_map)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,1000) /* guess, controls ay8910 tempo.*/
 
 	MDRV_QUANTUM_PERFECT_CPU("master")

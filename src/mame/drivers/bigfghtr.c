@@ -421,13 +421,13 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( bigfghtr )
 	MDRV_CPU_ADD("maincpu", M68000, 8000000) /* 8 MHz?? */
-	MDRV_CPU_PROGRAM_MAP(mainmem,0)
+	MDRV_CPU_PROGRAM_MAP(mainmem)
 
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3072000)	/* 3.072 MHz???? */
-	MDRV_CPU_PROGRAM_MAP(soundmem,0)
-	MDRV_CPU_IO_MAP(soundport,0)
+	MDRV_CPU_PROGRAM_MAP(soundmem)
+	MDRV_CPU_IO_MAP(soundport)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,128)
 
 	/* video hardware */
@@ -568,7 +568,7 @@ ROM_START( skyrobo )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Z80 code (sound) */
 	ROM_LOAD( "8.17k", 0x00000, 0x10000, CRC(0aeab61e) SHA1(165e0ad58542b65383fef714578da21f62df7b74) )
 
-	ROM_REGION( 0x10000, "cpu2", 0 )	/* Intel C8751 read protected MCU */
+	ROM_REGION( 0x10000, "mcu", 0 )	/* Intel C8751 read protected MCU */
 	ROM_LOAD( "i8751.mcu", 0x00000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )
@@ -600,7 +600,7 @@ ROM_START( bigfghtr )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Z80 code (sound) */
 	ROM_LOAD( "8.17k", 0x00000, 0x10000, CRC(0aeab61e) SHA1(165e0ad58542b65383fef714578da21f62df7b74) )
 
-	ROM_REGION( 0x10000, "cpu2", 0 )	/* Intel C8751 read protected MCU */
+	ROM_REGION( 0x10000, "mcu", 0 )	/* Intel C8751 read protected MCU */
 	ROM_LOAD( "i8751.mcu", 0x00000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )

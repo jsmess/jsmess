@@ -43,8 +43,8 @@ static MACHINE_RESET( pcfx )
 
 static MACHINE_DRIVER_START( pcfx )
 	MDRV_CPU_ADD( "maincpu", V810, 21477270 )
-	MDRV_CPU_PROGRAM_MAP( pcfx_mem, 0 )
-	MDRV_CPU_IO_MAP( pcfx_io, 0 )
+	MDRV_CPU_PROGRAM_MAP( pcfx_mem)
+	MDRV_CPU_IO_MAP( pcfx_io)
 
 	MDRV_MACHINE_RESET( pcfx )
 

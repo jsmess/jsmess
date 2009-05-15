@@ -139,8 +139,8 @@ static const mc6845_interface kaypro2x_crtc = {
 static MACHINE_DRIVER_START( kayproii )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 2500000)	/* 2.5 MHz */
-	MDRV_CPU_PROGRAM_MAP(kaypro_map, 0)
-	MDRV_CPU_IO_MAP(kayproii_io, 0)
+	MDRV_CPU_PROGRAM_MAP(kaypro_map)
+	MDRV_CPU_IO_MAP(kayproii_io)
 	MDRV_CPU_VBLANK_INT("screen", kay_kbd_interrupt)	/* this doesn't actually exist, it is to run the keyboard */
 	MDRV_CPU_CONFIG(kayproii_daisy_chain)
 
@@ -176,8 +176,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( kaypro2x )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(kaypro_map, 0)
-	MDRV_CPU_IO_MAP(kaypro2x_io, 0)
+	MDRV_CPU_PROGRAM_MAP(kaypro_map)
+	MDRV_CPU_IO_MAP(kaypro2x_io)
 	MDRV_CPU_VBLANK_INT("screen", kay_kbd_interrupt)
 	MDRV_CPU_CONFIG(kaypro2x_daisy_chain)
 

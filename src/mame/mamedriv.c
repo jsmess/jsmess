@@ -1642,6 +1642,7 @@ const game_driver * const drivers[] =
 	DRIVER( 40love )	/* A30 (c) 1984 Taito */
 	DRIVER( tsamurai )	/* A35 (c) 1985 Taito */
 	DRIVER( tsamurai2 )	/* A35 (c) 1985 Taito */
+	DRIVER( tsamuraih )	/* A35 (c) 1985 Taito */
 	DRIVER( ladymstr )	/* A49 (c) 1985 Taito */
 	DRIVER( nunchaku )	/* ??? (c) 1985 Taito */
 	DRIVER( yamagchi )	/* A38 (c) 1985 Taito */
@@ -2973,7 +2974,7 @@ V-V                           TP-027
 	DRIVER( taitogn )
 	DRIVER( chaoshea )	/* 1998.10 Chaos Heat (V2.08J) */
 	DRIVER( raycris )	/* 1998.12 Ray Crisis (V2.03J) */
-						/* 1999.02 Otenami Haiken (Success) */
+	DRIVER( otenamih )	/* 1999.02 Otenami Haiken (Success) */
 	DRIVER( spuzbobj )	/* 1999.03 Super Puzzle Bobble (Japan) */
 	DRIVER( spuzbobl )	/* 1999.?? Super Puzzle Bobble (V2.05O) */
 	DRIVER( gobyrc )	/* 1999.?? Go By RC (V2.03O) */
@@ -2990,7 +2991,7 @@ V-V                           TP-027
 	DRIVER( shikigam )	/* 2001.09 Shikigami no Shiro */
 	DRIVER( otenki )	/* 2001.10 Otenki Kororin */
 	DRIVER( usagi )		/* 2001.12 Usagi (V2.02J) */
-						/* 2002.02 Shanghai Sangokuhaitougi */
+	DRIVER( shangtou )	/* 2002.02 Shanghai Sangokuhaitougi */
 	DRIVER( xiistag )	/* 2002.07 XII Stag (V2.01J) */
 	DRIVER( sianniv )	/* 2003.10 Space Invaders Anniversary (V2.02J) */
 	DRIVER( kollon )	/* 2003.11 Kollon */
@@ -3523,8 +3524,8 @@ V-V                           TP-027
 	DRIVER( sscandal )	/* 834-5755 (c) 1985 Coreland / Sega (S1) */
 	DRIVER( myherok )	/* 834-5755 (c) 1985 Coreland / Sega (S1) */
 	DRIVER( shtngmst )	/* 834-5719/5720 (c) 1985 (S2) */
-	DRIVER( shtngmst1 )	/* 834-5719/5720 (c) 1985 (S2) */
- 	DRIVER( shtngmsta )	/* 834-5719/5720 (c) 1985 (S2) */
+	DRIVER( shtngmste )	/* 834-5719/5720 (c) 1985 (S2) */
+ 	DRIVER( shtngmstu )	/* 834-5719/5720 (c) 1985 (S2) */
 	DRIVER( choplift )	/* 834-5795 (c) 1985, (c) 1982 Dan Gorlin (S2) */
 	DRIVER( chopliftu )	/* 834-5795 (c) 1985, (c) 1982 Dan Gorlin (S2) */
 	DRIVER( chopliftbl )/* bootleg (S2) */
@@ -3729,6 +3730,7 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( shinobld )	/* (c) 1987 (but bootleg) */
 	DRIVER( tetrisbl )	/* (c) 1988 (but bootleg) */
 	DRIVER( beautyb )	/* (c) 1991 AMT */
+	DRIVER( iqpipe )    /* (c) 1991 AMT */
 	DRIVER( tturfbl )	/* (c) 1989 (Datsu bootleg) */
 	DRIVER( wb3bbl )	/* BOOTLEG */
 
@@ -7113,7 +7115,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( pipedrm )	/* (c) 1990 Video System Co. (World) */
 	DRIVER( pipedrmu )	/* (c) 1990 Video System Co. (US) */
 	DRIVER( pipedrmj )	/* (c) 1990 Video System Co. (Japan) */
-	DRIVER( hatris )	/* (c) 1990 Video System Co. (Japan) */
+	DRIVER( hatris )	/* (c) 1990 Video System Co. (US) */
+	DRIVER( hatrisj )	/* (c) 1990 Video System Co. (Japan) */
 	DRIVER( spinlbrk )	/* (c) 1990 V-System Co. (World) */
 	DRIVER( spinlbru )	/* (c) 1990 V-System Co. (US) */
 	DRIVER( spinlbrj )	/* (c) 1990 V-System Co. (Japan) */

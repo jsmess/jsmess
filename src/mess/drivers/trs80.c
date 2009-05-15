@@ -412,8 +412,8 @@ static const ay31015_config trs80_ay31015_config =
 static MACHINE_DRIVER_START( trs80 )		// the original model I, level I, with no extras
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 1796000)        /* 1.796 MHz */
-	MDRV_CPU_PROGRAM_MAP(trs80_map, 0)
-	MDRV_CPU_IO_MAP(trs80_io, 0)
+	MDRV_CPU_PROGRAM_MAP(trs80_map)
+	MDRV_CPU_IO_MAP(trs80_io)
 
 	MDRV_MACHINE_RESET( trs80 )
 
@@ -444,8 +444,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( model1 )		// model I, level II
 	MDRV_IMPORT_FROM( trs80 )
 	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP( model1_map, 0 )
-	MDRV_CPU_IO_MAP( model1_io, 0 )
+	MDRV_CPU_PROGRAM_MAP( model1_map)
+	MDRV_CPU_IO_MAP( model1_io)
 	MDRV_CPU_PERIODIC_INT(trs80_rtc_interrupt, 40)
 
 	/* devices */
@@ -460,8 +460,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( model3 )
 	MDRV_IMPORT_FROM( model1 )
 	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP( model3_map, 0 )
-	MDRV_CPU_IO_MAP( model3_io, 0 )
+	MDRV_CPU_PROGRAM_MAP( model3_map)
+	MDRV_CPU_IO_MAP( model3_io)
 	MDRV_CPU_PERIODIC_INT(trs80_rtc_interrupt, 30)
 
 	MDRV_VIDEO_UPDATE( trs80m4 )
@@ -473,7 +473,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( sys80 )
 	MDRV_IMPORT_FROM( model1 )
 	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_IO_MAP( sys80_io, 0 )
+	MDRV_CPU_IO_MAP( sys80_io)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ht1080z )
@@ -484,8 +484,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( lnw80 )
 	MDRV_IMPORT_FROM( model1 )
 	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP( lnw80_map, 0 )
-	MDRV_CPU_IO_MAP( lnw80_io, 0 )
+	MDRV_CPU_PROGRAM_MAP( lnw80_map)
+	MDRV_CPU_IO_MAP( lnw80_io)
 	MDRV_MACHINE_RESET( lnw80 )
 
 	MDRV_PALETTE_LENGTH(8)

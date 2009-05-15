@@ -196,8 +196,8 @@ static MACHINE_DRIVER_START(ti990_10)
 	/* TI990/10 CPU @ 4.0(???) MHz */
 	MDRV_CPU_ADD("maincpu", TI990_10, 4000000)
 	MDRV_CPU_CONFIG(reset_params)
-	MDRV_CPU_PROGRAM_MAP(ti990_10_memmap, 0)
-	MDRV_CPU_IO_MAP(ti990_10_io, 0)
+	MDRV_CPU_PROGRAM_MAP(ti990_10_memmap)
+	MDRV_CPU_IO_MAP(ti990_10_io)
 	MDRV_CPU_PERIODIC_INT(ti990_10_line_interrupt, 120/*or 100 in Europe*/)
 
 	MDRV_MACHINE_START( ti990_10 )

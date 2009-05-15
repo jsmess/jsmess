@@ -38,8 +38,8 @@ static VIDEO_UPDATE( sys2900 )
 static MACHINE_DRIVER_START( sys2900 )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
-    MDRV_CPU_PROGRAM_MAP(sys2900_mem, 0)
-    MDRV_CPU_IO_MAP(sys2900_io, 0)
+    MDRV_CPU_PROGRAM_MAP(sys2900_mem)
+    MDRV_CPU_IO_MAP(sys2900_io)
 
     MDRV_MACHINE_RESET(sys2900)
 

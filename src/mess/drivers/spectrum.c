@@ -496,8 +496,8 @@ static const cassette_config spectrum_cassette_config =
 MACHINE_DRIVER_START( spectrum )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3500000)        /* 3.5 MHz */
-	MDRV_CPU_PROGRAM_MAP(spectrum_mem, 0)
-	MDRV_CPU_IO_MAP(spectrum_io, 0)
+	MDRV_CPU_PROGRAM_MAP(spectrum_mem)
+	MDRV_CPU_IO_MAP(spectrum_io)
 	MDRV_CPU_VBLANK_INT("screen", spec_interrupt)
 	MDRV_QUANTUM_TIME(HZ(60))
 

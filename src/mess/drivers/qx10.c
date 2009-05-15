@@ -38,8 +38,8 @@ static VIDEO_UPDATE( qx10 )
 static MACHINE_DRIVER_START( qx10 )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
-    MDRV_CPU_PROGRAM_MAP(qx10_mem, 0)
-    MDRV_CPU_IO_MAP(qx10_io, 0)
+    MDRV_CPU_PROGRAM_MAP(qx10_mem)
+    MDRV_CPU_IO_MAP(qx10_io)
 
     MDRV_MACHINE_RESET(qx10)
 

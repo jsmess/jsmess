@@ -327,7 +327,7 @@ static MACHINE_RESET( scorpion )
 static MACHINE_DRIVER_START( scorpion )
 	MDRV_IMPORT_FROM( spectrum_128 )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(scorpion_io, 0)
+	MDRV_CPU_IO_MAP(scorpion_io)
 	MDRV_MACHINE_RESET( scorpion )
 	
 	MDRV_WD179X_ADD("wd179x", beta_wd17xx_interface )	

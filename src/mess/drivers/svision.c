@@ -483,7 +483,7 @@ static MACHINE_RESET( tvlink )
 static MACHINE_DRIVER_START( svision )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M65C02, 4000000)        /* ? stz used! speed? */
-	MDRV_CPU_PROGRAM_MAP(svision_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(svision_mem)
 	MDRV_CPU_VBLANK_INT("screen", svision_frame_int)
 
 	MDRV_MACHINE_RESET( svision )
@@ -531,7 +531,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( tvlinkp )
 	MDRV_IMPORT_FROM( svisionp )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(tvlink_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(tvlink_mem)
 
 	MDRV_MACHINE_RESET( tvlink )
 

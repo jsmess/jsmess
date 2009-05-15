@@ -38,8 +38,8 @@ static VIDEO_UPDATE( xor100 )
 static MACHINE_DRIVER_START( xor100 )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
-    MDRV_CPU_PROGRAM_MAP(xor100_mem, 0)
-    MDRV_CPU_IO_MAP(xor100_io, 0)
+    MDRV_CPU_PROGRAM_MAP(xor100_mem)
+    MDRV_CPU_IO_MAP(xor100_io)
 
     MDRV_MACHINE_RESET(xor100)
 

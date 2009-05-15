@@ -189,7 +189,7 @@ static const pia6821_interface aim65_pia_config =
 static MACHINE_DRIVER_START( aim65 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, AIM65_CLOCK) /* 1 MHz */
-	MDRV_CPU_PROGRAM_MAP(aim65_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(aim65_mem)
 
 	MDRV_MACHINE_START(aim65)
 

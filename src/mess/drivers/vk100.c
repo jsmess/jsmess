@@ -38,8 +38,8 @@ static VIDEO_UPDATE( vk100 )
 static MACHINE_DRIVER_START( vk100 )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",8085A, XTAL_4MHz)
-    MDRV_CPU_PROGRAM_MAP(vk100_mem, 0)
-    MDRV_CPU_IO_MAP(vk100_io, 0)
+    MDRV_CPU_PROGRAM_MAP(vk100_mem)
+    MDRV_CPU_IO_MAP(vk100_io)
 
     MDRV_MACHINE_RESET(vk100)
 

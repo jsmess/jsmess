@@ -562,13 +562,13 @@ static MACHINE_DRIVER_START(exelv)
 	/* basic machine hardware */
 	/* TMS7020 CPU @ 4.91(?) MHz */
 	MDRV_CPU_ADD("maincpu", TMS7000_EXL, 4910000)
-	MDRV_CPU_PROGRAM_MAP(exelv_memmap, 0)
-	MDRV_CPU_IO_MAP(exelv_portmap, 0)
+	MDRV_CPU_PROGRAM_MAP(exelv_memmap)
+	MDRV_CPU_IO_MAP(exelv_portmap)
 	MDRV_CPU_VBLANK_INT_HACK(exelv_hblank_interrupt, 363)
 
 	MDRV_CPU_ADD("tms7040", TMS7000, 4910000)
-	MDRV_CPU_PROGRAM_MAP(exelv_tms7040_map, 0)
-	MDRV_CPU_IO_MAP(exelv_tms7040_port, 0)
+	MDRV_CPU_PROGRAM_MAP(exelv_tms7040_map)
+	MDRV_CPU_IO_MAP(exelv_tms7040_port)
 
 	MDRV_QUANTUM_TIME(HZ(60))
 

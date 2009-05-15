@@ -90,7 +90,7 @@ static WRITE32_HANDLER( cpua_ctrl_w )
 
 	if (ACCESSING_BITS_8_15)
 	{
-		cputag_set_input_line(space->machine, "mcu", INPUT_LINE_RESET, (data &0x200) ? CLEAR_LINE : ASSERT_LINE);
+		cputag_set_input_line(space->machine, "sub", INPUT_LINE_RESET, (data &0x200) ? CLEAR_LINE : ASSERT_LINE);
 		if (data&0x8000) cputag_set_input_line(space->machine, "maincpu", 3, HOLD_LINE); /* Guess */
 	}
 
@@ -396,13 +396,13 @@ static MACHINE_DRIVER_START( superchs )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz */
-	MDRV_CPU_PROGRAM_MAP(superchs_map,0)
+	MDRV_CPU_PROGRAM_MAP(superchs_map)
 	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)/* VBL */
 
 	TAITO_F3_SOUND_SYSTEM_CPU(16000000)
 
 	MDRV_CPU_ADD("sub", M68000, 16000000)	/* 16 MHz */
-	MDRV_CPU_PROGRAM_MAP(superchs_cpub_map,0)
+	MDRV_CPU_PROGRAM_MAP(superchs_cpub_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)/* VBL */
 
 	MDRV_QUANTUM_TIME(HZ(480))	/* CPU slices - Need to interleave Cpu's 1 & 3 */
@@ -485,7 +485,7 @@ static DRIVER_INIT( superchs )
 {
 	/* Speedup handlers */
 	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x100000, 0x100003, 0, 0, main_cycle_r);
-	memory_install_read16_handler(cputag_get_address_space(machine, "mcu", ADDRESS_SPACE_PROGRAM), 0x80000a, 0x80000b, 0, 0, sub_cycle_r);
+	memory_install_read16_handler(cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM), 0x80000a, 0x80000b, 0, 0, sub_cycle_r);
 }
 
 GAMEL( 1992, superchs, 0, superchs, superchs, superchs, ROT0, "Taito America Corporation", "Super Chase - Criminal Termination (US)", 0, layout_superchs )

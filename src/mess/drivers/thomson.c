@@ -663,7 +663,7 @@ static MACHINE_DRIVER_START ( to7 )
 
 /* cpu */
      MDRV_CPU_ADD ( "maincpu", M6809, 1000000 )
-     MDRV_CPU_PROGRAM_MAP ( to7, 0 )
+     MDRV_CPU_PROGRAM_MAP ( to7)
 
 /* video */
      MDRV_SCREEN_ADD("screen", RASTER)
@@ -911,7 +911,7 @@ static MACHINE_DRIVER_START ( to770 )
      MDRV_MACHINE_RESET ( to770 )
 
      MDRV_CPU_MODIFY( "maincpu" )
-     MDRV_CPU_PROGRAM_MAP ( to770, 0 )
+     MDRV_CPU_PROGRAM_MAP ( to770)
 
 	MDRV_PIA6821_MODIFY( THOM_PIA_SYS, to770_pia6821_sys )
 
@@ -1106,7 +1106,7 @@ static MACHINE_DRIVER_START ( mo5 )
      MDRV_MACHINE_RESET ( mo5 )
 
      MDRV_CPU_MODIFY( "maincpu" )
-     MDRV_CPU_PROGRAM_MAP ( mo5, 0 )
+     MDRV_CPU_PROGRAM_MAP ( mo5)
 
      MDRV_CASSETTE_MODIFY( "cassette", mo5_cassette_config )
 
@@ -1453,7 +1453,7 @@ static MACHINE_DRIVER_START ( to9 )
      MDRV_MACHINE_RESET ( to9 )
 
      MDRV_CPU_MODIFY( "maincpu" )
-     MDRV_CPU_PROGRAM_MAP ( to9, 0 )
+     MDRV_CPU_PROGRAM_MAP ( to9)
 
 	MDRV_PIA6821_MODIFY( THOM_PIA_SYS, to9_pia6821_sys )
 	MDRV_PIA6821_REMOVE( THOM_PIA_IO )
@@ -1681,7 +1681,7 @@ static MACHINE_DRIVER_START ( to8 )
      MDRV_MACHINE_RESET ( to8 )
 
      MDRV_CPU_MODIFY( "maincpu" )
-     MDRV_CPU_PROGRAM_MAP ( to8, 0 )
+     MDRV_CPU_PROGRAM_MAP ( to8)
 
 	MDRV_PIA6821_MODIFY( THOM_PIA_SYS, to8_pia6821_sys )
 	MDRV_PIA6821_REMOVE( THOM_PIA_IO )
@@ -1836,7 +1836,7 @@ static MACHINE_DRIVER_START ( to9p )
      MDRV_MACHINE_RESET ( to9p )
 
      MDRV_CPU_MODIFY( "maincpu" )
-     MDRV_CPU_PROGRAM_MAP ( to9p, 0 )
+     MDRV_CPU_PROGRAM_MAP ( to9p)
 
 	MDRV_PIA6821_MODIFY( THOM_PIA_SYS, to9p_pia6821_sys )
 	MDRV_PIA6821_REMOVE( THOM_PIA_IO )
@@ -2176,7 +2176,7 @@ static MACHINE_DRIVER_START ( mo6 )
      MDRV_MACHINE_RESET ( mo6 )
 
      MDRV_CPU_MODIFY( "maincpu" )
-     MDRV_CPU_PROGRAM_MAP ( mo6, 0 )
+     MDRV_CPU_PROGRAM_MAP ( mo6)
 
      MDRV_MC6846_REMOVE( "mc6846" )
 
@@ -2408,7 +2408,7 @@ static MACHINE_DRIVER_START ( mo5nr )
      MDRV_MACHINE_RESET ( mo5nr )
 
      MDRV_CPU_MODIFY( "maincpu" )
-     MDRV_CPU_PROGRAM_MAP ( mo5nr, 0 )
+     MDRV_CPU_PROGRAM_MAP ( mo5nr)
 
      MDRV_MC6846_REMOVE( "mc6846" )
 

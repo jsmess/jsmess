@@ -2406,16 +2406,16 @@ static MACHINE_DRIVER_START( saturn )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
-	MDRV_CPU_PROGRAM_MAP(saturn_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(saturn_mem)
 	MDRV_CPU_VBLANK_INT("screen",stv_interrupt)
 	MDRV_CPU_CONFIG(sh2_conf_master)
 
 	MDRV_CPU_ADD("slave", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
-	MDRV_CPU_PROGRAM_MAP(saturn_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(saturn_mem)
 	MDRV_CPU_CONFIG(sh2_conf_slave)
 
 	MDRV_CPU_ADD("audiocpu", M68000, MASTER_CLOCK_352/5) //11.46 MHz
-	MDRV_CPU_PROGRAM_MAP(sound_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(sound_mem)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)

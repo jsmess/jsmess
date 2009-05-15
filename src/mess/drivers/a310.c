@@ -214,7 +214,7 @@ static const wd17xx_interface a310_wd17xx_interface = {
 static MACHINE_DRIVER_START( a310 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ARM, 8000000)        /* 8 MHz */
-	MDRV_CPU_PROGRAM_MAP(a310_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(a310_mem)
 
 	MDRV_MACHINE_RESET( a310 )
 	MDRV_MACHINE_START( a310 )

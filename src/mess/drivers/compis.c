@@ -251,8 +251,8 @@ static const mm58274c_interface compis_mm58274c_interface =
 static MACHINE_DRIVER_START( compis )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I80186, 8000000)	/* 8 MHz */
-	MDRV_CPU_PROGRAM_MAP(compis_mem, 0)
-	MDRV_CPU_IO_MAP(compis_io, 0)
+	MDRV_CPU_PROGRAM_MAP(compis_mem)
+	MDRV_CPU_IO_MAP(compis_io)
 	MDRV_CPU_VBLANK_INT("screen", compis_vblank_int)
 	MDRV_CPU_CONFIG(i86_address_mask)
 

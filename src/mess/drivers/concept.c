@@ -65,7 +65,7 @@ static const mm58274c_interface concept_mm58274c_interface =
 static MACHINE_DRIVER_START( concept )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8182000)        /* 16.364 MHz / 2 */
-	MDRV_CPU_PROGRAM_MAP(concept_memmap, 0)
+	MDRV_CPU_PROGRAM_MAP(concept_memmap)
 	MDRV_CPU_VBLANK_INT("screen", concept_interrupt)
 
 	MDRV_QUANTUM_TIME(HZ(60))

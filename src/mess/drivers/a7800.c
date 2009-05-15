@@ -253,7 +253,7 @@ static PALETTE_INIT(a7800p)
 static MACHINE_DRIVER_START( a7800_ntsc )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, A7800_NTSC_Y1/8)	/* 1.79 MHz (switches to 1.19 MHz on TIA or RIOT access) */
-	MDRV_CPU_PROGRAM_MAP(a7800_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(a7800_mem)
 	MDRV_CPU_VBLANK_INT_HACK(a7800_interrupt, 262)
 
 	MDRV_MACHINE_RESET(a7800)

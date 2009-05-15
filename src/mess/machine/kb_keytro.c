@@ -504,8 +504,8 @@ ADDRESS_MAP_END
 
 MACHINE_DRIVER_START( kb_keytronic )
 	MDRV_CPU_ADD( KEYTRONIC_KB3270PC_CPU, I8051, 11060250 )
-	MDRV_CPU_PROGRAM_MAP( kb_keytronic_program, 0 )
-	MDRV_CPU_IO_MAP( kb_keytronic_io, 0 )
+	MDRV_CPU_PROGRAM_MAP( kb_keytronic_program)
+	MDRV_CPU_IO_MAP( kb_keytronic_io)
 MACHINE_DRIVER_END
 
 

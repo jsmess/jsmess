@@ -137,8 +137,8 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( irisha )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", 8080, XTAL_16MHz / 9)
-    MDRV_CPU_PROGRAM_MAP(irisha_mem, 0)
-   	MDRV_CPU_IO_MAP(irisha_io, 0)
+    MDRV_CPU_PROGRAM_MAP(irisha_mem)
+   	MDRV_CPU_IO_MAP(irisha_io)
 
    	MDRV_MACHINE_RESET( irisha )
 

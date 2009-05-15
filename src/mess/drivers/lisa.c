@@ -92,11 +92,11 @@ static const applefdc_interface lisa210_fdc_interface =
 static MACHINE_DRIVER_START( lisa )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 5093760)        /* 20.37504 MHz / 4 */
-	MDRV_CPU_PROGRAM_MAP(lisa_map, 0)
+	MDRV_CPU_PROGRAM_MAP(lisa_map)
 	MDRV_CPU_VBLANK_INT("screen", lisa_interrupt)
 
 	MDRV_CPU_ADD("fdccpu", M6502, 2000000)        /* 16.000 MHz / 8 in when DIS asserted, 16.000 MHz / 9 otherwise (?) */
-	MDRV_CPU_PROGRAM_MAP(lisa_fdc_map, 0)
+	MDRV_CPU_PROGRAM_MAP(lisa_fdc_map)
 
 	MDRV_QUANTUM_TIME(HZ(60))
 	MDRV_MACHINE_RESET( lisa )
@@ -134,7 +134,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( lisa210 )
 	MDRV_IMPORT_FROM( lisa )
 	MDRV_CPU_MODIFY( "fdccpu" )
-	MDRV_CPU_PROGRAM_MAP(lisa210_fdc_map, 0)
+	MDRV_CPU_PROGRAM_MAP(lisa210_fdc_map)
 
 	/* Lisa 2/10 and MacXL had a slightly different FDC interface */	
 	MDRV_IWM_MODIFY("fdc", lisa210_fdc_interface)

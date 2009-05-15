@@ -454,7 +454,7 @@ WRITE8_HANDLER( tubep_background_c000_w )
 
 static TIMER_CALLBACK( sprite_timer_callback )
 {
-	cputag_set_input_line(machine, "nsc", 0, ASSERT_LINE);
+	cputag_set_input_line(machine, "mcu", 0, ASSERT_LINE);
 }
 
 
@@ -583,7 +583,7 @@ WRITE8_HANDLER( tubep_sprite_control_w )
             /SINT line will be reasserted in XSize * YSize cycles (RH0 signal cycles)
             */
 			/* 1.clear the /SINT interrupt line */
-			cputag_set_input_line(space->machine, "nsc", 0, CLEAR_LINE);
+			cputag_set_input_line(space->machine, "mcu", 0, CLEAR_LINE);
 
 			/* 2.assert /SINT again after this time */
 			timer_set( space->machine, attotime_mul(ATTOTIME_IN_HZ(19968000/8), (XSize+1)*(YSize+1)), NULL, 0, sprite_timer_callback);

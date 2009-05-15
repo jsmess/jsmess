@@ -426,8 +426,8 @@ static const cassette_config lviv_cassette_config =
 static MACHINE_DRIVER_START( lviv )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", 8080, 2500000)
-	MDRV_CPU_PROGRAM_MAP(lviv_mem, 0)
-	MDRV_CPU_IO_MAP(io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(lviv_mem)
+	MDRV_CPU_IO_MAP(io_map)
 	MDRV_QUANTUM_TIME(HZ(60))
 
 	MDRV_MACHINE_RESET( lviv )

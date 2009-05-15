@@ -244,8 +244,8 @@ static const cassette_config primo_cassette_config =
 static MACHINE_DRIVER_START( primoa32 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD( "maincpu", Z80, 2500000 )
-	MDRV_CPU_PROGRAM_MAP( primo32_mem, 0 )
-	MDRV_CPU_IO_MAP( primoa_port, 0 )
+	MDRV_CPU_PROGRAM_MAP( primo32_mem)
+	MDRV_CPU_IO_MAP( primoa_port)
 	MDRV_CPU_VBLANK_INT("screen", primo_vblank_interrupt)
 
 	MDRV_MACHINE_RESET( primoa )
@@ -287,19 +287,19 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( primoa48 )
 	MDRV_IMPORT_FROM( primoa32 )
 	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP( primo48_mem, 0 )
+	MDRV_CPU_PROGRAM_MAP( primo48_mem)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( primoa64 )
 	MDRV_IMPORT_FROM( primoa32 )
 	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP( primo64_mem, 0 )
+	MDRV_CPU_PROGRAM_MAP( primo64_mem)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( primob32 )
 	MDRV_IMPORT_FROM( primoa32 )
 	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_IO_MAP( primob_port, 0 )
+	MDRV_CPU_IO_MAP( primob_port)
 
 	MDRV_MACHINE_RESET( primob )
 MACHINE_DRIVER_END
@@ -307,7 +307,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( primob48 )
 	MDRV_IMPORT_FROM( primoa48 )
 	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_IO_MAP( primob_port, 0 )
+	MDRV_CPU_IO_MAP( primob_port)
 
 	MDRV_MACHINE_RESET( primob )
 MACHINE_DRIVER_END
@@ -315,7 +315,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( primob64 )
 	MDRV_IMPORT_FROM( primoa64 )
 	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_IO_MAP( primob_port, 0 )
+	MDRV_CPU_IO_MAP( primob_port)
 
 	MDRV_MACHINE_RESET( primob )
 MACHINE_DRIVER_END
@@ -323,7 +323,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( primoc64 )
 	MDRV_IMPORT_FROM( primoa64 )
 	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_IO_MAP( primob_port, 0 )
+	MDRV_CPU_IO_MAP( primob_port)
 
 	MDRV_MACHINE_RESET( primob )
 MACHINE_DRIVER_END

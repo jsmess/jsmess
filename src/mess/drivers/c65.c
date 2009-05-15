@@ -212,7 +212,7 @@ static const sid6581_interface c65_sound_interface =
 static MACHINE_DRIVER_START( c65 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M4510, 3500000)  /* or VIC6567_CLOCK, */
-	MDRV_CPU_PROGRAM_MAP(c65_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(c65_mem)
 	MDRV_CPU_VBLANK_INT("screen", c64_frame_interrupt)
 	MDRV_CPU_PERIODIC_INT(vic3_raster_irq, VIC6567_HRETRACERATE)
 

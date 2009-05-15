@@ -355,8 +355,8 @@ static MACHINE_DRIVER_START(ti99_2)
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", TMS9995, 10700000)
 	MDRV_CPU_CONFIG(ti99_2_processor_config)
-	MDRV_CPU_PROGRAM_MAP(ti99_2_memmap, 0)
-	MDRV_CPU_IO_MAP(ti99_2_io, 0)
+	MDRV_CPU_PROGRAM_MAP(ti99_2_memmap)
+	MDRV_CPU_IO_MAP(ti99_2_io)
 	MDRV_CPU_VBLANK_INT("screen", ti99_2_vblank_interrupt)
 
 	MDRV_MACHINE_RESET( ti99_2 )

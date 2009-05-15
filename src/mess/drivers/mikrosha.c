@@ -165,8 +165,8 @@ static const struct pit8253_config mikrosha_pit8253_intf =
 static MACHINE_DRIVER_START( mikrosha )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", 8080, XTAL_16MHz / 9)
-	MDRV_CPU_PROGRAM_MAP(mikrosha_mem, 0)
-	MDRV_CPU_IO_MAP(mikrosha_io, 0)
+	MDRV_CPU_PROGRAM_MAP(mikrosha_mem)
+	MDRV_CPU_IO_MAP(mikrosha_io)
 
 	MDRV_MACHINE_RESET( radio86 )
 

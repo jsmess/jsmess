@@ -177,8 +177,8 @@ static MACHINE_DRIVER_START( mz80k )
 
 	/* main CPU */
 	MDRV_CPU_ADD("maincpu", Z80, 2000000)        /* 2 MHz */
-	MDRV_CPU_PROGRAM_MAP(mz80k_mem, 0)
-	MDRV_CPU_IO_MAP(mz80k_io, 0)
+	MDRV_CPU_PROGRAM_MAP(mz80k_mem)
+	MDRV_CPU_IO_MAP(mz80k_io)
 
 	MDRV_MACHINE_RESET( mz80k )
 

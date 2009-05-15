@@ -615,7 +615,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( pico )
 	MDRV_IMPORT_FROM(megadriv)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(_pico_mem,0)
+	MDRV_CPU_PROGRAM_MAP(_pico_mem)
 
 	MDRV_MACHINE_RESET( ms_megadriv )
 	

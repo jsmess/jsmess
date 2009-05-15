@@ -398,7 +398,7 @@ static const cassette_config special_cassette_config =
 static MACHINE_DRIVER_START( special )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", 8080, 2000000)
-    MDRV_CPU_PROGRAM_MAP(specialist_mem, 0)
+    MDRV_CPU_PROGRAM_MAP(specialist_mem)
     MDRV_MACHINE_RESET( special )
 
 	MDRV_PIT8253_ADD( "pit8253", specimx_pit8253_intf )
@@ -432,7 +432,7 @@ static MACHINE_DRIVER_START( specialp )
     /* basic machine hardware */
     MDRV_IMPORT_FROM(special)
     MDRV_CPU_MODIFY("maincpu")
-    MDRV_CPU_PROGRAM_MAP(specialp_mem, 0)
+    MDRV_CPU_PROGRAM_MAP(specialp_mem)
 
     MDRV_SCREEN_MODIFY("screen")
     MDRV_VIDEO_START(specialp)
@@ -444,7 +444,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( specimx )
     MDRV_IMPORT_FROM(special)
     MDRV_CPU_MODIFY("maincpu")
-  	MDRV_CPU_PROGRAM_MAP(specimx_mem, 0)
+  	MDRV_CPU_PROGRAM_MAP(specimx_mem)
 
   	MDRV_MACHINE_START ( specimx )
   	MDRV_MACHINE_RESET ( specimx )
@@ -467,8 +467,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( erik )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", Z80, 4000000)
-    MDRV_CPU_PROGRAM_MAP(erik_mem, 0)
-    MDRV_CPU_IO_MAP(erik_io_map, 0)
+    MDRV_CPU_PROGRAM_MAP(erik_mem)
+    MDRV_CPU_IO_MAP(erik_io_map)
 
     MDRV_MACHINE_RESET( erik )
 

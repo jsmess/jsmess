@@ -173,19 +173,19 @@ static ADDRESS_MAP_START( dec0_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x240000, 0x240007) AM_WRITE(dec0_pf1_control_0_w)								/* text layer */
 	AM_RANGE(0x240010, 0x240017) AM_WRITE(dec0_pf1_control_1_w)
- 	AM_RANGE(0x242000, 0x24207f) AM_WRITE(SMH_RAM) AM_BASE(&dec0_pf1_colscroll)
-	AM_RANGE(0x242400, 0x2427ff) AM_WRITE(SMH_RAM) AM_BASE(&dec0_pf1_rowscroll)
+ 	AM_RANGE(0x242000, 0x24207f) AM_WRITEONLY AM_BASE(&dec0_pf1_colscroll)
+	AM_RANGE(0x242400, 0x2427ff) AM_WRITEONLY AM_BASE(&dec0_pf1_rowscroll)
 	AM_RANGE(0x242800, 0x243fff) AM_RAM														/* Robocop only */
 	AM_RANGE(0x244000, 0x245fff) AM_RAM_WRITE(dec0_pf1_data_w) AM_BASE(&dec0_pf1_data)
 	AM_RANGE(0x246000, 0x246007) AM_WRITE(dec0_pf2_control_0_w)								/* first tile layer */
 	AM_RANGE(0x246010, 0x246017) AM_WRITE(dec0_pf2_control_1_w)
-	AM_RANGE(0x248000, 0x24807f) AM_WRITE(SMH_RAM) AM_BASE(&dec0_pf2_colscroll)
-	AM_RANGE(0x248400, 0x2487ff) AM_WRITE(SMH_RAM) AM_BASE(&dec0_pf2_rowscroll)
+	AM_RANGE(0x248000, 0x24807f) AM_WRITEONLY AM_BASE(&dec0_pf2_colscroll)
+	AM_RANGE(0x248400, 0x2487ff) AM_WRITEONLY AM_BASE(&dec0_pf2_rowscroll)
 	AM_RANGE(0x24a000, 0x24a7ff) AM_RAM_WRITE(dec0_pf2_data_w) AM_BASE(&dec0_pf2_data)
 	AM_RANGE(0x24c000, 0x24c007) AM_WRITE(dec0_pf3_control_0_w)								/* second tile layer */
 	AM_RANGE(0x24c010, 0x24c017) AM_WRITE(dec0_pf3_control_1_w)
 	AM_RANGE(0x24c800, 0x24c87f) AM_RAM AM_BASE(&dec0_pf3_colscroll)
-	AM_RANGE(0x24cc00, 0x24cfff) AM_WRITE(SMH_RAM) AM_BASE(&dec0_pf3_rowscroll)
+	AM_RANGE(0x24cc00, 0x24cfff) AM_WRITEONLY AM_BASE(&dec0_pf3_rowscroll)
 	AM_RANGE(0x24d000, 0x24d7ff) AM_RAM_WRITE(dec0_pf3_data_w) AM_BASE(&dec0_pf3_data)
 	AM_RANGE(0x300000, 0x30001f) AM_READ(dec0_rotary_r)
 	AM_RANGE(0x30c000, 0x30c00b) AM_READ(dec0_controls_r)
@@ -239,8 +239,8 @@ static ADDRESS_MAP_START( slyspy_map, ADDRESS_SPACE_PROGRAM, 16 )
 	/* Pf3 is unaffected by protection */
 	AM_RANGE(0x300000, 0x300007) AM_WRITE(dec0_pf3_control_0_w)
 	AM_RANGE(0x300010, 0x300017) AM_WRITE(dec0_pf3_control_1_w)
-	AM_RANGE(0x300800, 0x30087f) AM_WRITE(SMH_RAM) AM_BASE(&dec0_pf3_colscroll)
-	AM_RANGE(0x300c00, 0x300fff) AM_WRITE(SMH_RAM) AM_BASE(&dec0_pf3_rowscroll)
+	AM_RANGE(0x300800, 0x30087f) AM_WRITEONLY AM_BASE(&dec0_pf3_colscroll)
+	AM_RANGE(0x300c00, 0x300fff) AM_WRITEONLY AM_BASE(&dec0_pf3_rowscroll)
 	AM_RANGE(0x301000, 0x3017ff) AM_WRITE(dec0_pf3_data_w) AM_BASE(&dec0_pf3_data)
 
 	AM_RANGE(0x304000, 0x307fff) AM_RAM AM_BASE(&dec0_ram) 	/* Sly spy main ram */
@@ -291,7 +291,7 @@ static ADDRESS_MAP_START( dec0_s_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym2", ym3812_w)
 	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r)
 	AM_RANGE(0x3800, 0x3800) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
-	AM_RANGE(0x8000, 0xffff) AM_RAM
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 /* Physical memory map (21 bits) */
@@ -340,7 +340,7 @@ static ADDRESS_MAP_START( secretab_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300c00, 0x300fff) AM_RAM AM_BASE(&dec0_pf3_rowscroll)
 	AM_RANGE(0x301000, 0x3017ff) AM_RAM_WRITE(dec0_pf3_data_w) AM_BASE(&dec0_pf3_data)
 	AM_RANGE(0x301800, 0x307fff) AM_RAM AM_BASE(&dec0_ram) /* Sly spy main ram */
-	AM_RANGE(0x310000, 0x3107ff) AM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x310000, 0x3107ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xb08000, 0xb087ff) AM_RAM AM_BASE(&spriteram16) /* Sprites */
 ADDRESS_MAP_END
 
@@ -349,28 +349,28 @@ static ADDRESS_MAP_START( automat_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x240000, 0x240007) AM_WRITE(dec0_pf1_control_0_w)			/* text layer */
 	AM_RANGE(0x240010, 0x240017) AM_WRITE(dec0_pf1_control_1_w)
-	AM_RANGE(0x242000, 0x24207f) AM_WRITE(SMH_RAM) AM_BASE(&dec0_pf1_colscroll)
-	AM_RANGE(0x242400, 0x2427ff) AM_WRITE(SMH_RAM) AM_BASE(&dec0_pf1_rowscroll)
+	AM_RANGE(0x242000, 0x24207f) AM_WRITEONLY AM_BASE(&dec0_pf1_colscroll)
+	AM_RANGE(0x242400, 0x2427ff) AM_WRITEONLY AM_BASE(&dec0_pf1_rowscroll)
 
 	AM_RANGE(0x242800, 0x243fff) AM_RAM 								/* Robocop only */
 	AM_RANGE(0x244000, 0x245fff) AM_RAM_WRITE(dec0_pf1_data_w) AM_BASE(&dec0_pf1_data)
 
 	AM_RANGE(0x246000, 0x246007) AM_WRITE(dec0_pf2_control_0_w)			/* first tile layer */
 	AM_RANGE(0x246010, 0x246017) AM_WRITE(dec0_pf2_control_1_w)
-	AM_RANGE(0x248000, 0x24807f) AM_WRITE(SMH_RAM) AM_BASE(&dec0_pf2_colscroll)
-	AM_RANGE(0x248400, 0x2487ff) AM_WRITE(SMH_RAM) AM_BASE(&dec0_pf2_rowscroll)
+	AM_RANGE(0x248000, 0x24807f) AM_WRITEONLY AM_BASE(&dec0_pf2_colscroll)
+	AM_RANGE(0x248400, 0x2487ff) AM_WRITEONLY AM_BASE(&dec0_pf2_rowscroll)
 
 	AM_RANGE(0x24a000, 0x24a7ff) AM_RAM_WRITE(dec0_pf2_data_w) AM_BASE(&dec0_pf2_data)
 	AM_RANGE(0x24c000, 0x24c007) AM_WRITE(dec0_pf3_control_0_w)			/* second tile layer */
 	AM_RANGE(0x24c010, 0x24c017) AM_WRITE(dec0_pf3_control_1_w)
 	AM_RANGE(0x24c800, 0x24c87f) AM_RAM AM_BASE(&dec0_pf3_colscroll)
-	AM_RANGE(0x24cc00, 0x24cfff) AM_WRITE(SMH_RAM) AM_BASE(&dec0_pf3_rowscroll)
+	AM_RANGE(0x24cc00, 0x24cfff) AM_WRITEONLY AM_BASE(&dec0_pf3_rowscroll)
 	AM_RANGE(0x24d000, 0x24d7ff) AM_RAM_WRITE(dec0_pf3_data_w) AM_BASE(&dec0_pf3_data)
 	AM_RANGE(0x300000, 0x30001f) AM_READ(dec0_rotary_r)
 	AM_RANGE(0x30c000, 0x30c00b) AM_READ(dec0_controls_r)
 	AM_RANGE(0x30c000, 0x30c01f) AM_WRITE(automat_control_w)			/* Priority, sound, etc. */
 	AM_RANGE(0x310000, 0x3107ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x314000, 0x3147ff) AM_READ(SMH_RAM)
+	AM_RANGE(0x314000, 0x3147ff) AM_RAM
 	AM_RANGE(0x400008, 0x400009) AM_WRITE(dec0_priority_w) 				// NEW
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM AM_BASE(&dec0_ram) 				/* Main ram */
 	AM_RANGE(0xffc000, 0xffc7ff) AM_RAM AM_BASE(&spriteram16) 			/* Sprites */
@@ -992,11 +992,11 @@ static MACHINE_DRIVER_START( automat )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
-	MDRV_CPU_PROGRAM_MAP(automat_map,0)
+	MDRV_CPU_PROGRAM_MAP(automat_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)/* VBL */
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3000000)// ?
-	MDRV_CPU_PROGRAM_MAP(automat_s_map,0)
+	MDRV_CPU_PROGRAM_MAP(automat_s_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1036,11 +1036,11 @@ static MACHINE_DRIVER_START( hbarrel )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
-	MDRV_CPU_PROGRAM_MAP(dec0_map,0)
+	MDRV_CPU_PROGRAM_MAP(dec0_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)/* VBL, level 5 interrupts from i8751 */
 
 	MDRV_CPU_ADD("audiocpu", M6502, 1500000)
-	MDRV_CPU_PROGRAM_MAP(dec0_s_map,0)
+	MDRV_CPU_PROGRAM_MAP(dec0_s_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1078,11 +1078,11 @@ static MACHINE_DRIVER_START( baddudes )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
-	MDRV_CPU_PROGRAM_MAP(dec0_map,0)
+	MDRV_CPU_PROGRAM_MAP(dec0_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)/* VBL, level 5 interrupts from i8751 */
 
 	MDRV_CPU_ADD("audiocpu", M6502, 1500000)
-	MDRV_CPU_PROGRAM_MAP(dec0_s_map,0)
+	MDRV_CPU_PROGRAM_MAP(dec0_s_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1120,11 +1120,11 @@ static MACHINE_DRIVER_START( birdtry )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
-	MDRV_CPU_PROGRAM_MAP(dec0_map,0)
+	MDRV_CPU_PROGRAM_MAP(dec0_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)/* VBL, level 5 interrupts from i8751 */
 
 	MDRV_CPU_ADD("audiocpu", M6502, 1500000)
-	MDRV_CPU_PROGRAM_MAP(dec0_s_map,0)
+	MDRV_CPU_PROGRAM_MAP(dec0_s_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1162,14 +1162,14 @@ static MACHINE_DRIVER_START( robocop )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
-	MDRV_CPU_PROGRAM_MAP(dec0_map,0)
+	MDRV_CPU_PROGRAM_MAP(dec0_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)/* VBL */
 
 	MDRV_CPU_ADD("audiocpu", M6502, 1500000)
-	MDRV_CPU_PROGRAM_MAP(dec0_s_map,0)
+	MDRV_CPU_PROGRAM_MAP(dec0_s_map)
 
 	MDRV_CPU_ADD("sub", H6280,21477200/16) /* 21.4772MHz clock */
-	MDRV_CPU_PROGRAM_MAP(robocop_sub_map,0)
+	MDRV_CPU_PROGRAM_MAP(robocop_sub_map)
 
 	MDRV_QUANTUM_TIME(HZ(3000))	/* Interleave between HuC6280 & 68000 */
 
@@ -1209,11 +1209,11 @@ static MACHINE_DRIVER_START( robocopb )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
-	MDRV_CPU_PROGRAM_MAP(dec0_map,0)
+	MDRV_CPU_PROGRAM_MAP(dec0_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)/* VBL */
 
 	MDRV_CPU_ADD("audiocpu", M6502, 1500000)
-	MDRV_CPU_PROGRAM_MAP(dec0_s_map,0)
+	MDRV_CPU_PROGRAM_MAP(dec0_s_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1251,14 +1251,14 @@ static MACHINE_DRIVER_START( hippodrm )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
-	MDRV_CPU_PROGRAM_MAP(dec0_map,0)
+	MDRV_CPU_PROGRAM_MAP(dec0_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)/* VBL */
 
 	MDRV_CPU_ADD("audiocpu", M6502, 1500000)
-	MDRV_CPU_PROGRAM_MAP(dec0_s_map,0)
+	MDRV_CPU_PROGRAM_MAP(dec0_s_map)
 
 	MDRV_CPU_ADD("sub", H6280,21477200/16) /* 21.4772MHz clock */
-	MDRV_CPU_PROGRAM_MAP(hippodrm_sub_map,0)
+	MDRV_CPU_PROGRAM_MAP(hippodrm_sub_map)
 
 	MDRV_QUANTUM_TIME(HZ(300))	/* Interleave between H6280 & 68000 */
 
@@ -1298,11 +1298,11 @@ static MACHINE_DRIVER_START( slyspy )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* verified on pcb (20MHZ OSC) 68000P12 running at 10Mhz */
-	MDRV_CPU_PROGRAM_MAP(slyspy_map,0)
+	MDRV_CPU_PROGRAM_MAP(slyspy_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)/* VBL */
 
 	MDRV_CPU_ADD("audiocpu", H6280, XTAL_12MHz/2/3) /* verified on pcb (6Mhz is XIN on pin 10 of H6280, verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(slyspy_s_map,0)
+	MDRV_CPU_PROGRAM_MAP(slyspy_s_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1340,12 +1340,12 @@ static MACHINE_DRIVER_START( secretab )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* verified on pcb (20MHZ OSC) 68000P12 running at 10Mhz */
-	MDRV_CPU_PROGRAM_MAP(secretab_map,0)
+	MDRV_CPU_PROGRAM_MAP(secretab_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)/* VBL */
 
 	/* z80 */
 //  MDRV_CPU_ADD("audiocpu", H6280, XTAL_12MHz/2/3) /* verified on pcb (6Mhz is XIN on pin 10 of H6280, verified on pcb */
-//  MDRV_CPU_PROGRAM_MAP(slyspy_s_map,0)
+//  MDRV_CPU_PROGRAM_MAP(slyspy_s_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1383,11 +1383,11 @@ static MACHINE_DRIVER_START( midres )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* verified on pcb (20MHZ OSC) 68000P12 running at 10Mhz */
-	MDRV_CPU_PROGRAM_MAP(midres_map,0)
+	MDRV_CPU_PROGRAM_MAP(midres_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)/* VBL */
 
 	MDRV_CPU_ADD("audiocpu", H6280, XTAL_24MHz/4/3) /* verified on pcb (6Mhz is XIN on pin 10 of H6280, verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(midres_s_map,0)
+	MDRV_CPU_PROGRAM_MAP(midres_s_map)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1435,6 +1435,9 @@ ROM_START( hbarrel )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 6502 Sound */
 	ROM_LOAD( "hb07.bin",     0x8000, 0x8000, CRC(a127f0f7) SHA1(2cf962410936ac336e384dda2bf434a297bc940f) )
 
+	ROM_REGION( 0x1000, "mcu", 0 )	/* i8751 microcontroller */
+	ROM_LOAD( "i8751",     0x0000, 0x1000, NO_DUMP )
+
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE ) /* chars */
 	ROM_LOAD( "hb25.bin",     0x00000, 0x10000, CRC(8649762c) SHA1(84d3d82d4d011c54271ef7a0dc5857a34b61cf8a) )
 	ROM_LOAD( "hb26.bin",     0x10000, 0x10000, CRC(f8189bbd) SHA1(b4445f50e8771af6ba4fcbc34018f6ecd379779a) )
@@ -1481,6 +1484,9 @@ ROM_START( hbarrelw )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 6502 Sound */
 	ROM_LOAD( "hb_ec07.rom",  0x8000, 0x8000, CRC(16a5a1aa) SHA1(27eb8c09be6b1be502bda9ae9c9ff860d2560d46) )
 
+	ROM_REGION( 0x1000, "mcu", 0 )	/* i8751 microcontroller */
+	ROM_LOAD( "i8751",     0x0000, 0x1000, NO_DUMP )
+
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE ) /* chars */
 	ROM_LOAD( "hb_ec25.rom",  0x00000, 0x10000, CRC(2e5732a2) SHA1(b730ce11db1876b81d2b7cde0f129bd6fbfeb771) )
 	ROM_LOAD( "hb_ec26.rom",  0x10000, 0x10000, CRC(161a2c4d) SHA1(fbfa97ecc8b4d540d38f811ebb6272b348ed37e5) )
@@ -1525,6 +1531,9 @@ ROM_START( baddudes )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound CPU */
 	ROM_LOAD( "baddudes.7",   0x8000, 0x8000, CRC(9fb1ef4b) SHA1(f4dd0773be93c2ad8b0faacd12939c531b5aa130) )
 
+	ROM_REGION( 0x1000, "mcu", 0 )	/* i8751 microcontroller */
+	ROM_LOAD( "i8751",     0x0000, 0x1000, NO_DUMP )
+
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE ) /* chars */
 	ROM_LOAD( "baddudes.25",  0x00000, 0x08000, CRC(bcf59a69) SHA1(486727e19c12ea55b47e2ef773d0d0471cf50083) )
 	ROM_LOAD( "baddudes.26",  0x08000, 0x08000, CRC(9aff67b8) SHA1(18c3972a9f17a48897463f48be0d723ea0cf5aba) )
@@ -1564,6 +1573,9 @@ ROM_START( drgninja )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound CPU */
 	ROM_LOAD( "drgninja.07",  0x8000, 0x8000, CRC(001d2f51) SHA1(f186671f0450ccf9201577a5caf0efc490c6645e) )
+
+	ROM_REGION( 0x1000, "mcu", 0 )	/* i8751 microcontroller */
+	ROM_LOAD( "i8751",     0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE ) /* chars */
 	ROM_LOAD( "drgninja.25",  0x00000, 0x08000, CRC(6791bc20) SHA1(7240b2688cda04ee9ea331472a84fbffc85b8e90) )
@@ -1606,6 +1618,9 @@ ROM_START( birdtry )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 6502 Sound */
 	ROM_LOAD( "ek-07.bin",     0x8000, 0x8000, CRC(236549bc) SHA1(1f664a277b3451b7905638abdf98c7e428b2e935) )
+
+	ROM_REGION( 0x1000, "mcu", 0 )	/* i8751 microcontroller */
+	ROM_LOAD( "i8751",     0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE ) /* chars */
 	ROM_LOAD( "ek-25.bin",     0x00000, 0x08000, CRC(4df134ad) SHA1(f2cfa7e3fc4a2ac40897c2600c901ff75237e081) )

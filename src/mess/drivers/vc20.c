@@ -255,7 +255,7 @@ static PALETTE_INIT( vc20 )
 static MACHINE_DRIVER_START( vic20 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, VIC6560_CLOCK)        /* 7.8336 MHz */
-	MDRV_CPU_PROGRAM_MAP(vc20_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(vc20_mem)
 	MDRV_CPU_VBLANK_INT("screen", vic20_frame_interrupt)
 	MDRV_CPU_PERIODIC_INT(vic656x_raster_interrupt, VIC656X_HRETRACERATE)
 
@@ -320,7 +320,7 @@ static MACHINE_DRIVER_START( vic20i )
 #endif
 
 	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP( vc20i_mem, 0 )
+	MDRV_CPU_PROGRAM_MAP( vc20i_mem)
 MACHINE_DRIVER_END
 
 
@@ -328,7 +328,7 @@ static MACHINE_DRIVER_START( vc20 )
 	MDRV_IMPORT_FROM( vic20 )
 
 	MDRV_CPU_REPLACE( "maincpu", M6502, VIC6561_CLOCK )
-	MDRV_CPU_PROGRAM_MAP( vc20i_mem, 0 )
+	MDRV_CPU_PROGRAM_MAP( vc20i_mem)
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(VIC6561_VRETRACERATE)

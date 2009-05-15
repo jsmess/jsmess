@@ -195,8 +195,8 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( nakajies210 )
 	MDRV_CPU_ADD( "v20hl", V20, X301 / 2 )
-	MDRV_CPU_PROGRAM_MAP( nakajies210_map, 0 )
-	MDRV_CPU_IO_MAP( nakajies_io_map, 0 )
+	MDRV_CPU_PROGRAM_MAP( nakajies210_map)
+	MDRV_CPU_IO_MAP( nakajies_io_map)
 
 	MDRV_SCREEN_ADD( "screen", LCD )
 	MDRV_SCREEN_REFRESH_RATE( 50 )	/* Wild guess */
@@ -214,8 +214,8 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( nakajies220 )
 	MDRV_CPU_ADD( "v20hl", V20, X301 / 2 )
-	MDRV_CPU_PROGRAM_MAP( nakajies220_map, 0 )
-	MDRV_CPU_IO_MAP( nakajies_io_map, 0 )
+	MDRV_CPU_PROGRAM_MAP( nakajies220_map)
+	MDRV_CPU_IO_MAP( nakajies_io_map)
 
 	MDRV_SCREEN_ADD( "screen", LCD )
 	MDRV_SCREEN_REFRESH_RATE( 50 )	/* Wild guess */
@@ -233,8 +233,8 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( nakajies250 )
 	MDRV_CPU_ADD( "v20hl", V20, X301 / 2 )
-	MDRV_CPU_PROGRAM_MAP( nakajies250_map, 0 )
-	MDRV_CPU_IO_MAP( nakajies_io_map, 0 )
+	MDRV_CPU_PROGRAM_MAP( nakajies250_map)
+	MDRV_CPU_IO_MAP( nakajies_io_map)
 
 	MDRV_SCREEN_ADD( "screen", LCD )
 	MDRV_SCREEN_REFRESH_RATE( 50 )  /* Wild guess */

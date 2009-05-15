@@ -38,8 +38,8 @@ static VIDEO_UPDATE( bcs3 )
 static MACHINE_DRIVER_START( bcs3 )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
-    MDRV_CPU_PROGRAM_MAP(bcs3_mem, 0)
-    MDRV_CPU_IO_MAP(bcs3_io, 0)
+    MDRV_CPU_PROGRAM_MAP(bcs3_mem)
+    MDRV_CPU_IO_MAP(bcs3_io)
 
     MDRV_MACHINE_RESET(bcs3)
 

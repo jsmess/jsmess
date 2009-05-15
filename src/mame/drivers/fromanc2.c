@@ -301,7 +301,7 @@ static ADDRESS_MAP_START( fromancr_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x980000, 0x983fff) AM_WRITENOP							// VRAM Unused ?
 
 	AM_RANGE(0xa00000, 0xa00fff) AM_READWRITE(fromancr_paletteram_0_r, fromancr_paletteram_0_w)	// PALETTE (1P)
-	AM_RANGE(0xa80000, 0xa80fff) AM_READWRITE(fromancr_paletteram_1_r, fromancr_paletteram_0_w)	// PALETTE (2P)
+	AM_RANGE(0xa80000, 0xa80fff) AM_READWRITE(fromancr_paletteram_1_r, fromancr_paletteram_1_w)	// PALETTE (2P)
 
 	AM_RANGE(0xd00000, 0xd00023) AM_WRITE(fromancr_gfxreg_1_w)			// SCROLL REG (1P/2P)
 	AM_RANGE(0xd00200, 0xd002ff) AM_WRITENOP							// ?
@@ -339,7 +339,7 @@ static ADDRESS_MAP_START( fromanc4_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xda0000, 0xdaffff) AM_WRITE(fromanc4_videoram_2_w)	// VRAM TEXT (1P/2P)
 
 	AM_RANGE(0xdb0000, 0xdb0fff) AM_READWRITE(fromanc4_paletteram_0_r, fromanc4_paletteram_0_w)	// PALETTE (1P)
-	AM_RANGE(0xdc0000, 0xdc0fff) AM_READWRITE(fromanc4_paletteram_1_r, fromanc4_paletteram_0_w)	// PALETTE (2P)
+	AM_RANGE(0xdc0000, 0xdc0fff) AM_READWRITE(fromanc4_paletteram_1_r, fromanc4_paletteram_1_w)	// PALETTE (2P)
 
 	AM_RANGE(0xd10000, 0xd10001) AM_READ(fromanc2_keymatrix_r)	// INPUT KEY MATRIX
 	AM_RANGE(0xd20000, 0xd20001) AM_READ_PORT("SYSTEM")
@@ -569,16 +569,16 @@ static MACHINE_DRIVER_START( fromanc2 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,32000000/2)		/* 16.00 MHz */
-	MDRV_CPU_PROGRAM_MAP(fromanc2_main_map,0)
+	MDRV_CPU_PROGRAM_MAP(fromanc2_main_map)
 	MDRV_CPU_VBLANK_INT("lscreen", fromanc2_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80,32000000/4)		/* 8.00 MHz */
-	MDRV_CPU_PROGRAM_MAP(fromanc2_sound_map,0)
-	MDRV_CPU_IO_MAP(fromanc2_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(fromanc2_sound_map)
+	MDRV_CPU_IO_MAP(fromanc2_sound_io_map)
 
 	MDRV_CPU_ADD("sub", Z80,32000000/4)		/* 8.00 MHz */
-	MDRV_CPU_PROGRAM_MAP(fromanc2_sub_map,0)
-	MDRV_CPU_IO_MAP(fromanc2_sub_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(fromanc2_sub_map)
+	MDRV_CPU_IO_MAP(fromanc2_sub_io_map)
 
 
 	MDRV_MACHINE_RESET(fromanc2)
@@ -621,16 +621,16 @@ static MACHINE_DRIVER_START( fromancr )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,32000000/2)		/* 16.00 MHz */
-	MDRV_CPU_PROGRAM_MAP(fromancr_main_map,0)
+	MDRV_CPU_PROGRAM_MAP(fromancr_main_map)
 	MDRV_CPU_VBLANK_INT("lscreen", fromanc2_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80,32000000/4)		/* 8.00 MHz */
-	MDRV_CPU_PROGRAM_MAP(fromanc2_sound_map,0)
-	MDRV_CPU_IO_MAP(fromanc2_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(fromanc2_sound_map)
+	MDRV_CPU_IO_MAP(fromanc2_sound_io_map)
 
 	MDRV_CPU_ADD("sub", Z80,32000000/4)		/* 8.00 MHz */
-	MDRV_CPU_PROGRAM_MAP(fromanc2_sub_map,0)
-	MDRV_CPU_IO_MAP(fromanc2_sub_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(fromanc2_sub_map)
+	MDRV_CPU_IO_MAP(fromanc2_sub_io_map)
 
 	MDRV_MACHINE_RESET(fromancr)
 	MDRV_NVRAM_HANDLER(93C46)
@@ -672,12 +672,12 @@ static MACHINE_DRIVER_START( fromanc4 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,32000000/2)		/* 16.00 MHz */
-	MDRV_CPU_PROGRAM_MAP(fromanc4_main_map,0)
+	MDRV_CPU_PROGRAM_MAP(fromanc4_main_map)
 	MDRV_CPU_VBLANK_INT("lscreen", fromanc2_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80,32000000/4)		/* 8.00 MHz */
-	MDRV_CPU_PROGRAM_MAP(fromanc2_sound_map,0)
-	MDRV_CPU_IO_MAP(fromanc2_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(fromanc2_sound_map)
+	MDRV_CPU_IO_MAP(fromanc2_sound_io_map)
 
 	MDRV_MACHINE_RESET(fromanc4)
 	MDRV_NVRAM_HANDLER(93C46)

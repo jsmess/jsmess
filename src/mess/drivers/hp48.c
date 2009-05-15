@@ -922,7 +922,7 @@ static MACHINE_DRIVER_START ( hp48_common )
 
 	/* cpu */
 	MDRV_CPU_ADD ( "maincpu", SATURN, 3937007 ) /* almost 4 MHz */
-	MDRV_CPU_PROGRAM_MAP ( hp48, 0 )
+	MDRV_CPU_PROGRAM_MAP ( hp48)
 	MDRV_CPU_CONFIG( hp48_config )
  
 	/* memory */

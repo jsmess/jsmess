@@ -178,8 +178,8 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( b2m )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", 8080, 2000000)
-    MDRV_CPU_PROGRAM_MAP(b2m_mem, 0) 
-    MDRV_CPU_IO_MAP(b2m_io, 0)
+    MDRV_CPU_PROGRAM_MAP(b2m_mem)
+    MDRV_CPU_IO_MAP(b2m_io)
     MDRV_CPU_VBLANK_INT("screen", b2m_vblank_interrupt)
 	                             
     MDRV_MACHINE_START( b2m )
@@ -222,7 +222,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( b2mrom )
     MDRV_IMPORT_FROM(b2m)
     MDRV_CPU_MODIFY("maincpu")        
-  	MDRV_CPU_IO_MAP(b2m_rom_io, 0)
+  	MDRV_CPU_IO_MAP(b2m_rom_io)
 MACHINE_DRIVER_END
  
  static void b2m_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)

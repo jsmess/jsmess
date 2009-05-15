@@ -140,7 +140,7 @@
 #include "debugger.h"
 #include "mcs51.h"
 
-#define VERBOSE 1
+#define VERBOSE 0
 
 #define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
@@ -326,8 +326,11 @@ struct _mcs51_state_t
 
 /* Read/Write a byte from/to the Internal RAM indirectly */
 /* (called from indirect addressing)                     */
-#define IRAM_IR(a) 		memory_read_byte_8le(mcs51_state->data, (a) & mcs51_state->ram_mask)
-#define IRAM_IW(a, d) 	memory_write_byte_8le(mcs51_state->data, (a) & mcs51_state->ram_mask, d)
+INLINE UINT8 iram_iread(mcs51_state_t *mcs51_state, offs_t a) { return (a <= mcs51_state->ram_mask) ? memory_read_byte_8le(mcs51_state->data, a) : 0xff; }
+INLINE void iram_iwrite(mcs51_state_t *mcs51_state, offs_t a, UINT8 d) { if (a <= mcs51_state->ram_mask) memory_write_byte_8le(mcs51_state->data, a, d); }
+
+#define IRAM_IR(a)		iram_iread(mcs51_state, a)
+#define IRAM_IW(a, d)	iram_iwrite(mcs51_state, a, d)
 
 /* Form an Address to Read/Write to External RAM indirectly */
 /* (called from indirect addressing)                        */
@@ -1728,6 +1731,10 @@ static void check_irqs(mcs51_state_t *mcs51_state)
 		return;
 	}
 
+	/* also break out of jb int0,<self> loops */
+	if (ROP(PC) == 0x20 && ROP_ARG(PC+1) == 0xb2 && ROP_ARG(PC+2) == 0xfd)
+		PC += 3;
+
  	//Save current pc to stack, set pc to new interrupt vector
 	push_pc(mcs51_state);
 	PC = int_vec;
@@ -1858,19 +1865,19 @@ static void mcs51_set_irq_line(mcs51_state_t *mcs51_state, int irqline, int stat
 			break;
 
 		case MCS51_T0_LINE:
-			if (GET_BIT(tr_state, MCS51_T0_LINE))
+			if (GET_BIT(tr_state, MCS51_T0_LINE) && GET_TR0)
 				mcs51_state->t0_cnt++;
 			break;
 
 		case MCS51_T1_LINE:
-			if (GET_BIT(tr_state, MCS51_T1_LINE))
+			if (GET_BIT(tr_state, MCS51_T1_LINE) && GET_TR1)
 				mcs51_state->t1_cnt++;
 			break;
 
 		case MCS51_T2_LINE:
 			if (mcs51_state->features & FEATURE_I8052)
 			{
-				if (GET_BIT(tr_state, MCS51_T2_LINE))
+				if (GET_BIT(tr_state, MCS51_T2_LINE) && GET_TR1)
 					mcs51_state->t2_cnt++;
 			}
 			else

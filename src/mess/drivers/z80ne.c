@@ -372,8 +372,8 @@ static const kr2376_interface lx388_kr2376_interface =
 static MACHINE_DRIVER_START( z80ne )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("z80ne", Z80, Z80NE_CPU_SPEED_HZ)
-	MDRV_CPU_PROGRAM_MAP(z80ne_mem, 0)
-	MDRV_CPU_IO_MAP(z80ne_io, 0)
+	MDRV_CPU_PROGRAM_MAP(z80ne_mem)
+	MDRV_CPU_IO_MAP(z80ne_io)
 
 	MDRV_MACHINE_START(z80ne)
 	MDRV_MACHINE_RESET(z80ne)
@@ -390,7 +390,7 @@ static MACHINE_DRIVER_START( z80net )
 	MDRV_IMPORT_FROM( z80ne )
 
 	MDRV_CPU_MODIFY("z80ne")
-	MDRV_CPU_IO_MAP(z80net_io, 0)
+	MDRV_CPU_IO_MAP(z80net_io)
 
 	MDRV_MACHINE_START( z80net )
 	MDRV_MACHINE_RESET( z80net )
@@ -415,8 +415,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( z80netb )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("z80ne", Z80, Z80NE_CPU_SPEED_HZ)
-	MDRV_CPU_PROGRAM_MAP(z80netb_mem, 0)
-	MDRV_CPU_IO_MAP(z80net_io, 0)
+	MDRV_CPU_PROGRAM_MAP(z80netb_mem)
+	MDRV_CPU_IO_MAP(z80net_io)
 
 	MDRV_MACHINE_START(z80netb)
 	MDRV_MACHINE_RESET(z80netb)

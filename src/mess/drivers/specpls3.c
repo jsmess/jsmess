@@ -364,7 +364,7 @@ static MACHINE_RESET( spectrum_plus3 )
 static MACHINE_DRIVER_START( spectrum_plus3 )
 	MDRV_IMPORT_FROM( spectrum_128 )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(spectrum_plus3_io, 0)
+	MDRV_CPU_IO_MAP(spectrum_plus3_io)
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(50.01)
 

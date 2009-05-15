@@ -371,8 +371,8 @@ static MACHINE_DRIVER_START( comx35_pal )
 
 	/* basic system hardware */
 	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, CDP1869_CPU_CLK_PAL)
-	MDRV_CPU_PROGRAM_MAP(comx35_map, 0)
-	MDRV_CPU_IO_MAP(comx35_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(comx35_map)
+	MDRV_CPU_IO_MAP(comx35_io_map)
 	MDRV_CPU_CONFIG(comx35_cdp1802_config)
 
 	MDRV_MACHINE_START(comx35p)
@@ -394,8 +394,8 @@ static MACHINE_DRIVER_START( comx35_ntsc )
 
 	/* basic system hardware */
 	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, CDP1869_CPU_CLK_NTSC)
-	MDRV_CPU_PROGRAM_MAP(comx35_map, 0)
-	MDRV_CPU_IO_MAP(comx35_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(comx35_map)
+	MDRV_CPU_IO_MAP(comx35_io_map)
 	MDRV_CPU_CONFIG(comx35_cdp1802_config)
 
 	MDRV_MACHINE_START(comx35n)

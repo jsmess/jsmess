@@ -1196,8 +1196,8 @@ static MACHINE_DRIVER_START( abc800m )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80_TAG, Z80, ABC800_X01/2/2)
 	MDRV_CPU_CONFIG(abc800_daisy_chain)
-	MDRV_CPU_PROGRAM_MAP(abc800m_map, 0)
-	MDRV_CPU_IO_MAP(abc800m_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(abc800m_map)
+	MDRV_CPU_IO_MAP(abc800m_io_map)
 
 	MDRV_MACHINE_START(abc800)
 	MDRV_MACHINE_RESET(abc800)
@@ -1231,8 +1231,8 @@ static MACHINE_DRIVER_START( abc800c )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80_TAG, Z80, ABC800_X01/2/2)
 	MDRV_CPU_CONFIG(abc800_daisy_chain)
-	MDRV_CPU_PROGRAM_MAP(abc800c_map, 0)
-	MDRV_CPU_IO_MAP(abc800c_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(abc800c_map)
+	MDRV_CPU_IO_MAP(abc800c_io_map)
 
 	MDRV_MACHINE_START(abc800)
 	MDRV_MACHINE_RESET(abc800)
@@ -1266,8 +1266,8 @@ static MACHINE_DRIVER_START( abc802 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80_TAG, Z80, ABC800_X01/2/2)
 	MDRV_CPU_CONFIG(abc800_daisy_chain)
-	MDRV_CPU_PROGRAM_MAP(abc802_map, 0)
-	MDRV_CPU_IO_MAP(abc802_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(abc802_map)
+	MDRV_CPU_IO_MAP(abc802_io_map)
 
 	MDRV_MACHINE_START(abc802)
 	MDRV_MACHINE_RESET(abc802)
@@ -1301,8 +1301,8 @@ static MACHINE_DRIVER_START( abc806 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80_TAG, Z80, ABC800_X01/2/2)
 	MDRV_CPU_CONFIG(abc800_daisy_chain)
-	MDRV_CPU_PROGRAM_MAP(abc806_map, 0)
-	MDRV_CPU_IO_MAP(abc806_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(abc806_map)
+	MDRV_CPU_IO_MAP(abc806_io_map)
 
 	MDRV_MACHINE_START(abc806)
 	MDRV_MACHINE_RESET(abc806)

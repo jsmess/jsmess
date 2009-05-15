@@ -1386,8 +1386,8 @@ static const pc_lpt_interface pcw16_lpt_config =
 static MACHINE_DRIVER_START( pcw16 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 16000000)
-	MDRV_CPU_PROGRAM_MAP(pcw16_map, 0)
-	MDRV_CPU_IO_MAP(pcw16_io, 0)
+	MDRV_CPU_PROGRAM_MAP(pcw16_map)
+	MDRV_CPU_IO_MAP(pcw16_io)
 	MDRV_QUANTUM_TIME(HZ(60))
 
 	MDRV_MACHINE_RESET( pcw16 )

@@ -722,7 +722,7 @@ static const sc61860_cpu_core config =
 static MACHINE_DRIVER_START( pc1401 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", SC61860, 192000)        /* 7.8336 MHz */
-	MDRV_CPU_PROGRAM_MAP(pc1401_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(pc1401_mem)
 	MDRV_CPU_CONFIG(config)
 
 	MDRV_QUANTUM_TIME(HZ(60))
@@ -766,7 +766,7 @@ static const sc61860_cpu_core pc1251_config =
 static MACHINE_DRIVER_START( pc1251 )
 	MDRV_IMPORT_FROM( pc1401 )
 	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP( pc1251_mem, 0 )
+	MDRV_CPU_PROGRAM_MAP( pc1251_mem)
 	MDRV_CPU_CONFIG( pc1251_config )
 
 	MDRV_NVRAM_HANDLER( pc1251 )
@@ -794,7 +794,7 @@ static const sc61860_cpu_core pc1350_config =
 static MACHINE_DRIVER_START( pc1350 )
 	MDRV_IMPORT_FROM( pc1401 )
 	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP( pc1350_mem, 0 )
+	MDRV_CPU_PROGRAM_MAP( pc1350_mem)
 	MDRV_CPU_CONFIG( pc1350_config )
 
 	MDRV_MACHINE_START( pc1350 )
@@ -824,7 +824,7 @@ static const sc61860_cpu_core pc1403_config =
 static MACHINE_DRIVER_START( pc1403 )
 	MDRV_IMPORT_FROM( pc1401 )
 	MDRV_CPU_REPLACE( "maincpu", SC61860, 256000 )
-	MDRV_CPU_PROGRAM_MAP( pc1403_mem, 0 )
+	MDRV_CPU_PROGRAM_MAP( pc1403_mem)
 	MDRV_CPU_CONFIG( pc1403_config )
 
 	MDRV_NVRAM_HANDLER( pc1403 )

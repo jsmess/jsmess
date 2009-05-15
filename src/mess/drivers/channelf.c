@@ -237,8 +237,8 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( channelf )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", F8, 3579545/2)        /* Colorburst/2 */
-	MDRV_CPU_PROGRAM_MAP(channelf_map, 0)
-	MDRV_CPU_IO_MAP(channelf_io, 0)
+	MDRV_CPU_PROGRAM_MAP(channelf_map)
+	MDRV_CPU_IO_MAP(channelf_io)
 	MDRV_QUANTUM_TIME(HZ(60))
 
 	/* video hardware */
@@ -265,8 +265,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( sabavdpl )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", F8, MASTER_CLOCK_PAL)        /* PAL speed */
-	MDRV_CPU_PROGRAM_MAP(channelf_map, 0)
-	MDRV_CPU_IO_MAP(channelf_io, 0)
+	MDRV_CPU_PROGRAM_MAP(channelf_map)
+	MDRV_CPU_IO_MAP(channelf_io)
 	MDRV_QUANTUM_TIME(HZ(50))
 
 	/* video hardware */
@@ -294,8 +294,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( channlf2 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", F8, 3579545/2)        /* Colorburst / 2 */
-	MDRV_CPU_PROGRAM_MAP(channelf_map, 0)
-	MDRV_CPU_IO_MAP(channelf_io, 0)
+	MDRV_CPU_PROGRAM_MAP(channelf_map)
+	MDRV_CPU_IO_MAP(channelf_io)
 	MDRV_QUANTUM_TIME(HZ(60))
 
 	/* video hardware */
@@ -323,8 +323,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( sabavpl2 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", F8, MASTER_CLOCK_PAL)        /* PAL speed */
-	MDRV_CPU_PROGRAM_MAP(channelf_map, 0)
-	MDRV_CPU_IO_MAP(channelf_io, 0)
+	MDRV_CPU_PROGRAM_MAP(channelf_map)
+	MDRV_CPU_IO_MAP(channelf_io)
 	MDRV_QUANTUM_TIME(HZ(50))
 
 	/* video hardware */

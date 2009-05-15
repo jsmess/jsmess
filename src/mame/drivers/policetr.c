@@ -121,7 +121,7 @@ static offs_t speedup_pc;
 
 static TIMER_CALLBACK( irq5_gen )
 {
-	cputag_set_input_line(machine, "audiocpu", R3000_IRQ5, ASSERT_LINE);
+	cputag_set_input_line(machine, "maincpu", R3000_IRQ5, ASSERT_LINE);
 }
 
 
@@ -441,7 +441,7 @@ static MACHINE_DRIVER_START( policetr )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", R3000BE, MASTER_CLOCK/2)
 	MDRV_CPU_CONFIG(config)
-	MDRV_CPU_PROGRAM_MAP(policetr_map,0)
+	MDRV_CPU_PROGRAM_MAP(policetr_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_gen)
 
 	MDRV_NVRAM_HANDLER(policetr)
@@ -474,7 +474,7 @@ static MACHINE_DRIVER_START( sshooter )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(sshooter_map,0)
+	MDRV_CPU_PROGRAM_MAP(sshooter_map)
 MACHINE_DRIVER_END
 
 

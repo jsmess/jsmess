@@ -1,13 +1,25 @@
-/********************************************************************************************
+/**********************************************************************************************
 
 M14 Hardware (c) 1979 Irem
 
 driver by Angelo Salese
 
 TODO:
-- Check if the coin latch are correct and understand why the proper gameplay looks stiff;
 - Sound (very likely to be discrete);
-- What are the high 4 bits in the colorram for? They are used on the tiles only, left-over?
+- Colors might be not 100% accurate (needs screenshots from the real thing);
+- What are the high 4 bits in the colorram for? They are used on the mahjong tiles only,
+  left-over or something more important?
+- I'm not sure about the hopper hook-up, it could also be that the player should press
+  start + button 1 + ron buttons (= 0x43) instead of being "automatic";
+- Inputs are grossly mapped;
+
+Notes:
+- If you call a ron but you don't have the right hand you'll automatically lose the match;
+- If you make the timer to run out, you'll lose the turn but you don't get any visible message
+  (presumably signaled by a sound effect);
+- As you could expect, the cpu hands are actually pre-determined, so you actually play alone
+  against a variable number of available tiles;
+
 
 ==============================================================================================
 x (Mystery Rom)
@@ -36,137 +48,182 @@ http://japump.i.am/
 Dumped by Chackn
 01/30/2000
 
-********************************************************************************************/
+**********************************************************************************************/
 
 #include "driver.h"
 #include "cpu/i8085/i8085.h"
 
+static tilemap *m14_tilemap;
+
+/*************************************
+ *
+ *  Video Hardware
+ *
+ *************************************/
+
+/* guess, might not be 100% accurate. */
+static PALETTE_INIT( m14 )
+{
+	int i;
+
+	for (i = 0; i < 0x20; i++)
+	{
+		rgb_t color;
+
+		if (i & 0x01)
+			color = MAKE_RGB(pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 3));
+		else
+			color = (i & 0x10) ? RGB_WHITE : RGB_BLACK;
+
+		palette_set_color(machine, i, color);
+	}
+}
+
+static TILE_GET_INFO( m14_get_tile_info )
+{
+	int code = videoram[tile_index];
+	int color = colorram[tile_index] & 0xf;
+
+	/* colorram & 0xf0 used but unknown purpose*/
+
+	SET_TILE_INFO(
+			0,
+			code,
+			color,
+			0);
+}
+
 VIDEO_START( m14 )
 {
-
+	m14_tilemap = tilemap_create(machine, m14_get_tile_info,tilemap_scan_rows,8,8,32,32);
 }
 
 VIDEO_UPDATE( m14 )
 {
-	const gfx_element *gfx = screen->machine->gfx[0];
-	int count = 0;
-
-	int y,x;
-
-
-	for (y=0;y<32;y++)
-	{
-		for (x=0;x<32;x++)
-		{
-			int tile = videoram[count];
-			int colour = colorram[count] & 0x0f;
-			/* bits 4-7? */
-
-			drawgfx(bitmap,gfx,tile,colour,0,0,x*8,y*8,cliprect,TRANSPARENCY_NONE,0);
-
-			count++;
-		}
-	}
+	tilemap_draw(bitmap,cliprect,m14_tilemap,0,0);
 	return 0;
 }
+
+
+static WRITE8_HANDLER( m14_vram_w )
+{
+	videoram[offset] = data;
+	tilemap_mark_tile_dirty(m14_tilemap,offset);
+}
+
+static WRITE8_HANDLER( m14_cram_w )
+{
+	colorram[offset] = data;
+	tilemap_mark_tile_dirty(m14_tilemap,offset);
+}
+
+/*************************************
+ *
+ *  I/O
+ *
+ *************************************/
+
+static UINT8 hop_mux;
 
 static READ8_HANDLER( m14_rng_r )
 {
 	/* graphic artifacts happens if this doesn't return random values. */
-	return mame_rand(space->machine);
+	return (mame_rand(space->machine) & 0x0f) | 0xf0; /* | (input_port_read(space->machine, "IN1") & 0x80)*/;
 }
 
+/* Here routes the hopper & the inputs */
+static READ8_HANDLER( input_buttons_r )
+{
+	if(hop_mux) { hop_mux = 0; return 0; } //0x43 status bits
+	else        { return input_port_read(space->machine, "IN0"); }
+}
+
+#if 0
 static WRITE8_HANDLER( test_w )
 {
 	static UINT8 x[5];
 
 	x[offset] = data;
 
-	//popmessage("%02x %02x %02x %02x %02x",x[0],x[1],x[2],x[3],x[4]);
+	popmessage("%02x %02x %02x %02x %02x",x[0],x[1],x[2],x[3],x[4]);
 }
+#endif
+
+static WRITE8_HANDLER( hopper_w )
+{
+	/* ---- x--- coin out */
+	/* ---- --x- hopper/input mux? */
+	hop_mux = data & 2;
+	//popmessage("%02x",data);
+}
+
+/*************************************
+ *
+ *  Memory Map
+ *
+ *************************************/
 
 static ADDRESS_MAP_START( m14_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_BASE(&videoram)
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_BASE(&colorram)
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(m14_vram_w) AM_BASE(&videoram)
+	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(m14_cram_w) AM_BASE(&colorram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( m14_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf8, 0xf8) AM_READ_PORT("IN0")
-	AM_RANGE(0xf9, 0xf9) AM_READ_PORT("IN1")
-	AM_RANGE(0xfa, 0xfa) AM_READ(m14_rng_r)
-	AM_RANGE(0xfb, 0xfb) AM_READ_PORT("IN3")
-	AM_RANGE(0xf8, 0xfc) AM_WRITE(test_w)
+	AM_RANGE(0xf8, 0xf8) AM_READ_PORT("AN_PADDLE") AM_WRITENOP
+	AM_RANGE(0xf9, 0xf9) AM_READ(input_buttons_r) AM_WRITENOP
+	AM_RANGE(0xfa, 0xfa) AM_READ(m14_rng_r) AM_WRITENOP
+	AM_RANGE(0xfb, 0xfb) AM_READ_PORT("DSW") AM_WRITE(hopper_w)
+	AM_RANGE(0xf8, 0xfc) AM_WRITENOP
 ADDRESS_MAP_END
+
+/*************************************
+ *
+ *  Input Port Definitions
+ *
+ *************************************/
 
 static INPUT_CHANGED( left_coin_inserted )
 {
 	/* left coin insertion causes a rst6.5 (vector 0x34) */
-	cputag_set_input_line(field->port->machine, "maincpu", I8085_RST65_LINE, newval ? ASSERT_LINE : CLEAR_LINE);
+	if(newval)
+		cputag_set_input_line(field->port->machine, "maincpu", I8085_RST65_LINE, HOLD_LINE);
 }
 
 static INPUT_CHANGED( right_coin_inserted )
 {
 	/* right coin insertion causes a rst5.5 (vector 0x2c) */
-	cputag_set_input_line(field->port->machine, "maincpu", I8085_RST55_LINE, newval ? ASSERT_LINE : CLEAR_LINE);
+	if(newval)
+		cputag_set_input_line(field->port->machine, "maincpu", I8085_RST55_LINE, HOLD_LINE);
 }
 
 static INPUT_PORTS_START( m14 )
-	PORT_START("IN0") // paddle?
-	PORT_DIPNAME( 0x01, 0x00, "IN0" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_START("AN_PADDLE")
+	PORT_BIT( 0xff, 0x00, IPT_PADDLE  ) PORT_MINMAX(0,0xff) PORT_SENSITIVITY(5) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_REVERSE
 
-	PORT_START("IN1")
-	PORT_DIPNAME( 0x01, 0x00, "IN1" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) ) //this affects the medal settings
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_RON ) //could be reach too
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) //affects medal settings?
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x20, "Freeze" )
 	PORT_DIPSETTING(    0x20, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("IN3") //this whole port is stored at work ram $2112.
+	PORT_START("DSW") //this whole port is stored at work ram $2112.
 	PORT_DIPNAME( 0x01, 0x00, "Show available tiles" ) // debug mode for the rng?
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
@@ -193,8 +250,8 @@ static INPUT_PORTS_START( m14 )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("FAKE")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED(left_coin_inserted, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED(right_coin_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED(left_coin_inserted, 0) //coin x 5
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED(right_coin_inserted, 0) //coin x 1
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =
@@ -212,23 +269,6 @@ static GFXDECODE_START( m14 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 0x10 )
 GFXDECODE_END
 
-static PALETTE_INIT( m14 )
-{
-	int i;
-
-	for (i = 0; i < 0x20; i++)
-	{
-		rgb_t color;
-
-		if (i & 0x01)
-			color = MAKE_RGB(pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 3));
-		else
-			color = (i & 0x10) ? RGB_WHITE : RGB_BLACK;
-
-		palette_set_color(machine, i, color);
-	}
-}
-
 static INTERRUPT_GEN( m14_irq )
 {
 	cpu_set_input_line(device, I8085_RST75_LINE, ASSERT_LINE);
@@ -238,9 +278,9 @@ static INTERRUPT_GEN( m14_irq )
 static MACHINE_DRIVER_START( m14 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",8085A,6000000)
-	MDRV_CPU_PROGRAM_MAP(m14_map,0)
-	MDRV_CPU_IO_MAP(m14_io_map,0)
+	MDRV_CPU_ADD("maincpu",8085A,6000000/2) //guess: 6 Mhz internally divided by 2
+	MDRV_CPU_PROGRAM_MAP(m14_map)
+	MDRV_CPU_IO_MAP(m14_io_map)
 	MDRV_CPU_VBLANK_INT("screen",m14_irq)
 
 	/* video hardware */
@@ -259,8 +299,10 @@ static MACHINE_DRIVER_START( m14 )
 
 	/* sound hardware */
 //  MDRV_SPEAKER_STANDARD_MONO("mono")
-//  MDRV_SOUND_ADD("ay", AY8910, 8000000/4 /* guess */)
-//  MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+
+//  MDRV_SOUND_ADD("discrete", DISCRETE, 0)
+//  MDRV_SOUND_CONFIG_DISCRETE(m14)
+//  MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
 /***************************************************************************
@@ -286,4 +328,4 @@ ROM_START( ptrmj )
 	ROM_LOAD( "mgpa10.bin",  0x0400, 0x0400, CRC(e1a4ebdc) SHA1(d9df42424ede17f0634d8d0a56c0374a33c55333) )
 ROM_END
 
-GAME( 1979, ptrmj,  0,       m14,  m14,  0, ROT0, "Irem", "PT Reach Mahjong (Japan)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 1979, ptrmj,  0,       m14,  m14,  0, ROT0, "Irem", "PT Reach Mahjong (Japan)", GAME_NO_SOUND )

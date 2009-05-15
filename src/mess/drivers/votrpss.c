@@ -137,8 +137,8 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START(votrpss)
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", Z80, XTAL_8MHz/2)  /* 4.000 MHz, verified */
-    MDRV_CPU_PROGRAM_MAP(z80_mem, 0)
-    MDRV_CPU_IO_MAP(z80_io, 0)
+    MDRV_CPU_PROGRAM_MAP(z80_mem)
+    MDRV_CPU_IO_MAP(z80_io)
     MDRV_QUANTUM_TIME(HZ(60))
 
     /* video hardware */

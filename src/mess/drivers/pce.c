@@ -168,8 +168,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( pce )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", H6280, MAIN_CLOCK/3)
-	MDRV_CPU_PROGRAM_MAP(pce_mem, 0)
-	MDRV_CPU_IO_MAP(pce_io, 0)
+	MDRV_CPU_PROGRAM_MAP(pce_mem)
+	MDRV_CPU_IO_MAP(pce_io)
 	MDRV_CPU_VBLANK_INT_HACK(pce_interrupt, VDC_LPF)
 	MDRV_QUANTUM_TIME(HZ(60))
 
@@ -212,8 +212,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( sgx )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", H6280, MAIN_CLOCK/3)
-	MDRV_CPU_PROGRAM_MAP(sgx_mem, 0)
-	MDRV_CPU_IO_MAP(sgx_io, 0)
+	MDRV_CPU_PROGRAM_MAP(sgx_mem)
+	MDRV_CPU_IO_MAP(sgx_io)
 	MDRV_CPU_VBLANK_INT_HACK(sgx_interrupt, VDC_LPF)
 	MDRV_QUANTUM_TIME(HZ(60))
 

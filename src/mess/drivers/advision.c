@@ -73,12 +73,12 @@ static MACHINE_DRIVER_START( advision )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(I8048_TAG, I8048, XTAL_11MHz)
-	MDRV_CPU_PROGRAM_MAP(program_map, 0)
-	MDRV_CPU_IO_MAP(io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(program_map)
+	MDRV_CPU_IO_MAP(io_map)
 
 	MDRV_CPU_ADD(COP411_TAG, COP411, 52631*16) // COP411L-KCN/N
 	MDRV_CPU_CONFIG(advision_cop411_interface)
-	MDRV_CPU_IO_MAP(sound_io_map, 0)
+	MDRV_CPU_IO_MAP(sound_io_map)
 
 	MDRV_MACHINE_START(advision)
 	MDRV_MACHINE_RESET(advision)

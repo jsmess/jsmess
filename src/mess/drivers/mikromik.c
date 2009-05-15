@@ -200,7 +200,7 @@ static MACHINE_DRIVER_START( mm1 )
 
 	/* basic system hardware */
 	MDRV_CPU_ADD(I8085_TAG, 8085A, 2000000)
-	MDRV_CPU_PROGRAM_MAP(mm1_map, 0)
+	MDRV_CPU_PROGRAM_MAP(mm1_map)
 
 	MDRV_MACHINE_START(mm1)
 

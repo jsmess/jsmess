@@ -420,8 +420,8 @@ static const cassette_config aquarius_cassette_config =
 static MACHINE_DRIVER_START( aquarius )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz) // ???
-	MDRV_CPU_PROGRAM_MAP(aquarius_mem, 0)
-	MDRV_CPU_IO_MAP(aquarius_io, 0)
+	MDRV_CPU_PROGRAM_MAP(aquarius_mem)
+	MDRV_CPU_IO_MAP(aquarius_io)
 	MDRV_CPU_VBLANK_INT("screen", aquarius_interrupt)
 
 	MDRV_MACHINE_START( aquarius )

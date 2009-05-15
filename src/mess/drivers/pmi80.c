@@ -38,8 +38,8 @@ static VIDEO_UPDATE( pmi80 )
 static MACHINE_DRIVER_START( pmi80 )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",8080, XTAL_1MHz)
-    MDRV_CPU_PROGRAM_MAP(pmi80_mem, 0)
-    MDRV_CPU_IO_MAP(pmi80_io, 0)
+    MDRV_CPU_PROGRAM_MAP(pmi80_mem)
+    MDRV_CPU_IO_MAP(pmi80_io)
 
     MDRV_MACHINE_RESET(pmi80)
 

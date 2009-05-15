@@ -344,8 +344,8 @@ ADDRESS_MAP_END
 
 static MACHINE_DRIVER_START( cpu_kc_disc )
 	MDRV_CPU_ADD("disc", Z80, 4000000)
-	MDRV_CPU_PROGRAM_MAP(kc85_disc_hw_mem, 0)
-	MDRV_CPU_IO_MAP(kc85_disc_hw_io, 0)
+	MDRV_CPU_PROGRAM_MAP(kc85_disc_hw_mem)
+	MDRV_CPU_IO_MAP(kc85_disc_hw_io)
 
 	//FIX: put right clock value for CTC
 	MDRV_Z80CTC_ADD( "z80ctc_1", KC85_4_CLOCK, kc85_disc_ctc_intf )
@@ -358,8 +358,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( kc85_3 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, KC85_3_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(kc85_3_mem, 0)
-	MDRV_CPU_IO_MAP(kc85_3_io, 0)
+	MDRV_CPU_PROGRAM_MAP(kc85_3_mem)
+	MDRV_CPU_IO_MAP(kc85_3_io)
 	MDRV_CPU_CONFIG(kc85_daisy_chain)
 	MDRV_QUANTUM_TIME(HZ(60))
 
@@ -399,8 +399,8 @@ static MACHINE_DRIVER_START( kc85_4 )
 	MDRV_IMPORT_FROM( kc85_3 )
 
 	MDRV_CPU_REPLACE("maincpu", Z80, KC85_4_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(kc85_4_mem, 0)
-	MDRV_CPU_IO_MAP(kc85_4_io, 0)
+	MDRV_CPU_PROGRAM_MAP(kc85_4_mem)
+	MDRV_CPU_IO_MAP(kc85_4_io)
 
 	MDRV_MACHINE_RESET( kc85_4 )
 	MDRV_VIDEO_START( kc85_4 )

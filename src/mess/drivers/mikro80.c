@@ -149,8 +149,8 @@ static const cassette_config mikro80_cassette_config =
 static MACHINE_DRIVER_START( mikro80 )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",8080, 2000000)
-    MDRV_CPU_PROGRAM_MAP(mikro80_mem, 0)
-    MDRV_CPU_IO_MAP(mikro80_io, 0)
+    MDRV_CPU_PROGRAM_MAP(mikro80_mem)
+    MDRV_CPU_IO_MAP(mikro80_io)
     MDRV_MACHINE_RESET( mikro80 )
 
 	MDRV_PPI8255_ADD( "ppi8255", mikro80_ppi8255_interface )
@@ -179,7 +179,7 @@ static MACHINE_DRIVER_START( radio99 )
     /* basic machine hardware */
     MDRV_IMPORT_FROM(mikro80)
     MDRV_CPU_MODIFY("maincpu")
-    MDRV_CPU_IO_MAP(radio99_io, 0)    
+    MDRV_CPU_IO_MAP(radio99_io)
         
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 16.00)    

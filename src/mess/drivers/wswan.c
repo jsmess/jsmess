@@ -130,8 +130,8 @@ static PALETTE_INIT( wscolor ) {
 static MACHINE_DRIVER_START( wswan )
 	/* Basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30MZ, 3072000)
-	MDRV_CPU_PROGRAM_MAP(wswan_mem, 0)
-	MDRV_CPU_IO_MAP(wswan_io, 0)
+	MDRV_CPU_PROGRAM_MAP(wswan_mem)
+	MDRV_CPU_IO_MAP(wswan_io)
 
 	MDRV_SCREEN_ADD("screen", LCD)
 	MDRV_SCREEN_REFRESH_RATE(75)
@@ -170,7 +170,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( wscolor )
 	MDRV_IMPORT_FROM(wswan)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(wscolor_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(wscolor_mem)
 	MDRV_MACHINE_START( wscolor )
 	MDRV_PALETTE_LENGTH(4096)
 	MDRV_PALETTE_INIT( wscolor )

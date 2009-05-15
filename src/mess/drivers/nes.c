@@ -235,7 +235,7 @@ static ppu2c0x_interface nes_ppu_interface =
 static MACHINE_DRIVER_START( nes )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", N2A03, NTSC_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(nes_map, 0)
+	MDRV_CPU_PROGRAM_MAP(nes_map)
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60.098)
 	// This isn't used so much to calulate the vblank duration (the PPU code tracks that manually) but to determine

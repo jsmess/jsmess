@@ -177,8 +177,8 @@ static const cassette_config ut88_cassette_config =
 static MACHINE_DRIVER_START( ut88 )
 	/* basic machine hardware */
     MDRV_CPU_ADD("maincpu", 8080, 2000000)
-    MDRV_CPU_PROGRAM_MAP(ut88_mem, 0)
-    MDRV_CPU_IO_MAP(ut88_io, 0)
+    MDRV_CPU_PROGRAM_MAP(ut88_mem)
+    MDRV_CPU_IO_MAP(ut88_io)
     MDRV_MACHINE_RESET( ut88 )
 
 	MDRV_PPI8255_ADD( "ppi8255", ut88_ppi8255_interface )
@@ -210,8 +210,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ut88mini )
 	/* basic machine hardware */
     MDRV_CPU_ADD("maincpu", 8080, 2000000)
-    MDRV_CPU_PROGRAM_MAP(ut88mini_mem, 0)
-    MDRV_CPU_IO_MAP(ut88mini_io, 0)
+    MDRV_CPU_PROGRAM_MAP(ut88mini_mem)
+    MDRV_CPU_IO_MAP(ut88mini_io)
    	MDRV_MACHINE_START(ut88mini)
    	MDRV_MACHINE_RESET( ut88mini )
 

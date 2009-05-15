@@ -544,8 +544,8 @@ static const cassette_config pmd85_cassette_config =
 static MACHINE_DRIVER_START( pmd85 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", 8080, 2000000)		/* 2.048MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(pmd85_mem, 0)
-	MDRV_CPU_IO_MAP(pmd85_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(pmd85_mem)
+	MDRV_CPU_IO_MAP(pmd85_io_map)
 	MDRV_QUANTUM_TIME(HZ(60))
 
 	MDRV_MACHINE_RESET( pmd85 )
@@ -592,19 +592,19 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( pmd852a )
 	MDRV_IMPORT_FROM( pmd851 )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(pmd852a_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(pmd852a_mem)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pmd853 )
 	MDRV_IMPORT_FROM( pmd851 )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(pmd853_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(pmd853_mem)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( alfa )
 	MDRV_IMPORT_FROM( pmd85 )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(alfa_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(alfa_mem)
 
 	MDRV_PPI8255_ADD( "ppi8255_0", alfa_ppi8255_interface[0] )
 
@@ -617,8 +617,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( mato )
 	MDRV_IMPORT_FROM( pmd85 )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mato_mem, 0)
-	MDRV_CPU_IO_MAP(mato_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(mato_mem)
+	MDRV_CPU_IO_MAP(mato_io_map)
 
 	MDRV_PPI8255_ADD( "ppi8255_0", mato_ppi8255_interface )
 
@@ -629,7 +629,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( c2717 )
 	MDRV_IMPORT_FROM( pmd851 )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(c2717_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(c2717_mem)
 MACHINE_DRIVER_END
 
 

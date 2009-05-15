@@ -463,8 +463,8 @@ static MACHINE_DRIVER_START(geneve_60hz)
 	/* basic machine hardware */
 	/* TMS9995 CPU @ 12.0 MHz */
 	MDRV_CPU_ADD("maincpu", TMS9995, 12000000)
-	MDRV_CPU_PROGRAM_MAP(memmap, 0)
-	MDRV_CPU_IO_MAP(cru_map, 0)
+	MDRV_CPU_PROGRAM_MAP(memmap)
+	MDRV_CPU_IO_MAP(cru_map)
 	MDRV_CPU_VBLANK_INT_HACK(geneve_hblank_interrupt, 262)	/* 262.5 in 60Hz, 312.5 in 50Hz */
 
 	MDRV_MACHINE_START( geneve )

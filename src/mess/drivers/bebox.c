@@ -85,10 +85,10 @@ ADDRESS_MAP_END
 static MACHINE_DRIVER_START( bebox )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("ppc1", PPC603, 66000000)	/* 66 MHz */
-	MDRV_CPU_PROGRAM_MAP(bebox_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(bebox_mem)
 
 	MDRV_CPU_ADD("ppc2", PPC603, 66000000)	/* 66 MHz */
-	MDRV_CPU_PROGRAM_MAP(bebox_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(bebox_mem)
 
 	MDRV_QUANTUM_TIME(HZ(60))
 

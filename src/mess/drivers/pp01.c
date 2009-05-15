@@ -41,8 +41,8 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( pp01 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", 8080, 2000000)
-	MDRV_CPU_PROGRAM_MAP(pp01_mem, 0)
-	MDRV_CPU_IO_MAP(pp01_io, 0)
+	MDRV_CPU_PROGRAM_MAP(pp01_mem)
+	MDRV_CPU_IO_MAP(pp01_io)
 
 	MDRV_MACHINE_START( pp01 )
 	MDRV_MACHINE_RESET( pp01 )

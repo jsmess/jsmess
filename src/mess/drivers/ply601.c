@@ -34,7 +34,7 @@ static VIDEO_UPDATE( ply601 )
 static MACHINE_DRIVER_START( ply601 )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",M6800, XTAL_4MHz)
-    MDRV_CPU_PROGRAM_MAP(ply601_mem, 0)
+    MDRV_CPU_PROGRAM_MAP(ply601_mem)
 
     MDRV_MACHINE_RESET(ply601)
 

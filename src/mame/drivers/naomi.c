@@ -976,6 +976,13 @@ ADDRESS_MAP_END
 * Input ports
 */
 
+#define NAOMI_MAME_DEBUG_DIP \
+	PORT_START("MAMEDEBUG") \
+	PORT_DIPNAME( 0x01, 0x00, "Bilinear Filtering" ) \
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) \
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) ) \
+
+
 /* for now we hardwire a joystick + 6 buttons for every game.*/
 static INPUT_PORTS_START( naomi )
 	PORT_START("IN0")
@@ -1011,6 +1018,8 @@ static INPUT_PORTS_START( naomi )
 	PORT_START("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(dc_coin_slots_callback, &dc_coin_counts[0])
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED(dc_coin_slots_callback, &dc_coin_counts[1])
+
+	NAOMI_MAME_DEBUG_DIP
 INPUT_PORTS_END
 
 /* JVS mahjong panel */
@@ -1122,6 +1131,8 @@ static INPUT_PORTS_START( naomi_mp )
 	PORT_START("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(dc_coin_slots_callback, &dc_coin_counts[0])
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED(dc_coin_slots_callback, &dc_coin_counts[1])
+
+	NAOMI_MAME_DEBUG_DIP
 INPUT_PORTS_END
 
 static MACHINE_RESET( naomi )
@@ -1138,12 +1149,12 @@ static MACHINE_DRIVER_START( naomi_base )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", SH4, CPU_CLOCK) // SH4!!!
 	MDRV_CPU_CONFIG(sh4cpu_config)
-	MDRV_CPU_PROGRAM_MAP(naomi_map,0)
-	MDRV_CPU_IO_MAP(naomi_port,0)
+	MDRV_CPU_PROGRAM_MAP(naomi_map)
+	MDRV_CPU_IO_MAP(naomi_port)
 	MDRV_CPU_VBLANK_INT("screen", naomi_vblank)
 
 	MDRV_CPU_ADD("soundcpu", ARM7, ((XTAL_33_8688MHz*2)/3)/8)	// AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
-	MDRV_CPU_PROGRAM_MAP(dc_audio_map, 0)
+	MDRV_CPU_PROGRAM_MAP(dc_audio_map)
 
 	MDRV_MACHINE_START( dc )
 	MDRV_MACHINE_RESET( naomi )
@@ -1207,7 +1218,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( aw )
 	MDRV_IMPORT_FROM(naomi)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(aw_map,0)
+	MDRV_CPU_PROGRAM_MAP(aw_map)
 MACHINE_DRIVER_END
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
@@ -3885,6 +3896,34 @@ ROM_START( monkeyba )
 	ROM_LOAD("317-0307-com.data", 0x00, 0x50, CRC(448bedc7) SHA1(092dbe5e28890d3ee40d62ca8cbf225c3ce90304) )
 ROM_END
 
+/*
+This is the I/O board used for Dynamic Golf which is
+located under the panel.
+It must be connected to the normal I/O board with a USB cable.
+
+PCB Layout
+----------
+
+837-13938
+|--------------------|
+|CN2      CN1        |
+|                    |
+|      |-----|       |
+|      | IC2 |       |
+| CN3  |     |       |
+|      |-----|    IC3|
+|LED    CN4     IC4  |
+|--------------------|
+Notes:
+      CN1 - 24 pin connector. not used
+      CN2 - 4 pin connector used for 5 volt power input
+      CN3 - USB connector type B
+      CN4 - 16 pin connector used for buttons and trackball
+      IC1 - HC240 logic IC (SOIC20)
+      IC2 - Sega 315-6146 custom IC (QFP176)
+      IC3 - 27C512 EPROM with label 'EPR-22084' (DIP28)
+      IC4 - HC4020 logic IC (SOIC16)
+*/
 
 ROM_START( dygolf )
 	NAOMIGD_BIOS
@@ -3898,6 +3937,9 @@ ROM_START( dygolf )
 	//PIC16C622A (317-0308-COM)
 	//(sticker 253-5508-0308)
 	ROM_LOAD("317-0308-com.data", 0x00, 0x50,  CRC(56f63af0) SHA1(3c453226fc53d2f700b3634db3ef8ce206d94392) )
+
+	ROM_REGION( 0x10000, "io_board", 0)
+	ROM_LOAD("epr-22084.ic3", 0x0000, 0x10000, CRC(18cf58bb) SHA1(1494f8215231929e41bbe2a133658d01882fbb0f) )
 ROM_END
 
 

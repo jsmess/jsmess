@@ -231,8 +231,8 @@ static const UPD7810_CONFIG config = {
 
 static MACHINE_DRIVER_START( gmaster )
 	MDRV_CPU_ADD("maincpu", UPD7810, MAIN_XTAL/2/*?*/)
-	MDRV_CPU_PROGRAM_MAP(gmaster_mem, 0)
-	MDRV_CPU_IO_MAP( gmaster_io, 0 )
+	MDRV_CPU_PROGRAM_MAP(gmaster_mem)
+	MDRV_CPU_IO_MAP( gmaster_io)
 	MDRV_CPU_CONFIG( config )
 	MDRV_CPU_VBLANK_INT("screen", gmaster_interrupt)
 

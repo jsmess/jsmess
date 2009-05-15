@@ -552,7 +552,7 @@ static MACHINE_DRIVER_START( creativision )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_2MHz)
-	MDRV_CPU_PROGRAM_MAP(crvision_map, 0)
+	MDRV_CPU_PROGRAM_MAP(crvision_map)
 	MDRV_CPU_VBLANK_INT(SCREEN_TAG, crvision_int)
 
 	/* sound hardware */
@@ -604,7 +604,7 @@ static MACHINE_DRIVER_START( wizzard )
 	MDRV_IMPORT_FROM(pal)
 
 	MDRV_CPU_MODIFY(M6502_TAG)
-	MDRV_CPU_PROGRAM_MAP(wizzard_map, 0)
+	MDRV_CPU_PROGRAM_MAP(wizzard_map)
 
 	/* printer */
 	MDRV_CENTRONICS_ADD("centronics", standard_centronics)

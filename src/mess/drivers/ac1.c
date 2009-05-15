@@ -103,8 +103,8 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( ac1 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_8MHz / 4)
-	MDRV_CPU_PROGRAM_MAP(ac1_mem, 0)
-	MDRV_CPU_IO_MAP(ac1_io, 0)
+	MDRV_CPU_PROGRAM_MAP(ac1_mem)
+	MDRV_CPU_IO_MAP(ac1_io)
 	MDRV_MACHINE_RESET( ac1 )
 
 	MDRV_Z80PIO_ADD( "z80pio", ac1_z80pio_intf )

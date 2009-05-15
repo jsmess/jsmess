@@ -64,7 +64,7 @@ static PALETTE_INIT( lynx )
 static MACHINE_DRIVER_START( lynx )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M65SC02, 4000000)        /* vti core, integrated in vlsi, stz, but not bbr bbs */
-	MDRV_CPU_PROGRAM_MAP(lynx_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(lynx_mem)
 	MDRV_CPU_VBLANK_INT("screen", lynx_frame_int)
 	MDRV_QUANTUM_TIME(HZ(60))
 

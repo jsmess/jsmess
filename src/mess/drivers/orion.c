@@ -89,8 +89,8 @@ static const cassette_config orion_cassette_config =
 /* Machine driver */
 static MACHINE_DRIVER_START( orion128 )
     MDRV_CPU_ADD("maincpu", 8080, 2000000)
-    MDRV_CPU_PROGRAM_MAP(orion128_mem, 0)
-    MDRV_CPU_IO_MAP(orion128_io, 0)
+    MDRV_CPU_PROGRAM_MAP(orion128_mem)
+    MDRV_CPU_IO_MAP(orion128_io)
 
     MDRV_MACHINE_START( orion128 )
     MDRV_MACHINE_RESET( orion128 )
@@ -140,8 +140,8 @@ static const ay8910_interface orionz80_ay_interface =
 
 static MACHINE_DRIVER_START( orionz80 )
     MDRV_CPU_ADD("maincpu", Z80, 2500000)
-    MDRV_CPU_PROGRAM_MAP(orionz80_mem, 0)
-    MDRV_CPU_IO_MAP(orionz80_io, 0)
+    MDRV_CPU_PROGRAM_MAP(orionz80_mem)
+    MDRV_CPU_IO_MAP(orionz80_io)
     MDRV_CPU_VBLANK_INT("screen",orionz80_interrupt)
 
     MDRV_MACHINE_START( orionz80 )
@@ -191,8 +191,8 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( orionpro )
     MDRV_CPU_ADD("maincpu", Z80, 5000000)
-    MDRV_CPU_PROGRAM_MAP(orionpro_mem, 0)
-    MDRV_CPU_IO_MAP(orionpro_io, 0)
+    MDRV_CPU_PROGRAM_MAP(orionpro_mem)
+    MDRV_CPU_IO_MAP(orionpro_io)
 
     MDRV_MACHINE_START( orionpro )
     MDRV_MACHINE_RESET( orionpro )

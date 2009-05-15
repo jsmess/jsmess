@@ -331,8 +331,8 @@ static const cassette_config mz700_cassette_config =
 static MACHINE_DRIVER_START( mz700 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_17_73447MHz/5)
-	MDRV_CPU_PROGRAM_MAP(mz700_mem, 0)
-	MDRV_CPU_IO_MAP(mz700_io, 0)
+	MDRV_CPU_PROGRAM_MAP(mz700_mem)
+	MDRV_CPU_IO_MAP(mz700_io)
 
 	MDRV_MACHINE_START(mz700)
 
@@ -374,8 +374,8 @@ static MACHINE_DRIVER_START( mz800 )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mz800_mem, 0)
-	MDRV_CPU_IO_MAP(mz800_io, 0)
+	MDRV_CPU_PROGRAM_MAP(mz800_mem)
+	MDRV_CPU_IO_MAP(mz800_io)
 
 	MDRV_GFXDECODE(mz800)
 	MDRV_VIDEO_START(mz800)

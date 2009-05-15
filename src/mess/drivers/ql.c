@@ -614,10 +614,10 @@ static MACHINE_DRIVER_START( ql )
 
 	// basic machine hardware
 	MDRV_CPU_ADD(M68008_TAG, M68008, X1/2)
-	MDRV_CPU_PROGRAM_MAP(ql_map, 0)
+	MDRV_CPU_PROGRAM_MAP(ql_map)
 
 	MDRV_CPU_ADD(I8749_TAG, I8749, X4)
-	MDRV_CPU_IO_MAP(ipc_io_map, 0)
+	MDRV_CPU_IO_MAP(ipc_io_map)
 
 	MDRV_MACHINE_START(ql)
 
@@ -661,10 +661,10 @@ static MACHINE_DRIVER_START( opd )
 
 	// basic machine hardware
 	MDRV_CPU_ADD(M68008_TAG, M68008, 7500000)
-	MDRV_CPU_PROGRAM_MAP(ql_map, 0)
+	MDRV_CPU_PROGRAM_MAP(ql_map)
 
 	MDRV_CPU_ADD(I8051_TAG, I8051, X4)
-	MDRV_CPU_IO_MAP(ipc_io_map, 0)
+	MDRV_CPU_IO_MAP(ipc_io_map)
 	
 	MDRV_CARTSLOT_REMOVE("cart")
 MACHINE_DRIVER_END

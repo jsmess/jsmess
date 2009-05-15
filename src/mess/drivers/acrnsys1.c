@@ -156,7 +156,7 @@ static const ins8154_interface ins8154_b1 =
 static MACHINE_DRIVER_START( acrnsys1 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 1008000)  /* 1.008 MHz */
-	MDRV_CPU_PROGRAM_MAP(acrnsys1_map, 0)
+	MDRV_CPU_PROGRAM_MAP(acrnsys1_map)
 
 	MDRV_DEFAULT_LAYOUT(layout_acrnsys1)
 

@@ -2497,7 +2497,7 @@ static DRIVER_INIT( x68000 )
 static MACHINE_DRIVER_START( x68000 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)  /* 10 MHz */
-	MDRV_CPU_PROGRAM_MAP(x68k_map, 0)
+	MDRV_CPU_PROGRAM_MAP(x68k_map)
 	MDRV_CPU_VBLANK_INT("screen", x68k_vsync_irq)
 	MDRV_QUANTUM_TIME(HZ(60))
 

@@ -216,8 +216,8 @@ static const cassette_config mc10_cassette_config =
 static MACHINE_DRIVER_START( mc10 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6803, XTAL_3_579545MHz)  /* 0,894886 MHz */
-	MDRV_CPU_PROGRAM_MAP(mc10_mem, 0)
-	MDRV_CPU_IO_MAP(mc10_io, 0)
+	MDRV_CPU_PROGRAM_MAP(mc10_mem)
+	MDRV_CPU_IO_MAP(mc10_io)
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 

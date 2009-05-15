@@ -834,8 +834,8 @@ static PALETTE_INIT( px4 )
 static MACHINE_DRIVER_START( px4 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_7_3728MHz/2)	/* uPD70008 */
-	MDRV_CPU_PROGRAM_MAP(px4_mem, 0)
-	MDRV_CPU_IO_MAP(px4_io, 0)
+	MDRV_CPU_PROGRAM_MAP(px4_mem)
+	MDRV_CPU_IO_MAP(px4_io)
 
 	MDRV_DRIVER_DATA(px4_state)
 

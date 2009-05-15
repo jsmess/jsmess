@@ -38,8 +38,8 @@ static VIDEO_UPDATE( chessmst )
 static MACHINE_DRIVER_START( chessmst )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
-    MDRV_CPU_PROGRAM_MAP(chessmst_mem, 0)
-    MDRV_CPU_IO_MAP(chessmst_io, 0)
+    MDRV_CPU_PROGRAM_MAP(chessmst_mem)
+    MDRV_CPU_IO_MAP(chessmst_io)
 
     MDRV_MACHINE_RESET(chessmst)
 

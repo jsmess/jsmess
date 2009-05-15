@@ -652,7 +652,7 @@ static MACHINE_DRIVER_START( pet_general )
 	MDRV_DRIVER_DATA(pet_state)
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 7833600)        /* 7.8336 MHz */
-	MDRV_CPU_PROGRAM_MAP(pet_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(pet_mem)
 	MDRV_CPU_VBLANK_INT("screen", pet_frame_interrupt)
 
 	MDRV_MACHINE_RESET( pet )
@@ -707,7 +707,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( pet40 )
 	MDRV_IMPORT_FROM( pet )
 	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP( pet40_mem, 0 )
+	MDRV_CPU_PROGRAM_MAP( pet40_mem)
 
 	MDRV_MC6845_ADD("crtc", MC6845, XTAL_17_73447MHz/3	/* This is a wild guess and mostly likely incorrect */, crtc_pet40)
 
@@ -729,7 +729,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( pet80 )
 	MDRV_IMPORT_FROM( pet )
 	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP( pet80_mem, 0 )
+	MDRV_CPU_PROGRAM_MAP( pet80_mem)
 
     /* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
@@ -759,11 +759,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( superpet )
 	MDRV_IMPORT_FROM( pet80 )
 	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP( superpet_mem, 0 )
+	MDRV_CPU_PROGRAM_MAP( superpet_mem)
 
 	/* m6809 cpu */
 	MDRV_CPU_ADD("m6809", M6809, 1000000)
-	MDRV_CPU_PROGRAM_MAP(superpet_m6809_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(superpet_m6809_mem)
 	MDRV_CPU_VBLANK_INT("screen", pet_frame_interrupt)
 
 	MDRV_SCREEN_MODIFY("screen")

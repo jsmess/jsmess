@@ -38,8 +38,8 @@ static VIDEO_UPDATE( xerox820 )
 static MACHINE_DRIVER_START( xerox820 )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
-    MDRV_CPU_PROGRAM_MAP(xerox820_mem, 0)
-    MDRV_CPU_IO_MAP(xerox820_io, 0)
+    MDRV_CPU_PROGRAM_MAP(xerox820_mem)
+    MDRV_CPU_IO_MAP(xerox820_io)
 
     MDRV_MACHINE_RESET(xerox820)
 

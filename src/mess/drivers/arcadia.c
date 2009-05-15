@@ -505,8 +505,8 @@ static DEVICE_IMAGE_LOAD( arcadia_cart )
 static MACHINE_DRIVER_START( arcadia )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", S2650, 3580000/4)        /* 0.895 MHz */
-	MDRV_CPU_PROGRAM_MAP(arcadia_mem, 0)
-	MDRV_CPU_IO_MAP(arcadia_io, 0)
+	MDRV_CPU_PROGRAM_MAP(arcadia_mem)
+	MDRV_CPU_IO_MAP(arcadia_io)
 	MDRV_CPU_PERIODIC_INT(arcadia_video_line, 262*60)
 	MDRV_QUANTUM_TIME(HZ(60))
 

@@ -38,8 +38,8 @@ static VIDEO_UPDATE( tiki100 )
 static MACHINE_DRIVER_START( tiki100 )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
-    MDRV_CPU_PROGRAM_MAP(tiki100_mem, 0)
-    MDRV_CPU_IO_MAP(tiki100_io, 0)
+    MDRV_CPU_PROGRAM_MAP(tiki100_mem)
+    MDRV_CPU_IO_MAP(tiki100_io)
 
     MDRV_MACHINE_RESET(tiki100)
 

@@ -422,8 +422,8 @@ static MACHINE_DRIVER_START(ex800)
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", UPD7810, 12000000)  /* 12 MHz? */
     MDRV_CPU_CONFIG(ex800_cpu_config)
-    MDRV_CPU_PROGRAM_MAP(ex800_mem, 0)
-	MDRV_CPU_IO_MAP(ex800_io, 0)
+    MDRV_CPU_PROGRAM_MAP(ex800_mem)
+	MDRV_CPU_IO_MAP(ex800_io)
 
 	MDRV_MACHINE_START(ex800)
 

@@ -844,8 +844,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( amstrad )
 	/* Machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
-	MDRV_CPU_PROGRAM_MAP(amstrad_mem, 0)
-	MDRV_CPU_IO_MAP(amstrad_io, 0)
+	MDRV_CPU_PROGRAM_MAP(amstrad_mem)
+	MDRV_CPU_IO_MAP(amstrad_io)
 
 	MDRV_QUANTUM_TIME(HZ(60))
 
@@ -899,8 +899,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( cpcplus )
 	/* Machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_40MHz / 10)
-	MDRV_CPU_PROGRAM_MAP(amstrad_mem, 0)
-	MDRV_CPU_IO_MAP(amstrad_io, 0)
+	MDRV_CPU_PROGRAM_MAP(amstrad_mem)
+	MDRV_CPU_IO_MAP(amstrad_io)
 
 	MDRV_QUANTUM_TIME(HZ(60))
 
@@ -949,8 +949,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( gx4000 )
 	/* Machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_40MHz / 10)
-	MDRV_CPU_PROGRAM_MAP(amstrad_mem, 0)
-	MDRV_CPU_IO_MAP(amstrad_io, 0)
+	MDRV_CPU_PROGRAM_MAP(amstrad_mem)
+	MDRV_CPU_IO_MAP(amstrad_io)
 
 	MDRV_QUANTUM_TIME(HZ(60))
 

@@ -411,8 +411,8 @@ static const cassette_config laser_cassette_config =
 static MACHINE_DRIVER_START( laser350 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3694700)        /* 3.694700 MHz */
-	MDRV_CPU_PROGRAM_MAP(vtech2_mem, 0)
-	MDRV_CPU_IO_MAP(vtech2_io, 0)
+	MDRV_CPU_PROGRAM_MAP(vtech2_mem)
+	MDRV_CPU_IO_MAP(vtech2_io)
 	MDRV_CPU_VBLANK_INT("screen", vtech2_interrupt)
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)

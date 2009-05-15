@@ -134,7 +134,7 @@ static const cassette_config apogee_cassette_config =
 static MACHINE_DRIVER_START( apogee )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", 8080, XTAL_16MHz / 9)
-    MDRV_CPU_PROGRAM_MAP(apogee_mem, 0)
+    MDRV_CPU_PROGRAM_MAP(apogee_mem)
     MDRV_MACHINE_RESET( radio86 )
 
 	MDRV_PPI8255_ADD( "ppi8255_1", radio86_ppi8255_interface_1 )

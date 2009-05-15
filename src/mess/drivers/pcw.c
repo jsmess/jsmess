@@ -987,8 +987,8 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( pcw )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)       /* clock supplied to chip, but in reality it is 3.4 MHz */
-	MDRV_CPU_PROGRAM_MAP(pcw_map, 0)
-	MDRV_CPU_IO_MAP(pcw_io, 0)
+	MDRV_CPU_PROGRAM_MAP(pcw_map)
+	MDRV_CPU_IO_MAP(pcw_io)
 	MDRV_QUANTUM_TIME(HZ(60))
 
 	MDRV_MACHINE_START(pcw)
@@ -1019,7 +1019,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( pcw9512 )
 	MDRV_IMPORT_FROM( pcw )
 	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_IO_MAP(pcw9512_io, 0)
+	MDRV_CPU_IO_MAP(pcw9512_io)
 MACHINE_DRIVER_END
 
 

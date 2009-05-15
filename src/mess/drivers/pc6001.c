@@ -39,8 +39,8 @@ static VIDEO_UPDATE( pc6001 )
 static MACHINE_DRIVER_START( pc6001 )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
-    MDRV_CPU_PROGRAM_MAP(pc6001_mem, 0)
-    MDRV_CPU_IO_MAP(pc6001_io, 0)
+    MDRV_CPU_PROGRAM_MAP(pc6001_mem)
+    MDRV_CPU_IO_MAP(pc6001_io)
 
     MDRV_MACHINE_RESET(pc6001)
 

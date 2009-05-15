@@ -1120,8 +1120,8 @@ static MACHINE_DRIVER_START( kyo85 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(I8085_TAG, 8085A, 2400000)
-	MDRV_CPU_PROGRAM_MAP(kyo85_mem, 0)
-	MDRV_CPU_IO_MAP(kyo85_io, 0)
+	MDRV_CPU_PROGRAM_MAP(kyo85_mem)
+	MDRV_CPU_IO_MAP(kyo85_io)
 	MDRV_CPU_CONFIG(kyocera_i8085_config)
 
 	MDRV_MACHINE_START( kyo85 )
@@ -1155,8 +1155,8 @@ static MACHINE_DRIVER_START( pc8201 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(I8085_TAG, 8085A, 2400000)
-	MDRV_CPU_PROGRAM_MAP(pc8201_mem, 0)
-	MDRV_CPU_IO_MAP(pc8201_io, 0)
+	MDRV_CPU_PROGRAM_MAP(pc8201_mem)
+	MDRV_CPU_IO_MAP(pc8201_io)
 	MDRV_CPU_CONFIG(kyocera_i8085_config)
 
 	MDRV_MACHINE_START(pc8201)
@@ -1196,8 +1196,8 @@ static MACHINE_DRIVER_START( tandy200 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(I8085_TAG, 8085A, XTAL_2_4576MHz)
-	MDRV_CPU_PROGRAM_MAP(tandy200_mem, 0)
-	MDRV_CPU_IO_MAP(tandy200_io, 0)
+	MDRV_CPU_PROGRAM_MAP(tandy200_mem)
+	MDRV_CPU_IO_MAP(tandy200_io)
 	MDRV_CPU_CONFIG(kyocera_i8085_config)
 
 	MDRV_MACHINE_START( tandy200 )

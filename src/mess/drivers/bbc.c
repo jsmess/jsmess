@@ -775,7 +775,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( bbca )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 2000000)        /* 2.00 MHz */
-	MDRV_CPU_PROGRAM_MAP( bbca_mem, 0 )
+	MDRV_CPU_PROGRAM_MAP( bbca_mem)
 	MDRV_CPU_VBLANK_INT("screen", bbcb_vsync)				/* screen refresh interrupts */
 	MDRV_CPU_PERIODIC_INT(bbcb_keyscan, 1000)		/* scan keyboard */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -818,7 +818,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( bbcb )
 	MDRV_IMPORT_FROM( bbca )
 	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP( bbcb_mem, 0 )
+	MDRV_CPU_PROGRAM_MAP( bbcb_mem)
 	MDRV_MACHINE_START( bbcb )
 	MDRV_MACHINE_RESET( bbcb )
 	MDRV_VIDEO_START( bbcb )
@@ -835,7 +835,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( bbcbp )
 	MDRV_IMPORT_FROM( bbca )
 	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP( bbcbp_mem, 0 )
+	MDRV_CPU_PROGRAM_MAP( bbcbp_mem)
 	MDRV_MACHINE_START( bbcbp )
 	MDRV_MACHINE_RESET( bbcbp )
 	MDRV_VIDEO_START( bbcbp )
@@ -851,7 +851,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( bbcbp128 )
 	MDRV_IMPORT_FROM( bbca )
 	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP( bbcbp128_mem, 0 )
+	MDRV_CPU_PROGRAM_MAP( bbcbp128_mem)
 	MDRV_MACHINE_START( bbcbp )
 	MDRV_MACHINE_RESET( bbcbp )
 	MDRV_VIDEO_START( bbcbp )
@@ -869,7 +869,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( bbcm )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M65SC02, 2000000)        /* 2.00 MHz */
-	MDRV_CPU_PROGRAM_MAP( bbcm_mem, 0 )
+	MDRV_CPU_PROGRAM_MAP( bbcm_mem)
 	MDRV_CPU_VBLANK_INT("screen", bbcb_vsync)				/* screen refresh interrupts */
 	MDRV_CPU_PERIODIC_INT(bbcm_keyscan, 1000)		/* scan keyboard */
 	MDRV_QUANTUM_TIME(HZ(60))

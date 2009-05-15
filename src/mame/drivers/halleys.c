@@ -1651,9 +1651,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x4801, 0x4801) AM_DEVREADWRITE("ay2", ay8910_r, ay8910_address_data_w)
-	AM_RANGE(0x4803, 0x4803) AM_DEVREADWRITE("ay3", ay8910_r, ay8910_address_data_w)
-	AM_RANGE(0x4805, 0x4805) AM_DEVREADWRITE("ay4", ay8910_r, ay8910_address_data_w)
+	AM_RANGE(0x4800, 0x4801) AM_DEVWRITE("ay2", ay8910_address_data_w)
+	AM_RANGE(0x4801, 0x4801) AM_DEVREAD("ay2", ay8910_r)
+	AM_RANGE(0x4802, 0x4803) AM_DEVWRITE("ay3", ay8910_address_data_w)
+	AM_RANGE(0x4803, 0x4803) AM_DEVREAD("ay3", ay8910_r)
+	AM_RANGE(0x4804, 0x4805) AM_DEVWRITE("ay4", ay8910_address_data_w)
+	AM_RANGE(0x4805, 0x4805) AM_DEVREAD("ay4", ay8910_r)
 	AM_RANGE(0x5000, 0x5000) AM_READ(soundlatch_r)
 	AM_RANGE(0xe000, 0xefff) AM_ROM // space for diagnostic ROM
 ADDRESS_MAP_END
@@ -1924,11 +1927,11 @@ static const ay8910_interface ay8910_config =
 
 static MACHINE_DRIVER_START( halleys )
 	MDRV_CPU_ADD("maincpu", M6809, XTAL_19_968MHz/12) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(halleys_map,0)
+	MDRV_CPU_PROGRAM_MAP(halleys_map)
 	MDRV_CPU_VBLANK_INT_HACK(halleys_interrupt, 4)
 
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_6MHz/2) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, (double)6000000/(4*16*16*10*16))
 
 	MDRV_MACHINE_RESET(halleys)

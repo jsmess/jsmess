@@ -277,8 +277,8 @@ static const z80pio_interface nascom1_z80pio_intf =
 static MACHINE_DRIVER_START( nascom1 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_16MHz/8)
-	MDRV_CPU_PROGRAM_MAP(nascom1_mem, 0)
-	MDRV_CPU_IO_MAP(nascom1_io, 0)
+	MDRV_CPU_PROGRAM_MAP(nascom1_mem)
+	MDRV_CPU_IO_MAP(nascom1_io)
 
 	MDRV_MACHINE_RESET( nascom1 )
 
@@ -309,7 +309,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( nascom2 )
 	MDRV_IMPORT_FROM(nascom1)
 	MDRV_CPU_REPLACE("maincpu", Z80, XTAL_16MHz/8)
-	MDRV_CPU_IO_MAP(nascom2_io, 0)
+	MDRV_CPU_IO_MAP(nascom2_io)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")

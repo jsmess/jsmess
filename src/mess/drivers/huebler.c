@@ -38,8 +38,8 @@ static VIDEO_UPDATE( huebler )
 static MACHINE_DRIVER_START( huebler )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
-    MDRV_CPU_PROGRAM_MAP(huebler_mem, 0)
-    MDRV_CPU_IO_MAP(huebler_io, 0)
+    MDRV_CPU_PROGRAM_MAP(huebler_mem)
+    MDRV_CPU_IO_MAP(huebler_io)
 
     MDRV_MACHINE_RESET(huebler)
 

@@ -464,8 +464,8 @@ static INTERRUPT_GEN( mbee_interrupt )
 static MACHINE_DRIVER_START( mbee )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz / 6)         /* 2 MHz */
-	MDRV_CPU_PROGRAM_MAP(mbee_mem, 0)
-	MDRV_CPU_IO_MAP(mbee_io, 0)
+	MDRV_CPU_PROGRAM_MAP(mbee_mem)
+	MDRV_CPU_IO_MAP(mbee_io)
 	MDRV_CPU_CONFIG(mbee_daisy_chain)
 	MDRV_CPU_VBLANK_INT("screen", mbee_interrupt)
 
@@ -504,8 +504,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( mbeeic )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3375000)         /* 3.37500 MHz */
-	MDRV_CPU_PROGRAM_MAP(mbeeic_mem, 0)
-	MDRV_CPU_IO_MAP(mbeeic_io, 0)
+	MDRV_CPU_PROGRAM_MAP(mbeeic_mem)
+	MDRV_CPU_IO_MAP(mbeeic_io)
 	MDRV_CPU_CONFIG(mbee_daisy_chain)
 	MDRV_CPU_VBLANK_INT("screen", mbee_interrupt)
 
@@ -544,20 +544,20 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( mbee56 )
 	MDRV_IMPORT_FROM( mbeeic )
 	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP(mbee56_mem, 0)
-	MDRV_CPU_IO_MAP(mbee56_io, 0)
+	MDRV_CPU_PROGRAM_MAP(mbee56_mem)
+	MDRV_CPU_IO_MAP(mbee56_io)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mbeepc )
 	MDRV_IMPORT_FROM( mbeeic )
 	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP(mbeepc_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(mbeepc_mem)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mbeepc85 )
 	MDRV_IMPORT_FROM( mbeeic )
 	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP(mbeepc85_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(mbeepc85_mem)
 MACHINE_DRIVER_END
 
 static DRIVER_INIT( mbee )

@@ -178,8 +178,8 @@ static const f3853_config mk1_config =
 static MACHINE_DRIVER_START( mk1 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD( "maincpu", F8, MAIN_CLOCK )        /* MK3850 */
-	MDRV_CPU_PROGRAM_MAP( mk1_mem, 0 )
-	MDRV_CPU_IO_MAP( mk1_io, 0 )
+	MDRV_CPU_PROGRAM_MAP( mk1_mem)
+	MDRV_CPU_IO_MAP( mk1_io)
 	MDRV_QUANTUM_TIME(HZ(60))
 
 	MDRV_MACHINE_START( mk1 )

@@ -235,12 +235,6 @@ SOUNDS += SP0256
 
 DRVLIBS = \
 	$(MESSOBJ)/messdriv.o \
-	$(MESSOBJ)/apple.a \
-	$(MESSOBJ)/cbm.a \
-	$(MESSOBJ)/cbmshare.a \
-	$(MESSOBJ)/primo.a \
-	$(MESSOBJ)/tangerin.a \
-	$(MESSOBJ)/thomson.a \
 	$(MESSOBJ)/3do.a \
 	$(MESSOBJ)/ac1.a \
 	$(MESSOBJ)/acorn.a \
@@ -249,6 +243,7 @@ DRVLIBS = \
 	$(MESSOBJ)/amstrad.a \
 	$(MESSOBJ)/apexc.a \
 	$(MESSOBJ)/apf.a \
+	$(MESSOBJ)/apple.a \
 	$(MESSOBJ)/aquarius.a \
 	$(MESSOBJ)/arcadia.a \
 	$(MESSOBJ)/ascii.a \
@@ -261,6 +256,8 @@ DRVLIBS = \
 	$(MESSOBJ)/be.a \
 	$(MESSOBJ)/bk.a \
 	$(MESSOBJ)/bondwell.a \
+	$(MESSOBJ)/cbm.a \
+	$(MESSOBJ)/cbmshare.a \
 	$(MESSOBJ)/cdi.a \
 	$(MESSOBJ)/cgenie.a \
 	$(MESSOBJ)/coco.a \
@@ -328,6 +325,7 @@ DRVLIBS = \
 	$(MESSOBJ)/pk8020.a \
 	$(MESSOBJ)/pmd85.a \
 	$(MESSOBJ)/pp01.a \
+	$(MESSOBJ)/primo.a \
 	$(MESSOBJ)/radio.a \
 	$(MESSOBJ)/rca.a \
 	$(MESSOBJ)/robotron.a \
@@ -338,6 +336,8 @@ DRVLIBS = \
 	$(MESSOBJ)/sega.a \
 	$(MESSOBJ)/sgi.a \
 	$(MESSOBJ)/sharp.a \
+	$(MESSOBJ)/sinclair.a \
+	$(MESSOBJ)/skeleton.a \
 	$(MESSOBJ)/snk.a \
 	$(MESSOBJ)/sony.a \
 	$(MESSOBJ)/sord.a \
@@ -347,10 +347,12 @@ DRVLIBS = \
 	$(MESSOBJ)/svi.a \
 	$(MESSOBJ)/svision.a \
 	$(MESSOBJ)/synertec.a \
+	$(MESSOBJ)/tangerin.a \
 	$(MESSOBJ)/tatung.a \
 	$(MESSOBJ)/teamconc.a \
 	$(MESSOBJ)/tec1.a \
 	$(MESSOBJ)/telmac.a \
+	$(MESSOBJ)/thomson.a \
 	$(MESSOBJ)/ti85.a \
 	$(MESSOBJ)/ti99.a \
 	$(MESSOBJ)/tiger.a \
@@ -364,8 +366,6 @@ DRVLIBS = \
 	$(MESSOBJ)/votrax.a \
 	$(MESSOBJ)/vtech.a \
 	$(MESSOBJ)/z80ne.a \
-	$(MESSOBJ)/sinclair.a \
-	$(MESSOBJ)/skeleton.a \
 	$(MESSOBJ)/shared.a \
 
 

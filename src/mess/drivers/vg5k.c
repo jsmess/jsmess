@@ -68,8 +68,8 @@ static VIDEO_UPDATE( vg5k )
 static MACHINE_DRIVER_START( vg5k )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
-	MDRV_CPU_PROGRAM_MAP(vg5k_mem, 0)
-	MDRV_CPU_IO_MAP(vg5k_io, 0)
+	MDRV_CPU_PROGRAM_MAP(vg5k_mem)
+	MDRV_CPU_IO_MAP(vg5k_io)
 
 	MDRV_MACHINE_RESET(vg5k)
 

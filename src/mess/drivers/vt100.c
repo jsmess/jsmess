@@ -313,8 +313,8 @@ INTERRUPT_GEN( vt100_vertical_interrupt )
 static MACHINE_DRIVER_START( vt100 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",8080, XTAL_24_8832MHz / 9)
-	MDRV_CPU_PROGRAM_MAP(vt100_mem, 0)
-	MDRV_CPU_IO_MAP(vt100_io, 0)	
+	MDRV_CPU_PROGRAM_MAP(vt100_mem)
+	MDRV_CPU_IO_MAP(vt100_io)
 	MDRV_CPU_VBLANK_INT("screen", vt100_vertical_interrupt)
 
 	MDRV_MACHINE_RESET(vt100)

@@ -220,8 +220,8 @@ static MACHINE_DRIVER_START( vc4000 )
 	/* basic machine hardware */
 //	MDRV_CPU_ADD("maincpu", S2650, 865000)        /* 3550000/4, 3580000/3, 4430000/3 */
 	MDRV_CPU_ADD("maincpu", S2650, 3546875/4)
-	MDRV_CPU_PROGRAM_MAP(vc4000_mem, 0)
-	MDRV_CPU_IO_MAP(vc4000_io, 0)
+	MDRV_CPU_PROGRAM_MAP(vc4000_mem)
+	MDRV_CPU_IO_MAP(vc4000_io)
 	MDRV_CPU_PERIODIC_INT(vc4000_video_line, 312*53)	// GOLF needs this exact value
 
 	/* video hardware */

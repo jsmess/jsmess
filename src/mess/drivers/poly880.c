@@ -38,8 +38,8 @@ static VIDEO_UPDATE( poly880 )
 static MACHINE_DRIVER_START( poly880 )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
-    MDRV_CPU_PROGRAM_MAP(poly880_mem, 0)
-    MDRV_CPU_IO_MAP(poly880_io, 0)
+    MDRV_CPU_PROGRAM_MAP(poly880_mem)
+    MDRV_CPU_IO_MAP(poly880_io)
 
     MDRV_MACHINE_RESET(poly880)
 

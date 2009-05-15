@@ -530,19 +530,19 @@ static DRIVER_INIT( nbmj9195 )
 	nbmj9195_soundbank_w(space, 0, 0);
 }
 
-#define TMPZ84C011_REGS \
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("main_ctc", z80ctc_r,z80ctc_w) \
-	AM_RANGE(0x50, 0x50) AM_READWRITE(tmpz84c011_0_pa_r,tmpz84c011_0_pa_w) \
-	AM_RANGE(0x51, 0x51) AM_READWRITE(tmpz84c011_0_pb_r,tmpz84c011_0_pb_w) \
-	AM_RANGE(0x52, 0x52) AM_READWRITE(tmpz84c011_0_pc_r,tmpz84c011_0_pc_w) \
-	AM_RANGE(0x30, 0x30) AM_READWRITE(tmpz84c011_0_pd_r,tmpz84c011_0_pd_w) \
-	AM_RANGE(0x40, 0x40) AM_READWRITE(tmpz84c011_0_pe_r,tmpz84c011_0_pe_w) \
-	AM_RANGE(0x54, 0x54) AM_READWRITE(tmpz84c011_0_dir_pa_r,tmpz84c011_0_dir_pa_w) \
-	AM_RANGE(0x55, 0x55) AM_READWRITE(tmpz84c011_0_dir_pb_r,tmpz84c011_0_dir_pb_w) \
-	AM_RANGE(0x56, 0x56) AM_READWRITE(tmpz84c011_0_dir_pc_r,tmpz84c011_0_dir_pc_w) \
-	AM_RANGE(0x34, 0x34) AM_READWRITE(tmpz84c011_0_dir_pd_r,tmpz84c011_0_dir_pd_w) \
-	AM_RANGE(0x44, 0x44) AM_READWRITE(tmpz84c011_0_dir_pe_r,tmpz84c011_0_dir_pe_w) \
-
+static ADDRESS_MAP_START( tmpz84c011_regs, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("main_ctc", z80ctc_r,z80ctc_w)
+	AM_RANGE(0x50, 0x50) AM_READWRITE(tmpz84c011_0_pa_r,tmpz84c011_0_pa_w)
+	AM_RANGE(0x51, 0x51) AM_READWRITE(tmpz84c011_0_pb_r,tmpz84c011_0_pb_w)
+	AM_RANGE(0x52, 0x52) AM_READWRITE(tmpz84c011_0_pc_r,tmpz84c011_0_pc_w)
+	AM_RANGE(0x30, 0x30) AM_READWRITE(tmpz84c011_0_pd_r,tmpz84c011_0_pd_w)
+	AM_RANGE(0x40, 0x40) AM_READWRITE(tmpz84c011_0_pe_r,tmpz84c011_0_pe_w)
+	AM_RANGE(0x54, 0x54) AM_READWRITE(tmpz84c011_0_dir_pa_r,tmpz84c011_0_dir_pa_w)
+	AM_RANGE(0x55, 0x55) AM_READWRITE(tmpz84c011_0_dir_pb_r,tmpz84c011_0_dir_pb_w)
+	AM_RANGE(0x56, 0x56) AM_READWRITE(tmpz84c011_0_dir_pc_r,tmpz84c011_0_dir_pc_w)
+	AM_RANGE(0x34, 0x34) AM_READWRITE(tmpz84c011_0_dir_pd_r,tmpz84c011_0_dir_pd_w)
+	AM_RANGE(0x44, 0x44) AM_READWRITE(tmpz84c011_0_dir_pe_r,tmpz84c011_0_dir_pe_w)
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sailorws_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
@@ -586,7 +586,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjuraden_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	TMPZ84C011_REGS
+	AM_IMPORT_FROM( tmpz84c011_regs )
 
 	AM_RANGE(0x80, 0x81) AM_READ(nbmj9195_blitter_0_r)
 	AM_RANGE(0x80, 0x8f) AM_WRITE(nbmj9195_blitter_0_w)
@@ -601,7 +601,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( koinomp_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	TMPZ84C011_REGS
+	AM_IMPORT_FROM( tmpz84c011_regs )
 
 	AM_RANGE(0x80, 0x81) AM_READ(nbmj9195_blitter_0_r)
 	AM_RANGE(0x80, 0x8f) AM_WRITE(nbmj9195_blitter_0_w)
@@ -621,7 +621,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( patimono_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	TMPZ84C011_REGS
+	AM_IMPORT_FROM( tmpz84c011_regs )
 
 	AM_RANGE(0x80, 0x81) AM_READ(nbmj9195_blitter_1_r)
 	AM_RANGE(0x80, 0x8f) AM_WRITE(nbmj9195_blitter_1_w)
@@ -639,7 +639,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mmehyou_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	TMPZ84C011_REGS
+	AM_IMPORT_FROM( tmpz84c011_regs )
 
 	AM_RANGE(0x80, 0x81) AM_READ(nbmj9195_blitter_0_r)
 	AM_RANGE(0x80, 0x8f) AM_WRITE(nbmj9195_blitter_0_w)
@@ -653,7 +653,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gal10ren_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	TMPZ84C011_REGS
+	AM_IMPORT_FROM( tmpz84c011_regs )
 
 	AM_RANGE(0x60, 0x61) AM_READ(nbmj9195_blitter_0_r)
 	AM_RANGE(0x60, 0x6f) AM_WRITE(nbmj9195_blitter_0_w)
@@ -671,7 +671,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( renaiclb_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	TMPZ84C011_REGS
+	AM_IMPORT_FROM( tmpz84c011_regs )
 
 	AM_RANGE(0x20, 0x20) AM_WRITE(nbmj9195_sound_w)
 	AM_RANGE(0x24, 0x24) AM_WRITENOP
@@ -689,7 +689,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjlaman_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	TMPZ84C011_REGS
+	AM_IMPORT_FROM( tmpz84c011_regs )
 
 	AM_RANGE(0x20, 0x20) AM_WRITE(nbmj9195_sound_w)
 	AM_RANGE(0x22, 0x22) AM_WRITENOP
@@ -708,7 +708,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mkeibaou_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	TMPZ84C011_REGS
+	AM_IMPORT_FROM( tmpz84c011_regs )
 
 	AM_RANGE(0x80, 0x81) AM_READ(nbmj9195_blitter_0_r)
 	AM_RANGE(0x80, 0x8f) AM_WRITE(nbmj9195_blitter_0_w)
@@ -727,7 +727,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pachiten_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	TMPZ84C011_REGS
+	AM_IMPORT_FROM( tmpz84c011_regs )
 
 	AM_RANGE(0x60, 0x61) AM_READ(nbmj9195_blitter_0_r)
 	AM_RANGE(0x60, 0x6f) AM_WRITE(nbmj9195_blitter_0_w)
@@ -745,7 +745,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sailorws_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	TMPZ84C011_REGS
+	AM_IMPORT_FROM( tmpz84c011_regs )
 
 	AM_RANGE(0x60, 0x61) AM_READ(nbmj9195_blitter_0_r)
 	AM_RANGE(0x60, 0x6f) AM_WRITE(nbmj9195_blitter_0_w)
@@ -763,7 +763,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sailorwr_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	TMPZ84C011_REGS
+	AM_IMPORT_FROM( tmpz84c011_regs )
 
 	AM_RANGE(0x60, 0x61) AM_READ(nbmj9195_blitter_0_r)
 	AM_RANGE(0x60, 0x6f) AM_WRITE(nbmj9195_blitter_0_w)
@@ -782,7 +782,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( psailor1_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	TMPZ84C011_REGS
+	AM_IMPORT_FROM( tmpz84c011_regs )
 
 	AM_RANGE(0x60, 0x61) AM_READ(nbmj9195_blitter_0_r)
 	AM_RANGE(0x60, 0x6f) AM_WRITE(nbmj9195_blitter_0_w)
@@ -800,7 +800,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( psailor2_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	TMPZ84C011_REGS
+	AM_IMPORT_FROM( tmpz84c011_regs )
 
 	AM_RANGE(0x60, 0x61) AM_READ(nbmj9195_blitter_0_r)
 	AM_RANGE(0x60, 0x6f) AM_WRITE(nbmj9195_blitter_0_w)
@@ -818,7 +818,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( otatidai_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	TMPZ84C011_REGS
+	AM_IMPORT_FROM( tmpz84c011_regs )
 
 	AM_RANGE(0x60, 0x61) AM_READ(nbmj9195_blitter_0_r)
 	AM_RANGE(0x60, 0x6f) AM_WRITE(nbmj9195_blitter_0_w)
@@ -836,7 +836,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( yosimoto_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	TMPZ84C011_REGS
+	AM_IMPORT_FROM( tmpz84c011_regs )
 
 	AM_RANGE(0x60, 0x61) AM_READ(nbmj9195_blitter_0_r)
 	AM_RANGE(0x60, 0x6f) AM_WRITE(nbmj9195_blitter_0_w)
@@ -854,7 +854,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jituroku_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	TMPZ84C011_REGS
+	AM_IMPORT_FROM( tmpz84c011_regs )
 
 	AM_RANGE(0x60, 0x61) AM_READ(nbmj9195_blitter_0_r)
 	AM_RANGE(0x60, 0x6f) AM_WRITE(nbmj9195_blitter_0_w)
@@ -872,7 +872,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ngpgal_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	TMPZ84C011_REGS
+	AM_IMPORT_FROM( tmpz84c011_regs )
 
 	AM_RANGE(0xa0, 0xa0) AM_WRITE(nbmj9195_sound_w)
 	AM_RANGE(0xa4, 0xa4) AM_WRITENOP
@@ -886,7 +886,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjgottsu_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	TMPZ84C011_REGS
+	AM_IMPORT_FROM( tmpz84c011_regs )
 
 	AM_RANGE(0x80, 0x81) AM_READ(nbmj9195_blitter_0_r)
 	AM_RANGE(0x80, 0x8f) AM_WRITE(nbmj9195_blitter_0_w)
@@ -900,7 +900,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cmehyou_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	TMPZ84C011_REGS
+	AM_IMPORT_FROM( tmpz84c011_regs )
 
 	AM_RANGE(0xa0, 0xa0) AM_WRITE(nbmj9195_sound_w)
 	AM_RANGE(0xa8, 0xa8) AM_WRITENOP
@@ -914,7 +914,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjkoiura_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	TMPZ84C011_REGS
+	AM_IMPORT_FROM( tmpz84c011_regs )
 
 	AM_RANGE(0x80, 0x81) AM_READ(nbmj9195_blitter_0_r)
 	AM_RANGE(0x80, 0x8f) AM_WRITE(nbmj9195_blitter_0_w)
@@ -928,7 +928,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mkoiuraa_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	TMPZ84C011_REGS
+	AM_IMPORT_FROM( tmpz84c011_regs )
 
 	AM_RANGE(0xa0, 0xa0) AM_WRITE(nbmj9195_sound_w)
 	AM_RANGE(0xa4, 0xa4) AM_WRITENOP
@@ -942,7 +942,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mscoutm_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	TMPZ84C011_REGS
+	AM_IMPORT_FROM( tmpz84c011_regs )
 
 	AM_RANGE(0x80, 0x80) AM_READ(mscoutm_dipsw_1_r)
 	AM_RANGE(0x82, 0x82) AM_READ(mscoutm_dipsw_0_r)
@@ -962,7 +962,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( imekura_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	TMPZ84C011_REGS
+	AM_IMPORT_FROM( tmpz84c011_regs )
 
 	AM_RANGE(0x80, 0x80) AM_READ(mscoutm_dipsw_1_r)
 	AM_RANGE(0x82, 0x82) AM_READ(mscoutm_dipsw_0_r)
@@ -982,7 +982,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjegolf_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	TMPZ84C011_REGS
+	AM_IMPORT_FROM( tmpz84c011_regs )
 
 	AM_RANGE(0x80, 0x86) AM_WRITENOP			// nb22090 param ?
 
@@ -2927,14 +2927,14 @@ static MACHINE_DRIVER_START( NBMJDRV1 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 12000000/2)		/* TMPZ84C011, 6.00 MHz */
 	MDRV_CPU_CONFIG(daisy_chain_main)
-	MDRV_CPU_PROGRAM_MAP(sailorws_map, 0)
-	MDRV_CPU_IO_MAP(sailorws_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(sailorws_map)
+	MDRV_CPU_IO_MAP(sailorws_io_map)
 	MDRV_CPU_VBLANK_INT("screen", ctc0_trg1)				/* vblank is connect to ctc triggfer */
 
 	MDRV_CPU_ADD("audiocpu", Z80, 8000000/1)					/* TMPZ84C011, 8.00 MHz */
 	MDRV_CPU_CONFIG(daisy_chain_sound)
-	MDRV_CPU_PROGRAM_MAP(sailorws_sound_map, 0)
-	MDRV_CPU_IO_MAP(sailorws_sound_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(sailorws_sound_map)
+	MDRV_CPU_IO_MAP(sailorws_sound_io_map)
 
 	MDRV_Z80CTC_ADD("main_ctc", 12000000/2 /* same as "maincpu" */, ctc_intf_main)
 	MDRV_Z80CTC_ADD("audio_ctc", 8000000/1 /* same as "audiocpu" */, ctc_intf_audio)
@@ -2999,8 +2999,8 @@ static MACHINE_DRIVER_START( mjuraden )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( NBMJDRV1 )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mjuraden_map, 0)
-	MDRV_CPU_IO_MAP(mjuraden_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(mjuraden_map)
+	MDRV_CPU_IO_MAP(mjuraden_io_map)
 MACHINE_DRIVER_END
 
 
@@ -3009,8 +3009,8 @@ static MACHINE_DRIVER_START( koinomp )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( NBMJDRV1 )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(koinomp_map, 0)
-	MDRV_CPU_IO_MAP(koinomp_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(koinomp_map)
+	MDRV_CPU_IO_MAP(koinomp_io_map)
 MACHINE_DRIVER_END
 
 
@@ -3019,7 +3019,7 @@ static MACHINE_DRIVER_START( patimono )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( NBMJDRV1 )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(patimono_io_map, 0)
+	MDRV_CPU_IO_MAP(patimono_io_map)
 MACHINE_DRIVER_END
 
 
@@ -3028,7 +3028,7 @@ static MACHINE_DRIVER_START( janbari )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( NBMJDRV1 )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(patimono_io_map, 0)
+	MDRV_CPU_IO_MAP(patimono_io_map)
 
 	MDRV_NVRAM_HANDLER(nbmj9195)
 MACHINE_DRIVER_END
@@ -3039,8 +3039,8 @@ static MACHINE_DRIVER_START( mmehyou )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( NBMJDRV1 )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(koinomp_map, 0)
-	MDRV_CPU_IO_MAP(mmehyou_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(koinomp_map)
+	MDRV_CPU_IO_MAP(mmehyou_io_map)
 
 	MDRV_NVRAM_HANDLER(nbmj9195)
 MACHINE_DRIVER_END
@@ -3051,8 +3051,8 @@ static MACHINE_DRIVER_START( ultramhm )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( NBMJDRV1 )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(koinomp_map, 0)
-	MDRV_CPU_IO_MAP(koinomp_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(koinomp_map)
+	MDRV_CPU_IO_MAP(koinomp_io_map)
 
 	MDRV_NVRAM_HANDLER(nbmj9195)
 MACHINE_DRIVER_END
@@ -3063,7 +3063,7 @@ static MACHINE_DRIVER_START( gal10ren )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( NBMJDRV1 )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(gal10ren_io_map, 0)
+	MDRV_CPU_IO_MAP(gal10ren_io_map)
 MACHINE_DRIVER_END
 
 
@@ -3072,7 +3072,7 @@ static MACHINE_DRIVER_START( renaiclb )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( NBMJDRV1 )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(renaiclb_io_map, 0)
+	MDRV_CPU_IO_MAP(renaiclb_io_map)
 MACHINE_DRIVER_END
 
 
@@ -3081,7 +3081,7 @@ static MACHINE_DRIVER_START( mjlaman )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( NBMJDRV1 )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(mjlaman_io_map, 0)
+	MDRV_CPU_IO_MAP(mjlaman_io_map)
 MACHINE_DRIVER_END
 
 
@@ -3090,7 +3090,7 @@ static MACHINE_DRIVER_START( mkeibaou )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( NBMJDRV1 )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(mkeibaou_io_map, 0)
+	MDRV_CPU_IO_MAP(mkeibaou_io_map)
 MACHINE_DRIVER_END
 
 
@@ -3099,7 +3099,7 @@ static MACHINE_DRIVER_START( pachiten )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( NBMJDRV1 )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(pachiten_io_map, 0)
+	MDRV_CPU_IO_MAP(pachiten_io_map)
 
 	MDRV_NVRAM_HANDLER(nbmj9195)
 MACHINE_DRIVER_END
@@ -3117,7 +3117,7 @@ static MACHINE_DRIVER_START( sailorwr )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( NBMJDRV1 )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(sailorwr_io_map, 0)
+	MDRV_CPU_IO_MAP(sailorwr_io_map)
 
 	MDRV_NVRAM_HANDLER(nbmj9195)
 MACHINE_DRIVER_END
@@ -3128,7 +3128,7 @@ static MACHINE_DRIVER_START( psailor1 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( NBMJDRV1 )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(psailor1_io_map, 0)
+	MDRV_CPU_IO_MAP(psailor1_io_map)
 MACHINE_DRIVER_END
 
 
@@ -3137,7 +3137,7 @@ static MACHINE_DRIVER_START( psailor2 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( NBMJDRV1 )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(psailor2_io_map, 0)
+	MDRV_CPU_IO_MAP(psailor2_io_map)
 MACHINE_DRIVER_END
 
 
@@ -3146,7 +3146,7 @@ static MACHINE_DRIVER_START( otatidai )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( NBMJDRV1 )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(otatidai_io_map, 0)
+	MDRV_CPU_IO_MAP(otatidai_io_map)
 MACHINE_DRIVER_END
 
 
@@ -3155,7 +3155,7 @@ static MACHINE_DRIVER_START( yosimoto )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( NBMJDRV1 )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(yosimoto_io_map, 0)
+	MDRV_CPU_IO_MAP(yosimoto_io_map)
 MACHINE_DRIVER_END
 
 
@@ -3164,7 +3164,7 @@ static MACHINE_DRIVER_START( jituroku )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( NBMJDRV1 )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(jituroku_io_map, 0)
+	MDRV_CPU_IO_MAP(jituroku_io_map)
 MACHINE_DRIVER_END
 
 
@@ -3173,8 +3173,8 @@ static MACHINE_DRIVER_START( ngpgal )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( NBMJDRV2 )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(ngpgal_map, 0)
-	MDRV_CPU_IO_MAP(ngpgal_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(ngpgal_map)
+	MDRV_CPU_IO_MAP(ngpgal_io_map)
 MACHINE_DRIVER_END
 
 
@@ -3183,8 +3183,8 @@ static MACHINE_DRIVER_START( mjgottsu )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( NBMJDRV2 )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(ngpgal_map, 0)
-	MDRV_CPU_IO_MAP(mjgottsu_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(ngpgal_map)
+	MDRV_CPU_IO_MAP(mjgottsu_io_map)
 MACHINE_DRIVER_END
 
 
@@ -3193,8 +3193,8 @@ static MACHINE_DRIVER_START( bakuhatu )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( NBMJDRV2 )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(ngpgal_map, 0)
-	MDRV_CPU_IO_MAP(mjgottsu_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(ngpgal_map)
+	MDRV_CPU_IO_MAP(mjgottsu_io_map)
 MACHINE_DRIVER_END
 
 
@@ -3203,8 +3203,8 @@ static MACHINE_DRIVER_START( cmehyou )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( NBMJDRV2 )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(ngpgal_map, 0)
-	MDRV_CPU_IO_MAP(cmehyou_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(ngpgal_map)
+	MDRV_CPU_IO_MAP(cmehyou_io_map)
 MACHINE_DRIVER_END
 
 
@@ -3213,8 +3213,8 @@ static MACHINE_DRIVER_START( mjkoiura )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( NBMJDRV2 )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mjuraden_map, 0)
-	MDRV_CPU_IO_MAP(mjkoiura_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(mjuraden_map)
+	MDRV_CPU_IO_MAP(mjkoiura_io_map)
 MACHINE_DRIVER_END
 
 
@@ -3223,8 +3223,8 @@ static MACHINE_DRIVER_START( mkoiuraa )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( NBMJDRV2 )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mjuraden_map, 0)
-	MDRV_CPU_IO_MAP(mkoiuraa_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(mjuraden_map)
+	MDRV_CPU_IO_MAP(mkoiuraa_io_map)
 MACHINE_DRIVER_END
 
 
@@ -3233,8 +3233,8 @@ static MACHINE_DRIVER_START( mscoutm )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( NBMJDRV3 )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mscoutm_map, 0)
-	MDRV_CPU_IO_MAP(mscoutm_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(mscoutm_map)
+	MDRV_CPU_IO_MAP(mscoutm_io_map)
 MACHINE_DRIVER_END
 
 
@@ -3243,8 +3243,8 @@ static MACHINE_DRIVER_START( imekura )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( NBMJDRV3 )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mjegolf_map, 0)
-	MDRV_CPU_IO_MAP(imekura_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(mjegolf_map)
+	MDRV_CPU_IO_MAP(imekura_io_map)
 MACHINE_DRIVER_END
 
 
@@ -3253,8 +3253,8 @@ static MACHINE_DRIVER_START( mjegolf )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( NBMJDRV3 )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mjegolf_map, 0)
-	MDRV_CPU_IO_MAP(mjegolf_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(mjegolf_map)
+	MDRV_CPU_IO_MAP(mjegolf_io_map)
 MACHINE_DRIVER_END
 
 

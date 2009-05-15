@@ -282,8 +282,8 @@ static MACHINE_DRIVER_START( llc1 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_3MHz)
 	MDRV_CPU_CONFIG(llc1_daisy_chain)
-	MDRV_CPU_PROGRAM_MAP(llc1_mem, 0)
-	MDRV_CPU_IO_MAP(llc1_io, 0)	
+	MDRV_CPU_PROGRAM_MAP(llc1_mem)
+	MDRV_CPU_IO_MAP(llc1_io)
 	
 	MDRV_MACHINE_START( llc1 )
 	MDRV_MACHINE_RESET( llc1 )
@@ -308,8 +308,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( llc2 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_3MHz)
-	MDRV_CPU_PROGRAM_MAP(llc2_mem, 0)
-	MDRV_CPU_IO_MAP(llc2_io, 0)	
+	MDRV_CPU_PROGRAM_MAP(llc2_mem)
+	MDRV_CPU_IO_MAP(llc2_io)
 	
 	MDRV_MACHINE_RESET( llc2 )
 

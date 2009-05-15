@@ -282,8 +282,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( svi318 )
 	/* Basic machine hardware */
 	MDRV_CPU_ADD( "maincpu", Z80, 3579545 )	/* 3.579545 MHz */
-	MDRV_CPU_PROGRAM_MAP( svi318_mem, 0 )
-	MDRV_CPU_IO_MAP( svi318_io, 0 )
+	MDRV_CPU_PROGRAM_MAP( svi318_mem)
+	MDRV_CPU_IO_MAP( svi318_io)
 	MDRV_CPU_VBLANK_INT("screen", svi318_interrupt)
 	MDRV_QUANTUM_TIME(HZ(60))
 
@@ -346,8 +346,8 @@ static const mc6845_interface svi806_crtc6845_interface =
 static MACHINE_DRIVER_START( svi328_806 )
 	/* Basic machine hardware */
 	MDRV_CPU_ADD( "maincpu", Z80, 3579545 )	/* 3.579545 MHz */
-	MDRV_CPU_PROGRAM_MAP( svi328_806_mem, 0 )
-	MDRV_CPU_IO_MAP( svi328_806_io, 0 )
+	MDRV_CPU_PROGRAM_MAP( svi328_806_mem)
+	MDRV_CPU_IO_MAP( svi328_806_io)
 	MDRV_CPU_VBLANK_INT("screen", svi318_interrupt)
 	MDRV_QUANTUM_TIME(HZ(60))
 

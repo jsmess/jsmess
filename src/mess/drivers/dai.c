@@ -185,8 +185,8 @@ static const cassette_config dai_cassette_config =
 static MACHINE_DRIVER_START( dai )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", 8080, 2000000)
-	MDRV_CPU_PROGRAM_MAP(dai_mem, 0)
-	MDRV_CPU_IO_MAP(dai_io, 0)
+	MDRV_CPU_PROGRAM_MAP(dai_mem)
+	MDRV_CPU_IO_MAP(dai_io)
 	MDRV_QUANTUM_TIME(HZ(60))
 
 	MDRV_MACHINE_START( dai )

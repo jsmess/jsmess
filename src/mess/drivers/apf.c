@@ -626,7 +626,7 @@ static MACHINE_DRIVER_START( apf_imagination )
 	/* basic machine hardware */
 	//	MDRV_CPU_ADD("maincpu", M6800, 3750000)        /* 7.8336 MHz, only 6800p type used 1 MHz max*/
 	MDRV_CPU_ADD("maincpu", M6800, 1000000 )        /* backgammon uses timing from vertical interrupt to switch between video modes during frame */
-	MDRV_CPU_PROGRAM_MAP(apf_imagination_map, 0)
+	MDRV_CPU_PROGRAM_MAP(apf_imagination_map)
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(M6847_NTSC_FRAMES_PER_SECOND)
 
@@ -656,7 +656,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( apf_m1000 )
 	MDRV_IMPORT_FROM( apf_imagination )
 	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP( apf_m1000_map, 0 )
+	MDRV_CPU_PROGRAM_MAP( apf_m1000_map)
 
 	MDRV_PIA6821_REMOVE( "pia_1" )
 

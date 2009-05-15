@@ -1653,8 +1653,8 @@ static VIDEO_UPDATE( einstein2 )
 static MACHINE_DRIVER_START( einstein )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, EINSTEIN_SYSTEM_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(einstein_mem, 0)
-	MDRV_CPU_IO_MAP(einstein_io, 0)
+	MDRV_CPU_PROGRAM_MAP(einstein_mem)
+	MDRV_CPU_IO_MAP(einstein_io)
 	MDRV_CPU_CONFIG(einstein_daisy_chain)
 	MDRV_QUANTUM_TIME(HZ(60))
 
@@ -1692,7 +1692,7 @@ static MACHINE_DRIVER_START( einstei2 )
 	MDRV_IMPORT_FROM( einstein )
 
 	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_IO_MAP(einstein2_io, 0)
+	MDRV_CPU_IO_MAP(einstein2_io)
 	MDRV_MACHINE_RESET( einstein2 )
 
     /* video hardware */

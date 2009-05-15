@@ -580,13 +580,13 @@ static const sid6581_interface c128_sound_interface =
 static MACHINE_DRIVER_START( c128 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, VIC6567_CLOCK)
-	MDRV_CPU_PROGRAM_MAP( c128_z80_mem, 0 )
-	MDRV_CPU_IO_MAP( c128_z80_io, 0 )
+	MDRV_CPU_PROGRAM_MAP( c128_z80_mem)
+	MDRV_CPU_IO_MAP( c128_z80_io)
 	MDRV_CPU_VBLANK_INT("screen", c64_frame_interrupt)
 	MDRV_CPU_PERIODIC_INT(vic2_raster_irq, VIC6567_HRETRACERATE)
 
 	MDRV_CPU_ADD("m8502", M8502, VIC6567_CLOCK)
-	MDRV_CPU_PROGRAM_MAP( c128_mem, 0 )
+	MDRV_CPU_PROGRAM_MAP( c128_mem)
 	MDRV_CPU_VBLANK_INT("screen", c64_frame_interrupt)
 	MDRV_CPU_PERIODIC_INT(vic2_raster_irq, VIC6567_HRETRACERATE)
 

@@ -268,13 +268,13 @@ static WRITE16_HANDLER ( musobana_inputport_w )
 	musobana_inputport = data;
 }
 
-#define TMP68301_REGS \
-	AM_RANGE(0xfffc00, 0xfffc0f) AM_READWRITE(tmp68301_address_decoder_r,tmp68301_address_decoder_w) \
-	AM_RANGE(0xfffc80, 0xfffc9f) AM_READWRITE(tmp68301_interrupt_controller_r,tmp68301_interrupt_controller_w) \
-	AM_RANGE(0xfffd00, 0xfffd0f) AM_READWRITE(tmp68301_parallel_interface_r,tmp68301_parallel_interface_w) \
-	AM_RANGE(0xfffd80, 0xfffdaf) AM_READWRITE(tmp68301_serial_interface_r,tmp68301_serial_interface_w) \
+static ADDRESS_MAP_START( tmp68301_regs, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0xfffc00, 0xfffc0f) AM_READWRITE(tmp68301_address_decoder_r,tmp68301_address_decoder_w)
+	AM_RANGE(0xfffc80, 0xfffc9f) AM_READWRITE(tmp68301_interrupt_controller_r,tmp68301_interrupt_controller_w)
+	AM_RANGE(0xfffd00, 0xfffd0f) AM_READWRITE(tmp68301_parallel_interface_r,tmp68301_parallel_interface_w)
+	AM_RANGE(0xfffd80, 0xfffdaf) AM_READWRITE(tmp68301_serial_interface_r,tmp68301_serial_interface_w)
 	AM_RANGE(0xfffe00, 0xfffe4f) AM_READWRITE(tmp68301_timer_r,tmp68301_timer_w)
-
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( niyanpai_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
@@ -308,7 +308,7 @@ static ADDRESS_MAP_START( niyanpai_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x240c00, 0x240c01) AM_WRITE(niyanpai_clutsel_1_w)
 	AM_RANGE(0x240e00, 0x240e01) AM_WRITE(niyanpai_clutsel_2_w)
 
-	TMP68301_REGS
+	AM_IMPORT_FROM( tmp68301_regs )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( musobana_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -346,7 +346,7 @@ static ADDRESS_MAP_START( musobana_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x280200, 0x280201) AM_READ(musobana_inputport_0_r)
 	AM_RANGE(0x280400, 0x280401) AM_READ_PORT("SYSTEM")
 
-	TMP68301_REGS
+	AM_IMPORT_FROM( tmp68301_regs )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mhhonban_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -386,7 +386,7 @@ static ADDRESS_MAP_START( mhhonban_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x280200, 0x280201) AM_READ(musobana_inputport_0_r)
 	AM_RANGE(0x280400, 0x280401) AM_READ_PORT("SYSTEM")
 
-	TMP68301_REGS
+	AM_IMPORT_FROM( tmp68301_regs )
 ADDRESS_MAP_END
 
 
@@ -780,13 +780,13 @@ static MACHINE_DRIVER_START( niyanpai )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12288000/2)	/* TMP68301, 6.144 MHz */
-	MDRV_CPU_PROGRAM_MAP(niyanpai_map,0)
+	MDRV_CPU_PROGRAM_MAP(niyanpai_map)
 	MDRV_CPU_VBLANK_INT("screen", niyanpai_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 8000000/1)					/* TMPZ84C011, 8.00 MHz */
 	MDRV_CPU_CONFIG(daisy_chain_sound)
-	MDRV_CPU_PROGRAM_MAP(niyanpai_sound_map, 0)
-	MDRV_CPU_IO_MAP(niyanpai_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(niyanpai_sound_map)
+	MDRV_CPU_IO_MAP(niyanpai_sound_io_map)
 
 	MDRV_Z80CTC_ADD("ctc", 8000000/1 /* same as "audiocpu" */, ctc_intf)
 
@@ -824,7 +824,7 @@ static MACHINE_DRIVER_START( musobana )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(niyanpai)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(musobana_map, 0)
+	MDRV_CPU_PROGRAM_MAP(musobana_map)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mhhonban )
@@ -832,7 +832,7 @@ static MACHINE_DRIVER_START( mhhonban )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(niyanpai)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mhhonban_map, 0)
+	MDRV_CPU_PROGRAM_MAP(mhhonban_map)
 MACHINE_DRIVER_END
 
 

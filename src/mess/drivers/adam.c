@@ -628,8 +628,8 @@ static MACHINE_RESET( adam )
 static MACHINE_DRIVER_START( adam )
 	/* Machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3579545)       /* 3.579545 MHz */
-	MDRV_CPU_PROGRAM_MAP(adam_mem, 0)
-	MDRV_CPU_IO_MAP(adam_io, 0)
+	MDRV_CPU_PROGRAM_MAP(adam_mem)
+	MDRV_CPU_IO_MAP(adam_io)
 
     /* Master M6801 AdamNet controller */
 	//MDRV_CPU_ADD("adamnet", M6800, 4000000)       /* 4.0 MHz */

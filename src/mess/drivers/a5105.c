@@ -38,8 +38,8 @@ static VIDEO_UPDATE( a5105 )
 static MACHINE_DRIVER_START( a5105 )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
-    MDRV_CPU_PROGRAM_MAP(a5105_mem, 0)
-    MDRV_CPU_IO_MAP(a5105_io, 0)
+    MDRV_CPU_PROGRAM_MAP(a5105_mem)
+    MDRV_CPU_IO_MAP(a5105_io)
 
     MDRV_MACHINE_RESET(a5105)
 

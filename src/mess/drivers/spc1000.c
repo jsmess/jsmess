@@ -255,8 +255,8 @@ static const cassette_config spc1000_cassette_config =
 static MACHINE_DRIVER_START( spc1000 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
-	MDRV_CPU_PROGRAM_MAP(spc1000_mem, 0)
-	MDRV_CPU_IO_MAP(spc1000_io, 0)
+	MDRV_CPU_PROGRAM_MAP(spc1000_mem)
+	MDRV_CPU_IO_MAP(spc1000_io)
 
 	MDRV_MACHINE_RESET(spc1000)
 

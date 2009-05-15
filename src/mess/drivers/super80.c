@@ -697,8 +697,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( super80 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)		/* 2 MHz */
-	MDRV_CPU_PROGRAM_MAP(super80_map, 0)
-	MDRV_CPU_IO_MAP(super80_io, 0)
+	MDRV_CPU_PROGRAM_MAP(super80_map)
+	MDRV_CPU_IO_MAP(super80_io)
 	MDRV_CPU_CONFIG(super80_daisy_chain)
 
 	MDRV_MACHINE_RESET( super80 )
@@ -743,7 +743,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( super80m )
 	MDRV_IMPORT_FROM(super80)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(super80m_map, 0)
+	MDRV_CPU_PROGRAM_MAP(super80m_map)
 
 	MDRV_GFXDECODE(super80m)
 	MDRV_PALETTE_LENGTH(256*2)
@@ -755,8 +755,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( super80v )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)		/* 2 MHz */
-	MDRV_CPU_PROGRAM_MAP(super80v_map, 0)
-	MDRV_CPU_IO_MAP(super80v_io, 0)
+	MDRV_CPU_PROGRAM_MAP(super80v_map)
+	MDRV_CPU_IO_MAP(super80v_io)
 	MDRV_CPU_CONFIG(super80_daisy_chain)
 
 	MDRV_MACHINE_RESET( super80 )
@@ -801,7 +801,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( super80r )
 	MDRV_IMPORT_FROM(super80v)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(super80r_io, 0)
+	MDRV_CPU_IO_MAP(super80r_io)
 MACHINE_DRIVER_END
 
 static void driver_init_common( running_machine *machine )

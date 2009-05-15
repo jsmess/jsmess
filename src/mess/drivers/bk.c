@@ -172,7 +172,7 @@ static MACHINE_DRIVER_START( bk0010 )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", T11, 3000000)
 	MDRV_CPU_CONFIG(t11_data)
-    MDRV_CPU_PROGRAM_MAP(bk0010_mem, 0)
+    MDRV_CPU_PROGRAM_MAP(bk0010_mem)
     MDRV_MACHINE_RESET( bk0010 )
 
     /* video hardware */
@@ -199,7 +199,7 @@ static MACHINE_DRIVER_START( bk0010fd )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", T11, 3000000)
 	MDRV_CPU_CONFIG(t11_data)
-    MDRV_CPU_PROGRAM_MAP(bk0010fd_mem, 0)
+    MDRV_CPU_PROGRAM_MAP(bk0010fd_mem)
     MDRV_MACHINE_RESET( bk0010 )
 
     /* video hardware */

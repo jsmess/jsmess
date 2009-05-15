@@ -38,8 +38,8 @@ static VIDEO_UPDATE( elwro800 )
 static MACHINE_DRIVER_START( elwro800 )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
-    MDRV_CPU_PROGRAM_MAP(elwro800_mem, 0)
-    MDRV_CPU_IO_MAP(elwro800_io, 0)
+    MDRV_CPU_PROGRAM_MAP(elwro800_mem)
+    MDRV_CPU_IO_MAP(elwro800_io)
 
     MDRV_MACHINE_RESET(elwro800)
 

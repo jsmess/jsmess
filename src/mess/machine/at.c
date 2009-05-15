@@ -541,7 +541,7 @@ ADDRESS_MAP_END
 
 MACHINE_DRIVER_START( at_kbdc8042 )
 	MDRV_CPU_ADD("kbdc8042", I8042, 4772720 )   /* Frequency is a wild guess */
-	MDRV_CPU_IO_MAP( kbdc8042_io, 0 )
+	MDRV_CPU_IO_MAP( kbdc8042_io)
 MACHINE_DRIVER_END
 
 

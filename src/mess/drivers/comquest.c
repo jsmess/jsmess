@@ -242,7 +242,7 @@ static MACHINE_DRIVER_START( comquest )
     not epson e0c88
 */
 
-	MDRV_CPU_PROGRAM_MAP(comquest_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(comquest_mem)
 	MDRV_CPU_CONFIG( amask )
 
 	MDRV_MACHINE_RESET( comquest )

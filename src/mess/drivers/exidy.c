@@ -764,8 +764,8 @@ static const cassette_config exidy_cassette_config =
 static MACHINE_DRIVER_START( exidy )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 12638000/6)
-	MDRV_CPU_PROGRAM_MAP(exidy_mem, 0)
-	MDRV_CPU_IO_MAP(exidy_io, 0)
+	MDRV_CPU_PROGRAM_MAP(exidy_mem)
+	MDRV_CPU_IO_MAP(exidy_io)
 
 	MDRV_MACHINE_START( exidy )
 	MDRV_MACHINE_RESET( exidy )
@@ -814,7 +814,7 @@ static MACHINE_DRIVER_START( exidyd )
 	MDRV_IMPORT_FROM( exidy )
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(exidyd_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(exidyd_mem)
 
 	MDRV_MACHINE_START( exidyd )
 	MDRV_MACHINE_RESET( exidyd )

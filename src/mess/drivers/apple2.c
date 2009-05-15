@@ -560,7 +560,7 @@ static const ay8910_interface apple2_ay8910_interface =
 static MACHINE_DRIVER_START( apple2_common )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 1021800)		/* close to actual CPU frequency of 1.020484 MHz */
-	MDRV_CPU_PROGRAM_MAP(apple2_map, 0)
+	MDRV_CPU_PROGRAM_MAP(apple2_map)
 	MDRV_CPU_VBLANK_INT_HACK(apple2_interrupt, 192/8)
 	MDRV_QUANTUM_TIME(HZ(60))
 

@@ -181,8 +181,8 @@ static MACHINE_DRIVER_START( pecom64 )
 	
     /* basic machine hardware */ 
 	MDRV_CPU_ADD("maincpu", CDP1802, CDP1869_DOT_CLK_PAL/3)
-	MDRV_CPU_PROGRAM_MAP(pecom64_mem, 0)
-  	MDRV_CPU_IO_MAP(pecom64_io, 0)
+	MDRV_CPU_PROGRAM_MAP(pecom64_mem)
+  	MDRV_CPU_IO_MAP(pecom64_io)
   	MDRV_CPU_CONFIG(pecom64_cdp1802_config)
   	
   	MDRV_MACHINE_START( pecom )

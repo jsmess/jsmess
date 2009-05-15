@@ -307,8 +307,8 @@ static const cassette_config radio86_cassette_config =
 static MACHINE_DRIVER_START( radio86 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",8080, XTAL_16MHz / 9)
-	MDRV_CPU_PROGRAM_MAP(radio86_mem, 0)
-	MDRV_CPU_IO_MAP(radio86_io, 0)
+	MDRV_CPU_PROGRAM_MAP(radio86_mem)
+	MDRV_CPU_IO_MAP(radio86_io)
 	MDRV_MACHINE_RESET( radio86 )
 
 	MDRV_PPI8255_ADD( "ppi8255_1", radio86_ppi8255_interface_1 )
@@ -341,14 +341,14 @@ static MACHINE_DRIVER_START( radio16 )
   	/* basic machine hardware */
   	MDRV_IMPORT_FROM(radio86)
   	MDRV_CPU_MODIFY("maincpu")
-  	MDRV_CPU_PROGRAM_MAP(radio86_16_mem, 0)
+  	MDRV_CPU_PROGRAM_MAP(radio86_16_mem)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( radiorom )
   	/* basic machine hardware */
   	MDRV_IMPORT_FROM(radio86)
   	MDRV_CPU_MODIFY("maincpu")
-  	MDRV_CPU_PROGRAM_MAP(radio86rom_mem, 0)
+  	MDRV_CPU_PROGRAM_MAP(radio86rom_mem)
     
 	MDRV_PPI8255_ADD( "ppi8255_2", radio86_ppi8255_interface_2 )
 MACHINE_DRIVER_END
@@ -357,7 +357,7 @@ static MACHINE_DRIVER_START( radioram )
   	/* basic machine hardware */
   	MDRV_IMPORT_FROM(radio86)
   	MDRV_CPU_MODIFY("maincpu")
-  	MDRV_CPU_PROGRAM_MAP(radio86ram_mem, 0)
+  	MDRV_CPU_PROGRAM_MAP(radio86ram_mem)
 
 	MDRV_PPI8255_ADD( "ppi8255_2", radio86_ppi8255_interface_2 )
 MACHINE_DRIVER_END
@@ -366,7 +366,7 @@ static MACHINE_DRIVER_START( rk7007 )
   	/* basic machine hardware */
   	MDRV_IMPORT_FROM(radio86)
   	MDRV_CPU_MODIFY("maincpu")
-  	MDRV_CPU_IO_MAP(rk7007_io, 0)
+  	MDRV_CPU_IO_MAP(rk7007_io)
 
 	MDRV_PPI8255_ADD( "ms7007", rk7007_ppi8255_interface )
 MACHINE_DRIVER_END
@@ -375,7 +375,7 @@ static MACHINE_DRIVER_START( rk700716 )
   	/* basic machine hardware */
   	MDRV_IMPORT_FROM(radio16)
   	MDRV_CPU_MODIFY("maincpu")
-  	MDRV_CPU_IO_MAP(rk7007_io, 0)
+  	MDRV_CPU_IO_MAP(rk7007_io)
     
 	MDRV_PPI8255_ADD( "ms7007", rk7007_ppi8255_interface )    
 MACHINE_DRIVER_END

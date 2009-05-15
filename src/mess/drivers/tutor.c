@@ -662,8 +662,8 @@ static MACHINE_DRIVER_START(tutor)
 	/* TMS9995 CPU @ 10.7 MHz */
 	MDRV_CPU_ADD("maincpu", TMS9995, 10700000)
 	MDRV_CPU_CONFIG(tutor_processor_config)
-	MDRV_CPU_PROGRAM_MAP(tutor_memmap, 0)
-	MDRV_CPU_IO_MAP(tutor_io, 0)
+	MDRV_CPU_PROGRAM_MAP(tutor_memmap)
+	MDRV_CPU_IO_MAP(tutor_io)
 	MDRV_CPU_VBLANK_INT("screen", tutor_vblank_interrupt)
 
 	MDRV_MACHINE_START( tutor )

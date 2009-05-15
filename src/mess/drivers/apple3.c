@@ -33,7 +33,7 @@ ADDRESS_MAP_END
 static MACHINE_DRIVER_START( apple3 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 2000000)        /* 2 MHz */
-	MDRV_CPU_PROGRAM_MAP(apple3_map, 0)
+	MDRV_CPU_PROGRAM_MAP(apple3_map)
 	MDRV_CPU_PERIODIC_INT(apple3_interrupt, 192)
 	MDRV_QUANTUM_TIME(HZ(60))
 

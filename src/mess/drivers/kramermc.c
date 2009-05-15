@@ -107,8 +107,8 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( kramermc )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 1500000)
-	MDRV_CPU_PROGRAM_MAP(kramermc_mem, 0)
-	MDRV_CPU_IO_MAP(kramermc_io, 0)
+	MDRV_CPU_PROGRAM_MAP(kramermc_mem)
+	MDRV_CPU_IO_MAP(kramermc_io)
 	MDRV_MACHINE_RESET( kramermc )
 
 	MDRV_Z80PIO_ADD( "z80pio", kramermc_z80pio_intf )

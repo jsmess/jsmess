@@ -1491,12 +1491,12 @@ static MACHINE_DRIVER_START( newbrain_a )
 
 	/* basic system hardware */
 	MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/8)
-	MDRV_CPU_PROGRAM_MAP(newbrain_map, 0)
-	MDRV_CPU_IO_MAP(newbrain_a_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(newbrain_map)
+	MDRV_CPU_IO_MAP(newbrain_a_io_map)
 	MDRV_CPU_VBLANK_INT(SCREEN_TAG, newbrain_interrupt)
 
 	MDRV_CPU_ADD(COP420_TAG, COP420, XTAL_16MHz/8) // COP420-GUW/N
-	MDRV_CPU_IO_MAP(newbrain_cop_io_map, 0)
+	MDRV_CPU_IO_MAP(newbrain_cop_io_map)
 	MDRV_CPU_CONFIG(newbrain_cop_intf)
 
 	MDRV_TIMER_ADD_PERIODIC("cop_regint", cop_regint_tick, MSEC(12.5)) // HACK
@@ -1517,11 +1517,11 @@ static MACHINE_DRIVER_START( newbrain_eim )
 	
 	/* basic system hardware */
 	MDRV_CPU_MODIFY(Z80_TAG)
-	MDRV_CPU_IO_MAP(newbrain_ei_io_map, 0)
+	MDRV_CPU_IO_MAP(newbrain_ei_io_map)
 
 	MDRV_CPU_ADD(FDC_Z80_TAG, Z80, XTAL_4MHz)
-	MDRV_CPU_PROGRAM_MAP(newbrain_fdc_map, 0)
-	MDRV_CPU_IO_MAP(newbrain_fdc_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(newbrain_fdc_map)
+	MDRV_CPU_IO_MAP(newbrain_fdc_io_map)
 
 	MDRV_MACHINE_START(newbrain_eim)
 

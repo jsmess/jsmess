@@ -382,7 +382,7 @@ static INTERRUPT_GEN( intv_interrupt2 )
 static MACHINE_DRIVER_START( intv )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", CP1610, XTAL_3_579545MHz/4)        /* Colorburst/4 */
-	MDRV_CPU_PROGRAM_MAP(intv_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(intv_mem)
 	MDRV_CPU_VBLANK_INT("screen", intv_interrupt)
 	MDRV_QUANTUM_TIME(HZ(60))
 
@@ -420,10 +420,10 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( intvkbd )
 	MDRV_IMPORT_FROM( intv )
 	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP(intvkbd_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(intvkbd_mem)
 
 	MDRV_CPU_ADD("keyboard", M6502, XTAL_3_579545MHz/2)	/* Colorburst/2 */
-	MDRV_CPU_PROGRAM_MAP(intv2_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(intv2_mem)
 	MDRV_CPU_VBLANK_INT("screen", intv_interrupt2)
 
 	MDRV_QUANTUM_TIME(HZ(6000))

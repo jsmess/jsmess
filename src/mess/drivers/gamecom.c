@@ -91,7 +91,7 @@ static PALETTE_INIT( gamecom )
 static MACHINE_DRIVER_START( gamecom )
 	/* basic machine hardware */
 	MDRV_CPU_ADD( "maincpu", SM8500, XTAL_11_0592MHz/2 )   /* actually it's an sm8521 microcontroller containing an sm8500 cpu */
-	MDRV_CPU_PROGRAM_MAP( gamecom_mem_map, 0 )
+	MDRV_CPU_PROGRAM_MAP( gamecom_mem_map)
 	MDRV_CPU_CONFIG( gamecom_cpu_config )
 
 	MDRV_SCREEN_ADD("screen", LCD)

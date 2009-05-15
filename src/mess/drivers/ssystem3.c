@@ -319,7 +319,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( ssystem3 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 1000000)
-	MDRV_CPU_PROGRAM_MAP(ssystem3_map, 0)
+	MDRV_CPU_PROGRAM_MAP(ssystem3_map)
 	MDRV_QUANTUM_TIME(HZ(60))
 
     /* video hardware */

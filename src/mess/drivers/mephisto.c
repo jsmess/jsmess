@@ -199,7 +199,7 @@ static MACHINE_RESET( mephisto )
 static MACHINE_DRIVER_START( mephisto )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M65C02,4915200)        /* 65C02 */
-	MDRV_CPU_PROGRAM_MAP(mephisto_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(mephisto_mem)
 	MDRV_QUANTUM_TIME(HZ(60))
 	MDRV_MACHINE_START( mephisto )
 	MDRV_MACHINE_RESET( mephisto )
@@ -217,7 +217,7 @@ static MACHINE_DRIVER_START( rebel5 )
 	MDRV_IMPORT_FROM( mephisto )
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(rebel5_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(rebel5_mem)
 	//beep_set_frequency(0, 4000);
 MACHINE_DRIVER_END
 

@@ -206,8 +206,8 @@ static MACHINE_DRIVER_START(ti990_4)
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0(???) MHz */
 	MDRV_CPU_ADD("maincpu", TMS9900, 3000000)
-	MDRV_CPU_PROGRAM_MAP(ti990_4_memmap, 0)
-	MDRV_CPU_IO_MAP(ti990_4_cru_map, 0)
+	MDRV_CPU_PROGRAM_MAP(ti990_4_memmap)
+	MDRV_CPU_IO_MAP(ti990_4_cru_map)
 	MDRV_CPU_PERIODIC_INT(ti990_4_line_interrupt, 120/*or TIME_IN_HZ(100) in Europe*/)
 
 	MDRV_MACHINE_RESET( ti990_4 )

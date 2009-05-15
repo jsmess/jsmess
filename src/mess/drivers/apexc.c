@@ -797,8 +797,8 @@ static MACHINE_DRIVER_START(apexc)
 	/* APEXC CPU @ 2.0 kHz (memory word clock frequency) */
 	MDRV_CPU_ADD("maincpu", APEXC, 2000)
 	/*MDRV_CPU_CONFIG(NULL)*/
-	MDRV_CPU_PROGRAM_MAP(apexc_mem_map, 0)
-	MDRV_CPU_IO_MAP(apexc_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(apexc_mem_map)
+	MDRV_CPU_IO_MAP(apexc_io_map)
 	/* dummy interrupt: handles the control panel */
 	MDRV_CPU_VBLANK_INT("screen", apexc_interrupt)
 	/*MDRV_CPU_PERIODIC_INT(func, rate)*/

@@ -433,8 +433,8 @@ static const pc_lpt_interface at_lpt_config =
 static MACHINE_DRIVER_START( ibm5170 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I80286, 6000000 /*6000000*/)
-	MDRV_CPU_PROGRAM_MAP(at16_map, 0)
-	MDRV_CPU_IO_MAP(at16_io, 0)
+	MDRV_CPU_PROGRAM_MAP(at16_map)
+	MDRV_CPU_IO_MAP(at16_io)
 	MDRV_CPU_CONFIG(i286_address_mask)
 
 	MDRV_QUANTUM_TIME(HZ(60))
@@ -500,8 +500,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ibm5162 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I80286, 6000000 /*6000000*/)
-	MDRV_CPU_PROGRAM_MAP(at16_map, 0)
-	MDRV_CPU_IO_MAP(at16_io, 0)
+	MDRV_CPU_PROGRAM_MAP(at16_map)
+	MDRV_CPU_IO_MAP(at16_io)
 	MDRV_CPU_CONFIG(i286_address_mask)
 
 	MDRV_QUANTUM_TIME(HZ(60))
@@ -557,8 +557,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ps2m30286 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I80286, 12000000)
-	MDRV_CPU_PROGRAM_MAP(at16_map, 0)
-	MDRV_CPU_IO_MAP(at16_io, 0)
+	MDRV_CPU_PROGRAM_MAP(at16_map)
+	MDRV_CPU_IO_MAP(at16_io)
 	MDRV_CPU_CONFIG(i286_address_mask)
 
 	MDRV_PIT8254_ADD( "pit8254", at_pit8254_config )
@@ -622,8 +622,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( atvga )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I80286, 12000000)
-	MDRV_CPU_PROGRAM_MAP(at16_map, 0)
-	MDRV_CPU_IO_MAP(at16_io, 0)
+	MDRV_CPU_PROGRAM_MAP(at16_map)
+	MDRV_CPU_IO_MAP(at16_io)
 	MDRV_CPU_CONFIG(i286_address_mask)
 
 	MDRV_PIT8254_ADD( "pit8254", at_pit8254_config )
@@ -690,8 +690,8 @@ static MACHINE_DRIVER_START( at386 )
     /* basic machine hardware */
 	/* original at 6 MHz, at03 8 megahertz */
 	MDRV_CPU_ADD("maincpu", I386, 12000000)
-	MDRV_CPU_PROGRAM_MAP(at386_map, 0)
-	MDRV_CPU_IO_MAP(at386_io, 0)
+	MDRV_CPU_PROGRAM_MAP(at386_map)
+	MDRV_CPU_IO_MAP(at386_io)
 	MDRV_CPU_CONFIG(i286_address_mask)
 
 	MDRV_MACHINE_START( at )
@@ -760,8 +760,8 @@ static MACHINE_DRIVER_START( at586 )
 	MDRV_IMPORT_FROM( at386 )
 
 	MDRV_CPU_REPLACE("maincpu", PENTIUM, 60000000)
-	MDRV_CPU_PROGRAM_MAP(at586_map, 0)
-	MDRV_CPU_IO_MAP(at586_io, 0)
+	MDRV_CPU_PROGRAM_MAP(at586_map)
+	MDRV_CPU_IO_MAP(at586_io)
 
 	MDRV_PCI_BUS_ADD("pcibus", 0)
 	MDRV_PCI_BUS_DEVICE(0, NULL, intel82439tx_pci_read, intel82439tx_pci_write)

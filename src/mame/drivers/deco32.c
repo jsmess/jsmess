@@ -866,6 +866,10 @@ static ADDRESS_MAP_START( tattass_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x174018, 0x17401b) AM_WRITENOP /* Sprite 'CPU' (unused) */
 	AM_RANGE(0x178000, 0x179fff) AM_RAM AM_BASE(&spriteram32_2) AM_SIZE(&spriteram_2_size)
 
+	AM_RANGE(0x17c000, 0x17c003) AM_WRITENOP /* Sprite DMA mode (2) */
+	AM_RANGE(0x17c010, 0x17c013) AM_WRITE(buffer_spriteram32_2_w)
+	AM_RANGE(0x17c018, 0x17c01b) AM_WRITENOP /* Sprite 'CPU' (unused) */
+
 	AM_RANGE(0x182000, 0x183fff) AM_RAM_WRITE(deco32_pf1_data_w) AM_BASE(&deco32_pf1_data)
 	AM_RANGE(0x184000, 0x185fff) AM_RAM_WRITE(deco32_pf2_data_w) AM_BASE(&deco32_pf2_data)
 	AM_RANGE(0x192000, 0x193fff) AM_RAM AM_BASE(&deco32_pf1_rowscroll)
@@ -1669,11 +1673,11 @@ static MACHINE_DRIVER_START( captaven )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ARM, 28000000/4)
-	MDRV_CPU_PROGRAM_MAP(captaven_map,0)
+	MDRV_CPU_PROGRAM_MAP(captaven_map)
 	MDRV_CPU_VBLANK_INT("screen", deco32_vbl_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", H6280, 32220000/8)
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_MACHINE_RESET(deco32)
 
@@ -1716,11 +1720,11 @@ static MACHINE_DRIVER_START( fghthist )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ARM, 28000000/4)
-	MDRV_CPU_PROGRAM_MAP(fghthist_map,0)
+	MDRV_CPU_PROGRAM_MAP(fghthist_map)
 	MDRV_CPU_VBLANK_INT("screen", deco32_vbl_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", H6280, 32220000/8)
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_NVRAM_HANDLER(93C46)
 
@@ -1762,11 +1766,11 @@ static MACHINE_DRIVER_START( fghthsta )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ARM, 28000000/4)
-	MDRV_CPU_PROGRAM_MAP(fghthsta_memmap,0)
+	MDRV_CPU_PROGRAM_MAP(fghthsta_memmap)
 	MDRV_CPU_VBLANK_INT("screen", deco32_vbl_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", H6280, 32220000/8)
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_NVRAM_HANDLER(93C46)
 
@@ -1808,11 +1812,11 @@ static MACHINE_DRIVER_START( dragngun )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ARM, 28000000/4)
-	MDRV_CPU_PROGRAM_MAP(dragngun_map,0)
+	MDRV_CPU_PROGRAM_MAP(dragngun_map)
 	MDRV_CPU_VBLANK_INT("screen", deco32_vbl_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", H6280, 32220000/8)
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_MACHINE_RESET(deco32)
 	MDRV_NVRAM_HANDLER(93C46)
@@ -1861,11 +1865,11 @@ static MACHINE_DRIVER_START( lockload )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ARM, 28000000/4)
-	MDRV_CPU_PROGRAM_MAP(lockload_map,0)
+	MDRV_CPU_PROGRAM_MAP(lockload_map)
 	MDRV_CPU_VBLANK_INT_HACK(deco32_vbl_interrupt,2) // From 2
 
 	MDRV_CPU_ADD("audiocpu", H6280, 32220000/8)
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_MACHINE_RESET(deco32)
 	MDRV_NVRAM_HANDLER(93C46)
@@ -1914,11 +1918,11 @@ static MACHINE_DRIVER_START( tattass )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ARM, 28000000/4) /* Unconfirmed */
-	MDRV_CPU_PROGRAM_MAP(tattass_map,0)
+	MDRV_CPU_PROGRAM_MAP(tattass_map)
 	MDRV_CPU_VBLANK_INT("screen", deco32_vbl_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", M6809, 2000000)
-	MDRV_CPU_PROGRAM_MAP(tattass_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(tattass_sound_map)
 	MDRV_CPU_PERIODIC_INT(tattass_snd_interrupt, 489) /* Fixed FIRQ of 489Hz as measured on real (pinball) machine */
 
 	MDRV_NVRAM_HANDLER(tattass)
@@ -1950,12 +1954,12 @@ static MACHINE_DRIVER_START( nslasher )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ARM, 28322000/4)
-	MDRV_CPU_PROGRAM_MAP(nslasher_map,0)
+	MDRV_CPU_PROGRAM_MAP(nslasher_map)
 	MDRV_CPU_VBLANK_INT("screen", deco32_vbl_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 32220000/9)
-	MDRV_CPU_PROGRAM_MAP(nslasher_sound,0)
-	MDRV_CPU_IO_MAP(nslasher_io_sound,0)
+	MDRV_CPU_PROGRAM_MAP(nslasher_sound)
+	MDRV_CPU_IO_MAP(nslasher_io_sound)
 
 	MDRV_QUANTUM_TIME(HZ(6000))	/* to improve main<->audio comms */
 

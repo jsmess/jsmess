@@ -38,8 +38,8 @@ static VIDEO_UPDATE( hec2hrx )
 static MACHINE_DRIVER_START( hec2hrx )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
-    MDRV_CPU_PROGRAM_MAP(hec2hrx_mem, 0)
-    MDRV_CPU_IO_MAP(hec2hrx_io, 0)
+    MDRV_CPU_PROGRAM_MAP(hec2hrx_mem)
+    MDRV_CPU_IO_MAP(hec2hrx_io)
 
     MDRV_MACHINE_RESET(hec2hrx)
 

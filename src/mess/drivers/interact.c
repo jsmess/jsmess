@@ -38,8 +38,8 @@ static VIDEO_UPDATE( interact )
 static MACHINE_DRIVER_START( interact )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
-    MDRV_CPU_PROGRAM_MAP(interact_mem, 0)
-    MDRV_CPU_IO_MAP(interact_io, 0)
+    MDRV_CPU_PROGRAM_MAP(interact_mem)
+    MDRV_CPU_IO_MAP(interact_io)
 
     MDRV_MACHINE_RESET(interact)
 

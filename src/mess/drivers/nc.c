@@ -1628,8 +1628,8 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( nc100 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, /*6000000*/ 4606000)        /* Russell Marks says this is more accurate */
-	MDRV_CPU_PROGRAM_MAP(nc_map, 0)
-	MDRV_CPU_IO_MAP(nc100_io, 0)
+	MDRV_CPU_PROGRAM_MAP(nc_map)
+	MDRV_CPU_IO_MAP(nc100_io)
 	MDRV_QUANTUM_TIME(HZ(60))
 
 	MDRV_MACHINE_START( nc100 )
@@ -1678,7 +1678,7 @@ static MACHINE_DRIVER_START( nc200 )
 	MDRV_IMPORT_FROM( nc100 )
 
 	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_IO_MAP(nc200_io, 0)
+	MDRV_CPU_IO_MAP(nc200_io)
 
 	MDRV_MACHINE_START( nc200 )
 	MDRV_MACHINE_RESET( nc200 )

@@ -1803,11 +1803,11 @@ static MACHINE_DRIVER_START( atarist )
 
 	// basic machine hardware
 	MDRV_CPU_ADD(M68000_TAG, M68000, Y2/4)
-	MDRV_CPU_PROGRAM_MAP(st_map, 0)
+	MDRV_CPU_PROGRAM_MAP(st_map)
 
 	MDRV_CPU_ADD(HD6301_TAG, HD63701, XTAL_4MHz)  /* HD6301 */
-	MDRV_CPU_PROGRAM_MAP(ikbd_map, 0)
-	MDRV_CPU_IO_MAP(ikbd_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(ikbd_map)
+	MDRV_CPU_IO_MAP(ikbd_io_map)
 
 	MDRV_MACHINE_START(atarist)
 
@@ -1846,7 +1846,7 @@ static MACHINE_DRIVER_START( megast )
 	MDRV_IMPORT_FROM(atarist)
 
 	MDRV_CPU_MODIFY(M68000_TAG)
-	MDRV_CPU_PROGRAM_MAP(megast_map, 0)
+	MDRV_CPU_PROGRAM_MAP(megast_map)
 	MDRV_RP5C15_ADD("rp5c15", rtc_intf)
 
 	MDRV_MACHINE_START(megast)
@@ -1857,11 +1857,11 @@ static MACHINE_DRIVER_START( atariste )
 
 	// basic machine hardware
 	MDRV_CPU_ADD(M68000_TAG, M68000, Y2/4)
-	MDRV_CPU_PROGRAM_MAP(ste_map, 0)
+	MDRV_CPU_PROGRAM_MAP(ste_map)
 
 	MDRV_CPU_ADD(HD6301_TAG, HD63701, XTAL_4MHz)  /* HD6301 */
-	MDRV_CPU_PROGRAM_MAP(ikbd_map, 0)
-	MDRV_CPU_IO_MAP(ikbd_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(ikbd_map)
+	MDRV_CPU_IO_MAP(ikbd_io_map)
 
 	MDRV_MACHINE_START(atariste)
 
@@ -1908,7 +1908,7 @@ static MACHINE_DRIVER_START( megaste )
 	MDRV_IMPORT_FROM(atariste)
 
 	MDRV_CPU_MODIFY(M68000_TAG)
-	MDRV_CPU_PROGRAM_MAP(megaste_map, 0)
+	MDRV_CPU_PROGRAM_MAP(megaste_map)
 	MDRV_RP5C15_ADD("rp5c15", rtc_intf)
 
 	MDRV_MACHINE_START(megaste)
@@ -1919,7 +1919,7 @@ static MACHINE_DRIVER_START( stbook )
 
 	// basic machine hardware
 	MDRV_CPU_ADD(M68000_TAG, M68000, U517/2)
-	MDRV_CPU_PROGRAM_MAP(stbook_map, 0)
+	MDRV_CPU_PROGRAM_MAP(stbook_map)
 
 	//MDRV_CPU_ADD(COP888_TAG, COP888, Y700)
 

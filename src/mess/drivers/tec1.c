@@ -240,8 +240,8 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( tec1 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 500000)	/* speed can be varied between 250kHz and 2MHz */
-	MDRV_CPU_PROGRAM_MAP(tec1_map, 0)
-	MDRV_CPU_IO_MAP(tec1_io, 0)
+	MDRV_CPU_PROGRAM_MAP(tec1_map)
+	MDRV_CPU_IO_MAP(tec1_io)
 
 	MDRV_MACHINE_RESET(tec1)
 

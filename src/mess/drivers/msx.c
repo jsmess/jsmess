@@ -1030,8 +1030,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( msx )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3579545)		  /* 3.579545 MHz */
-	MDRV_CPU_PROGRAM_MAP(msx_memory_map, 0)
-	MDRV_CPU_IO_MAP(msx_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(msx_memory_map)
+	MDRV_CPU_IO_MAP(msx_io_map)
 	MDRV_CPU_VBLANK_INT("screen", msx_interrupt)
 	MDRV_QUANTUM_TIME(HZ(60))
 
@@ -1089,8 +1089,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( msx2 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3579545)		  /* 3.579545 MHz */
-	MDRV_CPU_PROGRAM_MAP(msx_memory_map, 0)
-	MDRV_CPU_IO_MAP(msx2_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(msx_memory_map)
+	MDRV_CPU_IO_MAP(msx2_io_map)
 	MDRV_CPU_VBLANK_INT_HACK(msx2_interrupt, 262)
 	MDRV_QUANTUM_TIME(HZ(60))
 

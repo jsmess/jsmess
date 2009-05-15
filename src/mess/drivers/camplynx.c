@@ -107,8 +107,8 @@ static const mc6845_interface camplynx_crtc6845_interface = {
 static MACHINE_DRIVER_START( camplynx )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_4MHz)
-	MDRV_CPU_PROGRAM_MAP(camplynx_mem, 0)
-	MDRV_CPU_IO_MAP(camplynx_io, 0)
+	MDRV_CPU_PROGRAM_MAP(camplynx_mem)
+	MDRV_CPU_IO_MAP(camplynx_io)
 
 	MDRV_MACHINE_RESET(camplynx)
 

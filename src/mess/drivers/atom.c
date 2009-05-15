@@ -261,7 +261,7 @@ static const centronics_interface atom_centronics_config =
 static MACHINE_DRIVER_START( atom )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M65C02, X2 / 4)
-	MDRV_CPU_PROGRAM_MAP(atom_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(atom_mem)
 
 	MDRV_MACHINE_RESET( atom )
 
@@ -302,7 +302,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( atomeb )
 	MDRV_IMPORT_FROM( atom )
 	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP(atomeb_mem, 0 )
+	MDRV_CPU_PROGRAM_MAP(atomeb_mem)
 
 	MDRV_MACHINE_RESET( atomeb )
 MACHINE_DRIVER_END

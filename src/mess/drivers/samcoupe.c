@@ -548,8 +548,8 @@ static PALETTE_INIT( samcoupe )
 static MACHINE_DRIVER_START( samcoupe )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, SAMCOUPE_XTAL_X1/4) /* 6 MHz */
-	MDRV_CPU_PROGRAM_MAP(samcoupe_mem, 0)
-	MDRV_CPU_IO_MAP(samcoupe_io, 0)
+	MDRV_CPU_PROGRAM_MAP(samcoupe_mem)
+	MDRV_CPU_IO_MAP(samcoupe_io)
 	MDRV_CPU_VBLANK_INT("screen", samcoupe_frame_interrupt)
 
 	MDRV_MACHINE_RESET(samcoupe)

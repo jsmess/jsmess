@@ -532,8 +532,7 @@ static WRITE8_HANDLER( jsa3_io_w )
 			coin_counter_w(0, (data >> 4) & 1);
 
 			/* update the OKI frequency */
-			if (oki6295_l != NULL) okim6295_set_pin7(oki6295_l, data & 8);
-			if (oki6295_r != NULL) okim6295_set_pin7(oki6295_r, data & 8);
+			if (oki6295 != NULL) okim6295_set_pin7(oki6295, data & 8);
 			break;
 
 		case 0x206:		/* /MIX */
@@ -772,7 +771,7 @@ MACHINE_DRIVER_START( jsa_i_stereo )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("jsa", M6502, JSA_MASTER_CLOCK/2)
-	MDRV_CPU_PROGRAM_MAP(atarijsa1_map,0)
+	MDRV_CPU_PROGRAM_MAP(atarijsa1_map)
 	MDRV_CPU_PERIODIC_INT(atarigen_6502_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
 
 	/* sound hardware */
@@ -817,7 +816,7 @@ MACHINE_DRIVER_START( jsa_i_mono_speech )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("jsa", M6502, JSA_MASTER_CLOCK/2)
-	MDRV_CPU_PROGRAM_MAP(atarijsa1_map,0)
+	MDRV_CPU_PROGRAM_MAP(atarijsa1_map)
 	MDRV_CPU_PERIODIC_INT(atarigen_6502_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
 
 	/* sound hardware */
@@ -838,7 +837,7 @@ MACHINE_DRIVER_START( jsa_ii_mono )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("jsa", M6502, JSA_MASTER_CLOCK/2)
-	MDRV_CPU_PROGRAM_MAP(atarijsa2_map,0)
+	MDRV_CPU_PROGRAM_MAP(atarijsa2_map)
 	MDRV_CPU_PERIODIC_INT(atarigen_6502_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
 
 	/* sound hardware */
@@ -861,7 +860,7 @@ MACHINE_DRIVER_START( jsa_iii_mono )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(jsa_ii_mono)
 	MDRV_CPU_MODIFY("jsa")
-	MDRV_CPU_PROGRAM_MAP(atarijsa3_map,0)
+	MDRV_CPU_PROGRAM_MAP(atarijsa3_map)
 MACHINE_DRIVER_END
 
 
@@ -881,7 +880,7 @@ MACHINE_DRIVER_START( jsa_iiis_stereo )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("jsa", M6502, JSA_MASTER_CLOCK/2)
-	MDRV_CPU_PROGRAM_MAP(atarijsa3s_map,0)
+	MDRV_CPU_PROGRAM_MAP(atarijsa3s_map)
 	MDRV_CPU_PERIODIC_INT(atarigen_6502_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
 
 	/* sound hardware */

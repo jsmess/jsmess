@@ -123,7 +123,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( galeb )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", M6502, 1000000)
-    MDRV_CPU_PROGRAM_MAP(galeb_mem, 0)
+    MDRV_CPU_PROGRAM_MAP(galeb_mem)
     MDRV_MACHINE_RESET( galeb )
 
     /* video hardware */

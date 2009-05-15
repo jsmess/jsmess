@@ -362,7 +362,7 @@ static const centronics_interface oric_centronics_config =
 static MACHINE_DRIVER_START( oric )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 1000000)
-	MDRV_CPU_PROGRAM_MAP(oric_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(oric_mem)
 	MDRV_QUANTUM_TIME(HZ(60))
 
 	MDRV_MACHINE_START( oric )
@@ -405,7 +405,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( telstrat)
 	MDRV_IMPORT_FROM( oric )
 	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP( telestrat_mem, 0 )
+	MDRV_CPU_PROGRAM_MAP( telestrat_mem)
 
 	MDRV_MACHINE_START( telestrat )
 	MDRV_MACHINE_RESET( NULL )

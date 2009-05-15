@@ -325,7 +325,7 @@ static const cassette_config kim1_cassette_config =
 static MACHINE_DRIVER_START( kim1 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 1000000)        /* 1 MHz */
-	MDRV_CPU_PROGRAM_MAP(kim1_map, 0)
+	MDRV_CPU_PROGRAM_MAP(kim1_map)
 	MDRV_QUANTUM_TIME(HZ(60))
 
 	MDRV_MACHINE_START( kim1 )

@@ -38,8 +38,8 @@ static VIDEO_UPDATE( d6809 )
 static MACHINE_DRIVER_START( d6809 )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",M6809E, XTAL_4MHz)
-    MDRV_CPU_PROGRAM_MAP(d6809_mem, 0)
-    MDRV_CPU_IO_MAP(d6809_io, 0)
+    MDRV_CPU_PROGRAM_MAP(d6809_mem)
+    MDRV_CPU_IO_MAP(d6809_io)
 
     MDRV_MACHINE_RESET(d6809)
 

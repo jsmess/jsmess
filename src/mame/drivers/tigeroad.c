@@ -525,12 +525,12 @@ static MACHINE_DRIVER_START( tigeroad )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-	MDRV_CPU_IO_MAP(sound_port_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MDRV_CPU_IO_MAP(sound_port_map)
 
 	/* IRQs are triggered by the YM2203 */
 
@@ -570,8 +570,8 @@ static MACHINE_DRIVER_START( toramich )
 	MDRV_IMPORT_FROM(tigeroad)
 
 	MDRV_CPU_ADD("sample", Z80, 3579545) /* ? */
-	MDRV_CPU_PROGRAM_MAP(sample_map,0)
-	MDRV_CPU_IO_MAP(sample_port_map,0)
+	MDRV_CPU_PROGRAM_MAP(sample_map)
+	MDRV_CPU_IO_MAP(sample_port_map)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,4000)	/* ? */
 
 	/* sound hardware */
@@ -707,6 +707,9 @@ ROM_START( f1dream )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* audio CPU */
 	ROM_LOAD( "12k_04.bin",   0x0000, 0x8000, CRC(4b9a7524) SHA1(19004958c19ac0af35f2c97790b0082ee2c15bc4) )
+
+	ROM_REGION( 0x1000, "mcu", 0 )	/* i8751 microcontroller */
+	ROM_LOAD( "c8751h-88",     0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x008000, "text", ROMREGION_DISPOSE )
 	ROM_LOAD( "10d_01.bin",   0x00000, 0x08000, CRC(361caf00) SHA1(8a109e4e116d0c5eea86f9c57c05359754daa5b9) ) /* 8x8 text */

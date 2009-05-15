@@ -43,8 +43,8 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( rt1715 )
   /* basic machine hardware */
   MDRV_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
-  MDRV_CPU_PROGRAM_MAP(rt1715_mem, 0)
-  MDRV_CPU_IO_MAP(rt1715_io, 0)
+  MDRV_CPU_PROGRAM_MAP(rt1715_mem)
+  MDRV_CPU_IO_MAP(rt1715_io)
   MDRV_MACHINE_RESET( rt1715 )
 
     /* video hardware */

@@ -44,8 +44,8 @@ static MACHINE_DRIVER_START( mk90 )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",T11, XTAL_4MHz)
     MDRV_CPU_CONFIG(t11_data)
-    MDRV_CPU_PROGRAM_MAP(mk90_mem, 0)
-    MDRV_CPU_IO_MAP(mk90_io, 0)
+    MDRV_CPU_PROGRAM_MAP(mk90_mem)
+    MDRV_CPU_IO_MAP(mk90_io)
 
     MDRV_MACHINE_RESET(mk90)
 

@@ -585,8 +585,8 @@ static const cassette_config sordm5_cassette_config =
 static MACHINE_DRIVER_START( sord_m5 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3800000)
-	MDRV_CPU_PROGRAM_MAP(sord_m5_mem, 0)
-	MDRV_CPU_IO_MAP(sord_m5_io, 0)
+	MDRV_CPU_PROGRAM_MAP(sord_m5_mem)
+	MDRV_CPU_IO_MAP(sord_m5_io)
 	MDRV_CPU_VBLANK_INT("screen", sord_interrupt)
 	MDRV_CPU_CONFIG( sord_m5_daisy_chain )
 	MDRV_QUANTUM_TIME(HZ(60))
@@ -625,11 +625,11 @@ static MACHINE_DRIVER_START( sord_m5_fd5 )
 	MDRV_IMPORT_FROM( sord_m5 )
 
 	MDRV_CPU_REPLACE("maincpu", Z80, 3800000)
-	MDRV_CPU_IO_MAP(srdm5fd5_io, 0)
+	MDRV_CPU_IO_MAP(srdm5fd5_io)
 
 	MDRV_CPU_ADD("floppy", Z80, 3800000)
-	MDRV_CPU_PROGRAM_MAP(sord_fd5_mem, 0)
-	MDRV_CPU_IO_MAP(sord_fd5_io, 0)
+	MDRV_CPU_PROGRAM_MAP(sord_fd5_mem)
+	MDRV_CPU_IO_MAP(sord_fd5_io)
 
 	MDRV_QUANTUM_TIME(HZ(1200))
 	MDRV_MACHINE_RESET( sord_m5_fd5 )

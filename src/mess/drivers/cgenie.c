@@ -401,8 +401,8 @@ static const cassette_config cgenie_cassette_config =
 static MACHINE_DRIVER_START( cgenie )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 2216800)        /* 2,2168 MHz */
-	MDRV_CPU_PROGRAM_MAP(cgenie_mem, 0)
-	MDRV_CPU_IO_MAP(cgenie_io, 0)
+	MDRV_CPU_PROGRAM_MAP(cgenie_mem)
+	MDRV_CPU_IO_MAP(cgenie_io)
 	MDRV_CPU_VBLANK_INT("screen", cgenie_frame_interrupt)
 	MDRV_CPU_PERIODIC_INT(cgenie_timer_interrupt, 40)
 	MDRV_QUANTUM_TIME(HZ(240))

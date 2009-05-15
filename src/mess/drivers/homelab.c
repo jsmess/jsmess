@@ -132,7 +132,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( homelab )
 /* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3000000)
-	MDRV_CPU_PROGRAM_MAP(homelab2_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(homelab2_mem)
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
 
@@ -151,7 +151,7 @@ static MACHINE_DRIVER_START( homelab3 )
 /* basic machine hardware */
 	MDRV_IMPORT_FROM(homelab)
   MDRV_CPU_MODIFY("maincpu")     
-	MDRV_CPU_PROGRAM_MAP(homelab3_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(homelab3_mem)
 	
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_SIZE(80*8, 25*8)
