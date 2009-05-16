@@ -509,7 +509,7 @@ ROM_START( jaguar )
 	ROM_CART_LOAD("cart", 0x800000, 0x600000, ROM_NOMIRROR)
 ROM_END
 
-ROM_START( jag_cd )
+ROM_START( jaguarcd )
 	ROM_REGION( 0xe20000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS( 0, "default", "Jaguar CD" )
 	ROMX_LOAD( "jag_cd.bin", 0xe00000, 0x040000, CRC(687068d5) SHA1(73883e7a6e9b132452436f7ab1aeaeb0776428e5), ROM_BIOS(1))
@@ -552,5 +552,5 @@ static QUICKLOAD_LOAD( jaguar )
 
 /*    YEAR   NAME      PARENT    COMPAT  MACHINE   INPUT     INIT      CONFIG  COMPANY    FULLNAME */
 CONS( 1993,  jaguar,   0,        0,      jaguar,   jaguar,   jaguar,   0,      "Atari",   "Atari Jaguar", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING)
-CONS( 1995,  jag_cd,   jaguar,   0,      jaguar,   jaguar,   jaguar,   0,      "Atari",   "Atari Jaguar CD", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GA\
+CONS( 1995,  jaguarcd,   jaguar,   0,      jaguar,   jaguar,   jaguar,   0,      "Atari",   "Atari Jaguar CD", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GA\
 ME_NOT_WORKING)

@@ -49,7 +49,7 @@ const game_driver * const drivers[] =
 	DRIVER( lynx )		/* Atari Lynx Handheld								*/
 	DRIVER( lynx2 )		/* Atari Lynx II Handheld redesigned, no additions	*/
 	DRIVER( jaguar )	/* Atari Jaguar										*/
-	DRIVER( jag_cd )	/* Atari Jaguar CD									*/
+	DRIVER( jaguarcd )	/* Atari Jaguar CD									*/
 
 	/* NINTENDO */
 	DRIVER( nes )		/* Nintendo Entertainment System					*/
