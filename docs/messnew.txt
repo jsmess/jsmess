@@ -67,6 +67,7 @@ Skeleton drivers :
 - Sega 32X
 - Sega Mega-CD
 - Sega CD
+- Jaguar CD
 
 
 System Driver Changes:
@@ -74,6 +75,8 @@ System Driver Changes:
 - [COLECO] Fixed controller bug introduced in 0.131. [Fabio Priuli]
 
 - [CRVISION] Added support for stereo tapes. [Curt Coder]
+
+- [GLASGOW] Fixed blinking LEDs. This allows basic usage of this system. [Fabio Priuli]
 
 - [KYOCERA] All systems are now working without sound. [Curt Coder, Fabio Priuli]
 
