@@ -49,7 +49,7 @@ const game_driver * const drivers[] =
 	DRIVER( lynx )		/* Atari Lynx Handheld								*/
 	DRIVER( lynx2 )		/* Atari Lynx II Handheld redesigned, no additions	*/
 	DRIVER( jaguar )	/* Atari Jaguar										*/
-	DRIVER( jaguarcd )	/* Atari Jaguar CD									*/
+	DRIVER( jag_cd )	/* Atari Jaguar CD									*/
 
 	/* NINTENDO */
 	DRIVER( nes )		/* Nintendo Entertainment System					*/
@@ -1195,6 +1195,7 @@ const game_driver * const drivers[] =
 
 	/* Fujitsu */
 	DRIVER( fm7 )
+	DRIVER( fmtmarty )  /* 1993 Fujitsu FM-Towns Marty */
 
 	/* Camputers */
 	DRIVER( camplynx )
