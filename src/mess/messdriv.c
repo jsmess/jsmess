@@ -1195,6 +1195,8 @@ const game_driver * const drivers[] =
 
 	/* Fujitsu */
 	DRIVER( fm7 )
+	DRIVER( fmtowns )   /* 1989 Fujitsu FM-Towns */
+	DRIVER( fmtownsa )
 	DRIVER( fmtmarty )  /* 1993 Fujitsu FM-Towns Marty */
 
 	/* Camputers */
