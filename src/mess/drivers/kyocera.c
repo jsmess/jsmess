@@ -8,7 +8,7 @@
 	Comments about bit usage from Tech References and Virtual T source.
 
 	Supported systems:
-	  - Kyocera Kyotronic 85
+	  - Kyosei Kyotronic 85
 	  - Olivetti M10 (slightly diff hw, BIOS is shifted by 2 words)
 	  - NEC PC-8201A (slightly diff hw)
 	  - TRS-80 Model 100
@@ -27,9 +27,13 @@
 
 	TODO:
 
+	- upd1990 does not count up from year 99 to 00
 	- keyboard is unresponsive for couple of seconds after boot
 	- soft power on/off
-	- kc85 IM6042 UART
+	- IM6042 UART
+	- pc8201 48K RAM option
+	- pc8201 video interface
+	- pc8201 128K ROM cartridge
 	- pc8201 NEC PC-8233 floppy controller
 	- pc8201 NEC floppy disc drives (PC-8031-1W, PC-8031-2W, PC-80S31)
 	- pc8201 NEC PC-8240 video monitor adapter
@@ -57,47 +61,6 @@
 	ROMAL      084  132   Lowest 8 bits of extended ROM address
 	ROMAM      088  136   Middle eight bits of 128k ROM address
 	ROMRD      08C  140   Read data port for 128k ROM
-	IOCNT      090  144   I/O control port
-							 BIT 0-Bank #0 select
-							 BIT 1-Bank #1 select
-							 BIT 2-Bank #2 (0000-7FFF)
-							 BIT 3-Bank #2 (8000-FFFF)
-							 BIT 4-Clock strobe
-							 BIT 5-Cassette motor
-							 BIT 6&7- Serial interface multiplexor
-							  00=Not used
-							  01=RAM file
-							  10=F/D interface
-							  11=COM port RS232C
-	IOSTS      0A0  160   Return status of IOCNT port
-	BNKSTT     0A0  160   Current bank number is stored here
-	PRTSTB     0A1  161   Printer strobe
-	BNKSEL     0A1  161   This port is used to set the current bank
-	CS8155     0B8  184   8155 command/status port
-	PORTA      0B9  185   Printer data
-							 KEYBOARD STROBE
-							 LCD CHIP SELECT
-							 CLOCK DATA
-	PORTB      0BA  186   Bit 0&1 LCD block select
-							 BIT 2-Disable music output
-							 BIT 3-CAR detect(0)/RING detect(1)
-							 BIT 4-Disable auto power off
-							 BIT 5-Disable buzzer
-							 BIT 6-DTR ON
-							 BIT 7-RTS ON
-	PORTC      0BB  187   Bit 0-clock data in
-							 BIT 1-Printer select
-							 BIT 2-Printer busy
-							 BIT 3-Bar code reader data in
-							 BIT 4-CTS IN
-							 BIT 5-DSR IN
-	TIML       0BC  188   Low byte of timer
-	TIMH       0BD  189   High byte of timer count
-	TXRXD      0C8  200   6402 data register
-	CS6402     0D8  216   RS232 command & status port
-	KYRTIN     0E8  232   Read keyboard matrix port
-	LCDCM      0FE  254   LCD command/status port
-	LCDDT      0FF  255   LCD data port
 
 */
 
@@ -254,7 +217,7 @@ static WRITE8_HANDLER( pc8201_ctrl_w )
 	state->iosel = data >> 5;
 }
 
-static WRITE8_HANDLER( im6402_ctrl_w )
+static WRITE8_HANDLER( uart_ctrl_w )
 {
 	/*
 
@@ -281,7 +244,7 @@ static WRITE8_HANDLER( im6402_ctrl_w )
 */
 }
 
-static READ8_HANDLER( im6402_status_r )
+static READ8_HANDLER( uart_status_r )
 {
 	/*
 
@@ -316,7 +279,7 @@ static READ8_HANDLER( im6402_status_r )
 	return 0xf0;
 }
 
-static READ8_HANDLER( pc8201_im6402_status_r )
+static READ8_HANDLER( pc8201_uart_status_r )
 {
 	/*
 
@@ -350,6 +313,7 @@ static READ8_HANDLER( pc8201_im6402_status_r )
 
 	return 0xf0;
 }
+
 static WRITE8_HANDLER( modem_w )
 {
 	/*
@@ -368,7 +332,7 @@ static WRITE8_HANDLER( modem_w )
 	*/
 }
 
-static WRITE8_HANDLER( e0_w )
+static WRITE8_HANDLER( kc85_ctrl_w )
 {
 	/*
 
@@ -527,21 +491,21 @@ static ADDRESS_MAP_START( kc85_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) AM_WRITE(modem_w)
 	AM_RANGE(0xb0, 0xb7) AM_MIRROR(0x08) AM_DEVREADWRITE(PIO8155_TAG, pio8155_r, pio8155_w)
 //	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x0f) AM_DEVREADWRITE(IM6402_TAG, im6402_data_r, im6402_data_w)
-	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_READWRITE(im6402_status_r, im6402_ctrl_w)
-	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0f) AM_READWRITE(keyboard_r, e0_w)
+	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_READWRITE(uart_status_r, uart_ctrl_w)
+	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0f) AM_READWRITE(keyboard_r, kc85_ctrl_w)
 	AM_RANGE(0xf0, 0xf0) AM_MIRROR(0x0e) AM_READWRITE(kc85_lcd_status_r, kc85_lcd_command_w)
 	AM_RANGE(0xf1, 0xf1) AM_MIRROR(0x0e) AM_READWRITE(kc85_lcd_data_r, kc85_lcd_data_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc8201_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
-//	AM_RANGE(0x70, 0x70) AM_MIRROR(0x0f) optional RAM unit
+//	AM_RANGE(0x70, 0x70) AM_MIRROR(0x0f) optional video interface 8255
 //	AM_RANGE(0x80, 0x80) AM_MIRROR(0x0f) optional 128K ROM cartridge
-	AM_RANGE(0x90, 0x90) AM_WRITE(pc8201_ctrl_w)
+	AM_RANGE(0x90, 0x90) AM_MIRROR(0x0f) AM_WRITE(pc8201_ctrl_w)
 	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) AM_READWRITE(pc8201_bank_r, pc8201_bank_w)
 	AM_RANGE(0xb0, 0xb7) AM_MIRROR(0x08) AM_DEVREADWRITE(PIO8155_TAG, pio8155_r, pio8155_w )
 //	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x0f) AM_DEVREADWRITE(IM6402_TAG, im6402_data_r, im6402_data_w)
-	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_READWRITE(pc8201_im6402_status_r, im6402_ctrl_w)
+	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_READWRITE(pc8201_uart_status_r, uart_ctrl_w)
 	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0f) AM_READ(keyboard_r)
 	AM_RANGE(0xf0, 0xf0) AM_MIRROR(0x0e) AM_READWRITE(kc85_lcd_status_r, kc85_lcd_command_w)
 	AM_RANGE(0xf1, 0xf1) AM_MIRROR(0x0e) AM_READWRITE(kc85_lcd_data_r, kc85_lcd_data_w)
@@ -801,16 +765,16 @@ INPUT_PORTS_END
 
 /* uPD1990A Interface */
 
-static WRITE_LINE_DEVICE_HANDLER( kyocera_upd1990a_data_w )
+static WRITE_LINE_DEVICE_HANDLER( kc85_upd1990a_data_w )
 {
 	kc85_state *driver_state = device->machine->driver_data;
 
 	driver_state->upd1990a_data = state;
 }
 
-static UPD1990A_INTERFACE( kyocera_upd1990a_intf )
+static UPD1990A_INTERFACE( kc85_upd1990a_intf )
 {
-	DEVCB_LINE(kyocera_upd1990a_data_w),
+	DEVCB_LINE(kc85_upd1990a_data_w),
 	DEVCB_CPU_INPUT_LINE(I8085_TAG, I8085_RST75_LINE)
 };
 
@@ -1001,7 +965,6 @@ static WRITE8_DEVICE_HANDLER( pc8201_8155_port_b_w )
 
 	if (state->buzzer) speaker_level_w(state->speaker, state->bell);
 }
-
 
 static PIO8155_INTERFACE( pc8201_8155_intf )
 {
@@ -1276,29 +1239,29 @@ static MACHINE_START( tandy200 )
 	state_save_register_global(machine, state->bell);
 }
 
-static const cassette_config kyocera_cassette_config =
+static const cassette_config kc85_cassette_config =
 {
 	cassette_default_formats,
 	NULL,
 	CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED
 };
 
-static void kyocera_sod_w(const device_config *device, int state)
+static void kc85_sod_w(const device_config *device, int state)
 {
 	cassette_output(cassette_device_image(device->machine), state ? +1.0 : -1.0);
 }
 
-static int kyocera_sid_r(const device_config *device)
+static int kc85_sid_r(const device_config *device)
 {
 	return cassette_input(cassette_device_image(device->machine)) > 0.0;
 }
 
-static const i8085_config kyocera_i8085_config =
+static const i8085_config kc85_i8085_config =
 {
-	NULL,					/* INTE changed callback */
-	NULL,					/* STATUS changed callback */
-	kyocera_sod_w,			/* SOD changed callback (8085A only) */
-	kyocera_sid_r			/* SID changed callback (8085A only) */
+	NULL,				/* INTE changed callback */
+	NULL,				/* STATUS changed callback */
+	kc85_sod_w,			/* SOD changed callback (8085A only) */
+	kc85_sid_r			/* SID changed callback (8085A only) */
 };
 
 static TIMER_DEVICE_CALLBACK( tandy200_tp_tick )
@@ -1317,7 +1280,7 @@ static MACHINE_DRIVER_START( kc85 )
 	MDRV_CPU_ADD(I8085_TAG, 8085A, XTAL_4_9152MHz)
 	MDRV_CPU_PROGRAM_MAP(kc85_mem)
 	MDRV_CPU_IO_MAP(kc85_io)
-	MDRV_CPU_CONFIG(kyocera_i8085_config)
+	MDRV_CPU_CONFIG(kc85_i8085_config)
 
 	MDRV_MACHINE_START( kc85 )
 
@@ -1331,13 +1294,13 @@ static MACHINE_DRIVER_START( kc85 )
 
 	/* devices */
 	MDRV_PIO8155_ADD(PIO8155_TAG, XTAL_4_9152MHz/2, kc85_8155_intf)
-	MDRV_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, kyocera_upd1990a_intf)
+	MDRV_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, kc85_upd1990a_intf)
 
 	/* printer */
 	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
 
 	/* cassette */
-	MDRV_CASSETTE_ADD("cassette", kyocera_cassette_config)
+	MDRV_CASSETTE_ADD("cassette", kc85_cassette_config)
 
 	/* option ROM cartridge */
 	MDRV_CARTSLOT_ADD("cart")
@@ -1352,7 +1315,7 @@ static MACHINE_DRIVER_START( pc8201 )
 	MDRV_CPU_ADD(I8085_TAG, 8085A, XTAL_4_9152MHz)
 	MDRV_CPU_PROGRAM_MAP(pc8201_mem)
 	MDRV_CPU_IO_MAP(pc8201_io)
-	MDRV_CPU_CONFIG(kyocera_i8085_config)
+	MDRV_CPU_CONFIG(kc85_i8085_config)
 
 	MDRV_MACHINE_START(pc8201)
 
@@ -1366,13 +1329,13 @@ static MACHINE_DRIVER_START( pc8201 )
 
 	/* devices */
 	MDRV_PIO8155_ADD(PIO8155_TAG, XTAL_4_9152MHz/2, pc8201_8155_intf)
-	MDRV_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, kyocera_upd1990a_intf)
+	MDRV_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, kc85_upd1990a_intf)
 
 	/* printer */
 	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
 
 	/* cassette */
-	MDRV_CASSETTE_ADD("cassette", kyocera_cassette_config)
+	MDRV_CASSETTE_ADD("cassette", kc85_cassette_config)
 
 	/* option ROM cartridge */
 	MDRV_CARTSLOT_ADD("cart")
@@ -1393,7 +1356,7 @@ static MACHINE_DRIVER_START( tandy200 )
 	MDRV_CPU_ADD(I8085_TAG, 8085A, XTAL_4_9152MHz)
 	MDRV_CPU_PROGRAM_MAP(tandy200_mem)
 	MDRV_CPU_IO_MAP(tandy200_io)
-	MDRV_CPU_CONFIG(kyocera_i8085_config)
+	MDRV_CPU_CONFIG(kc85_i8085_config)
 
 	MDRV_MACHINE_START( tandy200 )
 
@@ -1418,7 +1381,7 @@ static MACHINE_DRIVER_START( tandy200 )
 	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
 
 	/* cassette */
-	MDRV_CASSETTE_ADD("cassette", kyocera_cassette_config)
+	MDRV_CASSETTE_ADD("cassette", kc85_cassette_config)
 
 	/* option ROM cartridge */
 	MDRV_CARTSLOT_ADD("cart")
@@ -1438,7 +1401,7 @@ ROM_END
 
 ROM_START( npc8201a )
 	ROM_REGION( 0x10000, I8085_TAG, 0 )
-	ROM_LOAD( "pc8201rom.rom0", 0x0000, 0x8000, BAD_DUMP CRC(30555035) SHA1(96f33ff235db3028bf5296052acedbc94437c596) )
+	ROM_LOAD( "pc8201rom.rom0", 0x0000, 0x8000, CRC(30555035) SHA1(96f33ff235db3028bf5296052acedbc94437c596) )
 
 	ROM_REGION( 0x8000, "option", ROMREGION_ERASEFF )
 	ROM_CART_LOAD("cart", 0x0000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
@@ -1487,6 +1450,7 @@ SYSTEM_CONFIG_END
 static SYSTEM_CONFIG_START( pc8201 )
 	CONFIG_RAM_DEFAULT	(16 * 1024)
 	CONFIG_RAM			(32 * 1024)
+//	CONFIG_RAM			(48 * 1024)
 	CONFIG_RAM			(64 * 1024)
 	CONFIG_RAM			(96 * 1024)
 SYSTEM_CONFIG_END
