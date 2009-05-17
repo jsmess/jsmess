@@ -8,7 +8,6 @@
 #define MBEE_H_
 
 #include "machine/wd17xx.h"
-#include "cpu/z80/z80daisy.h"
 
 /*----------- defined in machine/mbee.c -----------*/
 

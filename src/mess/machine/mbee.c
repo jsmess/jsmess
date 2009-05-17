@@ -9,15 +9,12 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "machine/wd17xx.h"
 #include "includes/mbee.h"
 #include "cpu/z80/z80.h"
 
 
-static UINT8 fdc_drv = 0;
-static UINT8 fdc_head = 0;
-static UINT8 fdc_den = 0;
 static UINT8 fdc_status = 0;
+static const device_config *mbee_fdc;
 
 
 /*
@@ -40,60 +37,33 @@ MACHINE_RESET( mbee )
 	mbee_speaker = devtag_get_device(machine, "speaker");
 	mbee_cassette = devtag_get_device(machine, "cassette");
 	mbee_printer = devtag_get_device(machine, "centronics");
+	mbee_fdc = devtag_get_device(machine, "wd179x");
 }
 
 static WD17XX_CALLBACK( mbee_fdc_callback )
 {
-	switch( state )
-	{
-	case WD17XX_IRQ_CLR:
-//		cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
-		fdc_status &= ~0x40;
-        break;
-	case WD17XX_IRQ_SET:
-//		cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
-		fdc_status |= 0x40;
-        break;
-	case WD17XX_DRQ_CLR:
-		fdc_status &= ~0x80;
-		break;
-	case WD17XX_DRQ_SET:
+	if (WD17XX_IRQ_SET || WD17XX_DRQ_SET)
 		fdc_status |= 0x80;
-        break;
-    }
+	else
+		fdc_status &= 0x7f;
 }
 
 const wd17xx_interface mbee_wd17xx_interface = { mbee_fdc_callback, NULL };
 
- READ8_HANDLER ( mbee_fdc_status_r )
+READ8_HANDLER ( mbee_fdc_status_r )
 {
-	logerror("mbee fdc_motor_r $%02X\n", fdc_status);
 	return fdc_status;
 }
 
 WRITE8_HANDLER ( mbee_fdc_motor_w )
 {
-	const device_config *fdc = devtag_get_device(space->machine, "wd179x");
-	logerror("mbee fdc_motor_w $%02X\n", data);
-	/* Controller latch bits
-	 * 0-1	driver select
-	 * 2	head select
-	 * 3	density (0: FM, 1:MFM)
-	 * 4-7	unused
-	 */
-	fdc_drv = data & 3;
-	fdc_head = (data >> 2) & 1;
-	fdc_den = (data >> 3) & 1;
-	wd17xx_set_drive(fdc,fdc_drv);
-	wd17xx_set_side(fdc,fdc_head);
-	if (data & (1<<3))
-	{
-	   wd17xx_set_density(fdc,DEN_FM_HI);
-	}
-	else
-	{
-	   wd17xx_set_density(fdc,DEN_MFM_LO);
-	}
+/*	d7..d4 not used
+	d3 density (1=MFM)
+	d2 side (1=side 1)
+	d1..d0 drive select (0 to 3 - although no microbee ever had more than 2 drives) */
 
+	wd17xx_set_drive(mbee_fdc, data & 3);
+	wd17xx_set_side(mbee_fdc, (data & 4) ? 1 : 0);
+	wd17xx_set_density(mbee_fdc, (data & 8) ? 1 : 0);
 }
 

@@ -68,7 +68,6 @@
 #include "sound/speaker.h"
 #include "sound/wave.h"
 #include "machine/z80pio.h"
-#include "machine/wd17xx.h"
 #include "includes/mbee.h"
 #include "devices/snapquik.h"
 #include "devices/basicdsk.h"
@@ -203,10 +202,7 @@ static ADDRESS_MAP_START(mbee56_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0b, 0x0b) AM_MIRROR(0x10) AM_READWRITE(mbee_video_bank_r, mbee_video_bank_w)
 	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x10) AM_READWRITE(m6545_status_r, m6545_index_w)
 	AM_RANGE(0x0d, 0x0d) AM_MIRROR(0x10) AM_READWRITE(m6545_data_r, m6545_data_w)
-	AM_RANGE(0x44, 0x44) AM_DEVREADWRITE("wd179x", wd17xx_status_r, wd17xx_command_w)
-	AM_RANGE(0x45, 0x45) AM_DEVREADWRITE("wd179x", wd17xx_track_r, wd17xx_track_w)
-	AM_RANGE(0x46, 0x46) AM_DEVREADWRITE("wd179x", wd17xx_sector_r, wd17xx_sector_w)
-	AM_RANGE(0x47, 0x47) AM_DEVREADWRITE("wd179x", wd17xx_data_r, wd17xx_data_w)
+	AM_RANGE(0x44, 0x47) AM_DEVREADWRITE("wd179x", wd17xx_r, wd17xx_w)
 	AM_RANGE(0x48, 0x48) AM_READWRITE(mbee_fdc_status_r, mbee_fdc_motor_w)
 ADDRESS_MAP_END
 
@@ -802,19 +798,61 @@ static QUICKLOAD_LOAD( mbee )
 	return INIT_PASS;
 }
 
+static DEVICE_IMAGE_LOAD( mbee_floppy )
+{
+	if (device_load_basicdsk_floppy(image)==INIT_PASS)
+	{
+		if (!mame_stricmp(image_filetype(image), "ss80"))
+		{
+			basicdsk_set_geometry(image, 80, 1, 10, 512, 1, 0, FALSE);
+			return INIT_PASS;
+		}
+		else
+		if (!mame_stricmp(image_filetype(image), "ds40"))
+		{
+			basicdsk_set_geometry(image, 80, 2, 10, 512, 1, 0, FALSE);
+			return INIT_PASS;
+		}
+		else
+		if (!mame_stricmp(image_filetype(image), "ds80"))
+		{
+			basicdsk_set_geometry(image, 160, 2, 10, 512, 1, 0, FALSE);
+			return INIT_PASS;
+		}
+		else
+		if (!mame_stricmp(image_filetype(image), "ds84"))
+		{
+			basicdsk_set_geometry(image, 168, 2, 10, 512, 1, 0, FALSE);
+			return INIT_PASS;
+		}
+		else
+		if (!mame_stricmp(image_filetype(image), "dsk"))
+		{
+			return INIT_FAIL;	// not handled yet - CPC-EMU formatted image
+		}
+		else
+		if (!mame_stricmp(image_filetype(image), "img"))
+		{
+			return INIT_FAIL;	// not handled - not investigated yet
+		}
+	}
+
+	return INIT_FAIL;
+}
+
 static void mbee_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:		info->i = 4; break;
+		case MESS_DEVINFO_INT_COUNT:		info->i = 2; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case MESS_DEVINFO_PTR_LOAD:		info->load = DEVICE_IMAGE_LOAD_NAME(basicdsk_floppy); break;
+		case MESS_DEVINFO_PTR_LOAD:		info->load = DEVICE_IMAGE_LOAD_NAME(mbee_floppy); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:	strcpy(info->s = device_temp_str(), "dsk"); break;
+		case MESS_DEVINFO_STR_FILE_EXTENSIONS:	strcpy(info->s = device_temp_str(), "dsk,ss40,ds40,ds84"); break;
 
 		default:				legacybasicdsk_device_getinfo(devclass, state, info); break;
 	}
