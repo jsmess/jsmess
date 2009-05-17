@@ -629,6 +629,9 @@ const game_driver * const drivers[] =
 	DRIVER( kc85_4 )	/* VEB KC 85/4										*/
 	DRIVER( kc85_3 )	/* VEB KC 85/3										*/
 	DRIVER( kc85_4d )	/* VEB KC 85/4 with disk interface					*/
+	DRIVER( mc8020 )	/* MC 80.2x											*/
+	DRIVER( mc8030 )	/* MC 80.3x											*/
+
 
 	/* MICROBEE SYSTEMS */
 	DRIVER( mbee )		/* Microbee 16 Standard or Plus						*/
@@ -1253,7 +1256,6 @@ const game_driver * const drivers[] =
 	DRIVER( sc80 )
 	DRIVER( lc80 )
 	DRIVER( jr200 )
-	DRIVER( mc80 )
 	DRIVER( hec2hrp )
 	DRIVER( hec2hrx )
 	DRIVER( hector1 )

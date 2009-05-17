@@ -785,6 +785,9 @@ $(MESSOBJ)/veb.a:      \
 	$(MESS_VIDEO)/kc.o	\
 	$(MESS_DRIVERS)/kc.o	\
 	$(MESS_MACHINE)/kc.o	\
+	$(MESS_DRIVERS)/mc80.o     \
+	$(MESS_VIDEO)/mc80.o       \
+	$(MESS_MACHINE)/mc80.o     \
 
 $(MESSOBJ)/nec.a:	   \
 	$(MAME_VIDEO)/vdc.o	 \
@@ -1357,7 +1360,6 @@ $(MESSOBJ)/skeleton.a: \
 	$(MESS_DRIVERS)/sc80.o \
 	$(MESS_DRIVERS)/lc80.o \
 	$(MESS_DRIVERS)/jr200.o \
-	$(MESS_DRIVERS)/mc80.o \
 	$(MESS_DRIVERS)/hec2hrp.o \
 	$(MESS_DRIVERS)/hec2hrx.o \
 	$(MESS_DRIVERS)/hector1.o \

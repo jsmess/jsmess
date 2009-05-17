@@ -15,6 +15,8 @@ New System Drivers Supported (in no particular order):
 - Timex Sinclair 1500 (not working) [Miodrag Milanovic]
 - Ringo 470 (not working) [Miodrag Milanovic]
 - Frael Bruc 100-1 [Miodrag Milanovic]
+- MC80.21/22 (not working) [Miodrag Milanovic]
+- MC80.30/31 (not working) [Miodrag Milanovic]
 
 Skeleton drivers : 
 ------------------
@@ -38,7 +40,6 @@ Skeleton drivers :
 - SC-80
 - LC-80
 - National JR200
-- MC 80
 - Hector 2HR+
 - Hector 2HRX
 - Hector 1
