@@ -5,9 +5,9 @@
 	Japanese computer system released in 1989.
 	
 	CPU:  AMD 80386SX (80387 available as add-on)
-	Sound:  Yamaha YM2612 (or YM3438?)
+	Sound:  Yamaha YM3438
 	        Ricoh RF5c68
-	Video:  Custom(?)
+	Video:  VGA + some custom extra video hardware
 	        320x200 - 640x480
 	        16 - 32768 colours from a possible palette of between 4096 and
 	          16.7m colours (depending on video mode)
@@ -29,7 +29,22 @@
 #include "sound/rf5c68.h"
 
 static ADDRESS_MAP_START(towns_mem, ADDRESS_SPACE_PROGRAM, 32)
-	ADDRESS_MAP_UNMAP_HIGH
+  // memory map based on FM-Towns/Bochs (Bochs modified to emulate the FM-Towns)
+  // may not be (and probably is not) correct
+  AM_RANGE(0x000c0000, 0x000c7fff) AM_NOP  // GVRAM
+  AM_RANGE(0x000c8000, 0x000cffff) AM_NOP  // TVRAM
+  AM_RANGE(0x000d0000, 0x000d7fff) AM_ROM AM_REGION("user",0x100000)  // DIC ROM
+  AM_RANGE(0x000d8000, 0x000d9fff) AM_NOP  // CMOS RAM
+  AM_RANGE(0x000f8000, 0x000fffff) AM_ROM AM_REGION("user",0x238000)  // BOOT (SYSTEM) ROM
+  AM_RANGE(0x80000000, 0x8007ffff) AM_NOP  // VRAM
+  AM_RANGE(0x80100000, 0x8017ffff) AM_NOP  // VRAM (mirror? second page?)
+  AM_RANGE(0x81000000, 0x8101ffff) AM_NOP  // Sprite RAM
+  AM_RANGE(0xc2000000, 0xc207ffff) AM_ROM AM_REGION("user",0x000000)  // OS ROM
+  AM_RANGE(0xc2080000, 0xc20fffff) AM_ROM AM_REGION("user",0x100000)  // DIC ROM
+  AM_RANGE(0xc2100000, 0xc213ffff) AM_ROM AM_REGION("user",0x180000)  // FONT ROM
+  AM_RANGE(0xc2140000, 0xc2141fff) AM_NOP  // CMOS (mirror?)
+  AM_RANGE(0xc2200000, 0xc2200fff) AM_NOP  // WAVE RAM
+  AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("user",0x200000)  // SYSTEM ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( towns_io , ADDRESS_SPACE_IO, 32)
@@ -72,8 +87,8 @@ static MACHINE_DRIVER_START( towns )
     
     /* sound hardware */
     MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("fm", YM2612, 4000000) // actual clock speed unknown
-//	MDRV_SOUND_CONFIG(ym2612_interface)
+	MDRV_SOUND_ADD("fm", YM3438, 4000000) // actual clock speed unknown
+//	MDRV_SOUND_CONFIG(ym3438_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MDRV_SOUND_ADD("pcm", RF5C68, 4000000)  // actual clock speed unknown
 //	MDRV_SOUND_CONFIG(rf5c68_interface)
@@ -85,7 +100,7 @@ MACHINE_DRIVER_END
 
 /* ROM definitions */
 ROM_START( fmtowns )
-  ROM_REGION( 0x280000, "maincpu", ROMREGION_ERASEFF )
+  ROM_REGION32_LE( 0x280000, "user", 0)
 	ROM_LOAD("fmt_dos.rom",  0x000000, 0x080000, CRC(112872ee) SHA1(57fd146478226f7f215caf63154c763a6d52165e) )
 	ROM_LOAD("fmt_f20.rom",  0x080000, 0x080000, CRC(9f55a20c) SHA1(1920711cb66340bb741a760de187de2f76040b8c) )
 	ROM_LOAD("fmt_dic.rom",  0x100000, 0x080000, CRC(82d1daa2) SHA1(7564020dba71deee27184824b84dbbbb7c72aa4e) )
@@ -94,7 +109,7 @@ ROM_START( fmtowns )
 ROM_END
 
 ROM_START( fmtownsa )
-  ROM_REGION( 0x280000, "maincpu", ROMREGION_ERASEFF )
+  ROM_REGION32_LE( 0x280000, "user", 0)
 	ROM_LOAD("fmt_dos.rom",  0x000000, 0x080000, CRC(22270e9f) SHA1(a7e97b25ff72b14121146137db8b45d6c66af2ae) )
 	ROM_LOAD("fmt_f20.rom",  0x080000, 0x080000, CRC(75660aac) SHA1(6a521e1d2a632c26e53b83d2cc4b0edecfc1e68c) )
 	ROM_LOAD("fmt_dic.rom",  0x100000, 0x080000, CRC(74b1d152) SHA1(f63602a1bd67c2ad63122bfb4ffdaf483510f6a8) )
@@ -103,7 +118,7 @@ ROM_START( fmtownsa )
 ROM_END
 
 ROM_START( fmtmarty )
-  ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+  ROM_REGION32_LE( 0x400000, "user", 0)
 	ROM_LOAD("mrom.m36",  0x000000, 0x200000, CRC(9c0c060c) SHA1(5721c5f9657c570638352fa9acac57fa8d0b94bd) )
 	ROM_LOAD("mrom.m37",  0x200000, 0x200000, CRC(fb66bb56) SHA1(e273b5fa618373bdf7536495cd53c8aac1cce9a5) )
 ROM_END
