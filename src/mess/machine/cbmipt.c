@@ -19,6 +19,162 @@
 #include "driver.h"
 #include "machine/cbmipt.h"
 
+
+
+
+/***********************************************
+
+	Input Reading - Common Components
+
+***********************************************/
+
+/* These are needed by c64, c65 and c128, each machine has also additional specific 
+components in its INTERRUPT_GEN */
+
+/* keyboard lines */
+UINT8 c64_keyline[10] =
+{
+	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
+};
+
+
+static TIMER_CALLBACK( lightpen_tick )
+{
+	if ((input_port_read(machine, "CTRLSEL") & 0x07) == 0x04)
+	{
+		/* enable lightpen crosshair */
+		crosshair_set_screen(machine, 0, CROSSHAIR_SCREEN_ALL);
+	}
+	else
+	{
+		/* disable lightpen crosshair */
+		crosshair_set_screen(machine, 0, CROSSHAIR_SCREEN_NONE);
+	}
+}
+
+void cbm_common_interrupt( const device_config *device )
+{
+	int value, i;
+	int controller1 = input_port_read(device->machine, "CTRLSEL") & 0x07;
+	int controller2 = input_port_read(device->machine, "CTRLSEL") & 0x70;
+	static const char *const c64ports[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7" };
+
+	/* Lines 0-7 : common keyboard */
+	for (i = 0; i < 8; i++)
+	{
+		value = 0xff;
+		value &= ~input_port_read(device->machine, c64ports[i]);
+
+		/* Shift Lock is mapped on Left Shift */
+		if ((i == 1) && (input_port_read(device->machine, "SPECIAL") & 0x40))
+			value &= ~0x80;
+
+		c64_keyline[i] = value;
+	}
+
+
+	value = 0xff;
+	switch(controller1)
+	{
+		case 0x00:
+			value &= ~input_port_read(device->machine, "JOY1_1B");			/* Joy1 Directions + Button 1 */
+			break;
+
+		case 0x01:
+			if (input_port_read(device->machine, "OTHER") & 0x40)			/* Paddle2 Button */
+				value &= ~0x08;
+			if (input_port_read(device->machine, "OTHER") & 0x80)			/* Paddle1 Button */
+				value &= ~0x04;
+			break;
+
+		case 0x02:
+			if (input_port_read(device->machine, "OTHER") & 0x02)			/* Mouse Button Left */
+				value &= ~0x10;
+			if (input_port_read(device->machine, "OTHER") & 0x01)			/* Mouse Button Right */
+				value &= ~0x01;
+			break;
+
+		case 0x03:
+			value &= ~(input_port_read(device->machine, "JOY1_2B") & 0x1f);	/* Joy1 Directions + Button 1 */
+			break;
+
+		case 0x04:
+/* was there any input on the lightpen? where is it mapped? */
+//			if (input_port_read(device->machine, "OTHER") & 0x04)			/* Lightpen Signal */
+//				value &= ?? ;
+			break;
+
+		case 0x07:
+			break;
+
+		default:
+			logerror("Invalid Controller 1 Setting %d\n", controller1);
+			break;
+	}
+
+	c64_keyline[8] = value;
+
+
+	value = 0xff;
+	switch(controller2)
+	{
+		case 0x00:
+			value &= ~input_port_read(device->machine, "JOY2_1B");			/* Joy2 Directions + Button 1 */
+			break;
+
+		case 0x10:
+			if (input_port_read(device->machine, "OTHER") & 0x10)			/* Paddle4 Button */
+				value &= ~0x08;
+			if (input_port_read(device->machine, "OTHER") & 0x20)			/* Paddle3 Button */
+				value &= ~0x04;
+			break;
+
+		case 0x20:
+			if (input_port_read(device->machine, "OTHER") & 0x02)			/* Mouse Button Left */
+				value &= ~0x10;
+			if (input_port_read(device->machine, "OTHER") & 0x01)			/* Mouse Button Right */
+				value &= ~0x01;
+			break;
+
+		case 0x30:
+			value &= ~(input_port_read(device->machine, "JOY2_2B") & 0x1f);	/* Joy2 Directions + Button 1 */
+			break;
+
+		case 0x40:
+/* was there any input on the lightpen? where is it mapped? */
+//			if (input_port_read(device->machine, "OTHER") & 0x04)			/* Lightpen Signal */
+//				value &= ?? ;
+			break;
+
+		case 0x70:
+			break;
+
+		default:
+			logerror("Invalid Controller 2 Setting %d\n", controller2);
+			break;
+	}
+
+	c64_keyline[9] = value;
+
+//	vic2_frame_interrupt does nothing so this is not necessary
+//	vic2_frame_interrupt (device);
+
+	/* check if lightpen has been chosen as input: if so, enable crosshair */
+	timer_set(device->machine, attotime_zero, NULL, 0, lightpen_tick);
+
+	set_led_status (1, input_port_read(device->machine, "SPECIAL") & 0x40 ? 1 : 0);		/* Shift Lock */
+	set_led_status (0, input_port_read(device->machine, "CTRLSEL") & 0x80 ? 1 : 0);		/* Joystick Swap */
+}
+
+
+
+
+/***********************************************
+
+	Input Ports
+
+***********************************************/
+
 /***************************** Commodore 64 ****************************************
  *
  *	- common_cbm_keyboard: C64 keyboard; used by C16, C65 and C128 as well
@@ -388,7 +544,7 @@ C128 Keyboard Layout
      ESC  TAB  ALT  LOCK           HELP  FEED  DISPLAY SCROLL      UP  DOWN  LEFT  RIGHT          F1  F3  F5  F7
   
                                                                              CLR    INST
-      <-   1!   2"   3#   4$   5%   6&   7'   8(   9)   0     +    -    £    HOME   DEL           7   8   9   +
+      <-   1!   2"   3#   4$   5%   6&   7'   8(   9)   0     +    -    £    HOME   DEL          7   8   9   +
   
    
    CONTROL   Q    W    E    R    T     Y    U    I    O    P    @    *     UP    RESTORE          4   5   6   -

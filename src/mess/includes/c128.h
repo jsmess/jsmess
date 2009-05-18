@@ -51,6 +51,7 @@ extern DRIVER_INIT( c128pal );
 extern DRIVER_INIT( c128d );
 extern DRIVER_INIT( c128dpal );
 extern MACHINE_RESET( c128 );
+extern INTERRUPT_GEN( c128_frame_interrupt );
 
 extern VIDEO_START( c128 );
 extern VIDEO_UPDATE( c128 );

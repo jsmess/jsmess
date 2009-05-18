@@ -20,6 +20,8 @@
 #include "video/vic6567.h"
 #include "video/vdc8563.h"
 
+#include "cbmipt.h"				/* we need cbm_common_interrupt & c64_keyline for input reading */
+
 #include "includes/c128.h"
 #include "includes/c64.h"
 
@@ -69,6 +71,8 @@ static int c128_ram_bottom, c128_ram_top;
 static UINT8 *c128_ram;
 
 static UINT8 c64_port_data;
+
+static UINT8 c128_keyline[3] = {0xff, 0xff, 0xff};
 
 static void c128_set_m8502_read_handler(running_machine *machine, UINT16 start, UINT16 end, read8_space_func rh)
 {
@@ -958,6 +962,76 @@ MACHINE_RESET( c128 )
 	cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
 	cputag_set_input_line(machine, "m8502", INPUT_LINE_HALT, ASSERT_LINE);
 }
+
+
+static void c128_nmi(running_machine *machine)
+{
+	static int nmilevel = 0;
+	const device_config *cia_1 = devtag_get_device(machine, "cia_1");
+	int cia1irq = cia_get_irq(cia_1);
+
+	if (nmilevel != (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq)	/* KEY_RESTORE */
+	{
+		if (1) // this was never valid, there is no active CPU during a timer firing!  cpu_getactivecpu() == 0)
+		{
+			/* z80 */
+			cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq);
+		}
+		else
+		{
+			cputag_set_input_line(machine, "m8502", INPUT_LINE_NMI, (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq);
+		}
+
+		nmilevel = (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq;
+	}
+}
+
+INTERRUPT_GEN( c128_frame_interrupt )
+{
+	static int monitor = -1;
+	static const char *const c128ports[] = { "KP0", "KP1", "KP2" };
+	int i, value;
+
+	c128_nmi(device->machine);
+
+	if ((input_port_read(device->machine, "SPECIAL") & 0x08) != monitor)
+	{
+		if (input_port_read(device->machine, "SPECIAL") & 0x08)
+		{
+			vic2_set_rastering(0);
+			vdc8563_set_rastering(1);
+			video_screen_set_visarea(device->machine->primary_screen, 0, 655, 0, 215);
+		}
+		else
+		{
+			vic2_set_rastering(1);
+			vdc8563_set_rastering(0);
+			if (c64_pal)
+				video_screen_set_visarea(device->machine->primary_screen, VIC6569_STARTVISIBLECOLUMNS, VIC6569_STARTVISIBLECOLUMNS + VIC6569_VISIBLECOLUMNS - 1, VIC6569_STARTVISIBLELINES, VIC6569_STARTVISIBLELINES + VIC6569_VISIBLELINES - 1);
+			else
+				video_screen_set_visarea(device->machine->primary_screen, VIC6567_STARTVISIBLECOLUMNS, VIC6567_STARTVISIBLECOLUMNS + VIC6567_VISIBLECOLUMNS - 1, VIC6567_STARTVISIBLELINES, VIC6567_STARTVISIBLELINES + VIC6567_VISIBLELINES - 1);
+		}
+		monitor = input_port_read(device->machine, "SPECIAL") & 0x08;
+	}
+
+
+	/* common keys input ports */
+	cbm_common_interrupt(device);
+
+	/* Fix Me! Currently, neither left Shift nor Shift Lock work in c128, but reading the correspondent input produces a bug!
+	Hence, we overwrite the actual reading as it never happens */
+	if ((input_port_read(device->machine, "SPECIAL") & 0x40))	// 
+		c64_keyline[1] |= 0x80;
+
+	/* c128 specific: keypad input ports */
+	for (i = 0; i < 3; i++)
+	{
+		value = 0xff;
+		value &= ~input_port_read(device->machine, c128ports[i]);
+		c128_keyline[i] = value;
+	}
+}
+
 
 VIDEO_START( c128 )
 {

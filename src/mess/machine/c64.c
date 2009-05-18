@@ -26,6 +26,7 @@
 #include "includes/cbmserb.h"
 #include "includes/cbmdrive.h"
 #include "includes/vc1541.h"
+#include "cbmipt.h"				/* we need cbm_common_interrupt & c64_keyline for input reading */
 
 #include "includes/c64.h"
 #include "includes/c128.h"      /* we need c128_bankswitch_64 in MACHINE_START */
@@ -44,17 +45,10 @@
 		} \
 	} while (0)
 
-unsigned char c65_keyline = { 0xff };
-UINT8 c65_6511_port=0xff;
-
-UINT8 c128_keyline[3] = {0xff, 0xff, 0xff};
-
-
-/* keyboard lines */
-UINT8 c64_keyline[10] =
-{
-	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
-};
+/* still needed for CIA interfaces, will be factored out soon... */
+UINT8 c65_6511_port = 0xff;
+static UINT8 c65_keyline = { 0xff };
+static UINT8 c128_keyline[3] = {0xff, 0xff, 0xff};
 
 /* expansion port lines input */
 int c64_pal = 0;
@@ -108,23 +102,7 @@ static void c64_nmi(running_machine *machine)
 
 	if (nmilevel != (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq)	/* KEY_RESTORE */
 	{
-		if (is_c128(machine))
-		{
-			if (1) // this was never valid, there is no active CPU during a timer firing!  cpu_getactivecpu() == 0)
-			{
-				/* z80 */
-				cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq);
-			}
-			else
-			{
-				cputag_set_input_line(machine, "m8502", INPUT_LINE_NMI, (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq);
-			}
-		}
-
-		else
-		{
-			cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq);
-		}
+		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq);
 
 		nmilevel = (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq;
 	}
@@ -848,7 +826,6 @@ UINT8 c64_m6510_port_read(const device_config *device, UINT8 direction)
 	{
 		if (input_port_read(device->machine, "SPECIAL") & 0x20)		/* Check Caps Lock */
 			data &= ~0x40;
-
 		else
 			data |=  0x40;
 	}
@@ -1077,7 +1054,7 @@ void c64_common_init_machine (running_machine *machine)
 {
 	if (is_sx64 /* || is_c128d(machine) */)
 	{
-		cbm_serial_config(machine, &cbm_fake_drive_interface);
+		cbm_serial_config(machine, &cbm_emu_drive_interface);
 		drive_reset ();
 	}
 
@@ -1109,179 +1086,10 @@ MACHINE_START( c64 )
 }
 
 
-static TIMER_CALLBACK( lightpen_tick )
-{
-	if ((input_port_read(machine, "CTRLSEL") & 0x07) == 0x04)
-	{
-		/* enable lightpen crosshair */
-		crosshair_set_screen(machine, 0, CROSSHAIR_SCREEN_ALL);
-	}
-	else
-	{
-		/* disable lightpen crosshair */
-		crosshair_set_screen(machine, 0, CROSSHAIR_SCREEN_NONE);
-	}
-}
-
 INTERRUPT_GEN( c64_frame_interrupt )
 {
-	static int monitor = -1;
-	int value, i;
-	int controller1 = input_port_read(device->machine, "CTRLSEL") & 0x07;
-	int controller2 = input_port_read(device->machine, "CTRLSEL") & 0x70;
-	static const char *const c64ports[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7" };
-	static const char *const c128ports[] = { "KP0", "KP1", "KP2" };
-
 	c64_nmi(device->machine);
-
-	 if (is_c128(device->machine))
-	 {
-	 	if ((input_port_read(device->machine, "SPECIAL") & 0x08) != monitor)
-		{
-			if (input_port_read(device->machine, "SPECIAL") & 0x08)
-			{
-				vic2_set_rastering(0);
-				vdc8563_set_rastering(1);
-				video_screen_set_visarea(device->machine->primary_screen, 0, 655, 0, 215);
-			}
-			else
-			{
-				vic2_set_rastering(1);
-				vdc8563_set_rastering(0);
-				if (c64_pal)
-					video_screen_set_visarea(device->machine->primary_screen, VIC6569_STARTVISIBLECOLUMNS, VIC6569_STARTVISIBLECOLUMNS + VIC6569_VISIBLECOLUMNS - 1, VIC6569_STARTVISIBLELINES, VIC6569_STARTVISIBLELINES + VIC6569_VISIBLELINES - 1);
-				else
-					video_screen_set_visarea(device->machine->primary_screen, VIC6567_STARTVISIBLECOLUMNS, VIC6567_STARTVISIBLECOLUMNS + VIC6567_VISIBLECOLUMNS - 1, VIC6567_STARTVISIBLELINES, VIC6567_STARTVISIBLELINES + VIC6567_VISIBLELINES - 1);
-			}
-			monitor = input_port_read(device->machine, "SPECIAL") & 0x08;
-		}
-	}
-
-	/* Lines 0-7 : common keyboard */
-	for (i = 0; i < 8; i++)
-	{
-		value = 0xff;
-		value &= ~input_port_read(device->machine, c64ports[i]);
-
-		/* Shift Lock is mapped on Left Shift */
-		if ((i == 1) && (input_port_read(device->machine, "SPECIAL") & 0x40) && !is_c128(device->machine))	// Fix Me! Currently, neither left Shift nor Shift Lock works in c128, but reading this in c128 produces a bug!
-			value &= ~0x80;
-
-		c64_keyline[i] = value;
-	}
-
-
-	value = 0xff;
-	switch(controller1)
-	{
-		case 0x00:
-			value &= ~input_port_read(device->machine, "JOY1_1B");			/* Joy1 Directions + Button 1 */
-			break;
-
-		case 0x01:
-			if (input_port_read(device->machine, "OTHER") & 0x40)			/* Paddle2 Button */
-				value &= ~0x08;
-			if (input_port_read(device->machine, "OTHER") & 0x80)			/* Paddle1 Button */
-				value &= ~0x04;
-			break;
-
-		case 0x02:
-			if (input_port_read(device->machine, "OTHER") & 0x02)			/* Mouse Button Left */
-				value &= ~0x10;
-			if (input_port_read(device->machine, "OTHER") & 0x01)			/* Mouse Button Right */
-				value &= ~0x01;
-			break;
-
-		case 0x03:
-			value &= ~(input_port_read(device->machine, "JOY1_2B") & 0x1f);	/* Joy1 Directions + Button 1 */
-			break;
-
-		case 0x04:
-/* was there any input on the lightpen? where is it mapped? */
-//			if (input_port_read(device->machine, "OTHER") & 0x04)			/* Lightpen Signal */
-//				value &= ?? ;
-			break;
-
-		case 0x07:
-			break;
-
-		default:
-			logerror("Invalid Controller 1 Setting %d\n", controller1);
-			break;
-	}
-
-	c64_keyline[8] = value;
-
-
-	value = 0xff;
-	switch(controller2)
-	{
-		case 0x00:
-			value &= ~input_port_read(device->machine, "JOY2_1B");			/* Joy2 Directions + Button 1 */
-			break;
-
-		case 0x10:
-			if (input_port_read(device->machine, "OTHER") & 0x10)			/* Paddle4 Button */
-				value &= ~0x08;
-			if (input_port_read(device->machine, "OTHER") & 0x20)			/* Paddle3 Button */
-				value &= ~0x04;
-			break;
-
-		case 0x20:
-			if (input_port_read(device->machine, "OTHER") & 0x02)			/* Mouse Button Left */
-				value &= ~0x10;
-			if (input_port_read(device->machine, "OTHER") & 0x01)			/* Mouse Button Right */
-				value &= ~0x01;
-			break;
-
-		case 0x30:
-			value &= ~(input_port_read(device->machine, "JOY2_2B") & 0x1f);	/* Joy2 Directions + Button 1 */
-			break;
-
-		case 0x40:
-/* was there any input on the lightpen? where is it mapped? */
-//			if (input_port_read(device->machine, "OTHER") & 0x04)			/* Lightpen Signal */
-//				value &= ?? ;
-			break;
-
-		case 0x70:
-			break;
-
-		default:
-			logerror("Invalid Controller 2 Setting %d\n", controller2);
-			break;
-	}
-
-	c64_keyline[9] = value;
-
-	/* C128 only : keypad input ports */
-	if (is_c128(device->machine))
-	{
-		for (i = 0; i < 3; i++)
-		{
-			value = 0xff;
-			value &= ~input_port_read(device->machine, c128ports[i]);
-			c128_keyline[i] = value;
-		}
-	}
-
-	/* C65 only : function keys input ports */
-	if (is_c65(device->machine))
-	{
-		value = 0xff;
-
-		value &= ~input_port_read(device->machine, "FUNCT");
-		c65_keyline = value;
-	}
-
-// vic2_frame_interrupt does nothing so this is not necessary
-//	vic2_frame_interrupt (device);
-
-	/* check if lightpen has been chosen as input: if so, enable crosshair */
-	timer_set(device->machine, attotime_zero, NULL, 0, lightpen_tick);
-
-	set_led_status (1, input_port_read(device->machine, "SPECIAL") & 0x40 ? 1 : 0);		/* Shift Lock */
-	set_led_status (0, input_port_read(device->machine, "CTRLSEL") & 0x80 ? 1 : 0);		/* Joystick Swap */
+	cbm_common_interrupt(device);
 }
 
 

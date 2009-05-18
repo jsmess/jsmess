@@ -19,10 +19,7 @@
 /*----------- defined in machine/c64.c -----------*/
 
 /* private area */
-extern UINT8 c65_keyline;
 extern UINT8 c65_6511_port;
-
-extern UINT8 c128_keyline[3];
 
 extern UINT8 *c64_colorram;
 extern UINT8 *c64_basic;
@@ -60,7 +57,6 @@ extern int c64_pal;
 extern int c64_tape_on;
 extern UINT8 *c64_roml;
 extern UINT8 *c64_romh;
-extern UINT8 c64_keyline[10];
 extern int c128_va1617;
 extern UINT8 *c64_vicaddr, *c128_vicaddr;
 extern UINT8 c64_game, c64_exrom;

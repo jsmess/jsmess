@@ -25,6 +25,7 @@ void c65_colorram_write (int offset, int value);
 DRIVER_INIT( c65 );
 DRIVER_INIT( c65pal );
 MACHINE_START( c65 );
+INTERRUPT_GEN( c65_frame_interrupt );
 
 
 #endif /* C65_H_ */

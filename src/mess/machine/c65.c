@@ -14,6 +14,7 @@
 
 #include "includes/cbmserb.h"
 #include "includes/cbmdrive.h"
+#include "cbmipt.h"				/* we need cbm_common_interrupt & c64_keyline for input reading */
 
 #include "includes/c65.h"
 #include "includes/c64.h"
@@ -29,9 +30,12 @@
 		} \
 	} while (0)
 
-static int c65_charset_select=0;
+static int c65_charset_select = 0;
 
-static int c64mode=0;
+static int c64mode = 0;
+
+static UINT8 c65_keyline = { 0xff };
+
 
 /*UINT8 *c65_basic; */
 /*UINT8 *c65_kernal; */
@@ -849,4 +853,36 @@ MACHINE_START( c65 )
 
 	c65_bankswitch_interface(machine, 0xff);
 	c65_bankswitch (machine);
+}
+
+
+static void c65_nmi(running_machine *machine)
+{
+	static int nmilevel = 0;
+	const device_config *cia_1 = devtag_get_device(machine, "cia_1");
+	int cia1irq = cia_get_irq(cia_1);
+
+	if (nmilevel != (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq)	/* KEY_RESTORE */
+	{
+		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq);
+
+		nmilevel = (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq;
+	}
+}
+
+
+INTERRUPT_GEN( c65_frame_interrupt )
+{
+	int value;
+
+	c65_nmi(device->machine);
+
+	/* common keys input ports */
+	cbm_common_interrupt(device);
+
+	/* c65 specific: function keys input ports */
+	value = 0xff;
+
+	value &= ~input_port_read(device->machine, "FUNCT");
+	c65_keyline = value;
 }
