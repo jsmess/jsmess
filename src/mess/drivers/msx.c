@@ -416,7 +416,7 @@ These keys corresponds to the following symbols
 
 	input_port	| msx	| msxuk	| msxjp	| msxkr	|hotbit	|expert	|
 	-------------------------------------------------------------
-	BACKSLASH2	|  \ |	|  \ |	|  � |	| won |	|  \ ^	|  { }	|
+	BACKSLASH2	|  \ |	|  \ |	|  ´ |	| won |	|  \ ^	|  { }	|
 	-------------------------------------------------------------
 	TILDE		|  DK*	|  DK*	|  _	|  _	|  < >	|  / ?	|
 
