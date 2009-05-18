@@ -15,8 +15,6 @@
 
 /*----------- defined in machine/cbm.c -----------*/
 
-/*---------- needed for keyboard reading ---------*/
-
 /* keyboard lines */
 extern UINT8 c64_keyline[10];
 void cbm_common_interrupt( const device_config *device );

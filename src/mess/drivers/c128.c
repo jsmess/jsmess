@@ -599,6 +599,7 @@ static MACHINE_DRIVER_START( c128 )
 	MDRV_CPU_VBLANK_INT("screen", c128_frame_interrupt)
 	MDRV_CPU_PERIODIC_INT(vic2_raster_irq, VIC6567_HRETRACERATE)
 
+	MDRV_MACHINE_START( c128 )
 	MDRV_MACHINE_RESET( c128 )
 
     /* video hardware */

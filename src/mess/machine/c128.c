@@ -17,6 +17,7 @@
 
 #include "includes/cbm.h"
 #include "includes/cbmserb.h"
+#include "includes/cbmdrive.h"
 #include "includes/vc1541.h"
 #include "video/vic6567.h"
 #include "video/vdc8563.h"
@@ -75,6 +76,7 @@ static UINT8 c64_port_data;
 static UINT8 c128_keyline[3] = {0xff, 0xff, 0xff};
 
 static int c128_va1617;
+static int c128_cia1_on = 1;
 static UINT8 serial_clock, serial_data, serial_atn;
 static UINT8 vicirq = 0;
 
@@ -1164,19 +1166,25 @@ DRIVER_INIT( c128dpal )
 //	drive_config (machine, type_1541, 0, 0, 1, 8);
 }
 
-#if 0
-// This was in MACHINE_START( c64 ), but never called
-// TO DO: find its correct use, when fixing c64 mode
 MACHINE_START( c128 )
 {
+	if (c128_cia1_on)
+	{
+		cbm_serial_config(machine, &cbm_sim_drive_interface);
+		cbm_serial_reset_write (machine, 0);
+		cbm_drive_0_config (SERIAL, 8);
+		cbm_drive_1_config (SERIAL, 9);
+		serial_clock = serial_data = serial_atn = 1;
+	}
+
+// This was in MACHINE_START( c64 ), but never called
+// TO DO: find its correct use, when fixing c64 mode
 	if (c64mode)
 		c128_bankswitch_64(machine, 1);
 }
-#endif
 
 MACHINE_RESET( c128 )
 {
-	c64_common_init_machine(machine);
 	c128_vicaddr = c64_vicaddr = c64_memory;
 	c64mode = 0;
 	c128_mmu8722_reset (machine);

@@ -71,11 +71,6 @@ static int is_sx64 = 0;	// temporary workaround until we implement full vc1541 e
 static UINT8 serial_clock, serial_data, serial_atn;
 static UINT8 vicirq = 0;
 
-static int is_c65(running_machine *machine)
-{
-	return !strncmp(machine->gamedrv->name, "c65", 3);
-}
-
 static void c64_nmi(running_machine *machine)
 {
 	static int nmilevel = 0;
@@ -620,12 +615,6 @@ void c64_m6510_port_write(const device_config *device, UINT8 direction, UINT8 da
 		}
 	}
 
-	if (is_c65(device->machine))
-	{
-		// NPW 8-Feb-2004 - Don't know why I have to do this
-		//c65_bankswitch(machine);
-	}
-
 	else if (!ultimax)
 		c64_bankswitch(device->machine, 0);
 
@@ -643,14 +632,6 @@ UINT8 c64_m6510_port_read(const device_config *device, UINT8 direction)
 			data &= ~0x10;
 		else
 			data |=  0x10;
-	}
-
-	if (is_c65(device->machine))
-	{
-		if (input_port_read(device->machine, "SPECIAL") & 0x20)		/* Check Caps Lock */
-			data &= ~0x40;
-		else
-			data |=  0x40;
 	}
 
 	return data;
@@ -873,7 +854,7 @@ DRIVER_INIT( sx64 )
 	drive_config (machine, type_1541, 0, 0, 1, 8);
 }
 
-void c64_common_init_machine (running_machine *machine)
+static void c64_common_init_machine (running_machine *machine)
 {
 	if (is_sx64)
 	{
