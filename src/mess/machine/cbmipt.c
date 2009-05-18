@@ -20,161 +20,6 @@
 #include "machine/cbmipt.h"
 
 
-
-
-/***********************************************
-
-	Input Reading - Common Components
-
-***********************************************/
-
-/* These are needed by c64, c65 and c128, each machine has also additional specific 
-components in its INTERRUPT_GEN */
-
-/* keyboard lines */
-UINT8 c64_keyline[10] =
-{
-	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
-};
-
-
-static TIMER_CALLBACK( lightpen_tick )
-{
-	if ((input_port_read(machine, "CTRLSEL") & 0x07) == 0x04)
-	{
-		/* enable lightpen crosshair */
-		crosshair_set_screen(machine, 0, CROSSHAIR_SCREEN_ALL);
-	}
-	else
-	{
-		/* disable lightpen crosshair */
-		crosshair_set_screen(machine, 0, CROSSHAIR_SCREEN_NONE);
-	}
-}
-
-void cbm_common_interrupt( const device_config *device )
-{
-	int value, i;
-	int controller1 = input_port_read(device->machine, "CTRLSEL") & 0x07;
-	int controller2 = input_port_read(device->machine, "CTRLSEL") & 0x70;
-	static const char *const c64ports[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7" };
-
-	/* Lines 0-7 : common keyboard */
-	for (i = 0; i < 8; i++)
-	{
-		value = 0xff;
-		value &= ~input_port_read(device->machine, c64ports[i]);
-
-		/* Shift Lock is mapped on Left Shift */
-		if ((i == 1) && (input_port_read(device->machine, "SPECIAL") & 0x40))
-			value &= ~0x80;
-
-		c64_keyline[i] = value;
-	}
-
-
-	value = 0xff;
-	switch(controller1)
-	{
-		case 0x00:
-			value &= ~input_port_read(device->machine, "JOY1_1B");			/* Joy1 Directions + Button 1 */
-			break;
-
-		case 0x01:
-			if (input_port_read(device->machine, "OTHER") & 0x40)			/* Paddle2 Button */
-				value &= ~0x08;
-			if (input_port_read(device->machine, "OTHER") & 0x80)			/* Paddle1 Button */
-				value &= ~0x04;
-			break;
-
-		case 0x02:
-			if (input_port_read(device->machine, "OTHER") & 0x02)			/* Mouse Button Left */
-				value &= ~0x10;
-			if (input_port_read(device->machine, "OTHER") & 0x01)			/* Mouse Button Right */
-				value &= ~0x01;
-			break;
-
-		case 0x03:
-			value &= ~(input_port_read(device->machine, "JOY1_2B") & 0x1f);	/* Joy1 Directions + Button 1 */
-			break;
-
-		case 0x04:
-/* was there any input on the lightpen? where is it mapped? */
-//			if (input_port_read(device->machine, "OTHER") & 0x04)			/* Lightpen Signal */
-//				value &= ?? ;
-			break;
-
-		case 0x07:
-			break;
-
-		default:
-			logerror("Invalid Controller 1 Setting %d\n", controller1);
-			break;
-	}
-
-	c64_keyline[8] = value;
-
-
-	value = 0xff;
-	switch(controller2)
-	{
-		case 0x00:
-			value &= ~input_port_read(device->machine, "JOY2_1B");			/* Joy2 Directions + Button 1 */
-			break;
-
-		case 0x10:
-			if (input_port_read(device->machine, "OTHER") & 0x10)			/* Paddle4 Button */
-				value &= ~0x08;
-			if (input_port_read(device->machine, "OTHER") & 0x20)			/* Paddle3 Button */
-				value &= ~0x04;
-			break;
-
-		case 0x20:
-			if (input_port_read(device->machine, "OTHER") & 0x02)			/* Mouse Button Left */
-				value &= ~0x10;
-			if (input_port_read(device->machine, "OTHER") & 0x01)			/* Mouse Button Right */
-				value &= ~0x01;
-			break;
-
-		case 0x30:
-			value &= ~(input_port_read(device->machine, "JOY2_2B") & 0x1f);	/* Joy2 Directions + Button 1 */
-			break;
-
-		case 0x40:
-/* was there any input on the lightpen? where is it mapped? */
-//			if (input_port_read(device->machine, "OTHER") & 0x04)			/* Lightpen Signal */
-//				value &= ?? ;
-			break;
-
-		case 0x70:
-			break;
-
-		default:
-			logerror("Invalid Controller 2 Setting %d\n", controller2);
-			break;
-	}
-
-	c64_keyline[9] = value;
-
-//	vic2_frame_interrupt does nothing so this is not necessary
-//	vic2_frame_interrupt (device);
-
-	/* check if lightpen has been chosen as input: if so, enable crosshair */
-	timer_set(device->machine, attotime_zero, NULL, 0, lightpen_tick);
-
-	set_led_status (1, input_port_read(device->machine, "SPECIAL") & 0x40 ? 1 : 0);		/* Shift Lock */
-	set_led_status (0, input_port_read(device->machine, "CTRLSEL") & 0x80 ? 1 : 0);		/* Joystick Swap */
-}
-
-
-
-
-/***********************************************
-
-	Input Ports
-
-***********************************************/
-
 /***************************** Commodore 64 ****************************************
  *
  *	- common_cbm_keyboard: C64 keyboard; used by C16, C65 and C128 as well
@@ -190,7 +35,7 @@ C64 Keyboard Layout
 -------------------
 
                                                                            CLR    INST
-    <-   1!   2"   3#   4$   5%   6&   7'   8(   9)   0     +    -    £    HOME   DEL           f 1
+    <-   1!   2"   3#   4$   5%   6&   7'   8(   9)   0     +    -    �    HOME   DEL           f 1
 
  
     CTRL   Q    W    E    R    T     Y    U    I    O    P    @    *     UP    RESTORE          f 3
@@ -205,7 +50,7 @@ C=    SHIFT     Z    X    C    V    B     N    M    ,<   .>   /?   SHIFT   U/D  
                                  SPACEBAR
 
 
-Notes: “C=” is a key with the Commodore logo, “UP” is an arrow pointing up, the “CRSR” keys at the 
+Notes: "C=" is a key with the Commodore logo, "UP" is an arrow pointing up, the "CRSR" keys at the 
 bottom-right corner are used to move the cursor on screen (Up/Down and Left/Right resp.). 
 */
 
@@ -278,7 +123,7 @@ INPUT_PORTS_START( common_cbm_keyboard )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Shift (Right)") PORT_CODE(KEYCODE_RSHIFT)	PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Home  Clr") PORT_CODE(KEYCODE_INSERT)		PORT_CHAR(UCHAR_MAMEKEY(HOME))
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE)								PORT_CHAR(';') PORT_CHAR(']')
-    PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE)						PORT_CHAR('*')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE)						PORT_CHAR('*')
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH2)						PORT_CHAR('\xA3')
 
 	PORT_START( "ROW7" )
@@ -295,7 +140,7 @@ INPUT_PORTS_END
 
 INPUT_PORTS_START( c64_special )
 	PORT_START( "SPECIAL" )  /* special keys */	
-    PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Restore") PORT_CODE(KEYCODE_PRTSCR)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Restore") PORT_CODE(KEYCODE_PRTSCR)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Shift Lock (switch)") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )													
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )	
@@ -319,8 +164,8 @@ INPUT_PORTS_START( c64_controls )
 //	PORT_CATEGORY_ITEM( 0x30, "Mouse (Non Proportional) 1350", 23 )
 	PORT_CATEGORY_ITEM( 0x70, "No Device Connected", 27 )
 	PORT_CONFNAME( 0x80, 0x00, "Swap Gameport A and B") PORT_CODE(KEYCODE_F1) PORT_TOGGLE
-	PORT_CONFSETTING(    0x00, DEF_STR( No ) )		
-	PORT_CONFSETTING(    0x80, DEF_STR( Yes ) )
+	PORT_CONFSETTING(	0x00, DEF_STR( No ) )		
+	PORT_CONFSETTING(	0x80, DEF_STR( Yes ) )
 
 	PORT_START("JOY1_1B")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1) PORT_CATEGORY(10)
@@ -328,7 +173,7 @@ INPUT_PORTS_START( c64_controls )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1) PORT_CATEGORY(10)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1) PORT_CATEGORY(10)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_CATEGORY(10)
-    PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED ) 
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED ) 
 
 	PORT_START("JOY2_1B") 
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2) PORT_CATEGORY(20) PORT_CODE(KEYCODE_HOME) PORT_CODE(JOYCODE_Y_UP_SWITCH)
@@ -336,7 +181,7 @@ INPUT_PORTS_START( c64_controls )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2) PORT_CATEGORY(20) PORT_CODE(KEYCODE_DEL) PORT_CODE(JOYCODE_X_LEFT_SWITCH)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2) PORT_CATEGORY(20) PORT_CODE(KEYCODE_PGDN) PORT_CODE(JOYCODE_X_RIGHT_SWITCH)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_CATEGORY(20) PORT_CODE(KEYCODE_INSERT) PORT_CODE(JOYCODE_BUTTON1)
-    PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED ) 
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED ) 
 
 	/* Mouse Commodore 1350 was basically working as a Joystick */
 	PORT_START("JOY1_2B")
@@ -346,12 +191,12 @@ INPUT_PORTS_START( c64_controls )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1) PORT_NAME("Mouse 1350 Right") PORT_CATEGORY(13)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("Mouse 1350 Button 1") PORT_CATEGORY(13)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("Mouse 1350 Button 2") PORT_CATEGORY(13)
-    PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED ) 
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED ) 
 
 	/* Still to verify how many mices you were able to plug into a c64 */
 	/* Only one, for now */
 	PORT_START("JOY2_2B") 
-    PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED ) 
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED ) 
 /*	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2) PORT_CATEGORY(23) PORT_CODE(KEYCODE_HOME) PORT_CODE(JOYCODE_Y_UP_SWITCH)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2) PORT_CATEGORY(23) PORT_CODE(KEYCODE_END) PORT_CODE(JOYCODE_Y_DOWN_SWITCH)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2) PORT_CATEGORY(23) PORT_CODE(KEYCODE_DEL) PORT_CODE(JOYCODE_X_LEFT_SWITCH)
@@ -421,7 +266,7 @@ C16 Keyboard Layout
   STOP  LOCK   A    S    D    F     G     H    J    K    L   :[   ;]    *      RETURN             f 5
   
   
-  C=    SHIFT     Z    X    C    V    B     N    M    ,<   .>   /?   SHIFT     £     =           HELP
+  C=    SHIFT     Z    X    C    V    B     N    M    ,<   .>   /?   SHIFT     �     =            HELP
   
   
                                  SPACEBAR
@@ -459,7 +304,7 @@ Plus/4 (also 232/264/364 proto)
      ESC   1!   2"   3#   4$   5%   6&   7'   8(   9)   0^   +    -     =    HOME    DEL        ||      @  +  -  =
                                                                                                 ||
                                                                                                 ||
-   CONTROL   Q    W    E    R    T     Y    U    I    O    P    @    £     *    CONTROL         ||      7  8  9  *
+   CONTROL   Q    W    E    R    T     Y    U    I    O    P    @    �     *    CONTROL         ||      7  8  9  *
                                                                                                 ||
   RUN   SHIFT                                                                                   ||
   STOP  LOCK   A    S    D    F     G     H    J    K    L   :[   ;]    RETURN                  ||      4  5  6  /
@@ -544,7 +389,7 @@ C128 Keyboard Layout
      ESC  TAB  ALT  LOCK           HELP  FEED  DISPLAY SCROLL      UP  DOWN  LEFT  RIGHT          F1  F3  F5  F7
   
                                                                              CLR    INST
-      <-   1!   2"   3#   4$   5%   6&   7'   8(   9)   0     +    -    £    HOME   DEL          7   8   9   +
+      <-   1!   2"   3#   4$   5%   6&   7'   8(   9)   0     +    -    �    HOME   DEL           7   8   9   +
   
    
    CONTROL   Q    W    E    R    T     Y    U    I    O    P    @    *     UP    RESTORE          4   5   6   -
@@ -565,7 +410,7 @@ corner are used to move the cursor on screen (Up/Down and Left/Right resp.).
 
 INPUT_PORTS_START( c128_special )
 	PORT_START( "SPECIAL" )  /* special keys */	
-    PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Restore") PORT_CODE(KEYCODE_PRTSCR)	
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Restore") PORT_CODE(KEYCODE_PRTSCR)	
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Shift Lock (switch)") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
 	PORT_DIPNAME( 0x20, 0x00, "Caps Lock (switch)")													
 	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )														
@@ -619,7 +464,7 @@ Notes: "C=" is a key with the Commodore logo, "UP" is an arrow pointing up.
 */
 INPUT_PORTS_START( c65_special )
 	PORT_START( "SPECIAL" )  /* special keys */	
-    PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Restore") PORT_CODE(KEYCODE_PRTSCR)	
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Restore") PORT_CODE(KEYCODE_PRTSCR)	
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Shift Lock (switch)") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
 	PORT_DIPNAME( 0x20, 0x00, "(C65) Caps Lock (switch)") PORT_CODE(KEYCODE_F3)						
 	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )														
@@ -899,7 +744,7 @@ INPUT_PORTS_END
 
 
 INPUT_PORTS_START( pet_config )
-    PORT_START("CFG")
+	PORT_START("CFG")
 	PORT_DIPNAME( 0x180, 0x180, "Memory")					
 	PORT_DIPSETTING(	0x000, "4 KByte" )					
 	PORT_DIPSETTING(	0x080, "8 KByte" )					
@@ -933,7 +778,7 @@ CBMB Series Keyboard Layout (based on a CBM 610 keyboard)
      F1    F2   F3   F4   F5   F6   F7   F8   F9  F10      DOWN  UP  LEFT  RIGHT     HOME/CLEAR   DEL/INST
   
                                                                             INS  
-     ESC   1!   2"   3#   4$   5%   6^   7&   8*   9(   0)   -   =+   <-£   DEL          ?   CE    .    /
+     ESC   1!   2"   3#   4$   5%   6^   7&   8*   9(   0)   -   =+   <-�   DEL          ?   CE    .    /
   
                                                                          ________   
      TAB     Q    W    E    R    T     Y    U    I    O    P    [    ]  | RETURN |       7    8    9    -
@@ -948,7 +793,7 @@ CBMB Series Keyboard Layout (based on a CBM 610 keyboard)
               CTRL               SPACEBAR                                              0      .    00   r
 
 
-Notes: "C=" is a key with the Commodore logo, Shift+6 produces an arrow pointing up (''^'' above). 
+Notes: "C=" is a key with the Commodore logo, Shift+6 produces an arrow pointing up ("^" above). 
 
 
 */
@@ -1103,7 +948,7 @@ VIC20 Keyboard Layout
 ---------------------
 
                                                                            CLR    INST
-    <-   1!   2"   3#   4$   5%   6&   7'   8(   9)   0     +    -    £    HOME   DEL           f 1
+    <-   1!   2"   3#   4$   5%   6&   7'   8(   9)   0     +    -    �    HOME   DEL           f 1
 
  
     CTRL   Q    W    E    R    T     Y    U    I    O    P    @    *     UP    RESTORE          f 3
@@ -1118,7 +963,7 @@ C=    SHIFT     Z    X    C    V    B     N    M    ,<   .>   /?   SHIFT   U/D  
                                  SPACEBAR
 
 
-Notes: “C=” is a key with the Commodore logo, “UP” is an arrow pointing up, the “CRSR” keys at the 
+Notes: "C=" is a key with the Commodore logo, "UP" is an arrow pointing up, the "CRSR" keys at the 
 bottom-right corner are used to move the cursor on screen (Up/Down and Left/Right respectively).
 Notice that this is exactly the same layout of C64 keyboard.
  
@@ -1209,7 +1054,7 @@ INPUT_PORTS_END
 
 INPUT_PORTS_START( vic_special )
 	PORT_START( "SPECIAL" )  /* special keys */	
-    PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Restore") PORT_CODE(KEYCODE_PRTSCR)	
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Restore") PORT_CODE(KEYCODE_PRTSCR)	
 	PORT_DIPNAME( 0x01, 0x00, "Shift Lock (switch)") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE		
 	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )														
 	PORT_DIPSETTING(	0x01, DEF_STR( On ) )

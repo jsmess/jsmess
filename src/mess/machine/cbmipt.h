@@ -2,15 +2,6 @@
 #define CBMIPT_H_
 
 
-/*---------- needed for keyboard reading ---------*/
-
-/* keyboard lines */
-extern UINT8 c64_keyline[10];
-void cbm_common_interrupt( const device_config *device );
-
-
-/*------------------ input ports -----------------*/
-
 /* Commodore 64 */
 
 INPUT_PORTS_EXTERN( common_cbm_keyboard );	/* shared with c16, c65, c128 */

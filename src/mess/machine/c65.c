@@ -12,9 +12,9 @@
 #include "machine/6526cia.h"
 #include "video/vic4567.h"
 
+#include "includes/cbm.h"
 #include "includes/cbmserb.h"
 #include "includes/cbmdrive.h"
-#include "cbmipt.h"				/* we need cbm_common_interrupt & c64_keyline for input reading */
 
 #include "includes/c65.h"
 #include "includes/c64.h"
@@ -34,8 +34,11 @@ static int c65_charset_select = 0;
 
 static int c64mode = 0;
 
+static UINT8 c65_6511_port = 0xff;
 static UINT8 c65_keyline = { 0xff };
 
+static UINT8 serial_clock, serial_data, serial_atn;
+static UINT8 vicirq = 0;
 
 /*UINT8 *c65_basic; */
 /*UINT8 *c65_kernal; */
@@ -44,6 +47,199 @@ UINT8 *c65_chargen;
 /*UINT8 *c65_monitor; */
 UINT8 *c65_interface;
 /*UINT8 *c65_graphics; */
+
+
+static void c65_nmi(running_machine *machine)
+{
+	static int nmilevel = 0;
+	const device_config *cia_1 = devtag_get_device(machine, "cia_1");
+	int cia1irq = cia_get_irq(cia_1);
+
+	if (nmilevel != (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq)	/* KEY_RESTORE */
+	{
+		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq);
+
+		nmilevel = (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq;
+	}
+}
+
+
+/***********************************************
+
+	CIA Interfaces
+
+***********************************************/
+
+/*
+ *	CIA 0 - Port A keyboard line select
+ *	CIA 0 - Port B keyboard line read
+ *
+ *	flag cassette read input, serial request in
+ *	irq to irq connected
+ *
+ *	see machine/cbm.c
+ */
+
+static READ8_DEVICE_HANDLER( c65_cia0_port_a_r )
+{
+	UINT8 cia0portb = cia_get_output_b(devtag_get_device(device->machine, "cia_0"));
+
+	return common_cia0_port_a_r(device, cia0portb);
+}
+
+static READ8_DEVICE_HANDLER( c65_cia0_port_b_r )
+{
+    UINT8 value = 0xff;
+	UINT8 cia0porta = cia_get_output_a(devtag_get_device(device->machine, "cia_0"));
+
+	value &= common_cia0_port_b_r(device, cia0porta);
+
+	if (!(c65_6511_port & 0x02))
+		value &= c65_keyline;
+
+    return value;
+}
+
+static WRITE8_DEVICE_HANDLER( c65_cia0_port_b_w )
+{
+//	was there lightpen support in c65 video chip?
+//	vic2_lightpen_write(data & 0x10);
+}
+
+static void c65_irq (running_machine *machine, int level)
+{
+	static int old_level = 0;
+
+	if (level != old_level)
+	{
+		DBG_LOG (3, "mos6510", ("irq %s\n", level ? "start" : "end"));
+		cputag_set_input_line(machine, "maincpu", M6510_IRQ_LINE, level);
+		old_level = level;
+	}
+}
+
+static void c65_cia0_interrupt (const device_config *device, int level)
+{
+	c65_irq (device->machine, level || vicirq);
+}
+
+void c65_vic_interrupt (running_machine *machine, int level)
+{
+	const device_config *cia_0 = devtag_get_device(machine, "cia_0");
+#if 1
+	if (level != vicirq)
+	{
+		c65_irq (machine, level || cia_get_irq(cia_0));
+		vicirq = level;
+	}
+#endif
+}
+
+const cia6526_interface c65_ntsc_cia0 =
+{
+	DEVCB_LINE(c65_cia0_interrupt),
+	DEVCB_NULL,	/* pc_func */
+	60,
+
+	{
+		{ DEVCB_HANDLER(c65_cia0_port_a_r), DEVCB_NULL },
+		{ DEVCB_HANDLER(c65_cia0_port_b_r), DEVCB_HANDLER(c65_cia0_port_b_w) }
+	}
+};
+
+const cia6526_interface c65_pal_cia0 =
+{
+	DEVCB_LINE(c65_cia0_interrupt),
+	DEVCB_NULL,	/* pc_func */
+	50,
+
+	{
+		{ DEVCB_HANDLER(c65_cia0_port_a_r), DEVCB_NULL },
+		{ DEVCB_HANDLER(c65_cia0_port_b_r), DEVCB_HANDLER(c65_cia0_port_b_w) }
+	}
+};
+
+/*
+ * CIA 1 - Port A
+ * bit 7 serial bus data input
+ * bit 6 serial bus clock input
+ * bit 5 serial bus data output
+ * bit 4 serial bus clock output
+ * bit 3 serial bus atn output
+ * bit 2 rs232 data output
+ * bits 1-0 vic-chip system memory bank select
+ *
+ * CIA 1 - Port B
+ * bit 7 user rs232 data set ready
+ * bit 6 user rs232 clear to send
+ * bit 5 user
+ * bit 4 user rs232 carrier detect
+ * bit 3 user rs232 ring indicator
+ * bit 2 user rs232 data terminal ready
+ * bit 1 user rs232 request to send
+ * bit 0 user rs232 received data
+ *
+ * flag restore key or rs232 received data input
+ * irq to nmi connected ?
+ */
+static READ8_DEVICE_HANDLER( c65_cia1_port_a_r )
+{
+	UINT8 value = 0xff;
+
+	if (!serial_clock || !cbm_serial_clock_read (device->machine))
+		value &= ~0x40;
+
+	if (!serial_data || !cbm_serial_data_read (device->machine))
+		value &= ~0x80;
+
+	return value;
+}
+
+static WRITE8_DEVICE_HANDLER( c65_cia1_port_a_w )
+{
+	static const int helper[4] = {0xc000, 0x8000, 0x4000, 0x0000};
+
+	cbm_serial_clock_write (device->machine, serial_clock = !(data & 0x10));
+	cbm_serial_data_write (device->machine, serial_data = !(data & 0x20));
+	cbm_serial_atn_write (device->machine, serial_atn = !(data & 0x08));
+	c64_vicaddr = c64_memory + helper[data & 0x03];
+}
+
+static void c65_cia1_interrupt (const device_config *device, int level)
+{
+	c65_nmi(device->machine);
+}
+
+
+const cia6526_interface c65_ntsc_cia1 =
+{
+	DEVCB_LINE(c65_cia1_interrupt),
+	DEVCB_NULL,	/* pc_func */
+	60,
+
+	{
+		{ DEVCB_HANDLER(c65_cia1_port_a_r), DEVCB_HANDLER(c65_cia1_port_a_w) },
+		{ DEVCB_NULL, DEVCB_NULL }
+	}
+};
+
+const cia6526_interface c65_pal_cia1 =
+{
+	DEVCB_LINE(c65_cia1_interrupt),
+	DEVCB_NULL,	/* pc_func */
+	50,
+
+	{
+		{ DEVCB_HANDLER(c65_cia1_port_a_r), DEVCB_HANDLER(c65_cia1_port_a_w) },
+		{ DEVCB_NULL, DEVCB_NULL }
+	}
+};
+
+/***********************************************
+
+	Memory Handlers
+
+***********************************************/
 
 /* processor has only 1 mega address space !? */
 /* and system 8 megabyte */
@@ -820,8 +1016,7 @@ static void c65_common_driver_init (running_machine *machine)
 
 	/*memset(c64_memory+0x40000, 0, 0x800000-0x40000); */
 
-	vic4567_init(machine, c64_pal, c65_dma_read, c65_dma_read_color,
-				  c64_vic_interrupt, c65_bankswitch_interface);
+	vic4567_init(machine, c64_pal, c65_dma_read, c65_dma_read_color, c65_vic_interrupt, c65_bankswitch_interface);
 }
 
 DRIVER_INIT( c65 )
@@ -853,21 +1048,6 @@ MACHINE_START( c65 )
 
 	c65_bankswitch_interface(machine, 0xff);
 	c65_bankswitch (machine);
-}
-
-
-static void c65_nmi(running_machine *machine)
-{
-	static int nmilevel = 0;
-	const device_config *cia_1 = devtag_get_device(machine, "cia_1");
-	int cia1irq = cia_get_irq(cia_1);
-
-	if (nmilevel != (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq)	/* KEY_RESTORE */
-	{
-		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq);
-
-		nmilevel = (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq;
-	}
 }
 
 

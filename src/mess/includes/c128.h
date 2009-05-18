@@ -14,6 +14,7 @@
 #ifndef C128_H_
 #define C128_H_
 
+#include "machine/6526cia.h"
 
 /*----------- defined in machine/c128.c -----------*/
 
@@ -58,5 +59,7 @@ extern VIDEO_UPDATE( c128 );
 
 void c128_bankswitch_64 (running_machine *machine, int reset);
 
+extern const cia6526_interface c128_ntsc_cia0, c128_pal_cia0;
+extern const cia6526_interface c128_ntsc_cia1, c128_pal_cia1;
 
 #endif /* C128_H_ */

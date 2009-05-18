@@ -26,10 +26,8 @@
 #include "includes/cbmserb.h"
 #include "includes/cbmdrive.h"
 #include "includes/vc1541.h"
-#include "cbmipt.h"				/* we need cbm_common_interrupt & c64_keyline for input reading */
 
 #include "includes/c64.h"
-#include "includes/c128.h"      /* we need c128_bankswitch_64 in MACHINE_START */
 
 #include "devices/cassette.h"
 #include "devices/cartslot.h"
@@ -45,17 +43,12 @@
 		} \
 	} while (0)
 
-/* still needed for CIA interfaces, will be factored out soon... */
-UINT8 c65_6511_port = 0xff;
-static UINT8 c65_keyline = { 0xff };
-static UINT8 c128_keyline[3] = {0xff, 0xff, 0xff};
 
 /* expansion port lines input */
 int c64_pal = 0;
 UINT8 c64_game = 1, c64_exrom = 1;
 
 /* cpu port */
-int c128_va1617;
 UINT8 *c64_vicaddr, *c128_vicaddr;
 UINT8 *c64_memory;
 UINT8 *c64_colorram;
@@ -83,17 +76,6 @@ static int is_c65(running_machine *machine)
 	return !strncmp(machine->gamedrv->name, "c65", 3);
 }
 
-static int is_c128(running_machine *machine)
-{
-	return !strncmp(machine->gamedrv->name, "c128", 4);
-}
-
-/* Needed to initialize correctly the floppy drive emulation */
-/*static int is_c128d(running_machine *machine)
-{
-	return !strncmp(machine->gamedrv->name, "c128d", 5);
-}*/
-
 static void c64_nmi(running_machine *machine)
 {
 	static int nmilevel = 0;
@@ -109,187 +91,39 @@ static void c64_nmi(running_machine *machine)
 }
 
 
+/***********************************************
+
+	CIA Interfaces
+
+***********************************************/
+
 /*
- * cia 0
- * port a
- * 7-0 keyboard line select
- * 7,6: paddle select( 01 port a, 10 port b)
- * 4: joystick a fire button
- * 3,2: Paddles port a fire button
- * 3-0: joystick a direction
- * port b
- * 7-0: keyboard raw values
- * 4: joystick b fire button, lightpen select
- * 3,2: paddle b fire buttons (left,right)
- * 3-0: joystick b direction
- * flag cassette read input, serial request in
- * irq to irq connected
+ *	CIA 0 - Port A keyboard line select
+ *	CIA 0 - Port B keyboard line read
+ *
+ *	flag cassette read input, serial request in
+ *	irq to irq connected
+ *
+ *	see machine/cbm.c
  */
+
 static READ8_DEVICE_HANDLER( c64_cia0_port_a_r )
 {
-	UINT8 value = 0xff;
 	UINT8 cia0portb = cia_get_output_b(devtag_get_device(device->machine, "cia_0"));
 
-	if (!(cia0portb & 0x80))
-	{
-		UINT8 t = 0xff;
-		if (!(c64_keyline[7] & 0x80)) t &= ~0x80;
-		if (!(c64_keyline[6] & 0x80)) t &= ~0x40;
-		if (!(c64_keyline[5] & 0x80)) t &= ~0x20;
-		if (!(c64_keyline[4] & 0x80)) t &= ~0x10;
-		if (!(c64_keyline[3] & 0x80)) t &= ~0x08;
-		if (!(c64_keyline[2] & 0x80)) t &= ~0x04;
-		if (!(c64_keyline[1] & 0x80)) t &= ~0x02;
-		if (!(c64_keyline[0] & 0x80)) t &= ~0x01;
-		value &= t;
-	}
-
-	if (!(cia0portb & 0x40))
-	{
-		UINT8 t = 0xff;
-		if (!(c64_keyline[7] & 0x40)) t &= ~0x80;
-		if (!(c64_keyline[6] & 0x40)) t &= ~0x40;
-		if (!(c64_keyline[5] & 0x40)) t &= ~0x20;
-		if (!(c64_keyline[4] & 0x40)) t &= ~0x10;
-		if (!(c64_keyline[3] & 0x40)) t &= ~0x08;
-		if (!(c64_keyline[2] & 0x40)) t &= ~0x04;
-		if (!(c64_keyline[1] & 0x40)) t &= ~0x02;
-		if (!(c64_keyline[0] & 0x40)) t &= ~0x01;
-		value &= t;
-	}
-
-	if (!(cia0portb & 0x20))
-	{
-		UINT8 t = 0xff;
-		if (!(c64_keyline[7] & 0x20)) t &= ~0x80;
-		if (!(c64_keyline[6] & 0x20)) t &= ~0x40;
-		if (!(c64_keyline[5] & 0x20)) t &= ~0x20;
-		if (!(c64_keyline[4] & 0x20)) t &= ~0x10;
-		if (!(c64_keyline[3] & 0x20)) t &= ~0x08;
-		if (!(c64_keyline[2] & 0x20)) t &= ~0x04;
-		if (!(c64_keyline[1] & 0x20)) t &= ~0x02;
-		if (!(c64_keyline[0] & 0x20)) t &= ~0x01;
-		value &= t;
-	}
-
-	if (!(cia0portb & 0x10))
-	{
-		UINT8 t = 0xff;
-		if (!(c64_keyline[7] & 0x10)) t &= ~0x80;
-		if (!(c64_keyline[6] & 0x10)) t &= ~0x40;
-		if (!(c64_keyline[5] & 0x10)) t &= ~0x20;
-		if (!(c64_keyline[4] & 0x10)) t &= ~0x10;
-		if (!(c64_keyline[3] & 0x10)) t &= ~0x08;
-		if (!(c64_keyline[2] & 0x10)) t &= ~0x04;
-		if (!(c64_keyline[1] & 0x10)) t &= ~0x02;
-		if (!(c64_keyline[0] & 0x10)) t &= ~0x01;
-		value &= t;
-	}
-
-	if (!(cia0portb & 0x08))
-	{
-		UINT8 t = 0xff;
-		if (!(c64_keyline[7] & 0x08)) t &= ~0x80;
-		if (!(c64_keyline[6] & 0x08)) t &= ~0x40;
-		if (!(c64_keyline[5] & 0x08)) t &= ~0x20;
-		if (!(c64_keyline[4] & 0x08)) t &= ~0x10;
-		if (!(c64_keyline[3] & 0x08)) t &= ~0x08;
-		if (!(c64_keyline[2] & 0x08)) t &= ~0x04;
-		if (!(c64_keyline[1] & 0x08)) t &= ~0x02;
-		if (!(c64_keyline[0] & 0x08)) t &= ~0x01;
-		value &= t;
-	}
-
-	if (!(cia0portb & 0x04))
-	{
-		UINT8 t = 0xff;
-		if (!(c64_keyline[7] & 0x04)) t &= ~0x80;
-		if (!(c64_keyline[6] & 0x04)) t &= ~0x40;
-		if (!(c64_keyline[5] & 0x04)) t &= ~0x20;
-		if (!(c64_keyline[4] & 0x04)) t &= ~0x10;
-		if (!(c64_keyline[3] & 0x04)) t &= ~0x08;
-		if (!(c64_keyline[2] & 0x04)) t &= ~0x04;
-		if (!(c64_keyline[1] & 0x04)) t &= ~0x02;
-		if (!(c64_keyline[0] & 0x04)) t &= ~0x01;
-		value &= t;
-	}
-
-	if (!(cia0portb & 0x02))
-	{
-		UINT8 t = 0xff;
-		if (!(c64_keyline[7] & 0x02)) t &= ~0x80;
-		if (!(c64_keyline[6] & 0x02)) t &= ~0x40;
-		if (!(c64_keyline[5] & 0x02)) t &= ~0x20;
-		if (!(c64_keyline[4] & 0x02)) t &= ~0x10;
-		if (!(c64_keyline[3] & 0x02)) t &= ~0x08;
-		if (!(c64_keyline[2] & 0x02)) t &= ~0x04;
-		if (!(c64_keyline[1] & 0x02)) t &= ~0x02;
-		if (!(c64_keyline[0] & 0x02)) t &= ~0x01;
-		value &= t;
-	}
-
-	if (!(cia0portb & 0x01))
-	{
-		UINT8 t = 0xff;
-		if (!(c64_keyline[7] & 0x01)) t &= ~0x80;
-		if (!(c64_keyline[6] & 0x01)) t &= ~0x40;
-		if (!(c64_keyline[5] & 0x01)) t &= ~0x20;
-		if (!(c64_keyline[4] & 0x01)) t &= ~0x10;
-		if (!(c64_keyline[3] & 0x01)) t &= ~0x08;
-		if (!(c64_keyline[2] & 0x01)) t &= ~0x04;
-		if (!(c64_keyline[1] & 0x01)) t &= ~0x02;
-		if (!(c64_keyline[0] & 0x01)) t &= ~0x01;
-		value &= t;
-	}
-
-	if ( input_port_read(device->machine, "CTRLSEL") & 0x80 )
-		value &= c64_keyline[8];
-	else
-		value &= c64_keyline[9];
-
-	return value;
+	return common_cia0_port_a_r(device, cia0portb);
 }
 
 static READ8_DEVICE_HANDLER( c64_cia0_port_b_r )
 {
-    UINT8 value = 0xff;
 	UINT8 cia0porta = cia_get_output_a(devtag_get_device(device->machine, "cia_0"));
 
-    if (!(cia0porta & 0x80)) value &= c64_keyline[7];
-    if (!(cia0porta & 0x40)) value &= c64_keyline[6];
-    if (!(cia0porta & 0x20)) value &= c64_keyline[5];
-    if (!(cia0porta & 0x10)) value &= c64_keyline[4];
-    if (!(cia0porta & 0x08)) value &= c64_keyline[3];
-    if (!(cia0porta & 0x04)) value &= c64_keyline[2];
-    if (!(cia0porta & 0x02)) value &= c64_keyline[1];
-    if (!(cia0porta & 0x01)) value &= c64_keyline[0];
-
-	if ( input_port_read(device->machine, "CTRLSEL") & 0x80 )
-		value &= c64_keyline[9];
-    else
-		value &= c64_keyline[8];
-
-    if (is_c128(device->machine))
-    {
-		if (!vic2e_k0_r ())
-			value &= c128_keyline[0];
-		if (!vic2e_k1_r ())
-			value &= c128_keyline[1];
-		if (!vic2e_k2_r ())
-			value &= c128_keyline[2];
-    }
-    if (is_c65(device->machine))
-	{
-		if (!(c65_6511_port & 0x02))
-			value &= c65_keyline;
-    }
-
-    return value;
+	return common_cia0_port_b_r(device, cia0porta);
 }
 
 static WRITE8_DEVICE_HANDLER( c64_cia0_port_b_w )
 {
-    vic2_lightpen_write (data & 0x10);
+    vic2_lightpen_write(data & 0x10);
 }
 
 static void c64_irq (running_machine *machine, int level)
@@ -299,21 +133,7 @@ static void c64_irq (running_machine *machine, int level)
 	if (level != old_level)
 	{
 		DBG_LOG (3, "mos6510", ("irq %s\n", level ? "start" : "end"));
-		if (is_c128(machine))
-		{
-			if (0) // && (cpu_getactivecpu() == 0))
-			{
-				cputag_set_input_line(machine, "maincpu", 0, level);
-			}
-			else
-			{
-				cputag_set_input_line(machine, "m8502", M6510_IRQ_LINE, level);
-			}
-		}
-		else
-		{
-			cputag_set_input_line(machine, "maincpu", M6510_IRQ_LINE, level);
-		}
+		cputag_set_input_line(machine, "maincpu", M6510_IRQ_LINE, level);
 		old_level = level;
 	}
 }
@@ -333,61 +153,6 @@ void c64_vic_interrupt (running_machine *machine, int level)
 		vicirq = level;
 	}
 #endif
-}
-
-/*
- * cia 1
- * port a
- * 7 serial bus data input
- * 6 serial bus clock input
- * 5 serial bus data output
- * 4 serial bus clock output
- * 3 serial bus atn output
- * 2 rs232 data output
- * 1-0 vic-chip system memory bank select
- *
- * port b
- * 7 user rs232 data set ready
- * 6 user rs232 clear to send
- * 5 user
- * 4 user rs232 carrier detect
- * 3 user rs232 ring indicator
- * 2 user rs232 data terminal ready
- * 1 user rs232 request to send
- * 0 user rs232 received data
- * flag restore key or rs232 received data input
- * irq to nmi connected ?
- */
-static READ8_DEVICE_HANDLER( c64_cia1_port_a_r )
-{
-	UINT8 value = 0xff;
-
-	if (!serial_clock || !cbm_serial_clock_read (device->machine))
-		value &= ~0x40;
-
-	if (!serial_data || !cbm_serial_data_read (device->machine))
-		value &= ~0x80;
-
-	return value;
-}
-
-static WRITE8_DEVICE_HANDLER( c64_cia1_port_a_w )
-{
-	static const int helper[4] = {0xc000, 0x8000, 0x4000, 0x0000};
-
-	cbm_serial_clock_write (device->machine, serial_clock = !(data & 0x10));
-	cbm_serial_data_write (device->machine, serial_data = !(data & 0x20));
-	cbm_serial_atn_write (device->machine, serial_atn = !(data & 0x08));
-	c64_vicaddr = c64_memory + helper[data & 0x03];
-	if (is_c128(device->machine))
-	{
-		c128_vicaddr = c64_memory + helper[data & 0x03] + c128_va1617;
-	}
-}
-
-static void c64_cia1_interrupt (const device_config *device, int level)
-{
-	c64_nmi(device->machine);
 }
 
 const cia6526_interface c64_ntsc_cia0 =
@@ -414,6 +179,58 @@ const cia6526_interface c64_pal_cia0 =
 	}
 };
 
+
+/*
+ * CIA 1 - Port A
+ * bit 7 serial bus data input
+ * bit 6 serial bus clock input
+ * bit 5 serial bus data output
+ * bit 4 serial bus clock output
+ * bit 3 serial bus atn output
+ * bit 2 rs232 data output
+ * bits 1-0 vic-chip system memory bank select
+ *
+ * CIA 1 - Port B
+ * bit 7 user rs232 data set ready
+ * bit 6 user rs232 clear to send
+ * bit 5 user
+ * bit 4 user rs232 carrier detect
+ * bit 3 user rs232 ring indicator
+ * bit 2 user rs232 data terminal ready
+ * bit 1 user rs232 request to send
+ * bit 0 user rs232 received data
+ *
+ * flag restore key or rs232 received data input
+ * irq to nmi connected ?
+ */
+static READ8_DEVICE_HANDLER( c64_cia1_port_a_r )
+{
+	UINT8 value = 0xff;
+
+	if (!serial_clock || !cbm_serial_clock_read (device->machine))
+		value &= ~0x40;
+
+	if (!serial_data || !cbm_serial_data_read (device->machine))
+		value &= ~0x80;
+
+	return value;
+}
+
+static WRITE8_DEVICE_HANDLER( c64_cia1_port_a_w )
+{
+	static const int helper[4] = {0xc000, 0x8000, 0x4000, 0x0000};
+
+	cbm_serial_clock_write (device->machine, serial_clock = !(data & 0x10));
+	cbm_serial_data_write (device->machine, serial_data = !(data & 0x20));
+	cbm_serial_atn_write (device->machine, serial_atn = !(data & 0x08));
+	c64_vicaddr = c64_memory + helper[data & 0x03];
+}
+
+static void c64_cia1_interrupt (const device_config *device, int level)
+{
+	c64_nmi(device->machine);
+}
+
 const cia6526_interface c64_ntsc_cia1 =
 {
 	DEVCB_LINE(c64_cia1_interrupt),
@@ -437,6 +254,12 @@ const cia6526_interface c64_pal_cia1 =
 		{ DEVCB_NULL, DEVCB_NULL }
 	}
 };
+
+/***********************************************
+
+	Memory Handlers
+
+***********************************************/
 
 static UINT8 *c64_io_ram_w_ptr;
 static UINT8 *c64_io_ram_r_ptr;
@@ -1052,10 +875,10 @@ DRIVER_INIT( sx64 )
 
 void c64_common_init_machine (running_machine *machine)
 {
-	if (is_sx64 /* || is_c128d(machine) */)
+	if (is_sx64)
 	{
 		cbm_serial_config(machine, &cbm_emu_drive_interface);
-		drive_reset ();
+		drive_reset();
 	}
 
 	else if (c64_cia1_on)
@@ -1077,9 +900,6 @@ MACHINE_START( c64 )
 
 	c64_io_mirror = auto_alloc_array(machine, UINT8, 0x1000 );
 	c64_common_init_machine (machine);
-
-	if (is_c128(machine))
-		c128_bankswitch_64(machine, 1);
 
 	if (!ultimax)
 		c64_bankswitch(machine, 1);
