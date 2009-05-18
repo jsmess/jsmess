@@ -119,7 +119,9 @@ void c16_m7501_port_write(const device_config *device, UINT8 direction, UINT8 da
 	cbm_serial_clock_write (device->machine, clk = !(data & 0x02));
 	cbm_serial_data_write (device->machine, dat = !(data & 0x01));
 
-//	vc20_tape_write (!(data & 0x02));		// CASSETTE_RECORD not implemented yet
+	cassette_output(devtag_get_device(device->machine, "cassette"), !(data & 0x02) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
+	
+	cassette_change_state(devtag_get_device(device->machine, "cassette"), (data & 0x08) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 }
 
 UINT8 c16_m7501_port_read(const device_config *device, UINT8 direction)
@@ -139,8 +141,6 @@ UINT8 c16_m7501_port_read(const device_config *device, UINT8 direction)
 		data |=  0x10;
 	else
 		data &= ~0x10;
-
-	cassette_change_state(devtag_get_device(device->machine, "cassette"), (c16_port7501 & 0x08) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 
 	return data;
 }
@@ -303,8 +303,11 @@ READ8_HANDLER(plus4_6529_port_r)
 {
 	int data = 0x00;
 
-	if (!((cassette_get_state(devtag_get_device(space->machine, "cassette")) & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY))
-		data |= 0x04;
+	if ((cassette_get_state(devtag_get_device(space->machine, "cassette")) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
+		data &= ~0x04;
+	else
+		data |=  0x04;
+
 	return data;
 }
 
@@ -312,8 +315,11 @@ READ8_HANDLER(c16_fd1x_r)
 {
 	int data = 0x00;
 
-	if (!((cassette_get_state(devtag_get_device(space->machine, "cassette")) & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY))
-		data |= 0x04;
+	if ((cassette_get_state(devtag_get_device(space->machine, "cassette")) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
+		data &= ~0x04;
+	else
+		data |=  0x04;
+
 	return data;
 }
 
