@@ -27,7 +27,7 @@
 
 	TODO:
 
-	- upd1990 does not count up from year 99 to 00
+	- un-Y2K-hack tandy200
 	- keyboard is unresponsive for couple of seconds after boot
 	- soft power on/off
 	- IM6042 UART
@@ -1425,7 +1425,7 @@ ROM_END
 
 ROM_START( tandy102 )
 	ROM_REGION( 0x8000, I8085_TAG, 0 )
-	ROM_LOAD( "m102rom.bin", 0x0000, 0x8000, BAD_DUMP CRC(0e4ff73a) SHA1(d91f4f412fb78c131ccd710e8158642de47355e2) ) /* Y2K hacked */
+	ROM_LOAD( "m102rom.bin", 0x0000, 0x8000, CRC(08e9f89c) SHA1(b6ede7735a361c80419f4c9c0e36e7d480c36d11) )
 
 	ROM_REGION( 0x8000, "option", ROMREGION_ERASEFF )
 	ROM_CART_LOAD("cart", 0x0000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
