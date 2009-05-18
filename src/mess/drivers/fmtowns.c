@@ -48,7 +48,39 @@ static ADDRESS_MAP_START(towns_mem, ADDRESS_SPACE_PROGRAM, 32)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( towns_io , ADDRESS_SPACE_IO, 32)
-	ADDRESS_MAP_UNMAP_HIGH
+  // I/O ports derived from FM Towns/Bochs, these are specific to the FM Towns
+  // Some common PC ports are likely to also be used
+  // System ports
+  AM_RANGE(0x0020,0x0033) AM_NOP  // R/W
+  AM_RANGE(0x006c,0x006f) AM_NOP  // R/W (0x6c)
+  // DMA controllers (uPD71071?)
+  AM_RANGE(0x00a0,0x00af) AM_NOP
+  AM_RANGE(0x00b0,0x00bf) AM_NOP
+  // Floppy controller
+  AM_RANGE(0x0200,0x020f) AM_NOP  // all R/W
+  // CRTC / Video
+  AM_RANGE(0x0400,0x0403) AM_NOP  // R/O (0x400)
+  AM_RANGE(0x0404,0x0407) AM_NOP  // R/W (0x404)
+  AM_RANGE(0x0440,0x045f) AM_NOP
+  // System port
+  AM_RANGE(0x0480,0x0483) AM_NOP  // R/W (0x480)
+  // CD-ROM
+  AM_RANGE(0x04c0,0x04cf) AM_NOP
+  // Sound (YM3438 [FM], RF5c68 [PCM])
+  AM_RANGE(0x04d4,0x04d7) AM_NOP  // R/W  -- (0x4d5) mute?
+  AM_RANGE(0x04d8,0x04db) AM_NOP  // R/W  -- (0x4d8) YM control port A / status port A
+                                  // R/W  -- (0x4da) YM data port A / status port A
+  AM_RANGE(0x04dc,0x04df) AM_NOP  // R/W  -- (0x4dc) YM control port B / status port A
+                                  // R/W  -- (0x4de) YM data port B / status port A
+  AM_RANGE(0x04e0,0x04e3) AM_NOP  // R/W  -- volume ports
+  AM_RANGE(0x04e8,0x04ef) AM_NOP  // R/O  -- (0x4e9) FM IRQ flag (bit 0), PCM IRQ flag (bit 3)
+                                  // (0x4ea) PCM IRQ mask
+                                  // R/W  -- (0x4eb) PCM IRQ flag
+                                  // W/O  -- (0x4ec) LED control
+  AM_RANGE(0x04f0,0x04fb) AM_NOP  // W/O  -- (0x4f0-0x4f8) PCM registers
+  // System ports
+  AM_RANGE(0x05e8,0x05ef) AM_NOP  // R/O (0x5e8, 0x5ec)
+
 ADDRESS_MAP_END
 
 /* Input ports */
