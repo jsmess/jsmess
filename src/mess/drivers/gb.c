@@ -696,6 +696,11 @@ ROM_START( gbpocket )
 /*  ROM_LOAD( "gbp_boot.bin", 0x0000, 0x0100, NO_DUMP ) */
 ROM_END
 
+ROM_START( gblight )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+/*  ROM_LOAD( "gbl_boot.bin", 0x0000, 0x0100, NO_DUMP ) */
+ROM_END
+
 ROM_START( gbcolor )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 /*  ROM_LOAD( "gbc_boot.bin", 0x0000, 0x0100, NO_DUMP ) */
@@ -710,6 +715,7 @@ ROM_END
 CONS( 1990, gameboy,  0,       0,	gameboy,  gameboy, 0,    0,	 "Nintendo", "Game Boy"  , 0)
 CONS( 1994, supergb,  0,       gameboy,	supergb,  gameboy, 0,    0,	 "Nintendo", "Super Game Boy" , 0)
 CONS( 1996, gbpocket, gameboy, 0,	gbpocket, gameboy, 0,    0,	 "Nintendo", "Game Boy Pocket" , 0)
+CONS( 1997, gblight,  gameboy, 0,	gbpocket, gameboy, 0,    0,	 "Nintendo", "Game Boy Light" , 0)
 CONS( 1998, gbcolor,  0,       gameboy,	gbcolor,  gameboy, 0,    gb_cgb, "Nintendo", "Game Boy Color" , GAME_NOT_WORKING)
 
 /* Sound is not 100% yet, it generates some sounds which could be ok. Since we're lacking a real

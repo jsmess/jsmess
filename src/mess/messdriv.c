@@ -59,6 +59,7 @@ const game_driver * const drivers[] =
 	DRIVER( gameboy )	/* Nintendo Game Boy Handheld						*/
 	DRIVER( supergb )	/* Nintendo Super Game Boy SNES Cartridge			*/
 	DRIVER( gbpocket )	/* Nintendo Game Boy Pocket Handheld				*/
+	DRIVER( gblight )	/* Nintendo Game Boy Light Handheld				*/
 	DRIVER( gbcolor )	/* Nintendo Game Boy Color Handheld					*/
 	DRIVER( snes )		/* Nintendo Super Nintendo NTSC						*/
 	DRIVER( snespal )	/* Nintendo Super Nintendo PAL						*/
