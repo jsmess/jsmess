@@ -41,10 +41,27 @@ static TIMER_CALLBACK(keyboard_callback)
 		code = 	input_port_read(machine, keynames[i]);
 		if (code != 0) 
 		{
-			if (i<2 && shift==0) {
+			if (i==0 && shift==0) {
 				key_code = 0x30 + row_number(code) + 8*i; // for numbers and some signs
 			}
-			if (i<2 && shift==1) {
+			if (i==0 && shift==1) {
+				key_code = 0x20 + row_number(code) + 8*i; // for shifted numbers
+			}
+			if (i==1 && shift==0) {
+				if (row_number(code) < 4) {
+					key_code = 0x30 + row_number(code) + 8*i; // for numbers and some signs
+				} else {
+					key_code = 0x20 + row_number(code) + 8*i; // for numbers and some signs
+				}
+			}
+			if (i==1 && shift==1) {
+				if (row_number(code) < 4) {
+					key_code = 0x20 + row_number(code) + 8*i; // for numbers and some signs
+				} else {
+					key_code = 0x30 + row_number(code) + 8*i; // for numbers and some signs
+				}
+			}
+			if (i==1 && shift==1) {
 				key_code = 0x20 + row_number(code) + 8*i; // for shifted numbers
 			}
 			if (i>=2 && i<=4 && shift==0 && ctrl==0) {
