@@ -320,6 +320,7 @@ DRVLIBS = \
 	$(MESSOBJ)/pasogo.a \
 	$(MESSOBJ)/pc.a \
 	$(MESSOBJ)/pcshare.a \
+	$(MESSOBJ)/pc8401a.a \
 	$(MESSOBJ)/pdp1.a \
 	$(MESSOBJ)/pel.a \
 	$(MESSOBJ)/pk8020.a \
@@ -753,6 +754,9 @@ $(MESSOBJ)/pc.a:	   \
 	$(MESS_MACHINE)/pc.o       \
 	$(MESS_DRIVERS)/pc.o		\
 	$(MESS_VIDEO)/pc_t1t.o	 
+
+$(MESSOBJ)/pc8401a.a:	   \
+	$(MESS_DRIVERS)/pc8401a.o
 
 $(MESSOBJ)/at.a:	   \
 	$(MESS_MACHINE)/pc_ide.o   \

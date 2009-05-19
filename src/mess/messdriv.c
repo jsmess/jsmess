@@ -1196,6 +1196,8 @@ const game_driver * const drivers[] =
 //	DRIVER( npc8201 )
 	DRIVER( npc8201a )
 //	DRIVER( npc8300 )
+//	DRIVER( pc8401 )
+	DRIVER( pc8500 )
 
 	/* Nakajima manufactured eletronic typewriters */
 	DRIVER( drwrt200 )	/* 199? NTS DreamWriter T200                         */
