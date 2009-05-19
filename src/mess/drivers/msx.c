@@ -1,4 +1,4 @@
-/*
+﻿/*
 ** msx.c : driver for MSX
 **
 ** Todo:
@@ -61,6 +61,7 @@ Philips NMS-8280
 Philips NMS-8280G
 Philips VG-8000
 Philips VG-8010
+Philips VG-8010F
 Philips VG-8020-00
 Philips VG-8020-20
 Philips VG-8020-40
@@ -1507,6 +1508,48 @@ MSX_LAYOUT_INIT (nms801)
 	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
 	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
 	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
+MSX_LAYOUT_END
+
+/* MSX - Philips VG-8000 */
+
+ROM_START (vg8000)
+	ROM_REGION (0x8000, "maincpu", 0)
+	ROM_LOAD ("8000bios.rom", 0x0000, 0x8000, CRC(efd970b0) SHA1(42252cf87deeb58181a7bfec7c874190a1351779))
+ROM_END
+
+MSX_LAYOUT_INIT (vg8000)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM, 0x4000, 0xC000)   /* 16KB RAM */
+MSX_LAYOUT_END
+
+/* MSX - Philips VG-8010 */
+
+ROM_START (vg8010)
+	ROM_REGION (0x8000, "maincpu", 0)
+	ROM_LOAD ("8010bios.rom", 0x0000, 0x8000, CRC(efd970b0) SHA1(42252cf87deeb58181a7bfec7c874190a1351779))
+ROM_END
+
+MSX_LAYOUT_INIT (vg8010)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM, 0x8000, 0x8000)   /* 32KB RAM */
+MSX_LAYOUT_END
+
+/* MSX - Philips VG-8010F */
+
+ROM_START (vg8010f)
+	ROM_REGION (0x8000, "maincpu", 0)
+	ROM_LOAD ("8010fbios.rom", 0x0000, 0x8000, CRC(df57c9ca) SHA1(898630ad1497dc9a329580c682ee55c4bcb9c30c))
+ROM_END
+
+MSX_LAYOUT_INIT (vg8010f)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM, 0x8000, 0x8000)   /* 32KB RAM */
 MSX_LAYOUT_END
 
 /* MSX - Philips VG-8020-00 */
@@ -3788,6 +3831,9 @@ COMP(1985, cf3300,   msx,	0,      msx,      msxjp,    msx,     msx, "National / 
 COMP(1985, fs1300,   msx,	0,      msx,      msxjp,    msx,     msx, "National / Matsushita", "FS-1300 (Japan)" , 0)
 COMP(1985, fs4000,   msx,	0,      msx,      msxjp,    msx,     msx, "National / Matsushita", "FS-4000 (Japan)" , 0)
 COMP(1983, nms801, 	  msx,	0,	msx_pal,  msx,      msx,     msx, "Philips", "NMS-801" , 0)
+COMP(1984, vg8000,  msx,	0,	msx,	  msx,      msx,     msx, "Philips",	 "VG-8000" , GAME_NOT_WORKING)
+COMP(1984, vg8010,  msx,	0,	msx,	  msx,      msx,     msx, "Philips",	 "VG-8010" , GAME_NOT_WORKING)
+COMP(1984, vg8010f,  msx,	0,	msx,	  msx,      msx,     msx, "Philips",	 "VG-8010F" , GAME_NOT_WORKING)
 COMP(1985, vg802000,  msx,	0,	msx,	  msx,      msx,     msx, "Philips",	 "VG-8020-00" , 0)
 COMP(1985, vg802020, msx,	0,	msx,	  msx,      msx,     msx, "Philips",	 "VG-8020-20" , 0)
 COMP(1985, piopx7, 	  msx,	0,	msx_pal,  msx,      msx,     msx, "Pioneer",	 "PX-07" , 0)

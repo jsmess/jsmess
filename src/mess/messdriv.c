@@ -749,6 +749,9 @@ const game_driver * const drivers[] =
 	DRIVER( fs1300 )	/* 1985 MSX Japan									*/
 	DRIVER( fs4000 )	/* 1985 MSX Japan									*/
 	DRIVER( nms801 )
+	DRIVER( vg8000 )
+	DRIVER( vg8010 )
+	DRIVER( vg8010f )
 	DRIVER( vg802000 )
 	DRIVER( vg802020 )	/* 1985 MSX											*/
 	DRIVER( piopx7 )

@@ -72,6 +72,9 @@ Skeleton drivers :
 - Sega Mega-CD
 - Sega CD
 - Jaguar CD
+- Philips VG-8000
+- Philips VG-8010
+- Philips VG-8010F
 
 
 System Driver Changes:
