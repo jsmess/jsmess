@@ -1282,5 +1282,6 @@ const game_driver * const drivers[] =
 	DRIVER( iq151 )
 	DRIVER( ply601 )
 	DRIVER( ply601a )
+	DRIVER( m20 )
 
 #endif /* DRIVER_RECURSIVE */

@@ -65,7 +65,7 @@ CPUS += T11
 CPUS += S2650
 #CPUS += TMS340X0
 CPUS += TMS9900
-#CPUS += Z8000
+CPUS += Z8000
 #CPUS += TMS32010
 #CPUS += TMS32025
 #CPUS += TMS32031
@@ -312,6 +312,7 @@ DRVLIBS = \
 	$(MESSOBJ)/nintendo.a \
 	$(MESSOBJ)/nokia.a \
 	$(MESSOBJ)/ondra.a \
+	$(MESSOBJ)/olivetti.a \
 	$(MESSOBJ)/orion.a \
 	$(MESSOBJ)/osborne.a \
 	$(MESSOBJ)/osi.a \
@@ -1338,6 +1339,9 @@ $(MESSOBJ)/z80ne.a:	\
 
 $(MESSOBJ)/tec1.a: \
 	$(MESS_DRIVERS)/tec1.o \
+
+$(MESSOBJ)/olivetti.a: \
+	$(MESS_DRIVERS)/m20.o \	
 
 $(MESSOBJ)/kyocera.a: \
 	$(MESS_DRIVERS)/kyocera.o \
