@@ -11,12 +11,13 @@ New System Drivers Supported (in no particular order):
   Fernandez Gerhardt, Wilbert Pol]
 - Samsung SPC-1000 [Miodrag Milanovic]
 - CIP-01 [Miodrag Milanovic]
-- TK85 (not working) [Miodrag Milanovic]
-- Timex Sinclair 1500 (not working) [Miodrag Milanovic]
+- TK85 [Robbbert, Miodrag Milanovic]
+- Timex Sinclair 1500 [Robbbert, Miodrag Milanovic]
 - Ringo 470 (not working) [Miodrag Milanovic]
 - Frael Bruc 100-1 [Miodrag Milanovic]
 - MC80.21/22 (not working) [Miodrag Milanovic]
 - MC80.30/31 (not working) [Miodrag Milanovic]
+- PolyMorphic Systems Poly-88 [Miodrag Milanovic]
 
 Skeleton drivers : 
 ------------------

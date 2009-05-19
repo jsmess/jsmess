@@ -1150,6 +1150,9 @@ const game_driver * const drivers[] =
 	/* Samsung SPC-1000 */
 	DRIVER(spc1000)
 
+	/* PolyMorphic Systems */
+	DRIVER( poly88 )
+		
 	/* Bondwell */
 	DRIVER( bw2 )
 

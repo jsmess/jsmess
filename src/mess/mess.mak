@@ -324,6 +324,7 @@ DRVLIBS = \
 	$(MESSOBJ)/pel.a \
 	$(MESSOBJ)/pk8020.a \
 	$(MESSOBJ)/pmd85.a \
+	$(MESSOBJ)/poly88.a \
 	$(MESSOBJ)/pp01.a \
 	$(MESSOBJ)/primo.a \
 	$(MESSOBJ)/radio.a \
@@ -1301,6 +1302,11 @@ $(MESSOBJ)/dec.a:      \
 $(MESSOBJ)/samsung.a: \
 	$(MESS_DRIVERS)/spc1000.o \
 
+$(MESSOBJ)/poly88.a:      \
+	$(MESS_DRIVERS)/poly88.o \
+	$(MESS_MACHINE)/poly88.o \
+	$(MESS_VIDEO)/poly88.o \
+		
 $(MESSOBJ)/grundy.a: \
 	$(MESS_DRIVERS)/newbrain.o \
 	$(MESS_VIDEO)/newbrain.o \
