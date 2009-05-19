@@ -290,7 +290,7 @@ static INPUT_PORTS_START( pow3000 )
 INPUT_PORTS_END
 
 /* Graphics Layouts */
-
+#if 0
 static const gfx_layout zx_char_layout =
 {
 	8, 8,							   /* 8x8 pixels */
@@ -317,7 +317,7 @@ GFXDECODE_END
 static GFXDECODE_START( pc8300 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, zx_char_layout, 0, 2 )
 GFXDECODE_END
-
+#endif
 
 /* Palette Initialization */
 
@@ -375,7 +375,7 @@ static const cassette_config zx81_cassette_config =
 
 
 static MACHINE_DRIVER_START( zx80 )
-	// basic machine hardware
+	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, ZX81_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(zx80_map)
 	MDRV_CPU_IO_MAP(zx80_io_map)
@@ -385,18 +385,17 @@ static MACHINE_DRIVER_START( zx80 )
 
 	MDRV_MACHINE_RESET(zx80)
 
-    // video hardware
+	/* video hardware */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(ZX81_PIXELS_PER_SCANLINE, ZX81_PAL_SCANLINES)
 	MDRV_SCREEN_VISIBLE_AREA(0, ZX81_PIXELS_PER_SCANLINE-1, 0, ZX81_PAL_SCANLINES-1)
-	MDRV_GFXDECODE(zx80)
+//	MDRV_GFXDECODE(zx80)
 	MDRV_PALETTE_LENGTH(4)
 	MDRV_PALETTE_INIT(zx80)
 
 	MDRV_VIDEO_START(zx)
 	MDRV_VIDEO_EOF(zx)
 	MDRV_VIDEO_UPDATE(generic_bitmapped)
-
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -414,7 +413,7 @@ static MACHINE_DRIVER_START( zx81 )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(zx81_io_map)
 
-	MDRV_GFXDECODE(zx81)
+//	MDRV_GFXDECODE(zx81)
 
 	MDRV_CASSETTE_MODIFY( "cassette", zx81_cassette_config )
 MACHINE_DRIVER_END
@@ -438,7 +437,7 @@ static MACHINE_DRIVER_START( pc8300 )
 	MDRV_SCREEN_SIZE(ZX81_PIXELS_PER_SCANLINE, ZX81_NTSC_SCANLINES)
 	MDRV_SCREEN_VISIBLE_AREA(0, ZX81_PIXELS_PER_SCANLINE-1, 0, ZX81_NTSC_SCANLINES-1)
 
-	MDRV_GFXDECODE(pc8300)
+//	MDRV_GFXDECODE(pc8300)
 	MDRV_PALETTE_INIT(zx80)
 MACHINE_DRIVER_END
 
@@ -449,7 +448,7 @@ static MACHINE_DRIVER_START( pow3000 )
 	MDRV_CPU_IO_MAP(pow3000_io_map)
 
 	MDRV_MACHINE_RESET(pow3000)
-	MDRV_GFXDECODE(pc8300)
+//	MDRV_GFXDECODE(pc8300)
 	MDRV_PALETTE_INIT(zx80)
 MACHINE_DRIVER_END
 
@@ -485,12 +484,12 @@ ROM_END
 
 ROM_START(ts1500)
 	ROM_REGION( 0x10000, "maincpu",0 )
-  	ROM_LOAD( "ts1500.rom", 0x0000, 0x2000, CRC(7dd19c48) SHA1(3eb437359221b4406d236085ec66fa02278e7495))	
+  	ROM_LOAD( "ts1500.rom", 0x0000, 0x2000, CRC(7dd19c48) SHA1(3eb437359221b4406d236085ec66fa02278e7495) )	
 ROM_END
 
-ROM_START( ringo470 )
-  ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-  ROM_LOAD( "ringo470.rom", 0x0000, 0x2000, CRC(b9c5abec) SHA1(191c4994adfffe4f83b98dc3959dde2724b1dbac))
+ROM_START(ringo470)
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "ringo470.rom", 0x0000, 0x2000, CRC(b9c5abec) SHA1(191c4994adfffe4f83b98dc3959dde2724b1dbac) )
 ROM_END
 
 ROM_START(pc8300)
@@ -518,8 +517,8 @@ ROM_START(lambda)
 ROM_END
 
 ROM_START( tk85 )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-    ROM_LOAD( "tk85.rom", 0x0000, 0x2800, CRC(8972d756) SHA1(7b961a1733fc047eb682150a32e17bca10a018d2))
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "tk85.rom", 0x0000, 0x2800, CRC(8972d756) SHA1(7b961a1733fc047eb682150a32e17bca10a018d2) )
 ROM_END
 /* System Configuration */
 
@@ -544,13 +543,13 @@ SYSTEM_CONFIG_END
 
 /* Game Drivers */
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG  COMPANY                     FULLNAME                                        FLAGS */
-COMP( 1980, zx80,       0,      0,      zx80,       zx80,       zx,     zx80,    "Sinclair Research",        "ZX-80",                                        0 )
-COMP( 1981, zx81,       0,      0,      zx81,       zx81,       zx,     zx81,    "Sinclair Research",        "ZX-81",                                        0 )
-COMP( 1982, ts1000,     zx81,   0,      ts1000,     zx81,       zx,     zx81,    "Timex Sinclair",           "Timex Sinclair 1000",                          0 )
-COMP( 1983, ts1500,     zx81,   0,      ts1000,     zx81,       zx,     zx81,    "Timex Sinclair",           "Timex Sinclair 1500",                          GAME_NOT_WORKING )
-COMP( 1983, ringo470,   zx81,   0,      ts1000,     zx81,       zx,     zx81,    "Ritas do Brasil Ltda",     "Ringo 470",                          			 GAME_NOT_WORKING )
-COMP( 1984, pc8300,     zx81,   0,      pc8300,     pc8300,     zx,     pc8300,  "Your Computer",            "PC8300",                                       0 )
-COMP( 1983, pow3000,    zx81,   0,      pow3000,    pow3000,    zx,     pow3000, "Creon Enterprises",        "Power 3000",                                   0 )
-COMP( 1982, lambda,     zx81,   0,      pow3000,    pow3000,    zx,     pow3000, "Lambda Electronics Ltd",   "Lambda 8300",                                  0 )
-COMP( 1983, tk85,     	zx81,   0,      ts1000,     zx81,       zx,     zx81,    "Microdigital",             "TK85",                         				 GAME_NOT_WORKING )
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    CONFIG  COMPANY                     FULLNAME                FLAGS */
+COMP( 1980, zx80,       0,      0,      zx80,       zx80,       zx,     zx80,    "Sinclair Research",        "ZX-80",               0 )
+COMP( 1981, zx81,       0,      0,      zx81,       zx81,       zx,     zx81,    "Sinclair Research",        "ZX-81",               0 )
+COMP( 1982, ts1000,     zx81,   0,      ts1000,     zx81,       zx,     zx81,    "Timex Sinclair",           "Timex Sinclair 1000", 0 )
+COMP( 1983, ts1500,     zx81,   0,      ts1000,     zx81,       zx,     pc8300,  "Timex Sinclair",           "Timex Sinclair 1500", 0 )
+COMP( 1983, tk85,     	zx81,   0,      ts1000,     zx81,       zx,     zx81,    "Microdigital",             "TK85",                0 )
+COMP( 1983, ringo470,   zx81,   0,      ts1000,     zx81,       zx,     zx81,    "Ritas do Brasil Ltda",     "Ringo 470", GAME_NOT_WORKING )
+COMP( 1984, pc8300,     zx81,   0,      pc8300,     pc8300,     zx,     pc8300,  "Your Computer",            "PC8300",              0 )
+COMP( 1983, pow3000,    zx81,   0,      pow3000,    pow3000,    zx,     pow3000, "Creon Enterprises",        "Power 3000",          0 )
+COMP( 1982, lambda,     zx81,   0,      pow3000,    pow3000,    zx,     pow3000, "Lambda Electronics Ltd",   "Lambda 8300",         0 )
