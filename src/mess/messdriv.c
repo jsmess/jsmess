@@ -53,6 +53,7 @@ const game_driver * const drivers[] =
 
 	/* NINTENDO */
 	DRIVER( nes )		/* Nintendo Entertainment System					*/
+	DRIVER( dendy )		/* Dendy Classic russian famiclone					*/
 	DRIVER( nespal )	/* Nintendo Entertainment System					*/
 	DRIVER( famicom )
 	DRIVER( famitwin )	/* Sharp Famicom Twin System						*/

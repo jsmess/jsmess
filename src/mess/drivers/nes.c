@@ -8,6 +8,9 @@
   Based in part on the old xNes code, by Nicolas Hamel, Chuck Mason, Brad Oliver,
   Richard Bannister and Jeff Mitchell.
 
+  Todo: Famicom driver has hardcoded famicom disk-system, needs removing and 
+        adding as it's own driver.
+
 ***************************************************************************/
 
 #include "driver.h"
@@ -214,6 +217,17 @@ ROM_START( famitwin )
 	ROM_FILL( 0x0000, 0x10000, 0x00 )
 ROM_END
 
+ROM_START( dendy )
+    ROM_REGION( 0x10000, "maincpu",0 )  /* Main RAM + program banks */
+	ROM_FILL( 0x0000, 0x10000, 0x00 )
+    ROM_REGION( 0x2000,  "gfx1",0 )  /* VROM */
+	ROM_FILL( 0x0000, 0x2000, 0x00 )
+    ROM_REGION( 0x2000,  "gfx2",0 )  /* VRAM */
+	ROM_FILL( 0x0000, 0x2000, 0x00 )
+    ROM_REGION( 0x10000, "user1",0 ) /* WRAM */
+	ROM_FILL( 0x0000, 0x10000, 0x00 )
+ROM_END
+
 
 static void ppu_nmi(const device_config *device, int *ppu_regs)
 {
@@ -294,6 +308,27 @@ static MACHINE_DRIVER_START( nespal )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( dendy )
+	MDRV_IMPORT_FROM( nes )
+
+	/* basic machine hardware */
+	MDRV_CPU_REPLACE("maincpu", N2A03, 26601712/15) /* 26.601712MHz / 15 == 1.77344746666... MHz */
+
+	MDRV_DEVICE_REMOVE( "ppu" )
+	MDRV_PPU2C07_ADD( "ppu", nes_ppu_interface )
+
+	/* video hardware */
+	MDRV_SCREEN_MODIFY("screen")
+	MDRV_SCREEN_REFRESH_RATE(50.00697796827)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((106.53/(PAL_CLOCK/1000000)) * (PPU_VBLANK_LAST_SCANLINE_PAL-PPU_VBLANK_FIRST_SCANLINE+1+2)))
+	MDRV_VIDEO_START(nes_pal)
+
+    /* sound hardware */
+	MDRV_SOUND_REPLACE("nessound", NES, 26601712/15) /* 26.601712MHz / 15 == 1.77344746666... MHz */
+	MDRV_SOUND_CONFIG(nes_apu_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+MACHINE_DRIVER_END
+
 static MACHINE_DRIVER_START( famicom )
 	MDRV_IMPORT_FROM( nes )
 	
@@ -336,8 +371,10 @@ SYSTEM_CONFIG_END
 
 ***************************************************************************/
 
-/*     YEAR  NAME      PARENT    COMPAT MACHINE   INPUT     INIT      CONFIG    COMPANY   FULLNAME */
-CONS( 1983, famicom,   0,        0,		famicom,  famicom,  0,	      famicom,	"Nintendo",	"Famicom" , GAME_NOT_WORKING)
-CONS( 1986, famitwin,  famicom,  0,		famicom,  famicom,  0,	      famicom,	"Sharp",	"Famicom Twin" , GAME_NOT_WORKING)
-CONS( 1985, nes,       0,        0,		nes,      nes,      0,        0,		"Nintendo",	"Nintendo Entertainment System (NTSC)" , GAME_NOT_WORKING)
-CONS( 1987, nespal,    nes,      0,		nespal,   nes,      0,	      0,		"Nintendo",	"Nintendo Entertainment System (PAL)" , GAME_NOT_WORKING)
+/*     YEAR  NAME      PARENT    COMPAT MACHINE   INPUT     INIT      CONFIG    COMPANY   	FULLNAME */
+CONS( 1983, famicom,   0,        0,	famicom,  famicom,  0,	      famicom,	"Nintendo",	"Famicom" , GAME_NOT_WORKING)
+CONS( 1986, famitwin,  famicom,  0,	famicom,  famicom,  0,	      famicom,	"Sharp",	"Famicom Twin" , GAME_NOT_WORKING)
+CONS( 1985, nes,       famicom,  0,	nes,      nes,      0,        0,	"Nintendo",	"Nintendo Entertainment System (NTSC)" , GAME_NOT_WORKING)
+CONS( 1987, nespal,    famicom,  0,	nespal,   nes,      0,	      0,	"Nintendo",	"Nintendo Entertainment System (PAL)" , GAME_NOT_WORKING)
+CONS( 199?, dendy,     famicom,  0,	dendy,    nes,      0,        0,	"Steepler",	"Dendy Classic" , GAME_NOT_WORKING)
+
