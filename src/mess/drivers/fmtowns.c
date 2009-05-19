@@ -28,14 +28,252 @@
 #include "sound/2612intf.h"
 #include "sound/rf5c68.h"
 
+/* System ports
+ * 
+ * 0x0020 RW: bit 0 = soft reset (read/write), bit 6 = power off (write), bit 7 = NMI vector protect
+ * 0x0022  W: bit 7 = power off (write)
+ * 0x0025 R : returns 0x00? (read)
+ * 0x0026 R : timer?
+ * 0x0028 RW: bit 0 = NMI mask (read/write)
+ * 0x0030 R : Machine ID (low)
+ * 0x0031 R : Machine ID (high)
+ * 0x0032 RW: bit 7 = RESET, bit 6 = CLK (serial?)
+ * 0x006c RW: returns 0x00? (read) timer? (write)
+ * 0x0480 RW: bit 1 = some sort of RAM switch?
+ * 0x05e8 R : RAM size in MB
+ * 0x05ec RW: bit 0 = compatibility mode?
+ */
+static READ8_HANDLER(towns_system_r)
+{
+	switch(offset)
+	{
+		case 0x00:
+			logerror("SYS: port 0x20 read\n");
+			return 0x00;
+		case 0x05:
+			logerror("SYS: port 0x25 read\n");
+			return 0x00;
+		case 0x06:
+			logerror("SYS: (0x26) timer read\n");
+			return 0x00;
+		case 0x08:
+			logerror("SYS: (0x28) NMI mask read\n");
+			return 0x00;
+		case 0x10:
+			logerror("SYS: (0x30) Machine ID read\n");
+			return 0x01;
+		case 0x11:
+			logerror("SYS: (0x31) Machine ID read\n");
+			return 0x01;
+		case 0x12:
+			logerror("SYS: (0x32) Serial(?) read\n");
+			return 0x00;
+		default:
+			logerror("SYS: Unknown system port read (0x%02x)\n",offset);
+			return 0x00;
+	}
+}
+
+static WRITE8_HANDLER(towns_system_w)
+{
+	switch(offset)
+	{
+		case 0x00:
+			logerror("SYS: port 0x20 write %02x\n",data);
+			break;
+		case 0x02:
+			logerror("SYS: (0x22) power port write %02x\n",data);
+			break;
+		case 0x08:
+			logerror("SYS: (0x28) NMI mask write %02x\n",data);
+			break;
+		case 0x12:
+			logerror("SYS: (0x32) Serial(?) write %02x\n",data);
+			break;
+		default:
+			logerror("SYS: Unknown system port write 0x%02x (0x%02x)\n",data,offset);
+	}
+}
+
+static READ8_HANDLER(towns_sys6c_r)
+{
+	logerror("SYS: (0x6c) Timer? read\n");
+	return 0x00;
+}
+
+static WRITE8_HANDLER(towns_sys6c_w)
+{
+	logerror("SYS: (0x6c) write to timer (0x%02x)\n",data);
+}
+
+static READ8_HANDLER(towns_dma1_r)
+{
+	logerror("DMA#1: read register %i\n",offset);
+	return 0x00;
+}
+
+static WRITE8_HANDLER(towns_dma1_w)
+{
+	logerror("DMA#1: wrote 0x%02x to register %i\n",data,offset);
+}
+
+static READ8_HANDLER(towns_dma2_r)
+{
+	logerror("DMA#2: read register %i\n",offset);
+	return 0x00;
+}
+
+static WRITE8_HANDLER(towns_dma2_w)
+{
+	logerror("DMA#2: wrote 0x%02x to register %i\n",data,offset);
+}
+
+static READ8_DEVICE_HANDLER(towns_fm_r)
+{
+	logerror("FM: read status port %i\n",offset);
+	return 0x00;
+}
+
+static WRITE8_DEVICE_HANDLER(towns_fm_w)
+{
+	switch(offset)
+	{
+		case 0x00:
+			logerror("FM: wrote %02x to FM control port A\n",data);
+			break;
+		case 0x02:
+			logerror("FM: wrote %02x to FM data port A\n",data);
+			break;
+		case 0x04:
+			logerror("FM: wrote %02x to FM control port B\n",data);
+			break;
+		case 0x06:
+			logerror("FM: wrote %02x to FM data port B\n",data);
+			break;
+		default:
+			logerror("FM: unknown port write (%02x -> 0x%04x)\n",data,offset+0x4d8);
+	}
+}
+
+static READ8_DEVICE_HANDLER(towns_pcm_r)
+{
+	logerror("PCM: read register %i\n",offset);
+	return 0x00;
+}
+
+static WRITE8_DEVICE_HANDLER(towns_pcm_w)
+{
+	logerror("PCM: wrote 0x%02x to register %i\n",data,offset);
+}
+
+static READ8_HANDLER(towns_floppy_r)
+{
+	logerror("PCM: read register %i\n",offset);
+	return 0x00;
+}
+
+static WRITE8_HANDLER(towns_floppy_w)
+{
+	logerror("PCM: wrote 0x%02x to register %i\n",data,offset);
+}
+
+static READ8_HANDLER(towns_video_440_r)
+{
+	logerror("VID: read port %04x\n",offset+0x440);
+	return 0x00;
+}
+
+static WRITE8_HANDLER(towns_video_440_w)
+{
+	logerror("VID: wrote 0x%02x to port %04x\n",data,offset+0x440);
+}
+
+static READ8_HANDLER(towns_video_5c8_r)
+{
+	logerror("VID: read port %04x\n",offset+0x5c8);
+	return 0x00;
+}
+
+static WRITE8_HANDLER(towns_video_5c8_w)
+{
+	logerror("VID: wrote 0x%02x to port %04x\n",data,offset+0x5c8);
+}
+
+static READ8_HANDLER(towns_video_fd90_r)
+{
+	logerror("VID: read port %04x\n",offset+0xfd90);
+	return 0x00;
+}
+
+static WRITE8_HANDLER(towns_video_fd90_w)
+{
+	logerror("VID: wrote 0x%02x to port %04x\n",data,offset+0xfd90);
+}
+
+static READ8_HANDLER(towns_video_ff81_r)
+{
+	logerror("VID: read port ff81\n");
+	return 0x00;
+}
+
+static WRITE8_HANDLER(towns_video_ff81_w)
+{
+	logerror("VID: wrote 0x%02x to port ff81\n",data);
+}
+
+static READ32_HANDLER(towns_sys5e8_r)
+{
+	switch(offset)
+	{
+		case 0x00:
+			if(ACCESSING_BITS_0_7)
+			{
+				logerror("SYS: read RAM size port\n");
+				return 0x06;  // 6MB is standard for the Marty
+			}
+			break;
+		case 0x01:
+			if(ACCESSING_BITS_0_7)
+			{
+				logerror("SYS: read port 5ec\n");
+				return 0x00;
+			}
+			break;
+	}
+	return 0x00;
+}
+
+static WRITE32_HANDLER(towns_sys5e8_w)
+{
+	switch(offset)
+	{
+		case 0x00:
+			if(ACCESSING_BITS_0_7)
+			{
+				logerror("SYS: wrote 0x%02x to port 5e8\n",data);
+			}
+			break;
+		case 0x01:
+			if(ACCESSING_BITS_0_7)
+			{
+				logerror("SYS: wrote 0x%02x to port 5ec\n",data);
+			}
+			break;
+	}
+}
+
 static ADDRESS_MAP_START(towns_mem, ADDRESS_SPACE_PROGRAM, 32)
   // memory map based on FM-Towns/Bochs (Bochs modified to emulate the FM-Towns)
   // may not be (and probably is not) correct
-  AM_RANGE(0x000c0000, 0x000c7fff) AM_NOP  // GVRAM
-  AM_RANGE(0x000c8000, 0x000cffff) AM_NOP  // TVRAM
+  AM_RANGE(0x00000000, 0x000bffff) AM_RAM
+  AM_RANGE(0x000c0000, 0x000c7fff) AM_RAM  // GVRAM
+  AM_RANGE(0x000c8000, 0x000cffff) AM_RAM  // TVRAM
   AM_RANGE(0x000d0000, 0x000d7fff) AM_ROM AM_REGION("user",0x100000)  // DIC ROM
-  AM_RANGE(0x000d8000, 0x000d9fff) AM_NOP  // CMOS RAM
+  AM_RANGE(0x000d8000, 0x000d9fff) AM_RAM  // CMOS RAM
+  AM_RANGE(0x000da000, 0x000effff) AM_RAM
+  AM_RANGE(0x000f0000, 0x000f7fff) AM_RAM
   AM_RANGE(0x000f8000, 0x000fffff) AM_ROM AM_REGION("user",0x238000)  // BOOT (SYSTEM) ROM
+  AM_RANGE(0x00100000, 0x001fffff) AM_RAM  // some extra RAM - seems to be needed to boot
   AM_RANGE(0x80000000, 0x8007ffff) AM_NOP  // VRAM
   AM_RANGE(0x80100000, 0x8017ffff) AM_NOP  // VRAM (mirror? second page?)
   AM_RANGE(0x81000000, 0x8101ffff) AM_NOP  // Sprite RAM
@@ -51,35 +289,37 @@ static ADDRESS_MAP_START( towns_io , ADDRESS_SPACE_IO, 32)
   // I/O ports derived from FM Towns/Bochs, these are specific to the FM Towns
   // Some common PC ports are likely to also be used
   // System ports
-  AM_RANGE(0x0020,0x0033) AM_NOP  // R/W
-  AM_RANGE(0x006c,0x006f) AM_NOP  // R/W (0x6c)
+  AM_RANGE(0x0020,0x0033) AM_READWRITE8(towns_system_r,towns_system_w, 0xffffffff)
+  AM_RANGE(0x006c,0x006f) AM_READWRITE8(towns_sys6c_r,towns_sys6c_w, 0x000000ff)
   // DMA controllers (uPD71071?)
-  AM_RANGE(0x00a0,0x00af) AM_NOP
-  AM_RANGE(0x00b0,0x00bf) AM_NOP
+  AM_RANGE(0x00a0,0x00af) AM_READWRITE8(towns_dma1_r, towns_dma1_w, 0xffffffff)
+  AM_RANGE(0x00b0,0x00bf) AM_READWRITE8(towns_dma2_r, towns_dma2_w, 0xffffffff)
   // Floppy controller
-  AM_RANGE(0x0200,0x020f) AM_NOP  // all R/W
+  AM_RANGE(0x0200,0x020f) AM_READWRITE8(towns_floppy_r, towns_floppy_w, 0xffffffff)
   // CRTC / Video
   AM_RANGE(0x0400,0x0403) AM_NOP  // R/O (0x400)
   AM_RANGE(0x0404,0x0407) AM_NOP  // R/W (0x404)
-  AM_RANGE(0x0440,0x045f) AM_NOP
+  AM_RANGE(0x0440,0x045f) AM_READWRITE8(towns_video_440_r, towns_video_440_w, 0xffffffff)
   // System port
   AM_RANGE(0x0480,0x0483) AM_NOP  // R/W (0x480)
   // CD-ROM
   AM_RANGE(0x04c0,0x04cf) AM_NOP
   // Sound (YM3438 [FM], RF5c68 [PCM])
   AM_RANGE(0x04d4,0x04d7) AM_NOP  // R/W  -- (0x4d5) mute?
-  AM_RANGE(0x04d8,0x04db) AM_NOP  // R/W  -- (0x4d8) YM control port A / status port A
-                                  // R/W  -- (0x4da) YM data port A / status port A
-  AM_RANGE(0x04dc,0x04df) AM_NOP  // R/W  -- (0x4dc) YM control port B / status port A
-                                  // R/W  -- (0x4de) YM data port B / status port A
+  AM_RANGE(0x04d8,0x04df) AM_DEVREADWRITE8("fm",towns_fm_r,towns_fm_w,0x00ff00ff)
   AM_RANGE(0x04e0,0x04e3) AM_NOP  // R/W  -- volume ports
   AM_RANGE(0x04e8,0x04ef) AM_NOP  // R/O  -- (0x4e9) FM IRQ flag (bit 0), PCM IRQ flag (bit 3)
                                   // (0x4ea) PCM IRQ mask
                                   // R/W  -- (0x4eb) PCM IRQ flag
                                   // W/O  -- (0x4ec) LED control
-  AM_RANGE(0x04f0,0x04fb) AM_NOP  // W/O  -- (0x4f0-0x4f8) PCM registers
+  AM_RANGE(0x04f0,0x04fb) AM_DEVREADWRITE8("pcm",towns_pcm_r,towns_pcm_w,0xffffffff)
+  // CRTC / Video
+  AM_RANGE(0x05c8,0x05cb) AM_READWRITE8(towns_video_5c8_r, towns_video_5c8_w, 0x00ff00ff)
   // System ports
-  AM_RANGE(0x05e8,0x05ef) AM_NOP  // R/O (0x5e8, 0x5ec)
+  AM_RANGE(0x05e8,0x05ef) AM_READWRITE(towns_sys5e8_r, towns_sys5e8_w)
+  // CRTC / Video (again)
+  AM_RANGE(0xfd90,0xfda3) AM_READWRITE8(towns_video_fd90_r, towns_video_fd90_w, 0xffffffff)
+  AM_RANGE(0xff80,0xff83) AM_READWRITE8(towns_video_ff81_r, towns_video_ff81_w, 0x0000ff00)
 
 ADDRESS_MAP_END
 
