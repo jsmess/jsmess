@@ -1051,6 +1051,7 @@ const game_driver * const drivers[] =
 	DRIVER( bk0010 )
 	DRIVER( bk001001 )
 	DRIVER( bk0010fd )
+	DRIVER( bk0011m )
 
 	/* Bashkiria-2M */
 	DRIVER( b2m )

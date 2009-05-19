@@ -75,7 +75,8 @@ Skeleton drivers :
 - Philips VG-8000
 - Philips VG-8010
 - Philips VG-8010F
-
+- Olivetti M-20
+- BK-0011M
 
 System Driver Changes:
 ----------------------
