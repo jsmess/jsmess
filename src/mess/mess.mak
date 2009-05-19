@@ -1341,7 +1341,7 @@ $(MESSOBJ)/tec1.a: \
 	$(MESS_DRIVERS)/tec1.o \
 
 $(MESSOBJ)/olivetti.a: \
-	$(MESS_DRIVERS)/m20.o \	
+	$(MESS_DRIVERS)/m20.o \
 
 $(MESSOBJ)/kyocera.a: \
 	$(MESS_DRIVERS)/kyocera.o \
