@@ -20,6 +20,7 @@
 		* Olivetti M10 Modem (US) (diff BIOS than the European version)
 		* NEC PC-8201 (original Japanese version of PC-8201A)
 		* NEC PC-8300 (similar hardware to PC-8201)
+		* NEC PC-8300 w/BradyWriter II ROMs
 
 ******************************************************************************************/
 
@@ -32,7 +33,7 @@
 	- soft power on/off
 	- IM6042 UART
 	- pc8201 48K RAM option
-	- pc8201 video interface
+	- pc8201 NEC PC-8241A video interface (TMS9918, 16K videoRAM, 8K ROM)
 	- pc8201 128K ROM cartridge
 	- pc8201 NEC PC-8233 floppy controller
 	- pc8201 NEC floppy disc drives (PC-8031-1W, PC-8031-2W, PC-80S31)
@@ -361,7 +362,7 @@ static WRITE8_HANDLER( kc85_ctrl_w )
 	upd1990a_stb_w(state->upd1990a, BIT(data, 2));
 
 	/* cassette motor */
-	cassette_change_state(cassette_device_image(space->machine), BIT(data, 3) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+	cassette_change_state(cassette_device_image(space->machine), BIT(data, 3) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
 static UINT8 read_keyboard(running_machine *machine, UINT16 keylatch)
@@ -1295,6 +1296,7 @@ static MACHINE_DRIVER_START( kc85 )
 	/* devices */
 	MDRV_PIO8155_ADD(PIO8155_TAG, XTAL_4_9152MHz/2, kc85_8155_intf)
 	MDRV_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, kc85_upd1990a_intf)
+//	MDRV_MC14412_ADD(MC14412_TAG, XTAL_1MHz)
 
 	/* printer */
 	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
@@ -1364,18 +1366,18 @@ static MACHINE_DRIVER_START( tandy200 )
 	MDRV_IMPORT_FROM(tandy200_video)
 
 	/* TP timer */
-	MDRV_TIMER_ADD_PERIODIC("tp", tandy200_tp_tick, USEC(3300)) // 3.3 ms
+	MDRV_TIMER_ADD_PERIODIC("tp", tandy200_tp_tick, HZ(XTAL_4_9152MHz/2/8192))
 
 	/* sound hardware */
-//	MDRV_TCM5089_ADD(TCM5089_TAG, XTAL_3_579545MHz)
-
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+//	MDRV_TCM5089_ADD(TCM5089_TAG, XTAL_3_579545MHz)
 
 	/* devices */
 	MDRV_PIO8155_ADD(PIO8155_TAG, XTAL_4_9152MHz/2, tandy200_8155_intf)
 	MDRV_RP5C01A_ADD(RP5C01A_TAG, XTAL_32_768kHz, tandy200_rp5c01a_intf)
+//	MDRV_MC14412_ADD(MC14412_TAG, XTAL_1MHz)
 
 	/* printer */
 	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
@@ -1408,16 +1410,24 @@ ROM_START( npc8201a )
 ROM_END
 
 ROM_START( trsm100 )
+	/*
+		Board Code	ROM type			ROM Code			Comment
+		-------------------------------------------------------------------
+		PLX110CH1X	custom				LH535618			early North America
+		PLX110EH1X	27C256 compatible	3256C07-3J1/11US	late North America
+		PLX120CH1X	27C256 compatible	3256C05-3E1/11EP	European/Italian
+	*/
 	ROM_REGION( 0x8000, I8085_TAG, 0 )
-	ROM_LOAD( "m100rom.bin",  0x0000, 0x8000, CRC(730a3611) SHA1(094dbc4ac5a4ea5cdf51a1ac581a40a9622bb25d) )
+	ROM_LOAD( "m100rom.m12",  0x0000, 0x8000, CRC(730a3611) SHA1(094dbc4ac5a4ea5cdf51a1ac581a40a9622bb25d) )
 
 	ROM_REGION( 0x8000, "option", ROMREGION_ERASEFF )
 	ROM_CART_LOAD("cart", 0x0000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START( olivm10 )
+	// 3256C02-4B3/I		Italian
 	ROM_REGION( 0x8010, I8085_TAG, 0 )
-	ROM_LOAD( "m10rom.bin", 0x0000, 0x8010, CRC(0be02b58) SHA1(56f2087a658efd0323663d15afcd4f5f27c68664) )
+	ROM_LOAD( "m10rom.m12", 0x0000, 0x8000, CRC(f0e8447a) SHA1(d58867276213116a79f7074109b7d7ce02e8a3af) )
 
 	ROM_REGION( 0x8000, "option", ROMREGION_ERASEFF )
 	ROM_CART_LOAD("cart", 0x0000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
@@ -1425,7 +1435,7 @@ ROM_END
 
 ROM_START( tandy102 )
 	ROM_REGION( 0x8000, I8085_TAG, 0 )
-	ROM_LOAD( "m102rom.bin", 0x0000, 0x8000, CRC(08e9f89c) SHA1(b6ede7735a361c80419f4c9c0e36e7d480c36d11) )
+	ROM_LOAD( "m102rom.m12", 0x0000, 0x8000, CRC(08e9f89c) SHA1(b6ede7735a361c80419f4c9c0e36e7d480c36d11) )
 
 	ROM_REGION( 0x8000, "option", ROMREGION_ERASEFF )
 	ROM_CART_LOAD("cart", 0x0000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
@@ -1433,6 +1443,9 @@ ROM_END
 
 ROM_START( tandy200 )
 	ROM_REGION( 0x18000, I8085_TAG, 0 )
+	ROM_LOAD( "rom #1-1.m15", 0x00000, 0x8000, NO_DUMP )
+	ROM_LOAD( "rom #1-2.m13", 0x08000, 0x2000, NO_DUMP )
+	ROM_LOAD( "rom #2.m14",	  0x10000, 0x8000, NO_DUMP )
 	ROM_LOAD( "t200rom.bin", 0x0000, 0xa000, BAD_DUMP CRC(e3358b38) SHA1(35d4e6a5fb8fc584419f57ec12b423f6021c0991) ) /* Y2K hacked */
 	ROM_CONTINUE(			0x10000, 0x8000 )
 
