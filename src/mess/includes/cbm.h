@@ -53,7 +53,7 @@ QUICKLOAD_LOAD( cbm_c65 );
 #define CBM_ROM_ADDR_HI -2
 
 typedef struct {
-	int addr, size /*, bank*/;	// mi serve prob questo per implementare il corretto caricamento delle cart tipo >0!
+	int addr, size, index, start;
 	UINT8 *chip;
 } CBM_ROM;
 

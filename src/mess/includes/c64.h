@@ -38,6 +38,7 @@ DRIVER_INIT( c64gs );
 DRIVER_INIT( sx64 );
 
 MACHINE_START( c64 );
+MACHINE_RESET( c64 );
 INTERRUPT_GEN( c64_frame_interrupt );
 TIMER_CALLBACK( c64_tape_timer );
 

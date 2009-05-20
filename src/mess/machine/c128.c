@@ -1137,7 +1137,7 @@ DRIVER_INIT( c128 )
 {
 	c64_tape_on = 1;
 	c128_common_driver_init(machine);
-	vic6567_init (1, c64_pal, c128_dma_read, c128_dma_read_color, c128_vic_interrupt);
+	vic6567_init(1, c64_pal, c128_dma_read, c128_dma_read_color, c128_vic_interrupt);
 	vic2_set_rastering(0);
 	vdc8563_init(0);
 	vdc8563_set_rastering(1);
@@ -1148,7 +1148,7 @@ DRIVER_INIT( c128pal )
 	c64_tape_on = 1;
 	c64_pal = 1;
 	c128_common_driver_init(machine);
-	vic6567_init (1, c64_pal, c128_dma_read, c128_dma_read_color, c128_vic_interrupt);
+	vic6567_init(1, c64_pal, c128_dma_read, c128_dma_read_color, c128_vic_interrupt);
 	vic2_set_rastering(1);
 	vdc8563_init(0);
 	vdc8563_set_rastering(0);
@@ -1157,13 +1157,13 @@ DRIVER_INIT( c128pal )
 DRIVER_INIT( c128d )
 {
 	DRIVER_INIT_CALL( c128 );
-//	drive_config (machine, type_1541, 0, 0, 1, 8);
+	drive_config(machine, type_1541, 0, 0, "cpu_vc1540", 8);
 }
 
 DRIVER_INIT( c128dpal )
 {
 	DRIVER_INIT_CALL( c128d );
-//	drive_config (machine, type_1541, 0, 0, 1, 8);
+	drive_config(machine, type_1541, 0, 0, "cpu_vc1540", 8);
 }
 
 MACHINE_START( c128 )
@@ -1171,9 +1171,9 @@ MACHINE_START( c128 )
 	if (c128_cia1_on)
 	{
 		cbm_serial_config(machine, &cbm_sim_drive_interface);
-		cbm_serial_reset_write (machine, 0);
-		cbm_drive_0_config (SERIAL, 8);
-		cbm_drive_1_config (SERIAL, 9);
+		cbm_serial_reset_write(machine, 0);
+		cbm_drive_0_config(SERIAL, 8);
+		cbm_drive_1_config(SERIAL, 9);
 		serial_clock = serial_data = serial_atn = 1;
 	}
 

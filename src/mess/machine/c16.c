@@ -457,17 +457,17 @@ static void c16_common_driver_init (running_machine *machine)
 	memset(mess_ram + (0xfd40 % mess_ram_size), 0xff, 0x20);
 	
 	if (has_c1551)		/* C1551 */
-		drive_config(machine, type_1551, 0, 0, 1, 8);
+		drive_config(machine, type_1551, 0, 0, "cpu_c1551", 8);
 
 	if (has_vc1541)		/* VC1541 */
-		drive_config(machine, type_1541, 0, 0, 1, 8);
+		drive_config(machine, type_1541, 0, 0, "cpu_vc1540", 8);
 }
 
 static void c16_driver_init(running_machine *machine)
 {
-	c16_common_driver_init (machine);
-	ted7360_init (machine, (read_cfg1(machine) & 0x10 ) == 0x00);		/* is it PAL? */
-	ted7360_set_dma (ted7360_dma_read, ted7360_dma_read_rom);
+	c16_common_driver_init(machine);
+	ted7360_init(machine, (read_cfg1(machine) & 0x10 ) == 0x00);		/* is it PAL? */
+	ted7360_set_dma(ted7360_dma_read, ted7360_dma_read_rom);
 }
 
 

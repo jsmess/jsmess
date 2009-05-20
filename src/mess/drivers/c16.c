@@ -449,10 +449,6 @@ static MACHINE_DRIVER_START( c16 )
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", cbm_cassette_config )
 
-	/* via */
-	MDRV_VIA6522_ADD("via6522_2", 0, vc1541_via2)
-	MDRV_VIA6522_ADD("via6522_3", 0, vc1541_via3)
-
 	/* tpi */
 	MDRV_TPI6525_ADD("tpi6535_tpi_2", c16_tpi6525_tpi_2_intf)
 	MDRV_TPI6525_ADD("tpi6535_tpi_3", c16_tpi6525_tpi_3_intf)
@@ -464,9 +460,14 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( c16c )
 	MDRV_IMPORT_FROM( c16 )
 
-	// Need to check this since c16c is only using tpi_2
-	//MDRV_TPI6525_REMOVE("tpi6535_tpi_2")
-	//MDRV_TPI6525_ADD("tpi6535_tpi_2", c16_tpi6525_tpi_2_c1551_intf)
+	/* c16c uses 'real' floppy drive emulation from machine/vc1541.c... 
+	still in progress and slow as hell, atm */
+	/* by default, it is also disabled atm => no floppies for c16c. it will be fixed */
+	MDRV_TPI6525_REMOVE("tpi6535_tpi_2")
+	MDRV_TPI6525_ADD("tpi6535_tpi_2", c16_tpi6525_tpi_2_c1551_intf)
+
+	/* emulation code currently supports only one drive */
+	MDRV_TPI6525_REMOVE("tpi6535_tpi_3")
 
 	MDRV_IMPORT_FROM( cpu_c1551 )
 #ifdef CPU_SYNC
@@ -485,6 +486,10 @@ static MACHINE_DRIVER_START( c16v )
 #else
 	MDRV_QUANTUM_TIME(HZ(300000))
 #endif
+
+	/* no c1551 in this driver */
+	MDRV_TPI6525_REMOVE("tpi6535_tpi_2")
+	MDRV_TPI6525_REMOVE("tpi6535_tpi_3")
 MACHINE_DRIVER_END
 
 
@@ -502,7 +507,18 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( plus4c )
 	MDRV_IMPORT_FROM( plus4 )
+
+	/* plus4c uses 'real' floppy drive emulation from machine/vc1541.c... 
+	still in progress and slow as hell, atm */
+	/* by default, it is also disabled atm => no floppies for plus4c. it will be fixed */
+	MDRV_TPI6525_REMOVE("tpi6535_tpi_2")
+	MDRV_TPI6525_ADD("tpi6535_tpi_2", c16_tpi6525_tpi_2_c1551_intf)
+
+	/* emulation code currently supports only one drive */
+	MDRV_TPI6525_REMOVE("tpi6535_tpi_3")
+
 	MDRV_IMPORT_FROM( cpu_c1551 )
+
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 #ifdef CPU_SYNC
@@ -524,6 +540,10 @@ static MACHINE_DRIVER_START( plus4v )
 #else
 	MDRV_QUANTUM_TIME(HZ(300000))
 #endif
+
+	/* no c1551 in this driver */
+	MDRV_TPI6525_REMOVE("tpi6535_tpi_2")
+	MDRV_TPI6525_REMOVE("tpi6535_tpi_3")
 MACHINE_DRIVER_END
 
 

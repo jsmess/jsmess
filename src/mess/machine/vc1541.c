@@ -146,12 +146,12 @@ GCR - http://www.baltissen.org/newhtm/1541c.htm
 
 
 #define VERBOSE_LEVEL 0
-#define DBG_LOG(N,M,A) \
+#define DBG_LOG(MACHINE,N,M,A) \
 	do { \
 		if(VERBOSE_LEVEL >= N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time(machine)), (char*) M ); \
+				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time(MACHINE)), (char*) M ); \
 			logerror A; \
 		} \
 	} while (0)
@@ -184,7 +184,7 @@ to the MESS core floppy code. However, fixing the C64 / Floppy drive
 communications is a priority over the clean up of this part */
 typedef struct
 {
-	int cpunumber;
+	const char *cputag;
 	int type;
 	union {
 		struct {
@@ -297,17 +297,17 @@ static const int d82_sectors_per_track[] =
 
 static const int max_tracks_per_format[] =
 {
-D64_MAX_TRACKS,
-D64_MAX_TRACKS,
-D64_40T_MAX_TRACKS,
-D64_40T_MAX_TRACKS,
-D64_MAX_TRACKS,
-D71_MAX_TRACKS,
-D71_MAX_TRACKS,
-D81_MAX_TRACKS,
-D80_MAX_TRACKS,
-D82_MAX_TRACKS,
-0		/* Still to add support for .g64 */
+	D64_MAX_TRACKS,
+	D64_MAX_TRACKS,
+	D64_40T_MAX_TRACKS,
+	D64_40T_MAX_TRACKS,
+	D64_MAX_TRACKS,
+	D71_MAX_TRACKS,
+	D71_MAX_TRACKS,
+	D81_MAX_TRACKS,
+	D80_MAX_TRACKS,
+	D82_MAX_TRACKS,
+	0		/* Still to add support for .g64 */
 };
 
 static int image_offset[IMAGE_MAX_TRACKS] = { 0 };
@@ -576,18 +576,18 @@ static void gcr_double_2_gcr(UINT8 a, UINT8 b, UINT8 c, UINT8 d, UINT8 *dest)
 
 static ADDRESS_MAP_START( _1541_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE("via6522_2", via_r, via_w)	/* 0 and 1 used in vc20 */
-	AM_RANGE(0x1810, 0x189f) AM_READ(SMH_NOP)				/* for debugger */
-	AM_RANGE(0x1c00, 0x1c0f) AM_DEVREADWRITE("via6522_3", via_r, via_w)
-	AM_RANGE(0x1c10, 0x1c9f) AM_READ(SMH_NOP)				/* for debugger */
+	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE("_1541_via_0", via_r, via_w)	/* 0 and 1 used in vc20 */	// IEC Bus
+//	AM_RANGE(0x1810, 0x189f) AM_READ(SMH_NOP)				/* for debugger */
+	AM_RANGE(0x1c00, 0x1c0f) AM_DEVREADWRITE("_1541_via_1", via_r, via_w)		// Drive
+//	AM_RANGE(0x1c10, 0x1c9f) AM_READ(SMH_NOP)				/* for debugger */
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( dolphin_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE("via6522_2", via_r, via_w)	/* 0 and 1 used in vc20 */
-	AM_RANGE(0x1c00, 0x1c0f) AM_DEVREADWRITE("via6522_3", via_r, via_w)
+	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE("_1541_via_0", via_r, via_w)	/* 0 and 1 used in vc20 */
+	AM_RANGE(0x1c00, 0x1c0f) AM_DEVREADWRITE("_1541_via_1", via_r, via_w)
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -604,9 +604,9 @@ static TIMER_CALLBACK(drive_timer)
 	
 		if (drive->type == type_1541) 
 		{
-			const device_config *via_3 = devtag_get_device(machine, "via6522_3");
+			const device_config *via_3 = devtag_get_device(machine, "_1541_via_1");
 
-			cpu_set_input_line(machine->cpu[drive->cpunumber], M6502_SET_OVERFLOW, 1);
+			cputag_set_input_line(machine, drive->cputag, M6502_SET_OVERFLOW, 1);
 			via_ca1_w(via_3, 0, 1);
 		}
 
@@ -642,8 +642,8 @@ static TIMER_CALLBACK(drive_timer)
 
 	if (drive->type == type_1541) 
 	{
-		const device_config *via_3 = devtag_get_device(machine, "via6522_3");
-		cpu_set_input_line(machine->cpu[drive->cpunumber], M6502_SET_OVERFLOW, 0);
+		const device_config *via_3 = devtag_get_device(machine, "_1541_via_1");
+		cputag_set_input_line(machine, drive->cputag, M6502_SET_OVERFLOW, 0);
 		via_ca1_w(via_3, 0, 0);
 	}
 
@@ -667,14 +667,12 @@ static TIMER_CALLBACK(drive_timer)
  * irq to m6502 irq connected (or with second via irq)
  */
 
-static void vc1541_via0_irq (const device_config *device, int level)
+static void vc1541_via0_irq(const device_config *device, int level)
 {
-	running_machine *machine = device->machine;
-
 	drive->via0irq = level;
-	DBG_LOG(2, "vc1541 via0 irq",("level %d %d\n",drive->via0irq,drive->via1irq));
+	DBG_LOG(device->machine, 2, "vc1541 via0 irq", ("level %d %d\n", drive->via0irq, drive->via1irq));
 
-	cpu_set_input_line (device->machine->cpu[drive->cpunumber], M6502_IRQ_LINE, drive->via1irq || drive->via0irq);
+	cputag_set_input_line(device->machine, drive->cputag, M6502_IRQ_LINE, drive->via1irq || drive->via0irq);
 }
 
 static READ8_DEVICE_HANDLER( vc1541_via0_read_portb )
@@ -709,9 +707,7 @@ static READ8_DEVICE_HANDLER( vc1541_via0_read_portb )
 
 static WRITE8_DEVICE_HANDLER( vc1541_via0_write_portb )
 {
-	running_machine *machine = device->machine;
-
-	DBG_LOG(2, "vc1541 serial write",("%s %s %s\n",
+	DBG_LOG(device->machine, 2, "vc1541 serial write", ("%s %s %s\n",
 									 data & 0x10 ? "ATN"   : "atn",
 									 data & 0x08 ? "CLOCK" : "clock",
 									 data & 0x02 ? "DATA"  : "data"));
@@ -721,15 +717,15 @@ static WRITE8_DEVICE_HANDLER( vc1541_via0_write_portb )
 
 	if ((!(data & 0x02)) != drive->drive.serial.serial_data)
 	{
-		vc1541_serial_data_write (1, drive->drive.serial.serial_data = !(data & 0x02));
+		vc1541_serial_data_write(device->machine, 1, drive->drive.serial.serial_data = !(data & 0x02));
 	}
 
 	if ((!(data & 0x08)) != drive->drive.serial.serial_clock)
 	{
-		vc1541_serial_clock_write (1, drive->drive.serial.serial_clock = !(data & 0x08));
+		vc1541_serial_clock_write(device->machine, 1, drive->drive.serial.serial_clock = !(data & 0x08));
 	}
 
-	vc1541_serial_atn_write (device->machine, 1, drive->drive.serial.serial_atn = 1);
+	vc1541_serial_atn_write(device->machine, 1, drive->drive.serial.serial_atn = 1);
 }
 
 
@@ -763,26 +759,23 @@ static WRITE8_DEVICE_HANDLER( vc1541_via0_write_portb )
 
 static void vc1541_via1_irq (const device_config *device, int level)
 {
-	running_machine *machine = device->machine;
-
 	drive->via1irq = level;
-	DBG_LOG(2, "vc1541 via1 irq", ("level %d %d\n", drive->via0irq, drive->via1irq));
+	DBG_LOG(device->machine, 2, "vc1541 via1 irq", ("level %d %d\n", drive->via0irq, drive->via1irq));
 
-	cpu_set_input_line (machine->cpu[drive->cpunumber], M6502_IRQ_LINE, drive->via1irq || drive->via0irq);
+	cputag_set_input_line(device->machine, drive->cputag, M6502_IRQ_LINE, drive->via1irq || drive->via0irq);
 }
 
 static READ8_DEVICE_HANDLER( vc1541_via1_read_porta )
 {
-	running_machine *machine = device->machine;
 	int data = drive->gcr.data[drive->pos];
-	DBG_LOG(2, "vc1541 drive", ("port a read %.2x\n", data));
+
+	DBG_LOG(device->machine, 2, "vc1541 drive", ("port a read %.2x\n", data));
 	return data;
 }
 
 static WRITE8_DEVICE_HANDLER( vc1541_via1_write_porta )
 {
-	running_machine *machine = device->machine;
-	DBG_LOG(1, "vc1541 drive", ("port a write %.2x\n", data));
+	DBG_LOG(device->machine, 1, "vc1541 drive", ("port a write %.2x\n", data));
 }
 
 static  READ8_DEVICE_HANDLER( vc1541_via1_read_portb )
@@ -806,10 +799,9 @@ static int old = 0;
 
 static WRITE8_DEVICE_HANDLER( vc1541_via1_write_portb )
 {
-	running_machine *machine = device->machine;
 	if (data != old) 
 	{
-		DBG_LOG(1, "vc1541 drive",("%.2x\n", data));
+		DBG_LOG(device->machine, 1, "vc1541 drive",("%.2x\n", data));
 
 		if ((old & 0x03) != (data & 0x03)) 
 		{
@@ -844,7 +836,7 @@ static WRITE8_DEVICE_HANDLER( vc1541_via1_write_portb )
 				break;
 			}
 
-			logerror("Track #: %f\n", drive->track);
+//			logerror("Track #: %f\n", drive->track);
 
 			/* If we have reached the first or last track, we cannot proceed further! */
 			if (drive->track < 1) 
@@ -889,7 +881,7 @@ static WRITE8_DEVICE_HANDLER( vc1541_via1_write_portca2 )
 {
 }
 
-const via6522_interface vc1541_via2 =
+const via6522_interface vc1541_via0 =
 {
 	DEVCB_NULL,								   /*vc1541_via0_read_porta, */
 	DEVCB_HANDLER(vc1541_via0_read_portb),
@@ -904,7 +896,9 @@ const via6522_interface vc1541_via2 =
 	DEVCB_NULL,								   /*via2_write_ca2, */
 	DEVCB_NULL,								   /*via2_write_cb2, */
 	DEVCB_LINE(vc1541_via0_irq)
-}, vc1541_via3 =
+}, 
+
+vc1541_via1 =
 {
 	DEVCB_HANDLER(vc1541_via1_read_porta),
 	DEVCB_HANDLER(vc1541_via1_read_portb),
@@ -922,26 +916,28 @@ const via6522_interface vc1541_via2 =
 };
 
 
-void vc1541_serial_reset_write (int which, int level)
+void vc1541_serial_reset_write( running_machine *machine, int which, int level )
 {
 }
 
-int vc1541_serial_atn_read (int which)
+int vc1541_serial_atn_read( running_machine *machine, int which )
 {
+/* there is no more cpu_getactivecpu! */
 #ifdef CPU_SYNC
 		if (cpu_getactivecpu()==0) cpu_sync();
 #endif
 	return serial.atn[0];
 }
 
-void vc1541_serial_atn_write (running_machine *machine, int which, int level)
+void vc1541_serial_atn_write( running_machine *machine, int which, int level )
 {
-	const device_config *via_2 = devtag_get_device(machine, "via6522_2");
+	const device_config *via_2 = devtag_get_device(machine, "_1541_via_0");
 #if 0
 	int value;
 #endif
 	if (serial.atn[1 + which] != level)
 	{
+/* there is no more cpu_getactivecpu! */
 #ifdef CPU_SYNC
 		if (cpu_getactivecpu()==0) cpu_sync();
 #endif
@@ -952,7 +948,7 @@ void vc1541_serial_atn_write (running_machine *machine, int which, int level)
 			if (serial.atn[0] == level)
 			{
 			#if 0
-				DBG_LOG(1, "vc1541",("%d:%.4x atn %s\n",
+				DBG_LOG(machine, 1, "vc1541",("%d:%.4x atn %s\n",
 									 cpu_getactivecpu (),
 									 activecpu_get_pc(),
 									 serial.atn[0]?"ATN":"atn"));
@@ -973,18 +969,20 @@ void vc1541_serial_atn_write (running_machine *machine, int which, int level)
 	}
 }
 
-int vc1541_serial_data_read (int which)
+int vc1541_serial_data_read( running_machine *machine, int which )
 {
+/* there is no more cpu_getactivecpu! */
 #ifdef CPU_SYNC
 		if (cpu_getactivecpu()==0) cpu_sync();
 #endif
 	return serial.data[0];
 }
 
-void vc1541_serial_data_write (int which, int level)
+void vc1541_serial_data_write( running_machine *machine, int which, int level )
 {
 	if (serial.data[1 + which] != level)
 	{
+/* there is no more cpu_getactivecpu! */
 #ifdef CPU_SYNC
 		if (cpu_getactivecpu()==0) cpu_sync();
 #endif
@@ -995,7 +993,7 @@ void vc1541_serial_data_write (int which, int level)
 			#if 0
 			if (serial.data[0] == level)
 			{
-				DBG_LOG(1, "vc1541",("%d:%.4x data %s\n",
+				DBG_LOG(machine, 1, "vc1541",("%d:%.4x data %s\n",
 									 cpu_getactivecpu (),
 									 activecpu_get_pc(),
 									 serial.data[0]?"DATA":"data"));
@@ -1005,18 +1003,20 @@ void vc1541_serial_data_write (int which, int level)
 	}
 }
 
-int vc1541_serial_clock_read (int which)
+int vc1541_serial_clock_read( running_machine *machine, int which )
 {
+/* there is no more cpu_getactivecpu! */
 #ifdef CPU_SYNC
 		if (cpu_getactivecpu()==0) cpu_sync();
 #endif
 	return serial.clock[0];
 }
 
-void vc1541_serial_clock_write (int which, int level)
+void vc1541_serial_clock_write( running_machine *machine, int which, int level )
 {
 	if (serial.clock[1 + which] != level)
 	{
+/* there is no more cpu_getactivecpu! */
 #ifdef CPU_SYNC
 		if (cpu_getactivecpu()==0) cpu_sync();
 #endif
@@ -1026,7 +1026,7 @@ void vc1541_serial_clock_write (int which, int level)
 			serial.clock[0] = serial.clock[1] && serial.clock[2];
 			if (serial.clock[0] == level)
 			{
-/*				DBG_LOG(1, "vc1541",("%d:%.4x clock %s\n",
+/*				DBG_LOG(machine, 1, "vc1541",("%d:%.4x clock %s\n",
 									 cpu_getactivecpu (),
 									 activecpu_get_pc(),
 									 serial.clock[0]?"CLOCK":"clock"));*/
@@ -1035,12 +1035,12 @@ void vc1541_serial_clock_write (int which, int level)
 	}
 }
 
-int vc1541_serial_request_read (int which)
+int vc1541_serial_request_read( running_machine *machine, int which )
 {
 	return 1;
 }
 
-void vc1541_serial_request_write (int which, int level)
+void vc1541_serial_request_write( running_machine *machine, int which, int level )
 {
 }
 
@@ -1053,9 +1053,9 @@ void vc1541_serial_request_write (int which, int level)
 
 static ADDRESS_MAP_START( _1571_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE("via6522_2", via_r, via_w)  /* 0 and 1 used in vc20 */
+	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE("_1541_via_0", via_r, via_w)  /* 0 and 1 used in vc20 */
 	AM_RANGE(0x1810, 0x189f) AM_READ(SMH_NOP) /* for debugger */
-	AM_RANGE(0x1c00, 0x1c0f) AM_DEVREADWRITE("via6522_3", via_r, via_w)
+	AM_RANGE(0x1c00, 0x1c0f) AM_DEVREADWRITE("_1541_via_1", via_r, via_w)
 	AM_RANGE(0x1c10, 0x1c9f) AM_READ(SMH_NOP) /* for debugger */
 //	AM_RANGE(0x2000, 0x2003) // WD17xx
 //	AM_RANGE(0x4000, 0x400f) // CIA
@@ -1100,7 +1100,7 @@ ADDRESS_MAP_END
  */
 static TIMER_CALLBACK(c1551_irq_timer)
 {
-	cpu_set_input_line(machine->cpu[drive->cpunumber], M6502_IRQ_LINE, ASSERT_LINE);
+	cputag_set_input_line(machine, drive->cputag, M6502_IRQ_LINE, ASSERT_LINE);
 }
 
 /*
@@ -1113,17 +1113,16 @@ static TIMER_CALLBACK(c1551_irq_timer)
   7: input byte ready
  */
 
-static WRITE8_HANDLER ( c1551_port_w )
+static WRITE8_HANDLER( c1551_port_w )
 {
-	running_machine *machine = space->machine;
 	if (offset) 
 	{
-		DBG_LOG(1, "c1551 port",("write %.2x\n", data));
+		DBG_LOG(space->machine, 1, "c1551 port",("write %.2x\n", data));
 		drive->drive.c1551.cpu_port = data;
 
 		if (data != old) 
 		{
-			DBG_LOG(1, "vc1541 drive",("%.2x\n", data));
+			DBG_LOG(space->machine, 1, "vc1541 drive",("%.2x\n", data));
 		
 			if ((old & 0x03) != (data & 0x03)) 
 			{
@@ -1191,13 +1190,12 @@ static WRITE8_HANDLER ( c1551_port_w )
 	else 
 	{
 		drive->drive.c1551.cpu_ddr = data;
-		DBG_LOG(1, "c1551 ddr", ("write %.2x\n", data));
+		DBG_LOG(space->machine, 1, "c1551 ddr", ("write %.2x\n", data));
 	}
 }
 
-static READ8_HANDLER ( c1551_port_r )
+static READ8_HANDLER( c1551_port_r )
 {
-	running_machine *machine = space->machine;
 	int data;
 
 	if (offset) 
@@ -1215,12 +1213,12 @@ static READ8_HANDLER ( c1551_port_r )
 
 		data &= ~drive->drive.c1551.cpu_ddr;
 		data |= drive->drive.c1551.cpu_ddr & drive->drive.c1551.cpu_port;
-		DBG_LOG(3, "c1551 port",("read %.2x\n", data));
+		DBG_LOG(space->machine, 3, "c1551 port",("read %.2x\n", data));
 	} 
 	else 
 	{
 		data = drive->drive.c1551.cpu_ddr;
-		DBG_LOG(3, "c1551 ddr",("read %.2x\n", data));
+		DBG_LOG(space->machine, 3, "c1551 ddr",("read %.2x\n", data));
 	}
 	return data;
 }
@@ -1255,9 +1253,9 @@ static READ8_DEVICE_HANDLER( c1551_port_c_r )
 
 static READ8_DEVICE_HANDLER( c1551_port_b_r )
 {
-	running_machine *machine = device->machine;
 	int data = drive->gcr.data[drive->pos];
-	DBG_LOG(2, "c1551 drive",("port a read %.2x\n", data));
+
+	DBG_LOG(device->machine, 2, "c1551 drive",("port a read %.2x\n", data));
 	return data;
 }
 
@@ -1272,7 +1270,7 @@ ADDRESS_MAP_END
 
 WRITE8_DEVICE_HANDLER( c1551x_write_data )
 {
-//	DBG_LOG(1, "c1551 cpu", ("%d write data %.2x\n", cpu_getactivecpu (), data));
+//	DBG_LOG(device->machine, 1, "c1551 cpu", ("%d write data %.2x\n", cpu_getactivecpu (), data));
 #ifdef CPU_SYNC
 	cpu_sync();
 #endif
@@ -1287,13 +1285,13 @@ READ8_DEVICE_HANDLER( c1551x_read_data )
 #endif
 
 	data = tpi6525_porta_r(device, 0);
-//	DBG_LOG(2, "c1551 cpu",("%d read data %.2x\n", cpu_getactivecpu (), data));
+//	DBG_LOG(device->machine, 2, "c1551 cpu",("%d read data %.2x\n", cpu_getactivecpu (), data));
 	return data;
 }
 
 WRITE8_DEVICE_HANDLER( c1551x_write_handshake )
 {
-//	DBG_LOG(1, "c1551 cpu",("%d write handshake %.2x\n", cpu_getactivecpu (), data));
+//	DBG_LOG(device->machine, 1, "c1551 cpu",("%d write handshake %.2x\n", cpu_getactivecpu (), data));
 #ifdef CPU_SYNC
 	cpu_sync();
 #endif
@@ -1309,7 +1307,7 @@ READ8_DEVICE_HANDLER( c1551x_read_handshake )
 #endif
 
 	data = tpi6525_portc_r(device, 0) & 0x08 ? 0x80 : 0x00;
-//	DBG_LOG(2, "c1551 cpu",("%d read handshake %.2x\n", cpu_getactivecpu (), data));
+//	DBG_LOG(device->machine, 2, "c1551 cpu",("%d read handshake %.2x\n", cpu_getactivecpu (), data));
 	return data;
 }
 
@@ -1321,7 +1319,7 @@ READ8_DEVICE_HANDLER( c1551x_read_status )
 #endif
 
 	data = tpi6525_portc_r(device, 0) & 0x03;
-//	DBG_LOG(1, "c1551 cpu",("%d read status %.2x\n", cpu_getactivecpu (), data));
+//	DBG_LOG(device->machine, 1, "c1551 cpu",("%d read status %.2x\n", cpu_getactivecpu (), data));
 
 	return data;
 }
@@ -1333,10 +1331,10 @@ READ8_DEVICE_HANDLER( c1551x_read_status )
 
 **************************************/
 
-int drive_config (running_machine *machine, int type, int id, int mode, int cpunr, int devicenr)
+int drive_config( running_machine *machine, int type, int id, int mode, const char *cputag, int devicenr )
 {
 	drive->type = type;
-	drive->cpunumber = cpunr;
+	drive->cputag = cputag;
 	drive->drive.serial.deviceid = devicenr;
 	drive->timer = timer_alloc(machine, drive_timer, NULL);
 
@@ -1390,6 +1388,9 @@ static const tpi6525_interface c1551_tpi_intf =
 MACHINE_DRIVER_START( cpu_vc1540 )
 	MDRV_CPU_ADD("cpu_vc1540", M6502, XTAL_16_MHz / 16)
 	MDRV_CPU_PROGRAM_MAP(_1541_map)
+
+	MDRV_VIA6522_ADD("_1541_via_0", 0, vc1541_via0)
+	MDRV_VIA6522_ADD("_1541_via_1", 0, vc1541_via1)
 MACHINE_DRIVER_END
 
 MACHINE_DRIVER_START( cpu_vc1541 )
@@ -1416,6 +1417,9 @@ MACHINE_DRIVER_END
 MACHINE_DRIVER_START( cpu_c1571 )
 	MDRV_CPU_ADD("cpu_vc1540", M6502, XTAL_16_MHz / 16)
 	MDRV_CPU_PROGRAM_MAP(_1571_map)
+
+	MDRV_VIA6522_ADD("_1541_via_0", 0, vc1541_via0)
+	MDRV_VIA6522_ADD("_1541_via_1", 0, vc1541_via1)
 MACHINE_DRIVER_END
 
 

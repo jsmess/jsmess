@@ -138,32 +138,32 @@ const cbm_serial_interface cbm_sim_drive_interface =
 
 static void emu_drive_reset_write( running_machine *machine, int level )
 {
-	vc1541_serial_reset_write(0, level);
+	vc1541_serial_reset_write(machine, 0, level);
 }
 
 static int emu_drive_request_read( running_machine *machine )	
 {
-	return vc1541_serial_request_read(0);
+	return vc1541_serial_request_read(machine, 0);
 }
 	
 static void emu_drive_request_write( running_machine *machine, int level )
 {
-	vc1541_serial_request_write(0, level);
+	vc1541_serial_request_write(machine, 0, level);
 }
 
 static int emu_drive_atn_read( running_machine *machine )
 {
-	return vc1541_serial_atn_read(0);
+	return vc1541_serial_atn_read(machine, 0);
 }
 
 static int emu_drive_data_read( running_machine *machine )
 {
-	return vc1541_serial_data_read(0);
+	return vc1541_serial_data_read(machine, 0);
 }
 
 static int emu_drive_clock_read( running_machine *machine )
 {
-	return vc1541_serial_clock_read(0);
+	return vc1541_serial_clock_read(machine, 0);
 }
 
 static void emu_drive_atn_write( running_machine *machine, int level )
@@ -173,12 +173,12 @@ static void emu_drive_atn_write( running_machine *machine, int level )
 
 static void emu_drive_data_write( running_machine *machine, int level )
 {
-	vc1541_serial_data_write(0, level);
+	vc1541_serial_data_write(machine, 0, level);
 }
 
 static void emu_drive_clock_write( running_machine *machine, int level )
 {
-	vc1541_serial_clock_write(0, level);
+	vc1541_serial_clock_write(machine, 0, level);
 }
 
 const cbm_serial_interface cbm_emu_drive_interface =

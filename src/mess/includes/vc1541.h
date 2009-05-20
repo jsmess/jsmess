@@ -49,7 +49,7 @@ format_g64,				/* 1541 image in GCR format */
 };
 
 
-int drive_config(running_machine *machine, int type, int id, int mode, int cpunr, int devicenr);
+int drive_config(running_machine *machine, int type, int id, int mode, const char *cputag, int devicenr);
 void drive_reset(void);
 
 void vc1541_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
@@ -186,15 +186,15 @@ READ8_DEVICE_HANDLER( c1551x_read_status );
 /* serial bus for vic20, c64 & c16 with vc1541 and some printer */
 
 /* To be passed to serial bus emulation */
-void vc1541_serial_reset_write(int which,int level);
-int vc1541_serial_atn_read(int which);
-void vc1541_serial_atn_write(running_machine *machine, int which,int level);
-int vc1541_serial_data_read(int which);
-void vc1541_serial_data_write(int which,int level);
-int vc1541_serial_clock_read(int which);
-void vc1541_serial_clock_write(int which,int level);
-int vc1541_serial_request_read(int which);
-void vc1541_serial_request_write(int which,int level);
+void vc1541_serial_reset_write(running_machine *machine, int which, int level);
+int vc1541_serial_atn_read(running_machine *machine, int which);
+void vc1541_serial_atn_write(running_machine *machine, int which, int level);
+int vc1541_serial_data_read(running_machine *machine, int which);
+void vc1541_serial_data_write(running_machine *machine, int which, int level);
+int vc1541_serial_clock_read(running_machine *machine, int which);
+void vc1541_serial_clock_write(running_machine *machine, int which, int level);
+int vc1541_serial_request_read(running_machine *machine, int which);
+void vc1541_serial_request_write(running_machine *machine, int which, int level);
 
 
 #endif /* VC1541_H_ */

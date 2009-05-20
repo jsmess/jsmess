@@ -814,27 +814,27 @@ static void c64_common_driver_init (running_machine *machine)
 		datasette_timer = timer_alloc(machine, c64_tape_timer, NULL);
 
 	if (ultimax)
-		vic6567_init (0, c64_pal, c64_dma_read_ultimax, c64_dma_read_color, c64_vic_interrupt);
+		vic6567_init(0, c64_pal, c64_dma_read_ultimax, c64_dma_read_color, c64_vic_interrupt);
 	else
-		vic6567_init (0, c64_pal, c64_dma_read, c64_dma_read_color, c64_vic_interrupt);
+		vic6567_init(0, c64_pal, c64_dma_read, c64_dma_read_color, c64_vic_interrupt);
 }
 
 DRIVER_INIT( c64 )
 {
-	c64_common_driver_init (machine);
+	c64_common_driver_init(machine);
 }
 
 DRIVER_INIT( c64pal )
 {
 	c64_pal = 1;
-	c64_common_driver_init (machine);
+	c64_common_driver_init(machine);
 }
 
 DRIVER_INIT( ultimax )
 {
 	ultimax = 1;
     c64_cia1_on = 0;
-	c64_common_driver_init (machine);
+	c64_common_driver_init(machine);
 }
 
 DRIVER_INIT( c64gs )
@@ -842,7 +842,7 @@ DRIVER_INIT( c64gs )
 	c64_pal = 1;
 	c64_tape_on = 0;
     c64_cia1_on = 1;
-	c64_common_driver_init (machine);
+	c64_common_driver_init(machine);
 }
 
 DRIVER_INIT( sx64 )
@@ -850,8 +850,8 @@ DRIVER_INIT( sx64 )
 	is_sx64 = 1;
 	c64_tape_on = 0;
 	c64_pal = 1;
-	c64_common_driver_init (machine);
-	drive_config (machine, type_1541, 0, 0, 1, 8);
+	c64_common_driver_init(machine);
+	drive_config(machine, type_1541, 0, 0, "cpu_vc1540", 8);
 }
 
 static void c64_common_init_machine (running_machine *machine)
@@ -865,9 +865,9 @@ static void c64_common_init_machine (running_machine *machine)
 	else if (c64_cia1_on)
 	{
 		cbm_serial_config(machine, &cbm_sim_drive_interface);
-		cbm_serial_reset_write (machine, 0);
-		cbm_drive_0_config (SERIAL, 8);
-		cbm_drive_1_config (SERIAL, 9);
+		cbm_serial_reset_write(machine, 0);
+		cbm_drive_0_config(SERIAL, 8);
+		cbm_drive_1_config(SERIAL, 9);
 		serial_clock = serial_data = serial_atn = 1;
 	}
 
@@ -879,13 +879,16 @@ MACHINE_START( c64 )
 {
 	c64_port_data = 0x17;
 
-	c64_io_mirror = auto_alloc_array(machine, UINT8, 0x1000 );
-	c64_common_init_machine (machine);
+	c64_io_mirror = auto_alloc_array(machine, UINT8, 0x1000);
+	c64_common_init_machine(machine);
 
 	if (!ultimax)
 		c64_bankswitch(machine, 1);
 }
 
+MACHINE_RESET( c64 )
+{
+}
 
 INTERRUPT_GEN( c64_frame_interrupt )
 {

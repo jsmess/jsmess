@@ -19,8 +19,8 @@
 extern UINT8 *vc20_memory_9400;
 extern const via6522_interface vc20_via0;
 extern const via6522_interface vc20_via1;
-extern const via6522_interface vc20_via4;
-extern const via6522_interface vc20_via5;
+extern const via6522_interface vc20_via2;
+extern const via6522_interface vc20_via3;
 
 WRITE8_HANDLER ( vc20_write_9400 );
 
