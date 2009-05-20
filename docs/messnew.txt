@@ -1,32 +1,37 @@
-﻿0.131.1
+0.131.1
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
 - Amiga 1200 NTSC & PAL (not working)  [incog nito, Dirk Best, Fabio Priuli]
 - Amiga CD32 (not working)  [incog nito, Fabio Priuli]
 - CD-I (not working)  [incog nito]
+- CIP-01 [Miodrag Milanovic]
+- Frael Bruc 100-1 [Miodrag Milanovic]
+- MC80.21/22 (not working) [Miodrag Milanovic]
+- MC80.30/31 (not working) [Miodrag Milanovic]
 - Microbee Premium PC85 (not working) [Robbbert]
 - Microbee 64k (not working) [Robbbert]
 - NTS DreamWriter T200 (not working)  [Roberto Carlos
   Fernandez Gerhardt, Wilbert Pol]
+- PolyMorphic Systems Poly-88 [Miodrag Milanovic]
+- Ringo 470 (not working) [Miodrag Milanovic]
 - Samsung SPC-1000 [Miodrag Milanovic]
-- CIP-01 [Miodrag Milanovic]
 - TK85 [Robbbert, Miodrag Milanovic]
 - Timex Sinclair 1500 [Robbbert, Miodrag Milanovic]
-- Ringo 470 (not working) [Miodrag Milanovic]
-- Frael Bruc 100-1 [Miodrag Milanovic]
-- MC80.21/22 (not working) [Miodrag Milanovic]
-- MC80.30/31 (not working) [Miodrag Milanovic]
-- PolyMorphic Systems Poly-88 [Miodrag Milanovic]
 
 Skeleton drivers : 
 ------------------
 - Acorn 6809
 - BIC A5105
 - BCS-3
+- BK-0011M
 - BOB-85
 - C-80
+- Camputers Lynx 48
+- Camputers Lynx 96
+- Camputers Lynx 128
 - CCE MC-1000
+- Chess-Master	
 - DEC VK-100
 - Dunfield 6809 Portable
 - Elektronika MK-90
@@ -38,16 +43,35 @@ Skeleton drivers :
 - Heathkit ET-3400
 - Hubler/Everts MC
 - Interact Family Computer
+- IQ-151
 - SC-80
 - LC-80
 - National JR200
 - Hector 2HR+
 - Hector 2HRX
 - Hector 1
+- Jaguar CD
+- NEC PC-6001
+- NEC PC-6001A
+- NEC PC-6001mkII
+- NEC PC-6001mkIISR
+- NEC PC-6600
+- NEC PC-6600SR
+- Olivetti M-20
+- Philips VG-5000
+- Philips VG-8000
+- Philips VG-8010
+- Philips VG-8010F
+- Plydin-601 
+- Plydin-601A
 - Poly-Computer 880
 - Schachcomputer SC1
 - Schachcomputer SC2
-- Chess-Master	
+- Sega 32X
+- Sega CD
+- Sega Mega-CD
+- SNK NeoGeo AES
+- Sony PocketStation
 - System 2900
 - Tesla PMI-80
 - Tiki 100
@@ -55,31 +79,14 @@ Skeleton drivers :
 - Visual 1050
 - Xerox 820
 - XOR-100-12
-- IQ-151
-- NEC PC-6001
-- NEC PC-6001A
-- NEC PC-6001mkII
-- NEC PC-6001mkIISR
-- NEC PC-6600
-- NEC PC-6600SR
-- Plydin-601 
-- Plydin-601A
-- Philips VG-5000
-- Camputers Lynx 48
-- Camputers Lynx 96
-- Camputers Lynx 128
-- Sega 32X
-- Sega Mega-CD
-- Sega CD
-- Jaguar CD
-- Philips VG-8000
-- Philips VG-8010
-- Philips VG-8010F
-- Olivetti M-20
-- BK-0011M
+
 
 System Driver Changes:
 ----------------------
+- [ATARI] Added proper labels and dumps to Atari 400, 800 and XE/XL. A
+  few are still marked as BAD_DUMP while waiting for confirmation. [Freddy 
+  Offenga, Fabio Priuli]
+
 - [COLECO] Fixed controller bug introduced in 0.131. [Fabio Priuli]
 
 - [CRVISION] Added support for stereo tapes. [Curt Coder]

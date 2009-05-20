@@ -139,8 +139,8 @@ SOUNDS += YM2151
 SOUNDS += YM2203
 SOUNDS += YM2413
 #SOUNDS += YM2608
-#SOUNDS += YM2610
-#SOUNDS += YM2610B
+SOUNDS += YM2610
+SOUNDS += YM2610B
 SOUNDS += YM2612
 #SOUNDS += YM3438
 SOUNDS += YM3812
@@ -1044,7 +1044,8 @@ $(MESSOBJ)/tatung.a:     \
 $(MESSOBJ)/sony.a:     \
 	$(MESS_DRIVERS)/psx.o	\
 	$(MAME_MACHINE)/psx.o	\
-	$(MAME_VIDEO)/psx.o
+	$(MAME_VIDEO)/psx.o	\
+	$(MESS_DRIVERS)/pockstat.o
 
 $(MESSOBJ)/dai.a:     \
 	$(MESS_DRIVERS)/dai.o     \
@@ -1330,7 +1331,10 @@ $(MESSOBJ)/nakajima.a: \
 
 $(MESSOBJ)/snk.a: \
 	$(MESS_DRIVERS)/ngp.o \
-	$(MESS_VIDEO)/k1ge.o
+	$(MESS_VIDEO)/k1ge.o \
+	$(MESS_DRIVERS)/ng_aes.o \
+	$(MAME_VIDEO)/neogeo.o \
+	$(MAME_MACHINE)/neoprot.o
 
 $(MESSOBJ)/z80ne.a:	\
 	$(MESS_DRIVERS)/z80ne.o     \

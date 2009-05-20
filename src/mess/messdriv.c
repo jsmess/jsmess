@@ -113,6 +113,13 @@ const game_driver * const drivers[] =
 	DRIVER( dceu )		/* 1999 Sega Dreamcast (Europe) */
 	DRIVER( dcdev )		/* 1998 Sega HKT-0120 Sega Dreamcast Development Box */
 
+	/* Sony */
+	DRIVER( psj )		/* 1994 Sony PlayStation (Japan)					*/
+	DRIVER( psu )		/* 1995 Sony PlayStation (USA)						*/
+	DRIVER( pse )		/* 1995 Sony PlayStation (Europe)					*/
+	DRIVER( psa )		/* 1995 Sony PlayStation (Asia-Pacific)				*/
+	DRIVER( pockstat )	/* 1999 Sony PocketStation							*/
+
 	/* BALLY */
 	DRIVER( astrocde )	/* Bally Astrocade									*/
 	DRIVER( astrocdw )	/* Bally Astrocade (white case)						*/
@@ -202,6 +209,7 @@ const game_driver * const drivers[] =
 	/* SNK */
 	DRIVER( ngp )		/* NeoGeo Pocket									*/
 	DRIVER( ngpc )		/* NeoGeo Pocket Color								*/
+	DRIVER( aes )		/* NeoGeo AES										*/
 
 	/* Philips */
 	DRIVER( cdi )		/* Philips CD-i										*/
@@ -939,12 +947,6 @@ const game_driver * const drivers[] =
 	/* Andrew Donald Booth (this is the name of the designer, not a company) */
 //	DRIVER( apexc53 )	/* 1951(?) APEXC: All-Purpose Electronic X-ray Computer */
 	DRIVER( apexc )		/* 1955(?) APEXC: All-Purpose Electronic X-ray Computer */
-
-	/* Sony */
-	DRIVER( psj )		/* 1994 Sony PlayStation (Japan)					*/
-	DRIVER( psu )		/* 1995 Sony PlayStation (USA)						*/
-	DRIVER( pse )		/* 1995 Sony PlayStation (Europe)					*/
-	DRIVER( psa )		/* 1995 Sony PlayStation (Asia-Pacific)				*/
 
 	/* Corvus */
 	DRIVER(concept)		/* 1982 Corvus Concept								*/
