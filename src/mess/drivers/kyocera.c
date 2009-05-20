@@ -942,9 +942,9 @@ static WRITE8_DEVICE_HANDLER( pc8201_8155_port_b_w )
 
 		0					LCD chip select 8, key scan 8
 		1					LCD chip select 9
-		2		_MC			memory control output ?
+		2		_MC			melody control output
 		3		DCD/_RD		RS232 DCD/_RD select
-		4		AP0			auto power off output
+		4		APO			auto power off output
 		5		BELL		buzzer output (0=ring, 1=not ring)
 		6		_DTR		RS232 data terminal ready output
 		7		_RTS		RS232 request to send output

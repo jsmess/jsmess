@@ -4,6 +4,20 @@
 #include "machine/8255ppi.h"
 #include "cpu/z80/z80.h"
 
+/*
+
+	TODO:
+
+	- everything
+
+	- peripherals
+		* PC-8431A Dual Floppy Drive
+		* PC-8441A CRT / Disk Interface
+		* PC-8461A 1200 Baud Modem
+		* PC-8407A 128KB RAM Expansion
+
+*/
+
 /* Read/Write Handlers */
 
 static void pc8401a_bankswitch(running_machine *machine, UINT8 data)
@@ -279,6 +293,7 @@ ROM_END
 
 static SYSTEM_CONFIG_START( pc8401a )
 	CONFIG_RAM_DEFAULT	(64 * 1024)
+	CONFIG_RAM			(96 * 1024)
 SYSTEM_CONFIG_END
 
 static SYSTEM_CONFIG_START( pc8500 )
