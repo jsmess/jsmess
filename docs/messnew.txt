@@ -101,6 +101,7 @@ System Driver Changes:
 
 - [Z88] Added version 3.0 and 4.01 finnish version of roms [Miodrag Milanovic]
 
+- [SYM1] Added BASIC and Assembler ROM's, and version 1.0 monitor [Miodrag Milanovic]
 
 User Interface Changes:
 -----------------------

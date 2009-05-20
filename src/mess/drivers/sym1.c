@@ -47,6 +47,7 @@ static ADDRESS_MAP_START( sym1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa600, 0xa67f) AM_RAMBANK(5) AM_BASE(&sym1_riot_ram)  /* U27 RIOT RAM */
 	AM_RANGE(0xa800, 0xa80f) AM_DEVREADWRITE("via6522_1", via_r, via_w)      /* U28 VIA #2 */
 	AM_RANGE(0xac00, 0xac0f) AM_DEVREADWRITE("via6522_2", via_r, via_w)      /* U29 VIA #3 */
+	AM_RANGE(0xb000, 0xefff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -150,11 +151,15 @@ MACHINE_DRIVER_END
 
 ROM_START( sym1 )
 	ROM_REGION(0x10000, "maincpu", 0)
-//  ROM_LOAD("basicv11", 0xc000, 0x2000, CRC(075b0bbd))
-	ROM_LOAD("sym1", 0x8000, 0x1000, CRC(7a4b1e12) SHA1(cebdf815105592658cfb7af262f2101d2aeab786) )
+	ROM_SYSTEM_BIOS(0, "ver10",  "Version 1.0")
+	ROMX_LOAD("symon1_0.bin", 0x8000, 0x1000, CRC(97928583) SHA1(6ac52c54adb7a086d51bc7f6d55dd30ab3a0a331),ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "ver11",  "Version 1.1")
+	ROMX_LOAD("symon1_1.bin", 0x8000, 0x1000, CRC(7a4b1e12) SHA1(cebdf815105592658cfb7af262f2101d2aeab786),ROM_BIOS(2))
+	ROM_LOAD("rae_b000", 0xb000, 0x1000, CRC(F6429326) SHA1(6f2f10649b54f54217bb35c8c453b5d05434bd86) )
+	ROM_LOAD("bas_c000", 0xc000, 0x1000, CRC(C168FE70) SHA1(7447a5e229140cbbde4cf90886966a5d93aa24e1) )
+	ROM_LOAD("bas_d000", 0xd000, 0x1000, CRC(8375A978) SHA1(240301bf8bb8ddb99b65a585f17895e1ad872631) )
+	ROM_LOAD("rae_e000", 0xe000, 0x1000, CRC(2255444B) SHA1(c7dd812962c2e2edd2faa7055e9cce4e769c0388) )
 ROM_END
-
-
 
 /******************************************************************************
  System Config
