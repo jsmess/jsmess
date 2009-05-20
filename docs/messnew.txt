@@ -18,6 +18,7 @@ New System Drivers Supported (in no particular order):
 - Samsung SPC-1000 [Miodrag Milanovic]
 - TK85 [Robbbert, Miodrag Milanovic]
 - Timex Sinclair 1500 [Robbbert, Miodrag Milanovic]
+- Pravetz 82, 8M and 8C [Miodrag Milanovic]
 
 Skeleton drivers : 
 ------------------

@@ -256,11 +256,14 @@ const game_driver * const drivers[] =
 	DRIVER( apple1 )	/* Jul 1976 Apple 1									*/
 	DRIVER( apple2 )	/* Apr 1977 Apple ][								*/
 	DRIVER( apple2p )	/* Jun 1979 Apple ][+								*/
+	DRIVER( prav82 )	/* Pravetz 82										*/
+	DRIVER( prav8m )	/* Pravetz 8M										*/
 	DRIVER( apple2jp )	/* ??? ???? Apple ][j+								*/
 	DRIVER( apple2e )	/* Jan 1983 Apple //e								*/
 	DRIVER( apple2ee )	/* Mar 1985 Apple //e Enhanced						*/
 	DRIVER( apple2ep )	/* Jan 1987 Apple //e Platinum						*/
 	DRIVER( apple2c )	/* Apr 1984 Apple //c								*/
+	DRIVER( prav8c )	/* Pravetz 8C								*/
 	DRIVER( apple2c0 )	/* ??? 1985 Apple //c (3.5 ROM)						*/
 	DRIVER( apple2c3 )	/* Sep 1986 Apple //c (Original Mem. Exp.)			*/
 	DRIVER( apple2c4 )	/* ??? 198? Apple //c (rev 4)						*/

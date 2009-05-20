@@ -688,6 +688,33 @@ ROM_START(apple2p) /* the autoboot apple2+ with applesoft (microsoft-written) ba
 	ROM_LOAD ( "341-0027-a.p5", 0x4500, 0x0100, CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16)) /* 341-0027-a "P5A" State machine PROM (Disk II ROM - DOS 3.3 version?) */
 ROM_END
 
+ROM_START(prav82)
+	ROM_REGION(0x0800,"gfx1",0)
+	ROM_LOAD ( "pravetz82.chr", 0x0000, 0x0800, BAD_DUMP CRC(8C55C984) SHA1(5a5a202000576b88b4ae2e180dd2d1b9b337b594)) // Taken from Agat computer
+
+	ROM_REGION(0x4700,"maincpu",0)
+	ROM_LOAD ( "pravetz82.d0", 0x1000, 0x0800, CRC(6f05f949) SHA1(0287ebcef2c1ce11dc71be15a99d2d7e0e128b1e))
+	ROM_LOAD ( "pravetz82.d8", 0x1800, 0x0800, CRC(1f08087c) SHA1(a75ce5aab6401355bf1ab01b04e4946a424879b5))
+	ROM_LOAD ( "pravetz82.e0", 0x2000, 0x0800, CRC(2b8d9a89) SHA1(8d82a1da63224859bd619005fab62c4714b25dd7))
+	ROM_LOAD ( "pravetz82.e8", 0x2800, 0x0800, CRC(5719871a) SHA1(37501be96d36d041667c15d63e0c1eff2f7dd4e9))
+	ROM_LOAD ( "pravetz82.f0", 0x3000, 0x0800, CRC(e26d9d35) SHA1(ce6e42e6c9a6c98e92522af7a6090cd04c56c778))
+	ROM_LOAD ( "pravetz82.f8", 0x3800, 0x0800, CRC(57547818) SHA1(db30bedec98305e31a14acb9e2a92be1c4853807))
+	ROM_LOAD ( "341-0027-a.p5", 0x4500, 0x0100, CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16)) /* 341-0027-a "P5A" State machine PROM (Disk II ROM - DOS 3.3 version?) */
+ROM_END
+
+ROM_START(prav8m)
+	ROM_REGION(0x0800,"gfx1",0)
+	ROM_LOAD ( "pravetz8m.chr", 0x0000, 0x0800, BAD_DUMP CRC(8C55C984) SHA1(5a5a202000576b88b4ae2e180dd2d1b9b337b594)) // Taken from Agat computer
+	ROM_REGION(0x4700,"maincpu",0)
+	ROM_LOAD ( "pravetz8m.d0", 0x1000, 0x0800, CRC(6f05f949) SHA1(0287ebcef2c1ce11dc71be15a99d2d7e0e128b1e))
+	ROM_LOAD ( "pravetz8m.d8", 0x1800, 0x0800, CRC(654b6f7b) SHA1(f7b1457b48fe6974c4de7e976df3a8fca6b7b661))
+	ROM_LOAD ( "pravetz8m.e0", 0x2000, 0x0800, CRC(2b8d9a89) SHA1(8d82a1da63224859bd619005fab62c4714b25dd7))
+	ROM_LOAD ( "pravetz8m.e8", 0x2800, 0x0800, CRC(5719871a) SHA1(37501be96d36d041667c15d63e0c1eff2f7dd4e9))
+	ROM_LOAD ( "pravetz8m.f0", 0x3000, 0x0800, CRC(e26d9d35) SHA1(ce6e42e6c9a6c98e92522af7a6090cd04c56c778))
+	ROM_LOAD ( "pravetz8m.f8", 0x3800, 0x0800, CRC(5bab0a46) SHA1(f6c0817ce37d2e2c43f482c339acaede0a73359b))
+	ROM_LOAD ( "341-0027-a.p5", 0x4500, 0x0100, CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16)) /* 341-0027-a "P5A" State machine PROM (Disk II ROM - DOS 3.3 version?) */
+ROM_END
+
 ROM_START(apple2jp)
 	ROM_REGION(0x0800,"gfx1",0)
 	ROM_LOAD ( "a2jp.chr", 0x0000, 0x0800, BAD_DUMP CRC(487104b5) SHA1(0a382be58db5215c4a3de53b19a72fab660d5da2)) // not confirmed as the actual rom on motherboard
@@ -750,6 +777,16 @@ ROM_START(apple2c)
 
 	ROM_REGION(0x4000,"maincpu",0)
 	ROM_LOAD ( "a2c.128", 0x0000, 0x4000, CRC(f0edaa1b) SHA1(1a9b8aca5e32bb702ddb7791daddd60a89655729))
+ROM_END
+
+ROM_START(prav8c)
+	ROM_REGION(0x2000,"gfx1",0)
+	ROM_LOAD ( "charrom.d20", 0x0000, 0x2000,CRC(935212cc) SHA1(934603a441c631bd841ea0d2ff39525474461e47))
+	ROM_REGION(0x4000,"maincpu",0)
+	ROM_LOAD ( "prom_cd.d46", 0x0000, 0x2000, CRC(195d0b48) SHA1(f8c4f3722159081f6950207f03bc85da30980c08))
+	ROM_LOAD ( "prom_ef.d41", 0x2000, 0x2000, CRC(ec6aa2f6) SHA1(64bce893ebf0e22cd8f22436b97ef1bfeddf692f))
+	ROM_REGION(0x2000,"unknown",0)
+	ROM_LOAD ( "eprom.d38", 0x0000, 0x2000, CRC(c8d00b19) SHA1(13d156957ea68d0e7bc4be57cb1580c8b1399981))
 ROM_END
 
 ROM_START(apple2c0)
@@ -880,12 +917,15 @@ SYSTEM_CONFIG_END
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE		INPUT     INIT CONFIG     COMPANY            FULLNAME */
 COMP( 1977, apple2,   0,        0,	apple2,		apple2,   0,   apple2,	"Apple Computer", "Apple ][" , 0)
 COMP( 1979, apple2p,  apple2,   0,	apple2p,	apple2p,  0,   apple2p,	"Apple Computer", "Apple ][+" , 0)
+COMP( 1982, prav82,   apple2,   0,	apple2p,	apple2p,  0,   apple2p,	"Pravetz", "Pravetz 82" , 0)
+COMP( 1985, prav8m,   apple2,   0,	apple2p,	apple2p,  0,   apple2p,	"Pravetz", "Pravetz 8M" , 0)
 COMP( 1980, apple2jp, apple2,   0,	apple2p,	apple2p,  0,   apple2p,	"Apple Computer", "Apple ][j+" , 0)
 COMP( 1982, ace100,   apple2,   0,	apple2,		apple2e,  0,   apple2,	"Franklin Computer", "Franklin Ace 100" , 0)
 COMP( 1983, apple2e,  0,        apple2,	apple2e,	apple2e,  0,   apple2e,	"Apple Computer", "Apple //e" , 0)
 COMP( 1985, apple2ee, apple2e,  0,	apple2ee,	apple2e,  0,   apple2e,	"Apple Computer", "Apple //e (enhanced)" , 0)
 COMP( 1987, apple2ep, apple2e,  0,	apple2ee,	apple2ep, 0,   apple2e,	"Apple Computer", "Apple //e (Platinum)" , 0)
 COMP( 1984, apple2c,  0,        apple2,	apple2c,	apple2e,  0,   apple2e,	"Apple Computer", "Apple //c" , 0)
+COMP( 1989, prav8c,   apple2c,  0,	apple2c,	apple2e,  0,   apple2e,	"Pravetz", "Pravetz 8C" , 0)
 COMP( 1983, las3000,  apple2,   0,	apple2p,	apple2p,  0,   apple2p,	"Video Technology", "Laser 3000",		GAME_NOT_WORKING )
 COMP( 1987, laser128, apple2c,  0,	apple2c,	apple2e,  0,   apple2e,	"Video Technology", "Laser 128 (rev 4)",		GAME_NOT_WORKING )
 COMP( 1987, las128ex, apple2c,  0,	apple2c,	apple2e,  0,   apple2e,	"Video Technology", "Laser 128ex (rev 4a)",		GAME_NOT_WORKING )
