@@ -1,54 +1,123 @@
 #include "driver.h"
+#include "includes/pc8401a.h"
+#include "devices/cartslot.h"
+#include "machine/8255ppi.h"
 #include "cpu/z80/z80.h"
 
 /* Read/Write Handlers */
 
-#ifdef UNUSED_CODE
+static void pc8401a_bankswitch(running_machine *machine, UINT8 data)
+{
+	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+
+	int rombank = data & 0x03;
+	int ram0000 = (data >> 2) & 0x03;
+	int ram8000 = (data >> 4) & 0x03;
+
+	switch (ram0000)
+	{
+	case 0: /* ROM 0000H to 7FFFH */
+		memory_install_readwrite8_handler(program, 0x0000, 0x7fff, 0, 0, SMH_BANK(1), SMH_UNMAP);
+		memory_set_bank(machine, 1, rombank);
+		logerror("0x0000-0x7fff = ROM %u\n", rombank);
+		break;
+
+	case 1: /* RAM 0000H to 7FFFH */
+		memory_install_readwrite8_handler(program, 0x0000, 0x7fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
+		memory_set_bank(machine, 1, 4);
+		logerror("0x0000-0x7fff = RAM 0-7fff\n");
+		break;
+
+	case 2:	/* RAM 8000H to FFFFH */
+		memory_install_readwrite8_handler(program, 0x0000, 0x7fff, 0, 0, SMH_BANK(1), SMH_BANK(1));
+		memory_set_bank(machine, 1, 5);
+		logerror("0x0000-0x7fff = RAM 8000-ffff\n");
+		break;
+
+	case 3: /* invalid */
+		logerror("0x0000-0x7fff = invalid\n");
+		break;
+	}
+
+	switch (ram8000)
+	{
+	case 0: /* cell addresses 0000H to 03FFFH */
+		memory_install_readwrite8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_BANK(3), SMH_BANK(3));
+		memory_set_bank(machine, 3, 0);
+		logerror("0x8000-0xbfff = RAM 0-3fff\n");
+		break;
+
+	case 1: /* cell addresses 4000H to 7FFFH */
+		memory_install_readwrite8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_BANK(3), SMH_BANK(3));
+		memory_set_bank(machine, 3, 1);
+		logerror("0x8000-0xbfff = RAM 4000-7fff\n");
+		break;
+
+	case 2: /* cell addresses 8000H to BFFFH */
+		memory_install_readwrite8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_BANK(3), SMH_BANK(3));
+		memory_set_bank(machine, 3, 2);
+		logerror("0x8000-0xbfff = RAM 8000-bfff\n");
+		break;
+
+	case 3: /* RAM cartridge */
+		memory_install_readwrite8_handler(program, 0x8000, 0xbfff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+//		memory_set_bank(machine, 3, 3); // TODO or 4
+		logerror("0x8000-0xbfff = RAM cartridge\n");
+		break;
+	}
+
+	if (BIT(data, 6))
+	{
+		/* CRT video RAM */
+		memory_install_readwrite8_handler(program, 0xc000, 0xdfff, 0, 0, SMH_BANK(4), SMH_BANK(4));
+		memory_install_readwrite8_handler(program, 0xe000, 0xe7ff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_set_bank(machine, 4, 1);
+		logerror("0xc000-0xdfff = video RAM\n");
+	}
+	else
+	{
+		/* RAM */
+		memory_install_readwrite8_handler(program, 0xc000, 0xe7ff, 0, 0, SMH_BANK(4), SMH_BANK(4));
+		memory_set_bank(machine, 4, 0);
+		logerror("0xc000-0e7fff = RAM c000-e7fff\n");
+	}
+}
+
 static WRITE8_HANDLER( mmr_w )
 {
+
 	/*
 
-		Memory Mapping Register
+		bit		description
 
-		RAM USER MODE (0-ffff=RAM)
-		b6b5b4b3b2b1b0
-		0 1 0 1 0 x x
-
-		ROM USER MODE (0-7ffff=ROM, 8000-ffff=RAM)
-
-		0 1 0 0 0 0 0		AP is in ROM #0
-		0 1 0 0 0 0 1		AP is in ROM #1
-		0 1 0 0 0 1 0		AP is in ROM #2
-		0 1 0 0 0 1 1		ROM cartridge AP
-
-		CCP MODE (MENU, 0-7ffff=ROM, 8000-ffff=RAM)
-
-		0 1 0 0 0 0 0
-
-		KERNEL MODE (0-7ffff=ROM, 8000-ffff=RAM)
-
-		0 0 0 0 0 0 0		S0 access
-		0 0 1 0 0 0 0		S1 access
-		0 1 1 0 0 0 0		RAM cartridge
-		1 x x 0 0 0 0		CRT access
-
-		etc...
+		0		ROM section bit 0
+		1		ROM section bit 1
+		2		mapping for CPU addresses 0000H to 7FFFH bit 0
+		3		mapping for CPU addresses 0000H to 7FFFH bit 1
+		4		mapping for CPU addresses 8000H to BFFFH bit 0
+		5		mapping for CPU addresses 8000H to BFFFH bit 1
+		6		mapping for CPU addresses C000H to E7FFH
+		7
 
 	*/
+
+	pc8401a_bankswitch(space->machine, data);
 }
-#endif
 
 /* Memory Maps */
 
 static ADDRESS_MAP_START( pc8401a_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_ROM
-//	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK(1)
-//	AM_RANGE(0x8000, 0xffff) AM_RAMBANK(2)
+	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK(3)
+	AM_RANGE(0xc000, 0xe7ff) AM_RAMBANK(4)
+	AM_RANGE(0xe800, 0xffff) AM_RAMBANK(5)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc8401a_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x31, 0x31) AM_MASK(0xff) AM_WRITE(mmr_w)
+	AM_RANGE(0xfc, 0xff) AM_MASK(0xff) AM_DEVREADWRITE(PPI8255_TAG, ppi8255_r, ppi8255_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -60,15 +129,87 @@ INPUT_PORTS_END
 
 static MACHINE_START( pc8401a )
 {
+	pc8401a_state *state = machine->driver_data;
+
+	/* allocate video memory */
+	state->video_ram = auto_alloc_array(machine, UINT8, PC8401A_VIDEORAM_SIZE);
+
+	/* set up A0/A1 memory banking */
+	memory_configure_bank(machine, 1, 0, 4, memory_region(machine, Z80_TAG), 0x8000);
+	memory_configure_bank(machine, 1, 4, 2, mess_ram, 0x8000);
+	memory_set_bank(machine, 1, 0);
+
+	/* set up A2 memory banking */
+	memory_configure_bank(machine, 3, 0, 5, mess_ram, 0x4000);
+	memory_set_bank(machine, 3, 0);
+
+	/* set up A3 memory banking */
+	memory_configure_bank(machine, 4, 0, 1, mess_ram + 0xc000, 0);
+	memory_configure_bank(machine, 4, 1, 1, state->video_ram, 0);
+	memory_set_bank(machine, 4, 0);
+
+	/* set up A4 memory banking */
+	memory_configure_bank(machine, 5, 0, 1, mess_ram + 0xe800, 0);
+	memory_set_bank(machine, 5, 0);
+
+	pc8401a_bankswitch(machine, 0);
 }
+
+static READ8_DEVICE_HANDLER( pc8401a_ppi8255_c_r )
+{
+	/*
+
+		bit		signal			description
+
+		PC0
+		PC1
+		PC2
+		PC3
+		PC4     PC-8431A DAV	data valid
+		PC5     PC-8431A RFD	ready for data
+		PC6     PC-8431A DAC	data accepted
+		PC7     PC-8431A ATN	attention
+
+	*/
+
+	return 0;
+}
+
+static WRITE8_DEVICE_HANDLER( pc8401a_ppi8255_c_w )
+{
+	/*
+
+		bit		signal			description
+
+		PC0
+		PC1
+		PC2
+		PC3
+		PC4     PC-8431A DAV	data valid
+		PC5     PC-8431A RFD	ready for data
+		PC6     PC-8431A DAC	data accepted
+		PC7     PC-8431A ATN	attention
+
+	*/
+}
+
+static const ppi8255_interface pc8401a_ppi8255_interface =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(pc8401a_ppi8255_c_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(pc8401a_ppi8255_c_w),
+};
 
 /* Machine Drivers */
 
 static MACHINE_DRIVER_START( pc8401a )
-//	MDRV_DRIVER_DATA(pc8401a_state)
+	MDRV_DRIVER_DATA(pc8401a_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 4000000)
+	MDRV_CPU_ADD(Z80_TAG, Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(pc8401a_mem)
 	MDRV_CPU_IO_MAP(pc8401a_io)
 	
@@ -82,13 +223,21 @@ static MACHINE_DRIVER_START( pc8401a )
 	MDRV_SCREEN_VISIBLE_AREA(0, 480-1, 0, 128-1)
 //	MDRV_DEFAULT_LAYOUT(layout_pc8401a)
 	MDRV_PALETTE_LENGTH(2)
+
+	/* devices */
+	MDRV_PPI8255_ADD(PPI8255_TAG, pc8401a_ppi8255_interface)
+
+	/* option ROM cartridge */
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("rom,bin")
+	MDRV_CARTSLOT_NOT_MANDATORY
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pc8500 )
-//	MDRV_DRIVER_DATA(pc8401a_state)
+	MDRV_DRIVER_DATA(pc8401a_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 4000000)
+	MDRV_CPU_ADD(Z80_TAG, Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(pc8401a_mem)
 	MDRV_CPU_IO_MAP(pc8401a_io)
 	
@@ -102,18 +251,28 @@ static MACHINE_DRIVER_START( pc8500 )
 	MDRV_SCREEN_VISIBLE_AREA(0, 480-1, 0, 200-1)
 //	MDRV_DEFAULT_LAYOUT(layout_pc8500)
 	MDRV_PALETTE_LENGTH(2)
+
+	/* devices */
+	MDRV_PPI8255_ADD(PPI8255_TAG, pc8401a_ppi8255_interface)
+
+	/* option ROM cartridge */
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("rom,bin")
+	MDRV_CARTSLOT_NOT_MANDATORY
 MACHINE_DRIVER_END
 
 /* ROMs */
 
 ROM_START( pc8401a )
-	ROM_REGION( 0x18000, "maincpu", 0 )
+	ROM_REGION( 0x20000, Z80_TAG, 0 )
 	ROM_LOAD( "pc8401a.bin", 0x0000, 0x18000, NO_DUMP )
+	ROM_CART_LOAD("cart", 0x18000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START( pc8500 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x20000, Z80_TAG, 0 )
 	ROM_LOAD( "pc8500.bin", 0x0000, 0x10000, CRC(c2749ef0) SHA1(f766afce9fda9ec84ed5b39ebec334806798afb3) )
+	ROM_CART_LOAD("cart", 0x18000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 /* System Configurations */
