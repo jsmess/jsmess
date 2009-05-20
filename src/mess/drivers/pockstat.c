@@ -30,11 +30,11 @@
 #include "cpu/arm7/arm7.h"
 
 static ADDRESS_MAP_START(pockstat_mem, ADDRESS_SPACE_PROGRAM, 32)
-	AM_RANGE(0x00000000, 0x000007ff) AM_RAM
-//	AM_RANGE(0x02000000, 0x0201ffff) Flash ROM
+/*	AM_RANGE(0x00000000, 0x000007ff) AM_RAM
+	AM_RANGE(0x02000000, 0x0201ffff) Flash ROM
 	AM_RANGE(0x04000000, 0x04003fff) AM_ROM
-//	AM_RANGE(0x08000000, 0x0801ffff) Same as 0x02 above. Mirrors every 128KB.
-/*	AM_RANGE(0x0a000000, 0x0a000003) IRQs currently triggered
+	AM_RANGE(0x08000000, 0x0801ffff) Same as 0x02 above. Mirrors every 128KB.
+	AM_RANGE(0x0a000000, 0x0a000003) IRQs currently triggered
 	AM_RANGE(0x0a000004, 0x0a000007) Raw status
 	AM_RANGE(0x0a000008, 0x0a00000b) Which IRQs are enabled
 	AM_RANGE(0x0a00000c, 0x0a00000f) Disable IRQs (write only)
