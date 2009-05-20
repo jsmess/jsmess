@@ -1316,5 +1316,55 @@ ROM_START( aes )
 	ROM_REGION( 0x100000, "sprites", ROMREGION_DISPOSE | ROMREGION_ERASEFF )
 ROM_END
 
+ROM_START( neocd )
+	ROM_REGION16_BE( 0x80000, "mainbios", 0 )
+	ROM_LOAD16_WORD_SWAP( "neocd.rom",    0x00000, 0x80000, CRC(33697892) SHA1(b0f1c4fa8d4492a04431805f6537138b842b549f) )
 
-CONS( 1990, aes,   0, 0,   neogeo,   aes,   neogeo,   0, "SNK", "Neo-Geo AES", 0 )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x20000, "audiobios", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x50000, "audiocpu", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x20000, "zoomy", 0 )
+	ROM_LOAD( "000-lo.lo", 0x00000, 0x20000, CRC(5a86cff2) SHA1(5992277debadeb64d1c1c64b0a92d9293eaf7e4a) )
+
+	ROM_REGION( 0x20000, "fixedbios", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x20000, "fixed", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x10000, "ym", ROMREGION_ERASEFF )
+
+//	NO_DELTAT_REGION
+
+	ROM_REGION( 0x100000, "sprites", ROMREGION_DISPOSE | ROMREGION_ERASEFF )
+ROM_END
+
+ROM_START( neocdz )
+	ROM_REGION16_BE( 0x80000, "mainbios", 0 )
+	ROM_LOAD16_WORD_SWAP( "neocd.bin",    0x00000, 0x80000, CRC(df9de490) SHA1(7bb26d1e5d1e930515219cb18bcde5b7b23e2eda) )
+
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x20000, "audiobios", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x50000, "audiocpu", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x20000, "zoomy", 0 )
+	ROM_LOAD( "000-lo.lo", 0x00000, 0x20000, CRC(5a86cff2) SHA1(5992277debadeb64d1c1c64b0a92d9293eaf7e4a) )
+
+	ROM_REGION( 0x20000, "fixedbios", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x20000, "fixed", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x10000, "ym", ROMREGION_ERASEFF )
+
+//	NO_DELTAT_REGION
+
+	ROM_REGION( 0x100000, "sprites", ROMREGION_DISPOSE | ROMREGION_ERASEFF )
+ROM_END
+
+
+CONS( 1990, aes,    0,   0,   neogeo,   aes,   neogeo,   0, "SNK", "Neo-Geo AES", GAME_NOT_WORKING )
+CONS( 1994, neocd,  aes, 0,   neogeo,   aes,   neogeo,   0, "SNK", "Neo-Geo CD", GAME_NOT_WORKING )
+CONS( 1996, neocdz, aes, 0,   neogeo,   aes,   neogeo,   0, "SNK", "Neo-Geo CDZ", GAME_NOT_WORKING )

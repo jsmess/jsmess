@@ -73,6 +73,8 @@ Skeleton drivers :
 - Sega CD
 - Sega Mega-CD
 - SNK NeoGeo AES
+- SNK NeoGeo CD
+- SNK NeoGeo CDZ
 - Sony PocketStation
 - System 2900
 - Tesla PMI-80

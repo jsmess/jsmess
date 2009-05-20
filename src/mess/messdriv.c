@@ -210,6 +210,8 @@ const game_driver * const drivers[] =
 	DRIVER( ngp )		/* NeoGeo Pocket									*/
 	DRIVER( ngpc )		/* NeoGeo Pocket Color								*/
 	DRIVER( aes )		/* NeoGeo AES										*/
+	DRIVER( neocd )		/* NeoGeo CD										*/
+	DRIVER( neocdz )	/* NeoGeo CDZ										*/
 
 	/* Philips */
 	DRIVER( cdi )		/* Philips CD-i										*/
