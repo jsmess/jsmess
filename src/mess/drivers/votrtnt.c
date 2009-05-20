@@ -25,8 +25,6 @@
  Address Maps
 ******************************************************************************/
 
-/* Note: Expansion memory is dynamically mapped in machine/vtech1.c */
-
 static ADDRESS_MAP_START(6802_mem, ADDRESS_SPACE_PROGRAM, 8)
     ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
