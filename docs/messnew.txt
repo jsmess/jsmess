@@ -19,6 +19,7 @@ New System Drivers Supported (in no particular order):
 - TK85 [Robbbert, Miodrag Milanovic]
 - Timex Sinclair 1500 [Robbbert, Miodrag Milanovic]
 - Pravetz 82, 8M and 8C [Miodrag Milanovic]
+- Microprofessor III [Miodrag Milanovic]
 
 Skeleton drivers : 
 ------------------

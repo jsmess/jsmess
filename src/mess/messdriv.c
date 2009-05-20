@@ -260,6 +260,7 @@ const game_driver * const drivers[] =
 	DRIVER( prav8m )	/* Pravetz 8M										*/
 	DRIVER( apple2jp )	/* ??? ???? Apple ][j+								*/
 	DRIVER( apple2e )	/* Jan 1983 Apple //e								*/
+	DRIVER( mprof3 )	/* Microprofessor III								*/
 	DRIVER( apple2ee )	/* Mar 1985 Apple //e Enhanced						*/
 	DRIVER( apple2ep )	/* Jan 1987 Apple //e Platinum						*/
 	DRIVER( apple2c )	/* Apr 1984 Apple //c								*/

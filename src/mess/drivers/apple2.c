@@ -749,6 +749,18 @@ ROM_START(apple2e)
 	ROM_LOAD ( "341-0027-a.p5", 0x4500, 0x0100, CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16)) /* Disk II ROM - DOS 3.3 version */
 ROM_END
 
+ROM_START(mprof3)
+	ROM_REGION(0x2000,"gfx1",0)
+	ROM_LOAD ( "mpf3.chr", 0x0000, 0x1000,CRC(2597bc19) SHA1(e114dcbb512ec24fb457248c1b53cbd78039ed20))
+	ROM_LOAD ( "mpf3.chr", 0x1000, 0x1000,CRC(2597bc19) SHA1(e114dcbb512ec24fb457248c1b53cbd78039ed20))
+
+	ROM_REGION(0x4700,"maincpu",0)
+	ROM_LOAD ( "mpf3-cd.rom", 0x0000, 0x2000, CRC(5b662e06) SHA1(aa0db775ca78986480829fcc10f00e57629e1a7c))
+	ROM_LOAD ( "mpf3-ef.rom", 0x2000, 0x2000, CRC(2c5e8b92) SHA1(befeb03e04b7c3ef36ef5829948a53880df85e92))	
+	
+	ROM_LOAD ( "341-0027-a.p5", 0x4500, 0x0100, CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16)) /* Disk II ROM - DOS 3.3 version */
+ROM_END
+
 ROM_START(apple2ee)
 	ROM_REGION(0x2000,"gfx1",0)
 	ROM_LOAD ( "342-0265-a.chr", 0x0000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
@@ -912,6 +924,10 @@ static SYSTEM_CONFIG_START(apple2e)
 	CONFIG_RAM_DEFAULT		(128 * 1024)
 SYSTEM_CONFIG_END
 
+static SYSTEM_CONFIG_START(mprof3)
+	CONFIG_IMPORT_FROM( apple2_common )
+	CONFIG_RAM_DEFAULT		(128 * 1024)
+SYSTEM_CONFIG_END
 
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE		INPUT     INIT CONFIG     COMPANY            FULLNAME */
@@ -922,6 +938,7 @@ COMP( 1985, prav8m,   apple2,   0,	apple2p,	apple2p,  0,   apple2p,	"Pravetz", "
 COMP( 1980, apple2jp, apple2,   0,	apple2p,	apple2p,  0,   apple2p,	"Apple Computer", "Apple ][j+" , 0)
 COMP( 1982, ace100,   apple2,   0,	apple2,		apple2e,  0,   apple2,	"Franklin Computer", "Franklin Ace 100" , 0)
 COMP( 1983, apple2e,  0,        apple2,	apple2e,	apple2e,  0,   apple2e,	"Apple Computer", "Apple //e" , 0)
+COMP( 1983, mprof3,   apple2e,  0,	apple2ee,	apple2e,  0,   mprof3,	"Multitech", "Microprofessor III" , 0)
 COMP( 1985, apple2ee, apple2e,  0,	apple2ee,	apple2e,  0,   apple2e,	"Apple Computer", "Apple //e (enhanced)" , 0)
 COMP( 1987, apple2ep, apple2e,  0,	apple2ee,	apple2ep, 0,   apple2e,	"Apple Computer", "Apple //e (Platinum)" , 0)
 COMP( 1984, apple2c,  0,        apple2,	apple2c,	apple2e,  0,   apple2e,	"Apple Computer", "Apple //c" , 0)
