@@ -1319,6 +1319,7 @@ $(MESSOBJ)/grundy.a: \
 
 $(MESSOBJ)/votrax.a: \
 	$(MESS_DRIVERS)/votrpss.o \
+	$(MESS_DRIVERS)/votrtnt.o \
 
 $(MESSOBJ)/nokia.a: \
 	$(MESS_DRIVERS)/mikromik.o \
@@ -1430,6 +1431,7 @@ $(MESS_DRIVERS)/sym1.o:		$(MESS_LAYOUT)/sym1.lh
 $(MESS_DRIVERS)/tec1.o:		$(MESS_LAYOUT)/tec1.lh
 $(MESS_DRIVERS)/ut88.o:		$(MESS_LAYOUT)/ut88mini.lh
 $(MESS_DRIVERS)/votrpss.o:	$(MESS_LAYOUT)/votrpss.lh
+$(MESS_DRIVERS)/votrtnt.o:	$(MESS_LAYOUT)/votrtnt.lh
 $(MESS_DRIVERS)/vt100.o:	$(MESS_LAYOUT)/vt100.lh
 $(MESS_DRIVERS)/x68k.o:		$(MESS_LAYOUT)/x68000.lh
 $(MESS_DRIVERS)/z80ne.o:	$(MESS_LAYOUT)/z80ne.lh   \

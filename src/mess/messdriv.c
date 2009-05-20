@@ -1219,7 +1219,7 @@ const game_driver * const drivers[] =
 	DRIVER( camply128 )
 
 	/* Votrax */
-//	DRIVER( votrtnt ) /* Votrax Type-N-Talk */
+	DRIVER( votrtnt ) /* Votrax Type-N-Talk */
 	DRIVER( votrpss ) /* Votrax Personal Speech System */
 
 /****************Games*******************************************************/
