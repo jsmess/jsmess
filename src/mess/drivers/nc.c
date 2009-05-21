@@ -1719,6 +1719,13 @@ ROM_START(nc100)
 	ROMX_LOAD("nc100.rom",  0x010000, 0x040000, CRC(a699eca3) SHA1(ce217d5a298b959ccc3d7bc5c93b1dba043f1339), ROM_BIOS(2))
 ROM_END
 
+
+ROM_START(nc150)
+	ROM_REGION(((64*1024)+(512*1024)), "maincpu",0)
+	ROM_LOAD("nc150_fr_b2.rom", 0x010000, 0x080000, CRC(be442d14) SHA1(f141d409dc72dc1e6662c21a147231c4df3be6b8))	/* French */
+ROM_END
+
+
 ROM_START(nc200)
         ROM_REGION(((64*1024)+(512*1024)), "maincpu",0)
         ROM_LOAD("nc200.rom", 0x010000, 0x080000, CRC(bb8180e7) SHA1(fb5c93b0a3e199202c6a12548d2617f7a09bae47))
@@ -1778,4 +1785,6 @@ SYSTEM_CONFIG_END
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY         FULLNAME    FLAGS */
 COMP( 1992, nc100,  0,      0,      nc100,  nc100,  0,      nc100,  "Amstrad plc",  "NC100",    0 )
+COMP( 1992, nc150,  nc100,  0,      nc100,  nc100,  0,      nc100,  "Amstrad plc",  "NC150",    0 )
 COMP( 1993, nc200,  0,      0,      nc200,  nc200,  0,      nc200,  "Amstrad plc",  "NC200",    0 )
+

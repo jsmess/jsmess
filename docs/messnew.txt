@@ -4,6 +4,7 @@ New System Drivers Supported (in no particular order):
 ------------------------------------------------------
 - Amiga 1200 NTSC & PAL (not working)  [incog nito, Dirk Best, Fabio Priuli]
 - Amiga CD32 (not working)  [incog nito, Fabio Priuli]
+- Amstrad NC150  [Roberto Carlos Fernandez Gerhardt, Wilbert Pol]
 - CD-I (not working)  [incog nito]
 - CIP-01 [Miodrag Milanovic]
 - Frael Bruc 100-1 [Miodrag Milanovic]
