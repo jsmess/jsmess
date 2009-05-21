@@ -62,12 +62,14 @@ SYSTEM_CONFIG_END
 
 /* ROM definition */
 ROM_START( huebler )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-  ROM_LOAD( "hemcfont.bin", 0x0000, 0x0400, CRC(1074d103) SHA1(e558279cff5744acef4eccf30759a9508b7f8750))
-  ROM_LOAD( "mon21.bin",    0x0000, 0x0bdf, CRC(ba905563) SHA1(1fa0aeab5428731756bdfa74efa3c664898bf083))
-  ROM_LOAD( "mon30.bin",    0x0000, 0x1000, CRC(033f8112) SHA1(0c6ae7b9d310dec093652db6e8ae84f8ebfdcd29))
-  ROM_LOAD( "mon30p_hbasic33p.bin", 0x0000, 0x4800, CRC(c927e7be) SHA1(2d1f3ff4d882c40438a1281872c6037b2f07fdf2))
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	/* Various bioses here, load address of each is shown */
+	ROM_LOAD( "mon21.bin",    0xf000, 0x0bdf, CRC(ba905563) SHA1(1fa0aeab5428731756bdfa74efa3c664898bf083))
+	ROM_LOAD( "mon30.bin",    0x0000, 0x1000, CRC(033f8112) SHA1(0c6ae7b9d310dec093652db6e8ae84f8ebfdcd29))
+	ROM_LOAD( "mon30p_hbasic33p.bin", 0x0000, 0x4800, CRC(c927e7be) SHA1(2d1f3ff4d882c40438a1281872c6037b2f07fdf2))
 
+	ROM_REGION( 0x0400, "gfx1", ROMREGION_ERASEFF )
+	ROM_LOAD( "hemcfont.bin", 0x0000, 0x0400, CRC(1074d103) SHA1(e558279cff5744acef4eccf30759a9508b7f8750))
 ROM_END
 
 /* Driver */

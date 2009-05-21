@@ -4,6 +4,9 @@
 
         12/05/2009 Skeleton driver.
 
+	Assuming that a cart is loaded to 800-FFF.
+	A test is made by the rom, it reads 800 if it is zero, jumps to it.
+
 ****************************************************************************/
 
 #include "driver.h"
@@ -11,6 +14,8 @@
 
 static ADDRESS_MAP_START(interact_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE( 0x0000, 0x0fff ) AM_ROM
+	AM_RANGE( 0x1000, 0xffff ) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( interact_io , ADDRESS_SPACE_IO, 8)
@@ -62,9 +67,8 @@ SYSTEM_CONFIG_END
 
 /* ROM definition */
 ROM_START( interact )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-  ROM_LOAD( "interact.rom", 0x0000, 0x0800, CRC(1aa50444) SHA1(405806c97378abcf7c7b0d549430c78c7fc60ba2))
-
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "interact.rom", 0x0000, 0x0800, CRC(1aa50444) SHA1(405806c97378abcf7c7b0d549430c78c7fc60ba2))
 ROM_END
 
 /* Driver */

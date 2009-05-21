@@ -62,15 +62,20 @@ SYSTEM_CONFIG_END
 
 /* ROM definition */
 ROM_START( lc80 )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-  ROM_LOAD( "lc80__00.rom", 0x0000, 0x0400, CRC(e754ef53) SHA1(044440b13e62addbc3f6a77369cfd16f99b39752))
-  ROM_LOAD( "lc80__08.rom", 0x0000, 0x0400, CRC(2b544da1) SHA1(3a6cbd0c57c38eadb7055dca4b396c348567d1d5))
-  ROM_LOAD( "lc80_2.bin", 0x0000, 0x1000, CRC(2e06d768) SHA1(d9cddaf847831e4ab21854c0f895348b7fda20b8))
-  ROM_LOAD( "lc80_2716.bin", 0x0000, 0x0800, CRC(b3025934) SHA1(6fff953f0f1eee829fd774366313ab7e8053468c))
-  ROM_LOAD( "lc80_u505.bin", 0x0000, 0x1000, CRC(d2d40b03) SHA1(1a18e98b35214c46fe5147ff4a90bdcc18cbb7ab))
-  ROM_LOAD( "lc80e_0000.bin", 0x0000, 0x2000, CRC(c98a8f08) SHA1(64c728459181ce163341eb94420e031e30d762b6))
-  ROM_LOAD( "lc80e_c000.bin", 0x0000, 0x1000, CRC(9c858d9c) SHA1(2f7b3fd046c965185606253f6cd9372da289ca6f))
-
+	/* There seem to be a number of bios versions here...
+		Rom 1 and 2 make a set
+		Rom 3 no idea where it fits in
+		Rom 4 works by itself
+		Rom 5 works by itself
+		Roms 6 and 7 make a set */
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "lc80__00.rom", 0x0000, 0x0400, CRC(e754ef53) SHA1(044440b13e62addbc3f6a77369cfd16f99b39752))
+	ROM_LOAD( "lc80__08.rom", 0x0800, 0x0400, CRC(2b544da1) SHA1(3a6cbd0c57c38eadb7055dca4b396c348567d1d5))
+	ROM_LOAD( "lc80_2.bin", 0x0c00, 0x1000, CRC(2e06d768) SHA1(d9cddaf847831e4ab21854c0f895348b7fda20b8))
+	ROM_LOAD( "lc80_2716.bin", 0x0000, 0x0800, CRC(b3025934) SHA1(6fff953f0f1eee829fd774366313ab7e8053468c))
+	ROM_LOAD( "lc80_u505.bin", 0x0000, 0x1000, CRC(d2d40b03) SHA1(1a18e98b35214c46fe5147ff4a90bdcc18cbb7ab))
+	ROM_LOAD( "lc80e_0000.bin", 0x0000, 0x2000, CRC(c98a8f08) SHA1(64c728459181ce163341eb94420e031e30d762b6))
+	ROM_LOAD( "lc80e_c000.bin", 0xc000, 0x1000, CRC(9c858d9c) SHA1(2f7b3fd046c965185606253f6cd9372da289ca6f))
 ROM_END
 
 /* Driver */
