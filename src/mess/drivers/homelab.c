@@ -150,7 +150,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( homelab3 )
 /* basic machine hardware */
 	MDRV_IMPORT_FROM(homelab)
-  MDRV_CPU_MODIFY("maincpu")     
+  	MDRV_CPU_MODIFY("maincpu")     
 	MDRV_CPU_PROGRAM_MAP(homelab3_mem)
 	
 	MDRV_SCREEN_MODIFY("screen")
@@ -168,8 +168,8 @@ ROM_START( homelab2 )
     ROM_LOAD( "hl2_2.rom", 0x0800, 0x0800, CRC(696AF3C1) SHA1(b53bc6ae2b75975618fc90e7181fa5d21409fce1))
     ROM_LOAD( "hl2_3.rom", 0x1000, 0x0800, CRC(69E57E8C) SHA1(e98510abb715dbf513e1b29fb6b09ab54e9483b7))
   	ROM_LOAD( "hl2_4.rom", 0x1800, 0x0800, CRC(97CBBE74) SHA1(34f0bad41302b059322018abc3d1c2336ecfbea8))
-		ROM_REGION(0x0800, "gfx1",0)
-		ROM_LOAD ("hl2.chr", 0x0000, 0x0800, CRC(2E669D40) SHA1(639dd82ed29985dc69830aca3b904b6acc8fe54a))
+	ROM_REGION(0x0800, "gfx1",0)
+	ROM_LOAD ("hl2.chr", 0x0000, 0x0800, CRC(2E669D40) SHA1(639dd82ed29985dc69830aca3b904b6acc8fe54a))
 ROM_END
 
 ROM_START( homelab3 )
@@ -178,8 +178,8 @@ ROM_START( homelab3 )
     ROM_LOAD( "hl3_2.rom", 0x1000, 0x1000, CRC(BCAC3C24) SHA1(aff371d17f61cb60c464998e092f04d5d85c4d52))
     ROM_LOAD( "hl3_3.rom", 0x2000, 0x1000, CRC(AB1B4AB0) SHA1(ad74c7793f5dc22061a88ef31d3407267ad08719))
   	ROM_LOAD( "hl3_4.rom", 0x3000, 0x1000, CRC(BF67EFF9) SHA1(2ef5d46f359616e7d0e5a124df528de44f0e850b))
-		ROM_REGION(0x0800, "gfx1",0)
-		ROM_LOAD ("hl3.chr", 0x0000, 0x0800, CRC(F58EE39B) SHA1(49399c42d60a11b218a225856da86a9f3975a78a))
+	ROM_REGION(0x0800, "gfx1",0)
+	ROM_LOAD ("hl3.chr", 0x0000, 0x0800, CRC(F58EE39B) SHA1(49399c42d60a11b218a225856da86a9f3975a78a))
 ROM_END
 
 ROM_START( homelab4 )
@@ -188,13 +188,25 @@ ROM_START( homelab4 )
     ROM_LOAD( "hl4_2.rom", 0x1000, 0x1000, CRC(151D33E8) SHA1(d32004bc1553f802b9d3266709552f7d5315fe44))
     ROM_LOAD( "hl4_3.rom", 0x2000, 0x1000, CRC(39571AB1) SHA1(8470cff2e3442101e6a0bc655358b3a6fc1ef944))
   	ROM_LOAD( "hl4_4.rom", 0x3000, 0x1000, CRC(F4B77CA2) SHA1(ffbdb3c1819c7357e2a0fc6317c111a8a7ecfcd5))
-		ROM_REGION(0x0800, "gfx1",0)
-		ROM_LOAD ("hl4.chr", 0x0000, 0x0800, CRC(F58EE39B) SHA1(49399c42d60a11b218a225856da86a9f3975a78a))
+	ROM_REGION(0x0800, "gfx1",0)
+	ROM_LOAD ("hl4.chr", 0x0000, 0x0800, CRC(F58EE39B) SHA1(49399c42d60a11b218a225856da86a9f3975a78a))
+ROM_END
+
+ROM_START( brailab4 )
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "brl1.rom", 0x0000, 0x1000, CRC(02323403) SHA1(3a2e853e0a39e05a04a8db58e1a76de1eda579c9))
+	ROM_LOAD( "brl2.rom", 0x1000, 0x1000, CRC(36173fbc) SHA1(1c01398e16a1cbe4103e1be769347ceae873e090))
+	ROM_LOAD( "brl3.rom", 0x2000, 0x1000, CRC(d3cdd108) SHA1(1a24e6c5f9c370ff6cb25045cb9d95e664467eb5))
+	ROM_LOAD( "brl4.rom", 0x3000, 0x1000, CRC(d4047885) SHA1(00fe40c4c2c64a49bb429fb2b27cc7e0d0025a85))
+	ROM_LOAD( "brl5.rom", 0x4000, 0x1000, CRC(8a76be04) SHA1(4b683b9be23b47117901fe874072eb7aa481e4ff))
+	ROM_REGION(0x0800, "gfx1",0)
+	ROM_LOAD ("hl4.chr", 0x0000, 0x0800, CRC(F58EE39B) SHA1(49399c42d60a11b218a225856da86a9f3975a78a))
 ROM_END
 
 /* Driver */
 
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT   INIT  CONFIG COMPANY                 FULLNAME   FLAGS */
-COMP( 1982, homelab2,   0	,0, 	homelab, 	homelab, 	homelab, NULL,  "", "Homelab 2 / Aircomp 16",		 GAME_NOT_WORKING)
-COMP( 1983, homelab3,   homelab2,0, 	homelab3, 	homelab, 	homelab, NULL,  "", "Homelab 3",		 GAME_NOT_WORKING)
-COMP( 1984, homelab4,   homelab2,0, 	homelab3, 	homelab, 	homelab, NULL,  "", "Homelab 4",		 GAME_NOT_WORKING)
+COMP( 1982, homelab2,   0	,	 0, 	homelab, 	homelab, 	homelab, NULL,  "Jozsef and Endre Lukacs", "Homelab 2 / Aircomp 16",		 GAME_NOT_WORKING)
+COMP( 1983, homelab3,   homelab2,0, 	homelab3, 	homelab, 	homelab, NULL,  "Jozsef and Endre Lukacs", "Homelab 3",		 GAME_NOT_WORKING)
+COMP( 1984, homelab4,   homelab2,0, 	homelab3, 	homelab, 	homelab, NULL,  "Jozsef and Endre Lukacs", "Homelab 4",		 GAME_NOT_WORKING)
+COMP( 1984, brailab4,   homelab2,0, 	homelab3, 	homelab, 	homelab, NULL,  "Jozsef and Endre Lukacs", "Brailab 4",		 GAME_NOT_WORKING)

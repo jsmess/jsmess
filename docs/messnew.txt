@@ -20,6 +20,7 @@ New System Drivers Supported (in no particular order):
 - Timex Sinclair 1500 [Robbbert, Miodrag Milanovic]
 - Pravetz 82, 8M and 8C [Miodrag Milanovic]
 - Microprofessor III [Miodrag Milanovic]
+- Brailab 4 (not working) [Miodrag Milanovic]
 
 Skeleton drivers : 
 ------------------
@@ -83,7 +84,7 @@ Skeleton drivers :
 - Visual 1050
 - Xerox 820
 - XOR-100-12
-
+- Nanos
 
 System Driver Changes:
 ----------------------

@@ -1083,6 +1083,7 @@ const game_driver * const drivers[] =
 	DRIVER (homelab2)
 	DRIVER (homelab3)
 	DRIVER (homelab4)
+	DRIVER (brailab4)
 
 	/* Irisha */
 	DRIVER (irisha)
@@ -1293,5 +1294,6 @@ const game_driver * const drivers[] =
 	DRIVER( ply601 )
 	DRIVER( ply601a )
 	DRIVER( m20 )
+	DRIVER( nanos )
 
 #endif /* DRIVER_RECURSIVE */

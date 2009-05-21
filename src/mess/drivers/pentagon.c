@@ -13,29 +13,37 @@
 
 
 static int ROMSelection;
+static device_config* beta;
 
 static DIRECT_UPDATE_HANDLER( pentagon_direct )
 {	
 	UINT16 pc = cpu_get_reg(cputag_get_cpu(space->machine, "maincpu"), REG_GENPCBASE);
-	if (betadisk_is_active()) 
+	
+	if (beta->started && betadisk_is_active(beta)) 
 	{
 		if (pc >= 0x4000) 
 		{
 			ROMSelection = ((spectrum_128_port_7ffd_data>>4) & 0x01) ? 1 : 0;
-			betadisk_disable();
+			betadisk_disable(beta);
 			memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
 			memory_set_bankptr(space->machine, 1, memory_region(space->machine, "maincpu") + 0x010000 + (ROMSelection<<14));
 		} 	
 	} else if (((pc & 0xff00) == 0x3d00) && (ROMSelection==1))
 	{
 		ROMSelection = 3;
-		betadisk_enable();
+		if (beta->started) 
+			betadisk_enable(beta);
 		
 	} 
 	if((address>=0x0000) && (address<=0x3fff)) 
-	{
+	{	
 		memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
-		direct->raw = direct->decrypted =  memory_region(space->machine, "maincpu") + 0x010000 + (ROMSelection<<14);
+		if (ROMSelection == 3) {			
+			if (beta->started) 
+				direct->raw = direct->decrypted =  memory_region(space->machine, "beta:beta");
+		} else {
+			direct->raw = direct->decrypted =  memory_region(space->machine, "maincpu") + 0x010000 + (ROMSelection<<14);
+		}
 		memory_set_bankptr(space->machine, 1, direct->raw);
 		return ~0;
 	}
@@ -48,13 +56,12 @@ static void pentagon_update_memory(running_machine *machine)
 
 	memory_set_bankptr(machine, 4, mess_ram + ((spectrum_128_port_7ffd_data & 0x07) * 0x4000));
 
-	if( betadisk_is_active() && !( spectrum_128_port_7ffd_data & 0x10 ) ) 
+	if (beta->started && betadisk_is_active(beta) && !( spectrum_128_port_7ffd_data & 0x10 ) ) 
 	{    
 		/* GLUK */
 		ROMSelection = 2;
 	}
-	else
-	{
+	else {	
 		/* ROM switching */
 		ROMSelection = ((spectrum_128_port_7ffd_data>>4) & 0x01) ;
 	}
@@ -77,12 +84,12 @@ static WRITE8_HANDLER(pentagon_port_7ffd_w)
 
 static ADDRESS_MAP_START (pentagon_io, ADDRESS_SPACE_IO, 8)	
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x001f, 0x001f) AM_READWRITE(betadisk_status_r,betadisk_command_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x003f, 0x003f) AM_READWRITE(betadisk_track_r,betadisk_track_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x005f, 0x005f) AM_READWRITE(betadisk_sector_r,betadisk_sector_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x007f, 0x007f) AM_READWRITE(betadisk_data_r,betadisk_data_w) AM_MIRROR(0xff00)
+	AM_RANGE(0x001f, 0x001f) AM_DEVREADWRITE(BETA_DISK_TAG, betadisk_status_r,betadisk_command_w) AM_MIRROR(0xff00)
+	AM_RANGE(0x003f, 0x003f) AM_DEVREADWRITE(BETA_DISK_TAG, betadisk_track_r,betadisk_track_w) AM_MIRROR(0xff00)
+	AM_RANGE(0x005f, 0x005f) AM_DEVREADWRITE(BETA_DISK_TAG, betadisk_sector_r,betadisk_sector_w) AM_MIRROR(0xff00)
+	AM_RANGE(0x007f, 0x007f) AM_DEVREADWRITE(BETA_DISK_TAG, betadisk_data_r,betadisk_data_w) AM_MIRROR(0xff00)
 	AM_RANGE(0x00fe, 0x00fe) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_MIRROR(0xff00) AM_MASK(0xffff) 
-	AM_RANGE(0x00ff, 0x00ff) AM_READWRITE(betadisk_state_r, betadisk_param_w) AM_MIRROR(0xff00)
+	AM_RANGE(0x00ff, 0x00ff) AM_DEVREADWRITE(BETA_DISK_TAG, betadisk_state_r, betadisk_param_w) AM_MIRROR(0xff00)
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(pentagon_port_7ffd_w)  AM_MIRROR(0x3ffd)
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay8912", ay8910_data_w) AM_MIRROR(0x3ffd)
 	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE("ay8912", ay8910_r, ay8910_address_w) AM_MIRROR(0x3ffd)
@@ -91,12 +98,15 @@ ADDRESS_MAP_END
 static MACHINE_RESET( pentagon )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-
+	beta = (device_config*)devtag_get_device(machine, BETA_DISK_TAG);
+	
 	memory_install_read8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_BANK(1));
 	memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
 
-	betadisk_enable();
-	betadisk_clear_status();
+	if (beta->started)  {
+		betadisk_enable(beta);
+		betadisk_clear_status(beta);
+	}
 
 	memory_set_direct_update_handler( space, pentagon_direct ); 
 	
@@ -119,7 +129,7 @@ static MACHINE_DRIVER_START( pentagon )
 	MDRV_CPU_IO_MAP(pentagon_io)
 	MDRV_MACHINE_RESET( pentagon )
 		
-	MDRV_WD179X_ADD("wd179x", beta_wd17xx_interface )
+	MDRV_BETA_DISK_ADD(BETA_DISK_TAG)
 MACHINE_DRIVER_END
 
 
@@ -131,11 +141,10 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START(pentagon)
-	ROM_REGION(0x020000, "maincpu", 0)
+	ROM_REGION(0x01c000, "maincpu", 0)
 	ROM_LOAD("128p-0.rom", 0x010000, 0x4000, CRC(124ad9e0) SHA1(d07fcdeca892ee80494d286ea9ea5bf3928a1aca) )
 	ROM_LOAD("128p-1.rom", 0x014000, 0x4000, CRC(b96a36be) SHA1(80080644289ed93d71a1103992a154cc9802b2fa) )
 	ROM_LOAD("gluck.rom",  0x018000, 0x4000, CRC(ca321d79) SHA1(015eb96dafb273d4f4512c467e9b43c305fd1bc4) )
-	ROM_LOAD("trdos.rom",  0x01c000, 0x4000, CRC(10751aba) SHA1(21695e3f2a8f796386ce66eea8a246b0ac44810c) )	
 	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 

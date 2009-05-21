@@ -192,12 +192,10 @@ void spectrum_128_update_memory(running_machine *machine)
 
 	if (spectrum_128_port_7ffd_data & 8)
 	{
-			logerror("SCREEN 1: BLOCK 7\n");
 			spectrum_screen_location = mess_ram + (7<<14);
 	}
 	else
 	{
-			logerror("SCREEN 0: BLOCK 5\n");
 			spectrum_screen_location = mess_ram + (5<<14);
 	}
 
@@ -210,8 +208,6 @@ void spectrum_128_update_memory(running_machine *machine)
 			ram_data = mess_ram + (ram_page<<14);
 
 			memory_set_bankptr(machine, 4, ram_data);
-
-			logerror("RAM at 0xc000: %02x\n",ram_page);
 	}
 
 	/* ROM switching */
@@ -222,8 +218,6 @@ void spectrum_128_update_memory(running_machine *machine)
 	ChosenROM = memory_region(machine, "maincpu") + 0x010000 + (ROMSelection<<14);
 
 	memory_set_bankptr(machine, 1, ChosenROM);
-
-	logerror("rom switch: %02x\n", ROMSelection);
 }
 
 static  READ8_HANDLER ( spectrum_128_ula_r )

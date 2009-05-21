@@ -189,6 +189,8 @@ static int scorpion_256_port_1ffd_data = 0;
 
 static int ROMSelection;
 
+static device_config* beta;
+
 //static UINT8 *rom_pointer;
 
 static void scorpion_update_memory(running_machine *machine)
@@ -224,24 +226,24 @@ static void scorpion_update_memory(running_machine *machine)
 static DIRECT_UPDATE_HANDLER( scorpion_direct )
 {	
 	UINT16 pc = cpu_get_reg(cputag_get_cpu(space->machine, "maincpu"), REG_GENPCBASE);
-	if (betadisk_is_active()) 
+	if (betadisk_is_active(beta)) 
 	{
 		if (pc >= 0x4000) 
 		{
 			ROMSelection = ((spectrum_128_port_7ffd_data>>4) & 0x01) ? 1 : 0;
-			betadisk_disable();
+			betadisk_disable(beta);
 			memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
 			memory_set_bankptr(space->machine, 1, memory_region(space->machine, "maincpu") + 0x010000 + (ROMSelection<<14));
 		} 	
 	} else if (((pc & 0xff00) == 0x3d00) && (ROMSelection==1))
 	{
 		ROMSelection = 3;
-		betadisk_enable();
+		betadisk_enable(beta);
 		
 	} 
 	if((address>=0x0000) && (address<=0x3fff)) 
 	{
-		memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);
+		memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_UNMAP);		
 		direct->raw = direct->decrypted =  memory_region(space->machine, "maincpu") + 0x010000 + (ROMSelection<<14);
 		memory_set_bankptr(space->machine, 1, direct->raw);
 		return ~0;
@@ -284,12 +286,12 @@ static WRITE8_HANDLER(scorpion_port_1ffd_w)
   
 static ADDRESS_MAP_START (scorpion_io, ADDRESS_SPACE_IO, 8)	
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x001f, 0x001f) AM_READWRITE(betadisk_status_r,betadisk_command_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x003f, 0x003f) AM_READWRITE(betadisk_track_r,betadisk_track_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x005f, 0x005f) AM_READWRITE(betadisk_sector_r,betadisk_sector_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x007f, 0x007f) AM_READWRITE(betadisk_data_r,betadisk_data_w) AM_MIRROR(0xff00)
+	AM_RANGE(0x001f, 0x001f) AM_DEVREADWRITE(BETA_DISK_TAG, betadisk_status_r,betadisk_command_w) AM_MIRROR(0xff00)
+	AM_RANGE(0x003f, 0x003f) AM_DEVREADWRITE(BETA_DISK_TAG, betadisk_track_r,betadisk_track_w) AM_MIRROR(0xff00)
+	AM_RANGE(0x005f, 0x005f) AM_DEVREADWRITE(BETA_DISK_TAG, betadisk_sector_r,betadisk_sector_w) AM_MIRROR(0xff00)
+	AM_RANGE(0x007f, 0x007f) AM_DEVREADWRITE(BETA_DISK_TAG, betadisk_data_r,betadisk_data_w) AM_MIRROR(0xff00)
 	AM_RANGE(0x00fe, 0x00fe) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_MIRROR(0xff00) AM_MASK(0xffff) 
-	AM_RANGE(0x00ff, 0x00ff) AM_READWRITE(betadisk_state_r, betadisk_param_w) AM_MIRROR(0xff00)
+	AM_RANGE(0x00ff, 0x00ff) AM_DEVREADWRITE(BETA_DISK_TAG, betadisk_state_r, betadisk_param_w) AM_MIRROR(0xff00)
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(scorpion_port_7ffd_w)  AM_MIRROR(0x3ffd)
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay8912", ay8910_data_w) AM_MIRROR(0x3ffd)
 	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE("ay8912", ay8910_r, ay8910_address_w) AM_MIRROR(0x3ffd)
@@ -299,12 +301,13 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( scorpion )
 {	
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);	
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	beta = (device_config*)devtag_get_device(machine, BETA_DISK_TAG);	
 	
 	memory_install_read8_handler (space, 0x0000, 0x3fff, 0, 0, SMH_BANK(1));
 	
-	betadisk_disable();
-	betadisk_clear_status();
+	betadisk_disable(beta);
+	betadisk_clear_status(beta);
 
 	memory_set_direct_update_handler(space, scorpion_direct ); 
 	
@@ -330,7 +333,7 @@ static MACHINE_DRIVER_START( scorpion )
 	MDRV_CPU_IO_MAP(scorpion_io)
 	MDRV_MACHINE_RESET( scorpion )
 	
-	MDRV_WD179X_ADD("wd179x", beta_wd17xx_interface )	
+	MDRV_BETA_DISK_ADD(BETA_DISK_TAG)
 MACHINE_DRIVER_END
 
 

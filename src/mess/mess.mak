@@ -1398,6 +1398,7 @@ $(MESSOBJ)/skeleton.a: \
 	$(MESS_DRIVERS)/ply601.o \
 	$(MESS_DRIVERS)/vg5k.o \
 	$(MESS_DRIVERS)/camplynx.o \
+	$(MESS_DRIVERS)/nanos.o \
 	
 #-------------------------------------------------
 # layout dependencies
