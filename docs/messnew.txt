@@ -61,7 +61,8 @@ Skeleton drivers :
 - NEC PC-6001mkIISR
 - NEC PC-6600
 - NEC PC-6600SR
-- Olivetti M-20
+- Olivetti L1 M20
+- Olivetti L1 M40
 - Philips VG-5000
 - Philips VG-8000
 - Philips VG-8010
