@@ -85,6 +85,8 @@ Skeleton drivers :
 - Xerox 820
 - XOR-100-12
 - Nanos
+- Robotron A5120
+- Robotron A5130
 
 System Driver Changes:
 ----------------------
