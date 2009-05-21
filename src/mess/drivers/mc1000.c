@@ -4,6 +4,12 @@
 
         12/05/2009 Skeleton driver.
 
+This is running - look at memory at 8000. There's even a flashing cursor.
+
+The display looks like 32x16 although memory from 8000-97FE is filled with
+spaces. The character generator rom is missing - unless it uses a 6847.
+This is a color computer.
+
 ****************************************************************************/
 
 #include "driver.h"
@@ -11,6 +17,8 @@
 
 static ADDRESS_MAP_START(mc1000_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE( 0x0000, 0xbfff ) AM_RAM
+	AM_RANGE( 0xc000, 0xffff ) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mc1000_io , ADDRESS_SPACE_IO, 8)
@@ -62,13 +70,12 @@ SYSTEM_CONFIG_END
 
 /* ROM definition */
 ROM_START( mc1000 )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-  ROM_LOAD( "mc1000.rom", 0x0000, 0x4000, CRC(d46f67d5) SHA1(48a2539506a24ea7478cb20ae1ea1226e2f670c4))
-
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "mc1000.rom", 0xc000, 0x4000, CRC(d46f67d5) SHA1(48a2539506a24ea7478cb20ae1ea1226e2f670c4))
 ROM_END
 
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( ????, mc1000,  0,       0, 	mc1000, 	mc1000, 	 0,  	  mc1000,  	 "CCE",   "MC 1000",		GAME_NOT_WORKING)
+COMP( ????, mc1000,  0,       0, 	mc1000, 	mc1000, 	 0,  	  mc1000,  	 "CCE",   "MC-1000",		GAME_NOT_WORKING)
 
