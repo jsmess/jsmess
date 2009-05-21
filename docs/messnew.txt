@@ -21,6 +21,7 @@ New System Drivers Supported (in no particular order):
 - Pravetz 82, 8M and 8C [Miodrag Milanovic]
 - Microprofessor III [Miodrag Milanovic]
 - Brailab 4 (not working) [Miodrag Milanovic]
+- Sharp Pocket Computer 1245,1250,1255,1260,1261/1262 [Miodrag Milanovic]
 
 Skeleton drivers : 
 ------------------

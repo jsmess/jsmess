@@ -545,8 +545,13 @@ const game_driver * const drivers[] =
 //	DRIVER( megaopd )
 
 	/* SHARP */
+	DRIVER( pc1245 )	/* Pocket Computer 1245								*/
+	DRIVER( pc1250 )	/* Pocket Computer 1250								*/
 	DRIVER( pc1251 )	/* Pocket Computer 1251								*/
+	DRIVER( pc1255 )	/* Pocket Computer 1255								*/
 	DRIVER( trs80pc3 )	/* Tandy TRS80 PC-3									*/
+	DRIVER( pc1260 )	/* Pocket Computer 1260								*/
+	DRIVER( pc1261 )	/* Pocket Computer 1261								*/
 	DRIVER( pc1401 )	/* Pocket Computer 1401								*/
 	DRIVER( pc1402 )	/* Pocket Computer 1402								*/
 	DRIVER( pc1350 )	/* Pocket Computer 1350								*/

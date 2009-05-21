@@ -121,44 +121,9 @@ static TIMER_CALLBACK(pc1251_power_up)
 DRIVER_INIT( pc1251 )
 {
 	int i;
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *gfx = memory_region(machine, "gfx1");
 	for (i=0; i<128; i++) gfx[i]=i;
 
 	timer_set(machine, ATTOTIME_IN_SEC(1), NULL, 0, pc1251_power_up);
-
-	// c600 b800 b000 a000 8000 tested
-	// 4 kb memory feedback 512 bytes too few???
-	// 11 kb ram: program stored at 8000
-#if 1
-	memory_install_write8_handler(space, 0x8000, 0xc7ff, 0, 0, SMH_BANK(1));
-	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0x8000);
-#else
-	if ((input_port_read(machine, "DSW0") & 0xc0) == 0xc0)
-	{
-		memory_install_write8_handler(space, 0x8000, 0xafff, 0, 0, SMH_RAM);
-		memory_install_write8_handler(space, 0xb000, 0xc5ff, 0, 0, SMH_NOP);
-		memory_install_write8_handler(space, 0xc600, 0xc7ff, 0, 0, SMH_RAM);
-		memory_install_write8_handler(space, 0xc800, 0xf7ff, 0, 0, SMH_RAM);
-	}
-	else if ((input_port_read(machine, "DSW0") & 0xc0) == 0x80)
-	{
-		memory_install_write8_handler(space, 0xa000, 0xafff, 0, 0, SMH_NOP);
-		memory_install_write8_handler(space, 0xb000, 0xc7ff, 0, 0, SMH_RAM);
-		memory_install_write8_handler(space, 0xc800, 0xcbff, 0, 0, SMH_RAM);
-	}
-	else if ((input_port_read(machine, "DSW0") & 0xc0) == 0x40)
-	{
-		memory_install_write8_handler(space, 0xa000, 0xb7ff, 0, 0, SMH_NOP);
-		memory_install_write8_handler(space, 0xb800, 0xc7ff, 0, 0, SMH_RAM);
-		memory_install_write8_handler(space, 0xc800, 0xcbff, 0, 0, SMH_RAM);
-	}
-	else
-	{
-		memory_install_write8_handler(space, 0xa000, 0xc5ff, 0, 0, SMH_NOP);
-		memory_install_write8_handler(space, 0xc600, 0xc9ff, 0, 0, SMH_RAM);
-		memory_install_write8_handler(space, 0xca00, 0xcbff, 0, 0, SMH_RAM);
-	}
-#endif
 }
 

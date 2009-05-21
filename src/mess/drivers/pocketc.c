@@ -89,13 +89,43 @@ static ADDRESS_MAP_START( pc1401_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc1251_mem , ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START( pc1250_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x1fff) AM_ROM
-//  { 0x2000, 0x3fff, SMH_RAM },
 	AM_RANGE( 0x4000, 0x7fff) AM_ROM
-	AM_RANGE( 0xa000, 0xcbff) AM_ROM
+	AM_RANGE( 0xc000, 0xc7ff) AM_RAM // 2KB RAM
 	AM_RANGE( 0xf800, 0xf8ff) AM_READWRITE( pc1251_lcd_read, pc1251_lcd_write)
 ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( pc1251_mem , ADDRESS_SPACE_PROGRAM, 8)
+	AM_RANGE( 0x0000, 0x1fff) AM_ROM
+	AM_RANGE( 0x4000, 0x7fff) AM_ROM
+	AM_RANGE( 0xb800, 0xc7ff) AM_RAM // 4KB RAM
+	AM_RANGE( 0xf800, 0xf8ff) AM_READWRITE( pc1251_lcd_read, pc1251_lcd_write)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( pc1255_mem , ADDRESS_SPACE_PROGRAM, 8)
+	AM_RANGE( 0x0000, 0x1fff) AM_ROM
+	AM_RANGE( 0x4000, 0x7fff) AM_ROM
+	AM_RANGE( 0xa000, 0xc7ff) AM_RAM // 10KB RAM
+	AM_RANGE( 0xf800, 0xf8ff) AM_READWRITE( pc1251_lcd_read, pc1251_lcd_write)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( pc1260_mem , ADDRESS_SPACE_PROGRAM, 8)
+	AM_RANGE( 0x0000, 0x1fff) AM_ROM
+	AM_RANGE( 0x2000, 0x20ff) AM_READWRITE( pc1251_lcd_read, pc1251_lcd_write)
+	//AM_RANGE( 0x2800, 0x28ff) AM_READWRITE( pc1251_lcd_read, pc1251_lcd_write)
+	AM_RANGE( 0x5800, 0x67ff) AM_RAM // 4KB RAM
+	AM_RANGE( 0x8000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( pc1261_mem , ADDRESS_SPACE_PROGRAM, 8)
+	AM_RANGE( 0x0000, 0x1fff) AM_ROM
+	AM_RANGE( 0x2000, 0x20ff) AM_READWRITE( pc1251_lcd_read, pc1251_lcd_write)
+	//AM_RANGE( 0x2800, 0x28ff) AM_READWRITE( pc1251_lcd_read, pc1251_lcd_write)
+	AM_RANGE( 0x4000, 0x67ff) AM_RAM // 10KB RAM
+	AM_RANGE( 0x8000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
 
 static ADDRESS_MAP_START( pc1350_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x1fff) AM_ROM
@@ -123,21 +153,6 @@ static ADDRESS_MAP_START( pc1421_writemem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x1fff) AM_WRITE( SMH_ROM )
 	AM_RANGE( 0x2000, 0x37ff) AM_WRITE( SMH_RAM )
 	AM_RANGE( 0x3800, 0x47ff) AM_WRITE( SMH_RAM )
-	AM_RANGE( 0x8000, 0xffff) AM_WRITE( SMH_ROM )
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( pc1260_readmem , ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE( 0x0000, 0x1fff) AM_READ( SMH_ROM )
-	AM_RANGE( 0x4000, 0x5fff) AM_READ( SMH_RAM )
-	AM_RANGE( 0x8000, 0xffff) AM_READ( SMH_ROM )
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( pc1260_writemem , ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE( 0x0000, 0x1fff) AM_WRITE( SMH_ROM )
-	AM_RANGE( 0x4000, 0x57ff) AM_WRITE( SMH_RAM ) /* 1261 */
-	AM_RANGE( 0x5800, 0x67ff) AM_WRITE( SMH_RAM )
-	AM_RANGE( 0x6000, 0x6fff) AM_WRITE( SMH_RAM )
-
 	AM_RANGE( 0x8000, 0xffff) AM_WRITE( SMH_ROM )
 ADDRESS_MAP_END
 #endif
@@ -531,13 +546,6 @@ static INPUT_PORTS_START( pc1251 )
 	PORT_DIPSETTING(	0x01, "On/RSV" )
 
 	PORT_START("DSW0")
-#if 0
-    PORT_DIPNAME( 0xc0, 0xc0, "RAM")
-	PORT_DIPSETTING(	0x00, "1KB" )
-	PORT_DIPSETTING(	0x40, "3.5KB" )
-	PORT_DIPSETTING(	0x80, "6KB" )
-	PORT_DIPSETTING(	0xc0, "11KB" )
-#endif
     PORT_DIPNAME( 0x07, 0x02, "Contrast")
 	PORT_DIPSETTING(	0x00, "0/Low" )
 	PORT_DIPSETTING(	0x01, "1" )
@@ -763,10 +771,10 @@ static const sc61860_cpu_core pc1251_config =
     pc1251_outc
 };
 
-static MACHINE_DRIVER_START( pc1251 )
+static MACHINE_DRIVER_START( pc1250 )
 	MDRV_IMPORT_FROM( pc1401 )
 	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP( pc1251_mem)
+	MDRV_CPU_PROGRAM_MAP( pc1250_mem)
 	MDRV_CPU_CONFIG( pc1251_config )
 
 	MDRV_NVRAM_HANDLER( pc1251 )
@@ -775,13 +783,59 @@ static MACHINE_DRIVER_START( pc1251 )
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_SIZE(608, 300)
 	MDRV_SCREEN_VISIBLE_AREA(0, 608-1, 0, 300-1)
-//  MDRV_SCREEN_SIZE(640, 334)
-//  MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 334-1)
 	MDRV_GFXDECODE( pc1251 )
-
+	
 	MDRV_VIDEO_UPDATE( pc1251 )
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( pc1251 )
+	MDRV_IMPORT_FROM( pc1250)
+	MDRV_CPU_MODIFY( "maincpu" )
+	MDRV_CPU_PROGRAM_MAP( pc1251_mem)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( pc1255 )
+	MDRV_IMPORT_FROM( pc1250)
+	MDRV_CPU_MODIFY( "maincpu" )
+	MDRV_CPU_PROGRAM_MAP( pc1255_mem)
+MACHINE_DRIVER_END
+
+NVRAM_HANDLER( pc1260 )
+{
+	const device_config *main_cpu = cputag_get_cpu(machine, "maincpu");
+	UINT8 *ram = memory_region(machine, "maincpu") + 0x4000;
+	UINT8 *cpu = sc61860_internal_ram(main_cpu);
+
+	if (read_or_write)
+	{
+		mame_fwrite(file, cpu, 96);
+		mame_fwrite(file, ram, 0x2800);
+	}
+	else if (file)
+	{
+		mame_fread(file, cpu, 96);
+		mame_fread(file, ram, 0x2800);
+	}
+	else
+	{
+		memset(cpu, 0, 96);
+		memset(ram, 0, 0x2800);
+	}
+}
+
+static MACHINE_DRIVER_START( pc1260 )
+	MDRV_IMPORT_FROM( pc1250)
+	MDRV_CPU_MODIFY( "maincpu" )
+	MDRV_CPU_PROGRAM_MAP( pc1260_mem)
+	
+	MDRV_NVRAM_HANDLER( pc1260 )
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( pc1261 )
+	MDRV_IMPORT_FROM( pc1260)
+	MDRV_CPU_MODIFY( "maincpu" )
+	MDRV_CPU_PROGRAM_MAP( pc1261_mem)
+MACHINE_DRIVER_END
 
 static const sc61860_cpu_core pc1350_config =
 {
@@ -857,15 +911,34 @@ ROM_END
 
 #define rom_pc1402 rom_pc1401
 
-ROM_START(pc1251)
+ROM_START(pc1245)
+	ROM_REGION(0x10000,"maincpu",0)
+  	ROM_LOAD( "cpu1245.rom", 0x0000, 0x2000, CRC(e0964069) SHA1(293c57b233d55944b308191fd72ecff81979cda7))
+  	ROM_LOAD( "bas1245.rom", 0x4000, 0x4000, CRC(f6253a0d) SHA1(bcac9b4f5a88eb952e81b3ee28f922c06bace18e))
+  	ROM_REGION(0x80,"gfx1",ROMREGION_ERASEFF)
+ROM_END
+
+ROM_START(pc1250)
 	ROM_REGION(0x10000,"maincpu",0)
 	/* sc61860a13 6c 13 ld */
-	ROM_LOAD("cpu1251.rom", 0x0000, 0x2000, CRC(f7287aca) SHA1(19bfa778e3e05ea06bdca15cd9dfbba9b971340e))
-	ROM_LOAD("bas1251.rom", 0x4000, 0x4000, CRC(93ecb629) SHA1(0fe0ad419053ee7814600b0be320dd2e8eb2ec92))
+	ROM_LOAD("cpu1250.rom", 0x0000, 0x2000, CRC(f7287aca) SHA1(19bfa778e3e05ea06bdca15cd9dfbba9b971340e))
+	ROM_LOAD("bas1250.rom", 0x4000, 0x4000, CRC(93ecb629) SHA1(0fe0ad419053ee7814600b0be320dd2e8eb2ec92))
 	ROM_REGION(0x80,"gfx1",ROMREGION_ERASEFF)
 ROM_END
 
-#define rom_trs80pc3 rom_pc1251
+#define rom_pc1251 rom_pc1250
+#define rom_pc1255 rom_pc1250
+#define rom_trs80pc3 rom_pc1250
+
+
+ROM_START(pc1260)
+	ROM_REGION(0x10000,"maincpu",0)
+	ROM_LOAD( "cpu1260.rom", 0x0000, 0x2000, CRC(f46d23d3) SHA1(e00c9194570048185ec8358732adeba151c56b33))
+	ROM_LOAD( "bas1260.rom", 0x8000, 0x8000, CRC(6c7e017d) SHA1(e2ae717438cea59416b0670e2a53989c147fb362)) 
+  	ROM_REGION(0x80,"gfx1",ROMREGION_ERASEFF)
+ROM_END
+
+#define rom_pc1261 rom_pc1260
 
 ROM_START(pc1350)
 	ROM_REGION(0x10000,"maincpu",0)
@@ -917,14 +990,21 @@ SYSTEM_CONFIG_END
    pc1600
 */
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG      COMPANY     FULLNAME */
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG      COMPANY     FULLNAME */
 /* cpu sc61860 */
-COMP( 1982, pc1251,	0,	0,	pc1251,	pc1251,	pc1251,	pocketc, "Sharp", "Pocket Computer 1251", 0 )
-COMP( 198?, trs80pc3,	pc1251,	0,	pc1251,	pc1251,	pc1251,	pocketc, "Tandy", "TRS80 PC-3", 0 )
+COMP( 1982, pc1245,	0,		0,	pc1250,	pc1251,	pc1251,	pocketc, "Sharp", "Pocket Computer 1245", GAME_NOT_WORKING )
+COMP( 1982, pc1250,	0,		0,	pc1250,	pc1251,	pc1251,	pocketc, "Sharp", "Pocket Computer 1250", 0 )
+COMP( 1982, pc1251,	pc1250,	0,	pc1251,	pc1251,	pc1251,	pocketc, "Sharp", "Pocket Computer 1251", 0 )
+COMP( 1982, pc1255,	pc1250,	0,	pc1255,	pc1251,	pc1251,	pocketc, "Sharp", "Pocket Computer 1255", 0 )
+COMP( 198?, trs80pc3,pc1250,0,	pc1251,	pc1251,	pc1251,	pocketc, "Tandy", "TRS80 PC-3", 0 )
+
+COMP( 1982, pc1260,	0,		0,	pc1260,	pc1251,	pc1251,	pocketc, "Sharp", "Pocket Computer 1260", GAME_NOT_WORKING )
+COMP( 1982, pc1261,	pc1260,	0,	pc1261,	pc1251,	pc1251,	pocketc, "Sharp", "Pocket Computer 1261/1262", GAME_NOT_WORKING )
 
 /* pc1261/pc1262 */
-COMP( 1984, pc1350,	0,	0,	pc1350,	pc1350,	0,	pc1350,	 "Sharp", "Pocket Computer 1350", 0 )
-COMP( 1983, pc1401,	0,	0,	pc1401,	pc1401,	pc1401,	pocketc, "Sharp", "Pocket Computer 1401", 0 )
+COMP( 1984, pc1350,	0,		0,	pc1350,	pc1350,	0,	pc1350,	 "Sharp", "Pocket Computer 1350", 0 )
+
+COMP( 1983, pc1401,	0,		0,	pc1401,	pc1401,	pc1401,	pocketc, "Sharp", "Pocket Computer 1401", 0 )
 COMP( 1984, pc1402,	pc1401,	0,	pc1401,	pc1402,	pc1401,	pocketc, "Sharp", "Pocket Computer 1402", 0 )
 
 /* 72kb rom, 32kb ram, cpu? pc1360 */
