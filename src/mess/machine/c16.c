@@ -457,7 +457,7 @@ static void c16_common_driver_init (running_machine *machine)
 	memset(mess_ram + (0xfd40 % mess_ram_size), 0xff, 0x20);
 	
 	if (has_c1551)		/* C1551 */
-		drive_config(machine, type_1551, 0, 0, "cpu_c1551", 8);
+		c1551_config(machine, "cpu_c1551");
 
 	if (has_vc1541)		/* VC1541 */
 		drive_config(machine, type_1541, 0, 0, "cpu_vc1540", 8);
@@ -561,7 +561,7 @@ MACHINE_RESET( c16 )
 		memory_install_read8_handler(space, 0xfec0, 0xfedf, 0, 0, SMH_NOP);
 	}
 
-	if (has_c1551 || has_vc1541)		/* c1551 or vc1541 */
+	if (has_vc1541)		/* vc1541 */
 	{
 		cbm_serial_config(machine, &cbm_fake_drive_interface);
 		drive_reset();

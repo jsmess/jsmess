@@ -9,12 +9,7 @@
 #ifndef VC1541_H_
 #define VC1541_H_
 
-#include "machine/6522via.h"
-
 /*----------- defined in machine/vc1541.c -----------*/
-
-extern const via6522_interface vc1541_via2;
-extern const via6522_interface vc1541_via3;
 
 /* we currently have preliminary support for 1541 & 1551 only */
 enum { 
@@ -50,6 +45,7 @@ format_g64,				/* 1541 image in GCR format */
 
 
 int drive_config(running_machine *machine, int type, int id, int mode, const char *cputag, int devicenr);
+void c1551_config(running_machine *machine, const char *cputag);
 void drive_reset(void);
 
 void vc1541_device_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info);
