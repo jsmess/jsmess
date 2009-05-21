@@ -23,13 +23,12 @@
 
 */
 
-#include "driver.h"
-#include "cpu/i386/i386.h"
-#include "sound/2612intf.h"
-#include "sound/rf5c68.h"
-
-/* System ports
- * 
+/* I/O port map (incomplete, could well be incorrect too)
+ *
+ * 0x0000   : Master 8259 PIC
+ * 0x0002   : Master 8259 PIC 
+ * 0x0010   : Slave 8259 PIC
+ * 0x0012   : Slave 8259 PIC 
  * 0x0020 RW: bit 0 = soft reset (read/write), bit 6 = power off (write), bit 7 = NMI vector protect
  * 0x0022  W: bit 7 = power off (write)
  * 0x0025 R : returns 0x00? (read)
@@ -38,11 +37,45 @@
  * 0x0030 R : Machine ID (low)
  * 0x0031 R : Machine ID (high)
  * 0x0032 RW: bit 7 = RESET, bit 6 = CLK (serial?)
+ * 0x0040   : 8253 PIT counter 0
+ * 0x0042   : 8253 PIT counter 1
+ * 0x0044   : 8253 PIT counter 2
+ * 0x0046   : 8253 PIT mode port
+ * 0x0060   : 8253 PIT ???
  * 0x006c RW: returns 0x00? (read) timer? (write)
+ * 0x00a0-af: DMA controller 1 (uPD71071)
+ * 0x00b0-bf: DMA controller 2 (uPD71071)
+ * 0x0200-0f: Floppy controller (unknown)
+ * 0x0400   : Video / CRTC (unknown)
+ * 0x0404   : Video / CRTC (unknown)
+ * 0x0440-5f: Video / CRTC (unknown)
  * 0x0480 RW: bit 1 = some sort of RAM switch?
+ * 0x04c0-cf: CD-ROM controller (unknown? SCSI?)
+ * 0x04d5   : Sound mute
+ * 0x04d8   : YM3438 control port A / status
+ * 0x04da   : YM3438 data port A / status
+ * 0x04dc   : YM3438 control port B / status
+ * 0x04de   : YM3438 data port B / status
+ * 0x04e0-e3: volume ports
+ * 0x04e9-ec: IRQ masks
+ * 0x04f0-f8: RF5c68 registers
  * 0x05e8 R : RAM size in MB
  * 0x05ec RW: bit 0 = compatibility mode?
+ * 0x0600 RW: Keyboard data port (8042)
+ * 0x0602   : Keyboard control port (8042)
+ * 0x0604   : (8042)
+ * 0x3000 - 0x3fff : CMOS RAM
+ * 0xfd90-a0: CRTC / Video
+ * 0xff81: CRTC / Video - returns value in RAM location 0xcff81?
  */
+
+#include "driver.h"
+#include "cpu/i386/i386.h"
+#include "sound/2612intf.h"
+#include "sound/rf5c68.h"
+#include "machine/pit8253.h"
+#include "machine/pic8259.h"
+
 static READ8_HANDLER(towns_system_r)
 {
 	switch(offset)
@@ -221,6 +254,17 @@ static WRITE8_HANDLER(towns_video_ff81_w)
 	logerror("VID: wrote 0x%02x to port ff81\n",data);
 }
 
+static READ8_HANDLER(towns_keyboard_r)
+{
+	logerror("KB: read offset %02x\n",offset);
+	return 0x00;
+}
+
+static WRITE8_HANDLER(towns_keyboard_w)
+{
+	logerror("KB: wrote 0x%02x to offset %02x\n",data,offset);
+}
+
 static READ32_HANDLER(towns_sys5e8_r)
 {
 	switch(offset)
@@ -265,18 +309,18 @@ static WRITE32_HANDLER(towns_sys5e8_w)
 static ADDRESS_MAP_START(towns_mem, ADDRESS_SPACE_PROGRAM, 32)
   // memory map based on FM-Towns/Bochs (Bochs modified to emulate the FM-Towns)
   // may not be (and probably is not) correct
-  AM_RANGE(0x00000000, 0x000bffff) AM_RAM
+  AM_RANGE(0x00000000, 0x000bffff) AM_RAM 
   AM_RANGE(0x000c0000, 0x000c7fff) AM_RAM  // GVRAM
   AM_RANGE(0x000c8000, 0x000cffff) AM_RAM  // TVRAM
   AM_RANGE(0x000d0000, 0x000d7fff) AM_ROM AM_REGION("user",0x100000)  // DIC ROM
-  AM_RANGE(0x000d8000, 0x000d9fff) AM_RAM  // CMOS RAM
+  AM_RANGE(0x000d8000, 0x000d9fff) AM_RAM  // CMOS? RAM
   AM_RANGE(0x000da000, 0x000effff) AM_RAM
   AM_RANGE(0x000f0000, 0x000f7fff) AM_RAM
   AM_RANGE(0x000f8000, 0x000fffff) AM_ROM AM_REGION("user",0x238000)  // BOOT (SYSTEM) ROM
-  AM_RANGE(0x00100000, 0x001fffff) AM_RAM  // some extra RAM - seems to be needed to boot
-  AM_RANGE(0x80000000, 0x8007ffff) AM_NOP  // VRAM
-  AM_RANGE(0x80100000, 0x8017ffff) AM_NOP  // VRAM (mirror? second page?)
-  AM_RANGE(0x81000000, 0x8101ffff) AM_NOP  // Sprite RAM
+  AM_RANGE(0x00100000, 0x005fffff) AM_RAM  // some extra RAM - seems to be needed to boot
+  AM_RANGE(0x80000000, 0x8007ffff) AM_RAM  // VRAM
+  AM_RANGE(0x80100000, 0x8017ffff) AM_RAM  // VRAM (mirror? second page?)
+  AM_RANGE(0x81000000, 0x8101ffff) AM_RAM  // Sprite RAM
   AM_RANGE(0xc2000000, 0xc207ffff) AM_ROM AM_REGION("user",0x000000)  // OS ROM
   AM_RANGE(0xc2080000, 0xc20fffff) AM_ROM AM_REGION("user",0x100000)  // DIC ROM
   AM_RANGE(0xc2100000, 0xc213ffff) AM_ROM AM_REGION("user",0x180000)  // FONT ROM
@@ -289,7 +333,10 @@ static ADDRESS_MAP_START( towns_io , ADDRESS_SPACE_IO, 32)
   // I/O ports derived from FM Towns/Bochs, these are specific to the FM Towns
   // Some common PC ports are likely to also be used
   // System ports
+  AM_RANGE(0x0000,0x0003) AM_DEVREADWRITE8("pic8259_master", pic8259_r, pic8259_w, 0x00ff00ff)
+  AM_RANGE(0x0010,0x0013) AM_DEVREADWRITE8("pic8259_slave", pic8259_r, pic8259_w, 0x00ff00ff)
   AM_RANGE(0x0020,0x0033) AM_READWRITE8(towns_system_r,towns_system_w, 0xffffffff)
+  AM_RANGE(0x0040,0x0047) AM_DEVREADWRITE8("pit",pit8253_r, pit8253_w, 0x00ff00ff)
   AM_RANGE(0x006c,0x006f) AM_READWRITE8(towns_sys6c_r,towns_sys6c_w, 0x000000ff)
   // DMA controllers (uPD71071?)
   AM_RANGE(0x00a0,0x00af) AM_READWRITE8(towns_dma1_r, towns_dma1_w, 0xffffffff)
@@ -306,7 +353,7 @@ static ADDRESS_MAP_START( towns_io , ADDRESS_SPACE_IO, 32)
   AM_RANGE(0x04c0,0x04cf) AM_NOP
   // Sound (YM3438 [FM], RF5c68 [PCM])
   AM_RANGE(0x04d4,0x04d7) AM_NOP  // R/W  -- (0x4d5) mute?
-  AM_RANGE(0x04d8,0x04df) AM_DEVREADWRITE8("fm",towns_fm_r,towns_fm_w,0x00ff00ff)
+  AM_RANGE(0x04d8,0x04df) AM_DEVREADWRITE8("fm",towns_fm_r,towns_fm_w,0xffffffff)
   AM_RANGE(0x04e0,0x04e3) AM_NOP  // R/W  -- volume ports
   AM_RANGE(0x04e8,0x04ef) AM_NOP  // R/O  -- (0x4e9) FM IRQ flag (bit 0), PCM IRQ flag (bit 3)
                                   // (0x4ea) PCM IRQ mask
@@ -314,9 +361,13 @@ static ADDRESS_MAP_START( towns_io , ADDRESS_SPACE_IO, 32)
                                   // W/O  -- (0x4ec) LED control
   AM_RANGE(0x04f0,0x04fb) AM_DEVREADWRITE8("pcm",towns_pcm_r,towns_pcm_w,0xffffffff)
   // CRTC / Video
-  AM_RANGE(0x05c8,0x05cb) AM_READWRITE8(towns_video_5c8_r, towns_video_5c8_w, 0x00ff00ff)
+  AM_RANGE(0x05c8,0x05cb) AM_READWRITE8(towns_video_5c8_r, towns_video_5c8_w, 0xffffffff)
   // System ports
   AM_RANGE(0x05e8,0x05ef) AM_READWRITE(towns_sys5e8_r, towns_sys5e8_w)
+  // Keyboard (8042 MCU)
+  AM_RANGE(0x0600,0x0607) AM_READWRITE8(towns_keyboard_r, towns_keyboard_w,0x00ff00ff)
+  // CMOS
+  AM_RANGE(0x3000,0x3fff) AM_RAM
   // CRTC / Video (again)
   AM_RANGE(0xfd90,0xfda3) AM_READWRITE8(towns_video_fd90_r, towns_video_fd90_w, 0xffffffff)
   AM_RANGE(0xff80,0xff83) AM_READWRITE8(towns_video_ff81_r, towns_video_ff81_w, 0x0000ff00)
@@ -341,6 +392,35 @@ static VIDEO_UPDATE( towns )
     return 0;
 }
 
+const struct pit8253_config towns_pit8253_config =
+{
+	{
+		{
+			307200,
+			NULL
+		}, 
+		{
+			307200,
+			NULL
+		}, 
+		{
+			307200,
+			NULL
+		}
+	}
+};
+
+const struct pic8259_interface towns_pic8259_master_config = 
+{
+	NULL
+};
+
+
+const struct pic8259_interface towns_pic8259_slave_config = 
+{
+	NULL
+};
+
 static MACHINE_DRIVER_START( towns )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I386, 16000000)
@@ -359,13 +439,19 @@ static MACHINE_DRIVER_START( towns )
     
     /* sound hardware */
     MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("fm", YM3438, 4000000) // actual clock speed unknown
+	MDRV_SOUND_ADD("fm", YM3438, 53693100 / 7) // actual clock speed unknown
 //	MDRV_SOUND_CONFIG(ym3438_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MDRV_SOUND_ADD("pcm", RF5C68, 4000000)  // actual clock speed unknown
+	MDRV_SOUND_ADD("pcm", RF5C68, 2150000)  // actual clock speed unknown
 //	MDRV_SOUND_CONFIG(rf5c68_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
     
+    MDRV_PIT8253_ADD("pit",towns_pit8253_config)
+    
+	MDRV_PIC8259_ADD( "pic8259_master", towns_pic8259_master_config )
+
+	MDRV_PIC8259_ADD( "pic8259_slave", towns_pic8259_slave_config )
+
     MDRV_VIDEO_START(towns)
     MDRV_VIDEO_UPDATE(towns)
 MACHINE_DRIVER_END
