@@ -22,9 +22,12 @@ static ADDRESS_MAP_START(poly88_mem, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( poly88_io , ADDRESS_SPACE_IO, 8)
-	ADDRESS_MAP_UNMAP_HIGH	
-	AM_RANGE(0x08, 0x08) AM_WRITE(polly_intr_w)
-	AM_RANGE(0xf8, 0xf8) AM_READ(polly_keyboard_r)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("uart", msm8251_status_r,msm8251_control_w)
+	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("uart", msm8251_data_r,msm8251_data_w)
+	AM_RANGE(0x04, 0x04) AM_WRITE(poly_baud_rate_w)
+	AM_RANGE(0x08, 0x08) AM_WRITE(poly_intr_w)
+	AM_RANGE(0xf8, 0xf8) AM_READ(poly_keyboard_r)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -131,6 +134,12 @@ static MACHINE_DRIVER_START( poly88 )
 
     MDRV_VIDEO_START(poly88)
     MDRV_VIDEO_UPDATE(poly88)
+    
+    /* uart */
+	MDRV_MSM8251_ADD("uart", poly88_usart_interface)
+	
+	/* snapshot */
+	MDRV_SNAPSHOT_ADD("snapshot", poly88, "img", 0)	
 MACHINE_DRIVER_END
 
 static SYSTEM_CONFIG_START(poly88)
