@@ -67,34 +67,31 @@ static TIMER_CALLBACK(keyboard_callback)
 					key_code = 0x30 + row_number(code) + 8*i; // for numbers and some signs
 				}
 			}
-			if (i==1 && shift==1) {
-				key_code = 0x20 + row_number(code) + 8*i; // for shifted numbers
-			}
-			if (i>=2 && i<=4 && shift==0 && ctrl==0) {
+			if (i>=2 && i<=4 && shift==1 && ctrl==0) {
 				key_code = 0x60 + row_number(code) + (i-2)*8; // for small letters
 			}
-			if (i>=2 && i<=4 && shift==1 && ctrl==0) {
+			if (i>=2 && i<=4 && shift==0 && ctrl==0) {
 				key_code = 0x40 + row_number(code) + (i-2)*8; // for big letters
 			}
 			if (i>=2 && i<=4 && ctrl==1) {
 				key_code = 0x00 + row_number(code) + (i-2)*8; // for CTRL + letters
 			}
-			if (i==5 && shift==0 && ctrl==0) {
-				if (row_number(code) < 3 || row_number(code)==7) {
+			if (i==5 && shift==1 && ctrl==0) {
+				if (row_number(code)<7) {
 					key_code = 0x60 + row_number(code) + (i-2)*8; // for small letters
 				} else {
 					key_code = 0x40 + row_number(code) + (i-2)*8; // for signs it is switched
 				}
 			}
-			if (i==5 && shift==1 && ctrl==0) {
-				if (row_number(code) < 3 || row_number(code)==7) {
+			if (i==5 && shift==0 && ctrl==0) {
+				if (row_number(code)<7) {
 					key_code = 0x40 + row_number(code) + (i-2)*8; // for small letters
 				} else {
 					key_code = 0x60 + row_number(code) + (i-2)*8; // for signs it is switched
 				}
 			}
 			if (i==5 && shift==0 && ctrl==1) {
-				key_code = 0x00 + row_number(code) + (i-2)*8; // for small letters + ctrl
+				key_code = 0x00 + row_number(code) + (i-2)*8; // for letters + ctrl
 			}
 			if (i==6) {
 				switch(row_number(code)) 
