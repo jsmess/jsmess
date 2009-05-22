@@ -4,7 +4,7 @@
 	
 	Japanese computer system released in 1989.
 	
-	CPU:  AMD 80386SX (80387 available as add-on)
+	CPU:  AMD 80386SX(DX?) (80387 available as add-on?)
 	Sound:  Yamaha YM3438
 	        Ricoh RF5c68
 	Video:  VGA + some custom extra video hardware
@@ -16,10 +16,13 @@
 	        
 	Fujitsu FM-Towns Marty
 	
-	Japanese console, based on the FM-Towns computer, released in 1993 
+	Japanese console, based on the FM-Towns computer, using an AMD 80386SX CPU,
+	released in 1993 
 
 
 	16/5/09:  Skeleton driver.
+
+	Issues: BIOS requires 386 protected mode.
 
 */
 
@@ -76,6 +79,10 @@
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
 
+UINT8 ftimer;
+UINT8 nmi_mask;
+UINT8 compat_mode;
+
 static READ8_HANDLER(towns_system_r)
 {
 	switch(offset)
@@ -88,10 +95,11 @@ static READ8_HANDLER(towns_system_r)
 			return 0x00;
 		case 0x06:
 			logerror("SYS: (0x26) timer read\n");
-			return 0x00;
+			ftimer -= 0x13;
+			return ftimer;
 		case 0x08:
 			logerror("SYS: (0x28) NMI mask read\n");
-			return 0x00;
+			return nmi_mask & 0x01;
 		case 0x10:
 			logerror("SYS: (0x30) Machine ID read\n");
 			return 0x01;
@@ -119,6 +127,7 @@ static WRITE8_HANDLER(towns_system_w)
 			break;
 		case 0x08:
 			logerror("SYS: (0x28) NMI mask write %02x\n",data);
+			nmi_mask = data & 0x01;
 			break;
 		case 0x12:
 			logerror("SYS: (0x32) Serial(?) write %02x\n",data);
@@ -137,6 +146,7 @@ static READ8_HANDLER(towns_sys6c_r)
 static WRITE8_HANDLER(towns_sys6c_w)
 {
 	logerror("SYS: (0x6c) write to timer (0x%02x)\n",data);
+	ftimer -= 0x54;
 }
 
 static READ8_HANDLER(towns_dma1_r)
@@ -159,44 +169,6 @@ static READ8_HANDLER(towns_dma2_r)
 static WRITE8_HANDLER(towns_dma2_w)
 {
 	logerror("DMA#2: wrote 0x%02x to register %i\n",data,offset);
-}
-
-static READ8_DEVICE_HANDLER(towns_fm_r)
-{
-	logerror("FM: read status port %i\n",offset);
-	return 0x00;
-}
-
-static WRITE8_DEVICE_HANDLER(towns_fm_w)
-{
-	switch(offset)
-	{
-		case 0x00:
-			logerror("FM: wrote %02x to FM control port A\n",data);
-			break;
-		case 0x02:
-			logerror("FM: wrote %02x to FM data port A\n",data);
-			break;
-		case 0x04:
-			logerror("FM: wrote %02x to FM control port B\n",data);
-			break;
-		case 0x06:
-			logerror("FM: wrote %02x to FM data port B\n",data);
-			break;
-		default:
-			logerror("FM: unknown port write (%02x -> 0x%04x)\n",data,offset+0x4d8);
-	}
-}
-
-static READ8_DEVICE_HANDLER(towns_pcm_r)
-{
-	logerror("PCM: read register %i\n",offset);
-	return 0x00;
-}
-
-static WRITE8_DEVICE_HANDLER(towns_pcm_w)
-{
-	logerror("PCM: wrote 0x%02x to register %i\n",data,offset);
 }
 
 static READ8_HANDLER(towns_floppy_r)
@@ -265,6 +237,24 @@ static WRITE8_HANDLER(towns_keyboard_w)
 	logerror("KB: wrote 0x%02x to offset %02x\n",data,offset);
 }
 
+static READ8_HANDLER(towns_port60_r)
+{
+	UINT8 val = 0x00;
+	if ( pit8253_get_output(devtag_get_device(space->machine, "pit"), 2 ) )
+		val |= 0x20;
+	else
+		val &= ~0x20;
+
+	logerror("PIT: port 0x60 read, returning 0x%02x\n",val);
+	return val;
+}
+
+static WRITE8_HANDLER(towns_port60_w)
+{
+	pit8253_gate_w(devtag_get_device(space->machine, "pit"), 2, data & 1);
+	logerror("PIT: wrote 0x%02x to port 0x60\n",data);
+}
+
 static READ32_HANDLER(towns_sys5e8_r)
 {
 	switch(offset)
@@ -280,7 +270,7 @@ static READ32_HANDLER(towns_sys5e8_r)
 			if(ACCESSING_BITS_0_7)
 			{
 				logerror("SYS: read port 5ec\n");
-				return 0x00;
+				return compat_mode & 0x01;
 			}
 			break;
 	}
@@ -301,6 +291,7 @@ static WRITE32_HANDLER(towns_sys5e8_w)
 			if(ACCESSING_BITS_0_7)
 			{
 				logerror("SYS: wrote 0x%02x to port 5ec\n",data);
+				compat_mode = data & 0x01;
 			}
 			break;
 	}
@@ -337,6 +328,7 @@ static ADDRESS_MAP_START( towns_io , ADDRESS_SPACE_IO, 32)
   AM_RANGE(0x0010,0x0013) AM_DEVREADWRITE8("pic8259_slave", pic8259_r, pic8259_w, 0x00ff00ff)
   AM_RANGE(0x0020,0x0033) AM_READWRITE8(towns_system_r,towns_system_w, 0xffffffff)
   AM_RANGE(0x0040,0x0047) AM_DEVREADWRITE8("pit",pit8253_r, pit8253_w, 0x00ff00ff)
+  AM_RANGE(0x0060,0x0063) AM_READWRITE8(towns_port60_r, towns_port60_w, 0x000000ff)
   AM_RANGE(0x006c,0x006f) AM_READWRITE8(towns_sys6c_r,towns_sys6c_w, 0x000000ff)
   // DMA controllers (uPD71071?)
   AM_RANGE(0x00a0,0x00af) AM_READWRITE8(towns_dma1_r, towns_dma1_w, 0xffffffff)
@@ -353,13 +345,13 @@ static ADDRESS_MAP_START( towns_io , ADDRESS_SPACE_IO, 32)
   AM_RANGE(0x04c0,0x04cf) AM_NOP
   // Sound (YM3438 [FM], RF5c68 [PCM])
   AM_RANGE(0x04d4,0x04d7) AM_NOP  // R/W  -- (0x4d5) mute?
-  AM_RANGE(0x04d8,0x04df) AM_DEVREADWRITE8("fm",towns_fm_r,towns_fm_w,0xffffffff)
+  AM_RANGE(0x04d8,0x04df) AM_DEVREADWRITE8("fm",ym3438_r,ym3438_w,0x00ff00ff)
   AM_RANGE(0x04e0,0x04e3) AM_NOP  // R/W  -- volume ports
   AM_RANGE(0x04e8,0x04ef) AM_NOP  // R/O  -- (0x4e9) FM IRQ flag (bit 0), PCM IRQ flag (bit 3)
                                   // (0x4ea) PCM IRQ mask
                                   // R/W  -- (0x4eb) PCM IRQ flag
                                   // W/O  -- (0x4ec) LED control
-  AM_RANGE(0x04f0,0x04fb) AM_DEVREADWRITE8("pcm",towns_pcm_r,towns_pcm_w,0xffffffff)
+  AM_RANGE(0x04f0,0x04fb) AM_DEVWRITE8("pcm",rf5c68_w,0xffffffff)
   // CRTC / Video
   AM_RANGE(0x05c8,0x05cb) AM_READWRITE8(towns_video_5c8_r, towns_video_5c8_w, 0xffffffff)
   // System ports
@@ -381,6 +373,9 @@ INPUT_PORTS_END
 
 static MACHINE_RESET( towns )
 {
+	ftimer = 0x00;
+	nmi_mask = 0x00;
+	compat_mode = 0x00;
 }
 
 static VIDEO_START( towns )
