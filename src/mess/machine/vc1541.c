@@ -111,17 +111,29 @@ In the end, we could also split the floppy drives emulation from the
 disk image handling...
 
 Current status:
-	+ preliminary vc1541 & c1551 implementation (seems very slow)
+	+ preliminary vc1541 & c1551 implementation (quite slow, especially 
+		if you turn on logging)
 	+ no support for other drive types (even if now I list all
 		the variants supported by Vice in the enum)
 	+ communications between the drive CPU and the computer CPU have 
-		to be checked, debugged and improved
+		to be checked, debugged and improved: somehow it works, but no
+		sync bit is set (encoding bug? timers-related bug?) and the drive 
+		keeps reading beyond the end of the track (synchronization 
+		problems?)
 	+ all but .g64 images should be correctly encoded at loading time
 		(I actually have doubts about some .d82 details) 
 	+ error maps are not still used, even if their presence is 
 		acknowledged
-	+ the floppy handling still uses CBM_Drive_Emu struct instead of
-		functions similar to other floppy formats
+	+ floppy drives should become devices and use ROMREGION_LOADBYNAME 
+		for their ROMs (not the current defines)
+	+ all available drive dumps are included for each systems using it
+		(vc1541 = sx64, vip64, c16v, plus4v; vc1571 = c128d; vc1571cr = c128dcr; 
+		vc1581 = c128d81; vc1540 = vc20v, vic20plv; c2031 = vc20i (only dumps added); 
+		c1551 = c16c, plus4c). this is only a temporary workaround to document 
+		available dumps. correct revisions will be used with each systems when 
+		emulation works (or 'default' bios will be used for most common 
+		configurations, when machines were compatible with more than a single 
+		drive model)
 */
 /*
 Informations on the fileformats (which the code is based on)
@@ -200,6 +212,17 @@ typedef struct
 	const char *cputag;
 	int type;
 
+	int led, motor, frequency;
+
+	double track;
+	int clock;
+	int start_pos, pos;		// start_pos = start of half track ; pos = position from the beginning of the current half-track!
+
+	void *timer;
+
+	GCR_data gcr;
+
+	/* vc1541 specific */
 	struct {
 		int deviceid;
 		int serial_atn, serial_clock, serial_data;
@@ -208,37 +231,31 @@ typedef struct
 
 	int via0irq, via1irq;
 
-	int led, motor, frequency;
-
-	double track;
-	int clock;
-	int pos;		// from the beginning of the current track!
-
-	void *timer;
-
-	GCR_data gcr;
-
 } vc1541_drive_emu;
 
 typedef struct
 {
 	const char *cputag;
-
-	UINT8 cpu_ddr, cpu_port;
-	void *irq_timer;
+	int type;
 
 	int led, motor, frequency;
+
 	double track;
-	int pos;		// from the beginning of the current track!
+	int clock;
+	int start_pos, pos;		// start_pos = start of half track ; pos = position from the beginning of the current half-track!
+
 	void *timer;
 
 	GCR_data gcr;
+
+	/* c1551 specific */
+	UINT8 cpu_ddr, cpu_port;
+	void *irq_timer;
 
 } c1551_drive_emu;
 
 static vc1541_drive_emu vc1541_drive_static = { 0 }, *vc1541_drive = &vc1541_drive_static;
 static c1551_drive_emu c1551_drive_static = { 0 }, *c1551_drive = &c1551_drive_static;
-
 
 
 /*******************************************
@@ -329,7 +346,7 @@ static const int max_tracks_per_format[] =
 };
 
 static int image_offset[IMAGE_MAX_TRACKS] = { 0 };
-
+static int gcr_offset[IMAGE_MAX_TRACKS] = { 0 };
 
 /*******************************************
 
@@ -337,13 +354,15 @@ static int image_offset[IMAGE_MAX_TRACKS] = { 0 };
 
 *******************************************/
 
-
-static void offset_init (int format)
+/* This is twice useful: with length = 256, it allows to determine the starting offset of each
+track in the .d64 image; with length = 368, it allows to determine the starting offset of each
+track in the GCR encoded image  */
+static void offset_init( int format, int *offset_list, int length )
 {
 	int i;
 
-	/* Track # starts from 1 */
-	image_offset[0] = 0;
+	/* Track # starts from 1, hence Track k will start at image_offset[k-1] */
+	offset_list[0] = 0;
 
 	switch (format)
 	{
@@ -351,34 +370,34 @@ static void offset_init (int format)
 		case format_d64_err:
 		case format_d67:
 			for (i = 1; i < D64_MAX_TRACKS; i++)
-				image_offset[i] = image_offset[i - 1] + d64_sectors_per_track[i - 1] * 256;
+				offset_list[i] = offset_list[i - 1] + d64_sectors_per_track[i - 1] * length;
 			break;
 
 		case format_d64_40t:
 		case format_d64_40t_err:
 			for (i = 1; i < D64_40T_MAX_TRACKS; i++)
-				image_offset[i] = image_offset[i - 1] + d64_sectors_per_track[i - 1] * 256;
+				offset_list[i] = offset_list[i - 1] + d64_sectors_per_track[i - 1] * length;
 			break;
 
 		case format_d71:
 		case format_d71_err:
 			for (i = 1; i < D71_MAX_TRACKS; i++)
-				image_offset[i] = image_offset[i - 1] + d71_sectors_per_track[i - 1] * 256;
+				offset_list[i] = offset_list[i - 1] + d71_sectors_per_track[i - 1] * length;
 			break;
 
 		case format_d81:
 			for (i = 1; i < D81_MAX_TRACKS; i++)
-				image_offset[i] = image_offset[i - 1] + 40 * 256;
+				offset_list[i] = offset_list[i - 1] + 40 * length;
 			break;
 
 		case format_d80:
 			for (i = 1; i < D80_MAX_TRACKS; i++)
-				image_offset[i] = image_offset[i - 1] + d80_sectors_per_track[i - 1] * 256;
+				offset_list[i] = offset_list[i - 1] + d80_sectors_per_track[i - 1] * length;
 			break;
 
 		case format_d82:
 			for (i = 1; i < D82_MAX_TRACKS; i++)
-				image_offset[i] = image_offset[i - 1] + d82_sectors_per_track[i - 1] * 256;
+				offset_list[i] = offset_list[i - 1] + d82_sectors_per_track[i - 1] * length;
 			break;
 
 		default:
@@ -587,32 +606,14 @@ static void gcr_double_2_gcr(UINT8 a, UINT8 b, UINT8 c, UINT8 d, UINT8 *dest)
 
 /**************************************
 
-	1541 / 1541II
+	Drive timers (aka floppy reading)
 
 **************************************/
 
-
-static ADDRESS_MAP_START( _1541_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE("_1541_via_0", via_r, via_w)	/* 0 and 1 used in vc20 */	// IEC Bus
-//	AM_RANGE(0x1810, 0x189f) AM_READ(SMH_NOP)				/* for debugger */
-	AM_RANGE(0x1c00, 0x1c0f) AM_DEVREADWRITE("_1541_via_1", via_r, via_w)		// Drive
-//	AM_RANGE(0x1c10, 0x1c9f) AM_READ(SMH_NOP)				/* for debugger */
-	AM_RANGE(0xc000, 0xffff) AM_ROM
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( dolphin_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE("_1541_via_0", via_r, via_w)	/* 0 and 1 used in vc20 */
-	AM_RANGE(0x1c00, 0x1c0f) AM_DEVREADWRITE("_1541_via_1", via_r, via_w)
-	AM_RANGE(0x8000, 0x9fff) AM_RAM
-	AM_RANGE(0xa000, 0xffff) AM_ROM
-ADDRESS_MAP_END
-
-
-static TIMER_CALLBACK(drive_timer)
+static TIMER_CALLBACK(vc1541_drive_timer)
 {
+	const device_config *via_1 = devtag_get_device(machine, "_1541_via_1");
+
 	if (vc1541_drive->clock == 0) 
 	{
 		vc1541_drive->gcr.ready = 0;
@@ -620,13 +621,8 @@ static TIMER_CALLBACK(drive_timer)
 		// or is it the way the serial port reads the sync count?!?
 		vc1541_drive->gcr.sync = 0;
 	
-		if (vc1541_drive->type == type_1541) 
-		{
-			const device_config *via_1 = devtag_get_device(machine, "_1541_via_1");
-
-			cputag_set_input_line(machine, vc1541_drive->cputag, M6502_SET_OVERFLOW, 1);
-			via_ca1_w(via_1, 0, 1);
-		}
+		cputag_set_input_line(machine, vc1541_drive->cputag, M6502_SET_OVERFLOW, 1);
+		via_ca1_w(via_1, 0, 1);
 
 		vc1541_drive->clock = 1;
 		return;
@@ -658,14 +654,52 @@ static TIMER_CALLBACK(drive_timer)
 		vc1541_drive->gcr.sync = 0;
 	}
 
-	if (vc1541_drive->type == type_1541) 
-	{
-		const device_config *via_1 = devtag_get_device(machine, "_1541_via_1");
-		cputag_set_input_line(machine, vc1541_drive->cputag, M6502_SET_OVERFLOW, 0);
-		via_ca1_w(via_1, 0, 0);
-	}
+	cputag_set_input_line(machine, vc1541_drive->cputag, M6502_SET_OVERFLOW, 0);
+	via_ca1_w(via_1, 0, 0);
 
 	vc1541_drive->clock = 0;
+}
+
+static TIMER_CALLBACK(c1551_drive_timer)
+{
+	if (c1551_drive->clock == 0) 
+	{
+		c1551_drive->gcr.ready = 0;
+		// why put sync back to 0 here?!? it would break the sync count, isn't it?
+		// or is it the way the serial port reads the sync count?!?
+		c1551_drive->gcr.sync = 0;
+	
+		c1551_drive->clock = 1;
+		return;
+	}
+
+	// this code has 2 effects: move on the pos on the data and reset it to 0 at the end of the track!
+	// size of the track is: (# sectors in the track) * (size of sector GCR endoded)
+	// Here, size of sector is 368 because of our choices in the loading: 9 bytes of header gap & 14 bytes of sector gap 
+	// We will need to set the size at loading time when adding support for G64 images
+	if (++(c1551_drive->pos) >= (d64_sectors_per_track[(int)c1551_drive->track - 1] * 368)) 
+		c1551_drive->pos = 0;
+	// should we check if there is a change of track? to reset the pos in that case as well?
+
+	c1551_drive->gcr.ready = 1;
+
+	// notice that if there is a sequence of more than 40 1s it correctly does not reset the sync 
+	// counter until a 0 is found
+	if (c1551_drive->gcr.data[c1551_drive->pos] == 0xff) 
+	{
+		c1551_drive->gcr.ones_count++;
+
+//		if (c1551_drive->gcr.ones_count == 2) // 9 ones should already mark it as a sync, even if CBM chose to use 40 of them
+		if (c1551_drive->gcr.ones_count == 5)
+			c1551_drive->gcr.sync = 1;
+	} 
+	else 
+	{
+		c1551_drive->gcr.ones_count = 0;
+		c1551_drive->gcr.sync = 0;
+	}
+
+	c1551_drive->clock = 0;
 }
 
 
@@ -844,8 +878,9 @@ static void vc1541_via1_irq (const device_config *device, int level)
 
 static READ8_DEVICE_HANDLER( vc1541_via1_read_porta )
 {
-	int data = vc1541_drive->gcr.data[vc1541_drive->pos];
-	logerror("Data read: Track %.1f Pos %d\n", vc1541_drive->track, vc1541_drive->pos);
+	UINT8 data = vc1541_drive->gcr.data[vc1541_drive->start_pos + vc1541_drive->pos];
+
+//	logerror("Data read: Track %.1f Pos %d\n", vc1541_drive->track, vc1541_drive->pos);
 
 	DBG_LOG(device->machine, 2, "vc1541 drive", ("port a read %.2x\n", data));
 	return data;
@@ -923,6 +958,12 @@ static WRITE8_DEVICE_HANDLER( vc1541_via1_write_portb )
 				vc1541_drive->track = 35.0;
 
 			logerror("Track #: %.1f\n", vc1541_drive->track);
+
+			/* We now adjust the vc1541_drive->pos according to the new track */
+			/* This seems a simple way to deal with half tracks */
+			vc1541_drive->pos = 0;
+			vc1541_drive->start_pos = gcr_offset[(int)vc1541_drive->track - 1]				// starting point of Track #
+				+ (int)(2 * (vc1541_drive->track - (int)vc1541_drive->track)) * 184 / 2;	// half track if needed (again, 184 comes from out loading choices)
 		}
 
 		if ((vc1541_drive->motor != (data & 0x04)) || (vc1541_drive->frequency != (data & 0x60)))
@@ -1108,6 +1149,29 @@ void vc1541_serial_request_write( running_machine *machine, int which, int level
 
 /**************************************
 
+	1541 / 1541B / 1541C / 1541II /
+		2031 (same as 1541 but IEEE)
+
+**************************************/
+
+static ADDRESS_MAP_START( _1541_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM
+	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE("_1541_via_0", via_r, via_w)	/* 0 and 1 used in vc20 */	// IEC Bus
+	AM_RANGE(0x1c00, 0x1c0f) AM_DEVREADWRITE("_1541_via_1", via_r, via_w)		// Drive
+	AM_RANGE(0xc000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( dolphin_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM
+	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE("_1541_via_0", via_r, via_w)	/* 0 and 1 used in vc20 */
+	AM_RANGE(0x1c00, 0x1c0f) AM_DEVREADWRITE("_1541_via_1", via_r, via_w)
+	AM_RANGE(0x8000, 0x9fff) AM_RAM
+	AM_RANGE(0xa000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+/**************************************
+
 	1570 / 1571 / 1571CR
 
 **************************************/
@@ -1115,12 +1179,41 @@ void vc1541_serial_request_write( running_machine *machine, int which, int level
 static ADDRESS_MAP_START( _1571_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE("_1541_via_0", via_r, via_w)  /* 0 and 1 used in vc20 */
-	AM_RANGE(0x1810, 0x189f) AM_READ(SMH_NOP) /* for debugger */
 	AM_RANGE(0x1c00, 0x1c0f) AM_DEVREADWRITE("_1541_via_1", via_r, via_w)
-	AM_RANGE(0x1c10, 0x1c9f) AM_READ(SMH_NOP) /* for debugger */
 //	AM_RANGE(0x2000, 0x2003) // WD17xx
 //	AM_RANGE(0x4000, 0x400f) // CIA
-	AM_RANGE(0xc000, 0xffff) AM_ROM
+	AM_RANGE(0x8000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+// for the C128DCR Drive
+/*
+David Gahris provided info about differences between 128DCR and stand-alone 1571s
+
+* There is no 6526 or 8521 in the drive section of the 128DCR.  I believe the 
+  5710 handles fast serial because the 5710 is a Commodore custom chip and 
+  128 fast serial is a Commodore custom protocol.  [Ed's note: Commodore lists
+  NTE229, ECG229, SK3246A/229, and 121-Z9021 as substitutes of the 5710.]
+
+* There is no 177x or heat-shrink-wrapped daughterboard in the drive section 
+  of the 128DCR.  I believe the Motorola plastic quad flat-pack chip handles 
+  MFM because I am pretty sure that I have seen this chip in IBM PC drive 
+  mechanisms.  
+
+* The 1571cr ROM works great in 1541 mode but not at all in 1571 mode in a 
+  standalone 1571.  
+
+* Olaf Seibert informed me that the 1571cr ROM contains a string to the 
+  effect of "5710 (c) 1986 by c. hauck"
+*/
+static ADDRESS_MAP_START( _1571cr_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM
+	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE("_1541_via_0", via_r, via_w)  /* 0 and 1 used in vc20 */
+	AM_RANGE(0x1c00, 0x1c0f) AM_DEVREADWRITE("_1541_via_1", via_r, via_w)
+//	AM_RANGE(0x2000, 0x2005) // 5710 FDC
+//	AM_RANGE(0x400c, 0x400f) // 5710 CIA Serial Port
+//	AM_RANGE(0x4010, 0x4017) // 5710 FDC2
+//	AM_RANGE(0x6000, 0x7fff) // RAM shadows
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -1133,19 +1226,34 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( _1581_map, ADDRESS_SPACE_PROGRAM, 8 )
 //	AM_RANGE(0x4000, 0x400f) // CIA
 //	AM_RANGE(0x6000, 0x6003) // WD17xx
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
 /**************************************
 
-	2031 / 2040 / 3040 / 4040 / 
-		1001 / 8050 / 8250
+	1001 / 8050 / 8250
+
+http://www.zimmers.net/anonftp/pub/cbm/firmware/drives/old/8050/d/8250.notes
 
 **************************************/
 
-static ADDRESS_MAP_START( _2031_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sfd1001_map, ADDRESS_SPACE_PROGRAM, 8 )
 //	AM_RANGE(0x0200, 0x021f) // RIOT1
 //	AM_RANGE(0x0280, 0x029f) // RIOT2
+	AM_RANGE(0xc000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+
+/**************************************
+
+	2040 / 3040 / 4040 
+
+http://www.zimmers.net/anonftp/pub/cbm/schematics/drives/old/4040/memorymap.txt
+
+**************************************/
+
+static ADDRESS_MAP_START( _4040_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
@@ -1183,7 +1291,7 @@ static WRITE8_HANDLER( c1551_port_w )
 
 		if (data != old) 
 		{
-			DBG_LOG(space->machine, 1, "vc1541 drive",("%.2x\n", data));
+			DBG_LOG(space->machine, 1, "c1551 drive",("%.2x\n", data));
 		
 			if ((old & 0x03) != (data & 0x03)) 
 			{
@@ -1223,6 +1331,14 @@ static WRITE8_HANDLER( c1551_port_w )
 					c1551_drive->track = 1.0;
 				if (c1551_drive->track > 35) 
 					c1551_drive->track = 35.0;
+
+			logerror("Track #: %.1f\n", c1551_drive->track);
+
+			/* We now adjust the c1551_drive->pos according to the new track */
+			/* This seems a simple way to deal with half tracks */
+			c1551_drive->pos = 0;
+			c1551_drive->start_pos = gcr_offset[(int)c1551_drive->track - 1]				// starting point of Track #
+				+ (int)(2 * (c1551_drive->track - (int)c1551_drive->track)) * 184 / 2;	// half track if needed (again, 184 comes from out loading choices)
 			}
 
 			if ( (c1551_drive->motor != (data & 0x04)) || (c1551_drive->frequency != (data & 0x60)) ) 
@@ -1284,6 +1400,17 @@ static READ8_HANDLER( c1551_port_r )
 	return data;
 }
 
+
+static ADDRESS_MAP_START( _1551_map, ADDRESS_SPACE_PROGRAM, 8 )
+    AM_RANGE(0x0000, 0x0001) AM_READWRITE(c1551_port_r, c1551_port_w)
+	AM_RANGE(0x0002, 0x07ff) AM_RAM
+    AM_RANGE(0x4000, 0x4007) AM_DEVREADWRITE("c1551_tpi", tpi6525_r, tpi6525_w)
+	AM_RANGE(0xc000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+
+/******************** Handlers for the C1551 TPI ********************/
+
 /*
    tia6523
    port a
@@ -1314,20 +1441,27 @@ static READ8_DEVICE_HANDLER( c1551_port_c_r )
 
 static READ8_DEVICE_HANDLER( c1551_port_b_r )
 {
-	int data = c1551_drive->gcr.data[c1551_drive->pos];
+	UINT8 data = c1551_drive->gcr.data[c1551_drive->start_pos + c1551_drive->pos];
 
 	DBG_LOG(device->machine, 2, "c1551 drive",("port a read %.2x\n", data));
 	return data;
 }
 
+static const tpi6525_interface c1551_tpi_intf =
+{
+	NULL,
+	c1551_port_b_r,
+	c1551_port_c_r,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	NULL
+};
 
-static ADDRESS_MAP_START( _1551_map, ADDRESS_SPACE_PROGRAM, 8 )
-    AM_RANGE(0x0000, 0x0001) AM_READWRITE(c1551_port_r, c1551_port_w)
-	AM_RANGE(0x0002, 0x07ff) AM_RAM
-    AM_RANGE(0x4000, 0x4007) AM_DEVREADWRITE("c1551_tpi", tpi6525_r, tpi6525_w)
-	AM_RANGE(0xc000, 0xffff) AM_ROM
-ADDRESS_MAP_END
 
+/******************** Handlers for the C16 TPI ********************/
 
 WRITE8_DEVICE_HANDLER( c1551x_write_data )
 {
@@ -1335,55 +1469,121 @@ WRITE8_DEVICE_HANDLER( c1551x_write_data )
 #ifdef CPU_SYNC
 	cpu_sync();
 #endif
-	tpi6525_porta_w(device, 0, data);
+	const device_config *tpi_0 = devtag_get_device(device->machine, "c1551_tpi");
+
+	tpi6525_porta_w(tpi_0, 0, data);
 }
 
 READ8_DEVICE_HANDLER( c1551x_read_data )
 {
-	int data = 0xff;
+	UINT8 data = 0xff;
+	const device_config *tpi_0 = devtag_get_device(device->machine, "c1551_tpi");
+
 #ifdef CPU_SYNC
 	cpu_sync ();
 #endif
 
-	data = tpi6525_porta_r(device, 0);
+	data = tpi6525_porta_r(tpi_0, 0);
 //	DBG_LOG(device->machine, 2, "c1551 cpu",("%d read data %.2x\n", cpu_getactivecpu (), data));
 	return data;
 }
 
 WRITE8_DEVICE_HANDLER( c1551x_write_handshake )
 {
+	const device_config *tpi_0 = devtag_get_device(device->machine, "c1551_tpi");
 //	DBG_LOG(device->machine, 1, "c1551 cpu",("%d write handshake %.2x\n", cpu_getactivecpu (), data));
 #ifdef CPU_SYNC
 	cpu_sync();
 #endif
 
-	tpi6525_portc_w(device, 0, data & 0x40 ? 0xff : 0x7f);
+	tpi6525_portc_w(tpi_0, 0, data & 0x40 ? 0xff : 0x7f);
 }
 
 READ8_DEVICE_HANDLER( c1551x_read_handshake )
 {
-	int data = 0xff;
+	const device_config *tpi_0 = devtag_get_device(device->machine, "c1551_tpi");
+	UINT8 data = 0xff;
 #ifdef CPU_SYNC
 	cpu_sync();
 #endif
 
-	data = tpi6525_portc_r(device, 0) & 0x08 ? 0x80 : 0x00;
+	data = tpi6525_portc_r(tpi_0, 0) & 0x08 ? 0x80 : 0x00;
 //	DBG_LOG(device->machine, 2, "c1551 cpu",("%d read handshake %.2x\n", cpu_getactivecpu (), data));
 	return data;
 }
 
 READ8_DEVICE_HANDLER( c1551x_read_status )
 {
-	int data = 0xff;
+	const device_config *tpi_0 = devtag_get_device(device->machine, "c1551_tpi");
+	UINT8 data = 0xff;
 #ifdef CPU_SYNC
 	cpu_sync();
 #endif
 
-	data = tpi6525_portc_r(device, 0) & 0x03;
+	data = tpi6525_portc_r(tpi_0, 0) & 0x03;
 //	DBG_LOG(device->machine, 1, "c1551 cpu",("%d read status %.2x\n", cpu_getactivecpu (), data));
 
 	return data;
 }
+
+
+
+/**************************************
+
+	Machine drivers
+
+**************************************/
+
+
+MACHINE_DRIVER_START( cpu_vc1540 )
+	MDRV_CPU_ADD("cpu_vc1540", M6502, XTAL_16_MHz / 16)
+	MDRV_CPU_PROGRAM_MAP(_1541_map)
+
+	MDRV_VIA6522_ADD("_1541_via_0", 0, vc1541_via0)
+	MDRV_VIA6522_ADD("_1541_via_1", 0, vc1541_via1)
+MACHINE_DRIVER_END
+
+MACHINE_DRIVER_START( cpu_vc1541 )
+	MDRV_IMPORT_FROM(cpu_vc1540)
+MACHINE_DRIVER_END
+
+MACHINE_DRIVER_START( cpu_c1571 )
+	MDRV_CPU_ADD("cpu_vc1571", M6502, XTAL_16_MHz / 16)
+	MDRV_CPU_PROGRAM_MAP(_1571_map)
+
+	MDRV_VIA6522_ADD("_1541_via_0", 0, vc1541_via0)
+	MDRV_VIA6522_ADD("_1541_via_1", 0, vc1541_via1)
+MACHINE_DRIVER_END
+
+MACHINE_DRIVER_START( cpu_c1571cr )
+	MDRV_CPU_ADD("cpu_vc1571", M6502, XTAL_16_MHz / 16)
+	MDRV_CPU_PROGRAM_MAP(_1571cr_map)
+
+	MDRV_VIA6522_ADD("_1541_via_0", 0, vc1541_via0)
+	MDRV_VIA6522_ADD("_1541_via_1", 0, vc1541_via1)
+MACHINE_DRIVER_END
+
+MACHINE_DRIVER_START( cpu_c1581 )
+	MDRV_IMPORT_FROM(cpu_c1571)		// obviously incorrect: we need proper 1581 memory map and emulation!
+MACHINE_DRIVER_END
+
+MACHINE_DRIVER_START( cpu_c2031 )
+	MDRV_IMPORT_FROM(cpu_vc1540)	// not sure the memory map is exactly the vc1541 one!
+MACHINE_DRIVER_END
+
+MACHINE_DRIVER_START( cpu_dolphin )
+	MDRV_CPU_ADD("cpu_dolphin", M6502, XTAL_16_MHz / 16)
+	MDRV_CPU_PROGRAM_MAP(dolphin_map)
+MACHINE_DRIVER_END
+
+MACHINE_DRIVER_START( cpu_c1551 )
+	MDRV_CPU_ADD("cpu_c1551", M6510T, 2000000)
+	MDRV_CPU_PROGRAM_MAP(_1551_map)
+
+	/* tpi */
+	MDRV_TPI6525_ADD("c1551_tpi", c1551_tpi_intf)
+MACHINE_DRIVER_END
+
 
 
 /**************************************
@@ -1392,19 +1592,19 @@ READ8_DEVICE_HANDLER( c1551x_read_status )
 
 **************************************/
 
-int drive_config( running_machine *machine, int type, int id, int mode, const char *cputag, int devicenr )
+void drive_config( running_machine *machine, int type, int id, int mode, const char *cputag, int devicenr )
 {
 	vc1541_drive->type = type;
 	vc1541_drive->cputag = cputag;
 	vc1541_drive->vc1541_serial.deviceid = devicenr;
-	vc1541_drive->timer = timer_alloc(machine, drive_timer, NULL);
-
-	return 0;
+	vc1541_drive->timer = timer_alloc(machine, vc1541_drive_timer, NULL);
 }
 
 void c1551_config( running_machine *machine, const char *cputag )
 {
+	c1551_drive->type = type_1551;
 	c1551_drive->cputag = cputag;
+	c1551_drive->timer = timer_alloc(machine, c1551_drive_timer, NULL);
 
 	/* time should be small enough to allow quitting of the irq
 	line before the next interrupt is triggered */
@@ -1424,66 +1624,41 @@ void drive_reset (void)
 		}
 	}
 
+	/* Create offset map for GCR encoded images: it speeds up finding position where to read data from */
+	switch (vc1541_drive->type)
+	{
+		case type_1541:
+		case type_1541ii:
+			offset_init(format_d64_40t, gcr_offset, 368);	// offset map is the same for both 35 and 40 track discs
+			break;
+
+		case type_1570:
+		case type_1571:
+		case type_1571cr:
+			offset_init(format_d71, gcr_offset, 368);
+			break;
+
+		case type_1581:
+			offset_init(format_d81, gcr_offset, 368);
+			break;
+
+		default:
+			logerror("GCR offset map not created\n");
+	}
+
 	vc1541_drive->track = 1.0;
+	vc1541_drive->start_pos = 0;
+	vc1541_drive->pos = 0;
 }
 
-
-/**************************************
-
-	Machine drivers
-
-**************************************/
-
-static const tpi6525_interface c1551_tpi_intf =
+void c1551_drive_reset (void)
 {
-	NULL,
-	c1551_port_b_r,
-	c1551_port_c_r,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL
-};
+	offset_init(format_d64_40t, gcr_offset, 368);	// offset map is the same for both 35 and 40 track discs
+	c1551_drive->track = 1.0;
+	c1551_drive->start_pos = 0;
+	c1551_drive->pos = 0;
+}
 
-
-MACHINE_DRIVER_START( cpu_vc1540 )
-	MDRV_CPU_ADD("cpu_vc1540", M6502, XTAL_16_MHz / 16)
-	MDRV_CPU_PROGRAM_MAP(_1541_map)
-
-	MDRV_VIA6522_ADD("_1541_via_0", 0, vc1541_via0)
-	MDRV_VIA6522_ADD("_1541_via_1", 0, vc1541_via1)
-MACHINE_DRIVER_END
-
-MACHINE_DRIVER_START( cpu_vc1541 )
-	MDRV_IMPORT_FROM(cpu_vc1540)
-MACHINE_DRIVER_END
-
-MACHINE_DRIVER_START( cpu_c2031 )
-	MDRV_IMPORT_FROM(cpu_vc1540)
-MACHINE_DRIVER_END
-
-MACHINE_DRIVER_START( cpu_dolphin )
-	MDRV_CPU_ADD("cpu_dolphin", M6502, XTAL_16_MHz / 16)
-	MDRV_CPU_PROGRAM_MAP(dolphin_map)
-MACHINE_DRIVER_END
-
-MACHINE_DRIVER_START( cpu_c1551 )
-	MDRV_CPU_ADD("cpu_c1551", M6510T, 2000000)
-	MDRV_CPU_PROGRAM_MAP(_1551_map)
-
-	/* tpi */
-	MDRV_TPI6525_ADD("c1551_tpi", c1551_tpi_intf)
-MACHINE_DRIVER_END
-
-MACHINE_DRIVER_START( cpu_c1571 )
-	MDRV_CPU_ADD("cpu_vc1540", M6502, XTAL_16_MHz / 16)
-	MDRV_CPU_PROGRAM_MAP(_1571_map)
-
-	MDRV_VIA6522_ADD("_1541_via_0", 0, vc1541_via0)
-	MDRV_VIA6522_ADD("_1541_via_1", 0, vc1541_via1)
-MACHINE_DRIVER_END
 
 
 /**************************************
@@ -1662,7 +1837,7 @@ static DEVICE_IMAGE_LOAD( _1541 )
 	}
 	
 	/* Set up track / sector map according to the format of the image */
-	offset_init (format);
+	offset_init(format, image_offset, 256);
 
 	/* Claim memory */
 	temp_copy = auto_alloc_array(image->machine, UINT8, filesize);
@@ -1721,7 +1896,7 @@ static DEVICE_IMAGE_LOAD( _1551 )
 	}
 	
 	/* Set up track / sector map according to the format of the image */
-	offset_init (format);
+	offset_init(format, image_offset, 256);
 
 	/* Claim memory */
 	temp_copy = auto_alloc_array(image->machine, UINT8, filesize);

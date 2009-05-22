@@ -372,9 +372,9 @@ const game_driver * const drivers[] =
 	DRIVER( vic20v )	/* Commodore VIC 20 (NTSC, VC1540)					*/
 	DRIVER( vic20pal )	/* Commodore VIC 20 (PAL)							*/
 	DRIVER( vic20crp )	/* Commodore VIC 20CR (PAL)							*/
-	DRIVER( vic20plv )	/* Commodore VIC 20 (PAL, VC1541)					*/
+	DRIVER( vic20plv )	/* Commodore VIC 20 (PAL, VC1540)					*/
 	DRIVER( vc20 )		/* Commodore VIC 20 (PAL, Germany)					*/
-	DRIVER( vc20v )		/* Commodore VIC 20 (PAL, VC1541)					*/
+	DRIVER( vc20v )		/* Commodore VIC 20 (PAL, VC1540)					*/
 	DRIVER( vic20swe )	/* Commodore VIC 20 (Swedish Expanson Kit)			*/
 
 	DRIVER( max )		/* Commodore Max Machine (Japan)					*/
@@ -424,7 +424,8 @@ const game_driver * const drivers[] =
 
 	DRIVER( c128 )		/* Commodore 128 - NTSC								*/
 	DRIVER( c128cr )	/* Commodore 128CR - NTSC (proto?)					*/
-	DRIVER( c128fin )	/* Commodore 128 - PAL (Finnish)					*/
+	DRIVER( c128sfi )	/* Commodore 128 - PAL (Swedish / Finnish)			*/
+	DRIVER( c128fino )	/* Commodore 128 - PAL (Finnish, Unconfirmed dumps)	*/
 	DRIVER( c128fra )	/* Commodore 128 - PAL (French)						*/
 	DRIVER( c128ger )	/* Commodore 128 - PAL (German)						*/
 	DRIVER( c128nor )	/* Commodore 128 - PAL (Norwegian)					*/
@@ -434,6 +435,7 @@ const game_driver * const drivers[] =
 	DRIVER( c128drde )	/* Commodore 128DCR - PAL (German)					*/
 	DRIVER( c128drit )	/* Commodore 128DCR - PAL (Italian)					*/
 	DRIVER( c128drsw )	/* Commodore 128DCR - PAL (Swedish)					*/
+	DRIVER( c128d81 )	/* Commodore 128D/81								*/
 
 	DRIVER( a500n )		/* Commodore Amiga 500 - NTSC						*/
 	DRIVER( a500p )		/* Commodore Amiga 500 - PAL						*/

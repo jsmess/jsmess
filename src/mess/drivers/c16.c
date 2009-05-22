@@ -461,8 +461,7 @@ static MACHINE_DRIVER_START( c16c )
 	MDRV_IMPORT_FROM( c16 )
 
 	/* c16c uses 'real' floppy drive emulation from machine/vc1541.c... 
-	still in progress and slow as hell, atm */
-	/* by default, it is also disabled atm => no floppies for c16c. it will be fixed */
+	still in progress, atm */
 	MDRV_TPI6525_REMOVE("tpi6535_tpi_2")
 	MDRV_TPI6525_ADD("tpi6535_tpi_2", c16_tpi6525_tpi_2_c1551_intf)
 
@@ -509,8 +508,7 @@ static MACHINE_DRIVER_START( plus4c )
 	MDRV_IMPORT_FROM( plus4 )
 
 	/* plus4c uses 'real' floppy drive emulation from machine/vc1541.c... 
-	still in progress and slow as hell, atm */
-	/* by default, it is also disabled atm => no floppies for plus4c. it will be fixed */
+	still in progress, atm */
 	MDRV_TPI6525_REMOVE("tpi6535_tpi_2")
 	MDRV_TPI6525_ADD("tpi6535_tpi_2", c16_tpi6525_tpi_2_c1551_intf)
 
@@ -565,19 +563,19 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( c232 )
-	ROM_REGION (0x40000, "maincpu", 0)
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "318006-01.bin", 0x10000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd) )
 	ROM_LOAD( "318004-01.bin", 0x14000, 0x4000, CRC(dbdc3319) SHA1(3c77caf72914c1c0a0875b3a7f6935cd30c54201) )
 ROM_END
 
 ROM_START( c264 )
-	ROM_REGION (0x40000, "maincpu", 0)
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "basic-264.bin", 0x10000, 0x4000, CRC(6a2fc8e3) SHA1(473fce23afa07000cdca899fbcffd6961b36a8a0) )
 	ROM_LOAD( "kernal-264.bin", 0x14000, 0x4000, CRC(8f32abe7) SHA1(d481faf5fcbb331878dc7851c642d04f26a32873) )
 ROM_END
 
 ROM_START( c364 )
-	ROM_REGION (0x40000, "maincpu", 0)
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "318006.01", 0x10000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd) )
 	ROM_LOAD( "kern364p.bin", 0x14000, 0x4000, CRC(84fd4f7a) SHA1(b9a5b5dacd57ca117ef0b3af29e91998bf4d7e5f) )
 	ROM_LOAD( "317053-01.bin", 0x18000, 0x4000, CRC(4fd1d8cb) SHA1(3b69f6e7cb4c18bb08e203fb18b7dabfa853390f) )
@@ -588,7 +586,7 @@ ROM_END
 
 
 ROM_START( c16 )
-	ROM_REGION (0x40000, "maincpu", 0)
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "318006-01.bin", 0x10000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd) )
 	ROM_SYSTEM_BIOS( 0, "default", "rev. 5" )
 	ROMX_LOAD( "318004-05.bin", 0x14000, 0x4000, CRC(71c07bd4) SHA1(7c7e07f016391174a557e790c4ef1cbe33512cdb), ROM_BIOS(1) )
@@ -599,7 +597,7 @@ ROM_START( c16 )
 ROM_END
 
 ROM_START( c16c )
-	ROM_REGION (0x40000, "maincpu", 0)
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "318006-01.bin", 0x10000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd) )
 	ROM_SYSTEM_BIOS( 0, "default", "rev. 5" )
 	ROMX_LOAD( "318004-05.bin", 0x14000, 0x4000, CRC(71c07bd4) SHA1(7c7e07f016391174a557e790c4ef1cbe33512cdb), ROM_BIOS(1) )
@@ -608,20 +606,16 @@ ROM_START( c16c )
 	ROM_SYSTEM_BIOS( 2, "rev4", "rev. 4" )
 	ROMX_LOAD( "318004-04.bin", 0x14000, 0x4000, CRC(be54ed79) SHA1(514ad3c29d01a2c0a3b143d9c1d4143b1912b793), ROM_BIOS(3) )
 
-	C1551_ROM ("cpu_c1551")
+	C1551_ROM("cpu_c1551")
 ROM_END
 
 ROM_START( c16v )
-	ROM_REGION (0x40000, "maincpu", 0)
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "318006-01.bin", 0x10000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd) )
-	ROM_SYSTEM_BIOS( 0, "default", "rev. 5" )
-	ROMX_LOAD( "318004-05.bin", 0x14000, 0x4000, CRC(71c07bd4) SHA1(7c7e07f016391174a557e790c4ef1cbe33512cdb), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS( 1, "rev3", "rev. 3" )
-	ROMX_LOAD( "318004-03.bin", 0x14000, 0x4000, CRC(77bab934) SHA1(97814dab9d757fe5a3a61d357a9a81da588a9783), ROM_BIOS(2) )
-	ROM_SYSTEM_BIOS( 2, "rev4", "rev. 4" )
-	ROMX_LOAD( "318004-04.bin", 0x14000, 0x4000, CRC(be54ed79) SHA1(514ad3c29d01a2c0a3b143d9c1d4143b1912b793), ROM_BIOS(3) )
+	ROM_LOAD( "318004-05.bin", 0x14000, 0x4000, CRC(71c07bd4) SHA1(7c7e07f016391174a557e790c4ef1cbe33512cdb) )
 
-	VC1541_ROM ("cpu_vc1540")
+	/* we temporarily use -bios to select among vc1541 firmwares, for this system */
+	VC1541_ROM("cpu_vc1540")
 ROM_END
 
 #define rom_c116		rom_c16
@@ -629,13 +623,13 @@ ROM_END
 #define rom_c116v		rom_c16v
 
 ROM_START( c16hun )
-	ROM_REGION (0x40000, "maincpu", 0)
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "318006-01.bin", 0x10000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd) )
 	ROM_LOAD( "hungary.bin", 0x14000, 0x4000, CRC(775f60c5) SHA1(20cf3c4bf6c54ef09799af41887218933f2e27ee) )
 ROM_END
 
 ROM_START( plus4 )
-	ROM_REGION (0x40000, "maincpu", 0)
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "318006-01.bin", 0x10000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd) )
 	ROM_SYSTEM_BIOS( 0, "default", "rev. 5" )
 	ROMX_LOAD( "318005-05.bin", 0x14000, 0x4000, CRC(70295038) SHA1(a3d9e5be091b98de39a046ab167fb7632d053682), ROM_BIOS(1) )
@@ -647,7 +641,7 @@ ROM_START( plus4 )
 ROM_END
 
 ROM_START( plus4c )
-	ROM_REGION (0x40000, "maincpu", 0)
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "318006-01.bin", 0x10000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd) )
 	ROM_SYSTEM_BIOS( 0, "default", "rev. 5" )
 	ROMX_LOAD( "318005-05.bin", 0x14000, 0x4000, CRC(70295038) SHA1(a3d9e5be091b98de39a046ab167fb7632d053682), ROM_BIOS(1) )
@@ -657,21 +651,19 @@ ROM_START( plus4c )
 	ROM_LOAD( "317053-01.bin", 0x18000, 0x4000, CRC(4fd1d8cb) SHA1(3b69f6e7cb4c18bb08e203fb18b7dabfa853390f) )
 	ROM_LOAD( "317054-01.bin", 0x1c000, 0x4000, CRC(109de2fc) SHA1(0ad7ac2db7da692d972e586ca0dfd747d82c7693) )
 
-	C1551_ROM ("cpu_c1551")
+	C1551_ROM("cpu_c1551")
 ROM_END
 
 ROM_START( plus4v )
-	ROM_REGION (0x40000, "maincpu", 0)
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "318006-01.bin", 0x10000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd) )
-	ROM_SYSTEM_BIOS( 0, "default", "rev. 5" )
-	ROMX_LOAD( "318005-05.bin", 0x14000, 0x4000, CRC(70295038) SHA1(a3d9e5be091b98de39a046ab167fb7632d053682), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS( 1, "rev4", "rev. 4" )
-	ROMX_LOAD( "318005-04.bin", 0x14000, 0x4000, CRC(799a633d) SHA1(5df52c693387c0e2b5d682613a3b5a65477311cf), ROM_BIOS(2) )
+	ROM_LOAD( "318005-05.bin", 0x14000, 0x4000, CRC(70295038) SHA1(a3d9e5be091b98de39a046ab167fb7632d053682) )
 
 	ROM_LOAD( "317053-01.bin", 0x18000, 0x4000, CRC(4fd1d8cb) SHA1(3b69f6e7cb4c18bb08e203fb18b7dabfa853390f) )
 	ROM_LOAD( "317054-01.bin", 0x1c000, 0x4000, CRC(109de2fc) SHA1(0ad7ac2db7da692d972e586ca0dfd747d82c7693) )
 
-	VC1541_ROM ("cpu_vc1540")
+	/* we temporarily use -bios to select among vc1541 firmwares, for this system */
+	VC1541_ROM("cpu_vc1540")
 ROM_END
 
 

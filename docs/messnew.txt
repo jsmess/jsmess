@@ -5,6 +5,7 @@ New System Drivers Supported (in no particular order):
 - Amiga 1200 NTSC & PAL (not working)  [incog nito, Dirk Best, Fabio Priuli]
 - Amiga CD32 (not working)  [incog nito, Fabio Priuli]
 - Amstrad NC150  [Roberto Carlos Fernandez Gerhardt, Wilbert Pol]
+- Brailab 4 (not working) [Miodrag Milanovic]
 - CD-I (not working)  [incog nito]
 - CIP-01 [Miodrag Milanovic]
 - Frael Bruc 100-1 [Miodrag Milanovic]
@@ -12,17 +13,16 @@ New System Drivers Supported (in no particular order):
 - MC80.30/31 (not working) [Miodrag Milanovic]
 - Microbee Premium PC85 (not working) [Robbbert]
 - Microbee 64k (not working) [Robbbert]
+- Microprofessor III [Miodrag Milanovic]
 - NTS DreamWriter T200 (not working)  [Roberto Carlos
   Fernandez Gerhardt, Wilbert Pol]
 - PolyMorphic Systems Poly-88 [Miodrag Milanovic]
+- Pravetz 82, 8M and 8C [Miodrag Milanovic]
 - Ringo 470 (not working) [Miodrag Milanovic]
 - Samsung SPC-1000 [Miodrag Milanovic]
+- Sharp Pocket Computer 1245,1250,1255,1260,1261/1262 [Miodrag Milanovic]
 - TK85 [Robbbert, Miodrag Milanovic]
 - Timex Sinclair 1500 [Robbbert, Miodrag Milanovic]
-- Pravetz 82, 8M and 8C [Miodrag Milanovic]
-- Microprofessor III [Miodrag Milanovic]
-- Brailab 4 (not working) [Miodrag Milanovic]
-- Sharp Pocket Computer 1245,1250,1255,1260,1261/1262 [Miodrag Milanovic]
 
 Skeleton drivers : 
 ------------------
@@ -56,6 +56,7 @@ Skeleton drivers :
 - Hector 2HRX
 - Hector 1
 - Jaguar CD
+- Nanos
 - NEC PC-6001
 - NEC PC-6001A
 - NEC PC-6001mkII
@@ -71,6 +72,8 @@ Skeleton drivers :
 - Plydin-601 
 - Plydin-601A
 - Poly-Computer 880
+- Robotron A5120
+- Robotron A5130
 - Schachcomputer SC1
 - Schachcomputer SC2
 - Sega 32X
@@ -87,15 +90,19 @@ Skeleton drivers :
 - Visual 1050
 - Xerox 820
 - XOR-100-12
-- Nanos
-- Robotron A5120
-- Robotron A5130
 
 System Driver Changes:
 ----------------------
 - [ATARI] Added proper labels and dumps to Atari 400, 800 and XE/XL. A
   few are still marked as BAD_DUMP while waiting for confirmation. [Freddy 
   Offenga, Fabio Priuli]
+
+- [C128] Added verified Swedish / Finnish dump [Iggy Drougge, Fabio Priuli]
+
+- [CBM] Added floppy drive firmwares and enabled floppy emulation code 
+  (with some fix) in sx64, c16c, c16v, vic20v, c128d, c128dcr, c128d81. 
+  The code is still not working, but it can be enabled since it does 
+  not crash MESS anymore. [Fabio Priuli]
 
 - [COLECO] Fixed controller bug introduced in 0.131. [Fabio Priuli]
 

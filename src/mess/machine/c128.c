@@ -79,6 +79,7 @@ static int c128_va1617;
 static int c128_cia1_on = 1;
 static UINT8 serial_clock, serial_data, serial_atn;
 static UINT8 vicirq = 0;
+static int emulated_drive = 0;
 
 static void c128_nmi(running_machine *machine)
 {
@@ -1157,18 +1158,46 @@ DRIVER_INIT( c128pal )
 DRIVER_INIT( c128d )
 {
 	DRIVER_INIT_CALL( c128 );
-	drive_config(machine, type_1541, 0, 0, "cpu_vc1540", 8);
+	emulated_drive = 1;
+	drive_config(machine, type_1571, 0, 0, "cpu_vc1571", 8);
 }
 
 DRIVER_INIT( c128dpal )
 {
-	DRIVER_INIT_CALL( c128d );
-	drive_config(machine, type_1541, 0, 0, "cpu_vc1540", 8);
+	DRIVER_INIT_CALL( c128pal );
+	emulated_drive = 1;
+	drive_config(machine, type_1571, 0, 0, "cpu_vc1571", 8);
+}
+
+DRIVER_INIT( c128dcr )
+{
+	DRIVER_INIT_CALL( c128 );
+	emulated_drive = 1;
+	drive_config(machine, type_1571cr, 0, 0, "cpu_vc1571", 8);
+}
+
+DRIVER_INIT( c128dcrp )
+{
+	DRIVER_INIT_CALL( c128pal );
+	emulated_drive = 1;
+	drive_config(machine, type_1571cr, 0, 0, "cpu_vc1571", 8);
+}
+
+DRIVER_INIT( c128d81 )
+{
+	DRIVER_INIT_CALL( c128 );
+	emulated_drive = 1;
+	drive_config(machine, type_1581, 0, 0, "cpu_vc1571", 8);
 }
 
 MACHINE_START( c128 )
 {
-	if (c128_cia1_on)
+	if (emulated_drive)
+	{
+		cbm_serial_config(machine, &cbm_emu_drive_interface);
+		drive_reset();
+	}
+	else if (c128_cia1_on)
 	{
 		cbm_serial_config(machine, &cbm_sim_drive_interface);
 		cbm_serial_reset_write(machine, 0);

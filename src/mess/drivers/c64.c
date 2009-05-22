@@ -676,19 +676,18 @@ ROM_START( sx64 )
 
 	ROM_REGION( 0x80000, "cart", ROMREGION_ERASE00 )
 
-	VC1541_ROM( "cpu_vc1540" )
+	VC1541_ROM("cpu_vc1540")
 ROM_END
 
 ROM_START( dx64 )
 	ROM_REGION( 0x19400, "maincpu", 0 )
     ROM_LOAD( "901226-01.bin", 0x10000, 0x2000, CRC(f833d117) SHA1(79015323128650c742a3694c9429aa91f355905e) )
-    ROM_LOAD( "dx64kern.bin",     0x12000, 0x2000, CRC(58065128) )
+    ROM_LOAD( "dx64kern.bin",  0x12000, 0x2000, CRC(58065128) )
 
 	ROM_REGION( 0x80000, "cart", ROMREGION_ERASE00 )
 
-    // vc1541 roms were not included in submission
-    VC1541_ROM ("cpu_vc1540")
-//	VC1541_ROM (" ")
+    // correct vc1541 roms were not included in submission
+    VC1541_ROM("cpu_vc1540")
 ROM_END
 
 ROM_START( vip64 )
@@ -699,7 +698,7 @@ ROM_START( vip64 )
 
 	ROM_REGION( 0x80000, "cart", ROMREGION_ERASE00 )
 
-	VC1541_ROM( "cpu_vc1540" )
+	VC1541_ROM("cpu_vc1540")
 ROM_END
 
 

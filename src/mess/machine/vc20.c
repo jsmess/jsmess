@@ -604,6 +604,7 @@ DRIVER_INIT( vic20v )
 	has_vc1541 = 1;
 	vc20_common_driver_init(machine);
 	vic6560_init(vic6560_dma_read, vic6560_dma_read_color);
+	drive_config(machine, type_1541, 0, 0, "cpu_vc1540", 8);
 }
 
 DRIVER_INIT( vic20i )
@@ -620,7 +621,7 @@ MACHINE_RESET( vic20 )
 
 	if (has_vc1541)
 	{
-		cbm_serial_config(machine, &cbm_fake_drive_interface);
+		cbm_serial_config(machine, &cbm_emu_drive_interface);
 		drive_reset();
 	}
 	else

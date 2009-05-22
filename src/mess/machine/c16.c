@@ -560,10 +560,13 @@ MACHINE_RESET( c16 )
 		memory_install_write8_handler(space, 0xfec0, 0xfedf, 0, 0, SMH_NOP);
 		memory_install_read8_handler(space, 0xfec0, 0xfedf, 0, 0, SMH_NOP);
 	}
-
+	if (has_c1551)		/* c1551 */
+	{
+		c1551_drive_reset();
+	}
 	if (has_vc1541)		/* vc1541 */
 	{
-		cbm_serial_config(machine, &cbm_fake_drive_interface);
+		cbm_serial_config(machine, &cbm_emu_drive_interface);
 		drive_reset();
 	}
 	else								/* simulated drives */
