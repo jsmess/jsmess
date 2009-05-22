@@ -1,4 +1,4 @@
-0.131.1
+﻿0.131.1
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
@@ -63,6 +63,7 @@ Skeleton drivers :
 - NEC PC-6001mkIISR
 - NEC PC-6600
 - NEC PC-6600SR
+- NEC PC-8500
 - Olivetti L1 M20
 - Olivetti L1 M40
 - Philips VG-5000
@@ -112,7 +113,7 @@ System Driver Changes:
 
 - [KAYPRO] Kayproii now works. [Robbbert]
 
-- [KYOCERA] All systems are now working without sound. [Curt Coder, Fabio Priuli]
+- [KYOCERA] All systems are now working. [Curt Coder, Fabio Priuli]
 
 - [ORIC] Various bioses added for different languages. [Miodrag Milanovic]
 
