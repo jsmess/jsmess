@@ -11,6 +11,7 @@
 
 /*----------- defined in machine/poly88.c -----------*/
 
+DRIVER_INIT(poly88);
 MACHINE_RESET(poly88);
 INTERRUPT_GEN( poly88_interrupt );
 READ8_HANDLER(poly_keyboard_r);

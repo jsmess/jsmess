@@ -8,6 +8,7 @@
 
 #include "driver.h"
 #include "cpu/i8085/i8085.h"
+#include "devices/cassette.h"
 #include "includes/poly88.h"
 
 static ADDRESS_MAP_START(poly88_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -113,6 +114,21 @@ INPUT_PORTS_START( poly88 )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("LF") PORT_CODE(KEYCODE_RALT) 	
 INPUT_PORTS_END
 
+static const struct CassetteOptions poly88_cassette_options =
+{
+	1,		/* channels */
+	16,		/* bits per sample */
+	7200	/* sample frequency */
+};
+
+static const cassette_config poly88_cassette_config =
+{
+	cassette_default_formats,
+	&poly88_cassette_options,
+	CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED
+};
+
+
 static MACHINE_DRIVER_START( poly88 )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",8080, 1853000)
@@ -135,6 +151,9 @@ static MACHINE_DRIVER_START( poly88 )
     MDRV_VIDEO_START(poly88)
     MDRV_VIDEO_UPDATE(poly88)
     
+    /* cassette */
+	MDRV_CASSETTE_ADD( "cassette", poly88_cassette_config )
+	
     /* uart */
 	MDRV_MSM8251_ADD("uart", poly88_usart_interface)
 	
@@ -156,5 +175,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   				  FULLNAME       FLAGS */
-COMP( 1976, poly88,  0,     0, 		 poly88, 	poly88,  0,  	 poly88,"PolyMorphic Systems",   "Poly-88",	 GAME_NOT_WORKING)
+COMP( 1976, poly88,  0,     0, 		 poly88, 	poly88,  poly88, poly88,"PolyMorphic Systems",   "Poly-88",	 GAME_NOT_WORKING)
 

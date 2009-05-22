@@ -9,10 +9,13 @@
 #include "driver.h"
 #include "includes/poly88.h"
 #include "cpu/i8085/i8085.h"
+#include "devices/cassette.h"
+#include "includes/serial.h"
 
 static UINT8 intr = 0;
 static UINT8 last_code = 0;
 static UINT8 int_vector = 0;
+static emu_timer * poly88_cassette_timer;
 
 WRITE8_HANDLER(poly_baud_rate_w)
 {
@@ -121,12 +124,98 @@ static IRQ_CALLBACK (poly88_irq_callback)
 	return int_vector;
 }
 
+
+static struct serial_connection poly88_cassette_serial_connection;
+
+static void poly88_cassette_write(running_machine *machine, int id, unsigned long state)
+{
+	poly88_cassette_serial_connection.input_state = state;
+}
+
+static TIMER_CALLBACK(poly88_cassette_timer_callback)
+{
+	int data;
+//	int current_level;
+//	static int previous_level = 0;
+	static int clk_level = 1;
+	static int clk_level_tape = 1;
+
+	//int_vector = 0xe7;
+	//cpu_set_input_line(cputag_get_cpu(machine, "maincpu"), 0, HOLD_LINE);	
+
+//	if (!(input_port_read(machine, "DSW0") & 0x02))	/* V.24 / Tape Switch */
+	//{
+		/* tape reading */
+/*		if (cassette_get_state(devtag_get_device(machine, "cassette"))&CASSETTE_PLAY)
+		{
+					if (clk_level_tape)
+					{
+						previous_level = (cassette_input(devtag_get_device(machine, "cassette")) > 0.038) ? 1 : 0;
+						clk_level_tape = 0;
+					}
+					else
+					{
+						current_level = (cassette_input(devtag_get_device(machine, "cassette")) > 0.038) ? 1 : 0;
+
+						if (previous_level!=current_level)
+						{
+							data = (!previous_level && current_level) ? 1 : 0;
+
+							set_out_data_bit(pmd85_cassette_serial_connection.State, data);
+							serial_connection_out(machine, &pmd85_cassette_serial_connection);
+							msm8251_receive_clock(devtag_get_device(machine, "uart"));
+
+							clk_level_tape = 1;
+						}
+					}
+		}
+		*/
+		/* tape writing */
+		if (cassette_get_state(devtag_get_device(machine, "cassette"))&CASSETTE_RECORD)
+		{
+			data = get_in_data_bit(poly88_cassette_serial_connection.input_state);
+			data ^= clk_level_tape;
+			cassette_output(devtag_get_device(machine, "cassette"), data&0x01 ? 1 : -1);
+
+			if (!clk_level_tape)
+				msm8251_transmit_clock(devtag_get_device(machine, "uart"));
+
+			clk_level_tape = clk_level_tape ? 0 : 1;
+
+			return;
+		}
+
+		clk_level_tape = 1;
+
+		if (!clk_level)
+			msm8251_transmit_clock(devtag_get_device(machine, "uart"));
+		clk_level = clk_level ? 0 : 1;
+//	}
+}
+
+
+static TIMER_CALLBACK( setup_machine_state ) 
+{
+	msm8251_connect(devtag_get_device(machine, "uart"), &poly88_cassette_serial_connection);
+}
+
+DRIVER_INIT ( poly88 )
+{
+	poly88_cassette_timer = timer_alloc(machine, poly88_cassette_timer_callback, NULL);
+	timer_adjust_periodic(poly88_cassette_timer, attotime_zero, 0, ATTOTIME_IN_HZ(2400));
+
+	serial_connection_init(machine, &poly88_cassette_serial_connection);
+	serial_connection_set_in_callback(machine, &poly88_cassette_serial_connection, poly88_cassette_write);
+}
+
 MACHINE_RESET(poly88)
 {	
 	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), poly88_irq_callback);
-	timer_pulse(machine, ATTOTIME_IN_HZ(2400), NULL, 0, keyboard_callback);
+	timer_pulse(machine, ATTOTIME_IN_HZ(24000), NULL, 0, keyboard_callback);
 	intr = 0;
 	last_code = 0;
+		
+	timer_set(machine,  attotime_zero, NULL, 0, setup_machine_state );
 }
 
 INTERRUPT_GEN( poly88_interrupt )
@@ -136,7 +225,7 @@ INTERRUPT_GEN( poly88_interrupt )
 }
 static void poly88_usart_rxready (const device_config *device, int state)
 {
-	int_vector = 0xe7;
+	//int_vector = 0xe7;
 	//cpu_set_input_line(device, 0, HOLD_LINE);	
 }
 const msm8251_interface poly88_usart_interface=
