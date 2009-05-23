@@ -6,8 +6,8 @@
 
 	NEC PC-88xx Models (and similar machines like PC-80xx and PC-98DO)
 
-	Model            | release |      CPU     |                      BIOS components                        |       |
-                     |         |     clock    | N-BASIC | N88-BASIC | N88-BASIC Enh |  Sound  |  CD |  Dict |  Disk | Notes
+    Model            | release |      CPU     |                      BIOS components                        |       |
+	                 |         |     clock    | N-BASIC | N88-BASIC | N88-BASIC Enh |  Sound  |  CD |  Dict |  Disk | Notes
 	==================================================================================================================================
 	PC-8001          | 1979-03 |   z80A @ 4   |    X    |     -     |       -       |    -    |  -  |   -   |   -   |
 	PC-8001A         |   ??    |   z80A @ 4   |    X    |     -     |       -       |    -    |  -  |   -   |   -   | (U)
@@ -54,9 +54,9 @@
 	(KE): Kanji Enhanced ROM
 
 	Memory mounting locations: 
-     * N-BASIC 0x0000 - 0x5fff, N-BASIC Expansion & Graph Enhhancement 0x6000 - 0x7fff
-     * N-BASIC 0x0000 - 0x5fff, N-BASIC Expansion & Graph Enhhancement 0x6000 - 0x7fff
-     * N88-BASIC 0x0000 - 0x7fff, N88-BASIC Expansion & Graph Enhhancement 0x6000 - 0x7fff
+	 * N-BASIC 0x0000 - 0x5fff, N-BASIC Expansion & Graph Enhhancement 0x6000 - 0x7fff
+	 * N-BASIC 0x0000 - 0x5fff, N-BASIC Expansion & Graph Enhhancement 0x6000 - 0x7fff
+	 * N88-BASIC 0x0000 - 0x7fff, N88-BASIC Expansion & Graph Enhhancement 0x6000 - 0x7fff
 	 * Sound BIOS: 0x6000 - 0x7fff
 	 * CD-ROM BISO: 0x0000 - 0x7fff
 	 * Dictionary: 0xc000 - 0xffff (32 Banks)
