@@ -28,6 +28,9 @@
 
 	TODO:
 
+	-	--- memory leak warning ---
+		allocation #004834, 256 bytes (src/lib/util/astring.c:127)
+		a total of 256 bytes were not free()'d
 	- un-Y2K-hack tandy200
 	- keyboard is unresponsive for couple of seconds after boot
 	- soft power on/off
@@ -37,13 +40,13 @@
 	- pc8201 128K ROM cartridge
 	- pc8201 NEC PC-8233 floppy controller
 	- pc8201 NEC floppy disc drives (PC-8031-1W, PC-8031-2W, PC-80S31)
-	- pc8201 NEC PC-8240 video monitor adapter
 	- trsm100 Tandy Portable Disk Drive (TPDD: 100k 3½", TPDD2: 200k 3½") (undumped HD63A01V1 MCU + full custom uPD65002, serial comms via the missing IM6042, not going to happen anytime soon)
 	- trsm100 Chipmunk disk drive (384k 3½") (full custom logic, not going to happen)
-	- kc85 RS232/modem select
+	- trsm100 RS232/modem select
+	- tandy200 UART8251
 	- tandy200 RTC alarm
 	- tandy200 TCM5089 sound
-	- tandy200 TP timer real value
+	- international keyboard option ROMs
 
 */
 
@@ -238,10 +241,10 @@ static WRITE8_HANDLER( uart_ctrl_w )
 	kc85_state *state = space->machine->driver_data;
 
 	im6402_sbs_w(state->im6402, BIT(data, 0));
-	im6402_epe_w(state->im6402, BIT(data, 0));
-	im6402_pi_w(state->im6402, BIT(data, 0));
-	im6402_cls1_w(state->im6402, BIT(data, 0));
-	im6402_cls2_w(state->im6402, BIT(data, 0));
+	im6402_epe_w(state->im6402, BIT(data, 1));
+	im6402_pi_w(state->im6402, BIT(data, 2));
+	im6402_cls1_w(state->im6402, BIT(data, 3));
+	im6402_cls2_w(state->im6402, BIT(data, 4));
 */
 }
 
@@ -331,6 +334,11 @@ static WRITE8_HANDLER( modem_w )
 		7		
 
 	*/
+/*
+	kc85_state *state = space->machine->driver_data;
+
+	mc14412_en_w(state->mc14412, BIT(data, 1));
+*/
 }
 
 static WRITE8_HANDLER( kc85_ctrl_w )
@@ -485,6 +493,20 @@ static ADDRESS_MAP_START( tandy200_mem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kc85_io, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_UNMAP_HIGH
+//	AM_RANGE(0x70, 0x70) AM_MIRROR(0x0f) optional RAM unit
+//	AM_RANGE(0x80, 0x80) AM_MIRROR(0x0f) optional I/O controller unit
+//	AM_RANGE(0x90, 0x90) AM_MIRROR(0x0f) optional answering telephone unit
+//	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) optional modem
+	AM_RANGE(0xb0, 0xb7) AM_MIRROR(0x08) AM_DEVREADWRITE(PIO8155_TAG, pio8155_r, pio8155_w)
+//	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x0f) AM_DEVREADWRITE(IM6402_TAG, im6402_data_r, im6402_data_w)
+	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_READWRITE(uart_status_r, uart_ctrl_w)
+	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0f) AM_READWRITE(keyboard_r, kc85_ctrl_w)
+	AM_RANGE(0xf0, 0xf0) AM_MIRROR(0x0e) AM_READWRITE(kc85_lcd_status_r, kc85_lcd_command_w)
+	AM_RANGE(0xf1, 0xf1) AM_MIRROR(0x0e) AM_READWRITE(kc85_lcd_data_r, kc85_lcd_data_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( trsm100_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 //	AM_RANGE(0x70, 0x70) AM_MIRROR(0x0f) optional RAM unit
 //	AM_RANGE(0x80, 0x80) AM_MIRROR(0x0f) optional I/O controller unit
@@ -1296,7 +1318,6 @@ static MACHINE_DRIVER_START( kc85 )
 	/* devices */
 	MDRV_PIO8155_ADD(PIO8155_TAG, XTAL_4_9152MHz/2, kc85_8155_intf)
 	MDRV_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, kc85_upd1990a_intf)
-//	MDRV_MC14412_ADD(MC14412_TAG, XTAL_1MHz)
 
 	/* printer */
 	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
@@ -1348,7 +1369,14 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( trsm100 )
 	MDRV_IMPORT_FROM(kc85)
 
+	/* basic machine hardware */
+	MDRV_CPU_MODIFY(I8085_TAG)
+	MDRV_CPU_IO_MAP(trsm100_io)
+
 	MDRV_MACHINE_START(trsm100)
+
+	/* devices */
+//	MDRV_MC14412_ADD(MC14412_TAG, XTAL_1MHz)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( tandy200 )
@@ -1377,6 +1405,7 @@ static MACHINE_DRIVER_START( tandy200 )
 	/* devices */
 	MDRV_PIO8155_ADD(PIO8155_TAG, XTAL_4_9152MHz/2, tandy200_8155_intf)
 	MDRV_RP5C01A_ADD(RP5C01A_TAG, XTAL_32_768kHz, tandy200_rp5c01a_intf)
+//	MDRV_UART8251_ADD(UART8251_TAG, XTAL_4_9152MHz/2, tandy200_8255_intf)
 //	MDRV_MC14412_ADD(MC14412_TAG, XTAL_1MHz)
 
 	/* printer */

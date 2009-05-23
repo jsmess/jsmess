@@ -43,7 +43,9 @@ struct _kc85_state
 	int iosel;				/* serial interface select */
 
 	const device_config *hd44102[10];
+	const device_config *im6042;
 	const device_config *upd1990a;
+	const device_config *mc14412;
 	const device_config *centronics;
 	const device_config *speaker;
 };
@@ -66,6 +68,9 @@ struct _tandy200_state
 	int bell;				/* bell output */
 
 	const device_config *hd61830;
+	const device_config *im6042;
+	const device_config *mc14412;
+	const device_config *tcm5089;
 	const device_config *centronics;
 	const device_config *speaker;
 };
