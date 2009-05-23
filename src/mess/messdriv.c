@@ -1172,6 +1172,7 @@ const game_driver * const drivers[] =
 	/* AC1 */
 	DRIVER(ac1) 	/* 1984 Amateurcomputer AC1				*/
 	DRIVER(ac1_32) 	/* 1984 Amateurcomputer AC1 (32 lines)	*/
+	DRIVER(ac1scch) 	/* 1984 Amateurcomputer AC1 SCCH		*/
 
 	/* DEC VT100 */
 	DRIVER(vt100)

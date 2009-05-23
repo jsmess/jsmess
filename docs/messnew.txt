@@ -2,6 +2,7 @@
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
+- AC1 SCCH [Miodrag Milanovic]
 - Amiga 1200 NTSC & PAL (not working)  [incog nito, Dirk Best, Fabio Priuli]
 - Amiga CD32 (not working)  [incog nito, Fabio Priuli]
 - Amstrad NC150  [Roberto Carlos Fernandez Gerhardt, Wilbert Pol]
