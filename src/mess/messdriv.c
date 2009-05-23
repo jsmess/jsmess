@@ -568,6 +568,11 @@ const game_driver * const drivers[] =
 	DRIVER( mz80kj )	/* 1979 Sharp MZ80K									*/
 	DRIVER( mz80k )		/* 1979 Sharp MZ80K									*/
 
+	DRIVER( x1 )		/* 1982 Sharp X1									*/
+	DRIVER( x1ck )		/* 1984 Sharp X1Ck									*/
+	DRIVER( x1turbo )	/* 1984 Sharp X1 Turbo								*/
+	DRIVER( x1turboz )	/* 1986 Sharp X1 TurboZ								*/
+
 	DRIVER( x68000 )	/* Sharp X68000 (1987)								*/
 
 	/* SILICON GRAPHICS */

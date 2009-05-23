@@ -1,4 +1,4 @@
-﻿0.131.1
+0.131.1
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
@@ -80,6 +80,9 @@ Skeleton drivers :
 - Sega 32X
 - Sega CD
 - Sega Mega-CD
+- Sharp X1
+- Sharp X1 Turbo
+- Sharp X1 Turbo Z
 - SNK NeoGeo AES
 - SNK NeoGeo CD
 - SNK NeoGeo CDZ
