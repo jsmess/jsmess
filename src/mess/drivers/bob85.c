@@ -11,6 +11,8 @@
 
 static ADDRESS_MAP_START(bob85_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE( 0x0000, 0x02ff ) AM_ROM
+	AM_RANGE( 0x0300, 0x1fff ) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bob85_io , ADDRESS_SPACE_IO, 8)
@@ -62,9 +64,9 @@ SYSTEM_CONFIG_END
 
 /* ROM definition */
 ROM_START( bob85 )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-  ROM_LOAD( "bob85.rom", 0x0000, 0x0300, CRC(adde33a8) SHA1(00f26dd0c52005e7705e6cc9cb11a20e572682c6))
-
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "bob85.rom", 0x0000, 0x0300, CRC(adde33a8) SHA1(00f26dd0c52005e7705e6cc9cb11a20e572682c6))
+	ROM_FILL(6,1,0)	// there are one or more bad bytes at the start, this fixes the hung state
 ROM_END
 
 /* Driver */

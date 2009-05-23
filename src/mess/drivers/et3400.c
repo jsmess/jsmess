@@ -4,6 +4,8 @@
 
         12/05/2009 Skeleton driver.
 
+The incorrect processor is being used here.
+
 ****************************************************************************/
 
 #include "driver.h"
@@ -11,6 +13,8 @@
 
 static ADDRESS_MAP_START(et3400_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE( 0x0000, 0x03ff ) AM_ROM
+	AM_RANGE( 0x0400, 0x3fff ) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( et3400_io , ADDRESS_SPACE_IO, 8)
