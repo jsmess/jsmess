@@ -19,6 +19,7 @@ New System Drivers Supported (in no particular order):
   PC-8801MC [Fabio Priuli]
 - NTS DreamWriter T200 (not working)  [Roberto Carlos
   Fernandez Gerhardt, Wilbert Pol]
+ -PC/M Mugler [Miodrag Milanovic]
 - PolyMorphic Systems Poly-88 [Miodrag Milanovic]
 - PolyMorphic Systems Poly-8813 (not working) [Miodrag Milanovic]
 - Pravetz 82, 8M and 8C [Miodrag Milanovic]

@@ -188,7 +188,7 @@ ROM_START( ac1scch )
 	ROM_SYSTEM_BIOS( 3, "v1088", "Version 10/88" )	
 	ROMX_LOAD( "mon_v1088.bin",  0x0000, 0x1000, CRC(bbb0a6df) SHA1(de9389e142541a8b5ff238b59e98bf571c794bef),ROM_BIOS(4))	
 	ROM_REGION(0x0800, "gfx1",0)	
-	ROM_LOAD ("zg_256.bin", 0x0000, 0x0800, CRC(fbfaf5da) SHA1(667568c5909e9a17675cf09dfbce2fc090c420ab))
+	ROM_LOAD ("zg_scch.bin", 0x0000, 0x0800, CRC(fbfaf5da) SHA1(667568c5909e9a17675cf09dfbce2fc090c420ab))
 ROM_END
 
 /* Driver */

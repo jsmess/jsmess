@@ -320,6 +320,7 @@ DRVLIBS = \
 	$(MESSOBJ)/palm.a \
 	$(MESSOBJ)/pasogo.a \
 	$(MESSOBJ)/pc.a \
+	$(MESSOBJ)/pcm.a \
 	$(MESSOBJ)/pcshare.a \
 	$(MESSOBJ)/pc8401a.a \
 	$(MESSOBJ)/pdp1.a \
@@ -1312,6 +1313,9 @@ $(MESSOBJ)/poly88.a:      \
 	$(MESS_DRIVERS)/poly88.o \
 	$(MESS_MACHINE)/poly88.o \
 	$(MESS_VIDEO)/poly88.o \
+
+$(MESSOBJ)/pcm.a: \
+	$(MESS_DRIVERS)/pcm.o	\
 		
 $(MESSOBJ)/grundy.a: \
 	$(MESS_DRIVERS)/newbrain.o \
@@ -1400,7 +1404,7 @@ $(MESSOBJ)/skeleton.a: \
 	$(MESS_DRIVERS)/camplynx.o \
 	$(MESS_DRIVERS)/nanos.o \
 	$(MESS_DRIVERS)/a51xx.o \
-	$(MESS_DRIVERS)/x1.o		\
+	$(MESS_DRIVERS)/x1.o	\
 	
 #-------------------------------------------------
 # layout dependencies

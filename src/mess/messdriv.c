@@ -1167,13 +1167,15 @@ const game_driver * const drivers[] =
 	DRIVER( compani1 )  /* 1990 Kompanion 1              */
 
 	/* Kramer */
-	DRIVER(kramermc) /* 1987 Kramer MC				*/
+	DRIVER(kramermc) 	/* 1987 Kramer MC				 */
 
 	/* AC1 */
 	DRIVER(ac1) 	/* 1984 Amateurcomputer AC1				*/
 	DRIVER(ac1_32) 	/* 1984 Amateurcomputer AC1 (32 lines)	*/
-	DRIVER(ac1scch) 	/* 1984 Amateurcomputer AC1 SCCH		*/
+	DRIVER(ac1scch) /* 1984 Amateurcomputer AC1 SCCH		*/
 
+	DRIVER( pcm )   /* PC/M Mugler 							*/
+	
 	/* DEC VT100 */
 	DRIVER(vt100)
 	
@@ -1317,6 +1319,6 @@ const game_driver * const drivers[] =
 	DRIVER( m40 )
 	DRIVER( nanos )
 	DRIVER( a5120 )
-	DRIVER( a5130 )
+	DRIVER( a5130 )	
 
 #endif /* DRIVER_RECURSIVE */
