@@ -41,6 +41,8 @@
 
 static ADDRESS_MAP_START( vg5k_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE( 0x0000, 0x3fff ) AM_ROM
+	AM_RANGE( 0x4000, 0xffff ) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vg5k_io , ADDRESS_SPACE_IO, 8)
@@ -93,7 +95,9 @@ ROM_START( vg5k )
 	ROMX_LOAD( "vg5k.bin",  0x0000, 0x4000, CRC(a6998ff8) SHA1(881ba594be0a721a999378312aea0c3c1c7b2b58), ROM_BIOS(1) )			// dumped from a Radiola VG-5000
 	ROM_SYSTEM_BIOS(1, "alt", "VG 5000 (alt)")
 	ROMX_LOAD( "vg5k.rom", 0x0000, 0x4000, BAD_DUMP CRC(a6f4a0ea) SHA1(58eccce33cc21fc17bc83921018f531b8001eda3), ROM_BIOS(2) )	// from dcvg5k
-	ROM_LOAD( "charset.rom", 0x4000, 0x2000, BAD_DUMP CRC(b2f49eb3) SHA1(d0ef530be33bfc296314e7152302d95fdf9520fc) )			// from dcvg5k
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "charset.rom", 0x0000, 0x2000, BAD_DUMP CRC(b2f49eb3) SHA1(d0ef530be33bfc296314e7152302d95fdf9520fc) )			// from dcvg5k
 ROM_END
 
 static SYSTEM_CONFIG_START( vg5k )
